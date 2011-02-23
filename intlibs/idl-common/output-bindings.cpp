@@ -394,6 +394,8 @@ static void lua_streamTypedefs(
 				continue;
 
 			string type = t.type;
+
+			// Use void* rather than wchar*
 			if (t.type == "wchar*")
 			{
 				type = "void*";
@@ -434,84 +436,3 @@ static void lua_streamConstants(
 		stream << "//End of defines.\n";
 	}
 }
-
-/**
- * Stream utility functions ued to create/delete and 
- * access MoSync data structures.
- */
-/*
-static void lua_streamHelperApi(ostream& stream)
-{
-	stream << "// Start of add-on API.\n";
-
-	// maScaleImage
-	stream << "#define SCALETYPE_NEAREST_NEIGHBOUR 1\n";
-	stream << "#define SCALETYPE_BILINEAR 2\n";
-	stream << "int maImageScale(MAHandle sourceImage, MARect* sourceRect, MAHandle destImagePlaceholder, int scaledImageWidth, int scaledImageHeight, int scaleType);\n";
-	stream << "int maImageScaleProportionally(MAHandle sourceImage, MARect* sourceRect, MAHandle destImagePlaceholder, double scaleFactor, int scaleType);\n";
-
-	// System support for event handling.
-	stream << "void maEnvironmentInitialize();\n";
-	stream << "void maEnvironmentHandleEvent(MAEvent* event);\n";
-
-	stream << "// End of add-on API.\n";
-
-	// -----------------------------------------------
-
-	stream << "// Start of helper API.\n";
-
-	// MAEvent
-	stream << "MAEvent* maEventCreate();\n";
-	stream << "void maEventDelete(MAEvent* event);\n";
-	stream << "int maEventGetType(MAEvent* event);\n";
-	stream << "int maEventGetKey(MAEvent* event);\n";
-	stream << "int maEventGetNativeKey(MAEvent* event);\n";
-	stream << "uint maEventGetCharacter(MAEvent* event);\n";
-	stream << "int maEventGetX(MAEvent* event);\n";
-	stream << "int maEventGetY(MAEvent* event);\n";
-	stream << "int maEventGetState(MAEvent* event);\n";
-	stream << "MAHandle maEventGetConnHandle(MAEvent* event);\n";
-	stream << "int maEventGetConnOpType(MAEvent* event);\n";
-	stream << "int maEventGetConnResult(MAEvent* event);\n";
-	stream << "int maEventGetTextBoxResult(MAEvent* event);\n";
-	stream << "int maEventGetTextBoxLength(MAEvent* event);\n";
-	stream << "void* maEventGetData(MAEvent* event);\n";
-
-	// MAExtent
-	stream << "MAExtent EXTENT(int x, int y);\n";
-	stream << "int EXTENT_X(MAExtent extent);\n";
-	stream << "int EXTENT_Y(MAExtent extent);\n";
-
-	// MAPoint2d
-	stream << "MAPoint2d* maPointCreate();\n";
-	stream << "void maPointDelete(MAPoint2d* point);\n";
-	stream << "int maPointGetX(MAPoint2d* point);\n";
-	stream << "int maPointGetY(MAPoint2d* point);\n";
-	stream << "void maPointSetX(MAPoint2d* point, int x);\n";
-	stream << "void maPointSetY(MAPoint2d* point, int y);\n";
-
-	// MARect
-	stream << "MARect* maRectCreate();\n";
-	stream << "void maRectDelete(MARect* rect);\n";
-	stream << "int maRectGetLeft(MARect* rect);\n";
-	stream << "int maRectGetTop(MARect* rect);\n";
-	stream << "int maRectGetWidth(MARect* rect);\n";
-	stream << "int maRectGetHeight(MARect* rect);\n";
-	stream << "void maRectSetLeft(MARect* rect, int left);\n";
-	stream << "void maRectSetTop(MARect* rect, int top);\n";
-	stream << "void maRectSetWidth(MARect* rect, int width);\n";
-	stream << "void maRectSetHeight(MARect* rect, int height);\n";
-
-	// MACopyData
-	stream << "MACopyData* maCopyDataCreate(MAHandle dst, int dstOffset, MAHandle src, int srcOffset, int size);\n";
-	stream << "void maCopyDataDelete(MACopyData* data);\n";
-
-	// Buffer of type void*
-	stream << "void* maBufferCreate(int size);\n";
-	stream << "void maBufferDelete(void* buffer);\n";
-	stream << "int maBufferGet(void* buffer, int offset);\n";
-	stream << "void maBufferSet(void* buffer, int offset, int value);\n";
-
-	stream << "// End of helper API.\n";
-}
-*/
