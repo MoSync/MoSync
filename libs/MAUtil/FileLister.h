@@ -38,6 +38,7 @@ public:
 	/**
 	* \see maFileListStart()
 	* Closes the active list, if any.
+	* Returns \< 0 on error.
 	*/
 	int start(const char* dir, const char* filter = "*");
 
