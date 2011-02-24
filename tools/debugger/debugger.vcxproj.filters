@@ -1,0 +1,102 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="pipe-tool">
+      <UniqueIdentifier>{46f0e416-cd0b-4d06-9f6a-5a7f7f77549b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="intlibs">
+      <UniqueIdentifier>{b7868fd3-8e7f-434b-86b4-e1d75fb41f53}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="expression">
+      <UniqueIdentifier>{111467b2-7675-4c97-acb3-0e9d1f0b043a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\pipe-tool\disas.c">
+      <Filter>pipe-tool</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\intlibs\helpers\TranslateSyscall.cpp">
+      <Filter>intlibs</Filter>
+    </ClCompile>
+    <ClCompile Include="expression.cpp">
+      <Filter>expression</Filter>
+    </ClCompile>
+    <ClCompile Include="expression_tree.cpp">
+      <Filter>expression</Filter>
+    </ClCompile>
+    <ClCompile Include="Token.cpp">
+      <Filter>expression</Filter>
+    </ClCompile>
+    <ClCompile Include="Value.cpp">
+      <Filter>expression</Filter>
+    </ClCompile>
+    <ClCompile Include="async.cpp" />
+    <ClCompile Include="cleanup.cpp" />
+    <ClCompile Include="cmd_break.cpp" />
+    <ClCompile Include="cmd_data.cpp" />
+    <ClCompile Include="cmd_exec.cpp" />
+    <ClCompile Include="cmd_file.cpp" />
+    <ClCompile Include="cmd_gdb.cpp" />
+    <ClCompile Include="cmd_stack.cpp" />
+    <ClCompile Include="cmd_symbol.cpp" />
+    <ClCompile Include="cmd_target.cpp" />
+    <ClCompile Include="cmd_var.cpp" />
+    <ClCompile Include="command.cpp" />
+    <ClCompile Include="debugger.cpp" />
+    <ClCompile Include="helpers.cpp" />
+    <ClCompile Include="initCommands.cpp" />
+    <ClCompile Include="..\..\intlibs\helpers\intutil.cpp" />
+    <ClCompile Include="memory.cpp" />
+    <ClCompile Include="old_expr.cpp" />
+    <ClCompile Include="remoteReadThread.cpp" />
+    <ClCompile Include="stab_helpers.cpp" />
+    <ClCompile Include="StubConnection.cpp" />
+    <ClCompile Include="StubConnLow.cpp" />
+    <ClCompile Include="Thread.cpp" />
+    <ClCompile Include="userInputThread.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\pipe-tool\disas.h">
+      <Filter>pipe-tool</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\intlibs\helpers\TranslateSyscall.h">
+      <Filter>intlibs</Filter>
+    </ClInclude>
+    <ClInclude Include="expression.h">
+      <Filter>expression</Filter>
+    </ClInclude>
+    <ClInclude Include="expression_tree.h">
+      <Filter>expression</Filter>
+    </ClInclude>
+    <ClInclude Include="ParseException.h">
+      <Filter>expression</Filter>
+    </ClInclude>
+    <ClInclude Include="Token.h">
+      <Filter>expression</Filter>
+    </ClInclude>
+    <ClInclude Include="Value.h">
+      <Filter>expression</Filter>
+    </ClInclude>
+    <ClInclude Include="async.h" />
+    <ClInclude Include="cleanup.h" />
+    <ClInclude Include="cmd_break.h" />
+    <ClInclude Include="cmd_data.h" />
+    <ClInclude Include="cmd_stack.h" />
+    <ClInclude Include="command.h" />
+    <ClInclude Include="commandInterface.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="globals.h" />
+    <ClInclude Include="helpers.h" />
+    <ClInclude Include="..\..\intlibs\helpers\intutil.h" />
+    <ClInclude Include="memory.h" />
+    <ClInclude Include="old_expr.h" />
+    <ClInclude Include="opHandler.h" />
+    <ClInclude Include="remote.h" />
+    <ClInclude Include="remoteReadThread.h" />
+    <ClInclude Include="stab_helpers.h" />
+    <ClInclude Include="StubConnection.h" />
+    <ClInclude Include="StubConnLow.h" />
+    <ClInclude Include="Thread.h" />
+    <ClInclude Include="userInputThread.h" />
+  </ItemGroup>
+</Project>

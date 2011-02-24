@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2DA2D2D5-182A-43B6-9519-8434BF5EDCCE}</ProjectGuid>
+    <RootNamespace>debugger</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>../../intlibs;../../runtimes/java/source;../../runtimes/cpp/core;../pipe-tool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;PTAH_EXPORTS;LOGGING_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Dbghelp.lib;..\..\intlibs\net\$(Configuration)\net.lib;..\..\intlibs\bluetooth\$(Configuration)\bluetooth.lib;..\..\intlibs\helpers\platforms\windows\$(Configuration)\windows.lib;..\..\intlibs\demangle\$(Configuration)\demangle.lib;..\..\intlibs\stabs\$(Configuration)\stabs.lib;Ws2_32.lib;libirprops.a;SDL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath)  $(MOSYNCDIR)\bin\mdb.exe /Y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>../../intlibs;../../runtimes/java/source;../../runtimes/cpp/core;../pipe-tool;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;PTAH_EXPORTS;LOGGING_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>Dbghelp.lib;..\..\intlibs\net\$(Configuration)\net.lib;..\..\intlibs\bluetooth\$(Configuration)\bluetooth.lib;..\..\intlibs\helpers\platforms\windows\$(Configuration)\windows.lib;..\..\intlibs\demangle\$(Configuration)\demangle.lib;..\..\intlibs\stabs\$(Configuration)\stabs.lib;Ws2_32.lib;libirprops.a;SDL.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Console</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath)  $(MOSYNCDIR)\bin\mdb.exe /Y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\pipe-tool\disas.c" />
+    <ClCompile Include="..\..\intlibs\helpers\TranslateSyscall.cpp" />
+    <ClCompile Include="expression.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4800;4146;4018;4804;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4800;4146;4018;4804;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="expression_tree.cpp">
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PreprocessToFile>
+      <PreprocessSuppressLineNumbers Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</PreprocessSuppressLineNumbers>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4800;4146;4018;4804;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4800;4146;4018;4804;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="Token.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4800;4146;4018;4804;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4800;4146;4018;4804;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="Value.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4800;4146;4018;4804;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Disabled</Optimization>
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">4800;4146;4018;4804;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="async.cpp" />
+    <ClCompile Include="cleanup.cpp" />
+    <ClCompile Include="cmd_break.cpp" />
+    <ClCompile Include="cmd_data.cpp" />
+    <ClCompile Include="cmd_exec.cpp" />
+    <ClCompile Include="cmd_file.cpp" />
+    <ClCompile Include="cmd_gdb.cpp" />
+    <ClCompile Include="cmd_stack.cpp" />
+    <ClCompile Include="cmd_symbol.cpp" />
+    <ClCompile Include="cmd_target.cpp" />
+    <ClCompile Include="cmd_var.cpp" />
+    <ClCompile Include="command.cpp" />
+    <ClCompile Include="debugger.cpp" />
+    <ClCompile Include="helpers.cpp" />
+    <ClCompile Include="initCommands.cpp" />
+    <ClCompile Include="..\..\intlibs\helpers\intutil.cpp" />
+    <ClCompile Include="memory.cpp" />
+    <ClCompile Include="old_expr.cpp">
+      <DisableSpecificWarnings Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">4800;4146;4018;4804;4805;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <ClCompile Include="remoteReadThread.cpp" />
+    <ClCompile Include="stab_helpers.cpp" />
+    <ClCompile Include="StubConnection.cpp" />
+    <ClCompile Include="StubConnLow.cpp" />
+    <ClCompile Include="Thread.cpp" />
+    <ClCompile Include="userInputThread.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\pipe-tool\disas.h" />
+    <ClInclude Include="..\..\intlibs\helpers\TranslateSyscall.h" />
+    <ClInclude Include="expression.h" />
+    <ClInclude Include="expression_tree.h" />
+    <ClInclude Include="ParseException.h" />
+    <ClInclude Include="Token.h" />
+    <ClInclude Include="Value.h" />
+    <ClInclude Include="async.h" />
+    <ClInclude Include="cleanup.h" />
+    <ClInclude Include="cmd_break.h" />
+    <ClInclude Include="cmd_data.h" />
+    <ClInclude Include="cmd_stack.h" />
+    <ClInclude Include="command.h" />
+    <ClInclude Include="commandInterface.h" />
+    <ClInclude Include="config.h" />
+    <ClInclude Include="globals.h" />
+    <ClInclude Include="helpers.h" />
+    <ClInclude Include="..\..\intlibs\helpers\intutil.h" />
+    <ClInclude Include="memory.h" />
+    <ClInclude Include="old_expr.h" />
+    <ClInclude Include="opHandler.h" />
+    <ClInclude Include="remote.h" />
+    <ClInclude Include="remoteReadThread.h" />
+    <ClInclude Include="stab_helpers.h" />
+    <ClInclude Include="StubConnection.h" />
+    <ClInclude Include="StubConnLow.h" />
+    <ClInclude Include="Thread.h" />
+    <ClInclude Include="userInputThread.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\intlibs\bluetooth\bluetooth.vcxproj">
+      <Project>{bdf8ff83-5382-4420-8bee-e2bd0b8e41e5}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\intlibs\demangle\demangle.vcxproj">
+      <Project>{5d4d3ad0-f82b-4574-8a5c-4dc16f4dd7f6}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\intlibs\net\net.vcxproj">
+      <Project>{0de8de07-507d-4a63-bdc4-ee2151723707}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+    <ProjectReference Include="..\..\intlibs\stabs\stabs.vcxproj">
+      <Project>{2015d7fc-3349-4afb-849c-46ce1b7aefa2}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

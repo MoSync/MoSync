@@ -91,7 +91,7 @@ int copyHackExe(File& inFile, File& outFile, u32 uid) {
 	inFile.seekg(0, std::ios_base::end);
 	if(!inFile.good())
 		return inFile.rdstate();
-	Array<char> buf(inFile.tellg());
+	Array<char> buf((size_t)inFile.tellg());
 	char* buffer(buf.p());
 	inFile.seekg(0, std::ios_base::beg);
 	inFile.read(buffer, (int)buf.size());
@@ -181,7 +181,7 @@ static int copyHackApp(File& inFile, File& outFile, uint uid) {
 	inFile.seekg(0, std::ios_base::end);
 	if(!inFile.good())
 		return inFile.rdstate();
-	Array<char> buf(inFile.tellg());
+	Array<char> buf((size_t)inFile.tellg());
 	char* buffer(buf.p());
 	inFile.seekg(0, std::ios_base::beg);
 	inFile.read(buffer, (int)buf.size());

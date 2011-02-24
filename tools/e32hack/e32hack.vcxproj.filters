@@ -1,0 +1,93 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="deflate">
+      <UniqueIdentifier>{5586369f-2d2a-4bbc-8741-061cd433a590}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deflate\deflate">
+      <UniqueIdentifier>{7108af4a-09ad-4e11-9b2c-441c9a7e211a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deflate\host">
+      <UniqueIdentifier>{82fcf216-2f97-4a71-bb4c-1d3805432de3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="deflate\inc">
+      <UniqueIdentifier>{4d5e29f0-c3ba-4c29-8820-43667cce219d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="deflate\deflate\compress.cpp">
+      <Filter>deflate\deflate</Filter>
+    </ClCompile>
+    <ClCompile Include="deflate\deflate\decode.cpp">
+      <Filter>deflate\deflate</Filter>
+    </ClCompile>
+    <ClCompile Include="deflate\deflate\deflate.cpp">
+      <Filter>deflate\deflate</Filter>
+    </ClCompile>
+    <ClCompile Include="deflate\deflate\encode.cpp">
+      <Filter>deflate\deflate</Filter>
+    </ClCompile>
+    <ClCompile Include="deflate\deflate\inflate.cpp">
+      <Filter>deflate\deflate</Filter>
+    </ClCompile>
+    <ClCompile Include="deflate\deflate\panic.cpp">
+      <Filter>deflate\deflate</Filter>
+    </ClCompile>
+    <ClCompile Include="deflate\host\h_file.cpp">
+      <Filter>deflate\host</Filter>
+    </ClCompile>
+    <ClCompile Include="deflate\host\h_mem.cpp">
+      <Filter>deflate\host</Filter>
+    </ClCompile>
+    <ClCompile Include="deflate\host\h_utl.cpp">
+      <Filter>deflate\host</Filter>
+    </ClCompile>
+    <ClCompile Include="crc.cpp" />
+    <ClCompile Include="e32hack.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="deflate\deflate\deflate.h">
+      <Filter>deflate\deflate</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\deflate\farray.h">
+      <Filter>deflate\deflate</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\deflate\huffman.h">
+      <Filter>deflate\deflate</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\deflate\panic.h">
+      <Filter>deflate\deflate</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\inc\e32base.h">
+      <Filter>deflate\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\inc\e32cmn.h">
+      <Filter>deflate\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\inc\e32def.h">
+      <Filter>deflate\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\inc\e32image.h">
+      <Filter>deflate\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\inc\e32std.h">
+      <Filter>deflate\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\inc\h_utl.h">
+      <Filter>deflate\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\inc\h_ver.h">
+      <Filter>deflate\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\inc\pe_defs.h">
+      <Filter>deflate\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\inc\pe_file.h">
+      <Filter>deflate\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="deflate\inc\seclib.h">
+      <Filter>deflate\inc</Filter>
+    </ClInclude>
+    <ClInclude Include="crc.h" />
+  </ItemGroup>
+</Project>

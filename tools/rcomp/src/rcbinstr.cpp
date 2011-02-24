@@ -101,7 +101,7 @@ void RCBinaryStream::Write( const unsigned char * p, unsigned long count)
 
 unsigned long RCBinaryStream::GetPosition()
 	{
-	return iOs.tellp();
+	return (unsigned long)iOs.tellp();
 	}
 
 void RCBinaryStream::SetPosition(unsigned long aNewPosition)

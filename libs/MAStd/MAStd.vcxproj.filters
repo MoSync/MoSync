@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="libsubc++">
+      <UniqueIdentifier>{db1d6e33-0d7a-4616-bedb-d93db4e94b37}</UniqueIdentifier>
+      <ParseFiles>false</ParseFiles>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\libsupc++\del_opnt.cc">
+      <Filter>libsubc++</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libsupc++\del_opvnt.cc">
+      <Filter>libsubc++</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libsupc++\new_handler.cc">
+      <Filter>libsubc++</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libsupc++\new_opnt.cc">
+      <Filter>libsubc++</Filter>
+    </ClCompile>
+    <ClCompile Include="..\libsupc++\new_opvnt.cc">
+      <Filter>libsubc++</Filter>
+    </ClCompile>
+    <ClCompile Include="conprint.c" />
+    <ClCompile Include="ma.c" />
+    <ClCompile Include="maassert.c" />
+    <ClCompile Include="macpp.cpp" />
+    <ClCompile Include="mactype.c" />
+    <ClCompile Include="madmath.c" />
+    <ClCompile Include="maheap.c" />
+    <ClCompile Include="maint64.c" />
+    <ClCompile Include="mastdlib.c" />
+    <ClCompile Include="mastring.c" />
+    <ClCompile Include="matask.c" />
+    <ClCompile Include="matime.c" />
+    <ClCompile Include="mavsprintf.c" />
+    <ClCompile Include="mawvsprintf.c" />
+    <ClCompile Include="maxtoa.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\libsupc++\macpp.h">
+      <Filter>libsubc++</Filter>
+    </ClInclude>
+    <ClInclude Include="api_areas.h" />
+    <ClInclude Include="conprint.h" />
+    <ClInclude Include="limits.h" />
+    <ClInclude Include="ma.h" />
+    <ClInclude Include="MAAPI.h" />
+    <ClInclude Include="maarg.h" />
+    <ClInclude Include="maassert.h" />
+    <ClInclude Include="mactype.h" />
+    <ClInclude Include="madmath.h" />
+    <ClInclude Include="maheap.h" />
+    <ClInclude Include="mastdlib.h" />
+    <ClInclude Include="mastring.h" />
+    <ClInclude Include="matask.h" />
+    <ClInclude Include="matime.h" />
+    <ClInclude Include="mavsprintf.h" />
+    <ClInclude Include="mawvsprintf.h" />
+    <ClInclude Include="maxtoa.h" />
+    <ClInclude Include="stdint.h" />
+    <ClInclude Include="stdio.h" />
+    <ClInclude Include="wchar.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\libsupc++\new">
+      <Filter>libsubc++</Filter>
+    </None>
+    <None Include="crtlib.s" />
+  </ItemGroup>
+</Project>

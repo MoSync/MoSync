@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Base">
+      <UniqueIdentifier>{97dca74e-6da2-4a64-94fa-10083f4e8c2f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SDL">
+      <UniqueIdentifier>{5e396545-ccb9-4d51-a1a6-7f157a0b5640}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\runtimes\cpp\base\FileStream.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtimes\cpp\base\ThreadPool.cpp">
+      <Filter>Base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtimes\cpp\platforms\sdl\FileImpl.cpp">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\runtimes\cpp\platforms\sdl\ThreadPoolImpl.cpp">
+      <Filter>SDL</Filter>
+    </ClCompile>
+    <ClCompile Include="unitTestServer.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\runtimes\cpp\base\FileStream.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\runtimes\cpp\base\ThreadPool.h">
+      <Filter>Base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\runtimes\cpp\platforms\sdl\FileImpl.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\runtimes\cpp\platforms\sdl\ThreadPoolImpl.h">
+      <Filter>SDL</Filter>
+    </ClInclude>
+    <ClInclude Include="..\unitTest\conn_common.h" />
+  </ItemGroup>
+</Project>

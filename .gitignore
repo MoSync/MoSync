@@ -16,6 +16,8 @@ IX_*.h
 *.class
 *.swp
 *~
+*.opensdf
+*.sdf
 
 MAHeaders.h
 program
@@ -29,6 +31,8 @@ stabs.tab
 .mosyncproject.local
 
 /*.bat
+
+/ipch/*
 
 /tools/profileGenerator/input/*
 /tools/profileGenerator/output/*

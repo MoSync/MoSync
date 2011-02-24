@@ -57,9 +57,9 @@ static bool filesAreEqual(const char* a, const char* b) {
 
 	// compare size
 	as.seekg(0, ios_base::end);
-	size_t aSize = as.tellg();
+	streamoff aSize = as.tellg();
 	bs.seekg(0, ios_base::end);
-	size_t bSize = bs.tellg();
+	streamoff bSize = bs.tellg();
 	if(!(as.good() && bs.good() && (aSize == bSize)))
 		return false;
 
@@ -70,7 +70,7 @@ static bool filesAreEqual(const char* a, const char* b) {
 	char aBuf[BUFSIZE], bBuf[BUFSIZE];
 	size_t pos = 0;
 	while(pos < aSize) {
-		size_t len = MIN(BUFSIZE, aSize - pos);
+		size_t len = MIN(BUFSIZE, (size_t)(aSize - pos));
 		as.read(aBuf, len);
 		bs.read(bBuf, len);
 		if(!(as.good() && bs.good())) {

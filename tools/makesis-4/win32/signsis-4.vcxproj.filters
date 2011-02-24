@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{ecab059d-eaf7-4213-9d43-d765e37379c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{a7ef697c-3937-4275-9aa6-310c83229c3e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\include\instendian.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\instform.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\crc.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\crtsis.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\parsecmd.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\parsepkg.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\signutils.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sisfield.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\sisfilegen.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utf8.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\utils.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="getopt.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\crc.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\crtsis.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\parsecmd.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\parsepkg.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\signsis.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\signutils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sisfield.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\sisfilegen.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utf8.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\utils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="getopt.c" />
+  </ItemGroup>
+</Project>

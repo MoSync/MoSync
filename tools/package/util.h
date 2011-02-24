@@ -28,7 +28,7 @@ void appendFile(const char* dst, const char* src);
 
 std::string readFileToString(const char* src);
 
-size_t getFileSize(const char* filename);
+std::streamoff getFileSize(const char* filename);
 
 // mallocs the buffer
 void* readBinaryFile(const char* src, size_t& size);

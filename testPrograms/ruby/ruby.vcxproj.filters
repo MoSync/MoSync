@@ -1,0 +1,151 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{aee8c0c9-ec00-4e7d-9569-1520318748b0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\array.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bignum.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\class.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\compar.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\enum.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\error.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\eval.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\file.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\gc.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hash.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\inits.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\io.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\math.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\numeric.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\object.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\parse.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\prec.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\random.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\range.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rb_e.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\re.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\regex.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ruby.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sprintf.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\st.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\string.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\struct.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\time.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\util.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\variable.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\version.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="mosync.c" />
+    <ClCompile Include="syscalls.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\defines.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\env.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\intern.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\missing.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\node.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\re.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\regex.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ruby.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rubyio.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\rubysig.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\st.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\util.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\version.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="config.h" />
+    <ClInclude Include="mosync.h" />
+  </ItemGroup>
+</Project>

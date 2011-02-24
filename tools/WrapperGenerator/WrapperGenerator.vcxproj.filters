@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="gcc">
+      <UniqueIdentifier>{d661b580-9c83-488f-bef7-4205a2c2f77e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="parser">
+      <UniqueIdentifier>{8fcda023-6899-4e17-9c63-918585eb2260}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="backends">
+      <UniqueIdentifier>{a9cb3ce0-c6df-4060-a965-78088ed333ce}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="ArrayType.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="Base.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="CvQualifiedType.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="Field.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="File.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="Function.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="FunctionType.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="FundamentalType.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="Location.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="Namespace.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="PointerType.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="ReferenceType.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="Struct.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="Typedef.cpp">
+      <Filter>gcc</Filter>
+    </ClCompile>
+    <ClCompile Include="ParseNode.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="Parser.cpp">
+      <Filter>parser</Filter>
+    </ClCompile>
+    <ClCompile Include="CppBackend.cpp">
+      <Filter>backends</Filter>
+    </ClCompile>
+    <ClCompile Include="IDLBackend.cpp">
+      <Filter>backends</Filter>
+    </ClCompile>
+    <ClCompile Include="WrapperGenerator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ArrayType.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Base.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="CvQualifiedType.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Field.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="File.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Function.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="FunctionType.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="FundamentalType.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Internal.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Location.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Namespace.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="PointerType.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="ReferenceType.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Struct.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="Typedef.h">
+      <Filter>gcc</Filter>
+    </ClInclude>
+    <ClInclude Include="ParseNode.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Parser.h">
+      <Filter>parser</Filter>
+    </ClInclude>
+    <ClInclude Include="Backend.h">
+      <Filter>backends</Filter>
+    </ClInclude>
+    <ClInclude Include="CppBackend.h">
+      <Filter>backends</Filter>
+    </ClInclude>
+    <ClInclude Include="IDLBackend.h">
+      <Filter>backends</Filter>
+    </ClInclude>
+    <ClInclude Include="WrapperGenerator.h" />
+  </ItemGroup>
+</Project>
