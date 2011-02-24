@@ -102,12 +102,14 @@ puts "Building native Library\n\n"
 cd "AndroidProject"
 
 if ENV['OS'] == "Windows_NT"
-	success = system "/cygwin/bin/bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin.sh)\""
+	# convert a copy of cygwin.sh to unix-style line endings, so bash can run it.
+	FileUtils.copy_file("#{cpath}/cygwin.sh", "#{cpath}/cygwin_u.sh")
+	success = system "/cygwin/bin/bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin_u.sh)\""
 	if (!success)
 		exitBuilder(1, mosyncppsource, thirdarg)
 	end
 
-	success = system "/cygwin/bin/bash.exe --login -i #{File.join(cpath, "cygwin.sh")} #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
+	success = system "/cygwin/bin/bash.exe --login -i #{File.join(cpath, "cygwin_u.sh")} #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
 else
 	success = system("#{File.join(cpath, "invoke-ndk-build.sh")} #{firstarg} #{secondarg} $MOSYNC_SRC");
 end
