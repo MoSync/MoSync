@@ -217,8 +217,9 @@ public:
 	* If the Key doesn't yet exist in the HashMap, it will be inserted
 	* with a default Value.
 	*
-	* There is no const variant of this function, because each call might
-	* potentially modify the HashMap by inserting a new key.
+	* There is no const variant of this function,
+	* because in order to return a valid reference,
+	* the HashMap may have to be modified by inserting a new key.
 	* Use find() if you have a const HashMap.
 	*/
 	Value& operator[](const Key&);
