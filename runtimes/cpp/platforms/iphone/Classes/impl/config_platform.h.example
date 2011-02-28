@@ -8,9 +8,11 @@
 
 #define __IPHONE__
 #define PUBLIC_DEBUG
-#define _USE_REBUILDER_
+//#define _USE_REBUILDER_
 #define SUPPORT_OPENGL_ES
 #define LOGGING_ENABLED
+//#define SUPPORT_PROGRAM_RELOAD
+#define MA_PROF_SUPPORT_WIDGETAPI
 
 //#define DEBUGGING_MODE
 //#define CORE_DEBUGGING_MODE	//very slow
