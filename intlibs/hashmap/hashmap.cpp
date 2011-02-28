@@ -146,7 +146,6 @@ void HashMapBase::rehash() {
 	m.stat.rehashes++;
 	LOG_HASH("Rehash\n");
 
-	DEBUG_ASSERT(sizeof(BasePair) == 8);
 	BasePair* oldBase = m.base;
 	CLEANUPSTACK_PUSH(oldBase);
 	uint oldLen = m.baseLen;

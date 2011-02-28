@@ -62,8 +62,8 @@ static void dumpSslErrors() {
 	}
 }
 
-#define TSSL_CUSTOM(func, test, action) { int _res = (int)(func); if(_res test) { IN_FILE_ON_LINE;\
-	LOG("OpenSSL error %i\n", _res); dumpSslErrors(); action; } }
+#define TSSL_CUSTOM(func, test, action) { ssize_t _res = (size_t)(func); if(_res test) { IN_FILE_ON_LINE;\
+	LOG("OpenSSL error %"PFZT"i\n", _res); dumpSslErrors(); action; } }
 
 #define TSSL(func, test) TSSL_CUSTOM(func, test, return CONNERR_SSL)
 #define TSSLZ(func) TSSL(func, == 0)

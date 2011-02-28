@@ -119,9 +119,9 @@ void printPrimitiveByFormat(printfPtr pf, const void* data, const char* decimalF
 	} else if(fmt == TypeBase::eDecimal) {
 		pf(decimalFmt, t);
 	} else if(fmt == TypeBase::eOctal) {
-		pf("%o", (unsigned)t);
+		pf("%"PFZT"o", (size_t)t);
 	} else if(fmt == TypeBase::eHexadecimal) {
-		pf("0x%x", (unsigned)t);
+		pf("0x%"PFZT"x", (size_t)t);
 	} else if(fmt == TypeBase::eBinary) {
 		u64 tt = (u64)(size_t)t;
 		int numBits = (int)(sizeof(T)<<3)-1;

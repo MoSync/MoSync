@@ -1383,7 +1383,7 @@ void WRITE_REG(int reg, int value) {
 		DUMPINT(InstCount);	//includes any eventual illegal instruction
 
 		//on error, this will probably have read some or all of the crashing instruction
-		LOG("IP: 0x%04X\n", rIP - mem_cs);
+		LOG("IP: 0x%04X\n", (int)(size_t)(rIP - mem_cs));
 		LOGC("Regs:\n");
 		for(int i=0; i<32; i++) {
 			LOGC("%2i: 0x%08X\n", i, regs[i]);

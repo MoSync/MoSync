@@ -82,7 +82,7 @@ namespace Base {
 
 #ifdef RESOURCE_MEMORY_LIMIT
 	uint size_RT_FLUX(void* size) {
-		return (int)size;
+		return (uint)(size_t)size;
 	}
 	uint size_RT_PLACEHOLDER(void*) {
 		return 0;
@@ -671,7 +671,7 @@ namespace Base {
 #if !defined(_android)
 	int Syscall::maBtGetNewDevice(MABtDevice* dst) {
 		char* vmName = dst->name;
-		dst->name = (char*)GetValidatedMemRange((int)dst->name, dst->nameBufSize);
+		dst->name = (char*)GetValidatedMemRange((int)(size_t)dst->name, dst->nameBufSize);
 		int res = BLUETOOTH(maBtGetNewDevice)(dst);
 		dst->name = vmName;
 		return res;
@@ -684,8 +684,8 @@ namespace Base {
 			return res;
 		char* vmName = dst->name;
 		MAUUID* vmUuids = dst->uuids;
-		dst->name = (char*)GetValidatedMemRange((int)dst->name, dst->nameBufSize);
-		dst->uuids = (MAUUID*)GetValidatedMemRange((int)dst->uuids, ss.nUuids * sizeof(MAUUID));
+		dst->name = (char*)GetValidatedMemRange((int)(size_t)dst->name, dst->nameBufSize);
+		dst->uuids = (MAUUID*)GetValidatedMemRange((int)(size_t)dst->uuids, ss.nUuids * sizeof(MAUUID));
 		res = BLUETOOTH(maBtGetNewService)(dst);
 		dst->name = vmName;
 		dst->uuids = vmUuids;

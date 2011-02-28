@@ -141,7 +141,7 @@ int Syscall::maPimFieldType(MAHandle list, int field) {
 int Syscall::maPimItemGetValue(MA_PIM_ARGS* args, int index) {
 	PimItem* pi = pimGetItem(args->item);
 	return pi->getValue(args->field, index,
-		GetValidatedMemRange((int)args->buf, args->bufSize), args->bufSize);
+		GetValidatedMemRange((int)(size_t)args->buf, args->bufSize), args->bufSize);
 }
 int Syscall::maPimItemClose(MAHandle item) {
 	mPimItems.erase(item);

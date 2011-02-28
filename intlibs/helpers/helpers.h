@@ -224,11 +224,11 @@ namespace MoSyncError {
 #define DEBUG_ASRTZERO(func) ASRTINT(func, 0, ERR_INTERNAL)
 
 #ifdef MEMORY_DEBUG
-#define CHECK_INT_ALIGNMENT(ptr) MYASSERT(((int)(ptr) & 0x3) == 0, ERR_MEMORY_ALIGNMENT)
+#define CHECK_INT_ALIGNMENT(ptr) MYASSERT(((size_t)(ptr) & 0x3) == 0, ERR_MEMORY_ALIGNMENT)
 #else
 #define CHECK_INT_ALIGNMENT(ptr)
 #endif
-#define ALIGN_INT(ptr) ((int*)((int)(ptr) & ~0x3))
+#define ALIGN_INT(ptr) ((int*)((size_t)(ptr) & ~0x3))
 
 //Test and Return Minus 1
 #define TRM1(func) if(!(func)) { LOG("Failure "); IN_FILE_ON_LINE; failFunction(); return -1; }

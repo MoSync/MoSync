@@ -287,6 +287,6 @@ class CopyFileTask < FileTask
 	end
 	def execute
 		puts "copy #{@src} #{@NAME}"
-		FileUtils.copy_file(@src, @NAME)
+		FileUtils.copy_file(@src, @NAME, true)
 	end
 end

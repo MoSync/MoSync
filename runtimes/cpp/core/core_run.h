@@ -289,7 +289,7 @@ VMLOOP_LABEL
 
 			OPC(JPI)		FETCH_IMM24		JMP_IMM		EOP;
 		default:
-			LOG("Illegal far instruction 0x%02X @ 0x%04X\n", op, (ip - mem_cs) - 1);
+			LOG("Illegal far instruction 0x%02X @ 0x%04X\n", op, (int)(size_t)(ip - mem_cs) - 1);
 			BIG_PHAT_ERROR(ERR_ILLEGAL_INSTRUCTION);
 			//return ip;
 		} EOP;
@@ -356,7 +356,7 @@ VMLOOP_LABEL
 
 	default:
 		//VM_State = -3;				// Bad instruction
-		LOG("Illegal instruction 0x%02X @ 0x%04X\n", op, (ip - mem_cs) - 1);
+		LOG("Illegal instruction 0x%02X @ 0x%04X\n", op, (int)(size_t)(ip - mem_cs) - 1);
 		BIG_PHAT_ERROR(ERR_ILLEGAL_INSTRUCTION);
 		//return ip;
 	}

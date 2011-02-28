@@ -224,7 +224,7 @@ const uchar * DisasDecode(DisasInfo *thisOpcode, const uchar *code_ip)
 	uchar thisOp;
 	uchar thisRD=0,thisRS=0;
 	uint thisIMM=0;
-	uint rip = (int) code_ip - (int) Disas_CodeMemory;
+	uint rip = (char*)code_ip - Disas_CodeMemory;
 	
 	const uchar *start_code_ip = code_ip;		// Make a copy
 	
