@@ -20,10 +20,50 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * \brief Simple asynchronous HTTP download to resources.
  * \author Patrick Broman and Niklas Nummelin.
  */
+ 
+/*
+Downloader state specification
+------------------------------
+
+This diagram shows the allowed state transitions for
+a downloader and its listener. When having multiple
+listeners, initiation of a new download from a listener
+will cause a panic (beginDownloading can only be called
+if a download is not in progress).
+
+downloader.beginDownloading -> 
+  precondition: closeConnection(NO_CLEANUP)
+  downloader.beginDownloading -> Error
+  downloader.cancelDownloading -> Ok
+  
+downloader.cancelDownloading ->
+  precondition: closeConnection(CLEANUP)
+  downloader.beginDownloading -> Ok
+  downloader.cancelDownloading -> Error
+
+listener.notifyProgress ->
+  precondition: none
+  downloader.beginDownloading -> Error
+  downloader.cancelDownloading -> Ok
+
+listener.finishedDownloading ->
+  precondition: closeConnection(NO_CLEANUP)
+  downloader.beginDownloading -> Ok
+  downloader.cancelDownloading -> Error
+
+listener.downloadCancelled ->
+  precondition: closeConnection(CLEANUP)
+  downloader.beginDownloading -> Ok
+  downloader.cancelDownloading -> Error
+
+listener.error ->
+  precondition: closeConnection(CLEANUP)
+  downloader.beginDownloading -> Ok
+  downloader.cancelDownloading -> Error
+*/
 
 #ifndef _SE_MSAB_MAUTIL_DOWNLOADER_H_
 #define _SE_MSAB_MAUTIL_DOWNLOADER_H_
-
 
 #include "Connection.h"
 #include "String.h"
@@ -101,7 +141,8 @@ namespace MAUtil {
 	};
 
 	/**
-	 * \brief The Downloader class. Use it to simplify asynchronous downloading of files to binary resources.
+	 * \brief The Downloader class. Use it to simplify asynchronous downloading 
+	 * of files to binary resources.
 	 */
 	class Downloader : public HttpConnectionListener
 	{
@@ -127,6 +168,10 @@ namespace MAUtil {
 		 */
 		void addDownloadListener(DownloadListener *dl);
 
+		/**
+		 * Remove a DownloadListener.
+		 * \param dl Pointer to the DownloadListener instance.
+		 */
 		void removeDownloadListener(DownloadListener *dl);
 
 		/**
@@ -141,6 +186,7 @@ namespace MAUtil {
 
 		/**
 		 * Function to cancel the current download.
+		 * Do cleanup and send downloadCancelled to listeners.
 		 */
 		virtual void cancelDownloading();
 
@@ -161,16 +207,42 @@ namespace MAUtil {
 		 */
 		virtual MAHandle getHandle();
 
+		/**
+		 * Helper method to get the data handle. Used by friend classes.
+		 */
 		MAHandle getDataPlaceholder();
 
+		/**
+		 * Send notifyProgress to listeners.
+		 */
 		void fireNotifyProgress(int dataOffset, int contentLength);
 
+		/**
+		 * Close connection and send finishedDownloading to listeners.
+		 */
 		void fireFinishedDownloading(MAHandle data);
 
+		/**
+		 * Do cleanup and send error to listeners.
+		 */
 		void fireError(int code);
 
-		void deleteReader();
+		/**
+		 * Close the connection used by the downloader.
+		 * This is part of the normal finishing of the download,
+		 * and is also done on errors and on cancelling the download.
+		 * \param cleanup if 1 free downloaded resources, if 0 do not do
+		 * free downloaded resources. Cleanup is done on errors and on 
+		 * cancelling a download.
+		 */
+		virtual void closeConnection(int cleanup);
 
+		/**
+		 * Delete the reader object (this is the object that
+		 * performs the download).
+		 */
+		void deleteReader();
+		
 		/**
 		 * Callback method in HttpConnectionListener.
 		 */
@@ -184,10 +256,16 @@ namespace MAUtil {
 	protected:
 		HttpConnection *mConn;
 		bool mIsDownloading;
-		bool mIsDataPlaceholderUserAllocated;
+		bool mIsDataPlaceholderSystemAllocated;
 		MAHandle mDataPlaceholder;
-		DownloaderReader* mReader;
 		Vector<DownloadListener*> mDownloadListeners;
+		
+		/**
+		 * Object that peformes the actual download. A downloader
+		 * is configured with different readers depending on the
+		 * how the server sends the data to the client.
+		 */
+		DownloaderReader* mReader;
 	};
 
 	/**
@@ -204,15 +282,13 @@ namespace MAUtil {
 		 * \see Downloader::beginDownloading(const char*, MAHandle);
 		 */
 		int beginDownloading(const char *url, MAHandle placeholder=0);
-
-		void cancelDownloading();
 		
 	protected:
 		virtual MAHandle getHandle();
-		void deleteImagePlaceholder();
+		virtual void closeConnection(int cleanup);
 
 	protected:
-		bool mIsImagePlaceholderUserAllocated;
+		bool mIsImagePlaceholderSystemAllocated;
 		bool mIsImageCreated;
 		MAHandle mImagePlaceholder;
 	};

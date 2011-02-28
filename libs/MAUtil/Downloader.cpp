@@ -22,6 +22,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
+// Perform cleanup on closing connection, 
+// deallocate any downloaded data.
+#define CLEANUP 1
+
+// Perform no cleanup on closing connection.
+// Downloaded data is now owned by the user.
+#define NO_CLEANUP 0
+
+// *************** Local functions *************** //
+
+/**
+ * Allocate a handle from the placeholder pool.
+ */
+static MAHandle allocateHandle();
+
+/**
+ * Return handle to placehoder pool, which deallocates it
+ * (PlaceholderPool will call maDestroyObject).
+ */
+static void deallocateHandle(MAHandle handle);
+
+static MAHandle allocateHandle()
+{
+	return PlaceholderPool::alloc();
+}
+
+static void deallocateHandle(MAHandle handle)
+{
+	PlaceholderPool::put(handle);
+}
+
 // *************** Class DownloadListener *************** //
 
 void DownloadListener::notifyProgress(Downloader* dl, int downloadedBytes, int totalBytes)
@@ -37,8 +68,8 @@ bool DownloadListener::outOfMemory(Downloader*)
 
 Downloader::Downloader()
 : mIsDownloading(false),
-  mIsDataPlaceholderUserAllocated(false),
-  mDataPlaceholder(0),
+  mIsDataPlaceholderSystemAllocated(false),
+  mDataPlaceholder(NULL),
   mReader(NULL)
 {
 	mConn = new HttpConnection(this);
@@ -46,44 +77,33 @@ Downloader::Downloader()
 
 Downloader::~Downloader()
 {
+	closeConnection(CLEANUP);
 	delete mConn;
-	
-	// Here we deallocate the data placeholder only if there
-	// is a download in progress, because the data object will
-	// never reach the user in this case.
-	if (mIsDownloading && !mIsDataPlaceholderUserAllocated)
-	{
-		// Return system allocated placeholder.
-		PlaceholderPool::put(mDataPlaceholder);
-	}
-
-	deleteReader();
 }
 
-void Downloader::addDownloadListener(DownloadListener *dl)
+void Downloader::addDownloadListener(DownloadListener* listener)
 {
-	mDownloadListeners.add(dl);
+	mDownloadListeners.add(listener);
 }
 
-void Downloader::removeDownloadListener(DownloadListener *dl)
+void Downloader::removeDownloadListener(DownloadListener* listener)
 {
 	for (int i = 0; i < mDownloadListeners.size(); ++i) 
 	{
-		if (mDownloadListeners[i] == dl) 
+		if (mDownloadListeners[i] == listener) 
 		{
 			mDownloadListeners.remove(i);
 			return;
 		}
 	}
-	PANIC_MESSAGE("Downloader::removeDownloadListener: Could not find listener");
 }
 
 int Downloader::beginDownloading(const char *url, MAHandle placeholder)
 {
-	ASSERT_MSG(!mIsDownloading, "Downloader::beginDownloading: Download already in progress");
+	ASSERT_MSG(!mIsDownloading, "Download already in progress");
 
 	// Make sure connection is closed.
-	mConn->close();
+	closeConnection(NO_CLEANUP);
 	
 	// Create new connection.
 	int result = mConn->create(url, HTTP_GET);
@@ -94,11 +114,12 @@ int Downloader::beginDownloading(const char *url, MAHandle placeholder)
 
 	mIsDownloading = true;
 
-	// Do we have a user allocated placeholder?
-	mIsDataPlaceholderUserAllocated = placeholder != 0;
+	// If the supplied placeholder is zero, we will use a 
+	// system allocated placeholder.
+	mIsDataPlaceholderSystemAllocated = (0 == placeholder);
 	
 	// Allocate placeholder if no one was supplied.
-	mDataPlaceholder = placeholder ? placeholder : PlaceholderPool::alloc();
+	mDataPlaceholder = placeholder ? placeholder : allocateHandle();
 
 	mConn->finish();
 
@@ -107,34 +128,20 @@ int Downloader::beginDownloading(const char *url, MAHandle placeholder)
 
 void Downloader::cancelDownloading()
 {
-	if (mIsDownloading) 
+	ASSERT_MSG(mIsDownloading, "Inactive download cancelled.");
+	
+	closeConnection(CLEANUP);
+	
+	// Notify listeners
+	for (int i = 0; i < mDownloadListeners.size(); ++i)
 	{
-		mIsDownloading = false;
-
-		mConn->close();
-		
-		if (!mIsDataPlaceholderUserAllocated)
-		{
-			// Return system allocated placeholder to pool.
-			PlaceholderPool::put(mDataPlaceholder);
-		}
-		
-		for(int i = 0; i < mDownloadListeners.size(); ++i)
-		{
-			mDownloadListeners[i]->downloadCancelled(this);
-		}
-	}
-	else 
-	{
-		PANIC_MESSAGE("Inactive download cancelled.");
+		mDownloadListeners[i]->downloadCancelled(this);
 	}
 }
 
 void Downloader::fireFinishedDownloading(MAHandle handle)
 {
-	mIsDownloading = false;
-
-	mConn->close();
+	closeConnection(NO_CLEANUP);
 	
 	// Broadcast finishedDownloading to listeners.
 	for (int i = 0; i < mDownloadListeners.size(); ++i)
@@ -145,15 +152,33 @@ void Downloader::fireFinishedDownloading(MAHandle handle)
 
 void Downloader::fireError(int code)
 {
-	mIsDownloading = false;
-
-	mConn->close();
+	closeConnection(CLEANUP);
 
 	// Broadcast error to listeners.
 	for (int i = 0; i < mDownloadListeners.size(); ++i)
 	{
 		mDownloadListeners[i]->error(this, code);
 	}
+}
+
+void Downloader::closeConnection(int cleanup)
+{
+	mConn->close();
+	
+	deleteReader();
+	
+	// We only cleanup if there is an ongoing download.
+	if (cleanup 
+		&& mIsDownloading 
+		&& mDataPlaceholder 
+		&& mIsDataPlaceholderSystemAllocated)
+	{
+		// Return system allocated placeholder.
+		deallocateHandle(mDataPlaceholder);
+		mDataPlaceholder = NULL;
+	}
+	
+	mIsDownloading = false;
 }
 
 void Downloader::deleteReader()
@@ -229,15 +254,9 @@ void Downloader::fireNotifyProgress(int dataOffset, int contentLength)
  */
 void Downloader::connRecvFinished(Connection* conn, int result)
 {
-	if (mReader)
-	{
-		mReader->connRecvFinished(conn, result);
-	}
-	else
-	{
-		// TODO: Is this the appropriate error code? What does it mean?
-		fireError(CONNERR_DOWNLOADER_USER);
-	}
+	ASSERT_MSG(mReader, "Downloader has no reader.");
+
+	mReader->connRecvFinished(conn, result);
 }
 
 MAHandle Downloader::getHandle()
@@ -253,25 +272,14 @@ MAHandle Downloader::getDataPlaceholder()
 // *************** Class ImageDownloader *************** //
 
 ImageDownloader::ImageDownloader() :
-	mIsImagePlaceholderUserAllocated(false),
+	mIsImagePlaceholderSystemAllocated(false),
 	mIsImageCreated(false),
-	mImagePlaceholder(0)
+	mImagePlaceholder(NULL)
 {
 }
 		
 ImageDownloader::~ImageDownloader()
 {
-	// Only delete the image placeholder if there is an ongoing download,
-	// since in this case the image will never reach the user.
-	if (mIsDownloading && !mIsImagePlaceholderUserAllocated) 
-	{
-		// Got close connection first in case placeholder is in flux.
-		// TODO: What is meant by "in flux" ??
-		mConn->close();
-
-		// Return placeholder.
-		PlaceholderPool::put(mImagePlaceholder);
-	}
 }
 
 MAHandle ImageDownloader::getHandle()
@@ -295,12 +303,15 @@ MAHandle ImageDownloader::getHandle()
 		return 0;
 	}
 	
-	if (!mIsDataPlaceholderUserAllocated)
+	// Now that the image is created, we can deallocate the data handle.
+	if (mIsDataPlaceholderSystemAllocated)
 	{
 		// Return system allocated data placeholder to pool.
-		PlaceholderPool::put(mDataPlaceholder);
+		deallocateHandle(mDataPlaceholder);
+		mDataPlaceholder = NULL;
 	}
 	
+	// Image is created.
 	mIsImageCreated = true;
 	
 	return mImagePlaceholder;
@@ -310,25 +321,33 @@ int ImageDownloader::beginDownloading(const char *url, MAHandle placeholder)
 {
 	mIsImageCreated = false;
 
-	// Have we got a user supplied placeholder for the image?
-	mIsImagePlaceholderUserAllocated = placeholder != 0;
+	// If the supplied placeholder is zero, we will use a 
+	// system allocated placeholder for the image.
+	mIsImagePlaceholderSystemAllocated = (0 == placeholder);
 	
 	// Allocate placeholder for image if no one was supplied.
-	mImagePlaceholder = placeholder ? placeholder : PlaceholderPool::alloc();
+	mImagePlaceholder = placeholder ? placeholder : allocateHandle();
 	
 	return Downloader::beginDownloading(url);
 }
 
-void ImageDownloader::cancelDownloading()
+void ImageDownloader::closeConnection(int cleanup)
 {
-	Downloader::cancelDownloading();
-
-	if (!mIsImagePlaceholderUserAllocated)
+	bool downloading = mIsDownloading;
+	
+	Downloader::closeConnection(cleanup);
+	
+	// We only cleanup if there is an ongoing download.
+	if (cleanup 
+		&& downloading 
+		&& mImagePlaceholder 
+		&& mIsImagePlaceholderSystemAllocated)
 	{
 		// Return system allocated placeholder to pool.
-		PlaceholderPool::put(mImagePlaceholder);
+		deallocateHandle(mImagePlaceholder);
+		mImagePlaceholder = NULL;
 	}
-
+	
 	mIsImageCreated = false;
 }
 
@@ -490,10 +509,8 @@ void DownloaderReaderWithKnownContentLength::connRecvFinished(
 	{
 		// We have got all data, finish download.
 		MAHandle handle = mDownloader->getHandle();
-		if (handle)
-		{
-			mDownloader->fireFinishedDownloading(handle);
-		}
+		ASSERT_MSG(handle, "No data handle in standard reader");
+		mDownloader->fireFinishedDownloading(handle);
 	}
 }
 
@@ -514,7 +531,7 @@ DownloaderReaderThatReadsChunks::~DownloaderReaderThatReadsChunks()
 		MAHandle chunk = mDataChunks[0];
 
 		// Return chunk to pool.
-		PlaceholderPool::put(chunk);
+		deallocateHandle(chunk);
 
 		// Remove chunk from list.
 		mDataChunks.remove(0);
@@ -578,7 +595,7 @@ void DownloaderReaderThatReadsChunks::connRecvFinished(Connection* conn, int res
 bool DownloaderReaderThatReadsChunks::readNextChunk(Connection* conn)
 {
 	// Allocate new a chunk of data.
-	MAHandle chunk = PlaceholderPool::alloc();
+	MAHandle chunk = allocateHandle();
 	int result = maCreateData(chunk, mDataChunkSize);
 	if (RES_OUT_OF_MEMORY == result)
 	{
@@ -625,7 +642,7 @@ void DownloaderReaderThatReadsChunks::finishedDownloadingChunkedData()
 		maWriteData(mDownloader->getDataPlaceholder(), buf, offset, size);		
 
 		// Return chunk to pool.
-		PlaceholderPool::put(chunk);
+		deallocateHandle(chunk);
 
 		// Remove chunk from list.
 		mDataChunks.remove(0);
@@ -635,14 +652,7 @@ void DownloaderReaderThatReadsChunks::finishedDownloadingChunkedData()
 	}
 	delete[] buf;
 
-
 	MAHandle handle = mDownloader->getHandle();
-	if (handle)
-	{
-		mDownloader->fireFinishedDownloading(handle);
-	}
-	else
-	{
-		mDownloader->fireError(CONNERR_DOWNLOADER_USER);
-	}
+	ASSERT_MSG(handle, "No data handle in chunked reader");
+	mDownloader->fireFinishedDownloading(handle);
 }
