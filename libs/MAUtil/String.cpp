@@ -118,9 +118,10 @@ namespace MAUtil {
 	}
 
 	template<class Tchar> BasicString<Tchar>& BasicString<Tchar>::operator=(const BasicString& s) {
-		sd->release();
+		StringData<Tchar>* old = sd;
 		sd = s.sd;
 		sd->addRef();
+		old->release();
 		return *this;
 	}
 

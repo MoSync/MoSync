@@ -1291,16 +1291,15 @@ public class MoSyncThread extends Thread
 
 		Canvas temporaryCanvas = new Canvas(temporaryBitmap);
 		
-		temporaryCanvas.drawBitmap(
-			imageResource.mBitmap,
-			new Matrix(),
-			new Paint());
+		temporaryCanvas.drawBitmap(imageResource.mBitmap, -srcLeft, -srcTop, new Paint());
 			
 		temporaryCanvas.drawColor(0xff000000, Mode.DST_ATOP);
 		
 		mMemDataSection.position(dst);
 
 		IntBuffer intBuffer = mMemDataSection.asIntBuffer();
+		
+		try {
 		
 		for (int y = 0; y < srcHeight; y++)
 		{
@@ -1319,8 +1318,8 @@ public class MoSyncThread extends Thread
 				colors,
 				0,
 				srcWidth,
-				srcLeft,
-				srcTop+y,
+				0,
+				y,
 				srcWidth,
 				1);
 			
@@ -1330,6 +1329,12 @@ public class MoSyncThread extends Thread
 			}
 			
 			intBuffer.put(pixels);	
+		}
+		} catch(Exception e) {
+			e.printStackTrace();
+			Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
+				imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
+			maPanic(-1, "maGetImageData");
 		}
 	}
 

@@ -92,6 +92,8 @@ namespace MAUI {
 		Vector_each(Widget*,it,mChildren)
 			delete (*it);
 		mChildren.clear();
+		requestUpdate();
+		requestRepaint();
 	}
 
 	const Rect& Widget::getBounds() {
