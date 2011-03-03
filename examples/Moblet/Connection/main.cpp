@@ -33,8 +33,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MAUtil;
 
 #define BUFSIZE 1024
-#define EXAMPLE_URL "http://www.example.com/"
+#define EXAMPLE_URL "http://www.google.com/"
 #define SECURE_URL "https://encrypted.google.com/"
+
+static bool sRepeat = false;
+static const char* sUrl;
+static int sCount;
 
 /**
 * Moblet class.
@@ -62,6 +66,8 @@ public:
 		printf("HTTPS connection -\n");
 		printf("   Press 1 key or\n");
 		printf("   soft left key\n");
+		printf("Toggle REPEAT -\n");
+		printf("   Press 5 key\n");
 		printf("To EXIT -\n");
 		printf("   Press 0 key or\n");
 		printf("   soft right key\n");
@@ -71,7 +77,12 @@ public:
 	* Initiates and establishes a new connection with the given url.
 	*/
 	void start(const char* url) {
-		printf("\nConnecting to,\n%s...\n", url);
+		sUrl = url;
+		if(sRepeat) {
+			sCount++;
+			printf("%i\n", sCount);
+		}
+		printf("Connecting to,\n%s...\n", url);
 
 		mHttp.close();
 		int res = mHttp.create(url, HTTP_GET);
@@ -119,7 +130,10 @@ public:
 	*/
 	virtual void connReadFinished(Connection* conn, int result) {
 		printf("connReadFinished result: %i\n\n", result);
-		showInformation();
+		if(sRepeat)
+			start(sUrl);
+		else
+			showInformation();
 	}
 
 	/**
@@ -132,6 +146,11 @@ public:
 			start(EXAMPLE_URL);
 		if(keyCode == MAK_1 || keyCode == MAK_SOFTLEFT)
 			start(SECURE_URL);
+		if(keyCode == MAK_5) {
+			sRepeat = !sRepeat;
+			sCount = 0;
+			printf("Repeat: %i\n", sRepeat);
+		}
 	}
 	
 	/**
