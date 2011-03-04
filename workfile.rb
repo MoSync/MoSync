@@ -79,7 +79,8 @@ target :examples => :base do
 	Work.invoke_subdirs(EXAM_DIRS)
 end
 
-target :all => :examples do
+target :all => :default do
+	Work.invoke_subdirs(EXAM_DIRS)
 end
 
 target :more => :base do

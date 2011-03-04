@@ -27,7 +27,7 @@ bool isReturnType(const Interface& inf, const string& token) {
 		token == "float" || token == "noreturn";
 }
 
-string cType(const Interface& inf, const string& type) {
+string directCType(const Interface& inf, const string& type) {
 	if(type == "int" || type == "double" || type == "float" || type == "void" ||
 		type == "char" || type == "uint" || type == "long long")
 		return type;
@@ -40,11 +40,6 @@ string cType(const Interface& inf, const string& type) {
 	if(isPointer)
 		return type;
 
-	for(size_t i=0; i<inf.structs.size(); i++) {
-		const Struct& s(inf.structs[i]);
-		if(type == s.name)
-			return s.name + "*";
-	}
 	for(size_t i=0; i<inf.typedefs.size(); i++) {
 		const Typedef& t(inf.typedefs[i]);
 		if(type == t.name) {
@@ -55,7 +50,21 @@ string cType(const Interface& inf, const string& type) {
 			}
 		}
 	}
+	for(size_t i=0; i<inf.structs.size(); i++) {
+		const Struct& s(inf.structs[i]);
+		if(type == s.name)
+			return s.name;
+	}
 	throwException("Unhandled type: " + type);
+}
+
+string cType(const Interface& inf, const string& type) {
+	for(size_t i=0; i<inf.structs.size(); i++) {
+		const Struct& s(inf.structs[i]);
+		if(type == s.name)
+			return s.name + "*";
+	}
+	return directCType(inf, type);
 }
 
 const string& resolveType(const Interface& inf, const string& ctype) {
@@ -71,6 +80,11 @@ const string& resolveType(const Interface& inf, const string& ctype) {
 bool isPointerType(const Interface& inf, const string& type) {
 	string ct = cType(inf, type);
 	return ct[ct.size() - 1] == '*';
+}
+
+bool isDirectPointerType(const Interface& inf, const string& type) {
+	string dct = directCType(inf, type);
+	return dct[dct.size() - 1] == '*';
 }
 
 string jType(const Interface& inf, const string& type) {

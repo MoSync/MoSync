@@ -1214,11 +1214,11 @@ void WRITE_REG(int reg, int value) {
 	int _SYSCALL_CONVERTRES_MAHandle(MAHandle h) { return h; }
 #define _SYSCALL_HANDLERES_MAHandle _SYSCALL_HANDLERES_DEFAULT(MAHandle)
 
-	void debug_MAAddress(const void*) {}
-	MAAddress _SYSCALL_CONVERT_MAAddress(int a) {
+	void debug_MAAddress(MAAddress) {}
+	void* _SYSCALL_CONVERT_MAAddress(MAAddress a) {
 		_debug_hex(a);
-		debug_MAAddress((MAAddress)a);
-		return (MAAddress)(a + (byte*)mem_ds);
+		debug_MAAddress(a);
+		return (a + (byte*)mem_ds);
 	}
 	int _SYSCALL_CONVERTRES_MAAddress(const void* a) {
 		return (int)((byte*)a - (byte*)mem_ds);

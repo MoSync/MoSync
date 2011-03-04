@@ -56,6 +56,7 @@ class PipeExeWork < PipeGccWork
 	def setup3(all_objects)
 		# resource compilation
 		if(!defined?(@LSTFILES))
+			#puts "LSTFILES not defined, searching..."
 			if(@SOURCES[0])
 				@LSTFILES = Dir[@SOURCES[0] + "/*.lst"]
 			else
@@ -63,6 +64,7 @@ class PipeExeWork < PipeGccWork
 			end
 		end
 		if(@LSTFILES.size > 0)
+			#puts @LSTFILES.size.to_s + " lstfiles found"
 			lstTasks = @LSTFILES.collect do |name| FileTask.new(self, name) end
 			@prerequisites << PipeResourceTask.new(self, "build/resources", lstTasks)
 		end

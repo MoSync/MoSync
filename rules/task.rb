@@ -221,7 +221,7 @@ class FileTask < Task
 	
 	# Is this FileTask needed?  Yes if it doesn't exist, or if its time stamp
 	# is out of date.
-	# Prints the reason the task is needed, unless <tt>log</tt> is false.
+	# Prints the reason the task is needed, if <tt>log</tt>.
 	def needed?(log = true)
 		if(!File.exist?(@NAME))
 			puts "Because file does not exist:" if(log)

@@ -22,9 +22,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 bool isReturnType(const Interface& inf, const string& token);
 string cType(const Interface& inf, const string& type);
+string directCType(const Interface& inf, const string& type);
 const string& resolveType(const Interface& inf, const string& ctype);
 
 bool isPointerType(const Interface& inf, const string& type);
+bool isDirectPointerType(const Interface& inf, const string& type);
+
 string jType(const Interface& inf, const string& type);
 string getSJType(const Interface& inf, const string& type, bool argIn);	//Static Java
 
