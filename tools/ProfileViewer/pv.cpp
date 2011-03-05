@@ -10,6 +10,7 @@
 #include "ProfNode.h"
 #include "FlagCheck.h"
 #include "SDL_gfxPrimitives.h"
+#include "SDL_Pixel.h"
 #include "helpers/attribute.h"
 #include "helpers/types.h"
 
@@ -17,14 +18,43 @@ using namespace std;
 
 // defines
 #define ASSERT(a) do { if(!(a)) fatalError(); } while(0)
+#define ST(sdlFunc) do { int res = (sdlFunc); ASSERT(res == 0); } while(0)
+
+// constants
+static const float TRIGGER_FRACTION = 0.01f;	// 1%
+
+static const uint WHITE = 0xffffffff;
+static const uint RED = 0xff0000ff;
+static const uint BLUE = 0x8080ffff;
+static const uint YELLOW = 0xffff00ff;
+static const uint PINK = 0xff00ffff;
+static const uint GREEN = 0x00ff00ff;
+
+static const uint COLORS[] = {
+	YELLOW, PINK, GREEN,
+};
+static const uint nColors = sizeof(COLORS) / sizeof(uint);
 
 // types
+struct SLICE {
+	ProfNode* node;
+	uint color;
+	float fraction;
+	Sint16 startAngle, endAngle;
+};
 
 // variables
 static SDL_Surface* sScreen = NULL;
+static SDL_Surface* sHitBuffer = NULL;
 static ProfNode* sRoot = NULL;
 static ProfNode* sCurrentNode;
 static int sMaxLevel = 0;
+// index into sSlices, +1.
+static Uint32 sSliceIndex = 0;
+
+// graphics cache
+static vector<SLICE> sSlices;
+int sRadius, sCenterX, sCenterY;
 
 // only valid during parsing
 static int sParseLevel, sNodeCount;
@@ -36,6 +66,8 @@ static void XMLCALL opEnd(void *data, const char *el);
 static float parseFloat(const char* str);
 static int parseInt(const char* str);
 static void ATTRIB(noreturn) fatalError();
+static void processMouseMotion(const SDL_MouseMotionEvent&);
+static void processMouseClick(const SDL_MouseButtonEvent&);
 
 static bool streq(const char* a, const char* b) {
 	return strcmp(a, b) == 0;
@@ -170,80 +202,78 @@ void loadProfile(const char* filename) {
 	printf("Loaded %i nodes. Max level: %i\n", sNodeCount, sMaxLevel);
 }
 
-struct SLICE {
-	uint color;
-	float fraction;
-};
-static const float TRIGGER_FRACTION = 0.01f;	// 1%
-
 static void dumpNode(ProfNode* node) {
 	printf("%s\n", node->name.c_str());
 }
 
-static void drawPie() {
-	static const uint WHITE = 0xffffffff;
-	static const uint RED = 0xff0000ff;
-	static const uint BLUE = 0x8080ffff;
-	static const uint YELLOW = 0xffff00ff;
-	static const uint PINK = 0xff00ffff;
-	static const uint GREEN = 0x00ff00ff;
-
-	static const uint COLORS[] = {
-		YELLOW, PINK, GREEN,
-	};
-	static const uint nColors = sizeof(COLORS) / sizeof(uint);
-
-	vector<SLICE> slices;
-	uint color = BLUE;
+static void constructPie() {
+	sSlices.clear();
+	uint color = BLUE;	// for local time
 	{
-		SLICE s = { color, sCurrentNode->localTime / sCurrentNode->totalTime };
-		slices.push_back(s);
+		SLICE s = { sCurrentNode, color,
+			sCurrentNode->localTime / sCurrentNode->totalTime };
+		sSlices.push_back(s);
 	}
 	uint colorIndex = 0;
-	const ProfSet& ch(sCurrentNode->children);
+	ProfSet& ch(sCurrentNode->children);
 	for(ProfSet::iterator itr = ch.begin(); itr != ch.end(); itr++) {
-		const ProfNode* node(*itr);
+		ProfNode* node(*itr);
 		float fraction = node->totalTime / sCurrentNode->totalTime;
 		if(fraction > TRIGGER_FRACTION) {
-			SLICE s = { color, fraction };
-			slices.push_back(s);
+			SLICE s = { node, color, fraction };
+			sSlices.push_back(s);
 			colorIndex++;
 			if(colorIndex >= nColors)
 				colorIndex = 0;
 		}
 	}
-	printf("%u slices constructed\n", slices.size());
+	printf("%u slices constructed\n", sSlices.size());
+}
 
-	int centerX = sScreen->w / 2, centerY = sScreen->h / 2;
-	int radius = MIN(centerX, centerY);
+void drawPie() {
+	sCenterX = sScreen->w / 2;
+	sCenterY = sScreen->h / 2;
+	sRadius = MIN(sCenterX, sCenterY);
+
+	ST(SDL_FillRect(sScreen, NULL, 0));
+	ST(SDL_FillRect(sHitBuffer, NULL, 0));
 
 	// draw slices
 	Sint16 angle = 0;
-	for(size_t i=0; i<slices.size(); i++) {
-		const SLICE& s(slices[i]);
-		Sint16 nextAngle = (Sint16)(angle + s.fraction * 360);
-		filledPieColor(sScreen, centerX, centerY, radius, angle, nextAngle, s.color);
-		angle = nextAngle;
+	for(size_t i=0; i<sSlices.size(); i++) {
+		SLICE& s(sSlices[i]);
+		s.startAngle = angle;
+		s.endAngle = (Sint16)(angle + s.fraction * 360);
+		ST(filledPieColor(sScreen, sCenterX, sCenterY, sRadius,
+			s.startAngle, s.endAngle, s.color));
+		ASSERT(i < 256);
+		ST(filledPieRGBA(sHitBuffer, sCenterX, sCenterY, sRadius,
+			s.startAngle, s.endAngle, (byte)i+1,0,0,0xff));
+		angle = s.endAngle;
 	}
-	// draw the rest
-	filledPieColor(sScreen, centerX, centerY, radius, angle, 360, RED);
+	// draw the rest (sub-1% children)
+	ST(filledPieColor(sScreen, sCenterX, sCenterY, sRadius, angle, 360, RED));
 
-	SDL_Flip(sScreen);
+	// todo: draw text
+
+	ST(SDL_Flip(sScreen));
 }
 
 #undef main
 extern "C" int main(int argc, const char** argv) {
 	const char* filename = argv[1];
 
-	// todo: draw "loading"
+	// todo: loading screen
 
 	loadProfile(filename);
 	
 	// init SDL
 	SDL_Init(SDL_INIT_VIDEO);
 	sScreen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE);
+	sHitBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 8, 0xff,0,0,0);
 
 	sCurrentNode = sRoot;
+	constructPie();
 	drawPie();
 
 	while(true) {
@@ -251,6 +281,30 @@ extern "C" int main(int argc, const char** argv) {
 		SDL_WaitEvent(&e);
 		if(e.type == SDL_QUIT)
 			break;
+		switch(e.type) {
+		case SDL_MOUSEMOTION:
+			processMouseMotion((SDL_MouseMotionEvent&)e);
+			break;
+		case SDL_MOUSEBUTTONDOWN:
+			processMouseClick((SDL_MouseButtonEvent&)e);
+			break;
+		}
 	}
 	return 0;
+}
+
+// show name and stats on pie-slice mouse-over
+// go down one level on click
+static void processMouseMotion(const SDL_MouseMotionEvent& e) {
+	Uint32 index;
+	ST(SDL_GetPixel(sHitBuffer, e.x, e.y, &index));
+	printf("%ix%i: %i\n", e.x, e.y, sSliceIndex);
+	ASSERT(index <= sSlices.size());
+	if(index != sSliceIndex) {
+		sSliceIndex = index;
+		drawPie();
+	}
+}
+
+static void processMouseClick(const SDL_MouseButtonEvent&) {
 }
