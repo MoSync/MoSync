@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include <expat.h>
 #include <SDL.h>
+#include <SDL/SDL_ttf.h>
 #include <vector>
 #include "ProfNode.h"
 #include "FlagCheck.h"
@@ -46,6 +47,7 @@ struct SLICE {
 // variables
 static SDL_Surface* sScreen = NULL;
 static SDL_Surface* sHitBuffer = NULL;
+static TTF_Font *sFont = NULL; 
 static ProfNode* sRoot = NULL;
 static ProfNode* sCurrentNode;
 static int sMaxLevel = 0;
@@ -78,6 +80,7 @@ template<class T> const T& MIN(const T& a, const T& b) {
 }
 
 static void fatalError() {
+	printf("SDL Error: %s\n", SDL_GetError());
 	exit(1);
 };
 
@@ -254,7 +257,15 @@ void drawPie() {
 	// draw the rest (sub-1% children)
 	ST(filledPieColor(sScreen, sCenterX, sCenterY, sRadius, angle, 360, RED));
 
-	// todo: draw text
+	// draw text
+	char buf[512];
+	sprintf(buf, "index: %i", sSliceIndex);
+	SDL_Color color = { 0xff, 0xff, 0xff, 0 };	// white
+	SDL_Surface* text_surface = TTF_RenderText_Solid(sFont, buf, color);
+	ASSERT(text_surface);
+	SDL_Rect rect = { (Sint16)0, (Sint16)0, 0, 0 };
+	SDL_BlitSurface(text_surface, NULL, sScreen, &rect);
+	SDL_FreeSurface(text_surface);
 
 	ST(SDL_Flip(sScreen));
 }
@@ -270,7 +281,16 @@ extern "C" int main(int argc, const char** argv) {
 	// init SDL
 	SDL_Init(SDL_INIT_VIDEO);
 	sScreen = SDL_SetVideoMode(640, 480, 32, SDL_SWSURFACE);
+	ASSERT(sScreen);
 	sHitBuffer = SDL_CreateRGBSurface(SDL_SWSURFACE, 640, 480, 8, 0xff,0,0,0);
+	ASSERT(sHitBuffer);
+
+	// load font
+	ST(TTF_Init());
+	char fontFileName[256];
+	sprintf(fontFileName, "%s/bin/unifont-5.1.20080907.ttf", getenv("MOSYNCDIR"));
+	sFont = TTF_OpenFont(fontFileName, 16);
+	ASSERT(sFont);
 
 	sCurrentNode = sRoot;
 	constructPie();
@@ -298,7 +318,7 @@ extern "C" int main(int argc, const char** argv) {
 static void processMouseMotion(const SDL_MouseMotionEvent& e) {
 	Uint32 index;
 	ST(SDL_GetPixel(sHitBuffer, e.x, e.y, &index));
-	printf("%ix%i: %i\n", e.x, e.y, sSliceIndex);
+	//printf("%ix%i: %i\n", e.x, e.y, sSliceIndex);
 	ASSERT(index <= sSlices.size());
 	if(index != sSliceIndex) {
 		sSliceIndex = index;
