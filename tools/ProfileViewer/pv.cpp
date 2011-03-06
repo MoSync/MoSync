@@ -71,6 +71,7 @@ static int parseInt(const char* str);
 static void ATTRIB(noreturn) fatalError();
 static void processMouseMotion(const SDL_MouseMotionEvent&);
 static void processMouseClick(const SDL_MouseButtonEvent&);
+static void processKeyDown(const SDL_KeyboardEvent& e);
 static void drawTextf(int& y, const char* fmt, ...) PRINTF_ATTRIB(2, 3);
 
 static bool streq(const char* a, const char* b) {
@@ -334,6 +335,9 @@ extern "C" int main(int argc, const char** argv) {
 		case SDL_MOUSEBUTTONDOWN:
 			processMouseClick((SDL_MouseButtonEvent&)e);
 			break;
+		case SDL_KEYDOWN:
+			processKeyDown((SDL_KeyboardEvent&)e);
+			break;
 		}
 	}
 	return 0;
@@ -352,8 +356,15 @@ static void processMouseMotion(const SDL_MouseMotionEvent& e) {
 	}
 }
 
+static void setNode(ProfNode* node) {
+	sCurrentNode = node;
+	constructPie();
+	sSliceIndex = 0;
+	drawPie();
+}
+
 static void processMouseClick(const SDL_MouseButtonEvent& e) {
-	if(!(e.type == SDL_MOUSEBUTTONDOWN || e.button == 0))
+	if(e.button != 1)
 		return;
 	Uint32 index;
 	ST(SDL_GetPixel(sHitBuffer, e.x, e.y, &index));
@@ -362,10 +373,16 @@ static void processMouseClick(const SDL_MouseButtonEvent& e) {
 	ProfNode* node = sSlices[index-1].node;
 	if(node->children.empty() || node == sCurrentNode)
 		return;
-	sCurrentNode = node;
-	constructPie();
-	sSliceIndex = 0;
-	drawPie();
-	ST(SDL_GetPixel(sHitBuffer, e.x, e.y, &sSliceIndex));
-	drawPie();
+	setNode(node);
+}
+
+static void processKeyDown(const SDL_KeyboardEvent& e) {
+	switch(e.keysym.sym) {
+	case SDLK_BACKSPACE:
+		if(sCurrentNode->parent)
+			setNode(sCurrentNode->parent);
+		break;
+	//case SDLK_ESCAPE:
+		//exit(0);
+	}
 }
