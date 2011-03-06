@@ -48,6 +48,7 @@ struct SLICE {
 static SDL_Surface* sScreen = NULL;
 static SDL_Surface* sHitBuffer = NULL;
 static TTF_Font *sFont = NULL; 
+static int sFontHeight;
 static ProfNode* sRoot = NULL;
 static ProfNode* sCurrentNode;
 static int sMaxLevel = 0;
@@ -70,6 +71,7 @@ static int parseInt(const char* str);
 static void ATTRIB(noreturn) fatalError();
 static void processMouseMotion(const SDL_MouseMotionEvent&);
 static void processMouseClick(const SDL_MouseButtonEvent&);
+static void drawTextf(int& y, const char* fmt, ...) PRINTF_ATTRIB(2, 3);
 
 static bool streq(const char* a, const char* b) {
 	return strcmp(a, b) == 0;
@@ -233,7 +235,21 @@ static void constructPie() {
 	printf("%u slices constructed\n", sSlices.size());
 }
 
-void drawPie() {
+static void drawTextf(int& y, const char* fmt, ...) {
+	char buf[512];
+	va_list args;
+	va_start(args, fmt);
+	vsprintf(buf, fmt, args);
+	SDL_Color color = { 0xff, 0xff, 0xff, 0 };	// white
+	SDL_Surface* text_surface = TTF_RenderText_Solid(sFont, buf, color);
+	ASSERT(text_surface);
+	SDL_Rect rect = { (Sint16)0, (Sint16)y, 0, 0 };
+	SDL_BlitSurface(text_surface, NULL, sScreen, &rect);
+	SDL_FreeSurface(text_surface);
+	y += sFontHeight;
+}
+
+static void drawPie() {
 	sCenterX = sScreen->w / 2;
 	sCenterY = sScreen->h / 2;
 	sRadius = MIN(sCenterX, sCenterY);
@@ -258,14 +274,19 @@ void drawPie() {
 	ST(filledPieColor(sScreen, sCenterX, sCenterY, sRadius, angle, 360, RED));
 
 	// draw text
-	char buf[512];
-	sprintf(buf, "index: %i", sSliceIndex);
-	SDL_Color color = { 0xff, 0xff, 0xff, 0 };	// white
-	SDL_Surface* text_surface = TTF_RenderText_Solid(sFont, buf, color);
-	ASSERT(text_surface);
-	SDL_Rect rect = { (Sint16)0, (Sint16)0, 0, 0 };
-	SDL_BlitSurface(text_surface, NULL, sScreen, &rect);
-	SDL_FreeSurface(text_surface);
+	int y = 0;
+	drawTextf(y, "Current function: %s", sCurrentNode->name.c_str());
+	drawTextf(y, "Total: %i ms. Local: %i ms. Children: %i ms.",
+		(int)sCurrentNode->totalTime,
+		(int)sCurrentNode->localTime,
+		(int)sCurrentNode->childrenTime);
+	drawTextf(y, "index: %i", sSliceIndex);
+	if(sSliceIndex != 0) {
+		ProfNode* node = sSlices[sSliceIndex-1].node;
+		drawTextf(y, "Under cursor: %s", node->name.c_str());
+		drawTextf(y, "Total: %i ms. Local: %i ms. Children: %i ms.",
+			(int)node->totalTime, (int)node->localTime, (int)node->childrenTime);
+	}
 
 	ST(SDL_Flip(sScreen));
 }
@@ -291,6 +312,7 @@ extern "C" int main(int argc, const char** argv) {
 	sprintf(fontFileName, "%s/bin/unifont-5.1.20080907.ttf", getenv("MOSYNCDIR"));
 	sFont = TTF_OpenFont(fontFileName, 16);
 	ASSERT(sFont);
+	sFontHeight = TTF_FontLineSkip(sFont);
 
 	sCurrentNode = sRoot;
 	constructPie();
