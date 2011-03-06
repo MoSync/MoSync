@@ -22,7 +22,7 @@ using namespace std;
 #define ST(sdlFunc) do { int res = (sdlFunc); ASSERT(res == 0); } while(0)
 
 // constants
-static const float TRIGGER_FRACTION = 0.01f;	// 1%
+static const float TRIGGER_FRACTION = 0.005f;	// 0.5%
 
 static const uint WHITE = 0xffffffff;
 static const uint RED = 0xff0000ff;
@@ -224,8 +224,9 @@ static void constructPie() {
 	for(ProfSet::iterator itr = ch.begin(); itr != ch.end(); itr++) {
 		ProfNode* node(*itr);
 		float fraction = node->totalTime / sCurrentNode->totalTime;
+		printf("%s: %i\n", node->name.c_str(), (int)node->totalTime);
 		if(fraction > TRIGGER_FRACTION) {
-			SLICE s = { node, color, fraction };
+			SLICE s = { node, COLORS[colorIndex], fraction };
 			sSlices.push_back(s);
 			colorIndex++;
 			if(colorIndex >= nColors)
@@ -243,10 +244,18 @@ static void drawTextf(int& y, const char* fmt, ...) {
 	SDL_Color color = { 0xff, 0xff, 0xff, 0 };	// white
 	SDL_Surface* text_surface = TTF_RenderText_Solid(sFont, buf, color);
 	ASSERT(text_surface);
-	SDL_Rect rect = { (Sint16)0, (Sint16)y, 0, 0 };
+	SDL_Rect rect = { (Sint16)0, (Sint16)y, text_surface->w, text_surface->h };
+	ST(SDL_FillRect(sScreen, &rect, 0));
 	SDL_BlitSurface(text_surface, NULL, sScreen, &rect);
 	SDL_FreeSurface(text_surface);
 	y += sFontHeight;
+}
+
+static void drawFuncText(const char* title, int& y, ProfNode* node) {
+	drawTextf(y, "%s: %s", title, node->name.c_str());
+	drawTextf(y, "Total: %i ms. Local: %i ms. Children: %i ms. Count: %i.",
+		(int)node->totalTime, (int)node->localTime, (int)node->childrenTime,
+		node->count);
 }
 
 static void drawPie() {
@@ -275,17 +284,12 @@ static void drawPie() {
 
 	// draw text
 	int y = 0;
-	drawTextf(y, "Current function: %s", sCurrentNode->name.c_str());
-	drawTextf(y, "Total: %i ms. Local: %i ms. Children: %i ms.",
-		(int)sCurrentNode->totalTime,
-		(int)sCurrentNode->localTime,
-		(int)sCurrentNode->childrenTime);
-	drawTextf(y, "index: %i", sSliceIndex);
+	drawFuncText("Current function", y, sCurrentNode);
 	if(sSliceIndex != 0) {
 		ProfNode* node = sSlices[sSliceIndex-1].node;
-		drawTextf(y, "Under cursor: %s", node->name.c_str());
-		drawTextf(y, "Total: %i ms. Local: %i ms. Children: %i ms.",
-			(int)node->totalTime, (int)node->localTime, (int)node->childrenTime);
+		if(node != sCurrentNode) {
+			drawFuncText("Under cursor", y, node);
+		}
 	}
 
 	ST(SDL_Flip(sScreen));
@@ -348,5 +352,20 @@ static void processMouseMotion(const SDL_MouseMotionEvent& e) {
 	}
 }
 
-static void processMouseClick(const SDL_MouseButtonEvent&) {
+static void processMouseClick(const SDL_MouseButtonEvent& e) {
+	if(!(e.type == SDL_MOUSEBUTTONDOWN || e.button == 0))
+		return;
+	Uint32 index;
+	ST(SDL_GetPixel(sHitBuffer, e.x, e.y, &index));
+	if(index == 0)
+		return;
+	ProfNode* node = sSlices[index-1].node;
+	if(node->children.empty() || node == sCurrentNode)
+		return;
+	sCurrentNode = node;
+	constructPie();
+	sSliceIndex = 0;
+	drawPie();
+	ST(SDL_GetPixel(sHitBuffer, e.x, e.y, &sSliceIndex));
+	drawPie();
 }
