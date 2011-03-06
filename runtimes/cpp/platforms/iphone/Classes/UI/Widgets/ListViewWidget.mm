@@ -69,8 +69,14 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-
-	return [super setPropertyWithKey:key toValue:value];
+    if([key isEqualToString:@"rowHeight"]) {
+		float rowHeight = [value floatValue];
+		UITableView* tableView = (UITableView*)view;
+		tableView.rowHeight = rowHeight;
+	} 
+	else {
+		return [super setPropertyWithKey:key toValue:value];
+	}
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

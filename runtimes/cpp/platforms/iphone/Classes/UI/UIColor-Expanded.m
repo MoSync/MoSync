@@ -367,6 +367,18 @@ static NSMutableDictionary *colorNameCache = nil;
 						   alpha:1.0f];
 }
 
++ (UIColor *)colorWithARGBHex:(UInt32)hex {
+	int a = (hex >> 24 ) & 0xFF;
+	int r = (hex >> 16) & 0xFF;
+	int g = (hex >> 8) & 0xFF;
+	int b = (hex) & 0xFF;
+	
+	return [UIColor colorWithRed:r / 255.0f
+						   green:g / 255.0f
+							blue:b / 255.0f
+						   alpha:a / 255.0f];
+}
+
 // Returns a UIColor by scanning the string for a hex number and passing that to +[UIColor colorWithRGBHex:]
 // Skips any leading whitespace and ignores any trailing characters
 + (UIColor *)colorWithHexString:(NSString *)stringToConvert {
@@ -374,16 +386,22 @@ static NSMutableDictionary *colorNameCache = nil;
 	// added by me: Niklas Nummelin
 	NSString *cString = [[stringToConvert stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] uppercaseString];  
     // String should be 6 or 8 characters  
-    if ([cString length] < 6) return nil;  
+    if ([cString length] < 6) return [UIColor purpleColor];  
     // strip 0X if it appears  
     if ([cString hasPrefix:@"0X"]) cString = [cString substringFromIndex:2];  
     if ([cString hasPrefix:@"#"]) cString = [cString substringFromIndex:1];  
-    if ([cString length] != 6) return nil;  	
+    //if ([cString length] > 6) cString = [cString substringFromIndex:([cString length]-6)];  
+	
+	NSLog(@"colorWithHexString: %@\n", cString);
 	
 	NSScanner *scanner = [NSScanner scannerWithString:cString];	
 	unsigned hexNum;
-	if (![scanner scanHexInt:&hexNum]) return nil;
-	return [UIColor colorWithRGBHex:hexNum];
+	if (![scanner scanHexInt:&hexNum]) return [UIColor purpleColor];
+	
+	if([cString length] > 6)
+		return [UIColor colorWithARGBHex:hexNum];
+	else
+		return [UIColor colorWithRGBHex:hexNum];		
 }
 
 // Lookup a color using css 3/svg color name
@@ -395,7 +413,7 @@ static NSMutableDictionary *colorNameCache = nil;
 		
 		if ((id)color == [NSNull null]) {
 			// If it wasn't there previously, it's still not there now
-			color = nil;
+			color = [UIColor purpleColor];
 		} else if (!color) {
 			// Color not in cache, so search for it now
 			color = [self searchForColorByName:cssColorName];
