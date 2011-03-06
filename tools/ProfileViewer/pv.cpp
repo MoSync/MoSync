@@ -237,7 +237,7 @@ static void constructPie() {
 	printf("%u slices constructed\n", sSlices.size());
 }
 
-static void drawTextf(int& y, const char* fmt, ...) {
+static void drawTextf(int& y, bool left, const char* fmt, ...) {
 	char buf[512];
 	va_list args;
 	va_start(args, fmt);
@@ -245,16 +245,25 @@ static void drawTextf(int& y, const char* fmt, ...) {
 	SDL_Color color = { 0xff, 0xff, 0xff, 0 };	// white
 	SDL_Surface* text_surface = TTF_RenderText_Solid(sFont, buf, color);
 	ASSERT(text_surface);
-	SDL_Rect rect = { (Sint16)0, (Sint16)y, text_surface->w, text_surface->h };
+	int x;
+	if(left) {
+		x = 0;
+	} else {
+		x = sScreen->w - text_surface->w;
+		y -= sFontHeight;
+	}
+	SDL_Rect rect = { (Sint16)x, (Sint16)y, text_surface->w, text_surface->h };
 	ST(SDL_FillRect(sScreen, &rect, 0));
 	SDL_BlitSurface(text_surface, NULL, sScreen, &rect);
 	SDL_FreeSurface(text_surface);
-	y += sFontHeight;
+	if(left) {
+		y += sFontHeight;
+	}
 }
 
 static void drawFuncText(const char* title, int& y, ProfNode* node) {
-	drawTextf(y, "%s: %s", title, node->name.c_str());
-	drawTextf(y, "Total: %i ms. Local: %i ms. Children: %i ms. Count: %i.",
+	drawTextf(y, true, "%s: %s", title, node->name.c_str());
+	drawTextf(y, true, "Total: %i ms. Local: %i ms. Children: %i ms. Count: %i.",
 		(int)node->totalTime, (int)node->localTime, (int)node->childrenTime,
 		node->count);
 }
@@ -283,8 +292,18 @@ static void drawPie() {
 	// draw the rest (sub-1% children)
 	ST(filledPieColor(sScreen, sCenterX, sCenterY, sRadius, angle, 360, RED));
 
-	// draw text
-	int y = 0;
+	int y;
+
+	// draw call stack
+	y = sScreen->h;
+	ProfNode* node = sCurrentNode->parent;
+	while(node) {
+		drawTextf(y, false, "%s", node->name.c_str());
+		node = node->parent;
+	}
+
+	// draw current info
+	y = 0;
 	drawFuncText("Current function", y, sCurrentNode);
 	if(sSliceIndex != 0) {
 		ProfNode* node = sSlices[sSliceIndex-1].node;
