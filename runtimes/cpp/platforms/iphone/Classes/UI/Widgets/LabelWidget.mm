@@ -17,10 +17,70 @@
 
 #import "LabelWidget.h"
 
+typedef enum VerticalAlignment {
+    VerticalAlignmentTop,
+    VerticalAlignmentMiddle,
+    VerticalAlignmentBottom,
+} VerticalAlignment;
+
+@interface UILabelWithVerticalAlignment : UILabel {
+@private
+    VerticalAlignment verticalAlignment_;
+}
+
+@property (nonatomic, assign) VerticalAlignment verticalAlignment;
+
+@end
+
+@implementation UILabelWithVerticalAlignment
+
+@synthesize verticalAlignment = verticalAlignment_;
+
+- (id)initWithFrame:(CGRect)frame {
+    if (self = [super initWithFrame:frame]) {
+        self.verticalAlignment = VerticalAlignmentMiddle;
+    }
+    return self;
+}
+
+- (void)setVerticalAlignment:(VerticalAlignment)verticalAlignment {
+    verticalAlignment_ = verticalAlignment;
+    [self setNeedsDisplay];
+}
+
+- (CGRect)textRectForBounds:(CGRect)bounds limitedToNumberOfLines:(NSInteger)numberOfLines {
+    CGRect textRect = [super textRectForBounds:bounds limitedToNumberOfLines:numberOfLines];
+    switch (self.verticalAlignment) {
+        case VerticalAlignmentTop:
+            textRect.origin.y = bounds.origin.y;
+            break;
+        case VerticalAlignmentBottom:
+            textRect.origin.y = bounds.origin.y + bounds.size.height - textRect.size.height;
+            break;
+        case VerticalAlignmentMiddle:
+            // Fall through.
+        default:
+            textRect.origin.y = bounds.origin.y + (bounds.size.height - textRect.size.height) / 2.0;
+    }
+    return textRect;
+}
+
+-(CGSize)sizeThatFits:(CGSize)_size {
+	CGSize size = [self.text sizeWithFont:self.font constrainedToSize:CGSizeMake(self.frame.size.width,FLT_MAX) lineBreakMode:UILineBreakModeWordWrap ];
+	return size;
+}
+
+-(void)drawTextInRect:(CGRect)requestedRect {
+    CGRect actualRect = [self textRectForBounds:requestedRect limitedToNumberOfLines:self.numberOfLines];
+    [super drawTextInRect:actualRect];
+}
+@end
+
+
 @implementation LabelWidget
 
 - (id)init {	
-	UILabel* label = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
+	UILabel* label = [[[UILabelWithVerticalAlignment alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
 	label.opaque = NO;
 	view = label;
 	label.numberOfLines = 0;
@@ -58,11 +118,16 @@
 		}		
 	}
 	else if([key isEqualToString:@"verticalAlignment"]) {
-		// This isn't trivial on iphone.
-		
-		//UILabel* label = (UILabel*) view;
-		//if([value isEqualToString:@"center"]) {
-		//}
+		UILabelWithVerticalAlignment* label = (UILabelWithVerticalAlignment*) view;
+		if([value isEqualToString:@"top"]) {
+			[label setVerticalAlignment:VerticalAlignmentTop];
+		}
+		else if([value isEqualToString:@"center"]) {
+			[label setVerticalAlignment:VerticalAlignmentMiddle];
+		}
+		else if([value isEqualToString:@"bottom"]) {
+			[label setVerticalAlignment:VerticalAlignmentBottom];
+		}		
 	}	
 	else if([key isEqualToString:@"fontColor"]) {
 		UILabel* label = (UILabel*) view;	
