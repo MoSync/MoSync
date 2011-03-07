@@ -22,11 +22,6 @@
 #define MA_WIDGET_ERROR -1
 #define MA_WIDGET_OK 0
 
-@interface AbstractLayoutView (AbstractLayoutViewExpanded)
-- (void) setVerticalAlignment: (UIControlContentVerticalAlignment) va;
-- (void) setHorizontalAlignment: (UIControlContentHorizontalAlignment) ha;
-@end
-
 typedef enum {
 	FIXED_SIZE,
 	FILL_PARENT,
@@ -45,6 +40,9 @@ typedef enum {
 	
 }
 
+
+// this generates a wrapper that routes the layoutSubviews and sizeThatFits commands to an IWidget
+// make sure not to call the IWidget::view.layoutSubviews or IWidget::view.sizeThatFits from the function  but the super* functions..
 #define MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(name) \
 @interface MoSync##name : name {\
 IWidget* mWidget;\
@@ -68,11 +66,16 @@ return [mWidget sizeThatFitsFor:(UIView*)self withSize:size];\
 - (void)superLayoutSubviews {\
 	[super layoutSubviews];\
 }\
+- (CGSize)superSizeThatFits:(CGSize)size {\
+[super sizeThatFits:size];\
+}\
 @end\
 
 - (void)setAutoSizeParamX:(AutoSizeParam)x andY:(AutoSizeParam)y;
 - (AutoSizeParam)getAutoSizeParamX;
 - (AutoSizeParam)getAutoSizeParamY;
+
+// override this if you want a special behaviour...
 - (void)layoutSubviews:(UIView*)view;
 - (CGSize)sizeThatFitsFor:(UIView*)view withSize:(CGSize)size;
 

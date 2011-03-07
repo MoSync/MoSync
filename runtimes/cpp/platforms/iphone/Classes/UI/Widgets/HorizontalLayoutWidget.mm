@@ -56,6 +56,21 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(HLayoutView)
 			[vlv setHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
 		else if([value isEqualToString:@"right"])
 			[vlv setHorizontalAlignment:UIControlContentHorizontalAlignmentRight];		
+	} else if([key isEqualToString:@"leftMargin"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		[vlv setLeftMargin:[value intValue]];
+	} else if([key isEqualToString:@"rightMargin"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		[vlv setRightMargin:[value intValue]];
+	} else if([key isEqualToString:@"topMargin"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		[vlv setTopMargin:[value intValue]];
+	} else if([key isEqualToString:@"bottomMargin"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		[vlv setBottomMargin:[value intValue]];
+	} else if([key isEqualToString:@"spacing"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		[vlv setSpacing:[value intValue]];
 	} else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

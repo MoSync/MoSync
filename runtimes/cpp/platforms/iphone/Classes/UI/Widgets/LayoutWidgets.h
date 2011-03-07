@@ -18,14 +18,42 @@
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
 
-@interface VerticalLayoutWidget : IWidget {
+@interface AbstractLayoutView (AbstractLayoutViewExpanded)
+- (void) setVerticalAlignment: (UIControlContentVerticalAlignment) va;
+- (void) setHorizontalAlignment: (UIControlContentHorizontalAlignment) ha;
+- (void) setSpacing:(int)_spacing;
+- (void) setLeftMargin:(int)_margin;
+- (void) setRightMargin:(int)_margin;
+- (void) setTopMargin:(int)_margin;
+- (void) setBottomMargin:(int)_margin;
+@end
+
+
+typedef enum {
+	OrientationVertical,
+	OrientationHorizontal
+} LinearLayoutOrientation;
+
+@interface LinearLayoutBase : IWidget {
+	LinearLayoutOrientation orientation;
 	
 }
 
-- (id)init;
+- (id)init:(LinearLayoutOrientation)ori;
+- (void)layoutSubviews:(UIView*)view;
 - (void)addChild: (IWidget*)child;
 - (void)removeChild: (IWidget*)child;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
 
+@end
+
+@interface HorizontalLayoutWidget : LinearLayoutBase {
+}
+- (id)init;
+@end
+
+@interface VerticalLayoutWidget : LinearLayoutBase {
+}
+- (id)init;
 @end

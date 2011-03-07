@@ -20,18 +20,6 @@
 #import <objc/runtime.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
-@implementation AbstractLayoutView (AbstractLayoutViewExpanded)
-
-- (void) setVerticalAlignment: (UIControlContentVerticalAlignment) va {
-	vAlignment = va;
-}
-
-- (void) setHorizontalAlignment: (UIControlContentHorizontalAlignment) ha {
-	hAlignment = ha;
-}
-
-@end
-
 @implementation IWidget
 
 
@@ -69,7 +57,7 @@
 			viewHeight = [childView sizeThatFits:CGSizeZero].height;
 		}
 		
-		[childView setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];
+		[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, viewWidth, viewHeight)];
 	}
 	
 	[_view superLayoutSubviews];
