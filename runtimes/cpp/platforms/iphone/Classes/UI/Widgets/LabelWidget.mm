@@ -22,8 +22,8 @@
 - (id)init {	
 	UILabel* label = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
 	label.opaque = NO;
-	view = label;		
-	
+	view = label;
+	label.numberOfLines = 0;
 	return [super init];	
 }
 
@@ -38,7 +38,8 @@
 	if([key isEqualToString:@"text"]) {
 		UILabel* label = (UILabel*) view;
 		[label setText: value];
-		[label sizeToFit];
+		[self layout];
+		//[label sizeToFit];
 	} 
 	else if([key isEqualToString:@"numberOfLines"]) {
 		UILabel* label = (UILabel*) view;

@@ -25,7 +25,6 @@
 #include <base/Syscall.h>
 #endif
 
-
 @implementation EditBoxWidget
 
 - (BOOL)textFieldShouldReturn:(UITextField*)textField {

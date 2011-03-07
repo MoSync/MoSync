@@ -18,15 +18,19 @@
 #import "VerticalLayoutWidget.h"
 #import "LayoutManagers.h"
 
+MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(VLayoutView)
+
 @implementation VerticalLayoutWidget
 
 - (id)init {
 	//view = [[VLayoutView alloc] init];
 	
-	view = [[VLayoutView alloc]  initWithFrame:CGRectZero spacing:0
+	view = [[MoSyncVLayoutView alloc]  initWithFrame:CGRectZero spacing:0
 									leftMargin:0 rightMargin:0 topMargin:0 bottomMargin:0
 									hAlignment:UIControlContentHorizontalAlignmentLeft
 									vAlignment:UIControlContentVerticalAlignmentTop];
+	
+	[view setWidget:self];
 	
 	return [super init];
 }

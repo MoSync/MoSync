@@ -17,11 +17,14 @@
 
 #import "RelativeLayoutWidget.h"
 
+MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(UIView)
+
 
 @implementation RelativeLayoutWidget
 
 - (id)init {	
-	view = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];	
+	view = [[[MoSyncUIView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];	
+	[view setWidget:self];
 	return [super init];	
 }
 

@@ -68,6 +68,7 @@
 	if([key isEqualToString:@"text"]) {
 		UIButton* button = (UIButton*) view;
 		[button setTitle:value forState:UIControlStateNormal];
+		[self layout];	
 	} else
 	if([key isEqualToString:@"fontSize"]) {
 		UIButton* button = (UIButton*) view;

@@ -77,8 +77,8 @@
 	//UIView *childView = [screen getView];	
 	//[childView setFrame: view.frame];
 
-	view.autoresizesSubviews = YES;	
-	[view setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
+	//view.autoresizesSubviews = YES;	
+	//[view setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
 
 }
 

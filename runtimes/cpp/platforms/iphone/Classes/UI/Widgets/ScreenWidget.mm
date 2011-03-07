@@ -86,7 +86,6 @@
 - (void)layout {
 	int viewWidth = view.frame.size.width; 
 	int viewHeight = view.frame.size.height; 
-
 	
 	//[view setNeedsLayout];
 	//[view setNeedsDisplay];

@@ -27,6 +27,11 @@
 - (void) setHorizontalAlignment: (UIControlContentHorizontalAlignment) ha;
 @end
 
+typedef enum {
+	FIXED_SIZE,
+	FILL_PARENT,
+	WRAP_CONTENT
+} AutoSizeParam;
 
 @interface IWidget : NSObject {
 	UIView* view;
@@ -35,11 +40,41 @@
 	IWidget* parent;
 	NSMutableArray* children;
 	
-	int fillWidth, fillHeight;
+	AutoSizeParam autoSizeParamX;
+	AutoSizeParam autoSizeParamY;	
+	
 }
 
-- (int)getFillWidth;
-- (int)getFillHeight;
+#define MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(name) \
+@interface MoSync##name : name {\
+IWidget* mWidget;\
+}\
+- (void)setWidget:(IWidget*)widget;\
+- (void)layoutSubviews;\
+- (void)superLayoutSubviews;\
+- (CGSize)sizeThatFits:(CGSize)size;\
+@end\
+@implementation MoSync##name \
+- (void)setWidget:(IWidget*)widget { \
+mWidget = widget; \
+}\
+- (void)layoutSubviews {\
+NSLog(@"%@ layoutSubviews", @#name);\
+[mWidget layoutSubviews:self];\
+}\
+- (CGSize)sizeThatFits:(CGSize)size {\
+return [mWidget sizeThatFitsFor:(UIView*)self withSize:size];\
+}\
+- (void)superLayoutSubviews {\
+	[super layoutSubviews];\
+}\
+@end\
+
+- (void)setAutoSizeParamX:(AutoSizeParam)x andY:(AutoSizeParam)y;
+- (AutoSizeParam)getAutoSizeParamX;
+- (AutoSizeParam)getAutoSizeParamY;
+- (void)layoutSubviews:(UIView*)view;
+- (CGSize)sizeThatFitsFor:(UIView*)view withSize:(CGSize)size;
 
 - (void)setParent:(IWidget*) parent;
 - (void)setWidgetHandle:(int) handle;
