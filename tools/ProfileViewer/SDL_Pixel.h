@@ -293,4 +293,4 @@ void SDL_LowerGetPixel(SDL_Surface *dst, Sint16 x, Sint16 y, Uint32 * rgb);
 
 #else
 #error reinclusion
-#endif _SDL_Pixel_GFX_H_
+#endif //_SDL_Pixel_GFX_H_

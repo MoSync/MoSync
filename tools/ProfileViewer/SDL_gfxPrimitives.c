@@ -37,7 +37,7 @@ LGPL (c) A. Schiffler
 
 \returns Returns 0 on success, -1 on failure.
 */
-int fastPixelColorNolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
+static int fastPixelColorNolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
 {
 	int bpp;
 	Uint8 *p;
@@ -94,7 +94,7 @@ Code needs to make sure we stay in surface bounds before calling.
 
 \returns Returns 0 on success, -1 on failure.
 */
-int fastPixelColorNolockNoclip(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
+static int fastPixelColorNolockNoclip(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
 {
 	int bpp;
 	Uint8 *p;
@@ -140,7 +140,7 @@ int fastPixelColorNolockNoclip(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 col
 
 \returns Returns 0 on success, -1 on failure.
 */
-int fastPixelColor(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
+static int fastPixelColor(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
 {
 	int result;
 
@@ -178,7 +178,7 @@ int fastPixelColor(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
 
 \returns Returns 0 on success, -1 on failure.
 */
-int fastPixelRGBA(SDL_Surface * dst, Sint16 x, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+static int fastPixelRGBA(SDL_Surface * dst, Sint16 x, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
 	Uint32 color;
 
@@ -206,7 +206,7 @@ int fastPixelRGBA(SDL_Surface * dst, Sint16 x, Sint16 y, Uint8 r, Uint8 g, Uint8
 
 \returns Returns 0 on success, -1 on failure.
 */
-int fastPixelRGBANolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+static int fastPixelRGBANolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
 	Uint32 color;
 
@@ -236,7 +236,7 @@ Only the bits up to the surface depth are significant in the color value.
 
 \returns Returns 0 on success, -1 on failure.
 */
-int _putPixelAlpha(SDL_Surface *dst, Sint16 x, Sint16 y, Uint32 color, Uint8 alpha)
+static int _putPixelAlpha(SDL_Surface *dst, Sint16 x, Sint16 y, Uint32 color, Uint8 alpha)
 {
 	SDL_PixelFormat *format;
 	Uint32 Rmask, Gmask, Bmask, Amask;
@@ -494,7 +494,7 @@ int pixelColor(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
 
 \returns Returns 0 on success, -1 on failure.
 */
-int pixelColorNolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
+static int pixelColorNolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color)
 {
 	Uint8 alpha;
 	Uint32 mcolor;
@@ -532,7 +532,7 @@ Assumes color is in destination format.
 
 \returns Returns 0 on success, -1 on failure.
 */
-int _filledRectAlpha(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color, Uint8 alpha)
+static int _filledRectAlpha(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color, Uint8 alpha)
 {
 	SDL_PixelFormat *format;
 	Uint32 Rmask, Bmask, Gmask, Amask;
@@ -761,7 +761,7 @@ int _filledRectAlpha(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 
 
 \returns Returns 0 on success, -1 on failure.
 */
-int filledRectAlpha(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color)
+static int filledRectAlpha(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color)
 {
 	Uint8 alpha;
 	Uint32 mcolor;
@@ -810,7 +810,7 @@ int filledRectAlpha(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y
 
 \returns Returns 0 on success, -1 on failure.
 */
-int _HLineAlpha(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 color)
+static int _HLineAlpha(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 color)
 {
 	return (filledRectAlpha(dst, x1, y, x2, y, color));
 }
@@ -827,7 +827,7 @@ int _HLineAlpha(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 color)
 
 \returns Returns 0 on success, -1 on failure.
 */
-int _VLineAlpha(SDL_Surface * dst, Sint16 x, Sint16 y1, Sint16 y2, Uint32 color)
+static int _VLineAlpha(SDL_Surface * dst, Sint16 x, Sint16 y1, Sint16 y2, Uint32 color)
 {
 	return (filledRectAlpha(dst, x, y1, x, y2, color));
 }
@@ -843,7 +843,7 @@ int _VLineAlpha(SDL_Surface * dst, Sint16 x, Sint16 y1, Sint16 y2, Uint32 color)
 
 \returns Returns 0 on success, -1 on failure.
 */
-int pixelColorWeight(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color, Uint32 weight)
+static int pixelColorWeight(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color, Uint32 weight)
 {
 	Uint32 a;
 
@@ -871,7 +871,7 @@ int pixelColorWeight(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color, Uint32
 
 \returns Returns 0 on success, -1 on failure.
 */
-int pixelColorWeightNolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color, Uint32 weight)
+static int pixelColorWeightNolock(SDL_Surface * dst, Sint16 x, Sint16 y, Uint32 color, Uint32 weight)
 {
 	Uint32 a;
 
@@ -947,7 +947,7 @@ from the input color value.
 
 \returns Returns 0 on success, -1 on failure.
 */
-int hlineColorStore(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 color)
+static int hlineColorStore(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, Uint32 color)
 {
 	Sint16 left, right, top, bottom;
 	Uint8 *pixel, *pixellast;
@@ -1089,7 +1089,7 @@ Function should only be used for 32 bit target surfaces.
 
 \returns Returns 0 on success, -1 on failure.
 */
-int hlineRGBAStore(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+static int hlineRGBAStore(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
 	/*
 	* Draw 
@@ -2189,7 +2189,7 @@ with alpha<255.
 
 \returns Returns 0 on success, -1 on failure.
 */
-int _aalineColor(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color, int draw_endpoint)
+static int _aalineColor(SDL_Surface * dst, Sint16 x1, Sint16 y1, Sint16 x2, Sint16 y2, Uint32 color, int draw_endpoint)
 {
 	Sint32 xx0, yy0, xx1, yy1;
 	int result;
@@ -2479,8 +2479,8 @@ int circleColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Uint32 color)
 	Sint16 x1, y1, x2, y2;
 	Sint16 cx = 0;
 	Sint16 cy = rad;
-	Sint16 ocx = (Sint16) 0xffff;
-	Sint16 ocy = (Sint16) 0xffff;
+	//Sint16 ocx = (Sint16) 0xffff;
+	//Sint16 ocy = (Sint16) 0xffff;
 	Sint16 df = 1 - rad;
 	Sint16 d_e = 3;
 	Sint16 d_se = -2 * rad + 5;
@@ -2726,8 +2726,8 @@ int arcColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Sint16 start, Si
 	Sint16 x1, y1, x2, y2;
 	Sint16 cx = 0;
 	Sint16 cy = rad;
-	Sint16 ocx = (Sint16) 0xffff;
-	Sint16 ocy = (Sint16) 0xffff;
+	//Sint16 ocx = (Sint16) 0xffff;
+	//Sint16 ocy = (Sint16) 0xffff;
 	Sint16 df = 1 - rad;
 	Sint16 d_e = 3;
 	Sint16 d_se = -2 * rad + 5;
@@ -2784,7 +2784,7 @@ int arcColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Sint16 start, Si
 		return(0);
 	}  
 
-	// Octant labelling
+	/* Octant labelling
 	//      
 	//  \ 5 | 6 /
 	//   \  |  /
@@ -2795,7 +2795,7 @@ int arcColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Sint16 start, Si
 	//  3 / | \ 0
 	//   /  |  \
 	//  / 2 | 1 \
-	//      +y
+	//      +y*/
 
 	// Initially reset bitmask to 0x00000000
 	// the set whether or not to keep drawing a given octant.
@@ -3802,7 +3802,7 @@ int aaellipseColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rx, Sint16 ry, 
 		t -= dt;
 
 		/* Calculate alpha */
-		if (s != 0.0) {
+		if (s > 0.0 || s < 0.0) {
 			cp = (float) abs(d) / (float) abs(s);
 			if (cp > 1.0) {
 				cp = 1.0;
@@ -3861,7 +3861,7 @@ int aaellipseColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rx, Sint16 ry, 
 		s += ds;
 
 		/* Calculate alpha */
-		if (t != 0.0) {
+		if (t > 0.0 || t < 0.0) {
 			cp = (float) abs(d) / (float) abs(t);
 			if (cp > 1.0) {
 				cp = 1.0;
@@ -4141,7 +4141,7 @@ Note: Determines vertex array and uses polygon or filledPolygon drawing routines
 
 \returns Returns 0 on success, -1 on failure.
 */
-int _pieColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Sint16 start, Sint16 end, Uint32 color, Uint8 filled)
+static int _pieColor(SDL_Surface * dst, Sint16 x, Sint16 y, Sint16 rad, Sint16 start, Sint16 end, Uint32 color, Uint8 filled)
 {
 	Sint16 left, right, top, bottom;
 	Sint16 x1, y1, x2, y2;
@@ -4741,7 +4741,7 @@ int aapolygonRGBA(SDL_Surface * dst, const Sint16 * vx, const Sint16 * vy, int n
 
 \returns Returns 0 if a==b, a negative number if a<b or a positive number if a>b.
 */
-int _gfxPrimitivesCompareInt(const void *a, const void *b)
+static int _gfxPrimitivesCompareInt(const void *a, const void *b)
 {
 	return (*(const int *) a) - (*(const int *) b);
 }
@@ -5005,7 +5005,7 @@ int filledPolygonRGBA(SDL_Surface * dst, const Sint16 * vx, const Sint16 * vy, i
 
 \returns Returns 0 on success, -1 on failure.
 */
-int _HLineTextured(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, SDL_Surface *texture, int texture_dx, int texture_dy)
+static int _HLineTextured(SDL_Surface * dst, Sint16 x1, Sint16 x2, Sint16 y, SDL_Surface *texture, int texture_dx, int texture_dy)
 {
 	Sint16 left, right, top, bottom;
 	Sint16 w;
@@ -5730,7 +5730,7 @@ int stringRGBA(SDL_Surface * dst, Sint16 x, Sint16 y, const char *s, Uint8 r, Ui
 
 \returns Interpolated value at position t, value[0] when t<0, value[n-1] when t>n.
 */
-double _evaluateBezier (double *data, int ndata, double t) 
+static double _evaluateBezier (double *data, int ndata, double t) 
 {
 	double mu, result;
 	int n,k,kn,nn,nkn;

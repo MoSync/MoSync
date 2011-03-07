@@ -21,7 +21,7 @@
 	$Id: SDL_PutPixel.c,v 1.1.1.1 2001/04/25 17:08:31 moorman Exp $
 */
 
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include "SDL_Pixel.h"
 
 /* 

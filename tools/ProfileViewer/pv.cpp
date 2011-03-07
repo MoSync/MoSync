@@ -2,10 +2,12 @@
 // program profile.
 
 #include <stdio.h>
+#ifdef _MSC_VER
 #include <io.h>
+#endif
 #include <fcntl.h>
 #include <expat.h>
-#include <SDL.h>
+#include <SDL/SDL.h>
 #include <SDL/SDL_ttf.h>
 #include <vector>
 #include "ProfNode.h"
@@ -72,7 +74,7 @@ static void ATTRIB(noreturn) fatalError();
 static void processMouseMotion(const SDL_MouseMotionEvent&);
 static void processMouseClick(const SDL_MouseButtonEvent&);
 static void processKeyDown(const SDL_KeyboardEvent& e);
-static void drawTextf(int& y, const char* fmt, ...) PRINTF_ATTRIB(2, 3);
+static void drawTextf(int& y, bool left, const char* fmt, ...) PRINTF_ATTRIB(3, 4);
 
 static bool streq(const char* a, const char* b) {
 	return strcmp(a, b) == 0;
@@ -143,7 +145,7 @@ static void XMLCALL opStart(void *data, const char *el, const char **attr) {
 	ASSERT(f.check());
 
 	ProfNode p = { sCurrentParent, name, count, nChildren,
-		totalTime, childrenTime, localTime };
+		totalTime, childrenTime, localTime, ProfSet() };
 	ProfNode* n = new ProfNode(p);
 	if(!sCurrentParent) {
 		ASSERT(!sRoot);
@@ -174,14 +176,14 @@ static void XMLCALL opEnd(void *data, const char *el) {
    is complete (the document has been completely parsed, or there's
    been an error), or the parse is stopped.
 */
-void parse_xml(XML_Parser p, int fd) {
+static void parse_xml(XML_Parser p, int fd) {
   for (;;) {
     int bytes_read;
     enum XML_Status status;
 
     void *buff = XML_GetBuffer(p, BUFF_SIZE);
     ASSERT(buff);
-    bytes_read = _read(fd, buff, BUFF_SIZE);
+    bytes_read = read(fd, buff, BUFF_SIZE);
     ASSERT(bytes_read >= 0);
     status = XML_ParseBuffer(p, bytes_read, bytes_read == 0);
 		if(status != XML_STATUS_OK) {
@@ -194,13 +196,13 @@ void parse_xml(XML_Parser p, int fd) {
   }
 }
 
-void loadProfile(const char* filename) {
+static void loadProfile(const char* filename) {
 	sParseLevel = 0;
 	sCurrentParent = NULL;
 	sNodeCount = 0;
 
 	printf("Loading '%s'\n", filename);
-	int fd = _open(filename, _O_RDONLY);
+	int fd = open(filename, O_RDONLY);
 	
 	XML_Parser p = XML_ParserCreate("UTF-8");
 	XML_SetElementHandler(p, opStart, opEnd);
@@ -208,16 +210,12 @@ void loadProfile(const char* filename) {
 	printf("Loaded %i nodes. Max level: %i\n", sNodeCount, sMaxLevel);
 }
 
-static void dumpNode(ProfNode* node) {
-	printf("%s\n", node->name.c_str());
-}
-
 static void constructPie() {
 	sSlices.clear();
 	uint color = BLUE;	// for local time
 	{
 		SLICE s = { sCurrentNode, color,
-			sCurrentNode->localTime / sCurrentNode->totalTime };
+			sCurrentNode->localTime / sCurrentNode->totalTime, 0,0 };
 		sSlices.push_back(s);
 	}
 	uint colorIndex = 0;
@@ -227,14 +225,14 @@ static void constructPie() {
 		float fraction = node->totalTime / sCurrentNode->totalTime;
 		printf("%s: %i\n", node->name.c_str(), (int)node->totalTime);
 		if(fraction > TRIGGER_FRACTION) {
-			SLICE s = { node, COLORS[colorIndex], fraction };
+			SLICE s = { node, COLORS[colorIndex], fraction, 0,0 };
 			sSlices.push_back(s);
 			colorIndex++;
 			if(colorIndex >= nColors)
 				colorIndex = 0;
 		}
 	}
-	printf("%u slices constructed\n", sSlices.size());
+	printf("%"PFZT" slices constructed\n", sSlices.size());
 }
 
 static void drawTextf(int& y, bool left, const char* fmt, ...) {
@@ -252,7 +250,7 @@ static void drawTextf(int& y, bool left, const char* fmt, ...) {
 		x = sScreen->w - text_surface->w;
 		y -= sFontHeight;
 	}
-	SDL_Rect rect = { (Sint16)x, (Sint16)y, text_surface->w, text_surface->h };
+	SDL_Rect rect = { (Sint16)x, (Sint16)y, (Uint16)text_surface->w, (Uint16)text_surface->h };
 	ST(SDL_FillRect(sScreen, &rect, 0));
 	SDL_BlitSurface(text_surface, NULL, sScreen, &rect);
 	SDL_FreeSurface(text_surface);
@@ -306,7 +304,7 @@ static void drawPie() {
 	y = 0;
 	drawFuncText("Current function", y, sCurrentNode);
 	if(sSliceIndex != 0) {
-		ProfNode* node = sSlices[sSliceIndex-1].node;
+		node = sSlices[sSliceIndex-1].node;
 		if(node != sCurrentNode) {
 			drawFuncText("Under cursor", y, node);
 		}
@@ -403,5 +401,7 @@ static void processKeyDown(const SDL_KeyboardEvent& e) {
 		break;
 	//case SDLK_ESCAPE:
 		//exit(0);
+	default:
+		break;
 	}
 }
