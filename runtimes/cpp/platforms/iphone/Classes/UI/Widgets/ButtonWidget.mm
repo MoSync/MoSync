@@ -80,7 +80,7 @@
 	} else			
 	if([key isEqualToString:@"backgroundImage"]) {
 		int imageHandle = [value intValue];
-		if(imageHandle == 0) return MAW_RES_INVALID_HANDLE;	
+		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;
 		UIButton* button = (UIButton*) view;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		UIImage* image = [UIImage imageWithCGImage:imageResource->image];

@@ -64,8 +64,8 @@
 		label.text = value;
 	} 
 	else if([key isEqualToString:@"icon"]) {
-		if(imageHandle == 0) return MAW_RES_INVALID_HANDLE;			
 		int imageHandle = [value intValue];
+		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;
 		UITableViewCell* cell = (UITableViewCell*) view;
 		UIImageView* imageView = cell.imageView;
 #ifndef NATIVE_TEST		
@@ -100,7 +100,7 @@
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
