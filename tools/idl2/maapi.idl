@@ -3409,6 +3409,7 @@ group WidgetAPI "Widget API" {
 	group WidgetWebViewProperties "Web view properties" {
 	constset MAString MAW_WEB_VIEW_ {
 		URL = "url";
+		NEW_URL = "newurl";
 	}
 	} // end of WidgetWebViewProperties
 

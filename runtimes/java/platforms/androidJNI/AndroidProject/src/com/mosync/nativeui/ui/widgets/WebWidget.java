@@ -13,6 +13,8 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  */
 public class WebWidget extends Widget
 {
+	private String m_newUrl;
+
 	/**
 	 * Constructor
 	 * 
@@ -42,6 +44,8 @@ public class WebWidget extends Widget
 		if( property.equals( IX_WIDGET.MAW_WEB_VIEW_URL ) )
 		{
 			webView.loadUrl( value );
+		} else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_NEW_URL )) {
+			m_newUrl = value;
 		}
 		
 		return true;
@@ -57,6 +61,10 @@ public class WebWidget extends Widget
 		if( property.equals( IX_WIDGET.MAW_WEB_VIEW_URL ) )
 		{
 			return webView.getUrl( );
+		}
+		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_NEW_URL ) )
+		{
+			return m_newUrl;
 		}
 		else
 		{
