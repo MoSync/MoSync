@@ -124,7 +124,12 @@
 	} else 
 	if([key isEqualToString:@"width"]) {
 		float width = [value floatValue];
-		if(width == -1) {
+		
+		if(width == -2) {
+			fillWidth = -2;
+			width = [view sizeThatFits:CGSizeZero].width;
+		}
+		else if(width == -1) {
 			//view.autoresizingMask =	view.autoresizingMask | 
 			//UIViewAutoresizingFlexibleWidth;
 			//[view setNeedsLayout];
@@ -144,7 +149,13 @@
 	} else
 	if([key isEqualToString:@"height"]) {
 		float height = [value floatValue];
-		if(height == -1) {
+		
+		
+		if(height == -2) {
+			fillWidth = -2;
+			height = [view sizeThatFits:CGSizeZero].height;
+		}		
+		else if(height == -1) {
 			//view.autoresizingMask =			view.autoresizingMask | 
 			//UIViewAutoresizingFlexibleHeight;
 			//[view setNeedsLayout];
@@ -212,10 +223,16 @@
 	if(fillWidth == -1) {
 		viewWidth = view.superview.frame.size.width;
 	}
+	else if(fillHeight == -2) {
+		viewWidth = [view sizeThatFits:CGSizeZero].width;
+	}
 	
 	int viewHeight = view.frame.size.height; 
 	if(fillHeight == -1) {
 		viewHeight = view.superview.frame.size.height;
+	}
+	else if(fillHeight == -2) {
+		viewHeight = [view sizeThatFits:CGSizeZero].height;
 	}
 	
 	[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];
