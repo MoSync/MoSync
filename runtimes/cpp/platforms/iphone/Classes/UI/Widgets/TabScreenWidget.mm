@@ -91,8 +91,10 @@
 		controller.title = value;
 	} 
 	else if([key isEqualToString:@"currentTab"]) {
+		unsigned int index = [value intValue];
 		UITabBarController* tabBarController = (UITabBarController*)controller;
-		tabBarController.selectedViewController = [tabBarController.viewControllers objectAtIndex: [value intValue]]; 
+		if(index >= [tabBarController.viewControllers count]) return MAW_RES_INVALID_INDEX;
+		tabBarController.selectedViewController = [tabBarController.viewControllers objectAtIndex:index]; 
 		//tabBarController.selectedIndex = [value intValue];
 		//[tabBarController.selectedViewController viewDidAppear:YES];
 	}
