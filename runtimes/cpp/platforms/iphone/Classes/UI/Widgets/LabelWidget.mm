@@ -21,6 +21,7 @@
 
 - (id)init {	
 	UILabel* label = [[[UILabel alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
+	label.numberOfLines = 0;
 	label.opaque = NO;
 	view = label;		
 	

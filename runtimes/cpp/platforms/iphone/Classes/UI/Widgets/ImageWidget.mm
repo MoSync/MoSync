@@ -55,7 +55,8 @@
 
 		imageView = [[UIImageView alloc] initWithImage:image];		
 		[view addSubview:imageView];
-		view.frame = imageView.frame;
+		view.frame.size.height = imageView.frame.size.height;
+		view.frame.size.width = imageView.frame.size.width;
 		#endif
 	}
 	else if([key isEqualToString:@"leftCapWidth"]) {
