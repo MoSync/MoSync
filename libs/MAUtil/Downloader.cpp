@@ -78,7 +78,7 @@ void Downloader::removeDownloadListener(DownloadListener *dl)
 	PANIC_MESSAGE("Downloader::removeDownloadListener: Could not find listener");
 }
 
-int Downloader::beginDownloading(const char *url, MAHandle placeholder, int method)
+int Downloader::beginDownloading(const char *url, MAHandle placeholder)
 {
 	ASSERT_MSG(!mIsDownloading, "Downloader::beginDownloading: Download already in progress");
 
@@ -86,7 +86,7 @@ int Downloader::beginDownloading(const char *url, MAHandle placeholder, int meth
 	mConn->close();
 	
 	// Create new connection.
-	int result = mConn->create(url, method);
+	int result = mConn->create(url, HTTP_GET);
 	if (result <= 0)
 	{
 		return result;
@@ -306,7 +306,7 @@ MAHandle ImageDownloader::getHandle()
 	return mImagePlaceholder;
 }
 
-int ImageDownloader::beginDownloading(const char *url, MAHandle placeholder, int method)
+int ImageDownloader::beginDownloading(const char *url, MAHandle placeholder)
 {
 	mIsImageCreated = false;
 
@@ -316,7 +316,7 @@ int ImageDownloader::beginDownloading(const char *url, MAHandle placeholder, int
 	// Allocate placeholder for image if no one was supplied.
 	mImagePlaceholder = placeholder ? placeholder : PlaceholderPool::alloc();
 	
-	return Downloader::beginDownloading(url, placeholder, method);
+	return Downloader::beginDownloading(url);
 }
 
 void ImageDownloader::cancelDownloading()
@@ -338,8 +338,7 @@ int AudioDownloader::beginDownloading(
 	const char *url, 
 	MAHandle placeholder,
 	const char *mimeType, 
-	bool forceMime,
-	int method)
+	bool forceMime)
 {
 	mForceMimeType = forceMime;
 	
@@ -353,12 +352,12 @@ int AudioDownloader::beginDownloading(
 		return CONNERR_NOHEADER;
 	}
 	
-	return Downloader::beginDownloading(url, placeholder, method);
+	return Downloader::beginDownloading(url, placeholder);
 }
 
-int AudioDownloader::beginDownloading(const char *url, MAHandle placeholder, int method)
+int AudioDownloader::beginDownloading(const char *url, MAHandle placeholder)
 {
-	return beginDownloading(url, placeholder, NULL, false, method);
+	return beginDownloading(url, placeholder, NULL, false);
 }
 
 /**
