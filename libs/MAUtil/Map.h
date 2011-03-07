@@ -24,10 +24,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Dictionary.h"
 
-#ifndef OFFSETOF
-#define OFFSETOF(struct, member) ((int)(((char*)&(((struct*)1)->member)) - 1))
-#endif
-
 namespace MAUtil {
 
 /** \brief Thin template sorted Map.
