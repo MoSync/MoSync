@@ -76,7 +76,7 @@ namespace Base {
 		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
 		DUMPHEX(maxCustomEventSize);
 		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
-
+		
 		return maxCustomEventSize;
 	}
 

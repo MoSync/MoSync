@@ -70,7 +70,21 @@
 	parent = toParent;
 }
 
+- (int)getFillWidth {
+	return fillWidth;
+}
+
+- (int)getFillHeight {
+	return fillHeight;
+}
+
 - (void) addChild: (IWidget*)child andSubview:(bool)addSubview {
+	UIView* childView = [child getView]; 
+	if([child getFillWidth] == -1)
+		[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, view.frame.size.width, childView.frame.size.height)];
+	if([child getFillHeight] == -1)
+		[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, childView.frame.size.width, view.frame.size.height)];	
+	
 	[child setParent:self];
 	[children addObject:child];
 	if(addSubview)
@@ -110,26 +124,49 @@
 	} else 
 	if([key isEqualToString:@"width"]) {
 		float width = [value floatValue];
-		if(width == -1) {
+		
+		if(width == -2) {
+			fillWidth = -2;
+			width = [view sizeThatFits:CGSizeZero].width;
+		}
+		else if(width == -1) {
 			//view.autoresizingMask =	view.autoresizingMask | 
 			//UIViewAutoresizingFlexibleWidth;
-			width = view.superview.frame.size.width;
 			//[view setNeedsLayout];
 			fillWidth = -1;
-			//return MA_WIDGET_OK;
+			
+			if(view.superview)
+				width = view.superview.frame.size.width;
+			else
+				return MA_WIDGET_OK;	
+
+			return MA_WIDGET_OK;
+		} else {
+			fillWidth = 0;
 		}
 		
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width, view.frame.size.height)];
 	} else
 	if([key isEqualToString:@"height"]) {
 		float height = [value floatValue];
-		if(height == -1) {
+		
+		
+		if(height == -2) {
+			fillWidth = -2;
+			height = [view sizeThatFits:CGSizeZero].height;
+		}		
+		else if(height == -1) {
 			//view.autoresizingMask =			view.autoresizingMask | 
 			//UIViewAutoresizingFlexibleHeight;
-			height = view.superview.frame.size.height;
 			//[view setNeedsLayout];
 			fillHeight = -1;
-			//return MA_WIDGET_OK;
+			
+			if(view.superview)
+				height = view.superview.frame.size.height;
+			else
+				return MA_WIDGET_OK;
+		} else {
+			fillHeight = 0;
 		}
 		
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height)];		
@@ -148,6 +185,10 @@
 	} else {
 			return MAW_RES_ERROR;
 	}
+	
+	[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, view.frame.size.height)];	
+	[view setNeedsDisplay];
+	//[view setNeedsLayout];
 			
 	return MAW_RES_OK;
 }
@@ -182,10 +223,16 @@
 	if(fillWidth == -1) {
 		viewWidth = view.superview.frame.size.width;
 	}
+	else if(fillHeight == -2) {
+		viewWidth = [view sizeThatFits:CGSizeZero].width;
+	}
 	
 	int viewHeight = view.frame.size.height; 
 	if(fillHeight == -1) {
 		viewHeight = view.superview.frame.size.height;
+	}
+	else if(fillHeight == -2) {
+		viewHeight = [view sizeThatFits:CGSizeZero].height;
 	}
 	
 	[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];

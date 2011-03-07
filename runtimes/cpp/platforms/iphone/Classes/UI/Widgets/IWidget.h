@@ -38,6 +38,9 @@
 	int fillWidth, fillHeight;
 }
 
+- (int)getFillWidth;
+- (int)getFillHeight;
+
 - (void)setParent:(IWidget*) parent;
 - (void)setWidgetHandle:(int) handle;
 - (int)getWidgetHandle;

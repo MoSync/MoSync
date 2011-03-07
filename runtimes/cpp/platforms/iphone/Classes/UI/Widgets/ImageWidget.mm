@@ -43,6 +43,7 @@
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"image"]) {
 		int imageHandle = [value intValue];
+		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;
 		#ifndef NATIVE_TEST
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		UIImage* image = [UIImage imageWithCGImage:imageResource->image];

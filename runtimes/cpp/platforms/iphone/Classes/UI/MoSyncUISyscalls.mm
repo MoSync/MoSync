@@ -34,6 +34,9 @@ NSString* stringFromChar(const char* str) {
 
 int currentWidgetIndex = 0;
 MAWidgetHandle maWidgetCreate(const char *widgetType) {
+	
+	NSLog(@"maWidgetCreate(%s)\n", widgetType);
+	
 	int returnValue;
 	[NSObject performSelectorOnMainThread:@selector(createWidget:)
 							   withTarget:mosyncUI
@@ -53,6 +56,8 @@ int maWidgetDestroy(MAWidgetHandle handle) {
 }
 
 int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value) {
+	NSLog(@"maWidgetSetProperty(%d, %s, %s)\n", handle, property, value);
+
 	IWidget* widget = [mosyncUI getWidget:handle];
 	
 	NSString* propertyString = stringFromChar(property);
@@ -95,6 +100,8 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 }
 
 int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
+	NSLog(@"maWidgetAddChild(%d, %d)\n", parentHandle, childHandle);
+
 	IWidget* parent = [mosyncUI getWidget:parentHandle];
 	IWidget* child = [mosyncUI getWidget:childHandle];
 	if(!parent) return MAW_RES_INVALID_HANDLE;

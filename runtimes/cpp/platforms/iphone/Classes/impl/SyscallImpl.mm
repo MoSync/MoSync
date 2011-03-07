@@ -972,7 +972,7 @@ namespace Base {
 	}
 	
 	SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
-		NOT_IMPLEMENTED;
+		MoSync_ReloadProgram(data, reload);		
 	}
 	
 } // namespace Base

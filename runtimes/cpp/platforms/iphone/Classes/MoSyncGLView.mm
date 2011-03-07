@@ -105,10 +105,11 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
  */
 
 - (void)layoutSubviews {
-    [EAGLContext setCurrentContext:context];
-    [self destroyFramebuffer];
-    [self createFramebuffer];
-    [self drawView];
+	[EAGLContext setCurrentContext:context];
+	[self destroyFramebuffer];
+	[self createFramebuffer];
+	[self drawView];
+	
 }
 
 

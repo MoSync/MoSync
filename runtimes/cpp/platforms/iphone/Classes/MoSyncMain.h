@@ -32,6 +32,7 @@ void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText,
 
 void MoSync_Exit();
 
+void MoSync_ReloadProgram(MAHandle data, int reload);
 void MoSync_StartUpdatingLocation();
 void MoSync_StopUpdatingLocation();
 void MoSync_StartUpdatingAccelerometer();
