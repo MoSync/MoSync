@@ -55,6 +55,7 @@
 	} 
 	else if([key isEqualToString:@"icon"]) {
 		int imageHandle = [value intValue];
+		if(imageHandle == 0) return MAW_RES_INVALID_HANDLE;
 #ifndef NATIVE_TEST
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);		
 		/*
@@ -70,7 +71,7 @@
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

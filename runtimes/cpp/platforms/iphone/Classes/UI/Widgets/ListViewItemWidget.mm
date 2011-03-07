@@ -64,6 +64,7 @@
 		label.text = value;
 	} 
 	else if([key isEqualToString:@"icon"]) {
+		if(imageHandle == 0) return MAW_RES_INVALID_HANDLE;			
 		int imageHandle = [value intValue];
 		UITableViewCell* cell = (UITableViewCell*) view;
 		UIImageView* imageView = cell.imageView;
