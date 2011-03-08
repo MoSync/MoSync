@@ -2262,13 +2262,26 @@ namespace Base {
 				WORD id = LOWORD(wParam);
 				if(id == IDOK || id == IDCANCEL) {
 					// get text
-					int res = GetWindowTextW(sEditBox, sTextBoxOutBuf, sTextBoxOutSize);
+					int length = GetWindowTextW(sEditBox, sTextBoxOutBuf, sTextBoxOutSize);
+					// fix EOL (remove 0x0D bytes)
+					const wchar_t* src = sTextBoxOutBuf;
+					wchar_t* dst = sTextBoxOutBuf;
+					length = 0;
+					while(*src) {
+						if(*src != 0x0D) {
+							*dst = *src;
+							dst++;
+							length++;
+						}
+						src++;
+					}
+					*dst = 0;
 
 					// send event
 					MAEvent e;
 					e.type = EVENT_TYPE_TEXTBOX;
 					e.textboxResult = (id == IDOK) ? MA_TB_RES_OK : MA_TB_RES_CANCEL;
-					e.textboxLength = res;
+					e.textboxLength = length;
 					gEventFifo.put(e);
 
 					// time to close

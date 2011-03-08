@@ -37,6 +37,7 @@ template<class Key, class Value>
 class Map : public Dictionary<const Key, Pair<const Key, Value> > {
 public:
 	typedef Pair<const Key, Value> PairKV;
+	typedef Pair<Key, Value> MutableStorage;
 protected:
 	typedef Dictionary<const Key, PairKV> D;
 	typedef typename D::DictNode DN;
@@ -45,13 +46,16 @@ public:
 	Map(int (*cf)(const Key&, const Key&) = &Compare<const Key>)
 		: D::Dictionary(cf, OFFSETOF(PairKV, first)) {}
 	Pair<typename D::Iterator, bool> insert(const Key& key, const Value& value) {
-		PairKV pkv = { key, value };
+		PairKV pkv(key, value);
+		return D::insert(pkv);
+	}
+	Pair<typename D::Iterator, bool> insert(const MutableStorage& pkv) {
 		return D::insert(pkv);
 	}
 	Value& operator[](const Key& key) {
 		DN* node = (DN*)dict_lookup(&this->mDict, &key);
 		if(node == NULL) {
-			PairKV p = { key, Value() };
+			PairKV p(key, Value());
 			node = new DN(p);
 			dict_insert(&this->mDict, node, &(node->data.first));
 		}

@@ -57,6 +57,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
@@ -146,9 +147,27 @@ public class MoSyncThread extends Thread
 	 */
 	private static final int CHUNK_READ_SIZE = 1024; 
 
+	/**
+	 * This is the MoSync Activity.
+	 */
 	private MoSync mContext;
+	
+	/**
+	 * The standard MoSync view.
+	 */
 	private MoSyncView mMoSyncView;
+	
+	/**
+	 * true if the MoSync program is considered to be dead,
+	 * used for maPanic.
+	 */
 	private boolean mHasDied;
+	
+	/**
+	 * Boolean used to determine whether to interrupt the trehad or not,
+	 * true if this thread is sleeping in maWait.
+	 */
+	private AtomicBoolean mIsSleepingInMaWait = new AtomicBoolean(false);
 	
 	/**
 	 * This is the size of the header of the asset file
@@ -565,13 +584,23 @@ public class MoSyncThread extends Thread
 	/**
 	 * Post a event to the MoSync event queue.
 	 */
-	public void postEvent(int[] event)
+	public synchronized void postEvent(int[] event)
 	{
 		// Add event to queue.
 		nativePostEvent(event);
 		
-		// Wake up this thread to make it process events.
-		interrupt(); 
+		// Only interrupt if we are sleeping in maWait.
+		if (mIsSleepingInMaWait.get())
+		{
+			// Wake up this thread to make it process events.
+			interrupt(); 
+		}
+		else
+		{
+			Log.i(
+				"@@@ MoSyncThread.postEvent", 
+				"Did not call interrupt, not in maWait (this is good!)");
+		}
 	}
 
 	/**
@@ -1262,16 +1291,15 @@ public class MoSyncThread extends Thread
 
 		Canvas temporaryCanvas = new Canvas(temporaryBitmap);
 		
-		temporaryCanvas.drawBitmap(
-			imageResource.mBitmap,
-			new Matrix(),
-			new Paint());
+		temporaryCanvas.drawBitmap(imageResource.mBitmap, -srcLeft, -srcTop, new Paint());
 			
 		temporaryCanvas.drawColor(0xff000000, Mode.DST_ATOP);
 		
 		mMemDataSection.position(dst);
 
 		IntBuffer intBuffer = mMemDataSection.asIntBuffer();
+		
+		try {
 		
 		for (int y = 0; y < srcHeight; y++)
 		{
@@ -1290,8 +1318,8 @@ public class MoSyncThread extends Thread
 				colors,
 				0,
 				srcWidth,
-				srcLeft,
-				srcTop+y,
+				0,
+				y,
 				srcWidth,
 				1);
 			
@@ -1301,6 +1329,12 @@ public class MoSyncThread extends Thread
 			}
 			
 			intBuffer.put(pixels);	
+		}
+		} catch(Exception e) {
+			e.printStackTrace();
+			Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
+				imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
+			maPanic(-1, "maGetImageData");
 		}
 	}
 
@@ -1763,6 +1797,8 @@ public class MoSyncThread extends Thread
 
 		try
 		{
+			mIsSleepingInMaWait.set(true);
+			
 	 		if (timeout<=0)
 			{
 				Thread.sleep(Long.MAX_VALUE);
@@ -1776,10 +1812,13 @@ public class MoSyncThread extends Thread
 		{
 			SYSLOG("Sleeping thread interrupted!");
 		} 
+		// TODO: This exception is never thrown! Remove it.
 		catch (Exception e) 
 		{
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
+		
+		mIsSleepingInMaWait.set(false);
 		
 		SYSLOG("maWait returned");
 	}

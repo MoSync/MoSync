@@ -61,6 +61,7 @@ template<class Key, class Value>
 class HashMap {
 public:
 	typedef Pair<const Key, Value> PairKV;
+	typedef Pair<Key, Value> MutableStorage;	// to match Dictionary.
 protected:
 	/** \brief Internal storage. */
 	struct HashNode : hnode_t {
@@ -165,6 +166,9 @@ public:
 	* the old element.
 	*/
 	Pair<Iterator, bool> insert(const Key&, const Value&);
+
+	Pair<Iterator, bool> insert(const PairKV&);
+
 	/**
 	* Searches the HashMap for a specified Key. The returned Iterator points to
 	* the element matching the Key if one was found, or to HashMap::end() if not.
@@ -213,8 +217,9 @@ public:
 	* If the Key doesn't yet exist in the HashMap, it will be inserted
 	* with a default Value.
 	*
-	* There is no const variant of this function, because each call might
-	* potentially modify the HashMap by inserting a new key.
+	* There is no const variant of this function,
+	* because in order to return a valid reference,
+	* the HashMap may have to be modified by inserting a new key.
 	* Use find() if you have a const HashMap.
 	*/
 	Value& operator[](const Key&);

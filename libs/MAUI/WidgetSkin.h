@@ -29,9 +29,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include <MAUtil/Vector.h>
 #include <MAUtil/HashMap.h>
 
-using namespace MAUtil;
-
 namespace MAUI {
+
+	using namespace MAUtil;
 
 	/** \brief A customizable skin for widgets.
 	 * 

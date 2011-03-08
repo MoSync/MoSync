@@ -33,6 +33,7 @@ template<class Key>
 class Set : public Dictionary<const Key, const Key> {
 public:
 	typedef Dictionary<const Key, const Key> D;
+	typedef Key MutableStorage;
 
 	Set(int (*cf)(const Key&, const Key&) = &Compare<const Key>) : D::Dictionary(cf, 0) {
 	}

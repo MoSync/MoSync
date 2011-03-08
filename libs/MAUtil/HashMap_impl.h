@@ -90,8 +90,14 @@ void MAUtil::HashMap<Key, Value>::clear() {
 template<class Key, class Value>
 MAUtil::Pair<typename MAUtil::HashMap<Key, Value>::Iterator, bool>
 MAUtil::HashMap<Key, Value>::insert(const Key& key, const Value& value) {
-	Pair<Iterator, bool> pair = { Iterator(), false };
-	PairKV p = { key, value };
+	PairKV p(key, value);
+	return insert(p);
+}
+
+template<class Key, class Value>
+MAUtil::Pair<typename MAUtil::HashMap<Key, Value>::Iterator, bool>
+MAUtil::HashMap<Key, Value>::insert(const PairKV& p) {
+	Pair<Iterator, bool> pair(Iterator(), false);
 	HashNode* newNode = new HashNode(p);
 	HashNode* resNode = (HashNode*)hash_insert(&mHash, newNode, &newNode->data.first);
 	if(resNode == NULL) {	//success
@@ -136,7 +142,7 @@ void MAUtil::HashMap<Key, Value>::erase(Iterator itr) {
 
 template<class Key, class Value>
 size_t MAUtil::HashMap<Key, Value>::size() const {
-	return hash_count(&mHash);
+	return hash_count((hash_t*)&mHash);
 }
 
 template<class Key, class Value>
@@ -148,7 +154,7 @@ typename MAUtil::HashMap<Key, Value>::Iterator MAUtil::HashMap<Key, Value>::begi
 template<class Key, class Value>
 typename MAUtil::HashMap<Key, Value>::ConstIterator MAUtil::HashMap<Key, Value>::begin() const {
 	ConstIterator itr;
-	hash_scan_begin(&itr.mScan, &mHash);
+	hash_scan_begin(&itr.mScan, (hash_t*)&mHash);
 	return itr;
 }
 
@@ -162,7 +168,7 @@ typename MAUtil::HashMap<Key, Value>::Iterator MAUtil::HashMap<Key, Value>::end(
 template<class Key, class Value>
 typename MAUtil::HashMap<Key, Value>::ConstIterator MAUtil::HashMap<Key, Value>::end() const {
 	ConstIterator itr;
-	itr.mScan.hash_table = &mHash;
+	itr.mScan.hash_table = (hash_t*)&mHash;
 	itr.mScan.hash_next = NULL;
 	return itr;
 }
@@ -171,7 +177,7 @@ template<class Key, class Value>
 Value& MAUtil::HashMap<Key, Value>::operator[](const Key& key) {
 	HashNode* node = (HashNode*)hash_lookup(&mHash, &key);
 	if(node == NULL) {
-		PairKV p = { key, Value() };
+		PairKV p(key, Value());
 		node = new HashNode(p);
 		hash_insert(&mHash, node, &node->data.first);
 	}

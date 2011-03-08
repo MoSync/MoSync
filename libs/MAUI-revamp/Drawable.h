@@ -37,6 +37,7 @@ namespace MAUI {
 	
 	class Drawable {
 	public:
+		Drawable() : mUseCaching(true) {}
 
 		// if applicable (images and filled rectangles don't use this).
 		void setUseCaching(bool useCaching = true);

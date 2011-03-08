@@ -54,6 +54,18 @@ namespace MAUtil {
 		}
 
 		/**
+		* Moves the position forward \a len bytes.
+		* \returns True on success. False if the operation could not be completed
+		* because the data object was too small.
+		*/
+		bool skip(int len) {
+			if(mPos + len > size)
+				return false;
+			mPos += len;
+			return true;
+		}
+
+		/**
 		* Copies \a len bytes to the data object from memory pointed to by \a src.
 		* \see maWriteData()
 		*/
