@@ -85,11 +85,11 @@ public class LabelWidget extends Widget
 		TextView textView = (TextView) getView( );
 		if( property.equals( IX_WIDGET.MAW_LABEL_TEXT ) )
 		{
-			if( textView.getText( ).length( ) > 0 )
+			if( textView.getText( ) != null && textView.getText( ).length( ) > 0 )
 			{
 				return textView.getText( ).toString( );
 			}
-			else if( textView.getHint( ).length( ) > 0 )
+			else if( textView.getHint( ) != null && textView.getText( ).length( ) > 0 )
 			{
 				return textView.getHint( ).toString( );
 			}

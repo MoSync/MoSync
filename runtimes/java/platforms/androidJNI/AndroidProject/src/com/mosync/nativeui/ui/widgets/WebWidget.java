@@ -35,7 +35,7 @@ public class WebWidget extends Widget
 	public boolean setProperty(String property, String value)
 			throws PropertyConversionException
 	{
-		if( super.setProperty(property, value) )
+		if( super.setProperty( property, value ) )
 		{
 			return true;
 		}
@@ -44,7 +44,9 @@ public class WebWidget extends Widget
 		if( property.equals( IX_WIDGET.MAW_WEB_VIEW_URL ) )
 		{
 			webView.loadUrl( value );
-		} else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_NEW_URL )) {
+		}
+		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_NEW_URL ) )
+		{
 			m_newUrl = value;
 		}
 		
