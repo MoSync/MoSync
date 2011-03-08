@@ -831,14 +831,16 @@ namespace Base
 		return result;
 	}
 
-	int _maWidgetEvauluateScript(int widget, const char *script, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetEvauluateScript(int widget, const char *script,
+								JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Convert to Java parameters
 		jstring jstrScript = jNIEnv->NewStringUTF(script);
 		
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetEvaluateScript", "(ILjava/lang/String;)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetEvaluateScript",
+													"(ILjava/lang/String;)I");
 		if (methodID == 0)
 		{
 			return 0;
@@ -854,21 +856,29 @@ namespace Base
 		return result;
 	}
 	
-	int _maWidgetGetMessageData(int memStart, int messageId, int messageBufferPointer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	int _maWidgetGetMessageData(
+		int memStart,
+		int messageId,
+		int messageBufferPointer,
+		int bufferSize,
+		JNIEnv* jNIEnv,
+		jobject jThis)
 	{
 		// Convert to Java parameters
 		int realMessageBufferPointer = messageBufferPointer - memStart;
 		
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetMessageData", "(III)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetMessageData",
+														"(III)I");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 		
 		// Call the java method
-		int result = jNIEnv->CallIntMethod(jThis, methodID, messageId, realMessageBufferPointer, bufferSize);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, messageId,
+										realMessageBufferPointer, bufferSize);
 		
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
@@ -915,4 +925,440 @@ namespace Base
 		
 		return (int)result;
 	}
+	
+	
+	
+	
+	MAHandle _maFileOpen(
+		const char* path,
+		int mode,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jstring jstrPath = jNIEnv->NewStringUTF(path);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileOpen", 
+												 "(Ljava/lang/String;I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, jstrPath, mode);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrPath);
+		
+		return (int)result;
+	}
+
+	int _maFileExists(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileExists", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileClose(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileClose", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileCreate(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileCreate", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileDelete(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileDelete", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileSize(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileSize", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileAvailableSpace(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileAvailableSpace", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileTotalSpace(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileTotalSpace", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileDate(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileDate", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileRename(
+		MAHandle file,
+		const char* newName,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jstring jstrNewName = jNIEnv->NewStringUTF(newName);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileRename", 
+												 "(ILjava/lang/String;)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, 
+											file, jstrNewName);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrNewName);
+		
+		return (int)result;
+	}
+
+	int _maFileTruncate(
+		MAHandle file,
+		int offset,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileTruncate", 
+												 "(II)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file, offset);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileWrite(
+		MAHandle file,
+		int src,
+		int len,
+		int memStart,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		int fixedSrc = src - memStart;
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileWrite", 
+												 "(III)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file,
+											fixedSrc, len);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	int _maFileWriteFromData(
+		MAHandle file,
+		MAHandle data,
+		int offset,
+		int len,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileWriteFromData", 
+												 "(IIII)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file,
+											data, offset, len);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	int _maFileRead(
+		MAHandle file,
+		int dst,
+		int len,
+		int memStart,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		int fixedDst = dst - memStart;
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileRead", 
+												 "(III)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file, fixedDst, len);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	int _maFileReadToData(
+		MAHandle file,
+		MAHandle data,
+		int offset,
+		int len,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileReadToData", 
+												 "(IIII)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file,
+											data, offset, len);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileTell(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileTell", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileSeek(
+		MAHandle file,
+		int offset,
+		int whence,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileSeek", 
+												 "(III)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID,
+											file, offset, whence);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	MAHandle _maFileListStart(
+		const char* path,
+		const char* filter,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jstring jstrPath = jNIEnv->NewStringUTF(path);
+		jstring jstrFilter = jNIEnv->NewStringUTF(filter);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+								cls, 
+								"maFileListStart", 
+								"(Ljava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID,
+											jstrPath, jstrFilter);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrPath);
+		jNIEnv->DeleteLocalRef(jstrFilter);
+		
+		return (int)result;
+	}
+
+	int _maFileListNext(
+		MAHandle list,
+		int nameBuf,
+		int bufSize,
+		int memStart,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		int fixedNameBuf = nameBuf - memStart;
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileListNext", 
+												 "(III)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID,
+											list, nameBuf, bufSize);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
+	int _maFileListClose(MAHandle list, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maFileListClose", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, list);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+
 }
