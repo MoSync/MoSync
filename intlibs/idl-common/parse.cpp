@@ -45,6 +45,9 @@ static Ioctl parseIoctl(const vector<string>& ixs, Interface& inf, Group* group)
 static Typedef parseTypedef(int currentIx, Group *group);
 static Define parseDefine(int currentIx, Group *group);
 static bool parseInterfaceStatement(Interface& inf, const vector<string>& ixs, int& currentIx, Ioctl* ioctl, Group* group=NULL);
+static int findGroup(Interface& inf, const string& id);
+void setGroup(Statement* s, Group* group);
+static void parseGroup(Interface& inf, const vector<string>& ixs, int& currentIx, Ioctl* ioctl, Group* parentGroup);
 
 
 #if 1

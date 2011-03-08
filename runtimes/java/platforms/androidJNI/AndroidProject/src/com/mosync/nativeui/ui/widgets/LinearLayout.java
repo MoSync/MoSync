@@ -2,7 +2,7 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.view.ViewGroup;
 
-import com.mosync.nativeui.core.Types;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
@@ -46,11 +46,13 @@ public class LinearLayout extends Layout
 		}
 		
 		android.widget.LinearLayout layout = (android.widget.LinearLayout) getView( );
-		if( property.equals( Types.WIDGET_PROPERTY_CHILD_HORIZONTAL_ALIGNMENT ) )
+		if( property.equals( IX_WIDGET.MAW_HORIZONTAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT ) ||
+				property.equals( IX_WIDGET.MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT ) )
 		{
 			layout.setHorizontalGravity( HorizontalAlignment.convert( value ) );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_CHILD_VERTICAL_ALIGNMENT ) )
+		else if( property.equals( IX_WIDGET.MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT) ||
+				 property.equals( IX_WIDGET.MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT ) )
 		{
 			layout.setVerticalGravity( VerticalAlignment.convert( value ) );
 		}

@@ -3083,6 +3083,11 @@ group WidgetAPI "Widget API" {
 		* @brief Sent when an GLView has been initialized and is ready for setup.
 		*/
 		GL_VIEW_READY = 8;
+
+		/**
+		 * Sent when the URL of a web view changes
+		 */
+		WEB_VIEW_URL_CHANGED = 9;
 	}
 	} // end of WidgetEventTypes
 
@@ -3258,6 +3263,7 @@ group WidgetAPI "Widget API" {
 		HEIGHT = "height";
 		ALPHA = "alpha";
 		BACKGROUND_COLOR = "backgroundColor";
+		VISIBLE = "visible";
 	}	
 
 	/**
@@ -3285,7 +3291,11 @@ group WidgetAPI "Widget API" {
 	group WidgetButtonProperties "Button properties" {
 	constset MAString MAW_BUTTON_ {
 		TEXT = "text";
+		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
+		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
 		BACKGROUND_IMAGE = "backgroundImage";
+		FONT_COLOR = "fontColor";
+		FONT_SIZE = "fontSize";
 	}
 	} // end of WidgetButtonProperties		
 	
@@ -3293,6 +3303,15 @@ group WidgetAPI "Widget API" {
 	* The available widget properties for a #MAW_IMAGE. See of \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetImageProperties "Image properties" {
+	constset MAString MAW_IMAGE_ {
+		IMAGE = "image";
+	}
+	} // end of WidgetImageProperties
+	
+	/**
+	* The available widget properties for a #MAW_IMAGE. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetImageButtonProperties "Image button properties" {
 	constset MAString MAW_IMAGE_BUTTON_ {
 		TEXT = "text";
 		BACKGROUND_IMAGE = "backgroundImage";
@@ -3305,8 +3324,8 @@ group WidgetAPI "Widget API" {
 	group WidgetLabelProperties "Label properties" {
 	constset MAString MAW_LABEL_ {
 		TEXT = "text";
-		VERTICAL_ALIGNMENT = "verticalAlignment";
-		HORIZONTAL_ALIGNMENT = "horizontalAlignment";
+		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
+		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
 		FONT_COLOR = "fontColor";
 		FONT_SIZE = "fontSize";
 	}
@@ -3390,6 +3409,7 @@ group WidgetAPI "Widget API" {
 	group WidgetWebViewProperties "Web view properties" {
 	constset MAString MAW_WEB_VIEW_ {
 		URL = "url";
+		NEW_URL = "newurl";
 	}
 	} // end of WidgetWebViewProperties
 

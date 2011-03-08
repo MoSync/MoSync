@@ -17,10 +17,19 @@
 
 #import "WebViewWidget.h"
 
+#ifndef NATIVE_TEST
+#include "Platform.h"
+#include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
+#endif
+
 @implementation WebViewWidget
 
 - (id)init {
-	view = [[[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)] retain]; // TODO: do have to do this (retain)??
+	UIWebView* webView = [[[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)] retain]; // TODO: do have to do this (retain)??
+	view = webView;
+	webView.delegate = self;
 	return [super init];	
 }
 
@@ -44,8 +53,28 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	
-	return [super getPropertyWithKey:key];
+	if([key isEqualToString:@"url"]) {
+		UIWebView* webView = (UIWebView*)view;
+		return webView.request.URL.absoluteString;
+	} else if([key isEqualToString:@"newurl"]) {
+		return newurl;
+	} else {
+		return [super getPropertyWithKey:key];
+	}
+}
+
+- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+#ifndef NATIVE_TEST
+	newurl = request.URL.absoluteString;
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = MAW_EVENT_WEB_VIEW_URL_CHANGED;
+	eventData->widgetHandle = handle;
+	event.data = eventData;
+	Base::gEventQueue.put(event);
+#endif
+	return YES;
 }
 
 @end

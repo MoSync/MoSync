@@ -1594,28 +1594,7 @@ namespace Base
 		case maIOCtl_maWidgetScreenShow:
 			SYSLOG("maIOCtl_maWidgetScreenShow");
 			return _maWidgetScreenShow(a, mJNIEnv, mJThis);
-			
-		case maIOCtl_maWidgetEvaluateScript:
-			SYSLOG("maIOCtl_maWidgetEvaluateScript");
-			return _maWidgetEvauluateScript(a, SYSCALL_THIS->GetValidatedStr(b), mJNIEnv, mJThis);
-			
-		case maIOCtl_maWidgetGetMessageData:
-		{
-			SYSLOG("maIOCtl_maWidgetGetMessageData");
-			
-			int memStart = (int) gCore->mem_ds;
-			int _messageId = a;
-			int _messageBufferSize = c;
-			int _messageBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(b, _messageBufferSize * sizeof(char));
-			
-			return _maWidgetGetMessageData(memStart, 
-										   _messageId, 
-										   _messageBuffer, 
-										   _messageBufferSize, 
-										   mJNIEnv, 
-										   mJThis);
-		}
-		
+				
 		case maIOCtl_maNotificationAdd:
 			SYSLOG("maIOCtl_maNotificationAdd");
 			return _maNotificationAdd(

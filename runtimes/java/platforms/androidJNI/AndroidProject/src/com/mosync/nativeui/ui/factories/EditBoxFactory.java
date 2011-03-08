@@ -30,7 +30,7 @@ public class EditBoxFactory implements AbstractViewFactory
 				if( (event.getAction( ) == KeyEvent.ACTION_DOWN)
 						&& (keyCode == KeyEvent.KEYCODE_ENTER) )
 				{
-					EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.WIDGET_EVENT_CLICKED, handle );
+					EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_CLICKED, handle );
 					return true;
 				}
 				else

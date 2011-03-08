@@ -1,9 +1,9 @@
 package com.mosync.nativeui.ui.widgets;
 
-import com.mosync.nativeui.core.Types;
-import com.mosync.nativeui.util.properties.PropertyConversionException;
-
 import android.webkit.WebView;
+
+import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * A WebWidget is graphical element that displays a webpage
@@ -13,6 +13,8 @@ import android.webkit.WebView;
  */
 public class WebWidget extends Widget
 {
+	private String m_newUrl;
+
 	/**
 	 * Constructor
 	 * 
@@ -39,11 +41,34 @@ public class WebWidget extends Widget
 		}
 		
 		WebView webView = (WebView) getView( );
-		if( property.equals( Types.WIDGET_PROPERTY_URL ) )
+		if( property.equals( IX_WIDGET.MAW_WEB_VIEW_URL ) )
 		{
 			webView.loadUrl( value );
+		} else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_NEW_URL )) {
+			m_newUrl = value;
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * @see Widget.getProperty.
+	 */
+	@Override
+	public String getProperty(String property)
+	{
+		WebView webView = (WebView) getView( );
+		if( property.equals( IX_WIDGET.MAW_WEB_VIEW_URL ) )
+		{
+			return webView.getUrl( );
+		}
+		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_NEW_URL ) )
+		{
+			return m_newUrl;
+		}
+		else
+		{
+			return super.getProperty( property );
+		}
 	}
 }

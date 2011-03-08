@@ -5,8 +5,8 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.view.ViewGroup;
 
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
-import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.LayoutParamsSetter;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -61,11 +61,11 @@ public class ScreenWidget extends Layout
 			return true;
 		}
 		
-		if( property.equals( Types.WIDGET_PROPERTY_TITLE ) )
+		if( property.equals( IX_WIDGET.MAW_SCREEN_TITLE ) )
 		{
 			m_title = value;
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_ICON ) )
+		else if( property.equals( IX_WIDGET.MAW_SCREEN_ICON ) )
 		{
 			int imageHandle = IntConverter.convert( value );
 			Bitmap icon = NativeUI.getBitmap( imageHandle );

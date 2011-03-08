@@ -147,7 +147,8 @@ void Downloader::fireError(int code)
 {
 	mIsDownloading = false;
 
-	mConn->close();
+	// TODO: We remove this now, because it breaks stuff in case of redirects. Should not go into master.
+	// mConn->close();
 
 	// Broadcast error to listeners.
 	for (int i = 0; i < mDownloadListeners.size(); ++i)

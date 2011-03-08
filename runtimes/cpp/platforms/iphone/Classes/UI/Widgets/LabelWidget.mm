@@ -105,7 +105,7 @@ typedef enum VerticalAlignment {
 		UILabel* label = (UILabel*) view;
 		label.numberOfLines = [value intValue];
 	} 
-	else if([key isEqualToString:@"horizontalAlignment"]) {
+	else if([key isEqualToString:@"textHorizontalAlignment"]) {
 		UILabel* label = (UILabel*) view;
 		if([value isEqualToString:@"left"]) {
 			label.textAlignment = UITextAlignmentLeft;
@@ -117,6 +117,7 @@ typedef enum VerticalAlignment {
 			label.textAlignment = UITextAlignmentRight;
 		}		
 	}
+<<<<<<< HEAD
 	else if([key isEqualToString:@"verticalAlignment"]) {
 		UILabelWithVerticalAlignment* label = (UILabelWithVerticalAlignment*) view;
 		if([value isEqualToString:@"top"]) {
@@ -128,6 +129,14 @@ typedef enum VerticalAlignment {
 		else if([value isEqualToString:@"bottom"]) {
 			[label setVerticalAlignment:VerticalAlignmentBottom];
 		}		
+=======
+	else if([key isEqualToString:@"textVerticalAlignment"]) {
+		// This isn't trivial on iphone.
+		
+		//UILabel* label = (UILabel*) view;
+		//if([value isEqualToString:@"center"]) {
+		//}
+>>>>>>> 7dc2153ccd8cd8580b7bec8ad4fe08765b2be6f6
 	}	
 	else if([key isEqualToString:@"fontColor"]) {
 		UILabel* label = (UILabel*) view;	

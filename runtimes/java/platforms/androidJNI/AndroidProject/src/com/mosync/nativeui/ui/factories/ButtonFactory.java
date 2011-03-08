@@ -1,15 +1,13 @@
 package com.mosync.nativeui.ui.factories;
 
-import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_CLICKED;
+import android.app.Activity;
+import android.widget.Button;
 
+import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.ui.widgets.ButtonWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
-import com.mosync.internal.android.EventQueue;
-
-import android.app.Activity;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
+import com.mosync.nativeui.util.MoSyncSendOnClick;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * A factory that creates button and sets up the default
@@ -28,38 +26,19 @@ public class ButtonFactory implements AbstractViewFactory
 		Button b = new Button( activity );
 		b.setOnClickListener( new MoSyncSendOnClick( handle ) );
 		
-		return new ButtonWidget(handle, b);
-	}
-	
-	/**
-	 * A class responsible for sending mosync widget events
-	 * when a button is clicked.
-	 * 
-	 * @author fmattias
-	 */
-	class MoSyncSendOnClick implements OnClickListener
-	{
-		private int m_handle = -1;
+		ButtonWidget button = new ButtonWidget( handle, b );
 		
-		/**
-		 * Constructor.
-		 * 
-		 * @param handle The handle of the widget bound to this 
-		 *               onclick handler.
-		 */
-		public MoSyncSendOnClick(int handle)
+		try
 		{
-			m_handle = handle;
+			button.setProperty( Types.WIDGET_PROPERTY_TEXT_HORIZONTAL_ALIGNMENT, Types.WIDGET_HORIZONTAL_CENTER );
+			button.setProperty( Types.WIDGET_PROPERTY_TEXT_VERTICAL_ALIGNMENT, Types.WIDGET_VERTICAL_CENTER );
 		}
-
-		/**
-		 * @see OnClickListener.onClick.
-		 */
-		@Override
-		public void onClick(View v)
+		catch(PropertyConversionException pe)
 		{
-			EventQueue eventQueue = EventQueue.getDefault( );
-			eventQueue.postWidgetEvent( WIDGET_EVENT_CLICKED, m_handle );
+			// If this happens, there is a bug in the implementation, just return null.
+			return null;
 		}
+		
+		return button;
 	}
 }
