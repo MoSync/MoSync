@@ -2,6 +2,7 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 
 import com.mosync.internal.generated.IX_WIDGET;
@@ -120,13 +121,18 @@ public class Widget
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_ALPHA ) )
 		{
 			float alpha = FloatConverter.convert( value );
-			if( alpha > 1.0f )
+			if( alpha > 1.0f || alpha < 0.0f )
 			{
 				return false;
 			}
 			
-			int intAlpha = (int) (alpha * 255.0f); 
-			getView( ).getBackground( ).setAlpha( intAlpha );
+			int intAlpha = (int) (alpha * 255.0f);
+			Drawable background = getView( ).getBackground( );
+			if( background == null )
+			{
+				return false;
+			}
+			background.setAlpha( intAlpha );
 		}
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_VISIBLE ) )
 		{
