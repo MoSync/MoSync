@@ -869,10 +869,10 @@ namespace Base
 		jstring jstr = mJNIEnv->NewStringUTF(key);
 		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maHttpGetResponseHeader", "(ILjava/lang/String;JI)I");
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maHttpGetResponseHeader", "(ILjava/lang/String;II)I");
 		if (methodID == 0) ERROR_EXIT;
-		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, conn, jstr, (jlong)rbuffer, bufSize);
-		
+		int retval = mJNIEnv->CallIntMethod(mJThis, methodID, conn, jstr, rbuffer, bufSize);
+			
 		mJNIEnv->DeleteLocalRef(cls);
 		mJNIEnv->DeleteLocalRef(jstr);
 		

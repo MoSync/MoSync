@@ -2426,7 +2426,7 @@ public class MoSyncThread extends Thread
 	}
 	
 	int maHttpGetResponseHeader(
-		int connHandle, String key, long address, int bufSize)
+		int connHandle, String key, int address, int bufSize)
 	{
 		return mMoSyncNetwork.maHttpGetResponseHeader(
 			connHandle, key, address, bufSize);
