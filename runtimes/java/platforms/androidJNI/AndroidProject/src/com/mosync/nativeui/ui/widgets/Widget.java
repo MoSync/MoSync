@@ -44,6 +44,13 @@ public class Widget
 	private LayoutParams m_layoutParams = new LayoutParams( );
 	
 	/**
+	 * The alpha is stored here to enable us to the alpha before
+	 * a background drawable is set. This means that as soon as
+	 * the background is changed, the alpha must also be set.
+	 */
+	private int m_alpha = 0xff;
+	
+	/**
 	 * Constructor.
 	 * 
 	 * Note: The id of the view is always equal to its handle.
@@ -108,6 +115,7 @@ public class Widget
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR ) )
 		{
 			getView( ).setBackgroundColor( ColorConverter.convert( value ) );
+			updateAlpha( m_alpha );
 		}
 		else if( property.equals( IX_WIDGET.MAW_BUTTON_BACKGROUND_IMAGE ) )
 		{
@@ -116,6 +124,11 @@ public class Widget
 			if( background != null )
 			{
 				getView( ).setBackgroundDrawable( new BitmapDrawable( background ) );
+				updateAlpha( m_alpha );
+			}
+			else
+			{
+				return false;
 			}
 		}
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_ALPHA ) )
@@ -127,12 +140,8 @@ public class Widget
 			}
 			
 			int intAlpha = (int) (alpha * 255.0f);
-			Drawable background = getView( ).getBackground( );
-			if( background == null )
-			{
-				return false;
-			}
-			background.setAlpha( intAlpha );
+			m_alpha = intAlpha;
+			updateAlpha( m_alpha );
 		}
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_VISIBLE ) )
 		{
@@ -254,5 +263,20 @@ public class Widget
 	{
 		assert( m_layoutParams != null );
 		return m_layoutParams;
+	}
+	
+	/**
+	 * Updates the alpha of the background of the underlying view.
+	 * 
+	 * @param alpha The new alpha of the underlying view.
+	 */
+	public void updateAlpha(int alpha)
+	{		
+		Drawable background = getView( ).getBackground( );
+		if( background == null )
+		{
+			return;
+		}
+		background.setAlpha( alpha & 0xff );
 	}
 }
