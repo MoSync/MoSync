@@ -25,13 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ma.h"
 
 #if defined(__GNUC__)
-
-#ifdef _android
-#define ATTRIBUTE(a, func) func (a)
-#else
 #define ATTRIBUTE(a, func)  func __attribute__ ((a))
-#endif
-
 #define ALIGN(ament, func) ATTRIBUTE(aligned(ament), func)
 #elif defined(_MSC_VER)
 #define ATTRIBUTE(a, func)  __declspec (a) func
