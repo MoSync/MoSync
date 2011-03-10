@@ -355,26 +355,26 @@ public class MoSyncThread extends Thread
 	/**
 	 * Allocate memory for the program data section.
 	 */
-	public ByteBuffer generateDataSection(int size)
+	 public boolean generateDataSection(ByteBuffer byteBuffer)
 	{
 		try
 		{
-			mMemDataSection = ByteBuffer.allocateDirect(size);
+			mMemDataSection = byteBuffer;
 			mMemDataSection.order(null);
 		}
 		catch (Exception e)
 		{
 			logError("MoSyncThread - Out of Memory!", e);
 			mMemDataSection = null;
-			return null;
+			return false;
 		}
 		catch (Error e)
 		{
 			logError("MoSyncThread - Out of Memory!", e);
 			mMemDataSection = null;
-			return null;
+			return false;
 		}
-		return mMemDataSection;
+		return true;
 	}
 	
 	/**
@@ -653,7 +653,7 @@ public class MoSyncThread extends Thread
 		}
 	}
 	
-	boolean initSyscalls()
+	void initSyscalls()
 	{
 		SYSLOG("initSyscalls");
 		mUsingFrameBuffer = false;
@@ -663,6 +663,9 @@ public class MoSyncThread extends Thread
 		mClipWidth = mWidth;
 		mClipHeight = mHeight;
 
+		// Reset cliprect
+		mCanvas.clipRect(mClipLeft, mClipTop, mClipWidth, mClipHeight, Region.Op.REPLACE);
+		
 		mPaint.setStyle(Paint.Style.FILL);
 		mPaint.setAntiAlias(false);
 		mPaint.setColor(0xffffffff);
@@ -678,8 +681,7 @@ public class MoSyncThread extends Thread
 			"abcdefghijklmnopqrstuvwxyz" +
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
 		mTextConsoleHeight = EXTENT_Y(extent);
-		 
-		 return true;
+
 	}
 
 	/**

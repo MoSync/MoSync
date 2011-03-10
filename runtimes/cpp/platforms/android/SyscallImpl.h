@@ -37,3 +37,9 @@ public:
 	void postEvent(MAEvent event, JNIEnv *jniEnv);
 	void setJNIEnvironment(JNIEnv* je, jobject jthis);
 	void checkAndStoreAudioResource(int resourceIndex);
+	
+	int getReloadHandle();
+	int setReloadHandle(MAHandle handle);
+	bool isReloading();
+	void setReloading(bool state);
+	void resetSyscallState();

@@ -32,8 +32,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
-#define SYSLOG(...)
+#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
+//#define SYSLOG(...)
 
 namespace Base
 {	
@@ -41,6 +41,9 @@ namespace Base
 
 	JNIEnv* mJNIEnv = 0;
 	jobject mJThis;
+	
+	int mReloadHandle = 0;
+	bool mIsReloading = false;
 	
 	static ResourceArray gResourceArray;
 	static CircularFifo<MAEvent, EVENT_BUFFER_SIZE> gEventFifo;
@@ -893,9 +896,54 @@ namespace Base
 	
 	// TODO : Implement maLoadProgram
 	
+	int Syscall::getReloadHandle()
+	{
+		return mReloadHandle;
+	}
+	
+	int Syscall::setReloadHandle(MAHandle handle)
+	{
+		mReloadHandle = handle;
+	}
+	
+	bool Syscall::isReloading()
+	{
+		return mIsReloading;
+	}
+	
+	void Syscall::setReloading(bool state)
+	{
+		mIsReloading = state;
+	}
+	
+	void Syscall::resetSyscallState()
+	{
+		// Reset the state
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "initSyscalls", "()V");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallVoidMethod(mJThis, methodID);
+		
+		mJNIEnv->DeleteLocalRef(cls);
+		
+		// Yield the runtime so that it can load the new program
+		SYSCALL_THIS->VM_Yield();
+	}
+	
 	SYSCALL(void,  maLoadProgram(MAHandle data, int reload))
 	{
-		SYSLOG("maLoadProgram NOT IMPLEMENTED");
+		SYSLOG("maLoadProgram");
+		
+		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "@@@@ MA LOAD PROGRAM");
+		
+		mReloadHandle = data;
+		
+		if(0 == reload)
+			mIsReloading = false;
+		else
+			mIsReloading = true;
+		
+		gSyscall->resetSyscallState();
 	}
 
 	// TODO : Implement maGetKeys
@@ -1675,36 +1723,61 @@ namespace Base
 	}
 }
 
+bool reloadProgram()
+{
+	if(true == Base::gSyscall->isReloading())
+	{
+		Base::gSyscall->resetSyscallState();
+		return true;
+	}
+	return false;
+}
+
 void MoSyncExit(int errorCode)
 {
 	__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Program has exited!");
 
-	exit(errorCode);
+	if(false == reloadProgram())
+	{
+		__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "nahh.. just die now");
+		
+		exit(errorCode);
+	}
+	else
+	{
+		__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Should reload program");
+		
+		Base::gEventFifo.clear();
+		
+		Base::SYSCALL_THIS->VM_Yield();
+	}
 }
 
 void MoSyncErrorExit(int errorCode)
 {
-	char* b = (char*)malloc(200);
-	sprintf(b, "MoSync error: %i", errorCode);
-	//sprintf(b, "MoSync error: %i ip: %i", errorCode , Core::GetIp(gCore));
 
-	__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", b);
-	
+	if(false == reloadProgram())
+	{
+		char* b = (char*)malloc(200);
+		sprintf(b, "MoSync error: %i", errorCode);
+		__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", b);
+		jstring jstr = Base::mJNIEnv->NewStringUTF(b);
+		free(b);
+		
+		jclass cls = Base::mJNIEnv->GetObjectClass(Base::mJThis);
+		jmethodID methodID = Base::mJNIEnv->GetMethodID(cls, "threadPanic", "(ILjava/lang/String;)V");
+		if (methodID == 0) ERROR_EXIT;
+		Base::mJNIEnv->CallVoidMethod(Base::mJThis, methodID, (jint)errorCode, jstr);
+		
+		Base::mJNIEnv->DeleteLocalRef(cls);
+		Base::mJNIEnv->DeleteLocalRef(jstr);
 
-	jstring jstr = Base::mJNIEnv->NewStringUTF(b);
+		exit(errorCode);
+	}
 	
-	free(b);
-	
-	jclass cls = Base::mJNIEnv->GetObjectClass(Base::mJThis);
-	jmethodID methodID = Base::mJNIEnv->GetMethodID(cls, "threadPanic", "(ILjava/lang/String;)V");
-	if (methodID == 0) ERROR_EXIT;
-	Base::mJNIEnv->CallVoidMethod(Base::mJThis, methodID, (jint)errorCode, jstr);
-	
-	Base::mJNIEnv->DeleteLocalRef(cls);
-	Base::mJNIEnv->DeleteLocalRef(jstr);
-
-	exit(errorCode);
+	Base::SYSCALL_THIS->VM_Yield();
 }
+
 
 
 // Build the event.
