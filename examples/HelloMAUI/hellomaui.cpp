@@ -1,4 +1,4 @@
-/* Copyright (C) 2010 MoSync AB
+/* Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -158,7 +158,7 @@ public:
 			//...check that the password is at least 6 characters long.
 			//Here we read the current text in the EditBox using the
 			//"getText" method and assigning it to "pw".
-			const String &pw = mPasswordBox->getText( );
+			const MAUtil::String &pw = mPasswordBox->getText( );
 			if ( pw.length() < 6 )
 			{
 				//If the validation failed, update the instructions label.
@@ -203,7 +203,7 @@ private:
 //That's the screen class finished, now we move on to the event handling
 //wrapper for the entire application. To create the wrapper we make our own
 //implementation of the MoSync Moblet base class.
-class HelloMAUIMoblet : public Moblet
+class HelloMAUIMoblet : public MAUtil::Moblet
 {
 public:
 	//The constructor method. (Note that constructors have the same
@@ -248,7 +248,7 @@ extern "C" int MAMain()
 	HelloMAUIMoblet mainMoblet;
 
 	//Run the Moblet to start the application.
-	Moblet::run( &mainMoblet );
+	MAUtil::Moblet::run( &mainMoblet );
 
 	//HelloMAUIMoblet will run until it is closed by the user pressing key 0.
 	//When it's closed we end our program in a well-behaved way, returning zero.

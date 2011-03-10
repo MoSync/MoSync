@@ -128,7 +128,6 @@ public:
 	//Next, the method that gets called when a pointer is pressed on the screen.
 	//The MoSync runtime supplies the pointer coordinates in the parameter "p",
 	//from which we can extract the individual x and y coordinates.
-	//Why virtual? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	virtual void pointerPressEvent(MAPoint2d p)
 	{
 		mX = p.x;
@@ -139,7 +138,6 @@ public:
 	}
 
 	//Similarly for a pointer movement to another location on the screen.
-	//Why virtual? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	virtual void pointerMoveEvent(MAPoint2d p)
 	{
 		mX = p.x;
@@ -148,7 +146,6 @@ public:
 	}
 
 	//We don't need to do anything when the pointer is lifted.
-	//Why virtual? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	virtual void pointerReleaseEvent(MAPoint2d p)
 	{
 	}
