@@ -1636,7 +1636,7 @@ strtod(CONST char *s00, char **se)
 		z = word0(rv) & Exp_mask;
 		if (y == z) {
 			/* Can we stop now? */
-			L = aadj;
+			L = (int32_t)aadj;
 			aadj -= L;
 			/* The tolerances below are conservative. */
 			if (dsign || word1(rv) || word0(rv) & Bndry_mask) {

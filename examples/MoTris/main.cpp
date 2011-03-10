@@ -30,7 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mastdlib.h>
 #include <mastring.h>
 #include <mavsprintf.h>
+#ifdef MAPIP
 #include <maprofile.h>
+#endif
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
 #include <MAUtil/Geometry.h>

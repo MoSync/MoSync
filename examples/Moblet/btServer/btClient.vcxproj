@@ -98,10 +98,6 @@
     <ClInclude Include="common.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\libs\MAStd\MAStd.vcxproj">
-      <Project>{b95fff1f-36b6-4b62-8b1e-137fc9f87648}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\libs\MAUtil\MAUtil.vcxproj">
       <Project>{c5755f5a-7628-4f47-af78-caa339f28d8d}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

@@ -60,6 +60,9 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Lib />
+    <Lib>
+      <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -71,18 +74,15 @@
       <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Lib />
+    <Lib>
+      <TreatLibWarningAsErrors>true</TreatLibWarningAsErrors>
+    </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="File.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="File.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\MAStd\MAStd.vcxproj">
-      <Project>{b95fff1f-36b6-4b62-8b1e-137fc9f87648}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

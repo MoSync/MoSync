@@ -128,10 +128,6 @@
       <Project>{ba7a553a-7b0b-471b-814e-5dcc5c7e917b}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>
-    <ProjectReference Include="..\..\libs\MAStd\MAStd.vcxproj">
-      <Project>{b95fff1f-36b6-4b62-8b1e-137fc9f87648}</Project>
-      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-    </ProjectReference>
     <ProjectReference Include="..\..\libs\MATest\MATest.vcxproj">
       <Project>{1da607cb-3416-4fd1-a9b8-c3917c27054e}</Project>
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>

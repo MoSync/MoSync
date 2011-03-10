@@ -177,12 +177,9 @@ namespace Base {
 #endif
 					TEST(file.readFully(*ms));
 					ROOM(resources.dadd_RT_BINARY(rI, ms));
-
 #ifdef _android
 					checkAndStoreAudioResource(rI);
-					
 #endif
-
 				}
 				break;
 			case RT_UBIN:
@@ -198,7 +195,6 @@ namespace Base {
 					ROOM(resources.dadd_RT_BINARY(rI,
 						new LimitedFileStream(aFilename, pos, size, getJNIEnvironment(), getJNIThis())));
 #endif
-
 					TEST(file.seek(Seek::Current, size));
 				}
 				break;

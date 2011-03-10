@@ -25,7 +25,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <ma.h>
 #include <mastdlib.h>
+#ifdef MAPIP
 #include <maprofile.h>
+#endif
 #include <conprint.h>
 
 #include "MAHeaders.h"

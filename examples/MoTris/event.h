@@ -18,7 +18,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _EVENT_H_
 #define _EVENT_H_
 
+#ifdef MAPIP
 #include <maprofile.h>
+#endif
 
 class EventHandler {
 private:

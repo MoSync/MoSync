@@ -22,8 +22,8 @@
       <Filter>Screens</Filter>
     </ClCompile>
     <ClCompile Include="Clock.cpp" />
-    <ClCompile Include="test.cpp" />
     <ClCompile Include="Util.cpp" />
+    <ClCompile Include="MAUIex.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CustomScreen.h">

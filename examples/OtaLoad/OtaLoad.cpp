@@ -42,7 +42,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/String.h>
 #include <MAUtil/PlaceholderPool.h>
 #include <MAUtil/util.h>
+#ifdef MAPIP
 #include <maprofile.h>
+#endif
 
 using namespace MAUtil;
 

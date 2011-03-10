@@ -164,8 +164,8 @@
 #define PAGE_SIZE (getpagesize())
 #endif
 
-#define PRINT_MSG(fmt, args...) printf(fmt, ## args)
-//#define ERROR_MSG(fmt, args...) printf(fmt, ## args)
+#define PRINT_MSG(fmt, ...) printf(fmt, ## args)
+//#define ERROR_MSG(fmt, ...) printf(fmt, ## args)
 #define ERROR_MSG(string) maWriteLog(string, sizeof(string)-1)
 
 typedef unsigned int u32_t;     /* NOTE: Make sure that this type is 4 bytes long on your computer */
