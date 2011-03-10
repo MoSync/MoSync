@@ -1660,7 +1660,7 @@ public
 			int address = mCore.mCustomEventPointer;
 
 			//copy main data to above top-of-stack
-			System.arraycopy(event, 1, mem_ds, INTPART(address), 9);
+			System.arraycopy(event, 1, mem_ds, INTPART(address), MALOCATION_INT_COUNT);
 
 			//write type and pointer to ordinary event location
 			WINT(dst, EVENT_TYPE_LOCATION);
@@ -2489,7 +2489,7 @@ public
 
 	synchronized public final void locationUpdated(LocationProvider provider, Location location) {
 		DEBUG_TEMP("locationUpdated\n");
-		int[] event = new int[11];
+		int[] event = new int[MALOCATION_INT_COUNT + 1];
 		EI_TYPE = EVENT_TYPE_LOCATION;
 		EI_STATE = handleLocation(location, event);
 		mCanvas.postEvent(event);

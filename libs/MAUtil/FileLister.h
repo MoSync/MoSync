@@ -38,6 +38,7 @@ public:
 	/**
 	* \see maFileListStart()
 	* Closes the active list, if any.
+	* Returns \< 0 on error.
 	*/
 	int start(const char* dir, const char* filter = "*");
 
@@ -46,6 +47,7 @@ public:
 	* \a dst's old contents are overwritten.
 	* Returns the length of the name, 0 if there are no more files, or \< 0 on error.
 	* On error, \a dst is not modified.
+	* \see maFileListNext()
 	*/
 	int next(MAUtil::String& dst);
 

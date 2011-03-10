@@ -1411,88 +1411,6 @@ namespace Base
 			SYSLOG("maIOCtl_maLocationStop");
 			return _maLocationStop(mJNIEnv, mJThis);
 
-		// File syscalls
-		
-		case maIOCtl_maFileOpen:
-			SYSLOG("maIOCtl_maFileOpen NOT IMPLEMENTED");
-			return -1;
-
-		case maIOCtl_maFileExists:
-			SYSLOG("maIOCtl_maFileExists NOT IMPLEMENTED");
-			return -1;
-
-		case maIOCtl_maFileClose:
-			SYSLOG("maIOCtl_maFileClose NOT IMPLEMENTED");
-			return -1;
-
-		case maIOCtl_maFileCreate:
-			SYSLOG("maIOCtl_maFileCreate NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileDelete:
-			SYSLOG("maIOCtl_maFileDelete NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileSize:
-			SYSLOG("maIOCtl_maFileSize NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileAvailableSpace:
-			SYSLOG("maIOCtl_maFileAvailableSpace NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileTotalSpace:
-			SYSLOG("maIOCtl_maFileTotalSpace NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileDate:
-			SYSLOG("maIOCtl_maFileDate NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileRename:
-			SYSLOG("maIOCtl_maFileRename NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileTruncate:
-			SYSLOG("maIOCtl_maFileTruncate NOT IMPLEMENTED");
-			return -1;
-
-		case maIOCtl_maFileWrite:
-			SYSLOG("maIOCtl_maFileWrite NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileWriteFromData:
-			SYSLOG("maIOCtl_maFileWriteFromData NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileRead:
-			SYSLOG("maIOCtl_maFileRead NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileReadToData:
-			SYSLOG("maIOCtl_maFileReadToData NOT IMPLEMENTED");
-			return -1;
-
-		case maIOCtl_maFileTell:
-			SYSLOG("maIOCtl_maFileTell NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileSeek:
-			SYSLOG("maIOCtl_maFileSeek NOT IMPLEMENTED");
-			return -1;
-
-		case maIOCtl_maFileListStart:
-			SYSLOG("maIOCtl_maFileListStart NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileListNext:
-			SYSLOG("maIOCtl_maFileListNext NOT IMPLEMENTED");
-			return -1;
-		
-		case maIOCtl_maFileListClose:
-			SYSLOG("maIOCtl_maFileListClose NOT IMPLEMENTED");
-			return -1;
-
 		// Video syscalls
 /*	
 		case maIOCtl_maStartVideoStream:
@@ -1690,6 +1608,149 @@ namespace Base
 				mJNIEnv, 
 				mJThis);
 				
+		case maIOCtl_maFileOpen:
+			SYSLOG("maIOCtl_maFileOpen");
+			return _maFileOpen(
+				SYSCALL_THIS->GetValidatedStr(a),
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFileExists:
+			return _maFileExists(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFileClose:
+			return _maFileClose(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFileCreate:
+			return _maFileCreate(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFileDelete:
+			return _maFileDelete(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFileSize:
+			return _maFileSize(
+				a, 
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFileAvailableSpace:
+			return _maFileAvailableSpace(
+				a,
+				mJNIEnv,
+				mJThis);
+		
+		case maIOCtl_maFileTotalSpace:
+			return _maFileTotalSpace(
+				a,
+				mJNIEnv,
+				mJThis);
+			
+		case maIOCtl_maFileDate:
+			return _maFileDate(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFileRename:
+			return _maFileRename(
+				a, 
+				SYSCALL_THIS->GetValidatedStr(b),
+				mJNIEnv,
+				mJThis);
+		
+		case maIOCtl_maFileTruncate:
+			return _maFileTruncate(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFileWrite:
+			return _maFileWrite(
+				a,
+				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(char)),
+				c,
+				(int)gCore->mem_ds,
+				mJNIEnv,
+				mJThis);
+		
+		case maIOCtl_maFileWriteFromData:
+			return _maFileWriteFromData(
+				a,
+				b,
+				c,
+				SYSCALL_THIS->GetValidatedStackValue(0),
+				mJNIEnv,
+				mJThis);
+			
+		case maIOCtl_maFileRead:
+			return _maFileRead(
+				a, 
+				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(char)),
+				c,
+				(int)gCore->mem_ds,
+				mJNIEnv,
+				mJThis);
+		
+		case maIOCtl_maFileReadToData:
+			return _maFileReadToData(
+				a,
+				b,
+				c,
+				SYSCALL_THIS->GetValidatedStackValue(0),
+				mJNIEnv,
+				mJThis);
+		
+		case maIOCtl_maFileTell:
+			return _maFileTell(
+				a,
+				mJNIEnv,
+				mJThis);
+		
+		case maIOCtl_maFileSeek:
+			return _maFileSeek(
+				a,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+				
+		case maIOCtl_maFileListStart:
+			return _maFileListStart(
+				SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b),
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFileListNext:
+			return _maFileListNext(
+				a,
+				b,
+				c,
+				(int)gCore->mem_ds,
+				mJNIEnv,
+				mJThis
+				);
+			
+		case maIOCtl_maFileListClose:
+			return _maFileListClose(
+				a,
+				mJNIEnv,
+				mJThis);
+				
 		} // End of switch
 		
 		return IOCTL_UNAVAILABLE;
@@ -1698,7 +1759,8 @@ namespace Base
 
 void MoSyncExit(int errorCode)
 {
-	__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Program has exited!");
+	__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!",
+											"Program has exited!");
 
 	exit(errorCode);
 }
@@ -1707,7 +1769,6 @@ void MoSyncErrorExit(int errorCode)
 {
 	char* b = (char*)malloc(200);
 	sprintf(b, "MoSync error: %i", errorCode);
-	//sprintf(b, "MoSync error: %i ip: %i", errorCode , Core::GetIp(gCore));
 
 	__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", b);
 	
@@ -1717,9 +1778,11 @@ void MoSyncErrorExit(int errorCode)
 	free(b);
 	
 	jclass cls = Base::mJNIEnv->GetObjectClass(Base::mJThis);
-	jmethodID methodID = Base::mJNIEnv->GetMethodID(cls, "threadPanic", "(ILjava/lang/String;)V");
+	jmethodID methodID = Base::mJNIEnv->GetMethodID(cls, "threadPanic",
+												"(ILjava/lang/String;)V");
 	if (methodID == 0) ERROR_EXIT;
-	Base::mJNIEnv->CallVoidMethod(Base::mJThis, methodID, (jint)errorCode, jstr);
+	Base::mJNIEnv->CallVoidMethod(Base::mJThis, methodID,
+									(jint)errorCode, jstr);
 	
 	Base::mJNIEnv->DeleteLocalRef(cls);
 	Base::mJNIEnv->DeleteLocalRef(jstr);

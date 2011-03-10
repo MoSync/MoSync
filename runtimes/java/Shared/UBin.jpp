@@ -50,7 +50,7 @@ final class UBin extends BinaryInterface {
 	public final InputStream getInputStream(int offset, int size) throws IOException {
 		//DEBUG_ALWAYS("uGIS "+filename+"\n");
 #ifdef _JavaME
-		InputStream in = getClass().getResourceAsStream(mFilename);
+		InputStream in = GET_RESOURCE(mFilename);
 #elif defined(_android)
 		InputStream in = new LittleEndianDataInputStream(mCore.mContext.getResources().openRawResource(R.raw.resources));
 #endif

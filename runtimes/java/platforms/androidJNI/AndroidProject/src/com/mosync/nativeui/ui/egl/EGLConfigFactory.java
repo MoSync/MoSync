@@ -129,27 +129,20 @@ public class EGLConfigFactory
         }
 
     /**
-     * This class will choose a supported surface as close to
-     * RGB565 as possible, with or without a depth buffer.
-     *
+     * This class will choose the ARGB8888 config.
      */
     public static class SimpleEGLConfigChooser extends ComponentSizeChooser {
         public SimpleEGLConfigChooser(boolean withDepthBuffer) {
-            super(4, 4, 4, 0, withDepthBuffer ? 16 : 0, 0);
-            // Adjust target values. This way we'll accept a 4444 or
+            super(8, 8, 8, 8, withDepthBuffer ? 16 : 0, 0);
 
-            // 555 buffer if there's no 565 buffer available.
-
-            mRedSize = 5;
-            mGreenSize = 6;
-            mBlueSize = 5;
+            mRedSize = 8;
+            mGreenSize = 8;
+            mBlueSize = 8;
         }
     }
-    
+
     public static EGLConfig findConfig(EGL10 egl, EGLDisplay display)
     {
     	return new SimpleEGLConfigChooser( true ).chooseConfig( egl, display );
     }
-	
-	
 }

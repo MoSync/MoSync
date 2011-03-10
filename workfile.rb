@@ -45,20 +45,27 @@ ALL_DIRS = MAIN_DIRS + EXAM_DIRS
 
 NEWLIB_DIRS = ["libs"]
 
-skins = Work.new
-skins.instance_eval do
+class CopyDirWork < Work
+	def initialize(name)
+		@NAME = name
+	end
 	def setup
-		builddir = "#{mosyncdir}/skins"
+		builddir = "#{mosyncdir}/#{@NAME}"
 		@prerequisites = [DirTask.new(self, builddir)]
-		skin_sources = Dir['skins/*']
-		@prerequisites |= skin_sources.collect do |src|
+		sources = Dir["#{@NAME}/*"]
+		@prerequisites |= sources.collect do |src|
 			CopyFileTask.new(self, FileTask.new(self, "#{builddir}/#{File.basename(src)}"),
 				FileTask.new(self, src))
 		end
 	end
 end
 
-target :base => skins do
+SKINS = CopyDirWork.new('skins')
+RULES = CopyDirWork.new('rules')
+
+target :base => [SKINS, RULES] do
+	SKINS.invoke
+	RULES.invoke
 	Work.invoke_subdirs(PRE_DIRS)
 	#Work.invoke_subdir("tools/WrapperGenerator", "compile")
 	Work.invoke_subdir("tools/idl2", "compile")
@@ -73,12 +80,6 @@ target :examples => :base do
 end
 
 target :all => :examples do
-end
-
-target :noidl => skins do
-	Work.invoke_subdirs(PRE_DIRS)
-	Work.invoke_subdir("tools/idl2")
-	Work.invoke_subdirs(MAIN_DIRS)
 end
 
 target :more => :base do

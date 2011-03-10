@@ -31,7 +31,6 @@ namespace MapDemo
 	//-------------------------------------------------------------------------
 	MapDemoScreen::MapDemoScreen( MobletEx* moblet ) :
 		AppScreen( moblet ),
-		scrolling( false ),
 		lastPointerPress( -1 )
 	//-------------------------------------------------------------------------
 	{

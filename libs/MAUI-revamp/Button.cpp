@@ -33,6 +33,26 @@ Button::Button(int x, int y, int width, int height, const String& caption)
 	this->setAutoSizeY(false);
 }
 
+bool Button::keyPressed(int keyCode, int nativeCode) {
+	if(keyCode == MAK_FIRE) {
+		mPressed = true;
+		ListenerSet_fire(ButtonListener, mListeners, onButtonEvent(this, true));
+		requestRepaint();
+		return true;
+	}
+	return false;
+}
+
+bool Button::keyReleased(int keyCode, int nativeCode) {
+	if(keyCode == MAK_FIRE && mPressed) {
+		mPressed = false;
+		ListenerSet_fire(ButtonListener, mListeners, onButtonEvent(this, false));
+		requestRepaint();
+		return true;
+	}
+	return false;
+}
+
 bool Button::pointerPressed(MAPoint2d point, int id)
 {
 	//lprintfln("bpp %ix%i", p.x, p.y);

@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Set.h>
 #include <MAUtil/Map.h>
 #include <MAUtil/HashMap.h>
+#include <MAUtil/HashSet.h>
 #include <conprint.h>
 
 #include "common.h"
@@ -42,12 +43,16 @@ public:
 		string();
 		printf("-set\n");
 		set();
+		printf("-hashSet\n");
+		hashSet();
 		printf("-hashMap\n");
 		hashMap();
 		printf("-map\n");
 		map();
 		printf("-setInt\n");
 		setInt();
+		printf("-hashSetInt\n");
+		hashSetInt();
 		printf("-hashMapInt\n");
 		hashMapInt();
 		printf("-mapInt\n");
@@ -125,71 +130,45 @@ public:
 		assert("String::clear()", str.length() == 0 && str == "");
 	}
 
-	void set() {
-		Set<String> s;
+
+	template<class SET> struct TestSet {
+		typedef void (MAUtilTypesTest::*Iterate)(typename SET::Iterator&, SET&);
+		typedef void (MAUtilTypesTest::*ConstIterate)(typename SET::ConstIterator&, SET&);
+	};
+
+	template<class SET> 
+	void testSetString(typename TestSet<SET>::Iterate iterate,
+		typename TestSet<SET>::ConstIterate constIterate)
+	{
+		SET s;
 
 		//insert
 		assert("Set::insert()", s.insert("foo").second);
-		assert("Set::insert()", s.insert("bar").second);
+		assert("Set::insert()", s.insert(typename SET::MutableStorage("bar")).second);
 		assert("Set::insert()", s.insert("baz").second);
 		assert("Set::size()", s.size() == 3);
 
 		//dupe insert
-		Pair<Set<String>::Iterator, bool> res = s.insert("foo");
+		Pair<typename SET::Iterator, bool> res = s.insert("foo");
 		assert("Set::insert()", !res.second);
 		assert("Set::insert()", res.first != s.end());
 		assert("Set::insert()", *res.first == "foo");
 
 		//find
-		Set<String>::Iterator itr = s.find("bar");
+		typename SET::Iterator itr = s.find("bar");
 		assert("Set::find()", itr != s.end());
 		assert("Set::find()", *itr == "bar");
 
-		//iterate
-		itr = s.begin();
-		assert("Set::begin()", itr != s.end());
-		assert("Set::Iterator", *itr == "bar");
-		++itr;
-		assert("Set::Iterator", *itr == "baz");
-		++itr;
-		assert("Set::Iterator", *itr == "foo");
-		++itr;
-		assert("Set::Iterator", itr == s.end());
-
 		//iterator
-		--itr;
-		assert("Set::Iterator--", itr != s.end());
-		itr--;
-		itr++;
-		itr++;
-		assert("Set::Iterator++", itr == s.end());
-		itr--;
-		assert("Set::Iterator--", itr != s.end());
+		(this->*iterate)(itr, s);
 		assert("Set::Iterator", itr->length() == 3);
 
 		//const iterator
-		Set<String>::ConstIterator citr = s.find("bar");
+		typename SET::ConstIterator citr = s.find("bar");
 		assert("cSet::find()", citr != s.end());
 		assert("cSet::find()", *citr == "bar");
 
-		citr = s.begin();
-		assert("cSet::begin()", citr != s.end());
-		assert("cSet::Iterator", *citr == "bar");
-		++citr;
-		assert("cSet::Iterator", *citr == "baz");
-		++citr;
-		assert("cSet::Iterator", *citr == "foo");
-		++citr;
-		assert("cSet::Iterator", citr == s.end());
-
-		--citr;
-		assert("cSet::Iterator--", citr != s.end());
-		citr--;
-		citr++;
-		citr++;
-		assert("cSet::Iterator++", citr == s.end());
-		citr--;
-		assert("cSet::Iterator--", citr != s.end());
+		(this->*constIterate)(citr, s);
 		assert("cSet::Iterator", citr->length() == 3);
 
 		//erase
@@ -197,7 +176,7 @@ public:
 		assert("Set::erase()", s.size() == 2);
 
 		//copy constuctor
-		Set<String> copy(s);
+		SET copy(s);
 		assert("Set::Set(Set)", copy.size() == 2);
 		
 		//clear
@@ -212,27 +191,61 @@ public:
 		assert("Set::operator=()", s.size() == 2);
 	}
 
-	void setInt() {
-		Set<int> s;
-
-		//insert
-		assert("Set::insert()", s.insert(2).second);
-		assert("Set::insert()", s.insert(3).second);
-		assert("Set::insert()", s.insert(4).second);
-		assert("Set::size()", s.size() == 3);
-
-		//dupe insert
-		Pair<Set<int>::Iterator, bool> res = s.insert(2);
-		assert("Set::insert()", !res.second);
-		assert("Set::insert()", res.first != s.end());
-		assert("Set::insert()", *res.first == 2);
-
-		//find
-		Set<int>::Iterator itr = s.find(3);
-		assert("Set::find()", itr != s.end());
-		assert("Set::find()", *itr == 3);
-
+	template<class SET, class ITR> void setStringIterate(
+		ITR& itr, SET& s)
+	{
 		//iterate
+		itr = s.begin();
+		assert("Set::begin()", itr != s.end());
+		assert("Set::Iterator", *itr == "bar");
+		++itr;
+		assert("Set::Iterator", *itr == "baz");
+		++itr;
+		assert("Set::Iterator", *itr == "foo");
+		++itr;
+		assert("Set::Iterator", itr == s.end());
+
+		basicIteratorTest(itr, s);
+	}
+
+	//template<class SET, class ITR> void basicIteratorTest(ITR& itr, SET& s);
+	template<class Key, class Storage, class ITR>
+	void basicIteratorTest(ITR& itr, Dictionary<Key, Storage>& s)
+	{
+		--itr;
+		assert("Iterator--", itr != s.end());
+		itr--;
+		itr++;
+		itr++;
+		assert("Iterator++", itr == s.end());
+		itr--;
+		assert("Iterator--", itr != s.end());
+	}
+
+	template<class Key, class Storage, class ITR>
+	void basicIteratorTest(ITR& itr, HashDict<Key, Storage>& s)
+	{
+		itr = s.begin();
+		itr++;
+		++itr;
+		assert("Iterator++", itr != s.end());
+	}
+
+	void set() {
+		testSetString<Set<String> >(
+			&MAUtilTypesTest::setStringIterate<Set<String>, Set<String>::Iterator>,
+			&MAUtilTypesTest::setStringIterate<Set<String>, Set<String>::ConstIterator>);
+	}
+
+	void hashSet() {
+		testSetString<HashSet<String> >(
+			&MAUtilTypesTest::setStringIterate<HashSet<String>, HashSet<String>::Iterator>,
+			&MAUtilTypesTest::setStringIterate<HashSet<String>, HashSet<String>::ConstIterator>);
+	}
+
+	template<class SET, class ITR> void setIntIterate(
+		ITR& itr, SET& s)
+	{
 		itr = s.begin();
 		assert("Set::begin()", itr != s.end());
 		assert("Set::Iterator", *itr == 2);
@@ -243,46 +256,48 @@ public:
 		++itr;
 		assert("Set::Iterator", itr == s.end());
 
+		basicIteratorTest(itr, s);
+	}
+
+	template<class SET> 
+	void testSetInt(typename TestSet<SET>::Iterate iterate,
+		typename TestSet<SET>::ConstIterate constIterate)
+	{
+		SET s;
+
+		//insert
+		assert("Set::insert()", s.insert(2).second);
+		assert("Set::insert()", s.insert(typename SET::MutableStorage(3)).second);
+		assert("Set::insert()", s.insert(4).second);
+		assert("Set::size()", s.size() == 3);
+
+		//dupe insert
+		Pair<typename SET::Iterator, bool> res = s.insert(2);
+		assert("Set::insert()", !res.second);
+		assert("Set::insert()", res.first != s.end());
+		assert("Set::insert()", *res.first == 2);
+
+		//find
+		typename SET::Iterator itr = s.find(3);
+		assert("Set::find()", itr != s.end());
+		assert("Set::find()", *itr == 3);
+
 		//iterator
-		--itr;
-		assert("Set::Iterator--", itr != s.end());
-		itr--;
-		itr++;
-		itr++;
-		assert("Set::Iterator++", itr == s.end());
-		itr--;
-		assert("Set::Iterator--", itr != s.end());
+		(this->*iterate)(itr, s);
 
 		//const iterator
-		Set<int>::ConstIterator citr = s.find(3);
+		typename SET::ConstIterator citr = s.find(3);
 		assert("cSet::find()", citr != s.end());
 		assert("cSet::find()", *citr == 3);
 
-		citr = s.begin();
-		assert("cSet::begin()", citr != s.end());
-		assert("cSet::Iterator", *citr == 2);
-		++citr;
-		assert("cSet::Iterator", *citr == 3);
-		++citr;
-		assert("cSet::Iterator", *citr == 4);
-		++citr;
-		assert("cSet::Iterator", citr == s.end());
-
-		--citr;
-		assert("cSet::Iterator--", citr != s.end());
-		citr--;
-		citr++;
-		citr++;
-		assert("cSet::Iterator++", citr == s.end());
-		citr--;
-		assert("cSet::Iterator--", citr != s.end());
+		(this->*constIterate)(citr, s);
 
 		//erase
 		assert("Set::erase()", s.erase(3));
 		assert("Set::erase()", s.size() == 2);
 
 		//copy constuctor
-		Set<int> copy(s);
+		SET copy(s);
 		assert("Set::Set(Set)", copy.size() == 2);
 		
 		//clear
@@ -297,12 +312,24 @@ public:
 		assert("Set::operator=()", s.size() == 2);
 	}
 
+	void setInt() {
+		testSetInt<Set<int> >(
+			&MAUtilTypesTest::setIntIterate<Set<int>, Set<int>::Iterator>,
+			&MAUtilTypesTest::setIntIterate<Set<int>, Set<int>::ConstIterator>);
+	}
+
+	void hashSetInt() {
+		testSetInt<HashSet<int> >(
+			&MAUtilTypesTest::setIntIterate<HashSet<int>, HashSet<int>::Iterator>,
+			&MAUtilTypesTest::setIntIterate<HashSet<int>, HashSet<int>::ConstIterator>);
+	}
+
 	void hashMap() {
 		HashMap<String, String> m;
 
 		//insert
 		assert("HashMap::insert()", m.insert("foo", "F00").second);
-		assert("HashMap::insert()", m.insert("bar", "B4R").second);
+		assert("HashMap::insert()", m.insert(HashMap<String, String>::MutableStorage("bar", "B4R")).second);
 		assert("HashMap::insert()", m.insert("baz", "B4Z").second);
 		assert("HashMap::size()", m.size() == 3);
 
@@ -319,7 +346,7 @@ public:
 		assert("HashMap::find()", itr->first == "bar");
 		assert("HashMap::find()", itr->second == "B4R");
 
-		//iterate
+		//iterator
 		itr = m.begin();
 		assert("HashMap::begin()", itr != m.end());
 		++itr;
@@ -373,7 +400,7 @@ public:
 
 		//insert
 		assert("HashMap::insert()", m.insert(2, 5).second);
-		assert("HashMap::insert()", m.insert(3, 6).second);
+		assert("HashMap::insert()", m.insert(HashMap<int, int>::MutableStorage(3, 6)).second);
 		assert("HashMap::insert()", m.insert(4, 7).second);
 		assert("HashMap::size()", m.size() == 3);
 
@@ -445,7 +472,7 @@ public:
 		//operator[] and insert
 		m["Abraham"] = "Lincoln";
 		m["Benjamin"] = "Franklin";
-		m.insert("George", "Washington");
+		m.insert(Map<String, String>::MutableStorage("George", "Washington"));
 		assert("Map::size()", m.size() == 3);
 
 		//iterate
@@ -488,7 +515,7 @@ public:
 		//operator[] and insert
 		m[2] = 5;
 		m[3] = 6;
-		m.insert(4, 7);
+		m.insert(Map<int, int>::MutableStorage(4, 7));
 		assert("Map::size()", m.size() == 3);
 
 		//iterate

@@ -373,9 +373,12 @@ void Syscall::ConnOp::RunL() {
 			LOGS("gConnection.Close() successful\n");
 			mSyscall.gNetworkingState = EIdle;
 			return;
-		case CSOC_Resolve:
+		case CSOC_Resolve: {
+			CSO_Resolve& r((CSO_Resolve&)sop);
+			r.resolver.Close();
 			SendResult(CONNERR_DNS);
 			return;
+		}
 		case CSOC_Accept:
 			SendResult(CONNERR_GENERIC);
 			return;
@@ -417,6 +420,11 @@ void Syscall::ConnOp::RunL() {
 			if(mSyscall.gNetworkingState == EStarting)
 				mSyscall.FinishNetworkingStartL();
 			break;
+		case CSOC_Resolve: {
+			CSO_Resolve& r((CSO_Resolve&)sop);
+			r.resolver.Close();
+			break;
+		}
 		}
 
 		subOps.Pop();
@@ -486,6 +494,7 @@ void Syscall::ConnOp::DoCancel() {
 	case CSOC_Resolve: {
 		CSO_Resolve& r((CSO_Resolve&)sop);
 		r.resolver.Cancel();
+		r.resolver.Close();
 		break;
 	}
 	case CSOC_Accept: {
@@ -731,6 +740,7 @@ CHttpConnection::~CHttpConnection() {
 	LOGST("~CHttpConnection");
 	mRequestHeaders.close();
 	mResponseHeaders.close();
+	delete mTransport;
 }
 
 void CHttpConnection::FormatRequestL() {

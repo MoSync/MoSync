@@ -45,6 +45,10 @@ public class LabelWidget extends Widget
 		{
 			textView.setText( value );
 		}
+		else if( property.equals( Types.WIDGET_PROPERTY_PLACEHOLDER ) )
+		{
+			textView.setHint( value );
+		}
 		else if( property.equals( Types.WIDGET_PROPERTY_FONT_COLOR ) )
 		{
 			textView.setTextColor( ColorConverter.convert( value ) );

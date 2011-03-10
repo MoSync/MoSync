@@ -24,6 +24,12 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_ACCESS_READ;
+import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_FORBIDDEN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_GENERIC;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_CUR;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_END;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_SET;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -57,6 +63,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
@@ -85,6 +92,7 @@ import android.net.Uri;
 import android.opengl.GLUtils;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StatFs;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.telephony.TelephonyManager;
@@ -92,6 +100,8 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import com.mosync.internal.android.MoSyncFile.MoSyncFileHandle;
+import com.mosync.internal.android.MoSyncFile.MoSyncFileListing;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
@@ -137,6 +147,7 @@ public class MoSyncThread extends Thread
 	MoSyncLocation mMoSyncLocation;
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
+	MoSyncFile mMoSyncFile;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -146,9 +157,27 @@ public class MoSyncThread extends Thread
 	 */
 	private static final int CHUNK_READ_SIZE = 1024; 
 
+	/**
+	 * This is the MoSync Activity.
+	 */
 	private MoSync mContext;
+	
+	/**
+	 * The standard MoSync view.
+	 */
 	private MoSyncView mMoSyncView;
+	
+	/**
+	 * true if the MoSync program is considered to be dead,
+	 * used for maPanic.
+	 */
 	private boolean mHasDied;
+	
+	/**
+	 * Boolean used to determine whether to interrupt the trehad or not,
+	 * true if this thread is sleeping in maWait.
+	 */
+	private AtomicBoolean mIsSleepingInMaWait = new AtomicBoolean(false);
 	
 	/**
 	 * This is the size of the header of the asset file
@@ -243,7 +272,9 @@ public class MoSyncThread extends Thread
 	{	
 		mContext = (MoSync) context;
 		
+		// TODO: Clean this up! The static reference should be in this class.
 		EventQueue.sMoSyncThread = this;
+		sMoSyncThread = this;
 		
 		mHasDied = false;
 		
@@ -252,6 +283,7 @@ public class MoSyncThread extends Thread
 		mMoSyncLocation = new MoSyncLocation(this);
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
+		mMoSyncFile = new MoSyncFile(this);
 		
 		// Bluetooth is not available on all platforms and
 		// therefore we do a conditional loading of the
@@ -563,13 +595,23 @@ public class MoSyncThread extends Thread
 	/**
 	 * Post a event to the MoSync event queue.
 	 */
-	public void postEvent(int[] event)
+	public synchronized void postEvent(int[] event)
 	{
 		// Add event to queue.
 		nativePostEvent(event);
 		
-		// Wake up this thread to make it process events.
-		interrupt(); 
+		// Only interrupt if we are sleeping in maWait.
+		if (mIsSleepingInMaWait.get())
+		{
+			// Wake up this thread to make it process events.
+			interrupt(); 
+		}
+		else
+		{
+			Log.i(
+				"@@@ MoSyncThread.postEvent", 
+				"Did not call interrupt, not in maWait (this is good!)");
+		}
 	}
 
 	/**
@@ -1260,16 +1302,15 @@ public class MoSyncThread extends Thread
 
 		Canvas temporaryCanvas = new Canvas(temporaryBitmap);
 		
-		temporaryCanvas.drawBitmap(
-			imageResource.mBitmap,
-			new Matrix(),
-			new Paint());
+		temporaryCanvas.drawBitmap(imageResource.mBitmap, -srcLeft, -srcTop, new Paint());
 			
 		temporaryCanvas.drawColor(0xff000000, Mode.DST_ATOP);
 		
 		mMemDataSection.position(dst);
 
 		IntBuffer intBuffer = mMemDataSection.asIntBuffer();
+		
+		try {
 		
 		for (int y = 0; y < srcHeight; y++)
 		{
@@ -1288,8 +1329,8 @@ public class MoSyncThread extends Thread
 				colors,
 				0,
 				srcWidth,
-				srcLeft,
-				srcTop+y,
+				0,
+				y,
 				srcWidth,
 				1);
 			
@@ -1299,6 +1340,12 @@ public class MoSyncThread extends Thread
 			}
 			
 			intBuffer.put(pixels);	
+		}
+		} catch(Exception e) {
+			e.printStackTrace();
+			Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
+				imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
+			maPanic(-1, "maGetImageData");
 		}
 	}
 
@@ -1427,16 +1474,35 @@ public class MoSyncThread extends Thread
 			BitmapFactory.Options options = new BitmapFactory.Options();
 			options.inPreferredConfig = Bitmap.Config.ARGB_8888;
 			
+			/**
+			 * The code below converts the Bitmap to the ARGB format.
+			 * If you do not use this method or a similar one, Android will ignore
+			 * the specified format and use the format of the screen, usually
+			 * RGB 565.
+			 */
 			Bitmap decodedImage = BitmapFactory.decodeByteArray(
 				resourceData, 0, resourceData.length, options);
+			
 			if (decodedImage == null)
 			{
 				logError("maCreateImageFromData - " 
 					+ "could not decode image data (decodedImage == null)");
 				return RES_BAD_INPUT;
 			}
+			
+			int width =  decodedImage.getWidth();
+			int height = decodedImage.getHeight();
+			int[] pixels = new int[width * height];
+			decodedImage.getPixels(pixels, 0, width, 0, 0, width, height);
+			decodedImage.recycle( );
+			Bitmap argbImage = Bitmap.createBitmap(
+					pixels,
+					width,
+					height,
+					Bitmap.Config.ARGB_8888);
+			
 			mImageResources.put(
-				placeholder, new ImageCache(null, decodedImage));
+				placeholder, new ImageCache(null, argbImage));
 		} 
 		catch (UnsupportedOperationException e) 
 		{
@@ -1742,6 +1808,8 @@ public class MoSyncThread extends Thread
 
 		try
 		{
+			mIsSleepingInMaWait.set(true);
+			
 	 		if (timeout<=0)
 			{
 				Thread.sleep(Long.MAX_VALUE);
@@ -1755,10 +1823,13 @@ public class MoSyncThread extends Thread
 		{
 			SYSLOG("Sleeping thread interrupted!");
 		} 
+		// TODO: This exception is never thrown! Remove it.
 		catch (Exception e) 
 		{
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
+		
+		mIsSleepingInMaWait.set(false);
 		
 		SYSLOG("maWait returned");
 	}
@@ -2722,13 +2793,15 @@ public class MoSyncThread extends Thread
 		
 		// Ensure that the bitmap we use has dimensions that are power of 2.
 		Bitmap bitmap = loadGlTextureHelperMakeBitmapPowerOf2(texture.mBitmap);
-		
-		// The texture bitmap encoding.
-		int textureFormat = GL10.GL_RGBA;
 
 		try
 		{
-			// Load the texture into OpenGL.
+			/**
+			 * It is important here to let Android choose the internal format,
+			 * by setting it to -1. Otherwise due to a bug in Android 1.5 it will
+			 * always throw an exception stating 'invalid Bitmap format' when loading
+			 * an image that previously was RGB.
+			 */
 			if (isSubTexture)
 			{
 				GLUtils.texSubImage2D(GL10.GL_TEXTURE_2D,
@@ -2736,16 +2809,17 @@ public class MoSyncThread extends Thread
 				  0,
 				  0,
 				  bitmap,
-				  textureFormat,
-				  GL10.GL_UNSIGNED_BYTE);
+				  -1,
+				  GL10.GL_UNSIGNED_BYTE); // texSubImage2D does not support -1 here
 			}
 			else
 			{
 				GLUtils.texImage2D(
 					GL10.GL_TEXTURE_2D, 
 					0, 
-					textureFormat, 
-					bitmap, 
+					-1, 
+					bitmap,
+					-1,
 					0);
 			}
 		}
@@ -2763,13 +2837,16 @@ public class MoSyncThread extends Thread
 		}
 		
 		// Check error status.
-		EGL10 egl = (EGL10) EGLContext.getEGL( );
-		if(egl.eglGetError( ) == EGL10.EGL_SUCCESS)
+		EGL10 egl = (EGL10) EGLContext.getEGL();
+		GL10 gl = (GL10) egl.eglGetCurrentContext().getGL();
+		int glError = gl.glGetError();
+		if(glError == GL10.GL_NO_ERROR)
 		{
 			return 0; // Success, no errors.
 		}
 		else
 		{
+			Log.i("MoSyncThread", "Could not load texture glGetError returned: 0x" + Integer.toHexString(glError));
 			return -3; // Texture could not be loaded.
 		}
 	}
@@ -2839,6 +2916,109 @@ public class MoSyncThread extends Thread
 		
 		return powerOf2;
 	}
+	
+	int maFileOpen(String path, int mode)
+	{
+		return mMoSyncFile.maFileOpen(path, mode);
+	}
+
+	int maFileExists(int file)
+	{
+		return mMoSyncFile.maFileExists(file);
+	}
+
+	int maFileClose(int file)
+	{
+		return mMoSyncFile.maFileClose(file);
+	}
+
+	int maFileCreate(int file)
+	{
+		return mMoSyncFile.maFileCreate(file);
+	}
+
+	int maFileDelete(int file)
+	{
+		return mMoSyncFile.maFileDelete(file);
+	}
+
+	int maFileSize(int file)
+	{
+		return mMoSyncFile.maFileSize(file);
+	}
+
+	int maFileAvailableSpace(int file)
+	{
+		return mMoSyncFile.maFileAvailableSpace(file);
+	}
+
+	int maFileTotalSpace(int file)
+	{
+		return mMoSyncFile.maFileTotalSpace(file);
+	}
+
+	int maFileDate(int file)
+	{
+		return mMoSyncFile.maFileDate(file);
+	}
+
+	int maFileRename(int file, int newName)
+	{
+		return mMoSyncFile.maFileRename(file, newName);
+	}
+
+	int maFileTruncate(int file, int offset)
+	{
+		return mMoSyncFile.maFileTruncate(file, offset);
+	}
+	
+	int maFileWrite(int file, int src, int len)
+	{
+		return mMoSyncFile.maFileWrite(file, src, len);
+	}
+	
+	int maFileWriteFromData(int file, int data, int offset, int len)
+	{
+		return mMoSyncFile.maFileWriteFromData(file, data, offset, len);
+	}
+	
+	int maFileRead(int file, int dst, int len)
+	{
+		return mMoSyncFile.maFileRead(file, dst, len);
+	}
+	
+	int maFileReadToData(int file, int data, int offset, int len)
+	{
+		return mMoSyncFile.maFileReadToData(file, data, offset, len);
+	}
+
+	int maFileTell(int file)
+	{
+		return mMoSyncFile.maFileTell(file);
+	}
+
+	int maFileSeek(int file, int offset, int whence)
+	{
+		return mMoSyncFile.maFileSeek(file, offset, whence);
+	}
+	
+	int maFileListStart(String path, String filter)
+	{
+		return mMoSyncFile.maFileListStart(path, filter);
+	}
+
+	int maFileListNext(int list, int nameBuf, int bufSize)
+	{
+		return mMoSyncFile.maFileListNext(list, nameBuf, bufSize);
+	}
+
+	int maFileListClose(int list)
+	{
+		return mMoSyncFile.maFileListClose(list);
+	}
+	
+	
+	
 	
 	/**
 	 * Class that holds image data.

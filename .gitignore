@@ -7,6 +7,7 @@ debug
 release
 stores
 FinalOutput
+ipch
 
 CPP_IX_*.h
 IX_*.h
@@ -16,6 +17,8 @@ IX_*.h
 *.class
 *.swp
 *~
+*.opensdf
+*.sdf
 
 MAHeaders.h
 program
@@ -165,6 +168,7 @@ stabs.tab
 
 /runtimes/java/platforms/androidJNI/AndroidProject/libs
 /runtimes/java/platforms/androidJNI/resources.ap_
+/runtimes/java/platforms/androidJNI/cygwin_u.sh
 /runtimes/java/platforms/androidJNI/AndroidProject/obj
 /runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated
 /runtimes/java/platforms/androidJNI/src/config_platform.h*
@@ -173,9 +177,12 @@ stabs.tab
 /runtimes/java/platforms/androidJNI/AndroidProject/bash.exe.stackdump
 /runtimes/java/platforms/androidJNI/AndroidProject/bin/
 /runtimes/java/platforms/androidJNI/AndroidProject/gen/
+/runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/java/android/R.java
+
 /tests/libc-suite/fp.xml
 /tests/libc-suite/profile.txt
 /tests/libc-suite/settings.rb
 /tests/libc-suite/filesystem
 
-/runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/java/android/R.java
+/tools/vis/fp.xml
+/tools/vis/sld.*

@@ -82,7 +82,7 @@ void MAUtil::Dictionary<Key, Storage>::clear() {
 template<class Key, class Storage>
 MAUtil::Pair<class MAUtil::Dictionary<Key, Storage>::Iterator, bool>
 MAUtil::Dictionary<Key, Storage>::insert(const Storage& data) {
-	Pair<Iterator, bool> pair = { Iterator(&mDict), false };
+	Pair<Iterator, bool> pair(Iterator(&mDict), false);
 	DictNode* newNode = new DictNode(data);
 	dnode_init(newNode, NULL);
 	char* ptr = (char*)&newNode->data;
