@@ -2197,7 +2197,19 @@ namespace Base {
 		switch(uMsg) {
 		case WM_INITDIALOG:
 			sEditBox = GetDlgItem(hwnd, IDC_EDIT1);
-			SetWindowTextW(sEditBox, sTextBoxInBuf);
+			{
+				// fix EOL (add 0x0D bytes)
+				std::wstring in;
+				in.reserve(wcslen(sTextBoxInBuf));
+				const wchar_t* src = sTextBoxInBuf;
+				while(*src) {
+					if(*src == 0x0A)
+						in += (wchar_t)0x0D;
+					in += *src;
+					src++;
+				}
+				SetWindowTextW(sEditBox, in.c_str());
+			}
 			SetFocus(sEditBox);
 			break;
 		case WM_COMMAND:
@@ -2205,13 +2217,26 @@ namespace Base {
 				WORD id = LOWORD(wParam);
 				if(id == IDOK || id == IDCANCEL) {
 					// get text
-					int res = GetWindowTextW(sEditBox, sTextBoxOutBuf, sTextBoxOutSize);
+					int length = GetWindowTextW(sEditBox, sTextBoxOutBuf, sTextBoxOutSize);
+					// fix EOL (remove 0x0D bytes)
+					const wchar_t* src = sTextBoxOutBuf;
+					wchar_t* dst = sTextBoxOutBuf;
+					length = 0;
+					while(*src) {
+						if(*src != 0x0D) {
+							*dst = *src;
+							dst++;
+							length++;
+						}
+						src++;
+					}
+					*dst = 0;
 
 					// send event
 					MAEvent e;
 					e.type = EVENT_TYPE_TEXTBOX;
 					e.textboxResult = (id == IDOK) ? MA_TB_RES_OK : MA_TB_RES_CANCEL;
-					e.textboxLength = res;
+					e.textboxLength = length;
 					gEventFifo.put(e);
 
 					// time to close

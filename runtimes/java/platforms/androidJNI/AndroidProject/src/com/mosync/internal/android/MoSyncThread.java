@@ -24,6 +24,12 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_ACCESS_READ;
+import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_FORBIDDEN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_GENERIC;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_CUR;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_END;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_SET;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -57,6 +63,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
@@ -85,6 +92,7 @@ import android.net.Uri;
 import android.opengl.GLUtils;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StatFs;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.telephony.TelephonyManager;
@@ -92,6 +100,8 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import com.mosync.internal.android.MoSyncFile.MoSyncFileHandle;
+import com.mosync.internal.android.MoSyncFile.MoSyncFileListing;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
@@ -137,6 +147,7 @@ public class MoSyncThread extends Thread
 	MoSyncLocation mMoSyncLocation;
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
+	MoSyncFile mMoSyncFile;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -146,9 +157,27 @@ public class MoSyncThread extends Thread
 	 */
 	private static final int CHUNK_READ_SIZE = 1024; 
 
+	/**
+	 * This is the MoSync Activity.
+	 */
 	private MoSync mContext;
+	
+	/**
+	 * The standard MoSync view.
+	 */
 	private MoSyncView mMoSyncView;
+	
+	/**
+	 * true if the MoSync program is considered to be dead,
+	 * used for maPanic.
+	 */
 	private boolean mHasDied;
+	
+	/**
+	 * Boolean used to determine whether to interrupt the trehad or not,
+	 * true if this thread is sleeping in maWait.
+	 */
+	private AtomicBoolean mIsSleepingInMaWait = new AtomicBoolean(false);
 	
 	/**
 	 * This is the size of the header of the asset file
@@ -254,6 +283,7 @@ public class MoSyncThread extends Thread
 		mMoSyncLocation = new MoSyncLocation(this);
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
+		mMoSyncFile = new MoSyncFile(this);
 		
 		// Bluetooth is not available on all platforms and
 		// therefore we do a conditional loading of the
@@ -565,13 +595,23 @@ public class MoSyncThread extends Thread
 	/**
 	 * Post a event to the MoSync event queue.
 	 */
-	public void postEvent(int[] event)
+	public synchronized void postEvent(int[] event)
 	{
 		// Add event to queue.
 		nativePostEvent(event);
 		
-		// Wake up this thread to make it process events.
-		interrupt(); 
+		// Only interrupt if we are sleeping in maWait.
+		if (mIsSleepingInMaWait.get())
+		{
+			// Wake up this thread to make it process events.
+			interrupt(); 
+		}
+		else
+		{
+			Log.i(
+				"@@@ MoSyncThread.postEvent", 
+				"Did not call interrupt, not in maWait (this is good!)");
+		}
 	}
 
 	/**
@@ -1262,16 +1302,15 @@ public class MoSyncThread extends Thread
 
 		Canvas temporaryCanvas = new Canvas(temporaryBitmap);
 		
-		temporaryCanvas.drawBitmap(
-			imageResource.mBitmap,
-			new Matrix(),
-			new Paint());
+		temporaryCanvas.drawBitmap(imageResource.mBitmap, -srcLeft, -srcTop, new Paint());
 			
 		temporaryCanvas.drawColor(0xff000000, Mode.DST_ATOP);
 		
 		mMemDataSection.position(dst);
 
 		IntBuffer intBuffer = mMemDataSection.asIntBuffer();
+		
+		try {
 		
 		for (int y = 0; y < srcHeight; y++)
 		{
@@ -1290,8 +1329,8 @@ public class MoSyncThread extends Thread
 				colors,
 				0,
 				srcWidth,
-				srcLeft,
-				srcTop+y,
+				0,
+				y,
 				srcWidth,
 				1);
 			
@@ -1301,6 +1340,12 @@ public class MoSyncThread extends Thread
 			}
 			
 			intBuffer.put(pixels);	
+		}
+		} catch(Exception e) {
+			e.printStackTrace();
+			Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
+				imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
+			maPanic(-1, "maGetImageData");
 		}
 	}
 
@@ -1763,6 +1808,8 @@ public class MoSyncThread extends Thread
 
 		try
 		{
+			mIsSleepingInMaWait.set(true);
+			
 	 		if (timeout<=0)
 			{
 				Thread.sleep(Long.MAX_VALUE);
@@ -1776,10 +1823,13 @@ public class MoSyncThread extends Thread
 		{
 			SYSLOG("Sleeping thread interrupted!");
 		} 
+		// TODO: This exception is never thrown! Remove it.
 		catch (Exception e) 
 		{
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
+		
+		mIsSleepingInMaWait.set(false);
 		
 		SYSLOG("maWait returned");
 	}
@@ -2866,6 +2916,109 @@ public class MoSyncThread extends Thread
 		
 		return powerOf2;
 	}
+	
+	int maFileOpen(String path, int mode)
+	{
+		return mMoSyncFile.maFileOpen(path, mode);
+	}
+
+	int maFileExists(int file)
+	{
+		return mMoSyncFile.maFileExists(file);
+	}
+
+	int maFileClose(int file)
+	{
+		return mMoSyncFile.maFileClose(file);
+	}
+
+	int maFileCreate(int file)
+	{
+		return mMoSyncFile.maFileCreate(file);
+	}
+
+	int maFileDelete(int file)
+	{
+		return mMoSyncFile.maFileDelete(file);
+	}
+
+	int maFileSize(int file)
+	{
+		return mMoSyncFile.maFileSize(file);
+	}
+
+	int maFileAvailableSpace(int file)
+	{
+		return mMoSyncFile.maFileAvailableSpace(file);
+	}
+
+	int maFileTotalSpace(int file)
+	{
+		return mMoSyncFile.maFileTotalSpace(file);
+	}
+
+	int maFileDate(int file)
+	{
+		return mMoSyncFile.maFileDate(file);
+	}
+
+	int maFileRename(int file, int newName)
+	{
+		return mMoSyncFile.maFileRename(file, newName);
+	}
+
+	int maFileTruncate(int file, int offset)
+	{
+		return mMoSyncFile.maFileTruncate(file, offset);
+	}
+	
+	int maFileWrite(int file, int src, int len)
+	{
+		return mMoSyncFile.maFileWrite(file, src, len);
+	}
+	
+	int maFileWriteFromData(int file, int data, int offset, int len)
+	{
+		return mMoSyncFile.maFileWriteFromData(file, data, offset, len);
+	}
+	
+	int maFileRead(int file, int dst, int len)
+	{
+		return mMoSyncFile.maFileRead(file, dst, len);
+	}
+	
+	int maFileReadToData(int file, int data, int offset, int len)
+	{
+		return mMoSyncFile.maFileReadToData(file, data, offset, len);
+	}
+
+	int maFileTell(int file)
+	{
+		return mMoSyncFile.maFileTell(file);
+	}
+
+	int maFileSeek(int file, int offset, int whence)
+	{
+		return mMoSyncFile.maFileSeek(file, offset, whence);
+	}
+	
+	int maFileListStart(String path, String filter)
+	{
+		return mMoSyncFile.maFileListStart(path, filter);
+	}
+
+	int maFileListNext(int list, int nameBuf, int bufSize)
+	{
+		return mMoSyncFile.maFileListNext(list, nameBuf, bufSize);
+	}
+
+	int maFileListClose(int list)
+	{
+		return mMoSyncFile.maFileListClose(list);
+	}
+	
+	
+	
 	
 	/**
 	 * Class that holds image data.
