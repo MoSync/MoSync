@@ -127,6 +127,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bluetooth", "intlibs\bluetooth\bluetooth.vcxproj", "{BDF8FF83-5382-4420-8BEE-E2BD0B8E41E5}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mosynclib", "runtimes\cpp\platforms\sdl\mosynclib\mosynclib.vcxproj", "{4DA91033-FE58-4729-8B55-F42614BD8F90}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C49EC64D-E0B9-4830-8B0F-E5F286F971A5} = {C49EC64D-E0B9-4830-8B0F-E5F286F971A5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sdl", "runtimes\cpp\platforms\sdl\sdl.vcxproj", "{ADF68B96-47DA-4A30-AA51-B5450B019F7F}"
 EndProject

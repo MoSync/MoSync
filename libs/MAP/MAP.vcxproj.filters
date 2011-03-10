@@ -39,9 +39,6 @@
     <ClCompile Include="LayerMapViewport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LonLat.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="MapCache.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
