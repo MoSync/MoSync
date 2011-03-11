@@ -925,12 +925,13 @@ namespace MAUI {
 
 		setFocused(true);
 
-		Vector_each(Widget *, it, mChildren) {
-			Widget *ret = (*it)->focusableWidgetAt(p.x, p.y);
+		for(int i=0; i<mChildren.size(); i++) {
+			Widget *ret = mChildren[i]->focusableWidgetAt(p.x, p.y);
 			if(ret) {
 				//MAUI_LOG("Found focusable!");
 				if(ret->pointerPressed(p, id)) {
 					if(mFocused) {
+						mSelectedIndex = i;
 						setFocusedWidget(ret);
 					}
 					else { 
