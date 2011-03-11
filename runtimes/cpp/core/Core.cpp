@@ -814,8 +814,8 @@ public:
 #define REG(nn)	regs[nn]
 #define	RD	(regs[rd])
 #define	RS	(regs[rs])
-#define	RDU	(((unsigned long*)regs)[rd])
-#define	RSU	(((unsigned long*)regs)[rs])
+#define	RDU	(((uint32_t*)regs)[rd])
+#define	RSU	(((uint32_t*)regs)[rs])
 
 #ifdef STACK_POINTER_VERIFICATION
 void WRITE_REG(int reg, int value) {
@@ -831,8 +831,8 @@ void WRITE_REG(int reg, int value) {
 #define WRITE_REG(reg, value) regs[reg] = value
 #endif
 
-#define IMMU	((unsigned long) imm32)
-#define IMM	((long) imm32)
+#define IMMU	((uint32_t) imm32)
+#define IMM	((int32_t) imm32)
 
 #ifdef MEMORY_DEBUG
 #ifdef CORE_DEBUGGING_MODE
@@ -860,8 +860,8 @@ void WRITE_REG(int reg, int value) {
 #define	JMP_IMM	JMP_GENERIC(IMM)
 #define	JMP_RD	JMP_GENERIC(RD)
 
-#define	CALL_IMM	REG(REG_rt) = (long) (ip - mem_cs); JMP_IMM;
-#define	CALL_RD		REG(REG_rt) = (long) (ip - mem_cs); JMP_RD;
+#define	CALL_IMM	REG(REG_rt) = (int32_t) (ip - mem_cs); JMP_IMM;
+#define	CALL_RD		REG(REG_rt) = (int32_t) (ip - mem_cs); JMP_RD;
 
 #define IB ((int)(*ip++))
 

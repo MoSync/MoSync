@@ -29,17 +29,17 @@ using namespace MoSyncError;
 
 #define SWAP(x, y, temp) {temp=x;x=y;y=temp;}
 
-inline long fp_ceil(long x) {
+inline int32_t fp_ceil(int32_t x) {
 	x += 0xffff;
 	return x >> 16;
 }
 
-inline long fp_div32(long a, long b) {
-	return (long)((((long long)a)<<16)/((long long)b));
+inline int32_t fp_div32(int32_t a, int32_t b) {
+	return (int32_t)((((int64_t)a)<<16)/((int64_t)b));
 }
 
-inline long fp_mul32(long a, long b) {
-	return (long)(((long long)a * (long long)b)>>16);
+inline int32_t fp_mul32(int32_t a, int32_t b) {
+	return (int32_t)(((int64_t)a * (int64_t)b)>>16);
 }  
 
 struct Point {

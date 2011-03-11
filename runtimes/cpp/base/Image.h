@@ -22,11 +22,11 @@ struct ClipRect {
 	int x, y, width, height;
 };
 
-inline unsigned long rgb16_to_rgb32(int a, int redMask, int greenMask, int blueMask, int redShift, int greenShift, int blueShift, int redBits, int greenBits, int blueBits)
+inline uint32_t rgb16_to_rgb32(int a, int redMask, int greenMask, int blueMask, int redShift, int greenShift, int blueShift, int redBits, int greenBits, int blueBits)
 {
-	unsigned long r = (a & redMask) >> redShift;
-	unsigned long g = (a & greenMask) >> greenShift;
-	unsigned long b = (a & blueMask) >> blueShift;
+	uint32_t r = (a & redMask) >> redShift;
+	uint32_t g = (a & greenMask) >> greenShift;
+	uint32_t b = (a & blueMask) >> blueShift;
 	r = r * 255 / ((1<<redBits)-1);
 	g = g * 255 / ((1<<greenBits)-1);
 	b = b * 255 / ((1<<blueBits)-1);

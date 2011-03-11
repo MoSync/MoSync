@@ -61,7 +61,7 @@ void logInstructionUse() {
 
 byte* RUN_NAME(byte* ip) {
 	byte op,rd,rs;
-	unsigned long imm32;
+	uint32_t imm32;
 
 	VM_Yield = 0;
 
@@ -74,7 +74,7 @@ byte* RUN_NAME(byte* ip) {
 	lastTime = (double)iCounter.QuadPart * 1000.0 / (double)iCounterFreq.QuadPart;	
 #endif	//_WIN32
 
-	//	printf("VM IP at %d\n",(long) ip - (long) mem_cs);
+	//	printf("VM IP at %d\n",(int32_t) ip - (int32_t) mem_cs);
 
 #ifndef CORE_DEBUGGING_MODE
 VMLOOP_LABEL
@@ -165,7 +165,7 @@ VMLOOP_LABEL
 			do {
 				//REG(REG_sp) -= 4;
 				ARITH(REG_sp, regs[REG_sp], -, 4);
-				MEM(long, REG(REG_sp), WRITE) = REG(r);
+				MEM(int32_t, REG(REG_sp), WRITE) = REG(r);
 				LOGC("\t0x%x", REG(r));
 				r++;
 			} while(--n);
@@ -180,7 +180,7 @@ VMLOOP_LABEL
 				BIG_PHAT_ERROR(ERR_ILLEGAL_INSTRUCTION_FORM); //raise hell
 
 			do {
-				REG(r) = MEM(long, REG(REG_sp), READ);
+				REG(r) = MEM(int32_t, REG(REG_sp), READ);
 				//REG(REG_sp) += 4;
 				ARITH(REG_sp, regs[REG_sp], +, 4);
 				LOGC("\t0x%x", REG(r));
@@ -208,7 +208,7 @@ VMLOOP_LABEL
 		OPC(LDW)
 		{
 			FETCH_RD_RS_CONST
-			WRITE_REG(rd, MEM(long, RS + IMM, READ));
+			WRITE_REG(rd, MEM(int32_t, RS + IMM, READ));
 			LOGC("\t%i", RD);
 		}
 		EOP;
@@ -230,7 +230,7 @@ VMLOOP_LABEL
 		OPC(STW)
 		{
 			FETCH_RD_RS_CONST			
-			MEM(unsigned long, RD + IMM, WRITE) = RS;
+			MEM(unsigned int, RD + IMM, WRITE) = RS;
 		}
 		EOP;
 
@@ -302,7 +302,7 @@ VMLOOP_LABEL
 		OPC(SYSCALL)
 		{
 			int syscallNumber = IB;
-			fakePush((long) (ip - mem_cs), -syscallNumber);
+			fakePush((int32_t) (ip - mem_cs), -syscallNumber);
 			InvokeSysCall(syscallNumber);
 			fakePop();
 			if (VM_Yield)

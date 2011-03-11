@@ -108,7 +108,7 @@ int WaveAudioSource::init()
 {
 	struct chunk_hdr {
 		char  id[4];
-		unsigned long len;
+		uint32_t len;
 	};
 
 	chunk_hdr chnk;
@@ -131,8 +131,8 @@ int WaveAudioSource::init()
 			struct fmt_header {
 				short          wFormatTag;
 				unsigned short wChannels;
-				unsigned long  dwSamplesPerSec;
-				unsigned long  dwAvgBytesPerSec;
+				uint32_t  dwSamplesPerSec;
+				uint32_t  dwAvgBytesPerSec;
 				unsigned short wBlockAlign;
 				unsigned short wBitsPerSample;
 			};
