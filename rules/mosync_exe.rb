@@ -18,6 +18,7 @@
 
 require "#{File.dirname(__FILE__)}/pipe.rb"
 require "#{File.dirname(__FILE__)}/mosync_util.rb"
+require "#{File.dirname(__FILE__)}/targets.rb"
 
 module PipeElimTask
 	def execute
@@ -56,7 +57,6 @@ class PipeExeWork < PipeGccWork
 	def setup3(all_objects)
 		# resource compilation
 		if(!defined?(@LSTFILES))
-			#puts "LSTFILES not defined, searching..."
 			if(@SOURCES[0])
 				@LSTFILES = Dir[@SOURCES[0] + "/*.lst"]
 			else
@@ -64,9 +64,9 @@ class PipeExeWork < PipeGccWork
 			end
 		end
 		if(@LSTFILES.size > 0)
-			#puts @LSTFILES.size.to_s + " lstfiles found"
 			lstTasks = @LSTFILES.collect do |name| FileTask.new(self, name) end
-			@prerequisites << PipeResourceTask.new(self, "build/resources", lstTasks)
+			@resourceTask = PipeResourceTask.new(self, "build/resources", lstTasks)
+			@prerequisites << @resourceTask
 		end
 		if(USE_NEWLIB)
 			default(:DEFAULT_LIBS, ["newlib"])
@@ -84,6 +84,36 @@ class PipeExeWork < PipeGccWork
 		
 		if(ELIM)
 			@TARGET.extend(PipeElimTask)
+		end
+	end
+	def emuCommandLine
+		if(@resourceTask)
+			resArg = " -resource #{@resourceTask}"
+		end
+		return "#{mosyncdir}/bin/MoRE -program #{@TARGET}#{resArg}"
+	end
+	def run
+		# run the emulator
+		sh emuCommandLine
+	end
+	def gdb
+		# debug the emulator
+		sh "gdb --args #{emuCommandLine}"
+	end
+	def invoke
+		super
+		# If you invoke a work without setting up any targets,
+		# we will check for the "run" goal here.
+		if(Targets.size == 0)
+			Targets.setup
+			if(Targets.goals.include?(:run))
+				self.run
+				return
+			end
+			if(Targets.goals.include?(:gdb))
+				self.gdb
+				return
+			end
 		end
 	end
 end

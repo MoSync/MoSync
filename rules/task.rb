@@ -73,7 +73,7 @@ class Work < TaskBase
 		# we will check for the "clean" goal here.
 		if(Targets.size == 0)
 			Targets.setup
-			if(Targets.goals == [:clean])
+			if(Targets.goals.include?(:clean))
 				self.execute_clean
 				return
 			end
