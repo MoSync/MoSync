@@ -357,7 +357,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * Update the size of the drawing surface.
 	 */
-	public void updateSurfaceSize(int width, int height)
+	public synchronized void updateSurfaceSize(int width, int height)
 	{
 		SYSLOG("updateSurfaceSize");		
 		
@@ -963,7 +963,7 @@ public class MoSyncThread extends Thread
 	 * so that we won't get touch events while drawing. This to
 	 * not hog the system with events.
 	 */
-	void maUpdateScreen()
+	synchronized void maUpdateScreen()
 	{
 		//SYSLOG("maUpdateScreen");
 		Canvas lockedCanvas = null;
@@ -1050,7 +1050,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * _maDrawRGB
 	 */
-	void _maDrawRGB(
+	synchronized void _maDrawRGB(
 		int dstX, 
 		int dstY, 
 		int mem, 
@@ -1099,7 +1099,7 @@ public class MoSyncThread extends Thread
 	 * @param dstTop Top coord of destination point.
 	 * @param transformMode A TRANS_* constant.
 	 */
-	void _maDrawImageRegion(
+	synchronized void _maDrawImageRegion(
 		final int image, 
 		final int srcRectLeft, 
 		final int srcRectTop, 
@@ -1353,7 +1353,7 @@ public class MoSyncThread extends Thread
 	 * Set the target image for drawing.
 	 * @param image The target image, 0 means the screen.
 	 */
-	int maSetDrawTarget(int image)
+	synchronized int maSetDrawTarget(int image)
 	{
 		SYSLOG("maSetDrawTarget");
 		if (0 == image)
