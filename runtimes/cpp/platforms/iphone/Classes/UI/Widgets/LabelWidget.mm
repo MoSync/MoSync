@@ -17,6 +17,13 @@
 
 #import "LabelWidget.h"
 
+#ifndef NATIVE_TEST
+#include "Platform.h"
+#include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
+#endif
+
 typedef enum VerticalAlignment {
     VerticalAlignmentTop,
     VerticalAlignmentMiddle,
@@ -80,18 +87,18 @@ typedef enum VerticalAlignment {
 @implementation LabelWidget
 
 - (id)init {	
-	UILabel* label = [[[UILabelWithVerticalAlignment alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
+	UILabel* label = [[[UILabelWithVerticalAlignment alloc] initWithFrame:CGRectMake(0, 0, 200, 60)] retain];
 	label.opaque = NO;
 	view = label;
 	label.numberOfLines = 0;
-	return [super init];	
+	
+	id ret = [super init];	
+	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
+	return ret;
 }
 
 - (void)addChild: (IWidget*)child {
 	[super addChild:child];
-}
-
-- (void)removeChild: (IWidget*)child {
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -117,8 +124,7 @@ typedef enum VerticalAlignment {
 			label.textAlignment = UITextAlignmentRight;
 		}		
 	}
-<<<<<<< HEAD
-	else if([key isEqualToString:@"verticalAlignment"]) {
+	else if([key isEqualToString:@"textVerticalAlignment"]) {
 		UILabelWithVerticalAlignment* label = (UILabelWithVerticalAlignment*) view;
 		if([value isEqualToString:@"top"]) {
 			[label setVerticalAlignment:VerticalAlignmentTop];
@@ -129,14 +135,6 @@ typedef enum VerticalAlignment {
 		else if([value isEqualToString:@"bottom"]) {
 			[label setVerticalAlignment:VerticalAlignmentBottom];
 		}		
-=======
-	else if([key isEqualToString:@"textVerticalAlignment"]) {
-		// This isn't trivial on iphone.
-		
-		//UILabel* label = (UILabel*) view;
-		//if([value isEqualToString:@"center"]) {
-		//}
->>>>>>> 7dc2153ccd8cd8580b7bec8ad4fe08765b2be6f6
 	}	
 	else if([key isEqualToString:@"fontColor"]) {
 		UILabel* label = (UILabel*) view;	
@@ -150,7 +148,7 @@ typedef enum VerticalAlignment {
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

@@ -67,7 +67,7 @@ return [mWidget sizeThatFitsFor:(UIView*)self withSize:size];\
 	[super layoutSubviews];\
 }\
 - (CGSize)superSizeThatFits:(CGSize)size {\
-[super sizeThatFits:size];\
+return [super sizeThatFits:size];\
 }\
 @end\
 

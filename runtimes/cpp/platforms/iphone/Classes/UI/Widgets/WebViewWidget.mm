@@ -30,14 +30,12 @@
 	UIWebView* webView = [[[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)] retain]; // TODO: do have to do this (retain)??
 	view = webView;
 	webView.delegate = self;
+	newurl = @"";
 	return [super init];	
 }
 
 - (void)addChild: (IWidget*)child {
 	[super addChild:child];
-}
-
-- (void)removeChild: (IWidget*)child {
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -49,7 +47,7 @@
 	} else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
@@ -57,7 +55,13 @@
 		UIWebView* webView = (UIWebView*)view;
 		return webView.request.URL.absoluteString;
 	} else if([key isEqualToString:@"newurl"]) {
-		return newurl;
+		NSString* ret = @"";
+		//@synchronized(self) {
+		ret = newurl;
+		NSLog(@"- newurl ptr: %x\n", newurl);		
+		NSLog(@"on newurl retrieved: %@\n", newurl);
+		//}
+		return ret;
 	} else {
 		return [super getPropertyWithKey:key];
 	}
@@ -65,7 +69,13 @@
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
 #ifndef NATIVE_TEST
-	newurl = request.URL.absoluteString;
+	// modify array
+	//@synchronized(self) {
+	newurl = [[NSString stringWithString:request.URL.absoluteString] retain]; // TODO: do have to do this (retain)??
+	NSLog(@"+ newurl ptr: %x\n", newurl);			
+	NSLog(@"on newurl received: %@\n", newurl);
+	//7}
+	
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -74,7 +84,7 @@
 	event.data = eventData;
 	Base::gEventQueue.put(event);
 #endif
-	return YES;
+	return YES; // MoSync user have to manually start a new request..
 }
 
 @end

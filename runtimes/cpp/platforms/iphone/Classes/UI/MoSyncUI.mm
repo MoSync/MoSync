@@ -25,9 +25,11 @@
 @implementation MoSyncUI
 
 NSMutableArray* widgetArray;
+NSMutableArray* unusedWidgetHandles;
+int currentWidgetIndex = 0;
+
 UIWindow* mainWindow;
 UIViewController *mainController;
-//UINavigationController *tabBarController;
 
 - (IWidget*)getWidget: (int) handle {
 	IWidget *widget = nil;
@@ -38,8 +40,8 @@ UIViewController *mainController;
 - (id)initWithWindow: (UIWindow*) window andController: (UIViewController*)controller {
 	[super init];
 	widgetArray = [[NSMutableArray alloc] init];
+	unusedWidgetHandles = [[NSMutableArray alloc] init];
 	
-	//mainWindow = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	if(!window) {
 		window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];		
 		[window makeKeyAndVisible];
@@ -47,22 +49,14 @@ UIViewController *mainController;
 	
 	mainWindow = window;
 	mainController = controller;
-	
 	mainWindow.backgroundColor = [UIColor whiteColor];
-	
-	//tabBarController = [[UITabBarController alloc] init];
-    //tabBarController = [[UINavigationController alloc] init];
-	
-	//tabBarController.viewControllers = [NSArray array];										 	
-	//tabBarController.view = mainWindow;
-
-	//[mainWindow addSubview:tabBarController.view];	
-
 	
 	return self;
 }
 
 - (void) close {
+	[widgetArray dealloc];
+	[unusedWidgetHandles dealloc];
 }
 
 - (int) createWidget: (NSString*)name {
@@ -77,6 +71,7 @@ UIViewController *mainController;
 		
 	} else {
 		//created = [[ReflectionWidget alloc] initWithName:name];
+		return MAW_RES_INVALID_TYPE_NAME;
 	}
 
 	// todo handle these things.
@@ -85,12 +80,33 @@ UIViewController *mainController;
 	[created setWidgetHandle:[widgetArray count]];
 	[created wasCreated];
 	
-	[widgetArray addObject:created];
+	int ret = MAW_RES_ERROR;
 	
-	return MAW_RES_OK;
+	if([unusedWidgetHandles count] > 0) {
+		ret = [[unusedWidgetHandles objectAtIndex:([unusedWidgetHandles count]-1)] intValue];
+		[unusedWidgetHandles removeLastObject];
+		[widgetArray replaceObjectAtIndex:ret withObject:created];
+	} else {
+		[widgetArray addObject:created];
+		ret = [widgetArray count]-1;
+	}
+	
+	return ret;
 }
 
-- (void) removeWidget: (IWidget*) handle {
+- (int) destroyWidgetInstance:(NSNumber*)handleNumber {
+	int handle = [handleNumber intValue];
+	[handleNumber release];
+	
+	IWidget* widget = [self getWidget:handle];
+	if(!widget) 
+		return MAW_RES_INVALID_HANDLE;
+	[widget remove];	
+	[widget dealloc];
+	[widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
+	[unusedWidgetHandles addObject:[[NSNumber alloc] initWithInt:handle]];
+
+	return MAW_RES_OK;
 }
 
 - (void) setPropertyOf: (IWidget*) widget withKey: (NSString*)key toValue: (NSString*)value {	

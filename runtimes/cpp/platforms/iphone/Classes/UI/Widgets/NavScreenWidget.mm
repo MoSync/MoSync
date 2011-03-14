@@ -17,6 +17,12 @@
 
 #import "NavScreenWidget.h"
 
+#ifndef NATIVE_TEST
+#include "Platform.h"
+#include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
+#endif
 
 @implementation NavScreenWidget
 
@@ -51,7 +57,7 @@
 	} else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

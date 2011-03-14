@@ -81,7 +81,9 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(HLayoutView)
 	
 	[view setWidget:self];
 	
-	return [super init];
+	id ret = [super init];
+	[self setAutoSizeParamX:FILL_PARENT andY:FILL_PARENT];
+	return ret;
 }
 
 - (void)layoutSubviews:(UIView*)_view {
@@ -174,10 +176,8 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(HLayoutView)
 
 - (void)addChild: (IWidget*)child {
 	[super addChild:child];
-	[view setSize];	
-}
-
-- (void)removeChild: (IWidget*)child {
+	//[view setSize];	
+	[view setNeedsLayout];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

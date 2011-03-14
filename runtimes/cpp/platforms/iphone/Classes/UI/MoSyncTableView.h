@@ -17,12 +17,9 @@
 
 #import <UIKit/UIKit.h>
 
-
 @interface MoSyncTableView : UITableViewController {
 	NSMutableArray* mDataForMyTable;
 }
-
-//@property(nonatomic, retain)NSMutableArray *mDataForMyTable;
 
 - (void) addView:(UIView*) view;
 

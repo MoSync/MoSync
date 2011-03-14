@@ -27,25 +27,8 @@
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-	//static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
-
 	NSUInteger row = [indexPath row];	
 	UITableViewCell* cell = [mDataForMyTable objectAtIndex:row];
-
-	/*
-	UITableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:SimpleTableIdentifier];
-	
-	if (cell == nil) {
-		cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
-									  reuseIdentifier:SimpleTableIdentifier] autorelease];
-	}
-	
-	[cell.contentView addSubview: cellContentView];
-	*/
-	
-	//cell.backgroundView = cellContentView;
-	//cell.selectedBackgroundView = cellContentView;
-	
 	return cell;
 }
 
@@ -53,21 +36,9 @@
 	[mDataForMyTable addObject: view];
 }
 
-
-
-/*
- // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if ((self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil])) {
-        // Custom initialization
-    }
-    return self;
-}
-*/
-
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView {
-	mDataForMyTable = [[NSMutableArray alloc] init ]; //initWithObjects:@"iPhone", @"iPod", @"iPad", nil];
+	mDataForMyTable = [[NSMutableArray alloc] init ];
 	[super loadView];
 }
 
@@ -75,14 +46,6 @@
  - (void)viewDidLoad {
 	 [super viewDidLoad];
  }
-
-/*
-// Override to allow orientations other than the default portrait orientation.
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
-*/
 
 - (void)didReceiveMemoryWarning {
     // Releases the view if it doesn't have a superview.

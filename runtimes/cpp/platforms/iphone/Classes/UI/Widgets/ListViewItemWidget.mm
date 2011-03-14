@@ -32,10 +32,9 @@
 	static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
 	
 	UITableViewCell *cell = nil; //[UITableView dequeueReusableCellWithIdentifier:SimpleTableIdentifier];
-	 
 	if (cell == nil) {
 		cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
-								   reuseIdentifier:SimpleTableIdentifier] retain];
+								   reuseIdentifier:SimpleTableIdentifier] retain];		 
 		cell.selectionStyle =  UITableViewCellSelectionStyleNone;
 	}
 
@@ -51,9 +50,7 @@
 //	[super addChild:child];
 	UITableViewCell *cell = (UITableViewCell*)view;
 	[cell.contentView addSubview: [child getView]];
-}
-
-- (void)removeChild: (IWidget*)child {
+	[self layout];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

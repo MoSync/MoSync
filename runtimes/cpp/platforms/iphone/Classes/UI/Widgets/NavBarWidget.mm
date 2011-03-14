@@ -27,7 +27,7 @@
 @implementation NavBarWidget
 
 - (id)init {	
-	UINavigationBar* navbar = [[[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
+	UINavigationBar* navbar = [[[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, 100, 44)] retain];
 	navbar.delegate = self;
 	prevNavitem = [[UINavigationItem alloc] init];
 	currNavitem = [[UINavigationItem alloc] init];
@@ -40,9 +40,6 @@
 
 - (void)addChild: (IWidget*)child {
 	[super addChild:child];
-}
-
-- (void)removeChild: (IWidget*)child {
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

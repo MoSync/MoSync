@@ -39,13 +39,10 @@
 }
 
 - (void)addChild: (IWidget*)child {
-//	if(!parent)
-//		[child getView].frame = [[UIScreen mainScreen] bounds];
+	if(!parent)
+		[child getView].frame = [[UIScreen mainScreen] bounds];
 	
 	[super addChild:child];	
-}
-
-- (void)removeChild: (IWidget*)child {
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

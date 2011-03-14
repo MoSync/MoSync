@@ -30,14 +30,13 @@
 	imageView = nil;
 	leftCapWidth = 0;
 	topCapHeight = 0;
-	return [super init];
+	id ret = [super init];
+	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
+	return ret;
 }
 
 - (void)addChild: (IWidget*)child {
 	[super addChild:child];
-}
-
-- (void)removeChild: (IWidget*)child {
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -53,10 +52,12 @@
 		if(imageView != nil)
 			[imageView removeFromSuperview];
 
-		imageView = [[UIImageView alloc] initWithImage:image];		
+		imageView = [[UIImageView alloc] initWithImage:image];	
+		[imageView sizeToFit];
 		[view addSubview:imageView];
-		view.frame.size.height = imageView.frame.size.height;
-		view.frame.size.width = imageView.frame.size.width;
+		//view.frame.size.height = imageView.frame.size.height;
+		//view.frame.size.width = imageView.frame.size.width;
+		[self layout];
 		#endif
 	}
 	else if([key isEqualToString:@"leftCapWidth"]) {
@@ -75,24 +76,38 @@
 		}
 		topCapHeight = newTopCapHeight;
 	}
+	/*
 	else if ([key isEqualToString:@"width"]) {
 		int ret = [super setPropertyWithKey:key toValue:value];
 		float width = [value floatValue];
-		if(width == -1) {
-			width = view.frame.size.width;
-		}		
+		if(width == -2 || width == -1) {
+			autoSizeParamX = width==-2?WRAP_CONTENT:FILL_PARENT;
+			//[self layout];
+			//return MAW_RES_OK;
+			width = (autoSizeParamX==FILL_PARENT)?imageView.superview.frame.size.width:[imageView sizeThatFits:CGSizeZero].width;
+			
+		} else {
+			autoSizeParamX = FIXED_SIZE;
+		}
 		[imageView setFrame:CGRectMake(imageView.frame.origin.x, imageView.frame.origin.y, width, imageView.frame.size.height)];
-		return ret;
+		return [super setPropertyWithKey:key toValue:value];
 	}
 	else if ([key isEqualToString:@"height"]) {
 		int ret = [super setPropertyWithKey:key toValue:value];
 		float height = [value floatValue];
-		if(height == -1) {
-			height = view.frame.size.height;
-		}		
+		if(height == -2 || height == -1) {
+			autoSizeParamY = height==-2?WRAP_CONTENT:FILL_PARENT;
+			//[self layout];
+			height = (autoSizeParamY==FILL_PARENT)?imageView.superview.frame.size.height:[imageView sizeThatFits:CGSizeZero].height;
+	
+		} else {
+			autoSizeParamY = FIXED_SIZE;
+		}
+		
 		[imageView setFrame:CGRectMake(imageView.frame.origin.x, imageView.frame.origin.y, imageView.frame.size.width, height)];
-		return ret;
+		return [super setPropertyWithKey:key toValue:value];
 	}
+	*/
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

@@ -63,9 +63,8 @@
 	
 	[tableView addView: [child getView]];
 	[view reloadData];
-}
-
-- (void)removeChild: (IWidget*)child {
+	
+	[super addChild:child];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -73,10 +72,13 @@
 		float rowHeight = [value floatValue];
 		UITableView* tableView = (UITableView*)view;
 		tableView.rowHeight = rowHeight;
+		[tableView reloadData];
 	} 
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
+	
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

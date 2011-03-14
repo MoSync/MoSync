@@ -137,6 +137,8 @@ int MoSync_ThreadMain(void *args) {
 		
 		if(gReloadHandle > 0) {
 			Base::Stream* stream = Base::gSyscall->resources.extract_RT_BINARY(gReloadHandle);
+			if(!stream->seek(Seek::Start, 0))
+				BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);
 			bool res = Core::LoadVMApp(gCore, *stream);
 			delete stream;
 			gReloadHandle = 0;

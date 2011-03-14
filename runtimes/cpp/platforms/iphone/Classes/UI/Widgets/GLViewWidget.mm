@@ -48,9 +48,6 @@
 	[super addChild:child];
 }
 
-- (void)removeChild: (IWidget*)child {
-}
-
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"bind"]) {
 		[view bindContext];

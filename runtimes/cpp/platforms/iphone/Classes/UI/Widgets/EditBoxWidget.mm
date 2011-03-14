@@ -57,15 +57,13 @@
 	
 	view = textField;			
 	id ret = [super init];
+	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
 	textField.delegate = self;
 	return ret;
 }
 
 - (void)addChild: (IWidget*)child {
 	[super addChild:child];
-}
-
-- (void)removeChild: (IWidget*)child {
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -117,6 +115,8 @@
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
+	
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

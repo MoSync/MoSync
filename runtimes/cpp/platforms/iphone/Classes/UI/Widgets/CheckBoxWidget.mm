@@ -54,9 +54,6 @@
 	[super addChild:child];
 }
 
-- (void)removeChild: (IWidget*)child {
-}
-
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"checked"]) {
 		bool checked = [value boolValue];
@@ -65,7 +62,7 @@
 	} else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

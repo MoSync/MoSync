@@ -54,7 +54,6 @@
 		85A1592212F80E520044BBE1 /* Readme.txt in Resources */ = {isa = PBXBuildFile; fileRef = 85A158EB12F80E520044BBE1 /* Readme.txt */; };
 		85A1592312F80E520044BBE1 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158ED12F80E520044BBE1 /* VLayoutView.m */; };
 		85A1592412F80E520044BBE1 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158EF12F80E520044BBE1 /* MoSyncTableView.m */; };
-		85A1592512F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */; };
 		85A1592612F80E520044BBE1 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F312F80E520044BBE1 /* MoSyncUI.mm */; };
 		85A1592712F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */; };
 		85A1592812F80E520044BBE1 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F712F80E520044BBE1 /* ScreenWidgetController.m */; };
@@ -84,8 +83,6 @@
 		85A1594212F80E520044BBE1 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158ED12F80E520044BBE1 /* VLayoutView.m */; };
 		85A1594312F80E520044BBE1 /* MoSyncTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158EE12F80E520044BBE1 /* MoSyncTableView.h */; };
 		85A1594412F80E520044BBE1 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158EF12F80E520044BBE1 /* MoSyncTableView.m */; };
-		85A1594512F80E520044BBE1 /* MoSyncTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F012F80E520044BBE1 /* MoSyncTableViewCell.h */; };
-		85A1594612F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */; };
 		85A1594712F80E520044BBE1 /* MoSyncUI.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F212F80E520044BBE1 /* MoSyncUI.h */; };
 		85A1594812F80E520044BBE1 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F312F80E520044BBE1 /* MoSyncUI.mm */; };
 		85A1594912F80E520044BBE1 /* MoSyncUISyscalls.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */; };
@@ -255,8 +252,6 @@
 		85A158ED12F80E520044BBE1 /* VLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLayoutView.m; sourceTree = "<group>"; };
 		85A158EE12F80E520044BBE1 /* MoSyncTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableView.h; sourceTree = "<group>"; };
 		85A158EF12F80E520044BBE1 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableView.m; sourceTree = "<group>"; };
-		85A158F012F80E520044BBE1 /* MoSyncTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableViewCell.h; sourceTree = "<group>"; };
-		85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableViewCell.m; sourceTree = "<group>"; };
 		85A158F212F80E520044BBE1 /* MoSyncUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUI.h; sourceTree = "<group>"; };
 		85A158F312F80E520044BBE1 /* MoSyncUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUI.mm; sourceTree = "<group>"; };
 		85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUISyscalls.h; sourceTree = "<group>"; };
@@ -514,6 +509,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		8500CD3E132E506D0003A01E /* External */ = {
+			isa = PBXGroup;
+			children = (
+				85A158E412F80E520044BBE1 /* LayoutManagers */,
+				85A158F812F80E520044BBE1 /* UIColor-Expanded.h */,
+				85A158F912F80E520044BBE1 /* UIColor-Expanded.m */,
+			);
+			name = External;
+			sourceTree = "<group>";
+		};
 		853983A8116CADDD000521C0 /* hashmap */ = {
 			isa = PBXGroup;
 			children = (
@@ -535,19 +540,15 @@
 		85A158E312F80E520044BBE1 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				85A158E412F80E520044BBE1 /* LayoutManagers */,
+				8500CD3E132E506D0003A01E /* External */,
 				85A158EE12F80E520044BBE1 /* MoSyncTableView.h */,
 				85A158EF12F80E520044BBE1 /* MoSyncTableView.m */,
-				85A158F012F80E520044BBE1 /* MoSyncTableViewCell.h */,
-				85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */,
 				85A158F212F80E520044BBE1 /* MoSyncUI.h */,
 				85A158F312F80E520044BBE1 /* MoSyncUI.mm */,
 				85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */,
 				85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */,
 				85A158F612F80E520044BBE1 /* ScreenWidgetController.h */,
 				85A158F712F80E520044BBE1 /* ScreenWidgetController.m */,
-				85A158F812F80E520044BBE1 /* UIColor-Expanded.h */,
-				85A158F912F80E520044BBE1 /* UIColor-Expanded.m */,
 				85A158FA12F80E520044BBE1 /* Widgets */,
 			);
 			path = UI;
@@ -768,7 +769,6 @@
 				85A1594012F80E520044BBE1 /* LayoutManagers.h in Headers */,
 				85A1594112F80E520044BBE1 /* VLayoutView.h in Headers */,
 				85A1594312F80E520044BBE1 /* MoSyncTableView.h in Headers */,
-				85A1594512F80E520044BBE1 /* MoSyncTableViewCell.h in Headers */,
 				85A1594712F80E520044BBE1 /* MoSyncUI.h in Headers */,
 				85A1594912F80E520044BBE1 /* MoSyncUISyscalls.h in Headers */,
 				85A1594B12F80E520044BBE1 /* ScreenWidgetController.h in Headers */,
@@ -943,7 +943,6 @@
 				85A1592012F80E520044BBE1 /* HLayoutView.m in Sources */,
 				85A1592312F80E520044BBE1 /* VLayoutView.m in Sources */,
 				85A1592412F80E520044BBE1 /* MoSyncTableView.m in Sources */,
-				85A1592512F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */,
 				85A1592612F80E520044BBE1 /* MoSyncUI.mm in Sources */,
 				85A1592712F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */,
 				85A1592812F80E520044BBE1 /* ScreenWidgetController.m in Sources */,
@@ -1008,7 +1007,6 @@
 				85A1593F12F80E520044BBE1 /* HLayoutView.m in Sources */,
 				85A1594212F80E520044BBE1 /* VLayoutView.m in Sources */,
 				85A1594412F80E520044BBE1 /* MoSyncTableView.m in Sources */,
-				85A1594612F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */,
 				85A1594812F80E520044BBE1 /* MoSyncUI.mm in Sources */,
 				85A1594A12F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */,
 				85A1594C12F80E520044BBE1 /* ScreenWidgetController.m in Sources */,

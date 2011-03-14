@@ -36,7 +36,8 @@
 //	view = [[UIButton alloc] initWithFrame:CGRectMake(0, 0, 30, 30)];
 	
 	UIButton* button = (UIButton*) view;
-	button.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
+	//button.contentEdgeInsets = UIEdgeInsetsMake(15.0, 15.0, 15.0, 15.0);
+	button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
 	
 	
 	[view addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
@@ -59,9 +60,6 @@
 
 - (void)addChild: (IWidget*)child {
 	[super addChild:child];
-}
-
-- (void)removeChild: (IWidget*)child {
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

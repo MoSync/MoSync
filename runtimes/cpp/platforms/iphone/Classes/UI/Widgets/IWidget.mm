@@ -78,10 +78,14 @@
 	//[view injectMixin:[UIViewAdditions class]];
 	//autoSizeParamX = FIXED_SIZE;
 	//autoSizeParamY = FIXED_SIZE;
+	//[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
 	[self setAutoSizeParamX:FIXED_SIZE andY:FIXED_SIZE];
+	
 	//[view setWidget:self];	
 	//[view sizeToFit]; 
 		
+	view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
+	
 	return self;
 }
 
@@ -139,7 +143,6 @@
 - (int)remove {
 	if(!parent) return MAW_RES_REMOVED_ROOT;
 	[parent removeChild: self];
-	
 	return MAW_RES_OK;
 }
 
@@ -233,7 +236,8 @@
 	
 	int viewWidth = view.frame.size.width; 
 	if(autoSizeParamX == FILL_PARENT) {
-		viewWidth = view.superview.frame.size.width;
+		if(view.superview)
+			viewWidth = view.superview.frame.size.width;
 	}
 	else if(autoSizeParamX == WRAP_CONTENT) {
 		viewWidth = [view sizeThatFits:CGSizeZero].width;
@@ -241,7 +245,8 @@
 	 
 	int viewHeight = view.frame.size.height; 
 	if(autoSizeParamY == FILL_PARENT) {
-		viewHeight = view.superview.frame.size.height;
+		if(view.superview)
+			viewHeight = view.superview.frame.size.height;
 	}
 	else if(autoSizeParamY == WRAP_CONTENT) {
 		viewHeight = [view sizeThatFits:CGSizeZero].height;
