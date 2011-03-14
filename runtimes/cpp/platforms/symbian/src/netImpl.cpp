@@ -809,7 +809,8 @@ void CHttpConnection::SyncCallbackL(TAny* aPtr, TInt aResult) {
 }
 
 void CHttpConnection::RunL(TInt aResult) {
-	LOGST("CHttpConnection::RunL");
+	LOGST("CHttpConnection::RunL. result:%i pos:%i len:%i",
+		aResult, mPos, mRecvPtr.Length());
 	DEBUG_ASSERT(mSyncOp != NULL);
 	DEBUG_ASSERT(mLineHandler != NULL);
 	if(IS_SYMBIAN_ERROR(aResult)) {
@@ -818,8 +819,9 @@ void CHttpConnection::RunL(TInt aResult) {
 		return;
 	}
 	mBufPtr.SetLength(mPos + mRecvPtr.Length());
+	LOGS("%s\n", mBufPtr.PtrZ());
 
-	int startPos = mPos;
+	int startPos = 0;
 	//read a line
 	//either a CR, an LF, or a CRLF pair will terminate a line.
 	while(mPos < mBufPtr.Length()) {
@@ -847,7 +849,14 @@ void CHttpConnection::RunL(TInt aResult) {
 		LOG("HTTP header buffer full!\n");
 		CompleteReadHeaders(CONNERR_INTERNAL, 0);
 	}
-
+	
+	// copy partial header lines to beginning of buffer
+	if(startPos != 0) {
+		LOGS("Deleting %i bytes.\n", startPos);
+		mBufPtr.Delete(0, startPos);
+		LOGS("%s\n", mBufPtr.PtrZ());
+		mPos = mBufPtr.Length();
+	}
 	ReadMoreHeadersL();
 }
 
