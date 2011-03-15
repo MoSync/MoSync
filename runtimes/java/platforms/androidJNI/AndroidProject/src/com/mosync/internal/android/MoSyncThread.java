@@ -252,8 +252,6 @@ public class MoSyncThread extends Thread
 	private Rect mMaDrawImageRegionTempSourceRect = new Rect();
 	private Rect mMaDrawImageRegionTempDestRect = new Rect();
 
-	ByteBuffer mTempImageRawBuffer;
-	
 	int mMaxStoreId = 0;
 
 	public boolean mIsUpdatingScreen = false;
@@ -1526,40 +1524,29 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * This function generates a ByteBuffer which then is sent to 
-	 * the JNI library for processing.
-	 */
-	ByteBuffer _maCreateImageRawGetData(int size)
-	{
-		mTempImageRawBuffer = ByteBuffer.allocateDirect(size);
-		mTempImageRawBuffer.order(null);
-		
-		return mTempImageRawBuffer;
-	}
-
-	/**
-	 * Takes the preprocessed raw image data and copies the 
+	 * Takes the pre-processed raw image data and copies the 
 	 * contents to a bitmap.
 	 */
-	int _maCreateImageRaw(int placeholder, int width, int height)
+	int _maCreateImageRaw(int placeholder, int width, int height, ByteBuffer buffer)
 	{
 		SYSLOG("maCreateImageRaw");
 		
 		Bitmap bitmap = Bitmap.createBitmap(
 			width, height, Bitmap.Config.ARGB_8888);
+		
 		if(null == bitmap)
 		{
 			maPanic(1, "Unable to create ");
 		}
 		
-		mTempImageRawBuffer.position(0);
-		bitmap.copyPixelsFromBuffer(mTempImageRawBuffer);
+		buffer.position(0);
+		bitmap.copyPixelsFromBuffer(buffer);
 		
 		mImageResources.put(placeholder, new ImageCache(null, bitmap));
-			
+		
 		return RES_OK;
 	}
-
+	
 	/**
 	 * maCreateDrawableImage
 	 */

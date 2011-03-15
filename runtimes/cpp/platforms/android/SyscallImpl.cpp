@@ -609,14 +609,13 @@ namespace Base
 		
 		int imgSize = imgWidth * imgHeight * 4;
 		
-		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maCreateImageRawGetData", "(I)Ljava/nio/ByteBuffer;");
-		if (methodID == 0) return -1;
-		jobject jo = mJNIEnv->CallObjectMethod(mJThis, methodID, imgSize);
-		char* img = (char*)mJNIEnv->GetDirectBufferAddress(jo);
+		// Malloc some memory to use when creating the image
+		char* img = (char*)malloc(imgSize);
+		if(img == NULL) return 0;
 		
-		mJNIEnv->DeleteLocalRef(cls);
-		
+		jobject jBuffer = mJNIEnv->NewDirectByteBuffer((void*)img, imgSize);
+		if(jBuffer == NULL) return 0;
+	
 		if(0==alpha)
 		{
 			char* srcImg = (char*)src;
@@ -631,7 +630,6 @@ namespace Base
 		}
 		else
 		{
-			
 			char* srcImg = (char*)src;
 			int j = 0;
 			for(int i = 0 ; i < imgSize/4; i++)
@@ -641,16 +639,17 @@ namespace Base
 				(*(img+j)) = (*(srcImg+j-2));j++;
 				(*(img+j)) = (*(srcImg+j));j++; 				
 			}
-			
-			//memcpy(img, src, imgSize);
 		}
 		
-		cls = mJNIEnv->GetObjectClass(mJThis);
-		methodID = mJNIEnv->GetMethodID(cls, "_maCreateImageRaw", "(III)I");
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "_maCreateImageRaw", "(IIILjava/nio/ByteBuffer;)I");
 		if (methodID == 0) ERROR_EXIT;
-		int retVal = mJNIEnv->CallIntMethod(mJThis, methodID, placeholder, imgWidth, imgHeight);
+		int retVal = mJNIEnv->CallIntMethod(mJThis, methodID, placeholder, imgWidth, imgHeight, jBuffer);
 		
 		mJNIEnv->DeleteLocalRef(cls);
+		mJNIEnv->DeleteLocalRef(jBuffer);
+		
+		free(img);
 		
 		SYSCALL_THIS->resources.add_RT_IMAGE(placeholder, NULL);
 		
