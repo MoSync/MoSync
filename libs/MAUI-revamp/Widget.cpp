@@ -434,6 +434,17 @@ namespace MAUI {
 	*/
 
 	void Widget::setFocused(bool focused) {
+		if(!mFocusable) {
+			for(int i=0; i<mChildren.size(); i++) {
+				Widget* c = mChildren[i];
+				if(c->isFocusable()) {
+					c->setFocused(focused);
+					return;
+				}
+			}
+		}
+		if(mFocused == focused)
+			return;
 		mFocused = focused;
 		/*
 		Vector_each(WidgetListener*, wl, mWidgetListeners) {
@@ -514,10 +525,26 @@ namespace MAUI {
 	}
 
 	bool Widget::keyPressed(int keyCode, int nativeCode) {
+		if(!mFocusable) {
+			for(int i=0; i<mChildren.size(); i++) {
+				Widget* c = mChildren[i];
+				if(c->isFocusable()) {
+					return c->keyPressed(keyCode, nativeCode);
+				}
+			}
+		}
 		return false;
 	}
 
 	bool Widget::keyReleased(int keyCode, int nativeCode) {
+		if(!mFocusable) {
+			for(int i=0; i<mChildren.size(); i++) {
+				Widget* c = mChildren[i];
+				if(c->isFocusable()) {
+					return c->keyReleased(keyCode, nativeCode);
+				}
+			}
+		}
 		return false;
 	}
 

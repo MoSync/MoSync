@@ -486,10 +486,6 @@ void Syscall::ConnOp::DoCancel() {
 		mSyscall.gConnection.Close();
 		LOGS("gConnection.Close() successful\n");
 		mSyscall.gNetworkingState = EIdle;
-		{
-			TRequestStatus* rsp = &iStatus;
-			User::RequestComplete(rsp, KErrCancel);
-		}
 		break;
 	case CSOC_Resolve: {
 		CSO_Resolve& r((CSO_Resolve&)sop);
@@ -798,7 +794,9 @@ void CHttpConnection::ReadHeadersL(CPublicActive& op) {
 }
 
 void CHttpConnection::ReadMoreHeadersL() {
-	mRecvPtr.Set(mBufPtr.MyTPtr(mPos));
+	// +1 to allow for mBufPtr.PtrZ().
+	mRecvPtr.Set((byte*)mBufPtr.Ptr() + mPos, mBufPtr.Length() - mPos,
+		mBufPtr.MaxLength() - (mPos+1));
 	mTransport->RecvOneOrMoreL(mRecvPtr, mSync);
 	//continues in RunL
 }
@@ -818,6 +816,8 @@ void CHttpConnection::RunL(TInt aResult) {
 		CompleteReadHeaders(0, aResult);
 		return;
 	}
+	LOGS("mBufPtr.SetLength(%i) max %i (pos %i + len %i)\n",
+		mPos + mRecvPtr.Length(), mBufPtr.MaxLength(), mPos, mRecvPtr.Length());
 	mBufPtr.SetLength(mPos + mRecvPtr.Length());
 	LOGS("%s\n", mBufPtr.PtrZ());
 
