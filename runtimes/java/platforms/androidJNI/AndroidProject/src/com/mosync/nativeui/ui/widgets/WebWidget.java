@@ -3,6 +3,7 @@ package com.mosync.nativeui.ui.widgets;
 import android.webkit.WebView;
 
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
@@ -33,7 +34,7 @@ public class WebWidget extends Widget
 	 */
 	@Override
 	public boolean setProperty(String property, String value)
-			throws PropertyConversionException
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty( property, value ) )
 		{

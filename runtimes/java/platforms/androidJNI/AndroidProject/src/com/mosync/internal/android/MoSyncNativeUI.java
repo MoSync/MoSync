@@ -167,8 +167,11 @@ public class MoSyncNativeUI
 				public void run()
 				{
 					int result = mNativeUI.maWidgetScreenShow(screenHandle);
-					((MoSync) getActivity()).setRootView( 
-						mNativeUI.getRootView( ) );
+					if( result == IX_WIDGET.MAW_RES_OK )
+					{
+						((MoSync) getActivity()).setRootView( 
+								mNativeUI.getRootView( ) );
+					}
 					waiter.setResult(result);
 				}
 			});

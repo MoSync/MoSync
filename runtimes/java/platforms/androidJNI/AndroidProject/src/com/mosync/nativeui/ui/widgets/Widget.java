@@ -13,6 +13,7 @@ import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
 import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
 
@@ -69,13 +70,18 @@ public class Widget
 	 * 
 	 * TODO: More sensible implementation.
 	 * 
-	 * @param property The property of the widget that should be set,
-	 *                 one of
+	 * @param property The property of the widget that should be set.
 	 * @param value The value of the property, this will be converted
 	 *              to the appropriate type.
 	 * @return true if the property was set, false otherwise.
+	 * 
+	 * @throws PropertyConversionException If a value could not be converted
+	 *                                     to a value suitable for the given property.
+	 * @throws InvalidPropertyValueException If the converted value was out of range
+	 *                                       or in any other sense invalid.
 	 */
-	public boolean setProperty(String property, String value) throws PropertyConversionException
+	public boolean setProperty(String property, String value)
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		LayoutParams layoutParams = getLayoutParams( );
 		if( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
@@ -136,7 +142,7 @@ public class Widget
 			float alpha = FloatConverter.convert( value );
 			if( alpha > 1.0f || alpha < 0.0f )
 			{
-				return false;
+				throw new InvalidPropertyValueException( value, property );
 			}
 			
 			int intAlpha = (int) (alpha * 255.0f);

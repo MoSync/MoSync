@@ -4,6 +4,7 @@ import android.view.ViewGroup;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
 
@@ -75,7 +76,7 @@ public class LinearLayout extends Layout
 
 	@Override
 	public boolean setProperty(String property, String value)
-			throws PropertyConversionException
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty( property, value ) )
 		{

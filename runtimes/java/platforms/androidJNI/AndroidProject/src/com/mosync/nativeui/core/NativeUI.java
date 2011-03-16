@@ -16,6 +16,7 @@ import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
@@ -163,6 +164,12 @@ public class NativeUI
 	 */
 	public int maWidgetAdd(int parentHandle, int childHandle)
 	{
+		if( parentHandle == childHandle )
+		{
+			Log.e( "MoSync", "maWidgetAdd: Child and parent are the same." );
+			return IX_WIDGET.MAW_RES_ERROR;
+		}
+		
 		Widget parent = m_widgetTable.get( parentHandle );
 		Widget child = m_widgetTable.get( childHandle );
 		
@@ -280,6 +287,11 @@ public class NativeUI
 		catch(PropertyConversionException pce)
 		{
 			Log.e( "MoSync", "Error while converting property value '" + value + "': " + pce.getMessage( ) );
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+		}
+		catch(InvalidPropertyValueException ipve)
+		{
+			Log.e( "MoSync", "Error while setting property: " + ipve.getMessage( ) );
 			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 		}
 	}

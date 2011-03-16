@@ -9,6 +9,7 @@ import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.util.LayoutParamsSetter;
 import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
@@ -34,6 +35,11 @@ public class ScreenWidget extends Layout
 	private Drawable m_icon = null;
 	
 	/**
+	 * Listener for when the title changes.
+	 */
+	private TitleChangedListener m_titleChangedListener = null;
+	
+	/**
 	 * Constructor
 	 * 
 	 * @param handle handle Integer handle corresponding to this instance.
@@ -54,7 +60,7 @@ public class ScreenWidget extends Layout
 
 	@Override
 	public boolean setProperty(String property, String value)
-			throws PropertyConversionException
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty( property, value ) )
 		{
@@ -64,6 +70,10 @@ public class ScreenWidget extends Layout
 		if( property.equals( IX_WIDGET.MAW_SCREEN_TITLE ) )
 		{
 			m_title = value;
+			if( m_titleChangedListener != null )
+			{
+				m_titleChangedListener.titleChanged( this, m_title );
+			}
 		}
 		else if( property.equals( IX_WIDGET.MAW_SCREEN_ICON ) )
 		{
@@ -75,7 +85,7 @@ public class ScreenWidget extends Layout
 			}
 			else
 			{
-				return false;
+				throw new InvalidPropertyValueException( value, property );
 			}
 		}
 		else
@@ -115,5 +125,32 @@ public class ScreenWidget extends Layout
 		return m_icon;
 	}
 	
+	/**
+	 * Sets a listener that is called when the title
+	 * of the screen has changed.
+	 * 
+	 * @param titleChangedListener A listener for title changes.
+	 */
+	public void setTitleChangedListener(TitleChangedListener titleChangedListener)
+	{
+		m_titleChangedListener = titleChangedListener;
+	}
 	
+	/**
+	 * A listener class for when the title of a screen changes,
+	 * so that the for example the tab screen has a chance
+	 * to update its tab title.
+	 * 
+	 * @author fmattias
+	 */
+	public interface TitleChangedListener
+	{
+		/**
+		 * Called when a title of the screen has changed.
+		 * 
+		 * @param screen The screen whose title has changed.
+		 * @param newTitle The new title of the screen.
+		 */
+		void titleChanged(ScreenWidget screen, String newTitle);
+	}
 }
