@@ -838,30 +838,17 @@ namespace MAUI {
 		}
 	}
 
-	bool ListBox::keyReleased(int keyCode, int nativeCode) {
-		Widget* selectedWidget = NULL;
-		if(mSelectedIndex < mChildren.size())
-			selectedWidget = mChildren[mSelectedIndex];
-		if(selectedWidget) {
-			bool ret = selectedWidget->keyReleased(keyCode, nativeCode);
-			if(ret) return true;
-		}
-		return false;
-	}
-
 	bool ListBox::keyPressed(int keyCode, int nativeCode) {
 		mTouched = false;
 
 		//MAUI_LOG("ListBox key pressed!");
-		Widget* selectedWidget = NULL;
-		if(mSelectedIndex < mChildren.size())
-			selectedWidget = mChildren[mSelectedIndex];
-		if(selectedWidget) {
-			// TODO: Remove commented out code if not needed.
-			bool ret = selectedWidget->keyPressed(keyCode, nativeCode);
-			if(ret) return true;
 
-			/*InputPolicy* ip = mFocusedWidget->getInputPolicy();
+		if(mFocusedWidget) {
+			// TODO: Remove commented out code if not needed.
+			//bool ret = mFocusedWidget->keyPressed(keyCode, nativeCode);
+			//if(ret) return true;
+
+			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(!ip) {
 				return false;
 			}
@@ -872,9 +859,9 @@ namespace MAUI {
 			} 
 			else {
 				return true;
-			}*/
+			}
 		} 
-		{
+		else {
 			if(mChildren.size()>0) {
 				bool res = keyPressedSelect(keyCode, nativeCode);
 				if(mChildren[mSelectedIndex]->isFocusable()) {

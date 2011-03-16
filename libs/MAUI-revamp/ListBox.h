@@ -317,8 +317,6 @@ namespace MAUI {
 		virtual bool keyPressed(int keyCode, int nativeCode);
 		bool keyPressedSelect(int keyCode, int nativeCode);
 
-		virtual bool keyReleased(int keyCode, int nativeCode);
-
 		/**
 		 * Sets the item in the ListBox that has focus.
 		 * \param w The widget that has focus.
