@@ -119,17 +119,27 @@ public:
 		}
 		else
 		{
-			printf("No content-length\n\n\n");
-			showInformation();
+			printf("No content-length\n");
+			mHttp.recv(mBuffer, BUFSIZE);
 		}
-
 	}
 
 	/**
-	* Listener that is fired when the content has been read.
+	* Listener that is fired when content with a known length has been read.
 	*/
 	virtual void connReadFinished(Connection* conn, int result) {
 		printf("connReadFinished result: %i\n\n", result);
+		if(sRepeat)
+			start(sUrl);
+		else
+			showInformation();
+	}
+
+	/**
+	* Listener that is fired when content with unknown length has been read.
+	*/
+	virtual void connRecvFinished(Connection* conn, int result) {
+		printf("connRecvFinished result: %i\n\n", result);
 		if(sRepeat)
 			start(sUrl);
 		else
