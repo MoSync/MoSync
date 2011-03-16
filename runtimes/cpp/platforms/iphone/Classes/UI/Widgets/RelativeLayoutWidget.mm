@@ -17,8 +17,7 @@
 
 #import "RelativeLayoutWidget.h"
 
-MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(UIView)
-
+MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIView)
 
 @implementation RelativeLayoutWidget
 

@@ -17,12 +17,9 @@
 
 #import "ListViewWidget.h"
 #import "ListViewItemWidget.h"
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
-#endif
 
 @implementation ListViewWidget
 
@@ -30,7 +27,6 @@
 	NSInteger index = [indexPath row];
 	
 	NSLog(@"ListItem %d pressed!", index);
-#ifndef NATIVE_TEST
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -38,9 +34,7 @@
 	eventData->widgetHandle = handle;
 	eventData->listItemIndex = index;
 	event.data = eventData;
-	Base::gEventQueue.put(event);
-#endif
-	
+	Base::gEventQueue.put(event);	
 }
 
 - (id)init {

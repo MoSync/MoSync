@@ -23,6 +23,10 @@
 
 MoSyncUI* mosyncUI;
 
+MoSyncUI* getMoSyncUI() {
+	return mosyncUI;
+}
+
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController) {
 	mosyncUI = [[MoSyncUI alloc] initWithWindow:window andController:viewController];
 }

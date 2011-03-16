@@ -17,44 +17,27 @@
 
 #import "EditBoxWidget.h"
 #import <QuartzCore/QuartzCore.h>
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
 
 @implementation EditBoxWidget
 
 - (BOOL)textFieldShouldReturn:(UITextField*)textField {
-#ifndef NATIVE_TEST
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_CLICKED;
 	eventData->widgetHandle = handle;
-//	eventData->searchBarButton = 0;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-#endif
 	return YES;
 }
 
 - (id)init {
 	textField = [[[UITextField alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];
-	
-	/*
-	 //	textView = [[[UITextView alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];	 
-	[textView setTextColor:[UIColor blackColor]];
-	[textView.layer setBackgroundColor: [[UIColor whiteColor] CGColor]];
-    [textView.layer setBorderColor: [[UIColor grayColor] CGColor]];
-    [textView.layer setBorderWidth: 1.0];
-    [textView.layer setCornerRadius:8.0f];
-    //[textView.layer setMasksToBounds:YES];
-	*/
 	textField.borderStyle = UITextBorderStyleRoundedRect;
-	
 	view = textField;			
 	id ret = [super init];
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];

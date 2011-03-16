@@ -16,13 +16,10 @@
  */
 
 #import "NavBarWidget.h"
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
 
 @implementation NavBarWidget
 
@@ -54,7 +51,7 @@
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
@@ -68,7 +65,6 @@
 }
 
 - (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item {
-#ifndef NATIVE_TEST
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -76,8 +72,6 @@
 	eventData->widgetHandle = handle;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-#endif
-
 	return false;
 }
 

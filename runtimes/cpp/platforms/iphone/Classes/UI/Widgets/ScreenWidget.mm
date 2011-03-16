@@ -18,23 +18,17 @@
 #import "ScreenWidget.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <base/Syscall.h>
-#endif
-
 
 @implementation ScreenWidget
 
 - (id)init {
-    //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	if([self class] == [ScreenWidget class])
 		controller = [[ScreenWidgetController alloc] init];
-	//controller.view = view;
 	controller.title = @"";
 	view = controller.view;
-	view.bounds = [[UIScreen mainScreen] bounds];
-	
+	view.bounds = [[UIScreen mainScreen] bounds];	
 	return [super init];
 }
 
@@ -53,17 +47,8 @@
 	else if([key isEqualToString:@"icon"]) {
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;
-#ifndef NATIVE_TEST
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);		
-		/*
-		controller.tabBarItem = [[UITabBarItem alloc] initWithTitle:controller.title 
-															  image:[UIImage imageWithCGImage:imageResource->image] 
-																tag:0];
-		*/
-		
 		[controller.tabBarItem setImage:[UIImage imageWithCGImage:imageResource->image]];	
-#endif
-
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
@@ -84,8 +69,6 @@
 	int viewWidth = view.frame.size.width; 
 	int viewHeight = view.frame.size.height; 
 	
-	//[view setNeedsLayout];
-	//[view setNeedsDisplay];
 	for (IWidget *child in children)
     {
 		UIView* childView = [child getView];

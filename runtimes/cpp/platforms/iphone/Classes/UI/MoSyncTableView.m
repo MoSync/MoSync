@@ -29,6 +29,7 @@
 {
 	NSUInteger row = [indexPath row];	
 	UITableViewCell* cell = [mDataForMyTable objectAtIndex:row];
+	[cell setFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, cell.frame.size.width,  tableView.rowHeight)];
 	return cell;
 }
 

@@ -37,6 +37,7 @@
 }
 
 - (void)layoutSubviews:(UIView*)_view {
+//- (void)layoutSubviews {	
 	for (IWidget *child in children)
     {
 		UIView* childView = [child getView];
@@ -61,30 +62,31 @@
 	}
 	
 	[_view superLayoutSubviews];
+	//[super layoutSubviews];
+	
+	//self.frame = view.frame;
 }
 
 - (CGSize)sizeThatFitsFor:(UIView*)_view withSize:(CGSize)size {
+//- (CGSize)sizeThatFits:(CGSize)size {
+//	return [super sizeThatFits:size];
 	return _view.frame.size;
 }
 
 - (id)init {
 	[super init];
-	[view setUserInteractionEnabled:YES];
-	view.contentMode = UIViewContentModeRedraw;
-	view.autoresizesSubviews = NO;
+
 	parent = nil;
 	children = [[NSMutableArray alloc] init];
-
-	//[view injectMixin:[UIViewAdditions class]];
-	//autoSizeParamX = FIXED_SIZE;
-	//autoSizeParamY = FIXED_SIZE;
-	//[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
 	[self setAutoSizeParamX:FIXED_SIZE andY:FIXED_SIZE];
-	
-	//[view setWidget:self];	
-	//[view sizeToFit]; 
-		
-	view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
+
+	if(view) {
+		[view setUserInteractionEnabled:YES];
+		view.contentMode = UIViewContentModeRedraw;
+		view.autoresizesSubviews = NO;
+		view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
+		//[self addSubview:view];
+	}
 	
 	return self;
 }
@@ -95,13 +97,11 @@
 
 - (void) setWidgetHandle:(int) toHandle {
 	handle = toHandle;
+	view.tag = handle;
 }
 
 - (int)getWidgetHandle {
 	return handle;
-}
-
-- (void)wasCreated {
 }
 
 - (void) setParent:(IWidget*) toParent {
@@ -110,18 +110,11 @@
 
 - (void) addChild: (IWidget*)child andSubview:(bool)addSubview {
 	UIView* childView = [child getView]; 
-	/*
-	if([child getFillWidth] == -1)
-		[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, view.frame.size.width, childView.frame.size.height)];
-	if([child getFillHeight] == -1)
-		[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, childView.frame.size.width, view.frame.size.height)];	
-	*/
-	
 	[child setParent:self];
 	[children addObject:child];
-	if(addSubview)
+	if(addSubview) {
 		[view addSubview:[child getView]];
-	
+	}
 	[view setNeedsLayout];
 }
 
@@ -148,11 +141,9 @@
 
 - (int) setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
 	if([key isEqualToString:@"left"]) {
-//		view.frame.origin.x = [value floatValue];
 		[view setFrame:CGRectMake([value floatValue], view.frame.origin.y, view.frame.size.width, view.frame.size.height)];
 	} else 
 	if([key isEqualToString:@"top"]) {
-//		view.frame.origin.y = [value floatValue];
 		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue], view.frame.size.width, view.frame.size.height)];
 	} else 
 	if([key isEqualToString:@"width"]) {
@@ -168,6 +159,7 @@
 		}
 		
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width, view.frame.size.height)];
+		[self layout];
 	} else
 	if([key isEqualToString:@"height"]) {
 		float height = [value floatValue];
@@ -181,8 +173,8 @@
 			autoSizeParamY = FIXED_SIZE;
 		}
 		
-		
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height)];		
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height)];	
+		[self layout];		
 	} else 
 	if([key isEqualToString:@"backgroundColor"]) {
 		view.backgroundColor = [UIColor colorWithHexString:value];
@@ -198,9 +190,6 @@
 	} else {
 			return MAW_RES_ERROR;
 	}
-	
-	//[view setNeedsDisplay];
-	//[view setNeedsLayout];
 			
 	return MAW_RES_OK;
 }
@@ -232,8 +221,7 @@
 
 - (void)layout {
 	[view setNeedsLayout];
-//	[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, view.frame.size.height)];			
-	
+
 	int viewWidth = view.frame.size.width; 
 	if(autoSizeParamX == FILL_PARENT) {
 		if(view.superview)
@@ -255,14 +243,12 @@
 	[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];
 	
 	return;
-	
-	//[view setNeedsLayout];
-	//[view setNeedsDisplay];
+/*
 	for (IWidget *child in children)
     {
 		[child layout];
-
-	}	
+	}
+ */
 }
 
 @end

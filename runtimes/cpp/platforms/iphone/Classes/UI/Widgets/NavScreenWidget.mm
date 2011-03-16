@@ -16,13 +16,10 @@
  */
 
 #import "NavScreenWidget.h"
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
 
 @implementation NavScreenWidget
 

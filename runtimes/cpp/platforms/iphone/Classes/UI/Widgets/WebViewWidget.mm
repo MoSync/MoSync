@@ -17,12 +17,10 @@
 
 #import "WebViewWidget.h"
 
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
 
 @implementation WebViewWidget
 
@@ -56,11 +54,7 @@
 		return webView.request.URL.absoluteString;
 	} else if([key isEqualToString:@"newurl"]) {
 		NSString* ret = @"";
-		//@synchronized(self) {
 		ret = newurl;
-		NSLog(@"- newurl ptr: %x\n", newurl);		
-		NSLog(@"on newurl retrieved: %@\n", newurl);
-		//}
 		return ret;
 	} else {
 		return [super getPropertyWithKey:key];
@@ -68,13 +62,7 @@
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-#ifndef NATIVE_TEST
-	// modify array
-	//@synchronized(self) {
 	newurl = [[NSString stringWithString:request.URL.absoluteString] retain]; // TODO: do have to do this (retain)??
-	NSLog(@"+ newurl ptr: %x\n", newurl);			
-	NSLog(@"on newurl received: %@\n", newurl);
-	//7}
 	
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
@@ -83,7 +71,6 @@
 	eventData->widgetHandle = handle;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-#endif
 	return YES; // MoSync user have to manually start a new request..
 }
 

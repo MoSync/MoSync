@@ -17,6 +17,7 @@
 
 #import "LayoutWidgets.h"
 #import "LayoutManagers.h"
+#include <helpers/CPP_IX_WIDGET.h>
 
 @implementation AbstractLayoutView (AbstractLayoutViewExpanded)
 
@@ -54,17 +55,14 @@
 	bottomMargin = _margin;
 	[self setNeedsLayout];
 }
-
 @end
 
-MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(VLayoutView)
-MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(HLayoutView)
+MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, VLayoutView)
+MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 
 @implementation LinearLayoutBase
 
-- (id)init:(LinearLayoutOrientation)ori {
-	//view = [[VLayoutView alloc] init];
-	
+- (id)init:(LinearLayoutOrientation)ori {	
 	orientation = ori;
 	
 	if(ori == OrientationVertical) {
@@ -128,7 +126,8 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(HLayoutView)
 			
 		}
 			
-		[_view superLayoutSubviews];			
+		[_view superLayoutSubviews];		
+		//[super layoutSubviews];
 	} else {
 		int numFillParent = 0;
 		int widthRemaining = 0;
@@ -170,7 +169,8 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(HLayoutView)
 			
 		}
 		
-		[_view superLayoutSubviews];		
+		[_view superLayoutSubviews];
+		//[super layoutSubviews];
 	}
 }
 
@@ -216,7 +216,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(HLayoutView)
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

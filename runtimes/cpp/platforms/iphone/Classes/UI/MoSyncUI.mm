@@ -77,9 +77,6 @@ UIViewController *mainController;
 	// todo handle these things.
 	if(created == nil) return MAW_RES_INVALID_TYPE_NAME;
 	
-	[created setWidgetHandle:[widgetArray count]];
-	[created wasCreated];
-	
 	int ret = MAW_RES_ERROR;
 	
 	if([unusedWidgetHandles count] > 0) {
@@ -90,6 +87,8 @@ UIViewController *mainController;
 		[widgetArray addObject:created];
 		ret = [widgetArray count]-1;
 	}
+	
+	[created setWidgetHandle:ret];	
 	
 	return ret;
 }

@@ -16,12 +16,9 @@
  */
 
 #import "TabScreenWidget.h"
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
-#endif
 
 @implementation TabScreenWidget
 
@@ -38,7 +35,6 @@
 		index++;
 	}
 
-#ifndef NATIVE_TEST
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -46,10 +42,10 @@
 	eventData->widgetHandle = handle;
 	eventData->tabIndex = index;
 	event.data = eventData;
-	Base::gEventQueue.put(event);
-#endif		
+	Base::gEventQueue.put(event);	
 	
-	
+	//if(index < [children count])
+	//	[[children objectAtIndex:index] layout];
 }
 
 - (id)init {
@@ -121,8 +117,8 @@
 	int viewHeight = view.frame.size.height - tabBarHeight; 
 	
 	
-	//[view setNeedsLayout];
-	//[view setNeedsDisplay];
+	[view setNeedsLayout];
+	//[view setNeedsDisplay]
 	for (IWidget *child in children)
     {
 		UIView* childView = [child getView];
@@ -130,7 +126,7 @@
 		
 		[child layout];
 		
-	}	
+	}
 }
 
 @end

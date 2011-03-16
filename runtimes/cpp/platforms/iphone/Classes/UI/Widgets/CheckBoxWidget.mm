@@ -16,28 +16,22 @@
  */
 
 #import "CheckBoxWidget.h"
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
 
 @implementation CheckBoxWidget
 
 - (id)init {
 	UISwitch* checkBox = [[[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
 	view = checkBox;
-
 	[view addTarget:self action:@selector(checkBoxPressed) forControlEvents:UIControlEventTouchUpInside];
-	
 	return [super init];
 }
 
 -(void)checkBoxPressed {
 	NSLog(@"CheckBox pressed!");
-#ifndef NATIVE_TEST
 	UISwitch *checkBox = (UISwitch*) view;
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
@@ -47,7 +41,6 @@
 	eventData->checked = checkBox.on;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-#endif	
 }
 
 - (void)addChild: (IWidget*)child {

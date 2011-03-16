@@ -17,13 +17,10 @@
 
 #import "GLViewWidget.h"
 #import "MoSyncGLView.h"
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
 
 @implementation GLViewWidget
 
@@ -32,8 +29,8 @@
 	return [super init];	
 }
 
-- (void)wasCreated {
-#ifndef NATIVE_TEST
+- (void)setWidgetHandle:(int)handle {
+	[super setWidgetHandle:handle];
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -41,7 +38,6 @@
 	eventData->widgetHandle = handle;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-#endif			
 }
 
 - (void)addChild: (IWidget*)child {
@@ -58,7 +54,7 @@
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
