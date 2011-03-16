@@ -2254,7 +2254,19 @@ namespace Base {
 		switch(uMsg) {
 		case WM_INITDIALOG:
 			sEditBox = GetDlgItem(hwnd, IDC_EDIT1);
-			SetWindowTextW(sEditBox, sTextBoxInBuf);
+			{
+				// fix EOL (add 0x0D bytes)
+				std::wstring in;
+				in.reserve(wcslen(sTextBoxInBuf));
+				const wchar_t* src = sTextBoxInBuf;
+				while(*src) {
+					if(*src == 0x0A)
+						in += (wchar_t)0x0D;
+					in += *src;
+					src++;
+				}
+				SetWindowTextW(sEditBox, in.c_str());
+			}
 			SetFocus(sEditBox);
 			break;
 		case WM_COMMAND:

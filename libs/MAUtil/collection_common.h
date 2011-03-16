@@ -26,6 +26,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define NULL 0
 #endif
 
+#ifndef OFFSETOF
+#define OFFSETOF(struct, member) ((int)(((char*)&(((struct*)1)->member)) - 1))
+#endif
+
 /**
 * \brief MoSync utility libraries
 */
