@@ -208,6 +208,37 @@ public:
 		basicIteratorTest(itr, s);
 	}
 
+	template<class SET, class ITR> int hashsetStringTest(ITR& itr, SET& s) {
+		assert("HashSet::Iterator", itr != s.end());
+		if(*itr == "bar")
+			return 1;
+		if(*itr == "baz")
+			return 2;
+		if(*itr == "foo")
+			return 4;
+		assert("HashSet::Iterator", false);
+		return 0;
+	}
+
+	template<class SET, class ITR> void hashsetStringIterate(
+		ITR& itr, SET& s)
+	{
+		//iterate
+		itr = s.begin();
+		assert("HashSet::begin()", itr != s.end());
+		int mask = 0;
+		mask |= hashsetStringTest(itr, s);
+		++itr;
+		mask |= hashsetStringTest(itr, s);
+		++itr;
+		mask |= hashsetStringTest(itr, s);
+		++itr;
+		assert("HashSet::Iterator", itr == s.end());
+		assert("HashSet::Iterator", mask == 7);
+
+		basicIteratorTest(itr, s);
+	}
+
 	//template<class SET, class ITR> void basicIteratorTest(ITR& itr, SET& s);
 	template<class Key, class Storage, class ITR>
 	void basicIteratorTest(ITR& itr, Dictionary<Key, Storage>& s)
@@ -239,8 +270,8 @@ public:
 
 	void hashSet() {
 		testSetString<HashSet<String> >(
-			&MAUtilTypesTest::setStringIterate<HashSet<String>, HashSet<String>::Iterator>,
-			&MAUtilTypesTest::setStringIterate<HashSet<String>, HashSet<String>::ConstIterator>);
+			&MAUtilTypesTest::hashsetStringIterate<HashSet<String>, HashSet<String>::Iterator>,
+			&MAUtilTypesTest::hashsetStringIterate<HashSet<String>, HashSet<String>::ConstIterator>);
 	}
 
 	template<class SET, class ITR> void setIntIterate(
