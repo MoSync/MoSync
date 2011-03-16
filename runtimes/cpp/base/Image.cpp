@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <config_platform.h>
 #include <helpers/helpers.h>
 #include <helpers/cpp_defs.h>
+#include <helpers/log.h>
 
 //#include <windows.h>
 
@@ -391,107 +392,107 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 		dirVerticalY = 0;
 
 	switch(transformMode) {
-			case TRANS_NONE:
-				srcPitchX = bpp;
-				srcPitchY = img->pitch;
-				transTopLeftX = u;
-				transTopLeftY = v;
-				transBottomRightX = u + width - 1;
-				transBottomRightY = v + height - 1;
-				transWidth = width;
-				transHeight = height;
-				dirHorizontalX = 1;
-				dirVerticalY = 1;
-				break;
-			case TRANS_ROT90:
-				srcPitchX = -img->pitch;
-				srcPitchY = bpp;
-				transTopLeftX = u;
-				transTopLeftY = v+height-1;
-				transBottomRightX = u + width - 1;
-				transBottomRightY = v;
-				transWidth = height;
-				transHeight = width;
-				dirHorizontalY = -1;
-				dirVerticalX = 1;
-				break;
-			case TRANS_ROT180:
-				srcPitchX = -bpp;
-				srcPitchY = -img->pitch;
-				transTopLeftX = u + width - 1;
-				transTopLeftY = v + height - 1;
-				transBottomRightX = u;
-				transBottomRightY = v;
-				transWidth = width;
-				transHeight = height;
-				dirHorizontalX = -1;
-				dirVerticalY = -1;
-				break;
-			case TRANS_ROT270:
-				srcPitchX = img->pitch;
-				srcPitchY = -bpp;
-				transTopLeftX = u + width - 1;
-				transTopLeftY = v;
-				transBottomRightX = u;
-				transBottomRightY = v + height - 1;
-				transWidth = height;
-				transHeight = width;
-				dirHorizontalY = 1;
-				dirVerticalX = -1;
-				break;
-			case TRANS_MIRROR:
-				srcPitchX = -bpp;
-				srcPitchY = img->pitch;
-				transTopLeftX = u + width - 1;
-				transTopLeftY = v;
-				transBottomRightX = u;
-				transBottomRightY = v + height - 1;
-				transWidth = width;
-				transHeight = height;
-				dirHorizontalX = -1;
-				dirVerticalY = 1;
-				break;
-			case TRANS_MIRROR_ROT90:
-				srcPitchX = -img->pitch;
-				srcPitchY = -bpp;
-				transTopLeftX = u+width-1;
-				transTopLeftY = v+height-1;
-				transBottomRightX = u;
-				transBottomRightY = v;
-				transWidth = height;
-				transHeight = width;
-				dirHorizontalY = 1;
-				dirVerticalX = 1;
-				break;
-			case TRANS_MIRROR_ROT180:
-				srcPitchX = bpp;
-				srcPitchY = -img->pitch;
-				transTopLeftX = u;
-				transTopLeftY = v + height - 1;
-				transBottomRightX = u + width - 1;
-				transBottomRightY = v;
-				transWidth = width;
-				transHeight = height;
-				dirHorizontalX = 1;
-				dirVerticalY = -1;
-				break;
-			case TRANS_MIRROR_ROT270:
-				srcPitchX = img->pitch;
-				srcPitchY = bpp;
-				transTopLeftX = u;
-				transTopLeftY = v;
-				transBottomRightX = u + width - 1;
-				transBottomRightY = v + height - 1;
-				transWidth = height;
-				transHeight = width;
-				dirHorizontalY = -1;
-				dirVerticalX = -1;
-				break;
-			default:
-				DEBIG_PHAT_ERROR;
+	case TRANS_NONE:
+		srcPitchX = bpp;
+		srcPitchY = img->pitch;
+		transTopLeftX = u;
+		transTopLeftY = v;
+		transBottomRightX = u + width - 1;
+		transBottomRightY = v + height - 1;
+		transWidth = width;
+		transHeight = height;
+		dirHorizontalX = 1;
+		dirVerticalY = 1;
+		break;
+	case TRANS_ROT90:
+		srcPitchX = -img->pitch;
+		srcPitchY = bpp;
+		transTopLeftX = u;
+		transTopLeftY = v+height-1;
+		transBottomRightX = u + width - 1;
+		transBottomRightY = v;
+		transWidth = height;
+		transHeight = width;
+		dirHorizontalY = -1;
+		dirVerticalX = 1;
+		break;
+	case TRANS_ROT180:
+		srcPitchX = -bpp;
+		srcPitchY = -img->pitch;
+		transTopLeftX = u + width - 1;
+		transTopLeftY = v + height - 1;
+		transBottomRightX = u;
+		transBottomRightY = v;
+		transWidth = width;
+		transHeight = height;
+		dirHorizontalX = -1;
+		dirVerticalY = -1;
+		break;
+	case TRANS_ROT270:
+		srcPitchX = img->pitch;
+		srcPitchY = -bpp;
+		transTopLeftX = u + width - 1;
+		transTopLeftY = v;
+		transBottomRightX = u;
+		transBottomRightY = v + height - 1;
+		transWidth = height;
+		transHeight = width;
+		dirHorizontalY = 1;
+		dirVerticalX = -1;
+		break;
+	case TRANS_MIRROR:
+		srcPitchX = -bpp;
+		srcPitchY = img->pitch;
+		transTopLeftX = u + width - 1;
+		transTopLeftY = v;
+		transBottomRightX = u;
+		transBottomRightY = v + height - 1;
+		transWidth = width;
+		transHeight = height;
+		dirHorizontalX = -1;
+		dirVerticalY = 1;
+		break;
+	case TRANS_MIRROR_ROT90:
+		srcPitchX = -img->pitch;
+		srcPitchY = -bpp;
+		transTopLeftX = u+width-1;
+		transTopLeftY = v+height-1;
+		transBottomRightX = u;
+		transBottomRightY = v;
+		transWidth = height;
+		transHeight = width;
+		dirHorizontalY = 1;
+		dirVerticalX = 1;
+		break;
+	case TRANS_MIRROR_ROT180:
+		srcPitchX = bpp;
+		srcPitchY = -img->pitch;
+		transTopLeftX = u;
+		transTopLeftY = v + height - 1;
+		transBottomRightX = u + width - 1;
+		transBottomRightY = v;
+		transWidth = width;
+		transHeight = height;
+		dirHorizontalX = 1;
+		dirVerticalY = -1;
+		break;
+	case TRANS_MIRROR_ROT270:
+		srcPitchX = img->pitch;
+		srcPitchY = bpp;
+		transTopLeftX = u;
+		transTopLeftY = v;
+		transBottomRightX = u + width - 1;
+		transBottomRightY = v + height - 1;
+		transWidth = height;
+		transHeight = width;
+		dirHorizontalY = -1;
+		dirVerticalX = -1;
+		break;
+	default:
+		DEBIG_PHAT_ERROR;
 	}
 
-	if( transWidth <= 0 || transHeight <= 0) return;
+	if(transWidth <= 0 || transHeight <= 0) return;
 	
 	if (transTopLeftX >= img->width) {BIG_PHAT_SOURCE_RECT_ERROR;}
 	else if(transTopLeftX < 0) {BIG_PHAT_SOURCE_RECT_ERROR;}
@@ -502,7 +503,7 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	if(transBottomRightY < 0) {BIG_PHAT_SOURCE_RECT_ERROR;}
 	else if(transBottomRightY >= img->height) {BIG_PHAT_SOURCE_RECT_ERROR;}
 
-	if( transWidth <= 0 || transHeight <= 0) return;
+	if(transWidth <= 0 || transHeight <= 0) return;
 
 	if (left >= clipRect.x + clipRect.width) 
 		return;
@@ -529,116 +530,170 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	else if(top + transHeight >= clipRect.y + clipRect.height)
 		transHeight -= (top + transHeight) - (clipRect.y + clipRect.height);
 	
-	if( transWidth <= 0 || transHeight<= 0) return;
+	if(transWidth <= 0 || transHeight<= 0) return;
 
 	unsigned char *dst = &data[left*bytesPerPixel + top*pitch];
 	unsigned char *src = &img->data[transTopLeftX*img->bytesPerPixel + transTopLeftY*img->pitch];
 
+#define DUMP(x) LOG("%s: %i\n", #x, x);
+#define DUMPX(x) LOG("%s: 0x%x\n", #x, x);
+	//DUMP(transformMode);
+	//DUMPX(img->alpha);
+	//DUMP(bpp);
+
 	if(img->alpha) {
 		switch(bpp) {
-				case 2:
-					{
-						srcPitchX>>=1;
-						unsigned char *salpha = &img->alpha[transTopLeftX + transTopLeftY*(img->pitch>>1)];
-						unsigned char *ascan;
-						unsigned short *src_scan;
-						unsigned short *dst_scan;
+		case 2:
+			{
+				srcPitchX>>=1;
+				unsigned char *salpha = &img->alpha[transTopLeftX + transTopLeftY*(img->pitch>>1)];
+				unsigned char *ascan;
+				unsigned short *src_scan;
+				unsigned short *dst_scan;
 
-						while(transHeight--) {
-							src_scan = (unsigned short*)src;
-							dst_scan = (unsigned short*)dst;
-							ascan = salpha;
-							int x = transWidth;
-							while(x--) {
-								int sr = (((*src_scan)&img->redMask)>>img->redShift);
-								int sg = (((*src_scan)&img->greenMask)>>img->greenShift);
-								int sb = (((*src_scan)&img->blueMask)>>img->blueShift);
-								int dr = (((*dst_scan)&redMask)>>redShift);
-								int dg = (((*dst_scan)&greenMask)>>greenShift);
-								int db = (((*dst_scan)&blueMask)>>blueShift);
+				while(transHeight--) {
+					src_scan = (unsigned short*)src;
+					dst_scan = (unsigned short*)dst;
+					ascan = salpha;
+					int x = transWidth;
+					while(x--) {
+						int sr = (((*src_scan)&img->redMask)>>img->redShift);
+						int sg = (((*src_scan)&img->greenMask)>>img->greenShift);
+						int sb = (((*src_scan)&img->blueMask)>>img->blueShift);
+						int dr = (((*dst_scan)&redMask)>>redShift);
+						int dg = (((*dst_scan)&greenMask)>>greenShift);
+						int db = (((*dst_scan)&blueMask)>>blueShift);
 
-								if(*ascan == 255) {
-									*dst_scan = (((sr)<< redShift)&redMask) |
-										(((sg)<< greenShift)&greenMask) |
-										(((sb)<< blueShift)&blueMask);
-								} else if(*ascan == 0) {
-									*dst_scan = (((dr)<< redShift)&redMask) |
-										(((dg)<< greenShift)&greenMask) |
-										(((db)<< blueShift)&blueMask);									
-								} else {
-									*dst_scan = 
-										(((dr + (((sr-dr)*(*ascan))>>8)) << redShift)&redMask) |
-										(((dg + (((sg-dg)*(*ascan))>>8)) << greenShift)&greenMask) |
-										(((db + (((sb-db)*(*ascan))>>8)) << blueShift)&blueMask);
-								}
-/*
-								*dst_scan = 
-									(((mulTable[dr][255-*ascan] + mulTable[sr][*ascan]) << redShift)&redMask) |
-									(((mulTable[dg][255-*ascan] + mulTable[sg][*ascan]) << greenShift)&greenMask) |
-									(((mulTable[db][255-*ascan] + mulTable[sb][*ascan]) << blueShift)&blueMask);
-*/
-								src_scan+=srcPitchX;
-								dst_scan++;
-								ascan+=srcPitchX;
-							}
-							src += srcPitchY;
-							dst += pitch;
-							salpha += srcPitchY>>1;
-						}	
+						if(*ascan == 255) {
+							*dst_scan = (((sr)<< redShift)&redMask) |
+								(((sg)<< greenShift)&greenMask) |
+								(((sb)<< blueShift)&blueMask);
+						} else if(*ascan == 0) {
+							*dst_scan = (((dr)<< redShift)&redMask) |
+								(((dg)<< greenShift)&greenMask) |
+								(((db)<< blueShift)&blueMask);									
+						} else {
+							*dst_scan = 
+								(((dr + (((sr-dr)*(*ascan))>>8)) << redShift)&redMask) |
+								(((dg + (((sg-dg)*(*ascan))>>8)) << greenShift)&greenMask) |
+								(((db + (((sb-db)*(*ascan))>>8)) << blueShift)&blueMask);
+						}
+
+						src_scan+=srcPitchX;
+						dst_scan++;
+						ascan+=srcPitchX;
 					}
-					break;
-				default:
-					BIG_PHAT_ERROR(ERR_UNSUPPORTED_BPP);
+					src += srcPitchY;
+					dst += pitch;
+					salpha += srcPitchY>>1;
+				}	
+			}
+			break;
+		case 4:
+			{
+				srcPitchX>>=2;
+				unsigned char *salpha = &img->alpha[transTopLeftX + transTopLeftY*(img->pitch>>2)];
+				unsigned char *ascan;
+				unsigned int *src_scan;
+				unsigned int *dst_scan;
+				//DUMP(srcPitchX);
+				//DUMP(srcPitchY);
+				//DUMP(transWidth);
+				//DUMP(transHeight);
+				//DUMP(pitch);
+				//DUMP(transTopLeftX);
+				//DUMP(transTopLeftY);
+
+				while(transHeight--) {
+					src_scan = (unsigned int*)src;
+					dst_scan = (unsigned int*)dst;
+					ascan = salpha;
+					int x = transWidth;
+					while(x--) {
+						int sr = (((*src_scan)&img->redMask)>>img->redShift);
+						int sg = (((*src_scan)&img->greenMask)>>img->greenShift);
+						int sb = (((*src_scan)&img->blueMask)>>img->blueShift);
+						int dr = (((*dst_scan)&redMask)>>redShift);
+						int dg = (((*dst_scan)&greenMask)>>greenShift);
+						int db = (((*dst_scan)&blueMask)>>blueShift);
+
+						if(*ascan == 255) {
+							*dst_scan = (((sr)<< redShift)&redMask) |
+								(((sg)<< greenShift)&greenMask) |
+								(((sb)<< blueShift)&blueMask);
+						} else if(*ascan == 0) {
+							*dst_scan = (((dr)<< redShift)&redMask) |
+								(((dg)<< greenShift)&greenMask) |
+								(((db)<< blueShift)&blueMask);									
+						} else {
+							*dst_scan = 
+								(((dr + (((sr-dr)*(*ascan))>>8)) << redShift)&redMask) |
+								(((dg + (((sg-dg)*(*ascan))>>8)) << greenShift)&greenMask) |
+								(((db + (((sb-db)*(*ascan))>>8)) << blueShift)&blueMask);
+						}
+
+						src_scan+=srcPitchX;
+						dst_scan++;
+						ascan+=srcPitchX;
+					}
+					src += srcPitchY;
+					dst += pitch;
+					salpha += srcPitchY>>2;
+				}	
+			}
+			break;
+		default:
+			BIG_PHAT_ERROR(ERR_UNSUPPORTED_BPP);
 		}
 	}
 	else
 	{
 		if(img->alphaMask) {
 			switch(bpp) {
-				case 4:
-				{
-					srcPitchX>>=2;
-					unsigned int *src_scan;
-					unsigned int *dst_scan;
-					
-					while(transHeight--) {
-						src_scan = (unsigned int*)src;
-						dst_scan = (unsigned int*)dst;
-						int x = transWidth;
-						while(x--) {
-							int sr = (((*src_scan)&img->redMask)>>img->redShift);
-							int sg = (((*src_scan)&img->greenMask)>>img->greenShift);
-							int sb = (((*src_scan)&img->blueMask)>>img->blueShift);
-							int sa = (((*src_scan)&img->alphaMask)>>img->alphaShift);
-							
-							int dr = (((*dst_scan)&redMask)>>redShift);
-							int dg = (((*dst_scan)&greenMask)>>greenShift);
-							int db = (((*dst_scan)&blueMask)>>blueShift);
-							
-							if(sa == 255) {
-								*dst_scan = (((sr)<< redShift)&redMask) |
-								(((sg)<< greenShift)&greenMask) |
-								(((sb)<< blueShift)&blueMask);
-							} else if(sa == 0) {
-								*dst_scan = (((dr)<< redShift)&redMask) |
-								(((dg)<< greenShift)&greenMask) |
-								(((db)<< blueShift)&blueMask);									
-							} else {
-								*dst_scan = 
-								(((dr + (((sr-dr)*(sa))>>8)) << redShift)&redMask) |
-								(((dg + (((sg-dg)*(sa))>>8)) << greenShift)&greenMask) |
-								(((db + (((sb-db)*(sa))>>8)) << blueShift)&blueMask);
-							}
-							src_scan+=srcPitchX;
-							dst_scan++;
+			case 4:
+			{
+				srcPitchX>>=2;
+				unsigned int *src_scan;
+				unsigned int *dst_scan;
+				
+				while(transHeight--) {
+					src_scan = (unsigned int*)src;
+					dst_scan = (unsigned int*)dst;
+					int x = transWidth;
+					while(x--) {
+						int sr = (((*src_scan)&img->redMask)>>img->redShift);
+						int sg = (((*src_scan)&img->greenMask)>>img->greenShift);
+						int sb = (((*src_scan)&img->blueMask)>>img->blueShift);
+						int sa = (((*src_scan)&img->alphaMask)>>img->alphaShift);
+						
+						int dr = (((*dst_scan)&redMask)>>redShift);
+						int dg = (((*dst_scan)&greenMask)>>greenShift);
+						int db = (((*dst_scan)&blueMask)>>blueShift);
+						
+						if(sa == 255) {
+							*dst_scan = (((sr)<< redShift)&redMask) |
+							(((sg)<< greenShift)&greenMask) |
+							(((sb)<< blueShift)&blueMask);
+						} else if(sa == 0) {
+							*dst_scan = (((dr)<< redShift)&redMask) |
+							(((dg)<< greenShift)&greenMask) |
+							(((db)<< blueShift)&blueMask);									
+						} else {
+							*dst_scan = 
+							(((dr + (((sr-dr)*(sa))>>8)) << redShift)&redMask) |
+							(((dg + (((sg-dg)*(sa))>>8)) << greenShift)&greenMask) |
+							(((db + (((sb-db)*(sa))>>8)) << blueShift)&blueMask);
 						}
-						src += srcPitchY;
-						dst += pitch;
-					}	
-				}
-					break;
-				default:
-					BIG_PHAT_ERROR(ERR_UNSUPPORTED_BPP);
+						src_scan+=srcPitchX;
+						dst_scan++;
+					}
+					src += srcPitchY;
+					dst += pitch;
+				}	
+			}
+				break;
+			default:
+				BIG_PHAT_ERROR(ERR_UNSUPPORTED_BPP);
 			}			
 		} else {
 			int dstOffsetY = -transWidth*bytesPerPixel + pitch;

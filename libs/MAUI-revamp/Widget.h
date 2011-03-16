@@ -152,9 +152,18 @@ namespace MAUI {
 
 		/**
 		* \brief Function used to remove all children from a widget. 
-		* \note The parent of the children will automatically be removed.
+		* Each child will have its parent set to NULL.
+		* Children are not deleted. Take care to preserve their pointers,
+		* or there will be memory leaks.
 		**/
 		virtual void clear();
+
+		/**
+		* \brief Deletes all children.
+		* Take care to discard all pointers to the children you may have kept elsewhere,
+		* for they are invalidated by this function.
+		*/
+		void deleteChildren();
 
 		/**
 		* \brief Function used to set the parent of a widget. 

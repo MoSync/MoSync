@@ -62,7 +62,7 @@ class Work < TaskBase
 	def invoke
 		#puts "Work.invoke: #{@NAME.inspect}"
 		
-		if(@prerequisites == []) then
+		if(@prerequisites == [] || !@prerequisites) then
 			setup
 			if(@prerequisites == [])
 				error "setup failed"

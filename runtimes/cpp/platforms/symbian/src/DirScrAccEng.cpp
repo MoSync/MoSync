@@ -154,9 +154,9 @@ void CDirScrAccEng::LineDrawClip(long x,long y,long dx,long dy)
 }
 
 void CDirScrAccEng::SetColor(int argb) {
-#ifdef __SERIES60_3X__
+#if defined(__SERIES60_3X__) && !defined(__S60_50__)
 	gCurrentUnconvertedColor = argb & 0xFFFFFF;	//set alpha to 0 (opaque).
-#else	//2nd ed.
+#else	//2nd and 5th ed.
 	gCurrentUnconvertedColor = ((argb & 0xff0000) >> 16) |
 		(argb & 0x00ff00) |
 		((argb & 0x0000ff) << 16);

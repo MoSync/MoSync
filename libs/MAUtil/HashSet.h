@@ -1,4 +1,4 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2011 Mobile Sorcery AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -15,31 +15,37 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file Set.h
-* \brief Thin template sorted Set.
+/** \file HashSet.h
+* \brief Thin template HashSet.
 */
 
-#ifndef _SE_MSAB_MAUTIL_SET_H_
-#define _SE_MSAB_MAUTIL_SET_H_
+#ifndef _SE_MSAB_MAUTIL_HASHSET_H_
+#define _SE_MSAB_MAUTIL_HASHSET_H_
 
-#include "Dictionary.h"
+#include "HashDict.h"
 
 namespace MAUtil {
 
-/** \brief Thin template sorted Set.
-* \see Dictionary
+/** \brief Thin template HashSet.
+* \see HashDict
 */
 template<class Key>
-class Set : public Dictionary<const Key, const Key> {
+class HashSet : public HashDict<const Key, const Key> {
 public:
-	typedef Dictionary<const Key, const Key> D;
 	typedef Key MutableStorage;
+protected:
+	typedef HashDict<const Key, const Key> D;
+public:
+	HashSet(typename D::HashFunction hf = &THashFunction<Key>,
+		typename D::CompareFunction cf = &Compare<Key>,
+		int init_bits = 6)
+		: D(0, hf, cf, init_bits) {}
 
-	Set(int (*cf)(const Key&, const Key&) = &Compare<const Key>) : D::Dictionary(cf, 0) {
+	Pair<typename D::Iterator, bool> insert(const Key& k) {
+		return D::insert(k);
 	}
-	Pair<typename D::Iterator, bool> insert(const Key& key) { return D::insert(key); }
 };
 
 }	//MAUtil
 
-#endif	//_SE_MSAB_MAUTIL_SET_H_
+#endif	//_SE_MSAB_MAUTIL_HASHSET_H_

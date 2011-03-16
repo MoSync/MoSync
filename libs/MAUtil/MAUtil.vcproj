@@ -176,6 +176,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\HashDict.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HashDict_impl.h"
+				>
+			</File>
+			<File
 				RelativePath=".\HashMap.cpp"
 				>
 			</File>
@@ -185,6 +193,10 @@
 			</File>
 			<File
 				RelativePath=".\HashMap_impl.h"
+				>
+			</File>
+			<File
+				RelativePath=".\HashSet.h"
 				>
 			</File>
 			<File
