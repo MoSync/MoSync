@@ -62,4 +62,11 @@
 	return [super getPropertyWithKey:key];
 }
 
+- (void)show {
+	[super show];
+	
+	MoSyncGLView* glView = (MoSyncGLView*) view;
+	[glView viewAppeared];
+}
+
 @end

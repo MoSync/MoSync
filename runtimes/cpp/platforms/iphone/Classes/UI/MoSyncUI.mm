@@ -31,6 +31,23 @@ int currentWidgetIndex = 0;
 UIWindow* mainWindow;
 UIViewController *mainController;
 
+//bool nativeUIEnabled = false;
+static IWidget* sOldScreen = nil;
+
+- (IWidget*)getCurrentlyShownScreen {
+	return sOldScreen;
+}
+
+- (void)showMoSyncCanvas {
+	if(!sOldScreen) return;
+	[[sOldScreen getView] removeFromSuperview];
+	[mainWindow insertSubview:mainController.view atIndex:0];
+	[mainWindow makeKeyAndVisible];
+	[mainController.view setNeedsDisplay];
+	sOldScreen = nil;
+	//nativeUIEnabled = false;
+}
+
 - (IWidget*)getWidget: (int) handle {
 	IWidget *widget = nil;
 	if(handle<0 || handle>=[widgetArray count]) return NULL;
@@ -94,45 +111,49 @@ UIViewController *mainController;
 	return ret;
 }
 
-- (int) destroyWidgetInstance:(NSNumber*)handleNumber {
-	int handle = [handleNumber intValue];
-	[handleNumber release];
-	
-	IWidget* widget = [self getWidget:handle];
-	if(!widget) 
-		return MAW_RES_INVALID_HANDLE;
+- (int) destroyWidgetInstance:(IWidget*)widget {
+	int handle = [widget getWidgetHandle];	
 	[widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
-	[widget remove];	
-	[widget dealloc];	
+	
+	int ret;
+	int removeRet = [widget remove];
+	if(removeRet<0)
+		ret = removeRet;
+	else
+		ret = MAW_RES_OK;
+
+	
+	//[widget dealloc];
+	[widget release];
 	[unusedWidgetHandles addObject:[[NSNumber alloc] initWithInt:handle]];
 
-	return MAW_RES_OK;
+	return ret;
 }
 
 - (void) setPropertyOf: (IWidget*) widget withKey: (NSString*)key toValue: (NSString*)value {	
 	[widget setPropertyWithKey:key toValue:value];
 }
 
-bool nativeUIEnabled = false;
-
-static IWidget* sOldScreen = nil;
-
-
 - (int)show: (IWidget*) widget {
-	if(!nativeUIEnabled) {
-		if(mainController)
-			[mainController.view removeFromSuperview];
-		nativeUIEnabled = true;
-	}
+//	if(!nativeUIEnabled) {
+//		if(mainController)
+//			[mainController.view removeFromSuperview];
+//		nativeUIEnabled = true;
+	//}
 	
 	if(sOldScreen != nil) {
 		UIView* actualView = [sOldScreen getView];
 		[actualView removeFromSuperview];
+	} else {
+		if(mainController)
+			[mainController.view removeFromSuperview];
+		//nativeUIEnabled = true;
 	}
 	
 	[mainWindow insertSubview:[widget getView] atIndex:0];
 	
 	[widget layout];
+	[widget show];
 	[mainWindow makeKeyAndVisible];
 	sOldScreen = widget;
 	

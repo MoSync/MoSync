@@ -3099,6 +3099,18 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetEvents
 
 	/**
+	* The available constants for the widget api.
+	*/
+	group WidgetConstants "Widget constants" {
+	constset int MAW_CONSTANT_ {
+		/**
+		* @brief A handle to the MoSync canvas screen. Use maWidgetScreenShow with this handle to show the initial mosync canvas.
+		*/
+		MOSYNC_SCREEN_HANDLE = 10000;
+	}
+	}
+
+	/**
 	* The available result codes for the widget api.
 	*/
 	group WidgetResultCodes "Widget result codes" {

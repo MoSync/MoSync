@@ -91,11 +91,11 @@
 	return self;
 }
 
-- (UIView*) getView {
+- (UIView*)getView {
 	return view;
 }
 
-- (void) setWidgetHandle:(int) toHandle {
+- (void)setWidgetHandle:(int) toHandle {
 	handle = toHandle;
 	view.tag = handle;
 }
@@ -104,11 +104,15 @@
 	return handle;
 }
 
-- (void) setParent:(IWidget*) toParent {
+- (void)setParent:(IWidget*) toParent {
 	parent = toParent;
 }
 
-- (void) addChild: (IWidget*)child andSubview:(bool)addSubview {
+- (IWidget*)getParent {
+	return parent;
+}
+
+- (void)addChild: (IWidget*)child andSubview:(bool)addSubview {
 	UIView* childView = [child getView]; 
 	[child setParent:self];
 	[children addObject:child];
@@ -118,15 +122,15 @@
 	[view setNeedsLayout];
 }
 
-- (void) addChild: (IWidget*)child {
+- (void)addChild: (IWidget*)child {
 	[self addChild:child andSubview:YES];	
 }
 
-- (void) removeChild: (IWidget*)child {
+- (void)removeChild: (IWidget*)child {
 	[self removeChild:child fromSuperview:YES];
 }
 
-- (void) removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview {
+- (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview {
 	[children removeObjectIdenticalTo:child];
 	[child setParent:nil];
 	if(removeFromSuperview)
@@ -134,12 +138,12 @@
 }
 
 - (int)remove {
-	if(!parent) return MAW_RES_REMOVED_ROOT;
+	//if(!parent) return MAW_RES_REMOVED_ROOT;
 	[parent removeChild: self];
 	return MAW_RES_OK;
 }
 
-- (int) setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
+- (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
 	if([key isEqualToString:@"left"]) {
 		[view setFrame:CGRectMake([value floatValue], view.frame.origin.y, view.frame.size.width, view.frame.size.height)];
 	} else 
@@ -198,7 +202,7 @@
 	return MAW_RES_OK;
 }
 
-- (NSString*) getPropertyWithKey: (NSString*)key {
+- (NSString*)getPropertyWithKey: (NSString*)key {
 	
 	if([key isEqualToString:@"width"]) {		
 		return [[NSNumber numberWithInt: view.frame.size.width ] stringValue];
@@ -253,6 +257,13 @@
 		[child layout];
 	}
  */
+}
+
+- (void)show {
+	for (IWidget *child in children)
+    {
+		[child show];
+	}	
 }
 
 @end

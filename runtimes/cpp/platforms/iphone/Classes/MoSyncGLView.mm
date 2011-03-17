@@ -245,6 +245,10 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
     [super dealloc];
 }
 
+- (void)viewAppeared {
+	[touchHelper clearTouches];
+}
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 	for (UITouch *touch in touches) 
 	{
@@ -277,7 +281,6 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 			[touchHelper removeTouch: touch];
 		}
 	}	
-	
 }
 
 @end

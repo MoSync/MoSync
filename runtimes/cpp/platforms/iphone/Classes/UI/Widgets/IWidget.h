@@ -75,6 +75,7 @@ return [super sizeThatFits:size];\
 - (CGSize)sizeThatFitsFor:(UIView*)view withSize:(CGSize)size;
 
 - (void)setParent:(IWidget*) parent;
+- (IWidget*)getParent;
 - (void)setWidgetHandle:(int) handle;
 - (int)getWidgetHandle;
 - (void)dealloc;
@@ -91,5 +92,8 @@ return [super sizeThatFits:size];\
 - (NSString*)getPropertyWithKey: (NSString*)key;
 
 - (void)layout;
+
+// when a root screen is shown, this will be called recursively for all widgets.
+- (void)show;
 
 @end

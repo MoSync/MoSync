@@ -29,6 +29,8 @@
 
 }
 
+- (void)showMoSyncCanvas;
+
 // Parameters are the main MoSync window and UIViewController.
 - (id)initWithWindow: (UIWindow*) window andController: (UIViewController*)controller;
 
@@ -41,8 +43,10 @@
 // get a pointer to a widget instance by passing a handle.
 - (IWidget*)getWidget: (int) handle;
 
+- (IWidget*)getCurrentlyShownScreen;
+
 // destroy a widget instance by passing a pointer to it.
-- (int) destroyWidgetInstance:(NSNumber*)handleNumber;
+- (int) destroyWidgetInstance:(IWidget*)widget;
 
 // shows a screen.
 - (int)show: (IWidget*) handle;

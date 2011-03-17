@@ -46,4 +46,8 @@
 	}	
 }
 
+- (void) clearTouches {
+	[touchArray removeAllObjects];
+}
+
 @end
