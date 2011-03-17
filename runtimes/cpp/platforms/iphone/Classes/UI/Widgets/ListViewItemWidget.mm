@@ -71,9 +71,12 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 	}
 	else if([key isEqualToString:@"backgroundColor"]) {
 		UITableViewCell *cell = (UITableViewCell*)view;
-		cell.contentView.backgroundColor = [UIColor colorWithHexString:value];
-		cell.textLabel.backgroundColor = [UIColor colorWithHexString:value];
-		cell.accessoryView.backgroundColor = [UIColor colorWithHexString:value];		
+		UIColor* color = [UIColor colorWithHexString:value];
+		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+		
+		cell.contentView.backgroundColor = color;
+		cell.textLabel.backgroundColor = color;
+		cell.accessoryView.backgroundColor = color;		
 	} 
     else if([key isEqualToString:@"accessoryType"]) {
 		UITableViewCell *cell = (UITableViewCell*)view;

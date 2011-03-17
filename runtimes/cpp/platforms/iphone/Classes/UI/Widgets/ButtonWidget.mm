@@ -65,7 +65,7 @@
 	} else			
 	if([key isEqualToString:@"backgroundImage"]) {
 		int imageHandle = [value intValue];
-		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;
+		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		UIButton* button = (UIButton*) view;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		UIImage* image = [UIImage imageWithCGImage:imageResource->image];
@@ -77,8 +77,12 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	
-	return [super getPropertyWithKey:key];
+	if([key isEqualToString:@"text"]) {
+		UIButton* button = (UIButton*) view;
+		return button.titleLabel.text;
+	} else {
+		return [super getPropertyWithKey:key];
+	}
 }
 
 @end

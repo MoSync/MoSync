@@ -70,7 +70,7 @@
 			textField.autocorrectionType = UITextAutocorrectionTypeNo;
 		}
 	}	
-	else if([key isEqualToString:@"horizontalAlignment"]) {
+	else if([key isEqualToString:@"textHorizontalAlignment"]) {
 		if([value isEqualToString:@"left"]) {
 			textField.textAlignment = UITextAlignmentLeft;
 		}
@@ -81,15 +81,17 @@
 			textField.textAlignment = UITextAlignmentRight;
 		}		
 	}
-	else if([key isEqualToString:@"verticalAlignment"]) {
+	else if([key isEqualToString:@"textVerticalAlignment"]) {
 		// This isn't trivial on iphone.
 		
 		//UILabel* label = (UILabel*) view;
 		//if([value isEqualToString:@"center"]) {
 		//}
 	}	
-	else if([key isEqualToString:@"fontColor"]) {	
-		textField.textColor = [UIColor colorWithHexString:value];
+	else if([key isEqualToString:@"fontColor"]) {
+		UIColor* color = [UIColor colorWithHexString:value];
+		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+		textField.textColor = color;
 	}	
 	else if([key isEqualToString:@"fontSize"]) {
 		float fontSize = [value floatValue];

@@ -137,8 +137,10 @@ typedef enum VerticalAlignment {
 		}		
 	}	
 	else if([key isEqualToString:@"fontColor"]) {
-		UILabel* label = (UILabel*) view;	
-		label.textColor = [UIColor colorWithHexString:value];
+		UILabel* label = (UILabel*) view;
+		UIColor* color = [UIColor colorWithHexString:value];
+		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+		label.textColor = color;
 	}	
 	else if([key isEqualToString:@"fontSize"]) {
 		UILabel* label = (UILabel*) view;	
@@ -152,8 +154,12 @@ typedef enum VerticalAlignment {
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	
-	return [super getPropertyWithKey:key];
+	if([key isEqualToString:@"text"]) {
+		UILabel* label = (UILabel*) view;		
+		return label.text;
+	} else {	
+		return [super getPropertyWithKey:key];
+	}
 }
 
 @end

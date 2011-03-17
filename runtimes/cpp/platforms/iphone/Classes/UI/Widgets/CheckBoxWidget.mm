@@ -59,8 +59,12 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	
-	return [super getPropertyWithKey:key];
+	if([key isEqualToString:@"checked"]) {
+		UISwitch* checkBox = (UISwitch*) view;
+		return checkBox.on?@"true":@"false";
+	} else {	
+		return [super getPropertyWithKey:key];
+	}
 }
 
 @end

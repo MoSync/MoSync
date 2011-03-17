@@ -386,17 +386,15 @@ static NSMutableDictionary *colorNameCache = nil;
 	// added by me: Niklas Nummelin
 	NSString *cString = [[stringToConvert stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]] uppercaseString];  
     // String should be 6 or 8 characters  
-    if ([cString length] < 6) return [UIColor purpleColor];  
+    if ([cString length] < 6) return NULL; //[UIColor purpleColor];  
     // strip 0X if it appears  
     if ([cString hasPrefix:@"0X"]) cString = [cString substringFromIndex:2];  
     if ([cString hasPrefix:@"#"]) cString = [cString substringFromIndex:1];  
     //if ([cString length] > 6) cString = [cString substringFromIndex:([cString length]-6)];  
-	
-	NSLog(@"colorWithHexString: %@\n", cString);
-	
+
 	NSScanner *scanner = [NSScanner scannerWithString:cString];	
 	unsigned hexNum;
-	if (![scanner scanHexInt:&hexNum]) return [UIColor purpleColor];
+	if (![scanner scanHexInt:&hexNum]) return NULL;// [UIColor purpleColor];
 	
 	if([cString length] > 6)
 		return [UIColor colorWithARGBHex:hexNum];

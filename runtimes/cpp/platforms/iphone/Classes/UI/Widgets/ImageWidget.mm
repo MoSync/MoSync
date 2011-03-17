@@ -40,7 +40,7 @@
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"image"]) {
 		int imageHandle = [value intValue];
-		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;
+		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		UIImage* image = [UIImage imageWithCGImage:imageResource->image];
 		if(leftCapWidth != 0 || topCapHeight != 0) {

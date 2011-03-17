@@ -42,6 +42,7 @@
 	
 	//[super addChild:child];
 	[super addChild:child andSubview:NO];
+	[navigationController popToRootViewControllerAnimated:YES];
 }
 
 - (void)removeChild: (IWidget*)child {	

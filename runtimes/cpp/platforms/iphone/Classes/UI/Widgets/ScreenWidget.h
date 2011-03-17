@@ -29,4 +29,7 @@
 - (NSString*)getPropertyWithKey: (NSString*)key;
 - (UIViewController*) getController;
 
+// if you have a navscreen inside a tabscreen for instance this will recurse to the root, showing everything that needs to be shown.
+- (void) showMe:(ScreenWidget*)screen;
+
 @end

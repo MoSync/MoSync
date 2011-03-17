@@ -33,6 +33,7 @@ UIViewController *mainController;
 
 - (IWidget*)getWidget: (int) handle {
 	IWidget *widget = nil;
+	if(handle<0 || handle>=[widgetArray count]) return NULL;
 	widget = [widgetArray objectAtIndex:(NSUInteger)handle];
 	return widget;
 }
@@ -100,9 +101,9 @@ UIViewController *mainController;
 	IWidget* widget = [self getWidget:handle];
 	if(!widget) 
 		return MAW_RES_INVALID_HANDLE;
-	[widget remove];	
-	[widget dealloc];
 	[widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
+	[widget remove];	
+	[widget dealloc];	
 	[unusedWidgetHandles addObject:[[NSNumber alloc] initWithInt:handle]];
 
 	return MAW_RES_OK;

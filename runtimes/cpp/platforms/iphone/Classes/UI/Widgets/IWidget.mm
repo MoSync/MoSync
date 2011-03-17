@@ -84,7 +84,7 @@
 		[view setUserInteractionEnabled:YES];
 		view.contentMode = UIViewContentModeRedraw;
 		view.autoresizesSubviews = NO;
-		view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
+		//view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
 		//[self addSubview:view];
 	}
 	
@@ -177,9 +177,13 @@
 		[self layout];		
 	} else 
 	if([key isEqualToString:@"backgroundColor"]) {
-		view.backgroundColor = [UIColor colorWithHexString:value];
+		UIColor* color = [UIColor colorWithHexString:value];
+		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+		view.backgroundColor = color;
 	} else
 	if([key isEqualToString:@"alpha"]) {
+		float alpha = [value floatValue];
+		if(alpha<0.0 || alpha>1.0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		view.alpha = [value floatValue];
 	} else
 	if([key isEqualToString:@"opaque"]){

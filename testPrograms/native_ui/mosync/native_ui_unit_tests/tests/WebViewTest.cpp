@@ -14,7 +14,6 @@
 static widget_property_test_t g_property_tests[] =
 {
 	{ MAW_WEB_VIEW_URL, "http://www.google.se/", "Testing url property.", MAW_RES_OK },
-	{ MAW_WEB_VIEW_NEW_URL, "http://www.google.se/", "Testing newurl property.", MAW_RES_OK },
 	{ NULL, NULL, NULL }
 };
 
