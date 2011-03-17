@@ -26,6 +26,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define NULL 0
 #endif
 
+#ifndef OFFSETOF
+#define OFFSETOF(struct, member) ((int)(((char*)&(((struct*)1)->member)) - 1))
+#endif
+
 /**
 * \brief MoSync utility libraries
 */
@@ -57,6 +61,12 @@ template<class T> int Compare(const T& a, const T& b) {
 template<class F, class S> struct Pair {
 	F first;
 	S second;
+
+	Pair() {}
+	Pair(const F& f, const S& s) : first(f), second(s) {}
+
+	template<class OF, class OS>
+	Pair(const Pair<OF, OS>& o) : first(o.first), second(o.second) {}
 };
 
 }	//namespace MAUtil

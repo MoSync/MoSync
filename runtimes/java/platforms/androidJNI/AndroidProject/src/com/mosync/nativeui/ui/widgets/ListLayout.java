@@ -13,6 +13,7 @@ import android.widget.ListView;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.LayoutParamsSetter;
 import com.mosync.nativeui.util.properties.BooleanConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
@@ -74,7 +75,7 @@ public class ListLayout extends Layout
 	
 	@Override
 	public boolean setProperty(String property, String value)
-			throws PropertyConversionException
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty( property, value ) )
 		{

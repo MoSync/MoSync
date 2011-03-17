@@ -6,6 +6,7 @@ import android.widget.ImageView;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
@@ -28,7 +29,7 @@ public class ImageWidget extends Widget
 
 	@Override
 	public boolean setProperty(String property, String value)
-			throws PropertyConversionException
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty(property, value) )
 		{

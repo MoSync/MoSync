@@ -3,6 +3,7 @@ package com.mosync.nativeui.ui.widgets;
 import android.webkit.WebView;
 
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
@@ -33,9 +34,9 @@ public class WebWidget extends Widget
 	 */
 	@Override
 	public boolean setProperty(String property, String value)
-			throws PropertyConversionException
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
-		if( super.setProperty(property, value) )
+		if( super.setProperty( property, value ) )
 		{
 			return true;
 		}
@@ -44,7 +45,9 @@ public class WebWidget extends Widget
 		if( property.equals( IX_WIDGET.MAW_WEB_VIEW_URL ) )
 		{
 			webView.loadUrl( value );
-		} else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_NEW_URL )) {
+		}
+		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_NEW_URL ) )
+		{
 			m_newUrl = value;
 		}
 		

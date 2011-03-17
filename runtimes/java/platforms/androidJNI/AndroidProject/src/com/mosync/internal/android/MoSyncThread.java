@@ -24,6 +24,12 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_ACCESS_READ;
+import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_FORBIDDEN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_GENERIC;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_CUR;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_END;
+import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_SET;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -57,6 +63,7 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
@@ -85,6 +92,7 @@ import android.net.Uri;
 import android.opengl.GLUtils;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.StatFs;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.telephony.TelephonyManager;
@@ -92,6 +100,8 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
+import com.mosync.internal.android.MoSyncFile.MoSyncFileHandle;
+import com.mosync.internal.android.MoSyncFile.MoSyncFileListing;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
@@ -137,6 +147,7 @@ public class MoSyncThread extends Thread
 	MoSyncLocation mMoSyncLocation;
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
+	MoSyncFile mMoSyncFile;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -146,9 +157,27 @@ public class MoSyncThread extends Thread
 	 */
 	private static final int CHUNK_READ_SIZE = 1024; 
 
+	/**
+	 * This is the MoSync Activity.
+	 */
 	private MoSync mContext;
+	
+	/**
+	 * The standard MoSync view.
+	 */
 	private MoSyncView mMoSyncView;
+	
+	/**
+	 * true if the MoSync program is considered to be dead,
+	 * used for maPanic.
+	 */
 	private boolean mHasDied;
+	
+	/**
+	 * Boolean used to determine whether to interrupt the trehad or not,
+	 * true if this thread is sleeping in maWait.
+	 */
+	private AtomicBoolean mIsSleepingInMaWait = new AtomicBoolean(false);
 	
 	/**
 	 * This is the size of the header of the asset file
@@ -223,8 +252,6 @@ public class MoSyncThread extends Thread
 	private Rect mMaDrawImageRegionTempSourceRect = new Rect();
 	private Rect mMaDrawImageRegionTempDestRect = new Rect();
 
-	ByteBuffer mTempImageRawBuffer;
-	
 	int mMaxStoreId = 0;
 
 	public boolean mIsUpdatingScreen = false;
@@ -254,6 +281,7 @@ public class MoSyncThread extends Thread
 		mMoSyncLocation = new MoSyncLocation(this);
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
+		mMoSyncFile = new MoSyncFile(this);
 		
 		// Bluetooth is not available on all platforms and
 		// therefore we do a conditional loading of the
@@ -327,7 +355,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * Update the size of the drawing surface.
 	 */
-	public void updateSurfaceSize(int width, int height)
+	public synchronized void updateSurfaceSize(int width, int height)
 	{
 		SYSLOG("updateSurfaceSize");		
 		
@@ -355,26 +383,26 @@ public class MoSyncThread extends Thread
 	/**
 	 * Allocate memory for the program data section.
 	 */
-	public ByteBuffer generateDataSection(int size)
+	 public boolean generateDataSection(ByteBuffer byteBuffer)
 	{
 		try
 		{
-			mMemDataSection = ByteBuffer.allocateDirect(size);
+			mMemDataSection = byteBuffer;
 			mMemDataSection.order(null);
 		}
 		catch (Exception e)
 		{
 			logError("MoSyncThread - Out of Memory!", e);
 			mMemDataSection = null;
-			return null;
+			return false;
 		}
 		catch (Error e)
 		{
 			logError("MoSyncThread - Out of Memory!", e);
 			mMemDataSection = null;
-			return null;
+			return false;
 		}
-		return mMemDataSection;
+		return true;
 	}
 	
 	/**
@@ -565,13 +593,23 @@ public class MoSyncThread extends Thread
 	/**
 	 * Post a event to the MoSync event queue.
 	 */
-	public void postEvent(int[] event)
+	public synchronized void postEvent(int[] event)
 	{
 		// Add event to queue.
 		nativePostEvent(event);
 		
-		// Wake up this thread to make it process events.
-		interrupt(); 
+		// Only interrupt if we are sleeping in maWait.
+		if (mIsSleepingInMaWait.get())
+		{
+			// Wake up this thread to make it process events.
+			interrupt(); 
+		}
+		else
+		{
+			Log.i(
+				"@@@ MoSyncThread.postEvent", 
+				"Did not call interrupt, not in maWait (this is good!)");
+		}
 	}
 
 	/**
@@ -653,7 +691,7 @@ public class MoSyncThread extends Thread
 		}
 	}
 	
-	boolean initSyscalls()
+	void initSyscalls()
 	{
 		SYSLOG("initSyscalls");
 		mUsingFrameBuffer = false;
@@ -663,6 +701,9 @@ public class MoSyncThread extends Thread
 		mClipWidth = mWidth;
 		mClipHeight = mHeight;
 
+		// Reset cliprect
+		mCanvas.clipRect(mClipLeft, mClipTop, mClipWidth, mClipHeight, Region.Op.REPLACE);
+		
 		mPaint.setStyle(Paint.Style.FILL);
 		mPaint.setAntiAlias(false);
 		mPaint.setColor(0xffffffff);
@@ -678,8 +719,7 @@ public class MoSyncThread extends Thread
 			"abcdefghijklmnopqrstuvwxyz" +
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
 		mTextConsoleHeight = EXTENT_Y(extent);
-		 
-		 return true;
+
 	}
 
 	/**
@@ -923,7 +963,7 @@ public class MoSyncThread extends Thread
 	 * so that we won't get touch events while drawing. This to
 	 * not hog the system with events.
 	 */
-	void maUpdateScreen()
+	synchronized void maUpdateScreen()
 	{
 		//SYSLOG("maUpdateScreen");
 		Canvas lockedCanvas = null;
@@ -1010,7 +1050,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * _maDrawRGB
 	 */
-	void _maDrawRGB(
+	synchronized void _maDrawRGB(
 		int dstX, 
 		int dstY, 
 		int mem, 
@@ -1059,7 +1099,7 @@ public class MoSyncThread extends Thread
 	 * @param dstTop Top coord of destination point.
 	 * @param transformMode A TRANS_* constant.
 	 */
-	void _maDrawImageRegion(
+	synchronized void _maDrawImageRegion(
 		final int image, 
 		final int srcRectLeft, 
 		final int srcRectTop, 
@@ -1262,16 +1302,15 @@ public class MoSyncThread extends Thread
 
 		Canvas temporaryCanvas = new Canvas(temporaryBitmap);
 		
-		temporaryCanvas.drawBitmap(
-			imageResource.mBitmap,
-			new Matrix(),
-			new Paint());
+		temporaryCanvas.drawBitmap(imageResource.mBitmap, -srcLeft, -srcTop, new Paint());
 			
 		temporaryCanvas.drawColor(0xff000000, Mode.DST_ATOP);
 		
 		mMemDataSection.position(dst);
 
 		IntBuffer intBuffer = mMemDataSection.asIntBuffer();
+		
+		try {
 		
 		for (int y = 0; y < srcHeight; y++)
 		{
@@ -1290,8 +1329,8 @@ public class MoSyncThread extends Thread
 				colors,
 				0,
 				srcWidth,
-				srcLeft,
-				srcTop+y,
+				0,
+				y,
 				srcWidth,
 				1);
 			
@@ -1302,13 +1341,19 @@ public class MoSyncThread extends Thread
 			
 			intBuffer.put(pixels);	
 		}
+		} catch(Exception e) {
+			e.printStackTrace();
+			Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
+				imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
+			maPanic(-1, "maGetImageData");
+		}
 	}
 
 	/**
 	 * Set the target image for drawing.
 	 * @param image The target image, 0 means the screen.
 	 */
-	int maSetDrawTarget(int image)
+	synchronized int maSetDrawTarget(int image)
 	{
 		SYSLOG("maSetDrawTarget");
 		if (0 == image)
@@ -1481,40 +1526,29 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * This function generates a ByteBuffer which then is sent to 
-	 * the JNI library for processing.
-	 */
-	ByteBuffer _maCreateImageRawGetData(int size)
-	{
-		mTempImageRawBuffer = ByteBuffer.allocateDirect(size);
-		mTempImageRawBuffer.order(null);
-		
-		return mTempImageRawBuffer;
-	}
-
-	/**
-	 * Takes the preprocessed raw image data and copies the 
+	 * Takes the pre-processed raw image data and copies the 
 	 * contents to a bitmap.
 	 */
-	int _maCreateImageRaw(int placeholder, int width, int height)
+	int _maCreateImageRaw(int placeholder, int width, int height, ByteBuffer buffer)
 	{
 		SYSLOG("maCreateImageRaw");
 		
 		Bitmap bitmap = Bitmap.createBitmap(
 			width, height, Bitmap.Config.ARGB_8888);
+		
 		if(null == bitmap)
 		{
 			maPanic(1, "Unable to create ");
 		}
 		
-		mTempImageRawBuffer.position(0);
-		bitmap.copyPixelsFromBuffer(mTempImageRawBuffer);
+		buffer.position(0);
+		bitmap.copyPixelsFromBuffer(buffer);
 		
 		mImageResources.put(placeholder, new ImageCache(null, bitmap));
-			
+		
 		return RES_OK;
 	}
-
+	
 	/**
 	 * maCreateDrawableImage
 	 */
@@ -1763,6 +1797,8 @@ public class MoSyncThread extends Thread
 
 		try
 		{
+			mIsSleepingInMaWait.set(true);
+			
 	 		if (timeout<=0)
 			{
 				Thread.sleep(Long.MAX_VALUE);
@@ -1776,10 +1812,13 @@ public class MoSyncThread extends Thread
 		{
 			SYSLOG("Sleeping thread interrupted!");
 		} 
+		// TODO: This exception is never thrown! Remove it.
 		catch (Exception e) 
 		{
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
+		
+		mIsSleepingInMaWait.set(false);
 		
 		SYSLOG("maWait returned");
 	}
@@ -2426,7 +2465,7 @@ public class MoSyncThread extends Thread
 	}
 	
 	int maHttpGetResponseHeader(
-		int connHandle, String key, long address, int bufSize)
+		int connHandle, String key, int address, int bufSize)
 	{
 		return mMoSyncNetwork.maHttpGetResponseHeader(
 			connHandle, key, address, bufSize);
@@ -2866,6 +2905,109 @@ public class MoSyncThread extends Thread
 		
 		return powerOf2;
 	}
+	
+	int maFileOpen(String path, int mode)
+	{
+		return mMoSyncFile.maFileOpen(path, mode);
+	}
+
+	int maFileExists(int file)
+	{
+		return mMoSyncFile.maFileExists(file);
+	}
+
+	int maFileClose(int file)
+	{
+		return mMoSyncFile.maFileClose(file);
+	}
+
+	int maFileCreate(int file)
+	{
+		return mMoSyncFile.maFileCreate(file);
+	}
+
+	int maFileDelete(int file)
+	{
+		return mMoSyncFile.maFileDelete(file);
+	}
+
+	int maFileSize(int file)
+	{
+		return mMoSyncFile.maFileSize(file);
+	}
+
+	int maFileAvailableSpace(int file)
+	{
+		return mMoSyncFile.maFileAvailableSpace(file);
+	}
+
+	int maFileTotalSpace(int file)
+	{
+		return mMoSyncFile.maFileTotalSpace(file);
+	}
+
+	int maFileDate(int file)
+	{
+		return mMoSyncFile.maFileDate(file);
+	}
+
+	int maFileRename(int file, int newName)
+	{
+		return mMoSyncFile.maFileRename(file, newName);
+	}
+
+	int maFileTruncate(int file, int offset)
+	{
+		return mMoSyncFile.maFileTruncate(file, offset);
+	}
+	
+	int maFileWrite(int file, int src, int len)
+	{
+		return mMoSyncFile.maFileWrite(file, src, len);
+	}
+	
+	int maFileWriteFromData(int file, int data, int offset, int len)
+	{
+		return mMoSyncFile.maFileWriteFromData(file, data, offset, len);
+	}
+	
+	int maFileRead(int file, int dst, int len)
+	{
+		return mMoSyncFile.maFileRead(file, dst, len);
+	}
+	
+	int maFileReadToData(int file, int data, int offset, int len)
+	{
+		return mMoSyncFile.maFileReadToData(file, data, offset, len);
+	}
+
+	int maFileTell(int file)
+	{
+		return mMoSyncFile.maFileTell(file);
+	}
+
+	int maFileSeek(int file, int offset, int whence)
+	{
+		return mMoSyncFile.maFileSeek(file, offset, whence);
+	}
+	
+	int maFileListStart(String path, String filter)
+	{
+		return mMoSyncFile.maFileListStart(path, filter);
+	}
+
+	int maFileListNext(int list, int nameBuf, int bufSize)
+	{
+		return mMoSyncFile.maFileListNext(list, nameBuf, bufSize);
+	}
+
+	int maFileListClose(int list)
+	{
+		return mMoSyncFile.maFileListClose(list);
+	}
+	
+	
+	
 	
 	/**
 	 * Class that holds image data.

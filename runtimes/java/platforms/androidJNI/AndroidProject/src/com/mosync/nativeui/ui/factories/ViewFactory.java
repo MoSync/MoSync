@@ -3,13 +3,11 @@ package com.mosync.nativeui.ui.factories;
 import java.util.HashMap;
 
 import android.app.Activity;
-import android.webkit.WebView;
 import android.widget.ImageView;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.FrameLayout;
 import com.mosync.nativeui.ui.widgets.ImageWidget;
-import com.mosync.nativeui.ui.widgets.WebWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 
 /**

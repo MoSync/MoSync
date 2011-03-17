@@ -1175,7 +1175,7 @@ SYSCALL(int, maGetMilliSecondCount()) {
 	int res = I64LOW((TInt64)((dt * 1000) / df));
 #else
 	DEBUG_ASSERT(gMicroSecondsPerTick > 1000);
-	int res = (int)((((double)User::TickCount()) * gMicroSecondsPerTick) / 1000);
+	int res = I64LOW((((TInt64)User::TickCount()) * gMicroSecondsPerTick) / 1000);
 #endif
 	return res;
 }

@@ -7,6 +7,7 @@ import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
 
@@ -34,7 +35,7 @@ public class LabelWidget extends Widget
 	 * @see Widget.setProperty.
 	 */
 	@Override
-	public boolean setProperty(String property, String value) throws PropertyConversionException
+	public boolean setProperty(String property, String value) throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty(property, value) )
 		{
@@ -85,11 +86,11 @@ public class LabelWidget extends Widget
 		TextView textView = (TextView) getView( );
 		if( property.equals( IX_WIDGET.MAW_LABEL_TEXT ) )
 		{
-			if( textView.getText( ).length( ) > 0 )
+			if( textView.getText( ) != null && textView.getText( ).length( ) > 0 )
 			{
 				return textView.getText( ).toString( );
 			}
-			else if( textView.getHint( ).length( ) > 0 )
+			else if( textView.getHint( ) != null && textView.getText( ).length( ) > 0 )
 			{
 				return textView.getHint( ).toString( );
 			}

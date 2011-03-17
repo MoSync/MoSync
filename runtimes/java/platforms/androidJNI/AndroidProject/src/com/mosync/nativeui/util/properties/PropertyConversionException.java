@@ -5,7 +5,7 @@ package com.mosync.nativeui.util.properties;
  * 
  * @author fmattias
  */
-public class PropertyConversionException extends Exception
+public class PropertyConversionException extends RuntimeException
 {
 	private static final long serialVersionUID = 7497514582595613978L;
 	

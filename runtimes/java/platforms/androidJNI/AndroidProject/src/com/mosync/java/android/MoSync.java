@@ -311,6 +311,9 @@ public class MoSync extends Activity
 	{
 		SYSLOG("onKeyDown: " + keyEvent.toString());
 
+		// If the key is being held down we shouldn't send any more events.
+		if(keyEvent.getRepeatCount() != 0) return true;
+		
 		int[] event = new int[3];
 		
 		event[0] = EVENT_TYPE_KEY_PRESSED;
@@ -360,9 +363,9 @@ public class MoSync extends Activity
 	 * onTouchEvent
 	 * Receives touch events from the screen.
 	 * 
-	 * This implementation is build so that it won't receive dragged touch 
-	 * events while the screen is updating. This is because the events are
-	 * fired more often than some devices can digest the events, leading to
+	 * This implementation discards touch move (dragged) events while the 
+	 * screen is updating. This is because move events are fired more 
+	 * frequently than some devices can digest the events, leading to
 	 * problems when the queue just grows. Discarded events are still 
 	 * marked as digested for the Android OS since we don't want any other 
 	 * view to digest them either.
@@ -371,15 +374,15 @@ public class MoSync extends Activity
 	 * 
 	 * @param motionEvent	The Motion event received from the Android OS
 	 * 
-	 * @return 				True if the event was digested
-	 * 						False if it wasn't
+	 * @return 				true if the event was digested
+	 * 						false if it wasn't
 	 */
 	public boolean onTouchEvent(MotionEvent motionEvent)
 	{
 		SYSLOG("onTouchEvent");
 		
-		// The first time around, see if this is multi or single touch device
-		if(!mHasDeterminedTouchCapabilities)
+		// The first time around, see if this is multi or single touch device.
+		if (!mHasDeterminedTouchCapabilities)
 		{
 			mHasDeterminedTouchCapabilities = true;
 			try
@@ -420,14 +423,18 @@ public class MoSync extends Activity
 		
 			case MotionEvent.ACTION_MOVE:
 				eventType = EVENT_TYPE_POINTER_DRAGGED;
-				// While drawing, discard this event
-				if(mMoSyncThread.mIsUpdatingScreen) return true;
+				// While drawing, discard this event.
+				if (mMoSyncThread.mIsUpdatingScreen) 
+				{
+					return true;
+				}
 				break;
 			default:
+				// Return false to indicate that we have not handled the event.
 				return false;
 		}
 		
-		if(index != -1)
+		if (index != -1)
 		{
 			mTouchHandler.loadEvent(motionEvent);
 			int[] eventData = mTouchHandler.parseEvent(index);
@@ -437,14 +444,20 @@ public class MoSync extends Activity
 		{
 			// Get all of the events and send them to the runtime
 			int numEvents = mTouchHandler.loadEvent(motionEvent);
-			for( int i = 0; i < numEvents; i++)
+			for (int i = 0; i < numEvents; i++)
 			{
 				int[] eventData = mTouchHandler.parseEvent(i);
 				sendPointerEvent(eventType, eventData);
 			}
 		}
 		
-		return super.onTouchEvent(motionEvent);
+		// TODO: The superclass returns false, not what we want. 
+		// Confirm that the code change below is correct,
+		// then delete commented out code.
+		//return super.onTouchEvent(motionEvent);
+		
+		// Return true to indicate that we have handled the event.
+		return true;
 	}
 	
 	/**

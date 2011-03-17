@@ -1290,6 +1290,11 @@ interface MAAPI {
 		
 		/**
 		* \brief An event sent from a native widget.
+		* \par The application can use the MAEvent.data field to access
+		* widget event data, which is of type MAWidgetEventData. 
+		* For example: \n
+		* \code MAWidgetEventData* widgetEventData = (MAWidgetEventData*) event.data; \endcode 
+		* \see MAWidgetEventData
 		*/
 		WIDGET = 28;
 		

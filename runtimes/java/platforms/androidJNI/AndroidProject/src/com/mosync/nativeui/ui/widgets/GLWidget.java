@@ -2,6 +2,7 @@ package com.mosync.nativeui.ui.widgets;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.egl.EGLView;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
@@ -29,7 +30,7 @@ public class GLWidget extends FrameLayout
 	}
 	
 	@Override
-	public boolean setProperty(String property, String value) throws PropertyConversionException
+	public boolean setProperty(String property, String value) throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty(property, value) )
 		{

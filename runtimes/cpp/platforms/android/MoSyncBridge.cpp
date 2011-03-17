@@ -157,7 +157,29 @@ static void nativeRun(JNIEnv* env, jobject jthis)
 	
 	while(1)
 	{
+		
 		Core::Run2(gCore);
+		
+		__android_log_write(ANDROID_LOG_INFO,"JNI","Runtime yielded!");
+		
+		// Check if we should load a resource as a program/resource combfile
+		int reloadHandle = Base::gSyscall->getReloadHandle();
+		if(0 != reloadHandle)
+		{
+			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is loading from handle");
+		
+			Base::Stream* stream = Base::gSyscall->resources.extract_RT_BINARY(reloadHandle);
+			
+			bool res = Core::LoadVMApp(gCore, *stream);
+			
+			delete stream;
+			
+			if(!res) {
+				BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);
+			}
+			
+			Base::gSyscall->setReloadHandle(0);
+		}
 		
 		// TODO: Could this be a good place to check for pending 
 		// exceptions from the Java side? 
@@ -165,21 +187,36 @@ static void nativeRun(JNIEnv* env, jobject jthis)
 		// below for how to do this.
 		//handlePendingExceptions(env);
 		
-// TODO: Why is this code commented out? Document its purpose.
-/*
-		if(gReloadHandle > 0) {
-			Base::Stream* stream = Base::gSyscall->resources.extract_RT_BINARY(gReloadHandle);
-			bool res = Core::LoadVMApp(gCore, *stream);
-			delete stream;
-			gReloadHandle = 0;
+		// TODO: Why is this code commented out? Document its purpose.
+	
+		// check if we should reload the initial program and resource file
+		else if(true == Base::gSyscall->isReloading())
+		{
+			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is reloading! 1");
+			
+			Base::gSyscall->setReloading(false);
+			
+			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is reloading! 2");
+			
+			jclass cls = env->GetObjectClass(jthis);
+			jmethodID methodID = env->GetMethodID(cls, "loadProgram", "()Z");
+			if (methodID == 0) return;
+			jboolean res = env->CallBooleanMethod(jthis, methodID);
+			
+			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is reloading! 3");
+			
 			if(!res) {
 				BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);
 			}
+			
+			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is reloading! 4");
+			
 		}
-*/		
+	
 	}
 	
 }
+
 
 /* 
 // This is how you trap exeptions from the Java side.

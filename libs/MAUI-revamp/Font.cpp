@@ -464,6 +464,7 @@ namespace MAUI {
 				cursor.x = x;
 				cursor.y += mCharset->lineHeight + mLineSpacing;
 				lineBreaks[j++] = i;
+				lastSpace = -1;
 				i++;
 				continue;
 			}
