@@ -196,7 +196,7 @@ NETSYSCALL(MAHandle) maHttpCreate(String url, int method) throws Exception {
 		methString = HttpConnection.POST;
 		break;
 	case HTTP_PUT:
-		rw = Connector.READ;
+		rw = Connector.READ_WRITE;
 		methString = HttpConnection.PUT;
 		break;
 	case HTTP_DELETE:
