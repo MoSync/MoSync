@@ -3106,7 +3106,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief A handle to the MoSync canvas screen. Use maWidgetScreenShow with this handle to show the initial mosync canvas.
 		*/
-		MOSYNC_SCREEN_HANDLE = 10000;
+		MOSYNC_SCREEN_HANDLE = 0;
 	}
 	}
 

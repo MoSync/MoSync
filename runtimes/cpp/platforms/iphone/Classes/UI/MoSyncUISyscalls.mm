@@ -30,6 +30,11 @@ MoSyncUI* getMoSyncUI() {
 	return mosyncUI;
 }
 
+static bool sNativeUIEnabled = false;
+bool isNativeUIEnabled() {
+	return sNativeUIEnabled;
+}
+
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController) {
 	mosyncUI = [[MoSyncUI alloc] initWithWindow:window andController:viewController];
 }
@@ -66,11 +71,14 @@ int maWidgetDestroy(MAWidgetHandle handle) {
 						   andReturnValue:&returnValue];
 
 	if(isCurrentlyShownScreen) {
+		/*
 		[NSObject performSelectorOnMainThread:@selector(showMoSyncCanvas)
 								   withTarget:mosyncUI
 								  withObjects:[NSArray arrayWithObjects: nil] 
 								waitUntilDone:YES
 							   andReturnValue:nil];
+		 */
+		maWidgetScreenShow(MAW_CONSTANT_MOSYNC_SCREEN_HANDLE);
 	}
 
 	return returnValue;
@@ -182,12 +190,8 @@ int maWidgetRemoveChild(MAWidgetHandle childHandle) {
 	return returnValue;
 }
 
-static bool sNativeUIEnabled = false;
-bool isNativeUIEnabled() {
-	return sNativeUIEnabled;
-}
-
 int maWidgetScreenShow(MAWidgetHandle screenHandle) {
+	/*
 	if(screenHandle == MAW_CONSTANT_MOSYNC_SCREEN_HANDLE) {
 		[NSObject performSelectorOnMainThread:@selector(showMoSyncCanvas)
 								   withTarget:mosyncUI
@@ -197,6 +201,7 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 		sNativeUIEnabled = false;
 		return MAW_RES_OK;
 	}
+	*/
 	
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
 	if(!screen) return MAW_RES_INVALID_HANDLE;
@@ -205,7 +210,7 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 		return MAW_RES_INVALID_SCREEN;
 	}
 	
-	sNativeUIEnabled = true;	
+	sNativeUIEnabled = screenHandle==MAW_CONSTANT_MOSYNC_SCREEN_HANDLE?false:true;	
 	
 	int returnValue;
 	[NSObject performSelectorOnMainThread:@selector(show:)

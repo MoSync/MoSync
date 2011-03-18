@@ -64,10 +64,15 @@ static IWidget* sOldScreen = nil;
 		window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];		
 		[window makeKeyAndVisible];
 	}
-	
+		
 	mainWindow = window;
 	mainController = controller;
 	mainWindow.backgroundColor = [UIColor whiteColor];
+	
+	ScreenWidget* mosyncScreen = [[ScreenWidget alloc] initWithController:mainController];
+	[widgetArray addObject:mosyncScreen];
+	[mosyncScreen setWidgetHandle:0]; // MAW_CONSTANT_MOSYNC_SCREEN_HANDLE	
+	sOldScreen = mosyncScreen;
 	
 	return self;
 }
@@ -145,8 +150,12 @@ static IWidget* sOldScreen = nil;
 		UIView* actualView = [sOldScreen getView];
 		[actualView removeFromSuperview];
 	} else {
+	/*
 		if(mainController)
 			[mainController.view removeFromSuperview];
+	 */
+		return MAW_RES_ERROR;
+		
 		//nativeUIEnabled = true;
 	}
 	
@@ -155,6 +164,7 @@ static IWidget* sOldScreen = nil;
 	[widget layout];
 	[widget show];
 	[mainWindow makeKeyAndVisible];
+	//[mainWindow setNeedsDisplay];
 	sOldScreen = widget;
 	
 	return MAW_RES_OK;

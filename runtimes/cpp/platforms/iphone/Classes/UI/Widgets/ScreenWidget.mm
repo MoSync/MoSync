@@ -24,8 +24,13 @@
 @implementation ScreenWidget
 
 - (id)init {
-	if([self class] == [ScreenWidget class])
-		controller = [[ScreenWidgetController alloc] init];
+	//if(!controller && [self class] == [ScreenWidget class])
+	UIViewController* c = [[ScreenWidgetController alloc] init];
+	return [self initWithController:c];
+}
+
+- (id)initWithController:(UIViewController*)_controller {
+	controller = _controller;
 	controller.title = @"";
 	view = controller.view;
 	view.bounds = [[UIScreen mainScreen] bounds];	

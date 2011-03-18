@@ -51,13 +51,13 @@
 - (id)init {
     //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	UITabBarController* tabBarController = [[[UITabBarController alloc] init] retain];
-	controller = tabBarController;
+	//controller = tabBarController;
 	tabBarController.viewControllers = [NSArray array];	
 	//view = controller.view;
 	//controller.view = view;
 	tabBarController.delegate = self;
 	
-	return [super init];	
+	return [super initWithController:tabBarController];	
 }
 
 - (void)addChild: (IWidget*)child {

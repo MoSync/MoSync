@@ -26,11 +26,11 @@
 - (id)init {
     //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	UINavigationController* navigationController = [[UINavigationController alloc] init];
-	controller = navigationController;
+	//controller = navigationController;
 	navigationController.viewControllers = [NSArray array];	
 	//view = controller.view;
 	
-	return [super init];
+	return [super initWithController:navigationController];
 }
 
 - (void)addChild: (IWidget*)child {
