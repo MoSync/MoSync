@@ -752,6 +752,12 @@ void CHttpConnection::FormatRequestL() {
 	case HTTP_POST:
 		APPEND(_L8("POST "));
 		break;
+	case HTTP_PUT:
+		APPEND(_L8("PUT "));
+		break;
+	case HTTP_DELETE:
+		APPEND(_L8("DELETE "));
+		break;
 	case HTTP_HEAD:
 		APPEND(_L8("HEAD "));
 		break;
