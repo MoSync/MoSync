@@ -801,9 +801,9 @@ public:
 	//Definitions
 	//****************************************
 #ifdef COUNT_INSTRUCTION_USE
-#define OPC(opcode)	case _##opcode: LOGC("%x: %i %s", ip - mem_cs - 1, _##opcode, #opcode); countInstructionUse(#opcode, op);
+#define OPC(opcode)	case _##opcode: LOGC("%x: %i %s", (int)(ip - mem_cs - 1), _##opcode, #opcode); countInstructionUse(#opcode, op);
 #else
-#define OPC(opcode)	case _##opcode: LOGC("%x: %i %s", ip - mem_cs - 1, _##opcode, #opcode);
+#define OPC(opcode)	case _##opcode: LOGC("%x: %i %s", (int)(ip - mem_cs - 1), _##opcode, #opcode);
 #endif
 #ifdef CORE_DEBUGGING_MODE
 #define EOP	LOGC("\n"); break;
@@ -842,7 +842,7 @@ void WRITE_REG(int reg, int value) {
 #else
 		std::string file;
 		int line;
-		bool res = mapIp(address, line, file);
+		mapIp(address, line, file);
 		LOGC("\nJump to 0x%x %s %s:%i\n", address, mapFunction(address), file.c_str(), line);
 #endif
 	}
