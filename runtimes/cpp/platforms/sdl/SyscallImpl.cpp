@@ -2126,7 +2126,7 @@ namespace Base {
 			{
 #ifdef WIN32
 				const char* url = SYSCALL_THIS->GetValidatedStr(a);
-				if(sstrcmp(url, "http://") == 0) {
+				if(sstrcmp(url, "http://") == 0 || sstrcmp(url, "https://") == 0) {
 					int result = (int)ShellExecute(NULL, NULL, url, NULL, NULL, SW_SHOW);
 					if(result <= 32) {
 						LOG("ShellExecute(%s) error %i\n", url, result);
@@ -2136,7 +2136,7 @@ namespace Base {
 				} else
 #endif
 				{
-					return IOCTL_UNAVAILABLE;
+					return CONNERR_UNAVAILABLE;
 				}
 			}
 

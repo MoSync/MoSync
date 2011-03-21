@@ -2014,7 +2014,7 @@ public class MoSyncThread extends Thread
 	 */
 	int maPlatformRequest(String url)
 	{
-		if (url.startsWith("http://"))
+		if (url.startsWith("http://") || url.startsWith("https://"))
 		{
 			Log.i("maPlatformRequest","Starting browser:" + url);
 			Intent intent = new Intent(Intent.ACTION_VIEW);

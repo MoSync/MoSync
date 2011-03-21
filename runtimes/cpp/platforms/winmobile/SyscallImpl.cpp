@@ -1865,7 +1865,7 @@ DWORD GetScreenOrientation()
 
 	SYSCALL(int, maPlatformRequest(const char* url)) 
 	{
-		if(sstrcmp(url, "http://") == 0) {
+		if(sstrcmp(url, "http://") == 0 || sstrcmp(url, "https://") == 0) {
 			SHELLEXECUTEINFO sei;
 			ZeroMemory(&sei, sizeof(SHELLEXECUTEINFO));
 			sei.cbSize = sizeof(SHELLEXECUTEINFO);
