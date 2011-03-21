@@ -1000,9 +1000,10 @@ namespace MAUI {
 		if(mFocusedWidget) {
 			int xx = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
 			int yy = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
-			MAPoint2d pp =  {xx, yy};
-			mFocusedWidget->pointerReleased(pp, id);
+			MAPoint2d pp = {xx, yy};
+			Widget* w = mFocusedWidget;
 			setFocusedWidget(NULL);
+			w->pointerReleased(pp, id);
 			return false;
 		}
 
