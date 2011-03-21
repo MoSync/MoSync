@@ -65,8 +65,7 @@ namespace MAUI {
 		mMain->setPosition(0,0);
 		mMain->setWidth(mScreenWidth);
 		mMain->setHeight(mScreenHeight);
-		Environment& env = Environment::getEnvironment();
-		if(!env.isKeyListener(this)) {
+		if(sCurrentScreen != this) {
 			mMain->setEnabled(false);
 		}
 
