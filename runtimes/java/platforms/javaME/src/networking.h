@@ -458,6 +458,22 @@ class ConnWrite implements Runnable {
 	}
 }
 
+// workaround a bug on some SonyEricsson phones,
+// where a too big a write() would cause an IOException.
+static void chunkWrite(OutputStream out, byte[] arr, int offset, int size) throws IOException {
+	int pos = offset;
+	int endPos = offset + size;
+	while(pos != endPos) {
+		// arbitrary: 32 kB.
+		int chunkSize = MIN(endPos - pos, 32*1024);
+		out.write(arr, pos, chunkSize);
+		pos += chunkSize;
+	}
+}
+
+static void chunkWrite(OutputStream out, byte[] arr) throws IOException {
+	chunkWrite(out, arr, 0, arr.length);
+}
 
 class ConnWriteFromData implements Runnable {
 	MAConn mac;
@@ -485,14 +501,14 @@ class ConnWriteFromData implements Runnable {
 #ifdef SEGMENTED_DATA
 				bin.write(mac.out, offset, size);
 #else
-				mac.out.write(bin.arr, offset, size);
+				chunkWrite(mac.out, bin.arr, offset, size);
 #endif
 			} else {
 				byte[] buffer = new byte[size];
 				DataInputStream dis = new DataInputStream(bi.getInputStream());
 				dis.readFully(buffer);
 				dis.close();
-				mac.out.write(buffer);
+				chunkWrite(mac.out, buffer);
 			}
 			mac.out.flush();
 		} catch(InterruptedIOException e) {
