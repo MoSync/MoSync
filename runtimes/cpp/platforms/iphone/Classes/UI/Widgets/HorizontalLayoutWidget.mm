@@ -18,16 +18,16 @@
 #import "HorizontalLayoutWidget.h"
 #import "LayoutManagers.h"
 
+MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(HLayoutView)
+
 @implementation HorizontalLayoutWidget
 
 - (id)init {
-	//view = [[HLayoutView alloc] init];	
-	
-	view = [[HLayoutView alloc]  initWithFrame:CGRectZero spacing:0
+	view = [[MoSyncHLayoutView alloc]  initWithFrame:CGRectZero spacing:0
 			 leftMargin:0 rightMargin:0 topMargin:0 bottomMargin:0
 			 hAlignment:UIControlContentHorizontalAlignmentLeft
 									vAlignment:UIControlContentVerticalAlignmentTop];
-	
+	[view setWidget:self];
 	return [super init];
 }
 
@@ -56,6 +56,21 @@
 			[vlv setHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
 		else if([value isEqualToString:@"right"])
 			[vlv setHorizontalAlignment:UIControlContentHorizontalAlignmentRight];		
+	} else if([key isEqualToString:@"leftMargin"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		[vlv setLeftMargin:[value intValue]];
+	} else if([key isEqualToString:@"rightMargin"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		[vlv setRightMargin:[value intValue]];
+	} else if([key isEqualToString:@"topMargin"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		[vlv setTopMargin:[value intValue]];
+	} else if([key isEqualToString:@"bottomMargin"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		[vlv setBottomMargin:[value intValue]];
+	} else if([key isEqualToString:@"spacing"]) {
+		VLayoutView* vlv = (VLayoutView*)view;
+		[vlv setSpacing:[value intValue]];
 	} else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

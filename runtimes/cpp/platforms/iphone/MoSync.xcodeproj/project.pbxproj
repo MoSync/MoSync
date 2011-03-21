@@ -41,6 +41,9 @@
 		858B432012E7325F0058DBFC /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 858B431F12E7325F0058DBFC /* log.cpp */; };
 		858B44BB12E7B1060058DBFC /* log.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 858B431F12E7325F0058DBFC /* log.cpp */; };
 		85923F26114539F0004875E4 /* filelist-linux.c in Sources */ = {isa = PBXBuildFile; fileRef = 85923F24114539F0004875E4 /* filelist-linux.c */; };
+		8594B89F13258A970059D79B /* LayoutWidgets.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8594B89E13258A970059D79B /* LayoutWidgets.mm */; };
+		8594B8A013258A970059D79B /* LayoutWidgets.h in Headers */ = {isa = PBXBuildFile; fileRef = 8594B89D13258A970059D79B /* LayoutWidgets.h */; };
+		8594B8A113258A970059D79B /* LayoutWidgets.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8594B89E13258A970059D79B /* LayoutWidgets.mm */; };
 		8597A98213095110003468CF /* EditBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8597A98113095110003468CF /* EditBoxWidget.mm */; };
 		8597A98313095110003468CF /* EditBoxWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 8597A98013095110003468CF /* EditBoxWidget.h */; };
 		8597A98413095110003468CF /* EditBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8597A98113095110003468CF /* EditBoxWidget.mm */; };
@@ -51,7 +54,6 @@
 		85A1592212F80E520044BBE1 /* Readme.txt in Resources */ = {isa = PBXBuildFile; fileRef = 85A158EB12F80E520044BBE1 /* Readme.txt */; };
 		85A1592312F80E520044BBE1 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158ED12F80E520044BBE1 /* VLayoutView.m */; };
 		85A1592412F80E520044BBE1 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158EF12F80E520044BBE1 /* MoSyncTableView.m */; };
-		85A1592512F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */; };
 		85A1592612F80E520044BBE1 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F312F80E520044BBE1 /* MoSyncUI.mm */; };
 		85A1592712F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */; };
 		85A1592812F80E520044BBE1 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F712F80E520044BBE1 /* ScreenWidgetController.m */; };
@@ -59,7 +61,6 @@
 		85A1592A12F80E520044BBE1 /* ButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158FC12F80E520044BBE1 /* ButtonWidget.mm */; };
 		85A1592B12F80E520044BBE1 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158FE12F80E520044BBE1 /* CheckBoxWidget.mm */; };
 		85A1592C12F80E520044BBE1 /* GLViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590012F80E520044BBE1 /* GLViewWidget.mm */; };
-		85A1592D12F80E520044BBE1 /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590212F80E520044BBE1 /* HorizontalLayoutWidget.mm */; };
 		85A1592E12F80E520044BBE1 /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590412F80E520044BBE1 /* ImageWidget.mm */; };
 		85A1592F12F80E520044BBE1 /* IWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590612F80E520044BBE1 /* IWidget.mm */; };
 		85A1593012F80E520044BBE1 /* LabelWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590812F80E520044BBE1 /* LabelWidget.mm */; };
@@ -72,7 +73,6 @@
 		85A1593712F80E520044BBE1 /* ScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591612F80E520044BBE1 /* ScreenWidget.mm */; };
 		85A1593812F80E520044BBE1 /* SearchBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591812F80E520044BBE1 /* SearchBarWidget.mm */; };
 		85A1593912F80E520044BBE1 /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591A12F80E520044BBE1 /* TabScreenWidget.mm */; };
-		85A1593A12F80E520044BBE1 /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591C12F80E520044BBE1 /* VerticalLayoutWidget.mm */; };
 		85A1593B12F80E520044BBE1 /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591E12F80E520044BBE1 /* WebViewWidget.mm */; };
 		85A1593C12F80E520044BBE1 /* AbstractLayoutView.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158E512F80E520044BBE1 /* AbstractLayoutView.h */; };
 		85A1593D12F80E520044BBE1 /* AbstractLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158E612F80E520044BBE1 /* AbstractLayoutView.m */; };
@@ -83,8 +83,6 @@
 		85A1594212F80E520044BBE1 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158ED12F80E520044BBE1 /* VLayoutView.m */; };
 		85A1594312F80E520044BBE1 /* MoSyncTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158EE12F80E520044BBE1 /* MoSyncTableView.h */; };
 		85A1594412F80E520044BBE1 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158EF12F80E520044BBE1 /* MoSyncTableView.m */; };
-		85A1594512F80E520044BBE1 /* MoSyncTableViewCell.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F012F80E520044BBE1 /* MoSyncTableViewCell.h */; };
-		85A1594612F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */; };
 		85A1594712F80E520044BBE1 /* MoSyncUI.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F212F80E520044BBE1 /* MoSyncUI.h */; };
 		85A1594812F80E520044BBE1 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F312F80E520044BBE1 /* MoSyncUI.mm */; };
 		85A1594912F80E520044BBE1 /* MoSyncUISyscalls.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */; };
@@ -99,8 +97,6 @@
 		85A1595212F80E520044BBE1 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158FE12F80E520044BBE1 /* CheckBoxWidget.mm */; };
 		85A1595312F80E520044BBE1 /* GLViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158FF12F80E520044BBE1 /* GLViewWidget.h */; };
 		85A1595412F80E520044BBE1 /* GLViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590012F80E520044BBE1 /* GLViewWidget.mm */; };
-		85A1595512F80E520044BBE1 /* HorizontalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590112F80E520044BBE1 /* HorizontalLayoutWidget.h */; };
-		85A1595612F80E520044BBE1 /* HorizontalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590212F80E520044BBE1 /* HorizontalLayoutWidget.mm */; };
 		85A1595712F80E520044BBE1 /* ImageWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590312F80E520044BBE1 /* ImageWidget.h */; };
 		85A1595812F80E520044BBE1 /* ImageWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1590412F80E520044BBE1 /* ImageWidget.mm */; };
 		85A1595912F80E520044BBE1 /* IWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1590512F80E520044BBE1 /* IWidget.h */; };
@@ -125,8 +121,6 @@
 		85A1596C12F80E520044BBE1 /* SearchBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591812F80E520044BBE1 /* SearchBarWidget.mm */; };
 		85A1596D12F80E520044BBE1 /* TabScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1591912F80E520044BBE1 /* TabScreenWidget.h */; };
 		85A1596E12F80E520044BBE1 /* TabScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591A12F80E520044BBE1 /* TabScreenWidget.mm */; };
-		85A1596F12F80E520044BBE1 /* VerticalLayoutWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1591B12F80E520044BBE1 /* VerticalLayoutWidget.h */; };
-		85A1597012F80E520044BBE1 /* VerticalLayoutWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591C12F80E520044BBE1 /* VerticalLayoutWidget.mm */; };
 		85A1597112F80E520044BBE1 /* WebViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A1591D12F80E520044BBE1 /* WebViewWidget.h */; };
 		85A1597212F80E520044BBE1 /* WebViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A1591E12F80E520044BBE1 /* WebViewWidget.mm */; };
 		85AD17FA11AC0D3B00FFCBD8 /* rebuild.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */; };
@@ -241,6 +235,8 @@
 		858B431F12E7325F0058DBFC /* log.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = log.cpp; path = impl/log.cpp; sourceTree = "<group>"; };
 		85923F24114539F0004875E4 /* filelist-linux.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = "filelist-linux.c"; path = "../../../../intlibs/filelist/filelist-linux.c"; sourceTree = SOURCE_ROOT; };
 		85923F25114539F0004875E4 /* filelist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = filelist.h; path = ../../../../intlibs/filelist/filelist.h; sourceTree = SOURCE_ROOT; };
+		8594B89D13258A970059D79B /* LayoutWidgets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LayoutWidgets.h; sourceTree = "<group>"; };
+		8594B89E13258A970059D79B /* LayoutWidgets.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = LayoutWidgets.mm; sourceTree = "<group>"; };
 		8597A98013095110003468CF /* EditBoxWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EditBoxWidget.h; sourceTree = "<group>"; };
 		8597A98113095110003468CF /* EditBoxWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = EditBoxWidget.mm; sourceTree = "<group>"; };
 		85A080F711352F2800267D56 /* fifo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fifo.h; path = ../../../../intlibs/helpers/fifo.h; sourceTree = SOURCE_ROOT; };
@@ -256,8 +252,6 @@
 		85A158ED12F80E520044BBE1 /* VLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLayoutView.m; sourceTree = "<group>"; };
 		85A158EE12F80E520044BBE1 /* MoSyncTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableView.h; sourceTree = "<group>"; };
 		85A158EF12F80E520044BBE1 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableView.m; sourceTree = "<group>"; };
-		85A158F012F80E520044BBE1 /* MoSyncTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableViewCell.h; sourceTree = "<group>"; };
-		85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableViewCell.m; sourceTree = "<group>"; };
 		85A158F212F80E520044BBE1 /* MoSyncUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUI.h; sourceTree = "<group>"; };
 		85A158F312F80E520044BBE1 /* MoSyncUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUI.mm; sourceTree = "<group>"; };
 		85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUISyscalls.h; sourceTree = "<group>"; };
@@ -272,8 +266,6 @@
 		85A158FE12F80E520044BBE1 /* CheckBoxWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CheckBoxWidget.mm; sourceTree = "<group>"; };
 		85A158FF12F80E520044BBE1 /* GLViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLViewWidget.h; sourceTree = "<group>"; };
 		85A1590012F80E520044BBE1 /* GLViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = GLViewWidget.mm; sourceTree = "<group>"; };
-		85A1590112F80E520044BBE1 /* HorizontalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HorizontalLayoutWidget.h; sourceTree = "<group>"; };
-		85A1590212F80E520044BBE1 /* HorizontalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = HorizontalLayoutWidget.mm; sourceTree = "<group>"; };
 		85A1590312F80E520044BBE1 /* ImageWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImageWidget.h; sourceTree = "<group>"; };
 		85A1590412F80E520044BBE1 /* ImageWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImageWidget.mm; sourceTree = "<group>"; };
 		85A1590512F80E520044BBE1 /* IWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IWidget.h; sourceTree = "<group>"; };
@@ -298,8 +290,6 @@
 		85A1591812F80E520044BBE1 /* SearchBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SearchBarWidget.mm; sourceTree = "<group>"; };
 		85A1591912F80E520044BBE1 /* TabScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TabScreenWidget.h; sourceTree = "<group>"; };
 		85A1591A12F80E520044BBE1 /* TabScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TabScreenWidget.mm; sourceTree = "<group>"; };
-		85A1591B12F80E520044BBE1 /* VerticalLayoutWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VerticalLayoutWidget.h; sourceTree = "<group>"; };
-		85A1591C12F80E520044BBE1 /* VerticalLayoutWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VerticalLayoutWidget.mm; sourceTree = "<group>"; };
 		85A1591D12F80E520044BBE1 /* WebViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WebViewWidget.h; sourceTree = "<group>"; };
 		85A1591E12F80E520044BBE1 /* WebViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = WebViewWidget.mm; sourceTree = "<group>"; };
 		85AD17F911AC0D3B00FFCBD8 /* rebuild.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rebuild.cpp; sourceTree = "<group>"; };
@@ -519,6 +509,16 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		8500CD3E132E506D0003A01E /* External */ = {
+			isa = PBXGroup;
+			children = (
+				85A158E412F80E520044BBE1 /* LayoutManagers */,
+				85A158F812F80E520044BBE1 /* UIColor-Expanded.h */,
+				85A158F912F80E520044BBE1 /* UIColor-Expanded.m */,
+			);
+			name = External;
+			sourceTree = "<group>";
+		};
 		853983A8116CADDD000521C0 /* hashmap */ = {
 			isa = PBXGroup;
 			children = (
@@ -540,19 +540,15 @@
 		85A158E312F80E520044BBE1 /* UI */ = {
 			isa = PBXGroup;
 			children = (
-				85A158E412F80E520044BBE1 /* LayoutManagers */,
+				8500CD3E132E506D0003A01E /* External */,
 				85A158EE12F80E520044BBE1 /* MoSyncTableView.h */,
 				85A158EF12F80E520044BBE1 /* MoSyncTableView.m */,
-				85A158F012F80E520044BBE1 /* MoSyncTableViewCell.h */,
-				85A158F112F80E520044BBE1 /* MoSyncTableViewCell.m */,
 				85A158F212F80E520044BBE1 /* MoSyncUI.h */,
 				85A158F312F80E520044BBE1 /* MoSyncUI.mm */,
 				85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */,
 				85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */,
 				85A158F612F80E520044BBE1 /* ScreenWidgetController.h */,
 				85A158F712F80E520044BBE1 /* ScreenWidgetController.m */,
-				85A158F812F80E520044BBE1 /* UIColor-Expanded.h */,
-				85A158F912F80E520044BBE1 /* UIColor-Expanded.m */,
 				85A158FA12F80E520044BBE1 /* Widgets */,
 			);
 			path = UI;
@@ -577,6 +573,8 @@
 		85A158FA12F80E520044BBE1 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				8594B89D13258A970059D79B /* LayoutWidgets.h */,
+				8594B89E13258A970059D79B /* LayoutWidgets.mm */,
 				8597A98013095110003468CF /* EditBoxWidget.h */,
 				8597A98113095110003468CF /* EditBoxWidget.mm */,
 				8527D5271302E34000535CCA /* ImageButtonWidget.h */,
@@ -587,8 +585,6 @@
 				85A158FE12F80E520044BBE1 /* CheckBoxWidget.mm */,
 				85A158FF12F80E520044BBE1 /* GLViewWidget.h */,
 				85A1590012F80E520044BBE1 /* GLViewWidget.mm */,
-				85A1590112F80E520044BBE1 /* HorizontalLayoutWidget.h */,
-				85A1590212F80E520044BBE1 /* HorizontalLayoutWidget.mm */,
 				85A1590312F80E520044BBE1 /* ImageWidget.h */,
 				85A1590412F80E520044BBE1 /* ImageWidget.mm */,
 				85A1590512F80E520044BBE1 /* IWidget.h */,
@@ -613,8 +609,6 @@
 				85A1591812F80E520044BBE1 /* SearchBarWidget.mm */,
 				85A1591912F80E520044BBE1 /* TabScreenWidget.h */,
 				85A1591A12F80E520044BBE1 /* TabScreenWidget.mm */,
-				85A1591B12F80E520044BBE1 /* VerticalLayoutWidget.h */,
-				85A1591C12F80E520044BBE1 /* VerticalLayoutWidget.mm */,
 				85A1591D12F80E520044BBE1 /* WebViewWidget.h */,
 				85A1591E12F80E520044BBE1 /* WebViewWidget.mm */,
 			);
@@ -775,7 +769,6 @@
 				85A1594012F80E520044BBE1 /* LayoutManagers.h in Headers */,
 				85A1594112F80E520044BBE1 /* VLayoutView.h in Headers */,
 				85A1594312F80E520044BBE1 /* MoSyncTableView.h in Headers */,
-				85A1594512F80E520044BBE1 /* MoSyncTableViewCell.h in Headers */,
 				85A1594712F80E520044BBE1 /* MoSyncUI.h in Headers */,
 				85A1594912F80E520044BBE1 /* MoSyncUISyscalls.h in Headers */,
 				85A1594B12F80E520044BBE1 /* ScreenWidgetController.h in Headers */,
@@ -783,7 +776,6 @@
 				85A1594F12F80E520044BBE1 /* ButtonWidget.h in Headers */,
 				85A1595112F80E520044BBE1 /* CheckBoxWidget.h in Headers */,
 				85A1595312F80E520044BBE1 /* GLViewWidget.h in Headers */,
-				85A1595512F80E520044BBE1 /* HorizontalLayoutWidget.h in Headers */,
 				85A1595712F80E520044BBE1 /* ImageWidget.h in Headers */,
 				85A1595912F80E520044BBE1 /* IWidget.h in Headers */,
 				85A1595B12F80E520044BBE1 /* LabelWidget.h in Headers */,
@@ -796,10 +788,10 @@
 				85A1596912F80E520044BBE1 /* ScreenWidget.h in Headers */,
 				85A1596B12F80E520044BBE1 /* SearchBarWidget.h in Headers */,
 				85A1596D12F80E520044BBE1 /* TabScreenWidget.h in Headers */,
-				85A1596F12F80E520044BBE1 /* VerticalLayoutWidget.h in Headers */,
 				85A1597112F80E520044BBE1 /* WebViewWidget.h in Headers */,
 				8527D52A1302E34000535CCA /* ImageButtonWidget.h in Headers */,
 				8597A98313095110003468CF /* EditBoxWidget.h in Headers */,
+				8594B8A013258A970059D79B /* LayoutWidgets.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -951,7 +943,6 @@
 				85A1592012F80E520044BBE1 /* HLayoutView.m in Sources */,
 				85A1592312F80E520044BBE1 /* VLayoutView.m in Sources */,
 				85A1592412F80E520044BBE1 /* MoSyncTableView.m in Sources */,
-				85A1592512F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */,
 				85A1592612F80E520044BBE1 /* MoSyncUI.mm in Sources */,
 				85A1592712F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */,
 				85A1592812F80E520044BBE1 /* ScreenWidgetController.m in Sources */,
@@ -959,7 +950,6 @@
 				85A1592A12F80E520044BBE1 /* ButtonWidget.mm in Sources */,
 				85A1592B12F80E520044BBE1 /* CheckBoxWidget.mm in Sources */,
 				85A1592C12F80E520044BBE1 /* GLViewWidget.mm in Sources */,
-				85A1592D12F80E520044BBE1 /* HorizontalLayoutWidget.mm in Sources */,
 				85A1592E12F80E520044BBE1 /* ImageWidget.mm in Sources */,
 				85A1592F12F80E520044BBE1 /* IWidget.mm in Sources */,
 				85A1593012F80E520044BBE1 /* LabelWidget.mm in Sources */,
@@ -972,10 +962,10 @@
 				85A1593712F80E520044BBE1 /* ScreenWidget.mm in Sources */,
 				85A1593812F80E520044BBE1 /* SearchBarWidget.mm in Sources */,
 				85A1593912F80E520044BBE1 /* TabScreenWidget.mm in Sources */,
-				85A1593A12F80E520044BBE1 /* VerticalLayoutWidget.mm in Sources */,
 				85A1593B12F80E520044BBE1 /* WebViewWidget.mm in Sources */,
 				8527D5291302E34000535CCA /* ImageButtonWidget.mm in Sources */,
 				8597A98213095110003468CF /* EditBoxWidget.mm in Sources */,
+				8594B89F13258A970059D79B /* LayoutWidgets.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1017,7 +1007,6 @@
 				85A1593F12F80E520044BBE1 /* HLayoutView.m in Sources */,
 				85A1594212F80E520044BBE1 /* VLayoutView.m in Sources */,
 				85A1594412F80E520044BBE1 /* MoSyncTableView.m in Sources */,
-				85A1594612F80E520044BBE1 /* MoSyncTableViewCell.m in Sources */,
 				85A1594812F80E520044BBE1 /* MoSyncUI.mm in Sources */,
 				85A1594A12F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */,
 				85A1594C12F80E520044BBE1 /* ScreenWidgetController.m in Sources */,
@@ -1025,7 +1014,6 @@
 				85A1595012F80E520044BBE1 /* ButtonWidget.mm in Sources */,
 				85A1595212F80E520044BBE1 /* CheckBoxWidget.mm in Sources */,
 				85A1595412F80E520044BBE1 /* GLViewWidget.mm in Sources */,
-				85A1595612F80E520044BBE1 /* HorizontalLayoutWidget.mm in Sources */,
 				85A1595812F80E520044BBE1 /* ImageWidget.mm in Sources */,
 				85A1595A12F80E520044BBE1 /* IWidget.mm in Sources */,
 				85A1595C12F80E520044BBE1 /* LabelWidget.mm in Sources */,
@@ -1038,10 +1026,10 @@
 				85A1596A12F80E520044BBE1 /* ScreenWidget.mm in Sources */,
 				85A1596C12F80E520044BBE1 /* SearchBarWidget.mm in Sources */,
 				85A1596E12F80E520044BBE1 /* TabScreenWidget.mm in Sources */,
-				85A1597012F80E520044BBE1 /* VerticalLayoutWidget.mm in Sources */,
 				85A1597212F80E520044BBE1 /* WebViewWidget.mm in Sources */,
 				8527D52B1302E34000535CCA /* ImageButtonWidget.mm in Sources */,
 				8597A98413095110003468CF /* EditBoxWidget.mm in Sources */,
+				8594B8A113258A970059D79B /* LayoutWidgets.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

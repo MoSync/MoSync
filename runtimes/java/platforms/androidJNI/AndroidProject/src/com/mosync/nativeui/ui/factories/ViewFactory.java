@@ -3,13 +3,11 @@ package com.mosync.nativeui.ui.factories;
 import java.util.HashMap;
 
 import android.app.Activity;
-import android.webkit.WebView;
 import android.widget.ImageView;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.FrameLayout;
 import com.mosync.nativeui.ui.widgets.ImageWidget;
-import com.mosync.nativeui.ui.widgets.WebWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 
 /**
@@ -91,7 +89,7 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_LIST_VIEW_ITEM, new ListItemFactory( ) );
 		addFactory( IX_WIDGET.MAW_SEARCH_BAR , new SearchBarFactory( ) );
 		addFactory( IX_WIDGET.MAW_SCREEN, new ScreenFactory( ) );
-		addFactory( IX_WIDGET.MAW_WEB_VIEW, new DefaultFactory( WebView.class, WebWidget.class ) );
+		addFactory( IX_WIDGET.MAW_WEB_VIEW, new WebViewFactory( ) );
 		addFactory( IX_WIDGET.MAW_TAB_SCREEN, new TabScreenFactory( ) );
 		addFactory( IX_WIDGET.MAW_GL_VIEW, new EGLViewFactory( ) );
 		addFactory( IX_WIDGET.MAW_IMAGE, new DefaultFactory( ImageView.class, ImageWidget.class ) );

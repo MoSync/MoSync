@@ -39,6 +39,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 -(void) startUpdatingAccelerometer;
 -(void) stopUpdatingAccelerometer;
 
+- (void)viewAppeared;
+
 - (void)deviceOrientationChanged:(NSNotification *)notification;
 - (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration;
 

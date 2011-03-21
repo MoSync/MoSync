@@ -17,19 +17,14 @@
 
 #import "SearchBarWidget.h"
 
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
-
 
 @implementation SearchBarWidget
 
-- (void) searchBarSearchButtonClicked:(UISearchBar *)searchBar {
-	
-#ifndef NATIVE_TEST
+- (void) searchBarSearchButtonClicked:(UISearchBar *)searchBar {	
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -38,13 +33,10 @@
 	eventData->searchBarButton = 0;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-#endif	
 }
 
 
-- (void) searchBarCancelButtonClicked:(UISearchBar *)searchBar {
-	
-#ifndef NATIVE_TEST
+- (void) searchBarCancelButtonClicked:(UISearchBar *)searchBar {	
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -53,7 +45,6 @@
 	eventData->searchBarButton = 1;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-#endif	
 }
 
 
@@ -74,9 +65,6 @@
 
 - (void)addChild: (IWidget*)child {
 	[super addChild:child];
-}
-
-- (void)removeChild: (IWidget*)child {
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

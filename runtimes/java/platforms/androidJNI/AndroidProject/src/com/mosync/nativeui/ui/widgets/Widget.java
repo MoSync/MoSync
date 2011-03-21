@@ -2,6 +2,7 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 
 import com.mosync.internal.generated.IX_WIDGET;
@@ -12,6 +13,7 @@ import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
 import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
 
@@ -43,6 +45,13 @@ public class Widget
 	private LayoutParams m_layoutParams = new LayoutParams( );
 	
 	/**
+	 * The alpha is stored here to enable us to the alpha before
+	 * a background drawable is set. This means that as soon as
+	 * the background is changed, the alpha must also be set.
+	 */
+	private int m_alpha = 0xff;
+	
+	/**
 	 * Constructor.
 	 * 
 	 * Note: The id of the view is always equal to its handle.
@@ -61,13 +70,18 @@ public class Widget
 	 * 
 	 * TODO: More sensible implementation.
 	 * 
-	 * @param property The property of the widget that should be set,
-	 *                 one of
+	 * @param property The property of the widget that should be set.
 	 * @param value The value of the property, this will be converted
 	 *              to the appropriate type.
 	 * @return true if the property was set, false otherwise.
+	 * 
+	 * @throws PropertyConversionException If a value could not be converted
+	 *                                     to a value suitable for the given property.
+	 * @throws InvalidPropertyValueException If the converted value was out of range
+	 *                                       or in any other sense invalid.
 	 */
-	public boolean setProperty(String property, String value) throws PropertyConversionException
+	public boolean setProperty(String property, String value)
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		LayoutParams layoutParams = getLayoutParams( );
 		if( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
@@ -107,6 +121,7 @@ public class Widget
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR ) )
 		{
 			getView( ).setBackgroundColor( ColorConverter.convert( value ) );
+			updateAlpha( m_alpha );
 		}
 		else if( property.equals( IX_WIDGET.MAW_BUTTON_BACKGROUND_IMAGE ) )
 		{
@@ -115,18 +130,24 @@ public class Widget
 			if( background != null )
 			{
 				getView( ).setBackgroundDrawable( new BitmapDrawable( background ) );
+				updateAlpha( m_alpha );
+			}
+			else
+			{
+				return false;
 			}
 		}
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_ALPHA ) )
 		{
 			float alpha = FloatConverter.convert( value );
-			if( alpha > 1.0f )
+			if( alpha > 1.0f || alpha < 0.0f )
 			{
-				return false;
+				throw new InvalidPropertyValueException( value, property );
 			}
 			
-			int intAlpha = (int) (alpha * 255.0f); 
-			getView( ).getBackground( ).setAlpha( intAlpha );
+			int intAlpha = (int) (alpha * 255.0f);
+			m_alpha = intAlpha;
+			updateAlpha( m_alpha );
 		}
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_VISIBLE ) )
 		{
@@ -248,5 +269,20 @@ public class Widget
 	{
 		assert( m_layoutParams != null );
 		return m_layoutParams;
+	}
+	
+	/**
+	 * Updates the alpha of the background of the underlying view.
+	 * 
+	 * @param alpha The new alpha of the underlying view.
+	 */
+	public void updateAlpha(int alpha)
+	{		
+		Drawable background = getView( ).getBackground( );
+		if( background == null )
+		{
+			return;
+		}
+		background.setAlpha( alpha & 0xff );
 	}
 }

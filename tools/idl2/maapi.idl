@@ -3088,10 +3088,27 @@ group WidgetAPI "Widget API" {
 		* @brief Sent when an GLView has been initialized and is ready for setup.
 		*/
 		GL_VIEW_READY = 8;
+
+		/**
+		 * Sent when the URL of a web view changes
+		 */
+		WEB_VIEW_URL_CHANGED = 9;
 	}
 	} // end of WidgetEventTypes
 
 	} // end of WidgetEvents
+
+	/**
+	* The available constants for the widget api.
+	*/
+	group WidgetConstants "Widget constants" {
+	constset int MAW_CONSTANT_ {
+		/**
+		* @brief A handle to the MoSync canvas screen. Use maWidgetScreenShow with this handle to show the initial mosync canvas.
+		*/
+		MOSYNC_SCREEN_HANDLE = 0;
+	}
+	}
 
 	/**
 	* The available result codes for the widget api.
@@ -3286,7 +3303,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetTabScreenProperties	
 
 	/**
-	* The available widget properties for a #MAW_BUTTON and #MAW_IMAGE_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetButtonProperties "Button properties" {
 	constset MAString MAW_BUTTON_ {
@@ -3298,6 +3315,20 @@ group WidgetAPI "Widget API" {
 		FONT_SIZE = "fontSize";
 	}
 	} // end of WidgetButtonProperties		
+
+	/**
+	* The available widget properties for a #MAW_IMAGE_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetImageButtonProperties "Image button properties" {
+	constset MAString MAW_IMAGE_BUTTON_ {
+		TEXT = "text";
+		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
+		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
+		BACKGROUND_IMAGE = "backgroundImage";
+		FONT_COLOR = "fontColor";
+		FONT_SIZE = "fontSize";
+	}
+	} // end of WidgetImageButtonProperties		
 	
 	/**
 	* The available widget properties for a #MAW_IMAGE. See of \ref WidgetProperties "Widget properties" for more properties. 
@@ -3307,17 +3338,7 @@ group WidgetAPI "Widget API" {
 		IMAGE = "image";
 	}
 	} // end of WidgetImageProperties
-	
-	/**
-	* The available widget properties for a #MAW_IMAGE. See of \ref WidgetProperties "Widget properties" for more properties. 
-	*/
-	group WidgetImageButtonProperties "Image button properties" {
-	constset MAString MAW_IMAGE_BUTTON_ {
-		TEXT = "text";
-		BACKGROUND_IMAGE = "backgroundImage";
-	}
-	} // end of WidgetImageProperties		
-	
+
 	/**
 	* The available widget properties for a #MAW_LABEL. See of \ref WidgetProperties "Widget properties" for more properties. 
 	*/
@@ -3329,7 +3350,7 @@ group WidgetAPI "Widget API" {
 		FONT_COLOR = "fontColor";
 		FONT_SIZE = "fontSize";
 	}
-	} // end of WidgetImageProperties		
+	} // end of WidgetLabelProperties		
 
 	/**
 	* The available widget properties for a #MAW_EDIT_BOX. See of \ref WidgetProperties "Widget properties" for more properties. 
@@ -3409,6 +3430,7 @@ group WidgetAPI "Widget API" {
 	group WidgetWebViewProperties "Web view properties" {
 	constset MAString MAW_WEB_VIEW_ {
 		URL = "url";
+		NEW_URL = "newurl";
 	}
 	} // end of WidgetWebViewProperties
 

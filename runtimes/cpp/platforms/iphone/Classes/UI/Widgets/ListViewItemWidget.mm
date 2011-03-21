@@ -17,13 +17,12 @@
 
 #import "ListViewItemWidget.h"
 #import "UIColor-Expanded.h"
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
+
+MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 
 @implementation ListViewItemWidget
 
@@ -31,17 +30,18 @@
 
 	static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
 	
-	UITableViewCell *cell = nil; //[UITableView dequeueReusableCellWithIdentifier:SimpleTableIdentifier];
-	 
+	UITableViewCell *cell = nil;
 	if (cell == nil) {
-		cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
+		//cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
+		//						   reuseIdentifier:SimpleTableIdentifier] retain];
+		cell = [[[MoSyncUITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
 								   reuseIdentifier:SimpleTableIdentifier] retain];
+		
+		
+		[cell setWidget:self];
+		
 		cell.selectionStyle =  UITableViewCellSelectionStyleNone;
 	}
-
-	//cell.textLabel.backgroundColor = [UIColor colorWithRGBHex:0xff0000];
-	//cell.backgroundView = cellContentView;
-	//cell.selectedBackgroundView = cellContentView;	
 	view = cell;
 	
 	return [super init];		
@@ -51,33 +51,32 @@
 //	[super addChild:child];
 	UITableViewCell *cell = (UITableViewCell*)view;
 	[cell.contentView addSubview: [child getView]];
-}
-
-- (void)removeChild: (IWidget*)child {
+	[super addChild:child andSubview:NO];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"text"]) {
 		UITableViewCell* cell = (UITableViewCell*) view;
-		//cell.text = value;
 		UILabel* label = cell.textLabel;
 		label.text = value;
+		[self layout];
 	} 
 	else if([key isEqualToString:@"icon"]) {
 		int imageHandle = [value intValue];
+		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;
 		UITableViewCell* cell = (UITableViewCell*) view;
 		UIImageView* imageView = cell.imageView;
-#ifndef NATIVE_TEST		
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);		
 		imageView.image = [UIImage imageWithCGImage:imageResource->image];
-#endif		
 	}
 	else if([key isEqualToString:@"backgroundColor"]) {
-		//	[super addChild:child];
 		UITableViewCell *cell = (UITableViewCell*)view;
-		cell.contentView.backgroundColor = [UIColor colorWithHexString:value];
-		cell.textLabel.backgroundColor = [UIColor colorWithHexString:value];
-		cell.accessoryView.backgroundColor = [UIColor colorWithHexString:value];		
+		UIColor* color = [UIColor colorWithHexString:value];
+		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+		
+		cell.contentView.backgroundColor = color;
+		cell.textLabel.backgroundColor = color;
+		cell.accessoryView.backgroundColor = color;		
 	} 
     else if([key isEqualToString:@"accessoryType"]) {
 		UITableViewCell *cell = (UITableViewCell*)view;
@@ -99,7 +98,7 @@
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

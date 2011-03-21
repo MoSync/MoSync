@@ -18,6 +18,10 @@
 #ifndef _MOSYNC_UI_SYSCALLS_
 #define _MOSYNC_UI_SYSCALLS_
 
+/*
+ * This is the syscall implementation for the native ui api.
+ */
+
 #import <Foundation/Foundation.h>
 #import "MoSyncUI.h"
 #import "MoSyncUISyscalls.h"
@@ -27,20 +31,22 @@
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
 bool isNativeUIEnabled();
 
-
-// returns MA_WIDGET_ERROR on error
-int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value);
+MoSyncUI* getMoSyncUI();
 
 MAWidgetHandle maWidgetCreate(const char *widgetType);
 
-// if maWidgetGetProperty returns <0 maxSize equals the size needed. removed pointer.
+int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value);
+
 int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value, int maxSize);
+
 int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle);
+
 int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index);
+
 int maWidgetDestroy(MAWidgetHandle handle) ;
+
 int maWidgetRemoveChild(MAWidgetHandle child);
+
 int maWidgetScreenShow(MAWidgetHandle screenHandle);
-int maWidgetEvaluateScript(MAWidgetHandle widget, const char* script);
-int maWidgetGetMessageData(int messageId, void* buffer, int bufferSize);
 
 #endif // _MOSYNC_UI_SYSCALLS_

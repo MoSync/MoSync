@@ -25,12 +25,21 @@
 @implementation MoSyncUI
 
 NSMutableArray* widgetArray;
+NSMutableArray* unusedWidgetHandles;
+int currentWidgetIndex = 0;
+
 UIWindow* mainWindow;
 UIViewController *mainController;
-//UINavigationController *tabBarController;
+
+static IWidget* sOldScreen = nil;
+
+- (IWidget*)getCurrentlyShownScreen {
+	return sOldScreen;
+}
 
 - (IWidget*)getWidget: (int) handle {
 	IWidget *widget = nil;
+	if(handle<0 || handle>=[widgetArray count]) return NULL;
 	widget = [widgetArray objectAtIndex:(NSUInteger)handle];
 	return widget;
 }
@@ -38,31 +47,28 @@ UIViewController *mainController;
 - (id)initWithWindow: (UIWindow*) window andController: (UIViewController*)controller {
 	[super init];
 	widgetArray = [[NSMutableArray alloc] init];
+	unusedWidgetHandles = [[NSMutableArray alloc] init];
 	
-	//mainWindow = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	if(!window) {
 		window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];		
 		[window makeKeyAndVisible];
 	}
-	
+		
 	mainWindow = window;
 	mainController = controller;
-	
 	mainWindow.backgroundColor = [UIColor whiteColor];
 	
-	//tabBarController = [[UITabBarController alloc] init];
-    //tabBarController = [[UINavigationController alloc] init];
-	
-	//tabBarController.viewControllers = [NSArray array];										 	
-	//tabBarController.view = mainWindow;
-
-	//[mainWindow addSubview:tabBarController.view];	
-
+	ScreenWidget* mosyncScreen = [[ScreenWidget alloc] initWithController:mainController];
+	[widgetArray addObject:mosyncScreen];
+	[mosyncScreen setWidgetHandle:0]; // MAW_CONSTANT_MOSYNC_SCREEN_HANDLE	
+	sOldScreen = mosyncScreen;
 	
 	return self;
 }
 
 - (void) close {
+	[widgetArray dealloc];
+	[unusedWidgetHandles dealloc];
 }
 
 - (int) createWidget: (NSString*)name {
@@ -77,46 +83,63 @@ UIViewController *mainController;
 		
 	} else {
 		//created = [[ReflectionWidget alloc] initWithName:name];
+		return MAW_RES_INVALID_TYPE_NAME;
 	}
 
 	// todo handle these things.
 	if(created == nil) return MAW_RES_INVALID_TYPE_NAME;
 	
-	[created setWidgetHandle:[widgetArray count]];
-	[created wasCreated];
+	int ret = MAW_RES_ERROR;
 	
-	[widgetArray addObject:created];
+	if([unusedWidgetHandles count] > 0) {
+		ret = [[unusedWidgetHandles objectAtIndex:([unusedWidgetHandles count]-1)] intValue];
+		[unusedWidgetHandles removeLastObject];
+		[widgetArray replaceObjectAtIndex:ret withObject:created];
+	} else {
+		[widgetArray addObject:created];
+		ret = [widgetArray count]-1;
+	}
 	
-	return MAW_RES_OK;
+	[created setWidgetHandle:ret];	
+	
+	return ret;
 }
 
-- (void) removeWidget: (IWidget*) handle {
+- (int) destroyWidgetInstance:(IWidget*)widget {
+	int handle = [widget getWidgetHandle];	
+	[widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
+	
+	int ret;
+	int removeRet = [widget remove];
+	if(removeRet<0)
+		ret = removeRet;
+	else
+		ret = MAW_RES_OK;
+
+	
+	//[widget dealloc];
+	[widget release];
+	[unusedWidgetHandles addObject:[[NSNumber alloc] initWithInt:handle]];
+
+	return ret;
 }
 
 - (void) setPropertyOf: (IWidget*) widget withKey: (NSString*)key toValue: (NSString*)value {	
 	[widget setPropertyWithKey:key toValue:value];
 }
 
-bool nativeUIEnabled = false;
-
-static IWidget* sOldScreen = nil;
-
-
-- (int)show: (IWidget*) widget {
-	if(!nativeUIEnabled) {
-		if(mainController)
-			[mainController.view removeFromSuperview];
-		nativeUIEnabled = true;
-	}
-	
+- (int)show: (IWidget*) widget {	
 	if(sOldScreen != nil) {
 		UIView* actualView = [sOldScreen getView];
 		[actualView removeFromSuperview];
+	} else {
+		return MAW_RES_ERROR;
 	}
 	
 	[mainWindow insertSubview:[widget getView] atIndex:0];
 	
 	[widget layout];
+	[widget show];
 	[mainWindow makeKeyAndVisible];
 	sOldScreen = widget;
 	

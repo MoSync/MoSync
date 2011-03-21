@@ -16,18 +16,21 @@
  */
 
 #import "NavScreenWidget.h"
-
+#include "Platform.h"
+#include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
 
 @implementation NavScreenWidget
 
 - (id)init {
     //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	UINavigationController* navigationController = [[UINavigationController alloc] init];
-	controller = navigationController;
+	//controller = navigationController;
 	navigationController.viewControllers = [NSArray array];	
 	//view = controller.view;
 	
-	return [super init];
+	return [super initWithController:navigationController];
 }
 
 - (void)addChild: (IWidget*)child {
@@ -39,6 +42,7 @@
 	
 	//[super addChild:child];
 	[super addChild:child andSubview:NO];
+	[navigationController popToRootViewControllerAnimated:YES];
 }
 
 - (void)removeChild: (IWidget*)child {	
@@ -51,7 +55,7 @@
 	} else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

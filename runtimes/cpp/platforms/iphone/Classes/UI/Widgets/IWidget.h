@@ -19,14 +19,11 @@
 #import <UIKit/UIKit.h>
 #import "AbstractLayoutView.h"
 
-#define MA_WIDGET_ERROR -1
-#define MA_WIDGET_OK 0
-
-@interface AbstractLayoutView (AbstractLayoutViewExpanded)
-- (void) setVerticalAlignment: (UIControlContentVerticalAlignment) va;
-- (void) setHorizontalAlignment: (UIControlContentHorizontalAlignment) ha;
-@end
-
+typedef enum {
+	FIXED_SIZE,
+	FILL_PARENT,
+	WRAP_CONTENT
+} AutoSizeParam;
 
 @interface IWidget : NSObject {
 	UIView* view;
@@ -35,13 +32,52 @@
 	IWidget* parent;
 	NSMutableArray* children;
 	
-	int fillWidth, fillHeight;
+	AutoSizeParam autoSizeParamX;
+	AutoSizeParam autoSizeParamY;	
+	
 }
 
+// this generates a wrapper that routes the layoutSubviews and sizeThatFits commands to an IWidget
+// make sure not to call the IWidget::view.layoutSubviews or IWidget::view.sizeThatFits from the function  but the super* functions..
+#define MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSyncName, UIViewName) \
+@interface MoSyncName ## UIViewName : UIViewName {\
+IWidget* mWidget;\
+}\
+- (void)setWidget:(IWidget*)widget;\
+- (void)layoutSubviews;\
+- (void)superLayoutSubviews;\
+- (CGSize)sizeThatFits:(CGSize)size;\
+@end\
+@implementation MoSync##UIViewName \
+- (void)setWidget:(IWidget*)widget { \
+mWidget = widget; \
+}\
+- (void)layoutSubviews {\
+	[mWidget layoutSubviews:self];\
+}\
+- (CGSize)sizeThatFits:(CGSize)size {\
+	return [mWidget sizeThatFitsFor:(UIView*)self withSize:size];\
+}\
+- (void)superLayoutSubviews {\
+	[super layoutSubviews];\
+}\
+- (CGSize)superSizeThatFits:(CGSize)size {\
+return [super sizeThatFits:size];\
+}\
+@end\
+
+- (void)setAutoSizeParamX:(AutoSizeParam)x andY:(AutoSizeParam)y;
+- (AutoSizeParam)getAutoSizeParamX;
+- (AutoSizeParam)getAutoSizeParamY;
+
+// override this if you want a special behaviour...
+- (void)layoutSubviews:(UIView*)view;
+- (CGSize)sizeThatFitsFor:(UIView*)view withSize:(CGSize)size;
+
 - (void)setParent:(IWidget*) parent;
+- (IWidget*)getParent;
 - (void)setWidgetHandle:(int) handle;
 - (int)getWidgetHandle;
-- (void)wasCreated; // do stuff after the handle has been set (temporary hack). 
 - (void)dealloc;
 - (id)init;
 - (UIView*)getView;
@@ -56,5 +92,8 @@
 - (NSString*)getPropertyWithKey: (NSString*)key;
 
 - (void)layout;
+
+// when a root screen is shown, this will be called recursively for all widgets.
+- (void)show;
 
 @end

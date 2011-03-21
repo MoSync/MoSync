@@ -735,6 +735,7 @@ public:
 			DATA_SEGMENT_SIZE = nextPowerOf2(16, Head.DataSize);
 			
 #ifdef _android
+			/*
 			jclass cls = mJniEnv->GetObjectClass(mJThis);
 			jmethodID methodID = mJniEnv->GetMethodID(cls, "generateDataSection", "(I)Ljava/nio/ByteBuffer;");
 			if (methodID == 0) return -1;
@@ -749,6 +750,30 @@ public:
 			
 			mem_ds = (int*)mJniEnv->GetDirectBufferAddress(jo);
 			mJniEnv->DeleteLocalRef(cls);
+			*/
+
+			char* buffer = (char*)malloc(DATA_SEGMENT_SIZE);
+			if(buffer == NULL) return 0;
+			
+			jobject byteBuffer = mJniEnv->NewDirectByteBuffer((void*)buffer, DATA_SEGMENT_SIZE);
+			if(byteBuffer == NULL) return 0;
+			
+			jclass cls = mJniEnv->GetObjectClass(mJThis);
+			jmethodID methodID = mJniEnv->GetMethodID(cls, "generateDataSection", "(Ljava/nio/ByteBuffer;)Z");
+			if (methodID == 0) return 0;
+			
+			jboolean ret = mJniEnv->CallBooleanMethod(mJThis, methodID, byteBuffer);
+			if(false == ret) 
+			{
+				__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "Deta section was allocated, not enough memory!");
+				return 0;
+			}
+
+			mem_ds = (int*)buffer;
+
+			mJniEnv->DeleteLocalRef(cls);
+			mJniEnv->DeleteLocalRef(byteBuffer);
+		
 #else
 			mem_ds = new int[DATA_SEGMENT_SIZE / sizeof(int)];
 #endif		

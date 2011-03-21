@@ -17,56 +17,36 @@
 
 #import "EditBoxWidget.h"
 #import <QuartzCore/QuartzCore.h>
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
-
 
 @implementation EditBoxWidget
 
 - (BOOL)textFieldShouldReturn:(UITextField*)textField {
-#ifndef NATIVE_TEST
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_CLICKED;
 	eventData->widgetHandle = handle;
-//	eventData->searchBarButton = 0;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-#endif
 	return YES;
 }
 
 - (id)init {
 	textField = [[[UITextField alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];
-	
-	/*
-	 //	textView = [[[UITextView alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];	 
-	[textView setTextColor:[UIColor blackColor]];
-	[textView.layer setBackgroundColor: [[UIColor whiteColor] CGColor]];
-    [textView.layer setBorderColor: [[UIColor grayColor] CGColor]];
-    [textView.layer setBorderWidth: 1.0];
-    [textView.layer setCornerRadius:8.0f];
-    //[textView.layer setMasksToBounds:YES];
-	*/
 	textField.borderStyle = UITextBorderStyleRoundedRect;
-	
 	view = textField;			
 	id ret = [super init];
+	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
 	textField.delegate = self;
 	return ret;
 }
 
 - (void)addChild: (IWidget*)child {
 	[super addChild:child];
-}
-
-- (void)removeChild: (IWidget*)child {
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -90,7 +70,7 @@
 			textField.autocorrectionType = UITextAutocorrectionTypeNo;
 		}
 	}	
-	else if([key isEqualToString:@"horizontalAlignment"]) {
+	else if([key isEqualToString:@"textHorizontalAlignment"]) {
 		if([value isEqualToString:@"left"]) {
 			textField.textAlignment = UITextAlignmentLeft;
 		}
@@ -101,15 +81,17 @@
 			textField.textAlignment = UITextAlignmentRight;
 		}		
 	}
-	else if([key isEqualToString:@"verticalAlignment"]) {
+	else if([key isEqualToString:@"textVerticalAlignment"]) {
 		// This isn't trivial on iphone.
 		
 		//UILabel* label = (UILabel*) view;
 		//if([value isEqualToString:@"center"]) {
 		//}
 	}	
-	else if([key isEqualToString:@"fontColor"]) {	
-		textField.textColor = [UIColor colorWithHexString:value];
+	else if([key isEqualToString:@"fontColor"]) {
+		UIColor* color = [UIColor colorWithHexString:value];
+		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+		textField.textColor = color;
 	}	
 	else if([key isEqualToString:@"fontSize"]) {
 		float fontSize = [value floatValue];
@@ -118,6 +100,8 @@
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
+	
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

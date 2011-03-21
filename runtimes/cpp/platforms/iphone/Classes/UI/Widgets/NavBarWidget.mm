@@ -16,18 +16,15 @@
  */
 
 #import "NavBarWidget.h"
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
 
 @implementation NavBarWidget
 
 - (id)init {	
-	UINavigationBar* navbar = [[[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
+	UINavigationBar* navbar = [[[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, 100, 44)] retain];
 	navbar.delegate = self;
 	prevNavitem = [[UINavigationItem alloc] init];
 	currNavitem = [[UINavigationItem alloc] init];
@@ -42,9 +39,6 @@
 	[super addChild:child];
 }
 
-- (void)removeChild: (IWidget*)child {
-}
-
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"title"]) {
 		currNavitem.title = value;
@@ -57,7 +51,7 @@
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
@@ -71,7 +65,6 @@
 }
 
 - (BOOL)navigationBar:(UINavigationBar *)navigationBar shouldPopItem:(UINavigationItem *)item {
-#ifndef NATIVE_TEST
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -79,8 +72,6 @@
 	eventData->widgetHandle = handle;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-#endif
-
 	return false;
 }
 

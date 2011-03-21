@@ -15,6 +15,13 @@
  02111-1307, USA.
  */
 
+/*
+ * This is the main obj-c interface for the native ui api. It should be executing on the main thread, so 
+ * everything calling it must use performSelectorOnMainThread when invoking methods on an instance.
+ * Most things can be performed directly on the widget instances themselves. But they still need to be 
+ * performed on the main thread. See MoSyncUISyscalls.* for more information.
+ */
+
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
 
@@ -22,12 +29,24 @@
 
 }
 
+// Parameters are the main MoSync window and UIViewController.
 - (id)initWithWindow: (UIWindow*) window andController: (UIViewController*)controller;
+
+// close the api.
 - (void)close;
-- (int)createWidget: (NSString*)name; // increasing handles beginning at 0
+
+// returns increasing handles beginning at 0
+- (int)createWidget: (NSString*)name;
+
+// get a pointer to a widget instance by passing a handle.
 - (IWidget*)getWidget: (int) handle;
-- (void)removeWidget: (IWidget*) handle;
-//- (void)addChild: (IWidget*)child toParent:(IWidget*)parent;
+
+- (IWidget*)getCurrentlyShownScreen;
+
+// destroy a widget instance by passing a pointer to it.
+- (int) destroyWidgetInstance:(IWidget*)widget;
+
+// shows a screen.
 - (int)show: (IWidget*) handle;
 
 @end

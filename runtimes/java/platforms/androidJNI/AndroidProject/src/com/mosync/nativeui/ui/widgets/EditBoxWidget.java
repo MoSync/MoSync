@@ -3,6 +3,7 @@ package com.mosync.nativeui.ui.widgets;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.BooleanConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 import android.content.Context;
@@ -34,7 +35,7 @@ public class EditBoxWidget extends LabelWidget
 	 * @see LabelWidget.setProperty.
 	 */
 	@Override
-	public boolean setProperty(String property, String value) throws PropertyConversionException
+	public boolean setProperty(String property, String value) throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty(property, value) )
 		{

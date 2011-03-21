@@ -17,12 +17,9 @@
 
 #import "ListViewWidget.h"
 #import "ListViewItemWidget.h"
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
-#endif
 
 @implementation ListViewWidget
 
@@ -30,7 +27,6 @@
 	NSInteger index = [indexPath row];
 	
 	NSLog(@"ListItem %d pressed!", index);
-#ifndef NATIVE_TEST
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -38,9 +34,7 @@
 	eventData->widgetHandle = handle;
 	eventData->listItemIndex = index;
 	event.data = eventData;
-	Base::gEventQueue.put(event);
-#endif
-	
+	Base::gEventQueue.put(event);	
 }
 
 - (id)init {
@@ -63,14 +57,22 @@
 	
 	[tableView addView: [child getView]];
 	[view reloadData];
-}
-
-- (void)removeChild: (IWidget*)child {
+	
+	[super addChild:child];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-
-	return [super setPropertyWithKey:key toValue:value];
+    if([key isEqualToString:@"rowHeight"]) {
+		float rowHeight = [value floatValue];
+		UITableView* tableView = (UITableView*)view;
+		tableView.rowHeight = rowHeight;
+		[tableView reloadData];
+	} 
+	else {
+		return [super setPropertyWithKey:key toValue:value];
+	}
+	
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

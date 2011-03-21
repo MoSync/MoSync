@@ -137,6 +137,8 @@ int MoSync_ThreadMain(void *args) {
 		
 		if(gReloadHandle > 0) {
 			Base::Stream* stream = Base::gSyscall->resources.extract_RT_BINARY(gReloadHandle);
+			if(!stream->seek(Seek::Start, 0))
+				BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);
 			bool res = Core::LoadVMApp(gCore, *stream);
 			delete stream;
 			gReloadHandle = 0;
@@ -194,6 +196,16 @@ void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText,
 	 ];  	
 }
 
+void MoSync_ReloadProgram(MAHandle data, int reload) {
+#ifdef SUPPORT_PROGRAM_RELOAD
+	Base::gSyscall->VM_Yield();
+	gReloadHandle = data;
+	//gReload |= (reload != 0);
+#else
+	BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
+#endif
+}
+
 void MoSync_Exit() {
 	[[UIApplication sharedApplication] terminateWithSuccess];
 }
@@ -242,7 +254,7 @@ void* MoSync_GetCustomEventData() {
 #ifdef _USE_REBUILDER_
 	return sCustomEventData;
 #else
-	return (void*) &gCore->mem_ds[gCore->DATA_SEGMENT_SIZE-Base::getMaxCustomEventSize()];
+	return GetCustomEventPointer(gCore);
 #endif
 }
 
@@ -250,7 +262,7 @@ void* MoSync_GetCustomEventDataMoSyncPointer() {
 #ifdef _USE_REBUILDER_
 	return (void*) sCustomEventDataPointer;
 #else
-	return (void*) (gCore->DATA_SEGMENT_SIZE-Base::getMaxCustomEventSize());
+	return (void*) (gCore->Head.DataSize-Base::getMaxCustomEventSize());
 	
 #endif
 }

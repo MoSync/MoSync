@@ -50,4 +50,6 @@
 - (void) bindContext;
 - (void) renderContext;
 
+- (void)viewAppeared;
+
 @end

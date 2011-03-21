@@ -4,6 +4,7 @@ import android.widget.CheckBox;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.BooleanConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
@@ -28,7 +29,7 @@ public class CheckBoxWidget extends Widget
 
 	@Override
 	public boolean setProperty(String property, String value)
-			throws PropertyConversionException
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty(property, value) )
 		{
@@ -46,6 +47,23 @@ public class CheckBoxWidget extends Widget
 		else
 		{
 			return false;
+		}
+	}
+	
+	/**
+	 * @see Widget.getProperty.
+	 */
+	@Override
+	public String getProperty(String property)
+	{
+		if( property.equals( IX_WIDGET.MAW_CHECK_BOX_CHECKED ) )
+		{
+			CheckBox checkBox = (CheckBox) getView( );
+			return Boolean.toString( checkBox.isChecked( ) );
+		}
+		else
+		{
+			return super.getProperty( property );
 		}
 	}
 }
