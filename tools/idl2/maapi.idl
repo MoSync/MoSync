@@ -3023,12 +3023,12 @@ group WidgetAPI "Widget API" {
 		
 		union {
 			/**
-			* @brief The index when a #WIDGET_EVENT_CLICKED event is receieved for a list view.	
+			* @brief The index when a #MAW_EVENT_CLICKED event is receieved for a list view.	
 			*/
 			int listItemIndex;
 
 			/**
-			* @brief The type of button that was clicked when a #WIDGET_EVENT_CLICKED event is receieved for a searchbar.	
+			* @brief The type of button that was clicked when a #MAW_EVENT_CLICKED event is receieved for a searchbar.	
 			* The type of searchbar button clicked:
 			* - 0 means 'search'
 			* - 1 means 'cancel'
@@ -3036,14 +3036,14 @@ group WidgetAPI "Widget API" {
 			int searchBarButton;
 
 			/**
-			* @brief The new state of the checkbox when a #WIDGET_EVENT_CLICKED event is receieved for a checkbox.
+			* @brief The new state of the checkbox when a #MAW_EVENT_CLICKED event is receieved for a checkbox.
 			* - 0 means 'unchecked'
 			* - 1 means 'checked'
 			*/
 			int checked;
 			
 			/**
-			* @brief The new tab index when a #WIDGET_EVENT_TAB_CHANGED event is received.
+			* @brief The new tab index when a #MAW_EVENT_TAB_CHANGED event is received.
 			*/
 			int tabIndex;
 		}
@@ -3218,7 +3218,7 @@ group WidgetAPI "Widget API" {
 		EDIT_BOX = "EditBox";
 
 		/**
-		* @brief A list view is a vertical list of widgets that is also scrollable. See \ref WidgetListViewProperties "List view properties" for the properties available.
+		* @brief A list view is a vertical list of widgets that is also scrollable.
 		*/
 		LIST_VIEW = "ListView";
 
@@ -3243,7 +3243,7 @@ group WidgetAPI "Widget API" {
 		VERTICAL_LAYOUT = "VerticalLayout";
 
 		/**
-		 * @brief A relative layout is a layout that layouts widgets relative to its coordinate system. See \ref WidgetRelativeLayoutProperties "Relative layout properties" for the properties available.
+		 * @brief A relative layout is a layout that layouts widgets relative to its coordinate system.
 		 */
 		RELATIVE_LAYOUT = "RelativeLayout";
 
@@ -3775,8 +3775,9 @@ group WidgetAPI "Widget API" {
 		/**
 		 * Set the screen orientation.
 		 * Currently implemented only on Android.
-		 * @param orientation One of the \link #SCREEN_ORIENTATION 
-		 * \endlink constants.
+		 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE 
+		 * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
+		 * constants.
 		 * @return \< 0 on error.
 		 */
 		int maScreenSetOrientation(in int orientation);
