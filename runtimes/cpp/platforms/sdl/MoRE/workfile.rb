@@ -18,8 +18,10 @@ work.instance_eval do
 		"#{BD}/runtimes/cpp/core/GdbStub.cpp",
 		"#{BD}/intlibs/helpers/intutil.cpp"]
 	@EXTRA_INCLUDES += ["../../.."]
+	@SPECIFIC_CFLAGS = { "Core.cpp" => " -DHAVE_IOCTL_ELLIPSIS" }
 	if(!@GCC_IS_V4 && CONFIG=="debug")
-		@SPECIFIC_CFLAGS = { "Core.cpp" => " -Wno-unreachable-code", "sld.cpp" => " -Wno-unreachable-code" }
+		@SPECIFIC_CFLAGS["Core.cpp"] += " -Wno-unreachable-code"
+		@SPECIFIC_CFLAGS["sld.cpp"] = " -Wno-unreachable-code"
 	end
 	
 	@LOCAL_LIBS = ["mosync_sdl", "demangle"] + @LOCAL_LIBS
