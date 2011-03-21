@@ -136,6 +136,8 @@ namespace Base {
 	static int gTimerSequence;
 	static SDL_mutex* gTimerMutex = NULL;
 	static bool gShowScreen;
+	
+	static SDL_TimerID gExitTimer = NULL;
 
 #ifdef SUPPORT_OPENGL_ES
 	static SubView sSubView;
@@ -867,7 +869,8 @@ namespace Base {
 		MAEvent event;
 		event.type = EVENT_TYPE_CLOSE;
 		gEventFifo.put(event);
-		DEBUG_ASSERT(NULL != SDL_AddTimer(EVENT_CLOSE_TIMEOUT, ExitCallback, NULL));
+		gExitTimer = SDL_AddTimer(EVENT_CLOSE_TIMEOUT, ExitCallback, NULL);
+		DEBUG_ASSERT(NULL != gExitTimer);
 	}
 
 	static void MARotateScreen() {
@@ -2663,6 +2666,10 @@ void MoSyncExit(int r) {
 
 		reloadProgram();
 	} else {
+		if(gExitTimer) {
+			SDL_bool res = SDL_RemoveTimer(gExitTimer);
+			DEBUG_ASSERT(res);
+		}
 #ifdef USE_MALIBQUIT
 		MALibQuit();	//disabled, hack to allow static destructors
 #endif	
