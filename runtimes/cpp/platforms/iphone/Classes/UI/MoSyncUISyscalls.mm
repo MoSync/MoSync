@@ -174,10 +174,36 @@ int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
 	return MAW_RES_OK;
 }
 
-// TODO: implement this
 int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index) {
+	IWidget* parent = [mosyncUI getWidget:parentHandle];
+	IWidget* child = [mosyncUI getWidget:childHandle];
+	if(!parent) return MAW_RES_INVALID_HANDLE;
+	if(!child) return MAW_RES_INVALID_HANDLE;
+	if(parent == child) return MAW_RES_ERROR;
 
-	return MAW_RES_ERROR;
+	if([child getParent] != NULL) return MAW_RES_ERROR;
+	
+	// ugly.
+	if(
+	   !([parent class] == [HorizontalLayoutWidget class]) &&
+	   !([parent class] == [VerticalLayoutWidget class]) &&
+	   !([parent class] == [RelativeLayoutWidget class]) &&
+	   !([parent class] == [ListViewItemWidget class]) &&	   
+	   !([parent class] == [ScreenWidget class]) &&
+	   !([parent superclass] == [ScreenWidget class])
+	   ) {
+		return MAW_RES_INVALID_LAYOUT;
+	}
+
+	
+	int returnValue;
+	[NSObject performSelectorOnMainThread:@selector(insertChild:atIndex:)
+							   withTarget:parent
+							  withObjects:[NSArray arrayWithObjects: child, [NSNumber numberWithInt:index], nil] 
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];	
+	
+	return returnValue;
 }
 
 int maWidgetRemoveChild(MAWidgetHandle childHandle) {

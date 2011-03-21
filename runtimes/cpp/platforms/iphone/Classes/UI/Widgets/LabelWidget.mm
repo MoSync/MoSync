@@ -16,13 +16,11 @@
  */
 
 #import "LabelWidget.h"
-
-#ifndef NATIVE_TEST
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-#endif
+#include "UIColor-Expanded.h"
 
 typedef enum VerticalAlignment {
     VerticalAlignmentTop,
@@ -95,10 +93,6 @@ typedef enum VerticalAlignment {
 	id ret = [super init];	
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
 	return ret;
-}
-
-- (void)addChild: (IWidget*)child {
-	[super addChild:child];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

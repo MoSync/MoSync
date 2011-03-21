@@ -68,7 +68,7 @@
 	tabBarController.viewControllers = newItems;
 	
 	//[super addChild:child];
-	[super addChild:child andSubview:NO];
+	[super addChild:child toSubview:NO];
 	
 	//UIView *childView = [screen getView];	
 	//[childView setFrame: view.frame];

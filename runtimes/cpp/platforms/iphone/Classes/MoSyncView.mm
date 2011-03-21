@@ -196,8 +196,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {
-	UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
-	//Base::gEventQueue.addScreenChangedEvent();
+	//UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
 	MoSync_AddScreenChangedEvent();
 }
 

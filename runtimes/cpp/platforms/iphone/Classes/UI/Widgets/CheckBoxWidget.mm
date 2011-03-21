@@ -26,7 +26,7 @@
 - (id)init {
 	UISwitch* checkBox = [[[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
 	view = checkBox;
-	[view addTarget:self action:@selector(checkBoxPressed) forControlEvents:UIControlEventTouchUpInside];
+	[checkBox addTarget:self action:@selector(checkBoxPressed) forControlEvents:UIControlEventTouchUpInside];
 	return [super init];
 }
 
@@ -41,10 +41,6 @@
 	eventData->checked = checkBox.on;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-}
-
-- (void)addChild: (IWidget*)child {
-	[super addChild:child];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

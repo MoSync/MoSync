@@ -45,10 +45,6 @@
 	return ret;
 }
 
-- (void)addChild: (IWidget*)child {
-	[super addChild:child];
-}
-
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"text"]) {
 		textField.text = value;

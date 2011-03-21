@@ -20,6 +20,7 @@
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
+#include "UIColor-Expanded.h"
 
 @implementation ButtonWidget
 
@@ -28,7 +29,7 @@
 		view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
 	UIButton* button = (UIButton*) view;
 	button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
-	[view addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
+	[button addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
 	
 	return [super init];
 }
@@ -42,10 +43,6 @@
 	eventData->widgetHandle = handle;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
-}
-
-- (void)addChild: (IWidget*)child {
-	[super addChild:child];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

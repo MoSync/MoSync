@@ -522,7 +522,7 @@ namespace Base {
 		path = newFile.c_str();
 		len = newFile.length();
 		int ret = _mkdir(newPath.c_str());
-		// TODO: handle return value
+		if(ret != 0) return STERR_GENERIC;
 #else
 		std::string newPath = STORE_PATH + std::string(name);
 		path = newPath.c_str();

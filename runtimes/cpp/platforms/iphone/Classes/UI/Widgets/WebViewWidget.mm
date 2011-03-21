@@ -32,10 +32,6 @@
 	return [super init];	
 }
 
-- (void)addChild: (IWidget*)child {
-	[super addChild:child];
-}
-
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"url"]) {
 		UIWebView* webView = (UIWebView*)view;

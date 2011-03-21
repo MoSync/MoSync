@@ -29,27 +29,25 @@
 	return [super init];	
 }
 
-- (void)setWidgetHandle:(int)handle {
+- (void)setWidgetHandle:(int)_handle {
 	[super setWidgetHandle:handle];
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_GL_VIEW_READY;
-	eventData->widgetHandle = handle;
+	eventData->widgetHandle = _handle;
 	event.data = eventData;
 	Base::gEventQueue.put(event);
 }
 
-- (void)addChild: (IWidget*)child {
-	[super addChild:child];
-}
-
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"bind"]) {
-		[view bindContext];
+		MoSyncGLView* glView = (MoSyncGLView*) view;
+		[glView bindContext];
 	}
 	else if([key isEqualToString:@"invalidate"]) {
-		[view renderContext];
+		MoSyncGLView* glView = (MoSyncGLView*) view;		
+		[glView renderContext];
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];

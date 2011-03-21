@@ -174,12 +174,6 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 	}
 }
 
-- (void)addChild: (IWidget*)child {
-	[super addChild:child];
-	//[view setSize];	
-	[view setNeedsLayout];
-}
-
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"childVerticalAlignment"]) {
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;

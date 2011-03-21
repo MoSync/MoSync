@@ -33,10 +33,6 @@
 	return ret;
 }
 
-- (void)addChild: (IWidget*)child {
-	[super addChild:child];
-}
-
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"image"]) {
 		int imageHandle = [value intValue];

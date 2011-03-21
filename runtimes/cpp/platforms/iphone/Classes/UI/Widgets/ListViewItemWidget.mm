@@ -29,21 +29,12 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 - (id)init {
 
 	static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
-	
-	UITableViewCell *cell = nil;
-	if (cell == nil) {
-		//cell = [[[UITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
-		//						   reuseIdentifier:SimpleTableIdentifier] retain];
-		cell = [[[MoSyncUITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
-								   reuseIdentifier:SimpleTableIdentifier] retain];
-		
-		
-		[cell setWidget:self];
-		
-		cell.selectionStyle =  UITableViewCellSelectionStyleNone;
-	}
+	MoSyncUITableViewCell *cell = nil;
+	cell = [[[MoSyncUITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
+							   reuseIdentifier:SimpleTableIdentifier] retain];
+	[cell setWidget:self];
+	cell.selectionStyle =  UITableViewCellSelectionStyleNone;
 	view = cell;
-	
 	return [super init];		
 }
 
@@ -51,7 +42,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 //	[super addChild:child];
 	UITableViewCell *cell = (UITableViewCell*)view;
 	[cell.contentView addSubview: [child getView]];
-	[super addChild:child andSubview:NO];
+	[super addChild:child toSubview:NO];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

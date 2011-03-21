@@ -41,7 +41,7 @@
 	navigationController.viewControllers = newItems;
 	
 	//[super addChild:child];
-	[super addChild:child andSubview:NO];
+	[super addChild:child toSubview:NO];
 	[navigationController popToRootViewControllerAnimated:YES];
 }
 

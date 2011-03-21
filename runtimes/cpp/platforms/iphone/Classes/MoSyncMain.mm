@@ -17,7 +17,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 #include "MoSyncMain.h"
-#include "MosyncView.h"
 
 #include "config_platform.h"
 #include <core/Core.h>
@@ -104,7 +103,7 @@ using namespace Base;
 static MAHandle gReloadHandle = 0;
 bool gRunning = false;
 
-static UIView *sMoSyncView;
+static MoSyncView *sMoSyncView;
 static int sWidth, sHeight;
 
 
@@ -112,7 +111,6 @@ static int sWidth, sHeight;
 int MoSync_ThreadMain(void *args) {
 	NSAutoreleasePool	 *autoreleasepool = [[NSAutoreleasePool alloc] init];
 	
-	const char *program = getReadablePath("program");
 	const char *resources = getReadablePath("resources");
 
 	InitLog(getWriteablePath("log.txt"));
@@ -128,6 +126,8 @@ int MoSync_ThreadMain(void *args) {
 	}
 	cpp_main();
 #else
+	const char *program = getReadablePath("program");
+
 	gCore = Core::CreateCore(*syscall);
 	MYASSERT(Core::LoadVMApp(gCore, program, resources), ERR_PROGRAM_LOAD_FAILED);
 	gRunning = true;
@@ -156,7 +156,7 @@ int MoSync_ThreadMain(void *args) {
 
 MoSyncThread mosyncThread;
 
-void MoSync_Main(int width, int height, UIView* mosyncView) {
+void MoSync_Main(int width, int height, MoSyncView* mosyncView) {
 	sWidth = width;
 	sHeight = height;
 	sMoSyncView = mosyncView;

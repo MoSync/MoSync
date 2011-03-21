@@ -112,18 +112,29 @@
 	return parent;
 }
 
-- (void)addChild: (IWidget*)child andSubview:(bool)addSubview {
+- (void)addChild: (IWidget*)child toSubview:(bool)addSubview {
 	UIView* childView = [child getView]; 
 	[child setParent:self];
 	[children addObject:child];
 	if(addSubview) {
-		[view addSubview:[child getView]];
+		[view addSubview:childView];
 	}
 	[view setNeedsLayout];
 }
 
 - (void)addChild: (IWidget*)child {
-	[self addChild:child andSubview:YES];	
+	[self addChild:child toSubview:YES];	
+}
+
+- (void)insertChild: (IWidget*)child atIndex:(NSNumber*)index {
+	int indexValue = [index intValue];
+	UIView* childView = [child getView];
+	[child setParent:self];
+	[children insertObject:child atIndex:indexValue];
+	//if(addSubview) {
+	[view insertSubview:childView atIndex:indexValue];
+	//}
+	[view setNeedsLayout];
 }
 
 - (void)removeChild: (IWidget*)child {

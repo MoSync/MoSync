@@ -50,7 +50,7 @@ IWidget* mWidget;\
 @end\
 @implementation MoSync##UIViewName \
 - (void)setWidget:(IWidget*)widget { \
-mWidget = widget; \
+	mWidget = widget; \
 }\
 - (void)layoutSubviews {\
 	[mWidget layoutSubviews:self];\
@@ -62,7 +62,7 @@ mWidget = widget; \
 	[super layoutSubviews];\
 }\
 - (CGSize)superSizeThatFits:(CGSize)size {\
-return [super sizeThatFits:size];\
+	return [super sizeThatFits:size];\
 }\
 @end\
 
@@ -83,7 +83,8 @@ return [super sizeThatFits:size];\
 - (UIView*)getView;
 
 - (void)addChild: (IWidget*)child;
-- (void)addChild: (IWidget*)child andSubview:(bool)addSubview;
+- (void)addChild: (IWidget*)child toSubview:(bool)toSubview;
+- (void)insertChild: (IWidget*)child atIndex:(NSNumber*)index;
 - (int)remove;
 - (void)removeChild: (IWidget*)child;
 - (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview;

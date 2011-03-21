@@ -35,10 +35,6 @@
 	return [super init];	
 }
 
-- (void)addChild: (IWidget*)child {
-	[super addChild:child];
-}
-
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"title"]) {
 		currNavitem.title = value;

@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/cpp_defs.h>
 #include "TouchHelper.h"
 
-@interface MoSyncView : UIView {
+@interface MoSyncView : UIView <UITextFieldDelegate> {
 	CGImageRef mosyncView;
     MoSyncCLController *locationController;	
 	TouchHelper* touchHelper;

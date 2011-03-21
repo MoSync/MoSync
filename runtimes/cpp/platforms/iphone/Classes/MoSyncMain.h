@@ -21,8 +21,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import <CoreGraphics/CoreGraphics.h>
 #import <UIKit/UIKit.h>
 #include "Platform.h"
+#include "MosyncView.h"
 
-void MoSync_Main(int width, int height, UIView* mosyncView);
+void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 
 void MoSync_UpdateView(CGImageRef ref);
 void MoSync_DoneUpdatingView();
