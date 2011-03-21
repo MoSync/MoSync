@@ -31,21 +31,10 @@ int currentWidgetIndex = 0;
 UIWindow* mainWindow;
 UIViewController *mainController;
 
-//bool nativeUIEnabled = false;
 static IWidget* sOldScreen = nil;
 
 - (IWidget*)getCurrentlyShownScreen {
 	return sOldScreen;
-}
-
-- (void)showMoSyncCanvas {
-	if(!sOldScreen) return;
-	[[sOldScreen getView] removeFromSuperview];
-	[mainWindow insertSubview:mainController.view atIndex:0];
-	[mainWindow makeKeyAndVisible];
-	[mainController.view setNeedsDisplay];
-	sOldScreen = nil;
-	//nativeUIEnabled = false;
 }
 
 - (IWidget*)getWidget: (int) handle {
@@ -139,24 +128,12 @@ static IWidget* sOldScreen = nil;
 	[widget setPropertyWithKey:key toValue:value];
 }
 
-- (int)show: (IWidget*) widget {
-//	if(!nativeUIEnabled) {
-//		if(mainController)
-//			[mainController.view removeFromSuperview];
-//		nativeUIEnabled = true;
-	//}
-	
+- (int)show: (IWidget*) widget {	
 	if(sOldScreen != nil) {
 		UIView* actualView = [sOldScreen getView];
 		[actualView removeFromSuperview];
 	} else {
-	/*
-		if(mainController)
-			[mainController.view removeFromSuperview];
-	 */
 		return MAW_RES_ERROR;
-		
-		//nativeUIEnabled = true;
 	}
 	
 	[mainWindow insertSubview:[widget getView] atIndex:0];
@@ -164,7 +141,6 @@ static IWidget* sOldScreen = nil;
 	[widget layout];
 	[widget show];
 	[mainWindow makeKeyAndVisible];
-	//[mainWindow setNeedsDisplay];
 	sOldScreen = widget;
 	
 	return MAW_RES_OK;

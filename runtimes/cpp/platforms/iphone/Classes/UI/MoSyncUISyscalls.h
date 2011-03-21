@@ -30,6 +30,7 @@
 
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
 bool isNativeUIEnabled();
+
 MoSyncUI* getMoSyncUI();
 
 MAWidgetHandle maWidgetCreate(const char *widgetType);

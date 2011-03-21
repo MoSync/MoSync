@@ -29,8 +29,6 @@
 
 }
 
-- (void)showMoSyncCanvas;
-
 // Parameters are the main MoSync window and UIViewController.
 - (id)initWithWindow: (UIWindow*) window andController: (UIViewController*)controller;
 

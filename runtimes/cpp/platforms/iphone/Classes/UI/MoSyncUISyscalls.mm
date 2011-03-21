@@ -48,11 +48,13 @@ MAWidgetHandle maWidgetCreate(const char *widgetType) {
 //	NSLog(@"maWidgetCreate(%s)\n", widgetType);
 	
 	int returnValue;
+	NSString* widgetTypeString = stringFromChar(widgetType);
 	[NSObject performSelectorOnMainThread:@selector(createWidget:)
 							   withTarget:mosyncUI
-							  withObjects:[NSArray arrayWithObjects: stringFromChar(widgetType), nil] 
+							  withObjects:[NSArray arrayWithObjects: widgetTypeString, nil] 
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
+	[widgetTypeString release];
 	return returnValue;
 }
 
@@ -71,13 +73,6 @@ int maWidgetDestroy(MAWidgetHandle handle) {
 						   andReturnValue:&returnValue];
 
 	if(isCurrentlyShownScreen) {
-		/*
-		[NSObject performSelectorOnMainThread:@selector(showMoSyncCanvas)
-								   withTarget:mosyncUI
-								  withObjects:[NSArray arrayWithObjects: nil] 
-								waitUntilDone:YES
-							   andReturnValue:nil];
-		 */
 		maWidgetScreenShow(MAW_CONSTANT_MOSYNC_SCREEN_HANDLE);
 	}
 
@@ -105,11 +100,16 @@ int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char*
 	
 	int returnValue;
 	
+	NSString *valueString = stringFromChar(value);
+	
 	[NSObject performSelectorOnMainThread:@selector(setPropertyWithKey:toValue:)
 							   withTarget:widget
-							  withObjects:[NSArray arrayWithObjects: propertyString, stringFromChar(value), nil]
+							  withObjects:[NSArray arrayWithObjects: propertyString, valueString, nil]
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
+	
+	[propertyString release];
+	[valueString release];	
 	
 	return returnValue;
 }
@@ -120,11 +120,11 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 	if(!widget) return MAW_RES_INVALID_HANDLE;		
 	
 // NSString* retval = [widget getPropertyWithKey:stringFromChar(property)];
-
+	NSString* propertyString = stringFromChar(property);
 	NSString* retval;
 	[NSObject performSelectorOnMainThread:@selector(getPropertyWithKey:)
 							   withTarget:widget
-							  withObjects:[NSArray arrayWithObjects:stringFromChar(property), nil]
+							  withObjects:[NSArray arrayWithObjects:propertyString, nil]
 							waitUntilDone:YES
 						   andReturnValue:&retval];
 	
@@ -137,6 +137,9 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 	}
 	
 	[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
+	[retval release];
+	[propertyString release];
+	
 	return realLength;
 }
 
@@ -191,18 +194,6 @@ int maWidgetRemoveChild(MAWidgetHandle childHandle) {
 }
 
 int maWidgetScreenShow(MAWidgetHandle screenHandle) {
-	/*
-	if(screenHandle == MAW_CONSTANT_MOSYNC_SCREEN_HANDLE) {
-		[NSObject performSelectorOnMainThread:@selector(showMoSyncCanvas)
-								   withTarget:mosyncUI
-								  withObjects:[NSArray arrayWithObjects: nil] 
-								waitUntilDone:YES
-							   andReturnValue:nil];	
-		sNativeUIEnabled = false;
-		return MAW_RES_OK;
-	}
-	*/
-	
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
 	if(!screen) return MAW_RES_INVALID_HANDLE;
 
