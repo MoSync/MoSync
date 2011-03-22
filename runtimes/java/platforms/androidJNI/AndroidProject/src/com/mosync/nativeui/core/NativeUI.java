@@ -9,10 +9,12 @@ import android.view.View;
 
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
+import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.ui.factories.ViewFactory;
 import com.mosync.nativeui.ui.widgets.Layout;
+import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
@@ -39,9 +41,9 @@ public class NativeUI
 	private HandleTable<Widget> m_widgetTable = new HandleTable<Widget>();
 	
 	/**
-	 * The screen that is currently shown, null if none.
+	 * Listener for changes in the root view of the screen.
 	 */
-	private ScreenWidget m_currentScreen = null;
+	private RootViewReplacedListener m_rootViewReplacedListener = null;
 	
 	/**
 	 * Mapping between image handles and bitmaps.
@@ -89,14 +91,19 @@ public class NativeUI
 	}
 	
 	/**
-	 * Returns the view that currently should be shown. I.e.
-	 * the view corresponding to the screen that was last shown.
+	 * Sets the default MoSync canvas view, so that it is possible
+	 * to switch back to it from native UI.
 	 * 
-	 * @return The current root view.
+	 * @param mosyncScreen The MoSync canvas view.
 	 */
-	public View getRootView()
+	public void setMoSyncScreen(MoSyncView mosyncScreen)
 	{
-		return m_currentScreen.getView( ); 
+		MoSyncScreenWidget screenWidget = new MoSyncScreenWidget( 
+				IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
+				mosyncScreen ); 
+		
+		m_widgetTable.add( IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
+				screenWidget );
 	}
 	
 	/**
@@ -234,7 +241,7 @@ public class NativeUI
 	 * Internal function for the maWidgetScreenShow system call.
 	 * Sets the root widget to the root of the given screen, but
 	 * it does not actually call setContentView, this should
-	 * be done by the caller.
+	 * be done through the RootViewReplacedListener.
 	 * 
 	 * Note: Should only be called on the UI thread.
 	 */
@@ -246,13 +253,17 @@ public class NativeUI
 			Log.e( "MoSync", "maWidgetScreenShow: Invalid screen handle: " + screenWidget );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
-		if( !( screen instanceof ScreenWidget ) )
+		if( !( screen instanceof ScreenWidget ) && !( screen instanceof MoSyncScreenWidget ) )
 		{
 			Log.e( "MoSync", "maWidgetScreenShow: Widget is not a screen: " + screenWidget );
 			return IX_WIDGET.MAW_RES_INVALID_SCREEN;
 		}
-
-		m_currentScreen = (ScreenWidget) screen;
+		
+		if( m_rootViewReplacedListener != null )
+		{
+			m_rootViewReplacedListener.rootViewReplaced( screen.getView( ) );
+		}
+		
 		return IX_WIDGET.MAW_RES_OK;
 	}
 	
@@ -333,5 +344,26 @@ public class NativeUI
 		mosyncThread.mMemDataSection.put( (byte)0 );
 		
 		return result.length( );
+	}
+	
+	/**
+	 * Sets a listener for when the root view is changed.
+	 * 
+	 * @param rootViewReplacedListener The class that listens for changes.
+	 */
+	public void setRootViewReplacedListener(RootViewReplacedListener rootViewReplacedListener)
+	{
+		m_rootViewReplacedListener = rootViewReplacedListener;
+	}
+	
+	public interface RootViewReplacedListener
+	{
+		/**
+		 * Called when the root view has been replaced
+		 * by another root view.
+		 * 
+		 * @param newRoot The new root view.
+		 */
+		void rootViewReplaced(View newRoot);
 	}
 }

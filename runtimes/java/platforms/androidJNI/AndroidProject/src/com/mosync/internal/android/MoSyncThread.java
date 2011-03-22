@@ -24,12 +24,6 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
-import static com.mosync.internal.generated.MAAPI_consts.MA_ACCESS_READ;
-import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_FORBIDDEN;
-import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_GENERIC;
-import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_CUR;
-import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_END;
-import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_SET;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -70,8 +64,8 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -82,7 +76,6 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
@@ -92,7 +85,6 @@ import android.net.Uri;
 import android.opengl.GLUtils;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.StatFs;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.telephony.TelephonyManager;
@@ -100,8 +92,6 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
-import com.mosync.internal.android.MoSyncFile.MoSyncFileHandle;
-import com.mosync.internal.android.MoSyncFile.MoSyncFileListing;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
@@ -342,6 +332,10 @@ public class MoSyncThread extends Thread
 	public void setMoSyncView(MoSyncView moSyncView)
 	{
 		mMoSyncView = moSyncView;
+		
+		// Each time the MoSync view is changed its reference
+		// must be updated in native UI.
+		mMoSyncNativeUI.setMoSyncScreen( moSyncView );
 	}
 	
 	/**
