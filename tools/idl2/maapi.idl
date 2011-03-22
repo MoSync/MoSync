@@ -3173,7 +3173,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetResultCodes
 	
 	/**
-	* The available widget types for \ref maWidgetCreate.
+	* The available widget types for maWidgetCreate().
 	*/
 	group WidgetTypes "Widget types" {
 	constset MAString MAW_ {
@@ -3188,9 +3188,22 @@ group WidgetAPI "Widget API" {
 		TAB_SCREEN = "TabScreen";
 
 		/**
-		* @brief A nav screen is a special type of screen stack that can have any number of screens pushed. Navigation is handled differently on iPhone and Android. On iPhone a navigation bar is used to go back, while on Android the back button is used.  See \ref WidgetNavScreenProperties "Nav screen properties" for the properties available.
+		* @brief A stack screen is a special type of screen that manages navigation
+		* between a set of screens.
+		*
+		* The screen stack can be pushed or popped. Pushing a given screen will hide
+		* the current screen and display the pushed screen. Popping a screen hides 
+		* the current screen and shows the previous screen in the stack. See
+		* maWidgetStackScreenPush() and maWidgetStackScreenPop().
+		* 
+		* Navigation between the screens in the stack is handled according to the
+		* norm on the specific platform. On iPhone a navigation bar is added to each
+		* pushed screen that can be used to go back, while on Android there is no 
+		* extra UI added and the back button is used to go back to the previous screen.
+		* See \ref WidgetStackScreenProperties "Stack screen properties" for the
+		* properties available.
 		*/
-		NAV_SCREEN = "NavScreen";
+		STACK_SCREEN = "StackScreen";
 
 		/**
 		* @brief A button is a widget that represent a physical button that can be pressed. See \ref WidgetButtonProperties "Button properties" for the properties available.
@@ -3265,7 +3278,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetTypes
 
 	/**
-	* All widgets have a set of properties that can be set. In order to set them, use \ref maWidgetSetProperty. These properties may change 
+	* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change 
 	* things like the visual appearance of the widget or the way it works.
 	*/
 	group WidgetProperties "Widget properties" {
@@ -3301,6 +3314,16 @@ group WidgetAPI "Widget API" {
 		CURRENT_TAB = "currentTab";
 	}
 	} // end of WidgetTabScreenProperties	
+
+	/**
+	* The available widget properties for a #MAW_STACK_SCREEN.
+	*/
+	group WidgetStackScreenProperties "Stack screen properties" {
+	constset MAString MAW_STACK_SCREEN_ {
+		TITLE = "title";
+		ICON = "icon";
+	}
+	} // end of WidgetStackScreenProperties	
 
 	/**
 	* The available widget properties for a #MAW_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
@@ -3522,6 +3545,38 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_SCREEN if the \a screenHandle is not a handle to a screen.
 	*/
 	int maWidgetScreenShow(in MAWidgetHandle screenHandle);
+
+	/**
+	 * Pushes a screen to the given screen stack, hides the current screen and 
+	 * shows the pushed screen it. Pushing it to the stack will make it 
+	 * automatically go back to the previous screen when popped.
+	 *
+	 * \param screenStack A handle to a #MAW_STACK_SCREEN.
+	 * \param newScreen A handle to either a #MAW_SCREEN or a #MAW_TAB_SCREEN.
+	 *                  The handle cannot exist in the stack already.
+	 *	 
+	 * \return Any of the following result codes:
+	 * - #MAW_RES_OK if the given screen could be pushed.
+	 * - #MAW_RES_INVALID_HANDLE if either the screenStack or newScreen handle
+	 *                           was invalid.
+	 * - #MAW_RES_ERROR if something else than a screen stack was passed, or if
+	 *                  the handle already exists in the stack.
+	 */
+	int maWidgetStackScreenPush(in MAWidgetHandle stackScreen, in MAWidgetHandle newScreen);
+
+	/**
+	 * Pops a screen from a screen stack, hides the current screen and shows 
+	 * the popped screen before the If there is no previous screen in the screen
+	 * stack, an empty screen will be shown.
+	 *
+	 * \param screenStack A handle to a #MAW_STACK_SCREEN to pop from.
+	 *
+	 * \return Any of the following result codes:
+	 * - #MAW_RES_OK if the given screen could be popped.
+	 * - #MAW_RES_INVALID_HANDLE if the screen stack does not exist.
+	 * - #MAW_RES_ERROR if something else than a screen stack was passed.
+	 */
+	int maWidgetStackScreenPop(in MAWidgetHandle stackScreen);
 
 	/** 
 	* Sets a specified property on the given widget.
