@@ -1002,9 +1002,8 @@ namespace MAUI {
 			int yy = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
 			MAPoint2d pp = {xx, yy};
 			Widget* w = mFocusedWidget;
-			setFocusedWidget(NULL);
-			w->pointerReleased(pp, id);
-			return false;
+			bool keepFocus = w->pointerReleased(pp, id);
+			return keepFocus;
 		}
 
 		if(id==0) {

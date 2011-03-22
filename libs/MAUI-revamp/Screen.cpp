@@ -221,17 +221,19 @@ namespace MAUI {
 	}
 	
 	void Screen::pointerReleaseEvent(MAPoint2d point) {
+		bool keepFocus = false;
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(ip) {
-				ip->pointerReleased(point, 0);
+				keepFocus = ip->pointerReleased(point, 0);
 			} 
 			else {
 				mFocusedWidget->pointerPressed(point, 0);
 			}
 		}
 
-		setFocusedWidget(NULL);
+		if(!keepFocus)
+			setFocusedWidget(NULL);
 	}
 	
 	void Screen::pointerMoveEvent(MAPoint2d point) {
