@@ -53,6 +53,23 @@ public class Layout extends Widget
 		layout.addView( child.getView( ) );
 	}
 	
+	/**
+	 * Returns the children of this layout.
+	 * 
+	 * @return a list of children for this layout.
+	 */
+	public List<Widget> getChildren()
+	{
+		return m_children;
+	}
+	
+	/**
+	 * Updates the Android layout params for the given child, according
+	 * to the parameters specified in the child. Only the parameters that
+	 * are supported for the layout will be taken into consideration.
+	 * 
+	 * @param child The child for which to update the layout params.
+	 */
 	public void updateLayoutParamsForChild(Widget child)
 	{
 		// Set layout params for the child

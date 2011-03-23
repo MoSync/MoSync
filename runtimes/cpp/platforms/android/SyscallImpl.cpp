@@ -1537,7 +1537,7 @@ namespace Base
 			
 		case maIOCtl_maWidgetRemoveChild:
 			SYSLOG("maIOCtl_maWidgetRemoveChild");
-			return _maWidgetRemoveChild(a, b, mJNIEnv, mJThis);
+			return _maWidgetRemoveChild(a, mJNIEnv, mJThis);
 			
 		case maIOCtl_maWidgetSetProperty:
 			SYSLOG("maIOCtl_maWidgetSetProperty");
