@@ -56,9 +56,8 @@
 	}
 	
 	[tableView addView: [child getView]];
+	[super addChild:child toSubview:NO];
 	[view reloadData];
-	
-	[super addChild:child];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
