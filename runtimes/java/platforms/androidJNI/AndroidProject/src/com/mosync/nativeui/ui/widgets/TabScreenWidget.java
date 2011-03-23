@@ -98,8 +98,8 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 	@Override
 	public void removeChild(Widget child)
 	{
-		m_tabIndexToScreen.remove( child );
-		
+		// There seems to be no sane way of removing
+		// tabs on Android.
 		return;
 	}
 
