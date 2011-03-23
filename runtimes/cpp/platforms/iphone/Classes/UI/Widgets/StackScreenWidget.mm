@@ -15,13 +15,13 @@
  02111-1307, USA.
  */
 
-#import "NavScreenWidget.h"
+#import "StackScreenWidget.h"
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
 
-@implementation NavScreenWidget
+@implementation StackScreenWidget
 
 - (id)init {
     //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];

@@ -222,6 +222,14 @@ int maWidgetRemoveChild(MAWidgetHandle childHandle) {
 	return returnValue;
 }
 
+int maWidgetStackScreenPush(MAWidgetHandle stackScreen, MAWidgetHandle screen) {
+	return -1;
+}
+
+int maWidgetStackScreenPop(MAWidgetHandle stackScreen) {
+	return -1;
+}
+
 int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	IWidget* screen = [mosyncUI getWidget:screenHandle];
 	if(!screen) return MAW_RES_INVALID_HANDLE;

@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 #import "ScreenWidget.h"
 
-@interface NavScreenWidget : ScreenWidget {
+@interface StackScreenWidget : ScreenWidget {
 }
 
 - (id)init;

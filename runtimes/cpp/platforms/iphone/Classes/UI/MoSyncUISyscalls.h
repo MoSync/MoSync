@@ -47,6 +47,10 @@ int maWidgetDestroy(MAWidgetHandle handle) ;
 
 int maWidgetRemoveChild(MAWidgetHandle child);
 
+int maWidgetStackScreenPush(MAWidgetHandle stackScreen, MAWidgetHandle screen);
+
+int maWidgetStackScreenPop(MAWidgetHandle stackScreen);
+
 int maWidgetScreenShow(MAWidgetHandle screenHandle);
 
 #endif // _MOSYNC_UI_SYSCALLS_
