@@ -1,16 +1,14 @@
 package com.mosync.nativeui.ui.widgets;
 
+import android.text.InputType;
+import android.widget.EditText;
+
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.util.KeyboardManager;
 import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
-
-import android.content.Context;
-import android.os.IBinder;
-import android.text.InputType;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
 
 /**
  * This class represents an editable text area.
@@ -57,24 +55,13 @@ public class EditBoxWidget extends LabelWidget
 		else if( property.equals( IX_WIDGET.MAW_EDIT_BOX_SHOW_KEYBOARD ) )
 		{
 			boolean showKeyboard = BooleanConverter.convert( value );
-			
-   			InputMethodManager manager = (InputMethodManager)
-			getView( ).getContext( ).getSystemService( Context.INPUT_METHOD_SERVICE );
-			IBinder windowToken = editTextView.getWindowToken( );
-			if( null == manager || null == windowToken )
+			if( showKeyboard )
 			{
-				return false;
-			}
-			
-			if( showKeyboard )	
-			{
-				// Seems that it needs to have focus before we can show the keyboard.
-				editTextView.requestFocus( );
-				manager.showSoftInput( editTextView, InputMethodManager.SHOW_FORCED );
+				return KeyboardManager.showKeyboardFor( getView( ) );
 			}
 			else
 			{
-				manager.hideSoftInputFromWindow( editTextView.getWindowToken( ), 0 );
+				return KeyboardManager.hideKeyboardFor( getView( ) );
 			}
 		}
 		else
