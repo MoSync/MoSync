@@ -84,7 +84,9 @@ IWidget* mWidget;\
 
 - (void)addChild: (IWidget*)child;
 - (void)addChild: (IWidget*)child toSubview:(bool)toSubview;
-- (void)insertChild: (IWidget*)child atIndex:(NSNumber*)index;
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview;
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index;
+
 - (int)remove;
 - (void)removeChild: (IWidget*)child;
 - (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview;

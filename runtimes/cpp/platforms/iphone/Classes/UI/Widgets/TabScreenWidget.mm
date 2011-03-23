@@ -78,6 +78,21 @@
 
 }
 
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index {
+	int ret = [super insertChild:child atIndex:index toSubview:NO];
+	if(ret!=MAW_RES_OK)
+		return ret;
+	
+	UITabBarController* tabBarController = (UITabBarController*)controller;
+	ScreenWidget* screen = (ScreenWidget*)child;
+	NSMutableArray *newItems = [NSMutableArray arrayWithArray:tabBarController.viewControllers];
+	[newItems insertObject:[screen getController] atIndex:[index intValue]];
+	tabBarController.viewControllers = newItems;
+	
+	return MAW_RES_OK;
+
+}
+
 - (void)removeChild: (IWidget*)child {
 	[super removeChild:child fromSuperview:NO];	
 }

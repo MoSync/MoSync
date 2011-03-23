@@ -290,6 +290,8 @@ void removeTouch(UITouch* touch) {
                           cancelButtonTitle:@"OK"
                           otherButtonTitles:nil];
 	
+	[touchHelper clearTouches];
+	
     [alert show];
     [alert release];
 }
@@ -333,6 +335,8 @@ void removeTouch(UITouch* touch) {
 	[textBoxAlert addSubview:textField];
 	
 	textBoxData.textField = textField;
+	
+    [touchHelper clearTouches];
 	
 	//[textBoxAlert setTransform:CGAffineTransformMakeTranslation(0,109)];
 	[textBoxAlert show];

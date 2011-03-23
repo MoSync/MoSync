@@ -36,13 +36,31 @@
 - (void)addChild: (IWidget*)child {
 	UINavigationController* navigationController = (UINavigationController*)controller;
 	ScreenWidget* screen = (ScreenWidget*)child;
+	//NSMutableArray *newItems = [NSMutableArray arrayWithArray:navigationController.viewControllers];
+	//[newItems addObject:[screen getController]];
+	//navigationController.viewControllers = newItems;
+	[navigationController pushViewController:[screen getController] animated:YES];
+	
+	//[super addChild:child toSubview:NO];
+	
+//	[navigationController popToRootViewControllerAnimated:YES];
+}
+
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index {
+	int ret = [super insertChild:child atIndex:index toSubview:NO];
+	if(ret!=MAW_RES_OK)
+		return ret;
+	
+	UINavigationController* navigationController = (UINavigationController*)controller;
+	ScreenWidget* screen = (ScreenWidget*)child;
 	NSMutableArray *newItems = [NSMutableArray arrayWithArray:navigationController.viewControllers];
-	[newItems addObject:[screen getController]];
+	[newItems insertObject:[screen getController] atIndex:[index intValue]];
 	navigationController.viewControllers = newItems;
 	
 	//[super addChild:child];
-	[super addChild:child toSubview:NO];
-	[navigationController popToRootViewControllerAnimated:YES];
+//	[navigationController popToRootViewControllerAnimated:YES];
+
+	return MAW_RES_OK;
 }
 
 - (void)removeChild: (IWidget*)child {	

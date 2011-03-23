@@ -85,7 +85,6 @@
 		view.contentMode = UIViewContentModeRedraw;
 		view.autoresizesSubviews = NO;
 		//view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
-		//[self addSubview:view];
 	}
 	
 	return self;
@@ -120,21 +119,31 @@
 		[view addSubview:childView];
 	}
 	[view setNeedsLayout];
+	[view setNeedsDisplay];
 }
 
 - (void)addChild: (IWidget*)child {
 	[self addChild:child toSubview:YES];	
 }
 
-- (void)insertChild: (IWidget*)child atIndex:(NSNumber*)index {
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview {
 	int indexValue = [index intValue];
+	if(indexValue<0 || indexValue>[children count]) return MAW_RES_INVALID_INDEX;
+	
 	UIView* childView = [child getView];
 	[child setParent:self];
+	
 	[children insertObject:child atIndex:indexValue];
-	//if(addSubview) {
-	[view insertSubview:childView atIndex:indexValue];
-	//}
+	if(addSubview) {
+		[view insertSubview:childView atIndex:indexValue];
+	}
 	[view setNeedsLayout];
+	
+	return MAW_RES_OK;
+}
+
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index {
+	return [self insertChild:child atIndex:index toSubview:YES];
 }
 
 - (void)removeChild: (IWidget*)child {

@@ -22,6 +22,7 @@
 #import "LayoutWidgets.h"
 #import "RelativeLayoutWidget.h"
 #import "ListViewItemWidget.h"
+#import "ListViewWidget.h"
 #import "GLViewWidget.h"
 
 MoSyncUI* mosyncUI;
@@ -159,7 +160,8 @@ int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
 	   !([parent class] == [HorizontalLayoutWidget class]) &&
 	   !([parent class] == [VerticalLayoutWidget class]) &&
 	   !([parent class] == [RelativeLayoutWidget class]) &&
-	   !([parent class] == [ListViewItemWidget class]) &&	   
+	   !([parent class] == [ListViewWidget class]) &&
+	   !([parent class] == [ListViewItemWidget class]) &&		   
 	   !([parent class] == [ScreenWidget class]) &&
 	   !([parent superclass] == [ScreenWidget class])
 	   ) {
@@ -188,6 +190,7 @@ int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle,
 	   !([parent class] == [HorizontalLayoutWidget class]) &&
 	   !([parent class] == [VerticalLayoutWidget class]) &&
 	   !([parent class] == [RelativeLayoutWidget class]) &&
+	   !([parent class] == [ListViewWidget class]) &&	   
 	   !([parent class] == [ListViewItemWidget class]) &&	   
 	   !([parent class] == [ScreenWidget class]) &&
 	   !([parent superclass] == [ScreenWidget class])

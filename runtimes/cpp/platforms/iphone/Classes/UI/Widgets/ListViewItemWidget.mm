@@ -35,6 +35,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 	[cell setWidget:self];
 	cell.selectionStyle =  UITableViewCellSelectionStyleNone;
 	view = cell;
+	[self setPropertyWithKey:@"backgroundColor" toValue:@"00000000"];
 	return [super init];		
 }
 
