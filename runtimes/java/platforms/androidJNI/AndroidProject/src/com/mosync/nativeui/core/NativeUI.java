@@ -98,12 +98,20 @@ public class NativeUI
 	 */
 	public void setMoSyncScreen(MoSyncView mosyncScreen)
 	{
-		MoSyncScreenWidget screenWidget = new MoSyncScreenWidget( 
-				IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
-				mosyncScreen ); 
-		
-		m_widgetTable.add( IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
-				screenWidget );
+		if( mosyncScreen != null )
+		{
+			MoSyncScreenWidget screenWidget = new MoSyncScreenWidget( 
+					IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
+					mosyncScreen ); 
+			
+			m_widgetTable.add( IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
+					screenWidget );
+		}
+		else
+		{
+			// If there is no MoSyncView, we cannot provide one here
+			m_widgetTable.remove( IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE );
+		}
 	}
 	
 	/**

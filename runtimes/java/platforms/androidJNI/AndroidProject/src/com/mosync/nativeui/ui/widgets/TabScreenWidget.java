@@ -108,7 +108,7 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 	{
 		int tabIndex = m_tabIndexToScreen.get( screen );
 		TabHost tabHost = (TabHost) getView( );
-		View tabIndicatorView = (TextView) tabHost.getTabWidget( ).getChildTabViewAt( tabIndex );
+		View tabIndicatorView = tabHost.getTabWidget( ).getChildTabViewAt( tabIndex );
 		if( tabIndicatorView == null )
 		{
 			return;
