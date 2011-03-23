@@ -4,11 +4,13 @@ import java.util.Hashtable;
 
 import android.app.Activity;
 import android.util.Log;
+import android.view.View;
 
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.core.NativeUI;
+import com.mosync.nativeui.core.NativeUI.RootViewReplacedListener;
 import com.mosync.nativeui.util.AsyncWait;
 
 /**
@@ -16,7 +18,7 @@ import com.mosync.nativeui.util.AsyncWait;
  * the MoSyncSyscalls file, also to call the native ui
  * functions in the UI thread.
  */
-public class MoSyncNativeUI
+public class MoSyncNativeUI implements RootViewReplacedListener
 {
 	/**
 	 * The MoSync thread object.
@@ -35,6 +37,7 @@ public class MoSyncNativeUI
 	{
 		mMoSyncThread = thread;
 		mNativeUI = new NativeUI(getActivity());
+		mNativeUI.setRootViewReplacedListener(this);
 		NativeUI.setImageTable(imageResources);
 	}
 
@@ -44,6 +47,17 @@ public class MoSyncNativeUI
 	private Activity getActivity()
 	{
 		return mMoSyncThread.getActivity();
+	}
+	
+	/**
+	 * Sets the default MoSync canvas view, so that it is possible
+	 * to switch back to it from native UI.
+	 * 
+	 * @param mosyncScreen The MoSync canvas view.
+	 */
+	public void setMoSyncScreen(MoSyncView moSyncView)
+	{
+		mNativeUI.setMoSyncScreen( moSyncView );
 	}
 	
 	/**
@@ -167,11 +181,6 @@ public class MoSyncNativeUI
 				public void run()
 				{
 					int result = mNativeUI.maWidgetScreenShow(screenHandle);
-					if( result == IX_WIDGET.MAW_RES_OK )
-					{
-						((MoSync) getActivity()).setRootView( 
-								mNativeUI.getRootView( ) );
-					}
 					waiter.setResult(result);
 				}
 			});
@@ -245,5 +254,11 @@ public class MoSyncNativeUI
 		{
 			return -1;
 		}
+	}
+
+	@Override
+	public void rootViewReplaced(View newRoot)
+	{
+		((MoSync) getActivity()).setRootView( newRoot );
 	}
 }

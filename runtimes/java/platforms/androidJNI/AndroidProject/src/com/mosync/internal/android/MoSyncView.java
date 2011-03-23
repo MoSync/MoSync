@@ -19,21 +19,14 @@ package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_CHANGED;
-
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Rect;
-import android.text.InputType;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.View;
-import android.view.inputmethod.BaseInputConnection;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputConnection;
-import android.view.inputmethod.InputMethodManager;
 
 /**
  * MoSyncView class
@@ -44,28 +37,6 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	
 	private Context mContext;
 	private MoSyncThread mMoSyncThread;
-	
-	class CustomInputConnection extends BaseInputConnection
-	{
-		private MoSyncView mMoSyncView;
-		
-		public CustomInputConnection(
-			View targetView, 
-			boolean fullEditor, 
-			MoSyncView mosyncView)
-		{
-			super(targetView, fullEditor);
-			mMoSyncView = mosyncView;
-		}
-		
-		public boolean performEditorAction (int actionCode)
-		{
-			InputMethodManager mgr = (InputMethodManager) 
-				mContext.getSystemService(Context.INPUT_METHOD_SERVICE);
-			mgr.hideSoftInputFromWindow(mMoSyncView.getWindowToken(), 0);
-			return true;
-		}
-	}
 
 	/**
 	 * MoSyncView Constructor
@@ -224,56 +195,5 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 	public boolean onTouchEvent(MotionEvent motionEvent)
 	{
 		return ((Activity) mContext).onTouchEvent(motionEvent);
-	}
-
-/*	TODO: Remove commented out code.
-	public int getKeys() {
-		return mKeyState;
-	}
-*/	
-	
-	// TODO: Remove commented out code.
-	/**
-	 * Map Android key codes to MoSync byte key codes.
-	 * @param keyCode
-	 * @param keyEvent
-	 * @return
-	 */
-	/* 
-	private final int convertToMoSyncKeyByteCode(int keyCode) 
-	{
-		if (keyCode == KeyEvent.KEYCODE_0) return MAKB_0; 
-		if (keyCode == KeyEvent.KEYCODE_1) return MAKB_1; 
-		if (keyCode == KeyEvent.KEYCODE_2) return MAKB_2; 
-		if (keyCode == KeyEvent.KEYCODE_3) return MAKB_3; 
-		if (keyCode == KeyEvent.KEYCODE_4) return MAKB_4; 
-		if (keyCode == KeyEvent.KEYCODE_5) return MAKB_5; 
-		if (keyCode == KeyEvent.KEYCODE_6) return MAKB_6; 
-		if (keyCode == KeyEvent.KEYCODE_7) return MAKB_7; 
-		if (keyCode == KeyEvent.KEYCODE_8) return MAKB_8; 
-		if (keyCode == KeyEvent.KEYCODE_9) return MAKB_9; 
-		if (keyCode == KeyEvent.KEYCODE_STAR) return MAKB_STAR; 
-		if (keyCode == KeyEvent.KEYCODE_POUND) return MAKB_POUND; 
-		if (keyCode == KeyEvent.KEYCODE_CLEAR) return MAKB_CLEAR;
-		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) return MAKB_LEFT; 
-		if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) return MAKB_RIGHT; 
-		if (keyCode == KeyEvent.KEYCODE_DPAD_UP) return MAKB_UP; 
-		if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) return MAKB_DOWN;
-		if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) return MAKB_FIRE; 
-		if (keyCode == KeyEvent.KEYCODE_SOFT_LEFT) return MAKB_SOFTLEFT; 
-		if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) return MAKB_SOFTRIGHT;
-		 
-		return 0;
-	}
-	*/
-	
-	/**
-	 * TODO: Document. Is this method needed?
-	 */
-	public InputConnection onCreateInputConnection(EditorInfo outAttrs)
-	{
-		outAttrs.inputType = InputType.TYPE_CLASS_NUMBER;
-		CustomInputConnection ic = new CustomInputConnection(this, false, this);
-		return ic;
 	}
 }
