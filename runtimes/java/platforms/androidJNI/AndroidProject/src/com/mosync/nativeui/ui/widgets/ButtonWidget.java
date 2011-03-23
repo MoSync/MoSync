@@ -3,6 +3,7 @@ package com.mosync.nativeui.ui.widgets;
 import android.widget.Button;
 
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -33,8 +34,12 @@ public class ButtonWidget extends LabelWidget
 	{
 		if( property.equals( IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR ) )
 		{
-			// You cannot set the background color of a button.
-			return false;
+			// Make sure bad values get caught, so that the API is consistent.
+			ColorConverter.convert( value );
+			
+			// Ignore the background color of a button, since Android
+			// buttons do not have anything behind the button foreground.
+			return true;
 		}
 		else
 		{
