@@ -3480,8 +3480,12 @@ group WidgetAPI "Widget API" {
 	MAWidgetHandle maWidgetCreate(in MAString widgetType);
 
 	/** 
-	* Destroys and a widget. Calling it a second time does nothing.
-    * \note If it has a parent it also removes it from its parent.
+	* Frees the memory and resources held by the given widget. Destryoing a widget
+	* with children will also cause its children to be destroyed. Once a handle has
+	* been destroyed it cannot be referenced by the maWidget* functions.
+	*
+    * \note If the given widget has a parent, the widget will be removed from its
+	* parent.
 	*
 	* \param widget A handle to the widget to be destroyed.
 	*
