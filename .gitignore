@@ -187,3 +187,6 @@ profile.txt
 
 /tools/vis/fp.xml
 /tools/vis/sld.*
+
+/examples/GenerateResources/config.rb
+/examples/GenerateResources/profile.rb
