@@ -53,7 +53,7 @@ static IWidget* sOldScreen = nil;
 		window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];		
 		[window makeKeyAndVisible];
 	}
-		
+	
 	mainWindow = window;
 	mainController = controller;
 	mainWindow.backgroundColor = [UIColor whiteColor];
@@ -62,7 +62,6 @@ static IWidget* sOldScreen = nil;
 	[widgetArray addObject:mosyncScreen];
 	[mosyncScreen setWidgetHandle:0]; // MAW_CONSTANT_MOSYNC_SCREEN_HANDLE	
 	sOldScreen = mosyncScreen;
-	
 	return self;
 }
 

@@ -113,7 +113,9 @@ int MoSync_ThreadMain(void *args) {
 	
 	const char *resources = getReadablePath("resources");
 
+#ifdef LOGGING_ENABLED
 	InitLog(getWriteablePath("log.txt"));
+#endif
 	
 	Base::Syscall *syscall = 0;
 	syscall = new Base::Syscall(sWidth, sHeight);
