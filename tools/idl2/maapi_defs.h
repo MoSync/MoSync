@@ -25,7 +25,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 #if defined(__GNUC__) || defined(__SYMBIAN32__)
+
+#ifdef _android
+#define ATTRIBUTE(a, func) ((func))
+#else
 #define ATTRIBUTE(a, func)  func __attribute__ ((a))
+#endif
+
 #define ATTRIB(a) __attribute__ ((a))
 #define GCCATTRIB(a) __attribute__ ((a))
 #define IOCTLDEF static inline

@@ -16,10 +16,22 @@
  */
 
 #import <Foundation/Foundation.h>
+#import "ScreenWidget.h"
 
-
-@interface MoSyncTableViewCell : UITableViewCell {
-
+@interface StackScreenWidget : ScreenWidget {
 }
+
+- (id)init;
+//- (void)addChild: (IWidget*)child;
+//- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index;
+//- (void)removeChild: (IWidget*)child;
+
+- (void)push: (IWidget*)child;
+- (void)pop;
+
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+- (NSString*)getPropertyWithKey: (NSString*)key;
+- (UIViewController*) getController;
+- (void)layout;
 
 @end

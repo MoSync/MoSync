@@ -24,10 +24,13 @@
 }
 
 - (id)init;
+- (id)initWithController:(UIViewController*)controller;
 - (void)addChild: (IWidget*)child;
-- (void)removeChild: (IWidget*)child;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
 - (UIViewController*) getController;
+
+// if you have a navscreen inside a tabscreen for instance this will recurse to the root, showing everything that needs to be shown.
+- (void) showMe:(ScreenWidget*)screen;
 
 @end

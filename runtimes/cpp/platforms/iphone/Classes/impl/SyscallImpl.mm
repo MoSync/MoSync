@@ -376,6 +376,7 @@ namespace Base {
 	}
 
 	SYSCALL(void, maUpdateScreen()) {
+		// we must check if the canvas is enabled, because the mosync thread will be locked until the surface is drawn to the screen.
 		if(gClosing || isNativeUIEnabled())
 			return;
 		MoSync_UpdateView(gBackbuffer->image);
@@ -972,7 +973,7 @@ namespace Base {
 	}
 	
 	SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
-		NOT_IMPLEMENTED;
+		MoSync_ReloadProgram(data, reload);		
 	}
 	
 } // namespace Base

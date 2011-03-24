@@ -15,17 +15,20 @@
  02111-1307, USA.
  */
 
-#import <Foundation/Foundation.h>
-#import "ScreenWidget.h"
+#import "ImageButtonWidget.h"
 
-@interface NavScreenWidget : ScreenWidget {
+#ifndef NATIVE_TEST
+#include "Platform.h"
+#include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+#include <base/Syscall.h>
+#endif
+
+@implementation ImageButtonWidget
+
+- (id)init {
+	view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // TODO: do have to do this (retain)??
+	return [super init];
 }
-
-- (id)init;
-- (void)addChild: (IWidget*)child;
-- (void)removeChild: (IWidget*)child;
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
-- (NSString*)getPropertyWithKey: (NSString*)key;
-- (UIViewController*) getController;
 
 @end

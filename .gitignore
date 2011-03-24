@@ -102,6 +102,13 @@ profile.txt
 /runtimes/cpp/platforms/iphone/Classes/helpers/maapi_defs.h
 /runtimes/cpp/platforms/iphone/Classes/syscall_static_cpp.h
 
+/runtimes/cpp/platforms/iphone/Classes/data_section.bin
+/runtimes/cpp/platforms/iphone/Classes/impl/config_platform.h
+/runtimes/cpp/platforms/iphone/Classes/rebuild.build.cpp
+/runtimes/cpp/platforms/iphone/data_section.bin
+/runtimes/cpp/platforms/iphone/template/
+
+
 /runtimes/cpp/platforms/symbian/inc/config_platform.h
 /testPrograms/sld.tab
 /runtimes/cpp/platforms/symbian/sis*/*.SIS

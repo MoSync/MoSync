@@ -23,10 +23,9 @@
 }
 
 - (id)init;
-- (void)wasCreated;
-- (void)addChild: (IWidget*)child;
-- (void)removeChild: (IWidget*)child;
+- (void)setWidgetHandle:(int)handle;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
+- (void)show;
 
 @end

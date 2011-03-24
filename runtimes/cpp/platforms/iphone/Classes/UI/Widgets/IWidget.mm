@@ -18,119 +18,196 @@
 #import "IWidget.h"
 #import "UIColor-Expanded.h"
 #import <objc/runtime.h>
-
-@implementation AbstractLayoutView (AbstractLayoutViewExpanded)
-
-- (void) setVerticalAlignment: (UIControlContentVerticalAlignment) va {
-	vAlignment = va;
-}
-
-- (void) setHorizontalAlignment: (UIControlContentHorizontalAlignment) ha {
-	hAlignment = ha;
-}
-
-@end
+#include <helpers/CPP_IX_WIDGET.h>
 
 @implementation IWidget
 
+
+- (void)setAutoSizeParamX:(AutoSizeParam)x andY:(AutoSizeParam)y {
+	autoSizeParamX = x;
+	autoSizeParamY = y;
+}
+
+- (AutoSizeParam)getAutoSizeParamX {
+	return autoSizeParamX;
+}
+
+- (AutoSizeParam)getAutoSizeParamY {
+	return autoSizeParamY;
+}
+
+- (void)layoutSubviews:(UIView*)_view {
+//- (void)layoutSubviews {	
+	for (IWidget *child in children)
+    {
+		UIView* childView = [child getView];
+		
+		int viewWidth = childView.frame.size.width; 
+		if([child getAutoSizeParamX] == FILL_PARENT) {
+			viewWidth = view.frame.size.width;
+		}
+		else if([child getAutoSizeParamX] == WRAP_CONTENT) {
+			viewWidth = [childView sizeThatFits:CGSizeZero].width;
+		}
+		
+		int viewHeight = childView.frame.size.height; 
+		if([child getAutoSizeParamY] == FILL_PARENT) {
+			viewHeight = view.frame.size.height;
+		}
+		else if([child getAutoSizeParamY] == WRAP_CONTENT) {
+			viewHeight = [childView sizeThatFits:CGSizeZero].height;
+		}
+		
+		[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, viewWidth, viewHeight)];
+	}
+	
+	[_view superLayoutSubviews];
+	//[super layoutSubviews];
+	
+	//self.frame = view.frame;
+}
+
+- (CGSize)sizeThatFitsFor:(UIView*)_view withSize:(CGSize)size {
+//- (CGSize)sizeThatFits:(CGSize)size {
+//	return [super sizeThatFits:size];
+	return _view.frame.size;
+}
+
 - (id)init {
 	[super init];
-	[view setUserInteractionEnabled:YES];
-	view.contentMode = UIViewContentModeRedraw;
-	view.autoresizesSubviews = NO;
+
 	parent = nil;
 	children = [[NSMutableArray alloc] init];
+	[self setAutoSizeParamX:FIXED_SIZE andY:FIXED_SIZE];
 
-	//[view injectMixin:[UIViewAdditions class]];
-
-	fillWidth = 0;
-	fillHeight = 0;
-	[view sizeToFit]; 
-		
+	if(view) {
+		[view setUserInteractionEnabled:YES];
+		view.contentMode = UIViewContentModeRedraw;
+		view.autoresizesSubviews = NO;
+		view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
+	}
+	
 	return self;
 }
 
-- (UIView*) getView {
+- (UIView*)getView {
 	return view;
 }
 
-- (void) setWidgetHandle:(int) toHandle {
+- (void)setWidgetHandle:(int) toHandle {
 	handle = toHandle;
+	view.tag = handle;
 }
 
 - (int)getWidgetHandle {
 	return handle;
 }
 
-- (void)wasCreated {
-}
-
-- (void) setParent:(IWidget*) toParent {
+- (void)setParent:(IWidget*) toParent {
 	parent = toParent;
 }
 
-- (void) addChild: (IWidget*)child andSubview:(bool)addSubview {
+- (IWidget*)getParent {
+	return parent;
+}
+
+- (void)addChild: (IWidget*)child toSubview:(bool)addSubview {
+	UIView* childView = [child getView]; 
 	[child setParent:self];
 	[children addObject:child];
-	if(addSubview)
-		[view addSubview:[child getView]];
+	if(addSubview) {
+		[view addSubview:childView];
+	}
+	[view setNeedsLayout];
+	[view setNeedsDisplay];
 }
 
-- (void) addChild: (IWidget*)child {
-	[self addChild:child andSubview:YES];	
+- (void)addChild: (IWidget*)child {
+	[self addChild:child toSubview:YES];	
 }
 
-- (void) removeChild: (IWidget*)child {
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview {
+	int indexValue = [index intValue];
+	if(indexValue<0 || indexValue>[children count]) return MAW_RES_INVALID_INDEX;
+	
+	UIView* childView = [child getView];
+	[child setParent:self];
+	
+	[children insertObject:child atIndex:indexValue];
+	if(addSubview) {
+		[view insertSubview:childView atIndex:indexValue];
+	}
+	[view setNeedsLayout];
+	
+	return MAW_RES_OK;
+}
+
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index {
+	return [self insertChild:child atIndex:index toSubview:YES];
+}
+
+- (void)removeChild: (IWidget*)child {
 	[self removeChild:child fromSuperview:YES];
 }
 
-- (void) removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview {
+- (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview {
 	[children removeObjectIdenticalTo:child];
 	[child setParent:nil];
 	if(removeFromSuperview)
 		[[child getView] removeFromSuperview];
 }
 
+- (int)remove {
+	//if(!parent) return MAW_RES_REMOVED_ROOT;
+	[parent removeChild: self];
+	return MAW_RES_OK;
+}
 
-- (int) setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
+- (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
 	if([key isEqualToString:@"left"]) {
-//		view.frame.origin.x = [value floatValue];
 		[view setFrame:CGRectMake([value floatValue], view.frame.origin.y, view.frame.size.width, view.frame.size.height)];
 	} else 
 	if([key isEqualToString:@"top"]) {
-//		view.frame.origin.y = [value floatValue];
 		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue], view.frame.size.width, view.frame.size.height)];
 	} else 
 	if([key isEqualToString:@"width"]) {
 		float width = [value floatValue];
-		if(width == -1) {
-			//view.autoresizingMask =	view.autoresizingMask | 
-			//UIViewAutoresizingFlexibleWidth;
-			width = view.superview.frame.size.width;
-			//[view setNeedsLayout];
-			fillWidth = -1;
-			//return MA_WIDGET_OK;
+		
+		if(width == -2 || width == -1) {
+			autoSizeParamX = width==-2?WRAP_CONTENT:FILL_PARENT;
+			[self layout];
+			return MAW_RES_OK;
+			
+		} else {
+			autoSizeParamX = FIXED_SIZE;
 		}
 		
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width, view.frame.size.height)];
+		[self layout];
 	} else
 	if([key isEqualToString:@"height"]) {
 		float height = [value floatValue];
-		if(height == -1) {
-			//view.autoresizingMask =			view.autoresizingMask | 
-			//UIViewAutoresizingFlexibleHeight;
-			height = view.superview.frame.size.height;
-			//[view setNeedsLayout];
-			fillHeight = -1;
-			//return MA_WIDGET_OK;
+				
+		if(height == -2 || height == -1) {
+			autoSizeParamY = height==-2?WRAP_CONTENT:FILL_PARENT;
+			[self layout];
+			return MAW_RES_OK;
+			
+		} else {
+			autoSizeParamY = FIXED_SIZE;
 		}
 		
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height)];		
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height)];	
+		[self layout];		
 	} else 
 	if([key isEqualToString:@"backgroundColor"]) {
-		view.backgroundColor = [UIColor colorWithHexString:value];
+		UIColor* color = [UIColor colorWithHexString:value];
+		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+		view.backgroundColor = color;
 	} else
 	if([key isEqualToString:@"alpha"]) {
+		float alpha = [value floatValue];
+		if(alpha<0.0 || alpha>1.0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		view.alpha = [value floatValue];
 	} else
 	if([key isEqualToString:@"opaque"]){
@@ -139,13 +216,13 @@
 	if([key isEqualToString:@"visible"]){
 		view.hidden = not [value boolValue];
 	} else {
-			return MA_WIDGET_ERROR;
+			return MAW_RES_ERROR;
 	}
 			
-	return MA_WIDGET_OK;
+	return MAW_RES_OK;
 }
 
-- (NSString*) getPropertyWithKey: (NSString*)key {
+- (NSString*)getPropertyWithKey: (NSString*)key {
 	
 	if([key isEqualToString:@"width"]) {		
 		return [[NSNumber numberWithInt: view.frame.size.width ] stringValue];
@@ -170,26 +247,42 @@
 	[view dealloc];
 }
 
-- (void)layout {	
+- (void)layout {
+	[view setNeedsLayout];
+
 	int viewWidth = view.frame.size.width; 
-	if(fillWidth == -1) {
-		viewWidth = view.superview.frame.size.width;
+	if(autoSizeParamX == FILL_PARENT) {
+		if(view.superview)
+			viewWidth = view.superview.frame.size.width;
 	}
-	
+	else if(autoSizeParamX == WRAP_CONTENT) {
+		viewWidth = [view sizeThatFits:CGSizeZero].width;
+	}
+	 
 	int viewHeight = view.frame.size.height; 
-	if(fillHeight == -1) {
-		viewHeight = view.superview.frame.size.height;
+	if(autoSizeParamY == FILL_PARENT) {
+		if(view.superview)
+			viewHeight = view.superview.frame.size.height;
+	}
+	else if(autoSizeParamY == WRAP_CONTENT) {
+		viewHeight = [view sizeThatFits:CGSizeZero].height;
 	}
 	
 	[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];
-	//[view sizeToFit];
 	
-	//[view setNeedsLayout];
-	//[view setNeedsDisplay];
+	return;
+/*
 	for (IWidget *child in children)
     {
 		[child layout];
+	}
+ */
+}
 
+- (void)show {
+	for (IWidget *child in children)
+    {
+		[child show];
 	}	
 }
 

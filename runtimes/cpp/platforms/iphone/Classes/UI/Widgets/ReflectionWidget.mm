@@ -17,6 +17,7 @@
 
 #import "ReflectionWidget.h"
 #import <objc/runtime.h>
+#include <helpers/CPP_IX_WIDGET.h>
 
 @implementation ReflectionWidget
 
@@ -44,10 +45,10 @@
 	if(nameVar != nil) {
 		object_setIvar(widgetClass, nameVar, value);
 	} else {
-		return MA_WIDGET_ERROR;
+		return MAW_RES_ERROR;
 	}
 	
-	return MA_WIDGET_OK;	
+	return MAW_RES_OK;	
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

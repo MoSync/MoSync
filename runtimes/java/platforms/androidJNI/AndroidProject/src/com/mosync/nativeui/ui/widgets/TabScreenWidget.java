@@ -1,13 +1,17 @@
 package com.mosync.nativeui.ui.widgets;
 
-import com.mosync.nativeui.core.Types;
-import com.mosync.nativeui.util.properties.IntConverter;
-import com.mosync.nativeui.util.properties.PropertyConversionException;
+import java.util.HashMap;
 
 import android.view.View;
 import android.widget.TabHost;
-import android.widget.TabHost.TabSpec;
 import android.widget.TabHost.TabContentFactory;
+import android.widget.TabHost.TabSpec;
+import android.widget.TextView;
+
+import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * A screen that allows navigation between screens using
@@ -15,8 +19,14 @@ import android.widget.TabHost.TabContentFactory;
  * 
  * @author fmattias
  */
-public class TabScreenWidget extends ScreenWidget
+public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleChangedListener
 {
+	/**
+	 * Map from a screen widget to its tab index in this
+	 * screen.
+	 */
+	private HashMap<ScreenWidget, Integer> m_tabIndexToScreen = new HashMap<ScreenWidget, Integer>( );
+	
 	/**
 	 * Constructor
 	 * 
@@ -62,11 +72,13 @@ public class TabScreenWidget extends ScreenWidget
 		
 		
 		tab.addTab( tabSpec );
+		m_tabIndexToScreen.put( screen, tab.getTabWidget( ).getChildCount( ) - 1 );
+		screen.setTitleChangedListener( this );
 	}
 
 	@Override
 	public boolean setProperty(String property, String value)
-			throws PropertyConversionException
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty( property, value ) )
 		{
@@ -74,7 +86,7 @@ public class TabScreenWidget extends ScreenWidget
 		}
 		
 		TabHost tabHost = (TabHost) getView( );
-		if( property.equals( Types.WIDGET_PROPERTY_CURRENT_TAB ) )
+		if( property.equals( IX_WIDGET.MAW_TAB_SCREEN_CURRENT_TAB ) )
 		{
 			int currentTabIndex = IntConverter.convert( value );			
 			tabHost.setCurrentTab( currentTabIndex );
@@ -86,6 +98,23 @@ public class TabScreenWidget extends ScreenWidget
 	@Override
 	public void removeChild(Widget child)
 	{
+		// There seems to be no sane way of removing
+		// tabs on Android.
 		return;
+	}
+
+	@Override
+	public void titleChanged(ScreenWidget screen, String newTitle)
+	{
+		int tabIndex = m_tabIndexToScreen.get( screen );
+		TabHost tabHost = (TabHost) getView( );
+		View tabIndicatorView = tabHost.getTabWidget( ).getChildTabViewAt( tabIndex );
+		if( tabIndicatorView == null )
+		{
+			return;
+		}
+		
+		TextView tabTitle = (TextView) tabIndicatorView.findViewById( android.R.id.title );
+		tabTitle.setText( newTitle );
 	}
 }

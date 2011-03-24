@@ -13,5 +13,6 @@
 - (void) performSelectorOnMainThread:(SEL)selector
 						  withTarget:(id)target
 						 withObjects:(NSArray*)objects
-					   waitUntilDone:(BOOL)waitUntilDone;
+					   waitUntilDone:(BOOL)waitUntilDone
+					  andReturnValue:(void*)retLoc;
 @end

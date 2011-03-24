@@ -1,15 +1,13 @@
 package com.mosync.nativeui.ui.widgets;
 
-import android.content.Context;
-import android.os.IBinder;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 
-import com.mosync.nativeui.core.Types;
+import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.KeyboardManager;
 import com.mosync.nativeui.util.properties.BooleanConverter;
-import com.mosync.nativeui.util.properties.ColorConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
@@ -36,7 +34,7 @@ public class SearchBarWidget extends Widget
 	 */
 	@Override
 	public boolean setProperty(String property, String value) 
-		throws PropertyConversionException
+		throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if (super.setProperty(property, value))
 		{
@@ -46,35 +44,24 @@ public class SearchBarWidget extends Widget
 		ViewGroup view = (ViewGroup) getView();
 		EditText editBox = (EditText) view.getChildAt(0);
 		
-		if (property.equals(Types.WIDGET_PROPERTY_TEXT))
+		if (property.equals(IX_WIDGET.MAW_SEARCH_BAR_TEXT))
 		{
 			editBox.setText(value);
 		}
-		else if(property.equals(Types.WIDGET_PROPERTY_FONT_COLOR))
+		else if(property.equals(IX_WIDGET.MAW_SEARCH_BAR_PLACEHOLDER))
 		{
-			editBox.setTextColor(ColorConverter.convert(value));
+			editBox.setHint(value);
 		}
-		else if(property.equals(Types.WIDGET_PROPERTY_SHOW_KEYBOARD))
+		else if(property.equals(IX_WIDGET.MAW_SEARCH_BAR_SHOW_KEYBOARD))
 		{
 			boolean showKeyboard = BooleanConverter.convert( value );
-			
-   			InputMethodManager manager = (InputMethodManager)
-			getView( ).getContext( ).getSystemService( Context.INPUT_METHOD_SERVICE );
-			IBinder windowToken = editBox.getWindowToken();
-			if (null == manager || null == windowToken)
+			if( showKeyboard )
 			{
-				return false;
-			}
-			
-			if( showKeyboard )	
-			{
-				// Seems that it needs to have focus before we can show the keyboard.
-				editBox.requestFocus( );
-				manager.showSoftInput( editBox, InputMethodManager.SHOW_FORCED );
+				return KeyboardManager.showKeyboardFor( getView( ) );
 			}
 			else
 			{
-				manager.hideSoftInputFromWindow( editBox.getWindowToken(), 0);
+				return KeyboardManager.hideKeyboardFor( getView( ) );
 			}
 		}
 		else
@@ -94,7 +81,7 @@ public class SearchBarWidget extends Widget
 		ViewGroup view = (ViewGroup) getView();
 		EditText editBox = (EditText) view.getChildAt(0);
 		
-		if (property.equals(Types.WIDGET_PROPERTY_TEXT))
+		if (property.equals(IX_WIDGET.MAW_SEARCH_BAR_TEXT))
 		{
 			return editBox.getText().toString();
 		}

@@ -16,9 +16,6 @@ export MOSYNC_DOXYGEN_OUTPUT_DIR=$MOSYNCDIR/docs
 cp release_notes.txt $MOSYNC_DOXYGEN_OUTPUT_DIR
 cp changelog.txt $MOSYNC_DOXYGEN_OUTPUT_DIR
 
-# Copy headers
-cd ../libs
-./copyHeaders.sh
 # Copy doxyfile
 cp Doxyfile $MOSYNCDIR/include/Doxyfile
 

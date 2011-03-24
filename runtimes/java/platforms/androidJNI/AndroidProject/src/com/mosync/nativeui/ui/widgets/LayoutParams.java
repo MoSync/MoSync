@@ -28,6 +28,11 @@ public class LayoutParams extends ViewGroup.LayoutParams
 	public int verticalAlignment = -1;
 	
 	/**
+	 * The amount of space allocated for this widget.
+	 */
+	public float weight = 0.0f;
+	
+	/**
 	 * The margins of this layout params.
 	 */
 	public int marginLeft   = 0;

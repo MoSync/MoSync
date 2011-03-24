@@ -291,7 +291,7 @@ static void outputConsts(const string& filename, const Interface& inf, int ix) {
 		streamHash(stream, inf);
 	}
 
-	streamConstants(stream, inf.constSets, ix);
+	streamConstants(stream, def, inf.constSets, ix);
 	streamIoctlDefines(stream, inf, def, ix, true);
 
 	stream << "#endif\t//" << def << "\n";
@@ -304,6 +304,8 @@ void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) 
 	for(size_t i=0; i<inf.functions.size(); i++) {
 		const Function& f(inf.functions[i]);
 		stream << f.comment;
+		if(f.groupId != "")
+			stream << "/** @ingroup " << f.groupId << " */\n";
 
 		if(syscall)
 			stream << "SYSCALL(";
