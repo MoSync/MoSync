@@ -60,7 +60,7 @@ end
 
 CopyFileTask.new(work, "config_platform.h",
 	FileTask.new(work, "config_platform.h.example")).invoke
-CopyFileTask.new(work, "#{mosyncdir}/etc/contacts.xml",
+CopyFileTask.new(work, "#{mosyncdir}/bin/default_contacts.xml",
 	FileTask.new(work, "contacts.xml"),
 	[DirTask.new(work, "#{mosyncdir}/etc")]).invoke if(!(NATIVE_RUNTIME == "true"))
 
