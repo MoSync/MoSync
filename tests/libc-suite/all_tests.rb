@@ -188,7 +188,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild)
 	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
 		return force_rebuild
 	end
-	cmd = "#{MOSYNCDIR}/bin/more -timeout 20 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
+	cmd = "#{MOSYNCDIR}/bin/more -timeout 60 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
 	$stderr.puts cmd
 	res = system(cmd)
 	puts res

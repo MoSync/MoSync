@@ -182,6 +182,9 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'tst-swscanf.c',	# Implementation-defined behaviour (%[a-c]). Also, an unsupported locale. See notes.
 	'bug-mmap-fflush.c',	# system
 	'tst-fopenloc2.c',	# GNU extension: fopen(ccs).
+	# glibc doesn't implement open_wmemstream's sizep parameter according to the Open Group Base Specification,
+	# so this test fails.
+	'tst-wmemstream2.c',
 ]
 
 SKIPPED_PATTERNS = [
