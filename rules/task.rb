@@ -290,3 +290,26 @@ class CopyFileTask < FileTask
 		FileUtils.copy_file(@src, @NAME)
 	end
 end
+
+# generate file in memory, then compare it to the one on disk
+# to decide if it should be overwritten.
+# subclasses must provide member variable @buf.
+class MemoryGeneratedFileTask < FileTask
+	def initialize(work, name)
+		super(work, name)
+		@ec = open(@NAME).read if(File.exist?(@NAME))
+	end
+	def needed?(log = true)
+		return true if(super(log))
+		if(@buf != @ec)
+			puts "Because generated file has changed:" if(log)
+			return true
+		end
+		return false
+	end
+	def execute
+		file = open(@NAME, 'w')
+		file.write(@buf)
+		file.close
+	end
+end

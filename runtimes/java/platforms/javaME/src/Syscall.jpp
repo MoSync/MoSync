@@ -543,7 +543,7 @@ IMPLEMENTS MoSync
 	//I think this is more efficient than writing each byte to the stream,
 	//despite the temporary memory allocation.
 	private final void readMemStream(OutputStream dst, Address src, int count) throws IOException {
-		dst.write(getMemBytes(src, count));
+		chunkWrite(dst, getMemBytes(src, count));
 	}
 #endif	//OLD_MEMCPY
 

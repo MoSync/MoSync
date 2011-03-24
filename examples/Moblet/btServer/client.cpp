@@ -58,7 +58,7 @@ public:
 		const byte* a = sAddress.a;
 		sprintf(buf, "btspp://%02x%02x%02x%02x%02x%02x:%i",
 			a[0], a[1], a[2], a[3], a[4], a[5], 2);
-		int res = mConn.connect(buf);
+		int res = mConn.Connection::connect(buf);
 #endif
 		printf("connect res %i\n", res);
 		currentBuffer = buffer1;

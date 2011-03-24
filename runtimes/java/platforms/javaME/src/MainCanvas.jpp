@@ -149,7 +149,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #ifndef JDB_DEBUG
 				try {
 #endif
-					DEBUG_ALWAYS("mainLoop start\n");
+					DEBUG("mainLoop start\n");
 					mStop = mDestroy = false;
 #ifndef PHONE_RELEASE
 					mCore.mInstCount = 0;
@@ -162,10 +162,10 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 					if(time == 0) time++;
 
 #ifdef MA_PROF_SUPPORT_CLDC_10				
-					DEBUG_ALWAYS(""+mCore.mInstCount+" instructions in "+time+" ms: "+
+					DEBUG(""+mCore.mInstCount+" instructions in "+time+" ms: "+
 						((mCore.mInstCount) / time)+" KIPS\n");
 #else				
-					DEBUG_ALWAYS(""+mCore.mInstCount+" instructions in "+time+" ms: "+
+					DEBUG(""+mCore.mInstCount+" instructions in "+time+" ms: "+
 						(((double)mCore.mInstCount) / time)+" KIPS\n");
 #endif
 
@@ -206,12 +206,12 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 
 						if(mEventBuffer.size() == 0 || mErrorAlert != null) {
 							if(mTimeout > 0) {
-								DEBUG_ALWAYS(" seq "+mWaitSequence+"\n");
+								DEBUG(" seq "+mWaitSequence+"\n");
 								mTimer.schedule(new WaitTask(mWaitSequence), mTimeout);
 							}
-							DEBUG_ALWAYS("wait()\n");
+							DEBUG("wait()\n");
 							this.wait();
-							DEBUG_ALWAYS("wait() done\n");
+							DEBUG("wait() done\n");
 						}
 						if(mCore == null) {
 							DEBUG_TEMP("mCore null, returning.\n");
@@ -488,7 +488,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 			mSequence = sequence;
 		}
 		public final void run() {
-			DEBUG_ALWAYS("WaitTask.run(), seq "+mSequence+"\n");
+			DEBUG("WaitTask.run(), seq "+mSequence+"\n");
 			if(mSequence != mWaitSequence)
 				return;
 			FinishWait();
@@ -510,7 +510,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		//DEBUG_ALWAYS("FinishWait\n");
 		try {
 			mWaitSequence++;
-			DEBUG_TEMP("notify()\n");
+			DEBUG("notify()\n");
 			this.notify();
 		} catch(Exception e) {
 			IN_FILE_ON_LINE;
