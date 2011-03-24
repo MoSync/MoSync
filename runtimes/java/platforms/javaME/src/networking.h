@@ -281,7 +281,7 @@ public static final int recv(InputStream in, byte[] bytes, int offset, int size)
 throws IOException
 {
 	//DEBUG_TEMP("special recv\n");
-	int res = in.read(bytes, offset, 1);
+	int res = in.read(bytes, offset, size);
 	if(res == 1) {
 		int len = size - 1;
 		if(len > 0) {
