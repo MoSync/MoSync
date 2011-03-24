@@ -19,6 +19,7 @@
 #import "NSObjectExpanded.h"
 
 #import "ScreenWidget.h"
+#import "StackScreenWidget.h"
 #import "LayoutWidgets.h"
 #import "RelativeLayoutWidget.h"
 #import "ListViewItemWidget.h"
@@ -222,12 +223,43 @@ int maWidgetRemoveChild(MAWidgetHandle childHandle) {
 	return returnValue;
 }
 
-int maWidgetStackScreenPush(MAWidgetHandle stackScreen, MAWidgetHandle screen) {
-	return -1;
+int maWidgetStackScreenPush(MAWidgetHandle stackScreenHandle, MAWidgetHandle screenHandle) {
+	IWidget* stackScreen = [mosyncUI getWidget:stackScreenHandle];
+	if(!stackScreen) return MAW_RES_INVALID_HANDLE;
+
+	IWidget* screen = [mosyncUI getWidget:screenHandle];
+	if(!screen) return MAW_RES_INVALID_HANDLE;	
+	
+	if(!([screen class] == [ScreenWidget class]) && !([screen superclass] == [ScreenWidget class])) {
+		return MAW_RES_INVALID_SCREEN;
+	}
+	
+	if(!([stackScreen class] == [StackScreenWidget class])) {
+		return MAW_RES_INVALID_SCREEN;
+	}
+	
+	[NSObject performSelectorOnMainThread:@selector(push:)
+							   withTarget:stackScreen
+							  withObjects:[NSArray arrayWithObjects: screen, nil] 
+							waitUntilDone:YES
+						   andReturnValue:nil];
+	return MAW_RES_OK;
 }
 
-int maWidgetStackScreenPop(MAWidgetHandle stackScreen) {
-	return -1;
+int maWidgetStackScreenPop(MAWidgetHandle stackScreenHandle) {
+	IWidget* stackScreen = [mosyncUI getWidget:stackScreenHandle];
+	if(!stackScreen) return MAW_RES_INVALID_HANDLE;
+	
+	if(!([stackScreen class] == [StackScreenWidget class])) {
+		return MAW_RES_INVALID_SCREEN;
+	}
+	
+	[NSObject performSelectorOnMainThread:@selector(pop)
+							   withTarget:stackScreen
+							  withObjects:[NSArray arrayWithObjects: nil] 
+							waitUntilDone:YES
+						   andReturnValue:nil];
+	return MAW_RES_OK;
 }
 
 int maWidgetScreenShow(MAWidgetHandle screenHandle) {
