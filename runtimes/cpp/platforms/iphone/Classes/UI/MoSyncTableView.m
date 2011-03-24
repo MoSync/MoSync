@@ -29,8 +29,14 @@
 {
 	NSUInteger row = [indexPath row];	
 	UITableViewCell* cell = [mDataForMyTable objectAtIndex:row];
-	[cell setFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, cell.frame.size.width,  tableView.rowHeight)];
+	//[cell setFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, cell.frame.size.width,  tableView.rowHeight)];
 	return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+	NSUInteger row = [indexPath row];
+	UITableViewCell* cell = [mDataForMyTable objectAtIndex:row];
+	return tableView.rowHeight;
 }
 
 - (void) addView:(UIView*)view {

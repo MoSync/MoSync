@@ -84,7 +84,7 @@
 		[view setUserInteractionEnabled:YES];
 		view.contentMode = UIViewContentModeRedraw;
 		view.autoresizesSubviews = NO;
-		//view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
+		view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
 	}
 	
 	return self;
