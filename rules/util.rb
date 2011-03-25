@@ -191,3 +191,12 @@ class File
 		end
 	end
 end
+
+def min(a, b)
+	return a if(a < b)
+	return b
+end
+
+def max(a, b)
+	return (a > b) ? a : b
+end

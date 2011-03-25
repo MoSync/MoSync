@@ -311,6 +311,9 @@ public class MoSync extends Activity
 	{
 		SYSLOG("onKeyDown: " + keyEvent.toString());
 
+		// If the key is being held down we shouldn't send any more events.
+		if(keyEvent.getRepeatCount() != 0) return true;
+		
 		int[] event = new int[3];
 		
 		event[0] = EVENT_TYPE_KEY_PRESSED;

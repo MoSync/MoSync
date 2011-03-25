@@ -1,8 +1,8 @@
 package com.mosync.internal.android;
 
-import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_CLICKED;
-import static com.mosync.internal.generated.IX_WIDGET.WIDGET_EVENT_ITEM_CLICKED;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_WIDGET;
+
+import com.mosync.internal.generated.IX_WIDGET;
 
 /**
  * Class that handles posting of events to the MoSync
@@ -55,7 +55,7 @@ public class EventQueue
 		int event[] = new int[ 5 ];
 		
 		event[0] = EVENT_TYPE_WIDGET;
-		event[1] = WIDGET_EVENT_CLICKED;
+		event[1] = IX_WIDGET.MAW_EVENT_CLICKED;
 		event[2] = widgetHandle;
 		event[3] = checked ? 1 : 0;
 		
@@ -73,7 +73,7 @@ public class EventQueue
 		int event[] = new int[ 5 ];
 		
 		event[0] = EVENT_TYPE_WIDGET;
-		event[1] = WIDGET_EVENT_ITEM_CLICKED;
+		event[1] = IX_WIDGET.MAW_EVENT_ITEM_CLICKED;
 		event[2] = widgetHandle;
 		event[3] = position;
 		

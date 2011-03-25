@@ -17,6 +17,7 @@
 # 02111-1307, USA.
 
 require "../../../../rules/util.rb"
+require "../../../../rules/mosync_util.rb"
 require "FileUtils"
 
 #FileUtils.rm_rf(["build"])
@@ -86,3 +87,6 @@ if (createTest == true)
 	FileUtils.cp ["resources", "data_section.bin"], "template_test"
 	FileUtils.cp "Classes/rebuild.build.cpp", "template_test/Classes"
 end
+
+FileUtils.rm_rf(mosyncdir+"/profiles/runtimes/iphoneos/1/template")
+FileUtils.cp_r "template", mosyncdir+"/profiles/runtimes/iphoneos/1/"

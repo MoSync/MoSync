@@ -34,7 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 void logWithNSLog(const char *str, int length) {
 	NSString* text = [[NSString alloc] initWithBytes:str length:length encoding:NSUTF8StringEncoding];
-	NSLog(text);
+	NSLog(@"%@", text);
 	[text release];
 }
 

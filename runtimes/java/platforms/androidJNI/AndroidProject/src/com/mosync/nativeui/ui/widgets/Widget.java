@@ -2,8 +2,10 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.view.View;
 
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.BooleanConverter;
@@ -11,6 +13,7 @@ import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
 import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
 
@@ -39,7 +42,14 @@ public class Widget
 	/**
 	 * Default layout params.
 	 */
-	private LayoutParams m_layoutParams = new LayoutParams();
+	private LayoutParams m_layoutParams = new LayoutParams( );
+	
+	/**
+	 * The alpha is stored here to enable us to the alpha before
+	 * a background drawable is set. This means that as soon as
+	 * the background is changed, the alpha must also be set.
+	 */
+	private int m_alpha = 0xff;
 	
 	/**
 	 * Constructor.
@@ -60,30 +70,35 @@ public class Widget
 	 * 
 	 * TODO: More sensible implementation.
 	 * 
-	 * @param property The property of the widget that should be set,
-	 *                 one of
+	 * @param property The property of the widget that should be set.
 	 * @param value The value of the property, this will be converted
 	 *              to the appropriate type.
 	 * @return true if the property was set, false otherwise.
+	 * 
+	 * @throws PropertyConversionException If a value could not be converted
+	 *                                     to a value suitable for the given property.
+	 * @throws InvalidPropertyValueException If the converted value was out of range
+	 *                                       or in any other sense invalid.
 	 */
-	public boolean setProperty(String property, String value) throws PropertyConversionException
+	public boolean setProperty(String property, String value)
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		LayoutParams layoutParams = getLayoutParams( );
-		if( property.equals( Types.WIDGET_PROPERTY_WIDTH ) )
+		if( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
 		{
 			layoutParams.width = IntConverter.convert( value );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_HEIGHT ) )
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
 		{
 			layoutParams.height = IntConverter.convert( value );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_LEFT ) ||
-				 property.equals( Types.WIDGET_PROPERTY_LEFT ) )
+				 property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
 		{
 			layoutParams.marginLeft = IntConverter.convert( value );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_TOP ) || 
-				 property.equals( Types.WIDGET_PROPERTY_TOP ) )
+				 property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
 		{
 			layoutParams.marginTop = IntConverter.convert( value );
 		}
@@ -103,31 +118,38 @@ public class Widget
 		{
 			layoutParams.verticalAlignment = VerticalAlignment.convert( value );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_BACKGROUND_COLOR ) )
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR ) )
 		{
 			getView( ).setBackgroundColor( ColorConverter.convert( value ) );
+			updateAlpha( m_alpha );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_BACKGROUND_IMAGE ) )
+		else if( property.equals( IX_WIDGET.MAW_BUTTON_BACKGROUND_IMAGE ) )
 		{
 			int imageHandle = IntConverter.convert( value );
 			Bitmap background = NativeUI.getBitmap( imageHandle );
 			if( background != null )
 			{
 				getView( ).setBackgroundDrawable( new BitmapDrawable( background ) );
+				updateAlpha( m_alpha );
 			}
-		}
-		else if( property.equals( Types.WIDGET_PROPERTY_ALPHA ) )
-		{
-			float alpha = FloatConverter.convert( value );
-			if( alpha > 1.0f )
+			else
 			{
 				return false;
 			}
-			
-			int intAlpha = (int) (alpha * 255.0f); 
-			getView( ).getBackground( ).setAlpha( intAlpha );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_VISIBLE  ) )
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_ALPHA ) )
+		{
+			float alpha = FloatConverter.convert( value );
+			if( alpha > 1.0f || alpha < 0.0f )
+			{
+				throw new InvalidPropertyValueException( value, property );
+			}
+			
+			int intAlpha = (int) (alpha * 255.0f);
+			m_alpha = intAlpha;
+			updateAlpha( m_alpha );
+		}
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_VISIBLE ) )
 		{
 			boolean shouldBeVisible = BooleanConverter.convert( value );
 			if( shouldBeVisible )
@@ -163,19 +185,21 @@ public class Widget
 	 */
 	public String getProperty(String property)
 	{
-		if( property.equals( Types.WIDGET_PROPERTY_WIDTH ) )
+		if( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
 		{
-			return Integer.toString( getView( ).getWidth( ) - getLayoutParams( ).marginLeft - getLayoutParams( ).marginRight );
+			return Integer.toString( getView( ).getWidth( ) -
+					getLayoutParams( ).marginLeft - getLayoutParams( ).marginRight );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_HEIGHT ) )
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
 		{
-			return Integer.toString( getView( ).getHeight( ) - getLayoutParams( ).marginTop - getLayoutParams( ).marginBottom );
+			return Integer.toString( getView( ).getHeight( ) -
+					getLayoutParams( ).marginTop - getLayoutParams( ).marginBottom );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_LEFT ) )
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
 		{
 			return Integer.toString( getView( ).getLeft( ) );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_TOP ) )
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
 		{
 			return Integer.toString( getView( ).getTop( ) );
 		}
@@ -245,5 +269,20 @@ public class Widget
 	{
 		assert( m_layoutParams != null );
 		return m_layoutParams;
+	}
+	
+	/**
+	 * Updates the alpha of the background of the underlying view.
+	 * 
+	 * @param alpha The new alpha of the underlying view.
+	 */
+	public void updateAlpha(int alpha)
+	{		
+		Drawable background = getView( ).getBackground( );
+		if( background == null )
+		{
+			return;
+		}
+		background.setAlpha( alpha & 0xff );
 	}
 }

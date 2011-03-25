@@ -42,13 +42,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 }
 
-
-/*
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
-- (void)viewDidLoad {
-    [super viewDidLoad];
+- (void)viewWillAppear:(BOOL)animated {
+	[mosyncView viewAppeared];
+    [super viewWillAppear:animated];
 }
-*/
 
 /*
 // Override to allow orientations other than the default portrait orientation.

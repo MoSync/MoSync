@@ -15,9 +15,15 @@
  02111-1307, USA.
  */
 
-#import "MoSyncTableViewCell.h"
+#import <Foundation/Foundation.h>
+#import "IWidget.h"
 
+@interface EditBoxWidget : IWidget <UITextFieldDelegate> {
+	UITextField* textField;
+}
 
-@implementation MoSyncTableViewCell
+- (id)init;
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+- (NSString*)getPropertyWithKey: (NSString*)key;
 
 @end

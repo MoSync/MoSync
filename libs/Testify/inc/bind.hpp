@@ -60,7 +60,7 @@ public:
 	virtual void operator () ( void ) = 0;
 };
 
-// @cond
+// @cond IGNORE_FUNCTOR_IMPLEMENTATION
 template <typename R, typename CLASS>
 class Functor0 : public Functor
 {

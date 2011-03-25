@@ -1,12 +1,13 @@
 package com.mosync.nativeui.ui.widgets;
 
-import com.mosync.nativeui.core.NativeUI;
-import com.mosync.nativeui.core.Types;
-import com.mosync.nativeui.util.properties.IntConverter;
-import com.mosync.nativeui.util.properties.PropertyConversionException;
-
 import android.graphics.Bitmap;
 import android.widget.ImageView;
+
+import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.core.NativeUI;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * Wraps the behavior of an Image view.
@@ -28,7 +29,7 @@ public class ImageWidget extends Widget
 
 	@Override
 	public boolean setProperty(String property, String value)
-			throws PropertyConversionException
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty(property, value) )
 		{
@@ -36,7 +37,7 @@ public class ImageWidget extends Widget
 		}
 		
 		ImageView imageView = (ImageView) getView( );
-		if( property.equals( Types.WIDGET_PROPERTY_IMAGE ) )
+		if( property.equals( IX_WIDGET.MAW_IMAGE_IMAGE ) )
 		{
 			Bitmap image = NativeUI.getBitmap( IntConverter.convert( value ) );
 			imageView.setImageBitmap( image );

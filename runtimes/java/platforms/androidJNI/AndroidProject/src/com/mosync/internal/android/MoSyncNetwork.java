@@ -438,7 +438,7 @@ public class MoSyncNetwork
 	int maHttpGetResponseHeader(
 		int connHandle, 
 		String key, 
-		long address, 
+		int address, 
 		int bufSize)
 	{
 		Log.i("MoSyncSyscall", "maHttpGetResponseHeader");
@@ -1011,7 +1011,7 @@ public class MoSyncNetwork
 			return false; 
 		}
 		
-		public int getResponseHeader(String key, long address, int bufSize) 
+		public int getResponseHeader(String key, int address, int bufSize) 
 		{ 
 			return CONNERR_GENERIC; 
 		}
@@ -1150,7 +1150,7 @@ public class MoSyncNetwork
 		}
 	
 		@Override
-		public int getResponseHeader(String key, long address, int bufSize)
+		public int getResponseHeader(String key, int address, int bufSize)
 		{
 			try
 			{
@@ -1163,19 +1163,21 @@ public class MoSyncNetwork
 				
 				// Write the bufSize first characters in the String value 
 				// to ds_mem starting at address.
-				
-				byte[] vstr = value.getBytes();
+				byte[] valueAsBytes = value.getBytes( );
+				if(bufSize < valueAsBytes.length + 1)
+				{
+					return valueAsBytes.length;
+				}
 				
 				SYSLOG(
 					"getResponseHeader value: " + value + 
-					" vstr: " + new String(vstr) + 
-					" vstr.length: " + vstr.length + 
+					" vstr: " + value + 
+					" vstr.length: " + valueAsBytes.length + 
 					" position: " + address);
 				
-				mMoSyncNetwork.copyBytesToMemory(
-					(int)address, vstr, 0, vstr.length);
+				mMoSyncNetwork.copyStringToMemory((int) address, value);
 				
-				return vstr.length;
+				return valueAsBytes.length;
 			} 
 			catch (IllegalStateException ex)
 			{

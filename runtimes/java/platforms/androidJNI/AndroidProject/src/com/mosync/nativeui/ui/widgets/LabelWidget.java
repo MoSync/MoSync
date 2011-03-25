@@ -2,10 +2,12 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.widget.TextView;
 
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
 
@@ -33,7 +35,7 @@ public class LabelWidget extends Widget
 	 * @see Widget.setProperty.
 	 */
 	@Override
-	public boolean setProperty(String property, String value) throws PropertyConversionException
+	public boolean setProperty(String property, String value) throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty(property, value) )
 		{
@@ -41,17 +43,21 @@ public class LabelWidget extends Widget
 		}
 		
 		TextView textView = (TextView) getView( );
-		if( property.equals( Types.WIDGET_PROPERTY_TEXT ) )
+		if( property.equals( IX_WIDGET.MAW_LABEL_TEXT ) )
 		{
 			textView.setText( value );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_PLACEHOLDER ) )
+		else if( property.equals( IX_WIDGET.MAW_EDIT_BOX_PLACEHOLDER ) )
 		{
 			textView.setHint( value );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_FONT_COLOR ) )
+		else if( property.equals( IX_WIDGET.MAW_LABEL_FONT_COLOR ) )
 		{
 			textView.setTextColor( ColorConverter.convert( value ) );
+		}
+		else if( property.equals( IX_WIDGET.MAW_LABEL_FONT_SIZE ) )
+		{
+			textView.setTextSize( FloatConverter.convert( value ) );
 		}
 		else if( property.equals( Types.WIDGET_PROPERTY_TEXT_HORIZONTAL_ALIGNMENT ) )
 		{
@@ -62,10 +68,6 @@ public class LabelWidget extends Widget
 		{
 			int currentGravity = VerticalAlignment.clearVerticalAlignment( textView.getGravity( ) );
 			textView.setGravity( currentGravity | VerticalAlignment.convert( value ) );
-		}
-		else if( property.equals( Types.WIDGET_PROPERTY_FONT_SIZE ) )
-		{
-			textView.setTextSize( FloatConverter.convert( value ) );
 		}
 		else
 		{
@@ -82,13 +84,24 @@ public class LabelWidget extends Widget
 	public String getProperty(String property)
 	{
 		TextView textView = (TextView) getView( );
-		if (property.equals(Types.WIDGET_PROPERTY_TEXT))
+		if( property.equals( IX_WIDGET.MAW_LABEL_TEXT ) )
 		{
-			return textView.getText().toString();
+			if( textView.getText( ) != null && textView.getText( ).length( ) > 0 )
+			{
+				return textView.getText( ).toString( );
+			}
+			else if( textView.getHint( ) != null && textView.getText( ).length( ) > 0 )
+			{
+				return textView.getHint( ).toString( );
+			}
+			else
+			{
+				return "";
+			}
 		}
 		else
 		{
-			return super.getProperty(property);
+			return super.getProperty( property );
 		}
 	}
 }

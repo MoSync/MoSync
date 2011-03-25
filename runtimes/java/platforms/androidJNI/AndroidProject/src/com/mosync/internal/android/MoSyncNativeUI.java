@@ -2,21 +2,23 @@ package com.mosync.internal.android;
 
 import java.util.Hashtable;
 
-import com.mosync.internal.android.MoSyncThread.ImageCache;
-import com.mosync.java.android.MoSync;
-import com.mosync.nativeui.core.NativeUI;
-import com.mosync.nativeui.core.Types;
-import com.mosync.nativeui.util.AsyncWait;
-
 import android.app.Activity;
 import android.util.Log;
+import android.view.View;
+
+import com.mosync.internal.android.MoSyncThread.ImageCache;
+import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.java.android.MoSync;
+import com.mosync.nativeui.core.NativeUI;
+import com.mosync.nativeui.core.NativeUI.RootViewReplacedListener;
+import com.mosync.nativeui.util.AsyncWait;
 
 /**
  * Wrapper for Native UI Syscalls to avoid cluttering
  * the MoSyncSyscalls file, also to call the native ui
  * functions in the UI thread.
  */
-public class MoSyncNativeUI
+public class MoSyncNativeUI implements RootViewReplacedListener
 {
 	/**
 	 * The MoSync thread object.
@@ -35,6 +37,7 @@ public class MoSyncNativeUI
 	{
 		mMoSyncThread = thread;
 		mNativeUI = new NativeUI(getActivity());
+		mNativeUI.setRootViewReplacedListener(this);
 		NativeUI.setImageTable(imageResources);
 	}
 
@@ -47,12 +50,22 @@ public class MoSyncNativeUI
 	}
 	
 	/**
+	 * Sets the default MoSync canvas view, so that it is possible
+	 * to switch back to it from native UI.
+	 * 
+	 * @param mosyncScreen The MoSync canvas view.
+	 */
+	public void setMoSyncScreen(MoSyncView moSyncView)
+	{
+		mNativeUI.setMoSyncScreen( moSyncView );
+	}
+	
+	/**
 	 * Internal wrapper for maWidgetCreate that runs
 	 * the call in the UI thread.
 	 */
 	public int maWidgetCreate(final String type)
 	{
-		Log.i("MoSync", "MoSyncThread.maWidgetCreate");
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
@@ -79,7 +92,6 @@ public class MoSyncNativeUI
 	 */
 	public int maWidgetDestroy(final int widget)
 	{
-		Log.i("MoSync", "MoSyncThread.maWidgetDestroy");
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
@@ -107,8 +119,6 @@ public class MoSyncNativeUI
 		final int parentHandle, 
 		final int childHandle)
 	{
-		Log.i("MoSync", "MoSyncThread.maWidgetAddChild");
-		
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
@@ -133,11 +143,9 @@ public class MoSyncNativeUI
 	 * Internal wrapper for maWidgetRemoveChild that runs
 	 * the call in the UI thread.
 	 */
-	public int maWidgetRemoveChild(
-		final int parentHandle, 
+	public int maWidgetRemoveChild( 
 		final int childHandle)
 	{
-		Log.i("MoSync", "MoSyncThread.maWidgetRemoveChild");
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
@@ -145,8 +153,7 @@ public class MoSyncNativeUI
 			{
 				public void run()
 				{
-					int result = mNativeUI.maWidgetRemove(
-						parentHandle, childHandle);
+					int result = mNativeUI.maWidgetRemove(childHandle);
 					waiter.setResult(result);
 				}
 			});
@@ -164,7 +171,6 @@ public class MoSyncNativeUI
 	 */
 	public int maWidgetScreenShow(final int screenHandle)
 	{
-		Log.i("MoSync", "MoSyncThread.maWidgetScreenShow");
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
@@ -173,8 +179,6 @@ public class MoSyncNativeUI
 				public void run()
 				{
 					int result = mNativeUI.maWidgetScreenShow(screenHandle);
-					((MoSync) getActivity()).setRootView( 
-						mNativeUI.getRootView( ) );
 					waiter.setResult(result);
 				}
 			});
@@ -195,11 +199,9 @@ public class MoSyncNativeUI
 		final String key, 
 		final String value)
 	{
-		Log.i("MoSync", "MoSyncThread.maWidgetSetProperty: " + key);
-		
 		// Bind and invalidate must be called on the main mosync thread,
 		// since all opengl calls will be called from that thread.
-		if( key.equals( Types.WIDGET_PROPERTY_BIND ) || key.equals( Types.WIDGET_PROPERTY_INVALIDATE ) )
+		if( key.equals( IX_WIDGET.MAW_GL_VIEW_BIND ) || key.equals( IX_WIDGET.MAW_GL_VIEW_INVALIDATE ) )
 		{
 			return mNativeUI.maWidgetSetProperty(widgetHandle, key, value);
 		}
@@ -234,8 +236,6 @@ public class MoSyncNativeUI
 		final int memBuffer,
 		final int memBufferSize)
 	{
-		Log.i("MoSync", "MoSyncThread.maWidgetGetProperty: " + key);
-		
 		try
 		{
 			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
@@ -252,5 +252,11 @@ public class MoSyncNativeUI
 		{
 			return -1;
 		}
+	}
+
+	@Override
+	public void rootViewReplaced(View newRoot)
+	{
+		((MoSync) getActivity()).setRootView( newRoot );
 	}
 }

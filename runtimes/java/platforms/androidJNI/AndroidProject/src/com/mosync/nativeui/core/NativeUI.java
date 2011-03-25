@@ -1,9 +1,5 @@
 package com.mosync.nativeui.core;
 
-import static com.mosync.internal.generated.IX_WIDGET.WIDGET_ERROR;
-import static com.mosync.internal.generated.IX_WIDGET.WIDGET_OK;
-import static com.mosync.internal.generated.IX_WIDGET.WIDGET_ROOT;
-
 import java.util.Hashtable;
 
 import android.app.Activity;
@@ -13,14 +9,17 @@ import android.view.View;
 
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
+import com.mosync.internal.android.MoSyncView;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.ui.factories.ViewFactory;
 import com.mosync.nativeui.ui.widgets.Layout;
+import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
-
 
 /**
  * This class contains the implementation of the NativeUI system calls
@@ -42,9 +41,9 @@ public class NativeUI
 	private HandleTable<Widget> m_widgetTable = new HandleTable<Widget>();
 	
 	/**
-	 * The screen that is currently shown, null if none.
+	 * Listener for changes in the root view of the screen.
 	 */
-	private ScreenWidget m_currentScreen = null;
+	private RootViewReplacedListener m_rootViewReplacedListener = null;
 	
 	/**
 	 * Mapping between image handles and bitmaps.
@@ -92,14 +91,27 @@ public class NativeUI
 	}
 	
 	/**
-	 * Returns the view that currently should be shown. I.e.
-	 * the view corresponding to the screen that was last shown.
+	 * Sets the default MoSync canvas view, so that it is possible
+	 * to switch back to it from native UI.
 	 * 
-	 * @return The current root view.
+	 * @param mosyncScreen The MoSync canvas view.
 	 */
-	public View getRootView()
+	public void setMoSyncScreen(MoSyncView mosyncScreen)
 	{
-		return m_currentScreen.getView( ); 
+		if( mosyncScreen != null )
+		{
+			MoSyncScreenWidget screenWidget = new MoSyncScreenWidget( 
+					IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
+					mosyncScreen ); 
+			
+			m_widgetTable.add( IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
+					screenWidget );
+		}
+		else
+		{
+			// If there is no MoSyncView, we cannot provide one here
+			m_widgetTable.remove( IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE );
+		}
 	}
 	
 	/**
@@ -111,6 +123,12 @@ public class NativeUI
 	 */
 	public int maWidgetCreate(String type)
 	{
+		if( !ViewFactory.typeExists( type ) )
+		{
+			Log.e( "MoSync", "maWidgetCreate: Unknown type: " + type );
+			return IX_WIDGET.MAW_RES_INVALID_TYPE_NAME;
+		}
+		
 		int nextHandle = m_widgetTable.getNextHandle( );
 		Widget widget = ViewFactory.createView( type, m_activity, nextHandle );
 		
@@ -121,7 +139,8 @@ public class NativeUI
 		}
 		else
 		{
-			return WIDGET_ERROR;
+			Log.e("MoSync", "maWidgetCreate: Error while creating widget: " + type );
+			return IX_WIDGET.MAW_RES_ERROR;
 		}
 	}
 	
@@ -135,25 +154,42 @@ public class NativeUI
 	public int maWidgetDestroy(int widgetHandle)
 	{
 		Widget widget = m_widgetTable.get( widgetHandle );
-		if( widget != null )
+		if( widget == null )
 		{
-			/**
-			 * XXX: Destroy all children?
-			 */
-			Layout parent = (Layout)  widget.getParent( );
-			if( parent != null )
+			Log.e( "MoSync", "maWidgetDestroy: Invalid widget handle: " + widgetHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+		
+		internalMaWidgetDestroy( widget );
+		
+		return IX_WIDGET.MAW_RES_OK;
+	}
+	
+	/**
+	 * Recursive function that destroys the given widget and 
+	 * its children.
+	 * 
+	 * @param widgetToDestroy The widget to destroy.
+	 */
+	private void internalMaWidgetDestroy(Widget widgetToDestroy)
+	{
+		// Destroy children first
+		if( widgetToDestroy.isLayout( ) )
+		{
+			Layout widgetToDestroyAsLayout = (Layout) widgetToDestroy;
+			for(Widget child : widgetToDestroyAsLayout.getChildren( ))
 			{
-				Widget child = m_widgetTable.get( widgetHandle );
-				parent.removeChild( child );
+				internalMaWidgetDestroy( child );
 			}
-			
-			m_widgetTable.remove( widgetHandle );
-			return WIDGET_OK;
 		}
-		else
+
+		Layout parent = (Layout) widgetToDestroy.getParent( );
+		if( parent != null )
 		{
-			return WIDGET_ERROR;
+			parent.removeChild( widgetToDestroy );
 		}
+		
+		m_widgetTable.remove( widgetToDestroy.getHandle( ) );
 	}
 	
 	/**
@@ -165,80 +201,100 @@ public class NativeUI
 	 */
 	public int maWidgetAdd(int parentHandle, int childHandle)
 	{
+		if( parentHandle == childHandle )
+		{
+			Log.e( "MoSync", "maWidgetAdd: Child and parent are the same." );
+			return IX_WIDGET.MAW_RES_ERROR;
+		}
+		
 		Widget parent = m_widgetTable.get( parentHandle );
 		Widget child = m_widgetTable.get( childHandle );
 		
-		if( child == null || parent == null )
+		if( child == null )
 		{
-			return WIDGET_ERROR;
+			Log.e( "MoSync", "maWidgetAdd: Invalid child widget handle: " + childHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
-
-		if( parent.isLayout( ) )
+		if( parent == null )
 		{
-			Layout parentAsLayout = (Layout) parent;
-			parentAsLayout.addChild( child );
-			return WIDGET_OK;
+			Log.e( "MoSync", "maWidgetAdd: Invalid parent widget handle: " + parentHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
-		else
+		if( !parent.isLayout( ) )
 		{
-			return WIDGET_ERROR;
+			Log.e( "MoSync", "maWidgetAdd: Parent " + parentHandle + " is not a layout." );
+			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
 		}
+		
+		Layout parentAsLayout = (Layout) parent;
+		parentAsLayout.addChild( child );
+		
+		return IX_WIDGET.MAW_RES_OK;
 	}
 	
 	/**
 	 * Internal function for the maWidgetRemove system call.
-	 * Removes a child from the given parent, but keeps a
+	 * Removes a child from its parent, but keeps a
 	 * reference to it.
 	 * 
 	 * Note: Should only be called on the UI thread.
 	 */
-	public int maWidgetRemove(int parentHandle, int childHandle)
-	{
-		if( childHandle == WIDGET_ROOT )
-		{
-			return WIDGET_ERROR;
-		}
-		
-		Widget parent = m_widgetTable.get( parentHandle );
+	public int maWidgetRemove(int childHandle)
+	{		
 		Widget child = m_widgetTable.get( childHandle );
-		
-		if( child == null || parent == null )
+		if( child == null )
 		{
-			return WIDGET_ERROR;
+			Log.e( "MoSync", "maWidgetRemove: Invalid child widget handle: " + childHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
-		if( parent.isLayout( ) )
+		Widget parent = child.getParent( );
+		if( parent == null )
 		{
-			Layout parentAsLayout = (Layout) parent;
-			parentAsLayout.removeChild( child );
-			return WIDGET_OK;
+			Log.e( "MoSync", "maWidgetRemove: Widget " + childHandle + " has no parent." );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
-		else
+		
+		if( !parent.isLayout( ) )
 		{
-			return WIDGET_ERROR;
+			Log.e( "MoSync", "maWidgetRemove: Parent for " + childHandle + " is not a layout." );
+			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
 		}
+
+		Layout parentAsLayout = (Layout) parent;
+		parentAsLayout.removeChild( child );
+		
+		return IX_WIDGET.MAW_RES_OK;
 	}
 	
 	/**
 	 * Internal function for the maWidgetScreenShow system call.
 	 * Sets the root widget to the root of the given screen, but
 	 * it does not actually call setContentView, this should
-	 * be done by the caller.
+	 * be done through the RootViewReplacedListener.
 	 * 
 	 * Note: Should only be called on the UI thread.
 	 */
 	public int maWidgetScreenShow(int screenWidget)
 	{
 		Widget screen = m_widgetTable.get( screenWidget );
-		if( screen != null && screen instanceof ScreenWidget )
+		if( screen == null )
 		{
-			m_currentScreen = (ScreenWidget) screen;
-			return WIDGET_OK;
+			Log.e( "MoSync", "maWidgetScreenShow: Invalid screen handle: " + screenWidget );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
-		else
+		if( !( screen instanceof ScreenWidget ) && !( screen instanceof MoSyncScreenWidget ) )
 		{
-			return WIDGET_ERROR;
+			Log.e( "MoSync", "maWidgetScreenShow: Widget is not a screen: " + screenWidget );
+			return IX_WIDGET.MAW_RES_INVALID_SCREEN;
 		}
+		
+		if( m_rootViewReplacedListener != null )
+		{
+			m_rootViewReplacedListener.rootViewReplaced( screen.getView( ) );
+		}
+		
+		return IX_WIDGET.MAW_RES_OK;
 	}
 	
 	/**
@@ -253,19 +309,31 @@ public class NativeUI
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null )
 		{
-			return WIDGET_ERROR;
+			Log.e( "MoSync", "maWidgetSetProperty: Invalid child widget handle: " + widgetHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
 		try
 		{
-			widget.setProperty( key, value );
-			return WIDGET_OK;
+			if( widget.setProperty( key, value ) )
+			{
+				return IX_WIDGET.MAW_RES_OK;
+			}
+			else
+			{
+				Log.e( "MoSync", "maWidgetSetProperty: Invalid property '" + key + "' on widget: " + widgetHandle );
+				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
+			}
 		}
 		catch(PropertyConversionException pce)
 		{
-			Log.e( this.getClass( ).getCanonicalName( ) , 
-				"Error while converting property: " + pce.getMessage( ), pce );
-			return WIDGET_ERROR;
+			Log.e( "MoSync", "Error while converting property value '" + value + "': " + pce.getMessage( ) );
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+		}
+		catch(InvalidPropertyValueException ipve)
+		{
+			Log.e( "MoSync", "Error while setting property: " + ipve.getMessage( ) );
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 		}
 	}
 	
@@ -278,28 +346,54 @@ public class NativeUI
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null )
 		{
-			return WIDGET_ERROR;
+			Log.e( "MoSync", "maWidgetGetProperty: Invalid child widget handle: " + widgetHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
 		String result = widget.getProperty( key );
-		Log.i("MoSync", "maWidgetGetProperty return: " + result);
+		if( result.length( ) <= 0 )
+		{
+			Log.e( "MoSync", "maWidgetGetProperty: Invalid or empty property '" + 
+					key + "' on widget: " + widgetHandle );
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
+		}
 		
 		if( result.length( ) + 1 > memBufferSize )
 		{
-			return WIDGET_ERROR;
+			Log.e( "MoSync", "maWidgetGetProperty: Buffer size " + memBufferSize + 
+					" too short to hold buffer of size: " + result.length( ) + 1 );
+			return IX_WIDGET.MAW_RES_INVALID_STRING_BUFFER_SIZE;
 		}
 		
 		byte[] ba = result.getBytes();
 
 		// Write string to MoSync memory.
-		MoSyncThread mosyncThread = ((MoSync) m_activity).getMoSyncThread();
-		// Commented out mark and reset, because we should not use them.
-		//mosyncThread.mMemDataSection.mark( );
+		MoSyncThread mosyncThread = ((MoSync) m_activity).getMoSyncThread( );
 		mosyncThread.mMemDataSection.position( memBuffer );
 		mosyncThread.mMemDataSection.put( ba );
 		mosyncThread.mMemDataSection.put( (byte)0 );
-		//mosyncThread.mMemDataSection.reset( );
 		
 		return result.length( );
+	}
+	
+	/**
+	 * Sets a listener for when the root view is changed.
+	 * 
+	 * @param rootViewReplacedListener The class that listens for changes.
+	 */
+	public void setRootViewReplacedListener(RootViewReplacedListener rootViewReplacedListener)
+	{
+		m_rootViewReplacedListener = rootViewReplacedListener;
+	}
+	
+	public interface RootViewReplacedListener
+	{
+		/**
+		 * Called when the root view has been replaced
+		 * by another root view.
+		 * 
+		 * @param newRoot The new root view.
+		 */
+		void rootViewReplaced(View newRoot);
 	}
 }

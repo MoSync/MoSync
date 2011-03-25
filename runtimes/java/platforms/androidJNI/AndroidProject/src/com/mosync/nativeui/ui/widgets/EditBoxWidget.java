@@ -1,14 +1,14 @@
 package com.mosync.nativeui.ui.widgets;
 
-import com.mosync.nativeui.core.Types;
-import com.mosync.nativeui.util.properties.BooleanConverter;
-import com.mosync.nativeui.util.properties.PropertyConversionException;
-
-import android.content.Context;
-import android.os.IBinder;
 import android.text.InputType;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+
+import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.core.Types;
+import com.mosync.nativeui.util.KeyboardManager;
+import com.mosync.nativeui.util.properties.BooleanConverter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * This class represents an editable text area.
@@ -33,7 +33,7 @@ public class EditBoxWidget extends LabelWidget
 	 * @see LabelWidget.setProperty.
 	 */
 	@Override
-	public boolean setProperty(String property, String value) throws PropertyConversionException
+	public boolean setProperty(String property, String value) throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty(property, value) )
 		{
@@ -52,27 +52,16 @@ public class EditBoxWidget extends LabelWidget
 				editTextView.setInputType( InputType.TYPE_CLASS_TEXT );
 			}
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_SHOW_KEYBOARD ) )
+		else if( property.equals( IX_WIDGET.MAW_EDIT_BOX_SHOW_KEYBOARD ) )
 		{
 			boolean showKeyboard = BooleanConverter.convert( value );
-			
-   			InputMethodManager manager = (InputMethodManager)
-			getView( ).getContext( ).getSystemService( Context.INPUT_METHOD_SERVICE );
-			IBinder windowToken = editTextView.getWindowToken( );
-			if( null == manager || null == windowToken )
+			if( showKeyboard )
 			{
-				return false;
-			}
-			
-			if( showKeyboard )	
-			{
-				// Seems that it needs to have focus before we can show the keyboard.
-				editTextView.requestFocus( );
-				manager.showSoftInput( editTextView, InputMethodManager.SHOW_FORCED );
+				return KeyboardManager.showKeyboardFor( getView( ) );
 			}
 			else
 			{
-				manager.hideSoftInputFromWindow( editTextView.getWindowToken( ), 0 );
+				return KeyboardManager.hideKeyboardFor( getView( ) );
 			}
 		}
 		else
