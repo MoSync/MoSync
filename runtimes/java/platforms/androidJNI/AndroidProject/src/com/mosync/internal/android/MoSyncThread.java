@@ -2645,11 +2645,10 @@ public class MoSyncThread extends Thread
 	 * Internal wrapper for maWidgetRemoveChild that runs
 	 * the call in the UI thread.
 	 */
-	public int maWidgetRemoveChild(
-		final int parentHandle, 
+	public int maWidgetRemoveChild( 
 		final int childHandle)
 	{
-		return mMoSyncNativeUI.maWidgetRemoveChild(parentHandle, childHandle);
+		return mMoSyncNativeUI.maWidgetRemoveChild(childHandle);
 	}
 	
 	/**

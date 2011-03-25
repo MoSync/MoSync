@@ -220,7 +220,7 @@ namespace Base
 	int _maWidgetDestroy(int widget, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetAddChild(int parent, int child, 
 							JNIEnv* jNIEnv, jobject jThis);
-	int _maWidgetRemoveChild(int parent, int child, 
+	int _maWidgetRemoveChild(int child, 
 							JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetSetProperty(int widget, const char *property, 
 							const char* value, 

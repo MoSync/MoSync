@@ -98,6 +98,11 @@ namespace MAUtil {
 		* Example: "btspp://38E7D8C7605E:DCBDB690C17111DF851A0800200C9A66"
 		*
 		* \return \> 0 on success, \< 0 on error.
+		*
+		* \note This function supports only its own form of URL.
+		* If you want to use another form with an object of this class,
+		* you can call the superclass function with this syntax:
+		* btConn.Connection::connect(url)
 		*/
 		int connect(const char* url);
 

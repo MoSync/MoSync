@@ -36,7 +36,7 @@ widget_test_t g_widgetsToCreate[] =
 	{ MAW_LABEL, "Creating MAW_LABEL." },
 	{ MAW_LIST_VIEW, "Creating MAW_LIST_VIEW." },
 	{ MAW_LIST_VIEW_ITEM, "Creating MAW_LIST_VIEW_ITEM." },
-	{ MAW_NAV_SCREEN, "Creating MAW_NAV_SCREEN." },
+	{ MAW_STACK_SCREEN, "Creating MAW_STACK_SCREEN." },
 	{ MAW_RELATIVE_LAYOUT, "Creating MAW_RELATIVE_LAYOUT." },
 	{ MAW_SCREEN, "Creating MAW_SCREEN." },
 	{ MAW_SEARCH_BAR, "Creating MAW_SEARCH_BAR." },

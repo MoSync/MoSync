@@ -143,8 +143,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	 * Internal wrapper for maWidgetRemoveChild that runs
 	 * the call in the UI thread.
 	 */
-	public int maWidgetRemoveChild(
-		final int parentHandle, 
+	public int maWidgetRemoveChild( 
 		final int childHandle)
 	{
 		try
@@ -154,8 +153,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			{
 				public void run()
 				{
-					int result = mNativeUI.maWidgetRemove(
-						parentHandle, childHandle);
+					int result = mNativeUI.maWidgetRemove(childHandle);
 					waiter.setResult(result);
 				}
 			});

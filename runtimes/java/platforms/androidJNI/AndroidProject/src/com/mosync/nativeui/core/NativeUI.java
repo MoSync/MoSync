@@ -98,12 +98,20 @@ public class NativeUI
 	 */
 	public void setMoSyncScreen(MoSyncView mosyncScreen)
 	{
-		MoSyncScreenWidget screenWidget = new MoSyncScreenWidget( 
-				IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
-				mosyncScreen ); 
-		
-		m_widgetTable.add( IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
-				screenWidget );
+		if( mosyncScreen != null )
+		{
+			MoSyncScreenWidget screenWidget = new MoSyncScreenWidget( 
+					IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
+					mosyncScreen ); 
+			
+			m_widgetTable.add( IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE, 
+					screenWidget );
+		}
+		else
+		{
+			// If there is no MoSyncView, we cannot provide one here
+			m_widgetTable.remove( IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE );
+		}
 	}
 	
 	/**
@@ -152,14 +160,36 @@ public class NativeUI
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
-		Layout parent = (Layout)  widget.getParent( );
+		internalMaWidgetDestroy( widget );
+		
+		return IX_WIDGET.MAW_RES_OK;
+	}
+	
+	/**
+	 * Recursive function that destroys the given widget and 
+	 * its children.
+	 * 
+	 * @param widgetToDestroy The widget to destroy.
+	 */
+	private void internalMaWidgetDestroy(Widget widgetToDestroy)
+	{
+		// Destroy children first
+		if( widgetToDestroy.isLayout( ) )
+		{
+			Layout widgetToDestroyAsLayout = (Layout) widgetToDestroy;
+			for(Widget child : widgetToDestroyAsLayout.getChildren( ))
+			{
+				internalMaWidgetDestroy( child );
+			}
+		}
+
+		Layout parent = (Layout) widgetToDestroy.getParent( );
 		if( parent != null )
 		{
-			parent.removeChild( widget );
+			parent.removeChild( widgetToDestroy );
 		}
-			
-		m_widgetTable.remove( widgetHandle );
-		return IX_WIDGET.MAW_RES_OK;
+		
+		m_widgetTable.remove( widgetToDestroy.getHandle( ) );
 	}
 	
 	/**
@@ -204,30 +234,30 @@ public class NativeUI
 	
 	/**
 	 * Internal function for the maWidgetRemove system call.
-	 * Removes a child from the given parent, but keeps a
+	 * Removes a child from its parent, but keeps a
 	 * reference to it.
 	 * 
 	 * Note: Should only be called on the UI thread.
 	 */
-	public int maWidgetRemove(int parentHandle, int childHandle)
+	public int maWidgetRemove(int childHandle)
 	{		
-		Widget parent = m_widgetTable.get( parentHandle );
 		Widget child = m_widgetTable.get( childHandle );
-		
 		if( child == null )
 		{
 			Log.e( "MoSync", "maWidgetRemove: Invalid child widget handle: " + childHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
+		
+		Widget parent = child.getParent( );
 		if( parent == null )
 		{
-			Log.e( "MoSync", "maWidgetRemove: Invalid parent widget handle: " + parentHandle );
+			Log.e( "MoSync", "maWidgetRemove: Widget " + childHandle + " has no parent." );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
 		if( !parent.isLayout( ) )
 		{
-			Log.e( "MoSync", "maWidgetRemove: Parent " + parentHandle + " is not a layout." );
+			Log.e( "MoSync", "maWidgetRemove: Parent for " + childHandle + " is not a layout." );
 			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
 		}
 

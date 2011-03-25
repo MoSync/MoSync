@@ -11,7 +11,6 @@ import android.widget.BaseAdapter;
 import android.widget.ListView;
 
 import com.mosync.nativeui.core.Types;
-import com.mosync.nativeui.util.LayoutParamsSetter;
 import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -52,16 +51,24 @@ public class ListLayout extends Layout
 	@Override
 	public void addChild(Widget child)
 	{
-		child.setParent( this );
-		m_children.add( child );
-		
-		// Set layout params for the child
-		ViewGroup.LayoutParams nativeLayoutParams = createNativeLayoutParams( child.getLayoutParams( ) );
-		LayoutParamsSetter.setPossibleParams( child.getLayoutParams( ), nativeLayoutParams );
-		child.getView( ).setLayoutParams( nativeLayoutParams );
+		super.addChild( child );
 		
 		child.getView( ).setFocusable( false );
 		m_viewAdapter.add( child.getView( ) );
+	}
+	
+	/**
+	 * Add the child to the view adapter rather to
+	 * the list view itself.
+	 * 
+	 * @see Layout.addChild.
+	 */
+	@Override
+	public void removeChild(Widget child)
+	{
+		super.removeChild( child );
+
+		m_viewAdapter.remove( child.getView( ) );
 	}
 	
 	/**
@@ -118,7 +125,7 @@ public class ListLayout extends Layout
 		}
 		
 		/**
-		 * Add a view to the adapter and notify the listeners.
+		 * Add a view to the adapter and notifies the listeners.
 		 * 
 		 * @param view The view to add.
 		 */
@@ -127,6 +134,20 @@ public class ListLayout extends Layout
 			if( view != null )
 			{
 				m_views.add( view );
+				notifyDataSetChanged( );
+			}
+		}
+		
+		/**
+		 * Removes a view from the adapter and notifies the listeners.
+		 * 
+		 * @param view The view to remove.
+		 */
+		public void remove(View view)
+		{
+			if( view != null )
+			{
+				m_views.remove( view );
 				notifyDataSetChanged( );
 			}
 		}
