@@ -65,7 +65,7 @@
       <DisableSpecificWarnings>4355;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>mosynclib.lib;mastd.lib;mautil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>mosynclibD.lib;mastdD.lib;mautilD.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
