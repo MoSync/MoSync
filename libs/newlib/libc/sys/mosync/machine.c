@@ -329,6 +329,14 @@ off_t lseek(int __fd, off_t __offset, int __whence) {
 	int res;
 	LOWFD;
 	LOGD("lseek(%i, %li, %i)\n", __fd, __offset, __whence);
+	if(lfd < LOWFD_OFFSET) {
+		// seeking on LOWFD_CONSOLE and LOWFD_WRITELOG is permitted only in a few special cases.
+		// also, we don't keep track on how much has been written to them.
+		if((__whence == SEEK_CUR || __whence == SEEK_END) && __offset == 0)
+			return 0;
+		else
+			ERRNOFAIL(EINVAL);
+	}
 	file = lfd - LOWFD_OFFSET;
 	switch(__whence) {
 		case SEEK_SET: __whence = MA_SEEK_SET; break;

@@ -297,13 +297,16 @@ public class MoSync extends Activity
 		
 		// We need to intercept the back key otherwise the
 		// activity will be terminated.
-		if( keyCode == KeyEvent.KEYCODE_BACK )
+		if(keyCode == KeyEvent.KEYCODE_BACK)
 		{
+			// Pass on the back event in case we want to handle it.
+			mMoSyncThread.handleBack();
+			
 			return true;
 		}
 		else
 		{
-			return super.onKeyUp( keyCode, keyEvent );
+			return super.onKeyUp(keyCode, keyEvent);
 		}
 	}
 	

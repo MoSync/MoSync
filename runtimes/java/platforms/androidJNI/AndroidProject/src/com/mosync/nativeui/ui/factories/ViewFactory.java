@@ -96,6 +96,7 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_RELATIVE_LAYOUT, new DefaultFactory( android.widget.FrameLayout.class, FrameLayout.class ) );
 		addFactory( IX_WIDGET.MAW_CHECK_BOX, new CheckBoxFactory( ) );
 		addFactory( IX_WIDGET.MAW_EDIT_BOX, new EditBoxFactory( ) );
+		addFactory( IX_WIDGET.MAW_STACK_SCREEN, new StackScreenFactory( ) );
 	}
 	
 	/**

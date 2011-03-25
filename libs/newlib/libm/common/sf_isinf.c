@@ -17,10 +17,12 @@ int
 _DEFUN (isinff, (x),
 	float x)
 {
-	__int32_t ix;
+	__int32_t ix,t;
 	GET_FLOAT_WORD(ix,x);
-	ix &= 0x7fffffff;
-	return FLT_UWORD_IS_INFINITE(ix);
+	t = ix & 0x7fffffff;
+	t ^= 0x7f800000;
+	t |= -t;
+	return ~(t >> 31) & (ix >> 30);
 }
 
 #ifdef _DOUBLE_IS_32BITS
