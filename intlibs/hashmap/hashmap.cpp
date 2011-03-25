@@ -99,8 +99,6 @@ void HashMapBase::insert(int key, void* value, bool in_rehash) {
 	LOG_HASH("Insert %i\n", key);
 	DEBUG_ASSERT(value != NULL);
 	if(m.base == NULL) {
-		DEBUG_ASSERT(sizeof(BasePair) == 8);
-
 		//requested Size = (Length * sizeof)
 		m.baseLen = HASHMAP_BASE_SIZE;
 		m.base = (BasePair*)malloc(m.baseLen * sizeof(BasePair));
