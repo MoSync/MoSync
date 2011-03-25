@@ -539,6 +539,10 @@ std::string HttpConnection::methodString() {
 		return "GET";
 	case HTTP_POST:
 		return "POST";
+	case HTTP_PUT:
+		return "PUT";
+	case HTTP_DELETE:
+		return "DELETE";
 	case HTTP_HEAD:
 		return "HEAD";
 	default:
