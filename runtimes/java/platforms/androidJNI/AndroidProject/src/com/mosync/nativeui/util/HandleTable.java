@@ -26,7 +26,7 @@ public class HandleTable<T>
 	/**
 	 * The id of the next handle.
 	 */
-	private int m_nextHandle = 0;
+	private int m_nextHandle = 1;
 	
 	/**
 	 * Adds a view to the widget table and returns

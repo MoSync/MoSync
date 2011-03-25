@@ -2,8 +2,9 @@ package com.mosync.nativeui.ui.widgets;
 
 import android.view.ViewGroup;
 
-import com.mosync.nativeui.core.Types;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
 
@@ -36,9 +37,46 @@ public class LinearLayout extends Layout
 		return new android.widget.LinearLayout.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
 	}
 	
+	/**
+	 * @see updateLayoutParamsForChild.
+	 */
+	@Override
+	public void updateLayoutParamsForChild(Widget child)
+	{
+		android.widget.LinearLayout linearLayout = (android.widget.LinearLayout) getView( );
+
+		LayoutParams childLayoutParams = child.getLayoutParams( );
+		if( linearLayout.getOrientation( ) == android.widget.LinearLayout.VERTICAL )
+		{
+			if( childLayoutParams.getHeight( ) == -1 )
+			{
+				childLayoutParams.height = 0;
+				childLayoutParams.weight = 1.0f;
+			}
+			else
+			{
+				childLayoutParams.weight = 0.0f;
+			}
+		}
+		else
+		{
+			if( childLayoutParams.getWidth( ) == -1 )
+			{
+				childLayoutParams.width = 0;
+				childLayoutParams.weight = 1.0f;
+			}
+			else
+			{
+				childLayoutParams.weight = 0.0f;
+			}
+		}
+		
+		super.updateLayoutParamsForChild( child );
+	}
+
 	@Override
 	public boolean setProperty(String property, String value)
-			throws PropertyConversionException
+			throws PropertyConversionException, InvalidPropertyValueException
 	{
 		if( super.setProperty( property, value ) )
 		{
@@ -46,11 +84,13 @@ public class LinearLayout extends Layout
 		}
 		
 		android.widget.LinearLayout layout = (android.widget.LinearLayout) getView( );
-		if( property.equals( Types.WIDGET_PROPERTY_CHILD_HORIZONTAL_ALIGNMENT ) )
+		if( property.equals( IX_WIDGET.MAW_HORIZONTAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT ) ||
+				property.equals( IX_WIDGET.MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT ) )
 		{
 			layout.setHorizontalGravity( HorizontalAlignment.convert( value ) );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_CHILD_VERTICAL_ALIGNMENT ) )
+		else if( property.equals( IX_WIDGET.MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT) ||
+				 property.equals( IX_WIDGET.MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT ) )
 		{
 			layout.setVerticalGravity( VerticalAlignment.convert( value ) );
 		}

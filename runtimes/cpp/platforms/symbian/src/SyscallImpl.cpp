@@ -1175,7 +1175,7 @@ SYSCALL(int, maGetMilliSecondCount()) {
 	int res = I64LOW((TInt64)((dt * 1000) / df));
 #else
 	DEBUG_ASSERT(gMicroSecondsPerTick > 1000);
-	int res = (int)((((double)User::TickCount()) * gMicroSecondsPerTick) / 1000);
+	int res = I64LOW((((TInt64)User::TickCount()) * gMicroSecondsPerTick) / 1000);
 #endif
 	return res;
 }
@@ -1368,7 +1368,7 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 
 	case maIOCtl_maPlatformRequest: {
 		const char* url = SYSCALL_THIS->GetValidatedStr(a);
-		if(sstrcmp(url, "http://") == 0) {
+		if(sstrcmp(url, "http://") == 0 || sstrcmp(url, "https://") == 0) {
 			int result = LaunchBrowser(url);
 			if(IS_SYMBIAN_ERROR(result)) {
 				return CONNERR_GENERIC;
@@ -1376,7 +1376,7 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 			return 0;
 		//} else if(sstrcmp(url, "tel:") == 0) {
 		} else {
-			return IOCTL_UNAVAILABLE;
+			return CONNERR_UNAVAILABLE;
 		}
 	}
 	

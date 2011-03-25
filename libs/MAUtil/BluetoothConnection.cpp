@@ -42,7 +42,7 @@ int BluetoothConnection::connect(
 	mAddress = address;
 	mPort = 0;
 	int res = mBluetoothDiscoverer.startServiceDiscovery(address, uuid, this);
-	if(res < 0) {
+	if(res == IOCTL_UNAVAILABLE) {
 		// No service discovery. Either we're on Android,
 		// or this device doesn't have bluetooth at all.
 		// Attempt to use the Android maConnect() extension.
@@ -72,7 +72,7 @@ int BluetoothConnection::connect(const char* url) {
 		url != strstr(url, "btspp://") ||
 		':' != url[20])
 	{
-		return -1;
+		return CONNERR_URL;
 	}
 
 	// Parse Bluetooth address values from url.

@@ -24,12 +24,6 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
-import static com.mosync.internal.generated.MAAPI_consts.MA_ACCESS_READ;
-import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_FORBIDDEN;
-import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_GENERIC;
-import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_CUR;
-import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_END;
-import static com.mosync.internal.generated.MAAPI_consts.MA_SEEK_SET;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -70,8 +64,8 @@ import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL10;
 
 import android.app.Activity;
-import android.content.BroadcastReceiver;
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -82,7 +76,6 @@ import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
@@ -92,7 +85,6 @@ import android.net.Uri;
 import android.opengl.GLUtils;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.StatFs;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.telephony.TelephonyManager;
@@ -100,8 +92,6 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 
-import com.mosync.internal.android.MoSyncFile.MoSyncFileHandle;
-import com.mosync.internal.android.MoSyncFile.MoSyncFileListing;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
@@ -252,8 +242,6 @@ public class MoSyncThread extends Thread
 	private Rect mMaDrawImageRegionTempSourceRect = new Rect();
 	private Rect mMaDrawImageRegionTempDestRect = new Rect();
 
-	ByteBuffer mTempImageRawBuffer;
-	
 	int mMaxStoreId = 0;
 
 	public boolean mIsUpdatingScreen = false;
@@ -344,6 +332,10 @@ public class MoSyncThread extends Thread
 	public void setMoSyncView(MoSyncView moSyncView)
 	{
 		mMoSyncView = moSyncView;
+		
+		// Each time the MoSync view is changed its reference
+		// must be updated in native UI.
+		mMoSyncNativeUI.setMoSyncScreen( moSyncView );
 	}
 	
 	/**
@@ -357,7 +349,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * Update the size of the drawing surface.
 	 */
-	public void updateSurfaceSize(int width, int height)
+	public synchronized void updateSurfaceSize(int width, int height)
 	{
 		SYSLOG("updateSurfaceSize");		
 		
@@ -385,26 +377,26 @@ public class MoSyncThread extends Thread
 	/**
 	 * Allocate memory for the program data section.
 	 */
-	public ByteBuffer generateDataSection(int size)
+	 public boolean generateDataSection(ByteBuffer byteBuffer)
 	{
 		try
 		{
-			mMemDataSection = ByteBuffer.allocateDirect(size);
+			mMemDataSection = byteBuffer;
 			mMemDataSection.order(null);
 		}
 		catch (Exception e)
 		{
 			logError("MoSyncThread - Out of Memory!", e);
 			mMemDataSection = null;
-			return null;
+			return false;
 		}
 		catch (Error e)
 		{
 			logError("MoSyncThread - Out of Memory!", e);
 			mMemDataSection = null;
-			return null;
+			return false;
 		}
-		return mMemDataSection;
+		return true;
 	}
 	
 	/**
@@ -693,7 +685,7 @@ public class MoSyncThread extends Thread
 		}
 	}
 	
-	boolean initSyscalls()
+	void initSyscalls()
 	{
 		SYSLOG("initSyscalls");
 		mUsingFrameBuffer = false;
@@ -703,6 +695,9 @@ public class MoSyncThread extends Thread
 		mClipWidth = mWidth;
 		mClipHeight = mHeight;
 
+		// Reset cliprect
+		mCanvas.clipRect(mClipLeft, mClipTop, mClipWidth, mClipHeight, Region.Op.REPLACE);
+		
 		mPaint.setStyle(Paint.Style.FILL);
 		mPaint.setAntiAlias(false);
 		mPaint.setColor(0xffffffff);
@@ -718,8 +713,7 @@ public class MoSyncThread extends Thread
 			"abcdefghijklmnopqrstuvwxyz" +
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
 		mTextConsoleHeight = EXTENT_Y(extent);
-		 
-		 return true;
+
 	}
 
 	/**
@@ -963,7 +957,7 @@ public class MoSyncThread extends Thread
 	 * so that we won't get touch events while drawing. This to
 	 * not hog the system with events.
 	 */
-	void maUpdateScreen()
+	synchronized void maUpdateScreen()
 	{
 		//SYSLOG("maUpdateScreen");
 		Canvas lockedCanvas = null;
@@ -1050,7 +1044,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * _maDrawRGB
 	 */
-	void _maDrawRGB(
+	synchronized void _maDrawRGB(
 		int dstX, 
 		int dstY, 
 		int mem, 
@@ -1099,7 +1093,7 @@ public class MoSyncThread extends Thread
 	 * @param dstTop Top coord of destination point.
 	 * @param transformMode A TRANS_* constant.
 	 */
-	void _maDrawImageRegion(
+	synchronized void _maDrawImageRegion(
 		final int image, 
 		final int srcRectLeft, 
 		final int srcRectTop, 
@@ -1353,7 +1347,7 @@ public class MoSyncThread extends Thread
 	 * Set the target image for drawing.
 	 * @param image The target image, 0 means the screen.
 	 */
-	int maSetDrawTarget(int image)
+	synchronized int maSetDrawTarget(int image)
 	{
 		SYSLOG("maSetDrawTarget");
 		if (0 == image)
@@ -1526,40 +1520,29 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * This function generates a ByteBuffer which then is sent to 
-	 * the JNI library for processing.
-	 */
-	ByteBuffer _maCreateImageRawGetData(int size)
-	{
-		mTempImageRawBuffer = ByteBuffer.allocateDirect(size);
-		mTempImageRawBuffer.order(null);
-		
-		return mTempImageRawBuffer;
-	}
-
-	/**
-	 * Takes the preprocessed raw image data and copies the 
+	 * Takes the pre-processed raw image data and copies the 
 	 * contents to a bitmap.
 	 */
-	int _maCreateImageRaw(int placeholder, int width, int height)
+	int _maCreateImageRaw(int placeholder, int width, int height, ByteBuffer buffer)
 	{
 		SYSLOG("maCreateImageRaw");
 		
 		Bitmap bitmap = Bitmap.createBitmap(
 			width, height, Bitmap.Config.ARGB_8888);
+		
 		if(null == bitmap)
 		{
 			maPanic(1, "Unable to create ");
 		}
 		
-		mTempImageRawBuffer.position(0);
-		bitmap.copyPixelsFromBuffer(mTempImageRawBuffer);
+		buffer.position(0);
+		bitmap.copyPixelsFromBuffer(buffer);
 		
 		mImageResources.put(placeholder, new ImageCache(null, bitmap));
-			
+		
 		return RES_OK;
 	}
-
+	
 	/**
 	 * maCreateDrawableImage
 	 */
@@ -2025,7 +2008,7 @@ public class MoSyncThread extends Thread
 	 */
 	int maPlatformRequest(String url)
 	{
-		if (url.startsWith("http://"))
+		if (url.startsWith("http://") || url.startsWith("https://"))
 		{
 			Log.i("maPlatformRequest","Starting browser:" + url);
 			Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -2476,7 +2459,7 @@ public class MoSyncThread extends Thread
 	}
 	
 	int maHttpGetResponseHeader(
-		int connHandle, String key, long address, int bufSize)
+		int connHandle, String key, int address, int bufSize)
 	{
 		return mMoSyncNetwork.maHttpGetResponseHeader(
 			connHandle, key, address, bufSize);
@@ -2662,11 +2645,10 @@ public class MoSyncThread extends Thread
 	 * Internal wrapper for maWidgetRemoveChild that runs
 	 * the call in the UI thread.
 	 */
-	public int maWidgetRemoveChild(
-		final int parentHandle, 
+	public int maWidgetRemoveChild( 
 		final int childHandle)
 	{
-		return mMoSyncNativeUI.maWidgetRemoveChild(parentHandle, childHandle);
+		return mMoSyncNativeUI.maWidgetRemoveChild(childHandle);
 	}
 	
 	/**

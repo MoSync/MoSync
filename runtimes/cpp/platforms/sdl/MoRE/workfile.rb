@@ -21,6 +21,9 @@ work.instance_eval do
 	if(!@GCC_IS_V4 && CONFIG=="debug")
 		@SPECIFIC_CFLAGS = { "Core.cpp" => " -Wno-unreachable-code", "sld.cpp" => " -Wno-unreachable-code" }
 	end
+	if(HOST == :win32)
+		@EXTRA_LINKFLAGS = ' -mwindows'
+	end
 	
 	@LOCAL_LIBS = ["mosync_sdl", "demangle"] + @LOCAL_LIBS
 	

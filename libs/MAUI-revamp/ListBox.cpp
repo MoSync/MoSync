@@ -925,12 +925,13 @@ namespace MAUI {
 
 		setFocused(true);
 
-		Vector_each(Widget *, it, mChildren) {
-			Widget *ret = (*it)->focusableWidgetAt(p.x, p.y);
+		for(int i=0; i<mChildren.size(); i++) {
+			Widget *ret = mChildren[i]->focusableWidgetAt(p.x, p.y);
 			if(ret) {
 				//MAUI_LOG("Found focusable!");
 				if(ret->pointerPressed(p, id)) {
 					if(mFocused) {
+						mSelectedIndex = i;
 						setFocusedWidget(ret);
 					}
 					else { 
@@ -999,10 +1000,10 @@ namespace MAUI {
 		if(mFocusedWidget) {
 			int xx = (mOrientation==LBO_HORIZONTAL)?(p.x-(mYOffset>>16)):p.x;
 			int yy = (mOrientation==LBO_VERTICAL)?(p.y-(mYOffset>>16)):p.y;
-			MAPoint2d pp =  {xx, yy};
-			mFocusedWidget->pointerReleased(pp, id);
-			setFocusedWidget(NULL);
-			return false;
+			MAPoint2d pp = {xx, yy};
+			Widget* w = mFocusedWidget;
+			bool keepFocus = w->pointerReleased(pp, id);
+			return keepFocus;
 		}
 
 		if(id==0) {

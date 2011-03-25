@@ -76,7 +76,7 @@ namespace Base {
 		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
 		DUMPHEX(maxCustomEventSize);
 		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
-
+		
 		return maxCustomEventSize;
 	}
 
@@ -517,8 +517,7 @@ namespace Base {
 		std::string newFile =  newPath + "/" + std::string(name);
 		path = newFile.c_str();
 		len = newFile.length();
-		int ret = _mkdir(newPath.c_str());
-		// TODO: handle return value
+		_mkdir(newPath.c_str());
 #else
 		std::string newPath = STORE_PATH + std::string(name);
 		path = newPath.c_str();

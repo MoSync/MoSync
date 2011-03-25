@@ -791,8 +791,8 @@ public class MoSyncFile {
 		if(file.isDirectory())
 			len++;
 		
-		if(bufSize == 0) return len;
-		if(len > bufSize) return len;
+		if(bufSize == 0) return len-1;
+		if(len > bufSize) return len-1;
 
 		byte[] nameChars = name.getBytes();
 		

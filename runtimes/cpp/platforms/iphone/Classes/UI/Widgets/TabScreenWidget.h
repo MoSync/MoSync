@@ -23,7 +23,7 @@
 
 - (id)init;
 - (void)addChild: (IWidget*)child;
-- (void)removeChild: (IWidget*)child;
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
 - (UIViewController*) getController;

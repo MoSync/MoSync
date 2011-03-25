@@ -27,6 +27,11 @@ public class LayoutParamsSetter
 			setGravity( mosyncLayoutParams, nativeLayoutParams );
 		}
 		
+		if( hasField( nativeLayoutParams, "weight" ) )
+		{
+			setWeight( mosyncLayoutParams, nativeLayoutParams );
+		}
+		
 		if( nativeLayoutParams instanceof ViewGroup.MarginLayoutParams )
 		{
 			setMargins( mosyncLayoutParams, (ViewGroup.MarginLayoutParams) nativeLayoutParams );
@@ -85,6 +90,27 @@ public class LayoutParamsSetter
 		nativeLayoutParams.topMargin = mosyncLayoutParams.getMarginTop( );
 		nativeLayoutParams.rightMargin = mosyncLayoutParams.getMarginRight( );
 		nativeLayoutParams.bottomMargin = mosyncLayoutParams.getMarginBottom( );
+	}
+	
+	/**
+	 * Sets the weight field on the given layout params from the value specified in the mosyncLayoutParams.
+	 * 
+	 * @param mosyncLayoutParams The layout params whose weight field will be converted to 
+	 *                           a weight setting.
+	 * @param nativeLayoutParams The layout params whose weight field will be updated.
+	 */
+	public static void setWeight(LayoutParams mosyncLayoutParams, ViewGroup.LayoutParams nativeLayoutParams)
+	{
+		try
+		{
+			Field weightField = nativeLayoutParams.getClass( ).getField( "weight" );
+			weightField.setFloat( nativeLayoutParams, mosyncLayoutParams.weight );
+	
+		}
+		catch(Exception e)
+		{
+			throw new IllegalArgumentException( "The nativeLayoutParams that you have passed does not have the 'weight' field." );
+		}
 	}
 	
 	/**

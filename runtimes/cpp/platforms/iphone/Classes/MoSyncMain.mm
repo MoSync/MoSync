@@ -17,7 +17,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 #include "MoSyncMain.h"
-#include "MosyncView.h"
 
 #include "config_platform.h"
 #include <core/Core.h>
@@ -104,7 +103,7 @@ using namespace Base;
 static MAHandle gReloadHandle = 0;
 bool gRunning = false;
 
-static UIView *sMoSyncView;
+static MoSyncView *sMoSyncView;
 static int sWidth, sHeight;
 
 
@@ -112,10 +111,11 @@ static int sWidth, sHeight;
 int MoSync_ThreadMain(void *args) {
 	NSAutoreleasePool	 *autoreleasepool = [[NSAutoreleasePool alloc] init];
 	
-	const char *program = getReadablePath("program");
 	const char *resources = getReadablePath("resources");
 
+#ifdef LOGGING_ENABLED
 	InitLog(getWriteablePath("log.txt"));
+#endif
 	
 	Base::Syscall *syscall = 0;
 	syscall = new Base::Syscall(sWidth, sHeight);
@@ -128,6 +128,8 @@ int MoSync_ThreadMain(void *args) {
 	}
 	cpp_main();
 #else
+	const char *program = getReadablePath("program");
+
 	gCore = Core::CreateCore(*syscall);
 	MYASSERT(Core::LoadVMApp(gCore, program, resources), ERR_PROGRAM_LOAD_FAILED);
 	gRunning = true;
@@ -137,6 +139,8 @@ int MoSync_ThreadMain(void *args) {
 		
 		if(gReloadHandle > 0) {
 			Base::Stream* stream = Base::gSyscall->resources.extract_RT_BINARY(gReloadHandle);
+			if(!stream->seek(Seek::Start, 0))
+				BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);
 			bool res = Core::LoadVMApp(gCore, *stream);
 			delete stream;
 			gReloadHandle = 0;
@@ -154,7 +158,7 @@ int MoSync_ThreadMain(void *args) {
 
 MoSyncThread mosyncThread;
 
-void MoSync_Main(int width, int height, UIView* mosyncView) {
+void MoSync_Main(int width, int height, MoSyncView* mosyncView) {
 	sWidth = width;
 	sHeight = height;
 	sMoSyncView = mosyncView;
@@ -192,6 +196,16 @@ void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText,
 	 maxSize:maxSize
 	 andConstraints:constraints
 	 ];  	
+}
+
+void MoSync_ReloadProgram(MAHandle data, int reload) {
+#ifdef SUPPORT_PROGRAM_RELOAD
+	Base::gSyscall->VM_Yield();
+	gReloadHandle = data;
+	//gReload |= (reload != 0);
+#else
+	BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
+#endif
 }
 
 void MoSync_Exit() {
@@ -242,7 +256,7 @@ void* MoSync_GetCustomEventData() {
 #ifdef _USE_REBUILDER_
 	return sCustomEventData;
 #else
-	return (void*) &gCore->mem_ds[gCore->DATA_SEGMENT_SIZE-Base::getMaxCustomEventSize()];
+	return GetCustomEventPointer(gCore);
 #endif
 }
 
@@ -250,7 +264,7 @@ void* MoSync_GetCustomEventDataMoSyncPointer() {
 #ifdef _USE_REBUILDER_
 	return (void*) sCustomEventDataPointer;
 #else
-	return (void*) (gCore->DATA_SEGMENT_SIZE-Base::getMaxCustomEventSize());
+	return (void*) (gCore->Head.DataSize-Base::getMaxCustomEventSize());
 	
 #endif
 }

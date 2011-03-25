@@ -65,8 +65,7 @@ namespace MAUI {
 		mMain->setPosition(0,0);
 		mMain->setWidth(mScreenWidth);
 		mMain->setHeight(mScreenHeight);
-		Environment& env = Environment::getEnvironment();
-		if(!env.isKeyListener(this)) {
+		if(sCurrentScreen != this) {
 			mMain->setEnabled(false);
 		}
 
@@ -222,17 +221,19 @@ namespace MAUI {
 	}
 	
 	void Screen::pointerReleaseEvent(MAPoint2d point) {
+		bool keepFocus = false;
 		if(mFocusedWidget) {
 			InputPolicy* ip = mFocusedWidget->getInputPolicy();
 			if(ip) {
-				ip->pointerReleased(point, 0);
+				keepFocus = ip->pointerReleased(point, 0);
 			} 
 			else {
 				mFocusedWidget->pointerPressed(point, 0);
 			}
 		}
 
-		setFocusedWidget(NULL);
+		if(!keepFocus)
+			setFocusedWidget(NULL);
 	}
 	
 	void Screen::pointerMoveEvent(MAPoint2d point) {

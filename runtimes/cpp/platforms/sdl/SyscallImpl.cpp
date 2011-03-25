@@ -2003,6 +2003,63 @@ namespace Base {
 		return MA_GL_TEX_IMAGE_2D_OK;
 	}
 	
+	int maOpenGLTexSubImage2D(MAHandle image) {
+		SDL_Surface* surface = gSyscall->resources.get_RT_IMAGE(image);	
+
+        GLint nOfColors = surface->format->BytesPerPixel;
+		GLenum texture_format = 0;
+        GLint flipColors = 0;
+
+		if (nOfColors == 4)     // contains an alpha channel
+        {
+                if (surface->format->Bmask == 0xff000000)
+                        texture_format = GL_RGBA;
+				else {
+					texture_format = GL_RGBA;
+					flipColors = 1; //texture_format = GL_BGR;
+				}
+		} 
+		else if (nOfColors == 3)     // no alpha channel
+        {
+                if (surface->format->Bmask == 0xff0000)
+                        texture_format = GL_RGB;
+				else {
+					texture_format = GL_RGB;
+					flipColors = 1; //texture_format = GL_BGR;
+				}
+        }
+
+		byte* data = (byte*)surface->pixels;
+		if(flipColors) {
+			int numBytes = surface->w * surface->h * surface->format->BytesPerPixel;
+			byte* copy = new byte[numBytes];
+
+			for(int i = 0; i < numBytes; i += nOfColors) {
+				int rIndex = surface->format->Rshift/8;
+				int gIndex = surface->format->Gshift/8;
+				int bIndex = surface->format->Bshift/8;
+				int aIndex = surface->format->Ashift/8;
+				copy[i+0] = data[i+rIndex]; 
+				copy[i+1] = data[i+gIndex]; 
+				copy[i+2] = data[i+bIndex]; 
+				if(nOfColors == 4)
+					copy[i+3] = data[i+aIndex]; 
+			}
+
+			data = copy;
+		}
+
+		// Edit the texture object's image data using the information SDL_Surface gives us
+		glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, surface->w, surface->h, texture_format
+						, GL_UNSIGNED_BYTE, data);
+
+		if(flipColors) {
+			delete data;
+		}
+		
+		return MA_GL_TEX_IMAGE_2D_OK;
+	}
+
 #endif // SUPPORT_OPENGL_ES	
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c, ...)) {
@@ -2069,7 +2126,7 @@ namespace Base {
 			{
 #ifdef WIN32
 				const char* url = SYSCALL_THIS->GetValidatedStr(a);
-				if(sstrcmp(url, "http://") == 0) {
+				if(sstrcmp(url, "http://") == 0 || sstrcmp(url, "https://") == 0) {
 					int result = (int)ShellExecute(NULL, NULL, url, NULL, NULL, SW_SHOW);
 					if(result <= 32) {
 						LOG("ShellExecute(%s) error %i\n", url, result);
@@ -2079,7 +2136,7 @@ namespace Base {
 				} else
 #endif
 				{
-					return IOCTL_UNAVAILABLE;
+					return CONNERR_UNAVAILABLE;
 				}
 			}
 

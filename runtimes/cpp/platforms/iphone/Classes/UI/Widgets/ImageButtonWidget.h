@@ -16,16 +16,11 @@
  */
 
 #import <Foundation/Foundation.h>
-#import "IWidget.h"
+#import "ButtonWidget.h"
 
-@interface HorizontalLayoutWidget : IWidget {
-	
+@interface ImageButtonWidget : ButtonWidget {
 }
 
 - (id)init;
-- (void)addChild: (IWidget*)child;
-- (void)removeChild: (IWidget*)child;
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
-- (NSString*)getPropertyWithKey: (NSString*)key;
 
 @end

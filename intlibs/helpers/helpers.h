@@ -48,7 +48,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #if defined(_MSC_VER) || defined(__SYMBIAN32__)
 void __declspec(noreturn) MoSyncExit(int code);
 #elif defined(__GNUC__)
+#if !defined(_android)
 void __attribute((noreturn)) MoSyncExit(int code);
+#else
+void MoSyncExit(int code);
+#endif
 #else
 #error Unsupported platform!
 #endif
@@ -57,7 +61,11 @@ void __attribute((noreturn)) MoSyncExit(int code);
 #if defined(_MSC_VER) || defined(__SYMBIAN32__)
 void __declspec(noreturn) MoSyncErrorExit(int errorCode);
 #elif defined(__GNUC__)
+#if !defined(_android)
 void __attribute((noreturn)) MoSyncErrorExit(int errorCode);
+#else
+void MoSyncErrorExit(int errorCode);
+#endif
 #endif
 
 #if !defined(__SYMBIAN32__) && !defined(_android)

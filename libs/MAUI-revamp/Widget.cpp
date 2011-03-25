@@ -109,7 +109,8 @@ namespace MAUI {
 	}
 
 	void Widget::draw(bool forceDraw) {
-		if(!mEnabled && !forceDraw) return;
+		if(!mEnabled && !forceDraw)
+			return;
 	
 		//Engine &engine = Engine::getSingleton();
 

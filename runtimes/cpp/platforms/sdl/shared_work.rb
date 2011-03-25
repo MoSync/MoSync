@@ -12,12 +12,12 @@ def setup_common
 			["libexpat.lib", "SDL_sound.lib", "libirprops.a", "libuuid.a", "FreeImage.lib",
 				"libeay32.lib", "ssleay32.lib"]
 		@LIBRARIES = ["wsock32", "ws2_32"]
-		@LOCAL_DLLS = ["amr"]
+		@LOCAL_DLLS = ["gsm_amr"]
 		@EXTRA_INCLUDES = ["../../../base", ".."]
 	elsif(HOST == :linux) then
 		@EXTRA_CPPFLAGS = ""
 		@IGNORED_FILES = []
-		@LOCAL_LIBS << "amr"
+		@LOCAL_LIBS << "gsm_amr"
 		if(SDL_SOUND)
 			sound_lib = [ "SDL_sound" ]
 		else
@@ -34,7 +34,7 @@ def setup_common
 		@EXTRA_INCLUDES = ["../../../base", ".."]
 	
 	elsif(HOST == :darwin)
-		@LOCAL_LIBS << "amr"
+		@LOCAL_LIBS << "gsm_amr"
 		@LIBRARIES = common_libraries + ["SDL_sound", "SDLmain", "expat", "freeimage", "ssl", "crypto"]
 		@EXTRA_INCLUDES = common_includes + ["/sw/include", "/opt/local/include"]
 	else

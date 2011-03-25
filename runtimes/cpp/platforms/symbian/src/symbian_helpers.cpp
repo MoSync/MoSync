@@ -128,7 +128,7 @@ void LogBin(const void* data, int size) {
 }
 
 void LogV(const char* fmt, VA_LIST args) {
-	TBuf8<512> buffer;
+	TBuf8<2048> buffer;
 	TPtrC8 fmtP(CBP fmt);
 	buffer.FormatList(fmtP, args);
 	AppendToFile(KLogFilePath, buffer);

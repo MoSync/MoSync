@@ -3,13 +3,11 @@ package com.mosync.nativeui.ui.factories;
 import java.util.HashMap;
 
 import android.app.Activity;
-import android.webkit.WebView;
 import android.widget.ImageView;
 
-import com.mosync.nativeui.core.Types;
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.FrameLayout;
 import com.mosync.nativeui.ui.widgets.ImageWidget;
-import com.mosync.nativeui.ui.widgets.WebWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 
 /**
@@ -60,6 +58,19 @@ public class ViewFactory
 	}
 	
 	/**
+	 * Returns true if there is a factory for the given type.
+	 * 
+	 * @param type The type to check for a factory.
+	 * 
+	 * @return true if there is a factory associated with the type,
+	 *         false otherwise.
+	 */
+	public static boolean typeExists(String type)
+	{
+		return m_factoryMap.containsKey( type );
+	}
+	
+	/**
 	 * Initializes the factory with the listed type -> factory mappings.
 	 */
 	public static void init()
@@ -69,21 +80,22 @@ public class ViewFactory
 			return;
 		}
 		
-		addFactory( Types.WIDGET_TYPE_BUTTON, new ButtonFactory( ) );
-		addFactory( Types.WIDGET_TYPE_LABEL, new LabelFactory( ) );
-		addFactory( Types.WIDGET_TYPE_LAYOUT_VERTICAL , new VerticalLayoutFactory( ) );
-		addFactory( Types.WIDGET_TYPE_LAYOUT_HORIZONTAL , new HorizontalLayoutFactory( ) );
-		addFactory( Types.WIDGET_TYPE_LIST, new ListFactory( ) );
-		addFactory( Types.WIDGET_TYPE_LIST_ITEM, new ListItemFactory( ) );
-		addFactory( Types.WIDGET_TYPE_SEARCHBAR , new SearchBarFactory( ) );
-		addFactory( Types.WIDGET_TYPE_SCREEN, new ScreenFactory( ) );
-		addFactory( Types.WIDGET_TYPE_WEB, new DefaultFactory( WebView.class, WebWidget.class ) );
-		addFactory( Types.WIDGET_TYPE_TAB_SCREEN, new TabScreenFactory( ) );
-		addFactory( Types.WIDGET_TYPE_EGL, new EGLViewFactory( ) );
-		addFactory( Types.WIDGET_TYPE_IMAGE, new DefaultFactory( ImageView.class, ImageWidget.class ) );
-		addFactory( Types.WIDGET_TYPE_LAYOUT_RELATIVE, new DefaultFactory( android.widget.FrameLayout.class, FrameLayout.class ) );
-		addFactory( Types.WIDGET_TYPE_CHECKBOX, new CheckBoxFactory( ) );
-		addFactory( Types.WIDGET_TYPE_EDIT_BOX, new EditBoxFactory( ) );
+		addFactory( IX_WIDGET.MAW_BUTTON, new ButtonFactory( ) );
+		addFactory( IX_WIDGET.MAW_IMAGE_BUTTON, new ImageButtonFactory( ) );
+		addFactory( IX_WIDGET.MAW_LABEL, new LabelFactory( ) );
+		addFactory( IX_WIDGET.MAW_VERTICAL_LAYOUT, new VerticalLayoutFactory( ) );
+		addFactory( IX_WIDGET.MAW_HORIZONTAL_LAYOUT, new HorizontalLayoutFactory( ) );
+		addFactory( IX_WIDGET.MAW_LIST_VIEW, new ListFactory( ) );
+		addFactory( IX_WIDGET.MAW_LIST_VIEW_ITEM, new ListItemFactory( ) );
+		addFactory( IX_WIDGET.MAW_SEARCH_BAR , new SearchBarFactory( ) );
+		addFactory( IX_WIDGET.MAW_SCREEN, new ScreenFactory( ) );
+		addFactory( IX_WIDGET.MAW_WEB_VIEW, new WebViewFactory( ) );
+		addFactory( IX_WIDGET.MAW_TAB_SCREEN, new TabScreenFactory( ) );
+		addFactory( IX_WIDGET.MAW_GL_VIEW, new EGLViewFactory( ) );
+		addFactory( IX_WIDGET.MAW_IMAGE, new DefaultFactory( ImageView.class, ImageWidget.class ) );
+		addFactory( IX_WIDGET.MAW_RELATIVE_LAYOUT, new DefaultFactory( android.widget.FrameLayout.class, FrameLayout.class ) );
+		addFactory( IX_WIDGET.MAW_CHECK_BOX, new CheckBoxFactory( ) );
+		addFactory( IX_WIDGET.MAW_EDIT_BOX, new EditBoxFactory( ) );
 	}
 	
 	/**

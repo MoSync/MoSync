@@ -152,13 +152,16 @@ void Downloader::fireFinishedDownloading(MAHandle handle)
 
 void Downloader::fireError(int code)
 {
-	closeConnection(CLEANUP);
+	mIsDownloading = false;
 
 	// Broadcast error to listeners.
 	for (int i = 0; i < mDownloadListeners.size(); ++i)
 	{
 		mDownloadListeners[i]->error(this, code);
 	}
+	
+	if(!mIsDownloading)
+		closeConnection(CLEANUP);
 }
 
 void Downloader::closeConnection(int cleanup)

@@ -107,7 +107,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 - (void)updateMoSyncView:(CGImageRef)ref {
 	mosyncView = ref;
-	[self performSelectorOnMainThread : @ selector(setNeedsDisplay) withObject:nil waitUntilDone:YES];
+	[self performSelectorOnMainThread : @ selector(setNeedsDisplay) withObject:nil waitUntilDone:NO];
 }
 
 -(void) startUpdatingLocation {
@@ -175,16 +175,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 - (void)drawRect:(CGRect)rect {
 	if(mosyncView == nil) return;
-
+	
     CGContextRef context = UIGraphicsGetCurrentContext();
 	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
 	CGContextSetAllowsAntialiasing(context, false);
-
 	CGContextTranslateCTM(context, 0, CGImageGetHeight(mosyncView));
 	CGContextScaleCTM(context, 1.0, -1.0);
-	
-	CGContextDrawImage(context, rect, mosyncView);	
-		
+	CGContextDrawImage(context, rect, mosyncView);		
 	
 	MoSync_DoneUpdatingView();	 
 }
@@ -196,8 +193,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {
-	UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
-	//Base::gEventQueue.addScreenChangedEvent();
+	//UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
 	MoSync_AddScreenChangedEvent();
 }
 
@@ -243,6 +239,11 @@ void removeTouch(UITouch* touch) {
 }
  */
 
+- (void)viewAppeared {
+	// some touches might not have been registered so let's clear the touch helper.
+    [touchHelper clearTouches];
+}
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 	for (UITouch *touch in touches) 
 	{
@@ -274,8 +275,7 @@ void removeTouch(UITouch* touch) {
 			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
 			[touchHelper removeTouch: touch];
 		}
-	}	
-	
+	}
 }
 
 -(void) messageBox:(id) obj {
@@ -286,6 +286,8 @@ void removeTouch(UITouch* touch) {
                           delegate:mbh
                           cancelButtonTitle:@"OK"
                           otherButtonTitles:nil];
+	
+	[touchHelper clearTouches];
 	
     [alert show];
     [alert release];
@@ -330,6 +332,8 @@ void removeTouch(UITouch* touch) {
 	[textBoxAlert addSubview:textField];
 	
 	textBoxData.textField = textField;
+	
+    [touchHelper clearTouches];
 	
 	//[textBoxAlert setTransform:CGAffineTransformMakeTranslation(0,109)];
 	[textBoxAlert show];
