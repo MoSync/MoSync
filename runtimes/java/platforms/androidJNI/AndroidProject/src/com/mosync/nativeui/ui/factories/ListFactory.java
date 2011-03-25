@@ -1,14 +1,15 @@
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
+import android.content.Context;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
+import com.mosync.internal.android.EventQueue;
 import com.mosync.nativeui.ui.widgets.ListLayout;
 import com.mosync.nativeui.ui.widgets.Widget;
-import com.mosync.internal.android.EventQueue;
 
 /**
  * Creates a list capable of displaying a set of widgets.
@@ -23,7 +24,7 @@ public class ListFactory implements AbstractViewFactory
 	@Override
 	public Widget create(Activity activity, int handle)
 	{
-		ListView listView = new ListView( activity );
+		ListView listView = new CustomListView( activity );
 		
 		listView.setOnItemClickListener( new ListOnItemClickListener( handle ) );
 		return new ListLayout( handle, listView );
@@ -53,5 +54,40 @@ public class ListFactory implements AbstractViewFactory
 			// Assume that the view's id is always the same as the handle.
 			EventQueue.getDefault( ).postWidgetItemClickedEvent( m_handle, position );
 		}	
+	}
+	
+	/**
+	 * Nullify the addView and removeView methods in ListView
+	 * so that it can be used in a convenient way as a Layout
+	 * subclass.
+	 * 
+	 * @author fmattias
+	 */
+	public class CustomListView extends ListView
+	{
+		public CustomListView(Context context)
+		{
+			super( context );
+		}
+
+		@Override
+		public void addView(View child, int index)
+		{
+		}
+
+		@Override
+		public void addView(View child)
+		{
+		}
+
+		@Override
+		public void removeView(View child)
+		{
+		}
+
+		@Override
+		public void removeViewAt(int index)
+		{
+		}
 	}
 }

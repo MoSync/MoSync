@@ -1559,6 +1559,14 @@ namespace Base
 		case maIOCtl_maWidgetScreenShow:
 			SYSLOG("maIOCtl_maWidgetScreenShow");
 			return _maWidgetScreenShow(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maWidgetStackScreenPush:
+			SYSLOG("maIOCtl_maWidgetStackScreenPush");
+			return _maWidgetStackScreenPush(a, b, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetStackScreenPop:
+			SYSLOG("maIOCtl_maWidgetStackScreenPop");
+			return _maWidgetStackScreenPop(a, mJNIEnv, mJThis);
 				
 		case maIOCtl_maNotificationAdd:
 			SYSLOG("maIOCtl_maNotificationAdd");
