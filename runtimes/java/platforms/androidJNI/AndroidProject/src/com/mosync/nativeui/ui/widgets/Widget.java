@@ -261,6 +261,17 @@ public class Widget
 	}
 	
 	/**
+	 * Handle a key press to the back button.
+	 * 
+	 * @return Returns true if the back button was handled,
+	 *         false otherwise.
+	 */
+	public boolean handleBack()
+	{
+		return false;
+	}
+	
+	/**
 	 * Returns the layout parameters.
 	 * 
 	 * @return The layout parameters, these are never null.

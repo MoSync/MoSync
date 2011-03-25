@@ -2682,6 +2682,35 @@ public class MoSyncThread extends Thread
 	}
 	
 	/**
+	 * Internal wrapper for maWidgetStackScreenPush that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetStackScreenPush(
+		final int stackScreenHandle, 
+		final int newScreenHandle)
+	{
+		return mMoSyncNativeUI.maWidgetStackScreenPush(stackScreenHandle, newScreenHandle);
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetStackScreenPop that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetStackScreenPop( 
+		final int stackScreenWidget)
+	{
+		return mMoSyncNativeUI.maWidgetStackScreenPop(stackScreenWidget);
+	}
+	
+	/**
+	 * Called when the back button has been pressed.
+	 */
+	public void handleBack()
+	{
+		mMoSyncNativeUI.handleBack();
+	}
+	
+	/**
 	 * Loads an OpenGL texture to the current texture handle. If the 
 	 * underlying bitmap has an alpha channel, the texture will also
 	 * get an alpha channel.
