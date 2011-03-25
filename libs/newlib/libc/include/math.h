@@ -198,7 +198,7 @@ extern int __signbitd (double x);
  *       taking double arguments still exist for compatibility purposes
  *       (prototypes for them are in <ieeefp.h>).  */
 #ifndef isinf
-  #define isinf(y) (fpclassify(y) == FP_INFINITE)
+	#define isinf(x) (sizeof (x) == sizeof (float) ? __isinff (x) : __isinfd (x))
 #endif
 
 #ifndef isnan
