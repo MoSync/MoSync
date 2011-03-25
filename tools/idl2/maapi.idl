@@ -3051,13 +3051,13 @@ group WidgetAPI "Widget API" {
 					/**
 					* @brief The handle to the screen that was popped from the stack screen.
 					*/
-					int fromScreen;
+					MAWidgetHandle fromScreen;
 					
 					/**
 					* @brief The handle to the screen that will be shown. If there is no screen
 					* to pop to, this will be the same as widgetHandle.
 					*/
-					int toScreen;
+					MAWidgetHandle toScreen;
 			} stackScreenPopInfo;
 	
 		}

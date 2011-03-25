@@ -18,7 +18,7 @@
 #import <Foundation/Foundation.h>
 #import "ScreenWidget.h"
 
-@interface StackScreenWidget : ScreenWidget {
+@interface StackScreenWidget : ScreenWidget <UINavigationControllerDelegate> {
 }
 
 - (id)init;

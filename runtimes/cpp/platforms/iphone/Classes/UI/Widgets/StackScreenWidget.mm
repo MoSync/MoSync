@@ -23,12 +23,27 @@
 
 @implementation StackScreenWidget
 
+- (void)navigationController:(UINavigationController *)navigationController 
+	  willShowViewController:(UIViewController *)viewController animated:(BOOL)animated {
+	
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = MAW_EVENT_STACK_SCREEN_POPPED;
+	eventData->widgetHandle = handle;
+	eventData->fromScreen = (MAWidgetHandle)navigationController.visibleViewController.view.tag;
+	eventData->toScreen = (MAWidgetHandle)viewController.view.tag;
+	event.data = eventData;
+	Base::gEventQueue.put(event);
+}
+
 - (id)init {
     //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	UINavigationController* navigationController = [[UINavigationController alloc] init];
 	//controller = navigationController;
 	navigationController.viewControllers = [NSArray array];	
 	//view = controller.view;
+	navigationController.delegate = self;
 	
 	return [super initWithController:navigationController];
 }
@@ -87,7 +102,12 @@
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"title"]) {
 		controller.title = value;
-	} else {
+	} 
+	else if([key isEqualToString:@"backButtonEnabled"]) {
+		UINavigationController* navigationController = (UINavigationController*)controller;
+		navigationController.navigationBar.backItem.hidesBackButton = [value boolValue];
+	}
+	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;	
