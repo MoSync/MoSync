@@ -15,7 +15,7 @@ end
 BUILD_DIR = 'build'
 MOSYNCDIR = ENV['MOSYNCDIR']
 GCC_FLAGS = " -I- -std=gnu99 -I. -Isys -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h"
-PIPE_FLAGS = " -datasize=#{2*1024*1024} -stacksize=#{512*1024} -heapsize=#{1024*1024}"
+PIPE_FLAGS = " -datasize=#{12*1024*1024} -stacksize=#{512*1024} -heapsize=#{1024*1024*10}"
 PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_debug/newlib.lib"
 
 # SETTINGS[:source_path] - directory in which source files are stored.
@@ -188,7 +188,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild)
 	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
 		return force_rebuild
 	end
-	cmd = "#{MOSYNCDIR}/bin/more -timeout 20 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
+	cmd = "#{MOSYNCDIR}/bin/more -timeout 60 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
 	$stderr.puts cmd
 	res = system(cmd)
 	puts res
