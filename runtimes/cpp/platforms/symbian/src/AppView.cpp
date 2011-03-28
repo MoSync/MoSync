@@ -720,9 +720,9 @@ int CAppView::GetEvent(MAEvent* ep) {
 
 	//TODO: clean up using static const table instead of macro.
 #define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ep->type == eventType) { \
-	memcpy(Core::GetCustomEventPointer(iCore), ep->data, sizeof(dataType)); \
+	memcpy(Core::GetCustomEventPointer(iCore), (void*)ep->data, sizeof(dataType)); \
 	delete (dataType*)ep->data; \
-	ep->data = (void*)(int(Core::GetCustomEventPointer(iCore)) - int(iCore->mem_ds)); }
+	ep->data = (int(Core::GetCustomEventPointer(iCore)) - int(iCore->mem_ds)); }
 
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
 		return 1;

@@ -589,7 +589,7 @@ int Bluetooth::maBtStartDeviceDiscovery(MABtCallback cb, bool names) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 
-int Bluetooth::maBtGetNewDevice(MABtDevice* dst) {
+int Bluetooth::maBtGetNewDevice(MABtDeviceNative* dst) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 
@@ -599,7 +599,7 @@ int Bluetooth::maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* 
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 
-int Bluetooth::maBtGetNewService(MABtService* dst) {
+int Bluetooth::maBtGetNewService(MABtServiceNative* dst) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 

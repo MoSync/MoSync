@@ -18,6 +18,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef _IMAGE_H_
 #define _IMAGE_H_
 
+#include "helpers/types.h"
+typedef u32 uint32_t;
+typedef s32 int32_t;
+
 struct ClipRect {
 	int x, y, width, height;
 };

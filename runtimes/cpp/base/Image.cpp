@@ -27,6 +27,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "base_errors.h"
 using namespace MoSyncError;
 
+typedef s64 int64_t;
+
 #define SWAP(x, y, temp) {temp=x;x=y;y=temp;}
 
 inline int32_t fp_ceil(int32_t x) {

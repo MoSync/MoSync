@@ -317,7 +317,7 @@ static void streamJavaConstants(
 }
 
 static void streamMembers(ostream& stream, string tab, const vector<Member>& members,
-	const Interface& inf, bool runtime)
+	const Interface& inf, bool runtime, bool native)
 {
 	bool lastPodHadComment = false;
 	for(size_t k=0; k<members.size(); k++) {
@@ -358,7 +358,7 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 							stream << "#else\n";
 						}
 						stream << tab << "struct {\n";
-						streamMembers(stream, tab + "\t", as.members, inf, runtime);
+						streamMembers(stream, tab + "\t", as.members, inf, runtime, native);
 						stream << tab << "};\n";
 						if(runtime) {
 							stream << "#endif\n";
@@ -371,7 +371,7 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 					throwException("Anonymous struct not found");
 			} else {
 				stream << tab;
-				if(runtime && isDirectPointerType(inf, pod.type)) {
+				if(!native && isDirectPointerType(inf, pod.type)) {
 					stream << "MAAddress";
 				} else {
 					stream << pod.type;
@@ -385,9 +385,11 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 	}	//member
 }
 
-static void streamStruct(ostream& stream, const Struct& s, const string& name, const Interface& inf, int ix, bool runtime) {
+static void streamStruct(ostream& stream, const Struct& s, const string& name,
+	const Interface& inf, int ix, bool runtime, bool native)
+{
 	stream << "typedef " << s.type << " " << name << " {\n";
-	streamMembers(stream, "\t", s.members, inf, runtime);
+	streamMembers(stream, "\t", s.members, inf, runtime, native);
 	stream << "} " << name << ";\n";
 }
 
@@ -405,9 +407,9 @@ static void streamStructs(ostream& stream, const Interface& inf, int ix, bool ru
 			stream << s.comment;
 		if(s.groupId != "")
 			stream << "/** @ingroup " << s.groupId << " */\n";
-		streamStruct(stream, s, s.name, inf, ix, runtime);
+		streamStruct(stream, s, s.name, inf, ix, runtime, false);
 		if(runtime) {
-			streamStruct(stream, s, s.name + "Native", inf, ix, false);
+			streamStruct(stream, s, s.name + "Native", inf, ix, true, true);
 		}
 		if(isAnonStructName(s.name)) {
 			stream << "#endif\n";

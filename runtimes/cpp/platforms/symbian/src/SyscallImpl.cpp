@@ -2315,7 +2315,7 @@ void Syscall::AddLocationEvent(const TPosition& p) {
 	//will be handled by GetEvent.
 	//definite memory leak if event is never Gotten.
 	//must go through all remaining events on shutdown and delete relevant memory.
-	e.data = loc;
+	e.data = (int)loc;
 	gAppView.AddEvent(e);
 }
 #endif	//SUPPORT_MOSYNC_SERVER || __S60_50__
@@ -2921,7 +2921,7 @@ void Syscall::AddStreamEvent(int event, int result) {
 	//will be handled by GetEvent.
 	//definite memory leak if event is never gotten.
 	//must go through all remaining events on shutdown and delete relevant memory.
-	e.data = sed;
+	e.data = (int)sed;
 	gAppView.AddEvent(e);
 }
 

@@ -33,7 +33,7 @@
 	eventData->widgetHandle = handle;
 	eventData->fromScreen = (MAWidgetHandle)navigationController.visibleViewController.view.tag;
 	eventData->toScreen = (MAWidgetHandle)viewController.view.tag;
-	event.data = eventData;
+	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
 

@@ -276,8 +276,9 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		// Copy location data. This data starts at array index 1.
 		int size = sizeof(MALocation);
-		event.data = new byte[size];
-		memcpy(event.data, intArray + 1, size);
+		byte* data = new byte[size];
+		memcpy(data, intArray + 1, size);
+		event.data = (int)data;
 	}
 	else if (event.type == EVENT_TYPE_LOCATION_PROVIDER)
 	{
@@ -339,7 +340,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 			widgetEvent->toScreen = intArray[4];
 		}
 
-		event.data = widgetEvent;
+		event.data = (int)widgetEvent;
 	}
 	
 	// Release the memory used for the int array.

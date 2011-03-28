@@ -19,6 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "WaveAudioSource.h"
 #include "Stream.h"
 #include "StreamHelpers.h"
+#include <stdint.h>
+
 using namespace Base;
 using namespace MoSyncError;
 

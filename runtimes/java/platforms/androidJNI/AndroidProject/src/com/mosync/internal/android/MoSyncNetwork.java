@@ -45,30 +45,8 @@ import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 import static com.mosync.internal.android.MoSyncHelpers.MYASSERT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_CANCELED;
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_CLOSED;
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_DNS;
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_GENERIC;
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_INTERNAL;
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_MAX;
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_NOHEADER;
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_PROTOCOL;
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_UNAVAILABLE;
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_URL;
-import static com.mosync.internal.generated.MAAPI_consts.CONNOP_ACCEPT;
-import static com.mosync.internal.generated.MAAPI_consts.CONNOP_CONNECT;
-import static com.mosync.internal.generated.MAAPI_consts.CONNOP_FINISH;
-import static com.mosync.internal.generated.MAAPI_consts.CONNOP_READ;
-import static com.mosync.internal.generated.MAAPI_consts.CONNOP_WRITE;
-import static com.mosync.internal.generated.MAAPI_consts.CONN_FAMILY_BT;
-import static com.mosync.internal.generated.MAAPI_consts.CONN_FAMILY_INET4;
-import static com.mosync.internal.generated.MAAPI_consts.CONN_MAX;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_CONN;
-import static com.mosync.internal.generated.MAAPI_consts.HANDLE_LOCAL;
-import static com.mosync.internal.generated.MAAPI_consts.HTTP_GET;
-import static com.mosync.internal.generated.MAAPI_consts.HTTP_HEAD;
-import static com.mosync.internal.generated.MAAPI_consts.HTTP_POST;
-import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.*;
+
 
 import java.io.IOException;
 import java.io.InputStream;

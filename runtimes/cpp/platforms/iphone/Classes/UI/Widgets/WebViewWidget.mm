@@ -65,7 +65,7 @@
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_WEB_VIEW_URL_CHANGED;
 	eventData->widgetHandle = handle;
-	event.data = eventData;
+	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 	return YES; // MoSync user have to manually start a new request..
 }

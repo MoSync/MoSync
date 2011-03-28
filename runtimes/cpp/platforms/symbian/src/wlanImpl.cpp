@@ -89,18 +89,12 @@ int Syscall::maWlanStartDiscovery() {
 }
 
 int Syscall::maWlanGetNewAp(MAWlanAp* dst) {
-	char* vmName = dst->name;
-	dst->name = (char*)GetValidatedMemRange((int)dst->name, dst->nameBufSize);
-	int res = WlanGetNewAp(dst);
-	dst->name = vmName;
-	return res;	
-}
-
-int Syscall::WlanGetNewAp(MAWlanAp* dst) {
 	if(gWlanSynchronizer->IsActive())
 		return 0;
 	if(gWlanInfo->IsDone())
 		return 0;
+
+	char* dstName = (char*)GetValidatedMemRange(dst->name, dst->nameBufSize);
 
 	TWlanBssid mac;
 	gWlanInfo->Bssid(mac);
@@ -108,7 +102,6 @@ int Syscall::WlanGetNewAp(MAWlanAp* dst) {
 
 	dst->signalStrength = - gWlanInfo->RXLevel();	//dBm
 
-	
 	TUint8 ieLen = 0;
 	const TUint8* ieData = NULL;
 	// Information Element ID for SSID as specified in 802.11.
@@ -119,11 +112,11 @@ int Syscall::WlanGetNewAp(MAWlanAp* dst) {
 		// (i.e. the header is bypassed). ieLen contains the length of payload
 		// data.
 		if(ieLen < dst->nameBufSize) {
-			memcpy(dst->name, ieData, ieLen);
-			dst->name[ieLen] = 0;
+			memcpy(dstName, ieData, ieLen);
+			dstName[ieLen] = 0;
 		}
 	} else {
-		dst->name[0] = 0;
+		dstName[0] = 0;
 	}
 
 	gWlanInfo->Next();
