@@ -3128,6 +3128,16 @@ group WidgetAPI "Widget API" {
 		* @brief A handle to the MoSync canvas screen. Use maWidgetScreenShow with this handle to show the initial mosync canvas.
 		*/
 		MOSYNC_SCREEN_HANDLE = 0;
+
+		/**
+		* @brief If set to the width or height of a widget it tries to fill the avilable space in that dimension. If there are multiple widgets specified with this constant, the space will be shared equally.
+		*/
+		FILL_AVAILABLE_SPACE = -1;
+		
+		/**
+		* @brief If set to the width or height of a widget it will be as big as its content in that dimension.
+		*/
+		WRAP_CONTENT = -2;
 	}
 	}
 
@@ -3308,12 +3318,38 @@ group WidgetAPI "Widget API" {
 	* The available widget properties for all widgets.
 	*/
 	constset MAString MAW_WIDGET_ {
+		/**
+		* @brief Specifies the horizontal distance from the parent widget. Takes an integer in pixels.
+		*/
 		LEFT = "left";
+
+		/**
+		* @brief Specifies the vertical distance from the parent widget. Takes an integer in pixels.
+		*/
 		TOP = "top";
+
+		/**
+		* @brief Specifies the width of a widget. Takes an integer in pixels, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
+		*/
 		WIDTH = "width";
+
+		/**
+		* @brief Specifies the height of a widget. Takes an integer in pixels, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT. 
+		*/
 		HEIGHT = "height";
+		/**
+		* @brief Specifies the transparency of the widget background. Takes a float between 0.0 and 1.0, where 0.0 is fully transparent and 1.0 is opaque.
+		*/
 		ALPHA = "alpha";
+
+		/**
+		* @brief Specifies the background color of a widget. The format of the color is a hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*/
 		BACKGROUND_COLOR = "backgroundColor";
+
+		/**
+		* @brief Specifies whether the widget is visible or not. Takes a boolean 'true' or 'false', where true is visible and false is invisible.
+		*/
 		VISIBLE = "visible";
 	}	
 
@@ -3577,7 +3613,7 @@ group WidgetAPI "Widget API" {
 	 * shows the pushed screen it. Pushing it to the stack will make it 
 	 * automatically go back to the previous screen when popped.
 	 *
-	 * \param screenStack A handle to a #MAW_STACK_SCREEN.
+	 * \param stackScreen A handle to a #MAW_STACK_SCREEN.
 	 * \param newScreen A handle to either a #MAW_SCREEN or a #MAW_TAB_SCREEN.
 	 *                  The handle cannot exist in the stack already.
 	 *	 
@@ -3595,7 +3631,7 @@ group WidgetAPI "Widget API" {
 	 * the popped screen before the If there is no previous screen in the screen
 	 * stack, an empty screen will be shown.
 	 *
-	 * \param screenStack A handle to a #MAW_STACK_SCREEN to pop from.
+	 * \param stackScreen A handle to a #MAW_STACK_SCREEN to pop from.
 	 *
 	 * \return Any of the following result codes:
 	 * - #MAW_RES_OK if the given screen could be popped.
