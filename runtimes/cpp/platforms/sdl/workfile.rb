@@ -32,7 +32,8 @@ work.instance_eval do
 		@EXTRA_INCLUDES = common_includes + ["/usr/include/gtk-2.0",
 			"/usr/include/glib-2.0", "/usr/include/pango-1.0",
 			"/usr/include/cairo", "/usr/include/atk-1.0",
-			"/usr/lib/glib-2.0/include", "/usr/lib/gtk-2.0/include"]
+			"/usr/lib/glib-2.0/include", "/usr/lib/gtk-2.0/include",
+			"/usr/include/gdk-pixbuf-2.0"]
 		@LIBRARIES = common_libraries
 		
 	elsif(HOST == :darwin)

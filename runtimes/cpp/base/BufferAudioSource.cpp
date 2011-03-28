@@ -51,7 +51,7 @@ BufferAudioSource::BufferAudioSource(const MAAudioBufferInfo *i, BufferRequestCa
 	}
 	info.numChannels = i->numChannels;
 	info.bufferSize = i->bufferSize;
-	mBuffer = SYSCALL_THIS->GetValidatedMemRange((int)i->buffer, info.bufferSize);
+	mBuffer = SYSCALL_THIS->GetValidatedMemRange((int)(size_t)i->buffer, info.bufferSize);
 	mCallback = callback;
 }
 

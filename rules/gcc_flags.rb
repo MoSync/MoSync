@@ -94,11 +94,11 @@ if(HOST == :win32)
 	@HOST_FLAGS = " -DWIN32"
 	@HOST_CPPFLAGS = ""
 elsif(HOST == :linux)
-	@HOST_FLAGS = " -DLINUX"
+	@HOST_FLAGS = " -DLINUX -fPIC"
 	if(HOST_PLATFORM == :darwin)
 		@HOST_FLAGS += " -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -m32 -DDARWIN"
 	end
-	@HOST_CPPFLAGS = " -fPIC"
+	@HOST_CPPFLAGS = ""
 elsif(HOST == :darwin)
 	@HOST_FLAGS = " -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -m32 -DDARWIN"
 	@HOST_CPPFLAGS = " -isysroot /Developer/SDKs/MacOSX10.5.sdk -mmacosx-version-min=10.5 -m32 -fPIC"

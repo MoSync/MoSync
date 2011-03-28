@@ -36,7 +36,7 @@ MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"runtimes/cpp/platforms/sdl/MoRE"
 	]
 
-BASE_DIRS = MORE_DIRS + ADDITIONAL_INTLIBS + PLATFORM_TOOLS
+BASE_DIRS = ADDITIONAL_INTLIBS + MORE_DIRS + PLATFORM_TOOLS
 
 PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/DefaultSkinGenerator", "libs"]
 EXAM_DIRS = PIPE_DIRS + ["tests/unitTest", "examples"]
@@ -82,7 +82,8 @@ target :examples => :base do
 	Work.invoke_subdirs(EXAM_DIRS)
 end
 
-target :all => :examples do
+target :all => :default do
+	Work.invoke_subdirs(EXAM_DIRS)
 end
 
 target :more => :base do

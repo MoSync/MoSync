@@ -89,7 +89,7 @@ public:
      *
      * @param p     Pointer to a MABtDevice to fill
      */
-    void getInfo ( MABtDevice *p ) const
+    void getInfo ( MABtDeviceNative *p ) const
     {
         memcpy( &p->address, &mAddr, sizeof( MABtAddr ) );
         strncpy( p->name, mName, p->nameBufSize );

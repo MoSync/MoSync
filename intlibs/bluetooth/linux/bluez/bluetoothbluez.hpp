@@ -133,7 +133,7 @@ namespace Bluetooth
              *
              * @return 1 if there was a device, 0 if not
              */
-            int getNextDevice ( MABtDevice *d );
+            int getNextDevice ( MABtDeviceNative* d );
 
 			/**
 			 * Cancels an on going device discovery, 
@@ -167,7 +167,7 @@ namespace Bluetooth
              *
              * @return 1 if there was a service, 0 if not
              */
-            int getNextService ( MABtService* d );
+            int getNextService ( MABtServiceNative* d );
 
             /**
              * Returns the number of UUIDs the next service
