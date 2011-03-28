@@ -7,11 +7,12 @@
 #include <ieeefp.h>
 #include <stdio.h>
 
-void checkf();
-void enter();
+//void checkf();
+//void enter();
+void abort(void);
 
 
-double translate_from();
+//double translate_from();
 
 typedef struct 
 {
@@ -70,7 +71,7 @@ typedef struct
 {
   int line;
   
-  char *string;
+  const char *string;
   double value;
   int endscan;
 } double_type;
@@ -90,7 +91,7 @@ typedef struct
   int_scan_type hex;
   int_scan_type normal;
   int_scan_type alphabetical;
-  char *string;
+  const char *string;
 } int_type;
 
 
@@ -98,15 +99,15 @@ typedef struct
 {
   int line;
   double value;
-  char *estring;
+  const char *estring;
   int e1;
   int e2;
   int e3;
-  char *fstring;
+  const char *fstring;
   int f1;
   int f2;
   int f3;
-  char *gstring;
+  const char *gstring;
   int g1;
 } ddouble_type;
 
@@ -114,8 +115,8 @@ typedef struct
 {
   int line;
   double value;
-  char *result;
-  char *format_string;
+  const char *result;
+  const char *format_string;
 } sprint_double_type;
 
 
@@ -123,8 +124,8 @@ typedef struct
 {
   int line;
   int value;
-  char *result;
-  char *format_string;
+  const char *result;
+  const char *format_string;
 } sprint_int_type;
 
 
@@ -140,6 +141,6 @@ void _EXFUN(line,(int));
 void _EXFUN(test_mok, (double, double, int));
 void _EXFUN(test_iok, (int, int));
 void _EXFUN(test_eok, (int, int));
-void _EXFUN(test_sok, (char *, char*));
-void _EXFUN(test_scok, (char *, char*, int));
+void _EXFUN(test_sok, (const char *, const char*));
+void _EXFUN(test_scok, (const char *, const char*, int));
 void _EXFUN(newfunc,(_CONST char *));

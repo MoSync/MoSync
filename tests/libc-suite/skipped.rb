@@ -186,6 +186,21 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	# glibc doesn't implement open_wmemstream's sizep parameter according to the Open Group Base Specification,
 	# so this test fails.
 	'tst-wmemstream2.c',
+	
+	# fp exceptions not supported by newlib.
+	'bug-nextafter.c',
+	'bug-nexttoward.c',
+	
+	# glibc math tests are too strict for us. we can use the newlib tests instead.
+	'test-double.c',
+	'test-fenv.c',
+	'test-float.c',
+	'test-fpucw.c',
+	'test-idouble.c',
+	'test-ifloat.c',
+	'test-ildouble.c',
+	'test-ldouble.c',
+	'test-matherr.c',
 ]
 
 SKIPPED_PATTERNS = [

@@ -32,8 +32,8 @@ _DEFUN(checkit,(ok,l),
 
 void
 _DEFUN(funcqual,(a,b,l),
-       char *a _AND
-       char *b _AND
+       const char *a _AND
+       const char *b _AND
        int l)
 {
   newfunc(it);
@@ -218,6 +218,7 @@ void test_string()
   check(strchr(one, 'b') == NULL); /* Empty string. */
   check(strchr(one, '\0') == one); /* NUL in empty string. */
 
+#if 0
   /* index - just like strchr.  */
   it = "index";
   check(index("abcd", 'z') == NULL);	/* Not found. */
@@ -231,6 +232,7 @@ void test_string()
   (void) strcpy(one, "");
   check(index(one, 'b') == NULL); /* Empty string. */
   check(index(one, '\0') == one); /* NUL in empty string. */
+#endif
 
   /* strrchr.  */
   it = "strrchr";
@@ -246,6 +248,7 @@ void test_string()
   check(strrchr(one, 'b') == NULL); /* Empty string. */
   check(strrchr(one, '\0') == one); /* NUL in empty string. */
 
+#if 0
   /* rindex - just like strrchr.  */
   it = "rindex";
   check(rindex("abcd", 'z') == NULL); /* Not found. */
@@ -259,6 +262,7 @@ void test_string()
   (void) strcpy(one, "");
   check(rindex(one, 'b') == NULL); /* Empty string. */
   check(rindex(one, '\0') == one); /* NUL in empty string. */
+#endif
 
   /* strpbrk - somewhat like strchr.  */
   it = "strpbrk";
