@@ -21,18 +21,53 @@
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
 
+@interface UINavigationController (UINavigationController_Expanded)
+
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated;
+
+@end
+
+@implementation UINavigationController (UINavigationController_Expanded)
+
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated{
+	NSLog(@"UINavigationController(Magic)");
+	if ([self.delegate respondsToSelector:@selector(viewControllerWillBePoped)]) {
+		[self.delegate performSelector:@selector(viewControllerWillBePoped)];
+	}
+	NSArray *vcs = self.viewControllers;
+	UIViewController *vcc = [vcs objectAtIndex:[vcs count] - 2];
+	[self popToViewController:vcc animated:YES];
+	return vcc;
+}
+
+@end
+
+
 @implementation StackScreenWidget
 
-- (void)navigationController:(UINavigationController *)navigationController 
-	  willShowViewController:(UIViewController *)viewController animated:(BOOL)animated {
+- (void)viewControllerWillBePoped {
+	UINavigationController* navigationController = (UINavigationController*)controller;
 	
+	NSArray *vcs = navigationController.viewControllers;
+		
+	UIViewController* fromViewController = navigationController.topViewController;
+	UIViewController* toViewController = ([vcs count] <= 1)?NULL:[vcs objectAtIndex:[vcs count] - 2];
+
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_STACK_SCREEN_POPPED;
 	eventData->widgetHandle = handle;
-	eventData->fromScreen = (MAWidgetHandle)navigationController.visibleViewController.view.tag;
-	eventData->toScreen = (MAWidgetHandle)viewController.view.tag;
+	if(fromViewController != NULL)
+		eventData->fromScreen = (MAWidgetHandle)fromViewController.view.tag;
+	else 
+		eventData->fromScreen = -1;
+
+	if(toViewController != NULL)
+		eventData->toScreen = (MAWidgetHandle)toViewController.view.tag;
+	else
+		eventData->toScreen = -1;
+	
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }

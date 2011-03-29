@@ -103,6 +103,11 @@ namespace Base {
 	
 	static CGFontRef sUnicodeFont;
 	
+#ifdef SUPPORT_OPENGL_ES
+	static MAHandle sOpenGLScreen = -1;
+	static MAHandle sOpenGLView = -1;
+#endif	
+	
 	void MALibQuit();
 
 	//***************************************************************************
@@ -376,9 +381,21 @@ namespace Base {
 	}
 
 	SYSCALL(void, maUpdateScreen()) {
-		// we must check if the canvas is enabled, because the mosync thread will be locked until the surface is drawn to the screen.
-		if(gClosing || isNativeUIEnabled())
+		if(gClosing) {
 			return;
+		}
+#ifdef SUPPORT_OPENGL_ES	
+		else if(sOpenGLView != -1) {
+			maWidgetSetProperty(sOpenGLView, "invalidate", "");
+			return;
+		}
+#endif		
+		else if(isNativeUIEnabled()) {
+			return;
+		}
+		
+		// we must check if the canvas is enabled, because the mosync thread will be locked until the surface is drawn to the screen.
+	
 		MoSync_UpdateView(gBackbuffer->image);
 	}
 
@@ -854,11 +871,25 @@ namespace Base {
 
 #ifdef SUPPORT_OPENGL_ES
 	int maOpenGLInitFullscreen() {
-		return 0;
+		if(sOpenGLScreen != -1) return 0;
+		sOpenGLScreen = maWidgetCreate("Screen");
+		sOpenGLView = maWidgetCreate("GLView");
+		maWidgetSetProperty(sOpenGLView, "width", "-1");
+		maWidgetSetProperty(sOpenGLView, "height", "-1");
+		maWidgetAddChild(sOpenGLScreen, sOpenGLView);
+		maWidgetScreenShow(sOpenGLScreen);
+		maWidgetSetProperty(sOpenGLView, "bind", "");		
+		return 1;
 	}
 	
 	int maOpenGLCloseFullscreen() {
-		return 0;
+		if(sOpenGLScreen == -1) return 0;
+		maWidgetRemoveChild(sOpenGLView);
+		maWidgetDestroy(sOpenGLView);
+		maWidgetDestroy(sOpenGLScreen);		
+		sOpenGLView = -1;
+		sOpenGLScreen = -1;
+		return 1;
 	}
 	
 	int maOpenGLTexImage2D(MAHandle image) {
