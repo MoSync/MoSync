@@ -30,6 +30,7 @@ using namespace Core;
 
 #ifdef _WIN32
 #include <windows.h>
+#include <stdint.h>
 #endif
 
 #ifdef _android
