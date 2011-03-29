@@ -68,6 +68,8 @@ import static com.mosync.internal.generated.MAAPI_consts.HANDLE_LOCAL;
 import static com.mosync.internal.generated.MAAPI_consts.HTTP_GET;
 import static com.mosync.internal.generated.MAAPI_consts.HTTP_HEAD;
 import static com.mosync.internal.generated.MAAPI_consts.HTTP_POST;
+import static com.mosync.internal.generated.MAAPI_consts.HTTP_PUT;
+import static com.mosync.internal.generated.MAAPI_consts.HTTP_DELETE;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
 
 import java.io.IOException;
