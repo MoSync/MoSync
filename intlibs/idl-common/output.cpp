@@ -371,7 +371,7 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 					throwException("Anonymous struct not found");
 			} else {
 				stream << tab;
-				if(!native && isDirectPointerType(inf, pod.type)) {
+				if(runtime && !native && isDirectPointerType(inf, pod.type)) {
 					stream << "MAAddress";
 				} else {
 					stream << pod.type;

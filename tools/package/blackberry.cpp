@@ -35,7 +35,9 @@ void packageBlackberry(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	std::string codName(s.name);
 	codName += ".cod";
-	int res = rename(codName.c_str(), (s.dst + ("/" + codName)).c_str());
+	std::string newName = s.dst + ("/" + codName);
+	remove(newName.c_str());
+	int res = rename(codName.c_str(), newName.c_str());
 	if(res != 0) {
 		printf("rename error %i, %i\n", res, errno);
 		exit(1);
