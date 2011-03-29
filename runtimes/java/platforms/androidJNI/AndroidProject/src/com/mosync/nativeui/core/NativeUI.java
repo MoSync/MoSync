@@ -179,7 +179,14 @@ public class NativeUI
 	 */
 	private void internalMaWidgetDestroy(Widget widgetToDestroy)
 	{
-		// Destroy children first
+		// Disconnect widget from widget tree
+		Layout parent = (Layout) widgetToDestroy.getParent( );
+		if( parent != null )
+		{
+			parent.removeChild( widgetToDestroy );
+		}
+		
+		// Disconnect and destroy children
 		if( widgetToDestroy.isLayout( ) )
 		{
 			Layout widgetToDestroyAsLayout = (Layout) widgetToDestroy;
@@ -189,12 +196,7 @@ public class NativeUI
 			}
 		}
 
-		Layout parent = (Layout) widgetToDestroy.getParent( );
-		if( parent != null )
-		{
-			parent.removeChild( widgetToDestroy );
-		}
-		
+		// Destroy widget
 		m_widgetTable.remove( widgetToDestroy.getHandle( ) );
 	}
 	

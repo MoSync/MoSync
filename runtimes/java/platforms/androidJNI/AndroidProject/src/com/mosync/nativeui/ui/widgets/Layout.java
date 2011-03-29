@@ -56,11 +56,14 @@ public class Layout extends Widget
 	/**
 	 * Returns the children of this layout.
 	 * 
+	 * Note: Modifications to the returned list of children will
+	 * not affect the layout.
+	 * 
 	 * @return a list of children for this layout.
 	 */
 	public List<Widget> getChildren()
 	{
-		return m_children;
+		return new ArrayList<Widget>( m_children );
 	}
 	
 	/**
