@@ -73,7 +73,7 @@ class Work < TaskBase
 		# we will check for the "clean" goal here.
 		if(Targets.size == 0)
 			Targets.setup
-			if(Targets.goals == [:clean])
+			if(Targets.goals.include?(:clean))
 				self.execute_clean
 				return
 			end
@@ -221,7 +221,7 @@ class FileTask < Task
 	
 	# Is this FileTask needed?  Yes if it doesn't exist, or if its time stamp
 	# is out of date.
-	# Prints the reason the task is needed, unless <tt>log</tt> is false.
+	# Prints the reason the task is needed, if <tt>log</tt>.
 	def needed?(log = true)
 		if(!File.exist?(@NAME))
 			puts "Because file does not exist:" if(log)
@@ -287,7 +287,7 @@ class CopyFileTask < FileTask
 	end
 	def execute
 		puts "copy #{@src} #{@NAME}"
-		FileUtils.copy_file(@src, @NAME)
+		FileUtils.copy_file(@src, @NAME, true)
 	end
 end
 

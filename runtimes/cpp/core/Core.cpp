@@ -826,9 +826,9 @@ public:
 	//Definitions
 	//****************************************
 #ifdef COUNT_INSTRUCTION_USE
-#define OPC(opcode)	case _##opcode: LOGC("%x: %i %s", ip - mem_cs - 1, _##opcode, #opcode); countInstructionUse(#opcode, op);
+#define OPC(opcode)	case _##opcode: LOGC("%x: %i %s", (int)(ip - mem_cs - 1), _##opcode, #opcode); countInstructionUse(#opcode, op);
 #else
-#define OPC(opcode)	case _##opcode: LOGC("%x: %i %s", ip - mem_cs - 1, _##opcode, #opcode);
+#define OPC(opcode)	case _##opcode: LOGC("%x: %i %s", (int)(ip - mem_cs - 1), _##opcode, #opcode);
 #endif
 #ifdef CORE_DEBUGGING_MODE
 #define EOP	LOGC("\n"); break;
@@ -839,8 +839,8 @@ public:
 #define REG(nn)	regs[nn]
 #define	RD	(regs[rd])
 #define	RS	(regs[rs])
-#define	RDU	(((unsigned long*)regs)[rd])
-#define	RSU	(((unsigned long*)regs)[rs])
+#define	RDU	(((uint32_t*)regs)[rd])
+#define	RSU	(((uint32_t*)regs)[rs])
 
 #ifdef STACK_POINTER_VERIFICATION
 void WRITE_REG(int reg, int value) {
@@ -856,8 +856,8 @@ void WRITE_REG(int reg, int value) {
 #define WRITE_REG(reg, value) regs[reg] = value
 #endif
 
-#define IMMU	((unsigned long) imm32)
-#define IMM	((long) imm32)
+#define IMMU	((uint32_t) imm32)
+#define IMM	((int32_t) imm32)
 
 #ifdef MEMORY_DEBUG
 #ifdef CORE_DEBUGGING_MODE
@@ -867,7 +867,7 @@ void WRITE_REG(int reg, int value) {
 #else
 		std::string file;
 		int line;
-		bool res = mapIp(address, line, file);
+		mapIp(address, line, file);
 		LOGC("\nJump to 0x%x %s %s:%i\n", address, mapFunction(address), file.c_str(), line);
 #endif
 	}
@@ -885,8 +885,8 @@ void WRITE_REG(int reg, int value) {
 #define	JMP_IMM	JMP_GENERIC(IMM)
 #define	JMP_RD	JMP_GENERIC(RD)
 
-#define	CALL_IMM	REG(REG_rt) = (long) (ip - mem_cs); JMP_IMM;
-#define	CALL_RD		REG(REG_rt) = (long) (ip - mem_cs); JMP_RD;
+#define	CALL_IMM	REG(REG_rt) = (int32_t) (ip - mem_cs); JMP_IMM;
+#define	CALL_RD		REG(REG_rt) = (int32_t) (ip - mem_cs); JMP_RD;
 
 #define IB ((int)(*ip++))
 
@@ -1239,11 +1239,11 @@ void WRITE_REG(int reg, int value) {
 	int _SYSCALL_CONVERTRES_MAHandle(MAHandle h) { return h; }
 #define _SYSCALL_HANDLERES_MAHandle _SYSCALL_HANDLERES_DEFAULT(MAHandle)
 
-	void debug_MAAddress(const void*) {}
-	MAAddress _SYSCALL_CONVERT_MAAddress(int a) {
+	void debug_MAAddress(MAAddress) {}
+	void* _SYSCALL_CONVERT_MAAddress(MAAddress a) {
 		_debug_hex(a);
-		debug_MAAddress((MAAddress)a);
-		return (MAAddress)(a + (byte*)mem_ds);
+		debug_MAAddress(a);
+		return (a + (byte*)mem_ds);
 	}
 	int _SYSCALL_CONVERTRES_MAAddress(const void* a) {
 		return (int)((byte*)a - (byte*)mem_ds);
@@ -1408,7 +1408,7 @@ void WRITE_REG(int reg, int value) {
 		DUMPINT(InstCount);	//includes any eventual illegal instruction
 
 		//on error, this will probably have read some or all of the crashing instruction
-		LOG("IP: 0x%04X\n", rIP - mem_cs);
+		LOG("IP: 0x%04X\n", (int)(size_t)(rIP - mem_cs));
 		LOGC("Regs:\n");
 		for(int i=0; i<32; i++) {
 			LOGC("%2i: 0x%08X\n", i, regs[i]);

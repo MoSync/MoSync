@@ -7,7 +7,6 @@ import android.view.ViewGroup;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
-import com.mosync.nativeui.util.LayoutParamsSetter;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -48,14 +47,6 @@ public class ScreenWidget extends Layout
 	public ScreenWidget(int handle, ViewGroup view)
 	{
 		super( handle, view );
-		
-		// Screen fills the whole screen.
-		getLayoutParams( ).width = ViewGroup.LayoutParams.FILL_PARENT;
-		getLayoutParams( ).height = ViewGroup.LayoutParams.FILL_PARENT;
-		
-		ViewGroup.LayoutParams nativeLayoutParams = createNativeLayoutParams( getLayoutParams( ) );
-		LayoutParamsSetter.setPossibleParams( getLayoutParams( ), nativeLayoutParams );
-		getView( ).setLayoutParams( nativeLayoutParams );
 	}
 
 	@Override

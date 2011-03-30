@@ -92,7 +92,7 @@ virtual void AttributeRequestComplete(TSdpServRecordHandle aHandle, TInt aError)
 
 
 void SBTmaBtStartDeviceDiscovery(bool names);
-int SBTmaBtGetNewDevice(MABtDevice* dst);
+int SBTmaBtGetNewDevice(MABtDeviceNative* dst);
 
 int SBTmaBtCancelDiscovery();
 
@@ -102,7 +102,7 @@ int SBTmaBtCancelDiscovery();
 void SBTmaBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid);
 
 //returns >0 on success.
-int SBTmaBtGetNewService(MABtService* dst);
+int SBTmaBtGetNewService(MABtServiceNative* dst);
 
 //does not remove a service from the queue. returns >0 on success.
 int SBTmaBtGetNextServiceSize(MABtServiceSize* dst);

@@ -1935,7 +1935,7 @@ extern int inacc;
 void
 _DEFUN(test_is_set,(func, name, p),
        int (*func)() _AND
-       char *name _AND
+       const char *name _AND
        int *p)
 {
   int i;
@@ -1954,7 +1954,7 @@ _DEFUN(test_is_set,(func, name, p),
 void
 _DEFUN(test_to_set,(func, name, p, low, high),
        int (*func)() _AND
-       char *name _AND
+       const char *name _AND
        int *p _AND
        int low _AND
        int high)
@@ -2018,8 +2018,10 @@ _DEFUN_VOID(test_is)
   test_is_set(isspace, "isspace function", &myspace);
   test_is_set(isupper, "isupper function", &myupper);
   test_is_set(isxdigit, "isxdigit function", &myxdigit);
+#if 0	//wtf? function does not exist...
   test_to_set(_tolower, "_tolower function", &setlower, 'A','Z');
   test_to_set(_toupper, "_toupper function", &setupper, 'a','z');
+#endif
   test_to_set(def__tolower, "_tolower define", &setlower, 'A','Z');
   test_to_set(def__toupper, "_toupper define", &setupper, 'a','z');
   test_to_set(def_toascii, "toascii define", &setascii, 0,255);

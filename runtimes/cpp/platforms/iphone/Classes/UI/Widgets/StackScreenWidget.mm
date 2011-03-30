@@ -21,7 +21,56 @@
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
 
+@interface UINavigationController (UINavigationController_Expanded)
+
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated;
+
+@end
+
+@implementation UINavigationController (UINavigationController_Expanded)
+
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated{
+	NSLog(@"UINavigationController(Magic)");
+	if ([self.delegate respondsToSelector:@selector(viewControllerWillBePoped)]) {
+		[self.delegate performSelector:@selector(viewControllerWillBePoped)];
+	}
+	NSArray *vcs = self.viewControllers;
+	UIViewController *vcc = [vcs objectAtIndex:[vcs count] - 2];
+	[self popToViewController:vcc animated:YES];
+	return vcc;
+}
+
+@end
+
+
 @implementation StackScreenWidget
+
+- (void)viewControllerWillBePoped {
+	UINavigationController* navigationController = (UINavigationController*)controller;
+	
+	NSArray *vcs = navigationController.viewControllers;
+		
+	UIViewController* fromViewController = navigationController.topViewController;
+	UIViewController* toViewController = ([vcs count] <= 1)?NULL:[vcs objectAtIndex:[vcs count] - 2];
+
+	MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = MAW_EVENT_STACK_SCREEN_POPPED;
+	eventData->widgetHandle = handle;
+	if(fromViewController != NULL)
+		eventData->fromScreen = (MAWidgetHandle)fromViewController.view.tag;
+	else 
+		eventData->fromScreen = -1;
+
+	if(toViewController != NULL)
+		eventData->toScreen = (MAWidgetHandle)toViewController.view.tag;
+	else
+		eventData->toScreen = -1;
+	
+	event.data = (int)eventData;
+	Base::gEventQueue.put(event);
+}
 
 - (id)init {
     //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -29,6 +78,7 @@
 	//controller = navigationController;
 	navigationController.viewControllers = [NSArray array];	
 	//view = controller.view;
+	navigationController.delegate = self;
 	
 	return [super initWithController:navigationController];
 }
@@ -87,7 +137,12 @@
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"title"]) {
 		controller.title = value;
-	} else {
+	} 
+	else if([key isEqualToString:@"backButtonEnabled"]) {
+		UINavigationController* navigationController = (UINavigationController*)controller;
+		navigationController.navigationBar.backItem.hidesBackButton = [value boolValue];
+	}
+	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;	

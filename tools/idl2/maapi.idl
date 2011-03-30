@@ -905,6 +905,8 @@ interface MAAPI {
 		GET = 1;
 		POST = 2;
 		HEAD = 3;
+		PUT = 4;
+		DELETE = 5;
 	}
 
 	/**
@@ -918,7 +920,7 @@ interface MAAPI {
 	* begun, you may no longer set request headers.
 
 	* \param url An HTTP or HTTPS URL. See maConnect() for the exact form.
-	* \param method #HTTP_GET, #HTTP_POST or #HTTP_HEAD.
+	* \param method #HTTP_GET, #HTTP_POST, #HTTP_HEAD, #HTTP_PUT or #HTTP_DELETE.
 	* \returns An unfinished HTTP connection handle \>0, or a
 	* \link #CONNERR_GENERIC CONNERR \endlink value.
 	* \see maHttpFinish
@@ -3046,6 +3048,20 @@ group WidgetAPI "Widget API" {
 			* @brief The new tab index when a #MAW_EVENT_TAB_CHANGED event is received.
 			*/
 			int tabIndex;
+
+			struct {
+					/**
+					* @brief The handle to the screen that was popped from the stack screen.
+					*/
+					MAWidgetHandle fromScreen;
+					
+					/**
+					* @brief The handle to the screen that will be shown. If there is no screen
+					* to pop to, this will be the same as widgetHandle.
+					*/
+					MAWidgetHandle toScreen;
+			} stackScreenPopInfo;
+	
 		}
 	}
 
@@ -3090,9 +3106,14 @@ group WidgetAPI "Widget API" {
 		GL_VIEW_READY = 8;
 
 		/**
-		 * Sent when the URL of a web view changes
+		 * @brief Sent when the URL of a web view changes
 		 */
 		WEB_VIEW_URL_CHANGED = 9;
+
+		/**
+		 * @brief Sent when a screen has been popped from a stack screen.
+		 */
+		STACK_SCREEN_POPPED = 10;
 	}
 	} // end of WidgetEventTypes
 
@@ -3322,6 +3343,7 @@ group WidgetAPI "Widget API" {
 	constset MAString MAW_STACK_SCREEN_ {
 		TITLE = "title";
 		ICON = "icon";
+		BACK_BUTTON_ENABLED = "backButtonEnabled";
 	}
 	} // end of WidgetStackScreenProperties	
 

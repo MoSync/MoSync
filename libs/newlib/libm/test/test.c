@@ -7,6 +7,9 @@ int verbose;
 static int count;
 int inacc;
 
+int MAMain() {
+	return main(0, NULL);
+}
 
 int
 _DEFUN(main,(ac, av),
@@ -49,7 +52,7 @@ bt();
    test_math();
   if (is)
    test_is();
-  if (ieee)  test_ieee();
+  //if (ieee)  test_ieee();
   printf("Tested %d functions, %d errors detected\n", count, inacc);
   return 0;
 }
@@ -184,8 +187,8 @@ _DEFUN(mag_of_error,(is, shouldbe),
 
 void
 _DEFUN(test_sok,(is, shouldbe),
-       char *is _AND
-       char *shouldbe)
+       const char *is _AND
+       const char *shouldbe)
 {
   if (strcmp(is,shouldbe))
     {
@@ -216,8 +219,8 @@ _DEFUN(test_iok,(is, shouldbe),
 */
 void 
 _DEFUN(test_scok,(is, shouldbe, count),
-       char *is _AND
-       char *shouldbe _AND
+       const char *is _AND
+       const char *shouldbe _AND
        int count)
 {
   if (strncmp(is,shouldbe, count))

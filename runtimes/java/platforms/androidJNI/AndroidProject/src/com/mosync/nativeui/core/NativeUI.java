@@ -16,6 +16,7 @@ import com.mosync.nativeui.ui.factories.ViewFactory;
 import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
+import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
@@ -44,6 +45,11 @@ public class NativeUI
 	 * Listener for changes in the root view of the screen.
 	 */
 	private RootViewReplacedListener m_rootViewReplacedListener = null;
+	
+	/**
+	 * Reference to the last shown screen.
+	 */
+	private Widget m_currentScreen = null;
 	
 	/**
 	 * Mapping between image handles and bitmaps.
@@ -293,6 +299,75 @@ public class NativeUI
 		{
 			m_rootViewReplacedListener.rootViewReplaced( screen.getView( ) );
 		}
+		m_currentScreen = screen;
+		
+		return IX_WIDGET.MAW_RES_OK;
+	}
+	
+	/**
+	 * Internal function for the maWidgetStackScreenPush system call.
+	 * Takes out the stack screen from the widget table and pushes
+	 * the screen to it.
+	 * 
+	 * Note: Should only be called on the UI thread.
+	 */
+	public int maWidgetStackScreenPush(int stackScreenHandle, int newScreenHandle)
+	{
+		Widget stackScreenWidget = m_widgetTable.get( stackScreenHandle );
+		if( stackScreenWidget == null )
+		{
+			Log.e( "MoSync", "maWidgetStackScreenPush: Invalid stack screen handle: " + stackScreenHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+		if( !(stackScreenWidget instanceof StackScreenWidget) )
+		{
+			Log.e( "MoSync", "maWidgetStackScreenPush: Widget is not a stack screen: " + stackScreenHandle );
+			return IX_WIDGET.MAW_RES_ERROR;
+		}
+		
+		Widget newScreenWidget = m_widgetTable.get( newScreenHandle );
+		if( newScreenWidget == null )
+		{
+			Log.e( "MoSync", "maWidgetStackScreenPush: Invalid screen handle: " + newScreenHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+		if( !(newScreenWidget instanceof ScreenWidget) )
+		{
+			Log.e( "MoSync", "maWidgetStackScreenPush: Widget is not a screen: " + newScreenHandle );
+			return IX_WIDGET.MAW_RES_ERROR;
+		}
+		
+		StackScreenWidget stackScreen = (StackScreenWidget) stackScreenWidget;
+		ScreenWidget newScreen = (ScreenWidget) newScreenWidget;
+		
+		stackScreen.push( newScreen );
+		
+		return IX_WIDGET.MAW_RES_OK;
+	}
+	
+	/**
+	 * Internal function for the maWidgetStackScreenPop system call.
+	 * Takes out the stack screen from the widget table and pops the
+	 * current screen from it.
+	 * 
+	 * Note: Should only be called on the UI thread.
+	 */
+	public int maWidgetStackScreenPop(int stackScreenHandle)
+	{
+		Widget stackScreenWidget = m_widgetTable.get( stackScreenHandle );
+		if( stackScreenWidget == null )
+		{
+			Log.e( "MoSync", "maWidgetStackScreenPop: Invalid stack screen handle: " + stackScreenHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+		if( !(stackScreenWidget instanceof StackScreenWidget) )
+		{
+			Log.e( "MoSync", "maWidgetStackScreenPop: Widget is not a stack screen: " + stackScreenHandle );
+			return IX_WIDGET.MAW_RES_ERROR;
+		}
+		
+		StackScreenWidget stackScreen = (StackScreenWidget) stackScreenWidget;
+		stackScreen.pop( );
 		
 		return IX_WIDGET.MAW_RES_OK;
 	}
@@ -374,6 +449,17 @@ public class NativeUI
 		mosyncThread.mMemDataSection.put( (byte)0 );
 		
 		return result.length( );
+	}
+	
+	/**
+	 * Called when the back button has been pressed.
+	 */
+	public void handleBack()
+	{
+		if( m_currentScreen != null )
+		{
+			m_currentScreen.handleBack( );
+		}
 	}
 	
 	/**

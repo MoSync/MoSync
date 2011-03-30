@@ -191,6 +191,61 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	}
 	
 	/**
+	 * Internal wrapper for maWidgetStackScreenPush that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetStackScreenPush(
+		final int stackScreenHandle, 
+		final int newScreenHandle)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() 
+			{
+				public void run()
+				{
+					int result = mNativeUI.maWidgetStackScreenPush(
+							stackScreenHandle, newScreenHandle);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+	
+	/**
+	 * Internal wrapper for maWidgetStackScreenPop that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetStackScreenPop( 
+		final int stackScreenWidget)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() 
+			{
+				public void run()
+				{
+					int result = mNativeUI.maWidgetStackScreenPop(stackScreenWidget);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+	
+	
+	/**
 	 * Internal wrapper for maWidgetSetProperty that runs
 	 * the call in the UI thread.
 	 */
@@ -252,6 +307,19 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		{
 			return -1;
 		}
+	}
+	
+	/**
+	 * Called when the back button has been pressed.
+	 */
+	public void handleBack()
+	{
+		getActivity().runOnUiThread(new Runnable() {
+			public void run()
+			{
+				mNativeUI.handleBack();
+			}
+		});
 	}
 
 	@Override

@@ -195,7 +195,7 @@ _DEFUN(normalize,(value, in),
   
 }
 int
-_DEFUN(round,(in, start, now, ch),
+_DEFUN(round2,(in, start, now, ch),
        cvt_info_type *in _AND
        char *start _AND
        char *now _AND
@@ -312,7 +312,7 @@ _DEFUN(_cvte,(in),
     
   }
 
-  if (round(in,
+  if (round2(in,
 	    in->buffer,
 	    in->buffer+buffer_idx,
 	    nextdigit(&(in->value)))) 
@@ -420,7 +420,7 @@ _DEFUN(_cvtf,(in),
 
   in->null_idx = buffer_idx;  
   in->buffer[buffer_idx] = 0;
-  if (round(in, in->buffer, in->buffer+buffer_idx,
+  if (round2(in, in->buffer, in->buffer+buffer_idx,
 	    nextdigit(&(in->value)))) 
   {
       _cvtf(in);

@@ -73,7 +73,7 @@ String File::getName ( void )
 {
 	String temp = "";
 	
-	unsigned int i = m_path.find_last_of( F_SEPERATOR );
+	size_t i = m_path.find_last_of( F_SEPERATOR );
 	if ( i != String::npos ) 
 		temp = String( &m_path[i+1] );
 

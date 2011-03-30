@@ -967,9 +967,9 @@ namespace Base
 		
 		// Copy event data to memory on the MoSync side.
 		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(event->type == eventType) { \
-			memcpy(Core::GetCustomEventPointer(gCore), event->data, sizeof(dataType)); \
+			memcpy(Core::GetCustomEventPointer(gCore), (void*)event->data, sizeof(dataType)); \
 			delete (dataType*) event->data; \
-			event->data = (void*) (int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
+			event->data = (int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
 
 		// Macro CUSTOM_EVENTS is defined in runtimes/cpp/base/Syscall.h
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
@@ -1559,6 +1559,14 @@ namespace Base
 		case maIOCtl_maWidgetScreenShow:
 			SYSLOG("maIOCtl_maWidgetScreenShow");
 			return _maWidgetScreenShow(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maWidgetStackScreenPush:
+			SYSLOG("maIOCtl_maWidgetStackScreenPush");
+			return _maWidgetStackScreenPush(a, b, mJNIEnv, mJThis);
+			
+		case maIOCtl_maWidgetStackScreenPop:
+			SYSLOG("maIOCtl_maWidgetStackScreenPop");
+			return _maWidgetStackScreenPop(a, mJNIEnv, mJThis);
 				
 		case maIOCtl_maNotificationAdd:
 			SYSLOG("maIOCtl_maNotificationAdd");

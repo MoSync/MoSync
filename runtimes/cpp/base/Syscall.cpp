@@ -82,7 +82,7 @@ namespace Base {
 
 #ifdef RESOURCE_MEMORY_LIMIT
 	uint size_RT_FLUX(void* size) {
-		return (int)size;
+		return (uint)(size_t)size;
 	}
 	uint size_RT_PLACEHOLDER(void*) {
 		return 0;
@@ -665,10 +665,11 @@ namespace Base {
 
 #if !defined(_android)
 	int Syscall::maBtGetNewDevice(MABtDevice* dst) {
-		char* vmName = dst->name;
-		dst->name = (char*)GetValidatedMemRange((int)dst->name, dst->nameBufSize);
-		int res = BLUETOOTH(maBtGetNewDevice)(dst);
-		dst->name = vmName;
+		MABtDeviceNative dn;
+		dn.name = (char*)GetValidatedMemRange(dst->name, dst->nameBufSize);
+		int res = BLUETOOTH(maBtGetNewDevice)(&dn);
+		dst->actualNameLength = dn.actualNameLength;
+		dst->address = dn.address;
 		return res;
 	}
 
@@ -677,13 +678,11 @@ namespace Base {
 		int res = BLUETOOTH(maBtGetNextServiceSize)(&ss);
 		if(res <= 0)
 			return res;
-		char* vmName = dst->name;
-		MAUUID* vmUuids = dst->uuids;
-		dst->name = (char*)GetValidatedMemRange((int)dst->name, dst->nameBufSize);
-		dst->uuids = (MAUUID*)GetValidatedMemRange((int)dst->uuids, ss.nUuids * sizeof(MAUUID));
-		res = BLUETOOTH(maBtGetNewService)(dst);
-		dst->name = vmName;
-		dst->uuids = vmUuids;
+		MABtServiceNative sn;
+		sn.name = (char*)GetValidatedMemRange(dst->name, dst->nameBufSize);
+		sn.uuids = (MAUUID*)GetValidatedMemRange(dst->uuids, ss.nUuids * sizeof(MAUUID));
+		res = BLUETOOTH(maBtGetNewService)(&sn);
+		dst->port = sn.port;
 		return res;
 	}
 

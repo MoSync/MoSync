@@ -7,13 +7,24 @@
 #include <string.h>
 #include <malloc.h>
 
+static void install_stdmalloc_hooks();
 int main(int argc, const char** argv);
 extern const char* gArgv[];
 extern const int gArgc;
 
 int MAMain() {
 	printf("MAMain()\n");
+	install_stdmalloc_hooks();
 	return main(gArgc, gArgv);
+}
+
+static void std_malloc_handler(int size) {
+	errno = ENOMEM;
+	lprintfln("malloc failed: %i", size);
+};
+
+static void install_stdmalloc_hooks() {
+	set_malloc_handler(std_malloc_handler);
 }
 
 void error(int __status, int __errnum, __const char* __format, ...)

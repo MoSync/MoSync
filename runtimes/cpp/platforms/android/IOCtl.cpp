@@ -831,6 +831,44 @@ namespace Base
 		return result;
 	}
 
+	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetStackScreenPush", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, stackScreenWidget, newScreen);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+
+	int _maWidgetStackScreenPop(int stackScreenWidget, JNIEnv* jNIEnv, jobject jThis)
+	{	
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetStackScreenPop", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, stackScreenWidget);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+
 	int _maWidgetEvauluateScript(int widget, const char *script,
 								JNIEnv* jNIEnv, jobject jThis)
 	{

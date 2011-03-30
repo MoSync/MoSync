@@ -395,8 +395,8 @@ Value DotNode::evaluate() {
 	if(res.found) {
 		if((res.offsetBits&0x7)!=0)
 			throw ParseException("Doesn't support bitfields just yet...");
-		int addr = (int)sym.address;
-		addr+=res.offsetBits>>3;
+		size_t addr = (size_t)sym.address;
+		addr += res.offsetBits >> 3;
 		//mParser->loadMemory(addr, res.sizeBits>>3);
 
 		SYM stackSym;

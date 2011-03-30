@@ -234,6 +234,8 @@ namespace Base
 								int messageBufferPointer, int bufferSize, 
 								JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetStackScreenPop(int stackScreenWidget, JNIEnv* jNIEnv, jobject jThis);
 	
 	// Open GL API
 	/**

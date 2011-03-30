@@ -118,7 +118,7 @@ protected:
      * @param b     Pointer to the sound buffer to fill
      * @param l     Number of bytes to fill
      */
-    void outputCallback ( void *b , long l );
+    void outputCallback ( void *b, size_t l );
     
 public:
     /**

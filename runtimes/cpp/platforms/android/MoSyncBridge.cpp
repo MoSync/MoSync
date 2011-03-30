@@ -276,8 +276,9 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		// Copy location data. This data starts at array index 1.
 		int size = sizeof(MALocation);
-		event.data = new byte[size];
-		memcpy(event.data, intArray + 1, size);
+		byte* data = new byte[size];
+		memcpy(data, intArray + 1, size);
+		event.data = (int)data;
 	}
 	else if (event.type == EVENT_TYPE_LOCATION_PROVIDER)
 	{
@@ -310,9 +311,12 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * WIDGET_EVENT_CLICKED
 		 * intArray[3] - Can be used to determine a checkbox that was clicked.
 		 *
-		 *
 		 * WIDGET_EVENT_ITEM_CLICKED
 		 * intArray[3] - The index of the list item that was clicked.
+		 *
+		 * WIDGET_EVENT_STACK_SCREEN_POPPED
+		 * intArray[3] - Handle to the screen that was popped.
+		 * intArray[4] - Handle to the screen that we popped to.
 		 */
 
 		int widgetEventType = intArray[1];
@@ -330,8 +334,13 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		{
 			widgetEvent->listItemIndex = intArray[3];
 		}
+		else if(widgetEventType == MAW_EVENT_STACK_SCREEN_POPPED)
+		{
+			widgetEvent->fromScreen = intArray[3];
+			widgetEvent->toScreen = intArray[4];
+		}
 
-		event.data = widgetEvent;
+		event.data = (int)widgetEvent;
 	}
 	
 	// Release the memory used for the int array.

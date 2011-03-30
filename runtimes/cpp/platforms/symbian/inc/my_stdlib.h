@@ -18,6 +18,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stddef.h>
 #include <string.h>
 
+#include <helpers/types.h>
+typedef u32 uint32_t;
+typedef s32 int32_t;
+
 extern "C" {
 //#ifndef _STRING_H_
 //const char* strrchr(const char* str, int c);

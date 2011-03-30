@@ -394,7 +394,7 @@ int Syscall::SBTmaBtCancelDiscovery() {
 	return 1;
 }
 
-int Syscall::SBTmaBtGetNewDevice(MABtDevice* dst) {
+int Syscall::SBTmaBtGetNewDevice(MABtDeviceNative* dst) {
 	if(gBtNextDevice >= gBtDeviceArray.Count())
 		return 0;
 
@@ -442,7 +442,7 @@ void Syscall::SBTmaBtStartServiceDiscovery(const MABtAddr* address, const MAUUID
 };
 
 //returns >0 on success.
-int Syscall::SBTmaBtGetNewService(MABtService* dst) {
+int Syscall::SBTmaBtGetNewService(MABtServiceNative* dst) {
 	if(gBtNextService == gBtServiceArray.Count()) {
 		return 0;
 	}

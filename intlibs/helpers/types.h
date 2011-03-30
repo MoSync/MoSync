@@ -34,13 +34,18 @@ typedef signed char s8;
 
 #ifdef _MSC_VER
 # define PFZT "Iu"
+# define PFSZT "Ii"
+typedef long int ssize_t;
 #elif defined(SYMBIAN)
 # define PFZT "u"
+# define PFSZT "i"
 #elif defined(__GNUC__)
 # if (__GNUC__ == 4) && defined(WIN32)
 #  define PFZT "u"
+#  define PFSZT "li"
 # else
 #  define PFZT "zu"
+#  define PFSZT "zi"
 # endif	//WIN32
 #else
 # error Unsupported compiler!

@@ -33,7 +33,7 @@
 	eventData->eventType = MAW_EVENT_ITEM_CLICKED;
 	eventData->widgetHandle = handle;
 	eventData->listItemIndex = index;
-	event.data = eventData;
+	event.data = (int)eventData;
 	Base::gEventQueue.put(event);	
 }
 
