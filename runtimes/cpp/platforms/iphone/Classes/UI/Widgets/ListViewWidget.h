@@ -17,14 +17,16 @@
 
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
-#import "MoSyncTableView.h"
+//#import "MoSyncTableView.h"
 
-@interface ListViewWidget : IWidget <UITableViewDelegate> {
-	MoSyncTableView* tableView;
+@interface ListViewWidget : IWidget <UITableViewDelegate, UITableViewDataSource> {
+	UITableViewController* tableViewController;
+	NSMutableArray* mDataForMyTable;	
 }
 
 - (id)init;
 - (void)addChild: (IWidget*)child;
+- (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview;
 - (void)removeChild: (IWidget*)child;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;

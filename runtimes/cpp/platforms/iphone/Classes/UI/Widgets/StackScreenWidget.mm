@@ -29,18 +29,19 @@
 
 @implementation UINavigationController (UINavigationController_Expanded)
 
-- (UIViewController *)popViewControllerAnimated:(BOOL)animated{
-	NSLog(@"UINavigationController(Magic)");
-	if ([self.delegate respondsToSelector:@selector(viewControllerWillBePoped)]) {
-		[self.delegate performSelector:@selector(viewControllerWillBePoped)];
-	}
-
+- (UIViewController *)popViewControllerAnimated:(BOOL)animated{	
 	NSArray *vcs = self.viewControllers;
 	int count = [vcs count];
 	UIViewController *newViewController = count>=2?[vcs objectAtIndex:count-2]:nil;
 	UIViewController *oldViewController = count>=1?[vcs objectAtIndex:count-1]:nil;	
-	if(newViewController && oldViewController)
+	if(newViewController && oldViewController) {
+		
+		if ([self.delegate respondsToSelector:@selector(viewControllerWillBePoped)]) {
+			[self.delegate performSelector:@selector(viewControllerWillBePoped)];
+		}
+		
 		[self popToViewController:newViewController animated:YES];
+	}
 	return oldViewController;
 }
 

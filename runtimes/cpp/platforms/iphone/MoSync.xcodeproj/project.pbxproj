@@ -56,7 +56,6 @@
 		85A1592112F80E520044BBE1 /* License.txt in Resources */ = {isa = PBXBuildFile; fileRef = 85A158EA12F80E520044BBE1 /* License.txt */; };
 		85A1592212F80E520044BBE1 /* Readme.txt in Resources */ = {isa = PBXBuildFile; fileRef = 85A158EB12F80E520044BBE1 /* Readme.txt */; };
 		85A1592312F80E520044BBE1 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158ED12F80E520044BBE1 /* VLayoutView.m */; };
-		85A1592412F80E520044BBE1 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158EF12F80E520044BBE1 /* MoSyncTableView.m */; };
 		85A1592612F80E520044BBE1 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F312F80E520044BBE1 /* MoSyncUI.mm */; };
 		85A1592712F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */; };
 		85A1592812F80E520044BBE1 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F712F80E520044BBE1 /* ScreenWidgetController.m */; };
@@ -83,8 +82,6 @@
 		85A1594012F80E520044BBE1 /* LayoutManagers.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158E912F80E520044BBE1 /* LayoutManagers.h */; };
 		85A1594112F80E520044BBE1 /* VLayoutView.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158EC12F80E520044BBE1 /* VLayoutView.h */; };
 		85A1594212F80E520044BBE1 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158ED12F80E520044BBE1 /* VLayoutView.m */; };
-		85A1594312F80E520044BBE1 /* MoSyncTableView.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158EE12F80E520044BBE1 /* MoSyncTableView.h */; };
-		85A1594412F80E520044BBE1 /* MoSyncTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158EF12F80E520044BBE1 /* MoSyncTableView.m */; };
 		85A1594712F80E520044BBE1 /* MoSyncUI.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F212F80E520044BBE1 /* MoSyncUI.h */; };
 		85A1594812F80E520044BBE1 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F312F80E520044BBE1 /* MoSyncUI.mm */; };
 		85A1594912F80E520044BBE1 /* MoSyncUISyscalls.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */; };
@@ -252,8 +249,6 @@
 		85A158EB12F80E520044BBE1 /* Readme.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = Readme.txt; sourceTree = "<group>"; };
 		85A158EC12F80E520044BBE1 /* VLayoutView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLayoutView.h; sourceTree = "<group>"; };
 		85A158ED12F80E520044BBE1 /* VLayoutView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLayoutView.m; sourceTree = "<group>"; };
-		85A158EE12F80E520044BBE1 /* MoSyncTableView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncTableView.h; sourceTree = "<group>"; };
-		85A158EF12F80E520044BBE1 /* MoSyncTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MoSyncTableView.m; sourceTree = "<group>"; };
 		85A158F212F80E520044BBE1 /* MoSyncUI.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUI.h; sourceTree = "<group>"; };
 		85A158F312F80E520044BBE1 /* MoSyncUI.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUI.mm; sourceTree = "<group>"; };
 		85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUISyscalls.h; sourceTree = "<group>"; };
@@ -541,8 +536,6 @@
 			isa = PBXGroup;
 			children = (
 				8500CD3E132E506D0003A01E /* External */,
-				85A158EE12F80E520044BBE1 /* MoSyncTableView.h */,
-				85A158EF12F80E520044BBE1 /* MoSyncTableView.m */,
 				85A158F212F80E520044BBE1 /* MoSyncUI.h */,
 				85A158F312F80E520044BBE1 /* MoSyncUI.mm */,
 				85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */,
@@ -768,7 +761,6 @@
 				85A1593E12F80E520044BBE1 /* HLayoutView.h in Headers */,
 				85A1594012F80E520044BBE1 /* LayoutManagers.h in Headers */,
 				85A1594112F80E520044BBE1 /* VLayoutView.h in Headers */,
-				85A1594312F80E520044BBE1 /* MoSyncTableView.h in Headers */,
 				85A1594712F80E520044BBE1 /* MoSyncUI.h in Headers */,
 				85A1594912F80E520044BBE1 /* MoSyncUISyscalls.h in Headers */,
 				85A1594B12F80E520044BBE1 /* ScreenWidgetController.h in Headers */,
@@ -942,7 +934,6 @@
 				85A1591F12F80E520044BBE1 /* AbstractLayoutView.m in Sources */,
 				85A1592012F80E520044BBE1 /* HLayoutView.m in Sources */,
 				85A1592312F80E520044BBE1 /* VLayoutView.m in Sources */,
-				85A1592412F80E520044BBE1 /* MoSyncTableView.m in Sources */,
 				85A1592612F80E520044BBE1 /* MoSyncUI.mm in Sources */,
 				85A1592712F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */,
 				85A1592812F80E520044BBE1 /* ScreenWidgetController.m in Sources */,
@@ -1006,7 +997,6 @@
 				85A1593D12F80E520044BBE1 /* AbstractLayoutView.m in Sources */,
 				85A1593F12F80E520044BBE1 /* HLayoutView.m in Sources */,
 				85A1594212F80E520044BBE1 /* VLayoutView.m in Sources */,
-				85A1594412F80E520044BBE1 /* MoSyncTableView.m in Sources */,
 				85A1594812F80E520044BBE1 /* MoSyncUI.mm in Sources */,
 				85A1594A12F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */,
 				85A1594C12F80E520044BBE1 /* ScreenWidgetController.m in Sources */,
