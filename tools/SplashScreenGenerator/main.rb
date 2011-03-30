@@ -45,14 +45,16 @@ PLATFORMS = [
 	'Windows Smartphone 2003'
 ]
 
-if ARGV.length() == 3
+if ARGV.length() == 4
 	version[0] = ARGV[0] # MoSync SDK name
-	version[1] = ARGV[1] # git mosync hash
-	version[2] = ARGV[2] # git eclipse hash 
+	version[1] = ARGV[1] # MoSync SDK date
+	version[2] = ARGV[2] # git mosync hash
+	version[3] = ARGV[3] # git eclipse hash
 elsif ARGV.length() > 0
 	version[0] = ARGV[0] # MoSync SDK name
-	version[1] = ""
+	version[1] = ARGV[1] # MoSync SDK date
 	version[2] = ""
+	version[3] = ""
 else
 	raise "Splash Screen Generator error - no arguments provided"
 end
@@ -76,6 +78,8 @@ end
 
 puts "Injecting string to images : Version #{version[0].strip}"
 
+# Eclipse Splash
+
 header.annotate(img, 271, 340, 275, 130, "#{version[0].strip}" ) do
 	self.font = 'Verdana'
 	self.pointsize = 14
@@ -84,7 +88,7 @@ header.annotate(img, 271, 340, 275, 130, "#{version[0].strip}" ) do
 	self.gravity = Magick::NorthWestGravity
 end
 
-header.annotate(img, 271, 340, 20, 314, "MoSync #{version[1].strip}" ) do
+header.annotate(img, 271, 340, 20, 314, "MoSync #{version[2].strip}" ) do
 	self.font = 'Verdana'
 	self.pointsize = 10
 	self.font_weight = Magick::LighterWeight
@@ -92,13 +96,24 @@ header.annotate(img, 271, 340, 20, 314, "MoSync #{version[1].strip}" ) do
 	self.gravity = Magick::NorthWestGravity
 end
 
-header.annotate(img, 271, 340, 20, 326, "Eclipse #{version[2].strip}" ) do
+header.annotate(img, 271, 340, 20, 326, "Eclipse #{version[3].strip}" ) do
 	self.font = 'Verdana'
 	self.pointsize = 10
 	self.font_weight = Magick::LighterWeight
 	self.fill = '#b0b0b0'
 	self.gravity = Magick::NorthWestGravity
 end
+
+header.annotate(img, 271, 340, 495, 326, "#{version[1].strip}" ) do
+	self.font = 'Verdana'
+	self.pointsize = 10
+	self.font_weight = Magick::LighterWeight
+	self.fill = '#b0b0b0'
+	self.gravity = Magick::NorthWestGravity
+end
+
+
+# Installer Splash
 
 header.annotate(img2, 271, 340, 80, 230, "#{version[0].strip}" ) do
 	self.font = 'Verdana'
@@ -108,7 +123,7 @@ header.annotate(img2, 271, 340, 80, 230, "#{version[0].strip}" ) do
 	self.gravity = Magick::NorthWestGravity
 end
 
-header.annotate(img2, 271, 340, 80, 250, "MoSync #{version[1].strip}" ) do
+header.annotate(img2, 271, 340, 80, 245, "MoSync #{version[2].strip}" ) do
 	self.font = 'Verdana'
 	self.pointsize = 10
 	self.font_weight = Magick::LighterWeight
@@ -116,7 +131,15 @@ header.annotate(img2, 271, 340, 80, 250, "MoSync #{version[1].strip}" ) do
 	self.gravity = Magick::NorthWestGravity
 end
 
-header.annotate(img2, 271, 340, 80, 262, "Eclipse #{version[2].strip}" ) do
+header.annotate(img2, 271, 340, 80, 257, "Eclipse #{version[3].strip}" ) do
+	self.font = 'Verdana'
+	self.pointsize = 10
+	self.font_weight = Magick::LighterWeight
+	self.fill = '#b0b0b0'
+	self.gravity = Magick::NorthWestGravity
+end
+
+header.annotate(img2, 271, 340, 80, 269, "#{version[1].strip}" ) do
 	self.font = 'Verdana'
 	self.pointsize = 10
 	self.font_weight = Magick::LighterWeight
