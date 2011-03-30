@@ -79,6 +79,12 @@
 	[view reloadData];
 }
 
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview {
+	int ret = [super insertChild:child atIndex:index toSubview:addSubview];
+	[view reloadData];
+	return ret;
+}
+
 - (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview {
 	[super removeChild:child fromSuperview:removeFromSuperview];
 	[view reloadData];
