@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /** 
 * \file MapViewport.h
 * \brief Viewport displaying a slippy map
-* \author Lars-Åke Vinberg
+* \author Lars-ï¿½ke Vinberg
 */
 
 #ifndef MAPVIEWPORT_H_
@@ -31,10 +31,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapCache.h"
 #include "Broadcaster.h"
 
-using namespace MAUI;
+
 
 namespace MAP
 {
+	using namespace MAUI;
+	
 	class MapTile;
 	class MapSource;
 	class MapCache;
