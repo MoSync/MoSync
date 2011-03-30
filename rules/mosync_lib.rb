@@ -81,9 +81,9 @@ class PipeLibWork < PipeGccWork
 		copyHeaders
 		super
 	end
-	def setup3(all_objects)
+	def setup3(all_objects, have_cppfiles)
 		@TARGET_PATH = "#{mosync_libdir}/#{@BUILDDIR_NAME}/#{@NAME}.lib"
-		super(all_objects)
+		super(all_objects, have_cppfiles)
 		if(!USE_NEWLIB)	# rake support
 			d = (CONFIG == "debug") ? 'D' : ''
 			dir = "#{mosync_libdir}/pipe/"
