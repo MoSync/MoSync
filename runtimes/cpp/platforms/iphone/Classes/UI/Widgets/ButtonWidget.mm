@@ -30,7 +30,10 @@
 	UIButton* button = (UIButton*) view;
 	button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
 	[button addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
-	
+	image = nil;
+	leftCapWidth = 0;
+	topCapHeight = 0;	
+	button.titleLabel.numberOfLines = 0;
 	return [super init];
 }
 
@@ -65,9 +68,31 @@
 		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		UIButton* button = (UIButton*) view;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
-		UIImage* image = [UIImage imageWithCGImage:imageResource->image];
+		image = [UIImage imageWithCGImage:imageResource->image];
 		[button setBackgroundImage:image forState:UIControlStateNormal];
-	} else {
+	} 
+	else if([key isEqualToString:@"leftCapWidth"]) {
+		int newLeftCapWidth = [value intValue];
+		if(image != nil) {
+			UIButton* button = (UIButton*) view;
+			UIImage* newImage = [image stretchableImageWithLeftCapWidth:newLeftCapWidth topCapHeight:topCapHeight];
+			[button setBackgroundImage:newImage forState:UIControlStateNormal];
+			image = newImage;			
+		}
+		leftCapWidth = newLeftCapWidth;
+	}
+	else if ([key isEqualToString:@"topCapHeight"]) {
+		int newTopCapHeight = [value intValue];
+		if(image != nil) {
+			UIButton* button = (UIButton*) view;
+			UIImage* newImage = [image stretchableImageWithLeftCapWidth:leftCapWidth topCapHeight:newTopCapHeight];
+			[button setBackgroundImage:newImage forState:UIControlStateNormal];
+			image = newImage;
+		}
+		topCapHeight = newTopCapHeight;
+	}	
+	
+	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;	

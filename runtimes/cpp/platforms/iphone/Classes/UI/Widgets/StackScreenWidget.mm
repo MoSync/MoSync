@@ -34,10 +34,14 @@
 	if ([self.delegate respondsToSelector:@selector(viewControllerWillBePoped)]) {
 		[self.delegate performSelector:@selector(viewControllerWillBePoped)];
 	}
+
 	NSArray *vcs = self.viewControllers;
-	UIViewController *vcc = [vcs objectAtIndex:[vcs count] - 2];
-	[self popToViewController:vcc animated:YES];
-	return vcc;
+	int count = [vcs count];
+	UIViewController *newViewController = count>=2?[vcs objectAtIndex:count-2]:nil;
+	UIViewController *oldViewController = count>=1?[vcs objectAtIndex:count-1]:nil;	
+	if(newViewController && oldViewController)
+		[self popToViewController:newViewController animated:YES];
+	return oldViewController;
 }
 
 @end
