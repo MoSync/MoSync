@@ -25,7 +25,7 @@
 }
 
 - (id)init;
-- (void)addChild: (IWidget*)child;
+- (void)addChild: (IWidget*)child toSubview:(bool)toSubview;
 - (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview;
 - (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;

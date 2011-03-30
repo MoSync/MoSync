@@ -68,7 +68,7 @@
 	return obj;
 }
 
-- (void)addChild: (IWidget*)child {
+- (void)addChild: (IWidget*)child toSubview:(bool)toSubview {
 	if([child class] != [ListViewItemWidget class]) {
 		ListViewItemWidget* lvcw = [[ListViewItemWidget alloc] init];
 		[lvcw addChild:child];
@@ -80,7 +80,13 @@
 }
 
 - (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview {
-	int ret = [super insertChild:child atIndex:index toSubview:addSubview];
+	if([child class] != [ListViewItemWidget class]) {
+		ListViewItemWidget* lvcw = [[ListViewItemWidget alloc] init];
+		[lvcw addChild:child];
+		child = lvcw;
+	}
+	
+	int ret = [super insertChild:child atIndex:index toSubview:NO];
 	[view reloadData];
 	return ret;
 }
