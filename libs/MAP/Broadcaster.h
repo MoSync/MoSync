@@ -26,10 +26,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUtil/Vector.h>
 
-using namespace MAUtil;
+
 
 namespace MAPUtil
 {
+
+	using namespace MAUtil;
+
 	//=========================================================================
 	/**
 	 * \brief This template class enables typed notification broadcasting to multiple

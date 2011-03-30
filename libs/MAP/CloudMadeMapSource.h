@@ -26,10 +26,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "MapSource.h"
 
-using namespace MAUtil;
+
 
 namespace MAP
 {
+	using namespace MAUtil;
+
 	class MapTile;
 	class MapSourceListener;
 	class MapSourceImageDownloader;
