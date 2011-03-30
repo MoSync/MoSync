@@ -88,8 +88,7 @@ typedef enum VerticalAlignment {
 	UILabel* label = [[[UILabelWithVerticalAlignment alloc] initWithFrame:CGRectMake(0, 0, 200, 60)] retain];
 	label.opaque = NO;
 	view = label;
-	label.numberOfLines = 0;
-	
+	//label.numberOfLines = 0;
 	id ret = [super init];	
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
 	return ret;

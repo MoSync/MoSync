@@ -23,6 +23,27 @@
 
 @implementation ListViewWidget
 
+- (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
+{
+	return [children count];
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+	NSUInteger row = [indexPath row];
+	IWidget* widget = [children objectAtIndex:row];
+	UITableViewCell* cell = (UITableViewCell*)[widget getView];	
+	[cell setFrame:CGRectMake(cell.frame.origin.x, cell.frame.origin.y, cell.frame.size.width,  tableView.rowHeight)];
+	return cell;
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
+	NSUInteger row = [indexPath row];
+	IWidget* widget = [children objectAtIndex:row];
+	UITableViewCell* cell = (UITableViewCell*)[widget getView];//[mDataForMyTable objectAtIndex:row];
+	return tableView.rowHeight;
+}
+
 - (void)tableView:(UITableView*)tableView didSelectRowAtIndexPath:(NSIndexPath*)indexPath {
 	NSInteger index = [indexPath row];
 	
@@ -38,25 +59,40 @@
 }
 
 - (id)init {
-	tableView = [[MoSyncTableView alloc] init];
-	view = tableView.tableView;	
-	
-//	[view addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
-	tableView.tableView.delegate = self;
+	tableViewController = [[UITableViewController alloc] init];
+	view = tableViewController.tableView;		
+	tableViewController.tableView.delegate = self;
+	tableViewController.tableView.dataSource = self;
 	id obj = [super init];		
 	
 	return obj;
 }
 
-- (void)addChild: (IWidget*)child {
+- (void)addChild: (IWidget*)child toSubview:(bool)toSubview {
 	if([child class] != [ListViewItemWidget class]) {
 		ListViewItemWidget* lvcw = [[ListViewItemWidget alloc] init];
 		[lvcw addChild:child];
 		child = lvcw;
 	}
 	
-	[tableView addView: [child getView]];
 	[super addChild:child toSubview:NO];
+	[view reloadData];
+}
+
+- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview {
+	if([child class] != [ListViewItemWidget class]) {
+		ListViewItemWidget* lvcw = [[ListViewItemWidget alloc] init];
+		[lvcw addChild:child];
+		child = lvcw;
+	}
+	
+	int ret = [super insertChild:child atIndex:index toSubview:NO];
+	[view reloadData];
+	return ret;
+}
+
+- (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview {
+	[super removeChild:child fromSuperview:removeFromSuperview];
 	[view reloadData];
 }
 
