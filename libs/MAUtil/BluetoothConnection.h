@@ -29,7 +29,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace MAUtil {
 
 	/**
-	* \brief Can connect to a Bluetooth service by UUID.
+	* \brief Connect to a Bluetooth service by UUID.
 	* Works mostly like a Connection, except the connect() method is different.
 	*
 	* This class wraps the special behaviour of the Android platform, which
@@ -49,8 +49,11 @@ namespace MAUtil {
 		*/
 		virtual ~BluetoothConnection();
 
-		/*
+		/**
 		* Asynchronously opens a connection using a Bluetooth address and UUID.
+		* 
+		* Note: there is a simpler connect method that takes just a 
+		* URL: connect(const char* url)
 		*
 		* Service discovery is performed. If a service is found, a connection
 		* is opened.
@@ -75,8 +78,8 @@ namespace MAUtil {
 		int connect(const MABtAddr& address, const MAUUID& uuid);
 
 		/**
-		* Asynchronously opens a connection using a URL that specifies
-		* a Bluetooth address and a UUID.
+		* This is a simpler connect method that asynchronously opens a connection
+		* using a URL that contains a Bluetooth address and a service UUID. 
 		*
 		* Service discovery is performed. If a service is found, a connection
 		* is opened.
