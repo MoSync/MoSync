@@ -207,6 +207,10 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;
 		[alv setSpacing:[value intValue]];
 	}
+	else if([key isEqualToString:@"isScrollable"]) {
+		AbstractLayoutView* alv = (AbstractLayoutView*)view;
+		alv.scrollEnabled = [value boolValue];
+	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

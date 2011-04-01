@@ -3403,6 +3403,10 @@ group WidgetAPI "Widget API" {
 		TEXT = "text";
 		PLACEHOLDER = "placeholder";
 		SHOW_KEYBOARD = "showKeyboard";
+		/**
+		* @brief Specifies what editing mode the edit box should have. Can be either 'password' or 'text'.
+		*/
+		EDIT_MODE = "editMode";
 	}
 	} // end of WidgetEditBoxProperties
 	

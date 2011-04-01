@@ -93,6 +93,15 @@
 		float fontSize = [value floatValue];
 		textField.font = [UIFont boldSystemFontOfSize:fontSize];
 	}
+	else if([key isEqualToString:@"editMode"]) {
+		
+		if(
+		   [value isEqualToString:@"password"])
+		   textField.secureTextEntry = YES;
+		else 
+		   textField.secureTextEntry = NO;
+		
+	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
