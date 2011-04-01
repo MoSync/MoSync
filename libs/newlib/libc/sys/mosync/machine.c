@@ -149,9 +149,9 @@ static void initFda(void) {
 
 	memset(sFda, 0, sizeof(sFda));
 	memset(sLfda, 0, sizeof(sLfda));
-	sFda[1] = &sLfConsole;
-	sFda[2] = &sLfConsole;
-	sFda[3] = &sLfConsole;
+	sFda[0] = &sLfConsole;	// stdin
+	sFda[1] = &sLfConsole;	// stdout
+	sFda[2] = &sLfConsole;	// stderr
 	sLfConsole.refCount = 3;
 }
 

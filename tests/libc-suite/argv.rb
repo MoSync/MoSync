@@ -5,6 +5,9 @@ SPECIFIC_ARGV = {
 	'tst_wprintf2.c' => ['Some Text'],
 	'tstgetopt.c' => ['-a', '-b', '-cfoobar', '--required', 'foobar', '--optional=bazbug',
 		'--none', 'random', '--colou', '--color', '--colour'],
+	'tst-rxspencer.c' => ['--utf8', 'rxspencer/tests'],
+	'tst-pcre.c' => ['PCRE.tests'],
+	'tst-boost.c' => ['BOOST.tests'],
 }
 
 SPECIFIC_FILES = {

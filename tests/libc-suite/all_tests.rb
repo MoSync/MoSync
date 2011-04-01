@@ -27,7 +27,9 @@ PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_debug/newlib.lib"
 FileUtils.mkdir_p(BUILD_DIR)
 FileUtils.rm_rf('filesystem')
 FileUtils.mkdir_p('filesystem/tmp')
-
+FileUtils.cp_r("#{SETTINGS[:source_path]}posix/rxspencer", 'filesystem')
+FileUtils.cp("#{SETTINGS[:source_path]}posix/PCRE.tests", 'filesystem')
+FileUtils.cp("#{SETTINGS[:source_path]}posix/BOOST.tests", 'filesystem')
 
 def writeArgvFile(filename, argv)
 	file = open(filename, 'w')
