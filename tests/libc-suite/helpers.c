@@ -2,6 +2,8 @@
 #include "error.h"
 #include "mavsprintf.h"
 #include "maassert.h"
+#include <mastdlib.h>
+#include <unistd.h>
 #include <errno.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +15,12 @@ extern const char* gArgv[];
 extern const int gArgc;
 
 int MAMain() {
+	// switch stdout from console to maWriteLog.
+	int wlfd = open_maWriteLog();
+	dup2(wlfd, 1);
+	dup2(wlfd, 2);
+	close(wlfd);
+
 	printf("MAMain()\n");
 	install_stdmalloc_hooks();
 	return main(gArgc, gArgv);
@@ -60,7 +68,7 @@ const char* strsignal(int __signo) {
 	return NULL;
 }
 
-void sleep(int s) {
+unsigned sleep(unsigned s) {
 	lprintfln("sleep(%i)", s);
 	const int start = maGetMilliSecondCount();
 	const int end = start + s * 1000;
@@ -78,6 +86,7 @@ void sleep(int s) {
 		}
 		maWait(left);
 	} while(1);
+	return 0;
 }
 
 FILE *popen(const char *s, const char * mode) {

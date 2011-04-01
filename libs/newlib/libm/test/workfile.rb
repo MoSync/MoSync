@@ -12,6 +12,7 @@ work.instance_eval do
 		' -Wno-missing-declarations -Wno-strict-prototypes -Wno-old-style-definition -Wno-missing-prototypes'+
 		' -Wno-error -Wno-cast-qual'
 	@EXTRA_LINKFLAGS = ' -datasize=2000000'
+	@EXTRA_EMUFLAGS = ' -allowdivzero'
 	@NAME = 'newlibm-test'
 end
 

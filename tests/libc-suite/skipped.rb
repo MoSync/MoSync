@@ -26,6 +26,8 @@ SKIPPED_DIRECTORIES = [
 # These are tests that should pass, but don't, and could not be fixed.
 SKIPPED_UNRESOLVED = [
 	'bug-ungetc2.c',
+	'test-double.c',
+	'test-float.c',
 ]
 
 SKIPPED_FILES = SKIPPED_UNRESOLVED + [
@@ -191,16 +193,16 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'bug-nextafter.c',
 	'bug-nexttoward.c',
 	
-	# glibc math tests are too strict for us. we can use the newlib tests instead.
-	'test-double.c',
+	# some of the glibc math types are unsupported.
 	'test-fenv.c',
-	'test-float.c',
 	'test-fpucw.c',
 	'test-idouble.c',
 	'test-ifloat.c',
 	'test-ildouble.c',
 	'test-ldouble.c',
-	'test-matherr.c',
+	#'test-matherr.c',
+	
+	'tst-error1.c',	# requires complex arguments and input files.
 ]
 
 SKIPPED_PATTERNS = [
