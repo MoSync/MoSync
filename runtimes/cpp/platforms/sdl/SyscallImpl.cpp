@@ -326,7 +326,7 @@ namespace Base {
 #ifdef EMULATOR
 	static Uint32 GCCATTRIB(noreturn) SDLCALL TimeoutCallback(Uint32 interval, void*) {
 		LOG("TimeoutCallback %i\n", interval);
-		exit(2);
+		MoSyncErrorExit(2);
 	}
 #endif
 
