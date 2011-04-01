@@ -5,7 +5,11 @@
 3dlines = 3dLines
 AdvGraphics
 debugging
+HelloLayerMap
+HelloMAUI
 HelloMap
+HelloNativeUI
+HelloOpenGLES
 Location = location
 MapDemo
 MAStx
@@ -18,6 +22,7 @@ simple = Moblet/simple
 Soap = Moblet/Soap
 Stylus = Moblet/Stylus
 timers = Moblet/timers
+MultiTouchExample = Moblet/MultiTouchExample
 MoSketch
 MoSound
 MoTooth = Moblet/MoTooth
