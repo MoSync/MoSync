@@ -119,16 +119,16 @@ void printPrimitiveByFormat(printfPtr pf, const void* data, const char* decimalF
 	} else if(fmt == TypeBase::eDecimal) {
 		pf(decimalFmt, t);
 	} else if(fmt == TypeBase::eOctal) {
-		pf("%"PFZT"o", (size_t)t);
+		pf("%"PFZT_PREFIX"o", (size_t)t);
 	} else if(fmt == TypeBase::eHexadecimal) {
-		pf("0x%"PFZT"x", (size_t)t);
+		pf("0x%"PFZT_PREFIX"x", (size_t)t);
 	} else if(fmt == TypeBase::eBinary) {
 		u64 tt = (u64)(size_t)t;
 		int numBits = (int)(sizeof(T)<<3)-1;
 		while(numBits>0 && !(tt&((u64)1<<numBits))) numBits--;
 		while(numBits>=0) {
-				pf((tt&((u64)1<<numBits))?"1":"0");
-				numBits--;
+			pf((tt&((u64)1<<numBits))?"1":"0");
+			numBits--;
 		}
 	}
 }

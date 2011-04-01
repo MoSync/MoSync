@@ -33,23 +33,27 @@ typedef signed short s16;
 typedef signed char s8;
 
 #ifdef _MSC_VER
-# define PFZT "Iu"
-# define PFSZT "Ii"
+# define PFZT_PREFIX "I"
 typedef long int ssize_t;
 #elif defined(SYMBIAN)
-# define PFZT "u"
-# define PFSZT "i"
+# define PFZT_PREFIX ""
 #elif defined(__GNUC__)
 # if (__GNUC__ == 4) && defined(WIN32)
-#  define PFZT "u"
-#  define PFSZT "li"
+#  define PFZT_PREFIX ""
 # else
-#  define PFZT "zu"
-#  define PFSZT "zi"
+#  define PFZT_PREFIX "z"
 # endif	//WIN32
 #else
 # error Unsupported compiler!
 #endif
+
+#define PFZT PFZT_PREFIX "u"
+#if defined(__GNUC__) && (__GNUC__ == 4) && defined(WIN32)
+# define PFSZT "li"
+#else
+# define PFSZT PFZT_PREFIX "i"
+#endif
+#define PFXZT PFZT_PREFIX "x"
 
 #ifdef SYMBIAN
 # define PFP "08x"
