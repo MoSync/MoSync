@@ -35,7 +35,7 @@ def writeArgvFile(filename, argv)
 	argv.each do |arg|
 		file.write("\"#{arg}\",")
 	end
-	file.write("};\n")
+	file.write(" 0 };\n")
 	file.write("const int gArgc = #{argv.size + 1};\n")
 	file.close
 end
