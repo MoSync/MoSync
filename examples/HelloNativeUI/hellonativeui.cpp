@@ -23,7 +23,7 @@ along with this program.  If not, write to the Free Software Foundation,
 * entry box and some control buttons.
 *
 * NOTE: this example application has the same functionality as our example
-* application "HelloNativeUI". Compare the two examples to see how we do the same
+* application "HelloMAUI". Compare the two examples to see how we do the same
 * things in MAUI and in Native UI.
 *
 * @author Mattias Frånberg & Chris Hughes
@@ -50,11 +50,11 @@ public:
 		MAUtil::Environment::getEnvironment().addCustomEventListener(this);
 
 		//Create a Native UI screen using the IOCTL function maWidgetCreate.
-		mScreen = maWidgetCreate("Screen");
+		mScreen = maWidgetCreate(MAW_SCREEN);
 
 		//Create the screen's main layout widget. As it is a member variable
 		//we give its name an "m" prefix.
-		mMainLayoutWidget = maWidgetCreate("VerticalLayout");
+		mMainLayoutWidget = maWidgetCreate(MAW_VERTICAL_LAYOUT);
 
 		//Identify the main layout widget as root of the screen's widget tree.
 		maWidgetAddChild(mScreen, mMainLayoutWidget);
@@ -64,37 +64,37 @@ public:
 		//The first widget is a label that we'll use to present instructions.
 		//We set its width and height, and we initialize it with some text.
 		//Finally we locate it inside the screen widget.
-		mInstructions = maWidgetCreate("Label");
-		maWidgetSetProperty(mInstructions, "width", "150");
-		maWidgetSetProperty(mInstructions, "height", "60");
-		maWidgetSetProperty(mInstructions, "text", "Enter a password:");
+		mInstructions = maWidgetCreate(MAW_LABEL);
+		maWidgetSetProperty(mInstructions, MAW_WIDGET_WIDTH, "150");
+		maWidgetSetProperty(mInstructions, MAW_WIDGET_HEIGHT, "60");
+		maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, "Enter a password:");
 		maWidgetAddChild(mMainLayoutWidget, mInstructions);
 
 		//The second widget is an edit box that we'll use to capture text. We use
 		//password mode to hide text after entry. We locate the password box
 		//inside the screen widget. It will appear after the instructions widget.
-		mPasswordBox = maWidgetCreate("EditBox");
-		maWidgetSetProperty(mPasswordBox, "width", "150");
-		maWidgetSetProperty(mPasswordBox, "height", "30");
+		mPasswordBox = maWidgetCreate(MAW_EDIT_BOX);
+		maWidgetSetProperty(mPasswordBox, MAW_WIDGET_WIDTH, "150");
+		maWidgetSetProperty(mPasswordBox, MAW_WIDGET_HEIGHT, "30");
 		maWidgetSetProperty(mPasswordBox, "editMode", "password");
 		maWidgetAddChild(mMainLayoutWidget, mPasswordBox);
 
 		//The third and fourth widgets are labels that we will use as buttons.
 		//We centre the text vertically and horizontally within the buttons.
-		mClearButton = maWidgetCreate("Button");
-		maWidgetSetProperty(mClearButton, "width", "150");
-		maWidgetSetProperty(mClearButton, "height", "30");
-		maWidgetSetProperty(mClearButton, "textVerticalAlignment", "center");
-		maWidgetSetProperty(mClearButton, "textHorizontalAlignment", "center");
-		maWidgetSetProperty(mClearButton, "text", "Clear");
+		mClearButton = maWidgetCreate(MAW_BUTTON);
+		maWidgetSetProperty(mClearButton, MAW_WIDGET_WIDTH, "150");
+		maWidgetSetProperty(mClearButton, MAW_WIDGET_HEIGHT, "30");
+		maWidgetSetProperty(mClearButton, MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT, "center");
+		maWidgetSetProperty(mClearButton, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, "center");
+		maWidgetSetProperty(mClearButton, MAW_BUTTON_TEXT, "Clear");
 		maWidgetAddChild(mMainLayoutWidget, mClearButton);
 
-		mSubmitButton = maWidgetCreate("Button");
-		maWidgetSetProperty(mSubmitButton, "width", "150");
-		maWidgetSetProperty(mSubmitButton, "height", "30");
-		maWidgetSetProperty(mSubmitButton, "textVerticalAlignment", "center");
-		maWidgetSetProperty(mSubmitButton, "textHorizontalAlignment", "center");
-		maWidgetSetProperty(mSubmitButton, "text", "Submit");
+		mSubmitButton = maWidgetCreate(MAW_BUTTON);
+		maWidgetSetProperty(mSubmitButton, MAW_WIDGET_WIDTH, "150");
+		maWidgetSetProperty(mSubmitButton, MAW_WIDGET_HEIGHT, "30");
+		maWidgetSetProperty(mSubmitButton, MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT, "center");
+		maWidgetSetProperty(mSubmitButton, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, "center");
+		maWidgetSetProperty(mSubmitButton, MAW_BUTTON_TEXT, "Submit");
 		maWidgetAddChild(mMainLayoutWidget, mSubmitButton);
 
 	//That's the constructor finished.
@@ -114,7 +114,7 @@ public:
 		if(widgetHandle == mClearButton)
 		{
 			//...clear the edit box.
-			maWidgetSetProperty(mPasswordBox, "text", "");
+			maWidgetSetProperty(mPasswordBox, MAW_EDIT_BOX_TEXT, "");
 		}
 		//If the submit button was clicked...
 		else if(widgetHandle == mSubmitButton)
@@ -124,13 +124,13 @@ public:
 			char passwordTextBuffer[256];
 
 			//Get the text from the password box and put it into the buffer.
-			int textLength = maWidgetGetProperty(mPasswordBox, "text",
+			int textLength = maWidgetGetProperty(mPasswordBox, MAW_EDIT_BOX_TEXT,
 					passwordTextBuffer, 256);
 
 			//If the text does not fit in the buffer, textLength will be set
 			//to -1, therefore we need to check that the length is greater than
 			//or equal to 0, otherwise we just ignore the event.
-			if(textLength == WIDGET_ERROR)
+			if(textLength == MAW_RES_INVALID_STRING_BUFFER_SIZE)
 			{
 				return;
 			}
@@ -141,14 +141,14 @@ public:
 				//If the password is too short we use the instructions label
 				//to inform the user. Note how C automatically
 				//concatenates strings split over multiple lines.
-				maWidgetSetProperty(mInstructions, "text", "Password too short. "
+				maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, "Password too short. "
 					"Please enter a password of at least 6 characters:");
 			}
 			else
 			{
 				//If the password is at least 6 characters long, we congratulate
 				//user.
-				maWidgetSetProperty(mInstructions, "text", "Password OK");
+				maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, "Password OK");
 			}
 		}
 	}
@@ -167,7 +167,7 @@ public:
 		MAWidgetEventData *widgetEventData = (MAWidgetEventData *) event.data;
 
 		//Check that the event was sent from a widget...
-		if(widgetEventData->eventType == WIDGET_EVENT_CLICKED)
+		if(widgetEventData->eventType == MAW_EVENT_CLICKED)
 		{
 			//...if so, passed it to the widgetClicked method.
 			widgetClicked(widgetEventData->widgetHandle);
