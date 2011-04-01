@@ -34,23 +34,30 @@ public class Layout extends Widget
 	}
 	
 	/**
-	 * Adds a child to this layout, by default the view
-	 * of the child is added to the wrapped ViewGroup.
+	 * Adds a child to this layout at the given position. By
+	 * default the view will be added to the wrapped ViewGroup.
 	 * 
-	 * The child's parent will be set to this layout.
-	 * 
-	 * @param child The child of to be added.
+	 * @param child The child to be added.
+	 * @param index The index where to add the child. The child will have
+	 *        this index after it has been added, the index starts at 0. If
+	 *        the index is -1 it will be added at the end.
 	 */
-	public void addChild(Widget child)
+	public void addChildAt(Widget child, int index)
 	{
-		child.setParent( this );
-		m_children.add( child );
+		int listIndex = index;
+		if( index == -1 )
+		{
+			listIndex = m_children.size( );
+		}
 
-		updateLayoutParamsForChild(child);
-		
+		child.setParent( this );
+		m_children.add( listIndex, child );
+
+		updateLayoutParamsForChild( child );
+
 		// Add child to layout
 		ViewGroup layout = getView( );
-		layout.addView( child.getView( ) );
+		layout.addView( child.getView( ), listIndex );
 	}
 	
 	/**

@@ -202,16 +202,28 @@ public class NativeUI
 	
 	/**
 	 * Internal function for the maWidgetAdd system call.
-	 * Adds a child to the given parent, the parent
-	 * must be of type Layout.
+	 * Uses maWidgetInsertChild to add the element at the
+	 * end.
 	 * 
 	 * Note: Should only be called on the UI thread.
 	 */
 	public int maWidgetAdd(int parentHandle, int childHandle)
 	{
+		return maWidgetInsertChild(parentHandle, childHandle, -1);
+	}
+	
+	/**
+	 * Internal function for the maWidgetInsertChild system call.
+	 * Inserts a child at a specific position in the given parent, the parent
+	 * must be of type Layout.
+	 * 
+	 * Note: Should only be called on the UI thread.
+	 */
+	public int maWidgetInsertChild(int parentHandle, int childHandle, int index)
+	{
 		if( parentHandle == childHandle )
 		{
-			Log.e( "MoSync", "maWidgetAdd: Child and parent are the same." );
+			Log.e( "MoSync", "maWidgetInsertChild: Child and parent are the same." );
 			return IX_WIDGET.MAW_RES_ERROR;
 		}
 		
@@ -220,22 +232,27 @@ public class NativeUI
 		
 		if( child == null )
 		{
-			Log.e( "MoSync", "maWidgetAdd: Invalid child widget handle: " + childHandle );
+			Log.e( "MoSync", "maWidgetInsertChild: Invalid child widget handle: " + childHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		if( parent == null )
 		{
-			Log.e( "MoSync", "maWidgetAdd: Invalid parent widget handle: " + parentHandle );
+			Log.e( "MoSync", "maWidgetInsertChild: Invalid parent widget handle: " + parentHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		if( !parent.isLayout( ) )
 		{
-			Log.e( "MoSync", "maWidgetAdd: Parent " + parentHandle + " is not a layout." );
+			Log.e( "MoSync", "maWidgetInsertChild: Parent " + parentHandle + " is not a layout." );
 			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
+		}
+		if( index < -1 )
+		{
+			Log.e( "MoSync", "maWidgetInsertChild: Invalid index: " + index );
+			return IX_WIDGET.MAW_RES_INVALID_INDEX;
 		}
 		
 		Layout parentAsLayout = (Layout) parent;
-		parentAsLayout.addChild( child );
+		parentAsLayout.addChildAt( child, index );
 		
 		return IX_WIDGET.MAW_RES_OK;
 	}
