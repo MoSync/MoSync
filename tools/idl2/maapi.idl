@@ -3140,6 +3140,36 @@ group WidgetAPI "Widget API" {
 		WRAP_CONTENT = -2;
 	}
 	}
+	
+	group WidgetAlignment "Widget alignment" {
+	constset MAString MAW_ALIGNMENT_
+	{
+		/**
+		* @brief Constant that represents a left aligned widget.
+		*/
+		LEFT = "left";
+		
+		/**
+		* @brief Constant that represents a right aligned widget.
+		*/
+		RIGHT = "right";
+		
+		/**
+		* @brief Constant that represents a center aligned widget.
+		*/
+		CENTER = "center";
+		
+		/**
+		* @brief Constant that represents a top aligned widget.
+		*/
+		TOP = "top";
+		
+		/**
+		* @brief Constant that represents a bottom aligned widget.
+		*/
+		BOTTOM = "bottom";
+	}
+	}
 
 	/**
 	* The available result codes for the widget api.
@@ -3319,12 +3349,12 @@ group WidgetAPI "Widget API" {
 	*/
 	constset MAString MAW_WIDGET_ {
 		/**
-		* @brief Specifies the horizontal distance from the parent widget. Takes an integer in pixels.
+		* @brief Specifies the horizontal distance from the parent widget. It is meant to be used to absolute position a widget inside a RelativeLayout. Takes an integer in pixels.
 		*/
 		LEFT = "left";
 
 		/**
-		* @brief Specifies the vertical distance from the parent widget. Takes an integer in pixels.
+		* @brief Specifies the vertical distance from the parent widget. It is meant to be used to absolute position a widget inside a RelativeLayout. Takes an integer in pixels.
 		*/
 		TOP = "top";
 
@@ -3358,7 +3388,13 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetScreenProperties "Screen properties" {
 	constset MAString MAW_SCREEN_ {
+		/**
+		* @brief Specifies the title of a screen. The screen title is used by tab screen to display the tab title. Takes a string.
+		*/
 		TITLE = "title";
+		/**
+		* @brief Specifies an icon for the screen. Should be of a suitable size for a tab icon. Takes a handle to an image.
+		*/
 		ICON = "icon";
 	}
 	} // end of WidgetScreenProperties	
@@ -3368,6 +3404,9 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetTabScreenProperties "Tab screen properties" {
 	constset MAString MAW_TAB_SCREEN_ {
+		/**
+		* @brief Changes the open tab to the tab with the given index. Takes an integer.
+		*/
 		CURRENT_TAB = "currentTab";
 	}
 	} // end of WidgetTabScreenProperties	
@@ -3377,8 +3416,17 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetStackScreenProperties "Stack screen properties" {
 	constset MAString MAW_STACK_SCREEN_ {
+		/**
+		* @copydoc #MAW_SCREEN_TITLE
+		*/
 		TITLE = "title";
+		/**
+		* @copydoc #MAW_SCREEN_ICON
+		*/
 		ICON = "icon";
+		/**
+		* @brief Specifies whether the back button automatically should pop the stack screen. This can have different behaviors on different platforms, on iPhone the UI back button is disabled, on Android the stack screen ignores back button events. Takes a boolean 'true' or 'false'. 
+		*/
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
 	}
 	} // end of WidgetStackScreenProperties	
@@ -3388,12 +3436,35 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetButtonProperties "Button properties" {
 	constset MAString MAW_BUTTON_ {
+		/**
+		* @copydoc #MAW_LABEL_TEXT
+		*/
 		TEXT = "text";
+
+		/**
+		* @copydoc #MAW_LABEL_TEXT_VERTICAL_ALIGNMENT
+		*/
 		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
+
+		/**
+		* @copydoc #MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT
+		*/
 		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
-		BACKGROUND_IMAGE = "backgroundImage";
+
+		/**
+		* @copydoc #MAW_LABEL_FONT_COLOR
+		*/
 		FONT_COLOR = "fontColor";
+
+		/**
+		* @copydoc #MAW_LABEL_FONT_SIZE
+		*/
 		FONT_SIZE = "fontSize";
+		
+		/**
+		* Sets the background image of the button. Takes an image handle.
+		*/
+		BACKGROUND_IMAGE = "backgroundImage";
 	}
 	} // end of WidgetButtonProperties		
 
@@ -3425,10 +3496,29 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetLabelProperties "Label properties" {
 	constset MAString MAW_LABEL_ {
+		/**
+		* @brief Sets the text that will be displayed in the label. Takes a string.
+		*/
 		TEXT = "text";
+
+		/**
+		* @brief Sets the vertical alignment of the text inside the label. If the widget's height is WRAP_CONTENT this property has no effect. Takes one of the constants #MAW_ALIGNMENT_TOP, MAW_ALIGNMENT_CENTER or MAW_ALIGNMENT_BOTTOM.
+		*/
 		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
+		
+		/**
+		* @brief Sets the horizontal alignment of the text inside the label. If the widget's height is WRAP_CONTENT this property has no effect. Takes one of the constants #MAW_ALIGNMENT_TOP, MAW_ALIGNMENT_CENTER or MAW_ALIGNMENT_BOTTOM.
+		*/
 		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
+
+		/**
+		* @brief Specifies the font color of the label's text. The format of the color is a hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*/
 		FONT_COLOR = "fontColor";
+		
+		/**
+		* @brief Specifies the font size in points of the label's text. Takes a float that specifies the number of points.
+		*/
 		FONT_SIZE = "fontSize";
 	}
 	} // end of WidgetLabelProperties		
@@ -3438,8 +3528,19 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetEditBoxProperties "Edit box properties" {
 	constset MAString MAW_EDIT_BOX_ {
+		/**
+		* @brief Set or get the text entered in the edit box. 
+		*/
 		TEXT = "text";
+
+		/**
+		* @brief Set a text in the edit box that acts as a placeholder when an edit box is empty.
+		*/
 		PLACEHOLDER = "placeholder";
+
+		/**
+		* @brief Shows or hides the virtual keyboard. If shown the focus will be set to this widget. Takes a boolean 'true' or 'false'.
+		*/
 		SHOW_KEYBOARD = "showKeyboard";
 	}
 	} // end of WidgetEditBoxProperties
@@ -3449,8 +3550,16 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetListViewItemProperties "List view item properties" {
 	constset MAString MAW_LIST_VIEW_ITEM_ {
+		/**
+		* @brief Sets the text part of the list view item. If there is an icon the text will be placed to the right of it, otherwise at the left edge.
+		*/
 		TEXT = "text";
+
+		/**
+		* @brief Sets an icon of the list view item. It will be placed in the left side of the widget.
+		*/
 		ICON = "icon";
+
 		ACCESSORY_TYPE = "accessoryType";
 	}
 	} // end of WidgetListViewItemProperties
@@ -3460,6 +3569,9 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetCheckBoxProperties "Check box properties" {
 	constset MAString MAW_CHECK_BOX_ {
+		/**
+		* @brief Specify or get whether or not the checkbox is checked. Takes or returns a boolean.
+		*/
 		CHECKED = "checked";
 	}
 	} // end of WidgetListViewProperties
