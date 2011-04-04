@@ -13,6 +13,7 @@ static void install_stdmalloc_hooks();
 int main(int argc, const char** argv);
 extern const char* gArgv[];
 extern const int gArgc;
+extern void setup_stdin();
 
 int MAMain() {
 	// switch stdout from console to maWriteLog.
@@ -20,6 +21,8 @@ int MAMain() {
 	dup2(wlfd, 1);
 	dup2(wlfd, 2);
 	close(wlfd);
+	
+	setup_stdin();
 
 	printf("MAMain()\n");
 	install_stdmalloc_hooks();

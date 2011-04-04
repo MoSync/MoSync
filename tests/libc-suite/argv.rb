@@ -12,4 +12,7 @@ SPECIFIC_ARGV = {
 
 SPECIFIC_FILES = {
 	'test-stat2.c' => ["#{SETTINGS[:source_path]}/io/Makefile", "build/test-stat2.moo"],
+	'tst-rxspencer.c' => ["#{SETTINGS[:source_path]}posix/rxspencer"],
+	'tst-pcre.c' => ["#{SETTINGS[:source_path]}posix/PCRE.tests"],
+	'tst-boost.c' => ["#{SETTINGS[:source_path]}posix/BOOST.tests"],
 }
