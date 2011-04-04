@@ -1,6 +1,7 @@
 package com.mosync.nativeui.ui.widgets;
 
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import android.view.View;
 import android.widget.TabHost;
@@ -69,8 +70,7 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 				return screenView;
 			}
 		});
-		
-		
+
 		tab.addTab( tabSpec );
 		m_tabIndexToScreen.put( screen, tab.getTabWidget( ).getChildCount( ) - 1 );
 		screen.setTitleChangedListener( this );
@@ -93,6 +93,28 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 		}
 		
 		return true;
+	}
+	
+	/**
+	 * Passes on the back event to the currently active tab.
+	 */
+	@Override
+	public boolean handleBack()
+	{
+		TabHost tabHost = (TabHost) getView( );
+		int currentTabIndex = tabHost.getCurrentTab( );
+		
+		// This set is likely to be small so we can safely iterate over it
+		for( Entry<ScreenWidget, Integer> entry : m_tabIndexToScreen.entrySet( ) )
+		{
+			if( entry.getValue( ) == currentTabIndex )
+			{
+				entry.getKey( ).handleBack( );
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	@Override

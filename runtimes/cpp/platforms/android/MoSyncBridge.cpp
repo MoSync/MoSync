@@ -310,9 +310,12 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * WIDGET_EVENT_CLICKED
 		 * intArray[3] - Can be used to determine a checkbox that was clicked.
 		 *
-		 *
 		 * WIDGET_EVENT_ITEM_CLICKED
 		 * intArray[3] - The index of the list item that was clicked.
+		 *
+		 * WIDGET_EVENT_STACK_SCREEN_POPPED
+		 * intArray[3] - Handle to the screen that was popped.
+		 * intArray[4] - Handle to the screen that we popped to.
 		 */
 
 		int widgetEventType = intArray[1];
@@ -329,6 +332,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		else if(widgetEventType == MAW_EVENT_ITEM_CLICKED)
 		{
 			widgetEvent->listItemIndex = intArray[3];
+		}
+		else if(widgetEventType == MAW_EVENT_STACK_SCREEN_POPPED)
+		{
+			widgetEvent->fromScreen = intArray[3];
+			widgetEvent->toScreen = intArray[4];
 		}
 
 		event.data = widgetEvent;

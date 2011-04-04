@@ -1112,6 +1112,12 @@ public class MoSyncNetwork
 				case HTTP_POST:
 					httpConnection.setRequestMethod("POST");
 					break;
+				case HTTP_PUT:
+					httpConnection.setRequestMethod("PUT");
+					break;
+				case HTTP_DELETE:
+					httpConnection.setRequestMethod("DELETE");
+					break;
 				case HTTP_HEAD:
 					httpConnection.setRequestMethod("HEAD");
 					break;

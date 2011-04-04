@@ -17,7 +17,7 @@ cp release_notes.txt $MOSYNC_DOXYGEN_OUTPUT_DIR
 cp changelog.txt $MOSYNC_DOXYGEN_OUTPUT_DIR
 
 # Copy doxyfile
-cp Doxyfile $MOSYNCDIR/include/Doxyfile
+cp ../libs/Doxyfile $MOSYNCDIR/include/Doxyfile
 
 # Build documentation
 cd $MOSYNCDIR/include

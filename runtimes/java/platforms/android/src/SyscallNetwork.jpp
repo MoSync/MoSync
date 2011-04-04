@@ -296,6 +296,12 @@ NETSYSCALL(MAHandle) maHttpCreate(String url, int method) throws Exception
 		case HTTP_POST:
 			httpConn.setRequestMethod("POST");
 			break;
+		case HTTP_PUT:
+			httpConn.setRequestMethod("PUT");
+			break;
+		case HTTP_DELETE:
+			httpConn.setRequestMethod("DELETE");
+			break;
 		case HTTP_HEAD:
 			httpConn.setRequestMethod("HEAD");
 			break;

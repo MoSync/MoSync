@@ -54,6 +54,7 @@
 
 #include <conprint.h>
 #include <string.h>
+#include <limits.h>
 
 #ifndef TLSF_USE_LOCKS
 #define	TLSF_USE_LOCKS 	(0)
@@ -682,6 +683,9 @@ void *malloc_ex(size_t size, void *mem_pool)
     int fl, sl;
     size_t tmp_size;
 
+	if(size > INT_MAX)
+		return NULL;
+
     size = (size < MIN_BLOCK_SIZE) ? MIN_BLOCK_SIZE : ROUNDUP_SIZE(size);
 
     /* Rounding up the requested size and calculating fl and sl */
@@ -802,6 +806,9 @@ void *realloc_ex(void *ptr, size_t new_size, void *mem_pool)
         free_ex(ptr, mem_pool);
         return NULL;
     }
+
+	if(new_size > INT_MAX)
+		return NULL;
 
     b = (bhdr_t *) ((char *) ptr - BHDR_OVERHEAD);
     next_b = GET_NEXT_BLOCK(b->ptr.buffer, b->size & BLOCK_SIZE);

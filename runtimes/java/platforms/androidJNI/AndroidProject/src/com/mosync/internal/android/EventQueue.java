@@ -79,6 +79,28 @@ public class EventQueue
 		
 		sMoSyncThread.postEvent( event );
 	}
+	
+	/**
+	 * Posts an event from a stack screen has been popped, and a handle to the
+	 * screen that was popped.
+	 * 
+	 * @param stackScreenHandle The stack screen that has been popped.
+	 * @param poppedFromScreenHandle The screen that was popped from.
+	 * @param poppedToScreenHandle The next screen that will be shown.
+	 */
+	public void postWidgetStackScreenPoppedEvent(int stackScreenHandle, 
+			int poppedFromScreenHandle, int poppedToScreenHandle)
+	{
+		int event[] = new int[ 5 ];
+		
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_STACK_SCREEN_POPPED;
+		event[2] = stackScreenHandle;
+		event[3] = poppedFromScreenHandle;
+		event[4] = poppedToScreenHandle;
+		
+		sMoSyncThread.postEvent( event );
+	}
 
 	public static EventQueue getDefault()
 	{
