@@ -140,6 +140,35 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	}
 	
 	/**
+	 * Internal wrapper for maWidgetInsertChild that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetInsertChild(
+		final int parentHandle, 
+		final int childHandle,
+		final int index)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable() 
+			{
+				public void run()
+				{
+					int result = mNativeUI.maWidgetInsertChild(
+						parentHandle, childHandle, index);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+	
+	/**
 	 * Internal wrapper for maWidgetRemoveChild that runs
 	 * the call in the UI thread.
 	 */

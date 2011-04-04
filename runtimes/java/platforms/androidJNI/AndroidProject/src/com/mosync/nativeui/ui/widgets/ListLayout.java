@@ -41,22 +41,22 @@ public class ListLayout extends Layout
 		super( handle, listView );
 		listView.setAdapter( m_viewAdapter );
 	}
-
-	/**
-	 * Add the child to the view adapter rather to
-	 * the list view itself.
-	 * 
-	 * @see Layout.addChild.
-	 */
+	
 	@Override
-	public void addChild(Widget child)
+	public void addChildAt(Widget child, int index)
 	{
-		super.addChild( child );
+		super.addChildAt( child, index );
+		
+		int listIndex = index;
+		if( index == -1 )
+		{
+			listIndex = m_viewAdapter.getCount( );
+		}
 		
 		child.getView( ).setFocusable( false );
-		m_viewAdapter.add( child.getView( ) );
+		m_viewAdapter.addAt( child.getView( ), listIndex );
 	}
-	
+
 	/**
 	 * Add the child to the view adapter rather to
 	 * the list view itself.
@@ -125,15 +125,17 @@ public class ListLayout extends Layout
 		}
 		
 		/**
-		 * Add a view to the adapter and notifies the listeners.
+		 * Adds a view to the adapter at the specific index and notifies
+		 * the listeners.
 		 * 
 		 * @param view The view to add.
+		 * @param index The index to add the element at.
 		 */
-		public void add(View view)
+		public void addAt(View view, int index)
 		{
 			if( view != null )
 			{
-				m_views.add( view );
+				m_views.add( index, view );
 				notifyDataSetChanged( );
 			}
 		}

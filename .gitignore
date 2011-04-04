@@ -181,6 +181,7 @@ profile.txt
 /runtimes/java/platforms/androidJNI/AndroidProject/obj
 /runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated
 /runtimes/java/platforms/androidJNI/src/config_platform.h*
+
 /runtimes/java/platforms/androidJNI/AndroidProject/assets/
 /runtimes/java/platforms/androidJNI/AndroidProject/bash.exe.stackdump
 /runtimes/java/platforms/androidJNI/AndroidProject/bin/

@@ -49,7 +49,7 @@ namespace MAUtil {
 		*/
 		virtual ~BluetoothConnection();
 
-		/*
+		/**
 		* Asynchronously opens a connection using a Bluetooth address and UUID.
 		*
 		* Service discovery is performed. If a service is found, a connection
@@ -76,7 +76,7 @@ namespace MAUtil {
 
 		/**
 		* Asynchronously opens a connection using a URL that specifies
-		* a Bluetooth address and a UUID.
+		* a Bluetooth address and a service UUID.
 		*
 		* Service discovery is performed. If a service is found, a connection
 		* is opened.

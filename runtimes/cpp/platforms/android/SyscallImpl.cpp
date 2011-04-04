@@ -1534,6 +1534,10 @@ namespace Base
 		case maIOCtl_maWidgetAddChild:
 			SYSLOG("maIOCtl_maWidgetAddChild");
 			return _maWidgetAddChild(a, b, mJNIEnv, mJThis);
+		
+		case maIOCtl_maWidgetInsertChild:
+			SYSLOG("maIOCtl_maWidgetInsertChild");
+			return _maWidgetInsertChild(a, b, c, mJNIEnv, mJThis);
 			
 		case maIOCtl_maWidgetRemoveChild:
 			SYSLOG("maIOCtl_maWidgetRemoveChild");
