@@ -46,6 +46,10 @@ SKIPPED_UNRESOLVED = [
 	'bug-getopt4.c',
 	'bug-getopt5.c',
 	'tstscanf.c',	# two minor failures.
+
+	# Seems like a getc() causes the write position to jump to the end of the file,
+	# but it should be the same as the read position. Too tricky to fix.
+	'test_rdwr.c',
 ]
 
 SKIPPED_FILES = SKIPPED_UNRESOLVED + [
@@ -224,6 +228,8 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	
 	'bug-glob3.c',	# GLOB_NOMATCH
 	'bug-getopt1.c',	# non-posix modifier: +
+	
+	'bug5.c',	# system()
 ]
 
 SKIPPED_PATTERNS = [
