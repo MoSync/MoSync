@@ -181,7 +181,7 @@ public:
 		pos = 0;
 		while(pos < DATA_SIZE) {
 			int res = recv(mSock, mReadBuffer + pos, DATA_SIZE - pos, 0);
-			if(res == SOCKET_ERROR) {
+			if(res == SOCKET_ERROR || res <= 0) {
 				printf("recv error %i\n", WSAGetLastError());
 				return;
 			}
