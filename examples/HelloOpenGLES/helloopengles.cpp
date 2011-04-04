@@ -137,7 +137,7 @@ public:
 		int screen = maWidgetCreate( MAW_SCREEN );
 		
 		//Check if this is supported on the device it's running on
-		if(mScreen == -1)
+		if(screen == -1)
 		{
 			maPanic(0,"Sorry but this program does not run currently on this platform");
 		}
