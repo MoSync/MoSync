@@ -51,6 +51,8 @@ def set_defaults
 	# Hash(String,String). Key is the filename of a source file.
 	# Value is extra compile flags to be used when compiling that file.
 	default(:SPECIFIC_CFLAGS, {})
+	# String, extra flags used when invoking MoRE in PipeExeWork's automatic "run" target
+	default(:EXTRA_EMUFLAGS, '')
 	# String, name of the base build directory.
 	default(:BUILDDIR_BASE, "build/")
 	# String, added to the beginning of build directories.

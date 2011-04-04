@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /** 
 * \file LayerMapViewport.h
 * \brief Viewport displaying a slippy map with layers overlaid
-* \author Lars-Åke Vinberg
+* \author Lars-ï¿½ke Vinberg
 */
 
 #ifndef LAYERMAPVIEWPORT_H_
@@ -29,10 +29,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Broadcaster.h"
 #include "Layer.h"
 
-using namespace MAUI;
+
 
 namespace MAP
 {
+	using namespace MAUI;
+	
 	class LayerMapViewport;
 	class Layer;
 

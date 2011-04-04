@@ -13,11 +13,14 @@
 #include "Broadcaster.h"
 #include "MapViewport.h"
 
-using namespace MAPUtil;
-using namespace MAUtil;
+
 
 namespace MAP
 {
+
+	using namespace MAPUtil;
+	using namespace MAUtil;
+	
 	//
 	// Forward class declarations
 	//

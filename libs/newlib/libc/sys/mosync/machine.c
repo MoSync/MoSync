@@ -16,6 +16,7 @@
 
 #include <maapi.h>
 #include "maassert.h"
+#include "mastdlib.h"
 #include "mavsprintf.h"
 #include "conprint.h"
 #include "realpath.h"
@@ -114,7 +115,7 @@ static struct LOW_FD* sFda[NFD];
 static struct LOW_FD sLfda[NFD];
 
 static struct LOW_FD sLfConsole = { LOWFD_CONSOLE, 1, O_APPEND };
-//static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1, O_APPEND };
+static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1, O_APPEND };
 
 static int closeLfd(struct LOW_FD* plfd);
 
@@ -148,9 +149,9 @@ static void initFda(void) {
 
 	memset(sFda, 0, sizeof(sFda));
 	memset(sLfda, 0, sizeof(sLfda));
-	sFda[1] = &sLfConsole;
-	sFda[2] = &sLfConsole;
-	sFda[3] = &sLfConsole;
+	sFda[0] = &sLfConsole;	// stdin
+	sFda[1] = &sLfConsole;	// stdout
+	sFda[2] = &sLfConsole;	// stderr
 	sLfConsole.refCount = 3;
 }
 
@@ -483,6 +484,14 @@ int open(const char * __filename, int __mode, ...) {
 	newLfd->refCount = 1;
 	newLfd->flags = __mode;
 	sFda[newFd] = newLfd;
+	return newFd;
+}
+
+int open_maWriteLog(void) {
+	int newFd;
+	CHECK(newFd = findFreeFd(), EMFILE);
+	sFda[newFd] = &sLfWriteLog;
+	sLfWriteLog.refCount++;
 	return newFd;
 }
 

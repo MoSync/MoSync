@@ -32,10 +32,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "Broadcaster.h"
 #include "MapTileCoordinate.h"
 
-using namespace MAUtil;
+
 
 namespace MAP
 {
+	using namespace MAUtil;
+	
 	//class LonLat;
 	class MapTile;
 	class MapSourceImageDownloader;

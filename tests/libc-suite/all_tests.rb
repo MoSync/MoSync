@@ -28,27 +28,47 @@ FileUtils.mkdir_p(BUILD_DIR)
 FileUtils.rm_rf('filesystem')
 FileUtils.mkdir_p('filesystem/tmp')
 
+def input_files(filename)
+	base = File.dirname(filename) + '/' + File.basename(filename, File.extname(filename))
+	inputName = base + '.input'
+	if(File.exists?(inputName))
+		return [inputName]
+	else
+		return []
+	end
+end
 
-def writeArgvFile(filename, argv)
+def writeArgvFile(filename, argv, testSrcName)
+	argv = DEFAULT_ARGV if(!argv)
 	file = open(filename, 'w')
-	file.write('const char* gArgv[] = {"MoSync", ')
+	file.write("const char* gArgv[] = {\"#{File.basename(testSrcName, File.extname(testSrcName))}\", ")
 	argv.each do |arg|
 		file.write("\"#{arg}\",")
 	end
-	file.write("};\n")
+	file.write(" 0 };\n")
 	file.write("const int gArgc = #{argv.size + 1};\n")
+	inputs = input_files(testSrcName)
+	file.write("\n")
+	file.write("#include <stdio.h>\n") if(!inputs.empty?)
+	#file.write("#include <stdlib.h>\n") if(!inputs.empty?)
+	file.write("void setup_stdin() {\n")
+	if(!inputs.empty?)
+		file.write("\tstdin = fopen(\"#{File.basename(inputs[0])}\", \"r\");\n")
+	end
+	file.write("}\n")
 	file.close
 end
 
-def doArgv(baseName, argv)
+def doArgv(baseName, argv, testSrcName, force_rebuild)
+	return if(!force_rebuild)
 	cName = "build/argv-#{baseName}.c"
 	sName = "build/argv-#{baseName}.s"
-	writeArgvFile(cName, argv)
-	sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S #{File.expand_path(cName)} -o #{sName}"
+	writeArgvFile(cName, argv, testSrcName)
+	sh "#{MOSYNCDIR}/bin/xgcc -g -I#{MOSYNCDIR}/include/newlib -Werror -S #{File.expand_path(cName)} -o #{sName}"
 	return sName
 end
 
-DEFAULT_ARGV_SFILE = doArgv('default', DEFAULT_ARGV)
+DEFAULT_ARGV_SFILE = doArgv('default', DEFAULT_ARGV, 'default', true)
 
 
 sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S #{File.expand_path('helpers.c')} -o build/helpers.s#{GCC_FLAGS}"
@@ -151,7 +171,7 @@ def delete_if_empty(filename)
 	end
 end
 
-def link_and_test(ofn, argvs, files, dead_code, force_rebuild)
+def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs)
 	suffix = dead_code ? 'e' : ''
 	pfn = ofn.ext('.moo' + suffix)
 	winFile = ofn.ext('.win' + suffix)
@@ -179,16 +199,21 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild)
 		error"Unknown link failure."
 	end
 	
-	files.each do |file|
-		FileUtils.cp(file, 'filesystem/')
-	end
-	
 	# execute it, if not win already, or we rebuilt something.
 	
 	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
 		return force_rebuild
 	end
-	cmd = "#{MOSYNCDIR}/bin/more -timeout 60 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
+	
+	# copy files only when executing
+	files.each do |file|
+		FileUtils.cp_r(file, 'filesystem/')
+	end
+	inputs.each do |input|
+		sh "dos2unix --d2u \"filesystem/#{File.basename(input)}\""
+	end
+	
+	cmd = "#{MOSYNCDIR}/bin/more -timeout 600 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
 	$stderr.puts cmd
 	res = system(cmd)
 	puts res
@@ -260,18 +285,21 @@ files.each do |filename|
 		force_rebuild = true
 	end
 	
+	inputs = input_files(filename)
+	
 	argv = SPECIFIC_ARGV.fetch(bn, nil)
-	if(argv == nil)
-		argvs = DEFAULT_ARGV_SFILE
+	if(argv != nil || !inputs.empty?)
+		argvs = doArgv(bn, argv, filename, force_rebuild)
 	else
-		argvs = doArgv(bn, argv)
+		argvs = DEFAULT_ARGV_SFILE
 	end
 	
 	files = SPECIFIC_FILES.fetch(bn, [])
+	files += inputs
 	
-	force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild)
+	force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild, inputs)
 	if(SETTINGS[:test_dead_code_elimination] && File.exists?(ofn.ext('.win')))
-		link_and_test(ofn, argvs, files, true, force_rebuild)
+		link_and_test(ofn, argvs, files, true, force_rebuild, inputs)
 	end
 end
 

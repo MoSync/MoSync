@@ -744,6 +744,26 @@ namespace Base
 		
 		return result;
 	}
+
+	int _maWidgetInsertChild(int parent, int child, int index, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetInsertChild", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, parent, child, index);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+
 	
 	int _maWidgetRemoveChild(int child, JNIEnv* jNIEnv, jobject jThis)
 	{

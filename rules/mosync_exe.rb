@@ -90,7 +90,7 @@ class PipeExeWork < PipeGccWork
 		if(@resourceTask)
 			resArg = " -resource #{@resourceTask}"
 		end
-		return "#{mosyncdir}/bin/MoRE -program #{@TARGET}#{resArg}"
+		return "#{mosyncdir}/bin/MoRE -program #{@TARGET}#{resArg}#{@EXTRA_EMUFLAGS}"
 	end
 	def run
 		# run the emulator

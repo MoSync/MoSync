@@ -158,7 +158,7 @@ class GccWork < BuildWork
 		@source_objects = objects(@all_sourcefiles)
 		all_objects = @source_objects + @EXTRA_OBJECTS
 		
-		setup3(all_objects)
+		setup3(all_objects, !cppfiles.empty?)
  	end
 	
 	def check_extra_sourcefile(file, ending)

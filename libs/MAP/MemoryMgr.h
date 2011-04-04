@@ -43,6 +43,10 @@ using namespace MAUtil;
 
 namespace MAPUtil
 {
+
+#ifdef TRACKOBJECTS
+	using namespace MAUtil;
+#endif
 	//=========================================================================
 	/**
 	 * \brief Simple resource tracking class.

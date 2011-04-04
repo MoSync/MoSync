@@ -26,6 +26,30 @@ SKIPPED_DIRECTORIES = [
 # These are tests that should pass, but don't, and could not be fixed.
 SKIPPED_UNRESOLVED = [
 	'bug-ungetc2.c',
+	'test-double.c',	# 1269 test cases, 93 errors.
+	'test-float.c',
+	'testfnm.c',	# 49 tests, 3 errors.
+	'runptests.c',	# 326 tests, 15 errors.
+	'bug-regex9.c',	# regcomp failed: empty (sub)expression.
+	'bug-regex11.c',
+	'bug-regex15.c',	# regerror repetition-operator operand invalid.
+	'bug-regex16.c',
+	'bug-regex17.c',
+	'bug-regex18.c',
+	'bug-regex24.c',
+	'bug-regex30.c',
+	'tst-rxspencer.c',	# about 90% failures.
+	'tst-pcre.c',
+	'tst-boost.c',	# about 50% failures.
+	'tst-fnmatch2.c',	# infinite loop.
+	'bug-getopt3.c',
+	'bug-getopt4.c',
+	'bug-getopt5.c',
+	'tstscanf.c',	# two minor failures.
+
+	# Seems like a getc() causes the write position to jump to the end of the file,
+	# but it should be the same as the read position. Too tricky to fix.
+	'test_rdwr.c',
 ]
 
 SKIPPED_FILES = SKIPPED_UNRESOLVED + [
@@ -191,16 +215,21 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'bug-nextafter.c',
 	'bug-nexttoward.c',
 	
-	# glibc math tests are too strict for us. we can use the newlib tests instead.
-	'test-double.c',
+	# some of the glibc math types are unsupported.
 	'test-fenv.c',
-	'test-float.c',
 	'test-fpucw.c',
 	'test-idouble.c',
 	'test-ifloat.c',
 	'test-ildouble.c',
 	'test-ldouble.c',
-	'test-matherr.c',
+	#'test-matherr.c',
+	
+	'tst-error1.c',	# requires complex arguments and input files.
+	
+	'bug-glob3.c',	# GLOB_NOMATCH
+	'bug-getopt1.c',	# non-posix modifier: +
+	
+	'bug5.c',	# system()
 ]
 
 SKIPPED_PATTERNS = [

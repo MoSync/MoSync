@@ -19,6 +19,9 @@
 #import "IWidget.h"
 
 @interface ButtonWidget : IWidget {
+	UIImage* image;
+	int leftCapWidth;
+	int topCapHeight;	
 }
 
 - (id)init;

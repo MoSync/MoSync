@@ -118,7 +118,7 @@ class PipeGccWork < GccWork
 	
 	def object_ending; ".s"; end
 	
-	def setup3(all_objects)
+	def setup3(all_objects, have_cppfiles)
 		#puts all_objects
 		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".lib") }
 		need(:@NAME)

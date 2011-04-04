@@ -30,10 +30,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/PlaceholderPool.h>
 #include "TraceScope.h"
 
-using namespace MAPUtil;
+
 
 namespace MAP
 {
+	
+	using namespace MAPUtil;
+	
 	class MapSource;
 
 	//=========================================================================
