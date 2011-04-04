@@ -2992,14 +2992,7 @@ interface MAAPI {
 #endif	//IX_PIM
 
 #if IX_WIDGET
-
-/**
-* This API may be used to access the Native UI components of the underlying system in a 
-* platform independant manner. Currently supported platforms are Android and iOS. The 
-* API has a small set of functions that use strings for keys and values. All keys are
-* defined as documented string constants. See \ref WidgetTypes "Widget types" and \ref
-* WidgetProperties "Widget properties" for more information.
-*/
+#include "native_ui_intro_doc.idl"
 group WidgetAPI "Widget API" {
 
 	/**
@@ -3130,7 +3123,7 @@ group WidgetAPI "Widget API" {
 		MOSYNC_SCREEN_HANDLE = 0;
 
 		/**
-		* @brief If set to the width or height of a widget it tries to fill the avilable space in that dimension. If there are multiple widgets specified with this constant, the space will be shared equally.
+		* @brief If set to the width or height of a widget and the parent is either a vertical or horizontal layout it tries to fill the available space in that dimension. If there are multiple widgets specified with this constant, the space will then be shared equally. If the parent isn't a horizontal or vertical layout it just resizes the child to the size of its parent.
 		*/
 		FILL_AVAILABLE_SPACE = -1;
 		
@@ -3384,7 +3377,7 @@ group WidgetAPI "Widget API" {
 	}	
 
 	/**
-	* The available widget properties for a #MAW_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_SCREEN. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetScreenProperties "Screen properties" {
 	constset MAString MAW_SCREEN_ {
@@ -3400,7 +3393,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetScreenProperties	
 
 	/**
-	* The available widget properties for a #MAW_TAB_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_TAB_SCREEN. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetTabScreenProperties "Tab screen properties" {
 	constset MAString MAW_TAB_SCREEN_ {
@@ -3412,7 +3405,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetTabScreenProperties	
 
 	/**
-	* The available widget properties for a #MAW_STACK_SCREEN.
+	* The available widget properties for a #MAW_STACK_SCREEN. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetStackScreenProperties "Stack screen properties" {
 	constset MAString MAW_STACK_SCREEN_ {
@@ -3432,7 +3425,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetStackScreenProperties	
 
 	/**
-	* The available widget properties for a #MAW_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_BUTTON. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetButtonProperties "Button properties" {
 	constset MAString MAW_BUTTON_ {
@@ -3469,7 +3462,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetButtonProperties		
 
 	/**
-	* The available widget properties for a #MAW_IMAGE_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_IMAGE_BUTTON. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetImageButtonProperties "Image button properties" {
 	constset MAString MAW_IMAGE_BUTTON_ {
@@ -3483,7 +3476,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetImageButtonProperties		
 	
 	/**
-	* The available widget properties for a #MAW_IMAGE. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_IMAGE. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetImageProperties "Image properties" {
 	constset MAString MAW_IMAGE_ {
@@ -3492,7 +3485,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetImageProperties
 
 	/**
-	* The available widget properties for a #MAW_LABEL. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_LABEL. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetLabelProperties "Label properties" {
 	constset MAString MAW_LABEL_ {
@@ -3542,11 +3535,15 @@ group WidgetAPI "Widget API" {
 		* @brief Shows or hides the virtual keyboard. If shown the focus will be set to this widget. Takes a boolean 'true' or 'false'.
 		*/
 		SHOW_KEYBOARD = "showKeyboard";
+		/**
+		* @brief Specifies what editing mode the edit box should have. Can be either 'password' or 'text'.
+		*/
+		EDIT_MODE = "editMode";
 	}
 	} // end of WidgetEditBoxProperties
 	
 	/**
-	* The available widget properties for a #MAW_LIST_VIEW_ITEM. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_LIST_VIEW_ITEM. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetListViewItemProperties "List view item properties" {
 	constset MAString MAW_LIST_VIEW_ITEM_ {
@@ -3565,7 +3562,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetListViewItemProperties
 	
 	/**
-	* The available widget properties for a #MAW_CHECK_BOX. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_CHECK_BOX. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetCheckBoxProperties "Check box properties" {
 	constset MAString MAW_CHECK_BOX_ {
@@ -3577,52 +3574,91 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetListViewProperties
 
 	/**
-	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetHorizontalLayoutProperties "Horizontal layout properties" {
-	constset MAString MAW_HORIZONTAL_LAYOUT_ {
+	constset MAString MAW_HORIZONTAL_LAYOUT_ {	
+		/**
+		* @brief Specifies how the children in the layout should be aligned in vertical axis. Can either be top, center, bottom.
+		*/
 		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
+		
+		/**
+		* @brief Specifies how the children in the layout should be aligned in horizontal axis. Can either be left, center, right.
+		*/
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
 	}
 	} // end of WidgetHorizontalLayoutProperties
 
 	/**
-	* The available widget properties for a #MAW_VERTICAL_LAYOUT. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_VERTICAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetVerticalLayoutProperties "Vertical layout properties" {
 	constset MAString MAW_VERTICAL_LAYOUT_ {
+		/**
+		* @brief Specifies how the children in the layout should be aligned in vertical axis. Can either be top, center, bottom.
+		*/
 		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
+		
+		/**
+		* @brief Specifies how the children in the layout should be aligned in horizontal axis. Can either be left, center, right.
+		*/
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
 	}
 	} // end of WidgetVerticalLayoutProperties
 	
 	/**
-	* The available widget properties for a #MAW_SEARCH_BAR. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_SEARCH_BAR. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetSearchBarProperties "Search bar properties" {
 	constset MAString MAW_SEARCH_BAR_ {
+		/**
+		* @brief Property for setting and getting the current text of the search bar.
+		*/	
 		TEXT = "text";
+
+		/**
+		* @brief Specifies a placeholder that isn't the actual text in the searchbar but rather a text that describes what should be written in it.
+		*/	
 		PLACEHOLDER = "placeholder";
+		
+		/**
+		* @brief Specifies if the searchbar should be active and the virtual keyboard should be shown. Can either be true or false.
+		*/
 		SHOW_KEYBOARD = "showKeyboard";
 	}
 	} // end of WidgetSearchBarProperties
 		
 	/**
-	* The available widget properties for a #MAW_GL_VIEW. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_GL_VIEW. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetGLViewProperties "GL view properties" {
 	constset MAString MAW_GL_VIEW_ {
+		/**
+		* @brief Property that tells the gl view that it should be redrawn. The value isn't taken into account.
+		*/	
 		INVALIDATE = "invalidate";
+
+		/**
+		* @brief Property that tells the gl view that all following gl calls will apply to this view. The value isn't taken into account.
+		*/	
 		BIND = "bind";
 	}
 	} // end of WidgetGLViewProperties
 	
 	/**
-	* The available widget properties for a #MAW_WEB_VIEW. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_WEB_VIEW. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetWebViewProperties "Web view properties" {
 	constset MAString MAW_WEB_VIEW_ {
+		/**
+		* @brief Property to set the url the webview should get its data from.
+		*/		
 		URL = "url";
+
+		/**
+		* @brief Property to get a new url whenever the webview changes the url. See \ref #MAW_EVENT_WEB_VIEW_URL_CHANGED.
+		*/		
 		NEW_URL = "newurl";
 	}
 	} // end of WidgetWebViewProperties
@@ -3968,12 +4004,11 @@ group WidgetAPI "Widget API" {
 		 * Add a notification item.
 		 *
 		 * Note that there can only be one notification of type
-		 * NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
+		 * #NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
 		 * types may be added in the future. This syscall is available 
 		 * on Android only.
 		 *
-		 * @param type The \link #NOTIFICATION_TYPE_APPLICATION_LAUNCHER 
-		 * \endlink constant.
+		 * @param type The #NOTIFICATION_TYPE_APPLICATION_LAUNCHER constant.
 		 * @param id The id of the notification. The id must be unique within 
 		 * the application.
 		 * @param title Title of the notification.

@@ -133,8 +133,6 @@
             overflowTop = (contentSize.height - self.frame.size.height) / 2;
     }
     self.contentSize = contentSize;
-    self.contentInset = UIEdgeInsetsMake(overflowTop, overflowLeft,
-                                         -overflowTop, -overflowLeft);
 }
 
 - (CGSize)sizeThatFits:(CGSize)size
