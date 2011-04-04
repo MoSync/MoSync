@@ -14,11 +14,12 @@
 #include "Enumerator.h"
 #include "GeoPoint.h"
 
-using namespace MAUtil;
-using namespace MAPUtil;
 
 namespace MAP
 {
+	using namespace MAUtil;
+	using namespace MAPUtil;
+
 	class GeoPointDataSource;
 	class LayerItem;
 

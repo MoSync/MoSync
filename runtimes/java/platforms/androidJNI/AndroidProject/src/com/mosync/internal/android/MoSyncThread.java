@@ -2642,6 +2642,18 @@ public class MoSyncThread extends Thread
 	}
 	
 	/**
+	 * Internal wrapper for maWidgetInsertChild that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetInsertChild(
+		final int parentHandle, 
+		final int childHandle,
+		final int index)
+	{
+		return mMoSyncNativeUI.maWidgetInsertChild(parentHandle, childHandle, index);
+	}
+	
+	/**
 	 * Internal wrapper for maWidgetRemoveChild that runs
 	 * the call in the UI thread.
 	 */

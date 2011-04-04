@@ -28,7 +28,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Environment.h>
 
 /**
-* \brief MoSync graphical user interface classes
+* \brief MoSync graphical user interface classes.
+*
+* A Screen represents a whole screen display that can contain MAUI widgets
+* (Label, ListBox, Image, etc.) in a Layout.
 */
 
 namespace MAUI {

@@ -3,6 +3,7 @@ package com.mosync.nativeui.ui.widgets;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import android.util.Log;
 import android.view.View;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
@@ -40,8 +41,16 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 	}
 
 	@Override
-	public void addChild(Widget child)
+	public void addChildAt(Widget child, int index)
 	{
+		// We cannot support adding tabs anywhere right now,
+		// since the Android api does not support it.
+		if( index != -1 )
+		{
+			Log.w( "MoSync", "Adding tab to a specific index other than last is" +
+					" currently not supported on Android." );
+		}
+		
 		if( !( child instanceof ScreenWidget ) )
 		{
 			return;
@@ -122,6 +131,8 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 	{
 		// There seems to be no sane way of removing
 		// tabs on Android.
+		Log.e( "MoSync", "It is currently not possible to remove children " +
+			" from a tab screen on Android." );
 		return;
 	}
 

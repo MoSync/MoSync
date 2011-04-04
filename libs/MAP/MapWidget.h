@@ -28,10 +28,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUI/Widget.h>
 #include "MapViewport.h"
 
-using namespace MAUI;
+
 
 namespace MAP
 {
+	using namespace MAUI;
+	
 	class MapSource;
 
 	//=========================================================================
