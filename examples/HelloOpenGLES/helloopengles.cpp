@@ -133,10 +133,18 @@ public:
 	  mYRotation( 0.0f ),
 	  mZRotation( 0.0f )
 	{
-		//Create a screen using NativeUI. Create an OpenGL widget within that
-		//screen. Set the widget's width and height: -1 means the whole
-		//screen. Make the widget a child of the screen, then show it.
+		//Create a screen using NativeUI. 
 		int screen = maWidgetCreate( MAW_SCREEN );
+		
+		//Check if this is supported on the device it's running on
+		if(mScreen == -1)
+		{
+			maPanic(0,"Sorry but this program does not run currently on this platform");
+		}
+		
+		//Create an OpenGL widget within the previously created screen.
+		//Set the widget's width and height: -1 means the whole screen.
+		//Make the widget a child of the screen, then show it.
 		mGLView = maWidgetCreate( MAW_GL_VIEW );
 		maWidgetSetPropertyInt( mGLView, MAW_WIDGET_WIDTH, -1 );
 		maWidgetSetPropertyInt( mGLView, MAW_WIDGET_HEIGHT, -1 );

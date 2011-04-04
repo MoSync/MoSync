@@ -52,6 +52,12 @@ public:
 		//Create a Native UI screen using the IOCTL function maWidgetCreate.
 		mScreen = maWidgetCreate(MAW_SCREEN);
 
+		//Check if this is supported on the device it's running on
+		if(mScreen == -1)
+		{
+			maPanic(0,"Sorry but this program does not run currently on this platform");
+		}
+	   
 		//Create the screen's main layout widget. As it is a member variable
 		//we give its name an "m" prefix.
 		mMainLayoutWidget = maWidgetCreate(MAW_VERTICAL_LAYOUT);
