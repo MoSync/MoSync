@@ -2992,14 +2992,7 @@ interface MAAPI {
 #endif	//IX_PIM
 
 #if IX_WIDGET
-
-/**
-* This API may be used to access the Native UI components of the underlying system in a 
-* platform independant manner. Currently supported platforms are Android and iOS. The 
-* API has a small set of functions that use strings for keys and values. All keys are
-* defined as documented string constants. See \ref WidgetTypes "Widget types" and \ref
-* WidgetProperties "Widget properties" for more information.
-*/
+#include "native_ui_intro_doc.idl"
 group WidgetAPI "Widget API" {
 
 	/**
@@ -3130,7 +3123,7 @@ group WidgetAPI "Widget API" {
 		MOSYNC_SCREEN_HANDLE = 0;
 
 		/**
-		* @brief If set to the width or height of a widget it tries to fill the avilable space in that dimension. If there are multiple widgets specified with this constant, the space will be shared equally.
+		* @brief If set to the width or height of a widget and the parent is either a vertical or horizontal layout it tries to fill the available space in that dimension. If there are multiple widgets specified with this constant, the space will then be shared equally. If the parent isn't a horizontal or vertical layout it just resizes the child to the size of its parent.
 		*/
 		FILL_AVAILABLE_SPACE = -1;
 		
@@ -4011,12 +4004,11 @@ group WidgetAPI "Widget API" {
 		 * Add a notification item.
 		 *
 		 * Note that there can only be one notification of type
-		 * NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
+		 * #NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
 		 * types may be added in the future. This syscall is available 
 		 * on Android only.
 		 *
-		 * @param type The \link #NOTIFICATION_TYPE_APPLICATION_LAUNCHER 
-		 * \endlink constant.
+		 * @param type The #NOTIFICATION_TYPE_APPLICATION_LAUNCHER constant.
 		 * @param id The id of the notification. The id must be unique within 
 		 * the application.
 		 * @param title Title of the notification.
