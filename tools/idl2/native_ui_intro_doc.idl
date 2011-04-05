@@ -34,14 +34,15 @@
 *programming a Screen is bascially an Activity.
 *
 *For now there are three types of Screens: Screen, TabScreen, StackScreen. 
-*- 	The Screen is just a container for layouts or views. A Screen can have Layouts or
-*	Views as children.
-*- 	The TabScreen is a special kind of screen that displays a tab bar and can have
-*	several Screens as children, each one representing a specific tab.
-*- 	The StackScreen is a special kind of screen that manages navigation and animation
-*	between Screens. It manages a stack of screens. Any Screen can be pushed to 
-*	the StackScreen in order to animate to it. Internally the StackScreen will push
-*	the screen onto a stack. When a StackScreen is popped, the stack of screens is popped 
+*- 	\b Screen \n
+*   A container for layouts or views. A Screen can have Layouts or Views as children.
+*
+*- 	\b TabScreen \n
+*   A special kind of screen that displays a tab bar and can have several Screens as children, each one representing a specific tab.
+*
+*- 	\b StackScreen \n
+*   A special kind of screen that manages navigation and animation between Screens. It manages a stack of screens. Any Screen can be pushed to 
+*	the StackScreen in order to animate to it. Internally the StackScreen will push the screen onto a stack. When a StackScreen is popped, the stack of screens is popped 
 *	and the Screen remaining on the stack is animated to and displayed.
 *
 *To show a screen you use #maWidgetScreenShow. A screen that is shown shouldn't
@@ -56,10 +57,14 @@
 *For now there are three different layouts: RelativeLayout, VerticalLayout and
 *HorizontalLayout.
 *
-*- 	RelativeLayout is a layout that just places its children relative to itself,
-*	using the coordinates set on the children ("left" and "top" properties).
-*- 	VerticalLayout is a layout that stacks views in the vertical axis.
-*- 	HorizontalLayout is a layout that stacks views in the horizontal axis.
+*- 	\b RelativeLayout \n 
+*   A layout that just places its children relative to itself, using the coordinates set on the children ("left" and "top" properties).
+*
+*- 	\b VerticalLayout \n 
+*   A layout that stacks views in the vertical axis.
+*
+*- 	\b HorizontalLayout \n 
+*   A layout that stacks views in the horizontal axis.
 *
 *All widgets have a set of default properties called "width" and "height". These properties
 *specify the actual width and height of the widget. However these values can also be set
@@ -84,39 +89,39 @@
 *
 *Today these are available:
 *
-*- Button
+*- \b Button \n
 *  Just a simple clickable button that can have a title.
 *
-*- ImageButton
+*- \b ImageButton \n
 *  Same as button but can also have an background image instead of the default button style.
 *  
-*- CheckBox
+*- \b CheckBox \n
 *  A switch/toggle button.
 *  
-*- Label
+*- \b Label \n
 *  A text label.
 *  
-*- EditBox
+*- \b EditBox \n
 *  A text field that can be edited using the virtual keyboard.
 *  
-*- SearchBar
+*- \b SearchBar \n
 *  Like an editbox on a toolbar with a default look and feel and a button for performing the search.
 *  
-*- NavBar
+*- \b NavBar \n
 *  A toolbar looking view that can have a back button and a title. A NavBar will automatically appear
 *  if you're using a StackScreen. It is only available on iOS for now.
 *
-*- ListView
+*- \b ListView \n
 *  A scrollable list of ListViewItems.
 *
-*- ListViewItem
+*- \b ListViewItem \n
 *  A widget that can be put in a ListView. It has a default layout for placing a text and a icon. But 
 *  any view can be added to it in order to create a custom appearance.
 *  
-*- GLView
+*- \b GLView \n
 *  A widget to draw accelerated graphics using OpenGL|ES (version 1.0 in the current version).
 *  
-*- WebView
+*- \b WebView \n
 *  A widget to render web content.
 *
 *
@@ -142,12 +147,13 @@
 *
 \code
 void customEvent(const MAEvent& event) {
-	if(event.type == EVENT_TYPE_WIDGET) {
-		MAWidgetEventData* widgetEventData = (MAWidgetEventData*)event.data;
-		if(event.widgetHandle == myButtonHandle && widgetEventData->eventType == MAW_EVENT_CLICKED)
-			// do something when the button is pressed.	
-		}
-	}
+    if(event.type == EVENT_TYPE_WIDGET) {
+        MAWidgetEventData* widgetEventData = (MAWidgetEventData*)event.data;
+        if(event.widgetHandle == myButtonHandle && 
+           widgetEventData->eventType == MAW_EVENT_CLICKED) {
+            // do something when the button is pressed.	
+        }
+    }
 }
 \endcode
 *
