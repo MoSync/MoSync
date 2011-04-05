@@ -138,7 +138,7 @@ private:
 	
 		if(0 == strcmp(URL, ""))
 		{
-			printf("No url provided, see source code for information on how to use this example");
+			printf("No url provided, \nsee source code for \ninformation on how \nto use this example");
 			return;
 		}
 	
