@@ -20,7 +20,7 @@ simple = Moblet/simple
 Soap = Moblet/Soap
 Stylus = Moblet/Stylus
 timers = Moblet/timers
-MultiTouchExample = Moblet/MultiTouchExample
+MultiTouch = Moblet/MultiTouch
 MoSketch
 MoSound
 MoTooth = Moblet/MoTooth
