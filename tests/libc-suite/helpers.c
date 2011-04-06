@@ -154,92 +154,6 @@ const char *re_compile_pattern (const char *__pattern, size_t __length,
 }
 
 
-#define MAXPATHLEN 1024
-char *
-basename(const char *path)
-{
-	static char bname[MAXPATHLEN];
-	size_t len;
-	const char *endp, *startp;
-
-	/* Empty or NULL string gets treated as "." */
-	if (path == NULL || *path == '\0') {
-		bname[0] = '.';
-		bname[1] = '\0';
-		return (bname);
-	}
-
-	/* Strip any trailing slashes */
-	endp = path + strlen(path) - 1;
-	while (endp > path && *endp == '/')
-		endp--;
-
-	/* All slashes becomes "/" */
-	if (endp == path && *endp == '/') {
-		bname[0] = '/';
-		bname[1] = '\0';
-		return (bname);
-	}
-
-	/* Find the start of the base */
-	startp = endp;
-	while (startp > path && *(startp - 1) != '/')
-		startp--;
-
-	len = endp - startp + 1;
-	if (len >= sizeof(bname)) {
-		errno = ENAMETOOLONG;
-		return (NULL);
-	}
-	memcpy(bname, startp, len);
-	bname[len] = '\0';
-	return (bname);
-}
-char *
-dirname(const char *path)
-{
-	static char dname[MAXPATHLEN];
-	size_t len;
-	const char *endp;
-
-	/* Empty or NULL string gets treated as "." */
-	if (path == NULL || *path == '\0') {
-		dname[0] = '.';
-		dname[1] = '\0';
-		return (dname);
-	}
-
-	/* Strip any trailing slashes */
-	endp = path + strlen(path) - 1;
-	while (endp > path && *endp == '/')
-		endp--;
-
-	/* Find the start of the dir */
-	while (endp > path && *endp != '/')
-		endp--;
-
-	/* Either the dir is "/" or there are no slashes */
-	if (endp == path) {
-		dname[0] = *endp == '/' ? '/' : '.';
-		dname[1] = '\0';
-		return (dname);
-	} else {
-		/* Move forward past the separating slashes */
-		do {
-			endp--;
-		} while (endp > path && *endp == '/');
-	}
-
-	len = endp - path + 1;
-	if (len >= sizeof(dname)) {
-		errno = ENAMETOOLONG;
-		return (NULL);
-	}
-	memcpy(dname, path, len);
-	dname[len] = '\0';
-	return (dname);
-}
-
 char* strchrnul(const char* str, int c) {
 	char* res = strchr(str, c);
 	if(res == NULL)
@@ -322,4 +236,9 @@ long int sysconf (int parameter) {
 
 wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size) {
 	return (wchar_t *)mempcpy(wto, wfrom, size * sizeof(wchar_t));
+}
+
+int mknod() {
+	errno = ENOSYS;
+	return -1;
 }

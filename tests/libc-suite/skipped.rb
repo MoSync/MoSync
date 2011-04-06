@@ -6,7 +6,6 @@ SKIPPED_DIRECTORIES = [
 	'elf',
 	'setjmp',
 	'signal',
-	'dirent',
 	'dlfcn',
 	'gmon',
 	'iconv',	# todo
@@ -144,7 +143,7 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	
 	'tst-truncate64.c',	# truncate64
 	'tst-fork.c',	# fork
-	'tst-dir.c',	# todo, dirent.h
+#	'tst-dir.c',	# todo, dirent.h
 	'tst-chmod.c',	# chmod
 	'bug-regex1.c',	# re_registers
 	'bug-regex4.c',	# re_search_2
@@ -230,6 +229,8 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'bug-getopt1.c',	# non-posix modifier: +
 	
 	'bug5.c',	# system()
+	
+	'tst-seekdir.c', # seekdir()
 ]
 
 SKIPPED_PATTERNS = [

@@ -697,6 +697,9 @@ namespace Base {
 		if(res < 0) {
 			LOGF("File: %s\n", fh.name.p());
 		}
+		if(res > 0 && !fh.isDirectory()) {
+			FILE_FAIL(MA_FERR_GENERIC);
+		}
 		if(fh.mode == MA_ACCESS_READ_WRITE) {
 			if(res == 0) {	//file exists and is not a directory
 				fh.fs = new WriteFileStream(fh.name, false, true);

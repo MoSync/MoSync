@@ -92,7 +92,7 @@ namespace Base {
 			int mode;
 			Array<char> name;
 			bool isDirectory() const {
-				return name[name.size()-1] == '/';
+				return name[name.size()-2] == '/';
 			}
 			FileHandle() : name(0) {}
 		};

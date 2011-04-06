@@ -114,3 +114,9 @@ int munmap(void*, size_t);
 int ffsl(long int i);
 int ffsll(long long int i);
 wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size);
+
+#define d_fileno d_namlen	//hackity-hack, for dirent/list.c
+#define O_DIRECTORY 0
+#define O_NDELAY 0
+#define O_NOATIME 0
+#define open64 open

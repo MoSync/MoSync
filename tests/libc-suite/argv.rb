@@ -8,6 +8,7 @@ SPECIFIC_ARGV = {
 	'tst-rxspencer.c' => ['--utf8', 'rxspencer/tests'],
 	'tst-pcre.c' => ['PCRE.tests'],
 	'tst-boost.c' => ['BOOST.tests'],
+	'list.c' => ['/', '.']
 }
 
 SPECIFIC_FILES = {

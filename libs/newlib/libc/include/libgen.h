@@ -12,8 +12,8 @@
 extern "C" {
 #endif
 
-char      *_EXFUN(basename,     (const char *));
-char      *_EXFUN(dirname,     (const char *));
+char      *_EXFUN(basename,     (char *));
+char      *_EXFUN(dirname,     (char *));
 
 #ifdef __cplusplus
 }
