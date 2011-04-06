@@ -158,17 +158,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		self.frame.origin.x = 0;
 		mosyncView = nil;
         // Initialization code
-		CGRect appFrame = [[UIScreen mainScreen] bounds];
-		CGFloat screenHeight = appFrame.size.height;
-		CGFloat screenWidth = appFrame.size.width;
-		
 		locationController = [[MoSyncCLController alloc] init];
-		
 		self.multipleTouchEnabled = YES;
 		touchHelper = [[TouchHelper alloc] init];
 		
-		//MoSyncMain(self.frame.size.width, screenHeight, self);
+		/*
+		CGRect appFrame = [[UIScreen mainScreen] bounds];
+		CGFloat screenHeight = appFrame.size.height;
+		CGFloat screenWidth = appFrame.size.width;
 		MoSync_Main(screenWidth, screenHeight, self);
+		 */
     }
     return self;
 }
