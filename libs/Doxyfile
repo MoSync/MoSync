@@ -162,7 +162,10 @@ TAB_SIZE               = 8
 # will result in a user-defined paragraph with heading "Side Effects:". 
 # You can put \n's in the value part of an alias to insert newlines.
 
-ALIASES                = 
+ALIASES                = "validvalue=\par Valid values\n"
+ALIASES               += "setandget=\par Set/Get\nSet and get."
+ALIASES               += "setonly=\par Set/Get\nSet only."
+ALIASES               += "getonly=\par Set/Get\nGet only."
 
 # Set the OPTIMIZE_OUTPUT_FOR_C tag to YES if your project consists of C 
 # sources only. Doxygen will then generate output that is more tailored for C. 
