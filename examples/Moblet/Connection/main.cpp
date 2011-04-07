@@ -33,7 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace MAUtil;
 
 #define BUFSIZE 1024
-#define EXAMPLE_URL "http://www.google.com/"
+#define EXAMPLE_URL "http://www.mosync.com/"
 #define SECURE_URL "https://encrypted.google.com/"
 
 static bool sRepeat = false;
