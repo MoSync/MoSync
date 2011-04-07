@@ -1,8 +1,8 @@
-//
-// Layer.h
-//
-// Author: Lars Ake Vinberg
-//
+/**
+ * \file Layer.h
+ * \brief Map layers.
+ * \author Lars Ake Vinberg
+ */
 
 #ifndef LAYER_H_
 #define LAYER_H_
@@ -12,8 +12,6 @@
 #include "MemoryMgr.h"
 #include "Broadcaster.h"
 #include "MapViewport.h"
-
-
 
 namespace MAP
 {
@@ -27,24 +25,20 @@ namespace MAP
 	class Layer;
 	class LayerRenderer;
 
-	//================================================================================
-	//
-	// Listener class for Layer
-	//
+	/**
+	 * \brief Inteface for notifications about changes in a map layer.
+	 */
 	class ILayerListener
-	//=========================================================================
 	{
 	public:
 		virtual void contentChanged( Layer* sender ) = 0;
 	};
 
-	//===============================================================================
-	//
-	// Layer class
-	//
+	/**
+	 * \brief Representation of a single layer in a map.
+	 */
 	class Layer : 
 		public Broadcaster<ILayerListener>
-	//=========================================================================
 	{
 	public:
 		Layer( );

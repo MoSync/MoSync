@@ -15,7 +15,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file Graphics.h
+/** 
+ * \file Graphics.h
  * \brief Translation/clipping stack for MoSync graphics.
  *
  * This file contains a set of graphics functions that closely mirror the ones available as MoSync syscalls. However, these
@@ -73,7 +74,9 @@ typedef void (*SetClearColor)(int r, int g, int b);
 typedef void (*SetColor)(int r, int g, int b);
 typedef void (*SetAlpha)(int a);
 
-
+/**
+ * @brief A driver struct to make multiple implementations of the graphics API possible.
+ */
 typedef struct MAGraphicsDriver_t {
 	SetupFunc setup;
 	SetClipRectFunc setClipRect;

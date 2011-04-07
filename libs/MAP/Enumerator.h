@@ -1,8 +1,8 @@
-//
-// Enumerator.h
-//
-// Author: Lars Ake Vinberg
-//
+/**
+ * \file Enumerator.h
+ * \brief Generic interface for enumerations.
+ * \author Lars Ake Vinberg
+ */
 
 #ifndef ENUMERATOR_H_
 #define ENUMERATOR_H_
@@ -11,26 +11,22 @@
 
 namespace MAPUtil
 {
-	//=========================================================================
-	//
-	// Generic Enumerable interface template
-	//
+	/**
+	* \brief Generic Enumerable interface template
+	*/
 	template<class T>
 	class IEnumerable
-	//=========================================================================
 	{
 	public:
 		virtual int size( ) = 0;
 		virtual T getItem( int index ) = 0;
 	};
 
-	//=========================================================================
-	//
-	// Generic enumerator class.
-	//
+	/**
+	* \brief Generic enumerator class.
+	*/
 	template<class T>
 	class Enumerator
-	//=========================================================================
 	{
 	public:
 		Enumerator( IEnumerable<T>& source ) :
