@@ -8,7 +8,8 @@ SPECIFIC_ARGV = {
 	'tst-rxspencer.c' => ['--utf8', 'rxspencer/tests'],
 	'tst-pcre.c' => ['PCRE.tests'],
 	'tst-boost.c' => ['BOOST.tests'],
-	'list.c' => ['/', '.']
+	'list.c' => ['/', '.'],
+	'tst-dir.c' => ['/', '/build/foo', '/build', 'tst-dir'],
 }
 
 SPECIFIC_FILES = {
@@ -16,4 +17,11 @@ SPECIFIC_FILES = {
 	'tst-rxspencer.c' => ["#{SETTINGS[:source_path]}posix/rxspencer"],
 	'tst-pcre.c' => ["#{SETTINGS[:source_path]}posix/PCRE.tests"],
 	'tst-boost.c' => ["#{SETTINGS[:source_path]}posix/BOOST.tests"],
+}
+
+SPECIFIC_CODE = {
+	'tst-dir.c' => Proc.new do
+		FileUtils.mkdir_p('filesystem/build/foo')
+		FileUtils.cp('build/tst-dir.moo', 'filesystem/build/foo/tst-dir')
+	end
 }

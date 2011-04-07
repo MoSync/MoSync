@@ -171,7 +171,7 @@ def delete_if_empty(filename)
 	end
 end
 
-def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs)
+def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	suffix = dead_code ? 'e' : ''
 	pfn = ofn.ext('.moo' + suffix)
 	winFile = ofn.ext('.win' + suffix)
@@ -213,6 +213,10 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs)
 		sh "dos2unix --d2u \"filesystem/#{File.basename(input)}\""
 	end
 	
+	if(code)
+		code.call
+	end
+	
 	cmd = "#{MOSYNCDIR}/bin/more -timeout 600 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
 	$stderr.puts cmd
 	res = system(cmd)
@@ -232,12 +236,13 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs)
 		FileUtils.mv('_masterdump.s', mdsFile) if(File.exists?('_masterdump.s'))
 		FileUtils.mv('rebuild.s', esFile) if(File.exists?('rebuild.s'))
 		if(SETTINGS[:stop_on_fail])
-			if(SETTINGS[:copy_target])
-				# copy program, sld and stabs to directory :copy_target.
-				ct = SETTINGS[:copy_target]
-				FileUtils.cp(pfn, ct + 'program')
-				FileUtils.cp(sldFile, ct + 'sld.tab')
-				FileUtils.cp(stabsFile, ct + 'stabs.tab')
+			if(SETTINGS[:copy_targets])
+				SETTINGS[:copy_targets].each do |target|
+					# copy program, sld and stabs to directory :copy_target.
+					FileUtils.cp(pfn, target + 'program')
+					FileUtils.cp(sldFile, target + 'sld.tab')
+					FileUtils.cp(stabsFile, target + 'stabs.tab')
+				end
 			end
 			error "Stop on fail"
 		end
@@ -297,9 +302,11 @@ files.each do |filename|
 	files = SPECIFIC_FILES.fetch(bn, [])
 	files += inputs
 	
-	force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild, inputs)
+	code = SPECIFIC_CODE.fetch(bn, nil)
+	
+	force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild, inputs, code)
 	if(SETTINGS[:test_dead_code_elimination] && File.exists?(ofn.ext('.win')))
-		link_and_test(ofn, argvs, files, true, force_rebuild, inputs)
+		link_and_test(ofn, argvs, files, true, force_rebuild, inputs, code)
 	end
 end
 

@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
+#include <sys/fcntl.h>
 
 static void install_stdmalloc_hooks();
 int main(int argc, const char** argv);
@@ -241,4 +242,18 @@ wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size) {
 int mknod() {
 	errno = ENOSYS;
 	return -1;
+}
+
+int symlink(const char* name, const char* target) {
+	// fakeout by creating an empty file.
+	int fd = open(name, O_RDWR | O_CREAT | O_EXCL);
+	if(fd < 0)
+		return fd;
+	return close(fd);
+}
+
+int chmod(const char* name, mode_t mode) {
+	// check that the file exists.
+	struct stat st;
+	return stat(name, &st);
 }

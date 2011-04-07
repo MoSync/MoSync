@@ -86,13 +86,19 @@ namespace Base {
 		int gStoreNextId;
 		StringMap gStores;
 
+#ifdef SYMBIAN
+#define DIRSEP '\\'
+#else
+#define DIRSEP '/'
+#endif
+
 		//todo: delete all FileStreams on exit.
 		struct FileHandle {
 			FileStream* fs;
 			int mode;
 			Array<char> name;
 			bool isDirectory() const {
-				return name[name.size()-2] == '/';
+				return name[name.size()-2] == DIRSEP;
 			}
 			FileHandle() : name(0) {}
 		};

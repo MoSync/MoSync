@@ -27,10 +27,16 @@ extern "C" {
 #endif
 
 #define MAXNAMLEN 384
+#define NAME_MAX MAXNAMLEN
 
 #define _DIRENT_HAVE_D_NAMLEN 1
+#define _DIRENT_HAVE_D_TYPE 1
+
+#define DT_DIR S_IFDIR	// Directory
+#define DT_REG S_IFREG	// Regular file
 
 typedef struct dirent {
+	int d_type;	// one of the DT_ constants.
 	int d_namlen;	// length of name, excluding the terminating zero.
 	char d_name[MAXNAMLEN];
 } dirent;
@@ -48,7 +54,7 @@ int dirfd(DIR*);
 DIR* fdopendir(int fd);
 DIR* opendir(const char* name);
 dirent* readdir(DIR*);
-//int readdir_r(DIR* restrict, dirent* restrict entry, dirent ** restrict result);
+int readdir_r(DIR* restrict, dirent* restrict entry, dirent ** restrict result);
 void rewinddir(DIR*);
 int scandir(const char* name, dirent *** namelist,
 	int (*sel)(const dirent *),

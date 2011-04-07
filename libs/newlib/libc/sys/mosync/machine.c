@@ -315,10 +315,8 @@ int stat(const char *file, struct stat *st) {
 	h = errnoFileOpen(temp, MA_ACCESS_READ);
 	if(h > 0) {
 		res = postStat(h, st, S_IFDIR);
-		if(res < 0) {
-			CHECK(maFileClose(h), EIO);
-			STDFAIL;
-		}
+		CHECK(maFileClose(h), EIO);
+		TEST(res);
 		if(res > 0)	// it was an existing directory.
 			return 0;
 	} else {
@@ -330,10 +328,8 @@ int stat(const char *file, struct stat *st) {
 	temp[length-1] = 0;	// remove the ending slash
 	TEST(h = errnoFileOpen(temp, MA_ACCESS_READ));
 	res = postStat(h, st, S_IFREG);
-	if(res < 0) {
-		CHECK(maFileClose(h), EIO);
-		STDFAIL;
-	}
+	CHECK(maFileClose(h), EIO);
+	TEST(res);
 	if(!res) {
 		ERRNOFAIL(ENOENT);
 	}
@@ -543,8 +539,19 @@ int mkdir(const char* path, mode_t mode) {
 	}
 	TEST(handle = errnoFileOpen(temp, MA_ACCESS_READ_WRITE));
 	if(postOpen(handle, O_CREAT | O_EXCL) < 0) {
+		int exists;
+		int orig_err = errno;
 		CHECK(maFileClose(handle), EIO);
-		STDFAIL;
+		// check if a file with the same name exists.
+		// if so, fail with EEXIST.
+		length--;
+		temp[length] = 0;
+		TEST(handle = errnoFileOpen(temp, MA_ACCESS_READ_WRITE));
+		exists = maFileExists(handle);
+		CHECK(maFileClose(handle), EIO);
+		CHECK(exists, ENOTRECOVERABLE);
+		FAILIF(exists, EEXIST);
+		ERRNOFAIL(orig_err);
 	}
 	return 0;
 }
@@ -565,7 +572,7 @@ int unlink(const char *name) {
 	int dres, cres;
 	int __fd;
 
-	__fd = open(name, O_WRONLY);
+	__fd = open(name, O_RDWR);
 	if(__fd < 0)
 		return __fd;
 	dres = maFileDelete(sFda[__fd]->lowFd - LOWFD_OFFSET);
@@ -591,30 +598,56 @@ int truncate(const char *path, off_t length) {
 int chdir(const char *filename) {
 	MAHandle file;
 	int length;
-	int ret = 1;
+	int ret;
 	char temp[2048];
 	getRealPath(temp, filename, 2046);
 	LOGD("chdir(%s)", temp);
 	
 	length = strlen(temp);
 	if(temp[length-1]!='/') {
+		// Check if it's a regular file. If so, ENOTDIR.
+		file = maFileOpen(temp, MA_ACCESS_READ);
+		if(file > 0) {
+			ret = maFileExists(file);
+			CHECK(maFileClose(file), EIO);
+			CHECK(ret, EIO);
+			FAILIF(ret > 0, ENOTDIR);
+		}
+		
 		temp[length] = '/';
 		length++;
 		temp[length] = 0;
 	}
 	
-	CHECK(file = maFileOpen(sCwd, MA_ACCESS_READ), EIO);
+	CHECK(file = maFileOpen(temp, MA_ACCESS_READ), EIO);
 	ret = maFileExists(file);
-	if(ret > 0) {
-		strcpy(sCwd, temp);
-		ret = 0;
-	}
 	CHECK(maFileClose(file), EIO);
 	CHECK(ret, EIO);
-	return ret;
+	FAILIF(ret == 0, ENOENT);
+
+	strcpy(sCwd, temp);
+	return 0;
 }
 
-char* getcwd(char *__buf, size_t __size ) {
+char* getcwd(char* __buf, size_t __size) {
+	// GNU functionality.
+	size_t len = strlen(sCwd);
+	if(__buf == NULL) {
+		if(__size == 0) {
+			__size = len + 1;
+		}
+	}
+	if(__size <= len) {
+		errno = ERANGE;
+		return NULL;
+	}
+	if(__buf == NULL) {
+		__buf = malloc(__size);
+		if(__buf == NULL) {
+			errno = ENOMEM;
+			return NULL;
+		}
+	}
 	strncpy(__buf, sCwd, __size);
 	return __buf;
 }
@@ -684,7 +717,16 @@ int getdents(int __fd, dirent* dp, int count) {
 		TEST(checkMAResult(plfd->listHandle));
 	}
 	CHECK(dp->d_namlen = maFileListNext(plfd->listHandle, dp->d_name, sizeof(dp->d_name)), EIO);
+	LOGD("namlen: %i\n", dp->d_namlen);
 	FAILIF(dp->d_namlen >= sizeof(dp->d_name), EINVAL);
+	if(dp->d_name[dp->d_namlen-1] == '/') {
+		LOGD("getdents: directory.\n");
+		dp->d_type = DT_DIR;
+		dp->d_name[dp->d_namlen-1] = 0;
+		dp->d_namlen--;
+	} else {
+		dp->d_type = DT_REG;
+	}
 	return dp->d_namlen;
 }
 
@@ -750,4 +792,10 @@ DIR* fdopendir(int __fd) {
 	dirp->dd_fd = __fd;
 
 	return dirp;
+}
+
+int fchdir(int __fd) {
+	LOWFD;
+	FAILIF(!(plfd->flags & O_DIRECTORY), ENOTDIR);
+	return chdir(plfd->name);
 }

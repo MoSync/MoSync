@@ -39,6 +39,7 @@ static char sccsid[] = "@(#)readdir.c	5.7 (Berkeley) 6/1/90";
 
 #include <dirent.h>
 #include <stddef.h>
+#include <string.h>
 
 /*
 * get next entry in a directory.
@@ -57,6 +58,15 @@ dirent* readdir(DIR* dirp) {
 	}
 	dp = (struct dirent *)(dirp->dd_buf);
 	return (dp);
+}
+
+int readdir_r(DIR* dirp, dirent* entry, dirent ** result) {
+	dirent* dp = readdir(dirp);
+	if(!dp)
+		return -1;
+	memcpy(entry, dp, sizeof(dirent));
+	*result = entry;
+	return 0;
 }
 
 #endif /* ! HAVE_OPENDIR */

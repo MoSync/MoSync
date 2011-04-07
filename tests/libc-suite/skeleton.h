@@ -120,3 +120,15 @@ wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size);
 #define O_NDELAY 0
 #define O_NOATIME 0
 #define open64 open
+
+#define dirent64 dirent
+#define readdir64 readdir
+#define readdir64_r readdir_r
+
+// supa-hack
+#define d_ino d_namlen, 0
+
+#define _D_EXACT_NAMLEN(d) ((d)->d_namlen)
+#define _D_ALLOC_NAMLEN(d) (_D_EXACT_NAMLEN (d) + 1)
+
+#define DT_UNKNOWN 0
