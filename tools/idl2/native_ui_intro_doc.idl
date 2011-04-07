@@ -1,20 +1,15 @@
 /**
-*MoSync now have initial Native UI support on Android and iPhone. In
-*essence this means that you can develop native user interfaces on MoSync. 
-*Technically we've mapped the different ways of coding UI:s on Android and iPhone 
-*into a single api. Some properties/widgets will only be available on some platforms. 
-*As of today most functionality int the Native UI api is available on both Android
-*and iPhone.
+*MoSync provides Native UI support on Android and iPhone. This means that you can develop
+*user interfaces that use each target platform's own widgets. 
+*We have mapped the different ways of coding UIs to a single API. A few properties/widgets
+*are only be available on one platform, but most are available on both Android and iPhone.
 *
-*All native UI api functions begin with the prefix maWidget. It is a minimal 
-*api where "widgets" (We will refer to them as Widgets) that have different 
-*semantics in the UI can be created. These Widgets can also 
-*have properties which can be set in order to change the appearance or behaviour of them. 
-*Some of the widgets can have children.
+*All native UI API functions begin with the prefix "maWidget". It is a minimal 
+*API where widgets with different semantics in the UI can be created: widget
+*properties affect widget appearance and behaviour. Some of the widgets can have children.
 *
-*There are three different types of Widgets: Screens, Layouts and Views. We
-*will try to explain them briefly. First take a look at this illustration to 
-*give you an overview of how the UI hierarchy usually will look
+*There are three main types of widget: Screens, Layouts and Views. We
+*explain them briefly here. The illustration below shows a typical widget hierarchy:
 *
 \verbatim
            Screen
@@ -30,8 +25,8 @@
 *\b Screens
 *
 *Screens represent the root of a UI hierarchy. If you're used to iPhone
-*programming a Screen is bascially a UIViewController. If you're used to Android 
-*programming a Screen is bascially an Activity.
+*programming, a Screen is equivalent to a UIViewController. If you're used to Android 
+*programming, a Screen is equivalent to an Activity.
 *
 *For now there are three types of Screens: Screen, TabScreen, StackScreen. 
 *- 	\b Screen \n
@@ -42,16 +37,17 @@
 *
 *- 	\b StackScreen \n
 *   A special kind of screen that manages navigation and animation between Screens. It manages a stack of screens. Any Screen can be pushed to 
-*	the StackScreen in order to animate to it. Internally the StackScreen will push the screen onto a stack. When a StackScreen is popped, the stack of screens is popped 
+*	the StackScreen in order to animate to it. Internally the StackScreen will push the 
+*	screen onto a stack. When a StackScreen is popped, the stack of screens is popped 
 *	and the Screen remaining on the stack is animated to and displayed.
 *
-*To show a screen you use #maWidgetScreenShow. A screen that is shown shouldn't
-*have a parent screen (i.e. it should be the root).
+*To show a screen you use #maWidgetScreenShow. A screen that is shown using this function should NOT have
+*have a parent screen (i.e., it should be at the root of a widget hierarchy).
 *
 *
 *\b Layouts
 *
-*There are different layouts to facilitate dynamic layouting. If you want the same layout
+*There are different layouts to facilitate dynamic layouts. If you want the same layout
 *for different screen sizes these come in handy.
 *
 *For now there are three different layouts: RelativeLayout, VerticalLayout and
@@ -68,29 +64,32 @@
 *
 *All widgets have a set of default properties called "width" and "height". These properties
 *specify the actual width and height of the widget. However these values can also be set
-*to two different constants. 
+*to two different constants: 
 *
-*One of them is #MAW_CONSTANT_WRAP_CONTENT, which means that the width or height should automatically
-*be set to wrap the content. For instance if you set width and height to MAW_CONSTANT_WRAP_CONTENT on
+*- 	#MAW_CONSTANT_WRAP_CONTENT means that the width or height should automatically
+*be set to wrap the content. If you set width and height to #MAW_CONSTANT_WRAP_CONTENT on
 *a label, the width and height of the widget will automatically be set to the size of the label text.
-*The other constant is #MAW_CONSTANT_FILL_AVAILABLE_SPACE, which means to dynamically adapt to the size
-*of the parent parent. If a widget is put inside a RelativeLayout or Screen this bascially means that
-*the widget should be stretched to the width or height of the parent. With vertical and horizontal
-*layouts they are more powerful. Then they mean that the width or height should be divided among all
-*widgets that have #MAW_CONSTANT_FILL_AVAILABLE_SPACE set. For instance: say that you have a
-*HorizontalLayout that is 320 wide and add 2 widgets that are 30 pixels wide and then two widgets that
+*
+*- 	#MAW_CONSTANT_FILL_AVAILABLE_SPACE dynamically adapts the size of the widget to
+*the parent. If a widget is put inside a RelativeLayout or Screen 
+*the widget will be stretched to fill the parent. 
+*
+*With vertical and horizontal layouts these constants are more powerful: they mean that the 
+*width or height should be divided among all
+*widgets that have #MAW_CONSTANT_FILL_AVAILABLE_SPACE set. For example, say you have a
+*HorizontalLayout that is 320 wide and you add 2 widgets that are 30 pixels wide and then two widgets that
 *have #MAW_CONSTANT_FILL_AVAILABLE_SPACE set as the width. These will share the remaining space which
 *equals 320-30*2=260. This means that they both will be 130 pixels wide.
 *
 *
 *\b Views
 *
-*There's many different kinds of views. These are all leaf-nodes in the UI tree.
+*There are many different kinds of Views. They are all leaf-nodes in the UI tree.
 *
-*Today these are available:
+*Today these view are available:
 *
 *- \b Button \n
-*  Just a simple clickable button that can have a title.
+*  Just a simple click-able button that can have a title.
 *
 *- \b ImageButton \n
 *  Same as button but can also have an background image instead of the default button style.
@@ -108,7 +107,7 @@
 *  Like an editbox on a toolbar with a default look and feel and a button for performing the search.
 *  
 *- \b NavBar \n
-*  A toolbar looking view that can have a back button and a title. A NavBar will automatically appear
+*  A toolbar-like view that can have a back button and a title. A NavBar will automatically appear
 *  if you're using a StackScreen. It is only available on iOS for now.
 *
 *- \b ListView \n
@@ -119,7 +118,7 @@
 *  any view can be added to it in order to create a custom appearance.
 *  
 *- \b GLView \n
-*  A widget to draw accelerated graphics using OpenGL|ES (version 1.0 in the current version).
+*  A widget to draw accelerated graphics using OpenGL for Embedded Systems version 1.0.
 *  
 *- \b WebView \n
 *  A widget to render web content.
@@ -127,16 +126,16 @@
 *
 *\b Properties
 *
-*Widget have properties. These can change the appearance of the widget or how it behaves. For some
-*widgets you can also get properties such as with an EditBox where you can get the current text of the
+*Widget have properties. These can change the appearance or behaviour of the widget. For some
+*widgets you can also get properties: for an EditBox, for example, you can get the current text of the
 *edit box. See the respective property set in the reference documentation for more information about
-*what properties each widget have.
+*what properties each widget has.
 *
 *
 *\b Events
 *
 *A UI system is rather useless if you don't connect it with some kind of logic. Whenever something in
-*the UI happens events are sent from the runtime to the MoSync applications. These can be hooked to
+*the UI happens, events are sent from the runtime to the MoSync applications. These can be hooked to
 *do whatever needs to be done. The top level event is called #EVENT_TYPE_WIDGET. When such an event is
 *received, the data pointer of the #MAEvent struct points to a #MAWidgetEventData struct. See 
 *#MAWidgetEventData for more information about the widget events.
@@ -160,12 +159,12 @@ void customEvent(const MAEvent& event) {
 *
 *\b Future \b plans
 *
-*As this api is rather low-level, we plan to make a higher level abstraction layer. A layer that
-*unifies how the programmer can design UI:s for all different phones using either MAUI (the custom UI
+*As this API is rather low-level, we plan to make a higher-level abstraction layer. A layer that
+*unifies how the programmer can design UIs for all different phones using either MAUI (the custom UI
 *system implemented entirely in MoSync) or Native UI. This library would then choose the most 
 *appropriate UI system for the platform the application is currently running on.
 *
-*We also have an experimental UI editor in the works that makes it possible to develop Native UI:s and 
+*We also have an experimental UI editor in the works that makes it possible to develop Native UIs and 
 *instantly see the results on both Android and iPhone devices/emulators.
 *
 */
