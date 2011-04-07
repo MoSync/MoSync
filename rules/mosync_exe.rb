@@ -54,7 +54,7 @@ class PipeExeWork < PipeGccWork
 			[mosync_include, "#{mosyncdir}/profiles/vendors/MoSync/Emulator"]
 		super
 	end
-	def setup3(all_objects)
+	def setup3(all_objects, have_cppfiles)
 		# resource compilation
 		if(!defined?(@LSTFILES))
 			if(@SOURCES[0])
@@ -80,7 +80,7 @@ class PipeExeWork < PipeGccWork
 		end
 		all_objects += libs
 		
-		super(all_objects)
+		super
 		
 		if(ELIM)
 			@TARGET.extend(PipeElimTask)
