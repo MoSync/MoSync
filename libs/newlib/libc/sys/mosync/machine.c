@@ -264,8 +264,8 @@ static int baseStat(MAHandle h, struct stat* st) {
 	st->st_nlink = 1;
 	st->st_uid = 0;
 	st->st_gid = 0;
-	st->st_atime = 0;
-	st->st_ctime = 0;
+	st->st_atime = st->st_mtime;
+	st->st_ctime = st->st_mtime;
 	st->st_blocks = (st->st_size / 512) + 1;
 	st->st_blksize = 1024 * 4;	// arbitrary
 	

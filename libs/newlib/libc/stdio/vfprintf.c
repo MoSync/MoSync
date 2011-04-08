@@ -1810,7 +1810,7 @@ exponent(char *p0, int exp, int fmtch)
 /* The below constant state tables are shared between all versions of
    vfprintf and vfwprintf.  They must only be defined once, which we do in
    the STRING_ONLY/INTEGER_ONLY versions here. */
-#if defined (STRING_ONLY) && defined(INTEGER_ONLY)
+#if defined (STRING_ONLY) //&& defined(INTEGER_ONLY)
 
 _CONST __CH_CLASS __chclass[256] = {
   /* 00-07 */  OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,   OTHER,

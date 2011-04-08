@@ -93,6 +93,7 @@ unsigned sleep(unsigned s) {
 	return 0;
 }
 
+#if 0
 FILE *popen(const char *s, const char * mode) {
 	errno = ENOSYS;
 	return NULL;
@@ -102,6 +103,7 @@ int pclose(FILE* file) {
 	errno = ENOSYS;
 	return -1;
 }
+#endif
 
 int mcheck (void (*__abortfunc) (int)) {
 	return 0;
@@ -119,14 +121,17 @@ void muntrace (void) {
 long int random (void) {
 	return rand();
 }
+void srandom(unsigned seed) {
+	srand(seed);
+}
+#if 0
 char *initstate(unsigned seed, char *state, size_t size) {
 	return NULL;
-}
-void srandom(unsigned seed) {
 }
 void * setstate (void *state) {
 	return NULL;
 }
+#endif
 
 double nexttoward(double x, double y) {
 	return nextafter(x, y);
