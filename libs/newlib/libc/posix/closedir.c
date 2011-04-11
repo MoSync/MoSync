@@ -1,8 +1,8 @@
-/*	$OpenBSD: strsep.c,v 1.6 2005/08/08 08:05:37 espie Exp $	*/
+#ifndef HAVE_OPENDIR
 
-/*-
- * Copyright (c) 1990, 1993
- *	The Regents of the University of California.  All rights reserved.
+/*
+ * Copyright (c) 1983 Regents of the University of California.
+ * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -12,7 +12,11 @@
  * 2. Redistributions in binary form must reproduce the above copyright
  *    notice, this list of conditions and the following disclaimer in the
  *    documentation and/or other materials provided with the distribution.
- * 3. Neither the name of the University nor the names of its contributors
+ * 3. All advertising materials mentioning features or use of this software
+ *    must display the following acknowledgement:
+ *	This product includes software developed by the University of
+ *	California, Berkeley and its contributors.
+ * 4. Neither the name of the University nor the names of its contributors
  *    may be used to endorse or promote products derived from this software
  *    without specific prior written permission.
  *
@@ -29,43 +33,44 @@
  * SUCH DAMAGE.
  */
 
-#include <string.h>
-#include <stdio.h>
+#if defined(LIBC_SCCS) && !defined(lint)
+static char sccsid[] = "@(#)closedir.c	5.9 (Berkeley) 2/23/91";
+#endif /* LIBC_SCCS and not lint */
+
+#include <sys/types.h>
+#include <dirent.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <sys/lock.h>
+
+extern void _cleanupdir (DIR *dirp);
 
 /*
- * Get next token from string *stringp, where tokens are possibly-empty
- * strings separated by characters from delim.  
- *
- * Writes NULs into the string at *stringp to end tokens.
- * delim need not remain constant from call to call.
- * On return, *stringp points past the last NUL written (if there might
- * be further tokens), or is NULL (if there are definitely no more tokens).
- *
- * If *stringp is NULL, strsep returns NULL.
+ * close a directory.
  */
-char *
-strsep(char **stringp, const char *delim)
+int
+_DEFUN(closedir, (dirp),
+       register DIR *dirp)
 {
-	char *s;
-	const char *spanp;
-	int c, sc;
-	char *tok;
+	int fd, rc;
 
-	if ((s = *stringp) == NULL)
-		return (NULL);
-	for (tok = s;;) {
-		c = *s++;
-		spanp = delim;
-		do {
-			if ((sc = *spanp++) == c) {
-				if (c == 0)
-					s = NULL;
-				else
-					s[-1] = 0;
-				*stringp = s;
-				return (tok);
-			}
-		} while (sc != 0);
+#ifdef HAVE_DD_LOCK
+	__lock_acquire_recursive(dirp->dd_lock);
+#endif
+	rc = 0;
+	fd = dirp->dd_fd;
+	if (fd != -1) {
+		dirp->dd_fd = -1;
+		//dirp->dd_loc = 0;
+		(void)free((void *)dirp->dd_buf);
+		(void)free((void *)dirp);
+		rc = close(fd);
 	}
-	/* NOTREACHED */
+#ifdef HAVE_DD_LOCK
+	__lock_release_recursive(dirp->dd_lock);
+	__lock_close_recursive(dirp->dd_lock);
+#endif
+	return rc;
 }
+
+#endif /* ! HAVE_OPENDIR */

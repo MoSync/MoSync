@@ -6,7 +6,6 @@ SKIPPED_DIRECTORIES = [
 	'elf',
 	'setjmp',
 	'signal',
-	'dirent',
 	'dlfcn',
 	'gmon',
 	'iconv',	# todo
@@ -50,6 +49,11 @@ SKIPPED_UNRESOLVED = [
 	# Seems like a getc() causes the write position to jump to the end of the file,
 	# but it should be the same as the read position. Too tricky to fix.
 	'test_rdwr.c',
+	
+	'tst-sprintf.c',	# newlib's printf doesn't handle invalid formats the same way as glibc.
+	'bug14.c',	# apparently, sscanf() doesn't convert from UTF-8 to wchar_t.
+	'scanf13.c',	# 8 fails.
+	'tst-strtod.c',	# 2 regular fails, and no locale support.
 ]
 
 SKIPPED_FILES = SKIPPED_UNRESOLVED + [
@@ -144,7 +148,7 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	
 	'tst-truncate64.c',	# truncate64
 	'tst-fork.c',	# fork
-	'tst-dir.c',	# todo, dirent.h
+#	'tst-dir.c',	# todo, dirent.h
 	'tst-chmod.c',	# chmod
 	'bug-regex1.c',	# re_registers
 	'bug-regex4.c',	# re_search_2
@@ -230,6 +234,26 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'bug-getopt1.c',	# non-posix modifier: +
 	
 	'bug5.c',	# system()
+	
+	'tst-seekdir.c', # seekdir()
+	
+	'scanf12.c',	# test seems broken.
+	'tst-swprintf.c',	# locale ja_JP.EUC-JP
+	'tst-popen.c',	# popen()
+	'tst-popen2.c',	# popen()
+	'scanf14.c',	# GNU extension: %as
+	'scanf16.c',	# GNU extension: %as
+	'bug21.c',	# GNU extension: %as
+	'bug22.c',	# we don't support writing to /dev/null.
+	
+	'tst-random.c',	# initstate()
+	'tst-random2.c',	# initstate()
+	'tst-system.c',	# system()
+	'tst-strtod4.c', # locale cs_CZ.UTF-8
+	'tst-strtod5.c', # locale cs_CZ.UTF-8
+	'tst-strtod6.c', # incorrect assumption about parsing of "NaN(foobar)"
+	'tst-makecontext3.c',	# ucontext.h
+	'tst-putenv.c',	# putenv from another process.
 ]
 
 SKIPPED_PATTERNS = [

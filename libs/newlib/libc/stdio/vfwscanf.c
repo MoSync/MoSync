@@ -488,9 +488,14 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	  continue;
 
 	case L'*':
+		if(width != 0)
+			goto match_failure;
 	  flags |= SUPPRESS;
 	  goto again;
 	case L'l':
+		if(flags & (LONGDBL | LONG)) {
+			goto match_failure;
+		}
 #if defined _WANT_IO_C99_FORMATS || !defined _NO_LONGLONG
 	  if (*fmt == L'l')	/* Check for 'll' = long long (SUSv3) */
 	    {
@@ -502,6 +507,9 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	    flags |= LONG;
 	  goto again;
 	case L'L':
+		if(flags & (LONGDBL | LONG)) {
+			goto match_failure;
+		}
 	  flags |= LONGDBL;
 	  goto again;
 	case L'h':
@@ -565,6 +573,9 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	case L'7':
 	case L'8':
 	case L'9':
+		if(flags & (LONGDBL | LONG)) {
+			goto match_failure;
+		}
 	  width = width * 10 + c - L'0';
 	  goto again;
 
@@ -718,7 +729,7 @@ _DEFUN(__SVFWSCANF_R, (rptr, fp, fmt0, ap),
 	  __sfp_lock_release ();
 	  return EOF;
 
-	default:		/* compat */
+	default:		/* no compat */
 	  goto match_failure;
 	}
 

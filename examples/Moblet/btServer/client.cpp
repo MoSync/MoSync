@@ -39,13 +39,16 @@ static const MABtAddr sAddress = { { 0x00,0x18,0xC5,0x3F,0x74,0x7E } };
 
 static const MAUUID sUuid = SERVER_MAUUID_DECL;
 
-class MyMoblet : public Moblet, ConnectionListener {
+static bool sBenchmarkMode = false;
+
+class MyMoblet : public Moblet, ConnectionListener, TimerListener {
 private:
 	BluetoothConnection mConn;
 	char buffer1[512], buffer2[512];
 	char* currentBuffer;
 	int pos;
 	bool writing, online;
+	int mBenchWriteCount, mBenchTime, mBenchLastWriteCount;
 public:
 	MyMoblet() : mConn(this), pos(0), writing(false), online(false) {
 		printf("Hello World!\n");
@@ -64,8 +67,39 @@ public:
 		currentBuffer = buffer1;
 	}
 
+	void benchWrite() {
+		// this is technically a buffer read overrun,
+		// but since we don't care what we send, it doesn't matter.
+		mConn.write(buffer1, 8*1024);
+	}
+
+	void runTimerEvent() {
+		// another second has passed since the start of the benchmark.
+		mBenchTime++;
+		// let's print the total average speed.
+		printf("%i kBps (current: %i)\n", (mBenchWriteCount * 8) / mBenchTime, (mBenchWriteCount - mBenchLastWriteCount) * 8);
+		mBenchLastWriteCount = mBenchWriteCount;
+	}
+
 	void keyPressEvent(int keyCode, int nativeCode) {
 		printf("kPE %i\n", keyCode);
+		if(keyCode == MAK_5 || keyCode == MAK_MENU) {
+			sBenchmarkMode = !sBenchmarkMode;
+			printf("Benchmark mode: %s\n", sBenchmarkMode ? "on" : "off");
+			if(sBenchmarkMode) {
+				if(!writing) {
+					benchWrite();
+					writing = true;
+				}
+				mBenchWriteCount = 0;
+				mBenchTime = 0;
+				mBenchLastWriteCount = 0;
+				addTimer(this, 1000, 0);
+				return;
+			} else {
+				removeTimer(this);
+			}
+		}
 		// If it's a printable key and we're connected...
 		if(keyCode >= MAK_SPACE && keyCode <= MAK_Z && online) {
 			// Store the digit.
@@ -88,8 +122,13 @@ public:
 		online = result > 0;
 	}
 	void connWriteFinished(Connection* conn, int result) {
-		printf("cWF %i\n", result);
 		online = result > 0;
+		if(sBenchmarkMode) {
+			mBenchWriteCount++;
+			benchWrite();
+			return;
+		}
+		printf("cWF %i\n", result);
 		writing = false;
 	}
 };

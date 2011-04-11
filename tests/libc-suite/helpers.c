@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <malloc.h>
+#include <sys/fcntl.h>
 
 static void install_stdmalloc_hooks();
 int main(int argc, const char** argv);
@@ -92,6 +93,7 @@ unsigned sleep(unsigned s) {
 	return 0;
 }
 
+#if 0
 FILE *popen(const char *s, const char * mode) {
 	errno = ENOSYS;
 	return NULL;
@@ -101,6 +103,7 @@ int pclose(FILE* file) {
 	errno = ENOSYS;
 	return -1;
 }
+#endif
 
 int mcheck (void (*__abortfunc) (int)) {
 	return 0;
@@ -118,14 +121,17 @@ void muntrace (void) {
 long int random (void) {
 	return rand();
 }
+void srandom(unsigned seed) {
+	srand(seed);
+}
+#if 0
 char *initstate(unsigned seed, char *state, size_t size) {
 	return NULL;
-}
-void srandom(unsigned seed) {
 }
 void * setstate (void *state) {
 	return NULL;
 }
+#endif
 
 double nexttoward(double x, double y) {
 	return nextafter(x, y);
@@ -135,7 +141,7 @@ float nexttowardf(float x, double y) {
 	return nextafterf(x, y);
 }
 
-char* strdupa(char* str) {
+char* strdupa(const char* str) {
 	// not a valid implementation, but it'll work for these small test programs.
 	return strdup(str);
 }
@@ -153,92 +159,6 @@ const char *re_compile_pattern (const char *__pattern, size_t __length,
 		return "regcomp error";
 }
 
-
-#define MAXPATHLEN 1024
-char *
-basename(const char *path)
-{
-	static char bname[MAXPATHLEN];
-	size_t len;
-	const char *endp, *startp;
-
-	/* Empty or NULL string gets treated as "." */
-	if (path == NULL || *path == '\0') {
-		bname[0] = '.';
-		bname[1] = '\0';
-		return (bname);
-	}
-
-	/* Strip any trailing slashes */
-	endp = path + strlen(path) - 1;
-	while (endp > path && *endp == '/')
-		endp--;
-
-	/* All slashes becomes "/" */
-	if (endp == path && *endp == '/') {
-		bname[0] = '/';
-		bname[1] = '\0';
-		return (bname);
-	}
-
-	/* Find the start of the base */
-	startp = endp;
-	while (startp > path && *(startp - 1) != '/')
-		startp--;
-
-	len = endp - startp + 1;
-	if (len >= sizeof(bname)) {
-		errno = ENAMETOOLONG;
-		return (NULL);
-	}
-	memcpy(bname, startp, len);
-	bname[len] = '\0';
-	return (bname);
-}
-char *
-dirname(const char *path)
-{
-	static char dname[MAXPATHLEN];
-	size_t len;
-	const char *endp;
-
-	/* Empty or NULL string gets treated as "." */
-	if (path == NULL || *path == '\0') {
-		dname[0] = '.';
-		dname[1] = '\0';
-		return (dname);
-	}
-
-	/* Strip any trailing slashes */
-	endp = path + strlen(path) - 1;
-	while (endp > path && *endp == '/')
-		endp--;
-
-	/* Find the start of the dir */
-	while (endp > path && *endp != '/')
-		endp--;
-
-	/* Either the dir is "/" or there are no slashes */
-	if (endp == path) {
-		dname[0] = *endp == '/' ? '/' : '.';
-		dname[1] = '\0';
-		return (dname);
-	} else {
-		/* Move forward past the separating slashes */
-		do {
-			endp--;
-		} while (endp > path && *endp == '/');
-	}
-
-	len = endp - path + 1;
-	if (len >= sizeof(dname)) {
-		errno = ENAMETOOLONG;
-		return (NULL);
-	}
-	memcpy(dname, path, len);
-	dname[len] = '\0';
-	return (dname);
-}
 
 char* strchrnul(const char* str, int c) {
 	char* res = strchr(str, c);
@@ -316,10 +236,34 @@ int ffsll(long long int i) {
 }
 
 long int sysconf (int parameter) {
-	errno = ENOSYS;
-	return -1;
+	switch(parameter) {
+	case _SC_PAGESIZE:
+		return 512;
+	default:
+		errno = ENOSYS;
+		return -1;
+	}
 }
 
 wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size) {
 	return (wchar_t *)mempcpy(wto, wfrom, size * sizeof(wchar_t));
+}
+
+int mknod() {
+	errno = ENOSYS;
+	return -1;
+}
+
+int symlink(const char* name, const char* target) {
+	// fakeout by creating an empty file.
+	int fd = open(name, O_RDWR | O_CREAT | O_EXCL);
+	if(fd < 0)
+		return fd;
+	return close(fd);
+}
+
+int chmod(const char* name, mode_t mode) {
+	// check that the file exists.
+	struct stat st;
+	return stat(name, &st);
 }

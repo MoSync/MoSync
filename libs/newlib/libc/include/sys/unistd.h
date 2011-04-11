@@ -53,7 +53,7 @@ int     _EXFUN(execvp, (const char *__file, char * const __argv[] ));
 int     _EXFUN(execvpe, (const char *__file, char * const __argv[], char * const __envp[] ));
 int	_EXFUN(faccessat, (int __dirfd, const char *__path, int __mode, int __flags));
 #endif
-#if defined(__CYGWIN__) || defined(__rtems__) || defined(__SPU__)
+#if defined(__CYGWIN__) || defined(__rtems__) || defined(__SPU__) || defined(MAPIP)
 int     _EXFUN(fchdir, (int __fildes));
 #endif
 int     _EXFUN(fchmod, (int __fildes, mode_t __mode ));

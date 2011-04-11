@@ -129,6 +129,11 @@ void Double::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) 
 	else pf("0");
 }
 
+void LongDouble::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const {
+	if(fmt == TypeBase::eDecimal || fmt == TypeBase::eNatural) pf("%f", *(double*)data);
+	else pf("0");
+}
+
 #define BROKEN_BUILTIN_FUNCTIONS(name, id) \
 	void id::printMI(printfPtr pf, const void* data, TypeBase::PrintFormat fmt) const { \
 	DEBIG_PHAT_ERROR; }

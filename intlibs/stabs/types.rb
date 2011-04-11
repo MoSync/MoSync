@@ -26,24 +26,24 @@ $types_int = [
 	["short unsigned int", "ShortUnsignedInt"],
 	["signed char", "SignedChar"],
 	["unsigned char", "UnsignedChar"],
-	["wchar_t", "Wchar"]
+	["wchar_t", "Wchar"],
 ]
 
 $types_float = [
 	["float", "Float"],
-	["double", "Double"]
+	["double", "Double"],
+	["long double", "LongDouble"],
 ]
 
 $types_bool = [
-	["bool", "Bool"]
+	["bool", "Bool"],
 ]
 
 $types_broken = [
-	["long double", "LongDouble"],
 	["complex int", "ComplexInt"],
 	["complex float", "ComplexFloat"],
 	["complex double", "ComplexDouble"],
 	["complex long double", "ComplexLongDouble"],
 	["void", "Void"],
-	["nothrow_t", "Nothrow"]
+	["nothrow_t", "Nothrow"],
 ]

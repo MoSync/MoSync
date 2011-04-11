@@ -30,10 +30,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
+static bool sBenchmarkMode = false;
+
 class MyConnectionHandler : public ConnectionListener {
 private:
 	Connection* mConn;
-	char mBuffer[64];
+	char mBuffer[8*1024];
 	const int mId;
 public:
 	MyConnectionHandler(int id) : mConn(NULL), mId(id) {}
@@ -64,9 +66,20 @@ public:
 			printf("recv %i: %i\n", mId, result);
 			delete this;	// should be safe
 		} else {
-			// We received data. Print it.
-			mBuffer[result] = 0;
-			printf("%i: %s\n", mId, mBuffer);
+			if(sBenchmarkMode) {
+				// The client takes care of timing the benchmark.
+				// We, the server, need only discard the data.
+				conn->recv(mBuffer, sizeof(mBuffer));
+				return;
+			}
+			// Avoid a buffer overrun if result == sizeof(mBuffer).
+			// If we've gotten more than 64 bytes,
+			// it's probably useless to try to print it.
+			if(result < 64) {
+				// We received data. Print it.
+				mBuffer[result] = 0;
+				printf("%i: %s\n", mId, mBuffer);
+			}
 			// Continue receiving data.
 			conn->recv(mBuffer, 63);
 		}
@@ -111,6 +124,11 @@ public:
 	void keyPressEvent(int keyCode, int nativeCode) {
 		if(keyCode == MAK_0)
 			close();
+		//if(keyCode == MAK_5)
+		{
+			sBenchmarkMode = !sBenchmarkMode;
+			printf("Benchmark mode: %s\n", sBenchmarkMode ? "on" : "off");
+		}
 	}
 
 	//ServerListener

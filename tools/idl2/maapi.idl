@@ -2356,10 +2356,8 @@ interface MAAPI {
 
 #if IX_CELLID
 		/**
-		* \brief Information about the current cell, including country, network and area code and the cell ID.
-		*
-		* Stores current cell id in *cellId.
-		* Returns the negated Symbian error code. 0 on success.
+		* \brief Information about the current cell, including country,
+		* network and area code and the cell ID.
 		*/
 		struct MACellInfo {
 			/**
@@ -2388,7 +2386,7 @@ interface MAAPI {
 		}
 
 		/**
-		* Retrieves the current cellular network information
+		* Retrieves the current cellular network information.
 		* If the phone is offline or otherwise has no signal, this function will fail.
 		* \param pInfo A pointer to a struct which will receive the information.
 		* \returns 0 if successful. \< 0 otherwise.

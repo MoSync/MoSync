@@ -20,6 +20,7 @@
 #include "mavsprintf.h"
 #include "conprint.h"
 #include "realpath.h"
+#include "dirent.h"
 
 
 #ifdef MOSYNCDEBUG
@@ -104,24 +105,31 @@ struct group* getgrgid(gid_t gid) {
 #define LOWFD_WRITELOG 1
 #define LOWFD_OFFSET 2
 
+// check include/sys/_default_fcntl.h to make sure this flag doesn't clash.
+#define O_DIRECTORY 0x1000000
+
 struct LOW_FD {
 	int lowFd;
 	int refCount;
 	int flags;
+	
+	// valid only if flags & O_DIRECTORY.
+	char* name;
+	int listHandle;
 };
 
 #define NFD 32
 static struct LOW_FD* sFda[NFD];
 static struct LOW_FD sLfda[NFD];
 
-static struct LOW_FD sLfConsole = { LOWFD_CONSOLE, 1, O_APPEND };
-static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1, O_APPEND };
+static struct LOW_FD sLfConsole = { LOWFD_CONSOLE, 1, O_APPEND, NULL, 0 };
+static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1, O_APPEND, NULL, 0 };
 
 static int closeLfd(struct LOW_FD* plfd);
 
 static char sCwd[2048] = "/";
 
-// returns 1 if it's a directory, 0 if it's not.
+// returns 1 the path is empty, 0 if it's not.
 static int getRealPath(char *buf, const char* path, int size) {
 #if 0
 	if(path[0]!='/') {
@@ -137,7 +145,7 @@ static int getRealPath(char *buf, const char* path, int size) {
 	}
 #endif
 	size=strlen(buf);
-	if(!size || buf[size-1]=='/') return 1;
+	if(!size) return 1;
 	else return 0;
 }
 
@@ -191,17 +199,23 @@ static int findFreeFd(void) {
 	STDFAIL;
 }
 
-static MAHandle errnoFileOpen(const char* path, int ma_mode) {
-	MAHandle h = maFileOpen(path, ma_mode);
-	if(h < 0) {
-		switch(h) {
+// converts maFile error codes to errno.
+// returns -1 on error.
+static int checkMAResult(int res) {
+	if(res < 0) {
+		switch(res) {
 		case MA_FERR_FORBIDDEN: errno = EACCES; break;
 		case MA_FERR_NOTFOUND: errno = ENOENT; break;
 		default: errno = EIO;
 		}
 		STDFAIL;
 	}
-	return h;
+	return res;
+}
+
+static MAHandle errnoFileOpen(const char* path, int ma_mode) {
+	MAHandle h = maFileOpen(path, ma_mode);
+	return checkMAResult(h);
 }
 
 int dup(int __fd) {
@@ -236,11 +250,11 @@ int dup2(int __fd, int newFd) {
 #error gha
 #endif
 
-static int baseStat(MAHandle h, struct stat* st, int checkSize) {
-	if(checkSize) {
+static int baseStat(MAHandle h, struct stat* st) {
+	if(st->st_mode == S_IFREG) {
 		CHECK(st->st_size = maFileSize(h), EIO);
 	} else {
-		st->st_size = 0;
+		st->st_size = 4*1024;	// default directory size.
 	}
 	CHECK(st->st_mtime = maFileDate(h), EIO);
 	
@@ -250,8 +264,8 @@ static int baseStat(MAHandle h, struct stat* st, int checkSize) {
 	st->st_nlink = 1;
 	st->st_uid = 0;
 	st->st_gid = 0;
-	st->st_atime = 0;
-	st->st_ctime = 0;
+	st->st_atime = st->st_mtime;
+	st->st_ctime = st->st_mtime;
 	st->st_blocks = (st->st_size / 512) + 1;
 	st->st_blksize = 1024 * 4;	// arbitrary
 	
@@ -266,8 +280,8 @@ int fstat(int __fd, struct stat *st) {
 		return 0;
 	} else {
 		MAHandle h = lfd - LOWFD_OFFSET;
-		st->st_mode = S_IFREG;
-		return baseStat(h, st, TRUE);
+		st->st_mode = (plfd->flags & O_DIRECTORY) ? S_IFDIR : S_IFREG;
+		return baseStat(h, st);
 	}
 }
 
@@ -279,7 +293,7 @@ static int postStat(MAHandle h, struct stat *st, int mode) {
 		return 0;
 	}
 	st->st_mode = mode;
-	TEST(baseStat(h, st, mode != S_IFDIR));
+	TEST(baseStat(h, st));
 	return 1;
 }
 
@@ -294,16 +308,15 @@ int stat(const char *file, struct stat *st) {
 	// check if it's a directory.
 	length = strlen(temp);
 	if(temp[length-1] != '/') {
-		strncat(temp, "/", sizeof(temp));
+		temp[length] = '/';
 		length++;
+		temp[length] = 0;
 	}
 	h = errnoFileOpen(temp, MA_ACCESS_READ);
 	if(h > 0) {
 		res = postStat(h, st, S_IFDIR);
-		if(res < 0) {
-			CHECK(maFileClose(h), EIO);
-			STDFAIL;
-		}
+		CHECK(maFileClose(h), EIO);
+		TEST(res);
 		if(res > 0)	// it was an existing directory.
 			return 0;
 	} else {
@@ -315,10 +328,8 @@ int stat(const char *file, struct stat *st) {
 	temp[length-1] = 0;	// remove the ending slash
 	TEST(h = errnoFileOpen(temp, MA_ACCESS_READ));
 	res = postStat(h, st, S_IFREG);
-	if(res < 0) {
-		CHECK(maFileClose(h), EIO);
-		STDFAIL;
-	}
+	CHECK(maFileClose(h), EIO);
+	TEST(res);
 	if(!res) {
 		ERRNOFAIL(ENOENT);
 	}
@@ -450,9 +461,10 @@ int open(const char * __filename, int __mode, ...) {
 	int handle;
 	int newFd;
 	struct LOW_FD* newLfd;
+	int length;
 
 	char temp[2048];
-	if(getRealPath(temp, __filename, 2048) == 1) {
+	if(getRealPath(temp, __filename, 2046)) {
 		errno = ENOENT;
 		STDFAIL;
 	}
@@ -469,12 +481,32 @@ int open(const char * __filename, int __mode, ...) {
 		PANIC_MESSAGE("unsupported mode: O_NONBLOCK");
 	}
 	// O_SHLOCK, O_EXLOCK and O_NOATIME are unsupported. we drop them silently.
-
+	
+	// Check to see if we're opening a directory.
+	__mode &= ~O_DIRECTORY;
+	length = strlen(temp);
+	if(temp[length-1] == '/') {
+		__mode |= O_DIRECTORY;
+	}
+	
 	// Find a spot in the descriptor array.
 	CHECK(newFd = findFreeFd(), EMFILE);
 	newLfd = findFreeLfd();
-
-	TEST(handle = errnoFileOpen(temp, ma_mode));
+	
+	if(!(__mode & O_DIRECTORY)) {
+		handle = errnoFileOpen(temp, ma_mode);
+		if(handle < 0) {
+			// Try opening the requested file as a directory.
+			temp[length] = '/';
+			length++;
+			temp[length] = 0;
+			__mode |= O_DIRECTORY;
+		}
+	}
+	if(__mode & O_DIRECTORY) {
+		handle = errnoFileOpen(temp, ma_mode);
+	}
+	TEST(handle);
 	if(postOpen(handle, __mode) < 0) {
 		CHECK(maFileClose(handle), EIO);
 		STDFAIL;
@@ -483,8 +515,49 @@ int open(const char * __filename, int __mode, ...) {
 	newLfd->lowFd = handle + LOWFD_OFFSET;
 	newLfd->refCount = 1;
 	newLfd->flags = __mode;
+	if(__mode & O_DIRECTORY) {
+		newLfd->name = malloc(length+1);
+		FAILIF(newLfd->name == NULL, ENOMEM);
+		memcpy(newLfd->name, temp, length+1);
+		newLfd->listHandle = 0;
+	}
 	sFda[newFd] = newLfd;
 	return newFd;
+}
+
+int mkdir(const char* path, mode_t mode) {
+	MAHandle handle;
+	char temp[2048];
+	int length;
+	
+	getRealPath(temp, path, 2046);
+	length = strlen(temp);
+	if(temp[length-1]!='/') {
+		temp[length] = '/';
+		length++;
+		temp[length] = 0;
+	}
+	TEST(handle = errnoFileOpen(temp, MA_ACCESS_READ_WRITE));
+	if(postOpen(handle, O_CREAT | O_EXCL) < 0) {
+		int exists;
+		int orig_err = errno;
+		CHECK(maFileClose(handle), EIO);
+		// check if a file with the same name exists.
+		// if so, fail with EEXIST.
+		length--;
+		temp[length] = 0;
+		TEST(handle = errnoFileOpen(temp, MA_ACCESS_READ_WRITE));
+		exists = maFileExists(handle);
+		CHECK(maFileClose(handle), EIO);
+		CHECK(exists, ENOTRECOVERABLE);
+		FAILIF(exists, EEXIST);
+		ERRNOFAIL(orig_err);
+	}
+	return 0;
+}
+
+int rmdir(const char* name) {
+	return unlink(name);
 }
 
 int open_maWriteLog(void) {
@@ -498,12 +571,8 @@ int open_maWriteLog(void) {
 int unlink(const char *name) {
 	int dres, cres;
 	int __fd;
-	char temp[2048];
 
-	getRealPath(temp, name, 2048);
-	LOGD("unlink(%s)", temp);
-
-	__fd = open(temp, O_WRONLY);
+	__fd = open(name, O_RDWR);
 	if(__fd < 0)
 		return __fd;
 	dres = maFileDelete(sFda[__fd]->lowFd - LOWFD_OFFSET);
@@ -529,27 +598,56 @@ int truncate(const char *path, off_t length) {
 int chdir(const char *filename) {
 	MAHandle file;
 	int length;
-	int ret = 1;
+	int ret;
 	char temp[2048];
-	getRealPath(temp, filename, 2048);
+	getRealPath(temp, filename, 2046);
 	LOGD("chdir(%s)", temp);
 	
 	length = strlen(temp);
-	if(temp[length-1]!='/')
-		strncat(temp, "/", sizeof(sCwd));
-	
-	CHECK(file = maFileOpen(sCwd, MA_ACCESS_READ), EIO);
-	ret = maFileExists(file);
-	if(ret > 0) {
-		strcpy(sCwd, temp);
-		ret = 0;
+	if(temp[length-1]!='/') {
+		// Check if it's a regular file. If so, ENOTDIR.
+		file = maFileOpen(temp, MA_ACCESS_READ);
+		if(file > 0) {
+			ret = maFileExists(file);
+			CHECK(maFileClose(file), EIO);
+			CHECK(ret, EIO);
+			FAILIF(ret > 0, ENOTDIR);
+		}
+		
+		temp[length] = '/';
+		length++;
+		temp[length] = 0;
 	}
+	
+	CHECK(file = maFileOpen(temp, MA_ACCESS_READ), EIO);
+	ret = maFileExists(file);
 	CHECK(maFileClose(file), EIO);
 	CHECK(ret, EIO);
-	return ret;
+	FAILIF(ret == 0, ENOENT);
+
+	strcpy(sCwd, temp);
+	return 0;
 }
 
-char* getcwd(char *__buf, size_t __size ) {
+char* getcwd(char* __buf, size_t __size) {
+	// GNU functionality.
+	size_t len = strlen(sCwd);
+	if(__buf == NULL) {
+		if(__size == 0) {
+			__size = len + 1;
+		}
+	}
+	if(__size <= len) {
+		errno = ERANGE;
+		return NULL;
+	}
+	if(__buf == NULL) {
+		__buf = malloc(__size);
+		if(__buf == NULL) {
+			errno = ENOMEM;
+			return NULL;
+		}
+	}
 	strncpy(__buf, sCwd, __size);
 	return __buf;
 }
@@ -604,4 +702,100 @@ int gettimeofday (struct timeval *tp, void *tzp) {
 int nice(int incr) {
 	errno = ENOSYS;
 	STDFAIL;
+}
+
+int getdents(int __fd, dirent* dp, int count) {
+	//int res;
+	LOWFD;
+	MAASSERT(count >= sizeof(dirent));
+	LOGD("getdents(%i)\n", __fd);
+	
+	// if we don't have an open list, open a list.
+	if(plfd->listHandle <= 0) {
+		MAASSERT(plfd->name != NULL);
+		plfd->listHandle = maFileListStart(plfd->name, "*");
+		TEST(checkMAResult(plfd->listHandle));
+	}
+	CHECK(dp->d_namlen = maFileListNext(plfd->listHandle, dp->d_name, sizeof(dp->d_name)), EIO);
+	LOGD("namlen: %i\n", dp->d_namlen);
+	FAILIF(dp->d_namlen >= sizeof(dp->d_name), EINVAL);
+	if(dp->d_name[dp->d_namlen-1] == '/') {
+		LOGD("getdents: directory.\n");
+		dp->d_type = DT_DIR;
+		dp->d_name[dp->d_namlen-1] = 0;
+		dp->d_namlen--;
+	} else {
+		dp->d_type = DT_REG;
+	}
+	return dp->d_namlen;
+}
+
+void rewinddir(DIR* dir) {
+	struct LOW_FD* plfd = getLowFd(dir->dd_fd);
+	MAASSERT(plfd);
+	if(plfd->listHandle > 0) {
+		int res = maFileListClose(plfd->listHandle);
+		MAASSERT(res == 0);
+		plfd->listHandle = 0;
+	}
+}
+
+int dirfd(DIR* dir) {
+	return dir->dd_fd;
+}
+
+DIR* opendir(const char *name) {
+	DIR *dirp;
+	int fd;
+
+	if ((fd = open(name, 0)) == -1)
+		return NULL;
+	dirp = fdopendir(fd);
+	if(dirp == NULL) {
+		close(fd);
+	}
+	return dirp;
+}
+
+DIR* fdopendir(int __fd) {
+	DIR *dirp;
+	int rc = 0;
+	
+	struct LOW_FD* plfd = getLowFd(__fd);
+	if(!plfd) {
+		LOGFAIL;
+		return NULL;
+	}
+	if(!(plfd->flags & O_DIRECTORY)) {
+		LOGFAIL;
+		errno = ENOTDIR;
+		return NULL;
+	}
+	
+	if (rc == -1 ||
+	    (dirp = (DIR *)malloc(sizeof(DIR))) == NULL) {
+		return NULL;
+	}
+	/*
+	 * If CLSIZE is an exact multiple of DIRBLKSIZ, use a CLSIZE
+	 * buffer that it cluster boundary aligned.
+	 * Hopefully this can be a big win someday by allowing page trades
+	 * to user space to be done by getdirentries()
+	 */
+	dirp->dd_buf = malloc (512);
+	dirp->dd_len = 512;
+
+	if (dirp->dd_buf == NULL) {
+		free (dirp);
+		return NULL;
+	}
+	dirp->dd_fd = __fd;
+
+	return dirp;
+}
+
+int fchdir(int __fd) {
+	LOWFD;
+	FAILIF(!(plfd->flags & O_DIRECTORY), ENOTDIR);
+	return chdir(plfd->name);
 }
