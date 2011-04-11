@@ -124,7 +124,7 @@ long int random (void) {
 void srandom(unsigned seed) {
 	srand(seed);
 }
-#if 0
+#if 1
 char *initstate(unsigned seed, char *state, size_t size) {
 	return NULL;
 }
