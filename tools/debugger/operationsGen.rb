@@ -112,7 +112,7 @@ def generate_operations_cpp(dest)
 	types = $types_int + $types_float + $types_bool
 	
 	# generate unary operations	
-	binaryOperations = $binary_operations + $binary_operations_int +	$binary_operations_boolean
+	binaryOperations = $binary_operations + $binary_operations_int + $binary_operations_boolean
 	
 	binaryOperations.each do |i|
 		out.write "template<typename T1, typename T2>\n"
@@ -122,7 +122,7 @@ def generate_operations_cpp(dest)
 	end	
 	
 	# generate template specializations for invalid operations
-	invalidTypes = ["double", "float"];
+	invalidTypes = ["double", "float", "long double"];
 	invalidSet = Set.new [["double", "double"]]
 	invalidOperations = $binary_operations_int
 	invalidTypes.each do |i|
@@ -154,7 +154,6 @@ def generate_operations_cpp(dest)
 		out.write "}\n"
 	end	
 	
-	invalidTypes = ["double", "float"]
 	invalidOperations = $unary_operations_int
 	
 	invalidOperations.each do |i|
