@@ -5,4 +5,5 @@ SETTINGS = {
 	:retry_failed => true,
 	:rebuild_missing_log => true,
 	:test_dead_code_elimination => false,
+	:test_release => false,
 }

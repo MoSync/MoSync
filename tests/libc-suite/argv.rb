@@ -15,7 +15,7 @@ SPECIFIC_ARGV = {
 }
 
 SPECIFIC_FILES = {
-	'test-stat2.c' => ["#{SETTINGS[:source_path]}/io/Makefile", "build/test-stat2.moo"],
+	'test-stat2.c' => ["#{SETTINGS[:source_path]}/io/Makefile", "#{BUILD_DIR}/test-stat2.moo"],
 	'tst-rxspencer.c' => ["#{SETTINGS[:source_path]}posix/rxspencer"],
 	'tst-pcre.c' => ["#{SETTINGS[:source_path]}posix/PCRE.tests"],
 	'tst-boost.c' => ["#{SETTINGS[:source_path]}posix/BOOST.tests"],
@@ -29,7 +29,7 @@ end
 SPECIFIC_CODE = {
 	'tst-dir.c' => Proc.new do
 		FileUtils.mkdir_p('filesystem/build/foo')
-		FileUtils.cp('build/tst-dir.moo', 'filesystem/build/foo/tst-dir')
+		FileUtils.cp("#{BUILD_DIR}/tst-dir.moo", 'filesystem/build/foo/tst-dir')
 	end,
 	'scanf4.c' => DEV_NULL,
 	'bug22.c' => DEV_NULL,

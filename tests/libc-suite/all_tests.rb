@@ -3,7 +3,6 @@
 require 'FileUtils'
 require './settings.rb'
 require './skipped.rb'
-require './argv.rb'
 require '../../rules/util.rb'
 require '../../rules/host.rb'
 
@@ -13,11 +12,16 @@ if(ARGV.length > 0)
 	SETTINGS[:retry_failed] = true
 end
 
-BUILD_DIR = 'build'
+OPT_VERSION = SETTINGS[:test_release] ? 'release' : 'debug'
+OPT_FLAGS = SETTINGS[:test_release] ? ' -O2' : ''
+BUILD_DIR = 'build/' + OPT_VERSION
 MOSYNCDIR = ENV['MOSYNCDIR']
-GCC_FLAGS = " -I- -std=gnu99 -I. -Isys -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h"
+GCC_FLAGS = " -I- -std=gnu99 -I. -Isys -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\""+
+	" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h #{OPT_FLAGS}"
 PIPE_FLAGS = " -datasize=#{12*1024*1024} -stacksize=#{512*1024} -heapsize=#{1024*1024*10}"
-PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_debug/newlib.lib"
+PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_#{OPT_VERSION}/newlib.lib"
+
+require './argv.rb'
 
 # SETTINGS[:source_path] - directory in which source files are stored.
 
@@ -134,7 +138,7 @@ pattern = "#{SETTINGS[:source_path]}*/"
 p pattern
 dirs = Dir[pattern]
 total = 0
-files = []
+files = {}
 #p dirs
 dirs.each do |dir|
 	dirName = File.basename(dir)
@@ -147,11 +151,13 @@ dirs.each do |dir|
 		$stdout.write dirName + ': '
 		tests = parse_makefile(mfPath)
 		if(tests)
+			tests.uniq!
 			puts tests.size
 			total += tests.size
 			#p tests
 			tests.each do |t|
-				files << dir + t + '.c'
+				fn = t + '.c'
+				files[dir + fn] = dirName
 			end
 		end
 	else
@@ -260,14 +266,42 @@ end
 #puts "premature exit"
 #exit 0
 
-if(ARGV.size > 0)
-	files.reject! do |f| !ARGV.include?(File.basename(f)) end
+# check for dupes
+basenames = {}
+overrides = []
+files.each do |f, dir|
+	bn = File.basename(f)
+	if(basenames[bn])
+		puts "Duplicate: #{f} - #{basenames[bn]}"
+		overrides << f
+		overrides << basenames[bn]
+	else
+		basenames[bn] = f
+	end
 end
+
+# mark dupes
+new_files = {}
+files.each do |f, dir|
+	bn = File.basename(f)
+	if(overrides.include?(f))
+		new_files[f] = dir + '_' + bn
+		puts "de-dupe: #{new_files[f]}"
+	else
+		new_files[f] = bn
+	end
+end
+files = new_files
+
+if(ARGV.size > 0)
+	files.reject! do |f, bn| !ARGV.include?(bn) end
+end
+
 
 unskippedCount = 0
 
-files.each do |filename|
-	bn = File.basename(filename)
+files.each do |filename, targetName|
+	bn = targetName
 	if(!File.exists?(filename))
 		puts "Nonexistant: #{bn}"
 		next
