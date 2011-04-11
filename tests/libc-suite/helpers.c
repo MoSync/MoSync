@@ -141,7 +141,7 @@ float nexttowardf(float x, double y) {
 	return nextafterf(x, y);
 }
 
-char* strdupa(char* str) {
+char* strdupa(const char* str) {
 	// not a valid implementation, but it'll work for these small test programs.
 	return strdup(str);
 }
@@ -236,8 +236,13 @@ int ffsll(long long int i) {
 }
 
 long int sysconf (int parameter) {
-	errno = ENOSYS;
-	return -1;
+	switch(parameter) {
+	case _SC_PAGESIZE:
+		return 512;
+	default:
+		errno = ENOSYS;
+		return -1;
+	}
 }
 
 wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size) {

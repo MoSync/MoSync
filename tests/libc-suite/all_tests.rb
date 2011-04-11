@@ -5,6 +5,7 @@ require './settings.rb'
 require './skipped.rb'
 require './argv.rb'
 require '../../rules/util.rb'
+require '../../rules/host.rb'
 
 if(ARGV.length > 0)
 	SETTINGS[:stop_on_fail] = true
@@ -218,6 +219,9 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	end
 	
 	cmd = "#{MOSYNCDIR}/bin/more -timeout 600 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
+	if(HOST == :win32)
+		cmd = "start /B /BELOWNORMAL /WAIT #{cmd}"
+	end
 	$stderr.puts cmd
 	startTime = Time.now
 	res = system(cmd)

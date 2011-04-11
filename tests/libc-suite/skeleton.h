@@ -94,7 +94,7 @@ char* index(const char *, int);
 char* rindex(const char *, int);
 void * rawmemchr (const void *block, int c);
 void * memrchr (const void *block, int c, size_t size);
-char* strdupa(char* str);
+char* strdupa(const char* str);
 
 #define MAP_FIXED 1
 #define MAP_ANON 2
