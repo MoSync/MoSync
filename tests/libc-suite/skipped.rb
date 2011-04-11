@@ -254,6 +254,8 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'tst-strtod6.c', # incorrect assumption about parsing of "NaN(foobar)"
 	'tst-makecontext3.c',	# ucontext.h
 	'tst-putenv.c',	# putenv from another process.
+	
+	'xbug.c',	# popen()
 ]
 
 SKIPPED_PATTERNS = [
