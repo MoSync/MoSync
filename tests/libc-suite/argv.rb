@@ -11,6 +11,7 @@ SPECIFIC_ARGV = {
 	'list.c' => ['/', '.'],
 	'tst-dir.c' => ['/', '/build/foo', '/build', 'tst-dir'],
 	'tst-fmemopen.c' => [],
+	'tst-qsort2.c' => [],
 }
 
 SPECIFIC_FILES = {

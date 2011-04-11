@@ -61,7 +61,7 @@ typedef off_t off64_t;
 #define __strtod_internal(a,b,c) strtod(a,b)
 
 #define WORD_BIT 32
-#define LONG_BIT 64
+#define LONG_BIT 32
 
 #define daylight _daylight
 #define timezone _timezone
@@ -132,3 +132,8 @@ wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size);
 #define _D_ALLOC_NAMLEN(d) (_D_EXACT_NAMLEN (d) + 1)
 
 #define DT_UNKNOWN 0
+
+// bug in tst-strtod6.c
+#define isnanf isnan
+
+#define libc_hidden_builtin_def(foo)

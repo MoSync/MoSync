@@ -248,6 +248,12 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	
 	'tst-random.c',	# initstate()
 	'tst-random2.c',	# initstate()
+	'tst-system.c',	# system()
+	'tst-strtod4.c', # locale cs_CZ.UTF-8
+	'tst-strtod5.c', # locale cs_CZ.UTF-8
+	'tst-strtod6.c', # incorrect assumption about parsing of "NaN(foobar)"
+	'tst-makecontext3.c',	# ucontext.h
+	'tst-putenv.c',	# putenv from another process.
 ]
 
 SKIPPED_PATTERNS = [

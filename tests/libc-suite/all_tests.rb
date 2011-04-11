@@ -219,8 +219,11 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	
 	cmd = "#{MOSYNCDIR}/bin/more -timeout 600 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
 	$stderr.puts cmd
+	startTime = Time.now
 	res = system(cmd)
+	endTime = Time.now
 	puts res
+	puts "Elapsed time: #{endTime - startTime}"
 	if(res == true)	# success
 		FileUtils.touch(winFile)
 		FileUtils.rm_f(failFile)
