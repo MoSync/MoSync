@@ -35,4 +35,6 @@ public class Types
 	public static final String WIDGET_VERTICAL_TOP = "top";
 	public static final String WIDGET_VERTICAL_CENTER = "center";
 	public static final String WIDGET_VERTICAL_BOTTOM = "bottom";
+	
+	public static final String BACKGROUND_IMAGE = "backgroundImage";
 }

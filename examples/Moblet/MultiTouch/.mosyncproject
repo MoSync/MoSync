@@ -6,18 +6,12 @@
 <property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Release" value="%mosync-home%/include"/>
-<property key="build.prefs:additional.libraries" value="mastd.lib, MAUtil.lib, MAUI.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="mastdD.lib, MAUtilD.lib, MAUID.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="mastd.lib, mautil.lib, maui.lib"/>
+<property key="build.prefs:additional.libraries" value="mastd.lib, MAUtil.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="mastdD.lib, MAUtilD.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="mastd.lib, MAUtil.lib"/>
 <property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Release" value="%mosync-home%/lib/pipe"/>
-<property key="build.prefs:extra.link.sw/Debug" value=""/>
-<property key="build.prefs:extra.link.sw/Release" value=""/>
-<property key="build.prefs:extra.res.sw/Debug" value=""/>
-<property key="build.prefs:extra.res.sw/Release" value=""/>
-<property key="build.prefs:gcc.warnings/Debug" value="0"/>
-<property key="build.prefs:gcc.warnings/Release" value="0"/>
 <property key="build.prefs:ignore.default.include.paths" value="true"/>
 <property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
@@ -27,16 +21,6 @@
 <property key="build.prefs:ignore.default.library.paths" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
-<property key="build.prefs:memory.data/Debug" value="256"/>
-<property key="build.prefs:memory.data/Release" value="256"/>
-<property key="build.prefs:memory.heap/Debug" value="128"/>
-<property key="build.prefs:memory.heap/Release" value="128"/>
-<property key="build.prefs:memory.stack/Debug" value="64"/>
-<property key="build.prefs:memory.stack/Release" value="64"/>
-<property key="build.prefs:project.type" value=""/>
-<property key="dependency.strategy" value="0"/>
-<property key="excludes/Debug" value=""/>
-<property key="excludes/Release" value=""/>
-<property key="template.id" value="project.maui"/>
+<property key="template.id" value="project.moblet"/>
 </properties>
 </project>

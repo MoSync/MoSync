@@ -39,13 +39,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	mosyncView = [[MoSyncView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	//mosyncView = [[MoSyncView alloc] initWithCoder:nil];
 	[self.view addSubview:mosyncView];
-
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewWillAppear:(BOOL)animated {
 	[mosyncView viewAppeared];
     [super viewWillAppear:animated];
+}
+
+- (UIView*) getMoSyncView {
+	return mosyncView;
 }
 
 /*
