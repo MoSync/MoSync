@@ -26,9 +26,11 @@
 -(void)tabBarController:(UITabBarController*)tabBarController didSelectViewController:(UIViewController*)viewController {
 	MAHandle controllerHandle = 0;
 	NSUInteger index = 0;
+	
 	for (UIViewController *child in tabBarController.viewControllers)
     {
 		if(child == viewController) {
+			if(index >= [children count]) return;
 			controllerHandle = [[children objectAtIndex:index] getWidgetHandle];
 			break;
 		}
@@ -116,8 +118,13 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	
-	return [super getPropertyWithKey:key];
+	if([key isEqualToString:@"currentTab"]) {
+		UITabBarController* tabBarController = (UITabBarController*)controller;
+		return [[NSNumber numberWithInt: tabBarController.selectedIndex] stringValue];
+	}
+	else {
+		return [super getPropertyWithKey:key];
+	}
 }
 
 - (UIViewController*) getController {

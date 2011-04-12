@@ -1,7 +1,7 @@
-
+#ifndef _TOUCH_HELPER_H_
+#define _TOUCH_HELPER_H_
 
 @interface TouchHelper : NSObject {
-	UITouch* dummyTouch;
 	NSMutableArray* touchArray;	
 }
 
@@ -12,3 +12,5 @@
 - (void) clearTouches;
 
 @end
+
+#endif

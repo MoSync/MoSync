@@ -238,6 +238,7 @@ void removeTouch(UITouch* touch) {
 }
  */
 
+/*
 - (void)viewAppeared {
 	// some touches might not have been registered so let's clear the touch helper.
     [touchHelper clearTouches];
@@ -276,6 +277,19 @@ void removeTouch(UITouch* touch) {
 		}
 	}
 }
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {	
+	for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseCancelled) {	
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper getTouchId: touch];		
+			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+			[touchHelper removeTouch: touch];
+		}
+	}
+}
+ */
 
 -(void) messageBox:(id) obj {
 	MessageBoxHandler *mbh = (MessageBoxHandler*) obj;

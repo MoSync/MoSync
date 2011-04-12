@@ -64,7 +64,7 @@
 	[super show];
 	
 	MoSyncGLView* glView = (MoSyncGLView*) view;
-	[glView viewAppeared];
+	//[glView viewAppeared];
 }
 
 @end
