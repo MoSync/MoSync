@@ -517,6 +517,13 @@ DEVICE.each_with_index do |device, index|
 					value.each do |v|
 						platform, version = v.split('/')
 						if(platform == 'BlackBerry')
+							major, minor = version.split('.')
+							if(major.to_i > 4 || minor.to_i >= 3)
+								def_name = 'MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH'
+								rt_obj.caps[def_name] = 'TRUE';
+								def_str = "#define #{def_name}"
+								profile.puts def_str
+							end
 							profile.puts '#define MA_PROF_SUPPORT_BLACKBERRY'
 							profile.puts "#define MA_PROF_CONST_BLACKBERRY_VERSION \"#{version}\""
 						end
