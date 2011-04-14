@@ -114,7 +114,7 @@ class PipeExeWork < PipeGccWork
 		if(ELIM)
 			@TARGET.extend(PipeElimTask)
 		end
-		if(PACK)
+		if(defined?(PACK))
 			@prerequisites = [@TARGET = MoSyncPackTask.new(self, @BUILDDIR_BASE, @buildpath,
 				PACK, @TARGET, @resourceTask, @NAME)]
 		end
@@ -123,7 +123,7 @@ class PipeExeWork < PipeGccWork
 		if(@resourceTask)
 			resArg = " -resource #{@resourceTask}"
 		end
-		return "#{mosyncdir}/bin/MoRE -program #{@TARGET}#{resArg}#{@EXTRA_EMUFLAGS}"
+		return "#{mosyncdir}/bin/MoRE -program #{@TARGET} -sld #{@SLD}#{resArg}#{@EXTRA_EMUFLAGS}"
 	end
 	def run
 		# run the emulator
