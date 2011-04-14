@@ -577,3 +577,31 @@ static class HttpFinish implements Runnable {
 		}
 	}
 }
+
+// -----------------------------------------
+// Blackberry-specific additions for BB OS 5
+// -----------------------------------------
+#ifdef BB_RIM_API
+static class BlackBerryConnectionFactory {
+
+	static net.rim.device.api.io.transport.ConnectionFactory connFactory = new net.rim.device.api.io.transport.ConnectionFactory();
+	static int[] preferredTransports = {
+		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_TCP_WIFI,
+		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_WAP2,
+		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_TCP_CELLULAR,
+		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_MDS
+	};
+	static {
+		connFactory.setPreferredTransportTypes(preferredTransports);
+		connFactory.setConnectionMode(net.rim.device.api.io.transport.ConnectionFactory.ACCESS_READ_WRITE);
+	};
+
+	static Connection openConnection(String url) throws IOException {
+		net.rim.device.api.io.transport.ConnectionDescriptor connDesc = connFactory.getConnection(url);
+		if(null == connDesc) {
+			throw new IOException("No path to destination url");
+		}
+		return connDesc.getConnection();
+	}
+};
+#endif //MA_PROF_STRING_PLATFORM_BLACKBERRY_5

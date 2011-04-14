@@ -116,6 +116,10 @@ public final class MAMidlet extends MIDlet {
 			if(mCanvas != null) {
 				if(!mStarted) {
 #ifdef MOSYNC_COMMERCIAL
+#ifdef BB_RIM_API
+					// For the blackberry we need to listen to Blackberry-specific key events (back and menu keys)
+					net.rim.device.api.system.Application.getApplication().addKeyListener(mCanvas);
+#endif
 					mCanvas.createCore();
 					mCanvas.initDisplay();
 #else	//non-commercial

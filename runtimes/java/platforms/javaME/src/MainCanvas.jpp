@@ -27,7 +27,11 @@ import java.util.Vector;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public final class MainCanvas extends GameCanvas implements Runnable, CommandListener {
+public final class MainCanvas extends GameCanvas implements Runnable, CommandListener 
+#ifdef BB_RIM_API
+, net.rim.device.api.system.KeyListener
+#endif
+{
 
 	public MAMidlet mMidlet;
 	public Core mCore;
@@ -738,4 +742,60 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		event[0] = EVENT_TYPE_FOCUS_GAINED;
 		postEvent(event);
 	}
+
+#ifdef BB_RIM_API
+/*************************************/
+/* BLACKBERRY SPECIAL EVENT HANDLING */
+/*************************************/
+	public boolean keyChar(char key, int status, int time) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean keyDown(int keycode, int time) {
+		DEBUG_ALWAYS("BB Hard key pressed "+keycode+"\n");
+        if (net.rim.device.api.ui.Keypad.key(keycode) == net.rim.device.api.ui.Keypad.KEY_MENU) { 
+			DEBUG_KEYS("Pressed BB Menu button\n");
+            //this is the menu key – code 1769472 
+        	handleKeyEvent(-20, false); // See syscall_helpers.h, row 41
+            return true; 
+        } else if (net.rim.device.api.ui.Keypad.key(keycode) == net.rim.device.api.ui.Keypad.KEY_ESCAPE) { 
+			DEBUG_KEYS("Pressed BB Back button\n");
+            // this is the escape key – code 268566528 
+        	handleKeyEvent(-11, false); // See syscall_helpers.h, row 41
+            return true;
+        } else { 
+            return false; 
+		}
+	}
+
+	public boolean keyRepeat(int keycode, int time) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean keyStatus(int keycode, int time) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean keyUp(int keycode, int time) {
+		DEBUG_KEYS("BB Hard key released "+keycode+"\n");
+        if (keycode == net.rim.device.api.ui.Keypad.KEY_MENU) { 
+            //this is the menu key – code 1769472 
+        	handleKeyEvent(-20, true);
+            return true;
+        } else if (keycode == net.rim.device.api.ui.Keypad.KEY_ESCAPE) { 
+            // this is the escape key – code 268566528 
+        	handleKeyEvent(-11, true);
+            return true;
+        } else { 
+            return false; 
+		}
+	}
+/*****************************************/
+/* END BLACKBERRY SPECIAL EVENT HANDLING */
+/*****************************************/
+#endif
+
 }

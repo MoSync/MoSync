@@ -104,6 +104,7 @@ require "./BuildWinCE.rb"
 require "./BuildAndroid.rb"
 require "./BuildMoblin.rb"
 require "./BuildIphone.rb"
+require "./BuildBlackBerry.rb"
 
 runtime_builder = RuntimeBuilder.new
 runtime_builder.build(ARGV[1].downcase, ARGV[2])

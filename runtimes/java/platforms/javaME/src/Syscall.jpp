@@ -2311,7 +2311,13 @@ public
 
 			DEBUG_MEDIA_STREAM("createPlayer Streaming Video...\n");
 
+#ifdef BB_RIM_API
+			InputConnection videoConnection = (InputConnection)BlackBerryConnectionFactory.openConnection(url);
+			mStreamPlayer = Manager.createPlayer(videoConnection.openInputStream(), "video/mp4");
+#else
 			mStreamPlayer = Manager.createPlayer(url);
+#endif
+
 			if(mStreamPlayer==null) { DEBUG_ALWAYS("Couldn't create Player."); BIG_PHAT_ERROR; }
 
 			DEBUG_MEDIA_STREAM("realize...\n");
