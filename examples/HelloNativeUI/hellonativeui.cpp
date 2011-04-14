@@ -26,11 +26,14 @@ along with this program.  If not, write to the Free Software Foundation,
 * application "HelloMAUI". Compare the two examples to see how we do the same
 * things in MAUI and in Native UI.
 *
+* IMPORTANT! THIS APPLICATION CURRENTLY ONLY WORKS ON ANDROID AND IOS DEVICES.
+* IT WILL NOT WORK ON THE MOSYNC EMULATOR, AS THE EMULATOR HAS NO NATIVE UI.
+*
 * @author Mattias Frånberg & Chris Hughes
 */
 
 //Include the header files for MoSync Moblets and Native UI extensions so that
-//we can access their library code from our application. Include the enviroment
+//we can access their library code from our application. Include the environment
 //so that we can listen for widget events.
 #include <MAUtil/Moblet.h>
 #include <MAUtil/Environment.h>

@@ -23,6 +23,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * so that you can see exactly what's happening at each step.
 * The application makes use of MoSync's Moblet framework to handle events.
 *
+* IMPORTANT! THIS APPLICATION CURRENTLY ONLY WORKS ON ANDROID AND IOS DEVICES.
+* IT WILL NOT WORK ON THE MOSYNC EMULATOR, AS THE EMULATOR HAS NO NATIVE UI.
+*
 * @author Mattias Frånberg and Chris Hughes
 */
 
