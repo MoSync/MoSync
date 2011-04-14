@@ -652,34 +652,9 @@ char* getcwd(char* __buf, size_t __size) {
 	return __buf;
 }
 
-int setpgid(pid_t pid, pid_t pgid) {
-	errno = ENOSYS;
-	STDFAIL;
-}
-
-int fork(void) {
-	errno = ENOSYS;
-	STDFAIL;
-}
-
-_sig_func_ptr signal(int sig, _sig_func_ptr f) {
-	errno = ENOSYS;
-	return SIG_ERR;
-}
-
 int sigprocmask(int how, const sigset_t *set, sigset_t *oset) {
 	errno = ENOSYS;
 	STDFAIL;
-}
-
-unsigned int alarm(unsigned int seconds) {
-	BIG_PHAT_ERROR;
-}
-
-
-int mallopt(int parameter, int value) {
-	errno = ENOSYS;
-	return 0;
 }
 
 int getpagesize(void) {
