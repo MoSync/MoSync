@@ -65,9 +65,9 @@ def writeArgvFile(filename, argv, testSrcName)
 end
 
 def doArgv(baseName, argv, testSrcName, force_rebuild)
-	return if(!force_rebuild)
 	cName = "build/argv-#{baseName}.c"
 	sName = "build/argv-#{baseName}.s"
+	return sName if(!force_rebuild)
 	writeArgvFile(cName, argv, testSrcName)
 	sh "#{MOSYNCDIR}/bin/xgcc -g -I#{MOSYNCDIR}/include/newlib -Werror -S #{File.expand_path(cName)} -o #{sName}"
 	return sName
@@ -195,7 +195,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	if(!File.exists?(pfn) || force_rebuild)
 		if(dead_code)
 			sh "pipe-tool#{PIPE_FLAGS} -elim -master-dump -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
-			sh "pipe-tool -sld=#{sldFile} -B #{pfn} rebuild.s"
+			sh "pipe-tool#{PIPE_FLAGS} -sld=#{sldFile} -B #{pfn} rebuild.s"
 		else
 			sh "pipe-tool -master-dump -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 		end
