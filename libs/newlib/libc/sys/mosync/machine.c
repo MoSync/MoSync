@@ -126,6 +126,7 @@ static struct LOW_FD sLfConsole = { LOWFD_CONSOLE, 1, O_APPEND, NULL, 0 };
 static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1, O_APPEND, NULL, 0 };
 
 static int closeLfd(struct LOW_FD* plfd);
+static void lowRewindDir(struct LOW_FD* plfd);
 
 static char sCwdBuf[2048] = "/";
 static char* sCwd = sCwdBuf;
@@ -341,6 +342,16 @@ off_t lseek(int __fd, off_t __offset, int __whence) {
 	int res;
 	LOWFD;
 	LOGD("lseek(%i, %li, %i)\n", __fd, __offset, __whence);
+	if(plfd->flags & O_DIRECTORY) {
+		// seeking in a directory is dangerous.
+		// for now, we only support this most simple case.
+		if(__offset == 0 && __whence == SEEK_SET) {
+			lowRewindDir(plfd);
+			return 0;
+		} else {
+			NOT;
+		}
+	}
 	if(lfd < LOWFD_OFFSET) {
 		// seeking on LOWFD_CONSOLE and LOWFD_WRITELOG is permitted only in a few special cases.
 		// also, we don't keep track on how much has been written to them.
@@ -709,6 +720,10 @@ int getdents(int __fd, dirent* dp, int count) {
 void rewinddir(DIR* dir) {
 	struct LOW_FD* plfd = getLowFd(dir->dd_fd);
 	MAASSERT(plfd);
+	lowRewindDir(plfd);
+}
+
+static void lowRewindDir(struct LOW_FD* plfd) {
 	if(plfd->listHandle > 0) {
 		int res = maFileListClose(plfd->listHandle);
 		MAASSERT(res == 0);
