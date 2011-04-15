@@ -127,27 +127,8 @@ static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1, O_APPEND, NULL, 0 };
 
 static int closeLfd(struct LOW_FD* plfd);
 
-static char sCwd[2048] = "/";
-
-// returns 1 the path is empty, 0 if it's not.
-static int getRealPath(char *buf, const char* path, int size) {
-#if 0
-	if(path[0]!='/') {
-		strncpy(buf, sCwd, size);
-		strncat(buf, path, size);
-		path = buf;
-	} else {
-		strncpy(buf, path, size);
-	}
-#else
-	if(realpath(path, buf) == NULL) {
-		PANIC_MESSAGE("realpath");
-	}
-#endif
-	size=strlen(buf);
-	if(!size) return 1;
-	else return 0;
-}
+static char sCwdBuf[2048] = "/";
+static char* sCwd = sCwdBuf;
 
 static void initFda(void) {
 	static int initialized = 0;
@@ -197,6 +178,25 @@ static int findFreeFd(void) {
 			return i;
 	}
 	STDFAIL;
+}
+
+// returns -1 and sets errno on failure.
+static int getRealPath(int __fd, char *buf, const char* path, int size) {
+	if(__fd != AT_FDCWD) {
+		// temporarily change cwd.
+		LOWFD;
+		FAILIF(!(plfd->flags & O_DIRECTORY), ENOTDIR);
+		sCwd = plfd->name;
+	}
+	if(realpath(path, buf) == NULL) {
+		STDFAIL;
+	}
+	if(__fd != AT_FDCWD) {
+		// restore original cwd.
+		sCwd = sCwdBuf;
+	}
+	FAILIF(buf[0] == 0, ENOENT);
+	return 0;
 }
 
 // converts maFile error codes to errno.
@@ -302,7 +302,7 @@ int stat(const char *file, struct stat *st) {
 	int res;
 	char temp[2048];
 	int length;
-	getRealPath(temp, file, 2046);
+	TEST(getRealPath(AT_FDCWD, temp, file, 2046));
 	LOGD("stat(%s)", temp);
 	
 	// check if it's a directory.
@@ -457,6 +457,10 @@ static int postOpen(MAHandle handle, int __mode) {
 }
 
 int open(const char * __filename, int __mode, ...) {
+	return openat(AT_FDCWD, __filename, __mode);
+}
+
+int openat(int __fd, const char * __filename, int __mode, ...) {
 	int ma_mode;
 	int handle;
 	int newFd;
@@ -464,11 +468,8 @@ int open(const char * __filename, int __mode, ...) {
 	int length;
 
 	char temp[2048];
-	if(getRealPath(temp, __filename, 2046)) {
-		errno = ENOENT;
-		STDFAIL;
-	}
-	LOGD("open(%s, 0x%x)", temp, __mode);
+	TEST(getRealPath(__fd, temp, __filename, 2046));
+	LOGD("openat(%i, %s, 0x%x)", __fd, temp, __mode);
 	
 	if((__mode & 3) == O_RDWR || (__mode & 3) == O_WRONLY) {
 		ma_mode = MA_ACCESS_READ_WRITE;
@@ -530,7 +531,7 @@ int mkdir(const char* path, mode_t mode) {
 	char temp[2048];
 	int length;
 	
-	getRealPath(temp, path, 2046);
+	TEST(getRealPath(AT_FDCWD, temp, path, 2046));
 	length = strlen(temp);
 	if(temp[length-1]!='/') {
 		temp[length] = '/';
@@ -600,7 +601,7 @@ int chdir(const char *filename) {
 	int length;
 	int ret;
 	char temp[2048];
-	getRealPath(temp, filename, 2046);
+	TEST(getRealPath(AT_FDCWD, temp, filename, 2046));
 	LOGD("chdir(%s)", temp);
 	
 	length = strlen(temp);
