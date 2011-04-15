@@ -134,6 +134,7 @@ namespace Core {
 #endif
 
 		VMCore();
+		virtual ~VMCore();
 
 #ifdef LOG_STATE_CHANGE
 		void logStateChange(int ip);

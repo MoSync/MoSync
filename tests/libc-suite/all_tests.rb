@@ -10,6 +10,7 @@ if(ARGV.length > 0)
 	SETTINGS[:stop_on_fail] = true
 	SETTINGS[:rebuild_failed] = true
 	SETTINGS[:retry_failed] = true
+	SETTINGS[:keep_parts] = true
 end
 
 OPT_VERSION = SETTINGS[:test_release] ? 'release' : 'debug'
@@ -178,6 +179,8 @@ def delete_if_empty(filename)
 	end
 end
 
+LOADER_URLS_FILE = open(SETTINGS[:htdocs_dir] + 'libc_tests.urls', 'wb')
+
 def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	suffix = dead_code ? 'e' : ''
 	pfn = ofn.ext('.moo' + suffix)
@@ -206,6 +209,16 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		error"Unknown link failure."
 	end
 	
+	# setup for loader
+	if(dead_code)
+		bn = File.basename(pfn)
+		lfn = SETTINGS[:htdocs_dir] + bn
+		if(!File.exists?(lfn))
+			FileUtils.cp(pfn, lfn)
+		end
+		LOADER_URLS_FILE.puts(SETTINGS[:loader_base_url] + bn)
+	end
+	
 	# execute it, if not win already, or we rebuilt something.
 	
 	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
@@ -225,23 +238,29 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	end
 	
 	cmd = "#{MOSYNCDIR}/bin/more -timeout 600 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
-	if(HOST == :win32)
-		cmd = "start /B /BELOWNORMAL /WAIT #{cmd}"
-	end
 	$stderr.puts cmd
 	startTime = Time.now
-	res = system(cmd)
+	if(HOST == :win32)
+		cmd = "echo_error.bat #{cmd}"
+		res = open('|'+cmd).read.strip
+		p res
+		res = (res == '0')
+	else
+		res = system(cmd)
+	end
 	endTime = Time.now
 	puts res
 	puts "Elapsed time: #{endTime - startTime}"
 	if(res == true)	# success
 		FileUtils.touch(winFile)
 		FileUtils.rm_f(failFile)
-		FileUtils.rm_f(logFile)
-		FileUtils.rm_f(mdsFile)
-		FileUtils.rm_f(esFile)
-		FileUtils.rm_f(sldFile)
-		FileUtils.rm_f(stabsFile)
+		if(!SETTINGS[:keep_parts])
+			FileUtils.rm_f(logFile)
+			FileUtils.rm_f(mdsFile)
+			FileUtils.rm_f(esFile)
+			FileUtils.rm_f(sldFile)
+			FileUtils.rm_f(stabsFile)
+		end
 	else	# failure
 		FileUtils.touch(failFile)
 		FileUtils.rm_f(winFile)
@@ -254,7 +273,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 					# copy program, sld and stabs to directory :copy_target.
 					FileUtils.cp(pfn, target + 'program')
 					FileUtils.cp(sldFile, target + 'sld.tab')
-					FileUtils.cp(stabsFile, target + 'stabs.tab')
+					FileUtils.cp(stabsFile, target + 'stabs.tab') unless(dead_code)
 				end
 			end
 			error "Stop on fail"

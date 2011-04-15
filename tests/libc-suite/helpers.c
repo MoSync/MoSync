@@ -9,14 +9,18 @@
 #include <string.h>
 #include <malloc.h>
 #include <sys/fcntl.h>
+#include <sys/times.h>
 
 static void install_stdmalloc_hooks();
 int main(int argc, const char** argv);
 extern const char* gArgv[];
 extern const int gArgc;
 extern void setup_stdin();
+static void exit_status_save(int, void*);
 
 int MAMain() {
+	on_exit(exit_status_save, NULL);
+
 	// switch stdout from console to maWriteLog.
 	int wlfd = open_maWriteLog();
 	dup2(wlfd, 1);
@@ -27,7 +31,22 @@ int MAMain() {
 
 	printf("MAMain()\n");
 	install_stdmalloc_hooks();
-	return main(gArgc, gArgv);
+	int res = main(gArgc, gArgv);
+	exit(res);
+}
+
+// save status to a store, so the loader can read it.
+// if this store is not saved, the loader will assume something went
+// catastrophically wrong with the test.
+static void exit_status_save(int status, void* dummy) {
+	// we don't check for errors here, because there can be no reasonable error handling at this stage.
+	// better then, to let the runtime's panic system deal with it.
+	MAHandle data = maCreatePlaceholder();
+	maCreateData(data, sizeof(int));
+	maWriteData(data, &status, 0, sizeof(int));
+	MAHandle store = maOpenStore("exit_status", MAS_CREATE_IF_NECESSARY);
+	maWriteStore(store, data);
+	maCloseStore(store, 0);
 }
 
 static void std_malloc_handler(int size) {
@@ -47,6 +66,7 @@ void error(int __status, int __errnum, __const char* __format, ...)
 	vsprintf(buffer, __format, args);
 	va_end(args);
 	lprintfln("error(%i, %i, %s)\n", __status, __errnum, buffer);
+	exit_status_save(1, NULL);
 	maExit(1);
 }
 
