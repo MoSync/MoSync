@@ -123,7 +123,7 @@ public class Widget
 			getView( ).setBackgroundColor( ColorConverter.convert( value ) );
 			updateAlpha( m_alpha );
 		}
-		else if( property.equals( IX_WIDGET.MAW_BUTTON_BACKGROUND_IMAGE ) )
+		else if( property.equals( Types.BACKGROUND_IMAGE ) )
 		{
 			int imageHandle = IntConverter.convert( value );
 			Bitmap background = NativeUI.getBitmap( imageHandle );

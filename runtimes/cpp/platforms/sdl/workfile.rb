@@ -58,8 +58,10 @@ work.instance_eval do
 	@NAME = "mosync_sdl"
 end
 
-CopyFileTask.new(work, "config_platform.h",
-	FileTask.new(work, "config_platform.h.example")).invoke
+if(!File.exist?("config_platform.h"))
+  CopyFileTask.new(work, "config_platform.h",
+	  FileTask.new(work, "config_platform.h.example")).invoke 
+end
 CopyFileTask.new(work, "#{mosyncdir}/bin/default_contacts.xml",
 	FileTask.new(work, "contacts.xml"),
 	[DirTask.new(work, "#{mosyncdir}/etc")]).invoke if(!(NATIVE_RUNTIME == "true"))

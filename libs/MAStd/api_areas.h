@@ -275,6 +275,43 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 <td><br>
 </td>
 </tr>
+<tr style="background-color: rgb(118, 29, 88);">
+<td colspan="2"><strong><span style="color: rgb(255, 255, 255);">User Interface APIs</span></strong><strong><br>
+</strong></td>
+
+<td><strong><span style="color: rgb(255, 255, 255); a:link { color: white; }">Syscalls (maapi.h)</span><br>
+</strong></td>
+<td><strong><span style="color: rgb(255, 255, 255);">Libraries</span><br>
+</strong></td>
+<td><strong><span style="color: rgb(255, 255, 255);">See also</span><br>
+</strong></td>
+</tr>
+<tr style="background-color: rgb(235, 211, 227);">
+<td>
+<strong>Native user interface</strong>
+</td>
+<td>Accesss to device specific UI system. Currently only available for Android and iOS.<br>
+</td>
+<td>maWidgetCreate(), maWidgetDestroy(), maWidgetAddChild(), maWidgetInsertChild(), maWidgetRemoveChild(), maWidgetScreenShow(), maWidgetStackScreenPush(), maWidgetStackScreenPop(), maWidgetSetProperty(), maWidgetGetProperty()<br>
+</td>
+<td>IX_WIDGET.h<br>
+</td>
+<td><br>
+</td>
+</tr>
+<tr style="background-color: rgb(235, 211, 227);">
+<td>
+<strong>Platform independent user interface</strong>
+</td>
+<td>Image, animated image, edit box, list box, screens, widgets, widget skins, input managers, etc.<br>
+</td>
+<td><br>
+</td>
+<td>MAUI, MAUI::EditBox, MAUI::Engine, MAUI::Font, MAUI::Image, MAUI::Label, MAUI::Layout, MAUI::ListBox, MAUI::Screen, MAUI::Widget<br>
+</td>
+<td><br>
+</td>
+</tr>
 <tr style="background-color: rgb(56, 118, 29);">
 <td colspan="2"><strong><span style="color: rgb(255, 255, 255);">Standard C Functions</span></strong><strong><br>
 </strong></td>
@@ -413,19 +450,6 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 <td><br>
 </td>
 <td>\ref MTXml/MTXml.h<br>
-</td>
-<td><br>
-</td>
-</tr>
-<tr style="background-color: rgb(249, 203, 156);">
-<td>
-<strong>Graphical user interface</strong>
-</td>
-<td>Image, animated image, edit box, list box, screens, widgets, widget skins, input managers, etc.<br>
-</td>
-<td><br>
-</td>
-<td>MAUI<br>
 </td>
 <td><br>
 </td>

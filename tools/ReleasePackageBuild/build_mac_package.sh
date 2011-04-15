@@ -272,7 +272,12 @@ echo "Building runtimes"
 echo "----------------------------------------------------"
 cd $script_dir
 MOSYNC_TRUNK=$SOURCEDIR
-/opt/local/bin/ruby buildRuntimes.rb || error_exit "Could not build runtimes."
+mkdir -p $MOSYNCDIR/profiles/runtimes/iphoneos/1/template
+cd $SOURCEDIR/runtimes/cpp/platforms/iphone
+cp Classes/impl/config_platform.h.example Classes/impl/config_platform.h 
+/opt/local/bin/ruby buildLibraries.rb || error_exit "Could not build runtimes."
+
+
 
 
 

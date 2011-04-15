@@ -16,15 +16,57 @@
  */
 
 #import "RelativeLayoutWidget.h"
+#include <helpers/CPP_IX_WIDGET.h>
 
-MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIView)
+MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 
 @implementation RelativeLayoutWidget
 
 - (id)init {	
-	view = [[[MoSyncUIView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];	
+	view = [[[MoSyncUIScrollView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];	
 	[view setWidget:self];
 	return [super init];	
+}
+
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
+	if([key isEqualToString:@"isScrollable"]) {
+		MoSyncUIScrollView* sv = (MoSyncUIScrollView*)view;
+		sv.scrollEnabled = [value boolValue];
+	}
+	else {
+		return [super setPropertyWithKey:key toValue:value];
+	}
+	return MAW_RES_OK;	
+}
+
+- (void)layoutSubviews:(UIView*)_view {
+	int minX = 0xffffff;
+	int maxX =  -0xffffff;
+	int minY = 0xffffff;
+	int maxY =  -0xffffff;
+	
+	[super layoutSubviews:_view];
+	
+	for (IWidget *child in children)
+    {
+		UIView* childView = [child getView];
+		
+		if(childView.frame.origin.x < minX)
+			minX = childView.frame.origin.x;
+			
+		if(childView.frame.origin.y < minY)
+			minY = childView.frame.origin.y;
+			
+		if(childView.frame.origin.x + childView.frame.size.width > maxX)
+			maxX = childView.frame.origin.x+childView.frame.size.width;
+
+		if(childView.frame.origin.y + childView.frame.size.height > maxY)
+			maxY = childView.frame.origin.y+childView.frame.size.height;
+	}
+	
+	MoSyncUIScrollView* sv = (MoSyncUIScrollView*)view;
+	//sv.contentSize = CGSizeMake(maxX-minX, maxY-minY);
+	sv.contentSize = CGSizeMake(maxX, maxY); // negative values aren't supported.
 }
 
 @end
