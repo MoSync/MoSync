@@ -605,13 +605,13 @@ interface MAAPI {
 	* Returns another \link #STERR_GENERIC STERR \endlink code if the store could not be opened
 	* for another reason.
 	*
-	* \param name The name of the store. A store name must have between 1 and 32 characters,
-	* inclusive, and must not contain any of the following characters: "\\:;?*'
+	* \param name The name of the store. A store name must have from 1 to 32 characters,
+	* and must not contain any of the following characters: "/\\:;?*'
 	* \param flags A combination of \link #MAS_CREATE_IF_NECESSARY MAS \endlink flags, or zero.
 	*/
 	MAHandle maOpenStore(in MAString name, in int flags);
 	/**
-	* Writes the contents of a data object to a store. Destroys any data currently in the store.
+	* Writes the contents of a data object to a store. Destroys any data previously in the store.
 	* Returns \> 0 on success, #STERR_FULL if the storage system is full,
 	* or another \link #STERR_GENERIC STERR \endlink code if the write failed for another reason.
 	* \param store The store to write to.
@@ -627,9 +627,9 @@ interface MAAPI {
 	*/
 	int maReadStore(in MAHandle store, in MAHandle placeholder);
 	/**
-	* Closes a store. Also removes that store if \a _remove is non-zero.
+	* Closes a store. Also deletes that store if \a _delete is non-zero.
 	*/
-	void maCloseStore(in MAHandle store, in int _remove);
+	void maCloseStore(in MAHandle store, in int _delete);
 
 	constset int CONNERR_ {
 		/// Generic error.
