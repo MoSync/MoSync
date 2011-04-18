@@ -314,7 +314,6 @@ int fstatat(int __fd, const char* path, struct stat* st, int flag) {
 	int res;
 	char temp[2048];
 	int length;
-	LOWFD;
 
 	LOGD("fstatat(%i, %s)", __fd, path);
 	TEST(getRealPath(__fd, temp, path, 2046));
@@ -462,6 +461,27 @@ int isatty(int __fd) {
 	return lfd == LOWFD_CONSOLE || lfd == LOWFD_WRITELOG;
 }
 
+static int _ttyname_r(int __fd, char* name, size_t namesize) {
+	const char* ttyName;
+	LOWFD;
+	switch(lfd) {
+	case LOWFD_CONSOLE: ttyName = "console"; break;
+	case LOWFD_WRITELOG: ttyName = "writeLog"; break;
+	default:
+		ERRNOFAIL(ENOTTY);
+	}
+	FAILIF(strlen(ttyName) >= namesize, ERANGE);
+	strncpy(name, ttyName, namesize);
+	return 0;
+}
+
+int ttyname_r(int __fd, char* name, size_t namesize) {
+	if(_ttyname_r(__fd, name, namesize) != 0) {
+		return errno;
+	}
+	return 0;
+}
+
 static int postOpen(MAHandle handle, int __mode) {
 	int exists;
 	CHECK(exists = maFileExists(handle), ENOTRECOVERABLE);
@@ -551,11 +571,15 @@ int openat(int __fd, const char * __filename, int __mode, ...) {
 }
 
 int mkdir(const char* path, mode_t mode) {
+	return mkdirat(AT_FDCWD, path, mode);
+}
+
+int mkdirat(int __fd, const char* path, mode_t mode) {
 	MAHandle handle;
 	char temp[2048];
 	int length;
 	
-	TEST(getRealPath(AT_FDCWD, temp, path, 2046));
+	TEST(getRealPath(__fd, temp, path, 2046));
 	length = strlen(temp);
 	if(temp[length-1]!='/') {
 		temp[length] = '/';
