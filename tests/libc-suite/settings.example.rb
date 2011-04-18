@@ -9,4 +9,5 @@ SETTINGS = {
 	:copy_targets => [],
 	:loader_base_url => 'http://localhost:5002/',
 	:htdocs_dir => '/htdocs/',
+	:write_master_dump => false,
 }

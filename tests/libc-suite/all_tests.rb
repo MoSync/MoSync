@@ -196,11 +196,12 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	
 	# link
 	if(!File.exists?(pfn) || force_rebuild)
+		mdFlag = ' -master-dump' if(SETTINGS[:write_master_dump])
 		if(dead_code)
-			sh "pipe-tool#{PIPE_FLAGS} -elim -master-dump -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
+			sh "pipe-tool#{PIPE_FLAGS} -elim#{mdFlag} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 			sh "pipe-tool#{PIPE_FLAGS} -sld=#{sldFile} -B #{pfn} rebuild.s"
 		else
-			sh "pipe-tool -master-dump -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
+			sh "pipe-tool#{mdFlag} -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 		end
 		force_rebuild = true
 	end
@@ -265,7 +266,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		FileUtils.touch(failFile)
 		FileUtils.rm_f(winFile)
 		FileUtils.mv('log.txt', logFile) if(File.exists?('log.txt'))
-		FileUtils.mv('_masterdump.s', mdsFile) if(File.exists?('_masterdump.s'))
+		FileUtils.mv('_masterdump.s', mdsFile) if(File.exists?('_masterdump.s') && SETTINGS[:write_master_dump])
 		FileUtils.mv('rebuild.s', esFile) if(File.exists?('rebuild.s'))
 		if(SETTINGS[:stop_on_fail])
 			if(SETTINGS[:copy_targets])
