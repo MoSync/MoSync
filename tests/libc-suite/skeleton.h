@@ -17,8 +17,6 @@ struct qelem
 // very weird one; not defined anywhere in glibc, yet used by some test programs.
 #define OBJPFX
 
-#define WEOF ((wchar_t)-1)
-
 // enables use of insque()
 #define _KERNEL
 #include <sys/queue.h>
@@ -124,6 +122,8 @@ wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size);
 #define dirent64 dirent
 #define readdir64 readdir
 #define readdir64_r readdir_r
+#define fstatat64 fstatat
+#define ftello64 ftello
 
 // supa-hack
 #define d_ino d_namlen, 0

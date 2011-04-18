@@ -54,6 +54,9 @@ SKIPPED_UNRESOLVED = [
 	'bug14.c',	# apparently, sscanf() doesn't convert from UTF-8 to wchar_t.
 	'scanf13.c',	# 8 fails.
 	'tst-strtod.c',	# 2 regular fails, and no locale support.
+	
+	'tst-dirname.c',	# fails on multiple slashes ("//")
+	'tst-fnmatch.c',	# many fails, complicated function.
 ]
 
 SKIPPED_FILES = SKIPPED_UNRESOLVED + [
@@ -182,8 +185,10 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'libio_tst-swscanf.c',	# Implementation-defined behaviour (%[a-c]). Also, an unsupported locale. See notes.
 	'bug-mmap-fflush.c',	# system
 	'tst-fopenloc2.c',	# GNU extension: fopen(ccs).
+	
 	# glibc doesn't implement open_wmemstream's sizep parameter according to the Open Group Base Specification,
-	# so this test fails.
+	# so these tests fail.
+	'bug-wmemstream1.c',
 	'tst-wmemstream2.c',
 	
 	# fp exceptions not supported by newlib.
@@ -230,6 +235,22 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	
 	'tst-timezone.c',	# non-standard TZ values.
 	'test-tz.c',	# apparently, newlib doesn't support zones like "MST"
+	
+	'tst-futimesat.c',	# mosync doesn't support *utime* functions.
+	'tst-fchownat.c',	# chown()
+	'tst-fchmodat.c',	# chmod()
+	'tst-faccessat.c',	# chmod()
+	'tst-symlinkat.c',	# symlink()
+	'tst-linkat.c',	# link()
+	'tst-readlinkat.c',	# readlink()
+	'tst-mknodat.c',	# mknod()
+	'tst-mkfifoat.c',	# mkfifo()
+	'tst-posix_fallocate.c',	# posix_fallocate()
+	'tst-ext.c',	# stdio_ext.h
+	'tst-ext2.c',	# stdio_ext.h
+	'tst-fopenloc.c',	# iconvdata
+	'tst-atime.c',	# atime
+	'tst-truncate64.c',	# mosync doesn't support 64-bit file ops.
 ]
 
 SKIPPED_PATTERNS = [

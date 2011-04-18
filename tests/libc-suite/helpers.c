@@ -28,6 +28,10 @@ int MAMain() {
 	close(wlfd);
 	
 	setup_stdin();
+	if(!stdin) {
+		printf("Error opening stdin: %i (%m)\n", errno);
+		exit(1);
+	}
 
 	printf("MAMain()\n");
 	install_stdmalloc_hooks();
