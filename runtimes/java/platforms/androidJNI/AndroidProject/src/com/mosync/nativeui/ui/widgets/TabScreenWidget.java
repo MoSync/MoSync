@@ -3,6 +3,7 @@ package com.mosync.nativeui.ui.widgets;
 import java.util.HashMap;
 import java.util.Map.Entry;
 
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
 import android.widget.TabHost;
@@ -60,16 +61,9 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 		
 		TabHost tab = (TabHost) getView( );
 		
-		TabSpec tabSpec = tab.newTabSpec( Integer.toString( screen.getHandle( ) ) );
-		
-		if( screen.getIcon( ) != null )
-		{
-			tabSpec.setIndicator( screen.getTitle( ), screen.getIcon( ) );
-		}
-		else
-		{
-			tabSpec.setIndicator( screen.getTitle( ) );
-		}
+		int indexOfNewTab = tab.getTabWidget( ).getChildCount( );
+		TabSpec tabSpec = tab.newTabSpec( Integer.toString( indexOfNewTab ) );
+		setIndicators( tabSpec, screen.getTitle( ), screen.getIcon( ) );
 		
 		// Provides the tab with its content.
 		tabSpec.setContent( new TabContentFactory( ) {
@@ -81,8 +75,20 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 		});
 
 		tab.addTab( tabSpec );
-		m_tabIndexToScreen.put( screen, tab.getTabWidget( ).getChildCount( ) - 1 );
+		m_tabIndexToScreen.put( screen, indexOfNewTab );
 		screen.setTitleChangedListener( this );
+	}
+
+	private void setIndicators(TabSpec tabSpec, String title, Drawable icon)
+	{
+		if( icon != null )
+		{
+			tabSpec.setIndicator( title, icon );
+		}
+		else
+		{
+			tabSpec.setIndicator( title );
+		}
 	}
 
 	@Override
@@ -102,6 +108,20 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 		}
 		
 		return true;
+	}
+	
+	@Override
+	public String getProperty(String property)
+	{
+		if( property.equals( IX_WIDGET.MAW_TAB_SCREEN_CURRENT_TAB ) )
+		{
+			TabHost tabHost = (TabHost) getView( );
+			return Integer.toString( tabHost.getCurrentTab( ) );
+		}
+		else
+		{
+			return super.getProperty( property );
+		}
 	}
 	
 	/**
