@@ -56,15 +56,19 @@ int	_EXFUN(faccessat, (int __dirfd, const char *__path, int __mode, int __flags)
 #if defined(__CYGWIN__) || defined(__rtems__) || defined(__SPU__) || defined(MAPIP)
 int     _EXFUN(fchdir, (int __fildes));
 #endif
+#if !defined(MAPIP)
 int     _EXFUN(fchmod, (int __fildes, mode_t __mode ));
-#if !defined(__INSIDE_CYGWIN__)
+#endif
+#if !defined(__INSIDE_CYGWIN__) || !defined(MAPIP)
 int     _EXFUN(fchown, (int __fildes, uid_t __owner, gid_t __group ));
 #endif
 #if defined(__CYGWIN__)
 int	_EXFUN(fchownat, (int __dirfd, const char *__path, uid_t __owner, gid_t __group, int __flags));
 int	_EXFUN(fexecve, (int __fd, char * const __argv[], char * const __envp[] ));
 #endif
+#if !defined(MAPIP)
 pid_t   _EXFUN(fork, (void ));
+#endif
 long    _EXFUN(fpathconf, (int __fd, int __name ));
 int     _EXFUN(fsync, (int __fd));
 int     _EXFUN(fdatasync, (int __fd));
@@ -174,7 +178,7 @@ long    _EXFUN(sysconf, (int __name ));
 pid_t   _EXFUN(tcgetpgrp, (int __fildes ));
 int     _EXFUN(tcsetpgrp, (int __fildes, pid_t __pgrp_id ));
 char *  _EXFUN(ttyname, (int __fildes ));
-#if defined(__CYGWIN__) || defined(__rtems__)
+#if defined(__CYGWIN__) || defined(__rtems__) || defined(MAPIP)
 int     _EXFUN(ttyname_r, (int, char *, size_t)); 
 #endif
 int     _EXFUN(unlink, (const char *__path ));
