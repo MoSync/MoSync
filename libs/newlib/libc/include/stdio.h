@@ -342,7 +342,7 @@ FILE *	_EXFUN(fmemopen, (void *, size_t, const char *));
 /* getdelim - see __getdelim for now */
 /* getline - see __getline for now */
 FILE *	_EXFUN(open_memstream, (char **, size_t *));
-#if defined (__CYGWIN__)
+#if defined (__CYGWIN__) || defined(MAPIP)
 int	_EXFUN(renameat, (int, const char *, int, const char *));
 #endif
 int	_EXFUN(vdprintf, (int, const char *, __VALIST)

@@ -953,6 +953,12 @@ namespace Base {
 				newName = nn.c_str();
 			}
 		}
+#if defined(FILESYSTEM_CHROOT)
+		else {
+			nn = FILESYSTEM_DIR + std::string(newName);
+			newName = nn.c_str();
+		}
+#endif
 		int res = rename(fh.name, newName);
 		if(res != 0) {
 			if(errno == EXDEV)

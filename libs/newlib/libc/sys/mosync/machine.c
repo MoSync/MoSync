@@ -29,6 +29,9 @@
 #define LOGD(...)
 #endif
 
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+
 #define LOGFAIL LOGD("Failure @ %s:%i", __FILE__, __LINE__)
 #define STDFAIL { LOGFAIL; return -1; }
 #define ERRNOFAIL(_errno) { LOGFAIL; errno = _errno; return -1; }
@@ -127,6 +130,7 @@ static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1, O_APPEND, NULL, 0 };
 
 static int closeLfd(struct LOW_FD* plfd);
 static void lowRewindDir(struct LOW_FD* plfd);
+static int doRename(MAHandle oldHandle, const char* newProper);
 
 static char sCwdBuf[2048] = "/";
 static char* sCwd = sCwdBuf;
@@ -159,9 +163,12 @@ static struct LOW_FD* getLowFd(int __fd) {
 	MAASSERT(sFda[__fd]->refCount > 0);
 	return sFda[__fd];
 }
-#define LOWFD int lfd; struct LOW_FD* plfd; \
-	/*LOGD("LOWFD(%i) in %s", __fd, __FUNCTION__);*/ \
-	plfd = getLowFd(__fd); if(plfd == NULL) { LOGD("Bad fd: %i\n", __fd); STDFAIL; } lfd = plfd->lowFd;
+
+#define LOWFD int lfd; DECLARE_PLOWFD(plfd, __fd); lfd = plfd->lowFd;
+
+#define DECLARE_PLOWFD(pldf, fd) struct LOW_FD* plfd; \
+	/*LOGD("LOWFD(%i) in %s", fd, __FUNCTION__);*/ \
+	plfd = getLowFd(fd); if(plfd == NULL) { LOGD("Bad fd: %i\n", fd); STDFAIL; }
 
 static struct LOW_FD* findFreeLfd(void) {
 	initFda();
@@ -485,8 +492,8 @@ int openat(int __fd, const char * __filename, int __mode, ...) {
 	int length;
 
 	char temp[2048];
+	LOGD("openat(%i, %s, 0x%x)", __fd, __filename, __mode);
 	TEST(getRealPath(__fd, temp, __filename, 2046));
-	LOGD("openat(%i, %s, 0x%x)", __fd, temp, __mode);
 	
 	if((__mode & 3) == O_RDWR || (__mode & 3) == O_WRONLY) {
 		ma_mode = MA_ACCESS_READ_WRITE;
@@ -601,6 +608,54 @@ int unlinkat(int fd, const char *name, int flag) {
 	cres = close(__fd);
 	CHECK(dres, EPERM);
 	return cres;
+}
+
+int _rename_r(struct _reent* dummy, const char* old, const char* new) {
+	return renameat(AT_FDCWD, old, AT_FDCWD, new);
+}
+
+int renameat(int oldfd, const char* old, int newfd, const char* new) {
+	MAHandle handle;
+	char oldReal[2048];
+	char newReal[2048];
+	const char* newProper;
+	const char* oldSlash;
+	const char* newSlash;
+	int res;
+	LOGD("renameat(%i, %s, %i, %s)", oldfd, old, newfd, new);
+
+	TEST(getRealPath(oldfd, oldReal, old, 2046));
+	TEST(getRealPath(newfd, newReal, new, 2046));
+
+	// JavaME restriction:
+	// if old and new are in the same directory, send only new filename to maFileRename.
+	oldSlash = strrchr(oldReal, '/');
+	newSlash = strrchr(newReal, '/');
+	MAASSERT(oldSlash && newSlash);
+	if(strncmp(oldReal, newReal, MAX((newSlash - newReal), (oldSlash - oldReal))) == 0) {
+		// may be problematic if target is a directory. todo: test.
+		newProper = newSlash + 1;
+	} else {
+		newProper = newReal;
+	}
+
+	TEST(handle = errnoFileOpen(oldReal, MA_ACCESS_READ_WRITE));
+	res = doRename(handle, newProper);
+	CHECK(maFileClose(handle), EIO);
+	TEST(res);
+	return 0;
+}
+
+static int doRename(MAHandle oldHandle, const char* newProper) {
+	int exists, res;
+	CHECK(exists = maFileExists(oldHandle), ENOTRECOVERABLE);
+	FAILIF(!exists, ENOENT);
+	res = maFileRename(oldHandle, newProper);
+	FAILIF(res == MA_FERR_RENAME_FILESYSTEM, EXDEV);
+	FAILIF(res == MA_FERR_FORBIDDEN, EACCES);
+	FAILIF(res == MA_FERR_RENAME_DIRECTORY, EACCES);
+	CHECK(res, EIO);
+	return 0;
 }
 
 int truncate(const char *path, off_t length) {
