@@ -184,7 +184,9 @@ extern int creat _PARAMS ((const char *, mode_t));
 extern int fcntl _PARAMS ((int, int, ...));
 #if defined(__CYGWIN__) || defined(MAPIP)
 #include <sys/time.h>
+#if !defined(MAPIP)
 extern int futimesat _PARAMS ((int, const char *, const struct timeval *));
+#endif
 extern int openat _PARAMS ((int, const char *, int, ...));
 #endif
 

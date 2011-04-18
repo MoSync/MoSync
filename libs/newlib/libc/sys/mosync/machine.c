@@ -299,12 +299,18 @@ static int postStat(MAHandle h, struct stat *st, int mode) {
 }
 
 int stat(const char *file, struct stat *st) {
+	return fstatat(AT_FDCWD, file, st, 0);
+}
+
+int fstatat(int __fd, const char* path, struct stat* st, int flag) {
 	MAHandle h;
 	int res;
 	char temp[2048];
 	int length;
-	TEST(getRealPath(AT_FDCWD, temp, file, 2046));
-	LOGD("stat(%s)", temp);
+	LOWFD;
+
+	LOGD("fstatat(%i, %s)", __fd, path);
+	TEST(getRealPath(__fd, temp, path, 2046));
 	
 	// check if it's a directory.
 	length = strlen(temp);
@@ -581,10 +587,14 @@ int open_maWriteLog(void) {
 }
 
 int unlink(const char *name) {
+	return unlinkat(AT_FDCWD, name, 0);
+}
+
+int unlinkat(int fd, const char *name, int flag) {
 	int dres, cres;
 	int __fd;
 
-	__fd = open(name, O_RDWR);
+	__fd = openat(fd, name, O_RDWR);
 	if(__fd < 0)
 		return __fd;
 	dres = maFileDelete(sFda[__fd]->lowFd - LOWFD_OFFSET);

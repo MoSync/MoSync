@@ -239,11 +239,11 @@ void    _EXFUN(sync, (void));
 #endif
 
 ssize_t _EXFUN(readlink, (const char *__path, char *__buf, size_t __buflen));
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(MAPIP)
 ssize_t	_EXFUN(readlinkat, (int __dirfd1, const char *__path, char *__buf, size_t __buflen));
 #endif
 int     _EXFUN(symlink, (const char *__name1, const char *__name2));
-#if defined(__CYGWIN__)
+#if defined(__CYGWIN__) || defined(MAPIP)
 int	_EXFUN(symlinkat, (const char *, int, const char *));
 int	_EXFUN(unlinkat, (int, const char *, int));
 #endif
