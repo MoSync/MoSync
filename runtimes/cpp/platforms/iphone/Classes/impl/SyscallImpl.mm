@@ -993,7 +993,7 @@ namespace Base {
 		maIOCtl_case(maMessageBox);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
-				maIOCtl_IX_OPENGL_ES_caselist;
+		maIOCtl_IX_OPENGL_ES_caselist;
 #endif	//SUPPORT_OPENGL_ES
 
 //		maIOCtl_case(maAccelerometerStart);
