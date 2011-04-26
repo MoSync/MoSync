@@ -296,7 +296,7 @@ int atoiLen(const char* str, int len) {
 
 
 ProtocolUrlParseResult parseProtocolURL(const char *parturl, u16 *port,
-										u16 defaultPort, const char **path, std::string &address)
+	u16 defaultPort, const char **path, std::string &address)
 {
 	const char* port_m1 = strchr(parturl, ':');
 	*path = strchr(parturl, '/');

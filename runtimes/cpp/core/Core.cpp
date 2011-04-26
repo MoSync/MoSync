@@ -1398,7 +1398,7 @@ void WRITE_REG(int reg, int value) {
 #endif
 	}
 	
-	~VMCoreInt() {
+	virtual ~VMCoreInt() {
 #ifdef GDB_DEBUG
 		if(mGdbOn)
 			mGdbStub->closeDebugConnection();
@@ -1488,6 +1488,8 @@ VMCore* CreateCore(Syscall& aSyscall) {
 void DeleteCore(VMCore* core) {
 	delete CORE;
 }
+
+VMCore::~VMCore() {}
 
 void VMCore::invokeSysCall(int id) {
 	((VMCoreInt*)this)->InvokeSysCall(id);

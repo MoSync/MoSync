@@ -158,17 +158,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		self.frame.origin.x = 0;
 		mosyncView = nil;
         // Initialization code
-		CGRect appFrame = [[UIScreen mainScreen] bounds];
-		CGFloat screenHeight = appFrame.size.height;
-		CGFloat screenWidth = appFrame.size.width;
-		
 		locationController = [[MoSyncCLController alloc] init];
-		
 		self.multipleTouchEnabled = YES;
 		touchHelper = [[TouchHelper alloc] init];
 		
-		//MoSyncMain(self.frame.size.width, screenHeight, self);
+		/*
+		CGRect appFrame = [[UIScreen mainScreen] bounds];
+		CGFloat screenHeight = appFrame.size.height;
+		CGFloat screenWidth = appFrame.size.width;
 		MoSync_Main(screenWidth, screenHeight, self);
+		 */
     }
     return self;
 }
@@ -239,6 +238,7 @@ void removeTouch(UITouch* touch) {
 }
  */
 
+/*
 - (void)viewAppeared {
 	// some touches might not have been registered so let's clear the touch helper.
     [touchHelper clearTouches];
@@ -277,6 +277,19 @@ void removeTouch(UITouch* touch) {
 		}
 	}
 }
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {	
+	for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseCancelled) {	
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper getTouchId: touch];		
+			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+			[touchHelper removeTouch: touch];
+		}
+	}
+}
+ */
 
 -(void) messageBox:(id) obj {
 	MessageBoxHandler *mbh = (MessageBoxHandler*) obj;

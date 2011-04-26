@@ -4,8 +4,6 @@
 
 - (id) init {
 	touchArray = [[NSMutableArray alloc] init];
-	dummyTouch = [[UITouch alloc] init];
-	
 	return self;
 }
 
@@ -15,7 +13,7 @@
 	for (UITouch* cur in touchArray) {
 		if(touch == cur) {
 			return -1;
-		} else if(cur == dummyTouch) {
+		} else if(cur == [NSNull null]) {
 			[touchArray replaceObjectAtIndex:index withObject:touch];
 			return index;
 		}
@@ -35,11 +33,10 @@
 
 - (void) removeTouch: (UITouch*) touch 
 {
-	//[touchArray removeObject:touch];
 	int index = 0;
 	for (UITouch* cur in touchArray) {
 		if(cur == touch) {
-			[touchArray replaceObjectAtIndex: index withObject:dummyTouch];
+			[touchArray replaceObjectAtIndex: index withObject:[NSNull null]];
 			return;
 		}
 		index++;

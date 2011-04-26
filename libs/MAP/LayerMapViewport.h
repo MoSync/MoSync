@@ -38,7 +38,10 @@ namespace MAP
 	class LayerMapViewport;
 	class Layer;
 
-	//=========================================================================
+	/**
+	 * \brief Listener class for LayerMapViewport.
+	 *
+	 */
 	class ILayerMapViewportListener
 	//=========================================================================
 	{

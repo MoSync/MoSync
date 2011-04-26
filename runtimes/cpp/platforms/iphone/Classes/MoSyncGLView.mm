@@ -245,6 +245,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
     [super dealloc];
 }
 
+/*
 - (void)viewAppeared {
 	[touchHelper clearTouches];
 }
@@ -256,7 +257,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 			CGPoint point = [touch locationInView:self];
 			int touchId = [touchHelper addTouch: touch];
 			MoSync_AddTouchPressedEvent(point.x, point.y, touchId);
-			NSLog(@"%f, %f", point.x, point.y);			
+			//NSLog(@"%f, %f", point.x, point.y);			
 		}
 	}	
 }
@@ -268,7 +269,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 			CGPoint point = [touch locationInView:self];
 			int touchId = [touchHelper getTouchId: touch];
 			MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
-			NSLog(@"%f, %f", point.x, point.y);
+			//NSLog(@"%f, %f", point.x, point.y);
 		}
 	}	
 }
@@ -284,5 +285,6 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 		}
 	}	
 }
+*/
 
 @end

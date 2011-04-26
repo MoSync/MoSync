@@ -32,6 +32,5 @@
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
 - (UIViewController*) getController;
-- (void)layout;
 
 @end

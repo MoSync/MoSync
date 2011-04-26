@@ -605,13 +605,13 @@ interface MAAPI {
 	* Returns another \link #STERR_GENERIC STERR \endlink code if the store could not be opened
 	* for another reason.
 	*
-	* \param name The name of the store. A store name must have between 1 and 32 characters,
-	* inclusive, and must not contain any of the following characters: "\\:;?*'
+	* \param name The name of the store. A store name must have from 1 to 32 characters,
+	* and must not contain any of the following characters: "/\\:;?*'
 	* \param flags A combination of \link #MAS_CREATE_IF_NECESSARY MAS \endlink flags, or zero.
 	*/
 	MAHandle maOpenStore(in MAString name, in int flags);
 	/**
-	* Writes the contents of a data object to a store. Destroys any data currently in the store.
+	* Writes the contents of a data object to a store. Destroys any data previously in the store.
 	* Returns \> 0 on success, #STERR_FULL if the storage system is full,
 	* or another \link #STERR_GENERIC STERR \endlink code if the write failed for another reason.
 	* \param store The store to write to.
@@ -627,9 +627,9 @@ interface MAAPI {
 	*/
 	int maReadStore(in MAHandle store, in MAHandle placeholder);
 	/**
-	* Closes a store. Also removes that store if \a _remove is non-zero.
+	* Closes a store. Also deletes that store if \a _delete is non-zero.
 	*/
-	void maCloseStore(in MAHandle store, in int _remove);
+	void maCloseStore(in MAHandle store, in int _delete);
 
 	constset int CONNERR_ {
 		/// Generic error.
@@ -2990,14 +2990,7 @@ interface MAAPI {
 #endif	//IX_PIM
 
 #if IX_WIDGET
-
-/**
-* This API may be used to access the Native UI components of the underlying system in a 
-* platform independant manner. Currently supported platforms are Android and iOS. The 
-* API has a small set of functions that use strings for keys and values. All keys are
-* defined as documented string constants. See \ref WidgetTypes "Widget types" and \ref
-* WidgetProperties "Widget properties" for more information.
-*/
+#include "native_ui_intro_doc.idl"
 group WidgetAPI "Widget API" {
 
 	/**
@@ -3128,7 +3121,7 @@ group WidgetAPI "Widget API" {
 		MOSYNC_SCREEN_HANDLE = 0;
 
 		/**
-		* @brief If set to the width or height of a widget it tries to fill the avilable space in that dimension. If there are multiple widgets specified with this constant, the space will be shared equally.
+		* @brief If set to the width or height of a widget and the parent is either a vertical or horizontal layout it tries to fill the available space in that dimension. If there are multiple widgets specified with this constant, the space will then be shared equally. If the parent isn't a horizontal or vertical layout it just resizes the child to the size of its parent.
 		*/
 		FILL_AVAILABLE_SPACE = -1;
 		
@@ -3347,147 +3340,216 @@ group WidgetAPI "Widget API" {
 	*/
 	constset MAString MAW_WIDGET_ {
 		/**
-		* @brief Specifies the horizontal distance from the parent widget. It is meant to be used to absolute position a widget inside a RelativeLayout. Takes an integer in pixels.
+		* @brief Sets or gets the horizontal distance from the parent widget in a RelativeLayout.
+		*
+		* @validvalue A positive integer in number of pixels.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_LEFT, "100");
+		* \endcode
 		*/
 		LEFT = "left";
 
 		/**
-		* @brief Specifies the vertical distance from the parent widget. It is meant to be used to absolute position a widget inside a RelativeLayout. Takes an integer in pixels.
+		* @brief Specifies the vertical distance from the parent widget in a RelativeLayout.
+		*
+		* @validvalue A positive integer in number of pixels.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_TOP, "100");
+		* \endcode
 		*/
 		TOP = "top";
 
 		/**
-		* @brief Specifies the width of a widget. Takes an integer in pixels, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
+		* @brief Sets or gets the width of a widget.
+		*
+		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_WIDTH, "100");
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_WIDTH, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+		* \endcode
 		*/
 		WIDTH = "width";
 
 		/**
-		* @brief Specifies the height of a widget. Takes an integer in pixels, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT. 
+		* @brief Sets or gets the height of a widget.
+		*
+		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_HEIGHT, "100");
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_HEIGHT, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+		* \endcode
 		*/
 		HEIGHT = "height";
+
 		/**
-		* @brief Specifies the transparency of the widget background. Takes a float between 0.0 and 1.0, where 0.0 is fully transparent and 1.0 is opaque.
+		* @brief Sets the transparency of the widget background.
+		*
+		* @validvalue A floay between 0.0 and 1.0, where 0.0 is fully transparent and 1.0 is opaque.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_ALPHA, "0.0"); // Not visible
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_ALPHA, "0.5"); // Half visible
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_ALPHA, "1.0"); // Fully visible
+		* \endcode
 		*/
 		ALPHA = "alpha";
 
 		/**
-		* @brief Specifies the background color of a widget. The format of the color is a hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		* @brief Specifies the background color of a widget.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_BACKGROUND_COLOR, "0xff0000"); // Red
+		* \endcode
 		*/
 		BACKGROUND_COLOR = "backgroundColor";
 
 		/**
-		* @brief Specifies whether the widget is visible or not. Takes a boolean 'true' or 'false', where true is visible and false is invisible.
+		* @brief Sets whether the widget is visible or not. Layouts ignore invisible widgets.
+		*
+		* @validvalue A boolean string 'true' or 'false', where true is visible and false is invisible.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_VISIBLE, "false");
+		* \endcode
 		*/
 		VISIBLE = "visible";
 	}	
 
 	/**
-	* The available widget properties for a #MAW_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_SCREEN. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetScreenProperties "Screen properties" {
 	constset MAString MAW_SCREEN_ {
 		/**
-		* @brief Specifies the title of a screen. The screen title is used by tab screen to display the tab title. Takes a string.
+		* @brief Sets the title of a screen. The screen title is used by tab screen to display a text on the tab indicator.
+		*
+		* @validvalue Null terminated string. The length of the string should be short enough to fit in a tab indicator.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(screenHandle, MAW_SCREEN_TITLE, "My title");
+		* \endcode
 		*/
 		TITLE = "title";
+
 		/**
-		* @brief Specifies an icon for the screen. Should be of a suitable size for a tab icon. Takes a handle to an image.
+		* @brief Sets an icon for a screen. The icon is used by a tab screen to display an icon on the tab indicator.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in a tab indicatior.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(screenHandle, MAW_SCREEN_ICON, toString(R_MY_ICON));
+		* \endcode
 		*/
 		ICON = "icon";
 	}
 	} // end of WidgetScreenProperties	
 
 	/**
-	* The available widget properties for a #MAW_TAB_SCREEN. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_TAB_SCREEN. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetTabScreenProperties "Tab screen properties" {
 	constset MAString MAW_TAB_SCREEN_ {
 		/**
-		* @brief Changes the open tab to the tab with the given index. Takes an integer.
+		* @copydoc MAW_SCREEN_TITLE
+		*/
+		TITLE = MAW_SCREEN_TITLE;
+
+		/**
+		* @copydoc MAW_SCREEN_ICON
+		*/
+		ICON = MAW_SCREEN_ICON;
+
+		/**
+		* @brief Sets or gets the currently open tab to the tab with the given index.
+		* 
+		* @validvalue A 0-indexed tab number.
+		*
+		* @setandget
+		*
+		* @par Example set
+		* \code
+		*	maWidgetSetProperty(tabScreenHandle, MAW_TAB_SCREEN_CURRENT_TAB, "1");
+		* \endcode
+		*
+		* @par Example get
+		* \code
+		* 	char currentTabBuffer[BUFFER_SIZE];
+		* 	int getStatus = maWidgetGetProperty(tabScreenHandle, MAW_WEB_VIEW_CURRENT_TAB, currentTabBuffer, BUFFER_SIZE);
+		* 	if(getStatus == MAW_RES_OK)
+		* 	{
+		* 	    // Do something with current tab.
+		* 	}
+		* \endcode
 		*/
 		CURRENT_TAB = "currentTab";
 	}
 	} // end of WidgetTabScreenProperties	
 
 	/**
-	* The available widget properties for a #MAW_STACK_SCREEN.
+	* The available widget properties for a #MAW_STACK_SCREEN. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetStackScreenProperties "Stack screen properties" {
 	constset MAString MAW_STACK_SCREEN_ {
 		/**
 		* @copydoc #MAW_SCREEN_TITLE
 		*/
-		TITLE = "title";
+		TITLE = MAW_SCREEN_TITLE;
+
 		/**
 		* @copydoc #MAW_SCREEN_ICON
 		*/
-		ICON = "icon";
+		ICON = MAW_SCREEN_ICON;
+
 		/**
-		* @brief Specifies whether the back button automatically should pop the stack screen. This can have different behaviors on different platforms, on iPhone the UI back button is disabled, on Android the stack screen ignores back button events. Takes a boolean 'true' or 'false'. 
+		* @brief Specifies whether the back button automatically should pop the stack screen.
+		*
+		* This can have different behaviors on different platforms, on iPhone the UI back button is disabled, on Android the stack screen ignores back button events.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_BACK_BUTTON_ENABLED, "false");
+		* \endcode
 		*/
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
 	}
 	} // end of WidgetStackScreenProperties	
-
-	/**
-	* The available widget properties for a #MAW_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
-	*/
-	group WidgetButtonProperties "Button properties" {
-	constset MAString MAW_BUTTON_ {
-		/**
-		* @copydoc #MAW_LABEL_TEXT
-		*/
-		TEXT = "text";
-
-		/**
-		* @copydoc #MAW_LABEL_TEXT_VERTICAL_ALIGNMENT
-		*/
-		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
-
-		/**
-		* @copydoc #MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT
-		*/
-		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
-
-		/**
-		* @copydoc #MAW_LABEL_FONT_COLOR
-		*/
-		FONT_COLOR = "fontColor";
-
-		/**
-		* @copydoc #MAW_LABEL_FONT_SIZE
-		*/
-		FONT_SIZE = "fontSize";
-		
-		/**
-		* Sets the background image of the button. Takes an image handle.
-		*/
-		BACKGROUND_IMAGE = "backgroundImage";
-	}
-	} // end of WidgetButtonProperties		
-
-	/**
-	* The available widget properties for a #MAW_IMAGE_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
-	*/
-	group WidgetImageButtonProperties "Image button properties" {
-	constset MAString MAW_IMAGE_BUTTON_ {
-		TEXT = "text";
-		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
-		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
-		BACKGROUND_IMAGE = "backgroundImage";
-		FONT_COLOR = "fontColor";
-		FONT_SIZE = "fontSize";
-	}
-	} // end of WidgetImageButtonProperties		
-	
-	/**
-	* The available widget properties for a #MAW_IMAGE. See of \ref WidgetProperties "Widget properties" for more properties. 
-	*/
-	group WidgetImageProperties "Image properties" {
-	constset MAString MAW_IMAGE_ {
-		IMAGE = "image";
-	}
-	} // end of WidgetImageProperties
 
 	/**
 	* The available widget properties for a #MAW_LABEL. See of \ref WidgetProperties "Widget properties" for more properties. 
@@ -3495,31 +3557,295 @@ group WidgetAPI "Widget API" {
 	group WidgetLabelProperties "Label properties" {
 	constset MAString MAW_LABEL_ {
 		/**
-		* @brief Sets the text that will be displayed in the label. Takes a string.
+		* @brief Sets or gets the text that is displayed in the label.
+		* 
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example set
+		* \code
+		*	maWidgetSetProperty(labelHandle, MAW_LABEL_TEXT, "My label");
+		* \endcode
+		*
+		* @par Example get
+		* \code
+		* 	char textBuffer[BUFFER_SIZE];
+		* 	int getStatus = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if(getStatus == MAW_RES_OK)
+		* 	{
+		* 	    // Do something with the label text.
+		* 	}
+		* \endcode
 		*/
 		TEXT = "text";
 
 		/**
-		* @brief Sets the vertical alignment of the text inside the label. If the widget's height is WRAP_CONTENT this property has no effect. Takes one of the constants #MAW_ALIGNMENT_TOP, MAW_ALIGNMENT_CENTER or MAW_ALIGNMENT_BOTTOM.
+		* @brief Sets the vertical alignment of the text inside the label. If the widget's height is WRAP_CONTENT this property has no effect.
+		* 
+		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(labelHandle, MAW_LABEL_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
 		*/
 		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
 		
 		/**
-		* @brief Sets the horizontal alignment of the text inside the label. If the widget's height is WRAP_CONTENT this property has no effect. Takes one of the constants #MAW_ALIGNMENT_TOP, MAW_ALIGNMENT_CENTER or MAW_ALIGNMENT_BOTTOM.
+		* @brief Sets the horizontal alignment of the text inside the label. If the widget's height is WRAP_CONTENT this property has no effect.
+		*
+		* @validvalue Takes one of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(labelHandle, MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
 		*/
 		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
 
 		/**
-		* @brief Specifies the font color of the label's text. The format of the color is a hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		* @brief Sets the font color of the label's text.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(labelHandle, MAW_LABEL_FONT_COLOR, "0xff0000");
+		* \endcode
 		*/
 		FONT_COLOR = "fontColor";
 		
 		/**
-		* @brief Specifies the font size in points of the label's text. Takes a float that specifies the number of points.
+		* @brief Sets the font size in points of the label's text.
+		*
+		* @validvalue A float that specifies the number of points.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(labelHandle, MAW_LABEL_FONT_SIZE, "13.0");
+		* \endcode
 		*/
 		FONT_SIZE = "fontSize";
 	}
 	} // end of WidgetLabelProperties		
+
+	/**
+	* The available widget properties for a #MAW_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetButtonProperties "Button properties" {
+	constset MAString MAW_BUTTON_ {
+		/**
+		* @brief Sets or gets the text that is displayed in the label.
+		* 
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example set
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_TEXT, "My button");
+		* \endcode
+		*
+		* @par Example get
+		* \code
+		* 	char textBuffer[BUFFER_SIZE];
+		* 	int getStatus = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if(getStatus == MAW_RES_OK)
+		* 	{
+		* 	    // Do something with the label text.
+		* 	}
+		* \endcode
+		*/
+		TEXT = "text";
+
+		/**
+		* @brief Sets the vertical alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
+		* 
+		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
+		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
+		
+		/**
+		* @brief Sets the horizontal alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
+		*
+		* @validvalue Takes one of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
+		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
+
+		/**
+		* @brief Sets the font color of the button's text.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_FONT_COLOR, "0xff0000");
+		* \endcode
+		*/
+		FONT_COLOR = "fontColor";
+		
+		/**
+		* @brief Sets the font size in points of the button's text.
+		*
+		* @validvalue A float that specifies the number of points.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_FONT_SIZE, "13.0");
+		* \endcode
+		*/
+		FONT_SIZE = "fontSize";
+	}
+	} // end of WidgetButtonProperties		
+
+	/**
+	* The available widget properties for a #MAW_IMAGE_BUTTON. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetImageButtonProperties "Image button properties" {
+	constset MAString MAW_IMAGE_BUTTON_ {
+		/**
+		* @brief Sets or gets the text that is displayed in the label.
+		* 
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example set
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, "My button");
+		* \endcode
+		*
+		* @par Example get
+		* \code
+		* 	char textBuffer[BUFFER_SIZE];
+		* 	int getStatus = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if(getStatus == MAW_RES_OK)
+		* 	{
+		* 	    // Do something with the label text.
+		* 	}
+		* \endcode
+		*/
+		TEXT = "text";
+
+		/**
+		* @brief Sets the vertical alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
+		* 
+		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
+		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
+		
+		/**
+		* @brief Sets the horizontal alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
+		*
+		* @validvalue Takes one of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
+		TEXT_HORIZONTAL_ALIGNMENT = "textHorizontalAlignment";
+
+		/**
+		* @brief Sets the font color of the button's text.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_FONT_COLOR, "0xff0000");
+		* \endcode
+		*/
+		FONT_COLOR = "fontColor";
+		
+		/**
+		* @brief Sets the font size in points of the button's text.
+		*
+		* @validvalue A float that specifies the number of points.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_FONT_SIZE, "13.0");
+		* \endcode
+		*/
+		FONT_SIZE = "fontSize";
+
+		/**
+		* Sets the image used to represent the button.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_BACKGROUND_IMAGE, toString(R_MY_IMAGE));
+		* \endcode
+		*/
+		BACKGROUND_IMAGE = "backgroundImage";
+	}
+	} // end of WidgetImageButtonProperties		
+	
+	/**
+	* The available widget properties for a #MAW_IMAGE. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetImageProperties "Image properties" {
+	constset MAString MAW_IMAGE_ {	
+		/**
+		* Sets the image that will be displayed.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_IMAGE_IMAGE, toString(R_MY_IMAGE));
+		* \endcode
+		*/
+		IMAGE = "image";
+	}
+	} // end of WidgetImageProperties
 
 	/**
 	* The available widget properties for a #MAW_EDIT_BOX. See of \ref WidgetProperties "Widget properties" for more properties. 
@@ -3527,100 +3853,329 @@ group WidgetAPI "Widget API" {
 	group WidgetEditBoxProperties "Edit box properties" {
 	constset MAString MAW_EDIT_BOX_ {
 		/**
-		* @brief Set or get the text entered in the edit box. 
+		* @brief Set or get the text entered in the edit box.
+		* 
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example set
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, "My label");
+		* \endcode
+		*
+		* @par Example get
+		* \code
+		* 	char textBuffer[BUFFER_SIZE];
+		* 	int getStatus = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if(getStatus == MAW_RES_OK)
+		* 	{
+		* 	    // Do something with the edit box text
+		* 	}
+		* \endcode
 		*/
 		TEXT = "text";
 
 		/**
 		* @brief Set a text in the edit box that acts as a placeholder when an edit box is empty.
+		* 
+		* @validvalue A null-terminated string.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_PLACEHOLDER, "Enter text...");
+		* \endcode
 		*/
 		PLACEHOLDER = "placeholder";
 
 		/**
-		* @brief Shows or hides the virtual keyboard. If shown the focus will be set to this widget. Takes a boolean 'true' or 'false'.
+		* @brief Shows or hides the virtual keyboard. If shown the focus will be set to this widget.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_SHOW_KEYBOARD, "true");
+		* \endcode
 		*/
 		SHOW_KEYBOARD = "showKeyboard";
+
+		/**
+		* @brief Specifies what editing mode the edit box should have.
+		*
+		* @validvalue Either 'password' or 'text'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_EDIT_MODE, "password");
+		* \endcode
+		*/
+		EDIT_MODE = "editMode";
 	}
 	} // end of WidgetEditBoxProperties
 	
 	/**
-	* The available widget properties for a #MAW_LIST_VIEW_ITEM. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_LIST_VIEW_ITEM. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetListViewItemProperties "List view item properties" {
 	constset MAString MAW_LIST_VIEW_ITEM_ {
 		/**
-		* @brief Sets the text part of the list view item. If there is an icon the text will be placed to the right of it, otherwise at the left edge.
+		* @brief Sets the text part of the list view item. If there is an icon the text will be placed to the right of it, otherwise near the left edge.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_TEXT, "My label");
+		* \endcode
 		*/
 		TEXT = "text";
 
 		/**
-		* @brief Sets an icon of the list view item. It will be placed in the left side of the widget.
+		* @brief Sets an icon of the list view item that is placed to the left of the text.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource.
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_ICON, toString(R_MY_ICON));
+		* \endcode
 		*/
 		ICON = "icon";
 
+		/**
+		* @brief Sets the type of list item displayed. Provides the corresponding icon in the right side of the list view.
+		*
+		* @note Only available for iOS.
+		*
+		* @validvalue One of "hasChildren", "hasDetails" or "isChecked".
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE, "hasChildren");
+		* \endcode
+		*/
 		ACCESSORY_TYPE = "accessoryType";
 	}
 	} // end of WidgetListViewItemProperties
 	
 	/**
-	* The available widget properties for a #MAW_CHECK_BOX. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_CHECK_BOX. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetCheckBoxProperties "Check box properties" {
 	constset MAString MAW_CHECK_BOX_ {
 		/**
-		* @brief Specify or get whether or not the checkbox is checked. Takes or returns a boolean.
+		* @brief Set or get the checked state of the checkbox.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_CHECK_BOX_CHECKED, "true");
+		* \endcode
 		*/
 		CHECKED = "checked";
 	}
 	} // end of WidgetListViewProperties
 
 	/**
-	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetHorizontalLayoutProperties "Horizontal layout properties" {
-	constset MAString MAW_HORIZONTAL_LAYOUT_ {
+	constset MAString MAW_HORIZONTAL_LAYOUT_ {	
+		/**
+		* @brief Sets how the children in the layout should be aligned in the vertical axis.
+		* 
+		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
 		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
+		
+		/**
+		* @brief Sets how the children in the layout should be aligned in the horizontal axis.
+		* 
+		* @validvalue One of the constants #MAW_ALIGNMENT_LEFT, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
 	}
 	} // end of WidgetHorizontalLayoutProperties
 
 	/**
-	* The available widget properties for a #MAW_VERTICAL_LAYOUT. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_VERTICAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetVerticalLayoutProperties "Vertical layout properties" {
 	constset MAString MAW_VERTICAL_LAYOUT_ {
+		/**
+		* @brief Sets how the children in the layout should be aligned in the vertical axis.
+		* 
+		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
 		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
+		
+		/**
+		* @brief Sets how the children in the layout should be aligned in the horizontal axis.
+		* 
+		* @validvalue One of the constants #MAW_ALIGNMENT_LEFT, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		* \endcode
+		*/
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
 	}
 	} // end of WidgetVerticalLayoutProperties
 	
 	/**
-	* The available widget properties for a #MAW_SEARCH_BAR. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_SEARCH_BAR. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetSearchBarProperties "Search bar properties" {
 	constset MAString MAW_SEARCH_BAR_ {
+		/**
+		* @brief Set or get the current text of the search bar.
+		* 
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(searchBarHandle, MAW_SEARCH_BAR_TEXT, "My search query");
+		* \endcode
+		*/	
 		TEXT = "text";
+
+		/**
+		* @brief Set a text in the search bar that acts as a placeholder when an edit box is empty.
+		* 
+		* @validvalue A null-terminated string.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(searchBarHandle, MAW_SEARCH_BAR_PLACEHOLDER, "Search...");
+		* \endcode
+		*/
 		PLACEHOLDER = "placeholder";
+		
+		/**
+		* @brief Shows or hides the virtual keyboard. If shown the focus will be set to this widget.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(searchBarHandle, MAW_SEARCH_BAR_SHOW_KEYBOARD, "true");
+		* \endcode
+		*/
 		SHOW_KEYBOARD = "showKeyboard";
 	}
 	} // end of WidgetSearchBarProperties
 		
 	/**
-	* The available widget properties for a #MAW_GL_VIEW. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_GL_VIEW. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetGLViewProperties "GL view properties" {
 	constset MAString MAW_GL_VIEW_ {
+		/**
+		* @brief Property that tells the gl view that it should be redrawn.
+		*
+		* @validvalue The value isn't taken into account.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(glViewHandle, MAW_GL_VIEW_INVALIDATE, "");
+		* \endcode
+		*/	
 		INVALIDATE = "invalidate";
+
+		/**
+		* @brief Property that tells the gl view that all following gl calls will apply to this view.
+		*
+		* @validvalue The value isn't taken into account.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(glViewHandle, MAW_GL_VIEW_BIND, "");
+		* \endcode
+		*/	
 		BIND = "bind";
 	}
 	} // end of WidgetGLViewProperties
 	
 	/**
-	* The available widget properties for a #MAW_WEB_VIEW. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_WEB_VIEW. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetWebViewProperties "Web view properties" {
 	constset MAString MAW_WEB_VIEW_ {
+		/**
+		* @brief Set or get the currently displayed url in the web view.
+		*
+		* @validvalue Any valid URL.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL, "http://www.mosync.com/");
+		* \endcode
+		*/		
 		URL = "url";
+
+		/**
+		* @brief Property to get a new url whenever the webview changes the url. See \ref #MAW_EVENT_WEB_VIEW_URL_CHANGED.
+		*
+		* @validvalue Any valid URL.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		* 	char urlBuffer[BUFFER_SIZE];
+		* 	int getStatus = maWidgetGetProperty(webViewHandle, MAW_WEB_VIEW_NEW_URL, urlBuffer, BUFFER_SIZE);
+		* 	if(getStatus == MAW_RES_OK)
+		* 	{
+		* 	    // Do something with URL.
+		* 	}
+		* \endcode
+		*/		
 		NEW_URL = "newurl";
 	}
 	} // end of WidgetWebViewProperties
@@ -3966,12 +4521,11 @@ group WidgetAPI "Widget API" {
 		 * Add a notification item.
 		 *
 		 * Note that there can only be one notification of type
-		 * NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
+		 * #NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
 		 * types may be added in the future. This syscall is available 
 		 * on Android only.
 		 *
-		 * @param type The \link #NOTIFICATION_TYPE_APPLICATION_LAUNCHER 
-		 * \endlink constant.
+		 * @param type The #NOTIFICATION_TYPE_APPLICATION_LAUNCHER constant.
 		 * @param id The id of the notification. The id must be unique within 
 		 * the application.
 		 * @param title Title of the notification.

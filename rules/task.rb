@@ -288,6 +288,11 @@ class CopyFileTask < FileTask
 	def execute
 		puts "copy #{@src} #{@NAME}"
 		FileUtils.copy_file(@src, @NAME, true)
+		# Work around a bug in Ruby's utime, which is called by copy_file.
+		# Bug appears during Daylight Savings Time, when copying files with dates outside DST.
+		mtime = File.mtime(@src)
+		mtime += mtime.utc_offset
+		File.utime(mtime, mtime, @NAME)
 	end
 end
 

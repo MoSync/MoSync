@@ -33,13 +33,13 @@
 	controller = _controller;
 	controller.title = @"";
 	view = controller.view;
-	view.bounds = [[UIScreen mainScreen] bounds];	
+	//view.bounds = [[UIScreen mainScreen] bounds];	
 	return [super init];
 }
 
 - (void)addChild: (IWidget*)child {
-	if(!parent)
-		[child getView].frame = [[UIScreen mainScreen] bounds];
+	//if(!parent)
+	//	[child getView].frame = [[UIScreen mainScreen] bounds];
 	
 	[super addChild:child];	
 }
@@ -73,6 +73,10 @@
 - (void)layout {
 	int viewWidth = view.frame.size.width; 
 	int viewHeight = view.frame.size.height; 
+	
+//	if(!parent)
+//		view.frame = [[UIScreen mainScreen] bounds];
+	
 	
 	for (IWidget *child in children)
     {

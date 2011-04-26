@@ -53,8 +53,11 @@ public:
 	//Method for handling key presses.
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		//Exit on any key press
-		maExit(0);
+		if(keyCode == MAK_0 || keyCode == MAK_BACK)
+		{
+			//Exit on any key press
+			maExit(0);
+		}
 	}
 
 	//Method for handling custom events. (Moblet is a CustomEventListener.)

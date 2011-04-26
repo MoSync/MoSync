@@ -21,14 +21,43 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <errno.h>
 #include "packagers.h"
 
+using namespace std;
+
+static string parseBlackberryVersion(const string& v) {
+	unsigned major, minor;
+	int res = sscanf(v.c_str(), "%u.%u", &major, &minor);
+	bool bad = false;
+	bad |= (res != 2);
+	bad |= major < 4;
+	bad |= major > 6;
+	if(bad) {
+		printf("Error: bad Blackberry version (%s)\n", v.c_str());
+		exit(1);
+	}
+	switch(major) {
+	case 4:
+		if(minor < 3)
+			return "40";
+		else
+			return "47";
+	case 5:
+		return "500";
+	case 6:
+		return "600";
+	default:
+		exit(42);
+	}
+}
+
 // reads JAD and JAR from cwd, outputs COD file to s.dst.
 void packageBlackberry(const SETTINGS& s, const RuntimeInfo& ri) {
 	testDst(s);
 	testName(s);
 	std::stringstream cmd;
-	cmd << "java -Xmx256m -classpath \""<<mosyncdir()<<"/bin/bb40/rapc.jar\""
+	string bbdir = mosyncdir()+string("/bin/bb")+parseBlackberryVersion(ri.blackberryVersion);
+	cmd << "java -Xmx256m -classpath \""<<bbdir<<"/rapc.jar\""
 		" net.rim.tools.compiler.Compiler"
-		" \"import="<<mosyncdir()<<"/bin/bb40/net_rim_api.jar\""
+		" \"import="<<bbdir<<"/net_rim_api.jar\""
 		" \"codename="<<s.name<<"\" -midlet"
 		" \"jad="<<s.name<<".jad\" \""<<s.name<<".jar\"";
 	sh(cmd.str().c_str());

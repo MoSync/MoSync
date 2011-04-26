@@ -10,6 +10,7 @@ if(ARGV.length > 0)
 	SETTINGS[:stop_on_fail] = true
 	SETTINGS[:rebuild_failed] = true
 	SETTINGS[:retry_failed] = true
+	SETTINGS[:keep_parts] = true
 end
 
 OPT_VERSION = SETTINGS[:test_release] ? 'release' : 'debug'
@@ -65,9 +66,9 @@ def writeArgvFile(filename, argv, testSrcName)
 end
 
 def doArgv(baseName, argv, testSrcName, force_rebuild)
-	return if(!force_rebuild)
 	cName = "build/argv-#{baseName}.c"
 	sName = "build/argv-#{baseName}.s"
+	return sName if(!force_rebuild)
 	writeArgvFile(cName, argv, testSrcName)
 	sh "#{MOSYNCDIR}/bin/xgcc -g -I#{MOSYNCDIR}/include/newlib -Werror -S #{File.expand_path(cName)} -o #{sName}"
 	return sName
@@ -178,6 +179,8 @@ def delete_if_empty(filename)
 	end
 end
 
+LOADER_URLS_FILE = open(SETTINGS[:htdocs_dir] + 'libc_tests.urls', 'wb')
+
 def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	suffix = dead_code ? 'e' : ''
 	pfn = ofn.ext('.moo' + suffix)
@@ -193,17 +196,28 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	
 	# link
 	if(!File.exists?(pfn) || force_rebuild)
+		mdFlag = ' -master-dump' if(SETTINGS[:write_master_dump])
 		if(dead_code)
-			sh "pipe-tool#{PIPE_FLAGS} -elim -master-dump -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
-			sh "pipe-tool -sld=#{sldFile} -B #{pfn} rebuild.s"
+			sh "pipe-tool#{PIPE_FLAGS} -elim#{mdFlag} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
+			sh "pipe-tool#{PIPE_FLAGS} -sld=#{sldFile} -B #{pfn} rebuild.s"
 		else
-			sh "pipe-tool -master-dump -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
+			sh "pipe-tool#{mdFlag} -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 		end
 		force_rebuild = true
 	end
 	delete_if_empty(pfn)
 	if(!File.exists?(pfn))
 		error"Unknown link failure."
+	end
+	
+	# setup for loader
+	if(dead_code)
+		bn = File.basename(pfn)
+		lfn = SETTINGS[:htdocs_dir] + bn
+		if(!File.exists?(lfn))
+			FileUtils.cp(pfn, lfn)
+		end
+		LOADER_URLS_FILE.puts(SETTINGS[:loader_base_url] + bn)
 	end
 	
 	# execute it, if not win already, or we rebuilt something.
@@ -225,28 +239,34 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	end
 	
 	cmd = "#{MOSYNCDIR}/bin/more -timeout 600 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
-	if(HOST == :win32)
-		cmd = "start /B /BELOWNORMAL /WAIT #{cmd}"
-	end
 	$stderr.puts cmd
 	startTime = Time.now
-	res = system(cmd)
+	if(HOST == :win32)
+		cmd = "echo_error.bat #{cmd}"
+		res = open('|'+cmd).read.strip
+		p res
+		res = (res == '0')
+	else
+		res = system(cmd)
+	end
 	endTime = Time.now
 	puts res
 	puts "Elapsed time: #{endTime - startTime}"
 	if(res == true)	# success
 		FileUtils.touch(winFile)
 		FileUtils.rm_f(failFile)
-		FileUtils.rm_f(logFile)
-		FileUtils.rm_f(mdsFile)
-		FileUtils.rm_f(esFile)
-		FileUtils.rm_f(sldFile)
-		FileUtils.rm_f(stabsFile)
+		if(!SETTINGS[:keep_parts])
+			FileUtils.rm_f(logFile)
+			FileUtils.rm_f(mdsFile)
+			FileUtils.rm_f(esFile)
+			FileUtils.rm_f(sldFile)
+			FileUtils.rm_f(stabsFile)
+		end
 	else	# failure
 		FileUtils.touch(failFile)
 		FileUtils.rm_f(winFile)
 		FileUtils.mv('log.txt', logFile) if(File.exists?('log.txt'))
-		FileUtils.mv('_masterdump.s', mdsFile) if(File.exists?('_masterdump.s'))
+		FileUtils.mv('_masterdump.s', mdsFile) if(File.exists?('_masterdump.s') && SETTINGS[:write_master_dump])
 		FileUtils.mv('rebuild.s', esFile) if(File.exists?('rebuild.s'))
 		if(SETTINGS[:stop_on_fail])
 			if(SETTINGS[:copy_targets])
@@ -254,7 +274,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 					# copy program, sld and stabs to directory :copy_target.
 					FileUtils.cp(pfn, target + 'program')
 					FileUtils.cp(sldFile, target + 'sld.tab')
-					FileUtils.cp(stabsFile, target + 'stabs.tab')
+					FileUtils.cp(stabsFile, target + 'stabs.tab') unless(dead_code)
 				end
 			end
 			error "Stop on fail"
@@ -299,6 +319,8 @@ end
 
 
 unskippedCount = 0
+wins = 0
+dceWins = 0
 
 files.each do |filename, targetName|
 	bn = targetName
@@ -346,9 +368,16 @@ files.each do |filename, targetName|
 	code = SPECIFIC_CODE.fetch(bn, nil)
 	
 	force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild, inputs, code)
+	wins += 1 if(File.exists?(ofn.ext('.win')))
 	if(SETTINGS[:test_dead_code_elimination] && File.exists?(ofn.ext('.win')))
 		link_and_test(ofn, argvs, files, true, force_rebuild, inputs, code)
+		dceWins += 1 if(File.exists?(ofn.ext('.wine')))
 	end
 end
 
 puts "#{unskippedCount} actual tests."
+puts "#{SKIPPED_UNRESOLVED.size} known unresolved fails."
+puts "#{wins} wins. #{unskippedCount - wins} remains."
+if(SETTINGS[:test_dead_code_elimination])
+	puts "#{dceWins} DCE wins. #{unskippedCount - dceWins} remains."
+end

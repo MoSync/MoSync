@@ -18,17 +18,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "MoSyncAppDelegate.h"
 #import "MoSyncViewController.h"
 
-//#include "MoSyncUISyscalls.h"
+@class MoSyncView;
+
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
-
-//#include "Platform.h"
-//#import "MoSyncMain.h"
-
 void MoSync_AddCloseEvent();
+void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 
 @implementation MoSyncAppDelegate
 
-@synthesize window;
+//@synthesize window;
 @synthesize viewController;
 
 
@@ -38,14 +36,19 @@ void MoSync_AddCloseEvent();
 	[[UIApplication sharedApplication] setStatusBarHidden:YES 
 										withAnimation:UIStatusBarAnimationFade];
 	//[[UIApplication sharedApplication] setStatusBarHidden:NO 
-	//									withAnimation:UIStatusBarAnimationFade];
+	//									withAnimation:UIStatusBarAnimationFade];	
 	
     // Override point for customization after app launch    
-	window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+	//UIWindow* window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     viewController = [[MoSyncViewController alloc] init];
-	initMoSyncUISyscalls(window, viewController);
-	[window addSubview:viewController.view];
-    [window makeKeyAndVisible];
+	initMoSyncUISyscalls(NULL, viewController);
+	//[window addSubview:viewController.view];
+    //[window makeKeyAndVisible];
+	
+	CGRect appFrame = [[UIScreen mainScreen] bounds];
+	CGFloat screenHeight = appFrame.size.height;
+	CGFloat screenWidth = appFrame.size.width;
+	MoSync_Main(screenWidth, screenHeight, (MoSyncView*)[viewController getMoSyncView]);	
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {
@@ -55,7 +58,7 @@ void MoSync_AddCloseEvent();
 
 - (void)dealloc {
     [viewController release];
-    [window release];
+  //  [window release];
     [super dealloc];
 }
 

@@ -52,9 +52,17 @@ public:
 		//Create a Native UI screen using the IOCTL function maWidgetCreate.
 		mScreen = maWidgetCreate(MAW_SCREEN);
 
+		//Check if this is supported on the device it's running on
+		if(mScreen == IOCTL_UNAVAILABLE)
+		{
+			maPanic(0,"Sorry but this program does not run currently on this platform");
+		}
+	   
 		//Create the screen's main layout widget. As it is a member variable
 		//we give its name an "m" prefix.
 		mMainLayoutWidget = maWidgetCreate(MAW_VERTICAL_LAYOUT);
+		maWidgetSetProperty(mMainLayoutWidget, MAW_WIDGET_WIDTH, "-1");
+		maWidgetSetProperty(mMainLayoutWidget, MAW_WIDGET_HEIGHT, "-1");
 
 		//Identify the main layout widget as root of the screen's widget tree.
 		maWidgetAddChild(mScreen, mMainLayoutWidget);
@@ -65,8 +73,8 @@ public:
 		//We set its width and height, and we initialize it with some text.
 		//Finally we locate it inside the screen widget.
 		mInstructions = maWidgetCreate(MAW_LABEL);
-		maWidgetSetProperty(mInstructions, MAW_WIDGET_WIDTH, "150");
-		maWidgetSetProperty(mInstructions, MAW_WIDGET_HEIGHT, "60");
+		maWidgetSetProperty(mInstructions, MAW_WIDGET_WIDTH, "-1");
+		maWidgetSetProperty(mInstructions, MAW_WIDGET_HEIGHT, "-2");
 		maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, "Enter a password:");
 		maWidgetAddChild(mMainLayoutWidget, mInstructions);
 
@@ -74,24 +82,24 @@ public:
 		//password mode to hide text after entry. We locate the password box
 		//inside the screen widget. It will appear after the instructions widget.
 		mPasswordBox = maWidgetCreate(MAW_EDIT_BOX);
-		maWidgetSetProperty(mPasswordBox, MAW_WIDGET_WIDTH, "150");
-		maWidgetSetProperty(mPasswordBox, MAW_WIDGET_HEIGHT, "30");
+		maWidgetSetProperty(mPasswordBox, MAW_WIDGET_WIDTH, "-1");
+		maWidgetSetProperty(mPasswordBox, MAW_WIDGET_HEIGHT, "-2");
 		maWidgetSetProperty(mPasswordBox, "editMode", "password");
 		maWidgetAddChild(mMainLayoutWidget, mPasswordBox);
 
 		//The third and fourth widgets are labels that we will use as buttons.
 		//We centre the text vertically and horizontally within the buttons.
 		mClearButton = maWidgetCreate(MAW_BUTTON);
-		maWidgetSetProperty(mClearButton, MAW_WIDGET_WIDTH, "150");
-		maWidgetSetProperty(mClearButton, MAW_WIDGET_HEIGHT, "30");
+		maWidgetSetProperty(mClearButton, MAW_WIDGET_WIDTH, "-1");
+		maWidgetSetProperty(mClearButton, MAW_WIDGET_HEIGHT, "-2");
 		maWidgetSetProperty(mClearButton, MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT, "center");
 		maWidgetSetProperty(mClearButton, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, "center");
 		maWidgetSetProperty(mClearButton, MAW_BUTTON_TEXT, "Clear");
 		maWidgetAddChild(mMainLayoutWidget, mClearButton);
 
 		mSubmitButton = maWidgetCreate(MAW_BUTTON);
-		maWidgetSetProperty(mSubmitButton, MAW_WIDGET_WIDTH, "150");
-		maWidgetSetProperty(mSubmitButton, MAW_WIDGET_HEIGHT, "30");
+		maWidgetSetProperty(mSubmitButton, MAW_WIDGET_WIDTH, "-1");
+		maWidgetSetProperty(mSubmitButton, MAW_WIDGET_HEIGHT, "-2");
 		maWidgetSetProperty(mSubmitButton, MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT, "center");
 		maWidgetSetProperty(mSubmitButton, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, "center");
 		maWidgetSetProperty(mSubmitButton, MAW_BUTTON_TEXT, "Submit");

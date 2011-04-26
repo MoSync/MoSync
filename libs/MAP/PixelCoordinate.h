@@ -103,8 +103,11 @@ namespace MAP
 		MagnificationT mMagnification;
 	};
 	
-	// override type that can be converted to int magnification
-	// and double etc. always floored to int etc.
+	/**
+	 * \brief The type used to represent a magnification. 
+	 * 
+	 * It simultaneously represents a discrete and continuous magnification.
+	 */
 	class MagnificationType {
 		public:
 		

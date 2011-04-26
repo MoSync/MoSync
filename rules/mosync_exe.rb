@@ -43,12 +43,41 @@ module PipeElimTask
 	end
 end
 
+# Packs a MoSync program for installation.
+# resource can be nil. all other parameters must be valid.
+class MoSyncPackTask < Task
+	def initialize(work, tempdir, buildpath, model, program, resource, name)
+		super(work)
+		@model = model
+		@program = program
+		@resource = resource
+		@packpath = buildpath + model
+		@name = name
+		@tempdir = tempdir
+		@prerequisites = [@program, DirTask.new(work, @packpath)]
+		@prerequisites << @resource if(@resource)
+	end
+	def execute
+		if(@resource)
+			r = File.expand_path(@resource)
+			resArg = " -r \"#{r}\""
+		end
+		p = File.expand_path(@program)
+		d = File.expand_path(@packpath)
+		FileUtils.cd(@tempdir, :verbose => true) do
+			sh "#{mosyncdir}/bin/package -p \"#{p}\"#{resArg} -m \"#{@model}\""+
+				" -d \"#{d}\" -n \"#{@name}\" --vendor MoSync"
+		end
+	end
+end
+
 class PipeExeWork < PipeGccWork
 	def setup
 		default(:TARGETDIR, '.')
 		set_defaults
-		@SLD = @TARGETDIR + "/" + @BUILDDIR + "sld.tab"
-		stabs = @TARGETDIR + "/" + @BUILDDIR + "stabs.tab"
+		@buildpath = @TARGETDIR + "/" + @BUILDDIR
+		@SLD = @buildpath + "sld.tab"
+		stabs = @buildpath + "stabs.tab"
 		@FLAGS = " -sld=#{@SLD} -stabs=#{stabs} -B"
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a +
 			[mosync_include, "#{mosyncdir}/profiles/vendors/MoSync/Emulator"]
@@ -85,12 +114,16 @@ class PipeExeWork < PipeGccWork
 		if(ELIM)
 			@TARGET.extend(PipeElimTask)
 		end
+		if(defined?(PACK))
+			@prerequisites = [@TARGET = MoSyncPackTask.new(self, @BUILDDIR_BASE, @buildpath,
+				PACK, @TARGET, @resourceTask, @NAME)]
+		end
 	end
 	def emuCommandLine
 		if(@resourceTask)
 			resArg = " -resource #{@resourceTask}"
 		end
-		return "#{mosyncdir}/bin/MoRE -program #{@TARGET}#{resArg}#{@EXTRA_EMUFLAGS}"
+		return "#{mosyncdir}/bin/MoRE -program #{@TARGET} -sld #{@SLD}#{resArg}#{@EXTRA_EMUFLAGS}"
 	end
 	def run
 		# run the emulator

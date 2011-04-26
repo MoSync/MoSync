@@ -194,6 +194,7 @@ profile.txt
 /tests/libc-suite/profile.txt
 /tests/libc-suite/settings.rb
 /tests/libc-suite/filesystem
+/tests/libc-suite/loader/config.h
 
 /tools/vis/fp.xml
 /tools/vis/sld.*

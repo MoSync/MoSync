@@ -1,0 +1,26 @@
+15:30 2011-04-11
+
+Newlib is an implementation of the standard libc, mostly written by Red Hat.
+It's designed for embedded systems, and so has a relatively small footprint.
+The downside is that it doesn't support some of the rarer features that you could find in GNU or BSD libc.
+
+The MoSync version of Newlib is a replacement for (and source-compatible with) MAStd,
+MoSync's first, tiny and rather non-compliant libc.
+
+Compared to MAStd, Newlib has many new, useful features, for example:
+* Full stdio implementation (fopen, printf, scanf, opendir et. al), connected to MoSync's native file API.
+* Complete string and wide-char support.
+* Advanced math functions, like atan, log10 and sinh.
+* Quick sort.
+
+Some functions are not available, such as:
+* The entire locale/iconv system (because it eats a huge amount of memory).
+* Anything that deals with other processes, such as system(), fork(), exec() and popen().
+* pthreads.
+
+Some functions are available, but with limitations:
+* getenv() and putenv() cannot read from or write to the external environment.
+* open() and mkdir() have octal permissions arguments. These are ignored in MoSync, as its virtual
+  filesystem does not support permissions.
+
+These lists are not exhaustive.

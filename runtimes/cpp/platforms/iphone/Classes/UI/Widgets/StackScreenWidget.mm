@@ -124,13 +124,14 @@
 	
 	/*
 	 [super addChild:child toSubview:NO];
-
+*/
 	int navBarHeight = navigationController.toolbar.bounds.size.height;
 	int viewWidth = view.frame.size.width; 
 	int viewHeight = view.frame.size.height - navBarHeight; 	
 	UIView* childView = [screen getView];
 	[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
-	 */
+//	[view setNeedsLayout];
+	[child layout];
 }
 
 - (void)pop {
@@ -161,25 +162,5 @@
 - (UIViewController*) getController {
 	return controller;
 }
-
-- (void)layout {
-	UINavigationController* navController = (UINavigationController*)controller;
-	
-	int navBarHeight = navController.toolbar.bounds.size.height;
-	int viewWidth = view.frame.size.width; 
-	int viewHeight = view.frame.size.height - navBarHeight; 
-	
-	[view setNeedsLayout];
-	//[view setNeedsDisplay]
-	for (IWidget *child in children)
-    {
-		UIView* childView = [child getView];
-		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];		
-		
-		[child layout];
-		
-	}
-}
-
 
 @end

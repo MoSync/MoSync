@@ -1823,8 +1823,8 @@ public class MoSyncThread extends Thread
 	int maTime()
 	{
 		SYSLOG("maTime");
-		Date d = new Date();
-		return (int)(d.getTime() / 1000);
+		Date date = new Date();
+		return (int)(date.getTime() / 1000);
 	}
 
 	/**
@@ -1833,9 +1833,11 @@ public class MoSyncThread extends Thread
 	int maLocalTime()
 	{
 		SYSLOG("maLocalTime");
-		Date d = new Date();
+		Date date = new Date();
+		long timeNow = date.getTime();
 		TimeZone tz = TimeZone.getDefault();
-		return (int)((d.getTime() + tz.getRawOffset()) / 1000);
+		int timeOffset = tz.getOffset(timeNow);
+		return (int)((timeNow + timeOffset) / 1000);
 	}
 
 	/**
