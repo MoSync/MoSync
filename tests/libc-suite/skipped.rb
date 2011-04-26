@@ -69,6 +69,9 @@ SKIPPED_UNRESOLVED = [
 	'tst-strptime.c',
 	
 	'bug-mktime1.c',	# fails because sizeof(time_t) < 8. Too tricky to fix.
+	
+	# Fails because newlib's C locale isn't identical to its Unicode locale.
+	'test_wctype.c',
 ]
 
 SKIPPED_FILES = SKIPPED_UNRESOLVED + [
@@ -263,6 +266,9 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'tst-fopenloc.c',	# iconvdata
 	'tst-atime.c',	# atime
 	'tst-truncate64.c',	# mosync doesn't support 64-bit file ops.
+	
+	'tst-btowc.c',	# locale
+	'tst-mbrtowc2.c',	# locale
 ]
 
 SKIPPED_PATTERNS = [
