@@ -16,12 +16,16 @@ extern char **environ;
 
 void	_EXFUN(_exit, (int __status ) _ATTRIBUTE ((noreturn)));
 
+#if !defined(MAPIP)
 int	_EXFUN(access,(const char *__path, int __amode ));
 unsigned  _EXFUN(alarm, (unsigned __secs ));
+#endif
 int     _EXFUN(chdir, (const char *__path ));
+#if !defined(MAPIP)
 int     _EXFUN(chmod, (const char *__path, mode_t __mode ));
 #if !defined(__INSIDE_CYGWIN__)
 int     _EXFUN(chown, (const char *__path, uid_t __owner, gid_t __group ));
+#endif
 #endif
 #if defined(__CYGWIN__) || defined(__rtems__)
 int     _EXFUN(chroot, (const char *__path ));
