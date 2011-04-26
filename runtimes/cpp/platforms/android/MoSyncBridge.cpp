@@ -314,6 +314,9 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * WIDGET_EVENT_ITEM_CLICKED
 		 * intArray[3] - The index of the list item that was clicked.
 		 *
+		 * WIDGET_EVENT_TAB_CHANGED
+		 * intArray[3] - The index of the new tab.
+		 *
 		 * WIDGET_EVENT_STACK_SCREEN_POPPED
 		 * intArray[3] - Handle to the screen that was popped.
 		 * intArray[4] - Handle to the screen that we popped to.
@@ -333,6 +336,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		else if(widgetEventType == MAW_EVENT_ITEM_CLICKED)
 		{
 			widgetEvent->listItemIndex = intArray[3];
+		}
+		else if(widgetEventType == MAW_EVENT_TAB_CHANGED)
+		{
+			widgetEvent->tabIndex = intArray[3];
 		}
 		else if(widgetEventType == MAW_EVENT_STACK_SCREEN_POPPED)
 		{
