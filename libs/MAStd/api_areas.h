@@ -290,13 +290,13 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 <td>
 <strong>Native user interface</strong>
 </td>
-<td>Accesss to device specific UI system. Currently only available for Android and iOS.<br>
+<td>Access to device specific UI system. Currently only available for Android and iOS.<br>
 </td>
 <td>maWidgetCreate(), maWidgetDestroy(), maWidgetAddChild(), maWidgetInsertChild(), maWidgetRemoveChild(), maWidgetScreenShow(), maWidgetStackScreenPush(), maWidgetStackScreenPop(), maWidgetSetProperty(), maWidgetGetProperty()<br>
 </td>
 <td>IX_WIDGET.h<br>
 </td>
-<td><br>
+<td>\ref WidgetAPI "Widget API"<br>
 </td>
 </tr>
 <tr style="background-color: rgb(235, 211, 227);">
@@ -307,9 +307,9 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 </td>
 <td><br>
 </td>
-<td>MAUI, MAUI::EditBox, MAUI::Engine, MAUI::Font, MAUI::Image, MAUI::Label, MAUI::Layout, MAUI::ListBox, MAUI::Screen, MAUI::Widget<br>
+<td>MAUI::EditBox, MAUI::Engine, MAUI::Font, MAUI::Image, MAUI::Label, MAUI::Layout, MAUI::ListBox, MAUI::Screen, MAUI::Widget<br>
 </td>
-<td><br>
+<td>MAUI<br>
 </td>
 </tr>
 <tr style="background-color: rgb(56, 118, 29);">

@@ -81,6 +81,24 @@ public class EventQueue
 	}
 	
 	/**
+	 * Sends a tab changed event from the given tabScreen.
+	 * 
+	 * @param tabScreen The tab screen that sends the event.
+	 * @param newTabIndex The index of the new tab.
+	 */
+	public void postWidgetTabChangedEvent(int tabScreen, int newTabIndex)
+	{
+		int event[] = new int[ 5 ];
+		
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_TAB_CHANGED;
+		event[2] = tabScreen;
+		event[3] = newTabIndex;
+		
+		sMoSyncThread.postEvent( event );
+	}
+	
+	/**
 	 * Posts an event from a stack screen has been popped, and a handle to the
 	 * screen that was popped.
 	 * 
