@@ -1,5 +1,4 @@
 #include <sys/unistd.h>
-#include <signal.h>
 #include <sys/fcntl.h>
 #include <stdlib.h>
 #include <sys/times.h>
@@ -10,7 +9,6 @@
 #include <pwd.h>
 #include <grp.h>
 #include <utime.h>
-#include <sys/signal.h>
 #include <string.h>
 #include <getopt.h>
 
@@ -58,12 +56,6 @@ void _exit(int status) {
 	LOGD("exit(%i)\n", status);
 	fcloseall();
 	maExit(status);
-}
-
-int raise(int code) {
-	//exit? panic?
-	//maPanic(code, "raise()");
-	STDFAIL;
 }
 
 #define NOT PANIC_MESSAGE("not supported")
@@ -751,11 +743,6 @@ char* getcwd(char* __buf, size_t __size) {
 	}
 	strncpy(__buf, sCwd, __size);
 	return __buf;
-}
-
-int sigprocmask(int how, const sigset_t *set, sigset_t *oset) {
-	errno = ENOSYS;
-	STDFAIL;
 }
 
 int getpagesize(void) {

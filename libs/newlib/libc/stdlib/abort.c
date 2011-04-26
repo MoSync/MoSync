@@ -48,7 +48,7 @@ Supporting OS subroutines required: <<_exit>> and optionally, <<write>>.
 
 #include <stdlib.h>
 #include <unistd.h>
-#include <signal.h>
+//#include <signal.h>
 
 _VOID
 _DEFUN_VOID (abort)
@@ -59,7 +59,7 @@ _DEFUN_VOID (abort)
 
   while (1)
     {
-      raise (SIGABRT);
+      //raise (SIGABRT);
       _exit (1);
     }
 }

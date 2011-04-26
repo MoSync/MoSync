@@ -60,7 +60,7 @@ static char sccsid[] = "@(#)hash_page.c	8.7 (Berkeley) 8/16/94";
 
 #include <errno.h>
 #include <fcntl.h>
-#include <signal.h>
+//#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -861,19 +861,19 @@ static int
 open_temp(hashp)
 	HTAB *hashp;
 {
-	sigset_t set, oset;
+	//sigset_t set, oset;
 	static char namestr[] = "_hashXXXXXX";
 
 	/* Block signals; make sure file goes away at process exit. */
-	(void)sigfillset(&set);
-	(void)sigprocmask(SIG_BLOCK, &set, &oset);
+	//(void)sigfillset(&set);
+	//(void)sigprocmask(SIG_BLOCK, &set, &oset);
 	if ((hashp->fp = mkstemp(namestr)) != -1) {
 		(void)unlink(namestr);
 #ifdef HAVE_FCNTL
 		(void)fcntl(hashp->fp, F_SETFD, 1);
 #endif
 	}
-	(void)sigprocmask(SIG_SETMASK, &oset, (sigset_t *)NULL);
+	//(void)sigprocmask(SIG_SETMASK, &oset, (sigset_t *)NULL);
 	return (hashp->fp != -1 ? 0 : -1);
 }
 
