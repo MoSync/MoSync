@@ -15,15 +15,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-/** \file Graphics.h
- * \brief Translation/clipping stack for MoSync graphics.
- *
- * This file contains a set of graphics functions that closely mirror the ones available as MoSync syscalls. However, these
- * functions make use of a transformation stack similar to ones commonly found in other graphics libraries. It simplifies
- * managing transformations, removing the need to manually keep track of the current transformation state.
- * Currently, only translation is supported.
- *
- * \author Patrick Broman
+/** 
+ * \file GraphicsOpenGL.h
+ * \brief Hardware accelerated implementation of the graphics API.
+ * \author Niklas Nummelin
  *
  */
 

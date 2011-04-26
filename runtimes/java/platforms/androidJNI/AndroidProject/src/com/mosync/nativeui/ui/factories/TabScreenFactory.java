@@ -1,17 +1,15 @@
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
+import android.view.ViewGroup;
+import android.view.ViewGroup.LayoutParams;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TabHost;
-import android.widget.TabWidget;
 import android.widget.TabHost.OnTabChangeListener;
-import android.util.Log;
-import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
+import android.widget.TabWidget;
 
 import com.mosync.internal.android.EventQueue;
-import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.TabScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 
@@ -44,7 +42,7 @@ public class TabScreenFactory implements AbstractViewFactory
         // a tabs content
         tabHost.setup( );
         
-        tabHost.setOnTabChangedListener( new TabChangeListener( ) );
+        tabHost.setOnTabChangedListener( new TabChangeListener( handle ) );
         
 		return new TabScreenWidget( handle, tabHost );
 	}
@@ -111,13 +109,21 @@ public class TabScreenFactory implements AbstractViewFactory
 	
 	public class TabChangeListener implements OnTabChangeListener
 	{
+		
+		private int m_tabScreenHandle;
+		
+		public TabChangeListener(int tabScreenHandle)
+		{
+			m_tabScreenHandle = tabScreenHandle;
+		}
 
 		@Override
 		public void onTabChanged(String tabTag)
 		{
 			// Assumes that the tag of the tab is the same as it's handle.
-			EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_TAB_CHANGED, Integer.parseInt( tabTag ) );
-			Log.i( "TabChangeListener", "New tab: " + tabTag );
+			EventQueue.getDefault( ).postWidgetTabChangedEvent( 
+					m_tabScreenHandle,
+					Integer.parseInt( tabTag ) );
 		}
 	}
 }

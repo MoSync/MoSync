@@ -407,15 +407,18 @@ def createWorkList ( runtimeMap )
 
         if ( type.shouldParallelize?( ) == true )
             elementsPerWorkPack = 4
-            workPackCount = list.length / elementsPerWorkPack
+            extraRunTimes = ((list.length % elementsPerWorkPack) != 0) ? 1:0;
+            workPackCount = list.length / elementsPerWorkPack + extraRunTimes
         end
 
         for i in 0..workPackCount-1 do
             workPack = WorkPackage::new( )
 
             for j in 0..elementsPerWorkPack-1 do
-                task = list[i*elementsPerWorkPack+j]
-                workPack.addTask( task )
+                if(list[i*elementsPerWorkPack+j] !=nil)
+                    task = list[i*elementsPerWorkPack+j]
+                    workPack.addTask( task )
+		end
             end
 
             workList.push( workPack )
