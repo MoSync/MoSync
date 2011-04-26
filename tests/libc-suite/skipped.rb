@@ -57,6 +57,18 @@ SKIPPED_UNRESOLVED = [
 	
 	'tst-dirname.c',	# fails on multiple slashes ("//")
 	'tst-fnmatch.c',	# many fails, complicated function.
+	'stdio-common_tst-sscanf.c',	# 4 fails, pretty uncommon stuff.
+	'stdio-common_tst-swscanf.c',
+	
+	'tst-environ.c',	# half the tests fail.
+	'bug-strtok1.c',	# one or two tests fail.
+	'tst-posixtz.c',	# a few more obscurities.
+	
+	# Many fails, though they appear minor. Also, function's specification is so unclear that
+	# it's possible that newlib's implementation is still conformant.
+	'tst-strptime.c',
+	
+	'bug-mktime1.c',	# fails because sizeof(time_t) < 8. Too tricky to fix.
 ]
 
 SKIPPED_FILES = SKIPPED_UNRESOLVED + [

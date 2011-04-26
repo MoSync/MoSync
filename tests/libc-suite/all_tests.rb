@@ -319,6 +319,8 @@ end
 
 
 unskippedCount = 0
+wins = 0
+dceWins = 0
 
 files.each do |filename, targetName|
 	bn = targetName
@@ -366,9 +368,16 @@ files.each do |filename, targetName|
 	code = SPECIFIC_CODE.fetch(bn, nil)
 	
 	force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild, inputs, code)
+	wins += 1 if(File.exists?(ofn.ext('.win')))
 	if(SETTINGS[:test_dead_code_elimination] && File.exists?(ofn.ext('.win')))
 		link_and_test(ofn, argvs, files, true, force_rebuild, inputs, code)
+		dceWins += 1 if(File.exists?(ofn.ext('.wine')))
 	end
 end
 
 puts "#{unskippedCount} actual tests."
+puts "#{SKIPPED_UNRESOLVED.size} known unresolved fails."
+puts "#{wins} wins. #{unskippedCount - wins} remains."
+if(SETTINGS[:test_dead_code_elimination])
+	puts "#{dceWins} DCE wins. #{unskippedCount - dceWins} remains."
+end

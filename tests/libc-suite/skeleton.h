@@ -76,6 +76,7 @@ int kill(int pid, int sig);
 pid_t waitpid(pid_t pid, int* status_ptr, int options);
 const char* strsignal(int __signo);
 void exit(int status);
+unsigned alarm(unsigned __secs);
 
 char *initstate(unsigned seed, char *state, size_t size);
 void * setstate (void *state);

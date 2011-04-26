@@ -114,6 +114,8 @@ unsigned sleep(unsigned s) {
 		}
 		maWait(left);
 	} while(1);
+	int passed = maGetMilliSecondCount() - start;
+	MAASSERT(passed >= s*1000);
 	return 0;
 }
 
@@ -290,4 +292,8 @@ int chmod(const char* name, mode_t mode) {
 	// check that the file exists.
 	struct stat st;
 	return stat(name, &st);
+}
+
+unsigned alarm(unsigned __secs) {
+	// used for timeout (at least in tst-mktime2). we have our own timeout, so we can leave this empty.
 }
