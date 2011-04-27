@@ -213,13 +213,15 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	end
 	
 	# setup for loader
-	if(dead_code)
+	if((!!dead_code == !!SETTINGS[:copy_dce]) && SETTINGS[:htdocs_dir])
+		puts 'Copying to htdocs...'
 		bn = File.basename(pfn)
 		lfn = SETTINGS[:htdocs_dir] + bn
 		if(!File.exists?(lfn))
 			FileUtils.cp(pfn, lfn)
 		end
 		LOADER_URLS_FILE.puts(SETTINGS[:loader_base_url] + bn)
+		LOADER_URLS_FILE.flush
 	end
 	
 	# execute it, if not win already, or we rebuilt something.

@@ -36,6 +36,7 @@ int MAMain() {
 	printf("MAMain()\n");
 	install_stdmalloc_hooks();
 	int res = main(gArgc, gArgv);
+	printf("main returned. exit(%i)\n", res);
 	exit(res);
 }
 
@@ -43,6 +44,7 @@ int MAMain() {
 // if this store is not saved, the loader will assume something went
 // catastrophically wrong with the test.
 static void exit_status_save(int status, void* dummy) {
+	printf("exit_status_save\n");
 	// we don't check for errors here, because there can be no reasonable error handling at this stage.
 	// better then, to let the runtime's panic system deal with it.
 	MAHandle data = maCreatePlaceholder();
