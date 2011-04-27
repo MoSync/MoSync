@@ -290,7 +290,7 @@ end
 
 def copyOrRemove(src, dst, remove)
 	if(remove)
-		FileUtils.rm(dst)
+		FileUtils.rm_f(dst)
 	else
 		FileUtils.cp(src, dst)
 	end
@@ -380,8 +380,10 @@ files.each do |filename, targetName|
 	
 	code = SPECIFIC_CODE.fetch(bn, nil)
 	
-	force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild, inputs, code)
-	wins += 1 if(File.exists?(ofn.ext('.win')))
+	unless(SETTINGS[:dce_only])
+		force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild, inputs, code)
+		wins += 1 if(File.exists?(ofn.ext('.win')))
+	end
 	if(SETTINGS[:test_dead_code_elimination] && File.exists?(ofn.ext('.win')))
 		link_and_test(ofn, argvs, files, true, force_rebuild, inputs, code)
 		dceWins += 1 if(File.exists?(ofn.ext('.wine')))
@@ -390,7 +392,7 @@ end
 
 puts "#{unskippedCount} actual tests."
 puts "#{SKIPPED_UNRESOLVED.size} known unresolved fails."
-puts "#{wins} wins. #{unskippedCount - wins} remains."
+puts "#{wins} wins. #{unskippedCount - wins} remains." unless(SETTINGS[:dce_only])
 if(SETTINGS[:test_dead_code_elimination])
 	puts "#{dceWins} DCE wins. #{unskippedCount - dceWins} remains."
 end

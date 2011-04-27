@@ -11,4 +11,5 @@ SETTINGS = {
 	:htdocs_dir => '/htdocs/',	# set to nil or false to disable copying.
 	:write_master_dump => false,
 	:copy_dce => false,
+	:dce_only => false,
 }
