@@ -189,19 +189,21 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	logFile = ofn.ext('.log' + suffix)
 	mdsFile = ofn.ext('.md.s')
 	esFile = ofn.ext('.e.s')
-	sldFile = ofn.ext('.sld' + suffix)
-	stabsFile = ofn.ext('.stabs' + suffix)
+	sldFile = ofn.ext('.sld' + suffix) if(!SETTINGS[:test_release])
+	stabsFile = ofn.ext('.stabs' + suffix) if(!SETTINGS[:test_release])
 	
 	delete_if_empty(pfn)
 	
 	# link
 	if(!File.exists?(pfn) || force_rebuild)
 		mdFlag = ' -master-dump' if(SETTINGS[:write_master_dump])
+		sldFlag = " -sld=#{sldFile}" if(!SETTINGS[:test_release])
+		stabsFlags = " -stabs=#{stabsFile}" if(!SETTINGS[:test_release])
 		if(dead_code)
 			sh "pipe-tool#{PIPE_FLAGS} -elim#{mdFlag} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
-			sh "pipe-tool#{PIPE_FLAGS} -sld=#{sldFile} -B #{pfn} rebuild.s"
+			sh "pipe-tool#{PIPE_FLAGS}#{sldFlag} -B #{pfn} rebuild.s"
 		else
-			sh "pipe-tool#{mdFlag} -sld=#{sldFile} -stabs=#{stabsFile}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
+			sh "pipe-tool#{mdFlag}#{sldFlag}#{stabsFlags}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 		end
 		force_rebuild = true
 	end
@@ -238,7 +240,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		code.call
 	end
 	
-	cmd = "#{MOSYNCDIR}/bin/more -timeout 600 -allowdivzero -noscreen -program #{pfn} -sld #{sldFile}"
+	sldFlag = " -sld #{sldFile}" if(!SETTINGS[:test_release])
+	cmd = "#{MOSYNCDIR}/bin/more -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag}"
 	$stderr.puts cmd
 	startTime = Time.now
 	if(HOST == :win32)
@@ -259,8 +262,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 			FileUtils.rm_f(logFile)
 			FileUtils.rm_f(mdsFile)
 			FileUtils.rm_f(esFile)
-			FileUtils.rm_f(sldFile)
-			FileUtils.rm_f(stabsFile)
+			FileUtils.rm_f(sldFile) if(!SETTINGS[:test_release])
+			FileUtils.rm_f(stabsFile) if(!SETTINGS[:test_release])
 		end
 	else	# failure
 		FileUtils.touch(failFile)
@@ -273,14 +276,22 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 				SETTINGS[:copy_targets].each do |target|
 					# copy program, sld and stabs to directory :copy_target.
 					FileUtils.cp(pfn, target + 'program')
-					FileUtils.cp(sldFile, target + 'sld.tab')
-					FileUtils.cp(stabsFile, target + 'stabs.tab') unless(dead_code)
+					copyOrRemove(sldFile, target + 'sld.tab', SETTINGS[:test_release])
+					copyOrRemove(stabsFile, target + 'stabs.tab', dead_code || SETTINGS[:test_release])
 				end
 			end
 			error "Stop on fail"
 		end
 	end
 	return force_rebuild
+end
+
+def copyOrRemove(src, dst, remove)
+	if(remove)
+		FileUtils.rm(dst)
+	else
+		FileUtils.cp(src, dst)
+	end
 end
 
 #puts "premature exit"
