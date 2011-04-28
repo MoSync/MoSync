@@ -15,14 +15,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+/**
+ * \file Color.h
+ * \brief Color conversions.
+ * \author Lars Ake Vinberg
+ */
+
 #ifndef COLOR_H_
 #define COLOR_H_
 
 namespace MAPUtil
 {
-	//=========================================================================
+	/**
+	 * \brief Small utility class for representing colors.
+	 */
 	class Color
-	//=========================================================================
 	{
 	public:
 		Color( ) 

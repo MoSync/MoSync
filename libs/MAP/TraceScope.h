@@ -1,8 +1,8 @@
-//
-// TraceScope.h
-//
-// Author: Lars Ake Vinberg
-//
+/**
+ * \file TraceScope.h
+ * \brief Defines a class for tracing and timing blocks.
+ * \author Lars Ake Vinberg
+ */
 
 #ifndef TRACESCOPE_H_
 #define TRACESCOPE_H_
@@ -18,24 +18,25 @@
 
 namespace MAP
 {
-	//=========================================================================
-	//
-	// Prints a debug trace on creation, and one on destruction.
-	// Usage:
-	//
-	//	...
-	//	{
-	//		TraceScope scope( "MyFunc" );
-	//		...
-	//	}
-	//	...
-	//
-	// Output:
-	//
-	//	+++ MyFunc
-	//	--- 45 MyFunc
+	/**
+	 * @brief Utility class for timing and marking the start and end of a block.
+	 *
+	 * Prints a debug trace on creation, and one on destruction.
+	 * Usage:
+	 *
+	 *	...
+	 *	{
+	 *		TraceScope scope( "MyFunc" );
+	 *		...
+	 *	}
+	 *	...
+	 *
+	 * Output:
+	 *
+	 *	+++ MyFunc
+	 *	--- 45 MyFunc
+	 */
 	class TraceScope
-	//=========================================================================
 	{
 	public:
 		TraceScope( const char* s )			

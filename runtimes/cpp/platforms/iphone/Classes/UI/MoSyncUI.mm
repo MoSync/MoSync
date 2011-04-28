@@ -21,6 +21,75 @@
 #import "ScreenWidget.h"
 #import "ReflectionWidget.h"
 #include <helpers/CPP_IX_WIDGET.h>
+#include "TouchHelper.h"
+#include "MoSyncMain.h"
+
+@interface MoSyncUIWindow : UIWindow {
+	TouchHelper* touchHelper;	
+}
+
+- (id)initWithFrame:(CGRect)rect;
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event;
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event;
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event;
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event;
+@end
+
+@implementation MoSyncUIWindow
+
+- (id)initWithFrame:(CGRect)rect {
+	touchHelper = [[TouchHelper alloc] init];
+	self.multipleTouchEnabled = YES;
+	return [super initWithFrame:rect];
+}
+
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
+	for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseBegan) {
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper addTouch: touch];
+			MoSync_AddTouchPressedEvent(point.x, point.y, touchId);	
+		}
+	}	
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+	for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseMoved) {
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper getTouchId: touch];
+			MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
+		}
+	}	
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {	
+    for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseEnded) {	
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper getTouchId: touch];		
+			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+			[touchHelper removeTouch: touch];
+		}
+	}
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {	
+	for (UITouch *touch in touches) 
+	{
+		if(touch.phase ==  UITouchPhaseCancelled) {	
+			CGPoint point = [touch locationInView:self];
+			int touchId = [touchHelper getTouchId: touch];		
+			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+			[touchHelper removeTouch: touch];
+		}
+	}
+}
+@end
+
 
 @implementation MoSyncUI
 
@@ -50,7 +119,8 @@ static IWidget* sOldScreen = nil;
 	unusedWidgetHandles = [[NSMutableArray alloc] init];
 	
 	if(!window) {
-		window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];		
+		//window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+		window = [[MoSyncUIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 		[window makeKeyAndVisible];
 	}
 	
@@ -60,8 +130,10 @@ static IWidget* sOldScreen = nil;
 	
 	ScreenWidget* mosyncScreen = [[ScreenWidget alloc] initWithController:mainController];
 	[widgetArray addObject:mosyncScreen];
-	[mosyncScreen setWidgetHandle:0]; // MAW_CONSTANT_MOSYNC_SCREEN_HANDLE	
+	[mosyncScreen setWidgetHandle:0]; // MAW_CONSTANT_MOSYNC_SCREEN_HANDLE
+	
 	sOldScreen = mosyncScreen;
+	[self show: mosyncScreen];
 	return self;
 }
 

@@ -20,6 +20,22 @@
 #import <objc/runtime.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
+@interface UIView (UIViewExpanded) 
+- (void)superLayoutSubviews;
+- (CGSize)superSizeThatFits:(CGSize)size;
+@end
+
+@implementation UIView (UIViewExpanded)
+
+- (void)superLayoutSubviews {
+}
+	
+- (CGSize)superSizeThatFits:(CGSize)size {
+	return CGSizeMake(0, 0);
+}
+
+@end
+
 @implementation IWidget
 
 
@@ -68,9 +84,8 @@
 }
 
 - (CGSize)sizeThatFitsFor:(UIView*)_view withSize:(CGSize)size {
-//- (CGSize)sizeThatFits:(CGSize)size {
-//	return [super sizeThatFits:size];
-	return _view.frame.size;
+	//return _view.frame.size;
+	return [_view superSizeThatFits:size];
 }
 
 - (id)init {
