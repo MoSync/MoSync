@@ -94,7 +94,6 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>cmd /c copy $(ProjectDir)$(Configuration)\dgles.dll %MOSYNCDIR%\bin</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
