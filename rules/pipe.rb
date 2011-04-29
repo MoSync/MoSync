@@ -95,7 +95,7 @@ class PipeGccWork < GccWork
 	def gccmode; "-S"; end
 	def host_flags;
 		flags = ''
-		flags += ' -g' if(CONFIG != '')
+		flags += ' -g' #if(CONFIG != '')
 		flags += ' -DUSE_NEWLIB' if(USE_NEWLIB)
 		return flags
 	end

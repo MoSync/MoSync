@@ -35,7 +35,7 @@ int maWidgetSetPropertyInt(MAHandle handle, const char *property, int value)
 	char buffer[256];
 	sprintf( buffer, "%d", value );
 
-	maWidgetSetProperty( handle, property, buffer );
+	return maWidgetSetProperty( handle, property, buffer );
 }
 
 int maWidgetGetPropertyInt(MAHandle handle, const char *property)
