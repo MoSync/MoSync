@@ -124,8 +124,10 @@ static int closeLfd(struct LOW_FD* plfd);
 static void lowRewindDir(struct LOW_FD* plfd);
 static int doRename(MAHandle oldHandle, const char* newProper);
 
-static char sCwdBuf[2048] = "/";
+static char sCwdBuf[2048] = "";
 static char* sCwd = sCwdBuf;
+static char sCwdRoot[2048] = "";	// set by chroot()
+static int sCwdRootLen;
 
 static void initFda(void) {
 	static int initialized = 0;
@@ -187,6 +189,9 @@ static int getRealPath(int __fd, char *buf, const char* path, int size) {
 		LOWFD;
 		FAILIF(!(plfd->flags & O_DIRECTORY), ENOTDIR);
 		sCwd = plfd->name;
+	} else {
+		memcpy(buf, sCwdRoot, sCwdRootLen);
+		buf += sCwdRootLen;
 	}
 	if(realpath(path, buf) == NULL) {
 		STDFAIL;
@@ -688,16 +693,13 @@ int truncate(const char *path, off_t length) {
 	return cres;
 }
 
-int chdir(const char *filename) {
+// fails unless file exists and is a directory.
+static int checkDirRaw(char* temp) {
 	MAHandle file;
 	int length;
 	int ret;
-	char temp[2048];
-	TEST(getRealPath(AT_FDCWD, temp, filename, 2046));
-	LOGD("chdir(%s)", temp);
-	
 	length = strlen(temp);
-	if(temp[length-1]!='/') {
+	if(temp[length-1] != '/') {
 		// Check if it's a regular file. If so, ENOTDIR.
 		file = maFileOpen(temp, MA_ACCESS_READ);
 		if(file > 0) {
@@ -717,8 +719,47 @@ int chdir(const char *filename) {
 	CHECK(maFileClose(file), EIO);
 	CHECK(ret, EIO);
 	FAILIF(ret == 0, ENOENT);
+	return 0;
+}
 
+static int checkDir(char* temp, const char* filename) {
+	TEST(getRealPath(AT_FDCWD, temp, filename, 2046));
+	return checkDirRaw(temp);
+}
+
+int chdir(const char *filename) {
+	char temp[2048];
+	LOGD("chdir(%s)", filename);
+	TEST(checkDir(temp, filename));
 	strcpy(sCwd, temp);
+	return 0;
+}
+
+int fchdir(int __fd) {
+	LOWFD;
+	LOGD("fchdir(%i) (%s)\n", __fd, plfd->name);
+	FAILIF(!(plfd->flags & O_DIRECTORY), ENOTDIR);
+	FAILIF(strncmp(sCwdRoot, plfd->name, sCwdRootLen) != 0, EACCES);
+	TEST(checkDirRaw(plfd->name));
+	strcpy(sCwd, plfd->name + sCwdRootLen);
+	return 0;
+}
+
+// MoSync doesn't have the native concept of a CWD,
+// nor does it have a single filesystem root (like UNIX).
+// This function affects only newlib-based filesystem access.
+// It creates the root "/" at the specified location, which is relative to the CWD
+// and is based on the most recent call to chroot(), if any.
+// This means that you cannot undo chroot().
+// This implementation departs from the standard by calling chdir("/"),
+// because anything else would cause undefined behaviour.
+int chroot(const char* newRoot) {
+	char temp[2048];
+	LOGD("chroot(%s)", newRoot);
+	TEST(checkDir(temp, newRoot));
+	strcpy(sCwdRoot, temp);
+	sCwdRootLen = strlen(sCwdRoot);
+	TEST(chdir("/"));
 	return 0;
 }
 
@@ -741,6 +782,7 @@ char* getcwd(char* __buf, size_t __size) {
 			return NULL;
 		}
 	}
+	// standard functionality.
 	strncpy(__buf, sCwd, __size);
 	return __buf;
 }
@@ -859,10 +901,4 @@ DIR* fdopendir(int __fd) {
 	dirp->dd_fd = __fd;
 
 	return dirp;
-}
-
-int fchdir(int __fd) {
-	LOWFD;
-	FAILIF(!(plfd->flags & O_DIRECTORY), ENOTDIR);
-	return chdir(plfd->name);
 }
