@@ -71,7 +71,8 @@ typedef enum VerticalAlignment {
 }
 
 -(CGSize)sizeThatFits:(CGSize)_size {
-	CGSize size = [self.text sizeWithFont:self.font constrainedToSize:CGSizeMake(self.frame.size.width,FLT_MAX) lineBreakMode:UILineBreakModeWordWrap ];
+	CGFloat frameWidth = self.frame.size.width;
+	CGSize size = [self.text sizeWithFont:self.font constrainedToSize:CGSizeMake(frameWidth,FLT_MAX) lineBreakMode:self.lineBreakMode ];
 	return size;
 }
 
@@ -104,6 +105,7 @@ typedef enum VerticalAlignment {
 	else if([key isEqualToString:@"numberOfLines"]) {
 		UILabel* label = (UILabel*) view;
 		label.numberOfLines = [value intValue];
+		[self layout];
 	} 
 	else if([key isEqualToString:@"textHorizontalAlignment"]) {
 		UILabel* label = (UILabel*) view;
@@ -139,6 +141,7 @@ typedef enum VerticalAlignment {
 		UILabel* label = (UILabel*) view;	
 		float fontSize = [value floatValue];
 		label.font = [UIFont boldSystemFontOfSize:fontSize];
+		[self layout];		
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];

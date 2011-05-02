@@ -33,8 +33,10 @@
 	image = nil;
 	leftCapWidth = 0;
 	topCapHeight = 0;	
-	button.titleLabel.numberOfLines = 0;
-	return [super init];
+	button.titleLabel.numberOfLines = 0;	
+	id ret = [super init];
+	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
+	return ret;
 }
 
 -(void)buttonPressed {
@@ -52,16 +54,19 @@
 	if([key isEqualToString:@"text"]) {
 		UIButton* button = (UIButton*) view;
 		[button setTitle:value forState:UIControlStateNormal];
-		[self layout];	
+		[self layout];
 	} else
 	if([key isEqualToString:@"fontSize"]) {
 		UIButton* button = (UIButton*) view;
 		float fontSize = [value floatValue];
 		[button setFont:[UIFont boldSystemFontOfSize:fontSize]];
+		[self layout];			
 	} else		
 	if([key isEqualToString:@"fontColor"]) {
 		UIButton* button = (UIButton*) view;
-		[button setTitleColor:[UIColor colorWithHexString:value] forState:UIControlStateNormal];
+		UIColor* color = [UIColor colorWithHexString:value];
+		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+		[button setTitleColor:color forState:UIControlStateNormal];
 	} else			
 	if([key isEqualToString:@"backgroundImage"]) {
 		int imageHandle = [value intValue];

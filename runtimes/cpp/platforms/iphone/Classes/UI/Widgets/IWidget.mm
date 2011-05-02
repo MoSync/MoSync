@@ -58,7 +58,9 @@
     {
 		UIView* childView = [child getView];
 		
-		int viewWidth = childView.frame.size.width; 
+		int viewWidth = childView.frame.size.width;		
+		int viewHeight = childView.frame.size.height;
+		
 		if([child getAutoSizeParamX] == FILL_PARENT) {
 			viewWidth = view.frame.size.width;
 		}
@@ -66,7 +68,8 @@
 			viewWidth = [childView sizeThatFits:CGSizeZero].width;
 		}
 		
-		int viewHeight = childView.frame.size.height; 
+		[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, viewWidth, viewHeight)];		
+		
 		if([child getAutoSizeParamY] == FILL_PARENT) {
 			viewHeight = view.frame.size.height;
 		}
@@ -78,14 +81,11 @@
 	}
 	
 	[_view superLayoutSubviews];
-	//[super layoutSubviews];
-	
-	//self.frame = view.frame;
 }
 
 - (CGSize)sizeThatFitsFor:(UIView*)_view withSize:(CGSize)size {
-	//return _view.frame.size;
-	return [_view superSizeThatFits:size];
+	CGSize ret = [_view superSizeThatFits:size];
+	return ret;
 }
 
 - (id)init {
@@ -93,13 +93,18 @@
 
 	parent = nil;
 	children = [[NSMutableArray alloc] init];
-	[self setAutoSizeParamX:FIXED_SIZE andY:FIXED_SIZE];
+	[self setAutoSizeParamX:FIXED_SIZE andY:FIXED_SIZE];	
 
 	if(view) {
 		[view setUserInteractionEnabled:YES];
 		view.contentMode = UIViewContentModeRedraw;
 		view.autoresizesSubviews = NO;
+		//view.autoresizesSubviews = YES;
 		view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
+		//view.backgroundColor = [UIColor redColor];
+		
+		//[[view layer] setBorderWidth:1.0];
+		//[[view layer] setBorderColor:[UIColor redColor].CGColor];
 	}
 	
 	return self;
@@ -133,6 +138,7 @@
 	if(addSubview) {
 		[view addSubview:childView];
 	}
+//	[self layout];
 	[view setNeedsLayout];
 	[view setNeedsDisplay];
 }
@@ -170,6 +176,7 @@
 	[child setParent:nil];
 	if(removeFromSuperview)
 		[[child getView] removeFromSuperview];
+	[view setNeedsLayout];
 }
 
 - (int)remove {
@@ -181,9 +188,11 @@
 - (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
 	if([key isEqualToString:@"left"]) {
 		[view setFrame:CGRectMake([value floatValue], view.frame.origin.y, view.frame.size.width, view.frame.size.height)];
+		[self layout];		
 	} else 
 	if([key isEqualToString:@"top"]) {
 		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue], view.frame.size.width, view.frame.size.height)];
+		[self layout];
 	} else 
 	if([key isEqualToString:@"width"]) {
 		float width = [value floatValue];
@@ -263,38 +272,17 @@
 }
 
 - (void)layout {
+	// the layouts should take care of the fill parent / wrap content layouting process..
+	// so no need to do it here.
+	//[view setNeedsLayout];
 	[view setNeedsLayout];
-
-	int viewWidth = view.frame.size.width; 
-	if(autoSizeParamX == FILL_PARENT) {
-		if(view.superview)
-			viewWidth = view.superview.frame.size.width;
-	}
-	else if(autoSizeParamX == WRAP_CONTENT) {
-		viewWidth = [view sizeThatFits:CGSizeZero].width;
-	}
-	 
-	int viewHeight = view.frame.size.height; 
-	if(autoSizeParamY == FILL_PARENT) {
-		if(view.superview)
-			viewHeight = view.superview.frame.size.height;
-	}
-	else if(autoSizeParamY == WRAP_CONTENT) {
-		viewHeight = [view sizeThatFits:CGSizeZero].height;
-	}
-	
-	[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];
-	
-	return;
-/*
-	for (IWidget *child in children)
-    {
-		[child layout];
-	}
- */
+//	[view layoutIfNeeded];
+	//[view setNeedsDisplay];	
+	//[view layoutIfNeeded];
 }
 
 - (void)show {
+	[self layout];
 	for (IWidget *child in children)
     {
 		[child show];

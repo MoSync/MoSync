@@ -131,7 +131,8 @@
 	UIView* childView = [screen getView];
 	[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
 //	[view setNeedsLayout];
-	[child layout];
+	//[child layout];
+	[child show];
 }
 
 - (void)pop {
