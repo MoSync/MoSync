@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'FileUtils'
+require 'fileutils'
 require './settings.rb'
 require './skipped.rb'
 require '../../rules/util.rb'
@@ -140,7 +140,7 @@ p pattern
 dirs = Dir[pattern]
 total = 0
 files = {}
-#p dirs
+p dirs
 dirs.each do |dir|
 	dirName = File.basename(dir)
 	if(SKIPPED_DIRECTORIES.include?(dirName))
@@ -179,7 +179,7 @@ def delete_if_empty(filename)
 	end
 end
 
-LOADER_URLS_FILE = open(SETTINGS[:htdocs_dir] + 'libc_tests.urls', 'wb')
+LOADER_URLS_FILE = open(SETTINGS[:htdocs_dir] + 'libc_tests.urls', 'wb') if(SETTINGS[:htdocs_dir])
 
 def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	suffix = dead_code ? 'e' : ''
@@ -196,14 +196,15 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	
 	# link
 	if(!File.exists?(pfn) || force_rebuild)
+		pipetool = "#{MOSYNCDIR}/bin/pipe-tool"
 		mdFlag = ' -master-dump' if(SETTINGS[:write_master_dump])
 		sldFlag = " -sld=#{sldFile}" if(!SETTINGS[:test_release])
 		stabsFlags = " -stabs=#{stabsFile}" if(!SETTINGS[:test_release])
 		if(dead_code)
-			sh "pipe-tool#{PIPE_FLAGS} -elim#{mdFlag} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
-			sh "pipe-tool#{PIPE_FLAGS}#{sldFlag} -B #{pfn} rebuild.s"
+			sh "#{pipetool}#{PIPE_FLAGS} -elim#{mdFlag} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
+			sh "#{pipetool}#{PIPE_FLAGS}#{sldFlag} -B #{pfn} rebuild.s"
 		else
-			sh "pipe-tool#{mdFlag}#{sldFlag}#{stabsFlags}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
+			sh "#{pipetool}#{mdFlag}#{sldFlag}#{stabsFlags}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 		end
 		force_rebuild = true
 	end
@@ -234,8 +235,10 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	files.each do |file|
 		FileUtils.cp_r(file, 'filesystem/')
 	end
-	inputs.each do |input|
-		sh "dos2unix --d2u \"filesystem/#{File.basename(input)}\""
+	if(HOST == :win32)
+		inputs.each do |input|
+			sh "dos2unix --d2u \"filesystem/#{File.basename(input)}\""
+		end
 	end
 	
 	if(code)
@@ -243,7 +246,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	end
 	
 	sldFlag = " -sld #{sldFile}" if(!SETTINGS[:test_release])
-	cmd = "#{MOSYNCDIR}/bin/more -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag}"
+	cmd = "#{MOSYNCDIR}/bin/MoRE -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag}"
 	$stderr.puts cmd
 	startTime = Time.now
 	if(HOST == :win32)
@@ -253,6 +256,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		res = (res == '0')
 	else
 		res = system(cmd)
+		$stderr.puts $?
 	end
 	endTime = Time.now
 	puts res

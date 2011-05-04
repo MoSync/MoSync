@@ -1129,6 +1129,7 @@ namespace Base {
 	// if this is MoRE, the emulator,
 	// we'll put all filesystem access into a separate directory, like chroot.
 	MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
+		LOGF("maFileListStart(%s, %s)\n", path, filter);
 		sFileList.files.clear();
 		sFileList.pos = 0;
 		if(path[0] == 0) {	//empty string
@@ -1163,8 +1164,10 @@ namespace Base {
 			sFileListRealDir = scanPath;
 			scanPath += filter;
 			int res = scanDirectory(scanPath.c_str(), fileListCallback);
-			if(res)
+			if(res) {
+				LOG("scanDirectory failed: %i\n", res);
 				FILE_FAIL(MA_FERR_GENERIC);
+			}
 		}
 		std::pair<FileListItr, bool> ires = sFileListings.insert(
 			std::pair<int, FileList>(sFileListNextHandle, sFileList));
