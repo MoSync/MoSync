@@ -138,6 +138,7 @@ public class MoSyncThread extends Thread
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
 	MoSyncFile mMoSyncFile;
+	MoSyncSensor mMoSyncSensor;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -285,12 +286,24 @@ public class MoSyncThread extends Thread
 			mMoSyncBluetooth = null;
 		}
 		
+		mMoSyncSensor = new MoSyncSensor(this);
+		
 		nativeInitRuntime();	
 	}
 	
 	public static MoSyncThread getInstance()
 	{
 		return sMoSyncThread;
+	}
+	
+	public void onResume()
+	{
+		mMoSyncSensor.onResume();
+	}
+
+	public void onPause()
+	{
+		mMoSyncSensor.onResume();
 	}
 	
 	/**
@@ -3042,8 +3055,15 @@ public class MoSyncThread extends Thread
 		return mMoSyncFile.maFileListClose(list);
 	}
 	
-	
-	
+	int maSensorStart(int sensor, int interval)
+	{
+		return mMoSyncSensor.maSensorStart(sensor, interval);
+	}
+
+	int maSensorStop(int sensor)
+	{
+		return mMoSyncSensor.maSensorStop(sensor);
+	}
 	
 	/**
 	 * Class that holds image data.

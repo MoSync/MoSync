@@ -1419,4 +1419,43 @@ namespace Base
 		return (int)result;
 	}
 
+	int _maSensorStart(int sensor, int interval, 
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSensorStart", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID, 
+			sensor, interval);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
+	
+	int _maSensorStop(int sensor, 
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSensorStart", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			sensor);
+		
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
+	}
 }
