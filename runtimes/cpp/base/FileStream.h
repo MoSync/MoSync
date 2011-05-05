@@ -44,6 +44,7 @@ namespace Base {
 		virtual bool length(int& aLength) const;
 		virtual bool seek(Seek::Enum mode, int offset);
 		virtual bool tell(int& aPos) const;
+		virtual bool mTime(time_t&) const;
 
 #ifndef _android
 		virtual Stream* createLimitedCopy(int size) const;
@@ -53,6 +54,8 @@ namespace Base {
 		virtual Stream* createCopy() const;
 
 		const char* getFilename() const;
+		
+		virtual bool truncate(int size) { FAIL; }
 
 #include "FileImpl.h"
 	};
@@ -66,6 +69,7 @@ namespace Base {
 		bool write(const void* src, int size);
 		Stream* createLimitedCopy(int /*size*/) const { FAIL; }
 		Stream* createCopy() const { FAIL; }
+		bool truncate(int size);
 	};
 
 	class LimitedFileStream : public FileStream {	//read-only

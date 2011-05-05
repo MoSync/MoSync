@@ -121,6 +121,13 @@ namespace Base {
 		LTEST(aPos = lseek(mFd, 0, SEEK_CUR));
 		return true;
 	}
+	bool FileStream::mTime(time_t& t) const {
+		TEST(isOpen());
+		struct stat s;
+		LTEST(fstat(mFd, &s));
+		t = s.st_mtime;
+		return true;
+	};
 
 	//******************************************************************************
 	//LimitedFileStream
@@ -157,6 +164,11 @@ namespace Base {
 			DEBUG_ASSERT(res <= len);
 			pos += res;
 		}
+		return true;
+	}
+	bool WriteFileStream::truncate(int size) {
+		TEST(isOpen());
+		LTEST(ftruncate(mFd, size));
 		return true;
 	}
 
