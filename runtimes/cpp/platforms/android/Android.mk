@@ -21,22 +21,23 @@ include $(CLEAR_VARS)
 LOCAL_MODULE    := mosync
 LOCAL_ARM_MODE  := arm
 LOCAL_SRC_FILES := FileImpl.cpp \
-				   MoSyncBridge.cpp \
-				   AndroidHelpers.cpp \
-				   SyscallImpl.cpp \
-				   IOCtl.cpp \
-				   ../../base/FileStream.cpp \
-				   ../../base/MemStream.cpp \
-				   ../../base/Stream.cpp \
-				   ../../base/Image.cpp \
-				   ../../base/Syscall.cpp \
-				   ../../core/Core.cpp \
-				   ../../core/disassembler.cpp \
-				   ../../core/Recompiler/ArmAssembler.cpp \
-				   ../../core/Recompiler/ArmRecompiler.cpp \
-				   ../../../../intlibs/hashmap/hashmap.cpp \
-				   ../../../../intlibs/helpers/platforms/linux/log.cpp
-				   
+	../../../../intlibs/helpers/platforms/linux/log.cpp \
+	../sdl/FileImpl.cpp \
+	MoSyncBridge.cpp \
+	AndroidHelpers.cpp \
+	SyscallImpl.cpp \
+	IOCtl.cpp \
+	../../base/FileStream.cpp \
+	../../base/MemStream.cpp \
+	../../base/Stream.cpp \
+	../../base/Image.cpp \
+	../../base/Syscall.cpp \
+	../../core/Core.cpp \
+	../../core/disassembler.cpp \
+	../../core/Recompiler/ArmAssembler.cpp \
+	../../core/Recompiler/ArmRecompiler.cpp \
+	../../../../intlibs/hashmap/hashmap.cpp \
+
 LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog -lGLESv1_CM
 
 LOCAL_CFLAGS	:= -DFPM_ARM

@@ -928,7 +928,7 @@ namespace Base {
 		}
 
 		bool hasPath = false;
-#if defined(WIN32) && !defined(_WIN32_WCE) && !defined(FILESYSTEM_CHROOT)
+#if defined(WIN32) && !defined(_WIN32_WCE) && !FILESYSTEM_CHROOT
 		// If fh.name and newName are on different file systems,
 		// forbid the operation.
 		if(newName[1] == ':' && toupper(fh.name[0]) != toupper(newName[0])) {
@@ -953,7 +953,7 @@ namespace Base {
 				newName = nn.c_str();
 			}
 		}
-#if defined(FILESYSTEM_CHROOT)
+#if FILESYSTEM_CHROOT
 		else {
 			nn = FILESYSTEM_DIR + std::string(newName);
 			newName = nn.c_str();

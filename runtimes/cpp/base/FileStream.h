@@ -34,7 +34,7 @@ namespace Base {
 	public:
 		FileStream(const char* filename);
 #ifdef _android
-		FileStream(FILE* file);
+		explicit FileStream(int fd);
 #endif
 		virtual ~FileStream();
 		virtual bool isOpen() const;
@@ -90,6 +90,10 @@ namespace Base {
 	protected:
 		const int mStartPos, mEndPos;
 		bool _open();
+#ifdef _android
+		JNIEnv* mJNIEnv;
+		jobject mJThis;
+#endif
 	};
 
 } // namespace Base

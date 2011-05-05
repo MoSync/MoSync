@@ -56,8 +56,7 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 {
 	SYSLOG("load program and resource");
 
-	FILE* prg = NULL;
-	FILE* res = NULL;
+	int prgFd, resFd;
 	
 	SYSLOG("get program file");
 	jclass fdClass = env->FindClass("java/io/FileDescriptor");
@@ -69,9 +68,8 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 		if (fdClassDescriptorFieldID != NULL && program != NULL) 
 		{			
 			jint fd = env->GetIntField(program, fdClassDescriptorFieldID);	
-			int myfd = dup(fd);
-			prg = fdopen(myfd, "rb");
-			fseek(prg, programOffset, SEEK_SET); 
+			prgFd = dup(fd);
+			lseek(prgFd, programOffset, SEEK_SET);
 		}
 	}
 	
@@ -87,16 +85,15 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 			if (fdClassDescriptorFieldID != NULL && resource != NULL) 
 			{			
 				jint fd = env->GetIntField(resource, fdClassDescriptorFieldID);	
-				int myfd = dup(fd);
-				res = fdopen(myfd, "rb"); 
-				fseek(res, resourceOffset, SEEK_SET);
+				resFd = dup(fd);
+				lseek(resFd, resourceOffset, SEEK_SET);
 			}
 		}
 	}
 	
 	SYSLOG("both files was obtained!");
 	
-	if(NULL == prg)
+	if(-1 == prgFd)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "MoSync Bridge", "No program file available!");
 		return false;
@@ -111,12 +108,12 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 
 	if(NULL == gCore) __android_log_write(ANDROID_LOG_INFO,"JNI","gCore == NULL");
 	SYSLOG("gCore!");
-	if(NULL == prg) __android_log_write(ANDROID_LOG_INFO,"JNI","prg == NULL");
+	if(-1 == prgFd) __android_log_write(ANDROID_LOG_INFO,"JNI","prg == NULL");
 	SYSLOG("prg!");
-	if(NULL == res) __android_log_write(ANDROID_LOG_INFO,"JNI","res == NULL");
+	if(-1 == resFd) __android_log_write(ANDROID_LOG_INFO,"JNI","res == NULL");
 	SYSLOG("res!");
 	
-	return Core::LoadVMApp(gCore, prg, res);
+	return Core::LoadVMApp(gCore, prgFd, resFd);
 }
 
 

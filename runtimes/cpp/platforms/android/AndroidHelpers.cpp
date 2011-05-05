@@ -22,7 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/log.h>
 #include <helpers/helpers.h>
 
-#ifdef LOGGING_ENABLED
+#if 1//def LOGGING_ENABLED
 
 static const char* sFilename = "log.txt";
 

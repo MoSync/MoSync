@@ -62,10 +62,14 @@ namespace Base {
 	//FileStream
 	//******************************************************************************
 	const char* FileStream::getFilename() const {
-		return mFilename.c_str();
+		return mFilename ? mFilename : "";
 	}
-	FileStream::FileStream() {}
-	FileStream::FileStream(const char* filename) : mFilename(filename) {
+	FileStream::FileStream() : mFilename(NULL) {}
+	FileStream::FileStream(const char* filename) {
+		int size = strlen(filename) + 1;
+		mFilename = (char*)malloc(size);
+		memcpy(mFilename, filename, size);
+		
 		// SDL_RWFromFile on Windows locks files,
 		// but the glibc test suite requires that they be shared.
 		//rwops = SDL_RWFromFile(filename, "rb");
@@ -75,6 +79,9 @@ namespace Base {
 		return mFd > 0;
 	}
 	FileStream::~FileStream() {
+		if(mFilename) {
+			free(mFilename);
+		}
 		if(isOpen()) {
 			::close(mFd);
 		}
@@ -129,6 +136,13 @@ namespace Base {
 		return true;
 	};
 
+#ifdef _android
+	FileStream::FileStream(int fd) : mFilename(NULL) {
+		mFd = fd;
+	}
+#endif
+
+#ifndef _android
 	//******************************************************************************
 	//LimitedFileStream
 	//******************************************************************************
@@ -140,6 +154,7 @@ namespace Base {
 			mFd = -1;
 		}
 	}
+#endif	//_android
 
 	//******************************************************************************
 	//WriteFileStream
