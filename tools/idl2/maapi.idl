@@ -2125,12 +2125,10 @@ interface MAAPI {
 		*/
 		int maFileClose(in MAHandle file);
 
-		//see JSR 75 for docs
 		/**
-		* Creates a file or directory, given an open handle.
+		* Creates a file or directory, given an file handle opened with #MA_ACCESS_READ_WRITE.
 		* The file must not exist prior to calling this function.
-		* After creation, the file will be accessible according to the mode specified when
-		* its handle was opened.
+		* After creation, the file will be accessible for writing and reading.
 		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileCreate(in MAHandle file);
