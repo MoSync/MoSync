@@ -8,42 +8,84 @@
 	_res, __FILE__, __LINE__); return false; } } while(0)
 #define MAT(func) MAT_CUSTOM(func, _res < 0)
 
+// delete all files and subdirectories in a directory.
+// the root directory must exist.
 static bool cleanOut(const char* dir);
+
 static bool makeDir(char* root, int rootLen, const char* name, int bufLen);
 static bool tryToMake(const char* dir);
 
 // each record has this format: {
-// byte isFile;
 // char name[];	// null-terminated
 // byte data[];	// terminated by end of record.
 // }
 void setup_filesystem() {
+	printf("setup_filesystem\n");
 	// first, we must find a temporary directory which we can work out of.
 	// we'll probably want to chroot() to it, too.
 	char newRoot[MAX_PATH] = "";
-	MAASSERT(makeDir(newRoot, 0, "mosync_tmp", sizeof(newRoot)));
-	MAASSERT(chdir(buf) == 0);
+	MAASSERT(makeDir(newRoot, 0, "mosync_root/", sizeof(newRoot)));
+	int newRootLen = strlen(newRoot);
+	MAASSERT(chdir(newRoot) == 0);
 	MAASSERT(chroot(".") == 0);
+	// now we have the root of a unix file-system.
 	
-	for(MAHandle i=RES_START; i<RES_END; i++) {
+	printf("%i files:\n", RES_END - RES_FILE_0);
+	
+	for(MAHandle i=RES_FILE_0; i<RES_END; i++) {
 		char buf[MAX_PATH];
 		int size = maGetDataSize(i);
 		int pathlen = MIN(MAX_PATH, size);
 		maReadData(i, buf, 0, pathlen);
-		bool isFile = !!buf[0];
-		const char* name = buf+1;
+		const char* name = buf;
 		int namelen = strlen(name);
 		MAASSERT(namelen < MAX_PATH);
-		int dataOffset = namelen+2;
+		int dataOffset = namelen+1;
+		int dataLen = size - dataOffset;
+		printf("%i: %s (%i bytes)\n", i, name, dataLen);
 		
-		// if(!isFile), then it's a directory that must be created.
+		bool isDirectory = name[namelen-1] == '/';
+		if(isDirectory) {
+			// there can be no data in a directory.
+			MAASSERT(dataLen == 0);
+			MAASSERT(!mkdir(name));
+		} else {
+			// Because we want to use maFileWriteFromData(), we can't use open() here.
+			char realName[MAX_PATH];
+			MAHandle fh;
+			bool res;
+			
+			memcpy(realName, newRoot, newRootLen);
+			// overwrite the slash in newRoot, so we don't get double slashes.
+			memcpy(realName + newRootLen - 1, name, namelen + 1);
+			
+			MAASSERT((fh = maFileOpen(realName, MA_ACCESS_READ_WRITE)) > 0);
+			res = writeFile(fh, i, dataOffset, dataLen)
+			MAASSERT(maFileClose(fh) > 0);
+			MAASSERT(res);
+		}
 	}
 }
 
-// uses root buffer as scratch space.
-// on success, writes full path of created directory to root.
-// \param root buffer that, on entry, contains directory path where searching should start.
-// \param rootLen length of string in root, excluding the terminating zero.
+static bool writeFile(MAHandle fh, MAHandle data, int dataOffset, int dataLen) {
+	int exists;
+
+	MAT(exists = maFileExists(fh));
+	if(exists) {
+		MAT(maFileTruncate(fh, 0));
+	} else {
+		MAT(maFileCreate(fh));
+	}
+	MAT(maFileWriteFromData(fh, data, dataOffset, dataLen));
+	return true;
+}
+
+// Uses root buffer as scratch space.
+// On success, writes full path of created directory to root.
+// \param root Buffer that, on entry, contains directory path where searching should start.
+// \param rootLen Length of string in root, excluding the terminating zero.
+// \param name Name of the directory to create. Must end with '/'.
+// \param bufLen Length of the buffer pointed to by \a root, in bytes.
 static bool makeDir(char* root, int rootLen, const char* name, int bufLen) {
 	// find a root path
 	printf("makeDir(%s)\n", root);
@@ -72,7 +114,7 @@ static bool makeDir(char* root, int rootLen, const char* name, int bufLen) {
 }
 
 static bool tryToMake(const char* dir) {
-	MAHandle file = maFileOpen(filename.c_str(), MA_ACCESS_READ_WRITE);
+	MAHandle file = maFileOpen(dir, MA_ACCESS_READ_WRITE);
 	MAT(file);
 	int res = maFileExists(file);
 	MAASSERT(res >= 0);

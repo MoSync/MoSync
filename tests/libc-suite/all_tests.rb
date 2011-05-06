@@ -34,6 +34,49 @@ FileUtils.mkdir_p(BUILD_DIR)
 FileUtils.rm_rf('filesystem')
 FileUtils.mkdir_p('filesystem/tmp')
 
+# treat filesystem/ as root. output a compiled resource file that setup_filesystem() can use
+# to reproduce all the files.
+def writeResourceFile(name)
+	resFileName = "#{name}.lst"
+	resFile = open("build/#{resFileName}", 'w')
+	dir = Dir.new('filesystem/')
+	doResourceDir(resFile, dir, '/', 0)
+	resFile.close
+	FileUtils.cd 'build'
+	sh "#{MOSYNCDIR}/bin/pipe-tool -R resources #{resFileName}"
+	FileUtils.cd '..'
+end
+
+def doResourceDir(resFile, dir, prefix, count)
+	dir.each do |name|
+		next if(name[0,1] == '.')
+		realPath = dir.path+name
+		resFile.puts('')
+		resFile.puts(".res RES_FILE_#{count}")
+		count += 1
+		resFile.puts(".ubin")
+		if(File.directory?(realPath))
+			runtimeName = prefix+name+'/'
+			resFile.puts(".cstring \"#{runtimeName}\"")
+			
+			d2 = Dir.new(realPath+'/')
+			count = doResourceDir(resFile, d2, runtimeName, count)
+		else
+			runtimeName = prefix+name
+			resFile.puts(".cstring \"#{runtimeName}\"")
+			resFile.puts(".include \"#{realPath}\"")
+		end
+	end
+	return count
+end
+
+# output a default resource file
+if(SETTINGS[:htdocs_dir])
+	writeResourceFile('default')
+	FileUtils.mv('build/resources', 'build/default_resources')
+	FileUtils.mv('build/MAHeaders.h', 'build/default_MAHeaders.h')
+end
+
 def input_files(filename)
 	base = File.dirname(filename) + '/' + File.basename(filename, File.extname(filename))
 	inputName = base + '.input'
@@ -213,18 +256,6 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		error"Unknown link failure."
 	end
 	
-	# setup for loader
-	if((!!dead_code == !!SETTINGS[:copy_dce]) && SETTINGS[:htdocs_dir])
-		puts 'Copying to htdocs...'
-		bn = File.basename(pfn)
-		lfn = SETTINGS[:htdocs_dir] + bn
-		if(!File.exists?(lfn))
-			FileUtils.cp(pfn, lfn)
-		end
-		LOADER_URLS_FILE.puts(SETTINGS[:loader_base_url] + bn)
-		LOADER_URLS_FILE.flush
-	end
-	
 	# execute it, if not win already, or we rebuilt something.
 	
 	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
@@ -243,6 +274,19 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	
 	if(code)
 		code.call
+	end
+	
+	# setup for loader
+	doCopyToHtdocs = ((!!dead_code == !!SETTINGS[:copy_dce]) && SETTINGS[:htdocs_dir])
+	if(doCopyToHtdocs)
+		puts 'Copying to htdocs...'
+		bn = File.basename(pfn)
+		lfn = SETTINGS[:htdocs_dir] + bn
+		if(!File.exists?(lfn))
+			FileUtils.cp(pfn, lfn)
+		end
+		LOADER_URLS_FILE.puts(SETTINGS[:loader_base_url] + bn)
+		LOADER_URLS_FILE.flush
 	end
 	
 	sldFlag = " -sld #{sldFile}" if(!SETTINGS[:test_release])
