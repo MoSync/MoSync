@@ -1957,9 +1957,12 @@ int Syscall::maFileListClose(MAHandle list) {
 
 #define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
 
+// TODO: Share these two with Base. Implement FileStream::mTime and truncate.
 int Syscall::maFileDate(MAHandle file) {
 	LOGD("maFileDate(%i)\n", file);
 	FileHandle& fh(getFileHandle(file));
+	if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
+	if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
 	TTime modTime;
 	// TODO: improve error code translation
 	SYMERR_CONVERT(fh.fs->mFile.Modified(modTime), MA_FERR_GENERIC);

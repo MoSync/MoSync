@@ -22,6 +22,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Stream.h"
 
+#include <time.h>
+
 // platform specific
 
 #ifdef _android

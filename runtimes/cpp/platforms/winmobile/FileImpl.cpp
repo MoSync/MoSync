@@ -83,6 +83,10 @@ namespace Base {
 		aPos = ftell(file);
 		return true;
 	}
+	bool FileStream::mTime(time_t& t) const {
+		// TODO
+		FAIL;
+	}
 
 	//******************************************************************************
 	//LimitedFileStream
@@ -124,5 +128,8 @@ namespace Base {
 		int res = fwrite(src, 1, size, file);
 		return res == size;
 	}
-
+	bool WriteFileStream::truncate(int size) {
+		// TODO. Will probably require rewrite of this entire file to use Win32 functions.
+		FAIL;
+	}
 };
