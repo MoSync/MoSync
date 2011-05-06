@@ -424,19 +424,19 @@ interface MAAPI {
 		/// The image is copied unchanged.
 		NONE = 0;
 		/// The image is rotated clockwise by 90 degrees.
-		ROT90 = 5;
+		ROT90 = 1;
 		/// The image is rotated clockwise by 180 degrees.
-		ROT180 = 3;
+		ROT180 = 2;
 		/// The image is rotated clockwise by 270 degrees.
-		ROT270 = 6;
+		ROT270 = 3;
 		/// The image is reflected about its vertical center.
-		MIRROR = 2;
+		MIRROR = 4;
 		/// The image is reflected about its vertical center, then rotated clockwise by 90 degrees.
-		MIRROR_ROT90 = 7;
+		MIRROR_ROT90 = 5;
 		/// The image is reflected about its vertical center, then rotated clockwise by 180 degrees.
-		MIRROR_ROT180 = 1;
+		MIRROR_ROT180 = 6;
 		/// The image is reflected about its vertical center, then rotated clockwise by 270 degrees.
-		MIRROR_ROT270 = 4;
+		MIRROR_ROT270 = 7;
 	}
 
 	/**
