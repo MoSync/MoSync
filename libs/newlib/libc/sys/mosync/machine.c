@@ -731,7 +731,7 @@ int chdir(const char *filename) {
 	char temp[2048];
 	LOGD("chdir(%s)", filename);
 	TEST(checkDir(temp, filename));
-	strcpy(sCwd, temp);
+	strcpy(sCwd, temp + sCwdRootLen);
 	return 0;
 }
 
@@ -752,13 +752,17 @@ int fchdir(int __fd) {
 // and is based on the most recent call to chroot(), if any.
 // This means that you cannot undo chroot().
 // This implementation departs from the standard by calling chdir("/"),
-// because anything else would cause undefined behaviour.
+// because staying outside would cause undefined behaviour.
 int chroot(const char* newRoot) {
 	char temp[2048];
 	LOGD("chroot(%s)", newRoot);
 	TEST(checkDir(temp, newRoot));
 	strcpy(sCwdRoot, temp);
 	sCwdRootLen = strlen(sCwdRoot);
+	if(sCwdRoot[sCwdRootLen-1] == '/') {
+		sCwdRootLen--;
+		sCwdRoot[sCwdRootLen] = 0;
+	}
 	TEST(chdir("/"));
 	return 0;
 }
