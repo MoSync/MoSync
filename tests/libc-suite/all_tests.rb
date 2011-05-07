@@ -20,7 +20,7 @@ MOSYNCDIR = ENV['MOSYNCDIR']
 GCC_FLAGS = " -I- -std=gnu99 -I. -Isys -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\""+
 	" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h #{OPT_FLAGS}"
 PIPE_FLAGS = " -datasize=#{12*1024*1024} -stacksize=#{512*1024} -heapsize=#{1024*1024*10}"
-PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_#{OPT_VERSION}/newlib.lib"
+PIPE_LIBS = " build/helpers.s build/setup_filesystem.s #{MOSYNCDIR}/lib/newlib_#{OPT_VERSION}/newlib.lib"
 
 require './argv.rb'
 
@@ -31,19 +31,31 @@ require './argv.rb'
 # but it would be faster.
 
 FileUtils.mkdir_p(BUILD_DIR)
-FileUtils.rm_rf('filesystem')
-FileUtils.mkdir_p('filesystem/tmp')
+
+def clear_filesystem
+	FileUtils.rm_rf('filesystem')
+	FileUtils.mkdir_p('filesystem/tmp')
+end
+clear_filesystem
 
 # treat filesystem/ as root. output a compiled resource file that setup_filesystem() can use
 # to reproduce all the files.
 def writeResourceFile(name)
 	resFileName = "#{name}.lst"
-	resFile = open("build/#{resFileName}", 'w')
+	resFile = open("#{resFileName}", 'w')
+	resFile.puts('.res')
+	resFile.puts('.label "start"')
+	
 	dir = Dir.new('filesystem/')
 	doResourceDir(resFile, dir, '/', 0)
+	
+	resFile.puts('')
+	resFile.puts('.res')
+	resFile.puts('.label "end"')
 	resFile.close
+	
 	FileUtils.cd 'build'
-	sh "#{MOSYNCDIR}/bin/pipe-tool -R resources #{resFileName}"
+	sh "#{MOSYNCDIR}/bin/pipe-tool -R resources ../#{resFileName}"
 	FileUtils.cd '..'
 end
 
@@ -64,16 +76,17 @@ def doResourceDir(resFile, dir, prefix, count)
 		else
 			runtimeName = prefix+name
 			resFile.puts(".cstring \"#{runtimeName}\"")
-			resFile.puts(".include \"#{realPath}\"")
+			resFile.puts(".include \"../../#{realPath}\"") if(File.size(realPath) > 0)
 		end
 	end
 	return count
 end
 
 # output a default resource file
+DEFAULT_RESOURCES = 'build/default_resources'
 if(SETTINGS[:htdocs_dir])
 	writeResourceFile('default')
-	FileUtils.mv('build/resources', 'build/default_resources')
+	FileUtils.mv('build/resources', DEFAULT_RESOURCES)
 	FileUtils.mv('build/MAHeaders.h', 'build/default_MAHeaders.h')
 end
 
@@ -120,7 +133,12 @@ end
 DEFAULT_ARGV_SFILE = doArgv('default', DEFAULT_ARGV, 'default', true)
 
 
-sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S #{File.expand_path('helpers.c')} -o build/helpers.s#{GCC_FLAGS}"
+def simple_compile(name)
+	sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S #{File.expand_path(name+'.c')} -o build/#{name}.s#{GCC_FLAGS}"
+end
+
+simple_compile('helpers')
+simple_compile('setup_filesystem')
 
 # Find tests.
 # We have many directories. Some of these have Makefiles with a definition of a "tests" variable.
@@ -262,8 +280,12 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		return force_rebuild
 	end
 	
+	clear_filesystem
+	has_files = false
+	
 	# copy files only when executing
 	files.each do |file|
+		has_files = true
 		FileUtils.cp_r(file, 'filesystem/')
 	end
 	if(HOST == :win32)
@@ -273,24 +295,39 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	end
 	
 	if(code)
+		has_files = true
 		code.call
 	end
-	
+
+	if(has_files)
+		resFile = ofn.ext('.res')
+		writeResourceFile(ofn)
+		FileUtils.mv('build/resources', resFile)
+		#FileUtils.mv('build/MAHeaders.h', 'build/'+ofn+'_MAHeaders.h')
+	else
+		resFile = DEFAULT_RESOURCES
+	end
+
 	# setup for loader
 	doCopyToHtdocs = ((!!dead_code == !!SETTINGS[:copy_dce]) && SETTINGS[:htdocs_dir])
 	if(doCopyToHtdocs)
 		puts 'Copying to htdocs...'
 		bn = File.basename(pfn)
 		lfn = SETTINGS[:htdocs_dir] + bn
-		if(!File.exists?(lfn))
-			FileUtils.cp(pfn, lfn)
+		
+		# copy program file
+		FileUtils.cp(pfn, lfn)
+		# append resource file
+		open(lfn, 'ab') do |f|
+			f.write(open(resFile, 'rb').read)
 		end
+		
 		LOADER_URLS_FILE.puts(SETTINGS[:loader_base_url] + bn)
 		LOADER_URLS_FILE.flush
 	end
 	
 	sldFlag = " -sld #{sldFile}" if(!SETTINGS[:test_release])
-	cmd = "#{MOSYNCDIR}/bin/MoRE -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag}"
+	cmd = "#{MOSYNCDIR}/bin/MoRE -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag} -resource #{resFile}"
 	$stderr.puts cmd
 	startTime = Time.now
 	if(HOST == :win32)

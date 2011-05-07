@@ -1,6 +1,9 @@
 #include <ma.h>
-#include "MAHeaders.h"
 #include <maassert.h>
+#include <stdio.h>
+#include <string.h>
+#include <stdbool.h>
+#include <unistd.h>
 
 #define MAX_PATH 256
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
@@ -14,6 +17,7 @@ static bool cleanOut(const char* dir);
 
 static bool makeDir(char* root, int rootLen, const char* name, int bufLen);
 static bool tryToMake(const char* dir);
+static bool writeFile(MAHandle fh, MAHandle data, int dataOffset, int dataLen);
 
 // each record has this format: {
 // char name[];	// null-terminated
@@ -30,9 +34,12 @@ void setup_filesystem() {
 	MAASSERT(chroot(".") == 0);
 	// now we have the root of a unix file-system.
 	
-	printf("%i files:\n", RES_END - RES_FILE_0);
+	const MAHandle start = maFindLabel("start");
+	const MAHandle end = maFindLabel("end");
+	MAASSERT(start > 0 && end > 0);
+	printf("%i files:\n", end - (start+1));
 	
-	for(MAHandle i=RES_FILE_0; i<RES_END; i++) {
+	for(MAHandle i=start+1; i<end; i++) {
 		char buf[MAX_PATH];
 		int size = maGetDataSize(i);
 		int pathlen = MIN(MAX_PATH, size);
@@ -48,7 +55,7 @@ void setup_filesystem() {
 		if(isDirectory) {
 			// there can be no data in a directory.
 			MAASSERT(dataLen == 0);
-			MAASSERT(!mkdir(name));
+			MAASSERT(!mkdir(name, 0755));
 		} else {
 			// Because we want to use maFileWriteFromData(), we can't use open() here.
 			char realName[MAX_PATH];
@@ -60,8 +67,8 @@ void setup_filesystem() {
 			memcpy(realName + newRootLen - 1, name, namelen + 1);
 			
 			MAASSERT((fh = maFileOpen(realName, MA_ACCESS_READ_WRITE)) > 0);
-			res = writeFile(fh, i, dataOffset, dataLen)
-			MAASSERT(maFileClose(fh) > 0);
+			res = writeFile(fh, i, dataOffset, dataLen);
+			MAASSERT(maFileClose(fh) >= 0);
 			MAASSERT(res);
 		}
 	}
@@ -89,17 +96,17 @@ static bool writeFile(MAHandle fh, MAHandle data, int dataOffset, int dataLen) {
 static bool makeDir(char* root, int rootLen, const char* name, int bufLen) {
 	// find a root path
 	printf("makeDir(%s)\n", root);
-	MAHandle list = maFileListStart(root, "*")
+	MAHandle list = maFileListStart(root, "*");
 	MAT(list);
 	int freeBufSpace = bufLen - rootLen;
 	while(1) {
 		int res;
 		res = maFileListNext(list, root + rootLen, freeBufSpace);
-		MAT(res, (_res < 0 || _res >= freeBufSpace));
+		MAT_CUSTOM(res, _res < 0 || _res >= freeBufSpace);
 		if(res == 0)
 			return false;
 		int resLen = rootLen + res;
-		if(file[resLen-1] == '/') {
+		if(root[resLen-1] == '/') {
 			rootLen = resLen;
 			MAASSERT(rootLen + strlen(name) < bufLen);
 			//printf("Dir: '%s'\n", file.c_str());
@@ -135,27 +142,27 @@ static bool tryToMake(const char* dir) {
 
 static bool cleanOut(const char* dir) {
 	printf("cleanOut(%s)\n", dir);
-	MAHandle list = maFileListStart(dir, "*")
+	MAHandle list = maFileListStart(dir, "*");
 	MAT(list);
 	char buf[2048];
 	int dirLen = strlen(dir);
 	strcpy(buf, dir);
-	int freeBufSpace = bufLen - dirLen;
+	int freeBufSpace = sizeof(buf) - dirLen;
 	while(1) {
 		int res;
 		MAHandle fh;
 		char* fileName = buf + dirLen;
 		res = maFileListNext(list, fileName, freeBufSpace);
-		MAT(res, (_res < 0 || _res >= freeBufSpace));
+		MAT_CUSTOM(res, (_res < 0 || _res >= freeBufSpace));
 		if(res == 0)
 			return true;
 		if(fileName[res-1] == '/') {
 			if(!cleanOut(buf))
 				return false;
 		}
-		MAT(file = maFileOpen(buf));
-		res = maFileDelete(file);
-		MAASSERT(maFileClose(file) == 0);
+		MAT(fh = maFileOpen(buf, MA_ACCESS_READ_WRITE));
+		res = maFileDelete(fh);
+		MAASSERT(maFileClose(fh) == 0);
 		MAT(res);
 	}
 	MAASSERT(maFileListClose(list) == 0);

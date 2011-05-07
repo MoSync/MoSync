@@ -28,7 +28,7 @@ int MAMain() {
 	dup2(wlfd, 2);
 	close(wlfd);
 	
-	//setup_filesystem();
+	setup_filesystem();
 	chdir("/");
 	
 	setup_stdin();
