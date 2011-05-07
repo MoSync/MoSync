@@ -644,7 +644,7 @@ namespace Base {
 	}
 
 	SYSCALL(int, maFindLabel(const char* name)) {
-		for(unsigned i = 0; i < SYSCALL_THIS->resources.size(); i++) {
+		for(unsigned i = 1; i < SYSCALL_THIS->resources.size(); i++) {
 			if(SYSCALL_THIS->resources.get_type(i)==RT_LABEL)
 			{
 				Label *l = SYSCALL_THIS->resources.get_RT_LABEL(i);
