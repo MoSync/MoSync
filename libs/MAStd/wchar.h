@@ -6,7 +6,7 @@
 #ifndef WCHAR_H
 #define WHCAR_H
 
-#include <ma.h>
+#include "ma.h"
 
 #ifdef __cplusplus
 extern "C" {

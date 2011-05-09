@@ -73,7 +73,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)/../../../../../intlibs;../;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)/../../../../../intlibs;../;../../../../../tools/ReleasePackageBuild/build_package_tools/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -84,6 +84,7 @@
     <Lib>
       <AdditionalDependencies>..\$(Configuration)\sdl.lib;..\..\..\..\..\intlibs\helpers\platforms\windows\$(Configuration)\windows.lib;libirprops.a;..\..\..\..\..\intlibs\filelist\$(Configuration)\filelist.lib;FreeImage.lib;ssleay32.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(MOSYNCDIR)\lib\w32\$(ProjectName).lib</OutputFile>
+      <AdditionalLibraryDirectories>../../../../../tools/ReleasePackageBuild/build_package_tools/lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>

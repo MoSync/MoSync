@@ -71,7 +71,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>cmd /c copy $(ProjectDir)$(Configuration)\dgles.dll %MOSYNCDIR%\bin</Command>
+      <Command>copy $(TargetPath) $(MOSYNCDIR)\bin\ /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -94,7 +94,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Command>cmd /c copy $(ProjectDir)$(Configuration)\dgles.dll %MOSYNCDIR%\bin</Command>
+      <Command>copy $(TargetPath) $(MOSYNCDIR)\bin\ /Y</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
