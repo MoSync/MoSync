@@ -136,7 +136,7 @@ static bool tryToMake(const char* dir) {
 	printf("Closing...\n");
 	res = maFileClose(file);
 	MAASSERT(res == 0);
-	printf("Done.\n");
+	printf("Done: %s\n", dir);
 	return true;
 }
 

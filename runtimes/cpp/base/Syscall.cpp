@@ -705,7 +705,7 @@ namespace Base {
 				fh.fs = new WriteFileStream(fh.name, false, true);
 			}
 		} else if((fh.mode & MA_ACCESS_READ) != 0) {
-			if(res >= 0) {	// file exists (may be a directory)
+			if(res == 0) {	//file exists and is not a directory
 				fh.fs = new FileStream(fh.name);
 			}
 		} else {
@@ -982,9 +982,27 @@ namespace Base {
 		LOGF("maFileDate(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
 		time_t t;
-		if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
-		if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
-		if(!fh.fs->mTime(t)) FILE_FAIL(MA_FERR_GENERIC);
+		if(fh.fs) {
+			if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
+			if(!fh.fs->mTime(t)) FILE_FAIL(MA_FERR_GENERIC);
+		} else {
+			const char* statName = fh.name;
+			Array<char> temp(0);
+			if(fh.name[fh.name.size()-2] == '/') {
+				// would cause stat() to fail. get rid of the slash.
+				//temp.assign(fh.name, fh.name.size()-2);
+				temp.resize(fh.name.size()-1);
+				memcpy(temp, fh.name, fh.name.size()-2);
+				temp[fh.name.size()-2] = 0;
+				statName = temp;
+			}
+			struct _stat st;
+			if(_stat(statName, &st) != 0) {
+				LOG("maFileDate:stat(%s) failed. errno: %i(%s)\n", statName, errno, strerror(errno));
+				FILE_FAIL(MA_FERR_GENERIC);
+			}
+			t = st.st_mtime;
+		}
 		LOGF("mtime: %i\n", (int)t);
 		return (int)t;
 	}

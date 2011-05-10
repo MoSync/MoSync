@@ -146,7 +146,7 @@ static void initFda(void) {
 static struct LOW_FD* getLowFd(int __fd) {
 	initFda();
 	//LOGD("getLowFd(%i)", __fd);
-	if(__fd <= 0 || __fd >= NFD) {
+	if(__fd < 0 || __fd >= NFD) {
 		errno = EBADF;
 		return NULL;
 	}
