@@ -426,8 +426,9 @@ _DEFUN (pow5mult,
   int i;
   static _CONST int p05[3] = {5, 25, 125};
 
-  if ((i = k & 3) != 0)
-    b = multadd (ptr, b, p05[i - 1], 0);
+  if ((i = (k & 3) - 1) >= 0) {
+    b = multadd (ptr, b, p05[i], 0);
+	}
 
   if (!(k >>= 2))
     return b;

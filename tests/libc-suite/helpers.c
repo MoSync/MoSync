@@ -17,6 +17,7 @@ extern const char* gArgv[];
 extern const int gArgc;
 extern void setup_stdin();
 static void exit_status_save(int, void*);
+extern void setup_filesystem();
 
 int MAMain() {
 	on_exit(exit_status_save, NULL);
@@ -27,6 +28,9 @@ int MAMain() {
 	dup2(wlfd, 2);
 	close(wlfd);
 	
+	setup_filesystem();
+	chdir("/");
+	
 	setup_stdin();
 	if(!stdin) {
 		printf("Error opening stdin: %i (%m)\n", errno);
@@ -36,6 +40,7 @@ int MAMain() {
 	printf("MAMain()\n");
 	install_stdmalloc_hooks();
 	int res = main(gArgc, gArgv);
+	printf("main returned. exit(%i)\n", res);
 	exit(res);
 }
 
@@ -43,6 +48,7 @@ int MAMain() {
 // if this store is not saved, the loader will assume something went
 // catastrophically wrong with the test.
 static void exit_status_save(int status, void* dummy) {
+	printf("exit_status_save\n");
 	// we don't check for errors here, because there can be no reasonable error handling at this stage.
 	// better then, to let the runtime's panic system deal with it.
 	MAHandle data = maCreatePlaceholder();

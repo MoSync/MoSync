@@ -2125,12 +2125,10 @@ interface MAAPI {
 		*/
 		int maFileClose(in MAHandle file);
 
-		//see JSR 75 for docs
 		/**
-		* Creates a file or directory, given an open handle.
+		* Creates a file or directory, given an file handle opened with #MA_ACCESS_READ_WRITE.
 		* The file must not exist prior to calling this function.
-		* After creation, the file will be accessible according to the mode specified when
-		* its handle was opened.
+		* After creation, the file will be accessible for writing and reading.
 		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileCreate(in MAHandle file);
@@ -2190,17 +2188,17 @@ interface MAAPI {
 		/**
 		* Truncates the file.
 		*
-		* If offset is less than the file's size,
+		* If \a offset is less than the file's current size,
 		* the file's new size is equal to the offset. All data after the offset is discarded.
 		*
-		* If the offset is equal to the file's size, this function does nothing.
+		* If \a offset is equal to the file's current size, this function does nothing.
 		*
-		* If the offset is greater than the file's current size,
+		* If \a offset is greater than the file's current size,
 		* this function MAY increase the size of the file.
 		* You can determine if it did so by calling maFileSeek() with #MA_SEEK_END.
 		*
-		* If the file's position is greater than the offset, it is reset
-		* to be equal to the offset.
+		* If the file's current position is greater than \a offset, it is reset
+		* to be equal to \a offset.
 		*
 		* The file must exist prior to calling this function.
 		* Returns 0 on success, or \< 0 on error.
@@ -2683,7 +2681,7 @@ interface MAAPI {
 		/**
 		* Increases the size of a data object.
 		* \note There is no way to decrease the size of a data object.
-		* However, you can destroy it.
+		* However, you can still destroy it.
 		* \returns #RES_OK if succeded and #RES_OUT_OF_MEMORY if failed.
 		* \see maDestroyObject()
 		* \see maCreateData()

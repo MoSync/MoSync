@@ -201,3 +201,5 @@ profile.txt
 
 /examples/GenerateResources/config.rb
 /examples/GenerateResources/profile.rb
+
+/docs/*.dot.*

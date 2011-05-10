@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <glob.h>
 #include <stdlib.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #include "filelist.h"
 
@@ -27,10 +28,15 @@ int scanDirectory(const char* path, FileListCallback cb) {
 	int res = glob(path, 0, 0, &g);
 	if(res != 0) {
 		globfree(&g);
+		if(res == GLOB_NOMATCH)
+			return 0;
 		return res;
 	}
 	for(i=0; i<g.gl_pathc; i++) {
-		cb(g.gl_pathv[i]);
+		const char* pathv = g.gl_pathv[i];
+		const char* lastSlash = strrchr(pathv, '/');
+		const char* filename = (lastSlash == NULL) ? pathv : lastSlash + 1;
+		cb(filename);
 	}
 	return 0;
 }

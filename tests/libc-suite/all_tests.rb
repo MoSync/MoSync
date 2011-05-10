@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'FileUtils'
+require 'fileutils'
 require './settings.rb'
 require './skipped.rb'
 require '../../rules/util.rb'
@@ -20,7 +20,7 @@ MOSYNCDIR = ENV['MOSYNCDIR']
 GCC_FLAGS = " -I- -std=gnu99 -I. -Isys -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\""+
 	" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h #{OPT_FLAGS}"
 PIPE_FLAGS = " -datasize=#{12*1024*1024} -stacksize=#{512*1024} -heapsize=#{1024*1024*10}"
-PIPE_LIBS = " build/helpers.s #{MOSYNCDIR}/lib/newlib_#{OPT_VERSION}/newlib.lib"
+PIPE_LIBS = " build/helpers.s build/setup_filesystem.s #{MOSYNCDIR}/lib/newlib_#{OPT_VERSION}/newlib.lib"
 
 require './argv.rb'
 
@@ -31,8 +31,64 @@ require './argv.rb'
 # but it would be faster.
 
 FileUtils.mkdir_p(BUILD_DIR)
-FileUtils.rm_rf('filesystem')
-FileUtils.mkdir_p('filesystem/tmp')
+
+def clear_filesystem
+	FileUtils.rm_rf('filesystem')
+	FileUtils.mkdir_p('filesystem/tmp')
+end
+clear_filesystem
+
+# treat filesystem/ as root. output a compiled resource file that setup_filesystem() can use
+# to reproduce all the files.
+def writeResourceFile(name)
+	resFileName = "#{name}.lst"
+	resFile = open("#{resFileName}", 'w')
+	resFile.puts('.res')
+	resFile.puts('.label "start"')
+	
+	dir = Dir.new('filesystem/')
+	doResourceDir(resFile, dir, '/', 0)
+	
+	resFile.puts('')
+	resFile.puts('.res')
+	resFile.puts('.label "end"')
+	resFile.close
+	
+	FileUtils.cd 'build'
+	sh "#{MOSYNCDIR}/bin/pipe-tool -R resources ../#{resFileName}"
+	FileUtils.cd '..'
+end
+
+def doResourceDir(resFile, dir, prefix, count)
+	dir.each do |name|
+		next if(name[0,1] == '.')
+		realPath = dir.path+name
+		resFile.puts('')
+		resFile.puts(".res RES_FILE_#{count}")
+		count += 1
+		resFile.puts(".ubin")
+		if(File.directory?(realPath))
+			runtimeName = prefix+name+'/'
+			resFile.puts(".cstring \"#{runtimeName}\"")
+			
+			d2 = Dir.new(realPath+'/')
+			count = doResourceDir(resFile, d2, runtimeName, count)
+		else
+			runtimeName = prefix+name
+			resFile.puts(".cstring \"#{runtimeName}\"")
+			resFile.puts(".include \"../../#{realPath}\"") if(File.size(realPath) > 0)
+		end
+	end
+	return count
+end
+
+# output a default resource file
+DEFAULT_RESOURCES = 'build/default_resources'
+if(SETTINGS[:htdocs_dir])
+	writeResourceFile('default')
+	FileUtils.mv('build/resources', DEFAULT_RESOURCES)
+	FileUtils.mv('build/MAHeaders.h', 'build/default_MAHeaders.h')
+end
 
 def input_files(filename)
 	base = File.dirname(filename) + '/' + File.basename(filename, File.extname(filename))
@@ -77,7 +133,12 @@ end
 DEFAULT_ARGV_SFILE = doArgv('default', DEFAULT_ARGV, 'default', true)
 
 
-sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S #{File.expand_path('helpers.c')} -o build/helpers.s#{GCC_FLAGS}"
+def simple_compile(name)
+	sh "#{MOSYNCDIR}/bin/xgcc -g -Werror -S #{File.expand_path(name+'.c')} -o build/#{name}.s#{GCC_FLAGS}"
+end
+
+simple_compile('helpers')
+simple_compile('setup_filesystem')
 
 # Find tests.
 # We have many directories. Some of these have Makefiles with a definition of a "tests" variable.
@@ -140,7 +201,7 @@ p pattern
 dirs = Dir[pattern]
 total = 0
 files = {}
-#p dirs
+p dirs
 dirs.each do |dir|
 	dirName = File.basename(dir)
 	if(SKIPPED_DIRECTORIES.include?(dirName))
@@ -179,7 +240,7 @@ def delete_if_empty(filename)
 	end
 end
 
-LOADER_URLS_FILE = open(SETTINGS[:htdocs_dir] + 'libc_tests.urls', 'wb')
+LOADER_URLS_FILE = open(SETTINGS[:htdocs_dir] + 'libc_tests.urls', 'wb') if(SETTINGS[:htdocs_dir])
 
 def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	suffix = dead_code ? 'e' : ''
@@ -196,14 +257,15 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	
 	# link
 	if(!File.exists?(pfn) || force_rebuild)
+		pipetool = "#{MOSYNCDIR}/bin/pipe-tool"
 		mdFlag = ' -master-dump' if(SETTINGS[:write_master_dump])
 		sldFlag = " -sld=#{sldFile}" if(!SETTINGS[:test_release])
 		stabsFlags = " -stabs=#{stabsFile}" if(!SETTINGS[:test_release])
 		if(dead_code)
-			sh "pipe-tool#{PIPE_FLAGS} -elim#{mdFlag} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
-			sh "pipe-tool#{PIPE_FLAGS}#{sldFlag} -B #{pfn} rebuild.s"
+			sh "#{pipetool}#{PIPE_FLAGS} -elim#{mdFlag} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
+			sh "#{pipetool}#{PIPE_FLAGS}#{sldFlag} -B #{pfn} rebuild.s"
 		else
-			sh "pipe-tool#{mdFlag}#{sldFlag}#{stabsFlags}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
+			sh "#{pipetool}#{mdFlag}#{sldFlag}#{stabsFlags}#{PIPE_FLAGS} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 		end
 		force_rebuild = true
 	end
@@ -212,36 +274,60 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		error"Unknown link failure."
 	end
 	
-	# setup for loader
-	if(dead_code)
-		bn = File.basename(pfn)
-		lfn = SETTINGS[:htdocs_dir] + bn
-		if(!File.exists?(lfn))
-			FileUtils.cp(pfn, lfn)
-		end
-		LOADER_URLS_FILE.puts(SETTINGS[:loader_base_url] + bn)
-	end
-	
 	# execute it, if not win already, or we rebuilt something.
 	
 	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
 		return force_rebuild
 	end
 	
+	clear_filesystem
+	has_files = false
+	
 	# copy files only when executing
 	files.each do |file|
+		has_files = true
 		FileUtils.cp_r(file, 'filesystem/')
 	end
-	inputs.each do |input|
-		sh "dos2unix --d2u \"filesystem/#{File.basename(input)}\""
+	if(HOST == :win32)
+		inputs.each do |input|
+			sh "dos2unix --d2u \"filesystem/#{File.basename(input)}\""
+		end
 	end
 	
 	if(code)
+		has_files = true
 		code.call
+	end
+
+	if(has_files)
+		resFile = ofn.ext('.res')
+		writeResourceFile(ofn)
+		FileUtils.mv('build/resources', resFile)
+		#FileUtils.mv('build/MAHeaders.h', 'build/'+ofn+'_MAHeaders.h')
+	else
+		resFile = DEFAULT_RESOURCES
+	end
+
+	# setup for loader
+	doCopyToHtdocs = ((!!dead_code == !!SETTINGS[:copy_dce]) && SETTINGS[:htdocs_dir])
+	if(doCopyToHtdocs)
+		puts 'Copying to htdocs...'
+		bn = File.basename(pfn)
+		lfn = SETTINGS[:htdocs_dir] + bn
+		
+		# copy program file
+		FileUtils.cp(pfn, lfn)
+		# append resource file
+		open(lfn, 'ab') do |f|
+			f.write(open(resFile, 'rb').read)
+		end
+		
+		LOADER_URLS_FILE.puts(SETTINGS[:loader_base_url] + bn)
+		LOADER_URLS_FILE.flush
 	end
 	
 	sldFlag = " -sld #{sldFile}" if(!SETTINGS[:test_release])
-	cmd = "#{MOSYNCDIR}/bin/more -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag}"
+	cmd = "#{MOSYNCDIR}/bin/MoRE -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag} -resource #{resFile}"
 	$stderr.puts cmd
 	startTime = Time.now
 	if(HOST == :win32)
@@ -251,6 +337,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		res = (res == '0')
 	else
 		res = system(cmd)
+		$stderr.puts $?
 	end
 	endTime = Time.now
 	puts res
@@ -288,7 +375,7 @@ end
 
 def copyOrRemove(src, dst, remove)
 	if(remove)
-		FileUtils.rm(dst)
+		FileUtils.rm_f(dst)
 	else
 		FileUtils.cp(src, dst)
 	end
@@ -378,8 +465,10 @@ files.each do |filename, targetName|
 	
 	code = SPECIFIC_CODE.fetch(bn, nil)
 	
-	force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild, inputs, code)
-	wins += 1 if(File.exists?(ofn.ext('.win')))
+	unless(SETTINGS[:dce_only])
+		force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild, inputs, code)
+		wins += 1 if(File.exists?(ofn.ext('.win')))
+	end
 	if(SETTINGS[:test_dead_code_elimination] && File.exists?(ofn.ext('.win')))
 		link_and_test(ofn, argvs, files, true, force_rebuild, inputs, code)
 		dceWins += 1 if(File.exists?(ofn.ext('.wine')))
@@ -388,7 +477,7 @@ end
 
 puts "#{unskippedCount} actual tests."
 puts "#{SKIPPED_UNRESOLVED.size} known unresolved fails."
-puts "#{wins} wins. #{unskippedCount - wins} remains."
+puts "#{wins} wins. #{unskippedCount - wins} remains." unless(SETTINGS[:dce_only])
 if(SETTINGS[:test_dead_code_elimination])
 	puts "#{dceWins} DCE wins. #{unskippedCount - dceWins} remains."
 end
