@@ -62,6 +62,21 @@ MA 02110-1301, USA.
  *  In the client app, press keys on key pad or touch the screen,
  *  this sends data to the server app. The data should be displayed
  *  on the server screen.
+ *
+ *  When a key for a printable character is pressed and it is
+ *  usually sent one character at a time, but may buffer if the
+ *  connection is (very) slow. Non-printable characters will
+ *  not be sent.
+ *
+ *  When touching the screen, the string: "Touch event: <x,y>"
+ *  is sent, where <x,y> is the touch coordinate, for example:
+ *  "Touch event: 234,318".
+ *
+ *  When running the programs on a device with a small screen,
+ *  like the default MoSync emulator, the output text is truncated.
+ *  Select a device with a bigger screen from the profile list,
+ *  then run the emulator again. Or modify the source code to
+ *  output shorter lines.
  */
 
 #ifndef COMMON_H

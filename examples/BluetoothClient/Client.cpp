@@ -55,22 +55,22 @@ MA 02110-1301, USA.
  *
  *   btspp://0023769FD7C2:1
  *
- *  Yet another option when connecting using a service UUID,
- *  is to use the connect methods that takes a MABtAddr and
- *  a MAUUID structure as parameters:
+ *  Yet another (more advanced) option when connecting using a
+ *  service UUID, is to use the connect methods that takes
+ *  a MABtAddr and a MAUUID structure as parameters:
  *
  *   int BluetoothConnection::connect(
  *       const MABtAddr& address,
  *       const MAUUID& uuid);
  *
  *  When using this method, you need to fill in the data
- *  structures, and then pass them to the connect  method.
+ *  structures, and then pass them to the connect method.
  *  For example:
  *
  *   static const MABtAddr sServerAddress =
- *       { { 0x00,0x23,0x79,0x9F,0xD7,0xC2 } };
+ *       {{ 0x00,0x23,0x79,0x9F,0xD7,0xC2 }};
  *   static const MAUUID sServiceUUID =
- *       {{ 0x10203040, 0x50607080, 0x90A0B0C0, 0xD0E0F010 }};
+ *       {{ 0x10203040,0x50607080,0x90A0B0C0,0xD0E0F010 }};
  *   int result = mConnection.connect(sServerAddress, sServiceUUID);
  */
 
