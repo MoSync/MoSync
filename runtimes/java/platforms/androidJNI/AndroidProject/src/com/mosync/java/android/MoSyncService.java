@@ -165,9 +165,6 @@ public class MoSyncService extends Service
 		// Don't restart if killed since it is not meaningful
 		// to have this service running without the app running.
 	    return START_NOT_STICKY;
-		
-		// Use START_STICKY after all!
-	    //return START_STICKY;
 	}
 
 	/**
