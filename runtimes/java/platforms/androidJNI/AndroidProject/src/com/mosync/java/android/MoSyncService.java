@@ -30,17 +30,12 @@ import android.util.Log;
 /**
  * Service used to give MoSync applications higher priority and display
  * a notification icon that can be used to launch the application.
+ * Start service in foreground with notification icon.
+ * Start foreground is only available on Android API level 5 and above.
  * @author Mikael Kindborg
  */
 public class MoSyncService extends Service
 {
-	// TODO: Remove commented out code.
-	//static boolean sIsRunning = true;
-	/*public static void stopService()
-	{
-		sIsRunning = false;
-	}*/
-	
 	// Since we just have one service, we can cheat and 
 	// make these global.
 	public static int sNotificationId;
@@ -50,6 +45,13 @@ public class MoSyncService extends Service
 	// Instance of this service.
 	static MoSyncService sMe;
 	
+	/**
+	 * Call this method to start the service and display a notification icon.
+	 * @param context
+	 * @param notificationId
+	 * @param notificationTitle
+	 * @param notificationText
+	 */
 	public static void startService(
 		Context context, 
 		int notificationId,
@@ -70,9 +72,15 @@ public class MoSyncService extends Service
 		sNotificationText = notificationText;
 		
 		Intent serviceIntent = new Intent(context, MoSyncService.class);
+		// Here we set a flag to signal that the service was started
+		// from the MoSync application.
+		serviceIntent.putExtra("StartedByTheMoSyncApplication", true);
 		context.startService(serviceIntent);
 	}
 	
+	/** 
+	 * Called by the Android runtime to stop the service.
+	 */
 	public static void stopService()
 	{
 		Log.i("@@@MoSync", "MoSyncService.stopService");
@@ -84,18 +92,24 @@ public class MoSyncService extends Service
 			sMe = null;
 		}
 	}
-	
-	public static void removeServceNotification(
-		int notificationId, Activity activity)
+
+	/** 
+	 * Called by the Android runtime to remove the notification icon.
+	 */
+	public static void removeServiceNotification(
+		int notificationId, 
+		Activity activity)
 	{
 		// We use a wrapper class to be backwards compatible.
 		// Loading the wrapper class will throw an error on
 		// platforms that does not support it.
 		try
 		{
-			new StartForegroundWrapper();
-			// Nothing special needs to be done here, the notification
-			// will be removed when the service is stopped.
+			if (null != sMe)
+			{
+				new StopForegroundWrapper().
+					stopForegroundAndRemoveNotificationIcon(sMe);
+			}
 		}
 		catch (java.lang.VerifyError error)
 		{
@@ -106,34 +120,107 @@ public class MoSyncService extends Service
 			mNotificationManager.cancel(notificationId);
 		}
 	}
-	
-	@Override
-	public IBinder onBind(Intent intent) 
-	{
-		return null;
-	}
-	
+
 	/**
-	 * Start service in foreground with notification icon.
-	 * Start foreground is only available on Android API level 5 and above.
+	 * Called when the service is created.
 	 */
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
 		
-		Log.i("@@@MoSync", "MoSyncService.onCreate sMe: " + sMe);
+		Log.i("@@@MoSync", "MoSyncService.onCreate");
 		
+		// Set the single instance of this service.
 		sMe = this;
+	}
+	
+	@Override
+	public IBinder onBind(Intent intent) 
+	{
+		return null;
+	}
+
+	/**
+	 * Called when a service is started on Android before version 2.0.
+	 */
+	@Override
+	public void onStart(Intent intent, int startId) 
+	{
+		Log.i("@@@MoSync", "MoSyncService.onStart");
 		
+		startMe(intent);
+	}
+
+	/**
+	 * Called when a service is started on Android starting from version 2.0.
+	 */
+	@Override
+	public int onStartCommand(Intent intent, int flags, int startId) 
+	{
+		Log.i("@@@MoSync", "MoSyncService.onStartCommand");
+		
+		startMe(intent);
+		
+		// Don't restart if killed since it is not meaningful
+		// to have this service running without the app running.
+	    return START_NOT_STICKY;
+		
+		// Use START_STICKY after all!
+	    //return START_STICKY;
+	}
+
+	/**
+	 * Start the service.
+	 * @param intent Could be null.
+	 */
+	private void startMe(Intent intent)
+	{
+		// Stop the service if there is no intent.
+		if (null == intent)
+		{
+			Log.i("@@@MoSync", "MoSyncService.startMe: "
+				+ "stopping service because intent is null");
+			stopSelf();
+			return;
+		}
+		
+		// Check that the MoSync start flag is set in the intent.
+		boolean startFlag = 
+			intent.getBooleanExtra("StartedByTheMoSyncApplication", false);
+		if (!startFlag)
+		{
+			Log.i("@@@MoSync", "MoSyncService.startMe: "
+				+ "stopping service because startFlag is false");
+			stopSelf();
+			return;
+		}
+
+		// sMe must be set.
+		if (null == sMe)
+		{
+			Log.i("@@@MoSync", "MoSyncService.startMe: "
+				+ "stopping service because sMe is null");
+			stopSelf();
+			return;
+		}
+		
+		displayNotificationIcon();
+	}
+	
+	/**
+	 * Display a notification icon.
+	 */
+	private void displayNotificationIcon()
+	{
 		// Get icon.
 		int icon = getResources().getIdentifier(
 			"icon", 
 			"drawable", 
 			getPackageName());
-		Log.i("@@@MoSync", "MoSyncService.onCreate icon: " + icon);
-		
-		// TODO: Replace with app name.
+		Log.i("@@@MoSync", 
+			"MoSyncService.displayNotificationIcon icon: " + icon);
+
 		CharSequence tickerText = sNotificationTitle;
 		long when = System.currentTimeMillis();
 		Notification notification = new Notification(icon, tickerText, when);
@@ -141,7 +228,6 @@ public class MoSyncService extends Service
 		Context context = getApplicationContext();
 		CharSequence contentTitle = sNotificationTitle;
 		CharSequence contentText = sNotificationText;
-		//Intent intent = new Intent("mosync.dynamicwebview.DISPLAY");
 		Intent intent = new Intent(context, MoSync.class);
 		intent.addFlags(
 			Intent.FLAG_ACTIVITY_NEW_TASK | 
@@ -206,3 +292,18 @@ class StartForegroundWrapper
 		service.startForeground(id, notification);
 	}
 }
+	
+/**
+ * Wrapper class for startForeground, which is not available on
+ * Android versions below level 5.
+ * @author Mikael Kindborg
+ */
+class StopForegroundWrapper
+{
+	public void stopForegroundAndRemoveNotificationIcon(Service service)
+	{
+		// The true argument removes the notification icon.
+		service.stopForeground(true);
+	}
+}
+
