@@ -2285,7 +2285,7 @@ public class MoSyncThread extends Thread
 		if (MoSyncService.sNotificationId == notificationId)
 		{
 			// Remove the service notification.
-			MoSyncService.removeServceNotification(
+			MoSyncService.removeServiceNotification(
 				notificationId, (Activity) mContext);
 			
 			// Stop the service.
