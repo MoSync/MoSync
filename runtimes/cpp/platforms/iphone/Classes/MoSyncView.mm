@@ -118,31 +118,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	[locationController.locationManager stopUpdatingLocation];
 }
 
-/*
-#define kUpdateFrequency 10  // Hz
--(void) startUpdatingAccelerometer {
-	[[UIAccelerometer sharedAccelerometer] setUpdateInterval:(20.0 / kUpdateFrequency)];
-	[[UIAccelerometer sharedAccelerometer] setDelegate:self];	
-}
-
--(void) stopUpdatingAccelerometer {
-	[[UIAccelerometer sharedAccelerometer] setDelegate:nil];	
-}
-
-- (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration {
-	MAEvent event;
-	event.type = EVENT_TYPE_ACCELEROMETER;
-	MAAccelerometer* accData = new MAAccelerometer;
-	event.data = accData;
-	
-	accData->roll = acceleration.x;
-	accData->pitch = acceleration.y;
-	accData->yaw = acceleration.z;
-	
-	Base::gEventQueue.put(event);
-}
- */
-
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         // Initialization code
@@ -161,6 +136,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		locationController = [[MoSyncCLController alloc] init];
 		self.multipleTouchEnabled = YES;
 		touchHelper = [[TouchHelper alloc] init];
+        moSyncSensor = [[MoSyncSensor alloc] init];
 		
 		/*
 		CGRect appFrame = [[UIScreen mainScreen] bounds];
@@ -189,6 +165,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 - (void)dealloc {
     [super dealloc];
     [locationController release];	
+    [moSyncSensor dealloc];
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {
@@ -371,6 +348,13 @@ void removeTouch(UITouch* touch) {
 	textBoxData.constraints = constraints;
 	
 	[self performSelectorOnMainThread: @ selector(textBox:) withObject:(id)textBoxData waitUntilDone:NO];
+}
+
+/**
+ * Returns a pointer to the MoSyncSensor object.
+ */
+-(MoSyncSensor*) getMoSyncSensor {
+    return moSyncSensor;
 }
 
 @end

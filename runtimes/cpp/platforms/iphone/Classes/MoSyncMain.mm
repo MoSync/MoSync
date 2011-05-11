@@ -220,12 +220,27 @@ void MoSync_StopUpdatingLocation() {
 	[sMoSyncView stopUpdatingLocation];
 }
 
-void MoSync_StartUpdatingAccelerometer() {
-	[sMoSyncView startUpdatingAccelerometer];
+/**
+ * Start a sensor.
+ * @param sensorType What type of sensor to start.
+ * @param value Update interval value.
+ * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
+ */
+int MoSync_SensorStart(int sensor, int interval) {
+    MoSyncSensor* moSyncSensor = [sMoSyncView getMoSyncSensor];
+    int result = [moSyncSensor startSensor:sensor interval:interval];
+    return result;
 }
 
-void MoSync_StopUpdatingAccelerometer() {
-	[sMoSyncView stopUpdatingAccelerometer];
+/**
+ * Stop a sensor.
+ * @param sensorType What type of sensor to stop.
+ * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
+ */
+int MoSync_SensorStop(int sensor) {
+    MoSyncSensor* moSyncSensor = [sMoSyncView getMoSyncSensor];
+    int result = [moSyncSensor stopSensor:sensor];
+    return result;
 }
 
 void MoSync_AddTouchPressedEvent(int x, int y, int touchId) {

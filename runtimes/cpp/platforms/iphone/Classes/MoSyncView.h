@@ -19,12 +19,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "MoSyncCLController.h"
 #include <helpers/cpp_defs.h>
 #include "TouchHelper.h"
+#include "MoSyncSensor.h"
 
 @interface MoSyncView : UIView <UITextFieldDelegate> {
 	CGImageRef mosyncView;
     MoSyncCLController *locationController;	
 	TouchHelper* touchHelper;
-
+    /**
+     * Used for handling sensors.
+     */
+    MoSyncSensor* moSyncSensor;
+    
 }
 
 -(void) updateMoSyncView: (CGImageRef)ref;
@@ -36,13 +41,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 			andConstraints:(int)constraints;
 -(void) startUpdatingLocation;
 -(void) stopUpdatingLocation;
--(void) startUpdatingAccelerometer;
--(void) stopUpdatingAccelerometer;
 
 - (void)viewAppeared;
 
 - (void)deviceOrientationChanged:(NSNotification *)notification;
 - (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration;
+
+/**
+ * Returns a pointer to the MoSyncSensor object.
+ */
+-(MoSyncSensor*) getMoSyncSensor;
 
 @end
 

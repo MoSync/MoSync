@@ -1311,6 +1311,13 @@ interface MAAPI {
 		* Currently implemented only on Android.
 		*/
 		BLUETOOTH_TURNED_ON = 30;
+
+		/**
+		* \brief Provides data from active sensors.
+		* \see MAEvent::sensor
+		* \see maSensorStart()
+		*/
+		SENSOR = 31;
 	}
 
 	/**
@@ -1323,6 +1330,14 @@ interface MAAPI {
 		int opType;
 		/// A success value \> 0 or a \link #CONNERR_GENERIC CONNERR \endlink code.
 		int result;
+	}
+
+	/**
+	* \brief A structure containing the sensor type and the data sent to the event.
+	*/
+	struct MASensor {
+		int type;
+		float values[4];
 	}
 	
 	/**
@@ -1384,6 +1399,11 @@ interface MAAPI {
 				*/
 				int textboxLength;
 			} textbox;
+			
+			/**
+			* Valid in \link #EVENT_TYPE_SENSOR SENSOR \endlinkR events.
+			*/
+			MASensor sensor;
 			
 			/**
 			* Used by custom events. See invididual event descriptions.
@@ -4614,9 +4634,84 @@ group WidgetAPI "Widget API" {
 		 * to ensure its visibility on all screen sizes.
 		 */
 		void maMessageBox(in MAString title, in MAString message);
+		
+		constset int SENSOR_TYPE_ {
+			// A constant describing all sensor types.
+			ALL = -1;
+			// A constant describing an accelerometer sensor type.
+			ACCELEROMETER = 1;
+			// A constant describing a magnetic field sensor type.
+			MAGNETIC_FIELD = 2;
+			// A constant describing an orientation sensor type.
+			ORIENTATION = 3;
+			// A constant describing a gyroscope sensor type.
+			GYROSCOPE = 4;
+			// A constant describing an light sensor type.
+			LIGHT = 5;
+			// A constant describing a pressure sensor type 
+			PRESSURE = 6;
+			// A constant describing a temperature sensor type.
+			TEMPERATURE = 7;
+			// A constant describing an proximity sensor type.
+			PROXIMITY = 8;
+			// A constant describing a gravity sensor type.
+			GRAVITY = 9;
+			// A constant describing a linear acceleration sensor type.
+			LINEAR_ACCELERATION = 10;
+			// A constant describing a rotation vector sensor type.
+			ROTATION_VECTOR = 11;
+		}
+		
+		constset int SENSOR_RATE_ {
+			// Get sensor data as fast as possible.
+			FASTEST = 0;
+			// A rate suitable for games.
+			GAME = -1;
+			// The default rate. Suitable for screen orientation changes.
+			NORMAL = -2;
+			// A rate suitable for the user interface.
+			UI = -3;
+		}
+		
+		constset int SENSOR_ERROR_ {
+			NONE = 0;
+			// Errors for maSensorStart
+			NOT_AVAILABLE = -2;
+			INTERVAL_NOT_SET = -3;
+			ALREADY_ENABLED = -4;
+			// Errors for maSensorStop
+			NOT_ENABLED = -5;
+			CANNOT_DISABLE = -6;
+		}
+		
+		/**
+		* \brief Enables a sensor and starts sending events if the sensor is available.
+		* If the sensor is already enabled this call will have no effect.
+		* \param sensor       The sensor which should be enabled.
+		* \param interval     Time interval in which a sensor update shall be triggered.
+		*            >0 interval time in milliseconds.
+		*            <=0 Any of predefined values.
+		* \return    #SENSOR_ERROR_NONE  on success.
+		*            #SENSOR_ERROR_NOT_AVAILABLE if this sensor wasn't available.
+		*            #SENSOR_ERROR_INTERVAL_NOT_SET if the interval wasn't set, could be due to platform limitations.
+		*            #SENSOR_ERROR_ALREADY_ENABLED if the sensor already was enabled.
+		* \see #EVENT_TYPE_SENSOR
+		*/
+		int maSensorStart(in int sensor, in int interval);
+
+		/**
+		* \brief Disables a sensor so that it doesn't send any further events.
+		* \param sensor    The sensor which should be disabled.
+		* \return    #SENSOR_ERROR_NONE on success.
+		*            #SENSOR_ERROR_NOT_ENABLED if this sensor wasn't enabled.
+		*            #SENSOR_ERROR_CANNOT_DISABLE if there was a problem disabling the sensor.
+		* \see #EVENT_TYPE_SENSOR
+		*/
+		int maSensorStop(in int sensor);
 	}
 	
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}
 }
+
