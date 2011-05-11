@@ -181,6 +181,9 @@ namespace Base {
 		}
 		return true;
 	}
+#ifdef _MSC_VER
+#define ftruncate _chsize
+#endif
 	bool WriteFileStream::truncate(int size) {
 		TEST(isOpen());
 		LTEST(ftruncate(mFd, size));
