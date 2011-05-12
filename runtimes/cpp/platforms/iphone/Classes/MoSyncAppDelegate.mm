@@ -20,6 +20,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 @class MoSyncView;
 
+
+void getScreenResolution(int &w, int &h);
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
 void MoSync_AddCloseEvent();
 void MoSync_Main(int width, int height, MoSyncView* mosyncView);
@@ -45,10 +47,16 @@ void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 	//[window addSubview:viewController.view];
     //[window makeKeyAndVisible];
 	
-	CGRect appFrame = [[UIScreen mainScreen] bounds];
-	CGFloat screenHeight = appFrame.size.height;
-	CGFloat screenWidth = appFrame.size.width;
-	MoSync_Main(screenWidth, screenHeight, (MoSyncView*)[viewController getMoSyncView]);	
+	//CGRect appFrame = [[UIScreen mainScreen] bounds];
+	//CGFloat screenHeight = appFrame.size.height;
+	//CGFloat screenWidth = appFrame.size.width;
+	//MoSync_Main(screenWidth, screenHeight, (MoSyncView*)[viewController getMoSyncView]);
+
+    int w, h;
+    getScreenResolution(w, h);
+	MoSync_Main(w, h, (MoSyncView*)[viewController getMoSyncView]);
+
+	
 }
 
 - (void)applicationWillTerminate:(UIApplication *)application {

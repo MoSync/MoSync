@@ -6,6 +6,7 @@
 #import <OpenGLES/EAGLDrawable.h>
 
 #import "MoSyncGLView.h"
+#include "iphone_helpers.h"
 
 // hackety hack..
 void MoSync_AddTouchPressedEvent(int x, int y, int touchId);
@@ -58,6 +59,15 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
             return nil;
         }
         
+        int w, h;
+        getScreenResolution(w, h);
+        if (w == 640 && h == 960) // Retina display detected
+        {
+            // Set contentScale Factor to 2
+            self.contentScaleFactor = 2.0;
+            eaglLayer.contentsScale=2; //new line   
+        }        
+            
         animationInterval = 1.0 / 60.0;
 			
 		WorkingContext = nil;	

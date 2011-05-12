@@ -153,7 +153,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:)
 													 name:UIDeviceOrientationDidChangeNotification object:nil];
-		
+
+        int w, h;
+        getScreenResolution(w, h);
+        if (w == 640 && h == 960) // Retina display detected
+        {
+            // Set contentScale Factor to 2
+            self.contentScaleFactor = 2.0;
+        }
+        
 		self.frame.origin.y = 0;
 		self.frame.origin.x = 0;
 		mosyncView = nil;
@@ -178,7 +186,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     CGContextRef context = UIGraphicsGetCurrentContext();
 	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
 	CGContextSetAllowsAntialiasing(context, false);
-	CGContextTranslateCTM(context, 0, CGImageGetHeight(mosyncView));
+	CGContextTranslateCTM(context, 0, self.frame.size.height); //CGImageGetHeight(mosyncView));
 	CGContextScaleCTM(context, 1.0, -1.0);
 	CGContextDrawImage(context, rect, mosyncView);		
 	
@@ -193,7 +201,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {
 	//UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
-	MoSync_AddScreenChangedEvent();
+	//MoSync_AddScreenChangedEvent();
 }
 
 /*
