@@ -131,3 +131,4 @@ void getScreenResolution(int& w, int &h) {
         h = mainscr.currentMode.size.height;
     }    
 }
+
