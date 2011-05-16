@@ -218,32 +218,28 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 
 
 - (void)startAnimation {
-   // self.animationTimer = [NSTimer scheduledTimerWithTimeInterval:animationInterval target:self selector:@selector(drawView) userInfo:nil repeats:YES];
+    //self.animationTimer = [NSTimer scheduledTimerWithTimeInterval:animationInterval target:self selector:@selector(drawView) userInfo:nil repeats:YES];
 }
 
 
 - (void)stopAnimation {
-  //  self.animationTimer = nil;
+    //self.animationTimer = nil;
 }
 
-
+/*
 - (void)setAnimationTimer:(NSTimer *)newTimer {
-   // [animationTimer invalidate];
-   // animationTimer = newTimer;
+   [animationTimer invalidate];
+   animationTimer = newTimer;
 }
 
-
-- (void)setAnimationInterval:(NSTimeInterval)interval {
-    
-	/*
+- (void)setAnimationInterval:(NSTimeInterval)interval {    
     animationInterval = interval;
     if (animationTimer) {
         [self stopAnimation];
         [self startAnimation];
     }
-	 */
 }
-
+*/
 
 - (void)dealloc {
     
@@ -256,12 +252,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
     [context release];  
     [super dealloc];
 }
-
 /*
-- (void)viewAppeared {
-	[touchHelper clearTouches];
-}
-
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 	for (UITouch *touch in touches) 
 	{

@@ -23,9 +23,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "iphone_helpers.h"
 //#include "Platform.h"
 
+/*
 @interface UIApplication(MyExtras) 
 - (void)terminateWithSuccess; 
 @end
+*/
 
 @interface MessageBoxHandler : UIViewController <UIAlertViewDelegate> {
 	BOOL kill;
@@ -118,31 +120,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	[locationController.locationManager stopUpdatingLocation];
 }
 
-/*
-#define kUpdateFrequency 10  // Hz
--(void) startUpdatingAccelerometer {
-	[[UIAccelerometer sharedAccelerometer] setUpdateInterval:(20.0 / kUpdateFrequency)];
-	[[UIAccelerometer sharedAccelerometer] setDelegate:self];	
-}
-
--(void) stopUpdatingAccelerometer {
-	[[UIAccelerometer sharedAccelerometer] setDelegate:nil];	
-}
-
-- (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration {
-	MAEvent event;
-	event.type = EVENT_TYPE_ACCELEROMETER;
-	MAAccelerometer* accData = new MAAccelerometer;
-	event.data = accData;
-	
-	accData->roll = acceleration.x;
-	accData->pitch = acceleration.y;
-	accData->yaw = acceleration.z;
-	
-	Base::gEventQueue.put(event);
-}
- */
-
 - (id)initWithFrame:(CGRect)frame {
     if (self = [super initWithFrame:frame]) {
         // Initialization code
@@ -203,102 +180,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	//UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
 	//MoSync_AddScreenChangedEvent();
 }
-
-/*
-int addTouch(UITouch* touch) {
-	if(touchArray == nil) {
-		touchArray = [[NSMutableArray alloc] init];
-		dummyTouch = [[UITouch alloc] init];
-	}
-	
-	int index = 0;
-	for (UITouch* cur in touchArray) {
-		if(touch == cur) {
-			return -1;
-		} else if(cur == dummyTouch) {
-			[touchArray replaceObjectAtIndex:index withObject:touch];
-			return index;
-		}
-		
-		index++;
-	}
-	
-	[touchArray addObject:touch];
-	return index;
-	
-}
-
-int getTouchId(UITouch* touch) {
-	return [touchArray indexOfObject:touch];
-}
-
-void removeTouch(UITouch* touch) {
-	//[touchArray removeObject:touch];
-	int index = 0;
-	for (UITouch* cur in touchArray) {
-		if(cur == touch) {
-			[touchArray replaceObjectAtIndex: index withObject:dummyTouch];
-			return;
-		}
-		index++;
-	}
-	
-}
- */
-
-/*
-- (void)viewAppeared {
-	// some touches might not have been registered so let's clear the touch helper.
-    [touchHelper clearTouches];
-}
-
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-	for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseBegan) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper addTouch: touch];
-			MoSync_AddTouchPressedEvent(point.x, point.y, touchId);	
-		}
-	}	
-}
-
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-	for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseMoved) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];
-			MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
-		}
-	}	
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {	
-    for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseEnded) {	
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];		
-			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
-			[touchHelper removeTouch: touch];
-		}
-	}
-}
-
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {	
-	for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseCancelled) {	
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];		
-			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
-			[touchHelper removeTouch: touch];
-		}
-	}
-}
- */
-
 -(void) messageBox:(id) obj {
 	MessageBoxHandler *mbh = (MessageBoxHandler*) obj;
 	UIAlertView *alert = [[UIAlertView alloc] 

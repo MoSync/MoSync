@@ -44,9 +44,7 @@ void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 	//UIWindow* window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     viewController = [[MoSyncViewController alloc] init];
 	initMoSyncUISyscalls(NULL, viewController);
-	//[window addSubview:viewController.view];
-    //[window makeKeyAndVisible];
-	
+
 	//CGRect appFrame = [[UIScreen mainScreen] bounds];
 	//CGFloat screenHeight = appFrame.size.height;
 	//CGFloat screenWidth = appFrame.size.width;

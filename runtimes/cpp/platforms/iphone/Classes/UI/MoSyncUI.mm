@@ -23,6 +23,7 @@
 #include <helpers/CPP_IX_WIDGET.h>
 #include "TouchHelper.h"
 #include "MoSyncMain.h"
+#include "MoSyncViewController.h"
 
 @interface MoSyncUIWindow : UIWindow {
 	TouchHelper* touchHelper;	
@@ -137,6 +138,10 @@ static IWidget* sOldScreen = nil;
 		window = [[MoSyncUIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 		[window makeKeyAndVisible];
 	}
+    
+    if(!controller) {
+        controller = [[MoSyncViewController alloc] init];
+    }
 	
 	mainWindow = window;
 	mainController = controller;
