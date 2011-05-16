@@ -370,10 +370,19 @@ static bool parseGSym(Tuple t, char* text) {
 	char* pType = type + 1;
 	const TypeBase* dataType = subParseType(&pType, Tuple(), string());
 
+	int address = mapVariable(text, gCurrentFile - 1);
+	if(address < 0) {
+		LOG("Could not resolve variable '%s' in file %i\n", text, gCurrentFile - 1);
+		// this problem cannot be fixed easily.
+		// gcc outputs a GSYM for static variables in template functions,
+		// when it should output a STSYM.
+		// let's disable access to these (few) variables for now.
+		return true;
+		//FAIL;
+	}
 	StaticVariable* var = new StaticVariable;
 	var->name = text;
-	var->address = mapVariable(text, gCurrentFile - 1);
-	FAILIF(var->address < 0);
+	var->address = address;
 	var->dataType = dataType;
 	var->global = true;
 	var->fileScope = gCurrentFile;
