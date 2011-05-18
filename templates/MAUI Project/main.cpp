@@ -19,23 +19,27 @@ public:
 	MAUIScreen()
 	{
 		mBackgroundArea = new Label(
-			0,   // Left
-			0,   // Top
-			50,  // Width
-			50,  // Height
+			0, // Left
+			0, // Top
+			0, // Width
+			0, // Height
 			NULL // Parent widget
 			);
 		mBackgroundArea->setBackgroundColor(0xFFFFFF);
-		setMain(mBackgroundArea);
 
 		mTouchArea = new Label(
-			0,   // Left
-			0,   // Top
+			100, // Left
+			100, // Top
 			50,  // Width
 			50,  // Height
 			mBackgroundArea // Parent widget
 			);
 		mTouchArea->setBackgroundColor(0x000000);
+
+		// Set the main widget of the screen. This will
+		// resize the widget to fit the screen.
+		setMain(mBackgroundArea);
+
 	}
 
 	/**
@@ -142,4 +146,3 @@ extern "C" int MAMain()
 	Moblet::run(new MAUIMoblet());
 	return 0;
 }
-
