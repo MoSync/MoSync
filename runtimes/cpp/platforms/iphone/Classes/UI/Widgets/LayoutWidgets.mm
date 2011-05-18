@@ -86,19 +86,22 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 	orientation = ori;
 	
 	if(ori == OrientationVertical) {
-		view = [[MoSyncVLayoutView alloc]  initWithFrame:CGRectZero spacing:0
+		MoSyncVLayoutView* layoutView = [[MoSyncVLayoutView alloc]  initWithFrame:CGRectZero spacing:0
 									leftMargin:0 rightMargin:0 topMargin:0 bottomMargin:0
 									hAlignment:UIControlContentHorizontalAlignmentLeft
 									vAlignment:UIControlContentVerticalAlignmentTop];
+        [layoutView setWidget:self];
+        view = layoutView;
 	} else {
-		view = [[MoSyncHLayoutView alloc]  initWithFrame:CGRectZero spacing:0
+		
+        MoSyncHLayoutView* layoutView = [[MoSyncHLayoutView alloc]  initWithFrame:CGRectZero spacing:0
 											  leftMargin:0 rightMargin:0 topMargin:0 bottomMargin:0
 											  hAlignment:UIControlContentHorizontalAlignmentLeft
 											  vAlignment:UIControlContentVerticalAlignmentTop];		
-	}
-	
-	[view setWidget:self];
-	
+    	[layoutView setWidget:self];
+        view = layoutView;
+    }
+		
 	id ret = [super init];
 	[self setAutoSizeParamX:FILL_PARENT andY:FILL_PARENT];
 	return ret;
@@ -153,7 +156,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			
 		}
 			
-		[_view superLayoutSubviews];
+		[((MoSyncVLayoutView*)_view) superLayoutSubviews];
 	} else {
 		int numFillParent = 0;
 		int widthRemaining = 0;
@@ -198,7 +201,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			
 		}
 		
-		[_view superLayoutSubviews];
+		[((MoSyncHLayoutView*)_view) superLayoutSubviews];
 	}
 }
 

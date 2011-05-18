@@ -13,7 +13,7 @@
 	for (UITouch* cur in touchArray) {
 		if(touch == cur) {
 			return -1;
-		} else if(cur == [NSNull null]) {
+		} else if(cur == (UITouch*)[NSNull null]) {
 			[touchArray replaceObjectAtIndex:index withObject:touch];
 			return index;
 		}

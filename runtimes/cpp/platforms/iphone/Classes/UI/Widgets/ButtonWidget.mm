@@ -59,7 +59,7 @@
 	if([key isEqualToString:@"fontSize"]) {
 		UIButton* button = (UIButton*) view;
 		float fontSize = [value floatValue];
-		[button setFont:[UIFont boldSystemFontOfSize:fontSize]];
+		button.titleLabel.font = [UIFont boldSystemFontOfSize:fontSize];
 		[self layout];			
 	} else		
 	if([key isEqualToString:@"fontColor"]) {
