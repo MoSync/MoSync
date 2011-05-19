@@ -20,78 +20,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/cpp_defs.h>
 
 /**
- * Custom conversion function from Wide Char String to Multi Byte String.
- * Exists because the android NDK does not support wchars.
- *
- * @param s		output multi-byte string
- * @param pwcs	input wide char string
- * @param n		length of the input wide char string
- *
- * @return		returns the number of bytes converted 
- *				(not including any terminating null), 
- *				if successful; otherwise, it returns (size_t)-1.
- */
-inline size_t wideCharString2multiByteString(char *s, const wchar *pwcs, size_t n)
-{
-	if(s == NULL)
-	{
-		int num_bytes = 0;
-		while(*pwcs != 0)
-		{
-			num_bytes++;
-			pwcs++;
-		}
-		return num_bytes;
-	}
-	int count = 0;
-	
-	if (n != 0) {
-		do {
-			if ((*s++ = (char) *pwcs++) == 0)
-				break;
-			count++;
-		} while (--n != 0);
-	}
-	return count;
-}
-
-/**
  * Custom Wide Char String length calculation function.
  * Exists because the android NDK does not support wchars.
  *
  * @param s		input multi-byte string
  *
  * @return		length of the input string
+ *
+ * TODO: Use a build in function instead if this one.
+ * This function is written in a non-readable way,
+ * improved it a little bit by changing a variable name.
  */
 inline size_t wideCharStringLength(const wchar * s)
 {
-	const wchar *save;
+	const wchar *current;
 	if (s == 0)
+	{
 		return 0;
-	for (save = s; *save; ++save);
-	return save-s;
-}
-
-
-/**
- * Converts a Wide Char String to a Java String.
- *
- * @param env	JNI Environment used
- * @param s		Input Wide Char String
- *
- * @return		Java String
- */
-inline jobject wchar2jstring(JNIEnv* env, const wchar* s)
-{
-    jobject result = 0;
-    size_t len = wideCharStringLength(s);
-    size_t sz = wideCharString2multiByteString (0, s, len);
-	char* c = (char*)malloc(sizeof(char)*(sz+1));
-    wideCharString2multiByteString (c, s, len);
-    c[sz] = '\0';
-    result = env->NewStringUTF(c);
-	free(c);
-    return result;
+	}
+	for (current = s; *current; ++current);
+	return current - s;
 }
 
 namespace Base
@@ -435,9 +383,11 @@ namespace Base
 		JNIEnv* jNIEnv, 
 		jobject jThis)
 	{
-		// Initialization
-		jstring jstrTITLE = (jstring)wchar2jstring(jNIEnv,  title);
-		jstring jstrINTEXT = (jstring)wchar2jstring(jNIEnv,  inText);
+
+		// Initialization.
+		jstring jstrTITLE = jNIEnv->NewString((jchar*)title, wideCharStringLength(title));
+		jstring jstrINTEXT = jNIEnv->NewString((jchar*)inText, wideCharStringLength(inText));
+		
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		
 		// Remove the offset from the output buffer's address
