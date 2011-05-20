@@ -116,3 +116,19 @@ size_t wcharLength(const wchar* str) {
 	while(*str++) length++;
 	return length;
 }
+
+void getScreenResolution(int& w, int &h) {
+    
+    w = 320;
+    h = 480;
+    
+    float ver = [[[UIDevice currentDevice] systemVersion] floatValue];
+    // You can't detect screen resolutions in pre 3.2 devices, but they are all 320x480
+    if (ver >= 3.2f)
+    {
+        UIScreen* mainscr = [UIScreen mainScreen];
+        w = mainscr.currentMode.size.width;
+        h = mainscr.currentMode.size.height;
+    }    
+}
+

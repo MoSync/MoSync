@@ -46,10 +46,7 @@
 - (void)stopAnimation;
 - (void)drawView;
 - (void)setupView;
-
 - (void) bindContext;
 - (void) renderContext;
-
-- (void)viewAppeared;
 
 @end

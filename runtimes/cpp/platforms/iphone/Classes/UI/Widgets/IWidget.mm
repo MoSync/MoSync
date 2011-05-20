@@ -105,7 +105,7 @@
 		
 		//[[view layer] setBorderWidth:1.0];
 		//[[view layer] setBorderColor:[UIColor redColor].CGColor];
-	}
+    }
 	
 	return self;
 }
