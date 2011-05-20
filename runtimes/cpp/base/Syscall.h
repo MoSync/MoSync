@@ -211,11 +211,9 @@ namespace Base {
 //Custom event handling
 #define CUSTOM_EVENT_STREAM(m) m(EVENT_TYPE_STREAM, MAStreamEventData)
 
-#ifdef MA_PROF_SUPPORT_LOCATIONAPI
+
 #define CUSTOM_EVENT_LOCATION(m) m(EVENT_TYPE_LOCATION, MALocation)
-#else
-#define CUSTOM_EVENT_LOCATION(m)
-#endif
+
 
 /**
  * Custom event data for widgets.
