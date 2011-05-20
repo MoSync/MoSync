@@ -130,7 +130,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:)
 													 name:UIDeviceOrientationDidChangeNotification object:nil];
-
         int w, h;
         getScreenResolution(w, h);
         if (w == 640 && h == 960) // Retina display detected

@@ -67,7 +67,6 @@ public:
 
 		bool noAlpha = false;
 		int bpp = CGImageGetBitsPerPixel(image);
-		CGBitmapInfo bInfo = CGImageGetBitmapInfo(image);
 
 		if(bpp != 32) {
 			CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
@@ -93,7 +92,17 @@ public:
 		
 		createImageDrawer();
 		
-		if((bInfo&kCGBitmapByteOrderMask)==kCGBitmapByteOrder32Host) {
+         CGBitmapInfo bInfo = CGImageGetBitmapInfo(image);
+         if((bInfo&kCGBitmapByteOrderMask)==kCGBitmapByteOrder32Host) {
+             for(int i = 0; i < height; i++) {
+                 for(int j = 0; j < width; j++) {
+                     int* iptr = (int*)&this->data[j*4 + i*rowBytes];
+                     int c = *iptr;
+                     *iptr = (c&0xff00ff00) | ((c>>16)&0xff) | ((c&0xff)<<16);
+                 }
+             }
+             
+             /*
 			mImageDrawer->redMask = 0x000000ff;
 			mImageDrawer->redShift = 0;		
 			mImageDrawer->greenMask = 0x00ff00;
@@ -101,9 +110,10 @@ public:
 			mImageDrawer->blueMask = 0xff0000;
 			mImageDrawer->blueShift = 16;		
 			mImageDrawer->alphaMask = 0xff000000;
-			mImageDrawer->alphaShift = 24;			
+			mImageDrawer->alphaShift = 24;
+             */
 		}
-
+        
 		if(noAlpha) {
 			mImageDrawer->alphaMask = 0;
 			mImageDrawer->alphaBits = 0;	
@@ -179,8 +189,8 @@ public:
 		
 		CGContextSaveGState(context);
 		
-		createImageDrawer();	
-		
+		createImageDrawer();
+        
 		if(bitmapInfo==kCGImageAlphaNoneSkipLast) {
 			mImageDrawer->alphaMask = 0;
 			mImageDrawer->alphaBits = 0;		
