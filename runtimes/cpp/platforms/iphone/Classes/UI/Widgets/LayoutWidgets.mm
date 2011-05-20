@@ -55,6 +55,26 @@
 	bottomMargin = _margin;
 	[self setNeedsLayout];
 }
+
+- (int) getLeftMargin {
+	return leftMargin;
+}
+
+- (int) getRightMargin {
+	return rightMargin;
+}
+
+- (int) getTopMargin{
+	return topMargin;;
+}
+
+- (int) getBottomMargin {
+	return bottomMargin;
+}
+
+- (int) getSpacing {
+	return spacing;
+}
 @end
 
 MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, VLayoutView)
@@ -66,25 +86,32 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 	orientation = ori;
 	
 	if(ori == OrientationVertical) {
-		view = [[MoSyncVLayoutView alloc]  initWithFrame:CGRectZero spacing:0
+		MoSyncVLayoutView* layoutView = [[MoSyncVLayoutView alloc]  initWithFrame:CGRectZero spacing:0
 									leftMargin:0 rightMargin:0 topMargin:0 bottomMargin:0
 									hAlignment:UIControlContentHorizontalAlignmentLeft
 									vAlignment:UIControlContentVerticalAlignmentTop];
+        [layoutView setWidget:self];
+        view = layoutView;
 	} else {
-		view = [[MoSyncHLayoutView alloc]  initWithFrame:CGRectZero spacing:0
+		
+        MoSyncHLayoutView* layoutView = [[MoSyncHLayoutView alloc]  initWithFrame:CGRectZero spacing:0
 											  leftMargin:0 rightMargin:0 topMargin:0 bottomMargin:0
 											  hAlignment:UIControlContentHorizontalAlignmentLeft
 											  vAlignment:UIControlContentVerticalAlignmentTop];		
-	}
-	
-	[view setWidget:self];
-	
+    	[layoutView setWidget:self];
+        view = layoutView;
+    }
+		
 	id ret = [super init];
 	[self setAutoSizeParamX:FILL_PARENT andY:FILL_PARENT];
 	return ret;
 }
 
 - (void)layoutSubviews:(UIView*)_view {
+	AbstractLayoutView* alv = (AbstractLayoutView*)view;
+	int totalHorizontalMargin = ([alv getLeftMargin] + [alv getRightMargin]);
+	int totalVerticalMargin = ([alv getTopMargin] + [alv getBottomMargin]);
+	
 	if(orientation == OrientationVertical) {
 		int numFillParent = 0;
 		int heightRemaining = 0;
@@ -93,14 +120,17 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			UIView* childView = [child getView];
 			
 			int viewWidth = childView.frame.size.width; 
+			int viewHeight = childView.frame.size.height; 
+
 			if([child getAutoSizeParamX] == FILL_PARENT) {
-				viewWidth = view.frame.size.width;
+				viewWidth = view.frame.size.width - totalHorizontalMargin;
 			}
 			else if([child getAutoSizeParamX] == WRAP_CONTENT) {
 				viewWidth = [childView sizeThatFits:CGSizeZero].width;
 			}
 			
-			int viewHeight = childView.frame.size.height; 
+			[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, viewWidth, viewHeight)];
+
 			if([child getAutoSizeParamY] == FILL_PARENT) {
 				numFillParent++;
 			}
@@ -110,12 +140,12 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			} else {
 				heightRemaining+=viewHeight;
 			}
-						
+			
 			[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, viewWidth, viewHeight)];
 		}
 		
 		if(numFillParent != 0) {
-			int fillParentHeight = (view.frame.size.height - heightRemaining)/numFillParent;
+			int fillParentHeight = (view.frame.size.height - heightRemaining - totalVerticalMargin - [alv getSpacing] *  ([children count] - 1))/numFillParent;
 			for (IWidget *child in children)
 			{
 				if([child getAutoSizeParamY] == FILL_PARENT) {
@@ -126,8 +156,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			
 		}
 			
-		[_view superLayoutSubviews];		
-		//[super layoutSubviews];
+		[((MoSyncVLayoutView*)_view) superLayoutSubviews];
 	} else {
 		int numFillParent = 0;
 		int widthRemaining = 0;
@@ -136,14 +165,17 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			UIView* childView = [child getView];
 			
 			int viewHeight = childView.frame.size.height; 
+			int viewWidth = childView.frame.size.width; 
+			
 			if([child getAutoSizeParamY] == FILL_PARENT) {
-				viewHeight = view.frame.size.height;
+				viewHeight = view.frame.size.height - totalVerticalMargin;
 			}
 			else if([child getAutoSizeParamY] == WRAP_CONTENT) {
 				viewHeight = [childView sizeThatFits:CGSizeZero].height;
 			}
 			
-			int viewWidth = childView.frame.size.width; 
+			[childView setFrame:CGRectMake(childView.frame.origin.x, childView.frame.origin.y, viewWidth, viewHeight)];
+			
 			if([child getAutoSizeParamX] == FILL_PARENT) {
 				numFillParent++;
 			}
@@ -158,7 +190,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 		}
 		
 		if(numFillParent != 0) {
-			int fillParentWidth = (view.frame.size.width - widthRemaining)/numFillParent;
+			int fillParentWidth = (view.frame.size.width - widthRemaining - totalHorizontalMargin - [alv getSpacing] * ([children count] - 1))/numFillParent;
 			for (IWidget *child in children)
 			{
 				if([child getAutoSizeParamX] == FILL_PARENT) {
@@ -169,12 +201,13 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			
 		}
 		
-		[_view superLayoutSubviews];
-		//[super layoutSubviews];
+		[((MoSyncHLayoutView*)_view) superLayoutSubviews];
 	}
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
+	// maybe set scroll indicator style..
+	
 	if([key isEqualToString:@"childVerticalAlignment"]) {
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;
 		if([value isEqualToString:@"top"])

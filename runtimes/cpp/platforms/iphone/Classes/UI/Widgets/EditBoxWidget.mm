@@ -21,6 +21,7 @@
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
+#include "UIColor-Expanded.h"
 
 @implementation EditBoxWidget
 

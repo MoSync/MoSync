@@ -420,6 +420,7 @@ interface MAAPI {
 	*/
 	void maDrawRGB(in MAPoint2d dstPoint, in MAAddress src, in MARect srcRect, in int scanlength);
 
+	// The JavaMe runtime requires that these constans have these values. Do not change.
 	constset int TRANS_ {
 		/// The image is copied unchanged.
 		NONE = 0;

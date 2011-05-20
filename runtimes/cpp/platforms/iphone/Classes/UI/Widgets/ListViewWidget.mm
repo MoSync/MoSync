@@ -38,9 +38,9 @@
 }
 
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath {
-	NSUInteger row = [indexPath row];
-	IWidget* widget = [children objectAtIndex:row];
-	UITableViewCell* cell = (UITableViewCell*)[widget getView];//[mDataForMyTable objectAtIndex:row];
+	//NSUInteger row = [indexPath row];
+	//IWidget* widget = [children objectAtIndex:row];
+	//UITableViewCell* cell = (UITableViewCell*)[widget getView];//[mDataForMyTable objectAtIndex:row];
 	return tableView.rowHeight;
 }
 
@@ -76,7 +76,7 @@
 	}
 	
 	[super addChild:child toSubview:NO];
-	[view reloadData];
+	[((UITableView*)view) reloadData];
 }
 
 - (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index toSubview:(bool)addSubview {
@@ -87,13 +87,13 @@
 	}
 	
 	int ret = [super insertChild:child atIndex:index toSubview:NO];
-	[view reloadData];
+	[((UITableView*)view) reloadData];
 	return ret;
 }
 
 - (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview {
 	[super removeChild:child fromSuperview:removeFromSuperview];
-	[view reloadData];
+	[((UITableView*)view) reloadData];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
