@@ -239,7 +239,7 @@ static void fireParseError() {
 	if(sStop)
 		return;
 	sThereIsData = false;
-	sContext->parseError(sContext, sCurPtr - sLastBeginPtr);
+	sContext->parseError(sContext, sCurPtr - sFirstPtr);
 }
 
 static void fireEncoding(char* name) {
