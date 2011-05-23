@@ -147,6 +147,11 @@ Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 
 # Don't build Android package file; it'll be done later, by the packager.
 package_root = "#{cpath}/AndroidProject/"
+
+if(!File.exist?("#{package_root}/gen"))
+	mkdir("#{package_root}/gen")
+end
+
 success = system(
 	"#{File.join(androidSDKPath, "tools/aapt")} package -f -v " +
 	"-M #{File.join(package_root,"AndroidManifest.xml")} -F resources.ap_ " +
