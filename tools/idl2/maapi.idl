@@ -3059,7 +3059,12 @@ group WidgetAPI "Widget API" {
 			* @brief The new tab index when a #MAW_EVENT_TAB_CHANGED event is received.
 			*/
 			int tabIndex;
-
+			
+			/**progress
+			* The value of the slider when a #MAW_EVENT_SLIDER_VALUE_CHANGED event is received.
+			*/
+			int sliderValue;
+			
 			struct {
 					/**
 					* @brief The handle to the screen that was popped from the stack screen.
@@ -3125,6 +3130,14 @@ group WidgetAPI "Widget API" {
 		 * @brief Sent when a screen has been popped from a stack screen.
 		 */
 		STACK_SCREEN_POPPED = 10;
+		
+		/**
+		 * @brief Sent when the progress level has been changed. 
+		 * This includes changes that were initiated by the user through a touch gesture,
+         * or arrow key/trackball as well as changes that were initiated programmatically. 
+		 */
+	    SLIDER_VALUE_CHANGED = 11;
+		
 	}
 	} // end of WidgetEventTypes
 
@@ -3346,6 +3359,32 @@ group WidgetAPI "Widget API" {
 		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
 		 */	
 		WEB_VIEW = "WebView";
+		
+		/**
+		 * @brief A progress bar is a visual indicator of progress in some operation. 
+		 * Displays a bar to the user representing how far the operation has progressed. 
+		 * A progress bar can also be made indeterminate, when the length of the task is unknown.
+		 * 
+		 * See \ref WidgetProgressBarProperties "Progress bar properties" for the properties available.
+		 */
+		PROGRESS_BAR = "ProgressBar";
+		
+		 /**
+		 * @brief An activity indicator is a visual indicator of progress in some operation. 
+		 * It shows a cyclic animation without an indication of progress.
+		 * It is used when the length of the task is unknown.
+		 * 
+		 * See \ref WidgetActivityIndicatorProperties "Activity Indicator properties" for the properties available.
+		 */
+		ACTIVITY_INDICATOR = "ActivityIndicator";
+		
+		/**
+		 * @brief A Slider is an extension of ProgressBar that adds a draggable thumb. 
+		 * The user can touch the thumb and drag left or right to set the current progress level.
+		 * 
+		 * See \ref WidgetSliderProperties "Slider properties" for the properties available.
+		 */
+		SLIDER = "Slider";
 	}
 	} // end of WidgetTypes
 
@@ -4200,6 +4239,143 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetWebViewProperties
 
+	/**
+	* The available widget properties for a #MAW_PROGRESS_BAR. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetProgressBarProperties "Progress bar properties" {
+	constset MAString MAW_PROGRESS_BAR_ {
+		/**
+		* @brief Sets or gets the range of the progress bar to 0...max.
+		*
+		* @validvalue An positive integer that specifies the upper range of this progress bar.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_MAX, "100");
+		* \endcode
+		*/		
+		MAX = "max";
+		
+		/**
+		* @brief Set or gets the current progress to the specified value.
+		*
+		* @validvalue An int that specifies the new progress, between 0 and max value. See \ref PROGRESS_BAR_MAX.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		* 	maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_PROGRESS, "10");
+		* \endcode
+		*/		
+		PROGRESS = "progress";
+		
+		/**
+		* @brief Increase the progress bar's progress by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the progress must be increased.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_INCREMENT_PROGRESS, "20");
+		* \endcode
+		*/		
+		INCREMENT_PROGRESS = "incrementProgress";
+	}
+	} // end of WidgetProgressBarProperties
+	
+	/**
+	* The available widget properties for a #MAW_ACTIVITY_INDICATOR. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetActivityIndicatorProperties "Activity Indicator properties" {
+	constset MAString MAW_ACTIVITY_INDICATOR_ {
+		/**
+		* @brief Sets if the indicator is still on or not.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // The activity is done. Now this widget is dismissed.
+        *   maWidgetSetProperty(activityIndicatorHandle, MAW_ACTIVITY_INDICATOR_IN_PROGRESS, "false");
+		* \endcode
+		*/		
+		IN_PROGRESS = "inProgress";
+	}
+	} // end of WidgetActivityIndicatorProperties
+	
+	/**
+	* The available widget properties for a #MAW_SLIDER. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetSliderProperties "Slider properties" {
+	constset MAString MAW_SLIDER_ {
+		/**
+		* @brief Sets or gets the range of the slider to 0...max.
+		*
+		* @validvalue An positive integer that specifies the upper range of this slider.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_MAX, "100");
+		* \endcode
+		*/		
+		MAX = "max";
+		
+		/**
+		* @brief Set or gets the current value to the slider.
+		*
+		* @validvalue An int that specifies the new value, between 0 and max value. See \ref SLIDER_MAX.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		* 	maWidgetSetProperty(sliderHandle, MAW_SLIDER_VALUE, "10");
+		* \endcode
+		*/		
+		VALUE = "value";
+		
+		/**
+		* @brief Increase the current value of the slider by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the slider value must be increased.
+		*
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_INCREMENT_VALUE, "20");
+		* \endcode
+		*/		
+		INCREMENT_VALUE = "incrementValue";
+		
+		/**
+		* @brief Decrease the current value of the slider by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the slider value must be decreased.
+		*
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_DECREMENT_VALUE, "20");
+		* \endcode
+		*/		
+		DECREMENT_VALUE = "decrementValue";
+		
+	}
+	} // end of WidgetSliderProperties
+	
 	} // end of WidgetProperties	
 		
 	typedef int MAWidgetHandle;

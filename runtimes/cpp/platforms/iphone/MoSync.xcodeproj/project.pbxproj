@@ -15,6 +15,15 @@
 		432933E8137ACEAE00150108 /* MoSyncSensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 432933E6137ACEAE00150108 /* MoSyncSensor.h */; };
 		432933E9137ACEAE00150108 /* MoSyncSensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432933E7137ACEAE00150108 /* MoSyncSensor.mm */; };
 		432933EA137ACEAE00150108 /* MoSyncSensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432933E7137ACEAE00150108 /* MoSyncSensor.mm */; };
+		4389D92D1383EE55007082CF /* SliderWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 4389D92B1383EE54007082CF /* SliderWidget.h */; };
+		4389D92E1383EE55007082CF /* SliderWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4389D92C1383EE54007082CF /* SliderWidget.mm */; };
+		4389D92F1383EE55007082CF /* SliderWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4389D92C1383EE54007082CF /* SliderWidget.mm */; };
+		43DD67EC13826C860097BE2E /* ProgressBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43DD67EA13826C840097BE2E /* ProgressBarWidget.h */; };
+		43DD67ED13826C860097BE2E /* ProgressBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43DD67EB13826C850097BE2E /* ProgressBarWidget.mm */; };
+		43DD67EE13826C860097BE2E /* ProgressBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43DD67EB13826C850097BE2E /* ProgressBarWidget.mm */; };
+		43E425781383A5FA0064079B /* ActivityIndicatorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43E425761383A5FA0064079B /* ActivityIndicatorWidget.h */; };
+		43E425791383A5FA0064079B /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43E425771383A5FA0064079B /* ActivityIndicatorWidget.mm */; };
+		43E4257A1383A5FA0064079B /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43E425771383A5FA0064079B /* ActivityIndicatorWidget.mm */; };
 		85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
 		85037841133A2275009251E2 /* StackScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 8503783E133A2275009251E2 /* StackScreenWidget.h */; };
 		85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
@@ -214,6 +223,12 @@
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
 		432933E6137ACEAE00150108 /* MoSyncSensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncSensor.h; sourceTree = "<group>"; };
 		432933E7137ACEAE00150108 /* MoSyncSensor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncSensor.mm; sourceTree = "<group>"; };
+		4389D92B1383EE54007082CF /* SliderWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SliderWidget.h; sourceTree = "<group>"; };
+		4389D92C1383EE54007082CF /* SliderWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SliderWidget.mm; sourceTree = "<group>"; };
+		43DD67EA13826C840097BE2E /* ProgressBarWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressBarWidget.h; sourceTree = "<group>"; };
+		43DD67EB13826C850097BE2E /* ProgressBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressBarWidget.mm; sourceTree = "<group>"; };
+		43E425761383A5FA0064079B /* ActivityIndicatorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorWidget.h; sourceTree = "<group>"; };
+		43E425771383A5FA0064079B /* ActivityIndicatorWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ActivityIndicatorWidget.mm; sourceTree = "<group>"; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
@@ -611,6 +626,12 @@
 				85A1591A12F80E520044BBE1 /* TabScreenWidget.mm */,
 				85A1591D12F80E520044BBE1 /* WebViewWidget.h */,
 				85A1591E12F80E520044BBE1 /* WebViewWidget.mm */,
+				43DD67EA13826C840097BE2E /* ProgressBarWidget.h */,
+				43DD67EB13826C850097BE2E /* ProgressBarWidget.mm */,
+				43E425761383A5FA0064079B /* ActivityIndicatorWidget.h */,
+				43E425771383A5FA0064079B /* ActivityIndicatorWidget.mm */,
+				4389D92B1383EE54007082CF /* SliderWidget.h */,
+				4389D92C1383EE54007082CF /* SliderWidget.mm */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -792,6 +813,9 @@
 				8594B8A013258A970059D79B /* LayoutWidgets.h in Headers */,
 				85037841133A2275009251E2 /* StackScreenWidget.h in Headers */,
 				432933E8137ACEAE00150108 /* MoSyncSensor.h in Headers */,
+				43DD67EC13826C860097BE2E /* ProgressBarWidget.h in Headers */,
+				43E425781383A5FA0064079B /* ActivityIndicatorWidget.h in Headers */,
+				4389D92D1383EE55007082CF /* SliderWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -966,6 +990,9 @@
 				8594B89F13258A970059D79B /* LayoutWidgets.mm in Sources */,
 				85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */,
 				432933E9137ACEAE00150108 /* MoSyncSensor.mm in Sources */,
+				43DD67ED13826C860097BE2E /* ProgressBarWidget.mm in Sources */,
+				43E425791383A5FA0064079B /* ActivityIndicatorWidget.mm in Sources */,
+				4389D92E1383EE55007082CF /* SliderWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1030,6 +1057,9 @@
 				8594B8A113258A970059D79B /* LayoutWidgets.mm in Sources */,
 				85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */,
 				432933EA137ACEAE00150108 /* MoSyncSensor.mm in Sources */,
+				43DD67EE13826C860097BE2E /* ProgressBarWidget.mm in Sources */,
+				43E4257A1383A5FA0064079B /* ActivityIndicatorWidget.mm in Sources */,
+				4389D92F1383EE55007082CF /* SliderWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
