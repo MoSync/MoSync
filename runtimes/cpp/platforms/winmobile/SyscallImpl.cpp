@@ -755,34 +755,24 @@ DWORD GetScreenOrientation()
 
 
 	void InitFullScreen() {
-		RECT rc;
-
-
 		HWND hwndTaskbar = TaskBarFind();
-		GetWindowRect(hwndTaskbar, &rc);
-		int taskBarHeight = (rc.bottom-rc.top);
-
 		//hide task bar and other icons
 		SHFullScreen(g_hwndMain, SHFS_HIDETASKBAR | SHFS_HIDESTARTICON | 
 					 SHFS_HIDESIPBUTTON);
 
         // Next resize the main window to the size of the screen.
-        SetRect(&rc, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
-		MoveWindow(g_hwndMain, rc.left, rc.top-taskBarHeight, rc.right-rc.left, rc.bottom-rc.top+taskBarHeight, TRUE);
+		MoveWindow(g_hwndMain, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), TRUE);
 
 		::ShowWindow(hwndTaskbar, SW_HIDE);
 	}
 
 	void InitWindowed() {
-		RECT rc;
-
 		//show task bar and other icons
 		SHFullScreen(g_hwndMain, SHFS_SHOWTASKBAR | SHFS_SHOWSTARTICON | 
 					 SHFS_SHOWSIPBUTTON);
 
         // Next resize the main window to the size of the work area.
-		SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, FALSE);
-		MoveWindow(g_hwndMain, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, TRUE);
+		MoveWindow(g_hwndMain, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), TRUE);
 
 		HWND hwndTaskbar = TaskBarFind();
 		::ShowWindow(hwndTaskbar, SW_SHOW);
