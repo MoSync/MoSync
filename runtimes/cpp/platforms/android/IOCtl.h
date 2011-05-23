@@ -485,4 +485,27 @@ namespace Base
 	* \returns 0.
 	*/
 	int _maFileListClose(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* \brief Enables a sensor and starts sending events if the sensor is available.
+	* If the sensor already is enabled this call will have no effect.
+	* \param sensor       The sensor which should be enabled
+	* \param interval     Time interval in which a sensor update shall be triggered
+	*            >0 interval time in milliseconds
+	*            <=0 Any of SensorUpdate enums
+	* \return     0  on success
+	*            -1 if this sensor wasn’t available
+	*            -2 if the interval wasn’t set, could be due to platform limitations
+	*            -3 if the sensor already was enabled    
+	*/
+	int _maSensorStart(int sensor, int interval, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* \brief Disables a sensor so that it doesn’t send any further events
+	* \param sensor    The sensor which should be disabled
+	* \return        0 on success
+	*            	-1 if this sensor wasn’t enabled
+	*            	-2 if there was a problem disabling the sensor
+	*/
+	int _maSensorStop(int sensor, JNIEnv* jNIEnv, jobject jThis);
 }

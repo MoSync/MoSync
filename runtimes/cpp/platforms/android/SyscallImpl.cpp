@@ -1788,6 +1788,21 @@ namespace Base
 				a,
 				mJNIEnv,
 				mJThis);
+
+		case maIOCtl_maSensorStart:
+			SYSLOG("maIOCtl_maSensorStart");
+			return _maSensorStart(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maSensorStop:
+			SYSLOG("maIOCtl_maSensorStop");
+			return _maSensorStop(
+				a,
+				mJNIEnv,
+				mJThis);
 				
 		} // End of switch
 		

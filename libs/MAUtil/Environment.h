@@ -155,6 +155,18 @@ namespace MAUtil {
 		 */
 		virtual void textBoxClosed(int result, int textLength) = 0;
 	};
+
+	/**
+	* \brief A listener for maSensor events.
+	* \see Environment::addSensorListener()
+	*/	
+	class SensorListener {
+	public:
+		/**
+		 * \param 'a' Acceleration minus G on the x, y and z axis .
+		 */
+		virtual void sensorEvent(MASensor a) = 0;
+	};
 	
 	/**
 	* \brief A base class for cross-platform event managers.
@@ -303,6 +315,9 @@ namespace MAUtil {
 		*/
 		void removeTextBoxListener(TextBoxListener* tl);		
 
+		void addSensorListener(SensorListener* tl);
+		void removeSensorListener(SensorListener* tl);
+		
 		/**
 		* Returns a reference to the Environment.
 		* Causes a panic if no Environment exists.
@@ -387,7 +402,11 @@ namespace MAUtil {
 		*/		
 		void fireTextBoxListeners(int result, int textLength);
 				
-		
+		/**
+		* Calls the registered sensor listeners, if any.
+		*/		
+		void fireSensorListeners(MASensor a);
+				
 		/**
 		* Calls the registered ConnListener, if any, for the MAHandle specified by \a data.
 		*/
@@ -425,7 +444,8 @@ namespace MAUtil {
 		ListenerSet<TimerEventInstance> mTimerEvents;
 		ListenerSet<FocusListener> mFocusListeners;
 		ListenerSet<CustomEventListener> mCustomEventListeners;
-		ListenerSet<TextBoxListener> mTextBoxListeners;		
+		ListenerSet<TextBoxListener> mTextBoxListeners;	
+		ListenerSet<SensorListener> mSensorListeners;
 private:
 		static Environment* sEnvironment;
 	};
