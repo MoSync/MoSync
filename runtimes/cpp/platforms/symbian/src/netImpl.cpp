@@ -309,6 +309,9 @@ void Syscall::ConnOp::SendResult(int result) {
 	//LOGS("cops %i 0x%08X\n", mSyscall.gConnOps.IsEmpty(), mSyscall.gConnOps.First());
 	mSyscall.gConnCleanupQue->move(this);
 	//LOGS("cops %i\n", mSyscall.gConnOps.IsEmpty());
+	
+	if(mConn.errorOverride)
+		result = mConn.errorOverride;
 
 	MAEvent event;
 	event.type = EVENT_TYPE_CONN;
@@ -1094,9 +1097,15 @@ void CBtServerSocket::init(RSocketServ& aServer, const TUUID& uuid, bool hasName
 	//next step would be to call mSocket.Accept(). we have maAccept() do that.
 }
 
-CBtServerSocket::~CBtServerSocket() {
-	if(mHandle != 0)
+void CBtServerSocket::CancelAll() {
+	CServerSocket::CancelAll();
+	if(mHandle != 0) {
 		mSdpDB.DeleteRecordL(mHandle);
+		mHandle = 0;
+	}
+}
+
+CBtServerSocket::~CBtServerSocket() {
 }
 
 //******************************************************************************

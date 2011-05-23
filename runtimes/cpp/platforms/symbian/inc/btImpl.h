@@ -69,13 +69,30 @@ RSdp gBtSdp;
 RSdpDatabase gBtSdpDB;
 
 //***************************************************************************
+//Power
+//***************************************************************************
+
+#ifdef __SERIES60_3X__
+CClassSynchronizer<Syscall>* gBtPowerSync;
+CRepository* gBtRepo;
+void BtPowerRunL(TInt aResult);
+#else	// 2nd edition
+CSettingInfo* gBtInfo;
+void HandleNotificationL(SettingInfo::TSettingID aID, const TDesC& aNewValue);
+#endif	//__SERIES60_3X__
+
+//***************************************************************************
 //Functions
 //***************************************************************************
 
 void ClearBluetoothVariables();
 void ConstructBluetoothL();
+void InitBluetoothL();
+void CancelBluetoothConnections();
+void CloseBluetooth();
 void DestructBluetooth();
 
+// can only return eError or eTurnedOff.
 BtState BtCheckPowerState();
 
 static void BtSyncCallbackL(TAny* aPtr, TInt aResult);
