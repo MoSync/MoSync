@@ -2696,13 +2696,20 @@ interface MAAPI {
 		*
 		* There are a few MoSync System Properties. They are unavailable on some devices.
 		* "mosync.imei" and "mosync.imsi" is the device's IMEI and IMSI number, respectively.
+		* The format of these numbers is not specified. It varies from device to device.
 		*
 		* "mosync.iso-639-1" and "mosync.iso-639-2" is the current language used by the system's UI.
 		* Multi-language applications should use this to determine which language to use.
 		*
-		* "mosync.winmobile.locale.SABBREVLANGNAME" is a windows mobile specific property. See http://msdn.microsoft.com/en-us/library/dd373831%28VS.85%29.aspx.
+		* "mosync.winmobile.locale.SABBREVLANGNAME" is a windows mobile specific property.
+		* See http://msdn.microsoft.com/en-us/library/dd373831%28VS.85%29.aspx.
 		*
-		* See http://www.loc.gov/standards/iso639-2/php/code_list.php - The official list of valid ISO-639 codes (online)
+		* See http://www.loc.gov/standards/iso639-2/php/code_list.php -
+		* The official list of valid ISO-639 codes (online).
+		*
+		* "mosync.device" is a description of the device. May include vendor, model name
+		* and firmware version.
+		* The format of this description is not specified. It varies from device to device.
 		*
 		* \param key The property's key.
 		* \param buf A buffer where the value should be written.

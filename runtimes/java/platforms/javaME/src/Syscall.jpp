@@ -2017,6 +2017,8 @@ public
 			if(value != null) {
 				value = value.substring(0, 2);
 			}
+		} else if(key.equals("mosync.device")) {
+			value = System.getProperty("microedition.platform");
 		} else {
 			value = System.getProperty(key);
 		}
