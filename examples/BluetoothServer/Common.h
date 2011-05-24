@@ -41,26 +41,26 @@ MA 02110-1301, USA.
  *  Bluetooth is turned on and that the devices are paired
  *  before running the server and the client applications.
  *
- *  Build and run the server app:
+ *  Build and run the server application:
  *   - Build and run project BluetoothServer.
- *   - Deploy and launch the server app on the first device.
+ *   - Deploy and launch the server application on the first device.
  *   - Note the Bluetooth device address that is displayed,
  *     it is to entered as the value for the variable
  *     sServerAddress in Client.cpp.
  *
- *  Build and run the client app:
+ *  Build and run the client application:
  *   - Edit the value of the variable sServerAddress to be
  *     the address of the server in file Client.cpp in
  *     project BluetoothClient. (If you have not entered
  *     this address, a panic message is shown, and the
- *     app closes).
+ *     application closes).
  *   - Build and run the project BluetoothClient.
  *   - Deploy and launch the client on the second device.
  *
  * How to verify that it works:
  *
- *  In the client app, press keys on key pad or touch the screen,
- *  this sends data to the server app. The data should be displayed
+ *  In the client application, press keys on key pad or touch the screen,
+ *  this sends data to the server application. The data should be displayed
  *  on the server screen.
  *
  *  When a key for a printable character is pressed and it is
@@ -71,12 +71,6 @@ MA 02110-1301, USA.
  *  When touching the screen, the string: "Touch event: <x,y>"
  *  is sent, where <x,y> is the touch coordinate, for example:
  *  "Touch event: 234,318".
- *
- *  When running the programs on a device with a small screen,
- *  like the default MoSync emulator, the output text is truncated.
- *  Select a device with a bigger screen from the profile list,
- *  then run the emulator again. Or modify the source code to
- *  output shorter lines.
  */
 
 #ifndef COMMON_H
@@ -97,7 +91,7 @@ static const char* sServiceUUID = "102030405060708090A0B0C0D0E0F010";
  */
 static void printDivider()
 {
-	printf("-----------------------------------------\n");
+	printf("-----------------------------\n");
 }
 
 #endif // COMMON_H
