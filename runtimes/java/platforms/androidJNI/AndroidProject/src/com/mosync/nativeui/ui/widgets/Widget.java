@@ -187,13 +187,15 @@ public class Widget
 	{
 		if( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
 		{
-			return Integer.toString( getView( ).getWidth( ) -
-					getLayoutParams( ).marginLeft - getLayoutParams( ).marginRight );
+			return Integer.toString( getLayoutParams( ).getWidth() );
+			//return Integer.toString( getView( ).getWidth( ) -
+			//		getLayoutParams( ).marginLeft - getLayoutParams( ).marginRight );
 		}
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
 		{
-			return Integer.toString( getView( ).getHeight( ) -
-					getLayoutParams( ).marginTop - getLayoutParams( ).marginBottom );
+			return Integer.toString(  getLayoutParams( ).getHeight() );
+			//return Integer.toString( getView( ).getHeight( ) -
+			//		getLayoutParams( ).marginTop - getLayoutParams( ).marginBottom );
 		}
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
 		{
