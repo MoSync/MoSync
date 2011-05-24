@@ -112,7 +112,7 @@ public:
 		mIsConnected(false)
 	{
 		// Print instructions.
-		printf("BluetoothClient example program\n");
+		printf("BluetoothClient example\n");
 		printf("Press BACK or 0 to exit.\n");
 		printDivider();
 		printf("Connecting to server...\n");
@@ -139,7 +139,7 @@ public:
 
 		if (result < 0)
 		{
-			printf("Connect failed with error code: %i\n", result);
+			printf("Connect failed. Error: %i\n", result);
 		}
 		else
 		{
@@ -250,13 +250,13 @@ public:
 		{
 			printf("connectFinished error: %i\n", result);
 			printf(
-				"Could not connect to server address:\n%s\n",
+				"Could not connect to server:\n%s\n",
 				sServerAddress);
 		}
 		else
 		{
 			printf("Connected to server.\n");
-			printf("Press a key or touch the screen\n");
+			printf("Press key or touch screen\n");
 			printf("to send data to the server.\n");
 		}
 		printDivider();
