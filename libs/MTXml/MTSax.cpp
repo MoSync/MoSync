@@ -152,10 +152,10 @@ void dataRemains(MTXContext* context, const char* data, int length)
 	outer->dataRemains(outer, data, length);
 }
 
-void parseError(MTXContext* context)
+void parseError(MTXContext* context, int offset)
 {
 	MTXSaxContext* outer = (MTXSaxContext*) context->userData;
-	outer->parseError(outer);
+	outer->parseError(outer, offset);
 }
 
 unsigned char unicodeCharacter(MTXContext* context, int unicode)
@@ -345,10 +345,10 @@ void SaxContextBase::dataRemains(MTXSaxContext* context, const char* data, int l
 	outer->mMtxListener->mtxDataRemains(data, length);
 }
 
-void SaxContextBase::parseError(MTXSaxContext* context)
+void SaxContextBase::parseError(MTXSaxContext* context, int offset)
 {
 	SaxContext* outer = (SaxContext*) context->userData;
-	outer->mSaxListenerW->mtxParseError();
+	outer->mSaxListenerW->mtxParseError(offset);
 }
 
 } /* namespace Mtx */

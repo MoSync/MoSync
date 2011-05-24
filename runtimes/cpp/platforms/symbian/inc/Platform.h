@@ -130,6 +130,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "CSmsHandler.h"
 #endif
 
+// Bluetooth
+#ifdef __SERIES60_3X__
+#include <centralrepository.h>
+#else	//Series 60, 2nd Ed.
+#include <settinginfo.h>
+#endif
+
 class CBaseSocket;
 class CSocket;
 class CHttpConnection;
@@ -138,7 +145,7 @@ class CMySecureSocket;
 
 class CConnection : public CBase {
 protected:
-	CConnection() : state(0), connErr(0) {}
+	CConnection() : state(0), connErr(0), errorOverride(0) {}
 public:
 	virtual ~CConnection() { LOGST("~CConnection"); }
 
@@ -153,9 +160,11 @@ public:
 
 	virtual CHttpConnection* http() { return NULL; }
 	virtual CServerSocket* server() { return NULL; }
+	virtual bool isBluetooth() const { return false; }
 
 	int state;
 	int connErr;
+	int errorOverride;
 };
 
 #ifdef SUPPORT_MOSYNC_SERVER

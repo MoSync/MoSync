@@ -44,7 +44,7 @@ private:
 	virtual void mtxTagStartEnd();
 	virtual void mtxTagData(const char* data, int len);
 	virtual void mtxTagEnd(const char* name, int len);
-	virtual void mtxParseError();
+	virtual void mtxParseError(int offset);
 	virtual void mtxEmptyTagEnd();
 	virtual unsigned char mtxUnicodeCharacter(int unicode);
 

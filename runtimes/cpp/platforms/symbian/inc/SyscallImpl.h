@@ -27,6 +27,7 @@ public MCameraObserver
 , public MRSendSMSObserver
 #else	//Series 60, 2nd Ed.
 , public MSmsObserver
+, public MSettingInfoObserver
 #endif	//__SERIES60_3X__
 #ifdef MMF
 , public MMMFControllerEventMonitorObserver

@@ -166,8 +166,11 @@ struct MTXContext {
 
 	/**
 	* Called when the parser detects an error.
+	* \param offset The approximate location of the error.
+	* This value is the number of bytes from the start of the last buffer provided to
+	* mtxFeed().
 	*/
-	void (*parseError)(MTXContext* context);
+	void (*parseError)(MTXContext* context, int offset);
 
 	/**
 	* Called during UTF-8 processing, if Latin-1 output is selected,
@@ -325,7 +328,7 @@ namespace Mtx {
 		/**
 		* \see MTXContext::parseError
 		*/
-		virtual void mtxParseError() = 0;
+		virtual void mtxParseError(int offset) = 0;
 		/**
 		* \see MTXContext::emptyTagEnd
 		*/

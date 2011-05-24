@@ -26,7 +26,10 @@ mod.class_eval do
 		@EXTRA_INCLUDES = []
 		@IGNORED_FILES = ["new_handler.cc"]
 		@SPECIFIC_CFLAGS = @pipe_specific_cflags
-		
+		if(CONFIG=="debug")
+			@EXTRA_CFLAGS = " -DMOSYNCDEBUG"
+		end
+
 		@EXTRA_OBJECTS = [FileTask.new(self, "crtlib.s")]
 		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + @INSTALL_INCDIR + "/new",
 			FileTask.new(self, "../libsupc++/new"))
