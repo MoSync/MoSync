@@ -36,6 +36,11 @@
      * Used by the gyroscope sensor to process data.
      */
     NSOperationQueue *operationQueue;
+    
+    /**
+     * The flag is set is the proximity sensor is started.
+     */
+    BOOL isProximitySensorRunning;
 }
 
 /**
@@ -83,6 +88,19 @@
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
 -(int) stopGyroscope;
+
+/**
+ * Start the proximity sensor.
+ * @param interval Update interval value.
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int)startProximity;
+
+/**
+ * Stop the proximity sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int) stopProximity;
 
 /**
  * Delivers the latest acceleration data.

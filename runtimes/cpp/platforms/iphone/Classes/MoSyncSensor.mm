@@ -30,6 +30,9 @@
 #include "MosyncMain.h"
 #include <helpers/cpp_defs.h>
 
+// proximity sensor name for the observer 
+NSString *const kProximityStateChangeNotification = @"UIDeviceProximityStateDidChangeNotification";
+
 @implementation MoSyncSensor
 
 /**
@@ -38,6 +41,7 @@
 -(id) init {
     operationQueue = [[NSOperationQueue alloc] init];
     motionManager = [[CMMotionManager alloc] init];
+    isProximitySensorRunning = FALSE;
     
     return [super init];
 }
@@ -57,6 +61,9 @@
         case SENSOR_TYPE_GYROSCOPE:
             result = [self startGyroscope:value];
             break;
+        case SENSOR_TYPE_PROXIMITY:
+            result = [self startProximity];
+            break;    
         default:
             result = SENSOR_ERROR_NOT_AVAILABLE;
     }
@@ -78,6 +85,9 @@
         case SENSOR_TYPE_GYROSCOPE:
             result = [self stopGyroscope];
             break;
+        case SENSOR_TYPE_PROXIMITY:
+            result = [self stopProximity];
+            break;    
         default:
             result = SENSOR_ERROR_NOT_AVAILABLE;
     }
@@ -202,6 +212,49 @@
 }
 
 /**
+ * Start the proximity sensor.
+ * @param interval Update interval value.
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int)startProximity {
+    UIDevice *device = [UIDevice currentDevice];
+    
+    if(isProximitySensorRunning) {
+        return SENSOR_ERROR_ALREADY_ENABLED;
+    }   
+    
+    // start the proximity sensor
+    device.proximityMonitoringEnabled = YES;
+    
+    // check if the proximity sensor is available
+    if(YES == device.proximityMonitoringEnabled) {
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(proximityChanged) name:kProximityStateChangeNotification object:nil];
+    } else {
+        return SENSOR_ERROR_NOT_AVAILABLE;
+    }
+    
+    isProximitySensorRunning = TRUE;
+    return SENSOR_ERROR_NONE;
+}
+
+/**
+ * Stop the proximity sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int)stopProximity {
+    UIDevice *device = [UIDevice currentDevice];
+    if(isProximitySensorRunning) {
+        device.proximityMonitoringEnabled = NO;
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        isProximitySensorRunning = FALSE;
+    } else {
+        return SENSOR_ERROR_NOT_ENABLED;
+    }    
+    
+    return SENSOR_ERROR_NONE;
+}
+
+/**
  * Delivers the latest acceleration data.
  * @param accelerometer The application's accelerometer object.
  * @param acceleration The most recent acceleration data.
@@ -215,6 +268,20 @@
 	event.sensor.values[1] = acceleration.y;
 	event.sensor.values[2] = acceleration.z;
     
+	Base::gEventQueue.put(event);
+}
+
+/**
+ * Delivers the latest data from proximity sensor.
+ */
+-(void)proximityChanged{
+    UIDevice *device = [UIDevice currentDevice];
+    float sensorValue = [device proximityState];
+    
+    MAEvent event;
+	event.type = EVENT_TYPE_SENSOR;
+	event.sensor.type = SENSOR_TYPE_PROXIMITY;
+	event.sensor.values[0] = sensorValue;
 	Base::gEventQueue.put(event);
 }
 
