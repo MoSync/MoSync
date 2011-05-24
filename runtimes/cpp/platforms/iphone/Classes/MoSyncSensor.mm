@@ -15,14 +15,32 @@
  02111-1307, USA.
  */
 
+
+// sensor update interval values in milliseconds
+#define SENSOR_RATE_FASTEST_IOS 20
+#define SENSOR_RATE_GAME_IOS    50
+#define SENSOR_RATE_NORMAL_IOS  70
+#define SENSOR_RATE_UI_IOS      100
+
 // used for converting milliseconds in seconds
 #define SECOND 1000.0
 
 #import "MoSyncSensor.h"
 
 #include "MosyncMain.h"
+#include <helpers/cpp_defs.h>
 
 @implementation MoSyncSensor
+
+/**
+ * Init function.
+ */
+-(id) init {
+    operationQueue = [[NSOperationQueue alloc] init];
+    motionManager = [[CMMotionManager alloc] init];
+    
+    return [super init];
+}
 
 /**
  * Start a sensor.
@@ -35,11 +53,14 @@
     switch (sensorType) {
         case SENSOR_TYPE_ACCELEROMETER:
             result = [self startAccelerometer:value];
-            break;            
+            break;  
+        case SENSOR_TYPE_GYROSCOPE:
+            result = [self startGyroscope:value];
+            break;
         default:
             result = SENSOR_ERROR_NOT_AVAILABLE;
     }
-    
+   
     return result;
 }
 
@@ -53,7 +74,10 @@
     switch (sensorType) {
         case SENSOR_TYPE_ACCELEROMETER:
             result = [self stopAccelerometer];
-            break;            
+            break;      
+        case SENSOR_TYPE_GYROSCOPE:
+            result = [self stopGyroscope];
+            break;
         default:
             result = SENSOR_ERROR_NOT_AVAILABLE;
     }
@@ -119,6 +143,65 @@
 }
 
 /**
+ * Start the gyroscope sensor.
+ * @param interval Update interval value.
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int) startGyroscope:(int)interval {
+    if([motionManager isGyroActive]) {
+        return SENSOR_ERROR_ALREADY_ENABLED;
+    }
+    
+    if(SENSOR_RATE_UI > interval) {
+        return SENSOR_ERROR_INTERVAL_NOT_SET;
+    }
+    
+    // check if gyroscope is available.
+    if([motionManager isGyroAvailable]) {
+        
+        // set the update interval(the value must be in seconds so we need to convert it from milliseconds).
+        float updateValue = interval;
+        motionManager.gyroUpdateInterval = updateValue / SECOND;
+        
+        // start gyroscope sensor.
+        [motionManager startGyroUpdatesToQueue:operationQueue
+                                   withHandler: ^(CMGyroData *gyroData, NSError *error) 
+                                                  {
+                                                      CMRotationRate rotate = gyroData.rotationRate;
+                                                    
+                                                      MAEvent event;
+                                                      event.type = EVENT_TYPE_SENSOR;
+                                                      event.sensor.type = SENSOR_TYPE_GYROSCOPE;
+                                                      
+                                                      event.sensor.values[0] = rotate.x;
+                                                      event.sensor.values[1] = rotate.y;
+                                                      event.sensor.values[2] = rotate.z;
+                                                      
+                                                      Base::gEventQueue.put(event);
+                                                  }];
+        
+        
+    } else {
+        return SENSOR_ERROR_NOT_AVAILABLE;
+    }
+    
+    return SENSOR_ERROR_NONE;
+}
+
+/**
+ * Stop the gyroscope sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int) stopGyroscope {
+    if(![motionManager isGyroActive]) {
+        return SENSOR_ERROR_NOT_ENABLED;
+    }
+    
+    [motionManager stopGyroUpdates];    
+    return SENSOR_ERROR_NONE;
+}
+
+/**
  * Delivers the latest acceleration data.
  * @param accelerometer The application's accelerometer object.
  * @param acceleration The most recent acceleration data.
@@ -139,7 +222,15 @@
  * Release all the objects.
  */
 - (void) dealloc {
+    // stop all sensors
+    [self stopAccelerometer];
+    [self stopGyroscope];
+    
     [accelerometer release];
+    [motionManager release];
+    [operationQueue release];
+    
     [super dealloc];
  }
+
 @end
