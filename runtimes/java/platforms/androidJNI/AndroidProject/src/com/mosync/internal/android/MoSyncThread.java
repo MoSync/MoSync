@@ -83,6 +83,7 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.net.Uri;
 import android.opengl.GLUtils;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -2008,6 +2009,10 @@ public class MoSyncThread extends Thread
 		{
 			Locale locale = Locale.getDefault();
 			property = locale.getISO3Language();
+		}
+		else if(key.equals("mosync.device"))
+		{
+			property = Build.FINGERPRINT;
 		}
 		
 		if (null == property) { return -2; }
