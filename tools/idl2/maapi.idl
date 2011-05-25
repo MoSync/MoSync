@@ -2715,7 +2715,7 @@ interface MAAPI {
 		* \param buf A buffer where the value should be written.
 		* \param size The size of the buffer, in bytes.
 		* \returns The length of the value, including the terminating zero.
-		* If this is less than \a size, the value will not have been copied to be buffer.
+		* If this is greater than \a size, the value will not have been copied to be buffer.
 		* In that case, you can make a bigger buffer and try again.
 		* If the property did not exist (System.getProperty() returned null),
 		* -2 will be returned.

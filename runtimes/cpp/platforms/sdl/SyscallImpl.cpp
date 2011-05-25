@@ -2693,7 +2693,7 @@ namespace Base {
 #endif
 		if(strcmp(key, "mosync.device") == 0) {
 			static const char model[] = "MoSync Emulator";
-			if(size >= sizeof(model)) {
+			if(size >= (int)sizeof(model)) {
 				memcpy(buf, model, sizeof(model));
 			}
 			return sizeof(model);
