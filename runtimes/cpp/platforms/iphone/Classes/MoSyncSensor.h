@@ -41,6 +41,11 @@
      * The flag is set is the proximity sensor is started.
      */
     BOOL isProximitySensorRunning;
+    
+    /**
+     * The flag is set is the orientation sensor is started.
+     */
+    BOOL isOrientationSensorRunning;
 }
 
 /**
@@ -81,7 +86,7 @@
  * @param interval Update interval value.
  * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
  */
--(int)startGyroscope:(int) interval;
+-(int)startGyroscope:(int)interval;
 
 /**
  * Stop the gyroscope sensor.
@@ -91,7 +96,6 @@
 
 /**
  * Start the proximity sensor.
- * @param interval Update interval value.
  * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
  */
 -(int)startProximity;
@@ -101,6 +105,18 @@
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
 -(int) stopProximity;
+
+/**
+ * Start the proximity sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int)startOrientation;
+
+/**
+ * Stop the orientation sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int) stopOrientation;
 
 /**
  * Delivers the latest acceleration data.

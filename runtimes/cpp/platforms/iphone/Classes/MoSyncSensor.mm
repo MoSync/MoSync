@@ -30,9 +30,6 @@
 #include "MosyncMain.h"
 #include <helpers/cpp_defs.h>
 
-// proximity sensor name for the observer 
-NSString *const kProximityStateChangeNotification = @"UIDeviceProximityStateDidChangeNotification";
-
 @implementation MoSyncSensor
 
 /**
@@ -41,7 +38,9 @@ NSString *const kProximityStateChangeNotification = @"UIDeviceProximityStateDidC
 -(id) init {
     operationQueue = [[NSOperationQueue alloc] init];
     motionManager = [[CMMotionManager alloc] init];
+    
     isProximitySensorRunning = FALSE;
+    isOrientationSensorRunning = FALSE;
     
     return [super init];
 }
@@ -63,6 +62,9 @@ NSString *const kProximityStateChangeNotification = @"UIDeviceProximityStateDidC
             break;
         case SENSOR_TYPE_PROXIMITY:
             result = [self startProximity];
+            break;    
+        case SENSOR_TYPE_ORIENTATION:
+            result = [self startOrientation];
             break;    
         default:
             result = SENSOR_ERROR_NOT_AVAILABLE;
@@ -88,6 +90,9 @@ NSString *const kProximityStateChangeNotification = @"UIDeviceProximityStateDidC
         case SENSOR_TYPE_PROXIMITY:
             result = [self stopProximity];
             break;    
+        case SENSOR_TYPE_ORIENTATION:
+            result = [self stopOrientation];
+            break;     
         default:
             result = SENSOR_ERROR_NOT_AVAILABLE;
     }
@@ -213,7 +218,6 @@ NSString *const kProximityStateChangeNotification = @"UIDeviceProximityStateDidC
 
 /**
  * Start the proximity sensor.
- * @param interval Update interval value.
  * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
  */
 -(int)startProximity {
@@ -228,7 +232,7 @@ NSString *const kProximityStateChangeNotification = @"UIDeviceProximityStateDidC
     
     // check if the proximity sensor is available
     if(YES == device.proximityMonitoringEnabled) {
-        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(proximityChanged) name:kProximityStateChangeNotification object:nil];
+        [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(proximityChanged) name:UIDeviceProximityStateDidChangeNotification object:nil];
     } else {
         return SENSOR_ERROR_NOT_AVAILABLE;
     }
@@ -243,10 +247,49 @@ NSString *const kProximityStateChangeNotification = @"UIDeviceProximityStateDidC
  */
 -(int)stopProximity {
     UIDevice *device = [UIDevice currentDevice];
+    
     if(isProximitySensorRunning) {
         device.proximityMonitoringEnabled = NO;
-        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceProximityStateDidChangeNotification object:nil];
         isProximitySensorRunning = FALSE;
+    } else {
+        return SENSOR_ERROR_NOT_ENABLED;
+    }    
+    
+    return SENSOR_ERROR_NONE;
+}
+
+
+/**
+ * Start the orientation sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int)startOrientation {
+    
+    if(isOrientationSensorRunning) {
+        return SENSOR_ERROR_ALREADY_ENABLED;
+    }   
+    
+    // start the orientation sensor
+    UIDevice *device = [UIDevice currentDevice];
+    [device beginGeneratingDeviceOrientationNotifications];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged) name:UIDeviceOrientationDidChangeNotification object:nil];
+    isOrientationSensorRunning = TRUE;
+    
+    return SENSOR_ERROR_NONE;
+}
+
+/**
+ * Stop the orientation sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int)stopOrientation {
+    UIDevice *device = [UIDevice currentDevice];
+    
+    if(isOrientationSensorRunning) {
+        [device endGeneratingDeviceOrientationNotifications];
+        [[NSNotificationCenter defaultCenter] removeObserver:self name:UIDeviceOrientationDidChangeNotification object:nil];
+        isOrientationSensorRunning = FALSE;
     } else {
         return SENSOR_ERROR_NOT_ENABLED;
     }    
@@ -281,6 +324,20 @@ NSString *const kProximityStateChangeNotification = @"UIDeviceProximityStateDidC
     MAEvent event;
 	event.type = EVENT_TYPE_SENSOR;
 	event.sensor.type = SENSOR_TYPE_PROXIMITY;
+	event.sensor.values[0] = sensorValue;
+	Base::gEventQueue.put(event);
+}
+
+/**
+ * Delivers the latest data from orientation sensor.
+ */
+-(void)orientationChanged{
+    UIDevice *device = [UIDevice currentDevice];
+    float sensorValue = [device orientation];
+    
+    MAEvent event;
+	event.type = EVENT_TYPE_SENSOR;
+	event.sensor.type = SENSOR_TYPE_ORIENTATION;
 	event.sensor.values[0] = sensorValue;
 	Base::gEventQueue.put(event);
 }
