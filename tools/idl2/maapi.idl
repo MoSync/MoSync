@@ -4861,12 +4861,19 @@ group WidgetAPI "Widget API" {
 		}
 		
 		constset int UIDEVICE_ORIENTATION {
+		    // The orientation of the device cannot be determined.
 			UNKNOWN = 0;
+			// The device is in portrait mode, with the device held upright and the home button at the bottom.
 			PORTRAIT = 1;
+			// The device is in portrait mode but upside down, with the device held upright and the home button at the top.
 			PORTRAIT_UPSIDE_DOWN = 2;
+			// The device is in landscape mode, with the device held upright and the home button on the right side.
 			LANDSCAPE_LEFT = 3;
+			// The device is in landscape mode, with the device held upright and the home button on the left side.
 			LANDSCAPE_RIGHT = 4;
+			// The device is held parallel to the ground with the screen facing upwards.
 			FACE_UP = 5;
+			// The device is held parallel to the ground with the screen facing downwards.
 			FACE_DOWN = 6;
 		}
 		

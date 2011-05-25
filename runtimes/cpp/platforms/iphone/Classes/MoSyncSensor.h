@@ -17,11 +17,12 @@
 
 #import <UIKit/UIKit.h>
 #import <CoreMotion/CoreMotion.h>
+#import <CoreLocation/CoreLocation.h>
 
 /**
  * A class for handling sensors.
  */
-@interface MoSyncSensor : NSObject<UIAccelerometerDelegate> {
+@interface MoSyncSensor : NSObject<UIAccelerometerDelegate, CLLocationManagerDelegate> {
     /**
      * Accelerometer object.
      */
@@ -38,6 +39,11 @@
     NSOperationQueue *operationQueue;
     
     /**
+     * Used to acces data from the magnetometer(compass) sensor.
+     */
+    CLLocationManager *locationManager;
+    
+    /**
      * The flag is set is the proximity sensor is started.
      */
     BOOL isProximitySensorRunning;
@@ -46,6 +52,11 @@
      * The flag is set is the orientation sensor is started.
      */
     BOOL isOrientationSensorRunning;
+    
+    /**
+     * The flag is set is the magnetometer sensor is started.
+     */
+    BOOL isMagnetometerSensorRunning;
 }
 
 /**
@@ -117,6 +128,18 @@
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
 -(int) stopOrientation;
+
+/**
+ * Start the magnetometer sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int)startMagnetometer;
+
+/**
+ * Stop the magnetometer sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int) stopMagnetometer;
 
 /**
  * Delivers the latest acceleration data.

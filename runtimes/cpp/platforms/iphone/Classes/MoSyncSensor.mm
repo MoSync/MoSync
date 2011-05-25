@@ -38,9 +38,11 @@
 -(id) init {
     operationQueue = [[NSOperationQueue alloc] init];
     motionManager = [[CMMotionManager alloc] init];
+    locationManager = [[CLLocationManager alloc] init];
     
     isProximitySensorRunning = FALSE;
     isOrientationSensorRunning = FALSE;
+    isMagnetometerSensorRunning = FALSE;
     
     return [super init];
 }
@@ -65,6 +67,9 @@
             break;    
         case SENSOR_TYPE_ORIENTATION:
             result = [self startOrientation];
+            break;    
+        case SENSOR_TYPE_MAGNETIC_FIELD:
+            result = [self startMagnetometer];
             break;    
         default:
             result = SENSOR_ERROR_NOT_AVAILABLE;
@@ -92,6 +97,9 @@
             break;    
         case SENSOR_TYPE_ORIENTATION:
             result = [self stopOrientation];
+            break;  
+        case SENSOR_TYPE_MAGNETIC_FIELD:
+            result = [self stopMagnetometer];
             break;     
         default:
             result = SENSOR_ERROR_NOT_AVAILABLE;
@@ -298,6 +306,43 @@
 }
 
 /**
+ * Start the magnetometer sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
+ */
+-(int)startMagnetometer {
+    if(![CLLocationManager headingAvailable]) {
+        return SENSOR_ERROR_NOT_AVAILABLE;
+    }
+    
+    if(isMagnetometerSensorRunning) {
+        return SENSOR_ERROR_ALREADY_ENABLED;
+    }   
+    
+    // start the magnetometer sensor
+    locationManager.delegate = self;
+    [locationManager startUpdatingHeading];
+    isMagnetometerSensorRunning = TRUE;
+    
+    return SENSOR_ERROR_NONE;
+}
+
+/**
+ * Stop the magnetometer sensor.
+ * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
+ */
+-(int)stopMagnetometer {
+    if(isMagnetometerSensorRunning) {
+        locationManager.delegate = self;
+        [locationManager stopUpdatingHeading];
+        isMagnetometerSensorRunning = FALSE;
+    } else {
+        return SENSOR_ERROR_NOT_ENABLED;
+    }
+    
+    return SENSOR_ERROR_NONE;
+}
+
+/**
  * Delivers the latest acceleration data.
  * @param accelerometer The application's accelerometer object.
  * @param acceleration The most recent acceleration data.
@@ -317,7 +362,7 @@
 /**
  * Delivers the latest data from proximity sensor.
  */
--(void)proximityChanged{
+-(void)proximityChanged {
     UIDevice *device = [UIDevice currentDevice];
     float sensorValue = [device proximityState];
     
@@ -331,7 +376,7 @@
 /**
  * Delivers the latest data from orientation sensor.
  */
--(void)orientationChanged{
+-(void)orientationChanged {
     UIDevice *device = [UIDevice currentDevice];
     float sensorValue = [device orientation];
     
@@ -343,16 +388,37 @@
 }
 
 /**
+ * This delegate method is invoked when the magnetometer sensor has new data.
+ * @param manager The location manager object.
+ * @param heading The new heading data.
+ */
+ - (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)heading {
+    MAEvent event;
+	event.type = EVENT_TYPE_SENSOR;
+    event.sensor.type = SENSOR_TYPE_MAGNETIC_FIELD;
+     
+	event.sensor.values[0] = heading.x;
+    event.sensor.values[1] = heading.y;
+    event.sensor.values[2] = heading.z;
+	
+    Base::gEventQueue.put(event);
+}    
+
+/**
  * Release all the objects.
  */
 - (void) dealloc {
     // stop all sensors
     [self stopAccelerometer];
     [self stopGyroscope];
+    [self stopProximity];
+    [self stopOrientation];
+    [self stopMagnetometer];
     
     [accelerometer release];
     [motionManager release];
     [operationQueue release];
+    [locationManager release];
     
     [super dealloc];
  }
