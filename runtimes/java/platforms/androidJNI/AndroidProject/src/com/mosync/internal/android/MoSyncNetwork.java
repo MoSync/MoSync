@@ -133,6 +133,26 @@ public class MoSyncNetwork
 	}
 
 	/**
+	 * Called from MoSyncThread when Bluetooth is turned off.
+	 * Here we close Bluetooth connections.
+	 */
+	public void bluetoothTurnedOff()
+	{
+		// Close Bluetooth connections.
+		for (ConnectionObject connObj : mConnectionTable.values()) 
+		{
+			try
+			{
+				connObj.bluetoothTurnedOff();
+			}
+			catch (IOException ex)
+			{
+				ex.printStackTrace();
+			}
+		}
+	}
+	
+	/**
 	 * @return The MoSync data section memory buffer.
 	 */
 	public ByteBuffer getMemDataSection()
@@ -147,7 +167,7 @@ public class MoSyncNetwork
 	{
 		mMoSyncThread.postEvent(event);
 	}
-	
+
 	/**
 	 * Initiates a connection and if successful, adds the new connection to the 
 	 * table of open connections.
@@ -290,7 +310,8 @@ public class MoSyncNetwork
 			// Keep an eye of this, if it will cause problems.
 			removeConnectionObject(connObj);
 			
-			connObj.close();
+			// Pass true to indicate a controlled cancel.
+			connObj.closeConnection(true);
 		}
 		catch (IOException ex)
 		{
@@ -717,9 +738,16 @@ public class MoSyncNetwork
 			mMoSyncNetwork.postEvent(event);
 		}
 		
-		public void close() throws IOException
+		/**
+		 * Closes the connection.
+		 * @param softCancel true if the cancel is "soft", that is requested
+		 * by the application. This is considered as a normal condition.
+		 * false is closed as result of an error.
+		 * @throws IOException
+		 */
+		public void closeConnection(boolean softCancel) throws IOException
 		{
-			mCancelled = true;
+			mCancelled = softCancel;
 			
 			if (getInputStream() != null)
 			{
@@ -733,6 +761,15 @@ public class MoSyncNetwork
 				getOutputStream().close();
 				Log.i("@@ConnectionObject", "closing output stream done");
 			}
+		}
+		
+		/**
+		 * Sent when Bluetooth is turned off.
+		 * @throws IOException
+		 */
+		public void bluetoothTurnedOff() throws IOException
+		{
+			// This method is implemented in relevant subclasses.
 		}
 		
 		/**
@@ -1277,11 +1314,18 @@ public class MoSyncNetwork
 				
 			super.writeFromData(data, offset, size);
 		}
-		
+
+		/**
+		 * Closes the connection.
+		 * @param softCancel true if the cancel is "soft", that is requested
+		 * by the application. This is considered as a normal condition.
+		 * false is closed as result of an error.
+		 * @throws IOException
+		 */
 		@Override
-		public void close() throws IOException
+		public void closeConnection(boolean softCancel) throws IOException
 		{
-			super.close();
+			super.closeConnection(softCancel);
 			
 			mUrlConnection = null;
 		}
@@ -1339,7 +1383,7 @@ public class MoSyncNetwork
 				
 				//mHttpState = HTTP_STATE_FINISHED;
 				
-				// Why synchronized at this particular point?
+				// TODO: Why synchronized at this particular point?
 				synchronized(this) 
 				{
 					if (mCancelled) 
@@ -1833,13 +1877,20 @@ public class MoSyncNetwork
 				0, // Port
 				addr);
 		}
-		
+
+		/**
+		 * Closes the connection.
+		 * @param softCancel true if the cancel is "soft", that is requested
+		 * by the application. This is considered as a normal condition.
+		 * false is closed as result of an error.
+		 * @throws IOException
+		 */
 		@Override
-		public void close() throws IOException
+		public void closeConnection(boolean softCancel) throws IOException
 		{
 			Log.i("@@BluetoothConnectionObject", "close handle: " + mHandle);
 			
-			super.close();
+			super.closeConnection(softCancel);
 			
 			Log.i("@@BluetoothConnectionObject", "close 2 handle: " + mHandle);
 			
@@ -1850,6 +1901,15 @@ public class MoSyncNetwork
 				mBluetoothSocket = null;
 				Log.i("@@BluetoothConnectionObject", "closing socket done");
 			}
+		}
+
+		/**
+		 * Sent when Bluetooth is turned off.
+		 * @throws IOException
+		 */
+		public void bluetoothTurnedOff() throws IOException
+		{
+			closeConnection(false);
 		}
 		
 		public void setBluetoothSocketAndOpenStreams(BluetoothSocket socket)
@@ -2082,16 +2142,23 @@ public class MoSyncNetwork
 				0, // Port
 				getMoSyncBluetooth().getDefaultAdapterAddressAsBytes());
 		}
-		
+
+		/**
+		 * Closes the connection.
+		 * @param softCancel true if the cancel is "soft", that is requested
+		 * by the application. This is considered as a normal condition.
+		 * false is closed as result of an error.
+		 * @throws IOException
+		 */
 		@Override
-		public void close() throws IOException
+		public void closeConnection(boolean softCancel) throws IOException
 		{
 			Log.i("@@BluetoothServerConnectionObject", 
 				"close handle: " + mHandle);
 			
-			// Superclass closes the streams and sets 
-			// mCancelled = true, should be what be want.
-			super.close();
+			// Superclass closes the streams and sets mCancelled
+			// to the value of softCancel.
+			super.closeConnection(softCancel);
 			
 			if (null != mBluetoothServerSocket)
 			{
@@ -2100,6 +2167,17 @@ public class MoSyncNetwork
 				mBluetoothServerSocket.close();
 				mBluetoothServerSocket = null;
 			}
+		}
+		
+		/**
+		 * Sent when Bluetooth is turned off.
+		 * @throws IOException
+		 */
+		public void bluetoothTurnedOff() throws IOException
+		{
+			// This will close the connection and cause an exception
+			// in the accept operation.
+			closeConnection(false);
 		}
 		
 		/**
