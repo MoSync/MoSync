@@ -42,10 +42,10 @@ cpath = pwd
 
 sh "ruby addLibraries.rb"
 
-firstarg = ARGV[0]
-secondarg = ARGV[1]
-thirdarg = ARGV[2]
-fortharg = ARGV[3]
+androidNDKPath = ARGV[0]
+androidSDKPath = ARGV[1]
+configPath = ARGV[2]
+debugFlag = ARGV[3]
 
 if ENV['MOSYNC_SRC'] == nil
 	cd "../../../../"
@@ -65,21 +65,21 @@ cd cpath
 
 ENV['MOSYNC_JAVA_SRC'] = cpath
 
-if firstarg == nil
+if androidNDKPath == nil
 	puts "missing argument, android NDK path is unknown!"
 	exit 1
 end
 
-if secondarg == nil
+if androidSDKPath == nil
 	puts "missing argument, android SDK path is unknown!"
 	exit 1
 end
 
-debug = (fortharg == nil) ? "" : "D"
+debug = (debugFlag == nil) ? "" : "D"
 
 outdir = ".."
-if thirdarg != nil
-	outdir = thirdarg
+if configPath != nil
+	outdir = configPath
 	
 	# change name on the current config_platform.h to config_platform.h.saved
 
@@ -89,7 +89,7 @@ if thirdarg != nil
 		FileUtils.copy_file conf_file, File.join(mosyncppsource, "config_platform.h.saved")
 	end
 
-	runtime_config = File.join(thirdarg, "config#{debug}.h") 
+	runtime_config = File.join(configPath, "config#{debug}.h")
 	puts "using runtime #{runtime_config}"
 	
 	# copy the config.h file to it's correct position and change it's name to config_platform.h
@@ -104,21 +104,35 @@ cd "AndroidProject"
 if ENV['OS'] == "Windows_NT"
 	# convert a copy of cygwin.sh to unix-style line endings, so bash can run it.
 	FileUtils.copy_file("#{cpath}/cygwin.sh", "#{cpath}/cygwin_u.sh")
-	success = system "/cygwin/bin/bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin_u.sh)\""
+	if(File.exist?("/cygwin/bin/bash.exe"))
+		cygPath = "/cygwin/bin/bash.exe"
+	elsif(nil != ENV["CYGPATH"])
+		cygPath = ENV["CYGPATH"]
+	elsif(system("bash.exe pwd"))
+		cygPath = ""
+	else
+		msg = "Can not find the cygwin installation.\n" +
+			  "It is either not installed or cannot be found in the default location"+
+			  "or it is not included in PATH.\n"+
+			  " If it is installed try adding your cygwin bin directory to either" +
+			  "PATH or CYGPATH environmental variable"
+		raise Exception.new(msg)
+	end
+	success = system "#{cygPath}bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin_u.sh)\""
 	if (!success)
-		exitBuilder(1, mosyncppsource, thirdarg)
+		exitBuilder(1, mosyncppsource, configPath)
 	end
 
-	success = system "/cygwin/bin/bash.exe --login -i #{File.join(cpath, "cygwin_u.sh")} #{firstarg} #{secondarg} #{ENV['MOSYNC_SRC']}"
+	success = system "#{cygPath}bash.exe --login -i #{File.join(cpath, "cygwin_u.sh")} #{androidNDKPath} #{androidSDKPath} #{ENV['MOSYNC_SRC']}"
 else
-	success = system("#{File.join(cpath, "invoke-ndk-build.sh")} #{firstarg} #{secondarg} $MOSYNC_SRC");
+	success = system("#{File.join(cpath, "invoke-ndk-build.sh")} #{androidNDKPath} #{androidSDKPath} $MOSYNC_SRC");
 end
 
 if (!success)
-	exitBuilder(1, mosyncppsource, thirdarg)
+	exitBuilder(1, mosyncppsource, configPath)
 end
 
-# Go to Android Java runtime root directory.
+puts "Getting into to Android Java runtime root directory."
 cd ".."
 puts pwd
 
@@ -133,14 +147,19 @@ Dir.mkdir class_dir; # No such directory/file.. create a temp directory
 
 # Don't build Android package file; it'll be done later, by the packager.
 package_root = "#{cpath}/AndroidProject/"
+
+if(!File.exist?("#{package_root}/gen"))
+	mkdir("#{package_root}/gen")
+end
+
 success = system(
-	"#{File.join(secondarg, "tools/aapt")} package -f -v " +
+	"#{File.join(androidSDKPath, "tools/aapt")} package -f -v " +
 	"-M #{File.join(package_root,"AndroidManifest.xml")} -F resources.ap_ " +
-	"-I #{File.join(secondarg, "android.jar")} " +
+	"-I #{File.join(androidSDKPath, "android.jar")} " +
 	"-S #{File.join(package_root, "res")} " +
-	"-m -J #{File.join(package_root, "src")}");
+	"-m -J #{File.join(package_root, "gen")}");
 	
-puts "Compile Java Source Files\n\n"
+puts "Compiling Java Source Files\n\n"
 
 packages = ["src/com/mosync/java/android/*.java",
             "src/com/mosync/internal/android/*.java",
@@ -160,10 +179,10 @@ java_files = packages.map { |package| File.join(package_root, package) }.join(" 
 sh(
 	"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
 	"-classpath " +
-	"#{File.join(secondarg, "android.jar")} " + java_files)
+	"#{File.join(androidSDKPath, "android.jar")} " + java_files)
 
 if (!success)
-	exitBuilder(1, mosyncppsource, thirdarg)
+	exitBuilder(1, mosyncppsource, configPath)
 end
 
 puts "Copy Generated Library File\n\n"
@@ -182,7 +201,7 @@ else
 	success = system("zip -r MoSyncRuntime#{debug}.zip .");
 end
 if (!success)
-	exitBuilder(1, mosyncppsource, thirdarg)
+	exitBuilder(1, mosyncppsource, configPath)
 end
 
 FileUtils.copy_file( "MoSyncRuntime#{debug}.zip", File.join(outdir, "MoSyncRuntime#{debug}.zip"))
@@ -193,6 +212,6 @@ cd ".."
 FileUtils.rm_rf class_dir
 
 if (!success)
-	exitBuilder(0, mosyncppsource, thirdarg)
+	exitBuilder(0, mosyncppsource, configPath)
 end
 

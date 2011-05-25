@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1">
+<project supports-build-configs="true" version="1.2">
 <build.cfg id="Benchmark - Debug" types="Debug"/>
 <build.cfg id="Benchmark - Release" types="Release"/>
 <build.cfg id="Render - Debug" types="Debug"/>
 <build.cfg id="Render - Release" types="Release"/>
 <properties>
-<property key="build.prefs:additional.include.paths" value=""/>
-<property key="build.prefs:additional.include.paths/Benchmark - Debug" value="./inc"/>
-<property key="build.prefs:additional.include.paths/Benchmark - Release" value="./inc"/>
-<property key="build.prefs:additional.include.paths/Render - Debug" value="./inc"/>
-<property key="build.prefs:additional.include.paths/Render - Release" value="./inc"/>
-<property key="build.prefs:additional.libraries" value=""/>
-<property key="build.prefs:additional.libraries/Benchmark - Debug" value=""/>
-<property key="build.prefs:additional.libraries/Benchmark - Release" value=""/>
-<property key="build.prefs:additional.libraries/Render - Debug" value=""/>
-<property key="build.prefs:additional.libraries/Render - Release" value=""/>
-<property key="build.prefs:additional.library.paths" value=""/>
-<property key="build.prefs:additional.library.paths/Benchmark - Debug" value=""/>
-<property key="build.prefs:additional.library.paths/Benchmark - Release" value=""/>
-<property key="build.prefs:additional.library.paths/Render - Debug" value=""/>
-<property key="build.prefs:additional.library.paths/Render - Release" value=""/>
+<property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
+<property key="build.prefs:additional.include.paths/Benchmark - Debug" value="%mosync-home%/include, inc"/>
+<property key="build.prefs:additional.include.paths/Benchmark - Release" value="%mosync-home%/include, inc"/>
+<property key="build.prefs:additional.include.paths/Render - Debug" value="%mosync-home%/include, inc"/>
+<property key="build.prefs:additional.include.paths/Render - Release" value="%mosync-home%/include, inc"/>
+<property key="build.prefs:additional.libraries" value="mastd.lib"/>
+<property key="build.prefs:additional.libraries/Benchmark - Debug" value="mastd.lib"/>
+<property key="build.prefs:additional.libraries/Benchmark - Release" value="mastd.lib"/>
+<property key="build.prefs:additional.libraries/Render - Debug" value="mastd.lib"/>
+<property key="build.prefs:additional.libraries/Render - Release" value="mastd.lib"/>
+<property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
+<property key="build.prefs:additional.library.paths/Benchmark - Debug" value="%mosync-home%/lib/pipe"/>
+<property key="build.prefs:additional.library.paths/Benchmark - Release" value="%mosync-home%/lib/pipe"/>
+<property key="build.prefs:additional.library.paths/Render - Debug" value="%mosync-home%/lib/pipe"/>
+<property key="build.prefs:additional.library.paths/Render - Release" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:app.output.path/Benchmark - Debug" value="benchmark_debug"/>
 <property key="build.prefs:app.output.path/Benchmark - Release" value="benchmark_release"/>
 <property key="build.prefs:app.output.path/Render - Debug" value="render_debug"/>
@@ -41,6 +41,21 @@
 <property key="build.prefs:gcc.switches/Render - Debug" value="-O0 -g"/>
 <property key="build.prefs:gcc.switches/Render - Release" value="-O2"/>
 <property key="build.prefs:gcc.warnings" value="0"/>
+<property key="build.prefs:ignore.default.include.paths" value="true"/>
+<property key="build.prefs:ignore.default.include.paths/Benchmark - Debug" value="true"/>
+<property key="build.prefs:ignore.default.include.paths/Benchmark - Release" value="true"/>
+<property key="build.prefs:ignore.default.include.paths/Render - Debug" value="true"/>
+<property key="build.prefs:ignore.default.include.paths/Render - Release" value="true"/>
+<property key="build.prefs:ignore.default.libraries" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Benchmark - Debug" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Benchmark - Release" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Render - Debug" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Render - Release" value="true"/>
+<property key="build.prefs:ignore.default.library.paths" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Benchmark - Debug" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Benchmark - Release" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Render - Debug" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Render - Release" value="true"/>
 <property key="build.prefs:memory.data/Benchmark - Debug" value="512"/>
 <property key="build.prefs:memory.data/Benchmark - Release" value="512"/>
 <property key="build.prefs:memory.data/Render - Debug" value="512"/>

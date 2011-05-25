@@ -16,4 +16,15 @@
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 	</natures>
+	<filteredResources>
+		<filter>
+			<id>1306233694849</id>
+			<name></name>
+			<type>6</type>
+			<matcher>
+				<id>org.eclipse.ui.ide.multiFilter</id>
+				<arguments>1.0-name-matches-false-true-.*rebuild.build.cpp</arguments>
+			</matcher>
+		</filter>
+	</filteredResources>
 </projectDescription>
