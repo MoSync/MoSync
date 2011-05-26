@@ -65,6 +65,19 @@ public class ListItemWidget extends Layout
 		return true;
 	}
 	
+	@Override
+	public String getProperty(String property)
+	{
+		if( property.equals( IX_WIDGET.MAW_LIST_VIEW_ITEM_TEXT ) )
+		{
+			return m_label.getText().toString();
+		}
+		else
+		{
+			return super.getProperty( property );
+		}
+	}	
+	
 	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
 	{
 		return new RelativeLayout.LayoutParams( mosyncLayoutParams.getWidth( ), mosyncLayoutParams.getHeight( ) );
