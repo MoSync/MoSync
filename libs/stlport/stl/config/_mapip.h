@@ -264,15 +264,7 @@
 //#define _STLP_NATIVE_INCLUDE_PATH ../
 #define _STLP_NATIVE_C_INCLUDE_PATH  ../newlib
 #define _STLP_NATIVE_CPP_C_INCLUDE_PATH ../newlib
-#define _STLP_NATIVE_CPP_RUNTIME_INCLUDE_PATH ../newlib
-
-
-//#   define _STLP_NATIVE_HEADER(header)    <../newlib/header>
-//#   define _STLP_NATIVE_C_HEADER(header)    <../newlib/header>
-//#   define _STLP_NATIVE_CPP_C_HEADER(header)    "C:/MoSync/include/newlib"
-//#   define _STLP_NATIVE_CPP_RUNTIME_HEADER(header) <../newlib/header>
-
-//# define _STLP_NATIVE_CPP_RUNTIME_INCLUDE_PATH newlib
+#define _STLP_NATIVE_CPP_RUNTIME_HEADER(header) <../newlib/header>
 
 // This macro constructs header path from directory and name.
 // You may change it if your compiler does not understand "/".

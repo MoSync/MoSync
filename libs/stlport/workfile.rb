@@ -64,7 +64,7 @@ work.instance_eval do
 		copyFilesSubDir("stlport", "using")
 		copyFilesSubDir("stlport", "using/h")
 
-		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + "newlib" + "/new.h",
+		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + "newlib" + "/new",
 			FileTask.new(self, "../libsupc++/new"))
 
 		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + "newlib" + "/macpp.h",
