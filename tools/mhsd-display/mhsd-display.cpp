@@ -46,12 +46,25 @@ struct StackComparator {
 	}
 };
 
+struct MallocSetSizeComparator {
+	typedef MallocSet Type;
+	// true iff a < b;
+	bool operator()(const Type& a, const Type& b) const {
+		if(a.usedSize > b.usedSize)
+			return true;
+		else
+			return false;
+	}
+};
+
 // key: address. value: index into sDumps.
 typedef map<uint, size_t> AddressMap;
 static AddressMap sAddressMap;
 
 typedef map<Dump, MallocSet, StackComparator> MallocMap;
 static MallocMap sMallocMap;
+
+typedef multimap<MallocSet, Dump, MallocSetSizeComparator> StackMap;
 
 static bool forceRead(int fd, void* dst, int size, bool allowEof = false) {
 	int res = read(fd, dst, size);
@@ -82,15 +95,16 @@ int main() {
 
 		// zero the blockSize of malloc dumps of freed items
 		if(dump.requestedSize >= 0) {	//malloc
-			printf("malloc: 0x%x\n", dump.address);
+			//printf("malloc: 0x%x\n", dump.address);
 			if(sAddressMap.find(dump.address) != sAddressMap.end()) {
+				printf("After %i mallocs, %i frees:\n", nMallocs, nFrees);
 				printf("Duplicate malloc: 0x%x\n", dump.address);
 				exit(1);
 			}
 			sAddressMap[dump.address] = sDumps.size();
 			nMallocs++;
 		} else {	//free
-			printf("free: 0x%x\n", dump.address);
+			//printf("free: 0x%x\n", dump.address);
 			AddressMap::iterator itr = sAddressMap.find(dump.address);
 			if(itr == sAddressMap.end()) {
 				printf("Broken free: 0x%x\n", dump.address);
@@ -126,5 +140,22 @@ int main() {
 	}
 
 	printf("%i distinct malloc stacks.\n", sMallocMap.size());
+	StackMap stackMap;
+	for(MallocMap::const_iterator itr = sMallocMap.begin(); itr != sMallocMap.end(); itr++) {
+		stackMap.insert(pair<MallocSet, Dump>(itr->second, itr->first));
+	}
+
+	printf("%i stacks sorted:\n", stackMap.size());
+	for(StackMap::const_iterator itr = stackMap.begin(); itr != stackMap.end(); itr++) {
+		const MallocSet& ms(itr->first);
+		const Dump& d(itr->second);
+		printf("%i bytes, %i mallocs, %i frees. %i frames:",
+			ms.usedSize, ms.nMallocs, ms.nFrees, d.nFrames);
+		for(uint i=0; i<d.nFrames; i++) {
+			printf(" 0x%x", d.frames[i]);
+		}
+		printf("\n");
+	}
+
 	return 0;
 }

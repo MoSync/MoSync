@@ -215,9 +215,9 @@ void * malloc(int size)
 	}
 #ifdef MOSYNCDEBUG
 	gNumMallocs++;
-	gUsedMem += tlsf_block_size(result);
-	gWastedMem += tlsf_block_size(result) - size;
-	dumpStack(size, tlsf_block_size(result), result);
+	gUsedMem += gBlockSizeHook(result);
+	gWastedMem += gBlockSizeHook(result) - size;
+	dumpStack(size, gBlockSizeHook(result), result);
 #endif
 
 #ifdef MEMORY_PROTECTION
@@ -254,13 +254,16 @@ void * calloc(int num_elem, int size_elem)
 
 void free(void *mem)
 {
+#ifdef MEMORY_PROTECTION
+	int wasMemoryProtected;
+#endif
 	MASTD_HEAP_LOG("free(0x%08X)\n", (int)mem);
 
 	if (!mem)
 		return;
 
 #ifdef MEMORY_PROTECTION
-	int wasMemoryProtected = maGetMemoryProtection();
+	wasMemoryProtected = maGetMemoryProtection();
 	maSetMemoryProtection(FALSE);
 	if(gBlockSizeHook)
 		maProtectMemory(mem, gBlockSizeHook(mem));	
@@ -268,8 +271,8 @@ void free(void *mem)
 
 #ifdef MOSYNCDEBUG
 	gNumFrees++;
-	gUsedMem -= tlsf_block_size(mem);
-	dumpStack(-1, tlsf_block_size(mem), mem);
+	gUsedMem -= gBlockSizeHook(mem);
+	dumpStack(-1, gBlockSizeHook(mem), mem);
 #endif
 
 	gFreeHook(mem);
@@ -281,11 +284,18 @@ void free(void *mem)
 }
 
 //****************************************
-//				fugly realloc
+//				nice realloc
 //****************************************
 void* realloc(void* old, int size) {
 	void* result;
 	MASTD_HEAP_LOG("realloc(0x%08X, %i)\n", (int)old, size);
+
+#ifdef MOSYNCDEBUG
+	// we'll count it as a free + malloc
+	gNumFrees++;
+	gUsedMem -= gBlockSizeHook(old);
+	dumpStack(-1, gBlockSizeHook(old), old);
+#endif
 
 	result = gReallocHook(old, size);
 	if(result == 0)
@@ -295,6 +305,14 @@ void* realloc(void* old, int size) {
 		gMallocHandler(size);
 		result = gReallocHook(old, size);
 	}
+
+#ifdef MOSYNCDEBUG
+	gNumMallocs++;
+	gUsedMem += gBlockSizeHook(result);
+	gWastedMem += gBlockSizeHook(result) - size;
+	dumpStack(size, gBlockSizeHook(result), result);
+#endif
+
 	return result;
 }
 
