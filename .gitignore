@@ -203,3 +203,4 @@ profile.txt
 /docs/*.dot.*
 
 /tools/mhsd-display/mhsd.bin
+/tools/mhsd-display/sld.tab

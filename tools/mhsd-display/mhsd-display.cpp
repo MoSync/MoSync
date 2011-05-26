@@ -4,6 +4,8 @@
 #include <errno.h>
 #include <vector>
 #include <map>
+#include <string>
+#include "sld.h"
 
 using namespace std;
 
@@ -78,6 +80,12 @@ static bool forceRead(int fd, void* dst, int size, bool allowEof = false) {
 }
 
 int main() {
+	printf("Loading SLD...\n");
+	if(!loadSLD("sld.tab")) {
+		printf("Couldn't load sld.tab.\n");
+		exit(1);
+	}
+
 	printf("Reading...\n");
 	int fd = open("mhsd.bin", O_RDONLY | O_BINARY);
 	char magic[4];
@@ -149,13 +157,22 @@ int main() {
 	for(StackMap::const_iterator itr = stackMap.begin(); itr != stackMap.end(); itr++) {
 		const MallocSet& ms(itr->first);
 		const Dump& d(itr->second);
-		printf("%i bytes, %i mallocs, %i frees. %i frames:",
+		printf("%i bytes, %i mallocs, %i frees. %i frames:\n",
 			ms.usedSize, ms.nMallocs, ms.nFrees, d.nFrames);
 		for(uint i=0; i<d.nFrames; i++) {
-			printf(" 0x%x", d.frames[i]);
+			uint address = d.frames[i];
+			int line;
+			string file;
+			mapIp(address, line, file);
+			printf("%s:%i (0x%x)\n", file.c_str(), line, address);
 		}
 		printf("\n");
 	}
 
 	return 0;
+}
+
+void MoSyncErrorExit(int code) {
+	printf("MoSyncErrorExit(%i)\n", code);
+	exit(code);
 }
