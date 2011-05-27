@@ -92,17 +92,24 @@ int main(int argc, char **argv) {
 
 	Backend::BasesMap bases;
 
-	if(argc != 2) System::error("Usage: WrapperGenerator input.h\n");
+	if(argc <= 2) System::error("Usage: WrapperGenerator input.h (|input2.h...) \n");
 	const char *header = argv[1];
 
-	string xmlName = System::genstr("%s.xml", header);
+	vector<string> headers;
 
-	string cmd = System::genstr("gccxml %s -fxml=%s \"-include\" \"options/attribs.h\"", header, xmlName.c_str());
-	printf("%s\n", cmd.c_str());
-	if(system(cmd.c_str()) != 0)
-		System::error("gccxml failed\n");
-	Parser::parse(xmlName.c_str(), bases);
+	for(int i = 1; i < argc; i++) {
+		headers.push_back(argv[i]);
+	}
 
+	for(size_t i = 0; i < headers.size(); i++) {
+		string xmlName = System::genstr("%s.xml", headers[i].c_str());
+		string cmd = System::genstr("gccxml %s -fxml=%s -Itests \"-include\" \"options/attribs.h\"", headers[i].c_str(), xmlName.c_str());
+		printf("%s\n", cmd.c_str());
+		if(system(cmd.c_str()) != 0)
+			System::error("gccxml failed\n");
+		Parser::parse(xmlName.c_str(), bases);
+	}
+	
 	string idlName = System::genstr("%s.idl", header);
 	string cppName = System::genstr("%s.cpp", header);
 

@@ -86,8 +86,10 @@ string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool u
 			if(isConst) ret+="*";
 		} else if(pType->getBaseType() == Base::EFunctionType) {
 			ret += "MAAddress";
+		} else if(pType->getBaseType() == Base::EPointerType) {
+			ret += "MAAddress";
 		} else {
-			System::error("Unsupported type!");
+			System::error("Unsupported type! %s\n", pType->toString().c_str());
 		}
 
 		/*

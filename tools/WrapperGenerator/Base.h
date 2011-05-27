@@ -49,9 +49,8 @@ public:
 	virtual std::string toString() const;
 	virtual void fromParseNode(const ParseNode& node) = 0;
 	BaseType getBaseType() const;
-
 	virtual const Base* resolveFully() const { return this; };
-
+	
 protected:
 	BaseType mBaseType;
 };

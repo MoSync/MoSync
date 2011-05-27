@@ -94,6 +94,9 @@ namespace Parser {
 
 
 	void parse(const string& input, std::multimap<std::string, const Base*>& bases) {
+		while(sParseStack.size()>0)
+			sParseStack.pop();
+
 		sXmlParser = XML_ParserCreate("UTF-8");
 		XML_SetElementHandler(sXmlParser, start, end);
 
@@ -117,7 +120,7 @@ namespace Parser {
 		// bind pointers.
 		for(size_t i = 0; i < parseNodes.size(); i++) {
 			if(parseNodes[i]->base) {
-				parseNodes[i]->base->fromParseNode(*(parseNodes[i]));	
+				parseNodes[i]->base->fromParseNode(*(parseNodes[i]));
 				bases.insert(pair<string, const Base*>(parseNodes[i]->name, parseNodes[i]->base));
 			}
 		}
