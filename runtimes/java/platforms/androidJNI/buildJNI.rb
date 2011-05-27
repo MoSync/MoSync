@@ -105,7 +105,7 @@ if ENV['OS'] == "Windows_NT"
 	# convert a copy of cygwin.sh to unix-style line endings, so bash can run it.
 	FileUtils.copy_file("#{cpath}/cygwin.sh", "#{cpath}/cygwin_u.sh")
 	if(File.exist?("/cygwin/bin/bash.exe"))
-		cygPath = "/cygwin/bin/bash.exe"
+		cygPath = "/cygwin/bin/"
 	elsif(nil != ENV["CYGPATH"])
 		cygPath = ENV["CYGPATH"]
 	elsif(system("bash.exe pwd"))
