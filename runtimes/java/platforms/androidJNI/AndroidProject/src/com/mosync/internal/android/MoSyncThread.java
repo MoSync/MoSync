@@ -653,12 +653,14 @@ public class MoSyncThread extends Thread
 	{
 		Log.i("MoSync Thread", "run");
 
+		// Load the program.
 		if (false == loadProgram())
 		{
 			logError("load program failed!!");
 			return;
 		}
 	
+		// Run program. This enters a while loop in C-code.
 		nativeRun();
 	}
 	
