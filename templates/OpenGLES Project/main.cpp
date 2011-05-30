@@ -92,6 +92,7 @@ public:
 
 	/**
 	 * Method that implements the custom event listener interface.
+	 * Widget events are sent as custom events.
 	 */
 	void customEvent(const MAEvent& event)
 	{
@@ -100,9 +101,7 @@ public:
 			// Get the widget event data structure.
 			MAWidgetEventData* eventData = (MAWidgetEventData*) event.data;
 
-			lprintfln("Widget event of type: %i", eventData->eventType);
-
-			// Event MAW_EVENT_GL_VIEW_READY is sent when the GL view is
+			// MAW_EVENT_GL_VIEW_READY is sent when the GL view is
 			// ready for drawing.
 			if (MAW_EVENT_GL_VIEW_READY == eventData->eventType)
 			{
@@ -140,7 +139,6 @@ private:
 	void initGL()
 	{
 		glShadeModel(GL_SMOOTH);
-		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClearDepthf(1.0f);
 		glEnable(GL_DEPTH_TEST);
 		glDepthFunc(GL_LEQUAL);
@@ -193,7 +191,7 @@ private:
 		glLoadIdentity();
 		glRotatef(rotation, 0.0f, 0.0f, 1.0f);
 		glTranslatef(0.0f, 0.0f, -z);
-		glClearColor(0.9, 0.9, 0.5, 1.0);
+		glClearColor(0.8, 0.9, 0.6, 1.0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glColor4f(0.9, 0.0, 0.0, 1.0);
@@ -234,7 +232,7 @@ private:
 	int widgetSetPropertyInt(MAHandle handle, const char *property, int value)
 	{
 		char buffer[256];
-		sprintf(buffer, "%d", value);
+		sprintf(buffer, "%i", value);
 		maWidgetSetProperty(handle, property, buffer);
 	}
 
