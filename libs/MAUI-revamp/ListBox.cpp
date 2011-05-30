@@ -452,7 +452,8 @@ namespace MAUI {
 		}
 
 		Widget *unselectedWidget = mChildren[this->mSelectedIndex];
-		unselectedWidget->setFocused(false);
+		if(unselectedWidget != NULL)
+			unselectedWidget->setFocused(false);
 		int lastIndex = this->mSelectedIndex;
 		int offset = (lastIndex-selectedIndex);
 		if(offset>0) {
@@ -543,7 +544,8 @@ namespace MAUI {
 		//printf("element: %d\n", selectedIndex);
 
 		Widget *unselectedWidget = mChildren[prevIndex];
-		mChildren[prevIndex]->setFocused(false);
+		if(unselectedWidget != NULL)
+			unselectedWidget->setFocused(false);
 
 		c = mChildren[mSelectedIndex];
 
