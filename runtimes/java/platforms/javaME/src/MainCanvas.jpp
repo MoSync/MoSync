@@ -753,6 +753,11 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	}
 
 	public boolean keyDown(int keycode, int time) {
+	
+		// If we are showing a form or TextBox, don't steal the blackberry key event)
+		if((Display.getDisplay(mMidlet).getCurrent() instanceof Form) || (Display.getDisplay(mMidlet).getCurrent() instanceof TextBox))
+			return false;
+	
 		DEBUG_ALWAYS("BB Hard key pressed "+keycode+"\n");
         if (net.rim.device.api.ui.Keypad.key(keycode) == net.rim.device.api.ui.Keypad.KEY_MENU) { 
 			DEBUG_KEYS("Pressed BB Menu button\n");

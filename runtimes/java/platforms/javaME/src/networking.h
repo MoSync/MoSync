@@ -586,10 +586,11 @@ static class BlackBerryConnectionFactory {
 
 	static net.rim.device.api.io.transport.ConnectionFactory connFactory = new net.rim.device.api.io.transport.ConnectionFactory();
 	static int[] preferredTransports = {
+		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_MDS,
 		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_TCP_WIFI,
-		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_WAP2,
 		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_TCP_CELLULAR,
-		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_MDS
+		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_BIS_B,
+		net.rim.device.api.io.transport.TransportInfo.TRANSPORT_WAP2
 	};
 	static {
 		connFactory.setPreferredTransportTypes(preferredTransports);
@@ -598,9 +599,9 @@ static class BlackBerryConnectionFactory {
 
 	static Connection openConnection(String url) throws IOException {
 		net.rim.device.api.io.transport.ConnectionDescriptor connDesc = connFactory.getConnection(url);
-		if(null == connDesc) {
-			throw new IOException("No path to destination url");
-		}
+		if(null == connDesc)
+			return null;
+
 		return connDesc.getConnection();
 	}
 };

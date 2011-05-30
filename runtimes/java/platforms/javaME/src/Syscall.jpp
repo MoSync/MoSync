@@ -2313,7 +2313,14 @@ public
 
 #ifdef BB_RIM_API
 			InputConnection videoConnection = (InputConnection)BlackBerryConnectionFactory.openConnection(url);
-			mStreamPlayer = Manager.createPlayer(videoConnection.openInputStream(), "video/mp4");
+			if(null == videoConnection) {
+				return CONNERR_GENERIC;
+			}
+			InputStream inStream = videoConnection.openInputStream();
+			if(null == inStream) {
+				return CONNERR_GENERIC;
+			}
+			mStreamPlayer = Manager.createPlayer(inStream, "video/mp4");
 #else
 			mStreamPlayer = Manager.createPlayer(url);
 #endif
@@ -2615,6 +2622,7 @@ public
 	//****************************************************************************
 	// maTextBox
 	//****************************************************************************
+#ifndef BB_RIM_API
 	TextBox mTextBox;
 	MAAddress mTextBoxBuffer;
 	int mTextBoxMaxSize;
@@ -2654,4 +2662,77 @@ public
 		mCanvas.mDisplay.setCurrent(mTextBox);
 		return 0;
 	}
+#endif
+
+#ifdef BB_RIM_API
+	MAAddress mTextBoxBuffer;
+	int mTextBoxMaxSize;
+	Form form;
+	TextField field;
+	DateField dateField;
+	boolean isDateMode = false;
+
+	class TextBoxCommandListener implements CommandListener {
+		public synchronized void commandAction(Command c, Displayable d) {
+			int jRes = c.getCommandType();
+			int mRes = jRes == Command.OK ? MA_TB_RES_OK : MA_TB_RES_CANCEL;
+
+			String text = null;
+			if(isDateMode) {
+				text = Long.toString(dateField.getDate().getTime());
+			} else {
+				text = field.getString();
+			}
+
+			writeWideString(text, mTextBoxBuffer, mTextBoxMaxSize*2);
+
+			int[] event = new int[3];
+			EI_TYPE = EVENT_TYPE_TEXTBOX;
+			EI_TEXTBOX_RESULT = mRes;
+			EI_TEXTBOX_LENGTH = text.length();
+			mCanvas.postEvent(event);
+
+			mCanvas.mDisplay.setCurrent(mCanvas);
+			mCanvas.setFullScreenMode(true);
+		}
+	}
+
+	int maTextBox(String title, String inText, MAAddress outText, int maxSize, int constraints) throws Exception
+	{
+		// Return value buffers
+		mTextBoxBuffer = outText;
+		mTextBoxMaxSize = maxSize;
+
+		// Setup form
+        Command cancel = new Command("Cancel", Command.CANCEL, 2);
+        Command ok = new Command("Ok", Command.OK, 2);
+        form = new Form(title);
+        form.addCommand(cancel);
+        form.addCommand(ok);
+
+		// Build UI (JavaME form) with either a text field or date field
+		if((constraints & 0x00400000) > 0) {
+			isDateMode = true;
+			dateField = new DateField(title, DateField.DATE);
+			try {
+				Date date = new Date(Long.parseLong(inText));
+				dateField.setDate(date);
+			} catch(NumberFormatException nfe) {
+				dateField.setDate(new Date());
+			}
+			form.append(dateField);
+		} else {
+			isDateMode = false;
+			field = new TextField(title, inText, outText, constraints);
+			form.append(field);
+		}
+		
+		// Add command listener
+		TextBoxCommandListener tbcl = new TextBoxCommandListener();
+		form.setCommandListener(tbcl);
+		mCanvas.mDisplay.setCurrent(form);
+
+		return 0;
+	}
+#endif
 }

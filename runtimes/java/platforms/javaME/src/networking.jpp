@@ -214,6 +214,8 @@ NETSYSCALL(MAHandle) maHttpCreate(String url, int method) throws Exception {
 	try {
 #ifdef BB_RIM_API
 		http = (HttpConnection)BlackBerryConnectionFactory.openConnection(url);
+		if(null == http)
+			return CONNERR_NETWORK;
 #else
 		http = (HttpConnection)Connector.open(url, rw, true);
 #endif
@@ -222,6 +224,7 @@ NETSYSCALL(MAHandle) maHttpCreate(String url, int method) throws Exception {
 		PRINT_STACK_TRACE;
 		return CONNERR_FORBIDDEN;
 	}
+	
 	MAStreamConn mac = new MAStreamConn(mConnNextHandle);
 	mac.conn = http;
 	DEBUG_ASSERT(mac.httpState == HTTPS_NULL);
