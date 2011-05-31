@@ -567,6 +567,7 @@ DWORD GetScreenOrientation()
 		//case WM_GESTURE:
 		//	return 0;
 
+
 		case WM_KEYDOWN:
 			if(wParam == VK_THOME) {
 				//ShowWindow(hwnd, SW_MINIMIZE);
@@ -581,7 +582,24 @@ DWORD GetScreenOrientation()
 				return 0;
 			}
 
-			if(wParam == VK_TTALK) break;
+			if(wParam == VK_TTALK)
+			{
+				//Letting the MoSync program know it lost focus
+				MAEvent event;
+				event.type = EVENT_TYPE_FOCUS_LOST;
+				gEventFifo.put(event);
+				//Suspending the program
+				Suspend();
+				//Forwarding the event to the main desktop window to open Phone App
+				CallWindowProc( 
+							  (WNDPROC)GetWindowLong(hwnd,GWL_WNDPROC), //Current Window 
+							  GetDesktopWindow(), //Main desktop window used by windows
+							  umsg, 
+							  wParam, 
+							  lParam 
+							); 
+				return 0;
+			}
 
 			if(lParam&0x40000000) return 0; // check if it has been repeated more than once
 			//if(wParam == VK_TBACK) {
@@ -710,7 +728,7 @@ DWORD GetScreenOrientation()
 	  hwnd = CreateWindow (
 					  g_szClassName,  // Registered class name         
 					  g_szTitle,      // Application window name
-					  WS_VISIBLE,			  // Window style
+					  WS_VISIBLE,	  // Window style
 					  CW_USEDEFAULT,  // Horizontal position of the window
 					  CW_USEDEFAULT,  // Vertical position of the window
 					  CW_USEDEFAULT,  // Window width
