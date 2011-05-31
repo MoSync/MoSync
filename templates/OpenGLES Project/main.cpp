@@ -34,7 +34,9 @@ public:
 		// Error handling for devices that do not support NativeUI.
 		if (-1 == screen)
 		{
-			maPanic(0, "This program is not supported on this device.");
+			maPanic(0,
+				"This application uses NativeUI, which currently "
+				"is supported on Android and iOS devices.");
 		}
 
 		// Create a GL_VIEW widget and add it to the screen.
@@ -82,15 +84,6 @@ public:
 	}
 
 	/**
-	 * Called on a timer event.
-	 */
-	void runTimerEvent()
-	{
-		draw(mDepth, mRotation);
-		mRotation += 5.0f;
-	}
-
-	/**
 	 * Method that implements the custom event listener interface.
 	 * Widget events are sent as custom events.
 	 */
@@ -127,6 +120,15 @@ public:
 				Environment::getEnvironment().addTimer(this, 20, -1);
 			}
 		}
+	}
+
+	/**
+	 * Called on a timer event.
+	 */
+	void runTimerEvent()
+	{
+		draw(mDepth, mRotation);
+		mRotation += 5.0f;
 	}
 
 private:

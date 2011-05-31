@@ -31,7 +31,9 @@ public:
 		// Error handling for devices that do not support NativeUI.
 		if (-1 == screen)
 		{
-			maPanic(0, "This program is not supported on this device.");
+			maPanic(0,
+				"This application uses NativeUI, which currently "
+				"is supported on Android and iOS devices.");
 		}
 
 		// Create a layout object.
