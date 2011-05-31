@@ -49,13 +49,7 @@ MA 02110-1301, USA.
  *
  *   btspp://0023769FD7C2:102030405060708090A0B0C0D0E0F010
  *
- *  You can also use this method to connect to a port (channel)
- *  if you know the number of the port, for example, connect
- *  to port number 1 with the following url:
- *
- *   btspp://0023769FD7C2:1
- *
- *  Yet another (more advanced) option when connecting using a
+ *  Another (more advanced) option when connecting using a
  *  service UUID, is to use the connect methods that takes
  *  a MABtAddr and a MAUUID structure as parameters:
  *
@@ -67,11 +61,11 @@ MA 02110-1301, USA.
  *  structures, and then pass them to the connect method.
  *  For example:
  *
- *   static const MABtAddr sServerAddress =
+ *   MABtAddr serverAddress =
  *       {{ 0x00,0x23,0x79,0x9F,0xD7,0xC2 }};
- *   static const MAUUID sServiceUUID =
+ *   MAUUID serviceUUID =
  *       {{ 0x10203040,0x50607080,0x90A0B0C0,0xD0E0F010 }};
- *   int result = mConnection.connect(sServerAddress, sServiceUUID);
+ *   int result = mConnection.connect(serverAddress, serviceUUID);
  */
 
 #include <MAUtil/Moblet.h>

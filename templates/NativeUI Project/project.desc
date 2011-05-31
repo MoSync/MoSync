@@ -1,0 +1,10 @@
+id = project.nativeui
+name = MoSync NativeUI Project
+description = A project that uses the Native UI functionality in MoSync.
+
+[Files]
+main.cpp
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib
+build.prefs:additional.libraries/Debug=MAUtilD.lib
