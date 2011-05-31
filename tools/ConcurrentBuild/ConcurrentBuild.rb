@@ -238,7 +238,7 @@ def getCoreCount
         count = ENV["NUMBER_OF_PROCESSORS"].to_i( )
     elsif ( os == "linux" )
         count = `cat /proc/cpuinfo | grep processor | wc -l`.gsub( /\n/, "" ).to_i( )
-    elsif ( os == "darwin" )
+    elsif ( os == "mac" )
         count = `sysctl hw.ncpu | awk '{print $2}'`.gsub( /\n/, "" ).to_i( )
     end
 
