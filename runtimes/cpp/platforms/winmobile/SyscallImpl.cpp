@@ -669,17 +669,37 @@ DWORD GetScreenOrientation()
 			VideoHandleEvent((VideoStream*)lParam);
 			break;
 #endif
+		//If the App is in the forground it receives the SETTINGCHANGE message
+		//when the orientation changes
 		case WM_SETTINGCHANGE:
 			if (SETTINGCHANGE_RESET == wParam) {
+				//restarting the screen buffer with new dimensions
+				if(sInternalBackBuffer) {
+					delete sInternalBackBuffer;
+					sInternalBackBuffer = 0;
+				}
+				InitGraphics();
 				MAEvent event;
 				event.type = EVENT_TYPE_SCREEN_CHANGED;
 				gEventFifo.put(event);
-				}
-			
-			return 0;
-		case WM_SIZE:
+			}
 			return 0;
 
+		//WM_SIZE is sent when the App does not have focus, this part is added 
+		//So the app comes back from background in correct orienation
+		case WM_SIZE:
+			//WM_SIZE is sent at launch time too, Ignore it by checking change in dimensions
+			if(backBuffer->width != GetSystemMetrics(SM_CXSCREEN)){
+				if(sInternalBackBuffer) {
+					delete sInternalBackBuffer;
+					sInternalBackBuffer = 0;
+				}
+				InitGraphics();
+				MAEvent event;
+				event.type = EVENT_TYPE_SCREEN_CHANGED;
+				gEventFifo.put(event);
+			}
+			return 0;
 			/*
 		case WM_MOVE:
 		case WM_WINDOWPOSCHANGED:
