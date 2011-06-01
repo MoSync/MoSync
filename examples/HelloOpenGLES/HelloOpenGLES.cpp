@@ -49,8 +49,8 @@ MA 02110-1301, USA.
 #include "MAHeaders.h"
 
 /**
- * A Moblet is the main object of MoSync application. In the Moblet we manage
- * the application and handle events.
+ * A Moblet is the main object of MoSync application. In the Moblet
+ * we manage the application and handle events.
  */
 class HelloGLMoblet :
 	public MAUtil::Moblet,
@@ -110,7 +110,7 @@ public:
 
 	/**
 	 * This method is called when a key is pressed. The method
-	 * is inherited from the Moblet class, and overridden here.
+	 * is inherited from the Moblet class, and is overridden here.
 	 */
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
