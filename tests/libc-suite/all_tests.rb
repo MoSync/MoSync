@@ -84,11 +84,9 @@ end
 
 # output a default resource file
 DEFAULT_RESOURCES = 'build/default_resources'
-if(SETTINGS[:htdocs_dir])
-	writeResourceFile('default')
-	FileUtils.mv('build/resources', DEFAULT_RESOURCES)
-	FileUtils.mv('build/MAHeaders.h', 'build/default_MAHeaders.h')
-end
+writeResourceFile('build/default')
+FileUtils.mv('build/resources', DEFAULT_RESOURCES)
+FileUtils.mv('build/MAHeaders.h', 'build/default_MAHeaders.h')
 
 def input_files(filename)
 	base = File.dirname(filename) + '/' + File.basename(filename, File.extname(filename))
