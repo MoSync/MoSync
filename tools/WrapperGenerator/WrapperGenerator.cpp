@@ -110,6 +110,24 @@ int main(int argc, char **argv) {
 		Parser::parse(xmlName.c_str(), bases);
 	}
 	
+	// remove duplicates
+	
+	for( std::multimap< std::string, const Base* >::iterator iter = bases.begin(); iter != bases.end(); iter++ ) {
+		for( std::multimap< std::string, const Base* >::const_iterator iter2 = bases.begin(); iter2 != iter; iter2++ ) {
+			const Base* a = iter->second;
+			const Base* b = iter2->second;
+			
+			if(a->toString() == b->toString()) {
+				printf("collision: %s\n", a->toString().c_str());
+				bases.erase(iter);
+				break;
+			}
+		}
+	}
+	
+	// -----------------------
+	
+	
 	string idlName = System::genstr("%s.idl", header);
 	string cppName = System::genstr("%s.cpp", header);
 

@@ -77,6 +77,16 @@ namespace Parser {
 				parseNode->attributes[attr[i]] = attr[i+1];
 			}
 			parseNode->base = createNode(parseNode->name);
+			
+			string attributes = parseNode->getAttr("attributes", false);
+			if(attributes != "") {
+				map<string, string> attrMap;
+				System::parseAttributes(attributes, attrMap);
+				string group = attrMap["group"];
+				// the global set is called ""
+				parseNode->base->setGroup(group);
+			}		
+			
 			parseNode->lineNumber = XML_GetCurrentLineNumber(sXmlParser);
 
 	}  /* End of start handler */
@@ -121,17 +131,19 @@ namespace Parser {
 		for(size_t i = 0; i < parseNodes.size(); i++) {
 			if(parseNodes[i]->base) {
 				parseNodes[i]->base->fromParseNode(*(parseNodes[i]));
-				bases.insert(pair<string, const Base*>(parseNodes[i]->name, parseNodes[i]->base));
+				//bases.insert(pair<string, const Base*>(parseNodes[i]->name, parseNodes[i]->base));
 			}
 		}
 
-#if 0
+//#if 0
 		// write info.
 		for(size_t i = 0; i < parseNodes.size(); i++) {
-			if(parseNodes[i]->base)
-				printf("%s\n", parseNodes[i]->base->toString().c_str());
+			if(parseNodes[i]->base) {
+				bases.insert(pair<string, const Base*>(parseNodes[i]->name, parseNodes[i]->base));
+				//printf("%s\n", parseNodes[i]->base->toString().c_str());
+			}
 		}
-#endif
+//#endif
 	}
 
 }

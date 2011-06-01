@@ -115,10 +115,21 @@ string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool u
 
 void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 	pair<BasesIterator, BasesIterator> typedefs = bases.equal_range("Typedef");
+	
+
+	std::vector<const Base*> sortedTypeDefs;	
 	for(BasesIterator td = typedefs.first; td!=typedefs.second; td++) {
 		const Typedef* t = (const Typedef*)td->second;
-		stream << "typedef " << getIDLType(t->getType(), NULL) << " " << t->getName() << ";\n";
+		//stream << "typedef " << getIDLType(t->getType(), NULL) << " " << t->getName() << ";\n";
+		sortedTypeDefs.push_back(t);
+	}
 
+	std::sort(sortedTypeDefs.begin(), sortedTypeDefs.end(), BaseLocationSortPredicate);
+	
+	//for(BasesIterator td = typedefs.first; td!=typedefs.second; td++) {
+	for(std::vector<const Base*>::const_iterator td = sortedTypeDefs.begin(); td!=sortedTypeDefs.end(); td++) {
+		const Typedef* t = (const Typedef*)*td;
+		stream << "typedef " << getIDLType(t->getType(), NULL) << " " << t->getName() << ";\n";
 	}
 
 	pair<BasesIterator, BasesIterator> functions = bases.equal_range("Function");
