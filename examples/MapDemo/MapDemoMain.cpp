@@ -25,11 +25,18 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern "C" int MAMain( )
 //-------------------------------------------------------------------------
 {
+	// If you should encounter memory problems, you can
+	// experiment with the size of the tile cache.
+	// Set the cache size like this:
+	//MapCache::get()->setCapacity(30);
+
 	//
 	// Init app style
 	//
-	AppStyleMgr::setStyle( newobject( MapDemo::MapDemoAppStyle, new MapDemo::MapDemoAppStyle( ) ) );
-	MapDemo::MapDemoMoblet* moblet = newobject( MapDemo::MapDemoMoblet, new MapDemo::MapDemoMoblet( ) );
+	AppStyleMgr::setStyle(
+		newobject(MapDemo::MapDemoAppStyle, new MapDemo::MapDemoAppStyle()));
+	MapDemo::MapDemoMoblet* moblet =
+		newobject(MapDemo::MapDemoMoblet, new MapDemo::MapDemoMoblet());
 	
 	Moblet::run( moblet );
 

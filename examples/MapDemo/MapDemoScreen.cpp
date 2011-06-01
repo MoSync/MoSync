@@ -78,17 +78,19 @@ namespace MapDemo
 			case MAK_2:
 				nextMapSource( );
 				return true;
-		case MAK_SOFTRIGHT:
-			//maExit( 0 );
-			// TODO: proper exit
-			MapDemoMoblet& moblet = (MapDemoMoblet&)Environment::getEnvironment( );
-			moblet.Terminate( );
-			return true;
+			case MAK_BACK:
+			case MAK_SOFTRIGHT:
+				//maExit( 0 );
+				// TODO: proper exit
+				MapDemoMoblet& moblet = (MapDemoMoblet&)Environment::getEnvironment( );
+				moblet.Terminate( );
+				return true;
 		}
 
 		if ( AppScreen::handleKeyPress( keyCode ) )
 			return true;
 
+		// Here we tell the map widget to handle the key press.
 		return mMap->handleKeyPress( keyCode );
 	}
 

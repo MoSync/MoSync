@@ -80,6 +80,7 @@ listener.error ->
 
 namespace MAUtil {
 
+	// Forward declarations.
 	class Downloader;
 	class DownloaderReader;
 
@@ -261,7 +262,7 @@ namespace MAUtil {
 		Vector<DownloadListener*> mDownloadListeners;
 		
 		/**
-		 * Object that peformes the actual download. A downloader
+		 * Object that performs the actual download. A downloader
 		 * is configured with different readers depending on the
 		 * how the server sends the data to the client.
 		 */
@@ -284,7 +285,14 @@ namespace MAUtil {
 		int beginDownloading(const char *url, MAHandle placeholder=0);
 		
 	protected:
+		/**
+		 * Return the image handle of the downloader.
+		 * The caller of this method should fire an error to listeners.
+		 * @return The image handle (> 0) if successful, 0 if there is 
+		 * an error (out of memory).
+		 */
 		virtual MAHandle getHandle();
+		
 		virtual void closeConnection(int cleanup);
 
 	protected:
