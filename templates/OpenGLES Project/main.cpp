@@ -35,8 +35,8 @@ public:
 		if (-1 == screen)
 		{
 			maPanic(0,
-				"This application uses NativeUI, which currently "
-				"is supported on Android and iOS devices.");
+				"OpenGL is only available on Android and iPhone. "
+				"You must run directly on the device or devices emulator.");
 		}
 
 		// Create a GL_VIEW widget and add it to the screen.
@@ -78,9 +78,15 @@ public:
 	 */
 	void pointerPressEvent(MAPoint2d point)
 	{
-		float screenHeight = EXTENT_Y(maGetScrSize());
-		mDepth = 20.0f / screenHeight * point.y;
-		draw(mDepth, mRotation);
+		computeZoomFactor(point);
+	}
+
+	/**
+	 * Called on a touch drag event.
+	 */
+	void pointerMoveEvent(MAPoint2d point)
+	{
+		computeZoomFactor(point);
 	}
 
 	/**
@@ -164,6 +170,17 @@ private:
 		glLoadIdentity();
 		GLfloat ratio = (GLfloat)width / (GLfloat)height;
 		gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+	}
+
+	/**
+	 * Compute the visible size of the quad by
+	 * setting the depth coordinate.
+	 */
+	void computeZoomFactor(MAPoint2d point)
+	{
+		float screenHeight = EXTENT_Y(maGetScrSize());
+		mDepth = 20.0f / screenHeight * point.y;
+		// Note: The quad gets redrawn by the timer.
 	}
 
 	/**
