@@ -341,7 +341,13 @@ namespace MAUI {
 		bool isFocused() const;
 
 		/**
-		* \brief Sets the widget enabled state (default: \a true). If it's not enabled it won't be drawn.
+		* \brief Sets the widget enabled state (default: \a true).
+		* If it's not enabled it (and its children) won't be drawn.
+		*
+		* The children still have enable states of their own,
+		* which are independent of the parent.
+		* For example, if the parent is disabled and the child is enabled,
+		* neither will be drawn.
 		*/ 
 		virtual void setEnabled(bool enabled=true);
 
