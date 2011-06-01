@@ -942,9 +942,12 @@ interface MAAPI {
 
 	/**
 	* Stores an HTTP response header in the specified buffer.
+	*
 	* The buffer may be too small to contain the header and the terminating zero;
 	* in that case, the buffer will not be filled
 	* and you should create a bigger buffer and call this function again.
+	* Use the return value to determine how long the buffer needs to be.
+	*
 	* \param conn A finished HTTP connection handle.
 	* \param key The name of the header. Case-insensitive.
 	* \param buffer A string buffer.
