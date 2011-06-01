@@ -27,9 +27,9 @@ MA 02110-1301, USA.
  * screen and a some widgets to provide a password entry box and
  * some control buttons.
  *
- * NOTE: this example application has the same functionality as
+ * NOTE: This example application has the same functionality as
  * our example application "HelloMAUI". Compare the two examples
- * to see how we do the same things in MAUI and in Native UI.
+ * to see how we do similar things in MAUI and in Native UI.
  */
 
 // Include MoSync syscalls.
@@ -53,7 +53,6 @@ MA 02110-1301, USA.
 class AppScreen : public MAUtil::CustomEventListener
 {
 public:
-
 	/**
 	 * In the constructor, we create the user interface.
 	 */
@@ -64,11 +63,8 @@ public:
 
 	/**
 	 * In the destructor, we destroy the widgets to release memory.
+	 * Destroying a widget automatically destroys all child widgets.
 	 */
-	//The last method of the AppScreen class is the destructor, it is used
-	//to release the memory used by the native UI widgets. In this case we
-	//just need to delete the main widget: all its children will automatically
-	//be deleted too.
 	virtual ~AppScreen()
 	{
 		// Destroying the screen widget destroys all of its children.
@@ -76,7 +72,7 @@ public:
 	}
 
 	/**
-	 * In the constructor, we create a screen widget.
+	 * Here we create the user interface widgets.
 	 */
 	void createUI()
 	{
@@ -336,13 +332,13 @@ private:
 /**
  * A Moblet is the main object of MoSync application. In the Moblet
  * we manage the application and handle events. Our Moblet inherits
- * the MOblet base class in the MAUtil library.
+ * the Moblet base class in the MAUtil library.
  */
 class HelloNativeUIMoblet : public MAUtil::Moblet
 {
 public:
 	/**
-	 * The user interface is created in the constructor.
+	 * The user interface is created in the constructor method.
 	 */
 	HelloNativeUIMoblet()
 	{
@@ -354,7 +350,7 @@ public:
 	}
 
 	/**
-	 * The destructor deletes the user interface object.
+	 * The destructor deletes the screen object.
 	 */
 	virtual ~HelloNativeUIMoblet()
 	{

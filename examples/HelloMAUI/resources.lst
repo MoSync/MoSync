@@ -1,0 +1,9 @@
+.res RES_FONT
+.bin
+.include "resources/Font.mof"
+
+.res RES_BUTTON_SELECTED
+.image "resources/ButtonNinePatchSelected.png"
+
+.res RES_BUTTON_UNSELECTED
+.image "resources/ButtonNinePatchUnselected.png"
