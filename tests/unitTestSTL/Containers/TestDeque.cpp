@@ -13,7 +13,13 @@
  * std::deque doesn't keep it's elements in a single block of memory (like vector). It uses multiple
  * blocks of memory and keeps track of them. Because of that is fast on insertions at the end and also at the
  * beginning. Also it doesn't need to copy and destroy objects when it needs to allocate more memory.
- * Provides random access to its elements.
+ * Provides (reasonable fast) random access to its elements. It has a random access iterator. That means that we can iterate
+ * through a vector step by step, using the ++ operator and --operator. Also we can move the iterator more then a step, and
+ * have access to random positions like this:
+ * 				++myVectorIterator; 	//ok. Move one step forward
+ * 				--myVectorIterator; 	//ok. Move one step backward
+ * 				myVectorIterator + 5; 	//ok. Move the iterator 5 positions forward.
+ * 				myVectorIterator - 2	//ok
  * std::deque is defined in the <deque> header.
  */
 void TestSTL::test_deque()
@@ -136,8 +142,33 @@ void TestSTL::test_deque()
 
 	/**
 	 * begin: returns an iterator refering to the first element of the deque
+	 * If the container is empty, it will return the one past-the-end element in the container,
+	 * like the set::end() function. See bellow.
 	 */
 	std::deque<int>::iterator itBegin = d4.begin();
+
+	/**
+	 * end: returns an iterator referring to the one past the end element in the deque
+	 * We must not deference the iterator returned by end(). It is used to see is if we reached the
+	 * end of the container, when we iterate through it.
+	 */
+	std::deque<int>::iterator itEnd = d4.end();
+	if( d4.empty() )
+	{
+		TESTIFY_ASSERT(itBegin == itEnd);
+	}
+	else
+	{
+		//the d4 deque is not empty, so d4.begin() !=  d4.end()
+		TESTIFY_ASSERT(itBegin != itEnd);
+	}
+	//iterate through d4
+	std::deque<int>::iterator iter;
+	for(iter = itBegin; iter != itEnd; ++iter)
+	{
+		//adds 1 to each element of deque
+		*iter += 1;
+	}
 
 	/**
 	 * insert function: inserts an element before the specified position.
@@ -176,16 +207,6 @@ void TestSTL::test_deque()
 	 * throw an out_of_range exception, if the requested index is out of range.
 	 */
 	int x2 = d4.at(0);
-
-	/**
-	 * end: returns an iterator referring to the one past the end element in the deque
-	 */
-	std::deque<int>::iterator iter;
-	for(iter = itBegin; iter != d4.end(); ++iter)
-	{
-		//adds 28 to each element of vector
-		*iter += 28;
-	}
 
 	/**
 	 * front: returns a reference to the first element

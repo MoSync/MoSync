@@ -17,7 +17,13 @@
  * first time the vector is constructed. When vector needs a bigger array, to hold its elements,
  * it will allocate a new, bigger, chunk of memory and will copy all the elements to this new chunk, deleting the
  * old chunk and destroying the objects contained in it.
- * std::vector provides random access to its elements.
+ * std::vector provides (the fastest) random access to its elements. It has a random access iterator. That means that we can
+ * iterate through a vector step by step, using the ++ operator and --operator. And also we can move the iterator more then a step,
+ * and have access to random positions like this:
+ * 				++myVectorIterator; 	//ok. Move one step forward
+ * 				--myVectorIterator; 	//ok. Move one step backward
+ * 				myVectorIterator + 5; 	//ok. Move the iterator 5 positions forward.
+ * 				myVectorIterator - 2	//ok
  * Has the fastest access speed of all STL containers. Also has the fastest iterators.
  * Appending and removing elements at the end of the container is very fast. Inserting an element
  * at the middle or at the beginning, means that all the following elements have to be moved to make room
@@ -140,9 +146,33 @@ void TestSTL::test_vector()
 	TESTIFY_ASSERT( v4.size() == 10 );
 
 	/**
-	 * begin: returns an iterator refering to the first element of the vector
+	 * begin: returns an iterator referring to the first element of the vector
+	 * If the container is empty, it will return the one past-the-end element in the container,
+	 * like the set::end() function. See bellow.
 	 */
 	std::vector<int>::iterator itBegin = v4.begin();
+
+	/**
+	 * end: returns an iterator referring to the one past the end element in the vector
+	 * We must not deference the iterator returned by vector::end(). It is used to see is if we reached the
+	 * end of the container, when we iterate through it.
+	 */
+	std::vector<int>::iterator itEnd = v4.end();
+	if( v4.empty() )
+	{
+		TESTIFY_ASSERT(itBegin == itEnd);
+	}
+	else
+	{
+		//the v4 vector is not empty, so v4.begin() !=  v4.end()
+		TESTIFY_ASSERT(itBegin != itEnd);
+	}
+	std::vector<int>::iterator iter;
+	for(iter = itBegin; iter != itEnd; ++iter)
+	{
+		//adds 20 to each element of vector
+		*iter += 20;
+	}
 
 	/**
 	 * insert function: inserts an element before the specified position.
@@ -181,16 +211,6 @@ void TestSTL::test_vector()
 	 * throw a out_of_range exception if the requested index is out of range.
 	 */
 	int x2 = v4.at(0);
-
-	/**
-	 * end: returns an iterator referring to the one past the end element in the vector
-	 */
-	std::vector<int>::iterator iter;
-	for(iter = itBegin; iter != v4.end(); ++iter)
-	{
-		//adds 20 to each element of vector
-		*iter += 20;
-	}
 
 	/**
 	 * front: returns a reference to the first element

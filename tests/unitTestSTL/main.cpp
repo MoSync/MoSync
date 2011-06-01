@@ -6,4 +6,7 @@
 #include <stdio.h>
 
 
+
+//#include <map>
+
 static Testify::TestHook hook(new TestSTL(), "TestSTL");

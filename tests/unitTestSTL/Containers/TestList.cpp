@@ -16,15 +16,19 @@ bool SomeUnaryPredToTestRemove(int val)
 /**
  *  test function for STL container std::list
  *  std::list is implemented as a doubly linked list of elements
- *  std::list doesn't have random access. For accessing a element, you have to
- *  iterate through list, until you reach the element. Compared with std::vector or std::deque
- *  is not efficient, when accessing an random element.
- *  std::list is efficient for insertion and removal of elements anywhere in the container.
- *  Also for moving elements and block of elements within the container.
- *	The std::list is efficient in removing or inserting an element in any position.
- *	(From this point of view is more efficient than vector or deque.)
+ *  std::list doesn't have random access, it provides only bidirectional iterators. For accessing a element, you have to
+ *  iterate through list, until you reach the element. Compared with std::vector or std::deque is not efficient,
+ *  when accessing an random element.
+ *  We can write for example:
+ * 				++myListIterator; 	//ok. Move one step forward
+ * 				--myListIterator; 	//ok. Move one step backward
+ * 				myListIterator + 5; //not ok. It won't compile. Only random access iterators can move more then a step...
+ * 				myListIterator - 2	//not ok. It won't compile.
+ *  std::list is efficient for insertion and removal of elements anywhere in the container. (From this point of view is more
+ *  efficient than vector or deque.)
  *	std::list is defined in <list> header
  */
+
 void TestSTL::test_list()
 {
 
@@ -128,6 +132,24 @@ void TestSTL::test_list()
 	 * begin: returns an iterator referring to the first element of the vector
 	 */
 	std::list<int>::iterator itBegin = lst4.begin();
+
+	/**
+	 * end: returns an iterator referring to the one past the end element in the list
+	 * We must not deference the iterator returned by end(). It is used to see is if we reached the
+	 * end of the container, when we iterate through it.
+	 */
+	std::list<int>::iterator itEnd = lst4.end();
+	if(!lst4.empty())
+	{
+		TESTIFY_ASSERT( itBegin != itEnd );
+	}
+	//iterate through lst4
+	std::list<int>::iterator iter;
+	for(iter = itBegin; iter != itEnd; ++iter)
+	{
+		//adds 11 to each element of deque
+		*iter += 11;
+	}
 
 	/**
 	 * insert function: inserts an element before the specified position.

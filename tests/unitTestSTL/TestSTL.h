@@ -23,7 +23,6 @@ public:
 	 */
 	void testPair();
 
-
 	/**
 	 * Function for testing std::auto_ptr
 	 * auto_ptr is a smart pointer that takes ownership of the pointer it stores.
@@ -84,6 +83,88 @@ public:
 	 * std::deque is defined in the <deque> header.
 	 */
 	void test_deque();
+
+	/**
+	 * test_map: function for testing the map from STL
+	 * map - is an associative container. That means that an entry in the map
+	 * is a combination of key - value. std::map manages key/value std::pairs as elements.
+	 * The key is used to identify an element in the map.
+	 * std::map sorts its elements automatically by key. The default comparison criterion
+	 * is operator<. Another ordering criterion can be provided as a template parameter (third parameter).
+	 * std::map allows only unique entries. That means that you can't have in a map two entries
+	 * with the same key. If you try to insert in map a entry with a certain key,
+	 * and inside the map exits already an element with that key, the element will be overridden.
+	 * std::map is defined in the <map> header.
+	 */
+	void test_map();
+
+	/**
+	 * test_set: function for testing the set from STL
+	 * std::set is an associative container, that stores unique elements. Associative container means that,
+	 * the index doesn't have to be an integer. It can be any type. std::set has, as his first template parameter,
+	 * the index type, like this:
+	 * 			template <	class Key,
+	 * 						class Compare = less<Key>,
+	 * 						....
+	           	    	  > class set;
+	 * std::set sorts automatically it's elements from lower to higher. The second template parameter is
+	 * the ordering criterion, and  is by default std::less<Key>. Another one can be provided anf it has to be
+	 * a class that takes two arguments of the same type as the container elements and returns a bool. (See  example bellow).
+	 * std::set accepts only one copy of an object. So it's guaranteed that a set will hold unique values. If you try to insert
+	 * an object that is equivalent to one that is already in the set, the set won't make the insertion.
+	 * std::set has bidirectional iterators. We can advance with ++ and -- operators, but we can't move more than one step.
+	 * That means that we can write for example:
+	 * 				++mySetIterator; 	//ok. Move one step forward
+	 * 				--mySetIterator; 	//ok. Move one step backward
+	 * 				mySetIterator + 5; 	//not ok. It won't compile. Only random access iterators can move more then a step...
+	 * 				mySetIterator - 2	//not ok. It won't compile.
+	 * std::set is designed to be efficient accessing its elements.
+	 * std::set is defined in the <set> header
+	 */
+	void test_set();
+
+	/**
+	 * test_multiset: function for testing the multiset
+	 * std::multiset is an associative container. Associative container means that,
+	 * the index doesn't have to be an integer. It can be any type. std::multiset has, as its first template parameter,
+	 * the index type, like this:
+	 * 			template <	class Key,
+	 * 						class Compare = less<Key>,
+	 * 						....
+	           	    	  > class multiset;
+	 * std::multiset sorts automatically it's elements from lower to higher. The second template parameter is
+	 * the ordering criterion, and  is by default std::less<Key>. Another orsering criterion can be provided, and it has to be
+	 * a class that takes two arguments of the same type as the container elements, and returns a bool. (See  example bellow).
+	 * std::multiset accepts multiple copies of an object.
+	 * std::multiset has bidirectional iterators. We can advance with ++ and -- operators, but we can't move more than one step.
+	 * That means that we can write for example:
+	 * 				++myMultisetIterator; 	//ok. Move one step forward
+	 * 				--myMultisetIterator; 	//ok. Move one step backward
+	 * 				myMultisetIterator + 5; //not ok. It won't compile. Only random access iterators can move more then a step...
+	 * 				myMultisetIterator - 2	//not ok. It won't compile.
+	 * std::multiset is designed to be efficient accessing its elements.
+	 * std::multiset is defined in the <set> header
+	 */
+	void test_multiset();
+
+	/**
+	 *  stack is a container that operates as in a LIFO (last in first out) mode.
+	 *  The elements are inserted and extracted only from the end of the container.
+	 *  std::stack is implemented as a container adaptor. Containers adapters are classes that use an
+	 *  encapsulated container and provide a restricted interface to that container.
+	 *  The underlying container can be a STL container or some other  container type. It has to provide the
+	 *  following public member functions: back(), push_back(), pop_back().
+	 *  stack is defined as a template taking with two parameters:
+	 *  		template < 	class T,
+	 *  					class Container = deque<T>
+	 *  				>
+	 *  				class stack;
+	 * 		The first parameter is the type of elements in will contain.
+	 * 		The second parameter is the underlying container, and is by default std::deque.
+	 * std::stack is defined in the <stack> header.
+	 */
+	void test_stack();
+
 };
 
 #endif /* TESTSTL_H_ */

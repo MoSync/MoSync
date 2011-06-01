@@ -23,11 +23,20 @@ TestSTL::TestSTL() : TestCase("STLTest")
 			bind(&TestSTL::test_comparasion_operators, this), "testComparasionOperators");
 
 		addTest(
-				bind(&TestSTL::test_vector, this), "test_vector");
+			bind(&TestSTL::test_vector, this), "test_vector");
 
 		addTest(
-				bind(&TestSTL::test_list, this), "test_list");
+			bind(&TestSTL::test_list, this), "test_list");
 
 		addTest(
-				bind(&TestSTL::test_deque, this), "test_deque");
+			bind(&TestSTL::test_deque, this), "test_deque");
+
+		addTest(
+			bind(&TestSTL::test_set, this), "test_set");
+
+		addTest(
+			bind(&TestSTL::test_multiset, this), "test_multiset");
+
+		addTest(
+			bind(&TestSTL::test_stack, this), "test_stack");
 }
