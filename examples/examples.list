@@ -8,6 +8,7 @@ debugging
 HelloMap
 HelloNativeUI
 HelloOpenGLES
+RockPaperScissorsGameNativeUI
 Location = location
 MapDemo
 MAStx

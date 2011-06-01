@@ -544,8 +544,8 @@ void PlayScreen::setupUI()
 	if (-1 == mScreen)
 	{
 		maPanic(0,
-			"This application uses NativeUI, which currently is "
-			"supported only on Android and iOS devices.");
+			"NativeUI is only available on Android and iPhone. "
+			"You must run directly on the device or devices emulator.");
 	}
 
 	// Create the main layout.
