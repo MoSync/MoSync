@@ -80,8 +80,8 @@ public:
 		if (-1 == screen)
 		{
 			maPanic(0,
-				"This application uses NativeUI, which currently "
-				"is supported on Android and iOS devices.");
+				"OpenGL is only available on Android and iPhone. "
+				"You must run directly on the device or devices emulator.");
 		}
 		
 		// Create a GL_VIEW widget and add it to the screen.
@@ -383,7 +383,6 @@ private:
 	    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, indices);
 
 	    // Disable texture and vertex arrays.
-//	    glDisableClientState(GL_NORMAL_ARRAY);
 	    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	    glDisableClientState(GL_VERTEX_ARRAY);
 
