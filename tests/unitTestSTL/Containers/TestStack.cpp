@@ -16,7 +16,7 @@
  *  encapsulated container and provide a restricted interface to that container.
  *  The underlying container can be a STL container or some other  container type. It has to provide the
  *  following public member functions: back(), push_back(), pop_back().
- *  stack is defined as a template taking with two parameters:
+ *  stack is defined as a template taking two parameters:
  *  		template < 	class T,
  *  					class Container = deque<T>
  *  				>

@@ -10,6 +10,10 @@
 
 TestSTL::TestSTL() : TestCase("STLTest")
 {
+		//*******************************************************************************************
+		//						UTILITIES: pair, auto_ptr, max, min, !=, >, <=, >=
+		//*******************************************************************************************
+
 		addTest(
 			bind(&TestSTL::testPair, this),	"testPair");
 
@@ -21,6 +25,10 @@ TestSTL::TestSTL() : TestCase("STLTest")
 
 		addTest(
 			bind(&TestSTL::test_comparasion_operators, this), "testComparasionOperators");
+
+		//*******************************************************************************************
+		//								CONTAINERS
+		//*******************************************************************************************
 
 		addTest(
 			bind(&TestSTL::test_vector, this), "test_vector");
@@ -39,4 +47,23 @@ TestSTL::TestSTL() : TestCase("STLTest")
 
 		addTest(
 			bind(&TestSTL::test_stack, this), "test_stack");
+
+		addTest(
+			bind(&TestSTL::test_prority_queue, this), "test_priority_queue");
+
+		addTest(
+				bind(&TestSTL::test_queue, this), "test_queue");
+
+		addTest(
+				bind(&TestSTL::test_bitset, this), "test_bitset");
+
+		//*******************************************************************************************
+		//								ALGORITHMS
+		//*******************************************************************************************
+
+		addTest(
+				bind(&TestSTL::predicate_example, this), "predicate_example");
+
+		addTest(
+				bind(&TestSTL::example_functors, this), "example_functors");
 }

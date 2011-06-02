@@ -11,7 +11,7 @@
 
 DummyClass::DummyClass(const std::string &name):mName(name)
 {
-	LOG("\t\tDummyClass constructor: %s", mName.c_str());
+	//LOG("\t\tDummyClass constructor: %s", mName.c_str());
 }
 DummyClass::DummyClass(const DummyClass &rv)
 {
@@ -29,11 +29,11 @@ DummyClass &DummyClass::operator=(const DummyClass &rv)
 }
 DummyClass::~DummyClass()
 {
-	LOG("\t\tDummyClass destructor: %s", mName.c_str());
+	//LOG("\t\tDummyClass destructor: %s", mName.c_str());
 }
 void DummyClass::SomeFunction()
 {
-	LOG("\t\tDummyClass::SomeFunction");
+	//LOG("\t\tDummyClass::SomeFunction");
 }
 
 std::string DummyClass::getName()const

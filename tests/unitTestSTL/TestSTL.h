@@ -15,6 +15,9 @@ class TestSTL: public Testify::TestCase
 public:
 	TestSTL();
 
+	//*******************************************************************************************
+	//						UTILITIES: pair, auto_ptr, max, min, !=, >, <=, >=
+	//*******************************************************************************************
 	/**
 	 * Function for testing std::pair
 	 * The pair structure is provided
@@ -43,6 +46,10 @@ public:
 	 * The operators are defined as template functions in std::rel_ops namespace
 	 */
 	void test_comparasion_operators();
+
+	//*******************************************************************************************
+	//								CONTAINERS
+	//*******************************************************************************************
 
 	/**
 	 * Function for testing the STL vector container. Vector is a sequence container, that is
@@ -164,6 +171,86 @@ public:
 	 * std::stack is defined in the <stack> header.
 	 */
 	void test_stack();
+
+	/**
+	 *  std::priority_queue is a container in which, the first element is always the element with lowest priority the
+	 *  of all the elements it contains. The element at the top is the element with the highest priority.
+	 *  std::priority_queue is implemented as a container adaptor. Containers adapters are classes that use an
+	 *  encapsulated container and provide a restricted interface to that container.
+	 *  The underlying container can be a STL container or some other  container type. It has to provide the
+	 *  following public member functions: back(), push_back(), pop_back().
+	 *  priority_queue is defined as a template taking three parameters:
+	 *  		template < 	class T,
+	 *  					class Container = vector<T>,
+	 *  					class Compare = less<typename Container::value_type>
+	 *  				>
+	 *  				class priority_queue;
+	 * 		The first parameter is the type of elements in will contain.
+	 * 		The second parameter is the underlying container, and is by default std::vector.
+	 * 		The Compare is the comparison class. std::less is the default. Another comparison criterion can be
+	 * 		provided. It may to be a functor object (a class implementing a function call operator), or just a
+	 * 		pointer  to a function.
+	 * 		The function object's call operator has to take two arguments of the same type as the container
+	 * 		elements and to return a bool. If we provide a pointer to a function, same applies to the function.
+	 * 		(See  example bellow).
+	 * std::priority_queue is defined in the <queue> header.
+	 */
+	void test_prority_queue();
+
+	/**
+	 *  std::queue is designed to operate in a FIFO mode (first-in first-out).
+	 *  std::priority_queue is implemented as a container adaptor. Containers adapters are classes that use an
+	 *  encapsulated container and provide a restricted interface to that container.
+	 *  The underlying container can be a STL container or some other  container type. It has to provide the
+	 *  following public member functions: front(), back(), push_back(), pop_front().
+	 *  priority_queue is defined as a template taking three parameters:
+	 *  		template < 	class T,
+	 *  					class Container = deque<T>
+	 *  				>
+	 *  				class queue;
+	 * 		The first parameter is the type of elements it will contain.
+	 * 		The second parameter is the underlying container, and is by default std::deque.
+	 * std::priority_queue is defined in the <queue> header.
+	 */
+	void test_queue();
+
+	/**
+	*  function for testing bitset
+	*  bitset is a special container class that is designed to store bits.
+	*  It is optimized for space allocation: each element occupies only one bit.
+	*  bitset is defined as a class template taking one parameter (of type unsigned int):
+	*  			template < size_t N > class bitset;
+	*  			N = the number of bits to represent
+	*  It is defined in the <bitset> header.
+	*/
+	void test_bitset();
+
+	//*******************************************************************************************
+	//								ALGORITHMS
+	//*******************************************************************************************
+
+	/**
+	* a predicate is a function that returns a boolean value
+	* predicates are used usually, with STL algorithms, or with containers that sort they elements
+	* Binary predicates are predicates that take two arguments.
+	* Unary predicates are predicates taking one argument.
+	* Usually binary predicates are used with sorting containers, providing them a way to compare
+	* two elements.
+	*/
+	void predicate_example();
+
+
+	/**
+	* Standard function adaptors (see Adaptors.cpp) make assumptions
+	* about the functors they use. (See Functor.cpp for what is a functor).
+	* STL provides two templates (unary_function and binary_function),
+	* that can be inherited by a functor, in order to meet the requirements
+	* of STL functor adapter.
+	* unary_function and binary_function are defined <functional> header.
+	*/
+	void example_function_pointer_adapters();
+
+	void example_functors();
 
 };
 

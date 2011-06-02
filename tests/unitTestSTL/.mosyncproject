@@ -3,7 +3,7 @@
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
-<property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%\include\stlport,  %mosync-home%\include\newlib, %mosync-home%\include\testify"/>
+<property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%\include\stlport,  %mosync-home%\include\newlib"/>
 <property key="build.prefs:additional.include.paths/Release" value="C:\MoSync\include\stlport, C:\MoSync\include\newlib"/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
 <property key="build.prefs:additional.libraries/Debug" value="testify.lib, MAUtil.lib,  newlib.lib, stlport.lib"/>

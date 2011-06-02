@@ -9,23 +9,8 @@
 #include <utility>  		//for std::pair
 #include "../TestSTL.h"
 #include "../DummyClass.h"
+#include "../FunctorForDummyClass.h"
 #include "../LOG.h"
-
-/**
- * We have to provide a way to compare two DummyClass objects.
- * We didn't provide an operator< in DummyClass, so we have to provide some comparison criterion that enables set
- * to sort its elements.
- * If we had provided an operator < for the DummyClass, then we could use the default comparison class (std::less).
- * That would have called our operator< automatically.
- */
-
-struct PredicateForDummy
-{
-	bool operator()(const DummyClass &a, const DummyClass &b) const
-	{
-		return a.getName() < b.getName();
-	}
-};
 
 /**
  * test_set: function for testing the set from STL
@@ -122,17 +107,17 @@ void TestSTL::test_set()
 
 	/**
 	 * default constructor
-	 * The second template parameter, "PredicateForDummy", is the comparison class. The std::set object will use
-	 * an object of type "PredicateForDummy" to compare objects of type "DummyClass" and to sort them accordingly.
+	 * The second template parameter, "FunctorForDummy", is the comparison class. The std::set object will use
+	 * an object of type "FunctorForDummy" to compare objects of type "DummyClass" and to sort them accordingly.
 	 * The sorting is made as we insert elements, so in every moment the elements in a std::set are sorted.
 	 */
-	set<DummyClass, PredicateForDummy> s2;
+	set<DummyClass, FunctorForDummy> s2;
 	DummyClass smallDummy("A");
 	DummyClass bigDummy("C");
 	DummyClass middleDummy("B");
 	s2.insert(bigDummy);
-	s2.insert(smallDummy);		//calls PredicateForDummy::operator()  and inserts the "smallDummy" before the "bigDummy"
-	s2.insert(middleDummy);		//calls PredicateForDummy::operator()  and inserts the "middleDummy" in the right place.
+	s2.insert(smallDummy);		//calls FunctorForDummy::operator()  and inserts the "smallDummy" before the "bigDummy"
+	s2.insert(middleDummy);		//calls FunctorForDummy::operator()  and inserts the "middleDummy" in the right place.
 
 	set<DummyClass>::iterator iter = s2.begin();
 	TESTIFY_ASSERT(*iter == smallDummy);		//the first element should be the smallest
@@ -147,19 +132,19 @@ void TestSTL::test_set()
 	 * and makes a copy of each of the elements from that range, inserting it into the container.
 	 * In the example bellow, a the new set is constructed and is filled with the all elements from the s3 set.
 	 */
-	set<DummyClass, PredicateForDummy> s3(s2.begin(), s2.end());
+	set<DummyClass, FunctorForDummy> s3(s2.begin(), s2.end());
 	TESTIFY_ASSERT( s3 == s2 ); 	//set provides besides ==, also !=, <, >, <=, >=.
 
 	/**
 	 * copy constructor
 	 */
-	set<DummyClass, PredicateForDummy> s4(s3);
+	set<DummyClass, FunctorForDummy> s4(s3);
 	TESTIFY_ASSERT( s4 == s3 );
 
 	/**
 	 *  erase function: removes a single element, or a range of elements
 	 */
-	set<DummyClass, PredicateForDummy>::iterator it = s4.begin();
+	set<DummyClass, FunctorForDummy>::iterator it = s4.begin();
 	TESTIFY_ASSERT(*it == smallDummy);		//the first element is smallDummy.
 	s4.erase(smallDummy);							//erase the first element from s4.
 	it = s4.begin();						//"it" iterator was invalidated by the erase. Have to retrieve again the first element
@@ -179,7 +164,7 @@ void TestSTL::test_set()
 	 * to it if found. If not it returns an iterator to the element past the end of the container (set::end).
 	 * set::find() member function is much faster than the generic std::find( ) algorithm (from <algorithm>).
 	 */
-	set<DummyClass, PredicateForDummy>::iterator found = s3.find(smallDummy); //s3 empty, nothing to find
+	set<DummyClass, FunctorForDummy>::iterator found = s3.find(smallDummy); //s3 empty, nothing to find
 	TESTIFY_ASSERT( s3.end() == found );
 	DummyClass f1("found me");
 	s3.insert(f1);
