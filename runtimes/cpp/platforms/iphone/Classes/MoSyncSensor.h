@@ -18,7 +18,7 @@
 #import <UIKit/UIKit.h>
 #import <CoreMotion/CoreMotion.h>
 #import <CoreLocation/CoreLocation.h>
-
+ 
 /**
  * A class for handling sensors.
  */

@@ -18,6 +18,15 @@
 		4389D92D1383EE55007082CF /* SliderWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 4389D92B1383EE54007082CF /* SliderWidget.h */; };
 		4389D92E1383EE55007082CF /* SliderWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4389D92C1383EE54007082CF /* SliderWidget.mm */; };
 		4389D92F1383EE55007082CF /* SliderWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4389D92C1383EE54007082CF /* SliderWidget.mm */; };
+		43AF4291139CF736001FD030 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FE41139CF46D00539962 /* MediaPlayer.framework */; };
+		43AF4292139CF73B001FD030 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FE3F139CF46600539962 /* CoreMotion.framework */; };
+		43AF4293139CF742001FD030 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FE41139CF46D00539962 /* MediaPlayer.framework */; };
+		43AF4294139CF745001FD030 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FE3F139CF46600539962 /* CoreMotion.framework */; };
+		43B18F0C1393AC7700A66C9F /* VideoViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B18F0A1393AC7700A66C9F /* VideoViewWidget.h */; };
+		43B18F0D1393AC7700A66C9F /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B18F0B1393AC7700A66C9F /* VideoViewWidget.mm */; };
+		43B18F0E1393AC7700A66C9F /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B18F0B1393AC7700A66C9F /* VideoViewWidget.mm */; };
+		43D9FE40139CF46600539962 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FE3F139CF46600539962 /* CoreMotion.framework */; };
+		43D9FE42139CF46D00539962 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D9FE41139CF46D00539962 /* MediaPlayer.framework */; };
 		43DD67EC13826C860097BE2E /* ProgressBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43DD67EA13826C840097BE2E /* ProgressBarWidget.h */; };
 		43DD67ED13826C860097BE2E /* ProgressBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43DD67EB13826C850097BE2E /* ProgressBarWidget.mm */; };
 		43DD67EE13826C860097BE2E /* ProgressBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43DD67EB13826C850097BE2E /* ProgressBarWidget.mm */; };
@@ -225,6 +234,10 @@
 		432933E7137ACEAE00150108 /* MoSyncSensor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncSensor.mm; sourceTree = "<group>"; };
 		4389D92B1383EE54007082CF /* SliderWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SliderWidget.h; sourceTree = "<group>"; };
 		4389D92C1383EE54007082CF /* SliderWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SliderWidget.mm; sourceTree = "<group>"; };
+		43B18F0A1393AC7700A66C9F /* VideoViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewWidget.h; sourceTree = "<group>"; };
+		43B18F0B1393AC7700A66C9F /* VideoViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoViewWidget.mm; sourceTree = "<group>"; };
+		43D9FE3F139CF46600539962 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		43D9FE41139CF46D00539962 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		43DD67EA13826C840097BE2E /* ProgressBarWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressBarWidget.h; sourceTree = "<group>"; };
 		43DD67EB13826C850097BE2E /* ProgressBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressBarWidget.mm; sourceTree = "<group>"; };
 		43E425761383A5FA0064079B /* ActivityIndicatorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorWidget.h; sourceTree = "<group>"; };
@@ -395,6 +408,8 @@
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */,
+				43AF4294139CF745001FD030 /* CoreMotion.framework in Frameworks */,
+				43AF4293139CF742001FD030 /* MediaPlayer.framework in Frameworks */,
 				85E2A0D61181D1B200CDB453 /* AudioToolbox.framework in Frameworks */,
 				850943891185B35D004A3B2D /* AVFoundation.framework in Frameworks */,
 				850944011185C440004A3B2D /* CoreLocation.framework in Frameworks */,
@@ -411,8 +426,10 @@
 				85F2551411AC12A700EB47EE /* AudioToolbox.framework in Frameworks */,
 				85F2551511AC12A700EB47EE /* CoreGraphics.framework in Frameworks */,
 				85F2551611AC12A700EB47EE /* Foundation.framework in Frameworks */,
+				43AF4292139CF73B001FD030 /* CoreMotion.framework in Frameworks */,
 				85F2551711AC12A700EB47EE /* UIKit.framework in Frameworks */,
 				858B404012E680460058DBFC /* QuartzCore.framework in Frameworks */,
+				43AF4291139CF736001FD030 /* MediaPlayer.framework in Frameworks */,
 				858B404112E680510058DBFC /* OpenGLES.framework in Frameworks */,
 				858B404212E6806A0058DBFC /* CoreLocation.framework in Frameworks */,
 			);
@@ -422,6 +439,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43D9FE42139CF46D00539962 /* MediaPlayer.framework in Frameworks */,
+				43D9FE40139CF46600539962 /* CoreMotion.framework in Frameworks */,
 				85F2557E11AC155D00EB47EE /* Foundation.framework in Frameworks */,
 				85F2557F11AC155D00EB47EE /* UIKit.framework in Frameworks */,
 				85F2558011AC155D00EB47EE /* CoreGraphics.framework in Frameworks */,
@@ -514,6 +533,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				43D9FE41139CF46D00539962 /* MediaPlayer.framework */,
+				43D9FE3F139CF46600539962 /* CoreMotion.framework */,
 				857B020112C627C200DEA306 /* OpenGLES.framework */,
 				850944001185C440004A3B2D /* CoreLocation.framework */,
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
@@ -632,6 +653,8 @@
 				43E425771383A5FA0064079B /* ActivityIndicatorWidget.mm */,
 				4389D92B1383EE54007082CF /* SliderWidget.h */,
 				4389D92C1383EE54007082CF /* SliderWidget.mm */,
+				43B18F0A1393AC7700A66C9F /* VideoViewWidget.h */,
+				43B18F0B1393AC7700A66C9F /* VideoViewWidget.mm */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -816,6 +839,7 @@
 				43DD67EC13826C860097BE2E /* ProgressBarWidget.h in Headers */,
 				43E425781383A5FA0064079B /* ActivityIndicatorWidget.h in Headers */,
 				4389D92D1383EE55007082CF /* SliderWidget.h in Headers */,
+				43B18F0C1393AC7700A66C9F /* VideoViewWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -993,6 +1017,7 @@
 				43DD67ED13826C860097BE2E /* ProgressBarWidget.mm in Sources */,
 				43E425791383A5FA0064079B /* ActivityIndicatorWidget.mm in Sources */,
 				4389D92E1383EE55007082CF /* SliderWidget.mm in Sources */,
+				43B18F0D1393AC7700A66C9F /* VideoViewWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1060,6 +1085,7 @@
 				43DD67EE13826C860097BE2E /* ProgressBarWidget.mm in Sources */,
 				43E4257A1383A5FA0064079B /* ActivityIndicatorWidget.mm in Sources */,
 				4389D92F1383EE55007082CF /* SliderWidget.mm in Sources */,
+				43B18F0E1393AC7700A66C9F /* VideoViewWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

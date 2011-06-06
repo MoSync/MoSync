@@ -3077,7 +3077,12 @@ group WidgetAPI "Widget API" {
 					*/
 					MAWidgetHandle toScreen;
 			} stackScreenPopInfo;
-	
+	        
+	        /**
+			* @brief The new state of the video widget when a #MAW_VIDEO_STATE_CHANGED event is received.
+			* See \ref VideoWidgetEvent.
+			*/			
+			int videoWidgetInfo;
 		}
 	}
 
@@ -3138,6 +3143,10 @@ group WidgetAPI "Widget API" {
 		 */
 	    SLIDER_VALUE_CHANGED = 11;
 		
+		/**
+		 * @brief Sent from the Video View when the state of the player has changed.
+		 */
+		VIDEO_STATE_CHANGED = 14;
 	}
 	} // end of WidgetEventTypes
 
@@ -3195,6 +3204,66 @@ group WidgetAPI "Widget API" {
 	}
 	}
 
+	/**
+	* The available playback actions for the video widget. For more info see \ref WidgetVideoViewProperties.
+	*/
+	group VideoWidgetAction "Video widget action" {
+	constset int MAW_VIDEO_WIDGET_ACTION_ {
+		/**
+		* @brief Play the video.
+		*/
+		PLAY = -1;
+
+		/**
+		* @brief Pause the video.
+		*/
+		PAUSE = -2;
+		
+		/**
+		* @brief Stop the video.
+		*/
+		STOP = -3;
+	}
+	}
+	
+   /**
+	* Events for the video widget. For more info see \ref WidgetVideoViewProperties.
+	*/
+	group VideoWidgetEvent "Video widget event" {
+	constset int MAW_VIDEO_WIDGET_ {
+		/**
+		* @brief The video is playing.
+		*/
+		PLAYING = -1;
+
+		/**
+		* @brief The video is paused.
+		*/
+		PAUSED = -2;
+		
+		/**
+		* @brief The video is stopped.
+		*/
+		STOPPED = -3;
+		
+		/**
+		* @brief The video has finished playing.
+		*/
+		FINISHED = -4;
+		
+		/**
+		* @brief The buffer has enough data for the playback to begin.
+		*/
+		LOADED = -5;
+		
+		/**
+		* @brief Playback is temporarily interruped(maybe there's no data in the buffer).
+		*/
+		INTERRUPTED = -5;
+		
+	}
+	}
+	
 	/**
 	* The available result codes for the widget api.
 	*/
@@ -3385,6 +3454,13 @@ group WidgetAPI "Widget API" {
 		 * See \ref WidgetSliderProperties "Slider properties" for the properties available.
 		 */
 		SLIDER = "Slider";
+		
+		/**
+		 * @brief A Video View displays a video file.
+		 * 
+		 * See \ref WidgetVideoViewProperties "Video View properties" for the properties available.
+		 */
+		VIDEO_VIEW = "VideoView";
 	}
 	} // end of WidgetTypes
 
@@ -4376,6 +4452,74 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetSliderProperties
 	
+	/**
+	* The available widget properties for a #MAW_VIDEO_VIEW. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetVideoViewProperties "Video View properties" {
+	constset MAString MAW_VIDEO_VIEW_ {
+		/**
+		* @brief Sets the video path.
+		*
+		* @validvalue Any valid path.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Set the video path.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_PATH, "\data\Video1.wav");
+		* \endcode
+		*/		
+		PATH = "path";
+		
+		/**
+		* @brief Sets the video url.
+		*
+		* @validvalue Any valid streaming url.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Set the video path.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_URL, "www.example.com/play.m3u8");
+		* \endcode
+		*/		
+		URL = "url";
+		
+		/**
+		* @brief Start,pause or stop the video playback.
+		*
+		* @validvalue MAW_VIDEO_WIDGET_ACTION_PLAY, MAW_VIDEO_WIDGET_ACTION_PAUSE or MAW_VIDEO_WIDGET_ACTION_STOP constants.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Start the playback.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_WIDGET_ACTION, toString(MAW_VIDEO_WIDGET_ACTION_PLAY));
+		* \endcode
+		*/		
+		ACTION = "action";
+
+	  /**
+		* @brief Gets the video file duration.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_DURATION, buf, BUFFER_SIZE);
+		*   // Do something with the duration.	
+		* \endcode
+		*/		
+		DURATION = "duration";
+	}
+	} // end of WidgetVideoViewProperties
+	
 	} // end of WidgetProperties	
 		
 	typedef int MAWidgetHandle;
@@ -4875,6 +5019,13 @@ group WidgetAPI "Widget API" {
 			FACE_UP = 5;
 			// The device is held parallel to the ground with the screen facing downwards.
 			FACE_DOWN = 6;
+		}
+		
+		constset int SENSOR_PROXIMITY_VALUE_ {
+			// the device is close to the user
+			TRUE = 1;
+			// the device is not close to the user
+			FALSE = 0;
 		}
 		
 		/**

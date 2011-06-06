@@ -364,7 +364,13 @@
  */
 -(void)proximityChanged {
     UIDevice *device = [UIDevice currentDevice];
-    float sensorValue = [device proximityState];
+    
+    float sensorValue;
+    if([device proximityState]) {
+        sensorValue = SENSOR_PROXIMITY_VALUE_TRUE;
+    } else {
+        sensorValue = SENSOR_PROXIMITY_VALUE_FALSE;    
+    }
     
     MAEvent event;
 	event.type = EVENT_TYPE_SENSOR;
@@ -372,7 +378,7 @@
 	event.sensor.values[0] = sensorValue;
 	Base::gEventQueue.put(event);
 }
-
+ 
 /**
  * Delivers the latest data from orientation sensor.
  */

@@ -16,21 +16,18 @@
  */
 
 #import <Foundation/Foundation.h>
+#import <MediaPlayer/MediaPlayer.h>  
 #import "IWidget.h"
 
 /**
- * Displays a slider to the user.
+ * Displays a video player to the user.
  */
-@interface SliderWidget : IWidget {
-    /**
-     * The maximum value of the slider.
-     */
-    float maxValue;
+@interface VideoViewWidget : IWidget {
     
     /**
-     * The progress value.
-     */ 
-    float progressValue;
+     * Controller for the media player.
+     */
+    MPMoviePlayerController *moviePlayerController;
 }
 
 /**
@@ -39,18 +36,29 @@
 - (id)init;
 
 /**
- * Sets a slider property.
- * @param key The property of the slider widget that should be set.
+ * Release the objects and remove the observers.
+ */
+- (void)dealloc;
+
+/**
+ * Sets a video widget property.
+ * @param key The property of the video widget that should be set.
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 
 /**
- * Returns a property value of the slider widget.
- * @param key The property of the slider widget. 
+ * Returns a property value of the video widget.
+ * @param key The property of the video widget. 
  * @return The value for the given property.
  */
 - (NSString*)getPropertyWithKey: (NSString*)key;
+
+/**
+ * Handle and video widget action(play, pause or stop the video).
+ * @param One of the VideoWidgetAction.
+ */
+-(void)handleAction:(NSString*) value;
 
 @end
