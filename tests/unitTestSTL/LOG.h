@@ -9,6 +9,7 @@
 #define LOG_H_
 
 #include <mavsprintf.h>
-#define LOG lprintfln
+#define LOG printf
+//#define LOG lprintfln
 
 #endif /* LOG_H_ */

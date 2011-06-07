@@ -252,6 +252,19 @@ public:
 
 	void example_functors();
 
+	void test_functors();
+
+	void test_algorithms();
 };
+
+namespace NumericUtilities
+{
+
+	bool isEven(int x);
+	bool isOdd(int x);
+	bool isNegative(int x);
+
+}//end NumericUtilities
+
 
 #endif /* TESTSTL_H_ */

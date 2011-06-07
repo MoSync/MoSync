@@ -20,20 +20,6 @@
 * Usually binary predicates are used with algorithms that need to compare two elements (e.g sorting algorithms).
 */
 
-bool isEven(int x)
-{
-	return x%2 == 0;
-}
-
-bool isNegative(int x)
-{
-	return x < 0;
-}
-
-bool compareByExperience(const Employee &lv, const Employee &rv)
-{
-	return lv.getExperience() < rv.getExperience();
-}
 
 void TestSTL::predicate_example()
 {
@@ -48,10 +34,10 @@ void TestSTL::predicate_example()
 	* condition we supply (e.g isEven, isNegative)
 	*/
 
-	int res = std::count_if(myVector.begin(), myVector.end(), isEven);		//returns the how many numbers are even
+	int res = std::count_if(myVector.begin(), myVector.end(), NumericUtilities::isEven);		//returns the how many numbers are even
 	TESTIFY_ASSERT(res == 6);
 
-	res = std::count_if(myVector.begin(), myVector.end(), isNegative);		//returns how many numbers are negative
+	res = std::count_if(myVector.begin(), myVector.end(), NumericUtilities::isNegative);		//returns how many numbers are negative
 	TESTIFY_ASSERT( res == 0);
 
 	//binary predicates:
@@ -66,10 +52,9 @@ void TestSTL::predicate_example()
 	*/
 
 	//sort by experience
-	std::sort(myStaff.begin(), myStaff.end(), compareByExperience); //supply a binary predicate for comparing employees
+	std::sort(myStaff.begin(), myStaff.end(), lessExperience); //supply a binary predicate for comparing employees
 
 	TESTIFY_ASSERT( myStaff[0].getExperience() == 2);
 	TESTIFY_ASSERT( myStaff[1].getExperience() == 3);
 	TESTIFY_ASSERT( myStaff[2].getExperience() == 20);
-
 }

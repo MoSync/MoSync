@@ -16,6 +16,7 @@
 class Employee
 {
 public:
+	Employee();
 	Employee(int exp, const std::string &name);
 
 	int getExperience() const;
@@ -29,5 +30,12 @@ private:
 	int 			mSalary;
 	std::string 	mName;
 };
+
+bool operator==(const Employee &lv, const Employee &rv);
+bool operator!=(const Employee &lv, const Employee &rv);
+
+bool lessExperience(const Employee &lv, const Employee &rv);
+bool equalSalary(const Employee &lv, const Employee &rv);
+
 
 #endif /* EMPLOYEE_H_ */

@@ -28,10 +28,6 @@ bool someUnaryFunction(const DummyClass &lv, const DummyClass &rv)
  */
 void TestSTL::test_aux_functions()
 {
-	LOG("*****************************************************************************************************************");
-	LOG("\t\t Testing std::min and std::max template functions");
-	LOG("*****************************************************************************************************************");
-
 	int small = 10;
 	int big = 20;
 

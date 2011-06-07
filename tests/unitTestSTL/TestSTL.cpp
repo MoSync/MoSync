@@ -66,4 +66,32 @@ TestSTL::TestSTL() : TestCase("STLTest")
 
 		addTest(
 				bind(&TestSTL::example_functors, this), "example_functors");
+
+		addTest(
+				bind(&TestSTL::test_functors, this), "test_functors");
+
+		addTest(
+				bind(&TestSTL::test_algorithms, this), "test_algorithms");
 }
+
+
+namespace NumericUtilities
+{
+
+bool isEven(int x)
+{
+	return x%2 == 0;
+}
+
+bool isOdd(int x)
+{
+	return (x%2!=0);
+}
+
+bool isNegative(int x)
+{
+	return x < 0;
+}
+
+}//end namespace NumericUtilities
+
