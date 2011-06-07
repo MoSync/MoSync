@@ -354,14 +354,14 @@ public:
 		// If the user press Ok in the textbox...
     	if (MA_TB_RES_OK == result)
     	{
-			// ...check the length of the text and provide user feedback.
-			checkPasswordLength(textLength);
+			// ...we get the text and set the contents of the
+    		// password box to it.
 
-			// Note: If you wish to use the text the user entered
-			// you probably need to convert the wide string in
-			// mTextBoxBuffer to a byte string. This is a very
-			// simple way of doing this that will only work for
-			// the basic ASCII character set.
+    		// Note: In order to use the text the user entered
+			// we need to convert the wide string in mTextBoxBuffer
+    		// to a byte string. The following is a very simplistic
+    		// way of doing this that will work only for the basic
+    		// ASCII character set.
 			char buffer[256];
 			int i;
 			for (i = 0; i < textLength; ++i)
@@ -371,6 +371,9 @@ public:
 			}
 			// Null terminate string.
 			buffer[i] = 0;
+
+			// Now we set the contents of the password box.
+			mPasswordBox->setText(buffer);
 
 			// Uncomment this line to display the text in
 			// the instructions label.
