@@ -15,7 +15,11 @@ Employee::Employee(int exp, const std::string &name):
 	mExperience(exp),
 	mName(name)
 {
-	mSalary = mExperience * 100 + 50;
+	if(mExperience > 0)
+		mSalary = mExperience * 100;
+	else
+		mSalary = 30;
+
 }
 
 int Employee::getExperience() const
@@ -54,6 +58,13 @@ bool operator!=(const Employee &lv, const Employee &rv)
 bool lessExperience(const Employee &lv, const Employee &rv)
 {
 	return lv.getExperience() < rv.getExperience();
+}
+
+Employee &increaseSalary(Employee &e, int amount)
+{
+	int oldSalary = e.getSalary();
+	e.setSalary(oldSalary + amount);
+	return e;
 }
 
 bool equalSalary(const Employee &lv, const Employee &rv)

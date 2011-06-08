@@ -6,8 +6,10 @@
  */
 
 #include <vector>
+#include <deque>
 #include <string>
 #include <algorithm>
+#include <numeric> 		//for numeric algorithms
 #include "../TestSTL.h"
 #include "../LOG.h"
 #include "../Employee.h"
@@ -608,7 +610,7 @@ void algorithms_for_removing()
 	* the elements, so that the "removed" ones are placed at end of the sequence. All the other elements
 	* remain in the same relative order.
 	* The removing function returns an iterator to the "new end" of the range, which is the end of the
-	* range, without the removed elements. The iterators past the "new end" [new_end - last_end)  are dereferenceable,
+	* range, without the removed elements. The iterators past the "new end" [new_end, last_end)  are deferenceable,
 	* but the values to which they point are unspecified, so we shouldn't use/deference these iterators.
 	*/
 
@@ -881,32 +883,108 @@ void sorting_algorithms()
 	TESTIFY_ASSERT( second_range[0] == 1 && second_range[1] == 2 && second_range[2] == 3 && second_range[3] == 4);
 
 	/**
-	*
-	* void nth_element(RandomAccessIterator first, RandomAccessIterator nth, RandomAccessIterator last);
-	* void nth_element(RandomAccessIterator first, RandomAccessIterator nth, RandomAccessIterator last,
-						BinaryPredicate somePredicate);
+	* std::nth_element: rearranges the elements in a range, so that all the elements smaller than a
+	* specified element will be moved at the beginning of the range. Neither subrange is in any
+	* particular order, the elements aren't sorted.
+	* It has two versions:
+	* 	void nth_element(RandomAccessIterator first, RandomAccessIterator nth_element, RandomAccessIterator last);
+	* 	void nth_element(RandomAccessIterator first, RandomAccessIterator nth_element, RandomAccessIterator last,
+	*					BinaryPredicate somePredicate);
 	*/
+	char letters[] = { 'b', 'd', 'a', 'c', 'w', 'z' };
+	int lettersSize = sizeof(letters)/sizeof(letters[0]);
+	char *nthElem = letters + 1; //'d'
+	std::nth_element(letters, nthElem, letters + lettersSize);
+	LOG("\nnth_element result:\n{ ");
+	for(int i=0; i<lettersSize; ++i)
+	{
+		LOG("%c ", letters[i]);
+	}
+	LOG(" }\n\n");
 
 	/**
-	* bool binary_search(ForwardIterator first, ForwardIterator last, const T& value);
-	* bool binary_search(ForwardIterator first, ForwardIterator last, const T& value, BinaryPredicate somePredicate);
+	* binary_search: performs a binary search in a sorted range.
+	* It has two versions:
+	* 	bool binary_search(ForwardIterator first, ForwardIterator last, const T& value);
+	* 	bool binary_search(ForwardIterator first, ForwardIterator last, const T& value,
+	* 						BinaryPredicate somePredicate);
+	*	Searches in the range [first, last) for "value". It it's found returns true.
+	*	The first version uses operator< for testing if the elements are equal (!(a<b) && !(b<a)),
+	*	and assumes that operator< was used to sort the elements.
+	*	The second version uses "somePredicate" to compare elements and assumes that "somePredicate"
+	*	was used also for sorting.
+	*	The same comparison function has to be used for sorting and for searching. Otherwise the
+	*	results are not defined.
 	*/
+	int myArray[] = { 4, 1, 2, 0 };
+	int sizeArray = sizeof(myArray)/sizeof(myArray[0]);
+	std::vector<int> myVector(myArray, myArray + sizeArray);
+
+	std::sort(myVector.begin(), myVector.end());
+	TESTIFY_ASSERT(myVector[0] == 0 && myVector[1] == 1 && myVector[2] == 2 && myVector[3] == 4);
+
+	bool found = std::binary_search(myVector.begin(), myVector.end(), 2);
+	TESTIFY_ASSERT(found == true);
 
 	/**
-	* ForwardIterator lower_bound(ForwardIterator first, ForwardIterator last, const T& value);
-	* ForwardIterator lower_bound(ForwardIterator first, ForwardIterator last, const T& value, BinaryPredicate somePredicate);
-	*
+	* lower_bound: returns an iterator indicating the first occurrence of a value in a range. If
+	* no value was found, an iterator were it would fit is returned.
+	* It has two overloads:
+	* 	ForwardIterator lower_bound(ForwardIterator first, ForwardIterator last, const T& value);
+	* 	ForwardIterator lower_bound(ForwardIterator first, ForwardIterator last, const T& value,
+	*								BinaryPredicate somePredicate);
+	*   The first version uses operator< to compare elements. The second uses "somePredicate".
 	*/
+	int someValues[] = { 3, 3, 7, 6, 6, 6, 8 };
+	int sizeValues = sizeof(someValues)/sizeof(someValues[0]);
+	std::vector<int> values(someValues, someValues + sizeValues);
+
+	std::sort(values.begin(), values.end());		//{ 3, 3, 7, 6, 6, 6, 8 } => { 3, 3, 6, 6, 6, 7, 8 }
+
+	std::vector<int>::iterator lower = std::lower_bound(values.begin(), values.end(), 6);
+	TESTIFY_ASSERT(*lower = 6);
+
+	//std::distance computes the number of elements between two iterators:
+	int pos = std::distance(values.begin(), lower);
+	TESTIFY_ASSERT(pos == 2);
 
 	/**
-	* ForwardIterator upper_bound(ForwardIterator first, ForwardIterator last, const T& value);
-	* ForwardIterator upper_bound(ForwardIterator first, ForwardIterator last, const T& value, BinaryPredicate somePredicate);
+	* upper_bound: returns an iterator indicating the first element in a range that is greater than a
+	* specified value. If the value is not found, an iterator were it would fit is returned.
+	* Two versions:
+	* 	ForwardIterator upper_bound(ForwardIterator first, ForwardIterator last, const T& value);
+	* 	ForwardIterator upper_bound(ForwardIterator first, ForwardIterator last, const T& value,
+	* 								BinaryPredicate somePredicate);
+	* The first version uses operator< to compare elements. The second uses "somePredicate".
 	*/
+	std::vector<int>::iterator upper = std::upper_bound(values.begin(), values.end(), 6);
+	TESTIFY_ASSERT(7 == *upper);
+	//std::distance computes the number of elements between two iterators:
+	pos = std::distance(values.begin(), upper);
+	TESTIFY_ASSERT(pos == 5);
 
 	/**
-	* pair<ForwardIterator, ForwardIterator> equal_range(ForwardIterator first, ForwardIterator last, const T& value);
-	* pair<ForwardIterator, ForwardIterator> equal_range(ForwardIterator first, ForwardIterator last, const T& value, BinaryPredicate somePredicat);
+	* equal_range: it's a combination or lower_bound and upper_bound. Returns the bounds of the largest subrange
+	* that includes all the elements equal to a certain value.
+	* It has two versions:
+	*	pair<ForwardIterator, ForwardIterator> equal_range(ForwardIterator first, ForwardIterator last, const T& value);
+	* 	pair<ForwardIterator, ForwardIterator> equal_range(ForwardIterator first, ForwardIterator last, const T& value,
+	* 														BinaryPredicate somePredicat);
+	* The first version uses operator< to compare elements. The second uses "somePredicate".
+	* If the value isn't found in the range, the subrange returned has the length zero. Both iterators will point
+	* to the nearest value greater than value. If the value is greater than all the element in the range it returns "last".
 	*/
+	typedef std::vector<int>::iterator ITER;
+	std::pair<ITER, ITER> result = std::equal_range(values.begin(), values.end(), 6);
+	TESTIFY_ASSERT(*result.first == 6);
+	TESTIFY_ASSERT(*result.second == 7);
+
+	//std::distance computes the number of elements between two iterators:
+	pos = std::distance(values.begin(), result.first);
+	TESTIFY_ASSERT(pos == 2);
+
+	pos = std::distance(values.begin(), result.second);
+	TESTIFY_ASSERT(pos == 5);
 }
 
 //*****************************************************************************************
@@ -915,28 +993,230 @@ void sorting_algorithms()
 void heap_operations()
 {
 	/**
-	*
+	*  A heap is a tree were each node is connected to values smaller than its own value.
+	*  The first element is always the greatest value in the heap.
 	*/
+
+	/**
+	*  make_heap: arranges the elements in a range so that they form a heap. The first element is always
+	*  the greatest value in the heap.
+	*  It has two versions:
+	*  	void make_heap ( RandomAccessIterator first, RandomAccessIterator last );
+	*  	void make_heap(RandomAccessIterator first, RandomAccessIterator last, BinaryPredicate somePredicate);
+	*  	The first version compares elements with operator</ The second uses "somePredicate" to compare elements.
+	*/
+	int array[] = { 1, 4, 3, 2 };
+	int arraySize = sizeof(array)/sizeof(array[0]);
+	std::vector<int> v1(array, array + arraySize);
+	std::make_heap(v1.begin(), v1.end());
+	TESTIFY_ASSERT( v1[0] == 4 );
+
+	/**
+	*  push_heap:
+	*   It has two versions: expands a heap range by inserting the last element into the heap (in the proper place).
+	*   It has two variants:
+	*  		void push_heap(RandomAccessIterator first, RandomAccessIterator last);
+	*  		void push_heap(RandomAccessIterator first, RandomAccessIterator last, BinaryPredicate somePredicate);
+	*		push_heap places the value "last - 1" at the the proper place in the heap.
+	*   The first version uses operator< to compare the elements and the second uses "somePredicate".
+	*/
+	int array2[] = { 0, 7, 6 };
+	int sizeArray2 = sizeof(array2)/sizeof(array2[0]);
+
+	std::vector<int> v2(array2, array2 + sizeArray2);
+
+	std::make_heap(v2.begin(), v2.end());
+	TESTIFY_ASSERT( v2[0] == 7 );					//v2 contains now: 7, 0, 6
+
+	v2.push_back(100);
+	TESTIFY_ASSERT( v2[0] == 7 && v2[3] == 100 );	//v2 contains now: 7, 0, 6, 100
+
+	std::push_heap(v2.begin(), v2.end());
+	TESTIFY_ASSERT( v2[0] == 100  && v2[1] == 7 );	//v2 contains now: 100, 7, 0, 6
+
+	/**
+	*  pop_heap: places the first element, into the last position in the heap.
+	*  It has two versions:
+	*   void pop_heap(RandomAccessIterator first, RandomAccessIterator last);
+	*   void pop_heap(RandomAccessIterator first, RandomAccessIterator last, BinaryPredicate somePredicate);
+	*   Places "first" (which has the biggest value) into the position (last - 1) and rearranges the range
+	*   so that is still a heap.
+	*/
+	//v2 contains: 100, 7, 0, 6
+	std::pop_heap(v2.begin(), v2.end());
+	TESTIFY_ASSERT( v2[0] == 7 && v2[3] == 100 );		//v2 contains now: 7, 0, 6, 100. The last element is 100.
+
+	/**
+	* sort_heap: arranges the elements in the heap so that they form a sorted range.
+	* void sort_heap(RandomAccessIterator first, RandomAccessIterator last);
+	* void sort_heap(RandomAccessIterator first, RandomAccessIterator last, BinaryPredicate somePredicate);
+	*/
+	//v2 contains: 7, 0, 6, 100.
+	TESTIFY_ASSERT(v2[0] == 7 && v2[1] == 0 && v2[2] == 6 && v2[3] == 100);
+
+	std::make_heap(v2.begin(), v2.end());
+	TESTIFY_ASSERT(v2[0]== 100 && v2[1] == 7 && v2[2] == 6 && v2[3] == 0);
 }
 
 //*****************************************************************************************
-//								Applying an operation to each element in a range
+//					Applying an operation to each element in a range
 //*****************************************************************************************
 void apply_operations_on_a_range()
 {
 	/**
-	*
+	*  A unary function is a function having one argument.
 	*/
+
+	Employee someStaff[] = { Employee(1, "Bob"), Employee(1, "Bill"), Employee(1, "Ben") };
+	int staffSize = sizeof(someStaff)/sizeof(someStaff[0]);
+	TESTIFY_ASSERT( someStaff[0].getSalary() == 100 &&
+					someStaff[1].getSalary() == 100 &&
+					someStaff[2].getSalary() == 100 );
+	/**
+	* for_each: iterates through a range and applies a operation to each element. The operation can be
+	* implemented as a simple function or a function call operator overloaded in a functor.
+	* prototype: UnaryFunction for_each(InputIterator first, InputIterator last, UnaryFunction someFun);
+	* Calls "someFun" on each of the elements in the range [first, last). We can supply a functor
+	* or a simple function, for "someFun".
+	*/
+	std::vector<Employee> happierStaff(someStaff, someStaff + staffSize);
+	std::for_each(happierStaff.begin(), happierStaff.end(), increaseSalary); //increase salary by 100
+	TESTIFY_ASSERT( happierStaff[0].getSalary() == 200 &&
+					happierStaff[1].getSalary() == 200 &&
+					happierStaff[2].getSalary() == 200 );
+
+	/**
+	* std::transform: iterates through a range and applies an operation to each element, saving the result
+	* in a second range. The operation can be implemented as a simple function or a function call operator
+	* overloaded in a functor.
+	* It has two versions:
+	* 	OutputIterator transform(InputIterator first, InputIterator last, OutputIterator result, UnaryFunction someFun);
+	* 	OutputIterator transform(	InputIterator1 first1, InputIterator1 last1,
+	* 								InputIterator2 first2, OutputIterator destination, BinaryFunction someFun);
+	*   The first version applies "someFun" to all the elements in the range [first1,last1) and
+	*   stores the returned value in the range beginning at destination.
+	*   It performs: *destination++ = someFun(*first++) while first!=last.
+	*   The second version uses, as the first argument for the binary function, an element from the first range,
+	*   and as a second argument, an element from the second range. The result is stored the range that
+	*   begins with "destination".
+	*   It performs: *destination++ = someFun(*first1++, *first2++) while (first1!=last1).	*
+	*   For both versions "destination" must point to  a type that has an operator= available (public)).
+	*
+	* The return value in is the one past the end iterator for the resulting "destination" range.
+	*/
+	std::vector<Employee> happyStaff;
+	happyStaff.resize(happierStaff.size());
+	std::transform(happierStaff.begin(), happierStaff.end(), happyStaff.begin(), increaseSalary);
+	TESTIFY_ASSERT( happyStaff[0].getSalary() == 300 &&
+					happyStaff[1].getSalary() == 300 &&
+					happyStaff[2].getSalary() == 300 );
+
 }
 
 //*****************************************************************************************
 //								Numeric algorithms
 //*****************************************************************************************
+
+// The numeric algorithms are defined in the <numeric> header
 void algorithms_for_numeric_op()
 {
 	/**
-	*
+	* accumulate: returns the result of accumulating all the values in a range.
+	* It has two versions:
+	* 	T accumulate(InputIterator first, InputIterator last, T initialValue);
+	* 	T accumulate(InputIterator first, InputIterator last, T initialValue, BinaryFunction someFun);
+	*   The first version uses operator+.
+	*   It performs:
+	*   	result = initialValue;
+	*   	while( first != last) {
+	*   		result = result + *first++; }
+	*   The second version performs:
+	*   	result = initialValue;
+	*   	while( first != last) {
+	*   		result = someFun(result, *first);
+	*   		++first; }
 	*/
+	int array[] = { 1, 2, 1 };
+	int arraySize = sizeof(array)/sizeof(array[0]);
+	int res = std::accumulate(array, array + arraySize, 5); //1 + 2 = 3; 3 + 1 = 4
+	TESTIFY_ASSERT( (5 + 4 ) == res );						//5 = initial value, 4 = 1 + 2 + 1
+
+	/**
+	* inner_product: computes cumulative product of a range.
+	* It has two versions:
+	* 	T inner_product(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, T initialValue);
+	* 	T inner_product(InputIterator1 first1, InputIterator1 last1, InputIterator2 first2, T initialValue,
+	* 					BinaryFunction1 someFun1, BinaryFunction2 someFun2);
+	*   The first version performs:
+	*   	result = initialValue;
+	*   	while( first1 != last1){
+	*   	result = result + (*first1) * (*first2); }
+	*   	e.g: for two arrays: { 1, 2, 3 }, { 10, 20, 30 } and initial value of -9, the inner product is:
+	*   					-9 + ( 1*10 + 2*20 + 3*30 ).
+	*
+	*   The second version uses "someFun1" instead of operator+ and "someFun2" instead of the multiply operator ("*").
+	*/
+	//array[] = { 1, 2, 1 };
+	int array2[] = { -1, -2, -1 };
+
+	res = std::inner_product(array, array + arraySize,  array2, 0);  //0 + 1*(-1) + 2*(-2) + 1*(-1)
+	TESTIFY_ASSERT( -6 == res );
+
+	res = std::inner_product(array, array +arraySize, array2, 6 );
+	TESTIFY_ASSERT( 0 == res );
+
+	/**
+	*
+	* partial_sum: computes the partial sum of the elements in a range.
+	* It has two versions:
+	* 	OutputIterator partial_sum(InputIterator first, InputIterator last, OutputIterator destination);
+	* 	OutputIterator partial_sum(InputIterator first, InputIterator last, OutputIterator destination,
+	*							  BinaryFunction someFun );
+	*	Assigns to every element in the range, starting at destination, the partial sum of the corresponding
+	*	elements in the range, like this:
+	*			*destination++ = *first;
+	*			*destination++ = *first + *(first + 1);
+	*			*destination++ = *first + *(first + 1) + *(first + 2);
+	*			*destination++ = *first + *(first + 1) + *(first + 2) + *(first + 3);
+	*			ect. Performs this until reaches at the end of the first range (last).
+	*	The first version uses operator+ to sum the elements.
+	*	The second version uses "someFun" instead of operator+.
+	*/
+	int array3[] = { 1, 2, 3 };
+	int array3_size = sizeof(array3)/sizeof(array3[0]);
+	std::vector<int> v3;
+	v3.resize(array3_size);
+	std::partial_sum(array3, array3 + array3_size, v3.begin());
+
+	//v3 will contain: 1, 1+2, 1+2+3
+	TESTIFY_ASSERT( v3[0] == 1 &&
+					v3[1] == (1 + 2) &&
+					v3[2] == (1 + 2 + 3) );
+
+
+	/**
+	* adjacent_difference: iterates through a range and computes the difference of adjacent elements.
+	* It has two versions:
+	* 	OutputIterator adjacent_difference(InputIterator first, InputIterator last, OutputIterator destination);
+	* 	OutputIterator adjacent_difference(InputIterator first, InputIterator last, OutputIterator destination,
+	* 										BinaryFunction someFun);
+	* 	Iterates through [first, last) and computes the difference of the adjacent elements (current_element
+	* 	- previous_element).
+	* 	It performs:
+	* 		*destination++ = *first;
+	* 		*destination++ = *(first+1) - *first;
+	* 		*destination++ = *(first+2) - *(first+1);
+	* 		*destination++ = *(first+3) - *(first+2);
+	* 		Iterates like this until reaches the end of the first range(last).
+	* 	The second form uses "someFun" instead of operator-.
+	*/
+	std::vector<int> v4;
+	v4.resize(array3_size);
+	std::adjacent_difference(array3, array3 + array3_size, v4.begin()); //array3[] = { 1, 2, 3 };
+	//v4 will contain: 1, 2-1, 3-1
+	TESTIFY_ASSERT( v4[0] == 1 		&&
+					v4[1] == (2-1) 	&&
+					v4[2] == (3-2) );
 }
 
 //*****************************************************************************************
@@ -945,8 +1225,117 @@ void algorithms_for_numeric_op()
 void general_utilities()
 {
 	/**
-	*
+	*  std::distance: returns the number of elements in range.
+	*  int distance(InputIterator first, InputIterator last);
 	*/
+	int longArray[] = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 };
+	int longArraySize = sizeof(longArray)/sizeof(longArray[0]);
+	int numElem = std::distance(longArray, longArray + 3);
+	TESTIFY_ASSERT( 3 == numElem );
+
+	numElem = std::distance(longArray, longArray + 14);
+	TESTIFY_ASSERT( 14 == numElem );
+
+	numElem = std::distance(longArray, longArray + 0);
+	TESTIFY_ASSERT( 0 == numElem );
+
+	numElem = std::distance(longArray, longArray + 20);
+	TESTIFY_ASSERT( 20 == numElem );
+	TESTIFY_ASSERT( longArraySize == numElem );
+
+	/**
+	*  back_inserter: returns a "back_insert_iterator" for a  container.
+	*  The "back_insert_iterator" expands the container automatically, calling the "push_back"
+	*  function of the container. It is used to insert elements into a container, rather than overwrite
+	*  the existing elements, using operator=. It is useful with algorithms that overwrite
+	*  elements like, copy.
+	*  The back_insert_iterator class has its operator= defined like this:
+	*  		back_insert_iterator<Container>& operator= (Container::value_type &value) {
+    { 					container->push_back(value);
+    					return *this; }
+    		So when *iterator = someValue is called, instead of an assignment, a push_back operation takes place.
+	*
+	*  prototype: back_insert_iterator<Container>   back_inserter(Container& x);
+	*/
+
+	int chars[] = { 'a', 'b', 'c' };
+	int charsNumber = sizeof(chars)/sizeof(chars[0]);
+
+	//two variants to copy the "chars" array into a vector:
+
+	std::vector<char> myVector;
+	//resize the vector because std::copy increments the iterator we supply(myVector.begin()) and assigns values to it.
+	//The vector won't expand automatically so we have to set the proper size.
+	myVector.resize(charsNumber);
+	std::copy(chars, chars + charsNumber, myVector.begin());
+	TESTIFY_ASSERT( myVector[0] = 'a' && myVector[1] == 'b' && myVector[2] == 'c');
+
+	std::vector<char> mySecondVector;
+	//we supply a back_insert_iterator to std::copy. That means that the back_insert_iterator will expand the
+	//vector automatically, as we copy elements in it.
+	//(std::copy will perform *iterator++ = elementValue, the back_insert_iterator::operator= will be called,
+	//and this will call push_back on the container).
+	std::copy(chars, chars + charsNumber, std::back_inserter(mySecondVector));
+	TESTIFY_ASSERT( mySecondVector[0] = 'a' && mySecondVector[1] == 'b' && mySecondVector[2] == 'c');
+	TESTIFY_ASSERT( mySecondVector.size() == charsNumber );
+
+	/**
+	*  front_inserter: returns a "front_insert_iterator" for a container.
+	*  The "front_insert_iterator" expands the container automatically, calling the "push_front"
+	*  function of the container. It is used to insert elements into a container, rather than overwrite
+	*  the existing elements, using operator=. It is useful with algorithms that overwrite
+	*  elements like, copy.
+	*  The front_insert_iterator class has its operator= defined like this:
+	*  		front_insert_iterator<Container>& operator= (Container::value_type &value) {
+	{ 					container->push_front(value);
+						return *this; }
+			So when *iterator = someValue is called, instead of an assignment, a push_front operation takes place.
+	*
+	*  prototype: front_insert_iterator<Container>  front_inserter(Container& x);
+	*/
+	std::deque<char> d;
+	d.push_back('d');
+	d.push_back('e');
+	char abc[] = { 'c', 'b', 'a' };
+	int abcSize = sizeof(abc)/sizeof(abc[0]);
+	std::copy( abc, abc + abcSize, front_inserter(d));
+	TESTIFY_ASSERT( 'a' == d[0] && 'b' == d[1] && 'c' == d[2] &&
+					'd' == d[3] && 'e' == d[4] );
+
+	/**
+	*  inserter: returns a "insert_iterator" for a container.
+	*  prototype:insert_iterator<Container>  inserter(Container& x, Iterator i);
+	*/
+
+	/**
+	*  inserter: returns a "insert_iterator" for a container.
+	*  The "insert_iterator" expands the container automatically, calling the "insert"
+	*  function of the container. It is used to insert elements into a container, rather than overwrite
+	*  the existing elements, using operator=. It is useful with algorithms that overwrite
+	*  elements like, copy.
+	*  The insert_iterator class has its operator= defined like this:
+	*  		insert_iterator<Container>& operator= (Container::value_type &value) {
+	{ 					iter = container->insert(iter, value);
+						++iter;
+						return *this; }
+			So when *iterator = someValue is called, instead of an assignment, a push_front operation takes place.
+	*
+	*  prototype: insert_iterator<Container> inserter (Container& x, Inserter iter);
+	*/
+	char someChars[] = { 'a', 'b', 'e', 'f' };
+	int someCharsSize = sizeof(someChars)/sizeof(someChars[0]);
+	std::vector<char> myChars(someChars, someChars + someCharsSize); //vector contains now: a, b, e, f
+	std::vector<char>::iterator iter = myChars.begin() + 2;
+
+	char missingChars[] = { 'c', 'd' };
+	int missingCharsSize = sizeof(missingChars)/sizeof(missingChars[0]);
+	//insert c  and d after b
+	std::copy(missingChars, missingChars + missingCharsSize, std::inserter(myChars, iter));
+
+	//the vector contains now: a, b, c, d, e, f
+	TESTIFY_ASSERT( 'a' == myChars[0] && 'b' == myChars[1] &&
+					'c' == myChars[2] && 'd' == myChars[3] &&
+					'e' == myChars[4] && 'f' == myChars[5] );
 }
 
 

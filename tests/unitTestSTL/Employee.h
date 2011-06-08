@@ -37,5 +37,7 @@ bool operator!=(const Employee &lv, const Employee &rv);
 bool lessExperience(const Employee &lv, const Employee &rv);
 bool equalSalary(const Employee &lv, const Employee &rv);
 
+Employee &increaseSalary(Employee &e, int amount = 100);
+
 
 #endif /* EMPLOYEE_H_ */
