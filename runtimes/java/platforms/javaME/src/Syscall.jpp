@@ -693,10 +693,10 @@ public
 	/// Writes s to dst, unless s.length() >= bufSize.
 	private final int writeStringBuf(String s, Address dst, int bufSize) {
 		MYASSERT(bufSize >= 0);
-		if(bufSize <= s.length())
-			return s.length();
-		INIT_MEMDS;
 		byte[] bytes = s.getBytes();
+		if(bufSize <= bytes.length)
+			return bytes.length;
+		INIT_MEMDS;
 		setMemBytes(dst, bytes);
 		WBYTE_RAW(dst + bytes.length, 0);
 		return bytes.length;
