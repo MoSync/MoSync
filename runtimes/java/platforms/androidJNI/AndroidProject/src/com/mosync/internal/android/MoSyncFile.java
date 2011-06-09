@@ -786,15 +786,14 @@ public class MoSyncFile {
 		
 		Log.i("MoSync File API","current path: " + name);
 		
-		int len = name.length()+1;
+		byte[] nameChars = name.getBytes();
+		int len = nameChars.length+1;
 		
 		if(file.isDirectory())
 			len++;
 		
 		if(bufSize == 0) return len-1;
 		if(len > bufSize) return len-1;
-
-		byte[] nameChars = name.getBytes();
 		
 		mMoSyncThread.mMemDataSection.position(nameBuf);	
 		mMoSyncThread.mMemDataSection.put(nameChars);

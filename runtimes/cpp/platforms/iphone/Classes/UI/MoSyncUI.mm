@@ -23,6 +23,7 @@
 #include <helpers/CPP_IX_WIDGET.h>
 #include "TouchHelper.h"
 #include "MoSyncMain.h"
+#include "MoSyncViewController.h"
 
 @interface MoSyncUIWindow : UIWindow {
 	TouchHelper* touchHelper;	
@@ -43,35 +44,49 @@
 	return [super initWithFrame:rect];
 }
 
+- (CGFloat) getScreenScale {
+    CGFloat scale = 1.0f;
+    if ([[UIScreen mainScreen] respondsToSelector:@selector(scale)]) {
+        scale = [UIScreen mainScreen].scale;
+    }
+    return scale;
+}
+
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-	for (UITouch *touch in touches) 
+	CGFloat screenScale = [self getScreenScale];
+    
+    for (UITouch *touch in touches) 
 	{
 		if(touch.phase ==  UITouchPhaseBegan) {
 			CGPoint point = [touch locationInView:self];
 			int touchId = [touchHelper addTouch: touch];
-			MoSync_AddTouchPressedEvent(point.x, point.y, touchId);	
+			MoSync_AddTouchPressedEvent(point.x*screenScale, point.y*screenScale, touchId);	
 		}
 	}	
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
+	CGFloat screenScale = [self getScreenScale];
+
 	for (UITouch *touch in touches) 
 	{
 		if(touch.phase ==  UITouchPhaseMoved) {
 			CGPoint point = [touch locationInView:self];
 			int touchId = [touchHelper getTouchId: touch];
-			MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
+			MoSync_AddTouchMovedEvent(point.x*screenScale, point.y*screenScale, touchId);
 		}
 	}	
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {	
+	CGFloat screenScale = [self getScreenScale];
+
     for (UITouch *touch in touches) 
 	{
 		if(touch.phase ==  UITouchPhaseEnded) {	
 			CGPoint point = [touch locationInView:self];
 			int touchId = [touchHelper getTouchId: touch];		
-			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
+			MoSync_AddTouchReleasedEvent(point.x*screenScale, point.y*screenScale, touchId);
 			[touchHelper removeTouch: touch];
 		}
 	}
@@ -123,6 +138,10 @@ static IWidget* sOldScreen = nil;
 		window = [[MoSyncUIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 		[window makeKeyAndVisible];
 	}
+    
+    if(!controller) {
+        controller = [[MoSyncViewController alloc] init];
+    }
 	
 	mainWindow = window;
 	mainController = controller;

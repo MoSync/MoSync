@@ -18,7 +18,10 @@ OPT_FLAGS = SETTINGS[:test_release] ? ' -O2' : ''
 BUILD_DIR = 'build/' + OPT_VERSION
 MOSYNCDIR = ENV['MOSYNCDIR']
 GCC_FLAGS = " -I- -std=gnu99 -I. -Isys -I#{MOSYNCDIR}/include/newlib -I \"#{SETTINGS[:source_path][0..-2]}\""+
-	" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h #{OPT_FLAGS}"
+	" -DNO_TRAMPOLINES -DUSE_EXOTIC_MATH -include skeleton.h #{OPT_FLAGS}"+
+	' -Wall -Wextra -Wno-unused-parameter -Wwrite-strings -Wshadow -Wpointer-arith -Wundef -Wfloat-equal'+
+	' -Winit-self -Wmissing-noreturn -Wmissing-format-attribute'
+
 PIPE_FLAGS = " -datasize=#{12*1024*1024} -stacksize=#{512*1024} -heapsize=#{1024*1024*10}"
 PIPE_LIBS = " build/helpers.s build/setup_filesystem.s #{MOSYNCDIR}/lib/newlib_#{OPT_VERSION}/newlib.lib"
 
@@ -84,11 +87,9 @@ end
 
 # output a default resource file
 DEFAULT_RESOURCES = 'build/default_resources'
-if(SETTINGS[:htdocs_dir])
-	writeResourceFile('default')
-	FileUtils.mv('build/resources', DEFAULT_RESOURCES)
-	FileUtils.mv('build/MAHeaders.h', 'build/default_MAHeaders.h')
-end
+writeResourceFile('build/default')
+FileUtils.mv('build/resources', DEFAULT_RESOURCES)
+FileUtils.mv('build/MAHeaders.h', 'build/default_MAHeaders.h')
 
 def input_files(filename)
 	base = File.dirname(filename) + '/' + File.basename(filename, File.extname(filename))

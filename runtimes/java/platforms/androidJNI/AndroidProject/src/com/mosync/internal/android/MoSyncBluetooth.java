@@ -192,17 +192,11 @@ public class MoSyncBluetooth
 					BluetoothAdapter.STATE_OFF);
 				if (newState == BluetoothAdapter.STATE_ON)
 				{
-					// Send event.
-					int[] event = new int[1];
-					event[0] = EVENT_TYPE_BLUETOOTH_TURNED_ON;
-					mMoSyncThread.postEvent(event);
+					mMoSyncThread.bluetoothTurnedOn();
 				}
 				else if (newState == BluetoothAdapter.STATE_OFF)
 				{
-					// Send event.
-					int[] event = new int[1];
-					event[0] = EVENT_TYPE_BLUETOOTH_TURNED_OFF;
-					mMoSyncThread.postEvent(event);
+					mMoSyncThread.bluetoothTurnedOff();
 				}
 			}
 		};

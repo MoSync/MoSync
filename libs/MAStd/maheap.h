@@ -169,6 +169,20 @@ block_size_hook set_block_size_hook(block_size_hook hook);
 */
 void override_heap_init_crt0(char* start, int length);
 
+/**
+* The default heap initialization function.
+* \see override_heap_init_crt0()
+*/
+void ansi_heap_init_crt0(char *start, int length);
+
+/**
+* Starts a system for dumping information about every call to malloc() or free().
+* Only available in debug builds.
+* It is recommended to call this from override_heap_init_crt0(), in order to
+* catch malloc() calls from static constructors.
+*/
+void initStackDump(void);
+
 #ifdef __cplusplus
 }	//extern "C"
 #endif

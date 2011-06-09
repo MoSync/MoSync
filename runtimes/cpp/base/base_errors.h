@@ -86,6 +86,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40066, ERR_PIM_LIST_CLOSED, "The PIM item's parent list is closed")\
 	m(40067, ERR_CAMERA_UNPOWERED, "Camera viewfinder is not active")\
 	m(40068, ERR_TEXTBOX_ACTIVE, "Text box is already active")\
+	m(40069, ERR_EXT_VERSION, "Extension version mismatch")\
+	m(40069, ERR_EXT_LOAD, "Failed to load extensions")\
 
 DECLARE_ERROR_ENUM(BASE)
 

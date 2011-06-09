@@ -40,7 +40,7 @@ typedef enum {
 }
 
 - (id)init:(LinearLayoutOrientation)ori;
-- (void)layoutSubviews;
+- (void)layoutSubviews:(UIView*)_view;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
 

@@ -242,7 +242,7 @@ extern "C" int MAMain()
 {
 	int screenHeight = EXTENT_Y( maGetScrSize( ) );
 
-	int tabScreen = maWidgetCreate( WIDGET_TYPE_TAB_SCREEN );
+	int tabScreen = maWidgetCreate( MAW_TAB_SCREEN );
 
 	int listScreen = createListScreen( );
 	maWidgetAddChild( tabScreen, listScreen );
@@ -312,7 +312,7 @@ extern "C" int MAMain()
 
 				MAWidgetEventData* data = (MAWidgetEventData*)event.data;
 
-				if(data->eventType == WIDGET_EVENT_TAB_CHANGED) {
+				if(data->eventType == MAW_EVENT_TAB_CHANGED) {
 					currentTab = data->tabIndex;
 				}
 
@@ -326,19 +326,19 @@ extern "C" int MAMain()
 
 int createListScreen()
 {
-	int listScreen = maWidgetCreate( WIDGET_TYPE_SCREEN );
+	int listScreen = maWidgetCreate( MAW_SCREEN );
 	maWidgetSetProperty( listScreen, "title", "RSS" );
 	maWidgetSetPropertyInt( listScreen, "icon", R_NEWS );
 
 	// Create List
-	int list = maWidgetCreate( WIDGET_TYPE_LIST_VIEW );
-	maWidgetSetPropertyInt( list, WIDGET_PROPERTY_HEIGHT, -1 );
-	maWidgetSetPropertyInt( list, WIDGET_PROPERTY_WIDTH, -1 );
+	int list = maWidgetCreate( MAW_LIST_VIEW );
+	maWidgetSetPropertyInt( list, MAW_WIDGET_HEIGHT, -1 );
+	maWidgetSetPropertyInt( list, MAW_WIDGET_WIDTH, -1 );
 
 	// Add 10 buttons to the list
 	for(int i = 0; i < 10; i++)
 	{
-		int listItem = maWidgetCreate( WIDGET_TYPE_LIST_VIEW_ITEM );
+		int listItem = maWidgetCreate( MAW_LIST_VIEW_ITEM );
 		maWidgetSetProperty( listItem, "text", "Click me" );
 		maWidgetSetPropertyInt( listItem, "icon", R_ICON );
 		maWidgetAddChild( list, listItem );
@@ -352,13 +352,13 @@ int createListScreen()
 
 int createWebScreen()
 {
-	int webScreen = maWidgetCreate( WIDGET_TYPE_SCREEN );
+	int webScreen = maWidgetCreate( MAW_SCREEN );
 	maWidgetSetProperty( webScreen, "title", "Web" );
 	maWidgetSetPropertyInt( webScreen, "icon", R_TV );
 
-	int webView = maWidgetCreate( WIDGET_TYPE_WEB_VIEW );
-	maWidgetSetPropertyInt( webView, WIDGET_PROPERTY_WIDTH, -1 );
-	maWidgetSetPropertyInt( webView, WIDGET_PROPERTY_HEIGHT, -1 );
+	int webView = maWidgetCreate( MAW_WEB_VIEW );
+	maWidgetSetPropertyInt( webView, MAW_WIDGET_WIDTH, -1 );
+	maWidgetSetPropertyInt( webView, MAW_WIDGET_HEIGHT, -1 );
 	maWidgetSetProperty( webView, "url", "http://www.google.se/" );
 
 	maWidgetAddChild( webScreen, webView );
@@ -368,21 +368,21 @@ int createWebScreen()
 
 int createOpenGLScreen(int& openglView)
 {
-	int screen = maWidgetCreate( WIDGET_TYPE_SCREEN );
+	int screen = maWidgetCreate( MAW_SCREEN );
 	maWidgetSetProperty( screen, "title", "OpenGL" );
-	openglView = maWidgetCreate(WIDGET_TYPE_GL_VIEW);
+	openglView = maWidgetCreate(MAW_GL_VIEW);
 	maWidgetAddChild( screen, openglView );
 	return screen;
 }
 
 int createScreen(const char *title, int icon, const char *text)
 {
-	int screen = maWidgetCreate( WIDGET_TYPE_SCREEN );
+	int screen = maWidgetCreate( MAW_SCREEN );
 	maWidgetSetProperty( screen, "title", title );
 	maWidgetSetPropertyInt( screen, "icon", icon );
 
-	int textView = maWidgetCreate( WIDGET_TYPE_LABEL );
-	maWidgetSetProperty( textView, WIDGET_PROPERTY_LABEL_TEXT, text );
+	int textView = maWidgetCreate( MAW_LABEL );
+	maWidgetSetProperty( textView, MAW_LABEL_TEXT, text );
 
 	maWidgetAddChild( screen, textView );
 

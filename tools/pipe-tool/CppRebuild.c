@@ -457,7 +457,7 @@ void CppDecodeReturn(int shouldPassR15)
 
 		case RET_float:
 		case RET_int:
-		RebuildEmit("	return r14;");
+			RebuildEmit("	return r14;");
 		break;
 
 		case RET_double:
@@ -1069,6 +1069,8 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 	reg_used &= ~(1 << REG_sp);
 	reg_used &= ~(1 << REG_zero);
 
+	if (ThisFunctionRetType != RET_null && ThisFunctionRetType != RET_void)
+		reg_used |= (1 << REG_r14);
 	if (ThisFunctionRetType == RET_double)
 		reg_used |= (1 << REG_r15);
 	

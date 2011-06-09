@@ -53,7 +53,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../../;$(ProjectDir)../../sdl/;$(ProjectDir)../../../../../intlibs/;Z:\MoSync\tools\ReleasePackageBuild\build_package_tools\include;$(ProjectDir)../../../base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../../;$(ProjectDir)../../sdl/;$(ProjectDir)../../../../../intlibs/;$(ProjectDir)../../../../../tools/ReleasePackageBuild/build_package_tools/include;$(ProjectDir)../../../base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
@@ -65,7 +65,7 @@
       <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\$(Configuration)\sdl.lib;..\..\..\..\..\intlibs\helpers\platforms\windows\$(Configuration)\windows.lib;libirprops.a;..\..\..\..\..\intlibs\filelist\$(Configuration)\filelist.lib;..\..\..\..\..\intlibs\demangle\$(Configuration)\demangle.lib;FreeImage.lib;comctl32.lib;ssleay32.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\$(Configuration)\sdl.lib;..\..\..\..\..\intlibs\helpers\platforms\windows\$(Configuration)\windows.lib;libirprops.a;..\..\..\..\..\intlibs\filelist\$(Configuration)\filelist.lib;..\..\..\..\..\intlibs\demangle\$(Configuration)\demangle.lib;..\..\..\..\..\intlibs\dll\$(Configuration)\dll.lib;FreeImage.lib;comctl32.lib;ssleay32.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>msvcrt.lib;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -79,7 +79,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(ProjectDir)../../../;$(ProjectDir)../../sdl/;$(ProjectDir)../../../../../intlibs/;Z:\MoSync\tools\ReleasePackageBuild\build_package_tools\include;$(ProjectDir)../../../base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)../../../;$(ProjectDir)../../sdl/;$(ProjectDir)../../../../../intlibs/;$(ProjectDir)../../../../../tools/ReleasePackageBuild/build_package_tools/include;$(ProjectDir)../../../base;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -89,7 +89,7 @@
       <DisableSpecificWarnings>4996;%(DisableSpecificWarnings)</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\$(Configuration)\sdl.lib;..\..\..\..\..\intlibs\helpers\platforms\windows\$(Configuration)\windows.lib;libirprops.a;..\..\..\..\..\intlibs\filelist\$(Configuration)\filelist.lib;..\..\..\..\..\intlibs\demangle\$(Configuration)\demangle.lib;FreeImage.lib;comctl32.lib;ssleay32.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\$(Configuration)\sdl.lib;..\..\..\..\..\intlibs\helpers\platforms\windows\$(Configuration)\windows.lib;libbthprops_ex.a;..\..\..\..\..\intlibs\filelist\$(Configuration)\filelist.lib;..\..\..\..\..\intlibs\demangle\$(Configuration)\demangle.lib;..\..\..\..\..\intlibs\dll\$(Configuration)\dll.lib;FreeImage.lib;comctl32.lib;ssleay32.lib;libeay32.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>

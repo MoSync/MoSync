@@ -1,0 +1,7 @@
+ConfFile := NumberOfFunctions \n (Dll*)
+
+NumberOfFunctions := <Ascii unsigned integer>
+
+Dll := FileName \n IdlHash \n
+
+IdlHash := 8 hex digits
