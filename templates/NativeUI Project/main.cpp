@@ -26,7 +26,7 @@ public:
 	void createUI()
 	{
 		// Create a NativeUI screen that will hold layout and widgets.
-		int screen = maWidgetCreate(MAW_SCREEN);
+		MAHandle screen = maWidgetCreate(MAW_SCREEN);
 
 		// Error handling for devices that do not support NativeUI.
 		if (-1 == screen)
@@ -139,7 +139,7 @@ public:
 	}
 
 	/**
-	 * Helper method for setting a widget property interger value.
+	 * Helper method for setting a widget property integer value.
 	 */
 	int widgetSetPropertyInt(MAHandle handle, const char *property, int value)
 	{

@@ -29,7 +29,7 @@ public:
 		mDepth(5.0f)
 	{
 		// Create a NativeUI screen that will hold the GL view.
-		int screen = maWidgetCreate(MAW_SCREEN);
+		MAHandle screen = maWidgetCreate(MAW_SCREEN);
 
 		// Error handling for devices that do not support NativeUI.
 		if (-1 == screen)
@@ -246,7 +246,7 @@ private:
 	}
 
 	/**
-	 * Helper method for setting a widget property interger value.
+	 * Helper method for setting a widget property integer value.
 	 */
 	int widgetSetPropertyInt(MAHandle handle, const char *property, int value)
 	{
