@@ -163,7 +163,7 @@ public:
 		// attribute (as here) and through the "setMultiLine" method.)
 		mPasswordBox = new MAUI::EditBox(
 			0, // Left.
-			0, // Top.
+			0, // Top (will be set by the layout).
 			displayWidth, // Width.
 			30, // Height.
 			mMainLayoutWidget, // Parent widget.
@@ -174,9 +174,12 @@ public:
 			false, // Not multiline.
 			60);   // Max number of characters in the edit box.
 
-		// Make the EditBox listen to key events so that its content
+		// Make the edit box listen to key events so that its content
 		// gets updated when keys are pressed.
 		mPasswordBox->activate();
+
+		// Make the edit box the selected widget.
+		mPasswordBox->setSelected(true);
 
 		// Use password mode to hide text after entry.
 		mPasswordBox->setPasswordMode(true);
@@ -185,7 +188,7 @@ public:
 		// for as a button widget.
 		mClearButton = new MAUI::Label(
 			0, // Left.
-			0, // Top.
+			0, // Top (will be set by the layout).
 			displayWidth, // Width.
 			30, // Height.
 			mMainLayoutWidget, // Parent widget.
@@ -203,7 +206,7 @@ public:
 		// The fourth widget is the Submit button.
 		mSubmitButton = new MAUI::Label(
 			0, // Left.
-			0, // Top.
+			0, // Top (will be set by the layout).
 			displayWidth, // Width.
 			30, // Height.
 			mMainLayoutWidget, // Parent widget.
@@ -232,6 +235,9 @@ public:
 	 */
 	void pointerPressEvent(MAPoint2d point)
 	{
+		// Deselect the edit box.
+		mPasswordBox->setSelected(false);
+
 		// If the Clear button is clicked...
 		if (mClearButton->contains(point.x, point.y))
 		{
@@ -240,10 +246,15 @@ public:
 			mClearButton->setSelected(true);
 		}
 		else
-		// Do the same for the Submit button.
 		if (mSubmitButton->contains(point.x, point.y))
 		{
+			// Do the same for the Submit button.
 			mSubmitButton->setSelected(true);
+		}
+		else
+		{
+			// Reselect the edit box.
+			mPasswordBox->setSelected(true);
 		}
 	}
 
@@ -254,22 +265,23 @@ public:
 	void pointerReleaseEvent(MAPoint2d point)
 	{
 		// Deselect the buttons so that the "unselected" skins
-		// are redisplayed.
+		// are redisplayed, and also reselect the edit box.
 		mClearButton->setSelected(false);
 		mSubmitButton->setSelected(false);
+		mPasswordBox->setSelected(true);
 
 		// If the pointer is inside the Clear button we call the
 		// action method for the button.
 		if (mClearButton->contains(point.x, point.y))
 		{
-			clearButtonClicked();
+			clearButtonAction();
 		}
 
 		// If the pointer is inside the Submit button we call the
 		// action method for the button.
 		if (mSubmitButton->contains(point.x, point.y))
 		{
-			submitButtonClicked();
+			submitButtonAction();
 		}
 
 		// If the edit box was touched we display a textbox.
@@ -277,23 +289,139 @@ public:
 		// have a key pad for text input.
 		if (mPasswordBox->contains(point.x, point.y))
 		{
-			editBoxClicked();
+			editBoxAction();
 		}
 	}
 
 	/**
-	 * This method is called when the Clear button is clicked.
+	 * This method is called when a key is pressed.
 	 */
-	void clearButtonClicked()
+	void keyPressEvent(int keyCode, int nativeCode)
+	{
+		switch (keyCode)
+		{
+			// Close the application if the back key, key 0,
+			// or the left "softkey" is pressed (the left
+			// softkey is usually located at the top left of
+			// the keypad of phones that have a keypad, and
+			// is often used as a back navigation key).
+			case MAK_BACK:
+			case MAK_0:
+			case MAK_SOFTLEFT:
+				// Exit the application.
+				maExit(0);
+				break;
+			case MAK_UP:
+				// When the up key on the keypad is pressed,
+				// we select the previous widget.
+				selectPreviousWidget();
+				break;
+			case MAK_DOWN:
+				// When the down key on the keypad is pressed,
+				// we select the next widget.
+				selectNextWidget();
+				break;
+			case MAK_FIRE:
+				// When the "fire" (centre) key on the keypad
+				// is pressed, we run the action associated
+				// with the selected widget.
+				runWidgetAction();
+				break;
+		}
+	}
+
+	/**
+	 * Make the previous widget on the screen the selected one.
+	 * We clear the currently selected widget and select
+	 * the previous one.
+	 */
+	void selectPreviousWidget()
+	{
+		if (mPasswordBox->isSelected())
+		{
+			mPasswordBox->setSelected(false);
+			mSubmitButton->setSelected(true);
+		}
+		else
+		if (mClearButton->isSelected())
+		{
+			mClearButton->setSelected(false);
+			mPasswordBox->setSelected(true);
+		}
+		else
+		if (mSubmitButton->isSelected())
+		{
+			mSubmitButton->setSelected(false);
+			mClearButton->setSelected(true);
+		}
+	}
+
+	/**
+	 * Make the next widget on the screen the selected one.
+	 * We clear the currently selected widget and select
+	 * the next one.
+	 */
+	void selectNextWidget()
+	{
+		if (mPasswordBox->isSelected())
+		{
+			mPasswordBox->setSelected(false);
+			mClearButton->setSelected(true);
+		}
+		else
+		if (mClearButton->isSelected())
+		{
+			mClearButton->setSelected(false);
+			mSubmitButton->setSelected(true);
+		}
+		else
+		if (mSubmitButton->isSelected())
+		{
+			mSubmitButton->setSelected(false);
+			mPasswordBox->setSelected(true);
+		}
+	}
+
+	/**
+	 * Execute the action of the selected widget.
+	 */
+	void runWidgetAction()
+	{
+		if (mPasswordBox->isSelected())
+		{
+			editBoxAction();
+		}
+		else
+		if (mClearButton->isSelected())
+		{
+			clearButtonAction();
+		}
+		else
+		if (mSubmitButton->isSelected())
+		{
+			submitButtonAction();
+		}
+
+		// Deselect the buttons so that the "unselected" skins
+		// are redisplayed, and make the edit box selected.
+		mClearButton->setSelected(false);
+		mSubmitButton->setSelected(false);
+		mPasswordBox->setSelected(true);
+	}
+
+	/**
+	 * This method is called when the Clear button is activated.
+	 */
+	void clearButtonAction()
 	{
 		// Empty the contents of the edit box.
 		mPasswordBox->clearText();
 	}
 
 	/**
-	 * This method is called when the Submit button is clicked.
+	 * This method is called when the Submit button is activated.
 	 */
-	void submitButtonClicked()
+	void submitButtonAction()
 	{
 		// Get the text of the edit box and check that the password
 		// is at least 6 characters long.
@@ -327,9 +455,9 @@ public:
 	}
 
 	/**
-	 * This method is called when the Password edit box is clicked.
+	 * This method is called when the Password edit box is activated.
 	 */
-	void editBoxClicked()
+	void editBoxAction()
 	{
 		// Open a text box input screen. This input method
 		// is especially useful if the device has no physical
@@ -447,20 +575,6 @@ public:
 	virtual ~HelloMAUIMoblet()
 	{
 		delete mAppScreen;
-	}
-
-	/**
-	 * This method is called when a key is pressed. The method
-	 * is inherited from the Moblet class, and is overridden here.
-	 */
-	void keyPressEvent(int keyCode, int nativeCode)
-	{
-		// Close the application if the back key or key 0 is pressed.
-		if (MAK_BACK == keyCode || MAK_0 == keyCode)
-		{
-			// Call close to exit the application.
-			close();
-		}
 	}
 
 private:
