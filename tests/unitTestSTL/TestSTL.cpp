@@ -27,7 +27,7 @@ TestSTL::TestSTL() : TestCase("STLTest")
 			bind(&TestSTL::test_comparasion_operators, this), "testComparasionOperators");
 
 		//*******************************************************************************************
-		//								CONTAINERS
+		//						CONTAINERS
 		//*******************************************************************************************
 
 		addTest(
@@ -58,7 +58,7 @@ TestSTL::TestSTL() : TestCase("STLTest")
 				bind(&TestSTL::test_bitset, this), "test_bitset");
 
 		//*******************************************************************************************
-		//								ALGORITHMS
+		//						ALGORITHMS
 		//*******************************************************************************************
 
 		addTest(
@@ -72,6 +72,13 @@ TestSTL::TestSTL() : TestCase("STLTest")
 
 		addTest(
 				bind(&TestSTL::test_algorithms, this), "test_algorithms");
+
+		//*******************************************************************************************
+		//						STRING
+		//*******************************************************************************************
+		addTest(
+				bind(&TestSTL::test_string, this), "test_string");
+
 }
 
 

@@ -252,9 +252,27 @@ public:
 
 	void example_functors();
 
+	/**
+	* STL provides definitions for several functors that are very useful in combination
+	* with the STL algorithms.
+	* For what is a functor see AboutFunctors.cpp
+	*/
 	void test_functors();
 
+	/**
+	*  STL algorithms are defined in the <algorithm> header.
+	*  They are function templates,implementing algorithms for sorting, filling, searching containers,
+	*  comparing ranges, copying ranges ect.
+	*  They can be used with any type of container (STL container or not),
+	*  that provides the proper iterator and holds elements that overload the operators required by the algorithm.
+	*  For example the count algorithm, compares every element in a container with a value we provide.
+	*  For comparison it uses operator==, so we have to have inside the container a type that has an operator== defined.
+	*
+	*  For what is an ForwardIterator, BidirectionalIterator ect. see Iterators.cpp
+	*/
 	void test_algorithms();
+
+	void test_string();
 };
 
 namespace NumericUtilities
