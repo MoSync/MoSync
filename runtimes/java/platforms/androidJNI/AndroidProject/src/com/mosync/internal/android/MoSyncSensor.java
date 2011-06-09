@@ -22,6 +22,7 @@ public class MoSyncSensor implements SensorEventListener {
 	private static final int SEVENT_SIZE = 6;
 	
 	private static final int SENSOR_TYPE_ALL = -1;
+	private static final int SENSOR_TYPE_ACCELEROMETER = 1;
 	private static final int SENSOR_TYPES = 10;
 
 	private static final int SENSOR_ERROR_NONE = 0;
@@ -52,6 +53,11 @@ public class MoSyncSensor implements SensorEventListener {
 	 */
 	private static final int SENSOR_DELAY_MULTIPLIER = 1000;
 	
+	/*
+	 * Used to keep the values in [-1; 1] interval to be the same as on iOS
+	 */
+	private static final int ACCELEROMETER_ADJUSTMENT = -10;
+
 	/**
 	 * The MoSync thread object.
 	 */
@@ -113,7 +119,14 @@ public class MoSyncSensor implements SensorEventListener {
 			int len = arg0.values.length;
 			for (int i=0; i<arg0.values.length; i++)
 			{
-	            	event[SEVENT_SENSOR_VALUES + i] = Float.floatToIntBits(arg0.values[i]);
+				if (event[SEVENT_SENSOR_TYPE] == SENSOR_TYPE_ACCELEROMETER)
+				{
+					event[SEVENT_SENSOR_VALUES + i] = Float.floatToIntBits(arg0.values[i] / ACCELEROMETER_ADJUSTMENT);
+				}
+				else
+				{
+					event[SEVENT_SENSOR_VALUES + i] = Float.floatToIntBits(arg0.values[i]);
+				}
 	        }
 		}
 		catch (Exception e)
