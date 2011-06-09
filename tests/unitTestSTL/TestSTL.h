@@ -272,7 +272,14 @@ public:
 	*/
 	void test_algorithms();
 
+	/**
+	*  std::string is a template class designed to manipulate sequences of characters.
+	*  It is a container of characters.
+	*  the string class is defined in the <string> header.
+	*/
 	void test_string();
+
+	void test_adaptors();
 };
 
 namespace NumericUtilities

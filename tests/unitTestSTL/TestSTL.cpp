@@ -73,6 +73,9 @@ TestSTL::TestSTL() : TestCase("STLTest")
 		addTest(
 				bind(&TestSTL::test_algorithms, this), "test_algorithms");
 
+		addTest(
+				bind(&TestSTL::test_adaptors, this), "test_adaptors");
+
 		//*******************************************************************************************
 		//						STRING
 		//*******************************************************************************************

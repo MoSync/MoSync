@@ -10,8 +10,9 @@
 #include "../Employee.h"
 
 /**
-* Standard function adaptors make assumptions about the functors they use.
-* (See AboutFunctor.cpp for what is a functor and  AboutAdaptors.cpp on what is an adaptor).
+* STL function adaptors make assumptions about the functors they use.
+* See AboutFunctors.cpp for what is a functor and  Adaptors.cpp on what is an adaptor.
+* Adaptors.cpp describes also the adaptors provided by STL.
 * The function adapters need to know the argument type and the return value of the operator().
 * So, a STL function adaptor requires that the supplied functor object provides the
 * the following public type definitions:
