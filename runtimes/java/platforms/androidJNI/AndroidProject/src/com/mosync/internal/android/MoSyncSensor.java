@@ -29,23 +29,23 @@ public class MoSyncSensor implements SensorEventListener {
 	/*
 	 * Error codes for maSensorStart
 	 */
-	private static final int SENSOR_ERROR_NOT_AVAILABLE = -1;
-	private static final int SENSOR_ERROR_INTERVAL_NOT_SET = -2;
-	private static final int SENSOR_ERROR_ALREADY_ENABLED = -3;
+	private static final int SENSOR_ERROR_NOT_AVAILABLE = -2;
+	private static final int SENSOR_ERROR_INTERVAL_NOT_SET = -3;
+	private static final int SENSOR_ERROR_ALREADY_ENABLED = -4;
 	
 	/*
 	 * Error codes for maSensorStop
 	 */
-	private static final int SENSOR_ERROR_NOT_ENABLED = -1;
-	private static final int SENSOR_ERROR_CANNOT_DISABLE = -2;
+	private static final int SENSOR_ERROR_NOT_ENABLED = -5;
+	private static final int SENSOR_ERROR_CANNOT_DISABLE = -6;
 
 	/*
 	 * Sensor predefined rates
 	 */
 	private static final int SENSOR_DELAY_FASTEST = 0;
 	private static final int SENSOR_DELAY_GAME = -1;
-	private static final int SENSOR_DELAY_NORMAL = -3;
-	private static final int SENSOR_DELAY_UI = -2;
+	private static final int SENSOR_DELAY_NORMAL = -2;
+	private static final int SENSOR_DELAY_UI = -3;
 	
 	/*
 	 * Used to convert the rate from milliseconds to microseconds
