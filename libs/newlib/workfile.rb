@@ -21,6 +21,12 @@ work.instance_eval do
 		copyHeaders
 	end
 	
+	def copyGl2Headers()
+		@INSTALL_INCDIR = "GLES2"
+		@HEADER_DIRS = ["../MAStd/GLES2"]
+		copyHeaders
+	end	
+	
 	def setup_pipe
 		@SOURCES = ["libc/sys/mosync", "libc/sys/mosync/libgcc", "../libsupc++", "libc/sys/mosync/quad",
 			"libc/misc", "libc/unix", "libc/posix", "libc/locale", "libc/reent", "libc/stdio",
@@ -83,6 +89,7 @@ work.instance_eval do
 		copyHeaderDir("sys")
 		copyHeaderDir("machine")
 		copyGlHeaders()
+		copyGl2Headers()
 
 		@HEADER_DIRS = ["libc/include", "libc/sys/mosync"]
 		@INSTALL_INCDIR = "."

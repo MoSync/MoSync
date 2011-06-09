@@ -32,7 +32,7 @@ Base::BaseType Base::getBaseType() const {
 	return mBaseType;
 }
 
-void Base::setGroup(std::string& group) {
+void Base::setGroup(const std::string& group) {
 	mGroup = group;
 }
 
@@ -52,7 +52,11 @@ bool BaseLocationSortPredicate(const Base* d1, const Base* d2)
 	const File* file2 = l2->getFile();
 	if(!file1||!file2) return false;
 	
-	 if(file1->getId() > file2->getId())
+	if(d1->getGroup() > d2->getGroup())
+	 	return true;
+	 else if(d1->getGroup() < d2->getGroup())
+	 	return false;
+	 else if(file1->getId() > file2->getId())
 	 	return true;
 	 else if(file1->getId() < file2->getId())
 	 	return false;

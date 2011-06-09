@@ -25,7 +25,7 @@ struct MoSyncArgument {
 };
 
 void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
-	pair<BasesIterator, BasesIterator> functions = bases.equal_range("Function");
+	pair<BasesIterator, BasesIterator> functions = bases.equal_range("Function");	
 
 	for(BasesIterator function = functions.first; function!=functions.second; function++) {
 		const Function* func = (const Function*)function->second;

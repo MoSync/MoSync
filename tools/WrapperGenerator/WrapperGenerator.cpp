@@ -23,6 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <fstream>
 #include <stdlib.h>
+#include <algorithm>
 
 #include "Parser.h"
 #include "IDLBackend.h"
@@ -31,6 +32,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace std;
 
 namespace System  {
+	std::string toUpperCase(const std::string& str) {
+		std::string ret = str;
+		std::transform(ret.begin(), ret.end(), ret.begin(), (int(*)(int))toupper);
+		return ret;
+	}
+	
 	void error(const char* fmt, ...) {
 		va_list argptr;
 		va_start(argptr, fmt);
@@ -92,12 +99,12 @@ int main(int argc, char **argv) {
 
 	Backend::BasesMap bases;
 
-	if(argc <= 2) System::error("Usage: WrapperGenerator input.h (|input2.h...) \n");
-	const char *header = argv[1];
+	if(argc <= 1) System::error("Usage: WrapperGenerator <name> input.h (|input2.h...) \n");
 
 	vector<string> headers;
+	std::string bindingName = argv[1];
 
-	for(int i = 1; i < argc; i++) {
+	for(int i = 2; i < argc; i++) {
 		headers.push_back(argv[i]);
 	}
 
@@ -107,29 +114,28 @@ int main(int argc, char **argv) {
 		printf("%s\n", cmd.c_str());
 		if(system(cmd.c_str()) != 0)
 			System::error("gccxml failed\n");
-		Parser::parse(xmlName.c_str(), bases);
+		Parser::parse(xmlName.c_str(), bases, bindingName);
 	}
 	
-	// remove duplicates
-	
-	for( std::multimap< std::string, const Base* >::iterator iter = bases.begin(); iter != bases.end(); iter++ ) {
-		for( std::multimap< std::string, const Base* >::const_iterator iter2 = bases.begin(); iter2 != iter; iter2++ ) {
-			const Base* a = iter->second;
-			const Base* b = iter2->second;
+	// remove duplicates	
+	for( std::multimap< std::string, Base* >::iterator iter = bases.begin(); iter != bases.end(); iter++ ) {
+		for( std::multimap< std::string, Base* >::iterator iter2 = bases.begin(); iter2 != iter; iter2++ ) {
+			Base* a = iter->second;
+			Base* b = iter2->second;
 			
 			if(a->toString() == b->toString()) {
+				a->setGroup(bindingName);
 				printf("collision: %s\n", a->toString().c_str());
-				bases.erase(iter);
+				bases.erase(iter2);
 				break;
 			}
 		}
 	}
-	
 	// -----------------------
 	
 	
-	string idlName = System::genstr("%s.idl", header);
-	string cppName = System::genstr("%s.cpp", header);
+	string idlName = System::genstr("tests/%s.idl", bindingName.c_str());
+	string cppName = System::genstr("tests/%s.cpp", bindingName.c_str());
 
 	idlBackend->generate(bases, idlName.c_str());
 	cppBackend->generate(bases, cppName.c_str());

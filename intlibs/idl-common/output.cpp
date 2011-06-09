@@ -823,7 +823,10 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 
 	streamHash(stream, inf);
 
+	stream << "#ifndef DONT_WANT_" << headerName << "_TYPEDEFS\n";
 	streamTypedefs(stream, inf.typedefs, ix);
+	stream << "#endif\n";
+
 	streamDefines(stream, inf.defines, ix);
 	streamConstants(stream, headerName, inf.constSets, ix);
 	streamStructs(stream, inf.structs, ix, true);

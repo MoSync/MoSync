@@ -40,7 +40,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 
 
 //The GL view is stored in the nib file. When it's unarchived it's sent -initWithCoder:
-- (id)initWithFrame:(CGRect)frame
+- (id)initWithFrame:(CGRect)frame andApi:(EAGLRenderingAPI)api
 {
     self = [super initWithFrame:frame];
 		if(self) {
@@ -52,7 +52,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
         eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
                                         [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
         
-        context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+        context = [[EAGLContext alloc] initWithAPI:api];
         
         if (!context || ![EAGLContext setCurrentContext:context]) {
             [self release];

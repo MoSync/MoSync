@@ -54,7 +54,7 @@ public:
 	virtual const Base* resolveFully() const { return this; }
 	virtual const Location* getLocation() const { return NULL; }
 	
-	void setGroup(std::string& group);
+	void setGroup(const std::string& group);
 	const std::string& getGroup() const;
 protected:
 	std::string mGroup;

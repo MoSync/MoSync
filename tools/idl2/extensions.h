@@ -28,4 +28,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define IX_SEGMENTED_DATA
 #define IX_PIM
 #define IX_OPENGL_ES
+#define IX_GL1
+#define IX_GL2
 #define IX_WIDGET

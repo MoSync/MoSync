@@ -20,6 +20,12 @@ mod.class_eval do
 		copyHeaders
 	end
 	
+	def copyGl2Headers()
+		@INSTALL_INCDIR = "GLES2"
+		@HEADER_DIRS = ["GLES2"]
+		copyHeaders
+	end	
+	
 	def setup_pipe
 		setup_base
 		@SOURCES = [".", "../libsupc++", "libgcc"]
@@ -30,6 +36,8 @@ mod.class_eval do
 		@EXTRA_OBJECTS = [FileTask.new(self, "crtlib.s")]
 		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + @INSTALL_INCDIR + "/new",
 			FileTask.new(self, "../libsupc++/new"))
+		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + @INSTALL_INCDIR + "/macpp.h",
+			FileTask.new(self, "../libsupc++/macpp.h"))
 	end
 	
 	def setup_base
@@ -75,7 +83,8 @@ mod.class_eval do
 			}, &HashMergeAdd).merge(pipe_specflags, &HashMergeAdd)
 		
 		copyGlHeaders()
-		
+	    copyGl2Headers()
+			
 		@HEADER_DIRS = ["."]
 		@INSTALL_INCDIR = "."
 		@IGNORED_HEADERS = ["math_private.h", "fdlibm.h"]
