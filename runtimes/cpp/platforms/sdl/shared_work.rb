@@ -4,7 +4,7 @@ module SdlCommon
 def setup_common
 	common_includes = ["../../../base", ".."]
 	
-	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "filelist"]
+	@LOCAL_LIBS = ["mosync_log_file", "mosync_bluetooth", "net", "filelist", "dll"]
 	common_libraries = ["SDL", "SDL_image", "SDL_ttf"]
 	
 	if(HOST == :win32) then

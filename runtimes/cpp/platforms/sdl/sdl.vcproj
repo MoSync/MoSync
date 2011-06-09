@@ -164,6 +164,14 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\base\extensions.cpp"
+				>
+			</File>
+			<File
+				RelativePath="..\..\base\extensions.h"
+				>
+			</File>
+			<File
 				RelativePath="..\..\base\FileStream.cpp"
 				>
 			</File>

@@ -2,9 +2,9 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="8.00"
-	Name="mosynclib"
-	ProjectGUID="{4DA91033-FE58-4729-8B55-F42614BD8F90}"
-	RootNamespace="mosynclib"
+	Name="dll"
+	ProjectGUID="{742A2184-E51F-495B-8210-8DFF452B6585}"
+	RootNamespace="dll"
 	Keyword="Win32Proj"
 	>
 	<Platforms>
@@ -40,17 +40,15 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="$(ProjectDir)/../../../../../intlibs;../"
-				PreprocessorDefinitions="WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="WIN32;_DEBUG;_LIB"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
 				UsePrecompiledHeader="0"
-				PrecompiledHeaderFile=""
 				WarningLevel="3"
 				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
-				DebugInformationFormat="3"
+				DebugInformationFormat="4"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -63,9 +61,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib ..\..\..\..\..\intlibs\dll\$(ConfigurationName)\dll.lib FreeImage.lib ssleay32.lib libeay32.lib"
-				OutputFile="$(MOSYNCDIR)\lib\w32\mosynclibD.lib"
-				IgnoreDefaultLibraryNames="msvcrt.lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -108,14 +103,13 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				WholeProgramOptimization="false"
-				AdditionalIncludeDirectories="$(ProjectDir)/../../../../../intlibs;../"
-				PreprocessorDefinitions="WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE"
+				PreprocessorDefinitions="WIN32;NDEBUG;_LIB"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				WarnAsError="true"
 				Detect64BitPortabilityProblems="false"
+				DebugInformationFormat="3"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -128,8 +122,6 @@
 			/>
 			<Tool
 				Name="VCLibrarianTool"
-				AdditionalDependencies="..\$(ConfigurationName)\sdl.lib ..\..\..\..\..\intlibs\helpers\platforms\windows\$(ConfigurationName)\windows.lib libirprops.a ..\..\..\..\..\intlibs\filelist\$(ConfigurationName)\filelist.lib ..\..\..\..\..\intlibs\dll\$(ConfigurationName)\dll.lib FreeImage.lib ssleay32.lib libeay32.lib"
-				OutputFile="$(MOSYNCDIR)\lib\w32\$(ProjectName).lib"
 			/>
 			<Tool
 				Name="VCALinkTool"
@@ -152,7 +144,11 @@
 	</References>
 	<Files>
 		<File
-			RelativePath=".\main.cpp"
+			RelativePath=".\dll.h"
+			>
+		</File>
+		<File
+			RelativePath=".\dll_win32.cpp"
 			>
 		</File>
 	</Files>
