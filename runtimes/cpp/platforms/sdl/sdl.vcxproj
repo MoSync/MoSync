@@ -88,6 +88,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\base\base_errors.cpp" />
+    <ClCompile Include="..\..\base\extensions.cpp" />
     <ClCompile Include="..\..\base\FileStream.cpp" />
     <ClCompile Include="..\..\base\MemStream.cpp" />
     <ClCompile Include="..\..\base\networking.cpp" />
@@ -148,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\base\base_errors.h" />
+    <ClInclude Include="..\..\base\extensions.h" />
     <ClInclude Include="..\..\base\FileStream.h" />
     <ClInclude Include="..\..\base\MemStream.h" />
     <ClInclude Include="..\..\base\networking.h" />

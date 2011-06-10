@@ -88,6 +88,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40068, ERR_TEXTBOX_ACTIVE, "Text box is already active")\
 	m(40069, ERR_EXT_VERSION, "Extension version mismatch")\
 	m(40069, ERR_EXT_LOAD, "Failed to load extensions")\
+	m(40070, ERR_EXT_CALL, "Invalid extension call")\
 
 DECLARE_ERROR_ENUM(BASE)
 

@@ -5,3 +5,38 @@ NumberOfFunctions := <Ascii unsigned integer>
 Dll := FileName \n IdlHash \n
 
 IdlHash := 8 hex digits
+
+
+14:12 2011-06-10
+Example ConfFile:
+5
+extension1.dll
+385ad26f
+extension2.dll
+ab528013
+
+
+16:37 2011-06-09
+Components:
+* Invocation/native-defs generator (single extension-IDL input)
+* Config/user-header generator (multiple extension-IDL input)
+* Template extension
+* Example extensions(plural)
+* Loader/invoker (implementation of maInvokeExtension() in MoRE)
+
+14:16 2011-06-10
+Invocator output:
+extension-src-dir/invoke-extension.cpp	// implements getIdlHash() and getFunctions()
+extension-src-dir/cpp_mx_MyExtension.h
+Input:
+mx-invoker -i MyExtension.idl -o extension-src-dir
+
+Config output:
+/project/build/mx_MyExtension.h
+/project/build/mx_MyOtherExtension.h
+/project/build/ConfFile.txt
+Input
+mx-config -o /project/build MyExtension.idl MyExtension.dll MyOtherExtension.idl MyOtherExtension.dll
+
+Emulator input:
+MoRE -p program -x ConfFile.txt

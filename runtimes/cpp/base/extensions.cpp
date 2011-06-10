@@ -88,3 +88,8 @@ void loadExtensions(const char* extConfFileName) {
 	EXT_ASSERT(pos == end);
 	// and we're done.
 }
+
+void maInvokeExtension(uint function) {
+	MYASSERT(function < snFunctions, ERR_EXT_CALL);
+	sFunctions[function]();
+}
