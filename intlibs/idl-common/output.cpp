@@ -853,6 +853,89 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 	stream << "#endif\t//" + headerName + "_DEFS_H\n";
 }
 
+void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool java) {
+	for(size_t i=0; i<maapi.functions.size(); i++) {
+		const Function& f(maapi.functions[i]);
+		streamInvokePrefix(stream, f);
+		stream << "{\n"
+		"\tLOGSC(\"\\t" << f.name << "(\");\n";
+		int ireg = 0;
+		int stack_ireg = 0;
+		for(size_t j=0; j<f.args.size(); j++) {
+			const Argument& a(f.args[j]);
+			if(j != 0)
+				stream << "\tLOGSC(\", \");\n";
+			string argType, convType;
+			if(java) {
+				if((a.type == "MAString" || a.type == "MAWString") && !a.in)
+					argType = "MAAddress";
+				else
+					argType = jType(maapi, a.type);
+				convType = argType;
+			} else {
+				argType = cType(maapi, a.type);
+				convType = a.type;
+			}
+
+			int sizeOfArgType = 1;
+			if(argType == "double" || argType == "long")
+				sizeOfArgType = 2;
+
+			stream << "\t" << argType << " " << a.name << " = _SYSCALL_CONVERT_" << convType;
+			if(ireg+sizeOfArgType>4) {
+				if(java) {
+					stream << "(RINT(REG(REG_sp)+" << (stack_ireg<<2) << ")";
+					if(argType == "double" || argType == "long") {
+						stream << ", RINT(REG(REG_sp)+" << ((stack_ireg+1)<<2) << ")";
+					}
+					stream << ")";
+				}
+				else
+					stream << "(MEM(" << argType << ", REG(REG_sp)+" << (stack_ireg<<2) << ")";
+
+				stream << ");\n";
+				stack_ireg += sizeOfArgType;
+				continue;
+			}
+			else if((argType == "double" || argType == "long") && java) {
+				//stream << "(REG_i" << ireg << ");\n";
+				stream << "(REG(REG_i" << ireg << "), REG(REG_i" << ireg << "+1));\n";
+			} else {
+				stream << "(REG(REG_i" << ireg << "));\n";
+			}
+			ireg += sizeOfArgType;
+		}
+		stream << "\t";
+		if(f.returnType != "void" && f.returnType != "noreturn") {
+			string retType;
+			if(java) {
+				if(f.returnType == "MAString" || f.returnType == "MAWString")
+					retType = "Address";
+				else
+					retType = jType(maapi, f.returnType);
+			} else {
+				retType = cType(maapi, f.returnType);
+			}
+			stream << retType << " res = ";
+		}
+		stream << "CALL_SYSCALL(" << f.name << ")(";
+		for(size_t j=0; j<f.args.size(); j++) {
+			const Argument& a(f.args[j]);
+			if(j != 0)
+				stream << ", ";
+			stream << a.name;
+		}
+		stream << ");\n";
+		if(f.returnType != "void" && f.returnType != "noreturn") {
+			stream << "\t_SYSCALL_HANDLERES_" << f.returnType << "\n";
+		} else {
+			stream << "\t_SYSCALL_HANDLERES_void\n";
+		}
+		stream << "\treturn;\n"
+			"}\n";
+	}
+}
+
 static uint32 hash32shift(uint32 key) {
 	key = key + ~(key << 15); // key = key - (key << 15) - 1;
 	key = key ^ (key >> 10);
