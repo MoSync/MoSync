@@ -273,13 +273,25 @@ public:
 	void test_algorithms();
 
 	/**
+	* Function object adaptors are used to create a function object from another function object.
+	* The created function object, is not the same as the original functor, but is adapted to a certain need.
+	* */
+	void test_adaptors();
+
+	/**
 	*  std::string is a template class designed to manipulate sequences of characters.
 	*  It is a container of characters.
 	*  the string class is defined in the <string> header.
 	*/
 	void test_string();
 
-	void test_adaptors();
+	/**
+	*  An iterator is an object that can iterate through a range, pointing to the elements in the range.
+	*  An iterator has to provide at least operator++, to iterate forward the range. Also it has to
+	*  provide the dereference operator(*), so that we can access the object to which it points.
+	*/
+	void example_iterators();
+
 };
 
 namespace NumericUtilities

@@ -76,6 +76,9 @@ TestSTL::TestSTL() : TestCase("STLTest")
 		addTest(
 				bind(&TestSTL::test_adaptors, this), "test_adaptors");
 
+		addTest(
+				bind(&TestSTL::example_iterators, this), "example_iterators");
+
 		//*******************************************************************************************
 		//						STRING
 		//*******************************************************************************************

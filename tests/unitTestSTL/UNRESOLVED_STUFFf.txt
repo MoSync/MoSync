@@ -1,0 +1,15 @@
+1) can't include the <map> header yet. Have to check "Ignore default" and include 
+all the paths manually (paths to headers).
+
+2) map not covered yet!
+
+3) make/ test library also in release
+
+4) mem_fun and allocators not covered yet.
+
+5) The library is not as easy to use as MAUtil.lib for example, were you have to 
+include only the library at BuildSettings. For stlport.lib you have to add also the
+path to the headers (Mosync/include/stlport). Have to make it user friendly, like MAUtil.
+
+6) iostreams, locals not included in the library. Should I include them later?
+
