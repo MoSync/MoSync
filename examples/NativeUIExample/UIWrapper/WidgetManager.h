@@ -36,8 +36,11 @@ MA 02110-1301, USA.
 #include "WidgetEventListener.h"
 #include "Widget.h"
 #include "Screen.h"
+#include "TabScreen.h"
+#include "StackScreen.h"
 #include "Layout.h"
 #include "TextWidget.h"
+#include "WebView.h"
 #include "Button.h"
 
 namespace MoSync
@@ -68,6 +71,18 @@ namespace MoSync
 		virtual Screen* createScreen();
 
 		/**
+		 * Create a tab screen.
+		 * @return A tab screen.
+		 */
+		virtual TabScreen* createTabScreen();
+
+		/**
+		 * Create a stack screen.
+		 * @return A stack screen.
+		 */
+		virtual StackScreen* createStackScreen();
+
+		/**
 		 * Create a horizontal layout. By default,
 		 * this layout fills the parent space.
 		 * @return An horizontal layout widget.
@@ -80,6 +95,12 @@ namespace MoSync
 		 * @return An vertical layout widget.
 		 */
 		virtual Layout* createVerticalLayout();
+
+		/**
+		 * Create a web view.
+		 * @return A web view.
+		 */
+		virtual WebView* createWebView();
 
 		/**
 		 * Create a button widget.

@@ -26,13 +26,14 @@ MA 02110-1301, USA.
 
 #include <ma.h>
 #include <MAUtil/Moblet.h>
-#include "MainUI.h"
+#include "UIWrapper/WidgetManager.h"
+#include "ScreenMain.h"
 
 using namespace MAUtil;
-//using namespace MoSync::UI;
+using namespace MoSync::UI;
 
 /**
- * Moblet to be used as a template for a Native UI application.
+ * Moblet for the  application.
  */
 class NativeUIMoblet : public Moblet
 {
@@ -55,11 +56,20 @@ public:
  */
 extern "C" int MAMain()
 {
+	// Create a moblet.
 	NativeUIMoblet* moblet = new NativeUIMoblet();
-	MainUI* ui = new MainUI();
-	ui->createUI();
+
+	// Create a widget manager.
+	WidgetManager* widgetManager = new WidgetManager();
+
+	// Create the user interface.
+	Screen* mainScreen = ScreenMain::create(widgetManager);
+	mainScreen->show();
+
+	// Run the moblet event loop.
 	Moblet::run(moblet);
-	delete ui;
-	delete moblet;
+
+	// TODO: Deallocate objects.
+
 	return 0;
 }

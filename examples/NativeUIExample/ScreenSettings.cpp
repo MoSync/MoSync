@@ -17,18 +17,14 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file MainUI.cpp
- * @author Mikael Kindborg
+ * @file ScreenSettings.h
+ * @author TODO: Add your name.
  *
- * This class handles the creation of the application user interface.
+ * TODO: Add comment.
  */
 
-#include <ma.h>
 #include <mavsprintf.h>
-#include <MAUtil/Moblet.h>
-#include "MainUI.h"
-
-using namespace MoSync::UI;
+#include "ScreenSettings.h"
 
 /**
  * Listener for button click events.
@@ -77,22 +73,24 @@ private:
 };
 
 /**
- * Create the user interface of the application.
+ * TODO: Add comment.
  */
-void MainUI::createUI()
+Screen* ScreenSettings::create(WidgetManager* widgetManager)
 {
-	// Create a widget manager.
-	WidgetManager* widgetManager = new WidgetManager();
-
-	// Create a NativeUI screen that will hold layout and widgets.
+	// Create screen.
 	Screen* screen = widgetManager->createScreen();
+	screen->setTitle("Settings");
 
-	// Create a layout object.
+	// Create a layout.
 	Layout* layout = widgetManager->createVerticalLayout();
 	layout->setBackgroundColor(255, 255, 255);
-	screen->setMainWidget(layout);
 
 	// Create a button.
+	Button* widget = widgetManager->createButton();
+	widget->setText("TODO: Implement a settings screen");
+	layout->addChild(widget);
+
+	// Create another clickable button.
 	Button* button = widgetManager->createButton();
 	button->setText("Click me!");
 	button->setFontColor(0, 0, 0);
@@ -100,7 +98,7 @@ void MainUI::createUI()
 	button->setEventListener(new ButtonEventListener());
 	layout->addChild(button);
 
-	// Show the screen.
-	screen->show();
-}
+	screen->setMainWidget(layout);
 
+	return screen;
+}

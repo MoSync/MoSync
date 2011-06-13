@@ -25,7 +25,7 @@
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
-<property key="excludes/Release" value="Resources/Resources.lst UIWrapper/ListSelectionScreen.cpp UIWrapper/ListSelectionScreen.h UIWrapper/TabScreen.cpp UIWrapper/TabScreen.h"/>
+<property key="excludes/Release" value="Resources/Resources.lst UIWrapper/ListSelectionScreen.cpp UIWrapper/ListSelectionScreen.h MainUI.cpp MainUI.h"/>
 <property key="template.id" value="project.nativeui"/>
 </properties>
 </project>

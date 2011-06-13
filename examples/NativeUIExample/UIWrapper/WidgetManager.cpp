@@ -46,6 +46,7 @@ namespace MoSync
 	 */
 	WidgetManager::~WidgetManager()
 	{
+		// TODO: Do cleanup. Destroy widgets.
 	}
 
 	/**
@@ -57,6 +58,32 @@ namespace MoSync
 		MAHandle widgetHandle = maWidgetCreate(MAW_SCREEN);
 		checkNativeUISupport(widgetHandle);
 		Screen* widget = new Screen(widgetHandle, this);
+		addWidgetToMap(widgetHandle, widget);
+		return widget;
+	}
+
+	/**
+	 * Create a tab screen.
+	 * @return A tab screen.
+	 */
+	TabScreen* WidgetManager::createTabScreen()
+	{
+		MAHandle widgetHandle = maWidgetCreate(MAW_TAB_SCREEN);
+		checkNativeUISupport(widgetHandle);
+		TabScreen* widget = new TabScreen(widgetHandle, this);
+		addWidgetToMap(widgetHandle, widget);
+		return widget;
+	}
+
+	/**
+	 * Create a stack screen.
+	 * @return A stack screen.
+	 */
+	StackScreen* WidgetManager::createStackScreen()
+	{
+		MAHandle widgetHandle = maWidgetCreate(MAW_STACK_SCREEN);
+		checkNativeUISupport(widgetHandle);
+		StackScreen* widget = new StackScreen(widgetHandle, this);
 		addWidgetToMap(widgetHandle, widget);
 		return widget;
 	}
@@ -91,6 +118,21 @@ namespace MoSync
 		addWidgetToMap(widgetHandle, widget);
 		widget->fillSpaceVertically();
 		widget->fillSpaceHorizontally();
+		return widget;
+	}
+
+	/**
+	 * Create a web view.
+	 * @return A web view.
+	 */
+	WebView* WidgetManager::createWebView()
+	{
+		MAHandle widgetHandle = ::maWidgetCreate(MAW_WEB_VIEW);
+		checkNativeUISupport(widgetHandle);
+		WebView* widget = new WebView(widgetHandle, this);
+		addWidgetToMap(widgetHandle, widget);
+		widget->fillSpaceHorizontally();
+		widget->fillSpaceVertically();
 		return widget;
 	}
 

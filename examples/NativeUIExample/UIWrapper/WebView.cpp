@@ -17,14 +17,14 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Screen.h
+ * @file WebView.cpp
  * @author Mikael Kindborg
  *
- * Class that represents a visible screen. Only one screen
- * is visible at a time.
+ * Class for web views. Create a web view instance by
+ * using the WidgetManager.
  */
 
-#include "Screen.h"
+#include "WebView.h"
 
 namespace MoSync
 {
@@ -39,7 +39,7 @@ namespace MoSync
 	 * @widgetHandle The handle of the widget.
 	 * @widgetManager The widget manager for this widget.
 	 */
-	Screen::Screen(MAHandle widgetHandle, WidgetManager* widgetManager) :
+	WebView::WebView(MAHandle widgetHandle, WidgetManager* widgetManager) :
 		Widget(widgetHandle, widgetManager)
 	{
 	}
@@ -47,41 +47,18 @@ namespace MoSync
 	/**
 	 * Destructor.
 	 */
-	Screen::~Screen()
+	WebView::~WebView()
 	{
 	}
 
 	/**
-	 * Set the title of the screen.
-	 * @param title The screen title.
+	 * Open a web page.
+	 * @param url The URL open.
 	 */
-	void Screen::setTitle(const MAUtil::String& title)
+	void WebView::openURL(const MAUtil::String& url)
 	{
-		setProperty("title", title.c_str());
-	}
-
-	/**
-	 * Set the main widget of the screen.
-	 * Note: A screen can only have one main widget.
-	 * Use a layout as main widget and add child
-	 * widgets to the layout.
-	 * @param widget The widget to be set as main widget.
-	 */
-	void Screen::setMainWidget(Widget* widget)
-	{
-		addChild(widget);
-	}
-
-	/**
-	 * Show a screen. Only one screen at a time is visible.
-	 * The previous screen will be hidden when showing a screen.
-	 * Note: This method is only applicable to screens.
-	 */
-	void Screen::show()
-	{
-		maWidgetScreenShow(getWidgetHandle());
+		setProperty("url", url.c_str());
 	}
 
 	} // namespace UI
 } // namespace MoSync
-

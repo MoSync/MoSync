@@ -17,34 +17,23 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file MainUI.cpp
- * @author Mikael Kindborg
+ * @file ScreenSpinningCube.cpp
+ * @author TODO: Add your name.
  *
- * This class handles the creation of the application user interface.
+ * TODO: Add comment.
  */
 
-#ifndef MAINUI_H_
-#define MAINUI_H_
-
-#include <ma.h>
-#include <mavsprintf.h>
-#include "UIWrapper/WidgetManager.h"
-#include "UIWrapper/WidgetEventListener.h"
-#include "UIWrapper/Screen.h"
-#include "UIWrapper/Layout.h"
-#include "UIWrapper/Button.h"
-#include "MainUI.h"
+#include "ScreenSpinningCube.h"
 
 /**
- * This class handles the creation of the application user interface.
+ * TODO: Add comment.
  */
-class MainUI
+Screen* ScreenSpinningCube::create(WidgetManager* widgetManager)
 {
-public:
-	/**
-	 * Create the user interface of the application.
-	 */
-	void createUI();
-};
-
-#endif
+	Screen* screen = widgetManager->createScreen();
+	screen->setTitle("3D Cube");
+	Button* widget = widgetManager->createButton();
+	widget->setText("TODO: Implement a Spinning Cube");
+	screen->setMainWidget(widget);
+	return screen;
+}

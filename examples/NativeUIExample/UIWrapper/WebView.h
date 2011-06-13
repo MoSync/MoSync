@@ -17,16 +17,17 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file TabScreen.h
- * @author Niklas Nummelin & Mikael Kindborg
+ * @file WebView.h
+ * @author Mikael Kindborg
  *
- * Class that represents a screen with tabs.
+ * Class for web views. Create a web view instance by
+ * using the WidgetManager.
  */
 
-#ifndef MOSYNC_UI_TABSCREEN_H_
-#define MOSYNC_UI_TABSCREEN_H_
+#ifndef MOSYNC_UI_WEBVIEW_H_
+#define MOSYNC_UI_WEBVIEW_H_
 
-#include "Screen.h"
+#include "Widget.h"
 
 namespace MoSync
 {
@@ -34,9 +35,9 @@ namespace MoSync
 	{
 
 	/**
-	 * Class that represents a tab screen.
+	 * Class for web views.
 	 */
-	class TabScreen : public Screen
+	class WebView : public Widget
 	{
 	public:
 		/**
@@ -47,27 +48,18 @@ namespace MoSync
 		 * @widgetHandle The handle of the widget.
 		 * @widgetManager The widget manager for this widget.
 		 */
-		TabScreen(MAHandle widgetHandle, WidgetManager* widgetManager);
+		WebView(MAHandle widgetHandle, WidgetManager* widgetManager);
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~TabScreen();
+		virtual ~WebView();
 
 		/**
-		 * Add a new tab with a screen in it.
-		 * @param screen The screen shown in the new tab.
+		 * Open a web page.
+		 * @param url The URL open.
 		 */
-		virtual void addTab(Screen* screen);
-
-		/**
-		 * Show a given tab.
-		 * @param index The index of the tab to show.
-		 * Index starts at zero.
-		 */
-		virtual void setActiveTab(int index);
-
-		// TODO: Add method for setting the tab icon.
+		virtual void openURL(const MAUtil::String& url);
 	};
 
 	} // namespace UI
