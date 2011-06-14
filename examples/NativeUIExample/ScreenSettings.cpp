@@ -56,9 +56,9 @@ public:
 				sprintf(buffer, "You clicked me once!", mButtonClickCount);
 			}
 			else
-			if (100 == mButtonClickCount)
+			if (99 < mButtonClickCount)
 			{
-				sprintf(buffer, "Wow! 100 times!", mButtonClickCount);
+				sprintf(buffer, "Wow! %d times!", mButtonClickCount);
 			}
 			else
 			{

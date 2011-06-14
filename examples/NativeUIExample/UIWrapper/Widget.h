@@ -23,14 +23,6 @@ MA 02110-1301, USA.
  * Widget is the base class of all widgets. This class is
  * used to wrap native widget handles and provides common
  * methods for widgets and event support.
- *
- * In the current implementation several widget types are
- * created as instances of class Widget. This may be changed
- * in the future so that each widget has its own subclass.
- *
- * Note that for convenience, there are methods in this class
- * that apply to many, but not all, widget. For example setText.
- * This is also something that may be changed in the future.
  */
 
 #ifndef MOSYNC_UI_WIDGET_H_
