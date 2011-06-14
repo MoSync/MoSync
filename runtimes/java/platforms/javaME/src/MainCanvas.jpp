@@ -27,11 +27,9 @@ import java.util.Vector;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public final class MainCanvas
+public final class MainCanvas extends GameCanvas implements Runnable, CommandListener
 #ifdef BB_RIM_API
-	extends net.rim.device.api.lcdui.game.BlackBerryGameCanvas implements Runnable, CommandListener, net.rim.device.api.system.KeyListener
-#else
-	extends GameCanvas implements Runnable, CommandListener
+	, net.rim.device.api.system.KeyListener
 #endif
 {
 
@@ -752,23 +750,6 @@ public final class MainCanvas
 	public boolean keyChar(char key, int status, int time) {
 		// TODO Auto-generated method stub
 		return false;
-	}
-
-	public void touchEvent(net.rim.device.api.ui.TouchEvent message) {
-		int x = message.getX(1);
-		int y = message.getY(1);
-
-		switch (message.getEvent()) {
-			case net.rim.device.api.ui.TouchEvent.DOWN:
-				pointerPressed(x, y);
-				break;
-			case net.rim.device.api.ui.TouchEvent.MOVE:
-				pointerDragged(x, y);
-				break;
-			case net.rim.device.api.ui.TouchEvent.UP:
-				pointerReleased(x, y);
-				break;
-		}
 	}
 
 	public boolean keyDown(int keycode, int time) {
