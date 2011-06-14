@@ -24,10 +24,14 @@ MA 02110-1301, USA.
  * that demonstrates NativeUI on MoSync.
  */
 
+#include <maprofile.h>
 #include <ma.h>
+#include <mastring.h>
+#include <MAUtil/String.h>
 #include <MAUtil/Moblet.h>
 #include "UIWrapper/Widgets.h"
 #include "ScreenMain.h"
+#include <conprint.h>
 
 using namespace MAUtil;
 using namespace MoSync::UI;
@@ -39,16 +43,59 @@ class NativeUIMoblet : public Moblet
 {
 public:
 	/**
+	 * Constructor that creates the UI.
+	 */
+	NativeUIMoblet()
+	{
+		// Create the main user interface.
+		if (isAndroid())
+		{
+			mMainScreen = ScreenMain::createFourTabUI();
+		}
+		else
+		{
+			mMainScreen = ScreenMain::createFiveTabUI();
+		}
+
+		// Show the screen.
+		mMainScreen->show();
+	}
+
+	/**
+	 * Destructor.
+	 */
+	virtual ~NativeUIMoblet()
+	{
+		delete mMainScreen;
+	}
+
+	/**
 	 * Called when a key is pressed.
 	 */
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		if (MAK_BACK == keyCode || MAK_0 == keyCode)
+		// Let the screen handle the keypress.
+		mMainScreen->handleKeyPress(keyCode);
+	}
+
+	/**
+	 * Detects if the current platform is Android.
+	 * @return true if the platform is Android.
+	 */
+	bool isAndroid()
+	{
+		if (NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
 		{
-			// Call close to exit the application.
-			close();
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
+
+private:
+	ScreenMain* mMainScreen;
 };
 
 /**
@@ -59,14 +106,11 @@ extern "C" int MAMain()
 	// Create a moblet.
 	NativeUIMoblet* moblet = new NativeUIMoblet();
 
-	// Create the user interface.
-	Screen* mainScreen = ScreenMain::create();
-	mainScreen->show();
-
 	// Run the moblet event loop.
 	Moblet::run(moblet);
 
-	// TODO: Deallocate objects.
+	// Deallocate objects.
+	delete moblet;
 
 	return 0;
 }

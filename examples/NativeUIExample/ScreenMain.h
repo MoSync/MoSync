@@ -34,14 +34,42 @@ using namespace MoSync::UI;
 
 /**
  * Class that creates the main screen of the application.
+ * TODO: The name of this class is confusing since it is
+ * not a screen, but a collection of screens (it does not
+ * inherit screen). Change name to for example "MainUI".
  */
 class ScreenMain
 {
 public:
 	/**
-	 * Create the main screen.
+	 * Constructor.
 	 */
-	static Screen* create();
+	ScreenMain() {};
+
+	/**
+	 * Destructor.
+	 */
+	virtual ~ScreenMain() {};
+
+	/**
+	 * Show the screen..
+	 */
+	virtual void show() = 0;
+
+	/**
+	 * Handle keypresses.
+	 */
+	virtual void handleKeyPress(int keyCode) = 0;
+
+	/**
+	 * Create UI with four tabs
+	 */
+	static ScreenMain* createFourTabUI();
+
+	/**
+	 * Create UI with five tabs
+	 */
+	static ScreenMain* createFiveTabUI();
 };
 
 #endif

@@ -25,6 +25,7 @@ MA 02110-1301, USA.
  * are created and connected to the main tab screen.
  */
 
+#include <maprofile.h>
 #include "ScreenMain.h"
 #include "ScreenColorList.h"
 #include "ScreenWebView.h"
@@ -32,25 +33,122 @@ MA 02110-1301, USA.
 #include "ScreenSpinningCube.h"
 #include "ScreenSettings.h"
 
-/**
- * Create the main screen.
- */
-Screen* ScreenMain::create()
+class ScreenMainWithFourTabs : public ScreenMain
 {
-	TabScreen* tabScreen = new TabScreen();
+public:
+	ScreenMainWithFourTabs() : ScreenMain()
+	{
+		mTabScreen = new TabScreen();
 
-	Screen* colorScreen = ScreenColorList::create();
-	Screen* webScreen = ScreenWebView::create();
-	Screen* imageScreen = ScreenImageSwiper::create();
-	Screen* cubeScreen = ScreenSpinningCube::create();
-	Screen* settingsScreen = ScreenSettings::create();
+		Screen* colorScreen = ScreenColorList::create();
+		Screen* webScreen = ScreenWebView::create();
+		Screen* imageScreen = ScreenImageSwiper::create();
+		Screen* cubeScreen = ScreenSpinningCube::create();
+		mSettingsScreen = ScreenSettings::create();
 
-	tabScreen->addTab(colorScreen);
-	tabScreen->addTab(webScreen);
-	tabScreen->addTab(imageScreen);
-	tabScreen->addTab(cubeScreen);
-	tabScreen->addTab(settingsScreen);
+		mTabScreen->addTab(colorScreen);
+		mTabScreen->addTab(webScreen);
+		mTabScreen->addTab(imageScreen);
+		mTabScreen->addTab(cubeScreen);
+	}
 
-	return tabScreen;
+	virtual ~ScreenMainWithFourTabs()
+	{
+		// TODO: Is this safe?
+		delete mTabScreen;
+		delete mSettingsScreen;
+	}
+
+	void show()
+	{
+		mVisibleScreen = mTabScreen;
+		mTabScreen->show();
+	}
+
+	void handleKeyPress(int keyCode)
+	{
+		if (MAK_MENU == keyCode)
+		{
+			// Show settings screen.
+			mVisibleScreen = mSettingsScreen;
+			mSettingsScreen->show();
+		}
+		else if (MAK_BACK == keyCode)
+		{
+			if (mVisibleScreen == mTabScreen)
+			{
+				// TODO: Later change to close();
+				//close();
+				maExit(0);
+			}
+			else if (mVisibleScreen == mSettingsScreen)
+			{
+				show();
+			}
+		}
+	}
+
+private:
+	TabScreen* mTabScreen;
+	Screen* mSettingsScreen;
+	Screen* mVisibleScreen;
+};
+
+class ScreenMainWithFiveTabs : public ScreenMain
+{
+public:
+	ScreenMainWithFiveTabs() : ScreenMain()
+	{
+		mTabScreen = new TabScreen();
+
+		Screen* colorScreen = ScreenColorList::create();
+		Screen* webScreen = ScreenWebView::create();
+		Screen* imageScreen = ScreenImageSwiper::create();
+		Screen* cubeScreen = ScreenSpinningCube::create();
+		Screen* settingsScreen = ScreenSettings::create();
+
+		mTabScreen->addTab(colorScreen);
+		mTabScreen->addTab(webScreen);
+		mTabScreen->addTab(imageScreen);
+		mTabScreen->addTab(cubeScreen);
+		mTabScreen->addTab(settingsScreen);
+	}
+
+	virtual ~ScreenMainWithFiveTabs()
+	{
+		// TODO: Is this safe?
+		delete mTabScreen;
+	}
+
+	void show()
+	{
+		mTabScreen->show();
+	}
+
+	void handleKeyPress(int keyCode)
+	{
+		if (MAK_BACK == keyCode)
+		{
+			maExit(0);
+		}
+	}
+
+private:
+	TabScreen* mTabScreen;
+};
+
+/**
+ * Create the main screen with four tabs.
+ */
+ScreenMain* ScreenMain::createFourTabUI()
+{
+	return new ScreenMainWithFourTabs();
 }
 
+/**
+ * Create the main screen with five tabs.
+ */
+ScreenMain* ScreenMain::createFiveTabUI()
+{
+	return new ScreenMainWithFiveTabs();
+}

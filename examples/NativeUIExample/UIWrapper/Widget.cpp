@@ -43,7 +43,8 @@ namespace MoSync
 	 * (one of the MAW_ constants).
 	 */
 	Widget::Widget(const MAUtil::String& widgetType) :
-		mWidgetManager(WidgetManager::getInstance())
+		mWidgetManager(WidgetManager::getInstance()),
+		mWidgetEventListener(NULL)
 	{
 		mWidgetHandle = maWidgetCreate(widgetType.c_str());
 		mWidgetManager->registerWidget(mWidgetHandle, this);
