@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file ScreenWebView.h
- * @author Mikael Kindborg
+ * @author TODO: Add your name.
  *
  * Class that creates a screen that displays a web view.
  */
@@ -28,11 +28,11 @@ MA 02110-1301, USA.
 /**
  * Create the web view screen.
  */
-Screen* ScreenWebView::create(WidgetManager* widgetManager)
+Screen* ScreenWebView::create()
 {
-	Screen* screen = widgetManager->createScreen();
+	Screen* screen = new Screen();
 	screen->setTitle("Web");
-	WebView* webView = widgetManager->createWebView();
+	WebView* webView = new WebView();
 	webView->openURL("http://www.google.com");
 	screen->setMainWidget(webView);
 	return screen;

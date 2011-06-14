@@ -17,39 +17,24 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Layout.cpp
+ * @file Widgets.h
  * @author Mikael Kindborg
  *
- * Class for layout of widgets. Create a layout instance by
- * using the WidgetManager.
+ * You can include all widget classes by just including
+ * this file, to make things a bit easier.
  */
 
-#include "Layout.h"
+#ifndef MOSYNC_UI_WIDGETS_H_
+#define MOSYNC_UI_WIDGETS_H_
 
-namespace MoSync
-{
-	namespace UI
-	{
+#include "WidgetEventListener.h"
+#include "Widget.h"
+#include "Screen.h"
+#include "TabScreen.h"
+#include "StackScreen.h"
+#include "HorizontalLayout.h"
+#include "VerticalLayout.h"
+#include "WebView.h"
+#include "Button.h"
 
-	/**
-	 * Constructor. Use one of the create methods in class
-	 * WidgetManager to create a widget instance. Do not create
-	 * an instance of this class with new unless you are implementing
-	 * your custom UI library.
-	 * @widgetHandle The handle of the widget.
-	 * @widgetManager The widget manager for this widget.
-	 */
-	Layout::Layout(MAHandle widgetHandle, WidgetManager* widgetManager) :
-		Widget(widgetHandle, widgetManager)
-	{
-	}
-
-	/**
-	 * Destructor.
-	 */
-	Layout::~Layout()
-	{
-	}
-
-	} // namespace UI
-} // namespace MoSync
+#endif

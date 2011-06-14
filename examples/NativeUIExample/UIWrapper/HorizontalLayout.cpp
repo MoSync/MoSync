@@ -17,17 +17,13 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Button.h
+ * @file HorizontalLayout.cpp
  * @author Mikael Kindborg
  *
- * Class for buttons. Create a button instance by
- * using the WidgetManager.
+ * Class for horizontal layout of widgets.
  */
 
-#ifndef MOSYNC_UI_BUTTON_H_
-#define MOSYNC_UI_BUTTON_H_
-
-#include "TextWidget.h"
+#include "HorizontalLayout.h"
 
 namespace MoSync
 {
@@ -35,23 +31,22 @@ namespace MoSync
 	{
 
 	/**
-	 * Class for buttons.
+	 * Constructor.
 	 */
-	class Button : public TextWidget
+	HorizontalLayout::HorizontalLayout() :
+		Widget(MAW_HORIZONTAL_LAYOUT)
 	{
-	public:
-		/**
-		 * Constructor.
-		 */
-		Button();
+		// Set some common default values.
+		this->fillSpaceVertically();
+		this->fillSpaceHorizontally();
+	}
 
-		/**
-		 * Destructor.
-		 */
-		virtual ~Button();
-	};
+	/**
+	 * Destructor.
+	 */
+	HorizontalLayout::~HorizontalLayout()
+	{
+	}
 
 	} // namespace UI
 } // namespace MoSync
-
-#endif

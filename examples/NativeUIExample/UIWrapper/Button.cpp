@@ -31,17 +31,16 @@ namespace MoSync
 	namespace UI
 	{
 
-	/**
-	 * Constructor. Use one of the create methods in class
-	 * WidgetManager to create a widget instance. Do not create
-	 * an instance of this class with new unless you are implementing
-	 * your custom UI library.
-	 * @widgetHandle The handle of the widget.
-	 * @widgetManager The widget manager for this widget.
-	 */
-	Button::Button(MAHandle widgetHandle, WidgetManager* widgetManager) :
-		TextWidget(widgetHandle, widgetManager)
+	Button::Button() :
+		TextWidget(MAW_BUTTON)
 	{
+		// Set some common default values to
+		// simplify when creating buttons.
+		this->fillSpaceHorizontally();
+		this->wrapContentVertically();
+		this->setText("Click Me!");
+		this->centerTextHorizontally();
+		this->centerTextVertically();
 	}
 
 	/**

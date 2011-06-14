@@ -28,11 +28,11 @@ MA 02110-1301, USA.
 /**
  * TODO: Add comment.
  */
-Screen* ScreenImageSwiper::create(WidgetManager* widgetManager)
+Screen* ScreenImageSwiper::create()
 {
-	Screen* screen = widgetManager->createScreen();
+	Screen* screen = new Screen();
 	screen->setTitle("Images");
-	Button* widget = widgetManager->createButton();
+	Button* widget = new Button();
 	widget->setText("TODO: Implement an image swiper");
 	screen->setMainWidget(widget);
 	return screen;

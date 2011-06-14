@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file ScreenWebView.h
- * @author Mikael Kindborg
+ * @author TODO: Add your name.
  *
  * Class that creates a screen that displays a web view.
  */
@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 #ifndef SCREEN_WEB_VIEW_H_
 #define SCREEN_WEB_VIEW_H_
 
-#include "UIWrapper/WidgetManager.h"
+#include "UIWrapper/Widgets.h"
 
 using namespace MoSync::UI;
 
@@ -39,7 +39,7 @@ public:
 	/**
 	 * Create the web view screen.
 	 */
-	static Screen* create(WidgetManager* widgetManager);
+	static Screen* create();
 };
 
 #endif

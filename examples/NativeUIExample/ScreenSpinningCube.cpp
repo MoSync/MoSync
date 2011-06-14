@@ -28,11 +28,11 @@ MA 02110-1301, USA.
 /**
  * TODO: Add comment.
  */
-Screen* ScreenSpinningCube::create(WidgetManager* widgetManager)
+Screen* ScreenSpinningCube::create()
 {
-	Screen* screen = widgetManager->createScreen();
+	Screen* screen = new Screen();
 	screen->setTitle("3D Cube");
-	Button* widget = widgetManager->createButton();
+	Button* widget = new Button();
 	widget->setText("TODO: Implement a Spinning Cube");
 	screen->setMainWidget(widget);
 	return screen;

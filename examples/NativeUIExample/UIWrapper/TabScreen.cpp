@@ -31,15 +31,10 @@ namespace MoSync
 	{
 
 	/**
-	 * Constructor. Use one of the create methods in class
-	 * WidgetManager to create a widget instance. Do not create
-	 * an instance of this class with new unless you are implementing
-	 * your custom UI library.
-	 * @widgetHandle The handle of the widget.
-	 * @widgetManager The widget manager for this widget.
+	 * Constructor.
 	 */
-	TabScreen::TabScreen(MAHandle widgetHandle, WidgetManager* widgetManager) :
-		Screen(widgetHandle, widgetManager)
+	TabScreen::TabScreen() :
+		Screen(MAW_TAB_SCREEN)
 	{
 	}
 

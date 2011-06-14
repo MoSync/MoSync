@@ -32,15 +32,20 @@ namespace MoSync
 	{
 
 	/**
-	 * Constructor. Use one of the create methods in class
-	 * WidgetManager to create a widget instance. Do not create
-	 * an instance of this class with new unless you are implementing
-	 * your custom UI library.
-	 * @widgetHandle The handle of the widget.
-	 * @widgetManager The widget manager for this widget.
+	 * Constructor.
 	 */
-	Screen::Screen(MAHandle widgetHandle, WidgetManager* widgetManager) :
-		Widget(widgetHandle, widgetManager)
+	Screen::Screen() :
+		Widget(MAW_SCREEN)
+	{
+	}
+
+	/**
+	 * Protected because only subclasses should use this constructor.
+	 * @widgetType The string constant that identifies the widget type
+	 * (one of the MAW_ constants).
+	 */
+	Screen::Screen(const MAUtil::String& widgetType) :
+		Widget(widgetType)
 	{
 	}
 

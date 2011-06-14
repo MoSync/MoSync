@@ -75,23 +75,23 @@ private:
 /**
  * TODO: Add comment.
  */
-Screen* ScreenSettings::create(WidgetManager* widgetManager)
+Screen* ScreenSettings::create()
 {
 	// Create screen.
-	Screen* screen = widgetManager->createScreen();
+	Screen* screen = new Screen();
 	screen->setTitle("Settings");
 
 	// Create a layout.
-	Layout* layout = widgetManager->createVerticalLayout();
+	VerticalLayout* layout = new VerticalLayout();
 	layout->setBackgroundColor(255, 255, 255);
 
 	// Create a button.
-	Button* widget = widgetManager->createButton();
+	Button* widget = new Button();
 	widget->setText("TODO: Implement a settings screen");
 	layout->addChild(widget);
 
 	// Create another clickable button.
-	Button* button = widgetManager->createButton();
+	Button* button = new Button();
 	button->setText("Click me!");
 	button->setFontColor(0, 0, 0);
 	button->setFontSize(36);

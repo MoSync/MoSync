@@ -35,15 +35,15 @@ MA 02110-1301, USA.
 /**
  * Create the main screen.
  */
-Screen* ScreenMain::create(WidgetManager* widgetManager)
+Screen* ScreenMain::create()
 {
-	TabScreen* tabScreen = widgetManager->createTabScreen();
+	TabScreen* tabScreen = new TabScreen();
 
-	Screen* colorScreen = ScreenColorList::create(widgetManager);
-	Screen* webScreen = ScreenWebView::create(widgetManager);
-	Screen* imageScreen = ScreenImageSwiper::create(widgetManager);
-	Screen* cubeScreen = ScreenSpinningCube::create(widgetManager);
-	Screen* settingsScreen = ScreenSettings::create(widgetManager);
+	Screen* colorScreen = ScreenColorList::create();
+	Screen* webScreen = ScreenWebView::create();
+	Screen* imageScreen = ScreenImageSwiper::create();
+	Screen* cubeScreen = ScreenSpinningCube::create();
+	Screen* settingsScreen = ScreenSettings::create();
 
 	tabScreen->addTab(colorScreen);
 	tabScreen->addTab(webScreen);

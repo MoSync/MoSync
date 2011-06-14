@@ -28,6 +28,7 @@ MA 02110-1301, USA.
 #include <mavsprintf.h>
 #include <mastdlib.h>
 #include "Widget.h"
+#include "WidgetManager.h"
 #include "WidgetEventListener.h"
 
 namespace MoSync
@@ -36,18 +37,16 @@ namespace MoSync
 	{
 
 	/**
-	 * Constructor. Use one of the create methods in class
-	 * WidgetManager to create a widget instance. Do not create
-	 * an instance of this class with new unless you are implementing
-	 * your custom UI library.
-	 * @widgetHandle The handle of the widget.
-	 * @widgetManager The widget manager for this widget.
+	 * Constructor is protected because actual widget instances
+	 * should be subclasses of this class.
+	 * @widgetType The string constant that identifies the widget type
+	 * (one of the MAW_ constants).
 	 */
-	Widget::Widget(MAHandle widgetHandle, WidgetManager* widgetManager) :
-		mWidgetHandle(widgetHandle),
-		mWidgetManager(widgetManager),
-		mWidgetEventListener(NULL)
+	Widget::Widget(const MAUtil::String& widgetType) :
+		mWidgetManager(WidgetManager::getInstance())
 	{
+		mWidgetHandle = maWidgetCreate(widgetType.c_str());
+		mWidgetManager->registerWidget(mWidgetHandle, this);
 	}
 
 	/**
@@ -55,12 +54,17 @@ namespace MoSync
 	 */
 	Widget::~Widget()
 	{
+		// Unregister from WidgetManager.
+		mWidgetManager->unregisterWidget(mWidgetHandle, this);
+
+		// Destroy the widget.
+		maWidgetDestroy(mWidgetHandle);
 	}
 
 	/**
 	 * @return The handle of the widget.
 	 */
-	MAHandle Widget::getWidgetHandle() const
+	MAWidgetHandle Widget::getWidgetHandle() const
 	{
 		return mWidgetHandle;
 	}

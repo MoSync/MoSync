@@ -17,17 +17,13 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Layout.h
+ * @file VerticalLayout.cpp
  * @author Mikael Kindborg
  *
- * Class for layout of widgets. Create a layout instance by
- * using the WidgetManager.
+ * Class for vertical layout of widgets.
  */
 
-#ifndef MOSYNC_UI_LAYOUT_H_
-#define MOSYNC_UI_LAYOUT_H_
-
-#include "Widget.h"
+#include "VerticalLayout.h"
 
 namespace MoSync
 {
@@ -35,28 +31,22 @@ namespace MoSync
 	{
 
 	/**
-	 * Class for buttons.
+	 * Constructor.
 	 */
-	class Layout : public Widget
+	VerticalLayout::VerticalLayout() :
+		Widget(MAW_VERTICAL_LAYOUT)
 	{
-	public:
-		/**
-		 * Constructor. Use one of the create methods in class
-		 * WidgetManager to create a widget instance. Do not create
-		 * an instance of this class with new unless you are implementing
-		 * your custom UI library.
-		 * @widgetHandle The handle of the widget.
-		 * @widgetManager The widget manager for this widget.
-		 */
-		Layout(MAHandle widgetHandle, WidgetManager* widgetManager);
+		// Set some common default values.
+		this->fillSpaceVertically();
+		this->fillSpaceHorizontally();
+	}
 
-		/**
-		 * Destructor.
-		 */
-		virtual ~Layout();
-	};
+	/**
+	 * Destructor.
+	 */
+	VerticalLayout::~VerticalLayout()
+	{
+	}
 
 	} // namespace UI
 } // namespace MoSync
-
-#endif

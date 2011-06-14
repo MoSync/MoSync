@@ -28,7 +28,7 @@ MA 02110-1301, USA.
 #ifndef SCREEN_MAIN_H_
 #define SCREEN_MAIN_H_
 
-#include "UIWrapper/WidgetManager.h"
+#include "UIWrapper/Widgets.h"
 
 using namespace MoSync::UI;
 
@@ -41,7 +41,7 @@ public:
 	/**
 	 * Create the main screen.
 	 */
-	static Screen* create(WidgetManager* widgetManager);
+	static Screen* create();
 };
 
 #endif

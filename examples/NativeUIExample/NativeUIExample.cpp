@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 
 #include <ma.h>
 #include <MAUtil/Moblet.h>
-#include "UIWrapper/WidgetManager.h"
+#include "UIWrapper/Widgets.h"
 #include "ScreenMain.h"
 
 using namespace MAUtil;
@@ -59,11 +59,8 @@ extern "C" int MAMain()
 	// Create a moblet.
 	NativeUIMoblet* moblet = new NativeUIMoblet();
 
-	// Create a widget manager.
-	WidgetManager* widgetManager = new WidgetManager();
-
 	// Create the user interface.
-	Screen* mainScreen = ScreenMain::create(widgetManager);
+	Screen* mainScreen = ScreenMain::create();
 	mainScreen->show();
 
 	// Run the moblet event loop.

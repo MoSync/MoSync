@@ -28,11 +28,11 @@ MA 02110-1301, USA.
 /**
  * TODO: Add comment.
  */
-Screen* ScreenColorList::create(WidgetManager* widgetManager)
+Screen* ScreenColorList::create()
 {
-	Screen* screen = widgetManager->createScreen();
+	Screen* screen = new Screen();
 	screen->setTitle("Colors");
-	Button* widget = widgetManager->createButton();
+	Button* widget = new Button();
 	widget->setText("TODO: Implement a color list");
 	screen->setMainWidget(widget);
 	return screen;
