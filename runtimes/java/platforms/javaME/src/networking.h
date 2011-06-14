@@ -339,6 +339,13 @@ class ConnRead implements Runnable {
 #endif
 			return;
 		}
+#ifdef BB_RIM_API
+		catch(NullPointerException e) {
+			PRINT_STACK_TRACE;
+			mac.handleResult(CONNOP_READ, CONNERR_INTERNAL);
+			return;
+		}
+#endif
 		int result;
 		if(res > 0) {
 #ifdef OLD_MEMCPY
@@ -575,6 +582,11 @@ static class HttpFinish implements Runnable {
 			mac.handleResult(CONNOP_FINISH, CONNERR_GENERIC);
 #endif
 		}
+#ifdef BB_RIM_API
+		catch(NullPointerException npe) {
+			mac.handleResult(CONNOP_FINISH, CONNERR_INTERNAL);
+		}
+#endif
 	}
 }
 

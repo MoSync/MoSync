@@ -221,6 +221,9 @@ IMPLEMENTS MoSync
 	Player mStreamPlayer = null;
 	VideoControl mStreamVideoControl = null;
 	int mStreamHandle = 0;
+#ifdef BB_RIM_API
+	InputConnection mStreamConnection = null;
+#endif
 #endif
 
 #ifdef MA_IX_AUDIOBUFFER
@@ -2273,7 +2276,7 @@ public
 	{
 		if(mStreamHandle != 0)
 		{
-			if(mStreamVideoControl != null || mStreamState != SS_IDLE)
+			if(mStreamState != SS_IDLE)
 			{
 				maStreamClose(mStreamHandle);
 			}
@@ -2286,20 +2289,13 @@ public
 
 		public void playerUpdate(Player player, String event, Object eventData)
 		{
-			if(event.equals(PlayerListener.STARTED))
-			{
+			DEBUG_MEDIA_STREAM("player event: " + event);
+	
+			if(event.equals(PlayerListener.STARTED)) {
 				mStreamState = SS_PLAYING;
-				if(mStreamVideoControl == null)
-				{
-					mStreamVideoControl = (VideoControl)player.getControl("VideoControl");
-					if(mStreamVideoControl != null)
-					{
-						mStreamVideoControl.initDisplayMode(mStreamVideoControl.USE_DIRECT_VIDEO, mCanvas);
-						mStreamVideoControl.setDisplayLocation(0, 0);
-						mStreamVideoControl.setVisible(true);
-					}
-				}
-			}	
+			} else if (PlayerListener.ERROR.equals(event)) {
+				DEBUG_MEDIA_STREAM("event data: " + eventData);
+			}
 		}
 	};
 
@@ -2309,15 +2305,19 @@ public
 		{
 			disposeStreamingVideo();
 
-			DEBUG_MEDIA_STREAM("createPlayer Streaming Video...\n");
-
+			DEBUG_MEDIA_STREAM("createPlayer streaming video: " + url + "\n");
 #ifdef BB_RIM_API
-			InputConnection videoConnection = (InputConnection)BlackBerryConnectionFactory.openConnection(url);
-			if(null == videoConnection) {
+			DEBUG_MEDIA_STREAM("Looking for connection...");
+			mStreamConnection = (InputConnection)BlackBerryConnectionFactory.openConnection(url);
+			if(null == mStreamConnection) {
+				DEBUG_MEDIA_STREAM("failed to find network path");
 				return CONNERR_GENERIC;
 			}
-			InputStream inStream = videoConnection.openInputStream();
+			DEBUG_MEDIA_STREAM("Found network path");
+			
+			InputStream inStream = mStreamConnection.openInputStream();
 			if(null == inStream) {
+				DEBUG_MEDIA_STREAM("Could not open connection");
 				return CONNERR_GENERIC;
 			}
 			mStreamPlayer = Manager.createPlayer(inStream, "video/mp4");
@@ -2325,18 +2325,35 @@ public
 			mStreamPlayer = Manager.createPlayer(url);
 #endif
 
-			if(mStreamPlayer==null) { DEBUG_ALWAYS("Couldn't create Player."); BIG_PHAT_ERROR; }
+			if(mStreamPlayer==null) {
+				try {
+					inStream.close();
+#ifdef BB_RIM_API
+					mStreamConnection.close();
+#endif
+				} catch (IOException e) {
+					PRINT_STACK_TRACE;
+				}
+				DEBUG_ALWAYS("Couldn't create Player.");
+				BIG_PHAT_ERROR;
+			}
 
 			DEBUG_MEDIA_STREAM("realize...\n");
 			mStreamPlayer.realize();
 			DEBUG_MEDIA_STREAM("realized\n");
-			/*
-			VolumeControl v = (VolumeControl)mStreamPlayer.getControl("VolumeControl");
-			if(v != null) v.setLevel(mSoundVolume);
-			*/			
+			
+			mStreamVideoControl = (VideoControl)mStreamPlayer.getControl("VideoControl");
+			if(null == mStreamVideoControl) {
+				DEBUG_ALWAYS("Couldn't retrieve VideoControl.");
+				BIG_PHAT_ERROR;
+			}
+			mStreamVideoControl.initDisplayMode(mStreamVideoControl.USE_DIRECT_VIDEO, mCanvas);
+			mStreamVideoControl.setDisplayLocation(0, 0);
+			mStreamVideoControl.setVisible(true);
+
 			mStreamPlayer.setLoopCount(1);
 			mStreamPlayer.addPlayerListener(new MoSyncStreamVideoListener());
-
+			
 			DEBUG_MEDIA_STREAM("prefetch...\n");
 			mStreamPlayer.prefetch();
 			DEBUG_MEDIA_STREAM("start...\n");
@@ -2345,31 +2362,56 @@ public
 
 			mStreamState = SS_OPENING;
 		}
-		catch(MediaException me) {
-			System.out.println("media: " + me.toString());
-			return 0;
-		}
-		catch(Exception e)
-		{
-			System.out.println(e);
+		catch(MediaException e) {
 			PRINT_STACK_TRACE;
-			return 0;
+			return CONNERR_USER - 1;
+		}
+		catch(SecurityException e) {
+			PRINT_STACK_TRACE;
+			return CONNERR_USER - 2;
+		}
+		catch(IOException e) {
+			PRINT_STACK_TRACE;
+			return CONNERR_USER - 3;
+		}
+		catch(IllegalStateException e) {
+			PRINT_STACK_TRACE;
+			return CONNERR_USER - 4;
+		}
+		catch(Exception e) {
+			PRINT_STACK_TRACE;
+			return CONNERR_USER - 5;
 		}
 		return ++mStreamHandle;
 	}
 
 	SYSCALL(int) maStreamClose(MAHandle stream)
 	{
-		// Make sure that the -1 is the correct
-		MYASSERT(mStreamState != SS_IDLE && stream == mStreamHandle);
+		if (null != mStreamVideoControl) {
+			mStreamVideoControl.setVisible(false);
+			mStreamVideoControl = null;
+		}
 
-		mStreamVideoControl.setVisible(false);
-		mStreamVideoControl = null;
+#ifdef BB_RIM_API
+		if (null != mStreamConnection) {
+			DEBUG_MEDIA_STREAM("closing stream connection");
+			try {
+				mStreamConnection.close();
+			} catch (IOException e) {
+				PRINT_STACK_TRACE;
+			}
+			mStreamConnection = null;
+		}
+#endif
+
 		mStreamState = SS_IDLE;
-		mStreamHandle--;
+
+		if (mStreamHandle > 0)
+			mStreamHandle--;
 
 		try {
-			mStreamPlayer.close();
+			if (null != mStreamPlayer)
+				mStreamPlayer.close();
 		}
 		catch(Exception e)
 		{
@@ -2455,7 +2497,7 @@ public
 	{
 		// Java uses microseconds and we uses milliseconds, take care of it
 		MYASSERT(mStreamState != SS_IDLE && stream == mStreamHandle);
-		return (int)(mStreamPlayer.getMediaTime()/100);
+		return (int)(mStreamPlayer.getMediaTime()/1000);
 	}
 
 	SYSCALL(int) maStreamSetPos(MAHandle stream, int pos)
@@ -2465,7 +2507,7 @@ public
 		int mt = 0;
 		try
 		{
-			mt = (int)(mStreamPlayer.setMediaTime(pos*100)/100);
+			mt = (int)(mStreamPlayer.setMediaTime(pos*1000)/1000);
 		}
 		catch(Exception e)
 		{
@@ -2669,21 +2711,13 @@ public
 	int mTextBoxMaxSize;
 	Form form;
 	TextField field;
-	DateField dateField;
-	boolean isDateMode = false;
 
 	class TextBoxCommandListener implements CommandListener {
 		public synchronized void commandAction(Command c, Displayable d) {
 			int jRes = c.getCommandType();
 			int mRes = jRes == Command.OK ? MA_TB_RES_OK : MA_TB_RES_CANCEL;
 
-			String text = null;
-			if(isDateMode) {
-				text = Long.toString(dateField.getDate().getTime());
-			} else {
-				text = field.getString();
-			}
-
+			String text = field.getString();
 			writeWideString(text, mTextBoxBuffer, mTextBoxMaxSize*2);
 
 			int[] event = new int[3];
@@ -2710,22 +2744,9 @@ public
         form.addCommand(cancel);
         form.addCommand(ok);
 
-		// Build UI (JavaME form) with either a text field or date field
-		if((constraints & 0x00400000) > 0) {
-			isDateMode = true;
-			dateField = new DateField(title, DateField.DATE);
-			try {
-				Date date = new Date(Long.parseLong(inText));
-				dateField.setDate(date);
-			} catch(NumberFormatException nfe) {
-				dateField.setDate(new Date());
-			}
-			form.append(dateField);
-		} else {
-			isDateMode = false;
-			field = new TextField(title, inText, outText, constraints);
-			form.append(field);
-		}
+		// Build UI (JavaME form) with a text field
+		field = new TextField(title, inText, outText, constraints);
+		form.append(field);
 		
 		// Add command listener
 		TextBoxCommandListener tbcl = new TextBoxCommandListener();
