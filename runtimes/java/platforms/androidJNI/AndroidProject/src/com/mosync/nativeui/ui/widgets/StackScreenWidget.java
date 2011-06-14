@@ -144,7 +144,6 @@ public class StackScreenWidget extends ScreenWidget
 			return false;
 		}
 		
-		//sendPopEvent();
 		pop( );
 		
 		return true;
