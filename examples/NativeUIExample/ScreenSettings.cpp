@@ -24,6 +24,7 @@ MA 02110-1301, USA.
  */
 
 #include <mavsprintf.h>
+#include "MAHeaders.h"
 #include "ScreenSettings.h"
 
 /**
@@ -80,6 +81,7 @@ Screen* ScreenSettings::create()
 	// Create screen.
 	Screen* screen = new Screen();
 	screen->setTitle("Settings");
+	screen->setIcon(RES_TAB_ICON_SETTINGS);
 
 	// Create a layout.
 	VerticalLayout* layout = new VerticalLayout();

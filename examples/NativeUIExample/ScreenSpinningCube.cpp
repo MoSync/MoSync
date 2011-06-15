@@ -23,6 +23,7 @@ MA 02110-1301, USA.
  * TODO: Add comment.
  */
 
+#include "MAHeaders.h"
 #include "ScreenSpinningCube.h"
 
 /**
@@ -31,7 +32,8 @@ MA 02110-1301, USA.
 Screen* ScreenSpinningCube::create()
 {
 	Screen* screen = new Screen();
-	screen->setTitle("3D Cube");
+	screen->setTitle("Cube");
+	screen->setIcon(RES_TAB_ICON_CUBE);
 	Button* widget = new Button();
 	widget->setText("TODO: Implement a Spinning Cube");
 	screen->setMainWidget(widget);

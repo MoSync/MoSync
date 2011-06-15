@@ -17,10 +17,11 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file ScreenSettings.h
- * @author TODO: Add your name.
+ * @file ScreenColorList.h
+ * @author Mikael Kindborg
  *
- * TODO: Add comment.
+ * Screen that displays a list of colors. When selecting an item
+ * in the list, another screen with that color is displayed.
  */
 
 #ifndef SCREEN_COLOR_LIST_H_
@@ -31,13 +32,13 @@ MA 02110-1301, USA.
 using namespace MoSync::UI;
 
 /**
- * TODO: Add comment.
+ * Class that creates the UI for the color list screen.
  */
 class ScreenColorList
 {
 public:
 	/**
-	 * TODO: Add comment.
+	 * Create the UI.
 	 */
 	static Screen* create();
 };
