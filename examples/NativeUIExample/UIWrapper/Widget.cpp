@@ -205,6 +205,17 @@ namespace MoSync
 
 	/**
 	 * Set the background color of the widget.
+	 * @param color a hexadecimal color value, e.g. 0xFF0000.
+	 */
+	void Widget::setBackgroundColor(int color)
+	{
+		char buffer[256];
+		sprintf(buffer, "0x%.6X", color);
+		setProperty(MAW_WIDGET_BACKGROUND_COLOR, buffer);
+	}
+
+	/**
+	 * Set the background color of the widget.
 	 * @param red Red component (range 0-255).
 	 * @param green Green component (range 0-255).
 	 * @param blue Blue component (range 0-255).

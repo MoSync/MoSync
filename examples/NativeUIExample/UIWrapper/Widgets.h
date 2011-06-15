@@ -35,6 +35,8 @@ MA 02110-1301, USA.
 #include "HorizontalLayout.h"
 #include "VerticalLayout.h"
 #include "WebView.h"
+#include "ListView.h"
+#include "ListViewItem.h"
 #include "Button.h"
 #include "Image.h"
 #include "RelativeLayout.h"
