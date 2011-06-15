@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 #ifndef MOSYNC_UI_WIDGETS_H_
 #define MOSYNC_UI_WIDGETS_H_
 
+#include "WidgetManager.h"
 #include "WidgetEventListener.h"
 #include "Widget.h"
 #include "Screen.h"

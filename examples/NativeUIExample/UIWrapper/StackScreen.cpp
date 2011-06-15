@@ -43,6 +43,11 @@ namespace MoSync
 	{
 	}
 
+	int StackScreen::getStackSize()
+	{
+		return mStack.size();
+	}
+
 	void StackScreen::push(Screen* screen)
 	{
 		maWidgetStackScreenPush(getWidgetHandle(), screen->getWidgetHandle());
@@ -58,6 +63,9 @@ namespace MoSync
 	}
 
 	/**
+	 * TODO: Check this code! We might not need this. Unsure about how
+	 * it works.
+	 *
 	 * This method is called when there is an event for this widget.
 	 * It passes on the event to the widget's listener if one is set.
 	 * Note: You can either use an event listener or override this
@@ -70,9 +78,12 @@ namespace MoSync
 		{
 			if (mStack.size() > 0)
 			{
-				//mStack[mStack.size() - 1]->hide();
 				mStack.resize(mStack.size() - 1);
 			}
+		}
+		else
+		{
+			Screen::handleWidgetEvent(widgetEventData);
 		}
 	}
 

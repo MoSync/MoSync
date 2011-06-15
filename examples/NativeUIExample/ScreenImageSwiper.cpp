@@ -33,7 +33,15 @@ Screen* ScreenImageSwiper::create()
 {
 	Screen* screen = new Screen();
 	screen->setTitle("Images");
-	screen->setIcon(RES_TAB_ICON_IMAGE_SWIPER);
+	if (WidgetManager::isAndroid())
+	{
+		screen->setIcon(RES_TAB_ICON_IMAGE_SWIPER_ANDROID);
+	}
+	else
+	{
+		screen->setIcon(RES_TAB_ICON_IMAGE_SWIPER);
+	}
+
 
 	//int SCREEN_WIDTH = screen->getPropertyInt(MAW_WIDGET_WIDTH);
 	printf("SCREEN_WIDTH = %d", screen->getPropertyInt(MAW_WIDGET_WIDTH));

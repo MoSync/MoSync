@@ -47,6 +47,8 @@ namespace MoSync
 		 */
 		virtual ~StackScreen();
 
+		virtual int getStackSize();
+
 		virtual void push(Screen* screen);
 
 		virtual void pop();

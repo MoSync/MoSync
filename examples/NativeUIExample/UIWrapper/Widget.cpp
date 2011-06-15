@@ -55,12 +55,45 @@ namespace MoSync
 	 */
 	Widget::~Widget()
 	{
-		// Unregister from WidgetManager.
-		mWidgetManager->unregisterWidget(mWidgetHandle, this);
+		MAWidgetHandle widgetHandle = mWidgetHandle;
 
+		markWidgetHandleAsDeleted();
+
+		for (int i = 0; i < mChildren.size(); ++i)
+		{
+			delete mChildren[i];
+		}
+
+		if (NULL != widgetHandle)
+		{
+			maWidgetDestroy(widgetHandle);
+		}
+	}
+
+	/**
+	 * Set my widget handle and my chilren's widget
+	 * handles to NULL to mark that it has been deleted.
+	 */
+	void Widget::markWidgetHandleAsDeleted()
+	{
+		mWidgetHandle = NULL;
+
+		for (int i = 0; i < mChildren.size(); ++i)
+		{
+			mChildren[i]->markWidgetHandleAsDeleted();
+		}
+	}
+
+	/**
+	 * Destroy the widget handle associated with this widget
+	 * and all child widgets. Will also deallocate all child
+	 * widget objects.
+	 */
+	/*void Widget::destroy()
+	{
 		// Destroy the widget.
 		maWidgetDestroy(mWidgetHandle);
-	}
+	}*/
 
 	/**
 	 * @return The handle of the widget.
@@ -142,6 +175,11 @@ namespace MoSync
 	 */
 	void Widget::addChild(Widget* widget)
 	{
+		// Add the widget object to the list of children.
+		mChildren.add(widget);
+
+		// Add the widget handle as a child, this will add
+		// the native widget as a child.
 		maWidgetAddChild(mWidgetHandle, widget->getWidgetHandle());
 	}
 

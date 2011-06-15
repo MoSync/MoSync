@@ -33,7 +33,14 @@ Screen* ScreenSpinningCube::create()
 {
 	Screen* screen = new Screen();
 	screen->setTitle("Cube");
-	screen->setIcon(RES_TAB_ICON_CUBE);
+	if (WidgetManager::isAndroid())
+	{
+		screen->setIcon(RES_TAB_ICON_CUBE_ANDROID);
+	}
+	else
+	{
+		screen->setIcon(RES_TAB_ICON_CUBE);
+	}
 	mGLViewWidget = new GLView();
 	screen->setMainWidget(mGLViewWidget);
 

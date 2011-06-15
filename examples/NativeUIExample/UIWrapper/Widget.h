@@ -31,6 +31,7 @@ MA 02110-1301, USA.
 #include <ma.h>
 #include <MAUtil/String.h>
 #include <MAUtil/Map.h>
+#include <MAUtil/Vector.h>
 #include <MAUtil/Environment.h>
 #include <IX_WIDGET.h>
 #include "conprint.h"
@@ -51,9 +52,16 @@ namespace MoSync
 	{
 	public:
 		/**
-		 * Destructor.
+		 * Destructor. Will delete all child widgets and
+		 * also handle the destruction of widget handles.
 		 */
 		virtual ~Widget();
+
+		/**
+		 * Set my widget handle and my chilren's widget
+		 * handles to NULL to mark that it has been deleted.
+		 */
+		virtual void markWidgetHandleAsDeleted();
 
 		/**
 		 * @return The handle of the widget.
@@ -202,6 +210,11 @@ namespace MoSync
 		 * Pointer to a widget listener (may be null).
 		 */
 		WidgetEventListener* mWidgetEventListener;
+
+		/**
+		 * List of child widgets.
+		 */
+		MAUtil::Vector<Widget*> mChildren;
 	};
 
 	} // namespace UI

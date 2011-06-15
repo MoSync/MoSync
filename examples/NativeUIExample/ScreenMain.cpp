@@ -33,38 +33,40 @@ MA 02110-1301, USA.
 #include "ScreenSpinningCube.h"
 #include "ScreenSettings.h"
 
+/**
+ * TODO: Comment this class.
+ */
 class ScreenMainWithFourTabs : public ScreenMain
 {
 public:
 	ScreenMainWithFourTabs() : ScreenMain()
 	{
-		mTabScreen = new TabScreen();
-
-		Screen* colorScreen = ScreenColorList::create();
+		mColorScreen = ScreenColorList::create();
 		Screen* webScreen = ScreenWebView::create();
 		Screen* imageScreen = ScreenImageSwiper::create();
 		Screen* cubeScreen = ScreenSpinningCube::create();
 		mSettingsScreen = ScreenSettings::create();
 
-		mTabScreen->addTab(colorScreen);
-		mTabScreen->addTab(webScreen);
-		mTabScreen->addTab(imageScreen);
-		mTabScreen->addTab(cubeScreen);
+		this->addTab(mColorScreen);
+		this->addTab(webScreen);
+		this->addTab(imageScreen);
+		this->addTab(cubeScreen);
 	}
 
 	virtual ~ScreenMainWithFourTabs()
 	{
-		// TODO: Is this safe?
-		delete mTabScreen;
 		delete mSettingsScreen;
 	}
 
 	void show()
 	{
-		mVisibleScreen = mTabScreen;
-		mTabScreen->show();
+		mVisibleScreen = this;
+		ScreenMain::show();
 	}
 
+	/**
+	 * TODO: Comment this code.
+	 */
 	void handleKeyPress(int keyCode)
 	{
 		if (MAK_MENU == keyCode)
@@ -75,66 +77,61 @@ public:
 		}
 		else if (MAK_BACK == keyCode)
 		{
-			if (mVisibleScreen == mTabScreen)
+			if (mVisibleScreen == this)
 			{
-				// TODO: Later change to close();
-				//close();
-				maExit(0);
+				if (mColorScreen->getStackSize() <= 1)
+				{
+					// TODO: Later change to close();
+					//close();
+					maExit(0);
+				}
 			}
 			else if (mVisibleScreen == mSettingsScreen)
 			{
-				show();
+				this->show();
 			}
 		}
 	}
 
 private:
-	TabScreen* mTabScreen;
+	StackScreen* mColorScreen;
 	Screen* mSettingsScreen;
 	Screen* mVisibleScreen;
 };
 
+/**
+ * TODO: Comment this class.
+ */
 class ScreenMainWithFiveTabs : public ScreenMain
 {
 public:
 	ScreenMainWithFiveTabs() : ScreenMain()
 	{
-		mTabScreen = new TabScreen();
-
 		Screen* colorScreen = ScreenColorList::create();
 		Screen* webScreen = ScreenWebView::create();
 		Screen* imageScreen = ScreenImageSwiper::create();
 		Screen* cubeScreen = ScreenSpinningCube::create();
 		Screen* settingsScreen = ScreenSettings::create();
 
-		mTabScreen->addTab(colorScreen);
-		mTabScreen->addTab(webScreen);
-		mTabScreen->addTab(imageScreen);
-		mTabScreen->addTab(cubeScreen);
-		mTabScreen->addTab(settingsScreen);
+		this->addTab(colorScreen);
+		this->addTab(webScreen);
+		this->addTab(imageScreen);
+		this->addTab(cubeScreen);
+		this->addTab(settingsScreen);
 	}
 
 	virtual ~ScreenMainWithFiveTabs()
 	{
-		// TODO: Is this safe?
-		delete mTabScreen;
-	}
-
-	void show()
-	{
-		mTabScreen->show();
 	}
 
 	void handleKeyPress(int keyCode)
 	{
 		if (MAK_BACK == keyCode)
 		{
+			// TODO: How does this work on iOS?
 			maExit(0);
 		}
 	}
-
-private:
-	TabScreen* mTabScreen;
 };
 
 /**
@@ -151,4 +148,19 @@ ScreenMain* ScreenMain::createFourTabUI()
 ScreenMain* ScreenMain::createFiveTabUI()
 {
 	return new ScreenMainWithFiveTabs();
+}
+
+
+/**
+ * Constructor.
+ */
+ScreenMain::ScreenMain()
+{
+}
+
+/**
+ * Destructor.
+ */
+ScreenMain::~ScreenMain()
+{
 }
