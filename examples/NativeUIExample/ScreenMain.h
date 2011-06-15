@@ -33,28 +33,20 @@ MA 02110-1301, USA.
 using namespace MoSync::UI;
 
 /**
- * Class that creates the main screen of the application.
- * TODO: The name of this class is confusing since it is
- * not a screen, but a collection of screens (it does not
- * inherit screen). Change name to for example "MainUI".
+ * This is the main screen of the application.
  */
-class ScreenMain
+class ScreenMain : public TabScreen
 {
 public:
 	/**
 	 * Constructor.
 	 */
-	ScreenMain() {};
+	ScreenMain();
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~ScreenMain() {};
-
-	/**
-	 * Show the screen..
-	 */
-	virtual void show() = 0;
+	virtual ~ScreenMain();
 
 	/**
 	 * Handle keypresses.

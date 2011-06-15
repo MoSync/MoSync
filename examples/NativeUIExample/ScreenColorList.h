@@ -27,21 +27,54 @@ MA 02110-1301, USA.
 #ifndef SCREEN_COLOR_LIST_H_
 #define SCREEN_COLOR_LIST_H_
 
+#include <MAUtil/Vector.h>
 #include "UIWrapper/Widgets.h"
 
 using namespace MoSync::UI;
 
 /**
- * Class that creates the UI for the color list screen.
+ * The main screen for the color list.
  */
-class ScreenColorList
+class ScreenColorList : public StackScreen
 {
 public:
 	/**
 	 * Create the UI for the color list screen.
-	 * @return The main screen for the color list UI.
+	 * @return The main screen for the color list UI
+	 * (an instance of this class).
 	 */
-	static Screen* create();
+	static StackScreen* create();
+
+	/**
+	 * Constructor.
+	 */
+	ScreenColorList();
+
+	/**
+	 * Destructor.
+	 */
+	virtual ~ScreenColorList();
+
+	/**
+	 * Create the UI for the color list screen.
+	 */
+	void createUI();
+
+	/**
+	 * Create a colored image.
+	 * @param color The color of the image (a hex value).
+	 * @param width The width of the image.
+	 * @param height The height of the image.
+	 * @return Handle to the image. The image needs to be
+	 * deallocated with maDestoryObject.
+	 */
+	MAHandle createColorImage(int color, int width, int height);
+
+	/**
+	 * This method is called when an item is clicked in the list widget.
+	 * @param listItemIndex The index of the list item that was clicked.
+	 */
+	void openColorScreen(int listItemIndex);
 };
 
 #endif

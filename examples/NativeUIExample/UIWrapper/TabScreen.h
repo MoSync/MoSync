@@ -62,7 +62,8 @@ namespace MoSync
 		 */
 		virtual void setActiveTab(int index);
 
-		// TODO: Add method for setting the tab icon.
+		// TODO: Add a Vector that keeps track of the tabs and
+		// deletes them in the destructor. Is this the right way?
 	};
 
 	} // namespace UI

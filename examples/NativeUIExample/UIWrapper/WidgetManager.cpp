@@ -24,8 +24,9 @@ MA 02110-1301, USA.
  * them to the target widgets.
  */
 
-#include "WidgetManager.h"
-#include "maprofile.h"
+#include <maprofile.h>		// Profile database
+#include <mastring.h>			// C string functions
+#include "WidgetManager.h"	// Header file for this class
 
 namespace MoSync
 {
@@ -121,6 +122,22 @@ namespace MoSync
 			maPanic(0,
 				"NativeUI is only available on Android and iPhone. "
 				"You must run directly on the device or devices emulator.");
+		}
+	}
+
+	/**
+	 * Detects if the current platform is Android.
+	 * @return true if the platform is Android, false otherwise.
+	 */
+	bool WidgetManager::isAndroid()
+	{
+		if (NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 

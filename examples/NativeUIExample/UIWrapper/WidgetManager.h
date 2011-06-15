@@ -73,6 +73,12 @@ namespace MoSync
 		 */
 		virtual void unregisterWidget(MAHandle widgetHandle, Widget* widget);
 
+		/**
+		 * Detects if the current platform is Android.
+		 * @return true if the platform is Android, false otherwise.
+		 */
+		static bool isAndroid();
+
 	protected:
 		/**
 		 * Constructor is protected since this is a singleton.
