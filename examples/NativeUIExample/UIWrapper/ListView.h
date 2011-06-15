@@ -17,31 +17,42 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file ScreenColorList.h
- * @author Mikael Kindborg
+ * @file ListView.h
+ * @author Emma Tresanszki
  *
- * Screen that displays a list of colors. When selecting an item
- * in the list, another screen with that color is displayed.
+ * Class for list views.
  */
 
-#ifndef SCREEN_COLOR_LIST_H_
-#define SCREEN_COLOR_LIST_H_
+#ifndef MOSYNC_UI_LIST_VIEW_H_
+#define MOSYNC_UI_LIST_VIEW_H_
 
-#include "UIWrapper/Widgets.h"
+#include "Widget.h"
 
-using namespace MoSync::UI;
-
-/**
- * Class that creates the UI for the color list screen.
- */
-class ScreenColorList
+namespace MoSync
 {
-public:
+	namespace UI
+	{
+
 	/**
-	 * Create the UI for the color list screen.
-	 * @return The main screen for the color list UI.
+	 * Class for list views.
 	 */
-	static Screen* create();
-};
+	class ListView : public Widget
+	{
+	public:
+		/**
+		 * Constructor.
+		 */
+		ListView();
+
+		/**
+		 * Destructor.
+		 */
+		virtual ~ListView();
+	};
+
+	} // namespace UI
+} // namespace MoSync
 
 #endif
+
+

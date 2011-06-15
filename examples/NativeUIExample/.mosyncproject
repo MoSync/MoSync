@@ -24,8 +24,8 @@
 <property key="build.prefs:memory.stack/Release" value="256"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
-<property key="excludes/Debug" value="UIWrapper/ListSelectionScreen.cpp UIWrapper/ListSelectionScreen.h"/>
-<property key="excludes/Release" value="UIWrapper/ListSelectionScreen.cpp UIWrapper/ListSelectionScreen.h"/>
+<property key="excludes/Debug" value=""/>
+<property key="excludes/Release" value=""/>
 <property key="template.id" value="project.nativeui"/>
 </properties>
 </project>

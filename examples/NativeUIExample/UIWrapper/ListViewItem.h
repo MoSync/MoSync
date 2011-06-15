@@ -17,16 +17,15 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Button.h
- * @author Mikael Kindborg
+ * @file ListView.h
+ * @author Emma Tresanszki
  *
- * Class for buttons.
+ * Class for list view items.
  */
+#ifndef MOSYNC_UI_LIST_VIEW_ITEM_H_
+#define MOSYNC_UI_LIST_VIEW_ITEM_H_
 
-#ifndef MOSYNC_UI_BUTTON_H_
-#define MOSYNC_UI_BUTTON_H_
-
-#include "TextWidget.h"
+#include "Widget.h"
 
 namespace MoSync
 {
@@ -34,20 +33,32 @@ namespace MoSync
 	{
 
 	/**
-	 * Class for buttons.
+	 * Class for list views.
 	 */
-	class Button : public TextWidget
+	class ListViewItem : public Widget
 	{
 	public:
 		/**
 		 * Constructor.
 		 */
-		Button();
+		ListViewItem();
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~Button();
+		virtual ~ListViewItem();
+
+		/*
+		 * Sets the text part of the list view item.
+		 * @param text The text of the item.
+		 */
+		virtual void setText(const MAUtil::String& text);
+
+		/*
+		 * Sets an icon of the list view item that is placed to the left of the text.
+		 * @param resource MoSync handle to an uncompressed image.
+		 */
+		virtual void setIcon(MAHandle imageHandle);
 	};
 
 	} // namespace UI

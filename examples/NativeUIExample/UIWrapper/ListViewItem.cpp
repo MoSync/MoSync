@@ -17,39 +17,52 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Button.cpp
- * @author Mikael Kindborg
+ * @file ListViewItem.cpp
+ * @author Emma Tresanszki
  *
- * Class for buttons.
+ * Class for list view items.
  */
 
-#include "Button.h"
+#include "ListViewItem.h"
 
 namespace MoSync
 {
 	namespace UI
 	{
 
-	/**
-	 * Constructor.
-	 */
-	Button::Button() :
-		TextWidget(MAW_BUTTON)
+	ListViewItem::ListViewItem() :
+		Widget(MAW_LIST_VIEW_ITEM)
 	{
+
 		// Set some common default values to
-		// simplify when creating buttons.
+		// simplify when creating list view items.
 		this->fillSpaceHorizontally();
 		this->wrapContentVertically();
-		this->setText("Click Me!");
-		this->centerTextHorizontally();
-		this->centerTextVertically();
 	}
 
 	/**
 	 * Destructor.
 	 */
-	Button::~Button()
+	ListViewItem::~ListViewItem()
 	{
+	}
+
+	/*
+	 * Sets the text part of the list view item.
+	 * @param text The text of the item.
+	 */
+	void ListViewItem::setText(const MAUtil::String& text)
+	{
+		setProperty(MAW_LIST_VIEW_ITEM_TEXT, text);
+	}
+
+	/*
+	 * Sets an icon of the list view item that is placed to the left of the text.
+	 * @param resource MoSync handle to an uncompressed image.
+	 */
+	void ListViewItem::setIcon(MAHandle imageHandle)
+	{
+		setProperty(MAW_LIST_VIEW_ITEM_ICON, imageHandle);
 	}
 
 	} // namespace UI

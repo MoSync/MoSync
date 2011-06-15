@@ -145,6 +145,12 @@ namespace MoSync
 
 		/**
 		 * Set the background color of the widget.
+		 * @param color a hexadecimal color value, e.g. 0xFF0000.
+		 */
+		virtual void setBackgroundColor(int color);
+
+		/**
+		 * Set the background color of the widget.
 		 * @param red Red component (range 0-255).
 		 * @param green Green component (range 0-255).
 		 * @param blue Blue component (range 0-255).
