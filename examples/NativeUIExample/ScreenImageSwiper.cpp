@@ -26,6 +26,11 @@ MA 02110-1301, USA.
 #include "MAHeaders.h"
 #include "ScreenImageSwiper.h"
 
+//ScreenImageSwiper *ScreenImageSwiper::sInstance = NULL;
+
+int ScreenImageSwiper::mScreenWidth = NULL;
+int ScreenImageSwiper::mScreenHeight = NULL;
+
 /**
  * TODO: Add comment.
  */
@@ -42,26 +47,34 @@ Screen* ScreenImageSwiper::create()
 		screen->setIcon(RES_TAB_ICON_IMAGE_SWIPER);
 	}
 
-
-	//int SCREEN_WIDTH = screen->getPropertyInt(MAW_WIDGET_WIDTH);
-	printf("SCREEN_WIDTH = %d", screen->getPropertyInt(MAW_WIDGET_WIDTH));
+	getScreenSize();
 
 	VerticalLayout* mainLayout = new VerticalLayout();
-	HorizontalLayout* imageLayout = new HorizontalLayout();
+	HorizontalLayout* imagesLayout = new HorizontalLayout();
+	imagesLayout->setBackgroundColor(0xFF0000);
+
+	Label* labelLayout = new Label();
+	labelLayout->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, mScreenHeight / 10);
+	labelLayout->setBackgroundColor(0x111111);
+	labelLayout->setText("CACA");
+	labelLayout->setFontColor(0xFFFFFF);
+	labelLayout->centerTextHorizontally();
+	labelLayout->centerTextVertically();
 
 	RelativeLayout* leftImageLayout = new RelativeLayout();
-	leftImageLayout->setSize(SCREEN_WIDTH / 6, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	leftImageLayout->setSize(mScreenWidth / 6, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 	//leftImageLayout->setBackgroundColor(0xFF0000);
 
 	RelativeLayout* centerImageLayout = new RelativeLayout();
-	centerImageLayout->setSize(2 * SCREEN_WIDTH / 3, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	centerImageLayout->setSize(2 * mScreenWidth / 3, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	centerImageLayout->setProperty("childVerticalAlignment", MAW_ALIGNMENT_CENTER);
 	//centerImageLayout->setBackgroundColor(0x00FF00);
 
 	RelativeLayout* rightImageLayout = new RelativeLayout();
-	rightImageLayout->setSize(SCREEN_WIDTH / 6, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	rightImageLayout->setSize(mScreenWidth / 6, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 	//rightImageLayout->setBackgroundColor(0xFF0000);
 
-	int imageSize = SCREEN_WIDTH - (SCREEN_WIDTH / 3) - SCREEN_WIDTH / 6;
+	int imageSize = mScreenWidth - (mScreenWidth / 3) - mScreenWidth / 6;
 
 	Image** images = new Image*[DISPLAYED_IMAGES];
 	for (int i=0; i<DISPLAYED_IMAGES; i++)
@@ -71,20 +84,21 @@ Screen* ScreenImageSwiper::create()
 		images[i]->setSize(imageSize, MAW_CONSTANT_WRAP_CONTENT);
 	}
 
-	images[LEFT_IMAGE]->setPosition(SCREEN_WIDTH / 6 - imageSize - SCREEN_WIDTH / 12, 10);
+	images[LEFT_IMAGE]->setPosition(mScreenWidth / 6 - imageSize - mScreenWidth / 12, mScreenWidth / 10);
 	leftImageLayout->addChild(images[LEFT_IMAGE]);
 
-	images[CENTER_IMAGE]->setPosition(SCREEN_WIDTH / 12, 10);
+	images[CENTER_IMAGE]->setPosition(mScreenWidth / 12, mScreenWidth / 10);
 	centerImageLayout->addChild(images[CENTER_IMAGE]);
 
-	images[RIGHT_IMAGE]->setPosition(SCREEN_WIDTH / 12, 10);
+	images[RIGHT_IMAGE]->setPosition(mScreenWidth / 12, mScreenWidth / 10);
 	rightImageLayout->addChild(images[RIGHT_IMAGE]);
 
-	imageLayout->addChild(leftImageLayout);
-	imageLayout->addChild(centerImageLayout);
-	imageLayout->addChild(rightImageLayout);
+	imagesLayout->addChild(leftImageLayout);
+	imagesLayout->addChild(centerImageLayout);
+	imagesLayout->addChild(rightImageLayout);
 
-	mainLayout->addChild(imageLayout);
+	mainLayout->addChild(imagesLayout);
+	mainLayout->addChild(labelLayout);
 
 	screen->setMainWidget(mainLayout);
 

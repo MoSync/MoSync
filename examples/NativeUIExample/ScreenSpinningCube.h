@@ -49,6 +49,13 @@ private:
 	GLuint	mTextureHandle;
 
 	GLView* mGLViewWidget;
+	VerticalLayout* mGLViewLayout;
+
+	static ScreenSpinningCube* sInstance;
+
+	static const GLfloat mLightAmbient[];
+	static const GLfloat mLightDiffuse[];
+	static const GLfloat mLightPosition[];
 
 public:
 	/**
@@ -68,15 +75,13 @@ public:
 	 */
 	void handleWidgetEvent(Widget* widget, MAWidgetEventData* widgetEventData);
 
+	static void toggleBlending(bool blend);
+
 private:
 	/*
 	 * Constructor
 	 */
 	ScreenSpinningCube();
-
-	static const GLfloat mLightAmbient[];
-	static const GLfloat mLightDiffuse[];
-	static const GLfloat mLightPosition[];
 
 	/*
 	 * Method for initializing open gl
@@ -97,12 +102,6 @@ private:
 	 * Method for drawing into the open GL screen
 	 */
 	void drawGLScene();
-
-//	/*
-//	 * Update the application
-//	 */
-//	void runTimerEvent();
-
 };
 
 #endif

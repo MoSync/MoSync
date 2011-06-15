@@ -17,14 +17,14 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Image.h
+ * @file Label.h
  * @author Mikael Kindborg
  *
- * Class for image of widgets.
+ * Class for label of widgets.
  */
 
-#ifndef MOSYNC_UI_IMAGE_H_
-#define MOSYNC_UI_IMAGE_H_
+#ifndef MOSYNC_UI_LABEL_H_
+#define MOSYNC_UI_LABEL_H_
 
 #include "Widget.h"
 
@@ -34,26 +34,50 @@ namespace MoSync
 	{
 
 	/**
-	 * Class for buttons.
+	 * Class for labels.
 	 */
-	class Image : public Widget
+	class Label : public Widget
 	{
 	public:
 		/**
 		 * Constructor.
 		 */
-		Image();
+		Label();
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~Image();
+		virtual ~Label();
 
 		/*
-		 * Set the image resource of the image widget.
-		 * @res The handle of the image resource.
+		 * Sets the text of the label.
+		 * @param text The text of the label.
 		 */
-		void setResource(MAHandle res);
+		void setText(const MAUtil::String& text);
+
+		/**
+		 * Center the text of the widget horizontally.
+		 * Note: Not all widgets support this property.
+		 */
+		void centerTextHorizontally();
+
+		/**
+		 * Center the text of the widget vertically.
+		 * Note: Not all widgets support this property.
+		 */
+		void centerTextVertically();
+
+		/*
+		 * Sets the font color of the label.
+		 * @param color The font color of the label.
+		 */
+		void setFontColor(const int color);
+
+		/*
+		 * Sets the font size of the label.
+		 * @param size The font size of the label.
+		 */
+		void setFontSize(const int size);
 	};
 
 	} // namespace UI

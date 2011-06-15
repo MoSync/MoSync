@@ -26,6 +26,8 @@ MA 02110-1301, USA.
 #include "MAHeaders.h"
 #include "ScreenSpinningCube.h"
 
+ScreenSpinningCube *ScreenSpinningCube::sInstance = NULL;
+
 /**
  * TODO: Add comment.
  */
@@ -41,8 +43,10 @@ Screen* ScreenSpinningCube::create()
 	{
 		screen->setIcon(RES_TAB_ICON_CUBE);
 	}
-	mGLViewWidget = new GLView();
-	screen->setMainWidget(mGLViewWidget);
+
+	sInstance = new ScreenSpinningCube();
+
+	screen->setMainWidget(sInstance->mGLViewLayout);
 
 	return screen;
 }
@@ -51,6 +55,10 @@ ScreenSpinningCube::ScreenSpinningCube():
 	mGlViewInitialized(false),
 	mXRotation(0), mYRotation(0), mZRotation(0)
 {
+	mGLViewLayout = new VerticalLayout();
+	mGLViewWidget = new GLView();
+	mGLViewWidget->setEventListener(this);
+	mGLViewLayout->addChild(mGLViewWidget);
 }
 
 const GLfloat ScreenSpinningCube::mLightAmbient[]=		{ 0.5f, 0.5f, 0.5f, 1.0f };
@@ -91,8 +99,11 @@ void ScreenSpinningCube::initGL()
 	glLightfv(GL_LIGHT1, GL_POSITION,mLightPosition);	// Position The Light
 	glEnable(GL_LIGHT1);								// Enable Light One
 
-	glColor4f(1.0f, 1.0f, 1.0f, 0.5);					// Full Brightness.  50% Alpha
-	glBlendFunc(GL_SRC_ALPHA,GL_ONE);					// Set The Blending Function For Translucency
+	glColor4f(1.0f, 1.0f, 1.0f, 0.7);					// Full Brightness.  50% Alpha
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);					// Set The Blending Function For Translucency
+
+	//timer to control the cube frame rate (65ms -> 15 FPS)
+	MAUtil::Environment::getEnvironment().addTimer(this, 65, 0);
 }
 
 /*
@@ -294,6 +305,7 @@ void ScreenSpinningCube::runTimerEvent()
  */
 void ScreenSpinningCube::handleWidgetEvent(Widget* widget, MAWidgetEventData* widgetEventData)
 {
+	printf("CUBE EVENT TYPE %d", widgetEventData->eventType);
 	if( widgetEventData->eventType == MAW_EVENT_GL_VIEW_READY )
 	{
 		//Make the OpenGL context associated with the GLView active.
@@ -310,8 +322,10 @@ void ScreenSpinningCube::handleWidgetEvent(Widget* widget, MAWidgetEventData* wi
 		glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
 		//Get width and height of the GLView widget, and resize.
-		int glViewWidth = mGLViewWidget->getProperty(MAW_WIDGET_WIDTH);
-		int glViewHeight = mGLViewWidget->getProperty(MAW_WIDGET_HEIGHT);
+		int glViewWidth = mGLViewWidget->getPropertyInt(MAW_WIDGET_WIDTH);
+		int glViewHeight = mGLViewWidget->getPropertyInt(MAW_WIDGET_HEIGHT);
+		printf("glViewWidth = %d", glViewWidth);
+		printf("glViewHeight = %d", glViewHeight);
 		resizeGLScene(glViewWidth, glViewHeight);
 
 		//Initialize OpenGL.
@@ -323,5 +337,19 @@ void ScreenSpinningCube::handleWidgetEvent(Widget* widget, MAWidgetEventData* wi
 
 		//Record that the GLView has been initialized.
 		mGlViewInitialized = true;
+	}
+}
+
+void ScreenSpinningCube::toggleBlending(bool blend)
+{
+	if(blend)				// Is blend TRUE?
+	{
+		glEnable(GL_BLEND);		// Turn Blending On
+		glDisable(GL_DEPTH_TEST);	// Turn Depth Testing Off
+	}
+	else					// Otherwise
+	{
+		glDisable(GL_BLEND);		// Turn Blending Off
+		glEnable(GL_DEPTH_TEST);	// Turn Depth Testing On
 	}
 }

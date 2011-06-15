@@ -38,13 +38,9 @@ MA 02110-1301, USA.
 #define CENTER_IMAGE			1
 #define RIGHT_IMAGE				2
 #define DISPLAYED_IMAGES		3
-
-#define SCREEN_WIDTH 			320
-
 /*
  * DEFINES
  */
-
 
 using namespace MoSync::UI;
 
@@ -54,15 +50,19 @@ using namespace MoSync::UI;
 class ScreenImageSwiper : public WidgetEventListener
 {
 private:
-	int mScreenWidth;
-	int mScreenHeight;
+	static int mScreenWidth;
+	static int mScreenHeight;
+
+//	static ScreenImageSwiper* sInstance;
+//
+//	VerticalLayout* mainLayout;
+//	HorizontalLayout* imagesLayout;
+//	Label* labelLayout;
 public:
 	/**
 	 * TODO: Add comment.
 	 */
 	static Screen* create();
-
-	static void destroy();
 
 	/**
 	 * This method is called when there is an event for this widget.
@@ -74,7 +74,7 @@ public:
 		MAWidgetEventData* widgetEventData);
 
 private:
-	void getScreenSize();
+	static void getScreenSize();
 };
 
 #endif

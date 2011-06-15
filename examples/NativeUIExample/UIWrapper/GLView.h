@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file GLView.h
  * @author Mikael Kindborg
  *
- * Class for horizontal layout of widgets.
+ * Class for gl view of widgets.
  */
 
 #ifndef MOSYNC_UI_GL_VIEW_H_

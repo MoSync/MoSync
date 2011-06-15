@@ -42,5 +42,6 @@ MA 02110-1301, USA.
 #include "Image.h"
 #include "RelativeLayout.h"
 #include "GLView.h"
+#include "Label.h"
 
 #endif
