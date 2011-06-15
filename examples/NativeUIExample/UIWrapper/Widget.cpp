@@ -228,17 +228,6 @@ namespace MoSync
 	}
 
 	/**
-	 * Set the background color of the widget.
-	 * @param color The desired color.
-	 */
-	void Widget::setBackgroundColor(int color)
-	{
-		char buffer[256];
-		sprintf(buffer, "0x%.6X", color);
-		setProperty(MAW_WIDGET_BACKGROUND_COLOR, buffer);
-	}
-
-	/**
 	 * Add an event listener for this widget.
 	 * Note: At present there can only be one listener.
 	 * The current listener will be replaced when a new

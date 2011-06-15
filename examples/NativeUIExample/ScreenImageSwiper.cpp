@@ -72,10 +72,6 @@ Screen* ScreenImageSwiper::create()
 	images[RIGHT_IMAGE]->setPosition(SCREEN_WIDTH / 12, 10);
 	rightImageLayout->addChild(images[RIGHT_IMAGE]);
 
-
-
-	//imageLayout->setBackgroundColor(0x0000FF);
-
 	imageLayout->addChild(leftImageLayout);
 	imageLayout->addChild(centerImageLayout);
 	imageLayout->addChild(rightImageLayout);
@@ -85,4 +81,19 @@ Screen* ScreenImageSwiper::create()
 	screen->setMainWidget(mainLayout);
 
 	return screen;
+}
+
+/*
+ * Method for getting the screen size inside the static members sScreenWidth and sScreenHeight
+ */
+void ScreenImageSwiper::getScreenSize()
+{
+	/// Get screen dimensions.
+	MAExtent size = maGetScrSize();
+
+	/// Extract the screen width
+	mScreenWidth = EXTENT_X(size);
+
+	/// Extract the screen height
+	mScreenHeight = EXTENT_Y(size);
 }

@@ -51,8 +51,11 @@ using namespace MoSync::UI;
 /**
  * TODO: Add comment.
  */
-class ScreenImageSwiper
+class ScreenImageSwiper : public WidgetEventListener
 {
+private:
+	int mScreenWidth;
+	int mScreenHeight;
 public:
 	/**
 	 * TODO: Add comment.
@@ -60,6 +63,18 @@ public:
 	static Screen* create();
 
 	static void destroy();
+
+	/**
+	 * This method is called when there is an event for this widget.
+	 * @param widget The widget object of the event.
+	 * @param widgetEventData The low-level event data.
+	 */
+	void handleWidgetEvent(
+		Widget* widget,
+		MAWidgetEventData* widgetEventData);
+
+private:
+	void getScreenSize();
 };
 
 #endif

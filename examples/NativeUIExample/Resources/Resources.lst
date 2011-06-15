@@ -14,10 +14,13 @@
 .image "TabIconWebView.png"
 
 .res RES_IMAGE1
-.image "image1.png"
+.image "Image1.png"
 
 .res RES_IMAGE2
-.image "image2.png"
+.image "Image2.png"
 
 .res RES_IMAGE3
-.image "image3.png"
+.image "Image3.png"
+
+.res RES_IMAGE_TEX
+.image "ImageTex.png"

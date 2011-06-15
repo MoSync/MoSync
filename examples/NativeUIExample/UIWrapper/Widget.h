@@ -159,12 +159,6 @@ namespace MoSync
 		virtual void setBackgroundColor(int red, int green, int blue);
 
 		/**
-		 * Set the background color of the widget.
-		 * @param color The desired color.
-		 */
-		virtual void setBackgroundColor(int color);
-
-		/**
 		 * Add an event listener for this widget.
 		 * Note: At present there can only be one listener.
 		 * The current listener will be replaced when a new
