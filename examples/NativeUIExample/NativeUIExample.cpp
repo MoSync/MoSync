@@ -24,14 +24,15 @@ MA 02110-1301, USA.
  * that demonstrates NativeUI on MoSync.
  */
 
-#include <maprofile.h>
-#include <ma.h>
-#include <mastring.h>
-#include <MAUtil/String.h>
-#include <MAUtil/Moblet.h>
-#include "UIWrapper/Widgets.h"
-#include "ScreenMain.h"
-#include <conprint.h>
+#include <maprofile.h> 			// Profile database
+#include <ma.h> 				// Syscalls
+#include <mastring.h>			// C string functions
+#include <MAUtil/String.h>		// C++ String class
+#include <MAUtil/Moblet.h>		// Moblet class
+#include <conprint.h>			// lprintfln for logging
+
+#include "UIWrapper/Widgets.h"	// Include all widgets
+#include "ScreenMain.h"			// Main UI screen
 
 using namespace MAUtil;
 using namespace MoSync::UI;
@@ -48,6 +49,7 @@ public:
 	NativeUIMoblet()
 	{
 		// Create the main user interface.
+		// Note: isAndroid() is a method defined in this class.
 		if (isAndroid())
 		{
 			mMainScreen = ScreenMain::createFourTabUI();
@@ -71,6 +73,7 @@ public:
 
 	/**
 	 * Called when a key is pressed.
+	 * This is a callback method declared in class Moblet.
 	 */
 	void keyPressEvent(int keyCode, int nativeCode)
 	{

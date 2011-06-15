@@ -17,26 +17,10 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file ScreenColorList.cpp
+ * @file NativeUIExample.cpp
  * @author Mikael Kindborg
  *
- * Screen that displays a list of colors. When selecting an item
- * in the list, another screen with that color is displayed.
+ * The PlatformManager class takes care off the differences
+ * between the runtime platforms we wish to handle.
  */
 
-#include "MAHeaders.h"
-#include "ScreenColorList.h"
-
-/**
- * TODO: Add comment.
- */
-Screen* ScreenColorList::create()
-{
-	Screen* screen = new Screen();
-	screen->setTitle("Colors");
-	screen->setIcon(RES_TAB_ICON_COLORS);
-	Button* widget = new Button();
-	widget->setText("TODO: Implement a color list");
-	screen->setMainWidget(widget);
-	return screen;
-}

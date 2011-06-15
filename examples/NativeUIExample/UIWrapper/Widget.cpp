@@ -212,7 +212,7 @@ namespace MoSync
 	void Widget::setBackgroundColor(int red, int green, int blue)
 	{
 		char buffer[256];
-		sprintf(buffer, "0x%X%X%X", red, green, blue);
+		sprintf(buffer, "0x%.2X%.2X%.2X", red, green, blue);
 		setProperty(MAW_WIDGET_BACKGROUND_COLOR, buffer);
 	}
 
