@@ -17,49 +17,36 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file ScreenImageSwiper.h
- * @author TODO: Add your name.
+ * @file RelativeLayout.cpp
+ * @author Emma Tresanszki
  *
- * TODO: Add comment.
+ * Class for relative layout of widgets.
  */
 
-#ifndef SCREEN_IMAGE_SWIPER_H_
-#define SCREEN_IMAGE_SWIPER_H_
+#include "RelativeLayout.h"
 
-#include "UIWrapper/Widgets.h"
-#include "MAHeaders.h"
-
-#include "conprint.h"
-
-/*
- * DEFINES
- */
-#define LEFT_IMAGE				0
-#define CENTER_IMAGE			1
-#define RIGHT_IMAGE				2
-#define DISPLAYED_IMAGES		3
-
-#define SCREEN_WIDTH 			320
-
-/*
- * DEFINES
- */
-
-
-using namespace MoSync::UI;
-
-/**
- * TODO: Add comment.
- */
-class ScreenImageSwiper
+namespace MoSync
 {
-public:
+	namespace UI
+	{
+
 	/**
-	 * TODO: Add comment.
+	 * Constructor.
 	 */
-	static Screen* create();
+	RelativeLayout::RelativeLayout() :
+		Widget(MAW_RELATIVE_LAYOUT)
+	{
+		// Set some common default values.
+		this->fillSpaceVertically();
+		this->fillSpaceHorizontally();
+	}
 
-	static void destroy();
-};
+	/**
+	 * Destructor.
+	 */
+	RelativeLayout::~RelativeLayout()
+	{
+	}
 
-#endif
+	} // namespace UI
+} // namespace MoSync

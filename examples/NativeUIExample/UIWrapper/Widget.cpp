@@ -223,7 +223,7 @@ namespace MoSync
 	void Widget::setBackgroundColor(int color)
 	{
 		char buffer[256];
-		sprintf(buffer, "0x%.6X", color); // fleu TODO Test with alpha
+		sprintf(buffer, "0x%.6X", color);
 		setProperty(MAW_WIDGET_BACKGROUND_COLOR, buffer);
 	}
 

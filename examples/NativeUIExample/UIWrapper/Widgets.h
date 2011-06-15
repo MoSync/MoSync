@@ -37,5 +37,6 @@ MA 02110-1301, USA.
 #include "WebView.h"
 #include "Button.h"
 #include "Image.h"
+#include "RelativeLayout.h"
 
 #endif
