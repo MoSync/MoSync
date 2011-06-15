@@ -17,25 +17,45 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Widgets.h
+ * @file Image.cpp
  * @author Mikael Kindborg
  *
- * You can include all widget classes by just including
- * this file, to make things a bit easier.
+ * Class for layout of widgets. Create a layout instance by
+ * using the WidgetManager.
  */
 
-#ifndef MOSYNC_UI_WIDGETS_H_
-#define MOSYNC_UI_WIDGETS_H_
-
-#include "WidgetEventListener.h"
-#include "Widget.h"
-#include "Screen.h"
-#include "TabScreen.h"
-#include "StackScreen.h"
-#include "HorizontalLayout.h"
-#include "VerticalLayout.h"
-#include "WebView.h"
-#include "Button.h"
 #include "Image.h"
 
-#endif
+namespace MoSync
+{
+	namespace UI
+	{
+
+	/**
+	 * Constructor.
+	 */
+	Image::Image() :
+		Widget(MAW_IMAGE)
+	{
+		// Set some common default values.
+		this->fillSpaceVertically();
+		this->fillSpaceHorizontally();
+	}
+	/**
+	 * Destructor.
+	 */
+	Image::~Image()
+	{
+	}
+
+	/*
+	 * Set the image resource of the image widget.
+	 * @res The handle of the image resource.
+	 */
+	void Image::setResource(MAHandle res)
+	{
+		setProperty(MAW_IMAGE_IMAGE, res);
+	}
+
+	} // namespace UI
+} // namespace MoSync

@@ -27,6 +27,9 @@ MA 02110-1301, USA.
 #define SCREEN_IMAGE_SWIPER_H_
 
 #include "UIWrapper/Widgets.h"
+#include "MAHeaders.h"
+
+#include "conprint.h"
 
 using namespace MoSync::UI;
 
@@ -40,6 +43,8 @@ public:
 	 * TODO: Add comment.
 	 */
 	static Screen* create();
+
+	static void destroy();
 };
 
 #endif

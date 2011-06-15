@@ -32,8 +32,28 @@ Screen* ScreenImageSwiper::create()
 {
 	Screen* screen = new Screen();
 	screen->setTitle("Images");
-	Button* widget = new Button();
-	widget->setText("TODO: Implement an image swiper");
-	screen->setMainWidget(widget);
+
+	VerticalLayout *mainLayout = new VerticalLayout();
+	HorizontalLayout *imageLayout = new HorizontalLayout();
+	VerticalLayout *infoLayout = new VerticalLayout();
+
+//	Image** images = new Image*[RES_IMAGE_NUM];
+//	for (int i=0; i<RES_IMAGE_NUM; i++)
+//	{
+//		images[i] = new Image();
+//		images[i]->setResource(RES_IMAGE1 + i);
+//		imageLayout->addChild(images[i]);
+//	}
+
+	//mainLayout->setSize(100, 100);
+	mainLayout->setBackgroundColor(0x00FF00);
+//	imageLayout->setBackgroundColor(0x00FF00);
+//	infoLayout->setBackgroundColor(0x0000FF);
+//
+//	mainLayout->addChild(imageLayout);
+//	mainLayout->addChild(infoLayout);
+
+	screen->setMainWidget(mainLayout);
+
 	return screen;
 }

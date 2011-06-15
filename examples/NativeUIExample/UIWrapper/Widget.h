@@ -33,6 +33,7 @@ MA 02110-1301, USA.
 #include <MAUtil/Map.h>
 #include <MAUtil/Environment.h>
 #include <IX_WIDGET.h>
+#include "conprint.h"
 
 namespace MoSync
 {
@@ -150,6 +151,12 @@ namespace MoSync
 		 * @param blue Blue component (range 0-255).
 		 */
 		virtual void setBackgroundColor(int red, int green, int blue);
+
+		/**
+		 * Set the background color of the widget.
+		 * @param color The desired color.
+		 */
+		virtual void setBackgroundColor(int color);
 
 		/**
 		 * Add an event listener for this widget.
