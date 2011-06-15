@@ -23,6 +23,7 @@ MA 02110-1301, USA.
  * TODO: Add comment.
  */
 
+#include "MAHeaders.h"
 #include "ScreenImageSwiper.h"
 
 /**
@@ -32,6 +33,7 @@ Screen* ScreenImageSwiper::create()
 {
 	Screen* screen = new Screen();
 	screen->setTitle("Images");
+	screen->setIcon(RES_TAB_ICON_IMAGE_SWIPER);
 	Button* widget = new Button();
 	widget->setText("TODO: Implement an image swiper");
 	screen->setMainWidget(widget);

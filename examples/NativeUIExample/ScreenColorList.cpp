@@ -23,6 +23,7 @@ MA 02110-1301, USA.
  * TODO: Add comment.
  */
 
+#include "MAHeaders.h"
 #include "ScreenColorList.h"
 
 /**
@@ -32,6 +33,7 @@ Screen* ScreenColorList::create()
 {
 	Screen* screen = new Screen();
 	screen->setTitle("Colors");
+	screen->setIcon(RES_TAB_ICON_COLORS);
 	Button* widget = new Button();
 	widget->setText("TODO: Implement a color list");
 	screen->setMainWidget(widget);

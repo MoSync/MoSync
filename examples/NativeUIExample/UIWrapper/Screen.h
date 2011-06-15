@@ -51,10 +51,18 @@ namespace MoSync
 		virtual ~Screen();
 
 		/**
-		 * Set the title of the screen.
+		 * Set the title of the screen. The title is displayed
+		 * on tab screens.
 		 * @param title The screen title.
 		 */
 		virtual void setTitle(const MAUtil::String& title);
+
+		/**
+		 * Set the icon of the screen. The icon is displayed
+		 * on tab screens.
+		 * @param imageHandle Handle to an image with the icon.
+		 */
+		virtual void setIcon(MAHandle imageHandle);
 
 		/**
 		 * Set the main widget of the screen.

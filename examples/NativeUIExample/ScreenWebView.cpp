@@ -23,6 +23,7 @@ MA 02110-1301, USA.
  * Class that creates a screen that displays a web view.
  */
 
+#include "MAHeaders.h"
 #include "ScreenWebView.h"
 
 /**
@@ -32,6 +33,7 @@ Screen* ScreenWebView::create()
 {
 	Screen* screen = new Screen();
 	screen->setTitle("Web");
+	screen->setIcon(RES_TAB_ICON_WEB_VIEW);
 	WebView* webView = new WebView();
 	webView->openURL("http://www.google.com");
 	screen->setMainWidget(webView);

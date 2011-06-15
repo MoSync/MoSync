@@ -57,12 +57,23 @@ namespace MoSync
 	}
 
 	/**
-	 * Set the title of the screen.
+	 * Set the title of the screen. The title is displayed
+	 * on tab screens.
 	 * @param title The screen title.
 	 */
 	void Screen::setTitle(const MAUtil::String& title)
 	{
-		setProperty("title", title.c_str());
+		setProperty(MAW_SCREEN_TITLE, title.c_str());
+	}
+
+	/**
+	 * Set the icon of the screen. The icon is displayed
+	 * on tab screens.
+	 * @param imageHandle Handle to an image with the icon.
+	 */
+	void Screen::setIcon(MAHandle imageHandle)
+	{
+		setProperty(MAW_SCREEN_ICON, imageHandle);
 	}
 
 	/**
