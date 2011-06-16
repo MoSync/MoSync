@@ -15,81 +15,88 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
-
+ 
 /**
  * @file ScreenWebView.h
  * @author Bogdan Iusco.
  *
- * Class that creates a screen that displays a web view.
+ * Class that creates a screen that displays a web view screen.
  */
 
-// the width of the edit box in percentage (x% of the screen width).
+// The width of the edit box in percentage (x% of the screen width).
 #define EDIT_BOX_WIDTH 65.0
 
-// the width of the open link button in percentage (x% of the screen width)
+// The width of the open link button in percentage (x% of the screen width)
 #define BUTTON_WIDTH 25.0
 
-// the default height of the navigation bar(when it's expanded).
-#define MAX_NAVIGATION_BAR_HEIGHT 55
+// The default height of the address bar(when it's expanded).
+#define MAX_ADDRESS_BAR_HEIGHT 55
 
-// the height of the navigation bar(when it's collapsed).
-#define MIN_NAVIGATION_BAR_HEIGHT 20
+// The height of the address bar(when it's collapsed).
+#define MIN_ADDRESS_BAR_HEIGHT 20
 
-// the height of the widgets from navigation bar.
+// The height of the widgets from address bar.
 #define NAV_BAR_WIDGETS_HEIGHT 50
 
-// increase/decrease height value of the navigation bar.
+// Increase/decrease height value of the address bar.
 #define ANIMATION_HEIGHT_VALUE 8
 
-// increase/decrease alpha value of the navigation bar.
+// Increase/decrease alpha value of the address bar.
 #define ANIMATION_ALPHA_VALUE 0.25
 
-// animation time
+// Animation time.
 #define ANIMATION_TIME_PERIOD 50
 
-// the maximum alpha value of the navigation bar.
+// The maximum alpha value of the address bar.
 #define MAX_ALPHA_VALUE 1
 
-// the minimum alpha value of the navigation bar.
+// The minimum alpha value of the address bar.
 #define MIN_ALPHA_VALUE 0
 
-// space between widgets
+// Space between widgets.
 #define SPACE 5
 
-// the default URL address
+// The default URL address.
 #define DEFAULT_URL_ADDRESS "http://www.google.com"
 
-// the name of the screen.
-#define SCREEN_TITLE "Web"
+// The name of the screen.
+#define SCREEN_TITLE "Web View"
 
-// the height of the line layout.
+// The text that will be showed on the tab widget.
+#define TAB_SCREEN_TITLE "Web"
+
+// The height of the title widget.
+#define NAVIGATION_BAR_WIDGET_HEIGHT 30
+
+// The height of the line layout.
 #define LINE_LAYOUT_HEIGHT 2
 
-// the background color of the line layout.
+// The background color of the line layout.
 #define LINE_LAYOUT_BG_COLOR 0xC0C0C0
 
-
-#include "ScreenWebView.h"
 
 // Include the resources for images.
 #include "MAHeaders.h"
 
-// set the pointer to ScreenWebView object to null.
-ScreenWebView* ScreenWebView::mScreenWebView = NULL;
+// Include the web view screen.
+#include "ScreenWebView.h"
 
-// set the default URL address.
-MAUtil::String ScreenWebView::mURL = DEFAULT_URL_ADDRESS;
+// Set the pointer to ScreenWebView object to null.
+ScreenWebView* ScreenWebView::sScreenWebView = NULL;
+
+// Set the default URL address.
+MAUtil::String ScreenWebView::sURL = DEFAULT_URL_ADDRESS;
 
 /**
  * Create the web view screen.
  */
 Screen* ScreenWebView::create()
 {
-	if(NULL == mScreenWebView) {
-		mScreenWebView = new ScreenWebView();
+	if(NULL == sScreenWebView) {
+		sScreenWebView = new ScreenWebView();
 	}
 
-	return mScreenWebView->getScreen();
+	return sScreenWebView->getScreen();
 }
 
 /**
@@ -97,8 +104,8 @@ Screen* ScreenWebView::create()
  */
 void ScreenWebView::destroy()
 {
-	delete mScreenWebView;
-	mScreenWebView = NULL;
+	delete sScreenWebView;
+	sScreenWebView = NULL;
 }
 
 /**
@@ -107,8 +114,9 @@ void ScreenWebView::destroy()
  */
 void ScreenWebView::setDefaultURL(const MAUtil::String url)
 {
-	mScreenWebView->openURL(url);
+	sScreenWebView->openURL(url);
 }
+
 /**
  * Constructor.
  * @param Screen The widgets will be added on this screen.
@@ -117,55 +125,69 @@ void ScreenWebView::setDefaultURL(const MAUtil::String url)
 ScreenWebView::ScreenWebView():
 		mScreen(NULL),
 		mWebView(NULL),
+		mNavBarWidget(NULL),
 		mOpenLinkButtonWidget(NULL),
 		mHideShowButtonWidget(NULL),
 		mEditBoxWidget(NULL),
-		mNavigationBarLayout(NULL),
+		mAddressBarLayout(NULL),
 		mLineLayout(NULL),
 		mEditBoxLayout(NULL),
 		mOpenLinkBtnLayout(NULL),
 		mHideShowBtnLayout(NULL),
-		mNavigationBarAnimation(NONE),
-		mCurrentNavigationBarHeight(0),
-		mCurrentNavigationBarAlpha(0),
+		mAddressBarAnimation(NONE),
+		mCurrentAddressBarHeight(0),
+		mCurrentAddressBarAlpha(0),
 		mScreenWidth(0),
 		mScreenHeight(0),
-		mIsNavigationBarVisible(false)
+		mIsAddressBarVisible(false)
 {
 	mScreen = new Screen();
-	mScreen->setTitle(SCREEN_TITLE);
+	mScreen->setTitle(TAB_SCREEN_TITLE);
 
 	// Get the screen size.
 	mScreenHeight = mScreen->getPropertyInt(MAW_WIDGET_HEIGHT);
 	mScreenWidth = mScreen->getPropertyInt(MAW_WIDGET_WIDTH);
 
+	// Create and add the main layout to the screen.
 	VerticalLayout* mainLayout = new VerticalLayout();
+	mScreen->setMainWidget(mainLayout);
 
-	// create the navigation bar.
-	createNavigationBar();
-	mainLayout->addChild(mNavigationBarLayout);
-	mIsNavigationBarVisible = true;
+	if (WidgetManager::isAndroid())
+	{
+		mScreen->setIcon(RES_TAB_ICON_WEB_VIEW_ANDROID);
 
-	// create the line layout.
+		// Get the screen size.
+		MAExtent screenSize = maGetScrSize();
+		mScreenWidth = EXTENT_X(screenSize);
+		mScreenHeight = EXTENT_Y(screenSize);
+	}
+	else
+	{
+		// Create and add the navigation bar to the main layout.
+		mNavBarWidget = new NavigationBar();
+		mNavBarWidget->setSize(mScreenWidth, NAVIGATION_BAR_WIDGET_HEIGHT);
+		mNavBarWidget->setTitle(SCREEN_TITLE);
+		mNavBarWidget->setBackButtonTitle("");
+		mainLayout->addChild(mNavBarWidget);
+
+		mScreen->setIcon(RES_TAB_ICON_WEB_VIEW);
+	}
+
+	// Create and add the address bar to the main layout.
+	createAddressBar();
+	mainLayout->addChild(mAddressBarLayout);
+	mIsAddressBarVisible = true;
+
+	// Create and add the line layout to the main layout.
 	mLineLayout = new HorizontalLayout();
 	mLineLayout->setSize(mScreenWidth, LINE_LAYOUT_HEIGHT);
 	mLineLayout->setBackgroundColor(LINE_LAYOUT_BG_COLOR);
 	mainLayout->addChild(mLineLayout);
 
-	// create the web view widget.
+	// Create and add the web view widget to the main layout.
 	mWebView = new WebView();
-	mWebView->openURL(mURL.c_str());
+	mWebView->openURL(sURL);
 	mainLayout->addChild(mWebView);
-
-	mScreen->setMainWidget(mainLayout);
-	if (WidgetManager::isAndroid())
-	{
-		mScreen->setIcon(RES_TAB_ICON_WEB_VIEW_ANDROID);
-	}
-	else
-	{
-		mScreen->setIcon(RES_TAB_ICON_WEB_VIEW);
-	}
 }
 
 /**
@@ -182,8 +204,9 @@ ScreenWebView::~ScreenWebView()
 	delete mOpenLinkButtonWidget;
 	delete mHideShowButtonWidget;
 	delete mEditBoxWidget;
+	delete mNavBarWidget;
 
-	delete mNavigationBarLayout;
+	delete mAddressBarLayout;
 	delete mLineLayout;
 	delete mEditBoxLayout;
 	delete mOpenLinkBtnLayout;
@@ -191,57 +214,64 @@ ScreenWebView::~ScreenWebView()
 }
 
 /**
- * Creates the navigation bar.
+ * Creates the address bar.
  */
-void ScreenWebView::createNavigationBar()
+void ScreenWebView::createAddressBar()
 {
 	float editBoxWidth = EDIT_BOX_WIDTH / 100.0 * mScreenWidth;
 	float buttonWidth = BUTTON_WIDTH / 100.0 * mScreenWidth;
 	int editBoxLayoutWidth = (int)editBoxWidth + SPACE;
-	mCurrentNavigationBarHeight = NAV_BAR_WIDGETS_HEIGHT;
-	mCurrentNavigationBarAlpha = MAX_ALPHA_VALUE;
+	mCurrentAddressBarHeight = NAV_BAR_WIDGETS_HEIGHT;
+	mCurrentAddressBarAlpha = MAX_ALPHA_VALUE;
 
-	// create the navigation layout.
-	mNavigationBarLayout = new HorizontalLayout();
-	mNavigationBarLayout->setSize(mScreenWidth, MAX_NAVIGATION_BAR_HEIGHT);
-	mNavigationBarLayout->setProperty(MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+	// Create the address layout.
+	mAddressBarLayout = new HorizontalLayout();
+	mAddressBarLayout->setSize(mScreenWidth, MAX_ADDRESS_BAR_HEIGHT);
+	mAddressBarLayout->setProperty(
+		MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
+		MAW_ALIGNMENT_CENTER);
 
-	// create the edit box widget.
+	// Create the edit box widget.
 	mEditBoxWidget = new EditBox();
 	mEditBoxWidget->setTextInputMode();
-	mEditBoxWidget->setProperty(MAW_EDIT_BOX_TEXT, mURL);
+	mEditBoxWidget->setProperty(MAW_EDIT_BOX_TEXT, sURL);
 	mEditBoxWidget->setSize((int) editBoxWidth, NAV_BAR_WIDGETS_HEIGHT);
 
-	// create the open link button widget.
+	// Create the open link button widget.
 	mOpenLinkButtonWidget = new ImageButton();
 	mOpenLinkButtonWidget->setImage(RES_WEB_VIEW_OPEN_LINK_IMAGE);
 	mOpenLinkButtonWidget->setSize(NAV_BAR_WIDGETS_HEIGHT, NAV_BAR_WIDGETS_HEIGHT);
 	mOpenLinkButtonWidget->setEventListener(this);
 
-	// create the hide/show button widget.
+	// Create the hide/show button widget.
 	mHideShowButtonWidget = new ImageButton();
 	mHideShowButtonWidget->setImage(RES_WEB_VIEW_IMAGE_HIDE_IMAGE);
-	mHideShowButtonWidget->setSize(MIN_NAVIGATION_BAR_HEIGHT, MIN_NAVIGATION_BAR_HEIGHT);
+	mHideShowButtonWidget->setSize(MIN_ADDRESS_BAR_HEIGHT, MIN_ADDRESS_BAR_HEIGHT);
 	mHideShowButtonWidget->setEventListener(this);
 
-	// create the edit box layout.
+	// Create the edit box layout.
 	mEditBoxLayout = createSpacer(editBoxLayoutWidth, NAV_BAR_WIDGETS_HEIGHT);
 	mEditBoxLayout->addChild(mEditBoxWidget);
 
-	// create the open link button layout
-	mOpenLinkBtnLayout = createSpacer(NAV_BAR_WIDGETS_HEIGHT + (2 * SPACE), NAV_BAR_WIDGETS_HEIGHT);
+	// Create the open link button layout.
+	mOpenLinkBtnLayout = createSpacer(
+		NAV_BAR_WIDGETS_HEIGHT + (2 * SPACE),
+		NAV_BAR_WIDGETS_HEIGHT);
 	mOpenLinkBtnLayout->addChild(mOpenLinkButtonWidget);
 
-	// create the hide/show btn layout.
-	int hideShowBtnLayoutWidth = mScreenWidth - editBoxLayoutWidth - NAV_BAR_WIDGETS_HEIGHT - (3 * SPACE);
+	// Create the hide/show button layout.
+	int hideShowBtnLayoutWidth = mScreenWidth - editBoxLayoutWidth -
+		NAV_BAR_WIDGETS_HEIGHT - (3 * SPACE);
 	mHideShowBtnLayout = createSpacer(hideShowBtnLayoutWidth, NAV_BAR_WIDGETS_HEIGHT);
-	mHideShowBtnLayout->setProperty(MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_TOP);
+	mHideShowBtnLayout->setProperty(
+		MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
+		MAW_ALIGNMENT_TOP);
 	mHideShowBtnLayout->addChild(mHideShowButtonWidget);
 
-	// add layouts to the navigation bar layout.
-	mNavigationBarLayout->addChild(mEditBoxLayout);
-	mNavigationBarLayout->addChild(mOpenLinkBtnLayout);
-	mNavigationBarLayout->addChild(mHideShowBtnLayout);
+	// Add layouts to the address bar layout.
+	mAddressBarLayout->addChild(mEditBoxLayout);
+	mAddressBarLayout->addChild(mOpenLinkBtnLayout);
+	mAddressBarLayout->addChild(mHideShowBtnLayout);
 }
 
 /**
@@ -255,13 +285,18 @@ VerticalLayout* ScreenWebView::createSpacer(const int width, const int height)
 {
 	VerticalLayout* layout = new VerticalLayout();
 	layout->setSize(width, height);
-	layout->setProperty(MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_RIGHT);
-	layout->setProperty(MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+	layout->setProperty(
+		MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT,
+		MAW_ALIGNMENT_RIGHT);
+	layout->setProperty(
+		MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
+		MAW_ALIGNMENT_CENTER);
+
 	return layout;
 }
 
 /**
- * This method is called when there is an event for this widget.
+ * This method is called when there is an event for a widget.
  * @param widget The widget object of the event.
  * @param widgetEventData The low-level event data.
  */
@@ -275,25 +310,25 @@ VerticalLayout* ScreenWebView::createSpacer(const int width, const int height)
 		if(widget == mOpenLinkButtonWidget)
 		{
 			MAUtil::String webAddress = mEditBoxWidget->getPropertyString("text");
-			mWebView->openURL(webAddress.c_str());
+			mWebView->openURL(webAddress);
 		} else if(widget == mHideShowButtonWidget)
 		{
-			// if the navigation bar is not animating handle this event.
-			if(NONE == mNavigationBarAnimation)
+			// If the address bar is not animating handle this event.
+			if(NONE == mAddressBarAnimation)
 			{
-				// initialize animation values.
-				mCurrentNavigationBarAlpha = MAX_ALPHA_VALUE;
-				if(mIsNavigationBarVisible)
+				// Initialize animation values.
+				mCurrentAddressBarAlpha = MAX_ALPHA_VALUE;
+				if(mIsAddressBarVisible)
 				{
-					mCurrentNavigationBarHeight = MAX_NAVIGATION_BAR_HEIGHT;
-					mNavigationBarAnimation = FADE_OUT_NAVIGATION_BAR;
+					mCurrentAddressBarHeight = MAX_ADDRESS_BAR_HEIGHT;
+					mAddressBarAnimation = FADE_OUT_ADDRESS_BAR;
 				} else
 				{
-					mCurrentNavigationBarHeight = MIN_NAVIGATION_BAR_HEIGHT;
-					mNavigationBarAnimation = HIDE_EXPAND_WIDGET;
+					mCurrentAddressBarHeight = MIN_ADDRESS_BAR_HEIGHT;
+					mAddressBarAnimation = HIDE_EXPAND_WIDGET;
 				}
 
-				// start the timer.
+				// Start the timer. It should be stopped when the animation is finished.
 				MAUtil::Environment::getEnvironment().addTimer(this, ANIMATION_TIME_PERIOD, 0);
 			}
 		}
@@ -316,21 +351,21 @@ Screen* ScreenWebView::getScreen() const
 void ScreenWebView::openURL(const MAUtil::String& url)
 {
 	mWebView->openURL(url.c_str());
-	mEditBoxWidget->setProperty(MAW_EDIT_BOX_TEXT, mURL);
+	mEditBoxWidget->setProperty(MAW_EDIT_BOX_TEXT, sURL);
 }
 
 /**
  * Called on timer events.
- * It is used for navigation bar animation.
+ * It is used for address bar animation.
  */
  void ScreenWebView::runTimerEvent()
  {
-	 // check the state of the animation and call the method
+	 // Check the state of the animation and call the method
 	 // that handles this state.
-	 switch(mNavigationBarAnimation)
+	 switch(mAddressBarAnimation)
 	 {
-	 	 case FADE_OUT_NAVIGATION_BAR:
-	 		 fadeOutNavigationBar();
+	 	 case FADE_OUT_ADDRESS_BAR:
+	 		 fadeOutAddressBar();
 	 		 break;
 	 	 case SHOW_EXPAND_WIDGET:
 	 		 showExpandWidget();
@@ -338,8 +373,8 @@ void ScreenWebView::openURL(const MAUtil::String& url)
 	 	 case HIDE_EXPAND_WIDGET:
 	 		 hideExpandWidget();
 	 		 break;
-	 	 case FADE_IN_NAVIGATION_BAR:
-	 		 fadeInNavigationBar();
+	 	 case FADE_IN_ADDRESS_BAR:
+	 		 fadeInAddressBar();
 	 		 break;
 	 	 case NONE:
 	 	 default:
@@ -348,111 +383,141 @@ void ScreenWebView::openURL(const MAUtil::String& url)
 }
 
 /**
- * Fades out the navigation bar.
+ * Fades out the address bar.
+ * This method decreases the height and alpha value of the address bar with a
+ * default value. The method should be called repeatedly until
+ * mAddressBarAnimation will be set to SHOW_EXPAND_WIDGET (then the animation
+ * can go to the next step - show the expand widget).
  */
-void ScreenWebView::fadeOutNavigationBar()
+void ScreenWebView::fadeOutAddressBar()
 {
 	 BOOL stopFading = true;
 
-	 // decrease the height of the navigation bar.
-	 mCurrentNavigationBarHeight -= ANIMATION_HEIGHT_VALUE;
-	 if(MIN_NAVIGATION_BAR_HEIGHT < mCurrentNavigationBarHeight)
+	 // Decrease the height of the address bar.
+	 mCurrentAddressBarHeight -= ANIMATION_HEIGHT_VALUE;
+	 if(MIN_ADDRESS_BAR_HEIGHT < mCurrentAddressBarHeight)
 	 {
-		 mNavigationBarLayout->setSize(mScreenWidth, mCurrentNavigationBarHeight);
+		 mAddressBarLayout->setSize(mScreenWidth, mCurrentAddressBarHeight);
 		 stopFading = false;
 	 }
 
-	 // set the alpha value for the navigation bar widgets.
-	 mCurrentNavigationBarAlpha -= ANIMATION_ALPHA_VALUE;
-	 if(MIN_ALPHA_VALUE <= mCurrentNavigationBarAlpha)
+	 // Set the alpha value for the address bar widgets.
+	 mCurrentAddressBarAlpha -= ANIMATION_ALPHA_VALUE;
+	 if(MIN_ALPHA_VALUE <= mCurrentAddressBarAlpha)
 	 {
-		 mEditBoxWidget->setProperty(MAW_WIDGET_ALPHA, mCurrentNavigationBarAlpha);
-		 mOpenLinkButtonWidget->setProperty(MAW_WIDGET_ALPHA, mCurrentNavigationBarAlpha);
-		 mHideShowButtonWidget->setProperty(MAW_WIDGET_ALPHA, mCurrentNavigationBarAlpha);
+		 mEditBoxWidget->setProperty(MAW_WIDGET_ALPHA, mCurrentAddressBarAlpha);
+		 mOpenLinkButtonWidget->setProperty(
+		 	MAW_WIDGET_ALPHA,
+		 	mCurrentAddressBarAlpha);
+		 mHideShowButtonWidget->setProperty(
+			MAW_WIDGET_ALPHA,
+			mCurrentAddressBarAlpha);
 		 stopFading = false;
 	 }
 
-	 // if the height of the navigation bar has reached at the
-	 // desired value(MIN_NAVIGATION_BAR_HEIGHT) and the alpha
-	 // value of the navigation bar widgets is MIN_ALPHA_VALUE
+	 // If the height of the address bar has reached at the
+	 // desired value(MIN_ADDRESS_BAR_HEIGHT) and the alpha
+	 // value of the address bar widgets is MIN_ALPHA_VALUE
 	 // then go to the next step of the animation.
 	 if(stopFading) {
-		 mNavigationBarAnimation = SHOW_EXPAND_WIDGET;
+		 mAddressBarAnimation = SHOW_EXPAND_WIDGET;
 		 mHideShowButtonWidget->setImage(RES_WEB_VIEW_IMAGE_SHOW_IMAGE);
-		 mHideShowBtnLayout->setProperty(MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+		 mHideShowBtnLayout->setProperty(
+			MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
+			MAW_ALIGNMENT_CENTER);
 	 }
 }
 
 /**
  * Shows the expand image button.
+ * This method increases the alpha value of the expand image button with a
+ * default value. The method should be called repeatedly until
+ * mAddressBarAnimation will be set to NONE (then the animation can go to
+ * the next step - fade in the address bar).
  */
 void ScreenWebView::showExpandWidget()
 {
-	// set the alpha value for the show/hide button widget.
-	 mCurrentNavigationBarAlpha += ANIMATION_ALPHA_VALUE;
-	 if(MAX_ALPHA_VALUE >= mCurrentNavigationBarAlpha)
+	// Set the alpha value for the show/hide button widget.
+	 mCurrentAddressBarAlpha += ANIMATION_ALPHA_VALUE;
+	 if(MAX_ALPHA_VALUE >= mCurrentAddressBarAlpha)
 	 {
-		 mHideShowButtonWidget->setProperty(MAW_WIDGET_ALPHA, mCurrentNavigationBarAlpha);
+		 mHideShowButtonWidget->setProperty(
+		 	MAW_WIDGET_ALPHA,
+		 	mCurrentAddressBarAlpha);
 	 } else
 	 {
-		 // stop the animation.
-		 mIsNavigationBarVisible = false;
-		 mNavigationBarAnimation = NONE;
+		 // Stop the animation.
+		 mIsAddressBarVisible = false;
+		 mAddressBarAnimation = NONE;
 	 }
 }
 
 /**
  * Hides the expand image button.
+ * This method decreases the alpha value of the expand image button with a
+ * default value. The method should be called repeatedly until
+ * mAddressBarAnimation will be set to FADE_IN_ADDRESS_BAR (the animation is finished).
  */
 void ScreenWebView::hideExpandWidget()
 {
-	 mCurrentNavigationBarAlpha -= ANIMATION_ALPHA_VALUE;
-	 if(MIN_ALPHA_VALUE <= mCurrentNavigationBarAlpha)
+	 mCurrentAddressBarAlpha -= ANIMATION_ALPHA_VALUE;
+	 if(MIN_ALPHA_VALUE <= mCurrentAddressBarAlpha)
 	 {
-		 mHideShowButtonWidget->setProperty(MAW_WIDGET_ALPHA, mCurrentNavigationBarAlpha);
+		 mHideShowButtonWidget->setProperty(
+			MAW_WIDGET_ALPHA,
+			mCurrentAddressBarAlpha);
 	 } else
 	 {
-		 // go the next step of the animation.
+		 // Go the next step of the animation.
 		 mHideShowButtonWidget->setImage(RES_WEB_VIEW_IMAGE_HIDE_IMAGE);
-		 mNavigationBarAnimation = FADE_IN_NAVIGATION_BAR;
-		 mHideShowBtnLayout->setProperty(MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_TOP);
+		 mAddressBarAnimation = FADE_IN_ADDRESS_BAR;
+		 mHideShowBtnLayout->setProperty(
+			MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
+			MAW_ALIGNMENT_TOP);
 	 }
 }
 
 /**
  * Fades in the navigation bar.
+ * This method increases the height and alpha value of the address bar with a
+ * default value. The method should be called repeatedly until
+ * mAddressBarAnimation will be set to NONE (the animation is finished).
  */
-void ScreenWebView::fadeInNavigationBar()
+void ScreenWebView::fadeInAddressBar()
 {
 	 BOOL stopFading = true;
 
-	 // increase the height of the navigation bar.
-	 mCurrentNavigationBarHeight += ANIMATION_HEIGHT_VALUE;
-	 if(MAX_NAVIGATION_BAR_HEIGHT >= mCurrentNavigationBarHeight)
+	 // Increase the height of the navigation bar.
+	 mCurrentAddressBarHeight += ANIMATION_HEIGHT_VALUE;
+	 if(MAX_ADDRESS_BAR_HEIGHT >= mCurrentAddressBarHeight)
 	 {
-		 mNavigationBarLayout->setSize(mScreenWidth, mCurrentNavigationBarHeight);
+		 mAddressBarLayout->setSize(mScreenWidth, mCurrentAddressBarHeight);
 		 stopFading = false;
 	 } else
 	 {
-		 mNavigationBarLayout->setSize(mScreenWidth, MAX_NAVIGATION_BAR_HEIGHT);
+		 mAddressBarLayout->setSize(mScreenWidth, MAX_ADDRESS_BAR_HEIGHT);
 	 }
 
-	 // set the alpha value for the navigation bar widgets.
-	 mCurrentNavigationBarAlpha += ANIMATION_ALPHA_VALUE;
-	 if(MAX_ALPHA_VALUE >= mCurrentNavigationBarAlpha)
+	 // Set the alpha value for the address bar widgets.
+	 mCurrentAddressBarAlpha += ANIMATION_ALPHA_VALUE;
+	 if(MAX_ALPHA_VALUE >= mCurrentAddressBarAlpha)
 	 {
-		 mEditBoxWidget->setProperty(MAW_WIDGET_ALPHA, mCurrentNavigationBarAlpha);
-		 mOpenLinkButtonWidget->setProperty(MAW_WIDGET_ALPHA, mCurrentNavigationBarAlpha);
-		 mHideShowButtonWidget->setProperty(MAW_WIDGET_ALPHA, mCurrentNavigationBarAlpha);
+		 mEditBoxWidget->setProperty(MAW_WIDGET_ALPHA, mCurrentAddressBarAlpha);
+		 mOpenLinkButtonWidget->setProperty(
+		 	MAW_WIDGET_ALPHA,
+		 	mCurrentAddressBarAlpha);
+		 mHideShowButtonWidget->setProperty(
+			MAW_WIDGET_ALPHA,
+			mCurrentAddressBarAlpha);
 		 stopFading = false;
 	 }
 
-	 // if the height of the navigation bar has reached at the
-	 // desired value(MAX_NAVIGATION_BAR_HEIGHT) and the alpha
-	 // value of the navigation bar widgets is MAX_ALPHA_VALUE
+	 // If the height of the address bar has reached at the
+	 // desired value(MAX_ADDRESS_BAR_HEIGHT) and the alpha
+	 // value of the address bar widgets is MAX_ALPHA_VALUE
 	 // then stop the animation.
 	 if(stopFading) {
-		 mNavigationBarAnimation = NONE;
-		 mIsNavigationBarVisible = true;
+		 mAddressBarAnimation = NONE;
+		 mIsAddressBarVisible = true;
 	 }
 }
