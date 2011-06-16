@@ -187,17 +187,43 @@ public class Widget
 	{
 		if( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
 		{
-			return Integer.toString( getLayoutParams( ).getWidth() );
+			// If the actual width of the Android view is greater than zero,
+			// we return the width minus margins. Othervise we return the
+			// width value in the layout param (which can be e.g. -1).
+			if (getView( ).getWidth( ) > 0)
+			{
+				return 
+					Integer.toString( getView( ).getWidth( )
+					- getLayoutParams( ).marginLeft 
+					- getLayoutParams( ).marginRight );
+			}
+			else
+			{
+				return Integer.toString( getLayoutParams( ).getWidth() );
+			}
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
 		{
-			return Integer.toString(  getLayoutParams( ).getHeight() );
+			// If the actual height of the Android view is greater than zero,
+			// we return the height minus margins. Othervise we return the
+			// height value in the layout param (which can be e.g. -1).
+			if (getView( ).getHeight( ) > 0)
+			{
+				return 
+					Integer.toString( getView( ).getHeight( )
+					- getLayoutParams( ).marginTop 
+					- getLayoutParams( ).marginBottom );
+			}
+			else
+			{
+				return Integer.toString(  getLayoutParams( ).getHeight() );
+			}
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
 		{
 			return Integer.toString( getView( ).getLeft( ) );
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
 		{
 			return Integer.toString( getView( ).getTop( ) );
 		}
