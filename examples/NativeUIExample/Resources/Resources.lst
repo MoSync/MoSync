@@ -37,14 +37,59 @@
 .res RES_SETTINGS_VIEW_RESET_IMAGE
 .image "ImageSettingsReset.png"
 
-.res RES_IMAGE1
-.image "Image1.png"
+.res RES_FIRST_IMAGE_SMALL
+.placeholder
 
-.res RES_IMAGE2
-.image "Image2.png"
+.res RES_IMAGE1_SMALL
+.ubin
+.include "small/Image1.png"
 
-.res RES_IMAGE3
-.image "Image3.png"
+.res RES_IMAGE2_SMALL
+.ubin
+.include "small/Image2.png"
+
+.res RES_IMAGE3_SMALL
+.ubin
+.include "small/Image3.png"
+
+.res RES_LAST_IMAGE_SMALL
+.placeholder
+
+.res RES_FIRST_IMAGE_MEDIUM
+.placeholder
+
+.res RES_IMAGE1_MEDIUM
+.ubin
+.include "medium/Image1.png"
+
+.res RES_IMAGE2_MEDIUM
+.ubin
+.include "medium/Image2.png"
+
+.res RES_IMAGE3_MEDIUM
+.ubin
+.include "medium/Image3.png"
+
+.res RES_LAST_IMAGE_MEDIUM
+.placeholder
+
+.res RES_FIRST_IMAGE_LARGE
+.placeholder
+
+.res RES_IMAGE1_LARGE
+.ubin
+.include "medium/Image1.png"
+
+.res RES_IMAGE2_LARGE
+.ubin
+.include "medium/Image2.png"
+
+.res RES_IMAGE3_LARGE
+.ubin
+.include "large/Image3.png"
+
+.res RES_LAST_IMAGE_LARGE
+.placeholder
 
 .res RES_IMAGE_TEX
 .image "ImageTex.png"

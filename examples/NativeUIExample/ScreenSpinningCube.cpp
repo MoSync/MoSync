@@ -26,39 +26,42 @@ MA 02110-1301, USA.
 #include "MAHeaders.h"
 #include "ScreenSpinningCube.h"
 
-ScreenSpinningCube *ScreenSpinningCube::sInstance = NULL;
-
 /**
  * TODO: Add comment.
  */
 Screen* ScreenSpinningCube::create()
 {
-	Screen* screen = new Screen();
-	screen->setTitle("Cube");
-	if (WidgetManager::isAndroid())
-	{
-		screen->setIcon(RES_TAB_ICON_CUBE_ANDROID);
-	}
-	else
-	{
-		screen->setIcon(RES_TAB_ICON_CUBE);
-	}
-
-	sInstance = new ScreenSpinningCube();
-
-	screen->setMainWidget(sInstance->mGLViewLayout);
-
+	ScreenSpinningCube* screen = new ScreenSpinningCube();
+	screen->createUI();
 	return screen;
 }
 
 ScreenSpinningCube::ScreenSpinningCube():
 	mGlViewInitialized(false),
-	mXRotation(0), mYRotation(0), mZRotation(0)
+	mXRotation(0), mYRotation(0), mZRotation(0),
+	mXDirection(0), mYDirection(0)
 {
+}
+
+void ScreenSpinningCube::createUI()
+{
+	setTitle("Cube");
+
+	if (WidgetManager::isAndroid())
+	{
+		setIcon(RES_TAB_ICON_CUBE_ANDROID);
+	}
+	else
+	{
+		setIcon(RES_TAB_ICON_CUBE);
+	}
+
 	mGLViewLayout = new VerticalLayout();
 	mGLViewWidget = new GLView();
 	mGLViewWidget->setEventListener(this);
 	mGLViewLayout->addChild(mGLViewWidget);
+
+	setMainWidget(mGLViewLayout);
 }
 
 const GLfloat ScreenSpinningCube::mLightAmbient[]=		{ 0.5f, 0.5f, 0.5f, 1.0f };
@@ -278,9 +281,9 @@ void ScreenSpinningCube::drawGLScene()
 	//Flush all drawings.
 	glFinish();
 
-	mXRotation += 0.5f;//mXDirection; /* X Axis Rotation */
-	mYRotation += 0.5f;//mYDirection; /* Y Axis Rotation */
-	mZRotation += 0.5f; /* Z Axis Rotation */
+	mXRotation += mXDirection / 100; /* X Axis Rotation */
+	mYRotation += mYDirection / 100; /* Y Axis Rotation */
+	//mZRotation += 0.5f; /* Z Axis Rotation */
 
 	//Commit the changes to GLView.
 	mGLViewWidget->setProperty(MAW_GL_VIEW_INVALIDATE, "");
@@ -324,8 +327,6 @@ void ScreenSpinningCube::handleWidgetEvent(Widget* widget, MAWidgetEventData* wi
 		//Get width and height of the GLView widget, and resize.
 		int glViewWidth = mGLViewWidget->getPropertyInt(MAW_WIDGET_WIDTH);
 		int glViewHeight = mGLViewWidget->getPropertyInt(MAW_WIDGET_HEIGHT);
-		printf("glViewWidth = %d", glViewWidth);
-		printf("glViewHeight = %d", glViewHeight);
 		resizeGLScene(glViewWidth, glViewHeight);
 
 		//Initialize OpenGL.
@@ -338,6 +339,33 @@ void ScreenSpinningCube::handleWidgetEvent(Widget* widget, MAWidgetEventData* wi
 		//Record that the GLView has been initialized.
 		mGlViewInitialized = true;
 	}
+}
+
+/**
+ * Handle pointer presses.
+ */
+void ScreenSpinningCube::handlePointerPressed(MAPoint2d p)
+{
+	mXPointer = p.x;
+	mYPointer = p.y;
+}
+
+/**
+ * Handle pointer moves.
+ */
+void ScreenSpinningCube::handlePointerMoved(MAPoint2d p)
+{
+	mXDirection = p.y - mYPointer;
+	mYDirection = p.x - mXPointer;
+}
+
+/**
+ * Handle pointer releases.
+ */
+void ScreenSpinningCube::handlePointerReleased(MAPoint2d p)
+{
+	mXDirection = 0;
+	mYDirection = 0;
 }
 
 void ScreenSpinningCube::toggleBlending(bool blend)

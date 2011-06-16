@@ -53,19 +53,12 @@ int RenderMain ( void )
 		{
 			if ( e.type == EVENT_TYPE_CLOSE ||
 				 e.type == EVENT_TYPE_KEY_PRESSED ||
-				 e.type == EVENT_TYPE_POINTER_PRESSED ||
-				 e.type == MAK_BACK)
-			{
+				 e.type == EVENT_TYPE_POINTER_PRESSED )
 				maExit(0);
-			}
 			else if(e.type == EVENT_TYPE_FOCUS_LOST)
-			{
 				focus = false;
-			}
 			else if(e.type == EVENT_TYPE_FOCUS_GAINED)
-			{
 				focus = true;
-			}
 
 			else if ( e.type == EVENT_TYPE_KEY_PRESSED )
 			{

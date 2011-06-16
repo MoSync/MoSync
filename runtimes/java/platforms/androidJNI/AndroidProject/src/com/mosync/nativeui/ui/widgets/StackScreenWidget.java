@@ -78,25 +78,6 @@ public class StackScreenWidget extends ScreenWidget
 		getView( ).addView( screen.getView( ) );
 	}
 	
-	private void sendPopEvent() {
-		if( m_screenStack.empty( ) )
-		{
-			return;
-		}
-	
-		// Only pop and send events if the stack is not empty
-		int poppedToScreenHandle = getHandle( );
-		if( m_screenStack.size( ) >= 2 )
-		{
-			poppedToScreenHandle = m_screenStack.get( 1 ).getHandle( );
-		}
-		
-		EventQueue.getDefault( ).postWidgetStackScreenPoppedEvent(
-				getHandle(),
-				m_screenStack.peek( ).getHandle( ),
-				poppedToScreenHandle );	
-	}
-	
 	/**
 	 * Pops a screen from the screen stack, and displays
 	 * the previous screen. If there is no previous screen,
@@ -104,8 +85,6 @@ public class StackScreenWidget extends ScreenWidget
 	 */
 	public void pop()
 	{
-		sendPopEvent();
-	
 		// Remove current view
 		getView( ).removeAllViews( );
 		
@@ -135,15 +114,22 @@ public class StackScreenWidget extends ScreenWidget
 	@Override
 	public boolean handleBack()
 	{
-		if( !m_backEnabled )
+		if( !m_backEnabled || m_screenStack.empty( ) )
 		{
 			return false;
 		}
 		
-		if(m_screenStack.size( ) <= 1) {
-			return false;
+		// Only pop and send events if the stack is not empty
+		int poppedToScreenHandle = getHandle( );
+		if( m_screenStack.size( ) >= 2 )
+		{
+			poppedToScreenHandle = m_screenStack.get( 1 ).getHandle( );
 		}
 		
+		EventQueue.getDefault( ).postWidgetStackScreenPoppedEvent(
+				getHandle(),
+				m_screenStack.peek( ).getHandle( ),
+				poppedToScreenHandle );
 		pop( );
 		
 		return true;

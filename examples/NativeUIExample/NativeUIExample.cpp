@@ -80,6 +80,33 @@ public:
 		mMainScreen->handleKeyPress(keyCode);
 	}
 
+	/**
+	 * Called when the screen was touched.
+	 * This is a callback method declared in class Moblet.
+	 */
+	void pointerPressEvent(MAPoint2d p)
+	{
+		mMainScreen->handlePointerPressed(p);
+	}
+
+	/**
+	 * Called when the pointer was moved on the screen.
+	 * This is a callback method declared in class Moblet.
+	 */
+	void pointerMoveEvent(MAPoint2d p)
+	{
+		mMainScreen->handlePointerMoved(p);
+	}
+
+	/**
+	 * Called when the screen was released.
+	 * This is a callback method declared in class Moblet.
+	 */
+	void pointerReleaseEvent(MAPoint2d p)
+	{
+		mMainScreen->handlePointerReleased(p);
+	}
+
 private:
 	ScreenMain* mMainScreen;
 };

@@ -9,7 +9,6 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 
 /**
  * Wraps the behavior of a ImageButton view. Some properties and event handling
@@ -29,16 +28,6 @@ public class ImageButtonWidget extends Widget
 	public ImageButtonWidget(int handle, ImageButton imageButton)
 	{
 		super( handle, imageButton );
-		
-		/**
-		 * Remove the background drawable (we don't want the default button background.).
-		 */
-		imageButton.setBackgroundDrawable(null);
-		
-		/**
-		 * Defaults to no scaling.
-		 */
-		imageButton.setScaleType(ImageView.ScaleType.CENTER); 
 	}
 
 	/**
@@ -48,6 +37,11 @@ public class ImageButtonWidget extends Widget
 	public boolean setProperty(String property, String value)
 			throws PropertyConversionException, InvalidPropertyValueException
 	{
+		if( super.setProperty( property, value ) )
+		{
+			return true;
+		}
+
 		if( property
 				.equals( IX_WIDGET.MAW_IMAGE_BUTTON_BACKGROUND_IMAGE ) )
 		{
@@ -55,21 +49,12 @@ public class ImageButtonWidget extends Widget
 			Bitmap background = NativeUI.getBitmap( imageHandle );
 			if( background != null )
 			{
-				/*
 				getView( ).setBackgroundDrawable(
 						new BitmapDrawable( background ) );
-						*/
-				ImageButton imageButton = (ImageButton) getView( );
-				imageButton.setImageBitmap( background );		
 			}
 		}
 		else
 		{
-			if( super.setProperty( property, value ) )
-			{
-				return true;
-			}
-			
 			return false;
 		}
 

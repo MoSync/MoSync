@@ -64,5 +64,14 @@ namespace MoSync
 		setProperty("selectedTab", index);
 	}
 
+	/**
+	 * Returns the index of the current tab.
+	 * Index starts at zero.
+	 */
+	int TabScreen::getActiveTab()
+	{
+		return getPropertyInt(MAW_TAB_SCREEN_CURRENT_TAB);
+	}
+
 	} // namespace UI
 } // namespace MoSync
