@@ -59,6 +59,7 @@ public class Layout extends Widget
 					View v = g.getChildAt( i );
 					if( getView( ) == v )
 					{
+						g.removeViewAt(i);
 						g.addView( m_scrollview, i );
 						break;
 					}

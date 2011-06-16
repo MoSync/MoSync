@@ -23,13 +23,16 @@
 
 @implementation ImageWidget
 
-- (id)init {	
+- (id)init {
+    
+    // temporarily use a UIView placeholder until we have an image..
 	view = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
 	imageView = nil;
 	leftCapWidth = 0;
 	topCapHeight = 0;
 	id ret = [super init];
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
+    view.contentMode = UIViewContentModeCenter;
 	return ret;
 }
 
@@ -46,8 +49,16 @@
 			[imageView removeFromSuperview];
 
 		imageView = [[UIImageView alloc] initWithImage:image];	
-		//[imageView sizeToFit];
-		[view addSubview:imageView];
+		
+        //[view addSubview:imageView];
+        
+        [view.superview insertSubview:imageView belowSubview:view];
+        [view removeFromSuperview];
+        imageView.contentMode = view.contentMode;
+        [view release];
+        view = imageView;
+        //view.contentMode = UIViewContentModeCenter;
+        
 		[self layout];
 	}
 	else if([key isEqualToString:@"leftCapWidth"]) {
@@ -66,6 +77,19 @@
 		}
 		topCapHeight = newTopCapHeight;
 	}
+    else if ([key isEqualToString:@"scaleMode"]) {
+        // none
+        // scaleXY
+        // scalePreserveAspect
+        
+        // maybe have these later?
+        // scaleX
+        // scaleY
+        
+        if([value isEqualToString:@"none"]) view.contentMode = UIViewContentModeCenter;
+        else if([value isEqualToString:@"scaleXY"]) view.contentMode = UIViewContentModeScaleToFill;
+        else if([value isEqualToString:@"scalePreserveAspect"]) view.contentMode = UIViewContentModeScaleAspectFit;        
+    }
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

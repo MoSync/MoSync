@@ -3830,6 +3830,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		BACKGROUND_IMAGE = "backgroundImage";
+		
+		/**
+		* @brief Specifies what type of scaling should be applied to the image button.
+		*
+		* @validvalue Either 'none', 'scaleXY' or 'scalePreserveAspect'. Default 'none'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_SCALE_MODE, "scaleXY");
+		* \endcode
+		*/		
+		SCALE_MODE = "scaleMode";		
 	}
 	} // end of WidgetImageButtonProperties		
 	
@@ -3851,6 +3865,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		IMAGE = "image";
+		
+		/**
+		* @brief Specifies what type of scaling should be applied to the image.
+		*
+		* @validvalue Either 'none', 'scaleXY' or 'scalePreserveAspect'. Default 'none'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_SCALE_MODE, "scaleXY");
+		* \endcode
+		*/		
+		SCALE_MODE = "scaleMode";		
 	}
 	} // end of WidgetImageProperties
 
