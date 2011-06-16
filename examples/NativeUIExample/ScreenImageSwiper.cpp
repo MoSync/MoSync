@@ -26,6 +26,28 @@ MA 02110-1301, USA.
 #include "MAHeaders.h"
 #include "ScreenImageSwiper.h"
 
+/*
+ * DEFINES
+ */
+#define ABS(a)	   						(((a) < 0) ? -(a) : (a))
+
+#define SMALL_SCREEN_RESOLUTION			320
+#define MEDIUM_SCREEN_RESOLUTION		480
+#define LARGE_SCREEN_RESOLUTION			1024
+
+#define TXT_SCREEN_TITLE				"Images"
+
+#define SCREEN_BG_COLOR					0xF0F0F0
+#define LABEL_BG_COLOR					0x111111
+#define FONT_COLOR						0xFFFFFF
+
+#define FRAME_DELAY						50
+
+#define DEFAULT_IMAGE_INDEX				0
+/*
+ * DEFINES
+ */
+
 /**
  * Create the Swiper Screen.
  */
@@ -42,7 +64,7 @@ Screen* ScreenImageSwiper::create()
 ScreenImageSwiper::ScreenImageSwiper()
 {
 	// Add a timer to keep the update at a 20 FPS rate
-	MAUtil::Environment::getEnvironment().addTimer(this, 50, 0);
+	MAUtil::Environment::getEnvironment().addTimer(this, FRAME_DELAY, 0);
 }
 
 /*
@@ -79,7 +101,7 @@ void ScreenImageSwiper::createUI()
 		mTitleWidget = new NavigationBar();
 
 		// Set the navigation's bar sizes.
-		mTitleWidget->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, TITLE_WIDGET_HEIGHT);
+		//mTitleWidget->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, TITLE_WIDGET_HEIGHT);
 
 		// Set the navigation's bar title.
 		mTitleWidget->setTitle(TXT_SCREEN_TITLE);
@@ -121,7 +143,7 @@ void ScreenImageSwiper::createUI()
 	labelLayout = new Label();
 	labelLayout->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, mScreenHeight / 10);
 	labelLayout->setBackgroundColor(LABEL_BG_COLOR);
-	labelLayout->setText(images[0]->name);
+	labelLayout->setText(images[DEFAULT_IMAGE_INDEX]->name);
 	labelLayout->setFontColor(FONT_COLOR);
 	labelLayout->centerTextHorizontally();
 	labelLayout->centerTextVertically();
@@ -145,23 +167,18 @@ void ScreenImageSwiper::setupImages(int width, int height)
 	int startX = (mScreenWidth - width) >> 1;
 	for (int i=0; i<imagesSize; i++)
 	{
+		// Set image widget properties.
 		images[i]->posX = startX;
 		images[i]->posY = mScreenHeight / 5;
 		images[i]->width = width;
 
 		images[i]->setResource();
 		images[i]->setSize(width, height);
-		images[i]->shadow = new RelativeLayout();
-		images[i]->shadow->setSize(width, height);
-		images[i]->shadow->setBackgroundColor(0);
-		images[i]->shadow->setProperty(MAW_WIDGET_ALPHA, SHADOW_ALPHA);
-		images[i]->shadow->setPosition(images[i]->posX + 5, images[i]->posY + 5);
 		images[i]->setPosition(images[i]->posX, images[i]->posY);
 
-		imagesLayout->addChild(images[i]->shadow);
 		imagesLayout->addChild(images[i]);
 
-		//Update x position for the next image widget.
+		// Update x position for the next image widget.
 		startX += width + mScreenWidth / 6;
 	}
 }
@@ -259,6 +276,7 @@ void ScreenImageSwiper::handlePointerMoved(MAPoint2d p)
  */
 void ScreenImageSwiper::handlePointerReleased(MAPoint2d p)
 {
+	// Search for the image on the center of the screen
 	int centeredImage = -1;
 	for (int i=0; i<imagesSize; i++)
 	{
@@ -269,6 +287,7 @@ void ScreenImageSwiper::handlePointerReleased(MAPoint2d p)
 		}
 	}
 
+	// Align images to grid
 	if (centeredImage >= 0)
 	{
 		labelLayout->setText(images[centeredImage]->name);
@@ -276,7 +295,6 @@ void ScreenImageSwiper::handlePointerReleased(MAPoint2d p)
 		for (int i=0; i<imagesSize; i++)
 		{
 			images[i]->posX += offset;
-			images[i]->shadow->setPosition(images[i]->posX + 5, images[i]->posY + 5);
 			images[i]->setPosition(images[i]->posX, images[i]->posY);
 		}
 	}
@@ -311,7 +329,6 @@ void ScreenImageSwiper::runTimerEvent()
 	{
 		images[i]->posX += offset;
 
-		images[i]->shadow->setPosition(images[i]->posX + 5, images[i]->posY + 5);
 		images[i]->setPosition(images[i]->posX, images[i]->posY);
 	}
 	mPointerXStart = mPointerXEnd;

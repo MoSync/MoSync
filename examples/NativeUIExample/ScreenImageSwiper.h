@@ -32,28 +32,6 @@ MA 02110-1301, USA.
 
 #include "conprint.h"
 
-/*
- * DEFINES
- */
-#define ABS(a)	   						(((a) < 0) ? -(a) : (a))
-
-#define SMALL_SCREEN_RESOLUTION			320
-#define MEDIUM_SCREEN_RESOLUTION		480
-#define LARGE_SCREEN_RESOLUTION			1024
-
-#define TXT_SCREEN_TITLE				"Images"
-
-#define SCREEN_BG_COLOR					0xF0F0F0
-#define LABEL_BG_COLOR					0x111111
-#define FONT_COLOR						0xFFFFFF
-
-#define SHADOW_ALPHA					"0.2"
-
-#define TITLE_WIDGET_HEIGHT				30
-/*
- * DEFINES
- */
-
 using namespace MoSync::UI;
 
 /*
@@ -68,8 +46,6 @@ public:
 	int width;
 
 	MAUtil::String name;
-
-	RelativeLayout* shadow;
 
 	void setResource()
 	{
