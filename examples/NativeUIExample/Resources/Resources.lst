@@ -1,0 +1,26 @@
+.res RES_TAB_ICON_COLORS
+.image "TabIconColors.png"
+
+.res RES_TAB_ICON_COLORS_ANDROID
+.image "TabIconColors_Android.png"
+
+.res RES_TAB_ICON_CUBE
+.image "TabIconCube.png"
+
+.res RES_TAB_ICON_CUBE_ANDROID
+.image "TabIconCube_Android.png"
+
+.res RES_TAB_ICON_IMAGE_SWIPER
+.image "TabIconImageSwiper.png"
+
+.res RES_TAB_ICON_IMAGE_SWIPER_ANDROID
+.image "TabIconImageSwiper_Android.png"
+
+.res RES_TAB_ICON_SETTINGS
+.image "TabIconSettings.png"
+
+.res RES_TAB_ICON_WEB_VIEW
+.image "TabIconWebView.png"
+
+.res RES_TAB_ICON_WEB_VIEW_ANDROID
+.image "TabIconWebView_Android.png"
