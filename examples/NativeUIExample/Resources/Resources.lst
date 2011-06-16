@@ -42,14 +42,17 @@
 
 .res RES_IMAGE1_SMALL
 .ubin
+.pstring "Image 1"
 .include "small/Image1.png"
 
 .res RES_IMAGE2_SMALL
 .ubin
+.pstring "Image 2"
 .include "small/Image2.png"
 
 .res RES_IMAGE3_SMALL
 .ubin
+.pstring "Image 3"
 .include "small/Image3.png"
 
 .res RES_LAST_IMAGE_SMALL
@@ -73,6 +76,13 @@
 .res RES_LAST_IMAGE_MEDIUM
 .placeholder
 
+.res RES_TXTS_MEDIUM
+.bin
+.byte    3
+.pstring "Image 1"
+.pstring "Image 2"
+.pstring "Image 3"
+
 .res RES_FIRST_IMAGE_LARGE
 .placeholder
 
@@ -90,6 +100,13 @@
 
 .res RES_LAST_IMAGE_LARGE
 .placeholder
+
+.res RES_TXTS_LARGE
+.bin
+.byte    3
+.pstring "Image 1"
+.pstring "Image 2"
+.pstring "Image 3"
 
 .res RES_IMAGE_TEX
 .image "ImageTex.png"

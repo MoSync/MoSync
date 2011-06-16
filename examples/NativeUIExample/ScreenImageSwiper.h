@@ -35,6 +35,8 @@ MA 02110-1301, USA.
 /*
  * DEFINES
  */
+#define ABS(a)	   						(((a) < 0) ? -(a) : (a))
+
 #define SMALL_SCREEN_RESOLUTION			320
 #define MEDIUM_SCREEN_RESOLUTION		480
 #define LARGE_SCREEN_RESOLUTION			1024
@@ -44,6 +46,10 @@ MA 02110-1301, USA.
 #define SCREEN_BG_COLOR					0xF0F0F0
 #define LABEL_BG_COLOR					0x111111
 #define FONT_COLOR						0xFFFFFF
+
+#define SHADOW_ALPHA					"0.2"
+
+#define TITLE_WIDGET_HEIGHT				30
 /*
  * DEFINES
  */
@@ -60,6 +66,10 @@ public:
 	int posX;
 	int posY;
 	int width;
+
+	MAUtil::String name;
+
+	RelativeLayout* shadow;
 
 	void setResource()
 	{
@@ -85,7 +95,7 @@ public:
 	~ScreenImageSwiper();
 
 	/*
-	 * Create the UI for Swiper Screen.
+	 * Create the UI for the image swiper screen.
 	 */
 	void createUI();
 
@@ -118,6 +128,12 @@ private:
 	RelativeLayout* imagesLayout;
 	Label* labelLayout;
 
+	/**
+	 * A simple navigation bar for iOS devices.
+	 * It is used only for displaying a text(the title of the screen).
+	 */
+	NavigationBar* mTitleWidget;
+
 	ScreenImage** images;
 	int imagesSize;
 
@@ -128,7 +144,15 @@ private:
 
 	void loadImages(int screenWidth);
 
-	//bool readString(int resID, int pos, MAUtil::String &result);
+	/*
+	 * Read the only string from one string resource.
+	 * @param resID A valid resource id.
+	 * @param pos The start position.
+	 * @param output The resulting string.
+	 */
+	bool readStringFromResource(MAHandle resID, int& pos, MAUtil::String &output) const;
+
+	Image* createBackgroundGradient();
 };
 
 #endif
