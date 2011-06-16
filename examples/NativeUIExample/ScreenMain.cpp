@@ -43,7 +43,7 @@ public:
 	{
 		mColorScreen = ScreenColorList::create();
 		Screen* webScreen = ScreenWebView::create();
-		Screen* imageScreen = ScreenImageSwiper::create();
+		imageScreen = ScreenImageSwiper::create();
 
 		this->addTab(mColorScreen);
 		this->addTab(webScreen);
@@ -97,9 +97,48 @@ public:
 		}
 	}
 
+	/**
+	 * Handle pointer presses.
+	 */
+	void handlePointerPressed(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerPressed(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer moves.
+	 */
+	void handlePointerMoved(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerMoved(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer releases.
+	 */
+	void handlePointerReleased(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerReleased(p);
+				break;
+		}
+	}
 private:
 	int mCurrentTabIndex;
 	StackScreen* mColorScreen;
+	Screen* imageScreen;
 };
 
 /**
