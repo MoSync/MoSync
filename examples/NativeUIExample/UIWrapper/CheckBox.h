@@ -17,16 +17,17 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file TabScreen.h
- * @author Niklas Nummelin & Mikael Kindborg
+ * @file CheckBox.h
+ * @author Emma Tresanszki
  *
- * Class that represents a screen with tabs.
+ * Class for check boxes. Create a check box instance by
+ * using the WidgetManager.
  */
 
-#ifndef MOSYNC_UI_TABSCREEN_H_
-#define MOSYNC_UI_TABSCREEN_H_
+#ifndef MOSYNC_UI_CHECKBOX_H_
+#define MOSYNC_UI_CHECKBOX_H_
 
-#include "Screen.h"
+#include "Widget.h"
 
 namespace MoSync
 {
@@ -34,42 +35,32 @@ namespace MoSync
 	{
 
 	/**
-	 * Class that represents a tab screen.
+	 * Class for check boxes.
 	 */
-	class TabScreen : public Screen
+	class CheckBox : public Widget
 	{
 	public:
 		/**
 		 * Constructor.
 		 */
-		TabScreen();
+		CheckBox();
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~TabScreen();
+		virtual ~CheckBox();
 
-		/**
-		 * Add a new tab with a screen in it.
-		 * @param screen The screen shown in the new tab.
+		/*
+		 * Sets the current check box state.
+		 * @param checkboxState The current state.
 		 */
-		virtual void addTab(Screen* screen);
+		virtual void setCheckedState(bool checkboxState);
 
-		/**
-		 * Show a given tab.
-		 * @param index The index of the tab to show.
-		 * Index starts at zero.
+		/*
+		 * Gets the current check box state.
+		 * @return The check box state.
 		 */
-		virtual void setActiveTab(int index);
-
-		/**
-		 * Returns the index of the current tab.
-		 * Index starts at zero.
-		 */
-		virtual int getActiveTab();
-
-		// TODO: Add a Vector that keeps track of the tabs and
-		// deletes them in the destructor. Is this the right way?
+		virtual bool getCheckedState();
 	};
 
 	} // namespace UI

@@ -36,7 +36,7 @@ namespace MoSync
 		// Set some common default values to
 		// simplify when creating list views.
 		this->fillSpaceHorizontally();
-		this->fillSpaceVertically();
+		this->wrapContentVertically();
 	}
 
 	/**

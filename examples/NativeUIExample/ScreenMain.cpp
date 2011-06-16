@@ -43,8 +43,8 @@ public:
 	{
 		mColorScreen = ScreenColorList::create();
 		Screen* webScreen = ScreenWebView::create();
-		Screen* imageScreen = ScreenImageSwiper::create();
-		Screen* cubeScreen = ScreenSpinningCube::create();
+		imageScreen = ScreenImageSwiper::create();
+		cubeScreen = ScreenSpinningCube::create();
 		mSettingsScreen = ScreenSettings::create();
 
 		this->addTab(mColorScreen);
@@ -93,8 +93,58 @@ public:
 		}
 	}
 
+	/**
+	 * Handle pointer presses.
+	 */
+	void handlePointerPressed(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerPressed(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerPressed(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer moves.
+	 */
+	void handlePointerMoved(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerMoved(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerMoved(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer releases.
+	 */
+	void handlePointerReleased(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerReleased(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerReleased(p);
+				break;
+		}
+	}
+
 private:
 	StackScreen* mColorScreen;
+	Screen* imageScreen;
+	Screen* cubeScreen;
 	Screen* mSettingsScreen;
 	Screen* mVisibleScreen;
 };
@@ -109,8 +159,8 @@ public:
 	{
 		Screen* colorScreen = ScreenColorList::create();
 		Screen* webScreen = ScreenWebView::create();
-		Screen* imageScreen = ScreenImageSwiper::create();
-		Screen* cubeScreen = ScreenSpinningCube::create();
+		imageScreen = ScreenImageSwiper::create();
+		cubeScreen = ScreenSpinningCube::create();
 		Screen* settingsScreen = ScreenSettings::create();
 
 		this->addTab(colorScreen);
@@ -132,6 +182,58 @@ public:
 			maExit(0);
 		}
 	}
+
+	/**
+	 * Handle pointer presses.
+	 */
+	void handlePointerPressed(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerPressed(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerPressed(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer moves.
+	 */
+	void handlePointerMoved(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerMoved(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerMoved(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer releases.
+	 */
+	void handlePointerReleased(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerReleased(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerReleased(p);
+				break;
+		}
+	}
+
+private:
+	Screen* imageScreen;
+	Screen* cubeScreen;
 };
 
 /**

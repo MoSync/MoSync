@@ -38,7 +38,8 @@ Screen* ScreenSpinningCube::create()
 
 ScreenSpinningCube::ScreenSpinningCube():
 	mGlViewInitialized(false),
-	mXRotation(0), mYRotation(0), mZRotation(0)
+	mXRotation(0), mYRotation(0), mZRotation(0),
+	mXDirection(0), mYDirection(0)
 {
 }
 
@@ -280,9 +281,9 @@ void ScreenSpinningCube::drawGLScene()
 	//Flush all drawings.
 	glFinish();
 
-	mXRotation += 0.5f;//mXDirection; /* X Axis Rotation */
-	mYRotation += 0.5f;//mYDirection; /* Y Axis Rotation */
-	mZRotation += 0.5f; /* Z Axis Rotation */
+	mXRotation += mXDirection / 100; /* X Axis Rotation */
+	mYRotation += mYDirection / 100; /* Y Axis Rotation */
+	//mZRotation += 0.5f; /* Z Axis Rotation */
 
 	//Commit the changes to GLView.
 	mGLViewWidget->setProperty(MAW_GL_VIEW_INVALIDATE, "");
@@ -338,6 +339,33 @@ void ScreenSpinningCube::handleWidgetEvent(Widget* widget, MAWidgetEventData* wi
 		//Record that the GLView has been initialized.
 		mGlViewInitialized = true;
 	}
+}
+
+/**
+ * Handle pointer presses.
+ */
+void ScreenSpinningCube::handlePointerPressed(MAPoint2d p)
+{
+	mXPointer = p.x;
+	mYPointer = p.y;
+}
+
+/**
+ * Handle pointer moves.
+ */
+void ScreenSpinningCube::handlePointerMoved(MAPoint2d p)
+{
+	mXDirection = p.y - mYPointer;
+	mYDirection = p.x - mXPointer;
+}
+
+/**
+ * Handle pointer releases.
+ */
+void ScreenSpinningCube::handlePointerReleased(MAPoint2d p)
+{
+	mXDirection = 0;
+	mYDirection = 0;
 }
 
 void ScreenSpinningCube::toggleBlending(bool blend)

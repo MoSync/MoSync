@@ -35,16 +35,11 @@ MA 02110-1301, USA.
 /*
  * DEFINES
  */
-#define LEFT_IMAGE				0
-#define CENTER_IMAGE			1
-#define RIGHT_IMAGE				2
-#define DISPLAYED_IMAGES		3
-
 #define SMALL_SCREEN_RESOLUTION			320
 #define MEDIUM_SCREEN_RESOLUTION		480
 #define LARGE_SCREEN_RESOLUTION			1024
 
-#define SHADOW_OFFSET					5
+//#define SHADOW_OFFSET					5
 /*
  * DEFINES
  */
@@ -57,13 +52,19 @@ struct ResImage
 	MAUtil::String text;
 };
 
-struct ScreenImage
+class ScreenImage : public Image
 {
-	Image* image;
-	RelativeLayout* shadow;
+public:
+	MAHandle handle;
+	//RelativeLayout* shadow;
 	int posX;
 	int posY;
-	int index;
+	int width;
+
+	void setResource()
+	{
+		Image::setResource(handle);
+	}
 };
 
 /**
@@ -71,19 +72,6 @@ struct ScreenImage
  */
 class ScreenImageSwiper : public Screen
 {
-private:
-	int mScreenWidth;
-	int mScreenHeight;
-
-	VerticalLayout* mainLayout;
-	RelativeLayout* imagesLayout;
-	Label* labelLayout;
-
-	ResImage* images;
-	ScreenImage* imageWidgets;
-	int imagesSize;
-	int currentImage;
-
 public:
 
 	/*
@@ -98,7 +86,36 @@ public:
 	 */
 	static Screen* create();
 
+	/**
+	 * Handle pointer presses.
+	 */
+	void handlePointerPressed(MAPoint2d p);
+
+	/**
+	 * Handle pointer moves.
+	 */
+	void handlePointerMoved(MAPoint2d p);
+
+	/**
+	 * Handle pointer releases.
+	 */
+	void handlePointerReleased(MAPoint2d p);
+
 private:
+	int mScreenWidth;
+	int mScreenHeight;
+
+	VerticalLayout* mainLayout;
+	RelativeLayout* imagesLayout;
+	Label* labelLayout;
+
+	ScreenImage** images;
+	int imagesSize;
+	int currentImage;
+
+	// pointer X coordinate on screen
+	int mPointerX;
+
 	void getScreenSize();
 
 	void loadImages(int screenWidth);

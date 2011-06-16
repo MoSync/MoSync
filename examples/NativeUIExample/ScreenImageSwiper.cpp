@@ -39,7 +39,6 @@ Screen* ScreenImageSwiper::create()
 ScreenImageSwiper::ScreenImageSwiper() :
 	currentImage(0)
 {
-	imageWidgets = new ScreenImage[DISPLAYED_IMAGES];
 }
 
 void ScreenImageSwiper::createUI()
@@ -63,71 +62,33 @@ void ScreenImageSwiper::createUI()
 
 	loadImages(mScreenWidth);
 
-	MAExtent size = maGetImageSize(images[0].handle);
+	MAExtent size = maGetImageSize(images[0]->handle);
 
 	int imageWidth = mScreenWidth - (mScreenWidth / 3) - mScreenWidth / 6;
 	int imageHeight = imageWidth * EXTENT_Y(size) / EXTENT_X(size);
-	//leftImage
-	imageWidgets[LEFT_IMAGE].index = 0;
-	imageWidgets[LEFT_IMAGE].posX = mScreenWidth / 6 - imageWidth - mScreenWidth / 12;
-	imageWidgets[LEFT_IMAGE].posY = mScreenHeight / 5;
 
-	imageWidgets[LEFT_IMAGE].shadow = new RelativeLayout();
-	imageWidgets[LEFT_IMAGE].shadow->setBackgroundColor(0);
-	imageWidgets[LEFT_IMAGE].shadow->setProperty(MAW_WIDGET_ALPHA, "0.2");
-	imageWidgets[LEFT_IMAGE].shadow->setSize(imageWidth, imageHeight);
-	imageWidgets[LEFT_IMAGE].shadow->setPosition(imageWidgets[LEFT_IMAGE].posX + SHADOW_OFFSET, imageWidgets[LEFT_IMAGE].posY + SHADOW_OFFSET);
+	int startX = mScreenWidth / 6 - imageWidth - mScreenWidth / 12;
+	for (int i=0; i<imagesSize; i++)
+	{
+		images[i]->posX = startX;
+		images[i]->posY = mScreenHeight / 5;
+		images[i]->width = imageWidth;
 
-	imagesLayout->addChild(imageWidgets[LEFT_IMAGE].shadow);
+//		imageWidgets[LEFT_IMAGE].shadow = new RelativeLayout();
+//		imageWidgets[LEFT_IMAGE].shadow->setBackgroundColor(0);
+//		imageWidgets[LEFT_IMAGE].shadow->setProperty(MAW_WIDGET_ALPHA, "0.2");
+//		imageWidgets[LEFT_IMAGE].shadow->setSize(imageWidth, imageHeight);
+//		imageWidgets[LEFT_IMAGE].shadow->setPosition(imageWidgets[LEFT_IMAGE].posX + SHADOW_OFFSET, imageWidgets[LEFT_IMAGE].posY + SHADOW_OFFSET);
+//
+//		imagesLayout->addChild(imageWidgets[LEFT_IMAGE].shadow);
 
-	imageWidgets[LEFT_IMAGE].image = new Image();
-	imageWidgets[LEFT_IMAGE].image->setResource(images[imageWidgets[LEFT_IMAGE].index].handle);
-	imageWidgets[LEFT_IMAGE].image->setSize(imageWidth, imageHeight);
-	imageWidgets[LEFT_IMAGE].image->setPosition(imageWidgets[LEFT_IMAGE].posX, imageWidgets[LEFT_IMAGE].posY);
+		images[i]->setResource();
+		images[i]->setSize(imageWidth, imageHeight);
+		images[i]->setPosition(images[i]->posX, images[i]->posY);
 
-	imagesLayout->addChild(imageWidgets[LEFT_IMAGE].image);
-
-	//centerImage
-	imageWidgets[CENTER_IMAGE].index = 1;
-	imageWidgets[CENTER_IMAGE].posX = mScreenWidth / 6 + mScreenWidth / 12;
-	imageWidgets[CENTER_IMAGE].posY = mScreenHeight / 5;
-
-	imageWidgets[CENTER_IMAGE].shadow = new RelativeLayout();
-	imageWidgets[CENTER_IMAGE].shadow->setBackgroundColor(0);
-	imageWidgets[CENTER_IMAGE].shadow->setProperty(MAW_WIDGET_ALPHA, "0.2");
-	imageWidgets[CENTER_IMAGE].shadow->setSize(imageWidth, imageHeight);
-	imageWidgets[CENTER_IMAGE].shadow->setPosition(imageWidgets[CENTER_IMAGE].posX + SHADOW_OFFSET, imageWidgets[CENTER_IMAGE].posY + SHADOW_OFFSET);
-
-	imagesLayout->addChild(imageWidgets[CENTER_IMAGE].shadow);
-
-	imageWidgets[CENTER_IMAGE].image = new Image();
-	imageWidgets[CENTER_IMAGE].image->setResource(images[imageWidgets[CENTER_IMAGE].index].handle);
-	imageWidgets[CENTER_IMAGE].image->setSize(imageWidth, imageHeight);
-
-	imageWidgets[CENTER_IMAGE].image->setPosition(imageWidgets[CENTER_IMAGE].posX, imageWidgets[CENTER_IMAGE].posY);
-
-	imagesLayout->addChild(imageWidgets[CENTER_IMAGE].image);
-
-	//rightImage
-	imageWidgets[RIGHT_IMAGE].index = 2;
-	imageWidgets[RIGHT_IMAGE].posX = mScreenWidth - mScreenWidth / 12;
-	imageWidgets[RIGHT_IMAGE].posY = mScreenHeight / 5;
-
-	imageWidgets[RIGHT_IMAGE].shadow = new RelativeLayout();
-	imageWidgets[RIGHT_IMAGE].shadow->setBackgroundColor(0);
-	imageWidgets[RIGHT_IMAGE].shadow->setProperty(MAW_WIDGET_ALPHA, "0.2");
-	imageWidgets[RIGHT_IMAGE].shadow->setSize(imageWidth, imageHeight);
-	imageWidgets[RIGHT_IMAGE].shadow->setPosition(imageWidgets[RIGHT_IMAGE].posX + SHADOW_OFFSET, imageWidgets[RIGHT_IMAGE].posY + SHADOW_OFFSET);
-
-	imagesLayout->addChild(imageWidgets[RIGHT_IMAGE].shadow);
-
-	imageWidgets[RIGHT_IMAGE].image = new Image();
-	imageWidgets[RIGHT_IMAGE].image->setResource(images[imageWidgets[RIGHT_IMAGE].index].handle);
-	imageWidgets[RIGHT_IMAGE].image->setSize(imageWidth, imageHeight);
-
-	imageWidgets[RIGHT_IMAGE].image->setPosition(imageWidgets[RIGHT_IMAGE].posX, imageWidgets[RIGHT_IMAGE].posY);
-
-	imagesLayout->addChild(imageWidgets[RIGHT_IMAGE].image);
+		imagesLayout->addChild(images[i]);
+		startX += imageWidth + mScreenWidth / 6;
+	}
 
 	labelLayout = new Label();
 	labelLayout->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, mScreenHeight / 10);
@@ -173,14 +134,61 @@ void ScreenImageSwiper::loadImages(int screenWidth)
 		lastImage = RES_LAST_IMAGE_MEDIUM;
 	}
 	imagesSize = lastImage - firstImage - 1;
-	images = new ResImage[imagesSize];
+	images = new ScreenImage*[imagesSize];
 	for (int i = 0; i < imagesSize; i++)
 	{
+		images[i] = new ScreenImage();
 		int resID = firstImage + i + 1;
-		images[i].handle = maCreatePlaceholder();
-		int ret = maCreateImageFromData(images[i].handle, resID, 0, maGetDataSize(resID));
+		images[i]->handle = maCreatePlaceholder();
+		maCreateImageFromData(images[i]->handle, resID, 0, maGetDataSize(resID));
 		//readString(resID + 1, 0, images[i].text);
 	}
+}
+
+/**
+ * Handle pointer presses.
+ */
+void ScreenImageSwiper::handlePointerPressed(MAPoint2d p)
+{
+	mPointerX = p.x;
+}
+
+/**
+ * Handle pointer moves.
+ */
+void ScreenImageSwiper::handlePointerMoved(MAPoint2d p)
+{
+	int offset = p.x - mPointerX;
+
+	if (offset < 0)
+	{
+		if (images[imagesSize - 1]->posX + images[imagesSize - 1]->width < mScreenWidth)
+		{
+			return;
+		}
+	}
+	else
+	{
+		if (images[0]->posX > 0)
+		{
+			return;
+		}
+	}
+
+	for (int i=0; i<imagesSize; i++)
+	{
+		images[i]->posX += offset;
+
+		images[i]->setPosition(images[i]->posX, images[i]->posY);
+	}
+	mPointerX = p.x;
+}
+
+/**
+ * Handle pointer releases.
+ */
+void ScreenImageSwiper::handlePointerReleased(MAPoint2d p)
+{
 }
 
 //bool ScreenImageSwiper::readString(int resID, int pos, MAUtil::String &result)

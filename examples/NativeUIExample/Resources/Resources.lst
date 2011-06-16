@@ -34,10 +34,10 @@
 .res RES_WEB_VIEW_IMAGE_HIDE_IMAGE
 .image "WebViewHideNavBar.png"
 
-.res RES_FIRST_IMAGE_SMALL
-.placeholder
+.res RES_SETTINGS_VIEW_RESET_IMAGE
+.image "ImageSettingsReset.png"
 
-.res RES_IMAGE1_SMALL
+.res RES_FIRST_IMAGE_SMALL.placeholder.res RES_IMAGE1_SMALL
 .ubin
 .include "small/Image1.png"
 

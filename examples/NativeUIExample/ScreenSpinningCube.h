@@ -37,24 +37,6 @@ using namespace MoSync::UI;
  */
 class ScreenSpinningCube : public Screen, public WidgetEventListener, public MAUtil::TimerListener
 {
-private:
-	bool mGlViewInitialized;
-	GLfloat mXRotation;
-	GLfloat mYRotation;
-	GLfloat mZRotation;
-
-	GLfloat mXDirection;
-	GLfloat mYDirection;
-
-	GLuint	mTextureHandle;
-
-	GLView* mGLViewWidget;
-	VerticalLayout* mGLViewLayout;
-
-	static const GLfloat mLightAmbient[];
-	static const GLfloat mLightDiffuse[];
-	static const GLfloat mLightPosition[];
-
 public:
 	/**
 	 * Creates the screen object.
@@ -78,14 +60,82 @@ public:
 	 */
 	static void toggleBlending(bool blend);
 
+	/**
+	 * Handle pointer presses.
+	 */
+	void handlePointerPressed(MAPoint2d p);
+
+	/**
+	 * Handle pointer moves.
+	 */
+	void handlePointerMoved(MAPoint2d p);
+
+	/**
+	 * Handle pointer releases.
+	 */
+	void handlePointerReleased(MAPoint2d p);
+
 private:
+	/*
+	 * Keeps track if the open GL view was initialized.
+	 */
+	bool mGlViewInitialized;
+
+	/*
+	 * Rotation values along the three axes.
+	 */
+	GLfloat mXRotation;
+	GLfloat mYRotation;
+	GLfloat mZRotation;
+
+	/*
+	 * Direction values used to rotate the object.
+	 */
+	GLfloat mXDirection;
+	GLfloat mYDirection;
+
+	/*
+	 * The handle for the cube's texture.
+	 */
+	GLuint	mTextureHandle;
+
+	/*
+	 * The OpenGL Widget.
+	 */
+	GLView* mGLViewWidget;
+
+	/*
+	 * The main Layout in OpenGL screen.
+	 */
+	VerticalLayout* mGLViewLayout;
+
+	/*
+	 * Values for ambient light.
+	 */
+	static const GLfloat mLightAmbient[];
+	/*
+	 * Values for diffuse light.
+	 */
+	static const GLfloat mLightDiffuse[];
+
+	/*
+	 * The position of the light source.
+	 */
+	static const GLfloat mLightPosition[];
+
+	/*
+	 * The last coordinates of pointer pressed/moved.
+	 */
+	int mXPointer;
+	int mYPointer;
+
 	/*
 	 * Constructor
 	 */
 	ScreenSpinningCube();
 
 	/*
-	 *
+	 * Creates the UI for Spinning Cube screen.
 	 */
 	void createUI();
 

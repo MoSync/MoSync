@@ -17,16 +17,17 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file TabScreen.h
- * @author Niklas Nummelin & Mikael Kindborg
+ * @file NavigationBar.h
+ * @author Emma Tresanszki
  *
- * Class that represents a screen with tabs.
+ * Class for navigation bars. Create a navigation bar instance by
+ * using the WidgetManager.
+ * This widget is available only on iOS.
  */
+#ifndef MOSYNC_UI_NAVIGATIONBAR_H_
+#define MOSYNC_UI_NAVIGATIONBAR_H_
 
-#ifndef MOSYNC_UI_TABSCREEN_H_
-#define MOSYNC_UI_TABSCREEN_H_
-
-#include "Screen.h"
+#include "Widget.h"
 
 namespace MoSync
 {
@@ -34,42 +35,33 @@ namespace MoSync
 	{
 
 	/**
-	 * Class that represents a tab screen.
+	 * Class for navigation bars.
+	 * Available only on iOS.
 	 */
-	class TabScreen : public Screen
+	class NavigationBar : public Widget
 	{
 	public:
 		/**
 		 * Constructor.
 		 */
-		TabScreen();
+		NavigationBar();
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~TabScreen();
+		virtual ~NavigationBar();
 
-		/**
-		 * Add a new tab with a screen in it.
-		 * @param screen The screen shown in the new tab.
+		/*
+		 * Sets the title of the nav bar.
+		 * @param title A null terminated string.
 		 */
-		virtual void addTab(Screen* screen);
+		virtual void setTitle(const MAUtil::String& title);
 
-		/**
-		 * Show a given tab.
-		 * @param index The index of the tab to show.
-		 * Index starts at zero.
+		/*
+		 * Sets the title of the back button.
+		 * @param title A null terminated string.
 		 */
-		virtual void setActiveTab(int index);
-
-		/**
-		 * Returns the index of the current tab.
-		 * Index starts at zero.
-		 */
-		virtual int getActiveTab();
-
-		// TODO: Add a Vector that keeps track of the tabs and
-		// deletes them in the destructor. Is this the right way?
+		virtual void setBackButtonTitle(const MAUtil::String& title);
 	};
 
 	} // namespace UI

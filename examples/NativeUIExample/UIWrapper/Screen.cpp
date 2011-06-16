@@ -98,6 +98,31 @@ namespace MoSync
 		maWidgetScreenShow(getWidgetHandle());
 	}
 
+	/**
+	 * Handle pointer presses.
+	 */
+	void Screen::handlePointerPressed(MAPoint2d p)
+	{
+
+	}
+
+	/**
+	 * Handle pointer moves.
+	 */
+	void Screen::handlePointerMoved(MAPoint2d p)
+	{
+
+	}
+
+	/**
+	 * Handle pointer releases.
+	 */
+	void Screen::handlePointerReleased(MAPoint2d p)
+	{
+
+	}
+
+
 	} // namespace UI
 } // namespace MoSync
 
