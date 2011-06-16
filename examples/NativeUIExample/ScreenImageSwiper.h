@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 #ifndef SCREEN_IMAGE_SWIPER_H_
 #define SCREEN_IMAGE_SWIPER_H_
 
+#include <MAUtil/String.h>
 #include "UIWrapper/Widgets.h"
 #include "MAHeaders.h"
 
@@ -38,43 +39,71 @@ MA 02110-1301, USA.
 #define CENTER_IMAGE			1
 #define RIGHT_IMAGE				2
 #define DISPLAYED_IMAGES		3
+
+#define SMALL_SCREEN_RESOLUTION			320
+#define MEDIUM_SCREEN_RESOLUTION		480
+#define LARGE_SCREEN_RESOLUTION			1024
+
+#define SHADOW_OFFSET					5
 /*
  * DEFINES
  */
 
 using namespace MoSync::UI;
 
+struct ResImage
+{
+	MAHandle handle;
+	MAUtil::String text;
+};
+
+struct ScreenImage
+{
+	Image* image;
+	RelativeLayout* shadow;
+	int posX;
+	int posY;
+	int index;
+};
+
 /**
  * TODO: Add comment.
  */
-class ScreenImageSwiper : public WidgetEventListener
+class ScreenImageSwiper : public Screen
 {
 private:
-	static int mScreenWidth;
-	static int mScreenHeight;
+	int mScreenWidth;
+	int mScreenHeight;
 
-//	static ScreenImageSwiper* sInstance;
-//
-//	VerticalLayout* mainLayout;
-//	HorizontalLayout* imagesLayout;
-//	Label* labelLayout;
+	VerticalLayout* mainLayout;
+	RelativeLayout* imagesLayout;
+	Label* labelLayout;
+
+	ResImage* images;
+	ScreenImage* imageWidgets;
+	int imagesSize;
+	int currentImage;
+
 public:
+
+	/*
+	 * Constructor
+	 */
+	ScreenImageSwiper();
+
+	void createUI();
+
 	/**
 	 * TODO: Add comment.
 	 */
 	static Screen* create();
 
-	/**
-	 * This method is called when there is an event for this widget.
-	 * @param widget The widget object of the event.
-	 * @param widgetEventData The low-level event data.
-	 */
-	void handleWidgetEvent(
-		Widget* widget,
-		MAWidgetEventData* widgetEventData);
-
 private:
-	static void getScreenSize();
+	void getScreenSize();
+
+	void loadImages(int screenWidth);
+
+	//bool readString(int resID, int pos, MAUtil::String &result);
 };
 
 #endif

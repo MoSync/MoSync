@@ -35,7 +35,7 @@ using namespace MoSync::UI;
 /**
  * TODO: Add comment.
  */
-class ScreenSpinningCube : public WidgetEventListener, public MAUtil::TimerListener
+class ScreenSpinningCube : public Screen, public WidgetEventListener, public MAUtil::TimerListener
 {
 private:
 	bool mGlViewInitialized;
@@ -51,15 +51,13 @@ private:
 	GLView* mGLViewWidget;
 	VerticalLayout* mGLViewLayout;
 
-	static ScreenSpinningCube* sInstance;
-
 	static const GLfloat mLightAmbient[];
 	static const GLfloat mLightDiffuse[];
 	static const GLfloat mLightPosition[];
 
 public:
 	/**
-	 * TODO: Add comment.
+	 * Creates the screen object.
 	 */
 	static Screen* create();
 
@@ -75,6 +73,9 @@ public:
 	 */
 	void handleWidgetEvent(Widget* widget, MAWidgetEventData* widgetEventData);
 
+	/*
+	 * Toggles alpha blending for the spinning cube.
+	 */
 	static void toggleBlending(bool blend);
 
 private:
@@ -82,6 +83,11 @@ private:
 	 * Constructor
 	 */
 	ScreenSpinningCube();
+
+	/*
+	 *
+	 */
+	void createUI();
 
 	/*
 	 * Method for initializing open gl
