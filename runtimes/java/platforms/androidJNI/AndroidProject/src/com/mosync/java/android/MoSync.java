@@ -95,7 +95,7 @@ public class MoSync extends Activity
 		// MoSync Android apps do not have a system title bar.
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		
-		// Default screen orientation is landscape mode.
+		// Default screen orientation is portrait mode.
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 		
 		try

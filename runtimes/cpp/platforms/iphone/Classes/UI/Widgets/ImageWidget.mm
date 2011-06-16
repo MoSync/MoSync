@@ -46,7 +46,7 @@
 			[imageView removeFromSuperview];
 
 		imageView = [[UIImageView alloc] initWithImage:image];	
-		[imageView sizeToFit];
+		//[imageView sizeToFit];
 		[view addSubview:imageView];
 		[self layout];
 	}

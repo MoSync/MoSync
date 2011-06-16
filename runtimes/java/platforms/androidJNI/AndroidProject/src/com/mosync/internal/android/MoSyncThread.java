@@ -234,8 +234,19 @@ public class MoSyncThread extends Thread
 	Paint mPaint = new Paint();
 	Paint mBlitPaint = new Paint();
 
+	/**
+	 * Height (ascent + descent) of text in the default console font.
+	 */
 	int mTextConsoleHeight;
 	
+	/**
+	 * Ascent of text in the default console font.
+	 */
+	int mTextConsoleAscent;
+	
+	/**
+	 * Rectangle that is used to get the extent of a text string.
+	 */
 	Rect mTextSizeRect = new Rect();
 
 	// Rectangle objects used for drawing in maDrawImageRegion().
@@ -709,11 +720,19 @@ public class MoSyncThread extends Thread
 		// Generates a default text height used for console text writing.
 		// This is used so that all text which is printed to the console
 		// gets the same text height.
-		int extent = maGetTextSize(
-			"abcdefghijklmnopqrstuvwxyz" +
-			"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
-		mTextConsoleHeight = EXTENT_Y(extent);
-
+		// Old code:
+		//int extent = maGetTextSize(
+		//	"abcdefghijklmnopqrstuvwxyz" +
+		//	"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
+		//mTextConsoleHeight = EXTENT_Y(extent);
+		
+		// New code uses font metrics. Ascent is a negative number,
+		// thus multiplying by -1 to get a positive number.
+		Paint.FontMetricsInt fontMetrics =
+			new Paint.FontMetricsInt();
+		mPaint.getFontMetricsInt(fontMetrics);
+		mTextConsoleHeight = -1 * fontMetrics.ascent + fontMetrics.descent;
+		mTextConsoleAscent = -1 * fontMetrics.ascent;
 	}
 
 	/**
@@ -888,12 +907,12 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Gets the height in pixels of the string.
+	 * Gets the width and height in pixels of the string.
 	 *
-	 * Calculates the height in pixels of this string, as it's gonna 
+	 * Calculates the size pixels of this string, as it's gonna 
 	 * be drawn to the screen.
 	 *
-	 * @param str The string which the height should be calculated from.
+	 * @param str The string which should be calculated.
 	 *
 	 * @return the height in pixels.
 	 */
@@ -903,16 +922,20 @@ public class MoSyncThread extends Thread
 		
 		mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 		
-		return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
+		// Old code:
+		// return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
+		
+		// The new implementation uses a constant text height.
+		return EXTENT(mTextSizeRect.width(), mTextConsoleHeight);
 	}
 
 	/**
-	 * Gets the height in pixels of the string.
+	 * Gets the width and height in pixels of the string.
 	 *
-	 * Calculates the height in pixels of this string, as it's gonna 
+	 * Calculates the size in pixels of this string, as it's gonna 
 	 * be drawn to the screen.
 	 *
-	 * @param str The string which the height should be calculated from.
+	 * @param str The string which should be calculated.
 	 *
 	 * @return the height in pixels.
 	 */
@@ -922,7 +945,11 @@ public class MoSyncThread extends Thread
 		
 		mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 		
-		return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
+		// Old code:
+		// return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
+		
+		// The new implementation uses a constant text height.
+		return EXTENT(mTextSizeRect.width(), mTextConsoleHeight);
 	}
 
 	/**
@@ -935,7 +962,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maDrawText");
 		
-		mCanvas.drawText(str, left, top+mTextConsoleHeight, mPaint);
+		mCanvas.drawText(str, left, top + mTextConsoleAscent, mPaint);
 	}
 
 	/**
@@ -948,7 +975,7 @@ public class MoSyncThread extends Thread
 	{
 	 	SYSLOG("maDrawTextW");
 		
-		mCanvas.drawText(str, left, top+mTextConsoleHeight, mPaint);
+		mCanvas.drawText(str, left, top + mTextConsoleAscent, mPaint);
 	}
 
 	/**
@@ -2285,7 +2312,7 @@ public class MoSyncThread extends Thread
 		if (MoSyncService.sNotificationId == notificationId)
 		{
 			// Remove the service notification.
-			MoSyncService.removeServceNotification(
+			MoSyncService.removeServiceNotification(
 				notificationId, (Activity) mContext);
 			
 			// Stop the service.

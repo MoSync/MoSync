@@ -6,6 +6,7 @@
 #import <OpenGLES/EAGLDrawable.h>
 
 #import "MoSyncGLView.h"
+#include "iphone_helpers.h"
 
 // hackety hack..
 void MoSync_AddTouchPressedEvent(int x, int y, int touchId);
@@ -58,6 +59,17 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
             return nil;
         }
         
+        /* Retina display support. This needs to be handled correctly for everything native ui...
+        int w, h;
+        getScreenResolution(w, h);
+        if (w == 640 && h == 960) // Retina display detected
+        {
+            // Set contentScale Factor to 2
+            self.contentScaleFactor = 2.0;
+            eaglLayer.contentsScale=2; //new line   
+        }  
+        */
+            
         animationInterval = 1.0 / 60.0;
 			
 		WorkingContext = nil;	
@@ -206,32 +218,28 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 
 
 - (void)startAnimation {
-   // self.animationTimer = [NSTimer scheduledTimerWithTimeInterval:animationInterval target:self selector:@selector(drawView) userInfo:nil repeats:YES];
+    //self.animationTimer = [NSTimer scheduledTimerWithTimeInterval:animationInterval target:self selector:@selector(drawView) userInfo:nil repeats:YES];
 }
 
 
 - (void)stopAnimation {
-  //  self.animationTimer = nil;
+    //self.animationTimer = nil;
 }
 
-
+/*
 - (void)setAnimationTimer:(NSTimer *)newTimer {
-   // [animationTimer invalidate];
-   // animationTimer = newTimer;
+   [animationTimer invalidate];
+   animationTimer = newTimer;
 }
 
-
-- (void)setAnimationInterval:(NSTimeInterval)interval {
-    
-	/*
+- (void)setAnimationInterval:(NSTimeInterval)interval {    
     animationInterval = interval;
     if (animationTimer) {
         [self stopAnimation];
         [self startAnimation];
     }
-	 */
 }
-
+*/
 
 - (void)dealloc {
     
@@ -244,12 +252,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
     [context release];  
     [super dealloc];
 }
-
 /*
-- (void)viewAppeared {
-	[touchHelper clearTouches];
-}
-
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 	for (UITouch *touch in touches) 
 	{

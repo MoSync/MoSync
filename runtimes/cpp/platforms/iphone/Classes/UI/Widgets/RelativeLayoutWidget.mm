@@ -23,8 +23,9 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 @implementation RelativeLayoutWidget
 
 - (id)init {	
-	view = [[[MoSyncUIScrollView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];	
-	[view setWidget:self];
+    MoSyncUIScrollView* scrollView = [[[MoSyncUIScrollView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];	;
+	view = scrollView;
+	[scrollView setWidget:self];
 	return [super init];	
 }
 

@@ -45,8 +45,10 @@
                     left = baseline - child.frame.size.width / 2;
                     break;
             }
-            child.frame = CGRectMake(left, top, child.frame.size.width,
-                                     child.frame.size.height);
+			
+			CGFloat childFrameWidth =  child.frame.size.width;
+			CGFloat childFrameHeight = child.frame.size.height;
+            child.frame = CGRectMake(left, top, childFrameWidth, childFrameHeight);
             top += child.frame.size.height;
         }
     }

@@ -107,13 +107,25 @@ namespace MAP
 		 */
 		MapSource* getMapSource( ) const { return mSource; }
 		void setMapSource( MapSource* source );
+		
 		/**
 		 * Center position property
 		 */
 		LonLat getCenterPosition( ) const;
-		void setCenterPosition( LonLat position, bool immediate, bool isPointerEvent );
-		void setCenterPosition( LonLat position, MagnificationType magnification, bool immediate, bool isPointerEvent );
+		
+		void setCenterPosition(
+			LonLat targetLonLat, 
+			bool immediate, 
+			bool isPointerEvent);
+			
+		void setCenterPosition(
+			LonLat targetLonLat, 
+			MagnificationType magnification, 
+			bool immediate, 
+			bool isPointerEvent);
+			
 		PixelCoordinate getCenterPositionPixels( ) const;
+		
 		/**
 		 * Magnification property
 		 */
@@ -203,10 +215,12 @@ namespace MAP
 			int viewportWidth = (int)floor(((double)mWidth / mScale));
 			return viewportWidth; 
 		}
+		
 		int getScaledHeight( ) const { 
 			int viewportHeight = (int)floor(((double)mHeight / mScale));
 			return viewportHeight;
 		}
+		
 		virtual void drawViewport( Point origin );
 
 		void beginZooming(const MAPoint2d& p1, const MAPoint2d& p2);
@@ -247,8 +261,9 @@ namespace MAP
 		double mMagnificationD;
 		double mLinearMagnificationStart;
 		int mZoomTime;
-		bool mZooming;
-		double mScale;
+		bool mZooming; // true if we are zooming.
+		double mScale; // TODO: Document this variable.
+		
 		//-------------------------------------------------------------------------
 	
 		//-------------------------------------------------------------------------
@@ -270,7 +285,7 @@ namespace MAP
 		MapSource* mSource;
 		MapViewportIdleListener* mIdleListener;
 		Font* mFont;
-		bool mHasTimer;
+		bool mHasTimer; // The timer is the idle listener.
 		bool mInDraw;
 		bool mShowPixelScale;
 		bool mShowHairlineCross;
