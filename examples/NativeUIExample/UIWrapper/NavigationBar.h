@@ -17,34 +17,54 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file ListView.cpp
+ * @file NavigationBar.h
  * @author Emma Tresanszki
  *
- * Class for list views.
+ * Class for navigation bars. Create a navigation bar instance by
+ * using the WidgetManager.
+ * This widget is available only on iOS.
  */
+#ifndef MOSYNC_UI_NAVIGATIONBAR_H_
+#define MOSYNC_UI_NAVIGATIONBAR_H_
 
-#include "ListView.h"
+#include "Widget.h"
 
 namespace MoSync
 {
 	namespace UI
 	{
 
-	ListView::ListView() :
-		Widget(MAW_LIST_VIEW)
-	{
-		// Set some common default values to
-		// simplify when creating list views.
-		this->fillSpaceHorizontally();
-		this->wrapContentVertically();
-	}
-
 	/**
-	 * Destructor.
+	 * Class for navigation bars.
+	 * Available only on iOS.
 	 */
-	ListView::~ListView()
+	class NavigationBar : public Widget
 	{
-	}
+	public:
+		/**
+		 * Constructor.
+		 */
+		NavigationBar();
+
+		/**
+		 * Destructor.
+		 */
+		virtual ~NavigationBar();
+
+		/*
+		 * Sets the title of the nav bar.
+		 * @param title A null terminated string.
+		 */
+		virtual void setTitle(const MAUtil::String& title);
+
+		/*
+		 * Sets the title of the back button.
+		 * @param title A null terminated string.
+		 */
+		virtual void setBackButtonTitle(const MAUtil::String& title);
+	};
 
 	} // namespace UI
 } // namespace MoSync
+
+#endif

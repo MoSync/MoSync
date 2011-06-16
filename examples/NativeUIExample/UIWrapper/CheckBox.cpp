@@ -17,47 +17,59 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file ImageButton.cpp
- * @author Bogdan Iusco
+ * @file CheckBox.cpp
+ * @author Emma Tresanszki
  *
- * Class for image buttons.
+ * Class for check boxes. Create a check box instance by
+ * using the WidgetManager.
  */
 
-#include "ImageButton.h"
+#include "CheckBox.h"
 
 namespace MoSync
 {
 	namespace UI
 	{
 
-	/**
-	 * Constructor.
-	 */
-	ImageButton::ImageButton() :
-		Widget(MAW_IMAGE_BUTTON)
+	CheckBox::CheckBox() :
+		Widget(MAW_CHECK_BOX)
 	{
 		// Set some common default values to
 		// simplify when creating buttons.
-		this->wrapContentHorizontally();
+//		this->fillSpaceHorizontally();
 		this->wrapContentVertically();
 	}
 
 	/**
 	 * Destructor.
 	 */
-	ImageButton::~ImageButton()
+	CheckBox::~CheckBox()
 	{
 	}
 
-	/**
-	 * Set a image for this button.
-	 * @param imageResource A image resource.
+	/*
+	 * Sets the current check box state.
+	 * @param checkboxState The current state.
 	 */
-	void ImageButton::setImage(MAHandle imageResource)
+	void CheckBox::setCheckedState(bool checkboxState)
 	{
-		setProperty(
-			MAW_IMAGE_BUTTON_BACKGROUND_IMAGE,
-			imageResource);
+		// 0 unchecked, 1 checked
+		setProperty(MAW_CHECK_BOX_CHECKED, checkboxState);
+	}
+
+	/*
+	 * Gets the current check box state.
+	 * @return The check box state.
+	 */
+	bool CheckBox::getCheckedState()
+	{
+		MAUtil::String checked = getPropertyString(MAW_CHECK_BOX_CHECKED);
+
+		if ( checked == "true")
+		{
+			return true;
+		}
+		return false;
 	}
 
 	} // namespace UI

@@ -18,9 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file Label.cpp
- * @author Mikael Kindborg
+ * @author Emma Tresanszki
  *
- * Class for label of widgets.
+ * Class for labels. Create a label instance by
+ * using the WidgetManager.
  */
 
 #include "Label.h"
@@ -30,13 +31,11 @@ namespace MoSync
 	namespace UI
 	{
 
-	/**
-	 * Constructor.
-	 */
 	Label::Label() :
 		Widget(MAW_LABEL)
 	{
-		// Set some common default values.
+		// Set some common default values to
+		// simplify when creating labels.
 		this->fillSpaceVertically();
 		this->fillSpaceHorizontally();
 	}
@@ -47,7 +46,6 @@ namespace MoSync
 	Label::~Label()
 	{
 	}
-
 	/*
 	 * Sets the text of the label.
 	 * @param text The text of the label.

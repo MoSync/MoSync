@@ -17,47 +17,53 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file ImageButton.cpp
- * @author Bogdan Iusco
+ * @file NavigationBar.cpp
+ * @author Emma Tresanszki
  *
- * Class for image buttons.
+ * Class for navigation bars. Create a navigation bar instance by
+ * using the WidgetManager.
+ * This widget is available only on iOS.
  */
 
-#include "ImageButton.h"
+#include "NavigationBar.h"
 
 namespace MoSync
 {
 	namespace UI
 	{
 
-	/**
-	 * Constructor.
-	 */
-	ImageButton::ImageButton() :
-		Widget(MAW_IMAGE_BUTTON)
+	NavigationBar::NavigationBar() :
+		Widget("NavBar")
 	{
 		// Set some common default values to
-		// simplify when creating buttons.
-		this->wrapContentHorizontally();
+		// simplify when creating nav bars.
+		this->fillSpaceHorizontally();
 		this->wrapContentVertically();
 	}
 
 	/**
 	 * Destructor.
 	 */
-	ImageButton::~ImageButton()
+	NavigationBar::~NavigationBar()
 	{
 	}
 
-	/**
-	 * Set a image for this button.
-	 * @param imageResource A image resource.
+	/*
+	 * Sets the title of the nav bar.
+	 * @param title A null terminated string.
 	 */
-	void ImageButton::setImage(MAHandle imageResource)
+	void NavigationBar::setTitle(const MAUtil::String& title)
 	{
-		setProperty(
-			MAW_IMAGE_BUTTON_BACKGROUND_IMAGE,
-			imageResource);
+		this->setProperty("title", title);
+	}
+
+	/*
+	 * Sets the title of the back button.
+	 * @param title A null terminated string.
+	 */
+	void NavigationBar::setBackButtonTitle(const MAUtil::String& title)
+	{
+		this->setProperty("backButtonTitle", title);
 	}
 
 	} // namespace UI

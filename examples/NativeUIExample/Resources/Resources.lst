@@ -34,6 +34,9 @@
 .res RES_WEB_VIEW_IMAGE_HIDE_IMAGE
 .image "WebViewHideNavBar.png"
 
+.res RES_SETTINGS_VIEW_RESET_IMAGE
+.image "ImageSettingsReset.png"
+
 .res RES_IMAGE1
 .image "Image1.png"
 

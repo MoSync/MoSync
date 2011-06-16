@@ -45,5 +45,8 @@ MA 02110-1301, USA.
 #include "RelativeLayout.h"
 #include "GLView.h"
 #include "Label.h"
+#include "CheckBox.h"
+#include "NavigationBar.h"
+
 
 #endif
