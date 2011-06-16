@@ -3,9 +3,13 @@ package com.mosync.nativeui.ui.widgets;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.mosync.nativeui.util.LayoutParamsSetter;
-
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ScrollView;
+
+import com.mosync.nativeui.util.LayoutParamsSetter;
+import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * This subclass of Widget represents the behavior of a Widget
@@ -21,6 +25,9 @@ public class Layout extends Widget
 	 * destroying all of the children.
 	 */
 	List<Widget> m_children = new ArrayList<Widget>( );
+	ScrollView m_scrollview = null;
+	boolean m_scrollable = false;
+	
 
 	/**
 	 * Constructor.
@@ -31,6 +38,55 @@ public class Layout extends Widget
 	public Layout(int handle, ViewGroup view)
 	{
 		super( handle, view );
+	}
+	
+	public void setIsScrollable(boolean s) 
+	{
+		if(m_scrollable == s) return;
+		
+		m_scrollable = s;
+		
+		if(s == true) 
+		{	
+			m_scrollview = new ScrollView( getView( ).getContext() );
+			Widget w = getParent();
+			if(w != null) 
+			{
+				ViewGroup g = (ViewGroup) w.getView( );
+
+				for(int i = 0; i < g.getChildCount( ); i++)
+				{
+					View v = g.getChildAt( i );
+					if( getView( ) == v )
+					{
+						g.addView( m_scrollview, i );
+						break;
+					}
+				}
+			}
+			
+			m_scrollview.addView( getView( ) );	
+		} 
+		else
+		{
+			m_scrollview.removeView( getView( ) );
+			
+			Widget w = getParent();
+			if(w != null) 
+			{
+				ViewGroup g = (ViewGroup) w.getView( );
+				
+				for(int i = 0; i < g.getChildCount( ); i++)
+				{
+					View v = g.getChildAt( i );
+					if( m_scrollview == v )
+					{
+						g.addView( getView( ) , i );
+						break;
+					}
+				}		
+			}
+		}
 	}
 	
 	/**
@@ -57,7 +113,7 @@ public class Layout extends Widget
 
 		// Add child to layout
 		ViewGroup layout = getView( );
-		layout.addView( child.getView( ), listIndex );
+		layout.addView( child.getRootView( ), listIndex );
 	}
 	
 	/**
@@ -85,7 +141,16 @@ public class Layout extends Widget
 		// Set layout params for the child
 		ViewGroup.LayoutParams nativeLayoutParams = createNativeLayoutParams( child.getLayoutParams( ) );
 		LayoutParamsSetter.setPossibleParams( child.getLayoutParams( ), nativeLayoutParams );
-		child.getView( ).setLayoutParams( nativeLayoutParams );
+		
+		View childView = child.getView();
+		
+		childView.setLayoutParams( nativeLayoutParams );
+		
+		View rootView = child.getRootView();
+		if( childView != rootView )
+		{
+			rootView.setLayoutParams( new ViewGroup.LayoutParams( nativeLayoutParams.width, nativeLayoutParams.height ) );
+		}
 	}
 	
 	/**
@@ -102,7 +167,7 @@ public class Layout extends Widget
 		child.setParent( null );
 		m_children.remove( child );
 		ViewGroup layout = getView( );
-		layout.removeView( child.getView( ) );
+		layout.removeView( child.getRootView( ) );
 	}
 	
 	/**
@@ -132,5 +197,43 @@ public class Layout extends Widget
 	{
 		// ViewGroup is a covariant return type to View
 		return (ViewGroup) super.getView( );
+	}
+	
+	/**
+	 * @see Widget.getView.
+	 */
+	@Override	 
+	public ViewGroup getRootView()
+	{
+		if(m_scrollable == true) 
+		{
+			// ViewGroup is a covariant return type to View
+			return (ViewGroup) m_scrollview;
+		} 
+		else 
+		{
+			return (ViewGroup) super.getView( );			
+		}
+	}
+	
+	@Override
+	public boolean setProperty(String property, String value)
+			throws PropertyConversionException, InvalidPropertyValueException
+	{
+		if( super.setProperty( property, value ) )
+		{
+			return true;
+		}
+		
+		if( property.equals( "isScrollable" ) ) 
+		{
+			this.setIsScrollable( value.equals( "true" ) );
+		}
+		else
+		{
+			return false;
+		}
+		
+		return true;
 	}
 }
