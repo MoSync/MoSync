@@ -75,6 +75,11 @@ public:
 
 
 	/**
+	 * Create UI with three tabs
+	 */
+	static ScreenMain* createThreeTabUI();
+
+	/**
 	 * Create UI with four tabs
 	 */
 	static ScreenMain* createFourTabUI();

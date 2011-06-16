@@ -37,7 +37,10 @@
 .res RES_SETTINGS_VIEW_RESET_IMAGE
 .image "ImageSettingsReset.png"
 
-.res RES_FIRST_IMAGE_SMALL.placeholder.res RES_IMAGE1_SMALL
+.res RES_FIRST_IMAGE_SMALL
+.placeholder
+
+.res RES_IMAGE1_SMALL
 .ubin
 .include "small/Image1.png"
 

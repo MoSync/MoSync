@@ -39,24 +39,24 @@ MA 02110-1301, USA.
 #define MEDIUM_SCREEN_RESOLUTION		480
 #define LARGE_SCREEN_RESOLUTION			1024
 
-//#define SHADOW_OFFSET					5
+#define TXT_SCREEN_TITLE				"Images"
+
+#define SCREEN_BG_COLOR					0xF0F0F0
+#define LABEL_BG_COLOR					0x111111
+#define FONT_COLOR						0xFFFFFF
 /*
  * DEFINES
  */
 
 using namespace MoSync::UI;
 
-struct ResImage
-{
-	MAHandle handle;
-	MAUtil::String text;
-};
-
+/*
+ * An extension to the Image widget wich uses ubin
+ */
 class ScreenImage : public Image
 {
 public:
 	MAHandle handle;
-	//RelativeLayout* shadow;
 	int posX;
 	int posY;
 	int width;
@@ -68,7 +68,7 @@ public:
 };
 
 /**
- * TODO: Add comment.
+ * A Image Swiper class.
  */
 class ScreenImageSwiper : public Screen
 {
@@ -79,10 +79,18 @@ public:
 	 */
 	ScreenImageSwiper();
 
+	/*
+	 * Destructor
+	 */
+	~ScreenImageSwiper();
+
+	/*
+	 * Create the UI for Swiper Screen.
+	 */
 	void createUI();
 
 	/**
-	 * TODO: Add comment.
+	 * Create the Swiper Screen.
 	 */
 	static Screen* create();
 
@@ -102,6 +110,7 @@ public:
 	void handlePointerReleased(MAPoint2d p);
 
 private:
+	// Screen sizes.
 	int mScreenWidth;
 	int mScreenHeight;
 
@@ -111,7 +120,6 @@ private:
 
 	ScreenImage** images;
 	int imagesSize;
-	int currentImage;
 
 	// pointer X coordinate on screen
 	int mPointerX;

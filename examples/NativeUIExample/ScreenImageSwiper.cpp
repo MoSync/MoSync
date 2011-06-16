@@ -27,7 +27,7 @@ MA 02110-1301, USA.
 #include "ScreenImageSwiper.h"
 
 /**
- * TODO: Add comment.
+ * Create the Swiper Screen.
  */
 Screen* ScreenImageSwiper::create()
 {
@@ -36,14 +36,25 @@ Screen* ScreenImageSwiper::create()
 	return screen;
 }
 
-ScreenImageSwiper::ScreenImageSwiper() :
-	currentImage(0)
+/*
+ * Constructor
+ */
+ScreenImageSwiper::ScreenImageSwiper()
 {
+}
+
+/*
+ * Destructor
+ */
+ScreenImageSwiper::~ScreenImageSwiper()
+{
+	delete[] images;
+	images = NULL;
 }
 
 void ScreenImageSwiper::createUI()
 {
-	setTitle("Images");
+	setTitle(TXT_SCREEN_TITLE);
 	if (WidgetManager::isAndroid())
 	{
 		setIcon(RES_TAB_ICON_IMAGE_SWIPER_ANDROID);
@@ -58,7 +69,7 @@ void ScreenImageSwiper::createUI()
 	mainLayout = new VerticalLayout();
 
 	imagesLayout = new RelativeLayout();
-	imagesLayout->setBackgroundColor(0xF0F0F0);
+	imagesLayout->setBackgroundColor(SCREEN_BG_COLOR);
 
 	loadImages(mScreenWidth);
 
@@ -74,14 +85,6 @@ void ScreenImageSwiper::createUI()
 		images[i]->posY = mScreenHeight / 5;
 		images[i]->width = imageWidth;
 
-//		imageWidgets[LEFT_IMAGE].shadow = new RelativeLayout();
-//		imageWidgets[LEFT_IMAGE].shadow->setBackgroundColor(0);
-//		imageWidgets[LEFT_IMAGE].shadow->setProperty(MAW_WIDGET_ALPHA, "0.2");
-//		imageWidgets[LEFT_IMAGE].shadow->setSize(imageWidth, imageHeight);
-//		imageWidgets[LEFT_IMAGE].shadow->setPosition(imageWidgets[LEFT_IMAGE].posX + SHADOW_OFFSET, imageWidgets[LEFT_IMAGE].posY + SHADOW_OFFSET);
-//
-//		imagesLayout->addChild(imageWidgets[LEFT_IMAGE].shadow);
-
 		images[i]->setResource();
 		images[i]->setSize(imageWidth, imageHeight);
 		images[i]->setPosition(images[i]->posX, images[i]->posY);
@@ -92,9 +95,9 @@ void ScreenImageSwiper::createUI()
 
 	labelLayout = new Label();
 	labelLayout->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, mScreenHeight / 10);
-	labelLayout->setBackgroundColor(0x111111);
+	labelLayout->setBackgroundColor(LABEL_BG_COLOR);
 	labelLayout->setText("Image X");
-	labelLayout->setFontColor(0xFFFFFF);
+	labelLayout->setFontColor(FONT_COLOR);
 	labelLayout->centerTextHorizontally();
 	labelLayout->centerTextVertically();
 
@@ -119,6 +122,9 @@ void ScreenImageSwiper::getScreenSize()
 	mScreenHeight = EXTENT_Y(size);
 }
 
+/*
+ * Load the needed images from ubins.
+ */
 void ScreenImageSwiper::loadImages(int screenWidth)
 {
 	int firstImage = RES_FIRST_IMAGE_LARGE;
@@ -162,14 +168,14 @@ void ScreenImageSwiper::handlePointerMoved(MAPoint2d p)
 
 	if (offset < 0)
 	{
-		if (images[imagesSize - 1]->posX + images[imagesSize - 1]->width < mScreenWidth)
+		if (images[imagesSize - 1]->posX + images[imagesSize - 1]->width <= (mScreenWidth >> 1))
 		{
 			return;
 		}
 	}
 	else
 	{
-		if (images[0]->posX > 0)
+		if (images[0]->posX >= (mScreenWidth >> 1))
 		{
 			return;
 		}
@@ -189,6 +195,26 @@ void ScreenImageSwiper::handlePointerMoved(MAPoint2d p)
  */
 void ScreenImageSwiper::handlePointerReleased(MAPoint2d p)
 {
+	int centerImage = -1;
+	for (int i=0; i<imagesSize; i++)
+	{
+		if ( (images[i]->posX - mScreenWidth / 12 < (mScreenWidth >> 1)) && ((images[i]->posX + images[i]->width + mScreenWidth / 12) > (mScreenWidth >> 1)) )
+		{
+			centerImage = i;
+			break;
+		}
+	}
+
+	if (centerImage > 0)
+	{
+		int offset = (mScreenWidth >> 1) - images[centerImage]->posX - (images[centerImage]->width >> 1);
+		for (int i=0; i<imagesSize; i++)
+		{
+			images[i]->posX += offset;
+
+			images[i]->setPosition(images[i]->posX, images[i]->posY);
+		}
+	}
 }
 
 //bool ScreenImageSwiper::readString(int resID, int pos, MAUtil::String &result)
