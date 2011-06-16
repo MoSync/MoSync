@@ -34,15 +34,15 @@ MA 02110-1301, USA.
 using namespace MoSync::UI;
 
 /**
- * Navigation bar animation states.
+ * Address bar animation states.
  */
-enum eNavigationBarAnimation
+enum eAddressBarAnimation
 {
 	NONE = 1,
-	FADE_OUT_NAVIGATION_BAR,
+	FADE_OUT_ADDRESS_BAR,
 	SHOW_EXPAND_WIDGET,
 	HIDE_EXPAND_WIDGET,
-	FADE_IN_NAVIGATION_BAR
+	FADE_IN_ADDRESS_BAR
 };
 
 /**
@@ -68,6 +68,31 @@ public:
 	 */
 	static void setDefaultURL(const MAUtil::String url);
 
+private:
+	/**
+	 * Constructor.
+	 */
+	ScreenWebView();
+
+	/**
+	 * Destructor.
+	 */
+	~ScreenWebView();
+
+	/**
+	 * Creates the address bar widgets and layouts.
+	 */
+	void createAddressBar();
+
+	/**
+	 * Creates an empty vertical layout.
+	 * @param width Layout width.
+	 * @param height Layout height.
+	 * @return A pointer to a vertical layout widget.
+	 * 		   The ownership of the result is passed to the caller!
+	 */
+	VerticalLayout* createSpacer(const int width,const int height);
+
 	/**
 	 * This method is called when there is an event for a widget.
 	 * @param widget The widget object of the event.
@@ -76,12 +101,6 @@ public:
 	virtual void handleWidgetEvent(
 		Widget* widget,
 		MAWidgetEventData* widgetEventData);
-
-	/**
-	 * Called on timer events.
-	 * It is used for navigation bar animation.
-	 */
-	void runTimerEvent();
 
 	/**
 	 * Returns a pointer to the screen object.
@@ -95,35 +114,16 @@ public:
 	 */
 	virtual void openURL(const MAUtil::String& url);
 
-private:
 	/**
-	 * Constructor.
+	 * Called on timer events.
+	 * It is used for navigation bar animation.
 	 */
-	ScreenWebView();
+	void runTimerEvent();
 
 	/**
-	 * Destructor.
+	 * Fades out the address bar.
 	 */
-	~ScreenWebView();
-
-	/**
-	 * Creates the navigation bar.
-	 */
-	void createNavigationBar();
-
-	/**
-	 * Creates an empty vertical layout.
-	 * @param width Layout width.
-	 * @param height Layout height.
-	 * @return A pointer to a vertical layout widget.
-	 * 		   The ownership of the result is passed to the caller!
-	 */
-	VerticalLayout* createSpacer(const int width,const int height);
-
-	/**
-	 * Fades out the navigation bar.
-	 */
-	void fadeOutNavigationBar();
+	void fadeOutAddressBar();
 
 	/**
 	 * Shows the expand image button.
@@ -136,21 +136,21 @@ private:
 	void hideExpandWidget();
 
 	/**
-	 * Fades in the navigation bar.
+	 * Fades in the address bar.
 	 */
-	void fadeInNavigationBar();
+	void fadeInAddressBar();
 
 private:
 
 	/**
 	 * Static ScreenWebView object(singleton design pattern).
 	 */
-	static ScreenWebView* mScreenWebView;
+	static ScreenWebView* sScreenWebView;
 
 	/**
 	 * The URL opened by the web view when the screen is showed.
 	 */
-	static 	MAUtil::String mURL;
+	static 	MAUtil::String sURL;
 
 	/**
 	 * A screen for this view.
@@ -163,14 +163,20 @@ private:
 	WebView* mWebView;
 
 	/**
+	 * A simple navigation bar for iOS devices.
+	 * It is used only for displaying a text(the title of the screen).
+	 */
+	NavigationBar* mNavBarWidget;
+
+	/**
 	 * Widget used for opening the given web address.
 	 */
 	ImageButton* mOpenLinkButtonWidget;
 
 	/**
-	 * According with state of the navigation bar(collapsed or expanded),
-	 * the widget will display a show or hide image.
-	 * It is used for collapsing or expanding the navigation bar.
+	 * According with state of the address bar(collapsed or expanded),
+	 * the widget will display a show or a hide image.
+	 * It is used for collapsing or expanding the address bar.
 	 */
 	ImageButton* mHideShowButtonWidget;
 
@@ -180,11 +186,11 @@ private:
 	EditBox* mEditBoxWidget;
 
 	/**
-	 * Navigation bar layout.
+	 * Address bar layout.
 	 * Will contain the edit box widget, open link button widget
 	 * and the show/hide button widget.
 	 */
-	HorizontalLayout* mNavigationBarLayout;
+	HorizontalLayout* mAddressBarLayout;
 
 	/**
 	 * A simple colored layout.
@@ -193,38 +199,38 @@ private:
 
 	/**
 	 * Edit box layout.
-	 * Will contain a spacer and the edit box widget.
+	 * Will contain the edit box widget.
 	 */
 	VerticalLayout* mEditBoxLayout;
 
 	/**
 	 * Open link button layout.
-	 * Will contain a spacer and the open link button widget.
+	 * Will contain the open link button widget.
 	 */
 	VerticalLayout* mOpenLinkBtnLayout;
 
 	/**
 	 * Hide/show button layout.
-	 * Will contain a spacer and the hide/show button widget.
+	 * Will contain the hide/show button widget.
 	 */
 	VerticalLayout* mHideShowBtnLayout;
 
 	/**
-	 * The current state of the navigation bar animation.
+	 * The current state of the address bar animation.
 	 */
-	eNavigationBarAnimation mNavigationBarAnimation;
+	eAddressBarAnimation mAddressBarAnimation;
 
 	/**
-	 * The current navigation bar height.
+	 * The current address bar height.
 	 * Used by the animation.
 	 */
-	int mCurrentNavigationBarHeight;
+	int mCurrentAddressBarHeight;
 
 	/**
-	 * The current navigation bar alpha.
+	 * The current address bar alpha.
 	 * Used by the animation.
 	 */
-	float mCurrentNavigationBarAlpha;
+	float mCurrentAddressBarAlpha;
 
 	/**
 	 * Screen width.
@@ -237,9 +243,9 @@ private:
 	int mScreenHeight;
 
 	/**
-	 * The flag is set if the navigation bar is visible.
+	 * The flag is set if the address bar is visible.
 	 */
-	BOOL mIsNavigationBarVisible;
+	BOOL mIsAddressBarVisible;
 };
 
 #endif
