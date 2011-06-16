@@ -84,7 +84,7 @@ using namespace MAUtil;
  * You must run the server application, note the address, and
  * enter it here, before the client will work.
  */
-static const char* sServerAddress = "";
+static const char* sServerAddress = "0022FC7739B4";
 
 /**
  * Moblet for the Bluetooth client.
