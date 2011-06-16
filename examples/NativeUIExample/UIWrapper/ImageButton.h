@@ -17,33 +17,46 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Widgets.h
- * @author Mikael Kindborg
+ * @file ImageButton.h
+ * @author Bogdan Iusco
  *
- * You can include all widget classes by just including
- * this file, to make things a bit easier.
+ * Class for image buttons.
  */
 
-#ifndef MOSYNC_UI_WIDGETS_H_
-#define MOSYNC_UI_WIDGETS_H_
+#ifndef MOSYNC_UI_IMAGEBUTTON_H_
+#define MOSYNC_UI_IMAGEBUTTON_H_
 
-#include "WidgetManager.h"
-#include "WidgetEventListener.h"
 #include "Widget.h"
-#include "Screen.h"
-#include "TabScreen.h"
-#include "StackScreen.h"
-#include "HorizontalLayout.h"
-#include "VerticalLayout.h"
-#include "WebView.h"
-#include "ListView.h"
-#include "ListViewItem.h"
-#include "Button.h"
-#include "EditBox.h"
-#include "ImageButton.h"
-#include "Image.h"
-#include "RelativeLayout.h"
-#include "GLView.h"
-#include "Label.h"
+
+namespace MoSync
+{
+	namespace UI
+	{
+
+	/**
+	 * Class for image buttons.
+	 */
+	class ImageButton : public Widget
+	{
+	public:
+		/**
+		 * Constructor.
+		 */
+		ImageButton();
+
+		/**
+		 * Destructor.
+		 */
+		virtual ~ImageButton();
+
+		/**
+		 * Set a image for this button.
+		 * @param imageResource A image resource.
+		 */
+		virtual void setImage(MAHandle imageResource);
+	};
+
+	} // namespace UI
+} // namespace MoSync
 
 #endif

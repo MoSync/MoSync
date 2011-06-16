@@ -25,6 +25,15 @@
 .res RES_TAB_ICON_WEB_VIEW_ANDROID
 .image "TabIconWebView_Android.png"
 
+.res RES_WEB_VIEW_OPEN_LINK_IMAGE
+.image "WebViewOpenLink.png"
+
+.res RES_WEB_VIEW_IMAGE_SHOW_IMAGE
+.image "WebViewShowNavBar.png"
+
+.res RES_WEB_VIEW_IMAGE_HIDE_IMAGE
+.image "WebViewHideNavBar.png"
+
 .res RES_FIRST_IMAGE_SMALL
 .placeholder
 
