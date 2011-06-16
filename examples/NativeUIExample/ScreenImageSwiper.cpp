@@ -41,6 +41,8 @@ Screen* ScreenImageSwiper::create()
  */
 ScreenImageSwiper::ScreenImageSwiper()
 {
+	// Add a timer to keep the update at a 20 FPS rate
+	MAUtil::Environment::getEnvironment().addTimer(this, 50, 0);
 }
 
 /*
@@ -48,6 +50,9 @@ ScreenImageSwiper::ScreenImageSwiper()
  */
 ScreenImageSwiper::~ScreenImageSwiper()
 {
+	// Remove the timer
+	MAUtil::Environment::getEnvironment().removeTimer(this);
+
 	delete images;
 	images = NULL;
 }
@@ -98,26 +103,56 @@ void ScreenImageSwiper::createUI()
 	imagesLayout->setBackgroundColor(SCREEN_BG_COLOR);
 
 	// Create a background gradient and add it to the images Layout
-	imagesLayout->addChild(createBackgroundGradient());
+	//imagesLayout->addChild(createBackgroundGradient());
 
+	// Loads the needed image according to the screen resolution.
 	loadImages(mScreenWidth);
 
+	// Get the image size.
 	MAExtent size = maGetImageSize(images[0]->handle);
 
+	// Compute the needed width and height for images.
 	int imageWidth = mScreenWidth - (mScreenWidth / 3) - mScreenWidth / 6;
 	int imageHeight = imageWidth * EXTENT_Y(size) / EXTENT_X(size);
 
-	int startX = mScreenWidth / 6 - imageWidth - mScreenWidth / 12;
+	setupImages(imageWidth, imageHeight);
+
+	//Creates a label layout to display image names and sets it's properties
+	labelLayout = new Label();
+	labelLayout->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, mScreenHeight / 10);
+	labelLayout->setBackgroundColor(LABEL_BG_COLOR);
+	labelLayout->setText(images[0]->name);
+	labelLayout->setFontColor(FONT_COLOR);
+	labelLayout->centerTextHorizontally();
+	labelLayout->centerTextVertically();
+
+	// Adds the created layouts as childrens of the main one.
+	mainLayout->addChild(imagesLayout);
+	mainLayout->addChild(labelLayout);
+
+	// Sets the main layout as the main widget for the current screen.
+	setMainWidget(mainLayout);
+}
+
+/*
+ * Sets the properties for the images widgets.
+ * @param width The desired width of the images widgets.
+ * @param height The desired height of the images widgets.
+ */
+void ScreenImageSwiper::setupImages(int width, int height)
+{
+	// The starting point for the first image.
+	int startX = (mScreenWidth - width) >> 1;
 	for (int i=0; i<imagesSize; i++)
 	{
 		images[i]->posX = startX;
 		images[i]->posY = mScreenHeight / 5;
-		images[i]->width = imageWidth;
+		images[i]->width = width;
 
 		images[i]->setResource();
-		images[i]->setSize(imageWidth, imageHeight);
+		images[i]->setSize(width, height);
 		images[i]->shadow = new RelativeLayout();
-		images[i]->shadow->setSize(imageWidth, imageHeight);
+		images[i]->shadow->setSize(width, height);
 		images[i]->shadow->setBackgroundColor(0);
 		images[i]->shadow->setProperty(MAW_WIDGET_ALPHA, SHADOW_ALPHA);
 		images[i]->shadow->setPosition(images[i]->posX + 5, images[i]->posY + 5);
@@ -125,21 +160,10 @@ void ScreenImageSwiper::createUI()
 
 		imagesLayout->addChild(images[i]->shadow);
 		imagesLayout->addChild(images[i]);
-		startX += imageWidth + mScreenWidth / 6;
+
+		//Update x position for the next image widget.
+		startX += width + mScreenWidth / 6;
 	}
-
-	labelLayout = new Label();
-	labelLayout->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, mScreenHeight / 10);
-	labelLayout->setBackgroundColor(LABEL_BG_COLOR);
-	labelLayout->setText(images[1]->name);
-	labelLayout->setFontColor(FONT_COLOR);
-	labelLayout->centerTextHorizontally();
-	labelLayout->centerTextVertically();
-
-	mainLayout->addChild(imagesLayout);
-	mainLayout->addChild(labelLayout);
-
-	setMainWidget(mainLayout);
 }
 
 /*
@@ -169,10 +193,12 @@ void ScreenImageSwiper::getScreenSize()
 }
 
 /*
- * Load the needed images from ubins.
+ * Load the images from resources according to the screen resolution.
+ * @param screenWidth The width of the screen.
  */
 void ScreenImageSwiper::loadImages(int screenWidth)
 {
+	// Set the image indexes inside the resources according to the resolution
 	int firstImage = RES_FIRST_IMAGE_LARGE;
 	int lastImage = RES_LAST_IMAGE_LARGE;
 	if (screenWidth <= SMALL_SCREEN_RESOLUTION)
@@ -185,81 +211,67 @@ void ScreenImageSwiper::loadImages(int screenWidth)
 		firstImage = RES_FIRST_IMAGE_MEDIUM;
 		lastImage = RES_LAST_IMAGE_MEDIUM;
 	}
+
+	// Compute the numer of images
 	imagesSize = lastImage - firstImage - 1;
+
+	// Create the images widgets
 	images = new ScreenImage*[imagesSize];
 	for (int i = 0; i < imagesSize; i++)
 	{
 		int pos = 0;
 		images[i] = new ScreenImage();
+		// Get the resource id of the current image.
 		int resID = firstImage + i + 1;
+
+		// Create a placeholder to store the current image.
 		images[i]->handle = maCreatePlaceholder();
 
+		// Load the image name from resources
 		readStringFromResource(resID, pos, images[i]->name);
 
+		// Create the image from ubin
 		maCreateImageFromData(images[i]->handle, resID, pos, maGetDataSize(resID) - images[i]->name.length() - 1);
 	}
 }
 
 /**
  * Handle pointer presses.
+ * @param p A valid point on the screen.
  */
 void ScreenImageSwiper::handlePointerPressed(MAPoint2d p)
 {
-	mPointerX = p.x;
+	mPointerXStart = mPointerXEnd = p.x;
 }
 
 /**
  * Handle pointer moves.
+ * @param p A valid point on the screen.
  */
 void ScreenImageSwiper::handlePointerMoved(MAPoint2d p)
 {
-	int offset = p.x - mPointerX;
-
-	if (ABS(offset) < mScreenWidth / 20)
-		return;
-
-	if (offset < 0)
-	{
-		if (images[imagesSize - 1]->posX + images[imagesSize - 1]->width <= (mScreenWidth >> 1))
-		{
-			return;
-		}
-	}
-	else
-	{
-		if (images[0]->posX >= (mScreenWidth >> 1))
-		{
-			return;
-		}
-	}
-
-	for (int i=0; i<imagesSize; i++)
-	{
-		images[i]->posX += offset;
-
-		images[i]->shadow->setPosition(images[i]->posX + 5, images[i]->posY + 5);
-		images[i]->setPosition(images[i]->posX, images[i]->posY);
-	}
-	mPointerX = p.x;
+	mPointerXEnd = p.x;
 }
 
 /**
  * Handle pointer releases.
+ * @param p A valid point on the screen.
  */
 void ScreenImageSwiper::handlePointerReleased(MAPoint2d p)
 {
 	int centeredImage = -1;
 	for (int i=0; i<imagesSize; i++)
 	{
-		if ( (images[i]->posX - mScreenWidth / 12 < (mScreenWidth >> 1)) && ((images[i]->posX + images[i]->width + mScreenWidth / 12) > (mScreenWidth >> 1)) )
+		if ( (images[i]->posX - mScreenWidth / 12 <= (mScreenWidth >> 1)) && ((images[i]->posX + images[i]->width + mScreenWidth / 12) >= (mScreenWidth >> 1)) )
 		{
 			centeredImage = i;
 			break;
 		}
 	}
-	labelLayout->setText(images[centeredImage]->name);
+
 	if (centeredImage >= 0)
 	{
+		labelLayout->setText(images[centeredImage]->name);
 		int offset = (mScreenWidth >> 1) - images[centeredImage]->posX - (images[centeredImage]->width >> 1);
 		for (int i=0; i<imagesSize; i++)
 		{
@@ -268,6 +280,41 @@ void ScreenImageSwiper::handlePointerReleased(MAPoint2d p)
 			images[i]->setPosition(images[i]->posX, images[i]->posY);
 		}
 	}
+	mPointerXStart = mPointerXEnd = p.x;
+}
+
+/*
+ * Update the application
+ */
+void ScreenImageSwiper::runTimerEvent()
+{
+	// Get the swiping length.
+	int offset = mPointerXEnd - mPointerXStart;
+
+	if (offset < 0) // We have a swiping from right to left.
+	{
+		if (images[imagesSize - 1]->posX + images[imagesSize - 1]->width + offset < (mScreenWidth >> 1)) // Stop scrolling if the last image will pass the middle screen.
+		{
+			return;
+		}
+	}
+	else  // We have a swiping from left to right.
+	{
+		if (images[0]->posX + offset > (mScreenWidth >> 1))  // Stop scrolling if the first image will pass the middle screen.
+		{
+			return;
+		}
+	}
+
+	// Update the images according to the swiping length.
+	for (int i=0; i<imagesSize; i++)
+	{
+		images[i]->posX += offset;
+
+		images[i]->shadow->setPosition(images[i]->posX + 5, images[i]->posY + 5);
+		images[i]->setPosition(images[i]->posX, images[i]->posY);
+	}
+	mPointerXStart = mPointerXEnd;
 }
 
 /*
@@ -279,29 +326,30 @@ void ScreenImageSwiper::handlePointerReleased(MAPoint2d p)
 bool ScreenImageSwiper::readStringFromResource(MAHandle resID, int& pos, MAUtil::String &output) const
 {
 	// Get all the characters on one read.
-
 	byte stringLen = 0;
 	maReadData(resID, (void*) &stringLen, pos, sizeof(byte));
-	//	GUI("stringLen = %d", stringLen);
 
 	if (stringLen > maGetDataSize(resID) || stringLen <= 0)
 		return false;
 
 	pos += sizeof(byte);
 	output.resize(stringLen);
-	//	GUI("read %d bytes from %d", stringLen, pos);
+
 	maReadData(resID, (void*) output.c_str(), pos, stringLen);
 	pos += stringLen;
 	return true;
 }
 
+/*
+ * Creates an image with a gray gradient.
+ */
 Image* ScreenImageSwiper::createBackgroundGradient()
 {
 	MAHandle h = maCreatePlaceholder();
-	int *src = new int[mScreenWidth * mScreenHeight];
-	for (int i=0; i<mScreenWidth; i++)
+	int *src = new int[10 * 256];
+	for (int i=0; i<256; i++)
 	{
-		for (int j=0; j<mScreenHeight; j++)
+		for (int j=0; j<10; j++)
 		{
 			int color = 0xFF - (i * 0xFF / mScreenWidth);
 			src[i*mScreenWidth + j] = color | (color << 8) | (color << 16);
