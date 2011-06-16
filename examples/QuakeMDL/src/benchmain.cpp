@@ -19,6 +19,23 @@
 #define BENCH_PASSES	3
 #define FRAMES_PASS		1000
 
+/*
+ * Wait for user to press exit
+ */
+void handleExitByUser(void)
+{
+		MAEvent e;
+		while ( maGetEvent( &e ) )
+		{
+			if ( e.type == EVENT_TYPE_CLOSE ||
+				 e.type == EVENT_TYPE_KEY_PRESSED ||
+				 e.type == EVENT_TYPE_POINTER_PRESSED ||
+				 e.type == MAK_BACK)
+			{
+				maExit(0);
+			}
+		}
+}
 
 int BenchMain ( void )
 {
@@ -55,8 +72,10 @@ int BenchMain ( void )
 		printf( "    - Pass %d/%d\n", i+1, BENCH_PASSES );
 		renderedFrames = 0;
 		tmrIni = maGetMilliSecondCount( );
+
 		while ( true )
 		{
+			handleExitByUser();
 			//
 			// Construct transformation pipe
 			//
@@ -92,17 +111,7 @@ int BenchMain ( void )
 			if ( renderedFrames == FRAMES_PASS )
 				break;
 
-			//
-			// Handle input
-			//
-			MAEvent e;
-			while ( maGetEvent( &e ) )
-			{
-				if ( e.type == EVENT_TYPE_CLOSE ||
-					 e.type == EVENT_TYPE_KEY_PRESSED ||
-					 e.type == EVENT_TYPE_POINTER_PRESSED )
-					maExit( 0 );
-			}
+
 		}
 
 		// Calculate average fps for pass
@@ -120,5 +129,13 @@ int BenchMain ( void )
 	printf( "-------------\n\n" );
 	printf( ".\n" );
 
-	FREEZE;
+
+	// Waiting for user event
+	while(true)
+	{
+		handleExitByUser();
+	}
+
 }
+
+
