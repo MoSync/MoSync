@@ -17,33 +17,40 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Widgets.h
+ * @file GLView.h
  * @author Mikael Kindborg
  *
- * You can include all widget classes by just including
- * this file, to make things a bit easier.
+ * Class for gl view of widgets.
  */
 
-#ifndef MOSYNC_UI_WIDGETS_H_
-#define MOSYNC_UI_WIDGETS_H_
+#ifndef MOSYNC_UI_GL_VIEW_H_
+#define MOSYNC_UI_GL_VIEW_H_
 
-#include "WidgetManager.h"
-#include "WidgetEventListener.h"
 #include "Widget.h"
-#include "Screen.h"
-#include "TabScreen.h"
-#include "StackScreen.h"
-#include "HorizontalLayout.h"
-#include "VerticalLayout.h"
-#include "WebView.h"
-#include "ListView.h"
-#include "ListViewItem.h"
-#include "Button.h"
-#include "EditBox.h"
-#include "ImageButton.h"
-#include "Image.h"
-#include "RelativeLayout.h"
-#include "GLView.h"
-#include "Label.h"
+
+namespace MoSync
+{
+	namespace UI
+	{
+
+	/**
+	 * Class for horizontal layouts.
+	 */
+	class GLView : public Widget
+	{
+	public:
+		/**
+		 * Constructor.
+		 */
+		GLView();
+
+		/**
+		 * Destructor.
+		 */
+		virtual ~GLView();
+	};
+
+	} // namespace UI
+} // namespace MoSync
 
 #endif

@@ -27,19 +27,54 @@ MA 02110-1301, USA.
 #define SCREEN_IMAGE_SWIPER_H_
 
 #include "UIWrapper/Widgets.h"
+#include "MAHeaders.h"
+
+#include "conprint.h"
+
+/*
+ * DEFINES
+ */
+#define LEFT_IMAGE				0
+#define CENTER_IMAGE			1
+#define RIGHT_IMAGE				2
+#define DISPLAYED_IMAGES		3
+/*
+ * DEFINES
+ */
 
 using namespace MoSync::UI;
 
 /**
  * TODO: Add comment.
  */
-class ScreenImageSwiper
+class ScreenImageSwiper : public WidgetEventListener
 {
+private:
+	static int mScreenWidth;
+	static int mScreenHeight;
+
+//	static ScreenImageSwiper* sInstance;
+//
+//	VerticalLayout* mainLayout;
+//	HorizontalLayout* imagesLayout;
+//	Label* labelLayout;
 public:
 	/**
 	 * TODO: Add comment.
 	 */
 	static Screen* create();
+
+	/**
+	 * This method is called when there is an event for this widget.
+	 * @param widget The widget object of the event.
+	 * @param widgetEventData The low-level event data.
+	 */
+	void handleWidgetEvent(
+		Widget* widget,
+		MAWidgetEventData* widgetEventData);
+
+private:
+	static void getScreenSize();
 };
 
 #endif

@@ -33,3 +33,15 @@
 
 .res RES_WEB_VIEW_IMAGE_HIDE_IMAGE
 .image "WebViewHideNavBar.png"
+
+.res RES_IMAGE1
+.image "Image1.png"
+
+.res RES_IMAGE2
+.image "Image2.png"
+
+.res RES_IMAGE3
+.image "Image3.png"
+
+.res RES_IMAGE_TEX
+.image "ImageTex.png"

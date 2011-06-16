@@ -34,6 +34,7 @@ MA 02110-1301, USA.
 #include <MAUtil/Vector.h>
 #include <MAUtil/Environment.h>
 #include <IX_WIDGET.h>
+#include "conprint.h"
 
 namespace MoSync
 {
