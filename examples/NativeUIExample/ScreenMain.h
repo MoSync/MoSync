@@ -54,6 +54,11 @@ public:
 	virtual void handleKeyPress(int keyCode) = 0;
 
 	/**
+	 * Create UI with three tabs
+	 */
+	static ScreenMain* createThreeTabUI();
+
+	/**
 	 * Create UI with four tabs
 	 */
 	static ScreenMain* createFourTabUI();

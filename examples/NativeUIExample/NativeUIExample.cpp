@@ -45,15 +45,18 @@ public:
 	 */
 	NativeUIMoblet()
 	{
-		// Create the main user interface.
-		if (WidgetManager::isAndroid())
-		{
-			mMainScreen = ScreenMain::createFourTabUI();
-		}
-		else
-		{
-			mMainScreen = ScreenMain::createFiveTabUI();
-		}
+//		// Create the main user interface screen.
+//		if (WidgetManager::isAndroid())
+//		{
+//			mMainScreen = ScreenMain::createFourTabUI();
+//		}
+//		else
+//		{
+//			mMainScreen = ScreenMain::createFiveTabUI();
+//		}
+
+		// Create the main user interface screen.
+		mMainScreen = ScreenMain::createThreeTabUI();
 
 		// Show the screen.
 		mMainScreen->show();
