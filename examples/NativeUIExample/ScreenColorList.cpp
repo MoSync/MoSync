@@ -196,8 +196,10 @@ void ScreenColorList::openColorScreen(int listItemIndex)
 {
 	// Create a screen that will show the color.
 	Screen* screen = new Screen();
-	// TODO: Perhaps we do not need to set the title of this screen?
-	screen->setTitle("Color");
+
+	// The title of this screen is displayed on the
+	// navigation bar on iPhone/iPad.
+	screen->setTitle(sColors[listItemIndex].name);
 	Widget* widget = new VerticalLayout();
 	widget->setBackgroundColor(sColors[listItemIndex].color);
 	screen->setMainWidget(widget);
