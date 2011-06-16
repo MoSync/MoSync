@@ -32,7 +32,7 @@ namespace MoSync
 	{
 
 	Label::Label() :
-		Widget(MAW_LABEL)
+		TextWidget(MAW_LABEL)
 	{
 		// Set some common default values to
 		// simplify when creating labels.
@@ -45,53 +45,6 @@ namespace MoSync
 	 */
 	Label::~Label()
 	{
-	}
-	/*
-	 * Sets the text of the label.
-	 * @param text The text of the label.
-	 */
-	void Label::setText(const MAUtil::String& text)
-	{
-		setProperty(MAW_LABEL_TEXT, text);
-	}
-
-	/**
-	 * Center the text of the widget horizontally.
-	 * Note: Not all widgets support this property.
-	 */
-	void Label::centerTextHorizontally()
-	{
-		setProperty(MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
-	}
-
-	/**
-	 * Center the text of the widget vertically.
-	 * Note: Not all widgets support this property.
-	 */
-	void Label::centerTextVertically()
-	{
-		setProperty(MAW_LABEL_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
-	}
-
-	/*
-	 * Sets the font color of the label.
-	 * @param color The font color of the label.
-	 */
-	void Label::setFontColor(const int color)
-	{
-		char buffer[256];
-		sprintf(buffer, "0x%.6X", color);
-		setProperty(MAW_LABEL_FONT_COLOR, buffer);
-	}
-
-	/*
-	 * Sets the font size of the label.
-	 * @param size The font size of the label.
-	 */
-	void Label::setFontSize(const int size)
-	{
-		setProperty(MAW_LABEL_FONT_SIZE, size);
-
 	}
 
 	} // namespace UI

@@ -101,27 +101,23 @@ namespace MoSync
 	/**
 	 * Handle pointer presses.
 	 */
-	void Screen::handlePointerPressed(MAPoint2d p)
+	void Screen::handlePointerPressed(MAPoint2d point)
 	{
-
 	}
 
 	/**
 	 * Handle pointer moves.
 	 */
-	void Screen::handlePointerMoved(MAPoint2d p)
+	void Screen::handlePointerMoved(MAPoint2d point)
 	{
-
 	}
 
 	/**
 	 * Handle pointer releases.
 	 */
-	void Screen::handlePointerReleased(MAPoint2d p)
+	void Screen::handlePointerReleased(MAPoint2d point)
 	{
-
 	}
-
 
 	} // namespace UI
 } // namespace MoSync

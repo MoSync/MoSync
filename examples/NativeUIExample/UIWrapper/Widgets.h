@@ -48,5 +48,4 @@ MA 02110-1301, USA.
 #include "CheckBox.h"
 #include "NavigationBar.h"
 
-
 #endif

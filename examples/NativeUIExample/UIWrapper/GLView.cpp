@@ -18,9 +18,9 @@ MA 02110-1301, USA.
 
 /**
  * @file GLView.cpp
- * @author Mikael Kindborg
+ * @author TODO: Add author.
  *
- * Class for horizontal layout of widgets.
+ * Class for OpenGL views.
  */
 
 #include "GLView.h"

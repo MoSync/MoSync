@@ -36,8 +36,7 @@ namespace MoSync
 	ImageButton::ImageButton() :
 		Widget(MAW_IMAGE_BUTTON)
 	{
-		// Set some common default values to
-		// simplify when creating buttons.
+		// Set default values.
 		this->wrapContentHorizontally();
 		this->wrapContentVertically();
 	}
@@ -51,13 +50,13 @@ namespace MoSync
 
 	/**
 	 * Set a image for this button.
-	 * @param imageResource A image resource.
+	 * @param imageHandle An image handle.
 	 */
-	void ImageButton::setImage(MAHandle imageResource)
+	void ImageButton::setImage(MAHandle imageHandle)
 	{
 		setProperty(
 			MAW_IMAGE_BUTTON_BACKGROUND_IMAGE,
-			imageResource);
+			imageHandle);
 	}
 
 	} // namespace UI

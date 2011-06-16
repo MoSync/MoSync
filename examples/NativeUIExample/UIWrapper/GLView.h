@@ -18,9 +18,9 @@ MA 02110-1301, USA.
 
 /**
  * @file GLView.h
- * @author Mikael Kindborg
+ * @author TODO: Add author.
  *
- * Class for gl view of widgets.
+ * Class for OpenGL views.
  */
 
 #ifndef MOSYNC_UI_GL_VIEW_H_
@@ -34,7 +34,7 @@ namespace MoSync
 	{
 
 	/**
-	 * Class for horizontal layouts.
+	 * Class for OpenGL views.
 	 */
 	class GLView : public Widget
 	{

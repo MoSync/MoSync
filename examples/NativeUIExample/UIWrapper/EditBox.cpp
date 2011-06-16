@@ -20,8 +20,7 @@ MA 02110-1301, USA.
  * @file EditBox.cpp
  * @author Emma Tresanszki
  *
- * Class for edit boxes. Create an edit box instance by
- * using the WidgetManager.
+ * Class for edit boxes.
  */
 
 #include "EditBox.h"
@@ -35,7 +34,7 @@ namespace MoSync
 	 * Constructor.
 	 */
 	EditBox::EditBox():
-		Widget(MAW_EDIT_BOX)
+		TextWidget(MAW_EDIT_BOX)
 	{
 		this->wrapContentVertically();
 	}
@@ -64,7 +63,8 @@ namespace MoSync
 	}
 
 	/*
-	 * Set a text in the edit box that acts as a placeholder when an edit box is empty.
+	 * Set a text in the edit box that acts as a placeholder
+	 * when an edit box is empty.
 	 * @param text A null-terminated string
 	 */
 	void EditBox::setPlaceholder(const MAUtil::String& text)

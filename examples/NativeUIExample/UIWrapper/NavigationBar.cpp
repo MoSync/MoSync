@@ -20,8 +20,8 @@ MA 02110-1301, USA.
  * @file NavigationBar.cpp
  * @author Emma Tresanszki
  *
- * Class for navigation bars. Create a navigation bar instance by
- * using the WidgetManager.
+ * Class for navigation bars.
+ *
  * This widget is available only on iOS.
  */
 
@@ -36,7 +36,7 @@ namespace MoSync
 		Widget("NavBar")
 	{
 		// Set some common default values to
-		// simplify when creating nav bars.
+		// simplify when creating navigation bars.
 		this->fillSpaceHorizontally();
 		this->wrapContentVertically();
 	}
@@ -48,18 +48,18 @@ namespace MoSync
 	{
 	}
 
-	/*
-	 * Sets the title of the nav bar.
-	 * @param title A null terminated string.
+	/**
+	 * Sets the title of the navigation bar.
+	 * @param title A String object.
 	 */
 	void NavigationBar::setTitle(const MAUtil::String& title)
 	{
 		this->setProperty("title", title);
 	}
 
-	/*
+	/**
 	 * Sets the title of the back button.
-	 * @param title A null terminated string.
+	 * @param title A String object.
 	 */
 	void NavigationBar::setBackButtonTitle(const MAUtil::String& title)
 	{

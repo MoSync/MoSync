@@ -18,10 +18,9 @@ MA 02110-1301, USA.
 
 /**
  * @file Image.cpp
- * @author Mikael Kindborg
+ * @author TODO: Add author.
  *
- * Class for layout of widgets. Create a layout instance by
- * using the WidgetManager.
+ * Class for image widgets.
  */
 
 #include "Image.h"
@@ -37,10 +36,11 @@ namespace MoSync
 	Image::Image() :
 		Widget(MAW_IMAGE)
 	{
-		// Set some common default values.
-		this->fillSpaceVertically();
-		this->fillSpaceHorizontally();
+		// Set default values.
+		this->wrapContentHorizontally();
+		this->wrapContentVertically();
 	}
+
 	/**
 	 * Destructor.
 	 */
@@ -49,12 +49,12 @@ namespace MoSync
 	}
 
 	/*
-	 * Set the image resource of the image widget.
-	 * @res The handle of the image resource.
+	 * Set the image of the image widget.
+	 * @param imageHandle The handle of the image.
 	 */
-	void Image::setResource(MAHandle res)
+	void Image::setResource(MAHandle imageHandle)
 	{
-		setProperty(MAW_IMAGE_IMAGE, res);
+		setProperty(MAW_IMAGE_IMAGE, imageHandle);
 	}
 
 	} // namespace UI

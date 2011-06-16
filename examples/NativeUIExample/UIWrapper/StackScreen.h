@@ -47,22 +47,41 @@ namespace MoSync
 		 */
 		virtual ~StackScreen();
 
+		/**
+		 * Get the number of screens in the stack screen.
+		 * @return Number of screens.
+		 */
 		virtual int getStackSize();
 
+		/**
+		 * Push a screen onto the stack screen.
+		 * This screen becomes the visible topmost screen.
+		 * @param screen The screen to push and show.
+		 */
 		virtual void push(Screen* screen);
 
+		/**
+		 * Pop a screen from the stack screen.
+		 * The previous screen becomes the visible topmost screen.
+		 */
 		virtual void pop();
 
 		/**
 		 * This method is called when there is an event for this widget.
-		 * It passes on the event to the widget's listener if one is set.
-		 * Note: You can either use an event listener or override this
-		 * method in a sublclass to handle events.
+		 *
+		 * Note: If you subclass StackScreen and override handleWidgetEvent,
+		 * make sure to call the method in this class to keep the stack
+		 * size logic working. Or just use a widget event listener.
+		 *
 		 * @param widgetEventData The data for the widget event.
 		 */
 		virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
 
 	private:
+
+		/**
+		 * List with the screens in the stack screen.
+		 */
 		MAUtil::Vector<Screen*> mStack;
 	};
 

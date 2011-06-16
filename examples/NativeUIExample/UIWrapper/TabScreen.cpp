@@ -51,7 +51,7 @@ namespace MoSync
 	 */
 	void TabScreen::addTab(Screen* screen)
 	{
-		maWidgetAddChild(getWidgetHandle(), screen->getWidgetHandle());
+		addChild(screen);
 	}
 
 	/**

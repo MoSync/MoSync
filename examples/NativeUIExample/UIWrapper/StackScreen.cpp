@@ -43,17 +43,30 @@ namespace MoSync
 	{
 	}
 
+	/**
+	 * Get the number of screens in the stack screen.
+	 * @return Number of screens.
+	 */
 	int StackScreen::getStackSize()
 	{
 		return mStack.size();
 	}
 
+	/**
+	 * Push a screen onto the stack screen.
+	 * This screen becomes the visible topmost screen.
+	 * @param screen The screen to push and show.
+	 */
 	void StackScreen::push(Screen* screen)
 	{
 		maWidgetStackScreenPush(getWidgetHandle(), screen->getWidgetHandle());
 		mStack.add(screen);
 	}
 
+	/**
+	 * Pop a screen from the stack screen.
+	 * The previous screen becomes the visible topmost screen.
+	 */
 	void StackScreen::pop()
 	{
 		if (mStack.size() > 0)
@@ -63,13 +76,12 @@ namespace MoSync
 	}
 
 	/**
-	 * TODO: Check this code! We might not need this. Unsure about how
-	 * it works.
-	 *
 	 * This method is called when there is an event for this widget.
-	 * It passes on the event to the widget's listener if one is set.
-	 * Note: You can either use an event listener or override this
-	 * method in a sublclass to handle events.
+	 *
+	 * Note: If you subclass StackScreen and override handleWidgetEvent,
+	 * make sure to call the method in this class to keep the stack
+	 * size logic working. Or just use a widget event listener.
+	 *
 	 * @param widgetEventData The data for the widget event.
 	 */
 	void StackScreen::handleWidgetEvent(MAWidgetEventData* widgetEventData)

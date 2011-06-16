@@ -20,8 +20,7 @@ MA 02110-1301, USA.
  * @file EditBox.h
  * @author Emma Tresanszki
  *
- * Class for edit boxes. Create an edit box instance by
- * using the WidgetManager.
+ * Class for edit boxes.
  */
 #ifndef MOSYNC_UI_EDITBOX_H_
 #define MOSYNC_UI_EDITBOX_H_
@@ -36,7 +35,7 @@ namespace MoSync
 	/**
 	 * Class for edit boxes.
 	 */
-	class EditBox : public Widget
+	class EditBox : public TextWidget
 	{
 	public:
 		/**
@@ -60,7 +59,8 @@ namespace MoSync
 		virtual void setTextInputMode();
 
 		/*
-		 * Set a text in the edit box that acts as a placeholder when an edit box is empty.
+		 * Set a text in the edit box that acts as a placeholder
+		 * when an edit box is empty.
 		 * @param text A null-terminated string
 		 */
 		virtual void setPlaceholder(const MAUtil::String& text);

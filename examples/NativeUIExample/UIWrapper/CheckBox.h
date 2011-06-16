@@ -20,8 +20,7 @@ MA 02110-1301, USA.
  * @file CheckBox.h
  * @author Emma Tresanszki
  *
- * Class for check boxes. Create a check box instance by
- * using the WidgetManager.
+ * Class for check boxes.
  */
 
 #ifndef MOSYNC_UI_CHECKBOX_H_
@@ -52,7 +51,8 @@ namespace MoSync
 
 		/*
 		 * Sets the current check box state.
-		 * @param checkboxState The current state.
+		 * @param checkboxState The current state,
+		 * false for not checked, true for checked.
 		 */
 		virtual void setCheckedState(bool checkboxState);
 

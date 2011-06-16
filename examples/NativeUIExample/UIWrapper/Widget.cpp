@@ -23,6 +23,13 @@ MA 02110-1301, USA.
  * Widget is the base class of all widgets. This class is
  * used to wrap native widget handles and provides common
  * methods for widgets and event support.
+ *
+ * Note: Not all methods in this class apply to all widget types.
+ * The motivation for this design is that it is convenient to
+ * have the most commonly used methods in the widget base class.
+ * The drawback is that some of the methods will not do anything
+ * when called on a widget that does not have the property used
+ * by the method.
  */
 
 #include <mavsprintf.h>

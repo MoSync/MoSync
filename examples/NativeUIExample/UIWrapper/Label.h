@@ -26,7 +26,7 @@ MA 02110-1301, USA.
 #ifndef MOSYNC_UI_LABEL_H_
 #define MOSYNC_UI_LABEL_H_
 
-#include "Widget.h"
+#include "TextWidget.h"
 
 namespace MoSync
 {
@@ -36,7 +36,7 @@ namespace MoSync
 	/**
 	 * Class for labels.
 	 */
-	class Label : public Widget
+	class Label : public TextWidget
 	{
 	public:
 		/**
@@ -48,36 +48,6 @@ namespace MoSync
 		 * Destructor.
 		 */
 		virtual ~Label();
-
-		/*
-		 * Sets the text of the label.
-		 * @param text The text of the label.
-		 */
-		void setText(const MAUtil::String& text);
-
-		/**
-		 * Center the text of the widget horizontally.
-		 * Note: Not all widgets support this property.
-		 */
-		void centerTextHorizontally();
-
-		/**
-		 * Center the text of the widget vertically.
-		 * Note: Not all widgets support this property.
-		 */
-		void centerTextVertically();
-
-		/*
-		 * Sets the font color of the label.
-		 * @param color The font color of the label.
-		 */
-		void setFontColor(const int color);
-
-		/*
-		 * Sets the font size of the label.
-		 * @param size The font size of the label.
-		 */
-		void setFontSize(const int size);
 	};
 
 	} // namespace UI

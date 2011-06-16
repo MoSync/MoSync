@@ -51,9 +51,9 @@ namespace MoSync
 
 		/**
 		 * Set a image for this button.
-		 * @param imageResource A image resource.
+		 * @param imageHandle An image handle.
 		 */
-		virtual void setImage(MAHandle imageResource);
+		virtual void setImage(MAHandle imageHandle);
 	};
 
 	} // namespace UI

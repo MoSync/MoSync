@@ -67,9 +67,6 @@ namespace MoSync
 		 * Index starts at zero.
 		 */
 		virtual int getActiveTab();
-
-		// TODO: Add a Vector that keeps track of the tabs and
-		// deletes them in the destructor. Is this the right way?
 	};
 
 	} // namespace UI

@@ -18,9 +18,9 @@ MA 02110-1301, USA.
 
 /**
  * @file Image.h
- * @author Mikael Kindborg
+ * @author TODO: Add author.
  *
- * Class for image of widgets.
+ * Class for image widgets.
  */
 
 #ifndef MOSYNC_UI_IMAGE_H_
@@ -50,10 +50,10 @@ namespace MoSync
 		virtual ~Image();
 
 		/*
-		 * Set the image resource of the image widget.
-		 * @res The handle of the image resource.
+		 * Set the image of the image widget.
+		 * @param imageHandle The handle of the image.
 		 */
-		void setResource(MAHandle res);
+		void setResource(MAHandle imageHandle);
 	};
 
 	} // namespace UI

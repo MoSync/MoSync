@@ -64,6 +64,12 @@ namespace MoSync
 		virtual void centerTextVertically();
 
 		/**
+		 * Sets the font color of the widget.
+		 * @param color The font color of the widget.
+		 */
+		void setFontColor(const int color);
+
+		/**
 		 * Set the font color of the widget.
 		 * Note: Not all widgets support this property.
 		 * @param red Red component (range 0-255).

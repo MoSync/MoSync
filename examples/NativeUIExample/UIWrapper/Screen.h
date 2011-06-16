@@ -83,17 +83,17 @@ namespace MoSync
 		/**
 		 * Handle pointer presses.
 		 */
-		virtual void handlePointerPressed(MAPoint2d p);
+		virtual void handlePointerPressed(MAPoint2d point);
 
 		/**
 		 * Handle pointer moves.
 		 */
-		virtual void handlePointerMoved(MAPoint2d p);
+		virtual void handlePointerMoved(MAPoint2d point);
 
 		/**
 		 * Handle pointer releases.
 		 */
-		virtual void handlePointerReleased(MAPoint2d p);
+		virtual void handlePointerReleased(MAPoint2d point);
 
 	protected:
 		/**

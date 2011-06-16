@@ -20,8 +20,7 @@ MA 02110-1301, USA.
  * @file CheckBox.cpp
  * @author Emma Tresanszki
  *
- * Class for check boxes. Create a check box instance by
- * using the WidgetManager.
+ * Class for check boxes.
  */
 
 #include "CheckBox.h"
@@ -35,8 +34,7 @@ namespace MoSync
 		Widget(MAW_CHECK_BOX)
 	{
 		// Set some common default values to
-		// simplify when creating buttons.
-//		this->fillSpaceHorizontally();
+		// simplify when creating a checkbox.
 		this->wrapContentVertically();
 	}
 
@@ -49,7 +47,8 @@ namespace MoSync
 
 	/*
 	 * Sets the current check box state.
-	 * @param checkboxState The current state.
+	 * @param checkboxState The current state,
+	 * false for not checked, true for checked.
 	 */
 	void CheckBox::setCheckedState(bool checkboxState)
 	{
@@ -65,11 +64,14 @@ namespace MoSync
 	{
 		MAUtil::String checked = getPropertyString(MAW_CHECK_BOX_CHECKED);
 
-		if ( checked == "true")
+		if (checked == "true")
 		{
 			return true;
 		}
-		return false;
+		else
+		{
+			return false;
+		}
 	}
 
 	} // namespace UI

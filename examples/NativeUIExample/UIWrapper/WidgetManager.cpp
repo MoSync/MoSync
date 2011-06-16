@@ -25,7 +25,7 @@ MA 02110-1301, USA.
  */
 
 #include <maprofile.h>		// Profile database
-#include <mastring.h>			// C string functions
+#include <mastring.h>		// C string functions
 #include "WidgetManager.h"	// Header file for this class
 
 namespace MoSync
@@ -53,7 +53,7 @@ namespace MoSync
 	 */
 	WidgetManager::~WidgetManager()
 	{
-		// TODO: Do cleanup. Destroy widgets.
+		// TODO: Do cleanup. Destroy widgets?
 	}
 
 	/**

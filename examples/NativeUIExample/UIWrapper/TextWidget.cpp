@@ -79,6 +79,17 @@ namespace MoSync
 	}
 
 	/**
+	 * Sets the font color of the widget.
+	 * @param color The font color of the widget.
+	 */
+	void TextWidget::setFontColor(const int color)
+	{
+		char buffer[256];
+		sprintf(buffer, "0x%.6X", color);
+		setProperty(MAW_LABEL_FONT_COLOR, buffer);
+	}
+
+	/**
 	 * Set the font color of the widget.
 	 * Note: Not all widgets support this property.
 	 * @param red Red component (range 0-255).
