@@ -62,9 +62,6 @@ MA 02110-1301, USA.
 // The text that will be showed on the tab widget.
 #define TAB_SCREEN_TITLE "Web"
 
-// The height of the title widget.
-#define NAVIGATION_BAR_WIDGET_HEIGHT 30
-
 // The height of the line layout.
 #define LINE_LAYOUT_HEIGHT 2
 
@@ -174,7 +171,6 @@ ScreenWebView::ScreenWebView():
 	{
 		// Create and add the navigation bar to the main layout.
 		mNavBarWidget = new NavigationBar();
-		mNavBarWidget->setSize(mScreenWidth, NAVIGATION_BAR_WIDGET_HEIGHT);
 		mNavBarWidget->setTitle(SCREEN_TITLE);
 		mNavBarWidget->setBackButtonTitle("");
 		mainLayout->addChild(mNavBarWidget);
@@ -256,7 +252,7 @@ void ScreenWebView::createAddressBar()
 	mEditBoxWidget = new EditBox();
 	mEditBoxWidget->setTextInputMode();
 	mEditBoxWidget->setProperty(MAW_EDIT_BOX_TEXT, sURL);
-	mEditBoxWidget->setSize((int) editBoxWidth, mAddressBarWidgetsHeight);
+	mEditBoxWidget->setProperty(MAW_WIDGET_WIDTH, -1);
 	mEditBoxWidget->setEventListener(this);
 
 	// Create the open link button widget.
@@ -327,7 +323,8 @@ VerticalLayout* ScreenWebView::createSpacer(const int width, const int height)
 	MAWidgetEventData* widgetEventData)
 {
 	// Check that the event was a click (touch) event.
-	if (MAW_EVENT_CLICKED == widgetEventData->eventType)
+	if (MAW_EVENT_CLICKED == widgetEventData->eventType ||
+		MAW_EVENT_POINTER_PRESSED == widgetEventData->eventType)
 	{
 		if(widget == mEditBoxWidget || widget == mOpenLinkButtonWidget)
 		{
