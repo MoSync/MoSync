@@ -18,9 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file Moblet.cpp
- * @author Emma Tresanszki
  *
  * This file contains the moblet that manages the application.
+ *
+ * @author Emma Tresanszki
  */
 
 // Include the header file for this Moblet.
@@ -30,10 +31,9 @@ namespace RockPaperScissors
 {
 
 /**
- * Constructor.
+ * Private constructor.
  */
-RockPaperScissorsMoblet::RockPaperScissorsMoblet() :
-	mMainScreen(NULL)
+RockPaperScissorsMoblet::RockPaperScissorsMoblet() : mMainScreen(NULL)
 {
 	mMainScreen = new PlayScreen();
 	mMainScreen->showScreen();
@@ -41,8 +41,7 @@ RockPaperScissorsMoblet::RockPaperScissorsMoblet() :
 
 /**
  * Get the single instance of this Moblet.
- * Returns a reference to the moblet instance,
- * so that we can access it from outside its class.
+ * Returns a reference to the moblet instance, so that we can access it from outside its class.
  * @return The Moblet instance.
  */
 RockPaperScissorsMoblet* RockPaperScissorsMoblet::getInstance()

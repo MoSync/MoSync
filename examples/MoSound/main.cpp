@@ -22,8 +22,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * Shows how to use the sound api. This example shows
 * how to play and loop a sound once.
 *
-* Copyright (c) Mobile Sorcery AB 2005-2007
-*
 * \author Niklas Nummelin
 *
 */

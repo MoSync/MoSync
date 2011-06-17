@@ -17,19 +17,20 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Game.cpp
- * @author Emma Tresanszki
+ * @file Game.h
  *
  * This file contains the game logic for the game.
  *
  * Game logic:
- *  - The game is started by clicking the Start button, and that enables the
- *    user to select a weapon from the 3 available ones.
- *  - The opponent's weapon is chosen randomly, and it is shown only after
- *    the user has picked his weapon.
- *  - The game result is displayed using two strings: who won the game and why.
- *  - The score info at the bottom is updated after each game is finished.
- *  - Game can be restarted by pressing the Start button again.
+ * The game is started by clicking the Start button, and that enables the
+ * user to select a weapon from the 3 available ones.
+ * The opponent's weapon is chosen randomly, and it is shown only after
+ * the user has picked his weapon.
+ * The game result is displayed using two strings: who won the game, and why.
+ * The score info at the bottom is updated after each game is finished.
+ * Game can be restarted by pressing the Start button again.
+ *
+ * @author Emma Tresanszki
  */
 
 #ifndef GAME_H_

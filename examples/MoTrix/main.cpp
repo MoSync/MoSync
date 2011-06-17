@@ -21,8 +21,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *
 * Shows how to use draw image region in a rather adanved way.
 *
-* Copyright (c) Mobile Sorcery AB 2005-2007
-*
 * \author Niklas Nummelin
 *
 */
