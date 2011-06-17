@@ -22,8 +22,6 @@ MA 02110-1301, USA.
 *
 * Shows how to create a medium advanced game called MoTris (tetris clone).
 *
-* Copyright (c) Mobile Sorcery AB 2005-2007
-*
 * \author Niklas Nummelin
 *
 */
@@ -1052,7 +1050,7 @@ void drawBackground(int w, int h, int x, int y) {
 	MAExtent logoExtents = maGetImageSize(MOTRIS_LOGO);
 	maDrawImage(MOTRIS_LOGO, (w>>1) - (EXTENT_X(logoExtents)>>1),  beneathLogoY-EXTENT_Y(logoExtents)-4);
 
-	const char *copyright = "(c) mobile sorcery 2007";
+	const char *copyright = "(c) MoSync 2011";
 	MAExtent ce = maGetTextSize(copyright);
 	aboveCopyrightY = h-EXTENT_Y(ce);
 	drawShadowedText((w>>1)-(EXTENT_X(ce)>>1), aboveCopyrightY, TEXT_COLOR, copyright);

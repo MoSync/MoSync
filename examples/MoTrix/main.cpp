@@ -22,8 +22,6 @@ MA 02110-1301, USA.
 *
 * Shows how to use draw image region in a rather adanved way.
 *
-* Copyright (c) Mobile Sorcery AB 2005-2007
-*
 * \author Niklas Nummelin
 *
 */

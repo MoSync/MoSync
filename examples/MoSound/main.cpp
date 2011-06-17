@@ -23,8 +23,6 @@ MA 02110-1301, USA.
 * Shows how to use the sound api. This example shows
 * how to play and loop a sound once.
 *
-* Copyright (c) Mobile Sorcery AB 2005-2007
-*
 * \author Niklas Nummelin
 *
 */

@@ -18,9 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file Moblet.h
- * @author Emma Tresanszki
  *
  * This file contains the moblet that manages the application.
+ *
+ * @author Emma Tresanszki
  */
 
 #ifndef NATIVEUIMOBLET_H_
@@ -48,14 +49,13 @@ class RockPaperScissorsMoblet : public MAUtil::Moblet
 {
 public:
 	/**
-	 * Constructor.
+	 * Constructor
 	 */
 	RockPaperScissorsMoblet();
 
 	/**
 	 * Get the single instance of this Moblet.
-	 * Returns a reference to the moblet instance,
-	 * so that we can access it from outside its class.
+	 * Returns a reference to the moblet instance, so that we can access it from outside its class.
 	 * @return The Moblet instance.
 	 */
 	static RockPaperScissorsMoblet* getInstance();
@@ -77,4 +77,4 @@ private:
 
 } // namespace RockPaperScissors
 
-#endif // NATIVEUIMOBLET_H_
+#endif  /* NATIVEUIMOBLET_H_ */
