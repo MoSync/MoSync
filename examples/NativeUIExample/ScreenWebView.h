@@ -15,7 +15,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
-   
+
 /**
  * @file ScreenWebView.h
  * @author Bogdan Iusco.
@@ -140,6 +140,12 @@ private:
 	 */
 	void fadeInAddressBar();
 
+	/**
+	 * Sets the visibility of the address bar widgets.
+	 * @param value True - shows the widgets, otherwise hides them.
+	 */
+	void setAddressBarWidgetsVisibility(const bool value);
+
 private:
 
 	/**
@@ -241,6 +247,21 @@ private:
 	 * Screen height.
 	 */
 	int mScreenHeight;
+
+	/**
+	 * The default height of the address bar(when it's expanded).
+	 */
+	int mAddressBarMaxHeight;
+
+	/**
+	 * The height of the address bar(when it's collapsed).
+	 */
+	int mAddressBarMinHeight;
+
+	/**
+	 * The height of the widgets from address bar.
+	 */
+	 int mAddressBarWidgetsHeight;
 
 	/**
 	 * The flag is set if the address bar is visible.

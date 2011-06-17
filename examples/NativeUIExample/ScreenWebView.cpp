@@ -15,7 +15,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
- 
+
 /**
  * @file ScreenWebView.h
  * @author Bogdan Iusco.
@@ -24,19 +24,16 @@ MA 02110-1301, USA.
  */
 
 // The width of the edit box in percentage (x% of the screen width).
-#define EDIT_BOX_WIDTH 65.0
+#define EDIT_BOX_WIDTH 55.0
 
 // The width of the open link button in percentage (x% of the screen width)
 #define BUTTON_WIDTH 25.0
 
 // The default height of the address bar(when it's expanded).
-#define MAX_ADDRESS_BAR_HEIGHT 55
+#define DEFAULT_MAX_ADDRESS_BAR_HEIGHT 55
 
-// The height of the address bar(when it's collapsed).
-#define MIN_ADDRESS_BAR_HEIGHT 20
-
-// The height of the widgets from address bar.
-#define NAV_BAR_WIDGETS_HEIGHT 50
+// The default height of the address bar(when it's collapsed).
+#define DEFAULT_MIN_ADDRESS_BAR_HEIGHT 20
 
 // Increase/decrease height value of the address bar.
 #define ANIMATION_HEIGHT_VALUE 8
@@ -74,6 +71,15 @@ MA 02110-1301, USA.
 // The background color of the line layout.
 #define LINE_LAYOUT_BG_COLOR 0xC0C0C0
 
+// Constant for defining big screens.
+#define LARGE_SCREEN_HEIGHT 800
+
+// The increase height value for widgets(for large screens only).
+#define LARGE_SCREEN_INCREASE_VALUE 30
+
+// True and false constants.
+#define TRUE_CONST "true"
+#define FALSE_CONST "false"
 
 // Include the resources for images.
 #include "MAHeaders.h"
@@ -139,6 +145,9 @@ ScreenWebView::ScreenWebView():
 		mCurrentAddressBarAlpha(0),
 		mScreenWidth(0),
 		mScreenHeight(0),
+		mAddressBarMaxHeight(0),
+		mAddressBarMinHeight(0),
+		mAddressBarWidgetsHeight(0),
 		mIsAddressBarVisible(false)
 {
 	mScreen = new Screen();
@@ -198,6 +207,7 @@ ScreenWebView::~ScreenWebView()
 	MAUtil::Environment::getEnvironment().removeTimer(this);
 	mOpenLinkButtonWidget->setEventListener(NULL);
 	mHideShowButtonWidget->setEventListener(NULL);
+	mEditBoxWidget->setEventListener(NULL);
 
 	delete mScreen;
 	delete mWebView;
@@ -221,12 +231,23 @@ void ScreenWebView::createAddressBar()
 	float editBoxWidth = EDIT_BOX_WIDTH / 100.0 * mScreenWidth;
 	float buttonWidth = BUTTON_WIDTH / 100.0 * mScreenWidth;
 	int editBoxLayoutWidth = (int)editBoxWidth + SPACE;
-	mCurrentAddressBarHeight = NAV_BAR_WIDGETS_HEIGHT;
+	mAddressBarMaxHeight = DEFAULT_MAX_ADDRESS_BAR_HEIGHT;
+	mAddressBarMinHeight = DEFAULT_MIN_ADDRESS_BAR_HEIGHT;
+
+	// For large screen increase the height of the widgets.
+	if(LARGE_SCREEN_HEIGHT <= mScreenHeight)
+	{
+		mAddressBarMaxHeight += LARGE_SCREEN_INCREASE_VALUE;
+		mAddressBarMinHeight += LARGE_SCREEN_INCREASE_VALUE - (2 * SPACE);
+	}
+
+	mAddressBarWidgetsHeight = mAddressBarMaxHeight - (2 * SPACE);
+	mCurrentAddressBarHeight = mAddressBarMaxHeight;
 	mCurrentAddressBarAlpha = MAX_ALPHA_VALUE;
 
 	// Create the address layout.
 	mAddressBarLayout = new HorizontalLayout();
-	mAddressBarLayout->setSize(mScreenWidth, MAX_ADDRESS_BAR_HEIGHT);
+	mAddressBarLayout->setSize(mScreenWidth, mAddressBarMaxHeight);
 	mAddressBarLayout->setProperty(
 		MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
 		MAW_ALIGNMENT_CENTER);
@@ -235,36 +256,37 @@ void ScreenWebView::createAddressBar()
 	mEditBoxWidget = new EditBox();
 	mEditBoxWidget->setTextInputMode();
 	mEditBoxWidget->setProperty(MAW_EDIT_BOX_TEXT, sURL);
-	mEditBoxWidget->setSize((int) editBoxWidth, NAV_BAR_WIDGETS_HEIGHT);
+	mEditBoxWidget->setSize((int) editBoxWidth, mAddressBarWidgetsHeight);
+	mEditBoxWidget->setEventListener(this);
 
 	// Create the open link button widget.
 	mOpenLinkButtonWidget = new ImageButton();
 	mOpenLinkButtonWidget->setImage(RES_WEB_VIEW_OPEN_LINK_IMAGE);
-	mOpenLinkButtonWidget->setSize(NAV_BAR_WIDGETS_HEIGHT, NAV_BAR_WIDGETS_HEIGHT);
+	mOpenLinkButtonWidget->setSize(mAddressBarWidgetsHeight, mAddressBarWidgetsHeight);
 	mOpenLinkButtonWidget->setEventListener(this);
 
 	// Create the hide/show button widget.
 	mHideShowButtonWidget = new ImageButton();
 	mHideShowButtonWidget->setImage(RES_WEB_VIEW_IMAGE_HIDE_IMAGE);
-	mHideShowButtonWidget->setSize(MIN_ADDRESS_BAR_HEIGHT, MIN_ADDRESS_BAR_HEIGHT);
+	mHideShowButtonWidget->setSize(mAddressBarMinHeight , mAddressBarMinHeight);
 	mHideShowButtonWidget->setEventListener(this);
 
 	// Create the edit box layout.
-	mEditBoxLayout = createSpacer(editBoxLayoutWidth, NAV_BAR_WIDGETS_HEIGHT);
+	mEditBoxLayout = createSpacer(editBoxLayoutWidth, mAddressBarWidgetsHeight);
 	mEditBoxLayout->addChild(mEditBoxWidget);
 
 	// Create the open link button layout.
 	mOpenLinkBtnLayout = createSpacer(
-		NAV_BAR_WIDGETS_HEIGHT + (2 * SPACE),
-		NAV_BAR_WIDGETS_HEIGHT);
+		mAddressBarWidgetsHeight + (2 * SPACE),
+		mAddressBarWidgetsHeight);
 	mOpenLinkBtnLayout->addChild(mOpenLinkButtonWidget);
 
 	// Create the hide/show button layout.
 	int hideShowBtnLayoutWidth = mScreenWidth - editBoxLayoutWidth -
-		NAV_BAR_WIDGETS_HEIGHT - (3 * SPACE);
-	mHideShowBtnLayout = createSpacer(hideShowBtnLayoutWidth, NAV_BAR_WIDGETS_HEIGHT);
+		mAddressBarWidgetsHeight - (5 * SPACE);
+	mHideShowBtnLayout = createSpacer(hideShowBtnLayoutWidth, mAddressBarWidgetsHeight);
 	mHideShowBtnLayout->setProperty(
-		MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
+		MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
 		MAW_ALIGNMENT_TOP);
 	mHideShowBtnLayout->addChild(mHideShowButtonWidget);
 
@@ -307,11 +329,13 @@ VerticalLayout* ScreenWebView::createSpacer(const int width, const int height)
 	// Check that the event was a click (touch) event.
 	if (MAW_EVENT_CLICKED == widgetEventData->eventType)
 	{
-		if(widget == mOpenLinkButtonWidget)
+		if(widget == mEditBoxWidget || widget == mOpenLinkButtonWidget)
 		{
+			mEditBoxWidget->setProperty(MAW_EDIT_BOX_SHOW_KEYBOARD, FALSE_CONST);
 			MAUtil::String webAddress = mEditBoxWidget->getPropertyString("text");
 			mWebView->openURL(webAddress);
-		} else if(widget == mHideShowButtonWidget)
+		}
+		else if(widget == mHideShowButtonWidget)
 		{
 			// If the address bar is not animating handle this event.
 			if(NONE == mAddressBarAnimation)
@@ -320,11 +344,11 @@ VerticalLayout* ScreenWebView::createSpacer(const int width, const int height)
 				mCurrentAddressBarAlpha = MAX_ALPHA_VALUE;
 				if(mIsAddressBarVisible)
 				{
-					mCurrentAddressBarHeight = MAX_ADDRESS_BAR_HEIGHT;
+					mCurrentAddressBarHeight = mAddressBarMaxHeight;
 					mAddressBarAnimation = FADE_OUT_ADDRESS_BAR;
 				} else
 				{
-					mCurrentAddressBarHeight = MIN_ADDRESS_BAR_HEIGHT;
+					mCurrentAddressBarHeight = mAddressBarMinHeight;
 					mAddressBarAnimation = HIDE_EXPAND_WIDGET;
 				}
 
@@ -395,7 +419,7 @@ void ScreenWebView::fadeOutAddressBar()
 
 	 // Decrease the height of the address bar.
 	 mCurrentAddressBarHeight -= ANIMATION_HEIGHT_VALUE;
-	 if(MIN_ADDRESS_BAR_HEIGHT < mCurrentAddressBarHeight)
+	 if(mAddressBarMinHeight < mCurrentAddressBarHeight)
 	 {
 		 mAddressBarLayout->setSize(mScreenWidth, mCurrentAddressBarHeight);
 		 stopFading = false;
@@ -416,15 +440,16 @@ void ScreenWebView::fadeOutAddressBar()
 	 }
 
 	 // If the height of the address bar has reached at the
-	 // desired value(MIN_ADDRESS_BAR_HEIGHT) and the alpha
+	 // desired value(mAddressBarMinHeight) and the alpha
 	 // value of the address bar widgets is MIN_ALPHA_VALUE
 	 // then go to the next step of the animation.
 	 if(stopFading) {
 		 mAddressBarAnimation = SHOW_EXPAND_WIDGET;
 		 mHideShowButtonWidget->setImage(RES_WEB_VIEW_IMAGE_SHOW_IMAGE);
 		 mHideShowBtnLayout->setProperty(
-			MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
+			MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
 			MAW_ALIGNMENT_CENTER);
+		 setAddressBarWidgetsVisibility(false);
 	 }
 }
 
@@ -437,18 +462,18 @@ void ScreenWebView::fadeOutAddressBar()
  */
 void ScreenWebView::showExpandWidget()
 {
-	// Set the alpha value for the show/hide button widget.
-	 mCurrentAddressBarAlpha += ANIMATION_ALPHA_VALUE;
-	 if(MAX_ALPHA_VALUE >= mCurrentAddressBarAlpha)
-	 {
-		 mHideShowButtonWidget->setProperty(
+    mCurrentAddressBarAlpha += ANIMATION_ALPHA_VALUE;
+	if(MAX_ALPHA_VALUE >= mCurrentAddressBarAlpha)
+	{
+		mHideShowButtonWidget->setProperty(
 		 	MAW_WIDGET_ALPHA,
 		 	mCurrentAddressBarAlpha);
 	 } else
 	 {
-		 // Stop the animation.
-		 mIsAddressBarVisible = false;
-		 mAddressBarAnimation = NONE;
+		// Stop the animation.
+		mIsAddressBarVisible = false;
+		mAddressBarAnimation = NONE;
+		mHideShowButtonWidget->setImage(RES_WEB_VIEW_IMAGE_SHOW_IMAGE);
 	 }
 }
 
@@ -472,7 +497,7 @@ void ScreenWebView::hideExpandWidget()
 		 mHideShowButtonWidget->setImage(RES_WEB_VIEW_IMAGE_HIDE_IMAGE);
 		 mAddressBarAnimation = FADE_IN_ADDRESS_BAR;
 		 mHideShowBtnLayout->setProperty(
-			MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
+			MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
 			MAW_ALIGNMENT_TOP);
 	 }
 }
@@ -489,13 +514,13 @@ void ScreenWebView::fadeInAddressBar()
 
 	 // Increase the height of the navigation bar.
 	 mCurrentAddressBarHeight += ANIMATION_HEIGHT_VALUE;
-	 if(MAX_ADDRESS_BAR_HEIGHT >= mCurrentAddressBarHeight)
+	 if(mAddressBarMaxHeight >= mCurrentAddressBarHeight)
 	 {
 		 mAddressBarLayout->setSize(mScreenWidth, mCurrentAddressBarHeight);
 		 stopFading = false;
 	 } else
 	 {
-		 mAddressBarLayout->setSize(mScreenWidth, MAX_ADDRESS_BAR_HEIGHT);
+		 mAddressBarLayout->setSize(mScreenWidth, mAddressBarMaxHeight);
 	 }
 
 	 // Set the alpha value for the address bar widgets.
@@ -513,11 +538,34 @@ void ScreenWebView::fadeInAddressBar()
 	 }
 
 	 // If the height of the address bar has reached at the
-	 // desired value(MAX_ADDRESS_BAR_HEIGHT) and the alpha
+	 // desired value(mAddressBarMaxHeight) and the alpha
 	 // value of the address bar widgets is MAX_ALPHA_VALUE
 	 // then stop the animation.
 	 if(stopFading) {
 		 mAddressBarAnimation = NONE;
 		 mIsAddressBarVisible = true;
+		 setAddressBarWidgetsVisibility(true);
 	 }
+}
+
+/**
+ * Sets the visibility of the address bar widgets.
+ * @param value True - shows the widgets, otherwise hides them.
+ */
+void ScreenWebView::setAddressBarWidgetsVisibility(const bool value)
+{
+	MAUtil::String propertyValue;
+
+	if(true == value)
+	{
+		propertyValue = TRUE_CONST;
+	} else
+	{
+		propertyValue = FALSE_CONST;
+	}
+
+	mEditBoxWidget->setProperty(MAW_WIDGET_VISIBLE, propertyValue);
+	mOpenLinkButtonWidget->setProperty(
+		MAW_WIDGET_VISIBLE,
+		propertyValue);
 }
