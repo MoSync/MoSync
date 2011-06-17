@@ -53,7 +53,7 @@ namespace MoSync
 		 * Set the image of the image widget.
 		 * @param imageHandle The handle of the image.
 		 */
-		void setResource(MAHandle imageHandle);
+		void setImage(MAHandle imageHandle);
 	};
 
 	} // namespace UI

@@ -52,7 +52,7 @@ namespace MoSync
 	 * Set the image of the image widget.
 	 * @param imageHandle The handle of the image.
 	 */
-	void Image::setResource(MAHandle imageHandle)
+	void Image::setImage(MAHandle imageHandle)
 	{
 		setProperty(MAW_IMAGE_IMAGE, imageHandle);
 	}
