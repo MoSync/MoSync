@@ -42,14 +42,17 @@
 
 .res RES_IMAGE1_SMALL
 .ubin
+.pstring "Image 1"
 .include "small/Image1.png"
 
 .res RES_IMAGE2_SMALL
 .ubin
+.pstring "Image 2"
 .include "small/Image2.png"
 
 .res RES_IMAGE3_SMALL
 .ubin
+.pstring "Image 3"
 .include "small/Image3.png"
 
 .res RES_LAST_IMAGE_SMALL
@@ -60,14 +63,17 @@
 
 .res RES_IMAGE1_MEDIUM
 .ubin
+.pstring "Image 1"
 .include "medium/Image1.png"
 
 .res RES_IMAGE2_MEDIUM
 .ubin
+.pstring "Image 2"
 .include "medium/Image2.png"
 
 .res RES_IMAGE3_MEDIUM
 .ubin
+.pstring "Image 3"
 .include "medium/Image3.png"
 
 .res RES_LAST_IMAGE_MEDIUM
@@ -78,14 +84,17 @@
 
 .res RES_IMAGE1_LARGE
 .ubin
+.pstring "Image 1"
 .include "medium/Image1.png"
 
 .res RES_IMAGE2_LARGE
 .ubin
+.pstring "Image 2"
 .include "medium/Image2.png"
 
 .res RES_IMAGE3_LARGE
 .ubin
+.pstring "Image 3"
 .include "large/Image3.png"
 
 .res RES_LAST_IMAGE_LARGE

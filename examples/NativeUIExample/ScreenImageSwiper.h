@@ -32,22 +32,6 @@ MA 02110-1301, USA.
 
 #include "conprint.h"
 
-/*
- * DEFINES
- */
-#define SMALL_SCREEN_RESOLUTION			320
-#define MEDIUM_SCREEN_RESOLUTION		480
-#define LARGE_SCREEN_RESOLUTION			1024
-
-#define TXT_SCREEN_TITLE				"Images"
-
-#define SCREEN_BG_COLOR					0xF0F0F0
-#define LABEL_BG_COLOR					0x111111
-#define FONT_COLOR						0xFFFFFF
-/*
- * DEFINES
- */
-
 using namespace MoSync::UI;
 
 /*
@@ -61,6 +45,8 @@ public:
 	int posY;
 	int width;
 
+	MAUtil::String name;
+
 	void setResource()
 	{
 		Image::setResource(handle);
@@ -70,7 +56,7 @@ public:
 /**
  * A Image Swiper class.
  */
-class ScreenImageSwiper : public Screen
+class ScreenImageSwiper : public Screen, public MAUtil::TimerListener
 {
 public:
 
@@ -85,9 +71,16 @@ public:
 	~ScreenImageSwiper();
 
 	/*
-	 * Create the UI for Swiper Screen.
+	 * Create the UI for the image swiper screen.
 	 */
 	void createUI();
+
+	/*
+	 * Sets the properties for the images widgets.
+	 * @param width The desired width of the images widgets.
+	 * @param height The desired height of the images widgets.
+	 */
+	void setupImages(int width, int height);
 
 	/**
 	 * Create the Swiper Screen.
@@ -109,6 +102,11 @@ public:
 	 */
 	void handlePointerReleased(MAPoint2d p);
 
+	/*
+	 * Update the application
+	 */
+	void runTimerEvent();
+
 private:
 	// Screen sizes.
 	int mScreenWidth;
@@ -118,17 +116,39 @@ private:
 	RelativeLayout* imagesLayout;
 	Label* labelLayout;
 
+	/**
+	 * A simple navigation bar for iOS devices.
+	 * It is used only for displaying a text(the title of the screen).
+	 */
+	NavigationBar* mTitleWidget;
+
 	ScreenImage** images;
 	int imagesSize;
 
-	// pointer X coordinate on screen
-	int mPointerX;
+	// pointer X coordinates on screen
+	int mPointerXStart;
+	int mPointerXEnd;
 
 	void getScreenSize();
 
+	/*
+	 * Load the images from resources according to the screen resolution.
+	 * @param screenWidth The width of the screen.
+	 */
 	void loadImages(int screenWidth);
 
-	//bool readString(int resID, int pos, MAUtil::String &result);
+	/*
+	 * Read the only string from one string resource.
+	 * @param resID A valid resource id.
+	 * @param pos The start position.
+	 * @param output The resulting string.
+	 */
+	bool readStringFromResource(MAHandle resID, int& pos, MAUtil::String &output) const;
+
+	/*
+	 * Creates an image with a gray gradient.
+	 */
+	Image* createBackgroundGradient();
 };
 
 #endif
