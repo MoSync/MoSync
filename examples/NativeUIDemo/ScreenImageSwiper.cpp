@@ -94,11 +94,8 @@ void ScreenImageSwiper::createUI()
 	}
 	else
 	{
-		// Create the navigation bar for iOS
+		// Create the navigation bar for iOS.
 		mTitleWidget = new NavigationBar();
-
-		// Set the navigation's bar sizes.
-		//mTitleWidget->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, TITLE_WIDGET_HEIGHT);
 
 		// Set the navigation's bar title.
 		mTitleWidget->setTitle(TXT_SCREEN_TITLE);
@@ -113,6 +110,7 @@ void ScreenImageSwiper::createUI()
 		setIcon(RES_TAB_ICON_IMAGE_SWIPER);
 	}
 
+	// Get the screen size.
 	getScreenSize();
 
 	// Create a RelativeLayout as container for images.
@@ -171,7 +169,6 @@ void ScreenImageSwiper::setupImages(int width, int height)
 		mImages[i]->showImage();
 		mImages[i]->setSize(width, height);
 		mImages[i]->setProperty("scaleMode", "scalePreserveAspect");
-		// TODO: Remove: mImages[i]->setPosition(mImages[i]->mPosX, mImages[i]->mPosY);
 
 		mImagesLayout->addChild(mImages[i]);
 
@@ -180,8 +177,9 @@ void ScreenImageSwiper::setupImages(int width, int height)
 	}
 }
 
-/*
- * Method for getting the screen size inside the members mScreenWidth and mScreenHeight
+/**
+ * Method that gets the screen size into the instance variables
+ * mScreenWidth and mScreenHeight.
  */
 void ScreenImageSwiper::getScreenSize()
 {

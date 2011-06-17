@@ -165,24 +165,23 @@ public:
 	}
 
 private:
-
-	/*
+	/**
 	 * The handle of the image.
 	 */
 	MAHandle mImageHandle;
 
-	/*
-	 * The image's position ont he screen.
+	/**
+	 * The image's position on the screen.
 	 */
 	int mPosX;
 	int mPosY;
 
-	/*
+	/**
 	 * The image's width.
 	 */
 	int mWidth;
 
-	/*
+	/**
 	 * The image's name.
 	 */
 	MAUtil::String mName;
@@ -249,12 +248,14 @@ public:
 
 private:
 	/**
-	 * TODO: Document.
+	 * Get the scale factor used when sweeping images.
+	 * @return scale factor used for sweeping
 	 */
 	float getScaleFactor();
 
-	/*
-	 * Method for getting the screen size inside the members mScreenWidth and mScreenHeight
+	/**
+	 * Method that gets the screen size into the instance variables
+	 * mScreenWidth and mScreenHeight.
 	 */
 	void getScreenSize();
 
