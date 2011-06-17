@@ -18,7 +18,6 @@ MA 02110-1301, USA.
 
 /**
  * @file main.cpp
- * @author Emma Tresanszki
  *
  * This application provides a very basic example of how to use some native UI widgets.
  * It is based on the game Rock-Paper-Scissors.
@@ -30,6 +29,8 @@ MA 02110-1301, USA.
  
  * Note also that this example will not work on the MoSync emulator (MoRE)
  * because it has no Native UI support yet.
+ *
+ * @author Emma Tresanszki
  */
 
 // Include the class declaration for the application's Moblet.

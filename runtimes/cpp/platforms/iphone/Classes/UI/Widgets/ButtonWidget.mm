@@ -27,8 +27,9 @@
 - (id)init {
 	if(!view)
 		view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
+        
 	UIButton* button = (UIButton*) view;
-	button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
+    button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
 	[button addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
 	image = nil;
 	leftCapWidth = 0;
@@ -36,10 +37,9 @@
 	button.titleLabel.numberOfLines = 0;	
 	id ret = [super init];
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
-    button.contentMode = UIViewContentModeCenter;
     button.imageView.contentMode = UIViewContentModeCenter;
-    button.adjustsImageWhenHighlighted = NO;
-	return ret;
+    button.imageView.autoresizingMask=NO;
+ 	return ret;
 }
 
 -(void)buttonPressed {
@@ -79,15 +79,23 @@
 		image = [UIImage imageWithCGImage:imageResource->image];
 		[button setBackgroundImage:image forState:UIControlStateNormal];
         //[button setImage:image forState:UIControlStateNormal];
-        
 	}
     else if ([key isEqualToString:@"scaleMode"]) {
         UIButton* button = (UIButton*)view;
         
-        if([value isEqualToString:@"none"]) button.contentMode = UIViewContentModeCenter;
-        else if([value isEqualToString:@"scaleXY"]) button.contentMode = UIViewContentModeScaleToFill;
-        else if([value isEqualToString:@"scalePreserveAspect"]) button.contentMode = UIViewContentModeScaleAspectFit;
-        else return MAW_RES_INVALID_PROPERTY_NAME;
+        UIViewContentMode contentMode;
+        
+        if([value isEqualToString:@"none"]) 
+            contentMode = UIViewContentModeCenter;
+        else if([value isEqualToString:@"scaleXY"]) 
+            contentMode = UIViewContentModeScaleToFill;
+        else if([value isEqualToString:@"scalePreserveAspect"]) 
+            contentMode = UIViewContentModeScaleAspectFit;
+        else 
+            return MAW_RES_INVALID_PROPERTY_NAME;
+        
+        [button setContentMode:contentMode];
+        button.imageView.contentMode = contentMode;
     }   
 	else if([key isEqualToString:@"leftCapWidth"]) {
 		int newLeftCapWidth = [value intValue];

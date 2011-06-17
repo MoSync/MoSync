@@ -21,7 +21,6 @@ MA 02110-1301, USA.
 * The background is gray. The pointer is white. Use the arrow keys to move the pointer
 * and draw a black polyline. Press 9 to clear the screen.
 * Press 2 to "lift" the pointer, or to put it back down.
-* Press 7 to have the program draw the MoSync logotype. //DISABLED!
 * Press 0 (zero) to exit the program.
 * The sketch is saved to a permanent store automatically when you exit the program.
 * If a sketch has been saved, it will be loaded automatically when you start the program.
