@@ -197,8 +197,19 @@ void ScreenWebView::createAddressBar()
 	mEditBoxWidget = new EditBox();
 	mEditBoxWidget->setTextInputMode();
 	mEditBoxWidget->setText(DEFAULT_URL_ADDRESS);
-	mEditBoxWidget->fillSpaceHorizontally();
-	mEditBoxWidget->wrapContentVertically();
+	if (WidgetManager::isAndroid())
+	{
+		// For Android.
+		mEditBoxWidget->fillSpaceHorizontally();
+		mEditBoxWidget->wrapContentVertically();
+	}
+	else
+	{
+		// For iOS.
+		mEditBoxWidget->setSize(
+			MAW_CONSTANT_FILL_AVAILABLE_SPACE,
+			EXTENT_Y(maGetImageSize(RES_WEB_VIEW_OPEN_LINK_IMAGE)));
+	}
 	mEditBoxWidget->setEventListener(this);
 
 	// Create the open link button widget.
