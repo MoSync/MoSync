@@ -121,9 +121,6 @@ void ScreenImageSwiper::createUI()
 	// Set the layout's background color.
 	mImagesLayout->setBackgroundColor(SCREEN_BG_COLOR);
 
-	// Create a background gradient and add it to the images Layout
-	//mImagesLayout->addChild(createBackgroundGradient());
-
 	// Loads the needed image according to the screen resolution.
 	loadImages(mScreenWidth);
 
@@ -170,7 +167,6 @@ void ScreenImageSwiper::setupImages(int width, int height)
 
 		mImages[i]->showImage();
 		mImages[i]->setSize(width, height);
-		mImages[i]->seProperty("scaleMode", "scaleXY");
 
 		mImagesLayout->addChild(mImages[i]);
 
@@ -290,13 +286,11 @@ void ScreenImageSwiper::handlePointerReleased(MAPoint2d point)
 		}
 	}
 
-	printf("CENTERED IMAGE %d", centeredImage);
 	// Align images to grid.
 	if (centeredImage >= 0)
 	{
 		mLabelLayout->setText(mImages[centeredImage]->getName());
 		int offset = mImages[centeredImage]->getGridOffset(mScreenWidth);
-		printf("GRID OFFSET %d", offset);
 		for (int i = 0; i < mImagesSize; ++i)
 		{
 			mImages[i]->update(offset, 0);
@@ -368,30 +362,4 @@ bool ScreenImageSwiper::readStringFromResource(
 	maReadData(resID, (void*) output.c_str(), pos, stringLen);
 	pos += stringLen;
 	return true;
-}
-
-/**
- * Creates an image with a gray gradient.
- */
-Image* ScreenImageSwiper::createBackgroundGradient()
-{
-	MAHandle h = maCreatePlaceholder();
-	int *src = new int[10 * 256];
-	for (int i = 0; i < 256; ++i)
-	{
-		for (int j = 0; j<10; ++j)
-		{
-			int color = 0xFF - (i * 0xFF / 256);
-			src[i*10 + j] = color | (color << 8) | (color << 16);
-		}
-	}
-
-	maCreateImageRaw(h, src, EXTENT(10, 256), 0);
-	Image* img = new Image();
-	img->setImage(h);
-	img->setPosition(0, 0);
-	img->setSize(mScreenWidth, mScreenHeight);
-	int size = maGetImageSize(h);
-	delete src;
-	return img;
 }
