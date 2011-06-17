@@ -23,18 +23,6 @@ MA 02110-1301, USA.
  * Class that creates a screen that displays a web view screen.
  */
 
-// The width of the edit box in percentage (x% of the screen width).
-//#define EDIT_BOX_WIDTH 55.0
-
-// The width of the open link button in percentage (x% of the screen width)
-//#define BUTTON_WIDTH 45.0
-
-// The default height of the address bar.
-//#define DEFAULT_ADDRESS_BAR_HEIGHT 70
-
-// Space between widgets.
-//#define SPACE 5
-
 // The default URL address.
 #define DEFAULT_URL_ADDRESS "http://www.google.com"
 
@@ -90,16 +78,15 @@ void ScreenWebView::destroy()
  * Initialize the objects.
  */
 ScreenWebView::ScreenWebView():
-		mScreen(NULL),
-		mWebView(NULL),
-		mNavBarWidget(NULL),
-		mOpenLinkButtonWidget(NULL),
-		mEditBoxWidget(NULL),
-		mAddressBarLayout(NULL),
-		mLineLayout(NULL),
-		mScreenWidth(0),
-		mScreenHeight(0)
-//		mAddressBarWidgetsHeight(0)
+	mScreen(NULL),
+	mWebView(NULL),
+	mNavBarWidget(NULL),
+	mOpenLinkButtonWidget(NULL),
+	mEditBoxWidget(NULL),
+	mAddressBarLayout(NULL),
+	mLineLayout(NULL),
+	mScreenWidth(0),
+	mScreenHeight(0)
 {
 	mScreen = new Screen();
 	mScreen->setTitle(TAB_SCREEN_TITLE);
@@ -115,6 +102,7 @@ ScreenWebView::ScreenWebView():
 
 	if (WidgetManager::isAndroid())
 	{
+		// Set the screen icon for Android.
 		mScreen->setIcon(RES_TAB_ICON_WEB_VIEW_ANDROID);
 
 		// Get the screen size.
@@ -124,13 +112,14 @@ ScreenWebView::ScreenWebView():
 	}
 	else
 	{
+		// Set the screen icon for iOS.
+		mScreen->setIcon(RES_TAB_ICON_WEB_VIEW);
+
 		// Create and add the navigation bar to the main layout.
 		mNavBarWidget = new NavigationBar();
 		mNavBarWidget->setTitle(SCREEN_TITLE);
 		mNavBarWidget->setBackButtonTitle("");
 		mainLayout->addChild(mNavBarWidget);
-
-		mScreen->setIcon(RES_TAB_ICON_WEB_VIEW);
 	}
 
 	// Create and add the address bar to the main layout.
@@ -139,7 +128,6 @@ ScreenWebView::ScreenWebView():
 
 	// Create and add the line layout to the main layout.
 	mLineLayout = new HorizontalLayout();
-	//mLineLayout->setSize(mScreenWidth, LINE_LAYOUT_HEIGHT);
 	mLineLayout->setSize(
 		MAW_CONSTANT_FILL_AVAILABLE_SPACE,
 		LINE_LAYOUT_HEIGHT);
@@ -167,8 +155,6 @@ ScreenWebView::~ScreenWebView()
 	delete mNavBarWidget;
 	delete mAddressBarLayout;
 	delete mLineLayout;
-//	delete mEditBoxLayout;
-//	delete mOpenLinkBtnLayout;
 }
 
 /**
@@ -176,19 +162,13 @@ ScreenWebView::~ScreenWebView()
  */
 void ScreenWebView::createAddressBar()
 {
-//	float editBoxWidth = EDIT_BOX_WIDTH / 100.0 * mScreenWidth;
-//	float layoutButtonWidth = BUTTON_WIDTH / 100.0 * mScreenWidth;
-//	mAddressBarHeight = DEFAULT_ADDRESS_BAR_HEIGHT;
-//	mAddressBarWidgetsHeight = mAddressBarHeight - (3 * SPACE);
-//	int buttonWidth = mAddressBarHeight + (mAddressBarHeight / 4);
-
 	// Create the address layout.
 	mAddressBarLayout = new HorizontalLayout();
 	mAddressBarLayout->fillSpaceHorizontally();
 	mAddressBarLayout->wrapContentVertically();
 
-	// This shows how you set a property for which there is no
-	// predefined method.
+	// This shows how you set a property for which there
+	// is no predefined method.
 	mAddressBarLayout->setProperty(
 		MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
 		MAW_ALIGNMENT_CENTER);

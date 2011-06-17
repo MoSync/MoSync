@@ -95,7 +95,6 @@ private:
 	virtual void openURL(const MAUtil::String& url);
 
 private:
-
 	/**
 	 * Static ScreenWebView object(singleton design pattern).
 	 */
@@ -140,18 +139,6 @@ private:
 	HorizontalLayout* mLineLayout;
 
 	/**
-	 * Edit box layout.
-	 * Will contain the edit box widget.
-	 */
-//	VerticalLayout* mEditBoxLayout;
-
-	/**
-	 * Open link button layout.
-	 * Will contain the open link button widget.
-	 */
-//	VerticalLayout* mOpenLinkBtnLayout;
-
-	/**
 	 * Screen width.
 	 */
 	int mScreenWidth;
@@ -160,16 +147,6 @@ private:
 	 * Screen height.
 	 */
 	int mScreenHeight;
-
-	/**
-	 * The height of the address bar.
-	 */
-//	int mAddressBarHeight;
-
-	/**
-	 * The height of the widgets from address bar.
-	 */
-//	int mAddressBarWidgetsHeight;
 };
 
 #endif // SCREEN_WEB_VIEW_H_
