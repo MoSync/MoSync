@@ -271,6 +271,11 @@ private:
 		MAUtil::String& output) const;
 
 	/**
+	 * Creates an image with a gray gradient.
+	 */
+	Image* createBackgroundGradient();
+
+	/**
 	 * Screen width.
 	 */
 	int mScreenWidth;

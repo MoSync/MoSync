@@ -121,6 +121,9 @@ void ScreenImageSwiper::createUI()
 	// Set the layout's background color.
 	mImagesLayout->setBackgroundColor(SCREEN_BG_COLOR);
 
+	// Create a background gradient and add it to the images Layout
+	mImagesLayout->addChild(createBackgroundGradient());
+
 	// Loads the needed image according to the screen resolution.
 	loadImages(mScreenWidth);
 
@@ -362,4 +365,30 @@ bool ScreenImageSwiper::readStringFromResource(
 	maReadData(resID, (void*) output.c_str(), pos, stringLen);
 	pos += stringLen;
 	return true;
+}
+
+/**
+ * Creates an image with a gray gradient.
+ */
+Image* ScreenImageSwiper::createBackgroundGradient()
+{
+	MAHandle h = maCreatePlaceholder();
+	int *src = new int[16 * 16];
+	for (int i = 0; i < 16; ++i)
+	{
+		for (int j = 0; j<16; ++j)
+		{
+			int color = 0xFF - (i * 0xFF / 16);
+			src[i*16 + j] = color | (color << 8) | (color << 16);
+		}
+	}
+
+	maCreateImageRaw(h, src, EXTENT(16, 16), 0);
+	Image* img = new Image();
+	img->setImage(h);
+	img->setPosition(0, 0);
+	img->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	int size = maGetImageSize(h);
+	delete src;
+	return img;
 }
