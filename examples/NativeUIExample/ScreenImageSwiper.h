@@ -29,12 +29,20 @@ MA 02110-1301, USA.
 #define SCREEN_IMAGE_SWIPER_H_
 
 #include <MAUtil/String.h>
+#include <MAUtil/Vector.h>
 #include "UIWrapper/Widgets.h"
 #include "MAHeaders.h"
 
 #include "conprint.h"
 
 using namespace MoSync::UI;
+
+enum eScrollingDirection
+{
+	DIRECTION_NONE = 0,
+	DIRECTION_LEFT,
+	DIRECTION_RIGHT
+};
 
 /**
  * An extension to the Image widget which
@@ -51,11 +59,132 @@ public:
 		Image::setImage(mImageHandle);
 	}
 
-	// TODO: Document, make private.
+	/*
+	 * Check if the horizontal center of the screen is inside the image.
+	 * @param screenWidth The width of the screen.
+	 */
+	bool isOnScreenCenter(int screenWidth)
+	{
+		return ( (mPosX - screenWidth / 12 <= (screenWidth >> 1))
+			&& ((mPosX + mWidth + screenWidth / 12) >= (screenWidth >> 1)) );
+	}
+
+	/*
+	 * Gets the offset needed to align the image to grid.
+	 * @param screenWidth The width of the screen.
+	 */
+	int getGridOffset(int screenWidth)
+	{
+		return ((screenWidth >> 1) - mPosX - (mWidth >> 1));
+	}
+
+	/*
+	 * Updates the image position using the given offsets.
+	 * @param xOffset The offset needed to align the image to the horizontal grid.
+	 * @param yOffset The offset needed to align the image to the vertical grid.
+	 */
+	void update(int xOffset, int yOffset)
+	{
+		mPosX += xOffset;
+		mPosY += yOffset;
+		Image::setPosition(mPosX, mPosY);
+	}
+
+	/*
+	 * Checks if you can scroll the image further to the given direction.
+	 * @param offset The scrolling offset.
+	 * @screenWidth The screen width.
+	 * @direction The direction of the scrolling.
+	 */
+	bool canScroll(int offset, int screenWidth, int direction)
+	{
+		switch (direction)
+		{
+			case DIRECTION_LEFT:
+				return (mPosX + mWidth + offset <
+						(screenWidth >> 1));
+			case DIRECTION_RIGHT:
+				return (mPosX + offset >
+						(screenWidth >> 1));
+		}
+	}
+
+	/*
+	 * Sets the image position inside the parent widget.
+	 * @param x A valid x position.
+	 * @param y A valid y position.
+	 */
+	void setPosition(int x, int y)
+	{
+		mPosX = x;
+		mPosY = y;
+		Image::setPosition(x, y);
+	}
+
+	/*
+	 * Sets the image width.
+	 * @param A valid width for the image.
+	 */
+	void setWidth(int w)
+	{
+		mWidth = w;
+	}
+
+	/*
+	 * Setter for the image handle.
+	 * @param The new handle for the image.
+	 */
+	void setHandle(int h)
+	{
+		mImageHandle = h;
+	}
+
+	/*
+	 * Setter for the image name.
+	 * @param name The new name of the image.
+	 */
+	void setName(MAUtil::String name)
+	{
+		mName = name;
+	}
+
+	/*
+	 * Getter for the image handle.
+	 */
+	MAHandle getHandle()
+	{
+		return mImageHandle;
+	}
+
+	/*
+	 * Getter for the image name.
+	 */
+	MAUtil::String getName()
+	{
+		return mName;
+	}
+
+private:
+
+	/*
+	 * The handle of the image.
+	 */
 	MAHandle mImageHandle;
+
+	/*
+	 * The image's position ont he screen.
+	 */
 	int mPosX;
 	int mPosY;
+
+	/*
+	 * The image's width.
+	 */
 	int mWidth;
+
+	/*
+	 * The image's name.
+	 */
 	MAUtil::String mName;
 };
 
@@ -119,8 +248,8 @@ public:
 	void runTimerEvent();
 
 private:
-	/**
-	 * TODO: Document.
+	/*
+	 * Method for getting the screen size inside the members mScreenWidth and mScreenHeight
 	 */
 	void getScreenSize();
 
@@ -181,7 +310,7 @@ private:
 	/**
 	 * Pointer to array of ScreenImage pointers.
 	 */
-	ScreenImage** mImages;
+	MAUtil::Vector<ScreenImage*> mImages;
 
 	/**
 	 * Number of images.
