@@ -18,9 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file PlayScreen.h
- * @author Emma Tresanszki
  *
  * This file contains the main screen of the game.
+ *
+ * @author Emma Tresanszki
  */
 
 #ifndef PLAYSCREEN_H_
@@ -38,9 +39,7 @@ MA 02110-1301, USA.
 namespace RockPaperScissors
 {
 
-/**
- * Colors used for fonts & background.
- */
+// Colors used for fonts & background.
 enum Colors
 {
 	// This is the default background color.
@@ -54,20 +53,18 @@ enum Colors
 	DARK_GREEN = 0x2F4F2F
 };
 
-/**
- * The sizes of the available images.
- * NOTE: On small screens, images are scaled automatically
- * by the parent widget.
- * There are two font sizes used:
- *   a rather big font for the win state and the score,
- *   and a smaller one for other widgets.
- *   These are set depending on the screen size.
- */
+// The sizes of the available images.
+// NOTE: On small screens, images are scaled automatically
+// by the parent widget.
 enum WidgetSize
 {
 	BREAKLINE_HEIGHT     = 2 ,
 	PADDING_SMALL        = 5 ,
 	PADDING              = 10 ,
+	/** There are two font sizes used:
+	 * a rather big font for the win state and the score,
+	 * and a smaller one for other widgets.\
+	 * These are set depending to the screen size. */
 	FONT_TITLE_SMALL     = 15 ,
 	FONT_REGULAR_SMALL   = 13 ,
 	FONT_TITLE_LARGE     = 20 ,
@@ -165,14 +162,14 @@ public:
 		int fontSize,
 		const char* text);
 
-	/**
+	/*
 	 * Set a text for a label.
 	 * @param aLabel Handle to the label.
 	 * @param aText Label text.
 	 */
 	void setLabelText(MAWidgetHandle aLabel, MAUtil::String aText);
 
-	/**
+	/*
 	 * Apply an int property for a widget.
 	 * @param aWidget The handle for the widget.
 	 * @param aProperty A string representing which property to set.
@@ -180,7 +177,7 @@ public:
 	 * @param base  The output radix. Default is 10, 16 is to be used
 	 * for color properties.
 	 *
-	 * @returns Any of the following result codes:
+	 * * \returns Any of the following result codes:
 	 * - #MAW_RES_OK if the property could be set.
 	 * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	 * - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
@@ -233,19 +230,6 @@ public:
 	MAWidgetHandle createSpacer(int width, int height);
 
 	/**
-	 * Layout the widgets (portrait mode).
-	 */
-	void setupUI();
-
-	/**
-	 * Create all the widgets in the UI.
-	 * The start button, count down label, flickering label,
-	 * weapon buttons, rival weapon, spacer, score label,
-	 * exit button.
-	 */
-	MAWidgetHandle createMainLayout();
-
-	/**
 	 * Utility function to create the layout
 	 * with 5 buttons for user selection.
 	 */
@@ -256,11 +240,25 @@ public:
 	 */
 	void setSizes();
 
-private:
+private: // methods
+	/**
+	 * Create all the widgets in the UI.
+	 * The start button, count down label, flickering label,
+	 * weapon buttons, rival weapon, spacer, score label,
+	 * exit button.
+	 */
+	MAWidgetHandle createMainLayout();
+
+	/**
+	 * Layout the widgets (portrait mode).
+	 */
+	void setupUI();
+
+private: // members
 	/** NativeUI widgets handles. */
 	MAWidgetHandle mScreen;
 
-	/** Main screen layout). */
+	/** Main screen layout. */
 	MAWidgetHandle mMainLayout;
 
 	/**

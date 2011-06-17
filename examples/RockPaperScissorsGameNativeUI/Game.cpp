@@ -18,18 +18,19 @@ MA 02110-1301, USA.
 
 /**
  * @file Game.cpp
- * @author Emma Tresanszki
  *
  * This file contains the game logic for the game.
  *
  * Game logic:
- *  - The game is started by clicking the Start button, and that enables the
- *    user to select a weapon from the 3 available ones.
- *  - The opponent's weapon is chosen randomly, and it is shown only after
- *    the user has picked his weapon.
- *  - The game result is displayed using two strings: who won the game and why.
- *  - The score info at the bottom is updated after each game is finished.
- *  - Game can be restarted by pressing the Start button again.
+ * The game is started by clicking the Start button, and that enables the
+ * user to select a weapon from the 3 available ones.
+ * The opponent's weapon is chosen randomly, and it is shown only after
+ * the user has picked his weapon.
+ * The game result is displayed using two strings: who won the game, and why.
+ * The score info at the bottom is updated after each game is finished.
+ * Game can be restarted by pressing the Start button again.
+ *
+ * @author Emma Tresanszki
  */
 
 // Include library for random number generator.
@@ -201,7 +202,7 @@ void Game::computeGameResult(){
 					mResult = WIN;
 					mWinState = YOU_WIN;
 					mExplanation = ROCK_vs_SCISSORS;
-					mWins++;
+					mWins ++;
 				}
 				else
 				{
@@ -209,7 +210,7 @@ void Game::computeGameResult(){
 					mExplanation = PAPER_vs_ROCK;
 					mWinState = YOU_LOSE;
 					mResult = LOSS;
-					mLoses++;
+					mLoses ++;
 				}
 				break;
 			}
@@ -221,7 +222,7 @@ void Game::computeGameResult(){
 					mResult = WIN;
 					mWinState = YOU_WIN;
 					mExplanation = PAPER_vs_ROCK;
-					mWins++;
+					mWins ++;
 				}
 				else
 				{
@@ -229,7 +230,7 @@ void Game::computeGameResult(){
 					mWinState = YOU_LOSE;
 					mExplanation = SCISSORS_vs_PAPER;
 					mResult = LOSS;
-					mLoses++;
+					mLoses ++;
 				}
 				break;
 			}
@@ -241,7 +242,7 @@ void Game::computeGameResult(){
 					mResult = WIN;
 					mWinState = YOU_WIN;
 					mExplanation = SCISSORS_vs_PAPER;
-					mWins++;
+					mWins ++;
 				}
 				else
 				{
@@ -249,7 +250,7 @@ void Game::computeGameResult(){
 					mWinState = YOU_LOSE;
 					mExplanation = ROCK_vs_SCISSORS;
 					mResult = LOSS;
-					mLoses++;
+					mLoses ++;
 				}
 				break;
 			}

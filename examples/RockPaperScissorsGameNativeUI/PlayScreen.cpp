@@ -18,9 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file PlayScreen.cpp
- * @author Emma Tresanszki
  *
  * This file contains the main screen of the game.
+ *
+ * @author Emma Tresanszki
  */
 
 // Include library for string conversions.
@@ -29,6 +30,10 @@ MA 02110-1301, USA.
 // Include util class for integer to string conversions.
 // Include utility class for integer-to-string conversions.
 #include <MAUtil/util.h>
+
+#include <maprofile.h>
+#include <ma.h>
+#include <mastring.h>
 
 // Include the resources for images.
 #include "MAHeaders.h"
@@ -69,14 +74,6 @@ PlayScreen::PlayScreen() :
 	mTimerStarted(false),
 	mTimerElapsedMilliSeconds(0)
 {
-	// Get the screen size.
-	MAExtent screenSize = maGetScrSize();
-	mScreenWidth = EXTENT_X(screenSize);
-	mScreenHeight = EXTENT_Y(screenSize);
-
-	// Set the necessary size for fonts and padding.
-	setSizes();
-
 	// Initialize the native UI widgets.
 	// NOTE: There is no scaling required, because that is done
 	// automatically by the platform at widget creation.
@@ -119,7 +116,7 @@ void PlayScreen::showScreen()
 void PlayScreen::customEvent(const MAEvent& event)
 {
 	// If the event does not come from a widget, we just ignore it.
-	if (event.type != EVENT_TYPE_WIDGET)
+	if(event.type != EVENT_TYPE_WIDGET)
 	{
 		return;
 	}
@@ -174,11 +171,11 @@ void PlayScreen::widgetClicked(MAHandle widgetHandle)
 		maWidgetSetProperty(mStartButton, MAW_WIDGET_VISIBLE, "false");
 	}
 	// If the timer is started, the user can pick a weapon.
-	else if (
-		(widgetHandle == mRockButton
-			|| widgetHandle == mPaperButton
-			|| widgetHandle == mScissorsButton)
-		&& mTimerStarted)
+	else if ((widgetHandle == mRockButton
+		|| widgetHandle == mPaperButton
+		|| widgetHandle == mScissorsButton)
+		&&
+		mTimerStarted )
 	{
 		// Stop timer. Now the game results can be computed.
 		stopTimer();
@@ -242,9 +239,7 @@ void PlayScreen::computeGameResult(eWeapons selectedWeapon)
 	}
 	// This sets the image.
 	setWidgetProperty(
-		mRivalWeapon,
-		MAW_IMAGE_BUTTON_BACKGROUND_IMAGE,
-		weaponResource);
+		mRivalWeapon, MAW_IMAGE_BUTTON_BACKGROUND_IMAGE, weaponResource);
 
 	// Compute the game result.
 	mGame.computeGameResult();
@@ -382,7 +377,7 @@ MAWidgetHandle PlayScreen::createLabel(
 	return label;
 }
 
-/**
+/*
  * Set a text for a label.
  * @param aLabel Handle to the label.
  * @param aText Label text.
@@ -392,7 +387,7 @@ void PlayScreen::setLabelText(MAWidgetHandle aLabel, MAUtil::String aText)
 	maWidgetSetProperty(aLabel,MAW_LABEL_TEXT, aText.c_str());
 }
 
-/**
+/*
  * Apply an int property for a widget.
  * @param aWidget The handle for the widget.
  * @param aProperty A string representing which property to set.
@@ -400,7 +395,7 @@ void PlayScreen::setLabelText(MAWidgetHandle aLabel, MAUtil::String aText)
  * @param base  The output radix. Default is 10, 16 is to be used
  * for color properties.
  *
- * @returns Any of the following result codes:
+ * * \returns Any of the following result codes:
  * - #MAW_RES_OK if the property could be set.
  * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
  * - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
@@ -415,8 +410,8 @@ int PlayScreen::setWidgetProperty(
 {
 	// Buffer for property values.
 	char buf[10];
-	// Convert to integer.
-	itoa(aValue, buf, base);
+
+	itoa( aValue, buf, base);
 	// Apply the property to the widget.
 	return maWidgetSetProperty(aWidget, aProperty, buf);
 }
@@ -434,23 +429,20 @@ MAWidgetHandle PlayScreen::createButton(const char* text)
 
 	// Set text and text alignment.
 	maWidgetSetProperty(
-		button,
-		MAW_BUTTON_TEXT,
-		text);
+		button, MAW_BUTTON_TEXT, text);
 	maWidgetSetProperty(
-		button,
-		MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT,
-		MAW_ALIGNMENT_CENTER);
+		button, MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT, "center");
 	maWidgetSetProperty(
-		button,
-		MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT,
-		MAW_ALIGNMENT_CENTER);
+		button, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, "center");
 
 	// Set button width (height is set automatically).
-	setWidgetProperty(button, MAW_WIDGET_LEFT, mScreenWidth / 2);
+	setWidgetProperty(button, MAW_WIDGET_LEFT, mScreenWidth/2);
 
 	// Set font color.
 	setWidgetProperty(button, MAW_BUTTON_FONT_COLOR, DARK_GREY, 16);
+
+	// Set font size to small.
+//	Not used: setWidgetProperty(button, MAW_BUTTON_FONT_SIZE, mFontRegularSize);
 
 	return button;
 }
@@ -471,6 +463,9 @@ MAWidgetHandle PlayScreen::createImageWidget(
 
 	// Set the image.
 	setWidgetProperty(image,MAW_IMAGE_IMAGE, imageResource);
+
+	// Set the scale mode to not scaling the image.
+	maWidgetSetProperty(image, "scaleMode", "scalePreserveAspect");
 
 	// Set the widget sizes.
 	setWidgetProperty(image, MAW_WIDGET_WIDTH, width);
@@ -498,19 +493,21 @@ MAWidgetHandle PlayScreen::createImageButton(
 		MAW_IMAGE_BUTTON_BACKGROUND_IMAGE,
 		imageResource);
 
+	// Set the scale mode to not scaling the image.
+	maWidgetSetProperty(imageButton, "scaleMode", "scalePreserveAspect");
+
 	// Set the widget size.
 	setWidgetProperty(imageButton, MAW_WIDGET_WIDTH, width);
 	setWidgetProperty(imageButton, MAW_WIDGET_HEIGHT, height);
 
-	// Set alignment.
 	maWidgetSetProperty(
 		imageButton,
 		MAW_IMAGE_BUTTON_TEXT_VERTICAL_ALIGNMENT,
-		MAW_ALIGNMENT_CENTER);
+		"center");
 	maWidgetSetProperty(
 		imageButton,
 		MAW_IMAGE_BUTTON_TEXT_HORIZONTAL_ALIGNMENT,
-		MAW_ALIGNMENT_CENTER);
+		"center");
 
 	return imageButton;
 }
@@ -541,12 +538,31 @@ void PlayScreen::setupUI()
 	mScreen = maWidgetCreate(MAW_SCREEN);
 
 	// Error handling for devices that do not support NativeUI.
-	if (-1 == mScreen)
+	if ( -1 == mScreen )
 	{
-		maPanic(0,
-			"NativeUI is only available on Android and iPhone. "
-			"You must run directly on the device or devices emulator.");
+		maPanic(0, " This application uses NativeUI, which currently is supported"
+				   " only on Android and iOS devices.");
 	}
+
+	// Get the screen size.
+	if (NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
+	{
+		MAExtent screenSize = maGetScrSize();
+		mScreenWidth = EXTENT_X(screenSize);
+		mScreenHeight = EXTENT_Y(screenSize);
+	}
+	else
+	{
+		char width[10];
+		char height[10];
+		maWidgetGetProperty(mScreen, MAW_WIDGET_WIDTH, width, 10);
+		maWidgetGetProperty(mScreen, MAW_WIDGET_HEIGHT, height, 10);
+		mScreenWidth = MAUtil::stringToInteger(width,10);
+		mScreenHeight = MAUtil::stringToInteger(height,10);
+	}
+
+	// Set the necessary size for fonts and padding.
+	setSizes();
 
 	// Create the main layout.
 	mMainLayout = createMainLayout();
@@ -560,10 +576,12 @@ void PlayScreen::setupUI()
 		mMainLayout,
 		createSpacer(mScreenWidth, mScreenHeight / 40));
 
-	// Add a horizontal line.
+	// Add a horizontal line, then the score.
 	MAWidgetHandle line = createSpacer(mScreenWidth, BREAKLINE_HEIGHT);
+
 	// Set the background color for this spacer.
 	setWidgetProperty(line, MAW_WIDGET_BACKGROUND_COLOR, DARK_GREEN, 16);
+
 	maWidgetAddChild(mMainLayout, line);
 
 	// Add a score label with a big font.
@@ -582,19 +600,14 @@ void PlayScreen::setupUI()
 
 	// Set the size for this layout;
 	setWidgetProperty(
-		bottomMenu,
-		MAW_WIDGET_WIDTH,
-		mScreenWidth);
+		bottomMenu, MAW_WIDGET_WIDTH, mScreenWidth);
 	setWidgetProperty(
-		bottomMenu,
-		MAW_WIDGET_HEIGHT,
-		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+		bottomMenu, MAW_WIDGET_HEIGHT, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 
 	// Arrange it's children vertically on bottom
-	maWidgetSetProperty(
-		bottomMenu,
-		MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
-		MAW_ALIGNMENT_BOTTOM);
+	maWidgetSetProperty(bottomMenu,
+			MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
+			MAW_ALIGNMENT_BOTTOM);
 
 	// Arrange the children widgets horizontally  at right.
 	maWidgetSetProperty(
@@ -673,12 +686,11 @@ MAWidgetHandle PlayScreen::createMainLayout()
 		mainLayout,
 		createSpacer(mScreenWidth, mScreenHeight / 40));
 
-	// MAW_CONSTANT_WRAP_CONTENT makes the label height is set so
-	// that it fits the available space.
+	// MAW_CONSTANT_WRAP_CONTENT makes the label height is set so that it fits the available space.
 	mWinStateLabel = createLabel(
 		mScreenWidth,
 		LIGHT_RED,
-		mFontTitleSize, // Set a big size, because this info is important.
+		mFontTitleSize, //  Set a big size, because this info is important.
 		" ");
 	maWidgetSetProperty(mWinStateLabel, MAW_WIDGET_VISIBLE, "false");
 	maWidgetAddChild(mainLayout, mWinStateLabel);
@@ -792,7 +804,7 @@ MAWidgetHandle PlayScreen::createWeaponSelectionLayout()
 void PlayScreen::setSizes()
 {
 	// For small screens, use small fonts and padding.
-	if (mScreenHeight < 600)
+	if (mScreenHeight < 600 )
 	{
 		// Set small font sizes.
 		mFontTitleSize = FONT_TITLE_SMALL;
