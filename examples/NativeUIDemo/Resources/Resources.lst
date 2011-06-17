@@ -1,0 +1,83 @@
+.res RES_TAB_ICON_COLORS
+.image "Icons\TabIconColors.png"
+
+.res RES_TAB_ICON_COLORS_ANDROID
+.image "Icons\TabIconColors_Android.png"
+
+.res RES_TAB_ICON_IMAGE_SWIPER
+.image "Icons\TabIconImageSwiper.png"
+
+.res RES_TAB_ICON_IMAGE_SWIPER_ANDROID
+.image "Icons\TabIconImageSwiper_Android.png"
+
+.res RES_TAB_ICON_WEB_VIEW
+.image "Icons\TabIconWebView.png"
+
+.res RES_TAB_ICON_WEB_VIEW_ANDROID
+.image "Icons\TabIconWebView_Android.png"
+
+.res RES_WEB_VIEW_OPEN_LINK_IMAGE
+.image "Icons\WebViewOpenLink.png"
+
+.res RES_FIRST_IMAGE_SMALL
+.placeholder
+
+.res RES_IMAGE1_SMALL
+.ubin
+.pstring "Image 1"
+.include "Images/Image1_Small.png"
+
+.res RES_IMAGE2_SMALL
+.ubin
+.pstring "Image 2"
+.include "Images/Image2_Small.png"
+
+.res RES_IMAGE3_SMALL
+.ubin
+.pstring "Image 3"
+.include "Images/Image3_Small.png"
+
+.res RES_LAST_IMAGE_SMALL
+.placeholder
+
+.res RES_FIRST_IMAGE_MEDIUM
+.placeholder
+
+.res RES_IMAGE1_MEDIUM
+.ubin
+.pstring "Image 1"
+.include "Images/Image1_Medium.png"
+
+.res RES_IMAGE2_MEDIUM
+.ubin
+.pstring "Image 2"
+.include "Images/Image2_Medium.png"
+
+.res RES_IMAGE3_MEDIUM
+.ubin
+.pstring "Image 3"
+.include "Images/Image3_Medium.png"
+
+.res RES_LAST_IMAGE_MEDIUM
+.placeholder
+
+.res RES_FIRST_IMAGE_LARGE
+.placeholder
+
+.res RES_IMAGE1_LARGE
+.ubin
+.pstring "Image 1"
+.include "Images/Image1_Large.png"
+
+.res RES_IMAGE2_LARGE
+.ubin
+.pstring "Image 2"
+.include "Images/Image2_Large.png"
+
+.res RES_IMAGE3_LARGE
+.ubin
+.pstring "Image 3"
+.include "Images/Image3_Large.png"
+
+.res RES_LAST_IMAGE_LARGE
+.placeholder
