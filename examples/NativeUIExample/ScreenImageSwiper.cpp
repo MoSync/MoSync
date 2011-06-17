@@ -170,6 +170,7 @@ void ScreenImageSwiper::setupImages(int width, int height)
 
 		mImages[i]->showImage();
 		mImages[i]->setSize(width, height);
+		mImages[i]->seProperty("scaleMode", "scaleXY");
 
 		mImagesLayout->addChild(mImages[i]);
 
