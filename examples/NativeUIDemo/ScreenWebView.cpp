@@ -24,16 +24,16 @@ MA 02110-1301, USA.
  */
 
 // The width of the edit box in percentage (x% of the screen width).
-#define EDIT_BOX_WIDTH 55.0
+//#define EDIT_BOX_WIDTH 55.0
 
 // The width of the open link button in percentage (x% of the screen width)
-#define BUTTON_WIDTH 45.0
+//#define BUTTON_WIDTH 45.0
 
 // The default height of the address bar.
-#define DEFAULT_ADDRESS_BAR_HEIGHT 70
+//#define DEFAULT_ADDRESS_BAR_HEIGHT 70
 
 // Space between widgets.
-#define SPACE 5
+//#define SPACE 5
 
 // The default URL address.
 #define DEFAULT_URL_ADDRESS "http://www.google.com"
@@ -97,11 +97,9 @@ ScreenWebView::ScreenWebView():
 		mEditBoxWidget(NULL),
 		mAddressBarLayout(NULL),
 		mLineLayout(NULL),
-		mEditBoxLayout(NULL),
-		mOpenLinkBtnLayout(NULL),
 		mScreenWidth(0),
-		mScreenHeight(0),
-		mAddressBarWidgetsHeight(0)
+		mScreenHeight(0)
+//		mAddressBarWidgetsHeight(0)
 {
 	mScreen = new Screen();
 	mScreen->setTitle(TAB_SCREEN_TITLE);
@@ -141,7 +139,10 @@ ScreenWebView::ScreenWebView():
 
 	// Create and add the line layout to the main layout.
 	mLineLayout = new HorizontalLayout();
-	mLineLayout->setSize(mScreenWidth, LINE_LAYOUT_HEIGHT);
+	//mLineLayout->setSize(mScreenWidth, LINE_LAYOUT_HEIGHT);
+	mLineLayout->setSize(
+		MAW_CONSTANT_FILL_AVAILABLE_SPACE,
+		LINE_LAYOUT_HEIGHT);
 	mLineLayout->setBackgroundColor(LINE_LAYOUT_BG_COLOR);
 	mainLayout->addChild(mLineLayout);
 
@@ -164,11 +165,10 @@ ScreenWebView::~ScreenWebView()
 	delete mOpenLinkButtonWidget;
 	delete mEditBoxWidget;
 	delete mNavBarWidget;
-
 	delete mAddressBarLayout;
 	delete mLineLayout;
-	delete mEditBoxLayout;
-	delete mOpenLinkBtnLayout;
+//	delete mEditBoxLayout;
+//	delete mOpenLinkBtnLayout;
 }
 
 /**
@@ -176,11 +176,11 @@ ScreenWebView::~ScreenWebView()
  */
 void ScreenWebView::createAddressBar()
 {
-	float editBoxWidth = EDIT_BOX_WIDTH / 100.0 * mScreenWidth;
-	float layoutButtonWidth = BUTTON_WIDTH / 100.0 * mScreenWidth;
-	mAddressBarHeight = DEFAULT_ADDRESS_BAR_HEIGHT;
-	mAddressBarWidgetsHeight = mAddressBarHeight - (3 * SPACE);
-	int buttonWidth = mAddressBarHeight + (mAddressBarHeight / 4);
+//	float editBoxWidth = EDIT_BOX_WIDTH / 100.0 * mScreenWidth;
+//	float layoutButtonWidth = BUTTON_WIDTH / 100.0 * mScreenWidth;
+//	mAddressBarHeight = DEFAULT_ADDRESS_BAR_HEIGHT;
+//	mAddressBarWidgetsHeight = mAddressBarHeight - (3 * SPACE);
+//	int buttonWidth = mAddressBarHeight + (mAddressBarHeight / 4);
 
 	// Create the address layout.
 	mAddressBarLayout = new HorizontalLayout();
@@ -202,33 +202,14 @@ void ScreenWebView::createAddressBar()
 	mEditBoxWidget->setEventListener(this);
 
 	// Create the open link button widget.
-//	mOpenLinkButtonWidget = new ImageButton();
-//	mOpenLinkButtonWidget->setImage(RES_WEB_VIEW_OPEN_LINK_IMAGE);
-//	mOpenLinkButtonWidget->setSize(buttonWidth, mAddressBarWidgetsHeight);
-//	mOpenLinkButtonWidget->setEventListener(this);
-
 	mOpenLinkButtonWidget = new Button();
 	mOpenLinkButtonWidget->setText("Open");
 	mOpenLinkButtonWidget->wrapContentHorizontally();
+	mOpenLinkButtonWidget->wrapContentVertically();
 	mOpenLinkButtonWidget->setEventListener(this);
 
-	// Create the edit box layout.
-//	mEditBoxLayout = createSpacer((int)editBoxWidth, mAddressBarWidgetsHeight);
-//	mEditBoxLayout->addChild(mEditBoxWidget);
-
-	// Create the open link button layout.
-//	mOpenLinkBtnLayout = createSpacer(
-//		(int)layoutButtonWidth - (2 * SPACE),
-//		mAddressBarWidgetsHeight);
-//	mOpenLinkBtnLayout->setProperty(
-//		MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT,
-//		MAW_ALIGNMENT_RIGHT);
-//	mOpenLinkBtnLayout->addChild(mOpenLinkButtonWidget);
-
-	// Add layouts to the address bar layout.
-//	mAddressBarLayout->addChild(mEditBoxLayout);
+	// Add widgets to the address bar layout.
 	mAddressBarLayout->addChild(mEditBoxWidget);
-//	mAddressBarLayout->addChild(mOpenLinkBtnLayout);
 	mAddressBarLayout->addChild(mOpenLinkButtonWidget);
 }
 

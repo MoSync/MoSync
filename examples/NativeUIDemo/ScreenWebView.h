@@ -120,7 +120,6 @@ private:
 	/**
 	 * Widget used for opening the given web address.
 	 */
-//	ImageButton* mOpenLinkButtonWidget;
 	Button* mOpenLinkButtonWidget;
 
 	/**
@@ -144,13 +143,13 @@ private:
 	 * Edit box layout.
 	 * Will contain the edit box widget.
 	 */
-	VerticalLayout* mEditBoxLayout;
+//	VerticalLayout* mEditBoxLayout;
 
 	/**
 	 * Open link button layout.
 	 * Will contain the open link button widget.
 	 */
-	VerticalLayout* mOpenLinkBtnLayout;
+//	VerticalLayout* mOpenLinkBtnLayout;
 
 	/**
 	 * Screen width.
@@ -165,12 +164,12 @@ private:
 	/**
 	 * The height of the address bar.
 	 */
-	int mAddressBarHeight;
+//	int mAddressBarHeight;
 
 	/**
 	 * The height of the widgets from address bar.
 	 */
-	int mAddressBarWidgetsHeight;
+//	int mAddressBarWidgetsHeight;
 };
 
 #endif // SCREEN_WEB_VIEW_H_
