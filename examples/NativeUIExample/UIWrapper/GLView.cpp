@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file GLView.cpp
- * @author TODO: Add author.
+ * @author Florin Leu
  *
  * Class for OpenGL views.
  */

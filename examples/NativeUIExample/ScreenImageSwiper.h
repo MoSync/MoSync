@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file ScreenImageSwiper.h
- * @author Bogdan Iusco
+ * @author Florin Leu
  *
  * This screen allows the user to flip between images by
  * swiping left or right with the finger (or some other
