@@ -25,6 +25,11 @@ public class ImageWidget extends Widget
 	public ImageWidget(int handle, ImageView imageView)
 	{
 		super( handle, imageView );
+		
+		/**
+		 * Defaults to no scaling.
+		 */
+		imageView.setScaleType(ImageView.ScaleType.CENTER);		
 	}
 
 	@Override
@@ -43,6 +48,27 @@ public class ImageWidget extends Widget
 			imageView.setImageBitmap( image );
 			return true;
 		}
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_SCALE_MODE ) )
+		{
+			if( value.equals( "none" ) )
+			{
+				imageView.setScaleType( ImageView.ScaleType.CENTER );
+			}
+			else if( value.equals( "scaleXY" ) )
+			{
+				imageView.setScaleType( ImageView.ScaleType.FIT_XY );
+			}
+			else if( value.equals( "scalePreserveAspect" ) )
+			{
+				imageView.setScaleType( ImageView.ScaleType.FIT_CENTER );
+			}
+			else
+			{
+				throw new InvalidPropertyValueException( property , value );
+			}
+			
+			return true;
+		}		
 		else
 		{
 			return false;

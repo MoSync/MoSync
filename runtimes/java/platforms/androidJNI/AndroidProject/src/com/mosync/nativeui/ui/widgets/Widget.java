@@ -237,6 +237,17 @@ public class Widget
 	{
 		return m_view;
 	}
+
+	/**
+	 * Returns the root view associated with this widget (if the mosync widgets contain an internal tree).
+	 * 
+	 * @return The root view associated with this widget.
+	 */
+	public View getRootView()
+	{
+		return m_view;
+	}
+
 	
 	/**
 	 * Returns the handle of this widget.

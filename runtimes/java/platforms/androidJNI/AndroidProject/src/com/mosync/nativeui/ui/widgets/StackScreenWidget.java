@@ -75,7 +75,8 @@ public class StackScreenWidget extends ScreenWidget
 	{
 		m_screenStack.push( screen );
 		getView( ).removeAllViews( );
-		getView( ).addView( screen.getView( ) );
+		//getView( ).addView( screen.getView( ) );
+		getView( ).addView( screen.getRootView( ) );
 	}
 	
 	/**

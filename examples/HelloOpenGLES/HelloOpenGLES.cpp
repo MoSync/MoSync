@@ -1,451 +1,375 @@
-/*
-Copyright (C) 2011 MoSync AB
+/* Copyright (C) 2011 MoSync AB
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
+along with this program.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
 */
 
-/**
- * @file HelloOpenGLES.cpp
- * @author Mattias Frånberg and Chris Hughes
- *
- * This application provides a very basic example of how to use
- * OpenGL for Embedded Systems (OpenGLES) in your MoSync application.
- * It creates a spinning box on the screen with 3D shading. The code is
- * very well commented so that you can see exactly what's happening at
- * each step. The application makes use of MoSync's Moblet framework to
- * handle events.
- */
+/** @file helloopengles.cpp
+*
+* This application provides a very basic example of how to use OpenGL for
+* Embedded Systems (OpenGLES) in your MoSync application. It creates a spinning
+* box on the screen with 3D shading. The code is very well commented
+* so that you can see exactly what's happening at each step.
+* The application makes use of MoSync's Moblet framework to handle events.
+*
+* @author Mattias Frånberg and Chris Hughes
+*/
 
-// Include MoSync syscalls.
-#include <maapi.h>
-
-// Include NativeUI so that we can create an OpenGL view.
-#include <IX_WIDGET.h>
-
-// Include header file for Moblets.
+//Include the header files for MoSync Moblets and OpenGL so that we can
+//access their libraries from our application.
 #include <MAUtil/Moblet.h>
-
-// Include header file for OpenGL.
 #include <GLES/gl.h>
 
-// Include widget utility functions. These functions simplify
-// getting and setting widget properties.
-#include "WidgetUtil.h"
+//Include NativeUI so that we can create an OpenGL view widget.
+#include <IX_WIDGET.h>
 
-// Include resource identifiers (in this case the texture to be
-// used as the surface of the spinning box).
+//Include MoSync syscall collection.
+#include <maapi.h>
+
+//Include our project's widget utilities. These utilities simplify
+//getting and setting widget properties.
+#include "widgetutil.h"
+
+//Include our resources (in this case a texture to be used as the
+//surface of our box).
 #include "MAHeaders.h"
 
-/**
- * A Moblet is the main object of MoSync application. In the Moblet
- * we manage the application and handle events.
- */
-class HelloGLMoblet :
-	public MAUtil::Moblet,
-	public MAUtil::TimerListener
+//Standard OpenGL code for setting up a perspective projection matrix.
+void gluPerspective(GLfloat fovy, GLfloat aspect, GLfloat zNear, GLfloat zFar)
 {
+ GLfloat xmin, xmax, ymin, ymax;
 
-// First, we define the public methods.
+ const float M_PI = 3.14159;
+
+   ymax = zNear * tan(fovy * M_PI / 360.0);
+   ymin = -ymax;
+   xmin = ymin * aspect;
+   xmax = ymax * aspect;
+
+   glFrustumf(xmin, xmax, ymin, ymax, zNear, zFar);
+}
+
+//Standard OpenGL code for initialization.
+void initGL(GLvoid)
+{
+    /* Enable Texture Mapping */
+    glEnable(GL_TEXTURE_2D);
+
+    /* Enable smooth shading */
+    glShadeModel(GL_SMOOTH);
+
+    /* Set the background black */
+    glClearColor(0.0f, 0.0f, 0.0f, 0.5f);
+
+    /* Depth buffer setup */
+    glClearDepthf(1.0f);
+
+    /* Enables Depth Testing */
+    glEnable(GL_DEPTH_TEST);
+
+    /* The Type Of Depth Test To Do */
+    glDepthFunc(GL_LEQUAL);
+
+    /* Really Nice Perspective Calculations */
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+}
+
+//Standard OpenGL code for setting camera angle.
+void resizeWindow(int width, int height)
+{
+    /* Height / width ration */
+    GLfloat ratio;
+
+    /* Protect against a divide by zero */
+    if (height==0)
+    {
+        height = 1;
+    }
+
+    ratio=(GLfloat)width/(GLfloat)height;
+
+    /* Setup our view port. */
+    glViewport(0, 0, (GLint)width, (GLint)height);
+
+    /*
+     * Change to the projection matrix and set
+     * our viewing volume.
+     */
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    /* Set our perspective */
+    gluPerspective(45.0f, ratio, 0.1f, 100.0f);
+
+    /* Make sure we're changing the model view and not the projection */
+    glMatrixMode(GL_MODELVIEW);
+
+    /* Reset The View */
+    glLoadIdentity();
+}
+
+//Create the wrapper for the entire application. It is here that we will manage
+//the application and handle events.
+class MyMoblet : public MAUtil::Moblet, MAUtil::TimerListener {
+
+//Define our new class's public methods.
 public:
 
-	// ================== Constructor ==================
-
-	/**
-	 * In the constructor we create the user interface.
-	 */
-	HelloGLMoblet() :
-		mGLViewInitialized(false),
-		mXRotation(0.0f),
-		mYRotation(0.0f),
-		mZRotation(0.0f)
+	//First, the constructor.
+	MyMoblet()
+	: mGlViewInitialized( false ),
+	  mXRotation( 0.0f ),
+	  mYRotation( 0.0f ),
+	  mZRotation( 0.0f )
 	{
-		// Create a screen widget that will hold the OpenGL view.
-		int screen = maWidgetCreate(MAW_SCREEN);
+		//Create a screen using NativeUI. 
+		int screen = maWidgetCreate( MAW_SCREEN );
 		
-		// Check if NativeUI is supported by the runtime platform.
-		// For example, MoRE does not support NativeUI at the time
-		// of writing this program.
-		if (-1 == screen)
+		//Check if this is supported on the device it's running on
+		if(screen == -1)
 		{
-			maPanic(0,
-				"OpenGL is only available on Android and iPhone. "
-				"You must run directly on the device or devices emulator.");
+			maPanic(0,"Sorry but this program does not run currently on this platform");
 		}
 		
-		// Create a GL_VIEW widget and add it to the screen.
-		// widgetSetPropertyInt is a helper function defined
-		// in WidgetUtil.cpp.
-		mGLView = maWidgetCreate(MAW_GL_VIEW);
-		widgetSetPropertyInt(
-			mGLView,
-			MAW_WIDGET_WIDTH,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		widgetSetPropertyInt(
-			mGLView,
-			MAW_WIDGET_HEIGHT,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		maWidgetAddChild(screen, mGLView);
+		//Create an OpenGL widget within the previously created screen.
+		//Set the widget's width and height: -1 means the whole screen.
+		//Make the widget a child of the screen, then show it.
+		mGLView = maWidgetCreate( MAW_GL_VIEW );
+		maWidgetSetPropertyInt( mGLView, MAW_WIDGET_WIDTH, -1 );
+		maWidgetSetPropertyInt( mGLView, MAW_WIDGET_HEIGHT, -1 );
+		maWidgetAddChild( screen, mGLView );
+		maWidgetScreenShow( screen );
 
-		// Show the screen.
-		maWidgetScreenShow(screen);
+		//Make the moblet listen to custom events, so that we can know when our
+		//GLView widget is ready to be drawn.
+		MAUtil::Environment::getEnvironment( ).addCustomEventListener( this );
 
-		// Make the Moblet listen to custom events, so that we
-		// know when the GLView widget is ready to be drawn.
-		MAUtil::Environment::getEnvironment().addCustomEventListener(this);
+		//Make the moblet draw every 20 milliseconds.
+		MAUtil::Environment::getEnvironment( ).addTimer( this, 20, -1 );
 	}
 
-	// ================== Event methods ==================
-
-	/**
-	 * This method is called when a key is pressed. The method
-	 * is inherited from the Moblet class, and is overridden here.
-	 */
+	//Next, a method for detecting key presses. This is a method we have
+	//inherited from the Moblet base class, and here we will override that
+	//method with some processing of our own.
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		// Close the application if the back key or key 0 is pressed.
-		if (MAK_BACK == keyCode || MAK_0 == keyCode)
+		//Close the application if key 0 or the back key is pressed.
+		if(keyCode == MAK_0 || keyCode == MAK_BACK)
 		{
-			// Call close to exit the application.
 			close();
 		}
 	}
 
-	/**
-	 * Method that implements the custom event listener interface.
-	 * Widget events are sent as custom events.
-	 */
+	//Now we implement the custom event listener interface.
 	void customEvent(const MAEvent& event)
 	{
-		// Check if this is a widget event.
-		if (EVENT_TYPE_WIDGET == event.type)
-		{
-			// Get the widget event data structure.
-			MAWidgetEventData* eventData = (MAWidgetEventData*) event.data;
-
-			// MAW_EVENT_GL_VIEW_READY is sent when the GL view is
-			// ready for drawing.
-			if (MAW_EVENT_GL_VIEW_READY == eventData->eventType)
-			{
-				// Associate the OpenGL context with the GLView.
-				maWidgetSetProperty(mGLView, MAW_GL_VIEW_BIND, "");
-
-				// Create the texture we will use for rendering.
-				createTexture();
-
-				// Set the GL viewport.
-				int viewWidth = widgetGetPropertyInt(mGLView, MAW_WIDGET_WIDTH);
-				int viewHeight = widgetGetPropertyInt(mGLView, MAW_WIDGET_HEIGHT);
-				setViewport(viewWidth, viewHeight);
-
-				// Initialize OpenGL.
-				initGL();
-
-				// Flag that the GLView has been initialized.
-				mGLViewInitialized = true;
-
-				// Draw the initial scene.
-				draw();
-
-				// Start timer that will redraw the scene.
-				// This calls runTimerEvent each 20 ms.
-				MAUtil::Environment::getEnvironment().addTimer(this, 20, -1);
-			}
-		}
-	}
-
-	/**
-	 * Called on a timer event. Implements the interface in TimerListener.
-	 */
-	void runTimerEvent()
-	{
-		// Draw the 3D scene.
-		draw();
-
-	    // Update rotation parameters.
-	    mXRotation += 1.0f;
-	    mYRotation += 0.8f;
-	    mZRotation += 0.6f;
-	}
-
-// Next, we define the private methods. These are methods
-// used within this class, not called from the framework.
-private:
-
-	// ================== OpenGL/rendering methods ==================
-
-	/**
-	 * Create the texture used for rendering.
-	 */
-	void createTexture()
-	{
-		// Create an OpenGL 2D texture from the R_BOX resource.
-		glEnable(GL_TEXTURE_2D);
-		glGenTextures(1, &mBoxTextureHandle);
-		glBindTexture(GL_TEXTURE_2D, mBoxTextureHandle);
-		maOpenGLTexImage2D(R_BOX_TEXTURE);
-
-		// Set texture parameters.
-		glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	}
-
-	/**
-	 * Setup the projection matrix.
-	 */
-	void setViewport(int width, int height)
-	{
-		// Protect against divide by zero.
-		if (0 == height)
-		{
-			height = 1;
-		}
-
-		// Set viewport.
-		glViewport(0, 0, (GLint)width, (GLint)height);
-
-		// Select the projection matrix.
-		glMatrixMode(GL_PROJECTION);
-
-		// Reset the projection matrix.
-		glLoadIdentity();
-
-		// Set the perspective (updates the projection
-		// matrix to use the perspective we define).
-		GLfloat ratio = (GLfloat)width / (GLfloat)height;
-		gluPerspective(45.0f, ratio, 0.1f, 100.0f);
-	}
-
-	/**
-	 * Standard OpenGL initialization.
-	 */
-	void initGL()
-	{
-	    // Enable texture mapping.
-	    glEnable(GL_TEXTURE_2D);
-
-	    // Enable smooth shading.
-		glShadeModel(GL_SMOOTH);
-
-		// Set the depth value used when clearing the depth buffer.
-		glClearDepthf(1.0f);
-
-		// Enable depth testing.
-		glEnable(GL_DEPTH_TEST);
-
-		// Set the type of depth test.
-		glDepthFunc(GL_LEQUAL);
-
-		// Use the best perspective correction method.
-		glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	}
-
-	/**
-	 * Render the 3D model.
-	 */
-	void draw()
-	{
-		// The GL_View must be initialized before we can do any drawing.
-		if (!mGLViewInitialized)
+		//Ignore events that do not come from widgets.
+		if( event.type != EVENT_TYPE_WIDGET )
 		{
 			return;
 		}
 
-	    // Array used for object coordinates.
-	    GLfloat vcoords[4][3];
+		// Check if the GLView is ready to be drawn.
+		MAWidgetEventData *eventData = (MAWidgetEventData *) event.data;
+		if( eventData->eventType == MAW_EVENT_GL_VIEW_READY )
+		{
+			//Make the OpenGL context associated with the GLView active.
+			maWidgetSetProperty(mGLView, MAW_GL_VIEW_BIND, "");
 
-	    // Array used for texture coordinates.
-	    GLfloat tcoords[4][2];
+			//Create an OpenGL 2D texture from the R_BOX resource.
+			glEnable(GL_TEXTURE_2D);
+			glGenTextures(1, &mBoxTextureHandle);
+			glBindTexture(GL_TEXTURE_2D, mBoxTextureHandle);
+			maOpenGLTexImage2D(R_BOX);
 
-	    // Array used to convert from QUAD to TRIANGLE_STRIP.
-	    // QUAD is not available on the OpenGL implementation
-	    // we are using.
-	    GLubyte indices[4] = {0, 1, 3, 2};
+			//Set texture parameters.
+			glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+			glTexParameterx(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	    // Set the background color to be used when clearing the screen.
-	    glClearColor(0.3f, 0.0f, 0.0f, 0.0f);
+			//Get width and height of the GLView widget, and resize.
+			int glViewWidth = maWidgetGetPropertyInt(mGLView, MAW_WIDGET_WIDTH);
+			int glViewHeight = maWidgetGetPropertyInt(mGLView, MAW_WIDGET_HEIGHT);
+			resizeWindow(glViewWidth, glViewHeight);
 
-	    // Clear the screen and the depth buffer.
+			//Initialize OpenGL.
+			initGL();
+
+			//Commit the changes to GLView ("invalidate" tells the screen
+			//that it is out-of-date and needs to be redrawn).
+			maWidgetSetProperty(mGLView, MAW_GL_VIEW_INVALIDATE, "");
+
+			//Record that the GLView has been initialized.
+			mGlViewInitialized = true;
+		}
+	}
+
+	void runTimerEvent()
+	{
+		// Only draw when the GLView is initialized
+		if( !mGlViewInitialized )
+		{
+			return;
+		}
+
+	    //Calculate the frames per second.
+	    GLfloat texcoords[4][2];
+	    GLfloat vertices[4][3];
+	    GLubyte indices[4]={0, 1, 3, 2}; /* QUAD to TRIANGLE_STRIP conversion; */
+
+	    //Clear the screen and the depth buffer.
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	    // Use the model matrix.
-	    glMatrixMode(GL_MODELVIEW);
-
-	    // Reset the model matrix.
+	    //Move into the screen 5 units.
 	    glLoadIdentity();
-
-	    // Move into the screen 5 units.
 	    glTranslatef(0.0f, 0.0f, -5.0f);
 
-	    // Specify rotation along the X, Y, and Z axes.
-	    glRotatef(mXRotation, 1.0f, 0.0f, 0.0f);
-	    glRotatef(mYRotation, 0.0f, 1.0f, 0.0f);
-	    glRotatef(mZRotation, 0.0f, 0.0f, 1.0f);
+	    glRotatef(mXRotation, 1.0f, 0.0f, 0.0f); /* Rotate On The X Axis */
+	    glRotatef(mYRotation, 0.0f, 1.0f, 0.0f); /* Rotate On The Y Axis */
+	    glRotatef(mZRotation, 0.0f, 0.0f, 1.0f); /* Rotate On The Z Axis */
 
-	    // Select the texture to use when rendering the box.
+	    //Select our texture.
 	    glBindTexture(GL_TEXTURE_2D, mBoxTextureHandle);
 
-	    // Set pointers to vertex coordinates and texture coordinates.
-	    glVertexPointer(3, GL_FLOAT, 0, vcoords);
-	    glTexCoordPointer(2, GL_FLOAT, 0, tcoords);
+	    //Set pointers to vertices and texcoords.
+	    glVertexPointer(3, GL_FLOAT, 0, vertices);
+	    glTexCoordPointer(2, GL_FLOAT, 0, texcoords);
 
-	    // Enable vertex and texture coord arrays.
+	    //Enable vertices and texcoords arrays.
 	    glEnableClientState(GL_VERTEX_ARRAY);
 	    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-	    // Define the front face of the box.
-	    tcoords[0][0] = 1.0f;  tcoords[0][1] = 0.0f;
-	    vcoords[0][0] = -1.0f; vcoords[0][1] = -1.0f; vcoords[0][2] = 1.0f;
-	    tcoords[1][0] = 0.0f;  tcoords[1][1] = 0.0f;
-	    vcoords[1][0] = 1.0f;  vcoords[1][1] = -1.0f; vcoords[1][2] = 1.0f;
-	    tcoords[2][0] = 0.0f;  tcoords[2][1] = 1.0f;
-	    vcoords[2][0] = 1.0f;  vcoords[2][1] = 1.0f;  vcoords[2][2] = 1.0f;
-	    tcoords[3][0] = 1.0f;  tcoords[3][1] = 1.0f;
-	    vcoords[3][0] = -1.0f; vcoords[3][1] = 1.0f;  vcoords[3][2] = 1.0f;
+	    //Front face.
+	    texcoords[0][0]=1.0f; texcoords[0][1]=0.0f;
+	    vertices[0][0]=-1.0f; vertices[0][1]=-1.0f; vertices[0][2]=1.0f;
+	    texcoords[1][0]=0.0f; texcoords[1][1]=0.0f;
+	    vertices[1][0]=1.0f;  vertices[1][1]=-1.0f; vertices[1][2]=1.0f;
+	    texcoords[2][0]=0.0f; texcoords[2][1]=1.0f;
+	    vertices[2][0]=1.0f;  vertices[2][1]=1.0f; vertices[2][2]=1.0f;
+	    texcoords[3][0]=1.0f; texcoords[3][1]=1.0f;
+	    vertices[3][0]=-1.0f; vertices[3][1]=1.0f; vertices[3][2]=1.0f;
 
-	    // This draws one textured plane using a strip of two triangles.
+	    //Draw one textured plane using two stripped triangles.
 	    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, indices);
 
-	    // Define the back face of the box.
-	    tcoords[0][0] = 0.0f;  tcoords[0][1] = 0.0f;
-	    vcoords[0][0] = -1.0f; vcoords[0][1] = -1.0f; vcoords[0][2] = -1.0f;
-	    tcoords[1][0] = 0.0f;  tcoords[1][1] = 1.0f;
-	    vcoords[1][0] = -1.0f; vcoords[1][1] = 1.0f;  vcoords[1][2] = -1.0f;
-	    tcoords[2][0] = 1.0f;  tcoords[2][1] = 1.0f;
-	    vcoords[2][0] = 1.0f;  vcoords[2][1] = 1.0f;  vcoords[2][2] = -1.0f;
-	    tcoords[3][0] = 1.0f;  tcoords[3][1] = 0.0f;
-	    vcoords[3][0] = 1.0f;  vcoords[3][1] = -1.0f; vcoords[3][2] = -1.0f;
+	    //Back face.
+	    //Normal pointing away from viewer.
+	    texcoords[0][0]=0.0f; texcoords[0][1]=0.0f;
+	    vertices[0][0]=-1.0f; vertices[0][1]=-1.0f; vertices[0][2]=-1.0f;
+	    texcoords[1][0]=0.0f; texcoords[1][1]=1.0f;
+	    vertices[1][0]=-1.0f; vertices[1][1]=1.0f; vertices[1][2]=-1.0f;
+	    texcoords[2][0]=1.0f; texcoords[2][1]=1.0f;
+	    vertices[2][0]=1.0f;  vertices[2][1]=1.0f; vertices[2][2]=-1.0f;
+	    texcoords[3][0]=1.0f; texcoords[3][1]=0.0f;
+	    vertices[3][0]=1.0f; vertices[3][1]=-1.0f; vertices[3][2]=-1.0f;
 
-	    // Draw the plane.
+	    //Draw one textured plane using two stripped triangles.
 	    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, indices);
 
-	    // Define the top face of the box.
-	    tcoords[0][0] = 1.0f;  tcoords[0][1] = 1.0f;
-	    vcoords[0][0] = -1.0f; vcoords[0][1] = 1.0f; vcoords[0][2] = -1.0f;
-	    tcoords[1][0] = 1.0f;  tcoords[1][1] = 0.0f;
-	    vcoords[1][0] = -1.0f; vcoords[1][1] = 1.0f; vcoords[1][2] = 1.0f;
-	    tcoords[2][0] = 0.0f;  tcoords[2][1] = 0.0f;
-	    vcoords[2][0] = 1.0f;  vcoords[2][1] = 1.0f; vcoords[2][2] = 1.0f;
-	    tcoords[3][0] = 0.0f;  tcoords[3][1] = 1.0f;
-	    vcoords[3][0] = 1.0f;  vcoords[3][1] = 1.0f; vcoords[3][2] = -1.0f;
+	    //Top Face.
+	    texcoords[0][0]=1.0f; texcoords[0][1]=1.0f;
+	    vertices[0][0]=-1.0f; vertices[0][1]=1.0f; vertices[0][2]=-1.0f;
+	    texcoords[1][0]=1.0f; texcoords[1][1]=0.0f;
+	    vertices[1][0]=-1.0f; vertices[1][1]=1.0f; vertices[1][2]=1.0f;
+	    texcoords[2][0]=0.0f; texcoords[2][1]=0.0f;
+	    vertices[2][0]=1.0f;  vertices[2][1]=1.0f; vertices[2][2]=1.0f;
+	    texcoords[3][0]=0.0f; texcoords[3][1]=1.0f;
+	    vertices[3][0]=1.0f;  vertices[3][1]=1.0f; vertices[3][2]=-1.0f;
 
-	    // Draw the plane.
+	    //Draw one textured plane using two stripped triangles.
 	    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, indices);
 
-	    // Define the bottom face of the box.
-	    tcoords[0][0] = 0.0f;  tcoords[0][1] = 1.0f;
-	    vcoords[0][0] = -1.0f; vcoords[0][1] = -1.0f; vcoords[0][2] = -1.0f;
-	    tcoords[1][0] = 1.0f;  tcoords[1][1] = 1.0f;
-	    vcoords[1][0] = 1.0f;  vcoords[1][1] = -1.0f; vcoords[1][2] = -1.0f;
-	    tcoords[2][0] = 1.0f;  tcoords[2][1] = 0.0f;
-	    vcoords[2][0] = 1.0f;  vcoords[2][1] = -1.0f; vcoords[2][2] = 1.0f;
-	    tcoords[3][0] = 0.0f;  tcoords[3][1] = 0.0f;
-	    vcoords[3][0] = -1.0f; vcoords[3][1] = -1.0f; vcoords[3][2] = 1.0f;
+	    //Bottom Face.
+	    texcoords[0][0]=0.0f; texcoords[0][1]=1.0f;
+	    vertices[0][0]=-1.0f; vertices[0][1]=-1.0f; vertices[0][2]=-1.0f;
+	    texcoords[1][0]=1.0f; texcoords[1][1]=1.0f;
+	    vertices[1][0]=1.0f;  vertices[1][1]=-1.0f; vertices[1][2]=-1.0f;
+	    texcoords[2][0]=1.0f; texcoords[2][1]=0.0f;
+	    vertices[2][0]=1.0f;  vertices[2][1]=-1.0f; vertices[2][2]=1.0f;
+	    texcoords[3][0]=0.0f; texcoords[3][1]=0.0f;
+	    vertices[3][0]=-1.0f; vertices[3][1]=-1.0f; vertices[3][2]=1.0f;
 
-	    // Draw the plane.
+	    //Draw one textured plane using two stripped triangles.
 	    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, indices);
 
-	    // Define the right face of the box.
-	    tcoords[0][0] = 0.0f; tcoords[0][1] = 0.0f;
-	    vcoords[0][0] = 1.0f; vcoords[0][1] = -1.0f; vcoords[0][2] = -1.0f;
-	    tcoords[1][0] = 0.0f; tcoords[1][1] = 1.0f;
-	    vcoords[1][0] = 1.0f; vcoords[1][1] = 1.0f;  vcoords[1][2] = -1.0f;
-	    tcoords[2][0] = 1.0f; tcoords[2][1] = 1.0f;
-	    vcoords[2][0] = 1.0f; vcoords[2][1] = 1.0f;  vcoords[2][2] = 1.0f;
-	    tcoords[3][0] = 1.0f; tcoords[3][1] = 0.0f;
-	    vcoords[3][0] = 1.0f; vcoords[3][1] = -1.0f; vcoords[3][2] = 1.0f;
+	    //Right face.
+	    texcoords[0][0]=0.0f; texcoords[0][1]=0.0f;
+	    vertices[0][0]=1.0f;  vertices[0][1]=-1.0f; vertices[0][2]=-1.0f;
+	    texcoords[1][0]=0.0f; texcoords[1][1]=1.0f;
+	    vertices[1][0]=1.0f;  vertices[1][1]=1.0f; vertices[1][2]=-1.0f;
+	    texcoords[2][0]=1.0f; texcoords[2][1]=1.0f;
+	    vertices[2][0]=1.0f;  vertices[2][1]=1.0f; vertices[2][2]=1.0f;
+	    texcoords[3][0]=1.0f; texcoords[3][1]=0.0f;
+	    vertices[3][0]=1.0f;  vertices[3][1]=-1.0f; vertices[3][2]=1.0f;
 
-	    // Draw the plane.
+	    //Draw one textured plane using two stripped triangles.
 	    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, indices);
 
-	    // Define the left face of the box.
-	    tcoords[0][0] = 1.0f;  tcoords[0][1] = 0.0f;
-	    vcoords[0][0] = -1.0f; vcoords[0][1] = -1.0f; vcoords[0][2] = -1.0f;
-	    tcoords[1][0] = 0.0f;  tcoords[1][1] = 0.0f;
-	    vcoords[1][0] = -1.0f; vcoords[1][1] = -1.0f; vcoords[1][2] = 1.0f;
-	    tcoords[2][0] = 0.0f;  tcoords[2][1] = 1.0f;
-	    vcoords[2][0] = -1.0f; vcoords[2][1] = 1.0f;  vcoords[2][2] = 1.0f;
-	    tcoords[3][0] = 1.0f;  tcoords[3][1] = 1.0f;
-	    vcoords[3][0] = -1.0f; vcoords[3][1] = 1.0f;  vcoords[3][2] = -1.0f;
+	    //Left Face.
+	    texcoords[0][0]=1.0f; texcoords[0][1]=0.0f;
+	    vertices[0][0]=-1.0f; vertices[0][1]=-1.0f; vertices[0][2]=-1.0f;
+	    texcoords[1][0]=0.0f; texcoords[1][1]=0.0f;
+	    vertices[1][0]=-1.0f; vertices[1][1]=-1.0f; vertices[1][2]=1.0f;
+	    texcoords[2][0]=0.0f; texcoords[2][1]=1.0f;
+	    vertices[2][0]=-1.0f; vertices[2][1]=1.0f; vertices[2][2]=1.0f;
+	    texcoords[3][0]=1.0f; texcoords[3][1]=1.0f;
+	    vertices[3][0]=-1.0f; vertices[3][1]=1.0f; vertices[3][2]=-1.0f;
 
-	    // Draw the plane.
+	    //Draw one textured plane using two stripped triangles.
 	    glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_BYTE, indices);
 
-	    // Disable texture and vertex arrays.
+	    //Disable texcoords and vertices arrays.
+	    glDisableClientState(GL_NORMAL_ARRAY);
 	    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
 	    glDisableClientState(GL_VERTEX_ARRAY);
 
-	    // Wait (blocks) until all GL drawing commands to finish.
+	    //Flush all drawings.
 	    glFinish();
 
-		// Update the GLView.
+	    mXRotation+=1.0f; /* X Axis Rotation */
+	    mYRotation+=0.8f; /* Y Axis Rotation */
+	    mZRotation+=0.6f; /* Z Axis Rotation */
+
+		//Commit the changes to GLView.
 	    maWidgetSetProperty(mGLView, MAW_GL_VIEW_INVALIDATE, "");
 	}
 
-	/**
-	 * Standard OpenGL utility function for setting up the
-	 * perspective projection matrix.
-	 */
-	void gluPerspective(
-		GLfloat fovy,
-		GLfloat aspect,
-		GLfloat zNear,
-		GLfloat zFar)
-	{
-		const float M_PI = 3.14159;
-
-		GLfloat ymax = zNear * tan(fovy * M_PI / 360.0);
-		GLfloat ymin = -ymax;
-		GLfloat xmin = ymin * aspect;
-		GLfloat xmax = ymax * aspect;
-
-		glFrustumf(xmin, xmax, ymin, ymax, zNear, zFar);
-	}
-
-// Finally, we declare the instance variables used within this class.
 private:
-
-	// ================== Instance variables ==================
-
-	/** Handle to the GLView widget. */
+	//Handle to the GLView widget.
 	MAHandle mGLView;
 
-	/** GLView state (true = initialized and ready to be drawn). */
-	bool mGLViewInitialized;
+	//GLView state (true = initialized and ready to be drawn).
+	bool mGlViewInitialized;
 
-	/** Handle to the texture. */
+	//Handle for the box texture.
 	GLuint mBoxTextureHandle;
 
-	/** X axis rotation. */
+	//Rotation angles.
 	GLfloat mXRotation;
-
-	/** Y axis rotation. */
 	GLfloat mYRotation;
-
-	/** Z axis rotation. */
 	GLfloat mZRotation;
 };
 
-/**
- * Main function that is called when the program starts.
- */
-extern "C" int MAMain()
-{
-	// Start the application by creating and running a Moblet.
-	MAUtil::Moblet::run(new HelloGLMoblet());
+//The entry point for the application - the place where processing starts.
+extern "C" int MAMain() {
 
-	// The Moblet will run until it is closed by the user.
-	// Returning zero indicates a controlled exit.
+	//Create the instance of MyMoblet
+	MyMoblet myMoblet;
+
+	// Run the Moblet to start the application.
+	MAUtil::Moblet::run( &myMoblet );
+
+	//MyMoblet will run until it is closed by the user pressing key 0. When
+	//it's closed we end our program in a well-behaved way by returning zero.
 	return 0;
-}
+};

@@ -36,6 +36,9 @@
 	button.titleLabel.numberOfLines = 0;	
 	id ret = [super init];
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
+    button.contentMode = UIViewContentModeCenter;
+    button.imageView.contentMode = UIViewContentModeCenter;
+    button.adjustsImageWhenHighlighted = NO;
 	return ret;
 }
 
@@ -75,7 +78,17 @@
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		image = [UIImage imageWithCGImage:imageResource->image];
 		[button setBackgroundImage:image forState:UIControlStateNormal];
-	} 
+        //[button setImage:image forState:UIControlStateNormal];
+        
+	}
+    else if ([key isEqualToString:@"scaleMode"]) {
+        UIButton* button = (UIButton*)view;
+        
+        if([value isEqualToString:@"none"]) button.contentMode = UIViewContentModeCenter;
+        else if([value isEqualToString:@"scaleXY"]) button.contentMode = UIViewContentModeScaleToFill;
+        else if([value isEqualToString:@"scalePreserveAspect"]) button.contentMode = UIViewContentModeScaleAspectFit;
+        else return MAW_RES_INVALID_PROPERTY_NAME;
+    }   
 	else if([key isEqualToString:@"leftCapWidth"]) {
 		int newLeftCapWidth = [value intValue];
 		if(image != nil) {

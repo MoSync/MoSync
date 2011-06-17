@@ -53,6 +53,28 @@ public class ImageButtonWidget extends Widget
 						new BitmapDrawable( background ) );
 			}
 		}
+		else if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_SCALE_MODE ) )
+		{
+			ImageButton imageButton = (ImageButton) getView( );
+			if( value.equals( "none" ) )
+			{
+				imageButton.setScaleType( ImageView.ScaleType.CENTER );
+			}
+			else if( value.equals( "scaleXY" ) )
+			{
+				imageButton.setScaleType( ImageView.ScaleType.FIT_XY );
+			}
+			else if( value.equals( "scalePreserveAspect" ) )
+			{
+				imageButton.setScaleType( ImageView.ScaleType.FIT_CENTER );
+			} 
+			else 
+			{
+				throw new InvalidPropertyValueException( property , value );
+			}
+			
+			return true;
+		}		
 		else
 		{
 			return false;
