@@ -38,8 +38,8 @@
 	id ret = [super init];
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
     button.imageView.contentMode = UIViewContentModeCenter;
-    button.imageView.autoresizingMask=NO;
- 	return ret;
+     	
+    return ret;
 }
 
 -(void)buttonPressed {
@@ -78,8 +78,17 @@
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		image = [UIImage imageWithCGImage:imageResource->image];
 		[button setBackgroundImage:image forState:UIControlStateNormal];
-        //[button setImage:image forState:UIControlStateNormal];
 	}
+    else			
+    if([key isEqualToString:@"image"]) {
+        int imageHandle = [value intValue];
+        if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
+        UIButton* button = (UIButton*) view;
+        Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
+        image = [UIImage imageWithCGImage:imageResource->image];
+        [button setImage:image forState:UIControlStateNormal];
+    }    
+    /* // doesn't work on iphone....
     else if ([key isEqualToString:@"scaleMode"]) {
         UIButton* button = (UIButton*)view;
         
@@ -96,7 +105,8 @@
         
         [button setContentMode:contentMode];
         button.imageView.contentMode = contentMode;
-    }   
+    }
+    */  
 	else if([key isEqualToString:@"leftCapWidth"]) {
 		int newLeftCapWidth = [value intValue];
 		if(image != nil) {
