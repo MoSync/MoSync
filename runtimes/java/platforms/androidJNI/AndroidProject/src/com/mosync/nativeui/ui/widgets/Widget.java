@@ -180,24 +180,48 @@ public class Widget
 	 * Returns the property of the wrapped widget.
 	 * 
 	 * @param property
-	 * @return the property of the wrapped widget. If no property is found, an
-	 *         empty string is returned.
+	 * @return the property of the wrapped widget. If no property is found, 
+	 *         an empty string is returned.
 	 */
 	public String getProperty(String property)
 	{
-		if( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
+		if ( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
 		{
-			return Integer.toString( getLayoutParams( ).getWidth() );
+			if (getView( ).getWidth( ) > 0)
+			{
+				// If the Android view has width, we return it, minus margins.
+				return 
+					Integer.toString( getView( ).getWidth( ) 
+					- getLayoutParams( ).marginLeft 
+					- getLayoutParams( ).marginRight );
+			}
+			else
+			{
+				// Otherwise we return the layout value for the width.
+				return Integer.toString( getLayoutParams( ).getWidth() );
+			}
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
 		{
-			return Integer.toString(  getLayoutParams( ).getHeight() );
+			if (getView( ).getHeight( ) > 0)
+			{
+				// If the Android view has height, we return it, minus margins.
+				return 
+					Integer.toString( getView( ).getHeight( ) 
+					- getLayoutParams( ).marginTop 
+					- getLayoutParams( ).marginBottom );
+			}
+			else
+			{
+				// Otherwise we return the layout value for the height.
+				return Integer.toString(  getLayoutParams( ).getHeight() );
+			}
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
 		{
 			return Integer.toString( getView( ).getLeft( ) );
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
 		{
 			return Integer.toString( getView( ).getTop( ) );
 		}
