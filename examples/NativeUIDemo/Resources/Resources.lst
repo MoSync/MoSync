@@ -1,23 +1,23 @@
 .res RES_TAB_ICON_COLORS
-.image "Icons\TabIconColors.png"
+.image "Icons/TabIconColors.png"
 
 .res RES_TAB_ICON_COLORS_ANDROID
-.image "Icons\TabIconColors_Android.png"
+.image "Icons/TabIconColors_Android.png"
 
 .res RES_TAB_ICON_IMAGE_SWIPER
-.image "Icons\TabIconImageSwiper.png"
+.image "Icons/TabIconImageSwiper.png"
 
 .res RES_TAB_ICON_IMAGE_SWIPER_ANDROID
-.image "Icons\TabIconImageSwiper_Android.png"
+.image "Icons/TabIconImageSwiper_Android.png"
 
 .res RES_TAB_ICON_WEB_VIEW
-.image "Icons\TabIconWebView.png"
+.image "Icons/TabIconWebView.png"
 
 .res RES_TAB_ICON_WEB_VIEW_ANDROID
-.image "Icons\TabIconWebView_Android.png"
+.image "Icons/TabIconWebView_Android.png"
 
 .res RES_WEB_VIEW_OPEN_LINK_IMAGE
-.image "Icons\WebViewOpenLink.png"
+.image "Icons/WebViewOpenLink.png"
 
 .res RES_FIRST_IMAGE_SMALL
 .placeholder
