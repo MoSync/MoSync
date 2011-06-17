@@ -26,16 +26,30 @@ MA 02110-1301, USA.
 #ifndef SCREEN_WEB_VIEW_H_
 #define SCREEN_WEB_VIEW_H_
 
+// Include the library for event handling listener.
+#include "MAUtil/Environment.h"
 // Include all the wrappers.
 #include "UIWrapper/Widgets.h"
 
 using namespace MoSync::UI;
 
 /**
+ * Address bar animation states.
+ */
+enum eAddressBarAnimation
+{
+	NONE = 1,
+	FADE_OUT_ADDRESS_BAR,
+	SHOW_EXPAND_WIDGET,
+	HIDE_EXPAND_WIDGET,
+	FADE_IN_ADDRESS_BAR
+};
+
+/**
  * Class that creates a screen that displays a web view.
  */
-class ScreenWebView:
-    public WidgetEventListener // used for listening widget events.
+class ScreenWebView: public WidgetEventListener, // used for listening widget events.
+					 public MAUtil::TimerListener // used for timer notification.
 {
 public:
 	/**
@@ -47,6 +61,12 @@ public:
 	 * Destroy the web view screen.
 	 */
 	static void destroy();
+
+	/**
+	 * Sets the default URL address for the web widget.
+	 * @param url The desired URL web page.
+	 */
+	static void setDefaultURL(const MAUtil::String url);
 
 private:
 	/**
@@ -94,12 +114,49 @@ private:
 	 */
 	virtual void openURL(const MAUtil::String& url);
 
+	/**
+	 * Called on timer events.
+	 * It is used for navigation bar animation.
+	 */
+	void runTimerEvent();
+
+	/**
+	 * Fades out the address bar.
+	 */
+	void fadeOutAddressBar();
+
+	/**
+	 * Shows the expand image button.
+	 */
+	void showExpandWidget();
+
+	/**
+	 * Hides the expand image button.
+	 */
+	void hideExpandWidget();
+
+	/**
+	 * Fades in the address bar.
+	 */
+	void fadeInAddressBar();
+
+	/**
+	 * Sets the visibility of the address bar widgets.
+	 * @param value True - shows the widgets, otherwise hides them.
+	 */
+	void setAddressBarWidgetsVisibility(const bool value);
+
 private:
 
 	/**
 	 * Static ScreenWebView object(singleton design pattern).
 	 */
 	static ScreenWebView* sScreenWebView;
+
+	/**
+	 * The URL opened by the web view when the screen is showed.
+	 */
+	static 	MAUtil::String sURL;
 
 	/**
 	 * A screen for this view.
@@ -121,6 +178,13 @@ private:
 	 * Widget used for opening the given web address.
 	 */
 	ImageButton* mOpenLinkButtonWidget;
+
+	/**
+	 * According with state of the address bar(collapsed or expanded),
+	 * the widget will display a show or a hide image.
+	 * It is used for collapsing or expanding the address bar.
+	 */
+	ImageButton* mHideShowButtonWidget;
 
 	/**
 	 * Used by the user for providing a web address.
@@ -152,6 +216,29 @@ private:
 	VerticalLayout* mOpenLinkBtnLayout;
 
 	/**
+	 * Hide/show button layout.
+	 * Will contain the hide/show button widget.
+	 */
+	VerticalLayout* mHideShowBtnLayout;
+
+	/**
+	 * The current state of the address bar animation.
+	 */
+	eAddressBarAnimation mAddressBarAnimation;
+
+	/**
+	 * The current address bar height.
+	 * Used by the animation.
+	 */
+	int mCurrentAddressBarHeight;
+
+	/**
+	 * The current address bar alpha.
+	 * Used by the animation.
+	 */
+	float mCurrentAddressBarAlpha;
+
+	/**
 	 * Screen width.
 	 */
 	int mScreenWidth;
@@ -162,14 +249,24 @@ private:
 	int mScreenHeight;
 
 	/**
-	 * The height of the address bar.
+	 * The default height of the address bar(when it's expanded).
 	 */
-	int mAddressBarHeight;
+	int mAddressBarMaxHeight;
+
+	/**
+	 * The height of the address bar(when it's collapsed).
+	 */
+	int mAddressBarMinHeight;
 
 	/**
 	 * The height of the widgets from address bar.
 	 */
 	 int mAddressBarWidgetsHeight;
+
+	/**
+	 * The flag is set if the address bar is visible.
+	 */
+	BOOL mIsAddressBarVisible;
 };
 
-#endif // SCREEN_WEB_VIEW_H_
+#endif

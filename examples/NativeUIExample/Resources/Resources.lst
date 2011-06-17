@@ -28,12 +28,6 @@
 .res RES_WEB_VIEW_OPEN_LINK_IMAGE
 .image "WebViewOpenLink.png"
 
-.res RES_WEB_VIEW_IMAGE_SHOW_IMAGE
-.image "WebViewShowNavBar.png"
-
-.res RES_WEB_VIEW_IMAGE_HIDE_IMAGE
-.image "WebViewHideNavBar.png"
-
 .res RES_SETTINGS_VIEW_RESET_IMAGE
 .image "ImageSettingsReset.png"
 
