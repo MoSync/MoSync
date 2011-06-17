@@ -25,14 +25,21 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 - (id)init {	
     MoSyncUIScrollView* scrollView = [[[MoSyncUIScrollView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];	;
 	view = scrollView;
+    scrollView.scrollEnabled = NO;
 	[scrollView setWidget:self];
-	return [super init];	
+	id ret = [super init];
+    
+    // if it doesn't scroll it shouldn't absorb events :)
+    scrollView.userInteractionEnabled = NO;
+    return ret;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"isScrollable"]) {
 		MoSyncUIScrollView* sv = (MoSyncUIScrollView*)view;
-		sv.scrollEnabled = [value boolValue];
+        BOOL enabled =  [value boolValue];
+		sv.scrollEnabled = enabled;
+        sv.userInteractionEnabled = enabled;
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
