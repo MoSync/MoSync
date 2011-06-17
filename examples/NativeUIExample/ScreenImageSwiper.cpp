@@ -170,6 +170,8 @@ void ScreenImageSwiper::setupImages(int width, int height)
 
 		mImages[i]->showImage();
 		mImages[i]->setSize(width, height);
+		mImages[i]->setProperty("scaleMode", "scalePreserveAspect");
+		// TODO: Remove: mImages[i]->setPosition(mImages[i]->mPosX, mImages[i]->mPosY);
 
 		mImagesLayout->addChild(mImages[i]);
 
@@ -251,6 +253,10 @@ void ScreenImageSwiper::loadImages(int screenWidth)
 	}
 }
 
+float ScreenImageSwiper::getScaleFactor() {
+	 return (float)mScreenWidth / (float)EXTENT_X(maGetScrSize());
+}
+
 /**
  * Handle pointer presses.
  * @param point The pointer position on the screen.
@@ -258,8 +264,10 @@ void ScreenImageSwiper::loadImages(int screenWidth)
 void ScreenImageSwiper::handlePointerPressed(MAPoint2d point)
 {
 	// Set start and end swipe point to the touch down point.
-	mPointerXStart = point.x;
-	mPointerXEnd = point.x;
+
+	float scaleFactor = getScaleFactor();
+	mPointerXStart = (int)((float) point.x * scaleFactor);
+	mPointerXEnd = (int)((float) point.x * scaleFactor);
 }
 
 /**
@@ -268,8 +276,9 @@ void ScreenImageSwiper::handlePointerPressed(MAPoint2d point)
  */
 void ScreenImageSwiper::handlePointerMoved(MAPoint2d point)
 {
+	float scaleFactor = getScaleFactor();
 	// Update the end swipe position.
-	mPointerXEnd = point.x;
+	mPointerXEnd = (int)((float) point.x * scaleFactor);
 }
 
 /**
@@ -300,8 +309,9 @@ void ScreenImageSwiper::handlePointerReleased(MAPoint2d point)
 		}
 	}
 
-	mPointerXStart = point.x;
-	mPointerXEnd = point.x;
+	float scaleFactor = getScaleFactor();
+	mPointerXStart = (int)((float) point.x * scaleFactor);
+	mPointerXEnd = (int)((float) point.x * scaleFactor);
 }
 
 /**

@@ -50,12 +50,6 @@ MA 02110-1301, USA.
 // The background color of the line layout.
 #define LINE_LAYOUT_BG_COLOR 0xC0C0C0
 
-// Constant for defining big screens.
-#define LARGE_SCREEN_HEIGHT 800
-
-// The increase height value for widgets(for large screens only).
-#define LARGE_SCREEN_INCREASE_VALUE 30
-
 // False constant.
 #define FALSE_CONST "false"
 
@@ -184,17 +178,10 @@ void ScreenWebView::createAddressBar()
 	float buttonWidth = BUTTON_WIDTH / 100.0 * mScreenWidth;
 	mAddressBarHeight = DEFAULT_ADDRESS_BAR_HEIGHT;
 
-	// For large screen increase the height of the widgets.
-	if (LARGE_SCREEN_HEIGHT <= mScreenHeight)
-	{
-		mAddressBarHeight += LARGE_SCREEN_INCREASE_VALUE;
-	}
-
 	mAddressBarWidgetsHeight = mAddressBarHeight - (2 * SPACE);
 
 	// Create the address layout.
 	mAddressBarLayout = new HorizontalLayout();
-	//mAddressBarLayout->setSize(mScreenWidth, mAddressBarHeight);
 	mAddressBarLayout->fillSpaceHorizontally();
 	mAddressBarLayout->wrapContentVertically();
 	mAddressBarLayout->setProperty(
@@ -225,8 +212,8 @@ void ScreenWebView::createAddressBar()
 		(int)buttonWidth - (2 * SPACE),
 		mAddressBarWidgetsHeight);
 	mOpenLinkBtnLayout->setProperty(
-			MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT,
-			MAW_ALIGNMENT_RIGHT);
+		MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT,
+		MAW_ALIGNMENT_RIGHT);
 	mOpenLinkBtnLayout->addChild(mOpenLinkButtonWidget);
 
 	// Add layouts to the address bar layout.

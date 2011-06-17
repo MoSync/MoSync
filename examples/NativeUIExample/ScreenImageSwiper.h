@@ -248,6 +248,11 @@ public:
 	void runTimerEvent();
 
 private:
+	/**
+	 * TODO: Document.
+	 */
+	float getScaleFactor();
+
 	/*
 	 * Method for getting the screen size inside the members mScreenWidth and mScreenHeight
 	 */
