@@ -1247,7 +1247,7 @@ interface MAAPI {
 		/// or \< 0 on error.
 		AUDIOBUFFER_FILL = 18;
 #endif
-		/** \brief The size of the screen changed.
+		/** \brief The size of the screen has changed.
 		* Use maGetScrSize() to get the new size.
 		*
 		* If the screen is the current draw target, the clipping rectangle is removed.

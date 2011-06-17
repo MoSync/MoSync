@@ -1,0 +1,23 @@
+The images Paper.png, Rock.png and Scissors.png used in this game is altered from the original source at
+
+http://en.wikipedia.org/wiki/File:Pierre_ciseaux_feuille_l%C3%A9zard_spock_aligned.svg
+
+and is licensed under Creative Commons Attribution-Share Alike 3.0 Unported, 2.5 Generic, 2.0 Generic and 1.0 Generic.
+
+You are free:
+	to share – to copy, distribute and transmit the work
+	to remix – to adapt the work
+	
+Under the following conditions:
+	attribution – You must attribute the work in the manner specified by the author or licensor
+		(but not in any way that suggests that they endorse you or your use of the work).
+	share alike – If you alter, transform, or build upon this work, you may distribute the resulting
+		work only under the same or similar license to this one.
+
+
+For further information about these licenses, please visit:
+
+http://creativecommons.org/licenses/by-sa/3.0/deed.en
+http://creativecommons.org/licenses/by-sa/2.5/deed.en
+http://creativecommons.org/licenses/by-sa/2.0/deed.en
+http://creativecommons.org/licenses/by-sa/1.0/deed.en
