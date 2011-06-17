@@ -198,30 +198,33 @@ void ScreenWebView::createAddressBar()
 	mEditBoxWidget->setTextInputMode();
 	mEditBoxWidget->setText(DEFAULT_URL_ADDRESS);
 	mEditBoxWidget->fillSpaceHorizontally();
+	mEditBoxWidget->wrapContentVertically();
 	mEditBoxWidget->setEventListener(this);
 
 	// Create the open link button widget.
 	mOpenLinkButtonWidget = new ImageButton();
 	mOpenLinkButtonWidget->setImage(RES_WEB_VIEW_OPEN_LINK_IMAGE);
-	mOpenLinkButtonWidget->setSize(buttonWidth, mAddressBarWidgetsHeight);
+//	mOpenLinkButtonWidget->setSize(buttonWidth, mAddressBarWidgetsHeight);
 	mOpenLinkButtonWidget->setEventListener(this);
 
 	// Create the edit box layout.
-	mEditBoxLayout = createSpacer((int)editBoxWidth, mAddressBarWidgetsHeight);
-	mEditBoxLayout->addChild(mEditBoxWidget);
+//	mEditBoxLayout = createSpacer((int)editBoxWidth, mAddressBarWidgetsHeight);
+//	mEditBoxLayout->addChild(mEditBoxWidget);
 
 	// Create the open link button layout.
-	mOpenLinkBtnLayout = createSpacer(
-		(int)layoutButtonWidth - (2 * SPACE),
-		mAddressBarWidgetsHeight);
-	mOpenLinkBtnLayout->setProperty(
-		MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT,
-		MAW_ALIGNMENT_RIGHT);
-	mOpenLinkBtnLayout->addChild(mOpenLinkButtonWidget);
+//	mOpenLinkBtnLayout = createSpacer(
+//		(int)layoutButtonWidth - (2 * SPACE),
+//		mAddressBarWidgetsHeight);
+//	mOpenLinkBtnLayout->setProperty(
+//		MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT,
+//		MAW_ALIGNMENT_RIGHT);
+//	mOpenLinkBtnLayout->addChild(mOpenLinkButtonWidget);
 
 	// Add layouts to the address bar layout.
-	mAddressBarLayout->addChild(mEditBoxLayout);
-	mAddressBarLayout->addChild(mOpenLinkBtnLayout);
+//	mAddressBarLayout->addChild(mEditBoxLayout);
+	mAddressBarLayout->addChild(mEditBoxWidget);
+//	mAddressBarLayout->addChild(mOpenLinkBtnLayout);
+	mAddressBarLayout->addChild(mOpenLinkButtonWidget);
 }
 
 /**
