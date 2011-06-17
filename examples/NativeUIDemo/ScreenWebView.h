@@ -120,7 +120,8 @@ private:
 	/**
 	 * Widget used for opening the given web address.
 	 */
-	ImageButton* mOpenLinkButtonWidget;
+//	ImageButton* mOpenLinkButtonWidget;
+	Button* mOpenLinkButtonWidget;
 
 	/**
 	 * Used by the user for providing a web address.
