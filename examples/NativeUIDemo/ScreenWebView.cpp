@@ -24,10 +24,10 @@ MA 02110-1301, USA.
  */
 
 // The width of the edit box in percentage (x% of the screen width).
-#define EDIT_BOX_WIDTH 70.0
+#define EDIT_BOX_WIDTH 55.0
 
 // The width of the open link button in percentage (x% of the screen width)
-#define BUTTON_WIDTH 30.0
+#define BUTTON_WIDTH 45.0
 
 // The default height of the address bar.
 #define DEFAULT_ADDRESS_BAR_HEIGHT 70
@@ -177,10 +177,10 @@ ScreenWebView::~ScreenWebView()
 void ScreenWebView::createAddressBar()
 {
 	float editBoxWidth = EDIT_BOX_WIDTH / 100.0 * mScreenWidth;
-	float buttonWidth = BUTTON_WIDTH / 100.0 * mScreenWidth;
+	float layoutButtonWidth = BUTTON_WIDTH / 100.0 * mScreenWidth;
 	mAddressBarHeight = DEFAULT_ADDRESS_BAR_HEIGHT;
-
-	mAddressBarWidgetsHeight = mAddressBarHeight - (2 * SPACE);
+	mAddressBarWidgetsHeight = mAddressBarHeight - (3 * SPACE);
+	int buttonWidth = mAddressBarHeight + (mAddressBarHeight / 4);
 
 	// Create the address layout.
 	mAddressBarLayout = new HorizontalLayout();
@@ -203,7 +203,7 @@ void ScreenWebView::createAddressBar()
 	// Create the open link button widget.
 	mOpenLinkButtonWidget = new ImageButton();
 	mOpenLinkButtonWidget->setImage(RES_WEB_VIEW_OPEN_LINK_IMAGE);
-	mOpenLinkButtonWidget->setSize(mAddressBarWidgetsHeight, mAddressBarWidgetsHeight);
+	mOpenLinkButtonWidget->setSize(buttonWidth, mAddressBarWidgetsHeight);
 	mOpenLinkButtonWidget->setEventListener(this);
 
 	// Create the edit box layout.
@@ -212,7 +212,7 @@ void ScreenWebView::createAddressBar()
 
 	// Create the open link button layout.
 	mOpenLinkBtnLayout = createSpacer(
-		(int)buttonWidth - (2 * SPACE),
+		(int)layoutButtonWidth - (2 * SPACE),
 		mAddressBarWidgetsHeight);
 	mOpenLinkBtnLayout->setProperty(
 		MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT,
