@@ -30,7 +30,7 @@ MA 02110-1301, USA.
 #define BUTTON_WIDTH 30.0
 
 // The default height of the address bar.
-#define DEFAULT_ADDRESS_BAR_HEIGHT 55
+#define DEFAULT_ADDRESS_BAR_HEIGHT 70
 
 // Space between widgets.
 #define SPACE 5
@@ -194,7 +194,9 @@ void ScreenWebView::createAddressBar()
 
 	// Create the address layout.
 	mAddressBarLayout = new HorizontalLayout();
-	mAddressBarLayout->setSize(mScreenWidth, mAddressBarHeight);
+	//mAddressBarLayout->setSize(mScreenWidth, mAddressBarHeight);
+	mAddressBarLayout->fillSpaceHorizontally();
+	mAddressBarLayout->wrapContentVertically();
 	mAddressBarLayout->setProperty(
 		MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
 		MAW_ALIGNMENT_CENTER);
