@@ -1,34 +1,33 @@
-/*
-Copyright (C) 2011 MoSync AB
+/* Copyright (C) 2011 MoSync AB
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
+along with this program.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
 */
 
-/**
- * @file WidgetUtil.h
- * @author Mattias Frånberg and Chris Hughes
- *
- * Header file containing forward declarations for some basic
- * utilities that get and set widget properties.
- */
+/** @file widgetutil.h
+*
+* Header file containing forward declarations for some basic
+* utilities that get and set widget properties.
+*
+* @author Mattias Frånberg and Chris Hughes
+*/
 
-// Guard against multiple includes.
+
 #ifndef WIDGETUTIL_H_
 #define WIDGETUTIL_H_
 
-// Include MoSync syscalls.
+//Include the MoSync syscall collection.
 #include <maapi.h>
 
 /**
@@ -40,7 +39,7 @@ MA 02110-1301, USA.
  *
  * @return WIDGET_OK if the property was set, WIDGET_ERROR otherwise.
  */
-int widgetSetPropertyInt(MAHandle handle, const char *property, int value);
+int maWidgetSetPropertyInt(MAHandle handle, const char *property, int value);
 
 /**
  * Retrieve an integer property of a widget.
@@ -50,6 +49,6 @@ int widgetSetPropertyInt(MAHandle handle, const char *property, int value);
  *
  * @return The value of the property.
  */
-int widgetGetPropertyInt(MAHandle handle, const char *property);
+int maWidgetGetPropertyInt(MAHandle handle, const char *property);
 
-#endif // WIDGETUTIL_H_
+#endif /* WIDGETUTIL_H_ */

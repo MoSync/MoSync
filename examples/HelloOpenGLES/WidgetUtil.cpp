@@ -1,65 +1,47 @@
-/*
-Copyright (C) 2011 MoSync AB
+/* Copyright (C) 2011 MoSync AB
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License, version 2, as published by
+the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
+along with this program.  If not, write to the Free
+Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+02111-1307, USA.
 */
 
-/**
- * @file WidgetUtil.h
- * @author Mattias Frånberg and Chris Hughes
- *
- * Implementation of basic utilities that get and set widget properties.
- */
+/** @file widgetutil.cpp
+*
+* Implementation of basic utilities that get and set widget properties.
+*
+* @author Mattias Frånberg and Chris Hughes
+*/
 
-// Include the standard libraries we need.
+
+#include "widgetutil.h"
 #include <mastdlib.h>
 #include <mavsprintf.h>
 
-// Include NativeUI.
+//Include NativeUI so that we can set widget properties.
 #include <IX_WIDGET.h>
 
-// Include the header file for this file.
-#include "WidgetUtil.h"
-
-/**
- * Set an integer property of a widget.
- *
- * @param handle Handle to the widget.
- * @param property String representing the property to be set.
- * @param value The value the property is to be set to.
- *
- * @return WIDGET_OK if the property was set, WIDGET_ERROR otherwise.
- */
-int widgetSetPropertyInt(MAHandle handle, const char *property, int value)
+int maWidgetSetPropertyInt(MAHandle handle, const char *property, int value)
 {
 	char buffer[256];
-	sprintf(buffer, "%i", value);
+	sprintf( buffer, "%d", value );
+
 	maWidgetSetProperty( handle, property, buffer );
 }
 
-/**
- * Retrieve an integer property of a widget.
- *
- * @param handle Handle to the widget
- * @param property The property of the widget to get.
- *
- * @return The value of the property.
- */
-int widgetGetPropertyInt(MAHandle handle, const char *property)
+int maWidgetGetPropertyInt(MAHandle handle, const char *property)
 {
 	char buffer[256];
-	maWidgetGetProperty(handle, property, buffer, 256);
+	maWidgetGetProperty( handle, property, buffer, 256);
+
 	return atoi(buffer);
 }

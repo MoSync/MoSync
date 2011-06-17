@@ -3318,6 +3318,11 @@ group WidgetAPI "Widget API" {
 		 * @brief A search bar is a special kind of edit box that is used for searching. See \ref WidgetSearchBarProperties "Search bar properties" for the properties available.
 		 */
 		SEARCH_BAR = "SearchBar";
+		
+		/**
+		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
+		 */
+		NAV_BAR = "NavBar";		
 
 		/**
 		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
@@ -3825,6 +3830,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		BACKGROUND_IMAGE = "backgroundImage";
+		
+		/**
+		* @brief Specifies what type of scaling should be applied to the image button.
+		*
+		* @validvalue Either 'none', 'scaleXY' or 'scalePreserveAspect'. Default 'none'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_SCALE_MODE, "scaleXY");
+		* \endcode
+		*/		
+		SCALE_MODE = "scaleMode";		
 	}
 	} // end of WidgetImageButtonProperties		
 	
@@ -3846,6 +3865,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		IMAGE = "image";
+		
+		/**
+		* @brief Specifies what type of scaling should be applied to the image.
+		*
+		* @validvalue Either 'none', 'scaleXY' or 'scalePreserveAspect'. Default 'none'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_SCALE_MODE, "scaleXY");
+		* \endcode
+		*/		
+		SCALE_MODE = "scaleMode";		
 	}
 	} // end of WidgetImageProperties
 
