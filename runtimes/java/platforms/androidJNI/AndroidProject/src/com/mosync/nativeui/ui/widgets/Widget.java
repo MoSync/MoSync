@@ -187,11 +187,15 @@ public class Widget
 	{
 		if( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
 		{
-			return Integer.toString( getLayoutParams( ).getWidth() );
+			// shouldn't return the layout params.. Now it returns the actual pixel width.
+			//return Integer.toString( getLayoutParams( ).getWidth() );
+			return Integer.toString( getView( ).getWidth() );
 		}
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
 		{
-			return Integer.toString(  getLayoutParams( ).getHeight() );
+			// shouldn't return the layout params.. Now it returns the actual pixel height.
+			//return Integer.toString(  getLayoutParams( ).getHeight() );
+			return Integer.toString( getView( ).getHeight() );			
 		}
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
 		{

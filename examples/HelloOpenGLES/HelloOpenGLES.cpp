@@ -274,7 +274,7 @@ private:
 	    GLubyte indices[4] = {0, 1, 3, 2};
 
 	    // Set the background color to be used when clearing the screen.
-	    glClearColor(0.3f, 0.0f, 0.0f, 0.0f);
+	    glClearColor(0.3f, 0.0f, 0.0f, 1.0f);
 
 	    // Clear the screen and the depth buffer.
 	    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
