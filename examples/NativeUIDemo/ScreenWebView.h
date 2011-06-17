@@ -35,7 +35,7 @@ using namespace MoSync::UI;
  * Class that creates a screen that displays a web view.
  */
 class ScreenWebView:
-    public WidgetEventListener // used for listening widget events.
+    public WidgetEventListener // Used for listening widget events.
 {
 public:
 	/**
@@ -169,7 +169,7 @@ private:
 	/**
 	 * The height of the widgets from address bar.
 	 */
-	 int mAddressBarWidgetsHeight;
+	int mAddressBarWidgetsHeight;
 };
 
 #endif // SCREEN_WEB_VIEW_H_

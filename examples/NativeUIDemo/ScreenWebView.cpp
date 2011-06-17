@@ -67,7 +67,8 @@ ScreenWebView* ScreenWebView::sScreenWebView = NULL;
  */
 Screen* ScreenWebView::create()
 {
-	if (NULL == sScreenWebView) {
+	if (NULL == sScreenWebView)
+	{
 		sScreenWebView = new ScreenWebView();
 	}
 
@@ -105,7 +106,8 @@ ScreenWebView::ScreenWebView():
 	mScreen = new Screen();
 	mScreen->setTitle(TAB_SCREEN_TITLE);
 
-	// Get the screen size.
+	// Get the screen size. This shows how to get a property
+	// value for a property for which there is no predefined method.
 	mScreenHeight = mScreen->getPropertyInt(MAW_WIDGET_HEIGHT);
 	mScreenWidth = mScreen->getPropertyInt(MAW_WIDGET_WIDTH);
 
@@ -184,6 +186,9 @@ void ScreenWebView::createAddressBar()
 	mAddressBarLayout = new HorizontalLayout();
 	mAddressBarLayout->fillSpaceHorizontally();
 	mAddressBarLayout->wrapContentVertically();
+
+	// This shows how you set a property for which there is no
+	// predefined method.
 	mAddressBarLayout->setProperty(
 		MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
 		MAW_ALIGNMENT_CENTER);
@@ -191,10 +196,8 @@ void ScreenWebView::createAddressBar()
 	// Create the edit box widget.
 	mEditBoxWidget = new EditBox();
 	mEditBoxWidget->setTextInputMode();
-	mEditBoxWidget->setProperty(MAW_EDIT_BOX_TEXT, DEFAULT_URL_ADDRESS);
-	mEditBoxWidget->setProperty(
-		MAW_WIDGET_WIDTH,
-		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	mEditBoxWidget->setText(DEFAULT_URL_ADDRESS);
+	mEditBoxWidget->fillSpaceHorizontally();
 	mEditBoxWidget->setEventListener(this);
 
 	// Create the open link button widget.
@@ -232,6 +235,9 @@ VerticalLayout* ScreenWebView::createSpacer(const int width, const int height)
 {
 	VerticalLayout* layout = new VerticalLayout();
 	layout->setSize(width, height);
+
+	// This shows how you set a property for which there is no
+	// predefined method.
 	layout->setProperty(
 		MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT,
 		MAW_ALIGNMENT_RIGHT);
@@ -256,8 +262,18 @@ VerticalLayout* ScreenWebView::createSpacer(const int width, const int height)
 	{
 		if (widget == mEditBoxWidget || widget == mOpenLinkButtonWidget)
 		{
-			mEditBoxWidget->setProperty(MAW_EDIT_BOX_SHOW_KEYBOARD, FALSE_CONST);
-			MAUtil::String webAddress = mEditBoxWidget->getPropertyString("text");
+			// This shows how you set a property for which there is no
+			// predefined method.
+			mEditBoxWidget->setProperty(
+				MAW_EDIT_BOX_SHOW_KEYBOARD,
+				FALSE_CONST);
+
+			// This is how can get a property value for which there
+			// is no predefined method.
+			MAUtil::String webAddress =
+				mEditBoxWidget->getPropertyString("text");
+
+			// Open the web page.
 			mWebView->openURL(webAddress);
 		}
 	}
@@ -279,5 +295,5 @@ Screen* ScreenWebView::getScreen() const
 void ScreenWebView::openURL(const MAUtil::String& url)
 {
 	mWebView->openURL(url);
-	mEditBoxWidget->setProperty(MAW_EDIT_BOX_TEXT, url);
+	mEditBoxWidget->setText(url);
 }
