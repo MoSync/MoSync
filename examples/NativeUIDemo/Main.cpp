@@ -17,7 +17,7 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file NativeUIExample.cpp
+ * @file Main.cpp
  * @author Mikael Kindborg
  *
  * This is the main entry point for the example application
@@ -45,16 +45,6 @@ public:
 	 */
 	NativeUIMoblet()
 	{
-//		// Create the main user interface screen.
-//		if (WidgetManager::isAndroid())
-//		{
-//			mMainScreen = ScreenMain::createFourTabUI();
-//		}
-//		else
-//		{
-//			mMainScreen = ScreenMain::createFiveTabUI();
-//		}
-
 		// Create the main user interface screen.
 		mMainScreen = ScreenMain::createThreeTabUI();
 
@@ -84,27 +74,27 @@ public:
 	 * Called when the screen was touched.
 	 * This is a callback method declared in class Moblet.
 	 */
-	void pointerPressEvent(MAPoint2d p)
+	void pointerPressEvent(MAPoint2d point)
 	{
-		mMainScreen->handlePointerPressed(p);
+		mMainScreen->handlePointerPressed(point);
 	}
 
 	/**
 	 * Called when the pointer was moved on the screen.
 	 * This is a callback method declared in class Moblet.
 	 */
-	void pointerMoveEvent(MAPoint2d p)
+	void pointerMoveEvent(MAPoint2d point)
 	{
-		mMainScreen->handlePointerMoved(p);
+		mMainScreen->handlePointerMoved(point);
 	}
 
 	/**
 	 * Called when the screen was released.
 	 * This is a callback method declared in class Moblet.
 	 */
-	void pointerReleaseEvent(MAPoint2d p)
+	void pointerReleaseEvent(MAPoint2d point)
 	{
-		mMainScreen->handlePointerReleased(p);
+		mMainScreen->handlePointerReleased(point);
 	}
 
 private:

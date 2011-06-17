@@ -62,15 +62,26 @@ namespace MoSync
 	 */
 	Widget::~Widget()
 	{
+		// If my widget handle is NOT NULL, I set it
+		// to NULL in me and all my children, because
+		// once the widget handle is destroyed it will
+		// destroy all child widgets on the native side.
 		MAWidgetHandle widgetHandle = mWidgetHandle;
+		if (NULL != widgetHandle)
+		{
+			markWidgetHandleAsDeleted();
+		}
 
-		markWidgetHandleAsDeleted();
-
+		// Now I recursively delete all my children. They
+		// will not destroy their widget handles, because
+		// they are set to NULL in the above step.
 		for (int i = 0; i < mChildren.size(); ++i)
 		{
 			delete mChildren[i];
 		}
 
+		// If I had a widget handle, it is now destroyed, which
+		// also destroys all child widgets on the native side.
 		if (NULL != widgetHandle)
 		{
 			maWidgetDestroy(widgetHandle);
@@ -83,8 +94,10 @@ namespace MoSync
 	 */
 	void Widget::markWidgetHandleAsDeleted()
 	{
+		// Set my widget handle to NULL.
 		mWidgetHandle = NULL;
 
+		// Recursively do the same for my children.
 		for (int i = 0; i < mChildren.size(); ++i)
 		{
 			mChildren[i]->markWidgetHandleAsDeleted();

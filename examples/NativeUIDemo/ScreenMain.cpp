@@ -31,21 +31,28 @@ MA 02110-1301, USA.
 #include "ScreenWebView.h"
 #include "ScreenImageSwiper.h"
 
+// Indexes for the tab screens.
+#define COLOR_TAB		0
+#define WEB_TAB			1
+#define SWIPER_TAB		2
+
 /**
- * TODO: Comment this class.
+ * This is a main screen with three tabs.
  */
 class ScreenMainWithThreeTabs : public ScreenMain
 {
 public:
 	ScreenMainWithThreeTabs() : ScreenMain()
 	{
+		// Create child screens.
 		mColorScreen = ScreenColorList::create();
 		Screen* webScreen = ScreenWebView::create();
-		imageScreen = ScreenImageSwiper::create();
+		mImageScreen = ScreenImageSwiper::create();
 
+		// Add them as tabs.
 		this->addTab(mColorScreen);
 		this->addTab(webScreen);
-		this->addTab(imageScreen);
+		this->addTab(mImageScreen);
 	}
 
 	/**
@@ -56,40 +63,37 @@ public:
 	{
 		if (MAW_EVENT_TAB_CHANGED == widgetEventData->eventType)
 		{
+			// Here we save the current tab index.
 			mCurrentTabIndex = widgetEventData->tabIndex;
 		}
 	}
 
 	/**
-	 * TODO: Comment this code.
+	 * This method is called when a key is pressed.
 	 */
 	void handleKeyPress(int keyCode)
 	{
-		// The MAK_BACK key code is sent on Android when the back
-		// is pressed.
+		// The MAK_BACK key code is sent on Android when
+		//  the back key is pressed.
 		if (MAK_BACK == keyCode)
 		{
 			// Is this the color screen (first tab)?
-			if (0 == mCurrentTabIndex)
+			if (COLOR_TAB == mCurrentTabIndex)
 			{
 				// Exit only is this is the top screen in the stack.
 				// If there are more that one screen on the stack,
-				// we will instead go back to tre previous screen.
+				// we will instead go back to the previous screen.
 				// This behaviour is built into the stack screen
 				// widget, and can be turned on/off with the property
 				// MAW_STACK_SCREEN_BACK_BUTTON_ENABLED.
 				if (mColorScreen->getStackSize() <= 1)
 				{
-					// TODO: Later change to close();
-					//close();
 					maExit(0);
 				}
 			}
 			else
 			{
 				// Otherwise, always exit when back key is pressed.
-				// TODO: Later change to close();
-				//close();
 				maExit(0);
 			}
 		}
@@ -98,45 +102,51 @@ public:
 	/**
 	 * Handle pointer presses.
 	 */
-	void handlePointerPressed(MAPoint2d p)
+	void handlePointerPressed(MAPoint2d point)
 	{
-		switch (getActiveTab())
+		if (SWIPER_TAB == getActiveTab())
 		{
-			case SWIPER_TAB:
-				imageScreen->handlePointerPressed(p);
-				break;
+			mImageScreen->handlePointerPressed(point);
 		}
 	}
 
 	/**
 	 * Handle pointer moves.
 	 */
-	void handlePointerMoved(MAPoint2d p)
+	void handlePointerMoved(MAPoint2d point)
 	{
-		switch (getActiveTab())
+		if (SWIPER_TAB == getActiveTab())
 		{
-			case SWIPER_TAB:
-				imageScreen->handlePointerMoved(p);
-				break;
+			mImageScreen->handlePointerMoved(point);
 		}
 	}
 
 	/**
 	 * Handle pointer releases.
 	 */
-	void handlePointerReleased(MAPoint2d p)
+	void handlePointerReleased(MAPoint2d point)
 	{
-		switch (getActiveTab())
+		if (SWIPER_TAB == getActiveTab())
 		{
-			case SWIPER_TAB:
-				imageScreen->handlePointerReleased(p);
-				break;
+			mImageScreen->handlePointerReleased(point);
 		}
 	}
+
 private:
+	/**
+	 * Index of the currently visible tab.
+	 */
 	int mCurrentTabIndex;
+
+	/**
+	 * The color screen.
+	 */
 	StackScreen* mColorScreen;
-	Screen* imageScreen;
+
+	/**
+	 * The image screen.
+	 */
+	Screen* mImageScreen;
 };
 
 /**

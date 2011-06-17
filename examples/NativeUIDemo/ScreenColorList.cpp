@@ -92,6 +92,9 @@ public:
 	}
 
 private:
+	/**
+	 * The screen that we call back to.
+	 */
 	ScreenColorList* mScreen;
 };
 
