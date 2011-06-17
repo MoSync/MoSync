@@ -36,17 +36,17 @@
 
 .res RES_IMAGE1_SMALL
 .ubin
-.pstring "Image 1"
+.pstring "L-ouis on Flickr"
 .include "small/Image1.png"
 
 .res RES_IMAGE2_SMALL
 .ubin
-.pstring "Image 2"
+.pstring "TANAKA Juuyoh on Flickr"
 .include "small/Image2.png"
 
 .res RES_IMAGE3_SMALL
 .ubin
-.pstring "Image 3"
+.pstring "Sudarshan Vijayaraghavan on Flickr"
 .include "small/Image3.png"
 
 .res RES_LAST_IMAGE_SMALL
@@ -57,17 +57,17 @@
 
 .res RES_IMAGE1_MEDIUM
 .ubin
-.pstring "Image 1"
+.pstring "L-ouis on Flickr"
 .include "medium/Image1.png"
 
 .res RES_IMAGE2_MEDIUM
 .ubin
-.pstring "Image 2"
+.pstring "TANAKA Juuyoh on Flickr"
 .include "medium/Image2.png"
 
 .res RES_IMAGE3_MEDIUM
 .ubin
-.pstring "Image 3"
+.pstring "Sudarshan Vijayaraghavan on Flickr"
 .include "medium/Image3.png"
 
 .res RES_LAST_IMAGE_MEDIUM
@@ -78,17 +78,17 @@
 
 .res RES_IMAGE1_LARGE
 .ubin
-.pstring "Image 1"
+.pstring "L-ouis on Flickr"
 .include "medium/Image1.png"
 
 .res RES_IMAGE2_LARGE
 .ubin
-.pstring "Image 2"
+.pstring "TANAKA Juuyoh on Flickr"
 .include "medium/Image2.png"
 
 .res RES_IMAGE3_LARGE
 .ubin
-.pstring "Image 3"
+.pstring "Sudarshan Vijayaraghavan on Flickr"
 .include "large/Image3.png"
 
 .res RES_LAST_IMAGE_LARGE
