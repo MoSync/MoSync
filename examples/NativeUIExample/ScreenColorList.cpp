@@ -128,6 +128,8 @@ void ScreenColorList::createUI()
 {
 	// An instance of this class is a stack screen.
 	StackScreen* stackScreen = this;
+
+	// Set title and icon of the stack screen.
 	stackScreen->setTitle("Colors");
 	if (WidgetManager::isAndroid())
 	{
@@ -140,6 +142,10 @@ void ScreenColorList::createUI()
 
 	// Create the top screen in the stack.
 	Screen* screen = new Screen();
+
+	// Also set the title of this screen.
+	screen->setTitle("Colors");
+
 	// Create the list view widget.
 	ListView* listView = new ListView();
 
@@ -190,6 +196,10 @@ void ScreenColorList::openColorScreen(int listItemIndex)
 {
 	// Create a screen that will show the color.
 	Screen* screen = new Screen();
+
+	// The title of this screen is displayed on the
+	// navigation bar on iPhone/iPad.
+	screen->setTitle(sColors[listItemIndex].name);
 	Widget* widget = new VerticalLayout();
 	widget->setBackgroundColor(sColors[listItemIndex].color);
 	screen->setMainWidget(widget);

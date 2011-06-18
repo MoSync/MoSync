@@ -180,28 +180,28 @@ public class Widget
 	 * Returns the property of the wrapped widget.
 	 * 
 	 * @param property
-	 * @return the property of the wrapped widget. If no property is found, an
-	 *         empty string is returned.
+	 * @return the property of the wrapped widget. If no property is found, 
+	 *         an empty string is returned.
 	 */
 	public String getProperty(String property)
 	{
-		if( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
+		if ( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
 		{
 			// shouldn't return the layout params.. Now it returns the actual pixel width.
 			//return Integer.toString( getLayoutParams( ).getWidth() );
 			return Integer.toString( getView( ).getWidth() );
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
 		{
 			// shouldn't return the layout params.. Now it returns the actual pixel height.
 			//return Integer.toString(  getLayoutParams( ).getHeight() );
 			return Integer.toString( getView( ).getHeight() );			
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
 		{
 			return Integer.toString( getView( ).getLeft( ) );
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
 		{
 			return Integer.toString( getView( ).getTop( ) );
 		}

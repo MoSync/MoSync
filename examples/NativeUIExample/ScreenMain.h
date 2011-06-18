@@ -30,6 +30,11 @@ MA 02110-1301, USA.
 
 #include "UIWrapper/Widgets.h"
 
+#define COLOR_TAB		0
+#define WEB_TAB			1
+#define SWIPER_TAB		2
+#define CUBE_TAB		3
+
 using namespace MoSync::UI;
 
 /**
@@ -52,6 +57,27 @@ public:
 	 * Handle keypresses.
 	 */
 	virtual void handleKeyPress(int keyCode) = 0;
+
+	/**
+	 * Handle pointer presses.
+	 */
+	virtual void handlePointerPressed(MAPoint2d p) = 0;
+
+	/**
+	 * Handle pointer moves.
+	 */
+	virtual void handlePointerMoved(MAPoint2d p) = 0;
+
+	/**
+	 * Handle pointer releases.
+	 */
+	virtual void handlePointerReleased(MAPoint2d p) = 0;
+
+
+	/**
+	 * Create UI with three tabs
+	 */
+	static ScreenMain* createThreeTabUI();
 
 	/**
 	 * Create UI with four tabs

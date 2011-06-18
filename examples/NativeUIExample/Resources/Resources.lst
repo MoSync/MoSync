@@ -24,3 +24,75 @@
 
 .res RES_TAB_ICON_WEB_VIEW_ANDROID
 .image "TabIconWebView_Android.png"
+
+.res RES_WEB_VIEW_OPEN_LINK_IMAGE
+.image "WebViewOpenLink.png"
+
+.res RES_SETTINGS_VIEW_RESET_IMAGE
+.image "ImageSettingsReset.png"
+
+.res RES_FIRST_IMAGE_SMALL
+.placeholder
+
+.res RES_IMAGE1_SMALL
+.ubin
+.pstring "L-ouis on Flickr"
+.include "small/Image1.png"
+
+.res RES_IMAGE2_SMALL
+.ubin
+.pstring "TANAKA Juuyoh on Flickr"
+.include "small/Image2.png"
+
+.res RES_IMAGE3_SMALL
+.ubin
+.pstring "Sudarshan Vijayaraghavan on Flickr"
+.include "small/Image3.png"
+
+.res RES_LAST_IMAGE_SMALL
+.placeholder
+
+.res RES_FIRST_IMAGE_MEDIUM
+.placeholder
+
+.res RES_IMAGE1_MEDIUM
+.ubin
+.pstring "L-ouis on Flickr"
+.include "medium/Image1.png"
+
+.res RES_IMAGE2_MEDIUM
+.ubin
+.pstring "TANAKA Juuyoh on Flickr"
+.include "medium/Image2.png"
+
+.res RES_IMAGE3_MEDIUM
+.ubin
+.pstring "Sudarshan Vijayaraghavan on Flickr"
+.include "medium/Image3.png"
+
+.res RES_LAST_IMAGE_MEDIUM
+.placeholder
+
+.res RES_FIRST_IMAGE_LARGE
+.placeholder
+
+.res RES_IMAGE1_LARGE
+.ubin
+.pstring "L-ouis on Flickr"
+.include "medium/Image1.png"
+
+.res RES_IMAGE2_LARGE
+.ubin
+.pstring "TANAKA Juuyoh on Flickr"
+.include "medium/Image2.png"
+
+.res RES_IMAGE3_LARGE
+.ubin
+.pstring "Sudarshan Vijayaraghavan on Flickr"
+.include "large/Image3.png"
+
+.res RES_LAST_IMAGE_LARGE
+.placeholder
+
+.res RES_IMAGE_TEX
+.image "ImageTex.png"

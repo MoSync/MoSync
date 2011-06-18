@@ -36,6 +36,114 @@ MA 02110-1301, USA.
 /**
  * TODO: Comment this class.
  */
+class ScreenMainWithThreeTabs : public ScreenMain
+{
+public:
+	ScreenMainWithThreeTabs() : ScreenMain()
+	{
+		mColorScreen = ScreenColorList::create();
+		Screen* webScreen = ScreenWebView::create();
+		imageScreen = ScreenImageSwiper::create();
+
+		this->addTab(mColorScreen);
+		this->addTab(webScreen);
+		this->addTab(imageScreen);
+	}
+
+	/**
+	 * This method is called when there is an event for this widget.
+	 * @param widgetEventData The data for the widget event.
+	 */
+	void handleWidgetEvent(MAWidgetEventData* widgetEventData)
+	{
+		if (MAW_EVENT_TAB_CHANGED == widgetEventData->eventType)
+		{
+			mCurrentTabIndex = widgetEventData->tabIndex;
+		}
+	}
+
+	/**
+	 * TODO: Comment this code.
+	 */
+	void handleKeyPress(int keyCode)
+	{
+		// The MAK_BACK key code is sent on Android when the back
+		// is pressed.
+		if (MAK_BACK == keyCode)
+		{
+			// Is this the color screen (first tab)?
+			if (0 == mCurrentTabIndex)
+			{
+				// Exit only is this is the top screen in the stack.
+				// If there are more that one screen on the stack,
+				// we will instead go back to tre previous screen.
+				// This behaviour is built into the stack screen
+				// widget, and can be turned on/off with the property
+				// MAW_STACK_SCREEN_BACK_BUTTON_ENABLED.
+				if (mColorScreen->getStackSize() <= 1)
+				{
+					// TODO: Later change to close();
+					//close();
+					maExit(0);
+				}
+			}
+			else
+			{
+				// Otherwise, always exit when back key is pressed.
+				// TODO: Later change to close();
+				//close();
+				maExit(0);
+			}
+		}
+	}
+
+	/**
+	 * Handle pointer presses.
+	 */
+	void handlePointerPressed(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerPressed(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer moves.
+	 */
+	void handlePointerMoved(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerMoved(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer releases.
+	 */
+	void handlePointerReleased(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerReleased(p);
+				break;
+		}
+	}
+private:
+	int mCurrentTabIndex;
+	StackScreen* mColorScreen;
+	Screen* imageScreen;
+};
+
+/**
+ * TODO: Comment this class.
+ */
 class ScreenMainWithFourTabs : public ScreenMain
 {
 public:
@@ -43,8 +151,8 @@ public:
 	{
 		mColorScreen = ScreenColorList::create();
 		Screen* webScreen = ScreenWebView::create();
-		Screen* imageScreen = ScreenImageSwiper::create();
-		Screen* cubeScreen = ScreenSpinningCube::create();
+		imageScreen = ScreenImageSwiper::create();
+		cubeScreen = ScreenSpinningCube::create();
 		mSettingsScreen = ScreenSettings::create();
 
 		this->addTab(mColorScreen);
@@ -93,8 +201,58 @@ public:
 		}
 	}
 
+	/**
+	 * Handle pointer presses.
+	 */
+	void handlePointerPressed(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerPressed(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerPressed(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer moves.
+	 */
+	void handlePointerMoved(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerMoved(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerMoved(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer releases.
+	 */
+	void handlePointerReleased(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerReleased(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerReleased(p);
+				break;
+		}
+	}
+
 private:
 	StackScreen* mColorScreen;
+	Screen* imageScreen;
+	Screen* cubeScreen;
 	Screen* mSettingsScreen;
 	Screen* mVisibleScreen;
 };
@@ -109,8 +267,8 @@ public:
 	{
 		Screen* colorScreen = ScreenColorList::create();
 		Screen* webScreen = ScreenWebView::create();
-		Screen* imageScreen = ScreenImageSwiper::create();
-		Screen* cubeScreen = ScreenSpinningCube::create();
+		imageScreen = ScreenImageSwiper::create();
+		cubeScreen = ScreenSpinningCube::create();
 		Screen* settingsScreen = ScreenSettings::create();
 
 		this->addTab(colorScreen);
@@ -132,7 +290,67 @@ public:
 			maExit(0);
 		}
 	}
+
+	/**
+	 * Handle pointer presses.
+	 */
+	void handlePointerPressed(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerPressed(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerPressed(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer moves.
+	 */
+	void handlePointerMoved(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerMoved(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerMoved(p);
+				break;
+		}
+	}
+
+	/**
+	 * Handle pointer releases.
+	 */
+	void handlePointerReleased(MAPoint2d p)
+	{
+		switch (getActiveTab())
+		{
+			case SWIPER_TAB:
+				imageScreen->handlePointerReleased(p);
+				break;
+			case CUBE_TAB:
+				cubeScreen->handlePointerReleased(p);
+				break;
+		}
+	}
+
+private:
+	Screen* imageScreen;
+	Screen* cubeScreen;
 };
+
+/**
+ * Create the main screen with three tabs.
+ */
+ScreenMain* ScreenMain::createThreeTabUI()
+{
+	return new ScreenMainWithThreeTabs();
+}
 
 /**
  * Create the main screen with four tabs.
