@@ -3818,7 +3818,7 @@ group WidgetAPI "Widget API" {
 		FONT_SIZE = "fontSize";
 
 		/**
-		* Sets the image used to represent the button.
+		* Sets the background image. This will be scaled to fit the whole widget (not keeping the aspect).
 		*
 		* @validvalue MoSync handle to an uncompressed image resource.
 		*
@@ -3832,18 +3832,18 @@ group WidgetAPI "Widget API" {
 		BACKGROUND_IMAGE = "backgroundImage";
 		
 		/**
-		* @brief Specifies what type of scaling should be applied to the image button.
+		* Sets the foreground image of the button. This won't be scaled at all.
 		*
-		* @validvalue Either 'none', 'scaleXY' or 'scalePreserveAspect'. Default 'none'.
+		* @validvalue MoSync handle to an uncompressed image resource.
 		*
 		* @setonly
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_SCALE_MODE, "scaleXY");
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_IMAGE, toString(R_MY_IMAGE));
 		* \endcode
-		*/		
-		SCALE_MODE = "scaleMode";		
+		*/
+		IMAGE = "image";			
 	}
 	} // end of WidgetImageButtonProperties		
 	

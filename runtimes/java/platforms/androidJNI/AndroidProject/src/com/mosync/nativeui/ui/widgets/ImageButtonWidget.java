@@ -33,12 +33,12 @@ public class ImageButtonWidget extends Widget
 		/**
 		 * Remove the background drawable (we don't want the default button background.).
 		 */
-		imageButton.setBackgroundDrawable(null);
+		imageButton.setBackgroundDrawable( null );
 		
 		/**
 		 * Defaults to no scaling.
 		 */
-		imageButton.setScaleType(ImageView.ScaleType.CENTER); 
+		imageButton.setScaleType( ImageView.ScaleType.CENTER ); 
 	}
 
 	/**
@@ -55,14 +55,26 @@ public class ImageButtonWidget extends Widget
 			Bitmap background = NativeUI.getBitmap( imageHandle );
 			if( background != null )
 			{
-				/*
 				getView( ).setBackgroundDrawable(
 						new BitmapDrawable( background ) );
-						*/
-				ImageButton imageButton = (ImageButton) getView( );
-				imageButton.setImageBitmap( background );		
 			}
 		}
+		else if( property
+				.equals( IX_WIDGET.MAW_IMAGE_BUTTON_IMAGE ) )
+		{
+			int imageHandle = IntConverter.convert( value );
+			Bitmap foreground = NativeUI.getBitmap( imageHandle );
+			if( foreground != null )
+			{
+				ImageButton imageButton = (ImageButton) getView( );
+				imageButton.setImageBitmap( foreground );
+				imageButton.setScaleType( ImageView.ScaleType.CENTER );	
+			}
+		}		
+		/*
+		// this doesn't work on iphone we skip this and add the functionality to have
+		// both a background image (that uses scaleXY)
+		// and a foreground image (that uses no scaling).
 		else if( property.equals( IX_WIDGET.MAW_IMAGE_BUTTON_SCALE_MODE ) )
 		{
 			ImageButton imageButton = (ImageButton) getView( );
@@ -84,7 +96,8 @@ public class ImageButtonWidget extends Widget
 			}
 			
 			return true;
-		}		
+		}
+		*/
 		else
 		{
 			if( super.setProperty( property, value ) )
