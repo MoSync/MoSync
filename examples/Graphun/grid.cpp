@@ -103,9 +103,9 @@ Grid::Grid(int x, int y, int w, int h) : expression(scope) {
 	width = w;
 	height = h;
 	initGrid();
-	initTexture();
-	initGL();
-	resizeWindow(0, 0, width, height);
+	//initTexture();
+	//initGL();
+	//resizeWindow(0, 0, width, height);
 
 	validExpression = false;
 	mRotation = 0.0;
@@ -126,6 +126,14 @@ Grid::Grid(int x, int y, int w, int h) : expression(scope) {
 	mShadingEnabled = true;
 }
 
+void Grid::initContext(int w, int h) {
+	width = w;
+	height = h;
+	initTexture();
+	initGL();
+	resizeWindow(0, 0, width, height);
+}
+	
 void Grid::setShadingEnabled(bool enabled) {
 	mShadingEnabled = enabled;
 }

@@ -103,7 +103,7 @@ public:
 	// internal reverse polish notation representation.
 	// which can then easily be evaluated (and re-evaluated)
 	// This is done by first tokenizing the string 
-	// and then parse the tokens, converting 
+	// and then parsing the tokens, converting 
 	// the infix notation to rpn.
 	bool compile(const char *string);
 

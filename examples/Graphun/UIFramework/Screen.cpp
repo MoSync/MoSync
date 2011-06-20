@@ -174,7 +174,7 @@ namespace MoSync {
 			MAWidgetEventData* data = (MAWidgetEventData*)event.data;
 			switch(data->eventType) {
 				case MAW_EVENT_STACK_SCREEN_POPPED: {
-					if(!mStack.size()) return;
+					if(mStack.size()<=1) return;
 					mStack[mStack.size()-1]->hide();
 					mStack.resize(mStack.size()-1);
 					if(!mStack.size()) return;
@@ -194,6 +194,7 @@ namespace MoSync {
 		//if(!mStack.size()) return;
 		//mStack[mStack.size()-1]->hide();
 		//mStack.resize(mStack.size()-1);
+		if(mStack.size()<=1) return;
 		maWidgetStackScreenPop(mHandle);
 		//if(!mStack.size()) return;
 		//mStack[mStack.size()-1]->willAppear();

@@ -3,28 +3,9 @@
 
 #include "UIFramework/Screen.h"
 #include "UIFramework/ListSelectionScreen.h"
-
-#include "MAHeaders.h"
-
 #include "grid.h"
 
-/**
- * Credit glyphish for icons? Done.
- *
- * Improvements:
- * Smoother touch rotation (now it's linear). Done.
- * Some kind of shading. Done
- * Interpolate grid using cubic interpolation or something to get a smother grid without evaluation points.
- * Maybe different shapes (sphere where radius = f(s, t), grid)
- *
- * Settings ideas:
- * Enable shading: Yes/No. Done
- * Grid resolution: low, medium, high. Done
- * Help/about button. Done
- * Grid texture: 3 different textures, or url maybe?
- * Load expression: ability to save experssion from the main screen
- * Setting to choose between different shapes.
- */
+#include "MAHeaders.h"
 
 using namespace MAUtil;
 using namespace MoSync;
@@ -53,7 +34,11 @@ static const char* sAboutText =
 		"Graphun (version 1.0)\nMoSync AB 2011\n\nMade using MoSync SDK\nSee www.mosync.com for more information.\n\n"
 		"Icons by Glyphish (www.glyphish.com)\n";
 
-
+	/**
+	 * A generic text screen. It has a vertical layout where the first item is a label with multiple lines of text.
+	 * If a handle to an image is sent as the last argument to the constructor it is used to create an image widget
+	 * at the top.
+	 */
 	class TextScreen : public Screen  {
 	public:
 		TextScreen(const String& title, const String& text, MAHandle topImage=0) {
@@ -107,6 +92,9 @@ static const char* sAboutText =
 
 	};
 
+	/**
+	 * The settings screen.
+	 */
 	class SettingsScreen : public Screen  {
 	public:
 		SettingsScreen();
@@ -121,6 +109,9 @@ static const char* sAboutText =
 
 	};
 
+	/**
+	 * The main screen with the graph view.
+	 */
 	class MainScreen : public Screen, public IdleListener, public PointerListener  {
 		protected:
 		Widget* mEditBox;
@@ -163,6 +154,9 @@ static const char* sAboutText =
 	StackScreen *sStackScreen = NULL;
 	ListSelectionScreen* sResolutionSelector = NULL;
 
+	/**
+	 * The help screen. It inherits from the text screen.
+	 */
 	class HelpScreen : public TextScreen  {
 	public:
 		HelpScreen() : TextScreen("Help", sHelpText) {
@@ -209,7 +203,6 @@ static const char* sAboutText =
 
 			layout->setProperty("backgroundColor", "000000");
 			layout->setProperty("childHorizontalAlignment", "center");
-			MAExtent screenSize = maGetScrSize();
 
 			Widget* horizontalLayout = new Widget("HorizontalLayout");
 			horizontalLayout->setProperty("childVerticalAlignment", "center");
@@ -220,7 +213,7 @@ static const char* sAboutText =
 			label->setProperty("text", " z =");
 			label->setProperty("fontColor", "ffffff");
 			label->setProperty("fontSize", 16);
-			label->setProperty("width", 30);
+			label->setProperty("width", -2);
 			label->setProperty("height", -2);
 			label->setProperty("backgroundColor", "000000");
 			horizontalLayout->addChild(label);
@@ -254,10 +247,12 @@ static const char* sAboutText =
 			toolBar->setProperty("bottomMargin", "8");
 
 			mSettingsButton = new Widget("ImageButton");
-			mSettingsButton->setProperty("backgroundImage", R_SETTINGS_ICON);
+			mSettingsButton->setProperty("image", R_SETTINGS_ICON);
 			mSettingsButton->setProperty("width", "-2");
 			mSettingsButton->setProperty("height", "-2");
 			toolBar->addChild(mSettingsButton);
+			
+			grid = new Grid(0, 0, 0, 0);
 		}
 
 		void MainScreen::setExpression(const String& exp) {
@@ -352,7 +347,7 @@ static const char* sAboutText =
 				mGLView->setProperty("bind", "");
 				int glWidth = mGLView->getPropertyInt("width");
 				int glHeight = mGLView->getPropertyInt("height");
-				grid = new Grid(mGLView->getPropertyInt("left"), mGLView->getPropertyInt("top"), glWidth, glHeight);
+				grid->initContext(glWidth, glHeight);
 				grid->setExpression(mExpression);
 				mDrawing = true;
 			}

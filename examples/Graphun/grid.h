@@ -4,6 +4,11 @@
 #include "OpenGLHelpers.h"
 #include "eval.h"
 
+/**
+ * Grid renderer. Renders a grid on a plane with an isometric camera perspective.
+ * For each point on the plane an expression is evaluated to calculate the z value.
+ */
+
 class Grid {
 private:
 	GLuint mTexture;
@@ -26,6 +31,7 @@ private:
 
 public:
 	Grid(int x, int y, int w, int h);
+	void initContext(int w, int h);
 
 	void initGrid(int gridSizeX=8, int gridSizeY=8);
 	void setShadingEnabled(bool enabled);
