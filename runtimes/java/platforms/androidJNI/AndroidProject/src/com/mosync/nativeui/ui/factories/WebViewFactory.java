@@ -1,6 +1,9 @@
 package com.mosync.nativeui.ui.factories;
 
 import android.app.Activity;
+import android.content.Context;
+import android.view.MotionEvent;
+import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -20,7 +23,7 @@ public class WebViewFactory implements AbstractViewFactory
 	@Override
 	public Widget create(Activity activity, int handle)
 	{
-		WebView webView = new WebView( activity );
+		WebView webView = new MoSyncWebView( activity );
 		
 		// Java script is enabled by default on iOS so let make it so here too.
 		// This might affect memory consumption / performance.
@@ -63,6 +66,51 @@ public class WebViewFactory implements AbstractViewFactory
 			EventQueue.getDefault( ).postWidgetEvent( IX_WIDGET.MAW_EVENT_WEB_VIEW_URL_CHANGED, mWebWidget.getHandle( ) );
 
 			return super.shouldOverrideUrlLoading( view, url );
+		}
+	}
+	
+	/**
+	 * Custom WebView class.
+	 * @author Mikael Kindborg
+	 */
+	static class MoSyncWebView extends WebView
+	{
+		public MoSyncWebView(Context context)
+		{
+			super(context);
+			
+			// Make the web view gaining focus on touch events.
+			this.setOnTouchListener(new View.OnTouchListener() 
+			{ 
+				@Override
+				public boolean onTouch(View view, MotionEvent event) 
+				{
+		           switch (event.getAction()) 
+		           { 
+		               case MotionEvent.ACTION_DOWN: 
+		               case MotionEvent.ACTION_UP: 
+		                   if (!view.hasFocus()) 
+		                   { 
+		                       view.requestFocus(); 
+		                   }
+		                   break; 
+		           } 
+		           return false; 
+			    }
+			});
+		}
+
+		/**
+		 * TODO: Perhaps this is not needed.
+		 * 
+		 * This method is needed to make the WebView (this view) gain
+		 * focus on touch events. See Android Issue: 7189
+		 * http://code.google.com/p/android/issues/detail?id=7189
+		 */
+		@Override
+		public boolean onCheckIsTextEditor() 
+		{
+			return true; 
 		}
 	}
 }
