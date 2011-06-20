@@ -472,6 +472,13 @@ public:
 	}
 
 	void keyPressEvent(int keyCode, int nativeCode) {
+		if(keyCode == MAK_BACK)
+		{
+			if(1 == Graphun::sStackScreen->stackSize())
+			{
+				maExit(0);
+			}
+		}
 	}
 
 	void keyReleaseEvent(int keyCode, int nativeCode) {

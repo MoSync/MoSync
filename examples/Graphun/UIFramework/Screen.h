@@ -69,6 +69,7 @@ namespace MoSync {
 		void pushScreen(Screen* screen);
 		void pop();
 		void customEvent(const MAEvent& event);
+		int stackSize();
 	private:
 		Vector<Screen*> mStack;
 	};

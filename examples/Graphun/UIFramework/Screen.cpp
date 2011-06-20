@@ -147,6 +147,16 @@ namespace MoSync {
 	StackScreen::StackScreen() {
 		mType = "StackScreen";
 		mHandle = maWidgetCreate("StackScreen");
+		
+		// check if this is supported, NativeUI is only
+		// supported on Android and iOS devices/emulators
+		if (-1 == mHandle)
+		{
+			maPanic(0,
+				"NativeUI is only available on Android and iPhone. "
+				"You must run directly on the device or devices emulator.");
+		}
+		
 		sItems[mHandle] = this;
 	}
 
@@ -187,6 +197,11 @@ namespace MoSync {
 		maWidgetStackScreenPop(mHandle);
 		//if(!mStack.size()) return;
 		//mStack[mStack.size()-1]->willAppear();
+	}
+	
+	int StackScreen::stackSize()
+	{
+		return mStack.size();
 	}
 
 	} // namespace UI
