@@ -24,7 +24,7 @@ MA 02110-1301, USA.
  */
 
 // The default URL address.
-#define DEFAULT_URL_ADDRESS "http://www.google.com"
+#define DEFAULT_URL_ADDRESS "http://www.mosync.com"
 
 // The name of the screen.
 #define SCREEN_TITLE "Web View"
@@ -231,8 +231,8 @@ VerticalLayout* ScreenWebView::createSpacer(const int width, const int height)
 	{
 		if (widget == mEditBoxWidget || widget == mOpenLinkButtonWidget)
 		{
-			// This shows how you set a property for which there is no
-			// predefined method.
+			// Hide the virtual keyboard. This is how you set a property
+			// for which there is no predefined method.
 			mEditBoxWidget->setProperty(
 				MAW_EDIT_BOX_SHOW_KEYBOARD,
 				FALSE_CONST);
