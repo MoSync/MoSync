@@ -114,6 +114,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "MoRE", "MoRE", "{4E41F511-4E74-4517-AE99-850E37A5DD88}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MoRE", "runtimes\cpp\platforms\sdl\MoRE\MoRE.vcxproj", "{90CEAD6E-5FC9-4D1B-9BFC-D294319DBEBF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{742A2184-E51F-495B-8210-8DFF452B6585} = {742A2184-E51F-495B-8210-8DFF452B6585}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mosynclib", "runtimes\cpp\platforms\sdl\mosynclib\mosynclib.vcxproj", "{4DA91033-FE58-4729-8B55-F42614BD8F90}"
 EndProject

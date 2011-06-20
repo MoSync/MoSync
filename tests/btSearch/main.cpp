@@ -87,7 +87,7 @@ void myCallback() {
 	printf("myCallback %i\n", maBtDiscoveryState());
 	gSearching = maBtDiscoveryState() == 0;
 	MABtServiceSize ss;
-	MABtService s;
+	MABtServiceNative s;
 	int gnssRes = maBtGetNextServiceSize(&ss);
 	if(gnssRes == 0)
 		return;

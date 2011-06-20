@@ -151,9 +151,6 @@
     <ClCompile Include="strptime.c" />
     <ClCompile Include="SyscallImpl.cpp" />
     <ClCompile Include="ThreadPoolImpl.cpp" />
-    <ClCompile Include="..\..\base\extensions.cpp">
-      <Filter>base</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\base\base_errors.h">
@@ -330,8 +327,5 @@
     <ClInclude Include="SyscallImpl.h" />
     <ClInclude Include="ThreadPoolImpl.h" />
     <ClInclude Include="windows_errors.h" />
-    <ClInclude Include="..\..\base\extensions.h">
-      <Filter>base</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>
