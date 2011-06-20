@@ -18,8 +18,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
-import static com.mosync.internal.android.MoSyncHelpers.EXTENT_Y;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_ON;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
@@ -83,6 +84,7 @@ import android.graphics.Rect;
 import android.graphics.Region;
 import android.net.Uri;
 import android.opengl.GLUtils;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
@@ -348,6 +350,31 @@ public class MoSyncThread extends Thread
 	public boolean isBluetoothApiAvailable()
 	{
 		return mMoSyncBluetooth != null;
+	}
+	
+	/**
+	 * Called from broadcast listener in MoSyncBluetooth.
+	 */
+	public void bluetoothTurnedOn()
+	{
+		// Send event.
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_BLUETOOTH_TURNED_ON;
+		postEvent(event);
+	}
+
+	/**
+	 * Called from broadcast listener in MoSyncBluetooth.
+	 */
+	public void bluetoothTurnedOff()
+	{
+		// Close Bluetooth connections.
+		mMoSyncNetwork.bluetoothTurnedOff();
+		
+		// Send event.
+		int[] event = new int[1];
+		event[0] = EVENT_TYPE_BLUETOOTH_TURNED_OFF;
+		postEvent(event);
 	}
 	
 	/**
@@ -639,12 +666,14 @@ public class MoSyncThread extends Thread
 	{
 		Log.i("MoSync Thread", "run");
 
+		// Load the program.
 		if (false == loadProgram())
 		{
 			logError("load program failed!!");
 			return;
 		}
 	
+		// Run program. This enters a while loop in C-code.
 		nativeRun();
 	}
 	
@@ -2021,6 +2050,10 @@ public class MoSyncThread extends Thread
 		{
 			Locale locale = Locale.getDefault();
 			property = locale.getISO3Language();
+		}
+		else if(key.equals("mosync.device"))
+		{
+			property = Build.FINGERPRINT;
 		}
 		
 		if (null == property) { return -2; }

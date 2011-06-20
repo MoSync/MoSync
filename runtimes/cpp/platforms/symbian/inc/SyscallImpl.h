@@ -117,6 +117,7 @@ private:
 #ifdef TELEPHONY
 	CTelephony* gTelephony;
 
+	int GetPhoneId(CTelephony::TPhoneIdV1& pid);
 	int maGetBatteryCharge();
 #endif	//TELEPHONY
 

@@ -201,3 +201,6 @@ profile.txt
 /examples/GenerateResources/profile.rb
 
 /docs/*.dot.*
+
+/tools/mhsd-display/mhsd.bin
+/tools/mhsd-display/sld.tab

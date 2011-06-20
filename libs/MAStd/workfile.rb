@@ -30,7 +30,7 @@ mod.class_eval do
 			@EXTRA_CFLAGS = " -DMOSYNCDEBUG"
 		end
 
-		@EXTRA_OBJECTS = [FileTask.new(self, "crtlib.s")]
+		@EXTRA_OBJECTS = [FileTask.new(self, "crtlib.s"), FileTask.new(self, "mastack.s")]
 		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + @INSTALL_INCDIR + "/new",
 			FileTask.new(self, "../libsupc++/new"))
 	end

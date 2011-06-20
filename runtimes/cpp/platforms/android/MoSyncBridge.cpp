@@ -26,8 +26,30 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <android/log.h>
 
-#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", a);
+// Comment/comment out to turn on/off logging.
+// TODO: Move this to a header file to support common logging for all files.
+#define SYSLOG(m) __android_log_write(ANDROID_LOG_INFO, "MoSync JNI", m)
 //#define SYSLOG(...)
+
+/* 
+// This is how you trap exeptions from the Java side.
+// TODO: This function is not used, but could be used
+// to check for exceptions after calling a Java method. 
+static void handlePendingExceptions(JNIEnv* env)
+{
+	jthrowable exc;
+	exc = env->ExceptionOccurred();
+	if (exc) 
+	{
+		__android_log_write(
+			ANDROID_LOG_INFO, 
+			"@@@ MoSync", 
+			"Found pending exception");
+		env->ExceptionDescribe();
+		env->ExceptionClear();
+	}
+}
+*/
 
 /**
 * @brief Function that initializes the native core	
@@ -52,7 +74,13 @@ static jboolean nativeInitRuntime(JNIEnv* env, jobject jthis)
 /**
 * /return The newly created Data Section as a Direct ByteBuffer object
 */
-static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong programOffset, jobject resource, jlong resourceOffset)
+static jboolean nativeLoad(
+	JNIEnv* env, 
+	jobject jthis, 
+	jobject program, 
+	jlong programOffset, 
+	jobject resource, 
+	jlong resourceOffset)
 {
 	SYSLOG("load program and resource");
 
@@ -63,7 +91,8 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 	if (fdClass != NULL) 
 	{
 		jclass fdPrgClassRef = (jclass) env->NewGlobalRef(fdClass); 
-		jfieldID fdClassDescriptorFieldID = env->GetFieldID(fdPrgClassRef, "descriptor", "I");
+		jfieldID fdClassDescriptorFieldID = 
+			env->GetFieldID(fdPrgClassRef, "descriptor", "I");
 		
 		if (fdClassDescriptorFieldID != NULL && program != NULL) 
 		{			
@@ -73,14 +102,15 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 		}
 	}
 	
-	if(resourceOffset != 0)
+	if (resourceOffset != 0)
 	{
 		SYSLOG("get resource file");
 		jclass fdClass2 = env->FindClass("java/io/FileDescriptor");
 		if (fdClass2 != NULL) 
 		{
 			jclass fdResClassRef = (jclass) env->NewGlobalRef(fdClass2); 
-			jfieldID fdClassDescriptorFieldID = env->GetFieldID(fdResClassRef, "descriptor", "I");
+			jfieldID fdClassDescriptorFieldID = 
+				env->GetFieldID(fdResClassRef, "descriptor", "I");
 			
 			if (fdClassDescriptorFieldID != NULL && resource != NULL) 
 			{			
@@ -93,9 +123,9 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 	
 	SYSLOG("both files was obtained!");
 	
-	if(-1 == prgFd)
+	if (-1 == prgFd)
 	{
-		__android_log_write(ANDROID_LOG_INFO, "MoSync Bridge", "No program file available!");
+		SYSLOG("No program file available!");
 		return false;
 	}
 	
@@ -106,16 +136,35 @@ static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong pr
 	
 	SYSLOG("call load vm app");
 
-	if(NULL == gCore) __android_log_write(ANDROID_LOG_INFO,"JNI","gCore == NULL");
-	SYSLOG("gCore!");
-	if(-1 == prgFd) __android_log_write(ANDROID_LOG_INFO,"JNI","prg == NULL");
-	SYSLOG("prg!");
-	if(-1 == resFd) __android_log_write(ANDROID_LOG_INFO,"JNI","res == NULL");
-	SYSLOG("res!");
+	if (NULL == gCore) 
+	{
+		maPanic(-1, "MoSyncBridge.cpp: nativeLoad: NULL == gCore");
+	}
+	else
+	{
+		SYSLOG("gCore exists");
+	}
+	
+	if (-1 == prgFd)
+	{
+		maPanic(-1, "MoSyncBridge.cpp: nativeLoad: -1 == prgFd");
+	}
+	else
+	{
+		SYSLOG("prgFd exists");
+	}
+	
+	if (-1 == resFd)
+	{
+		maPanic(-1, "MoSyncBridge.cpp: nativeLoad: -1 == resFd");
+	}
+	else
+	{
+		SYSLOG("resFd exists");
+	}
 	
 	return Core::LoadVMApp(gCore, prgFd, resFd);
 }
-
 
 /**
 * @brief nativeLoadResource
@@ -129,7 +178,7 @@ static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
 }
 
 /**
-*	/return The newly created Data Section as a Direct ByteBuffer object
+* /return The newly created Data Section as a Direct ByteBuffer object
 */
 static jobject nativeLoadCombined(JNIEnv* env, jobject jthis, jobject combined)
 {
@@ -137,6 +186,7 @@ static jobject nativeLoadCombined(JNIEnv* env, jobject jthis, jobject combined)
 
 	char* combinedBuffer = (char*)env->GetDirectBufferAddress(combined);
 	
+	// TODO: Remove commented out code.
 	//gCore->jniEnv = env;
 	// do the thing
 	
@@ -144,111 +194,91 @@ static jobject nativeLoadCombined(JNIEnv* env, jobject jthis, jobject combined)
 }
 
 /**
-*	/return The newly created Data Section as a Direct ByteBuffer object
+* /return The newly created Data Section as a Direct ByteBuffer object
 */
 static void nativeRun(JNIEnv* env, jobject jthis)
 {
-	__android_log_write(ANDROID_LOG_INFO,"JNI","native run");
+	SYSLOG("nativeRun");
 	
 	Base::gSyscall->setJNIEnvironment(env, jthis);
 	
 	while(1)
 	{
-		
 		Core::Run2(gCore);
 		
-		__android_log_write(ANDROID_LOG_INFO,"JNI","Runtime yielded!");
+		SYSLOG("Runtime yielded!");
 		
 		// Check if we should load a resource as a program/resource combfile
 		int reloadHandle = Base::gSyscall->getReloadHandle();
-		if(0 != reloadHandle)
+		if (0 != reloadHandle)
 		{
-			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is loading from handle");
+			SYSLOG("Program is loading from handle");
 		
-			Base::Stream* stream = Base::gSyscall->resources.extract_RT_BINARY(reloadHandle);
+			Base::Stream* stream = 
+				Base::gSyscall->resources.extract_RT_BINARY(reloadHandle);
 			
 			bool res = Core::LoadVMApp(gCore, *stream);
 			
 			delete stream;
 			
-			if(!res) {
+			if (!res) 
+			{
 				BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);
 			}
 			
 			Base::gSyscall->setReloadHandle(0);
 		}
-		
-		// TODO: Could this be a good place to check for pending 
-		// exceptions from the Java side? 
-		// See commented out function handlePendingExceptions
-		// below for how to do this.
-		//handlePendingExceptions(env);
-		
-		// TODO: Why is this code commented out? Document its purpose.
-	
-		// check if we should reload the initial program and resource file
-		else if(true == Base::gSyscall->isReloading())
+		// Check if we should reload the initial program and resource file
+		else if (Base::gSyscall->isReloading())
 		{
-			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is reloading! 1");
+			SYSLOG("Program is reloading! 1");
 			
 			Base::gSyscall->setReloading(false);
 			
-			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is reloading! 2");
+			SYSLOG("Program is reloading! 2");
 			
 			jclass cls = env->GetObjectClass(jthis);
 			jmethodID methodID = env->GetMethodID(cls, "loadProgram", "()Z");
 			if (methodID == 0) return;
 			jboolean res = env->CallBooleanMethod(jthis, methodID);
 			
-			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is reloading! 3");
+			SYSLOG("Program is reloading! 3");
 			
-			if(!res) {
+			if( !res) 
+			{
 				BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);
 			}
 			
-			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is reloading! 4");
-			
+			SYSLOG("Program is reloading! 4");
 		}
-	
-	}
-	
-}
-
-
-/* 
-// This is how you trap exeptions from the Java side.
-// TODO: This function is not used, but could be used
-// to check for exceptions after calling a Java method. 
-static void handlePendingExceptions(JNIEnv* env)
-{
-	jthrowable exc;
-	exc = env->ExceptionOccurred();
-	if (exc) 
-	{
-		__android_log_write(
-			ANDROID_LOG_INFO, 
-			"@@@ MoSync", 
-			"Found pending exception");
-		env->ExceptionDescribe();
-		env->ExceptionClear();
 	}
 }
-*/
 
 /**
 * @brief nativePostEvent
 */
 static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 {
-	SYSLOG("MoSyncBridge.cpp: nativePostEvent");
-	
-	jsize len = env->GetArrayLength(eventBuffer);
+	// Get array data.
+	jsize arrayLength = env->GetArrayLength(eventBuffer);
 	jint *intArray = env->GetIntArrayElements(eventBuffer, 0);
+	
+	// Must have at least one element.
+	if (arrayLength < 1)
+	{
+		maPanic(-1, "MoSyncBridge.cpp: nativePostEvent: array length is zero");
+		return;
+	}
 	
 	// Build the event.
 	MAEvent event;
 	event.type = intArray[0];
 	event.data = NULL;
+	
+	// Print log message.
+	char logBuf[256];
+	sprintf(logBuf, "nativePostEvent event.type: %i", event.type);
+	SYSLOG(logBuf);
 	
 	if (event.type == EVENT_TYPE_POINTER_PRESSED || 
 		event.type == EVENT_TYPE_POINTER_RELEASED || 
@@ -258,7 +288,9 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.point.y = intArray[2];
 		event.touchId = intArray[3];
 	}
-	else if (event.type == EVENT_TYPE_KEY_RELEASED || event.type == EVENT_TYPE_KEY_PRESSED)
+	else if (
+		event.type == EVENT_TYPE_KEY_RELEASED || 
+		event.type == EVENT_TYPE_KEY_PRESSED)
 	{
 		event.key = intArray[1];
 		event.nativeKey = intArray[2];
@@ -302,7 +334,8 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 *
 		 * Optional:
 		 * WIDGET_EVENT_MESSAGE
-		 * intArray[3] - The id of the message being sent (if it has dynamically allocated data)
+		 * intArray[3] - The id of the message being sent (if it has 
+		 *               dynamically allocated data)
 		 * intARray[4] - Size of the message.
 		 *
 		 * WIDGET_EVENT_CLICKED
@@ -326,19 +359,19 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		widgetEvent->eventType    = intArray[1];
 		widgetEvent->widgetHandle = intArray[2];
 		
-		if(widgetEventType == MAW_EVENT_CLICKED)
+		if (widgetEventType == MAW_EVENT_CLICKED)
 		{
 			widgetEvent->checked = intArray[3];
 		}
-		else if(widgetEventType == MAW_EVENT_ITEM_CLICKED)
+		else if (widgetEventType == MAW_EVENT_ITEM_CLICKED)
 		{
 			widgetEvent->listItemIndex = intArray[3];
 		}
-		else if(widgetEventType == MAW_EVENT_TAB_CHANGED)
+		else if (widgetEventType == MAW_EVENT_TAB_CHANGED)
 		{
 			widgetEvent->tabIndex = intArray[3];
 		}
-		else if(widgetEventType == MAW_EVENT_STACK_SCREEN_POPPED)
+		else if (widgetEventType == MAW_EVENT_STACK_SCREEN_POPPED)
 		{
 			widgetEvent->fromScreen = intArray[3];
 			widgetEvent->toScreen = intArray[4];
@@ -358,7 +391,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	Base::gSyscall->postEvent(event);
 }
 
-static int nativeCreateBinaryResource( JNIEnv* env, jobject jthis, int resourceIndex, int size )
+static int nativeCreateBinaryResource(
+	JNIEnv* env, 
+	jobject jthis, 
+	int resourceIndex, 
+	int size)
 {
 	return Base::gSyscall->loadBinaryStore(resourceIndex, size);
 }
@@ -366,7 +403,11 @@ static int nativeCreateBinaryResource( JNIEnv* env, jobject jthis, int resourceI
 /**
 * @brief jniRegisterNativeMethods
 */
-int jniRegisterNativeMethods( JNIEnv* env, const char* className, const JNINativeMethod* gMethods, int numMethods )
+int jniRegisterNativeMethods(
+	JNIEnv* env, 
+	const char* className, 
+	const JNINativeMethod* gMethods, 
+	int numMethods)
 {
 	jclass clazz;
 
@@ -378,31 +419,35 @@ int jniRegisterNativeMethods( JNIEnv* env, const char* className, const JNINativ
 		SYSLOG("Class not found");
 		return -1;
 	}
+	
 	SYSLOG("Class found!");
+	
 	if (env->RegisterNatives(clazz, gMethods, numMethods) < 0)
 	{
+		SYSLOG("Failed to register native methods");
 		return -1;
 	}
+	
 	return 0;
 }
 
-jint numJavaMethods = 7;
+jint gNumJavaMethods = 7;
 static JNINativeMethod sMethods[] =
 {
     // name, signature, funcPtr 
-   { "nativeInitRuntime", "()Z", (void*)nativeInitRuntime}, 
-   { "nativeLoad", "(Ljava/io/FileDescriptor;JLjava/io/FileDescriptor;J)Z", (void*)nativeLoad},
-   { "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource},
-   { "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined},
-   { "nativeRun", "()V", (void*)nativeRun},
-   { "nativePostEvent", "([I)V", (void*)nativePostEvent},
-   { "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource}
+	{ "nativeInitRuntime", "()Z", (void*)nativeInitRuntime }, 
+	{ "nativeLoad", "(Ljava/io/FileDescriptor;JLjava/io/FileDescriptor;J)Z", (void*)nativeLoad },
+	{ "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource },
+	{ "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined },
+	{ "nativeRun", "()V", (void*)nativeRun },
+	{ "nativePostEvent", "([I)V", (void*)nativePostEvent },
+	{ "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource }
 };
 
 /**
 * @brief JNI_OnLoad
 */
-jint JNI_OnLoad ( JavaVM* vm, void* reserved )
+jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
 	JNIEnv* env = NULL;
 	jint result = -1;
@@ -416,6 +461,11 @@ jint JNI_OnLoad ( JavaVM* vm, void* reserved )
 		return result;
 	}
 	
-	jniRegisterNativeMethods( env, "com/mosync/internal/android/MoSyncThread", sMethods, numJavaMethods );
+	jniRegisterNativeMethods(
+		env, 
+		"com/mosync/internal/android/MoSyncThread", 
+		sMethods, 
+		gNumJavaMethods);
+	
 	return JNI_VERSION_1_4;
 }
