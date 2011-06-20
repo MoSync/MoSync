@@ -240,6 +240,52 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 }
 
 /**
+ * Streams C function declarations.
+ */
+void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) {
+	for(size_t i=0; i<inf.functions.size(); i++) {
+		const Function& f(inf.functions[i]);
+		stream << f.comment;
+		if(f.groupId != "")
+			stream << "/** @ingroup " << f.groupId << " */\n";
+
+		if(syscall)
+			stream << "SYSCALL(";
+		stream << cType(inf, f.returnType);
+		if(syscall)
+			stream << ", ";
+		if(f.returnType == "noreturn")
+			stream << " ATTRIBUTE(noreturn,";
+		stream << " " << f.name << "(";
+		if(f.args.size() == 0) {
+			stream << "void";
+		}
+		for(size_t j=0; j<f.args.size(); j++) {
+			const Argument& a(f.args[j]);
+			if(j != 0)
+				stream << ", ";
+			if(a.in && isPointerType(inf, a.type)) {
+				stream << "const ";
+			}
+			stream << cType(inf, a.type);
+			if(!isPointerType(inf, a.type) && !a.in)
+				stream << "*";
+			stream << " " << a.name;
+		}
+
+		if(f.isIOCtl) 
+			stream << " MA_IOCTL_ELLIPSIS";
+
+		if(f.returnType == "noreturn")
+			stream << ")";
+		if(syscall)
+			stream << ")";
+		stream << ");\n\n";
+	}
+	stream << "\n";
+}
+
+/**
  * Generate the content of a .java class file for the main MoSync API
  * or the given interface.
  * @param stream The output stream.

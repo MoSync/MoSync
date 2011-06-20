@@ -14,10 +14,10 @@ typedef void (*VoidFunction)(void);
 
 // each DLL has two functions:
 typedef int (*GetIdlHash)(void);
-typedef VoidFunction* (*GetFunctions)(int*);
+typedef VoidFunction* (*GetFunctions)(uint*);
 
 static VoidFunction* sFunctions;
-static int snFunctions;
+static uint snFunctions;
 
 static int readIntLine(char*& pos, const char* format) {
 	int len, result;
@@ -56,7 +56,7 @@ void loadExtensions(const char* extConfFileName) {
 	snFunctions = readIntLine(pos, "%i%n");
 	sFunctions = new VoidFunction[snFunctions];
 	EXT_ASSERT(sFunctions);
-	int count = 0;
+	uint count = 0;
 
 	// load each extension
 	while(pos < end) {
@@ -78,7 +78,7 @@ void loadExtensions(const char* extConfFileName) {
 		MYASSERT(dllHash == confHash, ERR_EXT_VERSION);
 
 		// copy function pointers
-		int nFunc;
+		uint nFunc;
 		VoidFunction* dllFunctions = getFunctions(&nFunc);
 		EXT_ASSERT(dllFunctions);
 		EXT_ASSERT(count + nFunc <= snFunctions);

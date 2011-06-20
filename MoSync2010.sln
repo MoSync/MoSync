@@ -203,6 +203,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dll", "intlibs\dll\dll.vcxproj", "{742A2184-E51F-495B-8210-8DFF452B6585}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mx-invoker", "tools\mx-invoker\mx-invoker.vcxproj", "{30E97612-4C04-4DAF-88BD-4AE77B7CA52A}"
+	ProjectSection(ProjectDependencies) = postProject
+		{A61A15F9-7412-44AA-B2C8-8A3CACAAC588} = {A61A15F9-7412-44AA-B2C8-8A3CACAAC588}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

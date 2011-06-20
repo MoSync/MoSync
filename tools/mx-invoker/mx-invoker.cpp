@@ -3,6 +3,7 @@
 #include <string>
 #include <fstream>
 #include <iomanip>
+#include <string.h>
 
 #include <idl-common/idl-common.h>
 
@@ -13,9 +14,29 @@ void outputInvoker(const char* output, const Interface&);
 void outputNativeHeader(const char* output, const Interface&);
 
 int main(int argc, const char** argv) {
+	const char* input = NULL;
+	const char* output = NULL;
+
 	// parse arguments
-	const char* input;
-	const char* output;
+	for(int i=1; i<argc; i++) {
+		if(strcmp(argv[i], "-i") == 0) {
+			i++;
+			if(i >= argc)
+				break;
+			input = argv[i];
+			continue;
+		} else if(strcmp(argv[i], "-o") == 0) {
+			i++;
+			if(i >= argc)
+				break;
+			output = argv[i];
+			continue;
+		} else {
+			printf("Unknown parameter: '%s'", argv[i]);
+			input = output = NULL;
+			break;
+		}
+	}
 
 	if(input && output) {
 		return generateInvoker(input, output);
@@ -35,12 +56,13 @@ int generateInvoker(const char* input, const char* output) {
 		printf("Exception: %s\n", e.what());
 		return 1;
 	}
+	return 0;
 }
 
 void outputInvoker(const char* output, const Interface& inf) {
 	ofstream stream((string(output)+"/invoke-extension.cpp").c_str());
 	stream << "#include \"invoke-extension.h\"\t//found in /mosync/ext-include/\n"
-		"#ínclude \"cpp_mx_"<<inf.name<<".h\"\n"
+		"#include \"cpp_mx_"<<inf.name<<".h\"\n"
 		"\n";
 	streamInvokeSyscall(stream, inf, false);
 	stream << "\n"
@@ -51,13 +73,13 @@ void outputInvoker(const char* output, const Interface& inf) {
 	}
 	stream << "};\n"
 		"\n"
-		"VoidFunction* DLLEXPORT getFunctions(int* numFunctions) {\n"
+		"VoidFunction* DLLEXPORT getFunctions(unsigned* numFunctions) {\n"
 		"\t*numFunctions = sizeof(sFunctions) / sizeof(*sFunctions);\n"
 		"\treturn sFunctions;\n"
 		"}\n"
 		"\n"
-		"int getIdlHash() {\n"
-		"\t return "<< setfill('0') << setw(8) <<	hex << calculateChecksum(inf)<<";\n"
+		"int DLLEXPORT getIdlHash() {\n"
+		"\t return IDL_HASH_"<<inf.name<<";\n"
 		"}\n";
 }
 
@@ -67,4 +89,10 @@ void streamInvokePrefix(ostream& stream, const Function& f) {
 
 void outputNativeHeader(const char* output, const Interface& inf) {
 	ofstream stream((string(output)+"/cpp_mx_"+inf.name+".h").c_str());
+	stream << "#ifndef CPP_MX_"<<inf.name<<"\n";
+	stream << "#define CPP_MX_"<<inf.name<<"\n";
+	stream << "\n";
+	stream << "#define IDL_HASH_"<<inf.name<<" "<<setfill('0') << setw(8) << hex << calculateChecksum(inf)<<"\n";
+	stream << "\n";
+	stream << "#endif\t//CPP_MX_"<<inf.name<<"\n";
 }

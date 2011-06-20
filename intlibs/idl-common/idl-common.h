@@ -152,9 +152,9 @@ void streamIoctlDefines(ostream& stream, const Interface& ioctls, const string& 
 //	const string& ioctlName);
 
 void streamInvokeSyscall(ostream&, const Interface&, bool java);
+void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall);
 
 //implemented by the user
-void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall);
 void streamInvokePrefix(ostream&, const Function&);
 
 void ATTRIBUTE(noreturn, throwException(const string& msg));

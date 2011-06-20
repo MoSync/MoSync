@@ -42,7 +42,9 @@ BASE_DIRS = ADDITIONAL_INTLIBS + MORE_DIRS + PLATFORM_TOOLS
 PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/DefaultSkinGenerator", "libs"]
 EXAM_DIRS = ["tests/unitTest", "examples"]
 TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/Bundle",
-	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack"]
+	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack",
+	"tools/mx-invoker",
+	]
 
 MAIN_DIRS = BASE_DIRS + TOOL_DIRS + PIPE_DIRS
 ALL_DIRS = MAIN_DIRS + EXAM_DIRS
