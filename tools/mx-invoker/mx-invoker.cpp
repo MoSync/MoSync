@@ -61,7 +61,9 @@ int generateInvoker(const char* input, const char* output) {
 
 void outputInvoker(const char* output, const Interface& inf) {
 	ofstream stream((string(output)+"/invoke-extension.cpp").c_str());
-	stream << "#include \"invoke-extension.h\"\t//found in /mosync/ext-include/\n"
+	stream <<
+		"#include \"extensionCommon.h\"\t//found in /mosync/ext-include/\n"
+		"#include \"invoke-extension.h\"\t//found in /mosync/ext-include/\n"
 		"#include \"cpp_mx_"<<inf.name<<".h\"\n"
 		"\n";
 	streamInvokeSyscall(stream, inf, false);
@@ -73,13 +75,16 @@ void outputInvoker(const char* output, const Interface& inf) {
 	}
 	stream << "};\n"
 		"\n"
-		"VoidFunction* DLLEXPORT getFunctions(unsigned* numFunctions) {\n"
-		"\t*numFunctions = sizeof(sFunctions) / sizeof(*sFunctions);\n"
-		"\treturn sFunctions;\n"
-		"}\n"
+		"int* gRegs;\n"
+		"void* gMemDs;\n"
 		"\n"
-		"int DLLEXPORT getIdlHash() {\n"
-		"\t return IDL_HASH_"<<inf.name<<";\n"
+		"void DLLEXPORT initializeExtension(ExtensionData* ed, const CoreData* cd) {\n"
+		"\ted->nFunctions = sizeof(sFunctions) / sizeof(*sFunctions);\n"
+		"\ted->functions = sFunctions;\n"
+		"\ted->idlHash = IDL_HASH_"<<inf.name<<";\n"
+		"\n"
+		"\tgRegs = cd->regs;\n"
+		"\tgMemDs = cd->memDs;\n"
 		"}\n";
 }
 
@@ -92,7 +97,12 @@ void outputNativeHeader(const char* output, const Interface& inf) {
 	stream << "#ifndef CPP_MX_"<<inf.name<<"\n";
 	stream << "#define CPP_MX_"<<inf.name<<"\n";
 	stream << "\n";
-	stream << "#define IDL_HASH_"<<inf.name<<" "<<setfill('0') << setw(8) << hex << calculateChecksum(inf)<<"\n";
+	stream << "#include \"extension.h\"\t//found in /mosync/ext-include/\n";
+	stream << "\n";
+	stream << "#define IDL_HASH_"<<inf.name<<" 0x"<<setfill('0') << setw(8) << hex << calculateChecksum(inf)<<"\n";
+	stream << "\n";
+	streamCppDefs(stream, inf, MAIN_INTERFACE);
+	streamHeaderFunctions(stream, inf, true);
 	stream << "\n";
 	stream << "#endif\t//CPP_MX_"<<inf.name<<"\n";
 }

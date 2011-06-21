@@ -146,10 +146,11 @@ void streamJavaDefinitionFile(
 	const Interface& apiData,
 	int ix);
 
-void streamConstants(ostream& stream, const string& interfaceName, const vector<ConstSet>& constSets, int ix);
+void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix);
 void streamIoctlDefines(ostream& stream, const Interface& ioctls, const string& headerName, int ix, bool java);
 //void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 //	const string& ioctlName);
+void streamCppDefs(ostream& stream, const Interface& inf, int ix);
 
 void streamInvokeSyscall(ostream&, const Interface&, bool java);
 void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall);

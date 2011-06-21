@@ -2,6 +2,7 @@
 #include "dll/dll.h"
 #include "FileStream.h"
 #include "base_errors.h"
+#include "../core/Core.h"
 
 using namespace Base;
 using namespace MoSyncError;
@@ -12,9 +13,19 @@ using namespace MoSyncError;
 // no function needs to know its number.
 typedef void (*VoidFunction)(void);
 
-// each DLL has two functions:
-typedef int (*GetIdlHash)(void);
-typedef VoidFunction* (*GetFunctions)(uint*);
+struct ExtensionData {
+	int idlHash;
+	unsigned int nFunctions;
+	VoidFunction* functions;
+};
+struct CoreData {
+	int* regs;
+	void* memDs;
+};
+
+// each DLL has this function.
+// don't mix 32-bit and 64-bit code. (should be impossible on most systems.)
+typedef void (*InitializeExtension)(ExtensionData*, const CoreData*);
 
 static VoidFunction* sFunctions;
 static uint snFunctions;
@@ -68,21 +79,22 @@ void loadExtensions(const char* extConfFileName) {
 		Dll dll;
 		bool success = dll.open(fileName);
 		EXT_ASSERT(success);
-		GetIdlHash getIdlHash = (GetIdlHash)dll.get("getIdlHash");
-		EXT_ASSERT(getIdlHash);
-		GetFunctions getFunctions = (GetFunctions)dll.get("getFunctions");
-		EXT_ASSERT(getFunctions);
+		InitializeExtension initializeExtension = (InitializeExtension)dll.get("initializeExtension");
+		EXT_ASSERT(initializeExtension);
+
+		ExtensionData ed;
+		CoreData cd;
+		cd.regs = gCore->regs;
+		cd.memDs = gCore->mem_ds;
+		initializeExtension(&ed, &cd);
 
 		// check hash
-		int dllHash = getIdlHash();
-		MYASSERT(dllHash == confHash, ERR_EXT_VERSION);
+		MYASSERT(ed.idlHash == confHash, ERR_EXT_VERSION);
 
 		// copy function pointers
-		uint nFunc;
-		VoidFunction* dllFunctions = getFunctions(&nFunc);
-		EXT_ASSERT(dllFunctions);
-		EXT_ASSERT(count + nFunc <= snFunctions);
-		memcpy(sFunctions + count, dllFunctions, nFunc + sizeof(VoidFunction));
+		EXT_ASSERT(ed.functions);
+		EXT_ASSERT(count + ed.nFunctions <= snFunctions);
+		memcpy(sFunctions + count, ed.functions, ed.nFunctions + sizeof(VoidFunction));
 	}
 	EXT_ASSERT(count == snFunctions);
 	EXT_ASSERT(pos == end);

@@ -21,6 +21,9 @@
     <ClCompile Include="debugger.cpp" />
     <ClCompile Include="..\..\..\..\..\intlibs\helpers\intutil.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="..\..\..\core\extensions.cpp">
+      <Filter>core</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\core\Core.h">
@@ -51,6 +54,18 @@
       <Filter>core</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\..\intlibs\helpers\intutil.h" />
+    <ClInclude Include="..\..\..\core\syscall_arguments.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\core\extensionCommon.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\core\extensions.h">
+      <Filter>core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\core\invoke-extension.h">
+      <Filter>core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\sdl.rc" />

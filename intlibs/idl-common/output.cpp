@@ -217,7 +217,7 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 	streamGroups(stream, inf.groups, ix);
 	streamTypedefs(stream, inf.typedefs, ix, false);
 	streamDefines(stream, inf.defines, ix);
-	streamConstants(stream, headerName, inf.constSets, ix);
+	streamConstants(stream, inf.constSets, ix);
 	streamStructs(stream, inf, ix, false);
 	if(ix == MAIN_INTERFACE) {
 		streamHeaderFunctions(stream, inf, false);
@@ -464,7 +464,7 @@ static void streamStructs(ostream& stream, const Interface& inf, int ix, bool ru
 	}	//struct
 }
 
-void streamConstants(ostream& stream, const string& interfaceName, const vector<ConstSet>& constSets, int ix) {
+void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix) {
 	for(size_t i=0; i<constSets.size(); i++) {
 		const ConstSet& cs(constSets[i]);
 		bool anyStreamed = false;
@@ -890,13 +890,17 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 
 	streamHash(stream, inf);
 
-	streamTypedefs(stream, inf.typedefs, ix, true);
-	streamDefines(stream, inf.defines, ix);
-	streamConstants(stream, headerName, inf.constSets, ix);
-	streamStructs(stream, inf, ix, true);
+	streamCppDefs(stream, inf, ix);
 	streamIoctlDefines(stream, inf, headerName, ix, false);
 
 	stream << "#endif\t//" + headerName + "_DEFS_H\n";
+}
+
+void streamCppDefs(ostream& stream, const Interface& inf, int ix) {
+	streamTypedefs(stream, inf.typedefs, ix, true);
+	streamDefines(stream, inf.defines, ix);
+	streamConstants(stream, inf.constSets, ix);
+	streamStructs(stream, inf, ix, true);
 }
 
 void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool java) {

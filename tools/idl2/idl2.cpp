@@ -290,7 +290,7 @@ static void outputConsts(const string& filename, const Interface& inf, int ix) {
 		streamHash(stream, inf);
 	}
 
-	streamConstants(stream, def, inf.constSets, ix);
+	streamConstants(stream, inf.constSets, ix);
 	streamIoctlDefines(stream, inf, def, ix, true);
 
 	stream << "#endif\t//" << def << "\n";

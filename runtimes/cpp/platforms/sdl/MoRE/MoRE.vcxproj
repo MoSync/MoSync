@@ -38,10 +38,10 @@
   <PropertyGroup>
     <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\temp\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)$(Configuration)\</OutDir>
-    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\temp\</IntDir>
     <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
     <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
@@ -106,6 +106,7 @@ copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y
   <ItemGroup>
     <ClCompile Include="..\..\..\core\Core.cpp" />
     <ClCompile Include="..\..\..\core\disassembler.cpp" />
+    <ClCompile Include="..\..\..\core\extensions.cpp" />
     <ClCompile Include="..\..\..\core\GdbStub.cpp" />
     <ClCompile Include="..\..\..\core\sld.cpp" />
     <ClCompile Include="debugger.cpp">
@@ -121,11 +122,15 @@ copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y
     <ClInclude Include="..\..\..\core\CoreCommon.h" />
     <ClInclude Include="..\..\..\core\debugger.h" />
     <ClInclude Include="..\..\..\core\disassembler.h" />
+    <ClInclude Include="..\..\..\core\extensionCommon.h" />
+    <ClInclude Include="..\..\..\core\extensions.h" />
     <ClInclude Include="..\..\..\core\GdbCommon.h" />
     <ClInclude Include="..\..\..\core\GdbStub.h" />
+    <ClInclude Include="..\..\..\core\invoke-extension.h" />
     <ClInclude Include="..\..\..\core\invoke_syscall_cpp.h" />
     <ClInclude Include="..\..\..\core\sld.h" />
     <ClInclude Include="..\..\..\..\..\intlibs\helpers\intutil.h" />
+    <ClInclude Include="..\..\..\core\syscall_arguments.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\sdl.rc" />

@@ -59,8 +59,8 @@ class CopyDirWork < Work
 		builddir = "#{mosyncdir}/#{@NAME}"
 		@prerequisites = [DirTask.new(self, builddir)]
 		sources = Dir["#{@NAME}/*"]
-		@prerequisites |= sources.collect do |src|
-			CopyFileTask.new(self, FileTask.new(self, "#{builddir}/#{File.basename(src)}"),
+		sources.each do |src|
+			@prerequisites << CopyFileTask.new(self, "#{builddir}/#{File.basename(src)}",
 				FileTask.new(self, src))
 		end
 	end
@@ -69,12 +69,36 @@ end
 SKINS = CopyDirWork.new('skins')
 RULES = CopyDirWork.new('rules')
 
+class ExtensionIncludeWork < Work
+	def setup
+		extIncDir = mosyncdir + '/ext-include'
+		@prerequisites = []
+		@prerequisites << DirTask.new(self, extIncDir)
+		sources = [
+			'runtimes/cpp/core/extensionCommon.h',
+			'runtimes/cpp/core/ext/invoke-extension.h',
+			'runtimes/cpp/core/ext/extension.h',
+			'runtimes/cpp/core/syscall_arguments.h',
+			'runtimes/cpp/core/CoreCommon.h',
+			'intlibs/helpers/cpp_defs.h',
+			'intlibs/helpers/maapi_defs.h',
+			]
+		sources.each do |src|
+			@prerequisites << CopyFileTask.new(self, "#{extIncDir}/#{File.basename(src)}",
+				FileTask.new(self, src))
+		end
+	end
+end
+
+EXTENSION_INCLUDES = ExtensionIncludeWork.new
+
 target :base => [SKINS, RULES] do
 	SKINS.invoke
 	RULES.invoke
 	Work.invoke_subdirs(PRE_DIRS)
 	#Work.invoke_subdir("tools/WrapperGenerator", "compile")
 	Work.invoke_subdir("tools/idl2", "compile")
+	EXTENSION_INCLUDES.invoke
 end
 
 target :default => :base do
