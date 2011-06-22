@@ -1,18 +1,19 @@
-/* Copyright (C) 2010 Mobile Sorcery AB
+/*
+Copyright (C) 2011 MoSync AB
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License, version 2, as published by
-the Free Software Foundation.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
 */
 
 #include <mastdlib.h>
@@ -78,17 +79,19 @@ namespace MapDemo
 			case MAK_2:
 				nextMapSource( );
 				return true;
-		case MAK_SOFTRIGHT:
-			//maExit( 0 );
-			// TODO: proper exit
-			MapDemoMoblet& moblet = (MapDemoMoblet&)Environment::getEnvironment( );
-			moblet.Terminate( );
-			return true;
+			case MAK_BACK:
+			case MAK_SOFTRIGHT:
+				maExit( 0 );
+				// TODO: proper exit
+				MapDemoMoblet& moblet = (MapDemoMoblet&)Environment::getEnvironment( );
+				moblet.Terminate( );
+				return true;
 		}
 
 		if ( AppScreen::handleKeyPress( keyCode ) )
 			return true;
 
+		// Here we tell the map widget to handle the key press.
 		return mMap->handleKeyPress( keyCode );
 	}
 

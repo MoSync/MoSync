@@ -180,26 +180,28 @@ public class Widget
 	 * Returns the property of the wrapped widget.
 	 * 
 	 * @param property
-	 * @return the property of the wrapped widget. If no property is found, an
-	 *         empty string is returned.
+	 * @return the property of the wrapped widget. If no property is found, 
+	 *         an empty string is returned.
 	 */
 	public String getProperty(String property)
 	{
-		if( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
+		if ( property.equals( IX_WIDGET.MAW_WIDGET_WIDTH ) )
 		{
-			return Integer.toString( getView( ).getWidth( ) -
-					getLayoutParams( ).marginLeft - getLayoutParams( ).marginRight );
+			// shouldn't return the layout params.. Now it returns the actual pixel width.
+			//return Integer.toString( getLayoutParams( ).getWidth() );
+			return Integer.toString( getView( ).getWidth() );
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_HEIGHT ) )
 		{
-			return Integer.toString( getView( ).getHeight( ) -
-					getLayoutParams( ).marginTop - getLayoutParams( ).marginBottom );
+			// shouldn't return the layout params.. Now it returns the actual pixel height.
+			//return Integer.toString(  getLayoutParams( ).getHeight() );
+			return Integer.toString( getView( ).getHeight() );			
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
 		{
 			return Integer.toString( getView( ).getLeft( ) );
 		}
-		else if( property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
 		{
 			return Integer.toString( getView( ).getTop( ) );
 		}
@@ -239,6 +241,17 @@ public class Widget
 	{
 		return m_view;
 	}
+
+	/**
+	 * Returns the root view associated with this widget (if the mosync widgets contain an internal tree).
+	 * 
+	 * @return The root view associated with this widget.
+	 */
+	public View getRootView()
+	{
+		return m_view;
+	}
+
 	
 	/**
 	 * Returns the handle of this widget.

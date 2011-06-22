@@ -25,9 +25,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MapSource.h"
 #include "DebugPrintf.h"
 #include <madmath.h>
+#include <conprint.h>
 
 //#define OnlyUpdateWhenJobComplete
 #define USE_ALPHAFADES
+
+//
+// There are three coordinate systems:
+//  LonLat
+//  Meters
+//  Pixels
+//
+// MapViewport draws tiles
+// MapCache stores tiles
+// Drawing is synchronous if the tile is already in the cache.
+// Drawing is asynchronous if the tile needs to be downloaded.
+//
+// Note the difference between magnification and scale:
+//  Magnification is a logarithmic scale. 
+//  Magnification 0 = whole world fits on one tile.
+//  Number of tiles = 2 ^ mag in each direction
+//  Scale is a linear scale.
+//
 
 #define SCALE_TO_MAG(scale) (log(scale)/log(2.0))
 #define MAG_TO_SCALE(mag) (pow(2.0, mag))
@@ -44,7 +63,6 @@ double calculateDistance(MAPoint2d touch1, MAPoint2d touch2) {
 	double distance = sqrt((double)(vector.x*vector.x + vector.y*vector.y));
 	return distance;
 }	
-	
 
 namespace MAP
 {
@@ -122,7 +140,7 @@ namespace MAP
 			mPanTime = currentTime;
 
 			PixelCoordinate prevCenterPix = mViewport->mCenterPositionPixels;
-			PixelCoordinate targetPix = mViewport->mPanTargetPositionPixels;
+			// Not used: PixelCoordinate targetPix = mViewport->mPanTargetPositionPixels;
 
 			if ( mGliding )
 			{
@@ -232,6 +250,7 @@ namespace MAP
 
 			}
 
+			// This is where the map is redrawn.
 			mViewport->updateMap( );
 		}
 
@@ -322,6 +341,8 @@ namespace MAP
 	PixelCoordinate MapViewport::getCenterPositionPixels( ) const
 	//-------------------------------------------------------------------------
 	{
+		// Return the target position, because that is the "real" current center position of
+		// the map to the suers of this class. (This is where we are gliding.)
 		return mPanTargetPositionPixels;
 	}
 
@@ -340,58 +361,90 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapViewport::setCenterPosition( LonLat position, MagnificationType magnification, bool immediate, bool isPointerEvent )
+	/**
+	 * Position the map at the given taget position.
+	 * @param targetLonLat Target position.
+	 * @param magnification The magnification.
+	 * @param immediate If true then draw the map without gliding.
+	 * @param isPointerEvent Pass true if called from a pointer event.
+	 */
+	//-------------------------------------------------------------------------
+	void MapViewport::setCenterPosition(
+		LonLat targetLonLat, 
+		MagnificationType magnification, 
+		bool immediate, 
+		bool isPointerEvent )
 	//-------------------------------------------------------------------------
 	{
 		int width = getScaledWidth( ); //getWidth( );
 		int height = getScaledHeight( ); //getHeight( );
 
+		//
+		// Draw without gliding if immediate is requested or 
+		// if the viewport area is zero.
+		//
 		if ( immediate || width <= 0 || height <= 0 )
 		{
 			mMagnification = magnification;
 			setScale(MAG_TO_SCALE((double)magnification));	
 			
-			mCenterPositionLonLat = mPanTargetPositionLonLat = position;
-			mCenterPositionPixels = mPanTargetPositionPixels = position.toPixels( magnification );
+			mCenterPositionLonLat = targetLonLat;
+			mPanTargetPositionLonLat = targetLonLat;
+			mCenterPositionPixels = targetLonLat.toPixels(magnification);
+			mPanTargetPositionPixels = targetLonLat.toPixels(magnification);
+			
+			// This causes mViewport->updateMap( ); to be called in the listeners idle() method.
 			mIdleListener->stopGlide( );
 
 			return;
 		}
 
-		PixelCoordinate prevTarget = mPanTargetPositionPixels;
-
-		PixelCoordinate newXy = position.toPixels( magnification );
 		//
-		// Make sure current position is nearby, so we only soft scroll less than one screen.
+		// Continue to draw using gliding.
 		//
-		int deltaX = newXy.getX( ) - mCenterPositionPixels.getX( );
-		int deltaY = newXy.getY( ) - mCenterPositionPixels.getY( );
-
-		double factor = /* 6 * */ fabs( Max( (double)deltaX / width, (double)deltaY / height ) );
+		
+		// Set target position.
+		PixelCoordinate targetPixels = targetLonLat.toPixels(magnification);
+		mPanTargetPositionPixels = targetPixels;
+		mPanTargetPositionLonLat = targetLonLat;
+		
+		// Make sure current position is nearby, so we only soft scroll 
+		// ("glide") less than one screen.
+		// TODO: Gliding currently does not work when jumping to a location.
+		int deltaX = targetPixels.getX( ) - mCenterPositionPixels.getX( );
+		int deltaY = targetPixels.getY( ) - mCenterPositionPixels.getY( );
+		double factor = fabs( Max( (double)deltaX / width, (double)deltaY / height ) );
 		if ( factor > 1 )
 		{
-			//
-			// go directly to location if delta is more than 1/6 of viewport size.
-			//
-			newXy = PixelCoordinate(	magnification,
-										mPanTargetPositionPixels.getX( ) - (int)( (double)deltaX / factor ),
-										mPanTargetPositionPixels.getY( ) - (int)( (double)deltaY / factor ) );
+			// Go directly to one screen from target location.
+			// deltaX / factor keeps the sign of deltaX, 
+			// that's why it is there.
+			PixelCoordinate newCenter = PixelCoordinate(	
+				magnification,
+				targetPixels.getX( ) - (int)( (double)deltaX / factor ),
+				targetPixels.getY( ) - (int)( (double)deltaY / factor ) );
+			mCenterPositionPixels = newCenter;
+			mCenterPositionLonLat = LonLat( newCenter );
 		}
-		if ( !isPointerEvent )
-			mIdleListener->stopGlide( );
-
-		mPanTargetPositionPixels = newXy;
-		mPanTargetPositionLonLat = LonLat( newXy );
 		
-		if((int)mMagnification != (int)magnification) {
+		if ( !isPointerEvent )
+		{
+			mIdleListener->stopGlide( );
+		}
+		
+		if ((int)mMagnification != (int)magnification) 
+		{
 			mMagnification = magnification;
 			setScale(MAG_TO_SCALE((double)magnification));	
 		}
 		mMagnificationD = mMagnification;
 		mScale = 1.0;
 		mZooming = false;
+		
+		// Notify client that update is needed.
 		onViewportUpdated();
 		
+		// The timer is the idle listener.
 		if ( !mHasTimer )
 		{
 			Environment::getEnvironment( ).addIdleListener( mIdleListener );
@@ -400,10 +453,21 @@ namespace MAP
 	}
 
 	//-------------------------------------------------------------------------
-	void MapViewport::setCenterPosition( LonLat position, bool immediate, bool isPointerEvent )
+	/**
+	 * Position the map at the given taget position, using the
+	 * current magnification of the viewport.
+	 * @param targetLonLat Target position.
+	 * @param immediate If true then draw the map without gliding.
+	 * @param isPointerEvent Pass true if called from a pointer event.
+	 */
+	//-------------------------------------------------------------------------
+	void MapViewport::setCenterPosition( 
+		LonLat targetLonLat, 
+		bool immediate, 
+		bool isPointerEvent)
 	//-------------------------------------------------------------------------
 	{
-		setCenterPosition( position, mMagnification, immediate, isPointerEvent );
+		setCenterPosition( targetLonLat, mMagnification, immediate, isPointerEvent );
 	}
 
 	//-------------------------------------------------------------------------
@@ -501,9 +565,13 @@ namespace MAP
 	AlphaRestore sAlphaRestore;
 	
 	//-------------------------------------------------------------------------
+	// This method is called synchrohronsly if the tile is in the cache, if not
+	// it is called asynchronously.
 	void MapViewport::tileReceived( MapCache* sender, MapTile* tile, bool foundInCache )
 	//-------------------------------------------------------------------------
 	{
+		// Only draw if tileReceived is called from the drawing method.
+		// The mInDraw flag controls this.
 		if ( mInDraw )
 		{
 			//
@@ -595,24 +663,30 @@ namespace MAP
 			Gfx_popMatrix();
 
 			#endif
-		}
+		} // end if(mInDraw)
 		else
 		{
+// Experimental flag used to optimize for flowing interaction.
 #ifndef OnlyUpdateWhenJobComplete		
-			{
-				#ifndef WIN32
-				
-				if ( !foundInCache ) {
-					Gfx_notifyImageUpdated( tile->getImage( ) );
-				}
-
-				#endif
-				
-				//
-				// notify client that update is needed
-				//
-				onViewportUpdated( );
+			
+			//
+			// We got the tile asynchronously, invalidate the map
+			// by calling onViewportUpdated.
+			//
+			
+			// Only relevant for Visual Studio, was used to make the
+			// code work with VS.
+			#ifndef WIN32
+			
+			// This is for OpenGL.
+			if ( !foundInCache ) {
+				Gfx_notifyImageUpdated( tile->getImage( ) );
 			}
+
+			#endif
+			
+			// Notify client that update is needed.
+			onViewportUpdated( );
 		}
 #endif		
 	}
@@ -623,10 +697,8 @@ namespace MAP
 	{
 #ifdef OnlyUpdateWhenJobComplete
 		{
-			//
-			// notify client that update is needed
-			//
-			onViewportUpdated( );
+			// Notify client that update is needed.
+			onViewportUpdated();
 		}
 #endif		
 	}
@@ -642,6 +714,7 @@ namespace MAP
 	void MapViewport::drawViewport( Point origin )
 	//-------------------------------------------------------------------------
 	{
+		// We are drawing, do not exit with return from witin this method.
 		mInDraw = true;
 		
 		//
@@ -764,6 +837,7 @@ namespace MAP
 		//
 		(void)Gfx_popClipRect( );
 
+		// Drawing is finished.
 		mInDraw = false;
 	}
 
@@ -993,6 +1067,7 @@ namespace MAP
 		
 		mIdleListener->stopGlide( );
 		this->updateMap( );
+		
 		//onViewportUpdated( );
 	}
 	

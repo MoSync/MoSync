@@ -86,7 +86,8 @@ public:
 		byte* a = address.bt.addr.a;
 		printf(
 			"Connection id: %i\n"
-			"Connection address: %02X%02X%02X%02X%02X%02X\n",
+			"Connection address:\n"
+			"%02X%02X%02X%02X%02X%02X\n",
 			mId,
 			a[0], a[1], a[2], a[3], a[4], a[5]);
 
@@ -162,7 +163,7 @@ public:
 		mNextId(1)
 	{
 		// Print instructions.
-		printf("BluetoothServer example program\n");
+		printf("BluetoothServer example\n");
 		printf("Press BACK or 0 to exit.\n");
 		printDivider();
 		printf("Starting server...\n");
@@ -180,7 +181,7 @@ public:
 
 		if (result < 0)
 		{
-			printf("There was an error starting the server.\n");
+			printf("Error starting the server.\n");
 		}
 		else
 		{
@@ -196,7 +197,7 @@ public:
 			byte* a = address.bt.addr.a;
 			printf(
 				"Bluetooth device address:\n"
-				"(use this address in Client.cpp)\n"
+				"(use this in Client.cpp)\n"
 				"%02X%02X%02X%02X%02X%02X\n",
 				a[0], a[1], a[2], a[3], a[4], a[5]);
 			printf("Bluetooth port: %i\n", address.bt.port);

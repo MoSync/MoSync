@@ -567,6 +567,7 @@ DWORD GetScreenOrientation()
 		//case WM_GESTURE:
 		//	return 0;
 
+
 		case WM_KEYDOWN:
 			if(wParam == VK_THOME) {
 				//ShowWindow(hwnd, SW_MINIMIZE);
@@ -581,7 +582,24 @@ DWORD GetScreenOrientation()
 				return 0;
 			}
 
-			if(wParam == VK_TTALK) break;
+			if(wParam == VK_TTALK)
+			{
+				//Letting the MoSync program know it lost focus
+				MAEvent event;
+				event.type = EVENT_TYPE_FOCUS_LOST;
+				gEventFifo.put(event);
+				//Suspending the program
+				Suspend();
+				//Forwarding the event to the main desktop window to open Phone App
+				CallWindowProc( 
+							  (WNDPROC)GetWindowLong(hwnd,GWL_WNDPROC), //Current Window 
+							  GetDesktopWindow(), //Main desktop window used by windows
+							  umsg, 
+							  wParam, 
+							  lParam 
+							); 
+				return 0;
+			}
 
 			if(lParam&0x40000000) return 0; // check if it has been repeated more than once
 			//if(wParam == VK_TBACK) {
@@ -651,31 +669,37 @@ DWORD GetScreenOrientation()
 			VideoHandleEvent((VideoStream*)lParam);
 			break;
 #endif
+		//If the App is in the forground it receives the SETTINGCHANGE message
+		//when the orientation changes
 		case WM_SETTINGCHANGE:
 			if (SETTINGCHANGE_RESET == wParam) {
-				MAEvent event;
-				event.type = EVENT_TYPE_SCREEN_CHANGED;
-				gEventFifo.put(event);
-
+				//restarting the screen buffer with new dimensions
 				if(sInternalBackBuffer) {
 					delete sInternalBackBuffer;
 					sInternalBackBuffer = 0;
 				}
-
 				InitGraphics();
+				MAEvent event;
+				event.type = EVENT_TYPE_SCREEN_CHANGED;
+				gEventFifo.put(event);
 			}
 			return 0;
+
+		//WM_SIZE is sent when the App does not have focus, this part is added 
+		//So the app comes back from background in correct orienation
 		case WM_SIZE:
-			/*
-			DWORD orientation = GetScreenOrientation();
-			MAEvent event;
-			event.type = EVENT_TYPE_SCREEN_CHANGED;
-			gEventFifo.put(event);
-
-			InitDDraw();
-			*/
+			//WM_SIZE is sent at launch time too, Ignore it by checking change in dimensions
+			if(backBuffer->width != GetSystemMetrics(SM_CXSCREEN)){
+				if(sInternalBackBuffer) {
+					delete sInternalBackBuffer;
+					sInternalBackBuffer = 0;
+				}
+				InitGraphics();
+				MAEvent event;
+				event.type = EVENT_TYPE_SCREEN_CHANGED;
+				gEventFifo.put(event);
+			}
 			return 0;
-
 			/*
 		case WM_MOVE:
 		case WM_WINDOWPOSCHANGED:
@@ -724,7 +748,7 @@ DWORD GetScreenOrientation()
 	  hwnd = CreateWindow (
 					  g_szClassName,  // Registered class name         
 					  g_szTitle,      // Application window name
-					  0,			  // Window style
+					  WS_VISIBLE,	  // Window style
 					  CW_USEDEFAULT,  // Horizontal position of the window
 					  CW_USEDEFAULT,  // Vertical position of the window
 					  CW_USEDEFAULT,  // Window width
@@ -769,34 +793,24 @@ DWORD GetScreenOrientation()
 
 
 	void InitFullScreen() {
-		RECT rc;
-
-
 		HWND hwndTaskbar = TaskBarFind();
-		GetWindowRect(hwndTaskbar, &rc);
-		int taskBarHeight = (rc.bottom-rc.top);
-
 		//hide task bar and other icons
 		SHFullScreen(g_hwndMain, SHFS_HIDETASKBAR | SHFS_HIDESTARTICON | 
 					 SHFS_HIDESIPBUTTON);
 
         // Next resize the main window to the size of the screen.
-        SetRect(&rc, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
-		MoveWindow(g_hwndMain, rc.left, rc.top-taskBarHeight, rc.right-rc.left, rc.bottom-rc.top+taskBarHeight, TRUE);
+		MoveWindow(g_hwndMain, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), TRUE);
 
 		::ShowWindow(hwndTaskbar, SW_HIDE);
 	}
 
 	void InitWindowed() {
-		RECT rc;
-
 		//show task bar and other icons
 		SHFullScreen(g_hwndMain, SHFS_SHOWTASKBAR | SHFS_SHOWSTARTICON | 
 					 SHFS_SHOWSIPBUTTON);
 
         // Next resize the main window to the size of the work area.
-		SystemParametersInfo(SPI_GETWORKAREA, 0, &rc, FALSE);
-		MoveWindow(g_hwndMain, rc.left, rc.top, rc.right-rc.left, rc.bottom-rc.top, TRUE);
+		MoveWindow(g_hwndMain, 0, 0, GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN), TRUE);
 
 		HWND hwndTaskbar = TaskBarFind();
 		::ShowWindow(hwndTaskbar, SW_SHOW);
@@ -1455,7 +1469,7 @@ DWORD GetScreenOrientation()
 	}
 
 	SYSCALL(MAExtent, maGetScrSize()) {
-		return EXTENT(backBuffer->width, backBuffer->height);
+		return EXTENT(GetSystemMetrics(SM_CXSCREEN),GetSystemMetrics(SM_CYSCREEN));
 	}
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {
@@ -2522,9 +2536,7 @@ DWORD GetScreenOrientation()
 	HANDLE gpsEvent = NULL;
 	HANDLE gpsProviderEvent = NULL;
 	HANDLE gpsDevice = NULL;
-
-#define fixDoubleEndian(x) (x)
-	/*
+	
 	double fixDoubleEndian(double d) {
 		int *dd = (int*)&d;
 		int temp = (*(dd+1));
@@ -2532,61 +2544,56 @@ DWORD GetScreenOrientation()
 		*dd = temp;
 		return *((double*)dd);
 	}
-	*/
+
 
 	void locCallback() {
-		//int posDataSize = MAX(sizeof(GPS_POSITION), 376);
-		//byte *posData = new byte[posDataSize];			
-		byte posData[MAX(sizeof(GPS_POSITION), 376)];
-		//byte posData[sizeof(GPS_POSITION)];
-		int posDataSize = sizeof(posData);
-		GPS_POSITION *pos = (GPS_POSITION*)posData;
-		memset(posData, 0, posDataSize);
-		pos->dwVersion = GPS_VERSION_1;
-		pos->dwSize = posDataSize; // 376
+		
+		GPS_POSITION pos;
+		ZeroMemory(&pos,sizeof(GPS_POSITION));
+		pos.dwVersion=GPS_VERSION_1;
+		pos.dwSize=sizeof(GPS_POSITION);
 
-		MALocation posEventData = {0};
+		MALocation* posEventData = new MALocation;
 		MAEvent posEvent;
 		posEvent.type = EVENT_TYPE_LOCATION;
 
 retry:
-		if(GPSGetPosition(gpsDevice, pos, 1000, 0) == ERROR_SUCCESS) {
-			if(pos->dwValidFields&(GPS_VALID_LATITUDE|GPS_VALID_LONGITUDE)) 
+		if(GPSGetPosition(gpsDevice, &pos, 10000, 0) == ERROR_SUCCESS) {
+			if(pos.dwFlags == GPS_DATA_FLAGS_HARDWARE_OFF)
 			{
-				posEventData.lat = fixDoubleEndian(pos->dblLatitude);
-				posEventData.lon = fixDoubleEndian(pos->dblLongitude);
+				posEventData->state = MA_LOC_INVALID;
+			}
+			else if((pos.dwValidFields&(GPS_VALID_LATITUDE|GPS_VALID_LONGITUDE)) != 0) 
+			{
+				posEventData->lat =  fixDoubleEndian(pos.dblLatitude);
+				posEventData->lon = fixDoubleEndian(pos.dblLongitude);
 				
-				if(pos->dwValidFields&GPS_VALID_HORIZONTAL_DILUTION_OF_PRECISION)
-					posEventData.horzAcc = fixDoubleEndian(pos->flHorizontalDilutionOfPrecision);
+				if(pos.dwValidFields&GPS_VALID_HORIZONTAL_DILUTION_OF_PRECISION)
+					posEventData->horzAcc = fixDoubleEndian(pos.flHorizontalDilutionOfPrecision);
 
-				if(pos->dwValidFields&GPS_VALID_VERTICAL_DILUTION_OF_PRECISION)
-					posEventData.vertAcc = fixDoubleEndian(pos->flVerticalDilutionOfPrecision);
+				if(pos.dwValidFields&GPS_VALID_VERTICAL_DILUTION_OF_PRECISION)
+					posEventData->vertAcc = fixDoubleEndian(pos.flVerticalDilutionOfPrecision);
 
-				if(pos->dwValidFields&GPS_VALID_ALTITUDE_WRT_ELLIPSOID)
-					posEventData.alt = pos->flAltitudeWRTEllipsoid;
+				if(pos.dwValidFields&GPS_VALID_ALTITUDE_WRT_ELLIPSOID)
+					posEventData->alt = pos.flAltitudeWRTEllipsoid;
 				
-				if(pos->FixQuality == GPS_FIX_QUALITY_UNKNOWN) {
-					posEventData.state = MA_LOC_UNQUALIFIED;
+				if(pos.FixQuality == GPS_FIX_QUALITY_UNKNOWN) {
+					posEventData->state = MA_LOC_UNQUALIFIED;
 				} else {
-					posEventData.state = MA_LOC_QUALIFIED;
+					posEventData->state = MA_LOC_QUALIFIED;
 				}
 			} else {
-				posEventData.state = MA_LOC_INVALID;
+				posEventData->state = MA_LOC_INVALID;
 			}
 		} else {
-			if(pos->dwSize != 376) {
-				pos->dwSize = 376; 
+			if(pos.dwSize != 376) {
+				pos.dwSize = 376; 
 				goto retry;
 			}
-			posEventData.state = MA_LOC_INVALID;
+			posEventData->state = MA_LOC_INVALID;
 		}
-
-		MALocation *data = new MALocation(posEventData);
-		posEvent.data = (int)data;
-
+		posEvent.data = posEventData;
 		gEventFifo.put(posEvent);
-
-		//delete posData;
 	}
 
 	void lpsCallback() {

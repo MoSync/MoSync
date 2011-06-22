@@ -1251,7 +1251,7 @@ interface MAAPI {
 		/// or \< 0 on error.
 		AUDIOBUFFER_FILL = 18;
 #endif
-		/** \brief The size of the screen changed.
+		/** \brief The size of the screen has changed.
 		* Use maGetScrSize() to get the new size.
 		*
 		* If the screen is the current draw target, the clipping rectangle is removed.
@@ -3325,6 +3325,11 @@ group WidgetAPI "Widget API" {
 		 * @brief A search bar is a special kind of edit box that is used for searching. See \ref WidgetSearchBarProperties "Search bar properties" for the properties available.
 		 */
 		SEARCH_BAR = "SearchBar";
+		
+		/**
+		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
+		 */
+		NAV_BAR = "NavBar";		
 
 		/**
 		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
@@ -3820,7 +3825,7 @@ group WidgetAPI "Widget API" {
 		FONT_SIZE = "fontSize";
 
 		/**
-		* Sets the image used to represent the button.
+		* Sets the background image. This will be scaled to fit the whole widget (not keeping the aspect).
 		*
 		* @validvalue MoSync handle to an uncompressed image resource.
 		*
@@ -3832,6 +3837,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		BACKGROUND_IMAGE = "backgroundImage";
+		
+		/**
+		* Sets the foreground image of the button. This won't be scaled at all.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_IMAGE, toString(R_MY_IMAGE));
+		* \endcode
+		*/
+		IMAGE = "image";			
 	}
 	} // end of WidgetImageButtonProperties		
 	
@@ -3853,6 +3872,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		IMAGE = "image";
+		
+		/**
+		* @brief Specifies what type of scaling should be applied to the image.
+		*
+		* @validvalue Either 'none', 'scaleXY' or 'scalePreserveAspect'. Default 'none'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_SCALE_MODE, "scaleXY");
+		* \endcode
+		*/		
+		SCALE_MODE = "scaleMode";		
 	}
 	} // end of WidgetImageProperties
 

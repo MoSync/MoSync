@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project supports-build-configs="true" version="1">
+<project supports-build-configs="true" version="1.2">
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
-<property key="build.prefs:additional.include.paths/Debug" value=""/>
-<property key="build.prefs:additional.include.paths/Release" value=""/>
-<property key="build.prefs:additional.libraries/Debug" value="mautil.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="mautil.lib"/>
-<property key="build.prefs:additional.library.paths/Debug" value=""/>
-<property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
+<property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include"/>
+<property key="build.prefs:additional.include.paths/Release" value="%mosync-home%/include"/>
+<property key="build.prefs:additional.libraries" value="mastd.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="mastdD.lib, mautil.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="mastd.lib, mautil.lib"/>
+<property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
+<property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%/lib/pipe"/>
+<property key="build.prefs:additional.library.paths/Release" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:app.permissions" value="Bluetooth"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
@@ -16,6 +19,15 @@
 <property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
+<property key="build.prefs:ignore.default.include.paths" value="true"/>
+<property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
+<property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
+<property key="build.prefs:ignore.default.libraries" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Debug" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Release" value="true"/>
+<property key="build.prefs:ignore.default.library.paths" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
 <property key="build.prefs:memory.data/Debug" value="128"/>
 <property key="build.prefs:memory.heap/Debug" value="64"/>
 <property key="build.prefs:memory.stack/Debug" value="32"/>
