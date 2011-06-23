@@ -239,7 +239,7 @@ static void fireParseError() {
 	if(sStop)
 		return;
 	sThereIsData = false;
-	sContext->parseError(sContext);
+	sContext->parseError(sContext, sCurPtr - sFirstPtr);
 }
 
 static void fireEncoding(char* name) {
@@ -1007,8 +1007,8 @@ namespace Mtx {
 	static void emptyTagEnd(MTXContext*) {
 		sXml->mtxEmptyTagEnd();
 	}
-	static void parseError(MTXContext*) {
-		sXml->mtxParseError();
+	static void parseError(MTXContext*, int offset) {
+		sXml->mtxParseError(offset);
 	}
 	static unsigned char unicodeCharacter(MTXContext*, int unicode) {
 		return sXml->mtxUnicodeCharacter(unicode);

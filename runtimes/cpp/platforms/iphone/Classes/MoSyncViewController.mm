@@ -21,29 +21,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 @implementation MoSyncViewController
 
-/*
-// The designated initializer. Override to perform setup that is required before the view is loaded.
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil {
-    if (self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil]) {
-        // Custom initialization
-    }
-    return self;
-}
-
-*/
-
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
 - (void)loadView {
 	[super loadView];
-	//self.view = mosyncView;
 	mosyncView = [[MoSyncView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	//mosyncView = [[MoSyncView alloc] initWithCoder:nil];
 	[self.view addSubview:mosyncView];	 
 }
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewWillAppear:(BOOL)animated {
-	//[mosyncView viewAppeared];
     [super viewWillAppear:animated];
 }
 

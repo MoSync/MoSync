@@ -78,6 +78,8 @@ DefaultInputPolicy::DefaultInputPolicy(Widget* owner) : InputPolicy(owner) {
 }
 
 bool DefaultInputPolicy::keyPressed(int keyCode, int nativeCode) {
+	if(!mOwner->isEnabled())
+		return false;
 	bool ret = mOwner->keyPressed(keyCode, nativeCode);
 	if (!ret) {
 		Direction dir = mapKeyCodeToDirection(keyCode);
@@ -98,18 +100,26 @@ bool DefaultInputPolicy::keyPressed(int keyCode, int nativeCode) {
 }
 
 bool DefaultInputPolicy::keyReleased(int keyCode, int nativeCode) {
+	if(!mOwner->isEnabled())
+		return false;
 	return mOwner->keyReleased(keyCode, nativeCode);
 }
 
 bool DefaultInputPolicy::pointerPressed(MAPoint2d p, int id) {
+	if(!mOwner->isEnabled())
+		return false;
 	return mOwner->pointerPressed(p, id);
 }
 
 bool DefaultInputPolicy::pointerMoved(MAPoint2d p, int id) {
+	if(!mOwner->isEnabled())
+		return false;
 	return mOwner->pointerMoved(p, id);
 }
 
 bool DefaultInputPolicy::pointerReleased(MAPoint2d p, int id) {
+	if(!mOwner->isEnabled())
+		return false;
 	return mOwner->pointerReleased(p, id);
 }
 

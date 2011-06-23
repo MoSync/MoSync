@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#include <errno.h>
 
 char *
 _DEFUN (asctime_r, (tim_p, result),
@@ -17,11 +18,21 @@ _DEFUN (asctime_r, (tim_p, result),
 	"Jan", "Feb", "Mar", "Apr", "May", "Jun", 
 	"Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
   };
+	int len;
+	
+	if((1900 + tim_p->tm_year) < 0) {
+		errno = EOVERFLOW;
+		return NULL;
+	}
 
-  sprintf (result, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
+  len = snprintf (result, 26, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
 	   day_name[tim_p->tm_wday], 
 	   mon_name[tim_p->tm_mon],
 	   tim_p->tm_mday, tim_p->tm_hour, tim_p->tm_min,
 	   tim_p->tm_sec, 1900 + tim_p->tm_year);
+	if(len >= 26) {
+		errno = EOVERFLOW;
+		return NULL;
+	}
   return result;
 }

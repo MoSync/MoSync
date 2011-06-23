@@ -54,6 +54,24 @@ SKIPPED_UNRESOLVED = [
 	'bug14.c',	# apparently, sscanf() doesn't convert from UTF-8 to wchar_t.
 	'scanf13.c',	# 8 fails.
 	'tst-strtod.c',	# 2 regular fails, and no locale support.
+	
+	'tst-dirname.c',	# fails on multiple slashes ("//")
+	'tst-fnmatch.c',	# many fails, complicated function.
+	'stdio-common_tst-sscanf.c',	# 4 fails, pretty uncommon stuff.
+	'stdio-common_tst-swscanf.c',
+	
+	'tst-environ.c',	# half the tests fail.
+	'bug-strtok1.c',	# one or two tests fail.
+	'tst-posixtz.c',	# a few more obscurities.
+	
+	# Many fails, though they appear minor. Also, function's specification is so unclear that
+	# it's possible that newlib's implementation is still conformant.
+	'tst-strptime.c',
+	
+	'bug-mktime1.c',	# fails because sizeof(time_t) < 8. Too tricky to fix.
+	
+	# Fails because newlib's C locale isn't identical to its Unicode locale.
+	'test_wctype.c',
 ]
 
 SKIPPED_FILES = SKIPPED_UNRESOLVED + [
@@ -74,7 +92,6 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'tst-gshadow.c',
 	'test-utime.c',
 	'test-lfs.c',
-	'tst-getcwd.c',
 	'tst-fcntl.c',
 	'bug-ftw1.c',
 	'bug-ftw2.c',
@@ -82,29 +99,7 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'bug-ftw4.c',
 	'bug-ftw5.c',
 	'tst-statvfs.c',
-	'tst-openat.c',	# todo
-	'tst-unlinkat.c',	# todo
-	'tst-fstatat.c',	# todo, dirent
-	'tst-futimesat.c',	# todo
-	'tst-renameat.c',	# todo
-	'tst-fchownat.c',	# todo
-	'tst-fchmodat.c',	# todo
-	'tst-faccessat.c',	# todo
-	'tst-symlinkat.c',	# todo
-	'tst-linkat.c',	# todo
-	'tst-readlinkat.c',	# todo
-	'tst-mkdirat.c',	# todo
-	'tst-mknodat.c',	# todo
-	'tst-mkfifoat.c',	# todo
-	'tst-ttyname_r.c',	# todo
-	'tst-posix_fallocate.c',	# todo
 	'tst-widetext.c',	# todo, iconv
-	'tst-ext.c',
-	'tst-ext2.c',
-	'tst-fopenloc.c',
-	'tst-atime.c',
-	'bug-memstream1.c',	# todo, ftello64
-	'bug-wmemstream1.c',	# todo, ftello64
 	'tst-popen1.c',	# popen
 	
 	# locale
@@ -133,7 +128,6 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'test-tgmath-ret.c',
 	'bug-tgmath1.c',
 	
-	'tst-dirname.c',	# dirname
 	'tst-efgcvt.c',	# ecvt_r
 	'tst-mntent.c',	# mntent.h
 	'tst-mntent2.c',	# mntent.h
@@ -146,9 +140,8 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	# todo, netinet
 	'tst-getaddrinfo.c',
 	
-	'tst-truncate64.c',	# truncate64
 	'tst-fork.c',	# fork
-#	'tst-dir.c',	# todo, dirent.h
+
 	'tst-chmod.c',	# chmod
 	'bug-regex1.c',	# re_registers
 	'bug-regex4.c',	# re_search_2
@@ -187,7 +180,6 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'tst-printfsz.c',	# register_printf_function
 	'tst-obprintf.c',	# obstack.h
 	'tst-unlockedio.c',
-	'tst-environ.c',	#todo, setenv & getenv
 	'tst-xpg-basename.c',
 	'tst-setcontext.c',
 	'tst-makecontext.c',
@@ -205,14 +197,13 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'tst-nanosleep.c',	# nanosleep
 	'tst-nice.c',	# we are not nice
 	'tst-perror.c',	# To be used only for testing glibc.
-	'tst_wscanf.c',	# we don't have stdin.
-	'tst_getwc.c',
-	'tst-fgetwc.c',
-	'tst-swscanf.c',	# Implementation-defined behaviour (%[a-c]). Also, an unsupported locale. See notes.
+	'libio_tst-swscanf.c',	# Implementation-defined behaviour (%[a-c]). Also, an unsupported locale. See notes.
 	'bug-mmap-fflush.c',	# system
 	'tst-fopenloc2.c',	# GNU extension: fopen(ccs).
+	
 	# glibc doesn't implement open_wmemstream's sizep parameter according to the Open Group Base Specification,
-	# so this test fails.
+	# so these tests fail.
+	'bug-wmemstream1.c',
 	'tst-wmemstream2.c',
 	
 	# fp exceptions not supported by newlib.
@@ -256,6 +247,28 @@ SKIPPED_FILES = SKIPPED_UNRESOLVED + [
 	'tst-putenv.c',	# putenv from another process.
 	
 	'xbug.c',	# popen()
+	
+	'tst-timezone.c',	# non-standard TZ values.
+	'test-tz.c',	# apparently, newlib doesn't support zones like "MST"
+	
+	'tst-futimesat.c',	# mosync doesn't support *utime* functions.
+	'tst-fchownat.c',	# chown()
+	'tst-fchmodat.c',	# chmod()
+	'tst-faccessat.c',	# chmod()
+	'tst-symlinkat.c',	# symlink()
+	'tst-linkat.c',	# link()
+	'tst-readlinkat.c',	# readlink()
+	'tst-mknodat.c',	# mknod()
+	'tst-mkfifoat.c',	# mkfifo()
+	'tst-posix_fallocate.c',	# posix_fallocate()
+	'tst-ext.c',	# stdio_ext.h
+	'tst-ext2.c',	# stdio_ext.h
+	'tst-fopenloc.c',	# iconvdata
+	'tst-atime.c',	# atime
+	'tst-truncate64.c',	# mosync doesn't support 64-bit file ops.
+	
+	'tst-btowc.c',	# locale
+	'tst-mbrtowc2.c',	# locale
 ]
 
 SKIPPED_PATTERNS = [

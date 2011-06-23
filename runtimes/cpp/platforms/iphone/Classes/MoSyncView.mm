@@ -23,9 +23,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include "iphone_helpers.h"
 //#include "Platform.h"
 
+/*
 @interface UIApplication(MyExtras) 
 - (void)terminateWithSuccess; 
 @end
+*/
 
 @interface MessageBoxHandler : UIViewController <UIAlertViewDelegate> {
 	BOOL kill;
@@ -128,7 +130,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		
 		[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(deviceOrientationChanged:)
 													 name:UIDeviceOrientationDidChangeNotification object:nil];
-		
+        int w, h;
+        getScreenResolution(w, h);
+        if (w == 640 && h == 960) // Retina display detected
+        {
+            // Set contentScale Factor to 2
+            self.contentScaleFactor = 2.0;
+        }
+        
 		self.frame.origin.y = 0;
 		self.frame.origin.x = 0;
 		mosyncView = nil;
@@ -154,7 +163,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
     CGContextRef context = UIGraphicsGetCurrentContext();
 	CGContextSetInterpolationQuality(context, kCGInterpolationNone);
 	CGContextSetAllowsAntialiasing(context, false);
-	CGContextTranslateCTM(context, 0, CGImageGetHeight(mosyncView));
+	CGContextTranslateCTM(context, 0, self.frame.size.height); //CGImageGetHeight(mosyncView));
 	CGContextScaleCTM(context, 1.0, -1.0);
 	CGContextDrawImage(context, rect, mosyncView);		
 	
@@ -170,104 +179,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {
 	//UIDeviceOrientation deviceOrientation = [UIDevice currentDevice].orientation;
-	MoSync_AddScreenChangedEvent();
+	//MoSync_AddScreenChangedEvent();
 }
-
-/*
-int addTouch(UITouch* touch) {
-	if(touchArray == nil) {
-		touchArray = [[NSMutableArray alloc] init];
-		dummyTouch = [[UITouch alloc] init];
-	}
-	
-	int index = 0;
-	for (UITouch* cur in touchArray) {
-		if(touch == cur) {
-			return -1;
-		} else if(cur == dummyTouch) {
-			[touchArray replaceObjectAtIndex:index withObject:touch];
-			return index;
-		}
-		
-		index++;
-	}
-	
-	[touchArray addObject:touch];
-	return index;
-	
-}
-
-int getTouchId(UITouch* touch) {
-	return [touchArray indexOfObject:touch];
-}
-
-void removeTouch(UITouch* touch) {
-	//[touchArray removeObject:touch];
-	int index = 0;
-	for (UITouch* cur in touchArray) {
-		if(cur == touch) {
-			[touchArray replaceObjectAtIndex: index withObject:dummyTouch];
-			return;
-		}
-		index++;
-	}
-	
-}
- */
-
-/*
-- (void)viewAppeared {
-	// some touches might not have been registered so let's clear the touch helper.
-    [touchHelper clearTouches];
-}
-
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-	for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseBegan) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper addTouch: touch];
-			MoSync_AddTouchPressedEvent(point.x, point.y, touchId);	
-		}
-	}	
-}
-
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-	for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseMoved) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];
-			MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
-		}
-	}	
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {	
-    for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseEnded) {	
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];		
-			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
-			[touchHelper removeTouch: touch];
-		}
-	}
-}
-
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {	
-	for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseCancelled) {	
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];		
-			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
-			[touchHelper removeTouch: touch];
-		}
-	}
-}
- */
-
 -(void) messageBox:(id) obj {
 	MessageBoxHandler *mbh = (MessageBoxHandler*) obj;
 	UIAlertView *alert = [[UIAlertView alloc] 

@@ -17,7 +17,9 @@ extern const char* gArgv[];
 extern const int gArgc;
 extern void setup_stdin();
 static void exit_status_save(int, void*);
+extern void setup_filesystem();
 
+int MAMain() GCCATTRIB(noreturn);
 int MAMain() {
 	on_exit(exit_status_save, NULL);
 
@@ -27,11 +29,19 @@ int MAMain() {
 	dup2(wlfd, 2);
 	close(wlfd);
 	
+	setup_filesystem();
+	chdir("/");
+	
 	setup_stdin();
+	if(!stdin) {
+		printf("Error opening stdin: %i (%m)\n", errno);
+		exit(1);
+	}
 
 	printf("MAMain()\n");
 	install_stdmalloc_hooks();
 	int res = main(gArgc, gArgv);
+	printf("main returned. exit(%i)\n", res);
 	exit(res);
 }
 
@@ -39,6 +49,7 @@ int MAMain() {
 // if this store is not saved, the loader will assume something went
 // catastrophically wrong with the test.
 static void exit_status_save(int status, void* dummy) {
+	printf("exit_status_save\n");
 	// we don't check for errors here, because there can be no reasonable error handling at this stage.
 	// better then, to let the runtime's panic system deal with it.
 	MAHandle data = maCreatePlaceholder();
@@ -58,6 +69,7 @@ static void install_stdmalloc_hooks() {
 	set_malloc_handler(std_malloc_handler);
 }
 
+void error(int __status, int __errnum, __const char* __format, ...) GCCATTRIB(noreturn);
 void error(int __status, int __errnum, __const char* __format, ...)
 {
 	va_list args;
@@ -70,26 +82,30 @@ void error(int __status, int __errnum, __const char* __format, ...)
 	maExit(1);
 }
 
+int nanosleep(const struct timespec *requested_time, struct timespec *remaining) GCCATTRIB(noreturn);
 int nanosleep(const struct timespec *requested_time, struct timespec *remaining) {
 	BIG_PHAT_ERROR;
 }
 
+int kill(int pid, int sig) GCCATTRIB(noreturn);
 int kill(int pid, int sig) {
 	BIG_PHAT_ERROR;
-	errno = ENOSYS;	// not implemented
-	return -1;
+	//errno = ENOSYS;	// not implemented
+	//return -1;
 }
 
+pid_t waitpid(pid_t pid, int* status_ptr, int options) GCCATTRIB(noreturn);
 pid_t waitpid(pid_t pid, int* status_ptr, int options) {
 	BIG_PHAT_ERROR;
-	errno = ENOSYS;
-	return -1;
+	//errno = ENOSYS;
+	//return -1;
 }
 
+const char* strsignal(int __signo) GCCATTRIB(noreturn);
 const char* strsignal(int __signo) {
 	BIG_PHAT_ERROR;
-	errno = ENOSYS;
-	return NULL;
+	//errno = ENOSYS;
+	//return NULL;
 }
 
 unsigned sleep(unsigned s) {
@@ -98,18 +114,19 @@ unsigned sleep(unsigned s) {
 	const int end = start + s * 1000;
 	do {
 		int left = end - maGetMilliSecondCount();
-		int res;
 		MAEvent e;
 		if(left <= 0)
 			break;
 		while(maGetEvent(&e)) {
-			if(e.type = EVENT_TYPE_CLOSE) {
+			if(e.type == EVENT_TYPE_CLOSE) {
 				lprintfln("EVENT_TYPE_CLOSE");
 				exit(42);
 			}
 		}
 		maWait(left);
 	} while(1);
+	int passed = maGetMilliSecondCount() - start;
+	MAASSERT(passed >= (int)s*1000);
 	return 0;
 }
 
@@ -286,4 +303,9 @@ int chmod(const char* name, mode_t mode) {
 	// check that the file exists.
 	struct stat st;
 	return stat(name, &st);
+}
+
+unsigned alarm(unsigned __secs) {
+	// used for timeout (at least in tst-mktime2). we have our own timeout, so we can leave this empty.
+	return 0;
 }

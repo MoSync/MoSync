@@ -94,10 +94,14 @@ class PipeGccWork < GccWork
 	
 	def gccmode; "-S"; end
 	def host_flags;
-		g = CONFIG == "" ? " -g" : ""
-		return (USE_NEWLIB ? g + " -DUSE_NEWLIB" : g)
+		flags = ''
+		flags += ' -g' #if(CONFIG != '')
+		flags += ' -DUSE_NEWLIB' if(USE_NEWLIB)
+		return flags
 	end
-	def host_cppflags; ""; end
+	def host_cppflags
+		return ''#' -frtti'
+	end
 	
 	include MoSyncInclude
 	

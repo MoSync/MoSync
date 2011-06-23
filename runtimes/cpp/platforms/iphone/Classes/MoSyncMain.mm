@@ -96,11 +96,12 @@ void cpp_main();
 
 #include <core/Core.cpp>
 
+static MAHandle gReloadHandle = 0;
+
 #endif
 
 using namespace Base;
 
-static MAHandle gReloadHandle = 0;
 bool gRunning = false;
 
 static MoSyncView *sMoSyncView;
@@ -209,7 +210,8 @@ void MoSync_ReloadProgram(MAHandle data, int reload) {
 }
 
 void MoSync_Exit() {
-	[[UIApplication sharedApplication] terminateWithSuccess];
+	//[[UIApplication sharedApplication] terminateWithSuccess];
+    exit(0);
 }
 
 void MoSync_StartUpdatingLocation() {

@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <errno.h>
+#include <stdbool.h>
 
 #ifndef TEST_FUNCTION
 # define TEST_FUNCTION do_test (argc, argv)

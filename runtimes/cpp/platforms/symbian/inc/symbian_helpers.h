@@ -332,6 +332,8 @@ private:
 //File system server connection management
 //***************************************************************************
 
+// todo: replace with CCoeEnv::Static()->FsSession().
+
 class MyRFs {
 public:
 	MyRFs() {}

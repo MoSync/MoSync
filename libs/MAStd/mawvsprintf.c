@@ -628,12 +628,12 @@ repeat:
         continue;
 
       case 's':	//latin-1 string
-				//todo: src should be treated as utf-8.
+        //todo: src should be treated as utf-8?
         S = va_arg(args, char *);
         if (!S) S = "<NULL>";
         len = strnlen(S, precision);
         if (!(flags & LEFT)) while (len < field_width--) *str++ = ' ';
-        for (i = 0; i < len; ++i) *str++ = *S++;
+        for (i = 0; i < len; ++i) *str++ = (unsigned char)*S++;
         while (len < field_width--) *str++ = ' ';
         continue;
 

@@ -408,12 +408,6 @@ namespace MAUI {
 		}
 	}
 
-	/*
-	Vector<Widget*>& Widget::getChildren() {
-		return mChildren;
-	}
-	*/
-
 	const Vector<Widget*>& Widget::getChildren() const {
 		return mChildren;
 	}
@@ -426,19 +420,9 @@ namespace MAUI {
 		mWidgetListeners.remove(wl);
 	}
 
-	/*
-	Vector<WidgetListener*>& Widget::getWidgetListeners()
-	{
-		return mWidgetListeners;
-	}
-	*/
-
 	void Widget::setFocused(bool focused) {
 		mFocused = focused;
-		/*
-		Vector_each(WidgetListener*, wl, mWidgetListeners) {
-			(*wl)->focusChanged(this, mFocused);
-		}*/
+
 		ListenerSet_fire(WidgetListener, mWidgetListeners, focusChanged(this, mFocused));
 
 		requestRepaint();
@@ -451,14 +435,6 @@ namespace MAUI {
 	void Widget::setEnabled(bool enabled) {
 		mEnabled = enabled;
 
-		Vector_each(Widget*,it,mChildren) {
-			(*it)->setEnabled(mEnabled);
-		}
-		
-		/*
-		Vector_each(WidgetListener*, wl, mWidgetListeners) {
-			(*wl)->enableStateChanged(this, mEnabled);
-		}*/
 		ListenerSet_fire(WidgetListener, mWidgetListeners, enableStateChanged(this, mEnabled));
 
 		requestRepaint();

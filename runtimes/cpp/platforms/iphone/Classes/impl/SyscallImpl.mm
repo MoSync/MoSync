@@ -837,7 +837,7 @@ namespace Base {
 		MoSync_StopUpdatingLocation();
 		return 0;
 	}
-	
+
 	int maTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
 		MoSync_ShowTextBox(title, inText, outText, maxSize, constraints);
 		return 0;
@@ -997,9 +997,6 @@ namespace Base {
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
 #endif	//SUPPORT_OPENGL_ES
-
-//		maIOCtl_case(maAccelerometerStart);
-//		maIOCtl_case(maAccelerometerStop);
 		}
 		
 		return IOCTL_UNAVAILABLE;

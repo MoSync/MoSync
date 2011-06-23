@@ -41,11 +41,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 			andConstraints:(int)constraints;
 -(void) startUpdatingLocation;
 -(void) stopUpdatingLocation;
-
-- (void)viewAppeared;
-
 - (void)deviceOrientationChanged:(NSNotification *)notification;
-- (void)accelerometer:(UIAccelerometer *)accelerometer didAccelerate:(UIAcceleration *)acceleration;
 
 /**
  * Returns a pointer to the MoSyncSensor object.

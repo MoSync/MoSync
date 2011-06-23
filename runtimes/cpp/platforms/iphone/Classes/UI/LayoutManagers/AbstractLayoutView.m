@@ -144,6 +144,7 @@
     CGSize contentSize = [self layoutSubviewsEffectively:NO];
     self.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
     self.showsVerticalScrollIndicator = showsVerticalScrollIndicator;    
+
     return contentSize;
 }
 

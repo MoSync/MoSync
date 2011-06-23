@@ -119,7 +119,7 @@ static bool readLine(char* dst, int maxLen, File& file) {
 	char* res = fgets(dst, maxLen-1, file.file);
 	if(res == NULL)
 		return false;
-	int end = strlen(res) - 1;
+	size_t end = strlen(res) - 1;
 	if(res[end] == '\n')
 		res[end] = 0;
 	return true;
@@ -214,7 +214,7 @@ void clearSLD() {
 static int fileIndexFromScope(int scope) {
 	for(size_t i=0; i<gFiles.size(); i++) {
 		if(gFiles[i].scope == scope)
-			return i;
+			return (int)i;
 	}
 	return -1;
 }

@@ -10,6 +10,7 @@
 
 #include "common.h"
 #include "vector3f.hpp"
+#include <mavsprintf.h>
 
 class Vector3fi
 {

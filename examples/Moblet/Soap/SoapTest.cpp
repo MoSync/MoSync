@@ -68,8 +68,8 @@ public:
 	void mtxTagEnd(const char* name, int len) {
 		printf("end '%s'\n", name);
 	}
-	void mtxParseError() {
-		printf("parseError\n");
+	void mtxParseError(int offset) {
+		printf("parseError %i\n", offset);
 	}
 	void mtxEmptyTagEnd() {
 		printf("emptyTagEnd\n");

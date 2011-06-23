@@ -187,7 +187,7 @@ public:
 	//to release the memory used by the native UI widgets. In this case we
 	//just need to delete the main widget: all its children will automatically
 	//be deleted too.
-	~AppScreen()
+	virtual ~AppScreen()
 	{
 		maWidgetDestroy(mMainLayoutWidget);
 	}

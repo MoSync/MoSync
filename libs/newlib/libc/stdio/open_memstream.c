@@ -362,7 +362,8 @@ _DEFUN(internal_open_memstream_r, (ptr, buf, size, wide),
 
   c->storage = c;
 	c->buf = *bufp;
-	c->size = *sizep;
+	c->size = 0;
+	c->pos = 0;
   c->bufp = bufp;
   c->sizep = sizep;
   c->eof = 0;
