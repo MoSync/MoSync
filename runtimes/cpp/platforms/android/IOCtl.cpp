@@ -839,61 +839,6 @@ namespace Base
 		return result;
 	}
 
-	int _maWidgetEvauluateScript(int widget, const char *script,
-								JNIEnv* jNIEnv, jobject jThis)
-	{
-		// Convert to Java parameters
-		jstring jstrScript = jNIEnv->NewStringUTF(script);
-		
-		// Get the Java method
-		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetEvaluateScript",
-													"(ILjava/lang/String;)I");
-		if (methodID == 0)
-		{
-			return 0;
-		}
-		
-		// Call the java method
-		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrScript);
-		
-		// Delete allocated memory
-		jNIEnv->DeleteLocalRef(cls);
-		jNIEnv->DeleteLocalRef(jstrScript);
-		
-		return result;
-	}
-	
-	int _maWidgetGetMessageData(
-		int memStart,
-		int messageId,
-		int messageBufferPointer,
-		int bufferSize,
-		JNIEnv* jNIEnv,
-		jobject jThis)
-	{
-		// Convert to Java parameters
-		int realMessageBufferPointer = messageBufferPointer - memStart;
-		
-		// Get the Java method
-		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetMessageData",
-														"(III)I");
-		if (methodID == 0)
-		{
-			return 0;
-		}
-		
-		// Call the java method
-		int result = jNIEnv->CallIntMethod(jThis, methodID, messageId,
-										realMessageBufferPointer, bufferSize);
-		
-		// Delete allocated memory
-		jNIEnv->DeleteLocalRef(cls);
-		
-		return result;
-	}
-	
 	int _maOpenGLInitFullscreen()
 	{
 		return IOCTL_UNAVAILABLE; 

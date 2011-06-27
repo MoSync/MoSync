@@ -227,13 +227,8 @@ namespace Base
 	int _maWidgetSetProperty(int widget, const char *property, 
 							const char* value, 
 							JNIEnv* jNIEnv, jobject jThis);
-	int _maWidgetEvauluateScript(int widget, const char *script, 
-								JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetGetProperty(int memStart, int widget, const char *property, 
 								int memBuffer, int memBufferSize, 
-								JNIEnv* jNIEnv, jobject jThis);
-	int _maWidgetGetMessageData(int memStart, int messageId, 
-								int messageBufferPointer, int bufferSize, 
 								JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis);
