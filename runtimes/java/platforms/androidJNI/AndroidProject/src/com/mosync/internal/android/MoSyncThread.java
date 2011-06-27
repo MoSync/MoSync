@@ -18,7 +18,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
-import static com.mosync.internal.android.MoSyncHelpers.EXTENT_Y;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
@@ -128,6 +127,7 @@ public class MoSyncThread extends Thread
 	public native int nativeCreateBinaryResource(
 		int resourceIndex,
 		int length);
+	public native int nativeCreatePlaceholder();
 
 	// Modules that handle syscalls for various subsystems.
 	// We delegate syscalls from this class to the modules.
@@ -576,6 +576,36 @@ public class MoSyncThread extends Thread
 		}
 		
 		return byteBuffer;  
+	}
+	
+	/**
+	 * Create a data object by (indirectly) calling maCreatePlaceholder,
+	 * and maCreateData, then copy the data given in the data parameter
+	 * to the new buffer.
+	 * @param data The data to fill the new data object with.
+	 * @return The handle to the data if successful, <0 on error.
+	 */
+	public int createDataObject(byte[] data)
+	{
+		// Create handle.
+		int dataHandle = nativeCreatePlaceholder();
+		
+		// Allocate data.
+		int result = nativeCreateBinaryResource(dataHandle, data.length);
+		if (result < 0)
+		{
+			return result;
+		}
+		
+		// Get byte buffer for the handle.
+		ByteBuffer buf = getBinaryResource(dataHandle);
+		if (null != buf)
+		{
+			// Copy data.
+			buf.put(data);
+		}
+		
+		return dataHandle;
 	}
 	
 	/**
@@ -2710,14 +2740,19 @@ public class MoSyncThread extends Thread
 	{
 		return mMoSyncNativeUI.maWidgetSetProperty(widgetHandle, key, value);
 	}
-	
+
+	/**
+	 * Internal wrapper for maWidgetGetProperty that runs
+	 * the call in the UI thread.
+	 */
 	public int maWidgetGetProperty(
 			final int widgetHandle,
 			final String key,
 			final int memBuffer, 
 			final int memBufferSize)
 	{
-		return mMoSyncNativeUI.maWidgetGetProperty(widgetHandle, key, memBuffer, memBufferSize);
+		return mMoSyncNativeUI.maWidgetGetProperty(
+			widgetHandle, key, memBuffer, memBufferSize);
 	}
 	
 	/**
