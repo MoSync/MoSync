@@ -1,8 +1,5 @@
 package com.mosync.nativeui.ui.factories;
 
-import java.io.FileDescriptor;
-import java.nio.ByteBuffer;
-
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -13,7 +10,6 @@ import android.webkit.WebViewClient;
 
 import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.android.MoSyncThread;
-import com.mosync.internal.generated.MAAPI_consts;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.WebWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
