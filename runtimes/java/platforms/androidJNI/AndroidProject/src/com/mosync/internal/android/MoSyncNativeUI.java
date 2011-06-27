@@ -311,7 +311,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	}
 	
 	/**
-	 * Internal wrapper for maWidgetSetProperty that runs
+	 * Internal wrapper for maWidgetGetProperty that runs
 	 * the call in the UI thread.
 	 */
 	public int maWidgetGetProperty(
