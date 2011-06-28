@@ -144,8 +144,8 @@ void streamJavaDefinitionFile(
 
 void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix);
 void streamIoctlDefines(ostream& stream, const Interface& ioctls, const string& headerName, int ix, bool java);
-//void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
-//	const string& ioctlName);
+void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
+	const string& ioctlName, int fnOffset = 0);
 void streamCppDefs(ostream& stream, const Interface& inf, int ix);
 
 void streamInvokeSyscall(ostream&, const Interface&, bool java);

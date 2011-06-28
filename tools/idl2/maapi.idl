@@ -1600,7 +1600,7 @@ interface MAAPI {
 	/**
 	* Invokes an extension function. Normally you don't call this function directly.
 	*/
-	int maInvokeExtension(in int function, in int a, in int b, in int c);
+	ioctl maInvokeExtension {}
 
 	/**
 	* These functions are available only on certain platforms.

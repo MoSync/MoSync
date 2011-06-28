@@ -39,8 +39,6 @@ static void streamStructs(ostream& stream, const Interface& inf, int ix, bool ru
 static void streamIoctls(ostream& stream, const Interface& inf, int ix);
 static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix, bool runtime);
 static void streamDefines(ostream& stream, const vector<Define>& defines, int ix);
-static void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
-	const string& ioctlName);
 static void streamJavaConstants(
 	ostream& stream, 
 	const vector<ConstSet>& 
@@ -789,8 +787,8 @@ static void streamIoctls(ostream& stream, const Interface& inf, int ix) {
 	}
 }
 
-static void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
-	const string& ioctlName)
+void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
+	const string& ioctlName, int fnOffset)
 {
 	stream << f.comment;
 	if(f.groupId != "")
@@ -855,7 +853,7 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 	for(size_t j=usedArgs; j<3; j++) {
 		invokeArgs += ", 0";
 	}
-	string invoke = ioctlName + "(" + toString(f.number) + invokeArgs + ");";
+	string invoke = ioctlName + "(" + toString(fnOffset + f.number) + invokeArgs + ");";
 	if(f.returnType == "double") {
 		//stream << "\tMA_DV _result;\n";
 		stream << "\t_result.ll = " + invoke + "\n";

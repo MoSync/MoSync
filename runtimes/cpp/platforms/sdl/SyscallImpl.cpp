@@ -1906,10 +1906,6 @@ namespace Base {
 	static int maSendTextSMS(const char* dst, const char* msg);
 	//static int maStartVideoStream(const char* url);
 
-	SYSCALL(int, GCCATTRIB(noreturn) maInvokeExtension(int, int, int, int)) {
-		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
-	}
-
 #ifdef _MSC_VER
 	static double atanh(double x) {
 		double d = (1+x) / (1-x);

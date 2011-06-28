@@ -1280,7 +1280,7 @@ static int LaunchBrowser(const char* url) {
 	return KErrNone;
 }
 
-SYSCALL(int, maInvokeExtension(int, int, int, int)) {
+SYSCALL(longlong, maInvokeExtension(int, int, int, int)) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 

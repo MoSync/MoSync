@@ -101,7 +101,7 @@ void loadExtensions(const char* extConfFileName) {
 	// and we're done.
 }
 
-void maInvokeExtension(uint function) {
+extern "C" void maInvokeExtension(uint function) {
 	MYASSERT(function < snFunctions, ERR_EXT_CALL);
 	sFunctions[function]();
 }
