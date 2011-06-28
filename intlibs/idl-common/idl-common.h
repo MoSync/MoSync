@@ -41,20 +41,17 @@ struct Group {
 
 struct Typedef : public Statement {
 	string type, name;
-	//string comment;
 	int ix;
 };
 
 struct Define : public Statement {
 	string value;
-	//string comment;
 	int ix;
 };
 
 struct Constant : public Statement {
 	string type;
 	string name, value;
-	//string comment;
 	int ix;
 };
 
@@ -106,11 +103,11 @@ struct Member {
 struct Struct : public Statement {
 	string type, name;
 	vector<Member> members;
-	//string comment;
 	int ix;	//internal extension
 };
 
-struct Interface : public Statement {
+struct Interface {
+	string comment;
 	string path;	//used by extensions
 	string name;
 	vector<Typedef> typedefs;
@@ -120,7 +117,6 @@ struct Interface : public Statement {
 	vector<Struct> structs;
 	vector<Ioctl> ioctls;	//internal IDL only
 	vector<Group> groups;
-	//string comment;
 };
 
 typedef unsigned int uint32;
@@ -162,6 +158,7 @@ void ATTRIBUTE(noreturn, throwException(const string& msg));
 void runCommand(const string& cmd);
 const string& getJdkDir();
 const string& getJ2meDir();
+void flushStream(ostream&);
 
 bool isAnonStructName(const string& name);
 

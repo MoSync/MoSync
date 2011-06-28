@@ -1173,3 +1173,10 @@ uint32 calculateChecksum(const Interface& inf) {
 
 	return sum;
 }
+
+void flushStream(ostream& stream) {
+	stream.flush();
+	if(!stream.good()) {
+		throwException("Stream error!\n");
+	}
+}

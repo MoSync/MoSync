@@ -8,7 +8,7 @@ work.instance_eval do
 	@SOURCES = ["."]
 	@EXTRA_INCLUDES = ["../../intlibs"]
 	@LOCAL_LIBS = ["idl-common"]
-	@NAME = "mx-invoker"
+	@NAME = "mx-config"
 	@INSTALLDIR = mosyncdir + '/bin'
 end
 

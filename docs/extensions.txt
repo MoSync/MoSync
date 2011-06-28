@@ -26,7 +26,7 @@ Components:
 
 14:16 2011-06-10
 Invocator output:
-extension-src-dir/invoke-extension.cpp	// implements getIdlHash() and getFunctions()
+extension-src-dir/invoke-extension.cpp	// implements initializeExtension()
 extension-src-dir/cpp_mx_MyExtension.h
 Input:
 mx-invoker -i MyExtension.idl -o extension-src-dir

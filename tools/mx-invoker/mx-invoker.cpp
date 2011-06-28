@@ -9,9 +9,9 @@
 
 using namespace std;
 
-int generateInvoker(const char* input, const char* output);
-void outputInvoker(const char* output, const Interface&);
-void outputNativeHeader(const char* output, const Interface&);
+static int generateInvoker(const char* input, const char* output);
+static void outputInvoker(const char* output, const Interface&);
+static void outputNativeHeader(const char* output, const Interface&);
 
 int main(int argc, const char** argv) {
 	const char* input = NULL;
@@ -46,7 +46,7 @@ int main(int argc, const char** argv) {
 	}
 }
 
-int generateInvoker(const char* input, const char* output) {
+static int generateInvoker(const char* input, const char* output) {
 	vector<string> dummy;
 	try {
 		Interface inf = parseInterface(dummy, input);
@@ -59,7 +59,7 @@ int generateInvoker(const char* input, const char* output) {
 	return 0;
 }
 
-void outputInvoker(const char* output, const Interface& inf) {
+static void outputInvoker(const char* output, const Interface& inf) {
 	ofstream stream((string(output)+"/invoke-extension.cpp").c_str());
 	stream <<
 		"#include \"extensionCommon.h\"\t//found in /mosync/ext-include/\n"
@@ -86,13 +86,14 @@ void outputInvoker(const char* output, const Interface& inf) {
 		"\tgRegs = cd->regs;\n"
 		"\tgMemDs = cd->memDs;\n"
 		"}\n";
+	flushStream(stream);
 }
 
 void streamInvokePrefix(ostream& stream, const Function& f) {
 	stream << "static void invoke_"<<f.name<<"() ";
 }
 
-void outputNativeHeader(const char* output, const Interface& inf) {
+static void outputNativeHeader(const char* output, const Interface& inf) {
 	ofstream stream((string(output)+"/cpp_mx_"+inf.name+".h").c_str());
 	stream << "#ifndef CPP_MX_"<<inf.name<<"\n";
 	stream << "#define CPP_MX_"<<inf.name<<"\n";
@@ -105,4 +106,5 @@ void outputNativeHeader(const char* output, const Interface& inf) {
 	streamHeaderFunctions(stream, inf, true);
 	stream << "\n";
 	stream << "#endif\t//CPP_MX_"<<inf.name<<"\n";
+	flushStream(stream);
 }

@@ -44,6 +44,7 @@ EXAM_DIRS = ["tests/unitTest", "examples"]
 TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/Bundle",
 	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack",
 	"tools/mx-invoker",
+	"tools/mx-config",
 	]
 
 MAIN_DIRS = BASE_DIRS + TOOL_DIRS + PIPE_DIRS
