@@ -336,7 +336,97 @@ namespace Base {
 		}
 		return len;
 	}
-	
+    
+    struct FontInfo{
+        NSString *name;
+        NSInteger size;
+        UIFont *uiFontObject;
+        CGFontRef cgFontObject;
+    };
+    
+    static std::vector<FontInfo*> sFontList;
+    
+    const int FONT_DEFAULT_AMOUNT=15;
+    NSString *gDefaultFontNames[FONT_DEFAULT_AMOUNT];
+    BOOL gDefaultFontNamesInitialized=0;
+    const int FONT_STYLE_SHIFT=2;
+    
+    
+    void initDefaultFontNames(){
+        int shiftedNormal=FONT_STYLE_NORMAL<<FONT_STYLE_SHIFT;
+        int shiftedBold=FONT_STYLE_BOLD<<FONT_STYLE_SHIFT;
+        int shiftedItalic=FONT_STYLE_ITALIC<<FONT_STYLE_SHIFT;
+        
+        gDefaultFontNames[FONT_TYPE_SERIF|shiftedNormal]=@"TimesNewRomanPSMT";
+        gDefaultFontNames[FONT_TYPE_SERIF|shiftedBold]=@"TimesNewRomanPS-BoldMT";
+        gDefaultFontNames[FONT_TYPE_SERIF|shiftedItalic]=@"TimesNewRomanPS-ItalicMT";
+        gDefaultFontNames[FONT_TYPE_SERIF|shiftedBold|shiftedItalic]=@"TimesNewRomanPS-BoldItalicMT";
+        gDefaultFontNames[FONT_TYPE_SANS_SERIF|shiftedNormal]=@"Helvetica";
+        gDefaultFontNames[FONT_TYPE_SANS_SERIF|shiftedBold]=@"Helvetica-Bold";
+        gDefaultFontNames[FONT_TYPE_SANS_SERIF|shiftedItalic]=@"Helvetica-Oblique";
+        gDefaultFontNames[FONT_TYPE_SANS_SERIF|shiftedBold|shiftedItalic]=@"Helvetica-BoldOblique";
+        gDefaultFontNames[FONT_TYPE_MONOSPACE|shiftedNormal]=@"Courier";
+        gDefaultFontNames[FONT_TYPE_MONOSPACE|shiftedBold]=@"Courier-Bold";
+        gDefaultFontNames[FONT_TYPE_MONOSPACE|shiftedItalic]=@"Courier-Oblique";
+        gDefaultFontNames[FONT_TYPE_MONOSPACE|shiftedBold|shiftedItalic]=@"Courier-BoldOblique";
+        
+        printf("Enumerating fonts\n");
+        for(int i=0;i<FONT_DEFAULT_AMOUNT;i++)
+        {
+            printf("%d:%s\n",i,[gDefaultFontNames[i] cStringUsingEncoding:NSASCIIStringEncoding]);
+        }
+        
+        gDefaultFontNamesInitialized=1;
+    }
+    
+    
+    SYSCALL(MAHandle, maFontCreateDefault(int type, int style, int size)){
+        int handle=0;
+        
+        int defaultFontIndex=type|(style<<FONT_STYLE_SHIFT);
+        if(defaultFontIndex<0 or defaultFontIndex>=FONT_DEFAULT_AMOUNT)
+        {
+            return 0;
+        }
+        
+        if(!gDefaultFontNamesInitialized)
+        {
+            initDefaultFontNames();
+        }
+        
+        
+        
+        FontInfo *newFontInfo=new FontInfo;
+        newFontInfo->name=gDefaultFontNames[defaultFontIndex];
+        newFontInfo->size=size;
+        newFontInfo->uiFontObject=NULL;
+        newFontInfo->cgFontObject=NULL;
+        
+        sFontList.push_back(newFontInfo);
+        handle=sFontList.size();
+        
+        
+        return handle;
+    }
+    
+    FontInfo *gCurrentFont;
+    
+    SYSCALL(void, maFontSetCurrent(MAHandle font)){
+        font=font-1;
+        if(font<0||font>=sFontList.size()||!sFontList[font])
+        {
+            printf("wrong MAHandle");
+            return;
+        }
+        
+        gCurrentFont=sFontList[font];
+                
+        
+        CGContextSelectFont(gDrawTarget->context,[gCurrentFont->name cStringUsingEncoding:NSASCIIStringEncoding],(CGFloat) gCurrentFont->size, kCGEncodingMacRoman);
+        
+        
+    }
+            
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);		
 		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
@@ -364,8 +454,10 @@ namespace Base {
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
 		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);	
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
-		CGContextSetTextPosition (gDrawTarget->context, 0, 0);		
+		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
+		CGContextSetAllowsAntialiasing (gDrawTarget->context, true);
 		CGContextShowTextAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, str, strlen(str));
+        CGContextSetAllowsAntialiasing (gDrawTarget->context, false);
 	}
 
 	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
@@ -977,6 +1069,8 @@ namespace Base {
 		maIOCtl_syscall_case(maFileCreate);
 		maIOCtl_syscall_case(maFileDelete);
 		maIOCtl_syscall_case(maFileSize);
+        maIOCtl_case(maFontCreateDefault);
+        maIOCtl_case(maFontSetCurrent);
 		maIOCtl_case(maTextBox);		
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);			
