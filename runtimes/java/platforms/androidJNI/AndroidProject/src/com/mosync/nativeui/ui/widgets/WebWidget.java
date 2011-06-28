@@ -50,6 +50,15 @@ public class WebWidget extends Widget
 		{
 			m_newUrl = value;
 		}
+		else if( property.equals( "html" ) )
+		{
+			webView.loadDataWithBaseURL(
+				null, 
+				value, 
+				"text/html", 
+				"utf-8",
+				null);
+		}
 		
 		return true;
 	}
