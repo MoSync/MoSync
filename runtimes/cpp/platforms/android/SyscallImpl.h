@@ -22,6 +22,7 @@ private:
 	Image* loadSprite(void* surface, ushort left, ushort top, ushort width, ushort height, ushort cx, ushort cy);
 	void loadUBinary(int resourceIndex, int offset, int size);
 	
+public:
 	JNIEnv* getJNIEnvironment();
 	jobject getJNIThis();
 	

@@ -53,7 +53,13 @@ static jboolean nativeInitRuntime(JNIEnv* env, jobject jthis)
 /**
 * /return The newly created Data Section as a Direct ByteBuffer object
 */
-static jboolean nativeLoad(JNIEnv* env, jobject jthis, jobject program, jlong programOffset, jobject resource, jlong resourceOffset)
+static jboolean nativeLoad(
+	JNIEnv* env, 
+	jobject jthis, 
+	jobject program, 
+	jlong programOffset, 
+	jobject resource, 
+	jlong resourceOffset)
 {
 	SYSLOG("load program and resource");
 
@@ -214,13 +220,9 @@ static void nativeRun(JNIEnv* env, jobject jthis)
 			}
 			
 			__android_log_write(ANDROID_LOG_INFO,"JNI","Program is reloading! 4");
-			
 		}
-	
 	}
-	
 }
-
 
 /* 
 // This is how you trap exeptions from the Java side.
@@ -364,20 +366,54 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	Base::gSyscall->postEvent(event);
 }
 
+/**
+ * TODO: This function has a fix for the problem of accessing JNIEnv on the wrong thread.
+ * Use the JavaVM object to get the current thread. Requires lots of code rewrite.
+ * Pointers:
+ * http://www.netmite.com/android/mydroid/1.6/dalvik/docs/jni-tips.html
+ * http://www.milk.com/kodebase/dalvik-docs-mirror/docs/jni-tips.html (same as above?)
+ * http://books.google.se/books?id=8M3F_sSSvWkC&pg=PA103&lpg=PA103&dq=JavaVM+obtain+the+JNIEnv+pointer&source=bl&ots=QlZ8PhF_dl&sig=9P_s_GGaN6jmWHkwokMvPAOadtQ&hl=sv&ei=kPAJToLnDsjPsga7kMjTDg&sa=X&oi=book_result&ct=result&resnum=4&ved=0CD4Q6AEwAw#v=onepage&q=JavaVM%20obtain%20the%20JNIEnv%20pointer&f=false
+ * http://www.scribd.com/doc/57157456/1430226471#ad_unit=Doc_Sideboard_MediumRectangle_BTF_300x250&url=http%3A//www.scribd.com/doc/57157456/1430226471&attributes=QuantSegs%3DD%26IABParent%3DTechnology%2520%2526%2520Computing%26Extension%3Dpdf%26AdLayout%3D-1472436212%26DocUser%3D79236763%26IABChild%3DJava%252CShareware/Freeware%252C3-D%2520Graphics%252CAntivirus%2520Software%26Document%3D57157456%26FourGen%3DTrue&skip=54
+ */
 static int nativeCreateBinaryResource( JNIEnv* env, jobject jthis, int resourceIndex, int size )
 {
-	return Base::gSyscall->loadBinaryStore(resourceIndex, size);
+	JNIEnv* prevJNIEnv = Base::gSyscall->getJNIEnvironment();
+	jobject prevJThis = Base::gSyscall->getJNIThis();
+	
+	Base::gSyscall->setJNIEnvironment(env, jthis);
+	
+	int result = Base::gSyscall->loadBinaryStore(resourceIndex, size);
+	
+	Base::gSyscall->setJNIEnvironment(prevJNIEnv, prevJThis);
+	
+	return result;
 }
 
+/**
+ * TODO: This function also has the JNIEnv fix.
+ */
 static int nativeCreatePlaceholder( JNIEnv* env, jobject jthis )
 {
-	return maCreatePlaceholder();
+	JNIEnv* prevJNIEnv = Base::gSyscall->getJNIEnvironment();
+	jobject prevJThis = Base::gSyscall->getJNIThis();
+	
+	Base::gSyscall->setJNIEnvironment(env, jthis);
+	
+	int result = maCreatePlaceholder();
+	
+	Base::gSyscall->setJNIEnvironment(prevJNIEnv, prevJThis);
+	
+	return result;
 }
 
 /**
 * @brief jniRegisterNativeMethods
 */
-int jniRegisterNativeMethods( JNIEnv* env, const char* className, const JNINativeMethod* gMethods, int numMethods )
+int jniRegisterNativeMethods(
+	JNIEnv* env, 
+	const char* className, 
+	const JNINativeMethod* gMethods, 
+	int numMethods)
 {
 	jclass clazz;
 

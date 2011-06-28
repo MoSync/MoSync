@@ -52,49 +52,39 @@ public class WebViewFactory implements AbstractViewFactory
 		public MoSyncWebView(Context context)
 		{
 			super(context);
-
-			// Make the web view gaining focus on touch events.
-			// See Android Issue: 7189
-			// http://code.google.com/p/android/issues/detail?id=7189
-			this.setOnTouchListener(new View.OnTouchListener() 
-			{ 
-				@Override
-				public boolean onTouch(View view, MotionEvent event) 
-				{
-					switch (event.getAction()) 
-					{
-						// On touch down and touch up events we give
-						// focus to the web view.
-						case MotionEvent.ACTION_DOWN: 
-						case MotionEvent.ACTION_UP: 
-							if (!view.hasFocus()) 
-							{ 
-								view.requestFocus(); 
-							}
-							break; 
-					}
-
-					// Indicate that we have not handled the event to
-					// enable further event processing.
-					return false; 
-				}
-			});
 		}
-		// End of class MoSyncWebView.
 
 		/**
-		 * TODO: Perhaps this method is not needed.
-		 * 
-		 * This method is needed to make the WebView (this view) gain
-		 * focus on touch events. See Android Issue: 7189
+		 * Make the web view gaining focus on touch events.
+		 * See Android Issue: 7189
 		 * http://code.google.com/p/android/issues/detail?id=7189
 		 */
 		@Override
-		public boolean onCheckIsTextEditor() 
+		public boolean onTouchEvent(MotionEvent event)
 		{
-			return true; 
+			// On touch down and touch up events we give
+			// focus to the web view.
+			if (event.getAction() == MotionEvent.ACTION_DOWN ||
+				event.getAction() == MotionEvent.ACTION_UP)
+			{
+				if (!this.hasFocus()) 
+				{ 
+					this.requestFocus(); 
+				}
+			}
+
+			// Continue with default event processing.
+			return super.onTouchEvent(event);
 		}
+
+		// Note: Some advise on the web may say that onCheckIsTextEditor 
+		// needs to be implemented to fix Android Issue: 7189
+		// For example this issue:
+		// http://code.google.com/p/android/issues/detail?id=7189
+		// But this solution causes a crash on HTC Flyer.
+		// Do NOT override onCheckIsTextEditor for now!
 	}
+	// End of class MoSyncWebView.
 	
 	/**
 	 * An extended web client that hooks loading of web pages and
@@ -148,7 +138,6 @@ public class WebViewFactory implements AbstractViewFactory
 					MoSyncThread.getInstance().createDataObject(
 						messageString.getBytes());
 				
-
 				// Post the MAW_EVENT_WEB_VIEW_URL_CHANGED message.
 				EventQueue.getDefault().postWidgetEvent(
 					IX_WIDGET.MAW_EVENT_CUSTOM_MESSAGE, 

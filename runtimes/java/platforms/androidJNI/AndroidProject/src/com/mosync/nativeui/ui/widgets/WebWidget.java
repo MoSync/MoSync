@@ -3,6 +3,7 @@ package com.mosync.nativeui.ui.widgets;
 import android.webkit.WebView;
 
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -58,6 +59,11 @@ public class WebWidget extends Widget
 				"text/html", 
 				"utf-8",
 				null);
+		}
+		else if( property.equals( "enableZoom" ) )
+		{
+			boolean enable = BooleanConverter.convert( value );
+			webView.getSettings().setBuiltInZoomControls(enable);
 		}
 		
 		return true;
