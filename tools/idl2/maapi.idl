@@ -3043,7 +3043,7 @@ group WidgetAPI "Widget API" {
 			int tabIndex;
 
 			/**
-			* @brief The data handle of the #MAW_CUSTOM_MESSAGE event.
+			* @brief The data handle of the #MAW_EVENT_CUSTOM_MESSAGE event.
 			*/
 			int messageDataHandle;
 			
