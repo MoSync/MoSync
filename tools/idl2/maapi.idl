@@ -2814,6 +2814,7 @@ interface MAAPI {
 			ADDR_POSTALCODE = 5;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country name.
 			ADDR_COUNTRY = 6;
+
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Family name.
 			NAME_FAMILY = 0;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Given name.
@@ -2824,6 +2825,7 @@ interface MAAPI {
 			NAME_PREFIX = 3;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
 			NAME_SUFFIX = 4;
+
 			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
 			CLASS_CONFIDENTIAL = 200;
 			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
@@ -2919,7 +2921,6 @@ interface MAAPI {
 		/**
 		* \brief Arguments for PIM functions.
 		*/		
-		
 		struct MA_PIM_ARGS {
 			/// Opened by maPimListNext().
 			MAHandle item;
@@ -2930,6 +2931,7 @@ interface MAAPI {
 			/// The size of the buffer, in bytes.
 			int bufSize;
 		}
+
 		/**
 		* Copies the specified value from a field and item to \a args.buf.
 		* \param args Common arguments.
