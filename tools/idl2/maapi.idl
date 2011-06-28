@@ -1619,8 +1619,36 @@ interface MAAPI {
 		LABEL = 9;
 		FLUX = 127;
 	}
+
+		
 #endif	//IX_RESOURCE_TYPES
 
+		constset int FONT_TYPE_{
+			SERIF = 0;
+			SANS_SERIF = 1;
+			MONOSPACE = 2;
+		}
+
+		constset int FONT_STYLE_{
+			NORMAL = 0;
+			BOLD = 1;
+			ITALIC = 2;
+		}
+		/**
+		* Returns a handle to one of the default fonts of the device, in the style and size you specify
+		* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE]
+		* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC]
+		* \param 'size' The size of the font
+		*/
+		MAHandle maFontCreateDefault(in int type, in int style, in int size);
+
+		/**
+		* Sets the font to be used with maDrawText and maDrawTextW
+		* \param 'font' an MAHandle for a font object
+		*/
+		void maFontSetCurrent(in MAHandle font);
+
+		
 		/**
 		 * Sends the current call stack to the report pipe. Returns 0 if succeeded.
 		 */
