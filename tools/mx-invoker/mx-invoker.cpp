@@ -66,7 +66,7 @@ static void outputInvoker(const char* output, const Interface& inf) {
 		"#include \"invoke-extension.h\"\t//found in /mosync/ext-include/\n"
 		"#include \"cpp_mx_"<<inf.name<<".h\"\n"
 		"\n";
-	streamInvokeSyscall(stream, inf, false);
+	streamInvokeSyscall(stream, inf, false, 1);
 	stream << "\n"
 		"static VoidFunction sFunctions[] = {\n";
 	for(size_t i=0; i<inf.functions.size(); i++) {
@@ -78,6 +78,7 @@ static void outputInvoker(const char* output, const Interface& inf) {
 		"int* gRegs;\n"
 		"void* gMemDs;\n"
 		"\n"
+		"extern \"C\"\n"
 		"void DLLEXPORT initializeExtension(ExtensionData* ed, const CoreData* cd) {\n"
 		"\ted->nFunctions = sizeof(sFunctions) / sizeof(*sFunctions);\n"
 		"\ted->functions = sFunctions;\n"

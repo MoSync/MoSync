@@ -1,5 +1,8 @@
-ConfFile := NumberOfFunctions \n (Dll*)
+* Config file must have Unix line endings.
 
+ConfFile := NumberOfExtensions \n NumberOfFunctions \n (Dll*)
+
+NumberOfExtensions := <Ascii unsigned integer>
 NumberOfFunctions := <Ascii unsigned integer>
 
 Dll := FileName \n IdlHash \n

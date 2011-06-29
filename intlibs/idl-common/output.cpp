@@ -901,13 +901,13 @@ void streamCppDefs(ostream& stream, const Interface& inf, int ix) {
 	streamStructs(stream, inf, ix, true);
 }
 
-void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool java) {
+void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool java, int argOffset) {
 	for(size_t i=0; i<maapi.functions.size(); i++) {
 		const Function& f(maapi.functions[i]);
 		streamInvokePrefix(stream, f);
 		stream << "{\n"
 		"\tLOGSC(\"\\t" << f.name << "(\");\n";
-		int ireg = 0;
+		int ireg = argOffset;
 		int stack_ireg = 0;
 		for(size_t j=0; j<f.args.size(); j++) {
 			const Argument& a(f.args[j]);

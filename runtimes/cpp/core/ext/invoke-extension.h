@@ -11,6 +11,7 @@
 #define CALL_SYSCALL(func) func
 
 #define DLLEXPORT __declspec(dllexport)
+extern "C"
 void DLLEXPORT initializeExtension(ExtensionData* ed, const CoreData* cd);
 
 // requirements for syscall_arguments.h

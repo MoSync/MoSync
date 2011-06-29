@@ -126,7 +126,6 @@ copy $(TargetPath)  $(MOSYNCDIR)\bin\ /Y
     <ClInclude Include="..\..\..\core\extensions.h" />
     <ClInclude Include="..\..\..\core\GdbCommon.h" />
     <ClInclude Include="..\..\..\core\GdbStub.h" />
-    <ClInclude Include="..\..\..\core\invoke-extension.h" />
     <ClInclude Include="..\..\..\core\invoke_syscall_cpp.h" />
     <ClInclude Include="..\..\..\core\sld.h" />
     <ClInclude Include="..\..\..\..\..\intlibs\helpers\intutil.h" />

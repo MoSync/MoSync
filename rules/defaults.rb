@@ -87,5 +87,10 @@ def set_defaults
 	
 	# String, path to a directory. If set, the Work's target will be copied there.
 	default(:INSTALLDIR, nil)
+	
+	# Array of Arrays of Strings, list of extensions to use.
+	# Each sub-array must contain two strings: [path to idl file, name of extension].
+	# Only used by PipeExeWork.
+	default(:EXTENSIONS, nil)
 end
 end

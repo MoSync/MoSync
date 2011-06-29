@@ -76,7 +76,8 @@ static int generateConfig(const char* output, vector<ExtensionSpec>& vext) {
 }
 
 static void outputConfig(const char* output, const vector<ExtensionSpec>& vext) {
-	ofstream stream((string(output)+"/mxConfig.txt").c_str());
+	ofstream stream((string(output)+"/mxConfig.txt").c_str(), ios::binary);
+	stream << vext.size() << "\n";
 	size_t functionCount = 0;
 	for(size_t i=0; i<vext.size(); i++) {
 		functionCount += vext[i].inf->functions.size();

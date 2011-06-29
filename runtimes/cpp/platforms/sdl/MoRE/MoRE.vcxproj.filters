@@ -63,9 +63,6 @@
     <ClInclude Include="..\..\..\core\extensions.h">
       <Filter>core</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\core\invoke-extension.h">
-      <Filter>core</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="..\sdl.rc" />

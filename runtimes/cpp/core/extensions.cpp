@@ -3,6 +3,8 @@
 #include "FileStream.h"
 #include "base_errors.h"
 #include "../core/Core.h"
+#include "../core/CoreCommon.h"
+#include "helpers/maapi_defs.h"
 
 using namespace Base;
 using namespace MoSyncError;
@@ -29,6 +31,8 @@ typedef void (*InitializeExtension)(ExtensionData*, const CoreData*);
 
 static VoidFunction* sFunctions;
 static uint snFunctions;
+static Dll* sDlls;
+static uint snDlls;
 
 static int readIntLine(char*& pos, const char* format) {
 	int len, result;
@@ -63,11 +67,19 @@ void loadExtensions(const char* extConfFileName) {
 	char* end = buf+len;
 	*end = 0;
 	char* pos = buf;
+
+	// load NumberOfExtensions
+	snDlls = readIntLine(pos, "%u%n");
+	sDlls = new Dll[snDlls];
+	EXT_ASSERT(sDlls);
+
 	// load NumberOfFunctions
-	snFunctions = readIntLine(pos, "%i%n");
+	snFunctions = readIntLine(pos, "%u%n");
 	sFunctions = new VoidFunction[snFunctions];
 	EXT_ASSERT(sFunctions);
-	uint count = 0;
+
+	uint nFunc = 0;
+	uint nDll = 0;
 
 	// load each extension
 	while(pos < end) {
@@ -76,10 +88,10 @@ void loadExtensions(const char* extConfFileName) {
 		int confHash = readIntLine(pos, "%x%n");
 
 		// load the dll and get the base functions
-		Dll dll;
-		bool success = dll.open(fileName);
+		EXT_ASSERT(nDll < snDlls);
+		bool success = sDlls[nDll].open(fileName);
 		EXT_ASSERT(success);
-		InitializeExtension initializeExtension = (InitializeExtension)dll.get("initializeExtension");
+		InitializeExtension initializeExtension = (InitializeExtension)sDlls[nDll].get("initializeExtension");
 		EXT_ASSERT(initializeExtension);
 
 		ExtensionData ed;
@@ -93,15 +105,24 @@ void loadExtensions(const char* extConfFileName) {
 
 		// copy function pointers
 		EXT_ASSERT(ed.functions);
-		EXT_ASSERT(count + ed.nFunctions <= snFunctions);
-		memcpy(sFunctions + count, ed.functions, ed.nFunctions + sizeof(VoidFunction));
+		EXT_ASSERT(nFunc + ed.nFunctions <= snFunctions);
+		memcpy(sFunctions + nFunc, ed.functions, ed.nFunctions + sizeof(VoidFunction));
+		nFunc += ed.nFunctions;
+		nDll++;
 	}
-	EXT_ASSERT(count == snFunctions);
+	EXT_ASSERT(nFunc == snFunctions);
+	EXT_ASSERT(nDll == snDlls);
 	EXT_ASSERT(pos == end);
 	// and we're done.
 }
 
-extern "C" void maInvokeExtension(uint function) {
+extern "C" longlong maInvokeExtension(uint function, int a, int b, int c);
+extern "C" longlong maInvokeExtension(uint function, int a, int b, int c) {
+	function--;
 	MYASSERT(function < snFunctions, ERR_EXT_CALL);
 	sFunctions[function]();
+	MA_DV dv;
+	dv.MA_LL_HI = gCore->regs[Core::REG_r14];
+	dv.MA_LL_LO = gCore->regs[Core::REG_r15];
+	return dv.ll;
 }

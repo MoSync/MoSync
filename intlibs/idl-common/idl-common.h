@@ -148,7 +148,7 @@ void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& 
 	const string& ioctlName, int fnOffset = 0);
 void streamCppDefs(ostream& stream, const Interface& inf, int ix);
 
-void streamInvokeSyscall(ostream&, const Interface&, bool java);
+void streamInvokeSyscall(ostream&, const Interface&, bool java, int argOffset = 0);
 void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall);
 
 //implemented by the user

@@ -4,6 +4,5 @@
 #include "helpers/types.h"
 
 void loadExtensions(const char* extConfFileName);
-extern "C" void maInvokeExtension(uint function);
 
 #endif	//EXTENSIONS_H
