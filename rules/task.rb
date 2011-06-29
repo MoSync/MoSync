@@ -173,13 +173,16 @@ class Task < TaskBase
 	# calls <tt>execute</tt> to perform whatever actions are necessary.
 	# <tt>execute</tt> is not implemented in the base classes; one must create subclasses
 	# and implement it.
+	# Returns true if the Task was executed, false otherwise.
 	def invoke
 		#puts "invoke: #{self}"
 		@prerequisites.each do |p| p.invoke end
 		if(self.needed?) then
 			puts "Execute: #{self}"
 			self.execute
+			return true
 		end
+		return false
 	end
 	
 	# A Task's timestamp is used for comparison with other Tasks to determine
@@ -219,6 +222,15 @@ class FileTask < Task
 		error "Don't know how to build #{@NAME}"
 	end
 	
+	# Makes sure the execution did not fail silently.
+	def invoke
+		res = super
+		if(res)
+			error "Failed to build #{@NAME}" if(needed?(false))
+		end
+		return res
+	end
+	
 	# Is this FileTask needed?  Yes if it doesn't exist, or if its time stamp
 	# is out of date.
 	# Prints the reason the task is needed, if <tt>log</tt>.
@@ -231,14 +243,18 @@ class FileTask < Task
 		return false
 	end
 	
-	# Time stamp for file task. If the file exists, this is the file's modification time,
-	# as reported by the filesystem.
-	def timestamp
-		if File.exist?(@NAME)
-			File.mtime(@NAME)
+	def self.timestamp(file)
+		if File.exist?(file)
+			File.mtime(file)
 		else
 			LATE
 		end
+	end
+	
+	# Time stamp for file task. If the file exists, this is the file's modification time,
+	# as reported by the filesystem.
+	def timestamp
+		self.class.timestamp(@NAME)
 	end
 	
 	# Are there any prerequisites with a later time than the given time stamp?
@@ -255,6 +271,58 @@ class FileTask < Task
 	def dump(level)
 		puts (" " * level) + @NAME
 		super
+	end
+end
+
+# A Task representing multiple files.
+# If any of the files are out-of-date, the Task will be executed.
+# The first file is designated primary, and acts as the single file in the parent class, FileTask.
+class MultiFileTask < FileTask
+	def initialize(work, name, files)
+		super(work, name)
+		@files = files.collect do |f|
+			fn = f.to_s
+			# names may not contain '~', the unix home directory hack, because File.exist?() doesn't parse it.
+			if(fn.include?('~'))
+				error "Bad filename: #{fn}"
+			end
+			fn
+		end
+	end
+	
+	def invoke
+		res = super
+		if(res)
+			@files.each do |file|
+				error "Failed to build #{file}" if(out_of_date?(self.class.timestamp(file), false))
+			end
+		end
+		return res
+	end
+	
+	def needed?(log = true)
+		if(!File.exist?(@NAME))
+			puts "Because file does not exist:" if(log)
+			return true
+		end
+		@files.each do |file|
+			if(!File.exist?(file))
+				puts "Because secondary file '#{file}' does not exist:" if(log)
+				return true
+			end
+		end
+		return true if out_of_date?(timestamp, log)
+		return false
+	end
+	
+	# Returns the timestamp of the newest file.
+	def timestamp
+		time = super
+		@files.each do |file|
+			t = self.class.timestamp(file)
+			time = t if(t > time)
+		end
+		return time
 	end
 end
 

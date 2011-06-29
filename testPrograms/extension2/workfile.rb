@@ -4,9 +4,9 @@ require File.expand_path('../../rules/host.rb')
 require File.expand_path('../../rules/mosync_util.rb')
 require File.expand_path('../../rules/dll.rb')
 
-class MxInvokerTask < FileTask
-	def initialize(work, sourceIdl)
-		super(work, 'output/invoke-extension.cpp')
+class MxInvokerTask < MultiFileTask
+	def initialize(work, sourceIdl, name)
+		super(work, 'output/invoke-extension.cpp', ["output/cpp_mx_#{name}.h"])
 		@source = sourceIdl
 		@mxInvoker = mosyncdir + '/bin/mx-invoker'
 		@prerequisites << DirTask.new(work, 'output')
@@ -20,11 +20,7 @@ end
 
 work = DllWork.new
 work.instance_eval do
-	@invokerTask = MxInvokerTask.new(self, 'test.idl')
-	def setup
-		@prerequisites << @invokerTask
-		super
-	end
+	@invokerTask = MxInvokerTask.new(self, 'test.idl', 'Test')
 	@EXTRA_SOURCETASKS = [@invokerTask]
 	@SOURCES = ['.']
 	@EXTRA_INCLUDES = [mosyncdir + '/ext-include', 'output']
