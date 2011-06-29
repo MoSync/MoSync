@@ -1639,10 +1639,11 @@ interface MAAPI {
 		MAHandle maFontCreateDefault(in int type, in int style, in int size);
 
 		/**
-		* Sets the font to be used with maDrawText and maDrawTextW
+		* Sets the font to be used with maDrawText and maDrawTextW, and returns the handle
+		* to the previous font
 		* \param 'font' an MAHandle for a font object
 		*/
-		void maFontSetCurrent(in MAHandle font);
+		MAHandle maFontSetCurrent(in MAHandle font);
 
 		
 		/**
