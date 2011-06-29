@@ -41,23 +41,24 @@ namespace Base {
 		if(isOpen())
 			fclose(file);
 	}
+    
 	bool FileStream::read(void* dst, int size) {
 		TEST(isOpen());
 		int res = fread(dst, 1, size, file);
 		return res == size;
 	}
+    
 	bool FileStream::length(int& aLength) const {
 		TEST(isOpen());
 		int oldpos = ftell(file);
-
 		if(fseek(file, 0, SEEK_END) != 0) {
 			FAIL;
 		}
 		aLength = ftell(file);
-
 		fseek(file, oldpos, SEEK_SET);
 		return true;
 	}
+    
 	bool FileStream::seek(Seek::Enum mode, int offset) {
 		TEST(isOpen());
 		if(mode == Seek::Start) {
@@ -65,18 +66,23 @@ namespace Base {
 				FAIL;
 			}
 		} else if(mode == Seek::Current) {
-			//int oldpos = ftell(file);
 			if(fseek(file, offset, SEEK_CUR) != 0) {
 				FAIL;
 			}
+        } else if(mode == Seek::End) {
+			if(fseek(file, offset, SEEK_END) != 0) {
+				FAIL;
+			}            
 		} else {	//unsupported mode
 			FAIL;
 		}
 		return true;
 	}
+    
 	bool FileStream::tell(int& aPos) const {
 		TEST(isOpen());
 		aPos = ftell(file);
+        if(aPos < 0) return false;
 		return true;
 	}
 

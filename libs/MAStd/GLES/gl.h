@@ -3,18 +3,16 @@
 
 /* $Revision: 10601 $ on $Date:: 2010-03-04 22:15:27 -0800 #$ */
 
-/*
+#ifndef MAPIP
 #include <GLES/glplatform.h>
-*/
-
+#else
 #include <ma.h>
-#ifndef __cplusplus
-typedef union MA_DV MA_DV;
-typedef union MA_FV MA_FV;
-#endif
-
+#include <maapi_defs.h>
 #include <IX_OPENGL_ES.h>
 #include <IX_GL1.h>
+#define GL_API
+#define GL_APIENTRY
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -25,7 +23,8 @@ extern "C" {
  * 2.0. For details, see http://oss.sgi.com/projects/FreeB/ .
  */
 
-/*
+#ifndef MAPIP
+
 typedef void             GLvoid;
 typedef char             GLchar;
 typedef unsigned int     GLenum;
@@ -42,10 +41,11 @@ typedef khronos_float_t  GLfloat;
 typedef khronos_float_t  GLclampf;
 typedef khronos_int32_t  GLfixed;
 typedef khronos_int32_t  GLclampx;
-
 typedef khronos_intptr_t GLintptr;
 typedef khronos_ssize_t  GLsizeiptr;
-*/
+
+#endif
+
 
 /*************************************************************/
 
@@ -601,8 +601,9 @@ typedef khronos_ssize_t  GLsizeiptr;
 
 /*************************************************************/
 
+#ifndef MAPIP
+
 /* Available only in Common profile */
-/*
 GL_API void GL_APIENTRY glAlphaFunc (GLenum func, GLclampf ref);
 GL_API void GL_APIENTRY glClearColor (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
 GL_API void GL_APIENTRY glClearDepthf (GLclampf depth);
@@ -642,10 +643,8 @@ GL_API void GL_APIENTRY glTexEnvfv (GLenum target, GLenum pname, _use_type_(true
 GL_API void GL_APIENTRY glTexParameterf (GLenum target, GLenum pname, GLfloat param);
 GL_API void GL_APIENTRY glTexParameterfv (GLenum target, GLenum pname, const GLfloat *params);
 GL_API void GL_APIENTRY glTranslatef (GLfloat x, GLfloat y, GLfloat z);
-*/
 
 /* Available in both Common and Common-Lite profiles */
-/*
 GL_API void GL_APIENTRY glActiveTexture (GLenum texture);
 GL_API void GL_APIENTRY glAlphaFuncx (GLenum func, GLclampx ref);
 GL_API void GL_APIENTRY glBindBuffer (GLenum target, GLuint buffer);
@@ -752,7 +751,8 @@ GL_API void GL_APIENTRY glTexSubImage2D (GLenum target, GLint level, GLint xoffs
 GL_API void GL_APIENTRY glTranslatex (GLfixed x, GLfixed y, GLfixed z);
 GL_API void GL_APIENTRY glVertexPointer (GLint size, GLenum type, GLsizei stride, _use_type_(true, false) const GLvoid *pointer);
 GL_API void GL_APIENTRY glViewport (GLint x, GLint y, GLsizei width, GLsizei height);
-*/
+
+#endif // ifndef MAPIP
 
 /*------------------------------------------------------------------------*
  * Required OES extension functions
@@ -771,7 +771,7 @@ GL_API void GL_APIENTRY glViewport (GLint x, GLint y, GLsizei width, GLsizei hei
 /* GL_OES_point_size_array */
 #ifndef GL_OES_point_size_array
 #define GL_OES_point_size_array 1
-//GL_API void GL_APIENTRY glPointSizePointerOES (GLenum type, GLsizei stride, const GLvoid *pointer);
+GL_API void GL_APIENTRY glPointSizePointerOES (GLenum type, GLsizei stride, const GLvoid *pointer);
 #endif
 
 /* GL_OES_point_sprite */

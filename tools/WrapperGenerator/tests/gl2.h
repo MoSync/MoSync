@@ -3,7 +3,16 @@
 
 /* $Revision: 10602 $ on $Date:: 2010-03-04 22:35:34 -0800 #$ */
 
+#ifndef MAPIP
 #include <GLES2/gl2platform.h>
+#else
+#include <ma.h>
+#include <maapi_defs.h>
+#include <IX_OPENGL_ES.h>
+#include <IX_GL2.h>
+#define GL_API
+#define GL_APIENTRY
+#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -17,6 +26,8 @@ extern "C" {
 /*-------------------------------------------------------------------------
  * Data type definitions
  *-----------------------------------------------------------------------*/
+
+#ifndef MAPIP
 
 typedef void             GLvoid;
 typedef char             GLchar;
@@ -37,6 +48,8 @@ typedef khronos_int32_t  GLfixed;
 /* GL types for handling large vertex buffer objects */
 typedef khronos_intptr_t GLintptr;
 typedef khronos_ssize_t  GLsizeiptr;
+
+#endif
 
 /* OpenGL ES core versions */
 #define GL_ES_VERSION_2_0                 1
@@ -467,6 +480,8 @@ typedef khronos_ssize_t  GLsizeiptr;
 
 #define GL_INVALID_FRAMEBUFFER_OPERATION  0x0506
 
+#ifndef MAPIP
+
 /*-------------------------------------------------------------------------
  * GL core functions.
  *-----------------------------------------------------------------------*/
@@ -613,6 +628,8 @@ GL_APICALL void         GL_APIENTRY glVertexAttrib4f (GLuint indx, GLfloat x, GL
 GL_APICALL void         GL_APIENTRY glVertexAttrib4fv (GLuint indx, _use_type_(true, false) const GLfloat* values);
 GL_APICALL void         GL_APIENTRY glVertexAttribPointer (GLuint indx, GLint size, GLenum type, GLboolean normalized, GLsizei stride, _use_type_(true, false) const GLvoid* ptr);
 GL_APICALL void         GL_APIENTRY glViewport (GLint x, GLint y, GLsizei width, GLsizei height);
+
+#endif // ifndef MAPIP
 
 #ifdef __cplusplus
 }

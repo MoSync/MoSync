@@ -268,3 +268,20 @@ void glTranslatex(in GLfixed x, in GLfixed y, in GLfixed z);
 void glVertexPointer(in GLint size, in GLenum type, in GLsizei stride, in MAAddress pointer);
 void glPointSizePointerOES(in GLenum type, in GLsizei stride, in MAAddress pointer);
 #endif
+#if IX_GL_OES_FRAMEBUFFER_OBJECT
+GLboolean glIsRenderbufferOES(in GLuint renderbuffer);
+GLvoid glBindRenderbufferOES(in GLenum target, in GLuint renderbuffer);
+GLvoid glDeleteRenderbuffersOES(in GLsizei n, in GLuint* renderbuffers);
+GLvoid glGenRenderbuffersOES(in GLsizei n, out GLuint renderbuffers);
+GLvoid glRenderbufferStorageOES(in GLenum target, in GLenum internalformat, in GLsizei width, in GLsizei height);
+GLvoid glGetRenderbufferParameterivOES(in GLenum target, in GLenum pname, out GLint params);
+GLboolean glIsFramebufferOES(in GLuint framebuffer);
+GLvoid glBindFramebufferOES(in GLenum target, in GLuint framebuffer);
+GLvoid glDeleteFramebuffersOES(in GLsizei n, in GLuint* framebuffers);
+GLvoid glGenFramebuffersOES(in GLsizei n, out GLuint framebuffers);
+GLenum glCheckFramebufferStatusOES(in GLenum target);
+GLvoid glFramebufferRenderbufferOES(in GLenum target, in GLenum attachment, in GLenum renderbuffertarget, in GLuint renderbuffer);
+GLvoid glFramebufferTexture2DOES(in GLenum target, in GLenum attachment, in GLenum textarget, in GLuint texture, in GLint level);
+GLvoid glGetFramebufferAttachmentParameterivOES(in GLenum target, in GLenum attachment, in GLenum pname, out GLint params);
+GLvoid glGenerateMipmapOES(in GLenum target);
+#endif

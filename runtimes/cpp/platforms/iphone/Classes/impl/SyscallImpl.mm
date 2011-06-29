@@ -60,8 +60,10 @@ using namespace MoSyncError;
 #include <helpers/CPP_IX_OPENGL_ES.h>
 #include <helpers/CPP_IX_GL1.h>
 #include <helpers/CPP_IX_GL2.h>
+#include <helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h>
 #include <OpenGLES/ES1/gl.h>
 #include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES1/glext.h>
 #include "../../../../generated/gl.h.cpp"
 #endif
 
@@ -911,19 +913,6 @@ return 0; \
         glShaderSource(shader, count, strCopies, length);
         delete strCopies;     
     }
-
-#undef maIOCtl_glCreateShader_case
-#define maIOCtl_glCreateShader_case(func) \
-case maIOCtl_glCreateShader: \
-{ \
-GLenum _type = (GLenum)a; \
-return wrap_glCreateShader(_type); \
-} \
-  
-    GLuint wrap_glCreateShader(GLenum what) {
-        GLuint ret = glCreateShader(what);
-        return ret;
-    }
     
 	int maOpenGLInitFullscreen(int glApi) {
 		if(sOpenGLScreen != -1) return 0;
@@ -1038,7 +1027,8 @@ return wrap_glCreateShader(_type); \
 		maIOCtl_case(maFrameBufferGetInfo);
 		maIOCtl_case(maFrameBufferInit);
 		maIOCtl_case(maFrameBufferClose);				
-		maIOCtl_syscall_case(maFileOpen);
+
+        maIOCtl_syscall_case(maFileOpen);
 		maIOCtl_syscall_case(maFileWriteFromData);
 		maIOCtl_syscall_case(maFileReadToData);
 		maIOCtl_syscall_case(maFileTell);
@@ -1050,6 +1040,17 @@ return wrap_glCreateShader(_type); \
 		maIOCtl_syscall_case(maFileCreate);
 		maIOCtl_syscall_case(maFileDelete);
 		maIOCtl_syscall_case(maFileSize);
+                
+        maIOCtl_syscall_case(maFileAvailableSpace);
+        maIOCtl_syscall_case(maFileTotalSpace);
+        maIOCtl_syscall_case(maFileDate);
+        maIOCtl_syscall_case(maFileRename);
+        maIOCtl_syscall_case(maFileTruncate);
+
+        maIOCtl_syscall_case(maFileListStart);
+        maIOCtl_syscall_case(maFileListNext);
+        maIOCtl_syscall_case(maFileListClose);
+                
 		maIOCtl_case(maTextBox);		
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);			
@@ -1059,6 +1060,7 @@ return wrap_glCreateShader(_type); \
 		maIOCtl_IX_OPENGL_ES_caselist;
         maIOCtl_IX_GL1_caselist;
         maIOCtl_IX_GL2_caselist;
+        maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist;
 #endif	//SUPPORT_OPENGL_ES
 		}
 		
