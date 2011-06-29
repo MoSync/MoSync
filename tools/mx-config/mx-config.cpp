@@ -101,7 +101,10 @@ static void outputMxHeader(const char* output, const Interface& inf, int fnOffse
 		stream << inf.comment << "\n";
 	}
 
-	streamHash(stream, inf);
+	stream << "#include <ma.h>\n\n";
+
+	stream << "#define IDL_HASH_" << inf.name << " ((int)0x" << setfill('0') << setw(8) <<
+		hex << calculateChecksum(inf) << dec << ")\n\n";
 
 	stream << "#ifdef __cplusplus\n"
 		"extern \"C\" {\n"

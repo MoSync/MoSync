@@ -72,8 +72,11 @@ class MoSyncPackTask < Task
 end
 
 class PipeExeWork < PipeGccWork
-	def setup
+	def set_defaults
 		default(:TARGETDIR, '.')
+		super
+	end
+	def setup
 		set_defaults
 		@buildpath = @TARGETDIR + "/" + @BUILDDIR
 		@SLD = @buildpath + "sld.tab"
