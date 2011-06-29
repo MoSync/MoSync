@@ -65,7 +65,6 @@ extern ThreadPool gThreadPool;
 
 #define NOT_IMPLEMENTED BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED)
 
-int Surface::fontSize;
 
 namespace Base {
 
@@ -101,7 +100,44 @@ namespace Base {
 	bool exited = false;
 	CRITICAL_SECTION exitMutex;
 	
-	static CGFontRef sUnicodeFont;
+    //Holds information that can be used by the various font systems to generate their own font objects.
+    struct FontInfo{
+        CFStringRef name;       //Postscript name of the font
+        CGFloat size;           //Size of the font
+        UIFont *uiFontObject;   //Instantiated when first needed
+        CGFontRef cgFontObject; //Instantiated when first needed
+    };
+    
+    //Internal storage indexed by MAHandle-1
+    static std::vector<FontInfo*> sFontList;
+    
+    const int FONT_DEFAULT_AMOUNT=15;
+    //The array holding the default system font names
+    //Three slots are unused due to the indexing system
+    CFStringRef gDefaultFontNames[FONT_DEFAULT_AMOUNT]; 
+    
+    MAHandle gCurrentFontHandle; //Handle to the currently selected font
+    
+    
+    /* The following consts are used for the indexing system.
+     * By using bitwise OR, you can get the index for that type and style combination
+     * in gDefaultFontNames
+     */
+    const short FONT_SANS_SERIF_INDEX=0;
+    const short FONT_SERIF_INDEX=1;
+    const short FONT_MONOSPACE_INDEX=2;
+    const short FONT_NORMAL_INDEX=0;
+    const short FONT_BOLD_INDEX=4;
+    const short FONT_ITALIC_INDEX=8;
+    
+    //The style and type for the initally selected font
+    const short INITIAL_FONT_STYLE=FONT_STYLE_NORMAL;
+    const short INITIAL_FONT_TYPE=FONT_TYPE_SANS_SERIF;
+    
+    extern "C" MAHandle maFontCreateDefault(int type, int style, int size);
+    extern "C" MAHandle maFontSetCurrent(MAHandle font);
+    
+
 	
 #ifdef SUPPORT_OPENGL_ES
 	static MAHandle sOpenGLScreen = -1;
@@ -171,25 +207,39 @@ namespace Base {
 
 		InitializeCriticalSection(&exitMutex);
 		
-		Surface::fontSize = gHeight/40;
 		gBackbuffer = new Surface(gWidth, gHeight);
 		CGContextRestoreGState(gBackbuffer->context);		
 		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
 		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
 		CGContextSaveGState(gBackbuffer->context);
 		
-		// init font
-		//CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
-		CFStringRef str = CFStringCreateWithCString(NULL, "Helvetica", kCFStringEncodingUTF8);
-		sUnicodeFont = CGFontCreateWithFontName(str);
-		CFRelease(str);
+        //Construction of the default font names array
+        CFStringEncoding enc=kCFStringEncodingMacRoman;
+        
+        gDefaultFontNames[FONT_SERIF_INDEX|FONT_NORMAL_INDEX]=CFStringCreateWithCString(NULL, "TimesNewRomanPSMT",enc);
+        gDefaultFontNames[FONT_SERIF_INDEX|FONT_BOLD_INDEX]=CFStringCreateWithCString(NULL, "TimesNewRomanPS-BoldMT",enc);
+        gDefaultFontNames[FONT_SERIF_INDEX|FONT_ITALIC_INDEX]=CFStringCreateWithCString(NULL, "TimesNewRomanPS-ItalicMT",enc);
+        gDefaultFontNames[FONT_SERIF_INDEX|FONT_BOLD_INDEX|FONT_ITALIC_INDEX]=CFStringCreateWithCString(NULL, "TimesNewRomanPS-BoldItalicMT",enc);
+        gDefaultFontNames[FONT_SANS_SERIF_INDEX|FONT_NORMAL_INDEX]=CFStringCreateWithCString(NULL, "Helvetica",enc);
+        gDefaultFontNames[FONT_SANS_SERIF_INDEX|FONT_BOLD_INDEX]=CFStringCreateWithCString(NULL, "Helvetica-Bold",enc);
+        gDefaultFontNames[FONT_SANS_SERIF_INDEX|FONT_ITALIC_INDEX]=CFStringCreateWithCString(NULL, "Helvetica-Oblique",enc);
+        gDefaultFontNames[FONT_SANS_SERIF_INDEX|FONT_BOLD_INDEX|FONT_ITALIC_INDEX]=CFStringCreateWithCString(NULL, "Helvetica-BoldOblique",enc);
+        gDefaultFontNames[FONT_MONOSPACE_INDEX|FONT_NORMAL_INDEX]=CFStringCreateWithCString(NULL, "Courier",enc);
+        gDefaultFontNames[FONT_MONOSPACE_INDEX|FONT_BOLD_INDEX]=CFStringCreateWithCString(NULL, "Courier-Bold",enc);
+        gDefaultFontNames[FONT_MONOSPACE_INDEX|FONT_ITALIC_INDEX]=CFStringCreateWithCString(NULL, "Courier-Oblique",enc);
+        gDefaultFontNames[FONT_MONOSPACE_INDEX|FONT_BOLD_INDEX|FONT_ITALIC_INDEX]=CFStringCreateWithCString(NULL, "Courier-BoldOblique",enc);
 		
-		gDrawTarget = gBackbuffer;
+               
+        gDrawTarget = gBackbuffer;
+        
+        //Setting the initially selected font. gHeight/40 was used originally, is kept for backwards compatibility
+        MAHandle initFontHandle=maFontCreateDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,gHeight/40);         
+        maFontSetCurrent(initFontHandle);
 		
 		mach_timebase_info( &gTimeBase );
 		//gTimeConversion = 1e-6 * (double)machInfo.numer/(double)machInfo.denom;
 		gTimeStart = mach_absolute_time();
-		
+
 		
 		MANetworkInit();		
 		
@@ -337,94 +387,96 @@ namespace Base {
 		return len;
 	}
     
-    struct FontInfo{
-        NSString *name;
-        NSInteger size;
-        UIFont *uiFontObject;
-        CGFontRef cgFontObject;
-    };
-    
-    static std::vector<FontInfo*> sFontList;
-    
-    const int FONT_DEFAULT_AMOUNT=15;
-    NSString *gDefaultFontNames[FONT_DEFAULT_AMOUNT];
-    BOOL gDefaultFontNamesInitialized=0;
-    const int FONT_STYLE_SHIFT=2;
-    
-    
-    void initDefaultFontNames(){
-        int shiftedNormal=FONT_STYLE_NORMAL<<FONT_STYLE_SHIFT;
-        int shiftedBold=FONT_STYLE_BOLD<<FONT_STYLE_SHIFT;
-        int shiftedItalic=FONT_STYLE_ITALIC<<FONT_STYLE_SHIFT;
-        
-        gDefaultFontNames[FONT_TYPE_SERIF|shiftedNormal]=@"TimesNewRomanPSMT";
-        gDefaultFontNames[FONT_TYPE_SERIF|shiftedBold]=@"TimesNewRomanPS-BoldMT";
-        gDefaultFontNames[FONT_TYPE_SERIF|shiftedItalic]=@"TimesNewRomanPS-ItalicMT";
-        gDefaultFontNames[FONT_TYPE_SERIF|shiftedBold|shiftedItalic]=@"TimesNewRomanPS-BoldItalicMT";
-        gDefaultFontNames[FONT_TYPE_SANS_SERIF|shiftedNormal]=@"Helvetica";
-        gDefaultFontNames[FONT_TYPE_SANS_SERIF|shiftedBold]=@"Helvetica-Bold";
-        gDefaultFontNames[FONT_TYPE_SANS_SERIF|shiftedItalic]=@"Helvetica-Oblique";
-        gDefaultFontNames[FONT_TYPE_SANS_SERIF|shiftedBold|shiftedItalic]=@"Helvetica-BoldOblique";
-        gDefaultFontNames[FONT_TYPE_MONOSPACE|shiftedNormal]=@"Courier";
-        gDefaultFontNames[FONT_TYPE_MONOSPACE|shiftedBold]=@"Courier-Bold";
-        gDefaultFontNames[FONT_TYPE_MONOSPACE|shiftedItalic]=@"Courier-Oblique";
-        gDefaultFontNames[FONT_TYPE_MONOSPACE|shiftedBold|shiftedItalic]=@"Courier-BoldOblique";
-        
-        printf("Enumerating fonts\n");
-        for(int i=0;i<FONT_DEFAULT_AMOUNT;i++)
-        {
-            printf("%d:%s\n",i,[gDefaultFontNames[i] cStringUsingEncoding:NSASCIIStringEncoding]);
-        }
-        
-        gDefaultFontNamesInitialized=1;
-    }
-    
     
     SYSCALL(MAHandle, maFontCreateDefault(int type, int style, int size)){
         int handle=0;
         
-        int defaultFontIndex=type|(style<<FONT_STYLE_SHIFT);
+        int defaultFontIndex=0; //Index to gDefaultFontNames
+        
+        switch (type) {
+            case FONT_TYPE_SERIF:
+                defaultFontIndex|=FONT_SERIF_INDEX;
+                break;
+                
+            case FONT_TYPE_SANS_SERIF:
+                defaultFontIndex|=FONT_SANS_SERIF_INDEX;
+                break;
+                
+            case FONT_TYPE_MONOSPACE:
+                defaultFontIndex|=FONT_MONOSPACE_INDEX;
+                break;
+                
+            default:
+                return 0;
+                break;
+        }
+        
+        if(style & FONT_STYLE_NORMAL) defaultFontIndex|=FONT_NORMAL_INDEX;
+        if(style & FONT_STYLE_BOLD) defaultFontIndex|=FONT_BOLD_INDEX;
+        if(style & FONT_STYLE_ITALIC) defaultFontIndex|=FONT_ITALIC_INDEX;
+        
+        
         if(defaultFontIndex<0 or defaultFontIndex>=FONT_DEFAULT_AMOUNT)
         {
             return 0;
         }
         
-        if(!gDefaultFontNamesInitialized)
-        {
-            initDefaultFontNames();
-        }
-        
-        
-        
         FontInfo *newFontInfo=new FontInfo;
         newFontInfo->name=gDefaultFontNames[defaultFontIndex];
-        newFontInfo->size=size;
+        newFontInfo->size=(CGFloat)size;
         newFontInfo->uiFontObject=NULL;
         newFontInfo->cgFontObject=NULL;
         
-        sFontList.push_back(newFontInfo);
-        handle=sFontList.size();
         
+        int i;
+        for(i=0; i<sFontList.size() ; i++)
+        {
+            if(!sFontList[i])break;
+        }
+        if(i<sFontList.size())
+        {
+            sFontList[i]=newFontInfo; //Inserting at the first empty position in the array
+        }
+        else
+        {
+            sFontList.push_back(newFontInfo); //Inserting at the end of the array
+        }
+        
+        handle=i+1; //Handles start from 1
         
         return handle;
     }
     
-    FontInfo *gCurrentFont;
     
-    SYSCALL(void, maFontSetCurrent(MAHandle font)){
-        font=font-1;
-        if(font<0||font>=sFontList.size()||!sFontList[font])
+    
+    SYSCALL(MAHandle, maFontSetCurrent(MAHandle font)){
+        if(font<1||font>sFontList.size()||!sFontList[font-1])
         {
             printf("wrong MAHandle");
-            return;
+            return 0;
         }
         
-        gCurrentFont=sFontList[font];
-                
+        MAHandle prevHandle=gCurrentFontHandle;
         
-        CGContextSelectFont(gDrawTarget->context,[gCurrentFont->name cStringUsingEncoding:NSASCIIStringEncoding],(CGFloat) gCurrentFont->size, kCGEncodingMacRoman);
+        gCurrentFontHandle=font;
+        FontInfo *currentFont=sFontList[gCurrentFontHandle-1];
         
+        //Used by maDrawText
+        CGContextSelectFont(gDrawTarget->context,
+                            CFStringGetCStringPtr(currentFont->name,kCFStringEncodingMacRoman), 
+                            currentFont->size, kCGEncodingMacRoman);
         
+        return prevHandle;
+        
+    }
+    
+    //Used to instantiate the CGFont object only when needed
+    inline void initCGFont(FontInfo *fontInfo)
+    {
+        if(!fontInfo->cgFontObject)
+        {
+            fontInfo->cgFontObject =CGFontCreateWithFontName(fontInfo->name);
+        }
     }
             
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
@@ -433,22 +485,25 @@ namespace Base {
 		CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
 		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
 		int width = after.x;
-		int height = FONT_HEIGHT;
+		int height = (int)sFontList[gCurrentFontHandle-1]->size;
 		return EXTENT(width, height);
 	}
 
 	SYSCALL(MAExtent, maGetTextSizeW(const wchar* str)) {
+        FontInfo *currentFont=sFontList[gCurrentFontHandle-1];
+        initCGFont(currentFont);
 		int numGlyphs = wcharLength(str);
 		if(numGlyphs==0) return EXTENT(0, 0);		
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
-		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
+		CMFontGetGlyphsForUnichars(currentFont->cgFontObject, (const UniChar*)str, glyphs, numGlyphs);
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
 		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
 		CGContextShowGlyphsAtPoint(gDrawTarget->context, 0, 0, glyphs, numGlyphs); 
 		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
 		int width = after.x;
+        int height = (int)sFontList[gCurrentFontHandle-1]->size;
 		delete glyphs;	
-		return EXTENT(width, FONT_HEIGHT);
+		return EXTENT(width, height);
 	}
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
@@ -456,19 +511,23 @@ namespace Base {
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
 		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
 		CGContextSetAllowsAntialiasing (gDrawTarget->context, true);
-		CGContextShowTextAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, str, strlen(str));
+		CGContextShowTextAtPoint(gDrawTarget->context, left, top+sFontList[gCurrentFontHandle-1]->size, str, strlen(str));
         CGContextSetAllowsAntialiasing (gDrawTarget->context, false);
 	}
 
 	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
+        FontInfo *currentFont=sFontList[gCurrentFontHandle-1];
+        initCGFont(currentFont);
 		int numGlyphs = wcharLength(str);		
 		if(numGlyphs==0) return;
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
-		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
+		CMFontGetGlyphsForUnichars(currentFont->cgFontObject, (const UniChar*)str, glyphs, numGlyphs);
 		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);	
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
-		CGContextSetTextPosition (gDrawTarget->context, 0, 0);		
-		CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, glyphs, numGlyphs);		
+		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
+        CGContextSetAllowsAntialiasing (gDrawTarget->context, true);
+		CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+sFontList[gCurrentFontHandle-1]->size, glyphs, numGlyphs);
+        CGContextSetAllowsAntialiasing (gDrawTarget->context, false);
 		delete glyphs;
 	}
 
