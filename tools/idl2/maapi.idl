@@ -4229,7 +4229,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue Any valid HTML data.
 		*
-		* @set
+		* @setonly
 		*
 		* @par Example
 		* \code
@@ -4256,6 +4256,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/		
 		NEW_URL = "newurl";
+		
+		/**
+		* @brief Enable or disable the zoom controls of the web view.
+		*
+		* @validvalue "true" to enable, "false" to disable.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_ENABLE_ZOOM, "true");
+		* \endcode
+		*/		
+		MAW_WEB_VIEW_ENABLE_ZOOM = "enableZoom";
 	}
 	
 	} // end of WidgetWebViewProperties
