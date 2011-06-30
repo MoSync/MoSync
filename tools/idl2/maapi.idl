@@ -3042,22 +3042,29 @@ group WidgetAPI "Widget API" {
 			*/
 			int tabIndex;
 
+			/**
+			* @brief The data handle of the #MAW_EVENT_CUSTOM_MESSAGE event.
+			*/
+			int messageDataHandle;
+			
+			/**
+			* @brief TODO: Document when this structure is used.
+			*/
 			struct {
-					/**
-					* @brief The handle to the screen that was popped from the stack screen.
-					*/
-					MAWidgetHandle fromScreen;
-					
-					/**
-					* @brief The handle to the screen that will be shown. If there is no screen
-					* to pop to, this will be the same as widgetHandle.
-					*/
-					MAWidgetHandle toScreen;
+				/**
+				* @brief The handle to the screen that was popped from the stack screen.
+				*/
+				MAWidgetHandle fromScreen;
+				
+				/**
+				* @brief The handle to the screen that will be shown. If there is no screen
+				* to pop to, this will be the same as widgetHandle.
+				*/
+				MAWidgetHandle toScreen;
 			} stackScreenPopInfo;
-	
 		}
 	}
-
+	
 	/**
 	* The available widget event types.
 	*/
@@ -3075,6 +3082,9 @@ group WidgetAPI "Widget API" {
 
 		/** 
 		* @brief A WebView widget has finished loading data. 
+		*
+		* This event is intended to be used also for other widgets
+		* that load data.
 		*/
 		CONTENT_LOADED = 4;
 
@@ -3107,7 +3117,27 @@ group WidgetAPI "Widget API" {
 		 * @brief Sent when a screen has been popped from a stack screen.
 		 */
 		STACK_SCREEN_POPPED = 10;
+		
+		/** 
+		* @brief A widget has sent a custom message.
+		*
+		* The field MAWidgetEventData.messageDataHandle contains
+		* a handle to the message data.
+		*
+		* Use syscall maGetDataSize to get the size of the data 
+		* and maReadData to access the data. 
+		*
+		* Note that when you get this message you have ownership 
+		* of the data and you have the responsibility to deallocate
+		* it using maDestroyObject.
+		*
+		* This event is curently used by the WebView widget, but is
+		* intended to be used also for other widgets that need to
+		* send potentially large custom messages.
+		*/
+		CUSTOM_MESSAGE = 11;
 	}
+	
 	} // end of WidgetEventTypes
 
 	} // end of WidgetEvents
@@ -4195,6 +4225,20 @@ group WidgetAPI "Widget API" {
 		URL = "url";
 
 		/**
+		* @brief Set the currently displayed HTML data in the web view.
+		*
+		* @validvalue Any valid HTML data.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HTML, "<h1>Hello World</h1>");
+		* \endcode
+		*/		
+		HTML = "html";
+		
+		/**
 		* @brief Property to get a new url whenever the webview changes the url. See \ref #MAW_EVENT_WEB_VIEW_URL_CHANGED.
 		*
 		* @validvalue Any valid URL.
@@ -4212,7 +4256,22 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/		
 		NEW_URL = "newurl";
+		
+		/**
+		* @brief Enable or disable the zoom controls of the web view.
+		*
+		* @validvalue "true" to enable, "false" to disable.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_ENABLE_ZOOM, "true");
+		* \endcode
+		*/		
+		MAW_WEB_VIEW_ENABLE_ZOOM = "enableZoom";
 	}
+	
 	} // end of WidgetWebViewProperties
 
 	} // end of WidgetProperties	
@@ -4375,7 +4434,9 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
-	} // end of group WidgetAPIFunctions
+		
+	} 
+	// end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI
 #endif //IX_WIDGET
