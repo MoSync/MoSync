@@ -21,6 +21,8 @@
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
+//#include <base/MemStream.h>
+
 
 @implementation WebViewWidget
 
@@ -29,6 +31,7 @@
 	view = webView;
 	webView.delegate = self;
 	newurl = @"";
+    hookPattern = @"";
 	return [super init];	
 }
 
@@ -38,6 +41,12 @@
 		NSURL *url = [NSURL URLWithString:value];
 		NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
 		[webView loadRequest:requestObj];
+    } else if([key isEqualToString:@MAW_WEB_VIEW_URL_HOOK_PATTERN]) {
+		[hookPattern release];
+        hookPattern = [value retain];
+    } else if([key isEqualToString:@MAW_WEB_VIEW_HTML]) {
+		UIWebView* webView = (UIWebView*)view;
+        [webView loadHTMLString:value baseURL:NULL];
 	} else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
@@ -58,7 +67,36 @@
 }
 
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-	newurl = [[NSString stringWithString:request.URL.absoluteString] retain]; // TODO: do have to do this (retain)??
+	if(request.URL.absoluteString==NULL)
+    {
+        return NO;
+    }
+    NSString *url=[NSString stringWithString:request.URL.absoluteString];
+    printf("Native printf: %s\n",[url cStringUsingEncoding:NSASCIIStringEncoding]);
+    if([self compare:url withRegularExpression:hookPattern])
+    {
+        
+        MAHandle urlHandle=(MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
+        int size=(int)[url lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
+        Base::MemStream* ms = new Base::MemStream(size);
+        Base::gSyscall->resources.add_RT_BINARY(urlHandle, ms);
+        ms->seek(Base::Seek::Start, 0);
+        ms->write([url cStringUsingEncoding:NSASCIIStringEncoding], size);
+        
+        MAEvent event;
+        event.type = EVENT_TYPE_WIDGET;
+        MAWidgetEventData *eventData = new MAWidgetEventData;
+        eventData->eventType = MAW_EVENT_CUSTOM_MESSAGE;
+        eventData->widgetHandle = handle;
+        eventData->messageDataHandle = urlHandle;
+        event.data = eventData;
+        Base::gEventQueue.put(event);
+                
+        return YES;
+    }
+    
+    //Deprecated
+    /*newurl = [[NSString stringWithString:request.URL.absoluteString] retain]; // TODO: do have to do this (retain)??
 	
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
@@ -66,8 +104,32 @@
 	eventData->eventType = MAW_EVENT_WEB_VIEW_URL_CHANGED;
 	eventData->widgetHandle = handle;
 	event.data = eventData;
-	Base::gEventQueue.put(event);
-	return YES; // MoSync user have to manually start a new request..
+	Base::gEventQueue.put(event);*/
+	return YES; 
+}
+
+- (BOOL)compare: (NSString*)text withRegularExpression: (NSString*)expression;{
+    
+    if([expression isEqualToString:@".*"] or [text isEqualToString:expression])
+    {
+        return YES;
+    }
+    
+    return NO;
 }
 
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
