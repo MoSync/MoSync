@@ -29,6 +29,7 @@ MA 02110-1301, USA.
 #include <mavsprintf.h>
 #include <MAUtil/String.h>
 #include <IX_WIDGET.h>
+#include "MAHeaders.h"
 
 // Test that JavaScript runs in the browser.
 #define HTML1 " \
@@ -37,12 +38,6 @@ MA 02110-1301, USA.
     </body></html>"
 
 // Call MoSync via JavsScript from a clickable link.
-#define HTML2 " \
-	<html><body> \
-	<a href=\"javascript:document.location = 'mosync://Notify/HelloWorld'\">Click Me</a></br> \
-    </body></html>"
-
-// Another way to specify the click action.
 #define HTML3 " \
 	<html><body> \
 	<a href=\"#\" onclick=\"document.location = 'mosync://Notify/HelloWorld'\">Click Me</a></br> \
@@ -119,7 +114,8 @@ MA 02110-1301, USA.
     </body> \
     </html>"
 
-// Test performance of JS background color change, if better than via MoSync roundtrip.
+// Test subjective performance of JS background color change,
+// if better than via MoSync roundtrip.
 #define HTML6 " \
 	<html> \
 	<head> \
@@ -158,14 +154,63 @@ MA 02110-1301, USA.
     </body> \
     </html>"
 
+// Script to set the background color of the web page.
 #define BGCOLOR_SCRIPT "javascript: \
 	document.getElementById(\"ColorMessage\").innerHTML = '%s is a beautiful color.'; \
-	document.bgColor='%s'; \
-	"
+	document.bgColor='%s';"
 
+// Script to display a text on the web page.
 #define MESSAGE_SCRIPT "javascript: \
-	document.getElementById(\"DataMessage\").innerHTML = '%s'; \
-	"
+	document.getElementById(\"DataMessage\").innerHTML = '%s';"
+
+/**
+ * Helper function that reads a text string from data handle.
+ */
+MAUtil::String UtilGetTextFromData(MAHandle data)
+{
+	// Get size of data.
+    int size = maGetDataSize(data);
+
+    // Allocate space for text plus zero termination character.
+    char* text = (char*) malloc(size + 1);
+    if (NULL == text)
+    {
+    	return "";
+    }
+
+    // Read data.
+    maReadData(data, text, 0, size);
+
+    // Zero terminate string.
+    text[size] = 0;
+
+    MAUtil::String textString = text;
+
+    free(text);
+
+    return textString;
+}
+
+/**
+ * Helper function that writes a text string to a file.
+ */
+void UtilWriteText(
+	const MAUtil::String& fileName,
+	const MAUtil::String& text)
+{
+	MAUtil::String filePath =
+		MAUtil::String("/data/data/com.mosync.webviewtestapp/files/")
+		+ fileName;
+	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ_WRITE);
+	if (! maFileExists(file))
+	{
+		maFileCreate(file);
+	}
+
+	maFileWrite(file, text.c_str(), text.length());
+
+	maFileClose(file);
+}
 
 /**
  * Class that reads and parses custom messages from a web view.
@@ -176,6 +221,14 @@ private:
 	MAUtil::String mMessageString;
 
 public:
+	static void getMessagesFor(MAWidgetHandle webView)
+	{
+		maWidgetSetProperty(
+			webView,
+			MAW_WEB_VIEW_URL_HOOK_PATTERN,
+			"mosync://.*");
+	}
+
 	WebViewMessage(MAHandle dataHandle)
 	{
 		if (NULL != dataHandle)
@@ -193,7 +246,8 @@ public:
 			stringData[dataSize] = 0;
 
 			// Set string data.
-			mMessageString = stringData;
+			char* p = stringData + strlen("mosync://");
+			mMessageString = p;
 
 			// Destroy string data.
 			free(stringData);
@@ -242,10 +296,18 @@ public:
 class WebViewTestApp
 {
 private:
+
 	MAWidgetHandle mScreen;
 	MAWidgetHandle mWebView;
 
 public:
+
+	void createData()
+	{
+		UtilWriteText("PageOne.html", UtilGetTextFromData(PageOne_html));
+		UtilWriteText("PageTwo.html", UtilGetTextFromData(PageTwo_html));
+	}
+
 	void createUI()
 	{
 		// Create screen.
@@ -261,7 +323,10 @@ public:
 		maWidgetSetProperty(mWebView, "height", "-1");
 
 		// Set the HTML the web view displays.
-		maWidgetSetProperty(mWebView, "html", HTML4);
+		//maWidgetSetProperty(mWebView, "html", HTML4);
+		maWidgetSetProperty(mWebView, "url", "PageOne.html");
+
+		WebViewMessage::getMessagesFor(mWebView);
 
 		// Add the web view to the screen.
 		maWidgetAddChild(mScreen, mWebView);
@@ -394,6 +459,7 @@ public:
 extern "C" int MAMain()
 {
 	WebViewTestApp app;
+	app.createData();
 	app.createUI();
 	app.runEventLoop();
 	app.destroyUI();

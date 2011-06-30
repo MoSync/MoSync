@@ -90,7 +90,7 @@ public class WebViewFactory implements AbstractViewFactory
 	 * An extended web client that hooks loading of web pages and
 	 * sends an event.
 	 * 
-	 * @author Mikael Kindborg, Magnus Hult
+	 * @author Mikael Kindborg
 	 */
 	static class MoSyncWebViewClient extends WebViewClient
 	{
@@ -126,14 +126,13 @@ public class WebViewFactory implements AbstractViewFactory
 		 */
 		public boolean shouldOverrideUrlLoading(WebView view, String url)
 		{
-			String mosyncProtocol = "mosync://";
-			
-			if (url.startsWith(mosyncProtocol))
+			// Should we hook this url and not load the page?
+			if (mWebWidget.wantsToHookUrl(url))
 			{
-				Log.i("@@@ MoSync", "Processing MoSync url: " + url);
+				Log.i("@@@ MoSync", "Url is hooked: " + url);
 				
 				// Store the message in a data object.
-				String messageString = url.substring(mosyncProtocol.length());
+				String messageString = url;
 				int messageDataHandle = 
 					MoSyncThread.getInstance().createDataObject(
 						messageString.getBytes());
@@ -152,6 +151,10 @@ public class WebViewFactory implements AbstractViewFactory
 			{
 				Log.i("@@@ MoSync", "Processing standard url: " + url);
 
+				// TODO: Remove the following code for handling
+				// MAW_EVENT_WEB_VIEW_URL_CHANGED. This should be
+				// deprecated.
+				
 				// Set the "newurl" property of the web view widget.
 				// Note that this will overwrite the previous url even
 				// if the corresponding MAW_EVENT_WEB_VIEW_URL_CHANGED

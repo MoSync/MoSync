@@ -1,0 +1,7 @@
+.res PageOne_html
+.bin
+.include "PageOne.html"
+
+.res PageTwo_html
+.bin
+.include "PageTwo.html"

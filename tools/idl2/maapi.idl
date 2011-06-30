@@ -3110,6 +3110,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief Sent when the URL of a web view changes
+		 * @deprecated Use property MAW_EVENT_CUSTOM_MESSAGE to
 		 */
 		WEB_VIEW_URL_CHANGED = 9;
 
@@ -4239,8 +4240,36 @@ group WidgetAPI "Widget API" {
 		HTML = "html";
 		
 		/**
-		* @brief Property to get a new url whenever the webview changes the url. See \ref #MAW_EVENT_WEB_VIEW_URL_CHANGED.
+		* @brief Set the pattern used to "hook" urls. When this pattern 
+		* matches a url that is being requested to load in the WebView, 
+		* a MAW_EVENT_CUSTOM_MESSAGE is sent. Note that urls opened
+		* using MAW_WEB_VIEW_URL are NOT hooked, the are excluded from
+		* this hook mechanism.
 		*
+		* @validvalue "true" to enable, "false" to disable.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Hook all urls.
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL_HOOK_PATTERN, ".*");
+		*
+		*   // Hook no urls.
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL_HOOK_PATTERN, "");
+		*
+		*   // Hook urls that start with "mosync:".
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL_HOOK_PATTERN, "mosync://.*");
+		* \endcode
+		*/		
+		URL_HOOK_PATTERN = "urlHookPattern";
+		
+		/**
+		* @brief Property to get a new url whenever the webview changes the url. 
+		* See \ref #MAW_EVENT_WEB_VIEW_URL_CHANGED.
+		*
+		* @deprecated Use property event \ref #MAW_EVENT_CUSTOM_MESSAGE
+		* 
 		* @validvalue Any valid URL.
 		*
 		* @getonly
@@ -4248,7 +4277,11 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* \code
 		* 	char urlBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(webViewHandle, MAW_WEB_VIEW_NEW_URL, urlBuffer, BUFFER_SIZE);
+		* 	int getStatus = maWidgetGetProperty(
+		*     webViewHandle, 
+		*     MAW_WEB_VIEW_NEW_URL, 
+		*     urlBuffer, 
+		*     BUFFER_SIZE);
 		* 	if(getStatus == MAW_RES_OK)
 		* 	{
 		* 	    // Do something with URL.

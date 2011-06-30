@@ -1,5 +1,7 @@
 package com.mosync.nativeui.ui.widgets;
 
+import java.util.HashSet;
+
 import android.app.Activity;
 import android.webkit.WebView;
 
@@ -18,7 +20,27 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
 public class WebWidget extends Widget
 {
 	private String m_newUrl;
+	
+	/**
+	 * The pattern used when determining which urls
+	 * will be "hooked" and sent MAW_EVENT_CUSTOM_MESSAGE
+	 * Widget events.
+	 */
+	private String mUrlHookPattern;
 
+	/**
+	 * Collection of urls that should NOT be "hooked".
+	 * This is used to make setting the url via the
+	 * property "url" NOT being hooked. This way we
+	 * prevent a "loop" in the hook mechanism.
+	 * 
+	 * TODO: Use a HashMap<String, Integer> and count 
+	 * references is case same url is requested to load
+	 * in parallel. A HashSet will fail in this case, 
+	 * as it has just one occurrence of each url.
+	 */
+	private HashSet<String> mNonHookedUrls = new HashSet<String>();
+	
 	/**
 	 * Constructor
 	 * 
@@ -32,6 +54,37 @@ public class WebWidget extends Widget
 		super(handle, view);
 	}
 
+	/**
+	 * Determine if the given url matches the hook pattern
+	 * of thiw web view. If the length of the hook pattern
+	 * if zero, then it is always a match.
+	 * @param url The url to match.
+	 * @return true if there is a match, false if not.
+	 */
+	public boolean wantsToHookUrl(String url)
+	{
+		if (mNonHookedUrls.contains(url))
+		{
+			// This url should NOT be hooked.
+			// Remove it from the non-hooked urls.
+			mNonHookedUrls.remove(url);
+			return false;
+		}
+		else
+		if (0 == mUrlHookPattern.length())
+		{
+			// When there is no hook pattern, the
+			// url should NOT be hooked.
+			return false;
+		}
+		else
+		{
+			// The reqexp match determines if the
+			// url should be hooked.
+			return url.matches(mUrlHookPattern);
+		}
+	}
+	
 	/**
 	 * @see Widget.setProperty.
 	 */
@@ -51,25 +104,50 @@ public class WebWidget extends Widget
 		{
 			// Here we check if the url has schema specifier.
 			// This is done so that is there is no schema
-			// we use the content provider to load the file
+			// we use the file:// schema to load the file
 			// from the application's local file system.
 			String url = value;
+			
 			if (url.contains("://") || url.contains("javascript:"))
 			{
 				// There is a schema specified.
+				
+				// Add this url to the non-hooked urls.
+				mNonHookedUrls.add(url);
+				
+				// Load the url.
 				webView.loadUrl(url);
 			}
 			else
 			{
-				// No schema present, add the content provider 
-				// schema and authority and load the file.
+				// No schema present, add the local file:// schema
+				// and load the file.
+				
+				// We need the activity.
 				Activity activity = MoSyncThread.getInstance().getActivity();
-				url = "content://" + activity.getPackageName() + "/" + url;
+
+				// We no longer use a content provider to load local files 
+				// from the web view. Instead we use a file:// scheme for 
+				// locally loaded pages, and for pages loaded over the
+				// network we do not want to have this capability anyway.
+				// Just want to keep line around for some time
+				// as a reference in case it will be needed. Micke :)
+//				url = "content://" + activity.getPackageName() + "/" + url;
+				
+				// This is the way that use the file:// schema.
+				url = 
+					"file://"
+					+ activity.getFilesDir().getAbsolutePath() 
+					+ "/" 
+					+ url;
+				
+				// Load the url.
 				webView.loadUrl(url);
 			}
 		}
 		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_NEW_URL))
 		{
+			// TODO: MAW_WEB_VIEW_NEW_URL should be deprecated.
 			m_newUrl = value;
 		}
 		else if (property.equals("html"))
@@ -79,11 +157,20 @@ public class WebWidget extends Widget
 			// com.mosync.java.android.MoSyncLocalFileContentProvider.java
 			Activity activity = MoSyncThread.getInstance().getActivity();
 			webView.loadDataWithBaseURL(
-				"content://" + activity.getPackageName() + "/", 
+				// Content provider is not used.
+//				"content://" + activity.getPackageName() + "/", 
+				// We use the path to the local application files
+				// directory as the base url.
+				"file://" + activity.getFilesDir().getAbsolutePath() + "/", 
 				value, 
 				"text/html", 
 				"utf-8",
 				null);
+		}
+		else if (property.equals("urlHookPattern"))
+		{
+			// Set the pattern used for url hooking.
+			mUrlHookPattern = value;
 		}
 		else if (property.equals("enableZoom"))
 		{
@@ -121,6 +208,7 @@ public class WebWidget extends Widget
 		}
 		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_NEW_URL))
 		{
+			// TODO: MAW_WEB_VIEW_NEW_URL should be deprecated.
 			return m_newUrl;
 		}
 		else
