@@ -2592,7 +2592,7 @@ retry:
 			}
 			posEventData->state = MA_LOC_INVALID;
 		}
-		posEvent.data = posEventData;
+		posEvent.data = (MAAddress)posEventData;
 		gEventFifo.put(posEvent);
 	}
 
