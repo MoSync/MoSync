@@ -1127,6 +1127,6 @@ void MoSyncErrorExit(int errorCode)
 	gRunning = false;
 	logWithNSLog(buffer, strlen(buffer));
 	MoSync_ShowMessageBox(nil, buffer, true);	
-	pthread_exit(NULL);
+	//pthread_exit(NULL);
 }
 	

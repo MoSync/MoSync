@@ -392,7 +392,9 @@ namespace Base {
 			&& !gSyscall->mAllowDivZero
 #endif
 			) {
+#ifndef ALLOW_DIVISION_BY_ZERO            
 			BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+#endif
 		}
 		return a/b;
 	}
@@ -746,8 +748,9 @@ namespace Base {
 		std::string newPath = getWriteablePath(fn);
 		fn = newPath.c_str();
 		size = newPath.size();
-		fh.name.resize(size);
+		fh.name.resize(size+1);
 		memcpy(fh.name, fn, size);
+        fh.name[size] = 0;
         LOG("Opening file: %s\n", newPath.c_str());
 #else
 		memcpy(fh.name, fn, size);

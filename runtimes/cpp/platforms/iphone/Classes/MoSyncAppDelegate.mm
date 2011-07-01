@@ -31,7 +31,23 @@ void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 //@synthesize window;
 @synthesize viewController;
 
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+ 	// Hide status bar HERE because later the space under the status bar is
+	// not usable for drawing, etc.
+	[[UIApplication sharedApplication] setStatusBarHidden:YES 
+                                            withAnimation:UIStatusBarAnimationFade];
+    // Override point for customization after app launch    
+    viewController = [[MoSyncViewController alloc] init];
+	initMoSyncUISyscalls(NULL, viewController);
 
+    int w, h;
+    getScreenResolution(w, h);
+	MoSync_Main(w, h, (MoSyncView*)[viewController getMoSyncView]);
+    
+    return YES;
+}
+
+/*
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    
 	// Hide status bar HERE because later the space under the status bar is
 	// not usable for drawing, etc.
@@ -52,10 +68,9 @@ void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 
     int w, h;
     getScreenResolution(w, h);
-	MoSync_Main(w, h, (MoSyncView*)[viewController getMoSyncView]);
-
-	
+	MoSync_Main(w, h, (MoSyncView*)[viewController getMoSyncView]);	
 }
+ */
 
 - (void)applicationWillTerminate:(UIApplication *)application {
 //	Base::gEventQueue.addCloseEvent();
