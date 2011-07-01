@@ -53,7 +53,7 @@ public class MoSyncFile {
 
 	MoSyncThread mMoSyncThread;
 	
-	int mNumFileHandles = 0;
+	int mFileHandleNext = 1;
 	
 	/**
 	 * Internal file for handling files
@@ -68,8 +68,13 @@ public class MoSyncFile {
 		 */
 		MoSyncFileHandle(String path, int accessMode) throws Throwable
 		{
-			mFile = new File(path);
 			mAccessMode = accessMode;
+			if(mAccessMode != MA_ACCESS_READ_WRITE &&
+				mAccessMode != MA_ACCESS_READ)
+			{
+				throw new Exception("Invalid access mode!");
+			}
+			mFile = new File(path);
 			
 			if(path.endsWith("/"))
 				mIsAFile = false;
@@ -87,7 +92,8 @@ public class MoSyncFile {
 		{
 			try
 			{
-				mRandomAccessFile = new RandomAccessFile(mFile, "rw");
+				mRandomAccessFile = new RandomAccessFile(mFile,
+					mAccessMode == MA_ACCESS_READ_WRITE ? "rw" : "r");
 				mFileChannel = mRandomAccessFile.getChannel();
 				
 				if(mCurrentPosition != 0)
@@ -136,9 +142,9 @@ public class MoSyncFile {
 			return 0;
 		}
 		
-		public File mFile;
-		public int mAccessMode;
-		public boolean mIsAFile;
+		public final File mFile;
+		public final int mAccessMode;
+		public final boolean mIsAFile;
 		public FileChannel mFileChannel;
 		public int mCurrentPosition;
 		private RandomAccessFile mRandomAccessFile;
@@ -213,12 +219,16 @@ public class MoSyncFile {
 	*/
 	int maFileOpen(String path, int mode)
 	{
-		mNumFileHandles++;
-		
 		try
 		{
-			mFileHandles.put(mNumFileHandles, 
-							new MoSyncFileHandle(path, mode));
+			MoSyncFileHandle fileHandle = new MoSyncFileHandle(path, mode);
+			if(fileHandle.mFile.exists())
+			{
+				int res = fileHandle.open();
+				if(res < 0)
+					return res;
+			}
+			mFileHandles.put(mFileHandleNext, fileHandle);
 		}
 		catch(Throwable t)
 		{
@@ -226,7 +236,7 @@ public class MoSyncFile {
 			return MA_FERR_GENERIC;
 		}
 		
-		return mNumFileHandles;
+		return mFileHandleNext++;
 	}
 
 	/**
@@ -235,9 +245,6 @@ public class MoSyncFile {
 	int maFileExists(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
-		
 		if(fileHandle.mFile.exists()) return 1;
 		return 0;
 	}
@@ -248,13 +255,9 @@ public class MoSyncFile {
 	int maFileClose(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
-		
-		int ret = fileHandle.close();
-		
+		fileHandle.close();
 		mFileHandles.remove(file);
-		return ret;
+		return 0;
 	}
 
 	//see JSR 75 for docs
@@ -268,8 +271,6 @@ public class MoSyncFile {
 	int maFileCreate(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
 		
 		if(fileHandle.mAccessMode == MA_ACCESS_READ)
 			return MA_FERR_FORBIDDEN;
@@ -279,7 +280,7 @@ public class MoSyncFile {
 			if(fileHandle.mIsAFile)
 			{
 				fileHandle.mFile.createNewFile();
-				return 0;
+				return fileHandle.open();
 			}
 			else
 			{
@@ -305,9 +306,7 @@ public class MoSyncFile {
 	int maFileDelete(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
-		
+
 		if(!fileHandle.mFile.exists())
 			return MA_FERR_GENERIC;
 		
@@ -344,8 +343,6 @@ public class MoSyncFile {
 	int maFileSize(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
 		
 		if( !fileHandle.mIsAFile ) return MA_FERR_GENERIC;
 		
@@ -362,8 +359,6 @@ public class MoSyncFile {
 	int maFileAvailableSpace(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
 
 		// The space function in java.io.File wasn't available on Android
 		StatFs fs = new StatFs(fileHandle.mFile.getAbsolutePath()); 
@@ -379,8 +374,6 @@ public class MoSyncFile {
 	int maFileTotalSpace(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
 
 		// The space function in java.io.File wasn't available on Android
 		StatFs fs = new StatFs(fileHandle.mFile.getAbsolutePath()); 
@@ -396,8 +389,6 @@ public class MoSyncFile {
 	int maFileDate(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
 		
 		return (int)(fileHandle.mFile.lastModified() / 1000);
 	}
@@ -419,8 +410,7 @@ public class MoSyncFile {
 	*/
 	int maFileRename(int file, int newName)
 	{
-		
-		return MA_FERR_GENERIC;
+		return -1;
 	}
 
 	/**
@@ -444,8 +434,7 @@ public class MoSyncFile {
 	*/
 	int maFileTruncate(int file, int offset)
 	{
-		
-		return MA_FERR_GENERIC;
+		return -1;
 	}
 
 	/**
@@ -499,16 +488,10 @@ public class MoSyncFile {
 	int maFileWrite(int file, int src, int len)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
 		
 		if(fileHandle.mAccessMode == MA_ACCESS_READ)
 			return MA_FERR_FORBIDDEN;
 		
-		int ret = fileHandle.open();
-		if(ret != 0)
-			return ret;
-	
 		// Create a sliced buffer which we can send to file
 		mMoSyncThread.mMemDataSection.position(src);
 		ByteBuffer slicedBuffer = mMoSyncThread.mMemDataSection.slice();
@@ -528,8 +511,6 @@ public class MoSyncFile {
 	int maFileWriteFromData(int file, int data, int offset, int len)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
 		
 		if(fileHandle.mAccessMode == MA_ACCESS_READ)
 			return MA_FERR_FORBIDDEN;
@@ -541,10 +522,6 @@ public class MoSyncFile {
 			return MA_FERR_GENERIC;
 		}
 
-		int ret = fileHandle.open();
-		if(ret != 0)
-			return ret;
-	
 		// If the whole object should be sent, just send it
 		if((offset == 0) && (len == byteBuffer.capacity()))
 		{
@@ -570,13 +547,7 @@ public class MoSyncFile {
 	int maFileRead(int file, int dst, int len)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
-		
-		int ret = fileHandle.open();
-		if(ret != 0)
-			return ret;
-	
+
 		// Create a sliced buffer which we can send to file
 		mMoSyncThread.mMemDataSection.position(dst);
 		ByteBuffer slicedBuffer = mMoSyncThread.mMemDataSection.slice();
@@ -594,8 +565,6 @@ public class MoSyncFile {
 	int maFileReadToData(int file, int data, int offset, int len)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
 		
 		ByteBuffer byteBuffer = mMoSyncThread.getBinaryResource(data);
 		if (null == byteBuffer)
@@ -604,10 +573,6 @@ public class MoSyncFile {
 			return MA_FERR_GENERIC;
 		}
 
-		int ret = fileHandle.open();
-		if(ret != 0)
-			return ret;
-	
 		// If the whole object should be sent, just send it
 		if((offset == 0) && (len == byteBuffer.capacity()))
 		{
@@ -618,7 +583,7 @@ public class MoSyncFile {
 		byteBuffer.position(offset);
 		ByteBuffer slicedBuffer = byteBuffer.slice();
 		slicedBuffer.limit(len);
-	
+
 		readFileToByteBuffer(fileHandle, slicedBuffer);
 		
 		return 0;
@@ -631,12 +596,6 @@ public class MoSyncFile {
 	int maFileTell(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
-		
-		int ret = fileHandle.open();
-		if(ret != 0)
-			return ret;
 		
 		try
 		{
@@ -661,26 +620,28 @@ public class MoSyncFile {
 	int maFileSeek(int file, int offset, int whence)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		if(fileHandle == null)
-			return MA_FERR_GENERIC;
-		
-		int ret = fileHandle.open();
-		if(ret != 0)
-			return ret;
-		
-		if(whence == MA_SEEK_SET)
-		{
-			offset = 0;
-		}
-		else if(whence == MA_SEEK_END)
-		{
-			offset = (int)fileHandle.mFile.length();
-			if(offset == 0)
+
+		switch(whence) {
+		case MA_SEEK_SET:
+			break;
+		case MA_SEEK_END:
+			try {
+				offset = (int)fileHandle.mFile.length() + offset;
+			} catch(Throwable t) {
+				Log.e("MoSync File API","(Exception) maFileSeek : " + t.toString());
 				return MA_FERR_GENERIC;
-		}
-		else if(whence != MA_SEEK_CUR)
-		{
-			return MA_FERR_GENERIC;
+			}
+			break;
+		case MA_SEEK_CUR:
+			try {
+				offset = (int)fileHandle.mFileChannel.position() + offset;
+			} catch(Throwable t) {
+				Log.e("MoSync File API","(Exception) maFileSeek : " + t.toString());
+				return MA_FERR_GENERIC;
+			}
+			break;
+		default:
+			throw new Error("maFileSeek: Invalid whence!");
 		}
 		
 		try
@@ -776,8 +737,6 @@ public class MoSyncFile {
 	int maFileListNext(int list, int nameBuf, int bufSize)
 	{
 		MoSyncFileListing fileListing = mFileListings.get(list);
-		if(fileListing == null)
-			return MA_FERR_GENERIC;
 		
 		if(fileListing.mFiles.length == fileListing.mIndex) return 0;
 		
@@ -814,8 +773,7 @@ public class MoSyncFile {
 	*/
 	int maFileListClose(int list)
 	{
-		mFileListings.remove(list);		
-		
+		mFileListings.remove(list);
 		return 0;
 	}
 	
