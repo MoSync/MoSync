@@ -21,7 +21,6 @@
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
-//#include <base/MemStream.h>
 
 
 @implementation WebViewWidget
@@ -32,7 +31,7 @@
 	webView.delegate = self;
 	newurl = @"";
     hookPattern = @"";
-    javaScriptIdentifier=@"javascript://";
+    javaScriptIdentifier=@"javascript:";
 	return [super init];	
 }
 
@@ -83,8 +82,14 @@
         return NO;
     }
     NSString *url=[NSString stringWithString:request.URL.absoluteString];
-    if([self compare:url withRegularExpression:hookPattern])
+    if([url compare:hookPattern options:NSRegularExpressionSearch|NSCaseInsensitiveSearch]>-1)
     {
+        
+        MAEvent event;
+        event.type = EVENT_TYPE_WIDGET;
+        MAWidgetEventData *eventData = new MAWidgetEventData;
+        eventData->eventType = MAW_EVENT_CUSTOM_MESSAGE;
+        eventData->widgetHandle = handle;
         
         MAHandle urlHandle=(MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
         int size=(int)[url lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
@@ -92,17 +97,14 @@
         Base::gSyscall->resources.add_RT_BINARY(urlHandle, ms);
         ms->seek(Base::Seek::Start, 0);
         ms->write([url cStringUsingEncoding:NSASCIIStringEncoding], size);
-        
-        MAEvent event;
-        event.type = EVENT_TYPE_WIDGET;
-        MAWidgetEventData *eventData = new MAWidgetEventData;
-        eventData->eventType = MAW_EVENT_CUSTOM_MESSAGE;
-        eventData->widgetHandle = handle;
+
         eventData->messageDataHandle = urlHandle;
         event.data = eventData;
+        
+        
         Base::gEventQueue.put(event);
                 
-        return YES;
+        return NO;
     }
     
     //Deprecated
@@ -118,15 +120,33 @@
 	return YES; 
 }
 
-- (BOOL)compare: (NSString*)text withRegularExpression: (NSString*)expression;{
+/*
+- (NSArray*)findMatches:(NSString *)text withRegularExpression:(NSString *)expression {
     
-    if([expression isEqualToString:@".*"] or [text isEqualToString:expression])
+    NSMutableArray *capturedStrings;
+    
+    NSError *err=NULL;
+    NSRegularExpression *regex=[[NSRegularExpression regularExpressionWithPattern:expression options:NSRegularExpressionCaseInsensitive error:&err] retain];
+    
+    NSArray *matches=[regex matchesInString:text options:NSRegularExpressionCaseInsensitive range:NSMakeRange(0,[text length ]) ];
+    
+    if([matches count]==0)
     {
-        return YES;
+        return NULL;
     }
     
-    return NO;
-}
+    capturedStrings=[NSMutableArray arrayWithCapacity:[matches count]]; //Ok, so [matches count] probably isnt enough, but it's not static, soooooo....
+    for(NSTextCheckingResult *match in matches)
+    {
+        for(int i=1;i<[match numberOfRanges];i++)
+        {
+            [capturedStrings addObject:[text substringWithRange:[match rangeAtIndex:i]]];
+        }
+    }
+    
+    [regex release];
+    return capturedStrings;
+}*/
 
 @end
 

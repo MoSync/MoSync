@@ -27,6 +27,6 @@
 - (id)init;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
-- (BOOL)compare: (NSString*)text withRegularExpression: (NSString*)expression;
+//- (NSArray*)findMatches: (NSString*)text withRegularExpression: (NSString*)expression;
 
 @end
