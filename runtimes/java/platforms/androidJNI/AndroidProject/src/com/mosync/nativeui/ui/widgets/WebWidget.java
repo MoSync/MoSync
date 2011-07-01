@@ -3,6 +3,7 @@ package com.mosync.nativeui.ui.widgets;
 import java.util.HashSet;
 
 import android.app.Activity;
+import android.util.Log;
 import android.webkit.WebView;
 
 import com.mosync.internal.android.MoSyncThread;
@@ -205,6 +206,13 @@ public class WebWidget extends Widget
 		if (property.equals(IX_WIDGET.MAW_WEB_VIEW_URL))
 		{
 			return webView.getUrl();
+		}
+		else if (property.equals("localFilesDirectory"))
+		{
+			Activity activity = MoSyncThread.getInstance().getActivity();
+			String path = activity.getFilesDir().getAbsolutePath() + "/";
+			Log.i("@@@ MoSync", "Property localFilesDirectory: " + path);
+			return path;
 		}
 		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_NEW_URL))
 		{
