@@ -3545,8 +3545,12 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char currentTabBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(tabScreenHandle, MAW_WEB_VIEW_CURRENT_TAB, currentTabBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(
+		* 		tabScreenHandle, 
+		* 		MAW_WEB_VIEW_CURRENT_TAB, 
+		* 		currentTabBuffer, 
+		*		BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with current tab.
 		* 	}
@@ -3609,8 +3613,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the label text.
 		* 	}
@@ -3696,8 +3700,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the label text.
 		* 	}
@@ -3783,8 +3787,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the label text.
 		* 	}
@@ -3933,8 +3937,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the edit box text
 		* 	}
@@ -4277,12 +4281,12 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* \code
 		* 	char urlBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(
+		* 	int result = maWidgetGetProperty(
 		*     webViewHandle, 
 		*     MAW_WEB_VIEW_NEW_URL, 
 		*     urlBuffer, 
 		*     BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with URL.
 		* 	}
