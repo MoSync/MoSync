@@ -17,7 +17,7 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Main.cpp
+ * @file WebViewTestApp.cpp
  * @author Mikael Kindborg
  *
  * Application for testing the WebView widget.
@@ -29,13 +29,18 @@ MA 02110-1301, USA.
 #include <mavsprintf.h>
 #include <MAUtil/String.h>
 #include <IX_WIDGET.h>
-#include "MAHeaders.h"
+
+#include "WebViewUtil.h"
+
+using namespace MoSync::UI;
 
 // Test that JavaScript runs in the browser.
 #define HTML1 " \
 	<html><body> \
     <script>for(var i = 0; i < 100; ++i) { document.write('Hello World ' + i + '</br>'); }</script> \
     </body></html>"
+
+// HTML2 has been removed.
 
 // Call MoSync via JavsScript from a clickable link.
 #define HTML3 " \
@@ -73,8 +78,8 @@ MA 02110-1301, USA.
 		<input type=\"button\" value=\"Press Me!\" onclick=\"ProcessData()\"/> \
 	</div> \
 	<div id=\"DataMessage\"></div> \
-	<div><a href=\"#\" onclick=\"MoSyncMessage('CloseWebView')\">Close WebView</a></div> \
 	<div><a href=\"#\" onclick=\"MoSyncMessage('ExitApp')\">Exit Application</a></div> \
+	<div><a href=\"#\" onclick=\"MoSyncMessage('CreatePanic')\">Create Panic</a></div> \
     </body> \
     </html>"
 
@@ -109,7 +114,6 @@ MA 02110-1301, USA.
 	</div> \
 	<div id=\"DataMessage\"></div> \
 	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncMessage('CloseWebView')\">Close WebView</a></div> \
 	<div><a href=\"#\" onclick=\"MoSyncMessage('ExitApp')\">Exit Application</a></div> \
     </body> \
     </html>"
@@ -149,7 +153,6 @@ MA 02110-1301, USA.
 	</div> \
 	<div id=\"DataMessage\"></div> \
 	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncMessage('CloseWebView')\">Close WebView</a></div> \
 	<div><a href=\"#\" onclick=\"MoSyncMessage('ExitApp')\">Exit Application</a></div> \
     </body> \
     </html>"
@@ -163,149 +166,21 @@ MA 02110-1301, USA.
 #define MESSAGE_SCRIPT "javascript: \
 	document.getElementById(\"DataMessage\").innerHTML = '%s';"
 
-/**
- * Helper function that reads a text string from data handle.
- */
-MAUtil::String UtilGetTextFromData(MAHandle data)
-{
-	// Get size of data.
-    int size = maGetDataSize(data);
-
-    // Allocate space for text plus zero termination character.
-    char* text = (char*) malloc(size + 1);
-    if (NULL == text)
-    {
-    	return "";
-    }
-
-    // Read data.
-    maReadData(data, text, 0, size);
-
-    // Zero terminate string.
-    text[size] = 0;
-
-    MAUtil::String textString = text;
-
-    free(text);
-
-    return textString;
-}
-
-/**
- * Helper function that writes a text string to a file.
- */
-void UtilWriteText(
-	const MAUtil::String& fileName,
-	const MAUtil::String& text)
-{
-	MAUtil::String filePath =
-		MAUtil::String("/data/data/com.mosync.webviewtestapp/files/")
-		+ fileName;
-	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ_WRITE);
-	if (! maFileExists(file))
-	{
-		maFileCreate(file);
-	}
-
-	maFileWrite(file, text.c_str(), text.length());
-
-	maFileClose(file);
-}
-
-/**
- * Class that reads and parses custom messages from a web view.
- */
-class WebViewMessage
-{
-private:
-	MAUtil::String mMessageString;
-
-public:
-	static void getMessagesFor(MAWidgetHandle webView)
-	{
-		maWidgetSetProperty(
-			webView,
-			MAW_WEB_VIEW_URL_HOOK_PATTERN,
-			"mosync://.*");
-	}
-
-	WebViewMessage(MAHandle dataHandle)
-	{
-		if (NULL != dataHandle)
-		{
-			// Get length of the data, it is not zero terminated.
-			int dataSize = maGetDataSize(dataHandle);
-
-			// Allocate buffer for string data.
-			char* stringData = (char*) malloc(dataSize + 1);
-
-			// Get the data.
-			maReadData(dataHandle, stringData, 0, dataSize);
-
-			// Zero terminate.
-			stringData[dataSize] = 0;
-
-			// Set string data.
-			char* p = stringData + strlen("mosync://");
-			mMessageString = p;
-
-			// Destroy string data.
-			free(stringData);
-
-			// Destroy the data handle
-			maDestroyObject(dataHandle);
-		}
-	}
-
-	virtual ~WebViewMessage()
-	{
-	}
-
-	const char* getString()
-	{
-		return mMessageString.c_str();
-	}
-
-	int is(const MAUtil::String& messageName)
-	{
-		// Start of messageName should be found at start of message string.
-			return 0 == mMessageString.find(messageName);
-	}
-
-	MAUtil::String getData()
-	{
-		// Must be at least three characters in a message
-		// that has a data part.
-		if (mMessageString.length() < 3)
-		{
-			return "";
-		}
-
-		// Find first slash.
-		int index = mMessageString.find("/");
-		if (MAUtil::String::npos == index)
-		{
-			return "";
-		}
-
-		// Return the substring after the slash.
-		return mMessageString.substr(index + 1);
-	}
-};
-
 class WebViewTestApp
 {
 private:
-
 	MAWidgetHandle mScreen;
 	MAWidgetHandle mWebView;
 
 public:
-
-	void createData()
+	WebViewTestApp()
 	{
-		UtilWriteText("PageOne.html", UtilGetTextFromData(PageOne_html));
-		UtilWriteText("PageTwo.html", UtilGetTextFromData(PageTwo_html));
+		createUI();
+	}
+
+	virtual ~WebViewTestApp()
+	{
+		destroyUI();
 	}
 
 	void createUI()
@@ -318,14 +193,17 @@ public:
 		mWebView = maWidgetCreate(MAW_WEB_VIEW);
 		widgetShouldBeValid(mWebView, "Could not create web view");
 
-		// Set size of vew view to fill the parent.
+		// Set size of the web view to fill the parent.
 		maWidgetSetProperty(mWebView, "width", "-1");
 		maWidgetSetProperty(mWebView, "height", "-1");
 
 		// Set the HTML the web view displays.
-		//maWidgetSetProperty(mWebView, "html", HTML4);
-		maWidgetSetProperty(mWebView, "url", "PageOne.html");
+		maWidgetSetProperty(mWebView, "html", HTML4);
 
+		// Enable zooming.
+		maWidgetSetProperty(mWebView, "enableZoom", "true");
+
+		// We want messages for this web view.
 		WebViewMessage::getMessagesFor(mWebView);
 
 		// Add the web view to the screen.
@@ -344,12 +222,6 @@ public:
 	{
 		MAEvent event;
 
-		// Paint something into the drawable MoSync view to make it
-		// visually identifiable.
-		//maSetColor(0xFFFFFF);
-		//maFillRect(0, 0, 2000, 2000);
-		//maUpdateScreen();
-
 		bool isRunning = true;
 		while (isRunning)
 		{
@@ -361,23 +233,15 @@ public:
 					isRunning = false;
 					break;
 
-				case EVENT_TYPE_POINTER_PRESSED:
-					// If the WebView has been closed, touching
-					// the screen will open it.
-					//maWidgetOpen(webView, WIDGET_ROOT);
-					break;
-
 				case EVENT_TYPE_KEY_PRESSED:
-					// TODO: Implement as a button bar.
-//					if (event.key == MAK_2) { SetBgColor(webView, "Gray"); }
-//					if (event.key == MAK_3) { SetBgColor(webView, "White"); }
-//					if (event.key == MAK_4) { SetBgColor(webView, "Pink"); }
-//					if (event.key == MAK_5) { SetBgColor(webView, "Orange"); }
-//					if (event.key == MAK_6) { SetBgColor(webView, "Chocolate"); }
-//					if (event.key == MAK_7) { SetBgColor(webView, "ABCDEF"); }
-//					if (event.key == MAK_8) { SetBgColor(webView, "DeepPink"); }
-					if (event.key == MAK_MENU) { /* TODO: Show menu in HTML/JS */ }
-					if (event.key == MAK_BACK) { isRunning = false; }
+					if (event.key == MAK_MENU)
+					{
+						// TODO: Show menu in HTML/JS.
+					}
+					if (event.key == MAK_BACK)
+					{
+						isRunning = false;
+					}
 					break;
 
 				case EVENT_TYPE_WIDGET:
@@ -396,7 +260,7 @@ public:
 			// Get message.
 			WebViewMessage message(widgetEvent->messageDataHandle);
 
-			lprintfln("@@@ message: %s", message.getString());
+			lprintfln("@@@ message: %s", message.getMessageString().c_str());
 
 			// Process message.
 			if (message.is("BgColor"))
@@ -411,15 +275,16 @@ public:
 				// back a result to the WebView.
 
 				// This is calls JavaScript.
-				displayText(message.getData());
-			}
-			else if (message.is("CloseWebView"))
-			{
-				//maWidgetClose(mWebView);
+				displayText(MAUtil::String("You wrote: ") + message.getData());
 			}
 			else if (message.is("ExitApp"))
 			{
 				maExit(0);
+			}
+			else if (message.is("CreatePanic"))
+			{
+				maVibrate(5000);
+				maPanic(0, "Panic created!");
 			}
 		}
 	}
@@ -459,10 +324,7 @@ public:
 extern "C" int MAMain()
 {
 	WebViewTestApp app;
-	app.createData();
-	app.createUI();
 	app.runEventLoop();
-	app.destroyUI();
 	return 0;
 }
 
