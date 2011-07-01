@@ -32,15 +32,26 @@
 	webView.delegate = self;
 	newurl = @"";
     hookPattern = @"";
+    javaScriptIdentifier=@"javascript://";
 	return [super init];	
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"url"]) {
 		UIWebView* webView = (UIWebView*)view;
-		NSURL *url = [NSURL URLWithString:value];
-		NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
-		[webView loadRequest:requestObj];
+        NSRange identifierLocation=[value rangeOfString:javaScriptIdentifier];
+        if(identifierLocation.location!=NSNotFound)
+        {
+            NSString *script=[[value substringFromIndex:identifierLocation.location+identifierLocation.length] retain];
+            [webView stringByEvaluatingJavaScriptFromString:script];
+            [script release];
+        }
+        else
+        {
+            NSURL *url = [NSURL URLWithString:value];
+            NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
+            [webView loadRequest:requestObj];
+        }
     } else if([key isEqualToString:@MAW_WEB_VIEW_URL_HOOK_PATTERN]) {
 		[hookPattern release];
         hookPattern = [value retain];
@@ -72,7 +83,6 @@
         return NO;
     }
     NSString *url=[NSString stringWithString:request.URL.absoluteString];
-    printf("Native printf: %s\n",[url cStringUsingEncoding:NSASCIIStringEncoding]);
     if([self compare:url withRegularExpression:hookPattern])
     {
         

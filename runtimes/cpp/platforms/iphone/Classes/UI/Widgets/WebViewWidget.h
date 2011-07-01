@@ -21,6 +21,7 @@
 @interface WebViewWidget : IWidget <UIWebViewDelegate> {
 	NSString* newurl;
     NSString* hookPattern;
+    NSString* javaScriptIdentifier;
 }
 
 - (id)init;
