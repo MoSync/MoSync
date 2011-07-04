@@ -1,5 +1,10 @@
 #include "mx_Test.h"
+#include <conprint.h>
+#include <maassert.h>
 
+int MAMain() GCCATTRIB(noreturn);
 int MAMain() {
-	return foo(7);
+	printf("Hello World!\n");
+	printf("Extension result: %i\n", foo(7));
+	FREEZE;
 }
