@@ -91,6 +91,30 @@
 	}
 }
 
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+    MAEvent event;
+    event.type = EVENT_TYPE_WIDGET;
+    MAWidgetEventData *eventData = new MAWidgetEventData;
+    eventData->eventType = MAW_EVENT_CONTENT_STARTED_LOADING;
+    eventData->widgetHandle = handle;
+    event.data = eventData;
+    Base::gEventQueue.put(event);
+    return;
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    MAEvent event;
+    event.type = EVENT_TYPE_WIDGET;
+    MAWidgetEventData *eventData = new MAWidgetEventData;
+    eventData->eventType = MAW_EVENT_CONTENT_LOADED;
+    eventData->widgetHandle = handle;
+    event.data = eventData;
+    Base::gEventQueue.put(event);
+    return;
+}
+
 - (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
 	if(request.URL.absoluteString==NULL)
     {

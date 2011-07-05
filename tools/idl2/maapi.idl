@@ -3137,6 +3137,14 @@ group WidgetAPI "Widget API" {
 		* send potentially large custom messages.
 		*/
 		CUSTOM_MESSAGE = 11;
+
+		/** 
+		* @brief A WebView widget is starting to load a new page. 
+		*
+		* This event is intended to be used also for other widgets
+		* that load data.
+		*/
+		CONTENT_STARTED_LOADING = 12;
 	}
 	
 	} // end of WidgetEventTypes
