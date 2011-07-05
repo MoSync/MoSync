@@ -96,7 +96,8 @@ realpath(const char *path, char resolved[PATH_MAX])
 				errno = ENAMETOOLONG;
 				return (NULL);
 			}
-			resolved[resolved_len++] = '/';
+			if(resolved_len != 0)	// MoSync: don't add a slash; our filesystem isn't Unix-style.
+				resolved[resolved_len++] = '/';
 			resolved[resolved_len] = '\0';
 		}
 		if (next_token[0] == '\0')
@@ -128,11 +129,13 @@ realpath(const char *path, char resolved[PATH_MAX])
 
 	}
 
+#if 0	// not a good idea on MoSync.
 	/*
 	 * Remove trailing slash except when the resolved pathname
 	 * is a single "/".
 	 */
 	if (resolved_len > 1 && resolved[resolved_len - 1] == '/')
 		resolved[resolved_len - 1] = '\0';
+#endif
 	return (resolved);
 }

@@ -107,14 +107,13 @@ static bool makeDir(char* root, int rootLen, const char* name, int bufLen) {
 			return false;
 		int resLen = rootLen + res;
 		if(root[resLen-1] == '/') {
-			rootLen = resLen;
-			MAASSERT(rootLen + (int)strlen(name) < bufLen);
+			MAASSERT(resLen + (int)strlen(name) < bufLen);
 			//printf("Dir: '%s'\n", file.c_str());
-			strcpy(root + rootLen, name);
+			strcpy(root + resLen, name);
 			if(tryToMake(root))
 				return true;
-			root[rootLen] = 0;
-			if(makeDir(root, rootLen, name, bufLen))
+			root[resLen] = 0;
+			if(makeDir(root, resLen, name, bufLen))
 				return true;
 		}
 	}

@@ -634,6 +634,10 @@ public:
 		profTree.init(Head.EntryPoint);
 #endif
 
+#ifdef GDB_DEBUG
+		mGdbSignal = eNone;
+#endif
+
 		return true;
 	}
 

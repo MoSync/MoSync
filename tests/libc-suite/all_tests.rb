@@ -69,7 +69,7 @@ def doResourceDir(resFile, dir, prefix, count)
 		resFile.puts('')
 		resFile.puts(".res RES_FILE_#{count}")
 		count += 1
-		resFile.puts(".ubin")
+		resFile.puts(".bin")
 		if(File.directory?(realPath))
 			runtimeName = prefix+name+'/'
 			resFile.puts(".cstring \"#{runtimeName}\"")
@@ -277,9 +277,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	
 	# execute it, if not win already, or we rebuilt something.
 	
-	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
-		return force_rebuild
-	end
+	shouldSkipTest = (File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild
+	return force_rebuild if(shouldSkipTest && !SETTINGS[:force_copy_htdocs])
 	
 	clear_filesystem
 	has_files = false
@@ -326,6 +325,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		LOADER_URLS_FILE.puts(SETTINGS[:loader_base_url] + bn)
 		LOADER_URLS_FILE.flush
 	end
+	
+	return force_rebuild if(shouldSkipTest)
 	
 	sldFlag = " -sld #{sldFile}" if(!SETTINGS[:test_release])
 	cmd = "#{MOSYNCDIR}/bin/MoRE -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag} -resource #{resFile}"

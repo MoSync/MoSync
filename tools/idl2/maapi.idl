@@ -2103,6 +2103,8 @@ interface MAAPI {
 		* but they can be created and deleted, and their existence can be queried.
 		* Directory paths must end with a slash('/').
 		*
+		* Attempting to open an existing directory without ending its path with a slash will fail.
+		*
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
 		*
 		* \note To find valid file paths, use maFileListStart().

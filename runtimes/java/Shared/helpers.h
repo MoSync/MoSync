@@ -85,6 +85,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define LOGSC DEBUG_SC
 
+#define DEBUG_CORE(a)
 #define DEBUG_RES(a) DEBUG_ALWAYS(a)
 #define DEBUG_BT(a) DEBUG_ALWAYS(a)
 #define DEBUG_LOAD(a) DEBUG_ALWAYS(a)

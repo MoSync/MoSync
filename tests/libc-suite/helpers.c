@@ -19,19 +19,25 @@ extern void setup_stdin();
 static void exit_status_save(int, void*);
 extern void setup_filesystem();
 
+#define WRITE_LOG(str) maWriteLog(str, sizeof(str)-1)
+
 int MAMain() GCCATTRIB(noreturn);
 int MAMain() {
+	WRITE_LOG("MAMain() 1\n");
 	on_exit(exit_status_save, NULL);
 
 	// switch stdout from console to maWriteLog.
+	WRITE_LOG("open_maWriteLog\n");
 	int wlfd = open_maWriteLog();
 	dup2(wlfd, 1);
 	dup2(wlfd, 2);
 	close(wlfd);
 	
+	WRITE_LOG("setup_filesystem\n");
 	setup_filesystem();
 	chdir("/");
 	
+	WRITE_LOG("setup_stdin\n");
 	setup_stdin();
 	if(!stdin) {
 		printf("Error opening stdin: %i (%m)\n", errno);

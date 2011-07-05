@@ -196,6 +196,7 @@ static int getRealPath(int __fd, char *buf, const char* path, int size) {
 	if(realpath(path, buf) == NULL) {
 		STDFAIL;
 	}
+	LOGD("realpath(%s): %s\n", path, buf);
 	if(__fd != AT_FDCWD) {
 		// restore original cwd.
 		sCwd = sCwdBuf;
@@ -700,6 +701,7 @@ static int checkDirRaw(char* temp) {
 	int ret;
 	length = strlen(temp);
 	if(temp[length-1] != '/') {
+		LOGD("checkDirRaw file(%s)", temp);
 		// Check if it's a regular file. If so, ENOTDIR.
 		file = maFileOpen(temp, MA_ACCESS_READ);
 		if(file > 0) {
@@ -714,6 +716,7 @@ static int checkDirRaw(char* temp) {
 		temp[length] = 0;
 	}
 	
+	LOGD("checkDirRaw dir(%s)", temp);
 	CHECK(file = maFileOpen(temp, MA_ACCESS_READ), EIO);
 	ret = maFileExists(file);
 	CHECK(maFileClose(file), EIO);

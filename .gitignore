@@ -193,6 +193,7 @@ profile.txt
 /tests/libc-suite/fp.xml
 /tests/libc-suite/profile.txt
 /tests/libc-suite/settings.rb
+/tests/libc-suite/_masterdump.s
 /tests/libc-suite/filesystem
 /tests/libc-suite/loader/config.h
 

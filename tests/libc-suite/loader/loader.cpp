@@ -55,6 +55,7 @@ private:
 			printf("Broken exit_status.\n");
 			FREEZE;
 		}
+		maCloseStore(store, 0);
 		maReadData(data, &status, 0, sizeof(int));
 		// for now, break on error.
 		printf("status: %i\n", status);

@@ -51,15 +51,20 @@ final MAHandle maFileOpen(String path, int mode) {
 	FileConnection fc;
 	try {
 		fc = (FileConnection)Connector.open("file:///" + path, mode);
-	} catch(IOException e) {
-		PRINT_STACK_TRACE;
-		return MA_FERR_GENERIC;
+		if(fc == null) {
+			DEBUG_ALWAYS("maFileOpen: Connector.open(\"file:///" + path + "\", "+mode+") returned null.\n");
+			return MA_FERR_GENERIC;
+		}
+		if(fc.isDirectory() && path.charAt(path.length()-1) != '/') {
+			DEBUG_ALWAYS("maFileOpen: directory opened without slash.\n");
+			fc.close();
+			return MA_FERR_GENERIC;
+		}
 	} catch(SecurityException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_FORBIDDEN;
-	}
-	if(fc == null) {
-		DEBUG_ALWAYS("maFileOpen: Connector.open(\"file:///" + path + "\", "+mode+") returned null.\n");
+	} catch(IOException e) {
+		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;
 	}
 	FileHandle fh = new FileHandle();
@@ -90,8 +95,9 @@ final int maFileClose(MAHandle file) throws Exception {
 
 final int maFileCreate(MAHandle file) {
 	FileHandle fh = getFileHandle(file);
+	//DEBUG_TEMP("maFileCreate:("+fh.fc.getURL()+")\n");
 	try {
-		if(fh.fc.isDirectory()) {
+		if(fh.isDirectory()) {
 			fh.fc.mkdir();
 		} else {
 			fh.fc.create();
