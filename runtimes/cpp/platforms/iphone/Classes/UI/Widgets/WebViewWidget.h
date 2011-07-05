@@ -22,11 +22,12 @@
 	NSString* newurl;
     NSString* hookPattern;
     NSString* javaScriptIdentifier;
+    NSMutableDictionary* urlsToNotHook;
 }
 
 - (id)init;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
-//- (NSArray*)findMatches: (NSString*)text withRegularExpression: (NSString*)expression;
+
 
 @end

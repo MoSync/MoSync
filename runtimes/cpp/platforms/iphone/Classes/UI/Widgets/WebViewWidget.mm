@@ -32,6 +32,8 @@
 	newurl = @"";
     hookPattern = @"";
     javaScriptIdentifier=@"javascript:";
+    urlsToNotHook=[[NSMutableDictionary alloc] init];
+    [urlsToNotHook retain];
 	return [super init];	
 }
 
@@ -49,6 +51,17 @@
         {
             NSURL *url = [NSURL URLWithString:value];
             NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
+            NSString *absoluteURL=[url absoluteString];
+            NSNumber *unHookCount=(NSNumber*)[urlsToNotHook objectForKey:absoluteURL];
+            
+            if(unHookCount)
+            {
+                [urlsToNotHook setValue:[NSNumber numberWithInteger:(unHookCount.integerValue+1)] forKey:absoluteURL]; //No idea why...
+            }
+            else
+            {
+                [urlsToNotHook setObject:[NSNumber numberWithInteger:1] forKey:absoluteURL];
+            }
             [webView loadRequest:requestObj];
         }
     } else if([key isEqualToString:@MAW_WEB_VIEW_URL_HOOK_PATTERN]) {
@@ -71,6 +84,8 @@
 		NSString* ret = @"";
 		ret = newurl;
 		return ret;
+    } else if([key isEqualToString:@MAW_WEB_VIEW_URL_HOOK_PATTERN]) {
+		return hookPattern;
 	} else {
 		return [super getPropertyWithKey:key];
 	}
@@ -82,9 +97,24 @@
         return NO;
     }
     NSString *url=[NSString stringWithString:request.URL.absoluteString];
-    if([url compare:hookPattern options:NSRegularExpressionSearch|NSCaseInsensitiveSearch]>-1)
+    NSNumber *unHookCount=[urlsToNotHook objectForKey:url];
+    BOOL skipHook=NO;
+    if(unHookCount)
     {
+        skipHook=YES;
         
+        if (unHookCount.intValue==1)
+        {
+            [urlsToNotHook removeObjectForKey:url];
+        }
+        else
+        {
+            [urlsToNotHook setValue:[NSNumber numberWithInteger:(unHookCount.integerValue-1)] forKey:url];
+        }
+    }
+    NSRange range=[url rangeOfString:hookPattern options:NSRegularExpressionSearch|NSCaseInsensitiveSearch];
+    if(skipHook==NO && range.location==0 && range.length==[url length])
+    {
         MAEvent event;
         event.type = EVENT_TYPE_WIDGET;
         MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -120,33 +150,6 @@
 	return YES; 
 }
 
-/*
-- (NSArray*)findMatches:(NSString *)text withRegularExpression:(NSString *)expression {
-    
-    NSMutableArray *capturedStrings;
-    
-    NSError *err=NULL;
-    NSRegularExpression *regex=[[NSRegularExpression regularExpressionWithPattern:expression options:NSRegularExpressionCaseInsensitive error:&err] retain];
-    
-    NSArray *matches=[regex matchesInString:text options:NSRegularExpressionCaseInsensitive range:NSMakeRange(0,[text length ]) ];
-    
-    if([matches count]==0)
-    {
-        return NULL;
-    }
-    
-    capturedStrings=[NSMutableArray arrayWithCapacity:[matches count]]; //Ok, so [matches count] probably isnt enough, but it's not static, soooooo....
-    for(NSTextCheckingResult *match in matches)
-    {
-        for(int i=1;i<[match numberOfRanges];i++)
-        {
-            [capturedStrings addObject:[text substringWithRange:[match rangeAtIndex:i]]];
-        }
-    }
-    
-    [regex release];
-    return capturedStrings;
-}*/
 
 @end
 
