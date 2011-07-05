@@ -2104,6 +2104,8 @@ interface MAAPI {
 		* Directory paths must end with a slash('/').
 		*
 		* Attempting to open an existing directory without ending its path with a slash will fail.
+		* Likewise, attempting to open an existing file while ending its path with a slash will also fail.
+		* Either case will return #MA_FERR_NOTFOUND.
 		*
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
 		*

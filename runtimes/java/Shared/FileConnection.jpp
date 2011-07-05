@@ -48,6 +48,7 @@ OutputStream getFileOutputStream(MAHandle file) throws IOException {
 //File Functions
 //***************************************************************************
 final MAHandle maFileOpen(String path, int mode) {
+	DEBUG_TEMP("maFileOpen("+path+", "+mode+"): "+mFileNextHandle+"\n");
 	FileConnection fc;
 	try {
 		fc = (FileConnection)Connector.open("file:///" + path, mode);
@@ -55,10 +56,10 @@ final MAHandle maFileOpen(String path, int mode) {
 			DEBUG_ALWAYS("maFileOpen: Connector.open(\"file:///" + path + "\", "+mode+") returned null.\n");
 			return MA_FERR_GENERIC;
 		}
-		if(fc.isDirectory() && path.charAt(path.length()-1) != '/') {
-			DEBUG_ALWAYS("maFileOpen: directory opened without slash.\n");
+		if(fc.exists() && (fc.isDirectory() != (path.charAt(path.length()-1) == '/'))) {
+			DEBUG_ALWAYS("maFileOpen: slash/isDirectory mismatch.\n");
 			fc.close();
-			return MA_FERR_GENERIC;
+			return MA_FERR_NOTFOUND;
 		}
 	} catch(SecurityException e) {
 		PRINT_STACK_TRACE;
@@ -76,10 +77,12 @@ final MAHandle maFileOpen(String path, int mode) {
 
 final int maFileExists(MAHandle file) throws Exception {
 	FileHandle fh = getFileHandle(file);
+	DEBUG_TEMP("maFileExists("+file+"): "+fh.fc.exists()+"\n");
 	return fh.fc.exists() ? 1 : 0;
 }
 
 final int maFileClose(MAHandle file) throws Exception {
+	DEBUG_TEMP("maFileClose("+file+")\n");
 	Integer key = new Integer(file);
 	FileHandle fh = (FileHandle)mFileHandles.get(key);
 	DEBUG_ASSERT(fh != null);
@@ -95,7 +98,7 @@ final int maFileClose(MAHandle file) throws Exception {
 
 final int maFileCreate(MAHandle file) {
 	FileHandle fh = getFileHandle(file);
-	//DEBUG_TEMP("maFileCreate:("+fh.fc.getURL()+")\n");
+	DEBUG_TEMP("maFileCreate("+fh.fc.getURL()+")\n");
 	try {
 		if(fh.isDirectory()) {
 			fh.fc.mkdir();
@@ -166,6 +169,18 @@ final int maFileTruncate(MAHandle file, int offset) {
 final int maFileDelete(MAHandle file) {
 	try {
 		FileHandle fh = getFileHandle(file);
+
+		// Make sure file is not open.
+		Enumeration e = mFileHandles.elements();
+		String url = fh.fc.getURL();
+		while(e.hasMoreElements()) {
+			FileHandle ofh = (FileHandle)e.nextElement();
+			if(ofh.fc != null && ofh != fh) if(ofh.fc.getURL().equals(url)) {
+				DEBUG_ALWAYS("maFileDelete("+file+"): file is still open!\n"); 
+				return MA_FERR_GENERIC;
+			}
+		}
+
 		fh.fc.delete();
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
@@ -184,6 +199,7 @@ final int maFileSize(MAHandle file) {
 	try {
 		FileHandle fh = getFileHandle(file);
 		long s = fh.fc.fileSize();
+		//DEBUG_TEMP("maFileSize("+file+"): "+s+"\n");
 		if(s > INT_MAX || s < 0) {
 			return MA_FERR_GENERIC;
 		}
