@@ -34,6 +34,10 @@ public:
 			runNextTest();
 		}
 	}
+	void keyPressEvent(int keyCode, int nativeCode) {
+		if(keyCode == MAK_0 || keyCode == MAK_BACK)
+			close();
+	}
 private:
 	void checkResult() {
 		MAHandle store = maOpenStore(STORE_BASE_NAME "testing", 0);
