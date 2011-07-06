@@ -448,6 +448,14 @@ namespace Base {
     }
     
     
+    SYSCALL(int, maFontGetCount()){
+        
+    }
+    
+    SYSCALL(int, maFontGetName(int index, char* buffer, int bufferLength)){
+        
+    }
+    
     
     SYSCALL(MAHandle, maFontSetCurrent(MAHandle font)){
         if(font<1||font>sFontList.size()||!sFontList[font-1])
@@ -1146,6 +1154,8 @@ namespace Base {
 		maIOCtl_syscall_case(maFileSize);
         maIOCtl_case(maFontCreateDefault);
         maIOCtl_case(maFontSetCurrent);
+        maIOCtl_case(maFontGetCount);
+        maIOCtl_case(maFontGetName);
 		maIOCtl_case(maTextBox);		
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);			
