@@ -6,13 +6,17 @@
 AdvGraphics
 debugging
 HelloMap
+HelloMAUI
+HelloWorld
 HelloNativeUI
 HelloOpenGLES
+Graphun
+RockPaperScissorsGameNativeUI
+NativeUIDemo
 Location = location
 MapDemo
 MAStx
 MAUIEx = MAUI/MAUIex
-MinUI
 BluetoothServer
 BluetoothClient
 Connection = Moblet/Connection

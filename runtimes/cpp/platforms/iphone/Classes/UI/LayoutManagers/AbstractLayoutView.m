@@ -51,6 +51,7 @@
         vAlignment = va;
         
         self.scrollEnabled = NO;
+        self.userInteractionEnabled = YES;
     }
     return self;
 }

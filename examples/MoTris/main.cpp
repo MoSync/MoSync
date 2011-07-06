@@ -1,18 +1,19 @@
-/* Copyright (C) 2009 Mobile Sorcery AB
+/*
+Copyright (C) 2011 MoSync AB
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License, version 2, as published by
-the Free Software Foundation.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
 
 This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with this program; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
 */
 
 /** \file main.cpp
@@ -20,8 +21,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * This file contains the main example program source.
 *
 * Shows how to create a medium advanced game called MoTris (tetris clone).
-*
-* Copyright (c) Mobile Sorcery AB 2005-2007
 *
 * \author Niklas Nummelin
 *
@@ -1053,7 +1052,7 @@ void drawBackground(int w, int h, int x, int y) {
 	MAExtent logoExtents = maGetImageSize(MOTRIS_LOGO);
 	maDrawImage(MOTRIS_LOGO, (w>>1) - (EXTENT_X(logoExtents)>>1),  beneathLogoY-EXTENT_Y(logoExtents)-4);
 
-	const char *copyright = "(c) mobile sorcery 2007";
+	const char *copyright = "(c) MoSync 2011";
 	MAExtent ce = maGetTextSize(copyright);
 	aboveCopyrightY = h-EXTENT_Y(ce);
 	drawShadowedText((w>>1)-(EXTENT_X(ce)>>1), aboveCopyrightY, TEXT_COLOR, copyright);

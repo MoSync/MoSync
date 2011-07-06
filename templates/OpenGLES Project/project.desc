@@ -1,0 +1,10 @@
+id = project.opengles
+name = MoSync OpenGL Project
+description = A project that uses the OpenGLES functionality in MoSync.
+
+[Files]
+main.cpp
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib
+build.prefs:additional.libraries/Debug=MAUtilD.lib

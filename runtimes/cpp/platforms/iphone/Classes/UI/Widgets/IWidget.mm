@@ -102,7 +102,7 @@
 		//view.autoresizesSubviews = YES;
 		view.backgroundColor = [UIColor colorWithHexString:@"00000000"];
 		//view.backgroundColor = [UIColor redColor];
-		
+        
 		//[[view layer] setBorderWidth:1.0];
 		//[[view layer] setBorderColor:[UIColor redColor].CGColor];
     }

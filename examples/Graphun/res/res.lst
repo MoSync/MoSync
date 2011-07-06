@@ -1,0 +1,8 @@
+.res R_GRAPHUN_LOGO
+.image "graphun.png"
+
+.res R_TEXTURE
+.image "tile.jpg"
+
+.res R_SETTINGS_ICON
+.image "157-wrench.png"
