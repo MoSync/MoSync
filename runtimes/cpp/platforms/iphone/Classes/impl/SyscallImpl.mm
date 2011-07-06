@@ -465,9 +465,25 @@ namespace Base {
         CGContextSelectFont(gDrawTarget->context,
                             CFStringGetCStringPtr(currentFont->name,kCFStringEncodingMacRoman), 
                             currentFont->size, kCGEncodingMacRoman);
-        
+ 
         return prevHandle;
         
+    }
+    
+    //Used to initialize (if needed) and return a UIFont object from a Font handle, to be used by NativeUI
+    UIFont* getUIFontObject(MAHandle fontHandle)
+    {
+        if(fontHandle<1||fontHandle>sFontList.size()||!sFontList[fontHandle-1])
+        {
+            printf("wrong MAHandle");
+            return 0;
+        }
+        
+        FontInfo *selectedFont=sFontList[fontHandle-1];
+        
+        if (selectedFont->uiFontObject==NULL) {
+            selectedFont->uiFontObject=[[UIFont fontWithName:(NSString *) selectedFont->name size:selectedFont->size] retain];
+        }
     }
     
     //Used to instantiate the CGFont object only when needed
