@@ -1645,6 +1645,18 @@ interface MAAPI {
 		*/
 		MAHandle maFontSetCurrent(in MAHandle font);
 
+		/**
+		* Returns the number of fonts that are available in the system
+		*/
+		int maFontGetCount();
+		
+		/**
+		* Copies the font name of the given index to the buffer
+		* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE]
+		* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC]
+		* \param 'size' The size of the font
+		*/
+		int maFontGetName(in int index, out char* buffer, in int bufferLen);
 		
 		/**
 		 * Sends the current call stack to the report pipe. Returns 0 if succeeded.
