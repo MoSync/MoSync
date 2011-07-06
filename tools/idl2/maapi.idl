@@ -2817,39 +2817,100 @@ interface MAAPI {
 			UID = 117;
 			/// #MA_PIM_TYPE_STRING. Uniform Resource Locator associated with the contact.
 			URL = 118;
+			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing an IM address .
+			/// Has \link #MA_PIM_CONTACT_IM_USERNAME MA_PIM_CONTACT_IM \endlink indices.
+			IM = 119;
+			/// #MA_PIM_TYPE_STRING. A data kind representing a relation. 
+			RELATION = 120;
+			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing a organization. 
+			/// Has \link #MA_PIM_CONTACT_ORGANIZATION_NAME MA_PIM_CONTACT_ORGANIZATION \endlink indices.
+			ORGANIZATION = 121;
 		}
 
-		constset int MA_PIM_CONTACT_ {
+		constset int MA_PIM_CONTACT_ADDR_ {
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Post office box number.
-			ADDR_POBOX = 0;
+			POBOX = 0;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Extra info.
-			ADDR_EXTRA = 1;
+			EXTRA = 1;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Street name and number.
-			ADDR_STREET = 2;
+			STREET = 2;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Locality name. (ex. city)
-			ADDR_LOCALITY = 3;
+			LOCALITY = 3;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Region name. (ex. province, state or territory)
-			ADDR_REGION = 4;
+			REGION = 4;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Postal code.
-			ADDR_POSTALCODE = 5;
+			POSTALCODE = 5;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country name.
-			ADDR_COUNTRY = 6;
+			COUNTRY = 6;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country code.
+			COUNTRY_CODE = 7;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Neighborhood.
+			NEIGHBORHOOD = 8;
+		}
+			
+		constset int MA_PIM_CONTACT_NAME_ {
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Family name.
-			NAME_FAMILY = 0;
+			FAMILY = 0;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Given name.
-			NAME_GIVEN = 1;
+			GIVEN = 1;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Alternate/secondary names, if any.
-			NAME_OTHER = 2;
+			OTHER = 2;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Prefix. (ex. "Dr.")
-			NAME_PREFIX = 3;
+			PREFIX = 3;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
-			NAME_SUFFIX = 4;
+			SUFFIX = 4;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Middle name.
+			MIDDLE = 5;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic first name.
+			PHONETIC_FIRST_NAME = 6;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic last name.
+			PHONETIC_LAST_NAME = 7;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic middle name.
+			PHONETIC_MIDDLE_NAME = 8;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Nickname
+			NICKNAME = 9;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Note
+			NOTE = 10;
+		}
+		
+		constset int MA_PIM_CONTACT_ORGANIZATION_ {
+			/// #MA_PIM_TYPE_STRING.
+			NAME = 0;
+			/// #MA_PIM_TYPE_STRING.
+			JOB_TITLE = 1;
+			/// #MA_PIM_TYPE_STRING.
+			DEPARTMENT = 2;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			JOB_DESCRIPTION = 3;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			SYMBOL = 4;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			PHONETIC_NAME = 5;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			OFFICE_LOCATION = 6;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			PHONETIC_NAME_STYLE = 7;
+		}
+		
+		constset int MA_PIM_CONTACT_IM_ {
+			/// #MA_PIM_TYPE_STRING.
+			USERNAME = 0;
+			/// #MA_PIM_TYPE_STRING.
+			PROTOCOL = 1;
+		}
+		
+		constset int MA_PIM_CONTACT_CLASS_ {			
 			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
-			CLASS_CONFIDENTIAL = 200;
+			CONFIDENTIAL = 200;
 			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
-			CLASS_PRIVATE = 201;
+			PRIVATE = 201;
 			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
-			CLASS_PUBLIC = 202;
+			PUBLIC = 202;
 		}
 
 		constset int MA_PIM_ATTR_ {
@@ -2928,6 +2989,33 @@ interface MAAPI {
 		* \param index \>= 0 and \< maPimItemFieldCount().
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
+
+		/** Sets a custom label for a value in a field and item.
+		* This also removes all of that value's attributes.
+		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
+		* \a args.bufSize must be valid.
+		* \param args Common arguments.
+		* \param index An index into the field's value array.
+		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
+		* \note This function is not available on JavaME or Blackberry.
+		*/
+		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
+
+		/** Retrieves the custom label for a value in a field and item,
+		* if the value has a custom label.
+		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
+		* \a args.bufSize must be valid.
+		* \param args Common arguments.
+		* \param index An index into the field's value array.
+		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+		* \returns If the value does not have a custom label, #MA_PIM_ERR_NO_LABEL.
+		* If it does, the number of bytes occupied by the value.
+		* If this number is greater than bufSize, the value is not written,
+		* and you'll have to allocate a bigger buffer and try again.
+		* \note This function is not available on JavaME or Blackberry.
+		*/
+		int maPimItemGetLabel(in MA_PIM_ARGS args, in int index);
 
 		/** Returns one of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants,
 		* or \< 0 if the field does not exist in the list.
@@ -3015,7 +3103,7 @@ interface MAAPI {
 		* \returns 0.
 		* \see maPimItemClose()
 		*/
-		int maPimItemRemove(in MAHandle list, in MAHandle item);
+		int maPimItemRemove(in MAHandle list, in MAHandle item);		
 #endif	//IX_PIM
 
 #if IX_WIDGET

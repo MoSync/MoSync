@@ -382,7 +382,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	else if (event.type == EVENT_TYPE_SENSOR)
 	{
 		event.sensor.type = intArray[1];
-		memcpy( event.sensor.values, intArray + 2, (len - 2) * sizeof(jint) );
+		memcpy( event.sensor.values, intArray + 2, (arrayLength - 2) * sizeof(jint) );
 	}
 	
 	// Release the memory used for the int array.

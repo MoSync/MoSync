@@ -23,7 +23,17 @@ public class MoSyncSensor implements SensorEventListener {
 	
 	private static final int SENSOR_TYPE_ALL = -1;
 	private static final int SENSOR_TYPE_ACCELEROMETER = 1;
-	private static final int SENSOR_TYPES = 10;
+	private static final int SENSOR_TYPE_MAGNETIC_FIELD = 2;
+	private static final int SENSOR_TYPE_ORIENTATION = 3;
+	private static final int SENSOR_TYPE_GYROSCOPE = 4;
+	private static final int SENSOR_TYPE_LIGHT = 5;
+	private static final int SENSOR_TYPE_PRESSURE = 6;
+	private static final int SENSOR_TYPE_TEMPERATURE = 7;
+	private static final int SENSOR_TYPE_PROXIMITY = 8;
+	private static final int SENSOR_TYPE_GRAVITY = 9;
+	private static final int SENSOR_TYPE_LINEAR_ACCELERATION = 10;
+	private static final int SENSOR_TYPE_ROTATION_VECTOR = 11;
+	private static final int SENSOR_TYPES = 11;
 
 	private static final int SENSOR_ERROR_NONE = 0;
 	
@@ -115,19 +125,32 @@ public class MoSyncSensor implements SensorEventListener {
 		try
 		{
 			event[SEVENT_TYPE] = EVENT_TYPE_SENSOR;
-			event[SEVENT_SENSOR_TYPE] = arg0.sensor.getType();
-			int len = arg0.values.length;
-			for (int i=0; i<arg0.values.length; i++)
+			event[SEVENT_SENSOR_TYPE] = getSensorType(arg0.sensor.getType());
+			
+			switch (event[SEVENT_SENSOR_TYPE])
 			{
-				if (event[SEVENT_SENSOR_TYPE] == SENSOR_TYPE_ACCELEROMETER)
-				{
-					event[SEVENT_SENSOR_VALUES + i] = Float.floatToIntBits(arg0.values[i] / ACCELEROMETER_ADJUSTMENT);
-				}
-				else
-				{
-					event[SEVENT_SENSOR_VALUES + i] = Float.floatToIntBits(arg0.values[i]);
-				}
-	        }
+				case SENSOR_TYPE_ORIENTATION:
+					break;
+				case SENSOR_TYPE_PROXIMITY:
+					break;
+				case SENSOR_TYPE_ACCELEROMETER:
+					for (int i=0; i<arg0.values.length; i++)
+					{
+						event[SEVENT_SENSOR_VALUES + i] = Float.floatToIntBits(arg0.values[i] / ACCELEROMETER_ADJUSTMENT);
+			        }
+				default:
+					for (int i=0; i<arg0.values.length; i++)
+					{
+						if (event[SEVENT_SENSOR_TYPE] == Sensor.TYPE_ACCELEROMETER)
+						{
+							event[SEVENT_SENSOR_VALUES + i] = Float.floatToIntBits(arg0.values[i] / ACCELEROMETER_ADJUSTMENT);
+						}
+						else
+						{
+							event[SEVENT_SENSOR_VALUES + i] = Float.floatToIntBits(arg0.values[i]);
+						}
+			        }
+			}
 		}
 		catch (Exception e)
 		{
@@ -166,6 +189,40 @@ public class MoSyncSensor implements SensorEventListener {
 		return SENSOR_ERROR_NONE;
 	}
 
+	/*
+	 * Returns the MoSync type starting from the Android one
+	 */
+	int getSensorType(int type)
+	{
+		switch (type)
+		{
+			case Sensor.TYPE_ACCELEROMETER:
+				return SENSOR_TYPE_ACCELEROMETER;
+			case Sensor.TYPE_MAGNETIC_FIELD:
+				return SENSOR_TYPE_MAGNETIC_FIELD;
+			case Sensor.TYPE_ORIENTATION:
+				return SENSOR_TYPE_ORIENTATION;
+			case Sensor.TYPE_GYROSCOPE:
+				return SENSOR_TYPE_GYROSCOPE;
+			case Sensor.TYPE_LIGHT:
+				return SENSOR_TYPE_LIGHT;
+			case Sensor.TYPE_PRESSURE:
+				return SENSOR_TYPE_PRESSURE;
+			case Sensor.TYPE_TEMPERATURE:
+				return SENSOR_TYPE_TEMPERATURE;
+			case Sensor.TYPE_PROXIMITY:
+				return SENSOR_TYPE_PROXIMITY;
+//			case Sensor.TYPE_GRAVITY:
+//				return SENSOR_TYPE_GRAVITY;
+//			case Sensor.TYPE_LINEAR_ACCELERATION:
+//				return SENSOR_TYPE_LINEAR_ACCELERATION;
+//			case Sensor.TYPE_ROTATION_VECTOR:
+//				return SENSOR_TYPE_ROTATION_VECTOR;
+			default:
+				return SENSOR_TYPE_ALL;
+		}
+	}
+	
 	/*
 	 * Returns the Android rate starting from the MoSync one
 	 */
