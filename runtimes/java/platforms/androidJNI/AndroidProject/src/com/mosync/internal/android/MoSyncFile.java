@@ -72,7 +72,7 @@ public class MoSyncFile {
 			if(mAccessMode != MA_ACCESS_READ_WRITE &&
 				mAccessMode != MA_ACCESS_READ)
 			{
-				throw new Exception("Invalid access mode!");
+				throw new Error("Invalid access mode!");
 			}
 			mFile = new File(path);
 			
@@ -225,11 +225,15 @@ public class MoSyncFile {
 		try
 		{
 			MoSyncFileHandle fileHandle = new MoSyncFileHandle(path, mode);
-			if(fileHandle.mFile.exists() && fileHandle.mIsAFile)
-			{
-				int res = fileHandle.open();
-				if(res < 0)
-					return res;
+			if(fileHandle.mFile.exists()) {
+				if(fileHandle.mIsAFile != fileHandle.mFile.isFile())
+					return MA_FERR_NOTFOUND;
+				if(fileHandle.mIsAFile)
+				{
+					int res = fileHandle.open();
+					if(res < 0)
+						return res;
+				}
 			}
 			mFileHandles.put(mFileHandleNext, fileHandle);
 		}

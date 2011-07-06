@@ -62,7 +62,7 @@ private:
 		maCloseStore(store, 0);
 		maReadData(data, &status, 0, sizeof(int));
 		// for now, break on error.
-		printf("status: %i\n", status);
+		printf("test %i status: %i\n", mState, status);
 		if(status != 0) {
 			FREEZE;
 		}
