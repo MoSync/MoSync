@@ -131,12 +131,14 @@ public class MoSyncFile {
 		{
 			try
 			{
-				mFileChannel.close();
-				mRandomAccessFile.close();
+				if(mFileChannel != null)
+					mFileChannel.close();
+				if(mRandomAccessFile != null)
+					mRandomAccessFile.close();
 			}
 			catch(Throwable t)
 			{
-				return MA_FERR_GENERIC;
+				t.printStackTrace();
 			}
 			
 			return 0;
@@ -219,10 +221,11 @@ public class MoSyncFile {
 	*/
 	int maFileOpen(String path, int mode)
 	{
+		Log.i("maFileOpen","("+path+", "+mode+"): "+mFileHandleNext);
 		try
 		{
 			MoSyncFileHandle fileHandle = new MoSyncFileHandle(path, mode);
-			if(fileHandle.mFile.exists())
+			if(fileHandle.mFile.exists() && fileHandle.mIsAFile)
 			{
 				int res = fileHandle.open();
 				if(res < 0)
@@ -245,6 +248,7 @@ public class MoSyncFile {
 	int maFileExists(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
+		Log.i("maFileExists","("+file+"): "+fileHandle.mFile.exists());
 		if(fileHandle.mFile.exists()) return 1;
 		return 0;
 	}
@@ -254,6 +258,7 @@ public class MoSyncFile {
 	*/
 	int maFileClose(int file)
 	{
+		Log.i("maFileClose","("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		fileHandle.close();
 		mFileHandles.remove(file);
@@ -270,6 +275,7 @@ public class MoSyncFile {
 	*/
 	int maFileCreate(int file)
 	{
+		Log.i("maFileCreate","("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		
 		if(fileHandle.mAccessMode == MA_ACCESS_READ)
@@ -305,6 +311,7 @@ public class MoSyncFile {
 	*/
 	int maFileDelete(int file)
 	{
+		Log.i("maFileDelete","("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 
 		if(!fileHandle.mFile.exists())
