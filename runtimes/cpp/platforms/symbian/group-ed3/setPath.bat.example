@@ -1,0 +1,2 @@
+set EPOCROOT=\Symbian\9.2\S60_3rd_FP1\
+set PATH=%EPOCROOT%epoc32\tools\;c:\Perl\bin\;%EPOCROOT%epoc32\gcc\bin\;c:\Program Files\CSL Arm Toolchain\bin\;c:\Program Files\Common Files\Symbian\tools\;%PATH%

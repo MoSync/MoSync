@@ -2007,14 +2007,19 @@ int Syscall::maFileListClose(MAHandle list) {
 #define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
 
 // TODO: Share these two with Base. Implement FileStream::mTime and truncate.
+// Or not; stat() isn't very implemented on Symbian, I think.
 int Syscall::maFileDate(MAHandle file) {
 	LOGD("maFileDate(%i)\n", file);
 	FileHandle& fh(getFileHandle(file));
-	if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
-	if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
 	TTime modTime;
-	// TODO: improve error code translation
-	SYMERR_CONVERT(fh.fs->mFile.Modified(modTime), MA_FERR_GENERIC);
+	if(fh.fs) {
+		if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
+		// TODO: improve error code translation
+		SYMERR_CONVERT(fh.fs->mFile.Modified(modTime), MA_FERR_GENERIC);
+	} else {	// directory and/or nonexistent
+		TCleaner<HBufC16> name(CreateHBufC16FromCStringLC(fh.name.p()));
+		SYMERR_CONVERT(CCoeEnv::Static()->FsSession().Modified(*name, modTime), MA_FERR_GENERIC);
+	}
 	return unixTime(modTime);
 }
 

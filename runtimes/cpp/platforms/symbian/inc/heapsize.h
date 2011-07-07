@@ -15,4 +15,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-#define HEAP_SIZE 0x1400000	//about 20 MB
+#define HEAP_SIZE 0x2000000	//about 32 MB

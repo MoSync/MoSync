@@ -692,9 +692,8 @@ namespace Base {
 		int res = isDirectory(fh.name);
 		if(res < 0) {
 			LOGF("File: %s\n", fh.name.p());
-		}
-		if(res > 0 && !fh.isDirectory()) {
-			FILE_FAIL(MA_FERR_GENERIC);
+		} else if(res > 0 != fh.isDirectory()) {
+			FILE_FAIL(MA_FERR_NOTFOUND);
 		}
 		if(fh.mode == MA_ACCESS_READ_WRITE) {
 			if(res == 0) {	//file exists and is not a directory
