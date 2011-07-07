@@ -142,7 +142,7 @@ public:	//CConnection
 	
 	CHttpConnection* http() { return this; }
 	
-	void CancelAll() { mTransport->CancelAll(); }
+	void CancelAll();
 	void GetAddr(MAConnAddr* addr) { mTransport->GetAddr(addr); }
 
 	//CBaseSocket
