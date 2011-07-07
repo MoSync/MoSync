@@ -50,7 +50,7 @@ namespace Base {
 		if(write) {
 			if(append || exist) {
 				LOG("AFO %s\n", filename);
-				TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, EFileShareExclusive | EFileWrite));
+				TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, EFileShareReadersOrWriters | EFileWrite));
 				if(IS_SYMBIAN_ERROR(mOpenResult))
 					return;
 				TInt offset = 0;
@@ -61,11 +61,11 @@ namespace Base {
 				}
 			} else {
 				LOG("WFO %s\n", filename);
-				TSNR(mOpenResult = mFile.Replace(mFs, *unicodeName, EFileShareExclusive | EFileWrite));
+				TSNR(mOpenResult = mFile.Replace(mFs, *unicodeName, EFileShareReadersOrWriters | EFileWrite));
 			}
 		} else {
 			LOG("RFO %s\n", filename);
-			TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, EFileShareReadersOnly));
+			TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, EFileShareReadersOrWriters));
 		}
 	}
 
