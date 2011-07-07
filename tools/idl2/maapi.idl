@@ -1640,7 +1640,7 @@ interface MAAPI {
 		* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC]
 		* \param 'size' The size of the font
 		*/
-		MAHandle maFontCreateDefault(in int type, in int style, in int size);
+		MAHandle maFontLoadDefault(in int type, in int style, in int size);
 
 		/**
 		* Sets the font to be used with maDrawText and maDrawTextW, and returns the handle
@@ -1655,12 +1655,26 @@ interface MAAPI {
 		int maFontGetCount();
 		
 		/**
-		* Copies the font name of the given index to the buffer
+		* Copies the font postscript name of the given index to the buffer, returns the number of bytes copied (with terminating NULL)
 		* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE]
 		* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC]
 		* \param 'size' The size of the font
 		*/
 		int maFontGetName(in int index, out char* buffer, in int bufferLen);
+
+		/**
+		* Returns a handle to a font with the specific postscript name and size
+		* \param 'postScriptName' The postscript name of the font
+		* \param 'size' The size of the font
+		*/
+		MAHandle maFontLoadWithPostScriptName(in char* postScriptName, in int size);
+
+		/**
+		* Deletes a loaded font
+		* \param 'font' A font handle
+		*/
+		int maFontDelete(in MAHandle font);
+
 		
 		/**
 		 * Sends the current call stack to the report pipe. Returns 0 if succeeded.
