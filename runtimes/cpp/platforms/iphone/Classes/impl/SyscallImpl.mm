@@ -134,7 +134,7 @@ namespace Base {
     const short INITIAL_FONT_STYLE=FONT_STYLE_NORMAL;
     const short INITIAL_FONT_TYPE=FONT_TYPE_SANS_SERIF;
     
-    extern "C" MAHandle maFontCreateDefault(int type, int style, int size);
+    extern "C" MAHandle maFontLoadDefault(int type, int style, int size);
     extern "C" MAHandle maFontSetCurrent(MAHandle font);
     
 
@@ -233,7 +233,7 @@ namespace Base {
         gDrawTarget = gBackbuffer;
         
         //Setting the initially selected font. gHeight/40 was used originally, is kept for backwards compatibility
-        MAHandle initFontHandle=maFontCreateDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,gHeight/40);         
+        MAHandle initFontHandle=maFontLoadDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,(int)(gHeight/40));         
         maFontSetCurrent(initFontHandle);
 		
 		mach_timebase_info( &gTimeBase );
@@ -387,9 +387,37 @@ namespace Base {
 		return len;
 	}
     
+    MAHandle createFontInfo(CFStringRef name, GLfloat size, UIFont *uiFontObject, CGFontRef cgFontObject)
+    {
+        MAHandle handle;
+        FontInfo *newFontInfo=new FontInfo;
+        newFontInfo->name=name;
+        newFontInfo->size=size;
+        newFontInfo->uiFontObject=uiFontObject;
+        newFontInfo->cgFontObject=cgFontObject;
+        
+        int i;
+        for(i=0; i<sFontList.size() ; i++)
+        {
+            if(!sFontList[i])break;
+        }
+        if(i<sFontList.size())
+        {
+            //printf("\n inserting %s at position %d\n",CFStringGetCStringPtr(newFontInfo->name,kCFStringEncodingMacRoman),i);
+            sFontList[i]=newFontInfo; //Inserting at the first empty position in the array
+        }
+        else
+        {
+            //printf("\n Inserting %s at the end (%d)\n",CFStringGetCStringPtr(newFontInfo->name,kCFStringEncodingMacRoman),i);
+            sFontList.push_back(newFontInfo); //Inserting at the end of the array
+        }
+        
+        handle=i+1; //Handles start from 1
+        
+        return handle;
+    }
     
-    SYSCALL(MAHandle, maFontCreateDefault(int type, int style, int size)){
-        int handle=0;
+    SYSCALL(MAHandle, maFontLoadDefault(int type, int style, int size)){
         
         int defaultFontIndex=0; //Index to gDefaultFontNames
         
@@ -421,39 +449,92 @@ namespace Base {
             return 0;
         }
         
-        FontInfo *newFontInfo=new FontInfo;
-        newFontInfo->name=gDefaultFontNames[defaultFontIndex];
-        newFontInfo->size=(CGFloat)size;
-        newFontInfo->uiFontObject=NULL;
-        newFontInfo->cgFontObject=NULL;
-        
-        
-        int i;
-        for(i=0; i<sFontList.size() ; i++)
-        {
-            if(!sFontList[i])break;
-        }
-        if(i<sFontList.size())
-        {
-            sFontList[i]=newFontInfo; //Inserting at the first empty position in the array
-        }
-        else
-        {
-            sFontList.push_back(newFontInfo); //Inserting at the end of the array
-        }
-        
-        handle=i+1; //Handles start from 1
-        
-        return handle;
+        // We ratain the string because we don't want maFontDelete to delete it, as it might be used by other handles
+        return createFontInfo((CFStringRef)CFRetain(gDefaultFontNames[defaultFontIndex]),(CGFloat)size,NULL,NULL);
     }
     
+    SYSCALL(MAHandle, maFontLoadWithPostScriptName(const char* postScriptName, int size)){
+        CFStringRef fontName=CFStringCreateWithCString(NULL,postScriptName,kCFStringEncodingMacRoman);
+        UIFont *uiFontObject=[UIFont fontWithName:(NSString*)fontName size:(GLfloat)size]; //Getting a UIFont object is probably the least expensive way to test if it exists
+        if(!uiFontObject)
+        {
+            return 0;
+        }
+        
+        return createFontInfo(fontName,(CGFloat)size,uiFontObject,NULL);
+
+    }
+    
+    SYSCALL(MAHandle, maFontDelete(MAHandle font)){
+        int index=font-1;
+        
+        if(index<0 || index>=sFontList.size() || sFontList[index]==NULL)
+        {
+            return 0;
+        }
+        
+        FontInfo *toDelete=sFontList[index];
+        
+        CFRelease(toDelete->name);
+        if(toDelete->uiFontObject)
+        {
+            [toDelete->uiFontObject release];
+        }
+        if(toDelete->cgFontObject)
+        {
+            CGFontRelease(toDelete->cgFontObject);
+        }
+        
+        delete toDelete;
+        sFontList[index]=NULL;
+        return 1;
+    }
+    
+    NSMutableArray *gDeviceFontNames;
     
     SYSCALL(int, maFontGetCount()){
+        if(!gDeviceFontNames)
+        {
+            gDeviceFontNames=[[NSMutableArray alloc] init ];
+            NSArray *familyNames=[UIFont familyNames];
+            NSEnumerator *familyEnumerator=[[familyNames objectEnumerator] retain];
+            
+            NSString *familyName;
+            while(familyName=[familyEnumerator nextObject])
+            {
+                NSArray *fontNamesInFamily=[UIFont fontNamesForFamilyName:familyName];
+                NSEnumerator *fontEnumerator=[[fontNamesInFamily objectEnumerator] retain];
+                
+                NSString *fontName;
+                while(fontName=[fontEnumerator nextObject])
+                {
+                    
+                    [gDeviceFontNames addObject:fontName];
+                    
+                }
+                [fontEnumerator release];
+                
+            }
+            [familyEnumerator release];
+        }
         
+        return gDeviceFontNames.count; 
     }
     
     SYSCALL(int, maFontGetName(int index, char* buffer, int bufferLength)){
+        if(!gDeviceFontNames)
+        {
+            return 0;
+        }
+        NSString *fontName=[gDeviceFontNames objectAtIndex:index];
+        if(!fontName || bufferLength<=[fontName lengthOfBytesUsingEncoding:NSASCIIStringEncoding])
+        {
+            return 0;
+        }
         
+        strncpy(buffer, [fontName cStringUsingEncoding:NSASCIIStringEncoding], bufferLength);
+        
+        return [fontName lengthOfBytesUsingEncoding:NSASCIIStringEncoding]+1;
     }
     
     
@@ -545,7 +626,12 @@ namespace Base {
 		int numGlyphs = wcharLength(str);		
 		if(numGlyphs==0) return;
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
-		CMFontGetGlyphsForUnichars(currentFont->cgFontObject, (const UniChar*)str, glyphs, numGlyphs);
+        if(!CMFontGetGlyphsForUnichars(currentFont->cgFontObject, (const UniChar*)str, glyphs, numGlyphs))
+        {
+            delete glyphs;
+            return;
+        }
+		
 		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);	
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
 		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
@@ -1152,7 +1238,9 @@ namespace Base {
 		maIOCtl_syscall_case(maFileCreate);
 		maIOCtl_syscall_case(maFileDelete);
 		maIOCtl_syscall_case(maFileSize);
-        maIOCtl_case(maFontCreateDefault);
+        maIOCtl_case(maFontLoadDefault);
+        maIOCtl_case(maFontLoadWithPostScriptName);
+        maIOCtl_case(maFontDelete);
         maIOCtl_case(maFontSetCurrent);
         maIOCtl_case(maFontGetCount);
         maIOCtl_case(maFontGetName);
