@@ -13,4 +13,5 @@ SETTINGS = {
 	:write_master_dump => false,
 	:copy_dce => false,
 	:dce_only => false,
+	:use_sld => true,
 }

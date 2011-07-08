@@ -243,6 +243,8 @@ end
 
 LOADER_URLS_FILE = open(SETTINGS[:htdocs_dir] + 'libc_tests.urls', 'wb') if(SETTINGS[:htdocs_dir])
 
+USE_SLD = !SETTINGS[:test_release] && SETTINGS[:use_sld]
+
 def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	suffix = dead_code ? 'e' : ''
 	pfn = ofn.ext('.moo' + suffix)
@@ -251,8 +253,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	logFile = ofn.ext('.log' + suffix)
 	mdsFile = ofn.ext('.md.s')
 	esFile = ofn.ext('.e.s')
-	sldFile = ofn.ext('.sld' + suffix) if(!SETTINGS[:test_release])
-	stabsFile = ofn.ext('.stabs' + suffix) if(!SETTINGS[:test_release])
+	sldFile = ofn.ext('.sld' + suffix) if(USE_SLD)
+	stabsFile = ofn.ext('.stabs' + suffix) if(USE_SLD)
 	
 	delete_if_empty(pfn)
 	
@@ -260,8 +262,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	if(!File.exists?(pfn) || force_rebuild)
 		pipetool = "#{MOSYNCDIR}/bin/pipe-tool"
 		mdFlag = ' -master-dump' if(SETTINGS[:write_master_dump])
-		sldFlag = " -sld=#{sldFile}" if(!SETTINGS[:test_release])
-		stabsFlags = " -stabs=#{stabsFile}" if(!SETTINGS[:test_release])
+		sldFlag = " -sld=#{sldFile}" if(USE_SLD)
+		stabsFlags = " -stabs=#{stabsFile}" if(USE_SLD)
 		if(dead_code)
 			sh "#{pipetool}#{PIPE_FLAGS} -elim#{mdFlag} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 			sh "#{pipetool}#{PIPE_FLAGS}#{sldFlag} -B #{pfn} rebuild.s"
@@ -328,7 +330,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	
 	return force_rebuild if(shouldSkipTest)
 	
-	sldFlag = " -sld #{sldFile}" if(!SETTINGS[:test_release])
+	sldFlag = " -sld #{sldFile}" if(USE_SLD)
 	cmd = "#{MOSYNCDIR}/bin/MoRE -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag} -resource #{resFile}"
 	$stderr.puts cmd
 	startTime = Time.now
@@ -351,8 +353,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 			FileUtils.rm_f(logFile)
 			FileUtils.rm_f(mdsFile)
 			FileUtils.rm_f(esFile)
-			FileUtils.rm_f(sldFile) if(!SETTINGS[:test_release])
-			FileUtils.rm_f(stabsFile) if(!SETTINGS[:test_release])
+			FileUtils.rm_f(sldFile) if(USE_SLD)
+			FileUtils.rm_f(stabsFile) if(USE_SLD)
 		end
 	else	# failure
 		FileUtils.touch(failFile)
@@ -365,8 +367,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 				SETTINGS[:copy_targets].each do |target|
 					# copy program, sld and stabs to directory :copy_target.
 					FileUtils.cp(pfn, target + 'program')
-					copyOrRemove(sldFile, target + 'sld.tab', SETTINGS[:test_release])
-					copyOrRemove(stabsFile, target + 'stabs.tab', dead_code || SETTINGS[:test_release])
+					copyOrRemove(sldFile, target + 'sld.tab', !USE_SLD)
+					copyOrRemove(stabsFile, target + 'stabs.tab', dead_code || !USE_SLD)
 				end
 			end
 			error "Stop on fail"
