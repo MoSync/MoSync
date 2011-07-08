@@ -499,6 +499,7 @@ void Syscall::ConnOp::DoCancel() {
 	case CSOC_Accept: {
 		CSO_Accept& a = (CSO_Accept&)sop;
 		delete a.newSock;
+		a.newSock = NULL;
 		// intentional fallthrough
 	}
 	case CSOC_SockConnect:
@@ -790,7 +791,7 @@ void CHttpConnection::FormatRequestL() {
 
 void CHttpConnection::ReadHeadersL(CPublicActive& op) {
 	//mBuffer->Reset();
-	LOGD("%i\n", mBuffer->Size());
+	LOGD("ReadHeadersL %i\n", mBuffer->Size());
 	mBufPtr.Set(CBufFlatPtr(mBuffer()));
 	mBufPtr.SetLength(0);
 	DEBUG_ASSERT(mBufPtr.MaxLength() >= 1024);
@@ -803,6 +804,7 @@ void CHttpConnection::ReadHeadersL(CPublicActive& op) {
 }
 
 void CHttpConnection::ReadMoreHeadersL() {
+	LOGD("ReadMoreHeadersL\n");
 	// +1 to allow for mBufPtr.PtrZ().
 	mRecvPtr.Set((byte*)mBufPtr.Ptr() + mPos, mBufPtr.Length() - mPos,
 		mBufPtr.MaxLength() - (mPos+1));
@@ -867,6 +869,13 @@ void CHttpConnection::RunL(TInt aResult) {
 		mPos = mBufPtr.Length();
 	}
 	ReadMoreHeadersL();
+}
+
+void CHttpConnection::CancelAll() {
+	mTransport->CancelAll();
+	if(mSyncOp) {
+		CompleteReadHeaders(CONNERR_CANCELED, KErrCancel);
+	}
 }
 
 void CHttpConnection::CompleteReadHeaders(int aConnErr, int aResult) {
