@@ -212,6 +212,7 @@ static int checkMAResult(int res) {
 		switch(res) {
 		case MA_FERR_FORBIDDEN: errno = EACCES; break;
 		case MA_FERR_NOTFOUND: errno = ENOENT; break;
+		case MA_FERR_WRONG_TYPE: errno = EEXIST; break;
 		default: errno = EIO;
 		}
 		STDFAIL;
@@ -331,7 +332,7 @@ int fstatat(int __fd, const char* path, struct stat* st, int flag) {
 		if(res > 0)	// it was an existing directory.
 			return 0;
 	} else {
-		if(errno != ENOENT)
+		if(errno != EEXIST)
 			STDFAIL;
 	}
 	
