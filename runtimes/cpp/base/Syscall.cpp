@@ -337,13 +337,16 @@ namespace Base {
 		return a*b;
 	}
 	SYSCALL(double, __divdf3(double a, double b)) {
+#ifndef ALLOW_FLOAT_DIVISION_BY_ZERO
 		if(b == 0
 #ifdef EMULATOR
 			&& !gSyscall->mAllowDivZero
-#endif
-			) {
+#endif	//EMULATOR
+			)
+		{
 			BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
 		}
+#endif	//ALLOW_FLOAT_DIVISION_BY_ZERO
 		return a/b;
 	}
 	SYSCALL(double, __negdf2(double a)) {
@@ -383,13 +386,16 @@ namespace Base {
 		return a*b;
 	}
 	SYSCALL(float, __divsf3(float a, float b)) {
+#ifndef ALLOW_FLOAT_DIVISION_BY_ZERO
 		if(b == 0
 #ifdef EMULATOR
 			&& !gSyscall->mAllowDivZero
-#endif
-			) {
+#endif	//EMULATOR
+			)
+		{
 			BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
 		}
+#endif	//ALLOW_FLOAT_DIVISION_BY_ZERO
 		return a/b;
 	}
 	SYSCALL(float, __negsf2(float a)) {
@@ -693,7 +699,7 @@ namespace Base {
 		if(res < 0) {
 			LOGF("File: %s\n", fh.name.p());
 		} else if(res > 0 != fh.isDirectory()) {
-			FILE_FAIL(MA_FERR_NOTFOUND);
+			FILE_FAIL(MA_FERR_WRONG_TYPE);
 		}
 		if(fh.mode == MA_ACCESS_READ_WRITE) {
 			if(res == 0) {	//file exists and is not a directory
@@ -715,7 +721,7 @@ namespace Base {
 	}
 
 	MAHandle Syscall::maFileOpen(const char* path, int mode) {
-		LOGF("maFileOpen(%s, %x)\n", path, mode);
+		LOGF("maFileOpen(%s, %x): %i\n", path, mode, gFileNextHandle);
 		Smartie<FileHandle> fhs(new FileHandle);
 		FileHandle& fh(*fhs);
 		fh.mode = mode;
