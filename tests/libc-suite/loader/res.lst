@@ -1,2 +1,2 @@
-.res dummy
-.placeholder
+.res RES_SOUND
+.media "audio/wav", "critStop.wav"
