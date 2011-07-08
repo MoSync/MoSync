@@ -2105,7 +2105,7 @@ interface MAAPI {
 		*
 		* Attempting to open an existing directory without ending its path with a slash will fail.
 		* Likewise, attempting to open an existing file while ending its path with a slash will also fail.
-		* Either case will return #MA_FERR_NOTFOUND.
+		* Either case will return #MA_FERR_WRONG_TYPE.
 		*
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
 		*
@@ -2304,6 +2304,7 @@ interface MAAPI {
 			FORBIDDEN = -4;
 			RENAME_FILESYSTEM = -5;
 			RENAME_DIRECTORY = -6;
+			WRONG_TYPE = -7;
 		}
 
 		//maybe add support for "hidden" files

@@ -59,7 +59,7 @@ final MAHandle maFileOpen(String path, int mode) {
 		if(fc.exists() && (fc.isDirectory() != (path.charAt(path.length()-1) == '/'))) {
 			DEBUG_ALWAYS("maFileOpen: slash/isDirectory mismatch.\n");
 			fc.close();
-			return MA_FERR_NOTFOUND;
+			return MA_FERR_WRONG_TYPE;
 		}
 	} catch(SecurityException e) {
 		PRINT_STACK_TRACE;

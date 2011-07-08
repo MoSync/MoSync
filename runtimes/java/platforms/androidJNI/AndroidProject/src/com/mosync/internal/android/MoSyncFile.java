@@ -227,7 +227,7 @@ public class MoSyncFile {
 			MoSyncFileHandle fileHandle = new MoSyncFileHandle(path, mode);
 			if(fileHandle.mFile.exists()) {
 				if(fileHandle.mIsAFile != fileHandle.mFile.isFile())
-					return MA_FERR_NOTFOUND;
+					return MA_FERR_WRONG_TYPE;
 				if(fileHandle.mIsAFile)
 				{
 					int res = fileHandle.open();

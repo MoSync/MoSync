@@ -698,7 +698,7 @@ namespace Base {
 		int res = isDirectory(fh.name);
 		if(res < 0) {
 			LOGF("File: %s\n", fh.name.p());
-		} else if(res > 0 != fh.isDirectory()) {
+		} else if((res > 0) != fh.isDirectory()) {
 			FILE_FAIL(MA_FERR_WRONG_TYPE);
 		}
 		if(fh.mode == MA_ACCESS_READ_WRITE) {
