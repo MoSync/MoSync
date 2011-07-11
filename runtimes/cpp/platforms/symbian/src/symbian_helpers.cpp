@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <AknUtils.h>
 #include <stringloader.h>
 #include <EIKAPP.H>
+#include <errno.h>
 
 #include "config_platform.h"
 
@@ -284,6 +285,29 @@ int _rmdir(const char* name) {
 	TCleaner<HBufC> desc(CreateHBufC16FromCStringLC(name));
 	return FSS.RmDir(*desc);
 }
+int rename(const char* oldName, const char* newName) {
+	TCleaner<HBufC> oldDesc(CreateHBufC16FromCStringLC(oldName));
+	TCleaner<HBufC> newDesc(CreateHBufC16FromCStringLC(newName));
+	int res = CCoeEnv::Static()->FsSession().Rename(*oldDesc, *newDesc);
+	switch(res) {
+	case KErrNone:
+		return 0;
+	case KErrAccessDenied:
+	case KErrPermissionDenied:
+		return EACCES;
+		break;
+	case KErrNotFound:
+	case KErrPathNotFound:
+		return ENOENT;
+		break;
+	case KErrNotSupported:
+		return EXDEV;
+		break;
+	default:
+		return EIO;
+	}
+}
+
 
 extern "C" int isDirectory(const char* filename) {
 	MyRFs myrfs;

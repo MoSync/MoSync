@@ -867,6 +867,85 @@ namespace Base {
 		return len;
 	}
 
+	int Syscall::maFileRename(MAHandle file, const char* newName) {
+		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
+
+		// close the file while we're renaming.
+		bool wasOpen;
+		int oldPos;
+		if(fh.fs)
+			wasOpen = fh.fs->isOpen();
+		else
+			wasOpen = false;
+		if(wasOpen) {
+			if(!fh.fs->tell(oldPos)) FILE_FAIL(MA_FERR_GENERIC);
+			delete fh.fs;
+			fh.fs = NULL;
+		}
+
+		bool hasPath = false;
+#if defined(WIN32) && !defined(_WIN32_WCE) && !FILESYSTEM_CHROOT
+		// If fh.name and newName are on different file systems,
+		// forbid the operation.
+		if(newName[1] == ':' && toupper(fh.name[0]) != toupper(newName[0])) {
+			return MA_FERR_RENAME_FILESYSTEM;
+		}
+		if(newName[1] == ':' || newName[0] == '/')
+			hasPath = true;
+#else
+		if(newName[0] == '/')
+			hasPath = true;
+#endif
+		Array<char> nn(0);
+		if(!hasPath) {
+			int oldPathLen = 0;
+			const char* lastSlash = strrchr(fh.name, '/');
+			if(lastSlash != NULL) {
+				oldPathLen = (lastSlash - fh.name) + 1;
+			}
+			if(oldPathLen > 0) {
+				int newNameLen = strlen(newName);
+				nn.resize(oldPathLen + newNameLen + 1);
+				memcpy(nn, fh.name, oldPathLen);
+				strcpy(nn + oldPathLen, newName);
+				newName = nn;
+			}
+		}
+#if FILESYSTEM_CHROOT
+		else {
+			const char* fsd = FILESYSTEM_DIR;
+			int fsdLen = strlen(fsd);
+			int newNameLen = strlen(newName);
+			nn.resize(fsdLen + newNameLen + 1);
+			memcpy(nn, fsd, fsdLen);
+			strcpy(nn + fsdLen, newName);
+			newName = nn;
+		}
+#endif
+		int res = rename(fh.name, newName);
+		if(res != 0) {
+#ifdef SYMBIAN
+			int err = res;
+#else
+			int err = errno;
+#endif
+			if(err == EXDEV)
+				return MA_FERR_RENAME_FILESYSTEM;
+			else if(err == EACCES)
+				return MA_FERR_FORBIDDEN;
+			else
+				return MA_FERR_GENERIC;
+		}
+		fh.name.resize(strlen(newName) + 1);
+		strcpy(fh.name, newName);
+
+		if(!wasOpen)
+			return 0;
+		TEST_LTZ(openFile(fh));
+		if(!fh.fs->seek(Seek::Start, oldPos)) FILE_FAIL(MA_FERR_GENERIC);
+		return 0;
+	}
+
 #if !defined(SYMBIAN) && !defined(_WIN32_WCE)
 
 #ifdef WIN32
@@ -910,73 +989,6 @@ namespace Base {
 
 	int Syscall::maFileTotalSpace(MAHandle file) {
 		return fileSpace(file, SPACE_TOTAL);
-	}
-
-	int Syscall::maFileRename(MAHandle file, const char* newName) {
-		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
-
-		// close the file while we're renaming.
-		bool wasOpen;
-		int oldPos;
-		if(fh.fs)
-			wasOpen = fh.fs->isOpen();
-		else
-			wasOpen = false;
-		if(wasOpen) {
-			if(!fh.fs->tell(oldPos)) FILE_FAIL(MA_FERR_GENERIC);
-			delete fh.fs;
-			fh.fs = NULL;
-		}
-
-		bool hasPath = false;
-#if defined(WIN32) && !defined(_WIN32_WCE) && !FILESYSTEM_CHROOT
-		// If fh.name and newName are on different file systems,
-		// forbid the operation.
-		if(newName[1] == ':' && toupper(fh.name[0]) != toupper(newName[0])) {
-			return MA_FERR_RENAME_FILESYSTEM;
-		}
-		if(newName[1] == ':' || newName[0] == '/')
-			hasPath = true;
-#else
-		if(newName[0] == '/')
-			hasPath = true;
-#endif
-		std::string nn;
-		if(!hasPath) {
-			int oldPathLen = 0;
-			const char* lastSlash = strrchr(fh.name, '/');
-			if(lastSlash != NULL) {
-				oldPathLen = (lastSlash - fh.name) + 1;
-			}
-			if(oldPathLen > 0) {
-				nn.append(fh.name, oldPathLen);
-				nn.append(newName);
-				newName = nn.c_str();
-			}
-		}
-#if FILESYSTEM_CHROOT
-		else {
-			nn = FILESYSTEM_DIR + std::string(newName);
-			newName = nn.c_str();
-		}
-#endif
-		int res = rename(fh.name, newName);
-		if(res != 0) {
-			if(errno == EXDEV)
-				return MA_FERR_RENAME_FILESYSTEM;
-			else if(errno == EACCES)
-				return MA_FERR_FORBIDDEN;
-			else
-				return MA_FERR_GENERIC;
-		}
-		fh.name.resize(strlen(newName) + 1);
-		strcpy(fh.name, newName);
-
-		if(!wasOpen)
-			return 0;
-		TEST_LTZ(openFile(fh));
-		if(!fh.fs->seek(Seek::Start, oldPos)) FILE_FAIL(MA_FERR_GENERIC);
-		return 0;
 	}
 
 	int Syscall::maFileDate(MAHandle file) {
