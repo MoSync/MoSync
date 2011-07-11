@@ -26,22 +26,22 @@ FileHandle getFileHandle(MAHandle file) {
 	return fh;
 }
 
-DataInputStream getFileInputStream(MAHandle file) throws IOException {
+FileHandle getFileInputStream(MAHandle file) throws IOException {
 	FileHandle fh = getFileHandle(file);
 	if(fh.in == null) {
 		fh.in = fh.fc.openDataInputStream();
 		if(fh.position != 0)
 			fh.in.skip(fh.position);
 	}
-	return fh.in;
+	return fh;
 }
 
-OutputStream getFileOutputStream(MAHandle file) throws IOException {
+FileHandle getFileOutputStream(MAHandle file) throws IOException {
 	FileHandle fh = getFileHandle(file);
 	if(fh.out == null) {
 		fh.out = fh.fc.openOutputStream(fh.position);
 	}
-	return fh.out;
+	return fh;
 }
 
 //***************************************************************************
@@ -119,6 +119,7 @@ final int maFileTell(MAHandle file) throws Exception {
 }
 
 final int maFileSeek(MAHandle file, int offset, int whence) throws Exception {
+	DEBUG_TEMP("maFileSeek("+file+", "+offset+", "+whence+")\n");
 	FileHandle fh = getFileHandle(file);
 	MYASSERT(fh.fc.exists() && !fh.fc.isDirectory());
 	int newPos;
@@ -135,6 +136,7 @@ final int maFileSeek(MAHandle file, int offset, int whence) throws Exception {
 	default:
 		BIG_PHAT_ERROR;
 	}
+	DEBUG_TEMP("maFileSeek newPos: "+newPos+"\n");
 	if(newPos == fh.position)
 		return fh.position;
 	if(fh.in != null) {
@@ -264,8 +266,9 @@ final int maFileRename(MAHandle file, String newName) {
 
 final int maFileWrite(MAHandle file, MAAddress src, int len) {
 	try {
-		OutputStream out = getFileOutputStream(file);
-		readMemStream(out, src, len);
+		FileHandle fh = getFileOutputStream(file);
+		readMemStream(fh.out, src, len);
+		fh.position += len;
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;
@@ -275,21 +278,22 @@ final int maFileWrite(MAHandle file, MAAddress src, int len) {
 
 final int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len) {
 	try {
-		OutputStream out = getFileOutputStream(file);
+		FileHandle fh = getFileOutputStream(file);
 		BinaryInterface bi = (BinaryInterface)getResource(data);
 		if(bi instanceof Binary) {
 			Binary bin = (Binary)bi;
 		#ifdef SEGMENTED_DATA
-			bin.write(out, offset, len);
+			bin.write(fh.out, offset, len);
 		#else
-			out.write(bin.arr, offset, len);
+			fh.out.write(bin.arr, offset, len);
 		#endif
+			fh.position += len;
 		} else {
 			byte[] buffer = new byte[len];
 			DataInputStream dis = new DataInputStream(bi.getInputStream());
 			dis.readFully(buffer);
 			dis.close();
-			out.write(buffer);
+			fh.out.write(buffer);
 		}
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
@@ -299,11 +303,13 @@ final int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len)
 }
 
 final int maFileRead(MAHandle file, MAAddress dst, int len) {
+	DEBUG_TEMP("maFileRead("+file+", "+len+")\n");
 	try {
-		DataInputStream dis = getFileInputStream(file);
+		FileHandle fh = getFileInputStream(file);
 		byte[] bytes = new byte[len];
-		dis.readFully(bytes);
+		fh.in.readFully(bytes);
 		writeMemBytes(dst, bytes, 0, len);
+		fh.position += len;
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;
@@ -313,13 +319,14 @@ final int maFileRead(MAHandle file, MAAddress dst, int len) {
 
 final int maFileReadToData(MAHandle file, MAHandle data, int offset, int len) {
 	try {
-		DataInputStream dis = getFileInputStream(file);
+		FileHandle fh = getFileInputStream(file);
 		Binary bin = (Binary)getResource(data);
 	#ifdef SEGMENTED_DATA
-		bin.read(dis, offset, len);
+		bin.read(fh.in, offset, len);
 	#else
-		dis.readFully(bin.arr, offset, len);
+		fh.in.readFully(bin.arr, offset, len);
 	#endif
+		fh.position += len;
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;

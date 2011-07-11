@@ -1,2 +1,2 @@
 .res RES_SOUND
-.media "audio/wav", "critStop.wav"
+.media "audio/x-wav", "critStop.wav"
