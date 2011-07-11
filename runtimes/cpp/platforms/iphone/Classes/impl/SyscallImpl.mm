@@ -433,7 +433,10 @@ namespace Base {
     SYSCALL(MAHandle, maFontLoadDefault(int type, int style, int size)){
         
         int defaultFontIndex=0; //Index to gDefaultFontNames
-        
+        if(size<=0)
+        {
+            return RES_FONT_INVALID_SIZE;
+        }
         switch (type) {
             case FONT_TYPE_SERIF:
                 defaultFontIndex|=FONT_SERIF_INDEX;
@@ -475,6 +478,10 @@ namespace Base {
             return RES_FONT_NAME_NONEXISTENT;
         }
         
+        if(size<=0)
+        {
+            return RES_FONT_INVALID_SIZE;
+        }
         return createFontInfo(fontName,(CGFloat)size,uiFontObject,NULL);
 
     }

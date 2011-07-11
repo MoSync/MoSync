@@ -383,7 +383,7 @@ interface MAAPI {
 	* \see maSetColor()
 	*/
 	void maDrawTextW(in int left, in int top, in MAWString str);
-
+		
 	/**
 	* Copies the back buffer to the physical screen.
 	*/
@@ -424,19 +424,19 @@ interface MAAPI {
 		/// The image is copied unchanged.
 		NONE = 0;
 		/// The image is rotated clockwise by 90 degrees.
-		ROT90 = 1;
+		ROT90 = 5;
 		/// The image is rotated clockwise by 180 degrees.
-		ROT180 = 2;
+		ROT180 = 3;
 		/// The image is rotated clockwise by 270 degrees.
-		ROT270 = 3;
+		ROT270 = 6;
 		/// The image is reflected about its vertical center.
-		MIRROR = 4;
+		MIRROR = 2;
 		/// The image is reflected about its vertical center, then rotated clockwise by 90 degrees.
-		MIRROR_ROT90 = 5;
+		MIRROR_ROT90 = 7;
 		/// The image is reflected about its vertical center, then rotated clockwise by 180 degrees.
-		MIRROR_ROT180 = 6;
+		MIRROR_ROT180 = 1;
 		/// The image is reflected about its vertical center, then rotated clockwise by 270 degrees.
-		MIRROR_ROT270 = 7;
+		MIRROR_ROT270 = 4;
 	}
 
 	/**
@@ -605,13 +605,13 @@ interface MAAPI {
 	* Returns another \link #STERR_GENERIC STERR \endlink code if the store could not be opened
 	* for another reason.
 	*
-	* \param name The name of the store. A store name must have between 1 and 32 characters,
-	* inclusive, and must not contain any of the following characters: "\\:;?*'
+	* \param name The name of the store. A store name must have from 1 to 32 characters,
+	* and must not contain any of the following characters: "/\\:;?*'
 	* \param flags A combination of \link #MAS_CREATE_IF_NECESSARY MAS \endlink flags, or zero.
 	*/
 	MAHandle maOpenStore(in MAString name, in int flags);
 	/**
-	* Writes the contents of a data object to a store. Destroys any data currently in the store.
+	* Writes the contents of a data object to a store. Destroys any data previously in the store.
 	* Returns \> 0 on success, #STERR_FULL if the storage system is full,
 	* or another \link #STERR_GENERIC STERR \endlink code if the write failed for another reason.
 	* \param store The store to write to.
@@ -627,9 +627,9 @@ interface MAAPI {
 	*/
 	int maReadStore(in MAHandle store, in MAHandle placeholder);
 	/**
-	* Closes a store. Also removes that store if \a _remove is non-zero.
+	* Closes a store. Also deletes that store if \a _delete is non-zero.
 	*/
-	void maCloseStore(in MAHandle store, in int _remove);
+	void maCloseStore(in MAHandle store, in int _delete);
 
 	constset int CONNERR_ {
 		/// Generic error.
@@ -1247,7 +1247,7 @@ interface MAAPI {
 		/// or \< 0 on error.
 		AUDIOBUFFER_FILL = 18;
 #endif
-		/** \brief The size of the screen has changed.
+		/** \brief The size of the screen changed.
 		* Use maGetScrSize() to get the new size.
 		*
 		* If the screen is the current draw target, the clipping rectangle is removed.
@@ -1615,8 +1615,6 @@ interface MAAPI {
 		LABEL = 9;
 		FLUX = 127;
 	}
-
-		
 #endif	//IX_RESOURCE_TYPES
 
 		constset int FONT_TYPE_{
@@ -1630,18 +1628,21 @@ interface MAAPI {
 			BOLD = 1;
 			ITALIC = 2;
 		}
-
+		
+		/**
+		* The available result codes for fonts.
+		*/
 		constset int RES_FONT_{
-	   		 /**
-   			 * \brief Indicates that the call to a font syscall was successful.
-   			 */
-	   		 OK = 1;
-   			 
-   			 /**
- 	  		 * \brief Indicates that an invalid font handle was passed.
-   			 */
-   			 INVALID_HANDLE = -1;
-
+			/**
+			* \brief Indicates that the call to a font syscall was successful.
+			*/
+			OK = 1;
+			
+			/**
+			* \brief Indicates that an invalid font handle was passed.
+			*/
+			INVALID_HANDLE = -1;
+			
 			/**
    			 * \brief Indicates that the index was off the list size.
    			 */
@@ -1666,49 +1667,55 @@ interface MAAPI {
    			 * \brief Indicates that the buffer is not big enough to store the font name.
    			 */
  	  		 INSUFFICIENT_BUFFER = -6;
-
-		 }
+			 
+			/**
+   			 * \brief Indicates that an invalid size was passed.
+   			 */
+ 	  		 INVALID_SIZE = -7;
+			 
+		}
+		
 		/**
-		* Returns a handle to one of the default fonts of the device, in the style and size you specify
-		* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE]
-		* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC]
-		* \param 'size' The size of the font
-		* \return The handle to the font, or RES_FONT_NO_TYPE_STYLE_COMBINATION
+		* Returns a handle to one of the default fonts of the device, in the style and size you specify.
+		* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE].
+		* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC].
+		* \param 'size' The size of the font.
+		* \return The handle to the font, RES_FONT_NO_TYPE_STYLE_COMBINATION, or RES_FONT_INVALID_SIZE.
 		*/
 		MAHandle maFontLoadDefault(in int type, in int style, in int size);
 
 		/**
 		* Sets the font to be used with maDrawText and maDrawTextW, and returns the handle
-		* to the previous font
-		* \param 'font' an MAHandle for a font object
-		* \return The handle to the previous font, or RES_FONT_INVALID_HANDLE
+		* to the previous font.
+		* \param 'font' an MAHandle for a font object.
+		* \return The handle to the previous font, or RES_FONT_INVALID_HANDLE.
 		*/
 		MAHandle maFontSetCurrent(in MAHandle font);
-
+	
 		/**
-		* Returns the number of fonts that are available in the system
-		* \return Number of fonts
-		* \see maFontGetName
+		* Returns the number of fonts that are available in the system.
+		* \return Number of fonts.
+		* \see maFontGetName.
 		*/
 		int maFontGetCount();
 		
 		/**
 		* Copies the font postscript name of the given index to the buffer. 
 		* You must have first called maFontGetCount() at least once before calling this function.
-		* \param 'index' A 0-based index to the font
-		* \param 'buffer' An empty char buffer that will receive the font name
-		* \param 'bufferLen' The size of the buffer
+		* \param 'index' A 0-based index to the font.
+		* \param 'buffer' An empty char buffer that will receive the font name.
+		* \param 'bufferLen' The size of the buffer.
 		* \return The number of bytes copied (with terminating NULL) or RES_FONT_INDEX_OUT_OF_BOUNDS 
-		* 		or RES_FONT_INSUFFICIENT_BUFFER or RES_FONT_LIST_NOT_INITIALIZED
-		* \see maFontGetCount, maFontLoadWithName
+		* 		or RES_FONT_INSUFFICIENT_BUFFER or RES_FONT_LIST_NOT_INITIALIZED.
+		* \see maFontGetCount, maFontLoadWithName.
 		*/
 		int maFontGetName(in int index, out char* buffer, in int bufferLen);
 
 		/**
-		* Returns a handle to a font with the specific postscript name and size
-		* \param 'postScriptName' The postscript name of the font
-		* \param 'size' The size of the font
-		* \return Handle to the font, or RES_FONT_NAME_NONEXISTENT
+		* Returns a handle to a font with the specific postscript name and size.
+		* \param 'postScriptName' The postscript name of the font.
+		* \param 'size' The size of the font.
+		* \return Handle to the font, RES_FONT_NAME_NONEXISTENT, or RES_FONT_INVALID_SIZE.
 		*/
 		MAHandle maFontLoadWithName(in char* postScriptName, in int size);
 
@@ -1718,7 +1725,6 @@ interface MAAPI {
 		* \return RES_FONT_OK or RES_FONT_INVALID_HANDLE
 		*/
 		int maFontDelete(in MAHandle font);
-
 		
 		/**
 		 * Sends the current call stack to the report pipe. Returns 0 if succeeded.
@@ -2459,10 +2465,8 @@ interface MAAPI {
 
 #if IX_CELLID
 		/**
-		* \brief Information about the current cell, including country, network and area code and the cell ID.
-		*
-		* Stores current cell id in *cellId.
-		* Returns the negated Symbian error code. 0 on success.
+		* \brief Information about the current cell, including country,
+		* network and area code and the cell ID.
 		*/
 		struct MACellInfo {
 			/**
@@ -2491,7 +2495,7 @@ interface MAAPI {
 		}
 
 		/**
-		* Retrieves the current cellular network information
+		* Retrieves the current cellular network information.
 		* If the phone is offline or otherwise has no signal, this function will fail.
 		* \param pInfo A pointer to a struct which will receive the information.
 		* \returns 0 if successful. \< 0 otherwise.
@@ -3157,7 +3161,45 @@ group WidgetAPI "Widget API" {
 					*/
 					MAWidgetHandle toScreen;
 			} stackScreenPopInfo;
-	
+			
+			/**progress
+			* The value of the slider when a #MAW_EVENT_SLIDER_VALUE_CHANGED event is received.
+			*/
+			int sliderValue;
+			
+			struct {
+					/**
+					* @brief The day value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
+					*/
+					int dayOfMonth;
+					
+					/**
+					* @brief The month value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
+					*/
+					int month;
+					
+					/**
+					* @brief The year value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
+					*/
+					int year;
+			} datePickerValueInfo;
+			
+			struct {
+					/**
+					* @brief The hour value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
+					*/
+					int hour;
+					
+					/**
+					* @brief The minute value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
+					*/
+					int minute; 
+			} timePickerValueInfo;
+			
+			/**
+			* The value of the number picker when a #MAW_EVENT_NUMBER_PICKER_VALUE_CHANGED event is received.
+			*/
+			int numberPickerValue;
 		}
 	}
 
@@ -3210,6 +3252,33 @@ group WidgetAPI "Widget API" {
 		 * @brief Sent when a screen has been popped from a stack screen.
 		 */
 		STACK_SCREEN_POPPED = 10;
+		
+		/**
+		 * @brief Sent when the progress level has been changed. 
+		 * This includes changes that were initiated by the user through a touch gesture,
+         * or arrow key/trackball as well as changes that were initiated programmatically. 
+		 */
+	    SLIDER_VALUE_CHANGED = 11;
+		
+		/**
+		 * @brief Sent when the user changes\d the date in a Date Picker.
+		 */
+		DATE_PICKER_VALUE_CHANGED = 12;
+		
+		/**
+		 * @brief Sent when the user changes\d the time in a Time Picker.
+		 */
+		TIME_PICKER_VALUE_CHANGED = 13;
+	
+		/**
+		 * @brief Sent when the user changes\d the value in a Number Picker.
+		 */
+		NUMBER_PICKER_VALUE_CHANGED = 14;
+		
+		/**
+		 * @brief Sent from the Video View when the media file is loaded and ready to go.
+		 */
+		MEDIA_SOURCE_READY = 15;
 	}
 	} // end of WidgetEventTypes
 
@@ -3326,6 +3395,11 @@ group WidgetAPI "Widget API" {
 		* @brief Indicates that the caller tried to remove a visible root widget (screen) and the MoSync view will become visible.
 		*/
 		REMOVED_ROOT = -10;
+		
+		/**
+		* @brief Indicates that the call to maWidgetSetProperty or maWidgetGetProperty tried to access a system call that is not supported by the curent framework version.
+		*/
+		FEATURE_NOT_AVAILABLE = -11;
 	}
 	} // end of WidgetResultCodes
 	
@@ -3421,11 +3495,6 @@ group WidgetAPI "Widget API" {
 		 * @brief A search bar is a special kind of edit box that is used for searching. See \ref WidgetSearchBarProperties "Search bar properties" for the properties available.
 		 */
 		SEARCH_BAR = "SearchBar";
-		
-		/**
-		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
-		 */
-		NAV_BAR = "NavBar";		
 
 		/**
 		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
@@ -3436,6 +3505,65 @@ group WidgetAPI "Widget API" {
 		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
 		 */	
 		WEB_VIEW = "WebView";
+		
+		/**
+		 * @brief A progress bar is a visual indicator of progress in some operation. 
+		 * Displays a bar to the user representing how far the operation has progressed. 
+		 * A progress bar can also be made indeterminate, when the length of the task is unknown.
+		 * 
+		 * See \ref WidgetProgressBarProperties "Progress bar properties" for the properties available.
+		 */
+		PROGRESS_BAR = "ProgressBar";
+		
+		 /**
+		 * @brief An activity indicator is a visual indicator of progress in some operation. 
+		 * It shows a cyclic animation without an indication of progress.
+		 * It is used when the length of the task is unknown.
+		 * 
+		 * See \ref WidgetActivityIndicatorProperties "Activity Indicator properties" for the properties available.
+		 */
+		ACTIVITY_INDICATOR = "ActivityIndicator";
+		
+		/**
+		 * @brief A Slider is an extension of ProgressBar that adds a draggable thumb. 
+		 * The user can touch the thumb and drag left or right to set the current progress level.
+		 * 
+		 * See \ref WidgetSliderProperties "Slider properties" for the properties available.
+		 */
+		SLIDER = "Slider";
+		
+		/**
+		 * @brief A Date Picker is a widget for selecting a date. The date can be selected by a year, month, and day spinners. 
+		 * The minimal and maximal date from which dates to be selected can be customized. 
+		 * The picker is initialized with the current system date.
+		 * 
+		 * See \ref WidgetDatePickerProperties "Date Picker properties" for the properties available.
+		 */
+		DATE_PICKER = "DatePicker";
+		
+		/**
+		 * @brief A Time Picker is a widget for selecting time of day, in either 24 hour or AM/PM mode.
+		 * The hour, each minute digit, and AM/PM (if applicable) can be controlled by vertical spinners. 
+		 * The hour can be entered by keyboard input. 
+		 * 
+		 * See \ref WidgetTimePickerProperties "Time Picker properties" for the properties available.
+		 */
+		TIME_PICKER = "TimePicker";	
+		
+		/**
+		 * @brief A Number Picker is a widget that enables the user to select a number form a predefined range.
+		 * 
+		 * See \ref WidgetNumberPickerProperties "Number Picker properties" for the properties available.
+		 */
+		NUMBER_PICKER = "NumberPicker";	
+
+		/**
+		 * @brief A Video View displays a video file.
+		 * 
+		 * See \ref WidgetVideoViewProperties "Video View properties" for the properties available.
+		 */
+		VIDEO_VIEW = "VideoView";
+		 //MEDIA_CONTROLLER = "MediaPlayerController";
 	}
 	} // end of WidgetTypes
 
@@ -3550,6 +3678,22 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		VISIBLE = "visible";
+		
+		/**
+		* @brief Sets or gets whether the widget is enabled or not. If not, the widget is grayed out.
+		*
+		* Widgets are enabled by default.
+		*
+		* @validvalue A boolean string 'true' or 'false', where true is enabled and false is disabled.
+		*
+		* @ssetandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_ENABLED, "false");
+		* \endcode
+		*/
+		ENABLED = "enabled";
 	}	
 
 	/**
@@ -3921,7 +4065,7 @@ group WidgetAPI "Widget API" {
 		FONT_SIZE = "fontSize";
 
 		/**
-		* Sets the background image. This will be scaled to fit the whole widget (not keeping the aspect).
+		* Sets the image used to represent the button.
 		*
 		* @validvalue MoSync handle to an uncompressed image resource.
 		*
@@ -3933,20 +4077,6 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		BACKGROUND_IMAGE = "backgroundImage";
-		
-		/**
-		* Sets the foreground image of the button. This won't be scaled at all.
-		*
-		* @validvalue MoSync handle to an uncompressed image resource.
-		*
-		* @setonly
-		*
-		* @par Example
-		* \code
-		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_IMAGE, toString(R_MY_IMAGE));
-		* \endcode
-		*/
-		IMAGE = "image";			
 	}
 	} // end of WidgetImageButtonProperties		
 	
@@ -3968,20 +4098,6 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		IMAGE = "image";
-		
-		/**
-		* @brief Specifies what type of scaling should be applied to the image.
-		*
-		* @validvalue Either 'none', 'scaleXY' or 'scalePreserveAspect'. Default 'none'.
-		*
-		* @setonly
-		*
-		* @par Example
-		* \code
-		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_SCALE_MODE, "scaleXY");
-		* \endcode
-		*/		
-		SCALE_MODE = "scaleMode";		
 	}
 	} // end of WidgetImageProperties
 
@@ -4315,9 +4431,472 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/		
 		NEW_URL = "newurl";
+		
+		/**
+		* @brief Sets or gets whether the horizontal scrollbar should be drawn or not.
+		* The scrollbar is not drawn by default.
+		
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HORIZONTAL_SCROLLBAR_ENABLED, "true");
+		* \endcode
+		*/		
+		HORIZONTAL_SCROLL_BAR_ENABLED = "horizontalScrollBarEnabled";
+		
+		/**
+		* @brief Sets or gets whether the vertical scrollbar should be drawn or not.
+		* The scrollbar is drawn by default.
+		
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
+		* \endcode
+		*/		
+		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
 	}
 	} // end of WidgetWebViewProperties
+	
+	/**
+	* The available widget properties for a #MAW_PROGRESS_BAR. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetProgressBarProperties "Progress bar properties" {
+	constset MAString MAW_PROGRESS_BAR_ {
+		/**
+		* @brief Sets or gets the range of the progress bar to 0...max.
+		*
+		* @validvalue An positive integer that specifies the upper range of this progress bar.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_MAX, "100");
+		* \endcode
+		*/		
+		MAX = "max";
+		
+		/**
+		* @brief Set or gets the current progress to the specified value.
+		*
+		* @validvalue An int that specifies the new progress, between 0 and max value. See \ref PROGRESS_BAR_MAX.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		* 	maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_PROGRESS, "10");
+		* \endcode
+		*/		
+		PROGRESS = "progress";
+		
+		/**
+		* @brief Increase the progress bar's progress by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the progress must be increased.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_INCREMENT_PROGRESS, "20");
+		* \endcode
+		*/		
+		INCREMENT_PROGRESS = "incrementProgress";
+	}
+	} // end of WidgetProgressBarProperties
+	
+	/**
+	* The available widget properties for a #MAW_ACTIVITY_INDICATOR. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetActivityIndicatorProperties "Activity Indicator properties" {
+	constset MAString MAW_ACTIVITY_INDICATOR_ {
+		/**
+		* @brief Sets if the indicator is still on or not.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // The activity is done. Now this widget is dismissed.
+        *   maWidgetSetProperty(activityIndicatorHandle, MAW_ACTIVITY_INDICATOR_IN_PROGRESS, "false");
+		* \endcode
+		*/		
+		IN_PROGRESS = "inProgress";
+	}
+	} // end of WidgetActivityIndicatorProperties
+	
+	/**
+	* The available widget properties for a #MAW_SLIDER. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetSliderProperties "Slider properties" {
+	constset MAString MAW_SLIDER_ {
+		/**
+		* @brief Sets or gets the range of the slider to 0...max.
+		*
+		* @validvalue An positive integer that specifies the upper range of this slider.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_MAX, "100");
+		* \endcode
+		*/		
+		MAX = "max";
+		
+		/**
+		* @brief Set or gets the current value to the slider.
+		*
+		* @validvalue An int that specifies the new value, between 0 and max value. See \ref SLIDER_MAX.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		* 	maWidgetSetProperty(sliderHandle, MAW_SLIDER_VALUE, "10");
+		* \endcode
+		*/		
+		VALUE = "value";
+		
+		/**
+		* @brief Increase the current value of the slider by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the slider value must be increased.
+		*
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_INCREMENT_VALUE, "20");
+		* \endcode
+		*/		
+		INCREMENT_VALUE = "incrementValue";
+		
+		/**
+		* @brief Decreases the current value of the slider by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the slider value must be decreased.
+		*
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_DECREASE_VALUE, "20");
+		* \endcode
+		*/		
+		DECREASE_VALUE = "decreaseValue";
+	}
+	} // end of WidgetSliderProperties
+	
+	/**
+	* The available widget properties for a #MAW_DATE_PICKER. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetDatePickerProperties "Date Picker properties" {
+	constset MAString MAW_DATE_PICKER_ {
+		/**
+		* @brief Sets or gets  maximal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00 in getDefault() time zone.
+		* The default maximal date is 12/31/2100.
+		*
+		* @validvalue A long int that specifies the upper range of this date picker.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE, "100000000");
+		* \endcode
+		*/		
+		MAX_DATE = "maxDate";
+		
+		/**
+		* @brief Sets or gets  minimal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00 in getDefault() time zone.
+		*
+		* @validvalue A long int that specifies the minimal supported date.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE, "100000000");
+		* \endcode
+		*/		
+		MIN_DATE = "minDate";
+		
+		/**
+		* @brief Sets or gets the currently displayed year.
+		*
+		* @validvalue An int that specifies a valid year.
+		*
+		* @aetandget
+		*
+		* @par Example
+		* \code
+		*   char yearBuffer[BUFFER_SIZE];
+        *   int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_YEAR, yearBuffer, BUFFER_SIZE);
+		*   if(getStatus == MAW_RES_OK)
+		*   {
+		*       // Do something with the year.
+		*   }
+		* \endcode
+		*/		
+		YEAR = "year";
+		
+		/**
+		* @brief Sets or gets the currently displayed month.
+		*
+		* @validvalue An int that specifies a valid month.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char monthBuffer[BUFFER_SIZE];
+        *   int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_MONTH, monthBuffer, BUFFER_SIZE);
+		*   if(getStatus == MAW_RES_OK)
+		*   {
+		*       // Do something with the month.
+		*   }
+		* \endcode
+		*/		
+		MONTH = "month";
+		
+		/**
+		* @brief Stes or gets the currently displayed day of month.
+		*
+		* @validvalue An int that specifies a valid day of month.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char dayBuffer[BUFFER_SIZE];
+        *   int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_DAY_OF_MONTH, dayBuffer, BUFFER_SIZE);
+		*   if(getStatus == MAW_RES_OK)
+		*   {
+		*       // Do something with the day.
+		*   }
+		* \endcode
+		*/		
+		DAY_OF_MONTH = "dayOfMonth";
+	}
+	} // end of WidgetDatePickerProperties
 
+	/**
+	* The available widget properties for a #MAW_TIME_PICKER. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetTimePickerProperties "Time Picker properties" {
+	constset MAString MAW_TIME_PICKER_ {
+		/**
+		* @brief Sets or gets the current hour in 24h mode( in the range: 0-23 ). 
+		*
+		* @validvalue An int that specifies the current hour.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   // Set hour to 20, that is 8PM.
+        *   maWidgetSetProperty(timePickerHandle, MAW_TIME_PICKER_CURRENT_HOUR, "20");
+		* \endcode
+		*/		
+		CURRENT_HOUR = "currentHour";
+		
+		/**
+		* @briefSets or gets the current minute (0-59). 
+		*
+		* @validvalue An int that specifies the current minute.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(timePickerHandle, MAW_TIME_PICKER_CURRENT_MINUTE, buf, BUFFER_SIZE);
+		*   // Do something with the minute.
+		* \endcode
+		*/		
+		CURRENT_MINUTE = "currentMinute";
+	}
+	} // end of WidgetTimePickerProperties
+
+	/**
+	* The available widget properties for a #MAW_NUMBER_PICKER. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetNumberPickerProperties "Number Picker properties" {
+	constset MAString MAW_NUMBER_PICKER_ {
+		/**
+		* @brief Sets or gets the current value for the number picker. 
+		* If the value is less than MAW_NUMBER_PICKER_MIN_VALUE property value, the current value is set to min.
+		* If the value is greater than MAW_NUMBER_PICKER_MAX_VALUE value, the current value is set to max.
+		*
+		* @validvalue A valid int.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_VALUE, "50");
+		* \endcode
+		*/		
+		VALUE = "value";
+		
+		/**
+		* @brief Sets or gets the min value of the picker.
+		*
+		* @validvalue An int that specifies the minimum value.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_MIN_VALUE, "0");
+		* \endcode
+		*/		
+		MIN_VALUE = "minValue";
+		
+		/**
+		* @brief Sets or gets the max value of the picker.
+		*
+		* @validvalue An int that specifies the maximum value.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_MAX_VALUE, "100");
+		* \endcode
+		*/		
+		MAX_VALUE = "maxValue";
+	}
+	} // end of WidgetNumberPickerProperties
+	
+	/**
+	* The available widget properties for a #MAW_VIDEO_VIEW. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetVideoViewProperties "Video View properties" {
+	constset MAString MAW_VIDEO_VIEW_ {
+		/**
+		* @brief Sets the video path.
+		*
+		* @validvalue Any valid path.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Set the video path.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_PATH, "\data\Video1.wav");
+		* \endcode
+		*/		
+		PATH = "path";
+		
+		/**
+		* @brief Starts or stops the video playback.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Start the playback.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_PLAYBACK_START, "true");
+		* \endcode
+		*/		
+		PLAYBACK_START = "playbackStart";
+
+		/**
+		* @brief Seeks into the video.
+		*
+		* @validvalue A valid integer for milliseconds.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_SEEK_TO, "10000");
+		* \endcode
+		*/		
+		SEEK_TO = "seekTo";
+		
+		/**
+		* @brief Pauses or resumes the playback.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Pause the playback.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_PAUSE, "true");
+		*   // Later, can resume the playback.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_PAUSE, "false");		
+		* \endcode
+		*/		
+		PAUSE = "pause";
+		
+		/**
+		* @brief Gets the video file duration.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_DURATION, buf, BUFFER_SIZE);
+		*   // Do something with the duration.	
+		* \endcode
+		*/		
+		DURATION = "duration";
+		
+		/**
+		* @brief Gets the buffer percentage of the played video file.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_BUFFER_PERCENTAGE, buf, BUFFER_SIZE);
+		*   // Do something with the percentage.	
+		* \endcode
+		*/		
+		BUFFER_PERCENTAGE = "bufferPercentage";
+		
+		/**
+		* @brief Gets the current position in the video file.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_CURRENT_POSITION, buf, BUFFER_SIZE);
+		*   // Do something with the position.
+		* \endcode
+		*/		
+		CURRENT_POSITION = "currentPosition";
+	}
+	} // end of WidgetVideoViewProperties
 	} // end of WidgetProperties	
 		
 	typedef int MAWidgetHandle;
@@ -4458,6 +5037,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.  
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetSetProperty(in MAWidgetHandle widget, in MAString property, in MAString value);
@@ -4475,6 +5055,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
 	* - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small. 
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
