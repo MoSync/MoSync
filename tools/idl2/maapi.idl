@@ -1634,11 +1634,50 @@ interface MAAPI {
 			BOLD = 1;
 			ITALIC = 2;
 		}
+
+		constset int RES_FONT_{
+	   		 /**
+   			 * \brief Indicates that the call to a font syscall was successful.
+   			 */
+	   		 OK = 1;
+   			 
+   			 /**
+ 	  		 * \brief Indicates that an invalid font handle was passed.
+   			 */
+   			 INVALID_HANDLE = -1;
+
+			/**
+   			 * \brief Indicates that the index was off the list size.
+   			 */
+	   		 INDEX_OUT_OF_BOUNDS = -2;
+
+			/**
+	   		 * \brief Indicates that a default font with that combination does not exist.
+   			 */
+   			 NO_TYPE_STYLE_COMBINATION = -3;
+		
+			/**
+   			 * \brief Indicates that there is no font with that name on the device.
+   			 */
+	   		 NAME_NONEXISTENT = -4;
+	
+			/**
+	   		 * \brief Indicates that maFontGetCount() was not called first.
+   			 */
+   			 LIST_NOT_INITIALIZED = -5;
+
+			/**
+   			 * \brief Indicates that the buffer is not big enough to store the font name.
+   			 */
+ 	  		 INSUFFICIENT_BUFFER = -6;
+
+		 }
 		/**
 		* Returns a handle to one of the default fonts of the device, in the style and size you specify
 		* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE]
 		* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC]
 		* \param 'size' The size of the font
+		* \return The handle to the font, or RES_FONT_NO_TYPE_STYLE_COMBINATION
 		*/
 		MAHandle maFontLoadDefault(in int type, in int style, in int size);
 
@@ -1646,19 +1685,26 @@ interface MAAPI {
 		* Sets the font to be used with maDrawText and maDrawTextW, and returns the handle
 		* to the previous font
 		* \param 'font' an MAHandle for a font object
+		* \return The handle to the previous font, or RES_FONT_INVALID_HANDLE
 		*/
 		MAHandle maFontSetCurrent(in MAHandle font);
 
 		/**
 		* Returns the number of fonts that are available in the system
+		* \return Number of fonts
+		* \see maFontGetName
 		*/
 		int maFontGetCount();
 		
 		/**
-		* Copies the font postscript name of the given index to the buffer, returns the number of bytes copied (with terminating NULL)
-		* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE]
-		* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC]
-		* \param 'size' The size of the font
+		* Copies the font postscript name of the given index to the buffer. 
+		* You must have first called maFontGetCount() at least once before calling this function.
+		* \param 'index' A 0-based index to the font
+		* \param 'buffer' An empty char buffer that will receive the font name
+		* \param 'bufferLen' The size of the buffer
+		* \return The number of bytes copied (with terminating NULL) or RES_FONT_INDEX_OUT_OF_BOUNDS 
+		* 		or RES_FONT_INSUFFICIENT_BUFFER or RES_FONT_LIST_NOT_INITIALIZED
+		* \see maFontGetCount, maFontLoadWithName
 		*/
 		int maFontGetName(in int index, out char* buffer, in int bufferLen);
 
@@ -1666,12 +1712,14 @@ interface MAAPI {
 		* Returns a handle to a font with the specific postscript name and size
 		* \param 'postScriptName' The postscript name of the font
 		* \param 'size' The size of the font
+		* \return Handle to the font, or RES_FONT_NAME_NONEXISTENT
 		*/
-		MAHandle maFontLoadWithPostScriptName(in char* postScriptName, in int size);
+		MAHandle maFontLoadWithName(in char* postScriptName, in int size);
 
 		/**
 		* Deletes a loaded font
 		* \param 'font' A font handle
+		* \return RES_FONT_OK or RES_FONT_INVALID_HANDLE
 		*/
 		int maFontDelete(in MAHandle font);
 
