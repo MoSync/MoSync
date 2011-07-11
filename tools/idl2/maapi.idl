@@ -4311,6 +4311,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/		
 		ENABLE_ZOOM = "enableZoom";
+
+		/**
+		* @brief Go a page back or forward in the browsing history
+		*
+		* @validvalue "back" , "forward".
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_NAVIGATE, "back");
+		* \endcode
+		*/		
+		NAVIGATE = "navigate";
 	}
 	
 	} // end of WidgetWebViewProperties

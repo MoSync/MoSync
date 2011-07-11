@@ -80,6 +80,16 @@
         {
             webView.scalesPageToFit=NO;
         }
+    } else if([key isEqualToString:@MAW_WEB_VIEW_NAVIGATE]) {
+		UIWebView* webView = (UIWebView*)view;
+        if([value isEqualToString:@"back"])
+        {
+            [webView goBack];
+        }
+        else if([value isEqualToString:@"forward"])
+        {
+            [webView goForward];
+        }
     } else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
