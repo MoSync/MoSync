@@ -4310,7 +4310,7 @@ group WidgetAPI "Widget API" {
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_ENABLE_ZOOM, "true");
 		* \endcode
 		*/		
-		MAW_WEB_VIEW_ENABLE_ZOOM = "enableZoom";
+		ENABLE_ZOOM = "enableZoom";
 	}
 	
 	} // end of WidgetWebViewProperties

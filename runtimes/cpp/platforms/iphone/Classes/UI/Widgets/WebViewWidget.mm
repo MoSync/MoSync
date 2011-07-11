@@ -70,7 +70,17 @@
     } else if([key isEqualToString:@MAW_WEB_VIEW_HTML]) {
 		UIWebView* webView = (UIWebView*)view;
         [webView loadHTMLString:value baseURL:NULL];
-	} else {
+    } else if([key isEqualToString:@MAW_WEB_VIEW_ENABLE_ZOOM]) {
+		UIWebView* webView = (UIWebView*)view;
+        if([value isEqualToString:@"true"])
+        {
+            webView.scalesPageToFit=YES;
+        }
+        else if([value isEqualToString:@"false"])
+        {
+            webView.scalesPageToFit=NO;
+        }
+    } else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
@@ -162,7 +172,7 @@
     }
     
     //Deprecated
-    /*newurl = [[NSString stringWithString:request.URL.absoluteString] retain]; // TODO: do have to do this (retain)??
+    newurl = [[NSString stringWithString:request.URL.absoluteString] retain]; // TODO: do have to do this (retain)??
 	
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
@@ -170,7 +180,7 @@
 	eventData->eventType = MAW_EVENT_WEB_VIEW_URL_CHANGED;
 	eventData->widgetHandle = handle;
 	event.data = eventData;
-	Base::gEventQueue.put(event);*/
+	Base::gEventQueue.put(event);
 	return YES; 
 }
 
