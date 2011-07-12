@@ -58,7 +58,8 @@ private:
 		
 		store = maOpenStore("exit_status", 0);
 		if(store == STERR_NONEXISTENT) {
-			printf("test crashed.\n");
+			printf("test %i crashed.\n", mState);
+			printf("%s\n", strrchr(getNextTest(), '/'));
 			FREEZE;
 		}
 		TEST(store);
