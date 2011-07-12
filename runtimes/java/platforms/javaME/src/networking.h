@@ -53,7 +53,6 @@ public class MAConn {
 	final void handleResult(int opType, int result) {
 		MYASSERT((state & opType) != 0);
 		state &= ~opType;
-		DEBUG_TEMP("hR\n");
 
 		int[] event = new int[4];
 		EI_TYPE = EVENT_TYPE_CONN;

@@ -806,7 +806,7 @@ public
 	//Proper Syscall Functions
 	//***************************************************************************
 
-	SYSCALL(Address) SPECIAL(memset)(Address dst, int val, int count) THE {
+	SYSCALL(Address) SPECIAL(memset)(final Address dst, int val, int count) THE {
 		DEBUG("memset("+dst+", "+val+", "+count+");\n");
 		MYASSERT(count >= 0);
 		int[] mem_ds = CORE.mMem_ds;
@@ -887,6 +887,7 @@ public
 		DEBUG("memcpy("+dst+", "+src+", "+size+");\n");
 		MYASSERT(size >= 0);
 		if(size==0) return dst;
+		int oldDst = dst;
 		int d = BYTEPART(dst);
 		int s = BYTEPART(src);
 		int[] mem_ds = CORE.mMem_ds;
@@ -920,7 +921,7 @@ public
 			WBYTE(dst++, b);
 		}
 
-		return dst;
+		return oldDst;
 	}
 	SYSCALL(Address) SPECIAL(strcpy)(Address dst, Address src) THE {
 		DEBUG("strcpy("+dst+", "+src+");\n");
