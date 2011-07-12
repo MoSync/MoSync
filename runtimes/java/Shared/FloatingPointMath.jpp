@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define ITF(x) Float.intBitsToFloat(x)
 #define FTI(x) Float.floatToIntBits(x)
 
-#ifdef MA_PROF_SUPPORT_CLDC_10	
+#ifdef MA_PROF_SUPPORT_CLDC_10
 	// used for storing the doubles/floats when doing the arithmetical operations
 	// so we don't need to allocate them for each operation.
 	Real tempRealA = new Real();
@@ -51,8 +51,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	
 	SYSCALL(long) __divdf3(long al, long bl) THE {
 		tempRealB.assignDoubleBits(bl);
+#ifndef MA_ALLOW_FLOAT_DIVISION_BY_ZERO
 		if(tempRealB.isZero() == true)
-			BIG_PHAT_ERROR;			
+			BIG_PHAT_ERROR;
+#endif
 		tempRealA.assignDoubleBits(al);
 		tempRealA.div(tempRealB);
 		return tempRealA.toDoubleBits();
@@ -79,44 +81,44 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	}
 
 	SYSCALL(long) STATIC_SYSCALL(__floatsidf)(int af) {
-		tempRealA.assign(af);		
+		tempRealA.assign(af);
 		return tempRealA.toDoubleBits();
 	}	
 
 	SYSCALL(int) dcmp(long al, long bl) {
 		tempRealA.assignDoubleBits(al);
-		tempRealB.assignDoubleBits(bl);		
+		tempRealB.assignDoubleBits(bl);
 		if(tempRealA.lessThan(tempRealB) == true) return -1;
 		else if(tempRealA.equalTo(tempRealB) == true) return 0;
 		else return 1;
 	}
 
 	SYSCALL(long) STATIC_SYSCALL(__extendsfdf2)(int fi) {
-		tempRealA.assignFloatBits(fi);	
+		tempRealA.assignFloatBits(fi);
 		return tempRealA.toDoubleBits();
 	}
 
 	SYSCALL(long) sin(long xl) {
 		tempRealA.assignDoubleBits(xl);
-		tempRealA.sin();	
+		tempRealA.sin();
 		return tempRealA.toDoubleBits();
 	}
 	
 	SYSCALL(long) cos(long xl) {
 		tempRealA.assignDoubleBits(xl);
-		tempRealA.cos();	
+		tempRealA.cos();
 		return tempRealA.toDoubleBits();
 	}
 	
 	SYSCALL(long) tan(long xl) {
 		tempRealA.assignDoubleBits(xl);
-		tempRealA.tan();	
+		tempRealA.tan();
 		return tempRealA.toDoubleBits();
 	}
 	
 	SYSCALL(long) sqrt(long xl) {
 		tempRealA.assignDoubleBits(xl);
-		tempRealA.sqrt();	
+		tempRealA.sqrt();
 		return tempRealA.toDoubleBits();
 	}
 	
@@ -129,36 +131,38 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	
 	SYSCALL(long) __subdf3(long al, long bl) {
 		double a = LTD(al);
-		double b = LTD(bl);	
+		double b = LTD(bl);
 		return DTL(a-b);
 	}
 	
 	SYSCALL(long) __muldf3(long al, long bl) {
 		double a = LTD(al);
-		double b = LTD(bl);		
+		double b = LTD(bl);
 		return DTL(a*b);
 	}
 	
 	SYSCALL(long) __divdf3(long al, long bl) THE {
-		double b = LTD(bl);		
+		double b = LTD(bl);
+#ifndef MA_ALLOW_FLOAT_DIVISION_BY_ZERO
 		if(b == 0)
 			BIG_PHAT_ERROR; // return DTL(Double.NaN);
-		double a = LTD(al);	
+#endif
+		double a = LTD(al);
 		return DTL(a/b);
 	}
 	
 	SYSCALL(long) __negdf2(long al) {
-		double a = LTD(al);	
+		double a = LTD(al);
 		return DTL(-a);
 	}
 	
 	SYSCALL(int) __fixdfsi(long al) {
-		double a = LTD(al);	
+		double a = LTD(al);
 		return (int)a;
 	}
 
 	SYSCALL(int) __fixunsdfsi(long al) {
-		double a = LTD(al);	
+		double a = LTD(al);
 		long l = (long)a;
 		if(l < 0)
 			return 0;
@@ -172,7 +176,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	
 	SYSCALL(int) dcmp(long al, long bl) {
 		double a = LTD(al);
-		double b = LTD(bl);	
+		double b = LTD(bl);
 		if(a > b)
 			return 1;
 		else if(a == b)
@@ -187,22 +191,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	}
 
 	SYSCALL(long) sin(long xl) {
-		double x = LTD(xl);	
+		double x = LTD(xl);
 		return DTL(Math.sin(x));
 	}
 	
 	SYSCALL(long) cos(long xl) {
-		double x = LTD(xl);		
+		double x = LTD(xl);
 		return DTL(Math.cos(x));
 	}
 	
 	SYSCALL(long) tan(long xl) {
-		double x = LTD(xl);		
+		double x = LTD(xl);
 		return DTL(Math.tan(x));
 	}
 	
 	SYSCALL(long) sqrt(long xl) {
-		double x = LTD(xl);	
+		double x = LTD(xl);
 		return DTL(Math.sqrt(x));
 	}
 	
@@ -232,26 +236,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	
 	SYSCALL(int) __divsf3(int al, int bl) THE {
 		tempRealB.assignFloatBits(bl);
+#ifndef MA_ALLOW_FLOAT_DIVISION_BY_ZERO
 		if(tempRealB.isZero() == true)
-			BIG_PHAT_ERROR;			
+			BIG_PHAT_ERROR;
+#endif
 		tempRealA.assignFloatBits(al);
 		tempRealA.div(tempRealB);
 		return tempRealA.toFloatBits();
 	}
 	
 	SYSCALL(int) __negsf2(int al) {
-		tempRealA.assignFloatBits(al);	
+		tempRealA.assignFloatBits(al);
 		tempRealA.neg();
 		return tempRealA.toFloatBits();
 	}
 	
 	SYSCALL(int) __fixsfsi(int al) {
-		tempRealA.assignFloatBits(al);	
+		tempRealA.assignFloatBits(al);
 		return tempRealA.toInteger();
 	}
 
 	SYSCALL(int) __fixunssfsi(int al) {
-		tempRealA.assignFloatBits(al);	
+		tempRealA.assignFloatBits(al);
 		long l = tempRealA.toLong();
 		if(l < 0)
 			return 0;
@@ -260,7 +266,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	}
 
 	SYSCALL(int) __floatsisf(int af) {
-		tempRealA.assign(af);		
+		tempRealA.assign(af);
 		return tempRealA.toFloatBits();
 	}	
 
@@ -286,36 +292,38 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	
 	SYSCALL(int) __subsf3(int al, int bl) {
 		float a = ITF(al);
-		float b = ITF(bl);	
+		float b = ITF(bl);
 		return FTI(a-b);
 	}
 	
 	SYSCALL(int) __mulsf3(int al, int bl) {
 		float a = ITF(al);
-		float b = ITF(bl);		
+		float b = ITF(bl);
 		return FTI(a*b);
 	}
 	
 	SYSCALL(int) __divsf3(int al, int bl) THE {
-		float b = ITF(bl);		
+		float b = ITF(bl);
+#ifndef MA_ALLOW_FLOAT_DIVISION_BY_ZERO
 		if(b == 0)
 			BIG_PHAT_ERROR; // return DTL(Double.NaN);
-		float a = ITF(al);	
+#endif
+		float a = ITF(al);
 		return FTI(a/b);
 	}
 	
 	SYSCALL(int) __negsf2(int al) {
-		float a = ITF(al);	
+		float a = ITF(al);
 		return FTI(-a);
 	}
 	
 	SYSCALL(int) __fixsfsi(int al) {
-		float a = ITF(al);	
+		float a = ITF(al);
 		return (int)a;
 	}
 
 	SYSCALL(int) __fixunssfsi(int al) {
-		float a = ITF(al);	
+		float a = ITF(al);
 		long l = (long)a;
 		if(l < 0)
 			return 0;
@@ -334,7 +342,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 	SYSCALL(int) fcmp(int al, int bl) {
 		float a = ITF(al);
-		float b = ITF(bl);	
+		float b = ITF(bl);
 		if(a > b)
 			return 1;
 		else if(a == b)
