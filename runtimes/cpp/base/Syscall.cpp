@@ -869,6 +869,7 @@ namespace Base {
 
 	int Syscall::maFileRename(MAHandle file, const char* newName) {
 		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
+		LOGF("maFileRename(%i, %s)\n", file, newName);
 
 		// close the file while we're renaming.
 		bool wasOpen;
@@ -893,13 +894,20 @@ namespace Base {
 		if(newName[1] == ':' || newName[0] == '/')
 			hasPath = true;
 #else
-		if(newName[0] == '/')
+		if(strrchr(newName, '/'))
 			hasPath = true;
 #endif
+
+#ifdef SYMBIAN
+#define DIRSEP '\\'
+#else
+#define DIRSEP '/'
+#endif
+
 		Array<char> nn(0);
 		if(!hasPath) {
 			int oldPathLen = 0;
-			const char* lastSlash = strrchr(fh.name, '/');
+			const char* lastSlash = strrchr(fh.name, DIRSEP);
 			if(lastSlash != NULL) {
 				oldPathLen = (lastSlash - fh.name) + 1;
 			}
@@ -907,7 +915,23 @@ namespace Base {
 				int newNameLen = strlen(newName);
 				nn.resize(oldPathLen + newNameLen + 1);
 				memcpy(nn, fh.name, oldPathLen);
+#ifdef SYMBIAN
+				char* dst = nn + oldPathLen;
+				const char* src = newName;
+				// Switch directory separators.
+				while(*src) {
+					if(*src == '/') {
+						*dst = '\\';
+					} else {
+						*dst = *src;
+					}
+					src++;
+					dst++;
+				}
+				*dst = 0;
+#else
 				strcpy(nn + oldPathLen, newName);
+#endif
 				newName = nn;
 			}
 		}
@@ -930,11 +954,11 @@ namespace Base {
 			int err = errno;
 #endif
 			if(err == EXDEV)
-				return MA_FERR_RENAME_FILESYSTEM;
+				FILE_FAIL(MA_FERR_RENAME_FILESYSTEM);
 			else if(err == EACCES)
-				return MA_FERR_FORBIDDEN;
+				FILE_FAIL(MA_FERR_FORBIDDEN);
 			else
-				return MA_FERR_GENERIC;
+				FILE_FAIL(MA_FERR_GENERIC);
 		}
 		fh.name.resize(strlen(newName) + 1);
 		strcpy(fh.name, newName);

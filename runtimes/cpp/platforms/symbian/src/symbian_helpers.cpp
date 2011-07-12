@@ -289,6 +289,7 @@ int rename(const char* oldName, const char* newName) {
 	TCleaner<HBufC> oldDesc(CreateHBufC16FromCStringLC(oldName));
 	TCleaner<HBufC> newDesc(CreateHBufC16FromCStringLC(newName));
 	int res = CCoeEnv::Static()->FsSession().Rename(*oldDesc, *newDesc);
+	LOGF("rename(%s, %s): %i\n", oldName, newName, res);
 	switch(res) {
 	case KErrNone:
 		return 0;
