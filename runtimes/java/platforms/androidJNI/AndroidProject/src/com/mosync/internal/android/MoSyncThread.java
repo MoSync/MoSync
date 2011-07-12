@@ -140,6 +140,8 @@ public class MoSyncThread extends Thread
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
 	MoSyncFile mMoSyncFile;
+	// Module for device fonts.
+	MoSyncFont mMoSyncFont;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -210,7 +212,7 @@ public class MoSyncThread extends Thread
 	 */
 	Hashtable<Integer, String> mStores = 
 		new Hashtable<Integer, String>();
-
+	
 	// Various variables, should be moved to subsystems 
 	// along with the syscalls.
 	public ByteBuffer mMemDataSection;
@@ -234,21 +236,11 @@ public class MoSyncThread extends Thread
 	int mDrawTargetHandle = 0;
 
 	Paint mPaint = new Paint();
+
 	Paint mBlitPaint = new Paint();
 
-	/**
-	 * Height (ascent + descent) of text in the default console font.
-	 */
 	int mTextConsoleHeight;
 	
-	/**
-	 * Ascent of text in the default console font.
-	 */
-	int mTextConsoleAscent;
-	
-	/**
-	 * Rectangle that is used to get the extent of a text string.
-	 */
 	Rect mTextSizeRect = new Rect();
 
 	// Rectangle objects used for drawing in maDrawImageRegion().
@@ -285,6 +277,7 @@ public class MoSyncThread extends Thread
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
 		mMoSyncFile = new MoSyncFile(this);
+		mMoSyncFont = new MoSyncFont(this);
 		
 		// Bluetooth is not available on all platforms and
 		// therefore we do a conditional loading of the
@@ -363,7 +356,16 @@ public class MoSyncThread extends Thread
 		event[0] = EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 		postEvent(event);
 	}
-	
+
+	/**
+	 * Check if the Font API is available.
+	 * @return true if the API is available.
+	 */
+	public boolean isFontApiAvailable()
+	{
+		return mMoSyncFont != null;
+	}
+
 	/**
 	 * setMoSyncView
 	 */
@@ -749,19 +751,11 @@ public class MoSyncThread extends Thread
 		// Generates a default text height used for console text writing.
 		// This is used so that all text which is printed to the console
 		// gets the same text height.
-		// Old code:
-		//int extent = maGetTextSize(
-		//	"abcdefghijklmnopqrstuvwxyz" +
-		//	"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
-		//mTextConsoleHeight = EXTENT_Y(extent);
-		
-		// New code uses font metrics. Ascent is a negative number,
-		// thus multiplying by -1 to get a positive number.
-		Paint.FontMetricsInt fontMetrics =
-			new Paint.FontMetricsInt();
-		mPaint.getFontMetricsInt(fontMetrics);
-		mTextConsoleHeight = -1 * fontMetrics.ascent + fontMetrics.descent;
-		mTextConsoleAscent = -1 * fontMetrics.ascent;
+		int extent = maGetTextSize(
+			"abcdefghijklmnopqrstuvwxyz" +
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890");
+		mTextConsoleHeight = EXTENT_Y(extent);
+
 	}
 
 	/**
@@ -936,12 +930,12 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Gets the width and height in pixels of the string.
+	 * Gets the height in pixels of the string.
 	 *
-	 * Calculates the size pixels of this string, as it's gonna 
+	 * Calculates the height in pixels of this string, as it's gonna 
 	 * be drawn to the screen.
 	 *
-	 * @param str The string which should be calculated.
+	 * @param str The string which the height should be calculated from.
 	 *
 	 * @return the height in pixels.
 	 */
@@ -951,20 +945,16 @@ public class MoSyncThread extends Thread
 		
 		mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 		
-		// Old code:
-		// return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
-		
-		// The new implementation uses a constant text height.
-		return EXTENT(mTextSizeRect.width(), mTextConsoleHeight);
+		return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 	}
 
 	/**
-	 * Gets the width and height in pixels of the string.
+	 * Gets the height in pixels of the string.
 	 *
-	 * Calculates the size in pixels of this string, as it's gonna 
+	 * Calculates the height in pixels of this string, as it's gonna 
 	 * be drawn to the screen.
 	 *
-	 * @param str The string which should be calculated.
+	 * @param str The string which the height should be calculated from.
 	 *
 	 * @return the height in pixels.
 	 */
@@ -974,13 +964,92 @@ public class MoSyncThread extends Thread
 		
 		mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 		
-		// Old code:
-		// return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
-		
-		// The new implementation uses a constant text height.
-		return EXTENT(mTextSizeRect.width(), mTextConsoleHeight);
+		return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
 	}
 
+	/**
+	* Returns a handle to one of the default fonts of the device, in the style and size you specify.
+	* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE].
+	* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC].
+	* \param 'size' The size of the font.
+	* \return The handle to the font, RES_FONT_NO_TYPE_STYLE_COMBINATION, or RES_FONT_INVALID_SIZE.
+	*/
+	int maFontLoadDefault(int type, int style, int size)
+	{
+		SYSLOG("maFontCreateDefault");
+
+		return mMoSyncFont.maFontLoadDefault(type, style, size); 
+	}
+
+	/**
+	* Sets the font to be used with maDrawText and maDrawTextW, and returns the handle
+	* to the previous font
+	* \param 'font' an MAHandle for a font object
+	* \return The handle to the previous font, or RES_FONT_INVALID_HANDLE
+	*/
+	int maFontSetCurrent(int fontHandle)
+	{
+		SYSLOG("maFontSetCurrent");
+		
+		return mMoSyncFont.maFontSetCurrent(fontHandle);
+	}
+	
+	/**
+	* Returns the number of fonts that are available in the system
+	* \return Number of fonts
+	* \see maFontGetName
+	*/
+	int maFontGetCount()
+	{
+		SYSLOG("maFontGetCount");
+		
+		return mMoSyncFont.maFontGetCount();
+	}
+	
+	/**
+	* Copies the font postscript name of the given index to the buffer. 
+	* You must have first called maFontGetCount() at least once before calling this function.
+	* \param 'index' A 0-based index to the font
+	* \param 'buffer' An empty char buffer that will receive the font name
+	* \param 'bufferLen' The size of the buffer
+	* \return The number of bytes copied (with terminating NULL) or RES_FONT_INDEX_OUT_OF_BOUNDS 
+	* 		or RES_FONT_INSUFFICIENT_BUFFER or RES_FONT_LIST_NOT_INITIALIZED
+	* \see maFontGetCount, maFontLoadWithName
+	*/
+	int maFontGetName(int index, //String buf, int bufLen)
+			final int memBuffer, 
+			final int memBufferSize)
+	{
+		SYSLOG("maFontGetName");
+		
+		return mMoSyncFont.maFontGetName(index, memBuffer, memBufferSize);
+	}
+	
+	/**
+	* Returns a handle to a font with the specific postscript name and size
+	* \param 'postScriptName' The postscript name of the font
+	* \param 'size' The size of the font
+	* \return Handle to the font, or RES_FONT_NAME_NONEXISTENT
+	*/
+	int maFontLoadWithName(final String postScriptName, int size)
+	{
+		SYSLOG("maFontLoadWithName");
+		
+		return mMoSyncFont.maFontLoadWithName(postScriptName, size);
+	}
+	
+	/**
+	* Deletes a loaded font
+	* \param 'font' A font handle
+	* \return RES_FONT_OK or RES_FONT_INVALID_HANDLE
+	*/
+	int maFontDelete(int fontHandle)
+	{
+		SYSLOG("maFontDelete");
+		
+		return mMoSyncFont.maFontDelete(fontHandle);
+	}
+	
 	/**
 	 * Draws a string of text to the screen.
 	 *
@@ -991,7 +1060,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maDrawText");
 		
-		mCanvas.drawText(str, left, top + mTextConsoleAscent, mPaint);
+	 	mCanvas.drawText( str, left, top+mTextConsoleHeight, mPaint);
 	}
 
 	/**
@@ -1004,9 +1073,9 @@ public class MoSyncThread extends Thread
 	{
 	 	SYSLOG("maDrawTextW");
 		
-		mCanvas.drawText(str, left, top + mTextConsoleAscent, mPaint);
+		mCanvas.drawText(str, left, top+mTextConsoleHeight, mPaint);
 	}
-
+	
 	/**
 	 * maUpdateScreen
 	 * Sets the boolean mIsUpdatingScreen when updating the screen
@@ -1024,6 +1093,7 @@ public class MoSyncThread extends Thread
 		
 		try 
 		{
+			// Start editing the pixels in the surface.
 			lockedCanvas = mMoSyncView.mSurfaceHolder.lockCanvas();
 			synchronized (mMoSyncView.mSurfaceHolder)
 			{
@@ -1066,7 +1136,6 @@ public class MoSyncThread extends Thread
 	/**
 	 * maResetBacklight
 	 */
-	void maResetBacklight()
 	{
 		SYSLOG("maResetBacklight");
 	}
@@ -2347,7 +2416,7 @@ public class MoSyncThread extends Thread
 		if (MoSyncService.sNotificationId == notificationId)
 		{
 			// Remove the service notification.
-			MoSyncService.removeServiceNotification(
+			MoSyncService.removeServceNotification(
 				notificationId, (Activity) mContext);
 			
 			// Stop the service.
@@ -3101,7 +3170,6 @@ public class MoSyncThread extends Thread
 	{
 		return mMoSyncFile.maFileListClose(list);
 	}
-	
 	
 	
 	

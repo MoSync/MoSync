@@ -1714,7 +1714,7 @@ interface MAAPI {
 		* 		or RES_FONT_INSUFFICIENT_BUFFER or RES_FONT_LIST_NOT_INITIALIZED.
 		* \see maFontGetCount, maFontLoadWithName.
 		*/
-		int maFontGetName(in int index, out char* buffer, in int bufferLen);
+		int maFontGetName(in int index, out MAString buffer range("bufferLen"), in int bufferLen);
 
 		/**
 		* Returns a handle to a font with the specific postscript name and size.
