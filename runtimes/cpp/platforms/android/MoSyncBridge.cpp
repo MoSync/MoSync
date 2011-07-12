@@ -84,7 +84,15 @@ static jboolean nativeLoad(
 {
 	SYSLOG("load program and resource");
 
-	int prgFd, resFd;
+	int prgFd;
+	/**
+		Due to logic -1 is never passed to LoadVMApp, use -2 when
+		no resource file is needed
+	    details: 
+			-1: resource file needed but not found
+			-2: resource file is not needed
+	*/
+	int resFd = -2;
 	
 	SYSLOG("get program file");
 	jclass fdClass = env->FindClass("java/io/FileDescriptor");
@@ -118,9 +126,13 @@ static jboolean nativeLoad(
 				resFd = dup(fd);
 				lseek(resFd, resourceOffset, SEEK_SET);
 			}
+			else if (resource == NULL)
+			{
+				resFd = -2;
+			}
 		}
 	}
-	
+
 	SYSLOG("both files was obtained!");
 	
 	if (-1 == prgFd)

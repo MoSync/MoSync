@@ -591,8 +591,9 @@ public:
 
 		if(!LoadVM(mod))
 			return false;
-
-		if(-1 != resFd)
+			
+		//-2 means that the mosync application does need any resources.
+		if(-2 != resFd)
 		{
 			FileStream res(resFd);
 
