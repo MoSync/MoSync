@@ -28,6 +28,22 @@ FileHandle getFileHandle(MAHandle file) {
 
 FileHandle getFileInputStream(MAHandle file) throws IOException {
 	FileHandle fh = getFileHandle(file);
+	if(fh.out != null) {
+		//DEBUG_TEMP("closing output stream.\n");
+		// make sure everything's written to disk.
+		fh.out.flush();
+		fh.out.close();
+		fh.out = null;
+		if(fh.in != null) {
+			//DEBUG_TEMP("closing input stream.\n");
+			fh.in.close();
+			fh.in = null;
+		}
+		//DEBUG_TEMP("closing file!\n");
+		String url = fh.fc.getURL();
+		fh.fc.close();
+		fh.fc = (FileConnection)Connector.open(url);
+	}
 	if(fh.in == null) {
 		fh.in = fh.fc.openDataInputStream();
 		if(fh.position != 0)
@@ -39,6 +55,7 @@ FileHandle getFileInputStream(MAHandle file) throws IOException {
 FileHandle getFileOutputStream(MAHandle file) throws IOException {
 	FileHandle fh = getFileHandle(file);
 	if(fh.out == null) {
+		//DEBUG_TEMP("openOutputStream("+fh.position+");\n");
 		fh.out = fh.fc.openOutputStream(fh.position);
 	}
 	return fh;
@@ -71,6 +88,7 @@ final MAHandle maFileOpen(String path, int mode) {
 	FileHandle fh = new FileHandle();
 	fh.fc = fc;
 	fh.position = 0;
+	fh.maxPos = 0;
 	mFileHandles.put(new Integer(mFileNextHandle), fh);
 	return mFileNextHandle++;
 }
@@ -119,7 +137,6 @@ final int maFileTell(MAHandle file) throws Exception {
 }
 
 final int maFileSeek(MAHandle file, int offset, int whence) throws Exception {
-	DEBUG_TEMP("maFileSeek("+file+", "+offset+", "+whence+")\n");
 	FileHandle fh = getFileHandle(file);
 	MYASSERT(fh.fc.exists() && !fh.fc.isDirectory());
 	int newPos;
@@ -136,7 +153,7 @@ final int maFileSeek(MAHandle file, int offset, int whence) throws Exception {
 	default:
 		BIG_PHAT_ERROR;
 	}
-	DEBUG_TEMP("maFileSeek newPos: "+newPos+"\n");
+	//DEBUG_TEMP("maFileSeek("+file+", "+offset+", "+whence+"): "+newPos+"\n");
 	if(newPos == fh.position)
 		return fh.position;
 	if(fh.in != null) {
@@ -144,19 +161,19 @@ final int maFileSeek(MAHandle file, int offset, int whence) throws Exception {
 			fh.in.skip(newPos - fh.position);
 		} else {
 			fh.in.close();
-			fh.in = fh.fc.openDataInputStream();
-			fh.in.skip(newPos);
+			fh.in = null;
 		}
 	}
 	if(fh.out != null) {
 		fh.out.close();
-		fh.out = fh.fc.openOutputStream(newPos);
+		fh.out = null;
 	}
 	return fh.position = newPos;
 }
 
 final int maFileTruncate(MAHandle file, int offset) {
 	try {
+		DEBUG_TEMP("maFileTruncate("+file+", "+offset+")\n");
 		FileHandle fh = getFileHandle(file);
 		fh.fc.truncate(offset);
 		if(fh.position > offset)
@@ -200,11 +217,23 @@ final int maFileDelete(MAHandle file) {
 final int maFileSize(MAHandle file) {
 	try {
 		FileHandle fh = getFileHandle(file);
+
+		// apparently, some calls to fileSize() can reset the position of a file's
+		// OutputStream.
+		if(fh.out != null) {
+			fh.out.close();
+			fh.out = null;
+		}
+
 		long s = fh.fc.fileSize();
-		//DEBUG_TEMP("maFileSize("+file+"): "+s+"\n");
 		if(s > INT_MAX || s < 0) {
 			return MA_FERR_GENERIC;
 		}
+		if(fh.maxPos > s)	{	// A call to maFileWrite may cause this to be true.
+			//DEBUG_TEMP("fileSize("+file+"): "+s+"\n");
+			s = fh.maxPos;
+		}
+		//DEBUG_TEMP("maFileSize("+file+"): "+s+"\n");
 		return (int)s;
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
@@ -252,6 +281,9 @@ final int maFileRename(MAHandle file, String newName) {
 	try {
 		FileHandle fh = getFileHandle(file);
 		fh.fc.rename(newName);
+		// rename closes all streams.
+		fh.in = null;
+		fh.out = null;
 		return 0;
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
@@ -267,8 +299,13 @@ final int maFileRename(MAHandle file, String newName) {
 final int maFileWrite(MAHandle file, MAAddress src, int len) {
 	try {
 		FileHandle fh = getFileOutputStream(file);
+		//DEBUG_TEMP("maFileWrite("+file+", "+len+") pos: "+fh.position+"\n");
 		readMemStream(fh.out, src, len);
 		fh.position += len;
+		if(fh.position > fh.maxPos)
+			fh.maxPos = fh.position;
+		//fh.out.flush();
+		//DEBUG_TEMP("size after write & flush: "+fh.fc.fileSize()+"\n");
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;
@@ -287,7 +324,6 @@ final int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len)
 		#else
 			fh.out.write(bin.arr, offset, len);
 		#endif
-			fh.position += len;
 		} else {
 			byte[] buffer = new byte[len];
 			DataInputStream dis = new DataInputStream(bi.getInputStream());
@@ -295,6 +331,10 @@ final int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len)
 			dis.close();
 			fh.out.write(buffer);
 		}
+		fh.position += len;
+		if(fh.position > fh.maxPos)
+			fh.maxPos = fh.position;
+		//fh.out.flush();
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;
@@ -303,9 +343,9 @@ final int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len)
 }
 
 final int maFileRead(MAHandle file, MAAddress dst, int len) {
-	DEBUG_TEMP("maFileRead("+file+", "+len+")\n");
 	try {
 		FileHandle fh = getFileInputStream(file);
+		//DEBUG_TEMP("maFileRead("+file+", "+len+") pos: "+fh.position+"\n");
 		byte[] bytes = new byte[len];
 		fh.in.readFully(bytes);
 		writeMemBytes(dst, bytes, 0, len);
