@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <unistd.h>
 
 namespace Base {
+#if 0
 	//******************************************************************************
 	//FileStream
 	//******************************************************************************
@@ -78,10 +79,10 @@ namespace Base {
 		TEST(isOpen());
 		int res = fread(dst, 1, size, mFile);
 		
-		char* b = (char*)malloc(200);
+		// todo: disable in release mode
+		char b[200];
 		sprintf(b, "size: %i res: %i (read: %x)", size, res, dst);
 		__android_log_write(ANDROID_LOG_INFO, "FileStream::read", b);
-		free(b);
 		
 		return res == size;
 	}
@@ -121,7 +122,7 @@ namespace Base {
 		aPos = ftell(mFile);
 		return true;
 	}
-
+#endif
 	//******************************************************************************
 	//LimitedFileStream
 	//******************************************************************************
@@ -159,23 +160,19 @@ namespace Base {
 			if (fdClassDescriptorFieldID != NULL && jo != NULL) 
 			{			
 				jint fd = mJNIEnv->GetIntField(jo, fdClassDescriptorFieldID);	
-				int myfd = dup(fd);
-				mFile = fdopen(myfd, "rb");
+				mFd = dup(fd);
 			}
 		}
-				
+		
 		if(!_open()) {
 			__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "2");
-			fclose(mFile);
+			close(mFd);
 			__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "3");
-			mFile = NULL;
+			mFd = -1;
 		}	
 		__android_log_write(ANDROID_LOG_INFO, "LimitedFileStream constructor", "4");
-		
-
-
 	}
-	
+#if 0
 	//******************************************************************************
 	//WriteFileStream
 	//******************************************************************************
@@ -201,5 +198,5 @@ namespace Base {
 		int res = fwrite(src, 1, size, mFile);
 		return res == size;
 	}
-
-};
+#endif
+}	//namespace Base

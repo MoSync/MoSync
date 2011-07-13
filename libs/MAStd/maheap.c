@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "ma.h"
 #include "maheap.h"
 #include "mavsprintf.h"
+#include "mastack.h"
 
 malloc_handler gMallocHandler = default_malloc_handler;
 malloc_hook gMallocHook = NULL;
@@ -30,13 +31,82 @@ static void* sHeapBase;
 #ifdef MOSYNCDEBUG
 //#define MEMORY_PROTECTION
 int gUsedMem = 0;
+int gWastedMem = 0;
 int gNumMallocs = 0, gNumFrees = 0;
+
+static MAHandle sDumpFile = 0;
+static void dumpStack(int req, int block, void* address);
+#endif
+
+#ifdef MOSYNCDEBUG
+void initStackDump(void) {
+	// Mosync Heap Stack Dump.
+	sDumpFile = maFileOpen("/mhsd.bin", MA_ACCESS_READ_WRITE);
+	lprintfln("initStackDump maFileOpen: %i", sDumpFile);
+	if(sDumpFile > 0) {
+		// todo: better error handling
+		int res = maFileExists(sDumpFile);
+		if(res == 0)
+			res = maFileCreate(sDumpFile);
+		else if(res == 1)
+			res = maFileTruncate(sDumpFile, 0);
+		if(res < 0) {
+			maFileClose(sDumpFile);
+			sDumpFile = res;
+			lprintfln("initStackDump error: %i", sDumpFile);
+			return;
+		}
+		maFileWrite(sDumpFile, "MHSD", 4);	// magic header, identifies this file type.
+	}
+}
+
+/* Dump format:
+struct Dump {
+	uint timeStamp;	// maGetMilliSecondCount()
+	int requestedSize;	// number of bytes requested for malloc(). -1 for free().
+	uint blockSize;	// number of bytes actually allocated/freed. 0 on malloc error.
+	uint address;	// address of allocated block. 0 on malloc error.
+	uint nFrames;	// number of stack frames
+
+	struct Frame {
+		uint address;
+	} frames[nFrames];
+};
+*/
+static void dumpStack(int req, int block, void* address) {
+	int count;
+	MA_STACK_FRAME* frame;
+	if(sDumpFile <= 0)
+		return;
+
+	count = maGetMilliSecondCount();
+	maFileWrite(sDumpFile, &count, sizeof(int));
+
+	maFileWrite(sDumpFile, &req, sizeof(int));
+	maFileWrite(sDumpFile, &block, sizeof(int));
+	maFileWrite(sDumpFile, &address, sizeof(int));
+
+	frame = getStackTop();
+	count = 0;
+	while(frame) {
+		count++;
+		frame = nextFrame(frame);
+	}
+	maFileWrite(sDumpFile, &count, sizeof(int));
+	frame = getStackTop();
+	while(frame) {
+		maFileWrite(sDumpFile, &frame->retAddr, sizeof(int));
+		frame = nextFrame(frame);
+	}
+}
 #endif
 
 void default_malloc_handler(int size) {
 #ifdef MOSYNCDEBUG
 	lprintfln("um %i", gUsedMem);
+	lprintfln("wm %i", gWastedMem);
 	lprintfln("nm %i, nf %i", gNumMallocs, gNumFrees);
+	dumpStack(size, 0, 0);
 #endif
 	maPanic(size, "Malloc failed. You most likely ran out of heap memory. Try to increase the heap size.");
 }
@@ -83,8 +153,6 @@ block_size_hook set_block_size_hook(block_size_hook new) {
 #else
 #define MASTD_HEAP_LOG(...)
 #endif
-
-void ansi_heap_init_crt0(char *start, int length);
 
 //****************************************
 //				NewPtr
@@ -147,7 +215,9 @@ void * malloc(int size)
 	}
 #ifdef MOSYNCDEBUG
 	gNumMallocs++;
-	gUsedMem += size;
+	gUsedMem += gBlockSizeHook(result);
+	gWastedMem += gBlockSizeHook(result) - size;
+	dumpStack(size, gBlockSizeHook(result), result);
 #endif
 
 #ifdef MEMORY_PROTECTION
@@ -184,16 +254,25 @@ void * calloc(int num_elem, int size_elem)
 
 void free(void *mem)
 {
+#ifdef MEMORY_PROTECTION
+	int wasMemoryProtected;
+#endif
 	MASTD_HEAP_LOG("free(0x%08X)\n", (int)mem);
 
 	if (!mem)
 		return;
 
 #ifdef MEMORY_PROTECTION
-	int wasMemoryProtected = maGetMemoryProtection();
+	wasMemoryProtected = maGetMemoryProtection();
 	maSetMemoryProtection(FALSE);
 	if(gBlockSizeHook)
 		maProtectMemory(mem, gBlockSizeHook(mem));	
+#endif
+
+#ifdef MOSYNCDEBUG
+	gNumFrees++;
+	gUsedMem -= gBlockSizeHook(mem);
+	dumpStack(-1, gBlockSizeHook(mem), mem);
 #endif
 
 	gFreeHook(mem);
@@ -205,11 +284,18 @@ void free(void *mem)
 }
 
 //****************************************
-//				fugly realloc
+//				nice realloc
 //****************************************
 void* realloc(void* old, int size) {
 	void* result;
 	MASTD_HEAP_LOG("realloc(0x%08X, %i)\n", (int)old, size);
+
+#ifdef MOSYNCDEBUG
+	// we'll count it as a free + malloc
+	gNumFrees++;
+	gUsedMem -= gBlockSizeHook(old);
+	dumpStack(-1, gBlockSizeHook(old), old);
+#endif
 
 	result = gReallocHook(old, size);
 	if(result == 0)
@@ -219,6 +305,14 @@ void* realloc(void* old, int size) {
 		gMallocHandler(size);
 		result = gReallocHook(old, size);
 	}
+
+#ifdef MOSYNCDEBUG
+	gNumMallocs++;
+	gUsedMem += gBlockSizeHook(result);
+	gWastedMem += gBlockSizeHook(result) - size;
+	dumpStack(size, gBlockSizeHook(result), result);
+#endif
+
 	return result;
 }
 

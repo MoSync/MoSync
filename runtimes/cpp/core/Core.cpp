@@ -584,17 +584,18 @@ public:
 		if(!mSyscall.loadResources(res, resfile))
 			return false;
 #else
-	bool LoadVMApp(FILE* modfile, FILE* resfile) {
+	bool LoadVMApp(int modFd, int resFd) {
 		InitVM();
 
-		FileStream mod(modfile);
+		FileStream mod(modFd);
 
 		if(!LoadVM(mod))
 			return false;
-
-		if(NULL != resfile)
+			
+		//-2 means that the mosync application does need any resources.
+		if(-2 != resFd)
 		{
-			FileStream res(resfile);
+			FileStream res(resFd);
 
 			if(!mSyscall.loadResources(res, "resources"))
 				return false;
@@ -1507,8 +1508,8 @@ bool LoadVMApp(VMCore* core, const char* modfile,const char* resfile) {
 	return CORE->LoadVMApp(modfile, resfile);
 }
 #else
-bool LoadVMApp(VMCore* core, FILE* modfile, FILE* resfile) {
-	return CORE->LoadVMApp(modfile, resfile);
+bool LoadVMApp(VMCore* core, int modFd, int resFd) {
+	return CORE->LoadVMApp(modFd, resFd);
 }
 #endif
 #endif

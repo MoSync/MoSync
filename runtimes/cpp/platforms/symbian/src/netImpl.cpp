@@ -309,6 +309,9 @@ void Syscall::ConnOp::SendResult(int result) {
 	//LOGS("cops %i 0x%08X\n", mSyscall.gConnOps.IsEmpty(), mSyscall.gConnOps.First());
 	mSyscall.gConnCleanupQue->move(this);
 	//LOGS("cops %i\n", mSyscall.gConnOps.IsEmpty());
+	
+	if(mConn.errorOverride)
+		result = mConn.errorOverride;
 
 	MAEvent event;
 	event.type = EVENT_TYPE_CONN;
@@ -496,6 +499,7 @@ void Syscall::ConnOp::DoCancel() {
 	case CSOC_Accept: {
 		CSO_Accept& a = (CSO_Accept&)sop;
 		delete a.newSock;
+		a.newSock = NULL;
 		// intentional fallthrough
 	}
 	case CSOC_SockConnect:
@@ -787,7 +791,7 @@ void CHttpConnection::FormatRequestL() {
 
 void CHttpConnection::ReadHeadersL(CPublicActive& op) {
 	//mBuffer->Reset();
-	LOGD("%i\n", mBuffer->Size());
+	LOGD("ReadHeadersL %i\n", mBuffer->Size());
 	mBufPtr.Set(CBufFlatPtr(mBuffer()));
 	mBufPtr.SetLength(0);
 	DEBUG_ASSERT(mBufPtr.MaxLength() >= 1024);
@@ -800,6 +804,7 @@ void CHttpConnection::ReadHeadersL(CPublicActive& op) {
 }
 
 void CHttpConnection::ReadMoreHeadersL() {
+	LOGD("ReadMoreHeadersL\n");
 	// +1 to allow for mBufPtr.PtrZ().
 	mRecvPtr.Set((byte*)mBufPtr.Ptr() + mPos, mBufPtr.Length() - mPos,
 		mBufPtr.MaxLength() - (mPos+1));
@@ -864,6 +869,13 @@ void CHttpConnection::RunL(TInt aResult) {
 		mPos = mBufPtr.Length();
 	}
 	ReadMoreHeadersL();
+}
+
+void CHttpConnection::CancelAll() {
+	mTransport->CancelAll();
+	if(mSyncOp) {
+		CompleteReadHeaders(CONNERR_CANCELED, KErrCancel);
+	}
 }
 
 void CHttpConnection::CompleteReadHeaders(int aConnErr, int aResult) {
@@ -1094,9 +1106,15 @@ void CBtServerSocket::init(RSocketServ& aServer, const TUUID& uuid, bool hasName
 	//next step would be to call mSocket.Accept(). we have maAccept() do that.
 }
 
-CBtServerSocket::~CBtServerSocket() {
-	if(mHandle != 0)
+void CBtServerSocket::CancelAll() {
+	CServerSocket::CancelAll();
+	if(mHandle != 0) {
 		mSdpDB.DeleteRecordL(mHandle);
+		mHandle = 0;
+	}
+}
+
+CBtServerSocket::~CBtServerSocket() {
 }
 
 //******************************************************************************

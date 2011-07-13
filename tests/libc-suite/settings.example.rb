@@ -8,5 +8,8 @@ SETTINGS = {
 	:test_release => false,
 	:copy_targets => [],
 	:loader_base_url => 'http://localhost:5002/',
-	:htdocs_dir => '/htdocs/',
+	:htdocs_dir => '/htdocs/',	# set to nil or false to disable copying.
+	:write_master_dump => false,
+	:copy_dce => false,
+	:dce_only => false,
 }

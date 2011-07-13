@@ -51,6 +51,7 @@
         vAlignment = va;
         
         self.scrollEnabled = NO;
+        self.userInteractionEnabled = YES;
     }
     return self;
 }
@@ -144,6 +145,7 @@
     CGSize contentSize = [self layoutSubviewsEffectively:NO];
     self.showsHorizontalScrollIndicator = showsHorizontalScrollIndicator;
     self.showsVerticalScrollIndicator = showsVerticalScrollIndicator;    
+
     return contentSize;
 }
 

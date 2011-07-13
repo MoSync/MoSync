@@ -27,14 +27,19 @@
 - (id)init {
 	if(!view)
 		view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
+        
 	UIButton* button = (UIButton*) view;
-	button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
+    button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
 	[button addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
 	image = nil;
 	leftCapWidth = 0;
 	topCapHeight = 0;	
-	button.titleLabel.numberOfLines = 0;
-	return [super init];
+	button.titleLabel.numberOfLines = 0;	
+	id ret = [super init];
+	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
+    button.imageView.contentMode = UIViewContentModeCenter;
+     	
+    return ret;
 }
 
 -(void)buttonPressed {
@@ -52,16 +57,19 @@
 	if([key isEqualToString:@"text"]) {
 		UIButton* button = (UIButton*) view;
 		[button setTitle:value forState:UIControlStateNormal];
-		[self layout];	
+		[self layout];
 	} else
 	if([key isEqualToString:@"fontSize"]) {
 		UIButton* button = (UIButton*) view;
 		float fontSize = [value floatValue];
-		[button setFont:[UIFont boldSystemFontOfSize:fontSize]];
+		button.titleLabel.font = [UIFont boldSystemFontOfSize:fontSize];
+		[self layout];			
 	} else		
 	if([key isEqualToString:@"fontColor"]) {
 		UIButton* button = (UIButton*) view;
-		[button setTitleColor:[UIColor colorWithHexString:value] forState:UIControlStateNormal];
+		UIColor* color = [UIColor colorWithHexString:value];
+		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
+		[button setTitleColor:color forState:UIControlStateNormal];
 	} else			
 	if([key isEqualToString:@"backgroundImage"]) {
 		int imageHandle = [value intValue];
@@ -70,7 +78,35 @@
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		image = [UIImage imageWithCGImage:imageResource->image];
 		[button setBackgroundImage:image forState:UIControlStateNormal];
-	} 
+	}
+    else			
+    if([key isEqualToString:@"image"]) {
+        int imageHandle = [value intValue];
+        if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
+        UIButton* button = (UIButton*) view;
+        Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
+        image = [UIImage imageWithCGImage:imageResource->image];
+        [button setImage:image forState:UIControlStateNormal];
+    }    
+    /* // doesn't work on iphone....
+    else if ([key isEqualToString:@"scaleMode"]) {
+        UIButton* button = (UIButton*)view;
+        
+        UIViewContentMode contentMode;
+        
+        if([value isEqualToString:@"none"]) 
+            contentMode = UIViewContentModeCenter;
+        else if([value isEqualToString:@"scaleXY"]) 
+            contentMode = UIViewContentModeScaleToFill;
+        else if([value isEqualToString:@"scalePreserveAspect"]) 
+            contentMode = UIViewContentModeScaleAspectFit;
+        else 
+            return MAW_RES_INVALID_PROPERTY_NAME;
+        
+        [button setContentMode:contentMode];
+        button.imageView.contentMode = contentMode;
+    }
+    */  
 	else if([key isEqualToString:@"leftCapWidth"]) {
 		int newLeftCapWidth = [value intValue];
 		if(image != nil) {

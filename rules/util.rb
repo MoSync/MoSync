@@ -78,11 +78,18 @@ class String
 end
 
 def sh(cmd)
-	#TODO: optimize by removing the extra shell
-	#the Process class should be useful.
-	$stderr.puts cmd
-	if(!system(cmd)) then
-		error "Command failed: '#{$?}'"
+	#Send the command to STDERR
+	warn "#{cmd}"
+	IO::popen(cmd) do |io|
+		while !io.eof?
+			line = io.gets( )
+			puts line
+	    end
+	    #Checking the return code
+	    exitCode = Process::waitpid2( io.pid )[1].exitstatus
+	    if(exitCode != 0) then
+			error"Command failed: '#{exitCode}'"
+	    end
 	end
 end
 

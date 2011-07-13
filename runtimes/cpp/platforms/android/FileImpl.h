@@ -15,11 +15,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#if 0
 FILE* mFile;
 const char* mFilename;
 
 protected:
 FileStream();
 
-JNIEnv* mJNIEnv;
-jobject mJThis;
+#else
+#include "../sdl/FileImpl.h"
+#define S_IREAD 0
+#define S_IWRITE 0
+#endif

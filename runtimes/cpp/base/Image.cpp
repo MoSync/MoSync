@@ -31,17 +31,20 @@ typedef s64 int64_t;
 
 #define SWAP(x, y, temp) {temp=x;x=y;y=temp;}
 
+#define FP_RESOLUTION 16
+#define FP_MASK ((1<<FP_RESOLUTION)-1)
+
 inline int32_t fp_ceil(int32_t x) {
-	x += 0xffff;
-	return x >> 16;
+	x += FP_MASK;
+	return x >> FP_RESOLUTION;
 }
 
 inline int32_t fp_div32(int32_t a, int32_t b) {
-	return (int32_t)((((int64_t)a)<<16)/((int64_t)b));
+	return (int32_t)((((int64_t)a)<<FP_RESOLUTION)/((int64_t)b));
 }
 
 inline int32_t fp_mul32(int32_t a, int32_t b) {
-	return (int32_t)(((int64_t)a * (int64_t)b)>>16);
+	return (int32_t)(((int64_t)a * (int64_t)b)>>FP_RESOLUTION);
 }  
 
 struct Point {
@@ -61,8 +64,6 @@ enum ClipResult  {
 };
 
 ClipResult clipTopLine(Point &a, Point &b, Point& out, int top) {
-	//bool shouldAddThisPoint = false;
-	//bool shouldAddClippedPoint = false;
 	if(a.y<top && b.y<top) return BOTH_OUT;
 	ClipResult clipResult;
 	if((a.y>=top && b.y<top)) {
@@ -73,17 +74,16 @@ ClipResult clipTopLine(Point &a, Point &b, Point& out, int top) {
 		return BOTH_IN;
 	}
 
-	if(abs(b.y-a.y)<0xffff) return BOTH_OUT;
-	int mul = fp_mul32((top-a.y),(b.x-a.x));
-	int div = fp_div32(mul, (b.y-a.y));			
+	if(abs(b.y-a.y)<FP_MASK) return BOTH_OUT;
+//	int mul = fp_mul32((top-a.y),(b.x-a.x));
+//	int div = fp_div32(mul, (b.y-a.y));			
+  	int div = fp_mul32((b.x-a.x), fp_div32((top-a.y), (b.y-a.y)));			
 	out.x = a.x + div;
 	out.y = top;
 	return clipResult;
 }
 
 ClipResult clipBottomLine(Point &a, Point &b, Point& out, int bottom) {
-	//bool shouldAddThisPoint = false;
-	//bool shouldAddClippedPoint = false;
 	if(a.y>bottom && b.y>bottom) return BOTH_OUT;
 	ClipResult clipResult;
 	if((a.y<=bottom && b.y>bottom)) {
@@ -94,17 +94,16 @@ ClipResult clipBottomLine(Point &a, Point &b, Point& out, int bottom) {
 		return BOTH_IN;
 	}
 
-	if(abs(b.y-a.y)<0xffff) return BOTH_OUT;
-	int mul = fp_mul32((bottom-a.y),(b.x-a.x));
-	int div = fp_div32(mul, (b.y-a.y));			
-	out.x = a.x + div;
+	if(abs(b.y-a.y)<FP_MASK) return BOTH_OUT;
+	//int mul = fp_mul32((bottom-a.y),(b.x-a.x));
+	//int div = fp_div32(mul, (b.y-a.y));			
+    int div = fp_mul32((b.x-a.x), fp_div32((bottom-a.y), (b.y-a.y)));			
+    out.x = a.x + div;
 	out.y = bottom;
 	return clipResult;
 }
 
 ClipResult clipLeftLine(Point &a, Point &b, Point& out, int left) {
-	//bool shouldAddThisPoint = false;
-	//bool shouldAddClippedPoint = false;
 	if(a.x<left && b.x<left) return BOTH_OUT;
 	ClipResult clipResult;
 	if((a.x>=left && b.x<left)) {
@@ -115,17 +114,16 @@ ClipResult clipLeftLine(Point &a, Point &b, Point& out, int left) {
 		return BOTH_IN;
 	}
 
-	if(abs(b.x-a.x)<0xffff) return BOTH_OUT;
-	int mul = fp_mul32((left-a.x),(b.y-a.y));
-	int div = fp_div32(mul, (b.x-a.x));			
-	out.x = left;
+	if(abs(b.x-a.x)<FP_MASK) return BOTH_OUT;
+	//int mul = fp_mul32((left-a.x),(b.y-a.y));
+	//int div = fp_div32(mul, (b.x-a.x));			
+    int div = fp_mul32((b.y-a.y), fp_div32((left-a.x), (b.x-a.x)));			
+    out.x = left;
 	out.y =  a.y + div;
 	return clipResult;
 }
 
 ClipResult clipRightLine(Point &a, Point &b, Point& out, int right) {
-	//bool shouldAddThisPoint = false;
-	//bool shouldAddClippedPoint = false;
 	if(a.x>right && b.x>right) return BOTH_OUT;
 	ClipResult clipResult;
 	if((a.x<=right && b.x>right)) {
@@ -136,9 +134,10 @@ ClipResult clipRightLine(Point &a, Point &b, Point& out, int right) {
 		return BOTH_IN;
 	}
 
-	if(abs(b.x-a.x)<0xffff) return BOTH_OUT;
-	int mul = fp_mul32((right-a.x),(b.y-a.y));
-	int div = fp_div32(mul, (b.x-a.x));			
+	if(abs(b.x-a.x)<FP_MASK) return BOTH_OUT;
+//	int mul = fp_mul32((right-a.x),(b.y-a.y));
+//	int div = fp_div32(mul, (b.x-a.x));			
+    int div = fp_mul32((b.y-a.y), fp_div32((right-a.x), (b.x-a.x)));
 	out.x = right;
 	out.y =  a.y + div;
 	return clipResult;
@@ -443,52 +442,52 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 		dirVerticalX = -1;
 		break;
 	case TRANS_MIRROR:
-		srcPitchX = -bpp;
-		srcPitchY = img->pitch;
-		transTopLeftX = u + width - 1;
-		transTopLeftY = v;
-		transBottomRightX = u;
-		transBottomRightY = v + height - 1;
-		transWidth = width;
-		transHeight = height;
-		dirHorizontalX = -1;
-		dirVerticalY = 1;
+        srcPitchX = -bpp;
+        srcPitchY = img->pitch;
+        transTopLeftX = u + width - 1;
+        transTopLeftY = v;
+        transBottomRightX = u ;
+        transBottomRightY = v + height - 1;
+        transWidth = width;
+        transHeight = height;
+        dirHorizontalX = -1;
+        dirVerticalY = 1;            
 		break;
-	case TRANS_MIRROR_ROT90:
-		srcPitchX = -img->pitch;
-		srcPitchY = -bpp;
-		transTopLeftX = u+width-1;
-		transTopLeftY = v+height-1;
-		transBottomRightX = u;
-		transBottomRightY = v;
-		transWidth = height;
-		transHeight = width;
-		dirHorizontalY = 1;
-		dirVerticalX = 1;
-		break;
+    case TRANS_MIRROR_ROT90:
+        srcPitchX = -img->pitch;
+        srcPitchY = -bpp;
+        transTopLeftX = u + width - 1;
+        transTopLeftY = v + height-1;
+        transBottomRightX = u;
+        transBottomRightY = v;
+        transWidth = height;
+        transHeight = width;
+        dirHorizontalY = -1;
+        dirVerticalX = -1;       
+        break;
 	case TRANS_MIRROR_ROT180:
-		srcPitchX = bpp;
-		srcPitchY = -img->pitch;
-		transTopLeftX = u;
-		transTopLeftY = v + height - 1;
-		transBottomRightX = u + width - 1;
-		transBottomRightY = v;
-		transWidth = width;
-		transHeight = height;
-		dirHorizontalX = 1;
-		dirVerticalY = -1;
+        srcPitchX = bpp;
+        srcPitchY = -img->pitch;
+        transTopLeftX = u;
+        transTopLeftY = v + height - 1;
+        transBottomRightX = u + width - 1;
+        transBottomRightY = v;
+        transWidth = width;
+        transHeight = height;
+        dirHorizontalX = 1;
+        dirVerticalY = -1;            
 		break;
 	case TRANS_MIRROR_ROT270:
-		srcPitchX = img->pitch;
-		srcPitchY = bpp;
-		transTopLeftX = u;
-		transTopLeftY = v;
-		transBottomRightX = u + width - 1;
-		transBottomRightY = v + height - 1;
-		transWidth = height;
-		transHeight = width;
-		dirHorizontalY = -1;
-		dirVerticalX = -1;
+        srcPitchX = img->pitch;
+        srcPitchY = bpp;
+        transTopLeftX = u;
+        transTopLeftY = v;
+        transBottomRightX = u + width - 1;
+        transBottomRightY = v + height - 1;
+        transWidth = height;
+        transHeight = width;
+        dirHorizontalY = 1;
+        dirVerticalX = 1;
 		break;
 	default:
 		DEBIG_PHAT_ERROR;
@@ -735,10 +734,10 @@ void Image::drawPoint(int posX, int posY, int color) {
 }
 
 bool clipLine(Point &a, Point &b, int left, int right, int top, int bottom) {
-	left<<=16;
-	right<<=16;
-	top<<=16;
-	bottom<<=16;
+	left<<=FP_RESOLUTION;
+	right<<=FP_RESOLUTION;
+	top<<=FP_RESOLUTION;
+	bottom<<=FP_RESOLUTION;
 
 	Point clippedPoint;
 	ClipResult res;
@@ -787,8 +786,8 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 		unsigned int color = realColor;
 		//int flags = 0;
 
-		Point a = {x0<<16, y0<<16};
-		Point b = {x1<<16, y1<<16};
+		Point a = {x0<<FP_RESOLUTION, y0<<FP_RESOLUTION};
+		Point b = {x1<<FP_RESOLUTION, y1<<FP_RESOLUTION};
 		if(!clipLine(a, b, left, right, top, bottom)) return;
 		x0 = fp_ceil(a.x);
 		x1 = fp_ceil(b.x);
@@ -859,8 +858,8 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 		int temp;
 		if(abs(dy)>abs(dx)) {
 			if(y1<y0) {SWAP(x1, x0, temp); SWAP(y1, y0, temp); }
-			int dxdy = (dx<<16)/dy;
-			x0<<=16;
+			int dxdy = (dx<<FP_RESOLUTION)/dy;
+			x0<<=FP_RESOLUTION;
 			switch(bpp) {
 				case 2:
 					for(int y = y0; y <= y1; y++) {
@@ -880,8 +879,8 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 
 		} else {
 			if(x1<x0) {SWAP(x1, x0, temp); SWAP(y1, y0, temp); }
-			int dydx = (dy<<16)/dx;
-			y0<<=16;
+			int dydx = (dy<<FP_RESOLUTION)/dx;
+			y0<<=FP_RESOLUTION;
 			/*
 			for(int x = x0; x <= x1; x++) {
 				drawPoint(x, fp_ceil(y0), color);
@@ -1017,7 +1016,7 @@ void Image::drawFilledRect(int x, int y, int rectWidth, int rectHeight, int real
 }
 
 void Image::clipPolygonTop(int src, int dst) {
-	int top = clipRect.y<<16;
+	int top = clipRect.y<<FP_RESOLUTION;
 	numPoints[dst] = 0;
 	for(int i = 0; i < numPoints[src]; i++) {
 		int next = (i+1)%numPoints[src];
@@ -1074,7 +1073,7 @@ void Image::clipPolygonTop(int src, int dst) {
 }
 
 void Image::clipPolygonLeft(int src, int dst) {
-	int left = clipRect.x<<16;
+	int left = clipRect.x<<FP_RESOLUTION;
 	numPoints[dst] = 0;
 	for(int i = 0; i < numPoints[src]; i++) {
 		int next = (i+1)%numPoints[src];
@@ -1133,7 +1132,7 @@ void Image::clipPolygonLeft(int src, int dst) {
 }
 
 void Image::clipPolygonRight(int src, int dst) {
-	int right = (clipRect.x+clipRect.width-1)<<16;
+	int right = (clipRect.x+clipRect.width-1)<<FP_RESOLUTION;
 	numPoints[dst] = 0;
 	for(int i = 0; i < numPoints[src]; i++) {
 		int next = (i+1)%numPoints[src];
@@ -1192,7 +1191,7 @@ void Image::clipPolygonRight(int src, int dst) {
 }
 
 void Image::clipPolygonBottom(int src, int dst) {
-	int bottom = (clipRect.y+clipRect.height-1)<<16;
+	int bottom = (clipRect.y+clipRect.height-1)<<FP_RESOLUTION;
 	numPoints[dst] = 0;
 	for(int i = 0; i < numPoints[src]; i++) {
 		int next = (i+1)%numPoints[src];
@@ -1262,13 +1261,13 @@ bool Image::clipPolygon() {
 
 
 // change this when screen gets bigger than 1024 ;) (4 kb shouldn't be too big..)
-#define RECIP_LUT_SIZE 1024
+#define RECIP_LUT_SIZE 2048
 static int recipLut[RECIP_LUT_SIZE];
 
 void initRecipLut() {
-	recipLut[0] = 0xffff;
+	recipLut[0] = FP_MASK;
 	for(int i = 1; i < RECIP_LUT_SIZE; i++) {
-		recipLut[i] = 0xffff/i;
+		recipLut[i] = FP_MASK/i;
 	}
 }
 
@@ -1301,8 +1300,8 @@ void Image::drawTriangleWithoutClipping(int x1, int y1, int x2, int y2, int x3, 
 	height = y3 - y1;
     if(height == 0)
         return;
-	temp = fp_mul32(((y2 - y1) << 16), recipLut[height]);
-    longest = temp * (x3 - x1) + ((x1 - x2) << 16);
+	temp = fp_mul32(((y2 - y1) << FP_RESOLUTION), recipLut[height]);
+    longest = temp * (x3 - x1) + ((x1 - x2) << FP_RESOLUTION);
     if(longest == 0)
         return;
 
@@ -1310,40 +1309,40 @@ void Image::drawTriangleWithoutClipping(int x1, int y1, int x2, int y2, int x3, 
 	dxdy_right1	= 0;
 	dxdy_left2	= 0;
 	dxdy_right2 = 0;
-	x_left		= x1<<16,
-	x_right		= x1<<16;
+	x_left		= x1<<FP_RESOLUTION,
+	x_right		= x1<<FP_RESOLUTION;
 
 	if(longest<0) {
 		// mid is on right side
 		if(y3-y1) {
-			dxdy_left1 = fp_mul32(((x3-x1)<<16), recipLut[y3-y1]);
+			dxdy_left1 = fp_mul32(((x3-x1)<<FP_RESOLUTION), recipLut[y3-y1]);
 			dxdy_left2 = dxdy_left1;
 			if(y2-y1) {
-				dxdy_right1 = fp_mul32(((x2-x1)<<16), recipLut[y2-y1]);
+				dxdy_right1 = fp_mul32(((x2-x1)<<FP_RESOLUTION), recipLut[y2-y1]);
 			} 
 			if(y3-y2) {
-				dxdy_right2 = fp_mul32(((x3-x2)<<16), recipLut[y3-y2]);
+				dxdy_right2 = fp_mul32(((x3-x2)<<FP_RESOLUTION), recipLut[y3-y2]);
 			}
 		} else {
 			return;
 		}
 		x_mid_left = x_left + dxdy_left1*(y2-y1);
-		x_mid_right = x2<<16;
+		x_mid_right = x2<<FP_RESOLUTION;
 	} else {
 		// mid is on left side
 		if(y3-y1) {
-			dxdy_right1 = fp_mul32(((x3-x1)<<16), recipLut[y3-y1]);
+			dxdy_right1 = fp_mul32(((x3-x1)<<FP_RESOLUTION), recipLut[y3-y1]);
 			dxdy_right2 = dxdy_right1;
 			if(y2-y1) {
-				dxdy_left1 = fp_mul32(((x2-x1)<<16), recipLut[y2-y1]);
+				dxdy_left1 = fp_mul32(((x2-x1)<<FP_RESOLUTION), recipLut[y2-y1]);
 			}
 			if(y3-y2) {
-				dxdy_left2 = fp_mul32(((x3-x2)<<16), recipLut[y3-y2]);
+				dxdy_left2 = fp_mul32(((x3-x2)<<FP_RESOLUTION), recipLut[y3-y2]);
 			}		
 		} else {
 			return;
 		}
-		x_mid_left = x2<<16;
+		x_mid_left = x2<<FP_RESOLUTION;
 		x_mid_right = x_right + dxdy_right1*(y2-y1);
 	}
 
@@ -1411,26 +1410,33 @@ void Image::drawTriangleWithoutClipping(int x1, int y1, int x2, int y2, int x3, 
 }
 
 void Image::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int color) {	
-	clippedPoints[0][0].x = x1<<16;
-	clippedPoints[0][0].y = y1<<16;
-	clippedPoints[0][1].x = x2<<16;
-	clippedPoints[0][1].y = y2<<16;
-	clippedPoints[0][2].x = x3<<16;
-	clippedPoints[0][2].y = y3<<16;
+    /*
+    drawLine(x1, y1, x2, y2, color);
+    drawLine(x2, y2, x3, y3, color);
+    drawLine(x3, y3, x1, y1, color);
+    return;
+    */
+    
+	clippedPoints[0][0].x = x1<<FP_RESOLUTION;
+	clippedPoints[0][0].y = y1<<FP_RESOLUTION;
+	clippedPoints[0][1].x = x2<<FP_RESOLUTION;
+	clippedPoints[0][1].y = y2<<FP_RESOLUTION;
+	clippedPoints[0][2].x = x3<<FP_RESOLUTION;
+	clippedPoints[0][2].y = y3<<FP_RESOLUTION;
 	currentList = 0;
 	numPoints[0] = 3;
 	
 	if(!clipPolygon()) return;
 
 	for(int i = 0; i < numPoints[currentList]-1; i++) {
-		drawTriangleWithoutClipping(
+         drawTriangleWithoutClipping(
 			fp_ceil(clippedPoints[currentList][0].x),
 			fp_ceil(clippedPoints[currentList][0].y),
 			fp_ceil(clippedPoints[currentList][i].x),
 			fp_ceil(clippedPoints[currentList][i].y),
 			fp_ceil(clippedPoints[currentList][i+1].x),
 			fp_ceil(clippedPoints[currentList][i+1].y),
-			color);	
+			color);
 	}
 
 	/*

@@ -142,11 +142,13 @@ struct	stat
 #define UTIME_OMIT	-1L
 #endif
 
+#if !defined(MAPIP)
 int	_EXFUN(chmod,( const char *__path, mode_t __mode ));
-int     _EXFUN(fchmod,(int __fd, mode_t __mode));
+int	_EXFUN(fchmod,(int __fd, mode_t __mode));
+int	_EXFUN(mkfifo,( const char *__path, mode_t __mode ));
+#endif
 int	_EXFUN(fstat,( int __fd, struct stat *__sbuf ));
 int	_EXFUN(mkdir,( const char *_path, mode_t __mode ));
-int	_EXFUN(mkfifo,( const char *__path, mode_t __mode ));
 int	_EXFUN(stat,( const char *__path, struct stat *__sbuf ));
 mode_t	_EXFUN(umask,( mode_t __mask ));
 
@@ -155,14 +157,16 @@ int	_EXFUN(lstat,( const char *__path, struct stat *__buf ));
 int	_EXFUN(mknod,( const char *__path, mode_t __mode, dev_t __dev ));
 #endif
 
-#if defined (__CYGWIN__) && !defined(__INSIDE_CYGWIN__)
-int	_EXFUN(fchmodat, (int, const char *, mode_t, int));
+#if (defined (__CYGWIN__) && !defined(__INSIDE_CYGWIN__)) || defined(MAPIP)
 int	_EXFUN(fstatat, (int, const char *, struct stat *, int));
 int	_EXFUN(mkdirat, (int, const char *, mode_t));
+#if !defined(MAPIP)
+int	_EXFUN(fchmodat, (int, const char *, mode_t, int));
 int	_EXFUN(mkfifoat, (int, const char *, mode_t));
 int	_EXFUN(mknodat, (int, const char *, mode_t, dev_t));
 int	_EXFUN(utimensat, (int, const char *, const struct timespec *, int));
 int	_EXFUN(futimens, (int, const struct timespec *));
+#endif
 #endif
 
 /* Provide prototypes for most of the _<systemcall> names that are

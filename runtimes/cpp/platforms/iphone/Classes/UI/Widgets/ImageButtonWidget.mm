@@ -28,7 +28,7 @@
 
 - (id)init {
 	view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // TODO: do have to do this (retain)??
-	return [super init];
+    return [super init];
 }
 
 @end

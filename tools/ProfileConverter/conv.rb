@@ -461,6 +461,10 @@ DEVICE.each_with_index do |device, index|
 					end	#value.each
 				elsif(CAP_TYPES[:supports].include? cap)
 					value.each do |v|
+						if(v == 'pdaapi')
+							value << 'fileconnection'
+							value << 'pimapi'
+						end
 						def_name = "MA_PROF_SUPPORT_#{cap.to_s.format}"
 						if(!(seen_defines.include? def_name)) then
 							if(def_name != "MA_PROF_SUPPORT_JAVAPACKAGE") then

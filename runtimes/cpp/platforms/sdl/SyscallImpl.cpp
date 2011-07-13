@@ -169,6 +169,7 @@ namespace Base {
 	static int maGetSystemProperty(const char* key, char* buf, int size);
 	
 #ifdef WIN32
+	static HFONT gWindowsUnifont = NULL;
 	static int maTextBox(const wchar* title, const wchar* inText, wchar* outText,
 		int maxSize, int constraints);
 #endif
@@ -460,6 +461,17 @@ namespace Base {
 		strcpy(destDir, mosyncDir);
 		strcat(destDir, "/bin/unifont-5.1.20080907.ttf");
 		gFont = TTF_OpenFont(destDir, 16);
+
+#ifdef WIN32
+		int res = AddFontResourceEx(destDir, FR_PRIVATE, 0);
+		LOG("AddFontResourceEx: %i faces added.\n", res);
+		gWindowsUnifont = CreateFont(0,0,0,0,0,0,0,0,
+			DEFAULT_CHARSET,OUT_DEFAULT_PRECIS,CLIP_DEFAULT_PRECIS,DEFAULT_QUALITY,
+			DEFAULT_PITCH, "unifont");
+		if(!gWindowsUnifont) {
+			LOG_GLE;
+		}
+#endif
 
 		if(gFont == NULL) {	//fallback to old font
 			LOG("Failed to load font %s. Attempting fallback.\n", destDir);
@@ -2257,6 +2269,12 @@ namespace Base {
 		switch(uMsg) {
 		case WM_INITDIALOG:
 			sEditBox = GetDlgItem(hwnd, IDC_EDIT1);
+
+			// We want a font that supports as much Unicode as possible.
+			// Let's use the same font we use for maDrawText().
+			if(gWindowsUnifont)
+				SendMessage(sEditBox, WM_SETFONT, (WPARAM)gWindowsUnifont, FALSE);
+
 			{
 				// fix EOL (add 0x0D bytes)
 				std::wstring in;
@@ -2346,7 +2364,7 @@ namespace Base {
 		GLE(sTextBox);
 		ShowWindow(sTextBox, SW_SHOW);
 #else	// so we go with modal, for now.
-		int res = DialogBox(GetModuleHandle(NULL), MAKEINTRESOURCE(IDD_TEXTBOX), sMainWnd,
+		int res = DialogBoxW(GetModuleHandle(NULL), MAKEINTRESOURCEW(IDD_TEXTBOX), sMainWnd,
 			TextBoxProc);
 		GLECUSTOM(res <= 0);
 
@@ -2691,6 +2709,13 @@ namespace Base {
 			return res;
 		}
 #endif
+		if(strcmp(key, "mosync.device") == 0) {
+			static const char model[] = "MoSync Emulator";
+			if(size >= (int)sizeof(model)) {
+				memcpy(buf, model, sizeof(model));
+			}
+			return sizeof(model);
+		}
 		return -2;
 	}
 

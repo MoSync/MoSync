@@ -54,7 +54,7 @@ public class ListLayout extends Layout
 		}
 		
 		child.getView( ).setFocusable( false );
-		m_viewAdapter.addAt( child.getView( ), listIndex );
+		m_viewAdapter.addAt( child.getRootView( ), listIndex );
 	}
 
 	/**
@@ -68,7 +68,7 @@ public class ListLayout extends Layout
 	{
 		super.removeChild( child );
 
-		m_viewAdapter.remove( child.getView( ) );
+		m_viewAdapter.remove( child.getRootView( ) );
 	}
 	
 	/**

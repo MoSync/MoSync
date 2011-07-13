@@ -14,7 +14,7 @@ _DEFUN (dirname, (path),
 {
 	char *p;
 	static char dot[] = ".";
-	static char slash[] = ".";
+	static char slash[] = "/";
 	if( path == NULL || *path == '\0' )
 		return dot;
 	p = path + strlen(path) - 1;

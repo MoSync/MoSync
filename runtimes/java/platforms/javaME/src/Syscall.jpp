@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "config_platform.h"
 #include "helpers.h"
 #include "syscall_helpers.h"
 #include "core_helpers.h"
@@ -692,10 +693,10 @@ public
 	/// Writes s to dst, unless s.length() >= bufSize.
 	private final int writeStringBuf(String s, Address dst, int bufSize) {
 		MYASSERT(bufSize >= 0);
-		if(bufSize <= s.length())
-			return s.length();
-		INIT_MEMDS;
 		byte[] bytes = s.getBytes();
+		if(bufSize <= bytes.length)
+			return bytes.length;
+		INIT_MEMDS;
 		setMemBytes(dst, bytes);
 		WBYTE_RAW(dst + bytes.length, 0);
 		return bytes.length;
@@ -1192,8 +1193,43 @@ public
 		if(srcRect_width <= 0 || srcRect_height <= 0)
 			return;
 
+		//The transformMode values that are passed to this function are in different order
+		// Reordering them here to make JavaME runtime behave like others
+		int transformModeReordered;
+		
+		switch (transformMode) 
+		{
+			case TRANS_NONE: 
+				transformModeReordered = 0;
+				break;
+			case TRANS_MIRROR_ROT180: 
+				transformModeReordered = 1;
+				break;
+			case TRANS_MIRROR: 
+				transformModeReordered = 2;
+				break;
+			case TRANS_ROT180: 
+				transformModeReordered = 3;
+				break;
+			case TRANS_MIRROR_ROT270: 
+				transformModeReordered = 4;
+				break;
+			case TRANS_ROT90: 
+				transformModeReordered = 5;
+				break;
+			case TRANS_ROT270: 
+				transformModeReordered = 6;
+				break;
+			case TRANS_MIRROR_ROT90: 
+				transformModeReordered = 7;
+				break;
+			default: 
+				transformModeReordered = 0;
+				break;
+		}
+		
 		mGraphics.drawRegion(img, srcRect_left, srcRect_top, srcRect_width, srcRect_height,
-			transformMode, dstTopLeft_x, dstTopLeft_y, Graphics.TOP|Graphics.LEFT);
+			transformModeReordered, dstTopLeft_x, dstTopLeft_y, Graphics.TOP|Graphics.LEFT);
 	}
 
 	static class MoSyncPlayerListener implements PlayerListener {
@@ -2017,6 +2053,8 @@ public
 			if(value != null) {
 				value = value.substring(0, 2);
 			}
+		} else if(key.equals("mosync.device")) {
+			value = System.getProperty("microedition.platform");
 		} else {
 			value = System.getProperty(key);
 		}
