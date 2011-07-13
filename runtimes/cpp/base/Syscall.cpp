@@ -292,10 +292,11 @@ namespace Base {
 #if defined(SYMBIAN)
 		//TODO: use TPtr8 and TPtrC8 to be able to call an optimized function
 		//check to see if that's faster than this homebrew.
+		char* oldDst = dst;
 		do {
 			*(dst++) = *(src);
 		} while(*src++);
-		return dst;
+		return oldDst;
 #else
 		return (char*)::strcpy(dst, src);
 #endif

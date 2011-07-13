@@ -94,6 +94,7 @@ namespace Base {
 		case Seek::Current: ts = ESeekCurrent; break;
 		case Seek::Start: ts = ESeekStart; break;
 		case Seek::End: ts = ESeekEnd; break;
+		default: DEBIG_PHAT_ERROR;
 		}
 		TEST_SYMBIAN(mFile.Seek(ts, offset));
 		return true;
