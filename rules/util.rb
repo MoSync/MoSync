@@ -83,7 +83,7 @@ def sh(cmd)
 	IO::popen(cmd) do |io|
 		while !io.eof?
 			line = io.gets( )
-			puts
+			puts line
 	    end
 	    #Checking the return code
 	    exitCode = Process::waitpid2( io.pid )[1].exitstatus
