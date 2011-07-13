@@ -3440,6 +3440,22 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		VISIBLE = "visible";
+		
+		/**
+		* @brief Sets whether the widget is enabled or not. If not, the widget is grayed out.
+		*
+		* Widgets are enabled by default.
+		*
+		* @validvalue A boolean string 'true' or 'false', where true is enabled and false is disabled.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_ENABLED, "false");
+		* \endcode
+		*/
+		ENABLED = "enabled";
 	}	
 
 	/**

@@ -161,6 +161,10 @@ public class Widget
 				getView( ).setVisibility( View.INVISIBLE );
 			}
 		}
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_ENABLED ))
+		{
+			 getView().setEnabled(BooleanConverter.convert(value));
+		}
 		else
 		{
 			return false;
