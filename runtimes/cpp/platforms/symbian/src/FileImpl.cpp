@@ -89,13 +89,13 @@ namespace Base {
 	}
 	bool FileStream::seek(Seek::Enum mode, int offset) {
 		TEST(isOpen());
-		TInt oldPos=0;
-		TEST_SYMBIAN(mFile.Seek(ESeekCurrent, oldPos));
-		TInt expectedPos = mode == Seek::Start ? offset : oldPos + offset;
-		TEST_SYMBIAN(mFile.Seek(mode == Seek::Start ? ESeekStart : ESeekCurrent, offset));
-		if(offset != expectedPos) {
-			FAIL;
+		TSeek ts;
+		switch(mode) {
+		case Seek::Current: ts = ESeekCurrent; break;
+		case Seek::Start: ts = ESeekStart; break;
+		case Seek::End: ts = ESeekEnd; break;
 		}
+		TEST_SYMBIAN(mFile.Seek(ts, offset));
 		return true;
 	}
 	bool FileStream::tell(int& aPos) const {
