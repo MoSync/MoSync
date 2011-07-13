@@ -109,8 +109,13 @@ target :clean do
 	verbose_rm_rf("build")
 	Work.invoke_subdirs(PRE_DIRS, "clean")
 	Work.invoke_subdir("tools/idl2", "clean")
-	Work.invoke_subdirs(ALL_DIRS, "clean")
+	Work.invoke_subdirs(MAIN_DIRS, "clean")
 end
+
+target :clean_examples do
+	Work.invoke_subdirs(EXAM_DIRS, "clean")
+end
+
 
 target :all_configs do
 	sh 'ruby workfile.rb all'
