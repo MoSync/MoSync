@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
+import static com.mosync.internal.android.MoSyncHelpers.EXTENT_Y;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_ON;
@@ -2416,7 +2417,7 @@ public class MoSyncThread extends Thread
 		if (MoSyncService.sNotificationId == notificationId)
 		{
 			// Remove the service notification.
-			MoSyncService.removeServceNotification(
+			MoSyncService.removeServiceNotification(
 				notificationId, (Activity) mContext);
 			
 			// Stop the service.
