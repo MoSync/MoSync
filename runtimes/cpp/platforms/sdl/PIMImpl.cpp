@@ -52,6 +52,16 @@ using namespace std;
 #endif
 
 //******************************************************************************
+// Forwards
+//******************************************************************************
+
+struct ContactValue;
+
+// returns 0 on success, error code otherwise.
+static int createContactValue(ContactValue*& v, int field, void* buf, int bufSize,
+	int attributes);
+
+//******************************************************************************
 // Contacts
 //******************************************************************************
 
@@ -72,7 +82,8 @@ struct ContactValue {
 
 	virtual ~ContactValue() {}
 	ContactValue(int t) : type(t), attr(0) {}
-	virtual int getValue(void* buf, int bufSize) const = 0;
+	virtual int getValue(void* buf, size_t bufSize) const = 0;
+	virtual void setValue(void* buf, size_t bufSize) = 0;
 	virtual void saveValue(ostream& stream) const = 0;
 	void save(ostream& stream) const;
 };
@@ -81,23 +92,30 @@ template<class T> struct TContactValue : ContactValue {
 	TContactValue(int t) : ContactValue(t) {}
 	T mValue;
 
-	int getValue(void* buf, int bufSize) const;
+	int getValue(void* buf, size_t bufSize) const;
+	void setValue(void* buf, size_t bufSize);
 	void saveValue(ostream& stream) const;
 };
 
 struct StringArray {
 	const ContactParser::FIELD_NAME* fnp;
-	int nNames;	// number of entries in array pointed to by fnp.
+	// sa.size() is also the number of entries in array pointed to by fnp.
 	vector<wstring> sa;
 };
 
 
 template<>
-int TContactValue<int>::getValue(void* buf, int bufSize) const {
-	if(bufSize < (int)sizeof(int))
+int TContactValue<int>::getValue(void* buf, size_t bufSize) const {
+	if(bufSize < sizeof(int))
 		return sizeof(int);
 	*(int*)buf = mValue;
 	return sizeof(int);
+}
+
+template<>
+void TContactValue<int>::setValue(void* buf, size_t bufSize) {
+	MYASSERT(bufSize = sizeof(int), ERR_INVALID_PIM_BUFFER_SIZE);
+	mValue = *(int*)buf;
 }
 
 static void streamDateTime(ostream& stream, int time) {
@@ -134,12 +152,26 @@ static void wstringCpy(wchar* dst, const wstring& s) {
 }
 
 template<>
-int TContactValue<wstring>::getValue(void* buf, int bufSize) const {
-	int size = (mValue.length() + 1) * sizeof(wchar);
+int TContactValue<wstring>::getValue(void* buf, size_t bufSize) const {
+	size_t size = (mValue.length() + 1) * sizeof(wchar);
 	if(bufSize < size)
 		return size;
 	wstringCpy((wchar*)buf, mValue);
 	return size;
+}
+
+template<>
+void TContactValue<wstring>::setValue(void* buf, size_t bufSize) {
+	MYASSERT(bufSize >= sizeof(wchar), ERR_INVALID_PIM_BUFFER_SIZE);
+	MYASSERT((bufSize % sizeof(wchar)) == 0, ERR_INVALID_PIM_BUFFER_SIZE);
+	size_t length = bufSize / sizeof(wchar);
+	mValue.clear();
+	wchar* src = (wchar*)buf;
+	size_t i;
+	for(i=0; i<length && src[i] != 0; i++) {
+		mValue += src[i];
+	}
+	MYASSERT(src[i] == 0, ERR_PIM_UNTERMINATED_STRING);
 }
 
 // converts wide-char to utf-8 on the fly.
@@ -179,14 +211,14 @@ void TContactValue<wstring>::saveValue(ostream& stream) const {
 }
 
 template<>
-int TContactValue<StringArray>::getValue(void* buf, int bufSize) const {
+int TContactValue<StringArray>::getValue(void* buf, size_t bufSize) const {
 	const vector<wstring>& sa(mValue.sa);
-	int size = sizeof(int);
+	size_t size = sizeof(int);
 	for(size_t i=0; i<sa.size(); i++) {
 		size += (sa[i].length() + 1) * sizeof(wchar);
 	}
 	if(bufSize < size)
-		return size;
+		return (int)size;
 	*(int*)buf = sa.size();
 	wchar* dst = (wchar*)((byte*)buf + sizeof(int));
 	memset(dst, -1, bufSize-4);	//temp
@@ -198,9 +230,31 @@ int TContactValue<StringArray>::getValue(void* buf, int bufSize) const {
 }
 
 template<>
+void TContactValue<StringArray>::setValue(void* buf, size_t bufSize) {
+	MYASSERT(bufSize > sizeof(int), ERR_INVALID_PIM_BUFFER_SIZE);
+	int nStrings = *(int*)buf;
+	MYASSERT((bufSize % sizeof(wchar)) == 0, ERR_INVALID_PIM_BUFFER_SIZE);
+	int nChars = (bufSize - sizeof(int)) / sizeof(wchar);
+	MYASSERT(nChars != nStrings, ERR_PIM_EMPTY_STRING_ARRAY);
+	MYASSERT(nChars > nStrings, ERR_INVALID_PIM_BUFFER_SIZE);
+	wchar* src = (wchar*)((int*)buf + 1);
+	wchar* end = src + nChars;
+	for(size_t i=0; i<mValue.sa.size(); i++) {
+		mValue.sa[i].clear();
+		while(true) {
+			MYASSERT(src != end, ERR_PIM_UNTERMINATED_STRING);
+			wchar c = *src;
+			src++;
+			if(c == 0)
+				break;
+			mValue.sa[i] += c;
+		}
+	}
+}
+
+template<>
 void TContactValue<StringArray>::saveValue(ostream& stream) const {
 	const vector<wstring>& sa(mValue.sa);
-	DEBUG_ASSERT((int)sa.size() == mValue.nNames);
 	for(size_t i=0; i<sa.size(); i++) {
 		if(!sa[i].empty())
 			stream << " "<<mValue.fnp[i].name<<"=\""<<sa[i]<<"\"";
@@ -246,6 +300,43 @@ public:
 		return getContactValue(field, index)->getValue(buf, bufSize);
 	}
 
+	void setValue(int field, int index, void* buf, int bufSize, int attributes) {
+		ContactValue* cv = (ContactValue*)getContactValue(field, index);
+		cv->setValue(buf, bufSize);
+		cv->attr = attributes;
+	}
+	int addValue(int field, void* buf, int bufSize, int attributes) {
+		ContactValue* v;
+		int res = createContactValue(v, field, buf, bufSize, attributes);
+		if(res < 0)
+			return res;
+		addValue(field, v);
+		return 0;
+	}
+	void addValue(int field, ContactValue* v) {
+		ContactItem::FieldMap::iterator itr = mFields.find(field);
+		if(itr == mFields.end()) {
+			// add field if item didn't have it already.
+			pair<int, vector<ContactValue*> > p;
+			p.first = field;
+			itr = mFields.insert(p).first;
+		}
+		vector<ContactValue*>& vcv(itr->second);
+		vcv.push_back(v);
+	}
+	void removeValue(int field, int index) {
+		FieldMap::iterator itr = mFields.find(field);
+		MYASSERT(itr != mFields.end(), ERR_MISSING_PIM_FIELD);
+		vector<ContactValue*>& vcv(itr->second);
+		MYASSERT(index >= 0 && index < (int)vcv.size(), ERR_INVALID_PIM_VALUE_INDEX);
+		delete vcv[index];
+		vcv.erase(vcv.begin() + index);
+		if(vcv.empty()) {
+			// remove the now-empty field.
+			mFields.erase(itr);
+		}
+	}
+
 	ContactItem(MAHandle pl) : PimItem(pl) {}
 
 	virtual ~ContactItem() {
@@ -286,7 +377,7 @@ public:
 			XML_Parse(xmlParser, contents, fileLength, 1);
 			delete contents;
 		} catch (exception& e) {
-			LOG("%s\n", e.what());
+			LOG("ContactParser exception: %s\n", e.what());
 			return false;
 		}
 		mPos = 0;
@@ -307,13 +398,24 @@ public:
 		stream << "</contacts>\n";
 		return stream.good();
 	}
-	virtual PimItem* next() {
+	PimItem* next() {
 		if(mPos >= mItems.size())
 			return NULL;
 		return mItems[mPos++];
 	}
 	int type(int field) const {
 		return pimContactFieldType(field);
+	}
+	PimItem* createItem(MAHandle list) {
+		return new ContactItem(list);
+	}
+	void removeItem(PimItem* pi) {
+		for(size_t i=0; i<mItems.size(); i++) {
+			if(mItems[i] == pi) {
+				mItems.erase(mItems.begin() + i);
+				break;
+			}
+		}
 	}
 
 	void add(ContactItem* ci) {
@@ -493,11 +595,11 @@ namespace ContactParser {
 	}
 
 	static ContactValue* parseStringArray(const FIELD_NAME* fnp, int nNames, const char** attr) {
-		Smartie<TContactValue<StringArray> > v(new TContactValue<StringArray>(MA_PIM_TYPE_STRING));
+		Smartie<TContactValue<StringArray> > v(
+			new TContactValue<StringArray>(MA_PIM_TYPE_STRING_ARRAY));
 		vector<wstring>& sa(v->mValue.sa);
 		vector<bool> valueSet(nNames, false);
 		v->mValue.fnp = fnp;
-		v->mValue.nNames = nNames;
 		sa.resize(nNames);
 		bool attrSet = false;
 		// iterate through an element's attributes
@@ -572,15 +674,7 @@ namespace ContactParser {
 				DEBIG_PHAT_ERROR;
 			}
 		}
-		ContactItem::FieldMap::iterator itr = sCI->mFields.find(field);
-		if(itr == sCI->mFields.end()) {
-			// add field if item didn't have it already.
-			pair<int, vector<ContactValue*> > p;
-			p.first = field;
-			itr = sCI->mFields.insert(p).first;
-		}
-		vector<ContactValue*>& vcv(itr->second);
-		vcv.push_back(v);
+		sCI->addValue(field, v);
 	}
 
 	static void start(void *data, const char *el, const char **attr) {
@@ -661,6 +755,47 @@ void ContactValue::save(ostream& stream) const {
 	}
 }
 
+// returns 0 on success, error code otherwise.
+static int createContactValue(ContactValue*& v, int field, void* buf, int bufSize,
+	int attributes)
+{
+	int type = pimContactFieldType(field);
+	switch(type) {
+	case MA_PIM_TYPE_BOOLEAN:
+	case MA_PIM_TYPE_DATE:
+	case MA_PIM_TYPE_INT:
+		v = new TContactValue<int>(type);
+		break;
+	case MA_PIM_TYPE_STRING:
+		v = new TContactValue<wstring>(type);
+		break;
+	case MA_PIM_TYPE_STRING_ARRAY:
+		{
+			// set mNames here, so setValue() can check for validity.
+			TContactValue<StringArray>* sav = new TContactValue<StringArray>(type);
+			switch(field) {
+			case MA_PIM_FIELD_CONTACT_ADDR:
+				sav->mValue.sa.resize(ContactParser::snAddrFields);
+				sav->mValue.fnp = ContactParser::sAddrFields;
+				break;
+			case MA_PIM_FIELD_CONTACT_NAME:
+				sav->mValue.sa.resize(ContactParser::snNameFields);
+				sav->mValue.fnp = ContactParser::sNameFields;
+				break;
+			default:
+				DEBIG_PHAT_ERROR;
+			}
+			v = sav;
+		}
+		break;
+	default:
+		return MA_PIM_ERR_FIELD_UNSUPPORTED;
+	}
+	v->setValue(buf, bufSize);
+	v->attr = attributes;
+	return 0;
+}
+
 //******************************************************************************
 // Syscalls
 //******************************************************************************
@@ -671,19 +806,18 @@ MAHandle Syscall::maPimListOpen(int listType) {
 		ContactList* cl = new ContactList();
 		string mosyncDir = getenv("MOSYNCDIR");
 		string fn = mosyncDir + "/etc/contacts.xml";
+		LOG("Reading %s...\n", fn.c_str());
 		bool res = cl->open(fn);
 		if(!res) {
 			// default contacts file
-			LOG("Cannot read %s\n", fn.c_str());
 			string ofn = mosyncDir + "/bin/default_contacts.xml";
+			LOG("Reading %s...\n", ofn.c_str());
 			res = cl->open(ofn);
-			if(!res) {
-				LOG("Cannot read %s\n", ofn.c_str());
-			} else {
+			if(res) {
 				// save a copy
 				res = cl->save(fn);
 				if(!res) {
-					LOG("Cannot write %s\n", fn.c_str());
+					LOG("Could not write %s\n", fn.c_str());
 				}
 			}
 		}

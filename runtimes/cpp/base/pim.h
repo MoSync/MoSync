@@ -30,6 +30,10 @@ public:
 	virtual int fieldCount(int field) const = 0;
 	virtual int attr(int field, int index) const = 0;
 	virtual int getValue(int field, int index, void* buf, int bufSize) const = 0;
+	virtual void setValue(int field, int index, void* buf, int bufSize,
+		int attributes) = 0;
+	virtual int addValue(int field, void* buf, int bufSize, int attributes) = 0;
+	virtual void removeValue(int field, int index) = 0;
 
 	const MAHandle pimList;
 };
@@ -43,6 +47,13 @@ public:
 	virtual PimItem* next() = 0;
 
 	virtual int type(int field) const = 0;
+
+	// \a list must be the handle to this list.
+	// also adds the item to this list.
+	virtual PimItem* createItem(MAHandle list) = 0;
+
+	// panics if the item is not a member of this list.
+	virtual void removeItem(PimItem*) = 0;
 };
 
 int pimContactFieldType(int field);

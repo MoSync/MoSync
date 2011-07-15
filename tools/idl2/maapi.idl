@@ -2860,6 +2860,8 @@ interface MAAPI {
 		constset int MA_PIM_ERR_ {
 			/// The native database's data type did not match the MoSync API.
 			NATIVE_TYPE_MISMATCH = -2;
+			/// The field type is not supported.
+			FIELD_UNSUPPORTED = -3;
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.
@@ -2951,6 +2953,9 @@ interface MAAPI {
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
+		* \note When setting a value with #MA_PIM_TYPE_STRING_ARRAY, at least one
+		* string must be present and have a length greater than zero.
+		* Any surplus strings are ignored.
 		*/
 		int maPimItemSetValue(in MA_PIM_ARGS args, in int index, in int attributes);
 

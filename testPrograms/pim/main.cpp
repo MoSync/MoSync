@@ -145,7 +145,7 @@ static void dumpItem(MAHandle list, MAHandle item) {
 				LOG("%i", *(int*)buf);
 				break;
 			case MA_PIM_TYPE_DATE:
-				LOG("%i (date unsupported)", *(int*)buf);
+				LOG("%i (date printing unsupported)", *(int*)buf);
 				break;
 			case MA_PIM_TYPE_STRING_ARRAY:
 				{
