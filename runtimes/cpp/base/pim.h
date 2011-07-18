@@ -34,6 +34,7 @@ public:
 		int attributes) = 0;
 	virtual int addValue(int field, void* buf, int bufSize, int attributes) = 0;
 	virtual void removeValue(int field, int index) = 0;
+	virtual void close() = 0;
 
 	const MAHandle pimList;
 };

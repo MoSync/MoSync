@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "sdl_syscall.h"
 #include "helpers/CPP_IX_PIM.h"
 #include "helpers/smartie.h"
+#include "helpers/hash_map.h"
+#include "helpers/hash_set.h"
 #include "ConfigParser.h"
 #include <expat.h>
 #include <limits.h>
@@ -82,9 +84,13 @@ struct ContactValue {
 
 	virtual ~ContactValue() {}
 	ContactValue(int t) : type(t), attr(0) {}
+
+	virtual bool operator!=(const ContactValue& o) const = 0;
+
 	virtual int getValue(void* buf, size_t bufSize) const = 0;
 	virtual void setValue(void* buf, size_t bufSize) = 0;
 	virtual void saveValue(ostream& stream) const = 0;
+	virtual ContactValue* clone() const = 0;
 	void save(ostream& stream) const;
 };
 
@@ -95,12 +101,28 @@ template<class T> struct TContactValue : ContactValue {
 	int getValue(void* buf, size_t bufSize) const;
 	void setValue(void* buf, size_t bufSize);
 	void saveValue(ostream& stream) const;
+
+	ContactValue* clone() const {
+		TContactValue* tcv = new TContactValue(*this);
+		return tcv;
+	}
+	bool operator!=(const ContactValue& o) const {
+		if(type != o.type)
+			return true;
+		if(attr != o.attr)
+			return true;
+		return mValue != ((TContactValue&)o).mValue;
+	}
 };
 
 struct StringArray {
 	const ContactParser::FIELD_NAME* fnp;
 	// sa.size() is also the number of entries in array pointed to by fnp.
 	vector<wstring> sa;
+
+	bool operator!=(const StringArray& o) const {
+		return fnp != o.fnp || sa != o.sa;
+	}
 };
 
 
@@ -337,9 +359,16 @@ public:
 		}
 	}
 
+	void close();
+
 	ContactItem(MAHandle pl) : PimItem(pl) {}
 
-	virtual ~ContactItem() {
+	ContactItem(const ContactItem& o) : PimItem(o.pimList) {
+		operator=(o);
+	}
+
+	// erase all values
+	void clear() {
 		FieldMap::iterator itr = mFields.begin();
 		while(itr != mFields.end()) {
 			vector<ContactValue*>& vcv(itr->second);
@@ -351,21 +380,79 @@ public:
 		mFields.clear();
 	}
 
+	virtual ~ContactItem() {
+		clear();
+	}
+
+	bool operator==(const ContactItem& o) const {
+		if(pimList != o.pimList)
+			return false;
+		if(mFields.size() != o.mFields.size())
+			return false;
+		// compare each field.
+		FieldMap::const_iterator itr = mFields.begin();
+		while(itr != mFields.end()) {
+			// check if this field exists in o.
+			FieldMap::const_iterator oi = o.mFields.find(itr->first);
+			if(oi == o.mFields.end())
+				return false;
+			// then compare value vectors.
+			const vector<ContactValue*>& vcv(itr->second);
+			const vector<ContactValue*>& ovcv(oi->second);
+			if(vcv.size() != ovcv.size())
+				return false;
+			for(size_t i=0; i<vcv.size(); i++) {
+				if(*vcv[i] != *ovcv[i])
+					return false;
+			}
+			itr++;
+		}
+		return true;
+	}
+	bool operator!=(const ContactItem& o) const {
+		return !operator==(o);
+	}
+
+	ContactItem& operator=(const ContactItem& o) {
+		// since pimList is const, we can't change it.
+		DEBUG_ASSERT(pimList == o.pimList);
+
+		clear();
+
+		FieldMap::const_iterator itr = o.mFields.begin();
+		while(itr != o.mFields.end()) {
+			const vector<ContactValue*>& ovcv(itr->second);
+			for(size_t i=0; i<ovcv.size(); i++) {
+				addValue(itr->first, ovcv[i]->clone());
+			}
+			itr++;
+		}
+		return *this;
+	}
+
 	void save(ostream& stream) const;
 
-	// todo: change to unordered_map when it becomes available across platforms.
 	// key: fieldId
-	typedef map<int, vector<ContactValue*> > FieldMap;
+	typedef hash_map<int, vector<ContactValue*> > FieldMap;
 	FieldMap mFields;
 };
 
 class ContactList : public PimList {
 private:
-	vector<ContactItem*> mItems;
-	size_t mPos;
+	// commited items.
+	typedef hash_set<ContactItem*> ItemSet;
+	// opened => commited items.
+	typedef hash_map<ContactItem*, ContactItem*> ItemMap;
+	typedef pair<ContactItem*, ContactItem*> ItemPair;
+
+	ItemMap mOpenItems;
+	ItemSet mItems;
+	ItemSet::const_iterator mItr;
+	string mFilename;
 public:
 	ContactList() {}
 	bool open(const string& fn) {
+		mFilename = fn;
 		try {
 			XML_Parser xmlParser = XML_ParserCreate("UTF-8");
 			XML_SetUserData(xmlParser, this);
@@ -380,46 +467,79 @@ public:
 			LOG("ContactParser exception: %s\n", e.what());
 			return false;
 		}
-		mPos = 0;
+		mItr = mItems.begin();
 		return true;
 	}
 	virtual ~ContactList() {
-		for(size_t i=0; i<mItems.size(); i++) {
-			delete mItems[i];
+		for(ItemSet::const_iterator itr=mItems.begin(); itr!=mItems.end(); ++itr) {
+			delete *itr;
 		}
 	}
 	bool save(const string& fn) {
+		mFilename = fn;
 		ofstream stream(fn.c_str());
 		stream << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
 		stream << "<contacts>\n";
-		for(size_t i=0; i<mItems.size(); i++) {
-			mItems[i]->save(stream);
+		for(ItemSet::const_iterator itr=mItems.begin(); itr!=mItems.end(); ++itr) {
+			(*itr)->save(stream);
 		}
 		stream << "</contacts>\n";
 		return stream.good();
 	}
 	PimItem* next() {
-		if(mPos >= mItems.size())
+		if(mItr == mItems.end())
 			return NULL;
-		return mItems[mPos++];
+		ContactItem* ci = new ContactItem(**mItr);
+		mOpenItems.insert(ItemPair(ci, *mItr));
+		mItr++;
+		return ci;
 	}
 	int type(int field) const {
 		return pimContactFieldType(field);
 	}
 	PimItem* createItem(MAHandle list) {
-		return new ContactItem(list);
+		//mItr = mItems.end();	// disable next()
+		DEBUG_ASSERT(gSyscall->mPimLists.find(list) == this);
+		ContactItem* ci = new ContactItem(list);
+		// item is uncommited and won't be saved until closed.
+		mOpenItems.insert(ItemPair(ci, (ContactItem*)NULL));
+		return ci;
 	}
 	void removeItem(PimItem* pi) {
-		for(size_t i=0; i<mItems.size(); i++) {
-			if(mItems[i] == pi) {
-				mItems.erase(mItems.begin() + i);
-				break;
-			}
+		//mItr = mItems.end();	// disable next()
+		ItemMap::iterator itr = mOpenItems.find((ContactItem*)pi);
+		DEBUG_ASSERT(itr != mOpenItems.end());
+		if(itr->second) {
+			mItems.erase(itr->second);
+			save(mFilename);
 		}
+		mOpenItems.erase(itr);
 	}
 
+	// used by parser.
 	void add(ContactItem* ci) {
-		mItems.push_back(ci);
+		mItems.insert(ci);
+	}
+
+	// used by ContactItem::close().
+	void close(ContactItem* ci) {
+		ItemMap::iterator itr = mOpenItems.find((ContactItem*)ci);
+		DEBUG_ASSERT(itr != mOpenItems.end());
+		bool modified = false;
+		ContactItem* orig = itr->second;
+		if(orig) {	// existing item
+			if(*orig != *ci) {
+				*orig = *ci;
+				modified = true;
+			}
+		} else {	// new item
+			//mItr = mItems.end();	// disable next()
+			mItems.insert(new ContactItem(*ci));
+			modified = true;
+		}
+		if(modified)
+			save(mFilename);
+		mOpenItems.erase(itr);
 	}
 };
 
@@ -753,6 +873,12 @@ void ContactValue::save(ostream& stream) const {
 		}
 		stream << "\"";
 	}
+}
+
+void ContactItem::close() {
+	ContactList* cl = (ContactList*)gSyscall->mPimLists.find(pimList);
+	if(cl != NULL)
+		cl->close(this);
 }
 
 // returns 0 on success, error code otherwise.

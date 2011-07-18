@@ -127,7 +127,17 @@ int Syscall::maPimItemRemove(MAHandle list, MAHandle item) {
 	MYASSERT(pl != NULL, ERR_INVALID_PIM_HANDLE);
 	PimItem* pi = pimGetItem(item);
 	pl->removeItem(pi);
-	maPimItemClose(item);
+	delete pi;
+	mPimItems.erase(item);
+	return 0;
+}
+
+int Syscall::maPimItemClose(MAHandle item) {
+	PimItem* pi = mPimItems.find(item);
+	MYASSERT(pi != NULL, ERR_INVALID_PIM_HANDLE);
+	pi->close();
+	delete pi;
+	mPimItems.erase(item);
 	return 0;
 }
 
@@ -160,10 +170,6 @@ int Syscall::maPimItemGetValue(const MA_PIM_ARGS* args, int index) {
 	PimItem* pi = pimGetItem(args->item);
 	return pi->getValue(args->field, index,
 		GetValidatedMemRange((int)(size_t)args->buf, args->bufSize), args->bufSize);
-}
-int Syscall::maPimItemClose(MAHandle item) {
-	mPimItems.erase(item);
-	return 0;
 }
 
 int Syscall::maPimItemSetValue(const MA_PIM_ARGS* args, int index, int attributes) {
