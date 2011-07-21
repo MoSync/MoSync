@@ -116,7 +116,7 @@ int Syscall::maPimListClose(MAHandle list) {
 MAHandle Syscall::maPimItemCreate(MAHandle list) {
 	PimList* pl = mPimLists.find(list);
 	MYASSERT(pl != NULL, ERR_INVALID_PIM_HANDLE);
-	PimItem* pi = pl->createItem(list);
+	PimItem* pi = pl->createItem();
 	DEBUG_ASSERT(pi != NULL);
 	mPimItems.insert(mPimItemNextHandle, pi);
 	return mPimItemNextHandle++;
@@ -126,8 +126,9 @@ int Syscall::maPimItemRemove(MAHandle list, MAHandle item) {
 	PimList* pl = mPimLists.find(list);
 	MYASSERT(pl != NULL, ERR_INVALID_PIM_HANDLE);
 	PimItem* pi = pimGetItem(item);
-	pl->removeItem(pi);
-	delete pi;
+	int res = pl->removeItem(pi);
+	if(res < 0)
+		return res;
 	mPimItems.erase(item);
 	return 0;
 }
@@ -136,7 +137,6 @@ int Syscall::maPimItemClose(MAHandle item) {
 	PimItem* pi = mPimItems.find(item);
 	MYASSERT(pi != NULL, ERR_INVALID_PIM_HANDLE);
 	pi->close();
-	delete pi;
 	mPimItems.erase(item);
 	return 0;
 }
@@ -148,7 +148,9 @@ int Syscall::maPimItemCount(MAHandle item) {
 int Syscall::maPimItemGetField(MAHandle item, int index) {
 	PimItem* pi = pimGetItem(item);
 	MYASSERT(index < pi->count(), ERR_INVALID_PIM_FIELD_INDEX);
-	return pi->fieldId(index);
+	int i = pi->fieldId(index);
+	LOGP("fieldId(%i): %i\n", index, i);
+	return i;
 }
 int Syscall::maPimItemFieldCount(MAHandle item, int field) {
 	PimItem* pi = pimGetItem(item);
@@ -174,10 +176,9 @@ int Syscall::maPimItemGetValue(const MA_PIM_ARGS* args, int index) {
 
 int Syscall::maPimItemSetValue(const MA_PIM_ARGS* args, int index, int attributes) {
 	PimItem* pi = pimGetItem(args->item);
-	pi->setValue(args->field, index,
+	return pi->setValue(args->field, index,
 		GetValidatedMemRange((int)(size_t)args->buf, args->bufSize), args->bufSize,
 		attributes);
-	return 0;
 }
 
 int Syscall::maPimItemAddValue(const MA_PIM_ARGS* args, int attributes) {
@@ -189,8 +190,7 @@ int Syscall::maPimItemAddValue(const MA_PIM_ARGS* args, int attributes) {
 
 int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index) {
 	PimItem* pi = pimGetItem(item);
-	pi->removeValue(field, index);
-	return 0;
+	return pi->removeValue(field, index);
 }
 
 #endif	//EMULATOR

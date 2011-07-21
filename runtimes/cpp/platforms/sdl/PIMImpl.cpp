@@ -322,10 +322,11 @@ public:
 		return getContactValue(field, index)->getValue(buf, bufSize);
 	}
 
-	void setValue(int field, int index, void* buf, int bufSize, int attributes) {
+	int setValue(int field, int index, void* buf, int bufSize, int attributes) {
 		ContactValue* cv = (ContactValue*)getContactValue(field, index);
 		cv->setValue(buf, bufSize);
 		cv->attr = attributes;
+		return 0;
 	}
 	int addValue(int field, void* buf, int bufSize, int attributes) {
 		ContactValue* v;
@@ -346,7 +347,7 @@ public:
 		vector<ContactValue*>& vcv(itr->second);
 		vcv.push_back(v);
 	}
-	void removeValue(int field, int index) {
+	int removeValue(int field, int index) {
 		FieldMap::iterator itr = mFields.find(field);
 		MYASSERT(itr != mFields.end(), ERR_MISSING_PIM_FIELD);
 		vector<ContactValue*>& vcv(itr->second);
@@ -357,6 +358,7 @@ public:
 			// remove the now-empty field.
 			mFields.erase(itr);
 		}
+		return 0;
 	}
 
 	void close();
@@ -449,8 +451,9 @@ private:
 	ItemSet mItems;
 	ItemSet::const_iterator mItr;
 	string mFilename;
+	const MAHandle mPlh;
 public:
-	ContactList() {}
+	ContactList(MAHandle plh) : mPlh(plh) {}
 	bool open(const string& fn) {
 		mFilename = fn;
 		try {
@@ -497,15 +500,15 @@ public:
 	int type(int field) const {
 		return pimContactFieldType(field);
 	}
-	PimItem* createItem(MAHandle list) {
+	PimItem* createItem() {
 		//mItr = mItems.end();	// disable next()
-		DEBUG_ASSERT(gSyscall->mPimLists.find(list) == this);
-		ContactItem* ci = new ContactItem(list);
+		DEBUG_ASSERT(gSyscall->mPimLists.find(mPlh) == this);
+		ContactItem* ci = new ContactItem(mPlh);
 		// item is uncommited and won't be saved until closed.
 		mOpenItems.insert(ItemPair(ci, (ContactItem*)NULL));
 		return ci;
 	}
-	void removeItem(PimItem* pi) {
+	int removeItem(PimItem* pi) {
 		//mItr = mItems.end();	// disable next()
 		ItemMap::iterator itr = mOpenItems.find((ContactItem*)pi);
 		DEBUG_ASSERT(itr != mOpenItems.end());
@@ -514,6 +517,7 @@ public:
 			save(mFilename);
 		}
 		mOpenItems.erase(itr);
+		return 0;
 	}
 
 	// used by parser.
@@ -929,7 +933,7 @@ static int createContactValue(ContactValue*& v, int field, void* buf, int bufSiz
 MAHandle Syscall::maPimListOpen(int listType) {
 	PimList* pl;
 	if(listType == MA_PIM_CONTACTS) {
-		ContactList* cl = new ContactList();
+		ContactList* cl = new ContactList(mPimListNextHandle);
 		string mosyncDir = getenv("MOSYNCDIR");
 		string fn = mosyncDir + "/etc/contacts.xml";
 		LOG("Reading %s...\n", fn.c_str());

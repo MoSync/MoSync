@@ -27,9 +27,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define ADD_REMOVE_ITEMS 1
 
 #if 1
+// log to screen and disk
 #define LOG printf
 #define CONSOLE_LOGGING 1
 #else
+// log to disk only
 #define LOG(...) lprintf(__VA_ARGS__)
 #define CONSOLE_LOGGING 0
 

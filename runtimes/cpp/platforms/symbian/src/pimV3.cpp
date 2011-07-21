@@ -185,8 +185,57 @@ static const char* ft2string(int uidValue) {
 }
 #endif	//DO_DUMP
 
+
+// m(KUidContactField##Value, MA_PIM_FIELD_CONTACT_##, MA_PIM_CONTACT_##_##)
 #define ADDR_NUM 7
+#define ADDR_FIELDS(m)\
+	m(Address, ADDR, STREET)\
+	m(PostOffice, ADDR, POBOX)\
+	m(ExtendedAddress, ADDR, EXTRA)\
+	m(Locality, ADDR, LOCALITY)\
+	m(Region, ADDR, REGION)\
+	m(PostCode, ADDR, POSTALCODE)\
+	m(Country, ADDR, COUNTRY)\
+
 #define NAME_NUM 5
+#define NAME_FIELDS(m)\
+	m(FamilyName, NAME, FAMILY)\
+	m(GivenName, NAME, GIVEN)\
+	m(AdditionalName, NAME, OTHER)\
+	m(PrefixName, NAME, PREFIX)\
+	m(SuffixName, NAME, SUFFIX)\
+
+// m(KUidContactField##Value, MA_PIM_FIELD_CONTACT_##)
+#define SINGLE_FIELDS(m)\
+	m(Birthday, BIRTHDAY)\
+	m(EMail, EMAIL)\
+	m(SecondName, NICKNAME)\
+	m(Note, NOTE)\
+	m(CompanyName, ORG)\
+	m(Picture, PHOTO)\
+	m(PhoneNumber, TEL)\
+	m(JobTitle, TITLE)\
+	m(Url, URL)\
+
+// no support for CLASS.
+// no support for FORMATTED_ADDR.
+// no support for FORMATTED_NAME.
+// no support for PHOTO_URL.
+// no obvious support for PUBLIC_KEY.
+// no obvious support for PUBLIC_KEY_STRING.
+// no obvious support for REVISION.
+// support for UID would come from CContactItem::Id().
+
+// m(KIntContactFieldVCardMap##, MA_PIM_ATTR_##)
+#define ATTRIBUTES(m)\
+	m(WORK, WORK)\
+	m(HOME, HOME)\
+	m(FAX, FAX)\
+	m(PREF, PREFERRED)\
+	m(CELL, MOBILE)\
+	m(PAGER, PAGER)\
+	m(Assistant, ASST)\
+
 
 class ContactItem : public PimItem {
 private:
@@ -196,26 +245,40 @@ private:
 		// into CContactItemFieldSet.
 		// invalidated on insert/remove, but not on add.
 		// we never do inserts, but removes are possible.
+		// thus, on remove, all indexes above the removed one must be
+		// decremented to remain valid.
 		int index;
 	};
 	struct MoSyncField {
 		RArray<MoSyncValue> values;
 	};
 
-	const TContactItemId mId;
 	CContactItem* mItem;
-	const PimList* mList;
+	PimList* mList;
 	HashMap<MoSyncField> mFieldMap;	//key: mosync field id.
 
 	int mAddr[ADDR_NUM], mName[NAME_NUM];
+	// Native Field Types
+	TUid mADDR_NFT[ADDR_NUM], mNAME_NFT[NAME_NUM];
 	bool mHasAddr, mHasName;
+	bool mIsModified;
 public:
-	ContactItem(TContactItemId id, const PimList* list, const MAHandle plh)
-		: PimItem(plh), mId(id), mItem(NULL), mList(list),
-		mHasAddr(0), mHasName(0)
+	const TContactItemId mId;
+	ContactItem(TContactItemId id, PimList* list, const MAHandle plh)
+		: PimItem(plh), mItem(NULL), mList(list),
+		mHasAddr(0), mHasName(0), mId(id)
 	{
+		mIsModified = false;
+
 		memset(mAddr, -1, sizeof(mAddr));
 		memset(mName, -1, sizeof(mName));
+
+#define SET_ARRAY_NFT(uidPart, fieldPart, indexPart)\
+	m##fieldPart##_NFT[MA_PIM_CONTACT_##fieldPart##_##indexPart] =\
+	TUid::Uid(KUidContactField##uidPart##Value);
+
+		ADDR_FIELDS(SET_ARRAY_NFT);
+		NAME_FIELDS(SET_ARRAY_NFT);
 	}
 	void ConstructL(CContactDatabase* db) {
 		mItem = db->ReadMinimalContactLC(mId);
@@ -270,6 +333,7 @@ public:
 	}
 
 	int fieldId(int index) const {
+		LOGP("fieldId(%i)\n", index);
 		if(index == 0) {
 			return MA_PIM_FIELD_CONTACT_UID;
 		}
@@ -288,6 +352,15 @@ public:
 		while(itr.hasMore()) {
 			const HashMap<MoSyncField>::Pair& p(itr.next());
 			if(i == index) {
+				LOGP("fieldId(%i) p.key: %i\n", index, p.key);
+				if((int)p.key < 0) {
+					LOG("FieldMap[%i] = [", p.key);
+					for(int j=0; j<p.value->values.Count(); j++) {
+						LOG("%s%i", j == 0 ? "" : ", ", p.value->values[j].index);
+					}
+					LOG("]\n");
+					DEBIG_PHAT_ERROR;
+				}
 				return p.key;
 			}
 			i++;
@@ -330,20 +403,23 @@ public:
 		return mf->values[index].attr;
 	}
 
-	int getValue(int field, int index, void* buf, int bufSize) const {
-		//LOG("getValue(%i, %i, 0x%x, %i)\n", field, index, buf, bufSize);
-		if(field == MA_PIM_FIELD_CONTACT_UID) {
-			MYASSERT(index == 0, ERR_INVALID_PIM_VALUE_INDEX);
-			if(bufSize >= 4)
-				*(int*)buf = mId;
-			return 4;
-		}
+	typedef int (ContactItem::*TouchStringArray)(void* buf, int bufSize,
+		int index, bool has, int* arr, int num, const TUid*);
+	typedef int (*TouchText)(void* buf, int bufSize, CContactTextField*);
+	typedef int (*TouchStore)(void* buf, int bufSize, CContactStoreField*);
+	typedef int (*TouchDateTime)(void* buf, int bufSize, CContactDateField*);
 
+	int touchValue(int field, int index, void* buf, int bufSize,
+		TouchStringArray touchStringArray, TouchText touchText,
+		TouchStore touchStore, TouchDateTime touchDateTime)
+	{
 		if(field == MA_PIM_FIELD_CONTACT_ADDR) {
-			return getStringArray(buf, bufSize, index, mHasAddr, mAddr, ADDR_NUM);
+			return (this->*touchStringArray)(buf, bufSize, index,
+				mHasAddr, mAddr, ADDR_NUM, mADDR_NFT);
 		}
 		if(field == MA_PIM_FIELD_CONTACT_NAME) {
-			return getStringArray(buf, bufSize, index, mHasName, mName, NAME_NUM);
+			return (this->*touchStringArray)(buf, bufSize, index,
+				mHasName, mName, NAME_NUM, mNAME_NFT);
 		}
 
 		const MoSyncField* mf = mFieldMap.find(field);
@@ -357,19 +433,19 @@ public:
 				LOG("Bad StorageType for f%i: %i\n", field, f.StorageType());
 				return MA_PIM_ERR_NATIVE_TYPE_MISMATCH;
 			}
-			return getText(buf, bufSize, f.TextStorage());
+			return touchText(buf, bufSize, f.TextStorage());
 		case KStorageTypeStore:
 			if(mList->type(field) != MA_PIM_TYPE_BINARY) {
 				LOG("Bad StorageType for f%i: %i\n", field, f.StorageType());
 				return MA_PIM_ERR_NATIVE_TYPE_MISMATCH;
 			}
-			return getStore(buf, bufSize, f.StoreStorage());
+			return touchStore(buf, bufSize, f.StoreStorage());
 		case KStorageTypeDateTime:
 			if(mList->type(field) != MA_PIM_TYPE_DATE) {
 				LOG("Bad StorageType for f%i: %i\n", field, f.StorageType());
 				return MA_PIM_ERR_NATIVE_TYPE_MISMATCH;
 			}
-			return getDateTime(buf, bufSize, f.DateTimeStorage());
+			return touchDateTime(buf, bufSize, f.DateTimeStorage());
 		case KStorageTypeContactItemId:
 		default:
 			LOG("Unknown StorageType: %i\n", f.StorageType());
@@ -377,13 +453,156 @@ public:
 		}
 	}
 
+	int getValue(int field, int index, void* buf, int bufSize) const {
+		//LOG("getValue(%i, %i, 0x%x, %i)\n", field, index, buf, bufSize);
+		if(field == MA_PIM_FIELD_CONTACT_UID) {
+			MYASSERT(index == 0, ERR_INVALID_PIM_VALUE_INDEX);
+			if(bufSize >= 4)
+				*(int*)buf = mId;
+			return 4;
+		}
+
+		return ((ContactItem*)this)->touchValue(field, index, buf, bufSize,
+			&ContactItem::getStringArray, &getText,
+			&getStore, &getDateTime);
+	}
+	int setValue(int field, int index, void* buf, int bufSize, int attributes) {
+		if(field == MA_PIM_FIELD_CONTACT_UID) {
+			return MA_PIM_ERR_READ_ONLY;
+		}
+		mIsModified = true;
+
+		return touchValue(field, index, buf, bufSize,
+			&ContactItem::setStringArray, &ContactItem::setText,
+			&ContactItem::setStore, &ContactItem::setDateTime);
+	}
+	int addValue(int field, void* buf, int bufSize, int attributes) {
+		LOGP("addValue(%i, %i, 0x%x)\n", field, bufSize, attributes);
+		MYASSERT(field > 0, ERR_MISSING_PIM_FIELD);
+		mIsModified = true;
+
+		TCleaner<CContentType> ct(CContentType::NewL());
+		CleanupStack::PushL(ct());
+		// special attributes
+		if(attributes & MA_PIM_ATTR_SMS) {
+			if(field != MA_PIM_FIELD_CONTACT_TEL) {
+				return MA_PIM_ERR_COMBO_UNSUPPORTED;
+			}
+			ct->AddFieldTypeL(TUid::Uid(KUidContactFieldSmsValue));
+		}
+		if(attributes & MA_PIM_ATTR_FAX) {
+			if(field != MA_PIM_FIELD_CONTACT_TEL) {
+				return MA_PIM_ERR_COMBO_UNSUPPORTED;
+			}
+			ct->AddFieldTypeL(TUid::Uid(KUidContactFieldFaxValue));
+		}
+
+#define ADD_CONTENTTYPE_SINGLE(uidPart, fieldPart)\
+	case MA_PIM_FIELD_CONTACT_##fieldPart:\
+	ct->AddFieldTypeL(TUid::Uid(KUidContactField##uidPart##Value)); break;
+
+// m(KIntContactFieldVCardMap##, MA_PIM_ATTR_##)
+#define ADD_CONTENTTYPE_ATTRIBUTE(vcardPart, attrPart)\
+	if(attributes & MA_PIM_ATTR_##attrPart)\
+	ct->AddFieldTypeL(TUid::Uid(KIntContactFieldVCardMap##vcardPart));
+
+		switch(field) {
+		case MA_PIM_FIELD_CONTACT_ADDR:
+			if(mHasAddr)
+				return MA_PIM_ERR_FIELD_COUNT_MAX;
+			setStringArray(buf, bufSize, 0, true, mAddr, ADDR_NUM, mADDR_NFT);
+			mHasAddr = 1;
+			return 0;
+		case MA_PIM_FIELD_CONTACT_NAME:
+			if(mHasName)
+				return MA_PIM_ERR_FIELD_COUNT_MAX;
+			setStringArray(buf, bufSize, 0, true, mName, NAME_NUM, mNAME_NFT);
+			mHasName = 1;
+			return 0;
+
+		SINGLE_FIELDS(ADD_CONTENTTYPE_SINGLE);
+
+		default:
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
+		}
+		ATTRIBUTES(ADD_CONTENTTYPE_ATTRIBUTE);
+
+		TStorageType st;
+		switch(mList->type(field)) {
+		case MA_PIM_TYPE_STRING: st = KStorageTypeText; break;
+		case MA_PIM_TYPE_BINARY: st = KStorageTypeStore; break;
+		case MA_PIM_TYPE_DATE: st = KStorageTypeDateTime; break;
+		default:
+			LOG("Unhandled StorageType: %i\n", mList->type(field));
+			return MA_PIM_ERR_NATIVE_TYPE_MISMATCH;
+		}
+
+		CContactItemField* cif = CContactItemField::NewLC(st, *ct);
+		cif->SetMapping(KUidContactFieldVCardMapUnusedN);
+		mItem->CardFields().AddL(*cif);
+		addValue(field, attributes, cif->Id());
+		CleanupStack::Pop(cif);
+		return 0;
+	}
+
+	int removeValue(int field, int index) {
+		LOGP("removeValue(%i, %i)\n", field, index);
+		if(field == MA_PIM_FIELD_CONTACT_UID) {
+			return MA_PIM_ERR_READ_ONLY;
+		}
+		mIsModified = true;
+
+		if(field == MA_PIM_FIELD_CONTACT_ADDR) {
+			return removeStringArray(index,
+				mHasAddr, mAddr, ADDR_NUM, mADDR_NFT);
+		}
+		if(field == MA_PIM_FIELD_CONTACT_NAME) {
+			return removeStringArray(index,
+				mHasName, mName, NAME_NUM, mNAME_NFT);
+		}
+
+		const MoSyncField* mf = mFieldMap.find(field);
+		MYASSERT(mf != NULL, ERR_MISSING_PIM_FIELD);
+		MYASSERT(index >= 0 && index < mf->values.Count(), ERR_INVALID_PIM_VALUE_INDEX);
+
+		removeNativeField(mf->values[index].index);
+		return 0;
+	}
+
+	void close();
+
 private:
+	void removeNativeField(int index) {
+		mItem->RemoveField(index);
+		//todo: repair indices of all the other items?
+	}
+
+	int removeStringArray(int index, bool& has,
+		int* arr, int num, const TUid* nativeFieldTypes)
+	{
+		MYASSERT(index == 0, ERR_INVALID_PIM_VALUE_INDEX);
+		MYASSERT(has, ERR_MISSING_PIM_FIELD);
+
+		for(int i=0; i<num; i++) {
+			if(arr[i] >= 0) {
+				removeNativeField(arr[i]);
+				arr[i] = -1;
+			}
+		}
+		has = 0;
+		return 0;
+	}
+
 	static int getStore(void* buf, int bufSize, CContactStoreField* sf) {
 		HBufC8* thing = sf->Thing();
 		if(bufSize >= thing->Size()) {
 			memcpy(buf, thing->Ptr(), thing->Size());
 		}
 		return thing->Size();
+	}
+	static int setStore(void* buf, int bufSize, CContactStoreField* sf) {
+		sf->SetThingL(TPtrC8(CBP buf, bufSize));
+		return 0;
 	}
 	
 	static int getText(void* buf, int bufSize, CContactTextField* tf) {
@@ -395,6 +614,14 @@ private:
 		}
 		return size;
 	}
+	static int setText(void* buf, int bufSize, CContactTextField* tf) {
+		MYASSERT(bufSize > (int)sizeof(wchar), ERR_INVALID_PIM_BUFFER_SIZE);
+		MYASSERT((bufSize % sizeof(wchar)) == 0, ERR_INVALID_PIM_BUFFER_SIZE);
+		DEBUG_ASSERT(sizeof(wchar) == sizeof(TUint16));
+		TPtrC ptr((const wchar*)buf, bufSize / sizeof(wchar));
+		tf->SetTextL(ptr);
+		return 0;
+	}
 	
 	static int getDateTime(void* buf, int bufSize, CContactDateField* df) {
 		if(bufSize < 4)
@@ -403,9 +630,14 @@ private:
 		*(int*)buf = unixTime(time);
 		return 4;
 	}
+	static int setDateTime(void* buf, int bufSize, CContactDateField* df) {
+		MYASSERT(bufSize == 4, ERR_INVALID_PIM_BUFFER_SIZE);
+		df->SetTime(symbianTime(*(int*)buf));
+		return 0;
+	}
 
 	int getStringArray(void* buf, int bufSize, int index, bool has,
-		const int* arr, int num) const
+		int* arr, int num, const TUid* nativeFieldTypes)
 	{
 		MYASSERT(index == 0, ERR_INVALID_PIM_VALUE_INDEX);
 		MYASSERT(has, ERR_MISSING_PIM_FIELD);
@@ -439,6 +671,55 @@ private:
 		return size;
 	}
 
+	int setStringArray(void* buf, int bufSize, int index, bool has,
+		int* arr, int num, const TUid* nativeFieldTypes)
+	{
+		LOGP("setStringArray(%i)\n", num);
+		MYASSERT(index == 0, ERR_INVALID_PIM_VALUE_INDEX);
+		MYASSERT(has, ERR_MISSING_PIM_FIELD);
+
+		MYASSERT(bufSize > (int)sizeof(int), ERR_INVALID_PIM_BUFFER_SIZE);
+		int nStrings = *(int*)buf;
+		MYASSERT((bufSize % sizeof(wchar)) == 0, ERR_INVALID_PIM_BUFFER_SIZE);
+		int nChars = (bufSize - sizeof(int)) / sizeof(wchar);
+		MYASSERT(nChars != nStrings, ERR_PIM_EMPTY_STRING_ARRAY);
+		MYASSERT(nChars > nStrings, ERR_INVALID_PIM_BUFFER_SIZE);
+		const wchar* src = (wchar*)((int*)buf + 1);
+		const wchar* end = src + nChars;
+		CContactItemFieldSet& fs(mItem->CardFields());
+		for(int i=0; i<num; i++) {
+			const wchar* stringStart = src;
+			while(true) {
+				MYASSERT(src != end, ERR_PIM_UNTERMINATED_STRING);
+				wchar c = *src;
+				src++;
+				if(c == 0)
+					break;
+			}
+			TPtrC ptr(stringStart, (src - stringStart) - 1);
+			if(arr[i] < 0 && ptr.Length() > 0) {
+				// add a new subfield, but don't populate it yet.
+				CContactItemField* cif = CContactItemField::NewLC(KStorageTypeText,
+					nativeFieldTypes[i]);
+				cif->SetMapping(KUidContactFieldVCardMapUnusedN);
+				fs.AddL(*cif);
+				arr[i] = cif->Id();
+				CleanupStack::Pop(cif);
+			}
+			if(arr[i] >= 0) {
+				// populate/change subfield.
+				const CContactItemField& f(fs[arr[i]]);
+				if(f.StorageType() != KStorageTypeText) {
+					LOG("Bad StorageType for SA%i: %i\n", num, f.StorageType());
+					return MA_PIM_ERR_NATIVE_TYPE_MISMATCH;
+				}
+				f.TextStorage()->SetTextL(ptr);
+			}
+		}
+		MYASSERT(src == end, ERR_INVALID_PIM_BUFFER_SIZE);
+		return 0;
+	}
+
 	void parseField(const CContactItemField& f, int fieldIndex) {
 		int mosyncFieldType = -1;
 		int arrayIndex = -1;	//if fieldType's data type is String Array.
@@ -452,6 +733,18 @@ private:
 
 #define SET_ARR(mft, index) arrayIndex = index; SET(mft)
 
+#define PARSE_ARRAY_FIELD(uidPart, fieldPart, indexPart)\
+	case KUidContactField##uidPart##Value:\
+	SET_ARR(MA_PIM_FIELD_CONTACT_##fieldPart, MA_PIM_CONTACT_##fieldPart##_##indexPart)
+
+#define PARSE_SINGLE_FIELD(uidPart, fieldPart)\
+	case KUidContactField##uidPart##Value:\
+	SET(MA_PIM_FIELD_CONTACT_##fieldPart)
+
+#define PARSE_ATTRIBUTE(vcardPart, attrPart)\
+	case KIntContactFieldVCardMap##vcardPart:\
+	attr |= MA_PIM_ATTR_##attrPart; break;
+
 		DUMPLOG(" StorageType: %i\n", f.StorageType());
 		const CContentType& ct(f.ContentType());
 		DUMPLOG(" %i types\n", ct.FieldTypeCount());
@@ -459,72 +752,21 @@ private:
 			int ft(ct.FieldType(j).iUid);
 			DUMPLOG("  0x%08X(%s)\n", ft, ft2string(ft));
 			switch(ft) {
-			case KUidContactFieldAddressValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_ADDR, MA_PIM_CONTACT_ADDR_STREET);
-			case KUidContactFieldPostOfficeValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_ADDR, MA_PIM_CONTACT_ADDR_POBOX);
-			case KUidContactFieldExtendedAddressValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_ADDR, MA_PIM_CONTACT_ADDR_EXTRA);
-			case KUidContactFieldLocalityValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_ADDR, MA_PIM_CONTACT_ADDR_LOCALITY);
-			case KUidContactFieldRegionValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_ADDR, MA_PIM_CONTACT_ADDR_REGION);
-			case KUidContactFieldPostCodeValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_ADDR, MA_PIM_CONTACT_ADDR_POSTALCODE);
-			case KUidContactFieldCountryValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_ADDR, MA_PIM_CONTACT_ADDR_COUNTRY);
-			case KUidContactFieldBirthdayValue:
-				SET(MA_PIM_FIELD_CONTACT_BIRTHDAY);
+				ADDR_FIELDS(PARSE_ARRAY_FIELD);
+				NAME_FIELDS(PARSE_ARRAY_FIELD);
+				SINGLE_FIELDS(PARSE_SINGLE_FIELD);
+				ATTRIBUTES(PARSE_ATTRIBUTE);
+
 			// no support for CLASS.
-			case KUidContactFieldEMailValue:
-				SET(MA_PIM_FIELD_CONTACT_EMAIL);
 			// no support for FORMATTED_ADDR.
 			// no support for FORMATTED_NAME.
-			case KUidContactFieldFamilyNameValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_NAME, MA_PIM_CONTACT_NAME_FAMILY);
-			case KUidContactFieldGivenNameValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_NAME, MA_PIM_CONTACT_NAME_GIVEN);
-			case KUidContactFieldAdditionalNameValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_NAME, MA_PIM_CONTACT_NAME_OTHER);
-			case KUidContactFieldPrefixNameValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_NAME, MA_PIM_CONTACT_NAME_PREFIX);
-			case KUidContactFieldSuffixNameValue:
-				SET_ARR(MA_PIM_FIELD_CONTACT_NAME, MA_PIM_CONTACT_NAME_SUFFIX);
-			case KUidContactFieldSecondNameValue:
-				SET(MA_PIM_FIELD_CONTACT_NICKNAME);
-			case KUidContactFieldNoteValue:
-				SET(MA_PIM_FIELD_CONTACT_NOTE);
-			case KUidContactFieldCompanyNameValue:
-				SET(MA_PIM_FIELD_CONTACT_ORG);
-			case KUidContactFieldPictureValue:
-				SET(MA_PIM_FIELD_CONTACT_PHOTO);
 			// no support for PHOTO_URL.
 			// no obvious support for PUBLIC_KEY.
 			// no obvious support for PUBLIC_KEY_STRING.
 			// no obvious support for REVISION.
-			case KUidContactFieldPhoneNumberValue:
-				SET(MA_PIM_FIELD_CONTACT_TEL);
-			case KUidContactFieldJobTitleValue:
-				SET(MA_PIM_FIELD_CONTACT_TITLE);
 			// support for UID would come from CContactItem::Id().
-			case KUidContactFieldUrlValue:
-				SET(MA_PIM_FIELD_CONTACT_URL);
 
-			case KIntContactFieldVCardMapWORK:
-				attr |= MA_PIM_ATTR_WORK; break;
-			case KIntContactFieldVCardMapHOME:
-				attr |= MA_PIM_ATTR_HOME; break;
-			case KIntContactFieldVCardMapFAX:
-				attr |= MA_PIM_ATTR_FAX; break;
-			case KIntContactFieldVCardMapPREF:
-				attr |= MA_PIM_ATTR_PREFERRED; break;
-			case KIntContactFieldVCardMapCELL:
-				attr |= MA_PIM_ATTR_MOBILE; break;
-			case KIntContactFieldVCardMapPAGER:
-				attr |= MA_PIM_ATTR_PAGER; break;
-			case KIntContactFieldVCardMapAssistant:
-				attr |= MA_PIM_ATTR_ASST; break;
-
+			// compund cases, handled without macros since they are so few.
 			case KUidContactFieldSmsValue:
 				attr |= MA_PIM_ATTR_SMS;
 				SET(MA_PIM_FIELD_CONTACT_TEL);
@@ -546,15 +788,20 @@ private:
 			}
 			mName[arrayIndex] = fieldIndex;
 			mHasName = 1;
-		} else {
-			MoSyncField* f = mFieldMap.find(mosyncFieldType);
-			if(f == NULL) {
-				f = new (ELeave) MoSyncField();
-				mFieldMap.insert(mosyncFieldType, f);
-			}
-			MoSyncValue v = { attr, fieldIndex };
-			f->values.AppendL(v);
+		} else if(mosyncFieldType > 0) {
+			addValue(mosyncFieldType, attr, fieldIndex);
 		}
+	}
+
+	void addValue(int mosyncFieldType, int attr, int fieldIndex) {
+		LOGP("addValue(%i, 0x%x, %i)\n", mosyncFieldType, attr, fieldIndex);
+		MoSyncField* f = mFieldMap.find(mosyncFieldType);
+		if(f == NULL) {
+			f = new (ELeave) MoSyncField();
+			mFieldMap.insert(mosyncFieldType, f);
+		}
+		MoSyncValue v = { attr, fieldIndex };
+		f->values.AppendL(v);
 	}
 };
 
@@ -563,7 +810,7 @@ private:
 	CContactDatabase* mDb;
 	const CContactIdArray* mList;
 	int mPos;
-	const MAHandle mPlh;
+	const MAHandle mPlh;	// this List's handle.
 public:
 	ContactList(MAHandle plh) : mDb(NULL), mPlh(plh) {}
 	void ConstructL() {
@@ -575,7 +822,7 @@ public:
 		if(mDb)
 			delete mDb;
 	}
-	virtual PimItem* next() {
+	PimItem* next() {
 		if(mPos >= mList->Count())
 			return NULL;
 		ContactItem* ci = new (ELeave) ContactItem((*mList)[mPos++], this, mPlh);
@@ -585,7 +832,35 @@ public:
 	int type(int field) const {
 		return pimContactFieldType(field);
 	}
+	PimItem* createItem() {
+		LOGP("createItem()\n");
+		TCleaner<CContactItem> cci(CContactCard::NewLC());
+		TContactItemId id = mDb->AddNewContactL(*cci);
+		ContactItem* ci = new (ELeave) ContactItem(id, this, mPlh);
+		ci->ConstructL(mDb);
+		return ci;
+	}
+	int removeItem(PimItem* pi) {
+		mDb->DeleteContactL(((ContactItem*)pi)->mId);
+		return 0;
+	}
+	CContactDatabase* db() {
+		return mDb;
+	}
 };
+
+void ContactItem::close() {
+	LOGP("ContactItem::close, mod %i\n", mIsModified);
+	CContactDatabase* db = ((ContactList*)mList)->db();
+	if(mIsModified) {
+		TCleaner<CContactItem> dummy(db->OpenContactL(mItem->Id()));
+		CleanupStack::PushL(dummy());
+		LTRAP(db->CommitContactL(*mItem));
+	} else {
+		db->CloseContactL(mItem->Id());
+	}
+}
+
 
 //******************************************************************************
 // Events
