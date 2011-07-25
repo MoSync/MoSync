@@ -14,7 +14,7 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-require 'FileUtils'
+require 'fileutils'
 require "#{File.dirname(__FILE__)}/util.rb"
 
 # If run at the root level of a Git working copy,
@@ -48,7 +48,7 @@ def enforceGithooks
 	if(HOST == :win32)
 		sh "githooks/junction.exe #{target} #{source}"
 	else
-		FileUtils.ln_s(target, source, :verbose => true)
+		FileUtils.ln_s('../'+source, target, :verbose => true)
 	end
 end
 
