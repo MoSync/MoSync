@@ -149,7 +149,7 @@ int Syscall::maPimItemGetField(MAHandle item, int index) {
 	PimItem* pi = pimGetItem(item);
 	MYASSERT(index < pi->count(), ERR_INVALID_PIM_FIELD_INDEX);
 	int i = pi->fieldId(index);
-	LOGP("fieldId(%i): %i\n", index, i);
+	//LOGP("fieldId(%i): %i\n", index, i);
 	return i;
 }
 int Syscall::maPimItemFieldCount(MAHandle item, int field) {
