@@ -83,8 +83,8 @@ class String
 end
 
 def sh(cmd)
-	# Print the command to stderr.
-	warn cmd
+	# Print the command to stdout.
+	puts cmd
 	# Open a process.
 	IO::popen(cmd) do |io|
 		# Pipe the process's output to our stdout.

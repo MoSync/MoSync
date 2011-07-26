@@ -57,7 +57,7 @@ private:
 	/**
 	 * Destructor.
 	 */
-	~ScreenWebView();
+	virtual ~ScreenWebView();
 
 	/**
 	 * Creates the address bar widgets and layouts.

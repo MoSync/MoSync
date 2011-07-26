@@ -58,6 +58,7 @@ namespace MoSync {
 	class Screen : public UIItem, public CustomEventListener {
 	public:
 		Screen(const String& title = "");
+		virtual ~Screen() {}
 		virtual void show();
 		virtual void hide();
 
@@ -77,6 +78,7 @@ namespace MoSync {
 	class TabScreen : public Screen {
 	public:
 		TabScreen(const String& title);
+		virtual ~TabScreen() {}
 		void addScreen(Screen* screen);
 		void setActiveTab(int index);
 	};
@@ -84,6 +86,7 @@ namespace MoSync {
 	class StackScreen : public Screen {
 	public:
 		StackScreen();
+		virtual ~StackScreen() {}
 		void pushScreen(Screen* screen);
 		void pop();
 		void customEvent(const MAEvent& event);

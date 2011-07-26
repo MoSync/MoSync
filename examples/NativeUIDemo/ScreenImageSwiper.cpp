@@ -397,7 +397,6 @@ Image* ScreenImageSwiper::createBackgroundGradient()
 	img->setPosition(0, 0);
 	img->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 	img->setProperty("scaleMode", "scaleXY");
-	int size = maGetImageSize(h);
 	delete src;
 	return img;
 }
