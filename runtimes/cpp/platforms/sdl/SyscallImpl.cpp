@@ -2215,26 +2215,7 @@ namespace Base {
 			maIOCtl_case(maCameraSnapshot);
 
 #ifdef EMULATOR
-		case maIOCtl_maPimListOpen:
-			return SYSCALL_THIS->maPimListOpen(a);
-		case maIOCtl_maPimListNext:
-			return SYSCALL_THIS->maPimListNext(a);
-		case maIOCtl_maPimListClose:
-			return SYSCALL_THIS->maPimListClose(a);
-		case maIOCtl_maPimItemCount:
-			return SYSCALL_THIS->maPimItemCount(a);
-		case maIOCtl_maPimItemGetField:
-			return SYSCALL_THIS->maPimItemGetField(a, b);
-		case maIOCtl_maPimItemFieldCount:
-			return SYSCALL_THIS->maPimItemFieldCount(a, b);
-		case maIOCtl_maPimItemGetAttributes:
-			return SYSCALL_THIS->maPimItemGetAttributes(a, b, c);
-		case maIOCtl_maPimFieldType:
-			return SYSCALL_THIS->maPimFieldType(a, b);
-		case maIOCtl_maPimItemGetValue:
-			return SYSCALL_THIS->maPimItemGetValue(GVMRA(MA_PIM_ARGS), b);
-		case maIOCtl_maPimItemClose:
-			return SYSCALL_THIS->maPimItemClose(a);
+		maIOCtl_IX_PIM_syscall_caselist;
 #endif	//EMULATOR
 
 		case maIOCtl_maGetSystemProperty:

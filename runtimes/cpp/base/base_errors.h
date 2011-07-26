@@ -86,9 +86,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40066, ERR_PIM_LIST_CLOSED, "The PIM item's parent list is closed")\
 	m(40067, ERR_CAMERA_UNPOWERED, "Camera viewfinder is not active")\
 	m(40068, ERR_TEXTBOX_ACTIVE, "Text box is already active")\
-	m(40069, ERR_EXT_VERSION, "Extension version mismatch")\
-	m(40069, ERR_EXT_LOAD, "Failed to load extensions")\
-	m(40070, ERR_EXT_CALL, "Invalid extension call")\
+	m(40069, ERR_INVALID_PIM_BUFFER_SIZE, "Invalid PIM value buffer size")\
+	m(40070, ERR_PIM_UNTERMINATED_STRING, "Unterminated PIM string value")\
+	m(40071, ERR_PIM_EMPTY_STRING_ARRAY, "Empty PIM string array")\
+	m(40072, ERR_EXT_VERSION, "Extension version mismatch")\
+	m(40073, ERR_EXT_LOAD, "Failed to load extensions")\
+	m(40074, ERR_EXT_CALL, "Invalid extension call")\
 
 DECLARE_ERROR_ENUM(BASE)
 
