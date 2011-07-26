@@ -43,4 +43,12 @@ then
 	exit 1
 fi
 
+# call some scripts of our own...
+if ! ruby $(git rev-parse --show-toplevel)/githooks/checkUser.rb
+then
+	exit 1
+fi
+
+# exec takes over the process; nothing in this script will be executed after this point.
+# Check whitespace conventions.
 exec git diff-index --check --cached $against --
