@@ -3340,6 +3340,12 @@ group WidgetAPI "Widget API" {
 		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
 		 */	
 		WEB_VIEW = "WebView";
+		
+		/**
+		 * @brief a Camera Preview widget is a widget that can be used t oshow the live preview from camera inside a native UI interface and handle the camera.
+		 */	
+		CAMERA_PREVIEW="CameraPreview";
+		
 	}
 	} // end of WidgetTypes
 
@@ -4222,6 +4228,25 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetWebViewProperties
 
+		/**
+	* The available widget properties for a #MAW_CHECK_BOX. See \ref WidgetProperties "Widget properties" for more properties. 
+	*/
+	group WidgetCameraPreview "Camera view properties" {
+	constset MAString MAW_CAMERA_ {
+		/**
+		* @brief Set output format for the camera when using  the specific widget.
+		*
+		* @validvalue A string that can include the list of formats "jpg" or "raw".
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(camerapreviewitemHandle, MAW_CAMERA_DATA_FORMAT, "jpg");
+		* \endcode
+		*/
+		DATA_FORMAT = "jpg";
+	}
+	} // end of WidgetListViewProperties
+	
 	} // end of WidgetProperties	
 		
 	typedef int MAWidgetHandle;
@@ -4365,6 +4390,25 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetSetProperty(in MAWidgetHandle widget, in MAString property, in MAString value);
+
+	/** 
+	* Sends a specific message to a widget to perform an action.
+	*
+	* \param widget Handle to the widget.
+	* \param action A string representing the action.
+	* \param param The parameter for the action..
+	*
+	* \note May be synchronous or asynchronous depending on the property.
+	* \note See \ref WidgetProperties "Widget properties" for the available properties.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the property could be set.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_INVALID_ACTION_NAME if the property name was invalid.
+	* - #MAW_RES_INVALID_ACTION_VALUE if the property value was invalid.  
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetPerformAction(in MAWidgetHandle widget, in MAString action, in MAString param);
 
 	/** 
 	* Retrieves a specified property from the given widget.
