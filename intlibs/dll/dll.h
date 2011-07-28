@@ -21,6 +21,8 @@ public:
 private:
 #ifdef WIN32
 	HMODULE mHandle;
+#else
+	void* mHandle;
 #endif
 };
 

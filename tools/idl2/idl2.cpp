@@ -67,7 +67,7 @@ static bool filesAreEqual(const char* a, const char* b) {
 	bs.seekg(0);
 	static const size_t BUFSIZE = 64*1024;	//arbitrary
 	char aBuf[BUFSIZE], bBuf[BUFSIZE];
-	size_t pos = 0;
+	ssize_t pos = 0;
 	while(pos < aSize) {
 		size_t len = MIN(BUFSIZE, (size_t)(aSize - pos));
 		as.read(aBuf, len);
