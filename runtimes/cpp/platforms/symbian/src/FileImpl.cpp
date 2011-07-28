@@ -19,6 +19,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "FileStream.h"
 #include "symbian_helpers.h"
 
+#ifdef __SERIES60_3X__
+#define FILE_SHARE EFileShareReadersOrWriters
+#else
+#define FILE_SHARE EFileShareAny
+#endif
+
 namespace Base {
 	//******************************************************************************
 	//FileStream
@@ -50,7 +56,7 @@ namespace Base {
 		if(write) {
 			if(append || exist) {
 				LOG("AFO %s\n", filename);
-				TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, EFileShareReadersOrWriters | EFileWrite));
+				TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, FILE_SHARE | EFileWrite));
 				if(IS_SYMBIAN_ERROR(mOpenResult))
 					return;
 				TInt offset = 0;
@@ -61,11 +67,11 @@ namespace Base {
 				}
 			} else {
 				LOG("WFO %s\n", filename);
-				TSNR(mOpenResult = mFile.Replace(mFs, *unicodeName, EFileShareReadersOrWriters | EFileWrite));
+				TSNR(mOpenResult = mFile.Replace(mFs, *unicodeName, FILE_SHARE | EFileWrite));
 			}
 		} else {
 			LOG("RFO %s\n", filename);
-			TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, EFileShareReadersOrWriters));
+			TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, FILE_SHARE | EFileRead));
 		}
 	}
 
