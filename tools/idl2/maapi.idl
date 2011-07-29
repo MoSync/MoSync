@@ -3230,6 +3230,18 @@ group WidgetAPI "Widget API" {
 		* @brief Indicates that the caller tried to remove a visible root widget (screen) and the MoSync view will become visible.
 		*/
 		REMOVED_ROOT = -10;
+
+		/**
+		* @brief Indicates that the caller tried to remove a visible root widget (screen) and the MoSync view will become visible.
+		*/
+		INVALID_ACTION = -11;
+
+		/**
+		* @brief Indicates that maWidgetPerformAction was called for a widget but with an invalid parameter.
+		*/
+		INVALID_PARAMETER_VALUE = -12;
+		
+		
 	}
 	} // end of WidgetResultCodes
 	
@@ -3349,6 +3361,15 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetTypes
 
+	/**
+	* Some widgets can perform actions when receive a message. In order to send action messages, use maWidgetPerformAction(). 
+	*/
+	group WidgetActions "Widget Actions" {
+	
+	
+	}//end of WidgetActions
+	
+	
 	/**
 	* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change 
 	* things like the visual appearance of the widget or the way it works.
@@ -4227,25 +4248,6 @@ group WidgetAPI "Widget API" {
 		NEW_URL = "newurl";
 	}
 	} // end of WidgetWebViewProperties
-
-		/**
-	* The available widget properties for a #MAW_CHECK_BOX. See \ref WidgetProperties "Widget properties" for more properties. 
-	*/
-	group WidgetCameraPreview "Camera view properties" {
-	constset MAString MAW_CAMERA_ {
-		/**
-		* @brief Set output format for the camera when using  the specific widget.
-		*
-		* @validvalue A string that can include the list of formats "jpg" or "raw".
-		*
-		* @par Example
-		* \code
-		*	maWidgetSetProperty(camerapreviewitemHandle, MAW_CAMERA_DATA_FORMAT, "jpg");
-		* \endcode
-		*/
-		DATA_FORMAT = "jpg";
-	}
-	} // end of WidgetListViewProperties
 	
 	} // end of WidgetProperties	
 		
@@ -4404,8 +4406,8 @@ group WidgetAPI "Widget API" {
 	* \returns Any of the following result codes:
 	* - #MAW_RES_OK if the property could be set.
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
-	* - #MAW_RES_INVALID_ACTION_NAME if the property name was invalid.
-	* - #MAW_RES_INVALID_ACTION_VALUE if the property value was invalid.  
+	* - #MAW_RES_INVALID_ACTION_NAME if the action name was invalid.
+	* - #MAW_RES_INVALID_ACTION_VALUE if the action value was invalid.  
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetPerformAction(in MAWidgetHandle widget, in MAString action, in MAString param);
@@ -4468,12 +4470,39 @@ group WidgetAPI "Widget API" {
 		int maCameraStop();
 
 		/**
+		* Adds a previewWidget to the camera controller in devices that support native UI.
+		* Returns 1 for success, \< 0 on error.
+		*/
+		int maCameraSetPreview(in MAHandle widgetHandle);
+
+		/**
+		* Selects a Camera from the available ones. 
+		* Returns 1 for success, \< 0 on error.
+		*/
+		int maCameraSelect(in int cameraNumber);
+
+
+		/**
+		* Returns the number of available Camera on the device. 
+		* Returns 1 for success, \< 0 on error.
+		*/
+		int maCameraNumber();
+
+		/**
 		* Requires the viewfinder to be active.
 		* Takes a snapshot using the specified format. The snapshot is JPEG-encoded and
 		* stored as a new data object in the supplied placeholder.
 		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
+
+		/**
+		* Starts or stops recording video. 
+		* \a stopStartFlag indicates the operation. 
+		* 1 for start recording and 0 for stop recording.
+		* Returns 1 for success, \< 0 on error.
+		*/
+		int maCameraRecord(in int stopStartFlag);
 		
 		/**
 		* Shows the virtual keyboard.
