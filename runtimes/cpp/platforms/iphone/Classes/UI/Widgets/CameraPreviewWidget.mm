@@ -29,19 +29,7 @@
 - (id)init {
 	
 	view=[[UIView alloc] init];
-	captureSession = [[AVCaptureSession alloc] init];
 	
-	captureSession.sessionPreset = AVCaptureSessionPresetMedium;
-	camera = [AVCaptureDevice defaultDeviceWithMediaType:AVMediaTypeVideo];
-	
-	NSError *error = nil;
-	AVCaptureDeviceInput *input =
-	[AVCaptureDeviceInput deviceInputWithDevice:camera error:&error];
-	
-	[captureSession addInput:input];
-	//previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-	previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:captureSession];
-	[view.layer addSublayer:previewLayer];
 	return [super init];	
 }
 
@@ -61,12 +49,6 @@
 	}
 	
 	return @"";
-}
-
-- (void)show {
-	previewLayer.frame = view.bounds;
-	[captureSession startRunning];
-	[super show];
 }
 
 

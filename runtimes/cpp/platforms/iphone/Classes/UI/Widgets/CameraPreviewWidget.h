@@ -21,14 +21,12 @@
 #import "IWidget.h"
 
 @interface CameraPreviewWidget : IWidget <UIImagePickerControllerDelegate,UINavigationControllerDelegate> {
-	AVCaptureSession *captureSession;
-	AVCaptureVideoPreviewLayer *previewLayer;
-	AVCaptureDevice *camera;
+	
+	
 }
 
 - (id)init;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
-- (void)show;
 
 @end

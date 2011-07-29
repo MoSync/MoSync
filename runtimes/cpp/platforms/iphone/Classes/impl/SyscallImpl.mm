@@ -947,6 +947,176 @@ namespace Base {
 	{		
 		MoSync_ShowMessageBox(title, message, false);
 	}
+	
+	struct CameraInfo {
+		AVCaptureSession *captureSession;
+		AVCaptureVideoPreviewLayer *previewLayer;
+		AVCaptureDevice *device;
+		UIView *view;
+	};
+	
+	struct CameraSystemInfo {
+		int numCameras;
+		int currentCamera;
+		BOOL initialized;
+		CameraInfo *cameraInfo;
+	}gCameraSystem={0,0,FALSE,NULL};
+	
+	void initCameraSystem()
+	{
+		
+		if(gCameraSystem.initialized==FALSE)
+		{
+			CameraInfo *cameraInfo;
+			int numCameras=0;
+			NSArray *devices = [AVCaptureDevice devices];
+			AVCaptureDevice *backCamera=NULL;
+			AVCaptureDevice *frontCamera=NULL;
+			for (AVCaptureDevice *device in devices) 
+			{
+				
+				NSLog(@"Device name: %@", [device localizedName]);
+				
+				if ([device hasMediaType:AVMediaTypeVideo]) 
+				{
+					numCameras++;
+					if ([device position] == AVCaptureDevicePositionBack) 
+					{
+						backCamera = device;
+					}
+					else 
+					{
+						frontCamera = device;
+					}
+				}
+			}
+			
+			if(numCameras>0)
+			{
+				int positionCounter=0;
+				cameraInfo=new CameraInfo[numCameras];
+				if (backCamera != NULL)
+				{
+					cameraInfo[positionCounter].device = backCamera;
+					positionCounter++;
+				}
+				if (frontCamera != NULL)
+				{
+					cameraInfo[positionCounter].device = frontCamera;
+					positionCounter++;
+				}
+				for (AVCaptureDevice *device in devices) 
+				{
+					if ([device hasMediaType:AVMediaTypeVideo] && 
+						device != backCamera && device != frontCamera) 
+					{
+						cameraInfo[positionCounter].device = device;
+						positionCounter++;
+					}
+				}
+				for (int i=0; i<numCameras; i++) {
+					cameraInfo[i].captureSession = NULL;
+					cameraInfo[i].previewLayer = NULL;
+					cameraInfo[i].view = NULL;
+				}
+			}
+			//captureSession = [[AVCaptureSession alloc] init];
+			//captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+			gCameraSystem.numCameras = numCameras;
+			gCameraSystem.cameraInfo = cameraInfo;
+			gCameraSystem.initialized = TRUE;
+		}
+	}
+	
+	CameraInfo *getCurrentCameraInfo()
+	{
+		initCameraSystem();
+		if(gCameraSystem.numCameras=0)
+		{
+			NSLog(@"No cameras");
+			return NULL;
+		}
+
+		CameraInfo *curCam = &gCameraSystem.cameraInfo[gCameraSystem.currentCamera];
+		if (curCam->captureSession == NULL) {
+			curCam->captureSession = [[AVCaptureSession alloc] init];
+			curCam->captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+			
+			NSError *error = nil;
+			AVCaptureDeviceInput *input =
+			[AVCaptureDeviceInput deviceInputWithDevice:curCam->device error:&error];
+			
+			[curCam->captureSession addInput:input];
+			NSLog(@"Created session");
+		}
+		return curCam;
+	}
+	
+	SYSCALL(int, maCameraStart()) 
+	{	
+		NSLog(@"About to get the camera info");
+		CameraInfo *info = getCurrentCameraInfo();
+		NSLog(@"About to change the layer's frame");
+		info->previewLayer.frame = info->view.bounds;
+		NSLog(@"About to start camera");
+		[info->captureSession startRunning];
+		NSLog(@"Camera started");
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraStop()) 
+	{		
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraSetPreview(MAHandle widgetHandle)) 
+	{		
+		IWidget *widget = [getMoSyncUI() getWidget:widgetHandle];
+		if(!widget)
+		{
+			NSLog(@"No widget");
+			return 0;
+		}
+		UIView *newView = [widget getView];
+		
+		CameraInfo *info = getCurrentCameraInfo();
+		if(!info->previewLayer)
+		{
+			info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
+			NSLog(@"Created preview layer");
+			//info->previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+		}
+		if (info->view)
+		{
+			[info->previewLayer removeFromSuperview];
+			
+		}
+		//I need to add some code here for the case of the user passing the same view to another camera
+		info->view = newView;
+		[info->view.layer addSublayer:info->previewLayer];
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraSelect(MAHandle cameraNumber)) 
+	{		
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraNumber()) 
+	{		
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder)) 
+	{		
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraRecord(int stopStartFlag))
+	{		
+		return 1;
+	}
+	
 		
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
@@ -981,6 +1151,13 @@ namespace Base {
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);			
 		maIOCtl_case(maMessageBox);
+		maIOCtl_case(maCameraStart);
+		maIOCtl_case(maCameraStop);
+		maIOCtl_case(maCameraSetPreview);
+		maIOCtl_case(maCameraSelect);
+		maIOCtl_case(maCameraNumber);
+		maIOCtl_case(maCameraSnapshot);
+		maIOCtl_case(maCameraRecord);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
