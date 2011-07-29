@@ -41,6 +41,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_NOTFOUND;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_FORBIDDEN;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_RENAME_FILESYSTEM;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_RENAME_DIRECTORY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_WRONG_TYPE;
 
 /**
  * MoSync File API

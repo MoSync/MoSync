@@ -868,6 +868,7 @@ namespace Base {
 		return len;
 	}
 
+#if !defined(_WIN32_WCE)
 	int Syscall::maFileRename(MAHandle file, const char* newName) {
 		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
 		LOGF("maFileRename(%i, %s)\n", file, newName);
@@ -970,6 +971,7 @@ namespace Base {
 		if(!fh.fs->seek(Seek::Start, oldPos)) FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
+#endif	//_WIN32_WCE
 
 #if !defined(SYMBIAN) && !defined(_WIN32_WCE)
 
