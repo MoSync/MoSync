@@ -26,16 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #else
 #include <ext/hash_set>
 using namespace __gnu_cxx;
-#if 1
-namespace __gnu_cxx {
-	template<> struct hash<std::string>
-	{
-		size_t operator()(const std::string& __s) const
-		{ return __stl_hash_string(__s.c_str()); }
-	};
-}
-#endif	//1
-template<class T> class hash_compare : public hash<T> {};
+#include "hash_compare.h"
 #endif	//HAVE_TR1
 #elif defined(_MSC_VER)
 #include <hash_set>
