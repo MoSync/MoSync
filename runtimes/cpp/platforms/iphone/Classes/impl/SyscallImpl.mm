@@ -1034,7 +1034,6 @@ namespace Base {
 		initCameraSystem();
 		if(gCameraSystem.numCameras=0)
 		{
-			NSLog(@"No cameras");
 			return NULL;
 		}
 
@@ -1048,26 +1047,48 @@ namespace Base {
 			[AVCaptureDeviceInput deviceInputWithDevice:curCam->device error:&error];
 			
 			[curCam->captureSession addInput:input];
-			NSLog(@"Created session");
 		}
 		return curCam;
 	}
 	
 	SYSCALL(int, maCameraStart()) 
 	{	
-		NSLog(@"About to get the camera info");
 		CameraInfo *info = getCurrentCameraInfo();
-		NSLog(@"About to change the layer's frame");
-		info->previewLayer.frame = info->view.bounds;
-		printf("frame bounds:\n");
-		NSLog(@"About to start camera");
-		[info->captureSession startRunning];
-		NSLog(@"Camera started");
+		if(info)
+		{
+			if(!info->view)
+			{
+				if(!info->previewLayer)
+				{
+					info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
+				}
+				MoSync_AddLayerToView(info->previewLayer);
+				MoSync_UpdateView(gBackbuffer->image);
+			}
+			else 
+			{
+				info->previewLayer.frame = info->view.bounds;
+			}
+			NSLog(@"Starting Camera");
+			//Have to do it this way, because otherwise it hijacks the main thread or something wierd
+			[info->captureSession performSelectorOnMainThread:@selector(startRunning) withObject:nil waitUntilDone:YES];
+			NSLog(@"Camera started");
+		}
 		return 1;
 	}
 	
 	SYSCALL(int, maCameraStop()) 
-	{		
+	{	
+		CameraInfo *info = getCurrentCameraInfo();
+		if(info)
+		{
+			NSLog(@"Stopping camera");
+			[info->captureSession stopRunning];
+			NSLog(@"Camera stopped");
+			if (!info->view) {
+				[info->previewLayer removeFromSuperlayer];
+			}
+		}
 		return 1;
 	}
 	
@@ -1085,12 +1106,11 @@ namespace Base {
 		if(!info->previewLayer)
 		{
 			info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
-			NSLog(@"Created preview layer");
 			//info->previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
 		}
 		if (info->view)
 		{
-			[info->previewLayer removeFromSuperview];
+			[info->previewLayer removeFromSuperlayer];
 			
 		}
 		//I need to add some code here for the case of the user passing the same view to another camera

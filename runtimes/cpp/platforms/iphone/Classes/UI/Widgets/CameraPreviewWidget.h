@@ -20,7 +20,7 @@
 #import <AVFoundation/AVFoundation.h>
 #import "IWidget.h"
 
-@interface CameraPreviewWidget : IWidget <UIImagePickerControllerDelegate,UINavigationControllerDelegate> {
+@interface CameraPreviewWidget : IWidget {
 	
 	AVCaptureVideoPreviewLayer *previewLayer;
 }
@@ -29,6 +29,6 @@
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
 - (void)show;
-@property AVCaptureVideoPreviewLayer *previewLayer;
+@property (retain) AVCaptureVideoPreviewLayer *previewLayer;
 
 @end

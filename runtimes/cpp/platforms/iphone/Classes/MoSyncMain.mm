@@ -263,6 +263,13 @@ void* MoSync_GetCustomEventDataMoSyncPointer() {
 #endif
 }
 
+void MoSync_AddLayerToView(CALayer* layer){
+	if ([[sMoSyncView.layer sublayers] containsObject:layer]==NO) {
+		[sMoSyncView.layer addSublayer:layer];
+	}
+	layer.frame = sMoSyncView.bounds;
+}
+
 /*
 void MoSync_AddLocationProviderEvent(int state) {
 }

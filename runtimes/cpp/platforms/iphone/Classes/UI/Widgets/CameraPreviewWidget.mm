@@ -59,6 +59,7 @@
 		previewLayer.frame = view.bounds;
 	}
 	[super show];
+	
 }
 
 
