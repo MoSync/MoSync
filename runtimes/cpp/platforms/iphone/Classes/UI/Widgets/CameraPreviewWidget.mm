@@ -26,6 +26,8 @@
 
 @implementation CameraPreviewWidget
 
+@synthesize previewLayer;
+
 - (id)init {
 	
 	view=[[UIView alloc] init];
@@ -51,6 +53,13 @@
 	return @"";
 }
 
+- (void)show
+{
+	if(previewLayer){
+		previewLayer.frame = view.bounds;
+	}
+	[super show];
+}
 
 
 @end

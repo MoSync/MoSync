@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
+#include "CameraPreviewWidget.h"
 
 #include "netImpl.h"
 
@@ -1058,6 +1059,7 @@ namespace Base {
 		CameraInfo *info = getCurrentCameraInfo();
 		NSLog(@"About to change the layer's frame");
 		info->previewLayer.frame = info->view.bounds;
+		printf("frame bounds:\n");
 		NSLog(@"About to start camera");
 		[info->captureSession startRunning];
 		NSLog(@"Camera started");
@@ -1071,7 +1073,7 @@ namespace Base {
 	
 	SYSCALL(int, maCameraSetPreview(MAHandle widgetHandle)) 
 	{		
-		IWidget *widget = [getMoSyncUI() getWidget:widgetHandle];
+		CameraPreviewWidget *widget = (CameraPreviewWidget*) [getMoSyncUI() getWidget:widgetHandle];
 		if(!widget)
 		{
 			NSLog(@"No widget");
@@ -1093,6 +1095,7 @@ namespace Base {
 		}
 		//I need to add some code here for the case of the user passing the same view to another camera
 		info->view = newView;
+		widget.previewLayer = info->previewLayer;
 		[info->view.layer addSublayer:info->previewLayer];
 		return 1;
 	}

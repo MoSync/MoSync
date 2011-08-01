@@ -22,11 +22,13 @@
 
 @interface CameraPreviewWidget : IWidget <UIImagePickerControllerDelegate,UINavigationControllerDelegate> {
 	
-	
+	AVCaptureVideoPreviewLayer *previewLayer;
 }
 
 - (id)init;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
+- (void)show;
+@property AVCaptureVideoPreviewLayer *previewLayer;
 
 @end
