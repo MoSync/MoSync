@@ -48,6 +48,13 @@ void Syscall::ClearBluetoothVariables() {
 	gBtAttrMatchList = NULL;
 	gBtService = NULL;
 	gBtInquirySockAddr.SetIAC(KGIAC);
+
+#ifdef __SERIES60_3X__
+	gBtPowerSync = NULL;
+	gBtRepo = NULL;
+#else	// 2nd edition
+	gBtInfo = NULL;
+#endif	//__SERIES60_3X__
 }
 
 Syscall::BtState Syscall::BtCheckPowerState() {
@@ -58,11 +65,9 @@ Syscall::BtState Syscall::BtCheckPowerState() {
 	// gBtState = eTurnedOff;
 	TInt btMode = -1;
 #ifdef __SERIES60_3X__
-	Smartie<CRepository> crep(CRepository::NewL(KCRUidBluetoothPowerState));
-	TInt err = crep->Get(KBTPowerState, btMode);
+	TInt err = gBtRepo->Get(KBTPowerState, btMode);
 #else	// 2nd edition
-	Smartie<CSettingInfo> si(CSettingInfo::NewL(NULL));
-	TInt err = si->Get(SettingInfo::EBluetoothPowerMode, btMode);
+	TInt err = gBtInfo->Get(SettingInfo::EBluetoothPowerMode, btMode);
 #endif	//__SERIES60_3X__
 	LOG("BtCheckPowerState: err %i, mode %i\n", err, btMode);
 	if(IS_SYMBIAN_ERROR(err) || btMode < 0) {
@@ -71,11 +76,15 @@ Syscall::BtState Syscall::BtCheckPowerState() {
 	}
 	if(btMode == 0)
 		return eTurnedOff;
+	if(btMode == 1)
+		return eAvailable;
 	LOG("Mysterious BluetoothPowerMode: %i\n", btMode);
 	return eError;
 }
 
-void Syscall::ConstructBluetoothL() {
+// sets gBtState.
+void Syscall::InitBluetoothL() {
+	LOGBT("InitBluetoothL\n");
 	TProtocolDesc pInfo;
 	_LIT(KL2Cap, "BTLinkManager");	//symbian magic
 	int res;
@@ -85,7 +94,7 @@ void Syscall::ConstructBluetoothL() {
 		return;
 	}
 	LHEL(res);
-	
+
 	res = gBtResolver.Open(gSocketServ, pInfo.iAddrFamily, pInfo.iProtocol);
 	if(res == KErrPermissionDenied) {
 		LOG("BtResolver Open error %i\n", res);
@@ -95,6 +104,10 @@ void Syscall::ConstructBluetoothL() {
 	if(res == KErrHardwareNotAvailable || res == KErrNotSupported) {
 		LOG("BtResolver Open error %i\n", res);
 		gBtState = BtCheckPowerState();
+		if(gBtState == eAvailable) {
+			LOG("Power state: available, yet resolver can't open. Very weird.\n");
+			gBtState = eError;
+		}
 		return;
 	} else {
 		LHEL(res);
@@ -118,9 +131,27 @@ void Syscall::ConstructBluetoothL() {
 	LHEL(gBtSdpDB.Open(gBtSdp));
 
 	gBtState = eAvailable;
+	LOGBT("InitBluetoothL complete\n");
 }
 
-void Syscall::DestructBluetooth() {
+void Syscall::CancelBluetoothConnections() {
+	HashMap<CConnection>::TIteratorC itr = gConnections.begin();
+	LOGBT("%i connections.\n", gConnections.size());
+	while(itr.hasMore()) {
+		const HashMap<CConnection>::Pair& p = itr.next();
+		CConnection* conn = p.value;
+		DEBUG_ASSERT(conn != NULL);
+		if(conn->isBluetooth()) {
+			LOGBT("Canceling ops on connection %i.\n", p.key);
+			conn->errorOverride = CONNERR_UNAVAILABLE;
+			conn->CancelAll();
+		}
+	}
+}
+
+void Syscall::CloseBluetooth() {
+	LOGBT("CloseBluetooth\n");
+	
 	if(gBtState == eAvailable)
 		gBtResolver.Cancel();
 	gBtResolver.Close();
@@ -135,6 +166,77 @@ void Syscall::DestructBluetooth() {
 	
 	gBtSdpDB.Close();
 	gBtSdp.Close();
+	
+	gBtState = eTurnedOff;
+	LOGBT("CloseBluetooth complete\n");
+}
+
+void Syscall::ConstructBluetoothL() {
+#ifdef __SERIES60_3X__
+	gBtPowerSync = new CClassSynchronizer<Syscall>(this, &Syscall::BtPowerRunL);
+	gBtRepo = CRepository::NewL(KCRUidBluetoothPowerState);
+	LHEL(gBtRepo->NotifyRequest(KBTPowerState, *gBtPowerSync->Status()));
+	gBtPowerSync->SetActive();
+#else	// 2nd edition
+	gBtInfo = CSettingInfo::NewL(this);
+	LHEL(gBtInfo->NotifyChanges(SettingInfo::EBluetoothPowerMode));
+#endif	//__SERIES60_3X__
+
+	InitBluetoothL();
+}
+
+void Syscall::DestructBluetooth() {
+	CloseBluetooth();
+
+#ifdef __SERIES60_3X__
+	if(gBtRepo) {
+		gBtRepo->NotifyCancel(KBTPowerState);
+	}
+	SAFE_DELETE(gBtRepo);
+	SAFE_DELETE(gBtPowerSync);
+#else	// 2nd edition
+	if(gBtInfo) {
+		gBtInfo->CancelNotifications(SettingInfo::EBluetoothPowerMode);
+	}
+	SAFE_DELETE(gBtInfo);
+#endif	//__SERIES60_3X__
+}
+
+//***************************************************************************
+//Power
+//***************************************************************************
+
+#ifdef __SERIES60_3X__
+void Syscall::BtPowerRunL(TInt aResult) {
+	LOG("BtPowerRunL %i\n", aResult);
+	LHEL(aResult);
+#else	// 2nd edition
+void Syscall::HandleNotificationL(SettingInfo::TSettingID aID, const TDesC& aNewValue) {
+	DEBUG_ASSERT(aID == SettingInfo::EBluetoothPowerMode);
+#endif	//__SERIES60_3X__
+
+	BtState newState = BtCheckPowerState();
+	LOGBT("newState: %i\n", newState);
+	if(newState != gBtState) {
+		MAEvent e;
+		if(newState == eAvailable) {
+			InitBluetoothL();
+			e.type = EVENT_TYPE_BLUETOOTH_TURNED_ON;
+		} else {
+			// at this point, we need to cancel every active bluetooth operation.
+			// this includes socket read/write/connects.
+			CancelBluetoothConnections();
+			CloseBluetooth();
+			e.type = EVENT_TYPE_BLUETOOTH_TURNED_OFF;
+		}
+		gAppView.AddEvent(e);
+	}
+
+#ifdef __SERIES60_3X__
+	LHEL(gBtRepo->NotifyRequest(KBTPowerState, *gBtPowerSync->Status()));
+	gBtPowerSync->SetActive();
+#else	// 2nd edition
+#endif	//__SERIES60_3X__
 }
 
 //***************************************************************************
@@ -394,7 +496,7 @@ int Syscall::SBTmaBtCancelDiscovery() {
 	return 1;
 }
 
-int Syscall::SBTmaBtGetNewDevice(MABtDevice* dst) {
+int Syscall::SBTmaBtGetNewDevice(MABtDeviceNative* dst) {
 	if(gBtNextDevice >= gBtDeviceArray.Count())
 		return 0;
 
@@ -442,7 +544,7 @@ void Syscall::SBTmaBtStartServiceDiscovery(const MABtAddr* address, const MAUUID
 };
 
 //returns >0 on success.
-int Syscall::SBTmaBtGetNewService(MABtService* dst) {
+int Syscall::SBTmaBtGetNewService(MABtServiceNative* dst) {
 	if(gBtNextService == gBtServiceArray.Count()) {
 		return 0;
 	}

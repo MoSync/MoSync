@@ -18,6 +18,7 @@
 
 require "#{File.dirname(__FILE__)}/pipe.rb"
 require "#{File.dirname(__FILE__)}/mosync_util.rb"
+require "#{File.dirname(__FILE__)}/targets.rb"
 
 module PipeElimTask
 	def execute
@@ -42,18 +43,47 @@ module PipeElimTask
 	end
 end
 
+# Packs a MoSync program for installation.
+# resource can be nil. all other parameters must be valid.
+class MoSyncPackTask < Task
+	def initialize(work, tempdir, buildpath, model, program, resource, name)
+		super(work)
+		@model = model
+		@program = program
+		@resource = resource
+		@packpath = buildpath + model
+		@name = name
+		@tempdir = tempdir
+		@prerequisites = [@program, DirTask.new(work, @packpath)]
+		@prerequisites << @resource if(@resource)
+	end
+	def execute
+		if(@resource)
+			r = File.expand_path(@resource)
+			resArg = " -r \"#{r}\""
+		end
+		p = File.expand_path(@program)
+		d = File.expand_path(@packpath)
+		FileUtils.cd(@tempdir, :verbose => true) do
+			sh "#{mosyncdir}/bin/package -p \"#{p}\"#{resArg} -m \"#{@model}\""+
+				" -d \"#{d}\" -n \"#{@name}\" --vendor MoSync"
+		end
+	end
+end
+
 class PipeExeWork < PipeGccWork
 	def setup
 		default(:TARGETDIR, '.')
 		set_defaults
-		@SLD = @TARGETDIR + "/" + @BUILDDIR + "sld.tab"
-		stabs = @TARGETDIR + "/" + @BUILDDIR + "stabs.tab"
+		@buildpath = @TARGETDIR + "/" + @BUILDDIR
+		@SLD = @buildpath + "sld.tab"
+		stabs = @buildpath + "stabs.tab"
 		@FLAGS = " -sld=#{@SLD} -stabs=#{stabs} -B"
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a +
 			[mosync_include, "#{mosyncdir}/profiles/vendors/MoSync/Emulator"]
 		super
 	end
-	def setup3(all_objects)
+	def setup3(all_objects, have_cppfiles)
 		# resource compilation
 		if(!defined?(@LSTFILES))
 			if(@SOURCES[0])
@@ -64,7 +94,8 @@ class PipeExeWork < PipeGccWork
 		end
 		if(@LSTFILES.size > 0)
 			lstTasks = @LSTFILES.collect do |name| FileTask.new(self, name) end
-			@prerequisites << PipeResourceTask.new(self, "build/resources", lstTasks)
+			@resourceTask = PipeResourceTask.new(self, "build/resources", lstTasks)
+			@prerequisites << @resourceTask
 		end
 		if(USE_NEWLIB)
 			default(:DEFAULT_LIBS, ["newlib"])
@@ -78,10 +109,44 @@ class PipeExeWork < PipeGccWork
 		end
 		all_objects += libs
 		
-		super(all_objects)
+		super
 		
 		if(ELIM)
 			@TARGET.extend(PipeElimTask)
+		end
+		if(defined?(PACK))
+			@prerequisites = [@TARGET = MoSyncPackTask.new(self, @BUILDDIR_BASE, @buildpath,
+				PACK, @TARGET, @resourceTask, @NAME)]
+		end
+	end
+	def emuCommandLine
+		if(@resourceTask)
+			resArg = " -resource #{@resourceTask}"
+		end
+		return "#{mosyncdir}/bin/MoRE -program #{@TARGET} -sld #{@SLD}#{resArg}#{@EXTRA_EMUFLAGS}"
+	end
+	def run
+		# run the emulator
+		sh emuCommandLine
+	end
+	def gdb
+		# debug the emulator
+		sh "gdb --args #{emuCommandLine}"
+	end
+	def invoke
+		super
+		# If you invoke a work without setting up any targets,
+		# we will check for the "run" goal here.
+		if(Targets.size == 0)
+			Targets.setup
+			if(Targets.goals.include?(:run))
+				self.run
+				return
+			end
+			if(Targets.goals.include?(:gdb))
+				self.gdb
+				return
+			end
 		end
 	end
 end

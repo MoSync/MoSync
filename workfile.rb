@@ -36,10 +36,10 @@ MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"runtimes/cpp/platforms/sdl/MoRE"
 	]
 
-BASE_DIRS = MORE_DIRS + ADDITIONAL_INTLIBS + PLATFORM_TOOLS
+BASE_DIRS = ADDITIONAL_INTLIBS + MORE_DIRS + PLATFORM_TOOLS
 
 PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/DefaultSkinGenerator", "libs"]
-EXAM_DIRS = PIPE_DIRS + ["tests/unitTest", "examples"]
+EXAM_DIRS = ["tests/unitTest", "examples"]
 TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/Bundle",
 	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack"]
 
@@ -79,10 +79,11 @@ target :default => :base do
 end
 
 target :examples => :base do
-	Work.invoke_subdirs(EXAM_DIRS)
+	Work.invoke_subdirs(PIPE_DIRS + EXAM_DIRS)
 end
 
-target :all => :examples do
+target :all => :default do
+	Work.invoke_subdirs(EXAM_DIRS)
 end
 
 target :more => :base do
@@ -108,8 +109,13 @@ target :clean do
 	verbose_rm_rf("build")
 	Work.invoke_subdirs(PRE_DIRS, "clean")
 	Work.invoke_subdir("tools/idl2", "clean")
-	Work.invoke_subdirs(ALL_DIRS, "clean")
+	Work.invoke_subdirs(MAIN_DIRS, "clean")
 end
+
+target :clean_examples do
+	Work.invoke_subdirs(EXAM_DIRS, "clean")
+end
+
 
 target :all_configs do
 	sh 'ruby workfile.rb all'

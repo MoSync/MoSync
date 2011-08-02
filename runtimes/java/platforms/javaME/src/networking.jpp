@@ -30,6 +30,9 @@ NETSYSCALL(MAHandle) maConnect(final String url) {
 		} catch(IOException e) {
 			PRINT_STACK_TRACE;
 			return CONNERR_GENERIC;
+		} catch(SecurityException e) {
+			PRINT_STACK_TRACE;
+			return CONNERR_FORBIDDEN;
 		}
 		mConnections.put(new Integer(mConnNextHandle), mac);
 		return mConnNextHandle++;

@@ -622,9 +622,9 @@ namespace Base {
 		else *dst = ev; //gEventQueue.get();
 		
 #define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ev.type == eventType) {\
-		memcpy(MoSync_GetCustomEventData(), ev.data, sizeof(dataType));\
+		memcpy(MoSync_GetCustomEventData(), (void*)ev.data, sizeof(dataType));\
 		delete (dataType*)ev.data;\
-		dst->data = MoSync_GetCustomEventDataMoSyncPointer(); }
+		dst->data = (int)MoSync_GetCustomEventDataMoSyncPointer(); }
 		
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
 		

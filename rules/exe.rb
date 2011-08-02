@@ -18,8 +18,8 @@ require "#{File.dirname(__FILE__)}/native_link.rb"
 
 # Links object files together to form a native executable.
 class ExeTask < NativeGccLinkTask
-	def initialize(work, name, objects, whole_libs, libs, linkflags)
-		super(work, name, whole_libs + objects + libs)
+	def initialize(work, name, objects, whole_libs, libs, linkflags, linker)
+		super(work, name, whole_libs + objects + libs, linker)
 		@FLAGS = linkflags
 	end
 end

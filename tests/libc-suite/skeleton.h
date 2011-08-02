@@ -17,8 +17,6 @@ struct qelem
 // very weird one; not defined anywhere in glibc, yet used by some test programs.
 #define OBJPFX
 
-#define WEOF ((wchar_t)-1)
-
 // enables use of insque()
 #define _KERNEL
 #include <sys/queue.h>
@@ -61,7 +59,7 @@ typedef off_t off64_t;
 #define __strtod_internal(a,b,c) strtod(a,b)
 
 #define WORD_BIT 32
-#define LONG_BIT 64
+#define LONG_BIT 32
 
 #define daylight _daylight
 #define timezone _timezone
@@ -78,6 +76,7 @@ int kill(int pid, int sig);
 pid_t waitpid(pid_t pid, int* status_ptr, int options);
 const char* strsignal(int __signo);
 void exit(int status);
+unsigned alarm(unsigned __secs);
 
 char *initstate(unsigned seed, char *state, size_t size);
 void * setstate (void *state);
@@ -94,7 +93,7 @@ char* index(const char *, int);
 char* rindex(const char *, int);
 void * rawmemchr (const void *block, int c);
 void * memrchr (const void *block, int c, size_t size);
-char* strdupa(char* str);
+char* strdupa(const char* str);
 
 #define MAP_FIXED 1
 #define MAP_ANON 2
@@ -114,3 +113,28 @@ int munmap(void*, size_t);
 int ffsl(long int i);
 int ffsll(long long int i);
 wchar_t* wmempcpy (wchar_t* wto, const wchar_t* wfrom, size_t size);
+
+#define d_fileno d_namlen	//hackity-hack, for dirent/list.c
+#define O_DIRECTORY 0
+#define O_NDELAY 0
+#define O_NOATIME 0
+#define open64 open
+
+#define dirent64 dirent
+#define readdir64 readdir
+#define readdir64_r readdir_r
+#define fstatat64 fstatat
+#define ftello64 ftello
+
+// supa-hack
+#define d_ino d_namlen, 0
+
+#define _D_EXACT_NAMLEN(d) ((d)->d_namlen)
+#define _D_ALLOC_NAMLEN(d) (_D_EXACT_NAMLEN (d) + 1)
+
+#define DT_UNKNOWN 0
+
+// bug in tst-strtod6.c
+#define isnanf isnan
+
+#define libc_hidden_builtin_def(foo)

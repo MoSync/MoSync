@@ -39,7 +39,7 @@ namespace Base {
 #ifndef _android
 		return new LimitedFileStream(getFilename(), curPos, size);
 #else
-		return new LimitedFileStream(getFilename(), curPos, size, mJNIEnv, mJThis);
+		return new LimitedFileStream(getFilename(), curPos, size, jniEnv, jthis);
 #endif
 	}
 

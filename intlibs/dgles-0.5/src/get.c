@@ -29,7 +29,7 @@ static int do_get(GLenum pname, union GetResult *res, enum GetType *type,
 {
 	GLboolean b[16];
 	GLint     i[16];
-	GLfloat   f[16];
+	//GLfloat   f[16];
 	GLdouble  d[16];
 	int j;
 
@@ -367,7 +367,8 @@ static int do_get(GLenum pname, union GetResult *res, enum GetType *type,
 		{
 		case GET_BOOLEAN: res[j].b = b[j]; break;
 		case GET_INT: res[j].i = i[j]; break;
-		case GET_FLOAT: res[j].f = f[j]; break;
+		//case GET_FLOAT: res[j].f = f[j]; break;
+		case GET_FLOAT: assert(!"float"); break;
 		case GET_DOUBLE: res[j].d = d[j]; break;
 		case GET_FIXED: break;
 		}

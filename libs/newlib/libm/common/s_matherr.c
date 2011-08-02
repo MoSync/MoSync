@@ -110,12 +110,22 @@ PORTABILITY
 
 #include "fdlibm.h"
 
-#ifdef __STDC__
-	int matherr(struct exception *x)
-#else
-	int matherr(x)
-	struct exception *x;
-#endif
+typedef int (*Matherr)(struct exception *);
+
+static int standard_matherr(struct exception *x);
+
+static Matherr sMatherr = standard_matherr;
+
+void setMatherr(Matherr m);	//hack
+void setMatherr(Matherr m) {
+	sMatherr = m;
+}
+
+int matherr(struct exception *x) {
+	return sMatherr(x);
+}
+
+static int standard_matherr(struct exception *x)
 {
 	int n=0;
 	if(x->arg1!=x->arg1) return 0;

@@ -28,18 +28,14 @@ module MoSyncMod
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a + [mosync_include]
 	end
 	
-	def copyHeaders
+	def copyHeaders(endings = ['.h', '.hpp'])
 		dir = mosync_include + "/" + @INSTALL_INCDIR
 		# create a bunch of CopyFileTasks, then invoke them all.
-		collect_headers(".h").each do |h|
-			task = CopyFileTask.new(self, dir + "/" + File.basename(h.to_s), h)
-			#task.invoke
-			@prerequisites = [task] + @prerequisites
-		end
-		collect_headers(".hpp").each do |h|
-			task = CopyFileTask.new(self, dir + "/" + File.basename(h.to_s), h)
-			#task.invoke
-			@prerequisites = [task] + @prerequisites
+		endings.each do |ending|
+			collect_headers(ending).each do |h|
+				task = CopyFileTask.new(self, dir + "/" + File.basename(h.to_s), h)
+				@prerequisites = [task] + @prerequisites
+			end
 		end
 		@prerequisites = [DirTask.new(self, dir)] + @prerequisites
 	end
@@ -52,8 +48,9 @@ module MoSyncMod
 		@HEADER_DIRS.each {|dir| files += Dir[dir+"/*"+ending]}
 		files.flatten!
 		if(defined?(@IGNORED_HEADERS))
-			files.reject! {|file| @IGNORED_HEADERS.member?(File.basename(file))}
+			files.reject! {|file| @IGNORED_HEADERS.member?(File.basename(file)) }
 		end
+		files.reject! {|file| File.directory?(file) }
 		return files.collect do |file| FileTask.new(self, file) end
 	end
 end
@@ -81,9 +78,9 @@ class PipeLibWork < PipeGccWork
 		copyHeaders
 		super
 	end
-	def setup3(all_objects)
+	def setup3(all_objects, have_cppfiles)
 		@TARGET_PATH = "#{mosync_libdir}/#{@BUILDDIR_NAME}/#{@NAME}.lib"
-		super(all_objects)
+		super(all_objects, have_cppfiles)
 		if(!USE_NEWLIB)	# rake support
 			d = (CONFIG == "debug") ? 'D' : ''
 			dir = "#{mosync_libdir}/pipe/"

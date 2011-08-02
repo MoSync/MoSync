@@ -495,7 +495,9 @@ _DEFUN (_dtoa_r,
 	  /* Use Steele & White method of only
 	   * generating digits needed.
 	   */
-	  eps.d = 0.5 / tens[ilim - 1] - eps.d;
+		 ilim--;
+	  eps.d = 0.5 / tens[ilim] - eps.d;
+		ilim++;
 	  for (i = 0;;)
 	    {
 	      L = d.d;
@@ -515,7 +517,9 @@ _DEFUN (_dtoa_r,
 	{
 #endif
 	  /* Generate ilim digits, then fix them up. */
-	  eps.d *= tens[ilim - 1];
+		ilim--;
+	  eps.d *= tens[ilim];
+		ilim++;
 	  for (i = 1;; i++, d.d *= 10.)
 	    {
 	      L = d.d;

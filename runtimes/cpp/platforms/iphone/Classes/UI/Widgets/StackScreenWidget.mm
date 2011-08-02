@@ -73,7 +73,7 @@
 	else
 		eventData->toScreen = -1;
 	
-	event.data = eventData;
+	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
 

@@ -1,0 +1,11 @@
+The MoSync runtime for Symbian Series 60, 3rd edition relies on an embedded program to access the Location API. There is a bug on all devices running Symbian OS v9.1 and v9.2 that affects MoSync applications.
+
+The embedded program is shared by all MoSync applications on a device. It is installed by the first MoSync application to be installed on the device. The bug is the following: whenever a MoSync application is UN-installed, it also removes the embedded program, rendering all remaining MoSync applications unusable.
+
+A workaround is to reinstall any one of the remaining MoSync applications. This will cause the embedded program to also be reinstalled.
+
+TODO: Compile a list of device models affected by this bug.
+
+Further reading:
+http://www3.symbian.com/faq.nsf/0/8D97309C0039D6288025731A000A4D1E?OpenDocument
+http://wiki.forum.nokia.com/index.php/KIS000457_-_The_dependency_option_is_not_supported_with_embedded_SIS_packages

@@ -31,7 +31,7 @@
 	eventData->eventType = MAW_EVENT_CLICKED;
 	eventData->widgetHandle = handle;
 	eventData->searchBarButton = 0;
-	event.data = eventData;
+	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
 
@@ -43,7 +43,7 @@
 	eventData->eventType = MAW_EVENT_CLICKED;
 	eventData->widgetHandle = handle;
 	eventData->searchBarButton = 1;
-	event.data = eventData;
+	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
 

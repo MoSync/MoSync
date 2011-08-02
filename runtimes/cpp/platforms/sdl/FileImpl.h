@@ -16,7 +16,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 int mFd;
-const std::string mFilename;
+protected:
+char* mFilename;
 
 protected:
 FileStream();

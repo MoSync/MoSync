@@ -73,6 +73,7 @@ work.instance_eval do
 			"e_hypot.c" => " -Wno-shadow",
 			"regexec.c" => " -Wno-char-subscripts",
 			"regcomp.c" => " -Wno-char-subscripts",
+			"mktemp.c" => " -DHAVE_MKDIR",
 		}
 		
 		@IGNORED_FILES = ["engine.c"]

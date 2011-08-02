@@ -1758,9 +1758,9 @@ DWORD GetScreenOrientation()
 		*dst = gEventFifo.get();
 
 		#define HANDLE_CUSTOM_EVENT(eventType, dataType) if(dst->type == eventType) {\
-			memcpy(Core::GetCustomEventPointer(gCore), dst->data, sizeof(dataType));\
-			delete (dataType*)dst->data;\
-			dst->data = (void*)(int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
+			memcpy(Core::GetCustomEventPointer(gCore), (void*)dst->data, sizeof(dataType));\
+			delete (dataType*)(void*)dst->data;\
+			dst->data = (int(Core::GetCustomEventPointer(gCore)) - int(gCore->mem_ds)); }
 
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
 
@@ -2592,7 +2592,7 @@ retry:
 			}
 			posEventData->state = MA_LOC_INVALID;
 		}
-		posEvent.data = posEventData;
+		posEvent.data = (MAAddress)posEventData;
 		gEventFifo.put(posEvent);
 	}
 

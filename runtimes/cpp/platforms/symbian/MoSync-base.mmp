@@ -86,3 +86,4 @@ LIBRARY eikcoctl.lib
 LIBRARY eikctl.lib
 LIBRARY form.lib
 LIBRARY uiklaf.lib
+LIBRARY sysutil.lib

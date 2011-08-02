@@ -30,6 +30,7 @@ using namespace Core;
 
 #ifdef _WIN32
 #include <windows.h>
+#include <stdint.h>
 #endif
 
 #ifdef _android
@@ -694,15 +695,15 @@ namespace MoSync {
 
 	// TODO implement division with assembly?
 	void ArmRecompiler::divu(int rd, int rs) {
-		unsigned long denom = *(unsigned long*)&mEnvironment.regs[rs];
+		uint32_t denom = *(uint32_t*)&mEnvironment.regs[rs];
 		if(denom==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
-		*(unsigned long*)&mEnvironment.regs[rd] /= denom;
+		*(uint32_t*)&mEnvironment.regs[rd] /= denom;
 	}
 
 	void ArmRecompiler::divui(int rd, int imm32) {
-		unsigned long denom = (unsigned long) imm32;
+		uint32_t denom = (uint32_t) imm32;
 		if(denom==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
-		*(unsigned long*)&mEnvironment.regs[rd] /= denom;
+		*(uint32_t*)&mEnvironment.regs[rd] /= denom;
 	}
 
 	void ArmRecompiler::div(int rd, int rs) {
@@ -711,7 +712,7 @@ namespace MoSync {
 	}
 
 	void ArmRecompiler::divi(int rd, int imm32) {
-		long denom = (long)imm32;
+		int denom = (int)imm32;
 		if(denom==0) BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
 		mEnvironment.regs[rd] /= denom;
 	}

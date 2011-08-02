@@ -1,0 +1,53 @@
+digraph MoSync {
+	//helpers -> filelist;
+	//helpers -> idlCommon;
+	//helpers -> idl2;
+	compound=true;
+
+	subgraph cluster0 {
+		label = "Runtimes";
+		labeljust = l;
+		//color = blue;
+		node [style=filled];
+		{ rank = same; WindowsMobile; Symbian; MoRE; Moblin; mosynclib; JavaME; Android; iOS; }
+	}
+
+	helpers;
+	
+	sdl [label = "sdl syscalls"];
+	idlCommon [label = "idl-common"];
+	userCode [label="user code"];
+	
+	//filelist -> idlCommon;
+	idlCommon -> idl2;
+	
+	idl2 -> net [style=dotted];
+	idl2 -> bluetooth [style=dotted];
+	idl2 -> sdl [style=dotted];
+	idl2 -> JavaME [style=dotted];
+	idl2 -> Android [style=dotted];
+	idl2 -> iOS [style=dotted];
+	idl2 -> Symbian [style=dotted];
+	idl2 -> WindowsMobile [style=dotted];
+	idl2 -> userCode [style=dotted];
+	
+	sdl -> MoRE;
+	sdl -> mosynclib;
+	sdl -> Moblin;
+	filelist -> sdl;
+	filelist -> WindowsMobile;
+	bluetooth -> sdl;
+	net -> sdl;
+	net -> Symbian [style=dashed];
+	net -> WindowsMobile;
+	bluetooth -> WindowsMobile;
+	
+	core -> MoRE;
+	core -> WindowsMobile;
+	core -> Symbian;
+	core -> iOS;
+	core -> Moblin;
+	core -> Android;
+	
+	stabs -> debugger;
+}

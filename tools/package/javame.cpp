@@ -94,9 +94,9 @@ void packageJavaME(const SETTINGS& s, const RuntimeInfo& ri) {
 	// done separately from the other package parts in order to "junk" path names.
 	cmd.str("");
 	cmd << "zip -9 -j \""<<appJarName<<"\" \""<<
-		(ri.isBlackberry ? split(program) : program)<<"\"";
+		(ri.hasLimitedResourceSize ? split(program) : program)<<"\"";
 	if(s.resource)
-		cmd << " \""<<(ri.isBlackberry ? split(resource) : resource)<<"\"";
+		cmd << " \""<<(ri.hasLimitedResourceSize ? split(resource) : resource)<<"\"";
 	// todo: icon
 	sh(cmd.str().c_str());
 

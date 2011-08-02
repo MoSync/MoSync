@@ -172,10 +172,10 @@ void SoapRequest::mtxDataRemains(const char* data, int len) {
 	}
 	mResponsePtr = mResponseBuffer + len;
 }
-void SoapRequest::mtxParseError() {
+void SoapRequest::mtxParseError(int offset) {
 	LOG("parseError\n");
 	if(mInBody)
-		mListener->mtxParseError();
+		mListener->mtxParseError(offset);
 	mState = eError;
 }
 void SoapRequest::mtxTagStart(const char* name, int len) {

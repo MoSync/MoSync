@@ -441,12 +441,17 @@ static __inline void
 insque(void *a, void *b)
 {
 	struct quehead *element = (struct quehead *)a,
-		 *head = (struct quehead *)b;
-
-	element->qh_link = head->qh_link;
-	element->qh_rlink = head;
-	head->qh_link = element;
-	element->qh_link->qh_rlink = element;
+		*head = (struct quehead *)b;
+	if(head != NULL) {
+		element->qh_link = head->qh_link;
+		element->qh_rlink = head;
+		head->qh_link = element;
+		if(element->qh_link != NULL)
+			element->qh_link->qh_rlink = element;
+	} else {
+		element->qh_link = NULL;
+		element->qh_rlink = NULL;
+	}
 }
 
 static __inline void
@@ -454,9 +459,11 @@ remque(void *a)
 {
 	struct quehead *element = (struct quehead *)a;
 
-	element->qh_link->qh_rlink = element->qh_rlink;
-	element->qh_rlink->qh_link = element->qh_link;
-	element->qh_rlink = 0;
+	if(element->qh_link != NULL)
+		element->qh_link->qh_rlink = element->qh_rlink;
+	if(element->qh_rlink != NULL)
+		element->qh_rlink->qh_link = element->qh_link;
+	element->qh_rlink = NULL;
 }
 
 #else /* !__GNUC__ */

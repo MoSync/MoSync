@@ -100,7 +100,7 @@ namespace Bluetooth
              *
              * @param s     Pointer to the strcture to fill.
              */
-            void getInfo ( MABtService* d )
+            void getInfo ( MABtServiceNative* d )
             {
                 int i = 0;
                 std::list<MAUUID>::iterator it;

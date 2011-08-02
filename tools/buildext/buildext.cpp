@@ -230,7 +230,7 @@ static void outputConstants(const Interface& inf) {
 	file << "#ifndef MX_" + toupper(inf.name) + "_CONSTS_H\n";
 	file << "#define MX_" + toupper(inf.name) + "_CONSTS_H\n\n";
 
-	streamConstants(file, inf.constSets, MAIN_INTERFACE);
+	streamConstants(file, inf.name, inf.constSets, MAIN_INTERFACE);
 
 	file << "#endif	//MX_" + toupper(inf.name) + "_CONSTS_H\n";
 }
@@ -249,7 +249,7 @@ static void outputExtensions(const vector<Interface>& infs) {
 }
 
 //streams C function declarations.
-void streamHeaderFunctions(ostream& stream, const Interface& inf) {
+void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) {
 	for(size_t i=0; i<inf.functions.size(); i++) {
 		const Function& f(inf.functions[i]);
 

@@ -15,6 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#include "config_platform.h"
 #include "helpers.h"
 #include "syscall_helpers.h"
 #include "core_helpers.h"
@@ -692,10 +693,10 @@ public
 	/// Writes s to dst, unless s.length() >= bufSize.
 	private final int writeStringBuf(String s, Address dst, int bufSize) {
 		MYASSERT(bufSize >= 0);
-		if(bufSize <= s.length())
-			return s.length();
-		INIT_MEMDS;
 		byte[] bytes = s.getBytes();
+		if(bufSize <= bytes.length)
+			return bytes.length;
+		INIT_MEMDS;
 		setMemBytes(dst, bytes);
 		WBYTE_RAW(dst + bytes.length, 0);
 		return bytes.length;
@@ -2052,6 +2053,8 @@ public
 			if(value != null) {
 				value = value.substring(0, 2);
 			}
+		} else if(key.equals("mosync.device")) {
+			value = System.getProperty("microedition.platform");
 		} else {
 			value = System.getProperty(key);
 		}

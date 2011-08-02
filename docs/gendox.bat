@@ -21,8 +21,11 @@ cd ..\libs
 REM call copyHeaders.bat
 ruby workfile.rb
 
+cd ..
+set SRCDIR=%CD%
+
 copy Doxyfile %MOSYNCDIR%\include\
 cd %MOSYNCDIR%\include\
-doxygen
+%SRCDIR%\tools\ReleasePackageBuild\build_package_tools\bin\doxygen
 cd %DOCSDIR%
 
