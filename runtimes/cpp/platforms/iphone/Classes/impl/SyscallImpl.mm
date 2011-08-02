@@ -961,13 +961,16 @@ namespace Base {
 		int currentCamera;
 		BOOL initialized;
 		CameraInfo *cameraInfo;
-	}gCameraSystem={0,0,FALSE,NULL};
+	};
+	
+	CameraSystemInfo gCameraSystem={0,0,FALSE,NULL};
 	
 	void initCameraSystem()
 	{
 		
 		if(gCameraSystem.initialized==FALSE)
 		{
+			NSLog(@"Initializing cameras");
 			CameraInfo *cameraInfo;
 			int numCameras=0;
 			NSArray *devices = [AVCaptureDevice devices];
@@ -1032,7 +1035,7 @@ namespace Base {
 	CameraInfo *getCurrentCameraInfo()
 	{
 		initCameraSystem();
-		if(gCameraSystem.numCameras=0)
+		if(gCameraSystem.numCameras == 0)
 		{
 			return NULL;
 		}
@@ -1049,6 +1052,20 @@ namespace Base {
 			[curCam->captureSession addInput:input];
 		}
 		return curCam;
+	}
+	
+	void StopAllCameraSessions()
+	{
+		if(gCameraSystem.initialized == TRUE)
+		{
+			for (int i=0; i < gCameraSystem.numCameras; i++) 
+			{
+				if(gCameraSystem.cameraInfo[i].captureSession)
+				{
+					[gCameraSystem.cameraInfo[i].captureSession stopRunning];
+				}
+			}
+		}
 	}
 	
 	SYSCALL(int, maCameraStart()) 
@@ -1113,19 +1130,30 @@ namespace Base {
 			[info->previewLayer removeFromSuperlayer];
 			
 		}
-		//I need to add some code here for the case of the user passing the same view to another camera
+		for (int i=0; i<gCameraSystem.numCameras; i++) {
+			if(gCameraSystem.cameraInfo[i].view == newView)
+			{
+				NSLog(@"removing previous layer from view");
+				[gCameraSystem.cameraInfo[i].previewLayer removeFromSuperlayer];
+				gCameraSystem.cameraInfo[i].view = NULL;
+			}
+		}
 		info->view = newView;
 		widget.previewLayer = info->previewLayer;
 		[info->view.layer addSublayer:info->previewLayer];
+		info->previewLayer.frame = info->view.bounds;
+		[info->view.layer setNeedsDisplay];
 		return 1;
 	}
 	
 	SYSCALL(int, maCameraSelect(MAHandle cameraNumber)) 
 	{	
 		initCameraSystem();
-		if (cameraNumber < 0 or cameraNumber >=gCameraSystem.numCameras) {
+		printf("camera no:%d, total cameras:%d\n",cameraNumber,gCameraSystem.numCameras);
+		if (cameraNumber < 0 || cameraNumber >=gCameraSystem.numCameras) {
 			return 0;
 		}
+		NSLog(@"maCameraSelect1");
 		gCameraSystem.currentCamera = cameraNumber;
 		return 1;
 	}
