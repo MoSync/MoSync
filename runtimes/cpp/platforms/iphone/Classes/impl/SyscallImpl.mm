@@ -1121,13 +1121,19 @@ namespace Base {
 	}
 	
 	SYSCALL(int, maCameraSelect(MAHandle cameraNumber)) 
-	{		
+	{	
+		initCameraSystem();
+		if (cameraNumber < 0 or cameraNumber >=gCameraSystem.numCameras) {
+			return 0;
+		}
+		gCameraSystem.currentCamera = cameraNumber;
 		return 1;
 	}
 	
 	SYSCALL(int, maCameraNumber()) 
-	{		
-		return 1;
+	{	
+		initCameraSystem();
+		return gCameraSystem.numCameras;
 	}
 	
 	SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder)) 
