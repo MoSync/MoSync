@@ -28,7 +28,16 @@
 - (id)init;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
-- (void)show;
 @property (retain) AVCaptureVideoPreviewLayer *previewLayer;
 
 @end
+
+@interface UIPreview : UIView{
+	CameraPreviewWidget* mWidget;
+}
+
+- (id)initWithCameraWidget:(CameraPreviewWidget*)widget;
+- (void)setFrame:(CGRect)newFrame;
+
+@end
+

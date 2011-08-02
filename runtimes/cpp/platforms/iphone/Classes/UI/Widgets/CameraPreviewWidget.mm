@@ -30,7 +30,7 @@
 
 - (id)init {
 	
-	view=[[UIView alloc] init];
+	view=[[UIPreview alloc] initWithCameraWidget:self];
 	
 	return [super init];	
 }
@@ -53,14 +53,24 @@
 	return @"";
 }
 
-- (void)show
-{
-	if(previewLayer){
-		previewLayer.frame = view.bounds;
-	}
-	[super show];
-	
-}
-
 
 @end
+
+@implementation UIPreview
+
+- (id)initWithCameraWidget:(CameraPreviewWidget*)widget
+{
+	mWidget=widget;
+	return [super init];
+}
+
+- (void)setFrame:(CGRect)newFrame
+{
+	super.frame=newFrame;
+	if(mWidget.previewLayer){
+		mWidget.previewLayer.frame = super.bounds;
+	}
+}
+
+@end
+
