@@ -3079,7 +3079,7 @@ group WidgetAPI "Widget API" {
 				* it hs been used. Each event allocates a new data object
 				* for the url data.
 				*/
-				int urlData;
+				MAHandle urlData;
 			} webViewHookInfo;
 			
 			/**

@@ -167,7 +167,7 @@
     if(unHookCount)
     {
         skipHook=YES;
-        
+        NSLog(@"Skipping hook");
         if (unHookCount.intValue==1)
         {
             [urlsToNotHook removeObjectForKey:url];
@@ -179,12 +179,12 @@
     }
 	NSRange softHookRange=[url rangeOfString:softHookPattern options:NSRegularExpressionSearch|NSCaseInsensitiveSearch];
     NSRange hardHookRange=[url rangeOfString:hardHookPattern options:NSRegularExpressionSearch|NSCaseInsensitiveSearch];
+
     if(skipHook==NO &&
 		((softHookRange.location==0 && softHookRange.length==[url length]) ||
 		(hardHookRange.location==0 && hardHookRange.length==[url length]))	
 	   )
     {
-		
         MAEvent event;
         event.type = EVENT_TYPE_WIDGET;
         MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -193,12 +193,12 @@
 		bool loadUrl;
 		if(hardHookRange.location != NSNotFound)
 		{
-			eventData->webViewHookInfo.hookType = MAW_CONSTANT_HARD;
+			eventData->hookType = MAW_CONSTANT_HARD;
 			loadUrl = NO;
 		}
 		else
 		{
-			eventData->webViewHookInfo.hookType = MAW_CONSTANT_SOFT;
+			eventData->hookType = MAW_CONSTANT_SOFT;
 			loadUrl = YES;
 		}
 
@@ -210,7 +210,7 @@
         ms->seek(Base::Seek::Start, 0);
         ms->write([url cStringUsingEncoding:NSASCIIStringEncoding], size);
 
-        eventData->webViewHookInfo.urlData = urlHandle;
+        eventData->urlData = urlHandle;
         event.data = eventData;
         
         
