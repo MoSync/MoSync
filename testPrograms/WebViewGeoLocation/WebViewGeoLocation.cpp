@@ -149,11 +149,12 @@ public:
 
 	void handleWidgetEvent(MAWidgetEventData* widgetEvent)
 	{
-		// Handle custom messages from the WebView widgets.
-		if (MAW_EVENT_CUSTOM_MESSAGE == widgetEvent->eventType)
+		// Handle messages from the WebView widget.
+		if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEvent->eventType &&
+			MAW_CONSTANT_HARD == widgetEvent->hookType)
 		{
 			// Get message.
-			WebViewMessage message(widgetEvent->messageDataHandle);
+			WebViewMessage message(widgetEvent->urlData);
 
 			if (message.is("StartTrackingGeoLocation"))
 			{

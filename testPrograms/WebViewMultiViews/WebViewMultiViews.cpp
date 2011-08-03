@@ -223,7 +223,7 @@ public:
 		// Get handle to the widget.
 		MAWidgetHandle widget = widgetEvent->widgetHandle;
 
-		// Handle custom messages from the WebView widgets.
+		// Handle messages from the WebView widgets.
 		if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEvent->eventType &&
 			MAW_CONSTANT_HARD == widgetEvent->hookType)
 		{
