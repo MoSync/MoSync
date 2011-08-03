@@ -30,6 +30,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MemStream.h>
 #include <FileStream.h>
 #include "Syscall.h"
+#include "PimSyscall.h"
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
@@ -193,6 +194,8 @@ namespace Base {
 		
 		MANetworkInit();		
 		
+        MAPimInit();
+        
 		// init some image.h optimizations.
 		initMulTable();
 		initRecipLut();
@@ -964,7 +967,24 @@ namespace Base {
 		maIOCtl_case(maLocationStop);
 		maIOCtl_case(maFrameBufferGetInfo);
 		maIOCtl_case(maFrameBufferInit);
-		maIOCtl_case(maFrameBufferClose);				
+		maIOCtl_case(maFrameBufferClose);	     
+        maIOCtl_syscall_case(maPimListOpen);  
+        maIOCtl_syscall_case(maPimListNext); 
+        maIOCtl_syscall_case(maPimItemCount);
+        maIOCtl_syscall_case(maPimItemGetValue);
+        maIOCtl_syscall_case(maPimListClose);   
+        maIOCtl_syscall_case(maPimItemGetField); 
+        maIOCtl_syscall_case(maPimItemFieldCount);       
+        maIOCtl_syscall_case(maPimItemGetAttributes); 
+        maIOCtl_syscall_case(maPimItemSetLabel);
+        maIOCtl_syscall_case(maPimItemGetLabel);
+        maIOCtl_syscall_case(maPimFieldType);       
+        maIOCtl_syscall_case(maPimItemSetValue);  
+        maIOCtl_syscall_case(maPimItemAddValue);        
+        maIOCtl_syscall_case(maPimItemRemoveValue);
+        maIOCtl_syscall_case(maPimItemClose);
+        maIOCtl_syscall_case(maPimItemCreate);
+        maIOCtl_syscall_case(maPimItemRemove);      
 		maIOCtl_syscall_case(maFileOpen);
 		maIOCtl_syscall_case(maFileWriteFromData);
 		maIOCtl_syscall_case(maFileReadToData);

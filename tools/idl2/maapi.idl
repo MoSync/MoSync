@@ -2787,7 +2787,7 @@ interface MAAPI {
 			PUBLIC_KEY = 112;
 			/// #MA_PIM_TYPE_STRING. Connected with PUBLIC_KEY.
 			PUBLIC_KEY_STRING = 113;
-			/// #MA_PIM_TYPE_DATE.
+			/// #MA_PIM_TYPE_DATE. The time when the item was last changed.
 			REVISION = 114;
 			/// #MA_PIM_TYPE_STRING. Telephone number.
 			TEL = 115;
@@ -2797,41 +2797,89 @@ interface MAAPI {
 			UID = 117;
 			/// #MA_PIM_TYPE_STRING. Uniform Resource Locator associated with the contact.
 			URL = 118;
+			
+			/// #MA_PIM_TYPE_STRING_ARRAY. Supplemental organization/company information.
+			/// Has \link #MA_PIM_CONTACT_ORG_NAME MA_PIM_CONTACT_ORG \endlink indices.
+			ORG_INFO = 200;
+			/// #MA_PIM_TYPE_DATE.
+			ANNIVERSARY = 201;
+			/// #MA_PIM_TYPE_DATE. An event that is not a birthday or anniversary.
+			EVENT = 202;
+			/// #MA_PIM_TYPE_STRING_ARRAY. Instant Messaging protocol & username.
+			/// The first string is one of the MA_PIM_CONTACT_IM constants. The second string is the username.
+			IM = 203;
+			/// #MA_PIM_TYPE_STRING.
+			/// 
+			RELATED_NAME = 204;
 		}
 
-		constset int MA_PIM_CONTACT_ {
-			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Post office box number.
-			ADDR_POBOX = 0;
-			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Extra info.
-			ADDR_EXTRA = 1;
-			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Street name and number.
-			ADDR_STREET = 2;
-			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Locality name. (ex. city)
-			ADDR_LOCALITY = 3;
-			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Region name. (ex. province, state or territory)
-			ADDR_REGION = 4;
-			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Postal code.
-			ADDR_POSTALCODE = 5;
-			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country name.
-			ADDR_COUNTRY = 6;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Family name.
-			NAME_FAMILY = 0;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Given name.
-			NAME_GIVEN = 1;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Alternate/secondary names, if any.
-			NAME_OTHER = 2;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Prefix. (ex. "Dr.")
-			NAME_PREFIX = 3;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
-			NAME_SUFFIX = 4;
-			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
-			CLASS_CONFIDENTIAL = 200;
-			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
-			CLASS_PRIVATE = 201;
-			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
-			CLASS_PUBLIC = 202;
+		/// Indices for #MA_PIM_FIELD_CONTACT_ADDR. 
+		constset int MA_PIM_CONTACT_ADDR_ {
+			/// Post office box number.
+			POBOX = 0;
+			/// Extra info.
+			EXTRA = 1;
+			/// Street name and number.
+			STREET = 2;
+			/// Locality name. (ex. city)
+			LOCALITY = 3;
+			/// Region name. (ex. province, state or territory)
+			REGION = 4;
+			/// Postal code.
+			POSTALCODE = 5;
+			/// Country name.
+			COUNTRY = 6;
+			COUNTRY_CODE = 7;
+			NEIGHBORHOOD = 8;
+		}
+		
+		/// Indices for #MA_PIM_FIELD_CONTACT_NAME. 
+		constset int MA_PIM_CONTACT_NAME_ {
+			/// Family name.
+			FAMILY = 0;
+			/// Given name.
+			GIVEN = 1;
+			/// Alternate/secondary names, if any.
+			OTHER = 2;
+			/// Prefix. (ex. "Dr.")
+			PREFIX = 3;
+			/// Suffix. (ex. "M.D.")
+			SUFFIX = 4;
+			// todo: document
+			PHONETIC_FAMILY = 5;
+			PHONETIC_GIVEN = 6;
+			PHONETIC_OTHER = 7;
 		}
 
+		// todo: document and enumerate.
+		constset int MA_PIM_CONTACT_ORG_ {
+			DEPARTMENT = 0;
+			JOB_DESCRIPTION = 1;
+			SYMBOL = 2;
+			PHONETIC_NAME = 3;
+			OFFICE_LOCATION = 4;
+		}
+
+		/// Values for #MA_PIM_FIELD_CONTACT_CLASS.
+		constset int MA_PIM_CONTACT_CLASS_ {
+			CONFIDENTIAL = 200;
+			PRIVATE = 201;
+			PUBLIC = 202;
+		}
+		
+		// todo: document and enumerate.
+		constset int MA_PIM_CONTACT_IM_ {
+			PROTOCOL_AIM = "AIM";
+			PROTOCOL_MSN = "MSN";
+			PROTOCOL_YAHOO = "Yahoo";
+			PROTOCOL_SKYPE = "Skype";
+			PROTOCOL_QQ = "QQ";
+			PROTOCOL_GOOGLE_TALK = "GoogleTalk";
+			PROTOCOL_ICQ = "ICQ";
+			PROTOCOL_JABBER = "Jabber";
+			PROTOCOL_NETMEETING = "Netmeeting";
+		}
+		
 		constset int MA_PIM_ATTR_ {
 			/// The value describes an assistant.
 			ASST = 1;
@@ -2851,15 +2899,68 @@ interface MAAPI {
 			/// Only one value per field may be marked PREFERRED. Marking a value PREFERRED
 			/// causes any other PREFERRED value in the field to become unmarked.
 			PREFERRED = 128;
+			/// The field's label can be set.
+			CUSTOM = 129;
+			
 			/// The value describes an SMS number?
-			SMS = 256;
+			SMS = 0x100;
 			/// The value describes a work phone number.
-			WORK = 512;
+			WORK = 0x200;
+
+			/// The value describes an iPhone number.
+			IPHONE = 0x400;
+			// todo: document.
+			CALLBACK = 0x800;
+			CAR = 0x1000;
+			ISDN = 0x2000;
+			RADIO = 0x4000;
+			TTY_TDD = 0x8000;
+			MMS = 0x10000;
+
+			BLOG = 0x20000;
+			PROFILE = 0x40000;
+			FTP = 0x80000;
+			
+			MOTHER    = 0x100000;
+			FATHER    = 0x200000;
+			PARENT    = 0x400000;
+			SISTER    = 0x800000;
+			BROTHER   = 0x1000000;
+			CHILD     = 0x2000000;
+			FRIEND    = 0x4000000;
+			SPOUSE    = 0x8000000;
+			PARTNER   = 0x10000000;
+			MANAGER   = 0x20000000;
+			ASSISTANT = 0x40000000;
 		}
 
 		constset int MA_PIM_ERR_ {
+			/// No error. The operation completed successfully.
+			NONE = 0;
+			/// This function is unavailable on the current platform.
+			UNAVAILABLE = -1;
 			/// The native database's data type did not match the MoSync API.
 			NATIVE_TYPE_MISMATCH = -2;
+			/// The value does not have a custom label.
+			NO_LABEL = -3;
+			/// The values's attribute is not set to custom.
+			CUSTOM_ATTRIBUTE = -4;
+			/// The given index is not valid.
+			/// This value is returned by maPimItemGetField(), maPimItemSetValue().
+			INVALID_INDEX = -5;
+			///
+			LABEL_NOT_SET = -6;
+			/// The field has no values / not supported on the current platform.
+			/// This value is returned by maPimItemSetLabel(), maPimItemGetAttributes.
+			UNAVAILABLE_FIELD = -7;
+			/// The specified pim list is not available on the current platform.
+			UNAVAILABLE_LIST = -8;
+			/// The specified list is not opend. Call maPimListOpen() first.
+			LIST_NOT_OPENED = -9;
+			/// The operation is not allowed by the Address Book database.
+			OPERATION_NOT_PERMITTED = -10;
+			/// Invalid handle.
+			INVALID_HANDLE = -11;
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.
@@ -2903,12 +3004,42 @@ interface MAAPI {
 
 		/** Returns the bitmask of attributes for the specified value in a field and item.
 		* Panics on field+index combinations that don't exist in this item.
+		* On iPhone platform in case of error one of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink 
+		* constants is returned. 
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
+		* \note For iPhone platform this syscall returns only one attribute.
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
+		/** Sets a custom label for a value in a field and item.
+		* The value's attribute must be set to MA_PIM_ATTR_CUSTOM.
+		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
+		* \a args.bufSize must be valid.
+		* \param args Common arguments.
+		* \param index An index into the field's value array.
+		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
+		* \note This function is not available on JavaME or Blackberry.
+		*/
+		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
+		
+		/** Retrieves the custom label for a value in a field and item,
+		* if the value has a custom label.
+		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
+		* \a args.bufSize must be valid.
+		* \param args Common arguments.
+		* \param index An index into the field's value array.
+		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+		* \returns If the value does not have a custom label, #MA_PIM_ERR_NO_LABEL.
+		* If it does, the number of bytes occupied by the value.
+		* If this number is greater than bufSize, the value is not written,
+		* and you'll have to allocate a bigger buffer and try again.
+		* \note This function is not available on JavaME or Blackberry.
+		*/
+		int maPimItemGetLabel(in MA_PIM_ARGS args, in int index);
+		
 		/** Returns one of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants,
 		* or \< 0 if the field does not exist in the list.
 		* \param list Opened by maPimListOpen().
@@ -2947,7 +3078,7 @@ interface MAAPI {
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
 		* \param attributes The value's new attributes.
-		* \returns 0.
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -2957,7 +3088,8 @@ interface MAAPI {
 		/** Adds a new value to a field and item.
 		* \param args Common arguments.
 		* \param attributes The new value's attributes.
-		* \returns 0.
+		* \returns The index of the new added value, or one of
+		* the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -2968,7 +3100,7 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns 0.
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note The changes is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -2978,7 +3110,7 @@ interface MAAPI {
 		/** Closes the handle to a PimItem, releasing resources used by the system.
 		* Writes any changes to disk.
 		* Panics on invalid handles.
-		* Returns 0.
+		* Returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note An item can also be closed by maPimItemRemove().
 		* \warning Does not write changes to disk if the item's List is closed.
 		* Make sure to keep the List open while editing items.
