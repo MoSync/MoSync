@@ -113,6 +113,34 @@ int Syscall::maPimListClose(MAHandle list) {
 	return 0;
 }
 
+MAHandle Syscall::maPimItemCreate(MAHandle list) {
+	PimList* pl = mPimLists.find(list);
+	MYASSERT(pl != NULL, ERR_INVALID_PIM_HANDLE);
+	PimItem* pi = pl->createItem();
+	DEBUG_ASSERT(pi != NULL);
+	mPimItems.insert(mPimItemNextHandle, pi);
+	return mPimItemNextHandle++;
+}
+
+int Syscall::maPimItemRemove(MAHandle list, MAHandle item) {
+	PimList* pl = mPimLists.find(list);
+	MYASSERT(pl != NULL, ERR_INVALID_PIM_HANDLE);
+	PimItem* pi = pimGetItem(item);
+	int res = pl->removeItem(pi);
+	if(res < 0)
+		return res;
+	mPimItems.erase(item);
+	return 0;
+}
+
+int Syscall::maPimItemClose(MAHandle item) {
+	PimItem* pi = mPimItems.find(item);
+	MYASSERT(pi != NULL, ERR_INVALID_PIM_HANDLE);
+	pi->close();
+	mPimItems.erase(item);
+	return 0;
+}
+
 int Syscall::maPimItemCount(MAHandle item) {
 	PimItem* pi = pimGetItem(item);
 	return pi->count();
@@ -120,7 +148,9 @@ int Syscall::maPimItemCount(MAHandle item) {
 int Syscall::maPimItemGetField(MAHandle item, int index) {
 	PimItem* pi = pimGetItem(item);
 	MYASSERT(index < pi->count(), ERR_INVALID_PIM_FIELD_INDEX);
-	return pi->fieldId(index);
+	int i = pi->fieldId(index);
+	//LOGP("fieldId(%i): %i\n", index, i);
+	return i;
 }
 int Syscall::maPimItemFieldCount(MAHandle item, int field) {
 	PimItem* pi = pimGetItem(item);
@@ -138,23 +168,29 @@ int Syscall::maPimFieldType(MAHandle list, int field) {
 	return pl->type(field);
 }
 
-int Syscall::maPimItemGetValue(MA_PIM_ARGS* args, int index) {
+int Syscall::maPimItemGetValue(const MA_PIM_ARGS* args, int index) {
 	PimItem* pi = pimGetItem(args->item);
 	return pi->getValue(args->field, index,
 		GetValidatedMemRange((int)(size_t)args->buf, args->bufSize), args->bufSize);
 }
-int Syscall::maPimItemClose(MAHandle item) {
-	mPimItems.erase(item);
-	return 0;
+
+int Syscall::maPimItemSetValue(const MA_PIM_ARGS* args, int index, int attributes) {
+	PimItem* pi = pimGetItem(args->item);
+	return pi->setValue(args->field, index,
+		GetValidatedMemRange((int)(size_t)args->buf, args->bufSize), args->bufSize,
+		attributes);
 }
 
-#if 0
-int Syscall::maPimItemSetValue(MA_PIM_ARGS* args, int index, int attributes);
-int Syscall::maPimItemAddValue(MA_PIM_ARGS* args, int attributes);
-int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index);
+int Syscall::maPimItemAddValue(const MA_PIM_ARGS* args, int attributes) {
+	PimItem* pi = pimGetItem(args->item);
+	return pi->addValue(args->field,
+		GetValidatedMemRange((int)(size_t)args->buf, args->bufSize), args->bufSize,
+		attributes);
+}
 
-MAHandle Syscall::maPimItemCreate(MAHandle list);
-int Syscall::maPimItemRemove(MAHandle list, MAHandle item);
-#endif
+int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index) {
+	PimItem* pi = pimGetItem(item);
+	return pi->removeValue(field, index);
+}
 
 #endif	//EMULATOR

@@ -27,9 +27,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define ADD_REMOVE_ITEMS 1
 
 #if 1
+// log to screen and disk
 #define LOG printf
 #define CONSOLE_LOGGING 1
 #else
+// log to disk only
 #define LOG(...) lprintf(__VA_ARGS__)
 #define CONSOLE_LOGGING 0
 
@@ -145,7 +147,7 @@ static void dumpItem(MAHandle list, MAHandle item) {
 				LOG("%i", *(int*)buf);
 				break;
 			case MA_PIM_TYPE_DATE:
-				LOG("%i (date unsupported)", *(int*)buf);
+				LOG("%i (date printing unsupported)", *(int*)buf);
 				break;
 			case MA_PIM_TYPE_STRING_ARRAY:
 				{
@@ -201,8 +203,48 @@ int writeStringArray(char* buf, const wchar_t* srca[NUM]) {
 static const wchar_t sDummyNote[] = L"tp_pim_dummy";
 static const wchar_t sDummyTelA[] = L"0123456789";
 static const wchar_t sDummyTelB[] = L"0987654321";
-static const wchar_t* sDummyName[] = { L"Smith", L"Agent", L"", L"", L"" };
+static const wchar_t* sDummyName[] = { L"Family", L"Given", L"Other", L"Prefix", L"Suffix" };
+//static const wchar_t* sDummyName2[] = { L"Family", L"Given", L"", L"", L"Sf" };
+static const wchar_t* sDummyAddr[] = { L"Pobox", L"Extra", L"Street", L"Locality", L"Region", L"PostalCode", L"Country" };
+//static const wchar_t* sDummyAddr2[] = { L"", L"", L"", L"", L"", L"", L"Country" };
 static const wchar_t sDummyEmail[] = L"foo@example.com";
+static const wchar_t sDummyNick[] = L"Nickname";
+static const wchar_t sDummyOrg[] = L"Organization";
+static const wchar_t sDummyTitle[] = L"Title";
+static const wchar_t sDummyUrl[] = L"http://example.com/";
+static const wchar_t sDummyFax[] = L"fax";
+static const wchar_t sDummyHome[] = L"home";
+static const wchar_t sDummyMobile[] = L"mobile";
+static const wchar_t sDummyPager[] = L"pager";
+static const wchar_t sDummySms[] = L"sms";
+static const wchar_t sDummyWork[] = L"work";
+static const wchar_t sDummyPreferred[] = L"preferred";
+
+struct SimpleField {
+	int id;
+	const wchar_t* value;
+	int bufSize;
+	int attr;
+};
+
+#define SF(id, val) { id, val, sizeof(val), 0 }
+#define TEL(val, attr) { MA_PIM_FIELD_CONTACT_TEL, val, sizeof(val), attr }
+static const SimpleField sSimpleFields[] = {
+	SF(MA_PIM_FIELD_CONTACT_NOTE, sDummyNote),
+	SF(MA_PIM_FIELD_CONTACT_EMAIL, sDummyEmail),
+	SF(MA_PIM_FIELD_CONTACT_NICKNAME, sDummyNick),
+	SF(MA_PIM_FIELD_CONTACT_ORG, sDummyOrg),
+	SF(MA_PIM_FIELD_CONTACT_TITLE, sDummyTitle),
+	SF(MA_PIM_FIELD_CONTACT_URL, sDummyUrl),
+	TEL(sDummyFax, MA_PIM_ATTR_FAX),
+	TEL(sDummyHome, MA_PIM_ATTR_HOME),
+	TEL(sDummyMobile, MA_PIM_ATTR_MOBILE),
+	TEL(sDummyPager, MA_PIM_ATTR_PAGER),
+	TEL(sDummySms, MA_PIM_ATTR_SMS),
+	TEL(sDummyWork, MA_PIM_ATTR_WORK),
+	TEL(sDummyPreferred, MA_PIM_ATTR_PREFERRED),
+};
+static const int snSimpleFields = sizeof(sSimpleFields) / sizeof(SimpleField);
 
 static void addContacts() {
 	char buf[512];
@@ -215,19 +257,28 @@ static void addContacts() {
 	TEST(args.item = maPimItemCreate(list));
 	
 	// add values
-	args.field = MA_PIM_FIELD_CONTACT_NOTE;
-	args.buf = (void*)sDummyNote;
-	args.bufSize = sizeof(sDummyNote);
+	for(int i=0; i<snSimpleFields; i++) {
+		const SimpleField& sf(sSimpleFields[i]);
+		args.field = sf.id;
+		args.buf = (void*)sf.value;
+		args.bufSize = sf.bufSize;
+		TEST(maPimItemAddValue(&args, sf.attr));
+	}
+
+	args.field = MA_PIM_FIELD_CONTACT_NAME;
+	args.buf = buf;
+	args.bufSize = writeStringArray<5>(buf, sDummyName);
 	TEST(maPimItemAddValue(&args, 0));
 	
+#if 1
 	args.field = MA_PIM_FIELD_CONTACT_TEL;
 	args.buf = (void*)sDummyTelA;
 	args.bufSize = sizeof(sDummyTelA);
 	TEST(maPimItemAddValue(&args, MA_PIM_ATTR_HOME));
-	
-	args.field = MA_PIM_FIELD_CONTACT_NAME;
+
+	args.field = MA_PIM_FIELD_CONTACT_ADDR;
 	args.buf = buf;
-	args.bufSize = writeStringArray<5>(buf, sDummyName);
+	args.bufSize = writeStringArray<7>(buf, sDummyAddr);
 	TEST(maPimItemAddValue(&args, 0));
 	
 	// try SetValue
@@ -243,12 +294,14 @@ static void addContacts() {
 	TEST(maPimItemAddValue(&args, 0));
 	
 	TEST(maPimItemRemoveValue(args.item, args.field, 0));
-	
+#endif
+
 	// check maPimItemCount()
 	int count = maPimItemCount(args.item);
+	int supposedCount = (3 + snSimpleFields);
 	printf("Item count: %i\n", count);
-	if(count != 3) {
-		printf("BAD ITEM COUNT!\n");
+	if(count != supposedCount) {
+		printf("BAD ITEM COUNT! (%i)\n", supposedCount);
 	}
 	
 	// close it up real good at the top

@@ -2858,8 +2858,16 @@ interface MAAPI {
 		}
 
 		constset int MA_PIM_ERR_ {
-			/// The native database's data type did not match the MoSync API.
+			/// The native database's data type for the given field did not match the MoSync API.
 			NATIVE_TYPE_MISMATCH = -2;
+			/// The field type is not supported.
+			FIELD_UNSUPPORTED = -3;
+			/// The field is read-only.
+			READ_ONLY = -4;
+			/// The field/attribute combination is not supported.
+			COMBO_UNSUPPORTED = -5;
+			/// More values in this field is not supported.
+			FIELD_COUNT_MAX = -6;
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.
@@ -2947,17 +2955,20 @@ interface MAAPI {
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
 		* \param attributes The value's new attributes.
-		* \returns 0.
+		* \returns 0 on success and \< 0 on failure.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
+		* \note When setting a value with #MA_PIM_TYPE_STRING_ARRAY, at least one
+		* string must be present and have a length greater than zero.
+		* Any surplus strings are ignored.
 		*/
 		int maPimItemSetValue(in MA_PIM_ARGS args, in int index, in int attributes);
 
 		/** Adds a new value to a field and item.
 		* \param args Common arguments.
 		* \param attributes The new value's attributes.
-		* \returns 0.
+		* \returns 0 on success and \< 0 on failure.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -2968,7 +2979,8 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns 0.
+		* \returns 0 on success and \< 0 on failure.
+		* \note If this function fails, the value is unchanged.
 		* \note The changes is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -2978,7 +2990,7 @@ interface MAAPI {
 		/** Closes the handle to a PimItem, releasing resources used by the system.
 		* Writes any changes to disk.
 		* Panics on invalid handles.
-		* Returns 0.
+		* \returns 0.
 		* \note An item can also be closed by maPimItemRemove().
 		* \warning Does not write changes to disk if the item's List is closed.
 		* Make sure to keep the List open while editing items.
@@ -2992,8 +3004,9 @@ interface MAAPI {
 		MAHandle maPimItemCreate(in MAHandle list);
 
 		/** Removes an item from a list. This also has the effect of closing the item.
-		* \returns 0.
+		* \returns 0 on success and \< 0 on failure.
 		* \see maPimItemClose()
+		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM

@@ -36,9 +36,9 @@ int maPimItemGetAttributes(MAHandle item, int field, int index);
 
 int maPimFieldType(MAHandle list, int field);
 
-int maPimItemGetValue(MA_PIM_ARGS* args, int index);
-int maPimItemSetValue(MA_PIM_ARGS* args, int index, int attributes);
-int maPimItemAddValue(MA_PIM_ARGS* args, int attributes);
+int maPimItemGetValue(const MA_PIM_ARGS* args, int index);
+int maPimItemSetValue(const MA_PIM_ARGS* args, int index, int attributes);
+int maPimItemAddValue(const MA_PIM_ARGS* args, int attributes);
 int maPimItemRemoveValue(MAHandle item, int field, int index);
 int maPimItemClose(MAHandle item);
 

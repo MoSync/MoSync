@@ -93,6 +93,7 @@ void HashMapBase::close() {
 	free(m.base);
 	m.base = NULL;
 	//DebugMarkEnd();
+	LOG_HASH("HashMapBase::close() complete.\n\n");
 }
 
 void HashMapBase::insert(int key, void* value, bool in_rehash) {
@@ -189,6 +190,7 @@ void HashMapBase::erase(int key) {
 	BasePair* pair(findIndex(key, m.stat.linearEraseSteps));
 	DEBUG_ASSERT(pair);
 	dispose(*pair);
+	LOG_HASH("Erase-dispose complete.\n");
 	pair->value = NULL;
 	m.numElem--;
 }
@@ -258,6 +260,7 @@ const HashMapBase::BasePair& HashMapBase::TIteratorC::next() {
 //******************************************************************************
 
 void StringMap::dispose(BasePair& pair) {
+	LOG_HASH("StringMap::dispose(0x%x)\n", pair.value);
 	free(pair.value);
 }
 
