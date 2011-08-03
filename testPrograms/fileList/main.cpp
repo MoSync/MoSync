@@ -57,8 +57,7 @@ static bool dumpFileList(const char* path) {
 		checkEvents();
 		MAUtil::String p2(path);
 		p2 += buffer;
-		MAUtil::String p3 = p2 + "\n";
-		LOG(p3);
+		LOG(p2);
 		if(p2[p2.size()-1] == '/')
 			dumpFileList(p2.c_str());
 		empty = false;
@@ -68,6 +67,7 @@ static bool dumpFileList(const char* path) {
 	return !empty;
 }
 
+extern "C" int MAMain() GCCATTRIB(noreturn);
 extern "C" int MAMain() {
 	InitConsole();
 	gConsoleLogging = 1;
