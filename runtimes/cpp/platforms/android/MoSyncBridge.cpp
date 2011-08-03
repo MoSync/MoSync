@@ -338,9 +338,6 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 *
 		 * Optional:
 		 *
-		 * MAW_EVENT_CUSTOM_MESSAGE
-		 * intArray[3] - The handle of the message data.
-		 *
 		 * MAW_EVENT_CLICKED
 		 * intArray[3] - Can be used to determine a checkbox that was clicked.
 		 *
@@ -353,6 +350,13 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * MAW_EVENT_STACK_SCREEN_POPPED
 		 * intArray[3] - Handle to the screen that was popped.
 		 * intArray[4] - Handle to the screen that we popped to.
+		 *
+		 * MAW_EVENT_WEB_VIEW_CONTENT_LOADING
+		 * intArray[3] - Page loading status.
+		 *
+		 * MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		 * intArray[3] - Hook type.
+		 * intArray[4] - Handle to url data.
 		 */
 
 		// Allocate the widget event data structure.
@@ -376,14 +380,19 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		{
 			widgetEvent->tabIndex = intArray[3];
 		}
-		else if (widgetEventType == MAW_EVENT_CUSTOM_MESSAGE)
-		{
-			widgetEvent->messageDataHandle = intArray[3];
-		}
 		else if (widgetEventType == MAW_EVENT_STACK_SCREEN_POPPED)
 		{
 			widgetEvent->fromScreen = intArray[3];
 			widgetEvent->toScreen = intArray[4];
+		}
+		else if (widgetEventType == MAW_EVENT_WEB_VIEW_CONTENT_LOADING)
+		{
+			widgetEvent->status = intArray[3];
+		}
+		else if (widgetEventType == MAW_EVENT_WEB_VIEW_HOOK_INVOKED)
+		{
+			widgetEvent->hookType = intArray[3];
+			widgetEvent->urlData = intArray[4];
 		}
 
 		event.data = (int)widgetEvent;

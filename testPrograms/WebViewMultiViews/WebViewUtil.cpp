@@ -236,7 +236,7 @@ void WebViewMessage::getMessagesFor(MAWidgetHandle webView)
 {
 	maWidgetSetProperty(
 		webView,
-		MAW_WEB_VIEW_URL_HOOK_PATTERN,
+		MAW_WEB_VIEW_HARD_HOOK_PATTERN,
 		"mosync://.*");
 }
 

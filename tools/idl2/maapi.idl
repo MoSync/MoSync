@@ -4355,8 +4355,15 @@ group WidgetAPI "Widget API" {
 		* reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
-		* syntax. Currently, only the ".*" matching expression is supported
-		* (this matches any substring).
+		* syntax, according to the ICU regular expression standard, using 
+		* complete match. For example, the ".*" matching expression is used 
+		* to match any url string. To match all HTTP requests, use the 
+		* pattern "http://.*". To match all requests for a specific domain, 
+		* use a pattern like ".*google.com.*". For further infomation, see:
+		* http://userguide.icu-project.org/strings/regexp
+		* When typing a C-string with a pattern that contains a matching 
+		* expression with a backslash, make sure to escape the backslash,
+		* for example "\B" should be "\\B".
 		*
 		* By setting the pattern to an empty string, the soft hook mechanism
 		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
@@ -4408,15 +4415,27 @@ group WidgetAPI "Widget API" {
 		* reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
-		* syntax. Currently, only the ".*" matching expression is supported
-		* (this matches any substring).
+		* syntax, according to the ICU regular expression standard, using 
+		* complete match. For example, the ".*" matching expression is used 
+		* to match any url string. To match all HTTP requests, use the 
+		* pattern "http://.*". To match all requests for a specific domain, 
+		* use a pattern like ".*google.com.*". For further infomation, see:
+		* http://userguide.icu-project.org/strings/regexp
+		* When typing a C-string with a pattern that contains a matching 
+		* expression with a backslash, make sure to escape the backslash,
+		* for example "\B" should be "\\B".
 		*
 		* By setting the pattern to an empty string, the soft hook mechanism
 		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
 		*
 		* Both "soft" hooks and "hard" hooks can be enabled simultaneously,
 		* but only one hook pattern can be used for each type of hook. When
-		* setting a new hook pattern, the old hook is replaced.
+		* setting a new hook pattern, the old hook is replaced. 
+		*
+		* The "hard" hook property takes precedence over the "soft" hook
+		* property. When both properties are set, 
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is sent once, for the 
+		* "hard" hook type.
 		*
 		* Note that urls opened using maWidgetSetProperty with the property 
 		* MAW_WEB_VIEW_URL are NOT hooked. This way of loading a page is 

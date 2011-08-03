@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.MotionEvent;
-import android.view.View;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -126,34 +125,41 @@ public class WebViewFactory implements AbstractViewFactory
 		 */
 		public boolean shouldOverrideUrlLoading(WebView view, String url)
 		{
-			// Should we hook this url and not load the page?
-			if (mWebWidget.wantsToHookUrl(url))
+			// Should we soft hook this url?
+			int hookType = mWebWidget.checkHookType(url);
+			if (IX_WIDGET.MAW_CONSTANT_SOFT == hookType || 
+				IX_WIDGET.MAW_CONSTANT_HARD == hookType)
 			{
 				Log.i("@@@ MoSync", "Url is hooked: " + url);
 				
 				// Store the message in a data object.
 				String messageString = url;
-				int messageDataHandle = 
-					MoSyncThread.getInstance().createDataObject(
-						messageString.getBytes());
+				int urlData = MoSyncThread.getInstance().createDataObject(
+					messageString.getBytes());
 				
-				// Post the MAW_EVENT_WEB_VIEW_URL_CHANGED message.
+				// Post message.
 				EventQueue.getDefault().postWidgetEvent(
-					IX_WIDGET.MAW_EVENT_CUSTOM_MESSAGE, 
+					IX_WIDGET.MAW_EVENT_WEB_VIEW_HOOK_INVOKED, 
 					mWebWidget.getHandle(),
-					messageDataHandle,
-					0);
+					hookType,
+					urlData);
 				
-				// Abort further processing of this url by returning true.
-				return true;
+				if (IX_WIDGET.MAW_CONSTANT_HARD == hookType)
+				{
+					// Abort further processing of this url by returning true.
+					return true;
+				}
+				else
+				{
+					return false;
+				}
 			}
 			else
 			{
 				Log.i("@@@ MoSync", "Processing standard url: " + url);
 
 				// TODO: Remove the following code for handling
-				// MAW_EVENT_WEB_VIEW_URL_CHANGED. This should be
-				// deprecated.
+				// the deprecated MAW_EVENT_WEB_VIEW_URL_CHANGED.
 				
 				// Set the "newurl" property of the web view widget.
 				// Note that this will overwrite the previous url even
