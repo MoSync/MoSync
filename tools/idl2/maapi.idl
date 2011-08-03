@@ -3050,9 +3050,37 @@ group WidgetAPI "Widget API" {
 			int tabIndex;
 
 			/**
-			* @brief The data handle of the #MAW_EVENT_CUSTOM_MESSAGE event.
+			* @brief Used by event #MAW_EVENT_WEB_VIEW_CONTENT_LOADING. 
+			* One of:
+			*  #MAW_CONSTANT_STARTED
+			*  #MAW_CONSTANT_DONE
+			*  #MAW_CONSTANT_STOPPED
+			*  #MAW_CONSTANT_FAILED
 			*/
-			int messageDataHandle;
+			int status;
+			
+			/**
+			* @brief Parameters for the #MAW_EVENT_WEB_VIEW_HOOK_INVOKED event.
+			*/
+			struct {
+				/**
+				* @brief The type of hook that has been invoked. 
+				* One of:
+				*  #MAW_CONSTANT_SOFT
+				*  #MAW_CONSTANT_HARD
+				*/
+				int hookType;
+				
+				/**
+				* @brief The handle to url data. This is string data, 
+				* there is NO null terminating character. The encoding 
+				* of the data is determined by the application. 
+				* The data MUST be deallocated with maDestroyObject after
+				* it hs been used. Each event allocates a new data object
+				* for the url data.
+				*/
+				MAHandle urlData;
+			} webViewHookInfo;
 			
 			/**
 			* @brief TODO: Document when this structure is used.
@@ -3088,10 +3116,9 @@ group WidgetAPI "Widget API" {
 		POINTER_RELEASED = 3;
 
 		/** 
-		* @brief A WebView widget has finished loading data. 
+		* @brief This event is not used and has been deprecated. 
 		*
-		* This event is intended to be used also for other widgets
-		* that load data.
+		* @deprecated Use #MAW_EVENT_WEB_VIEW_CONTENT_LOADING.
 		*/
 		CONTENT_LOADED = 4;
 
@@ -3117,7 +3144,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief Sent when the URL of a web view changes
-		 * @deprecated Use property MAW_EVENT_CUSTOM_MESSAGE to
+		 * @deprecated Use event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		 */
 		WEB_VIEW_URL_CHANGED = 9;
 
@@ -3127,23 +3154,40 @@ group WidgetAPI "Widget API" {
 		STACK_SCREEN_POPPED = 10;
 		
 		/** 
-		* @brief A widget has sent a custom message.
+		* @brief A WebView widget reports status of loading
+		* page content. Event parameter status is set to one
+		* of the following values:
+		*   #MAW_CONSTANT_STARTED
+		*   #MAW_CONSTANT_DONE
+		*   #MAW_CONSTANT_STOPPED
+		*   #MAW_CONSTANT_FAILED
+		*/
+		WEB_VIEW_CONTENT_LOADING = 11;
+		
+		/** 
+		* @brief A web view hook has captured a url.
 		*
-		* The field MAWidgetEventData.messageDataHandle contains
-		* a handle to the message data.
+		* The event parameter hookType is set to
+		* the type of hook, one of:
+		*   #MAW_CONSTANT_SOFT
+		*   #MAW_CONSTANT_HARD
 		*
-		* Use syscall maGetDataSize to get the size of the data 
+		* Event parameter urlData is a handle to the url that 
+		* has been captured.
+		*
+		* Use syscall maGetDataSize to get the size of the url data 
 		* and maReadData to access the data. 
 		*
-		* Note that when you get this message you have ownership 
-		* of the data and you have the responsibility to deallocate
-		* it using maDestroyObject.
+		* NOTE: When you get this message you have ownership 
+		* of the url data handle and you have the responsibility to 
+		* deallocate it using maDestroyObject.
 		*
-		* This event is curently used by the WebView widget, but is
-		* intended to be used also for other widgets that need to
-		* send potentially large custom messages.
+		* To get this event, you need to register a hook pattern, using
+		* maWidgetSetProperty with the properties 
+		* #MAW_WEB_VIEW_SOFT_HOOK_PATTERN and/or 
+		* #MAW_WEB_VIEW_HARD_HOOK_PATTERN.
 		*/
-		CUSTOM_MESSAGE = 11;
+		WEB_VIEW_HOOK_INVOKED = 12;
 	}
 	
 	} // end of WidgetEventTypes
@@ -3169,6 +3213,42 @@ group WidgetAPI "Widget API" {
 		* @brief If set to the width or height of a widget it will be as big as its content in that dimension.
 		*/
 		WRAP_CONTENT = -2;
+		
+		/**
+		* @brief Loading a page has started. Used in 
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		STARTED = 1;
+		
+		/**
+		* @brief Loading a page is done. Used in 
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		DONE = 2;
+		
+		/**
+		* @brief Loading a page has stopped (aborted). Used in 
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		STOPPED = 3;
+		
+		/**
+		* @brief Loading a page has failed (error). Used in 
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		FAILED = -1;
+		
+		/**
+		* @brief The hook type is a soft hook. Used in 
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		*/
+		SOFT = 5;
+		
+		/**
+		* @brief The hook type is a hard hook. Used in 
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		*/
+		HARD = 6;
 	}
 	}
 	
@@ -4225,14 +4305,25 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Set or get the currently displayed url in the web view.
 		*
+		* You can also use this property to evaluate JavaScript in the WebView,
+		* by using a url that starts with "javascript:" followed by the
+		* JavaScript code.
+		*
 		* @validvalue Any valid URL.
 		*
 		* @setandget
 		*
 		* @par Example
-		* \code
+		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL, "http://www.mosync.com/");
-		* \endcode
+		* @endcode
+		*
+		* @code
+		*	maWidgetSetProperty(
+		*		webViewHandle, 
+		*		MAW_WEB_VIEW_URL, 
+		*		"javascript:document.body.innerHTML= '<p>Hello World</p>'");
+		* @endcode
 		*/		
 		URL = "url";
 
@@ -4244,49 +4335,118 @@ group WidgetAPI "Widget API" {
 		* @setonly
 		*
 		* @par Example
-		* \code
+		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HTML, "<h1>Hello World</h1>");
-		* \endcode
+		* @endcode
 		*/		
 		HTML = "html";
 		
 		/**
-		* @brief Set the pattern used to "hook" urls. When this pattern 
-		* matches a url that is being requested to load in the WebView, 
-		* a MAW_EVENT_CUSTOM_MESSAGE is sent. Note that urls opened
-		* using MAW_WEB_VIEW_URL are NOT hooked, the are excluded from
-		* this hook mechanism.
+		* @brief Set the pattern used to "soft hook" urls, to get notified
+		* when pages are being loaded.
+		* 
+		* When this pattern matches a url that is being requested 
+		* to load in the WebView, event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED 
+		* is sent, and the page loads NORMALLY.
 		*
-		* @validvalue "true" to enable, "false" to disable.
+		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* you MUST deallocate the urlData handle of the event by calling
+		* maDestroyObject on the handle. Destory the handle when you are done
+		* reading the url data, to avoid that memory will get used up.
+		*
+		* The pattern is a url pattern specified using regular expression
+		* syntax. Currently, only the ".*" matching expression is supported
+		* (this matches any substring).
+		*
+		* By setting the pattern to an empty string, the soft hook mechanism
+		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
+		*
+		* Both "soft" hooks and "hard" hooks can be enabled simultaneously,
+		* but only one hook pattern can be used for each type of hook. When
+		* setting a new hook pattern, the old hook is replaced.
+		*
+		* Note that urls opened using maWidgetSetProperty with the property 
+		* MAW_WEB_VIEW_URL are NOT hooked. This way of loading a page is 
+		* excluded from the hook mechanism to prevent "loops" when loading 
+		* pages.
+		*
+		* @validvalue A string with a url pattern.
 		*
 		* @setonly
 		*
 		* @par Example
-		* \code
+		* @code
 		*   // Hook all urls.
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL_HOOK_PATTERN, ".*");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, ".*");
 		*
 		*   // Hook no urls.
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL_HOOK_PATTERN, "");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, "");
 		*
 		*   // Hook urls that start with "mosync:".
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL_HOOK_PATTERN, "mosync://.*");
-		* \endcode
-		*/		
-		URL_HOOK_PATTERN = "urlHookPattern";
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, "mosync://.*");
+		* @endcode
+		*/
+		SOFT_HOOK_PATTERN = "softHookPattern";
+
+		/**
+		* @brief Set the pattern used to "hard hook" urls, to get notified
+		* and prevent loading of pages.
+		* 
+		* Hard hooks are useful for communicating events from a WebView,
+		* for example by setting document.location to a url string in
+		* JavaScript. Example: document.location = 'mosync://ExitApp'
+		* The application can then examine the url data and take action
+		* depending on the url content.
+		* 
+		* When this pattern matches a url that is being requested 
+		* to load in the WebView, event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED 
+		* is sent, and page loading is ABORTED.
+		*
+		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* you MUST deallocate the urlData handle of the event by calling
+		* maDestroyObject on the handle. Destory the handle when you are done
+		* reading the url data, to avoid that memory will get used up.
+		*
+		* The pattern is a url pattern specified using regular expression
+		* syntax. Currently, only the ".*" matching expression is supported
+		* (this matches any substring).
+		*
+		* By setting the pattern to an empty string, the soft hook mechanism
+		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
+		*
+		* Both "soft" hooks and "hard" hooks can be enabled simultaneously,
+		* but only one hook pattern can be used for each type of hook. When
+		* setting a new hook pattern, the old hook is replaced.
+		*
+		* Note that urls opened using maWidgetSetProperty with the property 
+		* MAW_WEB_VIEW_URL are NOT hooked. This way of loading a page is 
+		* excluded from the hook mechanism to prevent "loops" when loading 
+		* pages.
+		*
+		* @validvalue A string with a url pattern.
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*   // Hook urls that start with "mosync:".
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HARD_HOOK_PATTERN, "mosync://.*");
+		* @endcode
+		*/
+		HARD_HOOK_PATTERN = "hardHookPattern";
 		
 		/**
 		* @brief Property to get a new url whenever the webview changes the url. 
-		* See \ref #MAW_EVENT_WEB_VIEW_URL_CHANGED.
+		* See #MAW_EVENT_WEB_VIEW_URL_CHANGED.
 		*
-		* @deprecated Use property event \ref #MAW_EVENT_CUSTOM_MESSAGE
+		* @deprecated Use event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		* 
 		* @validvalue Any valid URL.
 		*
 		* @getonly
 		*
 		* @par Example
-		* \code
+		* @code
 		* 	char urlBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(
 		*     webViewHandle, 
@@ -4297,7 +4457,7 @@ group WidgetAPI "Widget API" {
 		* 	{
 		* 	    // Do something with URL.
 		* 	}
-		* \endcode
+		* @endcode
 		*/		
 		NEW_URL = "newurl";
 		
@@ -4309,9 +4469,9 @@ group WidgetAPI "Widget API" {
 		* @setonly
 		*
 		* @par Example
-		* \code
+		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_ENABLE_ZOOM, "true");
-		* \endcode
+		* @endcode
 		*/		
 		MAW_WEB_VIEW_ENABLE_ZOOM = "enableZoom";
 	}
@@ -4319,7 +4479,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetWebViewProperties
 
 	} // end of WidgetProperties	
-		
+	
 	typedef int MAWidgetHandle;
 
 	/**
