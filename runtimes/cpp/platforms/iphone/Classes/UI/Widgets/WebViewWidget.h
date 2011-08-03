@@ -20,7 +20,8 @@
 
 @interface WebViewWidget : IWidget <UIWebViewDelegate> {
 	NSString* newurl;
-    NSString* hookPattern;
+    NSString* softHookPattern;
+	NSString* hardHookPattern;
     NSString* javaScriptIdentifier;
     NSMutableDictionary* urlsToNotHook;
 }

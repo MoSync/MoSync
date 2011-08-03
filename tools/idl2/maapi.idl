@@ -420,23 +420,24 @@ interface MAAPI {
 	*/
 	void maDrawRGB(in MAPoint2d dstPoint, in MAAddress src, in MARect srcRect, in int scanlength);
 
+	// The JavaMe runtime requires that these constans have these values. Do not change.
 	constset int TRANS_ {
 		/// The image is copied unchanged.
 		NONE = 0;
 		/// The image is rotated clockwise by 90 degrees.
-		ROT90 = 1;
+		ROT90 = 5;
 		/// The image is rotated clockwise by 180 degrees.
-		ROT180 = 2;
+		ROT180 = 3;
 		/// The image is rotated clockwise by 270 degrees.
-		ROT270 = 3;
+		ROT270 = 6;
 		/// The image is reflected about its vertical center.
-		MIRROR = 4;
+		MIRROR = 2;
 		/// The image is reflected about its vertical center, then rotated clockwise by 90 degrees.
-		MIRROR_ROT90 = 5;
+		MIRROR_ROT90 = 7;
 		/// The image is reflected about its vertical center, then rotated clockwise by 180 degrees.
-		MIRROR_ROT180 = 6;
+		MIRROR_ROT180 = 1;
 		/// The image is reflected about its vertical center, then rotated clockwise by 270 degrees.
-		MIRROR_ROT270 = 7;
+		MIRROR_ROT270 = 4;
 	}
 
 	/**
@@ -605,13 +606,13 @@ interface MAAPI {
 	* Returns another \link #STERR_GENERIC STERR \endlink code if the store could not be opened
 	* for another reason.
 	*
-	* \param name The name of the store. A store name must have between 1 and 32 characters,
-	* inclusive, and must not contain any of the following characters: "\\:;?*'
+	* \param name The name of the store. A store name must have from 1 to 32 characters,
+	* and must not contain any of the following characters: "/\\:;?*'
 	* \param flags A combination of \link #MAS_CREATE_IF_NECESSARY MAS \endlink flags, or zero.
 	*/
 	MAHandle maOpenStore(in MAString name, in int flags);
 	/**
-	* Writes the contents of a data object to a store. Destroys any data currently in the store.
+	* Writes the contents of a data object to a store. Destroys any data previously in the store.
 	* Returns \> 0 on success, #STERR_FULL if the storage system is full,
 	* or another \link #STERR_GENERIC STERR \endlink code if the write failed for another reason.
 	* \param store The store to write to.
@@ -627,9 +628,9 @@ interface MAAPI {
 	*/
 	int maReadStore(in MAHandle store, in MAHandle placeholder);
 	/**
-	* Closes a store. Also removes that store if \a _remove is non-zero.
+	* Closes a store. Also deletes that store if \a _delete is non-zero.
 	*/
-	void maCloseStore(in MAHandle store, in int _remove);
+	void maCloseStore(in MAHandle store, in int _delete);
 
 	constset int CONNERR_ {
 		/// Generic error.
@@ -941,9 +942,12 @@ interface MAAPI {
 
 	/**
 	* Stores an HTTP response header in the specified buffer.
+	*
 	* The buffer may be too small to contain the header and the terminating zero;
 	* in that case, the buffer will not be filled
 	* and you should create a bigger buffer and call this function again.
+	* Use the return value to determine how long the buffer needs to be.
+	*
 	* \param conn A finished HTTP connection handle.
 	* \param key The name of the header. Case-insensitive.
 	* \param buffer A string buffer.
@@ -2125,12 +2129,10 @@ interface MAAPI {
 		*/
 		int maFileClose(in MAHandle file);
 
-		//see JSR 75 for docs
 		/**
-		* Creates a file or directory, given an open handle.
+		* Creates a file or directory, given an file handle opened with #MA_ACCESS_READ_WRITE.
 		* The file must not exist prior to calling this function.
-		* After creation, the file will be accessible according to the mode specified when
-		* its handle was opened.
+		* After creation, the file will be accessible for writing and reading.
 		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maFileCreate(in MAHandle file);
@@ -2190,17 +2192,17 @@ interface MAAPI {
 		/**
 		* Truncates the file.
 		*
-		* If offset is less than the file's size,
+		* If \a offset is less than the file's current size,
 		* the file's new size is equal to the offset. All data after the offset is discarded.
 		*
-		* If the offset is equal to the file's size, this function does nothing.
+		* If \a offset is equal to the file's current size, this function does nothing.
 		*
-		* If the offset is greater than the file's current size,
+		* If \a offset is greater than the file's current size,
 		* this function MAY increase the size of the file.
 		* You can determine if it did so by calling maFileSeek() with #MA_SEEK_END.
 		*
-		* If the file's position is greater than the offset, it is reset
-		* to be equal to the offset.
+		* If the file's current position is greater than \a offset, it is reset
+		* to be equal to \a offset.
 		*
 		* The file must exist prior to calling this function.
 		* Returns 0 on success, or \< 0 on error.
@@ -2356,10 +2358,8 @@ interface MAAPI {
 
 #if IX_CELLID
 		/**
-		* \brief Information about the current cell, including country, network and area code and the cell ID.
-		*
-		* Stores current cell id in *cellId.
-		* Returns the negated Symbian error code. 0 on success.
+		* \brief Information about the current cell, including country,
+		* network and area code and the cell ID.
 		*/
 		struct MACellInfo {
 			/**
@@ -2388,7 +2388,7 @@ interface MAAPI {
 		}
 
 		/**
-		* Retrieves the current cellular network information
+		* Retrieves the current cellular network information.
 		* If the phone is offline or otherwise has no signal, this function will fail.
 		* \param pInfo A pointer to a struct which will receive the information.
 		* \returns 0 if successful. \< 0 otherwise.
@@ -2685,7 +2685,7 @@ interface MAAPI {
 		/**
 		* Increases the size of a data object.
 		* \note There is no way to decrease the size of a data object.
-		* However, you can destroy it.
+		* However, you can still destroy it.
 		* \returns #RES_OK if succeded and #RES_OUT_OF_MEMORY if failed.
 		* \see maDestroyObject()
 		* \see maCreateData()
@@ -2699,19 +2699,26 @@ interface MAAPI {
 		*
 		* There are a few MoSync System Properties. They are unavailable on some devices.
 		* "mosync.imei" and "mosync.imsi" is the device's IMEI and IMSI number, respectively.
+		* The format of these numbers is not specified. It varies from device to device.
 		*
 		* "mosync.iso-639-1" and "mosync.iso-639-2" is the current language used by the system's UI.
 		* Multi-language applications should use this to determine which language to use.
 		*
-		* "mosync.winmobile.locale.SABBREVLANGNAME" is a windows mobile specific property. See http://msdn.microsoft.com/en-us/library/dd373831%28VS.85%29.aspx.
+		* "mosync.winmobile.locale.SABBREVLANGNAME" is a windows mobile specific property.
+		* See http://msdn.microsoft.com/en-us/library/dd373831%28VS.85%29.aspx.
 		*
-		* See http://www.loc.gov/standards/iso639-2/php/code_list.php - The official list of valid ISO-639 codes (online)
+		* See http://www.loc.gov/standards/iso639-2/php/code_list.php -
+		* The official list of valid ISO-639 codes (online).
+		*
+		* "mosync.device" is a description of the device. May include vendor, model name
+		* and firmware version.
+		* The format of this description is not specified. It varies from device to device.
 		*
 		* \param key The property's key.
 		* \param buf A buffer where the value should be written.
 		* \param size The size of the buffer, in bytes.
 		* \returns The length of the value, including the terminating zero.
-		* If this is less than \a size, the value will not have been copied to be buffer.
+		* If this is greater than \a size, the value will not have been copied to be buffer.
 		* In that case, you can make a bigger buffer and try again.
 		* If the property did not exist (System.getProperty() returned null),
 		* -2 will be returned.
@@ -3043,9 +3050,37 @@ group WidgetAPI "Widget API" {
 			int tabIndex;
 
 			/**
-			* @brief The data handle of the #MAW_EVENT_CUSTOM_MESSAGE event.
+			* @brief Used by event #MAW_EVENT_WEB_VIEW_CONTENT_LOADING. 
+			* One of:
+			*  #MAW_CONSTANT_STARTED
+			*  #MAW_CONSTANT_DONE
+			*  #MAW_CONSTANT_STOPPED
+			*  #MAW_CONSTANT_FAILED
 			*/
-			int messageDataHandle;
+			int status;
+			
+			/**
+			* @brief Parameters for the #MAW_EVENT_WEB_VIEW_HOOK_INVOKED event.
+			*/
+			struct {
+				/**
+				* @brief The type of hook that has been invoked. 
+				* One of:
+				*  #MAW_CONSTANT_SOFT
+				*  #MAW_CONSTANT_HARD
+				*/
+				int hookType;
+				
+				/**
+				* @brief The handle to url data. This is string data, 
+				* there is NO null terminating character. The encoding 
+				* of the data is determined by the application. 
+				* The data MUST be deallocated with maDestroyObject after
+				* it hs been used. Each event allocates a new data object
+				* for the url data.
+				*/
+				int urlData;
+			} webViewHookInfo;
 			
 			/**
 			* @brief TODO: Document when this structure is used.
@@ -3081,10 +3116,9 @@ group WidgetAPI "Widget API" {
 		POINTER_RELEASED = 3;
 
 		/** 
-		* @brief A WebView widget has finished loading data. 
+		* @brief This event is not used and has been deprecated. 
 		*
-		* This event is intended to be used also for other widgets
-		* that load data.
+		* @deprecated Use #MAW_EVENT_WEB_VIEW_CONTENT_LOADING.
 		*/
 		CONTENT_LOADED = 4;
 
@@ -3110,7 +3144,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief Sent when the URL of a web view changes
-		 * @deprecated Use property MAW_EVENT_CUSTOM_MESSAGE to
+		 * @deprecated Use event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		 */
 		WEB_VIEW_URL_CHANGED = 9;
 
@@ -3120,31 +3154,40 @@ group WidgetAPI "Widget API" {
 		STACK_SCREEN_POPPED = 10;
 		
 		/** 
-		* @brief A widget has sent a custom message.
+		* @brief A WebView widget reports status of loading
+		* page content. Event parameter status is set to one
+		* of the following values:
+		*   #MAW_CONSTANT_STARTED
+		*   #MAW_CONSTANT_DONE
+		*   #MAW_CONSTANT_STOPPED
+		*   #MAW_CONSTANT_FAILED
+		*/
+		WEB_VIEW_CONTENT_LOADING = 11;
+		
+		/** 
+		* @brief A web view hook has captured a url.
 		*
-		* The field MAWidgetEventData.messageDataHandle contains
-		* a handle to the message data.
+		* The event parameter hookType is set to
+		* the type of hook, one of:
+		*   #MAW_CONSTANT_SOFT
+		*   #MAW_CONSTANT_HARD
 		*
-		* Use syscall maGetDataSize to get the size of the data 
+		* Event parameter urlData is a handle to the url that 
+		* has been captured.
+		*
+		* Use syscall maGetDataSize to get the size of the url data 
 		* and maReadData to access the data. 
 		*
-		* Note that when you get this message you have ownership 
-		* of the data and you have the responsibility to deallocate
-		* it using maDestroyObject.
+		* NOTE: When you get this message you have ownership 
+		* of the url data handle and you have the responsibility to 
+		* deallocate it using maDestroyObject.
 		*
-		* This event is curently used by the WebView widget, but is
-		* intended to be used also for other widgets that need to
-		* send potentially large custom messages.
+		* To get this event, you need to register a hook pattern, using
+		* maWidgetSetProperty with the properties 
+		* #MAW_WEB_VIEW_SOFT_HOOK_PATTERN and/or 
+		* #MAW_WEB_VIEW_HARD_HOOK_PATTERN.
 		*/
-		CUSTOM_MESSAGE = 11;
-
-		/** 
-		* @brief A WebView widget is starting to load a new page. 
-		*
-		* This event is intended to be used also for other widgets
-		* that load data.
-		*/
-		CONTENT_STARTED_LOADING = 12;
+		WEB_VIEW_HOOK_INVOKED = 12;
 	}
 	
 	} // end of WidgetEventTypes
@@ -3170,6 +3213,42 @@ group WidgetAPI "Widget API" {
 		* @brief If set to the width or height of a widget it will be as big as its content in that dimension.
 		*/
 		WRAP_CONTENT = -2;
+		
+		/**
+		* @brief Loading a page has started. Used in 
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		STARTED = 1;
+		
+		/**
+		* @brief Loading a page is done. Used in 
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		DONE = 2;
+		
+		/**
+		* @brief Loading a page has stopped (aborted). Used in 
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		STOPPED = 3;
+		
+		/**
+		* @brief Loading a page has failed (error). Used in 
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		FAILED = -1;
+		
+		/**
+		* @brief The hook type is a soft hook. Used in 
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		*/
+		SOFT = 5;
+		
+		/**
+		* @brief The hook type is a hard hook. Used in 
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		*/
+		HARD = 6;
 	}
 	}
 	
@@ -3553,8 +3632,12 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char currentTabBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(tabScreenHandle, MAW_WEB_VIEW_CURRENT_TAB, currentTabBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(
+		* 		tabScreenHandle, 
+		* 		MAW_WEB_VIEW_CURRENT_TAB, 
+		* 		currentTabBuffer, 
+		*		BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with current tab.
 		* 	}
@@ -3617,8 +3700,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the label text.
 		* 	}
@@ -3704,8 +3787,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the label text.
 		* 	}
@@ -3791,8 +3874,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the label text.
 		* 	}
@@ -3941,8 +4024,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the edit box text
 		* 	}
@@ -4222,14 +4305,25 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Set or get the currently displayed url in the web view.
 		*
+		* You can also use this property to evaluate JavaScript in the WebView,
+		* by using a url that starts with "javascript:" followed by the
+		* JavaScript code.
+		*
 		* @validvalue Any valid URL.
 		*
 		* @setandget
 		*
 		* @par Example
-		* \code
+		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL, "http://www.mosync.com/");
-		* \endcode
+		* @endcode
+		*
+		* @code
+		*	maWidgetSetProperty(
+		*		webViewHandle, 
+		*		MAW_WEB_VIEW_URL, 
+		*		"javascript:document.body.innerHTML= '<p>Hello World</p>'");
+		* @endcode
 		*/		
 		URL = "url";
 
@@ -4241,60 +4335,129 @@ group WidgetAPI "Widget API" {
 		* @setonly
 		*
 		* @par Example
-		* \code
+		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HTML, "<h1>Hello World</h1>");
-		* \endcode
+		* @endcode
 		*/		
 		HTML = "html";
 		
 		/**
-		* @brief Set the pattern used to "hook" urls. When this pattern 
-		* matches a url that is being requested to load in the WebView, 
-		* a MAW_EVENT_CUSTOM_MESSAGE is sent. Note that urls opened
-		* using MAW_WEB_VIEW_URL are NOT hooked, the are excluded from
-		* this hook mechanism.
+		* @brief Set the pattern used to "soft hook" urls, to get notified
+		* when pages are being loaded.
+		* 
+		* When this pattern matches a url that is being requested 
+		* to load in the WebView, event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED 
+		* is sent, and the page loads NORMALLY.
 		*
-		* @validvalue "true" to enable, "false" to disable.
+		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* you MUST deallocate the urlData handle of the event by calling
+		* maDestroyObject on the handle. Destory the handle when you are done
+		* reading the url data, to avoid that memory will get used up.
+		*
+		* The pattern is a url pattern specified using regular expression
+		* syntax. Currently, only the ".*" matching expression is supported
+		* (this matches any substring).
+		*
+		* By setting the pattern to an empty string, the soft hook mechanism
+		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
+		*
+		* Both "soft" hooks and "hard" hooks can be enabled simultaneously,
+		* but only one hook pattern can be used for each type of hook. When
+		* setting a new hook pattern, the old hook is replaced.
+		*
+		* Note that urls opened using maWidgetSetProperty with the property 
+		* MAW_WEB_VIEW_URL are NOT hooked. This way of loading a page is 
+		* excluded from the hook mechanism to prevent "loops" when loading 
+		* pages.
+		*
+		* @validvalue A string with a url pattern.
 		*
 		* @setonly
 		*
 		* @par Example
-		* \code
+		* @code
 		*   // Hook all urls.
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL_HOOK_PATTERN, "*");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, ".*");
 		*
 		*   // Hook no urls.
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL_HOOK_PATTERN, "");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, "");
 		*
-		*   // Hook urls that start with "mosync://".
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL_HOOK_PATTERN, "mosync://");
-		* \endcode
-		*/		
-		URL_HOOK_PATTERN = "urlHookPattern";
+		*   // Hook urls that start with "mosync:".
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, "mosync://.*");
+		* @endcode
+		*/
+		SOFT_HOOK_PATTERN = "softHookPattern";
+
+		/**
+		* @brief Set the pattern used to "hard hook" urls, to get notified
+		* and prevent loading of pages.
+		* 
+		* Hard hooks are useful for communicating events from a WebView,
+		* for example by setting document.location to a url string in
+		* JavaScript. Example: document.location = 'mosync://ExitApp'
+		* The application can then examine the url data and take action
+		* depending on the url content.
+		* 
+		* When this pattern matches a url that is being requested 
+		* to load in the WebView, event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED 
+		* is sent, and page loading is ABORTED.
+		*
+		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* you MUST deallocate the urlData handle of the event by calling
+		* maDestroyObject on the handle. Destory the handle when you are done
+		* reading the url data, to avoid that memory will get used up.
+		*
+		* The pattern is a url pattern specified using regular expression
+		* syntax. Currently, only the ".*" matching expression is supported
+		* (this matches any substring).
+		*
+		* By setting the pattern to an empty string, the soft hook mechanism
+		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
+		*
+		* Both "soft" hooks and "hard" hooks can be enabled simultaneously,
+		* but only one hook pattern can be used for each type of hook. When
+		* setting a new hook pattern, the old hook is replaced.
+		*
+		* Note that urls opened using maWidgetSetProperty with the property 
+		* MAW_WEB_VIEW_URL are NOT hooked. This way of loading a page is 
+		* excluded from the hook mechanism to prevent "loops" when loading 
+		* pages.
+		*
+		* @validvalue A string with a url pattern.
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*   // Hook urls that start with "mosync:".
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HARD_HOOK_PATTERN, "mosync://.*");
+		* @endcode
+		*/
+		HARD_HOOK_PATTERN = "hardHookPattern";
 		
 		/**
 		* @brief Property to get a new url whenever the webview changes the url. 
-		* See \ref #MAW_EVENT_WEB_VIEW_URL_CHANGED.
+		* See #MAW_EVENT_WEB_VIEW_URL_CHANGED.
 		*
-		* @deprecated Use property event \ref #MAW_EVENT_CUSTOM_MESSAGE
+		* @deprecated Use event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		* 
 		* @validvalue Any valid URL.
 		*
 		* @getonly
 		*
 		* @par Example
-		* \code
+		* @code
 		* 	char urlBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(
+		* 	int result = maWidgetGetProperty(
 		*     webViewHandle, 
 		*     MAW_WEB_VIEW_NEW_URL, 
 		*     urlBuffer, 
 		*     BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with URL.
 		* 	}
-		* \endcode
+		* @endcode
 		*/		
 		NEW_URL = "newurl";
 		
@@ -4306,23 +4469,23 @@ group WidgetAPI "Widget API" {
 		* @setonly
 		*
 		* @par Example
-		* \code
+		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_ENABLE_ZOOM, "true");
-		* \endcode
+		* @endcode
 		*/		
 		ENABLE_ZOOM = "enableZoom";
 
 		/**
-		* @brief Go a page back or forward in the browsing history
+		* @brief Navigate forward or back the browsing history.
 		*
-		* @validvalue "back" , "forward".
+		* @validvalue "back" or "forward".
 		*
 		* @setonly
 		*
 		* @par Example
-		* \code
+		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_NAVIGATE, "back");
-		* \endcode
+		* @endcode
 		*/		
 		NAVIGATE = "navigate";
 	}
@@ -4330,7 +4493,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetWebViewProperties
 
 	} // end of WidgetProperties	
-		
+	
 	typedef int MAWidgetHandle;
 
 	/**

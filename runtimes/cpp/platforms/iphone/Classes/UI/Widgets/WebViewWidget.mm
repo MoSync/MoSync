@@ -30,7 +30,8 @@
 	view = webView;
 	webView.delegate = self;
 	newurl = @"";
-    hookPattern = @"";
+    softHookPattern = @"";
+	hardHookPattern = @"";
     javaScriptIdentifier=@"javascript:";
     urlsToNotHook=[[NSMutableDictionary alloc] init];
     [urlsToNotHook retain];
@@ -64,9 +65,12 @@
             }
             [webView loadRequest:requestObj];
         }
-    } else if([key isEqualToString:@MAW_WEB_VIEW_URL_HOOK_PATTERN]) {
-		[hookPattern release];
-        hookPattern = [value retain];
+    } else if([key isEqualToString:@MAW_WEB_VIEW_SOFT_HOOK_PATTERN]) {
+		[softHookPattern release];
+        softHookPattern = [value retain];
+	} else if([key isEqualToString:@MAW_WEB_VIEW_HARD_HOOK_PATTERN]) {
+		[hardHookPattern release];
+        hardHookPattern = [value retain];
     } else if([key isEqualToString:@MAW_WEB_VIEW_HTML]) {
 		UIWebView* webView = (UIWebView*)view;
         [webView loadHTMLString:value baseURL:NULL];
@@ -104,8 +108,10 @@
 		NSString* ret = @"";
 		ret = newurl;
 		return ret;
-    } else if([key isEqualToString:@MAW_WEB_VIEW_URL_HOOK_PATTERN]) {
-		return hookPattern;
+    } else if([key isEqualToString:@MAW_WEB_VIEW_SOFT_HOOK_PATTERN]) {
+		return softHookPattern;
+	} else if([key isEqualToString:@MAW_WEB_VIEW_HARD_HOOK_PATTERN]) {
+		return hardHookPattern;
 	} else {
 		return [super getPropertyWithKey:key];
 	}
@@ -116,8 +122,9 @@
     MAEvent event;
     event.type = EVENT_TYPE_WIDGET;
     MAWidgetEventData *eventData = new MAWidgetEventData;
-    eventData->eventType = MAW_EVENT_CONTENT_STARTED_LOADING;
+    eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
     eventData->widgetHandle = handle;
+	eventData->status = MAW_CONSTANT_STARTED;
     event.data = eventData;
     Base::gEventQueue.put(event);
     return;
@@ -128,8 +135,22 @@
     MAEvent event;
     event.type = EVENT_TYPE_WIDGET;
     MAWidgetEventData *eventData = new MAWidgetEventData;
-    eventData->eventType = MAW_EVENT_CONTENT_LOADED;
+    eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
     eventData->widgetHandle = handle;
+	eventData->status = MAW_CONSTANT_DONE;
+    event.data = eventData;
+    Base::gEventQueue.put(event);
+    return;
+}
+
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
+{
+    MAEvent event;
+    event.type = EVENT_TYPE_WIDGET;
+    MAWidgetEventData *eventData = new MAWidgetEventData;
+    eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
+    eventData->widgetHandle = handle;
+	eventData->status = MAW_CONSTANT_FAILED;
     event.data = eventData;
     Base::gEventQueue.put(event);
     return;
@@ -156,14 +177,31 @@
             [urlsToNotHook setValue:[NSNumber numberWithInteger:(unHookCount.integerValue-1)] forKey:url];
         }
     }
-    NSRange range=[url rangeOfString:hookPattern options:NSRegularExpressionSearch|NSCaseInsensitiveSearch];
-    if(skipHook==NO && range.location==0 && range.length==[url length])
+	NSRange softHookRange=[url rangeOfString:softHookPattern options:NSRegularExpressionSearch|NSCaseInsensitiveSearch];
+    NSRange hardHookRange=[url rangeOfString:hardHookPattern options:NSRegularExpressionSearch|NSCaseInsensitiveSearch];
+    if(skipHook==NO &&
+		((softHookRange.location==0 && softHookRange.length==[url length]) ||
+		(hardHookRange.location==0 && hardHookRange.length==[url length]))	
+	   )
     {
+		
         MAEvent event;
         event.type = EVENT_TYPE_WIDGET;
         MAWidgetEventData *eventData = new MAWidgetEventData;
-        eventData->eventType = MAW_EVENT_CUSTOM_MESSAGE;
+        eventData->eventType = MAW_EVENT_WEB_VIEW_HOOK_INVOKED;
         eventData->widgetHandle = handle;
+		bool loadUrl;
+		if(hardHookRange.location != NSNotFound)
+		{
+			eventData->webViewHookInfo.hookType = MAW_CONSTANT_HARD;
+			loadUrl = NO;
+		}
+		else
+		{
+			eventData->webViewHookInfo.hookType = MAW_CONSTANT_SOFT;
+			loadUrl = YES;
+		}
+
         
         MAHandle urlHandle=(MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
         int size=(int)[url lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
@@ -172,13 +210,13 @@
         ms->seek(Base::Seek::Start, 0);
         ms->write([url cStringUsingEncoding:NSASCIIStringEncoding], size);
 
-        eventData->messageDataHandle = urlHandle;
+        eventData->webViewHookInfo.urlData = urlHandle;
         event.data = eventData;
         
         
         Base::gEventQueue.put(event);
                 
-        return NO;
+        return loadUrl;
     }
     
     //Deprecated
