@@ -241,6 +241,17 @@ def delete_if_empty(filename)
 	end
 end
 
+def dos2unixInPlaceCommand
+	v = open('|dos2unix --version 2>&1').read.strip
+	if(v.include?('version 0.'))
+		# in-place conversion is default; must specify source and target formats.
+		return 'dos2unix --d2u'
+	else
+		# source and target formats are default; must specify in-place conversion.
+		return 'dos2unix -o'
+	end
+end
+
 LOADER_URLS_FILE = open(SETTINGS[:htdocs_dir] + 'libc_tests.urls', 'wb') if(SETTINGS[:htdocs_dir])
 
 USE_SLD = !SETTINGS[:test_release] && SETTINGS[:use_sld]
@@ -291,8 +302,9 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		FileUtils.cp_r(file, 'filesystem/')
 	end
 	if(HOST == :win32)
+		cmd = dos2unixInPlaceCommand
 		inputs.each do |input|
-			sh "dos2unix --d2u \"filesystem/#{File.basename(input)}\""
+			sh "#{cmd} \"filesystem/#{File.basename(input)}\""
 		end
 	end
 	
