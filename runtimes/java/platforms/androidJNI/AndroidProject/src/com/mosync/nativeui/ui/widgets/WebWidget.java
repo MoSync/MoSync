@@ -219,7 +219,7 @@ public class WebWidget extends Widget
 			// TODO:  To be removed. MAW_WEB_VIEW_NEW_URL is deprecated.
 			m_newUrl = value;
 		}
-		else if (property.equals("html"))
+		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_HTML))
 		{
 			Activity activity = MoSyncThread.getInstance().getActivity();
 			webView.loadDataWithBaseURL(
@@ -244,27 +244,27 @@ public class WebWidget extends Widget
 //				"utf-8",
 //				null);
 		}
-		else if (property.equals("softHookPattern"))
+		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_SOFT_HOOK))
 		{
 			Log.i("@@@ Mosync", "Setting softHookPattern to: " + value);
 
 			// Set the pattern used for url hooking.
 			mSoftHookPattern = value;
 		}
-		else if (property.equals("hardHookPattern"))
+		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_HARD_HOOK))
 		{
 			Log.i("@@@ Mosync", "Setting hardHookPattern to: " + value);
 
 			// Set the pattern used for url hooking.
 			mHardHookPattern = value;
 		}
-		else if (property.equals("enableZoom"))
+		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_ENABLE_ZOOM))
 		{
 			// Turn on or off zooming.
 			boolean enable = BooleanConverter.convert(value);
 			webView.getSettings().setBuiltInZoomControls(enable);
 		}
-		else if (property.equals("navigate"))
+		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_NAVIGATE))
 		{
 			if ("back".equals(value))
 			{
@@ -525,7 +525,7 @@ public class WebWidget extends Widget
 			EventQueue.getDefault().postWidgetEvent(
 				IX_WIDGET.MAW_EVENT_WEB_VIEW_CONTENT_LOADING,
 				mWebWidget.getHandle(),
-				IX_WIDGET.MAW_CONSTANT_FAILED,
+				IX_WIDGET.MAW_CONSTANT_ERROR,
 				0);
 		}
 	}

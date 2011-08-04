@@ -3068,7 +3068,7 @@ group WidgetAPI "Widget API" {
 			*  #MAW_CONSTANT_STARTED
 			*  #MAW_CONSTANT_DONE
 			*  #MAW_CONSTANT_STOPPED
-			*  #MAW_CONSTANT_FAILED
+			*  #MAW_CONSTANT_ERROR
 			*/
 			int status;
 			
@@ -3173,7 +3173,7 @@ group WidgetAPI "Widget API" {
 		*   #MAW_CONSTANT_STARTED
 		*   #MAW_CONSTANT_DONE
 		*   #MAW_CONSTANT_STOPPED
-		*   #MAW_CONSTANT_FAILED
+		*   #MAW_CONSTANT_ERROR
 		*/
 		WEB_VIEW_CONTENT_LOADING = 11;
 		
@@ -3196,9 +3196,8 @@ group WidgetAPI "Widget API" {
 		* deallocate it using maDestroyObject.
 		*
 		* To get this event, you need to register a hook pattern, using
-		* maWidgetSetProperty with the properties 
-		* #MAW_WEB_VIEW_SOFT_HOOK_PATTERN and/or 
-		* #MAW_WEB_VIEW_HARD_HOOK_PATTERN.
+		* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
+		* and/or #MAW_WEB_VIEW_HARD_HOOK.
 		*/
 		WEB_VIEW_HOOK_INVOKED = 12;
 	}
@@ -3221,44 +3220,44 @@ group WidgetAPI "Widget API" {
 		* @brief If set to the width or height of a widget and the parent is either a vertical or horizontal layout it tries to fill the available space in that dimension. If there are multiple widgets specified with this constant, the space will then be shared equally. If the parent isn't a horizontal or vertical layout it just resizes the child to the size of its parent.
 		*/
 		FILL_AVAILABLE_SPACE = -1;
-		
+
 		/**
 		* @brief If set to the width or height of a widget it will be as big as its content in that dimension.
 		*/
 		WRAP_CONTENT = -2;
-		
+
 		/**
-		* @brief Loading a page has started. Used in 
+		* @brief Loading a page has started. Used in
 		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
 		*/
 		STARTED = 1;
-		
+
 		/**
-		* @brief Loading a page is done. Used in 
+		* @brief Loading a page is done. Used in
 		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
 		*/
 		DONE = 2;
-		
+
 		/**
-		* @brief Loading a page has stopped (aborted). Used in 
+		* @brief Loading a page has stopped (aborted). Used in
 		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
 		*/
 		STOPPED = 3;
-		
+
 		/**
-		* @brief Loading a page has failed (error). Used in 
+		* @brief Loading a page has failed. Used in
 		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
 		*/
-		FAILED = -1;
-		
+		ERROR = -1;
+
 		/**
-		* @brief The hook type is a soft hook. Used in 
+		* @brief The hook type is a soft hook. Used in
 		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		*/
 		SOFT = 5;
-		
+
 		/**
-		* @brief The hook type is a hard hook. Used in 
+		* @brief The hook type is a hard hook. Used in
 		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		*/
 		HARD = 6;
@@ -4311,7 +4310,8 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetGLViewProperties
 	
 	/**
-	* The available widget properties for a #MAW_WEB_VIEW. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_WEB_VIEW.
+	* See @ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetWebViewProperties "Web view properties" {
 	constset MAString MAW_WEB_VIEW_ {
@@ -4337,7 +4337,7 @@ group WidgetAPI "Widget API" {
 		*		MAW_WEB_VIEW_URL, 
 		*		"javascript:document.body.innerHTML= '<p>Hello World</p>'");
 		* @endcode
-		*/		
+		*/
 		URL = "url";
 
 		/**
@@ -4351,7 +4351,7 @@ group WidgetAPI "Widget API" {
 		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HTML, "<h1>Hello World</h1>");
 		* @endcode
-		*/		
+		*/
 		HTML = "html";
 		
 		/**
@@ -4397,16 +4397,16 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* @code
 		*   // Hook all urls.
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, ".*");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, ".*");
 		*
 		*   // Hook no urls.
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, "");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, "");
 		*
 		*   // Hook urls that start with "mosync:".
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, "mosync://.*");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, "mosync://.*");
 		* @endcode
 		*/
-		SOFT_HOOK_PATTERN = "softHookPattern";
+		SOFT_HOOK = "softHook";
 
 		/**
 		* @brief Set the pattern used to "hard hook" urls, to get notified
@@ -4462,10 +4462,10 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* @code
 		*   // Hook urls that start with "mosync:".
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HARD_HOOK_PATTERN, "mosync://.*");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HARD_HOOK, "mosync://.*");
 		* @endcode
 		*/
-		HARD_HOOK_PATTERN = "hardHookPattern";
+		HARD_HOOK = "hardHook";
 		
 		/**
 		* @brief Property to get a new url whenever the webview changes the url. 
@@ -4490,7 +4490,7 @@ group WidgetAPI "Widget API" {
 		* 	    // Do something with URL.
 		* 	}
 		* @endcode
-		*/		
+		*/
 		NEW_URL = "newurl";
 		
 		/**
