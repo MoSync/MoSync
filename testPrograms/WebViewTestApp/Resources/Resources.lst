@@ -1,3 +1,7 @@
+.res MainPage_html
+.bin
+.include "MainPage.html"
+
 .res PageOne_html
 .bin
 .include "PageOne.html"

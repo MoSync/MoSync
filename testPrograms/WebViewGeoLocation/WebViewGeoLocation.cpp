@@ -30,7 +30,6 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <IX_WIDGET.h>
 #include "MAHeaders.h"
-
 #include "WebViewUtil.h"
 
 using namespace MoSync::UI;

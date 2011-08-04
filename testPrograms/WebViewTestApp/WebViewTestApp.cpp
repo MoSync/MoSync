@@ -29,7 +29,7 @@ MA 02110-1301, USA.
 #include <mavsprintf.h>
 #include <MAUtil/String.h>
 #include <IX_WIDGET.h>
-
+#include "MAHeaders.h"
 #include "WebViewUtil.h"
 
 using namespace MoSync::UI;
@@ -171,9 +171,11 @@ class WebViewTestApp
 private:
 	MAWidgetHandle mScreen;
 	MAWidgetHandle mWebView;
+	PlatformUtil* mPlatformUtil;
+	int mPageLoadCounter;
 
 public:
-	WebViewTestApp()
+	WebViewTestApp() : mPageLoadCounter(0)
 	{
 		createUI();
 	}
@@ -185,6 +187,17 @@ public:
 
 	void createUI()
 	{
+		PlatformUtil::checkNativeUISupport();
+
+		if (PlatformUtil::isAndroid())
+		{
+			mPlatformUtil = new PlatformUtilAndroid();
+		}
+		else if (PlatformUtil::isIOS())
+		{
+			mPlatformUtil = new PlatformUtilIOS();
+		}
+
 		// Create screen.
 		mScreen = maWidgetCreate(MAW_SCREEN);
 		widgetShouldBeValid(mScreen, "Could not create screen");
@@ -198,7 +211,9 @@ public:
 		maWidgetSetProperty(mWebView, "height", "-1");
 
 		// Set the HTML the web view displays.
-		maWidgetSetProperty(mWebView, "html", HTML4);
+		MAUtil::String html =
+			mPlatformUtil->getTextFromDataHandle(MainPage_html);
+		maWidgetSetProperty(mWebView, "html", html.c_str());
 
 		// Enable zooming.
 		maWidgetSetProperty(mWebView, "enableZoom", "true");
@@ -240,7 +255,32 @@ public:
 					}
 					if (event.key == MAK_BACK)
 					{
-						isRunning = false;
+						// Decrement page load counter. We use
+						// this counter to determine the action
+						// of the BACK key (on Android).
+						--mPageLoadCounter;
+
+						if (0 == mPageLoadCounter)
+						{
+							// Exit program.
+							isRunning = false;
+						}
+						if (1 == mPageLoadCounter)
+						{
+							// Load the original page.
+							mPageLoadCounter = 0;
+							MAUtil::String html =
+								mPlatformUtil->getTextFromDataHandle(MainPage_html);
+							maWidgetSetProperty(mWebView, "html", html.c_str());
+						}
+						else
+						{
+							// Go back one page.
+							maWidgetSetProperty(
+								mWebView,
+								MAW_WEB_VIEW_NAVIGATE,
+								"back");
+						}
 					}
 					break;
 
@@ -253,6 +293,15 @@ public:
 
 	void handleWidgetEvent(MAWidgetEventData* widgetEvent)
 	{
+		// Handle messages from the WebView widget.
+		if (MAW_EVENT_WEB_VIEW_CONTENT_LOADING == widgetEvent->eventType)
+		{
+			if (MAW_CONSTANT_DONE == widgetEvent->status)
+			{
+				++mPageLoadCounter;
+			}
+		}
+
 		// Handle messages from the WebView widget.
 		if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEvent->eventType &&
 			MAW_CONSTANT_HARD == widgetEvent->hookType)
@@ -285,6 +334,27 @@ public:
 			{
 				maVibrate(5000);
 				maPanic(0, "Panic created!");
+			}
+			else if (message.is("ShowAlert"))
+			{
+				maWidgetSetProperty(
+					mWebView,
+					"url",
+					"javascript:alert('Hello World from MoSync C++')");
+			}
+			else if (message.is("GotoGoogle"))
+			{
+				maWidgetSetProperty(
+					mWebView,
+					"url",
+					"http://google.com");
+			}
+			else if (message.is("GotoMoSync"))
+			{
+				maWidgetSetProperty(
+					mWebView,
+					"url",
+					"http://mosync.com");
 			}
 		}
 	}

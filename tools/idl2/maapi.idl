@@ -4504,8 +4504,22 @@ group WidgetAPI "Widget API" {
 		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_ENABLE_ZOOM, "true");
 		* @endcode
-		*/		
-		MAW_WEB_VIEW_ENABLE_ZOOM = "enableZoom";
+		*/
+		ENABLE_ZOOM = "enableZoom";
+
+		/**
+		* @brief Navigate forward or back the browsing history.
+		*
+		* @validvalue "back" or "forward".
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_NAVIGATE, "back");
+		* @endcode
+		*/
+		NAVIGATE = "navigate";
 	}
 	
 	} // end of WidgetWebViewProperties
