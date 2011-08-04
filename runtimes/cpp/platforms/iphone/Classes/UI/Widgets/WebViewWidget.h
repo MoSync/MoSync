@@ -22,8 +22,8 @@
 	NSString* newurl;
     NSString* softHookPattern;
 	NSString* hardHookPattern;
-    NSString* javaScriptIdentifier;
-    NSMutableDictionary* urlsToNotHook;
+    NSString* javaScriptIdentifier; //"javascript:"
+    NSMutableDictionary* urlsToNotHook; //Used to let the set url property to bypass the hooks
 }
 
 - (id)init;

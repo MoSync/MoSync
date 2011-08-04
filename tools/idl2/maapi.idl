@@ -2858,8 +2858,16 @@ interface MAAPI {
 		}
 
 		constset int MA_PIM_ERR_ {
-			/// The native database's data type did not match the MoSync API.
+			/// The native database's data type for the given field did not match the MoSync API.
 			NATIVE_TYPE_MISMATCH = -2;
+			/// The field type is not supported.
+			FIELD_UNSUPPORTED = -3;
+			/// The field is read-only.
+			READ_ONLY = -4;
+			/// The field/attribute combination is not supported.
+			COMBO_UNSUPPORTED = -5;
+			/// More values in this field is not supported.
+			FIELD_COUNT_MAX = -6;
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.
@@ -2947,17 +2955,20 @@ interface MAAPI {
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
 		* \param attributes The value's new attributes.
-		* \returns 0.
+		* \returns 0 on success and \< 0 on failure.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
+		* \note When setting a value with #MA_PIM_TYPE_STRING_ARRAY, at least one
+		* string must be present and have a length greater than zero.
+		* Any surplus strings are ignored.
 		*/
 		int maPimItemSetValue(in MA_PIM_ARGS args, in int index, in int attributes);
 
 		/** Adds a new value to a field and item.
 		* \param args Common arguments.
 		* \param attributes The new value's attributes.
-		* \returns 0.
+		* \returns 0 on success and \< 0 on failure.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -2968,7 +2979,8 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns 0.
+		* \returns 0 on success and \< 0 on failure.
+		* \note If this function fails, the value is unchanged.
 		* \note The changes is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -2978,7 +2990,7 @@ interface MAAPI {
 		/** Closes the handle to a PimItem, releasing resources used by the system.
 		* Writes any changes to disk.
 		* Panics on invalid handles.
-		* Returns 0.
+		* \returns 0.
 		* \note An item can also be closed by maPimItemRemove().
 		* \warning Does not write changes to disk if the item's List is closed.
 		* Make sure to keep the List open while editing items.
@@ -2992,8 +3004,9 @@ interface MAAPI {
 		MAHandle maPimItemCreate(in MAHandle list);
 
 		/** Removes an item from a list. This also has the effect of closing the item.
-		* \returns 0.
+		* \returns 0 on success and \< 0 on failure.
 		* \see maPimItemClose()
+		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
@@ -3055,7 +3068,7 @@ group WidgetAPI "Widget API" {
 			*  #MAW_CONSTANT_STARTED
 			*  #MAW_CONSTANT_DONE
 			*  #MAW_CONSTANT_STOPPED
-			*  #MAW_CONSTANT_FAILED
+			*  #MAW_CONSTANT_ERROR
 			*/
 			int status;
 			
@@ -3079,7 +3092,7 @@ group WidgetAPI "Widget API" {
 				* it hs been used. Each event allocates a new data object
 				* for the url data.
 				*/
-				MAHandle urlData;
+				int urlData;
 			} webViewHookInfo;
 			
 			/**
@@ -3160,7 +3173,7 @@ group WidgetAPI "Widget API" {
 		*   #MAW_CONSTANT_STARTED
 		*   #MAW_CONSTANT_DONE
 		*   #MAW_CONSTANT_STOPPED
-		*   #MAW_CONSTANT_FAILED
+		*   #MAW_CONSTANT_ERROR
 		*/
 		WEB_VIEW_CONTENT_LOADING = 11;
 		
@@ -3183,9 +3196,8 @@ group WidgetAPI "Widget API" {
 		* deallocate it using maDestroyObject.
 		*
 		* To get this event, you need to register a hook pattern, using
-		* maWidgetSetProperty with the properties 
-		* #MAW_WEB_VIEW_SOFT_HOOK_PATTERN and/or 
-		* #MAW_WEB_VIEW_HARD_HOOK_PATTERN.
+		* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
+		* and/or #MAW_WEB_VIEW_HARD_HOOK.
 		*/
 		WEB_VIEW_HOOK_INVOKED = 12;
 	}
@@ -3208,44 +3220,44 @@ group WidgetAPI "Widget API" {
 		* @brief If set to the width or height of a widget and the parent is either a vertical or horizontal layout it tries to fill the available space in that dimension. If there are multiple widgets specified with this constant, the space will then be shared equally. If the parent isn't a horizontal or vertical layout it just resizes the child to the size of its parent.
 		*/
 		FILL_AVAILABLE_SPACE = -1;
-		
+
 		/**
 		* @brief If set to the width or height of a widget it will be as big as its content in that dimension.
 		*/
 		WRAP_CONTENT = -2;
-		
+
 		/**
-		* @brief Loading a page has started. Used in 
+		* @brief Loading a page has started. Used in
 		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
 		*/
 		STARTED = 1;
-		
+
 		/**
-		* @brief Loading a page is done. Used in 
+		* @brief Loading a page is done. Used in
 		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
 		*/
 		DONE = 2;
-		
+
 		/**
-		* @brief Loading a page has stopped (aborted). Used in 
+		* @brief Loading a page has stopped (aborted). Used in
 		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
 		*/
 		STOPPED = 3;
-		
+
 		/**
-		* @brief Loading a page has failed (error). Used in 
+		* @brief Loading a page has failed. Used in
 		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
 		*/
-		FAILED = -1;
-		
+		ERROR = -1;
+
 		/**
-		* @brief The hook type is a soft hook. Used in 
+		* @brief The hook type is a soft hook. Used in
 		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		*/
 		SOFT = 5;
-		
+
 		/**
-		* @brief The hook type is a hard hook. Used in 
+		* @brief The hook type is a hard hook. Used in
 		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		*/
 		HARD = 6;
@@ -4298,7 +4310,8 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetGLViewProperties
 	
 	/**
-	* The available widget properties for a #MAW_WEB_VIEW. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_WEB_VIEW.
+	* See @ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetWebViewProperties "Web view properties" {
 	constset MAString MAW_WEB_VIEW_ {
@@ -4324,7 +4337,7 @@ group WidgetAPI "Widget API" {
 		*		MAW_WEB_VIEW_URL, 
 		*		"javascript:document.body.innerHTML= '<p>Hello World</p>'");
 		* @endcode
-		*/		
+		*/
 		URL = "url";
 
 		/**
@@ -4338,7 +4351,7 @@ group WidgetAPI "Widget API" {
 		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HTML, "<h1>Hello World</h1>");
 		* @endcode
-		*/		
+		*/
 		HTML = "html";
 		
 		/**
@@ -4355,8 +4368,15 @@ group WidgetAPI "Widget API" {
 		* reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
-		* syntax. Currently, only the ".*" matching expression is supported
-		* (this matches any substring).
+		* syntax, according to the ICU regular expression standard, using 
+		* complete match. For example, the ".*" matching expression is used 
+		* to match any url string. To match all HTTP requests, use the 
+		* pattern "http://.*". To match all requests for a specific domain, 
+		* use a pattern like ".*google.com.*". For further infomation, see:
+		* http://userguide.icu-project.org/strings/regexp
+		* When typing a C-string with a pattern that contains a matching 
+		* expression with a backslash, make sure to escape the backslash,
+		* for example "\B" should be "\\B".
 		*
 		* By setting the pattern to an empty string, the soft hook mechanism
 		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
@@ -4377,16 +4397,16 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* @code
 		*   // Hook all urls.
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, ".*");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, ".*");
 		*
 		*   // Hook no urls.
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, "");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, "");
 		*
 		*   // Hook urls that start with "mosync:".
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK_PATTERN, "mosync://.*");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, "mosync://.*");
 		* @endcode
 		*/
-		SOFT_HOOK_PATTERN = "softHookPattern";
+		SOFT_HOOK = "softHook";
 
 		/**
 		* @brief Set the pattern used to "hard hook" urls, to get notified
@@ -4408,15 +4428,27 @@ group WidgetAPI "Widget API" {
 		* reading the url data, to avoid that memory will get used up.
 		*
 		* The pattern is a url pattern specified using regular expression
-		* syntax. Currently, only the ".*" matching expression is supported
-		* (this matches any substring).
+		* syntax, according to the ICU regular expression standard, using 
+		* complete match. For example, the ".*" matching expression is used 
+		* to match any url string. To match all HTTP requests, use the 
+		* pattern "http://.*". To match all requests for a specific domain, 
+		* use a pattern like ".*google.com.*". For further infomation, see:
+		* http://userguide.icu-project.org/strings/regexp
+		* When typing a C-string with a pattern that contains a matching 
+		* expression with a backslash, make sure to escape the backslash,
+		* for example "\B" should be "\\B".
 		*
 		* By setting the pattern to an empty string, the soft hook mechanism
 		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
 		*
 		* Both "soft" hooks and "hard" hooks can be enabled simultaneously,
 		* but only one hook pattern can be used for each type of hook. When
-		* setting a new hook pattern, the old hook is replaced.
+		* setting a new hook pattern, the old hook is replaced. 
+		*
+		* The "hard" hook property takes precedence over the "soft" hook
+		* property. When both properties are set, 
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is sent once, for the 
+		* "hard" hook type.
 		*
 		* Note that urls opened using maWidgetSetProperty with the property 
 		* MAW_WEB_VIEW_URL are NOT hooked. This way of loading a page is 
@@ -4430,10 +4462,10 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* @code
 		*   // Hook urls that start with "mosync:".
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HARD_HOOK_PATTERN, "mosync://.*");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HARD_HOOK, "mosync://.*");
 		* @endcode
 		*/
-		HARD_HOOK_PATTERN = "hardHookPattern";
+		HARD_HOOK = "hardHook";
 		
 		/**
 		* @brief Property to get a new url whenever the webview changes the url. 
@@ -4458,7 +4490,7 @@ group WidgetAPI "Widget API" {
 		* 	    // Do something with URL.
 		* 	}
 		* @endcode
-		*/		
+		*/
 		NEW_URL = "newurl";
 		
 		/**
@@ -4472,7 +4504,7 @@ group WidgetAPI "Widget API" {
 		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_ENABLE_ZOOM, "true");
 		* @endcode
-		*/		
+		*/
 		ENABLE_ZOOM = "enableZoom";
 
 		/**
@@ -4486,7 +4518,7 @@ group WidgetAPI "Widget API" {
 		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_NAVIGATE, "back");
 		* @endcode
-		*/		
+		*/
 		NAVIGATE = "navigate";
 	}
 	
