@@ -275,6 +275,10 @@ public:
 						}
 						else
 						{
+							// Decrement one more since the load counter will
+							// be incremented when the previous page loads.
+							--mPageLoadCounter;
+
 							// Go back one page.
 							maWidgetSetProperty(
 								mWebView,
