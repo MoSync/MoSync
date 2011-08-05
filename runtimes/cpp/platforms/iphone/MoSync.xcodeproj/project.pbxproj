@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B90962B13E05C1400A91170 /* CameraPreviewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B9095BE13E053C900A91170 /* CameraPreviewWidget.mm */; };
+		0B90962C13E05C1500A91170 /* CameraPreviewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B9095BE13E053C900A91170 /* CameraPreviewWidget.mm */; };
+		0B90962D13E05C1B00A91170 /* CameraPreviewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B9095BD13E053C900A91170 /* CameraPreviewWidget.h */; };
 		1D3623260D0F684500981E51 /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
 		1D60589B0D05DD56006BFB54 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -200,6 +203,8 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		0B9095BD13E053C900A91170 /* CameraPreviewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraPreviewWidget.h; sourceTree = "<group>"; };
+		0B9095BE13E053C900A91170 /* CameraPreviewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraPreviewWidget.mm; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncAppDelegate.mm; sourceTree = "<group>"; };
@@ -604,6 +609,8 @@
 				85A1591A12F80E520044BBE1 /* TabScreenWidget.mm */,
 				85A1591D12F80E520044BBE1 /* WebViewWidget.h */,
 				85A1591E12F80E520044BBE1 /* WebViewWidget.mm */,
+				0B9095BD13E053C900A91170 /* CameraPreviewWidget.h */,
+				0B9095BE13E053C900A91170 /* CameraPreviewWidget.mm */,
 			);
 			path = Widgets;
 			sourceTree = "<group>";
@@ -784,6 +791,7 @@
 				8597A98313095110003468CF /* EditBoxWidget.h in Headers */,
 				8594B8A013258A970059D79B /* LayoutWidgets.h in Headers */,
 				85037841133A2275009251E2 /* StackScreenWidget.h in Headers */,
+				0B90962D13E05C1B00A91170 /* CameraPreviewWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -957,6 +965,7 @@
 				8597A98213095110003468CF /* EditBoxWidget.mm in Sources */,
 				8594B89F13258A970059D79B /* LayoutWidgets.mm in Sources */,
 				85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */,
+				0B90962C13E05C1500A91170 /* CameraPreviewWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1020,6 +1029,7 @@
 				8597A98413095110003468CF /* EditBoxWidget.mm in Sources */,
 				8594B8A113258A970059D79B /* LayoutWidgets.mm in Sources */,
 				85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */,
+				0B90962B13E05C1400A91170 /* CameraPreviewWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

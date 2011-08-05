@@ -36,6 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
+#include "CameraPreviewWidget.h"
 
 #include "netImpl.h"
 
@@ -947,6 +948,264 @@ namespace Base {
 	{		
 		MoSync_ShowMessageBox(title, message, false);
 	}
+	
+	//This struct holds information about what resources are connected
+	//to a single camera. Each device camera has it's own instance
+	//(So, one for most phones, and two for iPhone 4, for example)
+	struct CameraInfo {
+		AVCaptureSession *captureSession;
+		AVCaptureVideoPreviewLayer *previewLayer;
+		AVCaptureDevice *device; //The physical camera device
+		UIView *view;
+	};
+	
+	//There is only a single instance of this struct, and it holds info about the
+	//devices on the system, as well as which one is the selected one for the camera
+	//syscalls
+	struct CameraSystemInfo {
+		int numCameras;
+		int currentCamera;
+		BOOL initialized;
+		CameraInfo *cameraInfo;
+	};
+	
+	CameraSystemInfo gCameraSystem={0,0,FALSE,NULL};
+	
+	//This performs lazy initialization of the camera system, the first time
+	//a relevant camera syscall is called.
+	void initCameraSystem()
+	{
+		
+		if( gCameraSystem.initialized == FALSE )
+		{
+
+			CameraInfo *cameraInfo;
+			int numCameras = 0;
+			
+			//This will also include microphones and maybe other, non camera devices
+			NSArray *devices = [AVCaptureDevice devices];
+			AVCaptureDevice *backCamera = NULL;
+			AVCaptureDevice *frontCamera = NULL;
+			 
+			for ( AVCaptureDevice *device in devices) 
+			{
+				//This weeds out the devices we don't need
+				if ( [device hasMediaType:AVMediaTypeVideo] ) 
+				{
+					numCameras++;
+					//The following code assumes that all cameras not facing back,
+					//will be facing forward. This works for the current phones,
+					//but it could probably fail if Apple ever introduces a device
+					//with three or more cameras
+					if ( [device position] == AVCaptureDevicePositionBack ) 
+					{
+						backCamera = device;
+					}
+					else 
+					{
+						frontCamera = device;
+					}
+				}
+			}
+			
+			if( numCameras > 0 )
+			{
+				int positionCounter = 0;
+				cameraInfo = new CameraInfo[numCameras];
+				
+				//Back facing camera should be first, then front facing, then the rest
+				if ( backCamera != NULL )
+				{
+					cameraInfo[positionCounter].device = backCamera;
+					positionCounter++;
+				}
+				if ( frontCamera != NULL )
+				{
+					cameraInfo[positionCounter].device = frontCamera;
+					positionCounter++;
+				}
+				
+				for ( AVCaptureDevice *device in devices ) 
+				{
+					if ( [device hasMediaType:AVMediaTypeVideo ] && 
+						device != backCamera && device != frontCamera) 
+					{
+						cameraInfo[positionCounter].device = device;
+						positionCounter++;
+					}
+				}
+				
+				for (int i=0; i<numCameras; i++) {
+					cameraInfo[i].captureSession = NULL;
+					cameraInfo[i].previewLayer = NULL;
+					cameraInfo[i].view = NULL;
+				}
+			}
+			
+			gCameraSystem.numCameras = numCameras;
+			gCameraSystem.cameraInfo = cameraInfo;
+			gCameraSystem.initialized = TRUE;
+		}
+	}
+	
+	//This function not only returns information about the currently selected amera, but
+	//also performs lazy initialization on the session object
+	CameraInfo *getCurrentCameraInfo()
+	{
+		initCameraSystem();
+		
+		if( gCameraSystem.numCameras == 0 )
+		{
+			return NULL;
+		}
+
+		CameraInfo *curCam = &gCameraSystem.cameraInfo[ gCameraSystem.currentCamera ];
+		if( curCam->captureSession == NULL ) {
+			
+			curCam->captureSession = [[AVCaptureSession alloc] init];
+			curCam->captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+			
+			NSError *error = nil;
+			AVCaptureDeviceInput *input =
+			[AVCaptureDeviceInput deviceInputWithDevice:curCam->device error:&error];
+			
+			[curCam->captureSession addInput:input];
+		}
+		return curCam;
+	}
+	
+	void StopAllCameraSessions()
+	{
+		if( gCameraSystem.initialized == TRUE )
+		{
+			for ( int i = 0; i < gCameraSystem.numCameras; i++ ) 
+			{
+				if( gCameraSystem.cameraInfo[i].captureSession )
+				{
+					[gCameraSystem.cameraInfo[i].captureSession stopRunning];
+				}
+			}
+		}
+	}
+	
+	SYSCALL(int, maCameraStart()) 
+	{	
+		CameraInfo *info = getCurrentCameraInfo();
+		if( info )
+		{
+			//In this case, no preview widget was assigned to this camera.
+			//Run the sublayer to the main mosync view at full screen
+			if( !info->view )
+			{
+				if( !info->previewLayer )
+				{
+					info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
+				}
+				
+				MoSync_AddLayerToView(info->previewLayer);
+				MoSync_UpdateView(gBackbuffer->image);
+			}
+			else 
+			{
+				info->previewLayer.frame = info->view.bounds;
+			}
+
+			//Have to do it this way, because otherwise it hijacks the main thread or something wierd
+			[info->captureSession	performSelectorOnMainThread:@selector(startRunning) 
+									withObject:nil 
+									waitUntilDone:YES];
+	
+		}
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraStop()) 
+	{	
+		CameraInfo *info = getCurrentCameraInfo();
+		if( info )
+		{
+			[info->captureSession stopRunning];
+			
+			//In this case, we don't have a preview widget,
+			//so we need to remove the layer from the main view.
+			if ( !info->view ) {
+				[info->previewLayer removeFromSuperlayer];
+			}
+		}
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraSetPreview(MAHandle widgetHandle)) 
+	{		
+		CameraPreviewWidget *widget = (CameraPreviewWidget*) [getMoSyncUI() getWidget:widgetHandle];
+		if( !widget )
+		{
+			return 0;
+		}
+		
+		UIView *newView = [widget getView];
+		
+		CameraInfo *info = getCurrentCameraInfo();
+		
+		if( !info->previewLayer )
+		{
+			info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
+			//info->previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+		}
+		
+		if ( info->view )
+		{
+			//Remove the preview layer from the other view
+			[info->previewLayer removeFromSuperlayer];
+			
+		}
+		
+		//If this widget was assigned to another camera, we need to remove that
+		//other camera's preview layer from it. 
+		for ( int i=0; i<gCameraSystem.numCameras; i++ ) {
+			if( gCameraSystem.cameraInfo[i].view == newView )
+			{
+				[gCameraSystem.cameraInfo[i].previewLayer removeFromSuperlayer];
+				gCameraSystem.cameraInfo[i].view = NULL;
+			}
+		}
+		
+		info->view = newView;
+		widget.previewLayer = info->previewLayer;
+		[info->view.layer addSublayer:info->previewLayer];
+		info->previewLayer.frame = info->view.bounds;
+		[info->view.layer setNeedsDisplay];
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraSelect(MAHandle cameraNumber)) 
+	{	
+		initCameraSystem();
+		
+		if (cameraNumber < 0 || cameraNumber >=gCameraSystem.numCameras) {
+			return 0;
+		}
+		
+		gCameraSystem.currentCamera = cameraNumber;
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraNumber()) 
+	{	
+		initCameraSystem();
+		return gCameraSystem.numCameras;
+	}
+	
+	SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder)) 
+	{		
+		return 1;
+	}
+	
+	SYSCALL(int, maCameraRecord(int stopStartFlag))
+	{		
+		return 1;
+	}
+	
 		
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
@@ -981,6 +1240,13 @@ namespace Base {
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);			
 		maIOCtl_case(maMessageBox);
+		maIOCtl_case(maCameraStart);
+		maIOCtl_case(maCameraStop);
+		maIOCtl_case(maCameraSetPreview);
+		maIOCtl_case(maCameraSelect);
+		maIOCtl_case(maCameraNumber);
+		maIOCtl_case(maCameraSnapshot);
+		maIOCtl_case(maCameraRecord);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
