@@ -344,6 +344,8 @@ public class WebWidget extends Widget
 			// it so here too.
 			// This might affect memory consumption / performance.
 			this.getSettings().setJavaScriptEnabled(true);
+
+			this.setVerticalScrollbarOverlay(true);
 		}
 
 		/**
