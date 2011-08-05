@@ -949,13 +949,19 @@ namespace Base {
 		MoSync_ShowMessageBox(title, message, false);
 	}
 	
+	//This struct holds information about what resources are connected
+	//to a single camera. Each device camera has it's own instance
+	//(So, one for most phones, and two for iPhone 4, for example)
 	struct CameraInfo {
 		AVCaptureSession *captureSession;
 		AVCaptureVideoPreviewLayer *previewLayer;
-		AVCaptureDevice *device;
+		AVCaptureDevice *device; //The physical camera device
 		UIView *view;
 	};
 	
+	//There is only a single instance of this struct, and it holds info about the
+	//devices on the system, as well as which one is the selected one for the camera
+	//syscalls
 	struct CameraSystemInfo {
 		int numCameras;
 		int currentCamera;
@@ -965,26 +971,33 @@ namespace Base {
 	
 	CameraSystemInfo gCameraSystem={0,0,FALSE,NULL};
 	
+	//This performs lazy initialization of the camera system, the first time
+	//a relevant camera syscall is called.
 	void initCameraSystem()
 	{
 		
-		if(gCameraSystem.initialized==FALSE)
+		if( gCameraSystem.initialized == FALSE )
 		{
-			NSLog(@"Initializing cameras");
+
 			CameraInfo *cameraInfo;
-			int numCameras=0;
+			int numCameras = 0;
+			
+			//This will also include microphones and maybe other, non camera devices
 			NSArray *devices = [AVCaptureDevice devices];
-			AVCaptureDevice *backCamera=NULL;
-			AVCaptureDevice *frontCamera=NULL;
-			for (AVCaptureDevice *device in devices) 
+			AVCaptureDevice *backCamera = NULL;
+			AVCaptureDevice *frontCamera = NULL;
+			 
+			for ( AVCaptureDevice *device in devices) 
 			{
-				
-				NSLog(@"Device name: %@", [device localizedName]);
-				
-				if ([device hasMediaType:AVMediaTypeVideo]) 
+				//This weeds out the devices we don't need
+				if ( [device hasMediaType:AVMediaTypeVideo] ) 
 				{
 					numCameras++;
-					if ([device position] == AVCaptureDevicePositionBack) 
+					//The following code assumes that all cameras not facing back,
+					//will be facing forward. This works for the current phones,
+					//but it could probably fail if Apple ever introduces a device
+					//with three or more cameras
+					if ( [device position] == AVCaptureDevicePositionBack ) 
 					{
 						backCamera = device;
 					}
@@ -995,53 +1008,60 @@ namespace Base {
 				}
 			}
 			
-			if(numCameras>0)
+			if( numCameras > 0 )
 			{
-				int positionCounter=0;
-				cameraInfo=new CameraInfo[numCameras];
-				if (backCamera != NULL)
+				int positionCounter = 0;
+				cameraInfo = new CameraInfo[numCameras];
+				
+				//Back facing camera should be first, then front facing, then the rest
+				if ( backCamera != NULL )
 				{
 					cameraInfo[positionCounter].device = backCamera;
 					positionCounter++;
 				}
-				if (frontCamera != NULL)
+				if ( frontCamera != NULL )
 				{
 					cameraInfo[positionCounter].device = frontCamera;
 					positionCounter++;
 				}
-				for (AVCaptureDevice *device in devices) 
+				
+				for ( AVCaptureDevice *device in devices ) 
 				{
-					if ([device hasMediaType:AVMediaTypeVideo] && 
+					if ( [device hasMediaType:AVMediaTypeVideo ] && 
 						device != backCamera && device != frontCamera) 
 					{
 						cameraInfo[positionCounter].device = device;
 						positionCounter++;
 					}
 				}
+				
 				for (int i=0; i<numCameras; i++) {
 					cameraInfo[i].captureSession = NULL;
 					cameraInfo[i].previewLayer = NULL;
 					cameraInfo[i].view = NULL;
 				}
 			}
-			//captureSession = [[AVCaptureSession alloc] init];
-			//captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+			
 			gCameraSystem.numCameras = numCameras;
 			gCameraSystem.cameraInfo = cameraInfo;
 			gCameraSystem.initialized = TRUE;
 		}
 	}
 	
+	//This function not only returns information about the currently selected amera, but
+	//also performs lazy initialization on the session object
 	CameraInfo *getCurrentCameraInfo()
 	{
 		initCameraSystem();
-		if(gCameraSystem.numCameras == 0)
+		
+		if( gCameraSystem.numCameras == 0 )
 		{
 			return NULL;
 		}
 
-		CameraInfo *curCam = &gCameraSystem.cameraInfo[gCameraSystem.currentCamera];
-		if (curCam->captureSession == NULL) {
+		CameraInfo *curCam = &gCameraSystem.cameraInfo[ gCameraSystem.currentCamera ];
+		if( curCam->captureSession == NULL ) {
+			
 			curCam->captureSession = [[AVCaptureSession alloc] init];
 			curCam->captureSession.sessionPreset = AVCaptureSessionPresetMedium;
 			
@@ -1056,11 +1076,11 @@ namespace Base {
 	
 	void StopAllCameraSessions()
 	{
-		if(gCameraSystem.initialized == TRUE)
+		if( gCameraSystem.initialized == TRUE )
 		{
-			for (int i=0; i < gCameraSystem.numCameras; i++) 
+			for ( int i = 0; i < gCameraSystem.numCameras; i++ ) 
 			{
-				if(gCameraSystem.cameraInfo[i].captureSession)
+				if( gCameraSystem.cameraInfo[i].captureSession )
 				{
 					[gCameraSystem.cameraInfo[i].captureSession stopRunning];
 				}
@@ -1071,14 +1091,17 @@ namespace Base {
 	SYSCALL(int, maCameraStart()) 
 	{	
 		CameraInfo *info = getCurrentCameraInfo();
-		if(info)
+		if( info )
 		{
-			if(!info->view)
+			//In this case, no preview widget was assigned to this camera.
+			//Run the sublayer to the main mosync view at full screen
+			if( !info->view )
 			{
-				if(!info->previewLayer)
+				if( !info->previewLayer )
 				{
 					info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
 				}
+				
 				MoSync_AddLayerToView(info->previewLayer);
 				MoSync_UpdateView(gBackbuffer->image);
 			}
@@ -1086,10 +1109,12 @@ namespace Base {
 			{
 				info->previewLayer.frame = info->view.bounds;
 			}
-			NSLog(@"Starting Camera");
+
 			//Have to do it this way, because otherwise it hijacks the main thread or something wierd
-			[info->captureSession performSelectorOnMainThread:@selector(startRunning) withObject:nil waitUntilDone:YES];
-			NSLog(@"Camera started");
+			[info->captureSession	performSelectorOnMainThread:@selector(startRunning) 
+									withObject:nil 
+									waitUntilDone:YES];
+	
 		}
 		return 1;
 	}
@@ -1097,12 +1122,13 @@ namespace Base {
 	SYSCALL(int, maCameraStop()) 
 	{	
 		CameraInfo *info = getCurrentCameraInfo();
-		if(info)
+		if( info )
 		{
-			NSLog(@"Stopping camera");
 			[info->captureSession stopRunning];
-			NSLog(@"Camera stopped");
-			if (!info->view) {
+			
+			//In this case, we don't have a preview widget,
+			//so we need to remove the layer from the main view.
+			if ( !info->view ) {
 				[info->previewLayer removeFromSuperlayer];
 			}
 		}
@@ -1112,32 +1138,38 @@ namespace Base {
 	SYSCALL(int, maCameraSetPreview(MAHandle widgetHandle)) 
 	{		
 		CameraPreviewWidget *widget = (CameraPreviewWidget*) [getMoSyncUI() getWidget:widgetHandle];
-		if(!widget)
+		if( !widget )
 		{
-			NSLog(@"No widget");
 			return 0;
 		}
+		
 		UIView *newView = [widget getView];
 		
 		CameraInfo *info = getCurrentCameraInfo();
-		if(!info->previewLayer)
+		
+		if( !info->previewLayer )
 		{
 			info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
 			//info->previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
 		}
-		if (info->view)
+		
+		if ( info->view )
 		{
+			//Remove the preview layer from the other view
 			[info->previewLayer removeFromSuperlayer];
 			
 		}
-		for (int i=0; i<gCameraSystem.numCameras; i++) {
-			if(gCameraSystem.cameraInfo[i].view == newView)
+		
+		//If this widget was assigned to another camera, we need to remove that
+		//other camera's preview layer from it. 
+		for ( int i=0; i<gCameraSystem.numCameras; i++ ) {
+			if( gCameraSystem.cameraInfo[i].view == newView )
 			{
-				NSLog(@"removing previous layer from view");
 				[gCameraSystem.cameraInfo[i].previewLayer removeFromSuperlayer];
 				gCameraSystem.cameraInfo[i].view = NULL;
 			}
 		}
+		
 		info->view = newView;
 		widget.previewLayer = info->previewLayer;
 		[info->view.layer addSublayer:info->previewLayer];
@@ -1149,11 +1181,11 @@ namespace Base {
 	SYSCALL(int, maCameraSelect(MAHandle cameraNumber)) 
 	{	
 		initCameraSystem();
-		printf("camera no:%d, total cameras:%d\n",cameraNumber,gCameraSystem.numCameras);
+		
 		if (cameraNumber < 0 || cameraNumber >=gCameraSystem.numCameras) {
 			return 0;
 		}
-		NSLog(@"maCameraSelect1");
+		
 		gCameraSystem.currentCamera = cameraNumber;
 		return 1;
 	}

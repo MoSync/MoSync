@@ -32,6 +32,8 @@
 
 @end
 
+//We need to create a new subclass of UIView in order to
+//have better control over the preview sublayer
 @interface UIPreview : UIView{
 	CameraPreviewWidget* mWidget;
 }

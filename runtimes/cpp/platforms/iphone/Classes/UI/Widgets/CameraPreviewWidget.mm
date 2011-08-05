@@ -60,13 +60,15 @@
 
 - (id)initWithCameraWidget:(CameraPreviewWidget*)widget
 {
-	mWidget=widget;
+	mWidget = widget;
 	return [super init];
 }
 
+//New implementation of the setter method for the frame property
+//It will resize the preview layer whenever the frame changes
 - (void)setFrame:(CGRect)newFrame
 {
-	super.frame=newFrame;
+	super.frame = newFrame;
 	if(mWidget.previewLayer){
 		mWidget.previewLayer.frame = super.bounds;
 	}
