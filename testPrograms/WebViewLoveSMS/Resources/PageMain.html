@@ -1,0 +1,132 @@
+<html>
+<head>
+<style type="text/css">
+html, body
+{
+  margin: 0;
+  padding: 0;
+  background: FF5577;
+  font-family: sans-serif;
+}
+
+#PageContainer
+{
+  width: 100%;
+  margin: auto;
+}
+
+#HeadingElement
+{
+  width: 100%;
+  margin: 0.1em auto;
+  font-size: 3.5em;
+  color: white;
+  text-align: center;
+}
+
+.button
+{
+  padding: 0.3em 0.5em;
+  display: table; /*inline-block;*/
+  margin: 20px auto;
+
+  color: white;
+  font-size: 1.5em;
+  text-align: center;
+  cursor: pointer;
+  font-weight: bold;
+
+  background-color: #99CF00;
+  border: none;
+  border-left: solid 1px #c3f83a;
+  border-top: solid 1px #c3f83a;
+  border-right: solid 1px #82a528;
+  border-bottom: solid 1px #58701b;
+
+  -moz-border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  border-radius: 0.3em;
+
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#99CF00), to(#6DB700));
+  background: -moz-linear-gradient(19% 75% 90deg,#6DB700, #99CF00);
+}
+
+/*.button:hover {
+    background-position: 0 -48px;
+    }*/
+
+.button:active
+{
+  /*background-position: 0 top;
+  position: relative;
+  top: 1px;
+  padding: 6px 10px 4px;*/
+
+  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6DB700), to(#99CF00));
+  background: -moz-linear-gradient(19% 75% 90deg,#99CF00, #6DB700);
+}
+
+a
+{
+  text-decoration: none;
+}
+
+#CenteredElement
+{
+  display: table;
+  height: 100px;
+  margin: 20px auto;
+  background-color: FFFFFF;
+}
+
+/*
+input.groovybutton
+{
+   font-size:20px;
+   font-family:Arial Black,sans-serif;
+   color:#FFFFFF;
+   width:200px;
+   height:50px;
+   background-color:#668899;
+   border-style:solid;
+   border-color:#000000;
+   border-width:2px;
+}
+*/
+</style>
+
+<script>
+/*function AdjustHeadingSize()
+{
+  var factor = 1/3;  // approximate width-to-height ratio
+  var headingContainer = document.getElementById("HeadingContainer");
+  var headingElement = document.getElementById("HeadingElement");
+  heading.style.fontSize =
+  div.css('font-size', div.width() / (div.text().length * factor) + 'px');
+}*/
+</script>
+</head>
+
+<body>
+<div id="PageContainer">
+<div id="HeadingContainer">
+	<h1 id="HeadingElement">LoveSMS</h1>
+</div>
+<div>
+	<!--<input class="button" type="button" value="Send Eternal Love" onclick="" />
+	<input class="button" type="button" value="Send Warm Kisses" onclick="" />-->
+
+	<a style="margin="20px 20px;" class="button" onclick="" href="#">Send Eternal Love</a>
+	<a class="button" onclick="" href="#">Send Warm Kisses</a>
+
+<!--
+</div>
+<div id="CenteredElement">Hello World</div>
+</div>
+-->
+
+<script>
+//AdjustHeadingSize();
+</script>
+</body>
+</html>
