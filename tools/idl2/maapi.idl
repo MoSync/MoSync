@@ -3230,17 +3230,6 @@ group WidgetAPI "Widget API" {
 		* @brief Indicates that the caller tried to remove a visible root widget (screen) and the MoSync view will become visible.
 		*/
 		REMOVED_ROOT = -10;
-
-		/**
-		* @brief Indicates that the caller tried to remove a visible root widget (screen) and the MoSync view will become visible.
-		*/
-		INVALID_ACTION = -11;
-
-		/**
-		* @brief Indicates that maWidgetPerformAction was called for a widget but with an invalid parameter.
-		*/
-		INVALID_PARAMETER_VALUE = -12;
-		
 		
 	}
 	} // end of WidgetResultCodes
@@ -3361,14 +3350,6 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetTypes
 
-	/**
-	* Some widgets can perform actions when receive a message. In order to send action messages, use maWidgetPerformAction(). 
-	*/
-	group WidgetActions "Widget Actions" {
-	
-	
-	}//end of WidgetActions
-	
 	
 	/**
 	* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change 
@@ -4394,25 +4375,6 @@ group WidgetAPI "Widget API" {
 	int maWidgetSetProperty(in MAWidgetHandle widget, in MAString property, in MAString value);
 
 	/** 
-	* Sends a specific message to a widget to perform an action.
-	*
-	* \param widget Handle to the widget.
-	* \param action A string representing the action.
-	* \param param The parameter for the action..
-	*
-	* \note May be synchronous or asynchronous depending on the property.
-	* \note See \ref WidgetProperties "Widget properties" for the available properties.
-	*
-	* \returns Any of the following result codes:
-	* - #MAW_RES_OK if the property could be set.
-	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
-	* - #MAW_RES_INVALID_ACTION_NAME if the action name was invalid.
-	* - #MAW_RES_INVALID_ACTION_VALUE if the action value was invalid.  
-	* - #MAW_RES_ERROR otherwise.
-	*/
-	int maWidgetPerformAction(in MAWidgetHandle widget, in MAString action, in MAString param);
-
-	/** 
 	* Retrieves a specified property from the given widget.
 	*
 	* \param widget Handle to the widget.
@@ -4432,7 +4394,201 @@ group WidgetAPI "Widget API" {
 
 } // end of group WidgetAPI
 #endif //IX_WIDGET
+
+group CameraAPI "Camera API" {
+
+	constset int MA_CAMERA_CONST_ {
+		/**
+		* @brief A constant that represents the flash being on.
+		*/
+		BACK_CAMERA = 0;
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		FRONT_CAMERA = 1;
+		
+	} //end MA_CAMERA_CONST
+
+group CameraResultCodes "Camera Result Codes" {
+	constset int MA_CAMERA_RES_ {
+		/**
+		* @brief A constant that represents the flash being on.
+		*/
+		OK = 1;
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		FAILED = -2;
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		NOT_STARTED = -3;
+		
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		PROPERTY_NOTSUPPORTED = -4;
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		INVALID_PROPERTY_VALUE = -5;
+		
+	} 
+} //end CameraResultCodes
+
+
+group FlashModes "Flash Modes" {
+	constset MAString MA_CAMERA_FLASH_ {
+		/**
+		* @brief A constant that represents the flash being on.
+		*/
+		ON = "on";
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		AUTO = "auto";
+		
+		/**
+		* @brief A constant that represents the flash being off.
+		*/
+		OFF = "off";
+		
+		/**
+		* @brief A constant that represents the flash being in the torch mode.
+		*/
+		TORCH = "torch";
+		
+	} //end MAC_FLASH_
+}// end of FlashMode
+
+group FocusModes "Focus Modes" {
+	constset MAString MA_CAMERA_FOCUS_ {
+		/**
+		* @brief A constant that represents the focus mode being automatic.
+		*/
+		AUTO = "auto";
+
+		/**
+		* @brief A constant that turns the camera to focus to infinity.
+		*/
+		INFINITY = "infinity";
+		
+		/**
+		* @brief A constant that turns the camera to macro mode.
+		*/
+		MACRO = "macro";
+		
+		/**
+		* @brief A constant that sets the camera to fixed focus mode.
+		*/
+		FIXED = "fixed";
+		
+	} //end MAC_FOCUS_
+} //end of FocusMode
+
+group ImageFormat "Image Formats" {
+	constset MAString MA_CAMERA_IMAGE_ {
+		/**
+		* @brief A constant that represents JPEG image format.
+		*/
+		JPEG = "jpeg";
+
+		/**
+		* @brief A constant that represents RAW image format.
+		*/
+		RAW = "raw";
+		
+	} //end MA_CAMERA_IMAGE_
+} //end ImageFormats
+
+group CameraProperties "Camera Properties" {
 	
+	constset MAString MA_CAMERA_ {	
+	
+		/**
+		* @brief Sets the flash mode for the camera.
+		*
+		* @validvalue can be one of the #MA_CAMERA_FLASH_ON, #MA_CAMERA_FLASH_OFF, #MA_CAMERA_FLASH_AUTO, #MA_CAMERA_FLASH_TORCH constants
+		*
+		* @par Example
+		* \code
+		*	maCameraSetProperty(MAW_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO);
+		* \endcode
+		*/
+		FLASH_MODE = "flash-mode";
+
+		/**
+		* @brief Sets the focus mode for the camera.
+		*
+		* @validvalue can be one of the #MA_CAMERA_FOCUS_AUTO, #MA_CAMERA_FOCUS_INFINITY, #MA_CAMERA_FOCUS_MACRO, #MA_CAMERA_FOCUS_FIXED constants
+		*
+		* @par Example
+		* \code
+		*	maCameraSetProperty(MAW_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO);
+		* \endcode
+		*/
+		FOCUS_MODE = "focus-mode";
+		
+		/**
+		* @brief Sets the image format for the camera.
+		*
+		* @validvalue can be one of the #MA_CAMERA_IMAGE_JPEG, #MA_CAMERA_IMAGE_RAW constants
+		*
+		* @par Example
+		* \code
+		*	maCameraSetProperty(MAW_CAMERA_IMAGE_FORMAT, MA_CAMERA_IMAGE_JPEG);
+		* \endcode
+		*/
+		IMAGE_FORMAT = "image-format";
+		
+
+		/**
+		* @brief Sets the focus mode for the camera.
+		*
+		* @validvalue an int string that can be between 0 and #MA_CAMERA_MAX_ZOOM
+		*
+		* @par Example
+		* \code
+		*	maCameraSetProperty(MAW_CAMERA_ZOOM, "1");
+		* \endcode
+		*/
+		ZOOM = "zoom";
+
+		/**
+		* @brief Provides the information about the maximum supported zoom level on the device.
+		*
+		* @getonly
+		*
+		*/
+		MAX_ZOOM = "max-zoom";
+
+		/**
+		* @brief Indicates that if the device supports zoom or not.
+		*
+		* @validvalue the returned value is "true" for support and "false" for lack of support.
+		*
+		* @getonly
+		*/
+		ZOOM_SUPPORTED = "zoom-supported";
+
+		/**
+		* @brief Indicates that if the device has a flash or not.
+		*
+		* @validvalue the returned value is "true" for support and "false" for lack of support.
+		*
+		* @getonly
+		*/
+		FLASH_SUPPORTED = "flash-supported";
+		
+	} //end of MAC_
+} // end of CameraProperties
+
+group CameraFunctions "Camera Functions" {
 		/**
 		* \brief The camera format, in pixels.
 		*/
@@ -4490,7 +4646,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* Requires the viewfinder to be active.
-		* Takes a snapshot using the specified format. The snapshot is JPEG-encoded and
+		* Takes a snapshot using the specified format. The snapshot is
 		* stored as a new data object in the supplied placeholder.
 		* Returns 0 on success, or \< 0 on error.
 		*/
@@ -4503,6 +4659,32 @@ group WidgetAPI "Widget API" {
 		* Returns 1 for success, \< 0 on error.
 		*/
 		int maCameraRecord(in int stopStartFlag);
+
+
+		/** 
+		* Sets a specified property on the Selected Camera.
+		*
+		* \param property A string representing which property to set.
+		* \param value The value which will be assigned to the property.
+		*
+		* \returns 1 for success and <0 for failure.
+		*/
+		int maCameraSetProperty(in MAString property, in MAString value);
+
+		/** 
+		* retrives a specified property on the Selected Camera.
+		*
+		* \param property A string representing which property to set.
+		* \param value A buffer that will hold the value of the property, represented as a string.
+		* \param bufSize Size of the buffer.		
+		*
+		* \returns 1 for success and <0 for failure.
+		*/
+		int maCameraGetProperty( in MAString property, out MAString value range("bufSize"), in int bufSize);
+	
+	} // end of CameraFunctions
+	
+	} //end of CameraAPI
 		
 		/**
 		* Shows the virtual keyboard.

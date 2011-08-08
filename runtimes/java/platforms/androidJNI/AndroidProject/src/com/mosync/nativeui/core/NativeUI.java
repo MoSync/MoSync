@@ -7,18 +7,22 @@ import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.View;
 
+import com.mosync.internal.android.MoSyncCameraController;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
+import com.mosync.nativeui.ui.factories.CameraPreviewFactory;
 import com.mosync.nativeui.ui.factories.ViewFactory;
+import com.mosync.nativeui.ui.widgets.CameraPreviewWidget;
 import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.util.properties.InvalidParameterException;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -35,6 +39,7 @@ public class NativeUI
 	 */
 	private Activity m_activity;
 	
+	public MoSyncThread mMoSyncThread;
 	/**
 	 * A table that contains a mapping between a handle and a widget, in a
 	 * mosync program a handle is the only reference to a widget.
@@ -137,7 +142,6 @@ public class NativeUI
 		
 		int nextHandle = m_widgetTable.getNextHandle( );
 		Widget widget = ViewFactory.createView( type, m_activity, nextHandle );
-		
 		if( widget != null )
 		{	
 			m_widgetTable.add( nextHandle, widget );
@@ -470,6 +474,7 @@ public class NativeUI
 		
 		return result.length( );
 	}
+
 	
 	/**
 	 * Called when the back button has been pressed.
@@ -502,4 +507,10 @@ public class NativeUI
 		 */
 		void rootViewReplaced(View newRoot);
 	}
+	
+	public Widget getCameraView(final int handle)
+	{
+		return m_widgetTable.get(handle);
+	}
+	
 }

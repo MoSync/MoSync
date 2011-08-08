@@ -97,6 +97,7 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_CHECK_BOX, new CheckBoxFactory( ) );
 		addFactory( IX_WIDGET.MAW_EDIT_BOX, new EditBoxFactory( ) );
 		addFactory( IX_WIDGET.MAW_STACK_SCREEN, new StackScreenFactory( ) );
+		addFactory( IX_WIDGET.MAW_CAMERA_PREVIEW, new CameraPreviewFactory( ) );
 	}
 	
 	/**

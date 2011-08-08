@@ -175,6 +175,8 @@ packages = ["src/com/mosync/java/android/*.java",
 # Concatenate each list element with package_root, and flatten the list to a string
 java_files = packages.map { |package| File.join(package_root, package) }.join(" ")
 
+
+
 # Compile all the java files into class files
 sh(
 	"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +

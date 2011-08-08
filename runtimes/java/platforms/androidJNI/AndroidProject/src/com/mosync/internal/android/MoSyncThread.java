@@ -93,11 +93,14 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
+import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -140,7 +143,8 @@ public class MoSyncThread extends Thread
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
 	MoSyncFile mMoSyncFile;
-
+	MoSyncCameraController mMoSyncCameraController;
+	
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
 	
@@ -170,6 +174,11 @@ public class MoSyncThread extends Thread
 	 * true if this thread is sleeping in maWait.
 	 */
 	private AtomicBoolean mIsSleepingInMaWait = new AtomicBoolean(false);
+
+	/**
+	 * a handle used for full screen camera preview 
+	 */
+	private int cameraScreen;
 	
 	/**
 	 * This is the size of the header of the asset file
@@ -190,7 +199,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * Table that holds binary resources.
 	 */
-	Hashtable<Integer, ByteBuffer> mBinaryResources = 
+	public Hashtable<Integer, ByteBuffer> mBinaryResources = 
 		new Hashtable<Integer, ByteBuffer>();
 
 	/**
@@ -285,6 +294,8 @@ public class MoSyncThread extends Thread
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
 		mMoSyncFile = new MoSyncFile(this);
+		
+		mMoSyncCameraController = new MoSyncCameraController(this);
 		
 		// Bluetooth is not available on all platforms and
 		// therefore we do a conditional loading of the
@@ -412,6 +423,7 @@ public class MoSyncThread extends Thread
 			+ " height:" + mBitmap.getHeight());
 	}
 
+	
 	/**
 	 * Allocate memory for the program data section.
 	 */
@@ -1096,6 +1108,8 @@ public class MoSyncThread extends Thread
 
 		mCanvas.drawBitmap(imageResource.mBitmap, left, top, null);
 	}
+
+
 
 	/**
 	 * _maDrawRGB
@@ -1820,6 +1834,7 @@ public class MoSyncThread extends Thread
 		SYSLOG("maLoadProgram");
 	}
 
+	
 	/**
 	 * maGetKeys
 	 */
@@ -2745,7 +2760,10 @@ public class MoSyncThread extends Thread
 	{
 		return mMoSyncNativeUI.maWidgetSetProperty(widgetHandle, key, value);
 	}
-	
+	/**
+	 * Internal wrapper for maWidgetGetProperty that runs
+	 * the call in the UI thread.
+	 */	
 	public int maWidgetGetProperty(
 			final int widgetHandle,
 			final String key,
@@ -2774,6 +2792,151 @@ public class MoSyncThread extends Thread
 		final int stackScreenWidget)
 	{
 		return mMoSyncNativeUI.maWidgetStackScreenPop(stackScreenWidget);
+	}
+	
+	/**
+	 * Releases the locked hardware for use in other apps
+	 */
+	public void releaseHardware()
+	{
+		mMoSyncCameraController.releaseCamera();
+	}
+	
+	/**
+	 * starts the Camera Preview
+	 * 
+	 * @return 1 if succeeds
+	 */
+	int maCameraStart()
+	{
+		//Start a fullscreen preview and then start the camera
+		if(false == mMoSyncCameraController.hasView())
+		{
+			if(cameraScreen == 0)
+			{
+				cameraScreen =  maWidgetCreate(IX_WIDGET.MAW_SCREEN);
+				int cameraPreview = maWidgetCreate(IX_WIDGET.MAW_CAMERA_PREVIEW);
+				maWidgetAddChild(cameraScreen, cameraPreview);
+				FrameLayout layout =  (FrameLayout) mMoSyncNativeUI.getCameraPreview(cameraPreview).getView();
+				mMoSyncCameraController.setPreview(
+					(MoSyncCameraPreview)layout.getChildAt(0)
+					);
+				maWidgetScreenShow(cameraScreen);
+			}
+		}
+		return mMoSyncCameraController.cameraStart();
+	}
+	
+	/**
+	 * Stops the Camera Preview
+	 * 
+	 * @return 1 if succeeds
+	 */
+	int maCameraStop()
+	{
+		int result = mMoSyncCameraController.cameraStop(); 
+		//go back to the previous screen'
+		if(cameraScreen != 0)
+		{
+			maWidgetDestroy(cameraScreen);
+			maWidgetScreenShow(IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE);
+			cameraScreen = 0;
+		}
+		return result;
+	}
+	
+	/**
+	 * Takes a snapshot and stores it in the place holder
+	 * 
+	 * @param formatIndex index of the format set by the user
+	 * @param placeHolder a place holder 
+	 * @return <0 if fails and >0 if succeeds
+	 */
+	int maCameraSnapshot(int formatIndex, int placeHolder)
+	{
+		return mMoSyncCameraController.cameraSnapshot(formatIndex, placeHolder);
+	}
+	
+	
+	/**
+	 * binds a preview to the camera
+	 * 
+	 * @param widgetHandle the handle to the Camera preview widget
+	 * @return 0 if widget not found, 1 for success
+	 */
+	int maCameraSetPreview(int widgetHandle)
+	{
+		FrameLayout layout =  
+				(FrameLayout)mMoSyncNativeUI.getCameraPreview(widgetHandle).getView();
+		MoSyncCameraPreview preview = (MoSyncCameraPreview)layout.getChildAt(0);
+		if(preview == null)
+			return 0; //Widget Not Found
+		mMoSyncCameraController.setPreview(preview);
+		return 1;
+	}
+	
+	/**
+	 * Selects the active Camera
+	 * 
+	 * @param cameraNumber index of the camera in the list
+	 * @return >0 for success, <0 for failure
+	 */
+	int maCameraSelect(int cameraNumber)
+	{
+		return mMoSyncCameraController.setActiveCamera(cameraNumber);
+	}
+	
+	/**
+	 * Queries the number of available cameras on the device
+	 * 
+	 * @return number of available cameras
+	 */
+	int maCameraNumber()
+	{
+		return mMoSyncCameraController.numberOfCameras();
+	}
+	
+	/**
+	 * Queries the number of supported formats
+	 * 
+	 * @return number of supported formats
+	 */
+	int maCameraFormatNumber()
+	{
+		return mMoSyncCameraController.getNumberOfPictureSizes();
+	}
+	
+	/**
+	 * Adds a custom format to the list
+	 * 
+	 * @param index index of the specific format
+	 * @param width image width
+	 * @param height image height
+	 * @return 1 for success
+	 */
+	
+	int maCameraFormat(int index, int width, int height)
+	{
+		mMoSyncCameraController.addSize(index, width, height);
+		return 1;
+	}
+	
+	
+	public int maCameraSetProperty(
+		final String key, 
+		final String value)
+	{
+		return mMoSyncCameraController.setCameraProperty(key, value);
+	}
+	
+	public int maCameraGetProperty(
+			final String key,
+			final int memBuffer, 
+			final int memBufferSize)
+	{
+		return mMoSyncCameraController.getCameraPorperty(key, 
+										memBuffer, 
+										memBufferSize);
 	}
 	
 	/**

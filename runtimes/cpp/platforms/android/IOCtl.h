@@ -485,4 +485,30 @@ namespace Base
 	* \returns 0.
 	*/
 	int _maFileListClose(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maCameraStart(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraStop(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraSetPreview(MAHandle widgetHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraSelect(MAHandle cameraHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraNumber(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraSnapshot(int formatIndex, MAHandle placeHolder, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraRecord(int flag, JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maCameraFormatNumber(JNIEnv* jNIEnv, jobject jThis);
+	
+	int _maCameraFormat(int index, int width, int height, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCameraSetProperty(const char *property, const char* value, 
+							JNIEnv* jNIEnv, jobject jThis);
+							
+	int _maCameraGetProperty(int memStart, const char *property, 
+								int memBuffer, int memBufferSize, 
+								JNIEnv* jNIEnv, jobject jThis);
+
 }

@@ -1789,6 +1789,88 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 				
+		case maIOCtl_maCameraStart:
+			return _maCameraStart(
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraStop:
+			return _maCameraStop(
+				mJNIEnv,
+				mJThis);
+
+
+		case maIOCtl_maCameraSnapshot:
+			return _maCameraSnapshot(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraSetPreview:
+			return _maCameraSetPreview(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraNumber:
+			return _maCameraNumber(
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraSelect:
+			return _maCameraSelect(
+				a,
+				mJNIEnv,
+				mJThis);
+				
+		case maIOCtl_maCameraRecord:
+			return _maCameraRecord(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraFormatNumber:
+			return _maCameraFormatNumber(
+				mJNIEnv,
+				mJThis);
+				
+		case maIOCtl_maCameraFormat:
+		{
+
+			// b is pointer to struct 	MA_CAMERA_FORMAT
+				MA_CAMERA_FORMAT* sizeInfo = (MA_CAMERA_FORMAT*) SYSCALL_THIS->GetValidatedMemRange(b, sizeof(MA_CAMERA_FORMAT));
+
+			// Size of buffer to store device name.
+			int width = sizeInfo->width;
+
+			// Size of buffer to store device name.
+			int height = sizeInfo->height;
+
+			
+			// Returns 1 for success, 0 for no more devices.
+			return _maCameraFormat(
+				a,
+				width,
+				height,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maCameraSetProperty:
+			return _maCameraSetProperty(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b), mJNIEnv, mJThis);
+
+		case maIOCtl_maCameraGetProperty:
+		{
+			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
+			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b, 
+				_valueBufferSize * sizeof(char));
+			
+			return _maCameraGetProperty((int)gCore->mem_ds, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}		
+
 		} // End of switch
 		
 		return IOCTL_UNAVAILABLE;

@@ -118,6 +118,7 @@ public class MoSync extends Activity
 		if (null != mMoSyncView)
 		{
 			mMoSyncThread.setMoSyncView(mMoSyncView);
+		
 			setContentView(mMoSyncView);
 		}
 		else
@@ -170,7 +171,7 @@ public class MoSync extends Activity
     protected void onStop()
 	{
 		Log.i("MoSync", "onStop");
-		
+		mMoSyncThread.releaseHardware();
 		super.onStop();
 		
 		if (theMoSyncThreadIsDead()) { return ; }
@@ -198,7 +199,7 @@ public class MoSync extends Activity
     protected void onPause()
 	{
 		Log.i("MoSync", "onPause");
-		
+		mMoSyncThread.releaseHardware();
 		super.onPause();
 		
 		if (theMoSyncThreadIsDead()) { return ; }
