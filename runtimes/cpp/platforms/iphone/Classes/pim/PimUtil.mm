@@ -369,7 +369,22 @@ static PimUtils *sharedInstance = nil;
             break;
         case MA_PIM_FIELD_CONTACT_RELATED_NAME:
             returnValue = MA_PIM_TYPE_STRING;
-            break;    
+            break;
+        case MA_PIM_FIELD_EVENT_TITLE:
+            returnValue = MA_PIM_TYPE_STRING;
+            break;
+        case MA_PIM_FIELD_EVENT_START_DATE:
+            returnValue = MA_PIM_TYPE_DATE;
+            break;
+        case MA_PIM_FIELD_EVENT_END_DATE:
+            returnValue = MA_PIM_TYPE_DATE;
+            break;
+        case MA_PIM_FIELD_EVENT_LOCATION:
+            returnValue = MA_PIM_TYPE_STRING;
+            break;
+        case MA_PIM_FIELD_EVENT_DESCRIPTION:
+            returnValue = MA_PIM_TYPE_STRING;
+            break;
         default:
             returnValue = MA_PIM_ERR_UNAVAILABLE_FIELD;
     }

@@ -2934,6 +2934,21 @@ interface MAAPI {
 			ASSISTANT = 0x40000000;
 		}
 
+		constset int MA_PIM_FIELD_EVENT_ {
+			/// #MA_PIM_TYPE_STRING.
+			TITLE = 1;
+			/// #MA_PIM_TYPE_DATE.
+			START_DATE = 2;
+			/// #MA_PIM_TYPE_DATE.
+			END_DATE = 3;
+			/// #MA_PIM_TYPE_STRING.
+			LOCATION = 4;
+			/// #MA_PIM_TYPE_STRING.
+			DESCRIPTION = 5;
+			/// #MA_PIM_TYPE_INT.
+			ALARM = 6;
+		}
+		
 		constset int MA_PIM_ERR_ {
 			/// No error. The operation completed successfully.
 			NONE = 0;
@@ -2961,6 +2976,18 @@ interface MAAPI {
 			OPERATION_NOT_PERMITTED = -10;
 			/// Invalid handle.
 			INVALID_HANDLE = -11;
+
+			/// The native database's data type for the given field did not match the MoSync API.
+			NATIVE_TYPE_MISMATCH = -2;
+			/// The field type is not supported.
+			FIELD_UNSUPPORTED = -3;
+			/// The field is read-only.
+			READ_ONLY = -4;
+			/// The field/attribute combination is not supported.
+			COMBO_UNSUPPORTED = -5;
+			/// More values in this field is not supported.
+			FIELD_COUNT_MAX = -6;
+
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.
@@ -3082,6 +3109,9 @@ interface MAAPI {
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
+		* \note When setting a value with #MA_PIM_TYPE_STRING_ARRAY, at least one
+		* string must be present and have a length greater than zero.
+		* Any surplus strings are ignored.
 		*/
 		int maPimItemSetValue(in MA_PIM_ARGS args, in int index, in int attributes);
 
@@ -3124,8 +3154,9 @@ interface MAAPI {
 		MAHandle maPimItemCreate(in MAHandle list);
 
 		/** Removes an item from a list. This also has the effect of closing the item.
-		* \returns 0.
+		* \returns 0 on success and \< 0 on failure.
 		* \see maPimItemClose()
+		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM

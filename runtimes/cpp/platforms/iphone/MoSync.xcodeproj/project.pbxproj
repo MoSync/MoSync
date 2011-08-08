@@ -40,6 +40,14 @@
 		4370369013E93F3000F22783 /* PimUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4370367613E93F3000F22783 /* PimUtil.mm */; };
 		4370369113E93F3000F22783 /* PimUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4370367613E93F3000F22783 /* PimUtil.mm */; };
 		4370369413E9467200F22783 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4370369313E9467200F22783 /* AddressBook.framework */; };
+		43B955F213ED21C300249D12 /* PimEventsList.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B955F013ED21C300249D12 /* PimEventsList.h */; };
+		43B955F313ED21C300249D12 /* PimEventsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 43B955F113ED21C300249D12 /* PimEventsList.m */; };
+		43B955F413ED21C300249D12 /* PimEventsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 43B955F113ED21C300249D12 /* PimEventsList.m */; };
+		43B955F713ED21D900249D12 /* PimEventItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B955F513ED21D900249D12 /* PimEventItem.h */; };
+		43B955F813ED21D900249D12 /* PimEventItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 43B955F613ED21D900249D12 /* PimEventItem.m */; };
+		43B955F913ED21D900249D12 /* PimEventItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 43B955F613ED21D900249D12 /* PimEventItem.m */; };
+		43B955FB13ED25E600249D12 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B955FA13ED25E600249D12 /* EventKit.framework */; };
+		43B9560913ED299500249D12 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4370369313E9467200F22783 /* AddressBook.framework */; };
 		85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
 		85037841133A2275009251E2 /* StackScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 8503783E133A2275009251E2 /* StackScreenWidget.h */; };
 		85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
@@ -256,6 +264,11 @@
 		4370367513E93F3000F22783 /* PimUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimUtil.h; sourceTree = "<group>"; };
 		4370367613E93F3000F22783 /* PimUtil.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PimUtil.mm; sourceTree = "<group>"; };
 		4370369313E9467200F22783 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		43B955F013ED21C300249D12 /* PimEventsList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimEventsList.h; sourceTree = "<group>"; };
+		43B955F113ED21C300249D12 /* PimEventsList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PimEventsList.m; sourceTree = "<group>"; };
+		43B955F513ED21D900249D12 /* PimEventItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimEventItem.h; sourceTree = "<group>"; };
+		43B955F613ED21D900249D12 /* PimEventItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PimEventItem.m; sourceTree = "<group>"; };
+		43B955FA13ED25E600249D12 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
@@ -419,6 +432,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43B955FB13ED25E600249D12 /* EventKit.framework in Frameworks */,
 				4370369413E9467200F22783 /* AddressBook.framework in Frameworks */,
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
@@ -457,6 +471,7 @@
 				85F2558211AC155D00EB47EE /* AVFoundation.framework in Frameworks */,
 				85F2558311AC155D00EB47EE /* CoreLocation.framework in Frameworks */,
 				85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */,
+				43B9560913ED299500249D12 /* AddressBook.framework in Frameworks */,
 				858B408B12E6824C0058DBFC /* OpenGLES.framework in Frameworks */,
 				858B408C12E682820058DBFC /* QuartzCore.framework in Frameworks */,
 			);
@@ -540,6 +555,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				43B955FA13ED25E600249D12 /* EventKit.framework */,
 				4370369313E9467200F22783 /* AddressBook.framework */,
 				857B020112C627C200DEA306 /* OpenGLES.framework */,
 				850944001185C440004A3B2D /* CoreLocation.framework */,
@@ -556,6 +572,7 @@
 		4370366313E93F3000F22783 /* pim */ = {
 			isa = PBXGroup;
 			children = (
+				43B955EE13ED218900249D12 /* events */,
 				4370366413E93F3000F22783 /* contacts */,
 				4370366913E93F3000F22783 /* PimDatabase.h */,
 				4370366A13E93F3000F22783 /* PimDatabase.mm */,
@@ -584,6 +601,17 @@
 				4370366813E93F3000F22783 /* PimContactsList.m */,
 			);
 			path = contacts;
+			sourceTree = "<group>";
+		};
+		43B955EE13ED218900249D12 /* events */ = {
+			isa = PBXGroup;
+			children = (
+				43B955F513ED21D900249D12 /* PimEventItem.h */,
+				43B955F613ED21D900249D12 /* PimEventItem.m */,
+				43B955F013ED21C300249D12 /* PimEventsList.h */,
+				43B955F113ED21C300249D12 /* PimEventsList.m */,
+			);
+			path = events;
 			sourceTree = "<group>";
 		};
 		8500CD3E132E506D0003A01E /* External */ = {
@@ -876,6 +904,8 @@
 				4370368913E93F3000F22783 /* PimList.h in Headers */,
 				4370368C13E93F3000F22783 /* PimSyscall.h in Headers */,
 				4370368F13E93F3000F22783 /* PimUtil.h in Headers */,
+				43B955F213ED21C300249D12 /* PimEventsList.h in Headers */,
+				43B955F713ED21D900249D12 /* PimEventItem.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1058,6 +1088,8 @@
 				4370368A13E93F3000F22783 /* PimList.mm in Sources */,
 				4370368D13E93F3000F22783 /* PimSyscall.mm in Sources */,
 				4370369013E93F3000F22783 /* PimUtil.mm in Sources */,
+				43B955F313ED21C300249D12 /* PimEventsList.m in Sources */,
+				43B955F813ED21D900249D12 /* PimEventItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1130,6 +1162,8 @@
 				4370368B13E93F3000F22783 /* PimList.mm in Sources */,
 				4370368E13E93F3000F22783 /* PimSyscall.mm in Sources */,
 				4370369113E93F3000F22783 /* PimUtil.mm in Sources */,
+				43B955F413ED21C300249D12 /* PimEventsList.m in Sources */,
+				43B955F913ED21D900249D12 /* PimEventItem.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

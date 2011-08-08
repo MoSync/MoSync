@@ -15,64 +15,75 @@
  02111-1307, USA.
  */
 
+#import "PimEventsList.h"
+#include "PimUtil.h"
 
-#import "PimContactsList.h"
-#import "PimUtil.h"
-
-@implementation PimContactsList
+@implementation PimEventsList
 
 /**
  * Init function.
  */
 -(id) init
 {
-    mContactsDictionary = [[NSMutableDictionary alloc] init];
+    mEventsDictionary = [[NSMutableDictionary alloc] init];
+    mEventStore = [[EKEventStore alloc] init];
     mKeysArrayIndex = MA_PIM_ERR_LIST_NOT_OPENED;
+    
     return [super init];
 }
 
 /**
- * Imports all contact items from Address Book.
+ * Imports all event items from Calendar.
  */
 -(void) openList
 {
-    // Copy all contacts.
-    mAddressBook = ABAddressBookCreate();
-    CFMutableArrayRef contactsArray;
-    CFArrayRef people = ABAddressBookCopyArrayOfAllPeople(mAddressBook);
-    contactsArray = CFArrayCreateMutableCopy(
-        kCFAllocatorDefault,
-        CFArrayGetCount(people),
-        people);
+    // Create the predicate's start and end dates.
+    CFGregorianDate gregorianStartDate, gregorianEndDate;
+    CFGregorianUnits startUnits = {-2, 0, 0, 0, 0, 0};
+    CFGregorianUnits endUnits = {2, 0, 0, 0, 0, 0};
+    CFTimeZoneRef timeZone = CFTimeZoneCopySystem();
     
-    // Sort the contacts by name.
-    int countContacts = CFArrayGetCount(contactsArray);
-    CFArraySortValues(
-        contactsArray,
-        CFRangeMake(0, countContacts),
-        (CFComparatorFunction) ABPersonComparePeopleByName,
-        (void*) ABPersonGetSortOrdering());
+    gregorianStartDate = CFAbsoluteTimeGetGregorianDate(
+        CFAbsoluteTimeAddGregorianUnits(CFAbsoluteTimeGetCurrent(), timeZone, startUnits),
+        timeZone);
+    gregorianStartDate.hour = 0;
+    gregorianStartDate.minute = 0;
+    gregorianStartDate.second = 0;
     
-    // Save the contact items into a dictionary. In the dictionary each contact item 
-    // will have associated a key(the item's handle). Each key is unique and it's 
-    // generated using getNextHandle function(PimUtils class).
-    for(int i = 0; i < countContacts; i++)
+    gregorianEndDate = CFAbsoluteTimeGetGregorianDate(
+        CFAbsoluteTimeAddGregorianUnits(CFAbsoluteTimeGetCurrent(), timeZone, endUnits),
+        timeZone);
+    gregorianEndDate.hour = 0;
+    gregorianEndDate.minute = 0;
+    gregorianEndDate.second = 0;
+    
+    NSDate* startDate =
+    [NSDate dateWithTimeIntervalSinceReferenceDate:CFGregorianDateGetAbsoluteTime(gregorianStartDate, timeZone)];
+    NSDate* endDate =
+    [NSDate dateWithTimeIntervalSinceReferenceDate:CFGregorianDateGetAbsoluteTime(gregorianEndDate, timeZone)];
+    CFRelease(timeZone);
+    
+    // Create the predicate.
+    NSArray* array = [NSArray arrayWithObject:[mEventStore defaultCalendarForNewEvents]];
+    NSPredicate *predicate = [mEventStore predicateForEventsWithStartDate:startDate 
+                                                                  endDate:endDate 
+                                                                calendars:array]; 
+    
+    // Fetch all events that match the predicate.
+    NSArray *events = [mEventStore eventsMatchingPredicate:predicate];
+    for (EKEvent* event in events)
     {
-        // Get the contact item from the array.
-        ABRecordRef nativeContact = CFArrayGetValueAtIndex(contactsArray, i);
-        PimContactItem* item = [[PimContactItem alloc] initWithRecord:nativeContact];
-        
+        PimItem* pimEvent = [[PimEventItem alloc] initWithEvent:event];
+       
         // Get the next handle.
         int handle = [[PimUtils sharedInstance] getNextHandle];
         NSString* key = [[NSString alloc] initWithFormat:@"%d", handle];
         
         // Save the item into dictionary.
-        [mContactsDictionary setObject:item forKey: key];
+        [mEventsDictionary setObject:pimEvent forKey: key];
         [key release];
     }
     
-    CFRelease(contactsArray);
-    CFRelease(people);
     mKeysArrayIndex = -1;
 }
 
@@ -90,7 +101,7 @@
     }
     
     // Check if the are more items in list.
-    NSArray* keysArray = [mContactsDictionary allKeys];
+    NSArray* keysArray = [mEventsDictionary allKeys];
     if ((mKeysArrayIndex + 1) >= [keysArray count])
     {
         return 0;
@@ -113,24 +124,24 @@
 -(PimItem*) getItem:(MAHandle) itemHandle
 {
     NSString* key = [[NSString alloc] initWithFormat:@"%d",itemHandle];
-    PimItem* contactItem = [mContactsDictionary objectForKey:key];
+    PimItem* contactItem = [mEventsDictionary objectForKey:key];
     [key release];
     
     return contactItem;
 }
 
 /**
- * Creates an Contact item.
- * @return A handle to the new Contact item.
+ * Creates an Event item.
+ * @return A handle to the new Event item.
  */
 -(MAHandle) createItem;
 {
-    PimContactItem* item = [[PimContactItem alloc] init];
+    PimEventItem* item = [[PimEventItem alloc] init];
     int handle = [[PimUtils sharedInstance] getNextHandle];
     NSString* key = [[NSString alloc] initWithFormat:@"%d", handle];
-    NSLog(@"createItem PimContactList --- create item with key = %@", key);
+    NSLog(@"createItem PimEventsList --- create item with key = %@", key);
     
-    [mContactsDictionary setObject:item forKey: key];
+    [mEventsDictionary setObject:item forKey: key];
     [key release];
     
     return handle;
@@ -146,14 +157,13 @@
 -(int) close
 {
     int returnedValue = MA_PIM_ERR_NONE;
-    CFErrorRef error = NULL;
-
-    NSArray* keysArray = [mContactsDictionary allKeys];
+    
+    NSArray* keysArray = [mEventsDictionary allKeys];
     int countContacts = [keysArray count];
     for (int i = 0; i < countContacts; i++) 
     {
         NSString* key = [keysArray objectAtIndex:i];
-        PimContactItem* item = [mContactsDictionary objectForKey:key];
+        PimEventItem* item = [mEventsDictionary objectForKey:key];
         PimItemStatus status = [item getStatus];
         
         if (kNewItem == status)
@@ -161,55 +171,18 @@
             // Write item's field into record.
             [item close];
             
-            bool isAdded = ABAddressBookAddRecord(mAddressBook, [item getRecord], &error);
-            
-            // Check if the item was added to Address Book.
-            if (!isAdded) 
-            {
-                returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-                break;
-            }
         }
         else if (kModifiedItem == status)
         {
-            // Remove the old record from Address Book.
-            bool isRemoved = ABAddressBookRemoveRecord(mAddressBook, [item getRecord], &error);
-            // Check if the item was removed from Address Book.
-            if (!isRemoved) 
-            {
-                returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-                break;
-            }
-            
-            // Write item's field into record.
-            [item close];
-            
-            // Add the new item to Address Book.
-            bool isAdded = ABAddressBookAddRecord(mAddressBook, [item getRecord], &error);
-            
-            // Check if the item was added to Address Book.
-            if (!isAdded) 
-            {
-                returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-                break;
-            }
         }
     }
     
     [keysArray release];
     
-    bool isSaved = ABAddressBookSave(mAddressBook, &error);
-    
-    // Check if the Address Book was saved.
-    if (!isSaved) 
-    {
-        returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-    }
-    
     // If no error occurred remove all the items from dictionary.
     if (MA_PIM_ERR_NONE == returnedValue) 
     {
-        [mContactsDictionary removeAllObjects];
+        [mEventsDictionary removeAllObjects];
     }
     
     return returnedValue;
@@ -223,7 +196,7 @@
 -(int) removeItem:(MAHandle) item
 {
     NSString* key = [[NSString alloc] initWithFormat:@"%d",item];
-    [mContactsDictionary removeObjectForKey:key];
+    [mEventsDictionary removeObjectForKey:key];
     [key release];
     
     return MA_PIM_ERR_NONE;
@@ -232,12 +205,13 @@
 /**
  * Release all the objects.
  */
-- (void) dealloc {
-
-    CFRelease(mAddressBook);
-    [mContactsDictionary release];
+- (void) dealloc
+{
+    
+    [mEventsDictionary release];
     
     [super dealloc];
 }
+
 
 @end
