@@ -23,7 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 namespace Bluetooth
 {
 
-class MABtServiceAuto : public MABtService {
+class MABtServiceAuto : public MABtServiceNative {
 public:
 	int nUuids;
 
@@ -43,7 +43,7 @@ int maBtDiscoveryState();
 
 //only one discovery operation may be active at a time
 int maBtStartDeviceDiscovery(MABtCallback cb, bool names);
-int maBtGetNewDevice(MABtDevice* dst);
+int maBtGetNewDevice(MABtDeviceNative* dst);
 
 int maBtCancelDiscovery();
 
@@ -53,7 +53,7 @@ int maBtCancelDiscovery();
 int maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid, MABtCallback cb);
 
 //returns >0 on success.
-int maBtGetNewService(MABtService* dst);
+int maBtGetNewService(MABtServiceNative* dst);
 
 //does not remove a service from the queue. returns >0 on success.
 int maBtGetNextServiceSize(MABtServiceSize* dst);

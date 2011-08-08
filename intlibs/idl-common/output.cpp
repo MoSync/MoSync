@@ -35,9 +35,9 @@ using namespace std;
 #define DUMPSIZE(s) { DO_LEVEL; printf("%s: %" PFZT "\n", #s, s); }
 #define DUMPSTRING(s) { DO_LEVEL; printf("%s: \"%s\"\n", #s, s.c_str()); }
 
-static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix, bool runtime);
+static void streamStructs(ostream& stream, const Interface& inf, int ix, bool runtime);
 static void streamIoctls(ostream& stream, const Interface& inf, int ix);
-static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix);
+static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix, bool runtime);
 static void streamDefines(ostream& stream, const vector<Define>& defines, int ix);
 static void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 	const string& ioctlName);
@@ -215,10 +215,10 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 		"#endif\n\n";
 
 	streamGroups(stream, inf.groups, ix);
-	streamTypedefs(stream, inf.typedefs, ix);
+	streamTypedefs(stream, inf.typedefs, ix, false);
 	streamDefines(stream, inf.defines, ix);
 	streamConstants(stream, headerName, inf.constSets, ix);
-	streamStructs(stream, inf.structs, ix, false);
+	streamStructs(stream, inf, ix, false);
 	if(ix == MAIN_INTERFACE) {
 		streamHeaderFunctions(stream, inf, false);
 	}
@@ -317,7 +317,7 @@ static void streamJavaConstants(
 }
 
 static void streamMembers(ostream& stream, string tab, const vector<Member>& members,
-	const vector<Struct>& structs, bool runtime)
+	const Interface& inf, bool runtime, bool native)
 {
 	bool lastPodHadComment = false;
 	for(size_t k=0; k<members.size(); k++) {
@@ -348,8 +348,8 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 					throwException("Bad anonymous struct");
 				//find struct definition
 				bool found = false;
-				for(size_t m2=0; m2<structs.size(); m2++) {
-					const Struct& as(structs[m2]);
+				for(size_t m2=0; m2<inf.structs.size(); m2++) {
+					const Struct& as(inf.structs[m2]);
 					if(as.name == pod.type) {
 						//print it
 						if(runtime) {
@@ -358,7 +358,7 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 							stream << "#else\n";
 						}
 						stream << tab << "struct {\n";
-						streamMembers(stream, tab + "\t", as.members, structs, runtime);
+						streamMembers(stream, tab + "\t", as.members, inf, runtime, native);
 						stream << tab << "};\n";
 						if(runtime) {
 							stream << "#endif\n";
@@ -370,7 +370,13 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 				if(!found)
 					throwException("Anonymous struct not found");
 			} else {
-				stream << tab << pod.type << " " << pod.name << ";\n";
+				stream << tab;
+				if(runtime && !native && isDirectPointerType(inf, pod.type)) {
+					stream << "MAAddress";
+				} else {
+					stream << pod.type;
+				}
+				stream << " " << pod.name << ";\n";
 			}
 		}	//pod
 		if(m.pod.size() != 1) {
@@ -379,9 +385,17 @@ static void streamMembers(ostream& stream, string tab, const vector<Member>& mem
 	}	//member
 }
 
-static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix, bool runtime) {
-	for(size_t j=0; j<structs.size(); j++) {
-		const Struct& s(structs[j]);
+static void streamStruct(ostream& stream, const Struct& s, const string& name,
+	const Interface& inf, int ix, bool runtime, bool native)
+{
+	stream << "typedef " << s.type << " " << name << " {\n";
+	streamMembers(stream, "\t", s.members, inf, runtime, native);
+	stream << "} " << name << ";\n";
+}
+
+static void streamStructs(ostream& stream, const Interface& inf, int ix, bool runtime) {
+	for(size_t j=0; j<inf.structs.size(); j++) {
+		const Struct& s(inf.structs[j]);
 		if(s.ix != ix)
 			continue;
 		if(isAnonStructName(s.name)) {
@@ -393,9 +407,10 @@ static void streamStructs(ostream& stream, const vector<Struct>& structs, int ix
 			stream << s.comment;
 		if(s.groupId != "")
 			stream << "/** @ingroup " << s.groupId << " */\n";
-		stream << "typedef " << s.type << " " << s.name << " {\n";
-		streamMembers(stream, "\t", s.members, structs, runtime);
-		stream << "} " << s.name << ";\n";
+		streamStruct(stream, s, s.name, inf, ix, runtime, false);
+		if(runtime) {
+			streamStruct(stream, s, s.name + "Native", inf, ix, true, true);
+		}
 		if(isAnonStructName(s.name)) {
 			stream << "#endif\n";
 		}
@@ -434,7 +449,7 @@ void streamConstants(ostream& stream, const string& interfaceName, const vector<
 	}
 }
 
-static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix) {
+static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix, bool runtime) {
 	if(ix == MAIN_INTERFACE)
 		stream <<
 		"#ifndef _WCHAR_DEFINED\n"
@@ -468,7 +483,13 @@ static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int
 		stream << t.comment;
 		if(t.groupId != "")
 			stream << "/** @ingroup " << t.groupId << " */\n";
-		stream << "typedef " << t.type << " " << t.name << ";\n";
+		stream << "typedef ";
+		if(runtime && t.name == "MAAddress") {
+			stream << "unsigned int";
+		} else {
+			stream << t.type;
+		}
+		stream << " " << t.name << ";\n";
 		anyStreamed = true;
 	}
 	if(anyStreamed)
@@ -634,6 +655,23 @@ static void streamIoctlArg(ostream& stream, const vector<Argument>& args,
 	stream << "; \\\n";
 }
 
+static void streamCaselist(ostream& stream, const Ioctl& ioctl, const string& headerName,
+	int ix, bool syscall)
+{
+	stream << "#define " << ioctl.name << "_" << headerName <<
+		(syscall ? "_syscall" : "") << "_caselist \\\n";
+	for(size_t j=0; j<ioctl.functions.size(); j++) {
+		const IoctlFunction& f(ioctl.functions[j]);
+		if(f.ix != ix)
+			continue;
+		if(syscall)
+			stream << "maIOCtl_syscall_case(" << f.f.name << ") \\\n";
+		else
+			stream << ioctl.name << "_" << f.f.name << "_case(" << f.f.name << ") \\\n";
+	}
+	stream << "\n";
+}
+
 void streamIoctlDefines(ostream& stream, const Interface& inf, const string& headerName,
 	int ix, bool java)
 {
@@ -642,14 +680,8 @@ void streamIoctlDefines(ostream& stream, const Interface& inf, const string& hea
 		const Ioctl& ioctl(ioctls[i]);
 		bool anyStreamed = false;
 
-		stream << "#define " << ioctl.name << "_" << headerName << "_caselist \\\n";
-		for(size_t j=0; j<ioctl.functions.size(); j++) {
-			const IoctlFunction& f(ioctl.functions[j]);
-			if(f.ix != ix)
-				continue;
-			stream << ioctl.name << "_" << f.f.name << "_case(" << f.f.name << ") \\\n";
-		}
-		stream << "\n";
+		streamCaselist(stream, ioctl, headerName, ix, false);
+		streamCaselist(stream, ioctl, headerName, ix, true);
 
 		for(size_t j=0; j<ioctl.functions.size(); j++) {
 			const IoctlFunction& f(ioctl.functions[j]);
@@ -824,12 +856,12 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 	streamHash(stream, inf);
 
 	stream << "#ifndef DONT_WANT_" << headerName << "_TYPEDEFS\n";
-	streamTypedefs(stream, inf.typedefs, ix);
+	streamTypedefs(stream, inf.typedefs, ix, true);
 	stream << "#endif\n";
 
 	streamDefines(stream, inf.defines, ix);
 	streamConstants(stream, headerName, inf.constSets, ix);
-	streamStructs(stream, inf.structs, ix, true);
+	streamStructs(stream, inf, ix, true);
 	streamIoctlDefines(stream, inf, headerName, ix, false);
 
 	stream << "#endif\t//" + headerName + "_DEFS_H\n";

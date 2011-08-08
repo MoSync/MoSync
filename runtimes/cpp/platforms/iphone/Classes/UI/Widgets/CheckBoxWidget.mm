@@ -39,7 +39,7 @@
 	eventData->eventType = MAW_EVENT_CLICKED;
 	eventData->widgetHandle = handle;
 	eventData->checked = checkBox.on;
-	event.data = eventData;
+	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
 

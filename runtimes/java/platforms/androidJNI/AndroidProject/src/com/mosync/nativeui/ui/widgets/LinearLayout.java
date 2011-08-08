@@ -84,6 +84,7 @@ public class LinearLayout extends Layout
 		}
 		
 		android.widget.LinearLayout layout = (android.widget.LinearLayout) getView( );
+		
 		if( property.equals( IX_WIDGET.MAW_HORIZONTAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT ) ||
 				property.equals( IX_WIDGET.MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT ) )
 		{

@@ -239,7 +239,7 @@ public:
 		if(count()==0) return false;
 		MAEvent e = CircularFifo<MAEvent, EVENT_BUFFER_SIZE>::get();
 		if(e.type<0) {
-			handleInternalEvent(e.type, e.data);
+			handleInternalEvent(e.type, (void*)e.data);
 			return getAndProcess(event);
 		} else {
 			event = e;
@@ -305,7 +305,7 @@ public:
 	void addInternalEvent(int type, void* data) {
 		MAEvent event;
 		event.type = type;
-		event.data = data;
+		event.data = (int)data;
 		put(event);
 	}
 		

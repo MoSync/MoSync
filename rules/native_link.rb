@@ -20,10 +20,11 @@ require "#{File.dirname(__FILE__)}/flags.rb"
 # Base class.
 # Links object files together to form an native executable or shared library.
 class NativeGccLinkTask < FileTask
-	def initialize(work, name, objects)
+	def initialize(work, name, objects, linker)
 		super(work, name)
 		initFlags
 		@prerequisites += @objects = objects
+		@linker = linker
 	end
 	
 	def needed?(log = true)
@@ -39,11 +40,7 @@ class NativeGccLinkTask < FileTask
 		execFlags
 		#puts "objects: #{@objects.join(' ')}"
 		#puts "flags: #{@FLAGS}"
-		if(HOST == :darwin)
-			sh "g++ -m32 #{cFlags} -o #{@NAME}"
-		else
-			sh "g++ #{cFlags} -o #{@NAME}"
-		end
+		sh "#{@linker} #{cFlags} -o #{@NAME}"
 	end
 	
 	include FlagsChanged
@@ -57,7 +54,7 @@ end
 class NativeGccLinkWork < NativeGccWork
 	private
 
-	def setup3(all_objects)
+	def setup3(all_objects, have_cppfiles)
 		if(HOST == :darwin)
 			@EXTRA_LINKFLAGS += " -m32 -L/sw/lib -L/opt/local/lib -framework Cocoa -framework IOBluetooth -framework Foundation"
 		end
@@ -73,7 +70,8 @@ class NativeGccLinkWork < NativeGccWork
 		need(:@TARGETDIR)
 		target = @TARGETDIR + "/" + @BUILDDIR + @NAME + link_file_ending
 		#puts "@EXTRA_LINKFLAGS: "+@EXTRA_LINKFLAGS
-		@TARGET = link_task_class.new(self, target, all_objects, wlo, llo + lld, @EXTRA_LINKFLAGS)
+		linker = have_cppfiles ? 'g++' : 'gcc'
+		@TARGET = link_task_class.new(self, target, all_objects, wlo, llo + lld, @EXTRA_LINKFLAGS, linker)
 		@prerequisites += [@TARGET]
 	end
 end

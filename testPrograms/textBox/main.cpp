@@ -22,23 +22,26 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-class MyMoblet : public Moblet {
+class MyMoblet : public Moblet, TextBoxListener {
 public:
 	wchar_t mBuf[32];
 	MyMoblet() {
 		printf("Hello World!\n");
+		addTextBoxListener(this);
 		int res = maTextBox(L"Title", L"initial text", mBuf, sizeof(mBuf) / sizeof(wchar_t), MA_TB_TYPE_ANY);
 		printf("maTextBox: %i\n", res);
 	}
 
 	void customEvent(const MAEvent& e) {
-		if(e.type != EVENT_TYPE_TEXTBOX)
-			return;
-		printf("textbox complete: %i, %i\n", e.textboxResult, e.textboxLength);
+		printf("cE: %i\n", e.type);
+	}
+	void textBoxClosed(int result, int textLength) {
+		printf("textbox complete: %i, %i\n", result, textLength);
 		wprintf(L"text: '%S'\n", mBuf);
 	}
 
 	void keyPressEvent(int keyCode, int nativeCode) {
+		printf("kP: %i, %i\n", keyCode, nativeCode);
 		if(keyCode == MAK_0)
 			close();
 	}

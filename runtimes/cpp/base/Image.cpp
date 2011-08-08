@@ -27,22 +27,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "base_errors.h"
 using namespace MoSyncError;
 
+typedef s64 int64_t;
+
 #define SWAP(x, y, temp) {temp=x;x=y;y=temp;}
 
 #define FP_RESOLUTION 16
 #define FP_MASK ((1<<FP_RESOLUTION)-1)
 
-inline long fp_ceil(long x) {
+inline int32_t fp_ceil(int32_t x) {
 	x += FP_MASK;
 	return x >> FP_RESOLUTION;
 }
 
-inline long fp_div32(long a, long b) {
-	return (long)((((long long)a)<<FP_RESOLUTION)/((long long)b));
+inline int32_t fp_div32(int32_t a, int32_t b) {
+	return (int32_t)((((int64_t)a)<<FP_RESOLUTION)/((int64_t)b));
 }
 
-inline long fp_mul32(long a, long b) {
-	return (long)(((long long)a * (long long)b)>>FP_RESOLUTION);
+inline int32_t fp_mul32(int32_t a, int32_t b) {
+	return (int32_t)(((int64_t)a * (int64_t)b)>>FP_RESOLUTION);
 }  
 
 struct Point {

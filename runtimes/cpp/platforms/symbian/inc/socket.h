@@ -44,11 +44,13 @@ public:
 	};
 
 	CSocket(RSocketServ& aServer, Type type) : mClosed(true) {
+		mIsBluetooth = false;
 		switch(type) {
 		case ETcp:
 			LHEL(mSocket.Open(aServer, KAfInet, KSockStream, KProtocolInetTcp));
 			break;
 		case ERfcomm:
+			mIsBluetooth = true;
 			LHEL(mSocket.Open(aServer, KBTAddrFamily, KSockStream, KRFCOMM));
 			break;
 		case EBlank:
@@ -73,6 +75,7 @@ public:
 		mSocket.CancelAll();
 	}
 	CMySecureSocket* ssl() { return NULL; }
+	bool isBluetooth() const { return mIsBluetooth; }
 	
 	void GetAddr(MAConnAddr* addr);
 	
@@ -82,6 +85,7 @@ protected:
 	RSocket mSocket;
 	TSockXfrLength mDummyLength;
 	bool mClosed;
+	bool mIsBluetooth;
 };
 
 class CMySecureSocket : public CSocket {
@@ -125,7 +129,8 @@ public:
 		const TDesC8& name = KNullDesC8);
 
 	//CConnection
-	//CBtServerSocket* btServer() { return this; }
+	void CancelAll();
+	bool isBluetooth() const { return true; }
 private:
 	RSdpDatabase& mSdpDB;
 	TSdpServRecordHandle mHandle;
@@ -142,7 +147,7 @@ public:	//CConnection
 	
 	CHttpConnection* http() { return this; }
 	
-	void CancelAll() { mTransport->CancelAll(); }
+	void CancelAll();
 	void GetAddr(MAConnAddr* addr) { mTransport->GetAddr(addr); }
 
 	//CBaseSocket

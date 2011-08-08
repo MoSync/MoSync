@@ -100,7 +100,7 @@ class RuntimeBuilder
 		# Preprocess all the platform dependant java files and store result in temporary location
 		Dir.foreach(java_me_source) {|x| 
 			if (x == "MainCanvas.jpp" || x == "MAMidlet.jpp" || x == "Syscall.jpp" || x == "Core.jpp" ||
-				(x == "Real.jpp" && cldc10))
+				(x == "Real.jpp" && cldc10) || x == "SplitResourceStream.jpp")
 				preprocess_java_file(x, "#{java_me_source}/", java_me_source, temp_dir, "_JavaME")
 			end
 		}

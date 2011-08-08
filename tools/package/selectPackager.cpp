@@ -29,6 +29,8 @@ using namespace std;
 
 static bool parseRuntimeTxt(const char* filename, string& path, string& name);
 static bool parseProfileHeader(const char* filename, RuntimeInfo& pi);
+static bool parseIntProp(const string& line, const char* key, int& value);
+static bool parseStringProp(const string& line, const char* key, string& value);
 
 void package(const SETTINGS& s) {
 	// Read runtime.txt and maprofile.h to find which runtime to use.
@@ -172,11 +174,26 @@ static bool parseIntProp(const string& line, const char* key, int& value) {
 	return false;
 }
 
+static bool parseStringProp(const string& line, const char* key, string& value) {
+	const char* val = findProp(line, key);
+	if(val) {
+		int len = strlen(val);
+		if(len < 2)
+			return false;
+		if(val[0] != '\"' || val[len-1] != '\"')
+			return false;
+		value = string(val + 1, len - 2);
+		return true;
+	}
+	return false;
+}
+
 static bool parseProfileHeader(const char* filename, RuntimeInfo& pi) {
 	ifstream file(filename);
 	if(!file.good())
 		return false;
 	pi.isBlackberry = false;
+	pi.hasLimitedResourceSize = false;
 	pi.isCldc10 = false;
 	pi.iconSize = "default";
 	int iconX = -1;
@@ -187,11 +204,19 @@ static bool parseProfileHeader(const char* filename, RuntimeInfo& pi) {
 		if(line.find("#define MA_PROF_SUPPORT_BLACKBERRY") == 0) {
 			pi.isBlackberry = true;
 		}
+		if(line.find("#define MA_PROF_BUG_RESOURCE_SIZE_LIMITED") == 0) {
+			pi.hasLimitedResourceSize = true;
+		}
+		parseStringProp(line, "MA_PROF_CONST_BLACKBERRY_VERSION", pi.blackberryVersion);
 		if(line.find("#define MA_PROF_SUPPORT_CLDC_10") == 0) {
 			pi.isCldc10 = true;
 		}
 		parseIntProp(line, "MA_PROF_CONST_ICONSIZE_X", iconX);
 		parseIntProp(line, "MA_PROF_CONST_ICONSIZE_Y", iconY);
+	}
+	if(pi.isBlackberry && pi.blackberryVersion.empty()) {
+		printf("Error: missing MA_PROF_CONST_BLACKBERRY_VERSION.\n");
+		return false;
 	}
 	if(iconX > 0 && iconY > 0) {
 		char buf[32];

@@ -86,13 +86,19 @@ namespace Base {
 		int gStoreNextId;
 		StringMap gStores;
 
+#ifdef SYMBIAN
+#define DIRSEP '\\'
+#else
+#define DIRSEP '/'
+#endif
+
 		//todo: delete all FileStreams on exit.
 		struct FileHandle {
 			FileStream* fs;
 			int mode;
 			Array<char> name;
 			bool isDirectory() const {
-				return name[name.size()-1] == '/';
+				return name[name.size()-2] == DIRSEP;
 			}
 			FileHandle() : name(0) {}
 		};
@@ -211,11 +217,9 @@ namespace Base {
 //Custom event handling
 #define CUSTOM_EVENT_STREAM(m) m(EVENT_TYPE_STREAM, MAStreamEventData)
 
-#ifdef MA_PROF_SUPPORT_LOCATIONAPI
+
 #define CUSTOM_EVENT_LOCATION(m) m(EVENT_TYPE_LOCATION, MALocation)
-#else
-#define CUSTOM_EVENT_LOCATION(m)
-#endif
+
 
 /**
  * Custom event data for widgets.

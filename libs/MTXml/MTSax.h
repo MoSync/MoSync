@@ -121,7 +121,7 @@ typedef struct MTXSaxContext_t
 	*
 	* \param context The current context.
 	*/
-	void (*parseError)(MTXSaxContext_t* context);
+	void (*parseError)(MTXSaxContext_t* context, int offset);
 
 	/**
 	* A value you can set to anything you like.  If you're parsing more than
@@ -254,7 +254,7 @@ public:
 	/**
 	 * \copydoc MTXSaxContext::parseError
 	 */
-	virtual void mtxParseError(void) = 0;
+	virtual void mtxParseError(int offset) = 0;
 };
 
 /// 8-bit SAX parser callback interface.
@@ -305,7 +305,7 @@ protected:
 	static void endElement(MTXSaxContext* context, const void* name);
 	static void characters(MTXSaxContext* context, const void* data, int length);
 	static void dataRemains(MTXSaxContext* context, const char* data, int length);
-	static void parseError(MTXSaxContext* context);
+	static void parseError(MTXSaxContext* context, int offset);
 
 	MTXSaxContext mContext;
 	MtxListener* mMtxListener;

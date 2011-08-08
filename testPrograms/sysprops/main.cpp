@@ -17,7 +17,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <MAUtil/Moblet.h>
 #include <conprint.h>
-#include <IX_SYSPROP.h>
 
 using namespace MAUtil;
 
@@ -25,6 +24,7 @@ class MyMoblet : public Moblet {
 public:
 	MyMoblet() {
 		printf("Hello World!\n");
+		dumpProp("mosync.device");
 		dumpProp("microedition.platform");
 		dumpProp("com.sonyericsson.net.lac");
 		dumpProp("com.sonyericsson.net.cellid");

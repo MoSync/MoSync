@@ -58,7 +58,10 @@ final MAHandle maFileOpen(String path, int mode) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_FORBIDDEN;
 	}
-	DEBUG_ASSERT(fc != null);
+	if(fc == null) {
+		DEBUG_ALWAYS("maFileOpen: Connector.open(\"file:///" + path + "\", "+mode+") returned null.\n");
+		return MA_FERR_GENERIC;
+	}
 	FileHandle fh = new FileHandle();
 	fh.fc = fc;
 	fh.position = 0;

@@ -1,0 +1,104 @@
+2008-12-18: Version 2.0 beta 1
+-----------------------------------
+
+New Stuff
+---------
+
+* Eclipse-based IDE. A version of the popular Integrated Development Environment, specialized for
+  MoSync.
+* New platform: Windows Mobile. Versions supported include 4.1, 5.0 and 6.0.
+* ARM recompiler. Speeds up execution on Symbian and WindowsMobile platforms by up to 10
+  times.
+* Library additions:
+    - MAUtil::Graphics library with transformation and clipping stacks.
+    - MTXml. A streaming, efficient XML parser.
+    - MinUI. An example of a minimalistic GUI library.
+    - MAFS. An implementation of the stdio buffered file access API (fopen() et. al), built
+      on top of MoSync's cross-platform Store system.
+    - Native framebuffer access. Write your own graphics renderers, or port framebuffer-based
+      applications to MoSync.
+    - Generic Connection library for Moblet users.
+    - MAUtil::Downloader and BuffDownloader. Easy-to-use APIs for downloading files from the Internet.
+* Touchscreen support.
+* Support for sending text SMS.
+* Better debugging. Call stacks and expanded panic codes help you find
+  errors faster. A communications link from the emulator to the IDE lets
+  an application log messages directly to the IDE.
+* New syscalls for debugging and error reporting: maReportCallStack(), maPanic().
+
+Other notable changes
+---------------------
+
+* Documentation overhaul. New look, new tutorials.
+* New look and feel of the MoSync emulator.
+* Bug-fixes to Dead Code Elimination. The GCC torture-test suite now runs without failure,
+  except for programs using some gcc extensions. See Known Issues below.
+* Enhanced maLoadProgram(), supporting reloading of the original program.
+* MAUtil::HttpGet has been removed.
+* MAUtil::Stream, a little-used and inefficient character stream library, has been removed.
+* Bugfix: basic drawing operations on Series 60 2nd edition, FP3, now work correctly.
+* HTTP headers, handled by maHttpSetRequestHeader and maHttpGetResponseHeader,
+  are now case-insensitive on all platforms.
+* Extensive improvements to the profile database.
+
+Compiler-breaking changes
+----------------
+
+* Spelling correction: STERR_NONEXISTANT -> STERR_NONEXISTENT
+* MAUtil::ConnectionListener changed name to ConnListener.
+* When compiling in debug mode, the preprocessor macro MOSYNCDEBUG will be
+  pre-defined. You cannot then define it yourself.
+
+Known Issues
+------------
+
+* The installer may fail to add %MOSYNCDIR%\bin to the environment variable PATH.
+  This will cause the compiler to fail, saying
+  "xgcc: installation problem, cannot exec `cc1plus': No such file or directory".
+  To resolve this problem, add \mosync\bin to your PATH manually.
+* Sometimes, compile errors aren't properly removed during a build, so that an application
+  will fail to launch even if no errors occured. This can be worked around by manually removing
+  the errors from the "problems" tab next to the IDE console.
+* The ARM recompiler improves performance at the cost of memory. Extraordinarily large
+  applications will fail to launch on devices that don't have enough memory.
+* The following GCC extensions are not supported and will result in undefined behaviour:
+  * the Complex built-in type
+  * trampolines
+  * pointers to labels
+* Using socket connections with port 13 on the Sony-Ericsson Z1010 causes the
+  system to shut down with the message "Network failure". Other low ports may
+  also exhibit this problem, so use port numbers above 1024 to avoid problems.
+* The Bluetooth system in the MoSync emulator doesn't yet work with any stack except for
+  Microsoft's. If you have a Broadcom stack/chipset, you can work around this
+  by adding a Microsoft-compatible Bluetooth dongle to your system.
+* Some SonyEricsson phones will cut off the last second or so of any sound
+  played. Work around this by adding some silence to the end of all your sounds.
+* Occasionally incorrect error line number information. Can be improved by
+  turning off compiler optimizations (add "-O0" to "Additional gcc switches").
+* The syscall maCreateImageRaw doesn't give the expected output on some
+  SonyEricsson phones when the source image has transparency.
+* On Symbian and Windows Mobile, maPlatformRequest() is unable to start voice
+  calls.
+* maSoundPlay on Windows Mobile can only play wave files.
+* Keypad lock functions on Windows Mobile isn't available.
+* Framebuffer functions are slow on J2ME phones.
+* Due to an optimization bug in gcc, the use of function pointers sometimes can result 
+  in a broken binary. By adding the -fno-omit-frame-pointer gcc flag this can sometimes
+  be fixed.
+
+Key Map
+-------
+
+The Windows runtime uses some of the keyboard's keys to simulate a phone's
+  keypad.
+The mapping to MAK codes is as follows:
+
+MAK_0 to MAK_9: numeric keypad, or the main number keys.
+MAK_0 is also mapped to the spacebar.
+MAK_LEFT, RIGHT, UP and DOWN: arrow keys.
+MAK_FIRE: Any of the Ctrl keys.
+MAK_STAR: numeric Multiply, or the comma key.
+MAK_GRID: numeric Divide, or the V key.
+MAK_SOFTLEFT: left Shift key.
+MAK_SOFTRIGHT: right Shift key.
+MAK_CLEAR: Delete or Backspace.

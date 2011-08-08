@@ -193,6 +193,8 @@ protected:
 
 	/**
 	* Constructs an empty HashDict.
+	* \param keyOffset The offset from the start of Storage to the Key, in bytes.
+	* Calculated by the macro #OFFSETOF.
 	* \param hf The hash function.
 	* \param cf The compare function. See Compare.
 	* \param init_bits The intial size of the hash table is 2 to the power of this number.

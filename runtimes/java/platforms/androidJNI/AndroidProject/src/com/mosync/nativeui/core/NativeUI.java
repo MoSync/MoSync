@@ -316,7 +316,8 @@ public class NativeUI
 		
 		if( m_rootViewReplacedListener != null )
 		{
-			m_rootViewReplacedListener.rootViewReplaced( screen.getView( ) );
+			//m_rootViewReplacedListener.rootViewReplaced( screen.getView( ) );
+			m_rootViewReplacedListener.rootViewReplaced( screen.getRootView( ) );
 		}
 		m_currentScreen = screen;
 		

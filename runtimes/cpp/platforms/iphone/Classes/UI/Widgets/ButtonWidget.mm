@@ -27,8 +27,9 @@
 - (id)init {
 	if(!view)
 		view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
+        
 	UIButton* button = (UIButton*) view;
-	button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
+    button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
 	[button addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
 	image = nil;
 	leftCapWidth = 0;
@@ -36,7 +37,9 @@
 	button.titleLabel.numberOfLines = 0;	
 	id ret = [super init];
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
-	return ret;
+    button.imageView.contentMode = UIViewContentModeCenter;
+     	
+    return ret;
 }
 
 -(void)buttonPressed {
@@ -46,7 +49,7 @@
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_CLICKED;
 	eventData->widgetHandle = handle;
-	event.data = eventData;
+	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
 
@@ -75,7 +78,35 @@
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
 		image = [UIImage imageWithCGImage:imageResource->image];
 		[button setBackgroundImage:image forState:UIControlStateNormal];
-	} 
+	}
+    else			
+    if([key isEqualToString:@"image"]) {
+        int imageHandle = [value intValue];
+        if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
+        UIButton* button = (UIButton*) view;
+        Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
+        image = [UIImage imageWithCGImage:imageResource->image];
+        [button setImage:image forState:UIControlStateNormal];
+    }    
+    /* // doesn't work on iphone....
+    else if ([key isEqualToString:@"scaleMode"]) {
+        UIButton* button = (UIButton*)view;
+        
+        UIViewContentMode contentMode;
+        
+        if([value isEqualToString:@"none"]) 
+            contentMode = UIViewContentModeCenter;
+        else if([value isEqualToString:@"scaleXY"]) 
+            contentMode = UIViewContentModeScaleToFill;
+        else if([value isEqualToString:@"scalePreserveAspect"]) 
+            contentMode = UIViewContentModeScaleAspectFit;
+        else 
+            return MAW_RES_INVALID_PROPERTY_NAME;
+        
+        [button setContentMode:contentMode];
+        button.imageView.contentMode = contentMode;
+    }
+    */  
 	else if([key isEqualToString:@"leftCapWidth"]) {
 		int newLeftCapWidth = [value intValue];
 		if(image != nil) {

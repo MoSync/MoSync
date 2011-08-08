@@ -47,7 +47,7 @@
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_GL_VIEW_READY;
 	eventData->widgetHandle = _handle;
-	event.data = eventData;
+	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
 }
 

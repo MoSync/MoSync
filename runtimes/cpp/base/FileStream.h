@@ -22,6 +22,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "Stream.h"
 
+#include <time.h>
+
 // platform specific
 
 #ifdef _android
@@ -34,7 +36,7 @@ namespace Base {
 	public:
 		FileStream(const char* filename);
 #ifdef _android
-		FileStream(FILE* file);
+		explicit FileStream(int fd);
 #endif
 		virtual ~FileStream();
 		virtual bool isOpen() const;
@@ -44,6 +46,7 @@ namespace Base {
 		virtual bool length(int& aLength) const;
 		virtual bool seek(Seek::Enum mode, int offset);
 		virtual bool tell(int& aPos) const;
+		virtual bool mTime(time_t&) const;
 
 #ifndef _android
 		virtual Stream* createLimitedCopy(int size) const;
@@ -53,6 +56,8 @@ namespace Base {
 		virtual Stream* createCopy() const;
 
 		const char* getFilename() const;
+		
+		virtual bool truncate(int size) { FAIL; }
 
 #include "FileImpl.h"
 	};
@@ -66,6 +71,7 @@ namespace Base {
 		bool write(const void* src, int size);
 		Stream* createLimitedCopy(int /*size*/) const { FAIL; }
 		Stream* createCopy() const { FAIL; }
+		bool truncate(int size);
 	};
 
 	class LimitedFileStream : public FileStream {	//read-only
@@ -86,6 +92,10 @@ namespace Base {
 	protected:
 		const int mStartPos, mEndPos;
 		bool _open();
+#ifdef _android
+		JNIEnv* mJNIEnv;
+		jobject mJThis;
+#endif
 	};
 
 } // namespace Base

@@ -207,7 +207,7 @@ int BluetoothBluez::startDiscovery ( MABtCallback cb,
  *
  * @return 1 if there was a device, 0 if not
  */
-int BluetoothBluez::getNextDevice ( MABtDevice *d )
+int BluetoothBluez::getNextDevice ( MABtDeviceNative *d )
 {
     CBtDevice *pDevice;
     Lock lock( mDeviceListMutex );
@@ -281,7 +281,7 @@ int BluetoothBluez::startServiceDiscovery ( MABtCallback cb,
  *
  * @return 1 if there was a service, 0 if not
  */
-int  BluetoothBluez::getNextService ( MABtService* d )
+int  BluetoothBluez::getNextService ( MABtServiceNative* d )
 {
     CBtService *s;
     Lock lck( mServiceListMutex );

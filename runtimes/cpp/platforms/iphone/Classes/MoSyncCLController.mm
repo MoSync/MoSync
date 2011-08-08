@@ -40,7 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	MAEvent event;
 	event.type = EVENT_TYPE_LOCATION;
 	MALocation* location = new MALocation;
-	event.data = location;
+	event.data = (int)location;
 	
 	location->state = MA_LOC_QUALIFIED;
 	location->lat = newLocation.coordinate.latitude;

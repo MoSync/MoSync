@@ -6,14 +6,19 @@
 AdvGraphics
 debugging
 HelloMap
+HelloMAUI
+HelloWorld
 HelloNativeUI
 HelloOpenGLES
+Graphun
+RockPaperScissorsGameNativeUI
+NativeUIDemo
 Location = location
 MapDemo
 MAStx
 MAUIEx = MAUI/MAUIex
-MinUI
-btServer = Moblet/btServer
+BluetoothServer
+BluetoothClient
 Connection = Moblet/Connection
 HelloMoblet = Moblet/HelloMoblet
 simple = Moblet/simple

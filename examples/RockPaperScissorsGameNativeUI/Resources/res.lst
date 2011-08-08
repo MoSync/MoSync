@@ -1,0 +1,15 @@
+
+.res RES_IMAGE_START
+.image "Images/Play.png"
+
+.res RES_IMAGE_ROCK
+.image "Images/Rock.png"
+
+.res RES_IMAGE_PAPER
+.image "Images/Paper.png"
+
+.res RES_IMAGE_SCISSORS
+.image "Images/Scissors.png"
+
+.res RES_IMAGE_QUESTION_MARK
+.image "Images/QuestionMark.png"

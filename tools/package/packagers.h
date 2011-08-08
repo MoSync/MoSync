@@ -27,6 +27,8 @@ struct RuntimeInfo {
 	bool isBlackberry;
 	bool isCldc10;
 	int androidVersion;
+	bool hasLimitedResourceSize;
+	std::string blackberryVersion;
 };
 
 // if isBlackberry, then s.dst is ignored, and the files stored in

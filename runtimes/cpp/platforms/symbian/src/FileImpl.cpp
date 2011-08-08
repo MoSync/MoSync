@@ -104,6 +104,10 @@ namespace Base {
 		TEST_SYMBIAN(mFile.Seek(ESeekCurrent, aPos));
 		return true;
 	}
+	bool FileStream::mTime(time_t& t) const {
+		// TODO
+		FAIL;
+	}
 
 	//******************************************************************************
 	//LimitedFileStream
@@ -128,6 +132,10 @@ namespace Base {
 		TPtrC8 desc(CBP src, size);
 		TEST_SYMBIAN(mFile.Write(desc));
 		return true;
+	}
+	bool WriteFileStream::truncate(int size) {
+		// TODO
+		FAIL;
 	}
 
 }

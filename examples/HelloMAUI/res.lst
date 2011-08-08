@@ -1,9 +1,0 @@
-.res RES_FONT
-.bin
-.include "pretty.mof"
-
-.res RES_SELECTED
-.image "background_tile_sel.png"
-
-.res RES_UNSELECTED
-.image "background_tile_unsel.png"

@@ -93,14 +93,13 @@ void HashMapBase::close() {
 	free(m.base);
 	m.base = NULL;
 	//DebugMarkEnd();
+	LOG_HASH("HashMapBase::close() complete.\n\n");
 }
 
 void HashMapBase::insert(int key, void* value, bool in_rehash) {
 	LOG_HASH("Insert %i\n", key);
 	DEBUG_ASSERT(value != NULL);
 	if(m.base == NULL) {
-		DEBUG_ASSERT(sizeof(BasePair) == 8);
-
 		//requested Size = (Length * sizeof)
 		m.baseLen = HASHMAP_BASE_SIZE;
 		m.base = (BasePair*)malloc(m.baseLen * sizeof(BasePair));
@@ -146,7 +145,6 @@ void HashMapBase::rehash() {
 	m.stat.rehashes++;
 	LOG_HASH("Rehash\n");
 
-	DEBUG_ASSERT(sizeof(BasePair) == 8);
 	BasePair* oldBase = m.base;
 	CLEANUPSTACK_PUSH(oldBase);
 	uint oldLen = m.baseLen;
@@ -192,6 +190,7 @@ void HashMapBase::erase(int key) {
 	BasePair* pair(findIndex(key, m.stat.linearEraseSteps));
 	DEBUG_ASSERT(pair);
 	dispose(*pair);
+	LOG_HASH("Erase-dispose complete.\n");
 	pair->value = NULL;
 	m.numElem--;
 }
@@ -261,6 +260,7 @@ const HashMapBase::BasePair& HashMapBase::TIteratorC::next() {
 //******************************************************************************
 
 void StringMap::dispose(BasePair& pair) {
+	LOG_HASH("StringMap::dispose(0x%x)\n", pair.value);
 	free(pair.value);
 }
 

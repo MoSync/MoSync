@@ -118,7 +118,7 @@ Value::Value(const SYM& sym) : mSym(sym), mPrimitiveType(Builtin::NUM_SUB_TYPES)
 		mPrimitiveType = Builtin::eInt;		
 	}  else if(getType() == TypeBase::eFunction) {
 		//if(!mSym.address) throw ParseException("Invalid function.");
-		this->Int = (int)mSym.address;	
+		this->Int = (int)(size_t)mSym.address;	
 		mPrimitiveType = Builtin::eInt;		
 	}
 }

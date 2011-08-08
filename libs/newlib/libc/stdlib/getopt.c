@@ -221,7 +221,7 @@ getopt_internal (int argc, char *const argv[], const char *shortopts,
 	case PERMUTE:
 	  permute_from = data->optind;
 	  num_nonopts = 0;
-	  while (!is_option (argv[data->optind], only))
+	  while (!is_option (argv[data->optind], only) && data->optind < argc)
 	    {
 	      data->optind++;
 	      num_nonopts++;

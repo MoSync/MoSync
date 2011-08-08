@@ -69,13 +69,30 @@ RSdp gBtSdp;
 RSdpDatabase gBtSdpDB;
 
 //***************************************************************************
+//Power
+//***************************************************************************
+
+#ifdef __SERIES60_3X__
+CClassSynchronizer<Syscall>* gBtPowerSync;
+CRepository* gBtRepo;
+void BtPowerRunL(TInt aResult);
+#else	// 2nd edition
+CSettingInfo* gBtInfo;
+void HandleNotificationL(SettingInfo::TSettingID aID, const TDesC& aNewValue);
+#endif	//__SERIES60_3X__
+
+//***************************************************************************
 //Functions
 //***************************************************************************
 
 void ClearBluetoothVariables();
 void ConstructBluetoothL();
+void InitBluetoothL();
+void CancelBluetoothConnections();
+void CloseBluetooth();
 void DestructBluetooth();
 
+// can only return eError or eTurnedOff.
 BtState BtCheckPowerState();
 
 static void BtSyncCallbackL(TAny* aPtr, TInt aResult);
@@ -92,7 +109,7 @@ virtual void AttributeRequestComplete(TSdpServRecordHandle aHandle, TInt aError)
 
 
 void SBTmaBtStartDeviceDiscovery(bool names);
-int SBTmaBtGetNewDevice(MABtDevice* dst);
+int SBTmaBtGetNewDevice(MABtDeviceNative* dst);
 
 int SBTmaBtCancelDiscovery();
 
@@ -102,7 +119,7 @@ int SBTmaBtCancelDiscovery();
 void SBTmaBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid);
 
 //returns >0 on success.
-int SBTmaBtGetNewService(MABtService* dst);
+int SBTmaBtGetNewService(MABtServiceNative* dst);
 
 //does not remove a service from the queue. returns >0 on success.
 int SBTmaBtGetNextServiceSize(MABtServiceSize* dst);

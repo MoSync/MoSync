@@ -134,6 +134,7 @@ namespace Core {
 #endif
 
 		VMCore();
+		virtual ~VMCore();
 
 #ifdef LOG_STATE_CHANGE
 		void logStateChange(int ip);
@@ -161,7 +162,7 @@ namespace Core {
 #ifndef _android
 	bool LoadVMApp(VMCore* core, const char* modfile, const char* resfile);
 #else
-	bool LoadVMApp(VMCore* core, FILE* modfile, FILE* resfile);
+	bool LoadVMApp(VMCore* core, int modFd, int resFd);
 #endif
 #endif
 	bool LoadVMApp(VMCore* core, Stream& stream, const char* combfile=0);

@@ -94,13 +94,13 @@ if(HOST == :win32)
 	@HOST_FLAGS = " -DWIN32"
 	@HOST_CPPFLAGS = ""
 elsif(HOST == :linux)
-	@HOST_FLAGS = " -DLINUX"
+	@HOST_FLAGS = " -DLINUX -fPIC"
 	if(HOST_PLATFORM == :darwin)
 		sdkNumber = (File.exist?("/Developer/SDKs/MacOSX10.5.sdk")) ? "5":"6"	
 		sdkAdress = "/Developer/SDKs/MacOSX10.#{sdkNumber}.sdk"
 		@HOST_FLAGS += " -isysroot #{sdkAdress} -mmacosx-version-min=10.5 -m32 -DDARWIN"
 	end
-	@HOST_CPPFLAGS = " -fPIC"
+	@HOST_CPPFLAGS = ""
 elsif(HOST == :darwin)
 	sdkNumber = (File.exist?("/Developer/SDKs/MacOSX10.5.sdk")) ? "5":"6"
 	sdkAdress = "/Developer/SDKs/MacOSX10.#{sdkNumber}.sdk"

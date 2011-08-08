@@ -24,18 +24,18 @@
 #include <errno.h>
 #include <stdio.h>
 
-int inacc;
+extern int inacc;
 
 int merror;
 double mretval = 64;
 int traperror = 1;
 char *mname;
 
-int verbose;
+extern int verbose;
 
 /* To test exceptions - we trap them all and return a known value */
 int
-_DEFUN(matherr,(e),
+_DEFUN(my_matherr,(e),
        struct exception *e)
 {
   if (traperror) 
@@ -120,7 +120,7 @@ _DEFUN(thedouble, (msw, lsw),
 }
 
 int calc;
-int reduce;
+extern int reduce;
 
 
 _DEFUN(frontline,(f, mag, p, result, merror, errno, args, name),
@@ -192,7 +192,7 @@ _DEFUN(finish,(f, vector,  result , p, args, name),
     frontline(f, mag, p, result, merror, errno, args , name);
   }
 } 
-int redo;  
+extern int redo;  
 
 _DEFUN(run_vector_1,(vector, p, func, name, args),
        int vector _AND
@@ -356,6 +356,7 @@ _DEFUN(run_vector_1,(vector, p, func, name, args),
 void
 _DEFUN_VOID(test_math)
 {
+	setMatherr(my_matherr);
   test_acos(0);
   test_acosf(0);
   test_acosh(0);
@@ -388,16 +389,20 @@ _DEFUN_VOID(test_math)
   test_floorf(0);
   test_fmod(0);
   test_fmodf(0);
+#if 0
   test_gamma(0);
   test_gammaf(0);
+#endif
   test_hypot(0);
   test_hypotf(0);
+#if 0
   test_j0(0);
   test_j0f(0);
   test_j1(0);
   test_j1f(0);
   test_jn(0);
   test_jnf(0);
+#endif
   test_log(0);
   test_log10(0);
   test_log10f(0);
@@ -416,12 +421,14 @@ _DEFUN_VOID(test_math)
   test_tanf(0);
   test_tanh(0);
   test_tanhf(0);
+#if 0
   test_y0(0);
   test_y0f(0);
   test_y1(0);
   test_y1f(0);
   test_y1f(0);
   test_ynf(0);
+#endif
 }
 
 /* These have to be played with to get to compile on machines which

@@ -144,7 +144,7 @@ int maBtStartDeviceDiscovery ( MABtCallback cb,
  *
  * @return 1 if there was a device, 0 if not
  */
-int maBtGetNewDevice ( MABtDevice* d )
+int maBtGetNewDevice ( MABtDeviceNative* d )
 {
     MAASSERT( gInstance != NULL );
     return gInstance->getNextDevice( d );
@@ -175,7 +175,7 @@ int maBtStartServiceDiscovery ( const MABtAddr* a,
  *
  * @return > 0 If there was any more services to get
  */
-int maBtGetNewService ( MABtService* d )
+int maBtGetNewService ( MABtServiceNative* d )
 {
     MAASSERT( gInstance != NULL );
     return gInstance->getNextService( d );

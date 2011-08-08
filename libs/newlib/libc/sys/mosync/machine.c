@@ -1,5 +1,4 @@
 #include <sys/unistd.h>
-#include <signal.h>
 #include <sys/fcntl.h>
 #include <stdlib.h>
 #include <sys/times.h>
@@ -10,15 +9,16 @@
 #include <pwd.h>
 #include <grp.h>
 #include <utime.h>
-#include <sys/signal.h>
 #include <string.h>
 #include <getopt.h>
 
 #include <maapi.h>
 #include "maassert.h"
+#include "mastdlib.h"
 #include "mavsprintf.h"
 #include "conprint.h"
 #include "realpath.h"
+#include "dirent.h"
 
 
 #ifdef MOSYNCDEBUG
@@ -26,6 +26,9 @@
 #else
 #define LOGD(...)
 #endif
+
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
 
 #define LOGFAIL LOGD("Failure @ %s:%i", __FILE__, __LINE__)
 #define STDFAIL { LOGFAIL; return -1; }
@@ -53,12 +56,6 @@ void _exit(int status) {
 	LOGD("exit(%i)\n", status);
 	fcloseall();
 	maExit(status);
-}
-
-int raise(int code) {
-	//exit? panic?
-	//maPanic(code, "raise()");
-	STDFAIL;
 }
 
 #define NOT PANIC_MESSAGE("not supported")
@@ -103,42 +100,34 @@ struct group* getgrgid(gid_t gid) {
 #define LOWFD_WRITELOG 1
 #define LOWFD_OFFSET 2
 
+// check include/sys/_default_fcntl.h to make sure this flag doesn't clash.
+#define O_DIRECTORY 0x1000000
+
 struct LOW_FD {
 	int lowFd;
 	int refCount;
 	int flags;
+	
+	// valid only if flags & O_DIRECTORY.
+	char* name;
+	int listHandle;
 };
 
 #define NFD 32
 static struct LOW_FD* sFda[NFD];
 static struct LOW_FD sLfda[NFD];
 
-static struct LOW_FD sLfConsole = { LOWFD_CONSOLE, 1, O_APPEND };
-//static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1, O_APPEND };
+static struct LOW_FD sLfConsole = { LOWFD_CONSOLE, 1, O_APPEND, NULL, 0 };
+static struct LOW_FD sLfWriteLog = { LOWFD_WRITELOG, 1, O_APPEND, NULL, 0 };
 
 static int closeLfd(struct LOW_FD* plfd);
+static void lowRewindDir(struct LOW_FD* plfd);
+static int doRename(MAHandle oldHandle, const char* newProper);
 
-static char sCwd[2048] = "/";
-
-// returns 1 if it's a directory, 0 if it's not.
-static int getRealPath(char *buf, const char* path, int size) {
-#if 0
-	if(path[0]!='/') {
-		strncpy(buf, sCwd, size);
-		strncat(buf, path, size);
-		path = buf;
-	} else {
-		strncpy(buf, path, size);
-	}
-#else
-	if(realpath(path, buf) == NULL) {
-		PANIC_MESSAGE("realpath");
-	}
-#endif
-	size=strlen(buf);
-	if(!size || buf[size-1]=='/') return 1;
-	else return 0;
-}
+static char sCwdBuf[2048] = "";
+static char* sCwd = sCwdBuf;
+static char sCwdRoot[2048] = "";	// set by chroot()
+static int sCwdRootLen;
 
 static void initFda(void) {
 	static int initialized = 0;
@@ -148,16 +137,16 @@ static void initFda(void) {
 
 	memset(sFda, 0, sizeof(sFda));
 	memset(sLfda, 0, sizeof(sLfda));
-	sFda[1] = &sLfConsole;
-	sFda[2] = &sLfConsole;
-	sFda[3] = &sLfConsole;
+	sFda[0] = &sLfConsole;	// stdin
+	sFda[1] = &sLfConsole;	// stdout
+	sFda[2] = &sLfConsole;	// stderr
 	sLfConsole.refCount = 3;
 }
 
 static struct LOW_FD* getLowFd(int __fd) {
 	initFda();
 	//LOGD("getLowFd(%i)", __fd);
-	if(__fd <= 0 || __fd >= NFD) {
+	if(__fd < 0 || __fd >= NFD) {
 		errno = EBADF;
 		return NULL;
 	}
@@ -168,9 +157,12 @@ static struct LOW_FD* getLowFd(int __fd) {
 	MAASSERT(sFda[__fd]->refCount > 0);
 	return sFda[__fd];
 }
-#define LOWFD int lfd; struct LOW_FD* plfd; \
-	/*LOGD("LOWFD(%i) in %s", __fd, __FUNCTION__);*/ \
-	plfd = getLowFd(__fd); if(plfd == NULL) { LOGD("Bad fd: %i\n", __fd); STDFAIL; } lfd = plfd->lowFd;
+
+#define LOWFD int lfd; DECLARE_PLOWFD(plfd, __fd); lfd = plfd->lowFd;
+
+#define DECLARE_PLOWFD(pldf, fd) struct LOW_FD* plfd; \
+	/*LOGD("LOWFD(%i) in %s", fd, __FUNCTION__);*/ \
+	plfd = getLowFd(fd); if(plfd == NULL) { LOGD("Bad fd: %i\n", fd); STDFAIL; }
 
 static struct LOW_FD* findFreeLfd(void) {
 	initFda();
@@ -190,17 +182,45 @@ static int findFreeFd(void) {
 	STDFAIL;
 }
 
-static MAHandle errnoFileOpen(const char* path, int ma_mode) {
-	MAHandle h = maFileOpen(path, ma_mode);
-	if(h < 0) {
-		switch(h) {
+// returns -1 and sets errno on failure.
+static int getRealPath(int __fd, char *buf, const char* path, int size) {
+	if(__fd != AT_FDCWD) {
+		// temporarily change cwd.
+		LOWFD;
+		FAILIF(!(plfd->flags & O_DIRECTORY), ENOTDIR);
+		sCwd = plfd->name;
+	} else {
+		memcpy(buf, sCwdRoot, sCwdRootLen);
+		buf += sCwdRootLen;
+	}
+	if(realpath(path, buf) == NULL) {
+		STDFAIL;
+	}
+	if(__fd != AT_FDCWD) {
+		// restore original cwd.
+		sCwd = sCwdBuf;
+	}
+	FAILIF(buf[0] == 0, ENOENT);
+	return 0;
+}
+
+// converts maFile error codes to errno.
+// returns -1 on error.
+static int checkMAResult(int res) {
+	if(res < 0) {
+		switch(res) {
 		case MA_FERR_FORBIDDEN: errno = EACCES; break;
 		case MA_FERR_NOTFOUND: errno = ENOENT; break;
 		default: errno = EIO;
 		}
 		STDFAIL;
 	}
-	return h;
+	return res;
+}
+
+static MAHandle errnoFileOpen(const char* path, int ma_mode) {
+	MAHandle h = maFileOpen(path, ma_mode);
+	return checkMAResult(h);
 }
 
 int dup(int __fd) {
@@ -235,11 +255,11 @@ int dup2(int __fd, int newFd) {
 #error gha
 #endif
 
-static int baseStat(MAHandle h, struct stat* st, int checkSize) {
-	if(checkSize) {
+static int baseStat(MAHandle h, struct stat* st) {
+	if(st->st_mode == S_IFREG) {
 		CHECK(st->st_size = maFileSize(h), EIO);
 	} else {
-		st->st_size = 0;
+		st->st_size = 4*1024;	// default directory size.
 	}
 	CHECK(st->st_mtime = maFileDate(h), EIO);
 	
@@ -249,8 +269,8 @@ static int baseStat(MAHandle h, struct stat* st, int checkSize) {
 	st->st_nlink = 1;
 	st->st_uid = 0;
 	st->st_gid = 0;
-	st->st_atime = 0;
-	st->st_ctime = 0;
+	st->st_atime = st->st_mtime;
+	st->st_ctime = st->st_mtime;
 	st->st_blocks = (st->st_size / 512) + 1;
 	st->st_blksize = 1024 * 4;	// arbitrary
 	
@@ -265,8 +285,8 @@ int fstat(int __fd, struct stat *st) {
 		return 0;
 	} else {
 		MAHandle h = lfd - LOWFD_OFFSET;
-		st->st_mode = S_IFREG;
-		return baseStat(h, st, TRUE);
+		st->st_mode = (plfd->flags & O_DIRECTORY) ? S_IFDIR : S_IFREG;
+		return baseStat(h, st);
 	}
 }
 
@@ -278,31 +298,35 @@ static int postStat(MAHandle h, struct stat *st, int mode) {
 		return 0;
 	}
 	st->st_mode = mode;
-	TEST(baseStat(h, st, mode != S_IFDIR));
+	TEST(baseStat(h, st));
 	return 1;
 }
 
 int stat(const char *file, struct stat *st) {
+	return fstatat(AT_FDCWD, file, st, 0);
+}
+
+int fstatat(int __fd, const char* path, struct stat* st, int flag) {
 	MAHandle h;
 	int res;
 	char temp[2048];
 	int length;
-	getRealPath(temp, file, 2046);
-	LOGD("stat(%s)", temp);
+
+	LOGD("fstatat(%i, %s)", __fd, path);
+	TEST(getRealPath(__fd, temp, path, 2046));
 	
 	// check if it's a directory.
 	length = strlen(temp);
 	if(temp[length-1] != '/') {
-		strncat(temp, "/", sizeof(temp));
+		temp[length] = '/';
 		length++;
+		temp[length] = 0;
 	}
 	h = errnoFileOpen(temp, MA_ACCESS_READ);
 	if(h > 0) {
 		res = postStat(h, st, S_IFDIR);
-		if(res < 0) {
-			CHECK(maFileClose(h), EIO);
-			STDFAIL;
-		}
+		CHECK(maFileClose(h), EIO);
+		TEST(res);
 		if(res > 0)	// it was an existing directory.
 			return 0;
 	} else {
@@ -314,10 +338,8 @@ int stat(const char *file, struct stat *st) {
 	temp[length-1] = 0;	// remove the ending slash
 	TEST(h = errnoFileOpen(temp, MA_ACCESS_READ));
 	res = postStat(h, st, S_IFREG);
-	if(res < 0) {
-		CHECK(maFileClose(h), EIO);
-		STDFAIL;
-	}
+	CHECK(maFileClose(h), EIO);
+	TEST(res);
 	if(!res) {
 		ERRNOFAIL(ENOENT);
 	}
@@ -329,6 +351,16 @@ off_t lseek(int __fd, off_t __offset, int __whence) {
 	int res;
 	LOWFD;
 	LOGD("lseek(%i, %li, %i)\n", __fd, __offset, __whence);
+	if(plfd->flags & O_DIRECTORY) {
+		// seeking in a directory is dangerous.
+		// for now, we only support this most simple case.
+		if(__offset == 0 && __whence == SEEK_SET) {
+			lowRewindDir(plfd);
+			return 0;
+		} else {
+			NOT;
+		}
+	}
 	if(lfd < LOWFD_OFFSET) {
 		// seeking on LOWFD_CONSOLE and LOWFD_WRITELOG is permitted only in a few special cases.
 		// also, we don't keep track on how much has been written to them.
@@ -426,6 +458,27 @@ int isatty(int __fd) {
 	return lfd == LOWFD_CONSOLE || lfd == LOWFD_WRITELOG;
 }
 
+static int _ttyname_r(int __fd, char* name, size_t namesize) {
+	const char* ttyName;
+	LOWFD;
+	switch(lfd) {
+	case LOWFD_CONSOLE: ttyName = "console"; break;
+	case LOWFD_WRITELOG: ttyName = "writeLog"; break;
+	default:
+		ERRNOFAIL(ENOTTY);
+	}
+	FAILIF(strlen(ttyName) >= namesize, ERANGE);
+	strncpy(name, ttyName, namesize);
+	return 0;
+}
+
+int ttyname_r(int __fd, char* name, size_t namesize) {
+	if(_ttyname_r(__fd, name, namesize) != 0) {
+		return errno;
+	}
+	return 0;
+}
+
 static int postOpen(MAHandle handle, int __mode) {
 	int exists;
 	CHECK(exists = maFileExists(handle), ENOTRECOVERABLE);
@@ -445,17 +498,19 @@ static int postOpen(MAHandle handle, int __mode) {
 }
 
 int open(const char * __filename, int __mode, ...) {
+	return openat(AT_FDCWD, __filename, __mode);
+}
+
+int openat(int __fd, const char * __filename, int __mode, ...) {
 	int ma_mode;
 	int handle;
 	int newFd;
 	struct LOW_FD* newLfd;
+	int length;
 
 	char temp[2048];
-	if(getRealPath(temp, __filename, 2048) == 1) {
-		errno = ENOENT;
-		STDFAIL;
-	}
-	LOGD("open(%s, 0x%x)", temp, __mode);
+	LOGD("openat(%i, %s, 0x%x)", __fd, __filename, __mode);
+	TEST(getRealPath(__fd, temp, __filename, 2046));
 	
 	if((__mode & 3) == O_RDWR || (__mode & 3) == O_WRONLY) {
 		ma_mode = MA_ACCESS_READ_WRITE;
@@ -468,12 +523,32 @@ int open(const char * __filename, int __mode, ...) {
 		PANIC_MESSAGE("unsupported mode: O_NONBLOCK");
 	}
 	// O_SHLOCK, O_EXLOCK and O_NOATIME are unsupported. we drop them silently.
-
+	
+	// Check to see if we're opening a directory.
+	__mode &= ~O_DIRECTORY;
+	length = strlen(temp);
+	if(temp[length-1] == '/') {
+		__mode |= O_DIRECTORY;
+	}
+	
 	// Find a spot in the descriptor array.
 	CHECK(newFd = findFreeFd(), EMFILE);
 	newLfd = findFreeLfd();
-
-	TEST(handle = errnoFileOpen(temp, ma_mode));
+	
+	if(!(__mode & O_DIRECTORY)) {
+		handle = errnoFileOpen(temp, ma_mode);
+		if(handle < 0) {
+			// Try opening the requested file as a directory.
+			temp[length] = '/';
+			length++;
+			temp[length] = 0;
+			__mode |= O_DIRECTORY;
+		}
+	}
+	if(__mode & O_DIRECTORY) {
+		handle = errnoFileOpen(temp, ma_mode);
+	}
+	TEST(handle);
 	if(postOpen(handle, __mode) < 0) {
 		CHECK(maFileClose(handle), EIO);
 		STDFAIL;
@@ -482,25 +557,126 @@ int open(const char * __filename, int __mode, ...) {
 	newLfd->lowFd = handle + LOWFD_OFFSET;
 	newLfd->refCount = 1;
 	newLfd->flags = __mode;
+	if(__mode & O_DIRECTORY) {
+		newLfd->name = malloc(length+1);
+		FAILIF(newLfd->name == NULL, ENOMEM);
+		memcpy(newLfd->name, temp, length+1);
+		newLfd->listHandle = 0;
+	}
 	sFda[newFd] = newLfd;
 	return newFd;
 }
 
+int mkdir(const char* path, mode_t mode) {
+	return mkdirat(AT_FDCWD, path, mode);
+}
+
+int mkdirat(int __fd, const char* path, mode_t mode) {
+	MAHandle handle;
+	char temp[2048];
+	int length;
+	
+	TEST(getRealPath(__fd, temp, path, 2046));
+	length = strlen(temp);
+	if(temp[length-1]!='/') {
+		temp[length] = '/';
+		length++;
+		temp[length] = 0;
+	}
+	TEST(handle = errnoFileOpen(temp, MA_ACCESS_READ_WRITE));
+	if(postOpen(handle, O_CREAT | O_EXCL) < 0) {
+		int exists;
+		int orig_err = errno;
+		CHECK(maFileClose(handle), EIO);
+		// check if a file with the same name exists.
+		// if so, fail with EEXIST.
+		length--;
+		temp[length] = 0;
+		TEST(handle = errnoFileOpen(temp, MA_ACCESS_READ_WRITE));
+		exists = maFileExists(handle);
+		CHECK(maFileClose(handle), EIO);
+		CHECK(exists, ENOTRECOVERABLE);
+		FAILIF(exists, EEXIST);
+		ERRNOFAIL(orig_err);
+	}
+	return 0;
+}
+
+int rmdir(const char* name) {
+	return unlink(name);
+}
+
+int open_maWriteLog(void) {
+	int newFd;
+	CHECK(newFd = findFreeFd(), EMFILE);
+	sFda[newFd] = &sLfWriteLog;
+	sLfWriteLog.refCount++;
+	return newFd;
+}
+
 int unlink(const char *name) {
+	return unlinkat(AT_FDCWD, name, 0);
+}
+
+int unlinkat(int fd, const char *name, int flag) {
 	int dres, cres;
 	int __fd;
-	char temp[2048];
 
-	getRealPath(temp, name, 2048);
-	LOGD("unlink(%s)", temp);
-
-	__fd = open(temp, O_WRONLY);
+	__fd = openat(fd, name, O_RDWR);
 	if(__fd < 0)
 		return __fd;
 	dres = maFileDelete(sFda[__fd]->lowFd - LOWFD_OFFSET);
 	cres = close(__fd);
 	CHECK(dres, EPERM);
 	return cres;
+}
+
+int _rename_r(struct _reent* dummy, const char* old, const char* new) {
+	return renameat(AT_FDCWD, old, AT_FDCWD, new);
+}
+
+int renameat(int oldfd, const char* old, int newfd, const char* new) {
+	MAHandle handle;
+	char oldReal[2048];
+	char newReal[2048];
+	const char* newProper;
+	const char* oldSlash;
+	const char* newSlash;
+	int res;
+	LOGD("renameat(%i, %s, %i, %s)", oldfd, old, newfd, new);
+
+	TEST(getRealPath(oldfd, oldReal, old, 2046));
+	TEST(getRealPath(newfd, newReal, new, 2046));
+
+	// JavaME restriction:
+	// if old and new are in the same directory, send only new filename to maFileRename.
+	oldSlash = strrchr(oldReal, '/');
+	newSlash = strrchr(newReal, '/');
+	MAASSERT(oldSlash && newSlash);
+	if(strncmp(oldReal, newReal, MAX((newSlash - newReal), (oldSlash - oldReal))) == 0) {
+		// may be problematic if target is a directory. todo: test.
+		newProper = newSlash + 1;
+	} else {
+		newProper = newReal;
+	}
+
+	TEST(handle = errnoFileOpen(oldReal, MA_ACCESS_READ_WRITE));
+	res = doRename(handle, newProper);
+	CHECK(maFileClose(handle), EIO);
+	TEST(res);
+	return 0;
+}
+
+static int doRename(MAHandle oldHandle, const char* newProper) {
+	int exists, res;
+	CHECK(exists = maFileExists(oldHandle), ENOTRECOVERABLE);
+	FAILIF(!exists, ENOENT);
+	res = maFileRename(oldHandle, newProper);
+	FAILIF(res == MA_FERR_RENAME_FILESYSTEM, EXDEV);
+	FAILIF(res == MA_FERR_FORBIDDEN, EACCES);
+	FAILIF(res == MA_FERR_RENAME_DIRECTORY, EACCES);
+	CHECK(res, EIO);
+	return 0;
 }
 
 int truncate(const char *path, off_t length) {
@@ -517,62 +693,102 @@ int truncate(const char *path, off_t length) {
 	return cres;
 }
 
-int chdir(const char *filename) {
+// fails unless file exists and is a directory.
+static int checkDirRaw(char* temp) {
 	MAHandle file;
 	int length;
-	int ret = 1;
-	char temp[2048];
-	getRealPath(temp, filename, 2048);
-	LOGD("chdir(%s)", temp);
-	
+	int ret;
 	length = strlen(temp);
-	if(temp[length-1]!='/')
-		strncat(temp, "/", sizeof(sCwd));
-	
-	CHECK(file = maFileOpen(sCwd, MA_ACCESS_READ), EIO);
-	ret = maFileExists(file);
-	if(ret > 0) {
-		strcpy(sCwd, temp);
-		ret = 0;
+	if(temp[length-1] != '/') {
+		// Check if it's a regular file. If so, ENOTDIR.
+		file = maFileOpen(temp, MA_ACCESS_READ);
+		if(file > 0) {
+			ret = maFileExists(file);
+			CHECK(maFileClose(file), EIO);
+			CHECK(ret, EIO);
+			FAILIF(ret > 0, ENOTDIR);
+		}
+		
+		temp[length] = '/';
+		length++;
+		temp[length] = 0;
 	}
+	
+	CHECK(file = maFileOpen(temp, MA_ACCESS_READ), EIO);
+	ret = maFileExists(file);
 	CHECK(maFileClose(file), EIO);
 	CHECK(ret, EIO);
-	return ret;
+	FAILIF(ret == 0, ENOENT);
+	return 0;
 }
 
-char* getcwd(char *__buf, size_t __size ) {
+static int checkDir(char* temp, const char* filename) {
+	TEST(getRealPath(AT_FDCWD, temp, filename, 2046));
+	return checkDirRaw(temp);
+}
+
+int chdir(const char *filename) {
+	char temp[2048];
+	LOGD("chdir(%s)", filename);
+	TEST(checkDir(temp, filename));
+	strcpy(sCwd, temp + sCwdRootLen);
+	return 0;
+}
+
+int fchdir(int __fd) {
+	LOWFD;
+	LOGD("fchdir(%i) (%s)\n", __fd, plfd->name);
+	FAILIF(!(plfd->flags & O_DIRECTORY), ENOTDIR);
+	FAILIF(strncmp(sCwdRoot, plfd->name, sCwdRootLen) != 0, EACCES);
+	TEST(checkDirRaw(plfd->name));
+	strcpy(sCwd, plfd->name + sCwdRootLen);
+	return 0;
+}
+
+// MoSync doesn't have the native concept of a CWD,
+// nor does it have a single filesystem root (like UNIX).
+// This function affects only newlib-based filesystem access.
+// It creates the root "/" at the specified location, which is relative to the CWD
+// and is based on the most recent call to chroot(), if any.
+// This means that you cannot undo chroot().
+// This implementation departs from the standard by calling chdir("/"),
+// because staying outside would cause undefined behaviour.
+int chroot(const char* newRoot) {
+	char temp[2048];
+	LOGD("chroot(%s)", newRoot);
+	TEST(checkDir(temp, newRoot));
+	strcpy(sCwdRoot, temp);
+	sCwdRootLen = strlen(sCwdRoot);
+	if(sCwdRoot[sCwdRootLen-1] == '/') {
+		sCwdRootLen--;
+		sCwdRoot[sCwdRootLen] = 0;
+	}
+	TEST(chdir("/"));
+	return 0;
+}
+
+char* getcwd(char* __buf, size_t __size) {
+	// GNU functionality.
+	size_t len = strlen(sCwd);
+	if(__buf == NULL) {
+		if(__size == 0) {
+			__size = len + 1;
+		}
+	}
+	if(__size <= len) {
+		errno = ERANGE;
+		return NULL;
+	}
+	if(__buf == NULL) {
+		__buf = malloc(__size);
+		if(__buf == NULL) {
+			errno = ENOMEM;
+			return NULL;
+		}
+	}
+	// standard functionality.
 	strncpy(__buf, sCwd, __size);
 	return __buf;
-}
-
-int setpgid(pid_t pid, pid_t pgid) {
-	errno = ENOSYS;
-	STDFAIL;
-}
-
-int fork(void) {
-	errno = ENOSYS;
-	STDFAIL;
-}
-
-_sig_func_ptr signal(int sig, _sig_func_ptr f) {
-	errno = ENOSYS;
-	return SIG_ERR;
-}
-
-int sigprocmask(int how, const sigset_t *set, sigset_t *oset) {
-	errno = ENOSYS;
-	STDFAIL;
-}
-
-unsigned int alarm(unsigned int seconds) {
-	BIG_PHAT_ERROR;
-}
-
-
-int mallopt(int parameter, int value) {
-	errno = ENOSYS;
-	return 0;
 }
 
 int getpagesize(void) {
@@ -595,4 +811,98 @@ int gettimeofday (struct timeval *tp, void *tzp) {
 int nice(int incr) {
 	errno = ENOSYS;
 	STDFAIL;
+}
+
+int getdents(int __fd, dirent* dp, int count) {
+	//int res;
+	LOWFD;
+	MAASSERT(count >= sizeof(dirent));
+	LOGD("getdents(%i)\n", __fd);
+	
+	// if we don't have an open list, open a list.
+	if(plfd->listHandle <= 0) {
+		MAASSERT(plfd->name != NULL);
+		plfd->listHandle = maFileListStart(plfd->name, "*");
+		TEST(checkMAResult(plfd->listHandle));
+	}
+	CHECK(dp->d_namlen = maFileListNext(plfd->listHandle, dp->d_name, sizeof(dp->d_name)), EIO);
+	LOGD("namlen: %i\n", dp->d_namlen);
+	FAILIF(dp->d_namlen >= sizeof(dp->d_name), EINVAL);
+	if(dp->d_name[dp->d_namlen-1] == '/') {
+		LOGD("getdents: directory.\n");
+		dp->d_type = DT_DIR;
+		dp->d_name[dp->d_namlen-1] = 0;
+		dp->d_namlen--;
+	} else {
+		dp->d_type = DT_REG;
+	}
+	return dp->d_namlen;
+}
+
+void rewinddir(DIR* dir) {
+	struct LOW_FD* plfd = getLowFd(dir->dd_fd);
+	MAASSERT(plfd);
+	lowRewindDir(plfd);
+}
+
+static void lowRewindDir(struct LOW_FD* plfd) {
+	if(plfd->listHandle > 0) {
+		int res = maFileListClose(plfd->listHandle);
+		MAASSERT(res == 0);
+		plfd->listHandle = 0;
+	}
+}
+
+int dirfd(DIR* dir) {
+	return dir->dd_fd;
+}
+
+DIR* opendir(const char *name) {
+	DIR *dirp;
+	int fd;
+
+	if ((fd = open(name, 0)) == -1)
+		return NULL;
+	dirp = fdopendir(fd);
+	if(dirp == NULL) {
+		close(fd);
+	}
+	return dirp;
+}
+
+DIR* fdopendir(int __fd) {
+	DIR *dirp;
+	int rc = 0;
+	
+	struct LOW_FD* plfd = getLowFd(__fd);
+	if(!plfd) {
+		LOGFAIL;
+		return NULL;
+	}
+	if(!(plfd->flags & O_DIRECTORY)) {
+		LOGFAIL;
+		errno = ENOTDIR;
+		return NULL;
+	}
+	
+	if (rc == -1 ||
+	    (dirp = (DIR *)malloc(sizeof(DIR))) == NULL) {
+		return NULL;
+	}
+	/*
+	 * If CLSIZE is an exact multiple of DIRBLKSIZ, use a CLSIZE
+	 * buffer that it cluster boundary aligned.
+	 * Hopefully this can be a big win someday by allowing page trades
+	 * to user space to be done by getdirentries()
+	 */
+	dirp->dd_buf = malloc (512);
+	dirp->dd_len = 512;
+
+	if (dirp->dd_buf == NULL) {
+		free (dirp);
+		return NULL;
+	}
+	dirp->dd_fd = __fd;
+
+	return dirp;
 }

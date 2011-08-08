@@ -43,7 +43,7 @@
 	eventData->eventType = MAW_EVENT_TAB_CHANGED;
 	eventData->widgetHandle = handle;
 	eventData->tabIndex = index;
-	event.data = eventData;
+	event.data = (int)eventData;
 	Base::gEventQueue.put(event);	
 	
 	//if(index < [children count])

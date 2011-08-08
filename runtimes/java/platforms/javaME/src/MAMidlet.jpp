@@ -23,7 +23,7 @@ import javax.microedition.lcdui.*;
 import javax.microedition.rms.*;
 import javax.microedition.io.*;
 import java.io.*;
-#ifndef PHONE_RELEASE
+#if !defined(PHONE_RELEASE) && defined(MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION)
 import javax.microedition.io.file.*;
 #endif
 
@@ -41,7 +41,7 @@ public final class MAMidlet extends MIDlet {
 #if defined(BLUETOOTH_LOG) || defined(TCP_LOG) || defined(PUBLIC_DEBUG)
 	private static final PrintStream makeConnectionPrintStream(final String url) throws Exception {
 		StreamConnection sc = (StreamConnection)Connector.open(url, Connector.WRITE);
-#ifndef PHONE_RELEASE
+#if !defined(PHONE_RELEASE) && defined(MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION)
 		if(sc instanceof FileConnection) {
 			FileConnection fc = (FileConnection)sc;
 			fc.truncate(0);

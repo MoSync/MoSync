@@ -15,7 +15,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#ifndef __IPHONE__
 #include "config_platform.h"
+#endif
 #include "FileStream.h"
 
 #ifdef _MSC_VER
@@ -62,10 +64,14 @@ namespace Base {
 	//FileStream
 	//******************************************************************************
 	const char* FileStream::getFilename() const {
-		return mFilename.c_str();
+		return mFilename ? mFilename : "";
 	}
-	FileStream::FileStream() {}
-	FileStream::FileStream(const char* filename) : mFilename(filename) {
+	FileStream::FileStream() : mFilename(NULL) {}
+	FileStream::FileStream(const char* filename) {
+		int size = strlen(filename) + 1;
+		mFilename = (char*)malloc(size);
+		memcpy(mFilename, filename, size);
+		
 		// SDL_RWFromFile on Windows locks files,
 		// but the glibc test suite requires that they be shared.
 		//rwops = SDL_RWFromFile(filename, "rb");
@@ -75,6 +81,9 @@ namespace Base {
 		return mFd > 0;
 	}
 	FileStream::~FileStream() {
+		if(mFilename) {
+			free(mFilename);
+		}
 		if(isOpen()) {
 			::close(mFd);
 		}
@@ -121,7 +130,21 @@ namespace Base {
 		LTEST(aPos = lseek(mFd, 0, SEEK_CUR));
 		return true;
 	}
+	bool FileStream::mTime(time_t& t) const {
+		TEST(isOpen());
+		struct stat s;
+		LTEST(fstat(mFd, &s));
+		t = s.st_mtime;
+		return true;
+	};
 
+#ifdef _android
+	FileStream::FileStream(int fd) : mFilename(NULL) {
+		mFd = fd;
+	}
+#endif
+
+#ifndef _android
 	//******************************************************************************
 	//LimitedFileStream
 	//******************************************************************************
@@ -133,6 +156,7 @@ namespace Base {
 			mFd = -1;
 		}
 	}
+#endif	//_android
 
 	//******************************************************************************
 	//WriteFileStream
@@ -157,6 +181,14 @@ namespace Base {
 			DEBUG_ASSERT(res <= len);
 			pos += res;
 		}
+		return true;
+	}
+#ifdef _MSC_VER
+#define ftruncate _chsize
+#endif
+	bool WriteFileStream::truncate(int size) {
+		TEST(isOpen());
+		LTEST(ftruncate(mFd, size));
 		return true;
 	}
 

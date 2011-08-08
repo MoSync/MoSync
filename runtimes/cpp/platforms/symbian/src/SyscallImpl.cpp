@@ -23,6 +23,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mmf/server/mmfDATASOURCESINK.HRH>
 #include <mmf/server/mmfdes.h>
 #include <apgcli.h>
+#include <sysutil.h>
 
 #include "config_platform.h"
 #define AUDIO_DEBUGGING_MODE
@@ -347,6 +348,9 @@ void Syscall::ConstructL(VMCore* aCore) {
 	if(!gScreenEngine.IsDrawing())
 		gScreenEngine.StartDrawingL();
 
+#ifdef __SERIES60_3X__
+	pimInit();
+#endif
 
 	gStartTime = maGetMilliSecondCount();
 
@@ -1599,36 +1603,7 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 	maIOCtl_syscall_case(maFileListClose);
 
 #ifdef __SERIES60_3X__	//todo: s60v2 implementation
-	case maIOCtl_maPimListOpen:
-		return maPimListOpen(a);
-	case maIOCtl_maPimListNext:
-		return maPimListNext(a);
-	case maIOCtl_maPimListClose:
-		return maPimListClose(a);
-	case maIOCtl_maPimItemCount:
-		return maPimItemCount(a);
-	case maIOCtl_maPimItemGetField:
-		return maPimItemGetField(a, b);
-	case maIOCtl_maPimItemFieldCount:
-		return maPimItemFieldCount(a, b);
-	case maIOCtl_maPimItemGetAttributes:
-		return maPimItemGetAttributes(a, b, c);
-	case maIOCtl_maPimFieldType:
-		return maPimFieldType(a, b);
-	case maIOCtl_maPimItemGetValue:
-		return maPimItemGetValue(GVMRA(MA_PIM_ARGS), b);
-	/*case maIOCtl_maPimItemSetValue:
-		return maPimItemSetValue(GVMRA(MA_PIM_ARGS), b, c);
-	case maIOCtl_maPimItemAddValue:
-		return maPimItemAddValue(GVMRA(MA_PIM_ARGS), b);
-	case maIOCtl_maPimItemRemoveValue:
-		return maPimItemRemoveValue(a, b, c);*/
-	case maIOCtl_maPimItemClose:
-		return maPimItemClose(a);
-	/*case maIOCtl_maPimItemCreate:
-		return maPimItemCreate(a);
-	case maIOCtl_maPimItemRemove:
-		return maPimItemRemove(a, b);*/
+	maIOCtl_IX_PIM_caselist;
 #endif	//__SERIES60_3X__
 
 #ifdef TELEPHONY
@@ -1759,21 +1734,36 @@ static const TDesC& getIso639() {
 	}
 }
 
+#ifdef TELEPHONY
+int Syscall::GetPhoneId(CTelephony::TPhoneIdV1& pid) {
+	Smartie<CLocalSynchronizer> ls(new CLocalSynchronizer());
+	CTelephony::TPhoneIdV1Pckg pidP(pid);
+	gTelephony->GetPhoneId(*ls->Status(), pidP);
+	ls->Wait();
+	return ls->Status()->Int();
+}
+#endif
+
+static void appendHalValue(TDes16& des, HALData::TAttribute a) {
+	TInt value;
+	int halRes = HAL::Get(a, value);
+	if(halRes == KErrNone) {
+		des.AppendNum(value, EHex);
+	}
+}
+
 int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 	TPtrC8 keyC8(CBP key);
 	TPtrC16 value;
 	_LIT8(KISO639, "mosync.iso-639-1");
+	_LIT8(KDevice, "mosync.device");
 #ifdef TELEPHONY
 	_LIT8(KIMEI, "mosync.imei");
 	_LIT8(KIMSI, "mosync.imsi");
 	if(keyC8.Compare(KIMEI) == 0) {
 		// fetch imei from telephony server
-		Smartie<CLocalSynchronizer> ls(new CLocalSynchronizer());
 		CTelephony::TPhoneIdV1 pid;
-		CTelephony::TPhoneIdV1Pckg pidP(pid);
-		gTelephony->GetPhoneId(*ls->Status(), pidP);
-		ls->Wait();
-		int result = ls->Status()->Int();
+		int result = GetPhoneId(pid);
 		LOG("IMEI result: %i\n", result);
 		if(result < 0)
 			return -3;
@@ -1794,6 +1784,39 @@ int Syscall::maGetSystemProperty(const char* key, char* buf, int size) {
 #endif	//TELEPHONY
 	if(keyC8.Compare(KISO639) == 0) {
 		value.Set(getIso639());
+	}
+	
+	Smartie<HBufC16> valBuf;
+	if(keyC8.Compare(KDevice) == 0) {
+		_LIT16(KSeparator, "::");
+
+		const int maxLen = 512;
+		valBuf = HBufC16::NewL(maxLen);
+		TPtr16 val = valBuf->Des();
+
+#ifdef TELEPHONY
+		CTelephony::TPhoneIdV1 pid;
+		int pidRes = GetPhoneId(pid);
+		LOG("GetPhoneId: %i\n", pidRes);
+		if(pidRes == KErrNone) {
+			val.Append(pid.iManufacturer);
+			val.Append(KSeparator);
+			val.Append(pid.iModel);
+		} else
+#endif
+		{
+			appendHalValue(val, HAL::EMachineUid);
+		}
+
+		TBuf<KSysUtilVersionTextLength> versionString;
+    int sysRes = SysUtil::GetSWVersion(versionString);
+    LOG("GetSWVersion: %i\n", sysRes);
+    if(sysRes == KErrNone) {
+    	val.Append(KSeparator);
+    	val.Append(versionString);
+    }
+		
+		value.Set(*valBuf);
 	}
 	int len = value.Length();
 	if(len == 0)
@@ -1957,9 +1980,12 @@ int Syscall::maFileListClose(MAHandle list) {
 
 #define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
 
+// TODO: Share these two with Base. Implement FileStream::mTime and truncate.
 int Syscall::maFileDate(MAHandle file) {
 	LOGD("maFileDate(%i)\n", file);
 	FileHandle& fh(getFileHandle(file));
+	if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
+	if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
 	TTime modTime;
 	// TODO: improve error code translation
 	SYMERR_CONVERT(fh.fs->mFile.Modified(modTime), MA_FERR_GENERIC);
@@ -2315,7 +2341,7 @@ void Syscall::AddLocationEvent(const TPosition& p) {
 	//will be handled by GetEvent.
 	//definite memory leak if event is never Gotten.
 	//must go through all remaining events on shutdown and delete relevant memory.
-	e.data = loc;
+	e.data = (int)loc;
 	gAppView.AddEvent(e);
 }
 #endif	//SUPPORT_MOSYNC_SERVER || __S60_50__
@@ -2921,7 +2947,7 @@ void Syscall::AddStreamEvent(int event, int result) {
 	//will be handled by GetEvent.
 	//definite memory leak if event is never gotten.
 	//must go through all remaining events on shutdown and delete relevant memory.
-	e.data = sed;
+	e.data = (int)sed;
 	gAppView.AddEvent(e);
 }
 

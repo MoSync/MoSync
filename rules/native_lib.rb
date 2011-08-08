@@ -35,7 +35,7 @@ end
 class NativeLibWork < NativeGccWork
 	private
 	
-	def setup3(all_objects)
+	def setup3(all_objects, have_cppfiles)
 		#puts @COMMON_BUILDDIR
 		target = @COMMON_BUILDDIR + @NAME + NATIVE_LIB_FILE_ENDING
 		dirTask = DirTask.new(self, @COMMON_BUILDDIR)

@@ -160,8 +160,12 @@ void Downloader::fireError(int code)
 		mDownloadListeners[i]->error(this, code);
 	}
 	
-	if(!mIsDownloading)
+	// A new download might be started, in that case we do not
+	// close the connection.
+	if (!mIsDownloading)
+	{
 		closeConnection(CLEANUP);
+	}
 }
 
 void Downloader::closeConnection(int cleanup)
@@ -285,6 +289,12 @@ ImageDownloader::~ImageDownloader()
 {
 }
 
+/**
+ * Return the image handle of the downloader.
+ * The caller of this method should fire an error to listeners.
+ * @return The image handle (> 0) if successful, 0 if there is 
+ * an error (out of memory).
+ */
 MAHandle ImageDownloader::getHandle()
 {
 	// If the image is already created, return its placeholder.
@@ -293,6 +303,8 @@ MAHandle ImageDownloader::getHandle()
 		return mImagePlaceholder;
 	}
 	
+	ASSERT_MSG(mReader, "Downloader has no reader.");
+
 	// If the image is not created, we do so now.
 	int res = maCreateImageFromData(
 		mImagePlaceholder, 
@@ -302,7 +314,6 @@ MAHandle ImageDownloader::getHandle()
 	
 	if (RES_OUT_OF_MEMORY == res)
 	{
-		fireError(CONNERR_DOWNLOADER_OOM);
 		return 0;
 	}
 	
@@ -512,8 +523,14 @@ void DownloaderReaderWithKnownContentLength::connRecvFinished(
 	{
 		// We have got all data, finish download.
 		MAHandle handle = mDownloader->getHandle();
-		ASSERT_MSG(handle, "No data handle in standard reader");
-		mDownloader->fireFinishedDownloading(handle);
+		if (handle)
+		{
+			mDownloader->fireFinishedDownloading(handle);
+		}
+		else
+		{
+			mDownloader->fireError(CONNERR_DOWNLOADER_OOM);
+		}
 	}
 }
 
@@ -656,6 +673,12 @@ void DownloaderReaderThatReadsChunks::finishedDownloadingChunkedData()
 	delete[] buf;
 
 	MAHandle handle = mDownloader->getHandle();
-	ASSERT_MSG(handle, "No data handle in chunked reader");
-	mDownloader->fireFinishedDownloading(handle);
+	if (handle)
+	{
+		mDownloader->fireFinishedDownloading(handle);
+	}
+	else
+	{
+		mDownloader->fireError(CONNERR_DOWNLOADER_OOM);
+	}
 }

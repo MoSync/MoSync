@@ -134,6 +134,7 @@ RELEVANT_CAPS = [
 	:CameraResolution_x,
 	:CameraResolution_y,
 	:properties,
+	:JavaPlatform,
 ]
 
 RELEVANT_DEFINES = {
@@ -149,6 +150,8 @@ RELEVANT_DEFINES = {
 		'MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION',
 		'MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI',
 		'MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI',
+		'MA_PROF_BUG_RESOURCE_SIZE_LIMITED',
+		'MA_PROF_BUG_NO_SIZECHANGED',
 	],
 	
 	:s60v2 => ['MA_PROF_SUPPORT_FRAMEBUFFER_32BIT'],
@@ -351,7 +354,7 @@ FileUtils.mkdir_p RUNTIME_DIR
 definitions = {}
 
 def skipVendor?(vendor)
-	return vendor.eql?("Generic") || vendor.eql?("Native") || vendor.eql?("BlackBerry")
+	return vendor.eql?("Generic") || vendor.eql?("Native")
 end
 
 puts "Handling vendors..."
@@ -404,6 +407,9 @@ DEVICE.each_with_index do |device, index|
 		if(device.platformversion.platform == :iphoneos)
 			profile.puts "#define MA_PROF_OUTPUT_CPP"
 		end
+#		if(vendor.eql?("BlackBerry"))
+#			profile.puts "#define MA_PROF_SUPPORT_BLACKBERRY"
+#		end
 		profile.puts
 		RELEVANT_CAPS.each do |cap|
 			if(device.caps.has_key?(cap))
@@ -455,6 +461,10 @@ DEVICE.each_with_index do |device, index|
 					end	#value.each
 				elsif(CAP_TYPES[:supports].include? cap)
 					value.each do |v|
+						if(v == 'pdaapi')
+							value << 'fileconnection'
+							value << 'pimapi'
+						end
 						def_name = "MA_PROF_SUPPORT_#{cap.to_s.format}"
 						if(!(seen_defines.include? def_name)) then
 							if(def_name != "MA_PROF_SUPPORT_JAVAPACKAGE") then
@@ -507,6 +517,21 @@ DEVICE.each_with_index do |device, index|
 							end
 						end
 					end	#value.each
+				elsif(cap == :JavaPlatform)
+					value.each do |v|
+						platform, version = v.split('/')
+						if(platform == 'BlackBerry')
+							major, minor = version.split('.')
+							if(major.to_i > 4 || minor.to_i >= 3)
+								def_name = 'MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH'
+								rt_obj.caps[def_name] = 'TRUE';
+								def_str = "#define #{def_name}"
+								profile.puts def_str
+							end
+							profile.puts '#define MA_PROF_SUPPORT_BLACKBERRY'
+							profile.puts "#define MA_PROF_CONST_BLACKBERRY_VERSION \"#{version}\""
+						end
+					end
 				elsif(cap == :JavaConfiguration)
 					value.each do |v|
 						if (v == "CLDC/1.0" ||

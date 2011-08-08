@@ -260,10 +260,10 @@ void convert_audio ( dst_t *dst, const int *src, int numSamples, int vol )
  * @param b     Pointer to the sound buffer to fill
  * @param l     Number of bytes to fill
  */
-void AudioInterface::outputCallback ( void *b, long len )
+void AudioInterface::outputCallback ( void *b, size_t len )
 {
     Lock    lck( m_mutex );
-    int     numSamples = len/((m_outputSampleBits/8)*m_outputChannels);
+    size_t numSamples = len/((m_outputSampleBits/8)*m_outputChannels);
 
     // Reset audio buffer
     memset( m_audioBuffer, 0, AUDIO_BUF_SAMPLES*2*sizeof( int ) );
@@ -276,7 +276,7 @@ void AudioInterface::outputCallback ( void *b, long len )
     // Convert to output format
 #ifndef __SOUND_OUTPUT_USE_CONVERSION__
     s16 *out = static_cast<s16 *>( b );
-    for ( int i = 0; i < numSamples; i++ )
+    for ( size_t i = 0; i < numSamples; i++ )
     {
         out[i*2+0] = (s16)mostd::clamp<int>( -32768, m_audioBuffer[i*2+0], 32767 );
         out[i*2+1] = (s16)mostd::clamp<int>( -32768, m_audioBuffer[i*2+1], 32767 );

@@ -82,7 +82,7 @@ namespace Base {
 
 #ifdef RESOURCE_MEMORY_LIMIT
 	uint size_RT_FLUX(void* size) {
-		return (int)size;
+		return (uint)(size_t)size;
 	}
 	uint size_RT_PLACEHOLDER(void*) {
 		return 0;
@@ -646,7 +646,7 @@ namespace Base {
 	}
 
 	SYSCALL(int, maFindLabel(const char* name)) {
-		for(unsigned i = 0; i < SYSCALL_THIS->resources.size(); i++) {
+		for(unsigned i = 1; i < SYSCALL_THIS->resources.size(); i++) {
 			if(SYSCALL_THIS->resources.get_type(i)==RT_LABEL)
 			{
 				Label *l = SYSCALL_THIS->resources.get_RT_LABEL(i);
@@ -671,10 +671,11 @@ namespace Base {
 
 #if !defined(_android)
 	int Syscall::maBtGetNewDevice(MABtDevice* dst) {
-		char* vmName = dst->name;
-		dst->name = (char*)GetValidatedMemRange((int)dst->name, dst->nameBufSize);
-		int res = BLUETOOTH(maBtGetNewDevice)(dst);
-		dst->name = vmName;
+		MABtDeviceNative dn;
+		dn.name = (char*)GetValidatedMemRange(dst->name, dst->nameBufSize);
+		int res = BLUETOOTH(maBtGetNewDevice)(&dn);
+		dst->actualNameLength = dn.actualNameLength;
+		dst->address = dn.address;
 		return res;
 	}
 
@@ -683,13 +684,11 @@ namespace Base {
 		int res = BLUETOOTH(maBtGetNextServiceSize)(&ss);
 		if(res <= 0)
 			return res;
-		char* vmName = dst->name;
-		MAUUID* vmUuids = dst->uuids;
-		dst->name = (char*)GetValidatedMemRange((int)dst->name, dst->nameBufSize);
-		dst->uuids = (MAUUID*)GetValidatedMemRange((int)dst->uuids, ss.nUuids * sizeof(MAUUID));
-		res = BLUETOOTH(maBtGetNewService)(dst);
-		dst->name = vmName;
-		dst->uuids = vmUuids;
+		MABtServiceNative sn;
+		sn.name = (char*)GetValidatedMemRange(dst->name, dst->nameBufSize);
+		sn.uuids = (MAUUID*)GetValidatedMemRange(dst->uuids, ss.nUuids * sizeof(MAUUID));
+		res = BLUETOOTH(maBtGetNewService)(&sn);
+		dst->port = sn.port;
 		return res;
 	}
 
@@ -700,12 +699,15 @@ namespace Base {
 		if(res < 0) {
 			LOGF("File: %s\n", fh.name.p());
 		}
+		if(res > 0 && !fh.isDirectory()) {
+			FILE_FAIL(MA_FERR_GENERIC);
+		}
 		if(fh.mode == MA_ACCESS_READ_WRITE) {
 			if(res == 0) {	//file exists and is not a directory
 				fh.fs = new WriteFileStream(fh.name, false, true);
 			}
 		} else if((fh.mode & MA_ACCESS_READ) != 0) {
-			if(res == 0) {
+			if(res == 0) {	//file exists and is not a directory
 				fh.fs = new FileStream(fh.name);
 			}
 		} else {
@@ -931,7 +933,7 @@ namespace Base {
 		}
 
 		bool hasPath = false;
-#if defined(WIN32) && !defined(_WIN32_WCE) && !defined(FILESYSTEM_CHROOT)
+#if defined(WIN32) && !defined(_WIN32_WCE) && !FILESYSTEM_CHROOT
 		// If fh.name and newName are on different file systems,
 		// forbid the operation.
 		if(newName[1] == ':' && toupper(fh.name[0]) != toupper(newName[0])) {
@@ -956,6 +958,12 @@ namespace Base {
 				newName = nn.c_str();
 			}
 		}
+#if FILESYSTEM_CHROOT
+		else {
+			nn = FILESYSTEM_DIR + std::string(newName);
+			newName = nn.c_str();
+		}
+#endif
 		int res = rename(fh.name, newName);
 		if(res != 0) {
 			if(errno == EXDEV)
@@ -978,23 +986,30 @@ namespace Base {
 	int Syscall::maFileDate(MAHandle file) {
 		LOGF("maFileDate(%i)\n", file);
 		FileHandle& fh(getFileHandle(file));
-		const char* statName = fh.name;
-		Array<char> temp(0);
-		if(fh.name[fh.name.size()-2] == '/') {
-			// would cause stat() to fail. get rid of the slash.
-			//temp.assign(fh.name, fh.name.size()-2);
-			temp.resize(fh.name.size()-1);
-			memcpy(temp, fh.name, fh.name.size()-2);
-			temp[fh.name.size()-2] = 0;
-			statName = temp;
+		time_t t;
+		if(fh.fs) {
+			if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
+			if(!fh.fs->mTime(t)) FILE_FAIL(MA_FERR_GENERIC);
+		} else {
+			const char* statName = fh.name;
+			Array<char> temp(0);
+			if(fh.name[fh.name.size()-2] == '/') {
+				// would cause stat() to fail. get rid of the slash.
+				//temp.assign(fh.name, fh.name.size()-2);
+				temp.resize(fh.name.size()-1);
+				memcpy(temp, fh.name, fh.name.size()-2);
+				temp[fh.name.size()-2] = 0;
+				statName = temp;
+			}
+			struct _stat st;
+			if(_stat(statName, &st) != 0) {
+				LOG("maFileDate:stat(%s) failed. errno: %i(%s)\n", statName, errno, strerror(errno));
+				FILE_FAIL(MA_FERR_GENERIC);
+			}
+			t = st.st_mtime;
 		}
-		struct _stat st;
-		if(_stat(statName, &st) != 0) {
-			LOG("maFileDate:stat(%s) failed. errno: %i(%s)\n", statName, errno, strerror(errno));
-			FILE_FAIL(MA_FERR_GENERIC);
-		}
-		LOGF("mtime: %i\n", (int)st.st_mtime);
-		return (int)st.st_mtime;
+		LOGF("mtime: %i\n", (int)t);
+		return (int)t;
 	}
 
 	int Syscall::maFileTruncate(MAHandle file, int offset) {
@@ -1002,27 +1017,7 @@ namespace Base {
 		FileHandle& fh(getFileHandle(file));
 		if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
 		if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
-		// looks like we'll have to close the file, open() it,
-		// truncate it, then restore the FileStream.
-		int oldPos;
-		if(!fh.fs->tell(oldPos)) FILE_FAIL(MA_FERR_GENERIC);
-
-		delete fh.fs;
-		fh.fs = NULL;
-
-		int fd = _open(fh.name, O_RDWR);
-		if(fd < 0) FILE_FAIL(MA_FERR_GENERIC);
-		int res =
-#ifdef WIN32
-		_chsize(fd, offset);
-#else
-		ftruncate(fd, offset);
-#endif
-		if(res < 0) FILE_FAIL(MA_FERR_GENERIC);
-		if(close(fd) < 0) FILE_FAIL(MA_FERR_GENERIC);
-
-		TEST_LTZ(openFile(fh));
-		if(!fh.fs->seek(Seek::Start, MIN(oldPos, offset))) FILE_FAIL(MA_FERR_GENERIC);
+		if(!fh.fs->truncate(offset)) FILE_FAIL(MA_FERR_GENERIC);
 		return 0;
 	}
 #endif	//SYMBIAN && _WIN32_WCE
@@ -1126,6 +1121,7 @@ namespace Base {
 	// if this is MoRE, the emulator,
 	// we'll put all filesystem access into a separate directory, like chroot.
 	MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
+		LOGF("maFileListStart(%s, %s)\n", path, filter);
 		sFileList.files.clear();
 		sFileList.pos = 0;
 		if(path[0] == 0) {	//empty string
@@ -1160,8 +1156,10 @@ namespace Base {
 			sFileListRealDir = scanPath;
 			scanPath += filter;
 			int res = scanDirectory(scanPath.c_str(), fileListCallback);
-			if(res)
+			if(res) {
+				LOG("scanDirectory failed: %i\n", res);
 				FILE_FAIL(MA_FERR_GENERIC);
+			}
 		}
 		std::pair<FileListItr, bool> ires = sFileListings.insert(
 			std::pair<int, FileList>(sFileListNextHandle, sFileList));

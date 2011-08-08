@@ -215,6 +215,7 @@ inline void* memset(void* dst, int c, uint len) {
 #endif
 
 int unixTime(const TTime& tt);
+TTime symbianTime(int unixTime);
 
 // returns 0 on success.
 int _mkdir(const char* name);
@@ -331,6 +332,8 @@ private:
 //***************************************************************************
 //File system server connection management
 //***************************************************************************
+
+// todo: replace with CCoeEnv::Static()->FsSession().
 
 class MyRFs {
 public:

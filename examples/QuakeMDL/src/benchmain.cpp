@@ -1,4 +1,22 @@
 /*
+Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/*
  * main.cpp
  *
  *  Created on: 2009-jun-09
@@ -19,6 +37,23 @@
 #define BENCH_PASSES	3
 #define FRAMES_PASS		1000
 
+/*
+ * Wait for user to press exit
+ */
+void handleExitByUser(void)
+{
+		MAEvent e;
+		while ( maGetEvent( &e ) )
+		{
+			if ( e.type == EVENT_TYPE_CLOSE ||
+				 e.type == EVENT_TYPE_KEY_PRESSED ||
+				 e.type == EVENT_TYPE_POINTER_PRESSED ||
+				 e.type == MAK_BACK)
+			{
+				maExit(0);
+			}
+		}
+}
 
 int BenchMain ( void )
 {
@@ -55,8 +90,10 @@ int BenchMain ( void )
 		printf( "    - Pass %d/%d\n", i+1, BENCH_PASSES );
 		renderedFrames = 0;
 		tmrIni = maGetMilliSecondCount( );
+
 		while ( true )
 		{
+			handleExitByUser();
 			//
 			// Construct transformation pipe
 			//
@@ -92,17 +129,7 @@ int BenchMain ( void )
 			if ( renderedFrames == FRAMES_PASS )
 				break;
 
-			//
-			// Handle input
-			//
-			MAEvent e;
-			while ( maGetEvent( &e ) )
-			{
-				if ( e.type == EVENT_TYPE_CLOSE ||
-					 e.type == EVENT_TYPE_KEY_PRESSED ||
-					 e.type == EVENT_TYPE_POINTER_PRESSED )
-					maExit( 0 );
-			}
+
 		}
 
 		// Calculate average fps for pass
@@ -120,5 +147,13 @@ int BenchMain ( void )
 	printf( "-------------\n\n" );
 	printf( ".\n" );
 
-	FREEZE;
+
+	// Waiting for user event
+	while(true)
+	{
+		handleExitByUser();
+	}
+
 }
+
+
