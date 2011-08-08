@@ -12,6 +12,28 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
+		43D8046C13EFBCB200183387 /* ActivityIndicatorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */; };
+		43D8046D13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */; };
+		43D8046E13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */; };
+		43D8046F13EFBCB200183387 /* DatePickerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046013EFBCB200183387 /* DatePickerWidget.h */; };
+		43D8047013EFBCB200183387 /* DatePickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046113EFBCB200183387 /* DatePickerWidget.mm */; };
+		43D8047113EFBCB200183387 /* DatePickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046113EFBCB200183387 /* DatePickerWidget.mm */; };
+		43D8047213EFBCB200183387 /* NumberPickerWIdget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046213EFBCB200183387 /* NumberPickerWIdget.h */; };
+		43D8047313EFBCB200183387 /* NumberPickerWIdget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046313EFBCB200183387 /* NumberPickerWIdget.mm */; };
+		43D8047413EFBCB200183387 /* NumberPickerWIdget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046313EFBCB200183387 /* NumberPickerWIdget.mm */; };
+		43D8047513EFBCB200183387 /* ProgressBarWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046413EFBCB200183387 /* ProgressBarWidget.h */; };
+		43D8047613EFBCB200183387 /* ProgressBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046513EFBCB200183387 /* ProgressBarWidget.mm */; };
+		43D8047713EFBCB200183387 /* ProgressBarWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046513EFBCB200183387 /* ProgressBarWidget.mm */; };
+		43D8047813EFBCB200183387 /* SliderWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046613EFBCB200183387 /* SliderWidget.h */; };
+		43D8047913EFBCB200183387 /* SliderWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046713EFBCB200183387 /* SliderWidget.mm */; };
+		43D8047A13EFBCB200183387 /* SliderWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046713EFBCB200183387 /* SliderWidget.mm */; };
+		43D8047B13EFBCB200183387 /* TimePickerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046813EFBCB200183387 /* TimePickerWidget.h */; };
+		43D8047C13EFBCB200183387 /* TimePickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046913EFBCB200183387 /* TimePickerWidget.mm */; };
+		43D8047D13EFBCB200183387 /* TimePickerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046913EFBCB200183387 /* TimePickerWidget.mm */; };
+		43D8047E13EFBCB200183387 /* VideoViewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046A13EFBCB200183387 /* VideoViewWidget.h */; };
+		43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
+		43D8048013EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
+		43D8048413EFBEEE00183387 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D8048213EFBCC700183387 /* MediaPlayer.framework */; };
 		85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
 		85037841133A2275009251E2 /* StackScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 8503783E133A2275009251E2 /* StackScreenWidget.h */; };
 		85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
@@ -209,6 +231,21 @@
 		28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncViewController.h; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
+		43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorWidget.h; sourceTree = "<group>"; };
+		43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ActivityIndicatorWidget.mm; sourceTree = "<group>"; };
+		43D8046013EFBCB200183387 /* DatePickerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatePickerWidget.h; sourceTree = "<group>"; };
+		43D8046113EFBCB200183387 /* DatePickerWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DatePickerWidget.mm; sourceTree = "<group>"; };
+		43D8046213EFBCB200183387 /* NumberPickerWIdget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NumberPickerWIdget.h; sourceTree = "<group>"; };
+		43D8046313EFBCB200183387 /* NumberPickerWIdget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = NumberPickerWIdget.mm; sourceTree = "<group>"; };
+		43D8046413EFBCB200183387 /* ProgressBarWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ProgressBarWidget.h; sourceTree = "<group>"; };
+		43D8046513EFBCB200183387 /* ProgressBarWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ProgressBarWidget.mm; sourceTree = "<group>"; };
+		43D8046613EFBCB200183387 /* SliderWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SliderWidget.h; sourceTree = "<group>"; };
+		43D8046713EFBCB200183387 /* SliderWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = SliderWidget.mm; sourceTree = "<group>"; };
+		43D8046813EFBCB200183387 /* TimePickerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TimePickerWidget.h; sourceTree = "<group>"; };
+		43D8046913EFBCB200183387 /* TimePickerWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TimePickerWidget.mm; sourceTree = "<group>"; };
+		43D8046A13EFBCB200183387 /* VideoViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewWidget.h; sourceTree = "<group>"; };
+		43D8046B13EFBCB200183387 /* VideoViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoViewWidget.mm; sourceTree = "<group>"; };
+		43D8048213EFBCC700183387 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
@@ -373,6 +410,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
+				43D8048413EFBEEE00183387 /* MediaPlayer.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */,
 				85E2A0D61181D1B200CDB453 /* AudioToolbox.framework in Frameworks */,
@@ -492,6 +530,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				43D8048213EFBCC700183387 /* MediaPlayer.framework */,
 				857B020112C627C200DEA306 /* OpenGLES.framework */,
 				850944001185C440004A3B2D /* CoreLocation.framework */,
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
@@ -566,6 +605,20 @@
 		85A158FA12F80E520044BBE1 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
+				43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */,
+				43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */,
+				43D8046013EFBCB200183387 /* DatePickerWidget.h */,
+				43D8046113EFBCB200183387 /* DatePickerWidget.mm */,
+				43D8046213EFBCB200183387 /* NumberPickerWIdget.h */,
+				43D8046313EFBCB200183387 /* NumberPickerWIdget.mm */,
+				43D8046413EFBCB200183387 /* ProgressBarWidget.h */,
+				43D8046513EFBCB200183387 /* ProgressBarWidget.mm */,
+				43D8046613EFBCB200183387 /* SliderWidget.h */,
+				43D8046713EFBCB200183387 /* SliderWidget.mm */,
+				43D8046813EFBCB200183387 /* TimePickerWidget.h */,
+				43D8046913EFBCB200183387 /* TimePickerWidget.mm */,
+				43D8046A13EFBCB200183387 /* VideoViewWidget.h */,
+				43D8046B13EFBCB200183387 /* VideoViewWidget.mm */,
 				8503783E133A2275009251E2 /* StackScreenWidget.h */,
 				8503783F133A2275009251E2 /* StackScreenWidget.mm */,
 				8594B89D13258A970059D79B /* LayoutWidgets.h */,
@@ -784,6 +837,13 @@
 				8597A98313095110003468CF /* EditBoxWidget.h in Headers */,
 				8594B8A013258A970059D79B /* LayoutWidgets.h in Headers */,
 				85037841133A2275009251E2 /* StackScreenWidget.h in Headers */,
+				43D8046C13EFBCB200183387 /* ActivityIndicatorWidget.h in Headers */,
+				43D8046F13EFBCB200183387 /* DatePickerWidget.h in Headers */,
+				43D8047213EFBCB200183387 /* NumberPickerWIdget.h in Headers */,
+				43D8047513EFBCB200183387 /* ProgressBarWidget.h in Headers */,
+				43D8047813EFBCB200183387 /* SliderWidget.h in Headers */,
+				43D8047B13EFBCB200183387 /* TimePickerWidget.h in Headers */,
+				43D8047E13EFBCB200183387 /* VideoViewWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -957,6 +1017,13 @@
 				8597A98213095110003468CF /* EditBoxWidget.mm in Sources */,
 				8594B89F13258A970059D79B /* LayoutWidgets.mm in Sources */,
 				85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */,
+				43D8046D13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */,
+				43D8047013EFBCB200183387 /* DatePickerWidget.mm in Sources */,
+				43D8047313EFBCB200183387 /* NumberPickerWIdget.mm in Sources */,
+				43D8047613EFBCB200183387 /* ProgressBarWidget.mm in Sources */,
+				43D8047913EFBCB200183387 /* SliderWidget.mm in Sources */,
+				43D8047C13EFBCB200183387 /* TimePickerWidget.mm in Sources */,
+				43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1020,6 +1087,13 @@
 				8597A98413095110003468CF /* EditBoxWidget.mm in Sources */,
 				8594B8A113258A970059D79B /* LayoutWidgets.mm in Sources */,
 				85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */,
+				43D8046E13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */,
+				43D8047113EFBCB200183387 /* DatePickerWidget.mm in Sources */,
+				43D8047413EFBCB200183387 /* NumberPickerWIdget.mm in Sources */,
+				43D8047713EFBCB200183387 /* ProgressBarWidget.mm in Sources */,
+				43D8047A13EFBCB200183387 /* SliderWidget.mm in Sources */,
+				43D8047D13EFBCB200183387 /* TimePickerWidget.mm in Sources */,
+				43D8048013EFBCB200183387 /* VideoViewWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
