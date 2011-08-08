@@ -17,82 +17,62 @@ html, body
 
 #HeadingElement
 {
-  width: 100%;
+  display: block;
   margin: 0.1em auto;
   font-size: 3.5em;
   color: white;
   text-align: center;
+  /*background-color:green;*/
 }
 
 .button
 {
+  /* Centers the button horizontally. */
+  display: table;
+  margin: 0.9em auto;
+
   padding: 0.3em 0.5em;
-  display: table; /*inline-block;*/
-  margin: 20px auto;
-
-  color: white;
-  font-size: 1.5em;
-  text-align: center;
-  cursor: pointer;
-  font-weight: bold;
-
-  background-color: #99CF00;
-  border: none;
-  border-left: solid 1px #c3f83a;
-  border-top: solid 1px #c3f83a;
-  border-right: solid 1px #82a528;
-  border-bottom: solid 1px #58701b;
-
+  border-radius: 0.3em;
   -moz-border-radius: 0.3em;
   -webkit-border-radius: 0.3em;
-  border-radius: 0.3em;
+
+  font-size: 1.5em;
+  font-weight: bold;
+  text-align: center;
+
+  color: white;
+  background-color: #99CF00;
+  border-left: solid 1px #C3F83A;
+  border-top: solid 1px #C3F83A;
+  border-right: solid 1px #82A528;
+  border-bottom: solid 1px #58701B;
 
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#99CF00), to(#6DB700));
-  background: -moz-linear-gradient(19% 75% 90deg,#6DB700, #99CF00);
-}
+  background: -moz-linear-gradient(19% 75% 90deg, #6DB700, #99CF00);
 
-/*.button:hover {
-    background-position: 0 -48px;
-    }*/
+  cursor: pointer;
+
+  width: 11em;
+}
 
 .button:active
 {
-  /*background-position: 0 top;
-  position: relative;
-  top: 1px;
-  padding: 6px 10px 4px;*/
-
   background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6DB700), to(#99CF00));
   background: -moz-linear-gradient(19% 75% 90deg,#99CF00, #6DB700);
 }
 
-a
-{
-  text-decoration: none;
-}
-
-#CenteredElement
+#PhoneNo
 {
   display: table;
-  height: 100px;
-  margin: 20px auto;
-  background-color: FFFFFF;
+  margin: 1.1em auto;
+  padding: 0.3em 0.5em;
+  width: 11em;
+  font-family: Sans-Serif;
+  font-size: 1.5em;
+  font-weight: bold;
+  background-color: #D6E5F4;
 }
 
-/*
-input.groovybutton
-{
-   font-size:20px;
-   font-family:Arial Black,sans-serif;
-   color:#FFFFFF;
-   width:200px;
-   height:50px;
-   background-color:#668899;
-   border-style:solid;
-   border-color:#000000;
-   border-width:2px;
-}
-*/
 </style>
 
 <script>
@@ -104,29 +84,108 @@ input.groovybutton
   heading.style.fontSize =
   div.css('font-size', div.width() / (div.text().length * factor) + 'px');
 }*/
+
+function SendMoSyncMessage(message)
+{
+  document.location = 'mosync://' + message;
+}
+
+function SendLoveSMS()
+{
+  if (ValidatePhoneNo())
+  {
+    alert('SendLoveSMS/' + GetPhoneNo());
+    SendMoSyncMessage('SendLoveSMS/' + GetPhoneNo());
+  }
+}
+
+function SendKissSMS()
+{
+  if (ValidatePhoneNo())
+  {
+    alert('SendLoveSMS/' + GetPhoneNo());
+    SendMoSyncMessage('SendLoveSMS/' + GetPhoneNo());
+  }
+  var phoneNo = GetPhoneNo();
+  alert('Sending Love SMS to ' + phoneNo);
+  SendMoSyncMessage('SendKissSMS/' + phoneNo);
+}
+
+function ValidatePhoneNo()
+{
+  var phoneNo = CleanPhoneNo(GetPhoneNo());
+  if (phoneNo.length < 6)
+  {
+    alert('Not a valid phone number.' + GetPhoneNo());
+    return false;
+  }
+  else
+  {
+    SetPhoneNo(phoneNo);
+    return true;
+  }
+}
+
+function GetPhoneNo()
+{
+  return document.getElementById("PhoneNo").value;
+}
+
+function SetPhoneNo(number)
+{
+  document.getElementById("PhoneNo").value = number;
+}
+
+//
+// Filter out everything except digits in the phone number.
+//
+function CleanPhoneNo(phoneNo)
+{
+  var cleanPhoneNo = '';
+
+  for (var i = 0; i < phoneNo.length; ++i)
+  {
+    var character = phoneNo.charAt(i);
+    if (IsDigit(character))
+    {
+      cleanPhoneNo += character;
+    }
+  }
+
+  return cleanPhoneNo;
+}
+
+function IsDigit(ch)
+{
+  return false ||
+    '0' == ch ||
+    '1' == ch ||
+    '2' == ch ||
+    '3' == ch ||
+    '4' == ch ||
+    '5' == ch ||
+    '6' == ch ||
+    '7' == ch ||
+    '8' == ch ||
+    '9' == ch;
+}
+
 </script>
 </head>
 
 <body>
 <div id="PageContainer">
-<div id="HeadingContainer">
-	<h1 id="HeadingElement">LoveSMS</h1>
+  <div id="HeadingContainer">
+    <h1 id="HeadingElement">LoveSMS</h1>
+  </div>
+  <div>
+    <input id="PhoneNo" type="text" />
+    <div class="button" onclick="SendLoveSMS()">Send Eternal Love</div>
+    <div class="button" onclick="SendKissSMS()">Send Warm Kisses</div>
+  </div>
 </div>
-<div>
-	<!--<input class="button" type="button" value="Send Eternal Love" onclick="" />
-	<input class="button" type="button" value="Send Warm Kisses" onclick="" />-->
-
-	<a style="margin="20px 20px;" class="button" onclick="" href="#">Send Eternal Love</a>
-	<a class="button" onclick="" href="#">Send Warm Kisses</a>
-
-<!--
-</div>
-<div id="CenteredElement">Hello World</div>
-</div>
--->
-
 <script>
-//AdjustHeadingSize();
+  SendMoSyncMessage('PageLoaded')
 </script>
 </body>
 </html>

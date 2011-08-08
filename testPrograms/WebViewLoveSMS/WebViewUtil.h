@@ -153,11 +153,10 @@ public:
 };
 
 /**
- * Class that reads and parses custom messages from a web view.
+ * Class that reads and parses messages in the form of urls
+ * sent from a web view as MAW_EVENT_WEB_VIEW_HOOK_INVOKED events.
  *
- * NOTE: By "messages" is meant MAW_EVENT_CUSTOM_MESSAGE events.
- *
- * Message used with this class has the format:
+ * Message (urls) used with this class has the format:
  *
  *   mosync://MessageName/Param1/Param2/...
  *
@@ -168,8 +167,6 @@ public:
  * To receive messages from a web from do an initial call to:
  *
  *   WebViewUtil::getMessagesFor(webView);
- *
- * Messages will then be delivered as MAW_EVENT_CUSTOM_MESSAGE events.
  */
 class WebViewMessage
 {
@@ -208,12 +205,13 @@ public:
 	bool is(const MAUtil::String& messageName);
 
 	/**
-	 * Returns the data part of a message.
+	 * Returns the parameter part of a message.
 	 */
-	MAUtil::String getData();
+	MAUtil::String getParams();
 
 	/**
 	 * Returns a message parameter by index.
+	 * Parameters are separated by slashes.
 	 */
 	MAUtil::String getParam(int index);
 };

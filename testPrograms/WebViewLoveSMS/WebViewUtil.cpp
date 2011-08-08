@@ -30,7 +30,7 @@ MA 02110-1301, USA.
 #include <mavsprintf.h>		// C string functions
 #include <MAUtil/String.h>	// C++ String class
 #include <IX_WIDGET.h>		// Widget API
-
+#include <conprint.h>
 #include "WebViewUtil.h"
 
 using namespace MoSync::UI;
@@ -293,13 +293,13 @@ MAUtil::String WebViewMessage::getMessageString()
 bool WebViewMessage::is(const MAUtil::String& messageName)
 {
 	// Start of messageName should be found at start of message string.
-		return 0 == mMessageString.find(messageName);
+	return 0 == mMessageString.find(messageName);
 }
 
 /**
- * Returns the data part of a message.
+ * Returns the parameter part of a message.
  */
-MAUtil::String WebViewMessage::getData()
+MAUtil::String WebViewMessage::getParams()
 {
 	// Must be at least three characters in a message
 	// that has a data part.
@@ -321,34 +321,39 @@ MAUtil::String WebViewMessage::getData()
 
 /**
  * Returns a message parameter by index.
+ * Parameters are separated by slashes.
  */
 MAUtil::String WebViewMessage::getParam(int index)
 {
 	// Get params.
-	MAUtil::String params = getData();
+	MAUtil::String params = getParams();
+
+	lprintfln("getParam params: %s", params.c_str());
 
 	// Find start slash of the param we look for.
 	int start = 0;
 	for (int i = 0; i < index; ++i)
 	{
-		start = mMessageString.find("/", start);
+		start = params.find("/", start);
 		if (MAUtil::String::npos == start)
 		{
 			// Param not found.
 			return "";
 		}
+		// Move to position after slash.
+		start = start + 1;
 	}
 
 	// Is this the last param?
-	int end = mMessageString.find("/", start);
+	int end = params.find("/", start);
 	if (MAUtil::String::npos == end)
 	{
 		// Yes, last param, return rest of the string.
-		return mMessageString.substr(start + 1);
+		return params.substr(start);
 	}
 	else
 	{
 		// No, not last param, return param part of the string.
-		return mMessageString.substr(start + 1, end);
+		return params.substr(start, end);
 	}
 }

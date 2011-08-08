@@ -21,6 +21,16 @@ MA 02110-1301, USA.
  * @author Mikael Kindborg
  *
  * Application for sending Love SMSs.
+ *
+ * This program illustrates how to use WebView for the
+ * user interface of a MoSync C++ application.
+ *
+ * The HTML/CSS/JavaScript layer is rather thin, and the
+ * application logic is implemented in C++. An alternative
+ * design is to keep the C++ layer as thin as possible,
+ * and implemented the application logic in JavaScript.
+ *
+ * By "application logic" is meant
  */
 
 #include <ma.h>
@@ -29,6 +39,7 @@ MA 02110-1301, USA.
 #include <mavsprintf.h>
 #include <MAUtil/String.h>
 #include <IX_WIDGET.h>
+#include <conprint.h>
 #include "MAHeaders.h"
 #include "WebViewUtil.h"
 
@@ -40,16 +51,38 @@ private:
 	MAWidgetHandle mScreen;
 	MAWidgetHandle mWebView;
 	PlatformUtil* mPlatformUtil;
+	MAUtil::String mLoveMessage;
+	MAUtil::String mKissMessage;
 
 public:
 	WebViewLoveSMSApp()
 	{
 		createUI();
+		createMessageStrings();
 	}
 
 	virtual ~WebViewLoveSMSApp()
 	{
 		destroyUI();
+	}
+
+	void createMessageStrings()
+	{
+		// Create a message string with lots of
+		// heart smileys!
+		mLoveMessage = "";
+		while (mLoveMessage.length() < 150)
+		{
+			mLoveMessage += "<3 ";
+		}
+
+		// Create a message string with lots of
+		// kiss smileys!
+		mKissMessage = "";
+		while (mKissMessage.length() < 150)
+		{
+			mKissMessage += ":-* ";
+		}
 	}
 
 	void createUI()
@@ -75,7 +108,8 @@ public:
 		// Create web view.
 		mWebView = createWebView(html);
 
-		// TODO: Use save phone no. insert via javascript: call.
+		// TODO: Use save phone no. insert via javascript: call
+		// when page is loaded.
 
 		// Compose objects.
 		maWidgetAddChild(mScreen, mWebView);
@@ -155,17 +189,64 @@ public:
 
 			if (message.is("SendLoveSMS"))
 			{
+				// Save phone no and send SMS.
+				savePhoneNoAndSendSMS(
+					message.getParam(0),
+					mLoveMessage);
 			}
 
 			if (message.is("SendKissSMS"))
 			{
 			}
 
-			if (message.is("SetPhoneNo"))
+			if (message.is("PageLoaded"))
 			{
-				// Save phone number here.
+				// Set saved phone number here.
 			}
 		}
+	}
+
+	void savePhoneNoAndSendSMS(
+		const MAUtil::String& phoneNo,
+		const MAUtil::String&  message)
+	{
+		lprintfln("*** SMS to: %s", phoneNo.c_str());
+		lprintfln("*** SMS to cleaned: %s", cleanPhoneNo(phoneNo.c_str()).c_str());
+		lprintfln("*** SMS data: %s", message.c_str());
+	}
+
+	/**
+	 * Filter out everything except digits in the phone number.
+	 */
+	MAUtil::String cleanPhoneNo(const MAUtil::String& phoneNo)
+	{
+		MAUtil::String cleanPhoneNo = "";
+
+		for (int i = 0; i < phoneNo.length(); ++i)
+		{
+			char character = phoneNo[i];
+			if (isDigit(character))
+			{
+				cleanPhoneNo += character;
+			}
+		}
+
+		return cleanPhoneNo;
+	}
+
+	bool isDigit(char ch)
+	{
+		return
+			'0' == ch ||
+			'1' == ch ||
+			'2' == ch ||
+			'3' == ch ||
+			'4' == ch ||
+			'5' == ch ||
+			'6' == ch ||
+			'7' == ch ||
+			'8' == ch ||
+			'9' == ch;
 	}
 
 //	void handleGeoLocationEvent(MALocation* location)
