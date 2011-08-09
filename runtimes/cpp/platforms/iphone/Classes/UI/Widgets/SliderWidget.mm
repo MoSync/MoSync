@@ -15,10 +15,10 @@
  02111-1307, USA.
  */
 
-// default maximum value for the slider.
+// Default maximum value for the slider.
 #define DEFAULT_MAXIMUM_VALUE 100
 
-// default minimum value for the slider.
+// Default minimum value for the slider.
 #define DEFAULT_MINIMUM_VALUE 0
 
 #import "SliderWidget.h"
@@ -31,16 +31,17 @@
 /**
  * Init function.
  */
-- (id)init {
-
-    if(!view) {
+- (id)init
+{
+    if(!view)
+    {
         UISlider* slider = [[UISlider alloc] init];
         view = [slider retain];
         [slider addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventTouchDragInside];
     }
 
-    maxValue = DEFAULT_MAXIMUM_VALUE;
-    progressValue = DEFAULT_MINIMUM_VALUE;
+    mMaxValue = DEFAULT_MAXIMUM_VALUE;
+    mProgressValue = DEFAULT_MINIMUM_VALUE;
 
     return [super init];
 }
@@ -51,76 +52,74 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+{
+    UISlider* slider = (UISlider*) view;
+    float paramValue = [value floatValue];
 
-    int result = [super setPropertyWithKey:key toValue:value];
+    if([key isEqualToString:@"max"])
+    {
+        TEST_FOR_NEGATIVE_VALUE(paramValue);
 
-    if(MAW_RES_OK != result) {
+        // Set the upper range(max) value.
+        mMaxValue = paramValue;
+        [slider setMaximumValue:mMaxValue];
 
-        // check for negative values
-        float paramValue = [value floatValue];
-        if(0 > paramValue) {
-            return MAW_RES_INVALID_PROPERTY_VALUE;
+        // Check if slider's value is bigger then the new maximum upper range.
+        if (mProgressValue > mMaxValue)
+        {
+            mProgressValue = mMaxValue;
+            [slider setValue:mProgressValue];
+        }
+    }
+    else if([key isEqualToString:@"value"])
+    {
+        TEST_FOR_NEGATIVE_VALUE(paramValue);
+        mProgressValue = paramValue;
+
+        // Check if the new value if bigger then the maximum value.
+        if (mProgressValue > mMaxValue)
+        {
+            mProgressValue = mMaxValue;
         }
 
-        UISlider* slider = (UISlider*) view;
-        result = MAW_RES_OK;
+        // Set the new value for the slider.
+        [slider setValue:mProgressValue];
+    }
+    else if([key isEqualToString:@"increaseValue"])
+    {
+        TEST_FOR_NEGATIVE_VALUE(paramValue);
+        mProgressValue += paramValue;
 
-        if([key isEqualToString:@"max"]) {
-
-            // set the upper range(max) value
-            maxValue = paramValue;
-            [slider setMaximumValue:maxValue];
-
-            // check if slider's value is bigger then the new maximum upper range
-            if(progressValue > maxValue) {
-                progressValue = maxValue;
-                [slider setValue:progressValue];
-            }
-
-        } else if([key isEqualToString:@"value"]) {
-
-            progressValue = paramValue;
-
-            // check if the new value if bigger then the maximum value
-            if(progressValue > maxValue) {
-                progressValue = maxValue;
-            }
-
-            // set the new value for the slider
-            [slider setValue:progressValue];
-
-        } else if([key isEqualToString:@"incrementValue"]) {
-
-            progressValue += paramValue;
-
-            // check if the new value if bigger then the maximum value
-            if(progressValue > maxValue) {
-                progressValue = maxValue;
-            }
-
-            // set the new value for the slider
-            [slider setValue:progressValue];
-
-        } else if([key isEqualToString:@"decrementValue"]) {
-
-            progressValue -= paramValue;
-
-            // check if the new value if smaller then the minimum value
-            if(progressValue < DEFAULT_MINIMUM_VALUE) {
-                progressValue = DEFAULT_MINIMUM_VALUE;
-            }
-
-            // set the new value for the slider
-            [slider setValue:progressValue];
-
-        } else {
-            result = MAW_RES_INVALID_PROPERTY_NAME;
+        // Check if the new value if bigger then the maximum value.
+        if (mProgressValue > mMaxValue)
+        {
+            mProgressValue = mMaxValue;
         }
 
+        // Set the new value for the slider.
+        [slider setValue:mProgressValue];
+    }
+    else if([key isEqualToString:@"decreaseValue"])
+    {
+        TEST_FOR_NEGATIVE_VALUE(paramValue);
+        mProgressValue -= paramValue;
+
+        // Check if the new value if smaller then the minimum value.
+        if (mProgressValue < DEFAULT_MINIMUM_VALUE)
+        {
+            mProgressValue = DEFAULT_MINIMUM_VALUE;
+        }
+
+        // Set the new value for the slider.
+        [slider setValue:mProgressValue];
+    }
+    else
+    {
+        return [super setPropertyWithKey:key toValue:value];
     }
 
-    return result;
+    return MAW_RES_OK;
 }
 
 /**
@@ -130,13 +129,18 @@
  */
 - (NSString*)getPropertyWithKey: (NSString*)key {
 
-	if([key isEqualToString:@"max"]) {
-        // return the maximum value for the slider
-         return[[NSString alloc] initWithFormat:@"%d", (int)maxValue];
-	} else if([key isEqualToString:@"value"]) {
-        // return the value of the slider
-        return[[NSString alloc] initWithFormat:@"%d", (int)progressValue];
-	} else {
+	if([key isEqualToString:@"max"])
+    {
+        // Return the maximum value for the slider.
+        return[[NSString alloc] initWithFormat:@"%d", (int)mMaxValue];
+	}
+    else if([key isEqualToString:@"value"])
+    {
+        // Return the value of the slider.
+        return[[NSString alloc] initWithFormat:@"%d", (int)mProgressValue];
+	}
+    else
+    {
 		return [super getPropertyWithKey:key];
 	}
 }
@@ -148,16 +152,15 @@
  */
 -(void) valueChanged:(id) sender
 {
-
     UISlider* slider = (UISlider*) view;
-    progressValue = [slider value];
+    mProgressValue = [slider value];
 
     MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_SLIDER_VALUE_CHANGED;
-    eventData->sliderValue = (int) progressValue;
+    eventData->sliderValue = (int) mProgressValue;
 	eventData->widgetHandle = handle;
 
     event.data = (int)eventData;

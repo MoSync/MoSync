@@ -15,7 +15,6 @@
  02111-1307, USA.
  */
 
-
 #import "TimePickerWidget.h"
 #include <helpers/CPP_IX_WIDGET.h>
 #include <helpers/cpp_defs.h>
@@ -26,9 +25,10 @@
 /**
  * Init function.
  */
-- (id)init {
-
-    if(!view) {
+- (id)init
+{
+    if (!view)
+    {
         UIDatePicker* datePicker = [[UIDatePicker alloc] init];
         [datePicker setDatePickerMode:UIDatePickerModeTime];
         [datePicker addTarget:self action:@selector(valueChanged:)
@@ -51,47 +51,50 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+{
+    UIDatePicker* timePicker = (UIDatePicker*) view;
+    int paramValue = [value intValue];
 
-    int result = [super setPropertyWithKey:key toValue:value];
+    if ([key isEqualToString:@"currentHour"] ||
+        [key isEqualToString:@"currentMinute"])
+    {
+        // Set a specified time into time picker.
+        unsigned unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit;
+        NSDate* selectedDate = [timePicker date];
+        NSCalendar* defaultCalendar = [NSCalendar currentCalendar];
+        NSDateComponents *components = [defaultCalendar components:unitFlags fromDate:selectedDate];
 
-    if(MAW_RES_OK != result) {
-
-        UIDatePicker* timePicker = (UIDatePicker*) view;
-        result = MAW_RES_OK;
-        int paramValue = [value intValue];
-
-         if ([key isEqualToString:@"currentHour"] ||
-             [key isEqualToString:@"currentMinute"]) {
-            // Set a specified time into time picker.
-            unsigned unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit;
-            NSDate* selectedDate = [timePicker date];
-            NSCalendar* defaultCalendar = [NSCalendar currentCalendar];
-            NSDateComponents *components = [defaultCalendar components:unitFlags fromDate:selectedDate];
-
-            if ([key isEqualToString:@"currentHour"]) {
-                // Check if the param is a valid hour.
-                if (paramValue < 0 || paramValue > 23) {
-                    return MAW_RES_INVALID_PROPERTY_VALUE;
-                }
-                [components setHour:paramValue];
-            } else if ([key isEqualToString:@"currentMinute"]) {
-                // Check if the param is a valid minute.
-                if (paramValue < 0 || paramValue > 59) {
-                    return MAW_RES_INVALID_PROPERTY_VALUE;
-                }
-                [components setMinute:paramValue];
+        if ([key isEqualToString:@"currentHour"])
+        {
+            // Check if the param is a valid hour.
+            if (paramValue < 0 || paramValue > 23)
+            {
+                return MAW_RES_INVALID_PROPERTY_VALUE;
             }
 
-            NSDate* newDate = [defaultCalendar dateFromComponents:components];
-            [timePicker setDate:newDate];
+            [components setHour:paramValue];
         }
-        else {
-            result = MAW_RES_INVALID_PROPERTY_NAME;
+        else if ([key isEqualToString:@"currentMinute"])
+        {
+            // Check if the param is a valid minute.
+            if (paramValue < 0 || paramValue > 59)
+            {
+                return MAW_RES_INVALID_PROPERTY_VALUE;
+            }
+
+            [components setMinute:paramValue];
         }
+
+        NSDate* newDate = [defaultCalendar dateFromComponents:components];
+        [timePicker setDate:newDate];
+    }
+    else
+    {
+       return [super setPropertyWithKey:key toValue:value];
     }
 
-    return result;
+    return MAW_RES_OK;
 }
 
 /**
@@ -99,26 +102,28 @@
  * @param key The property of the time picker widget.
  * @return The value for the given property.
  */
-- (NSString*)getPropertyWithKey: (NSString*)key {
-
+- (NSString*)getPropertyWithKey: (NSString*)key
+{
     UIDatePicker* timePicker = (UIDatePicker*) view;
 
-    if([key isEqualToString:@"currentHour"]) {
-        // return the selected month from the date picker.
+    if([key isEqualToString:@"currentHour"])
+    {
+        // Return the selected month from the date picker.
         NSDate* date = [timePicker date];
         NSDateComponents *components = [[NSCalendar currentCalendar] components:kCFCalendarUnitHour fromDate:date];
         NSInteger hour = [components hour];
         return[[NSString alloc] initWithFormat:@"%d", hour];
-
-	} else if([key isEqualToString:@"currentMinute"]) {
-        // return the selected day from the date picker.
+	}
+    else if([key isEqualToString:@"currentMinute"])
+    {
+        // Return the selected day from the date picker.
         NSDate* date = [timePicker date];
         NSDateComponents *components = [[NSCalendar currentCalendar] components:kCFCalendarUnitMinute fromDate:date];
         NSInteger minute = [components minute];
         return[[NSString alloc] initWithFormat:@"%d", minute];
-
 	}
-    else {
+    else
+    {
 		return [super getPropertyWithKey:key];
 	}
 }
@@ -130,7 +135,6 @@
  */
 -(void) valueChanged:(id) sender
 {
-
     UIDatePicker* timePicker = (UIDatePicker*) view;
     NSDate* date = [timePicker date];
     NSDateComponents *components = [[NSCalendar currentCalendar]

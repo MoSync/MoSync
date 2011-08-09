@@ -22,7 +22,14 @@
  * Displays a number picker to the user.
  */
 @interface NumberPickerWidget : IWidget<UIPickerViewDataSource, UIPickerViewDelegate> {
+    /**
+     * The minimum value that can be selected by user.
+     */
     int mMinValue;
+
+    /**
+     * The maximum value that can be selected by user.
+     */
     int mMaxValue;
 }
 

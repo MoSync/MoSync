@@ -36,11 +36,6 @@
 - (id)init;
 
 /**
- * Release the objects and remove the observers.
- */
-- (void)dealloc;
-
-/**
  * Sets a video widget property.
  * @param key The property of the video widget that should be set.
  * @param value The value of the property.
@@ -56,8 +51,8 @@
 - (NSString*)getPropertyWithKey: (NSString*)key;
 
 /**
- * Handle and video widget action(play, pause or stop the video).
- * @param One of the VideoWidgetAction.
+ * Handles an video widget action(play, pause or stop).
+ * @param One of the MAW_VIDEO_WIDGET_STATE constants.
  */
 -(void)handleAction:(NSString*) value;
 

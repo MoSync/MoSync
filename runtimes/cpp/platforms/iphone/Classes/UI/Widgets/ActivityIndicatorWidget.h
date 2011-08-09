@@ -32,15 +32,15 @@
 
 /**
  * Sets a activity indicator property.
- * @param key The property of the progress bar widget that should be set.
+ * @param key The property of the activity indicator widget that should be set.
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 
 /**
- * Returns a activity indicator of the progress bar widget.
- * @param key The property of the progress bar widget.
+ * Returns a activity indicator of the activity indicator widget.
+ * @param key The property of the activity indicator widget.
  * @return The value for the given property.
  */
 - (NSString*)getPropertyWithKey: (NSString*)key;

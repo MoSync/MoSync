@@ -25,12 +25,12 @@
     /**
      * The maximum value of the slider.
      */
-    float maxValue;
+    float mMaxValue;
 
     /**
      * The progress value.
      */
-    float progressValue;
+    float mProgressValue;
 }
 
 /**

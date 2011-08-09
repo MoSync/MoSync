@@ -29,10 +29,13 @@ NSString *const kFalseValueString = @"false";
 /**
  * Init function.
  */
-- (id)init {
+- (id)init
+{
+    if (!view)
+    {
+        UIActivityIndicatorView* activityIndicatorView = [[UIActivityIndicatorView alloc]
+            initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleGray];
 
-    if(!view) {
-        UIActivityIndicatorView* activityIndicatorView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleWhite];
         view = [activityIndicatorView retain];
         [activityIndicatorView startAnimating];
     }
@@ -46,16 +49,21 @@ NSString *const kFalseValueString = @"false";
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+{
     if([key isEqualToString:@"inProgress"]) {
         UIActivityIndicatorView* activityIndicatorView = (UIActivityIndicatorView*) view;
 
-        if([value isEqualToString: kTrueValueString]) {
+        if([value isEqualToString: kTrueValueString])
+        {
             [activityIndicatorView startAnimating];
-        } else if([value isEqualToString: kFalseValueString]) {
+        }
+        else if([value isEqualToString: kFalseValueString])
+        {
             [activityIndicatorView stopAnimating];
-        } else {
+        }
+        else
+        {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
 

@@ -3062,11 +3062,6 @@ group WidgetAPI "Widget API" {
 			*/
 			int tabIndex;
 
-			/**progress
-			* The value of the slider when a #MAW_EVENT_SLIDER_VALUE_CHANGED event is received.
-			*/
-			int sliderValue;
-
 			struct {
 					/**
 					* @brief The handle to the screen that was popped from the stack screen.
@@ -3080,11 +3075,12 @@ group WidgetAPI "Widget API" {
 					MAWidgetHandle toScreen;
 			} stackScreenPopInfo;
 
+
 			/**
-			* @brief The new state of the video widget when a #MAW_VIDEO_STATE_CHANGED event is received.
-			* See \ref VideoWidgetEvent.
+			* The value of the slider when a #MAW_EVENT_SLIDER_VALUE_CHANGED event is received.
+
 			*/
-			int videoWidgetInfo;
+			int sliderValue;
 
 			struct {
 					/**
@@ -3103,6 +3099,7 @@ group WidgetAPI "Widget API" {
 					int year;
 			} datePickerValueInfo;
 
+
 			struct {
 					/**
 					* @brief The hour value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
@@ -3113,12 +3110,19 @@ group WidgetAPI "Widget API" {
 					* @brief The minute value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
 					*/
 					int minute;
+
 			} timePickerValueInfo;
 
 			/**
 			* The value of the number picker when a #MAW_EVENT_NUMBER_PICKER_VALUE_CHANGED event is received.
 			*/
 			int numberPickerValue;
+
+			/**
+			* The new state of the Video view when a #MAW_EVENT_VIDEO_STATE_CHANGED event is received.
+			* One of the MAW_VIDEO_WIDGET_STATE constants.
+			*/
+			int videoViewState;
 		}
 	}
 
@@ -3179,7 +3183,7 @@ group WidgetAPI "Widget API" {
 		 */
 	    SLIDER_VALUE_CHANGED = 11;
 
-				/**
+		/**
 		 * @brief Sent when the user changes\d the date in a Date Picker.
 		 */
 		DATE_PICKER_VALUE_CHANGED = 12;
@@ -3195,9 +3199,10 @@ group WidgetAPI "Widget API" {
 		NUMBER_PICKER_VALUE_CHANGED = 14;
 
 		/**
-		 * @brief Sent from the Video View when the state of the player has changed.
+		 * @brief Sent from the Video View when the state of the video has changed.
 		 */
 		VIDEO_STATE_CHANGED = 15;
+
 	}
 	} // end of WidgetEventTypes
 
@@ -3263,54 +3268,55 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Play the video.
 		*/
-		PLAY = -1;
+		PLAY = 1;
 
 		/**
 		* @brief Pause the video.
 		*/
-		PAUSE = -2;
+		PAUSE = 2;
 
 		/**
 		* @brief Stop the video.
 		*/
-		STOP = -3;
+		STOP = 3;
 	}
 	}
 
    /**
-	* Events for the video widget. For more info see \ref WidgetVideoViewProperties.
+	* Events for the video widget. When the state of the video view changes an event with one
+	* of the next constants will be send.
 	*/
 	group VideoWidgetEvent "Video widget event" {
-	constset int MAW_VIDEO_WIDGET_ {
+	constset int MAW_VIDEO_WIDGET_STATE_ {
 		/**
 		* @brief The video is playing.
 		*/
-		PLAYING = -1;
+		PLAYING = 1;
 
 		/**
 		* @brief The video is paused.
 		*/
-		PAUSED = -2;
+		PAUSED = 2;
 
 		/**
 		* @brief The video is stopped.
 		*/
-		STOPPED = -3;
+		STOPPED = 3;
 
 		/**
 		* @brief The video has finished playing.
 		*/
-		FINISHED = -4;
+		FINISHED = 4;
 
 		/**
-		* @brief The buffer has enough data for the playback to begin.
+		* @brief The source is loaded into memory.
 		*/
-		LOADED = -5;
+		SOURCE_READY = 5;
 
 		/**
 		* @brief Playback is temporarily interruped(maybe there's no data in the buffer).
 		*/
-		INTERRUPTED = -5;
+		INTERRUPTED = 6;
 
 	}
 	}
@@ -3374,6 +3380,12 @@ group WidgetAPI "Widget API" {
 		* @brief Indicates that the caller tried to remove a visible root widget (screen) and the MoSync view will become visible.
 		*/
 		REMOVED_ROOT = -10;
+
+		/**
+		* @brief Indicates that a syscall tried to access a feature that is not supported by the curent framework version.
+		*/
+		FEATURE_NOT_AVAILABLE = -11;
+
 	}
 	} // end of WidgetResultCodes
 
@@ -3472,6 +3484,10 @@ group WidgetAPI "Widget API" {
 		
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
+		 * There is a replica available for Android.
+
+		 * See \ref WidgetNavigationBarProperties "Navigation Bar properties" for the properties available.
+
 		 */
 		NAV_BAR = "NavBar";		
 
@@ -3489,16 +3505,14 @@ group WidgetAPI "Widget API" {
 		 * @brief A progress bar is a visual indicator of progress in some operation.
 		 * Displays a bar to the user representing how far the operation has progressed.
 		 * A progress bar can also be made indeterminate, when the length of the task is unknown.
-		 *
 		 * See \ref WidgetProgressBarProperties "Progress bar properties" for the properties available.
 		 */
 		PROGRESS_BAR = "ProgressBar";
 
-		/**
+		 /**
 		 * @brief An activity indicator is a visual indicator of progress in some operation.
 		 * It shows a cyclic animation without an indication of progress.
 		 * It is used when the length of the task is unknown.
-		 *
 		 * See \ref WidgetActivityIndicatorProperties "Activity Indicator properties" for the properties available.
 		 */
 		ACTIVITY_INDICATOR = "ActivityIndicator";
@@ -3506,40 +3520,38 @@ group WidgetAPI "Widget API" {
 		/**
 		 * @brief A Slider is an extension of ProgressBar that adds a draggable thumb.
 		 * The user can touch the thumb and drag left or right to set the current progress level.
-		 *
 		 * See \ref WidgetSliderProperties "Slider properties" for the properties available.
 		 */
 		SLIDER = "Slider";
 
 		/**
-		 * @brief A Video View displays a video file.
-		 *
-		 * See \ref WidgetVideoViewProperties "Video View properties" for the properties available.
-		 */
-		VIDEO_VIEW = "VideoView";
-
-		/**
 		 * @brief A Date Picker is a widget for selecting a date. The date can be selected by a year, month, and day spinners.
 		 * The minimal and maximal date from which dates to be selected can be customized.
+		 * The picker is initialized with the current system date.
 		 * See \ref WidgetDatePickerProperties "Date Picker properties" for the properties available.
 		 */
 		DATE_PICKER = "DatePicker";
 
 		/**
-		 * @brief A Time Picker is a widget for selecting time of day, in either 24 hour or AM/PM mode.
+		 * @brief A Time Picker is a widget for selecting time of day, in 24 hour mode.
 		 * The hour, each minute digit, and AM/PM (if applicable) can be controlled by vertical spinners.
 		 * The hour can be entered by keyboard input.
-		 *
 		 * See \ref WidgetTimePickerProperties "Time Picker properties" for the properties available.
 		 */
 		TIME_PICKER = "TimePicker";
 
 		/**
 		 * @brief A Number Picker is a widget that enables the user to select a number form a predefined range.
-		 *
 		 * See \ref WidgetNumberPickerProperties "Number Picker properties" for the properties available.
 		 */
 		NUMBER_PICKER = "NumberPicker";
+
+		/**
+		 * @brief A Video View displays a video file.
+		 * See \ref WidgetVideoViewProperties "Video View properties" for the properties available.
+		 */
+		VIDEO_VIEW = "VideoView";
+
 	}
 	} // end of WidgetTypes
 
@@ -3654,7 +3666,23 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		VISIBLE = "visible";
-	}	
+
+		/**
+		* @brief Sets whether the widget is enabled or not. If not, the widget is grayed out.
+		* Widgets are enabled by default.
+		* @validvalue A boolean string 'true' or 'false', where true is enabled and false is disabled.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_WIDGET_ENABLED, "false");
+		* \endcode
+		*/
+
+		ENABLED = "enabled";
+
+	}
 
 	/**
 	* The available widget properties for a #MAW_SCREEN. See \ref WidgetProperties "Widget properties" for more properties. 
@@ -3762,6 +3790,51 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
+
+		/**
+
+		* @brief Specifies whether the navigation bar should be shown.
+
+		*
+
+		* This can have different behaviors on different platforms, on iPhone it is enabled by default, but on Android the
+
+		* user can set it to be shown, because this is not native behavior on Android.
+
+		* When it set this to true, a nav bar is associated to all screens of this stack screen, and there is
+
+		* no need to add it as a child to this widget.
+
+		* When it is set to false, the nav bar is removed from all containing screens of the stack.
+
+		* NOTE: remember to add main layouts for the screens, because those will be the parents of the navigation bars.
+
+		*
+
+		* @validvalue A boolean string 'true' or 'false'.
+
+		*
+
+		* @setandget
+
+		*
+
+		* @par Example
+
+		* \code
+
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_NAV_BAR_ENABLED, "true");
+
+		*   // Now a replica of the Nav Bar of iOS is shown on Android.
+
+		*   // And it handles the back button behaviour.
+
+		* \endcode
+
+		*/
+
+		NAV_BAR_ENABLED = "NavBarEnabled";
+
 	}
 	} // end of WidgetStackScreenProperties	
 
@@ -4419,8 +4492,71 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/		
 		NEW_URL = "newurl";
+
+
+		/**
+
+		* @brief Sets or gets whether the horizontal scrollbar should be drawn or not.
+
+		* The scrollbar is not drawn by default.
+
+		* Available only on Android for the moment.
+
+		* @validvalue A boolean string 'true' or 'false'.
+
+		*
+
+		* @setandget
+
+		*
+
+		* @par Example
+
+		* \code
+
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HORIZONTAL_SCROLLBAR_ENABLED, "true");
+
+		* \endcode
+
+		*/
+
+		HORIZONTAL_SCROLL_BAR_ENABLED = "horizontalScrollBarEnabled";
+
+
+		/**
+
+		* @brief Sets or gets whether the vertical scrollbar should be drawn or not.
+
+		* The scrollbar is drawn by default.
+
+		* Available only on Android for the moment.
+
+		* @validvalue A boolean string 'true' or 'false'.
+
+		*
+
+		* @setandget
+
+		*
+
+		* @par Example
+
+		* \code
+
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
+
+		* \endcode
+
+		*/
+
+		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
+
 	}
 	} // end of WidgetWebViewProperties
+
+	/**
+	* The available widget properties for a #MAW_PROGRESS_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
 
 	group WidgetProgressBarProperties "Progress bar properties" {
 	constset MAString MAW_PROGRESS_BAR_ {
@@ -4436,6 +4572,7 @@ group WidgetAPI "Widget API" {
         *   maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_MAX, "100");
 		* \endcode
 		*/
+
 		MAX = "max";
 
 		/**
@@ -4470,12 +4607,15 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* The available widget properties for a #MAW_ACTIVITY_INDICATOR. See \ref WidgetProperties "Widget properties" for more properties.
+
 	*/
 	group WidgetActivityIndicatorProperties "Activity Indicator properties" {
 	constset MAString MAW_ACTIVITY_INDICATOR_ {
 		/**
-		* @brief Sets if the indicator is still on or not.
-		*
+		* @brief Sets if the indicator is still on or off.
+
+		* If set to false, it doesn't delete the widget just dismisses it.
+
 		* @validvalue A boolean string 'true' or 'false'.
 		*
 		* @setonly
@@ -4492,6 +4632,7 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* The available widget properties for a #MAW_SLIDER. See \ref WidgetProperties "Widget properties" for more properties.
+
 	*/
 	group WidgetSliderProperties "Slider properties" {
 	constset MAString MAW_SLIDER_ {
@@ -4533,13 +4674,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_INCREMENT_VALUE, "20");
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_INCREASE_VALUE, "20");
 		* \endcode
 		*/
-		INCREMENT_VALUE = "incrementValue";
+		INCREASE_VALUE = "increaseValue";
 
 		/**
-		* @brief Decrease the current value of the slider by the specified amount.
+		* @brief Decreases the current value of the slider by the specified amount.
+
 		*
 		* @validvalue An int that specifies the amount by which the slider value must be decreased.
 		*
@@ -4548,10 +4690,11 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_DECREMENT_VALUE, "20");
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_DECREASE_VALUE, "20");
 		* \endcode
 		*/
-		DECREMENT_VALUE = "decrementValue";
+
+		DECREASE_VALUE = "decreaseValue";
 
 	}
 	} // end of WidgetSliderProperties
@@ -4659,11 +4802,14 @@ group WidgetAPI "Widget API" {
 		MIN_DATE = "minDate";
 
 		/**
-		* @brief Gets the selected year.
+		* @brief Sets or gets the currently displayed year.
+
 		*
-		* @validvalue An int that specifies the selected year.
+		* @validvalue An int that specifies a valid year.
+
 		*
-		* @getonly
+		* @setandget
+
 		*
 		* @par Example
 		* \code
@@ -4678,11 +4824,14 @@ group WidgetAPI "Widget API" {
 		YEAR = "year";
 
 		/**
-		* @brief Gets the selected month.
+		* @brief Sets or gets the currently displayed month.
+
 		*
-		* @validvalue An int that specifies the selected month.
+		* @validvalue An int that specifies a valid month.
+
 		*
-		* @getonly
+		* @setandget
+
 		*
 		* @par Example
 		* \code
@@ -4697,11 +4846,14 @@ group WidgetAPI "Widget API" {
 		MONTH = "month";
 
 		/**
-		* @brief Gets the selected day of month.
+		* @brief Sets or gets the currently displayed day of month.
+
 		*
-		* @validvalue An int that specifies the selected day of month.
+		* @validvalue An int that specifies a valid day of month.
+
 		*
-		* @getonly
+		* @setandget
+
 		*
 		* @par Example
 		* \code
@@ -4719,11 +4871,13 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* The available widget properties for a #MAW_TIME_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+
 	*/
 	group WidgetTimePickerProperties "Time Picker properties" {
 	constset MAString MAW_TIME_PICKER_ {
 		/**
 		* @brief Sets or gets the current hour in 24h mode( in the range: 0-23 ).
+
 		*
 		* @validvalue An int that specifies the current hour.
 		*
@@ -4738,7 +4892,8 @@ group WidgetAPI "Widget API" {
 		CURRENT_HOUR = "currentHour";
 
 		/**
-		* @briefSets or gets the current minute (0-59).
+		* @brief Sets or gets the current minute (0-59).
+
 		*
 		* @validvalue An int that specifies the current minute.
 		*
@@ -4757,11 +4912,13 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* The available widget properties for a #MAW_NUMBER_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+
 	*/
 	group WidgetNumberPickerProperties "Number Picker properties" {
 	constset MAString MAW_NUMBER_PICKER_ {
 		/**
 		* @brief Sets or gets the current value for the number picker.
+
 		* If the value is less than MAW_NUMBER_PICKER_MIN_VALUE property value, the current value is set to min.
 		* If the value is greater than MAW_NUMBER_PICKER_MAX_VALUE value, the current value is set to max.
 		*
@@ -4825,6 +4982,8 @@ group WidgetAPI "Widget API" {
 	* \returns A handle to the widget, or any of the following result codes:
 	* - #MAW_RES_ERROR if the widget could not be created.
 	* - #MAW_RES_INVALID_TYPE_NAME if the widget type was not available.
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported by the curent framework version.
+
 	*/
 	MAWidgetHandle maWidgetCreate(in MAString widgetType);
 
@@ -4833,7 +4992,8 @@ group WidgetAPI "Widget API" {
 	* with children will also cause its children to be destroyed. Once a handle has
 	* been destroyed it cannot be referenced by the maWidget* functions.
 	*
-    * \note If the given widget has a parent, the widget will be removed from its
+        * \note If the given widget has a parent, the widget will be removed from its
+
 	* parent.
 	*
 	* \param widget A handle to the widget to be destroyed.
@@ -4963,6 +5123,8 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
 	* - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small. 
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
+
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);

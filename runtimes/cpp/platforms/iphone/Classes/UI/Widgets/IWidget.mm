@@ -239,7 +239,12 @@
 	} else
 	if([key isEqualToString:@"visible"]){
 		view.hidden = not [value boolValue];
-	} else {
+	} else
+    if([key isEqualToString:@"enabled"]){
+        UIControl* controller = (UIControl*) view;
+        controller.enabled = [value boolValue];
+    }
+    else {
 			return MAW_RES_ERROR;
 	}
 			

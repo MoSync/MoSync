@@ -70,4 +70,19 @@
 	return YES; // MoSync user have to manually start a new request..
 }
 
+/**
+ * Sent after the web view finishes loading content.
+ * @param webView The object that send the event.
+ */
+-(void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = MAW_EVENT_CONTENT_LOADED;
+	eventData->widgetHandle = handle;
+	event.data = (int)eventData;
+	Base::gEventQueue.put(event);
+}
+
 @end

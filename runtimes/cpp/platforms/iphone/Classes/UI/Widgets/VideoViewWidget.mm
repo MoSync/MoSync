@@ -31,8 +31,10 @@
 /**
  * Init function.
  */
-- (id)init {
-    if(!view) {
+- (id)init
+{
+    if (!view)
+    {
         moviePlayerController = [[MPMoviePlayerController alloc] init];
         CGRect viewRect =CGRectMake(DEFAULT_RECT_X, DEFAULT_RECT_Y, DEFAULT_RECT_WIDTH, DEFAULT_RECT_HEIGHT);
         UIView* smallView = [[[UIView alloc] initWithFrame:viewRect] retain];
@@ -45,12 +47,14 @@
                                                  selector:@selector(moviePlaybackComplete:)
                                                      name:MPMoviePlayerPlaybackDidFinishNotification
                                                    object:moviePlayerController];
-
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(moviePlaybackStateChanged:)
                                                      name:MPMoviePlayerPlaybackStateDidChangeNotification
                                                    object:moviePlayerController];
-
+        [[NSNotificationCenter defaultCenter] addObserver:self
+                                                 selector:@selector(sourceReady:)
+                                                     name:MPMoviePlayerContentPreloadDidFinishNotification
+                                                   object:moviePlayerController];
     }
 
     return [super init];
@@ -59,39 +63,49 @@
 /**
  * Release the objects and remove the observers.
  */
-- (void)dealloc {
+- (void)dealloc
+{
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:MPMoviePlayerPlaybackDidFinishNotification
                                                   object:moviePlayerController];
-
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:MPMoviePlayerPlaybackStateDidChangeNotification
+                                                  object:moviePlayerController];
+    [[NSNotificationCenter defaultCenter] removeObserver:self
+                                                    name:MPMoviePlayerContentPreloadDidFinishNotification
                                                   object:moviePlayerController];
     [super dealloc];
 }
 
 /**
- * Sets a video property.
+ * Sets a video view property.
  * @param key The property of the video widget that should be set.
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-    if([key isEqualToString:@"path"]) {
-          // TO DO handle local video files
-        NSString *filepath   =   [[NSBundle mainBundle] pathForResource:@"mymovie" ofType:@"m4v"];
-        NSLog(@"File path = %@", filepath);
-            if(filepath) {
-                NSURL    *fileURL    =   [NSURL fileURLWithPath:filepath];
-                [moviePlayerController setContentURL:fileURL];
-            }
-        } else if([key isEqualToString:@"url"]) {
-        NSURL    *webURL    =   [NSURL URLWithString:value];
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+{
+    if ([key isEqualToString:@"path"])
+    {
+        NSString *filepath = [[NSBundle mainBundle] pathForResource:value ofType:@"m4v"];
+        if (filepath)
+        {
+            NSURL *fileURL = [NSURL fileURLWithPath:filepath];
+            [moviePlayerController setContentURL:fileURL];
+        }
+    }
+    else if ([key isEqualToString:@"url"])
+    {
+        NSURL *webURL = [NSURL URLWithString:value];
         [moviePlayerController setContentURL:webURL];
-    } else if([key isEqualToString:@"action"]) {
+    }
+    else if ([key isEqualToString:@"action"])
+    {
         [self handleAction:value];
-    }  else {
-        return [super setPropertyWithKey:key toValue:value];;
+    }
+    else
+    {
+        return [super setPropertyWithKey:key toValue:value];
     }
 
     return MAW_RES_OK;
@@ -102,11 +116,14 @@
  * @param key The property of the video widget.
  * @return The value for the given property.
  */
-- (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@"duration"]) {
-        // return the maximum value for the slider
+- (NSString*)getPropertyWithKey: (NSString*)key
+{
+	if([key isEqualToString:@"duration"])
+    {
         return[[NSString alloc] initWithFormat:@"%f", [moviePlayerController duration]];
-	} else {
+	}
+    else
+    {
 		return [super getPropertyWithKey:key];
 	}
 }
@@ -115,9 +132,11 @@
  * Handle and video widget action(play, pause or stop the video).
  * @param One of the VideoWidgetAction.
  */
--(void)handleAction:(NSString*) value {
+-(void)handleAction:(NSString*) value
+{
     int newStateValue = [value intValue];
-    switch (newStateValue) {
+    switch (newStateValue)
+    {
         case MAW_VIDEO_WIDGET_ACTION_PLAY:
             [moviePlayerController play];
             break;
@@ -136,18 +155,18 @@
  * This delegate method is invoked when the movie has finished playing.
  * @param The current movie player object.
  */
-- (void)moviePlaybackComplete:(NSNotification *)notification {
-    // check if an error occurred
+- (void)moviePlaybackComplete:(NSNotification *)notification
+{
+    // Check if an error occurred.
     NSError *error = [[notification userInfo] objectForKey:@"error"];
-    if(!error) {
-
-        // send the event
+    if (!error)
+    {
         MAEvent event;
         event.type = EVENT_TYPE_WIDGET;
 
         MAWidgetEventData *eventData = new MAWidgetEventData;
         eventData->eventType = MAW_EVENT_VIDEO_STATE_CHANGED;
-        eventData->videoWidgetInfo = MAW_VIDEO_WIDGET_FINISHED;
+        eventData->videoViewState = MAW_VIDEO_WIDGET_STATE_FINISHED;
         eventData->widgetHandle = handle;
 
         event.data = (int)eventData;
@@ -159,48 +178,73 @@
  * This delegate method is invoked when the playback state has changed.
  * @param The current movie player object.
  */
-- (void)moviePlaybackStateChanged:(NSNotification *)notification {
-    // check if an error occurred
+- (void)moviePlaybackStateChanged:(NSNotification *)notification
+{
+    // Check if an error occurred.
     NSError *error = [[notification userInfo] objectForKey:@"error"];
-    if(!error) {
-
+    if (!error)
+    {
         int playbackStateEvent = 0;
         BOOL sendEvent = TRUE;
         MPMoviePlaybackState playbackState = [moviePlayerController playbackState];
 
-        // check the type of the event(only the events from VideoWidgetEvent should be handled)
-        switch (playbackState) {
+        // Check the type of the event.
+        switch (playbackState)
+        {
             case MPMoviePlaybackStatePlaying:
-                playbackStateEvent = MAW_VIDEO_WIDGET_PLAYING;
+                playbackStateEvent = MAW_VIDEO_WIDGET_STATE_PLAYING;
                 break;
             case MPMoviePlaybackStatePaused:
-                playbackStateEvent = MAW_VIDEO_WIDGET_PAUSED;
+                playbackStateEvent = MAW_VIDEO_WIDGET_STATE_PAUSED;
                 break;
             case MPMoviePlaybackStateStopped:
-                playbackStateEvent = MAW_VIDEO_WIDGET_STOPPED;
+                playbackStateEvent = MAW_VIDEO_WIDGET_STATE_STOPPED;
                 break;
             case MPMoviePlaybackStateInterrupted:
-                playbackStateEvent = MAW_VIDEO_WIDGET_INTERRUPTED;
+                playbackStateEvent = MAW_VIDEO_WIDGET_STATE_INTERRUPTED;
                 break;
             default:
-                //don't handle the other playback states
+                // Don't handle the other playback states.
                 sendEvent = FALSE;
                 break;
         }
 
-        if(sendEvent) {
-            // send the event
+        if (sendEvent)
+        {
             MAEvent event;
             event.type = EVENT_TYPE_WIDGET;
 
             MAWidgetEventData *eventData = new MAWidgetEventData;
             eventData->eventType = MAW_EVENT_VIDEO_STATE_CHANGED;
             eventData->widgetHandle = handle;
-            eventData->videoWidgetInfo = playbackStateEvent;
+            eventData->videoViewState = playbackStateEvent;
 
             event.data = (int)eventData;
             Base::gEventQueue.put(event);
         }
+    }
+}
+
+/**
+ * This delegate method is invoked when the video source is loaded.
+ * @param The current movie player object.
+ */
+- (void)sourceReady:(NSNotification *)notification
+{
+    // Check if an error occurred.
+    NSError *error = [[notification userInfo] objectForKey:@"error"];
+    if (!error)
+    {
+        MAEvent event;
+        event.type = EVENT_TYPE_WIDGET;
+
+        MAWidgetEventData *eventData = new MAWidgetEventData;
+        eventData->eventType = MAW_EVENT_VIDEO_STATE_CHANGED;
+        eventData->videoViewState = MAW_VIDEO_WIDGET_STATE_SOURCE_READY;
+        eventData->widgetHandle = handle;
+
+        event.data = (int)eventData;
+        Base::gEventQueue.put(event);
     }
 }
 

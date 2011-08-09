@@ -26,12 +26,12 @@
     /**
      * The maximum value of the progress bar.
      */
-    float maxValue;
+    float mMaxValue;
 
     /**
      * The progress value(how much of the task has been completed).
      */
-    float progressValue;
+    float mProgressValue;
 }
 
 /**

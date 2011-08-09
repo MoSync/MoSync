@@ -15,10 +15,10 @@
  02111-1307, USA.
  */
 
-// default maximum value for the progress bar.
+// Default maximum value for the progress bar.
 #define DEFAULT_MAXIMUM_VALUE 100
 
-// default progress value for the progress bar.
+// Default progress value for the progress bar.
 #define DEFAULT_PROGRESS_VALUE 0
 
 #import "ProgressBarWidget.h"
@@ -29,15 +29,16 @@
 /**
  * Init function.
  */
-- (id)init {
-
-    if(!view) {
+- (id)init
+{
+    if(!view)
+    {
         UIProgressView* progressView = [[UIProgressView alloc] init];
         view = [[progressView initWithProgressViewStyle: UIProgressViewStyleBar] retain];
     }
 
-    maxValue = DEFAULT_MAXIMUM_VALUE;
-    progressValue = DEFAULT_PROGRESS_VALUE;
+    mMaxValue = DEFAULT_MAXIMUM_VALUE;
+    mProgressValue = DEFAULT_PROGRESS_VALUE;
 
     return [super init];
 }
@@ -48,69 +49,68 @@
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
-- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
+{
+    UIProgressView* progressView = (UIProgressView*) view;
+    float paramValue = [value floatValue];
 
-    int result = [super setPropertyWithKey:key toValue:value];
+    if([key isEqualToString:@"max"])
+    {
+        TEST_FOR_NEGATIVE_VALUE(paramValue);
+        mMaxValue = paramValue;
 
-    if(MAW_RES_OK != result) {
-
-        // check for negative values
-        float paramValue = [value floatValue];
-        if(0 > paramValue) {
-            return MAW_RES_INVALID_PROPERTY_VALUE;
+        // Check if progress bar's value is bigger then the new maximum upper range.
+        if(mProgressValue > mMaxValue)
+        {
+            mProgressValue = mMaxValue;
         }
 
-        result = MAW_RES_OK;
+        // Set the new value for the progress bar.
+        float currentPercentage = mProgressValue / mMaxValue;
+        [progressView setProgress:currentPercentage];
+    }
+    else if([key isEqualToString:@"progress"])
+    {
+        TEST_FOR_NEGATIVE_VALUE(paramValue);
+        mProgressValue = [value floatValue];
 
-        if([key isEqualToString:@"max"]) {
-
-            maxValue = paramValue;
-
-            // check if progress bar's value is bigger then the new maximum upper range
-            if(progressValue > maxValue) {
-                progressValue = maxValue;
-            }
-
-            // set the new value for the progress bar
-            float currentPercentage = progressValue / maxValue;
-            UIProgressView* progressView = (UIProgressView*) view;
-            [progressView setProgress:currentPercentage];
-
-        } else if([key isEqualToString:@"progress"]) {
-
-            progressValue = [value floatValue];
-
-            // check if the new progress value is bigger then the maximum upper range
-            if(progressValue > maxValue) {
-                progressValue = maxValue;
-            }
-
-            // set the new progress value for the progress bar
-            float currentPercent = progressValue / maxValue;
-            UIProgressView* progressView = (UIProgressView*) view;
-            [progressView setProgress:currentPercent];
-
-        } else if([key isEqualToString:@"incrementProgress"]) {
-
-           progressValue += [value floatValue];
-
-            // check if the new progress value is bigger then the maximum upper range
-            if(progressValue > maxValue) {
-                progressValue = maxValue;
-            }
-
-             // increment the progress value for the progress bar
-            float currentPercent = progressValue / maxValue;
-            UIProgressView* progressView = (UIProgressView*) view;
-            [progressView setProgress:currentPercent];
-
-        } else {
-            result = MAW_RES_INVALID_PROPERTY_NAME;
+        // Check if the new progress value is bigger then the maximum upper range.
+        if (mProgressValue > mMaxValue)
+        {
+            mProgressValue = mMaxValue;
         }
 
+        // Set the new progress value for the progress bar.
+        if (0 != mMaxValue)
+        {
+            float currentPercent = mProgressValue / mMaxValue;
+            [progressView setProgress:currentPercent];
+        }
+    }
+    else if([key isEqualToString:@"incrementProgress"])
+    {
+        TEST_FOR_NEGATIVE_VALUE(paramValue);
+        mProgressValue += [value floatValue];
+
+        // Check if the new progress value is bigger then the maximum upper range.
+        if (mProgressValue > mMaxValue)
+        {
+            mProgressValue = mMaxValue;
+        }
+
+        // Increment the progress value for the progress bar.
+        if (0 != mMaxValue)
+        {
+            float currentPercent = mProgressValue / mMaxValue;
+            [progressView setProgress:currentPercent];
+        }
+    }
+    else
+    {
+        return [super setPropertyWithKey:key toValue:value];
     }
 
-    return result;
+    return MAW_RES_OK;
 }
 
 /**
@@ -118,15 +118,20 @@
  * @param key The property of the progress bar widget.
  * @return The value for the given property.
  */
-- (NSString*)getPropertyWithKey: (NSString*)key {
-
-	if([key isEqualToString:@"max"]) {
-        // return the maximum value for the progress bar
-		return [[NSString alloc] initWithFormat:@"%d", (int)maxValue];
-	} else if([key isEqualToString:@"progress"]) {
-        // return the progress value of the progress bar
-        return [[NSString alloc] initWithFormat:@"%d", (int)progressValue];
-	} else {
+- (NSString*)getPropertyWithKey: (NSString*)key
+{
+	if([key isEqualToString:@"max"])
+    {
+        // Return the maximum value for the progress bar.
+		return [[NSString alloc] initWithFormat:@"%d", (int)mMaxValue];
+	}
+    else if([key isEqualToString:@"progress"])
+    {
+        // Return the progress value of the progress bar.
+        return [[NSString alloc] initWithFormat:@"%d", (int)mProgressValue];
+	}
+    else
+    {
 		return [super getPropertyWithKey:key];
 	}
 }

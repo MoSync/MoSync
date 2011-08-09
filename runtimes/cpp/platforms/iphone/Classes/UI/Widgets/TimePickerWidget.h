@@ -31,16 +31,16 @@
 - (id)init;
 
 /**
- * Sets a date picker property.
- * @param key The property of the date picker widget that should be set.
+ * Sets a time picker property.
+ * @param key The property of the time picker widget that should be set.
  * @param value The value of the property.
  * @return MAW_RES_OK if the property was set, or an error code otherwise.
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 
 /**
- * Returns a property value of the date picker widget.
- * @param key The property of the date picker widget.
+ * Returns a property value of the time picker widget.
+ * @param key The property of the time picker widget.
  * @return The value for the given property.
  */
 - (NSString*)getPropertyWithKey: (NSString*)key;
