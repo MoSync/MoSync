@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "config_platform.h"
 #import <UIKit/UIKit.h>
+#import <AssetsLibrary/AssetsLibrary.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -36,7 +37,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
-#include "CameraPreviewWidget.h"
+#import "CameraPreviewWidget.h"
+#import "CameraConfirgurator.h"
 
 #include "netImpl.h"
 
@@ -53,7 +55,7 @@ using namespace MoSyncError;
 #include "iphone_helpers.h"
 #include "CMGlyphDrawing.h"
 
-#include <AVFoundation/AVFoundation.h>
+#import <AVFoundation/AVFoundation.h>
 #include <AudioToolbox/AudioToolbox.h>
 
 #ifdef SUPPORT_OPENGL_ES
@@ -956,6 +958,7 @@ namespace Base {
 		AVCaptureSession *captureSession;
 		AVCaptureVideoPreviewLayer *previewLayer;
 		AVCaptureDevice *device; //The physical camera device
+        AVCaptureStillImageOutput *stillImageOutput;
 		UIView *view;
 	};
 	
@@ -1068,8 +1071,13 @@ namespace Base {
 			NSError *error = nil;
 			AVCaptureDeviceInput *input =
 			[AVCaptureDeviceInput deviceInputWithDevice:curCam->device error:&error];
-			
+            curCam->stillImageOutput = [[AVCaptureStillImageOutput alloc] init];
+            NSDictionary *outputSettings = [[NSDictionary alloc] initWithObjectsAndKeys:
+                                            AVVideoCodecJPEG, AVVideoCodecKey, nil];
+            [curCam->stillImageOutput setOutputSettings:outputSettings];
+			[outputSettings release];
 			[curCam->captureSession addInput:input];
+			[curCam->captureSession addOutput:curCam->stillImageOutput];
 		}
 		return curCam;
 	}
@@ -1197,7 +1205,26 @@ namespace Base {
 	}
 	
 	SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder)) 
-	{		
+	{
+		CameraInfo *info = getCurrentCameraInfo();
+        
+		AVCaptureConnection *videoConnection =	[info->stillImageOutput.connections objectAtIndex:0];
+		if ([videoConnection isVideoOrientationSupported])
+		{
+			[videoConnection setVideoOrientation:[UIDevice currentDevice].orientation];
+			if([UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeLeft)
+				NSLog(@"video orientation is set");
+		}
+        [info->stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection 
+								completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+									NSLog(@"Entered the capture Block!!!!!!!!!");
+									if (imageDataSampleBuffer != NULL) {
+									NSData *imageData = [AVCaptureStillImageOutput 
+													jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+									MemStream *stream = new MemStream([imageData length]);
+									stream->write([imageData bytes],[imageData length]);
+									gSyscall->resources.add_RT_BINARY(placeholder, stream);
+									}}];		
 		return 1;
 	}
 	
@@ -1206,7 +1233,47 @@ namespace Base {
 		return 1;
 	}
 	
+	SYSCALL(int, maCameraSetProperty(const char *property, const char* value))
+	{		
+		int result = 0;
+		CameraInfo *info = getCurrentCameraInfo();
 		
+		NSString *propertyString = [NSString stringWithUTF8String:property];
+		NSString *valueString = [NSString stringWithUTF8String:value];
+		CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
+		result = [configurator	setCameraProperty: info->device 
+								withProperty: propertyString 
+								withValue: valueString];
+		[propertyString release];
+		[valueString release];	
+		[configurator release];
+		return result;
+	}
+
+	
+	SYSCALL(int, maCameraGetProperty(const char *property, char *value, int maxSize))
+	{
+		NSString *propertyString = [NSString stringWithUTF8String:property];
+		CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
+		CameraInfo *info = getCurrentCameraInfo();
+		NSString* retval = [configurator	getCameraProperty:info->device
+											withProperty:propertyString];		
+			
+		if(retval == nil) return -2;
+		int length = maxSize;
+		int realLength = [retval length];
+		if(realLength > length) {
+			return -2;
+		}
+		
+		[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
+		[retval release];
+		[propertyString release];
+		[configurator release];
+		
+		return realLength;
+	}
+	
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {
@@ -1247,6 +1314,8 @@ namespace Base {
 		maIOCtl_case(maCameraNumber);
 		maIOCtl_case(maCameraSnapshot);
 		maIOCtl_case(maCameraRecord);
+		maIOCtl_case(maCameraSetProperty);
+		maIOCtl_case(maCameraGetProperty);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
