@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 MoSync AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -22,6 +22,7 @@
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
 
+
 @implementation WebViewWidget
 
 - (id)init {
@@ -29,37 +30,230 @@
 	view = webView;
 	webView.delegate = self;
 	newurl = @"";
-	return [super init];	
+    softHookPattern = @"";
+	hardHookPattern = @"";
+    javaScriptIdentifier = @"javascript:";
+    urlsToNotHook=[[NSMutableDictionary alloc] init];
+    [urlsToNotHook retain];
+	return [super init];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"url"]) {
+	//Set a new URL
+	if([key isEqualToString:@MAW_WEB_VIEW_URL]) {
+
 		UIWebView* webView = (UIWebView*)view;
-		NSURL *url = [NSURL URLWithString:value];
-		NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
-		[webView loadRequest:requestObj];
-	} else {
+		//Check whether the user tries to send some javascript
+        NSRange identifierLocation = [value rangeOfString:javaScriptIdentifier];
+        if(identifierLocation.location == 0)
+        {
+			NSInteger scriptLocation = identifierLocation.location+identifierLocation.length;
+            NSString *script=[[value substringFromIndex:scriptLocation] retain];
+            [webView stringByEvaluatingJavaScriptFromString:script];
+            [script release];
+        }
+        else
+        {
+			//Process a normal URL
+            NSURL *url = [NSURL URLWithString:value];
+            NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
+            NSString *absoluteURL = [url absoluteString];
+
+			//Hook by-pass system. Each url is saved in a dictionary with it's
+			//string as the key, and the number of time it was called as the value,
+			//in case it gets called more than once before it goes thourh the hook system
+            NSNumber *unHookCount = (NSNumber*)[urlsToNotHook objectForKey:absoluteURL];
+
+            if(unHookCount)
+            {
+				//increase the hook count for this url
+				NSNumber *newCount = [NSNumber numberWithInteger:(unHookCount.integerValue+1)];
+                [urlsToNotHook setValue:newCount forKey:absoluteURL];
+            }
+            else
+            {
+				//create a new dictionary entry for this URL.
+                [urlsToNotHook setObject:[NSNumber numberWithInteger:1] forKey:absoluteURL];
+            }
+            [webView loadRequest:requestObj];
+        }
+
+    } else if([key isEqualToString:@MAW_WEB_VIEW_SOFT_HOOK]) {
+		[softHookPattern release];
+        softHookPattern = [value retain];
+
+	} else if([key isEqualToString:@MAW_WEB_VIEW_HARD_HOOK]) {
+		[hardHookPattern release];
+        hardHookPattern = [value retain];
+
+    } else if([key isEqualToString:@MAW_WEB_VIEW_HTML]) {
+		UIWebView* webView = (UIWebView*)view;
+        [webView loadHTMLString:value baseURL:NULL];
+
+    } else if([key isEqualToString:@MAW_WEB_VIEW_ENABLE_ZOOM]) {
+		UIWebView* webView = (UIWebView*)view;
+        if([value isEqualToString:@"true"])
+        {
+            webView.scalesPageToFit = YES;
+        }
+        else if([value isEqualToString:@"false"])
+        {
+            webView.scalesPageToFit = NO;
+        }
+
+    } else if([key isEqualToString:@MAW_WEB_VIEW_NAVIGATE]) {
+		UIWebView* webView = (UIWebView*)view;
+        if([value isEqualToString:@"back"])
+        {
+            [webView goBack];
+        }
+        else if([value isEqualToString:@"forward"])
+        {
+            [webView goForward];
+        }
+
+    } else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@"url"]) {
+	if([key isEqualToString:@MAW_WEB_VIEW_URL]) {
 		UIWebView* webView = (UIWebView*)view;
 		return webView.request.URL.absoluteString;
-	} else if([key isEqualToString:@"newurl"]) {
-		NSString* ret = @"";
-		ret = newurl;
-		return ret;
+
+	} else if([key isEqualToString:@MAW_WEB_VIEW_NEW_URL]) {
+		return newurl;
+
+    } else if([key isEqualToString:@MAW_WEB_VIEW_SOFT_HOOK]) {
+		return softHookPattern;
+
+	} else if([key isEqualToString:@MAW_WEB_VIEW_HARD_HOOK]) {
+		return hardHookPattern;
+
 	} else {
 		return [super getPropertyWithKey:key];
 	}
 }
 
-- (BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
-	newurl = [[NSString stringWithString:request.URL.absoluteString] retain]; // TODO: do have to do this (retain)??
-	
+- (void)webViewDidStartLoad:(UIWebView *)webView
+{
+    MAEvent event;
+    event.type = EVENT_TYPE_WIDGET;
+    MAWidgetEventData *eventData = new MAWidgetEventData;
+    eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
+    eventData->widgetHandle = handle;
+	eventData->status = MAW_CONSTANT_STARTED;
+    event.data = eventData;
+    Base::gEventQueue.put(event);
+    return;
+}
+
+- (void)webViewDidFinishLoad:(UIWebView *)webView
+{
+    MAEvent event;
+    event.type = EVENT_TYPE_WIDGET;
+    MAWidgetEventData *eventData = new MAWidgetEventData;
+    eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
+    eventData->widgetHandle = handle;
+	eventData->status = MAW_CONSTANT_DONE;
+    event.data = eventData;
+    Base::gEventQueue.put(event);
+    return;
+}
+
+- (void)webView:(UIWebView *)webView didFailLoadWithError:(NSError *)error
+{
+    MAEvent event;
+    event.type = EVENT_TYPE_WIDGET;
+    MAWidgetEventData *eventData = new MAWidgetEventData;
+    eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
+    eventData->widgetHandle = handle;
+	eventData->status = MAW_CONSTANT_ERROR;
+    event.data = eventData;
+    Base::gEventQueue.put(event);
+    return;
+}
+
+- (BOOL)webView:(UIWebView *)webView
+		shouldStartLoadWithRequest:(NSURLRequest *)request
+		navigationType:(UIWebViewNavigationType)navigationType {
+
+	if(request.URL.absoluteString == NULL)
+    {
+        return NO;
+    }
+
+    NSString *url=[NSString stringWithString:request.URL.absoluteString];
+	//Hook by-pass system for the case of the MoSync coder using the
+	//set url property.
+    NSNumber *unHookCount = [urlsToNotHook objectForKey:url];
+    BOOL skipHook = NO;
+    if(unHookCount)
+    {
+        skipHook = YES;
+        if (unHookCount.intValue == 1)
+        {
+            [urlsToNotHook removeObjectForKey:url];
+        }
+        else
+        {
+			NSNumber *newCount = [NSNumber numberWithInteger:(unHookCount.integerValue-1)];
+            [urlsToNotHook setValue:newCount forKey:url];
+        }
+    }
+	NSStringCompareOptions options = NSRegularExpressionSearch|NSCaseInsensitiveSearch;
+	NSRange softHookRange = [url rangeOfString:softHookPattern options:options];
+    NSRange hardHookRange = [url rangeOfString:hardHookPattern options:options];
+
+    if(skipHook == NO &&
+		(
+		 (softHookRange.location == 0 && softHookRange.length == [url length]) ||
+		 (hardHookRange.location == 0 && hardHookRange.length == [url length])
+		)
+	   )
+    {
+		//The url matched one of the hooks
+        MAEvent event;
+        event.type = EVENT_TYPE_WIDGET;
+        MAWidgetEventData *eventData = new MAWidgetEventData;
+        eventData->eventType = MAW_EVENT_WEB_VIEW_HOOK_INVOKED;
+        eventData->widgetHandle = handle;
+		bool loadUrl;
+
+		//The hard hook takes precedence in the case that both were matched
+		if(hardHookRange.location != NSNotFound)
+		{
+			eventData->hookType = MAW_CONSTANT_HARD;
+			loadUrl = NO; //The hard hood stops the loading process
+		}
+		else
+		{
+			eventData->hookType = MAW_CONSTANT_SOFT;
+			loadUrl = YES; //The soft hook allows the proading process
+		}
+
+        //We create a placeholder resource that holds the url string
+        MAHandle urlHandle = (MAHandle) Base::gSyscall->resources.create_RT_PLACEHOLDER();
+        int size = (int)[url lengthOfBytesUsingEncoding:NSASCIIStringEncoding];
+        Base::MemStream* ms = new Base::MemStream(size);
+        Base::gSyscall->resources.add_RT_BINARY(urlHandle, ms);
+        ms->seek(Base::Seek::Start, 0);
+        ms->write([url cStringUsingEncoding:NSASCIIStringEncoding], size);
+
+        eventData->urlData = urlHandle;
+        event.data = eventData;
+
+
+        Base::gEventQueue.put(event);
+
+        return loadUrl;
+    }
+
+    //Deprecated
+    newurl = [[NSString stringWithString:request.URL.absoluteString] retain]; // TODO: do have to do this (retain)??
+
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -67,7 +261,7 @@
 	eventData->widgetHandle = handle;
 	event.data = (int)eventData;
 	Base::gEventQueue.put(event);
-	return YES; // MoSync user have to manually start a new request..
+	return YES;
 }
 
 @end
