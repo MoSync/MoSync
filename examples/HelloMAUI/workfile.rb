@@ -6,6 +6,7 @@ work = PipeExeWork.new
 work.instance_eval do 
 	@SOURCES = ["."]	
 	@LIBRARIES = ["mautil", "maui"]
+	@EXTRA_LINKFLAGS = " -datasize=256000 -heapsize=128000 -stacksize=16000"
 	@NAME = "HelloMAUI"
 end
 
