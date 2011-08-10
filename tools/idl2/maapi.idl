@@ -2264,6 +2264,7 @@ interface MAAPI {
 		*
 		* \param path The full path to a directory, or the empty string,
 		* which specifies that the root file systems should be listed.
+		* Which root file systems are listed vary between platforms.
 		* \param filter A string to match names with. May include an asterisk ('*') wildcard
 		* to represent 0 or more characters. Ignored if \a path is empty.
 		*
@@ -2713,6 +2714,10 @@ interface MAAPI {
 		* "mosync.device" is a description of the device. May include vendor, model name
 		* and firmware version.
 		* The format of this description is not specified. It varies from device to device.
+		*
+		* "mosync.path.local" is the absolute path to the local file system,
+		* on devices that have a local file system. The returned path has a
+		* trailing slash character ('/').
 		*
 		* \param key The property's key.
 		* \param buf A buffer where the value should be written.

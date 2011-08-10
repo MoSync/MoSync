@@ -2009,30 +2009,38 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * maGetSystemProperty
+	 * Get a system property as a string.
+	 * @param key The name of the property.
+	 * @param buf Index to the position or the buffer
+	 * in memory that will receive the property value.
+	 * @param key The name o the property.
+	 * @return Length of the property value, including
+	 * the null termination character. <0 on error.
+	 * If return value size is > size, the buffer is too
+	 * small and no data is copied.
 	 */
 	int maGetSystemProperty(String key, int buf, int size)
 	{
 		String property = "";
 
-		if(key.equals("mosync.imei"))
+		if (key.equals("mosync.imei"))
 		{
 			TelephonyManager manager = (TelephonyManager)
 				mContext.getSystemService(Context.TELEPHONY_SERVICE);
 			property = manager.getDeviceId();
 		}
-		else if(key.equals("mosync.imsi"))
+		else if (key.equals("mosync.imsi"))
 		{
 			TelephonyManager manager = (TelephonyManager)
 				mContext.getSystemService(Context.TELEPHONY_SERVICE);
 			property = manager.getSubscriberId();
 		}
-		else if(key.equals("mosync.iso-639-1"))
+		else if (key.equals("mosync.iso-639-1"))
 		{
 			Locale locale = Locale.getDefault();
 			property = locale.getLanguage();
 		}
-		else if(key.equals("mosync.iso-639-2"))
+		else if (key.equals("mosync.iso-639-2"))
 		{
 			Locale locale = Locale.getDefault();
 			property = locale.getISO3Language();
@@ -2041,22 +2049,31 @@ public class MoSyncThread extends Thread
 		{
 			property = Build.FINGERPRINT;
 		}
+		else if (key.equals("mosync.path.local"))
+		{
+			String path = getActivity().getFilesDir().getAbsolutePath() + "/";
+			Log.i("@@@ MoSync", "Property mosync.localFilePath: " + path);
+			property = path;
+		}
 
 		if (null == property) { return -2; }
 
 		if (0 == property.compareTo("")) { return -2; }
 
-		if (property.length() >= size)
+		// If the buffer is not big enough to hold the
+		// property data, then return the length of
+		// the property. This tells the caller that
+		// the buffer was too small.
+		if (property.length() +1 > size)
 		{
 			return property.length() + 1;
 		}
 
 		// Write this property to memory.
-
 		byte[] ba = property.getBytes();
-
 		mMemDataSection.position(buf);
 		mMemDataSection.put(ba);
+		// Add null termination character.
 		mMemDataSection.put((byte)0);
 
 		return property.length() + 1;
