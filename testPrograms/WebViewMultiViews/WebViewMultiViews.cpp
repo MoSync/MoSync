@@ -124,9 +124,16 @@ public:
 			mPlatform->createTextFromHandle(ColorPage_html));
 
 		// Set the URL the web view displays.
-		maWidgetSetProperty(webView, "url", "ColorPage.html");
+		// We should support both absolute file url and
+		// as url that assumes a url base is set.
+//		maWidgetSetProperty(webView, "url", "ColorPage.html");
+		MAUtil::String url =
+			MAUtil::String("file://") +
+			mPlatform->getLocalPath() +
+			"ColorPage.html";
+		maWidgetSetProperty(webView, "url", url.c_str());
 
-		// Register to receive messages from teh WebView.
+		// Register to receive messages from the WebView.
 		WebViewMessage::getMessagesFor(webView);
 
 		return webView;
