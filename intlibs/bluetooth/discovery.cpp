@@ -415,8 +415,9 @@ static bool haveRadio() {
 	}
 #else
 	BLUETOOTH_FIND_RADIO_PARAMS btfrp;
+	ZERO_OBJECT(btfrp);
 	btfrp.dwSize = sizeof(btfrp);
-	HANDLE hRadio;
+	HANDLE hRadio = 0;
 	HBLUETOOTH_RADIO_FIND hbtrf = BluetoothFindFirstRadio(&btfrp, &hRadio);
 	if(hbtrf == NULL) {
 		LOG("BluetoothFindFirstRadio error %lu\n", GetLastError());
