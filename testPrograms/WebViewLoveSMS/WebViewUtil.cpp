@@ -37,11 +37,35 @@ using namespace MoSync::UI;
 
 // ================= Class PlatformUtil =================
 
+
+/**
+ * Create a PlatformHandler for the current platform.
+ * The caller has the responsibility of deallocating the
+ * returned instance.
+ */
+PlatformHandler* PlatformHandler::create()
+{
+	PlatformHandler::checkNativeUISupport();
+
+	if (PlatformHandler::isAndroid())
+	{
+		return new PlatformHandlerAndroid();
+	}
+	else if (PlatformHandler::isIOS())
+	{
+		return new PlatformHandlerIOS();
+	}
+	else
+	{
+		return NULL;
+	}
+}
+
 /**
  * Error handling for devices that do not support NativeUI.
  * Here we throw a panic if NativeUI is not supported.
  */
-void PlatformUtil::checkNativeUISupport()
+void PlatformHandler::checkNativeUISupport()
 {
 	int widget = maWidgetCreate(MAW_WEB_VIEW);
 	if (-1 == widget)
@@ -60,7 +84,7 @@ void PlatformUtil::checkNativeUISupport()
  * Detects if the current platform is Android.
  * @return true if the platform is Android, false otherwise.
  */
-bool PlatformUtil::isAndroid()
+bool PlatformHandler::isAndroid()
 {
 	return NULL != strstr(MA_PROF_STRING_PLATFORM, "android");
 }
@@ -69,44 +93,150 @@ bool PlatformUtil::isAndroid()
  * Detects if the current platform is iOS.
  * @return true if the platform is iOS, false otherwise.
  */
-bool PlatformUtil::isIOS()
+bool PlatformHandler::isIOS()
 {
 	// TODO: Find a proper way to detect iOS.
-	return ! PlatformUtil::isAndroid();
+	return ! PlatformHandler::isAndroid();
 }
 
 /**
- * Helper method that reads a text string from data handle.
+ * Constructor.
  */
-MAUtil::String PlatformUtil::getTextFromDataHandle(MAHandle data)
+PlatformHandler::PlatformHandler()
 {
-	// Get size of data.
-	int size = maGetDataSize(data);
+}
 
-	// Allocate space for text plus zero termination character.
-	char* text = (char*) malloc(size + 1);
-	if (NULL == text)
+/**
+ * Destructor.
+ */
+PlatformHandler::~PlatformHandler()
+{
+	// Nothing needs to be explicitly destroyed.
+}
+
+// ================= Class PlatformUtilAndroid =================
+
+/**
+ * Constructor.
+ */
+PlatformHandlerAndroid::PlatformHandlerAndroid()
+{
+}
+
+/**
+ * Destructor.
+ */
+PlatformHandlerAndroid::~PlatformHandlerAndroid()
+{
+	// Nothing needs to be explicitly destroyed.
+}
+
+/**
+ * Get the path to the local file directory on Android.
+ */
+MAUtil::String PlatformHandlerAndroid::getLocalFileDirectory()
+{
+	return mLocalFilesDirectory;
+}
+
+/**
+ * Helper method that writes a text string to a local file.
+ */
+void PlatformHandlerAndroid::writeTextToLocalFile(
+	const MAUtil::String& fileName,
+	const MAUtil::String& text)
+{
+	PlatformHandler::writeTextToFile(
+		getLocalFileDirectory() + fileName,
+		text);
+}
+
+// ================= Class PlatformUtilIOS =================
+
+/**
+ * Constructor.
+ */
+PlatformHandlerIOS::PlatformHandlerIOS()
+{
+}
+
+/**
+ * Destructor.
+ */
+PlatformHandlerIOS::~PlatformHandlerIOS()
+{
+	// Nothing needs to be explicitly destroyed.
+}
+
+/**
+ * Helper method that writes a text string to a local file.
+ */
+void PlatformHandlerIOS::writeTextToLocalFile(
+	const MAUtil::String& fileName,
+	const MAUtil::String& text)
+{
+	// TODO: Implement.
+	maPanic(0, "PlatformUtilIOS::writeTextToLocalFile() is not implemented.");
+}
+
+// ================= Class DataHandler =================
+
+/**
+ * Return path to local files directory. Path ends with a slash.
+ */
+MAUtil::String DataHandler::getLocalFileSystemPath()
+{
+
+}
+
+/**
+ * Write a data object to a file.
+ * @return true on success, false on error.
+ */
+bool DataHandler::writeDataToFile(
+	const MAUtil::String& fileName,
+	MAHandle outData)
+{
+	//
+}
+
+/**
+ * Write a text string to a file.
+ * @return true on success, false on error.
+ */
+bool DataHandler::writeTextToFile(
+	const MAUtil::String& filePath,
+	const MAUtil::String& outText)
+{
+	int result;
+
+	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
 	{
-		return "";
+		return false;
 	}
 
-    // Read data.
-    maReadData(data, text, 0, size);
+	if (!maFileExists(file))
+	{
+		result = maFileCreate(file);
+		if (result < 0)
+		{
+			return false;
+		}
+	}
 
-    // Zero terminate string.
-    text[size] = 0;
+	result = maFileWrite(file, outText.c_str(), outText.length());
 
-    MAUtil::String textString = text;
+	maFileClose(file);
 
-    free(text);
-
-    return textString;
+	return result == 0;
 }
+
 
 /**
  * Helper method that writes a text string to a file.
  */
-void PlatformUtil::writeTextToFile(
+void PlatformHandler::writeTextToFile(
 	const MAUtil::String& filePath,
 	const MAUtil::String& text)
 {
@@ -122,108 +252,75 @@ void PlatformUtil::writeTextToFile(
 }
 
 /**
- * Constructor.
+ * Read a data object from a file.
+ * @return true on success, false on error.
  */
-PlatformUtil::PlatformUtil()
-{
-}
-
-/**
- * Destructor.
- */
-PlatformUtil::~PlatformUtil()
-{
-	// Nothing needs to be explicitly destroyed.
-}
-
-// ================= Class PlatformUtilAndroid =================
-
-/**
- * Constructor.
- */
-PlatformUtilAndroid::PlatformUtilAndroid()
-{
-	char path[1024];
-
-	MAWidgetHandle widget = maWidgetCreate(MAW_WEB_VIEW);
-	if (widget < 0)
-	{
-		maPanic(0, "Could not create web view in PlatformUtilAndroid");
-	}
-
-	int result = maWidgetGetProperty(
-		widget,
-		"localFilesDirectory",
-		path,
-		1024);
-	if (result > 0)
-	{
-		mLocalFilesDirectory = path;
-	}
-	else
-	{
-		char message[128];
-		sprintf(message, "Could not get localFilesDirectory, result: %d", result);
-		maPanic(0, message);
-	}
-
-	maWidgetDestroy(widget);
-}
-
-/**
- * Destructor.
- */
-PlatformUtilAndroid::~PlatformUtilAndroid()
-{
-	// Nothing needs to be explicitly destroyed.
-}
-
-/**
- * Get the path to the local file directory on Android.
- */
-MAUtil::String PlatformUtilAndroid::getLocalFileDirectory()
-{
-	return mLocalFilesDirectory;
-}
-
-/**
- * Helper method that writes a text string to a local file.
- */
-void PlatformUtilAndroid::writeTextToLocalFile(
+bool DataHandler::writeDataToFile(
 	const MAUtil::String& fileName,
-	const MAUtil::String& text)
+	MAHandle inData)
 {
-	PlatformUtil::writeTextToFile(
-		getLocalFileDirectory() + fileName,
-		text);
-}
 
-// ================= Class PlatformUtilIOS =================
-
-/**
- * Constructor.
- */
-PlatformUtilIOS::PlatformUtilIOS()
-{
 }
 
 /**
- * Destructor.
+ * Read a text string from a file.
+ * @return true on success, false on error.
  */
-PlatformUtilIOS::~PlatformUtilIOS()
-{
-	// Nothing needs to be explicitly destroyed.
-}
-
-/**
- * Helper method that writes a text string to a local file.
- */
-void PlatformUtilIOS::writeTextToLocalFile(
+bool DataHandler::writeTextToFile(
 	const MAUtil::String& fileName,
-	const MAUtil::String& text)
+	const MAUtil::String& inText)
 {
-	// TODO: Implement.
-	maPanic(0, "PlatformUtilIOS::writeTextToLocalFile() is not implemented.");
+
+}
+
+/**
+ * Create a text string from a handle.
+ */
+MAUtil::String DataHandler::createTextFromHandle(MAHandle handle)
+{
+	// Get size of data.
+	int size = maGetDataSize(handle);
+
+	// Allocate space for text plus zero termination character.
+	char* tempText = (char*) malloc(size + 1);
+	if (NULL == tempText)
+	{
+		return "";
+	}
+
+    // Read text data from handle.
+    maReadData(handle, tempText, 0, size);
+
+    // Zero terminate string.
+    tempText[size] = 0;
+
+    // Create String object.
+    MAUtil::String text = tempText;
+
+    // Free temporary text.
+    free(tempText);
+
+    // Return text object.
+    return text;
+}
+
+/**
+ * Create a data object from a handle.
+ * @return Pointer to data.
+ */
+void* DataHandler::createDataFromHandle(MAHandle handle)
+{
+	// Get size of data.
+	int size = maGetDataSize(handle);
+
+	// Allocate space for text plus zero termination character.
+	void* data = (void*) malloc(size);
+
+    // Read data from handle.
+    maReadData(handle, data, 0, size);
+
+    // Return data pointer.
+    return data;
 }
 
 // ================= Class WebViewMessage =================

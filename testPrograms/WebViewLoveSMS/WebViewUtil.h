@@ -36,9 +36,14 @@ namespace UI {
 /**
  * Class that contains utility methods.
  */
-class PlatformUtil
+class PlatformHandler
 {
 public:
+	/**
+	 * Create a PlatformHandler for the current platform.
+	 */
+	static PlatformHandler* create();
+
 	/**
 	 * Error handling for devices that do not support NativeUI.
 	 * Here we throw a panic if NativeUI is not supported.
@@ -58,98 +63,97 @@ public:
 	static bool isIOS();
 
 	/**
-	 * Create an instance of a PlatformUtil for the current platform.
-	 */
-	static PlatformUtil createPlatformUtil();
-
-	/**
-	 * Helper method that reads a text string from data handle.
-	 */
-	static MAUtil::String getTextFromDataHandle(MAHandle data);
-
-	/**
-	 * Helper method that writes a text string to a file.
-	 */
-	static void PlatformUtil::writeTextToFile(
-		const MAUtil::String& filePath,
-		const MAUtil::String& text);
-
-	/**
 	 * Constructor.
 	 */
-	PlatformUtil();
+	PlatformHandler();
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~PlatformUtil();
-
-	/**
-	 * Helper method that writes a text string to a local file.
-	 */
-	virtual void writeTextToLocalFile(
-		const MAUtil::String& fileName,
-		const MAUtil::String& text) = 0;
+	virtual ~PlatformHandler();
 };
 
 /**
  * Class that contains Android platform utility methods.
  */
-class PlatformUtilAndroid : public PlatformUtil
+class PlatformHandlerAndroid : public PlatformHandler
 {
-private:
-	/**
-	 * The Android package name.
-	 */
-	MAUtil::String mLocalFilesDirectory;
-
 public:
 	/**
 	 * Constructor.
 	 */
-	PlatformUtilAndroid();
+	PlatformHandlerAndroid();
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~PlatformUtilAndroid();
-
-	/**
-	 * Helper method that writes a text string to a local file.
-	 */
-	virtual void writeTextToLocalFile(
-		const MAUtil::String& fileName,
-		const MAUtil::String& text);
-
-private:
-	/**
-	 * Get the path to the local file directory.
-	 */
-	MAUtil::String getLocalFileDirectory();
+	virtual ~PlatformHandlerAndroid();
 };
 
 /**
  * Class that contains iOS platform utility methods.
  */
-class PlatformUtilIOS : public PlatformUtil
+class PlatformHandlerIOS : public PlatformHandler
 {
 public:
 	/**
 	 * Constructor.
 	 */
-	PlatformUtilIOS();
+	PlatformHandlerIOS();
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~PlatformUtilIOS();
+	virtual ~PlatformHandlerIOS();
+};
+
+/**
+ * Class that handles data access.
+ */
+class DataHandler
+{
+	/**
+	 * Return path to local files directory. Path ends with a slash.
+	 */
+	virtual MAUtil::String getLocalFileSystemPath();
 
 	/**
-	 * Helper method that writes a text string to a local file.
+	 * Write a data object to a file.
+	 * @return true on success, false on error.
 	 */
-	virtual void writeTextToLocalFile(
+	virtual bool writeDataToFile(
 		const MAUtil::String& fileName,
-		const MAUtil::String& text);
+		MAHandle outData);
+
+	/**
+	 * Write a text string to a file.
+	 * @return true on success, false on error.
+	 */
+	virtual bool writeTextToFile(
+		const MAUtil::String& fileName,
+		const MAUtil::String& outText);
+
+
+	/**
+	 * Read a data object from a file.
+	 * @return true on success, false on error.
+	 */
+	virtual bool writeDataToFile(
+		const MAUtil::String& fileName,
+		MAHandle inData);
+
+	/**
+	 * Read a text string from a file.
+	 * @return true on success, false on error.
+	 */
+	virtual bool writeTextToFile(
+		const MAUtil::String& fileName,
+		const MAUtil::String& inText);
+
+	/**
+	 * Create a text string from data handle.
+	 */
+	MAUtil::String createTextFromDataHandle(MAHandle data);
 };
 
 /**
