@@ -103,14 +103,14 @@ namespace Base
 	* 
 	* 
 	*/
-	bool Syscall::loadImage(int resourceIndex, int pos, int length)
+	bool Syscall::loadImage(int resourceIndex, int pos, int length, int binaryResourceHandle)
 	{
 		SYSLOG("loadImage");
 		
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "loadImage", "(IIII)Z");
 		if (methodID == 0) ERROR_EXIT;
-		bool retVal = mJNIEnv->CallBooleanMethod(mJThis, methodID, resourceIndex, pos, length, 0);
+		bool retVal = mJNIEnv->CallBooleanMethod(mJThis, methodID, resourceIndex, pos, length, binaryResourceHandle);
 				
 		mJNIEnv->DeleteLocalRef(cls);
 		return retVal;
