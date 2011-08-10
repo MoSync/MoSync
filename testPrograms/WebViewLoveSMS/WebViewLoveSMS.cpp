@@ -51,14 +51,14 @@ MA 02110-1301, USA.
 #include "MAHeaders.h"
 #include "WebViewUtil.h"
 
-using namespace MoSync::UI;
+using namespace MoSync;
 
 class WebViewLoveSMSApp
 {
 private:
 	MAWidgetHandle mScreen;
 	MAWidgetHandle mWebView;
-	PlatformHandler* mPlatformHandler;
+	Platform* mPlatform;
 	MAUtil::String mLoveMessage;
 	MAUtil::String mKissMessage;
 
@@ -95,19 +95,10 @@ public:
 
 	void createUI()
 	{
-		PlatformHandler::checkNativeUISupport();
-
-		if (PlatformHandler::isAndroid())
-		{
-			mPlatformHandler = new PlatformHandlerAndroid();
-		}
-		else if (PlatformHandler::isIOS())
-		{
-			mPlatformHandler = new PlatformHandlerIOS();
-		}
+		mPlatform = Platform::create();
 
 		MAUtil::String html =
-			mPlatformHandler->getTextFromDataHandle(MainPage_html);
+			mPlatform->createTextFromHandle(MainPage_html);
 
 		// Create screen.
 		mScreen = maWidgetCreate(MAW_SCREEN);
@@ -115,9 +106,6 @@ public:
 
 		// Create web view.
 		mWebView = createWebView(html);
-
-		// TODO: Use save phone no. insert via javascript: call
-		// when page is loaded.
 
 		// Compose objects.
 		maWidgetAddChild(mScreen, mWebView);
@@ -150,7 +138,7 @@ public:
 	void destroyUI()
 	{
 		maWidgetDestroy(mScreen);
-		delete mPlatformHandler;
+		delete mPlatform;
 	}
 
 	void runEventLoop()
@@ -225,6 +213,12 @@ public:
 	{
 		lprintfln("*** SMS to: %s", phoneNo.c_str());
 		lprintfln("*** SMS data: %s", message.c_str());
+
+		int result = maSendTextSMS(
+			phoneNo.c_str(),
+			message.c_str());
+
+		// TODO: Provide feedback via JS.
 	}
 
 	void setSavedPhoneNo()
@@ -235,14 +229,35 @@ public:
 		sprintf(
 			script,
 			"javascript:SetPhoneNo('%s')",
-			phoneNo);
+			"phoneNo");
 		maWidgetSetProperty(mWebView, "url", script);
+	}
+
+	void savePhoneNo(const MAUtil::String& phoneNo)
+	{
+		MAUtil::String path =
+			mPlatform->getLocalPath() +
+			"SavedPhoneNo";
+		mPlatform->writeTextToFile(path, phoneNo);
 	}
 
 	MAUtil::String loadPhoneNo()
 	{
-
+		MAUtil::String path =
+			mPlatform->getLocalPath() +
+			"SavedPhoneNo";
+		MAUtil::String phoneNo;
+		bool success = mPlatform->readTextFromFile(path, phoneNo);
+		if (success)
+		{
+			return phoneNo;
+		}
+		else
+		{
+			return "";
+		}
 	}
+
 
 	void widgetShouldBeValid(MAWidgetHandle widget, const char* panicMessage)
 	{

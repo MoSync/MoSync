@@ -23,26 +23,25 @@ MA 02110-1301, USA.
  * This file contains a utility library for working with WebViews.
  */
 
-#ifndef MOSYNC_UI_WEBVIEWUTIL_H_
-#define MOSYNC_UI_WEBVIEWUTIL_H_
+#ifndef MOSYNC_WEBVIEWUTIL_H_
+#define MOSYNC_WEBVIEWUTIL_H_
 
 #include <ma.h>
 #include <MAUtil/String.h>
 #include <IX_WIDGET.h>
 
 namespace MoSync {
-namespace UI {
 
 /**
  * Class that contains utility methods.
  */
-class PlatformHandler
+class Platform
 {
 public:
 	/**
-	 * Create a PlatformHandler for the current platform.
+	 * Create an instance for the current platform.
 	 */
-	static PlatformHandler* create();
+	static Platform* create();
 
 	/**
 	 * Error handling for devices that do not support NativeUI.
@@ -65,64 +64,25 @@ public:
 	/**
 	 * Constructor.
 	 */
-	PlatformHandler();
+	Platform();
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~PlatformHandler();
-};
-
-/**
- * Class that contains Android platform utility methods.
- */
-class PlatformHandlerAndroid : public PlatformHandler
-{
-public:
-	/**
-	 * Constructor.
-	 */
-	PlatformHandlerAndroid();
+	virtual ~Platform();
 
 	/**
-	 * Destructor.
+	 * Get the path to the local file system.
+	 * @return Path that ends with a slash.
 	 */
-	virtual ~PlatformHandlerAndroid();
-};
-
-/**
- * Class that contains iOS platform utility methods.
- */
-class PlatformHandlerIOS : public PlatformHandler
-{
-public:
-	/**
-	 * Constructor.
-	 */
-	PlatformHandlerIOS();
-
-	/**
-	 * Destructor.
-	 */
-	virtual ~PlatformHandlerIOS();
-};
-
-/**
- * Class that handles data access.
- */
-class DataHandler
-{
-	/**
-	 * Return path to local files directory. Path ends with a slash.
-	 */
-	virtual MAUtil::String getLocalFileSystemPath();
+	virtual MAUtil::String getLocalPath();
 
 	/**
 	 * Write a data object to a file.
 	 * @return true on success, false on error.
 	 */
 	virtual bool writeDataToFile(
-		const MAUtil::String& fileName,
+		const MAUtil::String& filePath,
 		MAHandle outData);
 
 	/**
@@ -130,30 +90,70 @@ class DataHandler
 	 * @return true on success, false on error.
 	 */
 	virtual bool writeTextToFile(
-		const MAUtil::String& fileName,
+		const MAUtil::String& filePath,
 		const MAUtil::String& outText);
-
 
 	/**
 	 * Read a data object from a file.
 	 * @return true on success, false on error.
 	 */
-	virtual bool writeDataToFile(
-		const MAUtil::String& fileName,
+	virtual bool readDataFromFile(
+		const MAUtil::String& filePath,
 		MAHandle inData);
 
 	/**
 	 * Read a text string from a file.
 	 * @return true on success, false on error.
 	 */
-	virtual bool writeTextToFile(
-		const MAUtil::String& fileName,
-		const MAUtil::String& inText);
+	virtual bool readTextFromFile(
+		const MAUtil::String& filePath,
+		MAUtil::String& inText);
 
 	/**
 	 * Create a text string from data handle.
 	 */
-	MAUtil::String createTextFromDataHandle(MAHandle data);
+	virtual MAUtil::String createTextFromHandle(MAHandle data);
+
+private:
+	/**
+	 * Open a file for read/write access. Create the file if it does not exist.
+	 * @return Handle to the open file, <0 on error.
+	 */
+	MAHandle openFileHelper(const MAUtil::String& filePath);
+};
+
+/**
+ * Class that contains Android platform utility methods.
+ */
+class PlatformAndroid : public Platform
+{
+public:
+	/**
+	 * Constructor.
+	 */
+	PlatformAndroid();
+
+	/**
+	 * Destructor.
+	 */
+	virtual ~PlatformAndroid();
+};
+
+/**
+ * Class that contains iOS platform utility methods.
+ */
+class PlatformIOS : public Platform
+{
+public:
+	/**
+	 * Constructor.
+	 */
+	PlatformIOS();
+
+	/**
+	 * Destructor.
+	 */
+	virtual ~PlatformIOS();
 };
 
 /**
@@ -220,7 +220,6 @@ public:
 	MAUtil::String getParam(int index);
 };
 
-} // namespace UI
 } // namespace MoSync
 
 #endif
