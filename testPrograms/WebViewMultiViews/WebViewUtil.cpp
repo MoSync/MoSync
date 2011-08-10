@@ -30,18 +30,41 @@ MA 02110-1301, USA.
 #include <mavsprintf.h>		// C string functions
 #include <MAUtil/String.h>	// C++ String class
 #include <IX_WIDGET.h>		// Widget API
-
+#include <conprint.h>
 #include "WebViewUtil.h"
 
-using namespace MoSync::UI;
+using namespace MoSync;
 
 // ================= Class PlatformUtil =================
+
+/**
+ * Create a PlatformHandler for the current platform.
+ * The caller has the responsibility of deallocating the
+ * returned instance.
+ */
+Platform* Platform::create()
+{
+	Platform::checkNativeUISupport();
+
+	if (Platform::isAndroid())
+	{
+		return new PlatformAndroid();
+	}
+	else if (Platform::isIOS())
+	{
+		return new PlatformIOS();
+	}
+	else
+	{
+		return NULL;
+	}
+}
 
 /**
  * Error handling for devices that do not support NativeUI.
  * Here we throw a panic if NativeUI is not supported.
  */
-void PlatformUtil::checkNativeUISupport()
+void Platform::checkNativeUISupport()
 {
 	int widget = maWidgetCreate(MAW_WEB_VIEW);
 	if (-1 == widget)
@@ -60,7 +83,7 @@ void PlatformUtil::checkNativeUISupport()
  * Detects if the current platform is Android.
  * @return true if the platform is Android, false otherwise.
  */
-bool PlatformUtil::isAndroid()
+bool Platform::isAndroid()
 {
 	return NULL != strstr(MA_PROF_STRING_PLATFORM, "android");
 }
@@ -69,71 +92,212 @@ bool PlatformUtil::isAndroid()
  * Detects if the current platform is iOS.
  * @return true if the platform is iOS, false otherwise.
  */
-bool PlatformUtil::isIOS()
+bool Platform::isIOS()
 {
 	// TODO: Find a proper way to detect iOS.
-	return ! PlatformUtil::isAndroid();
-}
-
-/**
- * Helper method that reads a text string from data handle.
- */
-MAUtil::String PlatformUtil::getTextFromDataHandle(MAHandle data)
-{
-	// Get size of data.
-    int size = maGetDataSize(data);
-
-    // Allocate space for text plus zero termination character.
-    char* text = (char*) malloc(size + 1);
-    if (NULL == text)
-    {
-    	return "";
-    }
-
-    // Read data.
-    maReadData(data, text, 0, size);
-
-    // Zero terminate string.
-    text[size] = 0;
-
-    MAUtil::String textString = text;
-
-    free(text);
-
-    return textString;
-}
-
-/**
- * Helper method that writes a text string to a file.
- */
-void PlatformUtil::writeTextToFile(
-	const MAUtil::String& filePath,
-	const MAUtil::String& text)
-{
-	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ_WRITE);
-	if (! maFileExists(file))
-	{
-		maFileCreate(file);
-	}
-
-	maFileWrite(file, text.c_str(), text.length());
-
-	maFileClose(file);
+	return ! Platform::isAndroid();
 }
 
 /**
  * Constructor.
  */
-PlatformUtil::PlatformUtil()
+Platform::Platform()
 {
 }
 
 /**
  * Destructor.
  */
-PlatformUtil::~PlatformUtil()
+Platform::~Platform()
 {
 	// Nothing needs to be explicitly destroyed.
+}
+
+// ================= Class Platform =================
+
+/**
+ * Get the path to the local file system.
+ * @return Path that ends with a slash.
+ */
+MAUtil::String Platform::getLocalPath()
+{
+	int bufferSize = 512;
+	char buffer[bufferSize];
+
+	int size = maGetSystemProperty(
+		"mosync.path.local",
+		buffer,
+		bufferSize);
+
+	// If there was an error, return empty string.
+	if (size < 0 || size > bufferSize)
+	{
+		return "";
+	}
+
+	return buffer;
+}
+
+/**
+ * Write a data object to a file.
+ * @return true on success, false on error.
+ */
+bool Platform::writeDataToFile(
+	const MAUtil::String& filePath,
+	MAHandle outData)
+{
+	MAHandle file = openFileHelper(filePath);
+	if (file < 0)
+	{
+		return false;
+	}
+
+	int result = maFileWriteFromData(
+		file,
+		outData,
+		0,
+		maGetDataSize(outData));
+
+	maFileClose(file);
+
+	return result == 0;
+}
+
+/**
+ * Write a text string to a file.
+ * @return true on success, false on error.
+ */
+bool Platform::writeTextToFile(
+	const MAUtil::String& filePath,
+	const MAUtil::String& outText)
+{
+	MAHandle file = openFileHelper(filePath);
+	if (file < 0)
+	{
+		return false;
+	}
+
+	int result = maFileWrite(file, outText.c_str(), outText.length());
+
+	maFileClose(file);
+
+	return result == 0;
+}
+
+/**
+ * Read a data object from a file.
+ * @return true on success, false on error.
+ */
+bool Platform::readDataFromFile(
+	const MAUtil::String& filePath,
+	MAHandle inData)
+{
+
+	MAHandle file = openFileHelper(filePath);
+	if (file < 0)
+	{
+		return false;
+	}
+
+	int size = maFileSize(file);
+	if (size < 1)
+	{
+		return false;
+	}
+
+	int result = maFileReadToData(file, inData, 0, size);
+
+	maFileClose(file);
+
+	return result == 0;
+}
+
+/**
+ * Read a text string from a file.
+ * @return true on success, false on error.
+ */
+bool Platform::readTextFromFile(
+	const MAUtil::String& filePath,
+	MAUtil::String& inText)
+{
+	MAHandle file = openFileHelper(filePath);
+	if (file < 0)
+	{
+		return false;
+	}
+
+	int size = maFileSize(file);
+	if (size < 1)
+	{
+		return false;
+	}
+
+	// Allocate buffer with space for a null termination character.
+	char* buffer = (char*) malloc(sizeof(char) * (size + 1));
+
+	int result = maFileRead(file, buffer, size);
+
+	maFileClose(file);
+
+	buffer[size] = 0;
+	inText = buffer;
+
+	return result == 0;
+}
+
+/**
+ * Open a file for read/write access. Create the file if it does not exist.
+ * @return Handle to the open file, <0 on error.
+ */
+MAHandle Platform::openFileHelper(const MAUtil::String& filePath)
+{
+	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	if (!maFileExists(file))
+	{
+		int result = maFileCreate(file);
+		if (result < 0)
+		{
+			return -1;
+		}
+	}
+
+	return file;
+}
+
+/**
+ * Create a text string from a handle.
+ */
+MAUtil::String Platform::createTextFromHandle(MAHandle handle)
+{
+	// Get size of data.
+	int size = maGetDataSize(handle);
+
+	// Allocate space for text plus zero termination character.
+	char* tempText = (char*) malloc(size + 1);
+	if (NULL == tempText)
+	{
+		return "";
+	}
+
+    // Read text data from handle.
+    maReadData(handle, tempText, 0, size);
+
+    // Zero terminate string.
+    tempText[size] = 0;
+
+    // Create String object.
+    MAUtil::String text = tempText;
+
+    // Free temporary text.
+    free(tempText);
+
+    // Return text object.
+    return text;
 }
 
 // ================= Class PlatformUtilAndroid =================
@@ -141,61 +305,16 @@ PlatformUtil::~PlatformUtil()
 /**
  * Constructor.
  */
-PlatformUtilAndroid::PlatformUtilAndroid()
+PlatformAndroid::PlatformAndroid()
 {
-	char path[1024];
-
-	MAWidgetHandle widget = maWidgetCreate(MAW_WEB_VIEW);
-	if (widget < 0)
-	{
-		maPanic(0, "Could not create web view in PlatformUtilAndroid");
-	}
-
-	int result = maWidgetGetProperty(
-		widget,
-		"localFilesDirectory",
-		path,
-		1024);
-	if (result > 0)
-	{
-		mLocalFilesDirectory = path;
-	}
-	else
-	{
-		char message[128];
-		sprintf(message, "Could not get localFilesDirectory, result: %d", result);
-		maPanic(0, message);
-	}
-
-	maWidgetDestroy(widget);
 }
 
 /**
  * Destructor.
  */
-PlatformUtilAndroid::~PlatformUtilAndroid()
+PlatformAndroid::~PlatformAndroid()
 {
 	// Nothing needs to be explicitly destroyed.
-}
-
-/**
- * Get the path to the local file directory on Android.
- */
-MAUtil::String PlatformUtilAndroid::getLocalFileDirectory()
-{
-	return mLocalFilesDirectory;
-}
-
-/**
- * Helper method that writes a text string to a local file.
- */
-void PlatformUtilAndroid::writeTextToLocalFile(
-	const MAUtil::String& fileName,
-	const MAUtil::String& text)
-{
-	PlatformUtil::writeTextToFile(
-		getLocalFileDirectory() + fileName,
-		text);
 }
 
 // ================= Class PlatformUtilIOS =================
@@ -203,27 +322,16 @@ void PlatformUtilAndroid::writeTextToLocalFile(
 /**
  * Constructor.
  */
-PlatformUtilIOS::PlatformUtilIOS()
+PlatformIOS::PlatformIOS()
 {
 }
 
 /**
  * Destructor.
  */
-PlatformUtilIOS::~PlatformUtilIOS()
+PlatformIOS::~PlatformIOS()
 {
 	// Nothing needs to be explicitly destroyed.
-}
-
-/**
- * Helper method that writes a text string to a local file.
- */
-void PlatformUtilIOS::writeTextToLocalFile(
-	const MAUtil::String& fileName,
-	const MAUtil::String& text)
-{
-	// TODO: Implement.
-	maPanic(0, "PlatformUtilIOS::writeTextToLocalFile() is not implemented.");
 }
 
 // ================= Class WebViewMessage =================
@@ -293,13 +401,13 @@ MAUtil::String WebViewMessage::getMessageString()
 bool WebViewMessage::is(const MAUtil::String& messageName)
 {
 	// Start of messageName should be found at start of message string.
-		return 0 == mMessageString.find(messageName);
+	return 0 == mMessageString.find(messageName);
 }
 
 /**
- * Returns the data part of a message.
+ * Returns the parameter part of a message.
  */
-MAUtil::String WebViewMessage::getData()
+MAUtil::String WebViewMessage::getParams()
 {
 	// Must be at least three characters in a message
 	// that has a data part.
@@ -321,34 +429,39 @@ MAUtil::String WebViewMessage::getData()
 
 /**
  * Returns a message parameter by index.
+ * Parameters are separated by slashes.
  */
 MAUtil::String WebViewMessage::getParam(int index)
 {
 	// Get params.
-	MAUtil::String params = getData();
+	MAUtil::String params = getParams();
+
+	lprintfln("getParam params: %s", params.c_str());
 
 	// Find start slash of the param we look for.
 	int start = 0;
 	for (int i = 0; i < index; ++i)
 	{
-		start = mMessageString.find("/", start);
+		start = params.find("/", start);
 		if (MAUtil::String::npos == start)
 		{
 			// Param not found.
 			return "";
 		}
+		// Move to position after slash.
+		start = start + 1;
 	}
 
 	// Is this the last param?
-	int end = mMessageString.find("/", start);
+	int end = params.find("/", start);
 	if (MAUtil::String::npos == end)
 	{
 		// Yes, last param, return rest of the string.
-		return mMessageString.substr(start + 1);
+		return params.substr(start);
 	}
 	else
 	{
 		// No, not last param, return param part of the string.
-		return mMessageString.substr(start + 1, end);
+		return params.substr(start, end);
 	}
 }

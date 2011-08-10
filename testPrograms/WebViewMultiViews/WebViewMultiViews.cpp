@@ -33,7 +33,7 @@ MA 02110-1301, USA.
 
 #include "WebViewUtil.h"
 
-using namespace MoSync::UI;
+using namespace MoSync;
 
 class WebViewMultiViewsApp
 {
@@ -42,7 +42,7 @@ private:
 	MAWidgetHandle mWebViews[4];
 	MAWidgetHandle mButtonAllWhite;
 	MAWidgetHandle mButtonAllBlack;
-	PlatformUtil* mPlatformUtil;
+	Platform* mPlatform;
 
 public:
 	WebViewMultiViewsApp()
@@ -57,27 +57,7 @@ public:
 
 	void createUI()
 	{
-		PlatformUtil::checkNativeUISupport();
-
-		if (PlatformUtil::isAndroid())
-		{
-			mPlatformUtil = new PlatformUtilAndroid();
-		}
-		else if (PlatformUtil::isIOS())
-		{
-			mPlatformUtil = new PlatformUtilIOS();
-		}
-
-		// Commented out this since file loading is not yet
-		// implemented on iOS.
-
-//		// Write HTML resource files to the local file system
-//		// so they can be accessed by the web view.
-//		// TODO: This can be removed once automatic resource
-//		// unpacking of file systems is supported.
-//		mPlatformUtil->writeTextToLocalFile(
-//			"ColorPage.html",
-//			mPlatformUtil->getTextFromDataHandle(ColorPage_html));
+		mPlatform = Platform::create();
 
 		// Create screen.
 		mScreen = maWidgetCreate(MAW_SCREEN);
@@ -127,19 +107,26 @@ public:
 		maWidgetSetProperty(webView, "width", "-1");
 		maWidgetSetProperty(webView, "height", "-1");
 
-		// Commented out this since file loading is not yet
-		// implemented on iOS.
+		// Method 1: Directly html property of WebView.
 
-//		// Set the URL the web view displays.
-//		maWidgetSetProperty(webView, "url", "ColorPage.html");
+//		MAUtil::String html =
+//			mPlatform->createTextFromHandle(ColorPage_html);
+//		maWidgetSetProperty(webView, "html", html.c_str());
 
-		// Instead using this code to load the HTML.
+		// Method 2: Write html file to local file system.
 
-		// Set the HTML the web view displays.
-		MAUtil::String html =
-			mPlatformUtil->getTextFromDataHandle(ColorPage_html);
-		maWidgetSetProperty(webView, "html", html.c_str());
+		// Write HTML resource files to the local file system
+		// so they can be accessed by the web view.
+		// TODO: This can be removed once automatic resource
+		// unpacking of file systems is supported.
+		mPlatform->writeTextToFile(
+			mPlatform->getLocalPath() + "ColorPage.html",
+			mPlatform->createTextFromHandle(ColorPage_html));
 
+		// Set the URL the web view displays.
+		maWidgetSetProperty(webView, "url", "ColorPage.html");
+
+		// Register to receive messages from teh WebView.
 		WebViewMessage::getMessagesFor(webView);
 
 		return webView;
@@ -178,7 +165,7 @@ public:
 	void destroyUI()
 	{
 		maWidgetDestroy(mScreen);
-		delete mPlatformUtil;
+		delete mPlatform;
 	}
 
 	void runEventLoop()
@@ -197,10 +184,6 @@ public:
 					break;
 
 				case EVENT_TYPE_KEY_PRESSED:
-					if (event.key == MAK_MENU)
-					{
-						// TODO: Show menu in HTML/JS.
-					}
 					if (event.key == MAK_BACK)
 					{
 						isRunning = false;
@@ -236,7 +219,8 @@ public:
 				return;
 			}
 
-			maVibrate(500);
+			// This was just annoying! But good as a demo.
+			// maVibrate(500);
 
 			if (widget == mWebViews[0])
 			{
