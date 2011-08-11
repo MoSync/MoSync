@@ -31,8 +31,16 @@ public class WebWidget extends Widget
 	/**
 	 * TODO: Belongs to deprecated API. Remove when
 	 * the deprecated API is removed.
+	 * @deprecated
 	 */
+	@Deprecated
 	private String m_newUrl;
+
+	/**
+	 * The base URL used when setting the URL and HTML
+	 * properties.
+	 */
+	private String mBaseURL;
 
 	/**
 	 * The pattern used when determining which urls
@@ -66,6 +74,10 @@ public class WebWidget extends Widget
 	public WebWidget(int handle, WebView view)
 	{
 		super(handle, view);
+
+		// This base URL is used for the URL and HTML properties.
+		Activity activity = MoSyncThread.getInstance().getActivity();
+		mBaseURL = "file://" + activity.getFilesDir().getAbsolutePath() + "/";
 	}
 
 	/**
@@ -167,10 +179,6 @@ public class WebWidget extends Widget
 
 		if (property.equals(IX_WIDGET.MAW_WEB_VIEW_URL))
 		{
-			// Here we check if the url has schema specifier.
-			// This is done so that is there is no schema
-			// we use the file:// schema to load the file
-			// from the application's local file system.
 			String url = value;
 
 			// Add this url to the non-hooked urls. We want urls
@@ -179,21 +187,18 @@ public class WebWidget extends Widget
 			// hard hooks).
 			mNonHookedUrls.add(url);
 
+			// Here we check if the url has schema specifier.
+			// This is done so that is there is no schema
+			// we use the file:// schema to load the file
+			// from the application's local file system.
 			if (url.contains("://") || url.contains("javascript:"))
 			{
 				// There is a schema specified.
-
 				// Load the url.
 				webView.loadUrl(url);
 			}
 			else
 			{
-				// No schema present, add the local file:// schema
-				// and load the file.
-
-				// We need the activity.
-				Activity activity = MoSyncThread.getInstance().getActivity();
-
 //				// Old code kept as a reference.
 //				// We no longer use a content provider to load local files
 //				// from the web view. Instead we use a file:// scheme for
@@ -203,14 +208,9 @@ public class WebWidget extends Widget
 //				// as a reference in case it will be needed. /Micke
 //				url = "content://" + activity.getPackageName() + "/" + url;
 
-				// This is the way that use the file:// schema.
-				url =
-					"file://"
-					+ activity.getFilesDir().getAbsolutePath()
-					+ "/"
-					+ url;
-
-				// Load the url.
+				// No schema present
+				// Add the local file:// schema and load the url.
+				url = mBaseURL + url;
 				webView.loadUrl(url);
 			}
 		}
@@ -221,17 +221,6 @@ public class WebWidget extends Widget
 		}
 		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_HTML))
 		{
-			Activity activity = MoSyncThread.getInstance().getActivity();
-			webView.loadDataWithBaseURL(
-				// We use the path to the local application files
-				// directory as the base url.
-				// TODO: Update this path to the sub folder we will use.
-				"file://" + activity.getFilesDir().getAbsolutePath() + "/",
-				value,
-				"text/html",
-				"utf-8",
-				null);
-
 //			// Old code kept as a reference.
 //			// Here we specify the base url of our content provider.
 //			// See class comment of this class for details:
@@ -243,6 +232,19 @@ public class WebWidget extends Widget
 //				"text/html",
 //				"utf-8",
 //				null);
+
+			// Load the HTML data using the currently set base url.
+			webView.loadDataWithBaseURL(
+				mBaseURL,
+				value, // HTML data.
+				"text/html",
+				"utf-8",
+				null);
+
+		}
+		else if (property.equals("baseUrl")) //IX_WIDGET.MAW_WEB_VIEW_BASE_URL))
+		{
+			mBaseURL = value;
 		}
 		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_SOFT_HOOK))
 		{
@@ -309,14 +311,9 @@ public class WebWidget extends Widget
 		{
 			return webView.getUrl();
 		}
-		else if (property.equals("localFilesDirectory"))
+		else if (property.equals("baseUrl")) //IX_WIDGET.MAW_WEB_VIEW_BASE_URL))
 		{
-			// TODO: Update this path to the sub folder we will use
-			// for MoSync "asset" files.
-			Activity activity = MoSyncThread.getInstance().getActivity();
-			String path = activity.getFilesDir().getAbsolutePath() + "/";
-			Log.i("@@@ MoSync", "Property localFilesDirectory: " + path);
-			return path;
+			return mBaseURL;
 		}
 		else if (property.equals(IX_WIDGET.MAW_WEB_VIEW_NEW_URL))
 		{

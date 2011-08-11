@@ -32,151 +32,24 @@ MA 02110-1301, USA.
 #include "MAHeaders.h"
 #include "WebViewUtil.h"
 
-using namespace MoSync::UI;
-
-// Test that JavaScript runs in the browser.
-#define HTML1 " \
-	<html><body> \
-    <script>for(var i = 0; i < 100; ++i) { document.write('Hello World ' + i + '</br>'); }</script> \
-    </body></html>"
-
-// HTML2 has been removed.
-
-// Call MoSync via JavsScript from a clickable link.
-#define HTML3 " \
-	<html><body> \
-	<a href=\"#\" onclick=\"document.location = 'mosync://Notify/HelloWorld'\">Click Me</a></br> \
-    </body></html>"
-
-// Test many features in one example.
-#define HTML4 " \
-	<html> \
-	<head> \
-    <style type=\"text/css\"> \
-		div { font-size:1.8em; margin-top:20pt; } \
-		a { cursor: hand; } \
-		input { font-size:1.2em; } \
-	</style> \
-	</head> \
-	<body> \
-	<script> \
-		function MoSyncMessage(message) { \
-			document.location = 'mosync://' + message; } \
-		function ProcessData() { \
-			var message = 'ProcessData/' + document.getElementById(\"DataField\").value; \
-			MoSyncMessage(message); } \
-	</script> \
-	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
-	<div> \
-		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Yellow')\">Yellow</a> \
-		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Red')\">Red</a> \
-		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Green')\">Green</a> \
-	</div> \
-	<div id=\"ColorMessage\"></div> \
-	<div> \
-		<input type='text' id='DataField' /> \
-		<input type=\"button\" value=\"Press Me!\" onclick=\"ProcessData()\"/> \
-	</div> \
-	<div id=\"DataMessage\"></div> \
-	<div><a href=\"#\" onclick=\"MoSyncMessage('ExitApp')\">Exit Application</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncMessage('CreatePanic')\">Create Panic</a></div> \
-    </body> \
-    </html>"
-
-// Test that percent signs work (was an issue on Android).
-#define HTML5 " \
-	<html> \
-	<head> \
-    <style type=\"text/css\"> \
-		div { font-size:150%; margin-top:20pt; } \
-		a { cursor: hand; } \
-		input { font-size:120%; } \
-	</style> \
-	</head> \
-	<body> \
-	<script> \
-		function MoSyncMessage(message) { \
-			document.location = 'mosync://' + message; } \
-		function ProcessData() { \
-			var message = 'ProcessData/' + document.getElementById(\"DataField\").value; \
-			MoSyncMessage(message); } \
-	</script> \
-	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
-	<div> \
-		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Yellow')\">Yellow</a> \
-		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Red')\">Red</a> \
-		<a href=\"#\" onclick=\"MoSyncMessage('BgColor/Green')\">Green</a> \
-	</div> \
-	<div id=\"ColorMessage\"></div> \
-	<div> \
-		<input type='text' id='DataField' /> \
-		<input type=\"button\" value=\"Press Me!\" onclick=\"ProcessData()\"/> \
-	</div> \
-	<div id=\"DataMessage\"></div> \
-	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncMessage('ExitApp')\">Exit Application</a></div> \
-    </body> \
-    </html>"
-
-// Test subjective performance of JS background color change,
-// if better than via MoSync roundtrip.
-#define HTML6 " \
-	<html> \
-	<head> \
-    <style type=\"text/css\"> \
-		div { font-size:1.8em; margin-top:20pt; } \
-		a { cursor: hand; } \
-		input { font-size:1.2em; } \
-	</style> \
-	</head> \
-	<body> \
-	<script> \
-		function SetBgColor(color) { \
-			document.getElementById('ColorMessage').innerHTML = color + ' is a beautiful color!'; \
-			document.bgColor = color; } \
-		function MoSyncMessage(message) { \
-			document.location = 'mosync://' + message; } \
-		function ProcessData() { \
-			var message = 'ProcessData/' + document.getElementById(\"DataField\").value; \
-			MoSyncMessage(message); } \
-	</script> \
-	<div style=\"margin-top:0pt; margin-bottom:10pt;\">Touch a color or press a keypad number key!</div> \
-	<div> \
-		<a href=\"#\" onclick=\"SetBgColor('Yellow')\">Yellow</a> \
-		<a href=\"#\" onclick=\"SetBgColor('Red')\">Red</a> \
-		<a href=\"#\" onclick=\"SetBgColor('Green')\">Green</a> \
-	</div> \
-	<div id=\"ColorMessage\"></div> \
-	<div> \
-		<input type='text' id='DataField' /> \
-		<input type=\"button\" value=\"Press Me!\" onclick=\"ProcessData()\"/> \
-	</div> \
-	<div id=\"DataMessage\"></div> \
-	<div><a href=\"http://www.jqtouch.com/preview/demos/main/#home\">Open jQTouch Demo</a></div> \
-	<div><a href=\"#\" onclick=\"MoSyncMessage('ExitApp')\">Exit Application</a></div> \
-    </body> \
-    </html>"
-
-// Script to set the background color of the web page.
-#define BGCOLOR_SCRIPT "javascript: \
-	document.getElementById(\"ColorMessage\").innerHTML = '%s is a beautiful color.'; \
-	document.bgColor='%s';"
-
-// Script to display a text on the web page.
-#define MESSAGE_SCRIPT "javascript: \
-	document.getElementById(\"DataMessage\").innerHTML = '%s';"
+using namespace MoSync;
 
 class WebViewTestApp
 {
 private:
 	MAWidgetHandle mScreen;
 	MAWidgetHandle mWebView;
-	PlatformUtil* mPlatformUtil;
+	Platform* mPlatform;
 	int mPageLoadCounter;
 
 public:
 	WebViewTestApp() : mPageLoadCounter(0)
 	{
+		// Create platform utility handler.
+		mPlatform = Platform::create();
+
+		createFiles();
+
 		createUI();
 	}
 
@@ -185,19 +58,24 @@ public:
 		destroyUI();
 	}
 
+	void createFiles()
+	{
+		// Create local HTML files we want to refer to by urls.
+		// We read data from resources and write to files.
+		// TODO: This can be removed once automatic resource
+		// unpacking of file systems is supported.
+
+		mPlatform->writeTextToFile(
+			mPlatform->getLocalPath() + "PageOne.html",
+			mPlatform->createTextFromHandle(PageOne_html));
+
+		mPlatform->writeTextToFile(
+			mPlatform->getLocalPath() + "PageTwo.html",
+			mPlatform->createTextFromHandle(PageTwo_html));
+	}
+
 	void createUI()
 	{
-		PlatformUtil::checkNativeUISupport();
-
-		if (PlatformUtil::isAndroid())
-		{
-			mPlatformUtil = new PlatformUtilAndroid();
-		}
-		else if (PlatformUtil::isIOS())
-		{
-			mPlatformUtil = new PlatformUtilIOS();
-		}
-
 		// Create screen.
 		mScreen = maWidgetCreate(MAW_SCREEN);
 		widgetShouldBeValid(mScreen, "Could not create screen");
@@ -210,10 +88,8 @@ public:
 		maWidgetSetProperty(mWebView, "width", "-1");
 		maWidgetSetProperty(mWebView, "height", "-1");
 
-		// Set the HTML the web view displays.
-		MAUtil::String html =
-			mPlatformUtil->getTextFromDataHandle(MainPage_html);
-		maWidgetSetProperty(mWebView, "html", html.c_str());
+		// Set the initial HTML the web view displays.
+		setMainPageHtml();
 
 		// Enable zooming.
 		maWidgetSetProperty(mWebView, "enableZoom", "true");
@@ -226,6 +102,13 @@ public:
 
 		// Show the screen.
 		maWidgetScreenShow(mScreen);
+	}
+
+	void setMainPageHtml()
+	{
+		MAUtil::String html =
+			mPlatform->createTextFromHandle(MainPage_html);
+		maWidgetSetProperty(mWebView, "html", html.c_str());
 	}
 
 	void destroyUI()
@@ -269,9 +152,7 @@ public:
 						{
 							// Load the original page.
 							mPageLoadCounter = 0;
-							MAUtil::String html =
-								mPlatformUtil->getTextFromDataHandle(MainPage_html);
-							maWidgetSetProperty(mWebView, "html", html.c_str());
+							setMainPageHtml();
 						}
 						else
 						{
@@ -319,7 +200,7 @@ public:
 			if (message.is("BgColor"))
 			{
 				// This is calls JavaScript.
-				setBgColor(message.getData());
+				setBgColor(message.getParam(0));
 			}
 			else if (message.is("ProcessData"))
 			{
@@ -328,7 +209,7 @@ public:
 				// back a result to the WebView.
 
 				// This is calls JavaScript.
-				displayText(MAUtil::String("You wrote: ") + message.getData());
+				displayText(MAUtil::String("You wrote: ") + message.getParam(0));
 			}
 			else if (message.is("ExitApp"))
 			{
@@ -366,14 +247,24 @@ public:
 	void setBgColor(const MAUtil::String& color)
 	{
 		char script[256];
-		sprintf(script, BGCOLOR_SCRIPT, color.c_str(), color.c_str());
+		sprintf(
+			script,
+			"javascript:document.getElementById(\"ColorMessage\")"
+			".innerHTML = '%s is a beautiful color.'; "
+			"document.bgColor='%s';",
+			color.c_str(),
+			color.c_str());
 		runScript(script);
 	}
 
 	void displayText(const MAUtil::String& text)
 	{
 		char script[256];
-		sprintf(script, MESSAGE_SCRIPT, text.c_str());
+		sprintf(
+			script,
+			"javascript:document.getElementById(\"DataMessage\")"
+			".innerHTML = '%s';",
+			text.c_str());
 		runScript(script);
 	}
 

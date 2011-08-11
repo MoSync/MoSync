@@ -8,7 +8,7 @@ import com.mosync.nativeui.ui.widgets.Widget;
 /**
  * Creates a web view which sends MoSync events for some of its
  * state changes.
- * 
+ *
  * @author Mikael Kindborg
  */
 public class WebViewFactory implements AbstractViewFactory
@@ -19,4 +19,3 @@ public class WebViewFactory implements AbstractViewFactory
 		return WebWidget.create(activity, handle);
 	}
 }
-//End of class WebViewFactory.

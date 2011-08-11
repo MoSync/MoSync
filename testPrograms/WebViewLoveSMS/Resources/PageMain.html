@@ -20,9 +20,20 @@ html, body
   display: block;
   margin: 0.1em auto;
   font-size: 3.5em;
+  font-weight: bold;
   color: white;
   text-align: center;
   /*background-color:green;*/
+}
+
+#Message
+{
+  display: block;
+  margin: 1.3em auto;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: black;
+  text-align: center;
 }
 
 .button
@@ -72,7 +83,6 @@ html, body
   font-weight: bold;
   background-color: #D6E5F4;
 }
-
 </style>
 
 <script>
@@ -94,7 +104,8 @@ function SendLoveSMS()
 {
   if (ValidatePhoneNo())
   {
-    alert('SendLoveSMS/' + GetPhoneNo());
+    //alert('SendLoveSMS/' + GetPhoneNo());
+	DisplayMessage('Sending...');
     SendMoSyncMessage('SendLoveSMS/' + GetPhoneNo());
   }
 }
@@ -103,27 +114,32 @@ function SendKissSMS()
 {
   if (ValidatePhoneNo())
   {
-    alert('SendLoveSMS/' + GetPhoneNo());
+    // alert('SendLoveSMS/' + GetPhoneNo());
+	DisplayMessage('Sending...');
     SendMoSyncMessage('SendLoveSMS/' + GetPhoneNo());
   }
-  var phoneNo = GetPhoneNo();
-  alert('Sending Love SMS to ' + phoneNo);
-  SendMoSyncMessage('SendKissSMS/' + phoneNo);
 }
 
-function ValidatePhoneNo()
+var DisplayMessageTimer = 0;
+
+// Display a message for 5 seconds.
+function DisplayMessage(message)
 {
-  var phoneNo = CleanPhoneNo(GetPhoneNo());
-  if (phoneNo.length < 6)
+  if (0 != DisplayMessageTimer)
   {
-    alert('Not a valid phone number.' + GetPhoneNo());
-    return false;
+    clearTimeout(DisplayMessageTimer);
+	DisplayMessageTimer = 0;
   }
-  else
+  document.getElementById("Message").innerHTML = message;
+  if (message != "")
   {
-    SetPhoneNo(phoneNo);
-    return true;
+    DisplayMessageTimer = setTimeout("DisplayMessage('')", 5000);
   }
+}
+
+function SetPhoneNo(number)
+{
+  document.getElementById("PhoneNo").value = number;
 }
 
 function GetPhoneNo()
@@ -131,9 +147,20 @@ function GetPhoneNo()
   return document.getElementById("PhoneNo").value;
 }
 
-function SetPhoneNo(number)
+function ValidatePhoneNo()
 {
-  document.getElementById("PhoneNo").value = number;
+  var phoneNo = CleanPhoneNo(GetPhoneNo());
+  if (phoneNo.length < 6)
+  {
+    //alert('Not a valid phone number.' + GetPhoneNo());
+	DisplayMessage('Invalid phone number');
+    return false;
+  }
+  else
+  {
+    SetPhoneNo(phoneNo);
+    return true;
+  }
 }
 
 //
@@ -169,7 +196,6 @@ function IsDigit(ch)
     '8' == ch ||
     '9' == ch;
 }
-
 </script>
 </head>
 
@@ -182,6 +208,7 @@ function IsDigit(ch)
     <input id="PhoneNo" type="text" />
     <div class="button" onclick="SendLoveSMS()">Send Eternal Love</div>
     <div class="button" onclick="SendKissSMS()">Send Warm Kisses</div>
+    <div id="Message"></div>
   </div>
 </div>
 <script>

@@ -120,18 +120,13 @@ public:
 		// TODO: This can be removed once automatic resource
 		// unpacking of file systems is supported.
 		mPlatform->writeTextToFile(
-			mPlatform->getLocalPath() + "ColorPage.html",
+			mPlatform->getLocalPath() + "Assets/ColorPage.html",
 			mPlatform->createTextFromHandle(ColorPage_html));
 
 		// Set the URL the web view displays.
-		// We should support both absolute file url and
+		// We support both absolute file url and
 		// as url that assumes a url base is set.
-//		maWidgetSetProperty(webView, "url", "ColorPage.html");
-		MAUtil::String url =
-			MAUtil::String("file://") +
-			mPlatform->getLocalPath() +
-			"ColorPage.html";
-		maWidgetSetProperty(webView, "url", url.c_str());
+		maWidgetSetProperty(webView, "url", "ColorPage.html");
 
 		// Register to receive messages from the WebView.
 		WebViewMessage::getMessagesFor(webView);

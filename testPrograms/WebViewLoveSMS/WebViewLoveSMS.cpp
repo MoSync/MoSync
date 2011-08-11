@@ -202,7 +202,7 @@ public:
 			if (message.is("PageLoaded"))
 			{
 				// Set saved phone number here.
-
+				setSavedPhoneNo();
 			}
 		}
 	}
@@ -214,25 +214,55 @@ public:
 		lprintfln("*** SMS to: %s", phoneNo.c_str());
 		lprintfln("*** SMS data: %s", message.c_str());
 
+		// Save the phone number.
+		savePhoneNo(phoneNo);
+
+		// Send the message.
 		int result = maSendTextSMS(
 			phoneNo.c_str(),
 			message.c_str());
 
-		// TODO: Provide feedback via JS.
+		// Provide feedback via JS.
+		if (0 == result)
+		{
+			displayMessage("Lovely SMS sent :)");
+		}
+		else
+		{
+			displayMessage("Could not send SMS :(");
+		}
 	}
 
-	void setSavedPhoneNo()
+	/**
+	 * Display a status message in the WebView.
+	 */
+	void displayMessage(const MAUtil::String& message)
 	{
 		char script[512];
-
-		// Read phone n
 		sprintf(
 			script,
-			"javascript:SetPhoneNo('%s')",
-			"phoneNo");
+			"javascript:DisplayMessage('%s')",
+			message.c_str());
 		maWidgetSetProperty(mWebView, "url", script);
 	}
 
+	/**
+	 * Read saved phone number and set it on
+	 * the JavaScript side.
+	 */
+	void setSavedPhoneNo()
+	{
+		char script[512];
+		sprintf(
+			script,
+			"javascript:SetPhoneNo('%s')",
+			loadPhoneNo().c_str());
+		maWidgetSetProperty(mWebView, "url", script);
+	}
+
+	/**
+	 * Save the phone number.
+	 */
 	void savePhoneNo(const MAUtil::String& phoneNo)
 	{
 		MAUtil::String path =
@@ -241,6 +271,9 @@ public:
 		mPlatform->writeTextToFile(path, phoneNo);
 	}
 
+	/**
+	 * Load the phone number.
+	 */
 	MAUtil::String loadPhoneNo()
 	{
 		MAUtil::String path =
@@ -257,7 +290,6 @@ public:
 			return "";
 		}
 	}
-
 
 	void widgetShouldBeValid(MAWidgetHandle widget, const char* panicMessage)
 	{
