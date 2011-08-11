@@ -121,7 +121,7 @@ Platform::~Platform()
  */
 MAUtil::String Platform::getLocalPath()
 {
-	int bufferSize = 512;
+	int bufferSize = 1024;
 	char buffer[bufferSize];
 
 	int size = maGetSystemProperty(
@@ -176,7 +176,7 @@ bool Platform::writeTextToFile(
 	{
 		return false;
 	}
-
+	lprintfln("Platform::writeTextToFile: %s", filePath.c_str());
 	int result = maFileWrite(file, outText.c_str(), outText.length());
 
 	maFileClose(file);

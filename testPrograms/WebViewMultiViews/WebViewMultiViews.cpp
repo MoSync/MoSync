@@ -64,13 +64,13 @@ public:
 		widgetShouldBeValid(mScreen, "Could not create screen");
 
 		// Create layouts.
-		MAWidgetHandle verticalLayout = createLayout(MAW_VERTICAL_LAYOUT);
-		MAWidgetHandle horizontalLayoutOne = createLayout(MAW_HORIZONTAL_LAYOUT);
-		MAWidgetHandle horizontalLayoutTwo = createLayout(MAW_HORIZONTAL_LAYOUT);
-		MAWidgetHandle horizontalLayoutThree = createLayout(MAW_HORIZONTAL_LAYOUT);
+		MAWidgetHandle verticalLayout = createLayout(MAW_VERTICAL_LAYOUT, "-1", "-1");
+		MAWidgetHandle horizontalLayoutOne = createLayout(MAW_HORIZONTAL_LAYOUT, "-1", "200");
+		MAWidgetHandle horizontalLayoutTwo = createLayout(MAW_HORIZONTAL_LAYOUT, "-1", "200");
+		MAWidgetHandle horizontalLayoutThree = createLayout(MAW_HORIZONTAL_LAYOUT, "-1", "80");
 
 		// Shrink wrap last layout, which will be used for buttons.
-		maWidgetSetProperty(horizontalLayoutThree, "height", "-2");
+		maWidgetSetProperty(horizontalLayoutThree, "height", "80");
 
 		// Create web views.
 		mWebViews[0] = createWebView();
@@ -120,18 +120,13 @@ public:
 		// TODO: This can be removed once automatic resource
 		// unpacking of file systems is supported.
 		mPlatform->writeTextToFile(
-			mPlatform->getLocalPath() + "ColorPage.html",
+			mPlatform->getLocalPath() + "Assets/ColorPage.html",
 			mPlatform->createTextFromHandle(ColorPage_html));
 
 		// Set the URL the web view displays.
 		// We should support both absolute file url and
 		// as url that assumes a url base is set.
-//		maWidgetSetProperty(webView, "url", "ColorPage.html");
-		MAUtil::String url =
-			MAUtil::String("file://") +
-			mPlatform->getLocalPath() +
-			"ColorPage.html";
-		maWidgetSetProperty(webView, "url", url.c_str());
+		maWidgetSetProperty(webView, "url", "ColorPage.html");
 
 		// Register to receive messages from the WebView.
 		WebViewMessage::getMessagesFor(webView);
@@ -156,15 +151,15 @@ public:
 		return button;
 	}
 
-	MAWidgetHandle createLayout(const char* type)
+	MAWidgetHandle createLayout(const char* type, const char * width, const char * height)
 	{
 		// Create web view
 		MAWidgetHandle layout = maWidgetCreate(type);
 		widgetShouldBeValid(layout, "Could not create layout");
 
 		// Set size of the layout to fill the parent.
-		maWidgetSetProperty(layout, "width", "-1");
-		maWidgetSetProperty(layout, "height", "-1");
+		maWidgetSetProperty(layout, "width", width);
+		maWidgetSetProperty(layout, "height", height);
 
 		return layout;
 	}

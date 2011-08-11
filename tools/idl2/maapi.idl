@@ -2719,6 +2719,10 @@ interface MAAPI {
 		* on devices that have a local file system. The returned path has a
 		* trailing slash character ('/').
 		*
+		* "mosync.path.local.url" is the absolute file URL to the local file system,
+		* on devices that have a local file system. The returned URL has a
+		* trailing slash character ('/').
+		*
 		* \param key The property's key.
 		* \param buf A buffer where the value should be written.
 		* \param size The size of the buffer, in bytes.
@@ -4359,6 +4363,21 @@ group WidgetAPI "Widget API" {
 		*/
 		HTML = "html";
 		
+		/**
+		* @brief Set the base URL used by the web-view when loading relative paths.
+		* The value of this URL is used when setting the #MAW_WEB_VIEW_URL and
+		* #MAW_WEB_VIEW_HTML properties. The default value for this property points to
+		* the Assets folder in the local file system ("file://pathToLocalFileSystem/Assets/").
+		*
+		* @note Use: #maGetSystemProperty ("mosync.path.local.url") to find the baseURL
+		* for the local file system.
+		*
+		* @validvalue Any valid URL schema.
+		*
+		* @setandget
+		*/
+		BASE_URL = "baseUrl";
+
 		/**
 		* @brief Set the pattern used to "soft hook" urls, to get notified
 		* when pages are being loaded.
