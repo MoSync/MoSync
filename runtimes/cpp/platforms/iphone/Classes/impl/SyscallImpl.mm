@@ -877,14 +877,14 @@ namespace Base {
 #undef maIOCtl_glGetPointerv_case
 #define maIOCtl_glGetPointerv_case(func) \
 case maIOCtl_glGetPointerv: \
-{ \
+{\
 return IOCTL_UNAVAILABLE; \
 }
     
 #undef maIOCtl_glGetVertexAttribPointerv_case
 #define maIOCtl_glGetVertexAttribPointerv_case(func) \
 case maIOCtl_glGetVertexAttribPointerv: \
-{ \
+{\
 return IOCTL_UNAVAILABLE; \
 }
     

@@ -26,9 +26,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <jni.h>
 #include <GLES/gl.h>
+#include <GLES2/gl2.h>
 
 #include "helpers/CPP_IX_AUDIOBUFFER.h"
 #include "helpers/CPP_IX_OPENGL_ES.h"
+#include "helpers/CPP_IX_GL1.h"
+#include "helpers/CPP_IX_GL2.h"
+//#include "helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h"
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
@@ -1193,9 +1197,9 @@ namespace Base
 	 * calls the real implementation _maOpenGLInitFullscreen
 	 * in ioctl.h.
 	 */
-	int maOpenGLInitFullscreen()
+	int maOpenGLInitFullscreen(int glApi)
 	{
-		return _maOpenGLInitFullscreen();
+		return _maOpenGLInitFullscreen(glApi, mJNIEnv, mJThis);
 	}
 	
 	/**
@@ -1205,8 +1209,59 @@ namespace Base
 	 */
 	int maOpenGLCloseFullscreen()
 	{
-		return _maOpenGLCloseFullscreen();
+		return _maOpenGLCloseFullscreen(mJNIEnv, mJThis);
 	}
+	
+// the wrapper generator can't yet handle a few set of functions
+// in the opengles 2.0 api (so we manually override them).
+// remove implementations for broken bindings..
+	#undef maIOCtl_glGetPointerv_case
+	#define maIOCtl_glGetPointerv_case(func) \
+	case maIOCtl_glGetPointerv: \
+	{ \
+	return IOCTL_UNAVAILABLE; \
+	}
+    
+	#undef maIOCtl_glGetVertexAttribPointerv_case
+	#define maIOCtl_glGetVertexAttribPointerv_case(func) \
+	case maIOCtl_glGetVertexAttribPointerv: \
+	{ \
+	return IOCTL_UNAVAILABLE; \
+	}
+    
+	#undef maIOCtl_glShaderSource_case
+	#define maIOCtl_glShaderSource_case(func) \
+	case maIOCtl_glShaderSource: \
+	{ \
+	GLuint _shader = (GLuint)a; \
+	GLsizei _count = (GLsizei)b; \
+	void* _string = GVMR(c, MAAddress); \
+	const GLint* _length = GVMR(SYSCALL_THIS->GetValidatedStackValue(0 VSV_ARGPTR_USE), GLint); \
+	wrap_glShaderSource(_shader, _count, _string, _length); \
+	return 0; \
+	}
+
+    void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
+        
+        int* stringsArray = (int*)strings;
+        const GLchar** strCopies = new const GLchar*[count];
+        
+        for(int i = 0; i < count; i++) {
+            void* src = GVMR(stringsArray[i], MAAddress);
+            strCopies[i] = (GLchar*)src;
+    		__android_log_write(ANDROID_LOG_INFO, 
+								"@@@ MoSync gl strings", 
+								strCopies[i]);
+        }
+        
+        
+        char temp[1024];
+        sprintf(temp, "shader: %d, count: %d, length: %d, strCopies: %s", shader, count, length, strCopies[0]);
+    		__android_log_write(ANDROID_LOG_INFO, 
+								"@@@ MoSync glShaderSource", temp);        
+        glShaderSource(shader, count, strCopies, length);
+        delete strCopies;     
+    }	
 	
 	/**
 	 * Utility function for displaying and catching pending
@@ -1252,7 +1307,10 @@ namespace Base
 		switch(function)
 		{
 		maIOCtl_IX_OPENGL_ES_caselist
-		
+		maIOCtl_IX_GL1_caselist
+		maIOCtl_IX_GL2_caselist
+	//	maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist
+
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");
 			return _maWriteLog((const char*)gSyscall->GetValidatedMemRange(a, b), b, mJNIEnv, mJThis);

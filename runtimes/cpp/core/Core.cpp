@@ -1030,6 +1030,7 @@ void WRITE_REG(int reg, int value) {
 #endif
 	}
 	void* GetValidatedMemRange(int address, int size) {
+		if(address == 0) return NULL;
 		if(uint(address) >= DATA_SEGMENT_SIZE || uint(address+size) >= DATA_SEGMENT_SIZE ||
 			uint(size) > DATA_SEGMENT_SIZE)
 			BIG_PHAT_ERROR(ERR_MEMORY_OOB);

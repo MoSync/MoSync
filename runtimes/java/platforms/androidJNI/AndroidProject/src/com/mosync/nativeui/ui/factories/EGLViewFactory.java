@@ -19,6 +19,13 @@ import com.mosync.nativeui.ui.widgets.Widget;
  */
 public class EGLViewFactory implements AbstractViewFactory
 {	
+	private int m_glApi;
+
+	public EGLViewFactory(int glApi) {
+		super( );
+		m_glApi = glApi;
+	}
+
 	/**
 	 * @see AbstractViewFactory.create.
 	 */
@@ -26,7 +33,7 @@ public class EGLViewFactory implements AbstractViewFactory
 	public Widget create(Activity activity, final int handle)
 	{
 		FrameLayout eglFrame = new FrameLayout( activity );
-		EGLView eglView = new EGLView( activity );
+		EGLView eglView = new EGLView( activity, m_glApi );
 		eglView.setLayoutParams( new LayoutParams( LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT ) );
 		eglView.setEglViewReadyListener( new EGLViewReadyListener( ) {
 			

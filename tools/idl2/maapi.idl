@@ -3350,6 +3350,11 @@ group WidgetAPI "Widget API" {
 		GL_VIEW = "GLView";
 
 		/**
+		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
+		 */
+		GL2_VIEW = "GL2View";
+
+		/**
 		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
 		 */	
 		WEB_VIEW = "WebView";

@@ -42,6 +42,7 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
+import com.mosync.internal.generated.IX_OPENGL_ES;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -1018,8 +1019,13 @@ public class MoSyncThread extends Thread
 		//SYSLOG("maUpdateScreen");
 		Canvas lockedCanvas = null;
 		
-		if (mMoSyncView == null) return;
+		if(mOpenGLView != -1) {
+			maWidgetSetProperty(mOpenGLView, "invalidate", "");
+			return;
+		}
 		
+		if (mMoSyncView == null) return;
+
 		mIsUpdatingScreen = true;
 		
 		try 
@@ -2984,7 +2990,7 @@ public class MoSyncThread extends Thread
 	{
 		return ((0 != n) && (0 == (n & (n - 1)))); 
 	}
-	
+
 	/**
 	 * Return a number that is the next higher power of two after n.
 	 * @param n Number to test.
@@ -3000,6 +3006,39 @@ public class MoSyncThread extends Thread
 		}
 		
 		return powerOf2;
+	}
+
+
+	private int mOpenGLScreen = -1;
+	private int mOpenGLView = -1;
+
+	int maOpenGLInitFullscreen(int glApi) {
+		if(mOpenGLScreen != -1) return 0;
+
+        if(glApi == IX_OPENGL_ES.MA_GL_API_GL1)
+            mOpenGLView = maWidgetCreate("GLView");
+        else if(glApi == IX_OPENGL_ES.MA_GL_API_GL2)
+            mOpenGLView = maWidgetCreate("GL2View");
+        else
+            return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;
+
+        mOpenGLScreen = maWidgetCreate("Screen");
+		maWidgetSetProperty(mOpenGLView, "width", "-1");
+		maWidgetSetProperty(mOpenGLView, "height", "-1");
+		maWidgetAddChild(mOpenGLScreen, mOpenGLView);
+		maWidgetScreenShow(mOpenGLScreen);
+		maWidgetSetProperty(mOpenGLView, "bind", "");
+		return 1;
+	}
+
+	int maOpenGLCloseFullscreen() {
+		if(mOpenGLScreen == -1) return 0;
+		maWidgetRemoveChild(mOpenGLView);
+		maWidgetDestroy(mOpenGLView);
+		maWidgetDestroy(mOpenGLScreen);
+		mOpenGLView = -1;
+		mOpenGLScreen = -1;
+		return 1;
 	}
 	
 	int maFileOpen(String path, int mode)

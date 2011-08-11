@@ -18,15 +18,15 @@ import android.view.SurfaceView;
  * This view acts as a placeholder for an OpenGL surface
  * by extending a SurfaceView which is a general placeholder
  * for any kind of surface.
- * 
+ *
  * The EGLView is fairly similar to the GLSurfaceView with
  * the exception that its rendered content is provided by
  * the MoSync user, rather than from a separate rendering
  * thread. The reason for this design is:
- * 
+ *
  * Using the GLSurfaceView we cannot bind the EGLContext to
  * the MoSync interpreter thread that issues the OpenGL calls.
- * 
+ *
  * @author fmattias
  */
 public class EGLView extends SurfaceView implements SurfaceHolder.Callback
@@ -35,12 +35,12 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 	 * Reference to the holder and controller of this surface.
 	 */
 	private SurfaceHolder m_holder = null;
-	
+
 	/**
 	 * Holds the EGL information necessary to draw onto an
 	 */
-	private EGLState m_eglState = new EGLState( );
-	
+	private EGLState m_eglState;
+
 	/**
 	 * Listener for egl view ready listener.
 	 */
@@ -48,13 +48,14 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param context Context in which the view is created.
 	 */
-	public EGLView(Context context)
+	public EGLView(Context context, int glApi)
 	{
 		super( context );
-		
+
+		m_eglState = new EGLState(glApi);
 		m_holder = getHolder( );
 		m_holder.addCallback( this );
 		m_holder.setType( SurfaceHolder.SURFACE_TYPE_GPU );
@@ -73,7 +74,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 	/**
 	 * Makes the surface ready to be drawn on, by binding
 	 * it to the current EGL context.
-	 * 
+	 *
 	 * Note: You must call the finishRender function to
 	 * draw the surface on the screen.
 	 */
@@ -90,18 +91,18 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 	{
 		m_eglState.finishRender( );
 	}
-	
+
 	/**
 	 * Sets a listener that notifies when the EGL view has been created
 	 * and is ready to be drawn.
-	 * 
+	 *
 	 * @param readyListener The listener to call.
 	 */
 	public void setEglViewReadyListener(EGLViewReadyListener readyListener)
 	{
 		m_readyListener = readyListener;
 	}
-	
+
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height)
@@ -132,9 +133,9 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 
 	/**
 	 * This class is responsible for holding and updating
-	 * an EGL context and its surface, as the state of 
+	 * an EGL context and its surface, as the state of
 	 * the surface view changes.
-	 * 
+	 *
 	 * @author fmattias
 	 */
 	public class EGLState
@@ -143,38 +144,41 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		 * The configuration of the context.
 		 */
 		private EGLConfig m_config = null;
-		
+
 		/**
 		 * The current context.
 		 */
 		private EGLContext m_context = null;
-		
+
 		/**
 		 * The active surface.
 		 */
 		private EGLSurface m_surface = null;
-		
+
 		/**
 		 * Access to EGL functions.
 		 */
 		private EGL10 m_egl = (EGL10) EGLContext.getEGL( );
-		
+
 		/**
 		 * Workaround for eglGetCurrentSurface that is not implemented
 		 * correctly on android. It destroys the context or crashes.
 		 */
 		private boolean m_surfaceIsCurrent = false;
-		
+
 		/**
 		 * This lock and condition guards the surface from being destroyed
 		 * while changing the EGLContext.
 		 */
 		private final Lock m_surfaceLock = new ReentrantLock( );
 
-		public EGLState()
+		private int m_glApi;
+
+		public EGLState(int glApi)
 		{
+			m_glApi = glApi;
 			EGLManager.initEgl( );
-			m_config = EGLConfigFactory.findConfig( m_egl, EGLManager.getDisplay( ) );
+			m_config = EGLConfigFactory.findConfig( m_egl, EGLManager.getDisplay( ), m_glApi);
 		}
 
 		/**
@@ -192,7 +196,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			 * Create an OpenGL ES context. This must be done only once, an
 			 * OpenGL context is a somewhat heavy object.
 			 */
-			m_context = EGLContextFactory.createContext( m_egl, m_config, EGLManager.getDisplay( ) );
+			m_context = EGLContextFactory.createContext( m_egl, m_config, EGLManager.getDisplay( ), m_glApi);
 			int eglError = m_egl.eglGetError( );
 			if( m_context == null || m_context == EGL10.EGL_NO_CONTEXT || eglError != EGL10.EGL_SUCCESS )
 			{
@@ -203,7 +207,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		/**
 		 * Makes the surface ready to be drawn on, by binding
 		 * it to the current EGL context.
-		 * 
+		 *
 		 * @return The surface that can be drawn on.
 		 */
 		public void prepareForRender()
@@ -212,7 +216,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			{
 				return;
 			}
-			
+
 			/**
 			 * If our surface is already set up, do nothing.
 			 */
@@ -220,7 +224,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			{
 				return;
 			}
-			
+
 			/*
 			 * Before we can issue GL commands, we need to make sure the context
 			 * is current and bound to a surface.
@@ -236,7 +240,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			setSurfaceCurrent( true );
 			m_surfaceLock.unlock( );
 		}
-		
+
 		/**
 		 * Draws the open GL surface on the screen, and makes it possible
 		 * to change the underlying SurfaceView again.
@@ -247,25 +251,25 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			{
 				return;
 			}
-			
+
 			m_surfaceLock.lock( );
 			// Wait for pending GL commands to finish and draw the surface
 			// onto the screen.
 			m_egl.eglWaitGL();
-			
+
 			m_egl.eglSwapBuffers( EGLManager.getDisplay( ), m_surface );
 			int eglError = m_egl.eglGetError( );
 			if( eglError != EGL10.EGL_SUCCESS )
 			{
 				Log.i( "EGLView", "Error while swapping buffers. EGL Error: " + eglError );
 			}
-			
+
 			m_surfaceLock.unlock( );
 		}
 
 		/**
 		 * Creates a new surface associated with this EGL state.
-		 * 
+		 *
 		 * @param holder Reference to the holder and controller of the SurfaceView
 		 *               that this EGLState is bound to.
 		 * @param width Width of the surface.
@@ -273,8 +277,9 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		 */
 		public void newSurface(SurfaceHolder holder, int width, int height)
 		{
+
 			m_surfaceLock.lock( );
-			
+
 			/*
 			 * The window size has changed, so we need to create a new surface.
 			 */
@@ -289,14 +294,14 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			/*
 			 * Create an EGL surface we can render into.
 			 */
-			m_surface = EGLSurfaceFactory.createSurface( m_egl, m_config, EGLManager.getDisplay( ), holder );
+			m_surface = EGLSurfaceFactory.createSurface( m_egl, m_config, EGLManager.getDisplay( ), holder);
 			if( m_surface == null || m_surface == EGL10.EGL_NO_SURFACE || m_egl.eglGetError( ) != EGL10.EGL_SUCCESS )
 			{
 				Log.i( "EGLView", "Failed to create surface. EGL Error: " + m_egl.eglGetError( ) );
 				m_surfaceLock.unlock( );
 				throw new RuntimeException( "Failed to create surface." );
 			}
-			
+
 			setSurfaceCurrent( false );
 			
 			m_surfaceLock.unlock( );
@@ -309,20 +314,20 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		public void destroySurface()
 		{
 			m_surfaceLock.lock( );
-			
+
 			m_egl.eglMakeCurrent( EGLManager.getDisplay( ), EGL10.EGL_NO_SURFACE,
 					EGL10.EGL_NO_SURFACE, EGL10.EGL_NO_CONTEXT );
 			EGLSurfaceFactory.destroySurface( m_egl, EGLManager.getDisplay( ),
 					m_surface );
 			m_surface = null;
 			setSurfaceCurrent( false );
-			
+
 			m_surfaceLock.unlock( );
 		}
-		
+
 		/**
 		 * Returns true if the surface is current (by makeCurrent).
-		 * 
+		 *
 		 * @return true if the surface is current (by makeCurrent), 
 		 *         false otherwise.
 		 */
@@ -330,10 +335,10 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		{
 			return m_surfaceIsCurrent;
 		}
-		
+
 		/**
 		 * The surface is marked as current.
-		 * 
+		 *
 		 * @param surfaceIsCurrent
 		 */
 		private void setSurfaceCurrent(boolean surfaceIsCurrent)
@@ -341,11 +346,11 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			m_surfaceIsCurrent = surfaceIsCurrent;
 		}
 	}
-	
+
 	/**
 	 * Class responsible for notifying when an EGL surface has
 	 * been created.
-	 * 
+	 *
 	 * @author fmattias
 	 */
 	public interface EGLViewReadyListener

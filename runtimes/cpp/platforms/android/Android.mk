@@ -38,7 +38,7 @@ LOCAL_SRC_FILES := FileImpl.cpp \
 	../../core/Recompiler/ArmRecompiler.cpp \
 	../../../../intlibs/hashmap/hashmap.cpp \
 
-LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog -lGLESv1_CM
+LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog -lGLESv1_CM -lGLESv2
 
 LOCAL_CFLAGS	:= -DFPM_ARM
 
