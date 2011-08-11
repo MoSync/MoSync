@@ -2083,8 +2083,15 @@ public class MoSyncThread extends Thread
 		else if (key.equals("mosync.path.local"))
 		{
 			String path = getActivity().getFilesDir().getAbsolutePath() + "/";
-			Log.i("@@@ MoSync", "Property mosync.localFilePath: " + path);
+			Log.i("@@@ MoSync", "Property mosync.path.local: " + path);
 			property = path;
+		}
+		else if (key.equals("mosync.path.local.url"))
+		{
+			String url = "file://" +
+				getActivity().getFilesDir().getAbsolutePath() + "/";
+			Log.i("@@@ MoSync", "Property mosync.path.local.url: " + url);
+			property = url;
 		}
 
 		if (null == property) { return -2; }
