@@ -19,6 +19,7 @@ package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
+import static com.mosync.internal.generated.MAAPI_consts.CONNERR_GENERIC;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_ON;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_OFF;
@@ -56,6 +57,7 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -89,6 +91,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.os.Vibrator;
+import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
@@ -141,6 +144,7 @@ public class MoSyncThread extends Thread
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
 	MoSyncFile mMoSyncFile;
+	MoSyncSMS mMoSyncSMS;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -297,6 +301,18 @@ public class MoSyncThread extends Thread
 		catch (java.lang.VerifyError error)
 		{
 			mMoSyncBluetooth = null;
+		}
+
+		// SMS is not available on all platforms and
+		// therefore we do a conditional loading of the
+		// MoSyncSMS class.
+		try
+		{
+			mMoSyncSMS = new MoSyncSMS(this);
+		}
+		catch (java.lang.VerifyError error)
+		{
+			mMoSyncSMS = null;
 		}
 
 		nativeInitRuntime();
@@ -2037,6 +2053,25 @@ public class MoSyncThread extends Thread
 	{
 		Log.i("maWriteLog", str);
 		return 1;
+	}
+
+	/**
+	 * Send an SMS (text message).
+	 * @param phoneNo The destination phone number.
+	 * @param message The text message.
+	 * @return 0 on success, <0 on error.
+	 */
+	int maSendTextSMS(String phoneNo, String message)
+	{
+		if (null != mMoSyncSMS)
+		{
+			return mMoSyncSMS.maSendTextSMS(phoneNo, message);
+		}
+		else
+		{
+			// Not available.
+			return -1;
+		}
 	}
 
 	/**

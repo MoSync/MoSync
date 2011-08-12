@@ -146,7 +146,7 @@ bool Platform::writeDataToFile(
 	const MAUtil::String& filePath,
 	MAHandle outData)
 {
-	MAHandle file = openFileHelper(filePath);
+	MAHandle file = openFileHelper(filePath, true);
 	if (file < 0)
 	{
 		return false;
@@ -171,7 +171,7 @@ bool Platform::writeTextToFile(
 	const MAUtil::String& filePath,
 	const MAUtil::String& outText)
 {
-	MAHandle file = openFileHelper(filePath);
+	MAHandle file = openFileHelper(filePath, true);
 	if (file < 0)
 	{
 		return false;
@@ -193,7 +193,7 @@ bool Platform::readDataFromFile(
 	MAHandle inData)
 {
 
-	MAHandle file = openFileHelper(filePath);
+	MAHandle file = openFileHelper(filePath, false);
 	if (file < 0)
 	{
 		return false;
@@ -220,15 +220,17 @@ bool Platform::readTextFromFile(
 	const MAUtil::String& filePath,
 	MAUtil::String& inText)
 {
-	MAHandle file = openFileHelper(filePath);
+	MAHandle file = openFileHelper(filePath, false);
 	if (file < 0)
 	{
+		lprintfln("Platform::readTextFromFile: file < 0");
 		return false;
 	}
 
 	int size = maFileSize(file);
 	if (size < 1)
 	{
+		lprintfln("Platform::readTextFromFile: maFileSize size: %d", size);
 		return false;
 	}
 
@@ -236,6 +238,8 @@ bool Platform::readTextFromFile(
 	char* buffer = (char*) malloc(sizeof(char) * (size + 1));
 
 	int result = maFileRead(file, buffer, size);
+
+	lprintfln("Platform::readTextFromFile: maFileRead result: %d", result);
 
 	maFileClose(file);
 
@@ -249,7 +253,9 @@ bool Platform::readTextFromFile(
  * Open a file for read/write access. Create the file if it does not exist.
  * @return Handle to the open file, <0 on error.
  */
-MAHandle Platform::openFileHelper(const MAUtil::String& filePath)
+MAHandle Platform::openFileHelper(
+	const MAUtil::String& filePath,
+	bool truncate)
 {
 	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ_WRITE);
 	if (file < 0)

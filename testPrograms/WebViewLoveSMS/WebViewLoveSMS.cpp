@@ -97,15 +97,29 @@ public:
 	{
 		mPlatform = Platform::create();
 
-		MAUtil::String html =
-			mPlatform->createTextFromHandle(MainPage_html);
-
 		// Create screen.
 		mScreen = maWidgetCreate(MAW_SCREEN);
 		widgetShouldBeValid(mScreen, "Could not create screen");
 
+		// Write image as file.
+		mPlatform->writeDataToFile(
+			mPlatform->getLocalPath() + "amor.png",
+			amor_png);
+
+		mPlatform->writeTextToFile(
+			mPlatform->getLocalPath() + "MainPage.html",
+			mPlatform->createTextFromHandle(MainPage_html));
+
+		// Get HTML data.
+		MAUtil::String html =
+			mPlatform->createTextFromHandle(MainPage_html);
+
 		// Create web view.
-		mWebView = createWebView(html);
+		mWebView = createWebView();
+
+		// Set the HTML the web view displays.
+		// maWidgetSetProperty(mWebView, "html", html.c_str());
+		maWidgetSetProperty(mWebView, "url", "MainPage.html");
 
 		// Compose objects.
 		maWidgetAddChild(mScreen, mWebView);
@@ -114,7 +128,7 @@ public:
 		maWidgetScreenShow(mScreen);
 	}
 
-	MAWidgetHandle createWebView(const MAUtil::String& html)
+	MAWidgetHandle createWebView()
 	{
 		// Create web view
 		MAWidgetHandle webView = maWidgetCreate(MAW_WEB_VIEW);
@@ -126,9 +140,6 @@ public:
 
 		// Enable zooming.
 		maWidgetSetProperty(webView, "enableZoom", "true");
-
-		// Set the HTML the web view displays.
-		maWidgetSetProperty(webView, "html", html.c_str());
 
 		WebViewMessage::getMessagesFor(webView);
 
@@ -170,12 +181,38 @@ public:
 				case EVENT_TYPE_WIDGET:
 					handleWidgetEvent((MAWidgetEventData*) event.data);
 					break;
+
+				case EVENT_TYPE_SMS:
+					if (MA_SMS_RESULT_SENT == event.status)
+					{
+						callJSFunction("StatusMessageSMSSent");
+					}
+					if (MA_SMS_RESULT_NOT_SENT == event.status)
+					{
+						callJSFunction("StatusMessageSMSNotSent");
+					}
+					if (MA_SMS_RESULT_DELIVERED == event.status)
+					{
+						callJSFunction("StatusMessageSMSDelivered");
+					}
+					if (MA_SMS_RESULT_NOT_DELIVERED == event.status)
+					{
+						callJSFunction("StatusMessageSMSNotDelivered");
+					}
+					break;
 			}
 		}
 	}
 
 	void handleWidgetEvent(MAWidgetEventData* widgetEvent)
 	{
+		// Has page been loaded?
+		if (MAW_EVENT_WEB_VIEW_CONTENT_LOADING == widgetEvent->eventType &&
+			MAW_CONSTANT_DONE == widgetEvent->status)
+		{
+			lprintfln("MAW_EVENT_WEB_VIEW_CONTENT_LOADING DONE");
+		}
+
 		// Handle messages from the WebView widget.
 		if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEvent->eventType &&
 			MAW_CONSTANT_HARD == widgetEvent->hookType)
@@ -203,6 +240,8 @@ public:
 			{
 				// Set saved phone number here.
 				setSavedPhoneNo();
+				//callJS("document.body.innerHTML='<p>Hello</p>'");
+				lprintfln("PageLoaded");
 			}
 		}
 	}
@@ -223,26 +262,29 @@ public:
 			message.c_str());
 
 		// Provide feedback via JS.
-		if (0 == result)
+		if (0 > result)
 		{
-			displayMessage("Lovely SMS sent :)");
-		}
-		else
-		{
-			displayMessage("Could not send SMS :(");
+			callJSFunction("StatusMessageSMSNotSent");
 		}
 	}
 
 	/**
-	 * Display a status message in the WebView.
+	 * Call a JavaScript function.
 	 */
-	void displayMessage(const MAUtil::String& message)
+	void callJSFunction(const MAUtil::String& fun)
+	{
+		char code[512];
+		sprintf(code, "%s()", fun.c_str());
+		callJS(code);
+	}
+
+	/**
+	 * Run JavaScript code.
+	 */
+	void callJS(const MAUtil::String& code)
 	{
 		char script[512];
-		sprintf(
-			script,
-			"javascript:DisplayMessage('%s')",
-			message.c_str());
+		sprintf(script, "javascript:%s", code.c_str());
 		maWidgetSetProperty(mWebView, "url", script);
 	}
 
@@ -268,6 +310,7 @@ public:
 		MAUtil::String path =
 			mPlatform->getLocalPath() +
 			"SavedPhoneNo";
+		lprintfln("Saving phoneNo: %s to: %s", phoneNo.c_str(), path.c_str());
 		mPlatform->writeTextToFile(path, phoneNo);
 	}
 
@@ -283,10 +326,12 @@ public:
 		bool success = mPlatform->readTextFromFile(path, phoneNo);
 		if (success)
 		{
+			lprintfln("Loaded phoneNo: %s", phoneNo.c_str());
 			return phoneNo;
 		}
 		else
 		{
+			lprintfln("Loading phoneNo failed");
 			return "";
 		}
 	}

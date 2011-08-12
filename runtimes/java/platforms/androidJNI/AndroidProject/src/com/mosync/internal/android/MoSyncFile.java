@@ -371,7 +371,10 @@ public class MoSyncFile {
 			return MA_FERR_NOTFOUND;
 		}
 
-		if( !fileHandle.mIsAFile ) return MA_FERR_GENERIC;
+		if( !fileHandle.mIsAFile )
+		{
+			return MA_FERR_GENERIC;
+		}
 
 		return (int)fileHandle.mFile.length();
 	}
@@ -585,6 +588,10 @@ public class MoSyncFile {
 	int maFileWriteFromData(int file, int data, int offset, int len)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
+		if (null == fileHandle)
+		{
+			return MA_FERR_NOTFOUND;
+		}
 
 		if(fileHandle.mAccessMode == MA_ACCESS_READ)
 			return MA_FERR_FORBIDDEN;
@@ -621,6 +628,10 @@ public class MoSyncFile {
 	int maFileRead(int file, int dst, int len)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
+		if (null == fileHandle)
+		{
+			return MA_FERR_NOTFOUND;
+		}
 
 		// Create a sliced buffer which we can send to file
 		mMoSyncThread.mMemDataSection.position(dst);
@@ -639,6 +650,10 @@ public class MoSyncFile {
 	int maFileReadToData(int file, int data, int offset, int len)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
+		if (null == fileHandle)
+		{
+			return MA_FERR_NOTFOUND;
+		}
 
 		ByteBuffer byteBuffer = mMoSyncThread.getBinaryResource(data);
 		if (null == byteBuffer)
@@ -670,6 +685,10 @@ public class MoSyncFile {
 	int maFileTell(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
+		if (null == fileHandle)
+		{
+			return MA_FERR_NOTFOUND;
+		}
 
 		try
 		{
@@ -694,6 +713,10 @@ public class MoSyncFile {
 	int maFileSeek(int file, int offset, int whence)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
+		if (null == fileHandle)
+		{
+			return MA_FERR_NOTFOUND;
+		}
 
 		switch(whence) {
 		case MA_SEEK_SET:
