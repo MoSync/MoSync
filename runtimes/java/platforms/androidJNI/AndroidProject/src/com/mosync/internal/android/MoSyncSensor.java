@@ -227,6 +227,10 @@ public class MoSyncSensor implements SensorEventListener {
 	 */
 	int maSensorStart(int sensor, int interval)
 	{
+		if ( (sensor < SENSOR_TYPE_ACCELEROMETER) || (sensor > SENSOR_TYPE_PROXIMITY) )
+		{
+			return SENSOR_ERROR_NOT_AVAILABLE;
+		}
 		int rate = getSensorRate(interval);
 		int sensorType = getSensorAndroidType(sensor);
 
@@ -340,6 +344,11 @@ public class MoSyncSensor implements SensorEventListener {
 	 */
 	int maSensorStop(int sensor)
 	{
+		if ( (sensor < SENSOR_TYPE_ACCELEROMETER) || (sensor > SENSOR_TYPE_PROXIMITY) )
+		{
+			return SENSOR_ERROR_NOT_AVAILABLE;
+		}
+
 		if (mSensorList[sensor - 1] == null)
 		{
 			return SENSOR_ERROR_NOT_ENABLED;
