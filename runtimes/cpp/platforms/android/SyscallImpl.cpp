@@ -29,11 +29,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "helpers/CPP_IX_AUDIOBUFFER.h"
 #include "helpers/CPP_IX_OPENGL_ES.h"
+#include "helpers/CPP_IX_PIM.h"
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
-#define SYSLOG(...)
+#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
+//#define SYSLOG(...)
 
 namespace Base
 {	
@@ -1788,7 +1789,204 @@ namespace Base
 				a,
 				mJNIEnv,
 				mJThis);
+
+		case maIOCtl_maSensorStart:
+			SYSLOG("maIOCtl_maSensorStart");
+			return _maSensorStart(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maSensorStop:
+			SYSLOG("maIOCtl_maSensorStop");
+			return _maSensorStop(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimListOpen:
+			SYSLOG("maIOCtl_maPimListOpen");
+			return _maPimListOpen(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimListNext:
+			SYSLOG("maIOCtl_maPimListNext");
+			return _maPimListNext(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimListClose:
+			SYSLOG("maIOCtl_maPimListClose");
+			return _maPimListClose(
+				a,
+				mJNIEnv,
+				mJThis);
 				
+		case maIOCtl_maPimItemCount:
+			SYSLOG("maIOCtl_maPimItemCount");
+			return _maPimItemCount(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemGetField:
+			SYSLOG("maIOCtl_maPimItemGetField");
+			return _maPimItemGetField(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemFieldCount:
+			SYSLOG("maIOCtl_maPimItemFieldCount");
+			return _maPimItemFieldCount(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemGetAttributes:
+			SYSLOG("maIOCtl_maPimItemGetAttributes");
+			return _maPimItemGetAttributes(
+				a,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemSetLabel:
+		{
+			SYSLOG("maIOCtl_maPimItemSetLabel");
+
+			MA_PIM_ARGS* args = (MA_PIM_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_PIM_ARGS));
+			int argsBufSize = args->bufSize;
+			int argsBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)args->buf, argsBufSize);
+
+			return _maPimItemSetLabel(
+				args->item,
+				args->field,
+				argsBufPointer,
+				argsBufSize,
+				b,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maPimItemGetLabel:
+		{
+			SYSLOG("maIOCtl_maPimItemGetLabel");
+
+			MA_PIM_ARGS* args = (MA_PIM_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_PIM_ARGS));
+			int argsBufSize = args->bufSize;
+			int argsBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)args->buf, argsBufSize);
+
+			return _maPimItemGetLabel(
+				args->item,
+				args->field,
+				argsBufPointer,
+				argsBufSize,
+				b,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maPimFieldType:
+			SYSLOG("maIOCtl_maPimFieldType");
+			return _maPimFieldType(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemGetValue:
+		{
+			SYSLOG("maIOCtl_maPimItemGetValue");
+
+			MA_PIM_ARGS* args = (MA_PIM_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_PIM_ARGS));
+			int argsBufSize = args->bufSize;
+			int argsBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)args->buf, argsBufSize);
+
+			return _maPimItemGetValue(
+				args->item,
+				args->field,
+				argsBufPointer,
+				argsBufSize,
+				b,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maPimItemSetValue:
+		{
+			SYSLOG("maIOCtl_maPimItemSetValue");
+
+			MA_PIM_ARGS* args = (MA_PIM_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_PIM_ARGS));
+			int argsBufSize = args->bufSize;
+			int argsBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)args->buf, argsBufSize);
+
+			return _maPimItemSetValue(
+				args->item,
+				args->field,
+				argsBufPointer,
+				argsBufSize,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maPimItemAddValue:
+		{
+			SYSLOG("maIOCtl_maPimItemAddValue");
+
+			MA_PIM_ARGS* args = (MA_PIM_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_PIM_ARGS));
+			int argsBufSize = args->bufSize;
+			int argsBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)args->buf, argsBufSize);
+
+			return _maPimItemAddValue(
+				args->item,
+				args->field,
+				argsBufPointer,
+				argsBufSize,
+				b,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maPimItemRemoveValue:
+			SYSLOG("maIOCtl_maPimItemRemoveValue");
+			return _maPimItemRemoveValue(
+				a,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemClose:
+			SYSLOG("maIOCtl_maPimItemClose");
+			return _maPimItemClose(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemCreate:
+			SYSLOG("maIOCtl_maPimItemCreate");
+			return _maPimItemCreate(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemRemove:
+			SYSLOG("maIOCtl_maPimItemRemove");
+			return _maPimItemRemove(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
 		} // End of switch
 		
 		return IOCTL_UNAVAILABLE;
