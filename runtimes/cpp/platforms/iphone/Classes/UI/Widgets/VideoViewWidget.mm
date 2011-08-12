@@ -36,7 +36,7 @@
     if (!view)
     {
         moviePlayerController = [[MPMoviePlayerController alloc] init];
-        CGRect viewRect =CGRectMake(DEFAULT_RECT_X, DEFAULT_RECT_Y, DEFAULT_RECT_WIDTH, DEFAULT_RECT_HEIGHT);
+        CGRect viewRect = CGRectMake(DEFAULT_RECT_X, DEFAULT_RECT_Y, DEFAULT_RECT_WIDTH, DEFAULT_RECT_HEIGHT);
         UIView* smallView = [[[UIView alloc] initWithFrame:viewRect] retain];
 
         [moviePlayerController.view setFrame: smallView.bounds];
@@ -53,7 +53,7 @@
                                                    object:moviePlayerController];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(sourceReady:)
-                                                     name:MPMoviePlayerContentPreloadDidFinishNotification
+                                                     name:MPMoviePlayerLoadStateDidChangeNotification
                                                    object:moviePlayerController];
     }
 
@@ -72,7 +72,7 @@
                                                     name:MPMoviePlayerPlaybackStateDidChangeNotification
                                                   object:moviePlayerController];
     [[NSNotificationCenter defaultCenter] removeObserver:self
-                                                    name:MPMoviePlayerContentPreloadDidFinishNotification
+                                                    name:MPMoviePlayerLoadStateDidChangeNotification
                                                   object:moviePlayerController];
     [super dealloc];
 }
@@ -102,6 +102,12 @@
     else if ([key isEqualToString:@"action"])
     {
         [self handleAction:value];
+    }
+    else if ([key isEqualToString:@"width"] ||
+             [key isEqualToString:@"height"])
+    {
+        [super setPropertyWithKey:key toValue:value];
+        [moviePlayerController.view setFrame: view.bounds];
     }
     else
     {
@@ -226,7 +232,7 @@
 }
 
 /**
- * This delegate method is invoked when the video source is loaded.
+ * This delegate method is invoked when the network buffering state has changed.
  * @param The current movie player object.
  */
 - (void)sourceReady:(NSNotification *)notification
@@ -235,16 +241,19 @@
     NSError *error = [[notification userInfo] objectForKey:@"error"];
     if (!error)
     {
-        MAEvent event;
-        event.type = EVENT_TYPE_WIDGET;
+        if (MPMovieLoadStatePlayable == [moviePlayerController loadState])
+        {
+            MAEvent event;
+            event.type = EVENT_TYPE_WIDGET;
 
-        MAWidgetEventData *eventData = new MAWidgetEventData;
-        eventData->eventType = MAW_EVENT_VIDEO_STATE_CHANGED;
-        eventData->videoViewState = MAW_VIDEO_WIDGET_STATE_SOURCE_READY;
-        eventData->widgetHandle = handle;
+            MAWidgetEventData *eventData = new MAWidgetEventData;
+            eventData->eventType = MAW_EVENT_VIDEO_STATE_CHANGED;
+            eventData->videoViewState = MAW_VIDEO_WIDGET_STATE_SOURCE_READY;
+            eventData->widgetHandle = handle;
 
-        event.data = (int)eventData;
-        Base::gEventQueue.put(event);
+            event.data = (int)eventData;
+            Base::gEventQueue.put(event);
+        }
     }
 }
 

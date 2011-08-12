@@ -19,6 +19,8 @@
 #import "UIColor-Expanded.h"
 #import <objc/runtime.h>
 #include <helpers/CPP_IX_WIDGET.h>
+#include <helpers/cpp_defs.h>
+#include "Platform.h"
 
 @interface UIView (UIViewExpanded) 
 - (void)superLayoutSubviews;
@@ -284,6 +286,21 @@
 //	[view layoutIfNeeded];
 	//[view setNeedsDisplay];	
 	//[view layoutIfNeeded];
+}
+
+/**
+ * Send a widget event type.
+ * @param eventDataType One of the MAW_EVENT constants.
+ */
+- (void) sendEvent:(const int) eventDataType
+{
+    MAEvent event;
+	event.type = EVENT_TYPE_WIDGET;
+	MAWidgetEventData *eventData = new MAWidgetEventData;
+	eventData->eventType = eventDataType;
+	eventData->widgetHandle = handle;
+	event.data = (int)eventData;
+	Base::gEventQueue.put(event);
 }
 
 - (void)show {

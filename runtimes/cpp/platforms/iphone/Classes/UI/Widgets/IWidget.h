@@ -102,6 +102,12 @@ IWidget* mWidget;\
 
 - (void)layout;
 
+/**
+ * Send a widget event type.
+ * @param eventDataType One of the MAW_EVENT constants.
+ */
+- (void) sendEvent:(const int) eventDataType;
+
 // when a root screen is shown, this will be called recursively for all widgets.
 - (void)show;
 

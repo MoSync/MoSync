@@ -30,27 +30,36 @@
         
 	UIButton* button = (UIButton*) view;
     button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);
-	[button addTarget:self action:@selector(buttonPressed) forControlEvents:UIControlEventTouchUpInside];
+	[button addTarget:self action:@selector(touchDownEvent) forControlEvents:UIControlEventTouchDown];
+    [button addTarget:self action:@selector(touchUpInsideEvent) forControlEvents:UIControlEventTouchUpInside];
+    [button addTarget:self action:@selector(touchUpOutsideEvent) forControlEvents:UIControlEventTouchUpOutside];
 	image = nil;
 	leftCapWidth = 0;
 	topCapHeight = 0;	
 	button.titleLabel.numberOfLines = 0;	
+    [button setTitleColor:[UIColor blackColor] forState:UIControlStateNormal];
+
 	id ret = [super init];
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
     button.imageView.contentMode = UIViewContentModeCenter;
-     	
+
     return ret;
 }
 
--(void)buttonPressed {
-	NSLog(@"Button pressed!");
-	MAEvent event;
-	event.type = EVENT_TYPE_WIDGET;
-	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = MAW_EVENT_CLICKED;
-	eventData->widgetHandle = handle;
-	event.data = (int)eventData;
-	Base::gEventQueue.put(event);
+-(void) touchDownEvent
+{
+    [super sendEvent:MAW_EVENT_POINTER_PRESSED];
+}
+
+-(void)touchUpInsideEvent
+{
+    [super sendEvent:MAW_EVENT_POINTER_RELEASED];
+    [super sendEvent:MAW_EVENT_CLICKED];
+}
+
+-(void) touchUpOutsideEvent
+{
+    [super sendEvent:MAW_EVENT_POINTER_RELEASED];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -60,6 +69,7 @@
 		[self layout];
 	} else
 	if([key isEqualToString:@"fontSize"]) {
+        TEST_FOR_NEGATIVE_VALUE([value floatValue]);
 		UIButton* button = (UIButton*) view;
 		float fontSize = [value floatValue];
 		button.titleLabel.font = [UIFont boldSystemFontOfSize:fontSize];
@@ -127,7 +137,35 @@
 		}
 		topCapHeight = newTopCapHeight;
 	}	
-	
+	else if([key isEqualToString:@"textHorizontalAlignment"]) {
+		UIButton* button = (UIButton*) view;
+        if([value isEqualToString:@"left"]) {
+			[button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
+		}
+		else if([value isEqualToString:@"center"]) {
+			[button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
+		}
+		else if([value isEqualToString:@"right"]) {
+			[button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentRight];
+		}
+        else {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+	}
+    else if([key isEqualToString:@"textVerticalAlignment"]) {
+		UIButton* button = (UIButton*) view;
+		if([value isEqualToString:@"top"]) {
+			[button setContentVerticalAlignment:UIControlContentVerticalAlignmentTop];
+		}
+		else if([value isEqualToString:@"center"]) {
+			[button setContentVerticalAlignment:UIControlContentVerticalAlignmentCenter];
+		}
+		else if([value isEqualToString:@"bottom"]) {
+			[button setContentVerticalAlignment:UIControlContentVerticalAlignmentBottom];
+		} else {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

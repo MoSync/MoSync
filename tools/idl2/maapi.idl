@@ -3459,6 +3459,8 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A check box is a widget that acts like a physical switch. When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetCheckBoxProperties "Check box properties" for the properties available.
+		 * If you want to display it with a "light" indicator, as it is on iOS use a Toggle Button instead.
+
 		 */
 		CHECK_BOX = "CheckBox";
 
@@ -3541,7 +3543,7 @@ group WidgetAPI "Widget API" {
 		TIME_PICKER = "TimePicker";
 
 		/**
-		 * @brief A Number Picker is a widget that enables the user to select a number form a predefined range.
+		 * @brief A Number Picker is a widget that enables the user to select a number from a predefined range.
 		 * See \ref WidgetNumberPickerProperties "Number Picker properties" for the properties available.
 		 */
 		NUMBER_PICKER = "NumberPicker";
@@ -3552,6 +3554,12 @@ group WidgetAPI "Widget API" {
 		 */
 		VIDEO_VIEW = "VideoView";
 
+		/**
+		 * @brief A Toggle Button is a widget that acts like a physical switch. Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF".
+		 * It is available only on Android, and it's similar to the Check Box on iOS.
+		 * When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetToggleButtonProperties "Toggle button properties" for the properties available.
+		 */
+		TOGGLE_BUTTON = "ToggleButton";
 	}
 	} // end of WidgetTypes
 
@@ -3682,7 +3690,39 @@ group WidgetAPI "Widget API" {
 
 		ENABLED = "enabled";
 
+
+		/**
+
+		* @brief Specifies the background gradient of a widget.
+
+		* Currently implemented only on Android.
+
+		*
+
+		* @validvalue Two hexadecimal values 0xRRGGBB, where R, G and B are the red, green and blue components respectively,
+
+		* separated by comma.
+
+		*
+
+		* @setonly
+
+		*
+
+		* @par Example
+
+		* \code
+
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_BACKGROUND_GRADIENT,  "0x27408B,0xCAE1FF");
+
+		* \endcode
+
+		*/
+
+		BACKGROUND_GRADIENT = "backgroundGradient";
+
 	}
+
 
 	/**
 	* The available widget properties for a #MAW_SCREEN. See \ref WidgetProperties "Widget properties" for more properties. 
@@ -3908,7 +3948,7 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		FONT_COLOR = "fontColor";
-		
+
 		/**
 		* @brief Sets the font size in points of the label's text.
 		*
@@ -3922,8 +3962,23 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		FONT_SIZE = "fontSize";
+
+		/**
+		* @brief Sets the maximum number of lines used for rendering text.
+		* To remove any maximum limit, and use as many lines as needed, set the value of this property to 0.
+		*
+		* @validvalue An integer that specifies the maximum number of lines.
+		*
+		* @setandget.
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(labelHandle, MAW_LABEL_MAX_NUMBER_OF_LINES, "3");
+		* \endcode
+		*/
+		MAX_NUMBER_OF_LINES = "maxNumberOfLines";
 	}
-	} // end of WidgetLabelProperties		
+	} // end of WidgetLabelProperties
 
 	/**
 	* The available widget properties for a #MAW_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
@@ -3969,9 +4024,9 @@ group WidgetAPI "Widget API" {
 		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
 		
 		/**
-		* @brief Sets the horizontal alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
+		* @brief Sets the horizontal alignment of the text inside the button. If the widget's width is WRAP_CONTENT this property has no effect.
 		*
-		* @validvalue Takes one of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		* @validvalue Takes one of the constants #MAW_ALIGNMENT_LEFT, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
 		*
 		* @setonly
 		*
@@ -4271,7 +4326,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @note Only available for iOS.
 		*
-		* @validvalue One of "hasChildren", "hasDetails" or "isChecked".
+		* @validvalue One of "none", "hasChildren", "hasDetails" or "isChecked".
 		*
 		* @par Example
 		* \code
@@ -4294,12 +4349,34 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(listViewItemHandle, MAW_CHECK_BOX_CHECKED, "true");
+		*	maWidgetSetProperty(checkBoxHandle, MAW_CHECK_BOX_CHECKED, "true");
+
 		* \endcode
 		*/
 		CHECKED = "checked";
 	}
-	} // end of WidgetListViewProperties
+	} // end of WidgetCheckBoxProperties
+
+
+	/**
+	* The available widget properties for a #MAW_TOGGLE_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetToggleButtonProperties "Toggle button properties" {
+	constset MAString MAW_TOGGLE_BUTTON_ {
+		/**
+		* @brief Set or get the checked state of the toggle button.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(toggleButtonHandle, MAW_TOGGLE_BUTTON_CHECKED, "true");
+		* \endcode
+		*/
+		CHECKED = "checked";
+	}
+	} // end of WidgetCheckBoxProperties
+
 
 	/**
 	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties. 
@@ -4744,7 +4821,7 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* \code
 		*   // Start the playback.
-        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_WIDGET_ACTION, toString(MAW_VIDEO_WIDGET_ACTION_PLAY));
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_ACTION, toString(MAW_VIDEO_WIDGET_ACTION_PLAY));
 		* \endcode
 		*/
 		ACTION = "action";
@@ -4767,14 +4844,12 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetVideoViewProperties
 
-	/**
-	* The available widget properties for a #MAW_DATE_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
-	*/
-	group WidgetDatePickerProperties "Date Picker properties" {
+group WidgetDatePickerProperties "Date Picker properties" {
 	constset MAString MAW_DATE_PICKER_ {
 		/**
-		* @brief Sets or gets  maximal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00 in getDefault() time zone.
-		* The default maximal date is 12/31/2100.
+		* @brief Sets or gets  maximal date supported by this DatePicker.
+		* The format is: "DDMMYYYY".
+		* NOTE: On Android the default maximal date is 12/31/2100.
 		*
 		* @validvalue A long int that specifies the upper range of this date picker.
 		*
@@ -4782,34 +4857,34 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE, "100000000");
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE, "10122010");
+		*   // Now the maximum date is  the 10th of December 2010.
 		* \endcode
 		*/
 		MAX_DATE = "maxDate";
 
 		/**
-		* @brief Sets or gets  minimal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00 in getDefault() time zone.
-		*
+		* @brief Sets or gets  minimal date supported by this DatePicker.
+		* The format is: "DDMMYYYY".
+		* Note: On Android the default minimal date is 01/01/1900.
 		* @validvalue A long int that specifies the minimal supported date.
 		*
 		* @setandget
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE, "100000000");
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE, "01012000");
+		*   // Now the minimum date is the 1st of January 2000.
 		* \endcode
 		*/
 		MIN_DATE = "minDate";
 
 		/**
 		* @brief Sets or gets the currently displayed year.
-
 		*
 		* @validvalue An int that specifies a valid year.
-
 		*
 		* @setandget
-
 		*
 		* @par Example
 		* \code
@@ -4825,13 +4900,10 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets or gets the currently displayed month.
-
 		*
 		* @validvalue An int that specifies a valid month.
-
 		*
 		* @setandget
-
 		*
 		* @par Example
 		* \code
@@ -4847,13 +4919,10 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets or gets the currently displayed day of month.
-
 		*
 		* @validvalue An int that specifies a valid day of month.
-
 		*
 		* @setandget
-
 		*
 		* @par Example
 		* \code
