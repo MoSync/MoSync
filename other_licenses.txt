@@ -3,8 +3,12 @@
 # filenames
 rakefile.*
 workfile.rb
+build-all.rb
+build-one.rb
 
 # directories
+
+/githooks
 
 /examples/wolf3d
 /examples/flashback
@@ -34,6 +38,7 @@ workfile.rb
 /testPrograms/ruby
 /testPrograms/faxpp
 /testPrograms/jsontest/yajl
+/testPrograms/native_ui/iphone/Classes/LayoutManagers
 
 /tests/hubbub
 
@@ -50,6 +55,9 @@ workfile.rb
 /tools/uidcrc
 
 # files
+
+/examples/parse_example_list.rb
+
 /libs/MAStd/api_areas.h
 /libs/MAStd/e_acos.c
 /libs/MAStd/e_asin.c
@@ -90,6 +98,9 @@ workfile.rb
 /runtimes/cpp/platforms/iphone/buildLibraries.rb
 /runtimes/cpp/platforms/iphone/Classes/CMGlyphDrawing.h
 /runtimes/cpp/platforms/iphone/Classes/CMGlyphDrawing.mm
+/runtimes/cpp/platforms/iphone/Classes/MoSyncGLView.*
+/runtimes/cpp/platforms/iphone/Classes/NSObjectExpanded.*
+/runtimes/cpp/platforms/iphone/Classes/UI/LayoutManagers/
 
 /runtimes/cpp/platforms/sdl/resource.h
 
@@ -143,3 +154,9 @@ workfile.rb
 /tools/ReleasePackageBuild/linux
 
 /tools/SplashScreenGenerator/main.rb
+
+/tools/ProfileViewer/SDL_*
+
+/tools/DefaultSkinGenerator/Generator.rb
+
+/tools/vis/ConvertSLD.rb
