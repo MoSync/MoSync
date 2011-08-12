@@ -97,6 +97,13 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_CHECK_BOX, new CheckBoxFactory( ) );
 		addFactory( IX_WIDGET.MAW_EDIT_BOX, new EditBoxFactory( ) );
 		addFactory( IX_WIDGET.MAW_STACK_SCREEN, new StackScreenFactory( ) );
+		addFactory( IX_WIDGET.MAW_PROGRESS_BAR, new ProgressBarFactory( ) );
+		addFactory( IX_WIDGET.MAW_ACTIVITY_INDICATOR, new ActivityIndicatorFactory( ) );
+		addFactory( IX_WIDGET.MAW_SLIDER, new SliderFactory( ) );
+		addFactory( IX_WIDGET.MAW_DATE_PICKER, new DatePickerFactory( ) );
+		addFactory( IX_WIDGET.MAW_TIME_PICKER, new TimePickerFactory( ) );
+		addFactory(IX_WIDGET.MAW_VIDEO_VIEW, new VideoViewFactory( ) );
+		addFactory(IX_WIDGET.MAW_TOGGLE_BUTTON, new ToggleButtonFactory( ) );
 	}
 	
 	/**
@@ -109,4 +116,5 @@ public class ViewFactory
 	{
 		m_factoryMap.put( type, factory );
 	}
+
 }

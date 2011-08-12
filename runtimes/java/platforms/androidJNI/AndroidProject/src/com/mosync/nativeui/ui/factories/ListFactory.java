@@ -26,6 +26,10 @@ public class ListFactory implements AbstractViewFactory
 	{
 		ListView listView = new CustomListView( activity );
 		
+		// Use the cache color hint optimization.
+		// This makes the background not to turn black while scrolling the list.
+		listView.setCacheColorHint(0x00000000);
+		
 		listView.setOnItemClickListener( new ListOnItemClickListener( handle ) );
 		return new ListLayout( handle, listView );
 	}

@@ -14,6 +14,7 @@
 static widget_property_test_t g_property_tests[] =
 {
 	{ MAW_WEB_VIEW_URL, "http://www.google.se/", "Testing url property.", MAW_RES_OK },
+	{ MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED, "true", "Testing enable horizontal scroll bar.", MAW_RES_OK },
 	{ NULL, NULL, NULL }
 };
 

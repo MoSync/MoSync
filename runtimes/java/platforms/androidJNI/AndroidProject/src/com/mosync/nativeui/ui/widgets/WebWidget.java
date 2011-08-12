@@ -3,6 +3,7 @@ package com.mosync.nativeui.ui.widgets;
 import android.webkit.WebView;
 
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.util.properties.BooleanConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -50,6 +51,14 @@ public class WebWidget extends Widget
 		{
 			m_newUrl = value;
 		}
+		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED ) )
+		{
+			webView.setHorizontalScrollBarEnabled(BooleanConverter.convert(value));
+		}
+		else if ( property.equals(IX_WIDGET.MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED ))
+		{
+			webView.setVerticalScrollBarEnabled(BooleanConverter.convert(value));
+		}
 		
 		return true;
 	}
@@ -68,6 +77,14 @@ public class WebWidget extends Widget
 		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_NEW_URL ) )
 		{
 			return m_newUrl;
+		}
+		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED ))
+		{
+			return Boolean.toString(webView.isHorizontalScrollBarEnabled());
+		}
+		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED ))
+		{
+			return Boolean.toString(webView.isVerticalScrollBarEnabled());
 		}
 		else
 		{

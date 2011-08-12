@@ -334,6 +334,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.textboxResult = intArray[1];
 		event.textboxLength = intArray[2];
 	}
+	else if (event.type == EVENT_TYPE_IMAGE_PICKER)
+	{
+		event.imagePickerState = intArray[1];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*
@@ -351,7 +355,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * intARray[4] - Size of the message.
 		 *
 		 * WIDGET_EVENT_CLICKED
-		 * intArray[3] - Can be used to determine a checkbox that was clicked.
+		 * intArray[3] - Can be used to determine a checkbox or toggle button that was clicked.
 		 *
 		 * WIDGET_EVENT_ITEM_CLICKED
 		 * intArray[3] - The index of the list item that was clicked.
@@ -362,6 +366,24 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * WIDGET_EVENT_STACK_SCREEN_POPPED
 		 * intArray[3] - Handle to the screen that was popped.
 		 * intArray[4] - Handle to the screen that we popped to.
+		 *
+		 * WIDGET_EVENT_SLIDER_VALUE_CHANGED
+		 * intArray[3] - The slider value.
+		 *
+		 * WIDGET_EVENT_DATE_PICKER_VALUE_CHANGED
+		 * intArray[3] - The day of month value.
+		 * intArray[4] - The month value.
+		 * intArray[5] - The year value.
+		 *
+		 * WIDGET_EVENT_TIME_PICKER_VALUE_CHANGED
+		 * intArray[3] - The current hour value.
+		 * intArray[4] - The current minute value.
+		 *
+		 * WIDGET_EVENT_NUMBER_PICKER_VALUE_CHANGED
+		 * intArray[3] - The current value.
+		 * 
+		 * WIDGET_EVENT_VIDEO_STATE_CHANGED
+		 * intArray[3] - One of the MAW_VIDEO_WIDGET_STATE constants.
 		 */
 
 		int widgetEventType = intArray[1];
@@ -388,7 +410,29 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 			widgetEvent->fromScreen = intArray[3];
 			widgetEvent->toScreen = intArray[4];
 		}
-
+		else if(widgetEventType == MAW_EVENT_SLIDER_VALUE_CHANGED)
+		{
+			widgetEvent->sliderValue = intArray[3];
+		}
+		else if(widgetEventType == MAW_EVENT_DATE_PICKER_VALUE_CHANGED)
+		{
+			widgetEvent->dayOfMonth = intArray[3];
+			widgetEvent->month = intArray[4];
+			widgetEvent->year = intArray[5];
+		}		
+		else if(widgetEventType == MAW_EVENT_TIME_PICKER_VALUE_CHANGED)
+		{
+			widgetEvent->hour = intArray[3];
+			widgetEvent->minute = intArray[4];
+		}
+		else if(widgetEventType == MAW_EVENT_NUMBER_PICKER_VALUE_CHANGED)
+		{
+			widgetEvent->numberPickerValue = intArray[3];
+		}
+		else if(widgetEventType == MAW_EVENT_VIDEO_STATE_CHANGED)
+		{
+			widgetEvent->videoViewState = intArray[3];
+		}
 		event.data = (int)widgetEvent;
 	}
 	
