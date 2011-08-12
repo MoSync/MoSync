@@ -1,4 +1,5 @@
 /* Copyright (C) 2010 MoSync AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -1156,6 +1157,228 @@ namespace Base
 		return -1;
 	}
 	
+	//////////////////////
+	//		PIM			//
+	//////////////////////
+	SYSCALL(MAHandle,  maPimListOpen(int listType))
+	{
+		SYSLOG("maPimListOpen");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimListOpen", "(I)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, listType);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(MAHandle, maPimListNext(MAHandle list))
+	{
+		SYSLOG("maPimListNext");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimListNext", "(I)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, list);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimListClose(MAHandle list))
+	{
+		SYSLOG("maPimListClose");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimListClose", "(I)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, list);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemCount(MAHandle item))
+	{
+		SYSLOG("maPimItemCount");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemCount", "(I)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, item);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemGetField(MAHandle item, int n))
+	{
+		SYSLOG("maPimItemGetField");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemGetField", "(II)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, item, n);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemFieldCount(MAHandle item, int field))
+	{
+		SYSLOG("maPimItemFieldCount");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemFieldCount", "(II)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, item, field);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemGetAttributes(MAHandle item, int field, int index))
+	{
+		SYSLOG("maPimItemGetAttributes");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemGetAttributes", "(III)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, item, field, index);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemSetLabel(MA_PIM_ARGS args, int index))
+	{
+		SYSLOG("maPimItemSetLabel");
+
+		int argsBufSize = args.bufSize;
+		int argsBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)args.buf, argsBufSize);
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemSetLabel", "(IIIII)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, args.item, args.field, argsBufPointer, argsBufSize, index);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemGetLabel(MA_PIM_ARGS args, int index))
+	{
+		SYSLOG("maPimItemGetLabel");
+
+		int argsBufSize = args.bufSize;
+		int argsBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)args.buf, argsBufSize);
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemGetLabel", "(IIIII)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, args.item, args.field, argsBufPointer, argsBufSize, index);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimFieldType(MAHandle list, int field))
+	{
+		SYSLOG("maPimFieldType");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimFieldType", "(II)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, list, field);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemGetValue(MA_PIM_ARGS args, int index))
+	{
+		SYSLOG("maPimItemGetValue");
+
+		int argsBufSize = args.bufSize;
+		int argsBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)args.buf, argsBufSize);
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemGetValue", "(IIIII)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, args.item, args.field, argsBufPointer, argsBufSize, index);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemSetValue(MA_PIM_ARGS args, int index, int attributes))
+	{
+		SYSLOG("maPimItemSetValue");
+
+		int argsBufSize = args.bufSize;
+		int argsBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)args.buf, argsBufSize);
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemSetValue", "(IIIIII)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, args.item, args.field, argsBufPointer, argsBufSize, index, attributes);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemAddValue(MA_PIM_ARGS args, int attributes))
+	{
+		SYSLOG("maPimItemAddValue");
+
+		int argsBufSize = args.bufSize;
+		int argsBufPointer = (int) SYSCALL_THIS->GetValidatedMemRange((int)args.buf, argsBufSize);
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemAddValue", "(IIIII)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, args.item, args.field, argsBufPointer, argsBufSize, attributes);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemRemoveValue(MAHandle item, int field, int index))
+	{
+		SYSLOG("maPimItemRemoveValue");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemRemoveValue", "(III)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, field, index);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemClose(MAHandle item))
+	{
+		SYSLOG("maPimItemClose");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemClose", "(I)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, item);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(MAHandle, maPimItemCreate(MAHandle list))
+	{
+		SYSLOG("maPimItemCreate");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemCreate", "(I)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, list);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
+	SYSCALL(int, maPimItemRemove(MAHandle list, MAHandle item))
+	{
+		SYSLOG("maPimItemRemove");
+
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maPimItemRemove", "(II)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID, list, item);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
 	// Temporary kludge to include the implementation of glString,
 	// a better solution would be to get a .h generated and
 	// then add gl.h.cpp to the list of files.
