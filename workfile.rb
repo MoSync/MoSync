@@ -1,10 +1,13 @@
 #!/usr/bin/ruby
 
 # File.expand_path is used here to ensure the files are really only loaded once.
+require File.expand_path('rules/githooks.rb')
 require File.expand_path('rules/targets.rb')
 require File.expand_path('rules/host.rb')
 require File.expand_path('rules/task.rb')
 require File.expand_path('rules/mosync_util.rb')
+
+enforceGithooks
 
 PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist"]
 

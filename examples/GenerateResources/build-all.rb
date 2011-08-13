@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 require File.expand_path(ENV['MOSYNCDIR'] + '/rules/util.rb')
 
 PROFILES = [

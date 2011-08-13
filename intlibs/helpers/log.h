@@ -227,6 +227,18 @@ void failFunction();
 #define LOGFBIN(v, i)
 #endif  //FILE_DEBUGGING_MODE
 
+#ifdef PIM_DEBUGGING_MODE
+#define LOGP LOG
+#define LOGPBIN LOGBIN
+#else
+#ifdef SYMBIAN
+#define LOGP(a...)
+#else
+#define LOGP(...)
+#endif	//SYMBIAN
+#define LOGPBIN(v, i)
+#endif  //PIM_DEBUGGING_MODE
+
 #define LOG_RES LOG
 
 #endif	//LOG_H

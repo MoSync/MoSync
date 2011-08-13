@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 class String
 	# Returns true if self begins with with.
 	def beginsWith(with)

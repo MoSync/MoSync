@@ -75,6 +75,11 @@ class String
 		return false if(self.length < with.length)
 		return self[0, with.length] == with
 	end
+
+	def endsWith(with)
+		return false if(self.length < with.length)
+		return self[-with.length, with.length] == with
+	end
 end
 
 def sh(cmd)
