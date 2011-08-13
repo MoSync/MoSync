@@ -47,4 +47,5 @@ fi
 ln -s /Applications/MoSync/eclipse/mosync.app /Applications/MoSync/MoSync
 chmod -R 777 /Applications/MoSync/eclipse/configuration
 chmod 755 /Applications/MoSync/eclipse/mosync.app/Contents/MacOS/mosync
+ln -s /Applications/MoSync/eclipse/mosync.app/Contents/MacOS/mosync /Applications/MoSync/eclipse/mosyncc
 chmod -R 775 /Applications/MoSync/examples/*

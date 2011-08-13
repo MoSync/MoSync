@@ -3086,29 +3086,29 @@ group WidgetAPI "Widget API" {
 					*/
 					MAWidgetHandle toScreen;
 			} stackScreenPopInfo;
-	
+
 			/**
 			* The value of the slider when a #MAW_EVENT_SLIDER_VALUE_CHANGED event is received.
 			*/
 			int sliderValue;
-			
+
 			struct {
 					/**
 					* @brief The day value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
 					*/
 					int dayOfMonth;
-					
+
 					/**
 					* @brief The month value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
 					*/
 					int month;
-					
+
 					/**
 					* @brief The year value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
 					*/
 					int year;
 			} datePickerValueInfo;
-			
+
 			struct {
 					/**
 					* @brief The hour value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
@@ -3338,12 +3338,12 @@ group WidgetAPI "Widget API" {
 		* @brief Indicates that the call to a widget syscall was successful.
 		*/
 		OK = 0;
-		
+
 		/**
 		* @brief Indicates that the call to a widget syscall was unsuccessful.
 		*/
 		ERROR = -2;
-		
+
 		/**
 		* @brief Indicates that the call to maWidgetSetProperty or maWidgetGetProperty received an invalid property name.
 		*/
@@ -3383,18 +3383,19 @@ group WidgetAPI "Widget API" {
 		* @brief Indicates that the caller tried to add a widget to a non-layout.
 		*/
 		INVALID_LAYOUT = -9;
-		
+
 		/**
 		* @brief Indicates that the caller tried to remove a visible root widget (screen) and the MoSync view will become visible.
 		*/
 		REMOVED_ROOT = -10;
+
 		/**
 		* @brief Indicates that a syscall tried to access a feature that is not supported by the current framework version.
 		*/
 		FEATURE_NOT_AVAILABLE = -11;
 	}
 	} // end of WidgetResultCodes
-	
+
 	/**
 	* The available widget types for maWidgetCreate().
 	*/
@@ -3466,6 +3467,7 @@ group WidgetAPI "Widget API" {
 		/**
 		 * @brief A check box is a widget that acts like a physical switch. When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetCheckBoxProperties "Check box properties" for the properties available.
 		 * If you want to display it with a "light" indicator, as it is on iOS use a Toggle Button instead.
+
 		 */
 		CHECK_BOX = "CheckBox";
 
@@ -3565,14 +3567,12 @@ group WidgetAPI "Widget API" {
 		 */
 		VIDEO_VIEW = "VideoView";
 		
-		
 		/**
 		 * @brief A Toggle Button is a widget that acts like a physical switch. Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF".
 		 * It is available only on Android, and it's similar to the Check Box on iOS.
 		 * When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetToggleButtonProperties "Toggle button properties" for the properties available.
 		 */
 		TOGGLE_BUTTON = "ToggleButton";
-		
 	}
 	} // end of WidgetTypes
 
@@ -3827,6 +3827,51 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
+
+		/**
+
+		* @brief Specifies whether the navigation bar should be shown.
+
+		*
+
+		* This can have different behaviors on different platforms, on iPhone it is enabled by default, but on Android the
+
+		* user can set it to be shown, because this is not native behavior on Android.
+
+		* When it set this to true, a nav bar is associated to all screens of this stack screen, and there is
+
+		* no need to add it as a child to this widget.
+
+		* When it is set to false, the nav bar is removed from all containing screens of the stack.
+
+		* NOTE: remember to add main layouts for the screens, because those will be the parents of the navigation bars.
+
+		*
+
+		* @validvalue A boolean string 'true' or 'false'.
+
+		*
+
+		* @setandget
+
+		*
+
+		* @par Example
+
+		* \code
+
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_NAV_BAR_ENABLED, "true");
+
+		*   // Now a replica of the Nav Bar of iOS is shown on Android.
+
+		*   // And it handles the back button behaviour.
+
+		* \endcode
+
+		*/
+
+		NAV_BAR_ENABLED = "NavBarEnabled";
+
 	}
 	} // end of WidgetStackScreenProperties	
 
@@ -3900,7 +3945,7 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		FONT_COLOR = "fontColor";
-		
+
 		/**
 		* @brief Sets the font size in points of the label's text.
 		*
@@ -4278,7 +4323,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @note Only available for iOS.
 		*
-		* @validvalue One of "hasChildren", "hasDetails" or "isChecked".
+		* @validvalue One of "none", "hasChildren", "hasDetails" or "isChecked".
 		*
 		* @par Example
 		* \code
@@ -5046,6 +5091,446 @@ group WidgetAPI "Widget API" {
 		
 	typedef int MAWidgetHandle;
 
+		/**
+		* @brief Sets or gets whether the horizontal scrollbar should be drawn or not.
+		* The scrollbar is not drawn by default.
+		* Available only on Android for the moment.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HORIZONTAL_SCROLLBAR_ENABLED, "true");
+		* \endcode
+		*/
+		HORIZONTAL_SCROLL_BAR_ENABLED = "horizontalScrollBarEnabled";
+
+
+		/**
+		* @brief Sets or gets whether the vertical scrollbar should be drawn or not.
+		* The scrollbar is drawn by default.
+		* Available only on Android for the moment.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
+		* \endcode
+		*/
+		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
+
+	}
+	} // end of WidgetWebViewProperties
+
+	/**
+	* The available widget properties for a #MAW_PROGRESS_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetProgressBarProperties "Progress bar properties" {
+	constset MAString MAW_PROGRESS_BAR_ {
+		/**
+		* @brief Sets or gets the range of the progress bar to 0...max.
+		*
+		* @validvalue An positive integer that specifies the upper range of this progress bar.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_MAX, "100");
+		* \endcode
+		*/
+
+		MAX = "max";
+
+		/**
+		* @brief Set or gets the current progress to the specified value.
+		*
+		* @validvalue An int that specifies the new progress, between 0 and max value. See \ref PROGRESS_BAR_MAX.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		* 	maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_PROGRESS, "10");
+		* \endcode
+		*/
+		PROGRESS = "progress";
+
+		/**
+		* @brief Increase the progress bar's progress by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the progress must be increased.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_INCREMENT_PROGRESS, "20");
+		* \endcode
+		*/
+		INCREMENT_PROGRESS = "incrementProgress";
+	}
+	} // end of WidgetProgressBarProperties
+
+	/**
+	* The available widget properties for a #MAW_ACTIVITY_INDICATOR. See \ref WidgetProperties "Widget properties" for more properties.
+
+	*/
+	group WidgetActivityIndicatorProperties "Activity Indicator properties" {
+	constset MAString MAW_ACTIVITY_INDICATOR_ {
+		/**
+		* @brief Sets if the indicator is still on or off.
+
+		* If set to false, it doesn't delete the widget just dismisses it.
+
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // The activity is done. Now this widget is dismissed.
+        *   maWidgetSetProperty(activityIndicatorHandle, MAW_ACTIVITY_INDICATOR_IN_PROGRESS, "false");
+		* \endcode
+		*/
+		IN_PROGRESS = "inProgress";
+	}
+	} // end of WidgetActivityIndicatorProperties
+
+	/**
+	* The available widget properties for a #MAW_SLIDER. See \ref WidgetProperties "Widget properties" for more properties.
+
+	*/
+	group WidgetSliderProperties "Slider properties" {
+	constset MAString MAW_SLIDER_ {
+		/**
+		* @brief Sets or gets the range of the slider to 0...max.
+		*
+		* @validvalue An positive integer that specifies the upper range of this slider.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_MAX, "100");
+		* \endcode
+		*/
+		MAX = "max";
+
+		/**
+		* @brief Set or gets the current value to the slider.
+		*
+		* @validvalue An int that specifies the new value, between 0 and max value. See \ref SLIDER_MAX.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		* 	maWidgetSetProperty(sliderHandle, MAW_SLIDER_VALUE, "10");
+		* \endcode
+		*/
+		VALUE = "value";
+
+		/**
+		* @brief Increase the current value of the slider by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the slider value must be increased.
+		*
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_INCREASE_VALUE, "20");
+		* \endcode
+		*/
+		INCREASE_VALUE = "increaseValue";
+
+		/**
+		* @brief Decreases the current value of the slider by the specified amount.
+
+		*
+		* @validvalue An int that specifies the amount by which the slider value must be decreased.
+		*
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_DECREASE_VALUE, "20");
+		* \endcode
+		*/
+
+		DECREASE_VALUE = "decreaseValue";
+
+	}
+	} // end of WidgetSliderProperties
+
+	/**
+	* The available widget properties for a #MAW_VIDEO_VIEW. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetVideoViewProperties "Video View properties" {
+	constset MAString MAW_VIDEO_VIEW_ {
+		/**
+		* @brief Sets the video path.
+		*
+		* @validvalue Any valid path.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Set the video path.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_PATH, "\data\Video1.wav");
+		* \endcode
+		*/
+		PATH = "path";
+
+		/**
+		* @brief Sets the video url.
+		*
+		* @validvalue Any valid streaming url.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Set the video path.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_URL, "www.example.com/play.m3u8");
+		* \endcode
+		*/
+		URL = "url";
+
+		/**
+		* @brief Start,pause or stop the video playback.
+		*
+		* @validvalue MAW_VIDEO_WIDGET_ACTION_PLAY, MAW_VIDEO_WIDGET_ACTION_PAUSE or MAW_VIDEO_WIDGET_ACTION_STOP constants.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Start the playback.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_ACTION, toString(MAW_VIDEO_WIDGET_ACTION_PLAY));
+		* \endcode
+		*/
+		ACTION = "action";
+
+	  /**
+		* @brief Gets the video file duration.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_DURATION, buf, BUFFER_SIZE);
+		*   // Do something with the duration.
+		* \endcode
+		*/
+		DURATION = "duration";
+	}
+	} // end of WidgetVideoViewProperties
+
+group WidgetDatePickerProperties "Date Picker properties" {
+	constset MAString MAW_DATE_PICKER_ {
+		/**
+		* @brief Sets or gets  maximal date supported by this DatePicker.
+		* The format is: "DDMMYYYY".
+		* NOTE: On Android the default maximal date is 12/31/2100.
+		*
+		* @validvalue A long int that specifies the upper range of this date picker.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE, "10122010");
+		*   // Now the maximum date is  the 10th of December 2010.
+		* \endcode
+		*/
+		MAX_DATE = "maxDate";
+
+		/**
+		* @brief Sets or gets  minimal date supported by this DatePicker.
+		* The format is: "DDMMYYYY".
+		* Note: On Android the default minimal date is 01/01/1900.
+		* @validvalue A long int that specifies the minimal supported date.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE, "01012000");
+		*   // Now the minimum date is the 1st of January 2000.
+		* \endcode
+		*/
+		MIN_DATE = "minDate";
+
+		/**
+		* @brief Sets or gets the currently displayed year.
+		*
+		* @validvalue An int that specifies a valid year.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char yearBuffer[BUFFER_SIZE];
+        *   int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_YEAR, yearBuffer, BUFFER_SIZE);
+		*   if(getStatus == MAW_RES_OK)
+		*   {
+		*       // Do something with the year.
+		*   }
+		* \endcode
+		*/
+		YEAR = "year";
+
+		/**
+		* @brief Sets or gets the currently displayed month.
+		*
+		* @validvalue An int that specifies a valid month.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char monthBuffer[BUFFER_SIZE];
+        *   int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_MONTH, monthBuffer, BUFFER_SIZE);
+		*   if(getStatus == MAW_RES_OK)
+		*   {
+		*       // Do something with the month.
+		*   }
+		* \endcode
+		*/
+		MONTH = "month";
+
+		/**
+		* @brief Sets or gets the currently displayed day of month.
+		*
+		* @validvalue An int that specifies a valid day of month.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char dayBuffer[BUFFER_SIZE];
+        *   int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_DAY_OF_MONTH, dayBuffer, BUFFER_SIZE);
+		*   if(getStatus == MAW_RES_OK)
+		*   {
+		*       // Do something with the day.
+		*   }
+		* \endcode
+		*/
+		DAY_OF_MONTH = "dayOfMonth";
+	}
+	} // end of WidgetDatePickerProperties
+
+	/**
+	* The available widget properties for a #MAW_TIME_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+
+	*/
+	group WidgetTimePickerProperties "Time Picker properties" {
+	constset MAString MAW_TIME_PICKER_ {
+		/**
+		* @brief Sets or gets the current hour in 24h mode( in the range: 0-23 ).
+
+		*
+		* @validvalue An int that specifies the current hour.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   // Set hour to 20, that is 8PM.
+        *   maWidgetSetProperty(timePickerHandle, MAW_TIME_PICKER_CURRENT_HOUR, "20");
+		* \endcode
+		*/
+		CURRENT_HOUR = "currentHour";
+
+		/**
+		* @brief Sets or gets the current minute (0-59).
+
+		*
+		* @validvalue An int that specifies the current minute.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(timePickerHandle, MAW_TIME_PICKER_CURRENT_MINUTE, buf, BUFFER_SIZE);
+		*   // Do something with the minute.
+		* \endcode
+		*/
+		CURRENT_MINUTE = "currentMinute";
+	}
+	} // end of WidgetTimePickerProperties
+
+	/**
+	* The available widget properties for a #MAW_NUMBER_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+
+	*/
+	group WidgetNumberPickerProperties "Number Picker properties" {
+	constset MAString MAW_NUMBER_PICKER_ {
+		/**
+		* @brief Sets or gets the current value for the number picker.
+
+		* If the value is less than MAW_NUMBER_PICKER_MIN_VALUE property value, the current value is set to min.
+		* If the value is greater than MAW_NUMBER_PICKER_MAX_VALUE value, the current value is set to max.
+		*
+		* @validvalue A valid int.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_VALUE, "50");
+		* \endcode
+		*/
+		VALUE = "value";
+
+		/**
+		* @brief Sets or gets the min value of the picker.
+		*
+		* @validvalue An int that specifies the minimum value.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_MIN_VALUE, "0");
+		* \endcode
+		*/
+		MIN_VALUE = "minValue";
+
+		/**
+		* @brief Sets or gets the max value of the picker.
+		*
+		* @validvalue An int that specifies the maximum value.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_MAX_VALUE, "100");
+		* \endcode
+		*/
+		MAX_VALUE = "maxValue";
+	}
+	} // end of WidgetNumberPickerProperties
+
+	} // end of WidgetProperties
+
+	typedef int MAWidgetHandle;
+
 	/**
 	* The set of functions available for the Widget API.
 	*/
@@ -5062,6 +5547,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR if the widget could not be created.
 	* - #MAW_RES_INVALID_TYPE_NAME if the widget type was not available.
 	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported by the curent framework version.
+
 	*/
 	MAWidgetHandle maWidgetCreate(in MAString widgetType);
 
@@ -5070,7 +5556,7 @@ group WidgetAPI "Widget API" {
 	* with children will also cause its children to be destroyed. Once a handle has
 	* been destroyed it cannot be referenced by the maWidget* functions.
 	*
-        * \note If the given widget has a parent, the widget will be removed from its
+	* \note If the given widget has a parent, the widget will be removed from its
 	* parent.
 	*
 	* \param widget A handle to the widget to be destroyed.

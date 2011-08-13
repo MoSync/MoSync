@@ -75,20 +75,27 @@ class String
 		return false if(self.length < with.length)
 		return self[0, with.length] == with
 	end
+
+	def endsWith(with)
+		return false if(self.length < with.length)
+		return self[-with.length, with.length] == with
+	end
 end
 
 def sh(cmd)
-	#Send the command to STDERR
-	warn "#{cmd}"
+	# Print the command to stderr.
+	warn cmd
+	# Open a process.
 	IO::popen(cmd) do |io|
+		# Pipe the process's output to our stdout.
 		while !io.eof?
-			line = io.gets( )
+			line = io.gets
 			puts line
 	    end
-	    #Checking the return code
-	    exitCode = Process::waitpid2( io.pid )[1].exitstatus
+	    # Check the return code
+	    exitCode = Process::waitpid2(io.pid)[1].exitstatus
 	    if(exitCode != 0) then
-			error"Command failed: '#{exitCode}'"
+			error "Command failed, code #{exitCode}"
 	    end
 	end
 end

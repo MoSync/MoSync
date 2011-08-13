@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <stdio.h>
 #include <conio.h>
+#include <stdlib.h>
 
 //hack
 #define CONFIG_H
@@ -24,6 +25,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/array.h>
 #include "obex.h"
+#include <bluetooth/discovery.h>
+#include <MAUtil/mauuid.h>
 
 const char* FileNameFromPath(const char* path) {
 	const char* ptr = strrchr(path, '\\');
@@ -33,6 +36,7 @@ const char* FileNameFromPath(const char* path) {
 //returns >0 on success
 static int sendFile(const char* filename, const MABtAddr* address, int port, int maxPacketSize);
 static int str2ba(const char* str, MABtAddr* bda);
+static int findObexPort(const MABtAddr* address);
 
 #ifdef _DEBUG
 #define DEBUG_GETCH _getch()
@@ -43,14 +47,16 @@ static int str2ba(const char* str, MABtAddr* bda);
 int dummy = __COUNTER__;
 
 int main(int argc, char** argv) {
-	if(argc < 4 || argc > 5) {
+	if(argc < 3 || argc > 5) {
 		const char* exename = FileNameFromPath(argv[0]);
 		printf(
-			"Usage: %s <file> <address> <port> [maxPacketSize]\n"
+			"Usage: %s <file> <address> [port] [maxPacketSize]\n"
 			"\n"
-			"Sends <file> to Bluetooth <address>:<port> using OBEX PUT\n"
+			"Sends <file> to Bluetooth <address>:[port] using OBEX PUT\n"
 			"with a maximum packet size decided by the target device,\n"
 			"optionally limited by [maxPacketSize].\n"
+			"\n"
+			"If [port] is not specified, Service Search is used to find it.\n"
 			"\n"
 			"Example: %s MoSync.jar 010203040506 9\n",
 			exename, exename);
@@ -61,14 +67,17 @@ int main(int argc, char** argv) {
 	MABtAddr address;
 	str2ba(argv[2], &address);
 
-	int port = atoi(argv[3]);
-	if(port < 1 || port > 30) {
-		printf("Bad port number: %i\n", port);
-		return -__COUNTER__;
+	int port = -1;
+	if(argc > 3) {
+		port = atoi(argv[3]);
+		if(port < 1 || port > 30) {
+			printf("Bad port number: %i\n", port);
+			return -__COUNTER__;
+		}
 	}
 
 	int maxPacketSize = 0xffff;
-	if(argc == 5) {
+	if(argc > 4) {
 		maxPacketSize = atoi(argv[4]);
 		if(maxPacketSize < 1 || maxPacketSize > 0xffff) {
 			printf("Bad maxPacketSize: %i\n", maxPacketSize);
@@ -122,8 +131,57 @@ static int sendFile(const char* path, const MABtAddr* address, int port, int max
 		return -__COUNTER__;
 	}
 
+	if(port < 0) {
+		printf("OBEX Object Push port not specified, querying remote device...\n");
+		port = findObexPort(address);
+		if(port < 0) {
+			printf("Query failed (%i). File not sent.\n", port);
+			return port;
+		} else {
+			printf("Port found: %i\n", port);
+		}
+	}
+
 	return sendObject(*address, file_buf, unicode_buf, port, maxPacketSize);
 }
+
+
+static int sPort;
+static bool sDiscoveryInProgress;
+
+static void discoveryCallback() {
+	if(!sDiscoveryInProgress)
+		return;
+	MAUUID uuids[32];
+	char name[512];
+	MABtServiceNative s;
+	s.name = name;
+	s.nameBufSize = sizeof(name);
+	s.uuids = uuids;
+	int res = Bluetooth::maBtGetNewService(&s);
+	if(res < 0) {
+		sPort = res;
+	} else {
+		sPort = s.port;
+	}
+	sDiscoveryInProgress = false;
+}
+
+static int findObexPort(const MABtAddr* address) {
+	sDiscoveryInProgress = true;
+	Bluetooth::maBtStartServiceDiscovery(address, &OBEXObjectPush_Service_MAUUID,
+		discoveryCallback);
+	// quick-&-dirty wait system.
+	while(sDiscoveryInProgress) {
+#ifdef WIN32
+		Sleep(100);
+#else
+		sleep(100);
+#endif
+	}
+	return sPort;
+}
+
 
 int str2ba(const char* str, MABtAddr *bta) {
 	int ai[6];	//address ints

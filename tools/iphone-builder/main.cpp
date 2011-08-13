@@ -146,12 +146,13 @@ void copyFilesCallback(const char *path) {
 		fn = slash + 1;
 	else fn = path;
 
-#ifdef WIN32
 	string p = sSourceDirectory.top() + string("/") + fn;
 	path = p.c_str();
-#endif
 
-	if(isDirectory(path)) {
+    int isDir = isDirectory(path);
+    if(isDir < 0) {
+        error("Could not scan source file/dir %s\n", path);
+    } else if(isDir == 1) {
 		sDestinationDirectory.push(sDestinationDirectory.top() + string("/") + fn);
 #ifdef WIN32
 		sSourceDirectory.push(sSourceDirectory.top() + string("/") + fn);
