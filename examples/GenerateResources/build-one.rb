@@ -1,3 +1,5 @@
+#!/usr/bin/ruby
+
 require 'FileUtils'
 require File.expand_path(ENV['MOSYNCDIR'] + '/rules/util.rb')
 require File.expand_path(ENV['MOSYNCDIR'] + '/rules/mosync_util.rb')
