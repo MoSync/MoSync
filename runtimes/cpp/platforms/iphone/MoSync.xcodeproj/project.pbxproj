@@ -15,6 +15,8 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
+		4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
+		4192E7B913F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
 		85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
 		85037841133A2275009251E2 /* StackScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 8503783E133A2275009251E2 /* StackScreenWidget.h */; };
 		85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
@@ -214,6 +216,8 @@
 		28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncViewController.h; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
+		4192E7B613F5801900C10302 /* CameraConfirgurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraConfirgurator.h; sourceTree = "<group>"; };
+		4192E7B713F5801900C10302 /* CameraConfirgurator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraConfirgurator.mm; sourceTree = "<group>"; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
@@ -447,6 +451,8 @@
 				85C9328812E07D8400CEB7EF /* MoSyncGLView.mm */,
 				85581E5E12EA323E009C6204 /* TouchHelper.h */,
 				85581E5F12EA323E009C6204 /* TouchHelper.mm */,
+				4192E7B613F5801900C10302 /* CameraConfirgurator.h */,
+				4192E7B713F5801900C10302 /* CameraConfirgurator.mm */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -966,6 +972,7 @@
 				8594B89F13258A970059D79B /* LayoutWidgets.mm in Sources */,
 				85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */,
 				0B90962C13E05C1500A91170 /* CameraPreviewWidget.mm in Sources */,
+				4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1041,6 +1048,7 @@
 				85F25A3611AD614700EB47EE /* main.m in Sources */,
 				85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */,
 				85F2557C11AC155D00EB47EE /* rebuild.cpp in Sources */,
+				4192E7B913F5801900C10302 /* CameraConfirgurator.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

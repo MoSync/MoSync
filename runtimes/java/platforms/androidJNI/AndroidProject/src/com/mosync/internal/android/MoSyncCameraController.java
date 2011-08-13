@@ -143,6 +143,11 @@ public class MoSyncCameraController {
 	public void setPreview(MoSyncCameraPreview preview)
 	{
 		mPreview = preview;
+		if(mPreview.mCamera == null)
+		{
+			mPreview.mCamera = Camera.open();
+			mPreview.initiateCamera();
+		}
 	}
 	
 	/**
@@ -192,6 +197,7 @@ public class MoSyncCameraController {
 		} 
 		catch (Exception e) 
 		{
+			SYSLOG(e.getMessage());
 			return MAAPI_consts.MA_CAMERA_RES_FAILED;
 		}
 		
@@ -253,7 +259,9 @@ public class MoSyncCameraController {
 	public int setCameraProperty(String key, String value)
 	{
 		if(mPreview.mCamera == null)
-			return -2;
+		{
+			mPreview.mCamera = Camera.open();
+		}
 		Camera.Parameters param = mPreview.mCamera.getParameters();
 		param.set(key, value);
 		try
@@ -262,7 +270,7 @@ public class MoSyncCameraController {
 		}
 		catch (RuntimeException e)
 		{
-			return -3;
+			return MAAPI_consts.MA_CAMERA_RES_FAILED;
 		}
 		return 1;
 	}
@@ -272,17 +280,35 @@ public class MoSyncCameraController {
 			int memBufferSize)
 	{
 		if(mPreview.mCamera == null)
-			return -2;
+		{
+			mPreview.mCamera = Camera.open();
+		}
 		Camera.Parameters param = mPreview.mCamera.getParameters();
-		String result = param.get(key);
+		String result;
+		if(key.equals(MAAPI_consts.MA_CAMERA_FLASH_SUPPORTED))
+		{
+			if( param.getSupportedFlashModes() != null )
+				result = "true";
+			else
+				result = "false";
+		}
+		else if(key.equals(MAAPI_consts.MA_CAMERA_ZOOM_SUPPORTED))
+		{
+			if(param.isZoomSupported())
+				result = "true";
+			else
+				result = "false";
+		}
+		else
+			result = param.get(key);
 		if(result == null)
-			return -3;
+			return MAAPI_consts.MA_CAMERA_RES_INVALID_PROPERTY_VALUE;
 		
 		if( result.length( ) + 1 > memBufferSize )
 		{
 			Log.e( "MoSync", "maCameraGetProperty: Buffer size " + memBufferSize + 
 					" too short to hold buffer of size: " + result.length( ) + 1 );
-			return -4;
+			return MAAPI_consts.MA_CAMERA_RES_FAILED;
 		}
 		
 		byte[] ba = result.getBytes();
@@ -334,7 +360,20 @@ public class MoSyncCameraController {
 	 */
 	PictureCallback rawCallback = new PictureCallback() {
 		public void onPictureTaken(byte[] data, Camera camera) {
-			//TODO: add format support
+			  lock.lock();
+			  try {
+				mMoSyncThread.nativeCreateBinaryResource(resourceIndex, data.length);
+				ByteBuffer byteBuffer = mMoSyncThread.mBinaryResources.get(resourceIndex);
+				byteBuffer.put(data);
+				dataReady = true;
+				condition.signalAll();
+			  } 
+			  catch (Exception e) {
+				  SYSLOG("Failed to create the data pool");
+			  }
+			  finally {
+			    lock.unlock();
+			  }
 		}
 	};
 

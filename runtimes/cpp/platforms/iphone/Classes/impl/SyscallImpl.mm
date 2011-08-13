@@ -1066,7 +1066,7 @@ namespace Base {
 		if( curCam->captureSession == NULL ) {
 			
 			curCam->captureSession = [[AVCaptureSession alloc] init];
-			curCam->captureSession.sessionPreset = AVCaptureSessionPresetMedium;
+			
 			
 			NSError *error = nil;
 			AVCaptureDeviceInput *input =
@@ -1076,6 +1076,9 @@ namespace Base {
                                             AVVideoCodecJPEG, AVVideoCodecKey, nil];
             [curCam->stillImageOutput setOutputSettings:outputSettings];
 			[outputSettings release];
+			if ([curCam->captureSession canSetSessionPreset:AVCaptureSessionPresetPhoto]) {
+				curCam->captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+			}
 			[curCam->captureSession addInput:input];
 			[curCam->captureSession addOutput:curCam->stillImageOutput];
 		}
@@ -1212,7 +1215,7 @@ namespace Base {
 		if ([videoConnection isVideoOrientationSupported])
 		{
 			[videoConnection setVideoOrientation:[UIDevice currentDevice].orientation];
-			if([UIDevice currentDevice].orientation == UIDeviceOrientationLandscapeLeft)
+			if([UIDevice currentDevice].orientation == UIDeviceOrientationFaceUp)
 				NSLog(@"video orientation is set");
 		}
         [info->stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection 

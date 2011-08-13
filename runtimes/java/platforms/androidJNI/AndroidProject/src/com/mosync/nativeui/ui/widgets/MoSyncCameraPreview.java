@@ -58,7 +58,8 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	 public void surfaceCreated(SurfaceHolder holder) 
 	 {
 		 mHolder = holder;
-		 initiateCamera();		 
+		 if(mCamera != null)
+			 initiateCamera();
 	 }
 	
 	 /**
@@ -66,10 +67,9 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	  */
 	 public void initiateCamera()
 	 {
-		if(mCamera != null)
+		if(mCamera == null)
 			return;
         try {
-        	mCamera = Camera.open();
         	setCameraDisplayOrientation();
 			mCamera.setPreviewDisplay(mHolder);
 			mCamera.setPreviewCallback(new PreviewCallback() {
@@ -85,6 +85,25 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 		}
 	 }
 	 
+	 public void reinitiateCamera()
+	 {
+		 try
+		 {
+			setCameraDisplayOrientation();
+			mCamera.setPreviewDisplay(mHolder);
+			mCamera.setPreviewCallback(new PreviewCallback() {
+				public void onPreviewFrame(byte[] data, Camera arg1) {
+						MoSyncCameraPreview.this.invalidate();
+				}
+			});
+		 } catch (Exception e) {
+				if (mCamera != null)
+					mCamera.release();
+				mCamera = null;
+		 }
+	 }
+	 
+	  
 	 /**
 	  * sets the Orientation of the camera Preview o be the same as MoSyncApp
 	  */
@@ -145,10 +164,10 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	 {
 	        try
 	        {
-		        mCamera.stopPreview();
-		        mCamera.setPreviewCallback(null);
-	        	mCamera.release();
-		        mCamera = null;
+		       mCamera.stopPreview();
+		       mCamera.setPreviewCallback(null);
+	      //  	mCamera.release();
+		    //    mCamera = null;
 	        }
 	        catch (Exception e)
 	        {
@@ -163,6 +182,15 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	 {
 		 if(mCamera == null)
 			 return;
+		 
+		 try
+		 {
+			 mCamera.setPreviewDisplay(mHolder);
+		 }
+		 catch(Exception e)
+		 {
+			 SYSLOG(e.getMessage());
+		 }
 		 Camera.Parameters param = mCamera.getParameters();
 		 Camera.Size optimalPreviewSize = getOptimalSize(
 				 			param.getSupportedPreviewSizes(), w, h);
@@ -171,6 +199,7 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 		 try
 		 {
 			 mCamera.setParameters(param);
+			 
 		 }
 		 catch (RuntimeException e)
 		 {
