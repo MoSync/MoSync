@@ -951,6 +951,16 @@ namespace Base {
 		MoSync_ShowMessageBox(title, message, false);
 	}
 		
+    SYSCALL(int, maSensorStart(int sensor, int interval)) 
+	{		
+		return MoSync_SensorStart(sensor, interval);
+	}
+    
+    SYSCALL(int, maSensorStop(int sensor)) 
+	{		
+		return MoSync_SensorStop(sensor);
+	}
+    
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {
@@ -1001,6 +1011,8 @@ namespace Base {
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);			
 		maIOCtl_case(maMessageBox);
+        maIOCtl_case(maSensorStart);
+        maIOCtl_case(maSensorStop);         
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;

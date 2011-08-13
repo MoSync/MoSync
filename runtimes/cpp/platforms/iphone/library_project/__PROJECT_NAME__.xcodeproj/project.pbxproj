@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		431869BF13F691E50051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869BE13F691E50051D97A /* CoreMotion.framework */; };
 		4370369E13E9487D00F22783 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4370369D13E9487D00F22783 /* AddressBook.framework */; };
 		85796C5512719251002B7859 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5312719251002B7859 /* Icon-72.png */; };
 		85796C5612719251002B7859 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5412719251002B7859 /* Icon.png */; };
@@ -36,6 +37,7 @@
 		28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncViewController.h; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
+		431869BE13F691E50051D97A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		4370369D13E9487D00F22783 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		850944001185C440004A3B2D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
@@ -60,6 +62,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				431869BF13F691E50051D97A /* CoreMotion.framework in Frameworks */,
 				4370369E13E9487D00F22783 /* AddressBook.framework in Frameworks */,
 				85F2557E11AC155D00EB47EE /* Foundation.framework in Frameworks */,
 				85F2557F11AC155D00EB47EE /* UIKit.framework in Frameworks */,
@@ -100,7 +103,6 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
-				4370369D13E9487D00F22783 /* AddressBook.framework */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,
@@ -134,6 +136,8 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				431869BE13F691E50051D97A /* CoreMotion.framework */,
+				4370369D13E9487D00F22783 /* AddressBook.framework */,
 				850944001185C440004A3B2D /* CoreLocation.framework */,
 				85DF23EF126745DA003A0FF6 /* libMoSyncLib.a */,
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,

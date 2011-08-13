@@ -1315,6 +1315,13 @@ interface MAAPI {
 		* Currently implemented only on Android.
 		*/
 		BLUETOOTH_TURNED_ON = 30;
+
+		/**
+		* \brief Provides data from active sensors.
+		* \see MAEvent::sensor
+		* \see maSensorStart()
+		*/
+		SENSOR = 31;
 	}
 
 	/**
@@ -1327,6 +1334,14 @@ interface MAAPI {
 		int opType;
 		/// A success value \> 0 or a \link #CONNERR_GENERIC CONNERR \endlink code.
 		int result;
+	}
+
+	/**
+	* \brief A structure containing the sensor type and the data sent to the event.
+	*/
+	struct MASensor {
+		int type;
+		float values[3];
 	}
 	
 	/**
@@ -1389,6 +1404,11 @@ interface MAAPI {
 				int textboxLength;
 			} textbox;
 			
+			/**
+			* Valid in \link #EVENT_TYPE_SENSOR SENSOR \endlinkR events.
+			*/
+			MASensor sensor;
+
 			/**
 			* Used by custom events. See invididual event descriptions.
 			*/
@@ -4819,6 +4839,90 @@ group WidgetAPI "Widget API" {
 		 * to ensure its visibility on all screen sizes.
 		 */
 		void maMessageBox(in MAString title, in MAString message);
+
+		constset int SENSOR_TYPE_ {
+			// A constant describing an accelerometer sensor type.
+			ACCELEROMETER = 1;
+			// A constant describing a magnetic field sensor type.
+			MAGNETIC_FIELD = 2;
+			// A constant describing an orientation sensor type.
+			ORIENTATION = 3;
+			// A constant describing a gyroscope sensor type.
+			GYROSCOPE = 4;
+			// A constant describing an proximity sensor type.
+			PROXIMITY = 5;
+		}
+
+		constset int SENSOR_RATE_ {
+			// Get sensor data as fast as possible.
+			FASTEST = 0;
+			// A rate suitable for games.
+			GAME = -1;
+			// The default rate. Suitable for screen orientation changes.
+			NORMAL = -2;
+			// A rate suitable for the user interface.
+			UI = -3;
+		}
+
+		constset int SENSOR_ERROR_ {
+			NONE = 0;
+			// Errors for maSensorStart
+			NOT_AVAILABLE = -1;
+			INTERVAL_NOT_SET = -2;
+			ALREADY_ENABLED = -3;
+			// Errors for maSensorStop
+			NOT_ENABLED = -4;
+			CANNOT_DISABLE = -5;
+		}
+
+		constset int UIDEVICE_ORIENTATION_ {
+		    // The orientation of the device cannot be determined.
+			UNKNOWN = 0;
+			// The device is in portrait mode, with the device held upright and the home button at the bottom.
+			PORTRAIT = 1;
+			// The device is in portrait mode but upside down, with the device held upright and the home button at the top.
+			PORTRAIT_UPSIDE_DOWN = 2;
+			// The device is in landscape mode, with the device held upright and the home button on the right side.
+			LANDSCAPE_LEFT = 3;
+			// The device is in landscape mode, with the device held upright and the home button on the left side.
+			LANDSCAPE_RIGHT = 4;
+			// The device is held parallel to the ground with the screen facing upwards.
+			FACE_UP = 5;
+			// The device is held parallel to the ground with the screen facing downwards.
+			FACE_DOWN = 6;
+		}
+
+		constset int SENSOR_PROXIMITY_VALUE_ {
+			// the device is not close to the user
+			FAR = 0;
+			// the device is close to the user
+			NEAR = 1;
+		}
+
+		/**
+		* \brief Enables a sensor and starts sending events if the sensor is available.
+		* If the sensor is already enabled this call will have no effect.
+		* \param sensor       The sensor which should be enabled.
+		* \param interval     Time interval in which a sensor update shall be triggered.
+		*            >0 interval time in milliseconds.
+		*            <=0 Any of SensorUpdate enums.
+		* \return    #SENSOR_ERROR_NONE  on success.
+		*            #SENSOR_ERROR_NOT_AVAILABLE if this sensor wasn't available.
+		*            #SENSOR_ERROR_INTERVAL_NOT_SET if the interval wasn't set, could be due to platform limitations.
+		*            #SENSOR_ERROR_ALREADY_ENABLED if the sensor already was enabled.
+		* \see #EVENT_TYPE_SENSOR
+		*/
+		int maSensorStart(in int sensor, in int interval);
+
+		/**
+		* \brief Disables a sensor so that it doesn't send any further events.
+		* \param sensor    The sensor which should be disabled.
+		* \return    #SENSOR_ERROR_NONE on success.
+		*            #SENSOR_ERROR_NOT_ENABLED if this sensor wasn't enabled.
+		*            #SENSOR_ERROR_CANNOT_DISABLE if there was a problem disabling the sensor.
+		* \see #EVENT_TYPE_SENSOR
+		*/
+		int maSensorStop(in int sensor);
 	}
 	
 	constset int IOCTL_ {
