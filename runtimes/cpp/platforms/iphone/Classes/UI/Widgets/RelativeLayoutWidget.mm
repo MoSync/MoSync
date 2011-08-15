@@ -16,6 +16,7 @@
  */
 
 #import "RelativeLayoutWidget.h"
+#include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
 MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
