@@ -83,13 +83,13 @@ public:
         	int result;
         	char buf[2048] = { 0 };
         	Connection con( "ssl://encrypted.google.com:443" );
-        	const char *httpGetRequest = "GET / HTTP/1.0\r\n\r\n";
+			const char httpGetRequest[] = "GET / HTTP/1.0\r\nHost:encrypted.google.com\r\n\r\n";
 
         	TESTIFY_ASSERT( con.isValid( ) == true );
 			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_CONNECT, result ) );
 			TESTIFY_ASSERT( result > 0 );
 
-			con.write( httpGetRequest, 22 );
+			con.write( httpGetRequest, sizeof(httpGetRequest)-1 );
 			TESTIFY_ASSERT( waitForEvent( MAX_DELAY, CONNOP_WRITE, result ) );
 			TESTIFY_ASSERT( result > 0 );
 
