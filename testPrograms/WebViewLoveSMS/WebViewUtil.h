@@ -114,12 +114,11 @@ public:
 	 */
 	virtual MAUtil::String createTextFromHandle(MAHandle data);
 
-private:
 	/**
 	 * Open a file for read/write access. Create the file if it does not exist.
 	 * @return Handle to the open file, <0 on error.
 	 */
-	MAHandle openFileHelper(const MAUtil::String& filePath);
+	MAHandle openFileHelper(const MAUtil::String& filePath, bool truncate);
 };
 
 /**

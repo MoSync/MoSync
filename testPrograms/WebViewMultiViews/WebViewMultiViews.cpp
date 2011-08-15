@@ -124,7 +124,7 @@ public:
 			mPlatform->createTextFromHandle(ColorPage_html));
 
 		// Set the URL the web view displays.
-		// We should support both absolute file url and
+		// We support both absolute file url and
 		// as url that assumes a url base is set.
 		maWidgetSetProperty(webView, "url", "ColorPage.html");
 

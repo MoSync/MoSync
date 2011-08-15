@@ -3,7 +3,7 @@
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
-<property key="android:package.name" value="com.mosync.webviewgeolocation"/>
+<property key="android:package.name" value="com.mosync.lovesms"/>
 <property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
@@ -13,7 +13,7 @@
 <property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
-<property key="build.prefs:app.permissions" value="File\ Storage File\ Storage/Read File\ Storage/Write Internet\ Access Location Location/Coarse Location/Fine Vibrate"/>
+<property key="build.prefs:app.permissions" value="File\ Storage File\ Storage/Read File\ Storage/Write SMS/Send"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Debug" value=""/>

@@ -257,8 +257,14 @@ MAHandle Platform::openFileHelper(const MAUtil::String& filePath)
 		return -1;
 	}
 
-	if (!maFileExists(file))
+	if (maFileExists(file))
 	{
+		// If the file exists, truncate it to zero size.
+		maFileTruncate(file, 0);
+	}
+	else
+	{
+		// If the file does not exist, create it.
 		int result = maFileCreate(file);
 		if (result < 0)
 		{

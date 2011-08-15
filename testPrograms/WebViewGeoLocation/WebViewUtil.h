@@ -23,22 +23,26 @@ MA 02110-1301, USA.
  * This file contains a utility library for working with WebViews.
  */
 
-#ifndef MOSYNC_UI_WEBVIEWUTIL_H_
-#define MOSYNC_UI_WEBVIEWUTIL_H_
+#ifndef MOSYNC_WEBVIEWUTIL_H_
+#define MOSYNC_WEBVIEWUTIL_H_
 
 #include <ma.h>
 #include <MAUtil/String.h>
 #include <IX_WIDGET.h>
 
 namespace MoSync {
-namespace UI {
 
 /**
  * Class that contains utility methods.
  */
-class PlatformUtil
+class Platform
 {
 public:
+	/**
+	 * Create an instance for the current platform.
+	 */
+	static Platform* create();
+
 	/**
 	 * Error handling for devices that do not support NativeUI.
 	 * Here we throw a panic if NativeUI is not supported.
@@ -58,106 +62,105 @@ public:
 	static bool isIOS();
 
 	/**
-	 * Create an instance of a PlatformUtil for the current platform.
-	 */
-	static PlatformUtil createPlatformUtil();
-
-	/**
-	 * Helper method that reads a text string from data handle.
-	 */
-	static MAUtil::String getTextFromDataHandle(MAHandle data);
-
-	/**
-	 * Helper method that writes a text string to a file.
-	 */
-	static void PlatformUtil::writeTextToFile(
-		const MAUtil::String& filePath,
-		const MAUtil::String& text);
-
-	/**
 	 * Constructor.
 	 */
-	PlatformUtil();
+	Platform();
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~PlatformUtil();
+	virtual ~Platform();
 
 	/**
-	 * Helper method that writes a text string to a local file.
+	 * Get the path to the local file system.
+	 * @return Path that ends with a slash.
 	 */
-	virtual void writeTextToLocalFile(
-		const MAUtil::String& fileName,
-		const MAUtil::String& text) = 0;
+	virtual MAUtil::String getLocalPath();
+
+	/**
+	 * Write a data object to a file.
+	 * @return true on success, false on error.
+	 */
+	virtual bool writeDataToFile(
+		const MAUtil::String& filePath,
+		MAHandle outData);
+
+	/**
+	 * Write a text string to a file.
+	 * @return true on success, false on error.
+	 */
+	virtual bool writeTextToFile(
+		const MAUtil::String& filePath,
+		const MAUtil::String& outText);
+
+	/**
+	 * Read a data object from a file.
+	 * @return true on success, false on error.
+	 */
+	virtual bool readDataFromFile(
+		const MAUtil::String& filePath,
+		MAHandle inData);
+
+	/**
+	 * Read a text string from a file.
+	 * @return true on success, false on error.
+	 */
+	virtual bool readTextFromFile(
+		const MAUtil::String& filePath,
+		MAUtil::String& inText);
+
+	/**
+	 * Create a text string from data handle.
+	 */
+	virtual MAUtil::String createTextFromHandle(MAHandle data);
+
+private:
+	/**
+	 * Open a file for read/write access. Create the file if it does not exist.
+	 * @return Handle to the open file, <0 on error.
+	 */
+	MAHandle openFileHelper(const MAUtil::String& filePath);
 };
 
 /**
  * Class that contains Android platform utility methods.
  */
-class PlatformUtilAndroid : public PlatformUtil
+class PlatformAndroid : public Platform
 {
-private:
-	/**
-	 * The Android package name.
-	 */
-	MAUtil::String mLocalFilesDirectory;
-
 public:
 	/**
 	 * Constructor.
 	 */
-	PlatformUtilAndroid();
+	PlatformAndroid();
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~PlatformUtilAndroid();
-
-	/**
-	 * Helper method that writes a text string to a local file.
-	 */
-	virtual void writeTextToLocalFile(
-		const MAUtil::String& fileName,
-		const MAUtil::String& text);
-
-private:
-	/**
-	 * Get the path to the local file directory.
-	 */
-	MAUtil::String getLocalFileDirectory();
+	virtual ~PlatformAndroid();
 };
 
 /**
  * Class that contains iOS platform utility methods.
  */
-class PlatformUtilIOS : public PlatformUtil
+class PlatformIOS : public Platform
 {
 public:
 	/**
 	 * Constructor.
 	 */
-	PlatformUtilIOS();
+	PlatformIOS();
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~PlatformUtilIOS();
-
-	/**
-	 * Helper method that writes a text string to a local file.
-	 */
-	virtual void writeTextToLocalFile(
-		const MAUtil::String& fileName,
-		const MAUtil::String& text);
+	virtual ~PlatformIOS();
 };
 
 /**
- * Class that reads and parses custom messages from a web view.
+ * Class that reads and parses messages in the form of urls
+ * sent from a web view as MAW_EVENT_WEB_VIEW_HOOK_INVOKED events.
  *
- * NOTE: By "messages" is meant MAW_EVENT_CUSTOM_MESSAGE events.
- *
- * Message used with this class has the format:
+ * Message (urls) used with this class has the format:
  *
  *   mosync://MessageName/Param1/Param2/...
  *
@@ -168,8 +171,6 @@ public:
  * To receive messages from a web from do an initial call to:
  *
  *   WebViewUtil::getMessagesFor(webView);
- *
- * Messages will then be delivered as MAW_EVENT_CUSTOM_MESSAGE events.
  */
 class WebViewMessage
 {
@@ -208,17 +209,17 @@ public:
 	bool is(const MAUtil::String& messageName);
 
 	/**
-	 * Returns the data part of a message.
+	 * Returns the parameter part of a message.
 	 */
-	MAUtil::String getData();
+	MAUtil::String getParams();
 
 	/**
 	 * Returns a message parameter by index.
+	 * Parameters are separated by slashes.
 	 */
 	MAUtil::String getParam(int index);
 };
 
-} // namespace UI
 } // namespace MoSync
 
 #endif
