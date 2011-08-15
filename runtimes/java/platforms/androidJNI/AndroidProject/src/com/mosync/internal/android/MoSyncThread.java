@@ -2803,6 +2803,14 @@ public class MoSyncThread extends Thread
 	}
 	
 	/**
+	 * Reacquires the released hardware in case of resume
+	 */
+	public void acquireHardware()
+	{
+		mMoSyncCameraController.acquireCamera();
+	}
+
+	/**
 	 * starts the Camera Preview
 	 * 
 	 * @return 1 if succeeds

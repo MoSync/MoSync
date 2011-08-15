@@ -188,7 +188,7 @@ public class MoSync extends Activity
 		
 		// The MoSync view comes to foreground and is visible.
 		mMoSyncThread.setMoSyncView(mMoSyncView);
-		
+		mMoSyncThread.acquireHardware();
 		SYSLOG("Posting EVENT_TYPE_FOCUS_GAINED to MoSync");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_FOCUS_GAINED;

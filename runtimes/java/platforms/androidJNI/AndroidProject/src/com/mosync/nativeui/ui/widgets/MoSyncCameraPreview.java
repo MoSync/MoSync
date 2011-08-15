@@ -84,25 +84,6 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 			mCamera = null;
 		}
 	 }
-	 
-	 public void reinitiateCamera()
-	 {
-		 try
-		 {
-			setCameraDisplayOrientation();
-			mCamera.setPreviewDisplay(mHolder);
-			mCamera.setPreviewCallback(new PreviewCallback() {
-				public void onPreviewFrame(byte[] data, Camera arg1) {
-						MoSyncCameraPreview.this.invalidate();
-				}
-			});
-		 } catch (Exception e) {
-				if (mCamera != null)
-					mCamera.release();
-				mCamera = null;
-		 }
-	 }
-	 
 	  
 	 /**
 	  * sets the Orientation of the camera Preview o be the same as MoSyncApp
@@ -155,6 +136,8 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	  			 parameters.setRotation(0);
 			 }
 			 mCamera.setParameters(parameters);
+		 } catch (RuntimeException e) {
+			 SYSLOG("Failed to set camera Parameters");
 		 }
 	 }
 	 /**
@@ -164,14 +147,14 @@ public class MoSyncCameraPreview extends SurfaceView implements SurfaceHolder.Ca
 	 {
 	        try
 	        {
-		       mCamera.stopPreview();
-		       mCamera.setPreviewCallback(null);
-	      //  	mCamera.release();
-		    //    mCamera = null;
+				if(mCamera != null)
+				{
+					mCamera = null;
+				}
 	        }
-	        catch (Exception e)
+	        catch (RuntimeException e)
 	        {
-		        mCamera = null;
+		      SYSLOG("Failed to stopPreivew after surface destory");
 	        }
 	 }
 	 

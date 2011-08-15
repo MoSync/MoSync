@@ -37,6 +37,8 @@ public class MoSyncCameraController {
 	private ReentrantLock lock;
 	private Condition condition;
 	
+	private Camera mCamera;
+
 	/**
 	 * A private attribute used to keep track of 
 	 * the data place holder in each snapshot
@@ -75,7 +77,7 @@ public class MoSyncCameraController {
 		dataReady = false;
 		userWidths = new ArrayList<Integer>();
 		userHeights = new ArrayList<Integer>();
-		
+		mCamera = Camera.open();
 	}
 
 	/**
@@ -105,19 +107,8 @@ public class MoSyncCameraController {
 	public int getNumberOfPictureSizes()
 	{
 		List <Camera.Size> sizeList;
-		if(mPreview.mCamera == null)
-		{
-			mPreview.mCamera = Camera.open();
-			Camera.Parameters parameters = mPreview.mCamera.getParameters();
-			sizeList = parameters.getSupportedPictureSizes();
-			mPreview.mCamera.release();
-			mPreview.mCamera = null;
-		}
-		else
-		{
-			Camera.Parameters parameters = mPreview.mCamera.getParameters();
-			sizeList = parameters.getSupportedPictureSizes();
-		}
+		Camera.Parameters parameters = mCamera.getParameters();
+		sizeList = parameters.getSupportedPictureSizes();
 		return sizeList.size();
 	}
 	
@@ -145,7 +136,7 @@ public class MoSyncCameraController {
 		mPreview = preview;
 		if(mPreview.mCamera == null)
 		{
-			mPreview.mCamera = Camera.open();
+			mPreview.mCamera = mCamera;
 			mPreview.initiateCamera();
 		}
 	}
@@ -191,9 +182,10 @@ public class MoSyncCameraController {
 		{
 			if(mPreview.mCamera == null)
 			{
+				mPreview.mCamera = mCamera;
 				mPreview.initiateCamera();
 			}
-			mPreview.mCamera.startPreview();			
+			mCamera.startPreview();
 		} 
 		catch (Exception e) 
 		{
@@ -211,7 +203,7 @@ public class MoSyncCameraController {
 	{
 		try
 		{
-			mPreview.mCamera.stopPreview();
+			mCamera.stopPreview();
 		} 
 		catch (Exception e) 
 		{
@@ -258,15 +250,11 @@ public class MoSyncCameraController {
 	
 	public int setCameraProperty(String key, String value)
 	{
-		if(mPreview.mCamera == null)
-		{
-			mPreview.mCamera = Camera.open();
-		}
-		Camera.Parameters param = mPreview.mCamera.getParameters();
+		Camera.Parameters param = mCamera.getParameters();
 		param.set(key, value);
 		try
 		{
-			mPreview.mCamera.setParameters(param);
+			mCamera.setParameters(param);
 		}
 		catch (RuntimeException e)
 		{
@@ -279,11 +267,7 @@ public class MoSyncCameraController {
 			int memBuffer, 
 			int memBufferSize)
 	{
-		if(mPreview.mCamera == null)
-		{
-			mPreview.mCamera = Camera.open();
-		}
-		Camera.Parameters param = mPreview.mCamera.getParameters();
+		Camera.Parameters param = mCamera.getParameters();
 		String result;
 		if(key.equals(MAAPI_consts.MA_CAMERA_FLASH_SUPPORTED))
 		{
@@ -326,10 +310,22 @@ public class MoSyncCameraController {
 	 */
 	public void releaseCamera()
 	{
-		if(mPreview.mCamera != null)
+		if(mCamera != null)
 		{
-			mPreview.mCamera.release();
+			mCamera.release();
 			mPreview.mCamera = null;
+			mCamera = null;
+		}
+	}
+	/**
+	 * Releases the camera in case of pause or exit
+	 */
+	public void acquireCamera()
+	{
+		if(mCamera == null)
+		{
+			mCamera = Camera.open();
+			mPreview.mCamera = mCamera;
 		}
 	}
 	
@@ -338,7 +334,7 @@ public class MoSyncCameraController {
 	 */
 	private void setNewSize(int formatIndex)
 	{
-		Camera.Parameters parameters = mPreview.mCamera.getParameters();
+		Camera.Parameters parameters = mCamera.getParameters();
 		List <Camera.Size> supportedSizes =  parameters.getSupportedPictureSizes();
 		int width = userWidths.get(formatIndex).intValue(); 
 		int height = userHeights.get(formatIndex).intValue();
@@ -346,7 +342,7 @@ public class MoSyncCameraController {
 		parameters.setPictureSize(optimalPictureSize.width,optimalPictureSize.height);
     	try
     	{
-    		mPreview.mCamera.setParameters(parameters);
+			mCamera.setParameters(parameters);
     	}
     	catch (Exception e)
     	{
