@@ -145,6 +145,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 		locationController = [[MoSyncCLController alloc] init];
 		self.multipleTouchEnabled = YES;
 		touchHelper = [[TouchHelper alloc] init];
+        moSyncSensor = [[MoSyncSensor alloc] init];
 		
 		/*
 		CGRect appFrame = [[UIScreen mainScreen] bounds];
@@ -173,6 +174,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 - (void)dealloc {
     [super dealloc];
     [locationController release];	
+    [moSyncSensor dealloc];
 }
 
 - (void)deviceOrientationChanged:(NSNotification *)notification {
@@ -259,6 +261,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	textBoxData.constraints = constraints;
 	
 	[self performSelectorOnMainThread: @ selector(textBox:) withObject:(id)textBoxData waitUntilDone:NO];
+}
+
+/**
+ * Returns a pointer to the MoSyncSensor object.
+ */
+-(MoSyncSensor*) getMoSyncSensor {
+    return moSyncSensor;
 }
 
 @end

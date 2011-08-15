@@ -2807,7 +2807,7 @@ interface MAAPI {
 			PUBLIC_KEY = 112;
 			/// #MA_PIM_TYPE_STRING. Connected with PUBLIC_KEY.
 			PUBLIC_KEY_STRING = 113;
-			/// #MA_PIM_TYPE_DATE.
+			/// #MA_PIM_TYPE_DATE. The time when the item was last changed.
 			REVISION = 114;
 			/// #MA_PIM_TYPE_STRING. Telephone number.
 			TEL = 115;
@@ -2817,14 +2817,20 @@ interface MAAPI {
 			UID = 117;
 			/// #MA_PIM_TYPE_STRING. Uniform Resource Locator associated with the contact.
 			URL = 118;
-			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing an IM address .
-			/// Has \link #MA_PIM_CONTACT_IM_USERNAME MA_PIM_CONTACT_IM \endlink indices.
-			IM = 119;
-			/// #MA_PIM_TYPE_STRING. A data kind representing a relation.
-			RELATION = 120;
-			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing a organization.
-			/// Has \link #MA_PIM_CONTACT_ORGANIZATION_NAME MA_PIM_CONTACT_ORGANIZATION \endlink indices.
-			ORG_INFO = 121;
+			
+			/// #MA_PIM_TYPE_STRING_ARRAY. Supplemental organization/company information.
+			/// Has \link #MA_PIM_CONTACT_ORG_NAME MA_PIM_CONTACT_ORG \endlink indices.
+			ORG_INFO = 200;
+			/// #MA_PIM_TYPE_DATE.
+			ANNIVERSARY = 201;
+			/// #MA_PIM_TYPE_DATE. An event that is not a birthday or anniversary.
+			EVENT = 202;
+			/// #MA_PIM_TYPE_STRING_ARRAY. Instant Messaging protocol & username.
+			/// The first string is one of the MA_PIM_CONTACT_IM constants. The second string is the username.
+			IM = 203;
+			/// #MA_PIM_TYPE_STRING.
+			/// 
+			RELATED_NAME = 204;
 		}
 
 		constset int MA_PIM_CONTACT_ADDR_ {
@@ -2912,21 +2918,54 @@ interface MAAPI {
 			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
 			PUBLIC = 202;
 		}
-
-		// todo: document and enumerate.
-		constset int MA_PIM_CONTACT_IM_PROTOCOL_ {
-			AIM = 0;
-			MSN = 1;
-			YAHOO = 2;
-			SKYPE = 3;
-			QQ = 4;
-			GOOGLE_TALK = 5;
-			ICQ = 6;
-			JABBER = 7;
-			NETMEETING = 8;
+		
+		/// Indices for #MA_PIM_FIELD_CONTACT_NAME. 
+		constset int MA_PIM_CONTACT_NAME_ {
+			/// Family name.
+			FAMILY = 0;
+			/// Given name.
+			GIVEN = 1;
+			/// Alternate/secondary names, if any.
+			OTHER = 2;
+			/// Prefix. (ex. "Dr.")
+			PREFIX = 3;
+			/// Suffix. (ex. "M.D.")
+			SUFFIX = 4;
+			// todo: document
+			PHONETIC_FAMILY = 5;
+			PHONETIC_GIVEN = 6;
+			PHONETIC_OTHER = 7;
 		}
 
-		// deprecated
+		// todo: document and enumerate.
+		constset int MA_PIM_CONTACT_ORG_ {
+			DEPARTMENT = 0;
+			JOB_DESCRIPTION = 1;
+			SYMBOL = 2;
+			PHONETIC_NAME = 3;
+			OFFICE_LOCATION = 4;
+		}
+
+		/// Values for #MA_PIM_FIELD_CONTACT_CLASS.
+		constset int MA_PIM_CONTACT_CLASS_ {
+			CONFIDENTIAL = 200;
+			PRIVATE = 201;
+			PUBLIC = 202;
+		}
+		
+		// todo: document and enumerate.
+		constset int MA_PIM_CONTACT_IM_ {
+			PROTOCOL_AIM = "AIM";
+			PROTOCOL_MSN = "MSN";
+			PROTOCOL_YAHOO = "Yahoo";
+			PROTOCOL_SKYPE = "Skype";
+			PROTOCOL_QQ = "QQ";
+			PROTOCOL_GOOGLE_TALK = "GoogleTalk";
+			PROTOCOL_ICQ = "ICQ";
+			PROTOCOL_JABBER = "Jabber";
+			PROTOCOL_NETMEETING = "Netmeeting";
+		}
+		
 		constset int MA_PIM_ATTR_ {
 			/// The value describes an assistant.
 			ASST = 1;
@@ -2946,10 +2985,39 @@ interface MAAPI {
 			/// Only one value per field may be marked PREFERRED. Marking a value PREFERRED
 			/// causes any other PREFERRED value in the field to become unmarked.
 			PREFERRED = 128;
+			/// The field's label can be set.
+			CUSTOM = 129;
+			
 			/// The value describes an SMS number?
-			SMS = 256;
+			SMS = 0x100;
 			/// The value describes a work phone number.
-			WORK = 512;
+			WORK = 0x200;
+
+			/// The value describes an iPhone number.
+			IPHONE = 0x400;
+			// todo: document.
+			CALLBACK = 0x800;
+			CAR = 0x1000;
+			ISDN = 0x2000;
+			RADIO = 0x4000;
+			TTY_TDD = 0x8000;
+			MMS = 0x10000;
+
+			BLOG = 0x20000;
+			PROFILE = 0x40000;
+			FTP = 0x80000;
+			
+			MOTHER    = 0x100000;
+			FATHER    = 0x200000;
+			PARENT    = 0x400000;
+			SISTER    = 0x800000;
+			BROTHER   = 0x1000000;
+			CHILD     = 0x2000000;
+			FRIEND    = 0x4000000;
+			SPOUSE    = 0x8000000;
+			PARTNER   = 0x10000000;
+			MANAGER   = 0x20000000;
+			ASSISTANT = 0x40000000;
 		}
 
 		constset int MA_PIM_ATTR_ADDR_ {
@@ -3085,6 +3153,29 @@ interface MAAPI {
 			NONE = 0;
 			/// This function is unavailable on the current platform.
 			UNAVAILABLE = -1;
+			/// The native database's data type did not match the MoSync API.
+			NATIVE_TYPE_MISMATCH = -2;
+			/// The value does not have a custom label.
+			NO_LABEL = -3;
+			/// The values's attribute is not set to custom.
+			CUSTOM_ATTRIBUTE = -4;
+			/// The given index is not valid.
+			/// This value is returned by maPimItemGetField(), maPimItemSetValue().
+			INVALID_INDEX = -5;
+			///
+			LABEL_NOT_SET = -6;
+			/// The field has no values / not supported on the current platform.
+			/// This value is returned by maPimItemSetLabel(), maPimItemGetAttributes.
+			UNAVAILABLE_FIELD = -7;
+			/// The specified pim list is not available on the current platform.
+			UNAVAILABLE_LIST = -8;
+			/// The specified list is not opend. Call maPimListOpen() first.
+			LIST_NOT_OPENED = -9;
+			/// The operation is not allowed by the Address Book database.
+			OPERATION_NOT_PERMITTED = -10;
+			/// Invalid handle.
+			INVALID_HANDLE = -11;
+
 			/// The native database's data type for the given field did not match the MoSync API.
 			NATIVE_TYPE_MISMATCH = -2;
 			/// The field type is not supported.
@@ -3095,23 +3186,7 @@ interface MAAPI {
 			COMBO_UNSUPPORTED = -5;
 			/// More values in this field is not supported.
 			FIELD_COUNT_MAX = -6;
-			/// The value does not have a custom label.
-			NO_LABEL = -7;
-			/// The values's attribute is not set to custom.
-			CUSTOM_ATTRIBUTE = -8;
-			/// The given index is not valid.
-			/// This value is returned by maPimItemGetField(), maPimItemSetValue().
-			INVALID_INDEX = -9;
-			///
-			LABEL_NOT_SET = -10;
-			/// The specified pim list is not available on the current platform.
-			UNAVAILABLE_LIST = -11;
-			/// The specified list is not opend. Call maPimListOpen() first.
-			LIST_NOT_OPENED = -12;
-			/// The operation is not allowed by the Address Book database.
-			OPERATION_NOT_PERMITTED = -13;
-			/// Invalid handle.
-			INVALID_HANDLE = -14;
+
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.
@@ -3155,8 +3230,8 @@ interface MAAPI {
 
 		/** Returns the bitmask of attributes for the specified value in a field and item.
 		* Panics on field+index combinations that don't exist in this item.
-		* On iPhone platform in case of error one of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink
-		* constants is returned.
+		* On iPhone platform in case of error one of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink 
+		* constants is returned. 
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
@@ -3175,7 +3250,7 @@ interface MAAPI {
 		* \note This function is not available on JavaME or Blackberry.
 		*/
 		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
-
+		
 		/** Retrieves the custom label for a value in a field and item,
 		* if the value has a custom label.
 		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
@@ -3190,7 +3265,7 @@ interface MAAPI {
 		* \note This function is not available on JavaME or Blackberry.
 		*/
 		int maPimItemGetLabel(in MA_PIM_ARGS args, in int index);
-
+		
 		/** Returns one of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants,
 		* or \< 0 if the field does not exist in the list.
 		* \param list Opened by maPimListOpen().
