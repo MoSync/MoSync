@@ -145,7 +145,7 @@
     eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
     eventData->widgetHandle = handle;
 	eventData->status = MAW_CONSTANT_STARTED;
-    event.data = eventData;
+    event.data = (MAAddress)eventData;
     Base::gEventQueue.put(event);
     return;
 }
@@ -158,7 +158,7 @@
     eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
     eventData->widgetHandle = handle;
 	eventData->status = MAW_CONSTANT_DONE;
-    event.data = eventData;
+    event.data = (MAAddress)eventData;
     Base::gEventQueue.put(event);
     return;
 }
@@ -171,7 +171,7 @@
     eventData->eventType = MAW_EVENT_WEB_VIEW_CONTENT_LOADING;
     eventData->widgetHandle = handle;
 	eventData->status = MAW_CONSTANT_ERROR;
-    event.data = eventData;
+    event.data = (MAAddress)eventData;
     Base::gEventQueue.put(event);
     return;
 }
@@ -243,7 +243,7 @@
         ms->write([url cStringUsingEncoding:NSASCIIStringEncoding], size);
 
         eventData->urlData = urlHandle;
-        event.data = eventData;
+        event.data = (MAAddress)eventData;
 
 
         Base::gEventQueue.put(event);
