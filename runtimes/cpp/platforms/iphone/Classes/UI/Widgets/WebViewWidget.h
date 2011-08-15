@@ -20,6 +20,7 @@
 
 @interface WebViewWidget : IWidget <UIWebViewDelegate> {
 	NSString* newurl;
+	NSString* baseUrl;
     NSString* softHookPattern;
 	NSString* hardHookPattern;
     NSString* javaScriptIdentifier; //"javascript:"
@@ -29,6 +30,5 @@
 - (id)init;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
-
-
+-(NSString*)getDefaultBaseURL;
 @end

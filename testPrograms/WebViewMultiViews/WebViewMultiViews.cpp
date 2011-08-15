@@ -119,9 +119,14 @@ public:
 		// so they can be accessed by the web view.
 		// TODO: This can be removed once automatic resource
 		// unpacking of file systems is supported.
+
 		mPlatform->writeTextToFile(
-			mPlatform->getLocalPath() + "Assets/ColorPage.html",
+			mPlatform->getLocalPath() + "ColorPage.html",
 			mPlatform->createTextFromHandle(ColorPage_html));
+
+		mPlatform->writeTextToFile(
+			mPlatform->getLocalPath() + "AnotherPage.html",
+			"<html><body><p><a href=\"ColorPage.html\">Hello World2</a></p></body></html>");
 
 		// Set the URL the web view displays.
 		// We support both absolute file url and
