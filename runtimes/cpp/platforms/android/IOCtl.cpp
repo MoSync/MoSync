@@ -1102,14 +1102,14 @@ namespace Base
 		jstring jstrNewName = jNIEnv->NewStringUTF(newName);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls,
-												 "maFileRename",
-												 "(ILjava/lang/String;)I");
+			cls,
+			"maFileRename",
+			"(ILjava/lang/String;)I");
 		if (methodID == 0)
 			return 0;
 
-		jint result = jNIEnv->CallIntMethod(jThis, methodID,
-											file, jstrNewName);
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID, file, jstrNewName);
 
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrNewName);
