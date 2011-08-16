@@ -1,7 +1,7 @@
 
 
 #import "CameraConfirgurator.h"
-
+#import <helpers/cpp_defs.h>
 
 @implementation CameraConfirgurator
 
@@ -49,7 +49,7 @@
 					}
 			}
 			else {
-				result = -2;
+				result = MA_CAMERA_RES_INVALID_PROPERTY_VALUE;
 			}
 
 		}
@@ -66,7 +66,7 @@
 				}
 			}
 			else {
-				result = -2;
+				result = MA_CAMERA_RES_VALUE_NOTSUPPORTED;
 			}
 
 			
@@ -74,7 +74,7 @@
 
 		else 
 		{
-			result = -2;
+			result = MA_CAMERA_RES_PROPERTY_NOTSUPPORTED;
 		}
 		
 		[device unlockForConfiguration];

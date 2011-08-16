@@ -1101,182 +1101,219 @@ namespace Base {
 	
 	SYSCALL(int, maCameraStart()) 
 	{	
-		CameraInfo *info = getCurrentCameraInfo();
-		if( info )
-		{
-			//In this case, no preview widget was assigned to this camera.
-			//Run the sublayer to the main mosync view at full screen
-			if( !info->view )
-			{
-				if( !info->previewLayer )
+		@try {
+				CameraInfo *info = getCurrentCameraInfo();
+				if( info )
 				{
-					info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
-				}
-				
-				MoSync_AddLayerToView(info->previewLayer);
-				MoSync_UpdateView(gBackbuffer->image);
-			}
-			else 
-			{
-				info->previewLayer.frame = info->view.bounds;
-			}
+					//In this case, no preview widget was assigned to this camera.
+					//Run the sublayer to the main mosync view at full screen
+					if( !info->view )
+					{
+						if( !info->previewLayer )
+						{
+							info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
+						}
 
-			//Have to do it this way, because otherwise it hijacks the main thread or something wierd
-			[info->captureSession	performSelectorOnMainThread:@selector(startRunning) 
-									withObject:nil 
-									waitUntilDone:YES];
-	
+						MoSync_AddLayerToView(info->previewLayer);
+						MoSync_UpdateView(gBackbuffer->image);
+					}
+					else
+					{
+						info->previewLayer.frame = info->view.bounds;
+					}
+
+					//Have to do it this way, because otherwise it hijacks the main thread or something wierd
+					[info->captureSession	performSelectorOnMainThread:@selector(startRunning)
+														   withObject:nil
+														waitUntilDone:YES];
+				}
+				return 1;
 		}
-		return 1;
+		@catch (NSException * e) {
+			return -1;
+		}
 	}
-	
+
 	SYSCALL(int, maCameraStop()) 
 	{	
-		CameraInfo *info = getCurrentCameraInfo();
-		if( info )
-		{
-			[info->captureSession stopRunning];
-			
-			//In this case, we don't have a preview widget,
-			//so we need to remove the layer from the main view.
-			if ( !info->view ) {
+		@try {
+			CameraInfo *info = getCurrentCameraInfo();
+			if( info )
+			{
+				[info->captureSession stopRunning];
+
+				//In this case, we don't have a preview widget,
+				//so we need to remove the layer from the main view.
+				if ( !info->view ) {
+					[info->previewLayer removeFromSuperlayer];
+				}
+			}
+			return 1;
+		}
+		@catch (NSException * e) {
+			return -1;
+		}
+	}
+
+	SYSCALL(int, maCameraSetPreview(MAHandle widgetHandle)) 
+	{
+		@try {
+			CameraPreviewWidget *widget = (CameraPreviewWidget*) [getMoSyncUI() getWidget:widgetHandle];
+			if( !widget )
+			{
+				return 0;
+			}
+
+			UIView *newView = [widget getView];
+
+			CameraInfo *info = getCurrentCameraInfo();
+
+			if( !info->previewLayer )
+			{
+				info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
+				//info->previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
+			}
+
+			if ( info->view )
+			{
+				//Remove the preview layer from the other view
 				[info->previewLayer removeFromSuperlayer];
 			}
-		}
-		return 1;
-	}
-	
-	SYSCALL(int, maCameraSetPreview(MAHandle widgetHandle)) 
-	{		
-		CameraPreviewWidget *widget = (CameraPreviewWidget*) [getMoSyncUI() getWidget:widgetHandle];
-		if( !widget )
-		{
-			return 0;
-		}
-		
-		UIView *newView = [widget getView];
-		
-		CameraInfo *info = getCurrentCameraInfo();
-		
-		if( !info->previewLayer )
-		{
-			info->previewLayer = [[AVCaptureVideoPreviewLayer alloc] initWithSession:info->captureSession];
-			//info->previewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill;
-		}
-		
-		if ( info->view )
-		{
-			//Remove the preview layer from the other view
-			[info->previewLayer removeFromSuperlayer];
-			
-		}
-		
-		//If this widget was assigned to another camera, we need to remove that
-		//other camera's preview layer from it. 
-		for ( int i=0; i<gCameraSystem.numCameras; i++ ) {
-			if( gCameraSystem.cameraInfo[i].view == newView )
-			{
-				[gCameraSystem.cameraInfo[i].previewLayer removeFromSuperlayer];
-				gCameraSystem.cameraInfo[i].view = NULL;
+
+			//If this widget was assigned to another camera, we need to remove that
+			//other camera's preview layer from it.
+			for ( int i=0; i<gCameraSystem.numCameras; i++ ) {
+				if( gCameraSystem.cameraInfo[i].view == newView )
+				{
+					[gCameraSystem.cameraInfo[i].previewLayer removeFromSuperlayer];
+					gCameraSystem.cameraInfo[i].view = NULL;
+				}
 			}
+
+			info->view = newView;
+			widget.previewLayer = info->previewLayer;
+			[info->view.layer addSublayer:info->previewLayer];
+			info->previewLayer.frame = info->view.bounds;
+			[info->view.layer setNeedsDisplay];
+			return 1;
 		}
-		
-		info->view = newView;
-		widget.previewLayer = info->previewLayer;
-		[info->view.layer addSublayer:info->previewLayer];
-		info->previewLayer.frame = info->view.bounds;
-		[info->view.layer setNeedsDisplay];
-		return 1;
+		@catch (NSException * e) {
+			return -1;
+		}
 	}
-	
+
 	SYSCALL(int, maCameraSelect(MAHandle cameraNumber)) 
 	{	
-		initCameraSystem();
-		
-		if (cameraNumber < 0 || cameraNumber >=gCameraSystem.numCameras) {
-			return 0;
+		@try {
+			initCameraSystem();
+
+			if (cameraNumber < 0 || cameraNumber >=gCameraSystem.numCameras) {
+				return 0;
+			}
+
+			gCameraSystem.currentCamera = cameraNumber;
+			return 1;
 		}
-		
-		gCameraSystem.currentCamera = cameraNumber;
-		return 1;
+		@catch (NSException * e) {
+			return -1;
+		}
 	}
-	
+
 	SYSCALL(int, maCameraNumber()) 
 	{	
-		initCameraSystem();
-		return gCameraSystem.numCameras;
+		@try {
+			initCameraSystem();
+			return gCameraSystem.numCameras;
+		}
+		@catch (NSException * e) {
+			return -1;
+		}
 	}
-	
+
 	SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder)) 
 	{
-		CameraInfo *info = getCurrentCameraInfo();
-        
-		AVCaptureConnection *videoConnection =	[info->stillImageOutput.connections objectAtIndex:0];
-		if ([videoConnection isVideoOrientationSupported])
-		{
-			[videoConnection setVideoOrientation:[UIDevice currentDevice].orientation];
-			if([UIDevice currentDevice].orientation == UIDeviceOrientationFaceUp)
-				NSLog(@"video orientation is set");
+		@try {
+			CameraInfo *info = getCurrentCameraInfo();
+
+			AVCaptureConnection *videoConnection =	[info->stillImageOutput.connections objectAtIndex:0];
+			if ([videoConnection isVideoOrientationSupported])
+			{
+				[videoConnection setVideoOrientation:[UIDevice currentDevice].orientation];
+				if([UIDevice currentDevice].orientation == UIDeviceOrientationFaceUp)
+					NSLog(@"video orientation is set");
+			}
+			[info->stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection
+											completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
+											if (imageDataSampleBuffer != NULL) {
+												NSData *imageData = [AVCaptureStillImageOutput
+												jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
+													MemStream *stream = new MemStream([imageData length]);
+													stream->write([imageData bytes],[imageData length]);
+													gSyscall->resources.add_RT_BINARY(placeholder, stream);
+													}}];
+			return 1;
+
 		}
-        [info->stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection 
-								completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
-									NSLog(@"Entered the capture Block!!!!!!!!!");
-									if (imageDataSampleBuffer != NULL) {
-									NSData *imageData = [AVCaptureStillImageOutput 
-													jpegStillImageNSDataRepresentation:imageDataSampleBuffer];
-									MemStream *stream = new MemStream([imageData length]);
-									stream->write([imageData bytes],[imageData length]);
-									gSyscall->resources.add_RT_BINARY(placeholder, stream);
-									}}];		
-		return 1;
+		@catch (NSException * e) {
+			return -1;
+		}
 	}
-	
+
 	SYSCALL(int, maCameraRecord(int stopStartFlag))
 	{		
 		return 1;
 	}
-	
+
 	SYSCALL(int, maCameraSetProperty(const char *property, const char* value))
-	{		
-		int result = 0;
-		CameraInfo *info = getCurrentCameraInfo();
-		
-		NSString *propertyString = [NSString stringWithUTF8String:property];
-		NSString *valueString = [NSString stringWithUTF8String:value];
-		CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
-		result = [configurator	setCameraProperty: info->device 
-								withProperty: propertyString 
-								withValue: valueString];
-		[propertyString release];
-		[valueString release];	
-		[configurator release];
-		return result;
+	{
+		@try {
+			int result = 0;
+			CameraInfo *info = getCurrentCameraInfo();
+
+			NSString *propertyString = [NSString stringWithUTF8String:property];
+			NSString *valueString = [NSString stringWithUTF8String:value];
+			CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
+			result = [configurator	setCameraProperty: info->device
+										withProperty: propertyString
+										   withValue: valueString];
+			[propertyString release];
+			[valueString release];
+			[configurator release];
+			return result;
+		}
+		@catch (NSException * e) {
+			return -1;
+		}
 	}
 
-	
 	SYSCALL(int, maCameraGetProperty(const char *property, char *value, int maxSize))
 	{
-		NSString *propertyString = [NSString stringWithUTF8String:property];
-		CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
-		CameraInfo *info = getCurrentCameraInfo();
-		NSString* retval = [configurator	getCameraProperty:info->device
-											withProperty:propertyString];		
+		@try {
+			NSString *propertyString = [NSString stringWithUTF8String:property];
+			CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
+			CameraInfo *info = getCurrentCameraInfo();
+			NSString* retval = [configurator	getCameraProperty:info->device
+												  withProperty:propertyString];
+
+			if(retval == nil) return -2;
+			int length = maxSize;
+			int realLength = [retval length];
+			if(realLength > length) {
+				return -2;
+			}
+
+			[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
+			[retval release];
+			[propertyString release];
+			[configurator release];
 			
-		if(retval == nil) return -2;
-		int length = maxSize;
-		int realLength = [retval length];
-		if(realLength > length) {
-			return -2;
+			return realLength;
 		}
-		
-		[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
-		[retval release];
-		[propertyString release];
-		[configurator release];
-		
-		return realLength;
+		@catch (NSException * e) {
+			return -1;
+		}
 	}
-	
+
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
 	{
 		switch(function) {

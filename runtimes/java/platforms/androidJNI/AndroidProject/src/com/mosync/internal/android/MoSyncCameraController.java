@@ -251,7 +251,29 @@ public class MoSyncCameraController {
 	public int setCameraProperty(String key, String value)
 	{
 		Camera.Parameters param = mCamera.getParameters();
-		param.set(key, value);
+		if(key.equals(MAAPI_consts.MA_CAMERA_FOCUS_MODE))
+		{
+			if(value.equals(MAAPI_consts.MA_CAMERA_FOCUS_AUTO))
+				mCamera.autoFocus(null);
+			else if(value.equals(MAAPI_consts.MA_CAMERA_FOCUS_FIXED))
+			{
+				mCamera.cancelAutoFocus();
+				return MAAPI_consts.MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+			}
+			else if(value.equals(MAAPI_consts.MA_CAMERA_FOCUS_MACRO))
+			{
+				mCamera.autoFocus(null);
+				return MAAPI_consts.MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+			}
+			else
+				mCamera.cancelAutoFocus();
+
+			param.setFocusMode(value);
+		}
+		else
+		{
+			param.set(key, value);
+		}
 		try
 		{
 			mCamera.setParameters(param);
@@ -260,7 +282,7 @@ public class MoSyncCameraController {
 		{
 			return MAAPI_consts.MA_CAMERA_RES_FAILED;
 		}
-		return 1;
+		return MAAPI_consts.MA_CAMERA_RES_OK;
 	}
 	
 	public int getCameraPorperty(String key,

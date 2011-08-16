@@ -1077,8 +1077,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				INFOPLIST_FILE = "MoSync-Info.plist";
 				PRODUCT_NAME = MoSync;
-				PROVISIONING_PROFILE = "92C69729-5F75-4E8B-A7F9-76BD5132C6F5";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "92C69729-5F75-4E8B-A7F9-76BD5132C6F5";
 			};
 			name = Debug;
 		};
@@ -1094,8 +1092,6 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				INFOPLIST_FILE = "MoSync-Info.plist";
 				PRODUCT_NAME = MoSync;
-				PROVISIONING_PROFILE = "92C69729-5F75-4E8B-A7F9-76BD5132C6F5";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "92C69729-5F75-4E8B-A7F9-76BD5132C6F5";
 			};
 			name = Release;
 		};
@@ -1156,7 +1152,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tomas Uppgard (MYB667RX83)";
 				DEAD_CODE_STRIPPING = NO;
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_PREPROCESSOR_DEFINITIONS = "";
@@ -1172,6 +1168,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 2.0;
 				OTHER_CFLAGS = "-DDARWIN";
 				PREBINDING = NO;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B06E2757-3CC3-41D7-9607-2B0F939ED9DB";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

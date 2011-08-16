@@ -4449,6 +4449,11 @@ group CameraResultCodes "Camera Result Codes" {
 		* @brief A constant that represents the flash being in the automatic mode.
 		*/
 		INVALID_PROPERTY_VALUE = -5;
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		VALUE_NOTSUPPORTED = -6;
 		
 	} 
 } //end CameraResultCodes
