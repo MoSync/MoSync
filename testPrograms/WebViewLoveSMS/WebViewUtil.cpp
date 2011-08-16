@@ -237,6 +237,7 @@ bool Platform::readTextFromFile(
 	int size = maFileSize(file);
 	if (size < 1)
 	{
+		lprintfln("Platform::readTextFromFile: size < 1");
 		return false;
 	}
 
@@ -244,11 +245,17 @@ bool Platform::readTextFromFile(
 	char* buffer = (char*) malloc(sizeof(char) * (size + 1));
 
 	int result = maFileRead(file, buffer, size);
+	lprintfln("Platform::readTextFromFile: maFileRead result: %i", result);
+	if (0 == result)
+	{
+		// Success, copy string data.
+		buffer[size] = 0;
+		inText = buffer;
+	}
+
+	free(buffer);
 
 	maFileClose(file);
-
-	buffer[size] = 0;
-	inText = buffer;
 
 	return result == 0;
 }

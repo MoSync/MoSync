@@ -70,7 +70,7 @@ public:
 	{
 		mPlatform = Platform::create();
 		// Used for testing the file API.
-		// testFileAPI();
+		testFileAPI();
 		createUI();
 		createMessageStrings();
 	}
@@ -92,6 +92,7 @@ public:
 			maPanic(0, "Test failed, inspect log.");
 		}
 	}
+
 	void testFileAPI()
 	{
 		bool success;
@@ -123,6 +124,8 @@ public:
 		success = mPlatform->writeDataToFile(
 			mPlatform->getLocalPath() + "testdata2",
 			h);
+		check(success, "writeDataToFile");
+		maDestroyObject(h);
 
 		// Read string to test that write to handle worked.
 		MAUtil::String data2;
@@ -132,6 +135,40 @@ public:
 		check(success, "readTextFromFile2");
 		check(data2.length() == 5, "readTextFromFile2 data2.length() == 5");
 		check(data2.find("12345", 0) == 0, "readTextFromFile2 data2.find(\"12345\", 0) == 0");
+
+		// Rename file using full path.
+		MAUtil::String fileName = mPlatform->getLocalPath() + "testdata2";
+		MAHandle file = maFileOpen(fileName.c_str(), MA_ACCESS_READ_WRITE);
+		check(file > 0, "maFileOpen");
+		check(maFileExists(file), "maFileExists");
+		MAUtil::String newFileName = mPlatform->getLocalPath() + "testdata3";
+		int result = maFileRename(file, newFileName.c_str());
+		check(0 == result, "maFileRename");
+
+		// Read renamed file.
+		MAUtil::String data3;
+		success = mPlatform->readTextFromFile(newFileName, data3);
+		check(success, "readTextFromFile3");
+		check(data3.length() == 5, "readTextFromFile3 data3.length() == 5");
+		check(data3.find("12345", 0) == 0, "readTextFromFile3 data3.find(\"12345\", 0) == 0");
+
+		// Now rename using file name only.
+		MAUtil::String fileName2 = mPlatform->getLocalPath() + "testdata3";
+		MAHandle file2 = maFileOpen(fileName2.c_str(), MA_ACCESS_READ_WRITE);
+		check(file2 > 0, "maFileOpen2");
+		check(maFileExists(file2), "maFileExists2");
+		MAUtil::String newFileName2 = "testdata4";
+		int result2 = maFileRename(file2, newFileName2.c_str());
+		check(0 == result2, "maFileRename2");
+
+		// Read renamed file.
+		MAUtil::String data4;
+		success = mPlatform->readTextFromFile(
+			mPlatform->getLocalPath() + "testdata4",
+			data4);
+		check(success, "readTextFromFile4");
+		check(data4.length() == 5, "readTextFromFile4 data4.length() == 5");
+		check(data4.find("12345", 0) == 0, "readTextFromFile4 data4.find(\"12345\", 0) == 0");
 
 		maExit(0);
 	}
