@@ -4888,7 +4888,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Gets the buffer percentage of the played video file.
-		*
+		* Only for Android platform.
 		* @validvalue An int.
 		*
 		* @getonly

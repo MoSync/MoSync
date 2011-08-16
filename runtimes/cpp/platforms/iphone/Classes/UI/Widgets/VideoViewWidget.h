@@ -27,7 +27,7 @@
     /**
      * Controller for the media player.
      */
-    MPMoviePlayerController *moviePlayerController;
+    MPMoviePlayerController *mMoviePlayerController;
 }
 
 /**

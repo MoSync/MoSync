@@ -35,26 +35,27 @@
 {
     if (!view)
     {
-        moviePlayerController = [[MPMoviePlayerController alloc] init];
+        mMoviePlayerController = [[MPMoviePlayerController alloc] init];
+
         CGRect viewRect = CGRectMake(DEFAULT_RECT_X, DEFAULT_RECT_Y, DEFAULT_RECT_WIDTH, DEFAULT_RECT_HEIGHT);
         UIView* smallView = [[[UIView alloc] initWithFrame:viewRect] retain];
 
-        [moviePlayerController.view setFrame: smallView.bounds];
+        [mMoviePlayerController.view setFrame: smallView.bounds];
         view = smallView;
-        [view addSubview:moviePlayerController.view];
+        [view addSubview:mMoviePlayerController.view];
 
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(moviePlaybackComplete:)
                                                      name:MPMoviePlayerPlaybackDidFinishNotification
-                                                   object:moviePlayerController];
+                                                   object:mMoviePlayerController];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(moviePlaybackStateChanged:)
                                                      name:MPMoviePlayerPlaybackStateDidChangeNotification
-                                                   object:moviePlayerController];
+                                                   object:mMoviePlayerController];
         [[NSNotificationCenter defaultCenter] addObserver:self
                                                  selector:@selector(sourceReady:)
                                                      name:MPMoviePlayerLoadStateDidChangeNotification
-                                                   object:moviePlayerController];
+                                                   object:mMoviePlayerController];
     }
 
     return [super init];
@@ -67,13 +68,13 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:MPMoviePlayerPlaybackDidFinishNotification
-                                                  object:moviePlayerController];
+                                                  object:mMoviePlayerController];
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:MPMoviePlayerPlaybackStateDidChangeNotification
-                                                  object:moviePlayerController];
+                                                  object:mMoviePlayerController];
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:MPMoviePlayerLoadStateDidChangeNotification
-                                                  object:moviePlayerController];
+                                                  object:mMoviePlayerController];
     [super dealloc];
 }
 
@@ -91,13 +92,13 @@
         if (filepath)
         {
             NSURL *fileURL = [NSURL fileURLWithPath:filepath];
-            [moviePlayerController setContentURL:fileURL];
+            [mMoviePlayerController setContentURL:fileURL];
         }
     }
     else if ([key isEqualToString:@"url"])
     {
         NSURL *webURL = [NSURL URLWithString:value];
-        [moviePlayerController setContentURL:webURL];
+        [mMoviePlayerController setContentURL:webURL];
     }
     else if ([key isEqualToString:@"action"])
     {
@@ -107,7 +108,12 @@
              [key isEqualToString:@"height"])
     {
         [super setPropertyWithKey:key toValue:value];
-        [moviePlayerController.view setFrame: view.bounds];
+        [mMoviePlayerController.view setFrame: view.bounds];
+    }
+    else if ([key isEqualToString:@"seekTo"])
+    {
+        TEST_FOR_NEGATIVE_VALUE([value floatValue]);
+        [mMoviePlayerController setCurrentPlaybackTime:[value floatValue]];
     }
     else
     {
@@ -126,7 +132,11 @@
 {
 	if([key isEqualToString:@"duration"])
     {
-        return[[NSString alloc] initWithFormat:@"%f", [moviePlayerController duration]];
+        return[[NSString alloc] initWithFormat:@"%f", [mMoviePlayerController duration]];
+	}
+    if([key isEqualToString:@"currentPosition"])
+    {
+        return[[NSString alloc] initWithFormat:@"%f", [mMoviePlayerController currentPlaybackTime]];
 	}
     else
     {
@@ -144,13 +154,13 @@
     switch (newStateValue)
     {
         case MAW_VIDEO_VIEW_ACTION_PLAY:
-            [moviePlayerController play];
+            [mMoviePlayerController play];
             break;
         case MAW_VIDEO_VIEW_ACTION_PAUSE:
-            [moviePlayerController pause];
+            [mMoviePlayerController pause];
             break;
         case MAW_VIDEO_VIEW_ACTION_STOP:
-            [moviePlayerController stop];
+            [mMoviePlayerController stop];
             break;
         default:
             break;
@@ -192,7 +202,7 @@
     {
         int playbackStateEvent = 0;
         BOOL sendEvent = TRUE;
-        MPMoviePlaybackState playbackState = [moviePlayerController playbackState];
+        MPMoviePlaybackState playbackState = [mMoviePlayerController playbackState];
 
         // Check the type of the event.
         switch (playbackState)
@@ -241,7 +251,7 @@
     NSError *error = [[notification userInfo] objectForKey:@"error"];
     if (!error)
     {
-        if (MPMovieLoadStatePlayable == [moviePlayerController loadState])
+        if (MPMovieLoadStatePlayable == [mMoviePlayerController loadState])
         {
             MAEvent event;
             event.type = EVENT_TYPE_WIDGET;
