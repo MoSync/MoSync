@@ -25,17 +25,6 @@
 
 @implementation EditBoxWidget
 
-- (BOOL)textFieldShouldReturn:(UITextField*)textField {
-	MAEvent event;
-	event.type = EVENT_TYPE_WIDGET;
-	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = MAW_EVENT_CLICKED;
-	eventData->widgetHandle = handle;
-	event.data = (int)eventData;
-	Base::gEventQueue.put(event);
-	return YES;
-}
-
 - (id)init {
 	textField = [[[UITextField alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];
 	textField.borderStyle = UITextBorderStyleRoundedRect;
@@ -43,6 +32,7 @@
 	id ret = [super init];
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
 	textField.delegate = self;
+    [textField addTarget:self action:@selector(textChanged) forControlEvents:UIControlEventEditingChanged];
 	return ret;
 }
 
@@ -80,42 +70,78 @@
 	}
 	else if([key isEqualToString:@"textVerticalAlignment"]) {
 		// This isn't trivial on iphone.
-		
+
 		//UILabel* label = (UILabel*) view;
 		//if([value isEqualToString:@"center"]) {
 		//}
-	}	
+	}
 	else if([key isEqualToString:@"fontColor"]) {
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		textField.textColor = color;
-	}	
+	}
 	else if([key isEqualToString:@"fontSize"]) {
 		float fontSize = [value floatValue];
 		textField.font = [UIFont boldSystemFontOfSize:fontSize];
 	}
 	else if([key isEqualToString:@"editMode"]) {
-		
+
 		if(
 		   [value isEqualToString:@"password"])
 		   textField.secureTextEntry = YES;
-		else 
+		else
 		   textField.secureTextEntry = NO;
-		
+
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	
+
 	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@"text"]) {
 		return textField.text;
-	}	
-	
+	}
+
 	return [super getPropertyWithKey:key];
+}
+
+/**
+ * Delegate for editing began action for this widget.
+ * @param textField The text field for which an editing session began.
+ */
+- (void)textFieldDidBeginEditing:(UITextField *)textField
+{
+    [super sendEvent:MAW_EVENT_EDIT_BOX_EDITING_DID_BEGIN];
+}
+
+/**
+ * Delegate for editing stopped action for this widget.
+ * @param textField The text field for which editing ended.
+ */
+- (void)textFieldDidEndEditing:(UITextField *)textField
+{
+    [super sendEvent:MAW_EVENT_EDIT_BOX_EDITING_DID_END];
+}
+
+/**
+ * Delegate for processing the pressing of the return button.
+ * @param textField The text field whose return button was pressed.
+ */
+- (BOOL)textFieldShouldReturn:(UITextField*)textField
+{
+    [super sendEvent:MAW_EVENT_EDIT_BOX_RETURN];
+	return YES;
+}
+
+/**
+ * Called each time when the text field's text has changed.
+ */
+- (void) textChanged
+{
+    [super sendEvent:MAW_EVENT_EDIT_BOX_TEXT_CHANGED];
 }
 
 @end

@@ -3203,6 +3203,34 @@ group WidgetAPI "Widget API" {
 		 */
 		VIDEO_STATE_CHANGED = 15;
 
+        /**
+         * @brief Sent from the Edit box when it gains focus(the user selects the widget).
+         * The virtual keyboard is shown.
+         * Only for iphone platform.
+         */
+         EDIT_BOX_EDITING_DID_BEGIN = 16;
+
+        /**
+         * @brief Sent from the Edit box when it loses focus.
+         * The virtual keyboard is hidden.
+         * Only for iphone platform.
+         */
+         EDIT_BOX_EDITING_DID_END = 17;
+
+        /**
+         * @brief Sent from the Edit box when the text was changed.
+         * Only for iphone platform.
+         */
+         EDIT_BOX_TEXT_CHANGED = 18;
+
+        /**
+         * @brief Sent from the Edit box when the return button was pressed.
+         * On iphone platform the virtual keyboard is not closed after receiving this event.
+         * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
+         * Only for iphone platform.
+         */
+         EDIT_BOX_RETURN = 19;
+
 	}
 	} // end of WidgetEventTypes
 
@@ -3261,10 +3289,10 @@ group WidgetAPI "Widget API" {
 	}
 
 	/**
-	* The available playback actions for the video widget. For more info see \ref WidgetVideoViewProperties.
+	* The available playback actions for the video view. For more info see \ref WidgetVideoViewProperties.
 	*/
-	group VideoWidgetAction "Video widget action" {
-	constset int MAW_VIDEO_WIDGET_ACTION_ {
+	group VideoViewAction "Video view action" {
+	constset int MAW_VIDEO_VIEW_ACTION_ {
 		/**
 		* @brief Play the video.
 		*/
@@ -3283,11 +3311,11 @@ group WidgetAPI "Widget API" {
 	}
 
    /**
-	* Events for the video widget. When the state of the video view changes an event with one
+	* Events for the video view. When the state of the video view changes an event with one
 	* of the next constants will be send.
 	*/
-	group VideoWidgetEvent "Video widget event" {
-	constset int MAW_VIDEO_WIDGET_STATE_ {
+	group VideoViewEvent "Video view event" {
+	constset int MAW_VIDEO_VIEW_STATE_ {
 		/**
 		* @brief The video is playing.
 		*/
@@ -3491,7 +3519,7 @@ group WidgetAPI "Widget API" {
 		 * See \ref WidgetNavigationBarProperties "Navigation Bar properties" for the properties available.
 
 		 */
-		NAV_BAR = "NavBar";		
+		NAV_BAR = "NavBar";
 
 		/**
 		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
@@ -3550,6 +3578,8 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A Video View displays a video file.
+		 * By default, it has attached a controller view that typically contains the buttons like
+		 * "Play/Pause", "Rewind", "Fast Forward" and a progress slider.
 		 * See \ref WidgetVideoViewProperties "Video View properties" for the properties available.
 		 */
 		VIDEO_VIEW = "VideoView";
@@ -3789,7 +3819,7 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char currentTabBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(tabScreenHandle, MAW_WEB_VIEW_CURRENT_TAB, currentTabBuffer, BUFFER_SIZE);
+		* 	int getStatus = maWidgetGetProperty(tabScreenHandle, MAW_TAB_SCREEN_CURRENT_TAB, currentTabBuffer, BUFFER_SIZE);
 		* 	if(getStatus == MAW_RES_OK)
 		* 	{
 		* 	    // Do something with current tab.
@@ -4814,19 +4844,33 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Start,pause or stop the video playback.
 		*
-		* @validvalue MAW_VIDEO_WIDGET_ACTION_PLAY, MAW_VIDEO_WIDGET_ACTION_PAUSE or MAW_VIDEO_WIDGET_ACTION_STOP constants.
+		* @validvalue MAW_VIDEO_VIEW_ACTION_PLAY, MAW_VIDEO_VIEW_ACTION_PAUSE or MAW_VIDEO_VIEW_ACTION_STOP constants.
 		*
 		* @setonly
 		*
 		* @par Example
 		* \code
 		*   // Start the playback.
-        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_ACTION, toString(MAW_VIDEO_WIDGET_ACTION_PLAY));
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_ACTION, toString(MAW_VIDEO_VIEW_ACTION_PLAY));
 		* \endcode
 		*/
 		ACTION = "action";
 
-	  /**
+		/**
+		* @brief Seeks into the video.
+		*
+		* @validvalue A valid integer for milliseconds.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_SEEK_TO, "10000");
+		* \endcode
+		*/
+		SEEK_TO = "seekTo";
+
+		/**
 		* @brief Gets the video file duration.
 		*
 		* @validvalue An int.
@@ -4841,14 +4885,46 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		DURATION = "duration";
+
+		/**
+		* @brief Gets the buffer percentage of the played video file.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_BUFFER_PERCENTAGE, buf, BUFFER_SIZE);
+		*   // Do something with the percentage.
+		* \endcode
+		*/
+		BUFFER_PERCENTAGE = "bufferPercentage";
+
+		/**
+		* @brief Gets the current position in the video file.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_CURRENT_POSITION, buf, BUFFER_SIZE);
+		*   // Do something with the position.
+		* \endcode
+		*/
+		CURRENT_POSITION = "currentPosition";
+
 	}
 	} // end of WidgetVideoViewProperties
 
 group WidgetDatePickerProperties "Date Picker properties" {
 	constset MAString MAW_DATE_PICKER_ {
 		/**
-		* @brief Sets or gets  maximal date supported by this DatePicker.
-		* The format is: "DDMMYYYY".
+		* @brief Sets or gets  maximal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00.
 		* NOTE: On Android the default maximal date is 12/31/2100.
 		*
 		* @validvalue A long int that specifies the upper range of this date picker.
@@ -4857,15 +4933,14 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE, "10122010");
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE, "101220100000");
 		*   // Now the maximum date is  the 10th of December 2010.
 		* \endcode
 		*/
 		MAX_DATE = "maxDate";
 
 		/**
-		* @brief Sets or gets  minimal date supported by this DatePicker.
-		* The format is: "DDMMYYYY".
+		* @brief Sets or gets  minimal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00
 		* Note: On Android the default minimal date is 01/01/1900.
 		* @validvalue A long int that specifies the minimal supported date.
 		*
@@ -4873,7 +4948,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE, "01012000");
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE, "0101200000");
 		*   // Now the minimum date is the 1st of January 2000.
 		* \endcode
 		*/
@@ -5032,6 +5107,64 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	}
 	} // end of WidgetNumberPickerProperties
 
+	/**
+	* The available widget properties for a #MAW_NAVIGATION_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetNavBarProperties "Navigation Bar properties" {
+	constset MAString MAW_NAV_BAR_ {
+		/**
+		* @brief Sets or gets the title.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_TITLE, "MyScreen");
+		* \endcode
+		*/
+		TITLE = "title";
+
+		/**
+		* @brief Sets the text for the back button.
+		* This can be set only when the navigation bar was
+		* attached to a screen that is not part of a stack screen.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_BACK_BTN, "Home");
+		* \endcode
+		*/
+		BACK_BTN = "backBtn";
+
+		/**
+		* @brief Sets the background color. The default color is light blue.
+		* The color is in RGB8 format (0xRRGGBB).
+		* On Android there is another option:
+		*    Apply a gradient, specified by two rgb colors separated by comma.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x101010");
+		* \endcode
+		*
+		* @par Example on Android apply a gradient from dark blue to light blue.
+		* \code
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B,0xCAE1FF");
+		* \endcode
+		*/
+		COLOR = "color";
+	}
+	} // end of WidgetNavBarProperties
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;
@@ -5175,6 +5308,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.  
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetSetProperty(in MAWidgetHandle widget, in MAString property, in MAString value);

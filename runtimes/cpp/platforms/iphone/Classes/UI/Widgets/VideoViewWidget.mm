@@ -143,13 +143,13 @@
     int newStateValue = [value intValue];
     switch (newStateValue)
     {
-        case MAW_VIDEO_WIDGET_ACTION_PLAY:
+        case MAW_VIDEO_VIEW_ACTION_PLAY:
             [moviePlayerController play];
             break;
-        case MAW_VIDEO_WIDGET_ACTION_PAUSE:
+        case MAW_VIDEO_VIEW_ACTION_PAUSE:
             [moviePlayerController pause];
             break;
-        case MAW_VIDEO_WIDGET_ACTION_STOP:
+        case MAW_VIDEO_VIEW_ACTION_STOP:
             [moviePlayerController stop];
             break;
         default:
@@ -172,7 +172,7 @@
 
         MAWidgetEventData *eventData = new MAWidgetEventData;
         eventData->eventType = MAW_EVENT_VIDEO_STATE_CHANGED;
-        eventData->videoViewState = MAW_VIDEO_WIDGET_STATE_FINISHED;
+        eventData->videoViewState = MAW_VIDEO_VIEW_STATE_FINISHED;
         eventData->widgetHandle = handle;
 
         event.data = (int)eventData;
@@ -198,16 +198,16 @@
         switch (playbackState)
         {
             case MPMoviePlaybackStatePlaying:
-                playbackStateEvent = MAW_VIDEO_WIDGET_STATE_PLAYING;
+                playbackStateEvent = MAW_VIDEO_VIEW_STATE_PLAYING;
                 break;
             case MPMoviePlaybackStatePaused:
-                playbackStateEvent = MAW_VIDEO_WIDGET_STATE_PAUSED;
+                playbackStateEvent = MAW_VIDEO_VIEW_STATE_PAUSED;
                 break;
             case MPMoviePlaybackStateStopped:
-                playbackStateEvent = MAW_VIDEO_WIDGET_STATE_STOPPED;
+                playbackStateEvent = MAW_VIDEO_VIEW_STATE_STOPPED;
                 break;
             case MPMoviePlaybackStateInterrupted:
-                playbackStateEvent = MAW_VIDEO_WIDGET_STATE_INTERRUPTED;
+                playbackStateEvent = MAW_VIDEO_VIEW_STATE_INTERRUPTED;
                 break;
             default:
                 // Don't handle the other playback states.
@@ -248,7 +248,7 @@
 
             MAWidgetEventData *eventData = new MAWidgetEventData;
             eventData->eventType = MAW_EVENT_VIDEO_STATE_CHANGED;
-            eventData->videoViewState = MAW_VIDEO_WIDGET_STATE_SOURCE_READY;
+            eventData->videoViewState = MAW_VIDEO_VIEW_STATE_SOURCE_READY;
             eventData->widgetHandle = handle;
 
             event.data = (int)eventData;
