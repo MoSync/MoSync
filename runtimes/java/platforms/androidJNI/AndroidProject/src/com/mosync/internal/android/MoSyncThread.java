@@ -19,7 +19,6 @@ package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
-import static com.mosync.internal.generated.MAAPI_consts.CONNERR_GENERIC;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_ON;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_OFF;
@@ -57,7 +56,6 @@ import java.nio.channels.FileChannel;
 import java.nio.channels.ReadableByteChannel;
 import java.util.Date;
 import java.util.Hashtable;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -91,7 +89,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.SystemClock;
 import android.os.Vibrator;
-import android.telephony.SmsManager;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
@@ -2120,6 +2117,10 @@ public class MoSyncThread extends Thread
 			String path = getActivity().getFilesDir().getAbsolutePath() + "/";
 			Log.i("@@@ MoSync", "Property mosync.path.local: " + path);
 			property = path;
+		}
+		else if (key.equals("mosync.path.local.urlPrefix"))
+		{
+			property = "file://";
 		}
 		else if (key.equals("mosync.path.local.url"))
 		{
