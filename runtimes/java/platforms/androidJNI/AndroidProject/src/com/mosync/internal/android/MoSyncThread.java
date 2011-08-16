@@ -3142,7 +3142,7 @@ public class MoSyncThread extends Thread
 		return mMoSyncFile.maFileDate(file);
 	}
 
-	int maFileRename(int file, int newName)
+	int maFileRename(int file, String newName)
 	{
 		return mMoSyncFile.maFileRename(file, newName);
 	}

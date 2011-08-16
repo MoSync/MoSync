@@ -39,8 +39,6 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_ACCESS_READ_WRITE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_GENERIC;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_NOTFOUND;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_FORBIDDEN;
-import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_RENAME_FILESYSTEM;
-import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_RENAME_DIRECTORY;
 
 /**
  * MoSync File API
@@ -60,6 +58,13 @@ public class MoSyncFile {
 	 */
 	class MoSyncFileHandle
 	{
+		private final int mAccessMode;
+		private final boolean mIsAFile;
+		private FileChannel mFileChannel;
+		private int mCurrentPosition;
+		private File mFile;
+		private RandomAccessFile mRandomAccessFile;
+
 		/**
 		 * Constructor
 		 * @param path The path to this file
@@ -141,13 +146,6 @@ public class MoSyncFile {
 
 			return 0;
 		}
-
-		public final File mFile;
-		public final int mAccessMode;
-		public final boolean mIsAFile;
-		public FileChannel mFileChannel;
-		public int mCurrentPosition;
-		private RandomAccessFile mRandomAccessFile;
 	}
 
 	/**
@@ -450,21 +448,54 @@ public class MoSyncFile {
 	*
 	* \returns 0 on success, or \< 0 on error.
 	*/
-	int maFileRename(int file, int newName)
+	int maFileRename(int file, String newName)
 	{
-		// TODO: Implement this method. Was about to
-		// do this when I discovered that newName is an int.
-		// Is it a memory index? Or should it be a string?
+		MoSyncFileHandle fileHandle = mFileHandles.get(file);
+		if (null == fileHandle)
+		{
+			return MA_FERR_NOTFOUND;
+		}
 
-//		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-//		if (null == fileHandle)
-//		{
-//			return MA_FERR_NOTFOUND;
-//		}
-//
-//		boolean success = fileHandle.mFile.renameTo(newName);
+		String newFilePath;
 
-		return -1;
+		// Does the file name have a path?
+		if (newName.contains("/"))
+		{
+			// Yes, it does, use the name as it is.
+			newFilePath = newName;
+		}
+		else
+		{
+			// No, it does not, assume the same location
+			// and build a full path name.
+			newFilePath = fileHandle.mFile.getParent() + "/" + newName;
+		}
+
+		// Create the new file object.
+		File newFile = new File(newFilePath);
+		boolean success = fileHandle.mFile.renameTo(newFile);
+		if (success)
+		{
+			Log.i("MoSync",
+				"SUCCESS maFileRename from: " +
+				fileHandle.mFile.getAbsolutePath() +
+				" to: " + newFile.getAbsolutePath());
+
+			// Rebind the mFile variable to the new file object.
+			// The old file object does not point to a valid file anymore.
+			fileHandle.mFile = newFile;
+
+			return 0;
+		}
+		else
+		{
+			Log.i("MoSync",
+				"FAIL maFileRename from: " +
+				fileHandle.mFile.getAbsolutePath() +
+				" to: " + newFile.getAbsolutePath());
+
+			return -1;
+		}
 	}
 
 	/**
@@ -516,14 +547,18 @@ public class MoSyncFile {
 		try
 		{
 			int ret = fileHandle.mFileChannel.write(byteBuffer);
+
+			Log.i("MoSync File API", "writeByteBufferToFile bytes written: "  + ret);
+
 			fileHandle.mCurrentPosition =
 				(int)fileHandle.mFileChannel.position();
 
 			return ret;
 		}
-		catch(Throwable t)
+		catch (Throwable t)
 		{
-			Log.e("MoSync File API","(Exception) maWriteFile - " + t);
+			Log.e("MoSync File API", "(Exception) writeByteBufferToFile - " + t);
+			t.printStackTrace();
 			return MA_FERR_GENERIC;
 		}
 	}
@@ -538,6 +573,9 @@ public class MoSyncFile {
 		try
 		{
 			int ret = fileHandle.mFileChannel.read(byteBuffer);
+
+			Log.i("MoSync File API", "readFileToByteBuffer bytes read: "  + ret);
+
 			fileHandle.mCurrentPosition =
 				(int)fileHandle.mFileChannel.position();
 
@@ -590,35 +628,67 @@ public class MoSyncFile {
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
+			Log.i("MoSync File API", "maFileWriteFromData: file handle not found");
 			return MA_FERR_NOTFOUND;
 		}
 
-		if(fileHandle.mAccessMode == MA_ACCESS_READ)
+		if (fileHandle.mAccessMode == MA_ACCESS_READ)
+		{
+			Log.i("MoSync File API", "maFileWriteFromData: writing forbidden");
 			return MA_FERR_FORBIDDEN;
+		}
 
 		ByteBuffer byteBuffer = mMoSyncThread.getBinaryResource(data);
 		if (null == byteBuffer)
 		{
-			Log.e("MoSync File API","(Error) No such data resource");
+			Log.e("MoSync File API","maFileWriteFromData: No such data resource");
 			return MA_FERR_GENERIC;
 		}
 
-		// If the whole object should be sent, just send it
-		if((offset == 0) && (len == byteBuffer.capacity()))
-		{
-			writeByteBufferToFile(fileHandle, byteBuffer);
-			return 0;
-		}
-		// Create a sliced buffer which we can send to file
+		// Set buffer position.
 		byteBuffer.position(offset);
-		ByteBuffer slicedBuffer = byteBuffer.slice();
-		slicedBuffer.limit(len);
 
-		int writtenBytes = writeByteBufferToFile(fileHandle, slicedBuffer);
-		if(len != writtenBytes)
-			return MA_FERR_GENERIC;
+		// If the whole object should be written, just write it.
+		if ((offset == 0) && (len == byteBuffer.capacity()))
+		{
+			Log.i("MoSync File API",
+				"maFileWriteFromData: writing whole buffer length: " + len);
 
-		return 0;
+			int writtenBytes = writeByteBufferToFile(fileHandle, byteBuffer);
+			if (len != writtenBytes)
+			{
+				Log.e("MoSync File API","maFileWriteFromData: error: len != writtenBytes");
+				return MA_FERR_GENERIC;
+			}
+			else
+			{
+				// Success.
+				Log.i("MoSync File API", "maFileWriteFromData: success");
+				return 0;
+			}
+		}
+		else
+		{
+			Log.i("MoSync File API",
+				"maFileWriteFromData: writing buffer slice length: " + len);
+
+			// Otherwise create a sliced buffer and write it to file.
+			ByteBuffer slicedBuffer = byteBuffer.slice();
+			slicedBuffer.limit(len);
+
+			int writtenBytes = writeByteBufferToFile(fileHandle, slicedBuffer);
+			if (len != writtenBytes)
+			{
+				Log.e("MoSync File API","maFileWriteFromData: error: len != writtenBytes");
+				return MA_FERR_GENERIC;
+			}
+			else
+			{
+				// Success.
+				Log.i("MoSync File API", "maFileWriteFromData: success");
+				return 0;
+			}
+		}
 	}
 
 	/**
@@ -662,20 +732,43 @@ public class MoSyncFile {
 			return MA_FERR_GENERIC;
 		}
 
-		// If the whole object should be sent, just send it
-		if((offset == 0) && (len == byteBuffer.capacity()))
-		{
-			readFileToByteBuffer(fileHandle, byteBuffer);
-			return 0;
-		}
-		// Create a sliced buffer which we can send to file
+		// Set buffer position.
 		byteBuffer.position(offset);
-		ByteBuffer slicedBuffer = byteBuffer.slice();
-		slicedBuffer.limit(len);
 
-		readFileToByteBuffer(fileHandle, slicedBuffer);
-
-		return 0;
+		// If the whole buffer should be read, just read it.
+		if ((offset == 0) && (len == byteBuffer.capacity()))
+		{
+			int readBytes = readFileToByteBuffer(fileHandle, byteBuffer);
+			if (len != readBytes)
+			{
+				Log.e("MoSync File API","maFileReadToData: error: len != readBytes");
+				return MA_FERR_GENERIC;
+			}
+			else
+			{
+				// Success.
+				Log.i("MoSync File API", "maFileReadToData: success");
+				return 0;
+			}
+		}
+		else
+		{
+			// Read a slice, create a sliced buffer we read into.
+			ByteBuffer slicedBuffer = byteBuffer.slice();
+			slicedBuffer.limit(len);
+			int readBytes = readFileToByteBuffer(fileHandle, slicedBuffer);
+			if (len != readBytes)
+			{
+				Log.e("MoSync File API","maFileReadToData: error: len != readBytes");
+				return MA_FERR_GENERIC;
+			}
+			else
+			{
+				// Success.
+				Log.i("MoSync File API", "maFileReadToData: success");
+				return 0;
+			}
+		}
 	}
 
 	/**
