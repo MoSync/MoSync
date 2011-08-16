@@ -33,6 +33,8 @@ stabs.tab
 fp.xml
 profile.txt
 
+config_platform.h
+
 /*.bat
 
 /ipch/*
@@ -45,6 +47,8 @@ profile.txt
 /tools/GLWrapperGenerator/magl_functions.h
 /tools/GLWrapperGenerator/opengl_generated.idl
 /tools/GLWrapperGenerator/opengl_invoke_generated.jpp
+
+/tools/idl2/opengl_generated.idl
 
 /tools/WrapperGenerator/tests/*.h.cpp
 /tools/WrapperGenerator/tests/*.h.idl
@@ -92,27 +96,23 @@ profile.txt
 /testPrograms/temp.s
 /testPrograms/copyfiles.bat
 
+/runtimes/cpp/generated
+
 /runtimes/cpp/core/invoke_syscall_arm_recompiler.h
 /runtimes/cpp/core/invoke_syscall_cpp.h
 
-/runtimes/cpp/platforms/sdl/config_platform.h
 /runtimes/cpp/platforms/sdl/mosynclib/mosynclib.def
-/runtimes/cpp/platforms/sdl/MoRE/fp.xml
-/runtimes/cpp/platforms/sdl/MoRE/profile.txt
 /runtimes/cpp/platforms/sdl/MoRE/filesystem/*
 
 /runtimes/cpp/platforms/iphone/Classes/helpers/maapi_defs.h
 /runtimes/cpp/platforms/iphone/Classes/syscall_static_cpp.h
 
 /runtimes/cpp/platforms/iphone/Classes/data_section.bin
-/runtimes/cpp/platforms/iphone/Classes/impl/config_platform.h
 /runtimes/cpp/platforms/iphone/Classes/rebuild.build.cpp
 /runtimes/cpp/platforms/iphone/data_section.bin
 /runtimes/cpp/platforms/iphone/template/
 
 
-/runtimes/cpp/platforms/symbian/inc/config_platform.h
-/testPrograms/sld.tab
 /runtimes/cpp/platforms/symbian/sis*/*.SIS
 
 /runtimes/cpp/platforms/symbian/group*/setPath.bat
@@ -131,8 +131,6 @@ profile.txt
 
 /runtimes/cpp/platforms/symbian/sis-ed3/1/*
 /runtimes/cpp/platforms/symbian/sis-ed5/1/*
-
-/runtimes/cpp/platforms/winmobile/config_platform.h
 
 /runtimes/java/source/MAAPI_consts.h
 /runtimes/java/source/core_consts.h
@@ -160,22 +158,14 @@ profile.txt
 /tools/debugger/operations_generated.cpp
 /tools/debugger/operations_generated.h
 /tools/debugger/mdb_log.txt
-/tools/debugger/fp.xml
 /tools/debugger/mdb_commands.txt
-/tools/debugger/profile.txt
-/tools/debugger/sld.tab
 /tools/debugger/start.bat
 /tools/debugger/filesystem
 
-/runtimes/cpp/platforms/sdl/MoRE/sld.tab
-/runtimes/cpp/platforms/sdl/MoRE/fp.xml
-/runtimes/cpp/platforms/sdl/MoRE/profile.txt
 /runtimes/cpp/platforms/sdl/MoRE/filesystem/*
-/runtimes/cpp/platforms/android/config_platform.h
 /runtimes/cpp/platforms/android/config_platform.h.saved
 /runtimes/java/platforms/javaME/setdirs.bat
 /runtimes/java/platforms/javaME/work.bat
-/runtimes/java/platforms/javaME/src/config_platform.h
 /runtimes/java/platforms/javaME/src/opengl_invoke_generated.jpp
 
 /runtimes/java/platforms/androidJNI/AndroidProject/libs
@@ -191,14 +181,11 @@ profile.txt
 /runtimes/java/platforms/androidJNI/AndroidProject/gen/
 /runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/java/android/R.java
 
-/tests/libc-suite/fp.xml
-/tests/libc-suite/profile.txt
 /tests/libc-suite/settings.rb
 /tests/libc-suite/_masterdump.s
 /tests/libc-suite/filesystem
 /tests/libc-suite/loader/config.h
 
-/tools/vis/fp.xml
 /tools/vis/sld.*
 
 /examples/GenerateResources/config.rb
@@ -207,4 +194,3 @@ profile.txt
 /docs/*.dot.*
 
 /tools/mhsd-display/mhsd.bin
-/tools/mhsd-display/sld.tab
