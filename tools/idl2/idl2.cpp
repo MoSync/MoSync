@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <idl-common/output-bindings.h>
 
 #include "helpers/mkdir.h"
+#include "helpers/types.h"
 
 #include "core.h"
 
