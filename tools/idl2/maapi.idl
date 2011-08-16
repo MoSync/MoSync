@@ -2918,24 +2918,6 @@ interface MAAPI {
 			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
 			PUBLIC = 202;
 		}
-		
-		/// Indices for #MA_PIM_FIELD_CONTACT_NAME. 
-		constset int MA_PIM_CONTACT_NAME_ {
-			/// Family name.
-			FAMILY = 0;
-			/// Given name.
-			GIVEN = 1;
-			/// Alternate/secondary names, if any.
-			OTHER = 2;
-			/// Prefix. (ex. "Dr.")
-			PREFIX = 3;
-			/// Suffix. (ex. "M.D.")
-			SUFFIX = 4;
-			// todo: document
-			PHONETIC_FAMILY = 5;
-			PHONETIC_GIVEN = 6;
-			PHONETIC_OTHER = 7;
-		}
 
 		// todo: document and enumerate.
 		constset int MA_PIM_CONTACT_ORG_ {
@@ -2945,25 +2927,17 @@ interface MAAPI {
 			PHONETIC_NAME = 3;
 			OFFICE_LOCATION = 4;
 		}
-
-		/// Values for #MA_PIM_FIELD_CONTACT_CLASS.
-		constset int MA_PIM_CONTACT_CLASS_ {
-			CONFIDENTIAL = 200;
-			PRIVATE = 201;
-			PUBLIC = 202;
-		}
 		
-		// todo: document and enumerate.
-		constset int MA_PIM_CONTACT_IM_ {
-			PROTOCOL_AIM = "AIM";
-			PROTOCOL_MSN = "MSN";
-			PROTOCOL_YAHOO = "Yahoo";
-			PROTOCOL_SKYPE = "Skype";
-			PROTOCOL_QQ = "QQ";
-			PROTOCOL_GOOGLE_TALK = "GoogleTalk";
-			PROTOCOL_ICQ = "ICQ";
-			PROTOCOL_JABBER = "Jabber";
-			PROTOCOL_NETMEETING = "Netmeeting";
+		constset int MA_PIM_CONTACT_IM_PROTOCOL_ {
+			AIM = "AIM";
+			MSN = "MSN";
+			YAHOO = "Yahoo";
+			SKYPE = "Skype";
+			QQ = "QQ";
+			GOOGLE_TALK = "GoogleTalk";
+			ICQ = "ICQ";
+			JABBER = "Jabber";
+			NETMEETING = "Netmeeting";
 		}
 		
 		constset int MA_PIM_ATTR_ {
