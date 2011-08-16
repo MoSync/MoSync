@@ -1,5 +1,8 @@
 <html>
 <head>
+<!-- iOS test of base url:
+<base href="file://localhost/Users/ali/Library/Application%20Support/iPhone%20Simulator/4.3/Applications/D052DA27-0021-43CC-BFD5-BB9BABA43609/Documents/" />
+-->
 <script>
 function OnBackgroundClick()
 {
@@ -12,6 +15,11 @@ function SetBackgroundColor(colorValue)
 }
 </script>
 </head>
+<!-- body onclick does not work on iOS. -->
 <body onclick="OnBackgroundClick()">
+<p><a href="#" onclick="OnBackgroundClick()">
+Click Me!!!!!
+</a></p>
+<p><a href="AnotherPage.html">AnotherPage</a></p>
 </body>
 </html>

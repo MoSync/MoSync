@@ -21,6 +21,9 @@ MA 02110-1301, USA.
  * @author Mikael Kindborg
  *
  * Application for testing the WebView widget.
+ *
+ * TODO: The app contains lots of experimental stuff
+ * that could be better structured.
  */
 
 #include <ma.h>

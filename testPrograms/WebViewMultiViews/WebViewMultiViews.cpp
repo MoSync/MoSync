@@ -21,6 +21,9 @@ MA 02110-1301, USA.
  * @author Mikael Kindborg
  *
  * Application for testing multiple WebView widgets.
+ *
+ * TODO: This program uses hard coded layout sizes to work
+ * on iOS. Fix this when iOS layout bugs are fixed.
  */
 
 #include <ma.h>
@@ -119,9 +122,15 @@ public:
 		// so they can be accessed by the web view.
 		// TODO: This can be removed once automatic resource
 		// unpacking of file systems is supported.
+
 		mPlatform->writeTextToFile(
-			mPlatform->getLocalPath() + "Assets/ColorPage.html",
+			mPlatform->getLocalPath() + "ColorPage.html",
 			mPlatform->createTextFromHandle(ColorPage_html));
+
+		// As a test, create a second page (linked to from ColorPage.html).
+		mPlatform->writeTextToFile(
+			mPlatform->getLocalPath() + "AnotherPage.html",
+			"<html><body><p><a href=\"ColorPage.html\">Hello World</a></p></body></html>");
 
 		// Set the URL the web view displays.
 		// We support both absolute file url and

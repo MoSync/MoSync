@@ -33,6 +33,7 @@
     softHookPattern = @"";
 	hardHookPattern = @"";
     javaScriptIdentifier = @"javascript:";
+	baseUrl = [[self getDefaultBaseURL] retain];
     urlsToNotHook=[[NSMutableDictionary alloc] init];
     [urlsToNotHook retain];
 	return [super init];
@@ -45,6 +46,7 @@
 		UIWebView* webView = (UIWebView*)view;
 		//Check whether the user tries to send some javascript
         NSRange identifierLocation = [value rangeOfString:javaScriptIdentifier];
+		NSRange schemaLocation = [value rangeOfString:@"://"];
         if(identifierLocation.location == 0)
         {
 			NSInteger scriptLocation = identifierLocation.location+identifierLocation.length;
@@ -54,8 +56,15 @@
         }
         else
         {
+			NSURL *url;
 			//Process a normal URL
-            NSURL *url = [NSURL URLWithString:value];
+          if (schemaLocation.location == NSNotFound) {
+			  NSString *urlString = [NSString stringWithFormat:@"%@%@", baseUrl, value];
+			  NSString* webURLString = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
+			  url = [[NSURL URLWithString: webURLString] filePathURL];
+		  } else {
+			  url = [NSURL URLWithString:value];
+		  }
             NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
             NSString *absoluteURL = [url absoluteString];
 
@@ -63,6 +72,7 @@
 			//string as the key, and the number of time it was called as the value,
 			//in case it gets called more than once before it goes thourh the hook system
             NSNumber *unHookCount = (NSNumber*)[urlsToNotHook objectForKey:absoluteURL];
+			NSLog(@"%@", absoluteURL);
 
             if(unHookCount)
             {
@@ -88,8 +98,7 @@
 
     } else if([key isEqualToString:@MAW_WEB_VIEW_HTML]) {
 		UIWebView* webView = (UIWebView*)view;
-        [webView loadHTMLString:value baseURL:NULL];
-
+        [webView loadHTMLString:value baseURL:[NSURL URLWithString:baseUrl]];
     } else if([key isEqualToString:@MAW_WEB_VIEW_ENABLE_ZOOM]) {
 		UIWebView* webView = (UIWebView*)view;
         if([value isEqualToString:@"true"])
@@ -112,7 +121,11 @@
             [webView goForward];
         }
 
-    } else {
+    } else if ([key isEqualToString:@MAW_WEB_VIEW_BASE_URL]) {
+		[baseUrl release];
+		baseUrl = [value retain];
+	}
+	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
 	return MAW_RES_OK;
@@ -132,6 +145,8 @@
 	} else if([key isEqualToString:@MAW_WEB_VIEW_HARD_HOOK]) {
 		return hardHookPattern;
 
+    } else if ([key isEqualToString:@MAW_WEB_VIEW_BASE_URL]) {
+		return  baseUrl;
 	} else {
 		return [super getPropertyWithKey:key];
 	}
@@ -259,9 +274,17 @@
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = MAW_EVENT_WEB_VIEW_URL_CHANGED;
 	eventData->widgetHandle = handle;
-	event.data = (int)eventData;
+	event.data = (MAAddress)eventData;
 	Base::gEventQueue.put(event);
 	return YES;
+}
+
+-(NSString*)getDefaultBaseURL {
+	NSString *localPath =  [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) objectAtIndex:0];
+//	NSURL *myURL = [[NSBundle mainBundle] bundleURL];
+//	NSLog(@"Bundle URL:%@", [myURL absoluteString]);
+//	[myURL release];
+	return [NSString stringWithFormat:@"file://localhost%@/", localPath];
 }
 
 @end
