@@ -39,7 +39,6 @@ import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
-import com.mosync.nativeui.util.properties.InvalidParameterException;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
