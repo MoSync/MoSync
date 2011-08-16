@@ -95,11 +95,13 @@ public:
 
 	/**
 	 * Read a data object from a file.
+	 * @param filePath Full path of file to read.
+	 * @param inPlaceholder Placeholder handle for data object.
 	 * @return true on success, false on error.
 	 */
 	virtual bool readDataFromFile(
 		const MAUtil::String& filePath,
-		MAHandle inData);
+		MAHandle inPlaceholder);
 
 	/**
 	 * Read a text string from a file.
@@ -114,12 +116,19 @@ public:
 	 */
 	virtual MAUtil::String createTextFromHandle(MAHandle data);
 
-private:
 	/**
-	 * Open a file for read/write access. Create the file if it does not exist.
+	 * Open a file for write (and read) access.
+	 * Create the file if it does not exist.
+	 * Note: Will truncate the file if it exists.
 	 * @return Handle to the open file, <0 on error.
 	 */
-	MAHandle openFileHelper(const MAUtil::String& filePath);
+	virtual MAHandle openFileForWriting(const MAUtil::String& filePath);
+
+	/**
+	 * Open a file for read access.
+	 * @return Handle to the open file, <0 on error.
+	 */
+	virtual MAHandle openFileForReading(const MAUtil::String& filePath);
 };
 
 /**
@@ -171,6 +180,8 @@ public:
  * To receive messages from a web from do an initial call to:
  *
  *   WebViewUtil::getMessagesFor(webView);
+ *
+ * TODO: Add copy constructor and assignment operator.
  */
 class WebViewMessage
 {

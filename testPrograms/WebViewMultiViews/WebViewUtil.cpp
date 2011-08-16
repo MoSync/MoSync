@@ -121,7 +121,7 @@ Platform::~Platform()
  */
 MAUtil::String Platform::getLocalPath()
 {
-	int bufferSize = 1024;
+	int bufferSize = 512;
 	char buffer[bufferSize];
 
 	int size = maGetSystemProperty(
@@ -146,7 +146,7 @@ bool Platform::writeDataToFile(
 	const MAUtil::String& filePath,
 	MAHandle outData)
 {
-	MAHandle file = openFileHelper(filePath);
+	MAHandle file = openFileForWriting(filePath);
 	if (file < 0)
 	{
 		return false;
@@ -171,12 +171,12 @@ bool Platform::writeTextToFile(
 	const MAUtil::String& filePath,
 	const MAUtil::String& outText)
 {
-	MAHandle file = openFileHelper(filePath);
+	MAHandle file = openFileForWriting(filePath);
 	if (file < 0)
 	{
 		return false;
 	}
-	lprintfln("Platform::writeTextToFile: %s", filePath.c_str());
+
 	int result = maFileWrite(file, outText.c_str(), outText.length());
 
 	maFileClose(file);
@@ -186,14 +186,16 @@ bool Platform::writeTextToFile(
 
 /**
  * Read a data object from a file.
+ * @param filePath Full path of file to read.
+ * @param inPlaceholder Placeholder handle for data object.
  * @return true on success, false on error.
  */
 bool Platform::readDataFromFile(
 	const MAUtil::String& filePath,
-	MAHandle inData)
+	MAHandle inPlaceholder)
 {
 
-	MAHandle file = openFileHelper(filePath);
+	MAHandle file = openFileForReading(filePath);
 	if (file < 0)
 	{
 		return false;
@@ -205,7 +207,13 @@ bool Platform::readDataFromFile(
 		return false;
 	}
 
-	int result = maFileReadToData(file, inData, 0, size);
+	int result = maCreateData(inPlaceholder, size);
+	if (RES_OK != result)
+	{
+		return false;
+	}
+
+	result = maFileReadToData(file, inPlaceholder, 0, size);
 
 	maFileClose(file);
 
@@ -220,7 +228,7 @@ bool Platform::readTextFromFile(
 	const MAUtil::String& filePath,
 	MAUtil::String& inText)
 {
-	MAHandle file = openFileHelper(filePath);
+	MAHandle file = openFileForReading(filePath);
 	if (file < 0)
 	{
 		return false;
@@ -246,10 +254,12 @@ bool Platform::readTextFromFile(
 }
 
 /**
- * Open a file for read/write access. Create the file if it does not exist.
+ * Open a file for write (and read) access.
+ * Create the file if it does not exist.
+ * Note: Will truncate the file if it exists.
  * @return Handle to the open file, <0 on error.
  */
-MAHandle Platform::openFileHelper(const MAUtil::String& filePath)
+MAHandle Platform::openFileForWriting(const MAUtil::String& filePath)
 {
 	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ_WRITE);
 	if (file < 0)
@@ -260,6 +270,9 @@ MAHandle Platform::openFileHelper(const MAUtil::String& filePath)
 	if (maFileExists(file))
 	{
 		// If the file exists, truncate it to zero size.
+		// We do this to prevent problems with old data
+		// at the end of the file if the new file is
+		// shorter than the old file.
 		maFileTruncate(file, 0);
 	}
 	else
@@ -270,6 +283,26 @@ MAHandle Platform::openFileHelper(const MAUtil::String& filePath)
 		{
 			return -1;
 		}
+	}
+
+	return file;
+}
+
+/**
+ * Open a file for read access.
+ * @return Handle to the open file, <0 on error.
+ */
+MAHandle Platform::openFileForReading(const MAUtil::String& filePath)
+{
+	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	if (!maFileExists(file))
+	{
+		return -1;
 	}
 
 	return file;
@@ -441,8 +474,6 @@ MAUtil::String WebViewMessage::getParam(int index)
 {
 	// Get params.
 	MAUtil::String params = getParams();
-
-	lprintfln("getParam params: %s", params.c_str());
 
 	// Find start slash of the param we look for.
 	int start = 0;

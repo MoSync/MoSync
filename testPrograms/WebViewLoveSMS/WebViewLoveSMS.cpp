@@ -53,6 +53,9 @@ MA 02110-1301, USA.
 
 using namespace MoSync;
 
+// Set to true to actually send SMS.
+static bool G_SendSMSForReal = true;
+
 class WebViewLoveSMSApp
 {
 private:
@@ -65,6 +68,9 @@ private:
 public:
 	WebViewLoveSMSApp()
 	{
+		mPlatform = Platform::create();
+		// Used for testing the file API.
+		// testFileAPI();
 		createUI();
 		createMessageStrings();
 	}
@@ -72,6 +78,62 @@ public:
 	virtual ~WebViewLoveSMSApp()
 	{
 		destroyUI();
+	}
+
+	void check(bool success, MAUtil::String testName)
+	{
+		if (success)
+		{
+			printf("Test %s passed.", testName.c_str());
+		}
+		else
+		{
+			printf("Test %s failed.", testName.c_str());
+			maPanic(0, "Test failed, inspect log.");
+		}
+	}
+	void testFileAPI()
+	{
+		bool success;
+
+		// Write a string.
+		success = mPlatform->writeTextToFile(
+			mPlatform->getLocalPath() + "testdata1",
+			"12345");
+		check(success, "writeTextToFile");
+
+		// Read the string.
+		MAUtil::String data;
+		success = mPlatform->readTextFromFile(
+			mPlatform->getLocalPath() + "testdata1",
+			data);
+		check(success, "readTextFromFile");
+		check(data.length() == 5, "readTextFromFile data.length() == 5");
+		check(data.find("12345", 0) == 0, "readTextFromFile data.find(\"12345\", 0) == 0");
+
+		// Read to a handle.
+		MAHandle h = maCreatePlaceholder();
+		success = mPlatform->readDataFromFile(
+			mPlatform->getLocalPath() + "testdata1",
+			h);
+		check(success, "readDataFromFile");
+		check(maGetDataSize(h) == 5, "maGetDataSize(h) == 5");
+
+		// Write from handle to another file.
+		success = mPlatform->writeDataToFile(
+			mPlatform->getLocalPath() + "testdata2",
+			h);
+
+		// Read string to test that write to handle worked.
+		MAUtil::String data2;
+		success = mPlatform->readTextFromFile(
+			mPlatform->getLocalPath() + "testdata2",
+			data2);
+		check(success, "readTextFromFile2");
+		check(data2.length() == 5, "readTextFromFile2 data2.length() == 5");
+		check(data2.find("12345", 0) == 0, "readTextFromFile2 data2.find(\"12345\", 0) == 0");
+
+		maExit(0);
 	}
 
 	void createMessageStrings()
@@ -95,17 +157,20 @@ public:
 
 	void createUI()
 	{
-		mPlatform = Platform::create();
-
 		// Create screen.
 		mScreen = maWidgetCreate(MAW_SCREEN);
 		widgetShouldBeValid(mScreen, "Could not create screen");
 
-		// Write image as file.
+		// Write background image file.
 		mPlatform->writeDataToFile(
 			mPlatform->getLocalPath() + "amor.png",
 			amor_png);
 
+		// Write main page.
+		// TODO: On iOS we need to insert a base tag with
+		// the base url, or find some other solution, since
+		// setting the "url" property does not seem to set
+		// the base url on iOS.
 		mPlatform->writeTextToFile(
 			mPlatform->getLocalPath() + "MainPage.html",
 			mPlatform->createTextFromHandle(MainPage_html));
@@ -119,6 +184,8 @@ public:
 
 		// Set the HTML the web view displays.
 		// maWidgetSetProperty(mWebView, "html", html.c_str());
+
+		// Display the main page.
 		maWidgetSetProperty(mWebView, "url", "MainPage.html");
 
 		// Compose objects.
@@ -170,7 +237,7 @@ public:
 				case EVENT_TYPE_KEY_PRESSED:
 					if (event.key == MAK_MENU)
 					{
-						// TODO: Show menu in HTML/JS.
+						// TODO: Show menu in HTML/JS on Android.
 					}
 					if (event.key == MAK_BACK)
 					{
@@ -256,13 +323,20 @@ public:
 		// Save the phone number.
 		savePhoneNo(phoneNo);
 
-		// Send the message.
-		int result = maSendTextSMS(
-			phoneNo.c_str(),
-			message.c_str());
+		if (G_SendSMSForReal)
+		{
+			// Send the message.
+			int result = maSendTextSMS(
+				phoneNo.c_str(),
+				message.c_str());
 
-		// Provide feedback via JS.
-		if (0 > result)
+			// Provide feedback via JS.
+			if (0 > result)
+			{
+				callJSFunction("StatusMessageSMSNotSent");
+			}
+		}
+		else
 		{
 			callJSFunction("StatusMessageSMSNotSent");
 		}

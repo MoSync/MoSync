@@ -32,14 +32,14 @@ MA 02110-1301, USA.
 #include "MAHeaders.h"
 #include "WebViewUtil.h"
 
-using namespace MoSync::UI;
+using namespace MoSync;
 
 class WebViewGeoLocationApp
 {
 private:
 	MAWidgetHandle mScreen;
 	MAWidgetHandle mWebView;
-	PlatformUtil* mPlatformUtil;
+	Platform* mPlatform;
 
 public:
 	WebViewGeoLocationApp()
@@ -54,19 +54,12 @@ public:
 
 	void createUI()
 	{
-		PlatformUtil::checkNativeUISupport();
+		// Create utility object.
+		mPlatform = Platform::create();
 
-		if (PlatformUtil::isAndroid())
-		{
-			mPlatformUtil = new PlatformUtilAndroid();
-		}
-		else if (PlatformUtil::isIOS())
-		{
-			mPlatformUtil = new PlatformUtilIOS();
-		}
-
+		// Get the HTML for the page.
 		MAUtil::String html =
-			mPlatformUtil->getTextFromDataHandle(GeoLocationPage_html);
+			mPlatform->createTextFromHandle(GeoLocationPage_html);
 
 		// Create screen.
 		mScreen = maWidgetCreate(MAW_SCREEN);
@@ -106,7 +99,7 @@ public:
 	void destroyUI()
 	{
 		maWidgetDestroy(mScreen);
-		delete mPlatformUtil;
+		delete mPlatform;
 	}
 
 	void runEventLoop()
