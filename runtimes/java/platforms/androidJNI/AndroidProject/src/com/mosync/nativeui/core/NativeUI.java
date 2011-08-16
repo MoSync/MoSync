@@ -1,12 +1,33 @@
+/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 package com.mosync.nativeui.core;
 
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.test.IsolatedContext;
 import android.util.Log;
 import android.view.View;
 
+import com.mosync.internal.android.MoSyncHelpers;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.internal.android.MoSyncView;
@@ -19,8 +40,10 @@ import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.util.properties.FeatureNotAvailableException;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
+
 
 /**
  * This class contains the implementation of the NativeUI system calls
@@ -333,6 +356,7 @@ public class NativeUI
 	 */
 	public int maWidgetStackScreenPush(int stackScreenHandle, int newScreenHandle)
 	{
+
 		Widget stackScreenWidget = m_widgetTable.get( stackScreenHandle );
 		if( stackScreenWidget == null )
 		{
@@ -408,17 +432,12 @@ public class NativeUI
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
+		boolean result;
+
 		try
 		{
-			if( widget.setProperty( key, value ) )
-			{
-				return IX_WIDGET.MAW_RES_OK;
-			}
-			else
-			{
-				Log.e( "MoSync", "maWidgetSetProperty: Invalid property '" + key + "' on widget: " + widgetHandle );
-				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
-			}
+			result =  widget.setProperty( key, value );
+
 		}
 		catch(PropertyConversionException pce)
 		{
@@ -429,6 +448,21 @@ public class NativeUI
 		{
 			Log.e( "MoSync", "Error while setting property: " + ipve.getMessage( ) );
 			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+		}
+		catch(FeatureNotAvailableException fnae)
+		{
+			Log.e("MoSync", "Feature not available exception: " + fnae.getMessage() );
+			return IX_WIDGET.MAW_RES_FEATURE_NOT_AVAILABLE;
+		}
+
+		if( result )
+		{
+			return IX_WIDGET.MAW_RES_OK;
+		}
+		else
+		{
+			Log.e( "MoSync", "maWidgetSetProperty: Invalid property '" + key + "' on widget: " + widgetHandle );
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
 		}
 	}
 	
@@ -445,7 +479,15 @@ public class NativeUI
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
-		String result = widget.getProperty( key );
+		String result;
+		try {
+			result = widget.getProperty( key );
+		}catch( FeatureNotAvailableException fnae)
+		{
+			Log.e("MoSync", "Feature not available exception: " + fnae.getMessage() );
+			return IX_WIDGET.MAW_RES_FEATURE_NOT_AVAILABLE;
+		}
+
 		if( result.length( ) <= 0 )
 		{
 			Log.e( "MoSync", "maWidgetGetProperty: Invalid or empty property '" + 

@@ -1,3 +1,20 @@
+/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 package com.mosync.nativeui.ui.factories;
 
 import java.util.HashMap;
@@ -97,6 +114,13 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_CHECK_BOX, new CheckBoxFactory( ) );
 		addFactory( IX_WIDGET.MAW_EDIT_BOX, new EditBoxFactory( ) );
 		addFactory( IX_WIDGET.MAW_STACK_SCREEN, new StackScreenFactory( ) );
+		addFactory( IX_WIDGET.MAW_PROGRESS_BAR, new ProgressBarFactory( ) );
+		addFactory( IX_WIDGET.MAW_ACTIVITY_INDICATOR, new ActivityIndicatorFactory( ) );
+		addFactory( IX_WIDGET.MAW_SLIDER, new SliderFactory( ) );
+		addFactory( IX_WIDGET.MAW_DATE_PICKER, new DatePickerFactory( ) );
+		addFactory( IX_WIDGET.MAW_TIME_PICKER, new TimePickerFactory( ) );
+		addFactory(IX_WIDGET.MAW_VIDEO_VIEW, new VideoViewFactory( ) );
+		addFactory(IX_WIDGET.MAW_TOGGLE_BUTTON, new ToggleButtonFactory( ) );
 	}
 	
 	/**
@@ -109,4 +133,5 @@ public class ViewFactory
 	{
 		m_factoryMap.put( type, factory );
 	}
+
 }

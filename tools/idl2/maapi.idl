@@ -1315,6 +1315,11 @@ interface MAAPI {
 		* Currently implemented only on Android.
 		*/
 		BLUETOOTH_TURNED_ON = 30;
+
+		/**
+		* \brief The ImagePicker dialog was dismissed either by Cancel, either by OK.
+		*/
+		IMAGE_PICKER = 31;
 	}
 
 	/**
@@ -1389,6 +1394,12 @@ interface MAAPI {
 				int textboxLength;
 			} textbox;
 			
+			/**
+			* #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if
+			* one of the \link #CONNERR_GENERIC CONNERR \endlink constants.
+			*/
+			int imagePickerState;
+
 			/**
 			* Used by custom events. See invididual event descriptions.
 			*/
@@ -1619,6 +1630,7 @@ interface MAAPI {
 		LABEL = 9;
 		FLUX = 127;
 	}
+
 #endif	//IX_RESOURCE_TYPES
 
 		/**
@@ -3051,7 +3063,7 @@ group WidgetAPI "Widget API" {
 			int searchBarButton;
 
 			/**
-			* @brief The new state of the checkbox when a #MAW_EVENT_CLICKED event is receieved for a checkbox.
+			* @brief The new state of the checkbox when a #MAW_EVENT_CLICKED event is receieved for a checkbox or toggle button.
 			* - 0 means 'unchecked'
 			* - 1 means 'checked'
 			*/
@@ -3075,10 +3087,8 @@ group WidgetAPI "Widget API" {
 					MAWidgetHandle toScreen;
 			} stackScreenPopInfo;
 
-
 			/**
 			* The value of the slider when a #MAW_EVENT_SLIDER_VALUE_CHANGED event is received.
-
 			*/
 			int sliderValue;
 
@@ -3099,7 +3109,6 @@ group WidgetAPI "Widget API" {
 					int year;
 			} datePickerValueInfo;
 
-
 			struct {
 					/**
 					* @brief The hour value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
@@ -3110,7 +3119,6 @@ group WidgetAPI "Widget API" {
 					* @brief The minute value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
 					*/
 					int minute;
-
 			} timePickerValueInfo;
 
 			/**
@@ -3410,10 +3418,9 @@ group WidgetAPI "Widget API" {
 		REMOVED_ROOT = -10;
 
 		/**
-		* @brief Indicates that a syscall tried to access a feature that is not supported by the curent framework version.
+		* @brief Indicates that a syscall tried to access a feature that is not supported by the current framework version.
 		*/
 		FEATURE_NOT_AVAILABLE = -11;
-
 	}
 	} // end of WidgetResultCodes
 
@@ -3515,9 +3522,7 @@ group WidgetAPI "Widget API" {
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
 		 * There is a replica available for Android.
-
 		 * See \ref WidgetNavigationBarProperties "Navigation Bar properties" for the properties available.
-
 		 */
 		NAV_BAR = "NavBar";
 
@@ -3535,6 +3540,7 @@ group WidgetAPI "Widget API" {
 		 * @brief A progress bar is a visual indicator of progress in some operation.
 		 * Displays a bar to the user representing how far the operation has progressed.
 		 * A progress bar can also be made indeterminate, when the length of the task is unknown.
+		 *
 		 * See \ref WidgetProgressBarProperties "Progress bar properties" for the properties available.
 		 */
 		PROGRESS_BAR = "ProgressBar";
@@ -3543,6 +3549,7 @@ group WidgetAPI "Widget API" {
 		 * @brief An activity indicator is a visual indicator of progress in some operation.
 		 * It shows a cyclic animation without an indication of progress.
 		 * It is used when the length of the task is unknown.
+		 *
 		 * See \ref WidgetActivityIndicatorProperties "Activity Indicator properties" for the properties available.
 		 */
 		ACTIVITY_INDICATOR = "ActivityIndicator";
@@ -3550,6 +3557,7 @@ group WidgetAPI "Widget API" {
 		/**
 		 * @brief A Slider is an extension of ProgressBar that adds a draggable thumb.
 		 * The user can touch the thumb and drag left or right to set the current progress level.
+		 *
 		 * See \ref WidgetSliderProperties "Slider properties" for the properties available.
 		 */
 		SLIDER = "Slider";
@@ -3558,20 +3566,23 @@ group WidgetAPI "Widget API" {
 		 * @brief A Date Picker is a widget for selecting a date. The date can be selected by a year, month, and day spinners.
 		 * The minimal and maximal date from which dates to be selected can be customized.
 		 * The picker is initialized with the current system date.
+		 *
 		 * See \ref WidgetDatePickerProperties "Date Picker properties" for the properties available.
 		 */
 		DATE_PICKER = "DatePicker";
 
 		/**
 		 * @brief A Time Picker is a widget for selecting time of day, in 24 hour mode.
-		 * The hour, each minute digit, and AM/PM (if applicable) can be controlled by vertical spinners.
+		 * The hour and each minute digit can be controlled by vertical spinners.
 		 * The hour can be entered by keyboard input.
+		 *
 		 * See \ref WidgetTimePickerProperties "Time Picker properties" for the properties available.
 		 */
 		TIME_PICKER = "TimePicker";
 
 		/**
 		 * @brief A Number Picker is a widget that enables the user to select a number from a predefined range.
+		 *
 		 * See \ref WidgetNumberPickerProperties "Number Picker properties" for the properties available.
 		 */
 		NUMBER_PICKER = "NumberPicker";
@@ -3707,7 +3718,9 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets whether the widget is enabled or not. If not, the widget is grayed out.
+		*
 		* Widgets are enabled by default.
+		*
 		* @validvalue A boolean string 'true' or 'false', where true is enabled and false is disabled.
 		*
 		* @setandget
@@ -3717,42 +3730,24 @@ group WidgetAPI "Widget API" {
 		*	maWidgetSetProperty(buttonHandle, MAW_WIDGET_ENABLED, "false");
 		* \endcode
 		*/
-
 		ENABLED = "enabled";
 
-
 		/**
-
 		* @brief Specifies the background gradient of a widget.
-
 		* Currently implemented only on Android.
-
 		*
-
 		* @validvalue Two hexadecimal values 0xRRGGBB, where R, G and B are the red, green and blue components respectively,
-
 		* separated by comma.
-
 		*
-
 		* @setonly
-
 		*
-
 		* @par Example
-
 		* \code
-
 		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_BACKGROUND_GRADIENT,  "0x27408B,0xCAE1FF");
-
 		* \endcode
-
 		*/
-
 		BACKGROUND_GRADIENT = "backgroundGradient";
-
 	}
-
 
 	/**
 	* The available widget properties for a #MAW_SCREEN. See \ref WidgetProperties "Widget properties" for more properties. 
@@ -4380,13 +4375,11 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* \code
 		*	maWidgetSetProperty(checkBoxHandle, MAW_CHECK_BOX_CHECKED, "true");
-
 		* \endcode
 		*/
 		CHECKED = "checked";
 	}
 	} // end of WidgetCheckBoxProperties
-
 
 	/**
 	* The available widget properties for a #MAW_TOGGLE_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.
@@ -4406,7 +4399,6 @@ group WidgetAPI "Widget API" {
 		CHECKED = "checked";
 	}
 	} // end of WidgetCheckBoxProperties
-
 
 	/**
 	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties. 
@@ -4600,71 +4592,41 @@ group WidgetAPI "Widget API" {
 		*/		
 		NEW_URL = "newurl";
 
-
 		/**
-
 		* @brief Sets or gets whether the horizontal scrollbar should be drawn or not.
-
-		* The scrollbar is not drawn by default.
-
 		* Available only on Android for the moment.
-
+		*
 		* @validvalue A boolean string 'true' or 'false'.
-
 		*
-
 		* @setandget
-
 		*
-
 		* @par Example
-
 		* \code
-
         *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HORIZONTAL_SCROLLBAR_ENABLED, "true");
-
 		* \endcode
-
 		*/
-
 		HORIZONTAL_SCROLL_BAR_ENABLED = "horizontalScrollBarEnabled";
 
-
 		/**
-
 		* @brief Sets or gets whether the vertical scrollbar should be drawn or not.
-
 		* The scrollbar is drawn by default.
-
 		* Available only on Android for the moment.
-
+		*
 		* @validvalue A boolean string 'true' or 'false'.
-
 		*
-
 		* @setandget
-
 		*
-
 		* @par Example
-
 		* \code
-
         *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
-
 		* \endcode
-
 		*/
-
 		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
-
 	}
 	} // end of WidgetWebViewProperties
-
 	/**
 	* The available widget properties for a #MAW_PROGRESS_BAR. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
-
 	group WidgetProgressBarProperties "Progress bar properties" {
 	constset MAString MAW_PROGRESS_BAR_ {
 		/**
@@ -4679,7 +4641,6 @@ group WidgetAPI "Widget API" {
         *   maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_MAX, "100");
 		* \endcode
 		*/
-
 		MAX = "max";
 
 		/**
@@ -4714,15 +4675,12 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* The available widget properties for a #MAW_ACTIVITY_INDICATOR. See \ref WidgetProperties "Widget properties" for more properties.
-
 	*/
 	group WidgetActivityIndicatorProperties "Activity Indicator properties" {
 	constset MAString MAW_ACTIVITY_INDICATOR_ {
 		/**
 		* @brief Sets if the indicator is still on or off.
-
 		* If set to false, it doesn't delete the widget just dismisses it.
-
 		* @validvalue A boolean string 'true' or 'false'.
 		*
 		* @setonly
@@ -4739,7 +4697,6 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* The available widget properties for a #MAW_SLIDER. See \ref WidgetProperties "Widget properties" for more properties.
-
 	*/
 	group WidgetSliderProperties "Slider properties" {
 	constset MAString MAW_SLIDER_ {
@@ -4776,7 +4733,6 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue An int that specifies the amount by which the slider value must be increased.
 		*
-		*
 		* @setonly
 		*
 		* @par Example
@@ -4788,10 +4744,8 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Decreases the current value of the slider by the specified amount.
-
 		*
 		* @validvalue An int that specifies the amount by which the slider value must be decreased.
-		*
 		*
 		* @setonly
 		*
@@ -4800,128 +4754,16 @@ group WidgetAPI "Widget API" {
         *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_DECREASE_VALUE, "20");
 		* \endcode
 		*/
-
 		DECREASE_VALUE = "decreaseValue";
-
 	}
 	} // end of WidgetSliderProperties
 
 	/**
-	* The available widget properties for a #MAW_VIDEO_VIEW. See \ref WidgetProperties "Widget properties" for more properties.
+	* The available widget properties for a #MAW_DATE_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
-	group WidgetVideoViewProperties "Video View properties" {
-	constset MAString MAW_VIDEO_VIEW_ {
-		/**
-		* @brief Sets the video path.
-		*
-		* @validvalue Any valid path.
-		*
-		* @setonly
-		*
-		* @par Example
-		* \code
-		*   // Set the video path.
-        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_PATH, "\data\Video1.wav");
-		* \endcode
-		*/
-		PATH = "path";
-
-		/**
-		* @brief Sets the video url.
-		*
-		* @validvalue Any valid streaming url.
-		*
-		* @setonly
-		*
-		* @par Example
-		* \code
-		*   // Set the video path.
-        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_URL, "www.example.com/play.m3u8");
-		* \endcode
-		*/
-		URL = "url";
-
-		/**
-		* @brief Start,pause or stop the video playback.
-		*
-		* @validvalue MAW_VIDEO_VIEW_ACTION_PLAY, MAW_VIDEO_VIEW_ACTION_PAUSE or MAW_VIDEO_VIEW_ACTION_STOP constants.
-		*
-		* @setonly
-		*
-		* @par Example
-		* \code
-		*   // Start the playback.
-        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_ACTION, toString(MAW_VIDEO_VIEW_ACTION_PLAY));
-		* \endcode
-		*/
-		ACTION = "action";
-
-		/**
-		* @brief Seeks into the video.
-		*
-		* @validvalue A valid integer for milliseconds.
-		*
-		* @setonly
-		*
-		* @par Example
-		* \code
-        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_SEEK_TO, "10000");
-		* \endcode
-		*/
-		SEEK_TO = "seekTo";
-
-		/**
-		* @brief Gets the video file duration.
-		*
-		* @validvalue An int.
-		*
-		* @getonly
-		*
-		* @par Example
-		* \code
-		*   char buf[BUFFER_SIZE];
-        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_DURATION, buf, BUFFER_SIZE);
-		*   // Do something with the duration.
-		* \endcode
-		*/
-		DURATION = "duration";
-
-		/**
-		* @brief Gets the buffer percentage of the played video file.
-		* Only for Android platform.
-		* @validvalue An int.
-		*
-		* @getonly
-		*
-		* @par Example
-		* \code
-		*   char buf[BUFFER_SIZE];
-        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_BUFFER_PERCENTAGE, buf, BUFFER_SIZE);
-		*   // Do something with the percentage.
-		* \endcode
-		*/
-		BUFFER_PERCENTAGE = "bufferPercentage";
-
-		/**
-		* @brief Gets the current position in the video file.
-		*
-		* @validvalue An int.
-		*
-		* @getonly
-		*
-		* @par Example
-		* \code
-		*   char buf[BUFFER_SIZE];
-        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_CURRENT_POSITION, buf, BUFFER_SIZE);
-		*   // Do something with the position.
-		* \endcode
-		*/
-		CURRENT_POSITION = "currentPosition";
-
-	}
-	} // end of WidgetVideoViewProperties
 
 group WidgetDatePickerProperties "Date Picker properties" {
+
 	constset MAString MAW_DATE_PICKER_ {
 		/**
 		* @brief Sets or gets  maximal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00.
@@ -5015,13 +4857,11 @@ group WidgetDatePickerProperties "Date Picker properties" {
 
 	/**
 	* The available widget properties for a #MAW_TIME_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
-
 	*/
 	group WidgetTimePickerProperties "Time Picker properties" {
 	constset MAString MAW_TIME_PICKER_ {
 		/**
 		* @brief Sets or gets the current hour in 24h mode( in the range: 0-23 ).
-
 		*
 		* @validvalue An int that specifies the current hour.
 		*
@@ -5037,7 +4877,6 @@ group WidgetDatePickerProperties "Date Picker properties" {
 
 		/**
 		* @brief Sets or gets the current minute (0-59).
-
 		*
 		* @validvalue An int that specifies the current minute.
 		*
@@ -5056,13 +4895,11 @@ group WidgetDatePickerProperties "Date Picker properties" {
 
 	/**
 	* The available widget properties for a #MAW_NUMBER_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
-
 	*/
 	group WidgetNumberPickerProperties "Number Picker properties" {
 	constset MAString MAW_NUMBER_PICKER_ {
 		/**
 		* @brief Sets or gets the current value for the number picker.
-
 		* If the value is less than MAW_NUMBER_PICKER_MIN_VALUE property value, the current value is set to min.
 		* If the value is greater than MAW_NUMBER_PICKER_MAX_VALUE value, the current value is set to max.
 		*
@@ -5106,6 +4943,120 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		MAX_VALUE = "maxValue";
 	}
 	} // end of WidgetNumberPickerProperties
+
+	/**
+	* The available widget properties for a #MAW_VIDEO_VIEW. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetVideoViewProperties "Video View properties" {
+	constset MAString MAW_VIDEO_VIEW_ {
+		/**
+		* @brief Sets the video path.
+		*
+		* @validvalue Any valid path.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Set the video path.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_PATH, "\data\Video1.wav");
+		* \endcode
+		*/
+		PATH = "path";
+
+		/**
+		* @brief Sets the video url.
+		*
+		* @validvalue Any valid streaming url.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Set the video path.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_URL, "www.example.com/play.m3u8");
+		* \endcode
+		*/
+		URL = "url";
+
+		/**
+		* @brief Start,pause or stop the video playback.
+		*
+		* @validvalue MAW_VIDEO_WIDGET_ACTION_PLAY, MAW_VIDEO_WIDGET_ACTION_PAUSE or MAW_VIDEO_WIDGET_ACTION_STOP constants.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Start the playback.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_WIDGET_ACTION, toString(MAW_VIDEO_WIDGET_ACTION_PLAY));
+		* \endcode
+		*/
+		ACTION = "action";
+
+		/**
+		* @brief Seeks into the video.
+		*
+		* @validvalue A valid integer for milliseconds.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_SEEK_TO, "10000");
+		* \endcode
+		*/
+		SEEK_TO = "seekTo";
+
+		/**
+		* @brief Gets the video file duration.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_DURATION, buf, BUFFER_SIZE);
+		*   // Do something with the duration.
+		* \endcode
+		*/
+		DURATION = "duration";
+
+		/**
+		* @brief Gets the buffer percentage of the played video file.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_BUFFER_PERCENTAGE, buf, BUFFER_SIZE);
+		*   // Do something with the percentage.
+		* \endcode
+		*/
+		BUFFER_PERCENTAGE = "bufferPercentage";
+
+		/**
+		* @brief Gets the current position in the video file.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_CURRENT_POSITION, buf, BUFFER_SIZE);
+		*   // Do something with the position.
+		* \endcode
+		*/
+		CURRENT_POSITION = "currentPosition";
+	}
+	} // end of WidgetVideoViewProperties
 
 	/**
 	* The available widget properties for a #MAW_NAVIGATION_BAR. See \ref WidgetProperties "Widget properties" for more properties.
@@ -5169,6 +5120,44 @@ group WidgetDatePickerProperties "Date Picker properties" {
 
 	typedef int MAWidgetHandle;
 
+		/**
+		* @brief Sets or gets whether the horizontal scrollbar should be drawn or not.
+		* The scrollbar is not drawn by default.
+		* Available only on Android for the moment.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HORIZONTAL_SCROLLBAR_ENABLED, "true");
+		* \endcode
+		*/
+		HORIZONTAL_SCROLL_BAR_ENABLED = "horizontalScrollBarEnabled";
+
+		/**
+		* @brief Sets or gets whether the vertical scrollbar should be drawn or not.
+		* The scrollbar is drawn by default.
+		* Available only on Android for the moment.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
+		* \endcode
+		*/
+		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
+
+	}
+	} // end of WidgetWebViewProperties
+	} // end of WidgetProperties
+
+	typedef int MAWidgetHandle;
+
 	/**
 	* The set of functions available for the Widget API.
 	*/
@@ -5194,8 +5183,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	* with children will also cause its children to be destroyed. Once a handle has
 	* been destroyed it cannot be referenced by the maWidget* functions.
 	*
-        * \note If the given widget has a parent, the widget will be removed from its
-
+	* \note If the given widget has a parent, the widget will be removed from its
 	* parent.
 	*
 	* \param widget A handle to the widget to be destroyed.
@@ -5327,7 +5315,6 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
 	* - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small. 
 	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
-
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
