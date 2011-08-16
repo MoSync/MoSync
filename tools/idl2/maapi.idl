@@ -5120,44 +5120,6 @@ group WidgetDatePickerProperties "Date Picker properties" {
 
 	typedef int MAWidgetHandle;
 
-		/**
-		* @brief Sets or gets whether the horizontal scrollbar should be drawn or not.
-		* The scrollbar is not drawn by default.
-		* Available only on Android for the moment.
-		*
-		* @validvalue A boolean string 'true' or 'false'.
-		*
-		* @setandget
-		*
-		* @par Example
-		* \code
-        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HORIZONTAL_SCROLLBAR_ENABLED, "true");
-		* \endcode
-		*/
-		HORIZONTAL_SCROLL_BAR_ENABLED = "horizontalScrollBarEnabled";
-
-		/**
-		* @brief Sets or gets whether the vertical scrollbar should be drawn or not.
-		* The scrollbar is drawn by default.
-		* Available only on Android for the moment.
-		*
-		* @validvalue A boolean string 'true' or 'false'.
-		*
-		* @setandget
-		*
-		* @par Example
-		* \code
-        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
-		* \endcode
-		*/
-		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
-
-	}
-	} // end of WidgetWebViewProperties
-	} // end of WidgetProperties
-
-	typedef int MAWidgetHandle;
-
 	/**
 	* The set of functions available for the Widget API.
 	*/
