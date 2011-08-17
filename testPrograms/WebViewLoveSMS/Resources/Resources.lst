@@ -1,0 +1,7 @@
+.res MainPage_html
+.bin
+.include "PageMain.html"
+
+.res amor_png
+.bin
+.include "amor.png"

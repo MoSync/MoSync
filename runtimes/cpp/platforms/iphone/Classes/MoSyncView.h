@@ -19,25 +19,33 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "MoSyncCLController.h"
 #include <helpers/cpp_defs.h>
 #include "TouchHelper.h"
+#include "MoSyncSensor.h"
 
 @interface MoSyncView : UIView <UITextFieldDelegate> {
 	CGImageRef mosyncView;
-    MoSyncCLController *locationController;	
+    MoSyncCLController *locationController;
 	TouchHelper* touchHelper;
+    /**
+     * Used for handling sensors.
+     */
+    MoSyncSensor* moSyncSensor;
 
 }
 
 -(void) updateMoSyncView: (CGImageRef)ref;
 -(void) showMessageBox:(NSString*)msg withTitle:(NSString*)title shouldKill:(bool)kill;
--(void) showTextBox:(NSString*)title 
-			withInText:(NSString*)inText 
-			outText:(wchar*)outText 
-			maxSize:(int)maxSize 
+-(void) showTextBox:(NSString*)title
+			withInText:(NSString*)inText
+			outText:(wchar*)outText
+			maxSize:(int)maxSize
 			andConstraints:(int)constraints;
 -(void) startUpdatingLocation;
 -(void) stopUpdatingLocation;
 - (void)deviceOrientationChanged:(NSNotification *)notification;
 
+/**
+ * Returns a pointer to the MoSyncSensor object.
+ */
+-(MoSyncSensor*) getMoSyncSensor;
+
 @end
-
-

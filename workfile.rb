@@ -101,6 +101,17 @@ target :libs => :base do
 	Work.invoke_subdirs(PIPE_DIRS)
 end
 
+target :version do
+	rev = open('|git rev-parse --verify HEAD').read.strip
+	mod = open('|git status --porcelain').read.strip
+	mod = 'mod ' if(mod.length > 0)
+	open("#{mosyncdir}/bin/version.dat", 'w') do |file|
+		file.puts("Developer local build")
+		file.puts(Time.new.strftime('%Y%m%d-%H%M'))
+		file.puts(mod+rev)
+	end
+end
+
 target :clean_more do
 	verbose_rm_rf("build")
 	Work.invoke_subdirs(PRE_DIRS, "clean")
