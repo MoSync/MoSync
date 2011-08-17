@@ -109,16 +109,16 @@
 {
     int fieldValuesCount = [mFieldValuesArray count];
     if (0 > index || index >= fieldValuesCount) {
-        return MA_PIM_ERR_UNAVAILABLE_FIELD;
+        return MA_PIM_ERR_INVALID_INDEX;
     }
     
     // Check if the attribute is set to MA_PIM_ATTR_CUSTOM.
     PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
-    int attribute = [itemValue getAttribute];
-    if (MA_PIM_ATTR_CUSTOM != attribute) 
-    {
-        return MA_PIM_ERR_NO_LABEL;
-    }
+//    int attribute = [itemValue getAttribute];
+//    if (MA_PIM_ATTR_CUSTOM != attribute) 
+//    {
+//        return MA_PIM_ERR_NO_LABEL;
+//    }
     
     [value copy:[itemValue getCustomLabel]];
     return MA_PIM_ERR_NONE; 
@@ -190,37 +190,37 @@
 -(int) addValue:(NSMutableArray*) value
 withStringAttribute:(NSString*) attribute
 {
-    int intAttibute;
-    if ([attribute isEqualToString:@"asst"]) {
-        intAttibute = MA_PIM_ATTR_ASST;
-    } else if ([attribute isEqualToString:@"auto"]) {
-        intAttibute = MA_PIM_ATTR_AUTO;
-    } else if ([attribute isEqualToString:@"fax"]) {
-        intAttibute = MA_PIM_ATTR_FAX;
-    } else if ([attribute isEqualToString:@"home"]) {
-        intAttibute = MA_PIM_ATTR_HOME;
-    } else if ([attribute isEqualToString:@"mobile"]) {
-        intAttibute = MA_PIM_ATTR_MOBILE;
-    } else if ([attribute isEqualToString:@"other"]) {
-        intAttibute = MA_PIM_ATTR_OTHER;
-    } else if ([attribute isEqualToString:@"pager"]) {
-        intAttibute = MA_PIM_ATTR_AUTO;
-    } else if ([attribute isEqualToString:@"preferred"]) {
-        intAttibute = MA_PIM_ATTR_PREFERRED;
-    } else if ([attribute isEqualToString:@"work"]) {
-        intAttibute = MA_PIM_ATTR_WORK;
-    } else if ([attribute isEqualToString:@"sms"]) {
-        intAttibute = MA_PIM_ATTR_SMS;
-    } else if ([attribute isEqualToString:@"iphone"]) {
-        intAttibute = MA_PIM_ATTR_IPHONE;
-    } else {
-        intAttibute = MA_PIM_ATTR_CUSTOM;
-    }
-    
-    [self addValue:value withAttribute:intAttibute];
-    if (MA_PIM_ATTR_CUSTOM == intAttibute) {
-        [self setLabel:attribute atIndex:([mFieldValuesArray count] - 1)];
-    }
+//    int intAttibute;
+//    if ([attribute isEqualToString:@"asst"]) {
+//        intAttibute = MA_PIM_ATTR_ASST;
+//    } else if ([attribute isEqualToString:@"auto"]) {
+//        intAttibute = MA_PIM_ATTR_AUTO;
+//    } else if ([attribute isEqualToString:@"fax"]) {
+//        intAttibute = MA_PIM_ATTR_FAX;
+//    } else if ([attribute isEqualToString:@"home"]) {
+//        intAttibute = MA_PIM_ATTR_HOME;
+//    } else if ([attribute isEqualToString:@"mobile"]) {
+//        intAttibute = MA_PIM_ATTR_MOBILE;
+//    } else if ([attribute isEqualToString:@"other"]) {
+//        intAttibute = MA_PIM_ATTR_OTHER;
+//    } else if ([attribute isEqualToString:@"pager"]) {
+//        intAttibute = MA_PIM_ATTR_AUTO;
+//    } else if ([attribute isEqualToString:@"preferred"]) {
+//        intAttibute = MA_PIM_ATTR_PREFERRED;
+//    } else if ([attribute isEqualToString:@"work"]) {
+//        intAttibute = MA_PIM_ATTR_WORK;
+//    } else if ([attribute isEqualToString:@"sms"]) {
+//        intAttibute = MA_PIM_ATTR_SMS;
+//    } else if ([attribute isEqualToString:@"iphone"]) {
+//        intAttibute = MA_PIM_ATTR_IPHONE;
+//    } else {
+//        intAttibute = MA_PIM_ATTR_CUSTOM;
+//    }
+//    
+//    [self addValue:value withAttribute:intAttibute];
+//    if (MA_PIM_ATTR_CUSTOM == intAttibute) {
+//        [self setLabel:attribute atIndex:([mFieldValuesArray count] - 1)];
+//    } // bogdan
     
     return 0;
 }

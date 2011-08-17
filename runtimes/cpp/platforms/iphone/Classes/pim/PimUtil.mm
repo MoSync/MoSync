@@ -358,35 +358,14 @@ static PimUtils *sharedInstance = nil;
         case MA_PIM_FIELD_CONTACT_ORG_INFO:
             returnValue = MA_PIM_TYPE_STRING_ARRAY;
             break;
-        case MA_PIM_FIELD_CONTACT_ANNIVERSARY:
-            returnValue = MA_PIM_TYPE_DATE;
-            break;
-        case MA_PIM_FIELD_CONTACT_EVENT:
-            returnValue = MA_PIM_TYPE_DATE;
-            break;
         case MA_PIM_FIELD_CONTACT_IM:
             returnValue = MA_PIM_TYPE_STRING_ARRAY;
             break;
-        case MA_PIM_FIELD_CONTACT_RELATED_NAME:
-            returnValue = MA_PIM_TYPE_STRING;
-            break;
-        case MA_PIM_FIELD_EVENT_TITLE:
-            returnValue = MA_PIM_TYPE_STRING;
-            break;
-        case MA_PIM_FIELD_EVENT_START_DATE:
-            returnValue = MA_PIM_TYPE_DATE;
-            break;
-        case MA_PIM_FIELD_EVENT_END_DATE:
-            returnValue = MA_PIM_TYPE_DATE;
-            break;
-        case MA_PIM_FIELD_EVENT_LOCATION:
-            returnValue = MA_PIM_TYPE_STRING;
-            break;
-        case MA_PIM_FIELD_EVENT_DESCRIPTION:
+        case MA_PIM_FIELD_CONTACT_RELATION:
             returnValue = MA_PIM_TYPE_STRING;
             break;
         default:
-            returnValue = MA_PIM_ERR_UNAVAILABLE_FIELD;
+            returnValue = MA_PIM_ERR_INVALID_INDEX;
     }
     
     return returnValue;
@@ -426,49 +405,43 @@ static PimUtils *sharedInstance = nil;
         case MA_PIM_ATTR_PREFERRED:
             string = [NSString stringWithString:@"Preferred"];
             break;  
-        case MA_PIM_ATTR_CUSTOM:
-            string = [NSString stringWithString:@""];
-            break;  
         case MA_PIM_ATTR_SMS:
             string = [NSString stringWithString:@"SMS"];
             break;  
         case MA_PIM_ATTR_WORK:
             string = [NSString stringWithString:(NSString*)kABWorkLabel];
             break;  
-        case MA_PIM_ATTR_IPHONE:
-            string = [NSString stringWithString:(NSString*)kABPersonPhoneIPhoneLabel];
-            break;  
-        case MA_PIM_ATTR_MOTHER:
+        case MA_PIM_ATTR_RELATION_MOTHER:
             string = [NSString stringWithString:(NSString*)kABPersonMotherLabel];
             break;
-        case MA_PIM_ATTR_FATHER:
+        case MA_PIM_ATTR_RELATION_FATHER:
             string = [NSString stringWithString:(NSString*)kABPersonFatherLabel];
             break;
-        case MA_PIM_ATTR_PARENT:
+        case MA_PIM_ATTR_RELATION_PARENT:
             string = [NSString stringWithString:(NSString*)kABPersonParentLabel];
             break;
-        case MA_PIM_ATTR_SISTER:
+        case MA_PIM_ATTR_RELATION_SISTER:
             string = [NSString stringWithString:(NSString*)kABPersonSisterLabel];
             break;
-        case MA_PIM_ATTR_BROTHER:
+        case MA_PIM_ATTR_RELATION_BROTHER:
             string = [NSString stringWithString:(NSString*)kABPersonBrotherLabel];
             break;
-        case MA_PIM_ATTR_CHILD:
+        case MA_PIM_ATTR_RELATION_CHILD:
             string = [NSString stringWithString:(NSString*)kABPersonChildLabel];
             break;
-        case MA_PIM_ATTR_FRIEND:
+        case MA_PIM_ATTR_RELATION_FRIEND:
             string = [NSString stringWithString:(NSString*)kABPersonFriendLabel];
             break;
-        case MA_PIM_ATTR_SPOUSE:
+        case MA_PIM_ATTR_RELATION_SPOUSE:
             string = [NSString stringWithString:(NSString*)kABPersonSpouseLabel];
             break;    
-        case MA_PIM_ATTR_PARTNER:
+        case MA_PIM_ATTR_RELATION_PARTNER:
             string = [NSString stringWithString:(NSString*)kABPersonPartnerLabel];
             break;
-        case MA_PIM_ATTR_MANAGER:
+        case MA_PIM_ATTR_RELATION_MANAGER:
             string = [NSString stringWithString:(NSString*)kABPersonManagerLabel];
             break;
-        case MA_PIM_ATTR_ASSISTANT:
+        case MA_PIM_ATTR_RELATION_ASSISTANT:
             string = [NSString stringWithString:(NSString*)kABPersonAssistantLabel];
             break;
         default:

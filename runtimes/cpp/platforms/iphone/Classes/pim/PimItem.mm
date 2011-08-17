@@ -105,7 +105,7 @@
     [key release];
     
     if (nil == itemField) {
-        returnValue = MA_PIM_ERR_UNAVAILABLE_FIELD;
+        returnValue = MA_PIM_ERR_INVALID_INDEX;
     } else {
         returnValue = [itemField getAttribute:index];
     }
@@ -142,7 +142,7 @@
     
     if (nil == itemField) 
     {
-        returnValue = MA_PIM_ERR_UNAVAILABLE_FIELD;
+        returnValue = MA_PIM_ERR_INVALID_INDEX;
     }
     else
     {
@@ -181,7 +181,7 @@
     
     if (nil == itemField)
     {
-        return MA_PIM_ERR_UNAVAILABLE_FIELD;
+        return MA_PIM_ERR_INVALID_INDEX;
     } 
     
     returnValue = [itemField getLabel:customLabel indexValue:index];
@@ -224,7 +224,7 @@
         0 > index  || 
         index > [fieldItem count])
     {
-        return MA_PIM_ERR_UNAVAILABLE_FIELD;
+        return MA_PIM_ERR_INVALID_INDEX;
     }
     
     int fieldType = [fieldItem getFieldType];
@@ -292,7 +292,7 @@
     
     if(nil == itemField) 
     {
-        return MA_PIM_ERR_UNAVAILABLE_FIELD;
+        return MA_PIM_ERR_INVALID_INDEX;
     }
     
     // Check if there is a value at the given index.
@@ -410,7 +410,7 @@
     
     if (nil == itemField) 
     {
-        returnValue = MA_PIM_ERR_UNAVAILABLE_FIELD;
+        returnValue = MA_PIM_ERR_INVALID_INDEX;
     } else 
     {
         returnValue = [itemField removeValue:index];

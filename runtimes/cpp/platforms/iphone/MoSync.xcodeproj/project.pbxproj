@@ -18,12 +18,6 @@
 		4318698813F68D410051D97A /* PimContactsList.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697013F68D410051D97A /* PimContactsList.h */; };
 		4318698913F68D410051D97A /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318697113F68D410051D97A /* PimContactsList.m */; };
 		4318698A13F68D410051D97A /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318697113F68D410051D97A /* PimContactsList.m */; };
-		4318698B13F68D410051D97A /* PimEventItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697313F68D410051D97A /* PimEventItem.h */; };
-		4318698C13F68D410051D97A /* PimEventItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318697413F68D410051D97A /* PimEventItem.m */; };
-		4318698D13F68D410051D97A /* PimEventItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318697413F68D410051D97A /* PimEventItem.m */; };
-		4318698E13F68D410051D97A /* PimEventsList.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697513F68D410051D97A /* PimEventsList.h */; };
-		4318698F13F68D410051D97A /* PimEventsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318697613F68D410051D97A /* PimEventsList.m */; };
-		4318699013F68D410051D97A /* PimEventsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318697613F68D410051D97A /* PimEventsList.m */; };
 		4318699113F68D410051D97A /* PimDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697713F68D410051D97A /* PimDatabase.h */; };
 		4318699213F68D410051D97A /* PimDatabase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4318697813F68D410051D97A /* PimDatabase.mm */; };
 		4318699313F68D410051D97A /* PimDatabase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4318697813F68D410051D97A /* PimDatabase.mm */; };
@@ -263,10 +257,6 @@
 		4318696F13F68D410051D97A /* PimContactItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PimContactItem.m; sourceTree = "<group>"; };
 		4318697013F68D410051D97A /* PimContactsList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactsList.h; sourceTree = "<group>"; };
 		4318697113F68D410051D97A /* PimContactsList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PimContactsList.m; sourceTree = "<group>"; };
-		4318697313F68D410051D97A /* PimEventItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimEventItem.h; sourceTree = "<group>"; };
-		4318697413F68D410051D97A /* PimEventItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PimEventItem.m; sourceTree = "<group>"; };
-		4318697513F68D410051D97A /* PimEventsList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimEventsList.h; sourceTree = "<group>"; };
-		4318697613F68D410051D97A /* PimEventsList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PimEventsList.m; sourceTree = "<group>"; };
 		4318697713F68D410051D97A /* PimDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimDatabase.h; sourceTree = "<group>"; };
 		4318697813F68D410051D97A /* PimDatabase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PimDatabase.mm; sourceTree = "<group>"; };
 		4318697913F68D410051D97A /* PimFieldItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimFieldItem.h; sourceTree = "<group>"; };
@@ -614,7 +604,6 @@
 			isa = PBXGroup;
 			children = (
 				4318696D13F68D410051D97A /* contacts */,
-				4318697213F68D410051D97A /* events */,
 				4318697713F68D410051D97A /* PimDatabase.h */,
 				4318697813F68D410051D97A /* PimDatabase.mm */,
 				4318697913F68D410051D97A /* PimFieldItem.h */,
@@ -642,17 +631,6 @@
 				4318697113F68D410051D97A /* PimContactsList.m */,
 			);
 			path = contacts;
-			sourceTree = "<group>";
-		};
-		4318697213F68D410051D97A /* events */ = {
-			isa = PBXGroup;
-			children = (
-				4318697313F68D410051D97A /* PimEventItem.h */,
-				4318697413F68D410051D97A /* PimEventItem.m */,
-				4318697513F68D410051D97A /* PimEventsList.h */,
-				4318697613F68D410051D97A /* PimEventsList.m */,
-			);
-			path = events;
 			sourceTree = "<group>";
 		};
 		8500CD3E132E506D0003A01E /* External */ = {
@@ -958,8 +936,6 @@
 				43D8047E13EFBCB200183387 /* VideoViewWidget.h in Headers */,
 				4318698513F68D410051D97A /* PimContactItem.h in Headers */,
 				4318698813F68D410051D97A /* PimContactsList.h in Headers */,
-				4318698B13F68D410051D97A /* PimEventItem.h in Headers */,
-				4318698E13F68D410051D97A /* PimEventsList.h in Headers */,
 				4318699113F68D410051D97A /* PimDatabase.h in Headers */,
 				4318699413F68D410051D97A /* PimFieldItem.h in Headers */,
 				4318699713F68D410051D97A /* PimFieldItemValue.h in Headers */,
@@ -1143,8 +1119,6 @@
 				85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */,
 				4318698613F68D410051D97A /* PimContactItem.m in Sources */,
 				4318698913F68D410051D97A /* PimContactsList.m in Sources */,
-				4318698C13F68D410051D97A /* PimEventItem.m in Sources */,
-				4318698F13F68D410051D97A /* PimEventsList.m in Sources */,
 				4318699213F68D410051D97A /* PimDatabase.mm in Sources */,
 				4318699513F68D410051D97A /* PimFieldItem.mm in Sources */,
 				4318699813F68D410051D97A /* PimFieldItemValue.mm in Sources */,
@@ -1218,8 +1192,6 @@
 				85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */,
 				4318698713F68D410051D97A /* PimContactItem.m in Sources */,
 				4318698A13F68D410051D97A /* PimContactsList.m in Sources */,
-				4318698D13F68D410051D97A /* PimEventItem.m in Sources */,
-				4318699013F68D410051D97A /* PimEventsList.m in Sources */,
 				4318699313F68D410051D97A /* PimDatabase.mm in Sources */,
 				4318699613F68D410051D97A /* PimFieldItem.mm in Sources */,
 				4318699913F68D410051D97A /* PimFieldItemValue.mm in Sources */,
@@ -1257,7 +1229,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Tomas Uppgard (MYB667RX83)";
+				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tomas Uppgard (MYB667RX83)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
@@ -1267,8 +1239,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				INFOPLIST_FILE = "MoSync-Info.plist";
 				PRODUCT_NAME = MoSync;
-				PROVISIONING_PROFILE = "92C69729-5F75-4E8B-A7F9-76BD5132C6F5";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "92C69729-5F75-4E8B-A7F9-76BD5132C6F5";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B06E2757-3CC3-41D7-9607-2B0F939ED9DB";
 			};
 			name = Debug;
 		};
@@ -1276,7 +1247,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: Tomas Uppgard (MYB667RX83)";
+				CODE_SIGN_IDENTITY = "";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tomas Uppgard (MYB667RX83)";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -1284,8 +1255,7 @@
 				GCC_PREPROCESSOR_DEFINITIONS = "";
 				INFOPLIST_FILE = "MoSync-Info.plist";
 				PRODUCT_NAME = MoSync;
-				PROVISIONING_PROFILE = "92C69729-5F75-4E8B-A7F9-76BD5132C6F5";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "92C69729-5F75-4E8B-A7F9-76BD5132C6F5";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B06E2757-3CC3-41D7-9607-2B0F939ED9DB";
 			};
 			name = Release;
 		};
@@ -1293,12 +1263,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tomas Uppgard (MYB667RX83)";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
 				PREBINDING = NO;
 				PRODUCT_NAME = MoSyncLib;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B06E2757-3CC3-41D7-9607-2B0F939ED9DB";
 			};
 			name = Debug;
 		};
@@ -1306,12 +1278,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: Tomas Uppgard (MYB667RX83)";
 				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
 				PREBINDING = NO;
 				PRODUCT_NAME = MoSyncLib;
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "B06E2757-3CC3-41D7-9607-2B0F939ED9DB";
 				ZERO_LINK = NO;
 			};
 			name = Release;

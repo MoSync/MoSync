@@ -1316,12 +1316,19 @@ interface MAAPI {
 		*/
 		BLUETOOTH_TURNED_ON = 30;
 
+
 		/**
+
 		* \brief Provides data from active sensors.
+
 		* \see MAEvent::sensor
+
 		* \see maSensorStart()
+
 		*/
+
 		SENSOR = 31;
+
 	}
 
 	/**
@@ -1336,13 +1343,21 @@ interface MAAPI {
 		int result;
 	}
 
+
 	/**
+
 	* \brief A structure containing the sensor type and the data sent to the event.
+
 	*/
+
 	struct MASensor {
+
 		int type;
+
 		float values[3];
+
 	}
+
 	
 	/**
 	* \brief An event; a message indicating that something has happened, e.g. that a key has been pressed.
@@ -1406,10 +1421,15 @@ interface MAAPI {
 			
 			/**
 			* Valid in \link #EVENT_TYPE_SENSOR SENSOR \endlinkR events.
+
 			*/
+
 			MASensor sensor;
 
+
+
 			/**
+
 			* Used by custom events. See invididual event descriptions.
 			*/
 			void* data;
@@ -2807,7 +2827,8 @@ interface MAAPI {
 			PUBLIC_KEY = 112;
 			/// #MA_PIM_TYPE_STRING. Connected with PUBLIC_KEY.
 			PUBLIC_KEY_STRING = 113;
-			/// #MA_PIM_TYPE_DATE. The time when the item was last changed.
+			/// #MA_PIM_TYPE_DATE.
+
 			REVISION = 114;
 			/// #MA_PIM_TYPE_STRING. Telephone number.
 			TEL = 115;
@@ -2817,89 +2838,186 @@ interface MAAPI {
 			UID = 117;
 			/// #MA_PIM_TYPE_STRING. Uniform Resource Locator associated with the contact.
 			URL = 118;
-			
-			/// #MA_PIM_TYPE_STRING_ARRAY. Supplemental organization/company information.
-			/// Has \link #MA_PIM_CONTACT_ORG_NAME MA_PIM_CONTACT_ORG \endlink indices.
-			ORG_INFO = 200;
-			/// #MA_PIM_TYPE_DATE.
-			ANNIVERSARY = 201;
-			/// #MA_PIM_TYPE_DATE. An event that is not a birthday or anniversary.
-			EVENT = 202;
-			/// #MA_PIM_TYPE_STRING_ARRAY. Instant Messaging protocol & username.
-			/// The first string is one of the MA_PIM_CONTACT_IM constants. The second string is the username.
-			IM = 203;
-			/// #MA_PIM_TYPE_STRING.
-			/// 
-			RELATED_NAME = 204;
+			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing an IM address .
+
+			/// Has \link #MA_PIM_CONTACT_IM_USERNAME MA_PIM_CONTACT_IM \endlink indices.
+
+			IM = 119;
+
+			/// #MA_PIM_TYPE_STRING. A data kind representing a relation.
+
+			RELATION = 120;
+
+			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing a organization.
+
+			/// Has \link #MA_PIM_CONTACT_ORGANIZATION_NAME MA_PIM_CONTACT_ORGANIZATION \endlink indices.
+
+			ORG_INFO = 121;
+
 		}
 
-		/// Indices for #MA_PIM_FIELD_CONTACT_ADDR. 
 		constset int MA_PIM_CONTACT_ADDR_ {
-			/// Post office box number.
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Post office box number.
+
 			POBOX = 0;
-			/// Extra info.
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Extra info.
+
 			EXTRA = 1;
-			/// Street name and number.
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Street name and number.
+
 			STREET = 2;
-			/// Locality name. (ex. city)
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Locality name. (ex. city)
+
 			LOCALITY = 3;
-			/// Region name. (ex. province, state or territory)
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Region name. (ex. province, state or territory)
+
 			REGION = 4;
-			/// Postal code.
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Postal code.
+
 			POSTALCODE = 5;
-			/// Country name.
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country name.
+
 			COUNTRY = 6;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country code.
+
 			COUNTRY_CODE = 7;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Neighborhood.
+
 			NEIGHBORHOOD = 8;
 		}
-		
-		/// Indices for #MA_PIM_FIELD_CONTACT_NAME. 
+
+
 		constset int MA_PIM_CONTACT_NAME_ {
-			/// Family name.
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Family name.
+
 			FAMILY = 0;
-			/// Given name.
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Given name.
+
 			GIVEN = 1;
-			/// Alternate/secondary names, if any.
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Alternate/secondary names, if any.
+
 			OTHER = 2;
-			/// Prefix. (ex. "Dr.")
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Prefix. (ex. "Dr.")
+
 			PREFIX = 3;
-			/// Suffix. (ex. "M.D.")
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
+
 			SUFFIX = 4;
-			// todo: document
-			PHONETIC_FAMILY = 5;
-			PHONETIC_GIVEN = 6;
-			PHONETIC_OTHER = 7;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Middle name.
+
+			MIDDLE = 5;
+
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic first name.
+
+			PHONETIC_FAMILY = 6;
+
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic last name.
+
+			PHONETIC_GIVEN = 7;
+
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic middle name.
+
+			PHONETIC_OTHER = 8;
+
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Nickname
+
+			NICKNAME = 9;
+
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Note
+
+			NOTE = 10;
+
 		}
 
-		// todo: document and enumerate.
-		constset int MA_PIM_CONTACT_ORG_ {
-			DEPARTMENT = 0;
-			JOB_DESCRIPTION = 1;
-			SYMBOL = 2;
-			PHONETIC_NAME = 3;
-			OFFICE_LOCATION = 4;
+		constset int MA_PIM_CONTACT_ORGANIZATION_ {
+
+			/// #MA_PIM_TYPE_STRING.
+
+			NAME = 0;
+
+			/// #MA_PIM_TYPE_STRING.
+
+			JOB_TITLE = 1;
+
+			/// #MA_PIM_TYPE_STRING.
+
+			DEPARTMENT = 2;
+
+			/// #MA_PIM_TYPE_STRING.
+
+			/// Only for Android devices.
+
+			JOB_DESCRIPTION = 3;
+
+			/// #MA_PIM_TYPE_STRING.
+
+			/// Only for Android devices.
+
+			SYMBOL = 4;
+
+			/// #MA_PIM_TYPE_STRING.
+
+			/// Only for Android devices.
+
+			PHONETIC_NAME = 5;
+
+			/// #MA_PIM_TYPE_STRING.
+
+			/// Only for Android devices.
+
+			OFFICE_LOCATION = 6;
+
+			/// #MA_PIM_TYPE_STRING.
+
+			/// Only for Android devices.
+
+			PHONETIC_NAME_STYLE = 7;
+
 		}
 
-		/// Values for #MA_PIM_FIELD_CONTACT_CLASS.
+		constset int MA_PIM_CONTACT_IM_ {
+
+			/// #MA_PIM_TYPE_STRING.
+
+			USERNAME = 0;
+
+			/// #MA_PIM_TYPE_STRING.
+
+			PROTOCOL = 1;
+
+		}
+
+
+
 		constset int MA_PIM_CONTACT_CLASS_ {
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+
 			CONFIDENTIAL = 200;
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+
 			PRIVATE = 201;
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+
 			PUBLIC = 202;
 		}
-		
+
+
 		// todo: document and enumerate.
-		constset int MA_PIM_CONTACT_IM_ {
-			PROTOCOL_AIM = "AIM";
-			PROTOCOL_MSN = "MSN";
-			PROTOCOL_YAHOO = "Yahoo";
-			PROTOCOL_SKYPE = "Skype";
-			PROTOCOL_QQ = "QQ";
-			PROTOCOL_GOOGLE_TALK = "GoogleTalk";
-			PROTOCOL_ICQ = "ICQ";
-			PROTOCOL_JABBER = "Jabber";
-			PROTOCOL_NETMEETING = "Netmeeting";
+		constset MAString MA_PIM_CONTACT_IM_PROTOCOL_ {
+			AIM = "AIM";
+			MSN = "MSN";
+			YAHOO = "Yahoo";
+			SKYPE = "Skype";
+			QQ = "QQ";
+			GOOGLE_TALK = "GoogleTalk";
+			ICQ = "ICQ";
+			JABBER = "Jabber";
+			NETMEETING = "Netmeeting";
 		}
-		
+
+
+		// deprecated
+
 		constset int MA_PIM_ATTR_ {
 			/// The value describes an assistant.
 			ASST = 1;
@@ -2919,94 +3037,329 @@ interface MAAPI {
 			/// Only one value per field may be marked PREFERRED. Marking a value PREFERRED
 			/// causes any other PREFERRED value in the field to become unmarked.
 			PREFERRED = 128;
-			/// The field's label can be set.
-			CUSTOM = 129;
-			
 			/// The value describes an SMS number?
-			SMS = 0x100;
+			SMS = 256;
+
 			/// The value describes a work phone number.
-			WORK = 0x200;
+			WORK = 512;
 
-			/// The value describes an iPhone number.
-			IPHONE = 0x400;
-			// todo: document.
-			CALLBACK = 0x800;
-			CAR = 0x1000;
-			ISDN = 0x2000;
-			RADIO = 0x4000;
-			TTY_TDD = 0x8000;
-			MMS = 0x10000;
-
-			BLOG = 0x20000;
-			PROFILE = 0x40000;
-			FTP = 0x80000;
-			
-			MOTHER    = 0x100000;
-			FATHER    = 0x200000;
-			PARENT    = 0x400000;
-			SISTER    = 0x800000;
-			BROTHER   = 0x1000000;
-			CHILD     = 0x2000000;
-			FRIEND    = 0x4000000;
-			SPOUSE    = 0x8000000;
-			PARTNER   = 0x10000000;
-			MANAGER   = 0x20000000;
-			ASSISTANT = 0x40000000;
 		}
 
-		constset int MA_PIM_FIELD_EVENT_ {
-			/// #MA_PIM_TYPE_STRING.
-			TITLE = 1;
-			/// #MA_PIM_TYPE_DATE.
-			START_DATE = 2;
-			/// #MA_PIM_TYPE_DATE.
-			END_DATE = 3;
-			/// #MA_PIM_TYPE_STRING.
-			LOCATION = 4;
-			/// #MA_PIM_TYPE_STRING.
-			DESCRIPTION = 5;
-			/// #MA_PIM_TYPE_INT.
-			ALARM = 6;
+
+		constset int MA_PIM_ATTR_ADDR_ {
+
+			HOME = 101;
+
+			WORK = 102;
+
+			/// The value describes a different adress type.
+
+			OTHER = 103;
+
+			/// The field's label can be set.
+
+			CUSTOM = 104;
+
 		}
-		
+
+
+		constset int MA_PIM_ATTR_EMAIL_ {
+
+			HOME = 201;
+
+			WORK = 202;
+
+			MOBILE = 203;
+
+			/// The value describes a different phone number type.
+
+			OTHER = 204;
+
+			/// The field's label can be set.
+
+			CUSTOM = 205;
+
+		}
+
+		constset int MA_PIM_ATTR_FORMATTED_ADDR_ {
+
+			HOME = 301;
+
+			WORK = 302;
+
+			/// The value describes a different adress type.
+
+			OTHER = 303;
+
+			/// The field's label can be set.
+
+			CUSTOM = 304;
+
+		}
+
+
+		constset int MA_PIM_ATTR_ORG_ {
+
+			WORK = 401;
+
+			/// The value describes a different IM type.
+
+			OTHER = 402;
+
+			/// The field's label can be set.
+
+			CUSTOM = 403;
+
+		}
+
+
+
+		constset int MA_PIM_ATTR_PHONE_ {
+
+			/// The value describes a mobile phone number.
+
+			HOME = 501;
+
+			/// The value describes a fax number.
+
+			MOBILE = 502;
+
+			/// The value describes a pager number.
+
+			HOME_FAX = 503;
+
+			WORK_FAX = 504;
+
+			/// The value describes an assistant.
+
+			PAGER = 505;
+
+			IPHONE = 506;
+
+			WORK = 507;
+
+			CALLBACK = 508;
+
+			CAR = 509;
+
+			COMPANY_MAIN = 510;
+
+			ISDN = 511;
+
+			OTHER_FAX = 512;
+
+			RADIO = 513;
+
+			TELEX = 514;
+
+			TTY_TDD = 515;
+
+			WORK_MOBILE = 516;
+
+			WORK_PAGER = 517;
+
+			ASSISTANT = 518;
+
+			MMS = 519;
+
+			/// The value describes a different type phone number.
+
+			OTHER = 520;
+
+			/// The field's label can be set.
+
+			CUSTOM = 521;
+
+		}
+
+
+
+		constset int MA_PIM_ATTR_TITLE_ {
+
+			WORK = 601;
+
+			/// The value describes a different IM type.
+
+			OTHER = 602;
+
+			/// The field's label can be set.
+
+			CUSTOM = 603;
+
+		}
+
+
+
+		constset int MA_PIM_ATTR_WEBSITE_ {
+
+			HOMEPAGE = 701;
+
+			BLOG = 702;
+
+			PROFILE = 703;
+
+			HOME = 704;
+
+			WORK = 705;
+
+			FTP = 706;
+
+			/// The value describes a different type phone number.
+
+			OTHER = 707;
+
+			/// The field's label can be set.
+
+			CUSTOM = 708;
+
+		}
+
+
+
+		constset int MA_PIM_ATTR_IM_ {
+
+			HOME = 801;
+
+			WORK = 802;
+
+			/// The value describes a different IM type.
+
+			OTHER = 803;
+
+			/// The field's label can be set.
+
+			CUSTOM = 804;
+
+		}
+
+
+
+		constset int MA_PIM_ATTR_RELATION_ {
+
+			MOTHER = 901;
+
+			FATHER = 902;
+
+			PARENT = 903;
+
+			SISTER = 904;
+
+			BROTHER = 905;
+
+			CHILD = 906;
+
+			FRIEND = 907;
+
+			SPOUSE = 908;
+
+			PARTNER = 909;
+
+			MANAGER = 910;
+
+			ASSISTANT = 911;
+
+			DOMESTIC_PARTNER = 912;
+
+			REFERRED_BY = 913;
+
+			RELATIVE = 914;
+
+			/// The field's label can be set.
+
+			CUSTOM = 915;
+
+		}
+
+
+
+		constset int MA_PIM_ATTR_ORG_INFO_ {
+
+			WORK = 1001;
+
+			/// The value describes a different IM type.
+
+			OTHER = 1002;
+
+			/// The field's label can be set.
+
+			CUSTOM = 1003;
+
+		}
+
+
+
+		constset int MA_PIM_ATTR
+
+		{
+
+			PREFERRED = 0x10000;
+
+		}
+
+
+
 		constset int MA_PIM_ERR_ {
 			/// No error. The operation completed successfully.
+
 			NONE = 0;
+
 			/// This function is unavailable on the current platform.
+
 			UNAVAILABLE = -1;
-			/// The native database's data type did not match the MoSync API.
-			NATIVE_TYPE_MISMATCH = -2;
-			/// The value does not have a custom label.
-			NO_LABEL = -3;
-			/// The values's attribute is not set to custom.
-			CUSTOM_ATTRIBUTE = -4;
-			/// The given index is not valid.
-			/// This value is returned by maPimItemGetField(), maPimItemSetValue().
-			INVALID_INDEX = -5;
-			///
-			LABEL_NOT_SET = -6;
-			/// The field has no values / not supported on the current platform.
-			/// This value is returned by maPimItemSetLabel(), maPimItemGetAttributes.
-			UNAVAILABLE_FIELD = -7;
-			/// The specified pim list is not available on the current platform.
-			UNAVAILABLE_LIST = -8;
-			/// The specified list is not opend. Call maPimListOpen() first.
-			LIST_NOT_OPENED = -9;
-			/// The operation is not allowed by the Address Book database.
-			OPERATION_NOT_PERMITTED = -10;
-			/// Invalid handle.
-			INVALID_HANDLE = -11;
 
 			/// The native database's data type for the given field did not match the MoSync API.
+
 			NATIVE_TYPE_MISMATCH = -2;
+
 			/// The field type is not supported.
+
 			FIELD_UNSUPPORTED = -3;
+
 			/// The field is read-only.
+
 			READ_ONLY = -4;
+
 			/// The field/attribute combination is not supported.
+
 			COMBO_UNSUPPORTED = -5;
+
 			/// More values in this field is not supported.
+
 			FIELD_COUNT_MAX = -6;
+
+			/// The value does not have a custom label.
+
+			NO_LABEL = -7;
+
+			/// The values's attribute is not set to custom.
+
+			CUSTOM_ATTRIBUTE = -8;
+
+			/// The given index is not valid.
+
+			/// This value is returned by maPimItemGetField(), maPimItemSetValue().
+
+			INVALID_INDEX = -9;
+
+			///
+
+			LABEL_NOT_SET = -10;
+
+			/// The specified pim list is not available on the current platform.
+
+			UNAVAILABLE_LIST = -11;
+
+			/// The specified list is not opend. Call maPimListOpen() first.
+
+			LIST_NOT_OPENED = -12;
+
+			/// The operation is not allowed by the Address Book database.
+
+			OPERATION_NOT_PERMITTED = -13;
+
+			/// Invalid handle.
+
+			INVALID_HANDLE = -14;
 
 		}
 
@@ -3051,8 +3404,10 @@ interface MAAPI {
 
 		/** Returns the bitmask of attributes for the specified value in a field and item.
 		* Panics on field+index combinations that don't exist in this item.
-		* On iPhone platform in case of error one of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink 
-		* constants is returned. 
+		* On iPhone platform in case of error one of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink
+
+		* constants is returned.
+
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
@@ -3071,7 +3426,8 @@ interface MAAPI {
 		* \note This function is not available on JavaME or Blackberry.
 		*/
 		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
-		
+
+
 		/** Retrieves the custom label for a value in a field and item,
 		* if the value has a custom label.
 		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
@@ -3086,7 +3442,8 @@ interface MAAPI {
 		* \note This function is not available on JavaME or Blackberry.
 		*/
 		int maPimItemGetLabel(in MA_PIM_ARGS args, in int index);
-		
+
+
 		/** Returns one of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants,
 		* or \< 0 if the field does not exist in the list.
 		* \param list Opened by maPimListOpen().
@@ -4840,89 +5197,173 @@ group WidgetAPI "Widget API" {
 		 */
 		void maMessageBox(in MAString title, in MAString message);
 
+
 		constset int SENSOR_TYPE_ {
+
 			// A constant describing an accelerometer sensor type.
+
 			ACCELEROMETER = 1;
+
 			// A constant describing a magnetic field sensor type.
+
 			MAGNETIC_FIELD = 2;
+
 			// A constant describing an orientation sensor type.
+
 			ORIENTATION = 3;
+
 			// A constant describing a gyroscope sensor type.
+
 			GYROSCOPE = 4;
+
 			// A constant describing an proximity sensor type.
+
 			PROXIMITY = 5;
+
 		}
+
+
 
 		constset int SENSOR_RATE_ {
+
 			// Get sensor data as fast as possible.
+
 			FASTEST = 0;
+
 			// A rate suitable for games.
+
 			GAME = -1;
+
 			// The default rate. Suitable for screen orientation changes.
+
 			NORMAL = -2;
+
 			// A rate suitable for the user interface.
+
 			UI = -3;
+
 		}
+
+
 
 		constset int SENSOR_ERROR_ {
+
 			NONE = 0;
+
 			// Errors for maSensorStart
+
 			NOT_AVAILABLE = -1;
+
 			INTERVAL_NOT_SET = -2;
+
 			ALREADY_ENABLED = -3;
+
 			// Errors for maSensorStop
+
 			NOT_ENABLED = -4;
+
 			CANNOT_DISABLE = -5;
+
 		}
+
+
 
 		constset int UIDEVICE_ORIENTATION_ {
+
 		    // The orientation of the device cannot be determined.
+
 			UNKNOWN = 0;
+
 			// The device is in portrait mode, with the device held upright and the home button at the bottom.
+
 			PORTRAIT = 1;
+
 			// The device is in portrait mode but upside down, with the device held upright and the home button at the top.
+
 			PORTRAIT_UPSIDE_DOWN = 2;
+
 			// The device is in landscape mode, with the device held upright and the home button on the right side.
+
 			LANDSCAPE_LEFT = 3;
+
 			// The device is in landscape mode, with the device held upright and the home button on the left side.
+
 			LANDSCAPE_RIGHT = 4;
+
 			// The device is held parallel to the ground with the screen facing upwards.
+
 			FACE_UP = 5;
+
 			// The device is held parallel to the ground with the screen facing downwards.
+
 			FACE_DOWN = 6;
+
 		}
+
+
 
 		constset int SENSOR_PROXIMITY_VALUE_ {
+
 			// the device is not close to the user
+
 			FAR = 0;
+
 			// the device is close to the user
+
 			NEAR = 1;
+
 		}
 
-		/**
-		* \brief Enables a sensor and starts sending events if the sensor is available.
-		* If the sensor is already enabled this call will have no effect.
-		* \param sensor       The sensor which should be enabled.
-		* \param interval     Time interval in which a sensor update shall be triggered.
-		*            >0 interval time in milliseconds.
-		*            <=0 Any of SensorUpdate enums.
-		* \return    #SENSOR_ERROR_NONE  on success.
-		*            #SENSOR_ERROR_NOT_AVAILABLE if this sensor wasn't available.
-		*            #SENSOR_ERROR_INTERVAL_NOT_SET if the interval wasn't set, could be due to platform limitations.
-		*            #SENSOR_ERROR_ALREADY_ENABLED if the sensor already was enabled.
-		* \see #EVENT_TYPE_SENSOR
-		*/
-		int maSensorStart(in int sensor, in int interval);
+
 
 		/**
-		* \brief Disables a sensor so that it doesn't send any further events.
-		* \param sensor    The sensor which should be disabled.
-		* \return    #SENSOR_ERROR_NONE on success.
-		*            #SENSOR_ERROR_NOT_ENABLED if this sensor wasn't enabled.
-		*            #SENSOR_ERROR_CANNOT_DISABLE if there was a problem disabling the sensor.
+
+		* \brief Enables a sensor and starts sending events if the sensor is available.
+
+		* If the sensor is already enabled this call will have no effect.
+
+		* \param sensor       The sensor which should be enabled.
+
+		* \param interval     Time interval in which a sensor update shall be triggered.
+
+		*            >0 interval time in milliseconds.
+
+		*            <=0 Any of SensorUpdate enums.
+
+		* \return    #SENSOR_ERROR_NONE  on success.
+
+		*            #SENSOR_ERROR_NOT_AVAILABLE if this sensor wasn't available.
+
+		*            #SENSOR_ERROR_INTERVAL_NOT_SET if the interval wasn't set, could be due to platform limitations.
+
+		*            #SENSOR_ERROR_ALREADY_ENABLED if the sensor already was enabled.
+
 		* \see #EVENT_TYPE_SENSOR
+
 		*/
+
+		int maSensorStart(in int sensor, in int interval);
+
+
+
+		/**
+
+		* \brief Disables a sensor so that it doesn't send any further events.
+
+		* \param sensor    The sensor which should be disabled.
+
+		* \return    #SENSOR_ERROR_NONE on success.
+
+		*            #SENSOR_ERROR_NOT_ENABLED if this sensor wasn't enabled.
+
+		*            #SENSOR_ERROR_CANNOT_DISABLE if there was a problem disabling the sensor.
+
+		* \see #EVENT_TYPE_SENSOR
+
+		*/
+
 		int maSensorStop(in int sensor);
+
 	}
 	
 	constset int IOCTL_ {

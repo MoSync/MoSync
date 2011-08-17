@@ -80,15 +80,9 @@
  */
 -(int) setCustomLabel:(NSString*) customLabel
 {
-    if (MA_PIM_ATTR_CUSTOM == mAttribute)
-    {
-        mCustomLabel = customLabel;
-        return MA_PIM_ERR_NONE;
-    }
-    else
-    {
-        return MA_PIM_ERR_CUSTOM_ATTRIBUTE;
-    }
+    mCustomLabel = customLabel;
+    return MA_PIM_ERR_NONE;
+    
 }
 
 /**

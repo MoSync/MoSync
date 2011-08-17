@@ -21,7 +21,6 @@
 #include "helpers/cpp_defs.h"
 #include "helpers/cpp_ix_pim.h"
 #include "PimContactsList.h"
-#include "PimEventsList.h"
 #import "PimUtil.h"
 #import "PimItem.h"
 
@@ -31,10 +30,6 @@
      */
     PimList* mContactsList;
     
-    /**
-     * List with event items.
-     */
-    PimList* mEventsList;
 }
 
 /**

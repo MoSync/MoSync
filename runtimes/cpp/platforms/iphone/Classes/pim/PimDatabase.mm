@@ -42,12 +42,6 @@
         [mContactsList openList];
         returnedValue = MA_PIM_CONTACTS;
     }
-    else if (MA_PIM_EVENTS == listType)
-    {
-        mEventsList = [[PimEventsList alloc] init];
-        [mEventsList openList];
-        returnedValue = MA_PIM_EVENTS;
-    }
     else
     {
         returnedValue = MA_PIM_ERR_UNAVAILABLE_LIST;
@@ -77,17 +71,6 @@
             returnedValue = [mContactsList getNextItem];   
         }
     }
-    else if (MA_PIM_EVENTS == list)
-    {
-        if (nil == mEventsList)
-        {
-            returnedValue = MA_PIM_ERR_LIST_NOT_OPENED;
-        }
-        else
-        {
-            returnedValue = [mEventsList getNextItem];   
-        }
-    }
     else
     {
         returnedValue = MA_PIM_ERR_UNAVAILABLE_LIST;
@@ -111,14 +94,6 @@
         if (MA_PIM_ERR_NONE == returnedValue)
         {
             mContactsList = nil;
-        }
-    }
-    else if (MA_PIM_EVENTS == list)
-    {
-        returnedValue = [self closeList:mEventsList];
-        if (MA_PIM_ERR_NONE == returnedValue)
-        {
-            mEventsList = nil;
         }
     }
     else
@@ -164,11 +139,7 @@
 -(PimItem*) getItem:(MAHandle) itemHandle
 {    
     PimItem* item = [mContactsList getItem:itemHandle];
-    if (nil == item)
-    {
-        item = [mEventsList getItem:itemHandle];
-    }
-    
+       
     return item;
 }
 
@@ -178,12 +149,7 @@
     {
         return [mContactsList createItem];   
     }
-    
-    if (list == MA_PIM_EVENTS) 
-    {
-        return [mEventsList createItem];   
-    }
-    
+
     return MA_PIM_ERR_UNAVAILABLE_LIST;
 }
 
@@ -201,11 +167,6 @@
         return [mContactsList removeItem:item];    
     }
     
-    if (list == MA_PIM_EVENTS) 
-    {
-        return [mEventsList removeItem:item];    
-    }
-    
     return MA_PIM_ERR_UNAVAILABLE_LIST;
 }
 
@@ -215,8 +176,6 @@
 - (void) dealloc {
     
     [mContactsList release];
-    [mEventsList release];
-    
     [super dealloc];
 }
 

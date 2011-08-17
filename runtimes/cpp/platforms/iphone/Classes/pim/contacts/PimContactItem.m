@@ -136,14 +136,10 @@
         case MA_PIM_FIELD_CONTACT_ORG_INFO:
             returnValue = [self writeOrgInfoField:itemField];
             break;
-        case MA_PIM_FIELD_CONTACT_EVENT:
-        case MA_PIM_FIELD_CONTACT_ANNIVERSARY:
-            returnValue = [self writeAnniversaryField:itemField];
-            break;
         case MA_PIM_FIELD_CONTACT_IM:
             returnValue = [self writeIMField:itemField];
             break;
-        case MA_PIM_FIELD_CONTACT_RELATED_NAME:
+        case MA_PIM_FIELD_CONTACT_RELATION:
             returnValue = [self writeRelatedNameField:itemField];
             break;    
         default:
@@ -241,7 +237,7 @@
     NSString* suffix = [array objectAtIndex:MA_PIM_CONTACT_NAME_SUFFIX];
     NSString* phoneticLastName = [array objectAtIndex:MA_PIM_CONTACT_NAME_PHONETIC_FAMILY];
     NSString* phoneticFirstName = [array objectAtIndex:MA_PIM_CONTACT_NAME_PHONETIC_GIVEN];
-    NSString* phoneticMiddleName = [array objectAtIndex:MA_PIM_CONTACT_NAME_PHONETIC_OTHER];
+//    NSString* phoneticMiddleName = [array objectAtIndex:MA_PIM_CONTACT_NAME_PHONETIC_OTHER];
     
     returnValue = [self setDataToRecord:firstName propertyID:kABPersonFirstNameProperty checkLength:true];
     CheckErrorCode(returnValue);
@@ -257,8 +253,8 @@
     CheckErrorCode(returnValue);
     returnValue = [self setDataToRecord:phoneticLastName propertyID:kABPersonLastNamePhoneticProperty checkLength:true];
     CheckErrorCode(returnValue);
-    returnValue = [self setDataToRecord:phoneticMiddleName propertyID:kABPersonMiddleNamePhoneticProperty checkLength:true];
-    CheckErrorCode(returnValue);
+//    returnValue = [self setDataToRecord:phoneticMiddleName propertyID:kABPersonMiddleNamePhoneticProperty checkLength:true];
+//    CheckErrorCode(returnValue);
     
     return MA_PIM_ERR_NONE;
 }
@@ -437,7 +433,7 @@
  */
 -(int) writeOrgInfoField:(PimFieldItem*) itemField
 {
-    NSString* department = [[itemField getValue:0] objectAtIndex:MA_PIM_CONTACT_ORG_DEPARTMENT];
+    NSString* department = [[itemField getValue:0] objectAtIndex:MA_PIM_CONTACT_ORGANIZATION_DEPARTMENT];
     return [self setDataToRecord:department propertyID:kABPersonDepartmentProperty checkLength:true];    
 }
 
@@ -827,11 +823,6 @@
     [itemField addValue:array withAttribute:0];
     [mFieldsDictionary setObject:itemField forKey:key];
     NSLog(@"department: %@", department);
-
-    // Add anniversary field.
-    multi = ABRecordCopyValue(mRecord, kABPersonDateProperty);
-    itemField = [[PimFieldItem alloc] initWithFieldConstant:MA_PIM_FIELD_CONTACT_ANNIVERSARY];
-    key = [[NSString alloc] initWithFormat:@"%d", MA_PIM_FIELD_CONTACT_ANNIVERSARY];
     
     for (CFIndex i = 0; i < ABMultiValueGetCount(multi); i++) {
         array = [[NSMutableArray alloc] init];
