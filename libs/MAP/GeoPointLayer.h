@@ -1,8 +1,3 @@
-//
-// GeoPointLayer.h
-//
-// Author: Lars Ake Vinberg
-//
 /* Copyright (C) 2010 Mobile Sorcery AB
 
 This program is free software; you can redistribute it and/or modify it under
@@ -19,6 +14,12 @@ along with this program; see the file COPYING.  If not, write to the Free
 Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
+
+//
+// GeoPointLayer.h
+//
+// Author: Lars Ake Vinberg
+//
 
 /**
 * \file GeoPointLayer.h
