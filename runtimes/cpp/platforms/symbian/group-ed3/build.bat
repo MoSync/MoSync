@@ -4,4 +4,3 @@ set PATH=%EPOCROOT%epoc32\tools\;c:\Perl\bin\;%EPOCROOT%epoc32\gcc\bin\;c:\Progr
 devices -setdefault @S60_3rd_FP1:com.nokia.s60
 call bldmake bldfiles
 call abld build gcce urel
-pause

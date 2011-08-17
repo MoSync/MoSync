@@ -188,11 +188,13 @@ public class MoSync extends Activity
 		// The MoSync view comes to foreground and is visible.
 		mMoSyncThread.setMoSyncView(mMoSyncView);
 		
+		mMoSyncThread.onResume();
+
 		SYSLOG("Posting EVENT_TYPE_FOCUS_GAINED to MoSync");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_FOCUS_GAINED;
 		mMoSyncThread.postEvent(event);
-    }
+	}
 
 	@Override
     protected void onPause()
@@ -206,6 +208,8 @@ public class MoSync extends Activity
 		// The view is not to be updated, inform the thread about this.
 		mMoSyncThread.setMoSyncView(null);
 		
+		mMoSyncThread.onPause();
+
 		SYSLOG("Posting EVENT_TYPE_FOCUS_LOST to MoSync");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_FOCUS_LOST;

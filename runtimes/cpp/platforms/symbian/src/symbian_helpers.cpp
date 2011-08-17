@@ -485,10 +485,14 @@ void MoSyncErrorExit(int errorCode) {
 //Utilities
 //***************************************************************************
 
+_LIT(KEpochStart, "19700000:");
 int unixTime(const TTime& tt) {
-	_LIT(KEpochStart, "19700000:");
 	TTime epochStart(KEpochStart);
 	return I64INT((tt.Int64() - epochStart.Int64()) / 1000000);
+}
+TTime symbianTime(int unixTime) {
+	TTime epochStart(KEpochStart);
+	return TTime(epochStart.Int64() + TInt64(unixTime) * 1000000);
 }
 
 
