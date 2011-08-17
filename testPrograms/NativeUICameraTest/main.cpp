@@ -201,7 +201,7 @@ public:
 		widgetSetPropertyInt(
 			widgetHandle,
 			MAW_WIDGET_HEIGHT,
-			65);
+			50);
 		maWidgetSetProperty(
 			widgetHandle,
 			MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT,
@@ -654,7 +654,7 @@ public:
 					mImageWidget,
 					MAW_WIDGET_HEIGHT,
 					MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-
+			maWidgetSetProperty(mImageWidget, MAW_IMAGE_SCALE_MODE, "scalePreserveAspect");
 			maWidgetAddChild(mMainLayoutWidget, mImageWidget);
 			res = widgetSetPropertyInt(
 					mImageWidget,

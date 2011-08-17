@@ -1076,8 +1076,8 @@ namespace Base {
                                             AVVideoCodecJPEG, AVVideoCodecKey, nil];
             [curCam->stillImageOutput setOutputSettings:outputSettings];
 			[outputSettings release];
-			if ([curCam->captureSession canSetSessionPreset:AVCaptureSessionPresetPhoto]) {
-				curCam->captureSession.sessionPreset = AVCaptureSessionPresetPhoto;
+			if ([curCam->captureSession canSetSessionPreset:AVCaptureSessionPresetMedium]) {
+				curCam->captureSession.sessionPreset = AVCaptureSessionPresetMedium;
 			}
 			[curCam->captureSession addInput:input];
 			[curCam->captureSession addOutput:curCam->stillImageOutput];
@@ -1238,9 +1238,9 @@ namespace Base {
 			AVCaptureConnection *videoConnection =	[info->stillImageOutput.connections objectAtIndex:0];
 			if ([videoConnection isVideoOrientationSupported])
 			{
-				[videoConnection setVideoOrientation:[UIDevice currentDevice].orientation];
-				if([UIDevice currentDevice].orientation == UIDeviceOrientationFaceUp)
-					NSLog(@"video orientation is set");
+				[videoConnection setVideoOrientation:UIDeviceOrientationPortrait];//[UIDevice currentDevice].orientation];
+				if([UIDevice currentDevice].orientation == UIDeviceOrientationPortrait)
+					NSLog(@"video orientation is set to Portrait");
 			}
 			[info->stillImageOutput captureStillImageAsynchronouslyFromConnection:videoConnection
 											completionHandler:^(CMSampleBufferRef imageDataSampleBuffer, NSError *error) {
@@ -1250,7 +1250,7 @@ namespace Base {
 													MemStream *stream = new MemStream([imageData length]);
 													stream->write([imageData bytes],[imageData length]);
 													gSyscall->resources.add_RT_BINARY(placeholder, stream);
-													}}];
+											}}];
 			return 1;
 
 		}

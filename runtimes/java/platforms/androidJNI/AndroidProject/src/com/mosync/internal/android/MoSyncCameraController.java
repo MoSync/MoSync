@@ -254,21 +254,37 @@ public class MoSyncCameraController {
 		if(key.equals(MAAPI_consts.MA_CAMERA_FOCUS_MODE))
 		{
 			if(value.equals(MAAPI_consts.MA_CAMERA_FOCUS_AUTO))
-				mCamera.autoFocus(null);
-			else if(value.equals(MAAPI_consts.MA_CAMERA_FOCUS_FIXED))
 			{
-				mCamera.cancelAutoFocus();
-				return MAAPI_consts.MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+				mCamera.autoFocus(null);
 			}
 			else if(value.equals(MAAPI_consts.MA_CAMERA_FOCUS_MACRO))
 			{
+				if(false == param.getSupportedFocusModes().contains(value))
+				{
+					return MAAPI_consts.MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+				}
 				mCamera.autoFocus(null);
+			}
+			else if(false == param.getSupportedFocusModes().contains(value))
+			{
+				mCamera.cancelAutoFocus();
 				return MAAPI_consts.MA_CAMERA_RES_VALUE_NOTSUPPORTED;
 			}
 			else
 				mCamera.cancelAutoFocus();
 
 			param.setFocusMode(value);
+		}
+		else if(key.equals(MAAPI_consts.MA_CAMERA_FLASH_MODE))
+		{
+			if(true == param.getSupportedFlashModes().contains(value))
+			{
+				param.setFlashMode(value);
+			}
+			else
+			{
+				return MAAPI_consts.MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+			}
 		}
 		else
 		{
@@ -278,7 +294,7 @@ public class MoSyncCameraController {
 		{
 			mCamera.setParameters(param);
 		}
-		catch (RuntimeException e)
+		catch (Exception e)
 		{
 			return MAAPI_consts.MA_CAMERA_RES_FAILED;
 		}
@@ -294,9 +310,20 @@ public class MoSyncCameraController {
 		if(key.equals(MAAPI_consts.MA_CAMERA_FLASH_SUPPORTED))
 		{
 			if( param.getSupportedFlashModes() != null )
-				result = "true";
+			{
+				if(param.getSupportedFlashModes().size() == 1)
+				{
+					result = "false";
+				}
+				else
+				{
+					result = "true";
+				}
+			}
 			else
+			{
 				result = "false";
+			}
 		}
 		else if(key.equals(MAAPI_consts.MA_CAMERA_ZOOM_SUPPORTED))
 		{
