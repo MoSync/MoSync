@@ -555,7 +555,8 @@ namespace Base
 		if(gDrawTargetHandle != HANDLE_SCREEN)
 		{
 			SYSCALL_THIS->resources.extract_RT_FLUX(gDrawTargetHandle);
-			if(SYSCALL_THIS->resources.add_RT_IMAGE(gDrawTargetHandle, NULL) == RES_OUT_OF_MEMORY)
+			if(SYSCALL_THIS->resources.add_RT_IMAGE(
+				gDrawTargetHandle, new int[1]) == RES_OUT_OF_MEMORY)
 			{
 				maPanic(ERR_RES_OOM, "maSetDrawTarget couldn't allocate drawtarget");
 			}
@@ -591,7 +592,11 @@ namespace Base
 	{
 		SYSLOG("maCreateImageFromData");
 
-		if(SYSCALL_THIS->resources.add_RT_IMAGE(placeholder, NULL) == RES_OUT_OF_MEMORY) return RES_OUT_OF_MEMORY;
+		if (SYSCALL_THIS->resources.add_RT_IMAGE(
+			placeholder, new int[1]) == RES_OUT_OF_MEMORY)
+		{
+			return RES_OUT_OF_MEMORY;
+		}
 
 		jclass cls = mJNIEnv->GetObjectClass(mJThis);
 		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maCreateImageFromData", "(IIII)I");
@@ -654,7 +659,7 @@ namespace Base
 
 		free(img);
 
-		SYSCALL_THIS->resources.add_RT_IMAGE(placeholder, NULL);
+		SYSCALL_THIS->resources.add_RT_IMAGE(placeholder,  new int[1]);
 
 		return retVal;
 	}
@@ -671,7 +676,9 @@ namespace Base
 		mJNIEnv->DeleteLocalRef(cls);
 
 		if(RES_OK == retval)
-			return SYSCALL_THIS->resources.add_RT_IMAGE(placeholder, NULL);
+		{
+			return SYSCALL_THIS->resources.add_RT_IMAGE(placeholder,  new int[1]);
+		}
 
 		return retval;
 	}
