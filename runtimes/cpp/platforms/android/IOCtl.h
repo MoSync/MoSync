@@ -496,4 +496,175 @@ namespace Base
 	* \returns 0.
 	*/
 	int _maFileListClose(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* \brief Enables a sensor and starts sending events if the sensor is available.
+	* If the sensor already is enabled this call will have no effect.
+	* \param sensor       The sensor which should be enabled
+	* \param interval     Time interval in which a sensor update shall be triggered
+	*            >0 interval time in milliseconds
+	*            <=0 Any of SensorUpdate enums
+	* \return     0  on success
+	*            -1 if this sensor wasn’t available
+	*            -2 if the interval wasn’t set, could be due to platform limitations
+	*            -3 if the sensor already was enabled
+	*/
+	int _maSensorStart(int sensor, int interval, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* \brief Disables a sensor so that it doesn’t send any further events
+	* \param sensor    The sensor which should be disabled
+	* \return        0 on success
+	*            	-1 if this sensor wasn’t enabled
+	*            	-2 if there was a problem disabling the sensor
+	*/
+	int _maSensorStop(int sensor, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Opens a PimList. Use maPimListNext() to open the list's items.
+	* Returns a PimList handle, or \< 0 on error.
+	* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
+	*/
+	MAHandle _maPimListOpen(int listType, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Returns a handle to the next PimItem in the \a list, or 0 if there are no more items,
+	* or \< 0 on error.
+	*
+	* You must use maPimItemClose() on every item to prevent memory leaks.
+	*/
+	MAHandle _maPimListNext(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Closes a PimList.
+	* \note This does not close the list's items, but it does invalidate them,
+	* so that maPimItemClose() is the only function you can safely use on them.
+	* \returns 0.
+	*/
+	int _maPimListClose(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Returns the number of fields in the \a item.
+	*/
+	int _maPimItemCount(MAHandle item, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Returns the field id of the item's n:th field.
+	* Panics on invalid indices.
+	* A field id is one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+	* \param item Opened by maPimListNext().
+	* \param n \>= 0 and \< maPimItemCount().
+	*/
+	int _maPimItemGetField(MAHandle item, int n, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Returns the number of values in the field for a given item.
+	* Returns 0 if the field (does not exist / has no values) for this item.
+	* \param item Opened by maPimListNext().
+	* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+	*/
+	int _maPimItemFieldCount(MAHandle item, int field, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Returns the bitmask of attributes for the specified value in a field and item.
+	* Panics on field+index combinations that don't exist in this item.
+	* \param item Opened by maPimListNext().
+	* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+	* \param index \>= 0 and \< maPimItemFieldCount().
+	*/
+	int _maPimItemGetAttributes(MAHandle item, int field, int index, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Sets a custom label for a value in a field and item.
+	* This also removes all of that value's attributes.
+	* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
+	* \a args.bufSize must be valid.
+	* \param args Common arguments.
+	* \param index An index into the field's value array.
+	* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+	* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
+	* \note This function is not available on JavaME or Blackberry.
+	*/
+	int _maPimItemSetLabel(int item, int field, int bufPointer, int bufSize, int index, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Retrieves the custom label for a value in a field and item,
+	* if the value has a custom label.
+	* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
+	* \a args.bufSize must be valid.
+	* \param args Common arguments.
+	* \param index An index into the field's value array.
+	* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+	* \returns If the value does not have a custom label, #MA_PIM_ERR_NO_LABEL.
+	* If it does, the number of bytes occupied by the value.
+	* If this number is greater than bufSize, the value is not written,
+	* and you'll have to allocate a bigger buffer and try again.
+	* \note This function is not available on JavaME or Blackberry.
+	*/
+	int _maPimItemGetLabel(int item, int field, int bufPointer, int bufSize, int index, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Returns one of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants,
+	* or \< 0 if the field does not exist in the list.
+	* \param list Opened by maPimListOpen().
+	* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+	*/
+	int _maPimFieldType(MAHandle list, int field, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Copies the specified value from a field and item to \a args.buf.
+	* \param args Common arguments.
+	* \param index An index into the field's value array.
+	* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+	* \returns The number of bytes occupied by the value.
+	* If this number is greater than bufSize, the value is not written,
+	* and you'll have to allocate a bigger buffer and try again.
+	*/
+	int _maPimItemGetValue(int item, int field, int bufPointer, int bufSize, int index, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Changes a value and its attributes in a field and item.
+	* This function cannot be used to add a new value.
+	* \param args Common arguments.
+	* \param index An index into the field's value array.
+	* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+	* \param attributes The value's new attributes.
+	* \returns 0.
+	* \note The new value is not actually written to disk until
+	* the item is closed with maPimItemClose(). If the program exits before then,
+	* the changes are lost.
+	*/
+	int _maPimItemSetValue(int item, int field, int bufPointer, int bufSize, int index, int attributes, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Adds a new value to a field and item.
+	* \param args Common arguments.
+	* \param attributes The new value's attributes.
+	* \returns 0.
+	* \note The new value is not actually written to disk until
+	* the item is closed with maPimItemClose(). If the program exits before then,
+	* the changes are lost.
+	*/
+	int _maPimItemAddValue(int item, int field, int bufPointer, int bufSize, int attributes, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Removes a value from a field and item.
+	* \param item Opened by maPimListNext().
+	* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+	* \param index \>= 0 and \< maPimItemFieldCount().
+	* \returns 0.
+	* \note The changes is not actually written to disk until
+	* the item is closed with maPimItemClose(). If the program exits before then,
+	* the changes are lost.
+	*/
+	int _maPimItemRemoveValue(MAHandle item, int field, int index, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Closes the handle to a PimItem, releasing resources used by the system.
+	* Writes any changes to disk.
+	* Panics on invalid handles.
+	* Returns 0.
+	* \note An item can also be closed by maPimItemRemove().
+	* \warning Does not write changes to disk if the item's List is closed.
+	* Make sure to keep the List open while editing items.
+	*/
+	int _maPimItemClose(MAHandle item, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Creates a new empty item in the specified list.
+	* \returns A handle to the new item, or \< 0 on error.
+	* \note The handle must be closed with maPimItemClose() to avoid memory leaks.
+	*/
+	MAHandle _maPimItemCreate(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
+
+	/** Removes an item from a list. This also has the effect of closing the item.
+	* \returns 0.
+	* \see maPimItemClose()
+	*/
+	int _maPimItemRemove(MAHandle list, MAHandle item, JNIEnv* jNIEnv, jobject jThis);
 }

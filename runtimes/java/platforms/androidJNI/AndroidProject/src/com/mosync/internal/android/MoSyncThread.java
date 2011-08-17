@@ -142,6 +142,8 @@ public class MoSyncThread extends Thread
 	MoSyncNativeUI mMoSyncNativeUI;
 	MoSyncFile mMoSyncFile;
 	MoSyncSMS mMoSyncSMS;
+	MoSyncSensor mMoSyncSensor;
+	MoSyncPIM mMoSyncPIM;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -313,11 +315,27 @@ public class MoSyncThread extends Thread
 		}
 
 		nativeInitRuntime();
+
+		mMoSyncSensor = new MoSyncSensor(this);
+
+		mMoSyncPIM = new MoSyncPIM(this);
+
+		nativeInitRuntime();
 	}
 
 	public static MoSyncThread getInstance()
 	{
 		return sMoSyncThread;
+	}
+
+	public void onResume()
+	{
+		mMoSyncSensor.onResume();
+	}
+
+	public void onPause()
+	{
+		mMoSyncSensor.onResume();
 	}
 
 	/**
@@ -3197,7 +3215,103 @@ public class MoSyncThread extends Thread
 		return mMoSyncFile.maFileListClose(list);
 	}
 
+	int maSensorStart(int sensor, int interval)
+	{
+		return mMoSyncSensor.maSensorStart(sensor, interval);
+	}
 
+	int maSensorStop(int sensor)
+	{
+		return mMoSyncSensor.maSensorStop(sensor);
+	}
+
+	/**
+	 * PIM related methods
+	 */
+	int maPimListOpen(int listType)
+	{
+		return mMoSyncPIM.maPimListOpen(listType);
+	}
+
+	int maPimListNext(int list)
+	{
+		return mMoSyncPIM.maPimListNext(list);
+	}
+
+	int maPimListClose(int list)
+	{
+		return mMoSyncPIM.maPimListClose(list);
+	}
+
+	int maPimItemCount(int item)
+	{
+		return mMoSyncPIM.maPimItemCount(item);
+	}
+
+	int maPimItemGetField(int item, int n)
+	{
+		return mMoSyncPIM.maPimItemGetField(item, n);
+	}
+
+	int maPimItemFieldCount(int item, int field)
+	{
+		return mMoSyncPIM.maPimItemFieldCount(item, field);
+	}
+
+	int maPimItemGetAttributes(int item, int field, int index)
+	{
+		return mMoSyncPIM.maPimItemGetAttributes(item, field, index);
+	}
+
+	int maPimItemSetLabel(int item, int field, int buffPointer, int buffSize, int index)
+	{
+		return mMoSyncPIM.maPimItemSetLabel(item, field, buffPointer, buffSize, index);
+	}
+
+	int maPimItemGetLabel(int item, int field, int buffPointer, int buffSize, int index)
+	{
+		return mMoSyncPIM.maPimItemGetLabel(item, field, buffPointer, buffSize, index);
+	}
+
+	int maPimFieldType(int list, int field)
+	{
+		return mMoSyncPIM.maPimFieldType(list, field);
+	}
+
+	int maPimItemGetValue(int item, int field, int buffPointer, int buffSize, int index)
+	{
+		return mMoSyncPIM.maPimItemGetValue(item, field, buffPointer, buffSize, index);
+	}
+
+	int maPimItemSetValue(int item, int field, int buffPointer, int buffSize, int index, int attributes)
+	{
+		return mMoSyncPIM.maPimItemSetValue(item, field, buffPointer, buffSize, index, attributes);
+	}
+
+	int maPimItemAddValue(int item, int field, int buffPointer, int buffSize, int attributes)
+	{
+		return mMoSyncPIM.maPimItemAddValue(item, field, buffPointer, buffSize, attributes);
+	}
+
+	int maPimItemRemoveValue(int item, int field, int index)
+	{
+		return mMoSyncPIM.maPimItemRemoveValue(item, field, index);
+	}
+
+	int maPimItemClose(int item)
+	{
+		return mMoSyncPIM.maPimItemClose(item);
+	}
+
+	int maPimItemCreate(int list)
+	{
+		return mMoSyncPIM.maPimItemCreate(list);
+	}
+
+	int maPimItemRemove(int list, int item)
+	{
+		return mMoSyncPIM.maPimItemRemove(list, item);
+	}
 
 
 	/**

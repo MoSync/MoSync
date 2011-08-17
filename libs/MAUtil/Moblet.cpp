@@ -118,6 +118,9 @@ namespace MAUtil {
 					case EVENT_TYPE_TEXTBOX:
 						moblet->fireTextBoxListeners(event.textboxResult, event.textboxLength);
 						break;
+					case EVENT_TYPE_SENSOR:
+						moblet->fireSensorListeners(event.sensor);
+						break;
 					default:
 						moblet->fireCustomEventListeners(event);
 				}

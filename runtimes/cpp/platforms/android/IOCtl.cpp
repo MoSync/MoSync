@@ -1356,4 +1356,372 @@ namespace Base
 		return (int)result;
 	}
 
+	//////////////
+	//  SENSOR  //
+	//////////////
+	int _maSensorStart(int sensor, int interval,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSensorStart", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			sensor, interval);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maSensorStop(int sensor,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSensorStart", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			sensor);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	//////////////////////
+	//		PIM			//
+	//////////////////////
+	MAHandle _maPimListOpen(int listType,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimListOpen", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			listType);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	MAHandle _maPimListNext(MAHandle list,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimListNext", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			list);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimListClose(MAHandle list,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimListClose", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			list);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemCount(MAHandle item,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemCount", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemGetField(MAHandle item, int n,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemGetField", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, n);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemFieldCount(MAHandle item, int field,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemFieldCount", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemGetAttributes(MAHandle item, int field, int index,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemGetAttributes", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemSetLabel(int item, int field, int bufPointer, int bufSize, int index,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemSetLabel", "(IIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, bufPointer, bufSize, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemGetLabel(int item, int field, int bufPointer, int bufSize, int index,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemGetLabel", "(IIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, bufPointer, bufSize, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimFieldType(MAHandle list, int field,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimFieldType", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			list, field);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemGetValue(int item, int field, int bufPointer, int bufSize, int index,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemGetValue", "(IIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, bufPointer, bufSize, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemSetValue(int item, int field, int bufPointer, int bufSize, int index, int attributes,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemSetValue", "(IIIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, bufPointer, bufSize, index, attributes);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemAddValue(int item, int field, int bufPointer, int bufSize, int attributes,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemAddValue", "(IIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, bufPointer, bufSize, attributes);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemRemoveValue(MAHandle item, int field, int index,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemRemoveValue", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemClose(MAHandle item,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemClose", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	MAHandle _maPimItemCreate(MAHandle list,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemCreate", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			list);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemRemove(MAHandle list, MAHandle item,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemRemove", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			list, item);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
 }
