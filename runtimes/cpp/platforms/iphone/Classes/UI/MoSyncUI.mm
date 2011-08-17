@@ -20,6 +20,7 @@
 #import "ListViewWidget.h"
 #import "ScreenWidget.h"
 #import "ReflectionWidget.h"
+#include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include "TouchHelper.h"
 #include "MoSyncMain.h"

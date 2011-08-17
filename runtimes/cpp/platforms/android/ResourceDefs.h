@@ -21,7 +21,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "base/Stream.h"
 #include "Image.h"
 
-// On android all images are stored and used on the Dalvik side
+// On Android images are stored on the Java side.
+// We store a dummy int array on the C-side.
+// See code in file runtimes\cpp\base\Syscall.cpp,
+// in function Syscall::loadResources, switch case
+// RT_IMAGE.
 
 #define TYPES(m)\
 	m(RT_BINARY, Base::Stream, delete)\
