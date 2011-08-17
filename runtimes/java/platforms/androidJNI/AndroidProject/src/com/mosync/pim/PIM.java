@@ -25,24 +25,26 @@ import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.CommonDataKinds.Website;
 import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
+import android.provider.ContactsContract.Data;
 
 public class PIM {
+
+	final static String DUMMY = Data._ID;
 
 	final static String[][] PIMFieldsColumns =
 	{
 		{},
-		{ StructuredPostal._ID, StructuredPostal.STREET, StructuredPostal.POBOX,
-			StructuredPostal.NEIGHBORHOOD, StructuredPostal.CITY, StructuredPostal.REGION,
-			StructuredPostal.POSTCODE, StructuredPostal.COUNTRY, StructuredPostal.TYPE,
-			StructuredPostal.LABEL, StructuredPostal.IS_PRIMARY },
+		{ StructuredPostal._ID, StructuredPostal.POBOX, DUMMY, StructuredPostal.STREET,
+			StructuredPostal.CITY, StructuredPostal.REGION, StructuredPostal.POSTCODE,
+			StructuredPostal.COUNTRY, DUMMY, StructuredPostal.NEIGHBORHOOD,
+			 StructuredPostal.TYPE, StructuredPostal.LABEL, StructuredPostal.IS_PRIMARY },
 		{ Event._ID, Event.START_DATE, Event.TYPE, Event.LABEL, Event.IS_PRIMARY },
 		{ Email._ID, Email.DATA, Email.TYPE, Email.LABEL, Email.IS_PRIMARY },
 		{ StructuredPostal._ID, StructuredPostal.FORMATTED_ADDRESS, StructuredPostal.TYPE,
 			StructuredPostal.LABEL, StructuredPostal.IS_PRIMARY },
-		{ StructuredName._ID, StructuredName.DISPLAY_NAME, StructuredName.GIVEN_NAME, StructuredName.FAMILY_NAME,
-			StructuredName.PREFIX, StructuredName.MIDDLE_NAME, StructuredName.SUFFIX,
-			StructuredName.PHONETIC_GIVEN_NAME, StructuredName.PHONETIC_MIDDLE_NAME, StructuredName.PHONETIC_FAMILY_NAME,
-			StructuredName.IS_PRIMARY},
+		{ StructuredName._ID, StructuredName.FAMILY_NAME, StructuredName.GIVEN_NAME, StructuredName.MIDDLE_NAME,
+			StructuredName.PREFIX, StructuredName.SUFFIX, StructuredName.PHONETIC_FAMILY_NAME,
+			StructuredName.PHONETIC_GIVEN_NAME, StructuredName.PHONETIC_MIDDLE_NAME, StructuredName.IS_PRIMARY},
 		{ Nickname._ID, Nickname.NAME, Nickname.IS_PRIMARY },
 		{ Note._ID, Note.NOTE, Note.IS_PRIMARY },
 		{ Organization._ID, Organization.COMPANY, Organization.TYPE,
@@ -55,10 +57,9 @@ public class PIM {
 		{ Im._ID, Im.DATA, Im.PROTOCOL, Im.CUSTOM_PROTOCOL,
 			Im. TYPE, Im.LABEL, Im.IS_PRIMARY },
 		{ Relation._ID, Relation.NAME, Relation.TYPE, Relation.LABEL, Relation.IS_PRIMARY },
-		{ Organization._ID, Organization.DEPARTMENT,
-			Organization.JOB_DESCRIPTION, Organization.SYMBOL, Organization.PHONETIC_NAME,
-			Organization.OFFICE_LOCATION, Organization.TYPE, Organization.LABEL,
-			Organization.IS_PRIMARY },
+		{ Organization._ID, Organization.DEPARTMENT, Organization.JOB_DESCRIPTION,
+			Organization.SYMBOL, Organization.PHONETIC_NAME, Organization.OFFICE_LOCATION,
+			Organization.TYPE, Organization.LABEL, Organization.IS_PRIMARY },
 	};
 
 	final static String[] PIMFieldsTypes =
@@ -99,7 +100,8 @@ public class PIM {
 	private final static int PIM_ERROR_INVALID_FIELD = -5;
 	private final static int PIM_ERROR_INVALID_INDEX = -6;
 	private final static int PIM_ERROR_NO_LABEL = -7;
-	private final static int PIM_ERROR_BUFFER_TOO_SMALL = -8;
+	private final static int PIM_ERROR_NO_VALUE = -8;
+	private final static int PIM_ERROR_BUFFER_TOO_SMALL = -9;
 
 	private final static int BUFFER_SIZE = 255;
 
@@ -364,6 +366,7 @@ public class PIM {
 		}
 
 		pimField.setCustomLabel(index, buffer);
+		//pimItem.updateField(getContentResolver(), contactId, PIMFieldsColumns[i], PIMFieldsTypes[i]);
 
 		return PIM_ERROR_NONE;
 	}
@@ -388,6 +391,7 @@ public class PIM {
 		}
 
 		String buffer = pimField.getCustomLabel(index);
+		buffer = "buf";
 		if (buffer == null)
 		{
 			return PIM_ERROR_NO_LABEL;
@@ -396,6 +400,7 @@ public class PIM {
 		if ( buffer.length() > buffSize )
 			return PIM_ERROR_BUFFER_TOO_SMALL;
 
+		DebugPrint("Data: " + getMemDataSection() + "; Position: " + Integer.toHexString(buffPointer) + "; Size: " + buffSize);
 		copyStringToMemory(buffPointer, buffer);
 
 		return buffer.length();
@@ -430,14 +435,50 @@ public class PIM {
 		return bytes.toString();
 	}
 
-	int maPimFieldType(int list, int field)
+	public int maPimFieldType(int list, int field)
 	{
-		return 0;
+		DebugPrint("maPimListNext " + list);
+		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
+		{
+			return PIM_ERROR_INVALID_LIST_HANDLE;
+		}
+
+		return PIMField.getDataType(field);
 	}
 
-	int maPimItemGetValue(int item, int field, int buffPointer, int buffSize, int index)
+	public int maPimItemGetValue(int item, int field, int buffPointer, int buffSize, int index)
 	{
-		return 0;
+		PIMItem pimItem = null;
+		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
+		{
+			return PIM_ERROR_INVALID_ITEM_HANDLE;
+		}
+
+		PIMField pimField = null;
+		if ( (pimField = pimItem.getField(field)) == null )
+		{
+			return PIM_ERROR_INVALID_FIELD;
+		}
+
+		if ( (index < 0) || (index >= pimField.length()) )
+		{
+			return PIM_ERROR_INVALID_INDEX;
+		}
+
+		String buffer = pimField.getData(index);
+		DebugPrint("GET DATA BUFFER = " + buffer);
+		if (buffer.length() == 0)
+		{
+			return PIM_ERROR_NO_VALUE;
+		}
+
+		if ( buffer.length() > buffSize )
+			return PIM_ERROR_BUFFER_TOO_SMALL;
+
+		DebugPrint("buffP = " + buffPointer + "; buff = " + buffer);
+		copyStringToMemory(buffPointer, buffer);
+
+		return buffer.length();
 	}
 
 	int maPimItemSetValue(int item, int field, int buffPointer, int buffSize, int index, int attributes)

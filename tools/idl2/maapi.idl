@@ -2859,42 +2859,32 @@ interface MAAPI {
 			PREFIX = 3;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
 			SUFFIX = 4;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Middle name.
-			MIDDLE = 5;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic first name.
 			PHONETIC_FAMILY = 6;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic last name.
 			PHONETIC_GIVEN = 7;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic middle name.
 			PHONETIC_OTHER = 8;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Nickname
-			NICKNAME = 9;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Note
-			NOTE = 10;
 		}
 
-		constset int MA_PIM_CONTACT_ORGANIZATION_ {
+		constset int MA_PIM_CONTACT_ORG_INFO_ {
 			/// #MA_PIM_TYPE_STRING.
-			NAME = 0;
-			/// #MA_PIM_TYPE_STRING.
-			JOB_TITLE = 1;
-			/// #MA_PIM_TYPE_STRING.
-			DEPARTMENT = 2;
+			DEPARTMENT = 0;
 			/// #MA_PIM_TYPE_STRING.
 			/// Only for Android devices.
-			JOB_DESCRIPTION = 3;
+			JOB_DESCRIPTION = 1;
 			/// #MA_PIM_TYPE_STRING.
 			/// Only for Android devices.
-			SYMBOL = 4;
+			SYMBOL = 2;
 			/// #MA_PIM_TYPE_STRING.
 			/// Only for Android devices.
-			PHONETIC_NAME = 5;
+			PHONETIC_NAME = 3;
 			/// #MA_PIM_TYPE_STRING.
 			/// Only for Android devices.
-			OFFICE_LOCATION = 6;
+			OFFICE_LOCATION = 4;
 			/// #MA_PIM_TYPE_STRING.
 			/// Only for Android devices.
-			PHONETIC_NAME_STYLE = 7;
+			PHONETIC_NAME_STYLE = 5;
 		}
 
 		constset int MA_PIM_CONTACT_IM_ {
@@ -2913,17 +2903,16 @@ interface MAAPI {
 			PUBLIC = 202;
 		}
 
-		// todo: document and enumerate.
-		constset int MA_PIM_CONTACT_IM_PROTOCOL_ {
-			AIM = 0;
-			MSN = 1;
-			YAHOO = 2;
-			SKYPE = 3;
-			QQ = 4;
-			GOOGLE_TALK = 5;
-			ICQ = 6;
-			JABBER = 7;
-			NETMEETING = 8;
+		constset MAString MA_PIM_CONTACT_IM_PROTOCOL_ {
+			AIM = "AIM";
+			MSN = "MSN";
+			YAHOO = "Yahoo";
+			SKYPE = "Skype";
+			QQ = "QQ";
+			GOOGLE_TALK = "GoogleTalk";
+			ICQ = "ICQ";
+			JABBER = "Jabber";
+			NETMEETING = "Netmeeting";
 		}
 
 		// deprecated
