@@ -40,6 +40,10 @@ public class MoSyncCameraController {
 	private Camera mCamera;
 
 	/**
+	 * A flag that indicates the format of the image to be taken
+	 */
+	private boolean rawMode;
+	/**
 	 * A private attribute used to keep track of 
 	 * the data place holder in each snapshot
 	 */
@@ -78,6 +82,7 @@ public class MoSyncCameraController {
 		userWidths = new ArrayList<Integer>();
 		userHeights = new ArrayList<Integer>();
 		mCamera = Camera.open();
+		rawMode = false;
 	}
 
 	/**
@@ -224,10 +229,10 @@ public class MoSyncCameraController {
 		{
 			setNewSize(formatIndex);
 		}
-		
 		resourceIndex = placeHolder;
+
 		mPreview.mCamera.takePicture(null, rawCallback, jpegCallback);
-		
+
 		lock.lock();
 		  try 
 		  {
@@ -251,7 +256,19 @@ public class MoSyncCameraController {
 	public int setCameraProperty(String key, String value)
 	{
 		Camera.Parameters param = mCamera.getParameters();
-		if(key.equals(MAAPI_consts.MA_CAMERA_FOCUS_MODE))
+		if(key.equals(MAAPI_consts.MA_CAMERA_IMAGE_FORMAT))
+		{
+			if(value.equals(MAAPI_consts.MA_CAMERA_IMAGE_RAW))
+			{
+				rawMode = true;
+			}
+			else
+			{
+				//default mode is jpeg
+				rawMode = false;
+			}
+		}
+		else if(key.equals(MAAPI_consts.MA_CAMERA_FOCUS_MODE))
 		{
 			if(value.equals(MAAPI_consts.MA_CAMERA_FOCUS_AUTO))
 			{
@@ -307,7 +324,14 @@ public class MoSyncCameraController {
 	{
 		Camera.Parameters param = mCamera.getParameters();
 		String result;
-		if(key.equals(MAAPI_consts.MA_CAMERA_FLASH_SUPPORTED))
+		if(key.equals(MAAPI_consts.MA_CAMERA_IMAGE_FORMAT))
+		{
+			if(rawMode == true)
+				result = MAAPI_consts.MA_CAMERA_IMAGE_RAW;
+			else
+				result = MAAPI_consts.MA_CAMERA_IMAGE_JPEG;
+		}
+		else if(key.equals(MAAPI_consts.MA_CAMERA_FLASH_SUPPORTED))
 		{
 			if( param.getSupportedFlashModes() != null )
 			{
@@ -405,20 +429,23 @@ public class MoSyncCameraController {
 	 */
 	PictureCallback rawCallback = new PictureCallback() {
 		public void onPictureTaken(byte[] data, Camera camera) {
-			  lock.lock();
-			  try {
-				mMoSyncThread.nativeCreateBinaryResource(resourceIndex, data.length);
-				ByteBuffer byteBuffer = mMoSyncThread.mBinaryResources.get(resourceIndex);
-				byteBuffer.put(data);
-				dataReady = true;
-				condition.signalAll();
-			  } 
-			  catch (Exception e) {
-				  SYSLOG("Failed to create the data pool");
-			  }
-			  finally {
-			    lock.unlock();
-			  }
+			if(rawMode == true)
+			{
+				lock.lock();
+				try {
+					mMoSyncThread.nativeCreateBinaryResource(resourceIndex, data.length);
+					ByteBuffer byteBuffer = mMoSyncThread.mBinaryResources.get(resourceIndex);
+					byteBuffer.put(data);
+					dataReady = true;
+					condition.signalAll();
+				}
+				catch (Exception e) {
+					SYSLOG("Failed to create the data pool");
+				}
+				finally {
+					lock.unlock();
+				}
+			}
 		}
 	};
 
@@ -427,20 +454,23 @@ public class MoSyncCameraController {
 	 */
 	PictureCallback jpegCallback = new PictureCallback() {
 		public void onPictureTaken(byte[] data, Camera camera) {
-			  lock.lock();
-			  try {
-				mMoSyncThread.nativeCreateBinaryResource(resourceIndex, data.length);
-				ByteBuffer byteBuffer = mMoSyncThread.mBinaryResources.get(resourceIndex);
-				byteBuffer.put(data);
-				dataReady = true;
-				condition.signalAll();
-			  } 
-			  catch (Exception e) {
-				  SYSLOG("Failed to create the data pool");
-			  }
-			  finally {
-			    lock.unlock();
-			  }
+			if(rawMode == false)
+			{
+				lock.lock();
+				try {
+					mMoSyncThread.nativeCreateBinaryResource(resourceIndex, data.length);
+					ByteBuffer byteBuffer = mMoSyncThread.mBinaryResources.get(resourceIndex);
+					byteBuffer.put(data);
+					dataReady = true;
+					condition.signalAll();
+				}
+				catch (Exception e) {
+					SYSLOG("Failed to create the data pool");
+				}
+				finally {
+					lock.unlock();
+				}
+			}
 		}
 	};	
 }
