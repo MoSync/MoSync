@@ -24,17 +24,24 @@
 
 @implementation PimFieldItem
 
-
 /**
  * Init function.
- * @param fieldConstant Must be one of MA_PIM_FIELD_CONTACT contants.
+ * @param fieldID Must be one of MA_PIM_FIELD_CONTACT constants.
+ * If the fieldID param is invalid or not supported on this platform, 
+ * the functions return nil.
  */
--(id) initWithFieldConstant:(int) fieldConstant
+-(id) initWithFieldID:(int) fieldID
 {
-    mFieldConstant = fieldConstant;
+    mFieldConstant = fieldID;
+    int result = [[PimUtils sharedInstance] fieldStructure:mFieldConstant 
+                                                   setType:&mFieldType
+                                          setIsSingleValue:&mIsSingleFieldValue];
+    if (result == MA_PIM_ERR_FIELD_UNSUPPORTED)
+    {
+        return nil;
+    }
+    
     mFieldValuesArray = [[NSMutableArray alloc] init];
-    mFieldType = [[PimUtils sharedInstance] getFieldType:fieldConstant];
-
     return [super init];
 }
 
@@ -172,58 +179,79 @@
 -(int) addValue:(NSMutableArray*) value
   withAttribute:(const int) attribute
 {
-    PimFieldItemValue* fieldValue = [[PimFieldItemValue alloc] init];
-    [fieldValue setValue:value];
-    [fieldValue setAttribute:attribute];
-    [mFieldValuesArray addObject:fieldValue];
+    int returnValue = MA_PIM_ERR_NONE;
+    // Check if the field can contain more then one value.
+    int countFieldValues = [mFieldValuesArray count];
+    if (mIsSingleFieldValue &&
+        1 == countFieldValues) 
+    {
+        returnValue = MA_PIM_ERR_FIELD_COUNT_MAX;
+    }
+    else
+    {
+        // Check if the attribute is allowed.
+        bool attributeAllowed = [self isAttributeValid:attribute];
+        if (!attributeAllowed)
+        {
+            returnValue = MA_PIM_ERR_COMBO_UNSUPPORTED;
+        }
+        else 
+        {
+            PimFieldItemValue* fieldValue = [[PimFieldItemValue alloc] init];
+            [fieldValue setValue:value];
+            [fieldValue setAttribute:attribute];
+            [mFieldValuesArray addObject:fieldValue];
+            returnValue = [mFieldValuesArray count] - 1;
+        }
+    }
     
-    return ([mFieldValuesArray count] - 1);
+    return returnValue;
 }
 
-/**
- * Add a value and attribute.
- * @param value The value.
- * @param attribute The specified string attribute.
- * @return The new value's index, or one of MA_PIM_ERR constants in
- *         case of error.
- */
--(int) addValue:(NSMutableArray*) value
-withStringAttribute:(NSString*) attribute
-{
-//    int intAttibute;
-//    if ([attribute isEqualToString:@"asst"]) {
-//        intAttibute = MA_PIM_ATTR_ASST;
-//    } else if ([attribute isEqualToString:@"auto"]) {
-//        intAttibute = MA_PIM_ATTR_AUTO;
-//    } else if ([attribute isEqualToString:@"fax"]) {
-//        intAttibute = MA_PIM_ATTR_FAX;
-//    } else if ([attribute isEqualToString:@"home"]) {
-//        intAttibute = MA_PIM_ATTR_HOME;
-//    } else if ([attribute isEqualToString:@"mobile"]) {
-//        intAttibute = MA_PIM_ATTR_MOBILE;
-//    } else if ([attribute isEqualToString:@"other"]) {
-//        intAttibute = MA_PIM_ATTR_OTHER;
-//    } else if ([attribute isEqualToString:@"pager"]) {
-//        intAttibute = MA_PIM_ATTR_AUTO;
-//    } else if ([attribute isEqualToString:@"preferred"]) {
-//        intAttibute = MA_PIM_ATTR_PREFERRED;
-//    } else if ([attribute isEqualToString:@"work"]) {
-//        intAttibute = MA_PIM_ATTR_WORK;
-//    } else if ([attribute isEqualToString:@"sms"]) {
-//        intAttibute = MA_PIM_ATTR_SMS;
-//    } else if ([attribute isEqualToString:@"iphone"]) {
-//        intAttibute = MA_PIM_ATTR_IPHONE;
-//    } else {
-//        intAttibute = MA_PIM_ATTR_CUSTOM;
-//    }
+///**
+// * Add a value and attribute.
+// * @param value The value.
+// * @param attribute The specified string attribute.
+// * @return The new value's index, or one of MA_PIM_ERR constants in
+// *         case of error.
+// */
+//-(int) addValue:(NSMutableArray*) value
+//withStringAttribute:(NSString*) attribute
+//{
+////    int intAttibute;
+////    if ([attribute isEqualToString:@"asst"]) {
+////        intAttibute = MA_PIM_ATTR_ASST;
+////    } else if ([attribute isEqualToString:@"auto"]) {
+////        intAttibute = MA_PIM_ATTR_AUTO;
+////    } else if ([attribute isEqualToString:@"fax"]) {
+////        intAttibute = MA_PIM_ATTR_FAX;
+////    } else if ([attribute isEqualToString:@"home"]) {
+////        intAttibute = MA_PIM_ATTR_HOME;
+////    } else if ([attribute isEqualToString:@"mobile"]) {
+////        intAttibute = MA_PIM_ATTR_MOBILE;
+////    } else if ([attribute isEqualToString:@"other"]) {
+////        intAttibute = MA_PIM_ATTR_OTHER;
+////    } else if ([attribute isEqualToString:@"pager"]) {
+////        intAttibute = MA_PIM_ATTR_AUTO;
+////    } else if ([attribute isEqualToString:@"preferred"]) {
+////        intAttibute = MA_PIM_ATTR_PREFERRED;
+////    } else if ([attribute isEqualToString:@"work"]) {
+////        intAttibute = MA_PIM_ATTR_WORK;
+////    } else if ([attribute isEqualToString:@"sms"]) {
+////        intAttibute = MA_PIM_ATTR_SMS;
+////    } else if ([attribute isEqualToString:@"iphone"]) {
+////        intAttibute = MA_PIM_ATTR_IPHONE;
+////    } else {
+////        intAttibute = MA_PIM_ATTR_CUSTOM;
+////    }
+////    
+////    [self addValue:value withAttribute:intAttibute];
+////    if (MA_PIM_ATTR_CUSTOM == intAttibute) {
+////        [self setLabel:attribute atIndex:([mFieldValuesArray count] - 1)];
+////    } // bogdan
 //    
-//    [self addValue:value withAttribute:intAttibute];
-//    if (MA_PIM_ATTR_CUSTOM == intAttibute) {
-//        [self setLabel:attribute atIndex:([mFieldValuesArray count] - 1)];
-//    } // bogdan
-    
-    return 0;
-}
+//    return 0;
+//}
 
 /**
  * Remove the value at a specified index.
@@ -258,9 +286,38 @@ withStringAttribute:(NSString*) attribute
 }
 
 /**
+ * Checks if an specified attribute is valid.
+ * @param attribute The given attribute.
+ * @return True if the attribute is valid, false otherwise.
+ */
+-(bool) isAttributeValid:(const int) attribute
+{
+    NSString* stringAttribute = [[NSString alloc] initWithFormat:@"%d",attribute];
+    NSMutableDictionary* allowedAttributes =
+        [[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
+
+    // If the field does not have attributes and if the attribute is preffered.
+    if (0 == [[allowedAttributes allKeys] count] &&
+        MA_PIM_ATTR_PREFERRED == attribute)
+    {
+        return true;
+    }
+
+    NSString* value = [allowedAttributes valueForKey:stringAttribute];
+
+    if (nil == value)
+    {
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * Release all the objects.
  */
-- (void) dealloc {
+- (void) dealloc
+{
     [mFieldValuesArray release];
     
     [super dealloc];

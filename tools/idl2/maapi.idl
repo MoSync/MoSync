@@ -2919,59 +2919,32 @@ interface MAAPI {
 
 			PHONETIC_OTHER = 8;
 
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Nickname
-
-			NICKNAME = 9;
-
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Note
-
-			NOTE = 10;
-
 		}
 
 		constset int MA_PIM_CONTACT_ORGANIZATION_ {
 
 			/// #MA_PIM_TYPE_STRING.
-
-			NAME = 0;
-
-			/// #MA_PIM_TYPE_STRING.
-
-			JOB_TITLE = 1;
+			DEPARTMENT = 0;
 
 			/// #MA_PIM_TYPE_STRING.
-
-			DEPARTMENT = 2;
-
-			/// #MA_PIM_TYPE_STRING.
-
 			/// Only for Android devices.
-
-			JOB_DESCRIPTION = 3;
-
-			/// #MA_PIM_TYPE_STRING.
-
-			/// Only for Android devices.
-
-			SYMBOL = 4;
+			JOB_DESCRIPTION = 1;
 
 			/// #MA_PIM_TYPE_STRING.
-
 			/// Only for Android devices.
-
-			PHONETIC_NAME = 5;
+			SYMBOL = 2;
 
 			/// #MA_PIM_TYPE_STRING.
-
 			/// Only for Android devices.
-
-			OFFICE_LOCATION = 6;
+			PHONETIC_NAME = 3;
 
 			/// #MA_PIM_TYPE_STRING.
-
 			/// Only for Android devices.
+			OFFICE_LOCATION = 4;
 
-			PHONETIC_NAME_STYLE = 7;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			PHONETIC_NAME_STYLE = 5;
 
 		}
 
@@ -3361,6 +3334,7 @@ interface MAAPI {
 
 			INVALID_HANDLE = -14;
 
+			
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.

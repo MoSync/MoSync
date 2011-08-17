@@ -136,7 +136,13 @@ int Syscall::maPimItemGetLabel(const MA_PIM_ARGS* args, int index)
 
 int Syscall::maPimFieldType(MAHandle list, int field)
 {
-    return [[PimUtils sharedInstance] getFieldType:field];
+    bool singleFieldValue;
+    int fieldType;
+    [[PimUtils sharedInstance] fieldStructure:field 
+                                      setType:&fieldType
+                             setIsSingleValue:&singleFieldValue];
+
+    return fieldType;
 }
 
 int Syscall::maPimItemGetValue(const MA_PIM_ARGS *args, int index)

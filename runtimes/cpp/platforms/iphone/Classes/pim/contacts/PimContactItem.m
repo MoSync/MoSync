@@ -68,6 +68,7 @@
  */
 -(int) close
 {
+    NSLog(@"close an contact item");
     NSArray* fieldsArray = [mFieldsDictionary allValues];
     int countFields = [fieldsArray count];
          
@@ -232,12 +233,12 @@
     NSMutableArray* array = [itemField getValue:0];
     NSString* firstName = [array objectAtIndex:MA_PIM_CONTACT_NAME_GIVEN];
     NSString* lastName = [array objectAtIndex:MA_PIM_CONTACT_NAME_FAMILY];
-    NSString* middleName = [array objectAtIndex:MA_PIM_CONTACT_NAME_OTHER];
+    NSString* middleName = [array objectAtIndex:MA_PIM_CONTACT_NAME_MIDDLE];
     NSString* prefix = [array objectAtIndex:MA_PIM_CONTACT_NAME_PREFIX];
     NSString* suffix = [array objectAtIndex:MA_PIM_CONTACT_NAME_SUFFIX];
     NSString* phoneticLastName = [array objectAtIndex:MA_PIM_CONTACT_NAME_PHONETIC_FAMILY];
     NSString* phoneticFirstName = [array objectAtIndex:MA_PIM_CONTACT_NAME_PHONETIC_GIVEN];
-//    NSString* phoneticMiddleName = [array objectAtIndex:MA_PIM_CONTACT_NAME_PHONETIC_OTHER];
+    NSString* phoneticMiddleName = [array objectAtIndex:MA_PIM_CONTACT_NAME_PHONETIC_OTHER];
     
     returnValue = [self setDataToRecord:firstName propertyID:kABPersonFirstNameProperty checkLength:true];
     CheckErrorCode(returnValue);
@@ -253,8 +254,8 @@
     CheckErrorCode(returnValue);
     returnValue = [self setDataToRecord:phoneticLastName propertyID:kABPersonLastNamePhoneticProperty checkLength:true];
     CheckErrorCode(returnValue);
-//    returnValue = [self setDataToRecord:phoneticMiddleName propertyID:kABPersonMiddleNamePhoneticProperty checkLength:true];
-//    CheckErrorCode(returnValue);
+    returnValue = [self setDataToRecord:phoneticMiddleName propertyID:kABPersonMiddleNamePhoneticProperty checkLength:true];
+    CheckErrorCode(returnValue);
     
     return MA_PIM_ERR_NONE;
 }
@@ -366,7 +367,7 @@
             (CFStringRef) phone, 
             label, 
             &identifier);
-        
+         
         if (!didAdd) 
         {
             returnValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;

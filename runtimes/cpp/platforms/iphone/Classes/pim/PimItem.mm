@@ -304,7 +304,8 @@
     
     // Get the new value.
     int fieldType = [itemField getFieldType];
-    switch (fieldType) {
+    switch (fieldType) 
+    {
         case MA_PIM_TYPE_BINARY:
             
             break;
@@ -358,10 +359,17 @@
     NSString* key = [[NSString alloc] initWithFormat:@"%d", field];
     PimFieldItem* itemField;
     itemField = [mFieldsDictionary objectForKey:key];
-    if(nil == itemField) 
+    if (nil == itemField) 
     {
         // If the field does not exist create a new one.
-        itemField = [[PimFieldItem alloc] initWithFieldConstant:field]; 
+        itemField = [[PimFieldItem alloc] initWithFieldID:field];
+        
+        // Check if the field was created.
+        if (nil == itemField)
+        {
+            [key release];
+            return MA_PIM_ERR_FIELD_UNSUPPORTED;
+        }
         [mFieldsDictionary setObject:itemField forKey:key];
     }
     [key release];
@@ -373,13 +381,11 @@
             valuesArray = [utils getBytes:address size:args->bufSize];
             break;
         case MA_PIM_TYPE_BOOLEAN:
-            
             break;
         case MA_PIM_TYPE_DATE:
             valuesArray = [utils getDate:address];
             break;
         case MA_PIM_TYPE_INT:
-            
             break;
         case MA_PIM_TYPE_STRING:
             valuesArray = [utils getString:address];
@@ -390,7 +396,7 @@
         default:
             break;
     }
-    
+
     return [itemField addValue:valuesArray withAttribute:attribute];
 }
 

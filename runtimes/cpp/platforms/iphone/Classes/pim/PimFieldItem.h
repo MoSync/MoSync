@@ -39,13 +39,21 @@
      * Stores the values.
      */
     NSMutableArray* mFieldValuesArray;
+    
+    /**
+     * True is this field is an single field value(e.g. this field can 
+     * contain only one value).
+     */
+    bool mIsSingleFieldValue;
 }
 
 /**
  * Init function.
- * @param fieldConstant Must be one of MA_PIM_FIELD_CONTACT contants.
+ * @param fieldID Must be one of MA_PIM_FIELD_CONTACT constants.
+ * If the fieldID param is invalid or not supported on this platform, 
+ * the functions return nil.
  */
--(id) initWithFieldConstant:(int) fieldConstant;
+-(id) initWithFieldID:(int) fieldID;
 
 /**
  * Get field constant.
@@ -120,15 +128,15 @@
 -(int) addValue:(NSMutableArray*) value
   withAttribute:(const int) attribute;
 
-/**
- * Add a value and attribute.
- * @param value The value.
- * @param attribute The specified string attribute.
- * @return The new value's index, or one of MA_PIM_ERR constants in
- *         case of error.
- */
--(int) addValue:(NSMutableArray*) value
-withStringAttribute:(NSString*) attribute;
+///**
+// * Add a value and attribute.
+// * @param value The value.
+// * @param attribute The specified string attribute.
+// * @return The new value's index, or one of MA_PIM_ERR constants in
+// *         case of error.
+// */
+//-(int) addValue:(NSMutableArray*) value
+//withStringAttribute:(NSString*) attribute;
 
 /**
  * Remove the value at a specified index.
@@ -143,5 +151,12 @@ withStringAttribute:(NSString*) attribute;
  * @return The item.
  */
 -(PimFieldItemValue*) getItem:(int) index;
+
+/**
+ * Checks if an specified attribute is valid.
+ * @param attribute The given attribute.
+ * @return True if the attribute is valid, false otherwise.
+ */
+-(bool) isAttributeValid:(const int) attribute;
 
 @end

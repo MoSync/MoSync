@@ -26,6 +26,14 @@
      * The current handle value. 
      */
     int mHandle;
+    
+    NSMutableDictionary* mAddressAttributes;
+    NSMutableDictionary* mEmailAttributes;
+    NSMutableDictionary* mPhoneAttributes;
+    NSMutableDictionary* mWebSiteAttributes;
+    NSMutableDictionary* mIMAttributes;
+    NSMutableDictionary* mRelationAttributes;
+    NSMutableDictionary* mNoAttributes;
 }
 
 /**
@@ -136,26 +144,29 @@
                   string:(NSString*) value;
 
 /**
- * Gets field type for a specified field ID.
- * @param The given field ID(one of MA_PIM_FIELD_CONTACT constants).
- * @return The field type (one of MA_PIM_TYPE constants), or 
- *         MA_PIM_ERR_UNAVAILABLE_FIELD in case the field is not supported.
+ * Gets field structure(the type, if it can contain only one value and the allowed 
+ * attributes for this field) for a specified field ID.
+ * @param fieldId The given field ID(one of MA_PIM_FIELD_CONTACT constants).
+ * @param type Will contain the field type (one of MA_PIM_TYPE constants).
+ * @param singleValue Will be set to true if the field can contain only one value.
+ * @return MA_PIM_ERR_NONE if the field is supported, or 
+ *         MA_PIM_ERR_FIELD_UNSUPPORTED in case the field is not supported.
  */
--(int) getFieldType:(const int) fieldID;
+-(int) fieldStructure:(const int) fieldID
+               setType:(int*) type
+     setIsSingleValue:(bool*) singleValue;
 
 /**
- * Gets the string associated with a given attribute.
- * @param attribute Must be one of MA_PIM_ATTR constants.
- * @return The string associated with a given attribute. 
+ * Gets the allowed attributes for an given field ID.
+ * @param fieldID The given field ID.
+ * @return An dictionary that contains:
+ *         - keys An string array with all the attributes(e.g. MA_PIM_ATTR_ADDR_HOME).
+ *         - values An string array with all the strings associedted with attributes.
+ *         Do not release the returned object. 
+ *         If the field is not supported or it does not allow attributes an empty 
+ *         dictionary will be returned.
  */
--(NSString*) getStringFromAttribute:(const int) attribute;
-
-/**
- * Gets the attribute associated with a specified string.
- * @param string The given string.
- * @return One of MA_PIM_ATTR constants. 
- */
--(int) getAttributeFromString:(CFStringRef) string;
+-(NSMutableDictionary*) getAttributesForFieldId:(const int) fieldID;
 
 /**
  * Gets the absolute memory address for a specified address from MoSync memory pool.

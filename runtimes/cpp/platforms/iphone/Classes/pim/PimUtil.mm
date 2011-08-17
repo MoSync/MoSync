@@ -58,7 +58,149 @@ static PimUtils *sharedInstance = nil;
 - (id)init
 {
     mHandle = 0;
+    NSString* homeLabel = [NSString stringWithString:(NSString*)kABHomeLabel];
+    NSString* workLabel = [NSString stringWithString:(NSString*)kABWorkLabel];
+    NSString* otherLabel = [NSString stringWithString:(NSString*)kABOtherLabel];
+    mNoAttributes = [[NSMutableDictionary alloc] init];
+    
+    mAddressAttributes = [[NSMutableDictionary alloc] init];
+    [mAddressAttributes setValue:homeLabel
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_HOME]];
+    [mAddressAttributes setValue:workLabel
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_WORK]];
+    [mAddressAttributes setValue:otherLabel
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_OTHER]];
+    [mAddressAttributes setValue:[NSString string]
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_CUSTOM]];
+
+    mEmailAttributes = [[NSMutableDictionary alloc] init];
+    [mEmailAttributes setValue:homeLabel
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_EMAIL_HOME]];
+    [mEmailAttributes setValue:workLabel
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_EMAIL_WORK]];
+    [mEmailAttributes setValue:[NSString stringWithString:@"mobile"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_EMAIL_MOBILE]];
+    [mEmailAttributes setValue:otherLabel
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_EMAIL_OTHER]];
+    [mEmailAttributes setValue:[NSString string]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_EMAIL_CUSTOM]];
+
+    mPhoneAttributes = [[NSMutableDictionary alloc] init];
+    [mPhoneAttributes setValue:homeLabel
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_HOME]];
+    [mPhoneAttributes setValue:workLabel
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_WORK]];
+    [mPhoneAttributes setValue:homeLabel
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_OTHER]];
+    [mPhoneAttributes setValue:[NSString string]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_CUSTOM]];
+    [mPhoneAttributes setValue:[NSString stringWithString:(NSString*)kABPersonPhoneMobileLabel]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_MOBILE]];
+    [mPhoneAttributes setValue:[NSString stringWithString:(NSString*)kABPersonPhoneHomeFAXLabel]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_HOME_FAX]];
+    [mPhoneAttributes setValue:[NSString stringWithString:(NSString*)kABPersonPhoneWorkFAXLabel]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_WORK_FAX]];
+    [mPhoneAttributes setValue:[NSString stringWithString:(NSString*)kABPersonPhonePagerLabel]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_PAGER]];
+    [mPhoneAttributes setValue:[NSString stringWithString:(NSString*)kABPersonPhoneIPhoneLabel]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_IPHONE]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"callback"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_CALLBACK]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"company main"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_COMPANY_MAIN]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"ISDN"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_ISDN]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"radio"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_RADIO]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"other fax"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_OTHER_FAX]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"telex"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_TELEX]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"TTY TDD"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_TTY_TDD]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"work mobile"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_WORK_MOBILE]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"work pager"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_WORK_PAGER]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"assistent"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_ASSISTANT]];
+    [mPhoneAttributes setValue:[NSString stringWithString:@"MMS"]
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_PHONE_MMS]];
+    
+    mWebSiteAttributes = [[NSMutableDictionary alloc] init];
+    [mWebSiteAttributes setValue:homeLabel
+                        forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_HOME]];
+    [mWebSiteAttributes setValue:workLabel
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_WORK]];
+    [mWebSiteAttributes setValue:otherLabel
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_OTHER]];
+    [mWebSiteAttributes setValue:[NSString stringWithString:@"blog"]
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_BLOG]];
+    [mWebSiteAttributes setValue:[NSString stringWithString:@"profile"]
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_PROFILE]];
+    [mWebSiteAttributes setValue:[NSString stringWithString:@"FTP"]
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_FTP]];
+    [mWebSiteAttributes setValue:[NSString string]
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_WEBSITE_CUSTOM]];
+    
+    mIMAttributes = [[NSMutableDictionary alloc] init];
+    [mIMAttributes setValue:homeLabel
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_HOME]];
+    [mIMAttributes setValue:workLabel
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_WORK]];
+    [mIMAttributes setValue:otherLabel
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_OTHER]];
+    [mIMAttributes setValue:[NSString string]
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_CUSTOM]];
+    
+    mRelationAttributes = [[NSMutableDictionary alloc] init];
+    [mRelationAttributes setValue:(NSString*)kABPersonMotherLabel
+                     forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_MOTHER]];
+    [mRelationAttributes setValue:(NSString*)kABPersonFatherLabel
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_FATHER]];
+    [mRelationAttributes setValue:(NSString*)kABPersonParentLabel
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_PARENT]];
+    [mRelationAttributes setValue:(NSString*)kABPersonSisterLabel
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_SISTER]];
+    [mRelationAttributes setValue:(NSString*)kABPersonBrotherLabel
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_BROTHER]];
+    [mRelationAttributes setValue:(NSString*)kABPersonChildLabel
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_CHILD]];
+    [mRelationAttributes setValue:(NSString*)kABPersonFriendLabel
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_FRIEND]];
+    [mRelationAttributes setValue:(NSString*)kABPersonSpouseLabel
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_SPOUSE]];
+    [mRelationAttributes setValue:(NSString*)kABPersonPartnerLabel
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_PARTNER]];
+    [mRelationAttributes setValue:(NSString*)kABPersonManagerLabel
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_MANAGER]];
+    [mRelationAttributes setValue:(NSString*)kABPersonAssistantLabel
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_ASSISTANT]];
+    [mRelationAttributes setValue:[NSString stringWithString:@"domectic partner"]
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER]];
+    [mRelationAttributes setValue:[NSString stringWithString:@"reffered by"]
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_REFERRED_BY]];
+    [mRelationAttributes setValue:[NSString stringWithString:@"relative"]
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_RELATIVE]];
+    [mRelationAttributes setValue:[NSString string]
+                           forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_RELATION_CUSTOM]];
     return [super init];
+}
+
+/**
+ * Release all the objects.
+ */
+- (void) dealloc 
+{
+    [mAddressAttributes release];
+    [mEmailAttributes release];
+    [mPhoneAttributes release];
+    [mWebSiteAttributes release];
+    [mIMAttributes release];
+    [mRelationAttributes release];
+    [mNoAttributes release];
+    
+    [super dealloc];
 }
 
 /**
@@ -295,171 +437,133 @@ static PimUtils *sharedInstance = nil;
     
 }
 
-
 /**
- * Gets field type for a specified field ID.
- * @param The given field ID(one of MA_PIM_FIELD_CONTACT constants).
- * @return The field type (one of MA_PIM_TYPE constants), or 
- *         MA_PIM_ERR_UNAVAILABLE_FIELD in case the field is not supported.
+ * Gets field structure(the type, if it can contain only one value and the allowed 
+ * attributes for this field) for a specified field ID.
+ * @param fieldId The given field ID(one of MA_PIM_FIELD_CONTACT constants).
+ * @param type Will contain the field type (one of MA_PIM_TYPE constants).
+ * @param singleValue Will be set to true if the field can contain only one value.
+ * @return MA_PIM_ERR_NONE if the field is supported, or 
+ *         MA_PIM_ERR_FIELD_UNSUPPORTED in case the field is not supported.
  */
--(int) getFieldType:(const int) fieldID
+-(int) fieldStructure:(const int) fieldID
+              setType:(int*) type
+     setIsSingleValue:(bool*) singleValue
 {
-    int returnValue;
+    int returnValue = MA_PIM_ERR_NONE;
+    *type = MA_PIM_ERR_FIELD_UNSUPPORTED;
+    *singleValue = true;
     
-    switch (fieldID) {
+    switch (fieldID) 
+    {
         case MA_PIM_FIELD_CONTACT_ADDR:
-            returnValue = MA_PIM_TYPE_STRING_ARRAY;
+            *type = MA_PIM_TYPE_STRING_ARRAY;
+            *singleValue = false;
             break;
         case MA_PIM_FIELD_CONTACT_BIRTHDAY:
-            returnValue = MA_PIM_TYPE_DATE;
+            *type = MA_PIM_TYPE_DATE;
+            *singleValue = false;
             break;
         case MA_PIM_FIELD_CONTACT_CLASS:
-            returnValue = MA_PIM_TYPE_INT;
+            returnValue = MA_PIM_ERR_FIELD_UNSUPPORTED;
             break;
         case MA_PIM_FIELD_CONTACT_EMAIL:
-            returnValue = MA_PIM_TYPE_STRING;
+            *type = MA_PIM_TYPE_STRING;
+            *singleValue = false;
             break;
         case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
-            returnValue = MA_PIM_TYPE_STRING;
+            returnValue = MA_PIM_ERR_FIELD_UNSUPPORTED;
             break;
         case MA_PIM_FIELD_CONTACT_FORMATTED_NAME:
-            returnValue = MA_PIM_TYPE_STRING;
+            returnValue = MA_PIM_ERR_FIELD_UNSUPPORTED;
             break;
         case MA_PIM_FIELD_CONTACT_NAME:
-            returnValue = MA_PIM_TYPE_STRING_ARRAY;
+            *type = MA_PIM_TYPE_STRING_ARRAY;
+            *singleValue = false;
             break;
         case MA_PIM_FIELD_CONTACT_NICKNAME:
-            returnValue = MA_PIM_TYPE_STRING;
+            *type = MA_PIM_TYPE_STRING;
             break;
         case MA_PIM_FIELD_CONTACT_NOTE:
-            returnValue = MA_PIM_TYPE_STRING;
+            *type = MA_PIM_TYPE_STRING;
             break;
         case MA_PIM_FIELD_CONTACT_ORG:
-            returnValue = MA_PIM_TYPE_STRING;
+            *type = MA_PIM_TYPE_STRING;
             break;
         case MA_PIM_FIELD_CONTACT_PHOTO:
-            returnValue = MA_PIM_TYPE_BINARY;
+            type = MA_PIM_TYPE_BINARY;
             break;
         case MA_PIM_FIELD_CONTACT_PHOTO_URL:
-            returnValue = MA_PIM_TYPE_STRING;
+            *type = MA_PIM_TYPE_STRING;
             break;
         case MA_PIM_FIELD_CONTACT_REVISION:
-            returnValue = MA_PIM_TYPE_DATE;
+            *type = MA_PIM_TYPE_DATE;
             break;
         case MA_PIM_FIELD_CONTACT_TEL:
-            returnValue = MA_PIM_TYPE_STRING;
+            *type = MA_PIM_TYPE_STRING;
+            *singleValue = false;
             break;
         case MA_PIM_FIELD_CONTACT_TITLE:
-            returnValue = MA_PIM_TYPE_STRING;
+            *type = MA_PIM_TYPE_STRING;
             break;
         case MA_PIM_FIELD_CONTACT_URL:
-            returnValue = MA_PIM_TYPE_STRING;
+            *type = MA_PIM_TYPE_STRING;
+            *singleValue = false;
             break;
         case MA_PIM_FIELD_CONTACT_ORG_INFO:
-            returnValue = MA_PIM_TYPE_STRING_ARRAY;
+            *type = MA_PIM_TYPE_STRING_ARRAY;
             break;
         case MA_PIM_FIELD_CONTACT_IM:
-            returnValue = MA_PIM_TYPE_STRING_ARRAY;
+            *type = MA_PIM_TYPE_STRING_ARRAY;
+            *singleValue = false;
             break;
         case MA_PIM_FIELD_CONTACT_RELATION:
-            returnValue = MA_PIM_TYPE_STRING;
+            *type = MA_PIM_TYPE_STRING;
+            *singleValue = false;
             break;
         default:
-            returnValue = MA_PIM_ERR_INVALID_INDEX;
+            returnValue = MA_PIM_ERR_FIELD_UNSUPPORTED;
     }
     
     return returnValue;
 }
 
 /**
- * Gets the string associated with a given attribute.
- * @param attribute Must be one of MA_PIM_ATTR constants.
- * @return The string associated with a given attribute. 
+ * Gets the allowed attributes for an given field ID.
+ * @param fieldID The given field ID.
+ * @return An dictionary that contains:
+ *         - keys An string array with all the attributes(e.g. MA_PIM_ATTR_ADDR_HOME).
+ *         - values An string array with all the strings associedted with attributes.
+ *         Do not release the returned object. 
+ *         If the field is not supported or it does not allow attributes an empty 
+ *         dictionary will be returned.
  */
--(NSString*) getStringFromAttribute:(const int) attribute
+-(NSMutableDictionary*) getAttributesForFieldId:(const int) fieldID
 {
-    NSString* string;
-    
-    switch (attribute) {
-        case MA_PIM_ATTR_ASST:
-            string = [NSString stringWithString:@"Assistant"];
+    NSMutableDictionary* returnedDictionary = mNoAttributes;
+    switch (fieldID) 
+    {
+        case MA_PIM_FIELD_CONTACT_ADDR:
+            returnedDictionary = mAddressAttributes;
             break;
-        case MA_PIM_ATTR_AUTO:
-            string = [NSString stringWithString:@"Auto"];
-            break;    
-        case MA_PIM_ATTR_FAX:
-            string = [NSString stringWithString:@"Fax"];        
-            break;  
-        case MA_PIM_ATTR_HOME:
-            string = [NSString stringWithString:(NSString*) kABHomeLabel];
-            break;  
-        case MA_PIM_ATTR_MOBILE:
-            string = (NSString*)kABPersonPhoneMobileLabel;
-            break;  
-        case MA_PIM_ATTR_OTHER:
-            string = [NSString stringWithString:(NSString*)kABOtherLabel];
-            break;  
-        case MA_PIM_ATTR_PAGER:
-            string = [NSString stringWithString:(NSString*)kABPersonPhonePagerLabel];
-            break;  
-        case MA_PIM_ATTR_PREFERRED:
-            string = [NSString stringWithString:@"Preferred"];
-            break;  
-        case MA_PIM_ATTR_SMS:
-            string = [NSString stringWithString:@"SMS"];
-            break;  
-        case MA_PIM_ATTR_WORK:
-            string = [NSString stringWithString:(NSString*)kABWorkLabel];
-            break;  
-        case MA_PIM_ATTR_RELATION_MOTHER:
-            string = [NSString stringWithString:(NSString*)kABPersonMotherLabel];
+        case MA_PIM_FIELD_CONTACT_EMAIL:
+            returnedDictionary = mEmailAttributes;
             break;
-        case MA_PIM_ATTR_RELATION_FATHER:
-            string = [NSString stringWithString:(NSString*)kABPersonFatherLabel];
+        case MA_PIM_FIELD_CONTACT_TEL:
+            returnedDictionary = mPhoneAttributes;
             break;
-        case MA_PIM_ATTR_RELATION_PARENT:
-            string = [NSString stringWithString:(NSString*)kABPersonParentLabel];
+        case MA_PIM_FIELD_CONTACT_URL:
+            returnedDictionary = mWebSiteAttributes;
             break;
-        case MA_PIM_ATTR_RELATION_SISTER:
-            string = [NSString stringWithString:(NSString*)kABPersonSisterLabel];
+        case MA_PIM_FIELD_CONTACT_IM:
+            returnedDictionary = mIMAttributes;
             break;
-        case MA_PIM_ATTR_RELATION_BROTHER:
-            string = [NSString stringWithString:(NSString*)kABPersonBrotherLabel];
+        case MA_PIM_FIELD_CONTACT_RELATION:
+            returnedDictionary = mRelationAttributes;    
             break;
-        case MA_PIM_ATTR_RELATION_CHILD:
-            string = [NSString stringWithString:(NSString*)kABPersonChildLabel];
-            break;
-        case MA_PIM_ATTR_RELATION_FRIEND:
-            string = [NSString stringWithString:(NSString*)kABPersonFriendLabel];
-            break;
-        case MA_PIM_ATTR_RELATION_SPOUSE:
-            string = [NSString stringWithString:(NSString*)kABPersonSpouseLabel];
-            break;    
-        case MA_PIM_ATTR_RELATION_PARTNER:
-            string = [NSString stringWithString:(NSString*)kABPersonPartnerLabel];
-            break;
-        case MA_PIM_ATTR_RELATION_MANAGER:
-            string = [NSString stringWithString:(NSString*)kABPersonManagerLabel];
-            break;
-        case MA_PIM_ATTR_RELATION_ASSISTANT:
-            string = [NSString stringWithString:(NSString*)kABPersonAssistantLabel];
-            break;
-        default:
-            string = [NSString stringWithString:@""];
     }
     
-    return string;
-
-}
-
-/**
- * Gets the attribute associated with a specified string.
- * @param string The given string.
- * @return One of MA_PIM_ATTR constants. 
- */
--(int) getAttributeFromString:(CFStringRef) string
-{
-    
+    return returnedDictionary;
 }
 
 /**
