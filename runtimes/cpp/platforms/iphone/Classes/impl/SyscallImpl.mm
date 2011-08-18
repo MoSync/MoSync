@@ -1324,7 +1324,7 @@ namespace Base {
 		}
 	}
 
-	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
+	
 
     SYSCALL(int, maSensorStart(int sensor, int interval))
 	{
