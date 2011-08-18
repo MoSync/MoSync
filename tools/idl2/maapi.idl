@@ -2902,11 +2902,11 @@ interface MAAPI {
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
 			SUFFIX = 4;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic first name.
-			PHONETIC_FAMILY = 6;
+			PHONETIC_FAMILY = 5;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic last name.
-			PHONETIC_GIVEN = 7;
+			PHONETIC_GIVEN = 6;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic middle name.
-			PHONETIC_OTHER = 8;
+			PHONETIC_OTHER = 7;
 		}
 
 		constset int MA_PIM_CONTACT_ORG_INFO_ {

@@ -140,11 +140,11 @@
 -(int) writeIMField:(PimFieldItem*) itemField;
 
 /**
- * Writes the related name field into record.
+ * Writes the relation field into record.
  * @param itemField The specified field.
  * @return One of MA_PIM_ERR constants.
  */
--(int) writeRelatedNameField:(PimFieldItem*) itemField;
+-(int) writeRelationField:(PimFieldItem*) itemField;
 
 /**
  * Writes a single field value into record.
@@ -231,6 +231,16 @@
  * Reads the instant message field from the record.
  */
 -(void) readIMField;
+
+/**
+ * Reads the relation field from the record.
+ */
+-(void) readRelationField;
+
+/**
+ * Reads the photo field from the record.
+ */
+-(void) readPhotoField;
 
 /**
  * Gets the instant message protocol associeted with a string constant.

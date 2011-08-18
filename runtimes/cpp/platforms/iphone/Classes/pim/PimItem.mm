@@ -223,7 +223,7 @@
 
     if (nil == fieldItem ||
         0 > index  ||
-        index > [fieldItem count])
+        index > ([fieldItem count] - 1))
     {
         return MA_PIM_ERR_INVALID_INDEX;
     }
@@ -379,7 +379,6 @@
     switch (fieldType)
     {
         case MA_PIM_TYPE_BINARY:
-            valuesArray = [utils getBytes:address size:args->bufSize];
             break;
         case MA_PIM_TYPE_BOOLEAN:
             break;
@@ -387,6 +386,7 @@
             valuesArray = [utils getDate:address];
             break;
         case MA_PIM_TYPE_INT:
+            valuesArray = [utils getIntValue:address];
             break;
         case MA_PIM_TYPE_STRING:
             valuesArray = [utils getString:address];

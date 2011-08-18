@@ -51,3 +51,7 @@ int maPimItemRemove(MAHandle list, MAHandle item);
 
 void* PimGetValidatedMemRange(const int address,const int size);
 void PimMaReadData(MAHandle data, void *dst, int offset, int size);
+int PimMaGetDataSize(MAHandle data);
+int PimMaCreatePlaceHolder();
+int PimMaCreateData(MAHandle placeholder, int size);
+void PimMaWriteData(MAHandle data, const void* src, int offset, int size);

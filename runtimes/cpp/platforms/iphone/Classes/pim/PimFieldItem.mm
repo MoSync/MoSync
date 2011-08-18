@@ -312,11 +312,17 @@
     NSMutableDictionary* allowedAttributes =
         [[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
     NSArray* attributesArray = [allowedAttributes allKeysForObject:label];
-    NSLog(@"count attributesArray = %d", [attributesArray count]);
-    if ([attributesArray count] > 0)
+    // Check if the attribute is a pre-defined one.
+    if ([attributesArray count] == 0)
     {
         NSString* stringAttribute = (NSString*) [attributesArray objectAtIndex:0];
         attributeId = [stringAttribute intValue];
+    }
+    else
+    {
+        // The attribute is custom.
+        // Get the custom attribute value.
+        attributeId = [[PimUtils sharedInstance] getCustomAttributeForFieldID:mFieldConstant];
     }
 
     return attributeId;
