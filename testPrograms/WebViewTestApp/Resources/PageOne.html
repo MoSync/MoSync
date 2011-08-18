@@ -1,0 +1,36 @@
+<html>
+<body>
+
+<script>
+function openWebPage()
+{
+  try
+  {
+    var textfield = document.getElementById("UrlField")
+    var url = textfield.value
+    document.location = url
+  }
+  catch (error)
+  {
+  }
+}
+</script>
+
+<image src="http://www.mosync.com/sites/all/themes/mosync/css/img/promo-box-3.png" />
+
+<div>
+<h2>Open a web page using a url field and JavaScript</h2>
+<input id="UrlField" value="http://openplay.se" type="text" size="30"/>
+<br />
+<input value="Open" type="button" onmousedown="openWebPage()" />
+</div>
+
+<div>
+<h2>Open web page using links</h2>
+<p><a href="http://openplay.se">Goto http://openplay.se</a></p>
+<p><a href="PageTwo.html">Goto local page</a></p>
+<p><a href="http://www.mosync.com/sites/all/themes/mosync/css/img/promo-box-3.png">Open an image</a></p>
+</div>
+
+</body>
+</html>

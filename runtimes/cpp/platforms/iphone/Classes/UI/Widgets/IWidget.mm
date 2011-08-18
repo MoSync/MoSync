@@ -18,6 +18,7 @@
 #import "IWidget.h"
 #import "UIColor-Expanded.h"
 #import <objc/runtime.h>
+#include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include <helpers/cpp_defs.h>
 #include "Platform.h"

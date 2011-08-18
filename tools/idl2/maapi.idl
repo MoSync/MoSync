@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 /** \file maapi.h
-* \brief Syscall declarations. These system calls and low-level 
+* \brief Syscall declarations. These system calls and low-level
 * functions provide access to the basic features of a device. They are
 * implemented by the MoSync runtimes in code native to the device.
 *
@@ -220,7 +220,7 @@ interface MAAPI {
 	* Returns \>0 if \a a \> \a b, 0 if \a a == \a b and \<0 if \a a \< \a b.
 	* If either argument is Not a Number, the result is undefined.
 	*/
-	int dcmp(in double a, in double b); 
+	int dcmp(in double a, in double b);
 
 
 	/**
@@ -264,7 +264,7 @@ interface MAAPI {
 	* Returns \>0 if \a a \> \a b, 0 if \a a == \a b and \<0 if \a a \< \a b.
 	* If either argument is Not a Number, the result is undefined.
 	*/
-	int fcmp(in float a, in float b); 
+	int fcmp(in float a, in float b);
 
 	/**
 	* Returns the sine of \a x.
@@ -296,7 +296,7 @@ interface MAAPI {
 
 	/**
 	 * \brief A structure representing a rectangle.
-	 * 
+	 *
 	 * The x and y coordinate of the top-left corner are defined by 'left' and 'top'.
 	 * The dimensions of the rectangle are defined by 'width' and 'height'.
 	 */
@@ -312,7 +312,7 @@ interface MAAPI {
 	* \param rgb A color in RGB8 format (0xRRGGBB). The top byte is ignored.
 	*/
 	int maSetColor(in int rgb);
-	
+
 	/**
 	* Sets the clipping rectangle for the current draw target.
 	* The screen and every drawable image each maintains a clipping rectangle.
@@ -321,7 +321,7 @@ interface MAAPI {
 	* clipping occurs at the draw target's edges.
 	*/
 	void maSetClipRect(in int left, in int top, in int width, in int height);
-	
+
 	/**
 	* Returns the clipping rectangle for the current draw target.
 	*/
@@ -345,7 +345,7 @@ interface MAAPI {
 	void maFillRect(in int left, in int top, in int width, in int height);
 	/**
 	* Draws a filled triangle strip using the current color.
-	* \param points A pointer to an array of \a count MAPoint2d:s representing the 
+	* \param points A pointer to an array of \a count MAPoint2d:s representing the
 	* vertices of the strip.
 	* \param count The count of vertices in the strip. Must be at least 3.
 	* \see maSetColor()
@@ -353,7 +353,7 @@ interface MAAPI {
 	void maFillTriangleStrip(in MAPoint2d points, in int count);
 	/**
 	* Draws a filled triangle fan using the current color.
-	* \param points A pointer to an array of \a count MAPoint2d:s representing the 
+	* \param points A pointer to an array of \a count MAPoint2d:s representing the
 	* vertices of the fan.
 	* \param count The count of vertices in the fan. Must be at least 3.
 	* \see maSetColor()
@@ -442,7 +442,7 @@ interface MAAPI {
 
 	/**
 	* Draws a portion of an image using a transformation.
-	* \param image The source image. 
+	* \param image The source image.
 	* \param srcRect The portion of the source image to be drawn.
 	* Must not exceed the bounds of the source image.
 	* \param dstPoint The top-left point on the draw target.
@@ -600,7 +600,7 @@ interface MAAPI {
 
 	/**
 	* Opens a permanent data store, optionally creates one if it doesn't exist already.
-	* 
+	*
 	* Returns a Store MAHandle on success.
 	* Returns #STERR_NONEXISTENT if !(flags & #MAS_CREATE_IF_NECESSARY) and the store does not exist.
 	* Returns another \link #STERR_GENERIC STERR \endlink code if the store could not be opened
@@ -1149,7 +1149,7 @@ interface MAAPI {
 		LCTRL			= 306;
 		RALT			= 307;
 		LALT			= 308;
-		
+
 		SEARCH          = 309;
 	}
 
@@ -1261,7 +1261,7 @@ interface MAAPI {
 
 		/// Character input. Uses MAEvent::character.
 		CHAR = 22;
-		
+
 		/** \brief The text box created by maTextBox() was just closed.
 		* Uses MAEvent::textboxResult and MAEvent::textboxLength.
 		*/
@@ -1273,7 +1273,7 @@ interface MAAPI {
 		 */
 		HOMESCREEN_SHOWN = 24;
 
-		/** \brief The home screen was hidden because an 
+		/** \brief The home screen was hidden because an
 		 * application came to front.
 		 * Currently implemented only on Android.
 		 * \see maHomeScreenEventsOn()
@@ -1293,17 +1293,17 @@ interface MAAPI {
 		 * \see maScreenActivateEventsOn()
 		 */
 		SCREEN_STATE_OFF = 27;
-		
+
 		/**
 		* \brief An event sent from a native widget.
 		* \par The application can use the MAEvent.data field to access
-		* widget event data, which is of type MAWidgetEventData. 
+		* widget event data, which is of type MAWidgetEventData.
 		* For example: \n
-		* \code MAWidgetEventData* widgetEventData = (MAWidgetEventData*) event.data; \endcode 
+		* \code MAWidgetEventData* widgetEventData = (MAWidgetEventData*) event.data; \endcode
 		* \see MAWidgetEventData
 		*/
 		WIDGET = 28;
-		
+
 		/** \brief The bluetooth chip was turned off.
 		* Bluetooth functions will return #CONNERR_UNAVAILABLE.
 		* Currently implemented only on Android.
@@ -1316,10 +1316,16 @@ interface MAAPI {
 		*/
 		BLUETOOTH_TURNED_ON = 30;
 
+		/** \brief SMS resuult message.
+		* The field status contains one of the
+		* This event is sent on Android and iOS.
+		*/
+		SMS = 31;
+
 		/**
 		* \brief The ImagePicker dialog was dismissed either by Cancel, either by OK.
 		*/
-		IMAGE_PICKER = 31;
+		IMAGE_PICKER = 32;
 	}
 
 	/**
@@ -1333,7 +1339,7 @@ interface MAAPI {
 		/// A success value \> 0 or a \link #CONNERR_GENERIC CONNERR \endlink code.
 		int result;
 	}
-	
+
 	/**
 	* \brief An event; a message indicating that something has happened, e.g. that a key has been pressed.
 	*/
@@ -1364,7 +1370,7 @@ interface MAAPI {
 				* In POINTER events, this will be the location of the pointer.
 				*/
 				MAPoint2d point;
-				
+
 				/**
 				* In POINTER events, this will be the finger triggering the event.
 				*/
@@ -1381,7 +1387,7 @@ interface MAAPI {
 			* Valid only in CONN events.
 			*/
 			MAConnEventData conn;
-			
+
 			struct {
 				/**
 				* One of the \link #MA_TB_RES_OK MA_TB_RES \endlink codes.
@@ -1393,7 +1399,13 @@ interface MAAPI {
 				*/
 				int textboxLength;
 			} textbox;
-			
+
+			/**
+			* In #EVENT_TYPE_SMS events, this will be one of the
+			* @link #MA_SMS_RESULT_SENT MA_SMS_RESULT_* @endlink constants.
+			*/
+			int status;
+
 			/**
 			* #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if
 			* one of the \link #CONNERR_GENERIC CONNERR \endlink constants.
@@ -1918,7 +1930,7 @@ interface MAAPI {
 		struct MAWlanAddr {
 			byte a[WLAN_ADDR_LEN];
 		}
-		
+
 		/**
 		* \brief A WLAN access point.
 		*/
@@ -2276,6 +2288,7 @@ interface MAAPI {
 		*
 		* \param path The full path to a directory, or the empty string,
 		* which specifies that the root file systems should be listed.
+		* Which root file systems are listed vary between platforms.
 		* \param filter A string to match names with. May include an asterisk ('*') wildcard
 		* to represent 0 or more characters. Ignored if \a path is empty.
 		*
@@ -2338,6 +2351,21 @@ interface MAAPI {
 		*/
 		int maSendTextSMS(in MAString dst, in MAString msg);
 		//int maSendBinarySMS(in MAString dst, in Address msg, in int len);
+
+		/**
+		* Values for the status field in the #EVENT_TYPE_SMS event.
+		* This event is sent on Android and iOS.
+		*/
+		constset int MA_SMS_RESULT_ {
+			/// The SMS was sent.
+			SENT = 1;
+			/// The SMS was NOT sent.
+			NOT_SENT = 2;
+			/// The SMS was delivered.
+			DELIVERED = 3;
+			/// The SMS was NOT delivered.
+			NOT_DELIVERED = 4;
+		}
 
 #if IX_RECORD
 		//These functions are all synchronous,
@@ -2583,9 +2611,9 @@ interface MAAPI {
 #endif	//IX_STREAMING
 
 		/**
-		* \brief A structure containing information about the native framebuffer, including color format and resolution. 
-		* 
-		* The 'sizeInBytes' field is the amount of bytes that should be used to allocate the offscreen framebuffer (a backbuffer). 
+		* \brief A structure containing information about the native framebuffer, including color format and resolution.
+		*
+		* The 'sizeInBytes' field is the amount of bytes that should be used to allocate the offscreen framebuffer (a backbuffer).
 		*/
 		struct MAFrameBufferInfo {
 			int sizeInBytes;         // The size in bytes of the frame buffer, is calculated as width*pitch.
@@ -2614,8 +2642,8 @@ interface MAAPI {
 		int maFrameBufferGetInfo(out MAFrameBufferInfo info);
 
 		/**
-		 * Pass a pointer to your framebuffer here. Each time an maUpdateScreen is performed, 
-		 * this piece of memory will be copied to the actual screen memory. 
+		 * Pass a pointer to your framebuffer here. Each time an maUpdateScreen is performed,
+		 * this piece of memory will be copied to the actual screen memory.
 		 * \param data A pointer to the custom framebuffer.
 		 * \returns \<=0 on error.
 		 */
@@ -2725,6 +2753,10 @@ interface MAAPI {
 		* "mosync.device" is a description of the device. May include vendor, model name
 		* and firmware version.
 		* The format of this description is not specified. It varies from device to device.
+		*
+		* "mosync.path.local" is the absolute path to the local file system,
+		* on devices that have a local file system. The returned path has a
+		* trailing slash character ('/').
 		*
 		* \param key The property's key.
 		* \param buf A buffer where the value should be written.
@@ -2938,8 +2970,8 @@ interface MAAPI {
 
 		/**
 		* \brief Arguments for PIM functions.
-		*/		
-		
+		*/
+
 		struct MA_PIM_ARGS {
 			/// Opened by maPimListNext().
 			MAHandle item;
@@ -3028,15 +3060,15 @@ interface MAAPI {
 group WidgetAPI "Widget API" {
 
 	/**
-	* Widgets can send events for instance when their internal state is changed (like when a 
+	* Widgets can send events for instance when their internal state is changed (like when a
 	* button is pressed). These are events sent using the MoSync event system \ref maGetEvent.
-	* When an event is received with the type #EVENT_TYPE_WIDGET the 'data' member of the MAEvent 
+	* When an event is received with the type #EVENT_TYPE_WIDGET the 'data' member of the MAEvent
 	* struct is a pointer to data of type #MAWidgetEventData.
 	*/
 	group WidgetEvents "Widget events" {
 	/**
 	* @brief A struct that holds the data associated with a widget event.
-	*/ 
+	*/
 	struct MAWidgetEventData {
 		/**
 		* @brief Determines which kind of widget event that has occurred. See \ref WidgetEventTypes "Widget event types" for the possible values.
@@ -3047,15 +3079,15 @@ group WidgetAPI "Widget API" {
 		* @brief Handle to the widget that sent the event.
 		*/
 		MAWidgetHandle widgetHandle;
-		
+
 		union {
 			/**
-			* @brief The index when a #MAW_EVENT_CLICKED event is receieved for a list view.	
+			* @brief The index when a #MAW_EVENT_CLICKED event is receieved for a list view.
 			*/
 			int listItemIndex;
 
 			/**
-			* @brief The type of button that was clicked when a #MAW_EVENT_CLICKED event is receieved for a searchbar.	
+			* @brief The type of button that was clicked when a #MAW_EVENT_CLICKED event is receieved for a searchbar.
 			* The type of searchbar button clicked:
 			* - 0 means 'search'
 			* - 1 means 'cancel'
@@ -3068,23 +3100,59 @@ group WidgetAPI "Widget API" {
 			* - 1 means 'checked'
 			*/
 			int checked;
-			
+
 			/**
 			* @brief The new tab index when a #MAW_EVENT_TAB_CHANGED event is received.
 			*/
 			int tabIndex;
 
+			/**
+			* @brief Used by event #MAW_EVENT_WEB_VIEW_CONTENT_LOADING.
+			* One of:
+			*  #MAW_CONSTANT_STARTED
+			*  #MAW_CONSTANT_DONE
+			*  #MAW_CONSTANT_STOPPED
+			*  #MAW_CONSTANT_ERROR
+			*/
+			int status;
+
+			/**
+			* @brief Parameters for the #MAW_EVENT_WEB_VIEW_HOOK_INVOKED event.
+			*/
 			struct {
-					/**
-					* @brief The handle to the screen that was popped from the stack screen.
-					*/
-					MAWidgetHandle fromScreen;
-					
-					/**
-					* @brief The handle to the screen that will be shown. If there is no screen
-					* to pop to, this will be the same as widgetHandle.
-					*/
-					MAWidgetHandle toScreen;
+				/**
+				* @brief The type of hook that has been invoked.
+				* One of:
+				*  #MAW_CONSTANT_SOFT
+				*  #MAW_CONSTANT_HARD
+				*/
+				int hookType;
+
+				/**
+				* @brief The handle to url data. This is string data,
+				* there is NO null terminating character. The encoding
+				* of the data is determined by the application.
+				* The data MUST be deallocated with maDestroyObject after
+				* it hs been used. Each event allocates a new data object
+				* for the url data.
+				*/
+				MAHandle urlData;
+			} webViewHookInfo;
+
+			/**
+			* @brief TODO: Document when this structure is used.
+			*/
+			struct {
+				/**
+				* @brief The handle to the screen that was popped from the stack screen.
+				*/
+				MAWidgetHandle fromScreen;
+
+				/**
+				* @brief The handle to the screen that will be shown. If there is no screen
+				* to pop to, this will be the same as widgetHandle.
+				*/
+				MAWidgetHandle toScreen;
 			} stackScreenPopInfo;
 
 			/**
@@ -3139,18 +3207,20 @@ group WidgetAPI "Widget API" {
 	*/
 	group WidgetEventTypes "Widget event types" {
 	constset int MAW_EVENT_ {
-		/** 
-		* @brief A pointer pressed event has occurred. 
+		/**
+		* @brief A pointer pressed event has occurred.
 		*/
 		POINTER_PRESSED = 2;
 
-		/** 
-		* @brief A pointer released event has occurred. 
+		/**
+		* @brief A pointer released event has occurred.
 		*/
 		POINTER_RELEASED = 3;
 
-		/** 
-		* @brief A WebView widget has finished loading data. 
+		/**
+		* @brief This event is not used and has been deprecated.
+		*
+		* @deprecated Use #MAW_EVENT_WEB_VIEW_CONTENT_LOADING.
 		*/
 		CONTENT_LOADED = 4;
 
@@ -3176,6 +3246,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief Sent when the URL of a web view changes
+		 * @deprecated Use event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		 */
 		WEB_VIEW_URL_CHANGED = 9;
 
@@ -3183,6 +3254,41 @@ group WidgetAPI "Widget API" {
 		 * @brief Sent when a screen has been popped from a stack screen.
 		 */
 		STACK_SCREEN_POPPED = 10;
+
+		/**
+		* @brief A WebView widget reports status of loading
+		* page content. Event parameter status is set to one
+		* of the following values:
+		*   #MAW_CONSTANT_STARTED
+		*   #MAW_CONSTANT_DONE
+		*   #MAW_CONSTANT_STOPPED
+		*   #MAW_CONSTANT_ERROR
+		*/
+		WEB_VIEW_CONTENT_LOADING = 11;
+
+		/**
+		* @brief A web view hook has captured a url.
+		*
+		* The event parameter hookType is set to
+		* the type of hook, one of:
+		*   #MAW_CONSTANT_SOFT
+		*   #MAW_CONSTANT_HARD
+		*
+		* Event parameter urlData is a handle to the url that
+		* has been captured.
+		*
+		* Use syscall maGetDataSize to get the size of the url data
+		* and maReadData to access the data.
+		*
+		* NOTE: When you get this message you have ownership
+		* of the url data handle and you have the responsibility to
+		* deallocate it using maDestroyObject.
+		*
+		* To get this event, you need to register a hook pattern, using
+		* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
+		* and/or #MAW_WEB_VIEW_HARD_HOOK.
+		*/
+		WEB_VIEW_HOOK_INVOKED = 12;
 
 		/**
 		 * @brief Sent when the progress level has been changed.
@@ -3238,6 +3344,7 @@ group WidgetAPI "Widget API" {
          EDIT_BOX_RETURN = 19;
 
 	}
+
 	} // end of WidgetEventTypes
 
 	} // end of WidgetEvents
@@ -3256,14 +3363,50 @@ group WidgetAPI "Widget API" {
 		* @brief If set to the width or height of a widget and the parent is either a vertical or horizontal layout it tries to fill the available space in that dimension. If there are multiple widgets specified with this constant, the space will then be shared equally. If the parent isn't a horizontal or vertical layout it just resizes the child to the size of its parent.
 		*/
 		FILL_AVAILABLE_SPACE = -1;
-		
+
 		/**
 		* @brief If set to the width or height of a widget it will be as big as its content in that dimension.
 		*/
 		WRAP_CONTENT = -2;
+
+		/**
+		* @brief Loading a page has started. Used in
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		STARTED = 1;
+
+		/**
+		* @brief Loading a page is done. Used in
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		DONE = 2;
+
+		/**
+		* @brief Loading a page has stopped (aborted). Used in
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		STOPPED = 3;
+
+		/**
+		* @brief Loading a page has failed. Used in
+		* #MAW_EVENT_WEB_VIEW_CONTENT_LOADED.
+		*/
+		ERROR = -1;
+
+		/**
+		* @brief The hook type is a soft hook. Used in
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		*/
+		SOFT = 5;
+
+		/**
+		* @brief The hook type is a hard hook. Used in
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		*/
+		HARD = 6;
 	}
 	}
-	
+
 	group WidgetAlignment "Widget alignment" {
 	constset MAString MAW_ALIGNMENT_
 	{
@@ -3271,22 +3414,22 @@ group WidgetAPI "Widget API" {
 		* @brief Constant that represents a left aligned widget.
 		*/
 		LEFT = "left";
-		
+
 		/**
 		* @brief Constant that represents a right aligned widget.
 		*/
 		RIGHT = "right";
-		
+
 		/**
 		* @brief Constant that represents a center aligned widget.
 		*/
 		CENTER = "center";
-		
+
 		/**
 		* @brief Constant that represents a top aligned widget.
 		*/
 		TOP = "top";
-		
+
 		/**
 		* @brief Constant that represents a bottom aligned widget.
 		*/
@@ -3442,13 +3585,13 @@ group WidgetAPI "Widget API" {
 		* between a set of screens.
 		*
 		* The screen stack can be pushed or popped. Pushing a given screen will hide
-		* the current screen and display the pushed screen. Popping a screen hides 
+		* the current screen and display the pushed screen. Popping a screen hides
 		* the current screen and shows the previous screen in the stack. See
 		* maWidgetStackScreenPush() and maWidgetStackScreenPop().
-		* 
+		*
 		* Navigation between the screens in the stack is handled according to the
 		* norm on the specific platform. On iPhone a navigation bar is added to each
-		* pushed screen that can be used to go back, while on Android there is no 
+		* pushed screen that can be used to go back, while on Android there is no
 		* extra UI added and the back button is used to go back to the previous screen.
 		* See \ref WidgetStackScreenProperties "Stack screen properties" for the
 		* properties available.
@@ -3470,7 +3613,7 @@ group WidgetAPI "Widget API" {
 		*/
 		IMAGE_BUTTON = "ImageButton";
 
-		/**	
+		/**
 		* @brief A label is a widget that can be used to display static non-editable text. See \ref WidgetLabelProperties "Label properties" for the properties available.
 		*/
 		LABEL = "Label";
@@ -3516,7 +3659,7 @@ group WidgetAPI "Widget API" {
 		 * @brief A search bar is a special kind of edit box that is used for searching. See \ref WidgetSearchBarProperties "Search bar properties" for the properties available.
 		 */
 		SEARCH_BAR = "SearchBar";
-		
+
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
 		 * There is a replica available for Android.
@@ -3531,7 +3674,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
-		 */	
+		 */
 		WEB_VIEW = "WebView";
 
 		/**
@@ -3603,7 +3746,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetTypes
 
 	/**
-	* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change 
+	* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change
 	* things like the visual appearance of the widget or the way it works.
 	*/
 	group WidgetProperties "Widget properties" {
@@ -3748,7 +3891,7 @@ group WidgetAPI "Widget API" {
 	}
 
 	/**
-	* The available widget properties for a #MAW_SCREEN. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_SCREEN. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetScreenProperties "Screen properties" {
 	constset MAString MAW_SCREEN_ {
@@ -3780,10 +3923,10 @@ group WidgetAPI "Widget API" {
 		*/
 		ICON = "icon";
 	}
-	} // end of WidgetScreenProperties	
+	} // end of WidgetScreenProperties
 
 	/**
-	* The available widget properties for a #MAW_TAB_SCREEN. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_TAB_SCREEN. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetTabScreenProperties "Tab screen properties" {
 	constset MAString MAW_TAB_SCREEN_ {
@@ -3799,7 +3942,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets or gets the currently open tab to the tab with the given index.
-		* 
+		*
 		* @validvalue A 0-indexed tab number.
 		*
 		* @setandget
@@ -3812,8 +3955,12 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char currentTabBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(tabScreenHandle, MAW_TAB_SCREEN_CURRENT_TAB, currentTabBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(
+		* 		tabScreenHandle,
+		* 		MAW_WEB_VIEW_CURRENT_TAB,
+		* 		currentTabBuffer,
+		*		BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with current tab.
 		* 	}
@@ -3821,7 +3968,7 @@ group WidgetAPI "Widget API" {
 		*/
 		CURRENT_TAB = "currentTab";
 	}
-	} // end of WidgetTabScreenProperties	
+	} // end of WidgetTabScreenProperties
 
 	/**
 	* The available widget properties for a #MAW_STACK_SCREEN. See \ref WidgetProperties "Widget properties" for more properties.
@@ -3899,16 +4046,16 @@ group WidgetAPI "Widget API" {
 		NAV_BAR_ENABLED = "NavBarEnabled";
 
 	}
-	} // end of WidgetStackScreenProperties	
+	} // end of WidgetStackScreenProperties
 
 	/**
-	* The available widget properties for a #MAW_LABEL. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_LABEL. See of \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetLabelProperties "Label properties" {
 	constset MAString MAW_LABEL_ {
 		/**
 		* @brief Sets or gets the text that is displayed in the label.
-		* 
+		*
 		* @validvalue A null-terminated string.
 		*
 		* @setandget
@@ -3921,8 +4068,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the label text.
 		* 	}
@@ -3932,7 +4079,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets the vertical alignment of the text inside the label. If the widget's height is WRAP_CONTENT this property has no effect.
-		* 
+		*
 		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 		*
 		* @setonly
@@ -3943,7 +4090,7 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
-		
+
 		/**
 		* @brief Sets the horizontal alignment of the text inside the label. If the widget's height is WRAP_CONTENT this property has no effect.
 		*
@@ -4004,13 +4151,13 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetLabelProperties
 
 	/**
-	* The available widget properties for a #MAW_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_BUTTON. See of \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetButtonProperties "Button properties" {
 	constset MAString MAW_BUTTON_ {
 		/**
 		* @brief Sets or gets the text that is displayed in the label.
-		* 
+		*
 		* @validvalue A null-terminated string.
 		*
 		* @setandget
@@ -4023,8 +4170,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the label text.
 		* 	}
@@ -4034,7 +4181,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets the vertical alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
-		* 
+		*
 		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 		*
 		* @setonly
@@ -4045,7 +4192,7 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
-		
+
 		/**
 		* @brief Sets the horizontal alignment of the text inside the button. If the widget's width is WRAP_CONTENT this property has no effect.
 		*
@@ -4073,7 +4220,7 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		FONT_COLOR = "fontColor";
-		
+
 		/**
 		* @brief Sets the font size in points of the button's text.
 		*
@@ -4088,16 +4235,16 @@ group WidgetAPI "Widget API" {
 		*/
 		FONT_SIZE = "fontSize";
 	}
-	} // end of WidgetButtonProperties		
+	} // end of WidgetButtonProperties
 
 	/**
-	* The available widget properties for a #MAW_IMAGE_BUTTON. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_IMAGE_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetImageButtonProperties "Image button properties" {
 	constset MAString MAW_IMAGE_BUTTON_ {
 		/**
 		* @brief Sets or gets the text that is displayed in the label.
-		* 
+		*
 		* @validvalue A null-terminated string.
 		*
 		* @setandget
@@ -4110,8 +4257,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the label text.
 		* 	}
@@ -4121,7 +4268,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets the vertical alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
-		* 
+		*
 		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 		*
 		* @setonly
@@ -4132,7 +4279,7 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
-		
+
 		/**
 		* @brief Sets the horizontal alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
 		*
@@ -4160,7 +4307,7 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		FONT_COLOR = "fontColor";
-		
+
 		/**
 		* @brief Sets the font size in points of the button's text.
 		*
@@ -4188,7 +4335,7 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		BACKGROUND_IMAGE = "backgroundImage";
-		
+
 		/**
 		* Sets the foreground image of the button. This won't be scaled at all.
 		*
@@ -4201,15 +4348,15 @@ group WidgetAPI "Widget API" {
 		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_IMAGE, toString(R_MY_IMAGE));
 		* \endcode
 		*/
-		IMAGE = "image";			
+		IMAGE = "image";
 	}
-	} // end of WidgetImageButtonProperties		
-	
+	} // end of WidgetImageButtonProperties
+
 	/**
-	* The available widget properties for a #MAW_IMAGE. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_IMAGE. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetImageProperties "Image properties" {
-	constset MAString MAW_IMAGE_ {	
+	constset MAString MAW_IMAGE_ {
 		/**
 		* Sets the image that will be displayed.
 		*
@@ -4223,7 +4370,7 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		IMAGE = "image";
-		
+
 		/**
 		* @brief Specifies what type of scaling should be applied to the image.
 		*
@@ -4235,19 +4382,19 @@ group WidgetAPI "Widget API" {
 		* \code
 		*	maWidgetSetProperty(imageHandle, MAW_IMAGE_SCALE_MODE, "scaleXY");
 		* \endcode
-		*/		
-		SCALE_MODE = "scaleMode";		
+		*/
+		SCALE_MODE = "scaleMode";
 	}
 	} // end of WidgetImageProperties
 
 	/**
-	* The available widget properties for a #MAW_EDIT_BOX. See of \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_EDIT_BOX. See of \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetEditBoxProperties "Edit box properties" {
 	constset MAString MAW_EDIT_BOX_ {
 		/**
 		* @brief Set or get the text entered in the edit box.
-		* 
+		*
 		* @validvalue A null-terminated string.
 		*
 		* @setandget
@@ -4260,8 +4407,8 @@ group WidgetAPI "Widget API" {
 		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with the edit box text
 		* 	}
@@ -4271,7 +4418,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Set a text in the edit box that acts as a placeholder when an edit box is empty.
-		* 
+		*
 		* @validvalue A null-terminated string.
 		*
 		* @setonly
@@ -4312,9 +4459,9 @@ group WidgetAPI "Widget API" {
 		EDIT_MODE = "editMode";
 	}
 	} // end of WidgetEditBoxProperties
-	
+
 	/**
-	* The available widget properties for a #MAW_LIST_VIEW_ITEM. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_LIST_VIEW_ITEM. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetListViewItemProperties "List view item properties" {
 	constset MAString MAW_LIST_VIEW_ITEM_ {
@@ -4359,9 +4506,9 @@ group WidgetAPI "Widget API" {
 		ACCESSORY_TYPE = "accessoryType";
 	}
 	} // end of WidgetListViewItemProperties
-	
+
 	/**
-	* The available widget properties for a #MAW_CHECK_BOX. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_CHECK_BOX. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetCheckBoxProperties "Check box properties" {
 	constset MAString MAW_CHECK_BOX_ {
@@ -4402,10 +4549,10 @@ group WidgetAPI "Widget API" {
 	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetHorizontalLayoutProperties "Horizontal layout properties" {
-	constset MAString MAW_HORIZONTAL_LAYOUT_ {	
+	constset MAString MAW_HORIZONTAL_LAYOUT_ {
 		/**
 		* @brief Sets how the children in the layout should be aligned in the vertical axis.
-		* 
+		*
 		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 		*
 		* @setonly
@@ -4416,10 +4563,10 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
-		
+
 		/**
 		* @brief Sets how the children in the layout should be aligned in the horizontal axis.
-		* 
+		*
 		* @validvalue One of the constants #MAW_ALIGNMENT_LEFT, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
 		*
 		* @setonly
@@ -4434,13 +4581,13 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetHorizontalLayoutProperties
 
 	/**
-	* The available widget properties for a #MAW_VERTICAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_VERTICAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetVerticalLayoutProperties "Vertical layout properties" {
 	constset MAString MAW_VERTICAL_LAYOUT_ {
 		/**
 		* @brief Sets how the children in the layout should be aligned in the vertical axis.
-		* 
+		*
 		* @validvalue One of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 		*
 		* @setonly
@@ -4451,10 +4598,10 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CHILD_VERTICAL_ALIGNMENT = "childVerticalAlignment";
-		
+
 		/**
 		* @brief Sets how the children in the layout should be aligned in the horizontal axis.
-		* 
+		*
 		* @validvalue One of the constants #MAW_ALIGNMENT_LEFT, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
 		*
 		* @setonly
@@ -4467,15 +4614,15 @@ group WidgetAPI "Widget API" {
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
 	}
 	} // end of WidgetVerticalLayoutProperties
-	
+
 	/**
-	* The available widget properties for a #MAW_SEARCH_BAR. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_SEARCH_BAR. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetSearchBarProperties "Search bar properties" {
 	constset MAString MAW_SEARCH_BAR_ {
 		/**
 		* @brief Set or get the current text of the search bar.
-		* 
+		*
 		* @validvalue A null-terminated string.
 		*
 		* @setandget
@@ -4484,12 +4631,12 @@ group WidgetAPI "Widget API" {
 		* \code
 		*	maWidgetSetProperty(searchBarHandle, MAW_SEARCH_BAR_TEXT, "My search query");
 		* \endcode
-		*/	
+		*/
 		TEXT = "text";
 
 		/**
 		* @brief Set a text in the search bar that acts as a placeholder when an edit box is empty.
-		* 
+		*
 		* @validvalue A null-terminated string.
 		*
 		* @setonly
@@ -4500,7 +4647,7 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		PLACEHOLDER = "placeholder";
-		
+
 		/**
 		* @brief Shows or hides the virtual keyboard. If shown the focus will be set to this widget.
 		*
@@ -4516,9 +4663,9 @@ group WidgetAPI "Widget API" {
 		SHOW_KEYBOARD = "showKeyboard";
 	}
 	} // end of WidgetSearchBarProperties
-		
+
 	/**
-	* The available widget properties for a #MAW_GL_VIEW. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_GL_VIEW. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetGLViewProperties "GL view properties" {
 	constset MAString MAW_GL_VIEW_ {
@@ -4533,7 +4680,7 @@ group WidgetAPI "Widget API" {
 		* \code
 		*	maWidgetSetProperty(glViewHandle, MAW_GL_VIEW_INVALIDATE, "");
 		* \endcode
-		*/	
+		*/
 		INVALIDATE = "invalidate";
 
 		/**
@@ -4547,48 +4694,237 @@ group WidgetAPI "Widget API" {
 		* \code
 		*	maWidgetSetProperty(glViewHandle, MAW_GL_VIEW_BIND, "");
 		* \endcode
-		*/	
+		*/
 		BIND = "bind";
 	}
 	} // end of WidgetGLViewProperties
-	
+
 	/**
-	* The available widget properties for a #MAW_WEB_VIEW. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_WEB_VIEW.
+	* See @ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetWebViewProperties "Web view properties" {
 	constset MAString MAW_WEB_VIEW_ {
 		/**
 		* @brief Set or get the currently displayed url in the web view.
 		*
+		* You can also use this property to evaluate JavaScript in the WebView,
+		* by using a url that starts with "javascript:" followed by the
+		* JavaScript code.
+		*
 		* @validvalue Any valid URL.
 		*
 		* @setandget
 		*
 		* @par Example
-		* \code
+		* @code
 		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_URL, "http://www.mosync.com/");
-		* \endcode
-		*/		
+		* @endcode
+		*
+		* @code
+		*	maWidgetSetProperty(
+		*		webViewHandle,
+		*		MAW_WEB_VIEW_URL,
+		*		"javascript:document.body.innerHTML= '<p>Hello World</p>'");
+		* @endcode
+		*/
 		URL = "url";
 
 		/**
-		* @brief Property to get a new url whenever the webview changes the url. See \ref #MAW_EVENT_WEB_VIEW_URL_CHANGED.
+		* @brief Set the currently displayed HTML data in the web view.
+		*
+		* @validvalue Any valid HTML data.
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HTML, "<h1>Hello World</h1>");
+		* @endcode
+		*/
+		HTML = "html";
+
+		/**
+		* @brief Set the base URL used by the web-view when loading relative paths.
+		* The value of this URL is used when setting the #MAW_WEB_VIEW_URL and
+		* #MAW_WEB_VIEW_HTML properties. The default value for this property points to
+		* the Assets folder in the local file system ("file://pathToLocalFileSystem/Assets/").
+		*
+		* @note Use: #maGetSystemProperty ("mosync.path.local.url") to find the baseURL
+		* for the local file system.
+		*
+		* @validvalue Any valid URL schema.
+		*
+		* @setandget
+		*/
+		BASE_URL = "baseUrl";
+
+		/**
+		* @brief Set the pattern used to "soft hook" urls, to get notified
+		* when pages are being loaded.
+		*
+		* When this pattern matches a url that is being requested
+		* to load in the WebView, event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* is sent, and the page loads NORMALLY.
+		*
+		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* you MUST deallocate the urlData handle of the event by calling
+		* maDestroyObject on the handle. Destory the handle when you are done
+		* reading the url data, to avoid that memory will get used up.
+		*
+		* The pattern is a url pattern specified using regular expression
+		* syntax, according to the ICU regular expression standard, using
+		* complete match. For example, the ".*" matching expression is used
+		* to match any url string. To match all HTTP requests, use the
+		* pattern "http://.*". To match all requests for a specific domain,
+		* use a pattern like ".*google.com.*". For further infomation, see:
+		* http://userguide.icu-project.org/strings/regexp
+		* When typing a C-string with a pattern that contains a matching
+		* expression with a backslash, make sure to escape the backslash,
+		* for example "\B" should be "\\B".
+		*
+		* By setting the pattern to an empty string, the soft hook mechanism
+		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
+		*
+		* Both "soft" hooks and "hard" hooks can be enabled simultaneously,
+		* but only one hook pattern can be used for each type of hook. When
+		* setting a new hook pattern, the old hook is replaced.
+		*
+		* Note that urls opened using maWidgetSetProperty with the property
+		* MAW_WEB_VIEW_URL are NOT hooked. This way of loading a page is
+		* excluded from the hook mechanism to prevent "loops" when loading
+		* pages.
+		*
+		* @validvalue A string with a url pattern.
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*   // Hook all urls.
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, ".*");
+		*
+		*   // Hook no urls.
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, "");
+		*
+		*   // Hook urls that start with "mosync:".
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_SOFT_HOOK, "mosync://.*");
+		* @endcode
+		*/
+		SOFT_HOOK = "softHook";
+
+		/**
+		* @brief Set the pattern used to "hard hook" urls, to get notified
+		* and prevent loading of pages.
+		*
+		* Hard hooks are useful for communicating events from a WebView,
+		* for example by setting document.location to a url string in
+		* JavaScript. Example: document.location = 'mosync://ExitApp'
+		* The application can then examine the url data and take action
+		* depending on the url content.
+		*
+		* When this pattern matches a url that is being requested
+		* to load in the WebView, event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* is sent, and page loading is ABORTED.
+		*
+		* Note that when receiving event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		* you MUST deallocate the urlData handle of the event by calling
+		* maDestroyObject on the handle. Destory the handle when you are done
+		* reading the url data, to avoid that memory will get used up.
+		*
+		* The pattern is a url pattern specified using regular expression
+		* syntax, according to the ICU regular expression standard, using
+		* complete match. For example, the ".*" matching expression is used
+		* to match any url string. To match all HTTP requests, use the
+		* pattern "http://.*". To match all requests for a specific domain,
+		* use a pattern like ".*google.com.*". For further infomation, see:
+		* http://userguide.icu-project.org/strings/regexp
+		* When typing a C-string with a pattern that contains a matching
+		* expression with a backslash, make sure to escape the backslash,
+		* for example "\B" should be "\\B".
+		*
+		* By setting the pattern to an empty string, the soft hook mechanism
+		* is turned off, and #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is not sent.
+		*
+		* Both "soft" hooks and "hard" hooks can be enabled simultaneously,
+		* but only one hook pattern can be used for each type of hook. When
+		* setting a new hook pattern, the old hook is replaced.
+		*
+		* The "hard" hook property takes precedence over the "soft" hook
+		* property. When both properties are set,
+		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED is sent once, for the
+		* "hard" hook type.
+		*
+		* Note that urls opened using maWidgetSetProperty with the property
+		* MAW_WEB_VIEW_URL are NOT hooked. This way of loading a page is
+		* excluded from the hook mechanism to prevent "loops" when loading
+		* pages.
+		*
+		* @validvalue A string with a url pattern.
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*   // Hook urls that start with "mosync:".
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HARD_HOOK, "mosync://.*");
+		* @endcode
+		*/
+		HARD_HOOK = "hardHook";
+
+		/**
+		* @brief Property to get a new url whenever the webview changes the url.
+		* See #MAW_EVENT_WEB_VIEW_URL_CHANGED.
+		*
+		* @deprecated Use event #MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		*
 		* @validvalue Any valid URL.
 		*
 		* @getonly
 		*
 		* @par Example
-		* \code
+		* @code
 		* 	char urlBuffer[BUFFER_SIZE];
-		* 	int getStatus = maWidgetGetProperty(webViewHandle, MAW_WEB_VIEW_NEW_URL, urlBuffer, BUFFER_SIZE);
-		* 	if(getStatus == MAW_RES_OK)
+		* 	int result = maWidgetGetProperty(
+		*     webViewHandle,
+		*     MAW_WEB_VIEW_NEW_URL,
+		*     urlBuffer,
+		*     BUFFER_SIZE);
+		* 	if (result > 0)
 		* 	{
 		* 	    // Do something with URL.
 		* 	}
-		* \endcode
-		*/		
+		* @endcode
+		*/
 		NEW_URL = "newurl";
+
+		/**
+		* @brief Enable or disable the zoom controls of the web view.
+		*
+		* @validvalue "true" to enable, "false" to disable.
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_ENABLE_ZOOM, "true");
+		* @endcode
+		*/
+		ENABLE_ZOOM = "enableZoom";
+
+		/**
+		* @brief Navigate forward or back the browsing history.
+		*
+		* @validvalue "back" or "forward".
+		*
+		* @setonly
+		*
+		* @par Example
+		* @code
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_NAVIGATE, "back");
+		* @endcode
+		*/
+		NAVIGATE = "navigate";
 
 		/**
 		* @brief Sets or gets whether the horizontal scrollbar should be drawn or not.
@@ -4621,6 +4957,7 @@ group WidgetAPI "Widget API" {
 		*/
 		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
 	}
+
 	} // end of WidgetWebViewProperties
 	/**
 	* The available widget properties for a #MAW_PROGRESS_BAR. See \ref WidgetProperties "Widget properties" for more properties.
@@ -5123,8 +5460,8 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	*/
 	group WidgetAPIFunctions "Widget functions" {
 
-	/** 
-	* Creates a new widget of the specified type. 
+	/**
+	* Creates a new widget of the specified type.
 	*
 	* \note See \ref WidgetTypes "Widget types" for the available widget types.
 	*
@@ -5138,7 +5475,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	*/
 	MAWidgetHandle maWidgetCreate(in MAString widgetType);
 
-	/** 
+	/**
 	* Frees the memory and resources held by the given widget. Destryoing a widget
 	* with children will also cause its children to be destroyed. Once a handle has
 	* been destroyed it cannot be referenced by the maWidget* functions.
@@ -5154,7 +5491,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	*/
 	int maWidgetDestroy(in MAWidgetHandle widget);
 
-	/** 
+	/**
 	* Adds a widget to the given parent as a child. Letting the
 	* parent widget layout the child.
 	*
@@ -5169,7 +5506,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	*/
 	int maWidgetAddChild(in MAWidgetHandle parent, in MAWidgetHandle child);
 
-	/** 
+	/**
 	* Inserts a widget to the given parent as a child at an index. Letting the
 	* parent widget layout the child.
 	*
@@ -5186,7 +5523,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	*/
 	int maWidgetInsertChild(in MAWidgetHandle parent, in MAWidgetHandle child, in int index);
 
-	/** 
+	/**
 	* Removes a child widget from its parent (but does not destroy it).
 	* Removing a currently visible top-level widget causes the MoSync view to become visible.
 	*
@@ -5198,7 +5535,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	int maWidgetRemoveChild(in MAWidgetHandle child);
 
 	/**
- 	* Shows a screen. If native UI hasn't been initialized, it is also initialized 
+	* Shows a screen. If native UI hasn't been initialized, it is also initialized
 	* and disables regular MoSync drawing.
 	*
 	* \param screenHandle The handle to the screen.
@@ -5210,14 +5547,14 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	int maWidgetScreenShow(in MAWidgetHandle screenHandle);
 
 	/**
-	 * Pushes a screen to the given screen stack, hides the current screen and 
-	 * shows the pushed screen it. Pushing it to the stack will make it 
+	 * Pushes a screen to the given screen stack, hides the current screen and
+	 * shows the pushed screen it. Pushing it to the stack will make it
 	 * automatically go back to the previous screen when popped.
 	 *
 	 * \param stackScreen A handle to a #MAW_STACK_SCREEN.
 	 * \param newScreen A handle to either a #MAW_SCREEN or a #MAW_TAB_SCREEN.
 	 *                  The handle cannot exist in the stack already.
-	 *	 
+	 *
 	 * \return Any of the following result codes:
 	 * - #MAW_RES_OK if the given screen could be pushed.
 	 * - #MAW_RES_INVALID_HANDLE if either the screenStack or newScreen handle
@@ -5228,7 +5565,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	int maWidgetStackScreenPush(in MAWidgetHandle stackScreen, in MAWidgetHandle newScreen);
 
 	/**
-	 * Pops a screen from a screen stack, hides the current screen and shows 
+	 * Pops a screen from a screen stack, hides the current screen and shows
 	 * the popped screen before the If there is no previous screen in the screen
 	 * stack, an empty screen will be shown.
 	 *
@@ -5241,7 +5578,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	 */
 	int maWidgetStackScreenPop(in MAWidgetHandle stackScreen);
 
-	/** 
+	/**
 	* Sets a specified property on the given widget.
 	*
 	* \param widget Handle to the widget.
@@ -5255,13 +5592,13 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	* - #MAW_RES_OK if the property could be set.
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
-	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.  
+	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
 	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetSetProperty(in MAWidgetHandle widget, in MAString property, in MAString value);
 
-	/** 
+	/**
 	* Retrieves a specified property from the given widget.
 	*
 	* \param widget Handle to the widget.
@@ -5273,16 +5610,18 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
-	* - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small. 
+	* - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
 	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
-	} // end of group WidgetAPIFunctions
+
+	}
+	// end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI
 #endif //IX_WIDGET
-	
+
 		/**
 		* \brief The camera format, in pixels.
 		*/
@@ -5326,7 +5665,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
-		
+
 		/**
 		* Shows the virtual keyboard.
 		*/
@@ -5438,7 +5777,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		 * @return \< 0 on error.
 		 */
 		int maHomeScreenEventsOff();
-		
+
 		/**
 		* Add shortcut icon to the device home screen.
 		* Available on Android only.
@@ -5454,27 +5793,27 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		* @return \< 0 on error.
 		*/
 		int maHomeScreenShortcutRemove(in MAString name);
-		
+
 		/**
 		 * Add a notification item.
 		 *
 		 * Note that there can only be one notification of type
-		 * #NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
-		 * types may be added in the future. This syscall is available 
+		 * #NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification
+		 * types may be added in the future. This syscall is available
 		 * on Android only.
 		 *
 		 * @param type The #NOTIFICATION_TYPE_APPLICATION_LAUNCHER constant.
-		 * @param id The id of the notification. The id must be unique within 
+		 * @param id The id of the notification. The id must be unique within
 		 * the application.
 		 * @param title Title of the notification.
 		 * @param text String to be displayed as part of the notification.
-		 * @return \< 0 on error or if the syscall is not available on the 
+		 * @return \< 0 on error or if the syscall is not available on the
 		 * current platform.
 		 */
 		int maNotificationAdd(
-			in int type, 
-			in int id, 
-			in MAString title, 
+			in int type,
+			in int id,
+			in MAString title,
 			in MAString text);
 
 		/**
@@ -5486,7 +5825,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		int maNotificationRemove(in int id);
 
 		constset int NOTIFICATION_TYPE_ {
-			/// A persistent notification that will launch the 
+			/// A persistent notification that will launch the
 			/// application when selected.
 			APPLICATION_LAUNCHER = 1;
 		}
@@ -5494,7 +5833,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		/**
 		 * Set the screen orientation.
 		 * Currently implemented only on Android.
-		 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE 
+		 * @param orientation One of the \link #SCREEN_ORIENTATION_LANDSCAPE
 		 * #SCREEN_ORIENTATION_PORTRAIT #SCREEN_ORIENTATION_DYNAMIC \endlink
 		 * constants.
 		 * @return \< 0 on error.
@@ -5517,7 +5856,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		 * @return \< 0 on error.
 		 */
 		int maScreenSetFullscreen(in int fullscreen);
-		
+
 		/**
 		 * Turn on sending of screen state events. Off by default.
 		 * Currently implemented only on Android.
@@ -5553,7 +5892,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		 */
 		void maMessageBox(in MAString title, in MAString message);
 	}
-	
+
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}
