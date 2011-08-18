@@ -3291,18 +3291,6 @@ group WidgetAPI "Widget API" {
 		WEB_VIEW_HOOK_INVOKED = 12;
 
 		/**
-		 * @brief Sent when the progress level has been changed.
-		 * This includes changes that were initiated by the user through a touch gesture,
-         * or arrow key/trackball as well as changes that were initiated programmatically.
-		 */
-	    SLIDER_VALUE_CHANGED = 11;
-
-		/**
-		 * @brief Sent when the user changes\d the date in a Date Picker.
-		 */
-		DATE_PICKER_VALUE_CHANGED = 12;
-
-		/**
 		 * @brief Sent when the user changes\d the time in a Time Picker.
 		 */
 		TIME_PICKER_VALUE_CHANGED = 13;
@@ -3342,6 +3330,18 @@ group WidgetAPI "Widget API" {
          * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
          */
          EDIT_BOX_RETURN = 19;
+
+		/**
+		 * @brief Sent when the progress level has been changed.
+		 * This includes changes that were initiated by the user through a touch gesture,
+         * or arrow key/trackball as well as changes that were initiated programmatically.
+		 */
+	    SLIDER_VALUE_CHANGED = 20;
+
+		/**
+		 * @brief Sent when the user changes\d the date in a Date Picker.
+		 */
+		DATE_PICKER_VALUE_CHANGED = 21;
 
 	}
 
@@ -3716,7 +3716,7 @@ group WidgetAPI "Widget API" {
 		 * @brief A Time Picker is a widget for selecting time of day, in 24 hour mode.
 		 * The hour and each minute digit can be controlled by vertical spinners.
 		 * The hour can be entered by keyboard input.
-		 *
+		 * Availabe only on iOS for the moment.
 		 * See \ref WidgetTimePickerProperties "Time Picker properties" for the properties available.
 		 */
 		TIME_PICKER = "TimePicker";
@@ -4002,45 +4002,25 @@ group WidgetAPI "Widget API" {
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
 
 		/**
-
 		* @brief Specifies whether the navigation bar should be shown.
-
 		*
-
 		* This can have different behaviors on different platforms, on iPhone it is enabled by default, but on Android the
-
 		* user can set it to be shown, because this is not native behavior on Android.
-
 		* When it set this to true, a nav bar is associated to all screens of this stack screen, and there is
-
 		* no need to add it as a child to this widget.
-
 		* When it is set to false, the nav bar is removed from all containing screens of the stack.
-
 		* NOTE: remember to add main layouts for the screens, because those will be the parents of the navigation bars.
-
 		*
-
 		* @validvalue A boolean string 'true' or 'false'.
-
 		*
-
 		* @setandget
-
 		*
-
 		* @par Example
-
 		* \code
-
 		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_NAV_BAR_ENABLED, "true");
-
 		*   // Now a replica of the Nav Bar of iOS is shown on Android.
-
 		*   // And it handles the back button behaviour.
-
 		* \endcode
-
 		*/
 
 		NAV_BAR_ENABLED = "NavBarEnabled";
