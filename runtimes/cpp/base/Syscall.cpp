@@ -210,7 +210,10 @@ namespace Base {
 					MemStream b(size);
 					TEST(file.readFully(b));
 #ifndef _android
-					ROOM(resources.dadd_RT_IMAGE(rI, loadImage(b)));
+                    RT_IMAGE_Type* image = loadImage(b);
+                    if(!image)
+                        BIG_PHAT_ERROR(ERR_IMAGE_LOAD_FAILED);
+					ROOM(resources.dadd_RT_IMAGE(rI, image));
 #else
 					ROOM(resources.dadd_RT_IMAGE(rI, NULL));
 					int pos;

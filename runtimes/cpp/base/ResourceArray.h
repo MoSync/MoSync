@@ -62,6 +62,9 @@ namespace Base {
 #define DECLARE_SIZEFUNCS(R, T, D) uint size_##R(T*);
 		TYPES(DECLARE_SIZEFUNCS);
 #endif
+    
+#define DECLARE_RESOURCE_TYPES(R, T, D) typedef T R##_Type;
+    TYPES(DECLARE_RESOURCE_TYPES);
 
 #define ROOM(func) if((func) == RES_OUT_OF_MEMORY) { BIG_PHAT_ERROR(ERR_RES_OOM); }
 

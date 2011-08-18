@@ -3022,6 +3022,10 @@ public class MoSyncThread extends Thread
         else
             return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;
 
+        if(mOpenGLView < 0) {
+            return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;            
+        }
+
         mOpenGLScreen = maWidgetCreate("Screen");
 		maWidgetSetProperty(mOpenGLView, "width", "-1");
 		maWidgetSetProperty(mOpenGLView, "height", "-1");

@@ -37,6 +37,7 @@
 - (id)initWithApi:(EAGLRenderingAPI)api {
 	view = [[[MoSyncGLView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) 
                                          andApi:api] retain]; // TODO: do have to do this (retain)??
+    if(view == nil) return nil;
 	return [super init];	    
 }
 

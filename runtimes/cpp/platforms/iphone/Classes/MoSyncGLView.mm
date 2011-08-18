@@ -59,7 +59,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
             return nil;
         }
         
-        /* Retina display support. This needs to be handled correctly for everything native ui...
+        /* Retina display support. This needs to be handled correctly for everything native ui... */
         int w, h;
         getScreenResolution(w, h);
         if (w == 640 && h == 960) // Retina display detected
@@ -68,7 +68,6 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
             self.contentScaleFactor = 2.0;
             eaglLayer.contentsScale=2; //new line   
         }  
-        */
             
         animationInterval = 1.0 / 60.0;
 			

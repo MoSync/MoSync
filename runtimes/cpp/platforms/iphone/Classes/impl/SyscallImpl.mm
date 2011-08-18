@@ -925,6 +925,10 @@ return 0; \
         else 
             return MA_GL_INIT_RES_UNAVAILABLE_API;
 
+        if(sOpenGLView < 0) {
+            return MA_GL_INIT_RES_UNAVAILABLE_API;            
+        }
+        
         sOpenGLScreen = maWidgetCreate("Screen");
 		maWidgetSetProperty(sOpenGLView, "width", "-1");
 		maWidgetSetProperty(sOpenGLView, "height", "-1");

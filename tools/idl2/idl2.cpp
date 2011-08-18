@@ -281,6 +281,23 @@ static bool isKeyInConstsets(const Interface& maapi, const string& str) {
 	return false;
 }
 
+static void outputJavascriptSyscallArg(ofstream& maapiFile, int i) {
+	if(i < 4) {
+		maapiFile << "this.regs[Reg.i" << i << "]";
+	} else {
+		maapiFile << "this.getStackValue(" << ((i-4)<<2) << ")";
+	}
+}
+
+static void outputJavascriptIoctlArg(ofstream& maapiFile, int i) {
+	if(i < 4) {
+		maapiFile << "i" << (i);
+	} else {
+		maapiFile << "this.getStackValue(" << ((i-4)<<2) << ")";
+	}
+}
+
+
 static void outputMaapiJavascript(const vector<string>& ixs, const Interface& maapi) {
 	ofstream maapiFile("Output/maapi.js");
 	
@@ -326,12 +343,16 @@ static void outputMaapiJavascript(const vector<string>& ixs, const Interface& ma
 			if(k != 0)
 				maapiFile << ", ";
 			if(a.type == "double") {
-				maapiFile << "this.regs[Reg.i" << i << "], ";
+				//maapiFile << "this.regs[Reg.i" << i << "], ";
+				outputJavascriptSyscallArg(maapiFile, i);
+				maapiFile << ", ";
 				i++;
-				maapiFile << "this.regs[Reg.i" << i << "] ";
+//				maapiFile << "this.regs[Reg.i" << i << "] ";
+				outputJavascriptSyscallArg(maapiFile, i);
 				i++;				
 			} else {
-				maapiFile << "this.regs[Reg.i" << i << "] ";
+				//maapiFile << "this.regs[Reg.i" << i << "] ";
+				outputJavascriptSyscallArg(maapiFile, i);
 				i++;
 			}
 		}
@@ -367,12 +388,16 @@ static void outputMaapiJavascript(const vector<string>& ixs, const Interface& ma
 				if(k != 0)
 					maapiFile << ", ";
 				if(a.type == "double") {
-					maapiFile << "i" << l << ", ";
+//					maapiFile << "i" << l << ", ";
+					outputJavascriptIoctlArg(maapiFile, l);
+					maapiFile << ", ";
 					l++;
-					maapiFile << "i" << l << "";
+//					maapiFile << "i" << l << "";
+					outputJavascriptIoctlArg(maapiFile, l);
 					l++;				
 				} else {
-					maapiFile << "i" << l << "";
+//					maapiFile << "i" << l << "";
+					outputJavascriptIoctlArg(maapiFile, l);
 					l++;
 				}
 			}
