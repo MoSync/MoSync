@@ -39,6 +39,8 @@ int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char*
 
 int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value, int maxSize);
 
+int maWidgetPerformAction(MAWidgetHandle widget, const char *action, const char *param);
+
 int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle);
 
 int maWidgetInsertChild(MAWidgetHandle parentHandle, MAWidgetHandle childHandle, int index);

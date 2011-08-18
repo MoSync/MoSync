@@ -1603,7 +1603,21 @@ SYSCALL(longlong, maIOCtl(int function, int a, int b, int c)) {
 	maIOCtl_syscall_case(maFileListClose);
 
 #ifdef __SERIES60_3X__	//todo: s60v2 implementation
-	maIOCtl_IX_PIM_caselist;
+	maIOCtl_maPimListOpen_case(maPimListOpen);
+	maIOCtl_maPimListNext_case(maPimListNext);
+	maIOCtl_maPimListClose_case(maPimListClose);
+	maIOCtl_maPimItemCount_case(maPimItemCount);
+	maIOCtl_maPimItemGetField_case(maPimItemGetField);
+	maIOCtl_maPimItemFieldCount_case(maPimItemFieldCount);
+	maIOCtl_maPimItemGetAttributes_case(maPimItemGetAttributes);
+	maIOCtl_maPimFieldType_case(maPimFieldType);
+	maIOCtl_maPimItemGetValue_case(maPimItemGetValue);
+	maIOCtl_maPimItemSetValue_case(maPimItemSetValue);
+	maIOCtl_maPimItemAddValue_case(maPimItemAddValue);
+	maIOCtl_maPimItemRemoveValue_case(maPimItemRemoveValue);
+	maIOCtl_maPimItemClose_case(maPimItemClose);
+	maIOCtl_maPimItemCreate_case(maPimItemCreate);
+	maIOCtl_maPimItemRemove_case(maPimItemRemove) ;
 #endif	//__SERIES60_3X__
 
 #ifdef TELEPHONY

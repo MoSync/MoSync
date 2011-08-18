@@ -27,13 +27,16 @@ import android.test.IsolatedContext;
 import android.util.Log;
 import android.view.View;
 
+import com.mosync.internal.android.MoSyncCameraController;
 import com.mosync.internal.android.MoSyncHelpers;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
+import com.mosync.nativeui.ui.factories.CameraPreviewFactory;
 import com.mosync.nativeui.ui.factories.ViewFactory;
+import com.mosync.nativeui.ui.widgets.CameraPreviewWidget;
 import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
@@ -58,6 +61,7 @@ public class NativeUI
 	 */
 	private Activity m_activity;
 	
+	public MoSyncThread mMoSyncThread;
 	/**
 	 * A table that contains a mapping between a handle and a widget, in a
 	 * mosync program a handle is the only reference to a widget.
@@ -147,7 +151,7 @@ public class NativeUI
 	 * Internal function for the maWidgetCreate system call.
 	 * It uses the ViewFactory to create a widget of the
 	 * given type, puts it in the handle table and returns it.
-	 * 
+	 *
 	 * Note: Should only be called on the UI thread.
 	 */
 	public int maWidgetCreate(String type)
@@ -465,7 +469,14 @@ public class NativeUI
 			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
 		}
 	}
-	
+
+	/**
+	 * Internal function for the maWidgetGetProperty system call.
+	 * Gets a property on the given widget, by accessing it from
+	 * the widget table and calling its getProperty method.
+	 *
+	 * Note: Should only be called on the UI thread.
+	 */
 	public int maWidgetGetProperty(
 		int widgetHandle, 
 		String key, 
@@ -512,6 +523,7 @@ public class NativeUI
 		
 		return result.length( );
 	}
+
 	
 	/**
 	 * Called when the back button has been pressed.
@@ -544,4 +556,10 @@ public class NativeUI
 		 */
 		void rootViewReplaced(View newRoot);
 	}
+	
+	public Widget getCameraView(final int handle)
+	{
+		return m_widgetTable.get(handle);
+	}
+	
 }
