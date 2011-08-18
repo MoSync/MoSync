@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 Mobile Sorcery AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -29,8 +29,8 @@
 -(id) init
 {
     mValuesArray = [[NSMutableArray alloc] init];
-    mAttribute = -1;
-    mCustomLabel = [[NSString alloc] init];
+    mAttributeID = -1;
+    mLabel = [[NSString alloc] init];
     
     return [super init];
 }
@@ -58,9 +58,9 @@
  * Set field's attribute.
  * @param attribute The new field's attribute.
  */
--(void) setAttribute:(int) attribute
+-(void) setAttribute:(int) attributeID
 {
-    mAttribute = attribute;
+    mAttributeID = attributeID;
 }
 
 /**
@@ -69,39 +69,34 @@
  */
 -(int) getAttribute
 {
-    return mAttribute;
+    return mAttributeID;
 }
+
 /**
- * Set custom label value. 
- * @param customLabel The new custom label's value.
+ * Set the label value.
+ * @param label The new label's value.
  * @return MA_PIM_ERR_NONE is the label was set, or
  *         MA_PIM_ERR_CUSTOM_ATTRIBUTE if the attibute
  *         is not set to custom.
  */
--(int) setCustomLabel:(NSString*) customLabel
+-(int) setLabel:(NSString*) label
 {
-    mCustomLabel = customLabel;
+    if (nil != label)
+    {
+        [mLabel release];
+        mLabel = [NSString stringWithString:label];
+    }
     return MA_PIM_ERR_NONE;
-    
 }
 
 /**
- * Get custom label value.
- * @return A string containing the custom label value, or
- *         an empty string if the attribute is not set to custom.
+ * Get the label value.
+ * @return A string containing the label value, or
+ *         nil if the attribute is not set to custom.
  */
--(NSString*) getCustomLabel
+-(NSString*) getLabel
 {
-    return mCustomLabel;
-}
-
-/**
- * Get the string label.
- * @return A string associated with the attribute. 
- */ 
--(NSString*) getStringLabel
-{
-    return [[PimUtils sharedInstance] getStringFromAttribute:mAttribute];
+    return mLabel;
 }
 
 /**
@@ -109,7 +104,7 @@
  */
 - (void) dealloc {
     [mValuesArray release];
-    [mCustomLabel release];
+    [mLabel release];
     
     [super dealloc];
 }

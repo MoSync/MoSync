@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 Mobile Sorcery AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -29,7 +29,7 @@ static PimUtils *sharedInstance = nil;
 
 
 /**
- * Returns an instance to the shared singleton. 
+ * Returns an instance to the shared singleton.
  * @return The shared generator object.
  */
 +(PimUtils*) sharedInstance
@@ -145,13 +145,13 @@ static PimUtils *sharedInstance = nil;
     
     mIMAttributes = [[NSMutableDictionary alloc] init];
     [mIMAttributes setValue:homeLabel
-                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_HOME]];
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_IM_HOME]];
     [mIMAttributes setValue:workLabel
-                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_WORK]];
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_IM_WORK]];
     [mIMAttributes setValue:otherLabel
-                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_OTHER]];
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_IM_OTHER]];
     [mIMAttributes setValue:[NSString string]
-                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_CUSTOM]];
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_IM_CUSTOM]];
     
     mRelationAttributes = [[NSMutableDictionary alloc] init];
     [mRelationAttributes setValue:(NSString*)kABPersonMotherLabel
@@ -479,7 +479,6 @@ static PimUtils *sharedInstance = nil;
             break;
         case MA_PIM_FIELD_CONTACT_NAME:
             *type = MA_PIM_TYPE_STRING_ARRAY;
-            *singleValue = false;
             break;
         case MA_PIM_FIELD_CONTACT_NICKNAME:
             *type = MA_PIM_TYPE_STRING;

@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 Mobile Sorcery AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -21,12 +21,12 @@
 #import <Foundation/Foundation.h>
 
 @interface PimUtils: NSObject {
-    
+
     /**
-     * The current handle value. 
+     * The current handle value.
      */
     int mHandle;
-    
+
     NSMutableDictionary* mAddressAttributes;
     NSMutableDictionary* mEmailAttributes;
     NSMutableDictionary* mPhoneAttributes;
@@ -57,9 +57,9 @@
  *                     - the first element must be a 4-byte int that specifies
  *                       the number of strings that can be read.
  *                     - first null terminated string(UTF-16 encoding).
- *                     - second null terminated string(UTF-16 encoding). 
- *                     - etc 
- * @return An array containing the strings. 
+ *                     - second null terminated string(UTF-16 encoding).
+ *                     - etc
+ * @return An array containing the strings.
  */
 -(NSMutableArray*) getStringArray:(void*) address;
 
@@ -71,11 +71,11 @@
  *                     - the first element must be a 4-byte int that specifies
  *                       the number of strings that can be read.
  *                     - first null terminated string(UTF-16 encoding).
- *                     - second null terminated string(UTF-16 encoding). 
+ *                     - second null terminated string(UTF-16 encoding).
  *                     - etc
  * @param size  The maximum size(in bytes) that can be written at the given address.
  * @return The size(in bytes) of the strings. If the size of the strings is greater than
- *         the maximum size(the size parameter) then the strings were not written. 
+ *         the maximum size(the size parameter) then the strings were not written.
  */
 -(int) writeStringArray:(NSMutableArray*) array
                atAddress:(void*) address
@@ -105,7 +105,7 @@
 /**
  * Gets a date from a given address.
  * @param address The specified address.
- *                The address must contain a 4-byte int representing the number of 
+ *                The address must contain a 4-byte int representing the number of
  *                seconds elapsed since January 1 1970(Unix time).
  * @return An array containing the date. 
  */
@@ -115,7 +115,7 @@
  * Writes a date to a given address.
  * @param date The given date.
  * @param address The specified address.
- *                The address will contain a 4-byte int representing the number of 
+ *                The address will contain a 4-byte int representing the number of
  *                seconds elapsed since January 1 1970(Unix time).
  * @param size The maximum size(in bytes) that can be written at the given address.
  * @return The size(in bytes) of the date. If the size of the date is greater than

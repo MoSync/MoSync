@@ -128,15 +128,15 @@
 -(int) addValue:(NSMutableArray*) value
   withAttribute:(const int) attribute;
 
-///**
-// * Add a value and attribute.
-// * @param value The value.
-// * @param attribute The specified string attribute.
-// * @return The new value's index, or one of MA_PIM_ERR constants in
-// *         case of error.
-// */
-//-(int) addValue:(NSMutableArray*) value
-//withStringAttribute:(NSString*) attribute;
+/**
+ * Add a value and attribute.
+ * @param value The value.
+ * @param attribute The specified string attribute.
+ * @return The new value's index, or one of MA_PIM_ERR constants in
+ *         case of error.
+ */
+-(int) addValue:(NSMutableArray*) value
+withLabel:(NSString*) label;
 
 /**
  * Remove the value at a specified index.
@@ -154,9 +154,22 @@
 
 /**
  * Checks if an specified attribute is valid.
- * @param attribute The given attribute.
+ * @param attributeID The given attribute.
  * @return True if the attribute is valid, false otherwise.
  */
--(bool) isAttributeValid:(const int) attribute;
+-(bool) isAttributeValid:(const int) attributeID;
+
+/**
+ * Gets the string value for an attribute.
+ * @param The given attribute id.
+ */
+-(NSString*) getStringAttribute:(const int) attributeID;
+
+/**
+ * Gets the attribute id from a specifed label value.
+ * @param label The given label.
+ * @return The attribute id.
+ */
+-(int) getAttributeFromLabel:(NSString*) label;
 
 @end

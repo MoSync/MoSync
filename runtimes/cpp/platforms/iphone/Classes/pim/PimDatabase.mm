@@ -87,7 +87,7 @@
 -(int) pimListClose:(MAHandle) list
 {
     MAHandle returnedValue;
-    
+
     if (MA_PIM_CONTACTS == list)
     {
         returnedValue = [self closeList:mContactsList];
@@ -100,7 +100,7 @@
     {
         returnedValue = MA_PIM_ERR_UNAVAILABLE_LIST;
     }
-    
+
     return returnedValue;
 }
 
@@ -145,7 +145,7 @@
 
 -(MAHandle) createItem:(MAHandle) list
 {
-    if (list == MA_PIM_CONTACTS) 
+    if (list == MA_PIM_CONTACTS)
     {
         return [mContactsList createItem];   
     }

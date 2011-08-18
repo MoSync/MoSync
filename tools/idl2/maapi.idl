@@ -2877,7 +2877,6 @@ interface MAAPI {
 			PHONETIC_GIVEN = 7;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic middle name.
 			PHONETIC_OTHER = 8;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Nickname
 		}
 
 		constset int MA_PIM_CONTACT_ORGANIZATION_ {

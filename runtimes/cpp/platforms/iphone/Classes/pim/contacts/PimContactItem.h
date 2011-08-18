@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 Mobile Sorcery AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -26,9 +26,9 @@
 #include "helpers/cpp_ix_pim.h"
 
 @interface PimContactItem: PimItem {
-    
+
     /**
-     * Stores the contact's data. 
+     * Stores the contact's data.
      */
     ABRecordRef mRecord;
 }
@@ -166,6 +166,71 @@
 -(int) setDataToRecord:(CFTypeRef) value
             propertyID:(ABPropertyID) property
            checkLength:(bool) verify;
+
+/**
+ * Reads the contact name field from the record.
+ */
+-(void) readContactNameField;
+
+/**
+ * Reads the address field from the record.
+ */
+-(void) readAddressField;
+
+/**
+ * Reads the birthday field from the record.
+ */
+-(void) readBirthdayField;
+
+/**
+ * Reads the email field from the record.
+ */
+-(void) readEmailField;
+
+/**
+ * Reads the nickname field from the record.
+ */
+-(void) readNicknameField;
+
+/**
+ * Reads the note field from the record.
+ */
+-(void) readNoteField;
+
+/**
+ * Reads the organization field from the record.
+ */
+-(void) readOrganizationField;
+
+/**
+ * Reads the phone field from the record.
+ */
+-(void) readPhoneField;
+
+/**
+ * Reads the job title field from the record.
+ */
+-(void) readTitleField;
+
+/**
+ * Reads the URL field from the record.
+ */
+-(void) readURLField;
+
+/**
+ * Reads the organization info field from the record.
+ */
+-(void) readOrgInfoField;
+
+/**
+ * Reads the revision field from the record.
+ */
+-(void) readRevisionField;
+
+/**
+ * Reads the instant message field from the record.
+ */
+-(void) readIMField;
 
 /**
  * Gets the instant message protocol associeted with a string constant.

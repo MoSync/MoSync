@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 Mobile Sorcery AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -27,14 +27,14 @@
 /**
  * An emulated abstract class for pim list.
  * Objectiv C does not offer the possibility to create an abstract class
- * so this is an usual class, but each method(except init and dealloc) 
+ * so this is an usual class, but each method(except init and dealloc)
  * raises an exception.
  * DO NOT USE THIS CLASS TO CREATE OBJECTS. Instead use classes that are
  * derived from this class(e.g. PimContactsList).
  * This class only defines the behavior for each pim list class.
  */
 @interface PimList :  NSObject {
-    
+
 }
 
 /**
@@ -49,7 +49,7 @@
 
 /**
  * Gets a handle to the next item in list.
- * @return A handle to the next item in list, or 0 if the are no more items, 
+ * @return A handle to the next item in list, or 0 if the are no more items,
  *         or one of the MA_PIM_ERR constants in case of error. 
  */
 -(MAHandle) getNextItem;

@@ -1078,7 +1078,7 @@ void MoSyncErrorExit(int errorCode)
 		}
 	}
 #endif
-	
+
 	gRunning = false;
 	logWithNSLog(buffer, strlen(buffer));
 	MoSync_ShowMessageBox(nil, buffer, true);	
