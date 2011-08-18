@@ -39,11 +39,11 @@ public class EventQueue
 	 * @param widgetEventType The type of the widget event.
 	 * @param widgetHandle The handle of the widget.
 	 * @param auxParam1 Parameter used by some (used by some
-	 *  messages for parameters like messageDataHandle, listItemIndex,
-	 *  searchBarButton, etc. See struct MAWidgetEventData for
-	 *  documentation of these fields.
+	 * messages for parameters like messageDataHandle, listItemIndex,
+	 * searchBarButton, etc. See struct MAWidgetEventData for
+	 * documentation of these fields.
 	 * @param auxParam2 Parameter used by some messages.
-	 *  Set to zero if not used.
+	 * Set to zero if not used.
 	 */
 	public void postWidgetEvent(
 		int widgetEventType,
@@ -73,7 +73,7 @@ public class EventQueue
 	{
 		postWidgetEvent(widgetEventType, widgetHandle, 0, 0);
 	}
-	
+
 	/**
 	 * Posts a widget clicked event.
 	 * 
@@ -88,7 +88,7 @@ public class EventQueue
 			checked ? 1 : 0,
 			0);
 	}
-	
+
 	/**
 	 * Posts an event that describes which item in a list that was clicked.
 	 * 
@@ -103,7 +103,7 @@ public class EventQueue
 			position,
 			0);
 	}
-	
+
 	/**
 	 * Sends a tab changed event from the given tabScreen.
 	 * 

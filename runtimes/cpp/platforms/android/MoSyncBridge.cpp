@@ -355,18 +355,25 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 *               dynamically allocated data)
 		 * intARray[4] - Size of the message.
 		 *
-		 * WIDGET_EVENT_CLICKED
+		 * MAW_EVENT_CLICKED
 		 * intArray[3] - Can be used to determine a checkbox or toggle button that was clicked.
 		 *
-		 * WIDGET_EVENT_ITEM_CLICKED
+		 * MAW_EVENT_ITEM_CLICKED
 		 * intArray[3] - The index of the list item that was clicked.
 		 *
-		 * WIDGET_EVENT_TAB_CHANGED
+		 * MAW_EVENT_TAB_CHANGED
 		 * intArray[3] - The index of the new tab.
 		 *
-		 * WIDGET_EVENT_STACK_SCREEN_POPPED
+		 * MAW_EVENT_STACK_SCREEN_POPPED
 		 * intArray[3] - Handle to the screen that was popped.
 		 * intArray[4] - Handle to the screen that we popped to.
+		 *
+		 * MAW_EVENT_WEB_VIEW_CONTENT_LOADING
+		 * intArray[3] - Page loading status.
+		 *
+		 * MAW_EVENT_WEB_VIEW_HOOK_INVOKED
+		 * intArray[3] - Hook type.
+		 * intArray[4] - Handle to url data.
 		 *
 		 * WIDGET_EVENT_SLIDER_VALUE_CHANGED
 		 * intArray[3] - The slider value.

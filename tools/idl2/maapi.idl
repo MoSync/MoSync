@@ -4031,7 +4031,7 @@ group WidgetAPI "Widget API" {
 		 * @brief A Time Picker is a widget for selecting time of day, in 24 hour mode.
 		 * The hour and each minute digit can be controlled by vertical spinners.
 		 * The hour can be entered by keyboard input.
-		 *
+		 * Availabe only on iOS for the moment.
 		 * See \ref WidgetTimePickerProperties "Time Picker properties" for the properties available.
 		 */
 		TIME_PICKER = "TimePicker";
@@ -4318,45 +4318,25 @@ group WidgetAPI "Widget API" {
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
 
 		/**
-
 		* @brief Specifies whether the navigation bar should be shown.
-
 		*
-
 		* This can have different behaviors on different platforms, on iPhone it is enabled by default, but on Android the
-
 		* user can set it to be shown, because this is not native behavior on Android.
-
 		* When it set this to true, a nav bar is associated to all screens of this stack screen, and there is
-
 		* no need to add it as a child to this widget.
-
 		* When it is set to false, the nav bar is removed from all containing screens of the stack.
-
 		* NOTE: remember to add main layouts for the screens, because those will be the parents of the navigation bars.
-
 		*
-
 		* @validvalue A boolean string 'true' or 'false'.
-
 		*
-
 		* @setandget
-
 		*
-
 		* @par Example
-
 		* \code
-
 		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_NAV_BAR_ENABLED, "true");
-
 		*   // Now a replica of the Nav Bar of iOS is shown on Android.
-
 		*   // And it handles the back button behaviour.
-
 		* \endcode
-
 		*/
 
 		NAV_BAR_ENABLED = "NavBarEnabled";
@@ -5908,7 +5888,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	* - #MAW_RES_OK if the property could be set.
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
-	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.  
+	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
 	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
 	* - #MAW_RES_ERROR otherwise.
 	*/
@@ -5926,7 +5906,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
-	* - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small. 
+	* - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
 	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
 	* - #MAW_RES_ERROR otherwise.
 	*/
