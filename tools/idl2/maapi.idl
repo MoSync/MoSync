@@ -1325,14 +1325,14 @@ interface MAAPI {
 		* The field status contains one of the
 		* This event is sent on Android and iOS.
 		*/
-		SMS = 31;
+		SMS = 32;
 
 		/**
 		* \brief Provides data from active sensors.
 		* \see MAEvent::sensor
 		* \see maSensorStart()
 		*/
-		SENSOR = 32;
+		SENSOR = 33;
 	}
 
 	/**
@@ -3631,7 +3631,7 @@ group WidgetAPI "Widget API" {
 		*   #MAW_CONSTANT_STOPPED
 		*   #MAW_CONSTANT_ERROR
 		*/
-		WEB_VIEW_CONTENT_LOADING = 11;
+		WEB_VIEW_CONTENT_LOADING = 20;
 
 		/**
 		* @brief A web view hook has captured a url.
@@ -3655,7 +3655,7 @@ group WidgetAPI "Widget API" {
 		* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
 		* and/or #MAW_WEB_VIEW_HARD_HOOK.
 		*/
-		WEB_VIEW_HOOK_INVOKED = 12;
+		WEB_VIEW_HOOK_INVOKED = 21;
 	}
 
 	} // end of WidgetEventTypes
