@@ -19,6 +19,7 @@ import android.provider.ContactsContract.CommonDataKinds.Relation;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.CommonDataKinds.Website;
+import android.provider.SyncStateContract.Columns;
 
 public class PIMField
 {
@@ -45,6 +46,15 @@ public class PIMField
 	final static int MA_PIM_FIELD_CONTACT_IM = 119;
 	final static int MA_PIM_FIELD_CONTACT_RELATION = 120;
 	final static int MA_PIM_FIELD_CONTACT_ORG_INFO = 121;
+
+	// field data types
+	private final static int MA_PIM_TYPE_INVALID = -1;
+	private final static int MA_PIM_TYPE_BINARY = 0;
+	private final static int MA_PIM_TYPE_BOOLEAN = 1;
+	private final static int MA_PIM_TYPE_DATE = 2;
+	private final static int MA_PIM_TYPE_INT = 3;
+	private final static int MA_PIM_TYPE_STRING = 4;
+	private final static int MA_PIM_TYPE_STRING_ARRAY = 5;
 
 	//address field attributes
 	final static int MA_PIM_ATTR_ADDR_HOME = 101;
@@ -272,7 +282,7 @@ public class PIMField
 		return null;
 	}
 
-	String getFieldValue(String[] names, String[] infos, String column, String value)
+	String setFieldValue(String[] names, String[] infos, String column, String value)
 	{
 		for (int i=0; i<names.length; i++)
 		{
@@ -576,6 +586,10 @@ public class PIMField
 				if ( getFieldIntValue(names, infos, Email.TYPE) == Email.TYPE_CUSTOM )
 					ret = getFieldValue(names, infos, Email.LABEL);
 				break;
+			case MA_PIM_FIELD_CONTACT_BIRTHDAY:
+				if ( getFieldIntValue(names, infos, Event.TYPE) == Event.TYPE_CUSTOM )
+					ret = getFieldValue(names, infos, Event.LABEL);
+				break;
 			case MA_PIM_FIELD_CONTACT_ORG:
 			case MA_PIM_FIELD_CONTACT_TITLE:
 			case MA_PIM_FIELD_CONTACT_ORG_INFO:
@@ -613,35 +627,142 @@ public class PIMField
 		{
 			case MA_PIM_FIELD_CONTACT_ADDR:
 			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
-				//if ( getFieldIntValue(names, infos, StructuredPostal.TYPE) == StructuredPostal.TYPE_CUSTOM )
-					//setFieldValue(names, infos, StructuredPostal.LABEL, label);
+				if ( getFieldIntValue(names, infos, StructuredPostal.TYPE) == StructuredPostal.TYPE_CUSTOM )
+					setFieldValue(names, infos, StructuredPostal.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_EMAIL:
 				if ( getFieldIntValue(names, infos, Email.TYPE) == Email.TYPE_CUSTOM )
-					ret = getFieldValue(names, infos, Email.LABEL);
+					setFieldValue(names, infos, Email.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG:
 			case MA_PIM_FIELD_CONTACT_TITLE:
 			case MA_PIM_FIELD_CONTACT_ORG_INFO:
 				if ( getFieldIntValue(names, infos, Organization.TYPE) == Organization.TYPE_CUSTOM )
-					ret = getFieldValue(names, infos, Organization.LABEL);
+					setFieldValue(names, infos, Organization.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_TEL:
 				if ( getFieldIntValue(names, infos, Phone.TYPE) == Phone.TYPE_CUSTOM )
-					ret = getFieldValue(names, infos, Phone.LABEL);
+					setFieldValue(names, infos, Phone.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_URL:
 				if ( getFieldIntValue(names, infos, Website.TYPE) == Website.TYPE_CUSTOM )
-					ret = getFieldValue(names, infos, Website.LABEL);
+					setFieldValue(names, infos, Website.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_IM:
 				if ( getFieldIntValue(names, infos, Im.TYPE) == Im.TYPE_CUSTOM )
-					ret = getFieldValue(names, infos, Im.LABEL);
+					setFieldValue(names, infos, Im.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_RELATION:
 				if ( getFieldIntValue(names, infos, Relation.TYPE) == Relation.TYPE_CUSTOM )
-					ret = getFieldValue(names, infos, Relation.LABEL);
+					setFieldValue(names, infos, Relation.LABEL, label);
 				break;
+		}
+
+		return ret;
+	}
+
+	static int getDataType(int fieldType)
+	{
+		switch (fieldType)
+		{
+			case MA_PIM_FIELD_CONTACT_ADDR:
+				return MA_PIM_TYPE_STRING_ARRAY;
+			case MA_PIM_FIELD_CONTACT_BIRTHDAY:
+				return MA_PIM_TYPE_DATE;
+			case MA_PIM_FIELD_CONTACT_CLASS:
+				return MA_PIM_TYPE_INT;
+			case MA_PIM_FIELD_CONTACT_EMAIL:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_FORMATTED_NAME:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_NAME:
+				return MA_PIM_TYPE_STRING_ARRAY;
+			case MA_PIM_FIELD_CONTACT_NICKNAME:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_NOTE:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_ORG:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_PHOTO:
+				return MA_PIM_TYPE_BINARY;
+			case MA_PIM_FIELD_CONTACT_PHOTO_URL:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_PUBLIC_KEY:
+				return MA_PIM_TYPE_BINARY;
+			case MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_REVISION:
+				return MA_PIM_TYPE_DATE;
+			case MA_PIM_FIELD_CONTACT_TEL:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_TITLE:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_UID:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_URL:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_IM:
+				return MA_PIM_TYPE_STRING_ARRAY;
+			case MA_PIM_FIELD_CONTACT_RELATION:
+				return MA_PIM_TYPE_STRING;
+			case MA_PIM_FIELD_CONTACT_ORG_INFO:
+				return MA_PIM_TYPE_STRING_ARRAY;
+			default:
+				return MA_PIM_TYPE_INVALID;
+		}
+	}
+
+	String getData(int index)
+	{
+		String ret = "";
+		String[] names = mStrNames.get(index);
+		String[] infos = mStrInfos.get(index);
+
+		switch ( getMoSyncType() )
+		{
+			case MA_PIM_FIELD_CONTACT_ADDR:
+			case MA_PIM_FIELD_CONTACT_BIRTHDAY:
+			case MA_PIM_FIELD_CONTACT_EMAIL:
+			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
+			case MA_PIM_FIELD_CONTACT_ORG:
+			case MA_PIM_FIELD_CONTACT_TEL:
+			case MA_PIM_FIELD_CONTACT_TITLE:
+			case MA_PIM_FIELD_CONTACT_URL:
+			case MA_PIM_FIELD_CONTACT_IM:
+			case MA_PIM_FIELD_CONTACT_RELATION:
+			case MA_PIM_FIELD_CONTACT_ORG_INFO:
+				for (int i=0; i<names.length - 3; i++)
+				{
+					if ( (infos[i] != null) && (names[i] != PIM.DUMMY) )
+					{
+						ret += infos[i] + 0;
+					}
+					ret += 0;
+				}
+				break;
+			case MA_PIM_FIELD_CONTACT_NAME:
+			case MA_PIM_FIELD_CONTACT_NICKNAME:
+			case MA_PIM_FIELD_CONTACT_NOTE:
+			case MA_PIM_FIELD_CONTACT_PHOTO:
+			case MA_PIM_FIELD_CONTACT_UID:
+				for (int i=0; i<names.length - 1; i++)
+				{
+					if ( (infos[i] != null) && (names[i] != PIM.DUMMY) )
+					{
+						ret += infos[i] + 0;
+					}
+					ret += 0;
+				}
+				break;
+//			case MA_PIM_FIELD_CONTACT_CLASS:
+//			case MA_PIM_FIELD_CONTACT_FORMATTED_NAME:
+//			case MA_PIM_FIELD_CONTACT_PHOTO_URL:
+//			case MA_PIM_FIELD_CONTACT_PUBLIC_KEY:
+//			case MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING:
+//			case MA_PIM_FIELD_CONTACT_REVISION:
+//				break;
 		}
 
 		return ret;

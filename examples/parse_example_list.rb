@@ -1,4 +1,5 @@
-##
+#!/usr/bin/ruby
+
 # 
 # parses the examples list uses by eclipse to provide unique processing of examples
 #

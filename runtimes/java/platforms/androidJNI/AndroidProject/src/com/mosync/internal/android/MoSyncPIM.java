@@ -85,14 +85,12 @@ class MoSyncPIM
 
 	int maPimFieldType(int list, int field)
 	{
-		return 0;
-		//return mPIM.maPimFieldType(list, field);
+		return mPIM.maPimFieldType(list, field);
 	}
 
 	int maPimItemGetValue(int item, int field, int buffPointer, int buffSize, int index)
 	{
-		return 0;
-		//return mPIM.maPimItemGetValue(item, field, buffPointer, buffSize, index);
+		return mPIM.maPimItemGetValue(item, field, buffPointer, buffSize, index);
 	}
 
 	int maPimItemSetValue(int item, int field, int buffPointer, int buffSize, int index, int attributes)

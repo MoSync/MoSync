@@ -13,7 +13,7 @@
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  02111-1307, USA.
- */
+*/
 
 #define methodNotImplemented() @throw [NSException exceptionWithName:NSInvalidArgumentException reason:[NSString stringWithFormat:   @"%@ method must be overriden in a subclass", NSStringFromSelector(_cmd)] userInfo:nil]
 
@@ -37,7 +37,7 @@
 }
 
 /**
- * Returns an instance to the shared singleton. 
+ * Returns an instance to the shared singleton.
  * @return The shared generator object.
  */
 +(PimUtils *) sharedInstance;
@@ -85,7 +85,7 @@
  * Get a string from a given address.
  * @param address The specified address.
  *                The address must contain a null terminated string(UTF-16 encoding).
- * @return An array containing the string. 
+ * @return An array containing the string.
  */
 -(NSMutableArray*) getString:(void*) address;
 
@@ -96,7 +96,7 @@
  * @param value The given string.
  * @param address The specified address.
  *                The address will contain a null terminated string(UTF-16 encoding).
- * @return The string's size(in bytes). 
+ * @return The string's size(in bytes).
  */
 -(int) writeString:(NSString*) value
          atAddress:(void*) address
@@ -107,7 +107,7 @@
  * @param address The specified address.
  *                The address must contain a 4-byte int representing the number of
  *                seconds elapsed since January 1 1970(Unix time).
- * @return An array containing the date. 
+ * @return An array containing the date.
  */
 -(NSMutableArray*) getDate:(void*) address;
 
@@ -119,7 +119,7 @@
  *                seconds elapsed since January 1 1970(Unix time).
  * @param size The maximum size(in bytes) that can be written at the given address.
  * @return The size(in bytes) of the date. If the size of the date is greater than
- *         the maximum size(the size parameter) the date was not written. 
+ *         the maximum size(the size parameter) the date was not written.
  */
 -(int) writeDate:(NSDate*) date
         atAddress:(void*) address
@@ -129,7 +129,7 @@
  * Gets the bytes from a given address.
  * @param address The specified address.
  * @param size The size that can be read from the memory address.
- * @return An array containing the pixels. 
+ * @return An array containing the pixels.
  */
 -(NSMutableArray*) getBytes:(void*) address
                        size:(const int) size;
@@ -144,12 +144,12 @@
                   string:(NSString*) value;
 
 /**
- * Gets field structure(the type, if it can contain only one value and the allowed 
+ * Gets field structure(the type, if it can contain only one value and the allowed
  * attributes for this field) for a specified field ID.
  * @param fieldId The given field ID(one of MA_PIM_FIELD_CONTACT constants).
  * @param type Will contain the field type (one of MA_PIM_TYPE constants).
  * @param singleValue Will be set to true if the field can contain only one value.
- * @return MA_PIM_ERR_NONE if the field is supported, or 
+ * @return MA_PIM_ERR_NONE if the field is supported, or
  *         MA_PIM_ERR_FIELD_UNSUPPORTED in case the field is not supported.
  */
 -(int) fieldStructure:(const int) fieldID
@@ -162,8 +162,8 @@
  * @return An dictionary that contains:
  *         - keys An string array with all the attributes(e.g. MA_PIM_ATTR_ADDR_HOME).
  *         - values An string array with all the strings associedted with attributes.
- *         Do not release the returned object. 
- *         If the field is not supported or it does not allow attributes an empty 
+ *         Do not release the returned object.
+ *         If the field is not supported or it does not allow attributes an empty
  *         dictionary will be returned.
  */
 -(NSMutableDictionary*) getAttributesForFieldId:(const int) fieldID;

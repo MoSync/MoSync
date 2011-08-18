@@ -1,19 +1,19 @@
 /* Copyright (C) 2011 Mobile Sorcery AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  02111-1307, USA.
- */
+*/
 
 
 #import "PimFieldItem.h"
@@ -27,22 +27,22 @@
 /**
  * Init function.
  * @param fieldID Must be one of MA_PIM_FIELD_CONTACT constants.
- * If the fieldID param is invalid or not supported on this platform, 
+ * If the fieldID param is invalid or not supported on this platform,
  * the functions return nil.
  */
 -(id) initWithFieldID:(int) fieldID
 {
-    mFieldConstant = fieldID;
-    int result = [[PimUtils sharedInstance] fieldStructure:mFieldConstant 
-                                                   setType:&mFieldType
-                                          setIsSingleValue:&mIsSingleFieldValue];
-    if (result == MA_PIM_ERR_FIELD_UNSUPPORTED)
-    {
-        return nil;
-    }
-    
-    mFieldValuesArray = [[NSMutableArray alloc] init];
-    return [super init];
+	mFieldConstant = fieldID;
+	int result = [[PimUtils sharedInstance] fieldStructure:mFieldConstant
+		setType:&mFieldType
+		setIsSingleValue:&mIsSingleFieldValue];
+	if (result == MA_PIM_ERR_FIELD_UNSUPPORTED)
+	{
+		return nil;
+	}
+
+	mFieldValuesArray = [[NSMutableArray alloc] init];
+	return [super init];
 }
 
 /**
@@ -51,7 +51,7 @@
  */
 -(int) getFieldConstant
 {
-    return mFieldConstant;
+	return mFieldConstant;
 }
 
 /**
@@ -60,7 +60,7 @@
  */
 -(int) getFieldType
 {
-    return mFieldType;
+	return mFieldType;
 }
 
 /**
@@ -69,23 +69,23 @@
  */
 -(int) count
 {
-    return [mFieldValuesArray count];
+	return [mFieldValuesArray count];
 }
 
 /**
  * Get the attribute of a specified value.
  * @param index The specified index value.
  * @return One of MA_PIM_ATTR constants, or MA_PIM_ERR_INVALID_INDEX
- *         if index param is not valid.
+ *		 if index param is not valid.
  */
 -(int) getAttribute:(int) index
 {
-    int fieldValuesCount = [mFieldValuesArray count];
-    if (0 > index || index <= fieldValuesCount) {
-        return MA_PIM_ERR_INVALID_INDEX;
-    }
-    
-    return [[mFieldValuesArray objectAtIndex:index] getAttribute];
+	int fieldValuesCount = [mFieldValuesArray count];
+	if (0 > index || index <= fieldValuesCount) {
+		return MA_PIM_ERR_INVALID_INDEX;
+	}
+
+	return [[mFieldValuesArray objectAtIndex:index] getAttribute];
 }
 
 /**
@@ -95,14 +95,15 @@
  * @return One of MA_PIM_ERR constants.
  */
 -(int) setLabel:(NSString*) customLabel
-        atIndex:(int) index
+		atIndex:(int) index
 {
-    int fieldValuesCount = [mFieldValuesArray count];
-    if (0 > index || index <= fieldValuesCount) {
-        return MA_PIM_ERR_INVALID_INDEX;
-    }
-    
-    return [[mFieldValuesArray objectAtIndex:index] setLabel:customLabel];
+	int fieldValuesCount = [mFieldValuesArray count];
+	if (0 > index || index <= fieldValuesCount) {
+		return MA_PIM_ERR_INVALID_INDEX;
+	}
+
+	return [[mFieldValuesArray objectAtIndex:index] setLabel:customLabel];
+
 }
 
 /**
@@ -112,39 +113,39 @@
  * @return One of MA_PIM_ERR constants.
  */
 -(int) getLabel:(NSString*) value
-     indexValue:(const int) index
+	 indexValue:(const int) index
 {
-    int fieldValuesCount = [mFieldValuesArray count];
-    if (0 > index || index >= fieldValuesCount) {
-        return MA_PIM_ERR_INVALID_INDEX;
-    }
-    
-    // Check if the attribute is set to MA_PIM_ATTR_CUSTOM.
-    PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
-//    int attribute = [itemValue getAttribute];
-//    if (MA_PIM_ATTR_CUSTOM != attribute) 
-//    {
-//        return MA_PIM_ERR_NO_LABEL;
-//    }
-    
-    [value copy:[itemValue getLabel]];
-    return MA_PIM_ERR_NONE; 
+	int fieldValuesCount = [mFieldValuesArray count];
+	if (0 > index || index >= fieldValuesCount) {
+		return MA_PIM_ERR_INVALID_INDEX;
+	}
+
+	// Check if the attribute is set to MA_PIM_ATTR_CUSTOM.
+	PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
+//	int attribute = [itemValue getAttribute];
+//	if (MA_PIM_ATTR_CUSTOM != attribute)
+//	{
+//		return MA_PIM_ERR_NO_LABEL;
+//	}
+
+	[value copy:[itemValue getLabel]];
+	return MA_PIM_ERR_NONE;
 }
 
 /**
  * Gets the values at a specified index.
  * @param index The specified index.
  * @return An array containing the values, or nil if the index
- *         does not exist.
+ *		 does not exist.
  */
 -(NSMutableArray*) getValue:(const int) index
 {
-    int fieldValuesCount = [mFieldValuesArray count];
-    if (0 > index || index >= fieldValuesCount) {
-        return nil;
-    }
-    
-    return [[mFieldValuesArray objectAtIndex:index] getValue]; 
+	int fieldValuesCount = [mFieldValuesArray count];
+	if (0 > index || index >= fieldValuesCount) {
+		return nil;
+	}
+
+	return [[mFieldValuesArray objectAtIndex:index] getValue];
 }
 
 /**
@@ -155,18 +156,18 @@
  * @return One of MA_PIM_ERR constants.
  */
 -(int) setValue:(NSMutableArray*) value
-        atIndex:(int) index
+		atIndex:(int) index
   withAttribute:(int) attribute
 {
-    int fieldValuesCount = [mFieldValuesArray count];
-    if (0 > index || index <= fieldValuesCount) {
-        return MA_PIM_ERR_INVALID_INDEX;
-    }
-    
-    PimFieldItemValue* fieldValue = [mFieldValuesArray objectAtIndex:index];
-    [fieldValue setValue:value];
-    
-    return MA_PIM_ERR_NONE;
+	int fieldValuesCount = [mFieldValuesArray count];
+	if (0 > index || index <= fieldValuesCount) {
+		return MA_PIM_ERR_INVALID_INDEX;
+	}
+
+	PimFieldItemValue* fieldValue = [mFieldValuesArray objectAtIndex:index];
+	[fieldValue setValue:value];
+
+	return MA_PIM_ERR_NONE;
 }
 
 /**
@@ -174,7 +175,7 @@
  * @param value The value.
  * @param attribute The specified attribute.
  * @return The new value's index, or one of MA_PIM_ERR constants in
- *         case of error.
+ *		 case of error.
  */
 -(int) addValue:(NSMutableArray*) value
   withAttribute:(const int) attribute
@@ -232,14 +233,14 @@
  */
 -(int) removeValue:(int) index
 {
-    int fieldValuesCount = [mFieldValuesArray count];
-    if (0 > index || index <= fieldValuesCount) {
-        return MA_PIM_ERR_INVALID_INDEX;
-    }
-    
-    [mFieldValuesArray removeObjectAtIndex:index];
-    
-    return MA_PIM_ERR_NONE;
+	int fieldValuesCount = [mFieldValuesArray count];
+	if (0 > index || index <= fieldValuesCount) {
+		return MA_PIM_ERR_INVALID_INDEX;
+	}
+
+	[mFieldValuesArray removeObjectAtIndex:index];
+
+	return MA_PIM_ERR_NONE;
 }
 
 /**
@@ -249,12 +250,12 @@
  */
 -(PimFieldItemValue*) getItem:(int) index
 {
-    int fieldValuesCount = [mFieldValuesArray count];
-    if (0 > index || index <= fieldValuesCount) {
-        return [mFieldValuesArray objectAtIndex:index];;
-    }
-    
-    return nil;
+	int fieldValuesCount = [mFieldValuesArray count];
+	if (0 > index || index <= fieldValuesCount) {
+		return [mFieldValuesArray objectAtIndex:index];;
+	}
+
+	return nil;
 }
 
 /**
@@ -264,6 +265,7 @@
  */
 -(bool) isAttributeValid:(const int) attributeID
 {
+
     bool returnValue = false;
     NSString* stringAttribute = [[NSString alloc] initWithFormat:@"%d",attributeID];
     NSMutableDictionary* allowedAttributes =
@@ -325,10 +327,9 @@
  */
 - (void) dealloc
 {
-    [mFieldValuesArray release];
-    
-    [super dealloc];
+	[mFieldValuesArray release];
+
+	[super dealloc];
 }
 
 @end
-

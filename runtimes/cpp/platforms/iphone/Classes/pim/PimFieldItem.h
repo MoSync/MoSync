@@ -1,19 +1,19 @@
 /* Copyright (C) 2011 Mobile Sorcery AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  02111-1307, USA.
- */
+*/
 
 #import <Foundation/Foundation.h>
 #import "PimFieldItemValue.h"
@@ -23,25 +23,25 @@
  * Stores the content of a field. The field is defined by one of
  * the MA_PIM_FIELD_CONTACT constants.
  */
-@interface PimFieldItem:  NSObject {
+@interface PimFieldItem: NSObject {
     /**
-     * Type of the field. Must be one of 
+     * Type of the field. Must be one of
      * MA_PIM_TYPE_ constants.
      */
-    int mFieldType; 
-    
+    int mFieldType;
+
     /**
      * Must be one of MA_PIM_FIELD_CONTACT constants.
      */
     int mFieldConstant;
-    
+
     /**
      * Stores the values.
      */
     NSMutableArray* mFieldValuesArray;
-    
+
     /**
-     * True is this field is an single field value(e.g. this field can 
+     * True is this field is an single field value(e.g. this field can
      * contain only one value).
      */
     bool mIsSingleFieldValue;
@@ -50,7 +50,7 @@
 /**
  * Init function.
  * @param fieldID Must be one of MA_PIM_FIELD_CONTACT constants.
- * If the fieldID param is invalid or not supported on this platform, 
+ * If the fieldID param is invalid or not supported on this platform,
  * the functions return nil.
  */
 -(id) initWithFieldID:(int) fieldID;

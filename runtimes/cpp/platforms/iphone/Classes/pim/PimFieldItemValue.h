@@ -1,5 +1,5 @@
 /* Copyright (C) 2011 Mobile Sorcery AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
@@ -34,6 +34,7 @@
      * If the attribute is custom the value will be custom also.
      */
     NSString* mLabel;
+
 }
 
 /**
@@ -79,7 +80,7 @@
  * @return A string containing the label value, or
  *         nil if the attribute is not set to custom.
  */
+
 -(NSString*) getLabel;
 
 @end
-

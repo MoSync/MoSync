@@ -13,7 +13,7 @@
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  02111-1307, USA.
- */
+*/
 
 /**
  * @file PimItem.h
@@ -34,12 +34,12 @@ typedef enum {
      */
     kNewItem,
     /**
-     * The item was imported from the database(e.g. Address Book). The content 
+     * The item was imported from the database(e.g. Address Book). The content
      * of the item has not been modified.
      */
     kImportedItem,
     /**
-     * The item was imported from the database(e.g. Address Book). The content 
+     * The item was imported from the database(e.g. Address Book). The content
      * of the item has been modified. The item must be updated into database.
      */
     kModifiedItem
@@ -56,12 +56,12 @@ typedef enum {
  */
 @interface PimItem: NSObject {
     /**
-     * Stores the fields. 
+     * Stores the fields.
      * Object type is PimItemField.
      * Object's key is one of MA_PIM_FIELD constants.
      */
     NSMutableDictionary* mFieldsDictionary;
-    
+
     /**
      * The status of the item.
      */
@@ -111,7 +111,7 @@ typedef enum {
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
  *             The custom label's value is stored in args.buf.
- *             The size of the value(in bytes) is stored in args.bufSize. 
+ *             The size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @return One of the MA_PIM_ERR constants.
  */
@@ -124,11 +124,11 @@ typedef enum {
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
  *             The custom label's value will be stored in args.buf.
- *             The maximum size of the value(in bytes) is stored in args.bufSize. 
+ *             The maximum size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @return The number of bytes occupied by the value. If the number is greater than
  *         args.bufSize the value was not written into args.buf.
- *         In case of error the function returns one of the MA_PIM_ERR constants. 
+ *         In case of error the function returns one of the MA_PIM_ERR constants.
  *         If the field's value does not have a custom label, the function will
  *         return MA_PIM_ERR_NO_LABEL.
  */
@@ -142,11 +142,11 @@ typedef enum {
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
  *             The field's value will be stored in args.buf.
- *             The maximum size of the value(in bytes) is stored in args.bufSize. 
+ *             The maximum size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @return The number of bytes occupied by the value. If the number is greater than
  *         args.bufSize the value was not written into args.buf.
- *         In case of error the function returns one of the MA_PIM_ERR constants. 
+ *         In case of error the function returns one of the MA_PIM_ERR constants.
  */
 -(int) getValue:(const MA_PIM_ARGS*) args
      indexValue:(const int) index;
@@ -157,13 +157,13 @@ typedef enum {
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
  *             The field's value is stored in args.buf.
- *             The size of the value(in bytes) is stored in args.bufSize. 
+ *             The size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @param attribute Field's value attribute.
- * @return One of the MA_PIM_ERR constants. 
+ * @return One of the MA_PIM_ERR constants.
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
-     indexValue:(const int) index 
+     indexValue:(const int) index
  valueAttribute:(const int) atttribute;
 
 /**
@@ -172,10 +172,10 @@ typedef enum {
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
  *             The field's value is stored in args.buf.
- *             The size of the value(in bytes) is stored in args.bufSize. 
+ *             The size of the value(in bytes) is stored in args.bufSize.
  * @param attribute Field's value attribute.
  * @return  New value's index in field, or one of the MA_PIM_ERR constants
- *          in case of error. 
+ *          in case of error.
  */
 -(int) addValue:(const MA_PIM_ARGS*) args
   withAttribute:(const int) attribute;
@@ -194,7 +194,7 @@ typedef enum {
  * Deletes all item's fields.
  * @return One of the MA_PIM_ERR constants.
  */
--(int) close;;
+-(int) close;
 
 /**
  * Gets the status of the item.
@@ -203,4 +203,3 @@ typedef enum {
 -(PimItemStatus) getStatus;
 
 @end
-

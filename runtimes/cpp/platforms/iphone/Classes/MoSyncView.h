@@ -23,21 +23,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 @interface MoSyncView : UIView <UITextFieldDelegate> {
 	CGImageRef mosyncView;
-    MoSyncCLController *locationController;	
+    MoSyncCLController *locationController;
 	TouchHelper* touchHelper;
     /**
      * Used for handling sensors.
      */
     MoSyncSensor* moSyncSensor;
-    
+
 }
 
 -(void) updateMoSyncView: (CGImageRef)ref;
 -(void) showMessageBox:(NSString*)msg withTitle:(NSString*)title shouldKill:(bool)kill;
--(void) showTextBox:(NSString*)title 
-			withInText:(NSString*)inText 
-			outText:(wchar*)outText 
-			maxSize:(int)maxSize 
+-(void) showTextBox:(NSString*)title
+			withInText:(NSString*)inText
+			outText:(wchar*)outText
+			maxSize:(int)maxSize
 			andConstraints:(int)constraints;
 -(void) startUpdatingLocation;
 -(void) stopUpdatingLocation;
@@ -49,5 +49,3 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 -(MoSyncSensor*) getMoSyncSensor;
 
 @end
-
-

@@ -13,7 +13,7 @@
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  02111-1307, USA.
- */
+*/
 
 #import "PimFieldItemValue.h"
 
@@ -31,7 +31,7 @@
     mValuesArray = [[NSMutableArray alloc] init];
     mAttributeID = -1;
     mLabel = [[NSString alloc] init];
-    
+
     return [super init];
 }
 
@@ -73,6 +73,7 @@
 }
 
 /**
+
  * Set the label value.
  * @param label The new label's value.
  * @return MA_PIM_ERR_NONE is the label was set, or
@@ -94,6 +95,7 @@
  * @return A string containing the label value, or
  *         nil if the attribute is not set to custom.
  */
+
 -(NSString*) getLabel
 {
     return mLabel;
@@ -102,12 +104,11 @@
 /**
  * Release all the objects.
  */
-- (void) dealloc {
+- (void) dealloc
+{
     [mValuesArray release];
     [mLabel release];
-    
     [super dealloc];
 }
 
 @end
-

@@ -13,7 +13,7 @@
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  02111-1307, USA.
- */
+*/
 
 /**
  * @file PimList.h
@@ -42,8 +42,8 @@
 
 /**
  * Gets a handle to the next item in list.
- * @return A handle to the next item in list, or 0 if the are no more items, 
- *         or one of the MA_PIM_ERR constants in case of error. 
+ * @return A handle to the next item in list, or 0 if the are no more items,
+ *         or one of the MA_PIM_ERR constants in case of error.
  */
 -(MAHandle) getNextItem
 {
@@ -81,7 +81,7 @@
 }
 
 /**
- * Closes the list. 
+ * Closes the list.
  * Adds the new items into database(e.g. Address Book).
  * Saves the modified items into database(e.g. Address Book).
  * Removes all items from the list.
@@ -95,7 +95,7 @@
 /**
  * Release all the objects.
  */
-- (void) dealloc 
+- (void) dealloc
 {
     [super dealloc];
 }

@@ -3,6 +3,7 @@ package com.mosync.pim;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract.Data;
@@ -10,12 +11,10 @@ import android.provider.ContactsContract.Data;
 public class PIMItem {
 
 	ArrayList<PIMField> mPIMFields;
-	int mID;
 
 	PIMItem()
 	{
 		mPIMFields = new ArrayList<PIMField>();
-		mID = -1;
 	}
 
 	void add(PIMField p)
@@ -37,7 +36,7 @@ public class PIMItem {
 
 	int getFieldsCount()
 	{
-		return (mPIMFields.size() + ((mID >= 0)?1:0));
+		return mPIMFields.size();
 	}
 
 	int getFieldType(int n)
@@ -50,6 +49,7 @@ public class PIMItem {
 	{
 		PIMField p = new PIMField(type);
 		p.add(new String[] {}, new String[] {id});
+		add(p);
 	}
 
 	void readField(ContentResolver cr, String contactId, String[] columns, String itemType)
@@ -74,15 +74,15 @@ public class PIMItem {
 		}
 	}
 
-	void updateField()
+	void updateField(ContentResolver cr, String contactId, String[] columns, String itemType)
 	{
-//		 ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-//
-//		 ops.add(ContentProviderOperation.newUpdate(Data.CONTENT_URI)
-//		          .withSelection(Data.CONTACT_ID + "=?",
-//					new String[] {String.valueOf(contactId)})
-//		          .withValue(itemType, "sample_text")
-//		          .build());
-//		 getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+		 ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+
+		 ops.add(ContentProviderOperation.newUpdate(Data.CONTENT_URI)
+		          .withSelection(Data.CONTACT_ID + "=?",
+					new String[] {String.valueOf(contactId)})
+		          .withValue(itemType, "sample_text")
+		          .build());
+		 //cr.applyBatch(ContactsContract.AUTHORITY, ops);
 	}
 }

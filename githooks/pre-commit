@@ -44,11 +44,27 @@ then
 fi
 
 # call some scripts of our own...
-if ! ruby $(git rev-parse --show-toplevel)/githooks/checkUser.rb
+if ! ruby $(git rev-parse --show-toplevel)/githooks/my-pre-commit.rb
 then
+	echo "ruby error"
 	exit 1
 fi
 
-# exec takes over the process; nothing in this script will be executed after this point.
 # Check whitespace conventions.
-exec git diff-index --check --cached $against --
+if ! git diff-index --check --cached $against --
+then
+	#echo "dr 1"
+	diffResult=1
+else
+	#echo "dr 0"
+	diffResult=0
+fi
+
+# Remove the temporary attributes file no matter the result.
+rm $(git rev-parse --show-toplevel)/.gitattributes
+
+if [ "$diffResult" != "0" ]
+then
+	echo "Errors detected. Commit aborted."
+	exit 1
+fi

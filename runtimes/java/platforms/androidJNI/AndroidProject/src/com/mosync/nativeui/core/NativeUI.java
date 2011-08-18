@@ -1,3 +1,20 @@
+/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 package com.mosync.nativeui.core;
 
 import java.util.Hashtable;
@@ -124,7 +141,7 @@ public class NativeUI
 	 * Internal function for the maWidgetCreate system call.
 	 * It uses the ViewFactory to create a widget of the
 	 * given type, puts it in the handle table and returns it.
-	 * 
+	 *
 	 * Note: Should only be called on the UI thread.
 	 */
 	public int maWidgetCreate(String type)
@@ -404,7 +421,7 @@ public class NativeUI
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null )
 		{
-			Log.e( "MoSync", "maWidgetSetProperty: Invalid child widget handle: " + widgetHandle );
+			Log.e( "MoSync", "maWidgetSetProperty: Invalid widget handle: " + widgetHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
@@ -431,7 +448,14 @@ public class NativeUI
 			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 		}
 	}
-	
+
+	/**
+	 * Internal function for the maWidgetGetProperty system call.
+	 * Gets a property on the given widget, by accessing it from
+	 * the widget table and calling its getProperty method.
+	 *
+	 * Note: Should only be called on the UI thread.
+	 */
 	public int maWidgetGetProperty(
 		int widgetHandle, 
 		String key, 
@@ -441,7 +465,7 @@ public class NativeUI
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null )
 		{
-			Log.e( "MoSync", "maWidgetGetProperty: Invalid child widget handle: " + widgetHandle );
+			Log.e( "MoSync", "maWidgetGetProperty: Invalid widget handle: " + widgetHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		

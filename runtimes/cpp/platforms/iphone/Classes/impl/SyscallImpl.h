@@ -25,5 +25,5 @@ Surface* loadSprite(void* surface, ushort left, ushort top,
 
 public:
 	Syscall(int w, int h);
-    
-#include "PimSyscall.h"    
+
+#include "PimSyscall.h"

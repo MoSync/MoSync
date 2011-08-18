@@ -13,7 +13,7 @@
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  02111-1307, USA.
- */
+*/
 
 /**
  * @file PimItem.m
@@ -41,7 +41,7 @@
  */
 -(int) count
 {
-   return [mFieldsDictionary count];   
+   return [mFieldsDictionary count];
 }
 
 /**
@@ -58,7 +58,7 @@
     {
         return MA_PIM_ERR_INVALID_INDEX;
     }
-    else 
+    else
     {
         NSArray* allValuesFromDictionary = [mFieldsDictionary allValues];
         PimFieldItem* fieldItem = [allValuesFromDictionary objectAtIndex:fieldIndex];
@@ -78,15 +78,15 @@
     NSString* key = [[NSString alloc] initWithFormat:@"%d",fieldID];
     PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];
     [key release];
-    
+
     if (nil == itemField) {
         returnValue = 0;
-    } 
+    }
     else
     {
         returnValue = [itemField count];
     }
-    
+
     return returnValue;
 }
 
@@ -103,13 +103,13 @@
     NSString* key = [[NSString alloc] initWithFormat:@"%d",fieldID];
     PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];
     [key release];
-    
+
     if (nil == itemField) {
         returnValue = MA_PIM_ERR_INVALID_INDEX;
     } else {
         returnValue = [itemField getAttribute:index];
     }
-    
+
     return returnValue;
 }
 
@@ -119,7 +119,7 @@
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
  *             The custom label's value is stored in args.buf.
- *             The size of the value(in bytes) is stored in args.bufSize. 
+ *             The size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @return One of the MA_PIM_ERR constants.
  */
@@ -129,18 +129,18 @@
     int returnValue = MA_PIM_ERR_NONE;
     PimUtils* utils = [PimUtils sharedInstance];
     void* address = [utils getValidatedMemRange:(int)args->buf withSize: args->bufSize];
-    
+
     // Create string with UTF-16 encoding.
-    NSString* customLabel = [[NSString alloc] initWithBytes:address 
-                                                     length:args->bufSize 
+    NSString* customLabel = [[NSString alloc] initWithBytes:address
+                                                     length:args->bufSize
                                                    encoding:NSUTF16LittleEndianStringEncoding];
-    
+
     int field = args->item;
     NSString* key = [[NSString alloc] initWithFormat:@"%d",field];
     PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];
     [key release];
-    
-    if (nil == itemField) 
+
+    if (nil == itemField)
     {
         returnValue = MA_PIM_ERR_INVALID_INDEX;
     }
@@ -148,7 +148,7 @@
     {
         returnValue = [itemField setLabel:customLabel atIndex:index];
     }
-    
+
     return returnValue;
 }
 
@@ -158,11 +158,11 @@
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
  *             The custom label's value will be stored in args.buf.
- *             The maximum size of the value(in bytes) is stored in args.bufSize. 
+ *             The maximum size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @return The number of bytes occupied by the value. If the number is greater than
  *         args.bufSize the value was not written into args.buf.
- *         In case of error the function returns one of the MA_PIM_ERR constants. 
+ *         In case of error the function returns one of the MA_PIM_ERR constants.
  *         If the field's value does not have a custom label, the function will
  *         return MA_PIM_ERR_NO_LABEL.
  */
@@ -174,26 +174,26 @@
     PimUtils* utils = [PimUtils sharedInstance];
     void* address = [utils getValidatedMemRange:(int)args->buf withSize: args->bufSize];
     int field = args->item;
-    
+
     NSString* key = [[NSString alloc] initWithFormat:@"%d",field];
     PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];
     [key release];
-    
+
     if (nil == itemField)
     {
         return MA_PIM_ERR_INVALID_INDEX;
-    } 
-    
+    }
+
     returnValue = [itemField getLabel:customLabel indexValue:index];
-    
+
     // If no error occurred write custom label's value.
     if (MA_PIM_ERR_NONE == returnValue)
     {
-        [[PimUtils sharedInstance] writeString:customLabel 
-                                     atAddress:address 
+        [[PimUtils sharedInstance] writeString:customLabel
+                                     atAddress:address
                                        maxSize:args->bufSize];
     }
-    
+
     return returnValue;
 }
 
@@ -203,11 +203,11 @@
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
  *             The field's value will be stored in args.buf.
- *             The maximum size of the value(in bytes) is stored in args.bufSize. 
+ *             The maximum size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @return The number of bytes occupied by the value. If the number is greater than
  *         args.bufSize the value was not written into args.buf.
- *         In case of error the function returns one of the MA_PIM_ERR constants. 
+ *         In case of error the function returns one of the MA_PIM_ERR constants.
  */
 -(int) getValue:(const MA_PIM_ARGS*) args
      indexValue:(const int) index
@@ -220,31 +220,31 @@
     NSString* key = [[NSString alloc] initWithFormat:@"%d", fieldConstant];
     PimFieldItem* fieldItem = [mFieldsDictionary objectForKey:key];
     [key release];
-    
+
     if (nil == fieldItem ||
-        0 > index  || 
+        0 > index  ||
         index > [fieldItem count])
     {
         return MA_PIM_ERR_INVALID_INDEX;
     }
-    
+
     int fieldType = [fieldItem getFieldType];
     NSMutableArray* valuesArray = [fieldItem getValue:index];
-    
+
     switch (fieldType) {
         case MA_PIM_TYPE_BINARY:
-            
+
             break;
         case MA_PIM_TYPE_BOOLEAN:
-            
+
             break;
         case MA_PIM_TYPE_DATE:
-            returnValue = [utils writeDate:[valuesArray objectAtIndex:0] 
+            returnValue = [utils writeDate:[valuesArray objectAtIndex:0]
                                  atAddress:address
                                    maxSize:args->bufSize];
             break;
         case MA_PIM_TYPE_INT:
-            
+
             break;
         case MA_PIM_TYPE_STRING:
             returnValue = [utils writeString:[valuesArray objectAtIndex:0]
@@ -252,14 +252,14 @@
                                      maxSize:args->bufSize];
             break;
         case MA_PIM_TYPE_STRING_ARRAY:
-            returnValue = [utils writeStringArray:valuesArray 
+            returnValue = [utils writeStringArray:valuesArray
                                         atAddress:address
                                           maxSize:args->bufSize];
             break;
         default:
             break;
     }
-    
+
     return returnValue;
 }
 
@@ -269,55 +269,55 @@
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
  *             The field's value is stored in args.buf.
- *             The size of the value(in bytes) is stored in args.bufSize. 
+ *             The size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @param attribute Field's value attribute.
- * @return One of the MA_PIM_ERR constants. 
+ * @return One of the MA_PIM_ERR constants.
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
-     indexValue:(const int) index 
+     indexValue:(const int) index
  valueAttribute:(const int) atttribute
 {
     int returnValue;
     int field = args->field;
     NSMutableArray* valuesArray = nil;
     PimUtils* utils = [PimUtils sharedInstance];
-    void* address = [utils getValidatedMemRange:(int)args->buf 
+    void* address = [utils getValidatedMemRange:(int)args->buf
                                        withSize:args->bufSize];
-    
+
     // Check if the field exists.
     NSString* key = [[NSString alloc] initWithFormat:@"%d", field];
     PimFieldItem* itemField;
     itemField = [mFieldsDictionary objectForKey:key];
     [key release];
-    
-    if(nil == itemField) 
+
+    if(nil == itemField)
     {
         return MA_PIM_ERR_INVALID_INDEX;
     }
-    
+
     // Check if there is a value at the given index.
     valuesArray = [itemField getValue:index];
     if (nil == valuesArray)
     {
         return MA_PIM_ERR_INVALID_INDEX;
     }
-    
+
     // Get the new value.
     int fieldType = [itemField getFieldType];
-    switch (fieldType) 
+    switch (fieldType)
     {
         case MA_PIM_TYPE_BINARY:
-            
+
             break;
         case MA_PIM_TYPE_BOOLEAN:
-            
+
             break;
         case MA_PIM_TYPE_DATE:
             valuesArray = [utils getDate:address];
             break;
         case MA_PIM_TYPE_INT:
-            
+
             break;
         case MA_PIM_TYPE_STRING:
             valuesArray = [utils getString:address];
@@ -328,10 +328,10 @@
         default:
             break;
     }
-    
-    returnValue = [itemField setValue:valuesArray atIndex:index 
+
+    returnValue = [itemField setValue:valuesArray atIndex:index
                         withAttribute:atttribute];
-    
+
     return returnValue;
 }
 
@@ -341,10 +341,10 @@
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
  *             The field's value is stored in args.buf.
- *             The size of the value(in bytes) is stored in args.bufSize. 
+ *             The size of the value(in bytes) is stored in args.bufSize.
  * @param attribute Field's value attribute.
  * @return  New value's index in field, or one of the MA_PIM_ERR constants
- *          in case of error. 
+ *          in case of error.
  */
 -(int) addValue:(const MA_PIM_ARGS*) args
   withAttribute:(const int) attribute
@@ -353,18 +353,18 @@
     int field = args->field;
     NSMutableArray* valuesArray;
     PimUtils* utils = [PimUtils sharedInstance];
-    void* address = [utils getValidatedMemRange:(int)args->buf 
+    void* address = [utils getValidatedMemRange:(int)args->buf
                                        withSize:args->bufSize];
-    
+
     // Check if the field exists.
     NSString* key = [[NSString alloc] initWithFormat:@"%d", field];
     PimFieldItem* itemField;
     itemField = [mFieldsDictionary objectForKey:key];
-    if (nil == itemField) 
+    if (nil == itemField)
     {
         // If the field does not exist create a new one.
         itemField = [[PimFieldItem alloc] initWithFieldID:field];
-        
+
         // Check if the field was created.
         if (nil == itemField)
         {
@@ -374,9 +374,9 @@
         [mFieldsDictionary setObject:itemField forKey:key];
     }
     [key release];
-    
+
     int fieldType = [itemField getFieldType];
-    switch (fieldType) 
+    switch (fieldType)
     {
         case MA_PIM_TYPE_BINARY:
             valuesArray = [utils getBytes:address size:args->bufSize];
@@ -414,15 +414,15 @@
     NSString* key = [[NSString alloc] initWithFormat:@"%d",field];
     PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];
     [key release];
-    
-    if (nil == itemField) 
+
+    if (nil == itemField)
     {
         returnValue = MA_PIM_ERR_INVALID_INDEX;
-    } else 
+    } else
     {
         returnValue = [itemField removeValue:index];
     }
-    
+
     return returnValue;
 }
 
@@ -448,7 +448,7 @@
 /**
  * Release all the objects.
  */
-- (void) dealloc 
+- (void) dealloc
 {
     [mFieldsDictionary release];
     [super dealloc];
