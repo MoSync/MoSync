@@ -3227,7 +3227,6 @@ group WidgetAPI "Widget API" {
 
         /**
          * @brief Sent from the Edit box when the text was changed.
-         * Only for iphone platform.
          */
          EDIT_BOX_TEXT_CHANGED = 18;
 
@@ -3235,7 +3234,6 @@ group WidgetAPI "Widget API" {
          * @brief Sent from the Edit box when the return button was pressed.
          * On iphone platform the virtual keyboard is not closed after receiving this event.
          * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
-         * Only for iphone platform.
          */
          EDIT_BOX_RETURN = 19;
 

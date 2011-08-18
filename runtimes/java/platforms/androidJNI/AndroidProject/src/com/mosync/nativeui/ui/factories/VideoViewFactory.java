@@ -31,7 +31,7 @@ public class VideoViewFactory implements AbstractViewFactory
 
 			@Override
 			public void onPrepared(MediaPlayer mp) {
-				EventQueue.getDefault().postVideoStateChanged( handle, IX_WIDGET.MAW_VIDEO_WIDGET_STATE_SOURCE_READY);
+				EventQueue.getDefault().postVideoStateChanged( handle, IX_WIDGET.MAW_VIDEO_VIEW_STATE_SOURCE_READY);
 			}
 		});
 
@@ -39,7 +39,7 @@ public class VideoViewFactory implements AbstractViewFactory
 
 			@Override
 			public void onCompletion(MediaPlayer mp) {
-				EventQueue.getDefault().postVideoStateChanged(handle, IX_WIDGET.MAW_VIDEO_WIDGET_STATE_FINISHED);
+				EventQueue.getDefault().postVideoStateChanged(handle, IX_WIDGET.MAW_VIDEO_VIEW_STATE_FINISHED);
 			}
 		});
 
@@ -47,7 +47,7 @@ public class VideoViewFactory implements AbstractViewFactory
 
 			@Override
 			public boolean onError(MediaPlayer mp, int what, int extra) {
-				EventQueue.getDefault().postVideoStateChanged(handle, IX_WIDGET.MAW_VIDEO_WIDGET_STATE_INTERRUPTED);
+				EventQueue.getDefault().postVideoStateChanged(handle, IX_WIDGET.MAW_VIDEO_VIEW_STATE_INTERRUPTED);
 				return true;
 			}
 		});

@@ -56,7 +56,7 @@ public class VideoViewWidget extends Widget
 		}
 		else if( property.equals( IX_WIDGET.MAW_VIDEO_VIEW_ACTION ) )
 		{
-			if ( IntConverter.convert(value) == IX_WIDGET.MAW_VIDEO_WIDGET_ACTION_PLAY )
+			if ( IntConverter.convert(value) == IX_WIDGET.MAW_VIDEO_VIEW_ACTION_PLAY )
 			{
 				// Reload last played source in case it was stopped.
 				if ( mLastLocalSource.length() > 0 && mPlaybackWasStopped )
@@ -75,33 +75,33 @@ public class VideoViewWidget extends Widget
 				// Try to start playback, and only if succeeded send the PLAYING event.
 				if ( videoView.isPlaying() )
 				{
-					EventQueue.getDefault().postVideoStateChanged(mHandle, IX_WIDGET.MAW_VIDEO_WIDGET_STATE_PLAYING);
+					EventQueue.getDefault().postVideoStateChanged(mHandle, IX_WIDGET.MAW_VIDEO_VIEW_STATE_PLAYING);
 				}
 				else
 				{
-					EventQueue.getDefault().postVideoStateChanged(mHandle, IX_WIDGET.MAW_VIDEO_WIDGET_STATE_INTERRUPTED);
+					EventQueue.getDefault().postVideoStateChanged(mHandle, IX_WIDGET.MAW_VIDEO_VIEW_STATE_INTERRUPTED);
 					return false;
 				}
 			}
-			else if ( IntConverter.convert(value) == IX_WIDGET.MAW_VIDEO_WIDGET_ACTION_PAUSE )
+			else if ( IntConverter.convert(value) == IX_WIDGET.MAW_VIDEO_VIEW_ACTION_PAUSE )
 			{
 				// Pause the playback only if the video is playing.
 				if (videoView.isPlaying() && videoView.canPause())
 				{
 					videoView.pause();
-					EventQueue.getDefault().postVideoStateChanged(mHandle, IX_WIDGET.MAW_VIDEO_WIDGET_STATE_PAUSED);
+					EventQueue.getDefault().postVideoStateChanged(mHandle, IX_WIDGET.MAW_VIDEO_VIEW_STATE_PAUSED);
 				}
 				else
 				{
 					return false;
 				}
 			}
-			else if ( IntConverter.convert(value) == IX_WIDGET.MAW_VIDEO_WIDGET_ACTION_STOP )
+			else if ( IntConverter.convert(value) == IX_WIDGET.MAW_VIDEO_VIEW_ACTION_STOP )
 			{
 				mPlaybackWasStopped = true;
 				videoView.stopPlayback();
 
-				EventQueue.getDefault().postVideoStateChanged(mHandle, IX_WIDGET.MAW_VIDEO_WIDGET_STATE_STOPPED);
+				EventQueue.getDefault().postVideoStateChanged(mHandle, IX_WIDGET.MAW_VIDEO_VIEW_STATE_STOPPED);
 
 			}
 		}
