@@ -881,14 +881,31 @@ namespace Base
 		return result;
 	}
 
-	int _maOpenGLInitFullscreen()
+	int _maOpenGLInitFullscreen(int glApi, JNIEnv* jNIEnv, jobject jThis)
 	{
-		return IOCTL_UNAVAILABLE;
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls, 
+												 "maOpenGLInitFullscreen", 
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, glApi);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return (int)result;
 	}
-
-	int _maOpenGLCloseFullscreen()
+	
+	int _maOpenGLCloseFullscreen(JNIEnv* jNIEnv, jobject jThis)
 	{
-		return IOCTL_UNAVAILABLE;
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = 
+			jNIEnv->GetMethodID(cls, "maOpenGLCloseFullscreen", "()I");
+		if (methodID == 0) return 0;
+		int ret = jNIEnv->CallIntMethod(jThis, methodID);
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return ret;
 	}
 
 	int _maOpenGLTexImage2D(MAHandle image, JNIEnv* jNIEnv, jobject jThis)

@@ -89,6 +89,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40069, ERR_INVALID_PIM_BUFFER_SIZE, "Invalid PIM value buffer size")\
 	m(40070, ERR_PIM_UNTERMINATED_STRING, "Unterminated PIM string value")\
 	m(40071, ERR_PIM_EMPTY_STRING_ARRAY, "Empty PIM string array")\
+    m(40072, ERR_IMAGE_LOAD_FAILED, "Image could not be loaded.")\
 
 DECLARE_ERROR_ENUM(BASE)
 

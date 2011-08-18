@@ -24,11 +24,17 @@ File::File() : Base(EFile) {
 
 void File::fromParseNode(const ParseNode& node) {
 	mName = node.getAttr("name");
+	mId = node.getAttr("id");
 }
 
 const string& File::getName() const {
 	return mName;
 }
+
+const string& File::getId() const {
+	return mId;
+}
+
 
 string File::toString() const {
 	return System::genstr("%s", mName.c_str());

@@ -255,14 +255,12 @@ namespace Base
 	 * Internal function that initializes an Open GL
 	 * fullscreen surface.
 	 */
-	int _maOpenGLInitFullscreen();
-
+	int _maOpenGLInitFullscreen(int glApi, JNIEnv* jNIEnv, jobject jThis);
 	/**
 	 * Internal function that destroys an Open GL fullscreen
 	 * surface.
 	 */
-	int _maOpenGLCloseFullscreen();
-
+	int _maOpenGLCloseFullscreen(JNIEnv* jNIEnv, jobject jThis);
 	/**
 	 * Internal function that calls the java side to load an opengl
 	 * texture, to the currently bound texture handle.

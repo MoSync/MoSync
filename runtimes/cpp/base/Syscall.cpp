@@ -221,7 +221,10 @@ namespace Base {
 					// On all platforms except Android, we load and add
 					// the image data. "dadd" means "delete and add",
 					// and is defined in runtimes\cpp\base\ResourceArray.h
-					ROOM(resources.dadd_RT_IMAGE(rI, loadImage(b)));
+                    RT_IMAGE_Type* image = loadImage(b);
+                    if(!image)
+                        BIG_PHAT_ERROR(ERR_IMAGE_LOAD_FAILED);
+					ROOM(resources.dadd_RT_IMAGE(rI, image));
 #else
 					// On Android images are stored on the Java side.
 					// Here we allocate a dummy array (real image is
@@ -413,7 +416,9 @@ namespace Base {
 			&& !gSyscall->mAllowDivZero
 #endif
 			) {
+#ifndef ALLOW_DIVISION_BY_ZERO            
 			BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+#endif
 		}
 		return a/b;
 	}
@@ -772,8 +777,10 @@ namespace Base {
 		std::string newPath = getWriteablePath(fn);
 		fn = newPath.c_str();
 		size = newPath.size();
-		fh.name.resize(size);
-		memcpy(fh.name, fn, size);		
+		fh.name.resize(size+1);
+		memcpy(fh.name, fn, size);
+        fh.name[size] = 0;
+        LOG("Opening file: %s\n", newPath.c_str());
 #else
 		memcpy(fh.name, fn, size);
 #endif
@@ -812,6 +819,7 @@ namespace Base {
 		LOGF("maFileClose(%i)\n", file);
 		FileHandle* fhp = gFileHandles.find(file);
 		MYASSERT(fhp, ERR_FILE_HANDLE_INVALID);
+        LOG("Closing file %s", std::string(fhp->name, fhp->name.size()).c_str());
 		FileHandle& fh(*fhp);
 		SAFE_DELETE(fh.fs);
 		gFileHandles.erase(file);

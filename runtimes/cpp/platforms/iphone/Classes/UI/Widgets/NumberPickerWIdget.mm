@@ -16,8 +16,9 @@
  */
 
 #import "NumberPickerWidget.h"
-#include <helpers/CPP_IX_WIDGET.h>
 #include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+
 #include "Platform.h"
 
 @implementation NumberPickerWidget

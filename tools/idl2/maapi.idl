@@ -1325,14 +1325,14 @@ interface MAAPI {
 		* The field status contains one of the
 		* This event is sent on Android and iOS.
 		*/
-		SMS = 31;
+		SMS = 32;
 
 		/**
 		* \brief Provides data from active sensors.
 		* \see MAEvent::sensor
 		* \see maSensorStart()
 		*/
-		SENSOR = 32;
+		SENSOR = 33;
 	}
 
 	/**
@@ -3631,7 +3631,7 @@ group WidgetAPI "Widget API" {
 		*   #MAW_CONSTANT_STOPPED
 		*   #MAW_CONSTANT_ERROR
 		*/
-		WEB_VIEW_CONTENT_LOADING = 11;
+		WEB_VIEW_CONTENT_LOADING = 20;
 
 		/**
 		* @brief A web view hook has captured a url.
@@ -3655,7 +3655,7 @@ group WidgetAPI "Widget API" {
 		* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
 		* and/or #MAW_WEB_VIEW_HARD_HOOK.
 		*/
-		WEB_VIEW_HOOK_INVOKED = 12;
+		WEB_VIEW_HOOK_INVOKED = 21;
 	}
 
 	} // end of WidgetEventTypes
@@ -3984,6 +3984,11 @@ group WidgetAPI "Widget API" {
 		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
 		 */
 		GL_VIEW = "GLView";
+
+		/**
+		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
+		 */
+		GL2_VIEW = "GL2View";
 
 		/**
 		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
@@ -6420,10 +6425,8 @@ group CameraFunctions "Camera Functions" {
 		 */
 		int maScreenStateEventsOff();
 
-#if IX_OPENGL_ES
 #include "opengl_non_generated.idl"
 #include "opengl_generated.idl"
-#endif
 
 		/**
 		 * Logs information about the state of all current resources.

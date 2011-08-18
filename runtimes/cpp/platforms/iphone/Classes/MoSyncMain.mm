@@ -46,6 +46,7 @@ void MoSyncDiv0() {
 }
 
 void* Base::Syscall::GetValidatedMemRange(int address, int size) {
+    if(address == 0) return NULL;
 	return (byte*)mem_ds + address;
 }
 void Base::Syscall::ValidateMemRange(const void* ptr, int size) {	

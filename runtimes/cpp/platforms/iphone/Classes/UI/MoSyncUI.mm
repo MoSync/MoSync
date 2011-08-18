@@ -169,6 +169,8 @@ static IWidget* sOldScreen = nil;
 	if(widgetClass != nil) {
 		created = [[widgetClass alloc] init];
 		
+        if(created == nil)
+            return MAW_RES_ERROR;
 		if(widgetClass == [IWidget class]) 
 			return MAW_RES_ERROR;
 		

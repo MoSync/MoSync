@@ -22,6 +22,7 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.widget.ImageView;
 
+import com.mosync.internal.generated.IX_OPENGL_ES;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.FrameLayout;
 import com.mosync.nativeui.ui.widgets.ImageWidget;
@@ -108,7 +109,8 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_SCREEN, new ScreenFactory( ) );
 		addFactory( IX_WIDGET.MAW_WEB_VIEW, new WebViewFactory( ) );
 		addFactory( IX_WIDGET.MAW_TAB_SCREEN, new TabScreenFactory( ) );
-		addFactory( IX_WIDGET.MAW_GL_VIEW, new EGLViewFactory( ) );
+		addFactory( IX_WIDGET.MAW_GL_VIEW, new EGLViewFactory( IX_OPENGL_ES.MA_GL_API_GL1 ) );
+		addFactory( IX_WIDGET.MAW_GL2_VIEW, new EGLViewFactory( IX_OPENGL_ES.MA_GL_API_GL2 ) );		
 		addFactory( IX_WIDGET.MAW_IMAGE, new DefaultFactory( ImageView.class, ImageWidget.class ) );
 		addFactory( IX_WIDGET.MAW_RELATIVE_LAYOUT, new DefaultFactory( android.widget.FrameLayout.class, FrameLayout.class ) );
 		addFactory( IX_WIDGET.MAW_CHECK_BOX, new CheckBoxFactory( ) );

@@ -60,8 +60,14 @@ using namespace MoSyncError;
 #include <AudioToolbox/AudioToolbox.h>
 
 #ifdef SUPPORT_OPENGL_ES
+#define DONT_WANT_IX_OPENGL_ES_TYPEDEFS
 #include <helpers/CPP_IX_OPENGL_ES.h>
+#include <helpers/CPP_IX_GL1.h>
+#include <helpers/CPP_IX_GL2.h>
+#include <helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h>
 #include <OpenGLES/ES1/gl.h>
+#include <OpenGLES/ES2/gl.h>
+#include <OpenGLES/ES1/glext.h>
 #include "../../../../generated/gl.h.cpp"
 #endif
 
@@ -152,6 +158,11 @@ namespace Base {
 		switch(format) {
 			case JPEG: imageRef = CGImageCreateWithJPEGDataProvider(dpr, NULL, true, kCGRenderingIntentDefault); break;
 			case PNG: imageRef = CGImageCreateWithPNGDataProvider(dpr, NULL, true, kCGRenderingIntentDefault); break;
+            default: {
+             CGDataProviderRelease(dpr);                
+             CFRelease(png_data);
+             return NULL;   
+            }
 		}
 
 		CGDataProviderRelease(dpr);
@@ -873,10 +884,65 @@ namespace Base {
 	}
 
 #ifdef SUPPORT_OPENGL_ES
-	int maOpenGLInitFullscreen() {
+
+
+// remove implementations for broken bindings..
+#undef maIOCtl_glGetPointerv_case
+#define maIOCtl_glGetPointerv_case(func) \
+case maIOCtl_glGetPointerv: \
+{\
+return IOCTL_UNAVAILABLE; \
+}
+    
+#undef maIOCtl_glGetVertexAttribPointerv_case
+#define maIOCtl_glGetVertexAttribPointerv_case(func) \
+case maIOCtl_glGetVertexAttribPointerv: \
+{\
+return IOCTL_UNAVAILABLE; \
+}
+    
+#undef maIOCtl_glShaderSource_case
+#define maIOCtl_glShaderSource_case(func) \
+case maIOCtl_glShaderSource: \
+{ \
+GLuint _shader = (GLuint)a; \
+GLsizei _count = (GLsizei)b; \
+void* _string = GVMR(c, MAAddress); \
+const GLint* _length = GVMR(SYSCALL_THIS->GetValidatedStackValue(0 VSV_ARGPTR_USE), GLint); \
+wrap_glShaderSource(_shader, _count, _string, _length); \
+return 0; \
+} \
+
+    void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
+        
+        int* stringsArray = (int*)strings;
+        const GLchar** strCopies = new const GLchar*[count];
+        
+        for(int i = 0; i < count; i++) {
+            void* src = GVMR(stringsArray[i], MAAddress);
+            strCopies[i] = (GLchar*)src;
+        }
+        
+        glShaderSource(shader, count, strCopies, length);
+        delete strCopies;     
+    }
+    
+	int maOpenGLInitFullscreen(int glApi) {
 		if(sOpenGLScreen != -1) return 0;
-		sOpenGLScreen = maWidgetCreate("Screen");
-		sOpenGLView = maWidgetCreate("GLView");
+		
+        
+        if(glApi == MA_GL_API_GL1)
+            sOpenGLView = maWidgetCreate("GLView");
+        else if(glApi == MA_GL_API_GL2)
+            sOpenGLView = maWidgetCreate("GL2View");
+        else 
+            return MA_GL_INIT_RES_UNAVAILABLE_API;
+
+        if(sOpenGLView < 0) {
+            return MA_GL_INIT_RES_UNAVAILABLE_API;            
+        }
+        
+        sOpenGLScreen = maWidgetCreate("Screen");
 		maWidgetSetProperty(sOpenGLView, "width", "-1");
 		maWidgetSetProperty(sOpenGLView, "height", "-1");
 		maWidgetAddChild(sOpenGLScreen, sOpenGLView);
@@ -1324,7 +1390,7 @@ namespace Base {
 		}
 	}
 
-	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
+	
 
     SYSCALL(int, maSensorStart(int sensor, int interval))
 	{
@@ -1382,7 +1448,15 @@ namespace Base {
 		maIOCtl_syscall_case(maFileCreate);
 		maIOCtl_syscall_case(maFileDelete);
 		maIOCtl_syscall_case(maFileSize);
-		maIOCtl_case(maTextBox);
+        maIOCtl_syscall_case(maFileAvailableSpace);
+        maIOCtl_syscall_case(maFileTotalSpace);
+        maIOCtl_syscall_case(maFileDate);
+        maIOCtl_syscall_case(maFileRename);
+        maIOCtl_syscall_case(maFileTruncate);
+        maIOCtl_syscall_case(maFileListStart);
+        maIOCtl_syscall_case(maFileListNext);
+        maIOCtl_syscall_case(maFileListClose);                
+		maIOCtl_case(maTextBox);		
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);
 		maIOCtl_case(maMessageBox);
@@ -1400,6 +1474,9 @@ namespace Base {
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
+        maIOCtl_IX_GL1_caselist;
+        maIOCtl_IX_GL2_caselist;
+        maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist;
 #endif	//SUPPORT_OPENGL_ES
 		}
 
