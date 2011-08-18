@@ -22,8 +22,10 @@
 #define DEFAULT_RECT_HEIGHT 100
 
 #import "VideoViewWidget.h"
-#include <helpers/CPP_IX_WIDGET.h>
+
 #include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+
 #include "Platform.h"
 
 @implementation VideoViewWidget

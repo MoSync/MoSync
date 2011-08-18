@@ -22,6 +22,7 @@
 #define DEFAULT_PROGRESS_VALUE 0
 
 #import "ProgressBarWidget.h"
+#include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
 @implementation ProgressBarWidget

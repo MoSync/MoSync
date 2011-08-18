@@ -22,8 +22,9 @@
 #define DEFAULT_MINIMUM_VALUE 0
 
 #import "SliderWidget.h"
-#include <helpers/CPP_IX_WIDGET.h>
 #include <helpers/cpp_defs.h>
+#include <helpers/CPP_IX_WIDGET.h>
+
 #include "Platform.h"
 
 @implementation SliderWidget
