@@ -145,7 +145,7 @@ public class NativeUI
 	 * Internal function for the maWidgetCreate system call.
 	 * It uses the ViewFactory to create a widget of the
 	 * given type, puts it in the handle table and returns it.
-	 * 
+	 *
 	 * Note: Should only be called on the UI thread.
 	 */
 	public int maWidgetCreate(String type)
@@ -456,7 +456,7 @@ public class NativeUI
 	 * Internal function for the maWidgetGetProperty system call.
 	 * Gets a property on the given widget, by accessing it from
 	 * the widget table and calling its getProperty method.
-	 * 
+	 *
 	 * Note: Should only be called on the UI thread.
 	 */
 	public int maWidgetGetProperty(

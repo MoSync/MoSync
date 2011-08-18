@@ -53,7 +53,8 @@ namespace MAUtil {
 		mTimerEvents(true),
 		mFocusListeners(false),
 		mCustomEventListeners(false),
-		mTextBoxListeners(false)		
+		mTextBoxListeners(false),
+		mSensorListeners(false)
 	{
 		if(sEnvironment)
 			PANIC_MESSAGE("The application tried to instantiate more than one Environment. "
@@ -210,7 +211,7 @@ namespace MAUtil {
 		//MAASSERT(sEnvironment == this);
 		mCustomEventListeners.remove(cl);
 	}
-	
+
 	void Environment::addTextBoxListener(TextBoxListener* tl) {
 		//MAASSERT(sEnvironment == this);
 		mTextBoxListeners.add(tl);
@@ -220,6 +221,16 @@ namespace MAUtil {
 		//MAASSERT(sEnvironment == this);
 		mTextBoxListeners.remove(tl);
 	}	
+
+	void Environment::addSensorListener(SensorListener* tl) {
+		//MAASSERT(sEnvironment == this);
+		mSensorListeners.add(tl);
+	}
+
+	void Environment::removeSensorListener(SensorListener* tl) {
+		//MAASSERT(sEnvironment == this);
+		mSensorListeners.remove(tl);
+	}
 	
 	void Environment::fireFocusGainedEvent() {
 		//MAASSERT(sEnvironment == this);
@@ -363,6 +374,15 @@ namespace MAUtil {
 		}
 		mTextBoxListeners.setRunning(false);
 	}	
+
+	void Environment::fireSensorListeners(MASensor a) {
+		//MAASSERT(sEnvironment == this);
+		mSensorListeners.setRunning(true);
+		ListenerSet_each(SensorListener, i, mSensorListeners) {
+			i->sensorEvent(a);
+		}
+		mSensorListeners.setRunning(false);
+	}
 
 	void Environment::runIdleListeners() {
 		//MAASSERT(sEnvironment == this);

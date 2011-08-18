@@ -31,6 +31,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MemStream.h>
 #include <FileStream.h>
 #include "Syscall.h"
+#include "PimSyscall.h"
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
@@ -89,12 +90,12 @@ namespace Base {
 	Surface* gBackbuffer;
 	Surface* gDrawTarget;
 	MAHandle gDrawTargetHandle = HANDLE_SCREEN;
-	
+
 	unsigned char *gBackBufferData;
-	
+
 	mach_timebase_info_data_t gTimeBase;
 	uint64_t gTimeStart;
-	
+
 	EventQueue gEventQueue;
 	static bool gEventOverflow	= false;
 	static bool gClosing		= false;
@@ -103,14 +104,14 @@ namespace Base {
 
 	bool exited = false;
 	CRITICAL_SECTION exitMutex;
-	
+
 	static CGFontRef sUnicodeFont;
-	
+
 #ifdef SUPPORT_OPENGL_ES
 	static MAHandle sOpenGLScreen = -1;
 	static MAHandle sOpenGLView = -1;
-#endif	
-	
+#endif
+
 	void MALibQuit();
 
 	//***************************************************************************
@@ -126,8 +127,8 @@ namespace Base {
 	Surface* Syscall::loadImage(MemStream& s) {
 		return loadImage((MemStreamC&)s);
 	}
-	
-	Surface* Syscall::loadImage(MemStreamC& s) 
+
+	Surface* Syscall::loadImage(MemStreamC& s)
 	{
 		int len;
 		TEST(s.length(len));
@@ -146,26 +147,26 @@ namespace Base {
 
 		CFDataRef png_data = CFDataCreate (NULL,data,len);
 		CGDataProviderRef dpr  = CGDataProviderCreateWithCFData (png_data);
-		
+
 		CGImageRef imageRef;
 		switch(format) {
 			case JPEG: imageRef = CGImageCreateWithJPEGDataProvider(dpr, NULL, true, kCGRenderingIntentDefault); break;
 			case PNG: imageRef = CGImageCreateWithPNGDataProvider(dpr, NULL, true, kCGRenderingIntentDefault); break;
 		}
-		   
+
 		CGDataProviderRelease(dpr);
-		
+
 		CFRelease(png_data);
-		
+
 		return new Surface(imageRef);
 	}
-	
+
 	Surface* Syscall::loadSprite(void* surface, ushort left, ushort top,
-		ushort width, ushort height, ushort cx, ushort cy) 
+		ushort width, ushort height, ushort cx, ushort cy)
 	{
 		return NULL;
 	}
-	
+
 	//***************************************************************************
 	// Helpers
 	//***************************************************************************
@@ -173,33 +174,35 @@ namespace Base {
 	static bool MALibInit() {
 
 		InitializeCriticalSection(&exitMutex);
-		
+
 		Surface::fontSize = gHeight/40;
 		gBackbuffer = new Surface(gWidth, gHeight);
-		CGContextRestoreGState(gBackbuffer->context);		
+		CGContextRestoreGState(gBackbuffer->context);
 		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
 		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
 		CGContextSaveGState(gBackbuffer->context);
-		
+
 		// init font
 		//CFStringRef str = CFStringCreateWithCStringNoCopy(NULL, "Helvetica", kCFStringEncodingUTF8, NULL);
 		CFStringRef str = CFStringCreateWithCString(NULL, "Helvetica", kCFStringEncodingUTF8);
 		sUnicodeFont = CGFontCreateWithFontName(str);
 		CFRelease(str);
-		
+
 		gDrawTarget = gBackbuffer;
-		
+
 		mach_timebase_info( &gTimeBase );
 		//gTimeConversion = 1e-6 * (double)machInfo.numer/(double)machInfo.denom;
 		gTimeStart = mach_absolute_time();
-		
-		
-		MANetworkInit();		
-		
+
+
+		MANetworkInit();
+
+        MAPimInit();
+
 		// init some image.h optimizations.
 		initMulTable();
 		initRecipLut();
-		
+
 		return true;
 	}
 
@@ -213,7 +216,7 @@ namespace Base {
 	{
 		return false;
 	}
-	
+
 	//***************************************************************************
 	// Syscall class
 	//***************************************************************************
@@ -224,7 +227,7 @@ namespace Base {
 		gHeight = h;
 		gSyscall = this;
 		bool ret = MALibInit();
-		if(ret == false) 
+		if(ret == false)
 		{
 			// if program is already open or something failed...
 			exit(0);
@@ -244,7 +247,7 @@ namespace Base {
 		CGContextRestoreGState(gDrawTarget->context);
 		CGContextSaveGState(gDrawTarget->context);
 		CGContextClipToRect(gDrawTarget->context, CGRectMake(left, top, width, height));
-		
+
 		gDrawTarget->mImageDrawer->clipRect.x = left;
 		gDrawTarget->mImageDrawer->clipRect.y = top;
 		gDrawTarget->mImageDrawer->clipRect.width = width;
@@ -253,9 +256,9 @@ namespace Base {
 
 	SYSCALL(void, maGetClipRect(MARect *rect))
 	{
-		gSyscall->ValidateMemRange(rect, sizeof(MARect));	
+		gSyscall->ValidateMemRange(rect, sizeof(MARect));
 		rect->left = gDrawTarget->mImageDrawer->clipRect.x;
-		rect->top = gDrawTarget->mImageDrawer->clipRect.y; 
+		rect->top = gDrawTarget->mImageDrawer->clipRect.y;
 		rect->width = gDrawTarget->mImageDrawer->clipRect.width;
 		rect->height = gDrawTarget->mImageDrawer->clipRect.height;
 
@@ -277,17 +280,17 @@ namespace Base {
 		currentRed = red;
 		currentGreen = green;
 		currentBlue = blue;
-		
+
 		// hmmmm I don't know why I have to do this :)
 		realColor = (argb&0xff00ff00)|((argb&0x00ff0000)>>16)|((argb&0x000000ff)<<16);
-		
+
 		return oldColor;
 	}
 
 	SYSCALL(void, maPlot(int posX, int posY)) {
 		if(!gDrawTarget->data) DEBIG_PHAT_ERROR;
 		gDrawTarget->mImageDrawer->drawPoint(posX, posY, realColor);
-		   
+
 	}
 
 	SYSCALL(void, maLine(int x0, int y0, int x1, int y1)) {
@@ -295,7 +298,7 @@ namespace Base {
 	}
 
 	SYSCALL(void, maFillRect(int left, int top, int width, int height)) {
-		//CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);			
+		//CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);
 		gDrawTarget->mImageDrawer->drawFilledRect(left, top, width, height, realColor);
 	}
 
@@ -314,7 +317,7 @@ namespace Base {
 											 realColor);
 		}
 	}
-	
+
 	SYSCALL(void, maFillTriangleFan(const MAPoint2d *points, int count)) {
 		SYSCALL_THIS->ValidateMemRange(points, sizeof(MAPoint2d) * count);
 		CHECK_INT_ALIGNMENT(points);
@@ -339,9 +342,9 @@ namespace Base {
 		}
 		return len;
 	}
-	
+
 	SYSCALL(MAExtent, maGetTextSize(const char* str)) {
-		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);		
+		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
 		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
 		CGContextShowTextAtPoint(gDrawTarget->context, 0, 0, str, strlen(str));
 		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
@@ -352,34 +355,34 @@ namespace Base {
 
 	SYSCALL(MAExtent, maGetTextSizeW(const wchar* str)) {
 		int numGlyphs = wcharLength(str);
-		if(numGlyphs==0) return EXTENT(0, 0);		
+		if(numGlyphs==0) return EXTENT(0, 0);
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
 		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextInvisible);
 		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
-		CGContextShowGlyphsAtPoint(gDrawTarget->context, 0, 0, glyphs, numGlyphs); 
+		CGContextShowGlyphsAtPoint(gDrawTarget->context, 0, 0, glyphs, numGlyphs);
 		CGPoint after = CGContextGetTextPosition(gDrawTarget->context);
 		int width = after.x;
-		delete glyphs;	
+		delete glyphs;
 		return EXTENT(width, FONT_HEIGHT);
 	}
 
 	SYSCALL(void, maDrawText(int left, int top, const char* str)) {
-		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);	
+		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
-		CGContextSetTextPosition (gDrawTarget->context, 0, 0);		
+		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
 		CGContextShowTextAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, str, strlen(str));
 	}
 
 	SYSCALL(void, maDrawTextW(int left, int top, const wchar* str)) {
-		int numGlyphs = wcharLength(str);		
+		int numGlyphs = wcharLength(str);
 		if(numGlyphs==0) return;
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
 		CMFontGetGlyphsForUnichars(sUnicodeFont, (const UniChar*)str, glyphs, numGlyphs);
-		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);	
+		CGContextSetRGBFillColor(gDrawTarget->context, currentRed, currentGreen, currentBlue, 1);
 		CGContextSetTextDrawingMode(gDrawTarget->context, kCGTextFill);
-		CGContextSetTextPosition (gDrawTarget->context, 0, 0);		
-		CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, glyphs, numGlyphs);		
+		CGContextSetTextPosition (gDrawTarget->context, 0, 0);
+		CGContextShowGlyphsAtPoint(gDrawTarget->context, left, top+FONT_HEIGHT, glyphs, numGlyphs);
 		delete glyphs;
 	}
 
@@ -387,18 +390,18 @@ namespace Base {
 		if(gClosing) {
 			return;
 		}
-#ifdef SUPPORT_OPENGL_ES	
+#ifdef SUPPORT_OPENGL_ES
 		else if(sOpenGLView != -1) {
 			maWidgetSetProperty(sOpenGLView, "invalidate", "");
 			return;
 		}
-#endif		
+#endif
 		else if(isNativeUIEnabled()) {
 			return;
 		}
-		
+
 		// we must check if the canvas is enabled, because the mosync thread will be locked until the surface is drawn to the screen.
-	
+
 		MoSync_UpdateView(gBackbuffer->image);
 	}
 
@@ -411,10 +414,10 @@ namespace Base {
 	}
 
 	SYSCALL(void, maDrawImage(MAHandle image, int left, int top)) {
-		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
-		gDrawTarget->mImageDrawer->drawImage(left, top, img->mImageDrawer);				
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
+		gDrawTarget->mImageDrawer->drawImage(left, top, img->mImageDrawer);
 	}
-	
+
 	void flipColorsFromAxGyToAyGx(int *buf, int width, int height, int scanlength) {
 		int *ptr = (int*)buf;
 		for(int j = 0; j < height; j++) {
@@ -424,18 +427,18 @@ namespace Base {
 				ptr++;
 			}
 			ptr+=-width+scanlength;
-		}		
-	}	
+		}
+	}
 
 	SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src, const MARect* srcRect,
 		int scanlength)) {
 		gSyscall->ValidateMemRange(dstPoint, sizeof(MAPoint2d));
 		gSyscall->ValidateMemRange(srcRect, sizeof(MARect));
 		gSyscall->ValidateMemRange(src, scanlength*srcRect->height*4);
-		
-		Surface *srcSurface = new 
+
+		Surface *srcSurface = new
 		Surface(srcRect->width, srcRect->height, (char*)src, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
-		
+
 		ClipRect srcRectCR;
 		srcRectCR.x = srcRect->left;
 		srcRectCR.y = srcRect->top;
@@ -443,7 +446,7 @@ namespace Base {
 		srcRectCR.height = srcRect->height;
 		gDrawTarget->mImageDrawer->drawImageRegion(dstPoint->x, dstPoint->y, &srcRectCR, srcSurface->mImageDrawer, 0);
 		delete srcSurface;
-		
+
 		flipColorsFromAxGyToAyGx(&((int*)gDrawTarget->data)[srcRect->left+srcRect->top*(gDrawTarget->rowBytes>>2)], srcRect->width, srcRect->height, gDrawTarget->rowBytes>>2);
 	}
 
@@ -451,7 +454,7 @@ namespace Base {
 		int transformMode))
 	{
 		gSyscall->ValidateMemRange(dstTopLeft, sizeof(MAPoint2d));
-		gSyscall->ValidateMemRange(src, sizeof(MARect));	
+		gSyscall->ValidateMemRange(src, sizeof(MARect));
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
 
 		ClipRect srcRect;
@@ -467,7 +470,7 @@ namespace Base {
 		return EXTENT(img->width, img->height);
 	}
 
-	
+
 	SYSCALL(void, maGetImageData(MAHandle image, void* dst, const MARect* src, int scanlength)) {
 		gSyscall->ValidateMemRange(src, sizeof(MARect));
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
@@ -484,27 +487,27 @@ namespace Base {
 		//int imgwidth = CGImageGetWidth(img->image);
 		//int imgheight = CGImageGetHeight(img->image);
 		//memset(dst, 0, scanlength*height*4);
-		
+
 		Surface *srcSurface = new Surface(smallImage);
-		
+
 		//Surface *dstSurface = new Surface(imgwidth, imgheight, (char*) dst, kCGImageAlphaPremultipliedLast|kCGBitmapByteOrder32Big, scanlength*4);
 
 		int* dstptr = (int*)dst;
 		int* srcptr = (int*)srcSurface->data;
 		for(int i = 0; i < height; i++) {
-			memcpy(dstptr, srcptr, width*4); 
+			memcpy(dstptr, srcptr, width*4);
 			srcptr+=width;
 			dstptr+=scanlength;
 	   }
-		
+
 		//CGContextDrawImage(dstSurface->context, CGRectMake(0, 0, width, height), smallImage);
 		//CGImageRelease(smallImage);
-		
+
 		flipColorsFromAxGyToAyGx((int*)dst, width, height, scanlength);
 		delete srcSurface;
 		//delete dstSurface;
-		
-		
+
+
 	}
 
 	SYSCALL(MAHandle, maSetDrawTarget(MAHandle handle)) {
@@ -520,8 +523,8 @@ namespace Base {
 			Surface* img = SYSCALL_THIS->resources.extract_RT_IMAGE(handle);
 			if(!img->data)
 				BIG_PHAT_ERROR(ERR_RES_INVALID_TYPE);
-			   
-			gDrawTarget = img; 
+
+			gDrawTarget = img;
 			ROOM(SYSCALL_THIS->resources.add_RT_FLUX(handle, NULL));
 		}
 		gDrawTargetHandle = handle;
@@ -532,13 +535,13 @@ namespace Base {
 		MYASSERT(size>0, ERR_DATA_OOB);
 		Stream* stream = gSyscall->resources.get_RT_BINARY(data);
 		Surface *bitmap = 0;
-		
+
 		int len;
-		TEST(stream->length(len));	
-		
+		TEST(stream->length(len));
+
 		if(offset<0 || offset+size>len)
 			BIG_PHAT_ERROR(ERR_DATA_OOB);
-		
+
 		if(!stream->ptrc()) {
 			// is not a memstream, read it to a buffer and load it.
 			MYASSERT(stream->seek(Seek::Start, offset), ERR_DATA_OOB);
@@ -553,16 +556,16 @@ namespace Base {
 			MemStreamC memStream((const void*)&ptr[offset], size);
 			bitmap = gSyscall->loadImage(memStream);
 		}
-		
+
 		if(!bitmap) return RES_BAD_INPUT;
 		if(!bitmap->image) {
 			delete bitmap;
 			// most likely bad input.
 			return RES_BAD_INPUT;
 		}
-		
+
 		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
-		
+
 	}
 
 	SYSCALL(int, maCreateImageRaw(MAHandle placeholder, const void* src, MAExtent size, int processAlpha)) {
@@ -577,14 +580,14 @@ namespace Base {
 			delete data;
 			return RES_OUT_OF_MEMORY;
 		}
-		
+
 		if(!bitmap->context || !bitmap->image || !bitmap->data) {
 			delete bitmap;
 			delete data;
 			return RES_OUT_OF_MEMORY;
 		}
-		
-		
+
+
 		bitmap->mOwnData = true;
 		flipColorsFromAxGyToAyGx((int*)data, EXTENT_X(size), EXTENT_Y(size), EXTENT_X(size));
 		return gSyscall->resources.add_RT_IMAGE(placeholder, bitmap);
@@ -596,74 +599,74 @@ namespace Base {
 		if(!surf) return RES_OUT_OF_MEMORY;
 		if(!surf->context || !surf->image || !surf->data) {
 			delete surf;
-			return RES_OUT_OF_MEMORY;			
+			return RES_OUT_OF_MEMORY;
 		}
-			
+
 		return gSyscall->resources.add_RT_IMAGE(placeholder, surf);
 	}
 
 
-	SYSCALL(int, maGetKeys()) 
+	SYSCALL(int, maGetKeys())
 	{
 		if(gClosing)
 			return 0;
 		return 0; // there's no keys on iphone :)
 	}
-	
 
-	SYSCALL(int, maGetEvent(MAEvent *dst)) 
+
+	SYSCALL(int, maGetEvent(MAEvent *dst))
 	{
-		gSyscall->ValidateMemRange(dst, sizeof(MAEvent));	
+		gSyscall->ValidateMemRange(dst, sizeof(MAEvent));
 		MYASSERT(((uint)dst & 3) == 0, ERR_MEMORY_ALIGNMENT);	//alignment
 
 		if(!gClosing)
 			gEventOverflow = false;
-		
+
 		MAEvent ev;
 		bool ret = gEventQueue.getAndProcess(ev);
 		if(!ret) return 0;
 		else *dst = ev; //gEventQueue.get();
-		
+
 #define HANDLE_CUSTOM_EVENT(eventType, dataType) if(ev.type == eventType) {\
 		memcpy(MoSync_GetCustomEventData(), (void*)ev.data, sizeof(dataType));\
 		delete (dataType*)ev.data;\
 		dst->data = (int)MoSync_GetCustomEventDataMoSyncPointer(); }
-		
+
 		CUSTOM_EVENTS(HANDLE_CUSTOM_EVENT);
-		
+
 		return 1;
 	}
 
-	SYSCALL(void, maWait(int timeout)) 
+	SYSCALL(void, maWait(int timeout))
 	{
 		if(gClosing)
 			return;
 		gEventQueue.wait(timeout);
 	}
 
-	SYSCALL(int, maTime()) 
+	SYSCALL(int, maTime())
 	{
 		return (int)time(NULL);
 	}
 
-	SYSCALL(int, maLocalTime()) 
+	SYSCALL(int, maLocalTime())
 	{
 		time_t t = time(NULL);
 		tm* lt = localtime(&t);
 		return t + lt->tm_gmtoff;
 	}
-	
-	SYSCALL(int, maGetMilliSecondCount()) 
+
+	SYSCALL(int, maGetMilliSecondCount())
 	{
 		//int time = (int)(CACurrentMediaTime()*1000.0);
 		//int time = (int)(CFAbsoluteTimeGetCurrent()*1000.0f);
 		//int time = (int)((double)mach_absolute_time()*gTimeConversion);
 		int time = (((mach_absolute_time() - gTimeStart) * gTimeBase.numer) / gTimeBase.denom) / 1000000;
-		
-		
+
+
 		return time;
 	}
-	
+
 
 	SYSCALL(int, maFreeObjectMemory()) {
 		return getFreeAmountOfMemory();
@@ -672,45 +675,45 @@ namespace Base {
 		return getTotalAmountOfMemory();
 	}
 
-	SYSCALL(int, maVibrate(int ms)) 
+	SYSCALL(int, maVibrate(int ms))
 	{
 		AudioServicesPlaySystemSound(kSystemSoundID_Vibrate);
 		return 1;
 	}
 
-	SYSCALL(void, maPanic(int result, char* message)) 
-	{		
+	SYSCALL(void, maPanic(int result, char* message))
+	{
 		MoSync_ShowMessageBox(nil, message, true);
 		gRunning = false;
 		pthread_exit(NULL);
 	}
 
-	SYSCALL(int, maPlatformRequest(const char* url)) 
+	SYSCALL(int, maPlatformRequest(const char* url))
 	{
 		if(!platformRequest(url)) return -1;
 		return 0;
 	}
-	
+
 	static AVAudioPlayer* sSoundPlayer = NULL;
-	
-	SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size)) 
-	{ 
+
+	SYSCALL(int, maSoundPlay(MAHandle sound_res, int offset, int size))
+	{
 		Stream *res = gSyscall->resources.get_RT_BINARY(sound_res);
 		MYASSERT(res->seek(Seek::Start, offset), ERR_DATA_ACCESS_FAILED);
 		Stream* src = res->createLimitedCopy(size);
 		MYASSERT(src, ERR_DATA_ACCESS_FAILED);
-		
+
 		byte b;
 		do {
 			if(!src->readByte(b))
 				BIG_PHAT_ERROR(ERR_MIME_READ_FAILED);
 		} while(b);
-		
+
 		int pos;
-		src->tell(pos);	
-		
+		src->tell(pos);
+
 		NSData *data = NULL;
-		
+
 		int encodedSize = size - pos + offset;
 		if(!src->ptrc()) {
 			byte* sound = new byte[encodedSize];
@@ -720,14 +723,14 @@ namespace Base {
 		} else {
 			byte* sound = &(((byte*)src->ptrc())[pos]);
 			data = [NSData dataWithBytesNoCopy:sound length:encodedSize freeWhenDone:NO];
-		}		
-		
+		}
+
 		if(sSoundPlayer) {
 			if(sSoundPlayer.playing==YES)
 				[sSoundPlayer stop];
-			[sSoundPlayer release];	
+			[sSoundPlayer release];
 		}
-		
+
 		NSError *err;
 		sSoundPlayer = [[AVAudioPlayer alloc] initWithData:data error:&err];
 		[data release];
@@ -736,34 +739,34 @@ namespace Base {
 			return -1;
 		}
 		[sSoundPlayer play];
-		
+
 		return 0;
 	}
 
-	SYSCALL(void, maSoundStop()) 
+	SYSCALL(void, maSoundStop())
 	{
 		[sSoundPlayer stop];
 		sSoundPlayer.currentTime = 0;
 	}
 
-	SYSCALL(int, maSoundIsPlaying()) 
+	SYSCALL(int, maSoundIsPlaying())
 	{
 		return sSoundPlayer.playing==YES;
 	}
 
-	SYSCALL(void, maSoundSetVolume(int vol)) 
+	SYSCALL(void, maSoundSetVolume(int vol))
 	{
 		sSoundPlayer.volume = (float)vol/100.0f;
 	}
 
-	SYSCALL(int, maSoundGetVolume()) 
+	SYSCALL(int, maSoundGetVolume())
 	{
 		return (int)(sSoundPlayer.volume*100.0f);
 	}
-	
-	SYSCALL(int, maGetBatteryCharge()) 
+
+	SYSCALL(int, maGetBatteryCharge())
 	{
-		float batLeft = [[UIDevice currentDevice] batteryLevel]; 		
+		float batLeft = [[UIDevice currentDevice] batteryLevel];
 		return (int)(batLeft*100.0f);
 	}
 
@@ -775,25 +778,25 @@ namespace Base {
 	SYSCALL(int, maInvokeExtension(int, int, int, int)) {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
-	
+
 	SYSCALL(int, maFrameBufferGetInfo(MAFrameBufferInfo *info)) {
 		int bytesPerRow = CGBitmapContextGetBytesPerRow(gBackbuffer->context);
 		int bitsPerPixel = CGBitmapContextGetBitsPerPixel(gBackbuffer->context);
 		int bytesPerPixel = bytesPerRow/gWidth;
 		int bitsPerComponent = CGBitmapContextGetBitsPerComponent(gBackbuffer->context);
-		
+
 		info->bitsPerPixel = bitsPerPixel;
 		info->bytesPerPixel = bytesPerPixel;
 
 		//CGBitmapInfo bInfo = CGImageGetBitmapInfo(gBackbuffer->image);
-		
+
 		info->redMask = 0x00ff0000;
 		info->greenMask = 0x0000ff00;
 		info->blueMask = 0x000000ff;
 		info->redShift = 16;
 		info->greenShift = 8;
-		info->blueShift = 0;				
-		
+		info->blueShift = 0;
+
 		info->sizeInBytes = bytesPerRow*gHeight;
 		info->width = gWidth;
 		info->height = gHeight;
@@ -803,25 +806,25 @@ namespace Base {
 		info->greenBits = bitsPerComponent;
 		info->blueBits = bitsPerComponent;
 		info->supportsGfxSyscalls = 1;
-		
+
 		return 1;
 	}
 
-	static Surface *sInternalBackBuffer = NULL;	
+	static Surface *sInternalBackBuffer = NULL;
 	SYSCALL(int, maFrameBufferInit(const void *data)) {
 		if(sInternalBackBuffer!=NULL) return 0;
 		sInternalBackBuffer = gBackbuffer;
 
 		gBackbuffer = new Surface(gWidth, gHeight, (char*)data, kCGImageAlphaNoneSkipFirst | kCGBitmapByteOrder32Little);
-		CGContextRestoreGState(gBackbuffer->context);		
+		CGContextRestoreGState(gBackbuffer->context);
 		CGContextTranslateCTM(gBackbuffer->context, 0, gHeight);
 		CGContextScaleCTM(gBackbuffer->context, 1.0, -1.0);
 		CGContextSaveGState(gBackbuffer->context);
 		gDrawTarget = gBackbuffer;
 		return 1;
 	}
-	
-	
+
+
 	SYSCALL(int, maFrameBufferClose()) {
 		if(sInternalBackBuffer==NULL) return 0;
 		delete gBackbuffer;
@@ -830,29 +833,29 @@ namespace Base {
 		gDrawTarget = gBackbuffer;
 		return 1;
 	}
-	
+
 	int maLocationStart() {
 		MoSync_StartUpdatingLocation();
 		return MA_LPS_AVAILABLE;
 	}
-	
+
 	int maLocationStop() {
 		MoSync_StopUpdatingLocation();
 		return 0;
 	}
-		
+
 	int maTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
 		MoSync_ShowTextBox(title, inText, outText, maxSize, constraints);
 		return 0;
 	}
-	
+
 	int maGetSystemProperty(const char *key, char *buf, int size) {
 		int res = -1;
 		if(strcmp(key, "mosync.iso-639-1")==0) {
-			// I don't know if this works perfectly (in the documentation it 
+			// I don't know if this works perfectly (in the documentation it
 			// says that it will return iso-639-x, but it looks like iso-639-1)
-			CFLocaleRef userLocaleRef = CFLocaleCopyCurrent(); 
-			CFStringRef str = (CFStringRef)CFLocaleGetValue(userLocaleRef, kCFLocaleLanguageCode);			
+			CFLocaleRef userLocaleRef = CFLocaleCopyCurrent();
+			CFStringRef str = (CFStringRef)CFLocaleGetValue(userLocaleRef, kCFLocaleLanguageCode);
 			res = CFStringGetLength(str);
 			CFStringGetCString(str, buf, size, kCFStringEncodingUTF8);
 			CFRelease(str);
@@ -867,7 +870,7 @@ namespace Base {
 			[@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
 		}
 		return res;
-	}	
+	}
 
 #ifdef SUPPORT_OPENGL_ES
 	int maOpenGLInitFullscreen() {
@@ -878,39 +881,39 @@ namespace Base {
 		maWidgetSetProperty(sOpenGLView, "height", "-1");
 		maWidgetAddChild(sOpenGLScreen, sOpenGLView);
 		maWidgetScreenShow(sOpenGLScreen);
-		maWidgetSetProperty(sOpenGLView, "bind", "");		
+		maWidgetSetProperty(sOpenGLView, "bind", "");
 		return 1;
 	}
-	
+
 	int maOpenGLCloseFullscreen() {
 		if(sOpenGLScreen == -1) return 0;
 		maWidgetRemoveChild(sOpenGLView);
 		maWidgetDestroy(sOpenGLView);
-		maWidgetDestroy(sOpenGLScreen);		
+		maWidgetDestroy(sOpenGLScreen);
 		sOpenGLView = -1;
 		sOpenGLScreen = -1;
 		return 1;
 	}
-	
+
 	int maOpenGLTexImage2D(MAHandle image) {
-		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
-	
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
+
 		int powWidth = nextPowerOf2(1, img->width);
 		int powHeight = nextPowerOf2(1, img->height);
 
 		if(powWidth!=img->width || powHeight!=img->height) {
-			
+
 			//surface = SDL_CreateRGBSurface(SDL_SWSURFACE, w, h, surface->format->BitsPerPixel,
 			//							   surface->format->Rmask, surface->format->Gmask, surface->format->Bmask, surface->format->Amask);
-			
+
 			int bytesPerPixel = 4; // for now.
-			
+
 			int oldBytesPerRow = img->rowBytes;
 			int newBytesPerRow = powWidth*bytesPerPixel;
 			int oldActualBytesPerRow = img->width*bytesPerPixel;
-			
+
 			byte* data = new byte[powHeight*newBytesPerRow];
-			
+
 			byte* src = (byte*)img->data;
 			byte* dst = data;
 			for(int y = 0; y < img->height; y++) {
@@ -918,43 +921,43 @@ namespace Base {
 				src+=oldBytesPerRow;
 				dst+=newBytesPerRow;
 			}
-			
+
 			glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, powWidth, powHeight, 0,
 						 GL_RGBA, GL_UNSIGNED_BYTE, data);
-			
+
 			delete data;
-			
+
 			return MA_GL_TEX_IMAGE_2D_OK;
 		}
-		
-									 
+
+
 		// Edit the texture object's image data using the information SDL_Surface gives us
 		glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, img->width, img->height, 0,
 					 GL_RGBA, GL_UNSIGNED_BYTE, img->data);
-		
+
 		return MA_GL_TEX_IMAGE_2D_OK;
 	}
-	
+
 
 	int maOpenGLTexSubImage2D(MAHandle image) {
-		Surface* img = gSyscall->resources.get_RT_IMAGE(image);	
-		
+		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
+
 		// Edit the texture object's image data using the information SDL_Surface gives us
 		glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0, img->width, img->height, GL_RGBA
 						, GL_UNSIGNED_BYTE, img->data);
-		
+
 		return MA_GL_TEX_IMAGE_2D_OK;
-	}	
-	
-#endif	//SUPPORT_OPENGL_ES	
-	
-	int maReportResourceInformation() {
-		gSyscall->resources.logEverything();
-		return 0;		
 	}
 
-	SYSCALL(void, maMessageBox(const char* title, const char* message)) 
-	{		
+#endif	//SUPPORT_OPENGL_ES
+
+	int maReportResourceInformation() {
+		gSyscall->resources.logEverything();
+		return 0;
+	}
+
+	SYSCALL(void, maMessageBox(const char* title, const char* message))
+	{
 		MoSync_ShowMessageBox(title, message, false);
 	}
 	
@@ -1322,6 +1325,18 @@ namespace Base {
 	}
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c)) 
+
+    SYSCALL(int, maSensorStart(int sensor, int interval))
+	{
+		return MoSync_SensorStart(sensor, interval);
+	}
+
+    SYSCALL(int, maSensorStop(int sensor))
+	{
+		return MoSync_SensorStop(sensor);
+	}
+
+	SYSCALL(int, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
 
@@ -1337,7 +1352,24 @@ namespace Base {
 		maIOCtl_case(maLocationStop);
 		maIOCtl_case(maFrameBufferGetInfo);
 		maIOCtl_case(maFrameBufferInit);
-		maIOCtl_case(maFrameBufferClose);				
+		maIOCtl_case(maFrameBufferClose);
+        maIOCtl_syscall_case(maPimListOpen);
+        maIOCtl_syscall_case(maPimListNext);
+        maIOCtl_syscall_case(maPimItemCount);
+        maIOCtl_syscall_case(maPimItemGetValue);
+        maIOCtl_syscall_case(maPimListClose);
+        maIOCtl_syscall_case(maPimItemGetField);
+        maIOCtl_syscall_case(maPimItemFieldCount);
+        maIOCtl_syscall_case(maPimItemGetAttributes);
+        maIOCtl_syscall_case(maPimItemSetLabel);
+        maIOCtl_syscall_case(maPimItemGetLabel);
+        maIOCtl_syscall_case(maPimFieldType);
+        maIOCtl_syscall_case(maPimItemSetValue);
+        maIOCtl_syscall_case(maPimItemAddValue);
+        maIOCtl_syscall_case(maPimItemRemoveValue);
+        maIOCtl_syscall_case(maPimItemClose);
+        maIOCtl_syscall_case(maPimItemCreate);
+        maIOCtl_syscall_case(maPimItemRemove);
 		maIOCtl_syscall_case(maFileOpen);
 		maIOCtl_syscall_case(maFileWriteFromData);
 		maIOCtl_syscall_case(maFileReadToData);
@@ -1350,9 +1382,9 @@ namespace Base {
 		maIOCtl_syscall_case(maFileCreate);
 		maIOCtl_syscall_case(maFileDelete);
 		maIOCtl_syscall_case(maFileSize);
-		maIOCtl_case(maTextBox);		
+		maIOCtl_case(maTextBox);
 		maIOCtl_case(maGetSystemProperty);
-		maIOCtl_case(maReportResourceInformation);			
+		maIOCtl_case(maReportResourceInformation);
 		maIOCtl_case(maMessageBox);
 		maIOCtl_case(maCameraStart);
 		maIOCtl_case(maCameraStop);
@@ -1363,31 +1395,33 @@ namespace Base {
 		maIOCtl_case(maCameraRecord);
 		maIOCtl_case(maCameraSetProperty);
 		maIOCtl_case(maCameraGetProperty);
+        maIOCtl_case(maSensorStart);
+        maIOCtl_case(maSensorStop);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
 #endif	//SUPPORT_OPENGL_ES
 		}
-		
+
 		return IOCTL_UNAVAILABLE;
 	}
-	
+
 	SYSCALL(void, maLoadProgram(MAHandle data, int reload)) {
-		MoSync_ReloadProgram(data, reload);		
+		MoSync_ReloadProgram(data, reload);
 	}
-	
+
 } // namespace Base
 
 void EventQueue::handleInternalEvent(int type, void *e) {
 	if(type == IEVENT_TYPE_DEFLUX_BINARY) {
 		InternalEventDefluxBin *d = (InternalEventDefluxBin*)e;
 		SYSCALL_THIS->resources.extract_RT_FLUX(d->handle);
-		ROOM(SYSCALL_THIS->resources.dadd_RT_BINARY(d->handle, d->stream));	
+		ROOM(SYSCALL_THIS->resources.dadd_RT_BINARY(d->handle, d->stream));
 		delete d;
 	}
 }
 
-void MoSyncExit(int r) 
+void MoSyncExit(int r)
 {
 	LOG("MoSyncExit(%d)\n", r);
 
@@ -1402,11 +1436,11 @@ void MoSyncExit(int r)
 	pthread_exit(NULL);
 }
 
-void MoSyncErrorExit(int errorCode) 
+void MoSyncErrorExit(int errorCode)
 {
 	LOG("ErrorExit %i\n", errorCode);
 	char buffer[256];
-	//char* ptr = buffer + 
+	//char* ptr = buffer +
 	sprintf(buffer, "MoSync Panic\np%i.", errorCode);
 #if 0
 	if(gCore) {
@@ -1428,10 +1462,9 @@ void MoSyncErrorExit(int errorCode)
 		}
 	}
 #endif
-	
+
 	gRunning = false;
 	logWithNSLog(buffer, strlen(buffer));
-	MoSync_ShowMessageBox(nil, buffer, true);	
+	MoSync_ShowMessageBox(nil, buffer, true);
 	pthread_exit(NULL);
 }
-	

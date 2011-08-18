@@ -70,6 +70,7 @@ FileUtils.cp "main.m", "template/main.m"
 FileUtils.cp "../../../../intlibs/helpers/maapi_defs.h", "template/Classes/helpers/maapi_defs.h"
 FileUtils.cp "../../../../intlibs/helpers/cpp_maapi.h", "template/Classes/helpers/cpp_maapi.h"
 FileUtils.cp "../../../../intlibs/helpers/cpp_defs.h", "template/Classes/helpers/cpp_defs.h"
+FileUtils.cp "../../../../intlibs/helpers/cpp_ix_pim.h", "template/Classes/helpers/cpp_ix_pim.h"
 FileUtils.cp "../../../../tools/idl2/Output/syscall_static_cpp.h", "template/Classes/syscall_static_cpp.h"
 
 # copy template files

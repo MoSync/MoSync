@@ -38,17 +38,17 @@ public class EventQueue
 	 * 
 	 * @param widgetEventType The type of the widget event.
 	 * @param widgetHandle The handle of the widget.
-	 * @param auxParam1 Parameter used by some (used by some 
-	 *  messages for parameters like messageDataHandle, listItemIndex, 
-	 *  searchBarButton, etc. See struct MAWidgetEventData for 
+	 * @param auxParam1 Parameter used by some (used by some
+	 *  messages for parameters like messageDataHandle, listItemIndex,
+	 *  searchBarButton, etc. See struct MAWidgetEventData for
 	 *  documentation of these fields.
-	 * @param auxParam2 Parameter used by some messages. 
+	 * @param auxParam2 Parameter used by some messages.
 	 *  Set to zero if not used.
 	 */
 	public void postWidgetEvent(
-		int widgetEventType, 
-		int widgetHandle, 
-		int auxParam1, 
+		int widgetEventType,
+		int widgetHandle,
+		int auxParam1,
 		int auxParam2)
 	{
 		int event[] = new int[5];
@@ -61,11 +61,11 @@ public class EventQueue
 		
 		sMoSyncThread.postEvent(event);
 	}
-	
+
 	/**
-	 * Convenience method for posting a widget event with 
+	 * Convenience method for posting a widget event with
 	 * two parameters.
-	 * 
+	 *
 	 * @param widgetEventType The type of the widget event.
 	 * @param widgetHandle The handle of the widget.
 	 */
@@ -83,7 +83,7 @@ public class EventQueue
 	public void postWidgetClickedEvent(int widgetHandle, boolean checked)
 	{
 		postWidgetEvent(
-			IX_WIDGET.MAW_EVENT_CLICKED, 
+			IX_WIDGET.MAW_EVENT_CLICKED,
 			widgetHandle,
 			checked ? 1 : 0,
 			0);
@@ -98,7 +98,7 @@ public class EventQueue
 	public void postWidgetItemClickedEvent(int widgetHandle, int position)
 	{
 		postWidgetEvent(
-			IX_WIDGET.MAW_EVENT_ITEM_CLICKED, 
+			IX_WIDGET.MAW_EVENT_ITEM_CLICKED,
 			widgetHandle,
 			position,
 			0);
@@ -113,7 +113,7 @@ public class EventQueue
 	public void postWidgetTabChangedEvent(int tabScreen, int newTabIndex)
 	{
 		postWidgetEvent(
-			IX_WIDGET.MAW_EVENT_TAB_CHANGED, 
+			IX_WIDGET.MAW_EVENT_TAB_CHANGED,
 			tabScreen,
 			newTabIndex,
 			0);
@@ -128,17 +128,17 @@ public class EventQueue
 	 * @param poppedToScreenHandle The next screen that will be shown.
 	 */
 	public void postWidgetStackScreenPoppedEvent(
-		int stackScreenHandle, 
-		int poppedFromScreenHandle, 
+		int stackScreenHandle,
+		int poppedFromScreenHandle,
 		int poppedToScreenHandle)
 	{
 		postWidgetEvent(
-			IX_WIDGET.MAW_EVENT_STACK_SCREEN_POPPED, 
+			IX_WIDGET.MAW_EVENT_STACK_SCREEN_POPPED,
 			stackScreenHandle,
 			poppedFromScreenHandle,
 			poppedToScreenHandle);
 	}
-	
+
 	public static EventQueue getDefault()
 	{
 		return DEFAULT;
