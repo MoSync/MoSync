@@ -17,6 +17,7 @@
 
 #import "ReflectionWidget.h"
 #import <objc/runtime.h>
+#include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
 @implementation ReflectionWidget

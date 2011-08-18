@@ -424,7 +424,7 @@ public class NativeUI
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null )
 		{
-			Log.e( "MoSync", "maWidgetSetProperty: Invalid child widget handle: " + widgetHandle );
+			Log.e( "MoSync", "maWidgetSetProperty: Invalid widget handle: " + widgetHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
@@ -451,7 +451,14 @@ public class NativeUI
 			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 		}
 	}
-	
+
+	/**
+	 * Internal function for the maWidgetGetProperty system call.
+	 * Gets a property on the given widget, by accessing it from
+	 * the widget table and calling its getProperty method.
+	 * 
+	 * Note: Should only be called on the UI thread.
+	 */
 	public int maWidgetGetProperty(
 		int widgetHandle, 
 		String key, 
@@ -461,7 +468,7 @@ public class NativeUI
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null )
 		{
-			Log.e( "MoSync", "maWidgetGetProperty: Invalid child widget handle: " + widgetHandle );
+			Log.e( "MoSync", "maWidgetGetProperty: Invalid widget handle: " + widgetHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		

@@ -857,8 +857,15 @@ namespace Base {
 			CFStringGetCString(str, buf, size, kCFStringEncodingUTF8);
 			CFRelease(str);
 			CFRelease(userLocaleRef);
+		} else if (strcmp(key, "mosync.path.local") == 0) {
+			NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+			NSString *documentsDirectoryPath = [NSString stringWithFormat:@"%@/",[paths objectAtIndex:0]];
+			[documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			[documentsDirectoryPath release];
+			[paths release];
+		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
+			[@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
 		}
-		
 		return res;
 	}	
 

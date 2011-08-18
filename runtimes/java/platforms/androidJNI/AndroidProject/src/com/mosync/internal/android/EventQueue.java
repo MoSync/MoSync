@@ -32,33 +32,46 @@ public class EventQueue
 	public static MoSyncThread sMoSyncThread;
 	
 	private static EventQueue DEFAULT = new EventQueue( );	
-	
-	public void postWidgetEvent(int widgetEventType, int widgetHandle)
-	{
-		postWidgetEvent( widgetEventType, widgetHandle, 0, 0 );
-	}
-	
+
 	/**
 	 * Post a widget event.
 	 * 
 	 * @param widgetEventType The type of the widget event.
 	 * @param widgetHandle The handle of the widget.
-	 * @param messageId The message id (may be zero and may also be used
-	 * for params listItemIndex and searchBarButton, see MAEvent for
-	 * documentation of these fields.
-	 * @param messageSize The size of the message (may be zero).
+	 * @param auxParam1 Parameter used by some (used by some 
+	 *  messages for parameters like messageDataHandle, listItemIndex, 
+	 *  searchBarButton, etc. See struct MAWidgetEventData for 
+	 *  documentation of these fields.
+	 * @param auxParam2 Parameter used by some messages. 
+	 *  Set to zero if not used.
 	 */
-	public void postWidgetEvent(int widgetEventType, int widgetHandle, int messageId, int messageSize)
+	public void postWidgetEvent(
+		int widgetEventType, 
+		int widgetHandle, 
+		int auxParam1, 
+		int auxParam2)
 	{
-		int event[] = new int[ 5 ];
+		int event[] = new int[5];
 		
 		event[0] = EVENT_TYPE_WIDGET;
 		event[1] = widgetEventType;
 		event[2] = widgetHandle;
-		event[3] = messageId;
-		event[4] = messageSize;
+		event[3] = auxParam1;
+		event[4] = auxParam2;
 		
-		sMoSyncThread.postEvent( event );
+		sMoSyncThread.postEvent(event);
+	}
+	
+	/**
+	 * Convenience method for posting a widget event with 
+	 * two parameters.
+	 * 
+	 * @param widgetEventType The type of the widget event.
+	 * @param widgetHandle The handle of the widget.
+	 */
+	public void postWidgetEvent(int widgetEventType, int widgetHandle)
+	{
+		postWidgetEvent(widgetEventType, widgetHandle, 0, 0);
 	}
 	
 	/**
@@ -69,14 +82,11 @@ public class EventQueue
 	 */
 	public void postWidgetClickedEvent(int widgetHandle, boolean checked)
 	{
-		int event[] = new int[ 5 ];
-		
-		event[0] = EVENT_TYPE_WIDGET;
-		event[1] = IX_WIDGET.MAW_EVENT_CLICKED;
-		event[2] = widgetHandle;
-		event[3] = checked ? 1 : 0;
-		
-		sMoSyncThread.postEvent( event );
+		postWidgetEvent(
+			IX_WIDGET.MAW_EVENT_CLICKED, 
+			widgetHandle,
+			checked ? 1 : 0,
+			0);
 	}
 	
 	/**
@@ -87,14 +97,11 @@ public class EventQueue
 	 */
 	public void postWidgetItemClickedEvent(int widgetHandle, int position)
 	{
-		int event[] = new int[ 5 ];
-		
-		event[0] = EVENT_TYPE_WIDGET;
-		event[1] = IX_WIDGET.MAW_EVENT_ITEM_CLICKED;
-		event[2] = widgetHandle;
-		event[3] = position;
-		
-		sMoSyncThread.postEvent( event );
+		postWidgetEvent(
+			IX_WIDGET.MAW_EVENT_ITEM_CLICKED, 
+			widgetHandle,
+			position,
+			0);
 	}
 	
 	/**
@@ -105,14 +112,11 @@ public class EventQueue
 	 */
 	public void postWidgetTabChangedEvent(int tabScreen, int newTabIndex)
 	{
-		int event[] = new int[ 5 ];
-		
-		event[0] = EVENT_TYPE_WIDGET;
-		event[1] = IX_WIDGET.MAW_EVENT_TAB_CHANGED;
-		event[2] = tabScreen;
-		event[3] = newTabIndex;
-		
-		sMoSyncThread.postEvent( event );
+		postWidgetEvent(
+			IX_WIDGET.MAW_EVENT_TAB_CHANGED, 
+			tabScreen,
+			newTabIndex,
+			0);
 	}
 	
 	/**
@@ -123,20 +127,18 @@ public class EventQueue
 	 * @param poppedFromScreenHandle The screen that was popped from.
 	 * @param poppedToScreenHandle The next screen that will be shown.
 	 */
-	public void postWidgetStackScreenPoppedEvent(int stackScreenHandle, 
-			int poppedFromScreenHandle, int poppedToScreenHandle)
+	public void postWidgetStackScreenPoppedEvent(
+		int stackScreenHandle, 
+		int poppedFromScreenHandle, 
+		int poppedToScreenHandle)
 	{
-		int event[] = new int[ 5 ];
-		
-		event[0] = EVENT_TYPE_WIDGET;
-		event[1] = IX_WIDGET.MAW_EVENT_STACK_SCREEN_POPPED;
-		event[2] = stackScreenHandle;
-		event[3] = poppedFromScreenHandle;
-		event[4] = poppedToScreenHandle;
-		
-		sMoSyncThread.postEvent( event );
+		postWidgetEvent(
+			IX_WIDGET.MAW_EVENT_STACK_SCREEN_POPPED, 
+			stackScreenHandle,
+			poppedFromScreenHandle,
+			poppedToScreenHandle);
 	}
-
+	
 	public static EventQueue getDefault()
 	{
 		return DEFAULT;
