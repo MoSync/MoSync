@@ -154,6 +154,8 @@ namespace Base {
 		DAR_UVINT(nResources);
 		DAR_UVINT(rSize);
 		resources.init(nResources);
+
+		// rI is the resource index.
 		int rI = 1;
 
 		while(true) {
@@ -194,9 +196,15 @@ namespace Base {
 					ROOM(resources.dadd_RT_BINARY(rI,
 						new LimitedFileStream(aFilename, pos, size)));
 #else
+					// Android loads ubins by using JNI.
 					loadUBinary(rI, pos, size);
 					ROOM(resources.dadd_RT_BINARY(rI,
-						new LimitedFileStream(aFilename, pos, size, getJNIEnvironment(), getJNIThis())));
+						new LimitedFileStream(
+							aFilename,
+							pos,
+							size,
+							getJNIEnvironment(),
+							getJNIThis())));
 #endif
 
 					TEST(file.seek(Seek::Current, size));
@@ -210,15 +218,28 @@ namespace Base {
 					MemStream b(size);
 					TEST(file.readFully(b));
 #ifndef _android
+					// On all platforms except Android, we load and add
+					// the image data. "dadd" means "delete and add",
+					// and is defined in runtimes\cpp\base\ResourceArray.h
                     RT_IMAGE_Type* image = loadImage(b);
                     if(!image)
                         BIG_PHAT_ERROR(ERR_IMAGE_LOAD_FAILED);
 					ROOM(resources.dadd_RT_IMAGE(rI, image));
 #else
-					ROOM(resources.dadd_RT_IMAGE(rI, NULL));
+					// On Android images are stored on the Java side.
+					// Here we allocate a dummy array (real image is
+					// in a table in Java) so that the resource handling,
+					// like deleting resources, will work also on Android.
+					// The actual image will be garbage collected on
+					// Android when a resource is replaced in the Java table.
+					ROOM(resources.dadd_RT_IMAGE(rI, new int[1]));
 					int pos;
 					file.tell(pos);
-					loadImage(rI, pos-size, size);
+					loadImage(
+						rI,
+						pos - size,
+						size,
+						Base::gSyscall->getReloadHandle());
 #endif
 				}
 				break;
@@ -368,7 +389,7 @@ namespace Base {
 	SYSCALL(uint, __fixunsdfsi(double f)) {
 		return (uint)f;
 	}
-#endif	//_android
+#endif	// NOT _android
 	SYSCALL(int, dcmp(double a, double b)) {
 		if(a > b)
 			return 1;
@@ -416,7 +437,7 @@ namespace Base {
 	SYSCALL(uint, __fixunssfsi(float f)) {
 		return (uint)f;
 	}
-#endif	//_android
+#endif	// NOT _android
 	SYSCALL(int, fcmp(float a, float b)) {
 		if(a > b)
 			return 1;
@@ -432,6 +453,9 @@ namespace Base {
 
 	SYSCALL(void, maDestroyObject(MAHandle handle)) {
 #ifdef _android
+		// On Android, we call into the Java side to
+		// delete objects, unless it is a binary resource,
+		// which is handled in the standard way.
 		if(!SYSCALL_THIS->destroyBinaryResource(handle))
 		{
 			SYSCALL_THIS->destroyResource(handle);
@@ -635,7 +659,7 @@ namespace Base {
 		}
 		SYSCALL_THIS->gStores.erase(store);
 	}
-#endif // _android
+#endif // NOT _android
 
 	SYSCALL(int, maLoadResources(MAHandle data)) {
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
@@ -1190,8 +1214,8 @@ namespace Base {
 		sFileListings.erase(itr);
 		return 0;
 	}
-#endif	//SYMBIAN
-#endif //_android
+#endif	// NOT SYMBIAN
+#endif // NOT _android
 
 #ifdef SYMBIAN
 #if 0

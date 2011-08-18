@@ -16,6 +16,7 @@
  */
 
 #import "NavBarWidget.h"
+#import "UIColor-Expanded.h"
 #include "Platform.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
@@ -36,18 +37,34 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"title"]) {
+	if([key isEqualToString:@"title"])
+    {
 		currNavitem.title = value;
 	}
-	else if([key isEqualToString:@"backButtonTitle"]) {
+	else if([key isEqualToString:@"backButtonTitle"])
+    {
 		//navitem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:value style:UIBarButtonItemStylePlain target:nil action:nil];
 		//navitem.hidesBackButton = YES;
 		prevNavitem.title = value;
 	}
-	else {
+    else if([key isEqualToString:@"backgroundColor"])
+    {
+        // The background color property must be handled different.
+        // For the rest of the widgets the property is handled by
+        // the super class(IWidget).
+        UINavigationBar* navBar = (UINavigationBar*) view;
+        UIColor* color = [UIColor colorWithHexString:value];
+		if (!color)
+        {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+		navBar.tintColor = color;
+	}
+	else
+    {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MAW_RES_OK;	
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {

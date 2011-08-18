@@ -145,6 +145,12 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 	return realLength;
 }
 
+int maWidgetPerformAction(MAWidgetHandle widget, const char *action, const char *param){
+	int returnValue=1;
+	
+	return returnValue; 
+}
+
 int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
 //	NSLog(@"maWidgetAddChild(%d, %d)\n", parentHandle, childHandle);
 

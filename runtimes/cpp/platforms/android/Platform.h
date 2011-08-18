@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define MA_PROF_SUPPORT_LOCATIONAPI
 #define MA_PROF_SUPPORT_WIDGETAPI
+#define MA_PROF_SUPPORT_SENSORAPI
 
 namespace Core {
 	class VMCore;

@@ -43,26 +43,26 @@ inline size_t wideCharStringLength(const wchar * s)
 }
 
 namespace Base
-{		
+{
 	int _maFrameBufferGetInfo(MAFrameBufferInfo *info)
-	{	
+	{
 		int size = maGetScrSize();
 		int width = (size&0xffff0000) >> 16;
 		int height = size&0x0000ffff;
-	
+
 		info->bitsPerPixel = 32;
 		info->bytesPerPixel = 4;
 		info->redMask = 0x000000ff;
 		info->greenMask = 0x0000ff00;
 		info->blueMask = 0x00ff0000;
 
-		
+
 		info->width = width;
 		info->height = height;
 		info->pitch = info->width*4;
-		
+
 		info->sizeInBytes = info->pitch * info->height;
-		
+
 		info->redShift = 0;
 		info->greenShift = 8;
 		info->blueShift = 16;
@@ -70,7 +70,7 @@ namespace Base
 		info->redBits = 8;
 		info->greenBits = 8;
 		info->blueBits = 8;
-		
+
 		info->supportsGfxSyscalls = 0;
 
 		return 1;
@@ -78,21 +78,21 @@ namespace Base
 
 
 	int _maFrameBufferInit(void *data, int memStart, JNIEnv* jNIEnv, jobject jThis)
-	{	
+	{
 		int rdata = (int)data - memStart;
-	
+
 		char* b = (char*)malloc(200);
 		sprintf(b,"Framebuffer data: %i", rdata);
 		__android_log_write(ANDROID_LOG_INFO,"JNI",b);
 		free(b);
-	
+
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "_enableFramebuffer", "(I)V");
 		if (methodID == 0) return 0;
 		jNIEnv->CallVoidMethod(jThis, methodID, rdata);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-	
+
 		return 1;
 	}
 
@@ -102,149 +102,149 @@ namespace Base
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "_disableFramebuffer", "()V");
 		if (methodID == 0) return 0;
 		jNIEnv->CallVoidMethod(jThis, methodID);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return 1;
 	}
-	
+
 	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery begin");
-		
+
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtStartDeviceDiscovery", "(I)I");
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, names);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery end");
-		
+
 		return (int)ret;
 	}
-	
+
 	/**
 	 * Returns actual length of device name.
 	 */
 	int _maBtGetNewDevice(
-		int memStart, 
-		int nameBufPointer, 
-		int nameBufSize, 
+		int memStart,
+		int nameBufPointer,
+		int nameBufSize,
 		int actualNameLengthPointer,
 		int addressPointer,
-		JNIEnv* jNIEnv, 
+		JNIEnv* jNIEnv,
 		jobject jThis)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewDevice begin");
-		
+
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtGetNewDevice", "(IIII)I");
 		if (methodID == 0) return 0;
-		
+
 		jint ret = jNIEnv->CallIntMethod(
-			jThis, 
-			methodID, 
+			jThis,
+			methodID,
 			nameBufPointer - memStart,
 			nameBufSize,
 			actualNameLengthPointer - memStart,
 			addressPointer - memStart);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewDevice end");
-		
+
 		return (int)ret;
 	}
-	
+
 	int _maBtStartServiceDiscovery(MABtAddr* addr, MAUUID* uuid, JNIEnv* jNIEnv, jobject jThis)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartServiceDiscovery begin");
-		
+
 		// Device address converted to string.
 		char addressBuf[64];
-		sprintf(addressBuf, "%02X%02X%02X%02X%02X%02X", 
+		sprintf(addressBuf, "%02X%02X%02X%02X%02X%02X",
 			addr->a[0], addr->a[1], addr->a[2], addr->a[3], addr->a[4], addr->a[5]);
 		jstring jstrAddress = jNIEnv->NewStringUTF(addressBuf);
-		
+
 		// UUID converted to string.
 		char uuidBuf[64];
 		char* u = (char*) uuid;
-		sprintf(uuidBuf, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X", 
+		sprintf(uuidBuf, "%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X%02X",
 			u[3], u[2], u[1], u[0], u[7], u[6], u[5], u[4], u[11], u[10], u[9], u[8], u[15], u[14], u[13], u[12]);
 		jstring jstrUUID = jNIEnv->NewStringUTF(uuidBuf);
-		
+
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtStartServiceDiscovery", "(Ljava/lang/String;Ljava/lang/String;)I");
 		if (methodID == 0) return 0;
-		
+
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrAddress, jstrUUID);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrAddress);
 		jNIEnv->DeleteLocalRef(jstrUUID);
-		
+
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartServiceDiscovery end");
-		
+
 		return (int)ret;
 	}
-	
+
 	int _maBtGetNextServiceSize(
 		int memStart,
 		int nameBufSizePointer,
 		int nUuidsPointer,
-		JNIEnv* jNIEnv, 
+		JNIEnv* jNIEnv,
 		jobject jThis)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNextServiceSize begin");
-		
+
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtGetNextServiceSize", "(II)I");
 		if (methodID == 0) return 0;
-		
+
 		jint ret = jNIEnv->CallIntMethod(
-			jThis, 
-			methodID, 
+			jThis,
+			methodID,
 			nameBufSizePointer - memStart,
 			nUuidsPointer - memStart);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNextServiceSize end");
-		
+
 		return (int)ret;
 	}
-	
+
 	int _maBtGetNewService(
 		int memStart,
 		int portPointer,
 		int nameBufPointer,
 		int nameBufSize,
 		int uuidsPointer,
-		JNIEnv* jNIEnv, 
+		JNIEnv* jNIEnv,
 		jobject jThis)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewService begin");
-		
+
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtGetNewService", "(IIII)I");
 		if (methodID == 0) return 0;
-		
+
 		jint ret = jNIEnv->CallIntMethod(
-			jThis, 
-			methodID, 
+			jThis,
+			methodID,
 			portPointer - memStart,
 			nameBufPointer - memStart,
 			nameBufSize,
 			uuidsPointer - memStart);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewService end");
-		
+
 		return (int)ret;
 	}
-	
+
 	int _maBtCancelDiscovery(JNIEnv* jNIEnv, jobject jThis)
 	{
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtCancelDiscovery begin");
@@ -254,10 +254,10 @@ namespace Base
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
 		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtCancelDiscovery end");
-		
+
 		return (int)ret;
 	}
-	
+
 	int _maAccept(int serverHandle, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
@@ -267,7 +267,7 @@ namespace Base
 		jNIEnv->DeleteLocalRef(cls);
 		return (int)ret;
 	}
-	
+
 	int _maLocationStart(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
@@ -275,10 +275,10 @@ namespace Base
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)ret;
 	}
-	
+
 	int _maLocationStop(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
@@ -286,26 +286,68 @@ namespace Base
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)ret;
 	}
-	
-	int _maGetSystemProperty(const char* key, int buf, int memStart, int size, JNIEnv* jNIEnv, jobject jThis)
+
+	int _maSendTextSMS(
+		const char* phoneNo,
+		const char* message,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		// Get Java objects.
+		jstring jstringPhoneNo = jNIEnv->NewStringUTF(phoneNo);
+		jstring jstringMessage = jNIEnv->NewStringUTF(message);
+		jclass theClass = jNIEnv->GetObjectClass(jThis);
+
+		// Get the method.
+		jmethodID methodID = jNIEnv->GetMethodID(
+			theClass,
+			"maSendTextSMS",
+			"(Ljava/lang/String;Ljava/lang/String;)I");
+
+		// Check that the method exists.
+		if (0 == methodID )
+		{
+			return -1;
+		}
+
+		// Call the method
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID, jstringPhoneNo, jstringMessage);
+
+		// Release Java objects.
+		jNIEnv->DeleteLocalRef(jstringPhoneNo);
+		jNIEnv->DeleteLocalRef(jstringMessage);
+		jNIEnv->DeleteLocalRef(theClass);
+
+		return (int)result;
+	}
+
+	int _maGetSystemProperty(
+		const char* key,
+		int buf,
+		int memStart,
+		int size,
+		JNIEnv* jNIEnv,
+		jobject jThis)
 	{
 		jstring jstrKey = jNIEnv->NewStringUTF(key);
 
 		int rBuf = buf - memStart;
-	
+
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maGetSystemProperty", "(Ljava/lang/String;II)I");
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls, "maGetSystemProperty", "(Ljava/lang/String;II)I");
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrKey, rBuf, size);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrKey);
-		
+
 		return (int)ret;
 	}
-	
+
 	int _maPlatformRequest(const char* url, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrURL = jNIEnv->NewStringUTF(url);
@@ -315,10 +357,10 @@ namespace Base
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrURL);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrURL);
-		
+
 		return (int)ret;
 	}
-	
+
 	int _maWriteLog(const char* str, int b, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrLOG = jNIEnv->NewStringUTF(str);
@@ -328,10 +370,10 @@ namespace Base
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrLOG);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrLOG);
-		
+
 		return (int)ret;
 	}
-	
+
 	/**
 	 * Internal function corresponding to the maShowVirtualKeyboard IOCtl.
 	 * Shows the android soft keyboard.
@@ -339,139 +381,139 @@ namespace Base
 	 * @param jNIEnv	JNI environment used
 	 * @param jThis		Pointer to the java class
 	 *
-	 * @return			Value returned by the maTextBox 
-	 *					java method 
+	 * @return			Value returned by the maTextBox
+	 *					java method
 	 */
 	int _maShowVirtualKeyboard(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = 
+		jmethodID methodID =
 			jNIEnv->GetMethodID(cls, "maShowVirtualKeyboard", "()I");
 		if (methodID == 0) return 0;
 		int ret = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return ret;
 	}
-	
+
 	/**
 	 * Internal function corresponding to the maTextBox IOCtl.
-	 * Displays a full screen editable text field with 
+	 * Displays a full screen editable text field with
 	 * OK and Cancel buttons.
 	 *
 	 * @param title			Title of the text box
 	 * @param inText		Initial content of the text box
-	 * @param outText		Buffer that will contain the text 
+	 * @param outText		Buffer that will contain the text
 	 *						entered by the user
 	 * @param maxSize		Maximum size of outText
 	 * @param constraints	Not implemented yet
-	 * @param memStart		Pointer to the begining of the 
+	 * @param memStart		Pointer to the begining of the
 	 *						MoSync memory
 	 * @param jNIEnv		JNI environment used
 	 * @param jThis			Pointer to the java class
 	 *
-	 * @return				Value returned by the maTextBox 
+	 * @return				Value returned by the maTextBox
 	 *						java method
 	 */
 	int _maTextBox(
-		const wchar* title, 
-		const wchar* inText, 
+		const wchar* title,
+		const wchar* inText,
 		int outText,
-		int maxSize,  
-		int constraints, 
-		int memStart, 
-		JNIEnv* jNIEnv, 
+		int maxSize,
+		int constraints,
+		int memStart,
+		JNIEnv* jNIEnv,
 		jobject jThis)
 	{
 
 		// Initialization.
 		jstring jstrTITLE = jNIEnv->NewString((jchar*)title, wideCharStringLength(title));
 		jstring jstrINTEXT = jNIEnv->NewString((jchar*)inText, wideCharStringLength(inText));
-		
+
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		// Remove the offset from the output buffer's address
 		int rBuf = outText - memStart;
-		
+
 		// Call the java method
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maTextBox", 
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maTextBox",
 												 "(Ljava/lang/String;Ljava/lang/String;III)I");
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTITLE,
 										 jstrINTEXT, rBuf, maxSize, constraints);
-		
+
 		// Clean
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrTITLE);
 		jNIEnv->DeleteLocalRef(jstrINTEXT);
-		
+
 		return (int)ret;
 	}
-	
+
 	int _maMessageBox(const char* title, const char* text, JNIEnv* jNIEnv, jobject jThis)
 	{
 		Base::gSyscall->VM_Yield();
-		
+
 		jstring jstrTitle = jNIEnv->NewStringUTF(title);
 		jstring jstrText = jNIEnv->NewStringUTF(text);
-		
+
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maMessageBox", "(Ljava/lang/String;Ljava/lang/String;)I");
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTitle, jstrText);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrTitle);
 		jNIEnv->DeleteLocalRef(jstrText);
-		
+
 		return ret;
 	}
-	
+
 	/**
 	 * Add a notification item.
 	 *
 	 * Note that there can only be one notification of type
-	 * NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification 
-	 * types may be added in the future. This syscall is available 
+	 * NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification
+	 * types may be added in the future. This syscall is available
 	 * on Android only.
 	 *
-	 * @param type The \link #NOTIFICATION_TYPE_APPLICATION_LAUNCHER 
+	 * @param type The \link #NOTIFICATION_TYPE_APPLICATION_LAUNCHER
 	 * \endlink constant.
-	 * @param id The id of the notification. The id must be unique within 
+	 * @param id The id of the notification. The id must be unique within
 	 * the application.
 	 * @param title Title of the notification.
 	 * @param text String to be displayed as part of the notification.
-	 * @return \< 0 on error or if the syscall is not available on the 
+	 * @return \< 0 on error or if the syscall is not available on the
 	 * current platform.
 	 */
 	int _maNotificationAdd(
-		int type, 
-		int id, 
-		const char* title, 
-		const char* text, 
-		JNIEnv* jNIEnv, 
+		int type,
+		int id,
+		const char* title,
+		const char* text,
+		JNIEnv* jNIEnv,
 		jobject jThis)
 	{
 		jstring jstrTitle = jNIEnv->NewStringUTF(title);
 		jstring jstrText = jNIEnv->NewStringUTF(text);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-			cls, 
-			"maNotificationAdd", 
+			cls,
+			"maNotificationAdd",
 			"(IILjava/lang/String;Ljava/lang/String;)I");
 		if (methodID == 0) return 0;
 		jint result = jNIEnv->CallIntMethod(
-			jThis, 
-			methodID, 
-			type, 
-			id, 
-			jstrTitle, 
+			jThis,
+			methodID,
+			type,
+			id,
+			jstrTitle,
 			jstrText);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrTitle);
 		jNIEnv->DeleteLocalRef(jstrText);
-		
+
 		return (int)result;
 	}
 
@@ -484,16 +526,16 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-			cls, 
-			"maNotificationRemove", 
+			cls,
+			"maNotificationRemove",
 			"(I)I");
 		if (methodID == 0) return 0;
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, id);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
+
 	/**
 	* Sends the application to the background, unless it's already there.
 	* Generates a \link #EVENT_TYPE_FOCUS_LOST FOCUS_LOST \endlink event.
@@ -503,19 +545,19 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-			cls, 
-			"maSendToBackground", 
+			cls,
+			"maSendToBackground",
 			"()I");
 		if (methodID == 0) return 0;
 		jint result = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
+
 	/**
 	 * Set the screen orientation.
-	 * @param orientation One of the \link #SCREEN_ORIENTATION 
+	 * @param orientation One of the \link #SCREEN_ORIENTATION
 	 * \endlink constants.
 	 * @return \< 0 on error.
 	 */
@@ -523,16 +565,16 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-			cls, 
-			"maScreenSetOrientation", 
+			cls,
+			"maScreenSetOrientation",
 			"(I)I");
 		if (methodID == 0) return 0;
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, orientation);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
+
 	/**
 	 * Enable/disable fullscreen mode.
 	 * @param fullscreen 1 for fullscreen on, 0 for fullscreen off.
@@ -542,18 +584,18 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-			cls, 
-			"maScreenSetFullscreen", 
+			cls,
+			"maScreenSetFullscreen",
 			"(I)I");
 		if (methodID == 0) return 0;
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, fullscreen);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
-	
-	
+
+
+
 	/**
 	* Turn on/off sending of HomeScreen events. Off by default.
 	* @param eventsOn 1 = events on, 0 = events off
@@ -563,16 +605,16 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-			cls, 
-			"maHomeScreenEventsOnOff", 
+			cls,
+			"maHomeScreenEventsOnOff",
 			"(I)I");
 		if (methodID == 0) return 0;
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, eventsOn);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
+
 	/**
 	* Add shortcut icon to the device home screen.
 	* Available on Android only.
@@ -584,17 +626,17 @@ namespace Base
 		jstring jstrName = jNIEnv->NewStringUTF(name);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-			cls, 
-			"maHomeScreenShortcutAdd", 
+			cls,
+			"maHomeScreenShortcutAdd",
 			"(Ljava/lang/String;)I");
 		if (methodID == 0) return 0;
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, jstrName);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrName);
-		
+
 		return (int)result;
 	}
-	
+
 	/**
 	* Remove shortcut icon from the device home screen.
 	* Available on Android only.
@@ -606,17 +648,17 @@ namespace Base
 		jstring jstrName = jNIEnv->NewStringUTF(name);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-			cls, 
-			"maHomeScreenShortcutRemove", 
+			cls,
+			"maHomeScreenShortcutRemove",
 			"(Ljava/lang/String;)I");
 		if (methodID == 0) return 0;
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, jstrName);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrName);
-		
+
 		return (int)result;
 	}
-	
+
 	/**
 	* Turn on/off sending of screen on/off events. Off by default.
 	* @param eventsOn 1 = events on, 0 = events off
@@ -626,13 +668,13 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-			cls, 
-			"maScreenStateEventsOnOff", 
+			cls,
+			"maScreenStateEventsOnOff",
 			"(I)I");
 		if (methodID == 0) return 0;
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, eventsOn);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
@@ -646,17 +688,17 @@ namespace Base
 		{
 			return 0;
 		}
-		
+
 		// Call the Java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrWidgetType);
-		
+
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrWidgetType);
-		
+
 		return result;
 	}
-	
+
 	int _maWidgetDestroy(int widget, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method
@@ -666,16 +708,16 @@ namespace Base
 		{
 			return 0;
 		}
-		
+
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, widget);
-		
+
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return result;
 	}
-	
+
 	int _maWidgetAddChild(int parent, int child, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method
@@ -685,13 +727,13 @@ namespace Base
 		{
 			return 0;
 		}
-		
+
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, parent, child);
-		
+
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return result;
 	}
 
@@ -704,17 +746,17 @@ namespace Base
 		{
 			return 0;
 		}
-		
+
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, parent, child, index);
-		
+
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return result;
 	}
 
-	
+
 	int _maWidgetRemoveChild(int child, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Get the Java method
@@ -724,22 +766,22 @@ namespace Base
 		{
 			return 0;
 		}
-		
+
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, child);
-		
+
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return result;
 	}
-	
+
 	int _maWidgetSetProperty(int widget, const char *property, const char* value, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Convert to Java parameters
 		jstring jstrProperty = jNIEnv->NewStringUTF(property);
 		jstring jstrValue = jNIEnv->NewStringUTF(value);
-		
+
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetSetProperty", "(ILjava/lang/String;Ljava/lang/String;)I");
@@ -747,23 +789,23 @@ namespace Base
 		{
 			return 0;
 		}
-		
+
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrProperty, jstrValue);
-		
+
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrValue);
 		jNIEnv->DeleteLocalRef(jstrProperty);
-		
+
 		return result;
 	}
-	
+
 	int _maWidgetGetProperty(int memStart, int widget, const char *property, int memBuffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
 	{
 		// Convert to Java parameters
 		jstring jstrProperty = jNIEnv->NewStringUTF(property);
-		
+
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetProperty", "(ILjava/lang/String;II)I");
@@ -771,14 +813,14 @@ namespace Base
 		{
 			return 0;
 		}
-		
+
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrProperty, memBuffer - memStart, bufferSize);
-		
+
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrProperty);
-		
+
 		return result;
 	}
 
@@ -791,13 +833,13 @@ namespace Base
 		{
 			return 0;
 		}
-		
+
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, screenWidget);
-		
+
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return result;
 	}
 
@@ -810,18 +852,18 @@ namespace Base
 		{
 			return 0;
 		}
-		
+
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, stackScreenWidget, newScreen);
-		
+
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return result;
 	}
 
 	int _maWidgetStackScreenPop(int stackScreenWidget, JNIEnv* jNIEnv, jobject jThis)
-	{	
+	{
 		// Get the Java method
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetStackScreenPop", "(I)I");
@@ -829,71 +871,16 @@ namespace Base
 		{
 			return 0;
 		}
-		
+
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, stackScreenWidget);
-		
+
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return result;
 	}
 
-	int _maWidgetEvauluateScript(int widget, const char *script,
-								JNIEnv* jNIEnv, jobject jThis)
-	{
-		// Convert to Java parameters
-		jstring jstrScript = jNIEnv->NewStringUTF(script);
-		
-		// Get the Java method
-		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetEvaluateScript",
-													"(ILjava/lang/String;)I");
-		if (methodID == 0)
-		{
-			return 0;
-		}
-		
-		// Call the java method
-		int result = jNIEnv->CallIntMethod(jThis, methodID, widget, jstrScript);
-		
-		// Delete allocated memory
-		jNIEnv->DeleteLocalRef(cls);
-		jNIEnv->DeleteLocalRef(jstrScript);
-		
-		return result;
-	}
-	
-	int _maWidgetGetMessageData(
-		int memStart,
-		int messageId,
-		int messageBufferPointer,
-		int bufferSize,
-		JNIEnv* jNIEnv,
-		jobject jThis)
-	{
-		// Convert to Java parameters
-		int realMessageBufferPointer = messageBufferPointer - memStart;
-		
-		// Get the Java method
-		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetGetMessageData",
-														"(III)I");
-		if (methodID == 0)
-		{
-			return 0;
-		}
-		
-		// Call the java method
-		int result = jNIEnv->CallIntMethod(jThis, methodID, messageId,
-										realMessageBufferPointer, bufferSize);
-		
-		// Delete allocated memory
-		jNIEnv->DeleteLocalRef(cls);
-		
-		return result;
-	}
-	
 	int _maOpenGLInitFullscreen(int glApi, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
@@ -920,40 +907,40 @@ namespace Base
 		
 		return ret;
 	}
-	
+
 	int _maOpenGLTexImage2D(MAHandle image, JNIEnv* jNIEnv, jobject jThis)
-	{		
+	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "loadGlTexture", 
+												 cls,
+												 "loadGlTexture",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, image);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
+
 	int _maOpenGLTexSubImage2D(MAHandle image, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "loadGlSubTexture", 
+												 cls,
+												 "loadGlSubTexture",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, image);
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
-	
-	
-	
+
+
+
+
 	MAHandle _maFileOpen(
 		const char* path,
 		int mode,
@@ -962,163 +949,163 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jstring jstrPath = jNIEnv->NewStringUTF(path);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileOpen", 
+												 cls,
+												 "maFileOpen",
 												 "(Ljava/lang/String;I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, jstrPath, mode);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrPath);
-		
+
 		return (int)result;
 	}
 
 	int _maFileExists(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileExists", 
+												 cls,
+												 "maFileExists",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
 	int _maFileClose(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileClose", 
+												 cls,
+												 "maFileClose",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
 	int _maFileCreate(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileCreate", 
+												 cls,
+												 "maFileCreate",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
 	int _maFileDelete(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileDelete", 
+												 cls,
+												 "maFileDelete",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
 	int _maFileSize(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileSize", 
+												 cls,
+												 "maFileSize",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
 	int _maFileAvailableSpace(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileAvailableSpace", 
+												 cls,
+												 "maFileAvailableSpace",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
 	int _maFileTotalSpace(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileTotalSpace", 
+												 cls,
+												 "maFileTotalSpace",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
 	int _maFileDate(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileDate", 
+												 cls,
+												 "maFileDate",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
@@ -1130,20 +1117,20 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jstring jstrNewName = jNIEnv->NewStringUTF(newName);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileRename", 
-												 "(ILjava/lang/String;)I");
+			cls,
+			"maFileRename",
+			"(ILjava/lang/String;)I");
 		if (methodID == 0)
 			return 0;
-		
-		jint result = jNIEnv->CallIntMethod(jThis, methodID, 
-											file, jstrNewName);
-		
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID, file, jstrNewName);
+
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrNewName);
-		
+
 		return (int)result;
 	}
 
@@ -1154,18 +1141,18 @@ namespace Base
 		jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileTruncate", 
+												 cls,
+												 "maFileTruncate",
 												 "(II)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file, offset);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
@@ -1178,24 +1165,24 @@ namespace Base
 		jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		int fixedSrc = src - memStart;
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileWrite", 
+												 cls,
+												 "maFileWrite",
 												 "(III)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file,
 											fixedSrc, len);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
+
 	int _maFileWriteFromData(
 		MAHandle file,
 		MAHandle data,
@@ -1205,22 +1192,22 @@ namespace Base
 		jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileWriteFromData", 
+												 cls,
+												 "maFileWriteFromData",
 												 "(IIII)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file,
 											data, offset, len);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
+
 	int _maFileRead(
 		MAHandle file,
 		int dst,
@@ -1230,23 +1217,23 @@ namespace Base
 		jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		int fixedDst = dst - memStart;
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileRead", 
+												 cls,
+												 "maFileRead",
 												 "(III)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file, fixedDst, len);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
+
 	int _maFileReadToData(
 		MAHandle file,
 		MAHandle data,
@@ -1256,37 +1243,37 @@ namespace Base
 		jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileReadToData", 
+												 cls,
+												 "maFileReadToData",
 												 "(IIII)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file,
 											data, offset, len);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
 	int _maFileTell(MAHandle file, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileTell", 
+												 cls,
+												 "maFileTell",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, file);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
@@ -1298,22 +1285,22 @@ namespace Base
 		jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileSeek", 
+												 cls,
+												 "maFileSeek",
 												 "(III)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID,
 											file, offset, whence);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
-	
+
 	MAHandle _maFileListStart(
 		const char* path,
 		const char* filter,
@@ -1323,21 +1310,21 @@ namespace Base
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jstring jstrPath = jNIEnv->NewStringUTF(path);
 		jstring jstrFilter = jNIEnv->NewStringUTF(filter);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-								cls, 
-								"maFileListStart", 
+								cls,
+								"maFileListStart",
 								"(Ljava/lang/String;Ljava/lang/String;)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID,
 											jstrPath, jstrFilter);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrPath);
 		jNIEnv->DeleteLocalRef(jstrFilter);
-		
+
 		return (int)result;
 	}
 
@@ -1350,40 +1337,629 @@ namespace Base
 		jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		int fixedNameBuf = nameBuf - memStart;
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileListNext", 
+												 cls,
+												 "maFileListNext",
 												 "(III)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID,
 											list, nameBuf, bufSize);
-		
+
 		jNIEnv->DeleteLocalRef(cls);
-		
+
 		return (int)result;
 	}
 
 	int _maFileListClose(MAHandle list, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		
+
 		jmethodID methodID = jNIEnv->GetMethodID(
-												 cls, 
-												 "maFileListClose", 
+												 cls,
+												 "maFileListClose",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
-		
+
 		jint result = jNIEnv->CallIntMethod(jThis, methodID, list);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+	
+	int _maCameraStart(JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraStart", "()I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
 		
+		// Call the Java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);
 		
+		return result;
+	}
+
+	int _maCameraStop(JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraStop", "()I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the Java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+
+	int _maCameraSetPreview(MAHandle widgetHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraSetPreview", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the Java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, widgetHandle);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+	
+	int _maCameraSelect(MAHandle cameraHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraSelect", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the Java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, cameraHandle);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+	
+	int _maCameraNumber(JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraNumber", "()I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the Java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+
+	
+	int _maCameraSnapshot(int formatIndex, MAHandle placeHolder, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraSnapshot", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the Java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, formatIndex, placeHolder);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+	
+	int _maCameraRecord(int flag, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraRecord", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the Java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, flag);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+	
+	
+	int _maCameraFormatNumber(JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraFormatNumber", "()I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the Java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}
+
+	int _maCameraFormat(int index, int width, int height, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraFormat", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the Java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, index, width, height);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		
+		return result;
+	}	
+	
+	int _maCameraSetProperty(const char *property, const char* value, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Convert to Java parameters
+		jstring jstrProperty = jNIEnv->NewStringUTF(property);
+		jstring jstrValue = jNIEnv->NewStringUTF(value);
+		
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraSetProperty", "(Ljava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrProperty, jstrValue);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrValue);
+		jNIEnv->DeleteLocalRef(jstrProperty);
+		
+		return result;
+	}
+	
+	int _maCameraGetProperty(int memStart, const char *property, int memBuffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Convert to Java parameters
+		jstring jstrProperty = jNIEnv->NewStringUTF(property);
+		
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maCameraGetProperty", "(Ljava/lang/String;II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+		
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrProperty, memBuffer - memStart, bufferSize);
+		
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrProperty);
+		
+		return result;
+	}
+
+	//////////////
+	//  SENSOR  //
+	//////////////
+	int _maSensorStart(int sensor, int interval,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSensorStart", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			sensor, interval);
+
+		jNIEnv->DeleteLocalRef(cls);
+
 		return (int)result;
 	}
 
+	int _maSensorStop(int sensor,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSensorStart", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			sensor);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	//////////////////////
+	//		PIM			//
+	//////////////////////
+	MAHandle _maPimListOpen(int listType,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimListOpen", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			listType);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	MAHandle _maPimListNext(MAHandle list,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimListNext", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			list);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimListClose(MAHandle list,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimListClose", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			list);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemCount(MAHandle item,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemCount", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemGetField(MAHandle item, int n,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemGetField", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, n);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemFieldCount(MAHandle item, int field,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemFieldCount", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemGetAttributes(MAHandle item, int field, int index,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemGetAttributes", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemSetLabel(int item, int field, int bufPointer, int bufSize, int index,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemSetLabel", "(IIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, bufPointer, bufSize, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemGetLabel(int item, int field, int bufPointer, int bufSize, int index,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemGetLabel", "(IIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, bufPointer, bufSize, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimFieldType(MAHandle list, int field,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimFieldType", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			list, field);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemGetValue(int item, int field, int bufPointer, int bufSize, int index,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemGetValue", "(IIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, bufPointer, bufSize, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemSetValue(int item, int field, int bufPointer, int bufSize, int index, int attributes,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemSetValue", "(IIIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, bufPointer, bufSize, index, attributes);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemAddValue(int item, int field, int bufPointer, int bufSize, int attributes,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemAddValue", "(IIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, bufPointer, bufSize, attributes);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemRemoveValue(MAHandle item, int field, int index,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemRemoveValue", "(III)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item, field, index);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemClose(MAHandle item,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemClose", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			item);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	MAHandle _maPimItemCreate(MAHandle list,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemCreate", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			list);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maPimItemRemove(MAHandle list, MAHandle item,
+		JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maPimItemRemove", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis, methodID,
+			list, item);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
 }

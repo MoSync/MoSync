@@ -1,3 +1,20 @@
+/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 package com.mosync.nativeui.ui.egl;
 
 import java.util.concurrent.locks.Lock;
@@ -40,6 +57,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 	 * Holds the EGL information necessary to draw onto an
 	 */
 	private EGLState m_eglState;
+
 
 	/**
 	 * Listener for egl view ready listener.
@@ -246,7 +264,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		 * to change the underlying SurfaceView again.
 		 */
 		public void finishRender()
-		{	
+		{
 			if( m_surface == null )
 			{
 				return;
@@ -277,7 +295,6 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		 */
 		public void newSurface(SurfaceHolder holder, int width, int height)
 		{
-
 			m_surfaceLock.lock( );
 
 			/*
@@ -303,7 +320,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			}
 
 			setSurfaceCurrent( false );
-			
+
 			m_surfaceLock.unlock( );
 		}
 
@@ -328,7 +345,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		/**
 		 * Returns true if the surface is current (by makeCurrent).
 		 *
-		 * @return true if the surface is current (by makeCurrent), 
+		 * @return true if the surface is current (by makeCurrent),
 		 *         false otherwise.
 		 */
 		private boolean surfaceIsCurrent()

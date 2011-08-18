@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #import <CoreGraphics/CoreGraphics.h>
 #import <UIKit/UIKit.h>
+#include <AVFoundation/AVFoundation.h>
 #include "Platform.h"
 #include "MosyncView.h"
 
@@ -36,8 +37,24 @@ void MoSync_Exit();
 void MoSync_ReloadProgram(MAHandle data, int reload);
 void MoSync_StartUpdatingLocation();
 void MoSync_StopUpdatingLocation();
-void MoSync_StartUpdatingAccelerometer();
-void MoSync_StopUpdatingAccelerometer();
+
+/**
+ * Start a sensor.
+ * @param sensorType What type of sensor to start.
+ * @param value Update interval value.
+ * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
+ */
+int MoSync_SensorStart(int sensor, int interval);
+
+/**
+ * Stop a sensor.
+ * @param sensorType What type of sensor to stop.
+ * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
+ */
+int MoSync_SensorStop(int sensor);
+
+
+
 void MoSync_AddTouchPressedEvent(int x, int y, int touchId);
 void MoSync_AddTouchMovedEvent(int x, int y, int touchId);
 void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
@@ -45,6 +62,7 @@ void MoSync_AddScreenChangedEvent();
 void MoSync_AddCloseEvent();
 void* MoSync_GetCustomEventData();
 void* MoSync_GetCustomEventDataMoSyncPointer();
+void MoSync_AddLayerToView(CALayer* layer);
 
 /*
 void MoSync_AddLocationProviderEvent(int state);

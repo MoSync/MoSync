@@ -1,3 +1,20 @@
+/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 package com.mosync.nativeui.ui.widgets;
 
 import android.widget.TextView;
@@ -7,6 +24,7 @@ import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
+import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
@@ -69,6 +87,17 @@ public class LabelWidget extends Widget
 			int currentGravity = VerticalAlignment.clearVerticalAlignment( textView.getGravity( ) );
 			textView.setGravity( currentGravity | VerticalAlignment.convert( value ) );
 		}
+		else if( property.equals(IX_WIDGET.MAW_LABEL_MAX_NUMBER_OF_LINES ) )
+		{
+			if ( IntConverter.convert(value) <= 0 )
+			{
+				throw new InvalidPropertyValueException(property, value);
+			}
+			// This overrides any height setting.
+			// Makes the TextView be at most this many lines tall.
+			m_maxNrLines = IntConverter.convert(value);
+			textView.setMaxLines( m_maxNrLines );
+		}
 		else
 		{
 			return false;
@@ -99,9 +128,19 @@ public class LabelWidget extends Widget
 				return "";
 			}
 		}
+		else if( property.equals(IX_WIDGET.MAW_LABEL_MAX_NUMBER_OF_LINES ) )
+		{
+			// If max number lines was not set, will return the default 0.
+			return Integer.toString( m_maxNrLines );
+		}
 		else
 		{
 			return super.getProperty( property );
 		}
 	}
+
+	/**
+	 * Hold the value of the maximum number of lines for the text view.
+	 */
+	private int m_maxNrLines = 0;
 }

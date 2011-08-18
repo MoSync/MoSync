@@ -1,4 +1,22 @@
 /*
+Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/*
  * WidgetTest.cpp
  *
  *  Created on: Mar 15, 2011
@@ -23,6 +41,7 @@ static struct widget_property_test_t g_general_widget_tests[] =
 	{ MAW_WIDGET_ALPHA, "2.0", "Testing alpha 2.0.", MAW_RES_INVALID_PROPERTY_VALUE },
 	{ MAW_WIDGET_BACKGROUND_COLOR, "0xffffff", "Testing background color with 0x.", MAW_RES_OK },
 	{ MAW_WIDGET_BACKGROUND_COLOR, "ffffff", "Testing background color without 0x.", MAW_RES_OK },
+	{ MAW_WIDGET_BACKGROUND_GRADIENT, "ffffff,ffffff", "Testing background gradient color without 0x,0x.", MAW_RES_OK },
 	{ MAW_WIDGET_BACKGROUND_COLOR, "fffff", "Testing background color without 0x.", MAW_RES_INVALID_PROPERTY_VALUE },
 	{ MAW_WIDGET_HEIGHT, "40", "Testing height with 40.", MAW_RES_OK },
 	{ MAW_WIDGET_HEIGHT, "-1", "Testing height with fill available space.", MAW_RES_OK },
@@ -34,6 +53,8 @@ static struct widget_property_test_t g_general_widget_tests[] =
 	{ MAW_WIDGET_TOP, "50", "Testing left with 50.", MAW_RES_OK },
 	{ MAW_WIDGET_VISIBLE, "true", "Testing visible with true.", MAW_RES_OK },
 	{ MAW_WIDGET_VISIBLE, "false", "Testing visible with false.", MAW_RES_OK },
+	{ MAW_WIDGET_ENABLED, "true", "Testing enabled with true.", MAW_RES_OK },
+	{ MAW_WIDGET_ENABLED, "false", "Testing enabled with false.", MAW_RES_OK },
 	{ NULL, NULL, NULL, -1 }
 };
 

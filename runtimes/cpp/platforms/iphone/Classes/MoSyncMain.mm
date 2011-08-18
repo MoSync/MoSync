@@ -223,6 +223,29 @@ void MoSync_StopUpdatingLocation() {
 	[sMoSyncView stopUpdatingLocation];
 }
 
+/**
+ * Start a sensor.
+ * @param sensorType What type of sensor to start.
+ * @param value Update interval value.
+ * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
+ */
+int MoSync_SensorStart(int sensor, int interval) {
+    MoSyncSensor* moSyncSensor = [sMoSyncView getMoSyncSensor];
+    int result = [moSyncSensor startSensor:sensor interval:interval];
+    return result;
+}
+
+/**
+ * Stop a sensor.
+ * @param sensorType What type of sensor to stop.
+ * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
+ */
+int MoSync_SensorStop(int sensor) {
+    MoSyncSensor* moSyncSensor = [sMoSyncView getMoSyncSensor];
+    int result = [moSyncSensor stopSensor:sensor];
+    return result;
+}
+
 void MoSync_AddTouchPressedEvent(int x, int y, int touchId) {
 	Base::gEventQueue.addPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_PRESSED);
 }
@@ -262,6 +285,13 @@ void* MoSync_GetCustomEventDataMoSyncPointer() {
 	return (void*) (gCore->Head.DataSize-Base::getMaxCustomEventSize());
 	
 #endif
+}
+
+void MoSync_AddLayerToView(CALayer* layer){
+	if ([[sMoSyncView.layer sublayers] containsObject:layer]==NO) {
+		[sMoSyncView.layer addSublayer:layer];
+	}
+	layer.frame = sMoSyncView.bounds;
 }
 
 /*

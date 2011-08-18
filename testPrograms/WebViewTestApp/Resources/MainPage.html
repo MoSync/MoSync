@@ -1,0 +1,59 @@
+<html>
+<head>
+    <style type="text/css">
+		div { font-size:1.8em; margin-top:20pt; }
+		a { cursor: hand; }
+		input { font-size:1.2em; }
+	</style>
+</head>
+<body>
+	<script>
+		function MoSyncMessage(message) {
+			document.location = 'mosync://' + message; }
+		function ProcessData() {
+			var message = 'ProcessData/' + document.getElementById("DataField").value;
+			MoSyncMessage(message); }
+	</script>
+
+	<div style="font-size:2.4em; margin-top:0pt; margin-bottom:10pt;">
+		Select a color!
+	</div>
+	<div>
+		<a href="#" onclick="MoSyncMessage('BgColor/Yellow')">Yellow</a>
+		<a href="#" onclick="MoSyncMessage('BgColor/Red')">Red</a>
+		<a href="#" onclick="MoSyncMessage('BgColor/Green')">Green</a>
+	</div>
+	<div id="ColorMessage"></div>
+
+	<div style="font-size:2.4em; margin-top:0pt; margin-bottom:10pt;">
+		Type something!
+	</div>
+	<div>
+		<input type="text" id="DataField" />
+		<input type="button" value="Press Me!" onclick="ProcessData()" />
+	</div>
+	<div id="DataMessage"></div>
+
+	<div style="font-size:2.4em; margin-top:0pt; margin-bottom:10pt;">
+		Select a link!
+	</div>
+
+	<div><a href="PageOne.html">Link to local page page</a></div>
+
+	<div><a href="http://google.com">Link to Google</a></div>
+	<div><a href="http://mosync.com">Link to MoSync</a></div>
+
+	<div><a href="#" onclick="MoSyncMessage('GotoGoogle')">Goto Google via C++</a></div>
+	<div><a href="#" onclick="MoSyncMessage('GotoMoSync')">Goto MoSync via C++</a></div>
+
+	<div><a href="#" onclick="alert('Hello World')">Show Alert</a></div>
+	<div><a href="#" onclick="MoSyncMessage('ShowAlert')">Show Alert via C++</a></div>
+
+	<div><a href="#" onclick="foo()">Trigger JS error</a></div>
+	<div><a href="#" onclick="alert(">Trigger another JS error</a></div>
+	<div><a href="http://webdgshshshsh.dhsh">Link to non-existing page</a></div>
+
+	<div><a href="#" onclick="MoSyncMessage('ExitApp')">Exit Application</a></div>
+	<div><a href="#" onclick="MoSyncMessage('CreatePanic')">Create Panic</a></div>
+</body>
+</html>

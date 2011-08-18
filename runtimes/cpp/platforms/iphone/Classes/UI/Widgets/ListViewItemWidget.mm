@@ -82,9 +82,12 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 		else if([value isEqualToString:@"isChecked"]) {
 			cell.accessoryType = UITableViewCellAccessoryCheckmark;
 		} 
-		else {
+		else if([value isEqualToString:@"none"]) {
 			cell.accessoryType = UITableViewCellAccessoryNone;			
-		}		   
+		} else
+        {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
 	} 
 	else {
 		return [super setPropertyWithKey:key toValue:value];

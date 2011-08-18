@@ -1,3 +1,20 @@
+/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 package com.mosync.internal.android;
 
 import java.util.Hashtable;
@@ -11,6 +28,7 @@ import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.NativeUI.RootViewReplacedListener;
+import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
 
 /**
@@ -311,7 +329,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	}
 	
 	/**
-	 * Internal wrapper for maWidgetSetProperty that runs
+	 * Internal wrapper for maWidgetGetProperty that runs
 	 * the call in the UI thread.
 	 */
 	public int maWidgetGetProperty(
@@ -337,7 +355,8 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
+
+		
 	/**
 	 * Called when the back button has been pressed.
 	 */
@@ -355,5 +374,10 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	public void rootViewReplaced(View newRoot)
 	{
 		((MoSync) getActivity()).setRootView( newRoot );
+	}
+	
+	public Widget getCameraPreview(final int handle)
+	{
+		return mNativeUI.getCameraView(handle);
 	}
 }
