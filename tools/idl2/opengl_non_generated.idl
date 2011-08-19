@@ -15,13 +15,56 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
+#if IX_OPENGL_ES
 constset int MA_GL_TEX_IMAGE_2D_ {
 	OK = 0;
 	INVALID_IMAGE = -2;
 }
 
-/// we will implement egl with all that later on.
-int maOpenGLInitFullscreen();
+constset int MA_GL_API_ {
+	GL2 = 0;
+	GL1 = 1;
+}
+
+constset int MA_GL_INIT_RES_ {
+	OK = 0;
+	UNAVAILABLE_API = -2;
+	ERROR = -3;
+}
+
+/**
+ * Initializes fullscreen OpenGL ES.
+ * @param glApi The api you want to use.
+ * \returns Any of the following result codes:
+ * - #MA_GL_INIT_RES_OK If the OpenGL context was successfully initialized.
+ * - #MA_GL_INIT_RES_UNAVAILABLE_API If the OpenGL api version wasn't available.
+ * - #MA_GL_INIT_RES_ERROR otherwise.
+ */
+int maOpenGLInitFullscreen(in int glApi);
+
+/**
+ * Closes full screen OpenGL ES.
+ * \returns <0 on error.
+ */
 int maOpenGLCloseFullscreen();
+
+/**
+ * Works exactly as glTexImage2D but it uses an image resource instead and
+ * figures out pixel formats etc.
+ * @param image The handle to the image.
+ * \returns Any of the following result codes:
+ * - #MA_GL_TEX_IMAGE_2D_OK If the call to the function was successful.
+ * - #MA_GL_TEX_IMAGE_2D_INVALID_IMAGE If the image resource handle was invalid or the image was invalid.
+ */
 int maOpenGLTexImage2D(in MAHandle image);
+
+/**
+ * Works exactly as glTexSubImage2D but it uses an image resource instead and
+ * figures out pixel formats etc.
+ * @param image The handle to the image.
+ * \returns Any of the following result codes:
+ * - #MA_GL_TEX_IMAGE_2D_OK If the call to the function was successful.
+ * - #MA_GL_TEX_IMAGE_2D_INVALID_IMAGE If the image resource handle was invalid or the image was invalid.
+ */
 int maOpenGLTexSubImage2D(in MAHandle image);
+#endif

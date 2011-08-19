@@ -1316,11 +1316,23 @@ interface MAAPI {
 		*/
 		BLUETOOTH_TURNED_ON = 30;
 
-		/** \brief SMS resuult message.
+		/**
+		* \brief The ImagePicker dialog was dismissed either by Cancel, either by OK.
+		*/
+		IMAGE_PICKER = 31;
+
+		/** \brief SMS result message.
 		* The field status contains one of the
 		* This event is sent on Android and iOS.
 		*/
-		SMS = 31;
+		SMS = 32;
+
+		/**
+		* \brief Provides data from active sensors.
+		* \see MAEvent::sensor
+		* \see maSensorStart()
+		*/
+		SENSOR = 33;
 	}
 
 	/**
@@ -1334,6 +1346,15 @@ interface MAAPI {
 		/// A success value \> 0 or a \link #CONNERR_GENERIC CONNERR \endlink code.
 		int result;
 	}
+
+	/**
+	* \brief A structure containing the sensor type and the data sent to the event.
+	*/
+	struct MASensor {
+		int type;
+		float values[3];
+	}
+
 
 	/**
 	* \brief An event; a message indicating that something has happened, e.g. that a key has been pressed.
@@ -1396,10 +1417,21 @@ interface MAAPI {
 			} textbox;
 
 			/**
+			* #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if
+			* one of the \link #CONNERR_GENERIC CONNERR \endlink constants.
+			*/
+			int imagePickerState;
+
+			/**
 			* In #EVENT_TYPE_SMS events, this will be one of the
 			* @link #MA_SMS_RESULT_SENT MA_SMS_RESULT_* @endlink constants.
 			*/
 			int status;
+
+			/**
+			* Valid in \link #EVENT_TYPE_SENSOR SENSOR \endlink events.
+			*/
+			MASensor sensor;
 
 			/**
 			* Used by custom events. See invididual event descriptions.
@@ -1631,6 +1663,7 @@ interface MAAPI {
 		LABEL = 9;
 		FLUX = 127;
 	}
+
 #endif	//IX_RESOURCE_TYPES
 
 		/**
@@ -2820,6 +2853,7 @@ interface MAAPI {
 			/// #MA_PIM_TYPE_STRING. Connected with PUBLIC_KEY.
 			PUBLIC_KEY_STRING = 113;
 			/// #MA_PIM_TYPE_DATE.
+
 			REVISION = 114;
 			/// #MA_PIM_TYPE_STRING. Telephone number.
 			TEL = 115;
@@ -2829,40 +2863,114 @@ interface MAAPI {
 			UID = 117;
 			/// #MA_PIM_TYPE_STRING. Uniform Resource Locator associated with the contact.
 			URL = 118;
+			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing an IM address .
+
+			/// Has \link #MA_PIM_CONTACT_IM_USERNAME MA_PIM_CONTACT_IM \endlink indices.
+
+			IM = 119;
+
+			/// #MA_PIM_TYPE_STRING. A data kind representing a relation.
+
+			RELATION = 120;
+
+			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing a organization.
+
+			/// Has \link #MA_PIM_CONTACT_ORGANIZATION_NAME MA_PIM_CONTACT_ORGANIZATION \endlink indices.
+
+			ORG_INFO = 121;
+
 		}
 
-		constset int MA_PIM_CONTACT_ {
+		constset int MA_PIM_CONTACT_ADDR_ {
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Post office box number.
-			ADDR_POBOX = 0;
+			POBOX = 0;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Extra info.
-			ADDR_EXTRA = 1;
+			EXTRA = 1;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Street name and number.
-			ADDR_STREET = 2;
+			STREET = 2;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Locality name. (ex. city)
-			ADDR_LOCALITY = 3;
+			LOCALITY = 3;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Region name. (ex. province, state or territory)
-			ADDR_REGION = 4;
+			REGION = 4;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Postal code.
-			ADDR_POSTALCODE = 5;
+			POSTALCODE = 5;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country name.
-			ADDR_COUNTRY = 6;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Family name.
-			NAME_FAMILY = 0;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Given name.
-			NAME_GIVEN = 1;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Alternate/secondary names, if any.
-			NAME_OTHER = 2;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Prefix. (ex. "Dr.")
-			NAME_PREFIX = 3;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
-			NAME_SUFFIX = 4;
-			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
-			CLASS_CONFIDENTIAL = 200;
-			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
-			CLASS_PRIVATE = 201;
-			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
-			CLASS_PUBLIC = 202;
+			COUNTRY = 6;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country code.
+			COUNTRY_CODE = 7;
+			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Neighborhood.
+			NEIGHBORHOOD = 8;
 		}
+
+		constset int MA_PIM_CONTACT_NAME_ {
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Family name.
+			FAMILY = 0;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Given name.
+			GIVEN = 1;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Alternate/secondary names, if any.
+			OTHER = 2;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Prefix. (ex. "Dr.")
+			PREFIX = 3;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
+			SUFFIX = 4;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic first name.
+			PHONETIC_FAMILY = 6;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic last name.
+			PHONETIC_GIVEN = 7;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic middle name.
+			PHONETIC_OTHER = 8;
+		}
+
+		constset int MA_PIM_CONTACT_ORG_INFO_ {
+			/// #MA_PIM_TYPE_STRING.
+			DEPARTMENT = 0;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			JOB_DESCRIPTION = 1;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			SYMBOL = 2;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			PHONETIC_NAME = 3;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			OFFICE_LOCATION = 4;
+			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
+			PHONETIC_NAME_STYLE = 5;
+		}
+
+		constset int MA_PIM_CONTACT_IM_ {
+			/// #MA_PIM_TYPE_STRING.
+			USERNAME = 0;
+			/// #MA_PIM_TYPE_STRING.
+			PROTOCOL = 1;
+		}
+
+		constset int MA_PIM_CONTACT_CLASS_ {
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+			CONFIDENTIAL = 200;
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+			PRIVATE = 201;
+			/// Value for #MA_PIM_FIELD_CONTACT_CLASS.
+			PUBLIC = 202;
+		}
+
+		constset MAString MA_PIM_CONTACT_IM_PROTOCOL_ {
+			AIM = "AIM";
+			MSN = "MSN";
+			YAHOO = "Yahoo";
+			SKYPE = "Skype";
+			QQ = "QQ";
+			GOOGLE_TALK = "GoogleTalk";
+			ICQ = "ICQ";
+			JABBER = "Jabber";
+			NETMEETING = "Netmeeting";
+		}
+
+
+		// deprecated
 
 		constset int MA_PIM_ATTR_ {
 			/// The value describes an assistant.
@@ -2885,21 +2993,204 @@ interface MAAPI {
 			PREFERRED = 128;
 			/// The value describes an SMS number?
 			SMS = 256;
+
 			/// The value describes a work phone number.
 			WORK = 512;
+
+		}
+
+		constset int MA_PIM_ATTR_ADDR_ {
+			HOME = 101;
+			WORK = 102;
+			/// The value describes a different adress type.
+			OTHER = 103;
+			/// The field's label can be set.
+			CUSTOM = 104;
+		}
+
+		constset int MA_PIM_ATTR_EMAIL_ {
+			HOME = 201;
+			WORK = 202;
+			MOBILE = 203;
+			/// The value describes a different phone number type.
+			OTHER = 204;
+			/// The field's label can be set.
+			CUSTOM = 205;
+		}
+
+		constset int MA_PIM_ATTR_FORMATTED_ADDR_ {
+			HOME = 301;
+			WORK = 302;
+			/// The value describes a different adress type.
+			OTHER = 303;
+			/// The field's label can be set.
+			CUSTOM = 304;
+		}
+
+		constset int MA_PIM_ATTR_ORG_ {
+			WORK = 401;
+			/// The value describes a different IM type.
+			OTHER = 402;
+			/// The field's label can be set.
+			CUSTOM = 403;
+		}
+
+		constset int MA_PIM_ATTR_PHONE_ {
+			/// The value describes a mobile phone number.
+			HOME = 501;
+			/// The value describes a fax number.
+			MOBILE = 502;
+			/// The value describes a pager number.
+			HOME_FAX = 503;
+			WORK_FAX = 504;
+			/// The value describes an assistant.
+			PAGER = 505;
+			IPHONE = 506;
+			WORK = 507;
+			CALLBACK = 508;
+			CAR = 509;
+			COMPANY_MAIN = 510;
+			ISDN = 511;
+			OTHER_FAX = 512;
+			RADIO = 513;
+			TELEX = 514;
+			TTY_TDD = 515;
+			WORK_MOBILE = 516;
+			WORK_PAGER = 517;
+			ASSISTANT = 518;
+			MMS = 519;
+			/// The value describes a different type phone number.
+			OTHER = 520;
+			/// The field's label can be set.
+			CUSTOM = 521;
+		}
+
+		constset int MA_PIM_ATTR_TITLE_ {
+			WORK = 601;
+			/// The value describes a different IM type.
+			OTHER = 602;
+			/// The field's label can be set.
+			CUSTOM = 603;
+		}
+
+		constset int MA_PIM_ATTR_WEBSITE_ {
+			HOMEPAGE = 701;
+			BLOG = 702;
+			PROFILE = 703;
+			HOME = 704;
+			WORK = 705;
+			FTP = 706;
+			/// The value describes a different type phone number.
+			OTHER = 707;
+			/// The field's label can be set.
+			CUSTOM = 708;
+		}
+
+		constset int MA_PIM_ATTR_IM_ {
+			HOME = 801;
+			WORK = 802;
+			/// The value describes a different IM type.
+			OTHER = 803;
+			/// The field's label can be set.
+			CUSTOM = 804;
+		}
+
+		constset int MA_PIM_ATTR_RELATION_ {
+			MOTHER = 901;
+			FATHER = 902;
+			PARENT = 903;
+			SISTER = 904;
+			BROTHER = 905;
+			CHILD = 906;
+			FRIEND = 907;
+			SPOUSE = 908;
+			PARTNER = 909;
+			MANAGER = 910;
+			ASSISTANT = 911;
+			DOMESTIC_PARTNER = 912;
+			REFERRED_BY = 913;
+			RELATIVE = 914;
+			/// The field's label can be set.
+			CUSTOM = 915;
+		}
+
+		constset int MA_PIM_ATTR_ORG_INFO_ {
+			WORK = 1001;
+			/// The value describes a different IM type.
+			OTHER = 1002;
+			/// The field's label can be set.
+			CUSTOM = 1003;
+		}
+
+		constset int MA_PIM_ATTR
+		{
+			PREFERRED = 0x10000;
 		}
 
 		constset int MA_PIM_ERR_ {
+			/// No error. The operation completed successfully.
+
+			NONE = 0;
+
+			/// This function is unavailable on the current platform.
+
+			UNAVAILABLE = -1;
+
 			/// The native database's data type for the given field did not match the MoSync API.
+
 			NATIVE_TYPE_MISMATCH = -2;
+
 			/// The field type is not supported.
+
 			FIELD_UNSUPPORTED = -3;
+
 			/// The field is read-only.
+
 			READ_ONLY = -4;
+
 			/// The field/attribute combination is not supported.
+
 			COMBO_UNSUPPORTED = -5;
+
 			/// More values in this field is not supported.
+
 			FIELD_COUNT_MAX = -6;
+
+			/// The value does not have a custom label.
+
+			NO_LABEL = -7;
+
+			/// The values's attribute is not set to custom.
+
+			CUSTOM_ATTRIBUTE = -8;
+
+			/// The given index is not valid.
+
+			/// This value is returned by maPimItemGetField(), maPimItemSetValue().
+
+			INVALID_INDEX = -9;
+
+			///
+
+			LABEL_NOT_SET = -10;
+
+			/// The specified pim list is not available on the current platform.
+
+			UNAVAILABLE_LIST = -11;
+
+			/// The specified list is not opend. Call maPimListOpen() first.
+
+			LIST_NOT_OPENED = -12;
+
+			/// The operation is not allowed by the Address Book database.
+
+			OPERATION_NOT_PERMITTED = -13;
+
+			/// Invalid handle.
+
+			INVALID_HANDLE = -14;
+
+
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.
@@ -2943,11 +3234,45 @@ interface MAAPI {
 
 		/** Returns the bitmask of attributes for the specified value in a field and item.
 		* Panics on field+index combinations that don't exist in this item.
+		* On iPhone platform in case of error one of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink
+
+		* constants is returned.
+
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
+		* \note For iPhone platform this syscall returns only one attribute.
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
+
+		/** Sets a custom label for a value in a field and item.
+		* The value's attribute must be set to MA_PIM_ATTR_CUSTOM.
+		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
+		* \a args.bufSize must be valid.
+		* \param args Common arguments.
+		* \param index An index into the field's value array.
+		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
+		* \note This function is not available on JavaME or Blackberry.
+		*/
+		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
+
+
+		/** Retrieves the custom label for a value in a field and item,
+		* if the value has a custom label.
+		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
+		* \a args.bufSize must be valid.
+		* \param args Common arguments.
+		* \param index An index into the field's value array.
+		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
+		* \returns If the value does not have a custom label, #MA_PIM_ERR_NO_LABEL.
+		* If it does, the number of bytes occupied by the value.
+		* If this number is greater than bufSize, the value is not written,
+		* and you'll have to allocate a bigger buffer and try again.
+		* \note This function is not available on JavaME or Blackberry.
+		*/
+		int maPimItemGetLabel(in MA_PIM_ARGS args, in int index);
+
 
 		/** Returns one of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants,
 		* or \< 0 if the field does not exist in the list.
@@ -2987,7 +3312,7 @@ interface MAAPI {
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
 		* \param attributes The value's new attributes.
-		* \returns 0 on success and \< 0 on failure.
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3000,7 +3325,8 @@ interface MAAPI {
 		/** Adds a new value to a field and item.
 		* \param args Common arguments.
 		* \param attributes The new value's attributes.
-		* \returns 0 on success and \< 0 on failure.
+		* \returns The index of the new added value, or one of
+		* the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3011,8 +3337,7 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns 0 on success and \< 0 on failure.
-		* \note If this function fails, the value is unchanged.
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note The changes is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3022,7 +3347,7 @@ interface MAAPI {
 		/** Closes the handle to a PimItem, releasing resources used by the system.
 		* Writes any changes to disk.
 		* Panics on invalid handles.
-		* \returns 0.
+		* Returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note An item can also be closed by maPimItemRemove().
 		* \warning Does not write changes to disk if the item's List is closed.
 		* Make sure to keep the List open while editing items.
@@ -3083,7 +3408,7 @@ group WidgetAPI "Widget API" {
 			int searchBarButton;
 
 			/**
-			* @brief The new state of the checkbox when a #MAW_EVENT_CLICKED event is receieved for a checkbox.
+			* @brief The new state of the checkbox when a #MAW_EVENT_CLICKED event is receieved for a checkbox or toggle button.
 			* - 0 means 'unchecked'
 			* - 1 means 'checked'
 			*/
@@ -3142,6 +3467,51 @@ group WidgetAPI "Widget API" {
 				*/
 				MAWidgetHandle toScreen;
 			} stackScreenPopInfo;
+
+			/**
+			* The value of the slider when a #MAW_EVENT_SLIDER_VALUE_CHANGED event is received.
+			*/
+			int sliderValue;
+
+			struct {
+					/**
+					* @brief The day value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
+					*/
+					int dayOfMonth;
+
+					/**
+					* @brief The month value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
+					*/
+					int month;
+
+					/**
+					* @brief The year value when a #MAW_EVENT_DATE_PICKER_VALUE_CHANGED event is received.
+					*/
+					int year;
+			} datePickerValueInfo;
+
+			struct {
+					/**
+					* @brief The hour value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
+					*/
+					int hour;
+
+					/**
+					* @brief The minute value when a #MAW_EVENT_TIME_PICKER_VALUE_CHANGED event is received.
+					*/
+					int minute;
+			} timePickerValueInfo;
+
+			/**
+			* The value of the number picker when a #MAW_EVENT_NUMBER_PICKER_VALUE_CHANGED event is received.
+			*/
+			int numberPickerValue;
+
+			/**
+			* The new state of the Video view when a #MAW_EVENT_VIDEO_STATE_CHANGED event is received.
+			* One of the MAW_VIDEO_WIDGET_STATE constants.
+			*/
+			int videoViewState;
 		}
 	}
 
@@ -3199,6 +3569,60 @@ group WidgetAPI "Widget API" {
 		STACK_SCREEN_POPPED = 10;
 
 		/**
+		 * @brief Sent when the progress level has been changed.
+		 * This includes changes that were initiated by the user through a touch gesture,
+         * or arrow key/trackball as well as changes that were initiated programmatically.
+		 */
+	    SLIDER_VALUE_CHANGED = 11;
+
+		/**
+		 * @brief Sent when the user changes\d the date in a Date Picker.
+		 */
+		DATE_PICKER_VALUE_CHANGED = 12;
+
+		/**
+		 * @brief Sent when the user changes\d the time in a Time Picker.
+		 */
+		TIME_PICKER_VALUE_CHANGED = 13;
+
+		/**
+		 * @brief Sent when the user changes\d the value in a Number Picker.
+		 */
+		NUMBER_PICKER_VALUE_CHANGED = 14;
+
+		/**
+		 * @brief Sent from the Video View when the state of the video has changed.
+		 */
+		VIDEO_STATE_CHANGED = 15;
+
+        /**
+         * @brief Sent from the Edit box when it gains focus(the user selects the widget).
+         * The virtual keyboard is shown.
+         * Only for iphone platform.
+         */
+         EDIT_BOX_EDITING_DID_BEGIN = 16;
+
+        /**
+         * @brief Sent from the Edit box when it loses focus.
+         * The virtual keyboard is hidden.
+         * Only for iphone platform.
+         */
+         EDIT_BOX_EDITING_DID_END = 17;
+
+        /**
+         * @brief Sent from the Edit box when the text was changed.
+         */
+         EDIT_BOX_TEXT_CHANGED = 18;
+
+        /**
+         * @brief Sent from the Edit box when the return button was pressed.
+         * On iphone platform the virtual keyboard is not closed after receiving this event.
+         * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
+         */
+         EDIT_BOX_RETURN = 19;
+
+
+		/**
 		* @brief A WebView widget reports status of loading
 		* page content. Event parameter status is set to one
 		* of the following values:
@@ -3207,7 +3631,7 @@ group WidgetAPI "Widget API" {
 		*   #MAW_CONSTANT_STOPPED
 		*   #MAW_CONSTANT_ERROR
 		*/
-		WEB_VIEW_CONTENT_LOADING = 11;
+		WEB_VIEW_CONTENT_LOADING = 20;
 
 		/**
 		* @brief A web view hook has captured a url.
@@ -3231,7 +3655,7 @@ group WidgetAPI "Widget API" {
 		* maWidgetSetProperty with the properties #MAW_WEB_VIEW_SOFT_HOOK
 		* and/or #MAW_WEB_VIEW_HARD_HOOK.
 		*/
-		WEB_VIEW_HOOK_INVOKED = 12;
+		WEB_VIEW_HOOK_INVOKED = 21;
 	}
 
 	} // end of WidgetEventTypes
@@ -3327,6 +3751,67 @@ group WidgetAPI "Widget API" {
 	}
 
 	/**
+	* The available playback actions for the video view. For more info see \ref WidgetVideoViewProperties.
+	*/
+	group VideoViewAction "Video view action" {
+	constset int MAW_VIDEO_VIEW_ACTION_ {
+		/**
+		* @brief Play the video.
+		*/
+		PLAY = 1;
+
+		/**
+		* @brief Pause the video.
+		*/
+		PAUSE = 2;
+
+		/**
+		* @brief Stop the video.
+		*/
+		STOP = 3;
+	}
+	}
+
+   /**
+	* Events for the video view. When the state of the video view changes an event with one
+	* of the next constants will be send.
+	*/
+	group VideoViewEvent "Video view event" {
+	constset int MAW_VIDEO_VIEW_STATE_ {
+		/**
+		* @brief The video is playing.
+		*/
+		PLAYING = 1;
+
+		/**
+		* @brief The video is paused.
+		*/
+		PAUSED = 2;
+
+		/**
+		* @brief The video is stopped.
+		*/
+		STOPPED = 3;
+
+		/**
+		* @brief The video has finished playing.
+		*/
+		FINISHED = 4;
+
+		/**
+		* @brief The source is loaded into memory.
+		*/
+		SOURCE_READY = 5;
+
+		/**
+		* @brief Playback is temporarily interruped(maybe there's no data in the buffer).
+		*/
+		INTERRUPTED = 6;
+
+	}
+	}
+
+	/**
 	* The available result codes for the widget api.
 	*/
 	group WidgetResultCodes "Widget result codes" {
@@ -3385,6 +3870,11 @@ group WidgetAPI "Widget API" {
 		* @brief Indicates that the caller tried to remove a visible root widget (screen) and the MoSync view will become visible.
 		*/
 		REMOVED_ROOT = -10;
+
+		/**
+		* @brief Indicates that a syscall tried to access a feature that is not supported by the current framework version.
+		*/
+		FEATURE_NOT_AVAILABLE = -11;
 	}
 	} // end of WidgetResultCodes
 
@@ -3458,6 +3948,8 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A check box is a widget that acts like a physical switch. When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetCheckBoxProperties "Check box properties" for the properties available.
+		 * If you want to display it with a "light" indicator, as it is on iOS use a Toggle Button instead.
+
 		 */
 		CHECK_BOX = "CheckBox";
 
@@ -3483,6 +3975,8 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
+		 * There is a replica available for Android.
+		 * See \ref WidgetNavigationBarProperties "Navigation Bar properties" for the properties available.
 		 */
 		NAV_BAR = "NavBar";
 
@@ -3492,12 +3986,86 @@ group WidgetAPI "Widget API" {
 		GL_VIEW = "GLView";
 
 		/**
-		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
+		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
 		 */
+		GL2_VIEW = "GL2View";
+
+		/**
+		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
+		 */	
+		CAMERA_PREVIEW="CameraPreview";
+		
 		WEB_VIEW = "WebView";
+
+		/**
+		 * @brief A progress bar is a visual indicator of progress in some operation.
+		 * Displays a bar to the user representing how far the operation has progressed.
+		 * A progress bar can also be made indeterminate, when the length of the task is unknown.
+		 *
+		 * See \ref WidgetProgressBarProperties "Progress bar properties" for the properties available.
+		 */
+		PROGRESS_BAR = "ProgressBar";
+
+		 /**
+		 * @brief An activity indicator is a visual indicator of progress in some operation.
+		 * It shows a cyclic animation without an indication of progress.
+		 * It is used when the length of the task is unknown.
+		 *
+		 * See \ref WidgetActivityIndicatorProperties "Activity Indicator properties" for the properties available.
+		 */
+		ACTIVITY_INDICATOR = "ActivityIndicator";
+
+		/**
+		 * @brief A Slider is an extension of ProgressBar that adds a draggable thumb.
+		 * The user can touch the thumb and drag left or right to set the current progress level.
+		 *
+		 * See \ref WidgetSliderProperties "Slider properties" for the properties available.
+		 */
+		SLIDER = "Slider";
+
+		/**
+		 * @brief A Date Picker is a widget for selecting a date. The date can be selected by a year, month, and day spinners.
+		 * The minimal and maximal date from which dates to be selected can be customized.
+		 * The picker is initialized with the current system date.
+		 *
+		 * See \ref WidgetDatePickerProperties "Date Picker properties" for the properties available.
+		 */
+		DATE_PICKER = "DatePicker";
+
+		/**
+		 * @brief A Time Picker is a widget for selecting time of day, in 24 hour mode.
+		 * The hour and each minute digit can be controlled by vertical spinners.
+		 * The hour can be entered by keyboard input.
+		 * Availabe only on iOS for the moment.
+		 * See \ref WidgetTimePickerProperties "Time Picker properties" for the properties available.
+		 */
+		TIME_PICKER = "TimePicker";
+
+		/**
+		 * @brief A Number Picker is a widget that enables the user to select a number from a predefined range.
+		 *
+		 * See \ref WidgetNumberPickerProperties "Number Picker properties" for the properties available.
+		 */
+		NUMBER_PICKER = "NumberPicker";
+
+		/**
+		 * @brief A Video View displays a video file.
+		 * By default, it has attached a controller view that typically contains the buttons like
+		 * "Play/Pause", "Rewind", "Fast Forward" and a progress slider.
+		 * See \ref WidgetVideoViewProperties "Video View properties" for the properties available.
+		 */
+		VIDEO_VIEW = "VideoView";
+
+		/**
+		 * @brief A Toggle Button is a widget that acts like a physical switch. Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF".
+		 * It is available only on Android, and it's similar to the Check Box on iOS.
+		 * When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetToggleButtonProperties "Toggle button properties" for the properties available.
+		 */
+		TOGGLE_BUTTON = "ToggleButton";
 	}
 	} // end of WidgetTypes
 
+	
 	/**
 	* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change
 	* things like the visual appearance of the widget or the way it works.
@@ -3609,6 +4177,38 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		VISIBLE = "visible";
+
+		/**
+		* @brief Sets whether the widget is enabled or not. If not, the widget is grayed out.
+		*
+		* Widgets are enabled by default.
+		*
+		* @validvalue A boolean string 'true' or 'false', where true is enabled and false is disabled.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(buttonHandle, MAW_WIDGET_ENABLED, "false");
+		* \endcode
+		*/
+		ENABLED = "enabled";
+
+		/**
+		* @brief Specifies the background gradient of a widget.
+		* Currently implemented only on Android.
+		*
+		* @validvalue Two hexadecimal values 0xRRGGBB, where R, G and B are the red, green and blue components respectively,
+		* separated by comma.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(widgetHandle, MAW_WIDGET_BACKGROUND_GRADIENT,  "0x27408B,0xCAE1FF");
+		* \endcode
+		*/
+		BACKGROUND_GRADIENT = "backgroundGradient";
 	}
 
 	/**
@@ -3721,6 +4321,31 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
+
+		/**
+		* @brief Specifies whether the navigation bar should be shown.
+		*
+		* This can have different behaviors on different platforms, on iPhone it is enabled by default, but on Android the
+		* user can set it to be shown, because this is not native behavior on Android.
+		* When it set this to true, a nav bar is associated to all screens of this stack screen, and there is
+		* no need to add it as a child to this widget.
+		* When it is set to false, the nav bar is removed from all containing screens of the stack.
+		* NOTE: remember to add main layouts for the screens, because those will be the parents of the navigation bars.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_NAV_BAR_ENABLED, "true");
+		*   // Now a replica of the Nav Bar of iOS is shown on Android.
+		*   // And it handles the back button behaviour.
+		* \endcode
+		*/
+
+		NAV_BAR_ENABLED = "NavBarEnabled";
+
 	}
 	} // end of WidgetStackScreenProperties
 
@@ -3808,6 +4433,21 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		FONT_SIZE = "fontSize";
+
+		/**
+		* @brief Sets the maximum number of lines used for rendering text.
+		* To remove any maximum limit, and use as many lines as needed, set the value of this property to 0.
+		*
+		* @validvalue An integer that specifies the maximum number of lines.
+		*
+		* @setandget.
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(labelHandle, MAW_LABEL_MAX_NUMBER_OF_LINES, "3");
+		* \endcode
+		*/
+		MAX_NUMBER_OF_LINES = "maxNumberOfLines";
 	}
 	} // end of WidgetLabelProperties
 
@@ -3855,9 +4495,9 @@ group WidgetAPI "Widget API" {
 		TEXT_VERTICAL_ALIGNMENT = "textVerticalAlignment";
 
 		/**
-		* @brief Sets the horizontal alignment of the text inside the button. If the widget's height is WRAP_CONTENT this property has no effect.
+		* @brief Sets the horizontal alignment of the text inside the button. If the widget's width is WRAP_CONTENT this property has no effect.
 		*
-		* @validvalue Takes one of the constants #MAW_ALIGNMENT_TOP, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
+		* @validvalue Takes one of the constants #MAW_ALIGNMENT_LEFT, #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
 		*
 		* @setonly
 		*
@@ -4157,7 +4797,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @note Only available for iOS.
 		*
-		* @validvalue One of "hasChildren", "hasDetails" or "isChecked".
+		* @validvalue One of "none", "hasChildren", "hasDetails" or "isChecked".
 		*
 		* @par Example
 		* \code
@@ -4180,15 +4820,34 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*	maWidgetSetProperty(listViewItemHandle, MAW_CHECK_BOX_CHECKED, "true");
+		*	maWidgetSetProperty(checkBoxHandle, MAW_CHECK_BOX_CHECKED, "true");
 		* \endcode
 		*/
 		CHECKED = "checked";
 	}
-	} // end of WidgetListViewProperties
+	} // end of WidgetCheckBoxProperties
 
 	/**
-	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties.
+	* The available widget properties for a #MAW_TOGGLE_BUTTON. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetToggleButtonProperties "Toggle button properties" {
+	constset MAString MAW_TOGGLE_BUTTON_ {
+		/**
+		* @brief Set or get the checked state of the toggle button.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(toggleButtonHandle, MAW_TOGGLE_BUTTON_CHECKED, "true");
+		* \endcode
+		*/
+		CHECKED = "checked";
+	}
+	} // end of WidgetCheckBoxProperties
+
+	/**
+	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties. 
 	*/
 	group WidgetHorizontalLayoutProperties "Horizontal layout properties" {
 	constset MAString MAW_HORIZONTAL_LAYOUT_ {
@@ -4545,6 +5204,37 @@ group WidgetAPI "Widget API" {
 		NEW_URL = "newurl";
 
 		/**
+		* @brief Sets or gets whether the horizontal scrollbar should be drawn or not.
+		* Available only on Android for the moment.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_HORIZONTAL_SCROLLBAR_ENABLED, "true");
+		* \endcode
+		*/
+		HORIZONTAL_SCROLL_BAR_ENABLED = "horizontalScrollBarEnabled";
+
+		/**
+		* @brief Sets or gets whether the vertical scrollbar should be drawn or not.
+		* The scrollbar is drawn by default.
+		* Available only on Android for the moment.
+		*
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
+		* \endcode
+		*/
+		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
+
+		/**
 		* @brief Enable or disable the zoom controls of the web view.
 		*
 		* @validvalue "true" to enable, "false" to disable.
@@ -4574,7 +5264,498 @@ group WidgetAPI "Widget API" {
 	}
 
 	} // end of WidgetWebViewProperties
+	/**
+	* The available widget properties for a #MAW_PROGRESS_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetProgressBarProperties "Progress bar properties" {
+	constset MAString MAW_PROGRESS_BAR_ {
+		/**
+		* @brief Sets or gets the range of the progress bar to 0...max.
+		*
+		* @validvalue An positive integer that specifies the upper range of this progress bar.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_MAX, "100");
+		* \endcode
+		*/
+		MAX = "max";
 
+		/**
+		* @brief Set or gets the current progress to the specified value.
+		*
+		* @validvalue An int that specifies the new progress, between 0 and max value. See \ref PROGRESS_BAR_MAX.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		* 	maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_PROGRESS, "10");
+		* \endcode
+		*/
+		PROGRESS = "progress";
+
+		/**
+		* @brief Increase the progress bar's progress by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the progress must be increased.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(progressBarHandle, MAW_PROGRESS_BAR_INCREMENT_PROGRESS, "20");
+		* \endcode
+		*/
+		INCREMENT_PROGRESS = "incrementProgress";
+	}
+	} // end of WidgetProgressBarProperties
+
+	/**
+	* The available widget properties for a #MAW_ACTIVITY_INDICATOR. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetActivityIndicatorProperties "Activity Indicator properties" {
+	constset MAString MAW_ACTIVITY_INDICATOR_ {
+		/**
+		* @brief Sets if the indicator is still on or off.
+		* If set to false, it doesn't delete the widget just dismisses it.
+		* @validvalue A boolean string 'true' or 'false'.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // The activity is done. Now this widget is dismissed.
+        *   maWidgetSetProperty(activityIndicatorHandle, MAW_ACTIVITY_INDICATOR_IN_PROGRESS, "false");
+		* \endcode
+		*/
+		IN_PROGRESS = "inProgress";
+	}
+	} // end of WidgetActivityIndicatorProperties
+
+	/**
+	* The available widget properties for a #MAW_SLIDER. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetSliderProperties "Slider properties" {
+	constset MAString MAW_SLIDER_ {
+		/**
+		* @brief Sets or gets the range of the slider to 0...max.
+		*
+		* @validvalue An positive integer that specifies the upper range of this slider.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_MAX, "100");
+		* \endcode
+		*/
+		MAX = "max";
+
+		/**
+		* @brief Set or gets the current value to the slider.
+		*
+		* @validvalue An int that specifies the new value, between 0 and max value. See \ref SLIDER_MAX.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		* 	maWidgetSetProperty(sliderHandle, MAW_SLIDER_VALUE, "10");
+		* \endcode
+		*/
+		VALUE = "value";
+
+		/**
+		* @brief Increase the current value of the slider by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the slider value must be increased.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_INCREASE_VALUE, "20");
+		* \endcode
+		*/
+		INCREASE_VALUE = "increaseValue";
+
+		/**
+		* @brief Decreases the current value of the slider by the specified amount.
+		*
+		* @validvalue An int that specifies the amount by which the slider value must be decreased.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(sliderHandle, MAW_SLIDER_DECREASE_VALUE, "20");
+		* \endcode
+		*/
+		DECREASE_VALUE = "decreaseValue";
+	}
+	} // end of WidgetSliderProperties
+
+	/**
+	* The available widget properties for a #MAW_DATE_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+
+group WidgetDatePickerProperties "Date Picker properties" {
+
+	constset MAString MAW_DATE_PICKER_ {
+		/**
+		* @brief Sets or gets  maximal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00.
+		* NOTE: On Android the default maximal date is 12/31/2100.
+		*
+		* @validvalue A long int that specifies the upper range of this date picker.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MAX_DATE, "101220100000");
+		*   // Now the maximum date is  the 10th of December 2010.
+		* \endcode
+		*/
+		MAX_DATE = "maxDate";
+
+		/**
+		* @brief Sets or gets  minimal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00
+		* Note: On Android the default minimal date is 01/01/1900.
+		* @validvalue A long int that specifies the minimal supported date.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(datePickerHandle, MAW_DATE_PICKER_MIN_DATE, "0101200000");
+		*   // Now the minimum date is the 1st of January 2000.
+		* \endcode
+		*/
+		MIN_DATE = "minDate";
+
+		/**
+		* @brief Sets or gets the currently displayed year.
+		*
+		* @validvalue An int that specifies a valid year.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char yearBuffer[BUFFER_SIZE];
+        *   int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_YEAR, yearBuffer, BUFFER_SIZE);
+		*   if(getStatus == MAW_RES_OK)
+		*   {
+		*       // Do something with the year.
+		*   }
+		* \endcode
+		*/
+		YEAR = "year";
+
+		/**
+		* @brief Sets or gets the currently displayed month.
+		*
+		* @validvalue An int that specifies a valid month.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char monthBuffer[BUFFER_SIZE];
+        *   int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_MONTH, monthBuffer, BUFFER_SIZE);
+		*   if(getStatus == MAW_RES_OK)
+		*   {
+		*       // Do something with the month.
+		*   }
+		* \endcode
+		*/
+		MONTH = "month";
+
+		/**
+		* @brief Sets or gets the currently displayed day of month.
+		*
+		* @validvalue An int that specifies a valid day of month.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char dayBuffer[BUFFER_SIZE];
+        *   int getStatus = maWidgetGetProperty(datePickerHandle, MAW_DATE_PICKER_DAY_OF_MONTH, dayBuffer, BUFFER_SIZE);
+		*   if(getStatus == MAW_RES_OK)
+		*   {
+		*       // Do something with the day.
+		*   }
+		* \endcode
+		*/
+		DAY_OF_MONTH = "dayOfMonth";
+	}
+	} // end of WidgetDatePickerProperties
+
+	/**
+	* The available widget properties for a #MAW_TIME_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetTimePickerProperties "Time Picker properties" {
+	constset MAString MAW_TIME_PICKER_ {
+		/**
+		* @brief Sets or gets the current hour in 24h mode( in the range: 0-23 ).
+		*
+		* @validvalue An int that specifies the current hour.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   // Set hour to 20, that is 8PM.
+        *   maWidgetSetProperty(timePickerHandle, MAW_TIME_PICKER_CURRENT_HOUR, "20");
+		* \endcode
+		*/
+		CURRENT_HOUR = "currentHour";
+
+		/**
+		* @brief Sets or gets the current minute (0-59).
+		*
+		* @validvalue An int that specifies the current minute.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(timePickerHandle, MAW_TIME_PICKER_CURRENT_MINUTE, buf, BUFFER_SIZE);
+		*   // Do something with the minute.
+		* \endcode
+		*/
+		CURRENT_MINUTE = "currentMinute";
+	}
+	} // end of WidgetTimePickerProperties
+
+	/**
+	* The available widget properties for a #MAW_NUMBER_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetNumberPickerProperties "Number Picker properties" {
+	constset MAString MAW_NUMBER_PICKER_ {
+		/**
+		* @brief Sets or gets the current value for the number picker.
+		* If the value is less than MAW_NUMBER_PICKER_MIN_VALUE property value, the current value is set to min.
+		* If the value is greater than MAW_NUMBER_PICKER_MAX_VALUE value, the current value is set to max.
+		*
+		* @validvalue A valid int.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_VALUE, "50");
+		* \endcode
+		*/
+		VALUE = "value";
+
+		/**
+		* @brief Sets or gets the min value of the picker.
+		*
+		* @validvalue An int that specifies the minimum value.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_MIN_VALUE, "0");
+		* \endcode
+		*/
+		MIN_VALUE = "minValue";
+
+		/**
+		* @brief Sets or gets the max value of the picker.
+		*
+		* @validvalue An int that specifies the maximum value.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(numberPickerHandle, MAW_NUMBER_PICKER_MAX_VALUE, "100");
+		* \endcode
+		*/
+		MAX_VALUE = "maxValue";
+	}
+	} // end of WidgetNumberPickerProperties
+
+	/**
+	* The available widget properties for a #MAW_VIDEO_VIEW. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetVideoViewProperties "Video View properties" {
+	constset MAString MAW_VIDEO_VIEW_ {
+		/**
+		* @brief Sets the video path.
+		*
+		* @validvalue Any valid path.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Set the video path.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_PATH, "\data\Video1.wav");
+		* \endcode
+		*/
+		PATH = "path";
+
+		/**
+		* @brief Sets the video url.
+		*
+		* @validvalue Any valid streaming url.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Set the video path.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_URL, "www.example.com/play.m3u8");
+		* \endcode
+		*/
+		URL = "url";
+
+		/**
+		* @brief Start,pause or stop the video playback.
+		*
+		* @validvalue MAW_VIDEO_WIDGET_ACTION_PLAY, MAW_VIDEO_WIDGET_ACTION_PAUSE or MAW_VIDEO_WIDGET_ACTION_STOP constants.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Start the playback.
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_WIDGET_ACTION, toString(MAW_VIDEO_WIDGET_ACTION_PLAY));
+		* \endcode
+		*/
+		ACTION = "action";
+
+		/**
+		* @brief Seeks into the video.
+		*
+		* @validvalue A valid integer for milliseconds.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(videoViewHandle, MAW_VIDEO_VIEW_SEEK_TO, "10000");
+		* \endcode
+		*/
+		SEEK_TO = "seekTo";
+
+		/**
+		* @brief Gets the video file duration.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_DURATION, buf, BUFFER_SIZE);
+		*   // Do something with the duration.
+		* \endcode
+		*/
+		DURATION = "duration";
+
+		/**
+		* @brief Gets the buffer percentage of the played video file.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_BUFFER_PERCENTAGE, buf, BUFFER_SIZE);
+		*   // Do something with the percentage.
+		* \endcode
+		*/
+		BUFFER_PERCENTAGE = "bufferPercentage";
+
+		/**
+		* @brief Gets the current position in the video file.
+		*
+		* @validvalue An int.
+		*
+		* @getonly
+		*
+		* @par Example
+		* \code
+		*   char buf[BUFFER_SIZE];
+        *   maWidgetGetProperty(videoViewHandle, MAW_VIDEO_VIEW_CURRENT_POSITION, buf, BUFFER_SIZE);
+		*   // Do something with the position.
+		* \endcode
+		*/
+		CURRENT_POSITION = "currentPosition";
+	}
+	} // end of WidgetVideoViewProperties
+
+	/**
+	* The available widget properties for a #MAW_NAVIGATION_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetNavBarProperties "Navigation Bar properties" {
+	constset MAString MAW_NAV_BAR_ {
+		/**
+		* @brief Sets or gets the title.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_TITLE, "MyScreen");
+		* \endcode
+		*/
+		TITLE = "title";
+
+		/**
+		* @brief Sets the text for the back button.
+		* This can be set only when the navigation bar was
+		* attached to a screen that is not part of a stack screen.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_BACK_BTN, "Home");
+		* \endcode
+		*/
+		BACK_BTN = "backBtn";
+
+		/**
+		* @brief Sets the background color. The default color is light blue.
+		* The color is in RGB8 format (0xRRGGBB).
+		* On Android there is another option:
+		*    Apply a gradient, specified by two rgb colors separated by comma.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x101010");
+		* \endcode
+		*
+		* @par Example on Android apply a gradient from dark blue to light blue.
+		* \code
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B,0xCAE1FF");
+		* \endcode
+		*/
+		COLOR = "color";
+	}
+	} // end of WidgetNavBarProperties
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;
@@ -4594,6 +5775,8 @@ group WidgetAPI "Widget API" {
 	* \returns A handle to the widget, or any of the following result codes:
 	* - #MAW_RES_ERROR if the widget could not be created.
 	* - #MAW_RES_INVALID_TYPE_NAME if the widget type was not available.
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported by the curent framework version.
+
 	*/
 	MAWidgetHandle maWidgetCreate(in MAString widgetType);
 
@@ -4602,7 +5785,7 @@ group WidgetAPI "Widget API" {
 	* with children will also cause its children to be destroyed. Once a handle has
 	* been destroyed it cannot be referenced by the maWidget* functions.
 	*
-    * \note If the given widget has a parent, the widget will be removed from its
+	* \note If the given widget has a parent, the widget will be removed from its
 	* parent.
 	*
 	* \param widget A handle to the widget to be destroyed.
@@ -4715,6 +5898,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetSetProperty(in MAWidgetHandle widget, in MAString property, in MAString value);
@@ -4732,16 +5916,214 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 	* - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
 	* - #MAW_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+	* - #MAW_RES_FEATURE_NOT_AVAILABLE if the property is not supported by the curent framework version.
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
-
-	}
-	// end of group WidgetAPIFunctions
+	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI
 #endif //IX_WIDGET
 
+group CameraAPI "Camera API" {
+
+	constset int MA_CAMERA_CONST_ {
+		/**
+		* @brief A constant that represents the flash being on.
+		*/
+		BACK_CAMERA = 0;
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		FRONT_CAMERA = 1;
+		
+	} //end MA_CAMERA_CONST
+
+group CameraResultCodes "Camera Result Codes" {
+	constset int MA_CAMERA_RES_ {
+		/**
+		* @brief A constant that represents the flash being on.
+		*/
+		OK = 1;
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		FAILED = -2;
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		NOT_STARTED = -3;
+		
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		PROPERTY_NOTSUPPORTED = -4;
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		INVALID_PROPERTY_VALUE = -5;
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		VALUE_NOTSUPPORTED = -6;
+		
+	} 
+} //end CameraResultCodes
+
+
+group FlashModes "Flash Modes" {
+	constset MAString MA_CAMERA_FLASH_ {
+		/**
+		* @brief A constant that represents the flash being on.
+		*/
+		ON = "on";
+
+		/**
+		* @brief A constant that represents the flash being in the automatic mode.
+		*/
+		AUTO = "auto";
+		
+		/**
+		* @brief A constant that represents the flash being off.
+		*/
+		OFF = "off";
+		
+		/**
+		* @brief A constant that represents the flash being in the torch mode.
+		*/
+		TORCH = "torch";
+		
+	} //end MAC_FLASH_
+}// end of FlashMode
+
+group FocusModes "Focus Modes" {
+	constset MAString MA_CAMERA_FOCUS_ {
+		/**
+		* @brief A constant that represents the focus mode being automatic.
+		*/
+		AUTO = "auto";
+
+		/**
+		* @brief A constant that turns the camera to focus to infinity.
+		*/
+		INFINITY = "infinity";
+		
+		/**
+		* @brief A constant that turns the camera to macro mode.
+		*/
+		MACRO = "macro";
+		
+		/**
+		* @brief A constant that sets the camera to fixed focus mode.
+		*/
+		FIXED = "fixed";
+		
+	} //end MAC_FOCUS_
+} //end of FocusMode
+
+group ImageFormat "Image Formats" {
+	constset MAString MA_CAMERA_IMAGE_ {
+		/**
+		* @brief A constant that represents JPEG image format.
+		*/
+		JPEG = "jpeg";
+
+		/**
+		* @brief A constant that represents RAW image format.
+		*/
+		RAW = "raw";
+		
+	} //end MA_CAMERA_IMAGE_
+} //end ImageFormats
+
+group CameraProperties "Camera Properties" {
+	
+	constset MAString MA_CAMERA_ {	
+	
+		/**
+		* @brief Sets the flash mode for the camera.
+		*
+		* @validvalue can be one of the #MA_CAMERA_FLASH_ON, #MA_CAMERA_FLASH_OFF, #MA_CAMERA_FLASH_AUTO, #MA_CAMERA_FLASH_TORCH constants
+		*
+		* @par Example
+		* \code
+		*	maCameraSetProperty(MAW_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO);
+		* \endcode
+		*/
+		FLASH_MODE = "flash-mode";
+
+		/**
+		* @brief Sets the focus mode for the camera.
+		*
+		* @validvalue can be one of the #MA_CAMERA_FOCUS_AUTO, #MA_CAMERA_FOCUS_INFINITY, #MA_CAMERA_FOCUS_MACRO, #MA_CAMERA_FOCUS_FIXED constants
+		*
+		* @par Example
+		* \code
+		*	maCameraSetProperty(MAW_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO);
+		* \endcode
+		*/
+		FOCUS_MODE = "focus-mode";
+		
+		/**
+		* @brief Sets the image format for the camera.
+		*
+		* @validvalue can be one of the #MA_CAMERA_IMAGE_JPEG, #MA_CAMERA_IMAGE_RAW constants
+		*
+		* @par Example
+		* \code
+		*	maCameraSetProperty(MAW_CAMERA_IMAGE_FORMAT, MA_CAMERA_IMAGE_JPEG);
+		* \endcode
+		*/
+		IMAGE_FORMAT = "image-format";
+		
+
+		/**
+		* @brief Sets the focus mode for the camera.
+		*
+		* @validvalue an int string that can be between 0 and #MA_CAMERA_MAX_ZOOM
+		*
+		* @par Example
+		* \code
+		*	maCameraSetProperty(MAW_CAMERA_ZOOM, "1");
+		* \endcode
+		*/
+		ZOOM = "zoom";
+
+		/**
+		* @brief Provides the information about the maximum supported zoom level on the device.
+		*
+		* @getonly
+		*
+		*/
+		MAX_ZOOM = "max-zoom";
+
+		/**
+		* @brief Indicates that if the device supports zoom or not.
+		*
+		* @validvalue the returned value is "true" for support and "false" for lack of support.
+		*
+		* @getonly
+		*/
+		ZOOM_SUPPORTED = "zoom-supported";
+
+		/**
+		* @brief Indicates that if the device has a flash or not.
+		*
+		* @validvalue the returned value is "true" for support and "false" for lack of support.
+		*
+		* @getonly
+		*/
+		FLASH_SUPPORTED = "flash-supported";
+		
+	} //end of MAC_
+} // end of CameraProperties
+
+group CameraFunctions "Camera Functions" {
 		/**
 		* \brief The camera format, in pixels.
 		*/
@@ -4779,13 +6161,66 @@ group WidgetAPI "Widget API" {
 		int maCameraStop();
 
 		/**
+		* Adds a previewWidget to the camera controller in devices that support native UI.
+		* Returns 1 for success, \< 0 on error.
+		*/
+		int maCameraSetPreview(in MAHandle widgetHandle);
+
+		/**
+		* Selects a Camera from the available ones. 
+		* Returns 1 for success, \< 0 on error.
+		*/
+		int maCameraSelect(in int cameraNumber);
+
+
+		/**
+		* Returns the number of available Camera on the device. 
+		* Returns 1 for success, \< 0 on error.
+		*/
+		int maCameraNumber();
+
+		/**
 		* Requires the viewfinder to be active.
-		* Takes a snapshot using the specified format. The snapshot is JPEG-encoded and
+		* Takes a snapshot using the specified format. The snapshot is
 		* stored as a new data object in the supplied placeholder.
 		* Returns 0 on success, or \< 0 on error.
 		*/
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
 
+		/**
+		* Starts or stops recording video. 
+		* \a stopStartFlag indicates the operation. 
+		* 1 for start recording and 0 for stop recording.
+		* Returns 1 for success, \< 0 on error.
+		*/
+		int maCameraRecord(in int stopStartFlag);
+
+
+		/** 
+		* Sets a specified property on the Selected Camera.
+		*
+		* \param property A string representing which property to set.
+		* \param value The value which will be assigned to the property.
+		*
+		* \returns 1 for success and <0 for failure.
+		*/
+		int maCameraSetProperty(in MAString property, in MAString value);
+
+		/** 
+		* retrives a specified property on the Selected Camera.
+		*
+		* \param property A string representing which property to set.
+		* \param value A buffer that will hold the value of the property, represented as a string.
+		* \param bufSize Size of the buffer.		
+		*
+		* \returns 1 for success and <0 for failure.
+		*/
+		int maCameraGetProperty( in MAString property, out MAString value range("bufSize"), in int bufSize);
+	
+	} // end of CameraFunctions
+	
+	} //end of CameraAPI
+		
 		/**
 		* Shows the virtual keyboard.
 		*/
@@ -4994,10 +6429,8 @@ group WidgetAPI "Widget API" {
 		 */
 		int maScreenStateEventsOff();
 
-#if IX_OPENGL_ES
 #include "opengl_non_generated.idl"
 #include "opengl_generated.idl"
-#endif
 
 		/**
 		 * Logs information about the state of all current resources.
@@ -5011,6 +6444,90 @@ group WidgetAPI "Widget API" {
 		 * to ensure its visibility on all screen sizes.
 		 */
 		void maMessageBox(in MAString title, in MAString message);
+
+		constset int SENSOR_TYPE_ {
+			// A constant describing an accelerometer sensor type.
+			ACCELEROMETER = 1;
+			// A constant describing a magnetic field sensor type.
+			MAGNETIC_FIELD = 2;
+			// A constant describing an orientation sensor type.
+			ORIENTATION = 3;
+			// A constant describing a gyroscope sensor type.
+			GYROSCOPE = 4;
+			// A constant describing an proximity sensor type.
+			PROXIMITY = 5;
+		}
+
+		constset int SENSOR_RATE_ {
+			// Get sensor data as fast as possible.
+			FASTEST = 0;
+			// A rate suitable for games.
+			GAME = -1;
+			// The default rate. Suitable for screen orientation changes.
+			NORMAL = -2;
+			// A rate suitable for the user interface.
+			UI = -3;
+		}
+
+		constset int SENSOR_ERROR_ {
+			NONE = 0;
+			// Errors for maSensorStart
+			NOT_AVAILABLE = -1;
+			INTERVAL_NOT_SET = -2;
+			ALREADY_ENABLED = -3;
+			// Errors for maSensorStop
+			NOT_ENABLED = -4;
+			CANNOT_DISABLE = -5;
+		}
+
+		constset int UIDEVICE_ORIENTATION_ {
+		    // The orientation of the device cannot be determined.
+			UNKNOWN = 0;
+			// The device is in portrait mode, with the device held upright and the home button at the bottom.
+			PORTRAIT = 1;
+			// The device is in portrait mode but upside down, with the device held upright and the home button at the top.
+			PORTRAIT_UPSIDE_DOWN = 2;
+			// The device is in landscape mode, with the device held upright and the home button on the right side.
+			LANDSCAPE_LEFT = 3;
+			// The device is in landscape mode, with the device held upright and the home button on the left side.
+			LANDSCAPE_RIGHT = 4;
+			// The device is held parallel to the ground with the screen facing upwards.
+			FACE_UP = 5;
+			// The device is held parallel to the ground with the screen facing downwards.
+			FACE_DOWN = 6;
+		}
+
+		constset int SENSOR_PROXIMITY_VALUE_ {
+			// the device is not close to the user
+			FAR = 0;
+			// the device is close to the user
+			NEAR = 1;
+		}
+
+		/**
+		* \brief Enables a sensor and starts sending events if the sensor is available.
+		* If the sensor is already enabled this call will have no effect.
+		* \param sensor       The sensor which should be enabled.
+		* \param interval     Time interval in which a sensor update shall be triggered.
+		*            >0 interval time in milliseconds.
+		*            <=0 Any of SensorUpdate enums.
+		* \return    #SENSOR_ERROR_NONE  on success.
+		*            #SENSOR_ERROR_NOT_AVAILABLE if this sensor wasn't available.
+		*            #SENSOR_ERROR_INTERVAL_NOT_SET if the interval wasn't set, could be due to platform limitations.
+		*            #SENSOR_ERROR_ALREADY_ENABLED if the sensor already was enabled.
+		* \see #EVENT_TYPE_SENSOR
+		*/
+		int maSensorStart(in int sensor, in int interval);
+
+		/**
+		* \brief Disables a sensor so that it doesn't send any further events.
+		* \param sensor    The sensor which should be disabled.
+		* \return    #SENSOR_ERROR_NONE on success.
+		*            #SENSOR_ERROR_NOT_ENABLED if this sensor wasn't enabled.
+		*            #SENSOR_ERROR_CANNOT_DISABLE if there was a problem disabling the sensor.
+		* \see #EVENT_TYPE_SENSOR
+		*/
+		int maSensorStop(in int sensor);
 	}
 
 	constset int IOCTL_ {

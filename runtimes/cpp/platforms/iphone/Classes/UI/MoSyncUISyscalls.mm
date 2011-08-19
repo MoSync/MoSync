@@ -89,7 +89,7 @@ int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char*
 	
 	NSString* propertyString = stringFromChar(property);
 	
-	if([widget class] == [GLViewWidget class]) {
+	if([widget class] == [GLViewWidget class] || [widget class] == [GL2ViewWidget class] ) {
 		// do this from the MoSync thread. Maybe do a generic system for this later.
 		if([propertyString isEqualToString:@"bind"]) {
 			return [widget setPropertyWithKey:@"bind" toValue:@""];
@@ -143,6 +143,12 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 	[propertyString release];
 	
 	return realLength;
+}
+
+int maWidgetPerformAction(MAWidgetHandle widget, const char *action, const char *param){
+	int returnValue=1;
+	
+	return returnValue; 
 }
 
 int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {

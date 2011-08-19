@@ -295,4 +295,3 @@ extern "C" int MAMain()
 	app.runEventLoop();
 	return 0;
 }
-

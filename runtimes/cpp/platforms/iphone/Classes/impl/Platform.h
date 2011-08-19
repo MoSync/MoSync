@@ -41,6 +41,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <base/Image.h>
 
+#include "PimSyscall.h"
+#include "helpers/cpp_ix_pim.h"
+
 namespace Core {
 	class VMCore;
 }

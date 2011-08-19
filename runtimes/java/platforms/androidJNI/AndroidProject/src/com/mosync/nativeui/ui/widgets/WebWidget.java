@@ -314,6 +314,15 @@ public class WebWidget extends Widget
 			webView.addJavascriptInterface(webView, value);
 		}
 
+		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED ) )
+		{
+			webView.setHorizontalScrollBarEnabled(BooleanConverter.convert(value));
+		}
+		else if ( property.equals(IX_WIDGET.MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED ))
+		{
+			webView.setVerticalScrollBarEnabled(BooleanConverter.convert(value));
+		}
+		
 		return true;
 	}
 
@@ -336,6 +345,14 @@ public class WebWidget extends Widget
 		{
 			// TODO: To be removed. MAW_WEB_VIEW_NEW_URL is deprecated.
 			return m_newUrl;
+		}
+		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED ))
+		{
+			return Boolean.toString(webView.isHorizontalScrollBarEnabled());
+		}
+		else if( property.equals( IX_WIDGET.MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED ))
+		{
+			return Boolean.toString(webView.isVerticalScrollBarEnabled());
 		}
 		else
 		{

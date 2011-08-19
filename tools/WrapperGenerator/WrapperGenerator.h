@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/attribute.h"
 
 namespace System {
+	std::string toUpperCase(const std::string& str);
 	void error(const char* fmt, ...) PRINTF_ATTRIB(1, 2) GCCATTRIB(noreturn);
 	std::string genstr(const char * fmt, ...) PRINTF_ATTRIB(1, 2);
 	void split(const std::string& str, const std::string& delim, std::vector<std::string>& output);

@@ -57,7 +57,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif
 
 // Convert between double, 2 ints and long long.
-union MA_DV {
+typedef union MA_DV {
 #if defined(__MARM_ARMI__)	//Symbian S60, 2nd edition hardware
 	int i[2];
 #else	//everything else
@@ -72,12 +72,12 @@ union MA_DV {
 #endif	//__MARM_ARMI__
 	long long ll;
 	double d;
-};
+} MA_DV;
 
 // Convert between float and int.
-union MA_FV {
+typedef union MA_FV {
 	float f;
 	int i;
-};
+} MA_FV;
 
 #endif	//_MAAPI_DEFS_H

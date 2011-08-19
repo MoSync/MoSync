@@ -18,26 +18,35 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.core;
 
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.test.IsolatedContext;
 import android.util.Log;
 import android.view.View;
 
+import com.mosync.internal.android.MoSyncCameraController;
+import com.mosync.internal.android.MoSyncHelpers;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
+import com.mosync.nativeui.ui.factories.CameraPreviewFactory;
 import com.mosync.nativeui.ui.factories.ViewFactory;
+import com.mosync.nativeui.ui.widgets.CameraPreviewWidget;
 import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.util.properties.FeatureNotAvailableException;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
+
 
 /**
  * This class contains the implementation of the NativeUI system calls
@@ -52,6 +61,7 @@ public class NativeUI
 	 */
 	private Activity m_activity;
 	
+	public MoSyncThread mMoSyncThread;
 	/**
 	 * A table that contains a mapping between a handle and a widget, in a
 	 * mosync program a handle is the only reference to a widget.
@@ -141,7 +151,7 @@ public class NativeUI
 	 * Internal function for the maWidgetCreate system call.
 	 * It uses the ViewFactory to create a widget of the
 	 * given type, puts it in the handle table and returns it.
-	 * 
+	 *
 	 * Note: Should only be called on the UI thread.
 	 */
 	public int maWidgetCreate(String type)
@@ -350,6 +360,7 @@ public class NativeUI
 	 */
 	public int maWidgetStackScreenPush(int stackScreenHandle, int newScreenHandle)
 	{
+
 		Widget stackScreenWidget = m_widgetTable.get( stackScreenHandle );
 		if( stackScreenWidget == null )
 		{
@@ -421,21 +432,16 @@ public class NativeUI
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null )
 		{
-			Log.e( "MoSync", "maWidgetSetProperty: Invalid widget handle: " + widgetHandle );
+			Log.e( "MoSync", "maWidgetSetProperty: Invalid child widget handle: " + widgetHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
+		boolean result;
+
 		try
 		{
-			if( widget.setProperty( key, value ) )
-			{
-				return IX_WIDGET.MAW_RES_OK;
-			}
-			else
-			{
-				Log.e( "MoSync", "maWidgetSetProperty: Invalid property '" + key + "' on widget: " + widgetHandle );
-				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
-			}
+			result =  widget.setProperty( key, value );
+
 		}
 		catch(PropertyConversionException pce)
 		{
@@ -447,13 +453,28 @@ public class NativeUI
 			Log.e( "MoSync", "Error while setting property: " + ipve.getMessage( ) );
 			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 		}
+		catch(FeatureNotAvailableException fnae)
+		{
+			Log.e("MoSync", "Feature not available exception: " + fnae.getMessage() );
+			return IX_WIDGET.MAW_RES_FEATURE_NOT_AVAILABLE;
+		}
+
+		if( result )
+		{
+			return IX_WIDGET.MAW_RES_OK;
+		}
+		else
+		{
+			Log.e( "MoSync", "maWidgetSetProperty: Invalid property '" + key + "' on widget: " + widgetHandle );
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
+		}
 	}
 
 	/**
 	 * Internal function for the maWidgetGetProperty system call.
 	 * Gets a property on the given widget, by accessing it from
 	 * the widget table and calling its getProperty method.
-	 * 
+	 *
 	 * Note: Should only be called on the UI thread.
 	 */
 	public int maWidgetGetProperty(
@@ -465,11 +486,19 @@ public class NativeUI
 		Widget widget = m_widgetTable.get( widgetHandle );
 		if( widget == null )
 		{
-			Log.e( "MoSync", "maWidgetGetProperty: Invalid widget handle: " + widgetHandle );
+			Log.e( "MoSync", "maWidgetGetProperty: Invalid child widget handle: " + widgetHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
-		String result = widget.getProperty( key );
+		String result;
+		try {
+			result = widget.getProperty( key );
+		}catch( FeatureNotAvailableException fnae)
+		{
+			Log.e("MoSync", "Feature not available exception: " + fnae.getMessage() );
+			return IX_WIDGET.MAW_RES_FEATURE_NOT_AVAILABLE;
+		}
+
 		if( result.length( ) <= 0 )
 		{
 			Log.e( "MoSync", "maWidgetGetProperty: Invalid or empty property '" + 
@@ -494,6 +523,7 @@ public class NativeUI
 		
 		return result.length( );
 	}
+
 	
 	/**
 	 * Called when the back button has been pressed.
@@ -526,4 +556,10 @@ public class NativeUI
 		 */
 		void rootViewReplaced(View newRoot);
 	}
+	
+	public Widget getCameraView(final int handle)
+	{
+		return m_widgetTable.get(handle);
+	}
+	
 }

@@ -1,4 +1,5 @@
 /* Copyright (C) 2010 MoSync AB
+/* Copyright (C) 2010 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -26,14 +27,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <jni.h>
 #include <GLES/gl.h>
+#include <GLES2/gl2.h>
 
 #include "helpers/CPP_IX_AUDIOBUFFER.h"
 #include "helpers/CPP_IX_OPENGL_ES.h"
+#include "helpers/CPP_IX_GL1.h"
+#include "helpers/CPP_IX_GL2.h"
+//#include "helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h"
+#include "helpers/CPP_IX_PIM.h"
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
-#define SYSLOG(...)
+#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
+//#define SYSLOG(...)
 
 namespace Base
 {
@@ -1200,9 +1206,9 @@ namespace Base
 	 * calls the real implementation _maOpenGLInitFullscreen
 	 * in ioctl.h.
 	 */
-	int maOpenGLInitFullscreen()
+	int maOpenGLInitFullscreen(int glApi)
 	{
-		return _maOpenGLInitFullscreen();
+		return _maOpenGLInitFullscreen(glApi, mJNIEnv, mJThis);
 	}
 
 	/**
@@ -1212,8 +1218,59 @@ namespace Base
 	 */
 	int maOpenGLCloseFullscreen()
 	{
-		return _maOpenGLCloseFullscreen();
+		return _maOpenGLCloseFullscreen(mJNIEnv, mJThis);
 	}
+	
+// the wrapper generator can't yet handle a few set of functions
+// in the opengles 2.0 api (so we manually override them).
+// remove implementations for broken bindings..
+	#undef maIOCtl_glGetPointerv_case
+	#define maIOCtl_glGetPointerv_case(func) \
+	case maIOCtl_glGetPointerv: \
+	{ \
+	return IOCTL_UNAVAILABLE; \
+	}
+    
+	#undef maIOCtl_glGetVertexAttribPointerv_case
+	#define maIOCtl_glGetVertexAttribPointerv_case(func) \
+	case maIOCtl_glGetVertexAttribPointerv: \
+	{ \
+	return IOCTL_UNAVAILABLE; \
+	}
+    
+	#undef maIOCtl_glShaderSource_case
+	#define maIOCtl_glShaderSource_case(func) \
+	case maIOCtl_glShaderSource: \
+	{ \
+	GLuint _shader = (GLuint)a; \
+	GLsizei _count = (GLsizei)b; \
+	void* _string = GVMR(c, MAAddress); \
+	const GLint* _length = GVMR(SYSCALL_THIS->GetValidatedStackValue(0 VSV_ARGPTR_USE), GLint); \
+	wrap_glShaderSource(_shader, _count, _string, _length); \
+	return 0; \
+	}
+
+    void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
+        
+        int* stringsArray = (int*)strings;
+        const GLchar** strCopies = new const GLchar*[count];
+        
+        for(int i = 0; i < count; i++) {
+            void* src = GVMR(stringsArray[i], MAAddress);
+            strCopies[i] = (GLchar*)src;
+    		__android_log_write(ANDROID_LOG_INFO, 
+								"@@@ MoSync gl strings", 
+								strCopies[i]);
+        }
+        
+        
+        char temp[1024];
+        sprintf(temp, "shader: %d, count: %d, length: %d, strCopies: %s", shader, count, length, strCopies[0]);
+    		__android_log_write(ANDROID_LOG_INFO, 
+								"@@@ MoSync glShaderSource", temp);        
+        glShaderSource(shader, count, strCopies, length);
+        delete strCopies;     
+    }	
 
 	/**
 	 * Utility function for displaying and catching pending
@@ -1259,6 +1316,9 @@ namespace Base
 		switch(function)
 		{
 		maIOCtl_IX_OPENGL_ES_caselist
+		maIOCtl_IX_GL1_caselist
+		maIOCtl_IX_GL2_caselist
+	//	maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist
 
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");
@@ -1804,7 +1864,276 @@ namespace Base
 				a,
 				mJNIEnv,
 				mJThis);
+				
+		case maIOCtl_maCameraStart:
+			return _maCameraStart(
+				mJNIEnv,
+				mJThis);
 
+		case maIOCtl_maCameraStop:
+			return _maCameraStop(
+				mJNIEnv,
+				mJThis);
+
+
+		case maIOCtl_maCameraSnapshot:
+			return _maCameraSnapshot(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraSetPreview:
+			return _maCameraSetPreview(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraNumber:
+			return _maCameraNumber(
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraSelect:
+			return _maCameraSelect(
+				a,
+				mJNIEnv,
+				mJThis);
+				
+		case maIOCtl_maCameraRecord:
+			return _maCameraRecord(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCameraFormatNumber:
+			return _maCameraFormatNumber(
+				mJNIEnv,
+				mJThis);
+				
+		case maIOCtl_maCameraFormat:
+		{
+
+			// b is pointer to struct 	MA_CAMERA_FORMAT
+				MA_CAMERA_FORMAT* sizeInfo = (MA_CAMERA_FORMAT*) SYSCALL_THIS->GetValidatedMemRange(b, sizeof(MA_CAMERA_FORMAT));
+
+			// Size of buffer to store device name.
+			int width = sizeInfo->width;
+
+			// Size of buffer to store device name.
+			int height = sizeInfo->height;
+
+			
+			// Returns 1 for success, 0 for no more devices.
+			return _maCameraFormat(
+				a,
+				width,
+				height,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maCameraSetProperty:
+			return _maCameraSetProperty(SYSCALL_THIS->GetValidatedStr(a), SYSCALL_THIS->GetValidatedStr(b), mJNIEnv, mJThis);
+
+		case maIOCtl_maCameraGetProperty:
+		{
+			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
+			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b, 
+				_valueBufferSize * sizeof(char));
+			
+			return _maCameraGetProperty((int)gCore->mem_ds, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}		
+
+		case maIOCtl_maSensorStart:
+			SYSLOG("maIOCtl_maSensorStart");
+			return _maSensorStart(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maSensorStop:
+			SYSLOG("maIOCtl_maSensorStop");
+			return _maSensorStop(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimListOpen:
+			SYSLOG("maIOCtl_maPimListOpen");
+			return _maPimListOpen(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimListNext:
+			SYSLOG("maIOCtl_maPimListNext");
+			return _maPimListNext(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimListClose:
+			SYSLOG("maIOCtl_maPimListClose");
+			return _maPimListClose(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemCount:
+			SYSLOG("maIOCtl_maPimItemCount");
+			return _maPimItemCount(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemGetField:
+			SYSLOG("maIOCtl_maPimItemGetField");
+			return _maPimItemGetField(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemFieldCount:
+			SYSLOG("maIOCtl_maPimItemFieldCount");
+			return _maPimItemFieldCount(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemGetAttributes:
+			SYSLOG("maIOCtl_maPimItemGetAttributes");
+			return _maPimItemGetAttributes(
+				a,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemSetLabel:
+		{
+			SYSLOG("maIOCtl_maPimItemSetLabel");
+
+			MA_PIM_ARGS* args = (MA_PIM_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_PIM_ARGS));
+
+			return _maPimItemSetLabel(
+				args->item,
+				args->field,
+				args->buf,
+				args->bufSize,
+				b,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maPimItemGetLabel:
+		{
+			SYSLOG("maIOCtl_maPimItemGetLabel");
+
+			MA_PIM_ARGS* args = (MA_PIM_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_PIM_ARGS));
+
+			return _maPimItemGetLabel(
+				args->item,
+				args->field,
+				args->buf,
+				args->bufSize,
+				b,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maPimFieldType:
+			SYSLOG("maIOCtl_maPimFieldType");
+			return _maPimFieldType(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemGetValue:
+		{
+			SYSLOG("maIOCtl_maPimItemGetValue");
+
+			MA_PIM_ARGS* args = (MA_PIM_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_PIM_ARGS));
+
+			return _maPimItemGetValue(
+				args->item,
+				args->field,
+				args->buf,
+				args->bufSize,
+				b,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maPimItemSetValue:
+		{
+			SYSLOG("maIOCtl_maPimItemSetValue");
+
+			MA_PIM_ARGS* args = (MA_PIM_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_PIM_ARGS));
+
+			return _maPimItemSetValue(
+				args->item,
+				args->field,
+				args->buf,
+				args->bufSize,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maPimItemAddValue:
+		{
+			SYSLOG("maIOCtl_maPimItemAddValue");
+
+			MA_PIM_ARGS* args = (MA_PIM_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_PIM_ARGS));
+
+			return _maPimItemAddValue(
+				args->item,
+				args->field,
+				args->buf,
+				args->bufSize,
+				b,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maPimItemRemoveValue:
+			SYSLOG("maIOCtl_maPimItemRemoveValue");
+			return _maPimItemRemoveValue(
+				a,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemClose:
+			SYSLOG("maIOCtl_maPimItemClose");
+			return _maPimItemClose(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemCreate:
+			SYSLOG("maIOCtl_maPimItemCreate");
+			return _maPimItemCreate(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maPimItemRemove:
+			SYSLOG("maIOCtl_maPimItemRemove");
+			return _maPimItemRemove(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
 		} // End of switch
 
 		return IOCTL_UNAVAILABLE;

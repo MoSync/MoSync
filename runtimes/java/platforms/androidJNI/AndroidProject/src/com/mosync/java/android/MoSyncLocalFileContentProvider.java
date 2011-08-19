@@ -35,26 +35,26 @@
 //import com.mosync.internal.android.MoSyncThread;
 //
 ///**
-// * Content provider that is used by web views to get access to files 
+// * Content provider that is used by web views to get access to files
 // * stored in the application's local file system.
-// * 
+// *
 // * The content provider is referenced in three places:
 // * - In this file (the content provider class)
 // * - In the Android manifest file, created in file:
 // *    Eclipse/com.mobilesorcery.sdk.builder.android/src/com/mobilesorcery/sdk/builder/android/AndroidPackager.java
-// * - In the WebWidget class (base url used is "content://" 
+// * - In the WebWidget class (base url used is "content://"
 // *   followed by the application's package name):
 // *    MoSync/runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/nativeui/ui/widgets/WebWidget.java
-// *    
-// * This class is based on the following article, which contains info for 
+// *
+// * This class is based on the following article, which contains info for
 // * creating a content provider for use from a WebView:
 // * http://www.techjini.com/blog/2009/01/10/android-tip-1-contentprovider-accessing-local-file-system-from-webview-showing-image-in-webview-using-content/
-// * 
+// *
 // * Note that each application must provide a unique authority for the
 // * content provider. The application's package name is used for this.
-// * See e.g. this page for more info: 
+// * See e.g. this page for more info:
 // * http://stackoverflow.com/questions/6089195/how-to-use-same-contentprovider-authority-in-free-and-paid-versions-of-app
-// * 
+// *
 // * @author Mikael Kindborg
 // */
 //public class MoSyncLocalFileContentProvider extends ContentProvider
@@ -68,10 +68,10 @@
 //		throws FileNotFoundException
 //	{
 //		Log.i("@@@", "uri.getPath(): " + uri.getPath());
-//		
+//
 //		File privateDir = MoSyncThread.getInstance().getActivity().getFilesDir();
 //		Log.i("@@@@@@ Path privateDir ", privateDir.getAbsolutePath());
-//		
+//
 //		//URI fileURI = URI.create("file://data/data/mosync.dynamicwebview/files" + uri.getPath());
 //		//File file = new File(fileURI);
 //		File file = MoSyncThread.getInstance().getActivity().getFileStreamPath(
@@ -80,7 +80,7 @@
 //			file,
 //			ParcelFileDescriptor.MODE_READ_ONLY);
 //	}
-//	
+//
 //	/**
 //	 * Implementation of abstract method in class ContentProvider.
 //	 */
@@ -125,10 +125,10 @@
 //	 */
 //	@Override
 //	public Cursor query(
-//		Uri uri, 
-//		String[] as, 
-//		String s, 
-//		String[] as1, 
+//		Uri uri,
+//		String[] as,
+//		String s,
+//		String[] as1,
 //		String s1)
 //	{
 //		throw new UnsupportedOperationException(
@@ -140,8 +140,8 @@
 //	 */
 //	@Override
 //	public int update(
-//		Uri uri, 
-//		ContentValues contentvalues, 
+//		Uri uri,
+//		ContentValues contentvalues,
 //		String s,
 //		String[] as)
 //	{

@@ -102,7 +102,8 @@ typedef enum VerticalAlignment {
 		[self layout];
 		//[label sizeToFit];
 	} 
-	else if([key isEqualToString:@"numberOfLines"]) {
+	else if([key isEqualToString:@"maxNumberOfLines"]) {
+        TEST_FOR_NEGATIVE_VALUE([value intValue]);
 		UILabel* label = (UILabel*) view;
 		label.numberOfLines = [value intValue];
 		[self layout];
@@ -117,7 +118,10 @@ typedef enum VerticalAlignment {
 		}
 		else if([value isEqualToString:@"right"]) {
 			label.textAlignment = UITextAlignmentRight;
-		}		
+		}
+        else {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
 	}
 	else if([key isEqualToString:@"textVerticalAlignment"]) {
 		UILabelWithVerticalAlignment* label = (UILabelWithVerticalAlignment*) view;
@@ -129,8 +133,11 @@ typedef enum VerticalAlignment {
 		}
 		else if([value isEqualToString:@"bottom"]) {
 			[label setVerticalAlignment:VerticalAlignmentBottom];
-		}		
-	}	
+		}
+        else {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+	}
 	else if([key isEqualToString:@"fontColor"]) {
 		UILabel* label = (UILabel*) view;
 		UIColor* color = [UIColor colorWithHexString:value];
@@ -153,6 +160,9 @@ typedef enum VerticalAlignment {
 	if([key isEqualToString:@"text"]) {
 		UILabel* label = (UILabel*) view;		
 		return label.text;
+	} else if([key isEqualToString:@"maxNumberOfLines"]) {
+		UILabel* label = (UILabel*) view;
+        return [[NSNumber numberWithInt: label.numberOfLines] stringValue];
 	} else {	
 		return [super getPropertyWithKey:key];
 	}
