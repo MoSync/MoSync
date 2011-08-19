@@ -104,7 +104,8 @@
     PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];
     [key release];
 
-    if (nil == itemField) {
+    if (nil == itemField)
+    {
         returnValue = MA_PIM_ERR_INVALID_INDEX;
     } else {
         returnValue = [itemField getAttribute:index];

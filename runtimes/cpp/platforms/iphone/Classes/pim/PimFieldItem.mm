@@ -81,7 +81,8 @@
 -(int) getAttribute:(int) index
 {
 	int fieldValuesCount = [mFieldValuesArray count];
-	if (0 > index || index <= fieldValuesCount) {
+	if (0 > index || index >= fieldValuesCount)
+    {
 		return MA_PIM_ERR_INVALID_INDEX;
 	}
 
@@ -98,7 +99,8 @@
 		atIndex:(int) index
 {
 	int fieldValuesCount = [mFieldValuesArray count];
-	if (0 > index || index <= fieldValuesCount) {
+	if (0 > index || index >= fieldValuesCount)
+    {
 		return MA_PIM_ERR_INVALID_INDEX;
 	}
 
@@ -116,7 +118,8 @@
 	 indexValue:(const int) index
 {
 	int fieldValuesCount = [mFieldValuesArray count];
-	if (0 > index || index >= fieldValuesCount) {
+	if (0 > index || index >= fieldValuesCount)
+    {
 		return MA_PIM_ERR_INVALID_INDEX;
 	}
 
@@ -141,7 +144,8 @@
 -(NSMutableArray*) getValue:(const int) index
 {
 	int fieldValuesCount = [mFieldValuesArray count];
-	if (0 > index || index >= fieldValuesCount) {
+	if (0 > index || index >= fieldValuesCount)
+    {
 		return nil;
 	}
 
@@ -221,8 +225,22 @@
 -(int) addValue:(NSMutableArray*) value
       withLabel:(NSString*) label
 {
+    bool isAttributeCustom = false;
     int attributeId = [self getAttributeFromLabel:label];
+    if (CUSTOM_ATTRIBUTE == attributeId)
+    {
+        // The attribute is custom.
+        // Get the custom attribute value.
+        attributeId = [[PimUtils sharedInstance] getCustomAttributeForFieldID:mFieldConstant];
+        isAttributeCustom = true;
+    }
+
     int returnValue = [self addValue:value withAttribute:attributeId];
+    if (returnValue >= 0 && isAttributeCustom)
+    {
+        [self setLabel:label atIndex:returnValue];
+    }
+
     return returnValue;
 }
 
@@ -234,7 +252,8 @@
 -(int) removeValue:(int) index
 {
 	int fieldValuesCount = [mFieldValuesArray count];
-	if (0 > index || index <= fieldValuesCount) {
+	if (0 > index || index <= fieldValuesCount)
+    {
 		return MA_PIM_ERR_INVALID_INDEX;
 	}
 
@@ -251,7 +270,8 @@
 -(PimFieldItemValue*) getItem:(int) index
 {
 	int fieldValuesCount = [mFieldValuesArray count];
-	if (0 > index || index <= fieldValuesCount) {
+	if (0 < index || index <= fieldValuesCount)
+    {
 		return [mFieldValuesArray objectAtIndex:index];;
 	}
 
@@ -304,25 +324,19 @@
 /**
  * Gets the attribute id from a specifed label value.
  * @param label The given label.
- * @return The attribute id.
+ * @return The attribute id, or CUSTOM_ATTRIBUTE is the attribute is custom.
  */
 -(int) getAttributeFromLabel:(NSString*) label
 {
-    int attributeId = 0;
+    int attributeId = CUSTOM_ATTRIBUTE;
     NSMutableDictionary* allowedAttributes =
         [[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
     NSArray* attributesArray = [allowedAttributes allKeysForObject:label];
     // Check if the attribute is a pre-defined one.
-    if ([attributesArray count] == 0)
+    if ([attributesArray count] > 0)
     {
         NSString* stringAttribute = (NSString*) [attributesArray objectAtIndex:0];
         attributeId = [stringAttribute intValue];
-    }
-    else
-    {
-        // The attribute is custom.
-        // Get the custom attribute value.
-        attributeId = [[PimUtils sharedInstance] getCustomAttributeForFieldID:mFieldConstant];
     }
 
     return attributeId;
