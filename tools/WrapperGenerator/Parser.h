@@ -26,7 +26,7 @@ const ParseNode* getParseNodeFromId(const std::string& name);
 const Base* parseType(const ParseNode& node,  bool& isconst);
 
 namespace Parser {
-	void parse(const std::string& input, std::multimap<std::string, const Base*>& output);
+	void parse(const std::string& input, std::multimap<std::string, Base*>& output, const std::string& bindingName);
 };
 
 #endif // _PARSER_H_

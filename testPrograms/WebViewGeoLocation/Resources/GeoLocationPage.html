@@ -4,14 +4,14 @@
 function StartTrackingGeoLocation()
 {
   document.getElementById("LocationStatus").innerHTML =
-	"Location tracking started"
+  "Location tracking started"
   document.location = "mosync://StartTrackingGeoLocation"
 }
 
 function StopTrackingGeoLocation()
 {
   document.getElementById("LocationStatus").innerHTML =
-	"Location tracking stopped"
+  "Location tracking stopped"
   document.getElementById("LocationData").innerHTML = ""
   document.location = "mosync://StopTrackingGeoLocation"
 }
@@ -19,7 +19,7 @@ function StopTrackingGeoLocation()
 function GeoLocationUpdated(lat, lon)
 {
   document.getElementById("LocationData").innerHTML =
-	"Latitude: " + lat + "<br />Longitude: " + lon
+  "Latitude: " + lat + "<br />Longitude: " + lon
 }
 </script>
 </head>

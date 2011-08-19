@@ -168,6 +168,71 @@
            checkLength:(bool) verify;
 
 /**
+ * Reads the contact name field from the record.
+ */
+-(void) readContactNameField;
+
+/**
+ * Reads the address field from the record.
+ */
+-(void) readAddressField;
+
+/**
+ * Reads the birthday field from the record.
+ */
+-(void) readBirthdayField;
+
+/**
+ * Reads the email field from the record.
+ */
+-(void) readEmailField;
+
+/**
+ * Reads the nickname field from the record.
+ */
+-(void) readNicknameField;
+
+/**
+ * Reads the note field from the record.
+ */
+-(void) readNoteField;
+
+/**
+ * Reads the organization field from the record.
+ */
+-(void) readOrganizationField;
+
+/**
+ * Reads the phone field from the record.
+ */
+-(void) readPhoneField;
+
+/**
+ * Reads the job title field from the record.
+ */
+-(void) readTitleField;
+
+/**
+ * Reads the URL field from the record.
+ */
+-(void) readURLField;
+
+/**
+ * Reads the organization info field from the record.
+ */
+-(void) readOrgInfoField;
+
+/**
+ * Reads the revision field from the record.
+ */
+-(void) readRevisionField;
+
+/**
+ * Reads the instant message field from the record.
+ */
+-(void) readIMField;
+
+/**
  * Gets the instant message protocol associeted with a string constant.
  * @param value Must be one of the MA_PIM_CONTACT_IM constants.
  * @return One of the IM protocol(see ABPerson reference - iOS Developer Library),

@@ -39,11 +39,11 @@ public class EventQueue
 	 * @param widgetEventType The type of the widget event.
 	 * @param widgetHandle The handle of the widget.
 	 * @param auxParam1 Parameter used by some (used by some
-	 *  messages for parameters like messageDataHandle, listItemIndex,
-	 *  searchBarButton, etc. See struct MAWidgetEventData for
-	 *  documentation of these fields.
+	 * messages for parameters like messageDataHandle, listItemIndex,
+	 * searchBarButton, etc. See struct MAWidgetEventData for
+	 * documentation of these fields.
 	 * @param auxParam2 Parameter used by some messages.
-	 *  Set to zero if not used.
+	 * Set to zero if not used.
 	 */
 	public void postWidgetEvent(
 		int widgetEventType,
@@ -73,12 +73,12 @@ public class EventQueue
 	{
 		postWidgetEvent(widgetEventType, widgetHandle, 0, 0);
 	}
-	
+
 	/**
 	 * Posts a widget clicked event.
 	 * 
 	 * @param widgetHandle The widget that was clicked.
-	 * @param checked If a checkbox was clicked, this determines if it is checked or not.
+	 * @param checked If a checkbox or toggle button was clicked, this determines if it is checked or not.
 	 */
 	public void postWidgetClickedEvent(int widgetHandle, boolean checked)
 	{
@@ -88,7 +88,7 @@ public class EventQueue
 			checked ? 1 : 0,
 			0);
 	}
-	
+
 	/**
 	 * Posts an event that describes which item in a list that was clicked.
 	 * 
@@ -103,7 +103,7 @@ public class EventQueue
 			position,
 			0);
 	}
-	
+
 	/**
 	 * Sends a tab changed event from the given tabScreen.
 	 * 
@@ -137,6 +137,101 @@ public class EventQueue
 			stackScreenHandle,
 			poppedFromScreenHandle,
 			poppedToScreenHandle);
+	}
+
+	/**
+	 * Sends a value changed event from the given slider.
+	 *
+	 * @param widgetHandle The slider that sends the event.
+	 * @param value The value of the slider.
+	 */
+	public void postSeekBarValueChangedEvent(int widgetHandle, int value)
+	{
+		int event[] = new int[ 5 ];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_SLIDER_VALUE_CHANGED;
+		event[2] = widgetHandle;
+		event[3] = value;
+
+		sMoSyncThread.postEvent( event );
+	}
+
+	/**
+	 * Sends a value changed event from the given date picker.
+    *
+	 * @param widgetHandle The date picker that sends the event.
+	 * @param dayOfMonthValue The value selected for the day.
+	 * @param monthValue The value selected for the month.
+	 * @param yearValue The value selected for the year.
+	 */
+	public void postDatePickerValueChangedEvent(int widgetHandle, int dayOfMonthValue, int monthValue, int yearValue)
+	{
+		int event[] = new int[ 6 ];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_DATE_PICKER_VALUE_CHANGED;
+		event[2] = widgetHandle;
+		event[3] = dayOfMonthValue;
+		event[4] = monthValue;
+		event[5] = yearValue;
+
+		sMoSyncThread.postEvent( event );
+	}
+
+	/**
+	 * Sends a value changed event from the given time picker.
+     *
+	 * @param widgetHandle The time picker that sends the event.
+	 * @param currentHour The value selected for the hour.
+	 * @param currentMinute The value selected for the minute.
+	 */
+	public void postTimePickerValueChangedEvent(int widgetHandle, int currentHour, int currentMinute)
+	{
+		int event[] = new int[ 5 ];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_TIME_PICKER_VALUE_CHANGED;
+		event[2] = widgetHandle;
+		event[3] = currentHour;
+		event[4] = currentMinute;
+
+		sMoSyncThread.postEvent( event );
+	}
+
+	/**
+	 * Sends a value changed event from the given number picker.
+	 *
+	 * @param widgetHandle The number picker that sends the event.
+	 * @param newValue The selected value.
+	 */
+	public void postNumberPickerValueChangedEvent(int widgetHandle, int newValue)
+	{
+		int event[] = new int[ 4 ];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_NUMBER_PICKER_VALUE_CHANGED;
+		event[2] = widgetHandle;
+		event[3] = newValue;
+
+		sMoSyncThread.postEvent( event );
+	}
+
+	/**
+	 * Sends the new state of the video view.
+	 * @param widgetHandle The video view that sends the event.
+	 * @param state One of the MAW_VIDEO_WIDGET_STATE constants.
+	 */
+	public void postVideoStateChanged(int widgetHandle, int state)
+	{
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_VIDEO_STATE_CHANGED;
+		event[2] = widgetHandle;
+		event[3] = state;
+
+		sMoSyncThread.postEvent(event);
 	}
 
 	public static EventQueue getDefault()

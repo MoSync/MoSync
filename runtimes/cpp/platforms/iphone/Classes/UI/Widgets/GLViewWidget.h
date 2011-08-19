@@ -17,15 +17,23 @@
 
 #import <Foundation/Foundation.h>
 #import "IWidget.h"
+#import <OpenGLES/EAGLDrawable.h>
 
 @interface GLViewWidget : IWidget {
 	
 }
 
 - (id)init;
+- (id)initWithApi:(EAGLRenderingAPI)api;
 - (void)setWidgetHandle:(int)handle;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
 - (void)show;
 
+@end
+
+@interface GL2ViewWidget : GLViewWidget {
+}
+
+-(id)init;
 @end

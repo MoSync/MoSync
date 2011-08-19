@@ -46,6 +46,7 @@ void MoSyncDiv0() {
 }
 
 void* Base::Syscall::GetValidatedMemRange(int address, int size) {
+    if(address == 0) return NULL;
 	return (byte*)mem_ds + address;
 }
 void Base::Syscall::ValidateMemRange(const void* ptr, int size) {	
@@ -284,6 +285,13 @@ void* MoSync_GetCustomEventDataMoSyncPointer() {
 	return (void*) (gCore->Head.DataSize-Base::getMaxCustomEventSize());
 	
 #endif
+}
+
+void MoSync_AddLayerToView(CALayer* layer){
+	if ([[sMoSyncView.layer sublayers] containsObject:layer]==NO) {
+		[sMoSyncView.layer addSublayer:layer];
+	}
+	layer.frame = sMoSyncView.bounds;
 }
 
 /*

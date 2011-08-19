@@ -22,11 +22,23 @@
 #include <helpers/CPP_IX_WIDGET.h>
 #include <base/Syscall.h>
 
+@implementation GL2ViewWidget
+-(id)init {
+    return [super initWithApi:kEAGLRenderingAPIOpenGLES2];
+}
+@end
+
 @implementation GLViewWidget
 
 - (id)init {
-	view = [[[MoSyncGLView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)] retain]; // TODO: do have to do this (retain)??
-	return [super init];	
+    return [self initWithApi:kEAGLRenderingAPIOpenGLES1];
+}
+
+- (id)initWithApi:(EAGLRenderingAPI)api {
+	view = [[[MoSyncGLView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) 
+                                         andApi:api] retain]; // TODO: do have to do this (retain)??
+    if(view == nil) return nil;
+	return [super init];	    
 }
 
 - (void)setWidgetHandle:(int)_handle {

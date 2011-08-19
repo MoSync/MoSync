@@ -60,6 +60,7 @@ static const char sInfo[] =
 "   -project-name   the name of the project.\n"
 "   -company-name   the name of the company.\n"
 "   -version        the version (used for knowing when to update on the app store).\n"
+"   -cert           the name of the certificate to use for signing the app.\n"
 "   -output         specifies the output folder of the xcode project (the project name will be used as the name for the files).\n"
 "\n"
 " build options:\n"
@@ -208,9 +209,11 @@ const string& validateArgument(const string& arg) {
 // slow implementation, but fast enough.
 void replaceTemplateDefine(string &templateFile, const string &whatToReplace, const string &replacement) {
 	size_t index;
-	while((index=templateFile.find(whatToReplace))!=string::npos) {
-		size_t endOfReplacement = index+whatToReplace.length();
-		templateFile = templateFile.substr(0, index) + replacement + templateFile.substr(endOfReplacement, templateFile.size()-endOfReplacement);
+	if (whatToReplace != replacement) {
+		while((index=templateFile.find(whatToReplace))!=string::npos) {
+			size_t endOfReplacement = index+whatToReplace.length();
+			templateFile = templateFile.substr(0, index) + replacement + templateFile.substr(endOfReplacement, templateFile.size()-endOfReplacement);
+		}
 	}
 }
 
@@ -271,6 +274,7 @@ void generate() {
 	string plistOutput = outputFolder + "/" + projectName + ".plist";
 
 	replaceTemplateDefine(pbxTemplateFile, "__PROJECT_NAME__", projectName);
+	replaceTemplateDefine(pbxTemplateFile, "iPhone Developer", validateArgument("cert"));
 	replaceTemplateDefine(plistTemplateFile, "__VERSION__", validateArgument("version"));
 	replaceTemplateDefine(plistTemplateFile, "__COMPANY_NAME__", filterWhiteSpace(validateArgument("company-name")));
 

@@ -145,13 +145,14 @@ static PimUtils *sharedInstance = nil;
 
     mIMAttributes = [[NSMutableDictionary alloc] init];
     [mIMAttributes setValue:homeLabel
-                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_HOME]];
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_IM_HOME]];
     [mIMAttributes setValue:workLabel
-                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_WORK]];
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_IM_WORK]];
     [mIMAttributes setValue:otherLabel
-                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_OTHER]];
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_IM_OTHER]];
     [mIMAttributes setValue:[NSString string]
-                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_ADDR_CUSTOM]];
+
+                          forKey:[NSString stringWithFormat:@"%d", MA_PIM_ATTR_IM_CUSTOM]];
 
     mRelationAttributes = [[NSMutableDictionary alloc] init];
     [mRelationAttributes setValue:(NSString*)kABPersonMotherLabel
@@ -479,7 +480,6 @@ static PimUtils *sharedInstance = nil;
             break;
         case MA_PIM_FIELD_CONTACT_NAME:
             *type = MA_PIM_TYPE_STRING_ARRAY;
-            *singleValue = false;
             break;
         case MA_PIM_FIELD_CONTACT_NICKNAME:
             *type = MA_PIM_TYPE_STRING;

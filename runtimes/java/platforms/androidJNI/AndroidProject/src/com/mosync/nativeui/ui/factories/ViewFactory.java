@@ -22,6 +22,7 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.widget.ImageView;
 
+import com.mosync.internal.generated.IX_OPENGL_ES;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.FrameLayout;
 import com.mosync.nativeui.ui.widgets.ImageWidget;
@@ -108,12 +109,21 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_SCREEN, new ScreenFactory( ) );
 		addFactory( IX_WIDGET.MAW_WEB_VIEW, new WebViewFactory( ) );
 		addFactory( IX_WIDGET.MAW_TAB_SCREEN, new TabScreenFactory( ) );
-		addFactory( IX_WIDGET.MAW_GL_VIEW, new EGLViewFactory( ) );
+		addFactory( IX_WIDGET.MAW_GL_VIEW, new EGLViewFactory( IX_OPENGL_ES.MA_GL_API_GL1 ) );
+		addFactory( IX_WIDGET.MAW_GL2_VIEW, new EGLViewFactory( IX_OPENGL_ES.MA_GL_API_GL2 ) );		
 		addFactory( IX_WIDGET.MAW_IMAGE, new DefaultFactory( ImageView.class, ImageWidget.class ) );
 		addFactory( IX_WIDGET.MAW_RELATIVE_LAYOUT, new DefaultFactory( android.widget.FrameLayout.class, FrameLayout.class ) );
 		addFactory( IX_WIDGET.MAW_CHECK_BOX, new CheckBoxFactory( ) );
 		addFactory( IX_WIDGET.MAW_EDIT_BOX, new EditBoxFactory( ) );
 		addFactory( IX_WIDGET.MAW_STACK_SCREEN, new StackScreenFactory( ) );
+		addFactory( IX_WIDGET.MAW_CAMERA_PREVIEW, new CameraPreviewFactory( ) );
+		addFactory( IX_WIDGET.MAW_PROGRESS_BAR, new ProgressBarFactory( ) );
+		addFactory( IX_WIDGET.MAW_ACTIVITY_INDICATOR, new ActivityIndicatorFactory( ) );
+		addFactory( IX_WIDGET.MAW_SLIDER, new SliderFactory( ) );
+		addFactory( IX_WIDGET.MAW_DATE_PICKER, new DatePickerFactory( ) );
+		addFactory( IX_WIDGET.MAW_TIME_PICKER, new TimePickerFactory( ) );
+		addFactory(IX_WIDGET.MAW_VIDEO_VIEW, new VideoViewFactory( ) );
+		addFactory(IX_WIDGET.MAW_TOGGLE_BUTTON, new ToggleButtonFactory( ) );
 	}
 	
 	/**
@@ -126,4 +136,5 @@ public class ViewFactory
 	{
 		m_factoryMap.put( type, factory );
 	}
+
 }

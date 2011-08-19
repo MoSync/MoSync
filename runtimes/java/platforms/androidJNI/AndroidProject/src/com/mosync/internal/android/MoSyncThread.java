@@ -42,6 +42,7 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
+import com.mosync.internal.generated.IX_OPENGL_ES;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -93,11 +94,14 @@ import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
 
+import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
+import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -141,6 +145,8 @@ public class MoSyncThread extends Thread
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
 	MoSyncFile mMoSyncFile;
+	MoSyncCameraController mMoSyncCameraController;
+	
 	MoSyncSMS mMoSyncSMS;
 	MoSyncSensor mMoSyncSensor;
 	MoSyncPIM mMoSyncPIM;
@@ -175,6 +181,11 @@ public class MoSyncThread extends Thread
 	 */
 	private AtomicBoolean mIsSleepingInMaWait = new AtomicBoolean(false);
 
+	/**
+	 * a handle used for full screen camera preview 
+	 */
+	private int cameraScreen;
+	
 	/**
 	 * This is the size of the header of the asset file
 	 * (an Android file header, this is not a MoSync header).
@@ -289,7 +300,9 @@ public class MoSyncThread extends Thread
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
 		mMoSyncFile = new MoSyncFile(this);
-
+		
+		mMoSyncCameraController = new MoSyncCameraController(this);
+		
 		// Bluetooth is not available on all platforms and
 		// therefore we do a conditional loading of the
 		// MoSyncBluetooth class.
@@ -444,6 +457,7 @@ public class MoSyncThread extends Thread
 			+ " height:" + mBitmap.getHeight());
 	}
 
+	
 	/**
 	 * Allocate memory for the program data section.
 	 */
@@ -1081,6 +1095,11 @@ public class MoSyncThread extends Thread
 	{
 		//SYSLOG("maUpdateScreen");
 		Canvas lockedCanvas = null;
+
+		if(mOpenGLView != -1) {
+			maWidgetSetProperty(mOpenGLView, "invalidate", "");
+			return;
+		}
 
 		if (mMoSyncView == null) return;
 
@@ -2890,6 +2909,159 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Releases the locked hardware for use in other apps
+	 */
+	public void releaseHardware()
+	{
+		mMoSyncCameraController.releaseCamera();
+	}
+	
+	/**
+	 * Reacquires the released hardware in case of resume
+	 */
+	public void acquireHardware()
+	{
+		mMoSyncCameraController.acquireCamera();
+	}
+
+	/**
+	 * starts the Camera Preview
+	 * 
+	 * @return 1 if succeeds
+	 */
+	int maCameraStart()
+	{
+		//Start a fullscreen preview and then start the camera
+		if(false == mMoSyncCameraController.hasView())
+		{
+			if(cameraScreen == 0)
+			{
+				cameraScreen =  maWidgetCreate(IX_WIDGET.MAW_SCREEN);
+				int cameraPreview = maWidgetCreate(IX_WIDGET.MAW_CAMERA_PREVIEW);
+				maWidgetAddChild(cameraScreen, cameraPreview);
+				FrameLayout layout =  (FrameLayout) mMoSyncNativeUI.getCameraPreview(cameraPreview).getView();
+				mMoSyncCameraController.setPreview(
+					(MoSyncCameraPreview)layout.getChildAt(0)
+					);
+				maWidgetScreenShow(cameraScreen);
+			}
+		}
+		return mMoSyncCameraController.cameraStart();
+	}
+	
+	/**
+	 * Stops the Camera Preview
+	 * 
+	 * @return 1 if succeeds
+	 */
+	int maCameraStop()
+	{
+		int result = mMoSyncCameraController.cameraStop(); 
+		//go back to the previous screen'
+		if(cameraScreen != 0)
+		{
+			maWidgetDestroy(cameraScreen);
+			maWidgetScreenShow(IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE);
+			cameraScreen = 0;
+		}
+		return result;
+	}
+	
+	/**
+	 * Takes a snapshot and stores it in the place holder
+	 * 
+	 * @param formatIndex index of the format set by the user
+	 * @param placeHolder a place holder 
+	 * @return <0 if fails and >0 if succeeds
+	 */
+	int maCameraSnapshot(int formatIndex, int placeHolder)
+	{
+		return mMoSyncCameraController.cameraSnapshot(formatIndex, placeHolder);
+	}
+	
+	
+	/**
+	 * binds a preview to the camera
+	 * 
+	 * @param widgetHandle the handle to the Camera preview widget
+	 * @return 0 if widget not found, 1 for success
+	 */
+	int maCameraSetPreview(int widgetHandle)
+	{
+		FrameLayout layout =  
+				(FrameLayout)mMoSyncNativeUI.getCameraPreview(widgetHandle).getView();
+		MoSyncCameraPreview preview = (MoSyncCameraPreview)layout.getChildAt(0);
+		if(preview == null)
+			return 0; //Widget Not Found
+		mMoSyncCameraController.setPreview(preview);
+		return 1;
+	}
+	
+	/**
+	 * Selects the active Camera
+	 * 
+	 * @param cameraNumber index of the camera in the list
+	 * @return >0 for success, <0 for failure
+	 */
+	int maCameraSelect(int cameraNumber)
+	{
+		return mMoSyncCameraController.setActiveCamera(cameraNumber);
+	}
+	
+	/**
+	 * Queries the number of available cameras on the device
+	 * 
+	 * @return number of available cameras
+	 */
+	int maCameraNumber()
+	{
+		return mMoSyncCameraController.numberOfCameras();
+	}
+	
+	/**
+	 * Queries the number of supported formats
+	 * 
+	 * @return number of supported formats
+	 */
+	int maCameraFormatNumber()
+	{
+		return mMoSyncCameraController.getNumberOfPictureSizes();
+	}
+	
+	/**
+	 * Adds a custom format to the list
+	 * 
+	 * @param index index of the specific format
+	 * @param width image width
+	 * @param height image height
+	 * @return 1 for success
+	 */
+	
+	int maCameraFormat(int index, int width, int height)
+	{
+		mMoSyncCameraController.addSize(index, width, height);
+		return 1;
+	}
+	
+	
+	public int maCameraSetProperty(
+		final String key, 
+		final String value)
+	{
+		return mMoSyncCameraController.setCameraProperty(key, value);
+	}
+	
+	public int maCameraGetProperty(
+			final String key,
+			final int memBuffer, 
+			final int memBufferSize)
+	{
+		return mMoSyncCameraController.getCameraPorperty(key, 
+										memBuffer, 
+										memBufferSize);
+	}
+	
+	/**
 	 * Called when the back button has been pressed.
 	 */
 	public void handleBack()
@@ -3114,6 +3286,45 @@ public class MoSyncThread extends Thread
 
 		return powerOf2;
 	}
+
+
+
+	private int mOpenGLScreen = -1;
+	private int mOpenGLView = -1;
+
+	int maOpenGLInitFullscreen(int glApi) {
+		if(mOpenGLScreen != -1) return 0;
+
+        if(glApi == IX_OPENGL_ES.MA_GL_API_GL1)
+            mOpenGLView = maWidgetCreate("GLView");
+        else if(glApi == IX_OPENGL_ES.MA_GL_API_GL2)
+            mOpenGLView = maWidgetCreate("GL2View");
+        else
+            return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;
+
+        if(mOpenGLView < 0) {
+            return IX_OPENGL_ES.MA_GL_INIT_RES_UNAVAILABLE_API;            
+        }
+
+        mOpenGLScreen = maWidgetCreate("Screen");
+		maWidgetSetProperty(mOpenGLView, "width", "-1");
+		maWidgetSetProperty(mOpenGLView, "height", "-1");
+		maWidgetAddChild(mOpenGLScreen, mOpenGLView);
+		maWidgetScreenShow(mOpenGLScreen);
+		maWidgetSetProperty(mOpenGLView, "bind", "");
+		return 1;
+	}
+
+	int maOpenGLCloseFullscreen() {
+		if(mOpenGLScreen == -1) return 0;
+		maWidgetRemoveChild(mOpenGLView);
+		maWidgetDestroy(mOpenGLView);
+		maWidgetDestroy(mOpenGLScreen);
+		mOpenGLView = -1;
+		mOpenGLScreen = -1;
+		return 1;
+	}
+	
 
 	int maFileOpen(String path, int mode)
 	{

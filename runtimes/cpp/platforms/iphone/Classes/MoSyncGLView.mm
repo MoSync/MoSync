@@ -40,7 +40,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 
 
 //The GL view is stored in the nib file. When it's unarchived it's sent -initWithCoder:
-- (id)initWithFrame:(CGRect)frame
+- (id)initWithFrame:(CGRect)frame andApi:(EAGLRenderingAPI)api
 {
     self = [super initWithFrame:frame];
 		if(self) {
@@ -52,14 +52,14 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
         eaglLayer.drawableProperties = [NSDictionary dictionaryWithObjectsAndKeys:
                                         [NSNumber numberWithBool:NO], kEAGLDrawablePropertyRetainedBacking, kEAGLColorFormatRGBA8, kEAGLDrawablePropertyColorFormat, nil];
         
-        context = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1];
+        context = [[EAGLContext alloc] initWithAPI:api];
         
         if (!context || ![EAGLContext setCurrentContext:context]) {
             [self release];
             return nil;
         }
         
-        /* Retina display support. This needs to be handled correctly for everything native ui...
+        /* Retina display support. This needs to be handled correctly for everything native ui... */
         int w, h;
         getScreenResolution(w, h);
         if (w == 640 && h == 960) // Retina display detected
@@ -68,7 +68,6 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
             self.contentScaleFactor = 2.0;
             eaglLayer.contentsScale=2; //new line   
         }  
-        */
             
         animationInterval = 1.0 / 60.0;
 			
@@ -82,39 +81,11 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
     return self;
 }
 
-- (void)setupView {  // new method for intialisation of variables and states		
-	/*
-	// setup the projection matrix
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	
-	// Setup Orthographic Projection for the 320 x 480 of the iPhone screen
-	glOrthof(0.0f, 320.0f, 480.0f, 0.0f, -1.0f, 1.0f);
-	glMatrixMode(GL_MODELVIEW);
-	*/
-	
+- (void)setupView {  // new method for intialisation of variables and states			
 }
 
-- (void)drawView {
-	
-//	[EAGLContext setCurrentContext:context];
-//glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
-//	glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
- //   [context presentRenderbuffer:GL_RENDERBUFFER_OES];	
+- (void)drawView {	
 }
-
-/*
-	[EAGLContext setCurrentContext:context];
-    glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
-
-	// draw...
-	glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
-    glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
-    [context presentRenderbuffer:GL_RENDERBUFFER_OES];
-}
- */
 
 - (void)layoutSubviews {
 	[EAGLContext setCurrentContext:context];
@@ -154,49 +125,12 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 }
 
 - (void) bindContext {
-	
-	/*
-    if(!WorkingContext) {
-		
-		EAGLSharegroup* group = context.sharegroup;
-		if (!group)
-		{
-			NSLog(@"Could not get sharegroup from the main context");
-			return;
-		}
-		
-		WorkingContext = [[EAGLContext alloc] initWithAPI:kEAGLRenderingAPIOpenGLES1 sharegroup:group];
-	}
-	
-    if (!WorkingContext || ![EAGLContext setCurrentContext:WorkingContext]) {
-        NSLog(@"Could not create WorkingContext");
-    }
-	
-	
-    glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
-	*/
-	
 	[EAGLContext setCurrentContext:context];
 	glBindFramebufferOES(GL_FRAMEBUFFER_OES, viewFramebuffer);
 	
 }
 
 - (void) renderContext {
-    /*
-	if (!WorkingContext || [EAGLContext setCurrentContext:WorkingContext] == NO)
-    {
-        NSLog(@"SwapBuffers: [EAGLContext setCurrentContext:WorkingContext] failed");
-        return;
-    }
-	
-    glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
-	
-    if([WorkingContext presentRenderbuffer:GL_RENDERBUFFER_OES] == NO)
-    {
-        NSLog(@"SwapBuffers: [WorkingContext presentRenderbuffer:GL_RENDERBUFFER_OES] failed");
-    }  
-	*/
-	
 	[EAGLContext setCurrentContext:context];	
     glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
     [context presentRenderbuffer:GL_RENDERBUFFER_OES];	
@@ -218,28 +152,12 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 
 
 - (void)startAnimation {
-    //self.animationTimer = [NSTimer scheduledTimerWithTimeInterval:animationInterval target:self selector:@selector(drawView) userInfo:nil repeats:YES];
 }
 
 
 - (void)stopAnimation {
-    //self.animationTimer = nil;
 }
 
-/*
-- (void)setAnimationTimer:(NSTimer *)newTimer {
-   [animationTimer invalidate];
-   animationTimer = newTimer;
-}
-
-- (void)setAnimationInterval:(NSTimeInterval)interval {    
-    animationInterval = interval;
-    if (animationTimer) {
-        [self stopAnimation];
-        [self startAnimation];
-    }
-}
-*/
 
 - (void)dealloc {
     
@@ -252,42 +170,5 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
     [context release];  
     [super dealloc];
 }
-/*
-- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
-	for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseBegan) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper addTouch: touch];
-			MoSync_AddTouchPressedEvent(point.x, point.y, touchId);
-			//NSLog(@"%f, %f", point.x, point.y);			
-		}
-	}	
-}
-
-- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
-	for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseMoved) {
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];
-			MoSync_AddTouchMovedEvent(point.x, point.y, touchId);
-			//NSLog(@"%f, %f", point.x, point.y);
-		}
-	}	
-}
-
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {	
-    for (UITouch *touch in touches) 
-	{
-		if(touch.phase ==  UITouchPhaseEnded) {	
-			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];		
-			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
-			[touchHelper removeTouch: touch];
-		}
-	}	
-}
-*/
 
 @end

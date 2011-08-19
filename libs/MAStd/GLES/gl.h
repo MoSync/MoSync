@@ -1,86 +1,55 @@
 #ifndef __gl_h_
 #define __gl_h_
 
-/* $Id: gl.h 4533 2007-11-26 11:19:35Z markc $ */
+/* $Revision: 10601 $ on $Date:: 2010-03-04 22:15:27 -0800 #$ */
 
 #include <ma.h>
-#include <GLES/glplatform.h>
-
-#ifndef __cplusplus
-typedef union MA_DV MA_DV;
-typedef union MA_FV MA_FV;
-#endif
-
-//typedef void* MAAddress;
-#include "IX_OPENGL_ES.h"
+#include <maapi_defs.h>
+#include <IX_OPENGL_ES.h>
+#include <IX_GL1.h>
+#define GL_API
+#define GL_APIENTRY
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 /*
-** License Applicability. Except to the extent portions of this file are
-** made subject to an alternative license as permitted in the SGI Free
-** Software License B, Version 1.0 (the "License"), the contents of this
-** file are subject only to the provisions of the License. You may not use
-** this file except in compliance with the License. You may obtain a copy
-** of the License at Silicon Graphics, Inc., attn: Legal Services, 1600
-** Amphitheatre Parkway, Mountain View, CA 94043-1351, or at:
-**
-** http://oss.sgi.com/projects/FreeB
-**
-** Note that, as provided in the License, the Software is distributed on an
-** "AS IS" basis, with ALL EXPRESS AND IMPLIED WARRANTIES AND CONDITIONS
-** DISCLAIMED, INCLUDING, WITHOUT LIMITATION, ANY IMPLIED WARRANTIES AND
-** CONDITIONS OF MERCHANTABILITY, SATISFACTORY QUALITY, FITNESS FOR A
-** PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
-**
-** Original Code. The Original Code is: OpenGL Sample Implementation,
-** Version 1.2.1, released January 26, 2000, developed by Silicon Graphics,
-** Inc. The Original Code is Copyright (c) 1991-2000 Silicon Graphics, Inc.
-** Copyright in any portions created by third parties is as indicated
-** elsewhere herein. All Rights Reserved.
-**
-** Additional Notice Provisions: The application programming interfaces
-** established by SGI in conjunction with the Original Code are The
-** OpenGL(R) Graphics System: A Specification (Version 1.2.1), released
-** April 1, 1999; The OpenGL(R) Graphics System Utility Library (Version
-** 1.3), released November 4, 1998; and OpenGL(R) Graphics with the X
-** Window System(R) (Version 1.3), released October 19, 1998. This software
-** was created using the OpenGL(R) version 1.2.1 Sample Implementation
-** published by SGI, but has not been independently verified as being
-** compliant with the OpenGL(R) version 1.2.1 Specification.
-*/
+ * This document is licensed under the SGI Free Software B License Version
+ * 2.0. For details, see http://oss.sgi.com/projects/FreeB/ .
+ */
+#if 0
+#ifndef MAPIP
 
-/*
-typedef unsigned int    GLenum;
-typedef unsigned char   GLboolean;
-typedef unsigned int    GLbitfield;
-typedef signed char     GLbyte;
-typedef short           GLshort;
-typedef int             GLint;
-typedef int             GLsizei;
-typedef unsigned char   GLubyte;
-typedef unsigned short  GLushort;
-typedef unsigned int    GLuint;
-typedef float           GLfloat;
-typedef float           GLclampf;
-typedef void            GLvoid;
-typedef int             GLfixed;
-typedef int             GLclampx;
+typedef void             GLvoid;
+typedef char             GLchar;
+typedef unsigned int     GLenum;
+typedef unsigned char    GLboolean;
+typedef unsigned int     GLbitfield;
+typedef khronos_int8_t   GLbyte;
+typedef short            GLshort;
+typedef int              GLint;
+typedef int              GLsizei;
+typedef khronos_uint8_t  GLubyte;
+typedef unsigned short   GLushort;
+typedef unsigned int     GLuint;
+typedef khronos_float_t  GLfloat;
+typedef khronos_float_t  GLclampf;
+typedef khronos_int32_t  GLfixed;
+typedef khronos_int32_t  GLclampx;
+typedef khronos_intptr_t GLintptr;
+typedef khronos_ssize_t  GLsizeiptr;
 
-typedef int             GLintptr;
-typedef int             GLsizeiptr;
-*/
-
+#endif
+#endif
 
 /*************************************************************/
 
 /* OpenGL ES core versions */
-#define GL_VERSION_ES_CM_1_0		  1
-#define GL_VERSION_ES_CL_1_0		  1
-#define GL_VERSION_ES_CM_1_1		  1
-#define GL_VERSION_ES_CL_1_1		  1
+#define GL_VERSION_ES_CM_1_0          1
+#define GL_VERSION_ES_CL_1_0          1
+#define GL_VERSION_ES_CM_1_1          1
+#define GL_VERSION_ES_CL_1_1          1
 
 /* ClearBufferMask */
 #define GL_DEPTH_BUFFER_BIT               0x00000100
@@ -587,7 +556,224 @@ typedef int             GLsizeiptr;
 #define GL_DOT3_RGB                       0x86AE
 #define GL_DOT3_RGBA                      0x86AF
 
+/*------------------------------------------------------------------------*
+ * required OES extension tokens
+ *------------------------------------------------------------------------*/
+
+/* OES_read_format */
+#ifndef GL_OES_read_format
+#define GL_IMPLEMENTATION_COLOR_READ_TYPE_OES                   0x8B9A
+#define GL_IMPLEMENTATION_COLOR_READ_FORMAT_OES                 0x8B9B
+#endif
+
+/* GL_OES_compressed_paletted_texture */
+#ifndef GL_OES_compressed_paletted_texture
+#define GL_PALETTE4_RGB8_OES                                    0x8B90
+#define GL_PALETTE4_RGBA8_OES                                   0x8B91
+#define GL_PALETTE4_R5_G6_B5_OES                                0x8B92
+#define GL_PALETTE4_RGBA4_OES                                   0x8B93
+#define GL_PALETTE4_RGB5_A1_OES                                 0x8B94
+#define GL_PALETTE8_RGB8_OES                                    0x8B95
+#define GL_PALETTE8_RGBA8_OES                                   0x8B96
+#define GL_PALETTE8_R5_G6_B5_OES                                0x8B97
+#define GL_PALETTE8_RGBA4_OES                                   0x8B98
+#define GL_PALETTE8_RGB5_A1_OES                                 0x8B99
+#endif
+
+/* OES_point_size_array */
+#ifndef GL_OES_point_size_array
+#define GL_POINT_SIZE_ARRAY_OES                                 0x8B9C
+#define GL_POINT_SIZE_ARRAY_TYPE_OES                            0x898A
+#define GL_POINT_SIZE_ARRAY_STRIDE_OES                          0x898B
+#define GL_POINT_SIZE_ARRAY_POINTER_OES                         0x898C
+#define GL_POINT_SIZE_ARRAY_BUFFER_BINDING_OES                  0x8B9F
+#endif
+
+/* GL_OES_point_sprite */
+#ifndef GL_OES_point_sprite
+#define GL_POINT_SPRITE_OES                                     0x8861
+#define GL_COORD_REPLACE_OES                                    0x8862
+#endif
+
 /*************************************************************/
+#if 0
+#ifndef MAPIP
+
+/* Available only in Common profile */
+GL_API void GL_APIENTRY glAlphaFunc (GLenum func, GLclampf ref);
+GL_API void GL_APIENTRY glClearColor (GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
+GL_API void GL_APIENTRY glClearDepthf (GLclampf depth);
+GL_API void GL_APIENTRY glClipPlanef (GLenum plane, _use_type_(true, false) const GLfloat *equation);
+GL_API void GL_APIENTRY glColor4f (GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+GL_API void GL_APIENTRY glDepthRangef (GLclampf zNear, GLclampf zFar);
+GL_API void GL_APIENTRY glFogf (GLenum pname, GLfloat param);
+GL_API void GL_APIENTRY glFogfv (GLenum pname, _use_type_(true, false) const GLfloat *params);
+GL_API void GL_APIENTRY glFrustumf (GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat zNear, GLfloat zFar);
+//GL_API void GL_APIENTRY glGetClipPlanef (GLenum pname, GLfloat eqn[4]);
+GL_API void GL_APIENTRY glGetClipPlanef (GLenum pname, _use_type_(true, false) GLfloat* eqn);
+GL_API void GL_APIENTRY glGetFloatv (GLenum pname, GLfloat *params);
+GL_API void GL_APIENTRY glGetLightfv (GLenum light, GLenum pname, GLfloat *params);
+GL_API void GL_APIENTRY glGetMaterialfv (GLenum face, GLenum pname, GLfloat *params);
+GL_API void GL_APIENTRY glGetTexEnvfv (GLenum env, GLenum pname, GLfloat *params);
+GL_API void GL_APIENTRY glGetTexParameterfv (GLenum target, GLenum pname, GLfloat *params);
+GL_API void GL_APIENTRY glLightModelf (GLenum pname, GLfloat param);
+GL_API void GL_APIENTRY glLightModelfv (GLenum pname, _use_type_(true, false) const GLfloat *params);
+GL_API void GL_APIENTRY glLightf (GLenum light, GLenum pname, GLfloat param);
+GL_API void GL_APIENTRY glLightfv (GLenum light, GLenum pname, const GLfloat *params);
+GL_API void GL_APIENTRY glLineWidth (GLfloat width);
+GL_API void GL_APIENTRY glLoadMatrixf (_use_type_(true, false) const GLfloat *m);
+GL_API void GL_APIENTRY glMaterialf (GLenum face, GLenum pname, GLfloat param);
+GL_API void GL_APIENTRY glMaterialfv (GLenum face, GLenum pname, const GLfloat *params);
+GL_API void GL_APIENTRY glMultMatrixf (_use_type_(true, false) const GLfloat *m);
+GL_API void GL_APIENTRY glMultiTexCoord4f (GLenum target, GLfloat s, GLfloat t, GLfloat r, GLfloat q);
+GL_API void GL_APIENTRY glNormal3f (GLfloat nx, GLfloat ny, GLfloat nz);
+GL_API void GL_APIENTRY glOrthof (GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat zNear, GLfloat zFar);
+GL_API void GL_APIENTRY glPointParameterf (GLenum pname, GLfloat param);
+GL_API void GL_APIENTRY glPointParameterfv (GLenum pname, _use_type_(true, false) const GLfloat *params);
+GL_API void GL_APIENTRY glPointSize (GLfloat size);
+GL_API void GL_APIENTRY glPolygonOffset (GLfloat factor, GLfloat units);
+GL_API void GL_APIENTRY glRotatef (GLfloat angle, GLfloat x, GLfloat y, GLfloat z);
+GL_API void GL_APIENTRY glScalef (GLfloat x, GLfloat y, GLfloat z);
+GL_API void GL_APIENTRY glTexEnvf (GLenum target, GLenum pname, GLfloat param);
+GL_API void GL_APIENTRY glTexEnvfv (GLenum target, GLenum pname, _use_type_(true, false) const GLfloat *params);
+GL_API void GL_APIENTRY glTexParameterf (GLenum target, GLenum pname, GLfloat param);
+GL_API void GL_APIENTRY glTexParameterfv (GLenum target, GLenum pname, const GLfloat *params);
+GL_API void GL_APIENTRY glTranslatef (GLfloat x, GLfloat y, GLfloat z);
+
+/* Available in both Common and Common-Lite profiles */
+GL_API void GL_APIENTRY glActiveTexture (GLenum texture);
+GL_API void GL_APIENTRY glAlphaFuncx (GLenum func, GLclampx ref);
+GL_API void GL_APIENTRY glBindBuffer (GLenum target, GLuint buffer);
+GL_API void GL_APIENTRY glBindTexture (GLenum target, GLuint texture);
+GL_API void GL_APIENTRY glBlendFunc (GLenum sfactor, GLenum dfactor);
+GL_API void GL_APIENTRY glBufferData (GLenum target, GLsizeiptr size, _use_type_(true, false) const GLvoid *data, GLenum usage);
+GL_API void GL_APIENTRY glBufferSubData (GLenum target, GLintptr offset, GLsizeiptr size, const GLvoid *data);
+GL_API void GL_APIENTRY glClear (GLbitfield mask);
+GL_API void GL_APIENTRY glClearColorx (GLclampx red, GLclampx green, GLclampx blue, GLclampx alpha);
+GL_API void GL_APIENTRY glClearDepthx (GLclampx depth);
+GL_API void GL_APIENTRY glClearStencil (GLint s);
+GL_API void GL_APIENTRY glClientActiveTexture (GLenum texture);
+GL_API void GL_APIENTRY glClipPlanex (GLenum plane, _use_type_(true, false) const GLfixed *equation);
+GL_API void GL_APIENTRY glColor4ub (GLubyte red, GLubyte green, GLubyte blue, GLubyte alpha);
+GL_API void GL_APIENTRY glColor4x (GLfixed red, GLfixed green, GLfixed blue, GLfixed alpha);
+GL_API void GL_APIENTRY glColorMask (GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha);
+GL_API void GL_APIENTRY glColorPointer (GLint size, GLenum type, GLsizei stride, _use_type_(true, false) const GLvoid *pointer);
+GL_API void GL_APIENTRY glCompressedTexImage2D (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid *data);
+GL_API void GL_APIENTRY glCompressedTexSubImage2D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLsizei imageSize, const GLvoid *data);
+GL_API void GL_APIENTRY glCopyTexImage2D (GLenum target, GLint level, GLenum internalformat, GLint x, GLint y, GLsizei width, GLsizei height, GLint border);
+GL_API void GL_APIENTRY glCopyTexSubImage2D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLint x, GLint y, GLsizei width, GLsizei height);
+GL_API void GL_APIENTRY glCullFace (GLenum mode);
+GL_API void GL_APIENTRY glDeleteBuffers (GLsizei n, _use_type_(true, false) const GLuint *buffers);
+GL_API void GL_APIENTRY glDeleteTextures (GLsizei n, _use_type_(true, false) const GLuint *textures);
+GL_API void GL_APIENTRY glDepthFunc (GLenum func);
+GL_API void GL_APIENTRY glDepthMask (GLboolean flag);
+GL_API void GL_APIENTRY glDepthRangex (GLclampx zNear, GLclampx zFar);
+GL_API void GL_APIENTRY glDisable (GLenum cap);
+GL_API void GL_APIENTRY glDisableClientState (GLenum array);
+GL_API void GL_APIENTRY glDrawArrays (GLenum mode, GLint first, GLsizei count);
+GL_API void GL_APIENTRY glDrawElements (GLenum mode, GLsizei count, GLenum type, _use_type_(true, false) const GLvoid *indices);
+GL_API void GL_APIENTRY glEnable (GLenum cap);
+GL_API void GL_APIENTRY glEnableClientState (GLenum array);
+GL_API void GL_APIENTRY glFinish (void);
+GL_API void GL_APIENTRY glFlush (void);
+GL_API void GL_APIENTRY glFogx (GLenum pname, GLfixed param);
+GL_API void GL_APIENTRY glFogxv (GLenum pname, _use_type_(true, false) const GLfixed *params);
+GL_API void GL_APIENTRY glFrontFace (GLenum mode);
+GL_API void GL_APIENTRY glFrustumx (GLfixed left, GLfixed right, GLfixed bottom, GLfixed top, GLfixed zNear, GLfixed zFar);
+GL_API void GL_APIENTRY glGetBooleanv (GLenum pname, GLboolean *params);
+GL_API void GL_APIENTRY glGetBufferParameteriv (GLenum target, GLenum pname, GLint *params);
+GL_API void GL_APIENTRY glGetClipPlanex (GLenum pname, GLfixed eqn[4]);
+GL_API void GL_APIENTRY glGenBuffers (GLsizei n, GLuint *buffers);
+GL_API void GL_APIENTRY glGenTextures (GLsizei n, GLuint *textures);
+GL_API GLenum GL_APIENTRY glGetError (void);
+GL_API void GL_APIENTRY glGetFixedv (GLenum pname, GLfixed *params);
+GL_API void GL_APIENTRY glGetIntegerv (GLenum pname, GLint *params);
+GL_API void GL_APIENTRY glGetLightxv (GLenum light, GLenum pname, GLfixed *params);
+GL_API void GL_APIENTRY glGetMaterialxv (GLenum face, GLenum pname, GLfixed *params);
+GL_API void GL_APIENTRY glGetPointerv (GLenum pname, GLvoid **params);
+GL_API _range_(strlen((char*)ret)+1, MOSYNC_GL_GROUP) const GLubyte * glGetString (GLenum name);
+GL_API void GL_APIENTRY glGetTexEnviv (GLenum env, GLenum pname, GLint *params);
+GL_API void GL_APIENTRY glGetTexEnvxv (GLenum env, GLenum pname, GLfixed *params);
+GL_API void GL_APIENTRY glGetTexParameteriv (GLenum target, GLenum pname, GLint *params);
+GL_API void GL_APIENTRY glGetTexParameterxv (GLenum target, GLenum pname, GLfixed *params);
+GL_API void GL_APIENTRY glHint (GLenum target, GLenum mode);
+GL_API GLboolean GL_APIENTRY glIsBuffer (GLuint buffer);
+GL_API GLboolean GL_APIENTRY glIsEnabled (GLenum cap);
+GL_API GLboolean GL_APIENTRY glIsTexture (GLuint texture);
+GL_API void GL_APIENTRY glLightModelx (GLenum pname, GLfixed param);
+GL_API void GL_APIENTRY glLightModelxv (GLenum pname, const GLfixed *params);
+GL_API void GL_APIENTRY glLightx (GLenum light, GLenum pname, GLfixed param);
+GL_API void GL_APIENTRY glLightxv (GLenum light, GLenum pname, const GLfixed *params);
+GL_API void GL_APIENTRY glLineWidthx (GLfixed width);
+GL_API void GL_APIENTRY glLoadIdentity (void);
+GL_API void GL_APIENTRY glLoadMatrixx (_use_type_(true, false) const GLfixed *m);
+GL_API void GL_APIENTRY glLogicOp (GLenum opcode);
+GL_API void GL_APIENTRY glMaterialx (GLenum face, GLenum pname, GLfixed param);
+GL_API void GL_APIENTRY glMaterialxv (GLenum face, GLenum pname, _use_type_(true, false) const GLfixed *params);
+GL_API void GL_APIENTRY glMatrixMode (GLenum mode);
+GL_API void GL_APIENTRY glMultMatrixx (_use_type_(true, false) const GLfixed *m);
+GL_API void GL_APIENTRY glMultiTexCoord4x (GLenum target, GLfixed s, GLfixed t, GLfixed r, GLfixed q);
+GL_API void GL_APIENTRY glNormal3x (GLfixed nx, GLfixed ny, GLfixed nz);
+GL_API void GL_APIENTRY glNormalPointer (GLenum type, GLsizei stride, const GLvoid *pointer);
+GL_API void GL_APIENTRY glOrthox (GLfixed left, GLfixed right, GLfixed bottom, GLfixed top, GLfixed zNear, GLfixed zFar);
+GL_API void GL_APIENTRY glPixelStorei (GLenum pname, GLint param);
+GL_API void GL_APIENTRY glPointParameterx (GLenum pname, GLfixed param);
+GL_API void GL_APIENTRY glPointParameterxv (GLenum pname, const GLfixed *params);
+GL_API void GL_APIENTRY glPointSizex (GLfixed size);
+GL_API void GL_APIENTRY glPolygonOffsetx (GLfixed factor, GLfixed units);
+GL_API void GL_APIENTRY glPopMatrix (void);
+GL_API void GL_APIENTRY glPushMatrix (void);
+GL_API void GL_APIENTRY glReadPixels (GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid *pixels);
+GL_API void GL_APIENTRY glRotatex (GLfixed angle, GLfixed x, GLfixed y, GLfixed z);
+GL_API void GL_APIENTRY glSampleCoverage (GLclampf value, GLboolean invert);
+GL_API void GL_APIENTRY glSampleCoveragex (GLclampx value, GLboolean invert);
+GL_API void GL_APIENTRY glScalex (GLfixed x, GLfixed y, GLfixed z);
+GL_API void GL_APIENTRY glScissor (GLint x, GLint y, GLsizei width, GLsizei height);
+GL_API void GL_APIENTRY glShadeModel (GLenum mode);
+GL_API void GL_APIENTRY glStencilFunc (GLenum func, GLint ref, GLuint mask);
+GL_API void GL_APIENTRY glStencilMask (GLuint mask);
+GL_API void GL_APIENTRY glStencilOp (GLenum fail, GLenum zfail, GLenum zpass);
+GL_API void GL_APIENTRY glTexCoordPointer (GLint size, GLenum type, GLsizei stride, _use_type_(true, false) const GLvoid *pointer);
+GL_API void GL_APIENTRY glTexEnvi (GLenum target, GLenum pname, GLint param);
+GL_API void GL_APIENTRY glTexEnvx (GLenum target, GLenum pname, GLfixed param);
+GL_API void GL_APIENTRY glTexEnviv (GLenum target, GLenum pname, _use_type_(true, false) const GLint *params);
+GL_API void GL_APIENTRY glTexEnvxv (GLenum target, GLenum pname, _use_type_(true, false) const GLfixed *params);
+GL_API void GL_APIENTRY glTexImage2D (GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels);
+GL_API void GL_APIENTRY glTexParameteri (GLenum target, GLenum pname, GLint param);
+GL_API void GL_APIENTRY glTexParameterx (GLenum target, GLenum pname, GLfixed param);
+GL_API void GL_APIENTRY glTexParameteriv (GLenum target, GLenum pname, _use_type_(true, false) const GLint *params);
+GL_API void GL_APIENTRY glTexParameterxv (GLenum target, GLenum pname, _use_type_(true, false) const GLfixed *params);
+GL_API void GL_APIENTRY glTexSubImage2D (GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels);
+GL_API void GL_APIENTRY glTranslatex (GLfixed x, GLfixed y, GLfixed z);
+GL_API void GL_APIENTRY glVertexPointer (GLint size, GLenum type, GLsizei stride, _use_type_(true, false) const GLvoid *pointer);
+GL_API void GL_APIENTRY glViewport (GLint x, GLint y, GLsizei width, GLsizei height);
+
+#endif // ifndef MAPIP
+#endif
+/*------------------------------------------------------------------------*
+ * Required OES extension functions
+ *------------------------------------------------------------------------*/
+
+/* GL_OES_read_format */
+#ifndef GL_OES_read_format
+#define GL_OES_read_format 1
+#endif
+
+/* GL_OES_compressed_paletted_texture */
+#ifndef GL_OES_compressed_paletted_texture
+#define GL_OES_compressed_paletted_texture 1
+#endif
+
+/* GL_OES_point_size_array */
+#ifndef GL_OES_point_size_array
+#define GL_OES_point_size_array 1
+GL_API void GL_APIENTRY glPointSizePointerOES (GLenum type, GLsizei stride, const GLvoid *pointer);
+#endif
+
+/* GL_OES_point_sprite */
+#ifndef GL_OES_point_sprite
+#define GL_OES_point_sprite 1
+#endif
 
 #ifdef __cplusplus
 }

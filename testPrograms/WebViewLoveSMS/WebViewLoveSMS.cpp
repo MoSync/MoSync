@@ -69,8 +69,6 @@ public:
 	WebViewLoveSMSApp()
 	{
 		mPlatform = Platform::create();
-		// Used for testing the file API.
-		// testFileAPI();
 		createUI();
 		createMessageStrings();
 	}
@@ -78,62 +76,6 @@ public:
 	virtual ~WebViewLoveSMSApp()
 	{
 		destroyUI();
-	}
-
-	void check(bool success, MAUtil::String testName)
-	{
-		if (success)
-		{
-			printf("Test %s passed.", testName.c_str());
-		}
-		else
-		{
-			printf("Test %s failed.", testName.c_str());
-			maPanic(0, "Test failed, inspect log.");
-		}
-	}
-	void testFileAPI()
-	{
-		bool success;
-
-		// Write a string.
-		success = mPlatform->writeTextToFile(
-			mPlatform->getLocalPath() + "testdata1",
-			"12345");
-		check(success, "writeTextToFile");
-
-		// Read the string.
-		MAUtil::String data;
-		success = mPlatform->readTextFromFile(
-			mPlatform->getLocalPath() + "testdata1",
-			data);
-		check(success, "readTextFromFile");
-		check(data.length() == 5, "readTextFromFile data.length() == 5");
-		check(data.find("12345", 0) == 0, "readTextFromFile data.find(\"12345\", 0) == 0");
-
-		// Read to a handle.
-		MAHandle h = maCreatePlaceholder();
-		success = mPlatform->readDataFromFile(
-			mPlatform->getLocalPath() + "testdata1",
-			h);
-		check(success, "readDataFromFile");
-		check(maGetDataSize(h) == 5, "maGetDataSize(h) == 5");
-
-		// Write from handle to another file.
-		success = mPlatform->writeDataToFile(
-			mPlatform->getLocalPath() + "testdata2",
-			h);
-
-		// Read string to test that write to handle worked.
-		MAUtil::String data2;
-		success = mPlatform->readTextFromFile(
-			mPlatform->getLocalPath() + "testdata2",
-			data2);
-		check(success, "readTextFromFile2");
-		check(data2.length() == 5, "readTextFromFile2 data2.length() == 5");
-		check(data2.find("12345", 0) == 0, "readTextFromFile2 data2.find(\"12345\", 0) == 0");
-
-		maExit(0);
 	}
 
 	void createMessageStrings()

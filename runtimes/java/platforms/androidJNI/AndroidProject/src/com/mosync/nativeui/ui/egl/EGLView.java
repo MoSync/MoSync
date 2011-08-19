@@ -56,7 +56,8 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 	/**
 	 * Holds the EGL information necessary to draw onto an
 	 */
-	private EGLState m_eglState = new EGLState( );
+	private EGLState m_eglState;
+
 
 	/**
 	 * Listener for egl view ready listener.
@@ -68,10 +69,11 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 	 *
 	 * @param context Context in which the view is created.
 	 */
-	public EGLView(Context context)
+	public EGLView(Context context, int glApi)
 	{
 		super( context );
 
+		m_eglState = new EGLState(glApi);
 		m_holder = getHolder( );
 		m_holder.addCallback( this );
 		m_holder.setType( SurfaceHolder.SURFACE_TYPE_GPU );
@@ -188,10 +190,13 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 		 */
 		private final Lock m_surfaceLock = new ReentrantLock( );
 
-		public EGLState()
+		private int m_glApi;
+
+		public EGLState(int glApi)
 		{
+			m_glApi = glApi;
 			EGLManager.initEgl( );
-			m_config = EGLConfigFactory.findConfig( m_egl, EGLManager.getDisplay( ) );
+			m_config = EGLConfigFactory.findConfig( m_egl, EGLManager.getDisplay( ), m_glApi);
 		}
 
 		/**
@@ -209,7 +214,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			 * Create an OpenGL ES context. This must be done only once, an
 			 * OpenGL context is a somewhat heavy object.
 			 */
-			m_context = EGLContextFactory.createContext( m_egl, m_config, EGLManager.getDisplay( ) );
+			m_context = EGLContextFactory.createContext( m_egl, m_config, EGLManager.getDisplay( ), m_glApi);
 			int eglError = m_egl.eglGetError( );
 			if( m_context == null || m_context == EGL10.EGL_NO_CONTEXT || eglError != EGL10.EGL_SUCCESS )
 			{
@@ -306,7 +311,7 @@ public class EGLView extends SurfaceView implements SurfaceHolder.Callback
 			/*
 			 * Create an EGL surface we can render into.
 			 */
-			m_surface = EGLSurfaceFactory.createSurface( m_egl, m_config, EGLManager.getDisplay( ), holder );
+			m_surface = EGLSurfaceFactory.createSurface( m_egl, m_config, EGLManager.getDisplay( ), holder);
 			if( m_surface == null || m_surface == EGL10.EGL_NO_SURFACE || m_egl.eglGetError( ) != EGL10.EGL_SUCCESS )
 			{
 				Log.i( "EGLView", "Failed to create surface. EGL Error: " + m_egl.eglGetError( ) );

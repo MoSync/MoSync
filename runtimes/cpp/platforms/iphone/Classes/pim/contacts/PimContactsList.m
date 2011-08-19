@@ -15,7 +15,6 @@
  02111-1307, USA.
 */
 
-
 #import "PimContactsList.h"
 #import "PimUtil.h"
 
@@ -68,6 +67,7 @@
 
         // Save the item into dictionary.
         [mContactsDictionary setObject:item forKey: key];
+        NSLog(@"contact item added-handle = %@", key);
         [key release];
     }
 

@@ -25,7 +25,7 @@ struct MoSyncArgument {
 };
 
 void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
-	pair<BasesIterator, BasesIterator> functions = bases.equal_range("Function");
+	pair<BasesIterator, BasesIterator> functions = bases.equal_range("Function");	
 
 	for(BasesIterator function = functions.first; function!=functions.second; function++) {
 		const Function* func = (const Function*)function->second;
@@ -123,7 +123,8 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 				if( func->getRangeExpression() == "") System::error("Return type is of pointer type, needs range attribute");
 				if(!returnsConstPtr)
 					System::error("Returns non-const pointer. Can't handle yet!");
-				stream << "\treturn SYSCALL_THIS->resources.add_RT_BINARY(placeholder, new MemStreamC(ret, " << func->getRangeExpression() << "));\n";
+				stream << "\tSYSCALL_THIS->resources.add_RT_BINARY(placeholder, new MemStreamC(ret, " << func->getRangeExpression() << "));\n";
+				stream << "\treturn placeholder;\n";
 			}
 
 

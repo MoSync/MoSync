@@ -29,8 +29,8 @@
 -(id) init
 {
     mValuesArray = [[NSMutableArray alloc] init];
-    mAttribute = -1;
-    mCustomLabel = [[NSString alloc] init];
+    mAttributeID = -1;
+    mLabel = [[NSString alloc] init];
 
     return [super init];
 }
@@ -58,9 +58,9 @@
  * Set field's attribute.
  * @param attribute The new field's attribute.
  */
--(void) setAttribute:(int) attribute
+-(void) setAttribute:(int) attributeID
 {
-    mAttribute = attribute;
+    mAttributeID = attributeID;
 }
 
 /**
@@ -69,48 +69,45 @@
  */
 -(int) getAttribute
 {
-    return mAttribute;
+    return mAttributeID;
 }
+
 /**
- * Set custom label value.
- * @param customLabel The new custom label's value.
+
+ * Set the label value.
+ * @param label The new label's value.
  * @return MA_PIM_ERR_NONE is the label was set, or
  *         MA_PIM_ERR_CUSTOM_ATTRIBUTE if the attibute
  *         is not set to custom.
  */
--(int) setCustomLabel:(NSString*) customLabel
+-(int) setLabel:(NSString*) label
 {
-    mCustomLabel = customLabel;
+    if (nil != label)
+    {
+        [mLabel release];
+        mLabel = [NSString stringWithString:label];
+    }
     return MA_PIM_ERR_NONE;
-
 }
 
 /**
- * Get custom label value.
- * @return A string containing the custom label value, or
- *         an empty string if the attribute is not set to custom.
+ * Get the label value.
+ * @return A string containing the label value, or
+ *         nil if the attribute is not set to custom.
  */
--(NSString*) getCustomLabel
-{
-    return mCustomLabel;
-}
 
-/**
- * Get the string label.
- * @return A string associated with the attribute.
- */
--(NSString*) getStringLabel
+-(NSString*) getLabel
 {
-    return [[PimUtils sharedInstance] getStringFromAttribute:mAttribute];
+    return mLabel;
 }
 
 /**
  * Release all the objects.
  */
-- (void) dealloc {
+- (void) dealloc
+{
     [mValuesArray release];
-    [mCustomLabel release];
-
+    [mLabel release];
     [super dealloc];
 }
 

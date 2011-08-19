@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <fstream>
 #include <stdlib.h>
 #include <string.h>
+#include <iomanip>
 
 #include <idl-common/idl-common.h>
 #include <idl-common/tokenizer.h>
@@ -36,6 +37,7 @@ using namespace std;
 
 static vector<string> readExtensions(const char* filename);
 static void outputMaapi(const vector<string>& ixs, const Interface& maapi);
+static void outputMaapiJavascript(const vector<string>& ixs, const Interface& maapi);
 static void outputRuntimeBuilderFiles(const Interface& maapi);
 static void outputCpp(const Interface& maapi);
 static void outputAsmConfigLst(const Interface& maapi);
@@ -131,6 +133,7 @@ int main() {
 		
 		// Generate files for the MoSync API.
 		outputMaapi(ixs, maapi);
+		outputMaapiJavascript(ixs, maapi);
 
 		// Generate files used when building the runtimes.
 		outputRuntimeBuilderFiles(maapi);
@@ -265,6 +268,146 @@ static void outputMaapi(const vector<string>& ixs, const Interface& maapi) {
 	}
 }
 
+
+static bool isKeyInConstsets(const Interface& maapi, const string& str) {
+	for(size_t j=0; j<maapi.constSets.size(); j++) {
+		const ConstSet& cs(maapi.constSets[j]);
+		for(size_t k=0; k<cs.constants.size(); k++) {
+			const Constant& c(cs.constants[k]);
+			if(str == (cs.name + c.name)) 
+				return true;
+		}
+	}
+	return false;
+}
+
+static void outputJavascriptSyscallArg(ofstream& maapiFile, int i) {
+	if(i < 4) {
+		maapiFile << "this.regs[Reg.i" << i << "]";
+	} else {
+		maapiFile << "this.getStackValue(" << ((i-4)<<2) << ")";
+	}
+}
+
+static void outputJavascriptIoctlArg(ofstream& maapiFile, int i) {
+	if(i < 4) {
+		maapiFile << "i" << (i);
+	} else {
+		maapiFile << "this.getStackValue(" << ((i-4)<<2) << ")";
+	}
+}
+
+
+static void outputMaapiJavascript(const vector<string>& ixs, const Interface& maapi) {
+	ofstream maapiFile("Output/maapi.js");
+	
+	maapiFile << "MoSyncGenerated = {};\n\n";
+	
+	// generate hash
+	maapiFile << "MoSyncHash = " << "0x" << setfill('0') << setw(8) << hex << calculateChecksum(maapi) << dec << ";\n\n";
+	
+	// generate constant table.
+	maapiFile << "MoSyncConstants = {\n";
+	for(size_t j=0; j<maapi.constSets.size(); j++) {
+		const ConstSet& cs(maapi.constSets[j]);
+		for(size_t k=0; k<cs.constants.size(); k++) {
+			const Constant& c(cs.constants[k]);
+			//printf("%s = %s;\n", c.name.c_str(), c.value.c_str());
+			bool isKey = isKeyInConstsets(maapi, c.value);	
+			string keyString = (isKey)?"this.":"";
+			
+			maapiFile << "\t" << cs.name << c.name.c_str() << ": " << keyString << c.value.c_str();
+			if(j==maapi.constSets.size()-1 && k == cs.constants.size()-1)
+				maapiFile << "\n";
+			else 
+				maapiFile << ",\n";
+		}
+	}
+	maapiFile << "};\n";
+	
+	// generate struct wrappers (todo)
+	
+	// generate invoke syscall
+	maapiFile << "MoSyncGenerated.invokeSyscall = function(id) {\n";	
+	maapiFile << "\tswitch(id) {\n";
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+	
+		maapiFile << "\t\tcase " << f.number << ":\n";
+
+		maapiFile << "\t\t\tret = this.Syscalls." << f.name << "(";
+
+		int i = 0;
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			if(k != 0)
+				maapiFile << ", ";
+			if(a.type == "double") {
+				//maapiFile << "this.regs[Reg.i" << i << "], ";
+				outputJavascriptSyscallArg(maapiFile, i);
+				maapiFile << ", ";
+				i++;
+//				maapiFile << "this.regs[Reg.i" << i << "] ";
+				outputJavascriptSyscallArg(maapiFile, i);
+				i++;				
+			} else {
+				//maapiFile << "this.regs[Reg.i" << i << "] ";
+				outputJavascriptSyscallArg(maapiFile, i);
+				i++;
+			}
+		}
+		maapiFile << ");\n";	
+	
+		if(f.returnType == "double") {
+			maapiFile << "\t\t\tthis.regs[Reg.r14] = ret.hi;\n";
+			maapiFile << "\t\t\tthis.regs[Reg.r15] = ret.lo;\n";
+		} else {
+			maapiFile << "\t\t\tthis.regs[Reg.r14] = (ret&0xffffffff);\n";
+		}
+		
+		maapiFile << "\t\tbreak;\n";
+	}
+	maapiFile << "\t};\n";	
+	maapiFile << "};\n";
+		
+	// generate ioctl invoke
+	const vector<Ioctl>& ioctls = maapi.ioctls;
+	maapiFile << "MoSyncGenerated.maIOCtl = function(id, i1, i2, i3) {\n";	
+	maapiFile << "\tswitch(id) {\n";
+	for(size_t i=0; i<ioctls.size(); i++) {
+		const Ioctl& ioctl(ioctls[i]);
+		for(size_t j=0; j<ioctl.functions.size(); j++) {
+			const Function& f(ioctl.functions[j].f);	
+			int l = 1;
+			maapiFile << "\t\tcase " << f.number << ":\n";
+			maapiFile << "\t\t\tif(this." << f.name << " == undefined)\n";
+			maapiFile << "\t\t\t\treturn MoSyncConstants.IOCTL_UNAVAILABLE;\n";
+			maapiFile << "\t\t\treturn this." << f.name << "(";
+			for(size_t k=0; k<f.args.size(); k++) {
+				const Argument& a(f.args[k]);
+				if(k != 0)
+					maapiFile << ", ";
+				if(a.type == "double") {
+//					maapiFile << "i" << l << ", ";
+					outputJavascriptIoctlArg(maapiFile, l);
+					maapiFile << ", ";
+					l++;
+//					maapiFile << "i" << l << "";
+					outputJavascriptIoctlArg(maapiFile, l);
+					l++;				
+				} else {
+//					maapiFile << "i" << l << "";
+					outputJavascriptIoctlArg(maapiFile, l);
+					l++;
+				}
+			}
+			maapiFile << ");\n";			
+		}
+	}	
+	maapiFile << "\t};\n";	
+	maapiFile << "};\n";	
+}
+
 /**
  * Generate files used when building the runtimes.
  */
@@ -276,6 +419,7 @@ static void outputRuntimeBuilderFiles(const Interface& maapi) {
 	outputInvokeSyscallCpp(maapi);
 	outputInvokeSyscallArmRecompiler(maapi);
 	outputInvokeSyscallJava(maapi);
+//	outputInvokeSyscallJavascript(maapi);
 	outputSyscallStaticJava(maapi);
 	outputSyscallStaticCpp(maapi);
 	outputConstSets(maapi);
