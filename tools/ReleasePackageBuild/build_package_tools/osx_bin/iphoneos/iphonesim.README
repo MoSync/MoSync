@@ -1,0 +1,1 @@
+The iphonesim binary is a prebuilt version of the iphonesim project found at https://github.com/jhaynie/iphonesim. One modification has been made though: the 'setLocalizedClientName' found in iphonesimulator.m has been changed to 'MoSyncDeveloper'. 
