@@ -5013,6 +5013,10 @@ group WidgetAPI "Widget API" {
 		* by using a url that starts with "javascript:" followed by the
 		* JavaScript code.
 		*
+		* Note that if the url is a non-local url that will cause data to
+		* be downloaded over the network, you need to set "Internet Access"
+		* permissions for the application.
+		*
 		* @validvalue Any valid URL.
 		*
 		* @setandget
