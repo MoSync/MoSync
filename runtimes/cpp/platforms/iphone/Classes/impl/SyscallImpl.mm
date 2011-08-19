@@ -667,7 +667,6 @@ namespace Base {
 		int numGlyphs = wcharLength(str);
         FontInfo *currentFont=sFontList[gCurrentFontHandle-1];
         initCGFont(currentFont);
-		int numGlyphs = wcharLength(str);
 		if(numGlyphs==0) return;
 		CGGlyph* glyphs = new CGGlyph[numGlyphs];
 
