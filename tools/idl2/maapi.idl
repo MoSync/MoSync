@@ -6179,8 +6179,9 @@ group CameraFunctions "Camera Functions" {
 		int maShowVirtualKeyboard();
 
 		/**
-		* Displays a native-ui text box, with
-		* "OK" and "Cancel" buttons or equivalent command items.
+		* Displays a NativeUI text box, with
+		* "OK" and "Cancel" buttons (or equivalent command items
+		* if the OS uses other input methods).
 		* The user can enter text using the native input system.
 		*
 		* This function returns immediately, leaving the text box on-screen.
@@ -6190,7 +6191,7 @@ group CameraFunctions "Camera Functions" {
 		* When the user activates one of the command items ("OK" or "Cancel"),
 		* a number of things will happen in order:
 		*
-		* The box's text will be copied to the buffer specified by \a text.
+		* The box's text will be copied to the buffer specified by \a outText.
 		* The text box will disappear.
 		* An event (#EVENT_TYPE_TEXTBOX) will be posted.
 		*
