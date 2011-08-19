@@ -193,6 +193,7 @@ cp $SOURCEDIR/tools/ReleasePackageBuild/build_package_tools/osx_bin/updater* $MO
 cp $SOURCEDIR/tools/ReleasePackageBuild/build_package_tools/osx_bin/lcab $MOSYNCDIR/bin || error_exit "Could not copy binary."
 cp $SOURCEDIR/tools/ReleasePackageBuild/build_package_tools/osx_bin/pcab.pl $MOSYNCDIR/bin || error_exit "Could not copy binary."
 cp $SOURCEDIR/tools/ReleasePackageBuild/build_package_tools/osx_bin/mof* $MOSYNCDIR/bin || error_exit "Could not copy binary."
+cp $SOURCEDIR/tools/ReleasePackageBuild/build_package_tools/osx_bin/iphoneos/iphonesim $MOSYNCDIR/bin || error_exit "Could not copy binary."
 cp $SOURCEDIR/tools/idl2/output/asm_config.lst $MOSYNCDIR/bin || error_exit "Could not copy binary."
 cp $SOURCEDIR/build/release/e32hack $MOSYNCDIR/bin || error_exit "Could not copy binary."
 cp -R $SOURCEDIR/tools/ReleasePackageBuild/build_package_tools/osx_bin/android $MOSYNCDIR/bin/ || error_exit "Could not copy binary."

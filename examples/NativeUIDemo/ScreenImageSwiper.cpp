@@ -230,8 +230,12 @@ void ScreenImageSwiper::loadImages(int screenWidth)
 	// Create the image widgets.
 	for (int i = 0; i < mImagesSize; i++)
 	{
+		// Byte index in the resource data.
 		int pos = 0;
+
+		// Create an image object.
 		mImages[i] = new ScreenImage();
+
 		// Get the resource id of the current image.
 		int resID = firstImage + i + 1;
 
@@ -240,9 +244,15 @@ void ScreenImageSwiper::loadImages(int screenWidth)
 
 		// Load the image name from resources.
 		MAUtil::String name;
+		// This reads the string into name and updates
+		// the value of pos to the start of the image data.
 		readStringFromResource(resID, pos, name);
+		// Set the image name.
 		mImages[i]->setName(name);
-		// Create the image from ubin.
+
+		// Create the image from ubin. Note that pos is
+		// updated by the call to readStringFromResource
+		// to point at the start of the image data.
 		maCreateImageFromData(
 			mImages[i]->getHandle(),
 			resID,
@@ -349,8 +359,11 @@ void ScreenImageSwiper::runTimerEvent()
 
 /*
  * Read the only string from one string resource.
+ * Note: The parameter pos is used both for input and output
+ * of the position in the resource data.
  * @param resID A valid resource id.
- * @param pos The start position.
+ * @param pos In: The start position. Out: The position
+ * after the string in the resource.
  * @param output The resulting string.
  */
 bool ScreenImageSwiper::readStringFromResource(
@@ -359,19 +372,24 @@ bool ScreenImageSwiper::readStringFromResource(
 	MAUtil::String& output) const
 {
 	// Get all the characters on one read.
+
+	// Get the length of the string stored as a .pstring
+	// (Pascal string). The first byte contains the length.
 	byte stringLen = 0;
 	maReadData(resID, (void*) &stringLen, pos, sizeof(byte));
-
 	if (stringLen > maGetDataSize(resID) || stringLen <= 0)
 	{
 		return false;
 	}
 
+	// Read the string.
 	pos += sizeof(byte);
 	output.resize(stringLen);
-
 	maReadData(resID, (void*) output.c_str(), pos, stringLen);
+
+	// Update position to the byte after the string.
 	pos += stringLen;
+
 	return true;
 }
 
@@ -380,24 +398,32 @@ bool ScreenImageSwiper::readStringFromResource(
  */
 Image* ScreenImageSwiper::createBackgroundGradient()
 {
-	MAHandle h = maCreatePlaceholder();
-	int *src = new int[16 * 16];
+	// Create gradient bitmap.
+	int *gradientBitmap = new int[16 * 16];
 	for (int i = 0; i < 16; ++i)
 	{
 		for (int j = 0; j<16; ++j)
 		{
 			int color = 0xFF - (i * 0xFF / 16);
-			src[i*16 + j] = color | (color << 8) | (color << 16);
+			gradientBitmap[i*16 + j] = color | (color << 8) | (color << 16);
 		}
 	}
 
-	maCreateImageRaw(h, src, EXTENT(16, 16), 0);
-	Image* img = new Image();
-	img->setImage(h);
-	img->setPosition(0, 0);
-	img->setSize(MAW_CONSTANT_FILL_AVAILABLE_SPACE, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-	img->setProperty("scaleMode", "scaleXY");
-	int size = maGetImageSize(h);
-	delete src;
-	return img;
+	// Create image with gradient.
+	MAHandle imageHandle = maCreatePlaceholder();
+	maCreateImageRaw(imageHandle, gradientBitmap, EXTENT(16, 16), 0);
+	delete gradientBitmap;
+
+	// Create image widget.
+	Image* imageWidget = new Image();
+	imageWidget->setImage(imageHandle);
+	imageWidget->setPosition(0, 0);
+	imageWidget->setSize(
+		MAW_CONSTANT_FILL_AVAILABLE_SPACE,
+		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+
+	// Tell image to stretch.
+	imageWidget->setProperty("scaleMode", "scaleXY");
+
+	return imageWidget;
 }

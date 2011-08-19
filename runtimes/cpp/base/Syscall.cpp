@@ -819,7 +819,6 @@ namespace Base {
 		LOGF("maFileClose(%i)\n", file);
 		FileHandle* fhp = gFileHandles.find(file);
 		MYASSERT(fhp, ERR_FILE_HANDLE_INVALID);
-        LOG("Closing file %s", std::string(fhp->name, fhp->name.size()).c_str());
 		FileHandle& fh(*fhp);
 		SAFE_DELETE(fh.fs);
 		gFileHandles.erase(file);

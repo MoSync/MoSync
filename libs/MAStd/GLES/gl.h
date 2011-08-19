@@ -3,16 +3,12 @@
 
 /* $Revision: 10601 $ on $Date:: 2010-03-04 22:15:27 -0800 #$ */
 
-#ifndef MAPIP
-#include <GLES/glplatform.h>
-#else
 #include <ma.h>
 #include <maapi_defs.h>
 #include <IX_OPENGL_ES.h>
 #include <IX_GL1.h>
 #define GL_API
 #define GL_APIENTRY
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -22,7 +18,7 @@ extern "C" {
  * This document is licensed under the SGI Free Software B License Version
  * 2.0. For details, see http://oss.sgi.com/projects/FreeB/ .
  */
-
+#if 0
 #ifndef MAPIP
 
 typedef void             GLvoid;
@@ -45,7 +41,7 @@ typedef khronos_intptr_t GLintptr;
 typedef khronos_ssize_t  GLsizeiptr;
 
 #endif
-
+#endif
 
 /*************************************************************/
 
@@ -600,7 +596,7 @@ typedef khronos_ssize_t  GLsizeiptr;
 #endif
 
 /*************************************************************/
-
+#if 0
 #ifndef MAPIP
 
 /* Available only in Common profile */
@@ -753,7 +749,7 @@ GL_API void GL_APIENTRY glVertexPointer (GLint size, GLenum type, GLsizei stride
 GL_API void GL_APIENTRY glViewport (GLint x, GLint y, GLsizei width, GLsizei height);
 
 #endif // ifndef MAPIP
-
+#endif
 /*------------------------------------------------------------------------*
  * Required OES extension functions
  *------------------------------------------------------------------------*/
