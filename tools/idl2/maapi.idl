@@ -2960,9 +2960,7 @@ interface MAAPI {
 			NETMEETING = "Netmeeting";
 		}
 
-
 		// deprecated
-
 		constset int MA_PIM_ATTR_ {
 			/// The value describes an assistant.
 			ASST = 1;
@@ -3148,6 +3146,8 @@ interface MAAPI {
 			OPERATION_NOT_PERMITTED = -13;
 			/// Invalid handle.
 			INVALID_HANDLE = -14;
+			// The requested field doesn't have a value.
+			NO_VALUE = -15;
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.
