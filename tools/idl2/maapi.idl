@@ -1683,33 +1683,31 @@ interface MAAPI {
 		int maDumpCallStackEx(in MAString str, in int data);
 
 		/**
-		 * Protects a piece of the data memory.
-		 * Any attempt to write to that piece of memory will raise a panic.
-		 * \param 'start' The start address of the memory piece to protect.
-		 * \param 'length' The length of the memory piece to protect.
-		 */
+		* Protects a piece of the data memory.
+		* Any attempt to write to that piece of memory will raise a panic.
+		* \param 'start' The start address of the memory piece to protect.
+		* \param 'length' The length of the memory piece to protect.
+		*/
 		void maProtectMemory(in MAAddress start, in int length);
 
 		/**
-		 * Unprotects a piece of the data memory.
-		 * \param 'start' The start address of the memory piece to unprotect.
-		 * \param 'length' The length of the memory piece to unprotect.
-		 */
+		* Unprotects a piece of the data memory.
+		* \param 'start' The start address of the memory piece to unprotect.
+		* \param 'length' The length of the memory piece to unprotect.
+		*/
 		void maUnprotectMemory(in MAAddress start, in int length);
 
 		/**
-		 * Toggles memory protection.
-		 * \param 'enable' If 1 turns on memory protection, if 0 turns of memory protection.
-		 */
+		* Toggles memory protection.
+		* \param 'enable' If 1 turns on memory protection, if 0 turns of memory protection.
+		*/
 		void maSetMemoryProtection(in int enable);
 
-
 		/**
-		 * Returns if memory protection is enabled or not.
-		 * \returns '1' if memory protection is turned on, '0' if it is turned off.
-		 */
+		* Returns if memory protection is enabled or not.
+		* \returns '1' if memory protection is turned on, '0' if it is turned off.
+		*/
 		int maGetMemoryProtection();
-
 
 		/**
 		* Returns the percentage of battery power remaining. This is an integer between 0 and 100.
