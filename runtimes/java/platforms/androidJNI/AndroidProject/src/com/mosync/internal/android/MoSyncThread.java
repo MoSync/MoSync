@@ -306,7 +306,7 @@ public class MoSyncThread extends Thread
 		{
 			mMoSyncCameraController = new MoSyncCameraController(this);
 		}
-		catch (java.lang.VerifyError error)
+ catch (Throwable e)
 		{
 			mMoSyncCameraController = null;
 		}
@@ -2924,7 +2924,9 @@ public class MoSyncThread extends Thread
 	 */
 	public void releaseHardware()
 	{
-		mMoSyncCameraController.releaseCamera();
+		if (mMoSyncCameraController != null) {
+			mMoSyncCameraController.releaseCamera();
+		}
 	}
 
 	/**
@@ -2932,7 +2934,9 @@ public class MoSyncThread extends Thread
 	 */
 	public void acquireHardware()
 	{
-		mMoSyncCameraController.acquireCamera();
+		if (mMoSyncCameraController != null) {
+			mMoSyncCameraController.acquireCamera();
+		}
 	}
 
 	/**
