@@ -305,7 +305,7 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 </td>
 <td>Image, animated image, edit box, list box, screens, widgets, widget skins, input managers, etc.<br>
 </td>
-<td><br>
+<td>maTextBox()<br>
 </td>
 <td>MAUI::EditBox, MAUI::Engine, MAUI::Font, MAUI::Image, MAUI::Label, MAUI::Layout, MAUI::ListBox, MAUI::Screen, MAUI::Widget<br>
 </td>
