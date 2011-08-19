@@ -228,6 +228,9 @@ namespace Base
 	int _maMessageBox(const char* title, const char* text,
 						JNIEnv* jNIEnv, jobject jThis);
 
+	int _maImagePickerOpen(const char* title,
+						JNIEnv* jNIEnv, jobject jThis);
+
 	// Widget API
 	int _maWidgetCreate(const char *widgetType,
 						JNIEnv* jNIEnv, jobject jThis);

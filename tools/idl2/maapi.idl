@@ -1416,11 +1416,17 @@ interface MAAPI {
 				int textboxLength;
 			} textbox;
 
-			/**
-			* #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if
-			* one of the \link #CONNERR_GENERIC CONNERR \endlink constants.
-			*/
-			int imagePickerState;
+			struct {
+                /**
+			    * #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if canceled or 1 if Ok was pressed.
+			    */
+				int imagePickerState;
+
+				/**
+				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
+				*/
+				int imagePickerItemHandle;
+			} imagePicker;
 
 			/**
 			* In #EVENT_TYPE_SMS events, this will be one of the
@@ -6440,6 +6446,14 @@ group CameraFunctions "Camera Functions" {
 		 * to ensure its visibility on all screen sizes.
 		 */
 		void maMessageBox(in MAString title, in MAString message);
+
+		/**
+		* Displays an image picker to the user.
+		* It's display depends on the platform.
+		* \param title The title of the dialog shown.
+		* Note: when a selection is made a #MAW_EVENT_TYPE_IMAGE_PICKER is sent.
+		*/
+		void maImagePickerOpen(in MAString title);
 
 		constset int SENSOR_TYPE_ {
 			// A constant describing an accelerometer sensor type.

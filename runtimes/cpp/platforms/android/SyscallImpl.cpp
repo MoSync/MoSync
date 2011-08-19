@@ -1722,6 +1722,13 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maImagePickerOpen:
+			SYSLOG("maIOCtl_maImagePickerOpen");
+			return _maImagePickerOpen(
+				SYSCALL_THIS->GetValidatedStr(a),
+				mJNIEnv,
+				mJThis);
+
 		case maIOCtl_maFileOpen:
 			SYSLOG("maIOCtl_maFileOpen");
 			return _maFileOpen(

@@ -169,7 +169,9 @@ packages = ["src/com/mosync/java/android/*.java",
             "src/com/mosync/nativeui/ui/widgets/*.java",
             "src/com/mosync/nativeui/util/*.java",
             "src/com/mosync/nativeui/util/properties/*.java",
-			"src/com/mosync/pim/*.java"
+			"src/com/mosync/pim/*.java",
+			"src/com/mosync/nativeui/ui/custom/*.java",
+			"gen/com/mosync/java/android/*.java"
             ]
 
 # Concatenate each list element with package_root, and flatten the list to a string

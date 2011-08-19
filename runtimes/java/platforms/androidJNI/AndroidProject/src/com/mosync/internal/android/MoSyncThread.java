@@ -2431,6 +2431,15 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Internal wrapper for maImagePickerOpen that runs
+	 * the call in the UI thread.
+	 */
+	int maImagePickerOpen(final String title)
+	{
+		return mMoSyncNativeUI.maImagePickerOpen(title);
+	}
+
+	/**
 	 * Display a notification.
 	 * @param type
 	 * @param id
