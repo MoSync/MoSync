@@ -98,7 +98,7 @@ namespace Base
 	/**
 	* Returns a reference to the JNI Object which initiated the execution of this native code
 	*
-	* @return A reference the JNI  Object
+	* @return A reference the JNI  Objec
 	*/
 	jobject Syscall::getJNIThis()
 	{
@@ -1178,7 +1178,7 @@ namespace Base
 	// For now, wrap them here and call functions in ioctl.h.
 
 	/**
-	 * Internal wrapper for maOpenGLTexImage2D that
+	 * Internal wrapper for maOpenGLTexImage2D tha
 	 * calls the real implementation _maOpenGLTexImage2D
 	 * in ioctl.h.
 	 *
@@ -1190,7 +1190,7 @@ namespace Base
 	}
 
 	/**
-	 * Internal wrapper for maOpenGLTexSubImage2D that
+	 * Internal wrapper for maOpenGLTexSubImage2D tha
 	 * calls the real implementation _maOpenGLTexSubImage2D
 	 * in ioctl.h.
 	 *
@@ -1202,7 +1202,7 @@ namespace Base
 	}
 
 	/**
-	 * Internal wrapper for maOpenGLInitFullscreen that
+	 * Internal wrapper for maOpenGLInitFullscreen tha
 	 * calls the real implementation _maOpenGLInitFullscreen
 	 * in ioctl.h.
 	 */
@@ -1212,7 +1212,7 @@ namespace Base
 	}
 
 	/**
-	 * Internal wrapper for maOpenGLCloseFullscreen that
+	 * Internal wrapper for maOpenGLCloseFullscreen tha
 	 * calls the real implementation _maOpenGLCloseFullscreen
 	 * in ioctl.h.
 	 */
@@ -2219,6 +2219,63 @@ return 0; \
 				b,
 				mJNIEnv,
 				mJThis);
+
+		case maIOCtl_maNFCStart:
+			SYSLOG("maIOCtl_maNFCStart");
+			return _maNFCStart(mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCStop:
+			SYSLOG("maIOCtl_maNFCStop");
+			return _maNFCStop(mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCReadTag:
+			return _maNFCReadTag(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCDestroyTag:
+			return _maNFCDestroyTag(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCGetNDEFMessage:
+			return _maNFCGetNDEFMessage(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCGetNDEFRecord:
+			return _maNFCGetNDEFRecord(a, b, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCGetNDEFRecordCount:
+			return _maNFCGetNDEFRecordCount(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCGetId:
+			return _maNFCGetId(
+				a,
+				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
+				c,
+				(int)gCore->mem_ds,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maNFCGetPayload:
+			return _maNFCGetPayload(
+				a,
+				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
+				c,
+				(int)gCore->mem_ds,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maNFCGetTnf:
+			return _maNFCGetTnf(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maNFCGetType:
+			return _maNFCGetType(
+				a,
+				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
+				c,
+				(int)gCore->mem_ds,
+				mJNIEnv,
+				mJThis);
+
 		} // End of switch
 
 		return IOCTL_UNAVAILABLE;

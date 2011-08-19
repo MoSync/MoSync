@@ -55,7 +55,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *  syscalls, but it cannot be accessed directly.
 * Each resource (aka Object) is represented by a
 * handle. There are different types of resources, for example
-* Image, Binary data, Sound or Placeholder. A placeholder object is not a real object, but
+* Image, Binary data, Sound or Placeholder. A placeholder object is not a real object, bu
 * just a handle which you can use to construct new objects dynamically.
 * Resources can also be defined at compile time, by using MoSync's resource compiler.
 * Placeholders can either be defined at compile time using a resource compiler directive
@@ -126,7 +126,7 @@ interface MAAPI {
 	* \param result Passed to the operating system, where applicable. Ignored otherwise.
 	* \param message The message should be short, not more than 40 characters,
 	* to ensure its visibility on all screen sizes.
-	* \see MAPanicReport
+	* \see MAPanicRepor
 	*/
 	noreturn maPanic(in int result, in MAString message);
 
@@ -317,7 +317,7 @@ interface MAAPI {
 	* Sets the clipping rectangle for the current draw target.
 	* The screen and every drawable image each maintains a clipping rectangle.
 	* Drawing operations have no effect outside the clipping rectangle.
-	* The default clipping rectangle covers the entire draw target, so that
+	* The default clipping rectangle covers the entire draw target, so tha
 	* clipping occurs at the draw target's edges.
 	*/
 	void maSetClipRect(in int left, in int top, in int width, in int height);
@@ -726,7 +726,7 @@ interface MAAPI {
 	* On a few devices, using ports numbered below 1024 may cause system crashes.
 	* Therefore, it is advisable to use ports above 1024 if you can choose.
 	*
-	* On some J2ME devices, connections to port 443 (except from https) is not
+	* On some J2ME devices, connections to port 443 (except from https) is no
 	* allowed and might cause a system exception.
 	*
 	* For the <tt>btspp</tt> protocol, \a \<address\> is 12 hexadecimal digits and
@@ -800,7 +800,7 @@ interface MAAPI {
 	* MAConnEventData::opType set to #CONNOP_READ.
 	* The success value is the number of bytes read.
 	*
-	* \see maGetEvent
+	* \see maGetEven
 	*/
 	void maConnRead(in MAHandle conn, out MAAddress dst, in int size);
 
@@ -813,7 +813,7 @@ interface MAAPI {
 	*
 	* \warning The source data must remain available until the operation is complete,
 	* so if it was dynamically allocated, don't free it too early.
-	* \see maGetEvent
+	* \see maGetEven
 	*/
 	void maConnWrite(in MAHandle conn, in MAAddress src, in int size);
 
@@ -827,7 +827,7 @@ interface MAAPI {
 	* MAConnEventData::opType set to #CONNOP_READ.
 	* The success value is is the number of bytes read.
 	*
-	* \see maGetEvent
+	* \see maGetEven
 	*/
 	void maConnReadToData(in MAHandle conn, in MAHandle data, in int offset, in int size);
 
@@ -841,7 +841,7 @@ interface MAAPI {
 	* MAConnEventData::opType set to #CONNOP_WRITE.
 	* The success value is \> 0.
 	*
-	* \see maGetEvent
+	* \see maGetEven
 	*/
 	void maConnWriteFromData(in MAHandle conn, in MAHandle data, in int offset, in int size);
 
@@ -959,7 +959,7 @@ interface MAAPI {
 		out MAString buffer range("bufSize"), in int bufSize);
 
 
-	//not needed yet
+	//not needed ye
 	//int maHttpGetResponseMessage(in MAHandle conn, out MAString buffer, in int bufSize);
 	//int maHttpGetRequestHeader(in MAHandle conn, in MAString key, out MAString buffer, in int bufSize);
 
@@ -974,7 +974,7 @@ interface MAAPI {
 	* The success value is the HTTP response code.
 	*
 	* \param conn An unfinished HTTP connection handle.
-	* \see maGetEvent
+	* \see maGetEven
 	*/
 	void maHttpFinish(in MAHandle conn);
 
@@ -1183,7 +1183,7 @@ interface MAAPI {
 	}
 
 	/**
-	* Returns a bitmask consisting of \link #MAKB_LEFT MAKB \endlink flags describing the current
+	* Returns a bitmask consisting of \link #MAKB_LEFT MAKB \endlink flags describing the curren
 	* key state.
 	*/
 	int maGetKeys();
@@ -1333,6 +1333,18 @@ interface MAAPI {
 		* \see maSensorStart()
 		*/
 		SENSOR = 33;
+
+		/** \brief A new NFC tag was received
+		* A new tag has been received, use maGetNextTag to
+		* retreive it.
+		*/
+		NFC_TAG_RECEIVED = 34;
+
+		/** \brief New tag data was read
+		* The results of an asynchronous NFC tag read was
+		* completed.
+		*/
+		NFC_TAG_DATA_READ = 35;
 	}
 
 	/**
@@ -1456,7 +1468,7 @@ interface MAAPI {
 	*
 	* When the \link #EVENT_TYPE_CLOSE Close event \endlink is posted,
 	* you must call maExit as soon as possible, or
-	* your program will be forcibly terminated. The timeout is device-dependent, but
+	* your program will be forcibly terminated. The timeout is device-dependent, bu
 	* never longer than #EVENT_CLOSE_TIMEOUT milliseconds.
 	*
 	* After the Close event has been posted, most syscalls will stop working,
@@ -1571,7 +1583,7 @@ interface MAAPI {
 	*
 	* To properly read an instance of this struct from a store, you should allocate a
 	* chunk of memory whose size is equal to the size of the store, then read the entire store
-	* into that chunk of memory. Then you should make a pointer of type MAPanicReport and point it
+	* into that chunk of memory. Then you should make a pointer of type MAPanicReport and point i
 	* to the chunk. Then you can read normally, using that pointer.
 	*
 	* \see maOpenStore()
@@ -1917,7 +1929,7 @@ interface MAAPI {
 			int nameBufSize;
 			///out, the length of the name, excluding the terminating zero.
 			int actualNameLength;
-			///out
+			///ou
 			MABtAddr address;
 		}
 
@@ -2002,7 +2014,7 @@ interface MAAPI {
 		* is 248 bytes, excluding the terminating zero. However, it's recommended that you
 		* don't provide buffers larger than what your application has a use for.
 		*
-		* Note that you need to fill the MABtDevice structure before passing it
+		* Note that you need to fill the MABtDevice structure before passing i
 		* as a parameter, otherwise you will get memory access problems.
 		*
 		* \returns 1 if successful, zero if the queue is empty.
@@ -2074,7 +2086,7 @@ interface MAAPI {
 		* \brief A WLAN access point.
 		*/
 		struct MAWlanAp {
-			/// out
+			/// ou
 			MAWlanAddr address;
 			/// in(ptr), out(content)
 			char* name;
@@ -2368,7 +2380,7 @@ interface MAAPI {
 		* this function MAY increase the size of the file.
 		* You can determine if it did so by calling maFileSeek() with #MA_SEEK_END.
 		*
-		* If the file's current position is greater than \a offset, it is reset
+		* If the file's current position is greater than \a offset, it is rese
 		* to be equal to \a offset.
 		*
 		* The file must exist prior to calling this function.
@@ -2847,8 +2859,8 @@ interface MAAPI {
 		*
 		* \param serv A server connection, opened with maConnect.
 		* \returns \< 0 on error, \> 0 on success.
-		* \see maConnect
-		* \see maGetEvent
+		* \see maConnec
+		* \see maGetEven
 		*/
 		int maAccept(in MAHandle serv);
 
@@ -2929,12 +2941,12 @@ interface MAAPI {
 			/// bytes
 			/// the bytes are not null-terminated.
 			BINARY = 0;
-			/// int
+			/// in
 			BOOLEAN = 1;
-			/// int
+			/// in
 			/// unix time.
 			DATE = 2;
-			/// int
+			/// in
 			INT = 3;
 			/// wide-string '\\0'
 			STRING = 4;
@@ -4334,7 +4346,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in number of pixels.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* \code
@@ -4348,7 +4360,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in number of pixels.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* \code
@@ -4362,7 +4374,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* \code
@@ -4377,7 +4389,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* \code
@@ -4519,14 +4531,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A 0-indexed tab number.
 		*
-		* @setandget
+		* @setandge
 		*
-		* @par Example set
+		* @par Example se
 		* \code
 		*	maWidgetSetProperty(tabScreenHandle, MAW_TAB_SCREEN_CURRENT_TAB, "1");
 		* \endcode
 		*
-		* @par Example get
+		* @par Example ge
 		* \code
 		* 	char currentTabBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(
@@ -4588,14 +4600,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandget
+		* @setandge
 		*
-		* @par Example set
+		* @par Example se
 		* \code
 		*	maWidgetSetProperty(labelHandle, MAW_LABEL_TEXT, "My label");
 		* \endcode
 		*
-		* @par Example get
+		* @par Example ge
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
@@ -4712,14 +4724,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandget
+		* @setandge
 		*
-		* @par Example set
+		* @par Example se
 		* \code
 		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_TEXT, "My button");
 		* \endcode
 		*
-		* @par Example get
+		* @par Example ge
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
@@ -4821,14 +4833,14 @@ group WidgetAPI "Widget API" {
 		* Note: It is not available on Android, as native image buttons do not have text attached.
 		* @validvalue A null-terminated string.
 		*
-		* @setandget
+		* @setandge
 		*
-		* @par Example set
+		* @par Example se
 		* \code
 		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, "My button");
 		* \endcode
 		*
-		* @par Example get
+		* @par Example ge
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
@@ -4993,20 +5005,20 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandget
+		* @setandge
 		*
-		* @par Example set
+		* @par Example se
 		* \code
 		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, "My label");
 		* \endcode
 		*
-		* @par Example get
+		* @par Example ge
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
 		* 	if (result > 0)
 		* 	{
-		* 	    // Do something with the edit box text
+		* 	    // Do something with the edit box tex
 		* 	}
 		* \endcode
 		*/
@@ -5243,7 +5255,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* \code
@@ -5336,7 +5348,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue Any valid URL.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* @code
@@ -6852,9 +6864,101 @@ group CameraFunctions "Camera Functions" {
 		* \see #EVENT_TYPE_SENSOR
 		*/
 		int maSensorStop(in int sensor);
+
+		/**
+		* Start listening to NFC events.
+		* @return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
+		* MA_NFC_NOT_AVAILABLE if NFC is not at all available, or
+		* 0 otherwise.
+		*/
+		int maNFCStart();
+
+		/**
+		* Stop listening to NFC events.
+		*/
+		void maNFCStop();
+
+		/**
+		* Reads the next available tag.
+		* @return A zero handle if no tag currently available
+		*/
+		MAHandle maNFCReadTag(in MAHandle nfcContext);
+
+		/**
+		* Destroys the tag. Clients are responsible for calling
+		* this function for every corresponding maNFCReadTag.
+		*/
+		void maNFCDestroyTag(in MAHandle tagHandle);
+
+		/**
+		* Returns a handle to an NDEF message, or a zero handle
+		* if the tag is not of the correct type.
+		*/
+		MAHandle maNFCGetNDEFMessage(in MAHandle tag);
+
+		/**
+		* Returns a handle to the ith NDEF record of an NDEF message,
+		* or a zero handle if the handle given as argument does no
+		* represent an NDEF message.
+		*/
+		MAHandle maNFCGetNDEFRecord(in MAHandle ndef, in int ix);
+
+		/**
+		* Returns the number of NDEF records in an NDEF message,
+		* or MA_NFC_INVALID_TAG_TYPE if the handle given as argumen
+		* does not represent an NDEF message.
+		*/
+		int maNFCGetNDEFRecordCount(in MAHandle ndef);
+
+		/**
+		* Reads the variable length id of an NDEF record.
+		* Returns NFC_INVALID_TAG_TYPE if the handle given as
+		* argument does not represent an NDEF message.
+		*/
+		int maNFCGetId(in MAHandle ndefRecord, out MAAddress dst, in int len);
+
+		/**
+		* Reads the variable length payload of an NDEF record.
+		* Returns NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF message.
+		*/
+		int maNFCGetPayload(in MAHandle ndefRecord, out MAAddress dst, in int len);
+
+		/**
+		 * Returns the 3-bit TNF of an NDEF record,
+		 * or NFC_INVALID_TAG_TYPE if the handle given as argumen
+		 * does not represent an NDEF message.
+		 */
+		int maNFCGetTnf(in MAHandle ndefRecord);
+
+		/**
+		* Returns the variable length type field of an NDEF record,
+		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
+		* does not represent an NDEF message.
+		*/
+		int maNFCGetType(in MAHandle ndefRecord, out MAAddress dst, in int len);
+
+		constset int MA_NFC_ {
+			/**
+			* A constant indicating there is no NFC support on the device.
+			*/
+			NOT_AVAILABLE = 1;
+
+			/**
+			* A constant indicating NFC is not enabled on the device. (But there is hardware support).
+			*/
+			NOT_ENABLED = 2;
+
+			/**
+			* A constant indicating an invalid tag type.
+			*/
+			MA_NFC_INVALID_TAG_TYPE = -1;
+		}
+
+
 	}
 
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}
+
 }

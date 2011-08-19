@@ -758,4 +758,76 @@ namespace Base
 								int memBuffer, int memBufferSize, 
 								JNIEnv* jNIEnv, jobject jThis);
 
+	/*
+	* Start listening to NFC events.
+	* @return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
+	* MA_NFC_NOT_AVAILABLE if NFC is not at all available, or
+	* 0 otherwise.
+	*/
+	int _maNFCStart(JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Stop listening to NFC events.
+	*/
+	int _maNFCStop(JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Reads the next available tag.
+	* @return A zero handle if no tag currently available
+	*/
+	MAHandle _maNFCReadTag(MAHandle nfcContext, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Destroys the tag. Clients are responsible for calling
+	* this function for every corresponding maNFCReadTag.
+	*/
+	int _maNFCDestroyTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Returns a handle to an NDEF message, or a zero handle
+	* if the tag is not of the correct type.
+	*/
+	MAHandle _maNFCGetNDEFMessage(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Returns a handle to the ith NDEF record of an NDEF message,
+	* or a zero handle if the handle given as argument does not
+	* represent an NDEF message.
+	*/
+	MAHandle _maNFCGetNDEFRecord(MAHandle ndef, int ix, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Returns the number of NDEF records in an NDEF message,
+	* or MA_NFC_INVALID_TAG_TYPE if the handle given as argument
+	* does not represent an NDEF message.
+	*/
+	int _maNFCGetNDEFRecordCount(MAHandle ndef, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Reads the variable length id of an NDEF record.
+	* Returns NFC_INVALID_TAG_TYPE if the handle given as
+	* argument does not represent an NDEF message.
+	*/
+	int _maNFCGetId(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Reads the variable length payload of an NDEF record.
+	* Returns NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF message.
+	*/
+	int _maNFCGetPayload(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	 * Returns the 3-bit TNF of an NDEF record,
+	 * or NFC_INVALID_TAG_TYPE if the handle given as argument
+	 * does not represent an NDEF message.
+	 */
+	int _maNFCGetTnf(MAHandle ndefRecord, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Returns the variable length type field of an NDEF record,
+	* or NFC_INVALID_TAG_TYPE if the handle given as argument
+	* does not represent an NDEF message.
+	*/
+	int _maNFCGetType(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
 }

@@ -18,7 +18,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
-import static com.mosync.internal.android.MoSyncHelpers.EXTENT_Y;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_ON;
@@ -44,65 +43,15 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
 
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.nio.ByteBuffer;
-import java.nio.IntBuffer;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.ReadableByteChannel;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import javax.microedition.khronos.egl.EGL10;
-import javax.microedition.khronos.egl.EGLContext;
-import javax.microedition.khronos.opengles.GL10;
-
-import android.app.Activity;
-import android.app.AlertDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.content.pm.ActivityInfo;
-import android.content.res.AssetFileDescriptor;
-import android.content.res.AssetManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.PorterDuff.Mode;
-import android.graphics.Rect;
-import android.graphics.Region;
-import android.net.Uri;
-import android.opengl.GLUtils;
-import android.os.Build;
-import android.os.Bundle;
-import android.os.Handler;
-import android.os.SystemClock;
-import android.os.Vibrator;
-import android.telephony.TelephonyManager;
-import android.util.Log;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.FrameLayout;
-
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
+import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.generated.IX_OPENGL_ES;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
+import com.mosync.nativeui.ui.widgets.FrameLayout;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 
 /**
@@ -153,6 +102,7 @@ public class MoSyncThread extends Thread
 	MoSyncSMS mMoSyncSMS;
 	MoSyncSensor mMoSyncSensor;
 	MoSyncPIM mMoSyncPIM;
+	MoSyncNFC mMoSyncNFC;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -342,6 +292,13 @@ public class MoSyncThread extends Thread
 		mMoSyncSensor = new MoSyncSensor(this);
 
 		mMoSyncPIM = new MoSyncPIM(this);
+
+		try {
+			mMoSyncNFC = MoSyncNFC.getDefault();
+			mMoSyncNFC.setMoSyncThread(this);
+		} catch (java.lang.VerifyError error) {
+			mMoSyncNFC = null;
+		}
 
 		nativeInitRuntime();
 	}
@@ -2290,6 +2247,7 @@ public class MoSyncThread extends Thread
 
 		// Write this property to memory.
 		byte[] ba = property.getBytes();
+
 		mMemDataSection.position(buf);
 		mMemDataSection.put(ba);
 		// Add null termination character.
@@ -3459,7 +3417,6 @@ public class MoSyncThread extends Thread
 
 		return powerOf2;
 	}
-
 
 
 	private int mOpenGLScreen = -1;
