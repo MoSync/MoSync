@@ -7,6 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		43B449FF13F94467001F2492 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B449FE13F94467001F2492 /* AddressBook.framework */; };
+		43B44A0213F94474001F2492 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B44A0113F94474001F2492 /* CoreMotion.framework */; };
+		43B44A0413F9447A001F2492 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B44A0313F9447A001F2492 /* EventKit.framework */; };
+		43B44A0613F94480001F2492 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B44A0513F94480001F2492 /* MediaPlayer.framework */; };
 		431869BF13F691E50051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869BE13F691E50051D97A /* CoreMotion.framework */; };
 		431869C913F69ECA0051D97A /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869C813F69ECA0051D97A /* EventKit.framework */; };
 		4370369E13E9487D00F22783 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4370369D13E9487D00F22783 /* AddressBook.framework */; };
@@ -38,6 +42,10 @@
 		28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncViewController.h; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
+		43B449FE13F94467001F2492 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
+		43B44A0113F94474001F2492 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		43B44A0313F9447A001F2492 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
+		43B44A0513F94480001F2492 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		431869BE13F691E50051D97A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		431869C813F69ECA0051D97A /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		4370369D13E9487D00F22783 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
@@ -64,6 +72,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43B44A0613F94480001F2492 /* MediaPlayer.framework in Frameworks */,
+				43B44A0413F9447A001F2492 /* EventKit.framework in Frameworks */,
+				43B44A0213F94474001F2492 /* CoreMotion.framework in Frameworks */,
+				43B449FF13F94467001F2492 /* AddressBook.framework in Frameworks */,
 				431869C913F69ECA0051D97A /* EventKit.framework in Frameworks */,
 				431869BF13F691E50051D97A /* CoreMotion.framework in Frameworks */,
 				4370369E13E9487D00F22783 /* AddressBook.framework in Frameworks */,
@@ -106,6 +118,10 @@
 		29B97314FDCFA39411CA2CEA /* CustomTemplate */ = {
 			isa = PBXGroup;
 			children = (
+				43B44A0513F94480001F2492 /* MediaPlayer.framework */,
+				43B44A0313F9447A001F2492 /* EventKit.framework */,
+				43B44A0113F94474001F2492 /* CoreMotion.framework */,
+				43B449FE13F94467001F2492 /* AddressBook.framework */,
 				080E96DDFE201D6D7F000001 /* Classes */,
 				29B97315FDCFA39411CA2CEA /* Other Sources */,
 				29B97317FDCFA39411CA2CEA /* Resources */,

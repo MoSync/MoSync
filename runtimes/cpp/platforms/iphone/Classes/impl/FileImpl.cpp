@@ -17,3 +17,4 @@ MA 02110-1301, USA.
 
 #include "config_platform.h"
 #include "../../../sdl/FileImpl.cpp"
+

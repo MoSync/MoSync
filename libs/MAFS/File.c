@@ -17,9 +17,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "File.h"
 #include <maheap.h>
-#include <conprint.h>
 #include <mactype.h>
+
+#ifndef USE_NEWLIB
+#include <conprint.h>
 #include <mavsprintf.h>
+#else
+#include <string.h>
+#endif
 
 // broken header files in linux/native
 int sprintf(char *buf, const char *fmt, ...);
@@ -136,7 +141,7 @@ static VolumeEntry *findFileRecursively(const char *filename, VolumeEntry *root)
 			const char *a = filename;
 			const char *b = root->name;
 			while(*a && *b) {
-				if(toupper(*a)!=toupper(*b)) return NULL;
+				if(toupper((int)*a)!=toupper((int)*b)) return NULL;
 				a++;
 				b++;
 			}
@@ -415,13 +420,13 @@ static MA_FILE* openRead(const char *filename, int modeFlags) {
 	MA_FILE *file;
 
 	if(!sRoot) {
-		lprintfln("filesystem not initialized");
+		LOG("filesystem not initialized");
 		return NULL;
 	}
 
 	volEntry = findFile(filename, sRoot);
 	if(!volEntry) {
-		lprintfln("couldn't find file");
+		LOG("couldn't find file");
 		return NULL;
 	}
 

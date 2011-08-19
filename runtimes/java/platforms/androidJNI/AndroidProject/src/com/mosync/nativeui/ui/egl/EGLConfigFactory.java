@@ -17,6 +17,8 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.egl;
 
+import com.mosync.internal.generated.IX_OPENGL_ES;
+
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.egl.EGLDisplay;
@@ -77,23 +79,43 @@ public class EGLConfigFactory
 
     private static class ComponentSizeChooser extends BaseConfigChooser {
         public ComponentSizeChooser(int redSize, int greenSize, int blueSize,
-                int alphaSize, int depthSize, int stencilSize) {
-            super(new int[] {
-                    EGL10.EGL_RED_SIZE, redSize,
-                    EGL10.EGL_GREEN_SIZE, greenSize,
-                    EGL10.EGL_BLUE_SIZE, blueSize,
-                    EGL10.EGL_ALPHA_SIZE, alphaSize,
-                    EGL10.EGL_DEPTH_SIZE, depthSize,
-                    EGL10.EGL_STENCIL_SIZE, stencilSize,
-                    EGL10.EGL_NONE});
-            mValue = new int[1];
-            mRedSize = redSize;
-            mGreenSize = greenSize;
-            mBlueSize = blueSize;
-            mAlphaSize = alphaSize;
+                int alphaSize, int depthSize, int stencilSize, int glApi) {
+
+            super(null);
+
+            if(glApi == IX_OPENGL_ES.MA_GL_API_GL1) {
+				glApi = 0;
+				mConfigSpec = new int[] {
+					EGL10.EGL_RED_SIZE, redSize,
+					EGL10.EGL_GREEN_SIZE, greenSize,
+					EGL10.EGL_BLUE_SIZE, blueSize,
+					EGL10.EGL_ALPHA_SIZE, alphaSize,
+					EGL10.EGL_DEPTH_SIZE, depthSize,
+					EGL10.EGL_STENCIL_SIZE, stencilSize,
+					EGL10.EGL_NONE};
+            } else if(glApi == IX_OPENGL_ES.MA_GL_API_GL2) {
+				int EGL_OPENGL_ES2_BIT = 4;
+				glApi = 4;
+				mConfigSpec = new int[] {
+					EGL10.EGL_RED_SIZE, redSize,
+					EGL10.EGL_GREEN_SIZE, greenSize,
+					EGL10.EGL_BLUE_SIZE, blueSize,
+					EGL10.EGL_ALPHA_SIZE, alphaSize,
+					EGL10.EGL_DEPTH_SIZE, depthSize,
+					EGL10.EGL_STENCIL_SIZE, stencilSize,
+					EGL10.EGL_RENDERABLE_TYPE, glApi,
+					EGL10.EGL_NONE};
+			}
+
+			mGLApi = glApi;
+			mValue = new int[1];
+			mRedSize = redSize;
+			mGreenSize = greenSize;
+			mBlueSize = blueSize;
+			mAlphaSize = alphaSize;
             mDepthSize = depthSize;
-            mStencilSize = stencilSize;
-       }
+			mStencilSize = stencilSize;
+		}
 
         @Override
         public EGLConfig chooseConfig(EGL10 egl, EGLDisplay display,
@@ -113,10 +135,15 @@ public class EGLConfigFactory
                         EGL10.EGL_DEPTH_SIZE, 0);
                 int s = findConfigAttrib(egl, display, config,
                         EGL10.EGL_STENCIL_SIZE, 0);
+               // int api = findConfigAttrib(egl, display, config,
+               //         EGL10.EGL_RENDERABLE_TYPE, 0);
+
                 int distance = Math.abs(r - mRedSize)
                     + Math.abs(g - mGreenSize)
                     + Math.abs(b - mBlueSize) + Math.abs(a - mAlphaSize)
-                    + Math.abs(d - mDepthSize) + Math.abs(s - mStencilSize);
+                    + Math.abs(d - mDepthSize) + Math.abs(s - mStencilSize)
+                 ;//   + Math.abs(api - mGLApi);
+
                 if (distance < closestDistance) {
                     closestDistance = distance;
                     closestConfig = config;
@@ -143,14 +170,15 @@ public class EGLConfigFactory
         protected int mAlphaSize;
         protected int mDepthSize;
         protected int mStencilSize;
+        protected int mGLApi;
         }
 
     /**
      * This class will choose the ARGB8888 config.
      */
     public static class SimpleEGLConfigChooser extends ComponentSizeChooser {
-        public SimpleEGLConfigChooser(boolean withDepthBuffer) {
-            super(8, 8, 8, 8, withDepthBuffer ? 16 : 0, 0);
+        public SimpleEGLConfigChooser(boolean withDepthBuffer, int glApi) {
+            super(8, 8, 8, 8, withDepthBuffer ? 16 : 0, 0, glApi);
 
             mRedSize = 8;
             mGreenSize = 8;
@@ -158,8 +186,8 @@ public class EGLConfigFactory
         }
     }
 
-    public static EGLConfig findConfig(EGL10 egl, EGLDisplay display)
+    public static EGLConfig findConfig(EGL10 egl, EGLDisplay display, int glApi)
     {
-    	return new SimpleEGLConfigChooser( true ).chooseConfig( egl, display );
+		return new SimpleEGLConfigChooser( true, glApi ).chooseConfig( egl, display);
     }
 }

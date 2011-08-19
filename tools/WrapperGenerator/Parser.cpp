@@ -68,6 +68,7 @@ namespace Parser {
 
 	static stack<ParseNode*> sParseStack;
 	static XML_Parser sXmlParser;
+	static std::string sBindingName;
 
 	static void start(void *data, const char *el, const char **attr) {
 			ParseNode* parseNode = new ParseNode();
@@ -77,6 +78,20 @@ namespace Parser {
 				parseNode->attributes[attr[i]] = attr[i+1];
 			}
 			parseNode->base = createNode(parseNode->name);
+			
+			if(parseNode->base) {
+				parseNode->base->setGroup(sBindingName);
+				
+				string attributes = parseNode->getAttr("attributes", false);
+				if(attributes != "") {
+					map<string, string> attrMap;
+					System::parseAttributes(attributes, attrMap);
+					string group = attrMap["group"];
+					// the global set is called ""
+					parseNode->base->setGroup(group);
+				}
+			}
+			
 			parseNode->lineNumber = XML_GetCurrentLineNumber(sXmlParser);
 
 	}  /* End of start handler */
@@ -93,7 +108,12 @@ namespace Parser {
 	}  /* End of end handler */
 
 
-	void parse(const string& input, std::multimap<std::string, const Base*>& bases) {
+	void parse(const string& input, std::multimap<std::string, Base*>& bases, const std::string& bindingName) {
+		sBindingName = bindingName;
+		
+		while(sParseStack.size()>0)
+			sParseStack.pop();
+
 		sXmlParser = XML_ParserCreate("UTF-8");
 		XML_SetElementHandler(sXmlParser, start, end);
 
@@ -117,18 +137,20 @@ namespace Parser {
 		// bind pointers.
 		for(size_t i = 0; i < parseNodes.size(); i++) {
 			if(parseNodes[i]->base) {
-				parseNodes[i]->base->fromParseNode(*(parseNodes[i]));	
-				bases.insert(pair<string, const Base*>(parseNodes[i]->name, parseNodes[i]->base));
+				parseNodes[i]->base->fromParseNode(*(parseNodes[i]));
+				//bases.insert(pair<string, const Base*>(parseNodes[i]->name, parseNodes[i]->base));
 			}
 		}
 
-#if 0
+//#if 0
 		// write info.
 		for(size_t i = 0; i < parseNodes.size(); i++) {
-			if(parseNodes[i]->base)
-				printf("%s\n", parseNodes[i]->base->toString().c_str());
+			if(parseNodes[i]->base) {
+				bases.insert(pair<string, Base*>(parseNodes[i]->name, parseNodes[i]->base));
+				//printf("%s\n", parseNodes[i]->base->toString().c_str());
+			}
 		}
-#endif
+//#endif
 	}
 
 }

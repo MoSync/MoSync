@@ -18,9 +18,13 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
+import android.graphics.drawable.GradientDrawable.Orientation;
 import android.view.View;
+import android.widget.CheckBox;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
@@ -178,6 +182,29 @@ public class Widget
 				getView( ).setVisibility( View.INVISIBLE );
 			}
 		}
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_ENABLED ))
+		{
+			 getView().setEnabled(BooleanConverter.convert(value));
+		}
+		else if (property.equals( IX_WIDGET.MAW_WIDGET_BACKGROUND_GRADIENT ))
+		{
+			int commaIndex = value.indexOf(",");
+			if ( commaIndex != -1 && commaIndex < value.length() )
+			{
+				String color1 = value.substring(0, commaIndex);
+				String color2 = value.substring(commaIndex+1);
+				// Make sure bad values get caught.
+				int[] colors = new int[2];
+				colors[0] = ColorConverter.convert(color1);
+				colors[1] = ColorConverter.convert(color2);
+				getView().setBackgroundDrawable(new GradientDrawable(Orientation.TOP_BOTTOM,colors ));
+				updateAlpha( m_alpha );
+			}
+			else
+			{
+				throw new InvalidPropertyValueException(property, value);
+			}
+		}
 		else
 		{
 			return false;
@@ -221,6 +248,10 @@ public class Widget
 		else if ( property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
 		{
 			return Integer.toString( getView( ).getTop( ) );
+		}
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_ENABLED ))
+		{
+			return Boolean.toString( getView().isEnabled() );
 		}
 		else
 		{
