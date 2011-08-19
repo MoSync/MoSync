@@ -253,9 +253,9 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 <tr style="background-color: rgb(207, 226, 243);">
 <td><strong>Camera</strong><br>
 </td>
-<td>Use the device's camera to display a viewfinder and capture snapshots.<br>
+<td>Access the available functionality on device's camera to capture still images.<br>
 </td>
-<td>maCameraFormatNumber(), maCameraFormat(), maCameraStart(), maCameraStop(), maCameraSnapshot()<br>
+<td>maCameraSelect(), maCameraNumber(), maCameraSetProperty(), maCameraGetProperty(), maCameraSetPreview(), maCameraFormatNumber(), maCameraFormat(), maCameraStart(), maCameraStop(), maCameraSnapshot()<br>
 </td>
 <td><br>
 </td>
