@@ -124,7 +124,7 @@ namespace Base {
     const int FONT_DEFAULT_AMOUNT=15;
     //The array holding the default system font names
     //Three slots are unused due to the indexing system
-	CFStringRef gDefaultFontNames[FONT_DEFAULT_AMOUNT];
+    CFStringRef gDefaultFontNames[FONT_DEFAULT_AMOUNT];
 
     MAHandle gCurrentFontHandle; //Handle to the currently selected font
 
@@ -258,11 +258,10 @@ namespace Base {
         gDefaultFontNames[FONT_MONOSPACE_INDEX|FONT_BOLD_INDEX|FONT_ITALIC_INDEX]=
                                         CFStringCreateWithCString(NULL, "Courier-BoldOblique",enc);
 
-
         gDrawTarget = gBackbuffer;
 
-		//Setting the initially selected font.
-		MAHandle initFontHandle=maFontLoadDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,INITIAL_FONT_SIZE);
+        //Setting the initially selected font.
+        MAHandle initFontHandle=maFontLoadDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,INITIAL_FONT_SIZE);
         maFontSetCurrent(initFontHandle);
 
 		mach_timebase_info( &gTimeBase );
@@ -417,8 +416,7 @@ namespace Base {
 		}
 		return len;
 	}
-
-	// This is a helper function that creates and stores a FontInfo with the provided arguments
+    // This is a helper function that creates and stores a FontInfo with the provided arguments
     MAHandle createFontInfo(CFStringRef name, GLfloat size, UIFont *uiFontObject, CGFontRef cgFontObject)
     {
         MAHandle handle;
@@ -442,12 +440,12 @@ namespace Base {
             sFontList.push_back(newFontInfo); //Inserting at the end of the vector
         }
 
-		handle=i+1; //Handles start from 1
+        handle=i+1; //Handles start from 1
 
         return handle;
     }
 
-	SYSCALL(MAHandle, maFontLoadDefault(int type, int style, int size)){
+    SYSCALL(MAHandle, maFontLoadDefault(int type, int style, int size)){
 
         int defaultFontIndex=0; //Index to gDefaultFontNames
         if(size<=0)
@@ -459,7 +457,7 @@ namespace Base {
                 defaultFontIndex|=FONT_SERIF_INDEX;
                 break;
 
-			case FONT_TYPE_SANS_SERIF:
+            case FONT_TYPE_SANS_SERIF:
                 defaultFontIndex|=FONT_SANS_SERIF_INDEX;
                 break;
 
@@ -483,7 +481,7 @@ namespace Base {
         return createFontInfo(gDefaultFontNames[defaultFontIndex],(CGFloat)size,NULL,NULL);
     }
 
-	SYSCALL(MAHandle, maFontLoadWithName(const char* name, int size)){
+    SYSCALL(MAHandle, maFontLoadWithName(const char* name, int size)){
         CFStringRef fontName=CFStringCreateWithCString(NULL,name,kCFStringEncodingMacRoman);
 
         //Getting a UIFont object is probably the least expensive way to test if it exists.

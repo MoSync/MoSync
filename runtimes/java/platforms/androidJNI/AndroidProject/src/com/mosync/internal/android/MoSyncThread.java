@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
+import static com.mosync.internal.android.MoSyncHelpers.EXTENT_Y;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_ON;
@@ -145,8 +146,9 @@ public class MoSyncThread extends Thread
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
 	MoSyncFile mMoSyncFile;
+	// Module for device fonts.
+	MoSyncFont mMoSyncFont;
 	MoSyncCameraController mMoSyncCameraController;
-
 	MoSyncSMS mMoSyncSMS;
 	MoSyncSensor mMoSyncSensor;
 	MoSyncPIM mMoSyncPIM;
@@ -249,11 +251,9 @@ public class MoSyncThread extends Thread
 	int mDrawTargetHandle = 0;
 
 	Paint mPaint = new Paint();
+
 	Paint mBlitPaint = new Paint();
 
-	/**
-	 * Height (ascent + descent) of text in the default console font.
-	 */
 	int mTextConsoleHeight;
 
 	/**
@@ -300,6 +300,7 @@ public class MoSyncThread extends Thread
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
 		mMoSyncFile = new MoSyncFile(this);
+		mMoSyncFont = new MoSyncFont(this);
 
 		//Do not access camera if it is not available
 		try
@@ -415,6 +416,15 @@ public class MoSyncThread extends Thread
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 		postEvent(event);
+	}
+
+	/**
+	 * Check if the Font API is available.
+	 * @return true if the API is available.
+	 */
+	public boolean isFontApiAvailable()
+	{
+		return mMoSyncFont != null;
 	}
 
 	/**
@@ -1022,12 +1032,12 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Gets the width and height in pixels of the string.
+	 * Gets the height in pixels of the string.
 	 *
 	 * Calculates the size pixels of this string, as it's gonna
 	 * be drawn to the screen.
 	 *
-	 * @param str The string which should be calculated.
+	 * @param str The string which the height should be calculated from.
 	 *
 	 * @return the height in pixels.
 	 */
@@ -1045,12 +1055,12 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Gets the width and height in pixels of the string.
+	 * Gets the height in pixels of the string.
 	 *
 	 * Calculates the size in pixels of this string, as it's gonna
 	 * be drawn to the screen.
 	 *
-	 * @param str The string which should be calculated.
+	 * @param str The string which the height should be calculated from.
 	 *
 	 * @return the height in pixels.
 	 */
@@ -1060,11 +1070,90 @@ public class MoSyncThread extends Thread
 
 		mPaint.getTextBounds(str, 0, str.length(), mTextSizeRect);
 
-		// Old code:
-		// return EXTENT(mTextSizeRect.width(), mTextSizeRect.height());
-
-		// The new implementation uses a constant text height.
 		return EXTENT(mTextSizeRect.width(), mTextConsoleHeight);
+	}
+
+	/**
+	* Returns a handle to one of the default fonts of the device, in the style and size you specify.
+	* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE].
+	* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC].
+	* \param 'size' The size of the font.
+	* \return The handle to the font, RES_FONT_NO_TYPE_STYLE_COMBINATION, or RES_FONT_INVALID_SIZE.
+	*/
+	int maFontLoadDefault(int type, int style, int size)
+	{
+		SYSLOG("maFontCreateDefault");
+
+		return mMoSyncFont.maFontLoadDefault(type, style, size);
+	}
+
+	/**
+	* Sets the font to be used with maDrawText and maDrawTextW, and returns the handle
+	* to the previous font
+	* \param 'font' an MAHandle for a font object
+	* \return The handle to the previous font, or RES_FONT_INVALID_HANDLE
+	*/
+	int maFontSetCurrent(int fontHandle)
+	{
+		SYSLOG("maFontSetCurrent");
+
+		return mMoSyncFont.maFontSetCurrent(fontHandle);
+	}
+
+	/**
+	* Returns the number of fonts that are available in the system
+	* \return Number of fonts
+	* \see maFontGetName
+	*/
+	int maFontGetCount()
+	{
+		SYSLOG("maFontGetCount");
+
+		return mMoSyncFont.maFontGetCount();
+	}
+
+	/**
+	* Copies the font postscript name of the given index to the buffer.
+	* You must have first called maFontGetCount() at least once before calling this function.
+	* \param 'index' A 0-based index to the font
+	* \param 'buffer' An empty char buffer that will receive the font name
+	* \param 'bufferLen' The size of the buffer
+	* \return The number of bytes copied (with terminating NULL) or RES_FONT_INDEX_OUT_OF_BOUNDS
+	* 		or RES_FONT_INSUFFICIENT_BUFFER or RES_FONT_LIST_NOT_INITIALIZED
+	* \see maFontGetCount, maFontLoadWithName
+	*/
+	int maFontGetName(int index, //String buf, int bufLen)
+			final int memBuffer,
+			final int memBufferSize)
+	{
+		SYSLOG("maFontGetName");
+
+		return mMoSyncFont.maFontGetName(index, memBuffer, memBufferSize);
+	}
+
+	/**
+	* Returns a handle to a font with the specific postscript name and size
+	* \param 'postScriptName' The postscript name of the font
+	* \param 'size' The size of the font
+	* \return Handle to the font, or RES_FONT_NAME_NONEXISTENT
+	*/
+	int maFontLoadWithName(final String postScriptName, int size)
+	{
+		SYSLOG("maFontLoadWithName");
+
+		return mMoSyncFont.maFontLoadWithName(postScriptName, size);
+	}
+
+	/**
+	* Deletes a loaded font
+	* \param 'font' A font handle
+	* \return RES_FONT_OK or RES_FONT_INVALID_HANDLE
+	*/
+	int maFontDelete(int fontHandle)
+	{
+		SYSLOG("maFontDelete");
+
+		return mMoSyncFont.maFontDelete(fontHandle);
 	}
 
 	/**
@@ -1077,7 +1166,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maDrawText");
 
-		mCanvas.drawText(str, left, top + mTextConsoleAscent, mPaint);
+		mCanvas.drawText( str, left, top+mTextConsoleHeight, mPaint);
 	}
 
 	/**
@@ -1090,7 +1179,7 @@ public class MoSyncThread extends Thread
 	{
 	 	SYSLOG("maDrawTextW");
 
-		mCanvas.drawText(str, left, top + mTextConsoleAscent, mPaint);
+		mCanvas.drawText(str, left, top+mTextConsoleHeight, mPaint);
 	}
 
 	/**
@@ -1115,6 +1204,7 @@ public class MoSyncThread extends Thread
 
 		try
 		{
+			// Start editing the pixels in the surface.
 			lockedCanvas = mMoSyncView.mSurfaceHolder.lockCanvas();
 			synchronized (mMoSyncView.mSurfaceHolder)
 			{
@@ -1157,7 +1247,6 @@ public class MoSyncThread extends Thread
 	/**
 	 * maResetBacklight
 	 */
-	void maResetBacklight()
 	{
 		SYSLOG("maResetBacklight");
 	}

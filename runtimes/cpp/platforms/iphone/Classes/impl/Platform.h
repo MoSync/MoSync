@@ -55,6 +55,7 @@ extern bool gRunning;
 class Surface {
 public:
 
+
 	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {
 		CGDataProviderRef dpr = CGImageGetDataProvider(image);
 		mDataRef = CGDataProviderCopyData(dpr);
