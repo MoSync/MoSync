@@ -3147,7 +3147,7 @@ interface MAAPI {
 			/// Invalid handle.
 			INVALID_HANDLE = -14;
 			// The requested field doesn't have a value.
-			NO_VALUE = -15;
+			EMPTY_FIELD = -15;
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.
