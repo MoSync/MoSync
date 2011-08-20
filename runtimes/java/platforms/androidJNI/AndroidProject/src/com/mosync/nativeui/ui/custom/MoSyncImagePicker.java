@@ -71,14 +71,14 @@ public class MoSyncImagePicker
 	 * Open a custom dialog with a gallery view and preview
 	 * for the selected item.
 	 */
-	public void loadGallery(final String title)
+	public void loadGallery()
 	{
 		// Initialize the selected image handle.
 		mImageHandle = -1;
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setCancelable(true);
-		builder.setTitle(title);
+		builder.setTitle("Image Picker");
 
 		builder.setNegativeButton("Cancel",
 		        new DialogInterface.OnClickListener() {

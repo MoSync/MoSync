@@ -44,7 +44,7 @@ public class MoSyncFont
 	/**
 	 * Internal handle for handling fonts.
 	 */
-	class MoSyncFontHandle
+	public class MoSyncFontHandle
 	{
 		/*
 		 * Constructor.
@@ -374,6 +374,20 @@ public class MoSyncFont
 		}
 
 		return "";// handle RES_FONT_LIST_NOT_INITIALIZED;
+	}
+
+	/**
+	 * Search in the list of fonts for a handle.
+	 * This is used when setting typeface to native ui widgets.
+	 * @param 'fontHandle' A font handle
+	 * @return The MoSyncFontHandle object that refers to that handle.
+	 */
+	public MoSyncFontHandle getMoSyncFont(int fontHandle)
+	{
+		MoSyncFontHandle currentFont = (MoSyncFontHandle)
+			mFonts.get(fontHandle);
+
+		return currentFont;
 	}
 
 	/************************ Class members ************************/

@@ -470,20 +470,17 @@ namespace Base
 		return ret;
 	}
 
-	int _maImagePickerOpen(const char* title, JNIEnv* jNIEnv, jobject jThis)
+	int _maImagePickerOpen(JNIEnv* jNIEnv, jobject jThis)
 	{
 		Base::gSyscall->VM_Yield();
 
-		jstring jstrTitle = jNIEnv->NewStringUTF(title);
-
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maImagePickerOpen", "(Ljava/lang/String;)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maImagePickerOpen", "()I");
 		if (methodID == 0) return 0;
-		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTitle);
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
 
 		jNIEnv->DeleteLocalRef(cls);
-		jNIEnv->DeleteLocalRef(jstrTitle);
 
 		return ret;
 	}

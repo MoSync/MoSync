@@ -18,7 +18,7 @@
 
 /**
  * @file MainScreen.cpp
- * @author Bogdan Iusco.
+ * @author Bogdan Iusco and Emma Tresanszki.
  */
 
 #include <conprint.h>
@@ -36,7 +36,8 @@
 MainScreen::MainScreen() :
 	Screen(),
 	mMainLayout(NULL),
-	mLabel(NULL)
+	mLabel(NULL),
+	nrFontsLabel(NULL)
 {
 	createMainLayout();
 
@@ -56,15 +57,44 @@ MainScreen::~MainScreen()
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
-	mMainLayout->setBackgroundColor(0xFF0000);
+	mMainLayout->setBackgroundColor(0x9BCD9B);
 	Screen::setMainWidget(mMainLayout);
 
 	mLabel = new Label();
 	mMainLayout->addChild(mLabel);
 
 	mLabel->setText("this is a label! 2 this is a label! 3 this is a label! 4 this is a label!");
+	mLabel->setFontColor(0xFF0000);
 	mLabel->setWidth(50);
 	mLabel->setMaxNumberOfLines(2);
 	int result = mLabel->getMaxNumberOfLines();
 	printf("result getMaxNumberOfLines = %d", result);
+
+	// Print number of available fonts.
+	int fontsCount = maFontGetCount();
+	nrFontsLabel = new Label();
+
+	nrFontsLabel->setText(MAUtil::integerToString(fontsCount) + " fonts available.");
+	nrFontsLabel->setFontColor(0xFF0000);
+	mMainLayout->addChild(nrFontsLabel);
+
+	// Get the first font
+	char buf[256];
+	maFontGetName(0, buf, 256);
+	Label* fontLoadedName = new Label();
+	// Print the name of the font
+	fontLoadedName->setText(buf);
+	fontLoadedName->setFontColor(0xFF0000);
+	mMainLayout->addChild(fontLoadedName);
+
+	// Load the font with size 10 and get a handle.
+	int fontHandle = maFontLoadWithName(buf, 10);
+
+	// Set the handle to a label
+	Label* testLabel1 = new Label();
+	testLabel1->setText("Test for this font!");
+	testLabel1->setFontColor(0xFF0000);
+	testLabel1->setFont(fontHandle);
+	mMainLayout->addChild(testLabel1);
+
 }

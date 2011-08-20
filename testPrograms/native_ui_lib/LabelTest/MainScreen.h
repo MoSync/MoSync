@@ -65,6 +65,7 @@ private:
 	VerticalLayout* mMainLayout;
 
 	Label* mLabel;
+	Label* nrFontsLabel;
 };
 
 

@@ -96,6 +96,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 
+import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.generated.IX_OPENGL_ES;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
@@ -1154,6 +1155,16 @@ public class MoSyncThread extends Thread
 		SYSLOG("maFontDelete");
 
 		return mMoSyncFont.maFontDelete(fontHandle);
+	}
+
+	/**
+	 * Get a font in the list based on key.
+	 * @param fontHandle A font handle.
+	 * @return The font handle object.
+	 */
+	public MoSyncFontHandle getMoSyncFont(int fontHandle)
+	{
+		return mMoSyncFont.getMoSyncFont(fontHandle);
 	}
 
 	/**
@@ -2532,9 +2543,9 @@ public class MoSyncThread extends Thread
 	 * Internal wrapper for maImagePickerOpen that runs
 	 * the call in the UI thread.
 	 */
-	int maImagePickerOpen(final String title)
+	int maImagePickerOpen()
 	{
-		return mMoSyncNativeUI.maImagePickerOpen(title);
+		return mMoSyncNativeUI.maImagePickerOpen();
 	}
 
 	/**

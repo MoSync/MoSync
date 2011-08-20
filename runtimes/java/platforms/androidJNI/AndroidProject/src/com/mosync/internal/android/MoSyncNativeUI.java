@@ -60,7 +60,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		Hashtable<Integer, ImageCache> imageResources)
 	{
 		mMoSyncThread = thread;
-		mNativeUI = new NativeUI(getActivity());
+		mNativeUI = new NativeUI(mMoSyncThread, getActivity());
 		mNativeUI.setRootViewReplacedListener(this);
 		NativeUI.setImageTable(imageResources);
 	}
@@ -366,7 +366,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	 * Internal wrapper for maImagePickerOpen that runs
 	 * the call in the UI thread.
 	 */
-	public int maImagePickerOpen(final String title)
+	public int maImagePickerOpen()
 	{
 		if ( mImagePicker == null )
 		{
@@ -376,7 +376,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		getActivity().runOnUiThread(new Runnable() {
 			public void run()
 			{
-				mImagePicker.loadGallery(title);
+				mImagePicker.loadGallery();
 			}
 		});
 

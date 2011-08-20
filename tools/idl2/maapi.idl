@@ -1425,7 +1425,7 @@ interface MAAPI {
 				/**
 				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
 				*/
-				int imagePickerItemHandle;
+				MAHandle imagePickerItem;
 			} imagePicker;
 
 			/**
@@ -4553,6 +4553,28 @@ group WidgetAPI "Widget API" {
 		FONT_SIZE = "fontSize";
 
 		/**
+		* @brief Sets the typeface and style in which the text should be displayed.
+		*
+		* @validvalue A font handle received from loading fonts using
+		* #maFontGetName and #maFontLoadWithName syscalls.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   int nrFonts = maFontGetCount();
+		*    char buf[256];
+		*    // Get first font name.
+		*    maFontGetName(1, buf, 256);
+		*    // Load that font for size 10.
+		*    int fontHandle = maFontLoadWithName(buf, 10);
+		*    // Set that font to the label.
+		*	maWidgetSetProperty(labelHandle, MAW_LABEL_FONT_HANDLE, toString(fontHandle));
+		* \endcode
+		*/
+		FONT_HANDLE = "fontHandle";
+
+		/**
 		* @brief Sets the maximum number of lines used for rendering text.
 		* To remove any maximum limit, and use as many lines as needed, set the value of this property to 0.
 		*
@@ -6567,10 +6589,9 @@ group CameraFunctions "Camera Functions" {
 		/**
 		* Displays an image picker to the user.
 		* It's display depends on the platform.
-		* \param title The title of the dialog shown.
 		* Note: when a selection is made a #MAW_EVENT_TYPE_IMAGE_PICKER is sent.
 		*/
-		void maImagePickerOpen(in MAString title);
+		void maImagePickerOpen();
 
 		constset int SENSOR_TYPE_ {
 			// A constant describing an accelerometer sensor type.
