@@ -1,0 +1,3 @@
+.res RES_IMAGE
+.ubin
+.include "image.png"
