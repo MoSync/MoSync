@@ -11,6 +11,7 @@ import com.mosync.internal.android.MoSyncThread;
 import android.app.Activity;
 import android.content.ContentResolver;
 import android.database.Cursor;
+import android.provider.BaseColumns;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Event;
@@ -55,7 +56,7 @@ public class PIM {
 			Organization.LABEL, Organization.IS_PRIMARY },
 		{ Website._ID, Website.URL, Website.TYPE, Website.LABEL, Website.IS_PRIMARY },
 		{ Im._ID, Im.DATA, Im.PROTOCOL, Im.CUSTOM_PROTOCOL,
-			Im. TYPE, Im.LABEL, Im.IS_PRIMARY },
+			Im.TYPE, Im.LABEL, Im.IS_PRIMARY },
 		{ Relation._ID, Relation.NAME, Relation.TYPE, Relation.LABEL, Relation.IS_PRIMARY },
 		{ Organization._ID, Organization.DEPARTMENT, Organization.JOB_DESCRIPTION,
 			Organization.SYMBOL, Organization.PHONETIC_NAME, Organization.OFFICE_LOCATION,
@@ -64,7 +65,7 @@ public class PIM {
 
 	final static String[] PIMFieldsTypes =
 	{
-		ContactsContract.Contacts._ID,
+		ContactsContract.Contacts.LOOKUP_KEY,
 		StructuredPostal.CONTENT_ITEM_TYPE,
 		Event.CONTENT_ITEM_TYPE,
 		Email.CONTENT_ITEM_TYPE,
@@ -102,8 +103,7 @@ public class PIM {
 	private final static int PIM_ERROR_NO_LABEL = -7;
 	private final static int PIM_ERROR_NO_VALUE = -8;
 	private final static int PIM_ERROR_BUFFER_TOO_SMALL = -9;
-
-	private final static int BUFFER_SIZE = 255;
+	private final static int PIM_ERROR_INVALID_FIELD_COMPONENTS = -10;
 
 	/*
 	 * PIM list
@@ -310,7 +310,7 @@ public class PIM {
 		}
 
 		PIMField pimField = null;
-		if ( (pimField = pimItem.getField(field)) == null )
+		if ( (pimField = pimItem.getField(field)) == null ) //fleu TODO empty field
 		{
 			return PIM_ERROR_INVALID_FIELD;
 		}
@@ -366,7 +366,7 @@ public class PIM {
 		}
 
 		pimField.setCustomLabel(index, buffer);
-		//pimItem.updateField(getContentResolver(), contactId, PIMFieldsColumns[i], PIMFieldsTypes[i]);
+		pimItem.updateField(getContentResolver(), BaseColumns._ID, pimField.getId(index), "data3", buffer);
 
 		return PIM_ERROR_NONE;
 	}
@@ -391,7 +391,7 @@ public class PIM {
 		}
 
 		String buffer = pimField.getCustomLabel(index);
-		buffer = "buf";
+
 		if (buffer == null)
 		{
 			return PIM_ERROR_NO_LABEL;
@@ -483,17 +483,91 @@ public class PIM {
 
 	int maPimItemSetValue(int item, int field, int buffPointer, int buffSize, int index, int attributes)
 	{
-		return 0;
+		PIMItem pimItem = null;
+		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
+		{
+			return PIM_ERROR_INVALID_ITEM_HANDLE;
+		}
+
+		PIMField pimField = null;
+		if ( (pimField = pimItem.getField(field)) == null )
+		{
+			return PIM_ERROR_INVALID_FIELD;
+		}
+
+		if ( (index < 0) || (index >= pimField.length()) )
+		{
+			return PIM_ERROR_INVALID_INDEX;
+		}
+
+		String buffer = readStringFromMemory(buffPointer, buffSize);
+		if (buffer.length() == 0)
+		{
+			return PIM_ERROR_NO_VALUE;
+		}
+
+		if (pimField.setData(index, buffer) < 0)
+		{
+			return PIM_ERROR_INVALID_FIELD_COMPONENTS;
+		}
+
+		pimField.setAttribute(index, attributes);
+
+		return PIM_ERROR_NONE;
 	}
 
 	int maPimItemAddValue(int item, int field, int buffPointer, int buffSize, int attributes)
 	{
-		return 0;
+		PIMItem pimItem = null;
+		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
+		{
+			return PIM_ERROR_INVALID_ITEM_HANDLE;
+		}
+
+		PIMField pimField = null;
+		if ( (pimField = pimItem.getField(field)) == null )
+		{
+			return PIM_ERROR_INVALID_FIELD;
+		}
+
+		String buffer = readStringFromMemory(buffPointer, buffSize);
+		if (buffer.length() == 0)
+		{
+			return PIM_ERROR_NO_VALUE;
+		}
+		int index = pimField.addData(buffer);
+		if ( index < 0)
+		{
+			return PIM_ERROR_INVALID_FIELD_COMPONENTS;
+		}
+
+		pimField.setAttribute(index, attributes);
+
+		return PIM_ERROR_NONE;
 	}
 
 	int maPimItemRemoveValue(int item, int field, int index)
 	{
-		return 0;
+		PIMItem pimItem = null;
+		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
+		{
+			return PIM_ERROR_INVALID_ITEM_HANDLE;
+		}
+
+		PIMField pimField = null;
+		if ( (pimField = pimItem.getField(field)) == null )
+		{
+			return PIM_ERROR_INVALID_FIELD;
+		}
+
+		if ( (index < 0) || (index >= pimField.length()) )
+		{
+			return PIM_ERROR_INVALID_INDEX;
+		}
+
+		pimField.remove(index);
+
+		return PIM_ERROR_NONE;
 	}
 
 	int maPimItemClose(int item)
@@ -503,11 +577,31 @@ public class PIM {
 
 	int maPimItemCreate(int list)
 	{
-		return 0;
+		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
+		{
+			return PIM_ERROR_INVALID_LIST_HANDLE;
+		}
+
+		PIMItem p = new PIMItem();
+		mPIMItems.put(mResourceIndex, p);
+
+		return mResourceIndex++;
 	}
 
 	int maPimItemRemove(int list, int item)
 	{
+		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
+		{
+			return PIM_ERROR_INVALID_LIST_HANDLE;
+		}
+
+		if ( (item < 0) || (mPIMItems.get(item) == null) )
+		{
+			return PIM_ERROR_INVALID_ITEM_HANDLE;
+		}
+
+		mPIMItems.remove(item);
+
 		return 0;
 	}
 }
