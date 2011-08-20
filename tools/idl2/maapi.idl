@@ -1727,6 +1727,12 @@ interface MAAPI {
 			* \brief Indicates that an invalid size was passed.
 			*/
 			INVALID_SIZE = -7;
+
+			/**
+			* \brief Indicates that the font cannot be deleted because it is in use.
+			*  maFontDelete(handle)  fails with this return code.
+			*/
+			DELETE_DENIED = -8;
 		}
 
 		/**
@@ -1776,7 +1782,7 @@ interface MAAPI {
 		/**
 		* Deletes a loaded font
 		* \param 'font' A font handle
-		* \return RES_FONT_OK or RES_FONT_INVALID_HANDLE
+		* \return RES_FONT_OK, RES_FONT_INVALID_HANDLE, or RES_FONT_DELETE_DENIED.
 		*/
 		int maFontDelete(in MAHandle font);
 

@@ -1122,7 +1122,7 @@ public class MoSyncThread extends Thread
 	* 		or RES_FONT_INSUFFICIENT_BUFFER or RES_FONT_LIST_NOT_INITIALIZED
 	* \see maFontGetCount, maFontLoadWithName
 	*/
-	int maFontGetName(int index, //String buf, int bufLen)
+	int maFontGetName(int index,
 			final int memBuffer,
 			final int memBufferSize)
 	{
@@ -1147,7 +1147,7 @@ public class MoSyncThread extends Thread
 	/**
 	* Deletes a loaded font
 	* \param 'font' A font handle
-	* \return RES_FONT_OK or RES_FONT_INVALID_HANDLE
+	* \return RES_FONT_OK, RES_FONT_INVALID_HANDLE, or RES_FONT_DELETE_DENIED.
 	*/
 	int maFontDelete(int fontHandle)
 	{
