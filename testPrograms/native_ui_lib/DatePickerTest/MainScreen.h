@@ -88,6 +88,7 @@ private:
      * @param button The button object that generated the event.
      */
     virtual void buttonClicked(Widget* button);
+
 private:
 	/**
 	 * Main layout.
@@ -95,8 +96,11 @@ private:
 	VerticalLayout* mMainLayout;
 	Button* mSetDate;
 	Button* mGetDate;
+	Label*  mDisplayedDate;
 	Button* mSetMaxDate;
 	Button* mGetMaxDate;
+	Label*  mGetMaxDateValue;
+	Label*  mGetMinDateValue;
 	Button* mSetMinDate;
 	Button* mGetMinDate;
 

@@ -38,8 +38,11 @@ MainScreen::MainScreen() :
 	mMainLayout(NULL),
 	mSetDate(NULL),
 	mGetDate(NULL),
+	mDisplayedDate(NULL),
 	mSetMaxDate(NULL),
 	mGetMaxDate(NULL),
+	mGetMaxDateValue(NULL),
+	mGetMinDateValue(NULL),
 	mSetMinDate(NULL),
 	mGetMinDate(NULL),
 	mDatePicker(NULL)
@@ -83,11 +86,15 @@ void MainScreen::createMainLayout() {
 	mDatePicker->fillSpaceHorizontally();
 	mMainLayout->addChild(mDatePicker);
 
+    mDisplayedDate = new Label();
+    mDisplayedDate->setText("Aug 17 2011");
+    mMainLayout->addChild(mDisplayedDate);
+
 	HorizontalLayout* layout1 = new HorizontalLayout();
 	mMainLayout->addChild(layout1);
 
 	mSetDate = new Button();
-	mSetDate->setText("Set Date");
+	mSetDate->setText("Reset Date Aug-17-2011");
 	layout1->addChild(mSetDate);
 
     mGetDate = new Button();
@@ -105,6 +112,10 @@ void MainScreen::createMainLayout() {
     mGetMaxDate->setText("Get Max Date");
     layout2->addChild(mGetMaxDate);
 
+    mGetMaxDateValue = new Label();
+    mGetMaxDateValue->setText("Max:");
+    layout2->addChild(mGetMaxDateValue);
+
     HorizontalLayout* layout3 = new HorizontalLayout();
     mMainLayout->addChild(layout3);
 
@@ -115,6 +126,10 @@ void MainScreen::createMainLayout() {
     mGetMinDate = new Button();
     mGetMinDate->setText("Get Min Date");
     layout3->addChild(mGetMinDate);
+
+    mGetMinDateValue = new Label();
+    mGetMinDateValue->setText("Min:");
+    layout3->addChild(mGetMinDateValue);
 }
 
 /**
@@ -128,6 +143,11 @@ void MainScreen::datePickerValueChanged(
 {
     if (datePicker == mDatePicker)
     {
+		mDisplayedDate->setText(
+			MAUtil::integerToString(selectedDate.month)+ "-" +
+			MAUtil::integerToString(selectedDate.day) + "-" +
+			MAUtil::integerToString(selectedDate.year));
+
         printf("mDatePicker value changed : %d-%d-%d",
             selectedDate.day,
             selectedDate.month,
@@ -152,9 +172,11 @@ void MainScreen::buttonClicked(Widget* button)
     }
     else if (button == mGetDate)
     {
-        Date date = mDatePicker->getDate();
-        printf("get date : %d-%d-%d", date.day, date.month, date.year);
-    }
+		Date theDate = mDatePicker->getDate();
+		mDisplayedDate->setText(MAUtil::integerToString(theDate.month)+ "-" +
+			MAUtil::integerToString(theDate.day) + "-" + MAUtil::integerToString(theDate.year));
+		printf("get date : %d-%d-%d", theDate.day, theDate.month, theDate.year);
+	}
     else if (button == mSetMaxDate)
     {
         Date date;
@@ -165,8 +187,10 @@ void MainScreen::buttonClicked(Widget* button)
     }
     else if (button == mGetMaxDate)
     {
-        Date date = mDatePicker->getMaxDate();
-        printf("get max date : %d-%d-%d", date.day, date.month, date.year);
+        Date theDate = mDatePicker->getMaxDate();
+        mGetMaxDateValue->setText(MAUtil::integerToString(theDate.month)+ "-" +
+		MAUtil::integerToString(theDate.day) + "-" + MAUtil::integerToString(theDate.year));
+        printf("get max date : %d-%d-%d", theDate.day, theDate.month, theDate.year);
     }
     else if (button == mSetMinDate)
     {
@@ -178,7 +202,9 @@ void MainScreen::buttonClicked(Widget* button)
     }
     else if (button == mGetMinDate)
     {
-        Date date = mDatePicker->getMinDate();
-        printf("get min date : %d-%d-%d", date.day, date.month, date.year);
+        Date theDate = mDatePicker->getMinDate();
+        mGetMinDateValue->setText(MAUtil::integerToString(theDate.month)+ "-" +
+		MAUtil::integerToString(theDate.day) + "-" + MAUtil::integerToString(theDate.year));
+        printf("get min date : %d-%d-%d", theDate.day, theDate.month, theDate.year);
     }
 }
