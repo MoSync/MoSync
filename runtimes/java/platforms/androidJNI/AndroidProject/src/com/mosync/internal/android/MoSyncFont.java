@@ -236,7 +236,7 @@ public class MoSyncFont
 			}
 		} catch (IOException e)
 		{
-			Log.e("MoSync", "No fonts in assets");
+			Log.e("MoSync", "maFontGetCount No fonts in assets");
 		}
 
 		return mFontNames.size();

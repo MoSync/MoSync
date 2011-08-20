@@ -51,8 +51,7 @@ MainScreen::MainScreen() :
 MainScreen::~MainScreen()
 {
     mCheckBoxButton->removeButtonListener(this);
-    mCheckBox->addCheckBoxListener(this);
-	delete mMainLayout;
+    mCheckBox->removeCheckBoxListener(this);
 }
 
 /**
@@ -80,6 +79,7 @@ void MainScreen::checkBoxStateChanged(
 {
     if (checkBox == mCheckBox)
     {
+		mCheckBoxState = state;
         if (state)
         {
             printf("check box state = true");

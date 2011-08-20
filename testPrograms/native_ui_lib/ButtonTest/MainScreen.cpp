@@ -49,7 +49,6 @@ MainScreen::~MainScreen()
 {
 	mButton->removeEventListener(this);
 	mButton->removeButtonListener(this);
-	delete mMainLayout;
 }
 
 /**
