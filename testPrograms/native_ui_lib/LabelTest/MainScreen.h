@@ -66,6 +66,8 @@ private:
 
 	Label* mLabel;
 	Label* nrFontsLabel;
+	Label* fontLoadedName;
+	Label* testFontLabel;
 };
 
 

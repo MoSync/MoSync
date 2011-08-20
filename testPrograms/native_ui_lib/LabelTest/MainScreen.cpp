@@ -37,7 +37,9 @@ MainScreen::MainScreen() :
 	Screen(),
 	mMainLayout(NULL),
 	mLabel(NULL),
-	nrFontsLabel(NULL)
+	nrFontsLabel(NULL),
+	fontLoadedName(NULL),
+	testFontLabel(NULL)
 {
 	createMainLayout();
 
@@ -48,7 +50,6 @@ MainScreen::MainScreen() :
  */
 MainScreen::~MainScreen()
 {
-	delete mMainLayout;
 }
 
 /**
@@ -81,7 +82,7 @@ void MainScreen::createMainLayout() {
 	// Get the first font
 	char buf[256];
 	maFontGetName(0, buf, 256);
-	Label* fontLoadedName = new Label();
+	fontLoadedName = new Label();
 	// Print the name of the font
 	fontLoadedName->setText(buf);
 	fontLoadedName->setFontColor(0xFF0000);
@@ -91,10 +92,10 @@ void MainScreen::createMainLayout() {
 	int fontHandle = maFontLoadWithName(buf, 10);
 
 	// Set the handle to a label
-	Label* testLabel1 = new Label();
-	testLabel1->setText("Test for this font!");
-	testLabel1->setFontColor(0xFF0000);
-	testLabel1->setFont(fontHandle);
-	mMainLayout->addChild(testLabel1);
+	testFontLabel = new Label();
+	testFontLabel->setText("Test for this font!");
+	testFontLabel->setFontColor(0xFF0000);
+	testFontLabel->setFont(fontHandle);
+	mMainLayout->addChild(testFontLabel);
 
 }
