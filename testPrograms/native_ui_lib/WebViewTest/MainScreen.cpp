@@ -206,6 +206,26 @@ void MainScreen::webViewContentLoading(
  */
  void MainScreen::buttonPressed(Widget* button)
 {
+
+}
+
+/**
+ * This method is called when there is an touch-up event for
+ * a button.
+ * Only for iphone platform.
+ * @param button The button object that generated the event.
+ */
+ void MainScreen::buttonReleased(Widget* button)
+{
+}
+
+/**
+ * This method is called if the touch-up event was inside the
+ * bounds of the button.
+ * @param button The button object that generated the event.
+ */
+ void MainScreen::buttonClicked(Widget* button)
+{
 	 if( mSetSoftHook == button)
 	 {
 		 mWebView->setSoftHook(".*");
@@ -244,24 +264,4 @@ void MainScreen::webViewContentLoading(
 				mEnableHorizontalScroll->setText("Disable HorizontalScroll");
 			}
 	 }
-}
-
-/**
- * This method is called when there is an touch-up event for
- * a button.
- * Only for iphone platform.
- * @param button The button object that generated the event.
- */
- void MainScreen::buttonReleased(Widget* button)
-{
-}
-
-/**
- * This method is called if the touch-up event was inside the
- * bounds of the button.
- * @param button The button object that generated the event.
- */
- void MainScreen::buttonClicked(Widget* button)
-{
-
 }
