@@ -53,6 +53,7 @@
 		431869B113F690C90051D97A /* MoSyncSensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 431869AE13F690C90051D97A /* MoSyncSensor.mm */; };
 		431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; };
 		431869B413F691B70051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; };
+		43D3B01613FFC82E00B3DE23 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
 		43D8046C13EFBCB200183387 /* ActivityIndicatorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */; };
 		43D8046D13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */; };
 		43D8046E13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */; };
@@ -1178,6 +1179,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43D3B01613FFC82E00B3DE23 /* CameraConfirgurator.mm in Sources */,
 				858B44BB12E7B1060058DBFC /* log.cpp in Sources */,
 				858B3FEC12E67D090058DBFC /* NSObjectExpanded.m in Sources */,
 				858B3FF312E67D090058DBFC /* MoSyncGLView.mm in Sources */,
