@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.ColorConverter;
@@ -49,6 +50,8 @@ public class ButtonWidget extends LabelWidget
 	@Override
 	public boolean setProperty(String property, String value) throws PropertyConversionException, InvalidPropertyValueException
 	{
+		Button button = (Button) getView( );
+
 		if( property.equals( IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR ) )
 		{
 			// Make sure bad values get caught, so that the API is consistent.
@@ -56,11 +59,15 @@ public class ButtonWidget extends LabelWidget
 			
 			// Ignore the background color of a button, since Android
 			// buttons do not have anything behind the button foreground.
-			return true;
+		}
+		else if( property.equals( IX_WIDGET.MAW_BUTTON_TEXT ) )
+		{
+			button.setText( value );
 		}
 		else
 		{
 			return super.setProperty( property, value );
 		}
+		return true;
 	}
 }
