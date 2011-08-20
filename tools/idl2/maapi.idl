@@ -2844,7 +2844,7 @@ interface MAAPI {
 			NOTE = 108;
 			/// #MA_PIM_TYPE_STRING. Organization/company name.
 			ORG = 109;
-			/// #MA_PIM_TYPE_BINARY. Connected with PHOTO_URL.
+			/// #MA_PIM_TYPE_INT. Connected with PHOTO_URL.
 			PHOTO = 110;
 			/// #MA_PIM_TYPE_STRING. Connected with PHOTO.
 			PHOTO_URL = 111;
@@ -2853,7 +2853,6 @@ interface MAAPI {
 			/// #MA_PIM_TYPE_STRING. Connected with PUBLIC_KEY.
 			PUBLIC_KEY_STRING = 113;
 			/// #MA_PIM_TYPE_DATE.
-
 			REVISION = 114;
 			/// #MA_PIM_TYPE_STRING. Telephone number.
 			TEL = 115;
@@ -2864,21 +2863,13 @@ interface MAAPI {
 			/// #MA_PIM_TYPE_STRING. Uniform Resource Locator associated with the contact.
 			URL = 118;
 			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing an IM address .
-
 			/// Has \link #MA_PIM_CONTACT_IM_USERNAME MA_PIM_CONTACT_IM \endlink indices.
-
 			IM = 119;
-
 			/// #MA_PIM_TYPE_STRING. A data kind representing a relation.
-
 			RELATION = 120;
-
 			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing a organization.
-
 			/// Has \link #MA_PIM_CONTACT_ORGANIZATION_NAME MA_PIM_CONTACT_ORGANIZATION \endlink indices.
-
 			ORG_INFO = 121;
-
 		}
 
 		constset int MA_PIM_CONTACT_ADDR_ {
@@ -2969,9 +2960,7 @@ interface MAAPI {
 			NETMEETING = "Netmeeting";
 		}
 
-
 		// deprecated
-
 		constset int MA_PIM_ATTR_ {
 			/// The value describes an assistant.
 			ASST = 1;
@@ -2993,10 +2982,8 @@ interface MAAPI {
 			PREFERRED = 128;
 			/// The value describes an SMS number?
 			SMS = 256;
-
 			/// The value describes a work phone number.
 			WORK = 512;
-
 		}
 
 		constset int MA_PIM_ATTR_ADDR_ {
@@ -3129,68 +3116,38 @@ interface MAAPI {
 
 		constset int MA_PIM_ERR_ {
 			/// No error. The operation completed successfully.
-
 			NONE = 0;
-
 			/// This function is unavailable on the current platform.
-
 			UNAVAILABLE = -1;
-
 			/// The native database's data type for the given field did not match the MoSync API.
-
 			NATIVE_TYPE_MISMATCH = -2;
-
 			/// The field type is not supported.
-
 			FIELD_UNSUPPORTED = -3;
-
 			/// The field is read-only.
-
 			READ_ONLY = -4;
-
 			/// The field/attribute combination is not supported.
-
 			COMBO_UNSUPPORTED = -5;
-
 			/// More values in this field is not supported.
-
 			FIELD_COUNT_MAX = -6;
-
 			/// The value does not have a custom label.
-
 			NO_LABEL = -7;
-
 			/// The values's attribute is not set to custom.
-
 			CUSTOM_ATTRIBUTE = -8;
-
 			/// The given index is not valid.
-
 			/// This value is returned by maPimItemGetField(), maPimItemSetValue().
-
 			INVALID_INDEX = -9;
-
 			///
-
 			LABEL_NOT_SET = -10;
-
 			/// The specified pim list is not available on the current platform.
-
 			UNAVAILABLE_LIST = -11;
-
 			/// The specified list is not opend. Call maPimListOpen() first.
-
 			LIST_NOT_OPENED = -12;
-
 			/// The operation is not allowed by the Address Book database.
-
 			OPERATION_NOT_PERMITTED = -13;
-
 			/// Invalid handle.
-
 			INVALID_HANDLE = -14;
-
-
+			// The requested field doesn't have a value.
+			EMPTY_FIELD = -15;
 		}
 
 		/** Opens a PimList. Use maPimListNext() to open the list's items.
@@ -3235,9 +3192,7 @@ interface MAAPI {
 		/** Returns the bitmask of attributes for the specified value in a field and item.
 		* Panics on field+index combinations that don't exist in this item.
 		* On iPhone platform in case of error one of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink
-
 		* constants is returned.
-
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
@@ -3257,7 +3212,6 @@ interface MAAPI {
 		*/
 		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
 
-
 		/** Retrieves the custom label for a value in a field and item,
 		* if the value has a custom label.
 		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
@@ -3273,7 +3227,6 @@ interface MAAPI {
 		*/
 		int maPimItemGetLabel(in MA_PIM_ARGS args, in int index);
 
-
 		/** Returns one of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants,
 		* or \< 0 if the field does not exist in the list.
 		* \param list Opened by maPimListOpen().
@@ -3284,7 +3237,6 @@ interface MAAPI {
 		/**
 		* \brief Arguments for PIM functions.
 		*/
-
 		struct MA_PIM_ARGS {
 			/// Opened by maPimListNext().
 			MAHandle item;
