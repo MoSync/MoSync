@@ -57,6 +57,22 @@ namespace NativeUI
         virtual ~ImageButton();
 
         /**
+         * Set the text displayed by the widget.
+         * Note: It is not available on Android, as native
+         * image buttons do not have text attached.
+         * @param text The given text.
+         */
+        virtual void setText(const MAUtil::String& text);
+
+        /**
+         * Get the text displayed by the widget.
+         * Note: It is not available on Android, as native
+         * image buttons do not have text attached.
+         * @return The text displayed by the widget.
+         */
+        virtual MAUtil::String getText() const;
+
+        /**
          * Set the foreground image of the button. This won't be scaled at all.
          * @param image MoSync handle to an uncompressed image resource.
          * @return Any of the following result codes:

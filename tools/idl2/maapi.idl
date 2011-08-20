@@ -4663,7 +4663,7 @@ group WidgetAPI "Widget API" {
 	constset MAString MAW_IMAGE_BUTTON_ {
 		/**
 		* @brief Sets or gets the text that is displayed in the label.
-		*
+		* Note: It is not available on Android, as native image buttons do not have text attached.
 		* @validvalue A null-terminated string.
 		*
 		* @setandget

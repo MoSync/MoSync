@@ -70,4 +70,21 @@ public class ButtonWidget extends LabelWidget
 		}
 		return true;
 	}
+
+	/**
+	 * @see Widget.getProperty.
+	 */
+	@Override
+	public String getProperty(String property)
+	{
+		Button button = (Button) getView( );
+		if( property.equals( IX_WIDGET.MAW_BUTTON_TEXT ) )
+		{
+			return button.getText().toString();
+		}
+		else
+		{
+			return super.getProperty( property );
+		}
+	}
 }
