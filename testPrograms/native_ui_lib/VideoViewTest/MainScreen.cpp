@@ -89,12 +89,14 @@ void MainScreen::createMainLayout() {
 	mMainLayout->addChild(mVideoView);
 
 	mEditBox = new EditBox();
-	mEditBox->setText("0");
+	mEditBox->setText("http://www.jhepple.com/SampleMovies/niceday.wmv");
 	mEditBox->fillSpaceHorizontally();
 	mMainLayout->addChild(mEditBox);
 
 	mSetUrl = new Button();
 	mSetUrl->setText("Set url");
+	// Android example link: "http://www.jhepple.com/SampleMovies/niceday.wmv"
+	// iOS example link: "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8"
 	mMainLayout->addChild(mSetUrl);
 
     mPlay = new Button();
@@ -135,7 +137,7 @@ void MainScreen::buttonClicked(Widget* button)
 {
     if (button == mSetUrl)
     {
-        mVideoView->setURL("http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8");
+        mVideoView->setURL(mEditBox->getText());
     }
     else if (button == mPlay)
     {
