@@ -3125,19 +3125,19 @@ interface MAAPI {
 			FIELD_UNSUPPORTED = -3;
 			/// The field is read-only.
 			READ_ONLY = -4;
+			/// The field is read-only.
+			WRITE_ONLY = -5;
 			/// The field/attribute combination is not supported.
-			COMBO_UNSUPPORTED = -5;
+			COMBO_UNSUPPORTED = -6;
 			/// More values in this field is not supported.
-			FIELD_COUNT_MAX = -6;
+			FIELD_COUNT_MAX = -7;
 			/// The value does not have a custom label.
-			NO_LABEL = -7;
+			NO_LABEL = -8;
 			/// The values's attribute is not set to custom.
-			CUSTOM_ATTRIBUTE = -8;
+			CUSTOM_ATTRIBUTE = -9;
 			/// The given index is not valid.
 			/// This value is returned by maPimItemGetField(), maPimItemSetValue().
-			INVALID_INDEX = -9;
-			///
-			LABEL_NOT_SET = -10;
+			INVALID_INDEX = -10;
 			/// The specified pim list is not available on the current platform.
 			UNAVAILABLE_LIST = -11;
 			/// The specified list is not opend. Call maPimListOpen() first.

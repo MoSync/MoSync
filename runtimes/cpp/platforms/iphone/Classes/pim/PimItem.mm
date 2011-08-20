@@ -200,6 +200,7 @@
 
 /**
  * Gets a field's value at a given index.
+ * Does not check if field is supported or write-only.
  * @param args Common arguments.
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
@@ -338,6 +339,7 @@
 
 /**
  * Adds a value to a specified field.
+ * Does not check if the field is supported or read-only.
  * @param args Common arguments.
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.

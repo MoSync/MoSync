@@ -100,6 +100,71 @@
 }
 
 /**
+ * Gets a field's value at a given index.
+ * Checks if field is supported or write-only.
+ * @param args Common arguments.
+ *             The item's handle is stored in args.item.
+ *             The field's ID is stored in args.field.
+ *             The field's value will be stored in args.buf.
+ *             The maximum size of the value(in bytes) is stored in args.bufSize.
+ * @param index Field's value index.
+ * @return The number of bytes occupied by the value. If the number is greater than
+ *         args.bufSize the value was not written into args.buf.
+ *         In case of error the function returns one of the MA_PIM_ERR constants.
+ */
+-(int) getValue:(const MA_PIM_ARGS*) args
+     indexValue:(const int) index
+{
+    int fieldID = args->field;
+    if (![self isFieldSupported:fieldID])
+    {
+        return MA_PIM_ERR_FIELD_UNSUPPORTED;
+    }
+    if ([self isFieldWriteOnly:fieldID])
+    {
+        return MA_PIM_ERR_READ_ONLY;
+    }
+
+    NSString* key = [[NSString alloc] initWithFormat:@"%d", fieldID];
+    PimFieldItem* fieldItem = [mFieldsDictionary objectForKey:key];
+    [key release];
+    if (nil == fieldItem)
+    {
+        return MA_PIM_ERR_EMPTY_FIELD;
+    }
+
+    return [super getValue:args indexValue:index];
+}
+
+/**
+ * Adds a value to a specified field.
+ * Checks if the field is supported or read-only.
+ * @param args Common arguments.
+ *             The item's handle is stored in args.item.
+ *             The field's ID is stored in args.field.
+ *             The field's value is stored in args.buf.
+ *             The size of the value(in bytes) is stored in args.bufSize.
+ * @param attribute Field's value attribute.
+ * @return  New value's index in field, or one of the MA_PIM_ERR constants
+ *          in case of error.
+ */
+-(int) addValue:(const MA_PIM_ARGS*) args
+  withAttribute:(const int) attribute
+{
+    int fieldID = args->field;
+    if (![self isFieldSupported:fieldID])
+    {
+        return MA_PIM_ERR_FIELD_UNSUPPORTED;
+    }
+    if ([self isFieldReadOnly:fieldID])
+    {
+        return MA_PIM_ERR_READ_ONLY;
+    }
+
+    return [super addValue:args withAttribute:attribute];
+}
+
+/**
  * Write a given field into record.
  * @param field The specified field.
  * @return One of MA_PIM_ERR constants.
@@ -1111,6 +1176,60 @@
     }
 
     return returnValue;
+}
+
+/**
+ * Checks if the field is supported on iphone platform.
+ * @param fieldID One of the MA_PIM_FIELD_CONTACT constants.
+ * @return True is the field is supported, false otherwise.
+ */
+-(bool) isFieldSupported:(const int) fieldID
+{
+    bool isSupported;
+    switch (fieldID)
+    {
+        case MA_PIM_FIELD_CONTACT_CLASS:
+        case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
+        case MA_PIM_FIELD_CONTACT_FORMATTED_NAME:
+        case MA_PIM_FIELD_CONTACT_PUBLIC_KEY:
+        case MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING:
+        case MA_PIM_FIELD_CONTACT_UID:
+            isSupported = false;
+            break;
+        default:
+            isSupported = true;
+    }
+    return isSupported;
+}
+
+/**
+ * Checks if the user can read data from a specified field.
+ * @param fieldID One of the MA_PIM_FIELD_CONTACT constants.
+ * @return True is the field is write only, false otherwise.
+ */
+-(bool) isFieldWriteOnly:(const int) fieldID
+{
+    if (MA_PIM_FIELD_CONTACT_PHOTO_URL == fieldID)
+    {
+        return true;
+    }
+
+    return false;
+}
+
+/**
+ * Checks if the user can write data to a specified field.
+ * @param fieldID One of the MA_PIM_FIELD_CONTACT constants.
+ * @return True is the field is read only, false otherwise.
+ */
+-(bool) isFieldReadOnly:(const int) fieldID
+{
+    if (MA_PIM_FIELD_CONTACT_REVISION == fieldID)
+    {
+        return true;
+    }
+
+    return false;
 }
 
 /**
