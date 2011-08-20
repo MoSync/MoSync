@@ -56,7 +56,7 @@ static PimUtils *sharedInstance = nil;
 
 - (id)init
 {
-    mHandle = 0;
+    mHandle = 1;
     NSString* homeLabel = [NSString stringWithString:(NSString*)kABHomeLabel];
     NSString* workLabel = [NSString stringWithString:(NSString*)kABWorkLabel];
     NSString* otherLabel = [NSString stringWithString:(NSString*)kABOtherLabel];
