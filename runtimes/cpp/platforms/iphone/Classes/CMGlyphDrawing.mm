@@ -52,12 +52,17 @@ CMCMap4Ref CMCMapCreate(CFDataRef fontTable, UInt32 segmentOffset);
 void CMCMapRelease(CMCMap4Ref cmap);
 
 
-void CMFontGetGlyphsForUnichars(CGFontRef cgFont, const UniChar buffer[], CGGlyph glyphs[], size_t numGlyphs) {
+int CMFontGetGlyphsForUnichars(CGFontRef cgFont, const UniChar buffer[], CGGlyph glyphs[], size_t numGlyphs) {
 	
 	CMCMap4Ref cmap = CMGetCMapForFont(cgFont);
+    if(!cmap)
+    {
+        return 0;
+    }
 	for (int i = 0; i < numGlyphs; i++) {
 		glyphs[i] = CMCMapGetGlyphIndexForUnichar(cmap, buffer[i]);
 	}
+    return 1;
 }
 
 

@@ -499,6 +499,71 @@ namespace Base
 	int _maFileListClose(MAHandle list, JNIEnv* jNIEnv, jobject jThis);
 
 	/**
+	* Returns a handle to one of the default fonts of the device, in the style and size you specify.
+	* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE].
+	* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC].
+	* \param 'size' The size of the font.
+	* \return The handle to the font, RES_FONT_NO_TYPE_STYLE_COMBINATION, or RES_FONT_INVALID_SIZE.
+	*/
+	MAHandle _maFontLoadDefault(
+			int type,
+			int style,
+			int size,
+			JNIEnv* jNIEnv,
+			jobject jThis);
+
+	/**
+	* Sets the font to be used with maDrawText and maDrawTextW, and returns the handle
+	* to the previous font
+	* \param 'font' an MAHandle for a font object
+	* \return The handle to the previous font, or RES_FONT_INVALID_HANDLE
+	*/
+	MAHandle _maFontSetCurrent(MAHandle font,JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Returns the number of fonts that are available in the system
+	* \return Number of fonts
+	* \see maFontGetName
+	*/
+	int _maFontGetCount(JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Copies the font postscript name of the given index to the buffer.
+	* You must have first called maFontGetCount() at least once before calling this function.
+	* \param 'index' A 0-based index to the font
+	* \param 'buffer' An empty char buffer that will receive the font name
+	* \param 'bufferLen' The size of the buffer
+	* \return The number of bytes copied (with terminating NULL) or RES_FONT_INDEX_OUT_OF_BOUNDS
+	* 		or RES_FONT_INSUFFICIENT_BUFFER or RES_FONT_LIST_NOT_INITIALIZED
+	* \see maFontGetCount, maFontLoadWithName
+	*/
+	int _maFontGetName(int memStart,
+			int index,
+			int memBuffer,
+			int memBufferSize,
+			JNIEnv* jNIEnv,
+			jobject jThis);
+
+	/**
+	* Returns a handle to a font with the specific postscript name and size
+	* \param 'postScriptName' The postscript name of the font
+	* \param 'size' The size of the font
+	* \return Handle to the font, RES_FONT_NAME_NONEXISTENT, or RES_FONT_INVALID_SIZE.
+	*/
+	MAHandle _maFontLoadWithName(
+			const char* postScriptName,
+			int size,
+			JNIEnv* jNIEnv,
+			jobject jThis);
+
+	/**
+	* Deletes a loaded font
+	* \param 'font' A font handle
+	* \return RES_FONT_OK or RES_FONT_INVALID_HANDLE
+	*/
+	int _maFontDelete(MAHandle font, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
 	* \brief Enables a sensor and starts sending events if the sensor is available.
 	* If the sensor already is enabled this call will have no effect.
 	* \param sensor       The sensor which should be enabled
