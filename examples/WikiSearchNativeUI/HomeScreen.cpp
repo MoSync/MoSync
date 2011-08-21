@@ -401,6 +401,9 @@ void HomeScreen::engineError(MAUtil::String errorMessage)
 {
 	// Some error occurred.
 	setLabelText(mLabel, errorMessage.c_str());
+	// Hide the progress bar and it's label.
+	maWidgetSetProperty(mProgressBar, MAW_WIDGET_VISIBLE, "false");
+	maWidgetSetProperty(mProgressLabel,MAW_WIDGET_VISIBLE, "false");
 }
 
 /*
@@ -450,10 +453,6 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 		// Close the edit box forced.
 		maWidgetSetProperty(mEditBox, MAW_EDIT_BOX_SHOW_KEYBOARD, "false");
 
-		// Show the progress bar and it's label.
-		maWidgetSetProperty(mProgressLabel,MAW_WIDGET_VISIBLE, "true");
-		maWidgetSetProperty(mProgressBar, MAW_WIDGET_VISIBLE, "true");
-
 		// Declare a buffer for the text contained in the edit box.
 		char textBuffer[256];
 
@@ -471,7 +470,11 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 		MAUtil::String text = textBuffer;
 		// Now we can perform a wiki search.
 		// After the result is received and processed, go to next screen.
-		if (text.size() > 2){
+		if (text.size() > 2)
+		{
+			// Show the progress bar and it's label.
+			maWidgetSetProperty(mProgressLabel,MAW_WIDGET_VISIBLE, "true");
+			maWidgetSetProperty(mProgressBar, MAW_WIDGET_VISIBLE, "true");
 
 			// This label is indicating that a search action is in progress.
 			maWidgetSetProperty(mProgressLabel, MAW_LABEL_TEXT, MESSAGE_WAITNOTE.c_str());

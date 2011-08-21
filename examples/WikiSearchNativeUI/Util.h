@@ -87,9 +87,12 @@ const MAUtil::String CATEGORY_MOVIES  = " Movies ";
 const MAUtil::String CATEGORY_SCIENCE = " Science ";
 
 /** Messages for UI screens. */
-const MAUtil::String MESSAGE_WAITNOTE        = " Please wait....";
-const MAUtil::String WARNING_NOTHING_SELECTED= " There is nothing selected.";
-const MAUtil::String MESSAGE_PAGE_LOADING    = " Page is loading...";
+const MAUtil::String MESSAGE_WAITNOTE        	  = " Please wait....";
+const MAUtil::String WARNING_NOTHING_SELECTED	  = " There is nothing selected.";
+const MAUtil::String MESSAGE_PAGE_LOADING    	  = " Page is loading...";
+const MAUtil::String MESSAGE_LOADING_STOPPED = " Page loading was stopped";
+const MAUtil::String MESSAGE_LOADING_ERROR   = " Sorry, this page cannot be loaded.";
+const MAUtil::String MESSAGE_LOADING_DONE    = " Page loaded";
 const MAUtil::String MESSAGE_EDITBOX_HINT    = " Enter tags separated by comma ";
 const MAUtil::String MESSAGE_SEARCH_HINT     = " Press SEARCH when ready ";
 const MAUtil::String MESSAGE_NEXT_HINT       = " Press NEXT when ready ";
