@@ -79,28 +79,6 @@ namespace NativeUI
          */
         virtual void enableBackButton(const bool enabledState);
 
-        /*
-         * Specify whether the navigation bar should be shown.
-         * This can have different behaviors on different platforms:
-         * on iPhone it is enabled by default,
-         * but on Android the user can set it to be shown, because this is not
-         * native behavior on Android.
-         * When it set this to true, a navigation bar is associated to all
-         * screens of this stack screen, and there is no need to add it as a
-         * child to this widget.
-         * When it is set to false, the navigation bar is removed from all
-         * containing screens of the stack.
-         * NOTE: remember to add main layouts for the screens, because those
-         * will be the parents of the navigation bars.
-         */
-        virtual void enableNavigationBar(const bool enabledState);
-
-        /**
-         * Check if the navigation bar is already enabled for the stack.
-         * @return True if Navigation bar is attached, false otherwise.
-         */
-        virtual bool isNavigationBarEnabled() const;
-
         /**
          * Add an stack screen event listener.
          * @param listener The listener that will receive stack screen events.

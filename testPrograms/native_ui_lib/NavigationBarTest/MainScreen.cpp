@@ -49,8 +49,6 @@ MainScreen::MainScreen() :
 MainScreen::~MainScreen()
 {
     mNavigationBar->removeNavigationBarListener(this);
-
-	delete mMainLayout;
 }
 
 /**
