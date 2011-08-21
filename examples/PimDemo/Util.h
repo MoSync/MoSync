@@ -1,20 +1,20 @@
 /*
-Copyright (C) 2011 MoSync AB
+ Copyright (C) 2011 MoSync AB
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License,
+ version 2, as published by the Free Software Foundation.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ MA 02110-1301, USA.
+ */
 
 #ifndef UTIL_H_
 #define UTIL_H_
@@ -27,49 +27,184 @@ MA 02110-1301, USA.
 #include <IX_PIM.h>
 #include <MAUtil/String.h>
 
-static const wchar_t* sContactName[] = { L"Iusco", L"Ioan", L"Bogdan", L"Dl", L"jr",
-									     L"Iusco", L"Ioan", L"Bogdan"};
+/**
+ * Values for MA_PIM_FIELD_CONTACT_NAME field.
+ */
+static const wchar_t* sContactName[] =
+{
+    L"O'Conner",   // MA_PIM_CONTACT_NAME_FAMILY
+    L"Brian",      // MA_PIM_CONTACT_NAME_GIVEN
+    L"Robert",     // MA_PIM_CONTACT_NAME_OTHER
+    L"Mr",         // MA_PIM_CONTACT_NAME_PREFIX
+    L"Jr",         // MA_PIM_CONTACT_NAME_SUFFIX
+    L"O'Conner",   // MA_PIM_CONTACT_NAME_PHONETIC_FAMILY
+    L"Brian",      // MA_PIM_CONTACT_NAME_PHONETIC_GIVEN
+    L"Robert"      // MA_PIM_CONTACT_NAME_PHONETIC_OTHER
+};
 
-static const wchar_t* sAddress1[] = { L"", L"", L"Luceafarului", L"Cluj-Napoca", L"Cluj",
-									     L"400434", L"Romania", L"RO", L"Zorilor"};
-static const wchar_t* sAddress2[] = { L"", L"", L"21 Decembrie", L"Cluj-Napoca", L"Cluj",
-									     L"400123", L"Romania", L"RO", L"Centru"};
+/**
+ * Values for MA_PIM_FIELD_CONTACT_ADDR field.
+ */
+static const wchar_t* sAddressWork[] =
+{
+    L"",                  // MA_PIM_CONTACT_ADDR_POBOX
+    L"",                  // MA_PIM_CONTACT_ADDR_EXTRA
+    L"Saltmatargatan 8A", // MA_PIM_CONTACT_ADDR_STREET
+    L"Stockholm",         // MA_PIM_CONTACT_ADDR_LOCALITY
+    L"",                  // MA_PIM_CONTACT_ADDR_REGION
+    L"113 59",            // MA_PIM_CONTACT_ADDR_POSTALCODE
+    L"Sweden",            // MA_PIM_CONTACT_ADDR_COUNTRY
+    L""                   // MA_PIM_CONTACT_ADDR_NEIGHBORHOOD
+};
+static const wchar_t* sAddressHome[] =
+{
+    L"",                 // MA_PIM_CONTACT_ADDR_POBOX
+    L"",                 // MA_PIM_CONTACT_ADDR_EXTRA
+    L"21 Decembrie 70",  // MA_PIM_CONTACT_ADDR_STREET
+    L"Cluj-Napoca",      // MA_PIM_CONTACT_ADDR_LOCALITY
+    L"Cluj",             // MA_PIM_CONTACT_ADDR_REGION
+    L"400123",           // MA_PIM_CONTACT_ADDR_POSTALCODE
+    L"Romania",          // MA_PIM_CONTACT_ADDR_COUNTRY
+    L"Marasti"           // MA_PIM_CONTACT_ADDR_NEIGHBORHOOD
+};
 
-static const wchar_t* sOrgInfo[] = { L"Dev-Cluj", L"", L"", L"", L"", L""};
+/**
+ * Value for MA_PIM_FIELD_CONTACT_ORG_INFO field.
+ */
+static const wchar_t* sOrgInfo[] =
+{
+    L"Dev-SDK",      // MA_PIM_CONTACT_ORG_INFO_DEPARTMENT
+    L"",              // MA_PIM_CONTACT_ORG_INFO_JOB_DESCRIPTION
+    L"",              // MA_PIM_CONTACT_ORG_INFO_SYMBOL
+    L"",              // MA_PIM_CONTACT_ORG_INFO_PHONETIC_NAME
+    L"",              // MA_PIM_CONTACT_ORG_INFO_OFFICE_LOCATION
+    L""               // MA_PIM_CONTACT_ORG_INFO_PHONETIC_NAME_STYLE
+};
 
-static const wchar_t* sEmail1 = L"bogdan.iusco@mosync.com\0";
-static const wchar_t* sEmail2 = L"grigaci@yahoo.com\0";
+/**
+ * Values for MA_PIM_FIELD_CONTACT_EMAIL field.
+ */
+static const wchar_t* sEmailWork = L"brian@mosync.com";
+static const wchar_t* sEmailHome = L"brian13@yahoo.com";
 
-static const wchar_t* sFormattedAddress = L"formatted addr\0";
-static const wchar_t* sFormattedName = L"formatted name\0";
-static const wchar_t* sPhotoURL = L"http://t2.gstatic.com/images?q=tbn:ANd9GcSrJS1-i7rBQrEb8HwuonyWrIrpS_xGNWvQage1ePefwi0nL55b\0";
-static const wchar_t* sPublicKey = L"\0";
-static const wchar_t* sPublicKeyString = L"Public key\0";
+/**
+ * Value for MA_PIM_FIELD_CONTACT_FORMATTED_ADDR field.
+ */
+static const wchar_t* sFormattedAddress = L"formatted addr";
 
-static const wchar_t* sPhone1 = L"+40767345769\0";
-static const wchar_t* sPhone2 = L"+40742123456\0";
-static const wchar_t* sPhone3 = L"+40364768453\0";
+/**
+ * Value for MA_PIM_FIELD_CONTACT_FORMATTED_NAME field.
+ */
+static const wchar_t* sFormattedName = L"formatted name";
 
-static const wchar_t* sNickname = L"grigaci\0";
-static const wchar_t* sNote = L"note\0";
-static const wchar_t* sOrg = L"MoSync\0";
-static const wchar_t* sTitle = L"developer\0";
-static const wchar_t* sUID = L"contact UID\0";
+/**
+ * Value for MA_PIM_FIELD_CONTACT_PHOTO_URL field.
+ */
+static const wchar_t* sPhotoURL =
+    L"http://t2.gstatic.com/images?q=tbn:ANd9GcSrJS1-i7rBQrEb8HwuonyWrIrpS_xGNWvQage1ePefwi0nL55b\0";
 
-static const wchar_t* sURL1 = L"www.mypage.com\0";
-static const wchar_t* sURL2 = L"www.mosync.com\0";
+/**
+ * Value for MA_PIM_FIELD_CONTACT_PUBLIC_KEY field.
+ */
+static const wchar_t* sPublicKey = L".";
 
-static const wchar_t* sIM1[] = {L"myusername", L"Yahoo"};
-static const wchar_t* sIM2[] = {L"myusername", L"AIM"};
+/**
+ * Value for MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING field.
+ */
+static const wchar_t* sPublicKeyString = L"Public key";
 
-static const wchar_t* sRelation1 = L"my brother";
-static const wchar_t* sRelation2 = L"my manager";
+/**
+ * Values for MA_PIM_FIELD_CONTACT_TEL field.
+ */
+static const wchar_t* sPhoneMobile = L"+46767345769";
+static const wchar_t* sPhoneIPhone = L"+40742123456";
+static const wchar_t* sPhoneHome = L"+40364768453";
 
-int writeString(void* buf, const wchar_t* srca);
+/**
+ * Value for MA_PIM_FIELD_CONTACT_NICKNAME field.
+ */
+static const wchar_t* sNickname = L"Spike";
 
-void printStringArray(void* buf);
+/**
+ * Value for MA_PIM_FIELD_CONTACT_NOTE field.
+ */
+static const wchar_t* sNote = L"Nissan Skyline R34";
 
-const wchar* getStringFromArray(void* buf, const int stringIndex);
+/**
+ * Value for MA_PIM_FIELD_CONTACT_ORG field.
+ */
+static const wchar_t* sOrg = L"MoSync";
+
+/**
+ * Value for MA_PIM_FIELD_CONTACT_TITLE field.
+ */
+static const wchar_t* sTitle = L"Developer";
+
+/**
+ * Value for MA_PIM_FIELD_CONTACT_UID field.
+ */
+static const wchar_t* sUID = L"contact UID";
+
+/**
+ * Values for MA_PIM_FIELD_CONTACT_URL field.
+ */
+static const wchar_t* sURLHome = L"www.brian.com";
+static const wchar_t* sURLWork = L"www.mosync.com";
+
+/**
+ * Values for MA_PIM_FIELD_CONTACT_IM field.
+ */
+static const wchar_t* sIMHome[] =
+{
+    L"brian13",
+    L"Yahoo"
+};
+static const wchar_t* sIMOther[] =
+{
+    L"brian",
+    L"AIM"
+};
+
+/**
+ * Value for MA_PIM_FIELD_CONTACT_RELATION field.
+ */
+static const wchar_t* sRelationBrother = L"Chester";
+static const wchar_t* sRelationManager = L"Alex";
+
+// Used for separating fields on the screen.
+static const char* sFieldSeparator =
+    "______________________________________________";
+
+/**
+ * Copy wchar array.
+ * @param destination Pointer to the destination array where the content will
+ * be copied
+ * @param source Pointer to the source of data to be copied.
+ * @return The number of bytes copied.
+ */
+int copyWCharArray(void* destination, const wchar_t* source);
+
+/**
+ * Get a wchar array from a specified buffer.
+ * @param buffer Contains n wchar-arrays, where n is the int value that can
+ * be read from buffer address.
+ * @param arrayIndex The index of the array.
+ * @return A pointer to the wchar array if the arrayIndex is valid, or
+ * a pointer to the latest wchar array from buffer otherwise.
+ */
+const wchar* getWCharArrayFromBuf(void* buffer, const int arrayIndex);
+
+/**
+ * Write n wchar-arrays to buffer.
+ * @param buffer The given buffer.
+ * The first value in buffer will be the number of wchar-arrays(n argument).
+ * @param src Contains the n wchar-arrays that will be written into buffer.
+ * @return The number of written bytes.
+ */
+int writeWCharArraysToBuf(
+    void* buffer,
+    const wchar_t** src,
+    const int n);
 
 /**
  * Print the result code.
@@ -80,28 +215,32 @@ const wchar* getStringFromArray(void* buf, const int stringIndex);
 void printResultCode(const int resultCode);
 
 /**
- * Return the string associated with a contact name field index.
+ * Get the string associated with a contact name field index.
  * @param index One of the MA_PIM_CONTACT_NAME constants.
+ * @return The contact name index string.
  */
-MAUtil::String getContactNameFieldString(const int index);
+MAUtil::String getContactNameIndexString(const int index);
 
 /**
- * Return the string associated with a address field index.
+ * Get the string associated with a address field index.
  * @param index One of the MA_PIM_CONTACT_ADDR constants.
+ * @return The address index string.
  */
-MAUtil::String getAddressFieldString(const int index);
+MAUtil::String getAddressIndexString(const int index);
 
 /**
- * Return the string associated with a class field index.
- * @param index One of the MA_PIM_CONTACT_CLASS constants.
+ * Get the string associated with a class field value.
+ * @param value One of the MA_PIM_CONTACT_CLASS constants.
+ * @return The class value string.
  */
-MAUtil::String getClassFieldString(const int index);
+MAUtil::String getClassValueString(const int value);
 
 /**
- * Return the string associated with a org info field index.
+ * Get the string associated with a org info field index.
  * @param index One of the MA_PIM_CONTACT_ORG_INFO constants.
+ * @return The org info index string.
  */
-MAUtil::String getOrgInfoFieldString(const int index);
+MAUtil::String getOrgInfoIndexString(const int index);
 
 /**
  * Return the preferred string attribute.
@@ -168,28 +307,5 @@ MAUtil::String getRelationAttributeString(const int attribute);
  * @param index One of the MA_PIM_ATTR_ORG_INFO constants.
  */
 MAUtil::String getOrgInfoAttributeString(const int attribute);
-
-// return the number of bytes written
-template<int NUM>
-int writeStringArray(void* buf, const wchar_t* srca[NUM])
-{
-    char* buffer = (char*) buf;
-	*(int*)buffer = NUM;
-	wchar_t* dst = (wchar_t*)(buffer + 4);
-	for(int i=0; i<NUM; i++) {
-		const wchar_t* src = srca[i];
-		while(true) {
-			*dst = *src;
-			dst++;
-			if(*src == 0)
-				break;
-			src++;
-		}
-	}
-	return (char*)dst - buffer;
-};
-
-
-
 
 #endif /* UTIL_H_ */

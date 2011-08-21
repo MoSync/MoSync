@@ -15,6 +15,10 @@
  02111-1307, USA.
  */
 
+/**
+ * Check the result of a syscall.
+ * If any error occurred the error is printed on the screen.
+ */
 #define checkResultCode(resultCode) \
     if (0 > resultCode) \
     {\
@@ -132,8 +136,8 @@ void PimContact::addDataToContact()
     waitForClick();
     addPhoto();
     waitForClick();
-    //    addPhotoURL();
-    //    waitForClick();
+//    addPhotoURL();
+//    waitForClick();
     addPublicKey();
     waitForClick();
     addPublicKeyString();
@@ -154,7 +158,6 @@ void PimContact::addDataToContact()
     waitForClick();
     addOrgInfo();
     waitForClick();
-    printf("===============================================");
 }
 
 /**
@@ -162,7 +165,7 @@ void PimContact::addDataToContact()
  */
 void PimContact::waitForClick()
 {
-    printf("tap the screen to continue......");
+    printf("Tap the screen to continue......\n");
     MAEvent event;
     while (true)
     {
@@ -173,7 +176,7 @@ void PimContact::waitForClick()
             break;
         }
     }
-    printf("_________________________________________");
+    printf(sFieldSeparator);
 }
 
 /**
@@ -191,7 +194,6 @@ void PimContact::printAttribute(const int field, const int index,
     int attribute = maPimItemGetAttributes(mItemHandle, field, index);
     MAUtil::String attributeString = pointerToFunc(attribute);
     printf("Attribute: %s", attributeString.c_str());
-    //    printf("Attribute: %d", attribute);
     if (MA_PIM_ATTR_ADDR_CUSTOM == attribute)
     {
         MA_PIM_ARGS attributeArgs;
@@ -205,24 +207,28 @@ void PimContact::printAttribute(const int field, const int index,
         checkResultCode(resultCode);
         printf("Label: %S", (wchar*) buf);
     }
-//    attribute&0xFFFF;
-
 }
 
+/**
+ * Print the contact name field values.
+ */
 void PimContact::printContactNameField()
 {
-    printf("MA_PIM_FIELD_CONTACT_NAME field:");
+    printf("Contact name field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_NAME;
     checkResultCode(maPimItemGetValue(&mArgs, 0));
     printAttribute(MA_PIM_FIELD_CONTACT_NAME, 0, getPrefferedAttributeString);
     for (int i = 0; i < 8; i++)
     {
-        MAUtil::String contactNameType = getContactNameFieldString(i);
-        const wchar* contactNameValue = getStringFromArray(mArgs.buf, i);
+        MAUtil::String contactNameType = getContactNameIndexString(i);
+        const wchar* contactNameValue = getWCharArrayFromBuf(mArgs.buf, i);
         printf("%s %S", contactNameType.c_str(), contactNameValue);
     }
 }
 
+/**
+ * Print the address field values.
+ */
 void PimContact::printAddress()
 {
     printf("MA_PIM_FIELD_CONTACT_ADDR field:");
@@ -240,8 +246,8 @@ void PimContact::printAddress()
 
         for (int j = 0; j < 9; j++)
         {
-            MAUtil::String addressValueIndex = getAddressFieldString(j);
-            const wchar* addressValue = getStringFromArray(mArgs.buf, j);
+            MAUtil::String addressValueIndex = getAddressIndexString(j);
+            const wchar* addressValue = getWCharArrayFromBuf(mArgs.buf, j);
             printf("%s %S", addressValueIndex.c_str(), addressValue);
         }
         printf("\n");
@@ -249,6 +255,9 @@ void PimContact::printAddress()
 
 }
 
+/**
+ * Print birthday field value.
+ */
 void PimContact::printBirthday()
 {
     printf("MA_PIM_FIELD_CONTACT_BIRTHDAY field:");
@@ -260,6 +269,9 @@ void PimContact::printBirthday()
     printf("Birthday: %d", birthday);
 }
 
+/**
+ * Print class field value.
+ */
 void PimContact::printClass()
 {
     printf("MA_PIM_FIELD_CONTACT_CLASS field:");
@@ -267,10 +279,13 @@ void PimContact::printClass()
     checkResultCode(maPimItemGetValue(&mArgs, 0));
     printAttribute(MA_PIM_FIELD_CONTACT_CLASS, 0, getPrefferedAttributeString);
     int classFieldValue = *(int*) mArgs.buf;
-    MAUtil::String classFieldString = getClassFieldString(classFieldValue);
+    MAUtil::String classFieldString = getClassValueString(classFieldValue);
     printf("Class: %s", classFieldString.c_str());
 }
 
+/**
+ * Print email field values.
+ */
 void PimContact::printEmail()
 {
     printf("MA_PIM_FIELD_CONTACT_EMAIL field:");
@@ -288,6 +303,9 @@ void PimContact::printEmail()
     }
 }
 
+/**
+ * Print formatted address field value.
+ */
 void PimContact::printFormatedAddress()
 {
     printf("MA_PIM_FIELD_CONTACT_FORMATTED_ADDR field:");
@@ -298,6 +316,9 @@ void PimContact::printFormatedAddress()
     printf("Formatted address: %S", (wchar*) mArgs.buf);
 }
 
+/**
+ * Print formatted name field value.
+ */
 void PimContact::printFormatedName()
 {
     printf("MA_PIM_FIELD_CONTACT_FORMATTED_NAME field:");
@@ -308,6 +329,9 @@ void PimContact::printFormatedName()
     printf("Formatted name: %S", (wchar*) mArgs.buf);
 }
 
+/**
+ * Print nickname field value.
+ */
 void PimContact::printNickname()
 {
     printf("MA_PIM_FIELD_CONTACT_NICKNAME field:");
@@ -326,6 +350,9 @@ void PimContact::printNickname()
     }
 }
 
+/**
+ * Print note field value.
+ */
 void PimContact::printNote()
 {
     printf("MA_PIM_FIELD_CONTACT_NOTE field:");
@@ -344,6 +371,9 @@ void PimContact::printNote()
     }
 }
 
+/**
+ * Print organization field value.
+ */
 void PimContact::printOrg()
 {
     printf("MA_PIM_FIELD_CONTACT_ORG field:");
@@ -361,6 +391,9 @@ void PimContact::printOrg()
     }
 }
 
+/**
+ * Print photo field value.
+ */
 void PimContact::printPhoto()
 {
     printf("MA_PIM_FIELD_CONTACT_PHOTO field:");
@@ -371,6 +404,9 @@ void PimContact::printPhoto()
     printf("Photo data handle: %d", handle);
 }
 
+/**
+ * Print photo URL field value.
+ */
 void PimContact::printPhotoURL()
 {
     printf("MA_PIM_FIELD_CONTACT_PHOTO_URL field:");
@@ -381,6 +417,9 @@ void PimContact::printPhotoURL()
     printf("Photo URL: %S", (wchar*) mArgs.buf);
 }
 
+/**
+ * Print key field value.
+ */
 void PimContact::printPublicKey()
 {
     printf("MA_PIM_FIELD_CONTACT_PUBLIC_KEY field:");
@@ -391,6 +430,9 @@ void PimContact::printPublicKey()
     printf("Public key"); // TODO print the binary value?
 }
 
+/**
+ * Print public key field value.
+ */
 void PimContact::printPublicKeyString()
 {
     printf("MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING field:");
@@ -401,6 +443,9 @@ void PimContact::printPublicKeyString()
     printf("Public key string: %S", (wchar*) mArgs.buf);
 }
 
+/**
+ * Print revision field value.
+ */
 void PimContact::printRevision()
 {
     printf("MA_PIM_FIELD_CONTACT_REVISION field:");
@@ -412,6 +457,9 @@ void PimContact::printRevision()
     printf("Revision date: %d", revisionDate);
 }
 
+/**
+ * Print phone field values.
+ */
 void PimContact::printPhone()
 {
     printf("MA_PIM_FIELD_CONTACT_TEL field:");
@@ -430,6 +478,9 @@ void PimContact::printPhone()
     }
 }
 
+/**
+ * Print title field value.
+ */
 void PimContact::printTitle()
 {
     printf("MA_PIM_FIELD_CONTACT_TITLE field:");
@@ -447,6 +498,9 @@ void PimContact::printTitle()
     }
 }
 
+/**
+ * Print UID field value.
+ */
 void PimContact::printUID()
 {
     printf("MA_PIM_FIELD_CONTACT_UID field:");
@@ -456,6 +510,9 @@ void PimContact::printUID()
     printf("UID: %S", (wchar*) mArgs.buf);
 }
 
+/**
+ * Print URL field values.
+ */
 void PimContact::printURL()
 {
     printf("MA_PIM_FIELD_CONTACT_URL field:");
@@ -474,6 +531,9 @@ void PimContact::printURL()
     }
 }
 
+/**
+ * Print instant message field values.
+ */
 void PimContact::printIM()
 {
     printf("MA_PIM_FIELD_CONTACT_IM field:");
@@ -486,8 +546,8 @@ void PimContact::printIM()
     {
         checkResultCode(maPimItemGetValue(&mArgs, i));
         printAttribute(MA_PIM_FIELD_CONTACT_IM, i, getIMAttributeString);
-        const wchar* protocolValue = getStringFromArray(mArgs.buf, 1);
-        const wchar* usernameValue = getStringFromArray(mArgs.buf, 0);
+        const wchar* protocolValue = getWCharArrayFromBuf(mArgs.buf, 1);
+        const wchar* usernameValue = getWCharArrayFromBuf(mArgs.buf, 0);
         printf("username: %S \n protocol: %S \n", usernameValue, protocolValue);
         printf("\n");
     }
@@ -508,10 +568,13 @@ void PimContact::printRelation()
         printAttribute(MA_PIM_FIELD_CONTACT_RELATION, i,
             getRelationAttributeString);
         printf("Relation: %S", (wchar*) mArgs.buf);
-        printf("_____________________________________________");
+        printf(sFieldSeparator);
     }
 }
 
+/**
+ * Print nickname field value.
+ */
 void PimContact::printOrgInfo()
 {
     printf("MA_PIM_FIELD_CONTACT_ORG_INFO field:");
@@ -528,28 +591,34 @@ void PimContact::printOrgInfo()
             getOrgInfoAttributeString);
         for (int j = 0; j < 6; j++)
         {
-            MAUtil::String orgInfoValueIndex = getOrgInfoFieldString(j);
-            const wchar* orgInfoValue = getStringFromArray(mArgs.buf, j);
+            MAUtil::String orgInfoValueIndex = getOrgInfoIndexString(j);
+            const wchar* orgInfoValue = getWCharArrayFromBuf(mArgs.buf, j);
             printf("%s %S", orgInfoValueIndex.c_str(), orgInfoValue);
         }
         printf("\n");
     }
 }
 
+/**
+ * Add value to contact name field.
+ */
 void PimContact::addContactName()
 {
     printf(" add MA_PIM_FIELD_CONTACT_NAME field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_NAME;
-    mArgs.bufSize = writeStringArray<8> (mArgs.buf, sContactName);
+    mArgs.bufSize = writeWCharArraysToBuf(mArgs.buf, sContactName, 8);
     for (int i = 0; i < 8; i++)
     {
-        MAUtil::String contactNameType = getContactNameFieldString(i);
+        MAUtil::String contactNameType = getContactNameIndexString(i);
         const wchar* contactNameValue = sContactName[i];
         printf("%s %S", contactNameType.c_str(), contactNameValue);
     }
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add values to address field.
+ */
 void PimContact::addAddress()
 {
     printf(" add MA_PIM_FIELD_CONTACT_ADDR field:");
@@ -558,25 +627,29 @@ void PimContact::addAddress()
     // Write home address.
     for (int i = 0; i < 9; i++)
     {
-        MAUtil::String addressValueIndex = getAddressFieldString(i);
-        const wchar* addressValue = sAddress1[i];
+        MAUtil::String addressValueIndex = getAddressIndexString(i);
+        const wchar* addressValue = sAddressHome[i];
         printf("%s %S", addressValueIndex.c_str(), addressValue);
     }
     printf("\n");
-    mArgs.bufSize = writeStringArray<9> (mArgs.buf, sAddress1);
+
+    mArgs.bufSize = writeWCharArraysToBuf(mArgs.buf, sAddressHome, 8);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_ADDR_HOME));
 
     // Write work address.
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < 8; i++)
     {
-        MAUtil::String addressValueIndex = getAddressFieldString(i);
-        const wchar* addressValue = sAddress2[i];
+        MAUtil::String addressValueIndex = getAddressIndexString(i);
+        const wchar* addressValue = sAddressWork[i];
         printf("%s %S", addressValueIndex.c_str(), addressValue);
     }
-    mArgs.bufSize = writeStringArray<9> (mArgs.buf, sAddress2);
+    mArgs.bufSize = writeWCharArraysToBuf(mArgs.buf, sAddressWork, 8);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_ADDR_WORK));
 }
 
+/**
+ * Add value to birthday field.
+ */
 void PimContact::addBirthday()
 {
     int birthday = 962928000;
@@ -591,6 +664,9 @@ void PimContact::addBirthday()
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add value to class field.
+ */
 void PimContact::addClass()
 {
     printf(" add MA_PIM_FIELD_CONTACT_CLASS field:");
@@ -603,85 +679,108 @@ void PimContact::addClass()
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add values to email field.
+ */
 void PimContact::addEmail()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_EMAIL field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_EMAIL;
-    mArgs.bufSize = writeString(mArgs.buf, sEmail1);
+
+    // Write home email.
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sEmailHome);
     attribute = getEmailAttributeString(MA_PIM_ATTR_EMAIL_WORK);
     printf("Attribute: %s", attribute.c_str());
-    printf("Email: %S", sEmail1);
+    printf("Email: %S", sEmailHome);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_EMAIL_WORK));
     printf("\n");
 
-    mArgs.bufSize = writeString(mArgs.buf, sEmail2);
+    // Write work email.
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sEmailWork);
     attribute = getEmailAttributeString(MA_PIM_ATTR_EMAIL_HOME);
     printf("Attribute: %s", attribute.c_str());
-    printf("Email: %S", sEmail2);
+    printf("Email: %S", sEmailWork);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_EMAIL_HOME));
 }
 
+/**
+ * Add value to formatted address field.
+ */
 void PimContact::addFormatedAddress()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_FORMATTED_ADDR field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_FORMATTED_ADDR;
-    mArgs.bufSize = writeString(mArgs.buf, sFormattedAddress);
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sFormattedAddress);
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     printf("Formatted address: %S", sFormattedAddress);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add value to formatted name field.
+ */
 void PimContact::addFormatedName()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_FORMATTED_NAME field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_FORMATTED_NAME;
-    mArgs.bufSize = writeString(mArgs.buf, sFormattedName);
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sFormattedName);
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     printf("Formatted address: %S", sFormattedName);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
-
+/**
+ * Add value to nickname field.
+ */
 void PimContact::addNickname()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_NICKNAME field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_NICKNAME;
-    mArgs.bufSize = writeString(mArgs.buf, sNickname);
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sNickname);
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     printf("Nickname: %S", sNickname);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add value to note field.
+ */
 void PimContact::addNote()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_NOTE field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_NOTE;
-    mArgs.bufSize = writeString(mArgs.buf, sNote);
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sNote);
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     printf("Note: %S", sNote);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add value to organization field.
+ */
 void PimContact::addOrg()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_ORG field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_ORG;
-    mArgs.bufSize = writeString(mArgs.buf, sOrg);
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sOrg);
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     printf("Org: %S", sOrg);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add value to photo field.
+ */
 void PimContact::addPhoto()
 {
     printf(" add MA_PIM_FIELD_CONTACT_PHOTO field:");
@@ -695,42 +794,54 @@ void PimContact::addPhoto()
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add value to URL field.
+ */
 void PimContact::addPhotoURL()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_PHOTO_URL field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_PHOTO_URL;
-    mArgs.bufSize = writeString(mArgs.buf, sPhotoURL);
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sPhotoURL);
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     printf("Photo URL: %S", sPhotoURL);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add value to public key field.
+ */
 void PimContact::addPublicKey()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_PUBLIC_KEY field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_PUBLIC_KEY;
-    mArgs.bufSize = writeString(mArgs.buf, sPublicKey);// TODO write binary value.
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sPublicKey);// TODO write binary value.
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     printf("Public key: %S", sPublicKey);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add value to public key string field.
+ */
 void PimContact::addPublicKeyString()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING;
-    mArgs.bufSize = writeString(mArgs.buf, sPublicKeyString);
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sPublicKeyString);
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     printf("Public key string: %S", sPublicKeyString);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add value to revision field.
+ */
 void PimContact::addRevision()
 {
     printf(" add MA_PIM_FIELD_CONTACT_REVISION field:");
@@ -745,130 +856,164 @@ void PimContact::addRevision()
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add values to phone field.
+ */
 void PimContact::addPhone()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_TEL field:");
+
+    // Write mobile number.
     mArgs.field = MA_PIM_FIELD_CONTACT_TEL;
-    mArgs.bufSize = writeString(mArgs.buf, sPhone1);
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sPhoneMobile);
     attribute = getPhoneAttributeString(MA_PIM_ATTR_PHONE_MOBILE);
     printf("Attribute: %s", attribute.c_str());
-    printf("Phone1: %S", sPhone1);
+    printf("Mobile number: %S", sPhoneMobile);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PHONE_MOBILE));
     printf("\n");
 
-    mArgs.bufSize = writeString(mArgs.buf, sPhone2);
+    // Write iPhone number.
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sPhoneIPhone);
     attribute = getPhoneAttributeString(MA_PIM_ATTR_PHONE_IPHONE);
     printf("Attribute: %s", attribute.c_str());
-    printf("Phone2: %S", sPhone2);
+    printf("iPhone number: %S", sPhoneIPhone);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PHONE_IPHONE));
     printf("\n");
 
-    mArgs.bufSize = writeString(mArgs.buf, sPhone3);
+    // Write home number.
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sPhoneHome);
     attribute = getPhoneAttributeString(MA_PIM_ATTR_PHONE_HOME);
     printf("Attribute: %s", attribute.c_str());
-    printf("Phone3: %S", sPhone3);
+    printf("Home number: %S", sPhoneHome);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PHONE_HOME));
 }
 
+/**
+ * Add value to title field.
+ */
 void PimContact::addTitle()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_TITLE field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_TITLE;
-    mArgs.bufSize = writeString(mArgs.buf, sTitle);
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sTitle);
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     printf("Public key string: %S", sTitle);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add value to UID field.
+ */
 void PimContact::addUID()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_UID field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_UID;
-    mArgs.bufSize = writeString(mArgs.buf, sUID);
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sUID);
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     printf("Public key string: %S", sUID);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
+/**
+ * Add values to URL field.
+ */
 void PimContact::addURL()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_URL field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_URL;
-    mArgs.bufSize = writeString(mArgs.buf, sURL1);
+
+    // Write home URL.
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sURLHome);
     attribute = getWebsiteAttributeString(MA_PIM_ATTR_WEBSITE_HOME);
     printf("Attribute: %s", attribute.c_str());
-    printf("URL1: %S", sURL1);
+    printf("URL1: %S", sURLHome);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_WEBSITE_HOME));
     printf("\n");
 
-    mArgs.bufSize = writeString(mArgs.buf, sURL2);
+    // Write work URL.
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sURLWork);
     attribute = getWebsiteAttributeString(MA_PIM_ATTR_WEBSITE_WORK);
     printf("Attribute: %s", attribute.c_str());
-    printf("URL2: %S", sURL2);
+    printf("URL2: %S", sURLWork);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_WEBSITE_WORK));
 }
 
+/**
+ * Add value to instant message field.
+ */
 void PimContact::addIM()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_IM field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_IM;
 
-    mArgs.bufSize = writeStringArray<2> (mArgs.buf, sIM1);
+    // Write home IM.
+    mArgs.bufSize = writeWCharArraysToBuf(mArgs.buf, sIMHome, 2);
     attribute = getIMAttributeString(MA_PIM_ATTR_IM_HOME);
     printf("Attribute: %s", attribute.c_str());
-    const wchar* imUsername1 = sIM1[0];
-    const wchar* imProtocol1 = sIM1[1];
-    printf("username1: %S - protocol1: %S", imUsername1, imProtocol1);
+    const wchar* imUsernameHome = sIMHome[0];
+    const wchar* imProtocolHome = sIMHome[1];
+    printf("Username: %S", imUsernameHome);
+    printf("Protocol: %S", imProtocolHome);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_IM_HOME));
-    printf("\n");
 
-    mArgs.bufSize = writeStringArray<2> (mArgs.buf, sIM2);
+    // Write other IM.
+    mArgs.bufSize = writeWCharArraysToBuf(mArgs.buf, sIMOther, 2);
     attribute = getIMAttributeString(MA_PIM_ATTR_IM_OTHER);
     printf("Attribute: %s", attribute.c_str());
-    const wchar* imUsername2 = sIM2[0];
-    const wchar* imProtocol2 = sIM2[1];
-    printf("username2: %S - protocol2: %S \n", imUsername2, imProtocol2);
+    const wchar* imUsernameOther = sIMOther[0];
+    const wchar* imProtocolOther = sIMOther[1];
+    printf("Username: %S", imUsernameOther);
+    printf("Protocol: %S", imProtocolOther);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_IM_OTHER));
 }
 
+/**
+ * Add values to relation field.
+ */
 void PimContact::addRelation()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_RELATION field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_RELATION;
-    mArgs.bufSize = writeString(mArgs.buf, sRelation1);
+
+    // Write brother relation.
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sRelationBrother);
     attribute = getRelationAttributeString(MA_PIM_ATTR_RELATION_BROTHER);
     printf("Attribute: %s", attribute.c_str());
-    printf("Relation1: %S", sRelation1);
+    printf("Relation1: %S", sRelationBrother);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_RELATION_BROTHER));
     printf("\n");
 
-    mArgs.bufSize = writeString(mArgs.buf, sRelation2);
+    // Write manager relation.
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sRelationManager);
     attribute = getRelationAttributeString(MA_PIM_ATTR_RELATION_MANAGER);
     printf("Attribute: %s", attribute.c_str());
-    printf("Relation2: %S", sRelation2);
+    printf("Relation2: %S", sRelationManager);
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_RELATION_MANAGER));
 }
 
+/**
+ * Add value to organization field.
+ */
 void PimContact::addOrgInfo()
 {
     MAUtil::String attribute;
     printf(" add MA_PIM_FIELD_CONTACT_ORG_INFO field:");
     mArgs.field = MA_PIM_FIELD_CONTACT_ORG_INFO;
 
-    mArgs.bufSize = writeStringArray<6> (mArgs.buf, sOrgInfo);
+    mArgs.bufSize = writeWCharArraysToBuf(mArgs.buf, sOrgInfo, 6);
     attribute = getPrefferedAttributeString(MA_PIM_ATTR_PREFERRED);
     printf("Attribute: %s", attribute.c_str());
     for (int i = 0; i < 6; i++)
     {
-        MAUtil::String orgInfoValueIndex = getOrgInfoFieldString(i);
+        MAUtil::String orgInfoValueIndex = getOrgInfoIndexString(i);
         const wchar* orgInfoValue = sOrgInfo[i];
         printf("%s %S \n", orgInfoValueIndex.c_str(), orgInfoValue);
     }

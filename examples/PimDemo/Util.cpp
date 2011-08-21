@@ -18,50 +18,50 @@
 
 #include "Util.h"
 
-int writeString(void* buf, const wchar_t* srca)
+/**
+ * Copy wchar array.
+ * @param destination Pointer to the destination array where the content will
+ * be copied
+ * @param source Pointer to the source of data to be copied.
+ * @return The number of bytes copied.
+ */
+int copyWCharArray(void* destination, const wchar_t* source)
 {
-    wchar_t* dst = (wchar_t*) buf;
-
-    wchar_t* src = (wchar_t*) srca;
+    wchar_t* dst = (wchar_t*) destination;
+    wchar_t* src = (wchar_t*) source;
+    int countBytes = 0;
 
     while (true)
     {
         *dst = *src;
         dst++;
+        countBytes++;
         if (*src == 0)
             break;
         src++;
     }
 
-    char* buffer = (char*) buf;
-    return (char*) dst - buffer;
+    return countBytes;
 }
 
-void printStringArray(void* buf)
+/**
+ * Get a wchar array from a specified buffer.
+ * @param buffer Contains n wchar-arrays, where n is the int value that can
+ * be read from buffer address.
+ * @param arrayIndex The index of the array.
+ * @return A pointer to the wchar array if the arrayIndex is valid, or
+ * a pointer to the latest wchar array from buffer otherwise.
+ */
+const wchar* getWCharArrayFromBuf(void* buffer, const int arrayIndex)
 {
-    int num = *(int*) buf;
-    char* buffer = (char*) buf;
-    const wchar* ptr = (wchar*) (buffer + 4);
-    //	printf("number of Strings = %d", num);
+    int num = *(int*) buffer;
+    char* charBuffer = (char*) buffer;
+    const wchar* ptr = (wchar*) (charBuffer + 4);
 
     const wchar* t = ptr;
     for (int i = 0; i < num; i++)
     {
-        printf("string %d = %S", i, ptr);
-        ptr += wcslen(ptr) + 1;
-    }
-
-}
-const wchar* getStringFromArray(void* buf, const int stringIndex)
-{
-    int num = *(int*) buf;
-    char* buffer = (char*) buf;
-    const wchar* ptr = (wchar*) (buffer + 4);
-
-    const wchar* t = ptr;
-    for (int i = 0; i < num; i++)
-    {
-        if (stringIndex == i)
+        if (arrayIndex == i)
         {
             break;
         }
@@ -71,6 +71,36 @@ const wchar* getStringFromArray(void* buf, const int stringIndex)
     return ptr;
 }
 
+/**
+ * Write n wchar-arrays to buffer.
+ * @param buffer The given buffer.
+ * The first value in buffer will be the number of wchar-arrays(n argument).
+ * @param src Contains the n wchar-arrays that will be written into buffer.
+ * @return The number of written bytes.
+ */
+int writeWCharArraysToBuf(
+    void* buffer,
+    const wchar_t** src,
+    const int n)
+{
+    char* charBuffer = (char*) buffer;
+    *(int*) charBuffer = n;
+    wchar_t* dst = (wchar_t*) (charBuffer + sizeof(int));
+    for (int i = 0; i < n; i++)
+    {
+        const wchar_t* array = src[i];
+        while (true)
+        {
+            *dst = *array;
+            dst++;
+            if (*array == 0)
+                break;
+            array++;
+        }
+    }
+
+    return (char*) dst - charBuffer;
+}
 /**
  * Print the result code.
  * If resultCode is different then MA_PIM_ERR_NONE prints
@@ -116,7 +146,6 @@ void printResultCode(const int resultCode)
     case MA_PIM_ERR_INVALID_INDEX:
         error = "MA_PIM_ERR_INVALID_INDEX";
         break;
-
     case MA_PIM_ERR_UNAVAILABLE_LIST:
         error = "MA_PIM_ERR_UNAVAILABLE_LIST";
         break;
@@ -129,16 +158,20 @@ void printResultCode(const int resultCode)
     case MA_PIM_ERR_INVALID_HANDLE:
         error = "MA_PIM_ERR_INVALID_HANDLE";
         break;
+    case MA_PIM_ERR_EMPTY_FIELD:
+        error = "MA_PIM_ERR_EMPTY_FIELD";
+        break;
     }
     error = "error: " + error;
     printf(error.c_str());
 }
 
 /**
- * Return the string associated with a contact name field index.
+ * Get the string associated with a contact name field index.
  * @param index One of the MA_PIM_CONTACT_NAME constants.
+ * @return The contact name index string.
  */
-MAUtil::String getContactNameFieldString(const int index)
+MAUtil::String getContactNameIndexString(const int index)
 {
     MAUtil::String text;
     switch (index)
@@ -171,11 +204,13 @@ MAUtil::String getContactNameFieldString(const int index)
 
     return text;
 }
+
 /**
- * Return the string associated with a address field index.
+ * Get the string associated with a address field index.
  * @param index One of the MA_PIM_CONTACT_ADDR constants.
+ * @return The address index string.
  */
-MAUtil::String getAddressFieldString(const int index)
+MAUtil::String getAddressIndexString(const int index)
 {
     MAUtil::String text;
     switch (index)
@@ -201,9 +236,6 @@ MAUtil::String getAddressFieldString(const int index)
     case MA_PIM_CONTACT_ADDR_COUNTRY:
         text = "Country:";
         break;
-    case MA_PIM_CONTACT_ADDR_COUNTRY_CODE:
-        text = "Country code:";
-        break;
     case MA_PIM_CONTACT_ADDR_NEIGHBORHOOD:
         text = "Neighborhood:";
         break;
@@ -213,13 +245,14 @@ MAUtil::String getAddressFieldString(const int index)
 }
 
 /**
- * Return the string associated with a class field index.
- * @param index One of the MA_PIM_CONTACT_CLASS constants.
+ * Get the string associated with a class field value.
+ * @param value One of the MA_PIM_CONTACT_CLASS constants.
+ * @return The class value string.
  */
-MAUtil::String getClassFieldString(const int index)
+MAUtil::String getClassValueString(const int value)
 {
     MAUtil::String text;
-    switch (index)
+    switch (value)
     {
     case MA_PIM_CONTACT_CLASS_CONFIDENTIAL:
         text = "Confidential";
@@ -236,10 +269,11 @@ MAUtil::String getClassFieldString(const int index)
 }
 
 /**
- * Return the string associated with a org info field index.
+ * Get the string associated with a org info field index.
  * @param index One of the MA_PIM_CONTACT_ORG_INFO constants.
+ * @return The org info index string.
  */
-MAUtil::String getOrgInfoFieldString(const int index)
+MAUtil::String getOrgInfoIndexString(const int index)
 {
     MAUtil::String text;
 

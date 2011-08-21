@@ -67,57 +67,235 @@ private:
         const int index,
         MAUtil::String (*pointerToFunc)(const int));
 
+    /**
+     * Print contact name field values.
+     */
     void printContactNameField();
+
+    /**
+     * Print address field values.
+     */
     void printAddress();
+
+    /**
+     * Print birthday field value.
+     */
     void printBirthday();
+
+    /**
+     * Print class field value.
+     */
     void printClass();
+
+    /**
+     * Print email field values.
+     */
     void printEmail();
+
+    /**
+     * Print formatted address field value.
+     */
     void printFormatedAddress();
+
+    /**
+     * Print formatted name field value.
+     */
     void printFormatedName();
+
+    /**
+     * Print nickname field value.
+     */
     void printNickname();
+
+    /**
+     * Print note field value.
+     */
     void printNote();
+
+    /**
+     * Print organization field value.
+     */
     void printOrg();
+
+    /**
+     * Print photo field value.
+     */
     void printPhoto();
+
+    /**
+     * Print photo URL field value.
+     */
     void printPhotoURL();
+
+    /**
+     * Print key field value.
+     */
     void printPublicKey();
+
+    /**
+     * Print public key field value.
+     */
     void printPublicKeyString();
+
+    /**
+     * Print revision field value.
+     */
     void printRevision();
+
+    /**
+     * Print phone field values.
+     */
     void printPhone();
+
+    /**
+     * Print title field value.
+     */
     void printTitle();
+
+    /**
+     * Print UID field value.
+     */
     void printUID();
+
+    /**
+     * Print URL field values.
+     */
     void printURL();
+
+    /**
+     * Print instant message field values.
+     */
     void printIM();
+
+    /**
+     * Print relation field values.
+     */
     void printRelation();
+
+    /**
+     * Print nickname field value.
+     */
     void printOrgInfo();
 
+    /**
+     * Add value to contact name field.
+     */
     void addContactName();
+
+    /**
+     * Add values to address field.
+     */
     void addAddress();
+
+    /**
+     * Add value to birthday field.
+     */
     void addBirthday();
+
+    /**
+     * Add value to class field.
+     */
     void addClass();
+
+    /**
+     * Add values to email field.
+     */
     void addEmail();
+
+    /**
+     * Add value to formatted address field.
+     */
     void addFormatedAddress();
+
+    /**
+     * Add value to formatted name field.
+     */
     void addFormatedName();
+
+    /**
+     * Add value to nickname field.
+     */
     void addNickname();
+
+    /**
+     * Add value to note field.
+     */
     void addNote();
+
+    /**
+     * Add value to organization field.
+     */
     void addOrg();
+
+    /**
+     * Add value to photo field.
+     */
     void addPhoto();
+
+    /**
+     * Add value to URL field.
+     */
     void addPhotoURL();
+
+    /**
+     * Add value to public key field.
+     */
     void addPublicKey();
+
+    /**
+     * Add value to public key string field.
+     */
     void addPublicKeyString();
+
+    /**
+     * Add value to revision field.
+     */
     void addRevision();
+
+    /**
+     * Add values to phone field.
+     */
     void addPhone();
+
+    /**
+     * Add value to title field.
+     */
     void addTitle();
+
+    /**
+     * Add value to UID field.
+     */
     void addUID();
+
+    /**
+     * Add values to URL field.
+     */
     void addURL();
+
+    /**
+     * Add value to instant message field.
+     */
     void addIM();
+
+    /**
+     * Add values to relation field.
+     */
     void addRelation();
+
+    /**
+     * Add value to organization field.
+     */
     void addOrgInfo();
+
 private:
     /**
      * Handle to a contact item.
      */
     MAHandle mItemHandle;
 
+    /**
+     * Arguments for getting and setting field values.
+     */
     MA_PIM_ARGS mArgs;
 };
 

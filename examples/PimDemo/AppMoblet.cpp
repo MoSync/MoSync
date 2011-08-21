@@ -15,6 +15,9 @@
  02111-1307, USA.
  */
 
+// Minimum number of values for drag events.
+#define MIN_DRAG_VALUES 10
+
 #include "AppMoblet.h"
 #include "Util.h"
 
@@ -53,7 +56,7 @@ void AppMoblet::pointerReleaseEvent(MAPoint2d point)
 {
     if (mHandlePointerEvent)
     {
-        if (mDragValues.size() < 5)
+        if (mDragValues.size() < MIN_DRAG_VALUES)
         {
             return;
         }

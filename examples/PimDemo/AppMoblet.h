@@ -99,10 +99,10 @@ private:
     MAUtil::Vector<int> mDragValues;
 
     /**
-     * Stores handles to new created contacts.
+     * If the flag is set to false is does not handle pointer events.
+     * This flag is set to true only when the app is waiting for drag events
+     * (no pim action is in progress).
      */
-    MAUtil::Vector<MAHandle> mNewContacts;
-
     bool mHandlePointerEvent;
 };
 #endif /* APPMOBLET_H_ */
