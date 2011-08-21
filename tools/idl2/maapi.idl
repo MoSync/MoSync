@@ -3739,7 +3739,6 @@ group WidgetAPI "Widget API" {
          */
          EDIT_BOX_RETURN = 19;
 
-
 		/**
 		* @brief A WebView widget reports status of loading
 		* page content. Event parameter status is set to one
@@ -4093,7 +4092,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
-		 * There is a replica available for Android.
+		 * This is an iOS specific widget.
 		 * See \ref WidgetNavigationBarProperties "Navigation Bar properties" for the properties available.
 		 */
 		NAV_BAR = "NavBar";
@@ -4439,30 +4438,6 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
-
-		/**
-		* @brief Specifies whether the navigation bar should be shown.
-		*
-		* This can have different behaviors on different platforms, on iPhone it is enabled by default, but on Android the
-		* user can set it to be shown, because this is not native behavior on Android.
-		* When it set this to true, a nav bar is associated to all screens of this stack screen, and there is
-		* no need to add it as a child to this widget.
-		* When it is set to false, the nav bar is removed from all containing screens of the stack.
-		* NOTE: remember to add main layouts for the screens, because those will be the parents of the navigation bars.
-		*
-		* @validvalue A boolean string 'true' or 'false'.
-		*
-		* @setandget
-		*
-		* @par Example
-		* \code
-		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_NAV_BAR_ENABLED, "true");
-		*   // Now a replica of the Nav Bar of iOS is shown on Android.
-		*   // And it handles the back button behaviour.
-		* \endcode
-		*/
-
-		NAV_BAR_ENABLED = "NavBarEnabled";
 
 	}
 	} // end of WidgetStackScreenProperties
@@ -5876,8 +5851,6 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		/**
 		* @brief Sets the background color. The default color is light blue.
 		* The color is in RGB8 format (0xRRGGBB).
-		* On Android there is another option:
-		*    Apply a gradient, specified by two rgb colors separated by comma.
 		*
 		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
 		*
@@ -5888,9 +5861,9 @@ group WidgetDatePickerProperties "Date Picker properties" {
         *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x101010");
 		* \endcode
 		*
-		* @par Example on Android apply a gradient from dark blue to light blue.
+		* @par Example
 		* \code
-        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B,0xCAE1FF");
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B");
 		* \endcode
 		*/
 		COLOR = "color";
