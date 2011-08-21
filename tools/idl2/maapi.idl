@@ -2887,10 +2887,8 @@ interface MAAPI {
 			POSTALCODE = 5;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country name.
 			COUNTRY = 6;
-			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Country code.
-			COUNTRY_CODE = 7;
 			/// Index for #MA_PIM_FIELD_CONTACT_ADDR. Neighborhood.
-			NEIGHBORHOOD = 8;
+			NEIGHBORHOOD = 7;
 		}
 
 		constset int MA_PIM_CONTACT_NAME_ {

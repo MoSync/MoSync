@@ -523,7 +523,7 @@
 {
     int returnValue = MA_PIM_ERR_NONE;
 
-    // Add the address to the multivalue.
+    // Add the anniversary to the multivalue.
     ABMultiValueIdentifier identifier;
     ABMutableMultiValueRef multiValue =
         ABMultiValueCreateMutable(kABDictionaryPropertyType);
@@ -777,7 +777,6 @@
         [utils addStringToArray:array string:state];  // Add REGION field.
         [utils addStringToArray:array string:zip];    // Add POSTALCODE field.
         [utils addStringToArray:array string:country];// Add COUNTRY field.
-        [utils addStringToArray:array string:@""];    // Add COUNTRY_CODE field.
         [utils addStringToArray:array string:@""];    // Add NEIGHBORHOOD field.
 
         [itemField addValue:array withLabel:(NSString*)addressLabel];
