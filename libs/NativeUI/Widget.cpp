@@ -493,7 +493,7 @@ namespace NativeUI
         sprintf(bufferColor1, "0x%.6X", firstColor);
         sprintf(bufferColor2, "0x%.6X", secondColor);
 
-        MAUtil::String gradient;
+        MAUtil::String gradient ="";
         gradient += bufferColor1;
         gradient += ",";
         gradient += bufferColor2;

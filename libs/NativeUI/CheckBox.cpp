@@ -61,7 +61,9 @@ namespace NativeUI
     bool CheckBox::isChecked() const
     {
         MAUtil::String value = this->getPropertyString(MAW_CHECK_BOX_CHECKED);
-        if (value.c_str() == "true")
+        // Add string because iOS cannot compile lib if there are warnings.
+        MAUtil::String trueStr = "true";
+        if (value.c_str() == trueStr.c_str() )
         {
             return true;
         }
