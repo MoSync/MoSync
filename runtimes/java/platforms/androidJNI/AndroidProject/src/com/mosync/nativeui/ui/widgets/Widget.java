@@ -191,8 +191,15 @@ public class Widget
 			int commaIndex = value.indexOf(",");
 			if ( commaIndex != -1 && commaIndex < value.length() )
 			{
-				String color1 = value.substring(0, commaIndex);
-				String color2 = value.substring(commaIndex+1);
+				String color1, color2;
+				try{
+				color1 = value.substring(0, commaIndex);
+				color2 = value.substring(commaIndex+1);
+				}
+				catch (IndexOutOfBoundsException iofbe)
+				{
+					throw new InvalidPropertyValueException(property, value);
+				}
 				// Make sure bad values get caught.
 				int[] colors = new int[2];
 				colors[0] = ColorConverter.convert(color1);
