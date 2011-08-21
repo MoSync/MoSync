@@ -1316,7 +1316,12 @@ return 0; \
 	{
 		MoSync_ShowMessageBox(title, message, false);
 	}
-	
+
+    SYSCALL(void, maImagePickerOpen())
+	{
+		MoSync_ShowImagePicker();
+	}
+
 	//This struct holds information about what resources are connected
 	//to a single camera. Each device camera has it's own instance
 	//(So, one for most phones, and two for iPhone 4, for example)
@@ -1767,6 +1772,7 @@ return 0; \
 		maIOCtl_case(maCameraGetProperty);
         maIOCtl_case(maSensorStart);
         maIOCtl_case(maSensorStop);
+		maIOCtl_case(maImagePickerOpen);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
