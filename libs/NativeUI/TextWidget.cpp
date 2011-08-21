@@ -53,7 +53,7 @@ namespace NativeUI
      */
     void TextWidget::setText(const MAUtil::String& text)
     {
-        this->setProperty(MAW_BUTTON_TEXT, text);
+        this->setProperty(MAW_LABEL_TEXT, text);
     }
 
     /**
@@ -62,7 +62,7 @@ namespace NativeUI
      */
      MAUtil::String TextWidget::getText() const
      {
-         return this->getPropertyString(MAW_BUTTON_TEXT);
+         return this->getPropertyString(MAW_LABEL_TEXT);
      }
 
      /**

@@ -12,17 +12,16 @@ import static com.mosync.internal.generated.MAAPI_consts.RES_FONT_NAME_NONEXISTE
 import static com.mosync.internal.generated.MAAPI_consts.RES_FONT_LIST_NOT_INITIALIZED;
 import static com.mosync.internal.generated.MAAPI_consts.RES_FONT_INSUFFICIENT_BUFFER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_FONT_INVALID_SIZE;
+import static com.mosync.internal.generated.MAAPI_consts.RES_FONT_DELETE_DENIED;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
-import com.mosync.internal.generated.IX_WIDGET;
-import com.mosync.java.android.MoSync;
-
-import android.app.Activity;
+import android.content.res.AssetManager;
 import android.graphics.Typeface;
 import android.util.Log;
 
@@ -45,7 +44,7 @@ public class MoSyncFont
 	/**
 	 * Internal handle for handling fonts.
 	 */
-	class MoSyncFontHandle
+	public class MoSyncFontHandle
 	{
 		/*
 		 * Constructor.
@@ -155,9 +154,6 @@ public class MoSyncFont
 				return RES_FONT_NO_TYPE_STYLE_COMBINATION;
 			}
 
-	//		mPaint.setTypeface(fontFamily);
-	//		mPaint.setTypeface(Typeface.defaultFromStyle(style));
-
 			// Increase the current index in the font list.
 			mFontHandle++;
 
@@ -211,23 +207,38 @@ public class MoSyncFont
 	*/
 	int maFontGetCount()
 	{
-		// Get this list each time the method gets called.
+		// Clear this list each time the method gets called.
 		mFontNames.clear();
 
-		File temp = new File("/system/fonts/");
-		final String fontSuffix = ".ttf";
+		// Add the system fonts.
+		File systemFontsFile = new File(SYSTEM_FONTS_FOLDER);
+
 		FilenameFilter myFileNameFilter = new FilenameFilter(){
 			public boolean accept(File f, String name){
-				return name.endsWith(fontSuffix);
+				return name.endsWith(FONT_EXT);
 			}
 		};
 
-		for(File font : temp.listFiles(myFileNameFilter)){
+		for(File font : systemFontsFile.listFiles(myFileNameFilter)){
 			String fontName = font.getName();
-			mFontNames.add(fontName.subSequence(0,fontName.lastIndexOf(fontSuffix)).toString());
+			mFontNames.add(fontName.subSequence(0,fontName.lastIndexOf(FONT_EXT)).toString());
 		}
 
-		//TODO add fonts from Assetsmanager also.
+		//Add custom fonts from Assets Manager.
+		try {
+	        String[] assetFiles = mMoSyncThread.getActivity().getAssets().list(ASSETS_FONT_FOLDER);
+	        for ( int i=0; i<assetFiles.length; i++)
+	        {
+				if ( assetFiles[i].endsWith(FONT_EXT))
+				{
+					mFontNames.add(assetFiles[i].subSequence(0, assetFiles[i].lastIndexOf(FONT_EXT)).toString());
+				}
+			}
+		} catch (IOException e)
+		{
+			Log.e("MoSync", "maFontGetCount No fonts in assets");
+		}
+
 		return mFontNames.size();
 
 	}
@@ -242,7 +253,7 @@ public class MoSyncFont
 	* 		or RES_FONT_INSUFFICIENT_BUFFER or RES_FONT_LIST_NOT_INITIALIZED.
 	* \see maFontGetCount, maFontLoadWithName.
 	*/
-	int maFontGetName(int index,// String buf, int bufLen)
+	int maFontGetName(int index,
 			final int memBuffer,
 			final int memBufferSize)
 	{
@@ -290,13 +301,24 @@ public class MoSyncFont
 		// Create a new font handle using postscript name and size.
 		MoSyncFontHandle newMosyncFont;
 
-		newMosyncFont = new MoSyncFontHandle(Typeface.createFromFile("/system/fonts/"+postScriptName+".ttf"), size );
+		// Try to get the typeface from system fonts if it exists.
+		Typeface newTypeface = Typeface.createFromFile(SYSTEM_FONTS_FOLDER + postScriptName + FONT_EXT);
 
-		// Check if the font exists.
-		if ( newMosyncFont.getTypeface() == null )
+		if ( newTypeface == null )
 		{
-			return RES_FONT_NAME_NONEXISTENT;
+			// Try to create a typeface from assets. ( ex "fonts/myFont.ttf" )
+			newTypeface = Typeface.createFromAsset(
+					mMoSyncThread.getActivity().getAssets(), ASSETS_FONT_FOLDER + "/" + postScriptName + FONT_EXT);
+
+			// Check if the font exists.
+			if ( newTypeface == null )
+			{
+				return RES_FONT_NAME_NONEXISTENT;
+			}
 		}
+
+		// Create the font handle.
+		newMosyncFont = new MoSyncFontHandle(newTypeface, size );
 
 		// Increase the current index in the font list.
 		mFontHandle++;
@@ -312,12 +334,17 @@ public class MoSyncFont
 	/**
 	* Deletes a loaded font.
 	* \param 'font' A font handle
-	* \return RES_FONT_OK or RES_FONT_INVALID_HANDLE
+	* \return RES_FONT_OK, RES_FONT_INVALID_HANDLE, or RES_FONT_DELETE_DENIED.
 	*/
 	int maFontDelete(int fontHandle)
 	{
-		MoSyncFontHandle currentFont = (MoSyncFontHandle)
-		mFonts.get(fontHandle);
+		// Cannot delete font in use.
+		if ( mDefaultFontHandle == fontHandle )
+		{
+			return RES_FONT_DELETE_DENIED;
+		}
+
+		MoSyncFontHandle currentFont = (MoSyncFontHandle) mFonts.get(fontHandle);
 
 		if ( currentFont == null )
 		{
@@ -340,10 +367,7 @@ public class MoSyncFont
 		// Check if the font list has been retrieved.
 		if ( mFontNames.size() > 0 )
 		{
-			// Check the index.
-			// OR: try { buf = mFontNames.get(index); }
-			// catch(IndexOutOfBoundsException iofbe)
-//			 if ( index >= 0 && index < mFontNames.size() )
+			// If out of bounds, IndexOutOfBounds is thrown.
 			fontName = mFontNames.get(index);
 			return fontName;
 
@@ -351,6 +375,37 @@ public class MoSyncFont
 
 		return "";// handle RES_FONT_LIST_NOT_INITIALIZED;
 	}
+
+	/**
+	 * Search in the list of fonts for a handle.
+	 * This is used when setting typeface to native ui widgets.
+	 * @param 'fontHandle' A font handle
+	 * @return The MoSyncFontHandle object that refers to that handle.
+	 */
+	public MoSyncFontHandle getMoSyncFont(int fontHandle)
+	{
+		MoSyncFontHandle currentFont = (MoSyncFontHandle)
+			mFonts.get(fontHandle);
+
+		return currentFont;
+	}
+
+	/************************ Class members ************************/
+
+	/**
+	 * The extension of the true type fonts.
+	 */
+	private final static String FONT_EXT = ".ttf";
+
+	/**
+	 * The directory of system fonts.
+	 */
+	private final static String SYSTEM_FONTS_FOLDER = "/system/fonts/";
+
+	/**
+	 * The subdir of the assets where custom fonts are loaded.
+	 */
+	private final static String ASSETS_FONT_FOLDER = "fonts";
 
 	/**
 	 * Table that holds list of fonts.

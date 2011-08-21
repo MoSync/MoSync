@@ -57,6 +57,18 @@ namespace NativeUI
         virtual ~Button();
 
         /**
+         * Set the text displayed by the widget.
+         * @param text The given text.
+         */
+        virtual void setText(const MAUtil::String& text);
+
+        /**
+         * Get the text displayed by the widget.
+         * @return The text displayed by the widget.
+         */
+        virtual MAUtil::String getText() const;
+
+        /**
          * Add an button event listener.
          * @param listener The listener that will receive button events.
          */

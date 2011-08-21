@@ -186,6 +186,13 @@ namespace NativeUI
 	 */
 	Date DatePicker::getMinDate()
 	{
+		if ( MAW_RES_FEATURE_NOT_AVAILABLE ==
+			this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE))
+		{
+			Date defaultDate = Date(1,1,1990);
+			return defaultDate;
+		}
+
         int minDateMilliseconds =
             this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE);
         tm *dateStruct = 0;
@@ -216,6 +223,13 @@ namespace NativeUI
 	 */
 	struct Date DatePicker::getMaxDate()
 	{
+		if ( MAW_RES_FEATURE_NOT_AVAILABLE ==
+			this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE))
+		{
+			Date defaultDate = Date(12,31,2100);
+			return defaultDate;
+		}
+
 	    int maxDateMilliseconds =
 	        this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE);
 	    tm *dateStruct = 0;

@@ -48,6 +48,24 @@ namespace NativeUI
      }
 
      /**
+      * Set the text displayed by the widget.
+      * @param text The given text.
+      */
+     void Button::setText(const MAUtil::String& text)
+     {
+         this->setProperty(MAW_BUTTON_TEXT, text);
+     }
+
+     /**
+      * Get the text displayed by the widget.
+      * @return The text displayed by the widget.
+      */
+      MAUtil::String Button::getText() const
+      {
+          return this->getPropertyString(MAW_BUTTON_TEXT);
+      }
+
+     /**
       * Add an button event listener.
       * @param listener The listener that will receive button events.
       */

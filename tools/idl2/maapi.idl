@@ -1425,7 +1425,7 @@ interface MAAPI {
 				/**
 				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
 				*/
-				int imagePickerItemHandle;
+				MAHandle imagePickerItem;
 			} imagePicker;
 
 			/**
@@ -1727,6 +1727,12 @@ interface MAAPI {
 			* \brief Indicates that an invalid size was passed.
 			*/
 			INVALID_SIZE = -7;
+
+			/**
+			* \brief Indicates that the font cannot be deleted because it is in use.
+			*  maFontDelete(handle)  fails with this return code.
+			*/
+			DELETE_DENIED = -8;
 		}
 
 		/**
@@ -1776,7 +1782,7 @@ interface MAAPI {
 		/**
 		* Deletes a loaded font
 		* \param 'font' A font handle
-		* \return RES_FONT_OK or RES_FONT_INVALID_HANDLE
+		* \return RES_FONT_OK, RES_FONT_INVALID_HANDLE, or RES_FONT_DELETE_DENIED.
 		*/
 		int maFontDelete(in MAHandle font);
 
@@ -3733,7 +3739,6 @@ group WidgetAPI "Widget API" {
          */
          EDIT_BOX_RETURN = 19;
 
-
 		/**
 		* @brief A WebView widget reports status of loading
 		* page content. Event parameter status is set to one
@@ -4087,7 +4092,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
-		 * There is a replica available for Android.
+		 * This is an iOS specific widget.
 		 * See \ref WidgetNavigationBarProperties "Navigation Bar properties" for the properties available.
 		 */
 		NAV_BAR = "NavBar";
@@ -4434,30 +4439,6 @@ group WidgetAPI "Widget API" {
 		*/
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
 
-		/**
-		* @brief Specifies whether the navigation bar should be shown.
-		*
-		* This can have different behaviors on different platforms, on iPhone it is enabled by default, but on Android the
-		* user can set it to be shown, because this is not native behavior on Android.
-		* When it set this to true, a nav bar is associated to all screens of this stack screen, and there is
-		* no need to add it as a child to this widget.
-		* When it is set to false, the nav bar is removed from all containing screens of the stack.
-		* NOTE: remember to add main layouts for the screens, because those will be the parents of the navigation bars.
-		*
-		* @validvalue A boolean string 'true' or 'false'.
-		*
-		* @setandget
-		*
-		* @par Example
-		* \code
-		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_NAV_BAR_ENABLED, "true");
-		*   // Now a replica of the Nav Bar of iOS is shown on Android.
-		*   // And it handles the back button behaviour.
-		* \endcode
-		*/
-
-		NAV_BAR_ENABLED = "NavBarEnabled";
-
 	}
 	} // end of WidgetStackScreenProperties
 
@@ -4545,6 +4526,28 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		FONT_SIZE = "fontSize";
+
+		/**
+		* @brief Sets the typeface and style in which the text should be displayed.
+		*
+		* @validvalue A font handle received from loading fonts using
+		* #maFontGetName and #maFontLoadWithName syscalls.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   int nrFonts = maFontGetCount();
+		*    char buf[256];
+		*    // Get first font name.
+		*    maFontGetName(1, buf, 256);
+		*    // Load that font for size 10.
+		*    int fontHandle = maFontLoadWithName(buf, 10);
+		*    // Set that font to the label.
+		*	maWidgetSetProperty(labelHandle, MAW_LABEL_FONT_HANDLE, toString(fontHandle));
+		* \endcode
+		*/
+		FONT_HANDLE = "fontHandle";
 
 		/**
 		* @brief Sets the maximum number of lines used for rendering text.
@@ -4657,7 +4660,7 @@ group WidgetAPI "Widget API" {
 	constset MAString MAW_IMAGE_BUTTON_ {
 		/**
 		* @brief Sets or gets the text that is displayed in the label.
-		*
+		* Note: It is not available on Android, as native image buttons do not have text attached.
 		* @validvalue A null-terminated string.
 		*
 		* @setandget
@@ -5848,8 +5851,6 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		/**
 		* @brief Sets the background color. The default color is light blue.
 		* The color is in RGB8 format (0xRRGGBB).
-		* On Android there is another option:
-		*    Apply a gradient, specified by two rgb colors separated by comma.
 		*
 		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
 		*
@@ -5860,9 +5861,9 @@ group WidgetDatePickerProperties "Date Picker properties" {
         *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x101010");
 		* \endcode
 		*
-		* @par Example on Android apply a gradient from dark blue to light blue.
+		* @par Example
 		* \code
-        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B,0xCAE1FF");
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B");
 		* \endcode
 		*/
 		COLOR = "color";
@@ -6561,10 +6562,9 @@ group CameraFunctions "Camera Functions" {
 		/**
 		* Displays an image picker to the user.
 		* It's display depends on the platform.
-		* \param title The title of the dialog shown.
 		* Note: when a selection is made a #MAW_EVENT_TYPE_IMAGE_PICKER is sent.
 		*/
-		void maImagePickerOpen(in MAString title);
+		void maImagePickerOpen();
 
 		constset int SENSOR_TYPE_ {
 			// A constant describing an accelerometer sensor type.
