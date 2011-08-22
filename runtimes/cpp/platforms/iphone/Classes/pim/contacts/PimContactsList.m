@@ -91,14 +91,29 @@
 
     // Check if the are more items in list.
     NSArray* keysArray = [mContactsDictionary allKeys];
-    if ((mKeysArrayIndex + 1) >= [keysArray count])
+    if (mKeysArrayIndex == ([keysArray count] -1))
     {
         return 0;
     }
 
+    // Sort the values in the array so the last values will last added.
+    // The created contacts will be at the end of the array.
+    NSArray* sortedKeysArray = [keysArray sortedArrayUsingComparator:
+        ^(id obj1, id obj2)
+     {
+         if ([obj1 intValue] > [obj2 intValue])
+         {
+             return (NSComparisonResult) NSOrderedDescending;
+         }
+         if ([obj1 integerValue] < [obj2 integerValue]) {
+             return (NSComparisonResult)NSOrderedAscending;
+         }
+         return (NSComparisonResult)NSOrderedSame;
+     }];
+
     // Return a handle to the next item.
     mKeysArrayIndex++;
-    NSString* currentStringKey = [keysArray objectAtIndex:mKeysArrayIndex];
+    NSString* currentStringKey = [sortedKeysArray objectAtIndex:mKeysArrayIndex];
     int currentIntKey = [currentStringKey intValue];
 
     return currentIntKey;
@@ -123,7 +138,7 @@
  * Creates an Contact item.
  * @return A handle to the new Contact item.
  */
--(MAHandle) createItem;
+-(MAHandle) createItem
 {
     PimContactItem* item = [[PimContactItem alloc] init];
     int handle = [[PimUtils sharedInstance] getNextHandle];
