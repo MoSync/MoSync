@@ -24,6 +24,7 @@ build-one.rb
 /libs/Testify
 /libs/yasper
 /libs/SDL
+/libs/yajl/
 
 /intlibs/gsm_amr
 /intlibs/sqlite
@@ -85,6 +86,8 @@ build-one.rb
 /libs/MAStd/s_ceil.c
 /libs/MAStd/s_floor.c
 /libs/MAStd/s_frexp.c
+/libs/MAStd/s_isinf.c
+/libs/MAStd/s_isnan.c
 /libs/MAStd/tlsf.c
 /libs/MAStd/tlsf.h
 /libs/MAStd/wchar.h
