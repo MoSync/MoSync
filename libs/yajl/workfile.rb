@@ -9,7 +9,7 @@ work.instance_eval do
 		@SOURCES << 'src/stdlib' if(!USE_NEWLIB)
 
 		@HEADER_DIRS = ['src/api']
-		@EXTRA_INCLUDES = ['src/stdlib']
+		@EXTRA_INCLUDES = ['src/stdlib'] if(!USE_NEWLIB)
 		@EXTRA_CFLAGS = ' -Wno-float-equal -Wno-unreachable-code'
 
 		@INSTALL_INCDIR = 'yajl'
