@@ -219,41 +219,51 @@ static char sDocument[] = "<devices>"
 "</devices>"
 ;
 
-static void tagStart(MTXContext* context, const char* name, int len) {
-	printf("s %i: \"%s\"\n", len, name);
+static void encoding(MTXContext* context, const char* value) {
+	printf("encoding: \"%s\"\n", value);
 }
-static void tagAttr(MTXContext* context, const char* attrName, const char* attrValue) {
-	printf("a \"%s\": \"%s\"\n", attrName, attrValue);
+static void tagStart(MTXContext* context, const void* name, int len) {
+	printf("s %i: \"%s\"\n", len, (char*)name);
 }
-static void tagData(MTXContext* context, const char* data, int len) {
-	printf("d %i: \"%s\"\n", len, data);
+static void tagAttr(MTXContext* context, const void* attrName, const void* attrValue) {
+	printf("a \"%s\": \"%s\"\n", (char*)attrName, (char*)attrValue);
 }
-static void tagEnd(MTXContext* context, const char* name, int len) {
-	printf("e %i: \"%s\"\n", len, name);
+static void tagData(MTXContext* context, const void* data, int len) {
+	printf("d %i: \"%s\"\n", len, (char*)data);
+}
+static void tagStartEnd(MTXContext* context) {
+	printf("se\n");
+}
+static void tagEnd(MTXContext* context, const void* name, int len) {
+	printf("e %i: \"%s\"\n", len, (char*)name);
 }
 static void dataRemains(MTXContext* context, const char* data, int len) {
 	printf("r %i: \"%s\"\n", len, data);
 }
-static void parseError(MTXContext* context) {
-	printf("parseError\n");
+static void parseError(MTXContext* context, int offset) {
+	printf("parseError %i\n", offset);
 }
 static void emptyTagEnd(MTXContext* context) {
 	printf("emptyTagEnd\n");
 }
 
+extern "C" int MAMain() GCCATTRIB(noreturn);
 extern "C" int MAMain() {
 	InitConsole();
 	gConsoleLogging = 1;
 	printf("Hello World!\n");
 
 	MTXContext c;
+	c.encoding = encoding;
 	c.tagStart = tagStart;
 	c.tagAttr = tagAttr;
 	c.tagData = tagData;
 	c.tagEnd = tagEnd;
+	c.tagStartEnd = tagStartEnd;
 	c.dataRemains = dataRemains;
 	c.parseError = parseError;
 	c.emptyTagEnd = emptyTagEnd;
+	c.unicodeCharacter = mtxBasicUnicodeConvert;
 	mtxStart(&c);
 	mtxFeed(&c, sDocument);
 
