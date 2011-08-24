@@ -16,7 +16,7 @@
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
-		4192E7B913F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
+		41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */ = {isa = PBXBuildFile; fileRef = 4192E7B613F5801900C10302 /* CameraConfirgurator.h */; };
 		4318698513F68D410051D97A /* PimContactItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318696E13F68D410051D97A /* PimContactItem.h */; };
 		4318698613F68D410051D97A /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318696F13F68D410051D97A /* PimContactItem.m */; };
 		4318698713F68D410051D97A /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318696F13F68D410051D97A /* PimContactItem.m */; };
@@ -988,6 +988,7 @@
 				43D8047B13EFBCB200183387 /* TimePickerWidget.h in Headers */,
 				43D8047E13EFBCB200183387 /* VideoViewWidget.h in Headers */,
 				43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */,
+				41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1275,7 +1276,6 @@
 				85F25A3611AD614700EB47EE /* main.m in Sources */,
 				85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */,
 				85F2557C11AC155D00EB47EE /* rebuild.cpp in Sources */,
-				4192E7B913F5801900C10302 /* CameraConfirgurator.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
