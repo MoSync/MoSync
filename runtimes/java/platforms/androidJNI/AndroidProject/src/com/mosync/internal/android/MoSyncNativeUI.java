@@ -370,7 +370,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	{
 		if ( mImagePicker == null )
 		{
-			mImagePicker = new MoSyncImagePicker(mMoSyncThread);
+			mImagePicker = new MoSyncImagePicker(mMoSyncThread, mNativeUI.getImageTable());
 		}
 
 		getActivity().runOnUiThread(new Runnable() {

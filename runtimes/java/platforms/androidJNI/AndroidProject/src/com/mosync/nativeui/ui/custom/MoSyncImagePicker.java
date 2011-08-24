@@ -21,6 +21,9 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_IMAGE_PICKER
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
+import java.util.Hashtable;
+import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -28,8 +31,12 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,6 +51,7 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.mosync.internal.android.MoSyncThread;
+import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.java.android.R;
 
 
@@ -62,9 +70,12 @@ public class MoSyncImagePicker
 	 * Constructor.
 	 * @param thread The MoSync thread.
 	 */
-	public MoSyncImagePicker(MoSyncThread thread)
+	public MoSyncImagePicker(MoSyncThread thread,Hashtable<Integer, ImageCache> imageTable)
 	{
 		mMoSyncThread = thread;
+		mImageTable = imageTable;
+		mPaths = new ArrayList<String>();
+		mNames = new ArrayList<String>();
 	}
 
 	/*
@@ -97,10 +108,8 @@ public class MoSyncImagePicker
 			}
 		});
 
-		// Get the images.
-		if ( getImages() )
+		if ( getImagesUsingCursor() )
 		{
-
 			// Provide a linear layout with a gallery and a preview of the
 			// selected item.
 			LinearLayout layout = new LinearLayout(getActivity());
@@ -111,8 +120,9 @@ public class MoSyncImagePicker
 			        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
 			Gallery gallery = new Gallery(getActivity());
-			gallery.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
-			        LayoutParams.WRAP_CONTENT));
+//			gallery.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+//			        LayoutParams.FILL_PARENT));
+			gallery.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,150));
 
 			// Fill the gallery view with images.
 			gallery.setAdapter(new CustomAdapter(getActivity()));
@@ -124,7 +134,7 @@ public class MoSyncImagePicker
 //			preview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
 //					LayoutParams.FILL_PARENT));
 
-            Bitmap bitmap = BitmapFactory.decodeFile(mImagePaths[0]);
+            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(0));
             preview.setImageBitmap(bitmap);
 
 			layout.addView(preview);
@@ -135,24 +145,26 @@ public class MoSyncImagePicker
 				public void onItemClick(AdapterView<?> arg0, View v,
 				        int position, long id)
 				{
-					Toast.makeText(getActivity(), mImageFiles[position].getName() ,
+					Toast.makeText(getActivity(), mNames.get(position) ,
 					        Toast.LENGTH_SHORT).show();
 
 					// Refresh the preview image.
-		            Bitmap bitmap = BitmapFactory.decodeFile(mImagePaths[position]);
+		            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(position));
 		            preview.setImageBitmap(bitmap);
 
 		            // Save the handle of the selected item as an event.
-		            mImageHandle = getSelectedImageHandle();
+		            mImageHandle = getSelectedImageHandle(mPaths.get(position));
 				}
 			});
 
 			builder.setView(layout);
+
 		}
 		else
 		{
 			builder.setMessage("No images were found on the device!");
 		}
+
 		AlertDialog alertDialog = builder.create();
 
 		// Display the dialog until user provides a selection, or cancels the
@@ -170,47 +182,96 @@ public class MoSyncImagePicker
 		event[0] = EVENT_TYPE_IMAGE_PICKER;
 		event[1] = state;
 		// If Cancel is clicked, the handle is -1.
-		event[2] = getSelectedImageHandle();
+		event[2] = mImageHandle;
 
 		mMoSyncThread.postEvent(event);
 	}
 
 	/*
-	 * Get the list of all images on the device.
+	 * Parse cursor and select only image paths and names.
+	 * Copy them locally.
 	 */
-	private boolean getImages()
+	private void parseCursor(Cursor aCursor)
 	{
-		// Check for files that are directly into the sd card
-		File imagesDir = new File("/sdcard/pics/"); // Environment.getDataDirectory();
+	    if (aCursor != null)
+	    {
 
-		mImageFiles = imagesDir.listFiles(new FilenameFilter(){
-
-			@Override
-            public boolean accept(File dir, String filename)
-            {
-				return ((filename.endsWith(".jpg"))||(filename.endsWith(".jpeg"))||(filename.endsWith(".png")));
-            }
-		});
-
-		if (mImageFiles != null )
-		{
-			mImagePaths =  new String[mImageFiles.length];
-
-			// Load items.
-			ProgressDialog progress = ProgressDialog.show(getActivity(), "", "Please wait..");
-			progress.setCancelable(false);
-
-			for(int i = 0 ; i< mImageFiles.length; i++)
+			if (aCursor.moveToFirst())
 			{
-				mImagePaths[i] = mImageFiles[i].getAbsolutePath();
-			}
-			progress.dismiss();
+		        String filePath;
+		        String title;
+		        int pathColumn = aCursor.getColumnIndex(
+		            MediaStore.Images.Media.DATA);
+
+		        int titleColumn = aCursor.getColumnIndex(
+		            MediaStore.Images.Media.TITLE);
+
+		        do {
+		            // Get the field values
+		            filePath = aCursor.getString(pathColumn);
+		            title = aCursor.getString(titleColumn);
+
+		            if ( filePath.endsWith(".jpg") || filePath.endsWith(".png") || filePath.endsWith(".jpeg") )
+		            {
+						mPaths.add(filePath);
+						mNames.add(title);
+		            }
+
+		            // This is for test only.
+//					Toast.makeText(getActivity(),"path= "+ filePath+" title="+title ,
+//					        Toast.LENGTH_SHORT).show();
+
+		        } while (aCursor.moveToNext());
+		    }
+	    }
+	}
+
+	private boolean getImagesUsingCursor()
+	{
+		mPaths.clear();
+		mNames.clear();
+
+		// Search for both internal and external images.
+		Uri externalImages = MediaStore.Images.Media.EXTERNAL_CONTENT_URI;
+		Uri internalImages = MediaStore.Images.Media.INTERNAL_CONTENT_URI;
+
+		// which image properties are we querying
+		String[] projection = new String[]{
+			MediaStore.Images.Media._ID,
+			// Get the absolute path.
+	        MediaStore.Images.Media.DATA,
+	        // Get the title for display.
+	        MediaStore.Images.Media.TITLE
+	};
+
+	    // Make the queries.
+	    Cursor externalCursor = getActivity().getContentResolver().query(externalImages,
+	            projection, // Which columns to return
+	            "",         // Which rows to return (all rows)
+	            null,       // Selection arguments (none)
+	            ""          // Ordering
+	            );
+
+	    parseCursor(externalCursor);
+
+	    Cursor internalCursor = getActivity().getContentResolver().query(internalImages,
+	            projection, // Which columns to return
+	            "",         // Which rows to return (all rows)
+	            null,       // Selection arguments (none)
+	            ""          // Ordering
+	            );
+
+	    parseCursor(internalCursor);
+
+	    if ( !mPaths.isEmpty() )
+	    {
 			return true;
-		}
-		else
-		{
+	    }
+	    else
+	    {
+			Log.i("MoSync","maImagePickerOpen - no images!!!");
 			return false;
-		}
+	    }
 	}
 
 	/**
@@ -226,12 +287,20 @@ public class MoSyncImagePicker
      * Further, post it in a EVENT_TYPE_IMAGE_PICKER event.
      * @return The new handle.
      */
-    private int getSelectedImageHandle()
+    private int getSelectedImageHandle(final String absPath)
     {
         // Create handle.
         int dataHandle = mMoSyncThread.nativeCreatePlaceholder();
-//    	createData(dataHandle, size);
-//    	writedata
+
+        Bitmap tempBitmap = BitmapFactory.decodeFile(absPath);
+
+			if(null == tempBitmap)
+			{
+				Log.i("MoSync","maImagePickerOpen Cannot create handle");
+//				maPanic(1, "Unable to create ");
+			}
+
+			mImageTable.put(dataHandle, new ImageCache(null, tempBitmap));
 
         return dataHandle;
     }
@@ -253,7 +322,7 @@ public class MoSyncImagePicker
 
         public int getCount()
         {
-            return mImagePaths.length;
+			return mPaths.size();
         }
 
         public Object getItem(int position)
@@ -270,7 +339,7 @@ public class MoSyncImagePicker
         {
             ImageView imgView = new ImageView(mContext);
 
-            Bitmap bitmap = BitmapFactory.decodeFile(mImagePaths[position]);
+            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(position));
             imgView.setImageBitmap(bitmap);
             imgView.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,
 			        LayoutParams.WRAP_CONTENT));
@@ -290,14 +359,19 @@ public class MoSyncImagePicker
     private MoSyncThread mMoSyncThread;
 
     /**
+     * It has access to the image resource table.
+     */
+    private Hashtable<Integer, ImageCache> mImageTable;
+
+    /**
      * List of absolute paths to all images on the device.
      */
-	private String[] mImagePaths;
+	private List<String> mPaths;
 
 	/**
-	 * List of all image files of the device.
+	 * List of image names.
 	 */
-	private File[] mImageFiles;
+	private List<String> mNames;
 
 	/**
 	 * The handle of the selected image.

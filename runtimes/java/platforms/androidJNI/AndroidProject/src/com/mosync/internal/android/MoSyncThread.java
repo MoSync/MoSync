@@ -3706,7 +3706,7 @@ public class MoSyncThread extends Thread
 		public Bitmap mBitmap;
 		public Canvas mCanvas;
 
-		ImageCache(Canvas canvas, Bitmap bitmap)
+		public ImageCache(Canvas canvas, Bitmap bitmap)
 		{
 			mCanvas = canvas;
 			mBitmap = bitmap;

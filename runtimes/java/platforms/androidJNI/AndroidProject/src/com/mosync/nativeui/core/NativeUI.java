@@ -131,6 +131,16 @@ public class NativeUI
 	}
 	
 	/**
+	 * Gets the bitmap table, that can be modified.
+	 *
+	 * @return The bitmap table.
+	 */
+	public Hashtable<Integer, ImageCache> getImageTable()
+	{
+		return m_imageTable;
+	}
+
+	/**
 	 * Sets the default MoSync canvas view, so that it is possible
 	 * to switch back to it from native UI.
 	 * 
