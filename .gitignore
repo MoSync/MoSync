@@ -191,6 +191,8 @@ config_platform.h
 /examples/GenerateResources/config.rb
 /examples/GenerateResources/profile.rb
 
+/examples/FacebookDemo/config.h
+
 /docs/*.dot.*
 
 /tools/mhsd-display/mhsd.bin

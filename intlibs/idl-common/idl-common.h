@@ -137,7 +137,7 @@ void streamHash(ostream& stream, const Interface& inf);
 void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string>& ixs, int ix);
 void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<string>& ixs, int ix);
 void streamJavaDefinitionFile(
-	ostream& stream, 
+	ostream& stream,
 	const string& className,
 	const Interface& apiData,
 	int ix);
@@ -146,7 +146,7 @@ void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix)
 void streamIoctlDefines(ostream& stream, const Interface& ioctls, const string& headerName, int ix, bool java);
 void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 	const string& ioctlName, int fnOffset = 0);
-void streamCppDefs(ostream& stream, const Interface& inf, int ix);
+void streamCppDefs(ostream& stream, const Interface& inf, int ix, const string& headerName);
 
 void streamInvokeSyscall(ostream&, const Interface&, bool java, int argOffset = 0);
 void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall);

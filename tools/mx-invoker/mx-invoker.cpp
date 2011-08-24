@@ -96,16 +96,17 @@ void streamInvokePrefix(ostream& stream, const Function& f) {
 
 static void outputNativeHeader(const char* output, const Interface& inf) {
 	ofstream stream((string(output)+"/cpp_mx_"+inf.name+".h").c_str());
-	stream << "#ifndef CPP_MX_"<<inf.name<<"\n";
-	stream << "#define CPP_MX_"<<inf.name<<"\n";
+	string headerName = "CPP_MX_" + inf.name;
+	stream << "#ifndef "<<headerName<<"\n";
+	stream << "#define "<<headerName<<"\n";
 	stream << "\n";
 	stream << "#include \"extension.h\"\t//found in /mosync/ext-include/\n";
 	stream << "\n";
 	stream << "#define IDL_HASH_"<<inf.name<<" 0x"<<setfill('0') << setw(8) << hex << calculateChecksum(inf)<<"\n";
 	stream << "\n";
-	streamCppDefs(stream, inf, MAIN_INTERFACE);
+	streamCppDefs(stream, inf, MAIN_INTERFACE, headerName);
 	streamHeaderFunctions(stream, inf, true);
 	stream << "\n";
-	stream << "#endif\t//CPP_MX_"<<inf.name<<"\n";
+	stream << "#endif\t//"<<headerName<<"\n";
 	flushStream(stream);
 }

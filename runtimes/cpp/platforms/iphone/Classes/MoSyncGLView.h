@@ -42,6 +42,7 @@
 
 @property NSTimeInterval animationInterval;
 
+- (id)initWithFrame:(CGRect)frame andApi:(EAGLRenderingAPI)api;
 - (void)startAnimation;
 - (void)stopAnimation;
 - (void)drawView;

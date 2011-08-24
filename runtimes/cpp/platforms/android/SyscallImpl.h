@@ -18,10 +18,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 class Syscall {
 
 private:
-	bool loadImage(int resourceIndex, int pos, int length);
+	/*
+	* Load an image and store it at the given resourceIndex
+	*/
+	bool loadImage(int resourceIndex, int pos, int length, int binaryResourceHandle = 0);
 	Image* loadSprite(void* surface, ushort left, ushort top, ushort width, ushort height, ushort cx, ushort cy);
 	void loadUBinary(int resourceIndex, int offset, int size);
 	
+public:
 	JNIEnv* getJNIEnvironment();
 	jobject getJNIThis();
 	

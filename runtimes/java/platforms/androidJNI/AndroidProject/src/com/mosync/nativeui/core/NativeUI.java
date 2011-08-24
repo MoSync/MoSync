@@ -18,26 +18,38 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.core;
 
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.List;
 
 import android.app.Activity;
 import android.graphics.Bitmap;
+import android.test.IsolatedContext;
 import android.util.Log;
 import android.view.View;
 
+import com.mosync.internal.android.MoSyncCameraController;
+import com.mosync.internal.android.MoSyncHelpers;
 import com.mosync.internal.android.MoSyncThread;
+import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
+import com.mosync.nativeui.ui.factories.CameraPreviewFactory;
 import com.mosync.nativeui.ui.factories.ViewFactory;
+import com.mosync.nativeui.ui.widgets.CameraPreviewWidget;
+import com.mosync.nativeui.ui.widgets.LabelWidget;
 import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
+import com.mosync.nativeui.util.properties.FeatureNotAvailableException;
+import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
+
 
 /**
  * This class contains the implementation of the NativeUI system calls
@@ -51,6 +63,10 @@ public class NativeUI
 	 * Context of the main activity.
 	 */
 	private Activity m_activity;
+	/**
+	 * The MoSync thread object.
+	 */
+	MoSyncThread mMoSyncThread;
 	
 	/**
 	 * A table that contains a mapping between a handle and a widget, in a
@@ -75,11 +91,12 @@ public class NativeUI
 	
 	/**
 	 * Constructor.
-	 * 
+	 * @param thread The MoSync thread.
 	 * @param activity The Activity in which the widgets should be created.
 	 */
-	public NativeUI(Activity activity)
+	public NativeUI(MoSyncThread thread, Activity activity)
 	{
+		mMoSyncThread = thread;
 		m_activity = activity;
 	}
 	
@@ -114,6 +131,16 @@ public class NativeUI
 	}
 	
 	/**
+	 * Gets the bitmap table, that can be modified.
+	 *
+	 * @return The bitmap table.
+	 */
+	public Hashtable<Integer, ImageCache> getImageTable()
+	{
+		return m_imageTable;
+	}
+
+	/**
 	 * Sets the default MoSync canvas view, so that it is possible
 	 * to switch back to it from native UI.
 	 * 
@@ -141,7 +168,7 @@ public class NativeUI
 	 * Internal function for the maWidgetCreate system call.
 	 * It uses the ViewFactory to create a widget of the
 	 * given type, puts it in the handle table and returns it.
-	 * 
+	 *
 	 * Note: Should only be called on the UI thread.
 	 */
 	public int maWidgetCreate(String type)
@@ -350,6 +377,7 @@ public class NativeUI
 	 */
 	public int maWidgetStackScreenPush(int stackScreenHandle, int newScreenHandle)
 	{
+
 		Widget stackScreenWidget = m_widgetTable.get( stackScreenHandle );
 		if( stackScreenWidget == null )
 		{
@@ -425,17 +453,43 @@ public class NativeUI
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
-		try
+		boolean result;
+
+		// Send the typeface to the label widget.
+		if ( key.compareTo( IX_WIDGET.MAW_LABEL_FONT_HANDLE ) == 0
+				&&
+				widget instanceof LabelWidget )
 		{
-			if( widget.setProperty( key, value ) )
+			MoSyncFontHandle currentFont = null;
+
+			// Search the fondle in the list of fonts.
+			try
 			{
-				return IX_WIDGET.MAW_RES_OK;
+				currentFont = mMoSyncThread.getMoSyncFont(IntConverter.convert(value));
+			} catch(PropertyConversionException pce)
+			{
+				Log.e( "MoSync", "Error while getting font handle with value '" + value + "Invalid property value");
+				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+			}
+
+			if ( currentFont == null )
+			{
+				Log.e( "MoSync", "Error while getting font handle with value '" + value + " The handle was not found");
+				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 			}
 			else
 			{
-				Log.e( "MoSync", "maWidgetSetProperty: Invalid property '" + key + "' on widget: " + widgetHandle );
-				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
+				Log.e("MoSync", "Set font typeface to native ui widget");
+				LabelWidget labelWidget = (LabelWidget) widget;
+				labelWidget.setFontTypeface(currentFont.getTypeface(), currentFont.getFontSize());
+				return IX_WIDGET.MAW_RES_OK;
 			}
+		}
+
+		try
+		{
+			result =  widget.setProperty( key, value );
+
 		}
 		catch(PropertyConversionException pce)
 		{
@@ -447,8 +501,30 @@ public class NativeUI
 			Log.e( "MoSync", "Error while setting property: " + ipve.getMessage( ) );
 			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
 		}
+		catch(FeatureNotAvailableException fnae)
+		{
+			Log.e("MoSync", "Feature not available exception: " + fnae.getMessage() );
+			return IX_WIDGET.MAW_RES_FEATURE_NOT_AVAILABLE;
+		}
+
+		if( result )
+		{
+			return IX_WIDGET.MAW_RES_OK;
+		}
+		else
+		{
+			Log.e( "MoSync", "maWidgetSetProperty: Invalid property '" + key + "' on widget: " + widgetHandle );
+			return IX_WIDGET.MAW_RES_INVALID_PROPERTY_NAME;
+		}
 	}
-	
+
+	/**
+	 * Internal function for the maWidgetGetProperty system call.
+	 * Gets a property on the given widget, by accessing it from
+	 * the widget table and calling its getProperty method.
+	 *
+	 * Note: Should only be called on the UI thread.
+	 */
 	public int maWidgetGetProperty(
 		int widgetHandle, 
 		String key, 
@@ -462,7 +538,15 @@ public class NativeUI
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
 		
-		String result = widget.getProperty( key );
+		String result;
+		try {
+			result = widget.getProperty( key );
+		}catch( FeatureNotAvailableException fnae)
+		{
+			Log.e("MoSync", "Feature not available exception: " + fnae.getMessage() );
+			return IX_WIDGET.MAW_RES_FEATURE_NOT_AVAILABLE;
+		}
+
 		if( result.length( ) <= 0 )
 		{
 			Log.e( "MoSync", "maWidgetGetProperty: Invalid or empty property '" + 
@@ -487,6 +571,7 @@ public class NativeUI
 		
 		return result.length( );
 	}
+
 	
 	/**
 	 * Called when the back button has been pressed.
@@ -519,4 +604,10 @@ public class NativeUI
 		 */
 		void rootViewReplaced(View newRoot);
 	}
+	
+	public Widget getCameraView(final int handle)
+	{
+		return m_widgetTable.get(handle);
+	}
+	
 }

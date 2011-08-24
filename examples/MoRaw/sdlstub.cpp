@@ -51,6 +51,8 @@ struct MoSyncStub : SystemStub {
 
 	int curSample;
 	int samplesAtNextTick;
+
+	int timeOfStart;
 #define BUFFERSIZE (2048)
 	unsigned char buffer[BUFFERSIZE];
 	int currentOrientation;
@@ -89,6 +91,7 @@ void MoSyncStub::init(const char *title) {
 	currentOrientation = 0;
 	FrameBuffer_init(SCREEN_W, SCREEN_H, currentOrientation, FLAG_4BPP|FLAG_RGB666);
 	timerActive = false;
+	timeOfStart = maGetMilliSecondCount();
 }
 
 void MoSyncStub::destroy() {
@@ -189,16 +192,16 @@ void MoSyncStub::processEvents() {
 }
 
 void MoSyncStub::sleep(uint32 duration) {
-	int startTime = maGetMilliSecondCount();
+	uint32 startTime = getTimeStamp();
 	do {
-		int curTime = maGetMilliSecondCount() - startTime;
-		if(curTime>=(int)duration) break;
+		uint32 curTime = getTimeStamp() - startTime;
+		if(curTime>=duration) break;
 		maWait(duration-curTime);
 	} while(true);
 }
 
 uint32 MoSyncStub::getTimeStamp() {
-	return maGetMilliSecondCount();
+	return maGetMilliSecondCount() - timeOfStart;
 }
 
 void MoSyncStub::startAudio(AudioCallback callbck, void *prm) {

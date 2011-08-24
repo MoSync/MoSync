@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <fstream>
 #include <stdlib.h>
 #include <string.h>
+#include <iomanip>
 
 #include <idl-common/idl-common.h>
 #include <idl-common/tokenizer.h>
@@ -37,6 +38,7 @@ using namespace std;
 
 static vector<string> readExtensions(const char* filename);
 static void outputMaapi(const vector<string>& ixs, const Interface& maapi);
+static void outputMaapiJavascript(const vector<string>& ixs, const Interface& maapi);
 static void outputRuntimeBuilderFiles(const Interface& maapi);
 static void outputCpp(const Interface& maapi);
 static void outputAsmConfigLst(const Interface& maapi);
@@ -121,25 +123,26 @@ static void copy(string src, string dst) {
  */
 int main() {
 	try {
-		// Generated files goes to this folder, is then copied to 
+		// Generated files goes to this folder, is then copied to
 		// target folders.
 		_mkdir("Output");
-		
+
 		// Read and parse the extensions and idl files.
 		vector<string> ixs = readExtensions("extensions.h");
 		Interface maapi = parseInterface(ixs, "maapi.idl");
-		
+
 		// Generate files for the MoSync API.
 		outputMaapi(ixs, maapi);
+		outputMaapiJavascript(ixs, maapi);
 
 		// Generate files used when building the runtimes.
 		outputRuntimeBuilderFiles(maapi);
-		
+
 		// Generate core constants.
 		outputCoreConsts();
-		
+
 		// Generate headefile suitable for use with the tolua binding library.
-		// See comment in output-bindings.h for notes on how to use thsi file 
+		// See comment in output-bindings.h for notes on how to use thsi file
 		// with tolua.
 		lua_outputHeaderFile(maapi, ixs, "Output/lua_maapi.h");
 
@@ -170,7 +173,7 @@ int main() {
 		_mkdir("../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated");
 
 		// Copy generated Android file.
-		copy("Output/MAAPI_consts.java", 
+		copy("Output/MAAPI_consts.java",
 			"../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated/");
 
 		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
@@ -195,7 +198,7 @@ int main() {
 			copy("Output/" + ixs[i] + "_CONSTS.h", "../../runtimes/java/Shared/generated/");
 
 			// Copy generated Android files.
-			copy("Output/" + ixs[i] + ".java", 
+			copy("Output/" + ixs[i] + ".java",
 				"../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated/");
 		}
 
@@ -230,7 +233,7 @@ static vector<string> readExtensions(const char* filename) {
  */
 static void outputMaapi(const vector<string>& ixs, const Interface& maapi) {
 	// Generate files for the main API.
-	{ 
+	{
 		ofstream ccpDefsFile("Output/cpp_defs.h");
 		streamCppDefsFile(ccpDefsFile, maapi, ixs, MAIN_INTERFACE);
 
@@ -240,7 +243,7 @@ static void outputMaapi(const vector<string>& ixs, const Interface& maapi) {
 		ofstream headerFile("Output/maapi.h");
 		streamHeaderFile(headerFile, maapi, ixs, MAIN_INTERFACE);
 
-		// Generate Java definition file for the main API (used by 
+		// Generate Java definition file for the main API (used by
 		// the Android runtime).
 		string className = "MAAPI_consts";
 		ofstream javaFile(("Output/" + className + ".java").c_str());
@@ -257,12 +260,152 @@ static void outputMaapi(const vector<string>& ixs, const Interface& maapi) {
 		ofstream headerFile(("Output/" + toupper(ixs[i]) + ".h").c_str());
 		streamHeaderFile(headerFile, maapi, ixs, i);
 
-		// Generate Java definition file for extension (used by 
+		// Generate Java definition file for extension (used by
 		// the Android runtime).
 		string className = toupper(ixs[i]);
 		ofstream javaFile(("Output/" + className + ".java").c_str());
 		streamJavaDefinitionFile(javaFile, className, maapi, i);
 	}
+}
+
+
+static bool isKeyInConstsets(const Interface& maapi, const string& str) {
+	for(size_t j=0; j<maapi.constSets.size(); j++) {
+		const ConstSet& cs(maapi.constSets[j]);
+		for(size_t k=0; k<cs.constants.size(); k++) {
+			const Constant& c(cs.constants[k]);
+			if(str == (cs.name + c.name))
+				return true;
+		}
+	}
+	return false;
+}
+
+static void outputJavascriptSyscallArg(ofstream& maapiFile, int i) {
+	if(i < 4) {
+		maapiFile << "this.regs[Reg.i" << i << "]";
+	} else {
+		maapiFile << "this.getStackValue(" << ((i-4)<<2) << ")";
+	}
+}
+
+static void outputJavascriptIoctlArg(ofstream& maapiFile, int i) {
+	if(i < 4) {
+		maapiFile << "i" << (i);
+	} else {
+		maapiFile << "this.getStackValue(" << ((i-4)<<2) << ")";
+	}
+}
+
+
+static void outputMaapiJavascript(const vector<string>& ixs, const Interface& maapi) {
+	ofstream maapiFile("Output/maapi.js");
+
+	maapiFile << "MoSyncGenerated = {};\n\n";
+
+	// generate hash
+	maapiFile << "MoSyncHash = " << "0x" << setfill('0') << setw(8) << hex << calculateChecksum(maapi) << dec << ";\n\n";
+
+	// generate constant table.
+	maapiFile << "MoSyncConstants = {\n";
+	for(size_t j=0; j<maapi.constSets.size(); j++) {
+		const ConstSet& cs(maapi.constSets[j]);
+		for(size_t k=0; k<cs.constants.size(); k++) {
+			const Constant& c(cs.constants[k]);
+			//printf("%s = %s;\n", c.name.c_str(), c.value.c_str());
+			bool isKey = isKeyInConstsets(maapi, c.value);
+			string keyString = (isKey)?"this.":"";
+
+			maapiFile << "\t" << cs.name << c.name.c_str() << ": " << keyString << c.value.c_str();
+			if(j==maapi.constSets.size()-1 && k == cs.constants.size()-1)
+				maapiFile << "\n";
+			else
+				maapiFile << ",\n";
+		}
+	}
+	maapiFile << "};\n";
+
+	// generate struct wrappers (todo)
+
+	// generate invoke syscall
+	maapiFile << "MoSyncGenerated.invokeSyscall = function(id) {\n";
+	maapiFile << "\tswitch(id) {\n";
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		maapiFile << "\t\tcase " << f.number << ":\n";
+
+		maapiFile << "\t\t\tret = this.Syscalls." << f.name << "(";
+
+		int i = 0;
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			if(k != 0)
+				maapiFile << ", ";
+			if(a.type == "double") {
+				//maapiFile << "this.regs[Reg.i" << i << "], ";
+				outputJavascriptSyscallArg(maapiFile, i);
+				maapiFile << ", ";
+				i++;
+//				maapiFile << "this.regs[Reg.i" << i << "] ";
+				outputJavascriptSyscallArg(maapiFile, i);
+				i++;
+			} else {
+				//maapiFile << "this.regs[Reg.i" << i << "] ";
+				outputJavascriptSyscallArg(maapiFile, i);
+				i++;
+			}
+		}
+		maapiFile << ");\n";
+
+		if(f.returnType == "double") {
+			maapiFile << "\t\t\tthis.regs[Reg.r14] = ret.hi;\n";
+			maapiFile << "\t\t\tthis.regs[Reg.r15] = ret.lo;\n";
+		} else {
+			maapiFile << "\t\t\tthis.regs[Reg.r14] = (ret&0xffffffff);\n";
+		}
+
+		maapiFile << "\t\tbreak;\n";
+	}
+	maapiFile << "\t};\n";
+	maapiFile << "};\n";
+
+	// generate ioctl invoke
+	const vector<Ioctl>& ioctls = maapi.ioctls;
+	maapiFile << "MoSyncGenerated.maIOCtl = function(id, i1, i2, i3) {\n";
+	maapiFile << "\tswitch(id) {\n";
+	for(size_t i=0; i<ioctls.size(); i++) {
+		const Ioctl& ioctl(ioctls[i]);
+		for(size_t j=0; j<ioctl.functions.size(); j++) {
+			const Function& f(ioctl.functions[j].f);
+			int l = 1;
+			maapiFile << "\t\tcase " << f.number << ":\n";
+			maapiFile << "\t\t\tif(this." << f.name << " == undefined)\n";
+			maapiFile << "\t\t\t\treturn MoSyncConstants.IOCTL_UNAVAILABLE;\n";
+			maapiFile << "\t\t\treturn this." << f.name << "(";
+			for(size_t k=0; k<f.args.size(); k++) {
+				const Argument& a(f.args[k]);
+				if(k != 0)
+					maapiFile << ", ";
+				if(a.type == "double") {
+//					maapiFile << "i" << l << ", ";
+					outputJavascriptIoctlArg(maapiFile, l);
+					maapiFile << ", ";
+					l++;
+//					maapiFile << "i" << l << "";
+					outputJavascriptIoctlArg(maapiFile, l);
+					l++;
+				} else {
+//					maapiFile << "i" << l << "";
+					outputJavascriptIoctlArg(maapiFile, l);
+					l++;
+				}
+			}
+			maapiFile << ");\n";
+		}
+	}
+	maapiFile << "\t};\n";
+	maapiFile << "};\n";
 }
 
 /**
@@ -276,6 +419,7 @@ static void outputRuntimeBuilderFiles(const Interface& maapi) {
 	outputInvokeSyscallCpp(maapi);
 	outputInvokeSyscallArmRecompiler(maapi);
 	outputInvokeSyscallJava(maapi);
+//	outputInvokeSyscallJavascript(maapi);
 	outputSyscallStaticJava(maapi);
 	outputSyscallStaticCpp(maapi);
 	outputConstSets(maapi);
@@ -408,7 +552,7 @@ static void outputArmRecompilerParameterPassing(int amountOfRegistersForArgument
 		}
 
 		int curIndex;
-		if(stackPass) 
+		if(stackPass)
 			curIndex = ireg-argSize;
 		else
 			curIndex = ireg+argSize;
@@ -433,8 +577,8 @@ static void outputArmRecompilerParameterPassing(int amountOfRegistersForArgument
 				if(a.in == false || isPointerType(maapi, a.type)) {
 					stream << "\tassm.ADD(AA::R0, " << reg << ", MEMORY_ADDR);\n";
 					reg = "AA::R0";
-				} 
-				
+				}
+
 				stream << "\tassm.STR(" << reg << ", 0, AA::SP);\n";
 			}
 		} else {
@@ -448,14 +592,14 @@ static void outputArmRecompilerParameterPassing(int amountOfRegistersForArgument
 
 				if(a.in == false || isPointerType(maapi, a.type)) {
 					stream << "\tassm.ADD(AA::R" << (areg+i) <<", loadRegister(REG_i" << (ireg+i) << ", AA::R" << (areg+i) << ", false) , MEMORY_ADDR);\n";
-				} else { 
+				} else {
 					stream << "\tloadRegister(REG_i" << (ireg+i) << ", AA::R" << (areg+i) << ", true);\n";
 				}
 			}
 		}
 
 
-		if(stackPass) 
+		if(stackPass)
 			ireg -= argSize;
 		else
 			ireg += argSize;
@@ -478,7 +622,7 @@ static void outputInvokeSyscallArmRecompiler(const Interface& maapi) {
 		stream << "\temitFuncCall((int)&((void (*)())" << f.name << "), (int)gSyscall);\n";
 */
 		//stream << "\tGEN_BREAKPOINT;\n";
-		
+
 
 
 		stream << "#ifdef SYMBIAN\n";
@@ -490,7 +634,7 @@ static void outputInvokeSyscallArmRecompiler(const Interface& maapi) {
 		outputArmRecompilerParameterPassing(4, 0, stream, maapi, f, false);
 		stream << "\temitFuncCall((int)&((void (*)())" << f.name << "), (int)gSyscall);\n";
 		stream << "#endif\n";
-		
+
 		if(f.returnType != "void" && f.returnType != "noreturn") {
 			stream << "\tsaveRegister(REG_r14, AA::R0);\n";
 			if(f.returnType == "double" || f.returnType == "long") {
@@ -622,7 +766,7 @@ static void outputSyscallStaticCpp(const Interface& maapi) {
 		staticCppStream << ") {";
 
 		stream << staticCppStream.str() <<"\n";
-		
+
 		stream << staticCppInitStream.str();
 
 		if(f.returnType != "void" && f.returnType != "noreturn") {

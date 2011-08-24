@@ -21,8 +21,8 @@ Targets.setup
 if(USE_NEWLIB)
 	stdlibs = ["newlib"]
 else
-	stdlibs = ["MAStd", "MAFS"]
+	stdlibs = ["MAStd"]
 end
-SUBDIRS = stdlibs + ["MAUtil", "MTXml", "MAUI", "MAUI-revamp", "MATest", "MAP", "Testify"] #, "MinUI"
+SUBDIRS = stdlibs + ["MAUtil", "MTXml", "MAUI", "MAUI-revamp", "MATest", "MAP", "Testify", "MAFS", "yajl", "Facebook", "NativeUI"] #, "MinUI"
 
 Targets.invoke

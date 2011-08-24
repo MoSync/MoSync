@@ -30,7 +30,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 	for(BasesIterator function = functions.first; function!=functions.second; function++) {
 		const Function* func = (const Function*)function->second;
 		string name = func->getName();
-		
+
 		/**
 		 * Never versions of gcc includes some builtin functions,
 		 * ignore these.
@@ -39,7 +39,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 		{
 			continue;
 		}
-		
+
 		const Base* ret = func->getReturnType();
 		string returnString = ret->toString();
 		bool returnsHandle = false;
@@ -53,7 +53,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 		//vector<MoSyncArgument> arguments;
 
 		const std::vector<const Argument*>& args = func->getArguments();
-		
+
 		/*
 		for(int i = 0; i < args.size(); i++) {
 			MoSyncArgument ma;
@@ -77,7 +77,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 
 			if(returnsHandle) stream << "MAHandle ";
 			else {
-				stream << ret->toString() << " ";	
+				stream << ret->toString() << " ";
 			}
 
 			stream << func->getName() << "Handle(";
@@ -123,7 +123,8 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 				if( func->getRangeExpression() == "") System::error("Return type is of pointer type, needs range attribute");
 				if(!returnsConstPtr)
 					System::error("Returns non-const pointer. Can't handle yet!");
-				stream << "\treturn SYSCALL_THIS->resources.add_RT_BINARY(placeholder, new MemStreamC(ret, " << func->getRangeExpression() << "));\n";
+				stream << "\tSYSCALL_THIS->resources.add_RT_BINARY(placeholder, new MemStreamC(ret, " << func->getRangeExpression() << "));\n";
+				stream << "\treturn placeholder;\n";
 			}
 
 
@@ -132,4 +133,4 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 
 	}
 
-}	
+}

@@ -40,9 +40,9 @@ static void streamIoctls(ostream& stream, const Interface& inf, int ix);
 static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix, bool runtime);
 static void streamDefines(ostream& stream, const vector<Define>& defines, int ix);
 static void streamJavaConstants(
-	ostream& stream, 
-	const vector<ConstSet>& 
-	constSets, 
+	ostream& stream,
+	const vector<ConstSet>&
+	constSets,
 	int ix);
 void streamGroups(ostream& stream, const vector<Group>& groups, const vector<int>& children, int ix, int level=0);
 void streamGroups(ostream& stream, const vector<Group>& groups, int ix);
@@ -271,7 +271,7 @@ void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) 
 			stream << " " << a.name;
 		}
 
-		if(f.isIOCtl) 
+		if(f.isIOCtl)
 			stream << " MA_IOCTL_ELLIPSIS";
 
 		if(f.returnType == "noreturn")
@@ -289,11 +289,11 @@ void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) 
  * @param stream The output stream.
  * @param className Name of the class.
  * @param apiData The parsed API data.
- * @param ix The id of the extension to generate definitions for. 
+ * @param ix The id of the extension to generate definitions for.
  * Also used to specify if definitions for the main API is to be generated.
  */
 void streamJavaDefinitionFile(
-	ostream& stream, 
+	ostream& stream,
 	const string& className,
 	const Interface& apiData,
 	int ix)
@@ -311,19 +311,19 @@ void streamJavaDefinitionFile(
  * Generate constants for a Java definition class file.
  * @param stream The output stream.
  * @param constSets Constant definitions.
- * @param ix The id of the extension to generate definitions for. 
+ * @param ix The id of the extension to generate definitions for.
  * Also used to specify if definitions for the main API is to be generated.
  */
 static void streamJavaConstants(
-	ostream& stream, 
-	const vector<ConstSet>& constSets, 
-	int ix) 
+	ostream& stream,
+	const vector<ConstSet>& constSets,
+	int ix)
 {
-	for (size_t i=0; i<constSets.size(); i++) 
+	for (size_t i=0; i<constSets.size(); i++)
 	{
 		const ConstSet& cs(constSets[i]);
 		bool anyStreamed = false;
-		for (size_t j=0; j<cs.constants.size(); j++) 
+		for (size_t j=0; j<cs.constants.size(); j++)
 		{
 			const Constant& c(cs.constants[j]);
 			if (c.ix != ix)
@@ -331,25 +331,25 @@ static void streamJavaConstants(
 				continue;
 			}
 
-			if (anyStreamed && 
-				(c.comment.size() != 0 
+			if (anyStreamed &&
+				(c.comment.size() != 0
 				|| cs.constants[j-1].comment.size() != 0))
 			{
 				stream << "\n";
 			}
-			
+
 			string type = "int ";
 			if(c.type == "MAString")
 				type = "String ";
-			
+
 			stream << c.comment;
-			stream 
+			stream
 				<< "\tpublic static final "
 				<< type
-				<< cs.name 
-				<< c.name 
-				<< " = " 
-				<< c.value 
+				<< cs.name
+				<< c.name
+				<< " = "
+				<< c.value
 				<< ";\n";
 			anyStreamed = true;
 		}
@@ -466,14 +466,14 @@ void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix)
 	for(size_t i=0; i<constSets.size(); i++) {
 		const ConstSet& cs(constSets[i]);
 		bool anyStreamed = false;
-		
+
 		for(size_t j=0; j<cs.constants.size(); j++) {
 			const Constant& c(cs.constants[j]);
 			if(c.ix != ix)
-				continue;	
+				continue;
 			anyStreamed = true;
 		}
-		
+
 		anyStreamed = false;
 		for(size_t j=0; j<cs.constants.size(); j++) {
 			const Constant& c(cs.constants[j]);
@@ -482,14 +482,14 @@ void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix)
 
 			if(anyStreamed && (c.comment.size() != 0 || cs.constants[j-1].comment.size() != 0))
 				stream << "\n";
-			
+
 			stream << c.comment;
 			if(c.groupId != "")
 				stream << "/** @ingroup " << c.groupId << " */\n";
 			stream << "#define " << cs.name << c.name << " " << c.value << "\n";
-			
+
 			anyStreamed = true;
-		}				
+		}
 	}
 }
 
@@ -899,17 +899,20 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 
 	streamHash(stream, inf);
 
-	streamCppDefs(stream, inf, ix);
-	streamIoctlDefines(stream, inf, headerName, ix, false);
+	streamCppDefs(stream, inf, ix, headerName);
 
 	stream << "#endif\t//" + headerName + "_DEFS_H\n";
 }
 
-void streamCppDefs(ostream& stream, const Interface& inf, int ix) {
+void streamCppDefs(ostream& stream, const Interface& inf, int ix, const string& headerName) {
+	stream << "#ifndef DONT_WANT_" << headerName << "_TYPEDEFS\n";
 	streamTypedefs(stream, inf.typedefs, ix, true);
+	stream << "#endif\n";
+
 	streamDefines(stream, inf.defines, ix);
 	streamConstants(stream, inf.constSets, ix);
 	streamStructs(stream, inf, ix, true);
+	streamIoctlDefines(stream, inf, headerName, ix, false);
 }
 
 void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool java, int argOffset) {

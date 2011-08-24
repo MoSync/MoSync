@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/log.h>
 #include "Base/ThreadPool.h"
 #include <base/FileStream.h>
-
+#include "ImagePickerController.h"
 #include <helpers/CriticalSection.h>
 
 #include "iphone_helpers.h"
@@ -46,6 +46,7 @@ void MoSyncDiv0() {
 }
 
 void* Base::Syscall::GetValidatedMemRange(int address, int size) {
+    if(address == 0) return NULL;
 	return (byte*)mem_ds + address;
 }
 void Base::Syscall::ValidateMemRange(const void* ptr, int size) {	
@@ -222,6 +223,29 @@ void MoSync_StopUpdatingLocation() {
 	[sMoSyncView stopUpdatingLocation];
 }
 
+/**
+ * Start a sensor.
+ * @param sensorType What type of sensor to start.
+ * @param value Update interval value.
+ * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
+ */
+int MoSync_SensorStart(int sensor, int interval) {
+    MoSyncSensor* moSyncSensor = [sMoSyncView getMoSyncSensor];
+    int result = [moSyncSensor startSensor:sensor interval:interval];
+    return result;
+}
+
+/**
+ * Stop a sensor.
+ * @param sensorType What type of sensor to stop.
+ * @return NO_ERROR if the sensor has been started, or a code error otherwise(for more info see MoSyncSenor.h).
+ */
+int MoSync_SensorStop(int sensor) {
+    MoSyncSensor* moSyncSensor = [sMoSyncView getMoSyncSensor];
+    int result = [moSyncSensor stopSensor:sensor];
+    return result;
+}
+
 void MoSync_AddTouchPressedEvent(int x, int y, int touchId) {
 	Base::gEventQueue.addPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_PRESSED);
 }
@@ -261,6 +285,18 @@ void* MoSync_GetCustomEventDataMoSyncPointer() {
 	return (void*) (gCore->Head.DataSize-Base::getMaxCustomEventSize());
 	
 #endif
+}
+
+void MoSync_ShowImagePicker()
+{
+    [[ImagePickerController getInstance] show];
+}
+
+void MoSync_AddLayerToView(CALayer* layer){
+	if ([[sMoSyncView.layer sublayers] containsObject:layer]==NO) {
+		[sMoSyncView.layer addSublayer:layer];
+	}
+	layer.frame = sMoSyncView.bounds;
 }
 
 /*

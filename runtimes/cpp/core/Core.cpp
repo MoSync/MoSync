@@ -592,7 +592,7 @@ public:
 		if(!LoadVM(mod))
 			return false;
 
-		//-2 means that the mosync application does need any resources.
+		//-2 means that the mosync application does not need any resources.
 		if(-2 != resFd)
 		{
 			FileStream res(resFd);
@@ -1034,6 +1034,7 @@ void WRITE_REG(int reg, int value) {
 #endif
 	}
 	void* GetValidatedMemRange(int address, int size) {
+		if(address == 0) return NULL;
 		if(uint(address) >= DATA_SEGMENT_SIZE || uint(address+size) >= DATA_SEGMENT_SIZE ||
 			uint(size) > DATA_SEGMENT_SIZE)
 			BIG_PHAT_ERROR(ERR_MEMORY_OOB);

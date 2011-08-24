@@ -33,6 +33,26 @@ extern "C" {
 
 #include <ma.h>
 
+#ifdef SEEK_SET
+#undef SEEK_SET
+#endif
+
+#ifdef SEEK_CUR
+#undef SEEK_CUR
+#endif
+
+#ifdef SEEK_END
+#undef SEEK_END
+#endif
+
+#ifdef EOF
+#undef EOF
+#endif
+
+#ifdef FILENAME_MAX
+#undef FILENAME_MAX
+#endif
+
 #define SEEK_SET 0
 #define SEEK_CUR 1
 #define SEEK_END 2
@@ -41,8 +61,11 @@ extern "C" {
 
 struct MA_FILE_t;
 typedef struct MA_FILE_t MA_FILE;
+
+#ifndef DONT_USE_TYPE_DEFINES
 //typedef unsigned int size_t;
 typedef unsigned int fpos_t;
+#endif
 
 /** 
 * Opens the file whose name is specified in the parameter filename and associates 
@@ -269,23 +292,94 @@ int MA_fgetpos ( MA_FILE * stream, fpos_t * position );
 int MA_fsetpos ( MA_FILE * stream, const fpos_t * pos );
 
 // file system functions are redefined to the standard names, original implementations have other names to prevent collisions.
+#ifdef fopen
+#undef fopen
+#endif
 #define fopen MA_fopen
+
+#ifdef fread
+#undef fread
+#endif
 #define fread MA_fread
+
+#ifdef fwrite
+#undef fwrite
+#endif
 #define fwrite MA_fwrite
+
+#ifdef fclose
+#undef fclose
+#endif
 #define fclose MA_fclose
+
+#ifdef fseek
+#undef fseek
+#endif
 #define fseek MA_fseek
+
+#ifdef feof
+#undef feof
+#endif
 #define feof MA_feof
+
+#ifdef ferror
+#undef ferror
+#endif
 #define ferror MA_ferror
+
+#ifdef rewind
+#undef rewind
+#endif
 #define rewind MA_rewind
+
+#ifdef fgetc
+#undef fgetc
+#endif
 #define fgetc MA_fgetc
+
+#ifdef fputc
+#undef fputc
+#endif
 #define fputc MA_fputc
+
+#ifdef fgets
+#undef fgets
+#endif
 #define fgets MA_fgets
+
+#ifdef fputs
+#undef fputs
+#endif
 #define fputs MA_fputs
+
+#ifdef getc
+#undef getc
+#endif
 #define getc MA_getc
+
+#ifdef putc
+#undef putc
+#endif
 #define putc MA_putc
+
+#ifdef ftell
+#undef ftell
+#endif
 #define ftell MA_ftell
+
+#ifdef fgetpos
+#undef fgetpos
+#endif
 #define fgetpos MA_fgetpos
+
+#ifdef fsetpos
+#undef fsetpos
+#endif
 #define fsetpos MA_fsetpos
+
+#ifdef FILE
+#undef FILE
+#endif
 #define FILE MA_FILE
 
 /** 

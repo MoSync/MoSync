@@ -20,10 +20,15 @@
 
 @interface WebViewWidget : IWidget <UIWebViewDelegate> {
 	NSString* newurl;
+	NSString* baseUrl;
+    NSString* softHookPattern;
+	NSString* hardHookPattern;
+    NSString* javaScriptIdentifier; //"javascript:"
+    NSMutableDictionary* urlsToNotHook; //Used to let the set url property to bypass the hooks
 }
 
 - (id)init;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
-
+-(NSString*)getDefaultBaseURL;
 @end

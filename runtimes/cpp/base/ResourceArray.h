@@ -62,6 +62,9 @@ namespace Base {
 #define DECLARE_SIZEFUNCS(R, T, D) uint size_##R(T*);
 		TYPES(DECLARE_SIZEFUNCS);
 #endif
+    
+#define DECLARE_RESOURCE_TYPES(R, T, D) typedef T R##_Type;
+    TYPES(DECLARE_RESOURCE_TYPES);
 
 #define ROOM(func) if((func) == RES_OUT_OF_MEMORY) { BIG_PHAT_ERROR(ERR_RES_OOM); }
 
@@ -214,6 +217,12 @@ namespace Base {
 		// size calculation functions
 		//**************************************************************************
 
+		/**
+		 * Delete and add a resource ("dadd").
+		 * @param index Resource index.
+		 * @param o Pointer to object data.
+		 * @param type Resource type.
+		 */
 		int _dadd(unsigned index, void* o, byte type) {
 			if(index&DYNAMIC_PLACEHOLDER_BIT) {
 				unsigned pIndex = index&(~DYNAMIC_PLACEHOLDER_BIT);
@@ -231,6 +240,12 @@ namespace Base {
 			}
 		}
 
+		/**
+		 * Add a resource.
+		 * @param index Resource index.
+		 * @param o Pointer to object data.
+		 * @param type Resource type.
+		 */
 		int _add(unsigned index, void* o, byte type) {
 			void **res = mRes;
 			byte *types = mTypes;
@@ -243,15 +258,15 @@ namespace Base {
 				TESTINDEX(index, mN);
 			}
 
-			if(o == NULL && (type != RT_PLACEHOLDER && type != RT_FLUX)) {
-#ifdef _android
-				// On Android JNI RT_IMAGE is stored on the Java side
-				if(type != RT_IMAGE) DEBIG_PHAT_ERROR;
-#else
+			// o is the resource data. If the resource is NULL
+			// and not a placeholder or in flux (resource is changing)
+			// then create a panic.
+			if (o == NULL && (type != RT_PLACEHOLDER && type != RT_FLUX)) {
 				DEBIG_PHAT_ERROR;
-#endif
 			}
 
+			// Resource at this index must not be in use, but it can be a
+			// placeholder. If the resource is in use, a panic is generated.
 			if(res[index] != NULL || types[index] != RT_PLACEHOLDER) {
 				BIG_PHAT_ERROR(ERR_RES_OVERWRITE);
 			}

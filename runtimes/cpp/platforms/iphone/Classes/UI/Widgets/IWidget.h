@@ -15,6 +15,12 @@
  02111-1307, USA.
  */
 
+// If the value is negative it returns MAW_RES_INVALID_PROPERTY_VALUE constant.
+#define TEST_FOR_NEGATIVE_VALUE(value) if (0 > value)\
+                                       {\
+                                            return  MAW_RES_INVALID_PROPERTY_VALUE; \
+                                       }
+
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "AbstractLayoutView.h"
@@ -95,6 +101,12 @@ IWidget* mWidget;\
 - (NSString*)getPropertyWithKey: (NSString*)key;
 
 - (void)layout;
+
+/**
+ * Send a widget event type.
+ * @param eventDataType One of the MAW_EVENT constants.
+ */
+- (void) sendEvent:(const int) eventDataType;
 
 // when a root screen is shown, this will be called recursively for all widgets.
 - (void)show;

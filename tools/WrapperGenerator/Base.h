@@ -36,6 +36,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(Struct, "Struct")\
 	m(Field, "Field")\
 
+class Location;
+
 class Base {
 public:
 
@@ -49,11 +51,16 @@ public:
 	virtual std::string toString() const;
 	virtual void fromParseNode(const ParseNode& node) = 0;
 	BaseType getBaseType() const;
+	virtual const Base* resolveFully() const { return this; }
+	virtual const Location* getLocation() const { return NULL; }
 
-	virtual const Base* resolveFully() const { return this; };
-
+	void setGroup(const std::string& group);
+	const std::string& getGroup() const;
 protected:
+	std::string mGroup;
 	BaseType mBaseType;
 };
+
+bool BaseLocationSortPredicate(const Base* d1, const Base* d2);
 
 #endif // _BASE_H_

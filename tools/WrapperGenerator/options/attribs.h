@@ -16,7 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 // range 'expression to calculate the range'
-#define _range_(x) __attribute((gccxml("range", #x)))
+#define _range_(x, group) __attribute((gccxml("range", #x), gccxml("group", group)))
 
 // defaults to handle without range
 // generate 'true/false to say if a pointer wrapper should be generated' 'true/false to say if a handle wrapper should be generated' 'the range to use to validate pointers'

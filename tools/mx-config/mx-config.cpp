@@ -111,7 +111,7 @@ static void outputMxHeader(const char* output, const Interface& inf, int fnOffse
 		"extern \"C\" {\n"
 		"#endif\n\n";
 
-	streamCppDefs(stream, inf, 0);
+	streamCppDefs(stream, inf, 0, headerName);
 
 	for(size_t i=0; i<inf.functions.size(); i++) {
 		streamIoctlFunction(stream, inf, inf.functions[i], "maInvokeExtension", fnOffset);

@@ -41,6 +41,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <base/Image.h>
 
+#include "PimSyscall.h"
+#include "helpers/cpp_ix_pim.h"
+
 namespace Core {
 	class VMCore;
 }
@@ -48,12 +51,11 @@ extern Core::VMCore* gCore;
 extern bool gRunning;
 
 
-#define FONT_HEIGHT Surface::fontSize //14
 
 class Surface {
 public:
-	static int fontSize;
-	
+
+
 	Surface(CGImageRef image) : image(image), context(NULL), data(NULL), mOwnData(false) {
 		CGDataProviderRef dpr = CGImageGetDataProvider(image);
 		mDataRef = CGDataProviderCopyData(dpr);
@@ -138,9 +140,7 @@ public:
 	
 	void initFont() {
 		if(!context) return;
-		CGContextSelectFont(context, "Arial", fontSize, kCGEncodingMacRoman);
 
-		CGContextSetFontSize(context, fontSize);
 		CGAffineTransform xform = CGAffineTransformMake(
 														1.0,  0.0,
 														0.0, -1.0,

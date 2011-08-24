@@ -28,7 +28,7 @@ class Base;
 
 class Backend {
 public:
-	typedef std::multimap<std::string, const Base*> BasesMap;
+	typedef std::multimap<std::string, Base*> BasesMap;
 	typedef BasesMap::const_iterator BasesIterator;
 
 	void generate(const BasesMap& bases, const std::string& outputFile) {

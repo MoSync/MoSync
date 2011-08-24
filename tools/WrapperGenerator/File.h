@@ -25,10 +25,12 @@ public:
 	File();
 	void fromParseNode(const ParseNode& node);
 	const std::string& getName() const;
+	const std::string& getId() const;
 	std::string toString() const;
 
 private:
 	std::string mName;
+	std::string mId;
 };
 
 #endif // _FILE_H_

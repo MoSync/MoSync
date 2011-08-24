@@ -906,8 +906,8 @@ decset(const char *last_mangled_name, 0)
 
 // Stabs
 
-dec(char StabFilePath[512])
-dec(char StabFileName[128])
+dec(char StabFilePath[NAME_MAX])
+dec(char StabFileName[NAME_MAX])
 dec(int C_Source_Line)
 
 

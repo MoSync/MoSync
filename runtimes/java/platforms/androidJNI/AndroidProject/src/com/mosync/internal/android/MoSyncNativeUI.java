@@ -28,7 +28,9 @@ import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.NativeUI.RootViewReplacedListener;
+import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
+import com.mosync.nativeui.ui.custom.MoSyncImagePicker;
 
 /**
  * Wrapper for Native UI Syscalls to avoid cluttering
@@ -45,6 +47,11 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	private NativeUI mNativeUI;
 
 	/**
+	 * The custom image picker handle.
+	 */
+	private MoSyncImagePicker mImagePicker = null;
+
+	/**
 	 * Constructor.
 	 * @param thread The MoSync thread.
 	 */
@@ -53,7 +60,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		Hashtable<Integer, ImageCache> imageResources)
 	{
 		mMoSyncThread = thread;
-		mNativeUI = new NativeUI(getActivity());
+		mNativeUI = new NativeUI(mMoSyncThread, getActivity());
 		mNativeUI.setRootViewReplacedListener(this);
 		NativeUI.setImageTable(imageResources);
 	}
@@ -328,7 +335,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	}
 	
 	/**
-	 * Internal wrapper for maWidgetSetProperty that runs
+	 * Internal wrapper for maWidgetGetProperty that runs
 	 * the call in the UI thread.
 	 */
 	public int maWidgetGetProperty(
@@ -354,7 +361,28 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
+
+	/**
+	 * Internal wrapper for maImagePickerOpen that runs
+	 * the call in the UI thread.
+	 */
+	public int maImagePickerOpen()
+	{
+		if ( mImagePicker == null )
+		{
+			mImagePicker = new MoSyncImagePicker(mMoSyncThread, mNativeUI.getImageTable());
+		}
+
+		getActivity().runOnUiThread(new Runnable() {
+			public void run()
+			{
+				mImagePicker.loadGallery();
+			}
+		});
+
+		return 0;
+	}
+
 	/**
 	 * Called when the back button has been pressed.
 	 */
@@ -372,5 +400,10 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	public void rootViewReplaced(View newRoot)
 	{
 		((MoSync) getActivity()).setRootView( newRoot );
+	}
+	
+	public Widget getCameraPreview(final int handle)
+	{
+		return mNativeUI.getCameraView(handle);
 	}
 }

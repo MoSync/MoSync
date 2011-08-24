@@ -110,8 +110,8 @@ cd "AndroidProject"
 if ENV['OS'] == "Windows_NT"
 	# convert a copy of cygwin.sh to unix-style line endings, so bash can run it.
 	FileUtils.copy_file("#{cpath}/cygwin.sh", "#{cpath}/cygwin_u.sh")
-	if(File.exist?("/cygwin/bin/bash.exe"))
-		cygPath = "/cygwin/bin/"
+	if(File.exist?("bash.exe"))
+		cygPath = ""
 	elsif(nil != ENV["CYGPATH"])
 		cygPath = ENV["CYGPATH"]
 	elsif(sh("bash.exe pwd"))
@@ -158,8 +158,7 @@ if(!File.exist?("#{package_root}/gen"))
 	mkdir("#{package_root}/gen")
 end
 
-success = sh(
-	"#{File.join(androidSDKPath, "tools/aapt")} package -f -v " +
+sh( "#{File.join(androidSDKPath, "tools/aapt")} package -f -v " +
 	"-M #{File.join(package_root,"AndroidManifest.xml")} -F resources.ap_ " +
 	"-I #{File.join(androidSDKPath, "android.jar")} " +
 	"-S #{File.join(package_root, "res")} " +
@@ -175,21 +174,22 @@ packages = ["src/com/mosync/java/android/*.java",
             "src/com/mosync/nativeui/ui/factories/*.java",
             "src/com/mosync/nativeui/ui/widgets/*.java",
             "src/com/mosync/nativeui/util/*.java",
-            "src/com/mosync/nativeui/util/properties/*.java"
+            "src/com/mosync/nativeui/util/properties/*.java",
+			"src/com/mosync/pim/*.java",
+			"src/com/mosync/nativeui/ui/custom/*.java",
+			"gen/com/mosync/java/android/*.java"
             ]
 
 # Concatenate each list element with package_root, and flatten the list to a string
 java_files = packages.map { |package| File.join(package_root, package) }.join(" ")
+
+
 
 # Compile all the java files into class files
 sh(
 	"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
 	"-classpath " +
 	"#{File.join(androidSDKPath, "android.jar")} " + java_files)
-
-if (!success)
-	exitBuilder(1, mosyncppsource, configPath)
-end
 
 puts "Copy Generated Library File\n\n"
 
