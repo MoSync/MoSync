@@ -144,7 +144,6 @@ namespace Base {
     //The style and type for the initally selected font
     const short INITIAL_FONT_STYLE=FONT_STYLE_NORMAL;
     const short INITIAL_FONT_TYPE=FONT_TYPE_SANS_SERIF;
-    const short INITIAL_FONT_SIZE=gHeight/40; //This value was used originally, is kept for backwards compatibility
 
     extern "C" MAHandle maFontLoadDefault(int type, int style, int size);
     extern "C" MAHandle maFontSetCurrent(MAHandle font);
@@ -260,8 +259,8 @@ namespace Base {
 
         gDrawTarget = gBackbuffer;
 
-        //Setting the initially selected font.
-        MAHandle initFontHandle=maFontLoadDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,INITIAL_FONT_SIZE);
+        //Setting the initially selected font. "gHeight/40" was used originally, is kept for backwards compatibility
+        MAHandle initFontHandle=maFontLoadDefault(INITIAL_FONT_TYPE,INITIAL_FONT_STYLE,gHeight/40);
         maFontSetCurrent(initFontHandle);
 
 		mach_timebase_info( &gTimeBase );
