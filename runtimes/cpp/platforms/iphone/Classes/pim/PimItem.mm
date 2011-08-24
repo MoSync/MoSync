@@ -104,7 +104,8 @@
     PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];
     [key release];
 
-    if (nil == itemField) {
+    if (nil == itemField)
+    {
         returnValue = MA_PIM_ERR_INVALID_INDEX;
     } else {
         returnValue = [itemField getAttribute:index];
@@ -199,6 +200,7 @@
 
 /**
  * Gets a field's value at a given index.
+ * Does not check if field is supported or write-only.
  * @param args Common arguments.
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
@@ -223,7 +225,7 @@
 
     if (nil == fieldItem ||
         0 > index  ||
-        index > [fieldItem count])
+        index > ([fieldItem count] - 1))
     {
         return MA_PIM_ERR_INVALID_INDEX;
     }
@@ -337,6 +339,7 @@
 
 /**
  * Adds a value to a specified field.
+ * Does not check if the field is supported or read-only.
  * @param args Common arguments.
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
@@ -379,7 +382,6 @@
     switch (fieldType)
     {
         case MA_PIM_TYPE_BINARY:
-            valuesArray = [utils getBytes:address size:args->bufSize];
             break;
         case MA_PIM_TYPE_BOOLEAN:
             break;
@@ -387,6 +389,7 @@
             valuesArray = [utils getDate:address];
             break;
         case MA_PIM_TYPE_INT:
+            valuesArray = [utils getIntValue:address];
             break;
         case MA_PIM_TYPE_STRING:
             valuesArray = [utils getString:address];
