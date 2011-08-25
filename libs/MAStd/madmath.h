@@ -144,6 +144,16 @@ double floor(double x);
 */
 double frexp(double x, int *eptr);
 
+/**
+* Returns 1 if \a x is Not a Number. 0 otherwise.
+*/
+int isnan(double x);
+
+/**
+* Returns 1 if \a x is Infinite. 0 otherwise.
+*/
+int isinf(double x);
+
 #else
 
 #ifndef _CRT_SECURE_NO_WARNINGS

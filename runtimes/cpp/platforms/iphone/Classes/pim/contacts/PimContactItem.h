@@ -57,6 +57,37 @@
 -(int) close;
 
 /**
+ * Gets a field's value at a given index.
+ * Checks if field is supported or write-only.
+ * @param args Common arguments.
+ *             The item's handle is stored in args.item.
+ *             The field's ID is stored in args.field.
+ *             The field's value will be stored in args.buf.
+ *             The maximum size of the value(in bytes) is stored in args.bufSize.
+ * @param index Field's value index.
+ * @return The number of bytes occupied by the value. If the number is greater than
+ *         args.bufSize the value was not written into args.buf.
+ *         In case of error the function returns one of the MA_PIM_ERR constants.
+ */
+-(int) getValue:(const MA_PIM_ARGS*) args
+     indexValue:(const int) index;
+
+/**
+ * Adds a value to a specified field.
+ * Checks if the field is supported or read-only.
+ * @param args Common arguments.
+ *             The item's handle is stored in args.item.
+ *             The field's ID is stored in args.field.
+ *             The field's value is stored in args.buf.
+ *             The size of the value(in bytes) is stored in args.bufSize.
+ * @param attribute Field's value attribute.
+ * @return  New value's index in field, or one of the MA_PIM_ERR constants
+ *          in case of error.
+ */
+-(int) addValue:(const MA_PIM_ARGS*) args
+  withAttribute:(const int) attribute;
+
+/**
  * Get the item's record.
  * @return The item's record.
  */
@@ -140,11 +171,11 @@
 -(int) writeIMField:(PimFieldItem*) itemField;
 
 /**
- * Writes the related name field into record.
+ * Writes the relation field into record.
  * @param itemField The specified field.
  * @return One of MA_PIM_ERR constants.
  */
--(int) writeRelatedNameField:(PimFieldItem*) itemField;
+-(int) writeRelationField:(PimFieldItem*) itemField;
 
 /**
  * Writes a single field value into record.
@@ -233,11 +264,42 @@
 -(void) readIMField;
 
 /**
+ * Reads the relation field from the record.
+ */
+-(void) readRelationField;
+
+/**
+ * Reads the photo field from the record.
+ */
+-(void) readPhotoField;
+
+/**
  * Gets the instant message protocol associeted with a string constant.
  * @param value Must be one of the MA_PIM_CONTACT_IM constants.
  * @return One of the IM protocol(see ABPerson reference - iOS Developer Library),
  *         or nil if the value param is not supported on iphone platform.
  */
 -(const CFStringRef) getIMProtocol:(NSString*) value;
+
+/**
+ * Checks if the field is supported on iphone platform.
+ * @param fieldID One of the MA_PIM_FIELD_CONTACT constants.
+ * @return True is the field is supported, false otherwise.
+ */
+-(bool) isFieldSupported:(const int) fieldID;
+
+/**
+ * Checks if the user can read data from a specified field.
+ * @param fieldID One of the MA_PIM_FIELD_CONTACT constants.
+ * @return True is the field is write only, false otherwise.
+ */
+-(bool) isFieldWriteOnly:(const int) fieldID;
+
+/**
+ * Checks if the user can write data to a specified field.
+ * @param fieldID One of the MA_PIM_FIELD_CONTACT constants.
+ * @return True is the field is read only, false otherwise.
+ */
+-(bool) isFieldReadOnly:(const int) fieldID;
 
 @end

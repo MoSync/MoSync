@@ -228,3 +228,23 @@ void PimMaReadData(MAHandle data, void *dst, int offset, int size)
 {
     maReadData(data, dst, offset, size);
 }
+
+int PimMaGetDataSize(MAHandle data)
+{
+    return maGetDataSize(data);
+}
+
+int PimMaCreatePlaceHolder()
+{
+    return maCreatePlaceholder();
+}
+
+int PimMaCreateData(MAHandle placeholder, int size)
+{
+    return maCreateData(placeholder, size);
+}
+
+void PimMaWriteData(MAHandle data, const void* src, int offset, int size)
+{
+    maWriteData(data, src, offset, size);
+}

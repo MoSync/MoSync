@@ -27,7 +27,6 @@ static PimUtils *sharedInstance = nil;
 
 @implementation PimUtils
 
-
 /**
  * Returns an instance to the shared singleton.
  * @return The shared generator object.
@@ -57,7 +56,7 @@ static PimUtils *sharedInstance = nil;
 
 - (id)init
 {
-    mHandle = 0;
+    mHandle = 1;
     NSString* homeLabel = [NSString stringWithString:(NSString*)kABHomeLabel];
     NSString* workLabel = [NSString stringWithString:(NSString*)kABWorkLabel];
     NSString* otherLabel = [NSString stringWithString:(NSString*)kABOtherLabel];
@@ -274,14 +273,14 @@ static PimUtils *sharedInstance = nil;
 //    NSLog(@"PimUtil--writeStringArray--noStrings = %d", noStrings);
 
     UInt16* dst = (UInt16*) ((int)address + sizeof(int));
-
+    int countWrittenBytes = sizeof(UInt16);
     for (int i = 0; i < noStrings; i++) {
         NSString* currentString = [array objectAtIndex:i];
-        [self writeString:currentString atAddress:(void*) dst maxSize:512];
+        countWrittenBytes += [self writeString:currentString atAddress:(void*) dst maxSize:512];
         dst += [currentString length] + 1;
     }
 
-    return 1;
+    return countWrittenBytes;
 }
 
 /**
@@ -399,23 +398,74 @@ static PimUtils *sharedInstance = nil;
 }
 
 /**
- * Gets the bytes from a given address.
+ * Gets an int value from a given address.
  * @param address The specified address.
- * @param size The size that can be read from the memory address.
- * @return An array containing the pixels.
+ * @return An array containing an NSNumber type object.
  */
--(NSMutableArray*) getBytes:(void*) address
-                       size:(const int) size
+-(NSMutableArray*) getIntValue:(void*) address
 {
-    int handle = *(int*) address;
-    char *newBuf = new char[size];
-	PimMaReadData(handle, newBuf,0,size);
-
-    NSData* data = [NSData dataWithBytes:newBuf length:size];
+    int value = *(int*) address;
+    NSNumber* number = [NSNumber numberWithInt:value];
     NSMutableArray* array = [[NSMutableArray alloc] init];
-    [array addObject:data];
+    [array addObject:number];
 
     return array;
+}
+
+/**
+ * Writes an int value to a given address.
+ * @param value The given int value.
+ * @param address The specified address.
+ * @param size The maximum size(in bytes) that can be written at the given address.
+ * @return The size(in bytes) of an int. If the size of the int is greater than
+ *         the maximum size(the size parameter) the date was not written.
+ */
+-(int) writeIntValue:(const int) value
+           atAddress:(void*) address
+             maxSize:(const int) size
+{
+    if (sizeof(value) < size)
+    {
+        *(int*) address = value;
+    }
+
+    return sizeof(value);
+}
+
+/**
+ * Gets the image data from a data handle.
+ * @param handle The given data handle.
+ * @return The image data if the handle is valid, or nil otherwise.
+ * The ownership of the result is passed to the caller.
+ */
+-(NSData*) getImageDataFromHandle:(const int) handle
+{
+    NSData* data = nil;
+    int size = PimMaGetDataSize(handle);
+    int* dst = new int[size];
+    PimMaReadData(handle, dst, 0, size);
+    data = [NSData dataWithBytes:dst length:size];
+    delete[] dst;
+
+    return data;
+}
+
+/**
+ * Creates a data handle for a NSData type object.
+ * @param data The given data object.
+ * @return The data handle.
+ */
+-(const int) createDataHandle:(NSData*) data
+{
+    MAHandle placeholder = PimMaCreatePlaceHolder();
+    int size = [data length];
+    const void* src = [data bytes];
+    if (RES_OK == PimMaCreateData(placeholder, size))
+    {
+        PimMaWriteData(placeholder, src, 0, size);
+    }
+
+    return placeholder;
 }
 
 /**
@@ -491,7 +541,7 @@ static PimUtils *sharedInstance = nil;
             *type = MA_PIM_TYPE_STRING;
             break;
         case MA_PIM_FIELD_CONTACT_PHOTO:
-            type = MA_PIM_TYPE_BINARY;
+            *type = MA_PIM_TYPE_INT;
             break;
         case MA_PIM_FIELD_CONTACT_PHOTO_URL:
             *type = MA_PIM_TYPE_STRING;
@@ -564,6 +614,27 @@ static PimUtils *sharedInstance = nil;
     }
 
     return returnedDictionary;
+}
+
+/**
+ * Gets the custom attribute for a specified field ID.
+ * @param fieldID the given field ID.
+ * @return The custom attribute, or 0 if it does not have one.
+ */
+-(int) getCustomAttributeForFieldID:(const int) fieldID
+{
+    int attribute = 0;
+    NSString* customLabel = [NSString string];
+    NSMutableDictionary* allowedAttributes = [self getAttributesForFieldId:fieldID];
+    NSArray* labelArray = [allowedAttributes allKeysForObject:customLabel];
+    if (0 < [labelArray count])
+    {
+        attribute = [[labelArray objectAtIndex:0] intValue];
+    }
+    [customLabel release];
+    [labelArray release];
+
+    return attribute;
 }
 
 /**

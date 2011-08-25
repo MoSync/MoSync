@@ -66,7 +66,7 @@ public class PIMItem {
 		    {
 				String[] info = new String[columns.length];
 				for (int i=0; i<columns.length; i++)
-					info[i] = cursor.getString( cursor.getColumnIndex(columns[i]));
+					info[i] = cursor.getString( cursor.getColumnIndex(columns[i]) );
 
 				p.add(columns, info);
 		    }
@@ -74,15 +74,22 @@ public class PIMItem {
 		}
 	}
 
-	void updateField(ContentResolver cr, String contactId, String[] columns, String itemType)
+	void updateField(ContentResolver cr, String dataIDName, String dataIDValue, String dataName, String dataValue)
 	{
-		 ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+		ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
 
-		 ops.add(ContentProviderOperation.newUpdate(Data.CONTENT_URI)
-		          .withSelection(Data.CONTACT_ID + "=?",
-					new String[] {String.valueOf(contactId)})
-		          .withValue(itemType, "sample_text")
-		          .build());
-		 //cr.applyBatch(ContactsContract.AUTHORITY, ops);
+		ops.add(ContentProviderOperation.newUpdate(Data.CONTENT_URI)
+				.withSelection(dataIDName + "=?",
+				new String[] {dataIDValue})
+				.withValue(dataName, dataValue)
+				.build());
+//		try
+//		{
+//			cr.applyBatch(ContactsContract.AUTHORITY, ops);
+//		}
+//		catch (Exception e)
+//		{
+//			e.printStackTrace();
+//		}
 	}
 }

@@ -126,13 +126,38 @@
          maxSize:(int) size;
 
 /**
- * Gets the bytes from a given address.
+ * Gets an int value from a given address.
  * @param address The specified address.
- * @param size The size that can be read from the memory address.
- * @return An array containing the pixels.
+ * @return An array containing an NSNumber type object.
  */
--(NSMutableArray*) getBytes:(void*) address
-                       size:(const int) size;
+-(NSMutableArray*) getIntValue:(void*) address;
+
+/**
+ * Writes an int value to a given address.
+ * @param value The given int value.
+ * @param address The specified address.
+ * @param size The maximum size(in bytes) that can be written at the given address.
+ * @return The size(in bytes) of an int. If the size of the int is greater than
+ *         the maximum size(the size parameter) the date was not written.
+ */
+-(int) writeIntValue:(const int) value
+           atAddress:(void*) address
+             maxSize:(const int) size;
+
+/**
+ * Gets the image data from a data handle.
+ * @param handle The given data handle.
+ * @return The image data if the handle is valid, or nil otherwise.
+ * The ownership of the result is passed to the caller.
+ */
+-(NSData*) getImageDataFromHandle:(const int) handle;
+
+/**
+ * Creates a data handle for a NSData type object.
+ * @param data The given data object.
+ * @return The data handle.
+ */
+-(const int) createDataHandle:(NSData*) data;
 
 /**
  * Adds an given string to a given array. If string param is nil
@@ -167,6 +192,13 @@
  *         dictionary will be returned.
  */
 -(NSMutableDictionary*) getAttributesForFieldId:(const int) fieldID;
+
+/**
+ * Gets the custom attribute for a specified field ID.
+ * @param fieldID the given field ID.
+ * @return The custom attribute, or 0 if it does not have one.
+ */
+-(int) getCustomAttributeForFieldID:(const int) fieldID;
 
 /**
  * Gets the absolute memory address for a specified address from MoSync memory pool.

@@ -143,15 +143,26 @@ void WebScreen::customEvent(const MAEvent& event)
 		// Handle the event emitted by the widget.
 		widgetClicked(widgetEventData->widgetHandle);
 	}
-	else if (MAW_EVENT_CONTENT_LOADED == widgetEventData->eventType ){
+	else if (MAW_EVENT_WEB_VIEW_CONTENT_LOADING == widgetEventData->eventType ){
 		// Refresh text in the top label.
 		setLabelText(mLabel, MESSAGE_BACK_HINT.c_str());
 	}
 	else if ( MAW_EVENT_WEB_VIEW_URL_CHANGED == widgetEventData->eventType){
-		// TODO test with MAW_EVENT_CONTENT_LOADED event.
-		// Refresh text in the top label.
-//		setLabelText(mLabel, MESSAGE_BACK_HINT.c_str());
-//		setLabelText(mLabel, MESSAGE_PAGE_LOADING.c_str());
+		 switch (widgetEventData->status)
+		 {
+		 case MAW_CONSTANT_STARTED:
+			 setLabelText(mLabel, MESSAGE_PAGE_LOADING.c_str());
+			 break;
+		 case MAW_CONSTANT_STOPPED:
+			 setLabelText(mLabel, MESSAGE_LOADING_STOPPED.c_str());
+			 break;
+		 case MAW_CONSTANT_ERROR:
+			 setLabelText(mLabel, MESSAGE_LOADING_ERROR.c_str());
+			 break;
+		 case MAW_CONSTANT_DONE:
+			 setLabelText(mLabel, MESSAGE_BACK_HINT.c_str());
+			 break;
+		 }
 	}
 	return;
 }
