@@ -56,6 +56,10 @@ namespace NativeUI
     /**
      * Set the type of scaling that should be applied to the image.
      * @param scaleMode The type of scaling.
+     * One of the following:
+     *  #IMAGE_SCALE_NONE
+     *  #IMAGE_SCALE_XY
+     *  #IMAGE_SCALE_PRESERVE_ASPECT
      */
     void Image::setScaleMode(ImageScaleMode scaleMode)
     {
