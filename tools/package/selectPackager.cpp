@@ -108,6 +108,7 @@ void toSlashes(string& str) {
 static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 	// read file
 	ifstream file(filename);
+	setName(file, filename);
 	if(!file.good())
 		return false;
 	string line;
@@ -190,6 +191,7 @@ static bool parseStringProp(const string& line, const char* key, string& value) 
 
 static bool parseProfileHeader(const char* filename, RuntimeInfo& pi) {
 	ifstream file(filename);
+	setName(file, filename);
 	if(!file.good())
 		return false;
 	pi.isBlackberry = false;

@@ -113,6 +113,7 @@ static void writeManifest(const SETTINGS& s, const RuntimeInfo& ri,
 	const char* filename, bool isJad, const string& jarFileName)
 {
 	ofstream stream(filename);
+	setName(stream, filename);
 	if(!isJad) {
 		stream << "Manifest-Version: 1.0\n";
 	}
@@ -127,4 +128,5 @@ static void writeManifest(const SETTINGS& s, const RuntimeInfo& ri,
 		stream << "MIDlet-Jar-URL: "<<jarFileName<<".jar\n";
 		stream << "MIDlet-Jar-Size: "<<getFileSize(jarFileName.c_str())<<"\n";
 	}
+	beGood(stream);
 }
