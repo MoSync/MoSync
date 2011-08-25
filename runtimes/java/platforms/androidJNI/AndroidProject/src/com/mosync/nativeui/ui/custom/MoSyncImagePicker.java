@@ -87,6 +87,8 @@ public class MoSyncImagePicker
 		// Initialize the selected image handle.
 		mImageHandle = -1;
 
+		mPosition = -1;
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setCancelable(true);
 		builder.setTitle("Image Picker");
@@ -104,6 +106,8 @@ public class MoSyncImagePicker
 		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which)
 			{
+	            // Save the handle of the selected item and post event.
+	            mImageHandle = getSelectedImageHandle(mPaths.get(mPosition));
 				postImagePickerEvent(PICKER_READY);
 			}
 		});
@@ -152,8 +156,8 @@ public class MoSyncImagePicker
 		            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(position));
 		            preview.setImageBitmap(bitmap);
 
-		            // Save the handle of the selected item as an event.
-		            mImageHandle = getSelectedImageHandle(mPaths.get(position));
+		            // Save the position of the last selected images.
+		            mPosition = position;
 				}
 			});
 
@@ -377,4 +381,9 @@ public class MoSyncImagePicker
 	 * The handle of the selected image.
 	 */
 	private int mImageHandle = -1;
+
+	/**
+	 * The current image index.
+	 */
+	private int mPosition = -1;
 }

@@ -87,6 +87,33 @@ void MainScreen::createMainLayout() {
 
     result = mButton->setFontSize(15.9);
     printf("result setFontSize = %d", result);
+
+	// Print number of available fonts.
+	int fontsCount = maFontGetCount();
+	Label* nrFontsLabel = new Label();
+
+	nrFontsLabel->setText(MAUtil::integerToString(fontsCount) + " fonts available.");
+	nrFontsLabel->setFontColor(0xFF0000);
+	mMainLayout->addChild(nrFontsLabel);
+
+	// Get the first font
+	char buf[256];
+	maFontGetName(0, buf, 256);
+	Label* fontLoadedName = new Label();
+	// Print the name of the font
+	fontLoadedName->setText(buf);
+	fontLoadedName->setFontColor(0xFF0000);
+	mMainLayout->addChild(fontLoadedName);
+
+	// Load the font with size 10 and get a handle.
+	int fontHandle = maFontLoadWithName(buf, 10);
+
+	// Set the handle to a label
+	Button* testFontLabel = new Button();
+	testFontLabel->setText("Test for this font!");
+	testFontLabel->setFontColor(0xFF0000);
+	testFontLabel->setFont(fontHandle);
+	mMainLayout->addChild(testFontLabel);
 }
 
 /**
