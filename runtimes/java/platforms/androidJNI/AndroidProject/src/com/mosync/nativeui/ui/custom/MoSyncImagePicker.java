@@ -296,7 +296,10 @@ public class MoSyncImagePicker
         // Create handle.
         int dataHandle = mMoSyncThread.nativeCreatePlaceholder();
 
-        Bitmap tempBitmap = BitmapFactory.decodeFile(absPath);
+		BitmapFactory.Options options = new BitmapFactory.Options();
+		options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+
+        Bitmap tempBitmap = BitmapFactory.decodeFile(absPath, options);
 
 			if(null == tempBitmap)
 			{
