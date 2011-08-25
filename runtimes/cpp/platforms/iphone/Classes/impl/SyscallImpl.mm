@@ -92,6 +92,26 @@ extern ThreadPool gThreadPool;
 				 didFinishWithResult:(MessageComposeResult)result{
 	MoSyncUI* msUI = getMoSyncUI();
 	[msUI hideModal];
+
+	MAEvent event;
+	event.type = EVENT_TYPE_SMS;
+
+	if (result == MessageComposeResultCancelled) {
+		event.status = MA_SMS_RESULT_NOT_SENT;
+	}
+	else if (result == MessageComposeResultFailed) {
+		event.status = MA_SMS_RESULT_NOT_DELIVERED;
+	}
+	else if (result == MessageComposeResultSent){
+		MAEvent firstEvent;
+		firstEvent.type = EVENT_TYPE_SMS;
+		firstEvent.status = MA_SMS_RESULT_SENT;
+		Base::gEventQueue.put(firstEvent);
+
+		event.status = MA_SMS_RESULT_DELIVERED;
+	}
+
+	Base::gEventQueue.put(event);
 }
 @end
 
