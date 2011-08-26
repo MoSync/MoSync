@@ -30,12 +30,12 @@ MA 02110-1301, USA.
 
 #include "consts.h"
 
-// the list with sensor error codes
-int mSensorError[SENSOR_TYPES];
-// values returned by sensors
-float mSensorValue[SENSOR_TYPES][SENSOR_VALUES];
-// names of the available sensors
-const char *mSensorName[SENSOR_TYPES] =
+// The list with sensor error codes.
+int gSensorError[SENSOR_TYPES];
+// Values returned by sensors.
+float gSensorValue[SENSOR_TYPES][SENSOR_VALUES];
+// Names of the available sensors.
+const char *gSensorName[SENSOR_TYPES] =
 {
 	TXT_SENSOR_NONE,
 	TXT_SENSOR_ACCELEROMETER,
@@ -45,9 +45,9 @@ const char *mSensorName[SENSOR_TYPES] =
 	TXT_SENSOR_PROXIMITY
 };
 
-// screen dimensions
-int mScreenWidth;
-int mScreenHeight;
+// Screen dimensions.
+int gScreenWidth;
+int gScreenHeight;
 
 /**
  * Get the screen size into the instance variables
@@ -59,10 +59,10 @@ static void updateScreenDimensions()
 	MAExtent size = maGetScrSize();
 
 	/// Extract the screen width
-	mScreenWidth = EXTENT_X(size);
+	gScreenWidth = EXTENT_X(size);
 
 	/// Extract the screen height
-	mScreenHeight = EXTENT_Y(size);
+	gScreenHeight = EXTENT_Y(size);
 }
 
 /*
@@ -88,7 +88,7 @@ char* getErrorText(int errorCode)
 }
 
 /*
- * \brief Get the orientation text using the sensor orientation code.
+ * @brief Get the orientation text using the sensor orientation code.
  */
 char* getOrientationText(int orientation)
 {
@@ -112,18 +112,18 @@ char* getOrientationText(int orientation)
 }
 
 /*
- * \brief Register to all sensors and get the error codes
+ * @brief Register to all sensors and get the error codes
  */
 void registerSensors()
 {
 	for (int type=0; type<SENSOR_TYPES; type++)
 	{
-		mSensorError[type] = maSensorStart(type, SENSOR_RATE_NORMAL);
+		gSensorError[type] = maSensorStart(type, SENSOR_RATE_NORMAL);
 	}
 }
 
 /*
- * \brief Unregister all the sensors
+ * @brief Unregister all the sensors
  */
 void unregisterSensors()
 {
@@ -134,21 +134,22 @@ void unregisterSensors()
 }
 
 /*
- * \brief Draw the sensor values.
- * \param index Current sensor index.
- * \param x Coordinate x where to draw the values.
- * \param y Coordinate y where to draw the values.
+ * @brief Draw the sensor values.
+ * @param index Current sensor index.
+ * @param x Coordinate x where to draw the values.
+ * @param y Coordinate y where to draw the values.
  */
 void drawSensorValue(int index, int x, int y)
 {
-	float* values = mSensorValue[index];
+	float* values = gSensorValue[index];
 	char buffer[BUFFER_SIZE];
 	switch (index)
 	{
 		case SENSOR_TYPE_ACCELEROMETER:
 		case SENSOR_TYPE_MAGNETIC_FIELD:
 		case SENSOR_TYPE_GYROSCOPE:
-			sprintf(buffer, "Values: %f; %f; %f", values[0], values[1], values[2]);
+			sprintf(buffer, "Values: %f; %f; %f",
+					values[0], values[1], values[2]);
 			break;
 		case SENSOR_TYPE_ORIENTATION:
 			sprintf(buffer, "Value: %s", getOrientationText((int)values[0]));
@@ -164,28 +165,29 @@ void drawSensorValue(int index, int x, int y)
 }
 
 /*
- * \brief Draw the sensor status.
- * \param index Current sensor index.
- * \param x Coordinate x where to draw the values.
- * \param y Coordinate y where to draw the values.
+ * @brief Draw the sensor status.
+ * @param index Current sensor index.
+ * @param x Coordinate x where to draw the values.
+ * @param y Coordinate y where to draw the values.
  */
 void drawSensorStatus(int index, int x, int y)
 {
 	char buffer[BUFFER_SIZE];
-	sprintf(buffer, "%s: %s", mSensorName[index], getErrorText(mSensorError[index]));
+	sprintf(buffer, "%s: %s",
+			gSensorName[index], getErrorText(gSensorError[index]));
 	maDrawText(x, y, buffer);
 }
 
 
 /*
- * \brief Displays the sensor values
+ * @brief Displays the sensor values
  * or an error message if the sensor cannot register.
  */
 void drawSensorOutput()
 {
 	//clean the screen
 	maSetColor(BG_COLOR);
-	maFillRect(0, 0, mScreenWidth, mScreenHeight);
+	maFillRect(0, 0, gScreenWidth, gScreenHeight);
 
 	//set output text color
 	maSetColor(TEXT_COLOR);
@@ -197,7 +199,7 @@ void drawSensorOutput()
 		posY += OFFSET_Y;
 
 		// skip is sensor couldn't register
-		if (mSensorError[i] != 0)
+		if (gSensorError[i] != 0)
 			continue;
 
 		drawSensorValue(i, 0, posY);
@@ -219,9 +221,11 @@ extern "C" int MAMain()
 		{
 			if(event.type == EVENT_TYPE_SENSOR)
 			{
-				memcpy( mSensorValue[event.sensor.type], event.sensor.values, SENSOR_VALUES * sizeof(float) );
+				memcpy(gSensorValue[event.sensor.type],
+						event.sensor.values, SENSOR_VALUES * sizeof(float));
 			}
-			else if ( (event.type == EVENT_TYPE_KEY_PRESSED) && (event.key == MAK_0) )
+			else if ((event.type == EVENT_TYPE_KEY_PRESSED) &&
+					(event.key == MAK_0))
 			{
 				break;
 			}
