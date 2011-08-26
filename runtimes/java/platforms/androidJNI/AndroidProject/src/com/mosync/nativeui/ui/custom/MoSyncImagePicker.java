@@ -42,6 +42,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.Gallery;
 import android.widget.ImageView;
@@ -106,8 +107,11 @@ public class MoSyncImagePicker
 		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which)
 			{
-	            // Save the handle of the selected item and post event.
-	            mImageHandle = getSelectedImageHandle(mPaths.get(mPosition));
+				if ( !mPaths.isEmpty() )
+				{
+					// Save the handle of the selected item and post event.
+					mImageHandle = getSelectedImageHandle(mPaths.get(mPosition));
+				}
 				postImagePickerEvent(PICKER_READY);
 			}
 		});
@@ -127,6 +131,7 @@ public class MoSyncImagePicker
 //			gallery.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
 //			        LayoutParams.FILL_PARENT));
 			gallery.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,150));
+			gallery.setCallbackDuringFling(false);
 
 			// Fill the gallery view with images.
 			gallery.setAdapter(new CustomAdapter(getActivity()));
@@ -142,23 +147,30 @@ public class MoSyncImagePicker
             preview.setImageBitmap(bitmap);
 
 			layout.addView(preview);
-
-			gallery.setOnItemClickListener(new OnItemClickListener() {
+			gallery.setCallbackDuringFling(false);
+			gallery.setOnItemSelectedListener(new OnItemSelectedListener() {
 
 				@Override
-				public void onItemClick(AdapterView<?> arg0, View v,
-				        int position, long id)
-				{
-					Toast.makeText(getActivity(), mNames.get(position) ,
+                public void onItemSelected(AdapterView<?> arg0, View arg1,
+                        int pos, long id)
+                {
+					Toast.makeText(getActivity(), mNames.get(pos) ,
 					        Toast.LENGTH_SHORT).show();
 
 					// Refresh the preview image.
-		            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(position));
+		            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(pos));
 		            preview.setImageBitmap(bitmap);
 
 		            // Save the position of the last selected images.
-		            mPosition = position;
-				}
+		            mPosition = pos;
+                }
+
+				@Override
+                public void onNothingSelected(AdapterView<?> arg0)
+                {
+
+                }
+
 			});
 
 			builder.setView(layout);
@@ -346,7 +358,9 @@ public class MoSyncImagePicker
         {
             ImageView imgView = new ImageView(mContext);
 
-            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(position));
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(position), options);
             imgView.setImageBitmap(bitmap);
             imgView.setLayoutParams(new Gallery.LayoutParams(LayoutParams.WRAP_CONTENT,
 			        LayoutParams.WRAP_CONTENT));
