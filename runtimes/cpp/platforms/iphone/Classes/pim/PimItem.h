@@ -29,20 +29,20 @@
  * The status of an pim item.
  */
 typedef enum {
-    /**
-     * New item. The item must be added to the database(e.g. Address Book) manually.
-     */
-    kNewItem,
-    /**
-     * The item was imported from the database(e.g. Address Book). The content
-     * of the item has not been modified.
-     */
-    kImportedItem,
-    /**
-     * The item was imported from the database(e.g. Address Book). The content
-     * of the item has been modified. The item must be updated into database.
-     */
-    kModifiedItem
+	/**
+	* New item. The item must be added to the database(e.g. Address Book) manually.
+	*/
+	kNewItem,
+	/**
+	* The item was imported from the database(e.g. Address Book). The content
+	* of the item has not been modified.
+	*/
+	kImportedItem,
+	/**
+	* The item was imported from the database(e.g. Address Book). The content
+	* of the item has been modified. The item must be updated into database.
+	*/
+	kModifiedItem
 } PimItemStatus;
 
 
@@ -55,17 +55,17 @@ typedef enum {
  * This class only defines the behavior for each pim item class.
  */
 @interface PimItem: NSObject {
-    /**
-     * Stores the fields.
-     * Object type is PimItemField.
-     * Object's key is one of MA_PIM_FIELD constants.
-     */
-    NSMutableDictionary* mFieldsDictionary;
+	/**
+	* Stores the fields.
+	* Object type is PimItemField.
+	* Object's key is one of MA_PIM_FIELD constants.
+	*/
+	NSMutableDictionary* mFieldsDictionary;
 
-    /**
-     * The status of the item.
-     */
-    PimItemStatus mItemStatus;
+	/**
+	* The status of the item.
+	*/
+	PimItemStatus mItemStatus;
 }
 
 /**

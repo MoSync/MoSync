@@ -15,7 +15,12 @@
  02111-1307, USA.
 */
 
+#include "config_platform.h"
 #import "PimDatabase.h"
+#include <helpers/helpers.h>
+
+#include <base_errors.h>
+using namespace MoSyncError;
 
 @implementation PimDatabase
 
@@ -64,7 +69,7 @@
 	{
 		if (nil == mContactsList)
 		{
-			returnedValue = MA_PIM_ERR_LIST_NOT_OPENED;
+			BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
 		}
 		else
 		{
@@ -73,7 +78,7 @@
 	}
 	else
 	{
-		returnedValue = MA_PIM_ERR_UNAVAILABLE_LIST;
+		BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
 	}
 
 	return returnedValue;
@@ -98,7 +103,7 @@
 	}
 	else
 	{
-		returnedValue = MA_PIM_ERR_UNAVAILABLE_LIST;
+		BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
 	}
 
 	return returnedValue;
@@ -112,21 +117,12 @@
 -(int) closeList:(PimList*) list;
 {
 	int returnedValue;
-
-	if (nil == list)
+	MYASSERT(nil != list, ERR_INVALID_PIM_HANDLE);
+	returnedValue = [list close];
+	if (MA_PIM_ERR_NONE == returnedValue)
 	{
-		returnedValue = MA_PIM_ERR_LIST_NOT_OPENED;
+		[list release];
 	}
-	else
-	{
-		returnedValue = [list close];
-
-		if (MA_PIM_ERR_NONE == returnedValue)
-		{
-			[list release];
-		}
-	}
-
 	return returnedValue;
 }
 
@@ -150,7 +146,7 @@
 		return [mContactsList createItem];
 	}
 
-	return MA_PIM_ERR_UNAVAILABLE_LIST;
+	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
 }
 
 /**
@@ -167,7 +163,7 @@
 		return [mContactsList removeItem:item];
 	}
 
-	return MA_PIM_ERR_UNAVAILABLE_LIST;
+	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
 }
 
 /**

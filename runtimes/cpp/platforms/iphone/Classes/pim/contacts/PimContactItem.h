@@ -18,12 +18,12 @@
 #import <Foundation/Foundation.h>
 #import <AddressBook/AddressBook.h>
 
+#include "helpers/cpp_defs.h"
+#include "helpers/cpp_ix_pim.h"
+
 #import "PimUtil.h"
 #import "PimFieldItem.h"
 #import "PimItem.h"
-
-#include "helpers/cpp_defs.h"
-#include "helpers/cpp_ix_pim.h"
 
 @interface PimContactItem: PimItem {
 

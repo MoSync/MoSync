@@ -15,8 +15,14 @@
  02111-1307, USA.
 */
 
+#include "config_platform.h"
+#import "PimList.h"
 #import "PimContactsList.h"
 #import "PimUtil.h"
+#include <helpers/helpers.h>
+
+#include <base_errors.h>
+using namespace MoSyncError;
 
 @implementation PimContactsList
 
@@ -26,7 +32,7 @@
 -(id) init
 {
     mContactsDictionary = [[NSMutableDictionary alloc] init];
-    mKeysArrayIndex = MA_PIM_ERR_LIST_NOT_OPENED;
+    mAddressBook = nil;
     return [super init];
 }
 
@@ -84,10 +90,7 @@
 -(MAHandle) getNextItem
 {
     // Check if the list is opened.
-    if(MA_PIM_ERR_LIST_NOT_OPENED == mKeysArrayIndex)
-    {
-        return MA_PIM_ERR_LIST_NOT_OPENED;
-    }
+    MYASSERT(mAddressBook != nil, ERR_INVALID_PIM_HANDLE);
 
     // Check if the are more items in list.
     NSArray* keysArray = [mContactsDictionary allKeys];

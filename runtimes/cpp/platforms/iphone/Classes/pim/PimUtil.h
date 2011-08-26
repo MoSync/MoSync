@@ -22,18 +22,18 @@
 
 @interface PimUtils: NSObject {
 
-    /**
-     * The current handle value.
-     */
-    int mHandle;
+	/**
+	* The current handle value.
+	*/
+	int mHandle;
 
-    NSMutableDictionary* mAddressAttributes;
-    NSMutableDictionary* mEmailAttributes;
-    NSMutableDictionary* mPhoneAttributes;
-    NSMutableDictionary* mWebSiteAttributes;
-    NSMutableDictionary* mIMAttributes;
-    NSMutableDictionary* mRelationAttributes;
-    NSMutableDictionary* mNoAttributes;
+	NSMutableDictionary* mAddressAttributes;
+	NSMutableDictionary* mEmailAttributes;
+	NSMutableDictionary* mPhoneAttributes;
+	NSMutableDictionary* mWebSiteAttributes;
+	NSMutableDictionary* mIMAttributes;
+	NSMutableDictionary* mRelationAttributes;
+	NSMutableDictionary* mNoAttributes;
 }
 
 /**

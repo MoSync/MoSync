@@ -18,23 +18,21 @@
 #import <Foundation/Foundation.h>
 
 @interface PimFieldItemValue:  NSObject {
+	/**
+	* Array with field values.
+	*/
+	NSMutableArray* mValuesArray;
 
-    /**
-     * Array with field values.
-     */
-    NSMutableArray* mValuesArray;
+	/**
+	* The attribute id.
+	*/
+	int mAttributeID;
 
-    /**
-     * The attribute id.
-     */
-    int mAttributeID;
-
-    /**
-     * The string value of the attribute id.
-     * If the attribute is custom the value will be custom also.
-     */
-    NSString* mLabel;
-
+	/**
+	* The string value of the attribute id.
+	* If the attribute is custom the value will be custom also.
+	*/
+	NSString* mLabel;
 }
 
 /**
