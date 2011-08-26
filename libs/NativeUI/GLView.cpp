@@ -33,16 +33,9 @@ namespace NativeUI
 	/**
 	 * Constructor.
 	 */
-	GLView::GLView(GLViewType type)
+	GLView::GLView(const MAUtil::String type):
+		Widget(type)
 	{
-		if ( type == GL1_VIEW )
-		{
-			Widget(GL_VIEW);
-		}
-		else
-		{
-			Widget(GL2_VIEW);
-		}
 		// Set some common default values.
 		fillSpaceVertically();
 		fillSpaceHorizontally();
