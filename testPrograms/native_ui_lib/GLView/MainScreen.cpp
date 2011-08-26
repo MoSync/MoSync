@@ -49,8 +49,6 @@ MainScreen::MainScreen() :
 MainScreen::~MainScreen()
 {
     mGLView->removeGLViewListener(this);
-
-	delete mMainLayout;
 }
 
 /**
