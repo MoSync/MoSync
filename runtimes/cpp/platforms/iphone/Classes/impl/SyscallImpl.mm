@@ -1038,6 +1038,7 @@ namespace Base {
 			// check err
 			return -1;
 		}
+        [sSoundPlayer prepareToPlay];
 		[sSoundPlayer play];
 
 		return 0;

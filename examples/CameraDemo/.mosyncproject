@@ -6,20 +6,19 @@
 <property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Release" value="%mosync-home%/include"/>
-<property key="build.prefs:additional.libraries" value="mastd.lib, MAUtil.lib, MAFS.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="mastdD.lib, MAUtilD.lib, MAFSD.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="mastd.lib, MAUtil.lib, MAFS.lib"/>
+<property key="build.prefs:additional.libraries" value="mastd.lib, MAUtil.lib, MAUI.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="mastdD.lib, MAUtilD.lib, MAUID.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="mastd.lib, mautil.lib, maui.lib"/>
 <property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Release" value="%mosync-home%/lib/pipe"/>
-<property key="build.prefs:app.permissions" value=""/>
-<property key="build.prefs:app.vendor" value="MoSync AB"/>
-<property key="build.prefs:dead.code.elim" value="false"/>
-<property key="build.prefs:extra.link.sw" value="-datasize=4096000 -heapsize=2048000 -master-dump"/>
+<property key="build.prefs:app.permissions" value="Camera"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
-<property key="build.prefs:extra.res.sw" value=""/>
-<property key="build.prefs:gcc.switches" value="-O3 -Wno-multichar"/>
-<property key="build.prefs:gcc.warnings" value="0"/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
+<property key="build.prefs:gcc.warnings/Release" value="0"/>
 <property key="build.prefs:ignore.default.include.paths" value="true"/>
 <property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
@@ -29,17 +28,15 @@
 <property key="build.prefs:ignore.default.library.paths" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
-<property key="build.prefs:memory.data/Release" value="16384"/>
-<property key="build.prefs:memory.heap/Release" value="10000"/>
+<property key="build.prefs:memory.data/Debug" value="65556"/>
+<property key="build.prefs:memory.heap/Debug" value="32768"/>
+<property key="build.prefs:memory.stack/Debug" value="8192"/>
 <property key="build.prefs:project.type" value=""/>
-<property key="debug" value="false"/>
 <property key="dependency.strategy" value="0"/>
+<property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
-<property key="screenHeight" value="320"/>
-<property key="screenWidth" value="240"/>
-<property key="symbian.uids:uid.s60v2uid" value="0x0FFF6213"/>
-<property key="symbian.uids:uid.s60v3uid" value="0xEFDB6086"/>
-<property key="Wall" value="true"/>
-<property key="Werror" value="false"/>
+<property key="symbian.uids:uid.s60v2uid" value="0x0000000"/>
+<property key="symbian.uids:uid.s60v3uid" value="0xee1fd9d2"/>
+<property key="template.id" value="project.maui"/>
 </properties>
 </project>

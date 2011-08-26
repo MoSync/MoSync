@@ -25,9 +25,15 @@ using namespace std;
 
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-static void beGood(const ios& i) {
+static const int IOS_NAME_INDEX = ios_base::xalloc();
+
+void setName(ios& i, const char* name) {
+	i.pword(IOS_NAME_INDEX) = (void*)name;
+}
+
+void beGood(ios& i) {
 	if(!i.good()) {
-		printf("File I/O error.\n");
+		printf("File I/O error in '%s'\n", (char*)i.pword(IOS_NAME_INDEX));
 		exit(1);
 	}
 }
@@ -57,18 +63,23 @@ static void writeCopy(istream& in, ostream& out) {
 
 void copyFile(const char* dst, const char* src) {
 	ifstream in(src, ios_base::binary);
+	setName(in, src);
 	ofstream out(dst, ios_base::binary);
+	setName(out, dst);
 	writeCopy(in, out);
 }
 
 void appendFile(const char* dst, const char* src) {
 	ifstream in(src, ios_base::binary);
+	setName(in, src);
 	ofstream out(dst, ios_base::binary | ios_base::app);
+	setName(out, dst);
 	writeCopy(in, out);
 }
 
 streamoff getFileSize(const char* filename) {
 	ifstream in(filename, ios_base::binary);
+	setName(in, filename);
 	beGood(in);
 
 	streamoff size;
@@ -80,6 +91,7 @@ streamoff getFileSize(const char* filename) {
 
 string readFileToString(const char* src) {
 	ifstream in(src);
+	setName(in, src);
 	beGood(in);
 
 	streamoff size;
@@ -96,6 +108,7 @@ string readFileToString(const char* src) {
 
 void* readBinaryFile(const char* src, size_t& size) {
 	ifstream in(src, ios_base::binary);
+	setName(in, src);
 	beGood(in);
 
 	in.seekg(0, ios_base::end);
@@ -111,6 +124,7 @@ void* readBinaryFile(const char* src, size_t& size) {
 
 void writeFile(const char* dst, const void* src, size_t size) {
 	ofstream out(dst, ios_base::binary);
+	setName(out, dst);
 	beGood(out);
 	out.write((char*)src, size);
 	beGood(out);
@@ -118,8 +132,10 @@ void writeFile(const char* dst, const void* src, size_t size) {
 
 void applyTemplate(const char* dst, const char* src, const TemplateMap& tm) {
 	ifstream in(src);
+	setName(in, src);
 	beGood(in);
 	ofstream out(dst);
+	setName(out, dst);
 	beGood(out);
 
 	while(true) {

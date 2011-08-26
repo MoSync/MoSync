@@ -386,5 +386,6 @@ class MemoryGeneratedFileTask < FileTask
 		file = open(@NAME, 'w')
 		file.write(@buf)
 		file.close
+		@ec = @buf
 	end
 end

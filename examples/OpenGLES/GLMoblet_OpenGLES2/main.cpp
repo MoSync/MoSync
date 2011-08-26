@@ -185,12 +185,16 @@ public:
 		return TRUE;
 	}
 
+	int mStartTime;
 	void init() {
 		mWidth = EXTENT_X(maGetScrSize());
 		mHeight = EXTENT_Y(maGetScrSize());
 
 		if(!initGL())
 			maPanic(1, "Failed to initialize!");
+
+		mStartTime = maGetMilliSecondCount();
+
 	}
 
 	void draw() {
@@ -205,14 +209,24 @@ public:
 
 		// Use the program object
 		glUseProgram(mShader);
+		checkGLError("glUseProgram");
 
-		glUniform1f(mTimeLoc, maGetMilliSecondCount() * 0.001f);
+		glUniform1f(mTimeLoc, (maGetMilliSecondCount() - mStartTime) * 0.001f);
+		checkGLError("glUniform1f");
+
 		glUniform2f(mResolutionLoc, 1.0f/(float)mWidth, 1.0f/(float)mHeight);
+		checkGLError("glUniform2f");
 
 		// Load the vertex data
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, vVertices);
+		checkGLError("glVertexAttribPointer");
+
 		glEnableVertexAttribArray(0);
+		checkGLError("glEnableVertexAttribArray");
+
 		glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+		checkGLError("glDrawArrays");
+
 	}
 };
 
