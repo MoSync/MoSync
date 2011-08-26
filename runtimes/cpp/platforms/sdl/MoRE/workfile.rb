@@ -16,7 +16,9 @@ work.instance_eval do
 	@EXTRA_SOURCEFILES = ["#{BD}/runtimes/cpp/core/Core.cpp",
 		"#{BD}/runtimes/cpp/core/sld.cpp",
 		"#{BD}/runtimes/cpp/core/GdbStub.cpp",
-		"#{BD}/intlibs/helpers/intutil.cpp"]
+		"#{BD}/runtimes/cpp/core/extensions.cpp",
+		"#{BD}/intlibs/helpers/intutil.cpp",
+		]
 	@EXTRA_INCLUDES += ["../../.."]
 	@SPECIFIC_CFLAGS = { "Core.cpp" => " -DHAVE_IOCTL_ELLIPSIS" }
 	if(!@GCC_IS_V4 && CONFIG=="debug")

@@ -24,7 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/log.h>
 #include "Base/ThreadPool.h"
 #include <base/FileStream.h>
-
+#include "ImagePickerController.h"
 #include <helpers/CriticalSection.h>
 
 #include "iphone_helpers.h"
@@ -285,6 +285,11 @@ void* MoSync_GetCustomEventDataMoSyncPointer() {
 	return (void*) (gCore->Head.DataSize-Base::getMaxCustomEventSize());
 	
 #endif
+}
+
+void MoSync_ShowImagePicker()
+{
+    [[ImagePickerController getInstance] show];
 }
 
 void MoSync_AddLayerToView(CALayer* layer){

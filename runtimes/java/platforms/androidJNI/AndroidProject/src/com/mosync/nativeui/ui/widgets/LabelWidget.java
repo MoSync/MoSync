@@ -17,8 +17,11 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.widgets;
 
+import android.graphics.Typeface;
 import android.widget.TextView;
 
+import com.mosync.internal.android.MoSyncFont;
+import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.ColorConverter;
@@ -37,6 +40,12 @@ import com.mosync.nativeui.util.properties.VerticalAlignment;
  */
 public class LabelWidget extends Widget
 {
+
+	/**
+	 * Hold the value of the maximum number of lines for the text view.
+	 */
+	private int m_maxNrLines = 0;
+
 	/**
 	 * Constructor.
 	 * 
@@ -140,7 +149,16 @@ public class LabelWidget extends Widget
 	}
 
 	/**
-	 * Hold the value of the maximum number of lines for the text view.
+	 * Sets the font typeface from mosync nativeUI.
+	 * It is called instead of the setProperty method,
+	 * as two params are needed.
+	 * @param aTypeface The typeface of MoSyncFontHandle
+	 * @param aSize The size of MoSyncFontHandle
 	 */
-	private int m_maxNrLines = 0;
+	public void setFontTypeface(Typeface aTypeface, float aSize)
+	{
+		TextView textView = (TextView) getView( );
+		textView.setTypeface(aTypeface);
+		textView.setTextSize(aSize);
+	}
 }

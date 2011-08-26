@@ -102,10 +102,12 @@ public:
 		{
 			case DIRECTION_LEFT:
 				return (mPosX + mWidth + offset <
-						(screenWidth >> 1));
+					(screenWidth >> 1));
 			case DIRECTION_RIGHT:
 				return (mPosX + offset >
-						(screenWidth >> 1));
+					(screenWidth >> 1));
+			default:
+				return false;
 		}
 	}
 

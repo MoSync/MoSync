@@ -30,6 +30,7 @@ import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.NativeUI.RootViewReplacedListener;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
+import com.mosync.nativeui.ui.custom.MoSyncImagePicker;
 
 /**
  * Wrapper for Native UI Syscalls to avoid cluttering
@@ -46,6 +47,11 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	private NativeUI mNativeUI;
 
 	/**
+	 * The custom image picker handle.
+	 */
+	private MoSyncImagePicker mImagePicker = null;
+
+	/**
 	 * Constructor.
 	 * @param thread The MoSync thread.
 	 */
@@ -54,7 +60,7 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		Hashtable<Integer, ImageCache> imageResources)
 	{
 		mMoSyncThread = thread;
-		mNativeUI = new NativeUI(getActivity());
+		mNativeUI = new NativeUI(mMoSyncThread, getActivity());
 		mNativeUI.setRootViewReplacedListener(this);
 		NativeUI.setImageTable(imageResources);
 	}
@@ -356,7 +362,27 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 		}
 	}
 
-		
+	/**
+	 * Internal wrapper for maImagePickerOpen that runs
+	 * the call in the UI thread.
+	 */
+	public int maImagePickerOpen()
+	{
+		if ( mImagePicker == null )
+		{
+			mImagePicker = new MoSyncImagePicker(mMoSyncThread, mNativeUI.getImageTable());
+		}
+
+		getActivity().runOnUiThread(new Runnable() {
+			public void run()
+			{
+				mImagePicker.loadGallery();
+			}
+		});
+
+		return 0;
+	}
+
 	/**
 	 * Called when the back button has been pressed.
 	 */

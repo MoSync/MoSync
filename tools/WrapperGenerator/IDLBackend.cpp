@@ -41,21 +41,21 @@ string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool u
 				ret += "in ";
 				if(argument->usesHandle() && !usePointer) {
 					ret+= "MAHandle";
-					return ret; 
+					return ret;
 				}
 			} else {
 				if(argument->usesHandle() && !usePointer) {
-					ret += "in MAHandle"; 
+					ret += "in MAHandle";
 					return ret;
 				} else {
 					ret += "out ";
 				}
-				
+
 			}
 		}
 
 		const Base* pType = pt->getType();
-		
+
 		const Base* resolvedType = pType->resolveFully();
 		if(resolvedType->getBaseType() == Base::EFundamentalType) {
 			const FundamentalType *pfType = (const FundamentalType*) resolvedType;
@@ -70,7 +70,7 @@ string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool u
 			/*
 			if(pfType->getName() == "char")
 				ret += "MAString";
-			else //if(pfType->getName() == "void") 
+			else //if(pfType->getName() == "void")
 				ret += "MAAddress";
 			*/
 			ret += pfType->getName();
@@ -116,9 +116,9 @@ string IDLBackend::getIDLType(const Base* base, const Argument* argument, bool u
 void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 	pair<BasesIterator, BasesIterator> typedefs = bases.equal_range("Typedef");
 
-	std::string group = "initial";	
-		
-	std::vector<const Base*> sortedTypeDefs;	
+	std::string group = "initial";
+
+	std::vector<const Base*> sortedTypeDefs;
 	for(BasesIterator td = typedefs.first; td!=typedefs.second; td++) {
 		const Typedef* t = (const Typedef*)td->second;
 		//stream << "typedef " << getIDLType(t->getType(), NULL) << " " << t->getName() << ";\n";
@@ -126,29 +126,29 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 	}
 
 	std::sort(sortedTypeDefs.begin(), sortedTypeDefs.end(), BaseLocationSortPredicate);
-	
+
 	//for(BasesIterator td = typedefs.first; td!=typedefs.second; td++) {
 	for(std::vector<const Base*>::const_iterator td = sortedTypeDefs.begin(); td!=sortedTypeDefs.end(); td++) {
 		const Typedef* t = (const Typedef*)*td;
-	
+
 		if(t->getGroup() != group) {
 			if(group!="initial") {
 				stream << "#endif\n";
 			}
 			group = t->getGroup();
 			stream << "#if IX_" << System::toUpperCase(group) << "\n";
-		}	
+		}
 		stream << "typedef " << getIDLType(t->getType(), NULL) << " " << t->getName() << ";\n";
 	}
-	
+
 	if(group!="initial") {
-		stream << "#endif\n";	
+		stream << "#endif\n";
 	}
 
-	
+
 	pair<BasesIterator, BasesIterator> functions = bases.equal_range("Function");
-	
-	std::vector<const Base*> sortedFunctions;	
+
+	std::vector<const Base*> sortedFunctions;
 	for(BasesIterator td = functions.first; td!=functions.second; td++) {
 		const Function* t = (const Function*)td->second;
 		//stream << "typedef " << getIDLType(t->getType(), NULL) << " " << t->getName() << ";\n";
@@ -157,12 +157,12 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 
 	std::sort(sortedFunctions.begin(), sortedFunctions.end(), BaseLocationSortPredicate);
 
-	group = "initial";	
+	group = "initial";
 	//for(BasesIterator function = functions.first; function!=functions.second; function++) {
-	for(std::vector<const Base*>::const_iterator function = sortedFunctions.begin(); function!=sortedFunctions.end(); function++) {	
+	for(std::vector<const Base*>::const_iterator function = sortedFunctions.begin(); function!=sortedFunctions.end(); function++) {
 		const Function* func = (const Function*)*function;
 		string name = func->getName();
-				
+
 		/**
 		 * Never versions of gcc includes some builtin functions,
 		 * ignore these.
@@ -171,15 +171,15 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 		{
 			continue;
 		}
-		
+
 		if(func->getGroup() != group) {
 			if(group!="initial") {
 				stream << "#endif\n";
 			}
 			group = func->getGroup();
 			stream << "#if IX_" << System::toUpperCase(group) << "\n";
-		}	
-	
+		}
+
 		const Base* ret = func->getReturnType();
 		string returnString = ret->toString();
 		bool returnsHandle = false;
@@ -212,8 +212,8 @@ void IDLBackend::emit(const BasesMap& bases, fstream& stream) {
 		stream << ");\n";
 
 	}
-	
+
 	if(group!="initial") {
-		stream << "#endif\n";	
+		stream << "#endif\n";
 	}
 }

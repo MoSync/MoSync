@@ -1722,6 +1722,12 @@ namespace Base
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maImagePickerOpen:
+			SYSLOG("maIOCtl_maImagePickerOpen");
+			return _maImagePickerOpen(
+				mJNIEnv,
+				mJThis);
+
 		case maIOCtl_maFileOpen:
 			SYSLOG("maIOCtl_maFileOpen");
 			return _maFileOpen(
@@ -1861,6 +1867,55 @@ namespace Base
 
 		case maIOCtl_maFileListClose:
 			return _maFileListClose(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFontLoadDefault:
+			SYSLOG("maIOCtl_maFontLoadDefault");
+			return _maFontLoadDefault(
+				a,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFontSetCurrent:
+			SYSLOG("maIOCtl_maFontSetCurrent");
+			return _maFontSetCurrent(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFontGetCount:
+			SYSLOG("maIOCtl_maFontGetCount");
+			return _maFontGetCount(
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFontGetName:
+			{
+			SYSLOG("maIOCtl_maFontGetName");
+			int _index = a;
+			int _valueBufferSize = c;
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				b,
+				_valueBufferSize * sizeof(char));
+
+			return _maFontGetName((int)gCore->mem_ds, _index, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+			}
+
+		case maIOCtl_maFontLoadWithName:
+			SYSLOG("maIOCtl_maFontLoadWithName");
+			return _maFontLoadWithName(
+				SYSCALL_THIS->GetValidatedStr(a),
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maFontDelete:
+			SYSLOG("maIOCtl_maFontDelete");
+			return _maFontDelete(
 				a,
 				mJNIEnv,
 				mJThis);

@@ -9,7 +9,9 @@ SETTINGS = {
 	:copy_targets => [],
 	:loader_base_url => 'http://localhost:5002/',
 	:htdocs_dir => '/htdocs/',	# set to nil or false to disable copying.
+	:force_copy_htdocs => false,
 	:write_master_dump => false,
 	:copy_dce => false,
 	:dce_only => false,
+	:use_sld => true,
 }

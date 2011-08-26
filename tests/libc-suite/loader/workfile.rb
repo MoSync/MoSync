@@ -7,6 +7,7 @@ work.instance_eval do
 	@SOURCES = ['.']
 	@LIBRARIES = ['mautil']
 	@NAME = 'libc-suite-loader'
+	@EXTRA_EMUFLAGS = ' -allowdivzero'
 end
 
 work.invoke

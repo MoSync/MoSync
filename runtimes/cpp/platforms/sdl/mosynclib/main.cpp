@@ -156,6 +156,10 @@ extern "C" void GCCATTRIB(noreturn) maLoadProgram(MAHandle data, int reload) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNSUPPORTED);
 }
 
+SYSCALL(longlong, maInvokeExtension(int function, int a, int b, int c)) {
+	return -1;
+}
+
 void MoSyncError::addRuntimeSpecificPanicInfo(char* ptr, bool newLines) {
 }
 

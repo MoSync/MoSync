@@ -14,17 +14,21 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-require "#{File.dirname(__FILE__)}/native_gcc.rb"
+require "#{File.dirname(__FILE__)}/native_link.rb"
 
 # Links object files together to form a native static library.
-class NativeLibTask < FileTask
+# Inherits from LinkTask to share flag-handling code.
+class NativeLibTask < NativeGccLinkTask
 	def initialize(work, name, objects)
-		super(work, name)
-		@prerequisites += @objects = objects
+		super(work, name, objects, nil)
 	end
 	
 	def execute
-		sh "ar rcs #{@NAME} #{@objects.join(' ')}"
+		execFlags
+		# ar does not remove out-of-date archive members.
+		# The file must be deleted if we are to get a clean build.
+		FileUtils.rm_f(@NAME)
+		sh "ar rcs #{@NAME} #{cFlags}"
 	end
 end
 

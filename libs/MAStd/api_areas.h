@@ -299,6 +299,21 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 <td>\ref WidgetAPI "Widget API"<br>
 </td>
 </tr>
+
+<tr style="background-color: rgb(235, 211, 227);">
+<td>
+<strong>Text input</strong>
+</td>
+<td>Native-UI text box. Available on all platforms.
+</td>
+<td>maTextBox()
+</td>
+<td>MAUI::NativeEditBox in MAUI-revamp
+</td>
+<td>
+</td>
+</tr>
+
 <tr style="background-color: rgb(235, 211, 227);">
 <td>
 <strong>Platform independent user interface</strong>

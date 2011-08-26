@@ -89,4 +89,3 @@ GL_API GLvoid GL_APIENTRY glGenerateMipmapOES (GLenum target);
 #endif
 
 #endif /* __glext_h_ */
-

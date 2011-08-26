@@ -1,0 +1,41 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="inc">
+      <UniqueIdentifier>{e739c236-7c01-477a-9da1-a267b55fd062}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\e32def.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\e32image.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\e32rom.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\e32std.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\e32uid.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\h_utl.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\h_ver.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pe_defs.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\pe_file.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="e32uid.cpp" />
+    <ClCompile Include="uidcrc.cpp" />
+  </ItemGroup>
+</Project>

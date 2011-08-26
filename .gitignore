@@ -37,6 +37,8 @@ config_platform.h
 
 /*.bat
 
+/ipch/*
+
 /tools/profileGenerator/input/*
 /tools/profileGenerator/output/*
 /tools/ProfileConverter/profiles/*
@@ -113,6 +115,7 @@ config_platform.h
 
 /runtimes/cpp/platforms/symbian/sis*/*.SIS
 
+/runtimes/cpp/platforms/symbian/group*/setPath.bat
 /runtimes/cpp/platforms/symbian/group*/ABLD.BAT
 /runtimes/cpp/platforms/symbian/group*/MOSYNC.xml
 /runtimes/cpp/platforms/symbian/group*/MoSync.xml
@@ -179,6 +182,7 @@ config_platform.h
 /runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/java/android/R.java
 
 /tests/libc-suite/settings.rb
+/tests/libc-suite/_masterdump.s
 /tests/libc-suite/filesystem
 /tests/libc-suite/loader/config.h
 
@@ -186,6 +190,8 @@ config_platform.h
 
 /examples/GenerateResources/config.rb
 /examples/GenerateResources/profile.rb
+
+/examples/FacebookDemo/config.h
 
 /docs/*.dot.*
 

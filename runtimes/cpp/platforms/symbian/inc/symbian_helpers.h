@@ -221,6 +221,7 @@ TTime symbianTime(int unixTime);
 int _mkdir(const char* name);
 int _rmdir(const char* name);
 int remove(const char* name);
+int rename(const char* oldName, const char* newName);	// sets errno.
 
 //***************************************************************************
 //Text conversion to/from unicode

@@ -104,6 +104,8 @@ static const char* sAboutText =
 			setMainWidget(mLayout);
 		}
 
+		virtual ~TextScreen() {}
+
 	protected:
 		Widget* mLabel;
 		Widget* mLayout;
@@ -116,6 +118,7 @@ static const char* sAboutText =
 	class SettingsScreen : public Screen  {
 	public:
 		SettingsScreen();
+		virtual ~SettingsScreen() {}
 
 		void checkboxStateChanged(UIItem* item, bool checked);
 		void listboxItemSelected(UIItem* item, int index);
@@ -192,6 +195,7 @@ static const char* sAboutText =
 				mExpressions[button] = expressions[i];
 			}
 		}
+		virtual ~HelpScreen() {}
 
 		virtual void buttonClicked(UIItem* item) {
 			const String& exp = mExpressions[item];

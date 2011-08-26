@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 
 // Include library for string conversions.
 #include <mastdlib.h>
+#include <maxtoa.h>
 
 // Include util class for integer to string conversions.
 // Include utility class for integer-to-string conversions.

@@ -1,0 +1,147 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>JavaME</ProjectName>
+    <ProjectGuid>{0430165F-29A5-4143-93B8-8BFC6A4BFE65}</ProjectGuid>
+    <RootNamespace>MAVM</RootNamespace>
+    <Keyword>MakeFileProj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Makefile</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">cd platforms\javaME\
+work.bat</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <NMakeOutput Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">WIN32;_DEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">shared;platforms/javaME/src;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
+    <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd platforms\javaME\
+work.bat</NMakeBuildCommandLine>
+    <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <NMakeOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <NMakePreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">WIN32;NDEBUG;$(NMakePreprocessorDefinitions)</NMakePreprocessorDefinitions>
+    <NMakeIncludeSearchPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">shared;platforms/javaME/src;$(NMakeIncludeSearchPath)</NMakeIncludeSearchPath>
+    <NMakeForcedIncludes Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeForcedIncludes)</NMakeForcedIncludes>
+    <NMakeAssemblySearchPath Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeAssemblySearchPath)</NMakeAssemblySearchPath>
+    <NMakeForcedUsingAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(NMakeForcedUsingAssemblies)</NMakeForcedUsingAssemblies>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <BuildLog />
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <BuildLog>
+      <Path>build\BuildLog.htm</Path>
+    </BuildLog>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <None Include="Shared\BigPhatError.jpp" />
+    <None Include="Shared\Binary.jpp" />
+    <None Include="Shared\BinaryInterface.jpp" />
+    <None Include="Shared\BufferlessPipeStream.jpp" />
+    <None Include="Shared\Core.jpp" />
+    <None Include="Shared\FileConnection.jpp" />
+    <None Include="Shared\FloatingPointMath.jpp" />
+    <None Include="Shared\GdbIoStream.jpp" />
+    <None Include="Shared\GdbStub.jpp" />
+    <None Include="Shared\ImageCache.jpp" />
+    <None Include="Shared\LimitedLengthInputStream.jpp" />
+    <None Include="Shared\LittleEndianDataInputStream.jpp" />
+    <None Include="Shared\LoggingInputStream.jpp" />
+    <None Include="Shared\MAPanicReport.jpp" />
+    <None Include="Shared\RefByteArrayOutputStream.jpp" />
+    <None Include="Shared\ThreadPool.jpp" />
+    <None Include="Shared\UBin.jpp" />
+    <None Include="platforms\javaME\src\AudioBufferDataSource.jpp" />
+    <None Include="platforms\javaME\src\AudioBufferInputStream.jpp" />
+    <None Include="platforms\javaME\src\bluetooth.jpp" />
+    <None Include="platforms\javaME\src\Camera.jpp" />
+    <None Include="platforms\javaME\src\ExtensionHandler.jpp" />
+    <None Include="platforms\javaME\src\MainCanvas.jpp" />
+    <None Include="platforms\javaME\src\MAMidlet.jpp" />
+    <None Include="platforms\javaME\src\MoSync.jpp" />
+    <None Include="platforms\javaME\src\networking.jpp" />
+    <None Include="platforms\javaME\src\opengl_invoke_non_generated.jpp" />
+    <None Include="platforms\javaME\src\opengl_non_generated.jpp" />
+    <None Include="platforms\javaME\src\Pcm2WavInputStream.jpp" />
+    <None Include="platforms\javaME\src\PIM.jpp" />
+    <None Include="platforms\javaME\src\PIM2.jpp" />
+    <None Include="platforms\javaME\src\PngStream.jpp" />
+    <None Include="platforms\javaME\src\Real.jpp" />
+    <None Include="platforms\javaME\src\SplitResourceStream.jpp" />
+    <None Include="platforms\javaME\src\Syscall.jpp" />
+    <None Include="platforms\javaME\build.bat" />
+    <None Include="platforms\javaME\cleardir.bat" />
+    <None Include="platforms\javaME\process.bat" />
+    <None Include="platforms\javaME\work.bat" />
+    <None Include="platforms\javaME\workfile.rb" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Shared\core_helpers.h" />
+    <ClInclude Include="Shared\core_run.h" />
+    <ClInclude Include="Shared\FileConnection.h" />
+    <ClInclude Include="Shared\GdbStub.h" />
+    <ClInclude Include="Shared\helpers.h" />
+    <ClInclude Include="Shared\generated\core_consts.h" />
+    <ClInclude Include="Shared\generated\invoke_syscall_java.h" />
+    <ClInclude Include="Shared\generated\IX_AUDIOBUFFER_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_CALL_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_CELLID_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_CONNSERVER_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_FILE_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_GUIDO_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_NATIVE_INPUT_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_OPENGL_ES_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_PIM_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_RECORD_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_RESOURCE_TYPES_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_SEGMENTED_DATA_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_STREAMING_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_SYSPROP_CONSTS.h" />
+    <ClInclude Include="Shared\generated\IX_WLAN_CONSTS.h" />
+    <ClInclude Include="Shared\generated\MAAPI_consts.h" />
+    <ClInclude Include="Shared\generated\syscall_static_java.h" />
+    <ClInclude Include="platforms\javaME\src\bluetooth.h" />
+    <ClInclude Include="platforms\javaME\src\config_platform.h" />
+    <ClInclude Include="platforms\javaME\src\networking.h" />
+    <ClInclude Include="platforms\javaME\src\syscall_converters.h" />
+    <ClInclude Include="platforms\javaME\src\syscall_helpers.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

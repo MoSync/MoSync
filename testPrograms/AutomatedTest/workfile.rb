@@ -6,9 +6,9 @@ work = PipeExeWork.new
 work.instance_eval do 
 	@SOURCES = ['src/net', 'src/base']
 	if(USE_NEWLIB)
-		@EXTRA_LINKFLAGS = " -stacksize=32000 -datasize=128000"
 		@EXTRA_CFLAGS = " -DUSE_NEWLIB"
 	end
+	@EXTRA_LINKFLAGS = " -stacksize=128000 -datasize=2048000 -heapsize=1024000"
 	@LIBRARIES = ['testify', 'mautil']
 	@NAME = "autoTest"
 end

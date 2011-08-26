@@ -14,6 +14,7 @@ work.instance_eval do
 	@SOURCES = [name]
 	@NAME = name
 	@LIBRARIES = ['mautil', 'mtxml']
+	@EXTRA_LINKFLAGS = ' -datasize=1024000 -heapsize=386000 -stacksize=64000'
 end
 
 work.invoke

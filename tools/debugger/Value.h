@@ -40,6 +40,11 @@ typedef Builtin::SubType PrimitiveType;
 
 #include "stabs/stabs_builtins.h"
 
+#if defined(_MSC_VER) && defined(NDEBUG)
+// fix warning C4748
+#pragma optimize("g", on)
+#endif
+
 #define TYPES(m) \
 	BUILTINS(m, m) \
 	m(bool, Bool)

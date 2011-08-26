@@ -28,7 +28,9 @@ MA 02110-1301, USA.
 */
 #include <ma.h>
 #include <conprint.h>
+#ifdef MAPIP
 #include <maprofile.h>
+#endif
 #include "MAHeaders.h"
 
 //

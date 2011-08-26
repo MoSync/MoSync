@@ -196,6 +196,7 @@ static int getRealPath(int __fd, char *buf, const char* path, int size) {
 	if(realpath(path, buf) == NULL) {
 		STDFAIL;
 	}
+	LOGD("realpath(%s): %s\n", path, buf);
 	if(__fd != AT_FDCWD) {
 		// restore original cwd.
 		sCwd = sCwdBuf;
@@ -211,6 +212,7 @@ static int checkMAResult(int res) {
 		switch(res) {
 		case MA_FERR_FORBIDDEN: errno = EACCES; break;
 		case MA_FERR_NOTFOUND: errno = ENOENT; break;
+		case MA_FERR_WRONG_TYPE: errno = EEXIST; break;
 		default: errno = EIO;
 		}
 		STDFAIL;
@@ -330,7 +332,7 @@ int fstatat(int __fd, const char* path, struct stat* st, int flag) {
 		if(res > 0)	// it was an existing directory.
 			return 0;
 	} else {
-		if(errno != ENOENT)
+		if(errno != EEXIST)
 			STDFAIL;
 	}
 	
@@ -575,6 +577,7 @@ int mkdirat(int __fd, const char* path, mode_t mode) {
 	MAHandle handle;
 	char temp[2048];
 	int length;
+	int res;
 	
 	TEST(getRealPath(__fd, temp, path, 2046));
 	length = strlen(temp);
@@ -584,10 +587,11 @@ int mkdirat(int __fd, const char* path, mode_t mode) {
 		temp[length] = 0;
 	}
 	TEST(handle = errnoFileOpen(temp, MA_ACCESS_READ_WRITE));
-	if(postOpen(handle, O_CREAT | O_EXCL) < 0) {
+	res = postOpen(handle, O_CREAT | O_EXCL);
+	CHECK(maFileClose(handle), EIO);
+	if(res < 0) {
 		int exists;
 		int orig_err = errno;
-		CHECK(maFileClose(handle), EIO);
 		// check if a file with the same name exists.
 		// if so, fail with EEXIST.
 		length--;
@@ -622,6 +626,7 @@ int unlinkat(int fd, const char *name, int flag) {
 	int dres, cres;
 	int __fd;
 
+	LOGD("unlinkat(%i, %s, %x)\n", fd, name, flag);
 	__fd = openat(fd, name, O_RDWR);
 	if(__fd < 0)
 		return __fd;
@@ -700,6 +705,7 @@ static int checkDirRaw(char* temp) {
 	int ret;
 	length = strlen(temp);
 	if(temp[length-1] != '/') {
+		LOGD("checkDirRaw file(%s)", temp);
 		// Check if it's a regular file. If so, ENOTDIR.
 		file = maFileOpen(temp, MA_ACCESS_READ);
 		if(file > 0) {
@@ -714,6 +720,7 @@ static int checkDirRaw(char* temp) {
 		temp[length] = 0;
 	}
 	
+	LOGD("checkDirRaw dir(%s)", temp);
 	CHECK(file = maFileOpen(temp, MA_ACCESS_READ), EIO);
 	ret = maFileExists(file);
 	CHECK(maFileClose(file), EIO);

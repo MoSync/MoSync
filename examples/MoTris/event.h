@@ -19,7 +19,9 @@ MA 02110-1301, USA.
 #ifndef _EVENT_H_
 #define _EVENT_H_
 
+#ifdef MAPIP
 #include <maprofile.h>
+#endif
 
 class EventHandler {
 private:

@@ -92,8 +92,8 @@ static jboolean nativeLoad(
 	// Due to logic -1 is never passed to LoadVMApp, use -2 when
 	// no resource file is needed.
 	// Details:
-	//		-1: resource file needed but not found
-	//		-2: resource file is not needed
+	//  -1: resource file needed but not found
+	//  -2: resource file is not needed
 	int resFd = -2;
 
 	// Check that global variable gCore has a value.
@@ -334,6 +334,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	else if (event.type == EVENT_TYPE_IMAGE_PICKER)
 	{
 		event.imagePickerState = intArray[1];
+		event.imagePickerItem = intArray[2];
 	}
 	else if (event.type == EVENT_TYPE_SMS)
 	{

@@ -19,7 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #ifdef WIN32
 #define WIN32_LEAN_AND_MEAN
-#define _WIN32_WINNT 0x500
+#define _WIN32_WINNT 0x502
 #include <windows.h>
 #include <shellapi.h>
 
@@ -1905,10 +1905,6 @@ namespace Base {
 
 	static int maSendTextSMS(const char* dst, const char* msg);
 	//static int maStartVideoStream(const char* url);
-
-	SYSCALL(int, GCCATTRIB(noreturn) maInvokeExtension(int, int, int, int)) {
-		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
-	}
 
 #ifdef _MSC_VER
 	static double atanh(double x) {

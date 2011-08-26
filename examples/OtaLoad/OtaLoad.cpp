@@ -23,13 +23,13 @@ MA 02110-1301, USA.
 * If there is already a program in the cache, the user is given the option to
 * run it immediately or ask the server for a new version.\n
 *
-* To use this example you must compile a program, with the same version of 
+* To use this example you must compile a program, with the same version of
 * MoSync as you build OtaLoad, with  and put the comb file on a webserver.
-* A comb file ( program.comb ) is a MoSync program in which both the program file and 
-* the resource file are combined  into one file.  This file is located in your projects 
+* A comb file ( program.comb ) is a MoSync program in which both the program file and
+* the resource file are combined into one file.  This file is located in your projects
 * Output/<Build Configuration>/ or
 * FinalOutput/<Build Configuration>/<Vendor>/<Device>/ folder.
-* The project you will download can't contain any unloaded resourcese such
+* The project you will download can't contain any unloaded resources such
 * as ubin or umedia.
 *
 * If you haven't got a webserver you can use free services like www.dropbox.com
@@ -38,12 +38,15 @@ MA 02110-1301, USA.
 
 #include <ma.h>
 #include <conprint.h>
+#include <mavsprintf.h>
 #include <MAUtil/Connection.h>
 #include <MAUtil/Moblet.h>
 #include <MAUtil/String.h>
 #include <MAUtil/PlaceholderPool.h>
 #include <MAUtil/util.h>
+#ifdef MAPIP
 #include <maprofile.h>
+#endif
 
 using namespace MAUtil;
 

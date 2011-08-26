@@ -34,6 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <core/Core.h>
 #include <core/sld.h>
+#include <core/extensions.h>
 #include <base/Syscall.h>
 #include <helpers/helpers.h>
 
@@ -95,6 +96,7 @@ int main2(int argc, char **argv) {
 	settings.timeout = 0;
 #endif
 	const char* sldFile = NULL;
+	const char* xFile = NULL;
 #ifdef GDB_DEBUG
 	bool gdb = false;
 #endif
@@ -127,18 +129,18 @@ int main2(int argc, char **argv) {
 				"\n"
 				"  -id <integer>                          instance id.\n"
 				"  -fd <integer>                          file descriptor to which certain binary data is written. used with IDEs.\n"
-				"  -program <filename:string>             program file to be executed (if option isn't specified it defaults to 'program' in cwd).\n"
-				"  -resource <filename:string>            resource file to be loaded (if option isn't specified it defaults to 'resources' in cwd).\n"
+				"  -program <filename:string>             program file to be executed (default: 'program' in cwd).\n"
+				"  -resource <filename:string>            resource file to be loaded (default: 'resources' in cwd).\n"
 				"  -resolution <x:integer> <y:integer>    resolution to use (defaults to 240 x 320).\n"
 				"  -icon <filename:string>                icon to use, to identify the instance.\n"
-				"  -noscreen                              don't open a display window. useful for repeated tests from a console script.\n"
+				"  -noscreen                              don't open a display window. useful for automated tests from a console script.\n"
 				"  -nomophone                             run emulator without skin, just show the screen.\n"
+				"  -vendor <string>                       set vendor. Used to choose skin.\n"
 				"  -model <string>                        set model. Used to choose skin.\n"
-				"  -vendor <string>                       set vendor. Used to choose skin.\n"
 				"  -sld <filename:string>                 load sld-file.\n"
-				"  -vendor <string>                       set vendor. Used to choose skin.\n"
 				"  -resmem <bytes:integer>                set resource memory limit.\n"
 				"  -gdb                                   start gdb stub.\n"
+				"  -x <filename:string>                   load extension config file.\n"
 #ifdef EMULATOR
 				"  -allowdivzero                          allow floating-point division by zero. this produces ieee standard results.\n"
 				"  -timeout <seconds:integer>             close the program if it runs longer than the timeout.\n"
@@ -234,6 +236,13 @@ int main2(int argc, char **argv) {
 				return 1;
 			}
 			settings.resmem = atoi(argv[i]);
+		} else if(strcmp(argv[i], "-x")==0) {
+			i++;
+			if(i>=argc) {
+				LOG("not enough parameters for -x");			
+				return 1;
+			}
+			xFile = argv[i];
 #ifdef GDB_DEBUG
 		} else if(strcmp(argv[i], "-gdb")==0) {
 			gdb = true;
@@ -285,6 +294,10 @@ int main2(int argc, char **argv) {
 #endif
 	if(!Core::LoadVMApp(gCore, programFile, resourceFile)) {
 		BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);
+	}
+
+	if(xFile) {
+		loadExtensions(xFile);
 	}
 
 #ifdef ENABLE_DEBUGGER

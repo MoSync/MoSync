@@ -416,9 +416,10 @@ IMPLEMENTS MoSync
 					break;
 #endif	//PHONE_RELEASE
 				case RT_LABEL:  
-					byte tempLabel[] = new byte[size];
-					file.readFully(tempLabel); 
-					resourceArray[rI] = new String(tempLabel);  
+					byte tempLabel[] = new byte[size-1];
+					file.readFully(tempLabel);
+					MYASSERT(file.read() == 0);	// read null terminator
+					resourceArray[rI] = new String(tempLabel);
 					break;
 				case RT_BINARY:
 					{
@@ -805,7 +806,7 @@ public
 	//Proper Syscall Functions
 	//***************************************************************************
 
-	SYSCALL(Address) SPECIAL(memset)(Address dst, int val, int count) THE {
+	SYSCALL(Address) SPECIAL(memset)(final Address dst, int val, int count) THE {
 		DEBUG("memset("+dst+", "+val+", "+count+");\n");
 		MYASSERT(count >= 0);
 		int[] mem_ds = CORE.mMem_ds;
@@ -886,6 +887,7 @@ public
 		DEBUG("memcpy("+dst+", "+src+", "+size+");\n");
 		MYASSERT(size >= 0);
 		if(size==0) return dst;
+		int oldDst = dst;
 		int d = BYTEPART(dst);
 		int s = BYTEPART(src);
 		int[] mem_ds = CORE.mMem_ds;
@@ -919,7 +921,7 @@ public
 			WBYTE(dst++, b);
 		}
 
-		return dst;
+		return oldDst;
 	}
 	SYSCALL(Address) SPECIAL(strcpy)(Address dst, Address src) THE {
 		DEBUG("strcpy("+dst+", "+src+");\n");
@@ -1567,7 +1569,7 @@ public
 #endif
 
 	SYSCALL(MAHandle) maOpenStore(String name, int flags) throws RecordStoreException {
-		DEBUG_ALWAYS("maOpenStore\n");
+		DEBUG_ALWAYS("maOpenStore("+name+")\n");
 		//DUMP(mStores.size());
 		try {
 			RecordStore store = RecordStore.openRecordStore(name,

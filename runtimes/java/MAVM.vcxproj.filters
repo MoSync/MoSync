@@ -1,0 +1,215 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="shared">
+      <UniqueIdentifier>{f358177e-d75a-4615-9f83-239190654c71}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="generated">
+      <UniqueIdentifier>{e8f9df10-3b4a-4d69-9b0a-3d0dff054080}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{dd8f83ed-5c68-4314-85e7-8994a109d96b}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shared\BigPhatError.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\Binary.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\BinaryInterface.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\BufferlessPipeStream.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\Core.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\FileConnection.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\FloatingPointMath.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\GdbIoStream.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\GdbStub.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\ImageCache.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\LimitedLengthInputStream.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\LittleEndianDataInputStream.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\LoggingInputStream.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\MAPanicReport.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\RefByteArrayOutputStream.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\ThreadPool.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="Shared\UBin.jpp">
+      <Filter>shared</Filter>
+    </None>
+    <None Include="platforms\javaME\src\AudioBufferDataSource.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\AudioBufferInputStream.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\bluetooth.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\Camera.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\ExtensionHandler.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\MainCanvas.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\MAMidlet.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\MoSync.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\networking.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\opengl_invoke_non_generated.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\opengl_non_generated.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\Pcm2WavInputStream.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\PIM.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\PIM2.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\PngStream.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\Real.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\SplitResourceStream.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\src\Syscall.jpp">
+      <Filter>src</Filter>
+    </None>
+    <None Include="platforms\javaME\build.bat" />
+    <None Include="platforms\javaME\cleardir.bat" />
+    <None Include="platforms\javaME\process.bat" />
+    <None Include="platforms\javaME\work.bat" />
+    <None Include="platforms\javaME\workfile.rb" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Shared\core_helpers.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\core_run.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\FileConnection.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\GdbStub.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\helpers.h">
+      <Filter>shared</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\core_consts.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\invoke_syscall_java.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_AUDIOBUFFER_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_CALL_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_CELLID_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_CONNSERVER_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_FILE_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_GUIDO_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_NATIVE_INPUT_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_OPENGL_ES_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_PIM_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_RECORD_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_RESOURCE_TYPES_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_SEGMENTED_DATA_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_STREAMING_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_SYSPROP_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\IX_WLAN_CONSTS.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\MAAPI_consts.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\generated\syscall_static_java.h">
+      <Filter>generated</Filter>
+    </ClInclude>
+    <ClInclude Include="platforms\javaME\src\bluetooth.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="platforms\javaME\src\config_platform.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="platforms\javaME\src\networking.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="platforms\javaME\src\syscall_converters.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="platforms\javaME\src\syscall_helpers.h">
+      <Filter>src</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

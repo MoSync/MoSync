@@ -39,6 +39,9 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_ACCESS_READ_WRITE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_GENERIC;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_NOTFOUND;
 import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_FORBIDDEN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_RENAME_FILESYSTEM;
+import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_RENAME_DIRECTORY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_FERR_WRONG_TYPE;
 
 /**
  * MoSync File API
@@ -77,7 +80,7 @@ public class MoSyncFile {
 			if(mAccessMode != MA_ACCESS_READ_WRITE &&
 				mAccessMode != MA_ACCESS_READ)
 			{
-				throw new Exception("Invalid access mode!");
+				throw new Error("Invalid access mode!");
 			}
 			mFile = new File(path);
 
@@ -136,12 +139,14 @@ public class MoSyncFile {
 		{
 			try
 			{
-				mFileChannel.close();
-				mRandomAccessFile.close();
+				if(mFileChannel != null)
+					mFileChannel.close();
+				if(mRandomAccessFile != null)
+					mRandomAccessFile.close();
 			}
 			catch(Throwable t)
 			{
-				return MA_FERR_GENERIC;
+				t.printStackTrace();
 			}
 
 			return 0;
@@ -217,14 +222,19 @@ public class MoSyncFile {
 	*/
 	int maFileOpen(String path, int mode)
 	{
+		Log.i("maFileOpen","("+path+", "+mode+"): "+mFileHandleNext);
 		try
 		{
 			MoSyncFileHandle fileHandle = new MoSyncFileHandle(path, mode);
-			if(fileHandle.mFile.exists())
-			{
-				int res = fileHandle.open();
-				if(res < 0)
-					return res;
+			if(fileHandle.mFile.exists()) {
+				if(fileHandle.mIsAFile != fileHandle.mFile.isFile())
+					return MA_FERR_WRONG_TYPE;
+				if(fileHandle.mIsAFile)
+				{
+					int res = fileHandle.open();
+					if(res < 0)
+						return res;
+				}
 			}
 			mFileHandles.put(mFileHandleNext, fileHandle);
 		}
@@ -243,6 +253,7 @@ public class MoSyncFile {
 	int maFileExists(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
+		Log.i("maFileExists","("+file+"): "+fileHandle.mFile.exists());
 		if(fileHandle.mFile.exists()) return 1;
 		return 0;
 	}
@@ -252,6 +263,7 @@ public class MoSyncFile {
 	*/
 	int maFileClose(int file)
 	{
+		Log.i("maFileClose","("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -276,6 +288,7 @@ public class MoSyncFile {
 	*/
 	int maFileCreate(int file)
 	{
+		Log.i("maFileCreate","("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -316,6 +329,7 @@ public class MoSyncFile {
 	*/
 	int maFileDelete(int file)
 	{
+		Log.i("maFileDelete","("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{

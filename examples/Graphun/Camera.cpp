@@ -59,11 +59,12 @@ void Camera::setCameraMatrix() {
 
 FirstPersonCamera::FirstPersonCamera() :
 	Camera(vec3(), vec3(0, 0, 1.0f), vec3(0, 1.0, 0)),
-	pitch(0.0f),
-	yaw(0.0f),
-	cameraOriginalLook(0, 0, -1), 
 	cameraOriginalUp(0, 1, 0),
-	cameraOriginalStrafe(1, 0, 0) {
+	cameraOriginalLook(0, 0, -1),
+	cameraOriginalStrafe(1, 0, 0),
+	pitch(0.0f),
+	yaw(0.0f)
+	{
 
 		mUpVector = cameraOriginalUp;
 		mPosition = 0.0;

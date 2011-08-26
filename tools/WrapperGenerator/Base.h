@@ -53,7 +53,7 @@ public:
 	BaseType getBaseType() const;
 	virtual const Base* resolveFully() const { return this; }
 	virtual const Location* getLocation() const { return NULL; }
-	
+
 	void setGroup(const std::string& group);
 	const std::string& getGroup() const;
 protected:

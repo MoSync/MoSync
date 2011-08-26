@@ -73,6 +73,7 @@ MA 02110-1301, USA.
 #include <ma.h>
 #include <maassert.h>
 #include <conprint.h>
+#include <mastring.h>
 
 // Here we include the file Common.h in the BluetoothServer project.
 #include "../BluetoothServer/Common.h"
@@ -176,7 +177,7 @@ public:
 		sprintf(buf, "Touch event: %i,%i", point.x, point.y);
 
 		// Write the characters in the string.
-		for (int i = 0; i < strlen(buf); ++i)
+		for (size_t i = 0; i < strlen(buf); ++i)
 		{
 			writeCharacter(buf[i]);
 		}
@@ -275,7 +276,7 @@ public:
 		}
 		else
 		{
-			printf("Data successfully written.\n", result);
+			printf("Data successfully written.\n");
 		}
 		printDivider();
 	}

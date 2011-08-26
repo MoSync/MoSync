@@ -26,55 +26,81 @@ FileHandle getFileHandle(MAHandle file) {
 	return fh;
 }
 
-DataInputStream getFileInputStream(MAHandle file) throws IOException {
+FileHandle getFileInputStream(MAHandle file) throws IOException {
 	FileHandle fh = getFileHandle(file);
+	if(fh.out != null) {
+		//DEBUG_TEMP("closing output stream.\n");
+		// make sure everything's written to disk.
+		fh.out.flush();
+		fh.out.close();
+		fh.out = null;
+		if(fh.in != null) {
+			//DEBUG_TEMP("closing input stream.\n");
+			fh.in.close();
+			fh.in = null;
+		}
+		//DEBUG_TEMP("closing file!\n");
+		String url = fh.fc.getURL();
+		fh.fc.close();
+		fh.fc = (FileConnection)Connector.open(url);
+	}
 	if(fh.in == null) {
 		fh.in = fh.fc.openDataInputStream();
 		if(fh.position != 0)
 			fh.in.skip(fh.position);
 	}
-	return fh.in;
+	return fh;
 }
 
-OutputStream getFileOutputStream(MAHandle file) throws IOException {
+FileHandle getFileOutputStream(MAHandle file) throws IOException {
 	FileHandle fh = getFileHandle(file);
 	if(fh.out == null) {
+		//DEBUG_TEMP("openOutputStream("+fh.position+");\n");
 		fh.out = fh.fc.openOutputStream(fh.position);
 	}
-	return fh.out;
+	return fh;
 }
 
 //***************************************************************************
 //File Functions
 //***************************************************************************
 final MAHandle maFileOpen(String path, int mode) {
+	DEBUG_TEMP("maFileOpen("+path+", "+mode+"): "+mFileNextHandle+"\n");
 	FileConnection fc;
 	try {
 		fc = (FileConnection)Connector.open("file:///" + path, mode);
-	} catch(IOException e) {
-		PRINT_STACK_TRACE;
-		return MA_FERR_GENERIC;
+		if(fc == null) {
+			DEBUG_ALWAYS("maFileOpen: Connector.open(\"file:///" + path + "\", "+mode+") returned null.\n");
+			return MA_FERR_GENERIC;
+		}
+		if(fc.exists() && (fc.isDirectory() != (path.charAt(path.length()-1) == '/'))) {
+			DEBUG_ALWAYS("maFileOpen: slash/isDirectory mismatch.\n");
+			fc.close();
+			return MA_FERR_WRONG_TYPE;
+		}
 	} catch(SecurityException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_FORBIDDEN;
-	}
-	if(fc == null) {
-		DEBUG_ALWAYS("maFileOpen: Connector.open(\"file:///" + path + "\", "+mode+") returned null.\n");
+	} catch(IOException e) {
+		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;
 	}
 	FileHandle fh = new FileHandle();
 	fh.fc = fc;
 	fh.position = 0;
+	fh.maxPos = 0;
 	mFileHandles.put(new Integer(mFileNextHandle), fh);
 	return mFileNextHandle++;
 }
 
 final int maFileExists(MAHandle file) throws Exception {
 	FileHandle fh = getFileHandle(file);
+	DEBUG_TEMP("maFileExists("+file+"): "+fh.fc.exists()+"\n");
 	return fh.fc.exists() ? 1 : 0;
 }
 
 final int maFileClose(MAHandle file) throws Exception {
+	DEBUG_TEMP("maFileClose("+file+")\n");
 	Integer key = new Integer(file);
 	FileHandle fh = (FileHandle)mFileHandles.get(key);
 	DEBUG_ASSERT(fh != null);
@@ -90,8 +116,9 @@ final int maFileClose(MAHandle file) throws Exception {
 
 final int maFileCreate(MAHandle file) {
 	FileHandle fh = getFileHandle(file);
+	DEBUG_TEMP("maFileCreate("+fh.fc.getURL()+")\n");
 	try {
-		if(fh.fc.isDirectory()) {
+		if(fh.isDirectory()) {
 			fh.fc.mkdir();
 		} else {
 			fh.fc.create();
@@ -126,6 +153,7 @@ final int maFileSeek(MAHandle file, int offset, int whence) throws Exception {
 	default:
 		BIG_PHAT_ERROR;
 	}
+	//DEBUG_TEMP("maFileSeek("+file+", "+offset+", "+whence+"): "+newPos+"\n");
 	if(newPos == fh.position)
 		return fh.position;
 	if(fh.in != null) {
@@ -133,19 +161,19 @@ final int maFileSeek(MAHandle file, int offset, int whence) throws Exception {
 			fh.in.skip(newPos - fh.position);
 		} else {
 			fh.in.close();
-			fh.in = fh.fc.openDataInputStream();
-			fh.in.skip(newPos);
+			fh.in = null;
 		}
 	}
 	if(fh.out != null) {
 		fh.out.close();
-		fh.out = fh.fc.openOutputStream(newPos);
+		fh.out = null;
 	}
 	return fh.position = newPos;
 }
 
 final int maFileTruncate(MAHandle file, int offset) {
 	try {
+		DEBUG_TEMP("maFileTruncate("+file+", "+offset+")\n");
 		FileHandle fh = getFileHandle(file);
 		fh.fc.truncate(offset);
 		if(fh.position > offset)
@@ -160,6 +188,18 @@ final int maFileTruncate(MAHandle file, int offset) {
 final int maFileDelete(MAHandle file) {
 	try {
 		FileHandle fh = getFileHandle(file);
+
+		// Make sure file is not open.
+		Enumeration e = mFileHandles.elements();
+		String url = fh.fc.getURL();
+		while(e.hasMoreElements()) {
+			FileHandle ofh = (FileHandle)e.nextElement();
+			if(ofh.fc != null && ofh != fh) if(ofh.fc.getURL().equals(url)) {
+				DEBUG_ALWAYS("maFileDelete("+file+"): file is still open!\n"); 
+				return MA_FERR_GENERIC;
+			}
+		}
+
 		fh.fc.delete();
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
@@ -177,10 +217,23 @@ final int maFileDelete(MAHandle file) {
 final int maFileSize(MAHandle file) {
 	try {
 		FileHandle fh = getFileHandle(file);
+
+		// apparently, some calls to fileSize() can reset the position of a file's
+		// OutputStream.
+		if(fh.out != null) {
+			fh.out.close();
+			fh.out = null;
+		}
+
 		long s = fh.fc.fileSize();
 		if(s > INT_MAX || s < 0) {
 			return MA_FERR_GENERIC;
 		}
+		if(fh.maxPos > s)	{	// A call to maFileWrite may cause this to be true.
+			//DEBUG_TEMP("fileSize("+file+"): "+s+"\n");
+			s = fh.maxPos;
+		}
+		//DEBUG_TEMP("maFileSize("+file+"): "+s+"\n");
 		return (int)s;
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
@@ -228,6 +281,9 @@ final int maFileRename(MAHandle file, String newName) {
 	try {
 		FileHandle fh = getFileHandle(file);
 		fh.fc.rename(newName);
+		// rename closes all streams.
+		fh.in = null;
+		fh.out = null;
 		return 0;
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
@@ -242,8 +298,14 @@ final int maFileRename(MAHandle file, String newName) {
 
 final int maFileWrite(MAHandle file, MAAddress src, int len) {
 	try {
-		OutputStream out = getFileOutputStream(file);
-		readMemStream(out, src, len);
+		FileHandle fh = getFileOutputStream(file);
+		//DEBUG_TEMP("maFileWrite("+file+", "+len+") pos: "+fh.position+"\n");
+		readMemStream(fh.out, src, len);
+		fh.position += len;
+		if(fh.position > fh.maxPos)
+			fh.maxPos = fh.position;
+		//fh.out.flush();
+		//DEBUG_TEMP("size after write & flush: "+fh.fc.fileSize()+"\n");
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;
@@ -253,22 +315,26 @@ final int maFileWrite(MAHandle file, MAAddress src, int len) {
 
 final int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len) {
 	try {
-		OutputStream out = getFileOutputStream(file);
+		FileHandle fh = getFileOutputStream(file);
 		BinaryInterface bi = (BinaryInterface)getResource(data);
 		if(bi instanceof Binary) {
 			Binary bin = (Binary)bi;
 		#ifdef SEGMENTED_DATA
-			bin.write(out, offset, len);
+			bin.write(fh.out, offset, len);
 		#else
-			out.write(bin.arr, offset, len);
+			fh.out.write(bin.arr, offset, len);
 		#endif
 		} else {
 			byte[] buffer = new byte[len];
 			DataInputStream dis = new DataInputStream(bi.getInputStream());
 			dis.readFully(buffer);
 			dis.close();
-			out.write(buffer);
+			fh.out.write(buffer);
 		}
+		fh.position += len;
+		if(fh.position > fh.maxPos)
+			fh.maxPos = fh.position;
+		//fh.out.flush();
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;
@@ -278,10 +344,12 @@ final int maFileWriteFromData(MAHandle file, MAHandle data, int offset, int len)
 
 final int maFileRead(MAHandle file, MAAddress dst, int len) {
 	try {
-		DataInputStream dis = getFileInputStream(file);
+		FileHandle fh = getFileInputStream(file);
+		//DEBUG_TEMP("maFileRead("+file+", "+len+") pos: "+fh.position+"\n");
 		byte[] bytes = new byte[len];
-		dis.readFully(bytes);
+		fh.in.readFully(bytes);
 		writeMemBytes(dst, bytes, 0, len);
+		fh.position += len;
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;
@@ -291,13 +359,14 @@ final int maFileRead(MAHandle file, MAAddress dst, int len) {
 
 final int maFileReadToData(MAHandle file, MAHandle data, int offset, int len) {
 	try {
-		DataInputStream dis = getFileInputStream(file);
+		FileHandle fh = getFileInputStream(file);
 		Binary bin = (Binary)getResource(data);
 	#ifdef SEGMENTED_DATA
-		bin.read(dis, offset, len);
+		bin.read(fh.in, offset, len);
 	#else
-		dis.readFully(bin.arr, offset, len);
+		fh.in.readFully(bin.arr, offset, len);
 	#endif
+		fh.position += len;
 	} catch(IOException e) {
 		PRINT_STACK_TRACE;
 		return MA_FERR_GENERIC;

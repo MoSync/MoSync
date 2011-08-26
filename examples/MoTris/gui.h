@@ -21,7 +21,9 @@ MA 02110-1301, USA.
 
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
+#ifdef MAPIP
 #include <maprofile.h>
+#endif
 
 #include "event.h"
 

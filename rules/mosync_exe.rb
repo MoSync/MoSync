@@ -71,9 +71,41 @@ class MoSyncPackTask < Task
 	end
 end
 
+class MxConfigTask < MultiFileTask
+	def dllName(e)
+		"#{@extDir}/ext_#{e[1]}.dll"
+	end
+	
+	def initialize(work, extDir, extensions)
+		@extensions = extensions
+		@extDir = extDir
+		mxNames = extensions.collect do |e|
+			"build/mx_#{e[1]}.h"
+		end
+		super(work, 'build/mxConfig.txt', mxNames)
+		@mxConfig = mosyncdir + '/bin/mx-config'
+		@prerequisites << DirTask.new(work, 'build')
+		@prerequisites << FileTask.new(work, @mxConfig + EXE_FILE_ENDING)
+		@extensions.each do |e|
+			@prerequisites << FileTask.new(work, e[0])
+			@prerequisites << FileTask.new(work, dllName(e))
+		end
+	end
+	def execute
+		params = ''
+		@extensions.each do |e|
+			params += " #{e[0]} #{dllName(e)}"
+		end
+		sh "#{@mxConfig} -o build#{params}"
+	end
+end
+
 class PipeExeWork < PipeGccWork
-	def setup
+	def set_defaults
 		default(:TARGETDIR, '.')
+		super
+	end
+	def setup
 		set_defaults
 		@buildpath = @TARGETDIR + "/" + @BUILDDIR
 		@SLD = @buildpath + "sld.tab"
@@ -81,6 +113,7 @@ class PipeExeWork < PipeGccWork
 		@FLAGS = " -sld=#{@SLD} -stabs=#{stabs} -B"
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a +
 			[mosync_include, "#{mosyncdir}/profiles/vendors/MoSync/Emulator"]
+		@prerequisites << MxConfigTask.new(self, "#{@COMMON_BASEDIR}/build/#{CONFIG}", @EXTENSIONS) if(@EXTENSIONS)
 		super
 	end
 	def setup3(all_objects, have_cppfiles)
@@ -123,7 +156,10 @@ class PipeExeWork < PipeGccWork
 		if(@resourceTask)
 			resArg = " -resource #{@resourceTask}"
 		end
-		return "#{mosyncdir}/bin/MoRE -program #{@TARGET} -sld #{@SLD}#{resArg}#{@EXTRA_EMUFLAGS}"
+		if(@EXTENSIONS)
+			extArg = " -x build/mxConfig.txt"
+		end
+		return "#{mosyncdir}/bin/MoRE -program #{@TARGET} -sld #{@SLD}#{resArg}#{extArg}#{@EXTRA_EMUFLAGS}"
 	end
 	def run
 		# run the emulator

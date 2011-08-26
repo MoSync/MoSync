@@ -52,8 +52,8 @@
 /*#define USE_SBRK        (0) */
 /*#define USE_MMAP        (0) */
 
-#include <conprint.h>
-#include <mastring.h>
+#include "conprint.h"
+#include "mastring.h"
 
 #ifndef TLSF_USE_LOCKS
 #define	TLSF_USE_LOCKS 	(0)
@@ -164,8 +164,8 @@
 #define PAGE_SIZE (getpagesize())
 #endif
 
-#define PRINT_MSG(fmt, args...) printf(fmt, ## args)
-//#define ERROR_MSG(fmt, args...) printf(fmt, ## args)
+#define PRINT_MSG(fmt, ...) printf(fmt, ## args)
+//#define ERROR_MSG(fmt, ...) printf(fmt, ## args)
 #define ERROR_MSG(string) maWriteLog(string, sizeof(string)-1)
 
 typedef unsigned int u32_t;     /* NOTE: Make sure that this type is 4 bytes long on your computer */

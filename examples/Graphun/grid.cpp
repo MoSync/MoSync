@@ -175,7 +175,7 @@ void Grid::render() {
 	glClearColorx(0, 0, 0, 0);
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 
-	double time = (double) maGetMilliSecondCount() * 0.001;
+	//double time = (double) maGetMilliSecondCount() * 0.001;
 
 	if(validExpression)
 		updateGrid();

@@ -16,7 +16,7 @@
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
-		4192E7B913F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
+		41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */ = {isa = PBXBuildFile; fileRef = 4192E7B613F5801900C10302 /* CameraConfirgurator.h */; };
 		4318698513F68D410051D97A /* PimContactItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318696E13F68D410051D97A /* PimContactItem.h */; };
 		4318698613F68D410051D97A /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318696F13F68D410051D97A /* PimContactItem.m */; };
 		4318698713F68D410051D97A /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318696F13F68D410051D97A /* PimContactItem.m */; };
@@ -53,6 +53,9 @@
 		431869B113F690C90051D97A /* MoSyncSensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 431869AE13F690C90051D97A /* MoSyncSensor.mm */; };
 		431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; };
 		431869B413F691B70051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; };
+		43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A7684E1400F6BA009608A4 /* ImagePickerController.h */; };
+		43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
+		43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
 		43D3B01613FFC82E00B3DE23 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
 		43D8046C13EFBCB200183387 /* ActivityIndicatorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */; };
 		43D8046D13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */; };
@@ -300,6 +303,8 @@
 		431869AD13F690C90051D97A /* MoSyncSensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncSensor.h; sourceTree = "<group>"; };
 		431869AE13F690C90051D97A /* MoSyncSensor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncSensor.mm; sourceTree = "<group>"; };
 		431869B213F691A30051D97A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		43A7684E1400F6BA009608A4 /* ImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerController.h; sourceTree = "<group>"; };
+		43A7684F1400F6BA009608A4 /* ImagePickerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImagePickerController.mm; sourceTree = "<group>"; };
 		43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorWidget.h; sourceTree = "<group>"; };
 		43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ActivityIndicatorWidget.mm; sourceTree = "<group>"; };
 		43D8046013EFBCB200183387 /* DatePickerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatePickerWidget.h; sourceTree = "<group>"; };
@@ -560,6 +565,8 @@
 				85581E5F12EA323E009C6204 /* TouchHelper.mm */,
 				4192E7B613F5801900C10302 /* CameraConfirgurator.h */,
 				4192E7B713F5801900C10302 /* CameraConfirgurator.mm */,
+				43A7684E1400F6BA009608A4 /* ImagePickerController.h */,
+				43A7684F1400F6BA009608A4 /* ImagePickerController.mm */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -980,6 +987,8 @@
 				43D8047813EFBCB200183387 /* SliderWidget.h in Headers */,
 				43D8047B13EFBCB200183387 /* TimePickerWidget.h in Headers */,
 				43D8047E13EFBCB200183387 /* VideoViewWidget.h in Headers */,
+				43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */,
+				41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1172,6 +1181,7 @@
 				43D8047913EFBCB200183387 /* SliderWidget.mm in Sources */,
 				43D8047C13EFBCB200183387 /* TimePickerWidget.mm in Sources */,
 				43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */,
+				43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1254,6 +1264,7 @@
 				43D8047A13EFBCB200183387 /* SliderWidget.mm in Sources */,
 				43D8047D13EFBCB200183387 /* TimePickerWidget.mm in Sources */,
 				43D8048013EFBCB200183387 /* VideoViewWidget.mm in Sources */,
+				43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1265,7 +1276,6 @@
 				85F25A3611AD614700EB47EE /* main.m in Sources */,
 				85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */,
 				85F2557C11AC155D00EB47EE /* rebuild.cpp in Sources */,
-				4192E7B913F5801900C10302 /* CameraConfirgurator.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

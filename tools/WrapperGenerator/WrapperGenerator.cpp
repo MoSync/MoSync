@@ -37,7 +37,7 @@ namespace System  {
 		std::transform(ret.begin(), ret.end(), ret.begin(), (int(*)(int))toupper);
 		return ret;
 	}
-	
+
 	void error(const char* fmt, ...) {
 		va_list argptr;
 		va_start(argptr, fmt);
@@ -116,13 +116,13 @@ int main(int argc, char **argv) {
 			System::error("gccxml failed\n");
 		Parser::parse(xmlName.c_str(), bases, bindingName);
 	}
-	
-	// remove duplicates	
+
+	// remove duplicates
 	for( std::multimap< std::string, Base* >::iterator iter = bases.begin(); iter != bases.end(); iter++ ) {
 		for( std::multimap< std::string, Base* >::iterator iter2 = bases.begin(); iter2 != iter; iter2++ ) {
 			Base* a = iter->second;
 			Base* b = iter2->second;
-			
+
 			if(a->toString() == b->toString()) {
 				a->setGroup(bindingName);
 				printf("collision: %s\n", a->toString().c_str());
@@ -132,8 +132,8 @@ int main(int argc, char **argv) {
 		}
 	}
 	// -----------------------
-	
-	
+
+
 	string idlName = System::genstr("tests/%s.idl", bindingName.c_str());
 	string cppName = System::genstr("tests/%s.cpp", bindingName.c_str());
 

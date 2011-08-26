@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="include">
+      <UniqueIdentifier>{d2cf5565-5902-46bd-a076-6d3b5b3fee52}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\toolsver.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bmconv.h" />
+    <ClInclude Include="src\rgb.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\bmtopbm.cpp" />
+    <ClCompile Include="src\mainfunc.cpp" />
+    <ClCompile Include="src\pbmcomp.cpp" />
+    <ClCompile Include="src\pbmtobm.cpp" />
+    <ClCompile Include="src\rgb.cpp" />
+    <ClCompile Include="src\utils.cpp" />
+  </ItemGroup>
+</Project>

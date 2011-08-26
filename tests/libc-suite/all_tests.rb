@@ -69,7 +69,7 @@ def doResourceDir(resFile, dir, prefix, count)
 		resFile.puts('')
 		resFile.puts(".res RES_FILE_#{count}")
 		count += 1
-		resFile.puts(".ubin")
+		resFile.puts(".bin")
 		if(File.directory?(realPath))
 			runtimeName = prefix+name+'/'
 			resFile.puts(".cstring \"#{runtimeName}\"")
@@ -241,7 +241,20 @@ def delete_if_empty(filename)
 	end
 end
 
+def dos2unixInPlaceCommand
+	v = open('|dos2unix --version 2>&1').read.strip
+	if(v.include?('version 0.'))
+		# in-place conversion is default; must specify source and target formats.
+		return 'dos2unix --d2u'
+	else
+		# source and target formats are default; must specify in-place conversion.
+		return 'dos2unix -o'
+	end
+end
+
 LOADER_URLS_FILE = open(SETTINGS[:htdocs_dir] + 'libc_tests.urls', 'wb') if(SETTINGS[:htdocs_dir])
+
+USE_SLD = !SETTINGS[:test_release] && SETTINGS[:use_sld]
 
 def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	suffix = dead_code ? 'e' : ''
@@ -251,8 +264,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	logFile = ofn.ext('.log' + suffix)
 	mdsFile = ofn.ext('.md.s')
 	esFile = ofn.ext('.e.s')
-	sldFile = ofn.ext('.sld' + suffix) if(!SETTINGS[:test_release])
-	stabsFile = ofn.ext('.stabs' + suffix) if(!SETTINGS[:test_release])
+	sldFile = ofn.ext('.sld' + suffix) if(USE_SLD)
+	stabsFile = ofn.ext('.stabs' + suffix) if(USE_SLD)
 	
 	delete_if_empty(pfn)
 	
@@ -260,8 +273,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	if(!File.exists?(pfn) || force_rebuild)
 		pipetool = "#{MOSYNCDIR}/bin/pipe-tool"
 		mdFlag = ' -master-dump' if(SETTINGS[:write_master_dump])
-		sldFlag = " -sld=#{sldFile}" if(!SETTINGS[:test_release])
-		stabsFlags = " -stabs=#{stabsFile}" if(!SETTINGS[:test_release])
+		sldFlag = " -sld=#{sldFile}" if(USE_SLD)
+		stabsFlags = " -stabs=#{stabsFile}" if(USE_SLD)
 		if(dead_code)
 			sh "#{pipetool}#{PIPE_FLAGS} -elim#{mdFlag} -B #{pfn} #{ofn} #{argvs} #{PIPE_LIBS}"
 			sh "#{pipetool}#{PIPE_FLAGS}#{sldFlag} -B #{pfn} rebuild.s"
@@ -277,9 +290,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	
 	# execute it, if not win already, or we rebuilt something.
 	
-	if((File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild)
-		return force_rebuild
-	end
+	shouldSkipTest = (File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild
+	return force_rebuild if(shouldSkipTest && !SETTINGS[:force_copy_htdocs])
 	
 	clear_filesystem
 	has_files = false
@@ -290,8 +302,9 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		FileUtils.cp_r(file, 'filesystem/')
 	end
 	if(HOST == :win32)
+		cmd = dos2unixInPlaceCommand
 		inputs.each do |input|
-			sh "dos2unix --d2u \"filesystem/#{File.basename(input)}\""
+			sh "#{cmd} \"filesystem/#{File.basename(input)}\""
 		end
 	end
 	
@@ -327,7 +340,9 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		LOADER_URLS_FILE.flush
 	end
 	
-	sldFlag = " -sld #{sldFile}" if(!SETTINGS[:test_release])
+	return force_rebuild if(shouldSkipTest)
+	
+	sldFlag = " -sld #{sldFile}" if(USE_SLD)
 	cmd = "#{MOSYNCDIR}/bin/MoRE -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag} -resource #{resFile}"
 	$stderr.puts cmd
 	startTime = Time.now
@@ -350,8 +365,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 			FileUtils.rm_f(logFile)
 			FileUtils.rm_f(mdsFile)
 			FileUtils.rm_f(esFile)
-			FileUtils.rm_f(sldFile) if(!SETTINGS[:test_release])
-			FileUtils.rm_f(stabsFile) if(!SETTINGS[:test_release])
+			FileUtils.rm_f(sldFile) if(USE_SLD)
+			FileUtils.rm_f(stabsFile) if(USE_SLD)
 		end
 	else	# failure
 		FileUtils.touch(failFile)
@@ -364,8 +379,8 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 				SETTINGS[:copy_targets].each do |target|
 					# copy program, sld and stabs to directory :copy_target.
 					FileUtils.cp(pfn, target + 'program')
-					copyOrRemove(sldFile, target + 'sld.tab', SETTINGS[:test_release])
-					copyOrRemove(stabsFile, target + 'stabs.tab', dead_code || SETTINGS[:test_release])
+					copyOrRemove(sldFile, target + 'sld.tab', !USE_SLD)
+					copyOrRemove(stabsFile, target + 'stabs.tab', dead_code || !USE_SLD)
 				end
 			end
 			error "Stop on fail"

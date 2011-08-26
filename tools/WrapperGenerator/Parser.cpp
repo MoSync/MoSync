@@ -78,10 +78,10 @@ namespace Parser {
 				parseNode->attributes[attr[i]] = attr[i+1];
 			}
 			parseNode->base = createNode(parseNode->name);
-			
+
 			if(parseNode->base) {
 				parseNode->base->setGroup(sBindingName);
-				
+
 				string attributes = parseNode->getAttr("attributes", false);
 				if(attributes != "") {
 					map<string, string> attrMap;
@@ -91,7 +91,7 @@ namespace Parser {
 					parseNode->base->setGroup(group);
 				}
 			}
-			
+
 			parseNode->lineNumber = XML_GetCurrentLineNumber(sXmlParser);
 
 	}  /* End of start handler */
@@ -110,7 +110,7 @@ namespace Parser {
 
 	void parse(const string& input, std::multimap<std::string, Base*>& bases, const std::string& bindingName) {
 		sBindingName = bindingName;
-		
+
 		while(sParseStack.size()>0)
 			sParseStack.pop();
 

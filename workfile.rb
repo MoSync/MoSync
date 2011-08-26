@@ -31,6 +31,7 @@ end
 MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"intlibs/bluetooth",
 	"intlibs/demangle",
+	"intlibs/dll",
 	"intlibs/gsm_amr",
 	"intlibs/net",
 	"intlibs/stabs",
@@ -44,7 +45,10 @@ BASE_DIRS = ADDITIONAL_INTLIBS + MORE_DIRS + PLATFORM_TOOLS
 PIPE_DIRS = ["tools/protobuild", "tools/pipe-tool", "tools/DefaultSkinGenerator", "libs"]
 EXAM_DIRS = ["tests/unitTest", "examples"]
 TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/Bundle",
-	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack"]
+	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack",
+	"tools/mx-invoker",
+	"tools/mx-config",
+	]
 
 MAIN_DIRS = BASE_DIRS + TOOL_DIRS + PIPE_DIRS
 ALL_DIRS = MAIN_DIRS + EXAM_DIRS
@@ -59,8 +63,8 @@ class CopyDirWork < Work
 		builddir = "#{mosyncdir}/#{@NAME}"
 		@prerequisites = [DirTask.new(self, builddir)]
 		sources = Dir["#{@NAME}/*"]
-		@prerequisites |= sources.collect do |src|
-			CopyFileTask.new(self, FileTask.new(self, "#{builddir}/#{File.basename(src)}"),
+		sources.each do |src|
+			@prerequisites << CopyFileTask.new(self, "#{builddir}/#{File.basename(src)}",
 				FileTask.new(self, src))
 		end
 	end
@@ -69,12 +73,36 @@ end
 SKINS = CopyDirWork.new('skins')
 RULES = CopyDirWork.new('rules')
 
+class ExtensionIncludeWork < Work
+	def setup
+		extIncDir = mosyncdir + '/ext-include'
+		@prerequisites = []
+		@prerequisites << DirTask.new(self, extIncDir)
+		sources = [
+			'runtimes/cpp/core/extensionCommon.h',
+			'runtimes/cpp/core/ext/invoke-extension.h',
+			'runtimes/cpp/core/ext/extension.h',
+			'runtimes/cpp/core/syscall_arguments.h',
+			'runtimes/cpp/core/CoreCommon.h',
+			'intlibs/helpers/cpp_defs.h',
+			'intlibs/helpers/maapi_defs.h',
+			]
+		sources.each do |src|
+			@prerequisites << CopyFileTask.new(self, "#{extIncDir}/#{File.basename(src)}",
+				FileTask.new(self, src))
+		end
+	end
+end
+
+EXTENSION_INCLUDES = ExtensionIncludeWork.new
+
 target :base => [SKINS, RULES] do
 	SKINS.invoke
 	RULES.invoke
 	Work.invoke_subdirs(PRE_DIRS)
 	#Work.invoke_subdir("tools/WrapperGenerator", "compile")
 	Work.invoke_subdir("tools/idl2", "compile")
+	EXTENSION_INCLUDES.invoke
 end
 
 target :default => :base do

@@ -1,0 +1,189 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="inc">
+      <UniqueIdentifier>{eb20d2ad-c072-49e5-aa06-1479b314159f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{fda3fcca-4077-49f7-a908-1d0c3cdde2ea}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="inc\array.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\astring.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\ctable.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\datatype.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\errorhan.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\fileacc.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\fileline.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\indextab.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\linkarra.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\linklist.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\localise.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\main.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\mem.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\messages.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\nameidma.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\numval.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\parser.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\qualifar.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rcbinstr.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rcscan.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\rcstack.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\resource.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\stack.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\stringar.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\structst.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\tokens.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\unicode_compressor.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\unistd.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\version.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+    <ClInclude Include="inc\wide.h">
+      <Filter>inc</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\array.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\astring.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ccodes.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ctable.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\datatype.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\errorhan.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fileacc.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\fileline.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\indextab.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\linklist.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\localise.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mem.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\messages.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\nameidma.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\numval.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qualifar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rcbinstr.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rcomp.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rcompl.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rcostrm.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rcscan.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\rcstack.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\resource.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stack.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\stringar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\structst.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\unicode_compressor.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

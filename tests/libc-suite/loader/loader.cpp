@@ -5,6 +5,7 @@
 #include <conprint.h>
 #include <maassert.h>
 #include <mastdlib.h>
+#include "MAHeaders.h"
 
 using namespace MAUtil;
 
@@ -12,6 +13,15 @@ using namespace MAUtil;
 
 #define STORE_BASE_NAME "libc_suite_loader_"
 #define TEST(a) do { int _res = (a); if(_res < 0) { printf("Error @ %i: %i\n", __LINE__, _res); FREEZE; } } while(0)
+
+#undef FREEZE
+#define FREEZE freeze()
+
+static void freeze() GCCATTRIB(noreturn);
+static void freeze() {
+	maSoundPlay(RES_SOUND, 0, maGetDataSize(RES_SOUND));
+	Freeze(0);
+}
 
 class MyMoblet : public Moblet, HttpConnectionListener {
 private:
@@ -34,6 +44,10 @@ public:
 			runNextTest();
 		}
 	}
+	void keyPressEvent(int keyCode, int nativeCode) {
+		if(keyCode == MAK_0 || keyCode == MAK_BACK)
+			close();
+	}
 private:
 	void checkResult() {
 		MAHandle store = maOpenStore(STORE_BASE_NAME "testing", 0);
@@ -44,7 +58,8 @@ private:
 		
 		store = maOpenStore("exit_status", 0);
 		if(store == STERR_NONEXISTENT) {
-			printf("test crashed.\n");
+			printf("test %i crashed.\n", mState);
+			printf("%s\n", strrchr(getNextTest(), '/'));
 			FREEZE;
 		}
 		TEST(store);
@@ -55,9 +70,10 @@ private:
 			printf("Broken exit_status.\n");
 			FREEZE;
 		}
+		maCloseStore(store, 0);
 		maReadData(data, &status, 0, sizeof(int));
 		// for now, break on error.
-		printf("status: %i\n", status);
+		printf("test %i status: %i\n", mState, status);
 		if(status != 0) {
 			FREEZE;
 		}

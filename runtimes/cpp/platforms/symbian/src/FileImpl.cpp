@@ -19,6 +19,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "FileStream.h"
 #include "symbian_helpers.h"
 
+#ifdef __SERIES60_3X__
+#define FILE_SHARE EFileShareReadersOrWriters
+#else
+#define FILE_SHARE EFileShareAny
+#endif
+
 namespace Base {
 	//******************************************************************************
 	//FileStream
@@ -50,7 +56,7 @@ namespace Base {
 		if(write) {
 			if(append || exist) {
 				LOG("AFO %s\n", filename);
-				TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, EFileShareExclusive | EFileWrite));
+				TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, FILE_SHARE | EFileWrite));
 				if(IS_SYMBIAN_ERROR(mOpenResult))
 					return;
 				TInt offset = 0;
@@ -61,11 +67,11 @@ namespace Base {
 				}
 			} else {
 				LOG("WFO %s\n", filename);
-				TSNR(mOpenResult = mFile.Replace(mFs, *unicodeName, EFileShareExclusive | EFileWrite));
+				TSNR(mOpenResult = mFile.Replace(mFs, *unicodeName, FILE_SHARE | EFileWrite));
 			}
 		} else {
 			LOG("RFO %s\n", filename);
-			TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, EFileShareReadersOnly));
+			TSNR(mOpenResult = mFile.Open(mFs, *unicodeName, FILE_SHARE | EFileRead));
 		}
 	}
 
@@ -89,13 +95,14 @@ namespace Base {
 	}
 	bool FileStream::seek(Seek::Enum mode, int offset) {
 		TEST(isOpen());
-		TInt oldPos=0;
-		TEST_SYMBIAN(mFile.Seek(ESeekCurrent, oldPos));
-		TInt expectedPos = mode == Seek::Start ? offset : oldPos + offset;
-		TEST_SYMBIAN(mFile.Seek(mode == Seek::Start ? ESeekStart : ESeekCurrent, offset));
-		if(offset != expectedPos) {
-			FAIL;
+		TSeek ts;
+		switch(mode) {
+		case Seek::Current: ts = ESeekCurrent; break;
+		case Seek::Start: ts = ESeekStart; break;
+		case Seek::End: ts = ESeekEnd; break;
+		default: DEBIG_PHAT_ERROR;
 		}
+		TEST_SYMBIAN(mFile.Seek(ts, offset));
 		return true;
 	}
 	bool FileStream::tell(int& aPos) const {

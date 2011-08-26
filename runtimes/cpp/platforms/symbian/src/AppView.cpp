@@ -370,10 +370,14 @@ TInt CAppView::RunL() {
 		if(iCore->symbianError == KLeaveMoSyncExit) {
 			iAppUi.Exit();
 		} else if(iCore->symbianError == KLeaveMoSyncReload) {
+			iStopForever = false;
 			iAppUi.iReload = false;
 			iSyscall->StopEverything();
 			iSyscall->maSetColor(0);
 			iEngine->ClearScreen();
+			if(!iEngine->IsDrawing()) {
+				LTRAP(iEngine->StartDrawingL());
+			}
 			LoadProgramL();
 		} else {
 			iKeepRunning = false;

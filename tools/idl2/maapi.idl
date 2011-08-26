@@ -1416,11 +1416,17 @@ interface MAAPI {
 				int textboxLength;
 			} textbox;
 
-			/**
-			* #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if
-			* one of the \link #CONNERR_GENERIC CONNERR \endlink constants.
-			*/
-			int imagePickerState;
+			struct {
+                /**
+			    * #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if canceled or 1 if Ok was pressed.
+			    */
+				int imagePickerState;
+
+				/**
+				* #EVENT_TYPE_IMAGE_PICKER event, contains the new handle to the selected image.
+				*/
+				MAHandle imagePickerItem;
+			} imagePicker;
 
 			/**
 			* In #EVENT_TYPE_SMS events, this will be one of the
@@ -1644,7 +1650,7 @@ interface MAAPI {
 	/**
 	* Invokes an extension function. Normally you don't call this function directly.
 	*/
-	int maInvokeExtension(in int function, in int a, in int b, in int c);
+	ioctl maInvokeExtension {}
 
 	/**
 	* These functions are available only on certain platforms.
@@ -1666,6 +1672,120 @@ interface MAAPI {
 
 #endif	//IX_RESOURCE_TYPES
 
+		constset int FONT_TYPE_{
+			SERIF = 0;
+			SANS_SERIF = 1;
+			MONOSPACE = 2;
+		}
+
+		constset int FONT_STYLE_{
+			NORMAL = 0;
+			BOLD = 1;
+			ITALIC = 2;
+		}
+
+		/**
+		* The available result codes for fonts.
+		*/
+		constset int RES_FONT_{
+			/**
+			* \brief Indicates that the call to a font syscall was successful.
+			*/
+			OK = 1;
+
+			/**
+			* \brief Indicates that an invalid font handle was passed.
+			*/
+			INVALID_HANDLE = -1;
+
+			/**
+			* \brief Indicates that the index was off the list size.
+			*/
+			INDEX_OUT_OF_BOUNDS = -2;
+
+			/**
+			* \brief Indicates that a default font with that combination does not exist.
+			*/
+			NO_TYPE_STYLE_COMBINATION = -3;
+
+			/**
+			* \brief Indicates that there is no font with that name on the device.
+			*/
+			NAME_NONEXISTENT = -4;
+
+			/**
+			* \brief Indicates that maFontGetCount() was not called first.
+			*/
+			LIST_NOT_INITIALIZED = -5;
+
+			/**
+			* \brief Indicates that the buffer is not big enough to store the font name.
+			*/
+			INSUFFICIENT_BUFFER = -6;
+
+			/**
+			* \brief Indicates that an invalid size was passed.
+			*/
+			INVALID_SIZE = -7;
+
+			/**
+			* \brief Indicates that the font cannot be deleted because it is in use.
+			*  maFontDelete(handle)  fails with this return code.
+			*/
+			DELETE_DENIED = -8;
+		}
+
+		/**
+		* Returns a handle to one of the default fonts of the device, in the style and size you specify.
+		* \param 'type' The type of the font, can be FONT_TYPE_[SANS_SERIF,SERIF,MONOSPACE].
+		* \param 'style' The style of the font, can be FONT_STYLE_[NORMAL,BOLD,ITALIC].
+		* \param 'size' The size of the font.
+		* \return The handle to the font, RES_FONT_NO_TYPE_STYLE_COMBINATION, or RES_FONT_INVALID_SIZE.
+		*/
+		MAHandle maFontLoadDefault(in int type, in int style, in int size);
+
+		/**
+		* Sets the font to be used with maDrawText and maDrawTextW, and returns the handle
+		* to the previous font.
+		* \param 'font' an MAHandle for a font object.
+		* \return The handle to the previous font, or RES_FONT_INVALID_HANDLE.
+		*/
+		MAHandle maFontSetCurrent(in MAHandle font);
+
+		/**
+		* Returns the number of fonts that are available in the system.
+		* \return Number of fonts.
+		* \see maFontGetName.
+		*/
+		int maFontGetCount();
+
+		/**
+		* Copies the font postscript name of the given index to the buffer.
+		* You must have first called maFontGetCount() at least once before calling this function.
+		* \param 'index' A 0-based index to the font.
+		* \param 'buffer' An empty char buffer that will receive the font name.
+		* \param 'bufferLen' The size of the buffer.
+		* \return The number of bytes copied (with terminating NULL) or RES_FONT_INDEX_OUT_OF_BOUNDS
+		* 		or RES_FONT_INSUFFICIENT_BUFFER or RES_FONT_LIST_NOT_INITIALIZED.
+		* \see maFontGetCount, maFontLoadWithName.
+		*/
+		int maFontGetName(in int index, out MAString buffer range("bufferLen"), in int bufferLen);
+
+		/**
+		* Returns a handle to a font with the specific postscript name and size.
+		* \param 'postScriptName' The postscript name of the font.
+		* \param 'size' The size of the font.
+		* \return Handle to the font, RES_FONT_NAME_NONEXISTENT, or RES_FONT_INVALID_SIZE.
+		*/
+		MAHandle maFontLoadWithName(in char* postScriptName, in int size);
+
+		/**
+		* Deletes a loaded font
+		* \param 'font' A font handle
+		* \return RES_FONT_OK, RES_FONT_INVALID_HANDLE, or RES_FONT_DELETE_DENIED.
+		*/
+		int maFontDelete(in MAHandle font);
+
 		/**
 		 * Sends the current call stack to the report pipe. Returns 0 if succeeded.
 		 */
@@ -1677,33 +1797,31 @@ interface MAAPI {
 		int maDumpCallStackEx(in MAString str, in int data);
 
 		/**
-		 * Protects a piece of the data memory.
-		 * Any attempt to write to that piece of memory will raise a panic.
-		 * \param 'start' The start address of the memory piece to protect.
-		 * \param 'length' The length of the memory piece to protect.
-		 */
+		* Protects a piece of the data memory.
+		* Any attempt to write to that piece of memory will raise a panic.
+		* \param 'start' The start address of the memory piece to protect.
+		* \param 'length' The length of the memory piece to protect.
+		*/
 		void maProtectMemory(in MAAddress start, in int length);
 
 		/**
-		 * Unprotects a piece of the data memory.
-		 * \param 'start' The start address of the memory piece to unprotect.
-		 * \param 'length' The length of the memory piece to unprotect.
-		 */
+		* Unprotects a piece of the data memory.
+		* \param 'start' The start address of the memory piece to unprotect.
+		* \param 'length' The length of the memory piece to unprotect.
+		*/
 		void maUnprotectMemory(in MAAddress start, in int length);
 
 		/**
-		 * Toggles memory protection.
-		 * \param 'enable' If 1 turns on memory protection, if 0 turns of memory protection.
-		 */
+		* Toggles memory protection.
+		* \param 'enable' If 1 turns on memory protection, if 0 turns of memory protection.
+		*/
 		void maSetMemoryProtection(in int enable);
 
-
 		/**
-		 * Returns if memory protection is enabled or not.
-		 * \returns '1' if memory protection is turned on, '0' if it is turned off.
-		 */
+		* Returns if memory protection is enabled or not.
+		* \returns '1' if memory protection is turned on, '0' if it is turned off.
+		*/
 		int maGetMemoryProtection();
-
 
 		/**
 		* Returns the percentage of battery power remaining. This is an integer between 0 and 100.
@@ -2148,6 +2266,10 @@ interface MAAPI {
 		* but they can be created and deleted, and their existence can be queried.
 		* Directory paths must end with a slash('/').
 		*
+		* Attempting to open an existing directory without ending its path with a slash will fail.
+		* Likewise, attempting to open an existing file while ending its path with a slash will also fail.
+		* Either case will return #MA_FERR_WRONG_TYPE.
+		*
 		* \note To avoid memory leaks, all opened handles should be closed using maFileClose().
 		*
 		* \note To find valid file paths, use maFileListStart().
@@ -2346,6 +2468,7 @@ interface MAAPI {
 			FORBIDDEN = -4;
 			RENAME_FILESYSTEM = -5;
 			RENAME_DIRECTORY = -6;
+			WRONG_TYPE = -7;
 		}
 
 		//maybe add support for "hidden" files
@@ -3245,6 +3368,7 @@ interface MAAPI {
 			/// The size of the buffer, in bytes.
 			int bufSize;
 		}
+
 		/**
 		* Copies the specified value from a field and item to \a args.buf.
 		* \param args Common arguments.
@@ -3570,7 +3694,6 @@ group WidgetAPI "Widget API" {
          * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
          */
          EDIT_BOX_RETURN = 19;
-
 
 		/**
 		* @brief A WebView widget reports status of loading
@@ -3925,7 +4048,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
-		 * There is a replica available for Android.
+		 * This is an iOS specific widget.
 		 * See \ref WidgetNavigationBarProperties "Navigation Bar properties" for the properties available.
 		 */
 		NAV_BAR = "NavBar";
@@ -3942,9 +4065,9 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
-		 */	
+		 */
 		CAMERA_PREVIEW="CameraPreview";
-		
+
 		WEB_VIEW = "WebView";
 
 		/**
@@ -3993,7 +4116,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A Number Picker is a widget that enables the user to select a number from a predefined range.
-		 *
+		 * Note: for the moment it is available only on iOS.
 		 * See \ref WidgetNumberPickerProperties "Number Picker properties" for the properties available.
 		 */
 		NUMBER_PICKER = "NumberPicker";
@@ -4015,7 +4138,7 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetTypes
 
-	
+
 	/**
 	* All widgets have a set of properties that can be set. In order to set them, use maWidgetSetProperty(). These properties may change
 	* things like the visual appearance of the widget or the way it works.
@@ -4272,30 +4395,6 @@ group WidgetAPI "Widget API" {
 		*/
 		BACK_BUTTON_ENABLED = "backButtonEnabled";
 
-		/**
-		* @brief Specifies whether the navigation bar should be shown.
-		*
-		* This can have different behaviors on different platforms, on iPhone it is enabled by default, but on Android the
-		* user can set it to be shown, because this is not native behavior on Android.
-		* When it set this to true, a nav bar is associated to all screens of this stack screen, and there is
-		* no need to add it as a child to this widget.
-		* When it is set to false, the nav bar is removed from all containing screens of the stack.
-		* NOTE: remember to add main layouts for the screens, because those will be the parents of the navigation bars.
-		*
-		* @validvalue A boolean string 'true' or 'false'.
-		*
-		* @setandget
-		*
-		* @par Example
-		* \code
-		*	maWidgetSetProperty(stackScreenHandle, MAW_STACK_SCREEN_NAV_BAR_ENABLED, "true");
-		*   // Now a replica of the Nav Bar of iOS is shown on Android.
-		*   // And it handles the back button behaviour.
-		* \endcode
-		*/
-
-		NAV_BAR_ENABLED = "NavBarEnabled";
-
 	}
 	} // end of WidgetStackScreenProperties
 
@@ -4383,6 +4482,28 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		FONT_SIZE = "fontSize";
+
+		/**
+		* @brief Sets the typeface and style in which the text should be displayed.
+		*
+		* @validvalue A font handle received from loading fonts using
+		* #maFontGetName and #maFontLoadWithName syscalls.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   int nrFonts = maFontGetCount();
+		*    char buf[256];
+		*    // Get first font name.
+		*    maFontGetName(1, buf, 256);
+		*    // Load that font for size 10.
+		*    int fontHandle = maFontLoadWithName(buf, 10);
+		*    // Set that font to the label.
+		*	maWidgetSetProperty(labelHandle, MAW_LABEL_FONT_HANDLE, toString(fontHandle));
+		* \endcode
+		*/
+		FONT_HANDLE = "fontHandle";
 
 		/**
 		* @brief Sets the maximum number of lines used for rendering text.
@@ -4495,7 +4616,7 @@ group WidgetAPI "Widget API" {
 	constset MAString MAW_IMAGE_BUTTON_ {
 		/**
 		* @brief Sets or gets the text that is displayed in the label.
-		*
+		* Note: It is not available on Android, as native image buttons do not have text attached.
 		* @validvalue A null-terminated string.
 		*
 		* @setandget
@@ -4797,7 +4918,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetCheckBoxProperties
 
 	/**
-	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties. 
+	* The available widget properties for a #MAW_HORIZONTAL_LAYOUT. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetHorizontalLayoutProperties "Horizontal layout properties" {
 	constset MAString MAW_HORIZONTAL_LAYOUT_ {
@@ -5686,8 +5807,6 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		/**
 		* @brief Sets the background color. The default color is light blue.
 		* The color is in RGB8 format (0xRRGGBB).
-		* On Android there is another option:
-		*    Apply a gradient, specified by two rgb colors separated by comma.
 		*
 		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
 		*
@@ -5698,9 +5817,9 @@ group WidgetDatePickerProperties "Date Picker properties" {
         *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x101010");
 		* \endcode
 		*
-		* @par Example on Android apply a gradient from dark blue to light blue.
+		* @par Example
 		* \code
-        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B,0xCAE1FF");
+        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B");
 		* \endcode
 		*/
 		COLOR = "color";
@@ -5887,7 +6006,7 @@ group CameraAPI "Camera API" {
 		* @brief A constant that represents the flash being in the automatic mode.
 		*/
 		FRONT_CAMERA = 1;
-		
+
 	} //end MA_CAMERA_CONST
 
 group CameraResultCodes "Camera Result Codes" {
@@ -5906,7 +6025,7 @@ group CameraResultCodes "Camera Result Codes" {
 		* @brief A constant that represents the flash being in the automatic mode.
 		*/
 		NOT_STARTED = -3;
-		
+
 		/**
 		* @brief A constant that represents the flash being in the automatic mode.
 		*/
@@ -5921,8 +6040,8 @@ group CameraResultCodes "Camera Result Codes" {
 		* @brief A constant that represents the flash being in the automatic mode.
 		*/
 		VALUE_NOTSUPPORTED = -6;
-		
-	} 
+
+	}
 } //end CameraResultCodes
 
 
@@ -5937,17 +6056,17 @@ group FlashModes "Flash Modes" {
 		* @brief A constant that represents the flash being in the automatic mode.
 		*/
 		AUTO = "auto";
-		
+
 		/**
 		* @brief A constant that represents the flash being off.
 		*/
 		OFF = "off";
-		
+
 		/**
 		* @brief A constant that represents the flash being in the torch mode.
 		*/
 		TORCH = "torch";
-		
+
 	} //end MAC_FLASH_
 }// end of FlashMode
 
@@ -5962,17 +6081,17 @@ group FocusModes "Focus Modes" {
 		* @brief A constant that turns the camera to focus to infinity.
 		*/
 		INFINITY = "infinity";
-		
+
 		/**
 		* @brief A constant that turns the camera to macro mode.
 		*/
 		MACRO = "macro";
-		
+
 		/**
 		* @brief A constant that sets the camera to fixed focus mode.
 		*/
 		FIXED = "fixed";
-		
+
 	} //end MAC_FOCUS_
 } //end of FocusMode
 
@@ -5987,14 +6106,14 @@ group ImageFormat "Image Formats" {
 		* @brief A constant that represents RAW image format.
 		*/
 		RAW = "raw";
-		
+
 	} //end MA_CAMERA_IMAGE_
 } //end ImageFormats
 
 group CameraProperties "Camera Properties" {
-	
-	constset MAString MA_CAMERA_ {	
-	
+
+	constset MAString MA_CAMERA_ {
+
 		/**
 		* @brief Sets the flash mode for the camera.
 		*
@@ -6018,7 +6137,7 @@ group CameraProperties "Camera Properties" {
 		* \endcode
 		*/
 		FOCUS_MODE = "focus-mode";
-		
+
 		/**
 		* @brief Sets the image format for the camera.
 		*
@@ -6030,7 +6149,7 @@ group CameraProperties "Camera Properties" {
 		* \endcode
 		*/
 		IMAGE_FORMAT = "image-format";
-		
+
 
 		/**
 		* @brief Sets the focus mode for the camera.
@@ -6069,7 +6188,7 @@ group CameraProperties "Camera Properties" {
 		* @getonly
 		*/
 		FLASH_SUPPORTED = "flash-supported";
-		
+
 	} //end of MAC_
 } // end of CameraProperties
 
@@ -6117,14 +6236,14 @@ group CameraFunctions "Camera Functions" {
 		int maCameraSetPreview(in MAHandle widgetHandle);
 
 		/**
-		* Selects a Camera from the available ones. 
+		* Selects a Camera from the available ones.
 		* Returns 1 for success, \< 0 on error.
 		*/
 		int maCameraSelect(in int cameraNumber);
 
 
 		/**
-		* Returns the number of available Camera on the device. 
+		* Returns the number of available Camera on the device.
 		* Returns 1 for success, \< 0 on error.
 		*/
 		int maCameraNumber();
@@ -6138,15 +6257,15 @@ group CameraFunctions "Camera Functions" {
 		int maCameraSnapshot(in int formatIndex, in MAHandle placeholder);
 
 		/**
-		* Starts or stops recording video. 
-		* \a stopStartFlag indicates the operation. 
+		* Starts or stops recording video.
+		* \a stopStartFlag indicates the operation.
 		* 1 for start recording and 0 for stop recording.
 		* Returns 1 for success, \< 0 on error.
 		*/
 		int maCameraRecord(in int stopStartFlag);
 
 
-		/** 
+		/**
 		* Sets a specified property on the Selected Camera.
 		*
 		* \param property A string representing which property to set.
@@ -6156,21 +6275,21 @@ group CameraFunctions "Camera Functions" {
 		*/
 		int maCameraSetProperty(in MAString property, in MAString value);
 
-		/** 
+		/**
 		* retrives a specified property on the Selected Camera.
 		*
 		* \param property A string representing which property to set.
 		* \param value A buffer that will hold the value of the property, represented as a string.
-		* \param bufSize Size of the buffer.		
+		* \param bufSize Size of the buffer.
 		*
 		* \returns 1 for success and <0 for failure.
 		*/
 		int maCameraGetProperty( in MAString property, out MAString value range("bufSize"), in int bufSize);
-	
+
 	} // end of CameraFunctions
-	
+
 	} //end of CameraAPI
-		
+
 		/**
 		* Shows the virtual keyboard.
 		*/
@@ -6395,6 +6514,13 @@ group CameraFunctions "Camera Functions" {
 		 * to ensure its visibility on all screen sizes.
 		 */
 		void maMessageBox(in MAString title, in MAString message);
+
+		/**
+		* Displays an image picker to the user.
+		* It's display depends on the platform.
+		* Note: when a selection is made a #MAW_EVENT_TYPE_IMAGE_PICKER is sent.
+		*/
+		void maImagePickerOpen();
 
 		constset int SENSOR_TYPE_ {
 			// A constant describing an accelerometer sensor type.

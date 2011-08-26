@@ -1,0 +1,331 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="base">
+      <UniqueIdentifier>{40107f6f-b73f-406e-8e58-c956301f1b4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base\audio">
+      <UniqueIdentifier>{d1be994f-8822-49c1-adaf-9b9fe0cde7fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="base\thread">
+      <UniqueIdentifier>{41d85655-306d-4b0c-a8bc-cd11b5889465}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="skinning">
+      <UniqueIdentifier>{2c995cd2-419e-4e42-b831-0324f5b3e30e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="hashmap">
+      <UniqueIdentifier>{21172c86-3e83-4b26-b82a-a89ebe426654}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\base\base_errors.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\FileStream.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\MemStream.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\networking.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\pim.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\Stream.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\Syscall.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\ThreadPool.cpp">
+      <Filter>base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\AudioChannel.cpp">
+      <Filter>base\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\AudioInterface.cpp">
+      <Filter>base\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\AudioSource.cpp">
+      <Filter>base\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\BufferAudioSource.cpp">
+      <Filter>base\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\WaveAudioSource.cpp">
+      <Filter>base\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\bind.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\bootstrap.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\condition.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\conditionfactory.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\cyclicbarrier.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\mutex.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\mutexfactory.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\semaphore.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\semaphorefactory.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\signal.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\thread.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\base\thread\threadfactory.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="AmrAudioSource.cpp">
+      <Filter>base\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioEngineSDL.cpp">
+      <Filter>base\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="AudioInterfaceSDL.cpp">
+      <Filter>base\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="SDLSoundAudioSource.cpp">
+      <Filter>base\audio</Filter>
+    </ClCompile>
+    <ClCompile Include="thread\conditionfactorysdl.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="thread\mutexfactorysdl.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="thread\mutexsdl.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="thread\semaphorefactorysdl.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="thread\semaphoresdl.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="thread\threadfactorysdl.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="thread\threadsdl.cpp">
+      <Filter>base\thread</Filter>
+    </ClCompile>
+    <ClCompile Include="Skinning\GenericSkin.cpp">
+      <Filter>skinning</Filter>
+    </ClCompile>
+    <ClCompile Include="Skinning\Screen.cpp">
+      <Filter>skinning</Filter>
+    </ClCompile>
+    <ClCompile Include="Skinning\SkinManager.cpp">
+      <Filter>skinning</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\intlibs\hashmap\hashmap.cpp">
+      <Filter>hashmap</Filter>
+    </ClCompile>
+    <ClCompile Include="ConfigParser.cpp" />
+    <ClCompile Include="fastevents.c" />
+    <ClCompile Include="FileImpl.cpp" />
+    <ClCompile Include="mutexImpl.cpp" />
+    <ClCompile Include="netImpl.cpp" />
+    <ClCompile Include="OpenGLES.cpp" />
+    <ClCompile Include="pimImpl.cpp" />
+    <ClCompile Include="report.cpp" />
+    <ClCompile Include="sdl_errors.cpp" />
+    <ClCompile Include="SDL_prim.c" />
+    <ClCompile Include="strptime.c" />
+    <ClCompile Include="SyscallImpl.cpp" />
+    <ClCompile Include="ThreadPoolImpl.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\base\base_errors.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\FileStream.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\MemStream.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\networking.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\pim.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\pimImpl.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\ResourceArray.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\Stream.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\StreamHelpers.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\Syscall.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\TcpConnection.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\ThreadPool.h">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\AudioChannel.h">
+      <Filter>base\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\AudioEngine.h">
+      <Filter>base\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\AudioInterface.h">
+      <Filter>base\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\AudioSource.h">
+      <Filter>base\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\BufferAudioSource.h">
+      <Filter>base\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\WaveAudioSource.h">
+      <Filter>base\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\bind.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\bootstrap.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\condition.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\conditionfactory.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\cyclicbarrier.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\lock.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\mutex.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\mutexfactory.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\relocker.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\semaphore.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\semaphorefactory.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\signal.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\thread.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\threadfactory.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\timedlock.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\timedmutex.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\base\thread\timeoutexception.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="AmrAudioSource.h">
+      <Filter>base\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioInterfaceSDL.h">
+      <Filter>base\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="SDLSoundAudioSource.h">
+      <Filter>base\audio</Filter>
+    </ClInclude>
+    <ClInclude Include="thread\conditionfactorysdl.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="thread\mutexfactorysdl.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="thread\mutexsdl.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="thread\semaphorefactorysdl.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="thread\semaphoresdl.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="thread\threadfactorysdl.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="thread\threadsdl.hpp">
+      <Filter>base\thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Skinning\DeviceProfile.h">
+      <Filter>skinning</Filter>
+    </ClInclude>
+    <ClInclude Include="Skinning\DeviceSkin.h">
+      <Filter>skinning</Filter>
+    </ClInclude>
+    <ClInclude Include="Skinning\GenericSkin.h">
+      <Filter>skinning</Filter>
+    </ClInclude>
+    <ClInclude Include="Skinning\Screen.h">
+      <Filter>skinning</Filter>
+    </ClInclude>
+    <ClInclude Include="Skinning\SkinFactory.h">
+      <Filter>skinning</Filter>
+    </ClInclude>
+    <ClInclude Include="Skinning\SkinManager.h">
+      <Filter>skinning</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\intlibs\hashmap\hashmap.h">
+      <Filter>hashmap</Filter>
+    </ClInclude>
+    <ClInclude Include="config_platform.h" />
+    <ClInclude Include="ConfigParser.h" />
+    <ClInclude Include="fastevents.h" />
+    <ClInclude Include="FileImpl.h" />
+    <ClInclude Include="netImpl.h" />
+    <ClInclude Include="OpenGLES.h" />
+    <ClInclude Include="Platform.h" />
+    <ClInclude Include="report.h" />
+    <ClInclude Include="report_codes.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="ResourceDefs.h" />
+    <ClInclude Include="sdl_errors.h" />
+    <ClInclude Include="SDL_prim.h" />
+    <ClInclude Include="sdl_syscall.h" />
+    <ClInclude Include="strptime.h" />
+    <ClInclude Include="SyscallImpl.h" />
+    <ClInclude Include="ThreadPoolImpl.h" />
+    <ClInclude Include="windows_errors.h" />
+  </ItemGroup>
+</Project>

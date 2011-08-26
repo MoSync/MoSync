@@ -179,12 +179,9 @@ namespace Base {
 #endif
 					TEST(file.readFully(*ms));
 					ROOM(resources.dadd_RT_BINARY(rI, ms));
-
 #ifdef _android
 					checkAndStoreAudioResource(rI);
-					
 #endif
-
 				}
 				break;
 			case RT_UBIN:
@@ -206,7 +203,6 @@ namespace Base {
 							getJNIEnvironment(),
 							getJNIThis())));
 #endif
-
 					TEST(file.seek(Seek::Current, size));
 				}
 				break;
@@ -320,10 +316,11 @@ namespace Base {
 #if defined(SYMBIAN)
 		//TODO: use TPtr8 and TPtrC8 to be able to call an optimized function
 		//check to see if that's faster than this homebrew.
+		char* oldDst = dst;
 		do {
 			*(dst++) = *(src);
 		} while(*src++);
-		return dst;
+		return oldDst;
 #else
 		return (char*)::strcpy(dst, src);
 #endif
@@ -365,13 +362,16 @@ namespace Base {
 		return a*b;
 	}
 	SYSCALL(double, __divdf3(double a, double b)) {
+#ifndef ALLOW_FLOAT_DIVISION_BY_ZERO
 		if(b == 0
 #ifdef EMULATOR
 			&& !gSyscall->mAllowDivZero
-#endif
-			) {
+#endif	//EMULATOR
+			)
+		{
 			BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
 		}
+#endif	//ALLOW_FLOAT_DIVISION_BY_ZERO
 		return a/b;
 	}
 	SYSCALL(double, __negdf2(double a)) {
@@ -411,15 +411,16 @@ namespace Base {
 		return a*b;
 	}
 	SYSCALL(float, __divsf3(float a, float b)) {
+#ifndef ALLOW_FLOAT_DIVISION_BY_ZERO
 		if(b == 0
 #ifdef EMULATOR
 			&& !gSyscall->mAllowDivZero
-#endif
-			) {
-#ifndef ALLOW_DIVISION_BY_ZERO            
+#endif	//EMULATOR
+			)
+		{
 			BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
-#endif
 		}
+#endif	//ALLOW_FLOAT_DIVISION_BY_ZERO
 		return a/b;
 	}
 	SYSCALL(float, __negsf2(float a)) {
@@ -725,9 +726,8 @@ namespace Base {
 		int res = isDirectory(fh.name);
 		if(res < 0) {
 			LOGF("File: %s\n", fh.name.p());
-		}
-		if(res > 0 && !fh.isDirectory()) {
-			FILE_FAIL(MA_FERR_GENERIC);
+		} else if((res > 0) != fh.isDirectory()) {
+			FILE_FAIL(MA_FERR_WRONG_TYPE);
 		}
 		if(fh.mode == MA_ACCESS_READ_WRITE) {
 			if(res == 0) {	//file exists and is not a directory
@@ -749,7 +749,7 @@ namespace Base {
 	}
 
 	MAHandle Syscall::maFileOpen(const char* path, int mode) {
-		LOGF("maFileOpen(%s, %x)\n", path, mode);
+		LOGF("maFileOpen(%s, %x): %i\n", path, mode, gFileNextHandle);
 		Smartie<FileHandle> fhs(new FileHandle);
 		FileHandle& fh(*fhs);
 		fh.mode = mode;
@@ -897,6 +897,111 @@ namespace Base {
 		return len;
 	}
 
+#if !defined(_WIN32_WCE)
+	int Syscall::maFileRename(MAHandle file, const char* newName) {
+		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
+		LOGF("maFileRename(%i, %s)\n", file, newName);
+
+		// close the file while we're renaming.
+		bool wasOpen;
+		int oldPos;
+		if(fh.fs)
+			wasOpen = fh.fs->isOpen();
+		else
+			wasOpen = false;
+		if(wasOpen) {
+			if(!fh.fs->tell(oldPos)) FILE_FAIL(MA_FERR_GENERIC);
+			delete fh.fs;
+			fh.fs = NULL;
+		}
+
+		bool hasPath = false;
+#if defined(WIN32) && !defined(_WIN32_WCE) && !FILESYSTEM_CHROOT
+		// If fh.name and newName are on different file systems,
+		// forbid the operation.
+		if(newName[1] == ':' && toupper(fh.name[0]) != toupper(newName[0])) {
+			return MA_FERR_RENAME_FILESYSTEM;
+		}
+		if(newName[1] == ':' || newName[0] == '/')
+			hasPath = true;
+#else
+		if(strrchr(newName, '/'))
+			hasPath = true;
+#endif
+
+#ifdef SYMBIAN
+#define DIRSEP '\\'
+#else
+#define DIRSEP '/'
+#endif
+
+		Array<char> nn(0);
+		if(!hasPath) {
+			int oldPathLen = 0;
+			const char* lastSlash = strrchr(fh.name, DIRSEP);
+			if(lastSlash != NULL) {
+				oldPathLen = (lastSlash - fh.name) + 1;
+			}
+			if(oldPathLen > 0) {
+				int newNameLen = strlen(newName);
+				nn.resize(oldPathLen + newNameLen + 1);
+				memcpy(nn, fh.name, oldPathLen);
+#ifdef SYMBIAN
+				char* dst = nn + oldPathLen;
+				const char* src = newName;
+				// Switch directory separators.
+				while(*src) {
+					if(*src == '/') {
+						*dst = '\\';
+					} else {
+						*dst = *src;
+					}
+					src++;
+					dst++;
+				}
+				*dst = 0;
+#else
+				strcpy(nn + oldPathLen, newName);
+#endif
+				newName = nn;
+			}
+		}
+#if FILESYSTEM_CHROOT
+		else {
+			const char* fsd = FILESYSTEM_DIR;
+			int fsdLen = strlen(fsd);
+			int newNameLen = strlen(newName);
+			nn.resize(fsdLen + newNameLen + 1);
+			memcpy(nn, fsd, fsdLen);
+			strcpy(nn + fsdLen, newName);
+			newName = nn;
+		}
+#endif
+		int res = rename(fh.name, newName);
+		if(res != 0) {
+#ifdef SYMBIAN
+			int err = res;
+#else
+			int err = errno;
+#endif
+			if(err == EXDEV)
+				FILE_FAIL(MA_FERR_RENAME_FILESYSTEM);
+			else if(err == EACCES)
+				FILE_FAIL(MA_FERR_FORBIDDEN);
+			else
+				FILE_FAIL(MA_FERR_GENERIC);
+		}
+		fh.name.resize(strlen(newName) + 1);
+		strcpy(fh.name, newName);
+
+		if(!wasOpen)
+			return 0;
+		TEST_LTZ(openFile(fh));
+		if(!fh.fs->seek(Seek::Start, oldPos)) FILE_FAIL(MA_FERR_GENERIC);
+		return 0;
+	}
+#endif	//_WIN32_WCE
+
 #if !defined(SYMBIAN) && !defined(_WIN32_WCE)
 
 #ifdef WIN32
@@ -940,73 +1045,6 @@ namespace Base {
 
 	int Syscall::maFileTotalSpace(MAHandle file) {
 		return fileSpace(file, SPACE_TOTAL);
-	}
-
-	int Syscall::maFileRename(MAHandle file, const char* newName) {
-		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
-
-		// close the file while we're renaming.
-		bool wasOpen;
-		int oldPos;
-		if(fh.fs)
-			wasOpen = fh.fs->isOpen();
-		else
-			wasOpen = false;
-		if(wasOpen) {
-			if(!fh.fs->tell(oldPos)) FILE_FAIL(MA_FERR_GENERIC);
-			delete fh.fs;
-			fh.fs = NULL;
-		}
-
-		bool hasPath = false;
-#if defined(WIN32) && !defined(_WIN32_WCE) && !FILESYSTEM_CHROOT
-		// If fh.name and newName are on different file systems,
-		// forbid the operation.
-		if(newName[1] == ':' && toupper(fh.name[0]) != toupper(newName[0])) {
-			return MA_FERR_RENAME_FILESYSTEM;
-		}
-		if(newName[1] == ':' || newName[0] == '/')
-			hasPath = true;
-#else
-		if(newName[0] == '/')
-			hasPath = true;
-#endif
-		std::string nn;
-		if(!hasPath) {
-			int oldPathLen = 0;
-			const char* lastSlash = strrchr(fh.name, '/');
-			if(lastSlash != NULL) {
-				oldPathLen = (lastSlash - fh.name) + 1;
-			}
-			if(oldPathLen > 0) {
-				nn.append(fh.name, oldPathLen);
-				nn.append(newName);
-				newName = nn.c_str();
-			}
-		}
-#if FILESYSTEM_CHROOT
-		else {
-			nn = FILESYSTEM_DIR + std::string(newName);
-			newName = nn.c_str();
-		}
-#endif
-		int res = rename(fh.name, newName);
-		if(res != 0) {
-			if(errno == EXDEV)
-				return MA_FERR_RENAME_FILESYSTEM;
-			else if(errno == EACCES)
-				return MA_FERR_FORBIDDEN;
-			else
-				return MA_FERR_GENERIC;
-		}
-		fh.name.resize(strlen(newName) + 1);
-		strcpy(fh.name, newName);
-
-		if(!wasOpen)
-			return 0;
-		TEST_LTZ(openFile(fh));
-		if(!fh.fs->seek(Seek::Start, oldPos)) FILE_FAIL(MA_FERR_GENERIC);
-		return 0;
 	}
 
 	int Syscall::maFileDate(MAHandle file) {

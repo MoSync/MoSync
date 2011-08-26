@@ -24,6 +24,11 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import "AbstractLayoutView.h"
+#import "Syscall.h"
+
+namespace Base {
+    UIFont* getUIFontObject(MAHandle fontHandle);
+};
 
 typedef enum {
 	FIXED_SIZE,

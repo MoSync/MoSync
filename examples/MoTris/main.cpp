@@ -29,7 +29,9 @@ MA 02110-1301, USA.
 #include <mastdlib.h>
 #include <mastring.h>
 #include <mavsprintf.h>
+#ifdef MAPIP
 #include <maprofile.h>
+#endif
 #include <MAUtil/Vector.h>
 #include <MAUtil/String.h>
 #include <MAUtil/Geometry.h>

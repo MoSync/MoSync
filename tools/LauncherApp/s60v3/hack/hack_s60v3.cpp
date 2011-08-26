@@ -228,7 +228,7 @@ void hackExe(uint uid) {
 	input.seekg(0, std::ios_base::end);
 	if(!input.good())
 		exit(1);
-	const int size = input.tellg();
+	const int size = (int)input.tellg();
 	Smartie<char> buffer(new char[size]);
 	input.seekg(0);
 	input.read(buffer(), size);

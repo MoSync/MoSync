@@ -26,7 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 extern "C" {
 #endif
 
-#include <ma.h>
+#include "ma.h"
 
 /// A MoSync call stack frame.
 typedef struct MA_STACK_FRAME {

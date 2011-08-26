@@ -220,19 +220,21 @@ void Expression::print()
 			printf("%.2f ", rpn[i].num);
 			break;
 		case DIV:
-			printf("/ ", rpn[i].num);
+			printf("/ ");
 			break;
 		case MUL:
-			printf("* ", rpn[i].num);
+			printf("* ");
 			break;
 		case MINUS:
-			printf("- ", rpn[i].num);
+			printf("- ");
 			break;
 		case PLUS:
-			printf("+ ", rpn[i].num);
+			printf("+ ");
 			break;
 		case END:
 			break;
+		default:
+			;// do nothing
 		}
 	}
 	printf("\n");
@@ -300,9 +302,10 @@ float Expression::evaluate()
 			break;
 		case END:
 			return values.peek();
+		default:
+			;// do nothing
 		}
 	}
-	return values.peek();
 }
 
 // Internal helper function for the compilation
@@ -418,6 +421,10 @@ int Expression::_compile(int start, Vector<Token>& tokens, Vector<Token>& rpn)
 				}
 			}
 			break;
+		case RPAREN:
+		case END:
+		case NONE:
+			;	// do nothing
 		}
 
 		lastTok = tokens[i].type;

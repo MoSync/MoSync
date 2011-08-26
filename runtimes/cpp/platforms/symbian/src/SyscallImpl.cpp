@@ -1283,7 +1283,7 @@ static int LaunchBrowser(const char* url) {
 	return KErrNone;
 }
 
-SYSCALL(int, maInvokeExtension(int, int, int, int)) {
+SYSCALL(longlong, maInvokeExtension(int, int, int, int)) {
 	BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 }
 
@@ -1992,17 +1992,43 @@ int Syscall::maFileListClose(MAHandle list) {
 // maFile*
 //------------------------------------------------------------------------------
 
+static int translateFErr(int res, const char* file, int line) {
+	int ferr;
+	switch(res) {
+	case KErrNone:
+		return 0;
+	case KErrAccessDenied:
+	case KErrPermissionDenied:
+		ferr = MA_FERR_FORBIDDEN;
+		break;
+	case KErrNotFound:
+	case KErrPathNotFound:
+		ferr = MA_FERR_NOTFOUND;
+		break;
+	default:
+		ferr = MA_FERR_GENERIC;
+	}
+	LOG("In %s on line %i: %i\n", file, line, res);
+	return ferr;
+}
+
 #define FILE_FAIL(val) do { LOG_VAL(val); return val; } while(0)
+#define FTEST(func) do { int _res = translateFErr(func, __FILE__, __LINE__); if(_res < 0) return _res; } while(0)
 
 // TODO: Share these two with Base. Implement FileStream::mTime and truncate.
+// Or not; stat() isn't very implemented on Symbian, I think.
 int Syscall::maFileDate(MAHandle file) {
 	LOGD("maFileDate(%i)\n", file);
 	FileHandle& fh(getFileHandle(file));
-	if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
-	if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
 	TTime modTime;
-	// TODO: improve error code translation
-	SYMERR_CONVERT(fh.fs->mFile.Modified(modTime), MA_FERR_GENERIC);
+	if(fh.fs) {
+		if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
+		// TODO: improve error code translation
+		FTEST(fh.fs->mFile.Modified(modTime));
+	} else {	// directory and/or nonexistent
+		TCleaner<HBufC16> name(CreateHBufC16FromCStringLC(fh.name.p()));
+		FTEST(CCoeEnv::Static()->FsSession().Modified(*name, modTime));
+	}
 	return unixTime(modTime);
 }
 
@@ -2011,10 +2037,11 @@ int Syscall::maFileTruncate(MAHandle file, int offset) {
 	FileHandle& fh(getFileHandle(file));
 	if(!fh.fs) FILE_FAIL(MA_FERR_GENERIC);
 	if(!fh.fs->isOpen()) FILE_FAIL(MA_FERR_GENERIC);
-	SYMERR_CONVERT(fh.fs->mFile.SetSize(offset), MA_FERR_GENERIC);
+	FTEST(fh.fs->mFile.SetSize(offset));
 	return 0;
 }
 
+#if 0
 int Syscall::maFileRename(MAHandle file, const char* newName) {
 	LOGD("maFileRename(%i, %s)\n", file, newName);
 	FileHandle& fh(getFileHandle(file));
@@ -2024,9 +2051,10 @@ int Syscall::maFileRename(MAHandle file, const char* newName) {
 	// TODO: The RFile::Rename function is simple, but doesn't follow the MoSync spec in a few cases.
 	// Use RFs::Rename() instead.
 	// May have to switch directory separators, too.
-	SYMERR_CONVERT(fh.fs->mFile.Rename(*nn), MA_FERR_GENERIC);
+	FTEST(fh.fs->mFile.Rename(*nn));
 	return 0;
 }
+#endif
 
 int Syscall::getVolumeInfo(MAHandle file, TVolumeInfo& vi) {
 	FileHandle& fh(getFileHandle(file));
@@ -2044,14 +2072,14 @@ int Syscall::getVolumeInfo(MAHandle file, TVolumeInfo& vi) {
 int Syscall::maFileAvailableSpace(MAHandle file) {
 	LOGD("maFileAvailableSpace(%i)\n", file);
 	TVolumeInfo vi;
-	SYMERR_CONVERT(getVolumeInfo(file, vi), MA_FERR_GENERIC);
+	FTEST(getVolumeInfo(file, vi));
 	return I64LOW(MIN(vi.iFree, TInt64(0x7fffffff)));
 }
 
 int Syscall::maFileTotalSpace(MAHandle file) {
 	LOGD("maFileTotalSpace(%i)\n", file);
 	TVolumeInfo vi;
-	SYMERR_CONVERT(getVolumeInfo(file, vi), MA_FERR_GENERIC);
+	FTEST(getVolumeInfo(file, vi));
 	return I64LOW(MIN(vi.iSize, TInt64(0x7fffffff)));
 }
 

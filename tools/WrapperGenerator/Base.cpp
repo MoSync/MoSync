@@ -51,16 +51,15 @@ bool BaseLocationSortPredicate(const Base* d1, const Base* d2)
 	const File* file1 = l1->getFile();
 	const File* file2 = l2->getFile();
 	if(!file1||!file2) return false;
-	
+
 	if(d1->getGroup() > d2->getGroup())
-	 	return true;
-	 else if(d1->getGroup() < d2->getGroup())
-	 	return false;
-	 else if(file1->getId() > file2->getId())
-	 	return true;
-	 else if(file1->getId() < file2->getId())
-	 	return false;
-	 else
-	 	return (l1Line < l2Line);
-	
-}	
+		return true;
+	else if(d1->getGroup() < d2->getGroup())
+		return false;
+	else if(file1->getId() > file2->getId())
+		return true;
+	else if(file1->getId() < file2->getId())
+		return false;
+	else
+		return (l1Line < l2Line);
+}

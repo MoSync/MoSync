@@ -39,12 +39,10 @@ static void streamStructs(ostream& stream, const Interface& inf, int ix, bool ru
 static void streamIoctls(ostream& stream, const Interface& inf, int ix);
 static void streamTypedefs(ostream& stream, const vector<Typedef>& typedefs, int ix, bool runtime);
 static void streamDefines(ostream& stream, const vector<Define>& defines, int ix);
-static void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
-	const string& ioctlName);
 static void streamJavaConstants(
-	ostream& stream, 
-	const vector<ConstSet>& 
-	constSets, 
+	ostream& stream,
+	const vector<ConstSet>&
+	constSets,
 	int ix);
 void streamGroups(ostream& stream, const vector<Group>& groups, const vector<int>& children, int ix, int level=0);
 void streamGroups(ostream& stream, const vector<Group>& groups, int ix);
@@ -217,7 +215,7 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 	streamGroups(stream, inf.groups, ix);
 	streamTypedefs(stream, inf.typedefs, ix, false);
 	streamDefines(stream, inf.defines, ix);
-	streamConstants(stream, headerName, inf.constSets, ix);
+	streamConstants(stream, inf.constSets, ix);
 	streamStructs(stream, inf, ix, false);
 	if(ix == MAIN_INTERFACE) {
 		streamHeaderFunctions(stream, inf, false);
@@ -240,16 +238,62 @@ void streamHeaderFile(ostream& stream, const Interface& inf, const vector<string
 }
 
 /**
+ * Streams C function declarations.
+ */
+void streamHeaderFunctions(ostream& stream, const Interface& inf, bool syscall) {
+	for(size_t i=0; i<inf.functions.size(); i++) {
+		const Function& f(inf.functions[i]);
+		stream << f.comment;
+		if(f.groupId != "")
+			stream << "/** @ingroup " << f.groupId << " */\n";
+
+		if(syscall)
+			stream << "SYSCALL(";
+		stream << cType(inf, f.returnType);
+		if(syscall)
+			stream << ", ";
+		if(f.returnType == "noreturn")
+			stream << " ATTRIBUTE(noreturn,";
+		stream << " " << f.name << "(";
+		if(f.args.size() == 0) {
+			stream << "void";
+		}
+		for(size_t j=0; j<f.args.size(); j++) {
+			const Argument& a(f.args[j]);
+			if(j != 0)
+				stream << ", ";
+			if(a.in && isPointerType(inf, a.type)) {
+				stream << "const ";
+			}
+			stream << cType(inf, a.type);
+			if(!isPointerType(inf, a.type) && !a.in)
+				stream << "*";
+			stream << " " << a.name;
+		}
+
+		if(f.isIOCtl)
+			stream << " MA_IOCTL_ELLIPSIS";
+
+		if(f.returnType == "noreturn")
+			stream << ")";
+		if(syscall)
+			stream << ")";
+		stream << ");\n\n";
+	}
+	stream << "\n";
+}
+
+/**
  * Generate the content of a .java class file for the main MoSync API
  * or the given interface.
  * @param stream The output stream.
  * @param className Name of the class.
  * @param apiData The parsed API data.
- * @param ix The id of the extension to generate definitions for. 
+ * @param ix The id of the extension to generate definitions for.
  * Also used to specify if definitions for the main API is to be generated.
  */
 void streamJavaDefinitionFile(
-	ostream& stream, 
+	ostream& stream,
 	const string& className,
 	const Interface& apiData,
 	int ix)
@@ -267,19 +311,19 @@ void streamJavaDefinitionFile(
  * Generate constants for a Java definition class file.
  * @param stream The output stream.
  * @param constSets Constant definitions.
- * @param ix The id of the extension to generate definitions for. 
+ * @param ix The id of the extension to generate definitions for.
  * Also used to specify if definitions for the main API is to be generated.
  */
 static void streamJavaConstants(
-	ostream& stream, 
-	const vector<ConstSet>& constSets, 
-	int ix) 
+	ostream& stream,
+	const vector<ConstSet>& constSets,
+	int ix)
 {
-	for (size_t i=0; i<constSets.size(); i++) 
+	for (size_t i=0; i<constSets.size(); i++)
 	{
 		const ConstSet& cs(constSets[i]);
 		bool anyStreamed = false;
-		for (size_t j=0; j<cs.constants.size(); j++) 
+		for (size_t j=0; j<cs.constants.size(); j++)
 		{
 			const Constant& c(cs.constants[j]);
 			if (c.ix != ix)
@@ -287,25 +331,25 @@ static void streamJavaConstants(
 				continue;
 			}
 
-			if (anyStreamed && 
-				(c.comment.size() != 0 
+			if (anyStreamed &&
+				(c.comment.size() != 0
 				|| cs.constants[j-1].comment.size() != 0))
 			{
 				stream << "\n";
 			}
-			
+
 			string type = "int ";
 			if(c.type == "MAString")
 				type = "String ";
-			
+
 			stream << c.comment;
-			stream 
+			stream
 				<< "\tpublic static final "
 				<< type
-				<< cs.name 
-				<< c.name 
-				<< " = " 
-				<< c.value 
+				<< cs.name
+				<< c.name
+				<< " = "
+				<< c.value
 				<< ";\n";
 			anyStreamed = true;
 		}
@@ -418,18 +462,18 @@ static void streamStructs(ostream& stream, const Interface& inf, int ix, bool ru
 	}	//struct
 }
 
-void streamConstants(ostream& stream, const string& interfaceName, const vector<ConstSet>& constSets, int ix) {
+void streamConstants(ostream& stream, const vector<ConstSet>& constSets, int ix) {
 	for(size_t i=0; i<constSets.size(); i++) {
 		const ConstSet& cs(constSets[i]);
 		bool anyStreamed = false;
-		
+
 		for(size_t j=0; j<cs.constants.size(); j++) {
 			const Constant& c(cs.constants[j]);
 			if(c.ix != ix)
-				continue;	
+				continue;
 			anyStreamed = true;
 		}
-		
+
 		anyStreamed = false;
 		for(size_t j=0; j<cs.constants.size(); j++) {
 			const Constant& c(cs.constants[j]);
@@ -438,14 +482,14 @@ void streamConstants(ostream& stream, const string& interfaceName, const vector<
 
 			if(anyStreamed && (c.comment.size() != 0 || cs.constants[j-1].comment.size() != 0))
 				stream << "\n";
-			
+
 			stream << c.comment;
 			if(c.groupId != "")
 				stream << "/** @ingroup " << c.groupId << " */\n";
 			stream << "#define " << cs.name << c.name << " " << c.value << "\n";
-			
+
 			anyStreamed = true;
-		}				
+		}
 	}
 }
 
@@ -754,8 +798,8 @@ static void streamIoctls(ostream& stream, const Interface& inf, int ix) {
 	}
 }
 
-static void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
-	const string& ioctlName)
+void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
+	const string& ioctlName, int fnOffset)
 {
 	stream << f.comment;
 	if(f.groupId != "")
@@ -820,7 +864,7 @@ static void streamIoctlFunction(ostream& stream, const Interface& inf, const Fun
 	for(size_t j=usedArgs; j<3; j++) {
 		invokeArgs += ", 0";
 	}
-	string invoke = ioctlName + "(" + toString(f.number) + invokeArgs + ");";
+	string invoke = ioctlName + "(" + toString(fnOffset + f.number) + invokeArgs + ");";
 	if(f.returnType == "double") {
 		//stream << "\tMA_DV _result;\n";
 		stream << "\t_result.ll = " + invoke + "\n";
@@ -855,16 +899,103 @@ void streamCppDefsFile(ostream& stream, const Interface& inf, const vector<strin
 
 	streamHash(stream, inf);
 
+	streamCppDefs(stream, inf, ix, headerName);
+
+	stream << "#endif\t//" + headerName + "_DEFS_H\n";
+}
+
+void streamCppDefs(ostream& stream, const Interface& inf, int ix, const string& headerName) {
 	stream << "#ifndef DONT_WANT_" << headerName << "_TYPEDEFS\n";
 	streamTypedefs(stream, inf.typedefs, ix, true);
 	stream << "#endif\n";
 
 	streamDefines(stream, inf.defines, ix);
-	streamConstants(stream, headerName, inf.constSets, ix);
+	streamConstants(stream, inf.constSets, ix);
 	streamStructs(stream, inf, ix, true);
 	streamIoctlDefines(stream, inf, headerName, ix, false);
+}
 
-	stream << "#endif\t//" + headerName + "_DEFS_H\n";
+void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool java, int argOffset) {
+	for(size_t i=0; i<maapi.functions.size(); i++) {
+		const Function& f(maapi.functions[i]);
+		streamInvokePrefix(stream, f);
+		stream << "{\n"
+		"\tLOGSC(\"\\t" << f.name << "(\");\n";
+		int ireg = argOffset;
+		int stack_ireg = 0;
+		for(size_t j=0; j<f.args.size(); j++) {
+			const Argument& a(f.args[j]);
+			if(j != 0)
+				stream << "\tLOGSC(\", \");\n";
+			string argType, convType;
+			if(java) {
+				if((a.type == "MAString" || a.type == "MAWString") && !a.in)
+					argType = "MAAddress";
+				else
+					argType = jType(maapi, a.type);
+				convType = argType;
+			} else {
+				argType = cType(maapi, a.type);
+				convType = a.type;
+			}
+
+			int sizeOfArgType = 1;
+			if(argType == "double" || argType == "long")
+				sizeOfArgType = 2;
+
+			stream << "\t" << argType << " " << a.name << " = _SYSCALL_CONVERT_" << convType;
+			if(ireg+sizeOfArgType>4) {
+				if(java) {
+					stream << "(RINT(REG(REG_sp)+" << (stack_ireg<<2) << ")";
+					if(argType == "double" || argType == "long") {
+						stream << ", RINT(REG(REG_sp)+" << ((stack_ireg+1)<<2) << ")";
+					}
+					stream << ")";
+				}
+				else
+					stream << "(MEM(" << argType << ", REG(REG_sp)+" << (stack_ireg<<2) << ")";
+
+				stream << ");\n";
+				stack_ireg += sizeOfArgType;
+				continue;
+			}
+			else if((argType == "double" || argType == "long") && java) {
+				//stream << "(REG_i" << ireg << ");\n";
+				stream << "(REG(REG_i" << ireg << "), REG(REG_i" << ireg << "+1));\n";
+			} else {
+				stream << "(REG(REG_i" << ireg << "));\n";
+			}
+			ireg += sizeOfArgType;
+		}
+		stream << "\t";
+		if(f.returnType != "void" && f.returnType != "noreturn") {
+			string retType;
+			if(java) {
+				if(f.returnType == "MAString" || f.returnType == "MAWString")
+					retType = "Address";
+				else
+					retType = jType(maapi, f.returnType);
+			} else {
+				retType = cType(maapi, f.returnType);
+			}
+			stream << retType << " res = ";
+		}
+		stream << "CALL_SYSCALL(" << f.name << ")(";
+		for(size_t j=0; j<f.args.size(); j++) {
+			const Argument& a(f.args[j]);
+			if(j != 0)
+				stream << ", ";
+			stream << a.name;
+		}
+		stream << ");\n";
+		if(f.returnType != "void" && f.returnType != "noreturn") {
+			stream << "\t_SYSCALL_HANDLERES_" << f.returnType << "\n";
+		} else {
+			stream << "\t_SYSCALL_HANDLERES_void\n";
+		}
+		stream << "\treturn;\n"
+			"}\n";
+	}
 }
 
 static uint32 hash32shift(uint32 key) {
@@ -1053,4 +1184,11 @@ uint32 calculateChecksum(const Interface& inf) {
 	}	//ioctls
 
 	return sum;
+}
+
+void flushStream(ostream& stream) {
+	stream.flush();
+	if(!stream.good()) {
+		throwException("Stream error!\n");
+	}
 }

@@ -1,0 +1,62 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{4c0c1b96-a6b7-4a35-8798-d568c74913dd}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="compile.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="demangle.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PBProto.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="PBProtoPub.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="pipe-asm-prefix.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="InstTable.h" />
+    <ClInclude Include="tokentable.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="allocator.c" />
+    <ClCompile Include="AnalyseCode.c" />
+    <ClCompile Include="ArrayClass.c" />
+    <ClCompile Include="AsmData.c" />
+    <ClCompile Include="AsmToken.c" />
+    <ClCompile Include="Assem.c" />
+    <ClCompile Include="BucketArray.c" />
+    <ClCompile Include="ClassLoader.c" />
+    <ClCompile Include="CodeRebuild.c" />
+    <ClCompile Include="CodeSearch.c" />
+    <ClCompile Include="CodeTools.c" />
+    <ClCompile Include="constreg.c" />
+    <ClCompile Include="CppRebuild.c" />
+    <ClCompile Include="demangle.c" />
+    <ClCompile Include="Directives.c" />
+    <ClCompile Include="Eval.c" />
+    <ClCompile Include="filealloc.c" />
+    <ClCompile Include="FuncAnalyse.c" />
+    <ClCompile Include="JavaRebuild.c" />
+    <ClCompile Include="Librarian.c" />
+    <ClCompile Include="Main.c" />
+    <ClCompile Include="MethodLoader.c" />
+    <ClCompile Include="Opcodes.c" />
+    <ClCompile Include="Output.c" />
+    <ClCompile Include="parseheaders.c" />
+    <ClCompile Include="profiles.c" />
+    <ClCompile Include="rescomp.c" />
+    <ClCompile Include="Stabs.c" />
+    <ClCompile Include="Symbols.c" />
+    <ClCompile Include="SysCall.c" />
+    <ClCompile Include="ThunkReg.c" />
+    <ClCompile Include="Tokens.c" />
+    <ClCompile Include="VarPool.c" />
+  </ItemGroup>
+</Project>

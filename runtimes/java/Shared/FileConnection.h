@@ -27,8 +27,15 @@ static class FileListing {
 static class FileHandle {
 	FileConnection fc;
 	int position;
+	int maxPos;	// maximum possible position. Use instead of fileSize() if greater.
 	DataInputStream in;
 	OutputStream out;
+
+	// FileConnection.isDirectory() only works if the directory already exists.
+	final boolean isDirectory() {
+		String url = fc.getURL();
+		return url.charAt(url.length()-1) == '/';
+	}
 }
 
 Hashtable mFileListings = new Hashtable();

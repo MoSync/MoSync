@@ -149,7 +149,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #ifndef JDB_DEBUG
 				try {
 #endif
-					DEBUG("mainLoop start\n");
+					DEBUG_CORE("mainLoop start\n");
 					mStop = mDestroy = false;
 #ifndef PHONE_RELEASE
 					mCore.mInstCount = 0;
@@ -162,10 +162,10 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 					if(time == 0) time++;
 
 #ifdef MA_PROF_SUPPORT_CLDC_10				
-					DEBUG(""+mCore.mInstCount+" instructions in "+time+" ms: "+
+					DEBUG_CORE(""+mCore.mInstCount+" instructions in "+time+" ms: "+
 						((mCore.mInstCount) / time)+" KIPS\n");
 #else				
-					DEBUG(""+mCore.mInstCount+" instructions in "+time+" ms: "+
+					DEBUG_CORE(""+mCore.mInstCount+" instructions in "+time+" ms: "+
 						(((double)mCore.mInstCount) / time)+" KIPS\n");
 #endif
 
@@ -206,12 +206,12 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 
 						if(mEventBuffer.size() == 0 || mErrorAlert != null) {
 							if(mTimeout > 0) {
-								DEBUG(" seq "+mWaitSequence+"\n");
+								DEBUG_CORE(" seq "+mWaitSequence+"\n");
 								mTimer.schedule(new WaitTask(mWaitSequence), mTimeout);
 							}
-							DEBUG("wait()\n");
+							DEBUG_CORE("wait()\n");
 							this.wait();
-							DEBUG("wait() done\n");
+							DEBUG_CORE("wait() done\n");
 						}
 						if(mCore == null) {
 							DEBUG_TEMP("mCore null, returning.\n");
@@ -396,7 +396,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 			if(mEventBuffer.size() + 1 == EVENT_BUFFER_SIZE) {	//leave space for Close event
 				mEventOverflow = true;
 				mEventBuffer.removeAllElements();
-				DEBUG("EventBuffer overflow!\n");
+				DEBUG_CORE("EventBuffer overflow!\n");
 			}
 			mEventBuffer.addElement(event);
 		}
@@ -488,7 +488,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 			mSequence = sequence;
 		}
 		public final void run() {
-			DEBUG("WaitTask.run(), seq "+mSequence+"\n");
+			DEBUG_CORE("WaitTask.run(), seq "+mSequence+"\n");
 			if(mSequence != mWaitSequence)
 				return;
 			FinishWait();
@@ -510,7 +510,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		//DEBUG_ALWAYS("FinishWait\n");
 		try {
 			mWaitSequence++;
-			DEBUG("notify()\n");
+			DEBUG_CORE("notify()\n");
 			this.notify();
 		} catch(Exception e) {
 			IN_FILE_ON_LINE;
@@ -550,6 +550,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		if(mReload) {
 			DEBUG_ALWAYS("mReload\n");
 			//reload original program
+			mDestroy = true;
 			stop();
 			return;
 		}

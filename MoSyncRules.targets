@@ -1,0 +1,81 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <PropertyPageSchema
+      Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+    <AvailableItemName
+      Include="MoSync_resource">
+      <Targets>_MoSync_resource</Targets>
+    </AvailableItemName>
+  </ItemGroup>
+  <UsingTask
+    TaskName="MoSync_resource"
+    TaskFactory="XamlTaskFactory"
+    AssemblyName="Microsoft.Build.Tasks.v4.0">
+    <Task>$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml</Task>
+  </UsingTask>
+  <Target
+    Name="_MoSync_resource"
+    BeforeTargets="$(MoSync_resourceBeforeTargets)"
+    AfterTargets="$(MoSync_resourceAfterTargets)"
+    Condition="'@(MoSync_resource)' != ''"
+    DependsOnTargets="$(MoSync_resourceDependsOn);ComputeMoSync_resourceOutput"
+    Outputs="@(MoSync_resource-&gt;Metadata('Outputs')-&gt;Distinct())"
+    Inputs="@(MoSync_resource);%(MoSync_resource.AdditionalDependencies);$(MSBuildProjectFile)">
+    <ItemGroup
+      Condition="'@(SelectedFiles)' != ''">
+      <MoSync_resource
+        Remove="@(MoSync_resource)"
+        Condition="'%(Identity)' != '@(SelectedFiles)'" />
+    </ItemGroup>
+    <ItemGroup>
+      <MoSync_resource_tlog
+        Include="%(MoSync_resource.Outputs)"
+        Condition="'%(MoSync_resource.Outputs)' != '' and '%(MoSync_resource.ExcludedFromBuild)' != 'true'">
+        <Source>@(MoSync_resource, '|')</Source>
+      </MoSync_resource_tlog>
+    </ItemGroup>
+    <Message
+      Importance="High"
+      Text="%(MoSync_resource.ExecutionDescription)" />
+    <WriteLinesToFile
+      Condition="'@(MoSync_resource_tlog)' != '' and '%(MoSync_resource_tlog.ExcludedFromBuild)' != 'true'"
+      File="$(IntDir)$(ProjectName).write.1.tlog"
+      Lines="^%(MoSync_resource_tlog.Source);@(MoSync_resource_tlog-&gt;'%(Fullpath)')" />
+    <MoSync_resource
+      Condition="'@(MoSync_resource)' != '' and '%(MoSync_resource.ExcludedFromBuild)' != 'true'"
+      CommandLineTemplate="%(MoSync_resource.CommandLineTemplate)"
+      AdditionalOptions="%(MoSync_resource.AdditionalOptions)"
+      Inputs="@(MoSync_resource)" />
+  </Target>
+  <PropertyGroup>
+    <ComputeLinkInputsTargets>
+            $(ComputeLinkInputsTargets);
+            ComputeMoSync_resourceOutput;
+          </ComputeLinkInputsTargets>
+    <ComputeLibInputsTargets>
+            $(ComputeLibInputsTargets);
+            ComputeMoSync_resourceOutput;
+          </ComputeLibInputsTargets>
+  </PropertyGroup>
+  <Target
+    Name="ComputeMoSync_resourceOutput"
+    Condition="'@(MoSync_resource)' != ''">
+    <ItemGroup>
+      <MoSync_resourceDirsToMake
+        Condition="'@(MoSync_resource)' != '' and '%(MoSync_resource.ExcludedFromBuild)' != 'true'"
+        Include="%(MoSync_resource.Outputs)" />
+      <Link
+        Include="%(MoSync_resourceDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+      <Lib
+        Include="%(MoSync_resourceDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+      <ImpLib
+        Include="%(MoSync_resourceDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+    </ItemGroup>
+    <MakeDir
+      Directories="@(MoSync_resourceDirsToMake-&gt;'%(RootDir)%(Directory)')" />
+  </Target>
+</Project>

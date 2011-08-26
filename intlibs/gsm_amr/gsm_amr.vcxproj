@@ -1,0 +1,830 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{75B90C0B-860B-4BF2-B0BE-5E2DCB4EA1B3}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.30319.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Debug\temp\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Release\temp\</IntDir>
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
+    <CodeAnalysisRuleSet Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">AllRules.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRules Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <CodeAnalysisRuleAssemblies Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ProjectName)D</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>amr_nb/common/include;./oscl;amr_nb/dec/include;common/dec/include;amr_wb/dec/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;GSM_AMR_EXPORTS;C_EQUIVALENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath) $(MOSYNCDIR)\bin\ /Y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>amr_nb/common/include;./oscl;amr_nb/dec/include;common/dec/include;amr_wb/dec/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;_USRDLL;GSM_AMR_EXPORTS;C_EQUIVALENT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+    </ClCompile>
+    <Link>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+    </Link>
+    <PostBuildEvent>
+      <Command>copy $(TargetPath) $(MOSYNCDIR)\bin\ /Y</Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="amr_nb\dec\src\a_refl.h" />
+    <ClInclude Include="amr_nb\common\include\abs_s.h" />
+    <ClInclude Include="amr_nb\common\include\add.h" />
+    <ClInclude Include="amr_nb\dec\src\agc.h" />
+    <ClInclude Include="amr_nb\dec\src\amrdecode.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\amrencode.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\autocorr.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\az_lsp.h" />
+    <ClInclude Include="amr_nb\dec\src\b_cn_cod.h" />
+    <ClInclude Include="amr_nb\common\include\basic_op.h" />
+    <ClInclude Include="amr_nb\common\include\basic_op_arm_gcc_v5.h" />
+    <ClInclude Include="amr_nb\common\include\basic_op_arm_v5.h" />
+    <ClInclude Include="amr_nb\common\include\basic_op_c_equivalent.h" />
+    <ClInclude Include="amr_nb\common\include\basicop_malloc.h" />
+    <ClInclude Include="amr_nb\dec\src\bgnscd.h" />
+    <ClInclude Include="amr_nb\common\include\bitno_tab.h" />
+    <ClInclude Include="amr_nb\common\include\bitreorder_tab.h" />
+    <ClInclude Include="amr_nb\common\include\bits2prm.h" />
+    <ClInclude Include="amr_nb\common\include\bytesused.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\c1035pf.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\c2_11pf.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\c2_9pf.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\c3_14pf.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\c4_17pf.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\c8_31pf.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\dec\src\c_g_aver.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\calc_cor.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\calc_en.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\cbsearch.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\cl_ltp.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\cnst.h" />
+    <ClInclude Include="amr_nb\common\include\cnst_vad.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\cod_amr.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\convolve.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\copy.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\cor_h.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\cor_h_x.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\cor_h_x2.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\dec\src\d1035pf.h" />
+    <ClInclude Include="amr_nb\dec\src\d2_11pf.h" />
+    <ClInclude Include="amr_nb\dec\src\d2_9pf.h" />
+    <ClInclude Include="amr_nb\dec\src\d3_14pf.h" />
+    <ClInclude Include="amr_nb\dec\src\d4_17pf.h" />
+    <ClInclude Include="amr_nb\dec\src\d8_31pf.h" />
+    <ClInclude Include="amr_nb\common\include\d_gain_c.h" />
+    <ClInclude Include="amr_nb\common\include\d_gain_p.h" />
+    <ClInclude Include="amr_nb\common\include\d_plsf.h" />
+    <ClInclude Include="amr_nb\dec\src\dec_amr.h" />
+    <ClInclude Include="amr_nb\dec\src\dec_gain.h" />
+    <ClInclude Include="amr_nb\dec\src\dec_lag3.h" />
+    <ClInclude Include="amr_nb\dec\src\dec_lag6.h" />
+    <ClInclude Include="amr_wb\dec\include\decoder_amr_wb.h" />
+    <ClInclude Include="amr_nb\dec\include\decoder_gsm_amr.h" />
+    <ClInclude Include="amr_nb\dec\src\decoder_gsm_amr_dpi.h" />
+    <ClInclude Include="amr_nb\common\include\div_32.h" />
+    <ClInclude Include="amr_nb\common\include\div_s.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\dtx.h" />
+    <ClInclude Include="amr_nb\common\include\dtx_common_def.h" />
+    <ClInclude Include="amr_nb\dec\src\dtx_dec.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\dtx_enc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_wb\dec\src\e_pv_amrwbdec.h" />
+    <ClInclude Include="amr_nb\dec\src\ec_gains.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\enc_lag3.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\enc_lag6.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\ets_to_if2.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\ets_to_wmf.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\dec\src\ex_ctrl.h" />
+    <ClInclude Include="amr_nb\common\include\extract_h.h" />
+    <ClInclude Include="amr_nb\common\include\extract_l.h" />
+    <ClInclude Include="amr_nb\common\include\frame.h" />
+    <ClInclude Include="amr_nb\common\include\frame_type_3gpp.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\g_adapt.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\g_code.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\g_pitch.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\gain_q.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\gc_pred.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\get_amr_wb_bits.h" />
+    <ClInclude Include="amr_nb\common\include\gmed_n.h" />
+    <ClInclude Include="amr_nb\common\include\gsm_amr_typedefs.h" />
+    <ClInclude Include="amr_nb\dec\src\gsmamr_dec.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\gsmamr_enc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\enc\include\gsmamr_encoder_wrapper.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\hp_max.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\dec\src\if2_to_ets.h" />
+    <ClInclude Include="amr_nb\common\include\int_lpc.h" />
+    <ClInclude Include="amr_nb\common\include\int_lsf.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\inter_36.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\inter_36_tab.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\inv_sqrt.h" />
+    <ClInclude Include="amr_nb\common\include\l_abs.h" />
+    <ClInclude Include="amr_nb\common\include\l_add.h" />
+    <ClInclude Include="amr_nb\common\include\l_add_c.h" />
+    <ClInclude Include="amr_nb\common\include\l_comp.h" />
+    <ClInclude Include="amr_nb\common\include\l_deposit_h.h" />
+    <ClInclude Include="amr_nb\common\include\l_deposit_l.h" />
+    <ClInclude Include="amr_nb\common\include\l_extract.h" />
+    <ClInclude Include="amr_nb\common\include\l_mac.h" />
+    <ClInclude Include="amr_nb\common\include\l_msu.h" />
+    <ClInclude Include="amr_nb\common\include\l_mult.h" />
+    <ClInclude Include="amr_nb\common\include\l_negate.h" />
+    <ClInclude Include="amr_nb\common\include\l_shl.h" />
+    <ClInclude Include="amr_nb\common\include\l_shr.h" />
+    <ClInclude Include="amr_nb\common\include\l_shr_r.h" />
+    <ClInclude Include="amr_nb\common\include\l_sub.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\lag_wind.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\lag_wind_tab.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\levinson.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\log2.h" />
+    <ClInclude Include="amr_nb\common\include\log2_norm.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\lpc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\lsfwt.h" />
+    <ClInclude Include="amr_nb\common\include\lsp.h" />
+    <ClInclude Include="amr_nb\dec\src\lsp_avg.h" />
+    <ClInclude Include="amr_nb\common\include\lsp_az.h" />
+    <ClInclude Include="amr_nb\common\include\lsp_lsf.h" />
+    <ClInclude Include="amr_nb\common\include\lsp_tab.h" />
+    <ClInclude Include="amr_nb\common\include\mac_32.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\mime_io.h" />
+    <ClInclude Include="amr_nb\common\include\mode.h" />
+    <ClInclude Include="amr_nb\common\include\mpy_32.h" />
+    <ClInclude Include="amr_nb\common\include\mpy_32_16.h" />
+    <ClInclude Include="amr_nb\common\include\mult.h" />
+    <ClInclude Include="amr_nb\common\include\mult_r.h" />
+    <ClInclude Include="amr_nb\common\include\n_proc.h" />
+    <ClInclude Include="amr_nb\common\include\negate.h" />
+    <ClInclude Include="amr_nb\common\include\norm_l.h" />
+    <ClInclude Include="amr_nb\common\include\norm_s.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\normalize_amr_wb.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\ol_ltp.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\oper_32b.h" />
+    <ClInclude Include="oscl\oscl_base.h" />
+    <ClInclude Include="oscl\oscl_base_macros.h" />
+    <ClInclude Include="oscl\oscl_dll.h" />
+    <ClInclude Include="oscl\oscl_error_codes.h" />
+    <ClInclude Include="oscl\oscl_exception.h" />
+    <ClInclude Include="oscl\oscl_lock_base.h" />
+    <ClInclude Include="oscl\oscl_mem.h" />
+    <ClInclude Include="oscl\oscl_types.h" />
+    <ClInclude Include="oscl\osclconfig.h" />
+    <ClInclude Include="amr_nb\common\include\p_ol_wgh.h" />
+    <ClInclude Include="amr_nb\dec\src\ph_disp.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\pitch_fr.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\pitch_ol.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\dec\src\post_pro.h" />
+    <ClInclude Include="amr_nb\common\include\pow2.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\pre_big.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\pre_proc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\pred_lt.h" />
+    <ClInclude Include="amr_nb\dec\src\preemph.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\prm2bits.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\dec\src\pstfilt.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\pv_amr_wb_type_defs.h" />
+    <ClInclude Include="amr_nb\dec\include\pvamrnbdecoder_api.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\pvamrwb_math_op.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\pvamrwbdecoder.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\pvamrwbdecoder_acelp.h" />
+    <ClInclude Include="amr_wb\dec\include\pvamrwbdecoder_api.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\pvamrwbdecoder_basic_op.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\pvamrwbdecoder_basic_op_armv5.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\pvamrwbdecoder_basic_op_cequivalent.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\pvamrwbdecoder_basic_op_gcc_armv5.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\pvamrwbdecoder_cnst.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\pvamrwbdecoder_mem_funcs.h" />
+    <ClInclude Include="amr_nb\common\include\pvgsmamr.h" />
+    <ClInclude Include="amr_nb\dec\src\pvgsmamrdecoder.h" />
+    <ClInclude Include="amr_nb\dec\src\pvgsmamrdecoder_dpi.h" />
+    <ClInclude Include="common\dec\include\pvgsmamrdecoderinterface.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\q_gain_c.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\q_gain_p.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\q_plsf.h" />
+    <ClInclude Include="amr_nb\common\include\q_plsf_5_tbl.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\q_pulse.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\qgain475.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\qgain475_tab.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\qgain795.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_wb\dec\src\qisf_ns.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\qpisf_2s.h" />
+    <ClInclude Include="amr_nb\common\include\qua_gain.h" />
+    <ClInclude Include="amr_nb\common\include\qua_gain_tbl.h" />
+    <ClInclude Include="amr_nb\common\include\reorder.h" />
+    <ClInclude Include="amr_nb\common\include\residu.h" />
+    <ClInclude Include="amr_nb\common\include\reverse_bits.h" />
+    <ClInclude Include="amr_nb\common\include\round.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\s10_8pf.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\set_sign.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\set_zero.h" />
+    <ClInclude Include="amr_nb\common\include\shl.h" />
+    <ClInclude Include="amr_nb\common\include\shr.h" />
+    <ClInclude Include="amr_nb\common\include\shr_r.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\sid_sync.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\dec\src\sp_dec.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\sp_enc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\spreproc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="amr_nb\enc\src\spstproc.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\sqrt_l.h" />
+    <ClInclude Include="amr_nb\common\include\sub.h" />
+    <ClInclude Include="amr_nb\common\include\syn_filt.h" />
+    <CustomBuildStep Include="amr_wb\dec\src\synthesis_amr_wb.h" />
+    <CustomBuildStep Include="amr_nb\enc\src\ton_stab.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="amr_nb\common\include\typedef.h" />
+    <ClInclude Include="amr_nb\common\include\vad.h" />
+    <ClInclude Include="amr_nb\common\include\vad1.h" />
+    <ClInclude Include="amr_nb\common\include\vad2.h" />
+    <ClInclude Include="amr_nb\common\include\weight_a.h" />
+    <ClInclude Include="amr_nb\common\include\window_tab.h" />
+    <ClInclude Include="amr_nb\common\include\wmf_to_ets.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="amr_nb\dec\src\a_refl.cpp" />
+    <ClCompile Include="amr_nb\common\src\add.cpp" />
+    <ClCompile Include="amr_nb\dec\src\agc.cpp" />
+    <ClCompile Include="amr_wb\dec\src\agc2_amr_wb.cpp" />
+    <ClCompile Include="amr_nb\dec\src\amrdecode.cpp" />
+    <ClCompile Include="amr_nb\enc\src\amrencode.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\autocorr.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\az_lsp.cpp" />
+    <ClCompile Include="amr_nb\dec\src\b_cn_cod.cpp" />
+    <ClCompile Include="amr_wb\dec\src\band_pass_6k_7k.cpp" />
+    <ClCompile Include="amr_nb\dec\src\bgnscd.cpp" />
+    <ClCompile Include="amr_nb\common\src\bitno_tab.cpp" />
+    <ClCompile Include="amr_nb\common\src\bitreorder_tab.cpp" />
+    <ClCompile Include="amr_nb\common\src\bits2prm.cpp" />
+    <ClCompile Include="amr_nb\common\src\bytesused.cpp" />
+    <ClCompile Include="amr_nb\enc\src\c1035pf.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\c2_11pf.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\c2_9pf.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\c2_9pf_tab.cpp" />
+    <ClCompile Include="amr_nb\enc\src\c3_14pf.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\c4_17pf.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\c8_31pf.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\dec\src\c_g_aver.cpp" />
+    <ClCompile Include="amr_nb\enc\src\calc_cor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\calc_en.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\cbsearch.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\cl_ltp.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\cod_amr.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\convolve.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\copy.cpp" />
+    <ClCompile Include="amr_nb\enc\src\cor_h.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\cor_h_x.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\cor_h_x2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\corrwght_tab.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\dec\src\d1035pf.cpp" />
+    <ClCompile Include="amr_nb\dec\src\d2_11pf.cpp" />
+    <ClCompile Include="amr_nb\dec\src\d2_9pf.cpp" />
+    <ClCompile Include="amr_nb\dec\src\d3_14pf.cpp" />
+    <ClCompile Include="amr_nb\dec\src\d4_17pf.cpp" />
+    <ClCompile Include="amr_nb\dec\src\d8_31pf.cpp" />
+    <ClCompile Include="amr_nb\dec\src\d_gain_c.cpp" />
+    <ClCompile Include="amr_nb\dec\src\d_gain_p.cpp" />
+    <ClCompile Include="amr_nb\dec\src\d_plsf.cpp" />
+    <ClCompile Include="amr_nb\dec\src\d_plsf_3.cpp" />
+    <ClCompile Include="amr_nb\dec\src\d_plsf_5.cpp" />
+    <ClCompile Include="amr_wb\dec\src\dec_acelp_2p_in_64.cpp" />
+    <ClCompile Include="amr_wb\dec\src\dec_acelp_4p_in_64.cpp" />
+    <ClCompile Include="amr_wb\dec\src\dec_alg_codebook.cpp" />
+    <ClCompile Include="amr_nb\dec\src\dec_amr.cpp" />
+    <ClCompile Include="amr_nb\dec\src\dec_gain.cpp" />
+    <ClCompile Include="amr_wb\dec\src\dec_gain2_amr_wb.cpp" />
+    <ClCompile Include="amr_nb\dec\src\dec_input_format_tab.cpp" />
+    <ClCompile Include="amr_nb\dec\src\dec_lag3.cpp" />
+    <ClCompile Include="amr_nb\dec\src\dec_lag6.cpp" />
+    <ClCompile Include="amr_wb\dec\src\decoder_amr_wb.cpp" />
+    <ClCompile Include="amr_nb\dec\src\decoder_gsm_amr.cpp" />
+    <ClCompile Include="amr_wb\dec\src\deemphasis_32.cpp" />
+    <ClCompile Include="amr_nb\common\src\div_32.cpp" />
+    <ClCompile Include="amr_nb\common\src\div_s.cpp" />
+    <ClCompile Include="amr_nb\dec\src\dtx_dec.cpp" />
+    <ClCompile Include="amr_wb\dec\src\dtx_decoder_amr_wb.cpp" />
+    <ClCompile Include="amr_nb\enc\src\dtx_enc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\dec\src\ec_gains.cpp" />
+    <ClCompile Include="amr_nb\enc\src\enc_lag3.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\enc_lag6.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\enc_output_format_tab.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\ets_to_if2.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\ets_to_wmf.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\dec\src\ex_ctrl.cpp" />
+    <ClCompile Include="amr_nb\common\src\extract_h.cpp" />
+    <ClCompile Include="amr_nb\common\src\extract_l.cpp" />
+    <ClCompile Include="amr_nb\enc\src\g_adapt.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\g_code.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\g_pitch.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\gain_q.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\gains_tbl.cpp" />
+    <ClCompile Include="amr_nb\common\src\gc_pred.cpp" />
+    <ClCompile Include="amr_wb\dec\src\get_amr_wb_bits.cpp" />
+    <ClCompile Include="amr_nb\common\src\gmed_n.cpp" />
+    <ClCompile Include="amr_nb\common\src\gray_tbl.cpp" />
+    <ClCompile Include="amr_nb\common\src\grid_tbl.cpp" />
+    <ClCompile Include="amr_nb\enc\src\gsmamr_encoder_wrapper.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_wb\dec\src\highpass_400hz_at_12k8.cpp" />
+    <ClCompile Include="amr_wb\dec\src\highpass_50hz_at_12k8.cpp" />
+    <ClCompile Include="amr_wb\dec\src\homing_amr_wb_dec.cpp" />
+    <ClCompile Include="amr_nb\enc\src\hp_max.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\dec\src\if2_to_ets.cpp" />
+    <ClCompile Include="amr_nb\common\src\int_lpc.cpp" />
+    <ClCompile Include="amr_nb\dec\src\int_lsf.cpp" />
+    <ClCompile Include="amr_nb\enc\src\inter_36.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\inter_36_tab.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_wb\dec\src\interpolate_isp.cpp" />
+    <ClCompile Include="amr_nb\common\src\inv_sqrt.cpp" />
+    <ClCompile Include="amr_nb\common\src\inv_sqrt_tbl.cpp" />
+    <ClCompile Include="amr_wb\dec\src\isf_extrapolation.cpp" />
+    <ClCompile Include="amr_wb\dec\src\isp_az.cpp" />
+    <ClCompile Include="amr_wb\dec\src\isp_isf.cpp" />
+    <ClCompile Include="amr_nb\common\src\l_abs.cpp" />
+    <ClCompile Include="amr_nb\enc\src\l_comp.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\l_deposit_h.cpp" />
+    <ClCompile Include="amr_nb\common\src\l_deposit_l.cpp" />
+    <ClCompile Include="amr_nb\enc\src\l_extract.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\l_negate.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\l_shr_r.cpp" />
+    <ClCompile Include="amr_nb\enc\src\lag_wind.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\lag_wind_tab.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_wb\dec\src\lagconceal.cpp" />
+    <ClCompile Include="amr_nb\enc\src\levinson.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\log2.cpp" />
+    <ClCompile Include="amr_nb\common\src\log2_norm.cpp" />
+    <ClCompile Include="amr_nb\common\src\log2_tbl.cpp" />
+    <ClCompile Include="amr_wb\dec\src\low_pass_filt_7k.cpp" />
+    <ClCompile Include="amr_nb\enc\src\lpc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\lsfwt.cpp" />
+    <ClCompile Include="amr_nb\common\src\lsp.cpp" />
+    <ClCompile Include="amr_nb\dec\src\lsp_avg.cpp" />
+    <ClCompile Include="amr_nb\common\src\lsp_az.cpp" />
+    <ClCompile Include="amr_nb\common\src\lsp_lsf.cpp" />
+    <ClCompile Include="amr_nb\common\src\lsp_lsf_tbl.cpp" />
+    <ClCompile Include="amr_nb\common\src\lsp_tab.cpp" />
+    <ClCompile Include="amr_wb\dec\src\median5.cpp" />
+    <ClCompile Include="amr_wb\dec\src\mime_io.cpp" />
+    <ClCompile Include="amr_nb\common\src\mult_r.cpp" />
+    <ClCompile Include="amr_nb\common\src\negate.cpp" />
+    <ClCompile Include="amr_wb\dec\src\noise_gen_amrwb.cpp" />
+    <ClCompile Include="amr_nb\common\src\norm_l.cpp" />
+    <ClCompile Include="amr_nb\common\src\norm_s.cpp" />
+    <ClCompile Include="amr_wb\dec\src\normalize_amr_wb.cpp" />
+    <ClCompile Include="amr_nb\enc\src\ol_ltp.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\overflow_tbl.cpp" />
+    <ClCompile Include="amr_wb\dec\src\oversamp_12k8_to_16k.cpp" />
+    <ClCompile Include="amr_nb\enc\src\p_ol_wgh.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\dec\src\ph_disp.cpp" />
+    <ClCompile Include="amr_nb\common\src\ph_disp_tab.cpp" />
+    <ClCompile Include="amr_wb\dec\src\phase_dispersion.cpp" />
+    <ClCompile Include="amr_wb\dec\src\pit_shrp.cpp" />
+    <ClCompile Include="amr_nb\enc\src\pitch_fr.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\pitch_ol.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\dec\src\post_pro.cpp" />
+    <ClCompile Include="amr_nb\common\src\pow2.cpp" />
+    <ClCompile Include="amr_nb\common\src\pow2_tbl.cpp" />
+    <ClCompile Include="amr_nb\enc\src\pre_big.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\pre_proc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\pred_lt.cpp" />
+    <ClCompile Include="amr_wb\dec\src\pred_lt4.cpp" />
+    <ClCompile Include="amr_nb\dec\src\preemph.cpp" />
+    <ClCompile Include="amr_wb\dec\src\preemph_amrwb_dec.cpp" />
+    <ClCompile Include="amr_nb\enc\src\prm2bits.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\dec\src\pstfilt.cpp" />
+    <ClCompile Include="amr_wb\dec\src\pvamrwb_math_op.cpp" />
+    <ClCompile Include="amr_wb\dec\src\pvamrwbdecoder.cpp" />
+    <ClCompile Include="amr_nb\dec\src\pvgsmamrdecoder.cpp" />
+    <ClCompile Include="common\dec\src\pvgsmamrdecoderinterface.cpp" />
+    <ClCompile Include="amr_wb\dec\src\q_gain2_tab.cpp" />
+    <ClCompile Include="amr_nb\enc\src\q_gain_c.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\q_gain_p.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\q_plsf.cpp" />
+    <ClCompile Include="amr_nb\common\src\q_plsf_3.cpp" />
+    <ClCompile Include="amr_nb\common\src\q_plsf_3_tbl.cpp" />
+    <ClCompile Include="amr_nb\common\src\q_plsf_5.cpp" />
+    <ClCompile Include="amr_nb\common\src\q_plsf_5_tbl.cpp" />
+    <ClCompile Include="amr_nb\enc\src\qgain475.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\dec\src\qgain475_tab.cpp" />
+    <ClCompile Include="amr_nb\enc\src\qgain795.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_wb\dec\src\qisf_ns.cpp" />
+    <ClCompile Include="amr_wb\dec\src\qisf_ns_tab.cpp" />
+    <ClCompile Include="amr_wb\dec\src\qpisf_2s.cpp" />
+    <ClCompile Include="amr_wb\dec\src\qpisf_2s_tab.cpp" />
+    <ClCompile Include="amr_nb\enc\src\qua_gain.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\qua_gain_tbl.cpp" />
+    <ClCompile Include="amr_nb\common\src\reorder.cpp" />
+    <ClCompile Include="amr_nb\common\src\residu.cpp" />
+    <ClCompile Include="amr_nb\common\src\round.cpp" />
+    <ClCompile Include="amr_nb\enc\src\s10_8pf.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_wb\dec\src\scale_signal.cpp" />
+    <ClCompile Include="amr_nb\enc\src\set_sign.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\set_zero.cpp" />
+    <ClCompile Include="amr_nb\common\src\shr.cpp" />
+    <ClCompile Include="amr_nb\common\src\shr_r.cpp" />
+    <ClCompile Include="amr_nb\enc\src\sid_sync.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\dec\src\sp_dec.cpp" />
+    <ClCompile Include="amr_nb\enc\src\sp_enc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\spreproc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\enc\src\spstproc.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\sqrt_l.cpp" />
+    <ClCompile Include="amr_nb\common\src\sqrt_l_tbl.cpp" />
+    <ClCompile Include="amr_nb\common\src\sub.cpp" />
+    <ClCompile Include="amr_nb\common\src\syn_filt.cpp" />
+    <ClCompile Include="amr_wb\dec\src\synthesis_amr_wb.cpp" />
+    <ClCompile Include="amr_nb\enc\src\ton_stab.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="amr_nb\common\src\vad1.cpp" />
+    <ClCompile Include="amr_wb\dec\src\voice_factor.cpp" />
+    <ClCompile Include="amr_wb\dec\src\wb_syn_filt.cpp" />
+    <ClCompile Include="amr_nb\common\src\weight_a.cpp" />
+    <ClCompile Include="amr_wb\dec\src\weight_amrwb_lpc.cpp" />
+    <ClCompile Include="amr_nb\common\src\window_tab.cpp" />
+    <ClCompile Include="amr_nb\dec\src\wmf_to_ets.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

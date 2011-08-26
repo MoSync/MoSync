@@ -37,16 +37,16 @@ static void writeCopy(istream& in, ostream& out) {
 	beGood(in);
 	beGood(out);
 
-	size_t size;
+	streamoff size;
 	in.seekg(0, ios_base::end);
 	size = in.tellg();
 	in.seekg(0, ios_base::beg);
 	beGood(in);
 
-	size_t pos = 0;
+	streamoff pos = 0;
 	while(pos < size) {
 		char buffer[64*1024];	// arbitrary size
-		size_t todo = MIN(size - pos, sizeof(buffer));
+		streamoff todo = MIN(size - pos, sizeof(buffer));
 		in.read(buffer, todo);
 		beGood(in);
 		out.write(buffer, todo);
@@ -67,11 +67,11 @@ void appendFile(const char* dst, const char* src) {
 	writeCopy(in, out);
 }
 
-size_t getFileSize(const char* filename) {
+streamoff getFileSize(const char* filename) {
 	ifstream in(filename, ios_base::binary);
 	beGood(in);
 
-	size_t size;
+	streamoff size;
 	in.seekg(0, ios_base::end);
 	size = in.tellg();
 	beGood(in);
@@ -82,7 +82,7 @@ string readFileToString(const char* src) {
 	ifstream in(src);
 	beGood(in);
 
-	size_t size;
+	streamoff size;
 	in.seekg(0, ios_base::end);
 	size = in.tellg();
 	in.seekg(0, ios_base::beg);
@@ -99,7 +99,7 @@ void* readBinaryFile(const char* src, size_t& size) {
 	beGood(in);
 
 	in.seekg(0, ios_base::end);
-	size = in.tellg();
+	size = (size_t)in.tellg();
 	in.seekg(0, ios_base::beg);
 	beGood(in);
 

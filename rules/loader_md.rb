@@ -21,7 +21,7 @@ require "#{File.dirname(__FILE__)}/host.rb"
 # Removing header files without modifying the source files that include them
 # will still cause compile errors.
 class HeaderFileTask < FileTask
-	def execute
+	def invoke
 	end
 end
 

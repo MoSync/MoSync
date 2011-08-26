@@ -30,6 +30,7 @@ import android.view.View;
 import com.mosync.internal.android.MoSyncCameraController;
 import com.mosync.internal.android.MoSyncHelpers;
 import com.mosync.internal.android.MoSyncThread;
+import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.generated.IX_WIDGET;
@@ -37,6 +38,7 @@ import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.ui.factories.CameraPreviewFactory;
 import com.mosync.nativeui.ui.factories.ViewFactory;
 import com.mosync.nativeui.ui.widgets.CameraPreviewWidget;
+import com.mosync.nativeui.ui.widgets.LabelWidget;
 import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
@@ -44,6 +46,7 @@ import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.HandleTable;
 import com.mosync.nativeui.util.properties.FeatureNotAvailableException;
+import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -60,8 +63,11 @@ public class NativeUI
 	 * Context of the main activity.
 	 */
 	private Activity m_activity;
+	/**
+	 * The MoSync thread object.
+	 */
+	MoSyncThread mMoSyncThread;
 	
-	public MoSyncThread mMoSyncThread;
 	/**
 	 * A table that contains a mapping between a handle and a widget, in a
 	 * mosync program a handle is the only reference to a widget.
@@ -85,11 +91,12 @@ public class NativeUI
 	
 	/**
 	 * Constructor.
-	 * 
+	 * @param thread The MoSync thread.
 	 * @param activity The Activity in which the widgets should be created.
 	 */
-	public NativeUI(Activity activity)
+	public NativeUI(MoSyncThread thread, Activity activity)
 	{
+		mMoSyncThread = thread;
 		m_activity = activity;
 	}
 	
@@ -123,6 +130,16 @@ public class NativeUI
 		m_imageTable = imageTable;
 	}
 	
+	/**
+	 * Gets the bitmap table, that can be modified.
+	 *
+	 * @return The bitmap table.
+	 */
+	public Hashtable<Integer, ImageCache> getImageTable()
+	{
+		return m_imageTable;
+	}
+
 	/**
 	 * Sets the default MoSync canvas view, so that it is possible
 	 * to switch back to it from native UI.
@@ -437,6 +454,37 @@ public class NativeUI
 		}
 		
 		boolean result;
+
+		// Send the typeface to the label widget.
+		if ( key.compareTo( IX_WIDGET.MAW_LABEL_FONT_HANDLE ) == 0
+				&&
+				widget instanceof LabelWidget )
+		{
+			MoSyncFontHandle currentFont = null;
+
+			// Search the fondle in the list of fonts.
+			try
+			{
+				currentFont = mMoSyncThread.getMoSyncFont(IntConverter.convert(value));
+			} catch(PropertyConversionException pce)
+			{
+				Log.e( "MoSync", "Error while getting font handle with value '" + value + "Invalid property value");
+				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+			}
+
+			if ( currentFont == null )
+			{
+				Log.e( "MoSync", "Error while getting font handle with value '" + value + " The handle was not found");
+				return IX_WIDGET.MAW_RES_INVALID_PROPERTY_VALUE;
+			}
+			else
+			{
+				Log.e("MoSync", "Set font typeface to native ui widget");
+				LabelWidget labelWidget = (LabelWidget) widget;
+				labelWidget.setFontTypeface(currentFont.getTypeface(), currentFont.getFontSize());
+				return IX_WIDGET.MAW_RES_OK;
+			}
+		}
 
 		try
 		{

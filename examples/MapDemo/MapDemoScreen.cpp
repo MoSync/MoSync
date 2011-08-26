@@ -82,10 +82,12 @@ namespace MapDemo
 			case MAK_BACK:
 			case MAK_SOFTRIGHT:
 				maExit( 0 );
+#if 0
 				// TODO: proper exit
 				MapDemoMoblet& moblet = (MapDemoMoblet&)Environment::getEnvironment( );
 				moblet.Terminate( );
 				return true;
+#endif
 		}
 
 		if ( AppScreen::handleKeyPress( keyCode ) )

@@ -38,6 +38,12 @@ def exitBuilder(arg, configDir, config)
 	exit Integer(arg)
 end
 
+alias :old_sh :sh
+def sh(cmd)
+	old_sh(cmd)
+	return true
+end
+
 cpath = pwd
 
 sh "ruby addLibraries.rb"
@@ -108,7 +114,7 @@ if ENV['OS'] == "Windows_NT"
 		cygPath = ""
 	elsif(nil != ENV["CYGPATH"])
 		cygPath = ENV["CYGPATH"]
-	elsif(system("bash.exe pwd"))
+	elsif(sh("bash.exe pwd"))
 		cygPath = ""
 	else
 		msg = "Can not find the cygwin installation.\n" +
@@ -118,14 +124,14 @@ if ENV['OS'] == "Windows_NT"
 			  "PATH or CYGPATH environmental variable"
 		raise Exception.new(msg)
 	end
-	success = system "#{cygPath}bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin_u.sh)\""
+	success = sh "#{cygPath}bash.exe --login -c \"dos2unix $(cygpath -u #{cpath}/cygwin_u.sh)\""
 	if (!success)
 		exitBuilder(1, mosyncppsource, configPath)
 	end
 
-	success = system "#{cygPath}bash.exe --login -i #{File.join(cpath, "cygwin_u.sh")} #{androidNDKPath} #{androidSDKPath} #{ENV['MOSYNC_SRC']}"
+	success = sh "#{cygPath}bash.exe --login -i #{File.join(cpath, "cygwin_u.sh")} #{androidNDKPath} #{androidSDKPath} #{ENV['MOSYNC_SRC']}"
 else
-	success = system("#{File.join(cpath, "invoke-ndk-build.sh")} #{androidNDKPath} #{androidSDKPath} $MOSYNC_SRC");
+	success = sh("#{File.join(cpath, "invoke-ndk-build.sh")} #{androidNDKPath} #{androidSDKPath} $MOSYNC_SRC");
 end
 
 if (!success)
@@ -169,7 +175,9 @@ packages = ["src/com/mosync/java/android/*.java",
             "src/com/mosync/nativeui/ui/widgets/*.java",
             "src/com/mosync/nativeui/util/*.java",
             "src/com/mosync/nativeui/util/properties/*.java",
-			"src/com/mosync/pim/*.java"
+			"src/com/mosync/pim/*.java",
+			"src/com/mosync/nativeui/ui/custom/*.java",
+			"gen/com/mosync/java/android/*.java"
             ]
 
 # Concatenate each list element with package_root, and flatten the list to a string
@@ -196,7 +204,7 @@ cd "temp"
 if ENV['OS'] == "Windows_NT"
 	sh("#{ENV['MOSYNC_SRC']}/tools/ReleasePackageBuild/build_package_tools/mosync_bin/zip -r MoSyncRuntime#{debug}.zip .");
 else
-	success = system("zip -r MoSyncRuntime#{debug}.zip .");
+	success = sh("zip -r MoSyncRuntime#{debug}.zip .");
 end
 if (!success)
 	exitBuilder(1, mosyncppsource, configPath)

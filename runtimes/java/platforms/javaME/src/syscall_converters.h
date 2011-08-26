@@ -263,7 +263,7 @@ final void debug_float(int i) throws Exception {
 #else
 #define debug_float(i)
 #endif
-#if 0	//unused
+#ifdef DEBUG_SYSCALLS
 final float _SYSCALL_CONVERT_float(int i) throws Exception {
 	_debug_hex(i);
 	float f = Float.intBitsToFloat(i);

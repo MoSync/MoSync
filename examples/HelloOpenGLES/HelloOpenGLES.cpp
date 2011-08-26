@@ -73,7 +73,7 @@ public:
 	{
 		// Create a screen widget that will hold the OpenGL view.
 		int screen = maWidgetCreate(MAW_SCREEN);
-		
+
 		// Check if NativeUI is supported by the runtime platform.
 		// For example, MoRE does not support NativeUI at the time
 		// of writing this program.
@@ -83,7 +83,7 @@ public:
 				"OpenGL is only available on Android and iPhone. "
 				"You must run directly on the device or devices emulator.");
 		}
-		
+
 		// Create a GL_VIEW widget and add it to the screen.
 		// widgetSetPropertyInt is a helper function defined
 		// in WidgetUtil.cpp.

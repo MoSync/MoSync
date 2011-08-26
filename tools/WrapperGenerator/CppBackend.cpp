@@ -25,12 +25,12 @@ struct MoSyncArgument {
 };
 
 void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
-	pair<BasesIterator, BasesIterator> functions = bases.equal_range("Function");	
+	pair<BasesIterator, BasesIterator> functions = bases.equal_range("Function");
 
 	for(BasesIterator function = functions.first; function!=functions.second; function++) {
 		const Function* func = (const Function*)function->second;
 		string name = func->getName();
-		
+
 		/**
 		 * Never versions of gcc includes some builtin functions,
 		 * ignore these.
@@ -39,7 +39,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 		{
 			continue;
 		}
-		
+
 		const Base* ret = func->getReturnType();
 		string returnString = ret->toString();
 		bool returnsHandle = false;
@@ -53,7 +53,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 		//vector<MoSyncArgument> arguments;
 
 		const std::vector<const Argument*>& args = func->getArguments();
-		
+
 		/*
 		for(int i = 0; i < args.size(); i++) {
 			MoSyncArgument ma;
@@ -77,7 +77,7 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 
 			if(returnsHandle) stream << "MAHandle ";
 			else {
-				stream << ret->toString() << " ";	
+				stream << ret->toString() << " ";
 			}
 
 			stream << func->getName() << "Handle(";
@@ -133,4 +133,4 @@ void CPPBackend::emit(const BasesMap& bases, fstream& stream) {
 
 	}
 
-}	
+}

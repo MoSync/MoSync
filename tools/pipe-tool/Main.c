@@ -715,9 +715,9 @@ Mode Switches:\n\
 General options:\n\
   -h | --help          show this usage info\n\
   -error-paths         show file paths in errors\n\
-	-xerr                extra information in case of errors\n\
-	-master-dump         also dump the input into a single text file\n\
-	-s<dir>              search <dir> for input libraries\n\
+  -xerr                extra information in case of errors\n\
+  -master-dump         also dump the input into a single text file\n\
+  -s<dir>              search <dir> for input libraries\n\
 \n\
 Build application (-B) options:\n\
   -entry=sym           set code entry point (default '%s')\n\
@@ -732,14 +732,14 @@ Build application (-B) options:\n\
   -stabs=file          output debug information\n\
   -elim                eliminate unreferenced code/data\n\
   -no-verify           prevent code verification\n\
-	-java                build a Java class file\n\
+  -java                build a Java class file\n\
   -gcj=flags           for -java option: set flags for GCJ\n\
 \n\
 Resource compiler (-R) options:\n\
   -depend=file         output dependencies in makefile syntax\n\
 \n\
 Librarian (-L) options:\n\
-	-quiet               don't display the component files\n\
+  -quiet               don't display the component files\n\
 \n\
 Library mode (-L) is used to combine .s files into a .lib library file.\n\
 In resource mode (-R), resource files are compiled to the output file.\n\
