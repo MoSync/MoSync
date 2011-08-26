@@ -38,7 +38,9 @@
 	view = [[[MoSyncGLView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) 
                                          andApi:api] retain]; // TODO: do have to do this (retain)??
     if(view == nil) return nil;
-	return [super init];	    
+	id ret = [super init];
+	view.backgroundColor = [UIColor colorWithHexString:@"000000ff"];
+    return ret;
 }
 
 - (void)setWidgetHandle:(int)_handle {
