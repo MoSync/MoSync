@@ -190,11 +190,11 @@
 
 - (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
 	if([key isEqualToString:@"left"]) {
-		[view setFrame:CGRectMake([value floatValue], view.frame.origin.y, view.frame.size.width, view.frame.size.height)];
+		[view setFrame:CGRectMake([value floatValue]/getScreenScale(), view.frame.origin.y, view.frame.size.width, view.frame.size.height)];
 		[self layout];		
 	} else 
 	if([key isEqualToString:@"top"]) {
-		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue], view.frame.size.width, view.frame.size.height)];
+		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue]/getScreenScale(), view.frame.size.width, view.frame.size.height)];
 		[self layout];
 	} else 
 	if([key isEqualToString:@"width"]) {
@@ -209,7 +209,7 @@
 			autoSizeParamX = FIXED_SIZE;
 		}
 		
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width, view.frame.size.height)];
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width/getScreenScale(), view.frame.size.height)];
 		[self layout];
 	} else
 	if([key isEqualToString:@"height"]) {
@@ -224,7 +224,7 @@
 			autoSizeParamY = FIXED_SIZE;
 		}
 		
-		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height)];	
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height/getScreenScale())];
 		[self layout];		
 	} else 
 	if([key isEqualToString:@"backgroundColor"]) {
@@ -257,18 +257,16 @@
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	
 	if([key isEqualToString:@"width"]) {		
-		return [[NSNumber numberWithInt: view.frame.size.width ] stringValue];
-		
+		return [[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue];
 	}
 	else if([key isEqualToString:@"height"]) {
-		return [[NSNumber numberWithInt: view.frame.size.height] stringValue];
+		return [[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue];
 	}
 	else if([key isEqualToString:@"left"]) {		
-		return [[NSNumber numberWithInt: view.frame.origin.x ] stringValue];
-		
+		return [[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue];
 	}
 	else if([key isEqualToString:@"top"]) {
-		return [[NSNumber numberWithInt: view.frame.origin.y] stringValue];
+		return [[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue];
 	}
 	
 	return nil;
