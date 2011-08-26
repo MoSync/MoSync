@@ -3035,6 +3035,7 @@ interface MAAPI {
 
 		constset int MA_PIM_CONTACT_ORG_INFO_ {
 			/// #MA_PIM_TYPE_STRING.
+			/// Only for Android devices.
 			DEPARTMENT = 0;
 			/// #MA_PIM_TYPE_STRING.
 			/// Only for Android devices.
@@ -3070,14 +3071,23 @@ interface MAAPI {
 		}
 
 		constset MAString MA_PIM_CONTACT_IM_PROTOCOL_ {
+			/// This constant describes an AIM protocol.
 			AIM = "AIM";
+			/// This constant describes a MSN protocol.
 			MSN = "MSN";
+			/// This constant describes a Yahoo protocol.
 			YAHOO = "Yahoo";
+			/// This constant describes a Skype protocol.
 			SKYPE = "Skype";
+			/// This constant describes a QQ protocol.
 			QQ = "QQ";
+			/// This constant describes a Google Talk protocol.
 			GOOGLE_TALK = "GoogleTalk";
+			/// This constant describes an ICQ protocol.
 			ICQ = "ICQ";
+			/// This constant describes a Jabber protocol.
 			JABBER = "Jabber";
+			/// This constant describes a NetMeeting protocol.
 			NETMEETING = "Netmeeting";
 		}
 
@@ -3108,130 +3118,188 @@ interface MAAPI {
 		}
 
 		constset int MA_PIM_ATTR_ADDR_ {
+			/// The constant describes a home address.
 			HOME = 101;
+			/// The constant describes a work address.
 			WORK = 102;
-			/// The value describes a different adress type.
+			/// The constant describes a different address type.
 			OTHER = 103;
+			/// The constant describes a custom address type.
 			/// The field's label can be set.
 			CUSTOM = 104;
 		}
 
 		constset int MA_PIM_ATTR_EMAIL_ {
+			/// The constant describes a home e-mail address.
 			HOME = 201;
+			/// The constant describes a work e-mail address.
 			WORK = 202;
+			/// The constant describes a mobile e-mail address.
 			MOBILE = 203;
-			/// The value describes a different phone number type.
+			/// The constant describes a different e-mail address type.
 			OTHER = 204;
+			/// The constant describes a custom e-mail address type.
 			/// The field's label can be set.
 			CUSTOM = 205;
 		}
 
 		constset int MA_PIM_ATTR_FORMATTED_ADDR_ {
+			/// The constant describes a home formatted address.
 			HOME = 301;
+			/// The constant describes a work formatted address.
 			WORK = 302;
-			/// The value describes a different adress type.
+			/// The constant describes a different formatted address type.
 			OTHER = 303;
+			/// The constant describes a custom formatted address type.
 			/// The field's label can be set.
 			CUSTOM = 304;
 		}
 
 		constset int MA_PIM_ATTR_ORG_ {
+			/// The constant describes a work organization.
 			WORK = 401;
-			/// The value describes a different IM type.
+			/// The constant describes a different organization type.
 			OTHER = 402;
+			/// The constant describes a custom organization type.
 			/// The field's label can be set.
 			CUSTOM = 403;
 		}
 
 		constset int MA_PIM_ATTR_PHONE_ {
-			/// The value describes a mobile phone number.
+			/// The constant describes a home phone number.
 			HOME = 501;
-			/// The value describes a fax number.
+			/// The constant describes a mobile phone number.
 			MOBILE = 502;
-			/// The value describes a pager number.
+			/// The constant describes a home fax phone number.
 			HOME_FAX = 503;
+			/// The constant describes a work fax phone number.
 			WORK_FAX = 504;
-			/// The value describes an assistant.
+			/// The constant describes a pager phone number.
 			PAGER = 505;
+			/// The constant describes an iPhone phone number.
 			IPHONE = 506;
+			/// The constant describes a work phone number.
 			WORK = 507;
+			/// The constant describes a callback phone number.
 			CALLBACK = 508;
+			/// The constant describes a car phone number.
 			CAR = 509;
+			/// The constant describes a company main phone number.
 			COMPANY_MAIN = 510;
+			/// The constant describes a ISDN phone number.
 			ISDN = 511;
+			/// The constant describes a other fax type phone number.
 			OTHER_FAX = 512;
+			/// The constant describes a radio phone number.
 			RADIO = 513;
+			/// The constant describes a telex phone number.
 			TELEX = 514;
+			/// The constant describes a TTY TDD phone number.
 			TTY_TDD = 515;
+			/// The constant describes a work mobile phone number.
 			WORK_MOBILE = 516;
+			/// The constant describes a work pager phone number.
 			WORK_PAGER = 517;
+			/// The constant describes an assistant phone number.
 			ASSISTANT = 518;
+			/// The constant describes a MMS phone number.
 			MMS = 519;
-			/// The value describes a different type phone number.
+			/// The constant describes a different phone number type.
 			OTHER = 520;
+			/// The constant describes a custom phone number type.
 			/// The field's label can be set.
 			CUSTOM = 521;
 		}
 
 		constset int MA_PIM_ATTR_TITLE_ {
+			/// The constant describes a work title.
 			WORK = 601;
-			/// The value describes a different IM type.
+			/// The constant describes a different title type.
 			OTHER = 602;
+			/// The constant describes a custom title type.
 			/// The field's label can be set.
 			CUSTOM = 603;
 		}
 
 		constset int MA_PIM_ATTR_WEBSITE_ {
+			/// The constant describes a homepage website.
 			HOMEPAGE = 701;
+			/// The constant describes a blog website.
 			BLOG = 702;
+			/// The constant describes a profile website.
 			PROFILE = 703;
+			/// The constant describes a home website.
 			HOME = 704;
+			/// The constant describes a work website.
 			WORK = 705;
+			/// The constant describes a FTP website.
 			FTP = 706;
-			/// The value describes a different type phone number.
+			/// The constant describes a different website type.
 			OTHER = 707;
+			/// The constant describes a custom website type.
 			/// The field's label can be set.
 			CUSTOM = 708;
 		}
 
 		constset int MA_PIM_ATTR_IM_ {
+			/// The constant describes a home IM address.
 			HOME = 801;
+			/// The constant describes a work IM address.
 			WORK = 802;
-			/// The value describes a different IM type.
+			/// The constant describes a different IM address type.
 			OTHER = 803;
+			/// The constant describes a custom IM address type.
 			/// The field's label can be set.
 			CUSTOM = 804;
 		}
 
 		constset int MA_PIM_ATTR_RELATION_ {
+			/// The constant describes a mother relation.
 			MOTHER = 901;
+			/// The constant describes a father relation.
 			FATHER = 902;
+			/// The constant describes a parent relation.
 			PARENT = 903;
+			/// The constant describes a sister relation.
 			SISTER = 904;
+			/// The constant describes a brother relation.
 			BROTHER = 905;
+			/// The constant describes a child relation.
 			CHILD = 906;
+			/// The constant describes a friend relation.
 			FRIEND = 907;
+			/// The constant describes a spouse relation.
 			SPOUSE = 908;
+			/// The constant describes a partner relation.
 			PARTNER = 909;
+			/// The constant describes a manager relation.
 			MANAGER = 910;
+			/// The constant describes a assistant relation.
 			ASSISTANT = 911;
+			/// The constant describes a domestic partner relation.
 			DOMESTIC_PARTNER = 912;
+			/// The constant describes a referred by relation.
 			REFERRED_BY = 913;
+			/// The constant describes a relative relation.
 			RELATIVE = 914;
+			/// The constant describes a custom relation type.
 			/// The field's label can be set.
 			CUSTOM = 915;
 		}
 
 		constset int MA_PIM_ATTR_ORG_INFO_ {
+			/// The constant describes a work organization.
 			WORK = 1001;
-			/// The value describes a different IM type.
+			/// The constant describes a different organization type.
 			OTHER = 1002;
+			/// The constant describes a custom organization type.
 			/// The field's label can be set.
 			CUSTOM = 1003;
 		}
 
 		constset int MA_PIM_ATTR
 		{
+			/// The constant describes a preferred field.
 			PREFERRED = 0x10000;
 		}
 
@@ -3277,6 +3345,8 @@ interface MAAPI {
 			BUFFER_TOO_SMALL = -18;
 			/// Invalid buffer structure
 			INVALID_BUFFER = -19;
+			/// The field doesn't have attributes
+			NO_ATTRIBUTES = -20;
 		}
 
 		/**
@@ -3352,6 +3422,7 @@ interface MAAPI {
 		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
 		*                    #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
+		*                    #MA_PIM_ERR_NO_ATTRIBUTES if the field doesn't have attributes.
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
@@ -3367,7 +3438,7 @@ interface MAAPI {
 		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
 		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
 		*              #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
-		*              #MA_PIM_ERR_NO_LABEL if the buffer is invalid.
+		*              #MA_PIM_ERR_NO_LABEL if the buffer is invalid or the attribute is not set to custom.
 		* \note This function is available on Android or iOS.
 		*/
 		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
@@ -3385,7 +3456,7 @@ interface MAAPI {
 		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
 		*                    #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
-		*                    #MA_PIM_ERR_NO_LABEL if the value does not have a custom label.
+		*                    #MA_PIM_ERR_NO_LABEL if the attribute type is not set to custom.
 		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
 		* \note This function is available on Android or iOS.
 		*/

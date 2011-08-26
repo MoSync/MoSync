@@ -133,6 +133,8 @@ public class PIM {
 	private final static int MA_PIM_ERR_BUFFER_TOO_SMALL = -18;
 	/// Invalid buffer structure
 	private final static int MA_PIM_ERR_INVALID_BUFFER = -19;
+	/// The field doesn't have attributes
+	private final static int MA_PIM_ERR_NO_ATTRIBUTES = -20;
 
 	private final static int PIM_ERROR_LIST_TYPE_NOT_SUPPORTED = -3;
 
@@ -367,6 +369,8 @@ public class PIM {
 		{
 			return MA_PIM_ERR_INVALID_INDEX;
 		}
+
+		//MA_PIM_ERR_NO_ATTRIBUTES fleu TODO
 
 		return pimField.getAttribute(index);
 	}
