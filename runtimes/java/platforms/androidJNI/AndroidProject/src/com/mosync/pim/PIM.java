@@ -92,18 +92,49 @@ public class PIM {
 	/*
 	 * Errors
 	 */
-	private final static int PIM_ERROR_NONE = 0;
-	private final static int PIM_ERROR_CANNOT_OPEN = -1;
-	private final static int PIM_ERROR_ALREADY_OPENED = -2;
+	/// No error. The operation completed successfully.
+	private static final int MA_PIM_ERR_NONE = 0;
+	/// This function is unavailable on the current platform.
+	private static final int MA_PIM_ERR_UNAVAILABLE = -1;
+	/// The native database's data type for the given field did not match the MoSync API.
+	private static final int MA_PIM_ERR_NATIVE_TYPE_MISMATCH = -2;
+	/// The field type is not supported.
+	private static final int MA_PIM_ERR_FIELD_UNSUPPORTED = -3;
+	/// The field is read-only.
+	private static final int MA_PIM_ERR_READ_ONLY = -4;
+	/// The field is read-only.
+	private static final int MA_PIM_ERR_WRITE_ONLY = -5;
+	/// The field/attribute combination is not supported.
+	private static final int MA_PIM_ERR_COMBO_UNSUPPORTED = -6;
+	/// More values in this field is not supported.
+	private static final int MA_PIM_ERR_FIELD_COUNT_MAX = -7;
+	/// The value does not have a custom label.
+	private static final int MA_PIM_ERR_NO_LABEL = -8;
+	/// The values's attribute is not set to custom.
+	private static final int MA_PIM_ERR_CUSTOM_ATTRIBUTE = -9;
+	/// The given index is not valid.
+	/// This value is returned by maPimItemGetField(), maPimItemSetValue().
+	private static final int MA_PIM_ERR_INVALID_INDEX = -10;
+	/// The specified pim list is not available on the current platform.
+	private static final int MA_PIM_ERR_UNAVAILABLE_LIST = -11;
+	/// The specified list is not opened. Call maPimListOpen() first.
+	private static final int MA_PIM_ERR_LIST_NOT_OPENED = -12;
+	/// The specified list is already opened.
+	private static final int MA_PIM_ERR_LIST_ALREADY_OPENED = -13;
+	/// The operation is not allowed by the Address Book database.
+	private static final int MA_PIM_ERR_OPERATION_NOT_PERMITTED = -14;
+	/// Invalid handle.
+	private static final int MA_PIM_ERR_INVALID_HANDLE = -15;
+	/// The requested field doesn't have a value.
+	private static final int MA_PIM_ERR_EMPTY_FIELD = -16;
+	/// The specified pim item is not available.
+	private static final int MA_PIM_ERR_UNAVAILABLE_ITEM = -17;
+	/// The allocated buffer is too small
+	private final static int MA_PIM_ERR_BUFFER_TOO_SMALL = -18;
+	/// Invalid buffer structure
+	private final static int MA_PIM_ERR_INVALID_BUFFER = -19;
+
 	private final static int PIM_ERROR_LIST_TYPE_NOT_SUPPORTED = -3;
-	private final static int PIM_ERROR_INVALID_LIST_HANDLE = -4;
-	private final static int PIM_ERROR_INVALID_ITEM_HANDLE = -4;
-	private final static int PIM_ERROR_INVALID_FIELD = -5;
-	private final static int PIM_ERROR_INVALID_INDEX = -6;
-	private final static int PIM_ERROR_NO_LABEL = -7;
-	private final static int PIM_ERROR_NO_VALUE = -8;
-	private final static int PIM_ERROR_BUFFER_TOO_SMALL = -9;
-	private final static int PIM_ERROR_INVALID_FIELD_COMPONENTS = -10;
 
 	/*
 	 * PIM list
@@ -184,12 +215,12 @@ public class PIM {
 		}
 		catch (Exception e)
 		{
-			return PIM_ERROR_CANNOT_OPEN;
+			return MA_PIM_ERR_LIST_NOT_OPENED;
 		}
 
 	    if (cur == null)
 	    {
-			return PIM_ERROR_CANNOT_OPEN;
+			return MA_PIM_ERR_LIST_NOT_OPENED;
 	    }
 
 	    if (mPIMContactsList == null)
@@ -198,7 +229,7 @@ public class PIM {
 	    }
 	    else
 	    {
-			return PIM_ERROR_ALREADY_OPENED;
+			return MA_PIM_ERR_LIST_ALREADY_OPENED;
 	    }
 
 	    DebugPrint("Contacts " + cur.getCount());
@@ -246,7 +277,7 @@ public class PIM {
 		DebugPrint("maPimListNext " + list);
 		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
 		{
-			return PIM_ERROR_INVALID_LIST_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_LIST;
 		}
 
 	    if (mPIMIterator.hasNext())
@@ -265,7 +296,7 @@ public class PIM {
 	{
 		if ((list < 0) || (!mPIMLists.containsKey(list)) )
 		{
-			return PIM_ERROR_INVALID_LIST_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_LIST;
 		}
 
 		mPIMContactsList = mPIMLists.remove(list);
@@ -279,7 +310,7 @@ public class PIM {
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		return pimItem.getFieldsCount();
@@ -290,12 +321,12 @@ public class PIM {
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		if ( (n < 0) || (n >= pimItem.getFieldsCount()) )
 		{
-			return PIM_ERROR_INVALID_INDEX;
+			return MA_PIM_ERR_INVALID_INDEX;
 		}
 
 		return pimItem.getFieldType(n);
@@ -306,13 +337,13 @@ public class PIM {
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		PIMField pimField = null;
 		if ( (pimField = pimItem.getField(field)) == null ) //fleu TODO empty field
 		{
-			return PIM_ERROR_INVALID_FIELD;
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
 
 		return pimField.length();
@@ -323,18 +354,18 @@ public class PIM {
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		PIMField pimField = null;
 		if ( (pimField = pimItem.getField(field)) == null )
 		{
-			return PIM_ERROR_INVALID_FIELD;
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
 
 		if ( (index < 0) || (index >= pimField.length()) )
 		{
-			return PIM_ERROR_INVALID_INDEX;
+			return MA_PIM_ERR_INVALID_INDEX;
 		}
 
 		return pimField.getAttribute(index);
@@ -345,30 +376,30 @@ public class PIM {
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		PIMField pimField = null;
 		if ( (pimField = pimItem.getField(field)) == null )
 		{
-			return PIM_ERROR_INVALID_FIELD;
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
 
 		if ( (index < 0) || (index >= pimField.length()) )
 		{
-			return PIM_ERROR_INVALID_INDEX;
+			return MA_PIM_ERR_INVALID_INDEX;
 		}
 
 		String buffer = readStringFromMemory(buffPointer, buffSize);
 		if (buffer == null)
 		{
-			return PIM_ERROR_NO_LABEL;
+			return MA_PIM_ERR_NO_LABEL;
 		}
 
 		pimField.setCustomLabel(index, buffer);
 		pimItem.updateField(getContentResolver(), BaseColumns._ID, pimField.getId(index), "data3", buffer);
 
-		return PIM_ERROR_NONE;
+		return MA_PIM_ERR_NONE;
 	}
 
 	public int maPimItemGetLabel(int item, int field, int buffPointer, int buffSize, int index)
@@ -376,29 +407,29 @@ public class PIM {
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		PIMField pimField = null;
 		if ( (pimField = pimItem.getField(field)) == null )
 		{
-			return PIM_ERROR_INVALID_FIELD;
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
 
 		if ( (index < 0) || (index >= pimField.length()) )
 		{
-			return PIM_ERROR_INVALID_INDEX;
+			return MA_PIM_ERR_INVALID_INDEX;
 		}
 
 		String buffer = pimField.getCustomLabel(index);
 
 		if (buffer == null)
 		{
-			return PIM_ERROR_NO_LABEL;
+			return MA_PIM_ERR_NO_LABEL;
 		}
 
 		if ( buffer.length() > buffSize )
-			return PIM_ERROR_BUFFER_TOO_SMALL;
+			return MA_PIM_ERR_BUFFER_TOO_SMALL;
 
 		DebugPrint("Data: " + getMemDataSection() + "; Position: " + Integer.toHexString(buffPointer) + "; Size: " + buffSize);
 		copyStringToMemory(buffPointer, buffer);
@@ -437,13 +468,15 @@ public class PIM {
 
 	public int maPimFieldType(int list, int field)
 	{
-		DebugPrint("maPimListNext " + list);
 		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
 		{
-			return PIM_ERROR_INVALID_LIST_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_LIST;
 		}
 
-		return PIMField.getDataType(field);
+		int ret = PIMField.getDataType(field);
+		if (ret < 0)
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
+		return ret;
 	}
 
 	public int maPimItemGetValue(int item, int field, int buffPointer, int buffSize, int index)
@@ -451,32 +484,29 @@ public class PIM {
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		PIMField pimField = null;
 		if ( (pimField = pimItem.getField(field)) == null )
 		{
-			return PIM_ERROR_INVALID_FIELD;
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
 
 		if ( (index < 0) || (index >= pimField.length()) )
 		{
-			return PIM_ERROR_INVALID_INDEX;
+			return MA_PIM_ERR_INVALID_INDEX;
 		}
 
 		String buffer = pimField.getData(index);
 		DebugPrint("GET DATA BUFFER = " + buffer);
-		if (buffer.length() == 0)
-		{
-			return PIM_ERROR_NO_VALUE;
-		}
 
 		if ( buffer.length() > buffSize )
-			return PIM_ERROR_BUFFER_TOO_SMALL;
+			return MA_PIM_ERR_BUFFER_TOO_SMALL;
 
 		DebugPrint("buffP = " + buffPointer + "; buff = " + buffer);
-		copyStringToMemory(buffPointer, buffer);
+		if (buffer.length() > 0)
+			copyStringToMemory(buffPointer, buffer);
 
 		return buffer.length();
 	}
@@ -486,34 +516,29 @@ public class PIM {
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		PIMField pimField = null;
 		if ( (pimField = pimItem.getField(field)) == null )
 		{
-			return PIM_ERROR_INVALID_FIELD;
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
 
 		if ( (index < 0) || (index >= pimField.length()) )
 		{
-			return PIM_ERROR_INVALID_INDEX;
+			return MA_PIM_ERR_INVALID_INDEX;
 		}
 
 		String buffer = readStringFromMemory(buffPointer, buffSize);
-		if (buffer.length() == 0)
-		{
-			return PIM_ERROR_NO_VALUE;
-		}
-
 		if (pimField.setData(index, buffer) < 0)
 		{
-			return PIM_ERROR_INVALID_FIELD_COMPONENTS;
+			return MA_PIM_ERR_INVALID_BUFFER;
 		}
 
 		pimField.setAttribute(index, attributes);
 
-		return PIM_ERROR_NONE;
+		return MA_PIM_ERR_NONE;
 	}
 
 	int maPimItemAddValue(int item, int field, int buffPointer, int buffSize, int attributes)
@@ -521,29 +546,29 @@ public class PIM {
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		PIMField pimField = null;
 		if ( (pimField = pimItem.getField(field)) == null )
 		{
-			return PIM_ERROR_INVALID_FIELD;
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
 
 		String buffer = readStringFromMemory(buffPointer, buffSize);
 		if (buffer.length() == 0)
 		{
-			return PIM_ERROR_NO_VALUE;
+			return MA_PIM_ERR_INVALID_BUFFER;
 		}
 		int index = pimField.addData(buffer);
 		if ( index < 0)
 		{
-			return PIM_ERROR_INVALID_FIELD_COMPONENTS;
+			return MA_PIM_ERR_INVALID_BUFFER;
 		}
 
 		pimField.setAttribute(index, attributes);
 
-		return PIM_ERROR_NONE;
+		return index;
 	}
 
 	int maPimItemRemoveValue(int item, int field, int index)
@@ -551,35 +576,39 @@ public class PIM {
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		PIMField pimField = null;
 		if ( (pimField = pimItem.getField(field)) == null )
 		{
-			return PIM_ERROR_INVALID_FIELD;
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
 
 		if ( (index < 0) || (index >= pimField.length()) )
 		{
-			return PIM_ERROR_INVALID_INDEX;
+			return MA_PIM_ERR_INVALID_INDEX;
 		}
 
 		pimField.remove(index);
 
-		return PIM_ERROR_NONE;
+		return MA_PIM_ERR_NONE;
 	}
 
 	int maPimItemClose(int item)
 	{
-		return 0;
+		if ( (item < 0) || (mPIMItems.get(item) == null) )
+		{
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
+		}
+		return MA_PIM_ERR_NONE;
 	}
 
 	int maPimItemCreate(int list)
 	{
 		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
 		{
-			return PIM_ERROR_INVALID_LIST_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_LIST;
 		}
 
 		PIMItem p = new PIMItem();
@@ -592,16 +621,16 @@ public class PIM {
 	{
 		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
 		{
-			return PIM_ERROR_INVALID_LIST_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_LIST;
 		}
 
 		if ( (item < 0) || (mPIMItems.get(item) == null) )
 		{
-			return PIM_ERROR_INVALID_ITEM_HANDLE;
+			return MA_PIM_ERR_UNAVAILABLE_ITEM;
 		}
 
 		mPIMItems.remove(item);
 
-		return 0;
+		return MA_PIM_ERR_NONE;
 	}
 }

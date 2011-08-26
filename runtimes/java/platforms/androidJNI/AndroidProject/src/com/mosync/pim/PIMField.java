@@ -3,6 +3,9 @@ package com.mosync.pim;
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Email;
@@ -146,6 +149,8 @@ public class PIMField
 	//preferred attribute
 	final static int MA_PIM_ATTR_PREFERRED = 0x10000;
 
+	Map<Integer,Integer> mAttributes = new HashMap<Integer,Integer>();
+
 	ArrayList<String[]> mStrNames;
 	ArrayList<String[]> mStrInfos;
 	String mStrType;
@@ -155,6 +160,106 @@ public class PIMField
 		mStrNames = new ArrayList<String[]>();
 		mStrInfos = new ArrayList<String[]>();
 		mStrType = type;
+	}
+
+	void createAttributesMap()
+	{
+		// Address attributes
+		mAttributes.put(MA_PIM_ATTR_ADDR_HOME, StructuredPostal.TYPE_HOME);
+		mAttributes.put(MA_PIM_ATTR_ADDR_WORK, StructuredPostal.TYPE_WORK);
+		mAttributes.put(MA_PIM_ATTR_ADDR_OTHER, StructuredPostal.TYPE_OTHER);
+		mAttributes.put(MA_PIM_ATTR_ADDR_CUSTOM, StructuredPostal.TYPE_CUSTOM);
+
+		// Email attributes
+		mAttributes.put(MA_PIM_ATTR_EMAIL_HOME, Email.TYPE_HOME);
+		mAttributes.put(MA_PIM_ATTR_EMAIL_WORK, Email.TYPE_WORK);
+		mAttributes.put(MA_PIM_ATTR_EMAIL_MOBILE, Email.TYPE_MOBILE);
+		mAttributes.put(MA_PIM_ATTR_EMAIL_OTHER, Email.TYPE_OTHER);
+		mAttributes.put(MA_PIM_ATTR_EMAIL_CUSTOM, Email.TYPE_CUSTOM);
+
+		// Formatted adress attributes
+		mAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_HOME, StructuredPostal.TYPE_HOME);
+		mAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_WORK, StructuredPostal.TYPE_WORK);
+		mAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_OTHER, StructuredPostal.TYPE_OTHER);
+		mAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM, StructuredPostal.TYPE_CUSTOM);
+
+		// Organization attributes
+		mAttributes.put(MA_PIM_ATTR_ORG_WORK, Organization.TYPE_WORK);
+		mAttributes.put(MA_PIM_ATTR_ORG_OTHER, Organization.TYPE_OTHER);
+		mAttributes.put(MA_PIM_ATTR_ORG_CUSTOM, Organization.TYPE_CUSTOM);
+
+		// Phone attributes
+		mAttributes.put(MA_PIM_ATTR_PHONE_HOME, Phone.TYPE_HOME);
+		mAttributes.put(MA_PIM_ATTR_PHONE_MOBILE, Phone.TYPE_MOBILE);
+		mAttributes.put(MA_PIM_ATTR_PHONE_HOME_FAX, Phone.TYPE_FAX_HOME);
+		mAttributes.put(MA_PIM_ATTR_PHONE_WORK_FAX, Phone.TYPE_FAX_WORK);
+		mAttributes.put(MA_PIM_ATTR_PHONE_PAGER, Phone.TYPE_PAGER);
+		mAttributes.put(MA_PIM_ATTR_PHONE_IPHONE, Phone.TYPE_CUSTOM);
+		mAttributes.put(MA_PIM_ATTR_PHONE_WORK, Phone.TYPE_WORK);
+		mAttributes.put(MA_PIM_ATTR_PHONE_CALLBACK, Phone.TYPE_CALLBACK);
+		mAttributes.put(MA_PIM_ATTR_PHONE_CAR, Phone.TYPE_CAR);
+		mAttributes.put(MA_PIM_ATTR_PHONE_COMPANY_MAIN, Phone.TYPE_COMPANY_MAIN);
+		mAttributes.put(MA_PIM_ATTR_PHONE_ISDN, Phone.TYPE_ISDN);
+		mAttributes.put(MA_PIM_ATTR_PHONE_OTHER_FAX, Phone.TYPE_OTHER_FAX);
+		mAttributes.put(MA_PIM_ATTR_PHONE_RADIO, Phone.TYPE_RADIO);
+		mAttributes.put(MA_PIM_ATTR_PHONE_TELEX, Phone.TYPE_TELEX);
+		mAttributes.put(MA_PIM_ATTR_PHONE_TTY_TDD, Phone.TYPE_TTY_TDD);
+		mAttributes.put(MA_PIM_ATTR_PHONE_WORK_MOBILE, Phone.TYPE_WORK_MOBILE);
+		mAttributes.put(MA_PIM_ATTR_PHONE_WORK_PAGER, Phone.TYPE_WORK_PAGER);
+		mAttributes.put(MA_PIM_ATTR_PHONE_ASSISTANT, Phone.TYPE_ASSISTANT);
+		mAttributes.put(MA_PIM_ATTR_PHONE_MMS, Phone.TYPE_MMS);
+		mAttributes.put(MA_PIM_ATTR_PHONE_OTHER, Phone.TYPE_OTHER);
+		mAttributes.put(MA_PIM_ATTR_PHONE_CUSTOM, Phone.TYPE_CUSTOM);
+
+		// Title attributes
+		mAttributes.put(MA_PIM_ATTR_TITLE_WORK, Organization.TYPE_WORK);
+		mAttributes.put(MA_PIM_ATTR_TITLE_OTHER, Organization.TYPE_OTHER);
+		mAttributes.put(MA_PIM_ATTR_TITLE_CUSTOM, Organization.TYPE_CUSTOM);
+
+		// Website attributes
+		mAttributes.put(MA_PIM_ATTR_WEBSITE_HOMEPAGE, Website.TYPE_HOMEPAGE);
+		mAttributes.put(MA_PIM_ATTR_WEBSITE_BLOG, Website.TYPE_BLOG);
+		mAttributes.put(MA_PIM_ATTR_WEBSITE_PROFILE, Website.TYPE_PROFILE);
+		mAttributes.put(MA_PIM_ATTR_WEBSITE_HOME, Website.TYPE_HOME);
+		mAttributes.put(MA_PIM_ATTR_WEBSITE_WORK, Website.TYPE_WORK);
+		mAttributes.put(MA_PIM_ATTR_WEBSITE_FTP, Website.TYPE_FTP);
+		mAttributes.put(MA_PIM_ATTR_WEBSITE_OTHER, Website.TYPE_OTHER);
+		mAttributes.put(MA_PIM_ATTR_WEBSITE_CUSTOM, Website.TYPE_CUSTOM);
+
+		// IM attributes
+		mAttributes.put(MA_PIM_ATTR_IM_HOME, Im.TYPE_HOME);
+		mAttributes.put(MA_PIM_ATTR_IM_WORK, Im.TYPE_WORK);
+		mAttributes.put(MA_PIM_ATTR_IM_OTHER, Im.TYPE_OTHER);
+		mAttributes.put(MA_PIM_ATTR_IM_CUSTOM, Im.TYPE_CUSTOM);
+
+		// Relation attributes
+		mAttributes.put(MA_PIM_ATTR_RELATION_MOTHER, Relation.TYPE_MOTHER);
+		mAttributes.put(MA_PIM_ATTR_RELATION_FATHER, Relation.TYPE_FATHER);
+		mAttributes.put(MA_PIM_ATTR_RELATION_PARENT, Relation.TYPE_PARENT);
+		mAttributes.put(MA_PIM_ATTR_RELATION_SISTER, Relation.TYPE_SISTER);
+		mAttributes.put(MA_PIM_ATTR_RELATION_BROTHER, Relation.TYPE_BROTHER);
+		mAttributes.put(MA_PIM_ATTR_RELATION_CHILD, Relation.TYPE_CHILD);
+		mAttributes.put(MA_PIM_ATTR_RELATION_FRIEND, Relation.TYPE_FRIEND);
+		mAttributes.put(MA_PIM_ATTR_RELATION_SPOUSE, Relation.TYPE_SPOUSE);
+		mAttributes.put(MA_PIM_ATTR_RELATION_PARTNER, Relation.TYPE_PARTNER);
+		mAttributes.put(MA_PIM_ATTR_RELATION_MANAGER, Relation.TYPE_MANAGER);
+		mAttributes.put(MA_PIM_ATTR_RELATION_ASSISTANT, Relation.TYPE_ASSISTANT);
+		mAttributes.put(MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER, Relation.TYPE_DOMESTIC_PARTNER);
+		mAttributes.put(MA_PIM_ATTR_RELATION_REFERRED_BY, Relation.TYPE_REFERRED_BY);
+		mAttributes.put(MA_PIM_ATTR_RELATION_RELATIVE, Relation.TYPE_RELATIVE);
+		mAttributes.put(MA_PIM_ATTR_RELATION_CUSTOM, Relation.TYPE_CUSTOM);
+	}
+
+	public static Object getKeyFromValue(Map<?, ?> hm, Object value)
+	{
+		for(Object o:hm.keySet())
+		{
+			if(hm.get(o).equals(value))
+			{
+				return o;
+			}
+		}
+		return null;
 	}
 
 	void add(String[] names, String[] infos)
@@ -294,405 +399,440 @@ public class PIMField
 
 	int getAddressAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case StructuredPostal.TYPE_HOME:
-				return MA_PIM_ATTR_ADDR_HOME;
-			case StructuredPostal.TYPE_WORK:
-				return MA_PIM_ATTR_ADDR_WORK;
-			case StructuredPostal.TYPE_CUSTOM:
-				return MA_PIM_ATTR_ADDR_CUSTOM;
-			default:
-				return MA_PIM_ATTR_ADDR_OTHER;
-		}
+		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
+//		switch (attr)
+//		{
+//			case StructuredPostal.TYPE_HOME:
+//				return MA_PIM_ATTR_ADDR_HOME;
+//			case StructuredPostal.TYPE_WORK:
+//				return MA_PIM_ATTR_ADDR_WORK;
+//			case StructuredPostal.TYPE_CUSTOM:
+//				return MA_PIM_ATTR_ADDR_CUSTOM;
+//			default:
+//				return MA_PIM_ATTR_ADDR_OTHER;
+//		}
+	}
+
+	int getAddressNativeAttribute(int attr)
+	{
+		return mAttributes.get(attr);
+//		switch (attr)
+//		{
+//			case MA_PIM_ATTR_ADDR_HOME:
+//				return StructuredPostal.TYPE_HOME;
+//			case MA_PIM_ATTR_ADDR_WORK:
+//				return StructuredPostal.TYPE_WORK;
+//			case MA_PIM_ATTR_ADDR_CUSTOM:
+//				return StructuredPostal.TYPE_CUSTOM;
+//			default:
+//				return StructuredPostal.TYPE_OTHER;
+//		}
 	}
 
 	int getEmailAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case Email.TYPE_HOME:
-				return MA_PIM_ATTR_EMAIL_HOME;
-			case Email.TYPE_WORK:
-				return MA_PIM_ATTR_EMAIL_WORK;
-			case Email.TYPE_MOBILE:
-				return MA_PIM_ATTR_EMAIL_MOBILE;
-			case Email.TYPE_CUSTOM:
-				return MA_PIM_ATTR_EMAIL_CUSTOM;
-			default:
-				return MA_PIM_ATTR_EMAIL_OTHER;
-		}
+		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
+//		switch (attr)
+//		{
+//			case Email.TYPE_HOME:
+//				return MA_PIM_ATTR_EMAIL_HOME;
+//			case Email.TYPE_WORK:
+//				return MA_PIM_ATTR_EMAIL_WORK;
+//			case Email.TYPE_MOBILE:
+//				return MA_PIM_ATTR_EMAIL_MOBILE;
+//			case Email.TYPE_CUSTOM:
+//				return MA_PIM_ATTR_EMAIL_CUSTOM;
+//			default:
+//				return MA_PIM_ATTR_EMAIL_OTHER;
+//		}
 	}
 
 	int getEmailNativeAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case MA_PIM_ATTR_EMAIL_HOME:
-				return Email.TYPE_HOME;
-			case MA_PIM_ATTR_EMAIL_WORK:
-				return Email.TYPE_WORK;
-			case MA_PIM_ATTR_EMAIL_MOBILE:
-				return Email.TYPE_MOBILE;
-			case MA_PIM_ATTR_EMAIL_CUSTOM:
-				return Email.TYPE_CUSTOM;
-			default:
-				return Email.TYPE_OTHER;
-		}
+		return mAttributes.get(attr);
+//		switch (attr)
+//		{
+//			case MA_PIM_ATTR_EMAIL_HOME:
+//				return Email.TYPE_HOME;
+//			case MA_PIM_ATTR_EMAIL_WORK:
+//				return Email.TYPE_WORK;
+//			case MA_PIM_ATTR_EMAIL_MOBILE:
+//				return Email.TYPE_MOBILE;
+//			case MA_PIM_ATTR_EMAIL_CUSTOM:
+//				return Email.TYPE_CUSTOM;
+//			default:
+//				return Email.TYPE_OTHER;
+//		}
 	}
 
 	int getFormattedAddressAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case StructuredPostal.TYPE_HOME:
-				return MA_PIM_ATTR_FORMATTED_ADDR_HOME;
-			case StructuredPostal.TYPE_WORK:
-				return MA_PIM_ATTR_FORMATTED_ADDR_WORK;
-			case StructuredPostal.TYPE_CUSTOM:
-				return MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM;
-			default:
-				return MA_PIM_ATTR_FORMATTED_ADDR_OTHER;
-		}
+		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
+//		switch (attr)
+//		{
+//			case StructuredPostal.TYPE_HOME:
+//				return MA_PIM_ATTR_FORMATTED_ADDR_HOME;
+//			case StructuredPostal.TYPE_WORK:
+//				return MA_PIM_ATTR_FORMATTED_ADDR_WORK;
+//			case StructuredPostal.TYPE_CUSTOM:
+//				return MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM;
+//			default:
+//				return MA_PIM_ATTR_FORMATTED_ADDR_OTHER;
+//		}
 	}
 
 	int getFormattedAddressNativeAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case MA_PIM_ATTR_FORMATTED_ADDR_HOME:
-				return StructuredPostal.TYPE_HOME;
-			case MA_PIM_ATTR_FORMATTED_ADDR_WORK:
-				return StructuredPostal.TYPE_WORK;
-			case MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM:
-				return StructuredPostal.TYPE_CUSTOM;
-			default:
-				return StructuredPostal.TYPE_OTHER;
-		}
+		return mAttributes.get(attr);
+//		switch (attr)
+//		{
+//			case MA_PIM_ATTR_FORMATTED_ADDR_HOME:
+//				return StructuredPostal.TYPE_HOME;
+//			case MA_PIM_ATTR_FORMATTED_ADDR_WORK:
+//				return StructuredPostal.TYPE_WORK;
+//			case MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM:
+//				return StructuredPostal.TYPE_CUSTOM;
+//			default:
+//				return StructuredPostal.TYPE_OTHER;
+//		}
 	}
 
 	int getOrganizationAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case Organization.TYPE_WORK:
-				return MA_PIM_ATTR_ORG_WORK;
-			case Organization.TYPE_CUSTOM:
-				return MA_PIM_ATTR_ORG_CUSTOM;
-			default:
-				return MA_PIM_ATTR_ORG_OTHER;
-		}
+		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
+//		switch (attr)
+//		{
+//			case Organization.TYPE_WORK:
+//				return MA_PIM_ATTR_ORG_WORK;
+//			case Organization.TYPE_CUSTOM:
+//				return MA_PIM_ATTR_ORG_CUSTOM;
+//			default:
+//				return MA_PIM_ATTR_ORG_OTHER;
+//		}
 	}
 
 	int getOrganizationNativeAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case MA_PIM_ATTR_ORG_WORK:
-				return Organization.TYPE_WORK;
-			case MA_PIM_ATTR_ORG_CUSTOM:
-				return Organization.TYPE_CUSTOM;
-			default:
-				return Organization.TYPE_OTHER;
-		}
+		return mAttributes.get(attr);
+//		switch (attr)
+//		{
+//			case MA_PIM_ATTR_ORG_WORK:
+//				return Organization.TYPE_WORK;
+//			case MA_PIM_ATTR_ORG_CUSTOM:
+//				return Organization.TYPE_CUSTOM;
+//			default:
+//				return Organization.TYPE_OTHER;
+//		}
 	}
 
 	int getPhoneAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case Phone.TYPE_CUSTOM:
-				return MA_PIM_ATTR_PHONE_CUSTOM;
-			case Phone.TYPE_HOME:
-				return MA_PIM_ATTR_PHONE_HOME;
-			case Phone.TYPE_MOBILE:
-				return MA_PIM_ATTR_PHONE_MOBILE;
-			case Phone.TYPE_WORK:
-				return MA_PIM_ATTR_PHONE_WORK;
-			case Phone.TYPE_FAX_WORK:
-				return MA_PIM_ATTR_PHONE_WORK_FAX;
-			case Phone.TYPE_FAX_HOME:
-				return MA_PIM_ATTR_PHONE_HOME_FAX;
-			case Phone.TYPE_PAGER:
-				return MA_PIM_ATTR_PHONE_PAGER;
-			case Phone.TYPE_CALLBACK:
-				return MA_PIM_ATTR_PHONE_CALLBACK;
-			case Phone.TYPE_CAR:
-				return MA_PIM_ATTR_PHONE_CAR;
-			case Phone.TYPE_COMPANY_MAIN:
-				return MA_PIM_ATTR_PHONE_COMPANY_MAIN;
-			case Phone.TYPE_ISDN:
-				return MA_PIM_ATTR_PHONE_ISDN;
-			case Phone.TYPE_OTHER_FAX:
-				return MA_PIM_ATTR_PHONE_OTHER_FAX;
-			case Phone.TYPE_RADIO:
-				return MA_PIM_ATTR_PHONE_RADIO;
-			case Phone.TYPE_TELEX:
-				return MA_PIM_ATTR_PHONE_TELEX;
-			case Phone.TYPE_TTY_TDD:
-				return MA_PIM_ATTR_PHONE_TTY_TDD;
-			case Phone.TYPE_WORK_MOBILE:
-				return MA_PIM_ATTR_PHONE_WORK_MOBILE;
-			case Phone.TYPE_WORK_PAGER:
-				return MA_PIM_ATTR_PHONE_WORK_PAGER;
-			case Phone.TYPE_ASSISTANT:
-				return MA_PIM_ATTR_PHONE_ASSISTANT;
-			case Phone.TYPE_MMS:
-				return MA_PIM_ATTR_PHONE_MMS;
-			case Phone.TYPE_OTHER:
-			case Phone.TYPE_MAIN:
-			default:
-				return MA_PIM_ATTR_PHONE_OTHER;
-		}
+		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
+//		switch (attr)
+//		{
+//			case Phone.TYPE_CUSTOM:
+//				return MA_PIM_ATTR_PHONE_CUSTOM;
+//			case Phone.TYPE_HOME:
+//				return MA_PIM_ATTR_PHONE_HOME;
+//			case Phone.TYPE_MOBILE:
+//				return MA_PIM_ATTR_PHONE_MOBILE;
+//			case Phone.TYPE_WORK:
+//				return MA_PIM_ATTR_PHONE_WORK;
+//			case Phone.TYPE_FAX_WORK:
+//				return MA_PIM_ATTR_PHONE_WORK_FAX;
+//			case Phone.TYPE_FAX_HOME:
+//				return MA_PIM_ATTR_PHONE_HOME_FAX;
+//			case Phone.TYPE_PAGER:
+//				return MA_PIM_ATTR_PHONE_PAGER;
+//			case Phone.TYPE_CALLBACK:
+//				return MA_PIM_ATTR_PHONE_CALLBACK;
+//			case Phone.TYPE_CAR:
+//				return MA_PIM_ATTR_PHONE_CAR;
+//			case Phone.TYPE_COMPANY_MAIN:
+//				return MA_PIM_ATTR_PHONE_COMPANY_MAIN;
+//			case Phone.TYPE_ISDN:
+//				return MA_PIM_ATTR_PHONE_ISDN;
+//			case Phone.TYPE_OTHER_FAX:
+//				return MA_PIM_ATTR_PHONE_OTHER_FAX;
+//			case Phone.TYPE_RADIO:
+//				return MA_PIM_ATTR_PHONE_RADIO;
+//			case Phone.TYPE_TELEX:
+//				return MA_PIM_ATTR_PHONE_TELEX;
+//			case Phone.TYPE_TTY_TDD:
+//				return MA_PIM_ATTR_PHONE_TTY_TDD;
+//			case Phone.TYPE_WORK_MOBILE:
+//				return MA_PIM_ATTR_PHONE_WORK_MOBILE;
+//			case Phone.TYPE_WORK_PAGER:
+//				return MA_PIM_ATTR_PHONE_WORK_PAGER;
+//			case Phone.TYPE_ASSISTANT:
+//				return MA_PIM_ATTR_PHONE_ASSISTANT;
+//			case Phone.TYPE_MMS:
+//				return MA_PIM_ATTR_PHONE_MMS;
+//			case Phone.TYPE_OTHER:
+//			case Phone.TYPE_MAIN:
+//			default:
+//				return MA_PIM_ATTR_PHONE_OTHER;
+//		}
 	}
 
 	int getPhoneNativeAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case MA_PIM_ATTR_PHONE_CUSTOM:
-				return Phone.TYPE_CUSTOM;
-			case MA_PIM_ATTR_PHONE_HOME:
-				return Phone.TYPE_HOME;
-			case MA_PIM_ATTR_PHONE_MOBILE:
-				return Phone.TYPE_MOBILE;
-			case MA_PIM_ATTR_PHONE_WORK:
-				return Phone.TYPE_WORK;
-			case MA_PIM_ATTR_PHONE_WORK_FAX:
-				return Phone.TYPE_FAX_WORK;
-			case MA_PIM_ATTR_PHONE_HOME_FAX:
-				return Phone.TYPE_FAX_HOME;
-			case MA_PIM_ATTR_PHONE_PAGER:
-				return Phone.TYPE_PAGER;
-			case MA_PIM_ATTR_PHONE_CALLBACK:
-				return Phone.TYPE_CALLBACK;
-			case MA_PIM_ATTR_PHONE_CAR:
-				return Phone.TYPE_CAR;
-			case MA_PIM_ATTR_PHONE_COMPANY_MAIN:
-				return Phone.TYPE_COMPANY_MAIN;
-			case MA_PIM_ATTR_PHONE_ISDN:
-				return Phone.TYPE_ISDN;
-			case MA_PIM_ATTR_PHONE_OTHER_FAX:
-				return Phone.TYPE_OTHER_FAX;
-			case MA_PIM_ATTR_PHONE_RADIO:
-				return Phone.TYPE_RADIO;
-			case MA_PIM_ATTR_PHONE_TELEX:
-				return Phone.TYPE_TELEX;
-			case MA_PIM_ATTR_PHONE_TTY_TDD:
-				return Phone.TYPE_TTY_TDD;
-			case MA_PIM_ATTR_PHONE_WORK_MOBILE:
-				return Phone.TYPE_WORK_MOBILE;
-			case MA_PIM_ATTR_PHONE_WORK_PAGER:
-				return Phone.TYPE_WORK_PAGER;
-			case MA_PIM_ATTR_PHONE_ASSISTANT:
-				return Phone.TYPE_ASSISTANT;
-			case MA_PIM_ATTR_PHONE_MMS:
-				return Phone.TYPE_MMS;
-			default:
-				return Phone.TYPE_OTHER;
-		}
+		return mAttributes.get(attr);
+//		switch (attr)
+//		{
+//			case MA_PIM_ATTR_PHONE_CUSTOM:
+//				return Phone.TYPE_CUSTOM;
+//			case MA_PIM_ATTR_PHONE_HOME:
+//				return Phone.TYPE_HOME;
+//			case MA_PIM_ATTR_PHONE_MOBILE:
+//				return Phone.TYPE_MOBILE;
+//			case MA_PIM_ATTR_PHONE_WORK:
+//				return Phone.TYPE_WORK;
+//			case MA_PIM_ATTR_PHONE_WORK_FAX:
+//				return Phone.TYPE_FAX_WORK;
+//			case MA_PIM_ATTR_PHONE_HOME_FAX:
+//				return Phone.TYPE_FAX_HOME;
+//			case MA_PIM_ATTR_PHONE_PAGER:
+//				return Phone.TYPE_PAGER;
+//			case MA_PIM_ATTR_PHONE_CALLBACK:
+//				return Phone.TYPE_CALLBACK;
+//			case MA_PIM_ATTR_PHONE_CAR:
+//				return Phone.TYPE_CAR;
+//			case MA_PIM_ATTR_PHONE_COMPANY_MAIN:
+//				return Phone.TYPE_COMPANY_MAIN;
+//			case MA_PIM_ATTR_PHONE_ISDN:
+//				return Phone.TYPE_ISDN;
+//			case MA_PIM_ATTR_PHONE_OTHER_FAX:
+//				return Phone.TYPE_OTHER_FAX;
+//			case MA_PIM_ATTR_PHONE_RADIO:
+//				return Phone.TYPE_RADIO;
+//			case MA_PIM_ATTR_PHONE_TELEX:
+//				return Phone.TYPE_TELEX;
+//			case MA_PIM_ATTR_PHONE_TTY_TDD:
+//				return Phone.TYPE_TTY_TDD;
+//			case MA_PIM_ATTR_PHONE_WORK_MOBILE:
+//				return Phone.TYPE_WORK_MOBILE;
+//			case MA_PIM_ATTR_PHONE_WORK_PAGER:
+//				return Phone.TYPE_WORK_PAGER;
+//			case MA_PIM_ATTR_PHONE_ASSISTANT:
+//				return Phone.TYPE_ASSISTANT;
+//			case MA_PIM_ATTR_PHONE_MMS:
+//				return Phone.TYPE_MMS;
+//			default:
+//				return Phone.TYPE_OTHER;
+//		}
 	}
 
 	int getTitleAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case Organization.TYPE_WORK:
-				return MA_PIM_ATTR_TITLE_WORK;
-			case Organization.TYPE_CUSTOM:
-				return MA_PIM_ATTR_TITLE_CUSTOM;
-			default:
-				return MA_PIM_ATTR_TITLE_OTHER;
-		}
+		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
+//		switch (attr)
+//		{
+//			case Organization.TYPE_WORK:
+//				return MA_PIM_ATTR_TITLE_WORK;
+//			case Organization.TYPE_CUSTOM:
+//				return MA_PIM_ATTR_TITLE_CUSTOM;
+//			default:
+//				return MA_PIM_ATTR_TITLE_OTHER;
+//		}
 	}
 
 	int getTitleNativeAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case MA_PIM_ATTR_TITLE_WORK:
-				return Organization.TYPE_WORK;
-			case MA_PIM_ATTR_TITLE_CUSTOM:
-				return Organization.TYPE_CUSTOM;
-			default:
-				return Organization.TYPE_OTHER;
-		}
+		return mAttributes.get(attr);
+//		switch (attr)
+//		{
+//			case MA_PIM_ATTR_TITLE_WORK:
+//				return Organization.TYPE_WORK;
+//			case MA_PIM_ATTR_TITLE_CUSTOM:
+//				return Organization.TYPE_CUSTOM;
+//			default:
+//				return Organization.TYPE_OTHER;
+//		}
 	}
 
 	int getOrganizationInfoAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case Organization.TYPE_WORK:
-				return MA_PIM_ATTR_ORG_INFO_WORK;
-			case Organization.TYPE_CUSTOM:
-				return MA_PIM_ATTR_ORG_INFO_CUSTOM;
-			default:
-				return MA_PIM_ATTR_ORG_INFO_OTHER;
-		}
+		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
+//		switch (attr)
+//		{
+//			case Organization.TYPE_WORK:
+//				return MA_PIM_ATTR_ORG_INFO_WORK;
+//			case Organization.TYPE_CUSTOM:
+//				return MA_PIM_ATTR_ORG_INFO_CUSTOM;
+//			default:
+//				return MA_PIM_ATTR_ORG_INFO_OTHER;
+//		}
 	}
 
 	int getOrganizationInfoNativeAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case MA_PIM_ATTR_ORG_INFO_WORK:
-				return Organization.TYPE_WORK;
-			case MA_PIM_ATTR_ORG_INFO_CUSTOM:
-				return Organization.TYPE_CUSTOM;
-			default:
-				return Organization.TYPE_OTHER;
-		}
+		return mAttributes.get(attr);
+//		switch (attr)
+//		{
+//			case MA_PIM_ATTR_ORG_INFO_WORK:
+//				return Organization.TYPE_WORK;
+//			case MA_PIM_ATTR_ORG_INFO_CUSTOM:
+//				return Organization.TYPE_CUSTOM;
+//			default:
+//				return Organization.TYPE_OTHER;
+//		}
 	}
 
 	int getWebsiteAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case Website.TYPE_HOMEPAGE:
-				return MA_PIM_ATTR_WEBSITE_HOMEPAGE;
-			case Website.TYPE_BLOG:
-				return MA_PIM_ATTR_WEBSITE_BLOG;
-			case Website.TYPE_PROFILE:
-				return MA_PIM_ATTR_WEBSITE_PROFILE;
-			case Website.TYPE_HOME:
-				return MA_PIM_ATTR_WEBSITE_HOME;
-			case Website.TYPE_WORK:
-				return MA_PIM_ATTR_WEBSITE_WORK;
-			case Website.TYPE_FTP:
-				return MA_PIM_ATTR_WEBSITE_FTP;
-			case Website.TYPE_CUSTOM:
-				return MA_PIM_ATTR_WEBSITE_CUSTOM;
-			default:
-				return MA_PIM_ATTR_WEBSITE_OTHER;
-		}
+		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
+//		switch (attr)
+//		{
+//			case Website.TYPE_HOMEPAGE:
+//				return MA_PIM_ATTR_WEBSITE_HOMEPAGE;
+//			case Website.TYPE_BLOG:
+//				return MA_PIM_ATTR_WEBSITE_BLOG;
+//			case Website.TYPE_PROFILE:
+//				return MA_PIM_ATTR_WEBSITE_PROFILE;
+//			case Website.TYPE_HOME:
+//				return MA_PIM_ATTR_WEBSITE_HOME;
+//			case Website.TYPE_WORK:
+//				return MA_PIM_ATTR_WEBSITE_WORK;
+//			case Website.TYPE_FTP:
+//				return MA_PIM_ATTR_WEBSITE_FTP;
+//			case Website.TYPE_CUSTOM:
+//				return MA_PIM_ATTR_WEBSITE_CUSTOM;
+//			default:
+//				return MA_PIM_ATTR_WEBSITE_OTHER;
+//		}
 	}
 
 	int getWebsiteNativeAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case MA_PIM_ATTR_WEBSITE_HOMEPAGE:
-				return Website.TYPE_HOMEPAGE;
-			case MA_PIM_ATTR_WEBSITE_BLOG:
-				return Website.TYPE_BLOG;
-			case MA_PIM_ATTR_WEBSITE_PROFILE:
-				return Website.TYPE_PROFILE;
-			case MA_PIM_ATTR_WEBSITE_HOME:
-				return Website.TYPE_HOME;
-			case MA_PIM_ATTR_WEBSITE_WORK:
-				return Website.TYPE_WORK;
-			case MA_PIM_ATTR_WEBSITE_FTP:
-				return Website.TYPE_FTP;
-			case MA_PIM_ATTR_WEBSITE_CUSTOM:
-				return Website.TYPE_CUSTOM;
-			default:
-				return Website.TYPE_OTHER;
-		}
+		return mAttributes.get(attr);
+//		switch (attr)
+//		{
+//			case MA_PIM_ATTR_WEBSITE_HOMEPAGE:
+//				return Website.TYPE_HOMEPAGE;
+//			case MA_PIM_ATTR_WEBSITE_BLOG:
+//				return Website.TYPE_BLOG;
+//			case MA_PIM_ATTR_WEBSITE_PROFILE:
+//				return Website.TYPE_PROFILE;
+//			case MA_PIM_ATTR_WEBSITE_HOME:
+//				return Website.TYPE_HOME;
+//			case MA_PIM_ATTR_WEBSITE_WORK:
+//				return Website.TYPE_WORK;
+//			case MA_PIM_ATTR_WEBSITE_FTP:
+//				return Website.TYPE_FTP;
+//			case MA_PIM_ATTR_WEBSITE_CUSTOM:
+//				return Website.TYPE_CUSTOM;
+//			default:
+//				return Website.TYPE_OTHER;
+//		}
 	}
 
 	int getImAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case Im.TYPE_HOME:
-				return MA_PIM_ATTR_IM_HOME;
-			case Im.TYPE_WORK:
-				return MA_PIM_ATTR_IM_WORK;
-			case Im.TYPE_CUSTOM:
-				return MA_PIM_ATTR_IM_CUSTOM;
-			default:
-				return MA_PIM_ATTR_IM_OTHER;
-		}
+		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
+//		switch (attr)
+//		{
+//			case Im.TYPE_HOME:
+//				return MA_PIM_ATTR_IM_HOME;
+//			case Im.TYPE_WORK:
+//				return MA_PIM_ATTR_IM_WORK;
+//			case Im.TYPE_CUSTOM:
+//				return MA_PIM_ATTR_IM_CUSTOM;
+//			default:
+//				return MA_PIM_ATTR_IM_OTHER;
+//		}
 	}
 
 	int getImNativeAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case MA_PIM_ATTR_IM_HOME:
-				return Im.TYPE_HOME;
-			case MA_PIM_ATTR_IM_WORK:
-				return Im.TYPE_WORK;
-			case MA_PIM_ATTR_IM_CUSTOM:
-				return Im.TYPE_CUSTOM;
-			default:
-				return Im.TYPE_OTHER;
-		}
+		return mAttributes.get(attr);
+//		switch (attr)
+//		{
+//			case MA_PIM_ATTR_IM_HOME:
+//				return Im.TYPE_HOME;
+//			case MA_PIM_ATTR_IM_WORK:
+//				return Im.TYPE_WORK;
+//			case MA_PIM_ATTR_IM_CUSTOM:
+//				return Im.TYPE_CUSTOM;
+//			default:
+//				return Im.TYPE_OTHER;
+//		}
 	}
 
 	int getRelationAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case Relation.TYPE_MOTHER:
-				return MA_PIM_ATTR_RELATION_MOTHER;
-			case Relation.TYPE_FATHER:
-				return MA_PIM_ATTR_RELATION_FATHER;
-			case Relation.TYPE_PARENT:
-				return MA_PIM_ATTR_RELATION_PARENT;
-			case Relation.TYPE_SISTER:
-				return MA_PIM_ATTR_RELATION_SISTER;
-			case Relation.TYPE_BROTHER:
-				return MA_PIM_ATTR_RELATION_BROTHER;
-			case Relation.TYPE_CHILD:
-				return MA_PIM_ATTR_RELATION_CHILD;
-			case Relation.TYPE_FRIEND:
-				return MA_PIM_ATTR_RELATION_FRIEND;
-			case Relation.TYPE_SPOUSE:
-				return MA_PIM_ATTR_RELATION_SPOUSE;
-			case Relation.TYPE_PARTNER:
-				return MA_PIM_ATTR_RELATION_PARTNER;
-			case Relation.TYPE_MANAGER:
-				return MA_PIM_ATTR_RELATION_MANAGER;
-			case Relation.TYPE_ASSISTANT:
-				return MA_PIM_ATTR_RELATION_ASSISTANT;
-			case Relation.TYPE_DOMESTIC_PARTNER:
-				return MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER;
-			case Relation.TYPE_REFERRED_BY:
-				return MA_PIM_ATTR_RELATION_REFERRED_BY;
-			case Relation.TYPE_CUSTOM:
-				return MA_PIM_ATTR_RELATION_CUSTOM;
-			default:
-				return MA_PIM_ATTR_RELATION_RELATIVE;
-		}
+		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
+//		switch (attr)
+//		{
+//			case Relation.TYPE_MOTHER:
+//				return MA_PIM_ATTR_RELATION_MOTHER;
+//			case Relation.TYPE_FATHER:
+//				return MA_PIM_ATTR_RELATION_FATHER;
+//			case Relation.TYPE_PARENT:
+//				return MA_PIM_ATTR_RELATION_PARENT;
+//			case Relation.TYPE_SISTER:
+//				return MA_PIM_ATTR_RELATION_SISTER;
+//			case Relation.TYPE_BROTHER:
+//				return MA_PIM_ATTR_RELATION_BROTHER;
+//			case Relation.TYPE_CHILD:
+//				return MA_PIM_ATTR_RELATION_CHILD;
+//			case Relation.TYPE_FRIEND:
+//				return MA_PIM_ATTR_RELATION_FRIEND;
+//			case Relation.TYPE_SPOUSE:
+//				return MA_PIM_ATTR_RELATION_SPOUSE;
+//			case Relation.TYPE_PARTNER:
+//				return MA_PIM_ATTR_RELATION_PARTNER;
+//			case Relation.TYPE_MANAGER:
+//				return MA_PIM_ATTR_RELATION_MANAGER;
+//			case Relation.TYPE_ASSISTANT:
+//				return MA_PIM_ATTR_RELATION_ASSISTANT;
+//			case Relation.TYPE_DOMESTIC_PARTNER:
+//				return MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER;
+//			case Relation.TYPE_REFERRED_BY:
+//				return MA_PIM_ATTR_RELATION_REFERRED_BY;
+//			case Relation.TYPE_CUSTOM:
+//				return MA_PIM_ATTR_RELATION_CUSTOM;
+//			default:
+//				return MA_PIM_ATTR_RELATION_RELATIVE;
+//		}
 	}
 
 	int getRelationNativeAttribute(int attr)
 	{
-		switch (attr)
-		{
-			case MA_PIM_ATTR_RELATION_MOTHER:
-				return Relation.TYPE_MOTHER;
-			case MA_PIM_ATTR_RELATION_FATHER:
-				return Relation.TYPE_FATHER;
-			case MA_PIM_ATTR_RELATION_PARENT:
-				return Relation.TYPE_PARENT;
-			case MA_PIM_ATTR_RELATION_SISTER:
-				return Relation.TYPE_SISTER;
-			case MA_PIM_ATTR_RELATION_BROTHER:
-				return Relation.TYPE_BROTHER;
-			case MA_PIM_ATTR_RELATION_CHILD:
-				return Relation.TYPE_CHILD;
-			case MA_PIM_ATTR_RELATION_FRIEND:
-				return Relation.TYPE_FRIEND;
-			case MA_PIM_ATTR_RELATION_SPOUSE:
-				return Relation.TYPE_SPOUSE;
-			case MA_PIM_ATTR_RELATION_PARTNER:
-				return Relation.TYPE_PARTNER;
-			case MA_PIM_ATTR_RELATION_MANAGER:
-				return Relation.TYPE_MANAGER;
-			case MA_PIM_ATTR_RELATION_ASSISTANT:
-				return Relation.TYPE_ASSISTANT;
-			case MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER:
-				return Relation.TYPE_DOMESTIC_PARTNER;
-			case MA_PIM_ATTR_RELATION_REFERRED_BY:
-				return Relation.TYPE_REFERRED_BY;
-			case MA_PIM_ATTR_RELATION_CUSTOM:
-				return Relation.TYPE_CUSTOM;
-			default:
-				return Relation.TYPE_RELATIVE;
-		}
+		return mAttributes.get(attr);
+//		switch (attr)
+//		{
+//			case MA_PIM_ATTR_RELATION_MOTHER:
+//				return Relation.TYPE_MOTHER;
+//			case MA_PIM_ATTR_RELATION_FATHER:
+//				return Relation.TYPE_FATHER;
+//			case MA_PIM_ATTR_RELATION_PARENT:
+//				return Relation.TYPE_PARENT;
+//			case MA_PIM_ATTR_RELATION_SISTER:
+//				return Relation.TYPE_SISTER;
+//			case MA_PIM_ATTR_RELATION_BROTHER:
+//				return Relation.TYPE_BROTHER;
+//			case MA_PIM_ATTR_RELATION_CHILD:
+//				return Relation.TYPE_CHILD;
+//			case MA_PIM_ATTR_RELATION_FRIEND:
+//				return Relation.TYPE_FRIEND;
+//			case MA_PIM_ATTR_RELATION_SPOUSE:
+//				return Relation.TYPE_SPOUSE;
+//			case MA_PIM_ATTR_RELATION_PARTNER:
+//				return Relation.TYPE_PARTNER;
+//			case MA_PIM_ATTR_RELATION_MANAGER:
+//				return Relation.TYPE_MANAGER;
+//			case MA_PIM_ATTR_RELATION_ASSISTANT:
+//				return Relation.TYPE_ASSISTANT;
+//			case MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER:
+//				return Relation.TYPE_DOMESTIC_PARTNER;
+//			case MA_PIM_ATTR_RELATION_REFERRED_BY:
+//				return Relation.TYPE_REFERRED_BY;
+//			case MA_PIM_ATTR_RELATION_CUSTOM:
+//				return Relation.TYPE_CUSTOM;
+//			default:
+//				return Relation.TYPE_RELATIVE;
+//		}
 	}
 
 	int getAttribute(int index)
@@ -777,7 +917,7 @@ public class PIMField
 					setFieldValue( names, infos, StructuredPostal.IS_PRIMARY, Integer.toString(attribute) );
 					ret &= 0xFFFF;
 				}
-				attrNativeValue = getFormattedAddressNativeAttribute(attrNativeValue);
+				attrNativeValue = getAddressNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
