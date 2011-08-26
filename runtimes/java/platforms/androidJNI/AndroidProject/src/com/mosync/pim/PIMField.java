@@ -1,6 +1,7 @@
 package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
+import com.mosync.internal.android.BigPhatError;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,134 +22,133 @@ import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.CommonDataKinds.Website;
 
+// field types
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_ADDR;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_BIRTHDAY;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_CLASS;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_EMAIL;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_FORMATTED_ADDR;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_FORMATTED_NAME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_NAME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_NICKNAME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_NOTE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_ORG;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_PHOTO;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_PHOTO_URL;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_PUBLIC_KEY;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_REVISION;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_TEL;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_TITLE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_UID;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_URL;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_IM;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_RELATION;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_ORG_INFO;
+
+// field data types
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_BINARY;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_BOOLEAN;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_DATE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_INT;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING_ARRAY;
+
+//address field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_CUSTOM;
+
+//email field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_MOBILE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_CUSTOM;
+
+//formatted address field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM;
+
+//organization field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_CUSTOM;
+
+//phone field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_MOBILE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_HOME_FAX;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_WORK_FAX;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_PAGER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_IPHONE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_CALLBACK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_CAR;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_COMPANY_MAIN;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_ISDN;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_OTHER_FAX;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_RADIO;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_TELEX;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_TTY_TDD;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_WORK_MOBILE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_WORK_PAGER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_ASSISTANT;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_MMS;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_CUSTOM;
+
+//title field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_TITLE_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_TITLE_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_TITLE_CUSTOM;
+
+//website field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_HOMEPAGE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_BLOG;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_PROFILE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_FTP;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_CUSTOM;
+
+//im field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_CUSTOM;
+
+//relation field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_MOTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_FATHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_PARENT;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_SISTER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_BROTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_CHILD;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_FRIEND;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_SPOUSE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_PARTNER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_MANAGER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_ASSISTANT;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_REFERRED_BY;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_RELATIVE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_CUSTOM;
+
+//organization info field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_INFO_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_INFO_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_INFO_CUSTOM;
+
+//preferred attribute
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PREFERRED;
+
 public class PIMField
 {
-	// field types
-	final static int MA_PIM_FIELD_CONTACT_ADDR = 100;
-	final static int MA_PIM_FIELD_CONTACT_BIRTHDAY = 101;
-	final static int MA_PIM_FIELD_CONTACT_CLASS = 102;
-	final static int MA_PIM_FIELD_CONTACT_EMAIL = 103;
-	final static int MA_PIM_FIELD_CONTACT_FORMATTED_ADDR = 104;
-	final static int MA_PIM_FIELD_CONTACT_FORMATTED_NAME = 105;
-	final static int MA_PIM_FIELD_CONTACT_NAME = 106;
-	final static int MA_PIM_FIELD_CONTACT_NICKNAME = 107;
-	final static int MA_PIM_FIELD_CONTACT_NOTE = 108;
-	final static int MA_PIM_FIELD_CONTACT_ORG = 109;
-	final static int MA_PIM_FIELD_CONTACT_PHOTO = 110;
-	final static int MA_PIM_FIELD_CONTACT_PHOTO_URL = 111;
-	final static int MA_PIM_FIELD_CONTACT_PUBLIC_KEY = 112;
-	final static int MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING = 113;
-	final static int MA_PIM_FIELD_CONTACT_REVISION = 114;
-	final static int MA_PIM_FIELD_CONTACT_TEL = 115;
-	final static int MA_PIM_FIELD_CONTACT_TITLE = 116;
-	final static int MA_PIM_FIELD_CONTACT_UID = 117;
-	final static int MA_PIM_FIELD_CONTACT_URL = 118;
-	final static int MA_PIM_FIELD_CONTACT_IM = 119;
-	final static int MA_PIM_FIELD_CONTACT_RELATION = 120;
-	final static int MA_PIM_FIELD_CONTACT_ORG_INFO = 121;
-
-	// field data types
-	private final static int MA_PIM_TYPE_INVALID = -1;
-	private final static int MA_PIM_TYPE_BINARY = 0;
-	//private final static int MA_PIM_TYPE_BOOLEAN = 1;
-	private final static int MA_PIM_TYPE_DATE = 2;
-	private final static int MA_PIM_TYPE_INT = 3;
-	private final static int MA_PIM_TYPE_STRING = 4;
-	private final static int MA_PIM_TYPE_STRING_ARRAY = 5;
-
-	//address field attributes
-	final static int MA_PIM_ATTR_ADDR_HOME = 101;
-	final static int MA_PIM_ATTR_ADDR_WORK = 102;
-	final static int MA_PIM_ATTR_ADDR_OTHER = 103;
-	final static int MA_PIM_ATTR_ADDR_CUSTOM = 104;
-
-	//email field attributes
-	final static int MA_PIM_ATTR_EMAIL_HOME = 201;
-	final static int MA_PIM_ATTR_EMAIL_WORK = 202;
-	final static int MA_PIM_ATTR_EMAIL_MOBILE = 203;
-	final static int MA_PIM_ATTR_EMAIL_OTHER = 204;
-	final static int MA_PIM_ATTR_EMAIL_CUSTOM = 205;
-
-	//formatted address field attributes
-	final static int MA_PIM_ATTR_FORMATTED_ADDR_HOME = 301;
-	final static int MA_PIM_ATTR_FORMATTED_ADDR_WORK = 302;
-	final static int MA_PIM_ATTR_FORMATTED_ADDR_OTHER = 303;
-	final static int MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM = 304;
-
-	//organization field attributes
-	final static int MA_PIM_ATTR_ORG_WORK = 401;
-	final static int MA_PIM_ATTR_ORG_OTHER = 402;
-	final static int MA_PIM_ATTR_ORG_CUSTOM = 403;
-
-	//phone field attributes
-	final static int MA_PIM_ATTR_PHONE_HOME = 501;
-	final static int MA_PIM_ATTR_PHONE_MOBILE = 502;
-	final static int MA_PIM_ATTR_PHONE_HOME_FAX = 503;
-	final static int MA_PIM_ATTR_PHONE_WORK_FAX = 504;
-	final static int MA_PIM_ATTR_PHONE_PAGER = 505;
-	final static int MA_PIM_ATTR_PHONE_IPHONE = 506;
-	final static int MA_PIM_ATTR_PHONE_WORK = 507;
-	final static int MA_PIM_ATTR_PHONE_CALLBACK = 508;
-	final static int MA_PIM_ATTR_PHONE_CAR = 509;
-	final static int MA_PIM_ATTR_PHONE_COMPANY_MAIN = 510;
-	final static int MA_PIM_ATTR_PHONE_ISDN = 511;
-	final static int MA_PIM_ATTR_PHONE_OTHER_FAX = 512;
-	final static int MA_PIM_ATTR_PHONE_RADIO = 513;
-	final static int MA_PIM_ATTR_PHONE_TELEX = 514;
-	final static int MA_PIM_ATTR_PHONE_TTY_TDD = 515;
-	final static int MA_PIM_ATTR_PHONE_WORK_MOBILE = 516;
-	final static int MA_PIM_ATTR_PHONE_WORK_PAGER = 517;
-	final static int MA_PIM_ATTR_PHONE_ASSISTANT = 518;
-	final static int MA_PIM_ATTR_PHONE_MMS = 519;
-	final static int MA_PIM_ATTR_PHONE_OTHER = 520;
-	final static int MA_PIM_ATTR_PHONE_CUSTOM = 521;
-
-	//title field attributes
-	final static int MA_PIM_ATTR_TITLE_WORK = 601;
-	final static int MA_PIM_ATTR_TITLE_OTHER = 602;
-	final static int MA_PIM_ATTR_TITLE_CUSTOM = 603;
-
-	//website field attributes
-	final static int MA_PIM_ATTR_WEBSITE_HOMEPAGE = 701;
-	final static int MA_PIM_ATTR_WEBSITE_BLOG = 702;
-	final static int MA_PIM_ATTR_WEBSITE_PROFILE = 703;
-	final static int MA_PIM_ATTR_WEBSITE_HOME = 704;
-	final static int MA_PIM_ATTR_WEBSITE_WORK = 705;
-	final static int MA_PIM_ATTR_WEBSITE_FTP = 706;
-	final static int MA_PIM_ATTR_WEBSITE_OTHER = 707;
-	final static int MA_PIM_ATTR_WEBSITE_CUSTOM = 708;
-
-	//im field attributes
-	final static int MA_PIM_ATTR_IM_HOME = 801;
-	final static int MA_PIM_ATTR_IM_WORK = 802;
-	final static int MA_PIM_ATTR_IM_OTHER = 803;
-	final static int MA_PIM_ATTR_IM_CUSTOM = 804;
-
-	//relation field attributes
-	final static int MA_PIM_ATTR_RELATION_MOTHER = 901;
-	final static int MA_PIM_ATTR_RELATION_FATHER = 902;
-	final static int MA_PIM_ATTR_RELATION_PARENT = 903;
-	final static int MA_PIM_ATTR_RELATION_SISTER = 904;
-	final static int MA_PIM_ATTR_RELATION_BROTHER = 905;
-	final static int MA_PIM_ATTR_RELATION_CHILD = 906;
-	final static int MA_PIM_ATTR_RELATION_FRIEND = 907;
-	final static int MA_PIM_ATTR_RELATION_SPOUSE = 908;
-	final static int MA_PIM_ATTR_RELATION_PARTNER = 909;
-	final static int MA_PIM_ATTR_RELATION_MANAGER = 910;
-	final static int MA_PIM_ATTR_RELATION_ASSISTANT = 911;
-	final static int MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER = 912;
-	final static int MA_PIM_ATTR_RELATION_REFERRED_BY = 913;
-	final static int MA_PIM_ATTR_RELATION_RELATIVE = 914;
-	final static int MA_PIM_ATTR_RELATION_CUSTOM = 915;
-
-	//organization info field attributes
-	final static int MA_PIM_ATTR_ORG_INFO_WORK = 1001;
-	final static int MA_PIM_ATTR_ORG_INFO_OTHER = 1002;
-	final static int MA_PIM_ATTR_ORG_INFO_CUSTOM = 1003;
-
-	//preferred attribute
-	final static int MA_PIM_ATTR_PREFERRED = 0x10000;
-
 	Map<Integer,Integer> mAttributes = new HashMap<Integer,Integer>();
 
 	ArrayList<String[]> mStrNames;
@@ -900,9 +900,8 @@ public class PIMField
 		return ret;
 	}
 
-	int setAttribute(int index, int attribute)
+	void setAttribute(int index, int attribute)
 	{
-		int ret = 0;
 		int attrNativeValue = 0;
 		String[] names = mStrNames.get(index);
 		String[] infos = mStrInfos.get(index);
@@ -912,98 +911,86 @@ public class PIMField
 		switch ( getMoSyncType() )
 		{
 			case MA_PIM_FIELD_CONTACT_ADDR:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTR_PREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, StructuredPostal.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
 				attrNativeValue = getAddressNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTR_PREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, StructuredPostal.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
 				attrNativeValue = getFormattedAddressNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_EMAIL:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTR_PREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Email.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				 attrNativeValue = getEmailNativeAttribute(attrNativeValue);
+				attrNativeValue = getEmailNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, Email.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTR_PREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Organization.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
 				attrNativeValue = getOrganizationNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_TITLE:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTR_PREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Organization.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
 				attrNativeValue = getTitleNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG_INFO:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTR_PREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Organization.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
 				attrNativeValue = getOrganizationInfoNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_TEL:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTR_PREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Phone.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
 				attrNativeValue = getPhoneNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, Phone.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_URL:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTR_PREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Website.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
 				attrNativeValue = getWebsiteNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, Website.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_IM:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTR_PREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Im.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
 				attrNativeValue = getImNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, Im.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_RELATION:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTR_PREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Relation.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
 				attrNativeValue = getRelationNativeAttribute(attrNativeValue);
 				setFieldValue( names, infos, Relation.TYPE, Integer.toString(attrNativeValue) );
 				break;
 		}
-
-		return ret;
 	}
 
 	public String getCustomLabel(int index)
@@ -1147,7 +1134,7 @@ public class PIMField
 			case MA_PIM_FIELD_CONTACT_ORG_INFO:
 				return MA_PIM_TYPE_STRING_ARRAY;
 			default:
-				return MA_PIM_TYPE_INVALID;
+				return -1;
 		}
 	}
 
@@ -1203,7 +1190,7 @@ public class PIMField
 		return ret.toString();
 	}
 
-	int setData(int index, String buffer)
+	void setData(int index, String buffer)
 	{
 		byte tmp[] = new byte[10];
 		int bufIndex = 0;
@@ -1244,7 +1231,7 @@ public class PIMField
 		int count = Integer.parseInt( tmp.toString() );
 
 		if (length - 4 != count)
-			return -1;
+			throw new BigPhatError("Invalid PIM value buffer size");
 
 		for (int i=0; i<count; i++)
 		{
@@ -1259,19 +1246,18 @@ public class PIMField
 				infos[i + 1] = tmp.toString();
 			}
 		}
-		return 0;
 	}
 
 	int addData(String buffer)
 	{
 		String[] names = mStrNames.get(0);
 		if (names == null)
-			return -1;
+			throw new BigPhatError("PIMField.addData");
 		String[] infos = new String[names.length];
 		mStrNames.add(names);
 		mStrInfos.add(infos);
 		int index = mStrNames.size() - 1;
-		return setData(index, buffer);
+		return index;
 	}
 
 	String getId(int index)

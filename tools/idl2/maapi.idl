@@ -3324,29 +3324,17 @@ interface MAAPI {
 			NO_LABEL = -8;
 			/// The values's attribute is not set to custom.
 			CUSTOM_ATTRIBUTE = -9;
-			/// The given index is not valid.
-			/// This value is returned by maPimItemGetField(), maPimItemSetValue().
-			INVALID_INDEX = -10;
 			/// The specified pim list is not available on the current platform.
 			UNAVAILABLE_LIST = -11;
-			/// The specified list is not opened. Call maPimListOpen() first.
-			LIST_NOT_OPENED = -12;
 			/// The specified list is already opened.
 			LIST_ALREADY_OPENED = -13;
 			/// The operation is not allowed by the Address Book database.
 			OPERATION_NOT_PERMITTED = -14;
-			/// Invalid handle.
-			INVALID_HANDLE = -15;
-			/// The requested field doesn't have a value.
-			EMPTY_FIELD = -16;
-			/// The specified pim item is not available.
-			UNAVAILABLE_ITEM = -17;
-			/// The allocated buffer is too small
-			BUFFER_TOO_SMALL = -18;
-			/// Invalid buffer structure
-			INVALID_BUFFER = -19;
-			/// The field doesn't have attributes
-			NO_ATTRIBUTES = -20;
+			/// The list or item could not be opened.
+			CANNOT_OPEN = -15;
+			/// The list or item is already opened and locked by the system.
+			/// It must be closed before it can be opened again.
+			ALREADY_OPEN = -16;
 		}
 
 		/**
