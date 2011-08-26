@@ -42,5 +42,6 @@ bool platformRequest(const char *url);
 size_t wcharLength(const wchar* str);
 
 void getScreenResolution(int& w, int &h);
+float getScreenScale();
 
 #endif
