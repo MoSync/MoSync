@@ -1,14 +1,14 @@
 # Copyright (C) 2009 Mobile Sorcery AB
-# 
+#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
 # the Free Software Foundation.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; see the file COPYING.  If not, write to the Free
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -31,19 +31,19 @@ class PipeTask < FileTask
 		dirTask = DirTask.new(work, File.dirname(name))
 		@objects = objects
 		@prerequisites += @objects + [dirTask]
-		
+
 		initFlags
 	end
-	
+
 	def needed?(log = true)
 		return true if(super(log))
 		return flagsNeeded?(log)
 	end
-	
+
 	def cFlags
-		return "#{@FLAGS} #{@NAME} #{@objects.join(' ')}"
+		return "#{@FLAGS} \"#{@NAME}\" \"#{@objects.join('" "')}\""
 	end
-	
+
 	def execute
 		execFlags
 		# pipe-tool may output an empty file and then fail.
@@ -57,7 +57,7 @@ class PipeTask < FileTask
 			error "Pipe-tool failed silently!"
 		end
 	end
-	
+
 	include FlagsChanged
 end
 
@@ -67,7 +67,7 @@ class PipeResourceTask < PipeTask
 		@depFile = "#{File.dirname(name)}/resources.mf"
 		@tempDepFile = "#{@depFile}t"
 		super(work, name, objects, " -depend=#{@tempDepFile} -R")
-		
+
 		# only if the file is not already needed do we care about extra dependencies
 		if(!needed?(false)) then
 			@prerequisites += MakeDependLoader.load(@depFile, @NAME)
@@ -91,7 +91,7 @@ class PipeGccWork < GccWork
 	include GccVersion
 
 	def gcc; mosyncdir + "/bin/xgcc"; end
-	
+
 	def gccmode; "-S"; end
 	def host_flags;
 		flags = ''
@@ -102,9 +102,9 @@ class PipeGccWork < GccWork
 	def host_cppflags
 		return ''#' -frtti'
 	end
-	
+
 	include MoSyncInclude
-	
+
 	def set_defaults
 		default(:BUILDDIR_PREFIX, "")
 		default(:COMMOM_BUILDDDIR_PREFIX, "")
@@ -117,11 +117,11 @@ class PipeGccWork < GccWork
 		end
 		super
 	end
-	
+
 	private
-	
+
 	def object_ending; ".s"; end
-	
+
 	def setup3(all_objects, have_cppfiles)
 		#puts all_objects
 		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".lib") }
