@@ -42,6 +42,8 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include "SettingsScreen.h"
 #include "ImageScreen.h"
+
+
 using namespace MAUtil;
 /**
  * Class that wraps a NativeUI screen widget. We implement
@@ -80,10 +82,7 @@ public:
 		// Make the AppScreen listen for events coming from widgets.
 		MAUtil::Environment::getEnvironment().addCustomEventListener(this);
 		createMainScreen();
-
 		mStackScreen = maWidgetCreate(MAW_STACK_SCREEN);
-
-
 	}
 
 	void createSettingsScreen()
@@ -94,10 +93,13 @@ public:
 		char buffer[256];
 		maCameraGetProperty(MA_CAMERA_FLASH_SUPPORTED, buffer, 256);
 		if(strcmp(buffer, "true") == 1)
+		{
 			mSettingsString->flashSupported = 1;
+		}
 		else
+		{
 			mSettingsString->flashSupported = 0;
-
+		}
 	}
 
 	void createImageScreen()
@@ -118,9 +120,11 @@ public:
 		// of writing this program.
 		if (-1 == mScreen)
 		{
-			maPanic(0,
+			maPanic(
+				0,
 				"This program uses features that are only available on Android and iOS. "
-				"You must run it directly on the device or devices emulator.");
+				"You must run it directly on the device or devices emulator."
+				);
 		}
 
 		// Create the screen's main layout widget.
@@ -152,8 +156,18 @@ public:
 
 	}
 
-	void setCameraButtonProperties(MAHandle widgetHandle , const char * title,
-								int width,  int height )
+	/**
+	 *
+	 * A Wrapper function that sets the common properties
+	 * for the camera control buttons
+	 *
+	 */
+	void setCameraButtonProperties(
+			MAHandle widgetHandle,
+			const char * title,
+			int width,
+			int height
+			)
 	{
 		widgetSetPropertyInt(
 			widgetHandle,
@@ -177,55 +191,74 @@ public:
 			title);
 	}
 
+	/**
+	 * A Wrapper function for creating the camera control buttons
+	 * and the layout that holds them
+	 */
 	void createCameraControlButtons()
 	{
-
-
 		mZoomInButton = maWidgetCreate(MAW_BUTTON);
-		setCameraButtonProperties(mZoomInButton, "+",
-									MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-									MAW_CONSTANT_WRAP_CONTENT);
-
+		setCameraButtonProperties(
+			mZoomInButton,
+			"+",
+			MAW_CONSTANT_FILL_AVAILABLE_SPACE,
+			MAW_CONSTANT_WRAP_CONTENT
+			);
 
 		mShowLastImageButton = maWidgetCreate(MAW_BUTTON);
-		setCameraButtonProperties(mShowLastImageButton, "Image",
-									MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-									MAW_CONSTANT_WRAP_CONTENT);
+		setCameraButtonProperties(
+			mShowLastImageButton,
+			"Image",
+			MAW_CONSTANT_FILL_AVAILABLE_SPACE,
+			MAW_CONSTANT_WRAP_CONTENT
+			);
 
 		mSettingsButton = maWidgetCreate(MAW_BUTTON);
-		setCameraButtonProperties(mSettingsButton, "Settings",
-									MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-									MAW_CONSTANT_WRAP_CONTENT);
-
+		setCameraButtonProperties(
+			mSettingsButton,
+			"Settings",
+			MAW_CONSTANT_FILL_AVAILABLE_SPACE,
+			MAW_CONSTANT_WRAP_CONTENT
+			);
 
 		mZoomOutButton = maWidgetCreate(MAW_BUTTON);
-		setCameraButtonProperties(mZoomOutButton, "-",
-									MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-									MAW_CONSTANT_WRAP_CONTENT);
-
+		setCameraButtonProperties(
+			mZoomOutButton,
+			"-",
+			MAW_CONSTANT_FILL_AVAILABLE_SPACE,
+			MAW_CONSTANT_WRAP_CONTENT
+			);
 
 		mSecondLayoutWidget = maWidgetCreate(MAW_HORIZONTAL_LAYOUT);
 		widgetSetPropertyInt(
 			mSecondLayoutWidget,
 			MAW_WIDGET_WIDTH,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+			MAW_CONSTANT_FILL_AVAILABLE_SPACE
+			);
 		widgetSetPropertyInt(
 			mSecondLayoutWidget,
 			MAW_WIDGET_HEIGHT,
-			65);
+			65
+			);
 
+		//Adding buttons to the horizontal Layout
 		maWidgetAddChild(mSecondLayoutWidget, mZoomInButton);
 		maWidgetAddChild(mSecondLayoutWidget, mShowLastImageButton);
 		maWidgetAddChild(mSecondLayoutWidget, mSettingsButton);
 		maWidgetAddChild(mSecondLayoutWidget, mZoomOutButton);
 
+		// Then we add the layout to its parent
 		maWidgetAddChild(mMainLayoutWidget, mSecondLayoutWidget);
 
-
+		//We create the capture button as a larger button
+		//so it is easier to be touched
 		mCaptureButton = maWidgetCreate(MAW_BUTTON);
-		setCameraButtonProperties(mCaptureButton, "Take Snapshot",
-								MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-								MAW_CONSTANT_WRAP_CONTENT);
+		setCameraButtonProperties(
+			mCaptureButton,
+			"Take Snapshot",
+			MAW_CONSTANT_FILL_AVAILABLE_SPACE,
+			MAW_CONSTANT_WRAP_CONTENT
+			);
 
 		//Add the capture button to the main layout so
 		//it will be larger than others.
@@ -233,17 +266,23 @@ public:
 
 	}
 
+	/**
+	 * A Wrapper function that creates the camera widget
+	 * and binds it to the default camera
+	 */
 	void createCameraWidget()
 	{
 		mCameraPreview = maWidgetCreate(MAW_CAMERA_PREVIEW);
 			widgetSetPropertyInt(
-						mCameraPreview,
-						MAW_WIDGET_WIDTH,
-						MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+				mCameraPreview,
+				MAW_WIDGET_WIDTH,
+				MAW_CONSTANT_FILL_AVAILABLE_SPACE
+				);
 			widgetSetPropertyInt(
-						mCameraPreview,
-						MAW_WIDGET_HEIGHT,
-						MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+				mCameraPreview,
+				MAW_WIDGET_HEIGHT,
+				MAW_CONSTANT_FILL_AVAILABLE_SPACE
+				);
 
 			//bind the widget to the default camera
 			maCameraSetPreview(mCameraPreview);
@@ -265,15 +304,23 @@ public:
 		createImageScreen();
 	}
 
+	/**
+	 * A function to setup the camera properties whenever they are
+	 * changed and we come back fro mthe settings screen
+	 */
 	void setupCameraProperties()
 	{
 		maCameraSelect(mSettingsString->getCurrentCamera());
 		maCameraSetPreview(mCameraPreview);
-		maCameraSetProperty(MA_CAMERA_FLASH_MODE, mSettingsString->getFLashMode());
+		maCameraSetProperty(
+				MA_CAMERA_FLASH_MODE,
+				mSettingsString->getFLashMode()
+				);
 		char buffer[256];
 		int length = maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
 	}
+
 	/**
 	 * This method implements a custom event listener.
 	 * Widget events are sent as custom events.
@@ -304,6 +351,8 @@ public:
 				}
 				else if (mZoomInButton == eventData->widgetHandle)
 				{
+					//Increase the zoom level if it is more
+					//than the maximum supported zoom
 					if(mCurrentZoomIndex < maxZoom)
 					{
 						mCurrentZoomIndex++;
@@ -315,6 +364,7 @@ public:
 				}
 				else if (mZoomOutButton == eventData->widgetHandle)
 				{
+					//Decrease the zoom index if it is more than 0
 					if(mCurrentZoomIndex > 0)
 					{
 						mCurrentZoomIndex--;
@@ -326,6 +376,7 @@ public:
 				}
 				else
 				{
+					//forward the event to a screen that is viewed
 					if(mSettingsString->isViewed)
 					{
 						mSettingsString->customEvent(event);
@@ -345,7 +396,6 @@ public:
 						}
 					}
 				}
-
 			}
 		}
 	}
@@ -364,10 +414,11 @@ public:
 	void captureButtonClicked()
 	{
 		if(mLastEnc != 0)
+		{
 			maDestroyObject(mLastEnc);
+		}
 		mLastEnc = maCreatePlaceholder();
 		maCameraSnapshot(-1, mLastEnc);
-		//setupCameraProperties();
 		maCameraStart();
 	}
 
@@ -377,7 +428,6 @@ public:
 	 */
 	void showImageButtonClicked()
 	{
-
 		maCameraStop();
 		mImageScreen->setImageDataHandle(mLastEnc);
 		mImageScreen->pushImageScreen();
@@ -385,15 +435,19 @@ public:
 
 private:
 
+	/* The Settings screen class that
+	 * creates and handles the settings view*/
 	SettingsScreen *mSettingsString;
 
+	/* The Image screen class that
+	 * creates and handles the Image view*/
 	ImageScreen *mImageScreen;
 
+	/* Stack Screen used to handle screen changes*/
 	MAHandle mStackScreen;
 
+	/* place holder used for keeping the last image*/
 	MAHandle mLastEnc;
-
-	MAHandle mLastPic;
 
 	/** The screen widget. */
 	MAHandle mScreen;
@@ -407,31 +461,25 @@ private:
 	/** Text editor box for user input. */
 	MAHandle mCameraPreview;
 
-	/** The Clear button. */
+	/** The Settings button. */
 	MAHandle mSettingsButton;
 
-	/** The Clear button. */
+	/** The Show Image button. */
 	MAHandle mShowLastImageButton;
 
-	/** The Submit button. */
+	/** The Capture button. */
 	MAHandle mCaptureButton;
 
-	/** The Submit button. */
+	/** The Zoom In button. */
 	MAHandle mZoomInButton;
 
-	/** The Submit button. */
+	/** The Zoom Out button. */
 	MAHandle mZoomOutButton;
 
-	/** The Submit button. */
-	MAHandle mFlashButton;
-
-
-	MAHandle mImageWidget;
-
-	int mNumFormats;
-
+	/* index of the current zoom level*/
 	int mCurrentZoomIndex;
 
+	/* maximum zoom supported by the camera*/
 	int maxZoom;
 };
 
