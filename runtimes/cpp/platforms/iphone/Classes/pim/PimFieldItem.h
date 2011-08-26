@@ -99,7 +99,7 @@
  * @param index Value's index.
  * @return One of MA_PIM_ERR constants.
  */
--(int) getLabel:(NSString*) value
+-(int) getLabel:(NSMutableString*) value
      indexValue:(const int) index;
 
 /**

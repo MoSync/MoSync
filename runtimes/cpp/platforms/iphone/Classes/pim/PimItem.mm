@@ -136,7 +136,7 @@
                                                      length:args->bufSize
                                                    encoding:NSUTF16LittleEndianStringEncoding];
 
-    int field = args->item;
+    int field = args->field;
     NSString* key = [[NSString alloc] initWithFormat:@"%d",field];
     PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];
     [key release];
@@ -171,10 +171,10 @@
      indexValue:(const int) index
 {
     int returnValue = MA_PIM_ERR_NONE;
-    NSString* customLabel = [[NSString alloc] init];
+    NSMutableString* customLabel = [[NSMutableString alloc] init];
     PimUtils* utils = [PimUtils sharedInstance];
     void* address = [utils getValidatedMemRange:(int)args->buf withSize: args->bufSize];
-    int field = args->item;
+    int field = args->field;
 
     NSString* key = [[NSString alloc] initWithFormat:@"%d",field];
     PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];
@@ -194,6 +194,8 @@
                                      atAddress:address
                                        maxSize:args->bufSize];
     }
+
+    [customLabel release];
 
     return returnValue;
 }
@@ -267,6 +269,7 @@
 
 /**
  * Sets a field's value and attribute at a given index.
+ * Does not check if field is supported or write-only.
  * @param args Common arguments.
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.

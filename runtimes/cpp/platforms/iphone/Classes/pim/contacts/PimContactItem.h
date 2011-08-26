@@ -88,6 +88,22 @@
   withAttribute:(const int) attribute;
 
 /**
+ * Sets a field's value and attribute at a given index.
+ * Checks if the field is supported or read-only.
+ * @param args Common arguments.
+ *             The item's handle is stored in args.item.
+ *             The field's ID is stored in args.field.
+ *             The field's value is stored in args.buf.
+ *             The size of the value(in bytes) is stored in args.bufSize.
+ * @param index Field's value index.
+ * @param attribute Field's value attribute.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) setValue:(const MA_PIM_ARGS*) args
+     indexValue:(const int) index
+ valueAttribute:(const int) atttribute;
+
+/**
  * Get the item's record.
  * @return The item's record.
  */
