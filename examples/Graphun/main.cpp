@@ -89,7 +89,7 @@ static const char* sAboutText =
 			mLabel->setProperty("textHorizontalAlignment", "left");
 			mLabel->setProperty("width", -1);
 			mLabel->setProperty("height", -2);
-			mLabel->setProperty("numberOfLines", "0");
+			mLabel->setProperty("maxNumberOfLines", "0");
 
 			mLayout->setProperty("width", -1);
 			mLayout->setProperty("height", -1);
@@ -260,7 +260,7 @@ static const char* sAboutText =
 			Widget* toolBar = new Widget("HorizontalLayout");
 			toolBar->setProperty("childVerticalAlignment", "center");
 			toolBar->setProperty("width", "-1");
-			toolBar->setProperty("height", 40);
+			toolBar->setProperty("height", EXTENT_Y(maGetScrSize())/10);
 			layout->addChild(toolBar);
 
 			toolBar->setProperty("leftMargin", "8");

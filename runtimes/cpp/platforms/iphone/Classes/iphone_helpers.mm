@@ -131,6 +131,9 @@ void getScreenResolution(int& w, int &h) {
         //h = mainscr.currentMode.size.height;
         w = mainscr.scale*mainscr.applicationFrame.size.width;
         h = mainscr.scale*mainscr.applicationFrame.size.height;
-    }    
+    }
 }
 
+float getScreenScale() {
+    return [UIScreen mainScreen].scale;
+}
