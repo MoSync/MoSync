@@ -232,13 +232,21 @@
 
 /**
  * Removes an pim item from this list.
- * @param item The given item.
+ * @param itemHandle The given item.
  * @return One of the MA_PIM_ERR constants.
  **/
--(int) removeItem:(MAHandle) item
+-(int) removeItem:(MAHandle) itemHandle
 {
-    NSString* key = [[NSString alloc] initWithFormat:@"%d",item];
+    PimContactItem* item = (PimContactItem*)[self getItem:itemHandle];
+    if (nil == item)
+    {
+        return MA_PIM_ERR_INVALID_HANDLE;
+    }
+
+    NSString* key = [[NSString alloc] initWithFormat:@"%d",itemHandle];
+    ABAddressBookRemoveRecord(mAddressBook, [item getRecord], nil);
     [mContactsDictionary removeObjectForKey:key];
+    [item release];
     [key release];
 
     return MA_PIM_ERR_NONE;
@@ -247,7 +255,8 @@
 /**
  * Release all the objects.
  */
-- (void) dealloc {
+- (void) dealloc
+{
 
     CFRelease(mAddressBook);
     [mContactsDictionary release];

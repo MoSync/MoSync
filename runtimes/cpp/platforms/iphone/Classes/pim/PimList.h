@@ -70,10 +70,10 @@
 
 /**
  * Removes an pim item from the list.
- * @param item The given item.
+ * @param itemHandle The given item.
  * @return One of the MA_PIM_ERR constants.
  **/
--(int) removeItem:(MAHandle) item;
+-(int) removeItem:(MAHandle) itemHandle;
 
 /**
  * Closes the list.
