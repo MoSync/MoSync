@@ -15,6 +15,16 @@
  02111-1307, USA.
 */
 
+/**
+ * @file PIMContact.h
+ *
+ * PIMContact class shows how to:
+ * - read, modify and delete field values.
+ * - set field value attributes and labels(custom attributes).
+ * - remove contact item from the list.
+ * - count field values.
+ */
+
 #ifndef PIMCONTACT_H_
 #define PIMCONTACT_H_
 
@@ -22,30 +32,56 @@
 #include <maapi.h>
 #include <MAUtil/String.h>
 
-class PimContact
+/**
+ * PIMContact class shows how to:
+ * - read, modify and delete field values.
+ * - set field value attributes and labels(custom attributes).
+ * - remove contact item from the list.
+ * - count field values.
+ */
+class PIMContact
 {
 public:
     /**
      * Constructor.
      * @param pimItemHandle Handle to a pim contact item.
      */
-    PimContact(MAHandle pimItemHandle);
+    PIMContact(MAHandle pimItemHandle);
 
     /**
      * Destructor.
      */
-    ~PimContact();
+    ~PIMContact();
 
     /**
-     * Print the contact's fields.
+     * Print all contact's field values.
      */
     void printContact();
 
     /**
      * Add data to the contact.
-     * The contact's fields must be empty.
+     * All fields must be empty.
      */
     void addDataToContact();
+
+    /**
+     * Modify the first value of the address field.
+     * Set a custom label for that value.
+     */
+    virtual void modifyAddressField();
+
+    /**
+     * Remove a specified field value.
+     * @param fieldID One of the MA_PIM_FIELD_CONTACT constants.
+     * @param index Value's index in the given field.
+     */
+    virtual void removeFieldValue(const int fieldID, const int index);
+
+    /**
+     * Get contact handle.
+     * @return The contact's handle.
+     */
+    virtual MAHandle getHandle() const;
 
 private:
     /**
@@ -68,9 +104,9 @@ private:
         MAUtil::String (*pointerToFunc)(const int));
 
     /**
-     * Print contact name field values.
+     * Print contact name field value.
      */
-    void printContactNameField();
+    void printContactName();
 
     /**
      * Print address field values.
@@ -83,11 +119,6 @@ private:
     void printBirthday();
 
     /**
-     * Print class field value.
-     */
-    void printClass();
-
-    /**
      * Print email field values.
      */
     void printEmail();
@@ -95,12 +126,7 @@ private:
     /**
      * Print formatted address field value.
      */
-    void printFormatedAddress();
-
-    /**
-     * Print formatted name field value.
-     */
-    void printFormatedName();
+    void printFormattedAddress();
 
     /**
      * Print nickname field value.
@@ -121,11 +147,6 @@ private:
      * Print photo field value.
      */
     void printPhoto();
-
-    /**
-     * Print photo URL field value.
-     */
-    void printPhotoURL();
 
     /**
      * Print key field value.
@@ -173,7 +194,7 @@ private:
     void printRelation();
 
     /**
-     * Print nickname field value.
+     * Print organization info field value.
      */
     void printOrgInfo();
 
@@ -193,11 +214,6 @@ private:
     void addBirthday();
 
     /**
-     * Add value to class field.
-     */
-    void addClass();
-
-    /**
      * Add values to email field.
      */
     void addEmail();
@@ -206,11 +222,6 @@ private:
      * Add value to formatted address field.
      */
     void addFormatedAddress();
-
-    /**
-     * Add value to formatted name field.
-     */
-    void addFormatedName();
 
     /**
      * Add value to nickname field.
@@ -238,21 +249,6 @@ private:
     void addPhotoURL();
 
     /**
-     * Add value to public key field.
-     */
-    void addPublicKey();
-
-    /**
-     * Add value to public key string field.
-     */
-    void addPublicKeyString();
-
-    /**
-     * Add value to revision field.
-     */
-    void addRevision();
-
-    /**
      * Add values to phone field.
      */
     void addPhone();
@@ -261,11 +257,6 @@ private:
      * Add value to title field.
      */
     void addTitle();
-
-    /**
-     * Add value to UID field.
-     */
-    void addUID();
 
     /**
      * Add values to URL field.

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>PimTest</name>
+	<name>PIMDemo</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -18,7 +18,7 @@
 	</natures>
 	<filteredResources>
 		<filter>
-			<id>1313675515677</id>
+			<id>1314518117985</id>
 			<name></name>
 			<type>6</type>
 			<matcher>

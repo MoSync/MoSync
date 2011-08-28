@@ -35,7 +35,7 @@ int copyWCharArray(void* destination, const wchar_t* source)
     {
         *dst = *src;
         dst++;
-        countBytes++;
+        countBytes += sizeof(wchar_t);
         if (*src == 0)
             break;
         src++;
@@ -162,7 +162,8 @@ void printResultCode(const int resultCode)
         error = "MA_PIM_ERR_EMPTY_FIELD";
         break;
     }
-    error = "error: " + error;
+
+    error = "Error: " + error;
     printf(error.c_str());
 }
 
@@ -245,30 +246,6 @@ MAUtil::String getAddressIndexString(const int index)
 }
 
 /**
- * Get the string associated with a class field value.
- * @param value One of the MA_PIM_CONTACT_CLASS constants.
- * @return The class value string.
- */
-MAUtil::String getClassValueString(const int value)
-{
-    MAUtil::String text;
-    switch (value)
-    {
-    case MA_PIM_CONTACT_CLASS_CONFIDENTIAL:
-        text = "Confidential";
-        break;
-    case MA_PIM_CONTACT_CLASS_PRIVATE:
-        text = "Private";
-        break;
-    case MA_PIM_CONTACT_CLASS_PUBLIC:
-        text = "Public";
-        break;
-    }
-
-    return text;
-}
-
-/**
  * Get the string associated with a org info field index.
  * @param index One of the MA_PIM_CONTACT_ORG_INFO constants.
  * @return The org info index string.
@@ -298,20 +275,6 @@ MAUtil::String getOrgInfoIndexString(const int index)
         text = "Phonetic name style:";
         break;
     }
-    return text;
-}
-
-/**
- * Return the preferred string attribute.
- * @param MA_PIM_ATTR_PREFERRED.
- */
-MAUtil::String getPrefferedAttributeString(const int attribute)
-{
-    MAUtil::String text = "Attribute is not preferred!";
-    if (MA_PIM_ATTR_PREFERRED == attribute)
-    {
-        text = "preferred";
-    }
 
     return text;
 }
@@ -336,7 +299,7 @@ MAUtil::String getAddressAttributeString(const int attribute)
         text = "Other";
         break;
     case MA_PIM_ATTR_ADDR_CUSTOM:
-        text = "custom";
+        text = sCustomAttributeValue;
         break;
     }
 
@@ -366,7 +329,7 @@ MAUtil::String getEmailAttributeString(const int attribute)
         text = "other";
         break;
     case MA_PIM_ATTR_EMAIL_CUSTOM:
-        text = "custom";
+        text = sCustomAttributeValue;
         break;
     }
 
@@ -393,7 +356,7 @@ MAUtil::String getFormattedAddressAttributeString(const int attribute)
         text = "other";
         break;
     case MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM:
-        text = "custom";
+        text = sCustomAttributeValue;
         break;
     }
 
@@ -417,7 +380,7 @@ MAUtil::String getOrgAttributeString(const int attribute)
         text = "other";
         break;
     case MA_PIM_ATTR_ORG_CUSTOM:
-        text = "custom";
+        text = sCustomAttributeValue;
         break;
     }
 
@@ -495,7 +458,7 @@ MAUtil::String getPhoneAttributeString(const int attribute)
         text = "other";
         break;
     case MA_PIM_ATTR_PHONE_CUSTOM:
-        text = "custom";
+        text = sCustomAttributeValue;
         break;
     }
 
@@ -519,7 +482,7 @@ MAUtil::String getTitleAttributeString(const int attribute)
         text = "other";
         break;
     case MA_PIM_ATTR_TITLE_CUSTOM:
-        text = "custom";
+        text = sCustomAttributeValue;
         break;
     }
 
@@ -558,7 +521,7 @@ MAUtil::String getWebsiteAttributeString(const int attribute)
         text = "other";
         break;
     case MA_PIM_ATTR_WEBSITE_CUSTOM:
-        text = "custom";
+        text = sCustomAttributeValue;
         break;
     }
 
@@ -585,7 +548,7 @@ MAUtil::String getIMAttributeString(const int attribute)
         text = "other";
         break;
     case MA_PIM_ATTR_IM_CUSTOM:
-         text = "custom";
+         text = sCustomAttributeValue;
          break;
     }
 
@@ -645,7 +608,7 @@ MAUtil::String getRelationAttributeString(const int attribute)
         text = "relative";
         break;
     case MA_PIM_ATTR_RELATION_CUSTOM:
-        text = "custom";
+        text = sCustomAttributeValue;
         break;
     }
 
@@ -669,7 +632,7 @@ MAUtil::String getOrgInfoAttributeString(const int attribute)
         text = "other";
         break;
     case MA_PIM_ATTR_ORG_INFO_CUSTOM:
-         text = "custom";
+         text = sCustomAttributeValue;
          break;
     }
 
