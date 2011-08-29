@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file HomeScreen.h
+ * @author Emma Tresanszki
  *
  * This file contains the home screen of the application.
  * When application is launched, this screen is displayed by default.
@@ -26,7 +27,6 @@ MA 02110-1301, USA.
  * After the user presses Search button, next screen with the
  * available article titles is displayed.
  *
- * @author Emma Tresanszki
  */
 
 #ifndef HOMESCREENNUI_H_
@@ -50,7 +50,7 @@ namespace WikiNativeUI
 // Forward declaration.
 class MediaWiki;
 
-/*
+/**
  * HomeScreen: native UI screen
  * It is the home screen, where user can add or remove tags, and perform a wiki search based on those tags.
  * It contains list boxes, vertical and horizontal layouts with widgets for user selection.
@@ -65,8 +65,8 @@ public:
 	 */
 	HomeScreen();
 
-	/*
-	 * destructor
+	/**
+	 * Destructor.
 	 */
 	~HomeScreen();
 
@@ -75,58 +75,60 @@ public:
 	 */
 	void showScreen();
 
-	/*
+	/**
 	 * from CustomEventListener
 	 * The custom event listener interface.
 	 */
 	void customEvent(const MAEvent& event);
 
-	/*
+	/**
 	 * Handle events on screen's widgets
-	 * NOTE: take care to dismiss the Keyboard until you press other buttons, because it is not modal.
+	 * NOTE: take care to dismiss the Keyboard until you press other buttons,
+	 * because it is not modal.
 	 */
 	void widgetClicked(MAHandle widgetHandle);
 
-	/*
+	/**
 	 * Notify the screen about wiki engine status
 	 * when finished, next screen can be displayed.
 	 */
 	void engineFinished();
 
-	/*
-	 * Notify this screen of the number the chunks of data the HTTP_GET request gets.
+	/**
+	 * Notify this screen of the number the chunks of data the HTTP_GET request.
 	 * After each chunk is received, the progress bar value is incremented.
 	 *
 	 */
 	void engineNrSteps(int nrSteps);
 
-	/*
+	/**
 	 * Engine notifies this screen that a new chunk of data is received.
 	 * At each step, the progress value is incremented.
 	 */
 	void engineChunkReceived();
 
-	/*
+	/**
 	 * The UI is notified when an engine error occurs.
 	 */
 	void engineError(MAUtil::String errorMessage = ERROR_ANY);
 
-	/*
+	/**
 	 * Provide the checked categories in a string, separated by comma.
 	 */
 	MAUtil::String getCheckedCategories();
 
 private: // methods
 
-	/*
+	/**
 	 * Create the layout with checkable categories.
 	 * It is parented by the main layout.
-	 * For the moment, there are only 6 available categories. ( These could be expanded also by new user categories.)
+	 * For the moment, there are only 6 available categories.
+	 * ( These could be expanded also by new user categories.)
 	 * @return The layout that contains the categories.
 	 */
 	MAWidgetHandle createCategoriesLayout();
 
-	/*
+	/**
 	 * Lay out the widgets (portrait mode).
 	 */
 	void setupUI();

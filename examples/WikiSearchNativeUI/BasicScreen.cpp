@@ -18,11 +18,11 @@ MA 02110-1301, USA.
 
 /**
  * @file BasicScreen.cpp
+ * @author Emma Tresanszki
  *
  * This file contains the base screen of the application.
  * It contains the base screen constructors, and the creation of a main layout that is common for some screens.
  *
- * @author Emma Tresanszki
  */
 
 // Include library for string conversions.

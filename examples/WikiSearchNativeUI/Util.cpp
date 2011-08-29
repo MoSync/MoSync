@@ -18,10 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file Util.cpp
+ * @author Emma Tresanszki
  *
  * This file contains the utility functions for the application.
  *
- * @author Emma Tresanszki
  */
 
 // Include util class for integer to string conversions.
@@ -67,13 +67,15 @@ MAWidgetHandle createLabel(int width, const char* text,
 	// Set the label text.
 	maWidgetSetProperty(label, MAW_LABEL_TEXT, text);
 
-	maWidgetSetProperty(label, MAW_LABEL_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
-	maWidgetSetProperty(label, MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+	maWidgetSetProperty(
+		label, MAW_LABEL_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+	maWidgetSetProperty(
+		label, MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
 
 	return label;
 }
 
-/*
+/**
  * Utility function to create a button.
  * Create a button with centered text.
  * By default, font size is 15, and color DARK GREY.
@@ -83,7 +85,8 @@ MAWidgetHandle createLabel(int width, const char* text,
  * @param width The widget width.
  * @param height The widget height.
  */
-MAWidgetHandle createButton(const char* text, int fontColor, int fontSize, int width, int height)
+MAWidgetHandle createButton(const char* text, int fontColor, int fontSize,
+	int width, int height)
 {
 	MAWidgetHandle button = maWidgetCreate(MAW_BUTTON);
 	maWidgetSetProperty(button, MAW_BUTTON_TEXT, text);
@@ -92,8 +95,10 @@ MAWidgetHandle createButton(const char* text, int fontColor, int fontSize, int w
 	setWidgetProperty(button, MAW_WIDGET_WIDTH, width);
 	setWidgetProperty(button, MAW_WIDGET_HEIGHT, height);
 
-	maWidgetSetProperty(button, MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
-	maWidgetSetProperty(button, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+	maWidgetSetProperty(
+		button, MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
+	maWidgetSetProperty(
+		button, MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
 
 	setWidgetProperty(button,MAW_BUTTON_FONT_SIZE, fontSize);
 	setWidgetProperty(button,MAW_BUTTON_FONT_COLOR, fontColor, 16);
@@ -101,28 +106,32 @@ MAWidgetHandle createButton(const char* text, int fontColor, int fontSize, int w
 	return button;
 }
 
-/*
+/**
  * Utility function to create a progress bar.
  * @return Handle to the new progress bar.
  */
 MAWidgetHandle createProgressBar()
 {
 	MAWidgetHandle progressBar = maWidgetCreate(MAW_PROGRESS_BAR);
-	setWidgetProperty(progressBar, MAW_WIDGET_WIDTH, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-	setWidgetProperty(progressBar, MAW_WIDGET_HEIGHT, MAW_CONSTANT_WRAP_CONTENT);
+	setWidgetProperty(
+		progressBar, MAW_WIDGET_WIDTH, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	setWidgetProperty(
+		progressBar, MAW_WIDGET_HEIGHT, MAW_CONSTANT_WRAP_CONTENT);
 
 	return progressBar;
 }
 
-/*
+/**
  * Utility function to create a slider control.
  * @return Handle to the new slider.
  */
 MAWidgetHandle createSlider()
 {
 	MAWidgetHandle slider = maWidgetCreate(MAW_SLIDER);
-	setWidgetProperty(slider, MAW_WIDGET_WIDTH, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-	setWidgetProperty(slider, MAW_WIDGET_HEIGHT, MAW_CONSTANT_WRAP_CONTENT);
+	setWidgetProperty(
+		slider, MAW_WIDGET_WIDTH, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	setWidgetProperty(
+		slider, MAW_WIDGET_HEIGHT, MAW_CONSTANT_WRAP_CONTENT);
 
 	return slider;
 }
@@ -144,7 +153,7 @@ MAWidgetHandle createSpacer(int width, int height)
 	return spacer;
 }
 
-/*
+/**
  * Utility function to create a list view.
  * @param width List View width.
  * @param height List View height.
@@ -161,7 +170,7 @@ MAWidgetHandle createListView(int width, int height)
 	return listView;
 }
 
-/*
+/**
  * Utility function to create an edit box.
  * @param width Edit box width.
  * @param height Edit box height.
@@ -178,7 +187,7 @@ MAWidgetHandle createEditBox(int width, int height)
 	return editBox;
 }
 
-/*
+/**
  * Utility function to create a check box.
  * @return Handle to the new check box.
  */
@@ -189,7 +198,7 @@ MAWidgetHandle createCheckBox()
 	return checkBox;
 }
 
-/*
+/**
  * Utility function to create a web view.
  * @param width Web view width.
  * @param height Web view height.
@@ -206,7 +215,7 @@ MAWidgetHandle createWebView(int width, int height)
 	return webView;
 }
 
-/*
+/**
  * Utility function to set sizes of a widget.
  * @param widget The widget handle.
  * @param width The widget width.
@@ -222,7 +231,7 @@ void setWidgetSize(MAWidgetHandle widget, int width, int height)
 	maWidgetSetProperty(widget, MAW_WIDGET_HEIGHT, buf);
 }
 
-/*
+/**
  * Set a text for a label.
  * @param aLabel Handle to the label.
  * @param aText Label text.
@@ -232,7 +241,7 @@ void setLabelText(MAWidgetHandle aLabel, MAUtil::String aText)
 	maWidgetSetProperty(aLabel,MAW_LABEL_TEXT, aText.c_str());
 }
 
-/*
+/**
  * Set a text for a button.
  * @param aButton Handle to the button.
  * @param aText Button text.
@@ -242,7 +251,7 @@ void setButtonText(MAWidgetHandle aButton, MAUtil::String aText)
 	maWidgetSetProperty(aButton, MAW_BUTTON_TEXT, aText.c_str());
 }
 
-/*
+/**
  * Apply an int property for a widget.
  * @param aWidget The handle for the widget.
  * @param aProperty A string representing which property to set.
@@ -256,7 +265,8 @@ void setButtonText(MAWidgetHandle aButton, MAUtil::String aText)
  * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
  * - #MAW_RES_ERROR otherwise.
  */
-int setWidgetProperty(MAWidgetHandle aWidget, const char* aProperty, int aValue, int base)
+int setWidgetProperty(MAWidgetHandle aWidget, const char* aProperty,
+	int aValue, int base)
 {
 	// Buffer for property values.
 	char buf[10];
@@ -266,12 +276,12 @@ int setWidgetProperty(MAWidgetHandle aWidget, const char* aProperty, int aValue,
 	return maWidgetSetProperty(aWidget, aProperty, buf);
 }
 
-/*
+/**
  * Utility functions for string handling
  * Converts the strings from xml into more human-readable strings
  */
 
-/*
+/**
  * Replaces special characters.
  * @param The buffer that needs to be parsed.
  */
@@ -348,7 +358,7 @@ void formatToUnicode(String& input)
   }
 }
 
-/*
+/**
  * Remove the span tags, keep only the search string.
  * @param The buffer that needs to be parsed.
  */
@@ -364,15 +374,16 @@ void trimSpanTags(String& input)
 
 	    if(closeTag != input.npos && closeTag > openTag)
 		{
-			replaceString(input, input.substr(openTag, closeTag - openTag +7 ), match);
+			replaceString(
+				input, input.substr(openTag, closeTag - openTag +7 ), match);
 		}
 
 	    openTag = input.find("<span class='searchmatch'>", openTag);
 	}
 }
 
-/*
- * trim bold tags
+/**
+ * Trim bold tags.
  * The b tags are encountered at the end, and contain dots ...
  * ( this is because the input is just a snippet, not the whole article)
  */
@@ -387,34 +398,42 @@ void trimBoldTags(String& input)
 
 	    if(closeTag != input.npos && closeTag > openTag)
 		{
-			replaceString(input, input.substr(openTag, closeTag - openTag +4 ), String("..."));
+			replaceString(
+				input,
+				input.substr(openTag, closeTag - openTag +4 ),
+				String("..."));
 	    }
 
 	    openTag = input.find("<b>", openTag);
 	}
 }
 
-/*
-*  Replaces the "remove" string with the "replacement" one in the "original" string.
-*      insert and remove operations require more time than the + operator
- *     replace for std::string was not ported for mosync string
-*  @param The original string.
-*  @param The string to be removed from the original one.
-*  @param The replacement.
-*/
-void replaceString(String& original, const String& remove, const String& replacement)
+/**
+ * Replaces the "remove" string with the "replacement" one in the "original" string.
+ * Insert and remove operations require more time than the + operator.
+ * Replace for std::string was not ported for mosync string.
+ * @param The original string.
+ * @param The string to be removed from the original one.
+ * @param The replacement.
+ */
+void replaceString(String& original, const String& remove,
+	const String& replacement)
 {
 	int lenght = remove.length();
 	int iBegin = original.find(remove, 0);
 
-	while (iBegin != original.npos) {
-		original = original.substr(0, iBegin) + replacement + original.substr(iBegin + lenght);
+	while (iBegin != original.npos)
+	{
+		original =
+			original.substr(0, iBegin) +
+			replacement +
+			original.substr(iBegin + lenght);
 		iBegin = original.find(remove, iBegin + 1);
 	}
 }
 
 /*
- * strReplaceFirst
+ * st*rReplaceFirst
  */
 char* strReplaceFirst(char *str, const char* what, const char* to)
 {
@@ -459,7 +478,7 @@ char* strReplaceFirst(char *str, const char* what, const char* to)
     return 0;
 }
 
-/*
+/**
  * strReplace
  */
 char* strReplace(char* str, const char* what, const char* to)

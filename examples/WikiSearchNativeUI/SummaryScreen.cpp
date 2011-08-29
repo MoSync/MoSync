@@ -18,13 +18,13 @@ MA 02110-1301, USA.
 
 /**
  * @file SummaryScreen.cpp
+ * @author Emma Tresanszki
  *
  * This This file contains the third screen of the application.
  * This screen displays all the text snippets.
  * By clicking on each snippet, a Web view is shown in next screen:WebScreen.
  * A StartOver button is available.
  *
- * @author Emma Tresanszki
  */
 
 // Include library for string conversions.
@@ -47,8 +47,8 @@ MA 02110-1301, USA.
 
 namespace WikiNativeUI {
 
-/*
- * constructor
+/**
+ * Constructor.
  * Pass the parent screen and the engine.
  */
 SummaryScreen::SummaryScreen(TitleScreen *parentScreen,MediaWiki* engine):
@@ -73,11 +73,12 @@ SummaryScreen::SummaryScreen(TitleScreen *parentScreen,MediaWiki* engine):
 	MAUtil::Environment::getEnvironment().addCustomEventListener(this);
 }
 
-/*
- * dtor
+/**
+ * Destructor.
  * Destroy the main widget, and all it's children will be destroyed also
  */
-SummaryScreen::~SummaryScreen() {
+SummaryScreen::~SummaryScreen()
+{
 	if (mWebScreen){
 		delete mWebScreen;
 		mWebScreen = NULL;
@@ -85,10 +86,11 @@ SummaryScreen::~SummaryScreen() {
 	// The base d-tor is called, and it destroys  the mMainLayout;
 }
 
-/*
+/**
  * Lay out the widgets (portrait mode).
  */
-void SummaryScreen::setupUI() {
+void SummaryScreen::setupUI()
+{
 
 	// Get the handle to the main layout and the screen.
 	mMainLayout = getMainLayout();
@@ -98,25 +100,25 @@ void SummaryScreen::setupUI() {
 	mBackButton = getTopButtonLeft();
 
 	// Set the text for the widget in the top layout: the label and button.
-//	setLabelText(mLabel, MESSAGE_HINT_STARTOVER.c_str());
 	setButtonText(mBackButton, " BACK ");
 	setButtonText(mHomeButton, " New Search ");
 
 	// Add the list view that will contain the snippets.
-	// It will be filled when this screen is displayed, based on the checked titles from TitlesScreen.
+	// It will be filled when this screen is displayed, based on the checked
+	// titles from TitlesScreen.
 	// The height is ScreenHeight - the size of the top layout.
 	mListView = createListView(mScreenWidth, 7*mScreenHeight/8);
 	maWidgetAddChild(mMainLayout, mListView);
 }
 
-/*
+/**
  *  Show the screen.
  *  If it is called from WebScreen it does not need refresh,
  *  but if from TitleScreen the list box needs refresh.
  */
 void SummaryScreen::showScreen(bool needsRefresh) {
 
-	// Each time this screen is shown, refresh the list data is taken from the engine.
+	// Each time this screen is shown, refresh the list taken from the engine.
 	if ( needsRefresh ){
 		fillListBox();
 	}
@@ -125,7 +127,7 @@ void SummaryScreen::showScreen(bool needsRefresh) {
 	BasicScreen::showScreen();
 }
 
-/*
+/**
  * Show the home screen.
  */
 void SummaryScreen::showHomeScreen()
@@ -133,7 +135,7 @@ void SummaryScreen::showHomeScreen()
 	mPrevScreen->showHomeScreen();
 }
 
-/*
+/**
  * Fill the list box with data provided by the engine.
  */
 void SummaryScreen::fillListBox()
@@ -154,7 +156,8 @@ void SummaryScreen::fillListBox()
 	maWidgetAddChild(mMainLayout, mListView);
 
 	// If no titles are selected, display a short message.
-	if (mSnippets.size() == 0){
+	if (mSnippets.size() == 0)
+	{
 		MAWidgetHandle listItem = maWidgetCreate(MAW_LIST_VIEW_ITEM);
 		maWidgetSetProperty(
 				listItem,
@@ -164,7 +167,8 @@ void SummaryScreen::fillListBox()
 	}
 
 	// Update the UI.
-	for ( int i=0; i<mSnippets.size(); i++){
+	for (int i=0; i < mSnippets.size(); i++)
+	{
 
 		MAWidgetHandle listItem = maWidgetCreate(MAW_LIST_VIEW_ITEM);
 		maWidgetSetProperty(
@@ -177,7 +181,7 @@ void SummaryScreen::fillListBox()
 	}
 }
 
-/*
+/**
  * from CustomEventListener
  * The custom event listener interface.
  */
@@ -200,14 +204,16 @@ void SummaryScreen::customEvent(const MAEvent& event)
 	// Check the event that was sent from a list view.
 	else if (widgetEventData->eventType == MAW_EVENT_ITEM_CLICKED )
 	{
-		// By clicking on an item, the corresponding web view is opened in the webSscreen.
+		// By clicking on an item, the corresponding web view is opened
+		// in the WebSsreen.
 		mWebScreen->showScreen();
-		mWebScreen->openWebView( mWiki->getTitleForIndex( widgetEventData->listItemIndex) );
+		mWebScreen->openWebView(
+			mWiki->getTitleForIndex( widgetEventData->listItemIndex) );
 	}
 	return;
 }
 
-/*
+/**
  * Handle events on screen's widgets.
  */
 void SummaryScreen::widgetClicked(MAHandle widgetHandle)

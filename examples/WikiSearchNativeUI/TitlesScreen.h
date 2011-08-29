@@ -18,11 +18,11 @@ MA 02110-1301, USA.
 
 /**
  * @file TitlesScreen.h
+ * @author Emma Tresanszki
  *
  * This file contains the second screen of the application.
  * This screen displays all the available article titles.
  *
- * @author Emma Tresanszki
  */
 
 #ifndef TITLESSCREENNUI_H_
@@ -47,7 +47,7 @@ namespace WikiNativeUI
 class HomeScreen;
 
 /*
- * TitlesScreen: native UI screen
+ * TitlesScreen: native UI screen.
  * It contains the available article titles.
  * Results are shown in a list view, and the user can select only the desired articles.
  * For each selected title, the corresponding article will be displayed.
@@ -56,59 +56,59 @@ class TitleScreen : public BasicScreen,
 			        public MAUtil::CustomEventListener
 {
 public:
-	/*
-	 * constructor
+	/**
+	 * Constructor.
 	 * Pass the previous screen and the engine.
 	 */
 	TitleScreen(HomeScreen *parentScreen, MediaWiki* engine);
 
-	/*
-	 * destructor
+	/**
+	 * Destructor.
 	 */
 	~TitleScreen();
 
-	/*
+	/**
 	 *  Show the screen.
 	 *  If it does not need refresh, it is called from the SummaryScreen.
 	 *  The list box need refresh when this is called from the home screen.
 	 */
 	void showScreen(bool needsRefresh);
 
-	/*
+	/**
 	 * from CustomEventListener
 	 * The custom event listener interface.
 	 */
 	void customEvent(const MAEvent& event);
 
-	/*
+	/**
 	 * Handle events on screen's widgets.
 	 */
 	void widgetClicked(MAHandle widgetHandle);
 
-	/*
+	/**
 	 * Fill the list box with data provided by the engine.
 	 */
 	void fillListBox();
 
-	/*
+	/**
 	 * Update wiki list of titles, with the ones selected by the user.
 	 */
 	void updateWikiTitles();
 
-	/*
+	/**
 	 * Get all the snippets.
 	 * @return all snippets with user checked title.
 	 */
 	MAUtil::Vector<MAUtil::String> getAllSnippets();
 
-	/*
+	/**
 	 * Called when user wants to start over, but he is in another screen.
 	 */
 	void showHomeScreen();
 
 private: // methods
 
-	/*
+	/**
 	 * Lay out the widgets (portrait mode).
 	 */
 	void setupUI();
