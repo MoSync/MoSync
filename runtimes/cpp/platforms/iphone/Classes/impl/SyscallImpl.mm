@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "config_platform.h"
 #import <UIKit/UIKit.h>
 #import <AssetsLibrary/AssetsLibrary.h>
+#import <MessageUI/MessageUI.h>
 #include <string>
 #include <vector>
 #include <map>
@@ -52,6 +53,7 @@ using namespace MoSyncError;
 #include <core/core.h>
 
 #include "MoSyncMain.h"
+#import "MoSyncAppDelegate.h"
 
 #include "iphone_helpers.h"
 #include "CMGlyphDrawing.h"
@@ -75,6 +77,43 @@ extern ThreadPool gThreadPool;
 
 #define NOT_IMPLEMENTED BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED)
 
+//This delegate is needed for the SMS system, because iOS does not automatically
+//hide the sms window after the user sends an SMS or clicks cancel
+@interface SMSResultDelegate:NSObject<MFMessageComposeViewControllerDelegate>{
+}
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
+				 didFinishWithResult:(MessageComposeResult)result;
+@end
+
+@implementation SMSResultDelegate
+
+- (void)messageComposeViewController:(MFMessageComposeViewController *)controller
+				 didFinishWithResult:(MessageComposeResult)result{
+	MoSyncUI* msUI = getMoSyncUI();
+	[msUI hideModal];
+
+	MAEvent event;
+	event.type = EVENT_TYPE_SMS;
+
+	if (result == MessageComposeResultCancelled) {
+		event.status = MA_SMS_RESULT_NOT_SENT;
+	}
+	else if (result == MessageComposeResultFailed) {
+		event.status = MA_SMS_RESULT_NOT_DELIVERED;
+	}
+	else if (result == MessageComposeResultSent){
+		MAEvent firstEvent;
+		firstEvent.type = EVENT_TYPE_SMS;
+		firstEvent.status = MA_SMS_RESULT_SENT;
+		Base::gEventQueue.put(firstEvent);
+
+		event.status = MA_SMS_RESULT_DELIVERED;
+	}
+
+	Base::gEventQueue.put(event);
+}
+@end
 
 namespace Base {
 
@@ -1072,8 +1111,18 @@ namespace Base {
 	}
 
 	SYSCALL(int, maSendTextSMS(const char* dst, const char* msg)) {
-		NOT_IMPLEMENTED;
-		return 1;
+		MFMessageComposeViewController *smsController = [[MFMessageComposeViewController alloc] init];
+
+		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst]];
+		smsController.body = [NSString stringWithCString:msg];
+
+		smsController.messageComposeDelegate = [[SMSResultDelegate alloc] init];
+
+		MoSyncUI* msUI = getMoSyncUI();
+		[msUI showModal:smsController];
+
+		[smsController release];
+		return 0;
 	}
 
 	SYSCALL(int, maInvokeExtension(int, int, int, int)) {
@@ -1773,6 +1822,7 @@ return 0; \
         maIOCtl_case(maSensorStart);
         maIOCtl_case(maSensorStop);
 		maIOCtl_case(maImagePickerOpen);
+		maIOCtl_case(maSendTextSMS);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
