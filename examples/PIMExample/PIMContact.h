@@ -219,11 +219,6 @@ private:
     void addEmail();
 
     /**
-     * Add value to formatted address field.
-     */
-    void addFormatedAddress();
-
-    /**
      * Add value to nickname field.
      */
     void addNickname();
@@ -288,6 +283,11 @@ private:
      * Arguments for getting and setting field values.
      */
     MA_PIM_ARGS mArgs;
+
+    /**
+     * Used for getting and setting field values.
+     */
+    char *mBuffer;
 };
 
 #endif /* PIMCONTACT_H_ */
