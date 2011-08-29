@@ -6,6 +6,8 @@
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries/Release" value="NativeUI.lib, MAUtil.lib"/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:app.name/Release" value="VideoNativeUIExample"/>
+<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access Vibrate"/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>

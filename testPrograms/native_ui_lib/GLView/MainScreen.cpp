@@ -49,8 +49,6 @@ MainScreen::MainScreen() :
 MainScreen::~MainScreen()
 {
     mGLView->removeGLViewListener(this);
-
-	delete mMainLayout;
 }
 
 /**
@@ -62,7 +60,7 @@ void MainScreen::createMainLayout() {
 	mMainLayout->setBackgroundColor(0xFF0000);
 	Screen::setMainWidget(mMainLayout);
 
-	mGLView = new GLView();
+	mGLView = new GLView(GL1_VIEW);
 	mGLView->fillSpaceHorizontally();
 	mGLView->fillSpaceVertically();
 	mMainLayout->addChild(mGLView);

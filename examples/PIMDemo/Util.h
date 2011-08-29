@@ -19,6 +19,17 @@
 #ifndef UTIL_H_
 #define UTIL_H_
 
+/**
+ * Check the result of a syscall.
+ * If any error occurred the error is printed on the screen.
+ */
+#define checkResultCode(resultCode) \
+    if (0 > resultCode) \
+    {\
+        printResultCode(resultCode);\
+        return;\
+    }
+
 #include <conprint.h>
 #include <wchar.h>
 #include <ma.h>
@@ -28,7 +39,7 @@
 #include <MAUtil/String.h>
 
 /**
- * Values for MA_PIM_FIELD_CONTACT_NAME field.
+ * Value for MA_PIM_FIELD_CONTACT_NAME field.
  */
 static const wchar_t* sContactName[] =
 {
@@ -37,9 +48,9 @@ static const wchar_t* sContactName[] =
     L"Robert",     // MA_PIM_CONTACT_NAME_OTHER
     L"Mr",         // MA_PIM_CONTACT_NAME_PREFIX
     L"Jr",         // MA_PIM_CONTACT_NAME_SUFFIX
-    L"O'Conner",   // MA_PIM_CONTACT_NAME_PHONETIC_FAMILY
-    L"Brian",      // MA_PIM_CONTACT_NAME_PHONETIC_GIVEN
-    L"Robert"      // MA_PIM_CONTACT_NAME_PHONETIC_OTHER
+    L"",           // MA_PIM_CONTACT_NAME_PHONETIC_FAMILY
+    L"",           // MA_PIM_CONTACT_NAME_PHONETIC_GIVEN
+    L""            // MA_PIM_CONTACT_NAME_PHONETIC_OTHER
 };
 
 /**
@@ -68,6 +79,23 @@ static const wchar_t* sAddressHome[] =
     L"Marasti"           // MA_PIM_CONTACT_ADDR_NEIGHBORHOOD
 };
 
+static const wchar_t* sAddressModified[] =
+{
+    L"",                 // MA_PIM_CONTACT_ADDR_POBOX
+    L"",                 // MA_PIM_CONTACT_ADDR_EXTRA
+    L"Dorobantilor 14",  // MA_PIM_CONTACT_ADDR_STREET
+    L"Cluj-Napoca",      // MA_PIM_CONTACT_ADDR_LOCALITY
+    L"Cluj",             // MA_PIM_CONTACT_ADDR_REGION
+    L"400117",           // MA_PIM_CONTACT_ADDR_POSTALCODE
+    L"Romania",          // MA_PIM_CONTACT_ADDR_COUNTRY
+    L"Marasti"           // MA_PIM_CONTACT_ADDR_NEIGHBORHOOD
+};
+
+/**
+ * Value for address label.
+ */
+static const wchar_t* sAddressLabel = L"New work address";
+
 /**
  * Value for MA_PIM_FIELD_CONTACT_ORG_INFO field.
  */
@@ -93,25 +121,10 @@ static const wchar_t* sEmailHome = L"brian13@yahoo.com";
 static const wchar_t* sFormattedAddress = L"formatted addr";
 
 /**
- * Value for MA_PIM_FIELD_CONTACT_FORMATTED_NAME field.
- */
-static const wchar_t* sFormattedName = L"formatted name";
-
-/**
  * Value for MA_PIM_FIELD_CONTACT_PHOTO_URL field.
  */
 static const wchar_t* sPhotoURL =
-    L"http://t2.gstatic.com/images?q=tbn:ANd9GcSrJS1-i7rBQrEb8HwuonyWrIrpS_xGNWvQage1ePefwi0nL55b\0";
-
-/**
- * Value for MA_PIM_FIELD_CONTACT_PUBLIC_KEY field.
- */
-static const wchar_t* sPublicKey = L".";
-
-/**
- * Value for MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING field.
- */
-static const wchar_t* sPublicKeyString = L"Public key";
+    L"http://www.mosync.com/files/press/images/mosync_logo_monochrome_vertical_thumb.png";
 
 /**
  * Values for MA_PIM_FIELD_CONTACT_TEL field.
@@ -141,11 +154,6 @@ static const wchar_t* sOrg = L"MoSync";
 static const wchar_t* sTitle = L"Developer";
 
 /**
- * Value for MA_PIM_FIELD_CONTACT_UID field.
- */
-static const wchar_t* sUID = L"contact UID";
-
-/**
  * Values for MA_PIM_FIELD_CONTACT_URL field.
  */
 static const wchar_t* sURLHome = L"www.brian.com";
@@ -173,7 +181,54 @@ static const wchar_t* sRelationManager = L"Alex";
 
 // Used for separating fields on the screen.
 static const char* sFieldSeparator =
-    "______________________________________________";
+    "______________________________________________\n\n";
+
+// Common value for custom attributes.
+static const char* sCustomAttributeValue = "custom";
+
+/**
+ * Indices for MA_PIM_FIELD_CONTACT_ADDR field:
+ * - MA_PIM_CONTACT_ADDR_POBOX
+ * - MA_PIM_CONTACT_ADDR_EXTRA
+ * - MA_PIM_CONTACT_ADDR_STREET
+ * - MA_PIM_CONTACT_ADDR_LOCALITY
+ * - MA_PIM_CONTACT_ADDR_REGION
+ * - MA_PIM_CONTACT_ADDR_POSTALCODE
+ * - MA_PIM_CONTACT_ADDR_COUNTRY
+ * - MA_PIM_CONTACT_ADDR_NEIGHBORHOOD
+ */
+static const int COUNT_ADDRESS_INDICES = 8;
+
+/**
+ * Indices for MA_PIM_FIELD_CONTACT_NAME field:
+ * - MA_PIM_CONTACT_NAME_FAMILY
+ * - MA_PIM_CONTACT_NAME_GIVEN
+ * - MA_PIM_CONTACT_NAME_OTHER
+ * - MA_PIM_CONTACT_NAME_PREFIX
+ * - MA_PIM_CONTACT_NAME_SUFFIX
+ * - MA_PIM_CONTACT_NAME_PHONETIC_FAMILY
+ * - MA_PIM_CONTACT_NAME_PHONETIC_GIVEN
+ * - MA_PIM_CONTACT_NAME_PHONETIC_OTHER
+ */
+static const int COUNT_NAME_INDICES = 8;
+
+/**
+ * Indices for MA_PIM_FIELD_CONTACT_ORG_INFO field:
+ * - MA_PIM_CONTACT_ORG_INFO_DEPARTMENT
+ * - MA_PIM_CONTACT_ORG_INFO_JOB_DESCRIPTION
+ * - MA_PIM_CONTACT_ORG_INFO_SYMBOL
+ * - MA_PIM_CONTACT_ORG_INFO_PHONETIC_NAME
+ * - MA_PIM_CONTACT_ORG_INFO_OFFICE_LOCATION
+ * - MA_PIM_CONTACT_ORG_INFO_PHONETIC_NAME_STYLE
+ */
+static const int COUNT_ORG_INFO_INDICES = 6;
+
+/**
+ * Indices for MA_PIM_FIELD_CONTACT_IM field:
+ * - MA_PIM_CONTACT_IM_USERNAME
+ * - MA_PIM_CONTACT_IM_PROTOCOL
+ */
+static const int COUNT_IM_INDICES = 2;
 
 /**
  * Copy wchar array.
@@ -229,24 +284,11 @@ MAUtil::String getContactNameIndexString(const int index);
 MAUtil::String getAddressIndexString(const int index);
 
 /**
- * Get the string associated with a class field value.
- * @param value One of the MA_PIM_CONTACT_CLASS constants.
- * @return The class value string.
- */
-MAUtil::String getClassValueString(const int value);
-
-/**
  * Get the string associated with a org info field index.
  * @param index One of the MA_PIM_CONTACT_ORG_INFO constants.
  * @return The org info index string.
  */
 MAUtil::String getOrgInfoIndexString(const int index);
-
-/**
- * Return the preferred string attribute.
- * @param MA_PIM_ATTR_PREFERRED.
- */
-MAUtil::String getPrefferedAttributeString(const int attribute);
 
 /**
  * Return the string associated with a specified address attribute.

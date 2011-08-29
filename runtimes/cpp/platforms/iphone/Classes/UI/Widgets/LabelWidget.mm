@@ -145,21 +145,25 @@ typedef enum VerticalAlignment {
 		label.textColor = color;
 	}	
 	else if([key isEqualToString:@"fontSize"]) {
-		UILabel* label = (UILabel*) view;	
+		UILabel* label = (UILabel*) view;
 		float fontSize = [value floatValue];
-		label.font = [UIFont boldSystemFontOfSize:fontSize];
-		[self layout];		
+        UIFont* currentFont = label.font;
+        NSString* currentFontName = [currentFont fontName];
+        UIFont* newFont = [UIFont fontWithName:currentFontName size:fontSize];
+        [label setFont:newFont];
+		[self layout];
 	}
     else if([key isEqualToString:@"fontHandle"])
     {
 		UILabel* label = (UILabel*) view;
 		UIFont* font = Base::getUIFontObject([value intValue]);
-        if (NULL == font)
+        if (!font)
         {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
 
         [label setFont:font];
+        [self layout];
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];

@@ -17,6 +17,7 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.widgets;
 
+import android.graphics.Typeface;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -86,5 +87,19 @@ public class ButtonWidget extends LabelWidget
 		{
 			return super.getProperty( property );
 		}
+	}
+
+	/**
+	 * Sets the font typeface from mosync nativeUI.
+	 * It is called instead of the setProperty method,
+	 * as two params are needed.
+	 * @param aTypeface The typeface of MoSyncFontHandle
+	 * @param aSize The size of MoSyncFontHandle
+	 */
+	public void setFontTypeface(Typeface aTypeface, float aSize)
+	{
+		Button btn = (Button) getView( );
+		btn.setTypeface(aTypeface);
+		btn.setTextSize(aSize);
 	}
 }
