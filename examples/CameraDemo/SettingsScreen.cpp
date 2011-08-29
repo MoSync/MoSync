@@ -1,8 +1,33 @@
+/*
+Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file SettingsScreen.cpp
+ * @author Ali Sarrafi
+ *
+ * This application provides a very basic example of how to work
+ * with Native UI and the Camera API
+ */
 #include "SettingsScreen.h"
-// Include NativeUI.
 
 #include <mastdlib.h>
 #include <mavsprintf.h>
+
 #include "WidgetUtil.h"
 
 
@@ -25,9 +50,13 @@ void SettingsScreen::customEvent(const MAEvent& event)
 			if(mFlashModeButton == eventData->widgetHandle)
 			{
 				if(flashModeIndex < 3)
+				{
 					flashModeIndex++;
+				}
 				else
+				{
 					flashModeIndex = 0;
+				}
 				char buffer[128];
 				sprintf(buffer, "Flash Mode: %s", getModeForIndex(flashModeIndex));
 				maWidgetSetProperty(mFlashModeButton,MAW_BUTTON_TEXT, buffer);
@@ -35,19 +64,28 @@ void SettingsScreen::customEvent(const MAEvent& event)
 			else if(mSwapCameraButton == eventData->widgetHandle)
 			{
 				if(currentCamera < numCameras-1)
+				{
 					currentCamera++;
+				}
 				else
+				{
 					currentCamera = 0;
+				}
 
 				if(currentCamera == 0)
-					maWidgetSetProperty( mSwapCameraButton,
-									MAW_LABEL_TEXT,
-									"Camera Selected: Back");
+				{
+					maWidgetSetProperty(
+							mSwapCameraButton,
+							MAW_LABEL_TEXT,
+							"Camera Selected: Back");
+				}
 				else
-					maWidgetSetProperty( mSwapCameraButton,
-									MAW_LABEL_TEXT,
-									"Camera Selected: Front");
-
+				{
+					maWidgetSetProperty(
+							mSwapCameraButton,
+							MAW_LABEL_TEXT,
+							"Camera Selected: Front");
+				}
 			}
 			else if(mOKButton == eventData->widgetHandle)
 			{
@@ -58,6 +96,9 @@ void SettingsScreen::customEvent(const MAEvent& event)
 	}
 }
 
+/**
+ * Lazy initialization
+ */
 int SettingsScreen::initialize(MAHandle stackScreen, MAHandle previewWidget)
 {
 	mPreviewWidget = previewWidget;
@@ -66,11 +107,12 @@ int SettingsScreen::initialize(MAHandle stackScreen, MAHandle previewWidget)
 	maCameraGetProperty(MA_CAMERA_FLASH_SUPPORTED, buffer1, 256);
 	flashSupported =  atoi(buffer1);
 	numCameras = maCameraNumber();
-
 	createUI();
 }
 
-
+/**
+ * Creates the required view and components
+ */
 void SettingsScreen::createUI()
 {
 	// Create a Native UI screen. As the screen is a member
@@ -110,35 +152,38 @@ void SettingsScreen::createUI()
 				MAW_WIDGET_HEIGHT,
 				MAW_CONSTANT_WRAP_CONTENT);
 			maWidgetSetProperty(
-					mFlashModeButton,
+				mFlashModeButton,
 				MAW_LABEL_TEXT,
 				"Flash Mode: OFF");
 			maWidgetAddChild(mMainLayoutWidget, mFlashModeButton);
 
+		//Only show switch camera buttons if we have more than one camera
 		if(numCameras>1)
 		{
 			mSwapCameraButton = maWidgetCreate(MAW_BUTTON);
 			widgetSetPropertyInt(
-					mSwapCameraButton,
+				mSwapCameraButton,
 				MAW_WIDGET_WIDTH,
 				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 			widgetSetPropertyInt(
-					mSwapCameraButton,
+				mSwapCameraButton,
 				MAW_WIDGET_HEIGHT,
 				MAW_CONSTANT_WRAP_CONTENT);
 			maWidgetSetProperty(
-					mSwapCameraButton,
+				mSwapCameraButton,
 				MAW_LABEL_TEXT,
 				"Camera Selected: Back");
 			maWidgetAddChild(mMainLayoutWidget, mSwapCameraButton);
 		}
+
+		//The button that finishes the setting operation
 		mOKButton = maWidgetCreate(MAW_BUTTON);
 		widgetSetPropertyInt(
-				mOKButton,
+			mOKButton,
 			MAW_WIDGET_WIDTH,
 			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 		widgetSetPropertyInt(
-				mOKButton,
+			mOKButton,
 			MAW_WIDGET_HEIGHT,
 			MAW_CONSTANT_WRAP_CONTENT);
 		maWidgetSetProperty(
@@ -149,12 +194,18 @@ void SettingsScreen::createUI()
 }
 
 
+/**
+ * pushes the settings screen to the device screen
+ */
 void SettingsScreen::pushSettingsScreen()
 {
 	isViewed = true;
 	maWidgetStackScreenPush(mStackScreen, mScreen);
 }
 
+/**
+ * A wrapper for iterating over flash modes
+ */
 char* SettingsScreen::getModeForIndex( int index)
 {
 	switch(index)
@@ -172,11 +223,17 @@ char* SettingsScreen::getModeForIndex( int index)
 	}
 }
 
+/**
+ * returns the selected camera index
+ */
 int SettingsScreen::getCurrentCamera()
 {
 	return currentCamera;
 }
 
+/**
+ * Returns the selected flash mode
+ */
 char * SettingsScreen::getFLashMode()
 {
 	return getModeForIndex(flashModeIndex);
