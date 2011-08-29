@@ -238,6 +238,13 @@ void BasicScreen::setupUI()
 	// Create the main screen.
 	mScreen = maWidgetCreate(MAW_SCREEN);
 
+	// Error handling for devices that do not support NativeUI.
+	if ( -1 == mScreen )
+	{
+		maPanic(0, " This application uses NativeUI, which currently is supported"
+				   " only on Android and iOS devices.");
+	}
+
 	// Create the main layout.
 	mMainLayout = createBaseMainLayout();
 
