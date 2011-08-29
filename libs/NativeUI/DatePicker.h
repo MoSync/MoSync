@@ -44,7 +44,8 @@ namespace NativeUI
 		int day; // Range: 1-31.
 		int month; // Range: 1-12.
 		int year;
-		Date(int aDay, int aMonth, int anYear):day(aDay),month(aMonth),year(anYear){};
+		Date(int aDay, int aMonth, int anYear):
+			day(aDay),month(aMonth),year(anYear){};
 		Date(){};
 	};
 
@@ -53,7 +54,8 @@ namespace NativeUI
 	 * The date picker is initialized with system date.
 	 *
 	 * The date can be selected by a year, month, and day spinners.
-	 * The minimal and maximal date from which dates to be selected can be customized.
+	 * The minimal and maximal date from which dates to be selected
+	 * can be customized.
 	 * The picker is initialized with the current system date.
 	 *
 	 * Note: The default minimal date on Android is 01/01/1900.
