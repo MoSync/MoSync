@@ -52,7 +52,19 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 		UILabel* label = cell.textLabel;
 		label.text = value;
 		[self layout];
-	} 
+	}
+    else if ([key isEqualToString:@"fontHandle"])
+    {
+        UITableViewCell* cell = (UITableViewCell*) view;
+		UILabel* label = cell.textLabel;
+        UIFont* font = Base::getUIFontObject([value intValue]);
+        if (!font)
+        {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+        [label setFont:font];
+        [self layout];
+    }
 	else if([key isEqualToString:@"icon"]) {
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;

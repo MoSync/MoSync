@@ -71,10 +71,25 @@
 	if([key isEqualToString:@"fontSize"]) {
         TEST_FOR_NEGATIVE_VALUE([value floatValue]);
 		UIButton* button = (UIButton*) view;
+        UILabel* label = button.titleLabel;
 		float fontSize = [value floatValue];
-		button.titleLabel.font = [UIFont boldSystemFontOfSize:fontSize];
-		[self layout];			
-	} else		
+        UIFont* currentFont = label.font;
+        NSString* currentFontName = [currentFont fontName];
+        UIFont* newFont = [UIFont fontWithName:currentFontName size:fontSize];
+        [label setFont:newFont];
+		[self layout];
+	} else
+    if([key isEqualToString:@"fontHandle"]) {
+        UIButton* button = (UIButton*) view;
+        UILabel* label = button.titleLabel;
+        UIFont* font = Base::getUIFontObject([value intValue]);
+        if (!font)
+        {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+        [label setFont:font];
+        [self layout];
+    } else
 	if([key isEqualToString:@"fontColor"]) {
 		UIButton* button = (UIButton*) view;
 		UIColor* color = [UIColor colorWithHexString:value];
@@ -165,17 +180,6 @@
 		} else {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
-	}
-    else if([key isEqualToString:@"fontHandle"])
-    {
-		UILabel* label = (UILabel*) view;
-		UIFont* font = Base::getUIFontObject([value intValue]);
-        if (NULL == font)
-        {
-            return MAW_RES_INVALID_PROPERTY_VALUE;
-        }
-
-        [label setFont:font];
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
