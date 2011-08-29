@@ -49,4 +49,10 @@
 // shows a screen.
 - (int)show: (IWidget*) handle;
 
+// shows a modal view controller
+- (void) showModal: (UIViewController*)controller;
+
+// hides a view controller that was shown modally
+- (void) hideModal;
+
 @end
