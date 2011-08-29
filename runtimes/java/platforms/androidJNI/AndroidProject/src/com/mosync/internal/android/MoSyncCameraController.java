@@ -386,7 +386,10 @@ public class MoSyncCameraController {
 		if(mCamera != null)
 		{
 			mCamera.release();
-			mPreview.mCamera = null;
+			if (mPreview != null)
+			{
+				mPreview.mCamera = null;
+			}
 			mCamera = null;
 		}
 	}
@@ -398,7 +401,10 @@ public class MoSyncCameraController {
 		if(mCamera == null)
 		{
 			mCamera = Camera.open();
-			mPreview.mCamera = mCamera;
+			if(mPreview != null)
+			{
+				mPreview.mCamera = mCamera;
+			}
 		}
 	}
 	
