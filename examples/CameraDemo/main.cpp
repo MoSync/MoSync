@@ -59,7 +59,7 @@ public:
 	AppScreen()
 	{
 		mLastEnc = 0;
-		mLastPic = 0;
+
 		mCurrentZoomIndex = 0;
 		createUI();
 	}
