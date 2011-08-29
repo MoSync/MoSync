@@ -33,8 +33,8 @@ namespace NativeUI
 	/**
 	 * Constructor.
 	 */
-	GLView::GLView() :
-		Widget(MAW_GL_VIEW)
+	GLView::GLView(const MAUtil::String type):
+		Widget(type)
 	{
 		// Set some common default values.
 		fillSpaceVertically();
