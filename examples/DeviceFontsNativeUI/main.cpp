@@ -48,9 +48,8 @@ public:
 
 		maWidgetAddChild(screen, mList);
 
-		//Set a font size relative to the size of the screen
-		MAExtent ex=maGetScrSize();
-		int fontSize=EXTENT_Y(ex)/40;
+		//Set a font size. This is independent of screen size.
+		int fontSize=20;
 
 		//Get the number of fonts installed in the device
 		int mNumFonts=maFontGetCount();
