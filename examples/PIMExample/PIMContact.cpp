@@ -45,8 +45,8 @@ PIMContact::PIMContact(MAHandle pimItemHandle)
     mItemHandle = pimItemHandle;
     mArgs.item = mItemHandle;
 
-    char buf[BUF_SIZE];
-    mArgs.buf = buf;
+    mBuffer = new char[BUF_SIZE];
+    mArgs.buf = mBuffer;
     mArgs.bufSize = BUF_SIZE;
 }
 
@@ -55,7 +55,7 @@ PIMContact::PIMContact(MAHandle pimItemHandle)
  */
 PIMContact::~PIMContact()
 {
-
+    delete[] mBuffer;
 }
 
 /**
@@ -144,9 +144,6 @@ void PIMContact::addDataToContact()
     waitForClick();
 
     addEmail();
-    waitForClick();
-
-    addFormatedAddress();
     waitForClick();
 
     addNickname();
@@ -808,24 +805,6 @@ void PIMContact::addEmail()
 
     // Add value to the email field.
     checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_EMAIL_WORK));
-}
-
-/**
- * Add value to formatted address field.
- */
-void PIMContact::addFormatedAddress()
-{
-    printf("Add value to formatted address field. \n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_FORMATTED_ADDR;
-
-    // Print value on the screen.
-    printf("Formatted address: %S", sFormattedAddress);
-
-    // Write value to buffer.
-    mArgs.bufSize = copyWCharArray(mArgs.buf, sFormattedAddress);
-
-    // Add value to formatted address field.
-    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
 }
 
 /**

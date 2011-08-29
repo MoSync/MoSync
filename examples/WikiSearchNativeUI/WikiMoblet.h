@@ -18,10 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file WikiMoblet.h
+ * @author Emma Tresanszki
  *
  * This file contains the moblet that manages the application.
  *
- * @author Emma Tresanszki
  */
 
 #ifndef WIKIMOBLET_H_
@@ -43,7 +43,7 @@ MA 02110-1301, USA.
 namespace WikiNativeUI
 {
 
-/*
+/**
  * The Moblet that will manage the application and handle events
  */
 class WikiMoblet : public MAUtil::Moblet

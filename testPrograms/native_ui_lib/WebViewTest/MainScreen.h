@@ -56,17 +56,6 @@ private:
 	 */
 	void createMainLayout();
 
-	// From WebViewListener
-    /**
-     * Deprecated, use webViewHookInvoked instead.
-     * This method is called when the URL has changed.
-     * @param webView The web view object that generated the event.
-     * @param newURL The new URL.
-     */
-    virtual void webViewUrlChanged(
-        WebView* webView,
-        const MAUtil::String& newURL);
-
     /**
      * This method is called when MAW_EVENT_WEB_VIEW_HOOK_INVOKED is received.
      * @param hookType The type of hook that has been invoked.

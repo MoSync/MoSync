@@ -18,11 +18,11 @@ MA 02110-1301, USA.
 
 /**
  * @file WikiEngine.cpp
+ * @author Emma Tresanszki
  *
  * This file contains the search engine for the application.
  * Check the http://en.wikipedia.org/w/api.php link for more request types.
  *
- * @author Emma Tresanszki
  */
 
 // The header file of the engine.
@@ -31,8 +31,8 @@ MA 02110-1301, USA.
 namespace WikiNativeUI
 {
 
-/*
- * constructor
+/**
+ * Constructor.
  * The constructor sets itself as the listener for the HttpConnection object,
  * so that the callbacks will be used.
  */
@@ -46,8 +46,8 @@ MediaWiki::MediaWiki(HomeScreen *parentScreen):
     mWiki = new MediaWikiPrivate();
 }
 
-/*
- * destructor
+/**
+ * Destructor.
  */
 MediaWiki::~MediaWiki()
 {
@@ -63,7 +63,7 @@ MediaWiki::~MediaWiki()
 	}
 }
 
-/*
+/**
  * Set the parent screen.
  * @param The screen.
  */
@@ -72,17 +72,19 @@ void MediaWiki::setScreen(HomeScreen *parentScreen)
 	mHomeScreen = parentScreen;
 }
 
-/*
+/**
  * Parse the received XML, and search for title& snippet attributes.
  */
 void MediaWiki::processSearchResults()
 {
 	/* for ex, try this request for "bear" in your browser:
-	 *   http://en.wikipedia.org/w/api.php?action=query&format=xml&list=search&srwhat=text&srsearch=bear
-	 * the output is like this:
+	 *   http://en.wikipedia.org/w/api.php?action=query&format=xml&
+	 *   list=search&srwhat=text&srsearch=bear
+	 * the output looks like this:
 	 * ...
 	 * <search>
-	 * <p ns="0" title="title1" snippet="text.." size="10283" wordcount="1324" timestamp="2011-04-12T14:25:24Z" />
+	 * <p ns="0" title="title1" snippet="text.." size="10283"
+	 * wordcount="1324" timestamp="2011-04-12T14:25:24Z" />
 	 * more paragraphs
 	 * </search>
 	 * ...
@@ -92,20 +94,27 @@ void MediaWiki::processSearchResults()
 	MAUtil::String input = mBuffer;
 	int openTag = input.find("<p ",0);
 
-	while( openTag != -1 ){
+	while( openTag != -1 )
+	{
 		int closeTag = input.find("/>", openTag+1);
-		if (closeTag != -1 && closeTag > openTag){
-			MAUtil::String  record = input.substr(openTag+2, closeTag - openTag +1);
-			// Now we have a record, ex: <p ns="0" title="title1" snippet="text.." size="10283" wordcount="1324" timestamp="2011-04-12T14:25:24Z" />
+		if (closeTag != -1 && closeTag > openTag)
+		{
+			MAUtil::String  record = input.substr(
+				openTag+2, closeTag - openTag +1);
+			// A record, ex: <p ns="0" title="title1" snippet="text.."
+			// size="10283" wordcount="1324" timestamp="2011-04-12T14:25:24Z" />
 			// Add the title if it doesn't exist yet.
 			MAUtil::String newRecord = getTitle(record);
 			bool canAdd(true);
-			for (int i=0; i<mWiki->titleResults.size(); i++){
-				if ( mWiki->titleResults[i] == newRecord ){
+			for (int i=0; i < mWiki->titleResults.size(); i++)
+			{
+				if ( mWiki->titleResults[i] == newRecord )
+				{
 					canAdd = false;
 				}
 			}
-			if (canAdd){
+			if (canAdd)
+			{
 				mWiki->titleResults.add(newRecord);
 				mWiki->snippetResults.add(getSnippet(record));
 			}
@@ -117,7 +126,7 @@ void MediaWiki::processSearchResults()
 	}
 }
 
-/*
+/**
  * Parse paragraph, and get the title attribute.
  * @param input The input paragraph.
  * @return The title.
@@ -128,8 +137,10 @@ MAUtil::String MediaWiki::getTitle(MAUtil::String inputStr)
 	int start = inputStr.find("title=",0);
 	if ( start != -1 ){
 		int end = inputStr.find(" snippet=", start+1);
-		if ( end != -1){
-			// Get rid of the quotes also ( from beginning, and end): title="text.." snippet=etc
+		if ( end != -1)
+		{
+			// Get rid of the quotes also
+			// ( from beginning, and end): title="text.." snippet=etc
 			title = inputStr.substr(start+7, end - start - 8);
 		}
 	}
@@ -142,7 +153,7 @@ MAUtil::String MediaWiki::getTitle(MAUtil::String inputStr)
 	return title;
 }
 
-/*
+/**
  * Parse paragraph, and get the snippet attribute.
  * @param input The input paragraph.
  * @return The snippet.
@@ -170,17 +181,21 @@ MAUtil::String MediaWiki::getSnippet(MAUtil::String inputStr)
 	return snippet;
 }
 
-/*
+/**
  * Set the request url using the search term and checked categories.
  */
 void MediaWiki::constructApiUrl()
 {
-	// Search inside the article text. The search inside the titles("srwhat=title") is disabled by the server.
-	mWiki->apiUrl = "http://en.wikipedia.org/w/api.php?action=query&format=xml&list=search&srlimit=";
+	// Search inside the article text. The search inside the titles
+	// ("srwhat=title") is disabled by the server.
+	mWiki->apiUrl =
+		"http://en.wikipedia.org/w/api.php?action=query&format=xml&list=search&srlimit=";
 
 	// Append the search limit and the search term.
 	// Note: even if the search limit is 0, there will be one result returned.
-	mWiki->apiUrl += MAUtil::integerToString( mWiki->maxItems )+ "&srwhat=text&srsearch=" + mSearchTerm ;
+	mWiki->apiUrl +=
+		MAUtil::integerToString( mWiki->maxItems )+
+		"&srwhat=text&srsearch=" + mSearchTerm ;
 
 	// Add the categories as tags after the search word, separated by comma.
 	mWiki->apiUrl += mHomeScreen->getCheckedCategories();
@@ -189,7 +204,7 @@ void MediaWiki::constructApiUrl()
 	replaceString(mWiki->apiUrl," ","%20");
 }
 
-/*
+/**
  * Perform a search based on user input.
  * Send a HTTP_GET request.
  * @param searchTerm The search term.
@@ -221,9 +236,10 @@ void MediaWiki::search(MAUtil::String searchTerm, int resultsLimit)
 	 }
 }
 
-/*
+/**
  * Inherited from HttpConnectionListener.
- * This callback function is called when a connection with the server is established.
+ * This callback function is called when a connection with the server is
+ * established.
  * @param http The HttpConnection that ran the operation.
  * @param result The HTTP response code (eg 200 or 404) on success,
  * or a \link #CONNERR_GENERIC CONNERR \endlink code \< 0 on failure.
@@ -239,25 +255,28 @@ void MediaWiki::httpFinished(MAUtil::HttpConnection *conn, int result)
 
 	if (contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0) {
 		// Receive in chunks.
-		// Calculate how many chunks we receive, so that we can increment a progress bar for this action.
+		// Calculate how many chunks we receive, so that we can increment
+		// a progress bar for this action.
 		div_t divide = div(contentLength, CONNECTION_BUFFER_SIZE);
 		int steps = divide.quot;
 		if (divide.rem != 0) {
 			steps++;
-			// Notify the UI of the number of increments the progress bar will need for this action.
+			// Notify the UI of the number of increments the progress bar
+			// will need for this action.
 			mHomeScreen->engineNrSteps(steps);
 		}
 
 		mHttp.recv(mBuffer, CONNECTION_BUFFER_SIZE);
 	} else {
-		// In this case the progress bar for this action will jump immediately to the max value.
+		// In this case the progress bar for this action will jump
+		// immediately to the max value.
 		mHomeScreen->engineNrSteps(1);
 		mBuffer[contentLength] = 0;
 		mHttp.read(mBuffer, contentLength);
 	}
 }
 
-/*
+/**
  * It is called when the read is done.
  * @param conn The Connection that ran the operation.
  * @param result \> 0 on success,
@@ -268,7 +287,8 @@ void MediaWiki::connReadFinished(MAUtil::Connection* conn, int result)
     if(result >= 0){
         // mBuffer now contains the result,we can now parse it.
 		processSearchResults();
-		if ( mWiki->titleResults.size() > 0 ){
+		if ( mWiki->titleResults.size() > 0 )
+		{
 			// The result is parsed, now display it.
 			mHomeScreen->engineFinished();
 		}
@@ -287,7 +307,7 @@ void MediaWiki::connReadFinished(MAUtil::Connection* conn, int result)
 	mIsConnected = false;
 }
 
-/*
+/**
  * It is called each time a new chunk of data is received.
  * @param conn The Connection that ran the operation.
  * @param result The number of bytes read on success,
@@ -325,7 +345,7 @@ void MediaWiki::connRecvFinished(MAUtil::Connection * conn, int result)
 
 }
 
-/*
+/**
  * Provides all the available titles.
  * @return All the titles.
  */
@@ -334,7 +354,7 @@ MAUtil::Vector<MAUtil::String> MediaWiki::getAllTitles()
 	return mWiki->titleResults;
 }
 
-/*
+/**
  * Provides the snippets.
  * @return All the snippets.
  */
@@ -343,23 +363,29 @@ MAUtil::Vector<MAUtil::String> MediaWiki::getAllSnippets()
 	return mWiki->snippetResults;
 }
 
-/*
+/**
  * Provides the snippets along with the title.
+ * Only for the checked ones.
  */
 MAUtil::Vector<MAUtil::String> MediaWiki::getAllSnippetsWithTitle()
 {
 	MAUtil::Vector<MAUtil::String> list;
-	for ( int i=0; i<mWiki->titleResults.size(); i++){
-		// Each entry has title and the corresponding snippet.
-		MAUtil::String line = mWiki->titleResults[i] + "\n" + mWiki->snippetResults[i] ;
-//		line.append("\n",1);
-//		line.append(mWiki->snippetResults[i].c_str(),mWiki->snippetResults[i].length());
-		list.add(line);
+	for (int i=0; i < mWiki->titleResults.size(); i++)
+	{
+		if ( !isItemHidden(i) )
+		{
+			// Each entry has title and the corresponding snippet.
+			MAUtil::String line =
+				mWiki->titleResults[i] +
+				"\n" +
+				mWiki->snippetResults[i] ;
+			list.add(line);
+		}
 	}
 	return list;
 }
 
-/*
+/**
  * Get the title on a given position.
  * @param index The position for which to search the array of titles.
  */
@@ -368,7 +394,7 @@ MAUtil::String MediaWiki::getTitleForIndex(int index)
 	return mWiki->titleResults[index];
 }
 
-/*
+/**
  * setter
  * Sets the current search term.
  * @param term The search term.
@@ -378,19 +404,64 @@ void MediaWiki::setSearchTerm(MAUtil::String term)
 	mSearchTerm = term;
 }
 
-/*
+/**
  * Delete the entries on selected indexes.
- * @param indexList The list with the indexes of the records that need to be deleted.
+ * @param indexList The list with the indexes of the records that
+ * need to be deleted.
  */
 void MediaWiki::filterData(MAUtil::Vector<int> indexList)
 {
+
 	int shift = 0;
 	// The vector is shifted to the left.
-	for (int i=0; i<indexList.size(); i++){
-		mWiki->titleResults.remove(indexList[i]-shift);
-		mWiki->snippetResults.remove(indexList[i]-shift);
+	for (int i=0; i < indexList.size(); i++)
+	{
+		if ( indexList[i]-shift >= 0)
+		{
+			if ( indexList[i]-shift < mWiki->titleResults.size() ){
+				mWiki->titleResults.remove(indexList[i]-shift);
+			}
+			if ( indexList[i]-shift < mWiki->snippetResults.size() ){
+				mWiki->snippetResults.remove(indexList[i]-shift);
+			}
+		}
 		shift++;
 	}
+}
+
+/**
+ * Mark as hidden the entries that are not checked in TitlesScreen.
+ * @param indexList The index of the item that needs to be hidden.
+ */
+void MediaWiki::markAsHidden(int indexList)
+{
+	mUncheckedItems.add(indexList);
+}
+
+/**
+ * Clear all the indexes that are marked as hidden.
+ */
+void MediaWiki::clearHiddenIndexList()
+{
+	mUncheckedItems.clear();
+}
+
+/**
+ * Checks if the wiki item on the indexArray is marked as hidden.
+ * Item is marked as hidden when unchecked from TitlesScreen.
+ * @param indexArray The item index from wiki array of results.
+ * @return true if the item should be hidden on SummaryScreen, false otherwise.
+ */
+bool MediaWiki::isItemHidden(int indexArray)
+{
+	for (int i=0; i < mUncheckedItems.size(); i++)
+	{
+		if ( mUncheckedItems[i] == indexArray )
+		{
+			return true;
+		}
+	}
+	return false;
 }
 
 }  // namespace WikiNativeUI

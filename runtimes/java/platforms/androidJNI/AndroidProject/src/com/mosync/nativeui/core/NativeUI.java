@@ -22,6 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
+import android.app.LauncherActivity.ListItem;
 import android.graphics.Bitmap;
 import android.test.IsolatedContext;
 import android.util.Log;
@@ -41,6 +42,7 @@ import com.mosync.nativeui.ui.widgets.ButtonWidget;
 import com.mosync.nativeui.ui.widgets.CameraPreviewWidget;
 import com.mosync.nativeui.ui.widgets.LabelWidget;
 import com.mosync.nativeui.ui.widgets.Layout;
+import com.mosync.nativeui.ui.widgets.ListItemWidget;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
@@ -456,7 +458,7 @@ public class NativeUI
 		
 		boolean result;
 
-		// Send the typeface to the label or button widget.
+		// Send the typeface to the label, button widget or list view item.
 		if ( key.compareTo( IX_WIDGET.MAW_LABEL_FONT_HANDLE ) == 0 )
 		{
 			MoSyncFontHandle currentFont = null;
@@ -490,6 +492,13 @@ public class NativeUI
 				{
 					ButtonWidget buttonWidget = (ButtonWidget) widget;
 					buttonWidget.setFontTypeface(
+							currentFont.getTypeface(),
+							currentFont.getFontSize());
+				}
+				else if ( widget instanceof ListItemWidget )
+				{
+					ListItemWidget listItemWidget = (ListItemWidget) widget;
+					listItemWidget.setFontTypeface(
 							currentFont.getTypeface(),
 							currentFont.getFontSize());
 				}
