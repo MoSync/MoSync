@@ -344,17 +344,6 @@ namespace NativeUI
                     widgetEventData->status);
             }
         }
-        if (MAW_EVENT_WEB_VIEW_URL_CHANGED == widgetEventData->eventType)
-        {
-            MAUtil::String newURL = this->getNewURL();
-
-            for (int i = 0; i < mWebViewListeners.size(); i++)
-            {
-                mWebViewListeners[i]->webViewUrlChanged(
-                    this,
-                    newURL);
-            }
-        }
         else if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
         {
 		int hookType = widgetEventData->hookType;

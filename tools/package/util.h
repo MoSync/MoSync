@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <map>
 #include <string>
+#include <ios>
 
 // All these functions exit() on error.
 
@@ -46,5 +47,12 @@ void toSlashes(std::string&);
 void toDir(std::string&);
 
 std::string fullpathString(const char* name);
+
+// Stores the pointer as a name for the stream.
+void setName(std::ios& i, const char* name);
+
+// Aborts the program if the stream is not good().
+// Reports the error using the name set by setName().
+void beGood(std::ios& i);
 
 #endif	//UTIL_H

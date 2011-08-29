@@ -91,8 +91,6 @@ namespace NativeUI
     }
 
     /**
-     * TODO: Check this code! We might not need this. Unsure about how
-     * it works.
      *
      * This method is called when there is an event for this widget.
      * It passes on the event to the widget's listener if one is set.

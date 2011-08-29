@@ -1,14 +1,14 @@
 # Copyright (C) 2009 Mobile Sorcery AB
-# 
+#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
 # the Free Software Foundation.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; see the file COPYING.  If not, write to the Free
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -46,20 +46,20 @@ class CompileGccTask < FileTask
 		super(work, name)
 		@SOURCE = source
 		@prerequisites << source
-		
+
 		@DEPFILE = @work.genfile(source, ".mf")
 		@TEMPDEPFILE = @work.genfile(source, ".mft")
-		depFlags = " -MMD -MF #{@TEMPDEPFILE}"
+		depFlags = " -MMD -MF \"#{@TEMPDEPFILE}\""
 		@FLAGS = cflags + depFlags
-		
+
 		initFlags
-		
+
 		# only if the file is not already needed do we care about extra dependencies
 		if(!needed?(false)) then
 			@prerequisites += MakeDependLoader.load(@DEPFILE, @NAME)
 		end
 	end
-	
+
 	def needed?(log = true)
 		return true if(super(log))
 		if(!File.exists?(@DEPFILE))
@@ -68,27 +68,27 @@ class CompileGccTask < FileTask
 		end
 		return flagsNeeded?(log)
 	end
-	
+
 	def cFlags
-		return "#{@FLAGS} #{@work.gccmode} #{File.expand_path_fix(@SOURCE)}"
+		return "#{@FLAGS} #{@work.gccmode} \"#{File.expand_path_fix(@SOURCE)}\""
 	end
-	
+
 	def execute
 		execFlags
 		begin
-			sh "#{@work.gcc} -o #{@NAME}#{cFlags}"
+			sh "#{@work.gcc} -o \"#{@NAME}\"#{cFlags}"
 		rescue => e
 			# in case gcc output a broken object file
 			FileUtils.rm_f(@NAME)
 			raise
 		end
-		
+
 		# In certain rare cases (error during preprocess caused by a header file)
 		# gcc may output an empty dependency file, resulting in an empty dependency list for
 		# the object file, which means it will not be recompiled, even though it should be.
 		FileUtils.mv(@TEMPDEPFILE, @DEPFILE)
 	end
-	
+
 	include FlagsChanged
 end
 
@@ -127,46 +127,46 @@ class GccWork < BuildWork
 	def genfile(source, ending)
 		@BUILDDIR + File.basename(source.to_s).ext(ending)
 	end
-	
+
 	# The filename of the target.
 	def target
 		@TARGET
 	end
-	
+
 	private
-	
+
 	include GccFlags
-	
+
 	def setup2
 		define_cflags
 		@CFLAGS_MAP = { ".c" => @CFLAGS + host_flags,
 			".cpp" => @CPPFLAGS + host_flags + host_cppflags,
 			".cc" => @CPPFLAGS + host_flags + host_cppflags }
-		
+
 		#find source files
 		cfiles = collect_files(".c")
 		cppfiles = collect_files(".cpp") + collect_files(".cc")
-		
+
 		if(HOST == :darwin)
 			@CFLAGS_MAP[".mm"] = @CPPFLAGS + host_flags + host_cppflags
 			cppfiles += collect_files(".mm")
 		end
-		
+
 		@all_sourcefiles = cfiles + cppfiles
 		@all_sourcefiles.sort! do |a,b| b.timestamp <=> a.timestamp end
-		
+
 		@source_objects = objects(@all_sourcefiles)
 		all_objects = @source_objects + @EXTRA_OBJECTS
-		
+
 		setup3(all_objects, !cppfiles.empty?)
  	end
-	
+
 	def check_extra_sourcefile(file, ending)
 		return false if(file.getExt != ending)
 		raise "Extra sourcefile '#{file}' does not exist!" if(!File.exist?(file))
 		return true
 	end
-	
+
 	# returns an array of FileTasks
 	def collect_files(ending)
 		files = @SOURCES.collect {|dir| Dir[dir+"/*"+ending]}
@@ -177,7 +177,7 @@ class GccWork < BuildWork
 		extra_tasks = @EXTRA_SOURCETASKS.select do |file| file.to_s.getExt == ending end
 		return extra_tasks + tasks
 	end
-	
+
 	def getGccFlags(source)
 		ext = source.to_s.getExt
 		cflags = @CFLAGS_MAP[ext]
@@ -188,13 +188,13 @@ class GccWork < BuildWork
 		cflags += @SPECIFIC_CFLAGS.fetch(File.basename(source.to_s), "")
 		return cflags
 	end
-	
+
 	def makeGccTask(source, ending)
 		objName = genfile(source, ending)
 		task = CompileGccTask.new(self, objName, source, getGccFlags(source))
 		return task
 	end
-	
+
 	# returns an array of CompileGccTasks
 	def objects(sources)
 		return sources.collect do |path| makeGccTask(path, object_ending) end

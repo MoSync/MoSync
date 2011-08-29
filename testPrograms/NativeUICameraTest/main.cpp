@@ -69,6 +69,8 @@ public:
 		mNumCameras = maCameraNumber();
 		mActiveCamera = 0;
 		currentViewIndex = 0;
+		mNumFailure = 0;
+		mNumSuccess = 0;
 		char buffer[256];
 		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
@@ -84,6 +86,16 @@ public:
 		maWidgetDestroy(mScreen);
 	}
 
+
+	void myAssert(int cameraResult)
+	{
+		if((cameraResult == MA_CAMERA_RES_OK) ||
+				(cameraResult == MA_CAMERA_RES_PROPERTY_NOTSUPPORTED) ||
+				(cameraResult == MA_CAMERA_RES_VALUE_NOTSUPPORTED))
+			mNumSuccess++;
+		else
+			mNumFailure++;
+	}
 	/**
 	 * Here we create the user interface widgets.
 	 */
@@ -367,15 +379,10 @@ public:
 
 	}
 
-	void setCameraProperty(const char * property, const char* value)
+	int setCameraProperty(const char * property, const char* value)
 	{
 		int res = maCameraSetProperty(property, value);
-		if(res == MA_CAMERA_RES_FAILED)
-		{
-			char buf[256];
-			sprintf(buf, "Failed to set property: %s to value %s", property, value);
-			maPanic(res, buf);
-		}
+		return res;
 	}
 	/**
 	 * This method is called when the Submit button is clicked.
@@ -397,44 +404,44 @@ public:
 		if(currentViewIndex == 1)
 		{
 			startCamera();
-			setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_ON);
+			myAssert(setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_ON));
 			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n  MA_CAMERA_FLASH_ON!!!");
 		}
 		else if (currentViewIndex == 2)
 		{
 			startCamera();
-			setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO);
+			myAssert(setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO));
 			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FLASH_AUTO!!!");
 		}
 		else if (currentViewIndex == 3)
 		{
 			startCamera();
-			setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_TORCH);
+			myAssert(setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_TORCH));
 			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FLASH_TORCH!!!");
 		}
 		else if (currentViewIndex == 4)
 		{
 			startCamera();
-			setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_OFF);
-			setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO);
+			myAssert(setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_OFF));
+			myAssert(setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO));
 			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FOCUS_AUTO!!!");
 		}
 		else if (currentViewIndex == 5)
 		{
 			startCamera();
-			setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_FIXED);
+			myAssert(setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_FIXED));
 			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FOCUS_FIXED!!!");
 		}
 		else if (currentViewIndex == 6)
 		{
 			startCamera();
-			setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_INFINITY);
+			myAssert(setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_INFINITY));
 			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n\n  MA_CAMERA_FOCUS_INFINITY!!!");
 		}
 		else if (currentViewIndex == 7)
 		{
 			startCamera();
-			setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO);
+			myAssert(setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO));
 			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FOCUS_MACRO!!!");
 		}
 		else if (currentViewIndex == 8)
@@ -443,7 +450,7 @@ public:
 		}
 		else
 		{
-			setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO);
+			myAssert(setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO));
 			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FLASH_AUTO!!!");
 		}
 	}
@@ -483,145 +490,165 @@ public:
 		// Make the label fill the width of the parent layout and
 		// adjust its height to "shrink wrap" the size of the text.
 		widgetSetPropertyInt(
-			mInstructions,
-			MAW_WIDGET_WIDTH,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		widgetSetPropertyInt(
-			mInstructions,
-			MAW_WIDGET_HEIGHT,
-			MAW_CONSTANT_WRAP_CONTENT);
-
-		// Set the label text.
-		maWidgetSetProperty(
-			mInstructions,
-			MAW_LABEL_TEXT,
-			"Reading the Camera properties!!!");
-
-		//Adding the label to the layout
-		maWidgetAddChild(mMainLayoutWidget, mInstructions);
-		// The first widget is a label that we'll use to present instructions.
-			int flashLabel = maWidgetCreate(MAW_LABEL);
-
-				// Make the label fill the width of the parent layout and
-			// adjust its height to "shrink wrap" the size of the text.
-			widgetSetPropertyInt(
-					flashLabel,
+				mInstructions,
 				MAW_WIDGET_WIDTH,
 				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-			widgetSetPropertyInt(
-					flashLabel,
+		widgetSetPropertyInt(
+				mInstructions,
 				MAW_WIDGET_HEIGHT,
 				MAW_CONSTANT_WRAP_CONTENT);
 
-			// Set the label text.
-			maWidgetSetProperty(
-					flashLabel,
+		// Set the label text.
+		maWidgetSetProperty(
+				mInstructions,
+				MAW_LABEL_TEXT,
+				"Reading the Camera properties!!!");
+
+		//Adding the label to the layout
+		maWidgetAddChild(mMainLayoutWidget, mInstructions);
+		int flashLabel = maWidgetCreate(MAW_LABEL);
+
+			// Make the label fill the width of the parent layout and
+		// adjust its height to "shrink wrap" the size of the text.
+		widgetSetPropertyInt(
+				flashLabel,
+				MAW_WIDGET_WIDTH,
+				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+		widgetSetPropertyInt(
+				flashLabel,
+				MAW_WIDGET_HEIGHT,
+				MAW_CONSTANT_WRAP_CONTENT);
+
+		// Set the label text.
+		maWidgetSetProperty(
+				flashLabel,
 				MAW_LABEL_TEXT,
 				"\nMA_CAMERA_FLASH_SUPPORTED:");
 
-			//Adding the label to the layout
-			maWidgetAddChild(mMainLayoutWidget, flashLabel);
+		//Adding the label to the layout
+		maWidgetAddChild(mMainLayoutWidget, flashLabel);
 
-	// The first widget is a label that we'll use to present instructions.
 		int flashSupported = maWidgetCreate(MAW_LABEL);
 
 		char buffer[256];
 		maCameraGetProperty(MA_CAMERA_FLASH_SUPPORTED, buffer, 256);
 
+		widgetSetPropertyInt(
+				flashSupported,
+				MAW_WIDGET_WIDTH,
+				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+		widgetSetPropertyInt(
+				flashSupported,
+				MAW_WIDGET_HEIGHT,
+				MAW_CONSTANT_WRAP_CONTENT);
+
+		// Set the label text.
+		maWidgetSetProperty(
+				flashSupported,
+				MAW_LABEL_TEXT,
+				buffer);
+
+		//Adding the label to the layout
+		maWidgetAddChild(mMainLayoutWidget, flashSupported);
+		int zoomLabel = maWidgetCreate(MAW_LABEL);
+
+			// Make the label fill the width of the parent layout and
+		// adjust its height to "shrink wrap" the size of the text.
+		widgetSetPropertyInt(
+				zoomLabel,
+				MAW_WIDGET_WIDTH,
+				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+		widgetSetPropertyInt(
+				zoomLabel,
+				MAW_WIDGET_HEIGHT,
+				MAW_CONSTANT_WRAP_CONTENT);
+
+		// Set the label text.
+		maWidgetSetProperty(
+				zoomLabel,
+				MAW_LABEL_TEXT,
+				"\n MA_CAMERA_ZOOM_SUPPORTED:");
+
+		//Adding the label to the layout
+		maWidgetAddChild(mMainLayoutWidget, zoomLabel);
+
+		int zoomSupported = maWidgetCreate(MAW_LABEL);
+
+		char buffer2[256];
+		maCameraGetProperty(MA_CAMERA_ZOOM_SUPPORTED, buffer2, 256);
+
 		// Make the label fill the width of the parent layout and
 		// adjust its height to "shrink wrap" the size of the text.
 		widgetSetPropertyInt(
-				flashSupported,
+				zoomSupported,
 			MAW_WIDGET_WIDTH,
 			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 		widgetSetPropertyInt(
-				flashSupported,
+				zoomSupported,
 			MAW_WIDGET_HEIGHT,
 			MAW_CONSTANT_WRAP_CONTENT);
 
 		// Set the label text.
 		maWidgetSetProperty(
-				flashSupported,
+				zoomSupported,
 			MAW_LABEL_TEXT,
-			buffer);
+			buffer2);
 
 		//Adding the label to the layout
-		maWidgetAddChild(mMainLayoutWidget, flashSupported);
-		// The first widget is a label that we'll use to present instructions.
-			int zoomLabel = maWidgetCreate(MAW_LABEL);
+		maWidgetAddChild(mMainLayoutWidget, zoomSupported);
 
-				// Make the label fill the width of the parent layout and
-			// adjust its height to "shrink wrap" the size of the text.
-			widgetSetPropertyInt(
-					zoomLabel,
+		int numCameras = maCameraNumber();
+		char buffer3[128];
+		sprintf(buffer3,"\n Number of Cameras:  %d", numCameras);
+		int cameraNumber = maWidgetCreate(MAW_LABEL);
+
+
+		// Make the label fill the width of the parent layout and
+		// adjust its height to "shrink wrap" the size of the text.
+		widgetSetPropertyInt(
+				cameraNumber,
 				MAW_WIDGET_WIDTH,
 				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-			widgetSetPropertyInt(
-					zoomLabel,
+		widgetSetPropertyInt(
+				cameraNumber,
 				MAW_WIDGET_HEIGHT,
 				MAW_CONSTANT_WRAP_CONTENT);
 
-			// Set the label text.
-			maWidgetSetProperty(
-					zoomLabel,
+		// Set the label text.
+		maWidgetSetProperty(
+				cameraNumber,
 				MAW_LABEL_TEXT,
-				"\n MA_CAMERA_ZOOM_SUPPORTED:");
+				buffer3);
+		//Adding the label to the layout
+		maWidgetAddChild(mMainLayoutWidget, cameraNumber);
 
-			//Adding the label to the layout
-			maWidgetAddChild(mMainLayoutWidget, zoomLabel);
+		char buffer4[128];
+		sprintf(buffer4,
+				"\n %d test failed out of  %d total tests",
+				mNumFailure,
+				mNumFailure+mNumSuccess);
+		int failureNumber = maWidgetCreate(MAW_LABEL);
 
-		// The first widget is a label that we'll use to present instructions.
-			int zoomSupported = maWidgetCreate(MAW_LABEL);
 
-			char buffer2[256];
-			maCameraGetProperty(MA_CAMERA_ZOOM_SUPPORTED, buffer2, 256);
-
-			// Make the label fill the width of the parent layout and
-			// adjust its height to "shrink wrap" the size of the text.
-			widgetSetPropertyInt(
-					zoomSupported,
+		// Make the label fill the width of the parent layout and
+		// adjust its height to "shrink wrap" the size of the text.
+		widgetSetPropertyInt(
+				failureNumber,
 				MAW_WIDGET_WIDTH,
 				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-			widgetSetPropertyInt(
-					zoomSupported,
+		widgetSetPropertyInt(
+				failureNumber,
 				MAW_WIDGET_HEIGHT,
 				MAW_CONSTANT_WRAP_CONTENT);
 
-			// Set the label text.
-			maWidgetSetProperty(
-					zoomSupported,
+		// Set the label text.
+		maWidgetSetProperty(
+				failureNumber,
 				MAW_LABEL_TEXT,
-				buffer2);
-
-			//Adding the label to the layout
-			maWidgetAddChild(mMainLayoutWidget, zoomSupported);
-
-			int numCameras = maCameraNumber();
-			char buffer3[128];
-			sprintf(buffer3,"\n Number of Cameras:  %d", numCameras);
-			// The first widget is a label that we'll use to present instructions.
-				int cameraNumber = maWidgetCreate(MAW_LABEL);
-
-
-				// Make the label fill the width of the parent layout and
-				// adjust its height to "shrink wrap" the size of the text.
-				widgetSetPropertyInt(
-						cameraNumber,
-					MAW_WIDGET_WIDTH,
-					MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-				widgetSetPropertyInt(
-						cameraNumber,
-					MAW_WIDGET_HEIGHT,
-					MAW_CONSTANT_WRAP_CONTENT);
-
-				// Set the label text.
-				maWidgetSetProperty(
-						cameraNumber,
-					MAW_LABEL_TEXT,
-					buffer3);
-				//Adding the label to the layout
-				maWidgetAddChild(mMainLayoutWidget, cameraNumber);
-				maWidgetScreenShow(mScreen);
+				buffer4);
+		//Adding the label to the layout
+		maWidgetAddChild(mMainLayoutWidget, failureNumber);
+		maWidgetScreenShow(mScreen);
 	}
 
 
@@ -723,6 +750,10 @@ private:
 	int maxZoom;
 
 	int mCurrentZoomIndex;
+
+	int mNumSuccess;
+
+	int mNumFailure;
 };
 
 // That's the screen class finished, now we move on to the Moblet that

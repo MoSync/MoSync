@@ -18,12 +18,12 @@ MA 02110-1301, USA.
 
 /**
  * @file BasicScreen.h
+ * @author Emma Tresanszki
  *
  * This file contains the base screen of the application.
  * It contains the base screen constructors, and the creation
  * of a main layout that is common for some screens.
  *
- * @author Emma Tresanszki
  */
 
 #ifndef BASICSCREENNUI_H_
@@ -35,7 +35,7 @@ MA 02110-1301, USA.
 namespace WikiNativeUI
 {
 
-/*
+/**
  * BasicScreen native UI.
  * When using many screens, inherit from this basic screen class.
  * which creates a screen with a main vertical layout, that fits the screen size.

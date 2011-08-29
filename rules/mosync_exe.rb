@@ -1,14 +1,14 @@
 # Copyright (C) 2009 Mobile Sorcery AB
-# 
+#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
 # the Free Software Foundation.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; see the file COPYING.  If not, write to the Free
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -75,7 +75,7 @@ class MxConfigTask < MultiFileTask
 	def dllName(e)
 		"#{@extDir}/ext_#{e[1]}.dll"
 	end
-	
+
 	def initialize(work, extDir, extensions)
 		@extensions = extensions
 		@extDir = extDir
@@ -110,7 +110,7 @@ class PipeExeWork < PipeGccWork
 		@buildpath = @TARGETDIR + "/" + @BUILDDIR
 		@SLD = @buildpath + "sld.tab"
 		stabs = @buildpath + "stabs.tab"
-		@FLAGS = " -sld=#{@SLD} -stabs=#{stabs} -B"
+		@FLAGS = " \"-sld=#{@SLD}\" \"-stabs=#{stabs}\" -B"
 		@EXTRA_INCLUDES = @EXTRA_INCLUDES.to_a +
 			[mosync_include, "#{mosyncdir}/profiles/vendors/MoSync/Emulator"]
 		@prerequisites << MxConfigTask.new(self, "#{@COMMON_BASEDIR}/build/#{CONFIG}", @EXTENSIONS) if(@EXTENSIONS)
@@ -135,31 +135,31 @@ class PipeExeWork < PipeGccWork
 		else
 			default(:DEFAULT_LIBS, ["mastd"])
 		end
-		
+
 		# libs
 		libs = (@DEFAULT_LIBS + @LIBRARIES).collect do |lib|
 			FileTask.new(self, "#{mosync_libdir}/#{@COMMON_BUILDDIR_NAME}/#{lib}.lib")
 		end
 		all_objects += libs
-		
+
 		super
-		
+
 		if(ELIM)
 			@TARGET.extend(PipeElimTask)
 		end
 		if(defined?(PACK))
-			@prerequisites = [@TARGET = MoSyncPackTask.new(self, @BUILDDIR_BASE, @buildpath,
-				PACK, @TARGET, @resourceTask, @NAME)]
+			@prerequisites << @TARGET = MoSyncPackTask.new(self, @BUILDDIR_BASE, @buildpath,
+				PACK, @TARGET, @resourceTask, @NAME)
 		end
 	end
 	def emuCommandLine
 		if(@resourceTask)
-			resArg = " -resource #{@resourceTask}"
+			resArg = " -resource \"#{@resourceTask}\""
 		end
 		if(@EXTENSIONS)
 			extArg = " -x build/mxConfig.txt"
 		end
-		return "#{mosyncdir}/bin/MoRE -program #{@TARGET} -sld #{@SLD}#{resArg}#{extArg}#{@EXTRA_EMUFLAGS}"
+		return "#{mosyncdir}/bin/MoRE -program \"#{@TARGET}\" -sld \"#{@SLD}\"#{resArg}#{extArg}#{@EXTRA_EMUFLAGS}"
 	end
 	def run
 		# run the emulator

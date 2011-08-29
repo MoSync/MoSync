@@ -239,4 +239,18 @@ static IWidget* sOldScreen = nil;
 	return MAW_RES_OK;
 }
 
+- (void) showModal: (UIViewController*) controller {
+	[self performSelectorOnMainThread:@selector(showModalHelper:)
+						   withObject:controller
+						waitUntilDone:NO];
+
+}
+
+- (void) showModalHelper: (UIViewController*) controller {
+	[[(ScreenWidget*)sOldScreen getController] presentModalViewController:controller animated:NO];
+}
+
+- (void) hideModal {
+	[[(ScreenWidget*)sOldScreen getController] dismissModalViewControllerAnimated:NO];
+}
 @end

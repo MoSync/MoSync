@@ -40,15 +40,6 @@ namespace NativeUI
     class WebViewListener
     {
     public:
-        /**
-         * Deprecated, use webViewHookInvoked instead.
-         * This method is called when the URL has changed.
-         * @param webView The web view object that generated the event.
-         * @param newURL The new URL.
-         */
-        virtual void webViewUrlChanged(
-            WebView* webView,
-            const MAUtil::String& newURL) = 0;
 
         /**
          * This method is called when MAW_EVENT_WEB_VIEW_HOOK_INVOKED is received.

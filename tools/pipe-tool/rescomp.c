@@ -480,7 +480,7 @@ short ResourceCommands()
 		GetStringName(128);
 
 		if(Do_Export_Dependencies && Pass == 2) {
-			fprintf(DependFile, "\t%s \\\n", AddRelPrefix(Name));
+			ExportFileDependency(Name);
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
@@ -529,7 +529,7 @@ short ResourceCommands()
 		GetStringName(128);
 
 		if(Do_Export_Dependencies && Pass == 2) {
-			fprintf(DependFile, "\t%s \\\n", AddRelPrefix(Name));
+			ExportFileDependency(Name);
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
@@ -643,7 +643,7 @@ short ResourceCommands()
 		WriteWord(ysize);
 
 		if(Do_Export_Dependencies && Pass == 2) {
-			fprintf(DependFile, "\t%s \\\n", AddRelPrefix(Name));
+			ExportFileDependency(Name);
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
@@ -696,7 +696,7 @@ short ResourceCommands()
 		ysize = GetExpression();		// ysize
 
 		if(Do_Export_Dependencies && Pass == 2) {
-			fprintf(DependFile, "\t%s \\\n", AddRelPrefix(Name));
+			ExportFileDependency(Name);
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
@@ -761,7 +761,7 @@ short ResourceCommands()
 		WriteWord(spr_cy);
 */
 		if(Do_Export_Dependencies && Pass == 2) {
-			fprintf(DependFile, "\t%s \\\n", AddRelPrefix(Name));
+			ExportFileDependency(Name);
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
@@ -1091,7 +1091,7 @@ short ResourceCommands()
 		GetStringName(128);		
 
 		if(Do_Export_Dependencies && Pass == 2) {
-			fprintf(DependFile, "\t%s \\\n", AddRelPrefix(Name));
+			ExportFileDependency(Name);
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
@@ -1294,6 +1294,29 @@ short ResourceCommands()
 	Error(Error_Fatal, "Illegal resource directive '%s'",Name);
 
 	return 0;
+}
+
+char* EscapeSpaceDependency(const char* name) {
+	static char buffer[8*1024];	// should be sufficient for most filenames
+	static const char SPACE_MARK[] = "__&NBSP;__";
+	char* bp = buffer;
+	const char* np = name;
+	while(*np) {
+		if(*np == ' ') {
+			memcpy(bp, SPACE_MARK, sizeof(SPACE_MARK));
+			bp += sizeof(SPACE_MARK)-1;
+		} else {
+			*bp = *np;
+			bp++;
+		}
+		np++;
+	}
+	*bp = 0;
+	return buffer;
+}
+
+void ExportFileDependency(const char* name) {
+	fprintf(DependFile, "\t%s \\\n", EscapeSpaceDependency(AddRelPrefix(Name)));
 }
 
 //****************************************
