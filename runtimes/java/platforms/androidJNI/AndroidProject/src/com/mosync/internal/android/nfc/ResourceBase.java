@@ -24,4 +24,8 @@ public class ResourceBase implements IResource {
 		handle = 0;
 	}
 
+	public boolean isDestroyed() {
+		return handle == 0;
+	}
+
 }

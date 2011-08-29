@@ -784,6 +784,28 @@ namespace Base
 	int _maNFCDestroyTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis);
 
 	/**
+	* Connects to a tag, enabling further I/O operations to be
+	* performed on it.
+	*/
+	int _maNFCConnectTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Closes I/O operations for a tag, disabling further I/O operations to be
+	* performed on it.
+	*/
+	int _maNFCCloseTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCIsType(MAHandle tagHandle, int tagType, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCGetTypedTag(MAHandle tagHandle, int tagType, JNIEnv* jNIEnv, jobject jThis);
+
+	MAHandle _maNFCBatchStart(MAHandle nfcContext, JNIEnv* jNIEnv, jobject jThis);
+
+	MAHandle _maNFCBatchCommit(MAHandle nfcContext, JNIEnv* jNIEnv, jobject jThis);
+
+	MAHandle _maNFCBatchRollback(MAHandle nfcContext, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
 	* Returns a handle to an NDEF message, or a zero handle
 	* if the tag is not of the correct type.
 	*/
@@ -829,5 +851,19 @@ namespace Base
 	* does not represent an NDEF message.
 	*/
 	int _maNFCGetType(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCAuthenticateSectorWithKeyA(MAHandle mfcTag, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCAuthenticateSectorWithKeyB(MAHandle mfcTag, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCGetSectorCount(MAHandle mfcTag, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCGetBlockCountInSector(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCSectorToBlock(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCReadBlocks(MAHandle mfcTag, int firstBlock, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCReadPages(MAHandle mfcTag, int firstPage, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
 }

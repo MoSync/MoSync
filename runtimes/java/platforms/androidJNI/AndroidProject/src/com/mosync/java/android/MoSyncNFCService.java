@@ -1,13 +1,14 @@
-package com.mosync.internal.android.nfc;
+package com.mosync.java.android;
 
 import android.app.IntentService;
+import android.content.Context;
 import android.content.Intent;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Parcelable;
 
-import com.mosync.java.android.MoSync;
+import com.mosync.internal.android.nfc.MoSyncNFC;
 
 public class MoSyncNFCService extends IntentService {
 
@@ -17,6 +18,16 @@ public class MoSyncNFCService extends IntentService {
 
 	@Override
 	public void onHandleIntent(Intent intent) {
+		handleNFCIntent(this, intent);
+	}
+
+	/**
+	 * Handles an NFC intent
+	 * @param context
+	 * @param intent
+	 * @return {@code true} If the intent was an NFC intent and handled.
+	 */
+	public static boolean handleNFCIntent(Context context, Intent intent) {
 		String action = intent.getAction();
 		MoSyncNFC nfcContext = MoSyncNFC.getDefault();
 		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
@@ -31,24 +42,28 @@ public class MoSyncNFCService extends IntentService {
 					msgs[i] = (NdefMessage) rawMsgs[i];
 				}
 				nfcContext.handleMessages(msgs);
-				activateMoSyncApp();
+				activateMoSyncApp(context);
+				return true;
 			}
-		} else if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)) {
+		} else if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action) || NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)) {
 			// Or, we have some specific tag technology such as MIFARE
 			// (also filtered in the androidManifest.xml)
 			Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
 			nfcContext.handleMessages(tag);
-			activateMoSyncApp();
+			activateMoSyncApp(context);
+			return true;
 		}
+
+		return false;
 	}
 
-	private void activateMoSyncApp() {
-		Intent launcherIntent = new Intent(this, MoSync.class);
+	private static void activateMoSyncApp(Context context) {
+		Intent launcherIntent = new Intent(context, MoSync.class);
 		launcherIntent.addFlags(
 			Intent.FLAG_ACTIVITY_NEW_TASK |
 			Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
 			Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		startActivity(launcherIntent);
+		context.startActivity(launcherIntent);
 	}
 
 }

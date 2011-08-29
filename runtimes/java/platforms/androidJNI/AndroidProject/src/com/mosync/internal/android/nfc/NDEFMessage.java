@@ -1,13 +1,26 @@
 package com.mosync.internal.android.nfc;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NDEF;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
+import android.nfc.tech.Ndef;
 
 
 public class NDEFMessage extends ResourceBase implements INFCTag {
 
 	private final NdefMessage msg;
 	private final NDEFRecord[] records;
+
+	static NDEFMessage get(ResourcePool pool, GenericTag tag) {
+		Ndef ndef = Ndef.get(tag.getTag());
+		if (ndef != null) {
+			NdefMessage ndefMessage = ndef.getCachedNdefMessage();
+			NDEFMessage result = new NDEFMessage(pool, ndefMessage);
+			return result;
+		}
+
+		return null;
+	}
 
 	public NDEFMessage(ResourcePool pool, NdefMessage msg) {
 		super(pool);
@@ -37,19 +50,20 @@ public class NDEFMessage extends ResourceBase implements INFCTag {
 
 	@Override
 	public void close() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void connect() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
-	public NDEFMessage getNDEFMessage(ResourcePool pool) {
-		return this;
+	public INFCTag toTypedTag(ResourcePool pool, int type) {
+		if (type == MA_NFC_TAG_TYPE_NDEF) {
+			return this;
+		}
+		return null;
 	}
 
 }

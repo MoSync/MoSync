@@ -2155,7 +2155,7 @@ namespace Base
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
 												 "maNFCStop",
-												 "()I");
+												 "()V");
 		if (methodID == 0)
 			return 0;
 
@@ -2183,12 +2183,63 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCDestroyTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis)  {
+	int _maNFCDestroyTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
 												 "maNFCDestroyTag",
+												 "(I)V");
+		if (methodID == 0)
+			return 0;
+
+		jNIEnv->CallVoidMethod(jThis, methodID, tagHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return 1;
+	}
+
+	int _maNFCConnectTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCConnectTag",
+												 "(I)V");
+		if (methodID == 0)
+			return 0;
+
+		jNIEnv->CallVoidMethod(jThis, methodID, tagHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return 1;
+	};
+
+	int _maNFCCloseTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCCloseTag",
+												 "(I)V");
+		if (methodID == 0)
+			return 0;
+
+		jNIEnv->CallVoidMethod(jThis, methodID, tagHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return 1;
+	};
+
+	MAHandle _maNFCBatchStart(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCBatchStart",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
@@ -2198,6 +2249,40 @@ namespace Base
 		jNIEnv->DeleteLocalRef(cls);
 
 		return (int)result;
+	}
+
+	int _maNFCBatchCommit(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCBatchCommit",
+												 "(I)V");
+		if (methodID == 0)
+			return 0;
+
+		jNIEnv->CallVoidMethod(jThis, methodID, tagHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return 1;
+	}
+
+	int _maNFCBatchRollback(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCBatchRollback",
+												 "(I)V");
+		if (methodID == 0)
+			return 0;
+
+		jNIEnv->CallVoidMethod(jThis, methodID, tagHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return 1;
 	}
 
 	MAHandle _maNFCGetNDEFMessage(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
@@ -2282,7 +2367,7 @@ namespace Base
 		if (methodID == 0)
 			return 0;
 
-		jint result = jNIEnv->CallIntMethod(jThis, methodID, ndefRecordHandle, dst, len);
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, ndefRecordHandle, fixedDst, len);
 
 		return result;
 	}
@@ -2316,12 +2401,171 @@ namespace Base
 		if (methodID == 0)
 			return 0;
 
-		jint result = jNIEnv->CallIntMethod(jThis, methodID, ndefRecordHandle, dst, len);
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, ndefRecordHandle, fixedDst, len);
 
 		jNIEnv->DeleteLocalRef(cls);
 
 		return (int)result;
 	}
 
+	int _maNFCIsType(MAHandle tagHandle, int tagType, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCIsType",
+												 "(II)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle, tagType);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maNFCGetTypedTag(MAHandle tagHandle, int tagType, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCGetTypedTag",
+												 "(II)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle, tagType);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+	int _maNFCAuthenticateSectorWithKeyA(MAHandle mfcTag, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		int fixedKeyAddr = keyAddr - memStart;
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCAuthenticateSectorWithKeyB",
+												 "(IIII)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, mfcTag, sectorIndex, fixedKeyAddr, keyLen);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maNFCAuthenticateSectorWithKeyB(MAHandle mfcTag, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		int fixedKeyAddr = keyAddr - memStart;
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCAuthenticateSectorWithKeyB",
+												 "(IIII)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, mfcTag, sectorIndex, fixedKeyAddr, keyLen);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maNFCGetSectorCount(MAHandle mfcTag, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCGetSectorCount",
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, mfcTag);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maNFCGetBlockCountInSector(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCGetBlockCountInSector",
+												 "(II)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, mfcTag, sectorIndex);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maNFCSectorToBlock(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCSectorToBlock",
+												 "(II)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, mfcTag, sectorIndex);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maNFCReadBlocks(MAHandle mfcTag, int firstBlock, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		int fixedDst = dst - memStart;
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCReadBlocks",
+												 "(IIII)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, mfcTag, firstBlock, fixedDst, len);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maNFCReadPages(MAHandle mfcTag, int firstPage, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		int fixedDst = dst - memStart;
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCReadPages",
+												 "(IIII)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, mfcTag, firstPage, fixedDst, len);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
 
 }

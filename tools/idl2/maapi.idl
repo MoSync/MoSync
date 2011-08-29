@@ -1341,10 +1341,26 @@ interface MAAPI {
 		NFC_TAG_RECEIVED = 34;
 
 		/** \brief New tag data was read
-		* The results of an asynchronous NFC tag read was
+		* The results of an asynchronous NFC tag read operation was
 		* completed.
 		*/
 		NFC_TAG_DATA_READ = 35;
+
+		/** \brief New tag data was written
+		* The results of an asynchronous NFC tag write operation was
+		* completed.
+		*/
+		NFC_TAG_DATA_WRITTEN = 36;
+
+		/** \brief A batch operation was performed
+		*/
+		NFC_BATCH_OP = 37;
+
+		/** \brief Tag authentication was performed
+		* The results of an asynchronous NFC tag authentication read was
+		* completed.
+		*/
+		NFC_TAG_AUTH_COMPLETE = 38;
 	}
 
 	/**
@@ -1367,6 +1383,19 @@ interface MAAPI {
 		float values[3];
 	}
 
+	/**
+	* \brief An event containing the result of an NFC asynchronous operation
+	*/
+	struct MANFCEventData {
+		/// The handle this event pertains to.
+		MAHandle handle;
+		/// The result of the asynchronous operation, usually a length if >= 0,
+		/// or an error code of < 0.
+		int result;
+		/// The destination of any read or write operation. Could be a memory
+		/// address, a block number, or some other value depending on the operation.
+		int dstId;
+	}
 
 	/**
 	* \brief An event; a message indicating that something has happened, e.g. that a key has been pressed.
@@ -1450,6 +1479,11 @@ interface MAAPI {
 			* Valid in \link #EVENT_TYPE_SENSOR SENSOR \endlink events.
 			*/
 			MASensor sensor;
+
+			/**
+			* NFC event data
+			*/
+			MANFCEventData nfc;
 
 			/**
 			* Used by custom events. See invididual event descriptions.
@@ -6867,7 +6901,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		* Start listening to NFC events.
-		* @return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
+		* \return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
 		* MA_NFC_NOT_AVAILABLE if NFC is not at all available, or
 		* 0 otherwise.
 		*/
@@ -6889,6 +6923,62 @@ group CameraFunctions "Camera Functions" {
 		* this function for every corresponding maNFCReadTag.
 		*/
 		void maNFCDestroyTag(in MAHandle tagHandle);
+
+		/**
+		* Connects to a tag, enabling further I/O operations to be
+		* performed on it.
+		*/
+		void maNFCConnectTag(in MAHandle tagHandle);
+
+		/**
+		* Closes I/O operations for a tag, disabling further I/O operations to be
+		* performed on it.
+		*/
+		void maNFCCloseTag(in MAHandle tagHandle);
+
+		/**
+		* Determines whether a tag is of a certain type.
+		* Use the constants prefixed with MA_NFC_TAG_TYPE_ to
+		* see the available tag types.
+		* \return > 0 if the tag is a the specified type, 0 if it is not,
+		* and MA_NFC_INVALID_TAG_TYPE if the tag type is not supported
+		* by this platform.
+		*/
+		int maNFCIsType(in MAHandle tagHandle, in int type);
+
+		/**
+		* To be able to call functions tag require the tag to be of
+		* a certain type (see maNFCIsType), the tag received
+		* must be converted to the proper type (see MA_NFC_TAG_TYPE_*
+		* constants).
+		* Clients are responsible for destroying the returned handle
+		* using maNFCDestroyTag.
+		* \return A handle if the type was convertable to the specified
+		* type.
+		*/
+		MAHandle maNFCGetTypedTag(in MAHandle tagHandle, in int type);
+
+		/**
+		* Starts a batch operation. No NFC I/O operations will be performed
+		* until maBatchCommit has been called.
+		* Note that only one active batch per tag is allowed.
+		* \param The tag on which to perform the batch operation
+		* \return A non-zero value if a batch is already started for this tag or if a batch
+		* could not be started, 0 otherwise.
+		*/
+		int maNFCBatchStart(in MAHandle tagHandle);
+
+		/**
+		* Asynchronously performs all operations since the last call to maNFCBatchStart. The event
+		* delivered will be of the EVENT_TYPE_NFC_BATCH_OP type and
+		* with an MANFCEventData containing the tag's handle.
+		*/
+		void maNFCBatchCommit(in MAHandle tagHandle);
+
+		/**
+		* Cancels all operations of the current batch.
+		*/
+		void maNFCBatchRollback(in MAHandle tagHandle);
 
 		/**
 		* Returns a handle to an NDEF message, or a zero handle
@@ -6937,6 +7027,78 @@ group CameraFunctions "Camera Functions" {
 		*/
 		int maNFCGetType(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
+		/**
+		* Authenticates a MIFARE Classic tag using key A. Authentication must take place
+		* before reading/writing to a certain sector.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_AUTH_COMPLETE
+		* event, unless part of a batch operation.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if authentication can take place.
+		*/
+		int maNFCAuthenticateSectorWithKeyA(in MAHandle tagHandle, in int sectorIndex, in MAAddress keySrc, in int keyLen);
+
+		/**
+		* Authenticates a MIFARE Classic tag using key B. Authentication must take place
+		* before reading/writing to a certain sector.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_AUTH_COMPLETE
+		* event, unless part of a batch operation.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if authentication can take place.
+		*/
+		int maNFCAuthenticateSectorWithKeyB(in MAHandle tagHandle, in int sectorIndex, in MAAddress keySrc, in int keyLen);
+
+		/**
+		* Returns the number of sectors of a MIFARE Classic tag.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), otherwise the number of sectors
+		* is returned.
+		*/
+		int maNFCGetSectorCount(in MAHandle tagHandle);
+
+		/**
+		* Returns the number of blocks in a sector of a MIFARE Classic tag.
+		* \param sector The sector to get the number of blocks in.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), otherwise the number of sectors
+		* is returned.
+		*/
+		int maNFCGetBlockCountInSector(in MAHandle tagHandle, in int sector);
+
+		/**
+		* Returns the first block of a sector of a MIFARE Classic tag.
+		* \param sector The sector of which to get the first block.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), otherwise the index of the
+		* first block of the sector is returned.
+		*/
+		int maNFCSectorToBlock(in MAHandle tagHandle, in int sector);
+
+		/**
+		* Reads a number of blocks of a MIFARE Classic tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_READ
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to read from.
+		* \param dst The memory address to write to.
+		* \param len The number of bytes to read. Several blocks may be read, depending
+		* on len (A block is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a read operation can be performed.
+		*/
+		int maNFCReadBlocks(in MAHandle tagHandle, in int firstBlock, out MAAddress dst, in int len);
+
+		/**
+		* Reads a number of blocks of a MIFARE Ultralight tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_READ
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to read from.
+		* \param dst The memory address to write to.
+		* \param len The number of bytes to read. Several pages may be read, depending
+		* on len (A page is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a read operation can be performed.
+		*/
+		int maNFCReadPages(in MAHandle tagHandle, in int firstPage, out MAAddress dst, in int len);
+
 		constset int MA_NFC_ {
 			/**
 			* A constant indicating there is no NFC support on the device.
@@ -6951,7 +7113,29 @@ group CameraFunctions "Camera Functions" {
 			/**
 			* A constant indicating an invalid tag type.
 			*/
-			MA_NFC_INVALID_TAG_TYPE = -1;
+			INVALID_TAG_TYPE = -2;
+
+			/**
+			* An error code if tag connection is lost.
+			*/
+			TAG_CONNECTION_LOST = -3;
+
+			/**
+			* An error code if some I/O error occurred,
+			* other than the special case of tag connection being lost.
+			*/
+			TAG_IO_ERROR = -4;
+
+		}
+
+		constset int MA_NFC_TAG_TYPE_ {
+
+			NDEF = 1;
+
+			MIFARE_CL = 2;
+
+			MIFARE_UL = 3;
+
 		}
 
 

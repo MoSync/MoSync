@@ -76,28 +76,31 @@ public class MoSync extends Activity
 	private MoSyncTouchHandler mTouchHandler;
 	private BroadcastReceiver mShutdownListener;
 	private boolean mEventTypeCloseHasBeenSent = false;
-	
+
 	/**
 	 * Sets screen and window properties.
 	 * Creates and initializes the MoSync thread
 	 * Calls the createMoSyncView method and then shows the created view.
 	 */
     @Override
-    public void onCreate(Bundle savedInstanceState) 
+    public void onCreate(Bundle savedInstanceState)
 	{
 		//Log.i("MoSync", "onCreate");
-		
+
 		super.onCreate(savedInstanceState);
-		
+
+		// If triggered by an NFC event, must handle it this way.
+		MoSyncNFCService.handleNFCIntent(this, getIntent());
+
 		// Initialize.
 		mMoSyncView = null;
-		
+
 		// MoSync Android apps do not have a system title bar.
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
-		
+
 		// Default screen orientation is portrait mode.
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-		
+
 		try
 		{
 			// Create the thread.
@@ -107,18 +110,18 @@ public class MoSync extends Activity
 		{
 			MoSyncThread.logError(
 				"MoSync - Unable to create thread! " +
-				"Application is closed!", 
+				"Application is closed!",
 				ex);
 			finish();
 			return;
 		}
-		
+
 		// Create the view.
 		mMoSyncView = createMoSyncView();
 		if (null != mMoSyncView)
 		{
 			mMoSyncThread.setMoSyncView(mMoSyncView);
-		
+
 			setContentView(mMoSyncView);
 		}
 		else
@@ -126,25 +129,33 @@ public class MoSync extends Activity
 			finish();
 			return;
 		}
-		
+
 		registerShutdownListener();
     }
-    
+
     public MoSyncThread getMoSyncThread()
     {
     	return mMoSyncThread;
     }
-	
+
 	public void setRootView(View root)
 	{
 		if(root == null)
 		{
 			Log.i("MoSync", "setRootView, root is null.");
 		}
-	
+
 		setContentView(root);
 	}
-	
+
+	@Override
+	public void onNewIntent(Intent intent) {
+		if (MoSyncNFCService.handleNFCIntent(this, intent)) {
+			Log.d("@@@ MoSync", "Discovered tag");
+		}
+		super.onNewIntent(intent);
+	}
+
 	/**
 	 * Handles the new configurations when the screen rotates.
 	 * @param newConfig Object that holds configuration info.
@@ -156,14 +167,14 @@ public class MoSync extends Activity
 
 		super.onConfigurationChanged(newConfig);
 	}
-	
+
 	@Override
     protected void onStart()
 	{
 		//Log.i("MoSync", "onStart");
-		
+
 		super.onStart();
-		
+
 		if (theMoSyncThreadIsDead()) { return ; }
 	}
 
@@ -173,7 +184,7 @@ public class MoSync extends Activity
 		//Log.i("MoSync", "onStop");
 		mMoSyncThread.releaseHardware();
 		super.onStop();
-		
+
 		if (theMoSyncThreadIsDead()) { return ; }
 	}
 
@@ -181,15 +192,15 @@ public class MoSync extends Activity
     protected void onResume()
 	{
 		//Log.i("MoSync", "onResume");
-		
+
 		super.onResume();
-		
+
 		if (theMoSyncThreadIsDead()) { return ; }
-		
+
 		// The MoSync view comes to foreground and is visible.
 		mMoSyncThread.setMoSyncView(mMoSyncView);
 		mMoSyncThread.acquireHardware();
-		
+
 		mMoSyncThread.onResume();
 
 		SYSLOG("Posting EVENT_TYPE_FOCUS_GAINED to MoSync");
@@ -204,12 +215,12 @@ public class MoSync extends Activity
 		//Log.i("MoSync", "onPause");
 		mMoSyncThread.releaseHardware();
 		super.onPause();
-		
+
 		if (theMoSyncThreadIsDead()) { return ; }
 
 		// The view is not to be updated, inform the thread about this.
 		mMoSyncThread.setMoSyncView(null);
-		
+
 		mMoSyncThread.onPause();
 
 		SYSLOG("Posting EVENT_TYPE_FOCUS_LOST to MoSync");
@@ -222,25 +233,25 @@ public class MoSync extends Activity
     protected void onRestart()
 	{
 		//Log.i("MoSync", "onRestart");
-		
+
 		super.onRestart();
-		
+
 		if (theMoSyncThreadIsDead()) { return ; }
 	}
-	
+
 	@Override
     protected void onDestroy()
 	{
 		//Log.i("MoSync", "onDestroy");
-		
+
 		super.onDestroy();
-		
+
 		// Tell the MoSync thread to do cleanup.
 		mMoSyncThread.onDestroy();
 
 		// Unregister the shutdown listener.
 		unregisterShutdownListener();
-		
+
 		// Send EVENT_TYPE_CLOSE.
 		// TODO: Since we have made some cleanup, everything may not
 		// be available to the app. Be aware of this if doing more
@@ -255,8 +266,8 @@ public class MoSync extends Activity
 	 */
 	@Override
 	protected void onActivityResult(
-		int requestCode, 
-		int resultCode, 
+		int requestCode,
+		int resultCode,
 		Intent data)
 	{
 		// Check that this is the result of the Bluetooth enable activity.
@@ -265,49 +276,50 @@ public class MoSync extends Activity
 			Mediator.getInstance().postBluetoothDialogClosedMessage();
 		}
 	}
-	
+
 	/**
 	 * Creates the MoSyncView. If it fails the Activity is destroyed.
-	 * @return 
+	 * @return
 	 */
 	private MoSyncView createMoSyncView()
 	{
 		//Log.i("MoSync", "createMoSyncView");
-		
-		try 
+
+		try
 		{
 			return new MoSyncView(this, mMoSyncThread);
-        } 
-		catch (Exception ex) 
+        }
+		catch (Exception ex)
 		{
 			MoSyncThread.logError(
 				"MoSync - The MoSyncView could not be created, " +
-				"the application could not start!", 
+				"the application could not start!",
 				ex);
 			ex.printStackTrace();
 			return null;
 		}
 	}
-	
+
+	@Override
 	public boolean onKeyUp(int keyCode, KeyEvent keyEvent)
 	{
 		SYSLOG("onKeyUp: " + keyEvent.toString());
 
 		int[] event = new int[3];
-		
+
 		event[0] = EVENT_TYPE_KEY_RELEASED;
 		event[1] = convertToMoSyncKeyCode(keyCode, keyEvent);
 		event[2] = keyCode;
-	
+
 		mMoSyncThread.postEvent(event);
-		
+
 		// We need to intercept the back key otherwise the
 		// activity will be terminated.
 		if(keyCode == KeyEvent.KEYCODE_BACK)
 		{
 			// Pass on the back event in case we want to handle it.
 			mMoSyncThread.handleBack();
-			
+
 			return true;
 		}
 		else
@@ -315,22 +327,23 @@ public class MoSync extends Activity
 			return super.onKeyUp(keyCode, keyEvent);
 		}
 	}
-	
+
+	@Override
 	public boolean onKeyDown(int keyCode, KeyEvent keyEvent)
 	{
 		SYSLOG("onKeyDown: " + keyEvent.toString());
 
 		// If the key is being held down we shouldn't send any more events.
 		if(keyEvent.getRepeatCount() != 0) return true;
-		
+
 		int[] event = new int[3];
-		
+
 		event[0] = EVENT_TYPE_KEY_PRESSED;
 		event[1] = convertToMoSyncKeyCode(keyCode, keyEvent);
 		event[2] = keyCode;
-	
+
 		mMoSyncThread.postEvent(event);
-		
+
 		// We need to intercept the back key otherwise the
 		// activity will be terminated.
 		if(keyCode == KeyEvent.KEYCODE_BACK)
@@ -342,7 +355,7 @@ public class MoSync extends Activity
 			return super.onKeyDown( keyCode, keyEvent );
 		}
 	}
-	
+
 	/**
 	 * Map Android key codes to MoSync key codes.
 	 * @param keyCode
@@ -351,45 +364,46 @@ public class MoSync extends Activity
 	 */
 	private final int convertToMoSyncKeyCode(int keyCode, KeyEvent keyEvent)
 	{
-		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) return MAK_LEFT; 
-		if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) return MAK_RIGHT; 
-		if (keyCode == KeyEvent.KEYCODE_DPAD_UP) return MAK_UP; 
+		if (keyCode == KeyEvent.KEYCODE_DPAD_LEFT) return MAK_LEFT;
+		if (keyCode == KeyEvent.KEYCODE_DPAD_RIGHT) return MAK_RIGHT;
+		if (keyCode == KeyEvent.KEYCODE_DPAD_UP) return MAK_UP;
 		if (keyCode == KeyEvent.KEYCODE_DPAD_DOWN) return MAK_DOWN;
-		if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) return MAK_FIRE; 
-		if (keyCode == KeyEvent.KEYCODE_SOFT_LEFT) return MAK_SOFTLEFT; 
-		if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) return MAK_SOFTRIGHT; 
-		if (keyCode == KeyEvent.KEYCODE_BACK) return MAK_BACK; 
+		if (keyCode == KeyEvent.KEYCODE_DPAD_CENTER) return MAK_FIRE;
+		if (keyCode == KeyEvent.KEYCODE_SOFT_LEFT) return MAK_SOFTLEFT;
+		if (keyCode == KeyEvent.KEYCODE_SOFT_RIGHT) return MAK_SOFTRIGHT;
+		if (keyCode == KeyEvent.KEYCODE_BACK) return MAK_BACK;
 		if (keyCode == KeyEvent.KEYCODE_MENU) return MAK_MENU;
 		if (keyCode == KeyEvent.KEYCODE_SEARCH) return MAK_SEARCH;
-		
+
 		// Support for native virtual keyboard.
 		if (keyCode == KeyEvent.KEYCODE_DEL) { return MAK_CLEAR; }
 		KeyCharacterMap keyCharacterMap = KeyCharacterMap.load(keyEvent.getDeviceId());
 		return keyCharacterMap.get(keyCode, keyEvent.getMetaState());
 	}
-	
+
 	/**
 	 * onTouchEvent
 	 * Receives touch events from the screen.
-	 * 
-	 * This implementation discards touch move (dragged) events while the 
-	 * screen is updating. This is because move events are fired more 
+	 *
+	 * This implementation discards touch move (dragged) events while the
+	 * screen is updating. This is because move events are fired more
 	 * frequently than some devices can digest the events, leading to
-	 * problems when the queue just grows. Discarded events are still 
-	 * marked as digested for the Android OS since we don't want any other 
+	 * problems when the queue just grows. Discarded events are still
+	 * marked as digested for the Android OS since we don't want any other
 	 * view to digest them either.
-	 * 
+	 *
 	 * Handles both single and multi touch devices.
-	 * 
+	 *
 	 * @param motionEvent	The Motion event received from the Android OS
-	 * 
+	 *
 	 * @return 				true if the event was digested
 	 * 						false if it wasn't
 	 */
+	@Override
 	public boolean onTouchEvent(MotionEvent motionEvent)
 	{
 		SYSLOG("onTouchEvent");
-		
+
 		// The first time around, see if this is multi or single touch device.
 		if (!mHasDeterminedTouchCapabilities)
 		{
@@ -405,35 +419,35 @@ public class MoSync extends Activity
 				//Log.i("MoSync TouchEvent","Single touch device!");
 			}
 		}
-		
+
 		int actionCode = motionEvent.getAction() & MotionEvent.ACTION_MASK;
 		int index = -1;
-		
+
 		int eventType = 0;
 		switch (actionCode)
 		{
 			case MotionEvent.ACTION_DOWN:
 				eventType = EVENT_TYPE_POINTER_PRESSED;
 				break;
-				
+
 			case MotionEvent.ACTION_UP:
 				eventType = EVENT_TYPE_POINTER_RELEASED;
 				break;
-		
+
 			case MotionEvent.ACTION_POINTER_DOWN:
 				eventType = EVENT_TYPE_POINTER_PRESSED;
 				index = (motionEvent.getAction() & 0x0000ff00) >> 0x00000008;
 				break;
-				
+
 			case MotionEvent.ACTION_POINTER_UP:
 				eventType = EVENT_TYPE_POINTER_RELEASED;
 				index = (motionEvent.getAction( ) & 0x0000ff00) >> 0x00000008;
 				break;
-		
+
 			case MotionEvent.ACTION_MOVE:
 				eventType = EVENT_TYPE_POINTER_DRAGGED;
 				// While drawing, discard this event.
-				if (mMoSyncThread.mIsUpdatingScreen) 
+				if (mMoSyncThread.mIsUpdatingScreen)
 				{
 					return true;
 				}
@@ -442,7 +456,7 @@ public class MoSync extends Activity
 				// Return false to indicate that we have not handled the event.
 				return false;
 		}
-		
+
 		if (index != -1)
 		{
 			mTouchHandler.loadEvent(motionEvent);
@@ -459,38 +473,38 @@ public class MoSync extends Activity
 				sendPointerEvent(eventType, eventData);
 			}
 		}
-		
-		// TODO: The superclass returns false, not what we want. 
+
+		// TODO: The superclass returns false, not what we want.
 		// Confirm that the code change below is correct,
 		// then delete commented out code.
 		//return super.onTouchEvent(motionEvent);
-		
+
 		// Return true to indicate that we have handled the event.
 		return true;
 	}
-	
+
 	/**
 	 * Send a pointer event.
-	 * 
+	 *
 	 * @param type The type of event to send, e.g. EVENT_TYPE_POINTER_MOVE.
-	 * @param eventData An array containing, in order: the x position, 
-	 * 				 	the y position, the id of the pointer. 
+	 * @param eventData An array containing, in order: the x position,
+	 * 				 	the y position, the id of the pointer.
 	 * @return
 	 */
 	public boolean sendPointerEvent(int type, int[] eventData)
-	{	
+	{
 		// TO-DO : Proper error handling
 		if(eventData == null)
 		{
 			return false;
 		}
-		
+
 		int[] touchEvent = new int[4];
 		touchEvent[0] = type;
 		touchEvent[1] = eventData[0];
 		touchEvent[2] = eventData[1];
 		touchEvent[3] = eventData[2];
-		
+
 		mMoSyncThread.postEvent(touchEvent);
 		return true;
 	}
@@ -513,7 +527,7 @@ public class MoSync extends Activity
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Register a broadcast receiver that listens for device shutdown events
 	 * (power off the device).
@@ -524,16 +538,16 @@ public class MoSync extends Activity
 		{
 			@Override
 			public void onReceive(Context context, Intent intent)
-			{	
+			{
 				//Log.i("@@@MoSync", "@@@ ACTION_SHUTDOWN Intent = " + intent);
 
 				// Send EVENT_TYPE_CLOSE.
 				sendCloseEvent();
 			}
 		};
-		
+
 		registerReceiver(
-			mShutdownListener, 
+			mShutdownListener,
 			new IntentFilter(Intent.ACTION_SHUTDOWN));
     }
 
@@ -548,7 +562,7 @@ public class MoSync extends Activity
     		mShutdownListener = null;
     	}
     }
-    
+
     /**
      * Posts an EVENT_TYPE_CLOSE to the MoSync events queue.
      */
@@ -560,7 +574,7 @@ public class MoSync extends Activity
 			int[] event = new int[1];
 			event[0] = EVENT_TYPE_CLOSE;
 			mMoSyncThread.postEvent(event);
-			
+
     		mEventTypeCloseHasBeenSent = true;
     	}
     }

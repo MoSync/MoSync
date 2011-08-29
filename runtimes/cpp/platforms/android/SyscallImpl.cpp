@@ -2234,6 +2234,27 @@ return 0; \
 		case maIOCtl_maNFCDestroyTag:
 			return _maNFCDestroyTag(a, mJNIEnv, mJThis);
 
+		case maIOCtl_maNFCConnectTag:
+			return _maNFCConnectTag(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCCloseTag:
+			return _maNFCCloseTag(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCIsType:
+			return _maNFCIsType(a, b, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCGetTypedTag:
+			return _maNFCGetTypedTag(a, b, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCBatchStart:
+			return _maNFCBatchStart(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCBatchCommit:
+			return _maNFCBatchCommit(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCBatchRollback:
+			return _maNFCBatchRollback(a, mJNIEnv, mJThis);
+
 		case maIOCtl_maNFCGetNDEFMessage:
 			return _maNFCGetNDEFMessage(a, mJNIEnv, mJThis);
 
@@ -2275,6 +2296,78 @@ return 0; \
 				(int)gCore->mem_ds,
 				mJNIEnv,
 				mJThis);
+
+		case maIOCtl_maNFCAuthenticateSectorWithKeyA:
+		{
+			int keyLen = SYSCALL_THIS->GetValidatedStackValue(0);
+			return _maNFCAuthenticateSectorWithKeyA(
+					a,
+					b,
+					(int) SYSCALL_THIS->GetValidatedMemRange( c, keyLen * sizeof(byte)),
+					keyLen,
+					(int)gCore->mem_ds,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maNFCAuthenticateSectorWithKeyB:
+		{
+			int keyLen = SYSCALL_THIS->GetValidatedStackValue(0);
+			return _maNFCAuthenticateSectorWithKeyB(
+					a,
+					b,
+					(int) SYSCALL_THIS->GetValidatedMemRange( c, keyLen * sizeof(byte)),
+					keyLen,
+					(int)gCore->mem_ds,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maNFCGetSectorCount:
+			return _maNFCGetSectorCount(
+					a,
+					mJNIEnv,
+					mJThis);
+
+		case maIOCtl_maNFCGetBlockCountInSector:
+			return _maNFCGetBlockCountInSector(
+					a,
+					b,
+					mJNIEnv,
+					mJThis);
+
+		case maIOCtl_maNFCSectorToBlock:
+			return _maNFCSectorToBlock(
+				a,
+				b,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maNFCReadBlocks:
+		{
+			int len = SYSCALL_THIS->GetValidatedStackValue(0);
+			return _maNFCReadBlocks(
+					a,
+					b,
+					(int) SYSCALL_THIS->GetValidatedMemRange( c, len * sizeof(byte)),
+					len,
+					(int)gCore->mem_ds,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maNFCReadPages:
+		{
+			int len = SYSCALL_THIS->GetValidatedStackValue(0);
+			return _maNFCReadPages(
+					a,
+					b,
+					(int) SYSCALL_THIS->GetValidatedMemRange( c, len * sizeof(byte)),
+					len,
+					(int)gCore->mem_ds,
+					mJNIEnv,
+					mJThis);
+		}
 
 		} // End of switch
 

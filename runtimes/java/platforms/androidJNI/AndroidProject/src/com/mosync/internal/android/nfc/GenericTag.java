@@ -1,57 +1,52 @@
 package com.mosync.internal.android.nfc;
 
-import android.nfc.NdefMessage;
-import android.nfc.Tag;
-import android.nfc.tech.MifareClassic;
-import android.nfc.tech.MifareUltralight;
-import android.nfc.tech.Ndef;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_MIFARE_CL;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_MIFARE_UL;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NDEF;
 
+import java.io.IOException;
+
+import android.nfc.Tag;
 
 public class GenericTag extends ResourceBase implements INFCTag {
 
 	private final Tag tag;
-	private NDEFMessage ndef;
-	private MifareClassic mfc;
-	private MifareUltralight mfu;
 
 	public GenericTag(ResourcePool pool, Tag tag) {
 		super(pool);
 		this.tag = tag;
 	}
 
-	@Override
-	public void close() {
-		// TODO Auto-generated method stub
+	public Tag getTag() {
+		return tag;
+	}
 
+	public boolean isType(int type) {
+		return toTypedTag(ResourcePool.NULL, type) != null;
 	}
 
 	@Override
-	public void connect() {
-		// TODO Auto-generated method stub
-
+	public INFCTag toTypedTag(ResourcePool pool, int type) {
+		switch (type) {
+		case MA_NFC_TAG_TYPE_NDEF:
+			return NDEFMessage.get(pool, this);
+		case MA_NFC_TAG_TYPE_MIFARE_CL:
+			return MifareClassicTag.get(pool, this);
+		case MA_NFC_TAG_TYPE_MIFARE_UL:
+			return MifareUltralightTag.get(pool, this);
+		default:
+			return null;
+		}
 	}
 
 	@Override
-	public void destroy(ResourcePool pool) {
-		if (ndef != null) {
-			ndef.destroy(pool);
-		}
-		super.destroy(pool);
+	public void close() throws IOException {
+		// Does nothing
 	}
 
 	@Override
-	public NDEFMessage getNDEFMessage(ResourcePool pool) {
-		if (ndef != null) {
-			return ndef;
-		}
-
-		Ndef ndef = Ndef.get(tag);
-		if (ndef != null) {
-			NdefMessage ndefMessage = ndef.getCachedNdefMessage();
-			this.ndef = new NDEFMessage(pool, ndefMessage);
-		}
-
-		return this.ndef;
+	public void connect() throws IOException {
+		// Does nothing
 	}
 
 }

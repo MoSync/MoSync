@@ -1,15 +1,13 @@
 package com.mosync.internal.android.nfc;
 
+import java.io.IOException;
+
 public interface INFCTag extends IResource {
 
-	void close();
+	void close() throws IOException;
 
-	void connect();
+	void connect() throws IOException;
 
-	/**
-	 * Non-blocking method to get the NDEF
-	 * message of this {@link INFCTag}.
-	 * @return
-	 */
-	NDEFMessage getNDEFMessage(ResourcePool pool);
+	INFCTag toTypedTag(ResourcePool pool, int type);
+
 }

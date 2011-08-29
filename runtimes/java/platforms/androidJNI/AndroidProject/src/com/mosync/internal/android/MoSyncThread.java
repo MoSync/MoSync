@@ -25,6 +25,7 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_INVALID_TAG_TYPE;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -43,6 +44,58 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
 
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
+import java.util.Date;
+import java.util.Hashtable;
+import java.util.Locale;
+import java.util.TimeZone;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javax.microedition.khronos.egl.EGL10;
+import javax.microedition.khronos.egl.EGLContext;
+import javax.microedition.khronos.opengles.GL10;
+
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.pm.ActivityInfo;
+import android.content.res.AssetFileDescriptor;
+import android.content.res.AssetManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.graphics.PorterDuff.Mode;
+import android.graphics.Rect;
+import android.graphics.Region;
+import android.net.Uri;
+import android.opengl.GLUtils;
+import android.os.Build;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
+import android.os.Vibrator;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.FrameLayout;
+
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.nfc.MoSyncNFC;
 import com.mosync.internal.generated.IX_OPENGL_ES;
@@ -51,7 +104,6 @@ import com.mosync.java.android.MoSync;
 import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
-import com.mosync.nativeui.ui.widgets.FrameLayout;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
 
 /**
@@ -3654,6 +3706,117 @@ public class MoSyncThread extends Thread
 		return mMoSyncPIM.maPimItemRemove(list, item);
 	}
 
+	int maNFCStart() {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCStart();
+	}
+
+	void maNFCStop() {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCStop();
+		}
+	}
+
+	int maNFCReadTag(int nfcContext) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadTag(nfcContext);
+	}
+
+	void maNFCDestroyTag(int tagHandle) {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCDestroyTag(tagHandle);
+		}
+	}
+
+	int maNFCIsType(int tagHandle, int type) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCIsType(tagHandle, type);
+	}
+
+	int maNFCGetTypedTag(int tagHandle, int type) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetTypedTag(tagHandle, type);
+	}
+
+	int maNFCBatchStart(int nfcContext) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCBatchStart(nfcContext);
+	}
+
+	void maNFCBatchCommit(int nfcContext) {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCBatchCommit(nfcContext);
+		}
+	}
+
+	void maNFCBatchRollback(int nfcContext) {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCBatchRollback(nfcContext);
+		}
+	}
+
+	void maNFCConnectTag(int tagHandle) {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCConnectTag(tagHandle);
+		}
+	}
+
+	void maNFCCloseTag(int tagHandle) {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCCloseTag(tagHandle);
+		}
+	}
+
+	int maNFCGetNDEFMessage(int tagHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetNDEFMessage(tagHandle);
+	}
+
+	int maNFCGetNDEFRecord(int ndefHandle, int ix) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetNDEFRecord(ndefHandle, ix);
+	}
+
+	int maNFCGetNDEFRecordCount(int ndefHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetNDEFRecordCount(ndefHandle);
+	}
+
+	int maNFCGetId(int ndefRecordHandle, int dst, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetId(ndefRecordHandle, dst, len);
+	}
+
+	int maNFCGetPayload(int ndefRecordHandle, int dst, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetPayload(ndefRecordHandle, dst, len);
+	}
+
+	int maNFCGetTnf(int ndefRecordHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetTnf(ndefRecordHandle);
+	}
+
+	int maNFCGetType(int ndefRecordHandle, int dst, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetType(ndefRecordHandle, dst, len);
+	}
+
+	public int maNFCAuthenticateSectorWithKeyA(int tagHandle, int sectorIndex, int keySrc, int keyLen) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCAuthenticateSectorWithKeyA(tagHandle, sectorIndex, keySrc, keyLen);
+	}
+
+	public int maNFCAuthenticateSectorWithKeyB(int tagHandle, int sectorIndex, int keySrc, int keyLen) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCAuthenticateSectorWithKeyB(tagHandle, sectorIndex, keySrc, keyLen);
+	}
+
+	public int maNFCGetSectorCount(int tagHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetSectorCount(tagHandle);
+	}
+
+	public int maNFCGetBlockCountInSector(int tagHandle, int sectorIndex) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetBlockCountInSector(tagHandle, sectorIndex);
+	}
+
+	public int maNFCSectorToBlock(int tagHandle, int sectorIndex) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSectorToBlock(tagHandle, sectorIndex);
+	}
+
+	public int maNFCReadBlocks(int tagHandle, int block, int dst, int resultSize) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadBlock(tagHandle, block, dst, resultSize);
+	}
+
+	public int maNFCReadPages(int tagHandle, int firstPage, int dst, int resultSize) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadPages(tagHandle, firstPage, dst, resultSize);
+	}
 
 	/**
 	 * Class that holds image data.
