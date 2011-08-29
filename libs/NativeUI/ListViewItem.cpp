@@ -92,4 +92,18 @@ namespace NativeUI
         this->setProperty(MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE, typeString);
     }
 
+    /**
+    * Set the typeface and style in which the text should be displayed.
+    * @param fontHandle A font handle received from loading fonts using
+    *  #maFontGetName and #maFontLoadWithName syscalls.
+    * @return Any of the following result codes:
+    * - #MAW_RES_OK if the property could be set.
+    * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+    * - #MAW_RES_ERROR otherwise.
+    */
+    int ListViewItem::setFont(const MAHandle fontHandle)
+    {
+        return this->setPropertyInt(MAW_LIST_VIEW_ITEM_FONT_HANDLE, fontHandle);
+    }
+
 } // namespace NativeUI

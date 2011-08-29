@@ -114,7 +114,7 @@
  * @param index Value's index.
  * @return One of MA_PIM_ERR constants.
  */
--(int) getLabel:(NSString*) value
+-(int) getLabel:(NSMutableString*) value
 	 indexValue:(const int) index
 {
 	int fieldValuesCount = [mFieldValuesArray count];
@@ -125,13 +125,14 @@
 
 	// Check if the attribute is set to MA_PIM_ATTR_CUSTOM.
 	PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
-//	int attribute = [itemValue getAttribute];
-//	if (MA_PIM_ATTR_CUSTOM != attribute)
-//	{
-//		return MA_PIM_ERR_NO_LABEL;
-//	}
+    NSString* label = [itemValue getLabel];
+	int attribute = [self getAttributeFromLabel:label];
+	if (CUSTOM_ATTRIBUTE != attribute)
+	{
+		return MA_PIM_ERR_NO_LABEL;
+	}
 
-	[value copy:[itemValue getLabel]];
+	[value setString:label];
 	return MA_PIM_ERR_NONE;
 }
 
@@ -164,7 +165,8 @@
   withAttribute:(int) attribute
 {
 	int fieldValuesCount = [mFieldValuesArray count];
-	if (0 > index || index <= fieldValuesCount) {
+	if (0 > index || index >= fieldValuesCount)
+    {
 		return MA_PIM_ERR_INVALID_INDEX;
 	}
 
@@ -252,7 +254,7 @@
 -(int) removeValue:(int) index
 {
 	int fieldValuesCount = [mFieldValuesArray count];
-	if (0 > index || index <= fieldValuesCount)
+	if (0 > index || index >= fieldValuesCount)
     {
 		return MA_PIM_ERR_INVALID_INDEX;
 	}

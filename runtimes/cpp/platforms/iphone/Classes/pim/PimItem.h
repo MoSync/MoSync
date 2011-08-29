@@ -154,6 +154,7 @@ typedef enum {
 
 /**
  * Sets a field's value and attribute at a given index.
+ * Does not check if field is supported or write-only.
  * @param args Common arguments.
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.

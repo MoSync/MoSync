@@ -83,6 +83,17 @@ namespace NativeUI
          * @param type The type of the accessory.
          */
         virtual void setAccessoryType(ListViewItemAccessory type);
+
+        /**
+        * Set the typeface and style in which the text should be displayed.
+        * @param fontHandle A font handle received from loading fonts using
+        *  #maFontGetName and #maFontLoadWithName syscalls.
+        * @return Any of the following result codes:
+        * - #MAW_RES_OK if the property could be set.
+        * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+        * - #MAW_RES_ERROR otherwise.
+        */
+        virtual int setFont(const MAHandle fontHandle);
     };
 
 } // namespace NativeUI
