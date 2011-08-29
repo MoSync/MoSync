@@ -56,8 +56,6 @@ MainScreen::~MainScreen()
     mAddItemButton->removeButtonListener(NULL);
     mRemoveItemButton->removeButtonListener(NULL);
     mListView->removeListViewListener(this);
-
-	delete mMainLayout;
 }
 
 /**
@@ -69,10 +67,19 @@ void MainScreen::createMainLayout() {
 	mMainLayout->setBackgroundColor(0xFF0000);
 	Screen::setMainWidget(mMainLayout);
 
+	int nrFonts = maFontGetCount();
+	// Get the first font
+	char buf[256];
+	maFontGetName(0, buf, 256);
+	// Load the font with size 15 and get a handle.
+	int fontHandle = maFontLoadWithName(buf, 15);
+
 	mListView = new ListView();
 
+	// The first item has different font.
 	ListViewItem* item = new ListViewItem();
-	item->setText("test");
+	item->setText("Test-First font was set for this item");
+	item->setFont(fontHandle);
 	mListView->addChild(item);
 
 	int result = mMainLayout->addChild(mListView);

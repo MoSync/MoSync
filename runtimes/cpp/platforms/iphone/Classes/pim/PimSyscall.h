@@ -15,10 +15,6 @@
  02111-1307, USA.
 */
 
-//#ifndef PIMIMPL_H
-//#error "Bad include!"
-//#endif	//PIMIMPL_H
-
 #import "helpers/cpp_defs.h"
 #include <helpers/CPP_IX_PIM.h>
 
@@ -49,9 +45,9 @@ int maPimItemClose(MAHandle item);
 MAHandle maPimItemCreate(MAHandle list);
 int maPimItemRemove(MAHandle list, MAHandle item);
 
-void* PimGetValidatedMemRange(const int address,const int size);
-void PimMaReadData(MAHandle data, void *dst, int offset, int size);
-int PimMaGetDataSize(MAHandle data);
-int PimMaCreatePlaceHolder();
-int PimMaCreateData(MAHandle placeholder, int size);
-void PimMaWriteData(MAHandle data, const void* src, int offset, int size);
+//void* PimGetValidatedMemRange(const int address,const int size);
+//void PimMaReadData(MAHandle data, void *dst, int offset, int size);
+//int PimMaGetDataSize(MAHandle data);
+//int PimMaCreatePlaceHolder();
+//int PimMaCreateData(MAHandle placeholder, int size);
+//void PimMaWriteData(MAHandle data, const void* src, int offset, int size);

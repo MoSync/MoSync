@@ -59,8 +59,6 @@ MainScreen::~MainScreen()
     mGetTextButton->removeButtonListener(this);
     mKeyboardButton->removeButtonListener(this);
     mEditBox->addEditBoxListener(this);
-
-	delete mMainLayout;
 }
 
 /**

@@ -18,11 +18,11 @@ MA 02110-1301, USA.
 
 /**
  * @file BasicScreen.cpp
+ * @author Emma Tresanszki
  *
  * This file contains the base screen of the application.
  * It contains the base screen constructors, and the creation of a main layout that is common for some screens.
  *
- * @author Emma Tresanszki
  */
 
 // Include library for string conversions.
@@ -237,6 +237,13 @@ void BasicScreen::setupUI()
 {
 	// Create the main screen.
 	mScreen = maWidgetCreate(MAW_SCREEN);
+
+	// Error handling for devices that do not support NativeUI.
+	if ( -1 == mScreen )
+	{
+		maPanic(0, " This application uses NativeUI, which currently is supported"
+				   " only on Android and iOS devices.");
+	}
 
 	// Create the main layout.
 	mMainLayout = createBaseMainLayout();

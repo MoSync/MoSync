@@ -18,10 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file WikiMoblet.cpp
+ * @author Emma Tresanszki
  *
  * This file contains the moblet that manages the application.
  *
- * @author Emma Tresanszki
  */
 
 // The header file of the class.
