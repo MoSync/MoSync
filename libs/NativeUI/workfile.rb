@@ -15,8 +15,7 @@ mod.class_eval do
 
 	def setup_base
 		@SOURCES = ["."]
-		#@EXTRA_CPPFLAGS = " -Wno-shadow"	#TODO, low-prio: enable -Wshadow
-        #		@IGNORED_HEADERS = ["WidgetUtil.h"]
+		@IGNORED_HEADERS = ["WidgetUtil.h"]
 		@INSTALL_INCDIR = "NativeUI"
 		@NAME = "nativeui"
 	end

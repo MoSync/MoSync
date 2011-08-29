@@ -56,8 +56,6 @@ MainScreen::~MainScreen()
     mAddItemButton->removeButtonListener(NULL);
     mRemoveItemButton->removeButtonListener(NULL);
     mListView->removeListViewListener(this);
-
-	delete mMainLayout;
 }
 
 /**

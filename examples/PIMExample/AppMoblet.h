@@ -15,19 +15,30 @@
  02111-1307, USA.
  */
 
+/**
+ * @file AppMoblet.h
+ *
+ * AppMoblet class shows how to:
+ * - open and close contacts list.
+ * - create contact item.
+ * - remove contact item from the list.
+ */
+
 #ifndef APPMOBLET_H_
 #define APPMOBLET_H_
 
 #include <MAUtil/Moblet.h>
 #include <MAUtil/Vector.h>
-#include <conprint.h>
-#include <IX_PIM.h>
-#include <maapi.h>
 
-#include "PimContact.h"
+// Forward declarations.
+class PIMContact;
 
 /**
- * Application's moblet.
+ * Application's moblet class.
+ * AppMoblet class shows how to:
+ * - open and close contacts list.
+ * - create contact item.
+ * - remove contact item from the list.
  */
 class AppMoblet: public MAUtil::Moblet
 {
@@ -58,27 +69,49 @@ public:
     virtual void pointerPressEvent(MAPoint2d point);
 
     /**
-     * Open pim list and add a new contact.
+     * Start working with PIM.
+     * Add, modify and remove a PIM contact.
      */
-    virtual void openPimList();
+    virtual void startPIM();
 
     /**
-     * Print the next contact from the pim list.
+     * Open PIM contacts list.
+     */
+    virtual void openPIMContactsList();
+
+    /**
+     * Print the next contact from the PIM contacts list.
      */
     virtual void printNextContact();
 
     /**
-     * Add a contact to Address Book.
+     * Create a new contact.
+     * @return The new created contact, or NULL in case of error.
+     * The ownership of the result is passed to the caller.
      */
-    virtual void addContact();
+    virtual PIMContact* createContact();
 
     /**
-     * Close the pim list.
+     * Modify the address field of a specified contact.
+     * Remove the first value from the phone field.
+     * @param contact The given contact item.
      */
-    virtual void closePimList();
+    virtual void modifyContact(PIMContact* contact);
 
     /**
-     * Print show next contact / add new contact options on the screen.
+     * Remove a specified contact from the list.
+     * It also closes the item.
+     * @param contact The given contact item.
+     */
+    virtual void removeContact(PIMContact* contact);
+
+    /**
+     * Close the PIM contacts list.
+     */
+    virtual void closePIMContactsList();
+
+    /**
+     * Print show next contact / close pim list options on the screen.
      */
     virtual void printInfo();
 
@@ -89,11 +122,6 @@ private:
     MAHandle mContactsListHandle;
 
     /**
-     * Handle to a new contact item.
-     */
-    MAHandle mNewContantHandle;
-
-    /**
      * Store the x axis values from pointer move events.
      */
     MAUtil::Vector<int> mDragValues;
@@ -101,8 +129,9 @@ private:
     /**
      * If the flag is set to false is does not handle pointer events.
      * This flag is set to true only when the app is waiting for drag events
-     * (no pim action is in progress).
+     * (no PIM action is in progress).
      */
     bool mHandlePointerEvent;
 };
+
 #endif /* APPMOBLET_H_ */

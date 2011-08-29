@@ -49,7 +49,6 @@ MainScreen::MainScreen() :
  */
 MainScreen::~MainScreen()
 {
-	delete mMainLayout;
 }
 
 /**

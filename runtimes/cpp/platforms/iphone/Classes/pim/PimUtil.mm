@@ -20,7 +20,7 @@
 #include "config_platform.h"
 #import "helpers/cpp_defs.h"
 #import "helpers/cpp_ix_pim.h"
-
+#include "Syscall.h"
 #import <AddressBook/AddressBook.h>
 
 static PimUtils *sharedInstance = nil;
@@ -441,9 +441,10 @@ static PimUtils *sharedInstance = nil;
 -(NSData*) getImageDataFromHandle:(const int) handle
 {
     NSData* data = nil;
-    int size = PimMaGetDataSize(handle);
+    int size = maGetDataSize(handle);
     int* dst = new int[size];
-    PimMaReadData(handle, dst, 0, size);
+//    PimMaReadData(handle, dst, 0, size);
+    maReadData(handle, dst, 0, size);
     data = [NSData dataWithBytes:dst length:size];
     delete[] dst;
 
@@ -457,12 +458,12 @@ static PimUtils *sharedInstance = nil;
  */
 -(const int) createDataHandle:(NSData*) data
 {
-    MAHandle placeholder = PimMaCreatePlaceHolder();
+    MAHandle placeholder = maCreatePlaceholder();
     int size = [data length];
     const void* src = [data bytes];
-    if (RES_OK == PimMaCreateData(placeholder, size))
+    if (RES_OK == maCreateData(placeholder, size))
     {
-        PimMaWriteData(placeholder, src, 0, size);
+        maWriteData(placeholder, src, 0, size);
     }
 
     return placeholder;
@@ -646,7 +647,7 @@ static PimUtils *sharedInstance = nil;
 -(void*) getValidatedMemRange:(const int) address
                      withSize:(const int) size
 {
-    return PimGetValidatedMemRange(address, size);
+    return Base::gSyscall->GetValidatedMemRange(address, size);
 }
 
 /**
