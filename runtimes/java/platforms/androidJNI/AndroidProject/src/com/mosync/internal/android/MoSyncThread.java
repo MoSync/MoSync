@@ -308,7 +308,7 @@ public class MoSyncThread extends Thread
 		{
 			mMoSyncCameraController = new MoSyncCameraController(this);
 		}
- catch (Throwable e)
+		catch (Throwable e)
 		{
 			mMoSyncCameraController = null;
 		}
