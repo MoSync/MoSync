@@ -124,7 +124,7 @@ namespace NativeUI
      * Remove the edit box listener.
      * @param listener The listener that receives edit box events.
      */
-    void EditBox::removeButtonListener(EditBoxListener* listener)
+    void EditBox::removeEditBoxListener(EditBoxListener* listener)
     {
         removeListenerFromVector(mEditBoxListeners, listener);
     }
