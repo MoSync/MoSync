@@ -35,7 +35,7 @@ MA 02110-1301, USA.
 #include <MAUtil/Moblet.h>
 
 // The default screen, that is displayed when application starts
-#include "NativeScreen.h"
+#include "MainScreen.h"
 
 namespace Test
 {
@@ -45,10 +45,15 @@ namespace Test
  */
 class TestMoblet : public MAUtil::Moblet
 {
-	/*
-	 * ctor
+	/**
+	 * Constructor.
 	 */
 	TestMoblet();
+
+	/**
+	 * Destructor.
+	 */
+	~TestMoblet();
 
 public:
 
@@ -72,7 +77,7 @@ private:
 	static TestMoblet *mInstance;
 
 	/** The main screen of the application. **/
-	NativeScreen* mMainScreen;
+	MainScreen* mMainScreen;
 };
 
 }// namespace Test

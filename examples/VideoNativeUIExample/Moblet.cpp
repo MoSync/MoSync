@@ -36,14 +36,22 @@ namespace Test
 
 TestMoblet *TestMoblet::mInstance = NULL;
 
-/*
- * ctor
+/**
+ * Constructor.
  */
 TestMoblet::TestMoblet():mMainScreen(NULL)
 {
-	mMainScreen = new NativeScreen();
+	mMainScreen = new MainScreen();
 	mMainScreen->show();
 
+}
+
+/**
+ * Destructor.
+ */
+TestMoblet::~TestMoblet()
+{
+	delete mMainScreen;
 }
 
 /**

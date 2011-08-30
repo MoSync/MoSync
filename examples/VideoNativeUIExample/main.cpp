@@ -24,7 +24,8 @@ MA 02110-1301, USA.
  * @author Emma Tresanszki
  */
 
-// Include the library for the event manager, that manages the application main loop.
+// Include the library for the event manager, that manages the application
+// main loop.
 #include <MAUtil/Moblet.h>
 
 // Include the header file for this application's moblet.

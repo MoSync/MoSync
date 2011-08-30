@@ -17,15 +17,18 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file NativeScreen.h
- * The main screen of the application.
- *
+ * @file VideoScreen.h
  * @author Emma Tresanszki
+ *
+ * The first screen of the application.
+ * It contains widget controlls for Video View: Play, Pause, Stop,
+ * an edit box for user input with the source link/path for the video.
+ *
+ *
  */
 
 #ifndef NATIVESCREEN_H_
 #define NATIVESCREEN_H_
-
 
 #include <maapi.h>
 #include <MAUtil/util.h>
@@ -35,7 +38,7 @@ MA 02110-1301, USA.
 
 using namespace NativeUI;
 
-class NativeScreen:
+class VideoScreen:
 	public Screen,
 	public ButtonListener,
 	public VideoViewListener
@@ -45,14 +48,40 @@ public:
 	/**
 	 * Constructor.
 	 */
-	NativeScreen();
+	VideoScreen();
 
 	/**
 	 * Destructor.
 	 */
-	~NativeScreen();
+	~VideoScreen();
+
+	/**
+	 * Load the default url. This can be set from SettingsScreen.
+	 */
+	void loadDefaultUrl(const MAUtil::String url);
+
+	/**
+	 * Show or hide the duration label.
+	 * @param state if true show it, hide it otherwise.
+	 */
+	void showDurationLabel(bool state);
 
 private:
+
+	/**
+	 * Creates and adds main layout to the screen.
+	 */
+	void createMainLayout();
+
+	/**
+	 * Creates and adds widgets to exemplify video widget.
+	 */
+	void addVideoWidgets();
+
+	/**
+	 * Create the controls area with Play, Pause and Stop buttons.
+	 */
+	void createPlaybackButtons();
 
     /**
      * This method is called when there is an touch-down event for
@@ -92,55 +121,69 @@ private:
         VideoView* videoView,
         const int videoViewState);
 
-	/**
-	 * Creates and adds main layout to the screen.
-	 */
-	void createMainLayout();
-
-	/**
-	 * Creates and adds widgets to exemplify video widget.
-	 */
-	void addVideoWidgets();
-
 private:
 	/**
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
 
-	VerticalLayout * mSpacerLayout;
+	/*
+	 * An empty layout as a spacer.
+	 */
+	VerticalLayout * mTopSpacerLayout;
 
-	/** The video view widget. */
+	/**
+	 * The video view widget.
+	 */
 	VideoView* mVideoView;
 
+	/**
+	 * Label that notifies the user of the video playback status.
+	 */
 	Label* mSourceStatus;
 
+	/**
+	 * Horizontal layout with buttons for controlling playback.
+	 */
 	HorizontalLayout* mButtonsLayout;
 	Button* mPlay;
 	Button* mPause;
 	Button* mStop;
 
-	/** Horizontal layout for seek to button and duration label. */
-	HorizontalLayout* mSeekToLayout;
-
-	/** Button for seeking to 100 millisecond. */
-	Button* mSeekTo;
-
-	/** Label that displays video total duration. */
+	/**
+	 * Label that displays video total duration.
+	 */
 	Label* mDuration;
 
-	/** Edit box for setting the uri or local path. */
+	/**
+	 *  Edit box for setting the uri or local path.
+	 */
 	EditBox* mEditBox;
 
-	/** Horizontal layout for load url, load path buttons. */
+	/**
+	 * Horizontal layout for load url, load path buttons.
+	 */
 	HorizontalLayout* mLoadLayout;
 	Button* mSetUrl;
 	Button* mSetPath;
 
+	VerticalLayout* mMiddleSpacerLayout;
 	VerticalLayout* mSpacerBottomLayout;
 
-	HorizontalLayout* mBottomLayout;
+	/**
+	 * Exit button.
+	 */
 	Button* mExitButton;
+
+	/**
+	 * The screen width.
+	 */
+	int mScreenWidth;
+
+	/**
+	 * The screen height.
+	 */
+	int mScreenHeight;
 };
 
 #endif /* NATIVESCREEN_H_ */
