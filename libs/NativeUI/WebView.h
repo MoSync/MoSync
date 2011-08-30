@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file WebView.h
- * @author Mikael Kindborg
+ * @author Emma Tresanszki
  *
  * Class for web views.
  */
@@ -75,8 +75,8 @@ namespace NativeUI
 		 * points to the Assets folder in the local file system
 		 * ("file://pathToLocalFileSystem/Assets/").
 		 *
-		 * @note Use: #maGetSystemProperty ("mosync.path.local.url") to find the baseURL
-		 * for the local file system.
+		 * @note Use: #maGetSystemProperty ("mosync.path.local.url") to find
+		 * the baseURL for the local file system.
 		 * @param baseUrl Any valid URL schema.
 		 *
 		 */

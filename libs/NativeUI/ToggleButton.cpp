@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file ToggleButton.cpp
- *
+ * @author Emma Tresanszki
  *
  * Class for a a special kind of check button.
  * It is available only on Android, and it's similar to the Check Box on iOS.
@@ -53,7 +53,8 @@ namespace NativeUI
 	 */
 	void ToggleButton::setCheckedState(const bool toggleState)
 	{
-		this->setProperty(MAW_TOGGLE_BUTTON_CHECKED, (toggleState ? "true" : "false") );
+		this->setProperty(
+			MAW_TOGGLE_BUTTON_CHECKED, (toggleState ? "true" : "false") );
 	}
 
 	/*
@@ -62,7 +63,8 @@ namespace NativeUI
 	 */
 	bool ToggleButton::isChecked() const
 	{
-		return (this->getPropertyString(MAW_TOGGLE_BUTTON_CHECKED)=="true" ? true : false );
+		return (this->getPropertyString(
+			MAW_TOGGLE_BUTTON_CHECKED)=="true" ? true : false );
 	}
 
 	/**
@@ -97,7 +99,8 @@ namespace NativeUI
 			bool toggleBtnState = widgetEventData->checked == 1 ? true : false;
 			for (int i = 0; i < mToggleButtonListeners.size(); i++)
 			{
-				mToggleButtonListeners[i]->toggleButtonStateChanged(this, toggleBtnState);
+				mToggleButtonListeners[i]->toggleButtonStateChanged(
+					this, toggleBtnState);
 			}
 		}
 	}

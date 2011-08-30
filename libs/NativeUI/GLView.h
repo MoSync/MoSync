@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file GLView.h
- * @author Mikael Kindborg
+ * @author Mikael Kindborg and Emma Tresanszki
  *
  * Class for gl view.
  */

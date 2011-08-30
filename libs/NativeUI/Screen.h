@@ -50,9 +50,8 @@ namespace NativeUI
 
 		/**
 		 * Set the title of the screen.
-		 * The title is used by tab screen to display a text on the tab indicator.
-		 * If the screen is pushed on a stack that has MAW_STACK_SCREEN_NAV_BAR_ENABLED
-		 * then the title will be displayed on the navigation bar.
+		 * The title is used by tab screen to display a text on the
+		 * tab indicator.
 		 * @param title The screen title.
 		 */
 		virtual void setTitle(const MAUtil::String& title);

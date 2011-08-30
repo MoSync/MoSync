@@ -66,14 +66,15 @@ namespace NativeUI
         MAUtil::String scaleModeString;
         switch (scaleMode)
         {
-            case IMAGE_SCALE_NONE:
-                scaleModeString = "none";
-                break;
             case IMAGE_SCALE_XY:
                 scaleModeString = "scaleXY";
                 break;
             case IMAGE_SCALE_PRESERVE_ASPECT:
                 scaleModeString = "scalePreserveAspect";
+            case IMAGE_SCALE_NONE:
+            default:
+                scaleModeString = "none";
+                break;
         }
 
         this->setProperty(MAW_IMAGE_SCALE_MODE, scaleModeString);
