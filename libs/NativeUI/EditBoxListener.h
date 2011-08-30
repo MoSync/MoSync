@@ -44,7 +44,7 @@ namespace NativeUI
          * Only for iphone platform.
          * @param editBox The edit box object that generated the event.
          */
-        virtual void editBoxEditingDidBegin(EditBox* editBox) = 0;
+        virtual void editBoxEditingDidBegin(EditBox* editBox) {};
 
         /**
          * This method is called when an edit box loses focus.
@@ -52,7 +52,7 @@ namespace NativeUI
          * Only for iphone platform.
          * @param editBox The edit box object that generated the event.
          */
-        virtual void editBoxEditingDidEnd(EditBox* editBox) = 0;
+        virtual void editBoxEditingDidEnd(EditBox* editBox) {};
 
         /**
          * This method is called when the edit box text was changed.
@@ -61,7 +61,7 @@ namespace NativeUI
          */
         virtual void editBoxTextChanged(
             EditBox* editBox,
-            const MAUtil::String& text) = 0;
+            const MAUtil::String& text) {};
 
         /**
          * This method is called when the return button was pressed.
