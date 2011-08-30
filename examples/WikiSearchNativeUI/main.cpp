@@ -17,6 +17,7 @@ MA 02110-1301, USA.
 */
 
 /** @file main.cpp
+ * @author Emma Tresanszki
  *
  * This application provides an example on how to use the Native UI.
  * It performs text searches on the Wikipedia, based on user input ( tags ) and selected categories.
@@ -29,7 +30,6 @@ MA 02110-1301, USA.
  * By clicking on each snippet, a Web view is shown in the WebScreen.
  * The application is exited by pressing the back button.
  *
- * @author Emma Tresanszki
  */
 
 // Include the library for the event manager, that manages the application main loop.

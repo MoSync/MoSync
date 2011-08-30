@@ -18,11 +18,11 @@ MA 02110-1301, USA.
 
 /**
  * @file TitlesScreen.cpp
+ * @author Emma Tresanszki
  *
  * This file contains the second screen of the application.
  * This screen displays all the available article titles.
  *
- * @author Emma Tresanszki
  */
 
 // Include library for string conversions.
@@ -45,8 +45,8 @@ MA 02110-1301, USA.
 
 namespace WikiNativeUI {
 
-/*
- * constructor
+/**
+ * Constructor.
  * Pass the previous screen and the engine.
  */
 TitleScreen::TitleScreen(HomeScreen *parentScreen, MediaWiki* engine):
@@ -70,11 +70,12 @@ TitleScreen::TitleScreen(HomeScreen *parentScreen, MediaWiki* engine):
 	MAUtil::Environment::getEnvironment().addCustomEventListener(this);
 }
 
-/*
- * dtor
+/**
+ * D-tor.
  * Delete the main widget, and all it's children will be deleted also.
  */
-TitleScreen::~TitleScreen() {
+TitleScreen::~TitleScreen()
+{
 	if (mSummaryScreen){
 		delete mSummaryScreen;
 		mSummaryScreen = NULL;
@@ -82,10 +83,11 @@ TitleScreen::~TitleScreen() {
 	// The base d-tor is called, and it destroys the mMainLayout;
 }
 
-/*
+/**
  * Lay out the widgets (portrait mode).
  */
-void TitleScreen::setupUI() {
+void TitleScreen::setupUI()
+{
 
 	// Get the handle to the main layout and the screen.
 	mMainLayout = getMainLayout();
@@ -95,23 +97,22 @@ void TitleScreen::setupUI() {
 	mNextButton = getTopButtonRight();
 
 	// Set the text for the widget in the top layout: the label and the buttons.
-//	setLabelText(mLabel, MESSAGE_NEXT_HINT.c_str());
 	setButtonText(mNextButton, " NEXT ");
 	setButtonText(mBackButton, " BACK ");
 
-	// The creation of the main layout is already done in the base class constructor, called at derived object creation.
+	// The creation of the main layout is already done in the base class
+	// constructor, called at derived object creation.
 	// So, we can use  a handle for the main layout at any point.
 
 	// Add an empty list view.
 	// Each line will have a check box, and the related label with article title
-	// List is populated when wiki search is performed, and showScreen() is called.
+	// List is populated when search is performed, and showScreen() is called.
 	// The height is ScreenHeight - the size of the top layout.
-	mListView = createListView(mScreenWidth, 7*mScreenHeight/8); //MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	mListView = createListView(mScreenWidth, 7*mScreenHeight/8);
 	maWidgetAddChild(mMainLayout, mListView);
 }
 
-
-/*
+/**
  *  Show the screen.
  *  If it does not need refresh, it is called from the SummaryScreen.
  *  The list box need refresh when this is called from the home screen.
@@ -129,12 +130,12 @@ void TitleScreen::showScreen(bool needsRefresh)
 	BasicScreen::showScreen();
 }
 
-/*
+/**
  * Fill the list box with data provided by the engine.
  */
 void TitleScreen::fillListBox()
 {
-	// Clear previous entries
+	// Clear previous entries.
 	mCheckBoxes.clear();
 	mTitleLabels.clear();
 
@@ -148,13 +149,14 @@ void TitleScreen::fillListBox()
 	if ( mListView != -1){
 		maWidgetDestroy(mListView);
 	}
-	mListView = createListView(mScreenWidth, MAW_CONSTANT_FILL_AVAILABLE_SPACE); //7*mScreenHeight/8);
+	mListView = createListView(mScreenWidth, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 	maWidgetAddChild(mMainLayout, mListView);
 
-	// Add a Select/Deselect All button
+	// Add a Select/Deselect All button.
 	MAWidgetHandle selectAllLayout = maWidgetCreate(MAW_HORIZONTAL_LAYOUT);
 	// Set layout's size.
-	setWidgetSize(selectAllLayout, mScreenWidth, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	setWidgetSize(
+		selectAllLayout, mScreenWidth, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 
 	mSelectAll = createCheckBox();
 	// All titles are deselected by default.
@@ -171,7 +173,8 @@ void TitleScreen::fillListBox()
 	maWidgetAddChild(mListView,selectAllLayout);
 
 	// Update the UI.
-	for ( int i=0; i< mTitles.size(); i++){
+	for (int i=0; i < mTitles.size(); i++)
+	{
 		// Add results in a horizontal layout.
 		MAWidgetHandle layout = maWidgetCreate(MAW_HORIZONTAL_LAYOUT);
 		setWidgetSize(layout, mScreenWidth, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
@@ -194,28 +197,27 @@ void TitleScreen::fillListBox()
 	}
 }
 
-/*
+/**
  * Update wiki list of titles, with the ones selected by the user.
  */
 void TitleScreen::updateWikiTitles()
 {
-	// For each check box that is unchecked, delete the corresponding entry in wiki engine
-
-	// Create vector with each index that needs to be deleted.
-	MAUtil::Vector<int> indexArray;
+	// For each check box that is unchecked, mark the corresponding entry
+	// in the engine. So that when displaying summary screen, those entries
+	// will not be displayed.
+	mWiki->clearHiddenIndexList();
 
 	char buf[6];
-	for (int i =0; i<mCheckBoxes.size(); i++){
+	for (int i =0; i < mCheckBoxes.size(); i++)
+	{
 		maWidgetGetProperty(mCheckBoxes[i], MAW_CHECK_BOX_CHECKED, buf, 6);
 		if ( strcmp(buf, "false") == 0 ){
-			indexArray.add(i);
+			mWiki->markAsHidden(i);
 		}
 	}
-	// Delete entries on selected indexes.
-	mWiki->filterData(indexArray);
 }
 
-/*
+/**
  * Get all the snippets.
  * @return all snippets with user checked title.
  */
@@ -225,7 +227,7 @@ MAUtil::Vector<MAUtil::String> TitleScreen::getAllSnippets()
 }
 
 
-/*
+/**
  * Called when user wants to start over, but he is in another screen.
  */
 void TitleScreen::showHomeScreen()
@@ -233,7 +235,7 @@ void TitleScreen::showHomeScreen()
 	mPrevScreen->showScreen();
 }
 
-/*
+/**
  * from CustomEventListener
  * The custom event listener interface.
  */
@@ -255,7 +257,7 @@ void TitleScreen::customEvent(const MAEvent& event)
 	return;
 }
 
-/*
+/**
  * Handle events on screen's widgets.
  */
 void TitleScreen::widgetClicked(MAHandle widgetHandle)
@@ -279,18 +281,23 @@ void TitleScreen::widgetClicked(MAHandle widgetHandle)
 	{
 		// Select all titles, or deselect them.
 		maWidgetGetProperty(mSelectAll, MAW_CHECK_BOX_CHECKED, buf, 6);
-			for (int i=0; i<mCheckBoxes.size(); i++){
+			for (int i=0; i < mCheckBoxes.size(); i++)
+			{
 				maWidgetSetProperty(mCheckBoxes[i], MAW_CHECK_BOX_CHECKED, buf);
 			}
 	}
 	else
 	{
 		// If a check box is unselected, than Select all is unselected too.
-		for (int i=0; i<mCheckBoxes.size(); i++){
+		for (int i=0; i < mCheckBoxes.size(); i++)
+		{
 			if (mCheckBoxes[i] == widgetHandle){
-				maWidgetGetProperty(mCheckBoxes[i], MAW_CHECK_BOX_CHECKED, buf, 6);
-				if (strcmp(buf, "false") == 0){
-					maWidgetSetProperty(mSelectAll, MAW_CHECK_BOX_CHECKED, "false");
+				maWidgetGetProperty(
+					mCheckBoxes[i], MAW_CHECK_BOX_CHECKED, buf, 6);
+				if (strcmp(buf, "false") == 0)
+				{
+					maWidgetSetProperty(
+						mSelectAll, MAW_CHECK_BOX_CHECKED, "false");
 				}
 				break;
 			}

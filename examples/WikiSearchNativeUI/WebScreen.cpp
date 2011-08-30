@@ -18,11 +18,11 @@ MA 02110-1301, USA.
 
 /**
  * @file WebScreen.cpp
+ * @author Emma Tresanszki
  *
  * This file contains the last screen of the application
  * It contains a top layout with a hint label and two buttons, and a web view.
  *
- * @author Emma Tresanszki
  */
 
 // Include library for string conversions.
@@ -45,8 +45,8 @@ MA 02110-1301, USA.
 
 namespace WikiNativeUI {
 
-/*
- * constructor
+/**
+ * Constructor.
  * Pass the parent screen.
  */
 WebScreen::WebScreen(SummaryScreen *parentScreen):
@@ -65,17 +65,19 @@ WebScreen::WebScreen(SummaryScreen *parentScreen):
 	MAUtil::Environment::getEnvironment().addCustomEventListener(this);
 }
 
-/*
- * dtor
+/**
+ * Destructor.
  */
-WebScreen::~WebScreen() {
+WebScreen::~WebScreen()
+{
 	// The base d-tor is called, and it destroys the mMainLayout;
 }
 
-/*
+/**
  * Lay out the widgets (portrait mode).
  */
-void WebScreen::setupUI() {
+void WebScreen::setupUI()
+{
 
 	// Get the handle to the main layout and the screen.
 	mMainLayout = getMainLayout();
@@ -84,27 +86,28 @@ void WebScreen::setupUI() {
 	mBackButton = getTopButtonLeft();
 	mNewSearchButton = getTopButtonRight();
 
-	// Before the web view is displayed, show this message.
-//	setLabelText(mLabel, MESSAGE_PAGE_LOADING.c_str());
 	setButtonText(mBackButton, " BACK ");
 	setButtonText(mNewSearchButton, "New Search");
 
 	// Add the web view that contains the article.
-	// It will be filled when this screen is displayed,  based on the checked titles from TitlesScreen.
-	mWebView = createWebView(MAW_CONSTANT_FILL_AVAILABLE_SPACE, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	// It will be filled when this screen is displayed,
+	// based on the checked titles from TitlesScreen.
+	mWebView = createWebView(
+		MAW_CONSTANT_FILL_AVAILABLE_SPACE, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 
 	maWidgetAddChild(mMainLayout, mWebView);
 }
 
-/*
+/**
  * Show the screen.
  */
-void WebScreen::showScreen() {
+void WebScreen::showScreen()
+{
 	// When this screen is shown, the url is set to the web view.
 	BasicScreen::showScreen();
 }
 
-/*
+/**
  * Open a web view for a certain title
  * compose the url and display
  * @param The article title for which we want to open a wikipedia definition.
@@ -119,12 +122,9 @@ bool WebScreen::openWebView(MAUtil::String title)
 
 	// Display the article.
 	maWidgetSetProperty(mWebView,MAW_WEB_VIEW_URL,url.c_str() );
-
-	// Display "Page is loading.."
-//	setLabelText(mLabel, MESSAGE_PAGE_LOADING.c_str());
 }
 
-/*
+/**
  * from CustomEventListener
  * The custom event listener interface.
  */
@@ -167,7 +167,7 @@ void WebScreen::customEvent(const MAEvent& event)
 	return;
 }
 
-/*
+/**
  * Handle events on screen's widgets.
  */
 void WebScreen::widgetClicked(MAHandle widgetHandle)

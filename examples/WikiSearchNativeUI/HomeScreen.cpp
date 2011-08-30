@@ -18,6 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file HomeScreen.cpp
+ * @author Emma Tresanszki
  *
  * This file contains the home screen of the application.
  * When application is launched, this screen is displayed by default.
@@ -26,7 +27,6 @@ MA 02110-1301, USA.
  * After the user presses Search button, next screen with the
  * available article titles is displayed.
  *
- * @author Emma Tresanszki
  */
 
 // Include library for string conversions.
@@ -77,11 +77,12 @@ HomeScreen::HomeScreen():
 	MAUtil::Environment::getEnvironment().addCustomEventListener(this);
 }
 
-/*
- * dtor
+/**
+ * Destructor.
  * Delete the main widget, and all it's children will be deleted also.
  */
-HomeScreen::~HomeScreen() {
+HomeScreen::~HomeScreen()
+{
 	// Delete the engine.
 	if (mWiki)
 	{
@@ -96,10 +97,11 @@ HomeScreen::~HomeScreen() {
 	// The main layout is destroyed in base class destructor.
 }
 
-/*
+/**
  * Create the layout with checkable categories.
  * It is parented by the main layout.
- * For the moment, there are only 6 available categories. ( These could be expanded also by new user categories.)
+ * For the moment, there are only 6 available categories.
+ * ( These could be expanded also by new user categories.)
  * @return The layout that contains the categories.
  */
 MAWidgetHandle HomeScreen::createCategoriesLayout()
@@ -136,7 +138,8 @@ MAWidgetHandle HomeScreen::createCategoriesLayout()
 	setWidgetProperty(line2, MAW_WIDGET_BACKGROUND_COLOR, DARK_GREY, 16);
 	maWidgetAddChild(categoriesLayout, line2);
 
-	// Available categories: All ( enabled by default), Nature, Sports, Movies, News, Science.
+	// Available categories:
+	// All ( enabled by default), Nature, Sports, Movies, News, Science.
 	mCategoriesStrings.clear();
 	mCategoriesStrings.add(CATEGORY_ALL);
 	mCategoriesStrings.add(CATEGORY_NATURE);
@@ -145,18 +148,20 @@ MAWidgetHandle HomeScreen::createCategoriesLayout()
 	mCategoriesStrings.add(CATEGORY_MOVIES);
 	mCategoriesStrings.add(CATEGORY_SCIENCE);
 
-	setWidgetProperty(categoriesLayout, MAW_WIDGET_BACKGROUND_COLOR, DARK_WHITE, 16);
+	setWidgetProperty(
+		categoriesLayout, MAW_WIDGET_BACKGROUND_COLOR, DARK_WHITE, 16);
 
 	int index(-1);
 
 	// Each category has a check box and label.
-	for ( int i=0; i<mCategoriesStrings.size()/2; i++)
+	for (int i=0; i < mCategoriesStrings.size() / 2; i++)
 	{
 		// Arrange 2 categories per row.
 		MAWidgetHandle categoryLayout = maWidgetCreate(MAW_HORIZONTAL_LAYOUT);
 
 		// Set layout's size.
-		setWidgetSize(categoryLayout,mScreenWidth, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+		setWidgetSize(
+			categoryLayout,mScreenWidth, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 
 		MAWidgetHandle checkBox1 = createCheckBox();
 		// By default, the first category (All) is checked,
@@ -175,7 +180,8 @@ MAWidgetHandle HomeScreen::createCategoriesLayout()
 				BLUE,
 				mFontSize );
 		// Arrange the text to the left.
-		maWidgetSetProperty(label1, MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_LEFT);
+		maWidgetSetProperty(
+			label1, MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_LEFT);
 		maWidgetAddChild(categoryLayout, label1);
 
 		// Add another check box & label, on the same row.
@@ -197,7 +203,8 @@ MAWidgetHandle HomeScreen::createCategoriesLayout()
 				BLUE,
 				mFontSize );
 		// Arrange the text to the left.
-		maWidgetSetProperty(label2, MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_LEFT);
+		maWidgetSetProperty(
+			label2, MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_LEFT);
 		maWidgetAddChild(categoryLayout, label2);
 
 		// Add this layout to the main vertical layout.
@@ -213,7 +220,7 @@ MAWidgetHandle HomeScreen::createCategoriesLayout()
 	return categoriesLayout;
 }
 
-/*
+/**
  * Lay out the widgets (portrait mode).
  */
 void HomeScreen::setupUI()
@@ -227,14 +234,12 @@ void HomeScreen::setupUI()
 	// so we can dismiss it.
 	MAWidgetHandle backBtn = getTopButtonLeft();
 	maWidgetDestroy(backBtn);
-//	maWidgetRemoveChild(backBtn);
 
-	// The creation of the main layout is already done in the base class constructor,
-	// called at derived object creation.
+	// The creation of the main layout is already done in the base class
+	// constructor, called at derived object creation.
 	// So, we can use  a handle for the main layout at any point.
 
-	// Set the text for the widget in the top layout: the label and button.
-//	setLabelText(mLabel,MESSAGE_SEARCH_HINT.c_str());
+	// Set the text for the button widget in the top layout.
 	setButtonText(mSearchButton, " NEXT ");
 
 	// Add a label before the Progress bar.
@@ -251,21 +256,26 @@ void HomeScreen::setupUI()
 	mProgressBar = createProgressBar();
 
 	// Set the range of the progress bar from 0..100
-	setWidgetProperty(mProgressBar, MAW_PROGRESS_BAR_MAX, PROGRESS_BAR_MAX_VALUE);
+	setWidgetProperty(
+		mProgressBar, MAW_PROGRESS_BAR_MAX, PROGRESS_BAR_MAX_VALUE);
 	// Set the progress value to 0.
-	setWidgetProperty(mProgressBar, MAW_PROGRESS_BAR_PROGRESS, 0);
+	setWidgetProperty(
+		mProgressBar, MAW_PROGRESS_BAR_PROGRESS, 0);
 	// Hide the widget at first, and display it when a Search is being performed.
-	maWidgetSetProperty(mProgressBar, MAW_WIDGET_VISIBLE, "false");
+	maWidgetSetProperty(
+		mProgressBar, MAW_WIDGET_VISIBLE, "false");
 
 	maWidgetAddChild(mMainLayout, mProgressBar);
 
-	// Next, fill the remaining space with an edit box and some check boxes for the categories.
+	// Next, fill the remaining space with an edit box and
+	// some check boxes for the categories.
 	MAWidgetHandle hintLabel = createLabel(
 			mScreenWidth,
 			MESSAGE_EDITBOX_HINT.c_str(),
 			BLUE,
 			mFontSize);
-	maWidgetSetProperty(hintLabel,MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT,MAW_ALIGNMENT_LEFT);
+	maWidgetSetProperty(
+		hintLabel,MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT,MAW_ALIGNMENT_LEFT);
 	maWidgetAddChild(mMainLayout, hintLabel);
 
 	// Add only one edit box.
@@ -316,7 +326,7 @@ void HomeScreen::setupUI()
 	maWidgetAddChild(mMainLayout, valuesLayout);
 }
 
-/*
+/**
  * Provide the checked categories in a string, separated by comma.
  */
 MAUtil::String HomeScreen::getCheckedCategories()
@@ -324,7 +334,7 @@ MAUtil::String HomeScreen::getCheckedCategories()
 	char buf[6];
 	MAUtil::String categories="";
 
-	for (int i=0; i<mCategoryBoxes.size(); i++)
+	for (int i=0; i < mCategoryBoxes.size(); i++)
 	{
 		maWidgetGetProperty(mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, buf, 6);
 		if ( strcmp(buf, "true") == 0)
@@ -341,7 +351,7 @@ MAUtil::String HomeScreen::getCheckedCategories()
 	return categories;
 }
 
-/*
+/**
  * Show the screen.
  */
 void HomeScreen::showScreen()
@@ -370,31 +380,34 @@ void HomeScreen::showScreen()
 	BasicScreen::showScreen();
 }
 
-/*
+/**
  * Notify the screen about wiki engine status
  * when finished, next screen can be displayed.
  */
 void HomeScreen::engineFinished()
 {
 	// Set the progress bar to it's max value.
-	setWidgetProperty(mProgressBar,MAW_PROGRESS_BAR_PROGRESS, PROGRESS_BAR_MAX_VALUE);
+	setWidgetProperty(
+		mProgressBar,MAW_PROGRESS_BAR_PROGRESS, PROGRESS_BAR_MAX_VALUE);
 
-	// Show next screen: the one with all the available titles and check boxes for each one.
+	// Show next screen: the one with all the available titles and
+	// check boxes for each one.
 	// And refresh the list view that contains those values.
 	mTitlesScreen->showScreen(true);
 }
 
-/*
+/**
  * Engine notifies this screen that a new chunk of data is received.
  * At each step, the progress value is incremented.
  */
 void HomeScreen::engineChunkReceived()
 {
 	int incrementBy = PROGRESS_BAR_MAX_VALUE/mSteps;
-	setWidgetProperty(mProgressBar, MAW_PROGRESS_BAR_INCREMENT_PROGRESS, incrementBy);
+	setWidgetProperty(
+		mProgressBar, MAW_PROGRESS_BAR_INCREMENT_PROGRESS, incrementBy);
 }
 
-/*
+/**
  * The UI is notified when an engine error occurs.
  */
 void HomeScreen::engineError(MAUtil::String errorMessage)
@@ -406,7 +419,7 @@ void HomeScreen::engineError(MAUtil::String errorMessage)
 	maWidgetSetProperty(mProgressLabel,MAW_WIDGET_VISIBLE, "false");
 }
 
-/*
+/**
  * Notify this screen of the number the chunks of data from HTTP_GET request.
  * After each chunk is received, the progress bar value is incremented.
  *
@@ -416,11 +429,12 @@ void HomeScreen::engineNrSteps(int nrSteps)
 	mSteps = nrSteps;
 }
 
-/*
+/**
  * from CustomEventListener
  * The custom event listener interface.
  */
-void HomeScreen::customEvent(const MAEvent& event) {
+void HomeScreen::customEvent(const MAEvent& event)
+{
 	//If the event does not come from a widget, we just ignore it.
 	if (event.type != EVENT_TYPE_WIDGET) {
 		return;
@@ -430,12 +444,14 @@ void HomeScreen::customEvent(const MAEvent& event) {
 	MAWidgetEventData *widgetEventData = (MAWidgetEventData *) event.data;
 
 	// Check that the event was sent from a widget...
-	if (widgetEventData->eventType == MAW_EVENT_CLICKED) {
+	if (widgetEventData->eventType == MAW_EVENT_CLICKED)
+	{
 		// handle the event emitted by the widget
 		widgetClicked(widgetEventData->widgetHandle);
 	}
 	// Check if the event came from a slider value change...
-	else if(widgetEventData->eventType == MAW_EVENT_SLIDER_VALUE_CHANGED) {
+	else if(widgetEventData->eventType == MAW_EVENT_SLIDER_VALUE_CHANGED)
+	{
 		// Set the current value of the slider.
 		mSliderValue = widgetEventData->sliderValue;
 	}
@@ -444,7 +460,8 @@ void HomeScreen::customEvent(const MAEvent& event) {
 
 /*
  * Handle events on screen's widgets
- * NOTE: take care to dismiss the Keyboard until you press other buttons, because it is not modal.
+ * NOTE: take care to dismiss the Keyboard until you press other buttons,
+ * because it is not modal.
  */
 void HomeScreen::widgetClicked(MAHandle widgetHandle)
 {
@@ -463,7 +480,10 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 		// If the text does not fit in the buffer, textLength will be set
 		// to -1, therefore we need to check that the length is greater than
 		// or equal to 0, otherwise we just ignore the event.
-		if (textLength == MAW_RES_INVALID_STRING_BUFFER_SIZE || strcmp(textBuffer,"") == 0) {
+		if (textLength == MAW_RES_INVALID_STRING_BUFFER_SIZE
+			||
+			strcmp(textBuffer,"") == 0)
+		{
 			return;
 		}
 
@@ -477,7 +497,8 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 			maWidgetSetProperty(mProgressBar, MAW_WIDGET_VISIBLE, "true");
 
 			// This label is indicating that a search action is in progress.
-			maWidgetSetProperty(mProgressLabel, MAW_LABEL_TEXT, MESSAGE_WAITNOTE.c_str());
+			maWidgetSetProperty(
+				mProgressLabel, MAW_LABEL_TEXT, MESSAGE_WAITNOTE.c_str());
 
 			// Initiate the search with a result limit.
 			mWiki->search(text, mSliderValue);
@@ -491,14 +512,17 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 		if (strcmp(buf,"true") == 0)
 		{
 			// Check the other ones.
-			for ( int i=1; i< mCategoryBoxes.size(); i++){
-				maWidgetSetProperty(mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "true");
+			for (int i=1; i < mCategoryBoxes.size(); i++)
+			{
+				maWidgetSetProperty(
+					mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "true");
 			}
 		}
 		else
 		{
 			// Uncheck all.
-			for ( int i=1; i< mCategoryBoxes.size(); i++){
+			for (int i=1; i < mCategoryBoxes.size(); i++)
+			{
 				maWidgetSetProperty(mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "false");
 			}
 		}
@@ -511,10 +535,12 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 			if ( mCategoryBoxes[i] == widgetHandle )
 			{
 				char buf[6];
-				maWidgetGetProperty(mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, buf, 6);
+				maWidgetGetProperty
+				(mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, buf, 6);
 				if (strcmp(buf,"false") == 0)
 				{
-					maWidgetSetProperty(mCategoryBoxes[0], MAW_CHECK_BOX_CHECKED, "false");
+					maWidgetSetProperty(
+						mCategoryBoxes[0], MAW_CHECK_BOX_CHECKED, "false");
 				}
 				break;
 			}

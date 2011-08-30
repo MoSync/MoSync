@@ -5079,8 +5079,8 @@ group WidgetAPI "Widget API" {
 		*    maFontGetName(1, buf, 256);
 		*    // Load that font for size 10.
 		*    int fontHandle = maFontLoadWithName(buf, 10);
-		*    // Set that font to the label.
-		*	maWidgetSetProperty(labelHandle, MAW_LIST_VIEW_ITEM_FONT_HANDLE, toString(fontHandle));
+		*    // Set that font to the list view item.
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_HANDLE, toString(fontHandle));
 		* \endcode
 		*/
 		FONT_HANDLE = "fontHandle";

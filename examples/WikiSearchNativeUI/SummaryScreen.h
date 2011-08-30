@@ -18,13 +18,13 @@ MA 02110-1301, USA.
 
 /**
  * @file SummaryScreen.h
+ * @author Emma Tresanszki
  *
  * This This file contains the third screen of the application.
  * This screen displays all the text snippets.
  * By clicking on each snippet, a Web view is shown in next screen:WebScreen.
  * A StartOver button is available.
  *
- * @author Emma Tresanszki
  */
 
 #ifndef SUMMARYSCREENNUI_H_
@@ -46,7 +46,7 @@ namespace WikiNativeUI
 class TitleScreen;
 class MediaWiki;
 
-/*
+/**
  * SummaryScreen: native UI screen
  * It contains the user selected article snippets.
  * Results are displayed in a list view, and each snippet is followed by an anchor.
@@ -57,49 +57,49 @@ class SummaryScreen : public BasicScreen,
 {
 public:
 
-	/*
-	 * constructor
+	/**
+	 * Constructor.
 	 * Pass the parent screen and the engine.
 	 */
 	SummaryScreen(TitleScreen *parentScreen,MediaWiki* engine);
 
-	/*
-	 * dtor
-	 * Destroy the main widget, and all it's children will be destroyed also
+	/**
+	 * Destructor.
+	 * Destroy the main widget, and all it's children will be destroyed also.
 	 */
 	~SummaryScreen();
 
-	/*
+	/**
 	 *  Show the screen.
 	 *  If it is called from WebScreen it does not need refresh,
 	 *  but if from TitleScreen the list box needs refresh.
 	 */
 	void showScreen(bool needsRefresh);
 
-	/*
+	/**
 	 * Show the home screen.
 	 */
 	void showHomeScreen();
 
-	/*
+	/**
 	 * from CustomEventListener
 	 * The custom event listener interface.
 	 */
 	void customEvent(const MAEvent& event);
 
-	/*
+	/**
 	 * Handle events on screen's widgets.
 	 */
 	void widgetClicked(MAHandle widgetHandle);
 
-	/*
+	/**
 	 * Fill the list box with data provided by the engine.
 	 */
 	void fillListBox();
 
 private: // methods
 
-	/*
+	/**
 	 * Lay out the widgets (portrait mode).
 	 */
 	void setupUI();
