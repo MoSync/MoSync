@@ -34,8 +34,8 @@ namespace NativeUI
 {
     /**
      * Class for labels.
-     * Methods for setting the text, alignment, font size and color are inherited
-     * from TextWidget.
+     * Methods for setting the text, alignment, font size and color are
+     * inherited from TextWidget.
      */
     class Label : public TextWidget
     {

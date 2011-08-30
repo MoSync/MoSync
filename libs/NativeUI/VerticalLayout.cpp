@@ -50,7 +50,8 @@ namespace NativeUI
 	 * @param alignment One of the constants #MAW_ALIGNMENT_LEFT,
 	 * #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
 	 */
-	void VerticalLayout::setChildHorizontalAlignment(const MAUtil::String alignment)
+	void VerticalLayout::setChildHorizontalAlignment
+	(const MAUtil::String alignment)
 	{
 		setProperty(
 				MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT, alignment);
@@ -61,7 +62,8 @@ namespace NativeUI
 	 * @param alignment One of the constants #MAW_ALIGNMENT_TOP,
 	 * #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 	 */
-	void VerticalLayout::setChildVerticalAlignment(const MAUtil::String alignment)
+	void VerticalLayout::setChildVerticalAlignment
+	(const MAUtil::String alignment)
 	{
 		setProperty(
 				MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT, alignment);

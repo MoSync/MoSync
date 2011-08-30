@@ -47,14 +47,16 @@ namespace NativeUI
 		virtual ~VerticalLayout();
 
 		/**
-		 * Set how the children in the layout should be aligned in the horizontal axis.
+		 * Set how the children in the layout should be aligned in the
+		 * horizontal axis.
 		 * @param alignment One of the constants #MAW_ALIGNMENT_LEFT,
 		 * #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_RIGHT.
 		 */
 		virtual void setChildHorizontalAlignment(const MAUtil::String alignment);
 
 		/**
-		 * Set how the children in the layout should be aligned in the vertical axis.
+		 * Set how the children in the layout should be aligned in
+		 * the vertical axis.
 		 * @param alignment One of the constants #MAW_ALIGNMENT_TOP,
 		 * #MAW_ALIGNMENT_CENTER or #MAW_ALIGNMENT_BOTTOM.
 		 */
