@@ -3347,15 +3347,18 @@ interface MAAPI {
 			INVALID_BUFFER = -19;
 			/// The field doesn't have attributes
 			NO_ATTRIBUTES = -20;
+			/// The specified list type is invalid.
+			INVALID_LIST_TYPE = -21;
 		}
 
 		/**
 		* \brief Opens a PimList. Use maPimListNext() to open the list's items.
 		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
-		* \returns     >= 0 A PimList handle, or \< 0 on error.
+		* \returns     >= 0 A PimList handle.
 		*              < 0 on error:
-		*                    #MA_PIM_ERR_LIST_NOT_OPENED if the list cannot be opened.
 		*                    #MA_PIM_ERR_LIST_ALREADY_OPENED if the list is already opened.
+		*					 #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not available on the current platform.
+		*                    #MA_PIM_ERR_INVALID_LIST_TYPE if the given list type is invalid.
 		*/
 		MAHandle maPimListOpen(in int listType);
 
@@ -3366,7 +3369,7 @@ interface MAAPI {
 		* \param list List handle provided by maPimListOpen(int listType).
 		* \returns     >= 0 A PimItem handle, or \< 0 on error.
 		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not opened.
+		*			   #MA_PIM_ERR_INVALID_HANDLE if the list handle is invalid.
 		*/
 		MAHandle maPimListNext(in MAHandle list);
 
@@ -3375,7 +3378,9 @@ interface MAAPI {
 		* so that maPimItemClose() is the only function you can safely use on them.
 		* \param list List handle provided by maPimListOpen(int listType).
 		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not opened.
+		*			   #MA_PIM_ERR_LIST_NOT_OPENED if the list is not opened.
+		*              #MA_PIM_ERR_UNAVAILABLE_LIST if the list is unavailable.
+		*			   #MA_PIM_ERR_INVALID_HANDLE if the list handle is invalid.
 		* \note This does not close the list's items, but it does invalidate them,
 		*/
 		int maPimListClose(in MAHandle list);
