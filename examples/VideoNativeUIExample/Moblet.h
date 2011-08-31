@@ -18,10 +18,9 @@ MA 02110-1301, USA.
 
 /**
  * @file Moblet.h
+ * @author Emma Tresanszki
  *
  * This file contains the moblet that manages the application.
- *
- * @author Emma Tresanszki
  */
 
 #ifndef MOBLET_H_
@@ -43,17 +42,17 @@ namespace Test
 /*
  * The Moblet that will manage the application and handle events
  */
-class TestMoblet : public MAUtil::Moblet
+class VideoMoblet : public MAUtil::Moblet
 {
 	/**
 	 * Constructor.
 	 */
-	TestMoblet();
+	VideoMoblet();
 
 	/**
 	 * Destructor.
 	 */
-	~TestMoblet();
+	~VideoMoblet();
 
 public:
 
@@ -61,7 +60,7 @@ public:
 	 * Get the single instance of this Moblet.
 	 * @return The Moblet instance.
 	 */
-	static TestMoblet *getInstance();
+	static VideoMoblet *getInstance();
 
 	/**
 	 * Method called when a key is pressed.
@@ -74,7 +73,7 @@ public:
 	void closeEvent();
 
 private:
-	static TestMoblet *mInstance;
+	static VideoMoblet *mInstance;
 
 	/** The main screen of the application. **/
 	MainScreen* mMainScreen;

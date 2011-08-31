@@ -16,12 +16,13 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/** @file main.cpp
+/**
+ * @file main.cpp
+ * @author Emma Tresanszki
  *
  * This application provides an example on how to use the Native UI wrapper, and
  * specifically the video view widget.
  *
- * @author Emma Tresanszki
  */
 
 // Include the library for the event manager, that manages the application
@@ -39,7 +40,7 @@ using namespace MAUtil;
 extern "C" int MAMain()
 {
 	// Create an instance for WikiMoblet & run it to start the application.
-	MAUtil::Moblet::run(Test::TestMoblet::getInstance());
+	MAUtil::Moblet::run(Test::VideoMoblet::getInstance());
 
 	//MyMoblet will run until it is closed by the user pressing key 0. When
 	//it's closed we end our program in a well-behaved way by returning zero.

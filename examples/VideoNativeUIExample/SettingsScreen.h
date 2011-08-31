@@ -23,8 +23,7 @@ MA 02110-1301, USA.
  * The screen that handles settings, like:
  *  - Display video file duration.
  *  - The default link/path to load at application startup.
- *  - Reset to default settings button.
- *
+ *  - Reload the default link.
  */
 
 #ifndef SETTINGSSCREEN_H_
@@ -115,19 +114,19 @@ private:
 	/**
 	 * List View with all settings.
 	 */
-	ListView*      mListView;
+	ListView* mListView;
 
 	/**
 	 * Check box for for displaying video duration.
 	 * Checked by default.
 	 */
-	CheckBox*      mDisplayDuration;
+	CheckBox* mDisplayDuration;
 
 	/**
 	 * Label for the home url, that is loaded at app startup.
 	 * It has different default values for Android and iOS.
 	 */
-	Label*       mHomeUrl;
+	Label* mHomeUrl;
 
 	/**
 	 * List view item for reloading the homepage source.

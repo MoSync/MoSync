@@ -18,10 +18,9 @@ MA 02110-1301, USA.
 
 /**
  * @file Moblet.cpp
+ * @author Emma Tresanszki
  *
  * This file contains the moblet that manages the application.
- *
- * @author Emma Tresanszki
  */
 
 #include <MAUtil/String.h>
@@ -34,12 +33,12 @@ MA 02110-1301, USA.
 namespace Test
 {
 
-TestMoblet *TestMoblet::mInstance = NULL;
+VideoMoblet *VideoMoblet::mInstance = NULL;
 
 /**
  * Constructor.
  */
-TestMoblet::TestMoblet():mMainScreen(NULL)
+VideoMoblet::VideoMoblet():mMainScreen(NULL)
 {
 	mMainScreen = new MainScreen();
 	mMainScreen->show();
@@ -49,7 +48,7 @@ TestMoblet::TestMoblet():mMainScreen(NULL)
 /**
  * Destructor.
  */
-TestMoblet::~TestMoblet()
+VideoMoblet::~VideoMoblet()
 {
 	delete mMainScreen;
 }
@@ -58,10 +57,10 @@ TestMoblet::~TestMoblet()
  * Get the single instance of this Moblet.
  * @return The Moblet instance.
  */
-TestMoblet *TestMoblet::getInstance()
+VideoMoblet *VideoMoblet::getInstance()
 {
 	if( NULL == mInstance ) {
-		mInstance = new TestMoblet();
+		mInstance = new VideoMoblet();
 	}
 
 	return mInstance;
@@ -70,7 +69,7 @@ TestMoblet *TestMoblet::getInstance()
 /**
  * This method is called when the application is closed.
  */
-void TestMoblet::closeEvent()
+void VideoMoblet::closeEvent()
 {
 	// Deallocate the main screen.
 	delete mMainScreen;
@@ -83,7 +82,7 @@ void TestMoblet::closeEvent()
 /**
  * Method called when a key is pressed.
  */
-void TestMoblet::keyPressEvent(int keyCode, int nativeCode)
+void VideoMoblet::keyPressEvent(int keyCode, int nativeCode)
 {
     // Close the application if the back key is pressed.
     if(MAK_BACK == keyCode)

@@ -325,7 +325,7 @@ void VideoScreen::buttonClicked(Widget* button)
     }
     else if (button = mExitButton)
     {
-		Test::TestMoblet::getInstance()->closeEvent();
+		Test::VideoMoblet::getInstance()->closeEvent();
     }
 }
 

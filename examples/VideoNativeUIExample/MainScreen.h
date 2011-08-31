@@ -23,8 +23,8 @@ MA 02110-1301, USA.
  * The main screen of the application.
  * This is the main entry point of the user interface of the application.
  * Here the application screens are created and connected to the main tab screen.
- *
  */
+
 #ifndef MAINSCREEN_H_
 #define MAINSCREEN_H_
 

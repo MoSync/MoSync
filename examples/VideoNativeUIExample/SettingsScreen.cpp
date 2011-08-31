@@ -23,8 +23,7 @@ MA 02110-1301, USA.
  * The screen that handles settings, like:
  *  - Display video file duration.
  *  - The default link/path to load at application startup.
- *  - Reset to default settings button.
- *
+ *  - Reload the default link.
  */
 
 #include <maprofile.h>		// Profile database

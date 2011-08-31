@@ -23,8 +23,6 @@ MA 02110-1301, USA.
  * The first screen of the application.
  * It contains widget controlls for Video View: Play, Pause, Stop,
  * an edit box for user input with the source link/path for the video.
- *
- *
  */
 
 #ifndef NATIVESCREEN_H_
