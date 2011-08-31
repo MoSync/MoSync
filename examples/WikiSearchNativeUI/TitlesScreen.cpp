@@ -22,7 +22,6 @@ MA 02110-1301, USA.
  *
  * This file contains the second screen of the application.
  * This screen displays all the available article titles.
- *
  */
 
 // Include library for string conversions.

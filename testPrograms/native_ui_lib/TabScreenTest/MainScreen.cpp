@@ -56,7 +56,6 @@ MainScreen::MainScreen() :
 MainScreen::~MainScreen()
 {
     this->removeTabScreenListener(this);
-	delete mMainLayout;
 }
 
 void MainScreen::addMainLayout(Screen* screen, int color)

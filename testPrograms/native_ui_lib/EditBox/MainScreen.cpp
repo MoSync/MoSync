@@ -58,7 +58,7 @@ MainScreen::~MainScreen()
     mSetTextButton->removeButtonListener(this);
     mGetTextButton->removeButtonListener(this);
     mKeyboardButton->removeButtonListener(this);
-    mEditBox->addEditBoxListener(this);
+    mEditBox->removeEditBoxListener(this);
 }
 
 /**

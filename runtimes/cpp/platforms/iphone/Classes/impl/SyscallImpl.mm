@@ -1614,7 +1614,16 @@ return 0; \
 			widget.previewLayer = info->previewLayer;
 			[info->view.layer addSublayer:info->previewLayer];
 			info->previewLayer.frame = info->view.bounds;
-			[info->view.layer setNeedsDisplay];
+			[info->view.layer needsLayout];
+
+			//We need to "reset" the view in case we switched sublayers (because we switched cameras)
+			//First we hide the view
+			info->view.hidden = YES;
+
+			//Then we tell the main thread (that's outside the user code loop) to show it again.
+			//We can't do it on the same "calling circle" because the UI system won't know that we
+			//tried to show and hide the view
+			[widget performSelectorOnMainThread:@selector(showViewAgain) withObject:nil waitUntilDone:NO];
 			return 1;
 		}
 		@catch (NSException * e) {
