@@ -308,7 +308,7 @@ public class MoSyncThread extends Thread
 		{
 			mMoSyncCameraController = new MoSyncCameraController(this);
 		}
- catch (Throwable e)
+		catch (Throwable e)
 		{
 			mMoSyncCameraController = null;
 		}
@@ -2380,9 +2380,9 @@ public class MoSyncThread extends Thread
 				+ resourceIndex);
 			return false;
 		}
-		catch (Exception e)
+		catch (Throwable e)
 		{
-			logError("loadImage - Bitmap exceptions : " + e.toString(), e);
+			logError("loadImage exception : " + e.toString(), e);
 			return false;
 		}
 	}

@@ -21,7 +21,6 @@ MA 02110-1301, USA.
  * @author Emma Tresanszki
  *
  * This file contains the utility functions for the application.
- *
  */
 
 #ifndef UTIL_H_

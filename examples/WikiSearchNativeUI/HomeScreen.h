@@ -26,7 +26,6 @@ MA 02110-1301, USA.
  * a progress bar and a slider control.
  * After the user presses Search button, next screen with the
  * available article titles is displayed.
- *
  */
 
 #ifndef HOMESCREENNUI_H_

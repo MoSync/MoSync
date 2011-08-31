@@ -44,7 +44,7 @@ namespace NativeUI
          * Only for iphone platform.
          * @param button The button object that generated the event.
          */
-        virtual void buttonPressed(Widget* button) = 0;
+        virtual void buttonPressed(Widget* button) {};
 
         /**
          * This method is called when there is an touch-up event for
@@ -52,7 +52,7 @@ namespace NativeUI
          * Only for iphone platform.
          * @param button The button object that generated the event.
          */
-        virtual void buttonReleased(Widget* button) = 0;
+        virtual void buttonReleased(Widget* button) {};
 
         /**
          * This method is called if the touch-up event was inside the

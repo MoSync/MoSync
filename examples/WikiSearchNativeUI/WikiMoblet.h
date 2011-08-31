@@ -21,7 +21,6 @@ MA 02110-1301, USA.
  * @author Emma Tresanszki
  *
  * This file contains the moblet that manages the application.
- *
  */
 
 #ifndef WIKIMOBLET_H_

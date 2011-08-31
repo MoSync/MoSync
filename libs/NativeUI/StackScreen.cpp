@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file StackScreen.cpp
- * @author Niklas Nummelin & Mikael Kindborg
+ * @author Emma Tresanszki
  */
 
 #include "StackScreen.h"

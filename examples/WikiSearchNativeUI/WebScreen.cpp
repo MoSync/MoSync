@@ -22,7 +22,6 @@ MA 02110-1301, USA.
  *
  * This file contains the last screen of the application
  * It contains a top layout with a hint label and two buttons, and a web view.
- *
  */
 
 // Include library for string conversions.

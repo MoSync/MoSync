@@ -101,7 +101,8 @@ namespace NativeUI
 		*    // Load that font for size 10.
 		*    int fontHandle = maFontLoadWithName(buf, 10);
 		*    // Set that font to the label.
-		*	maWidgetSetProperty(labelHandle, MAW_LABEL_FONT_HANDLE, toString(fontHandle));
+		*	maWidgetSetProperty(
+		*	    labelHandle, MAW_LABEL_FONT_HANDLE, toString(fontHandle));
 		* \endcode
 		*/
         virtual int setFont(const MAHandle fontHandle);
