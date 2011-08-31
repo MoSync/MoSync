@@ -95,13 +95,13 @@ class BMFontTask < FileTask
 		super(work, @fntFileName)
 		templateFile = FileTask.new(work, 'bmfont.bmfc.template')
 		@prerequisites = [templateFile]
-		
+
 		@buf = open(templateFile.to_s).read
 		@buf.gsub!('%fontName%', fontName)
 		@buf.gsub!('%fontSize%', fontSize.to_s)
 		@buf.gsub!('%isBold%', isBold ? '1' : '0')
 		@buf.gsub!('%bitmapHeight%', ((fontSize * fontSize) / 4).to_s)
-		
+
 		@ec = open(@confName).read if(File.exist?(@confName))
 	end
 	def needed?(log = true)
@@ -120,7 +120,8 @@ class BMFontTask < FileTask
 		file = open(@confName, 'w')
 		file.write(@buf)
 		file.close
-		
+		@ec = @buf
+
 		FileUtils::rm_f(@badPngFileName)
 		sh "#{mosyncdir}/bin/BMFont/bmfont -c \"#{@confName}\" -o \"#{@fntFileName}\""
 		if(File.exist?(@badPngFileName))
@@ -133,12 +134,12 @@ class MofTask < FileTask
 	def initialize(work, targetDir, id, fontName, isBold, fontSize, color)
 		@bmTask = BMFontTask.new(work, fontName, isBold, fontSize)
 		name = "#{targetDir}/#{File.basename(@bmTask).noExt}_#{color}.mof"
-		
+
 		@pngFileName = @bmTask.to_s.ext('_00.png');
 		if(!File.exist?(@pngFileName))
 			@pngFileName = @bmTask.to_s.ext('_0.png');
 		end
-		
+
 		super(work, name)
 		@prerequisites = [@bmTask, DirTask.new(work, targetDir)]
 		@color = color
@@ -190,7 +191,7 @@ class GeneratedLstTask < MemoryGeneratedFileTask
 		super(work, 'build/res.lst')
 		@prerequisites << DirTask.new(work, 'build')
 		@prerequisites += resources
-		
+
 		io = StringIO.new
 		first = true
 		io.write("// Screen size: #{profile['MA_PROF_CONST_SCREENSIZE_X']}x#{profile['MA_PROF_CONST_SCREENSIZE_Y']}\n")
