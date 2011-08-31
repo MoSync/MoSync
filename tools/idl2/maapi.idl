@@ -4215,10 +4215,13 @@ group WidgetAPI "Widget API" {
 		GL2_VIEW = "GL2View";
 
 		/**
-		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
+		 * @brief A Camera preview widget is a widget that can bound to a camera and contain the live veiw data from the camera.
 		 */
 		CAMERA_PREVIEW="CameraPreview";
 
+		/**
+		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
+		 */
 		WEB_VIEW = "WebView";
 
 		/**

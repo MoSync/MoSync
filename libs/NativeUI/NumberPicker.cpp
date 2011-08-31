@@ -48,8 +48,10 @@ namespace NativeUI
 
 	/**
 	 * Set the current value for the number picker.
-	 * If the value is less than MAW_NUMBER_PICKER_MIN_VALUE property value, the current value is set to min.
-	 * If the value is greater than MAW_NUMBER_PICKER_MAX_VALUE value, the current value is set to max.
+	 * If the value is less than MAW_NUMBER_PICKER_MIN_VALUE property value,
+	 * the current value is set to min.
+	 * If the value is greater than MAW_NUMBER_PICKER_MAX_VALUE value,
+	 * the current value is set to max.
 	 * @return Any of the following result codes:
 	 * - #MAW_RES_OK if the property could be set.
 	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.

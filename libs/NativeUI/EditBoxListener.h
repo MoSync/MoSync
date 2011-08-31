@@ -56,7 +56,6 @@ namespace NativeUI
 
         /**
          * This method is called when the edit box text was changed.
-         * Only for iphone platform.
          * @param editBox The edit box object that generated the event.
          * @param text The new text.
          */
@@ -68,7 +67,6 @@ namespace NativeUI
          * This method is called when the return button was pressed.
          * On iphone platform the virtual keyboard is not hidden after
          * receiving this event.
-         * Only for iphone platform.
          * @param editBox The edit box object that generated the event.
          */
         virtual void editBoxReturn(EditBox* editBox) = 0;

@@ -94,7 +94,9 @@ namespace NativeUI
       */
      int TextWidget::setTextHorizontalAlignment(const MAUtil::String& alignment)
      {
-         return this->setProperty(MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, alignment);
+		return this->setProperty(
+			MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT,
+			alignment);
      }
 
     /**
@@ -143,7 +145,8 @@ namespace NativeUI
 	 *    // Load that font for size 10.
 	 *    int fontHandle = maFontLoadWithName(buf, 10);
 	 *    // Set that font to the label.
-	 *	maWidgetSetProperty(labelHandle, MAW_LABEL_FONT_HANDLE, toString(fontHandle));
+	 *	maWidgetSetProperty(
+	 *	    labelHandle, MAW_LABEL_FONT_HANDLE, toString(fontHandle));
 	 * \endcode
      */
     int TextWidget::setFont(const MAHandle fontHandle)

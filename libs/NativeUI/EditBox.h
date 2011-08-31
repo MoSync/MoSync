@@ -111,7 +111,7 @@ namespace NativeUI
          * Remove the edit box listener.
          * @param listener The listener that receives edit box events.
          */
-        virtual void removeButtonListener(EditBoxListener* listener);
+        virtual void removeEditBoxListener(EditBoxListener* listener);
 
     protected:
         /**
