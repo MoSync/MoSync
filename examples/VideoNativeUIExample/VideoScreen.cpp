@@ -96,7 +96,7 @@ void VideoScreen::createMainLayout()
 	mMainLayout = new VerticalLayout();
 	mMainLayout->setBackgroundColor(SEA_GREEN);
 	// Arrange the children to center.
-	mMainLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_LEFT);
+	mMainLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	// Add the layout to the screen.
 	Screen::setMainWidget(mMainLayout);
 

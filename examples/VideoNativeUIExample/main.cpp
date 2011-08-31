@@ -33,7 +33,9 @@ MA 02110-1301, USA.
 
 using namespace MAUtil;
 
-// The entry point for the application - the place where processing starts.
+/**
+ * The entry point for the application - the place where processing starts.
+ */
 extern "C" int MAMain()
 {
 	// Create an instance for WikiMoblet & run it to start the application.
