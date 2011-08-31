@@ -54,7 +54,7 @@
 -(int) getFieldID:(const int) fieldIndex
 {
     int fieldsCount = [mFieldsDictionary count];
-    if (0 > fieldIndex || fieldIndex <= fieldsCount)
+    if (0 > fieldIndex || fieldIndex >= fieldsCount)
     {
         return MA_PIM_ERR_INVALID_INDEX;
     }
@@ -68,6 +68,7 @@
 
 /**
  * Gets the number of values for a given field ID.
+ * Does not check if field is supported.
  * @param field The specified field ID(one of the MA_PIM_FIELD constants).
  * @return The number of values for the given field, or 0 if the field ID
  *         has no values/does not exist.
@@ -79,7 +80,9 @@
     PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];
     [key release];
 
-    if (nil == itemField) {
+    if (nil == itemField)
+    {
+        // Field is empty.
         returnValue = 0;
     }
     else
@@ -92,6 +95,7 @@
 
 /**
  * Gets the attribute for a given field value.
+ * Does not check if field is supported.
  * @param fieldID The specified field ID(one of the MA_PIM_FIELD constants).
  * @param index The index of the given field value.
  * @return One of MA_PIM_ATTR constants, or MA_PIM_ERR in case of error.
@@ -106,7 +110,7 @@
 
     if (nil == itemField)
     {
-        returnValue = MA_PIM_ERR_INVALID_INDEX;
+        returnValue = MA_PIM_ERR_INVALID_FIELD;
     } else {
         returnValue = [itemField getAttribute:index];
     }
@@ -155,6 +159,7 @@
 
 /**
  * Gets a custom label for a given field value.
+ * Does not check if field is supported.
  * @param args Common arguments.
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
@@ -182,7 +187,7 @@
 
     if (nil == itemField)
     {
-        return MA_PIM_ERR_INVALID_INDEX;
+        return MA_PIM_ERR_EMPTY_FIELD;
     }
 
     returnValue = [itemField getLabel:customLabel indexValue:index];

@@ -3349,6 +3349,8 @@ interface MAAPI {
 			NO_ATTRIBUTES = -20;
 			/// The specified list type is invalid.
 			INVALID_LIST_TYPE = -21;
+			/// The specified field is invalid.
+			INVALID_FIELD = -22;
 		}
 
 		/**
@@ -3390,7 +3392,7 @@ interface MAAPI {
 		* \param item Item handle provided by maPimListNext(MAHandle list).
 		* \returns     >=0 the number of field in the item.
 		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
+		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
 		*/
 		int maPimItemCount(in MAHandle item);
 
@@ -3400,7 +3402,7 @@ interface MAAPI {
 		* \param n \>= 0 and \< maPimItemCount().
 		* \returns     >=0 one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
+		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
 		*                    #MA_PIM_ERR_INVALID_INDEX if the param n is not valid.
 		*/
 		int maPimItemGetField(in MAHandle item, in int n);
@@ -3410,10 +3412,11 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \returns     >0 the number of values for the item.
-		*              =0 if the item does not exists / has no values.
+		*              =0 if the item field has no values.
 		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
+		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field is unsupported.
+		*                    #MA_PIM_ERR_INVALID_FIELD if the field is invalid.
 		*/
 		int maPimItemFieldCount(in MAHandle item, in int field);
 
@@ -3424,7 +3427,8 @@ interface MAAPI {
 		* \param index \>= 0 and \< maPimItemFieldCount().
 		* \returns     >=0 the attribute for the specified field.
 		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
+		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
+		*					 #MA_PIM_ERR_INVALID_FIELD if the field is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
 		*                    #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
 		*                    #MA_PIM_ERR_NO_ATTRIBUTES if the field doesn't have attributes.
