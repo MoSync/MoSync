@@ -39,10 +39,10 @@
  * Constructor.
  */
 AppMoblet::AppMoblet() :
-    Moblet(),
-    mHandlePointerEvent(false)
+	Moblet(),
+	mHandlePointerEvent(false)
 {
-    this->startPIM();
+	this->startPIM();
 }
 
 /**
@@ -58,10 +58,10 @@ AppMoblet::~AppMoblet()
  */
 void AppMoblet::pointerMoveEvent(MAPoint2d point)
 {
-    if (mHandlePointerEvent)
-    {
-        mDragValues.add(point.x);
-    }
+	if (mHandlePointerEvent)
+	{
+		mDragValues.add(point.x);
+	}
 }
 
 /**
@@ -69,46 +69,46 @@ void AppMoblet::pointerMoveEvent(MAPoint2d point)
  */
 void AppMoblet::pointerReleaseEvent(MAPoint2d point)
 {
-    // Handle this event only if no PIM action is on progress.
-    if (mHandlePointerEvent)
-    {
-        // Check if there are enough drag events for analysis.
-        if (MIN_DRAG_VALUES > mDragValues.size())
-        {
-            return;
-        }
+	// Handle this event only if no PIM action is on progress.
+	if (mHandlePointerEvent)
+	{
+		// Check if there are enough drag events for analysis.
+		if (MIN_DRAG_VALUES > mDragValues.size())
+		{
+			return;
+		}
 
-        // Check if drag is from left to right of from right to left.
-        bool dragFromLeftToRight = true;
-        bool dragFromRightToLeft = true;
-        int previousValue = mDragValues[0];
-        for (int i = 1; (i < mDragValues.size()) && (dragFromLeftToRight
-            || dragFromRightToLeft); i++)
-        {
-            int currentValue = mDragValues[i];
-            if (previousValue > currentValue)
-            {
-                dragFromLeftToRight = false;
-            }
-            if (previousValue < currentValue)
-            {
-                dragFromRightToLeft = false;
-            }
+		// Check if drag is from left to right of from right to left.
+		bool dragFromLeftToRight = true;
+		bool dragFromRightToLeft = true;
+		int previousValue = mDragValues[0];
+		for (int i = 1; (i < mDragValues.size()) && (dragFromLeftToRight
+			|| dragFromRightToLeft); i++)
+		{
+			int currentValue = mDragValues[i];
+			if (previousValue > currentValue)
+			{
+				dragFromLeftToRight = false;
+			}
+			if (previousValue < currentValue)
+			{
+				dragFromRightToLeft = false;
+			}
 
-            previousValue = currentValue;
-        }
+			previousValue = currentValue;
+		}
 
-        // If drag is from left to right print the next contact, otherwise
-        // close the PIM contacts list.
-        if (dragFromLeftToRight)
-        {
-            this->printNextContact();
-        }
-        else if (dragFromRightToLeft)
-        {
-            this->closePIMContactsList();
-        }
-    }
+		// If drag is from left to right print the next contact, otherwise
+		// close the PIM contacts list.
+		if (dragFromLeftToRight)
+		{
+			this->printNextContact();
+		}
+		else if (dragFromRightToLeft)
+		{
+			this->closePIMContactsList();
+		}
+	}
 }
 
 /**
@@ -116,10 +116,10 @@ void AppMoblet::pointerReleaseEvent(MAPoint2d point)
  */
 void AppMoblet::pointerPressEvent(MAPoint2d point)
 {
-    if (mHandlePointerEvent)
-    {
-        mDragValues.clear();
-    }
+	if (mHandlePointerEvent)
+	{
+		mDragValues.clear();
+	}
 }
 
 /**
@@ -128,26 +128,26 @@ void AppMoblet::pointerPressEvent(MAPoint2d point)
  */
 void AppMoblet::startPIM()
 {
-    // Open PIM contacts list.
-    this->openPIMContactsList();
+	// Open PIM contacts list.
+	this->openPIMContactsList();
 
-    // Create new contact and add data into fields.
-    PIMContact* newContact = this->createContact();
-    if (NULL == newContact)
-    {
-        return;
-    }
-    newContact->addDataToContact();
+	// Create new contact and add data into fields.
+	PIMContact* newContact = this->createContact();
+	if (NULL == newContact)
+	{
+		return;
+	}
+	newContact->addDataToContact();
 
-    // Modify the new contact.
-    this->modifyContact(newContact);
+	// Modify the new contact.
+	this->modifyContact(newContact);
 
-    // Remove the new contact from the list and delete the object.
-    this->removeContact(newContact);
-    delete newContact;
+	// Remove the new contact from the list and delete the object.
+	this->removeContact(newContact);
+	delete newContact;
 
-    // Print options on the screen and wait for drag events.
-    this->printInfo();
+	// Print options on the screen and wait for drag events.
+	this->printInfo();
 }
 
 /**
@@ -155,11 +155,11 @@ void AppMoblet::startPIM()
  */
 void AppMoblet::openPIMContactsList()
 {
-    printf("\n==============Open contacts list===============");
+	printf("\n==============Open contacts list===============");
 
-    // Get a handle to the list of contacts.
-    mContactsListHandle = maPimListOpen(MA_PIM_CONTACTS);
-    checkResultCode(mContactsListHandle);
+	// Get a handle to the list of contacts.
+	mContactsListHandle = maPimListOpen(MA_PIM_CONTACTS);
+	checkResultCode(mContactsListHandle);
 }
 
 /**
@@ -167,35 +167,35 @@ void AppMoblet::openPIMContactsList()
  */
 void AppMoblet::printNextContact()
 {
-    // Ignore all drag events handled by this moblet.
-    mHandlePointerEvent = false;
+	// Ignore all drag events handled by this moblet.
+	mHandlePointerEvent = false;
 
-    printf("\n=============Printing next contact=============\n");
+	printf("\n=============Printing next contact=============\n");
 
-    // Get a hold on a contact item.
-    MAHandle pimItemHandle = maPimListNext(mContactsListHandle);
+	// Get a hold on a contact item.
+	MAHandle pimItemHandle = maPimListNext(mContactsListHandle);
 
-    // Check if the new contact handle is valid.
-    if (0 < pimItemHandle)
-    {
-        // Create new contact item and print it on the screen.
-        PIMContact* item = new PIMContact(pimItemHandle);
-        item->printContact();
-        delete item;
-    }
-    else if (pimItemHandle == 0)
-    {
-        // Reached at the end of the list.
-        printf("The contacts list does not contain more items.");
-    }
-    else
-    {
-        // Print the error on the screen.
-        printResultCode(pimItemHandle);
-    }
+	// Check if the new contact handle is valid.
+	if (0 < pimItemHandle)
+	{
+		// Create new contact item and print it on the screen.
+		PIMContact* item = new PIMContact(pimItemHandle);
+		item->printContact();
+		delete item;
+	}
+	else if (pimItemHandle == 0)
+	{
+		// Reached at the end of the list.
+		printf("The contacts list does not contain more items.");
+	}
+	else
+	{
+		// Print the error on the screen.
+		printResultCode(pimItemHandle);
+	}
 
-    // Print options on the screen and wait for drag events.
-    this->printInfo();
+	// Print options on the screen and wait for drag events.
+	this->printInfo();
 }
 
 /**
@@ -205,21 +205,21 @@ void AppMoblet::printNextContact()
  */
 PIMContact* AppMoblet::createContact()
 {
-    // Get a handle to the new created contact.
-    printf("\n==============Create new contact==============\n");
-    MAHandle newContantHandle = maPimItemCreate(MA_PIM_CONTACTS);
+	// Get a handle to the new created contact.
+	printf("\n==============Create new contact==============\n");
+	MAHandle newContantHandle = maPimItemCreate(mContactsListHandle);
 
-    // Check for errors.
-    if (0 > newContantHandle)
-    {
-        printf("Cann't create new contact.");
-        printResultCode(newContantHandle);
-        return NULL;
-    }
+	// Check for errors.
+	if (0 > newContantHandle)
+	{
+		printf("Cann't create new contact.");
+		printResultCode(newContantHandle);
+		return NULL;
+	}
 
-    // Create and return the new contact.
-    PIMContact* newContact = new PIMContact(newContantHandle);
-    return newContact;
+	// Create and return the new contact.
+	PIMContact* newContact = new PIMContact(newContantHandle);
+	return newContact;
 }
 
 /**
@@ -229,10 +229,10 @@ PIMContact* AppMoblet::createContact()
  */
 void AppMoblet::modifyContact(PIMContact* contact)
 {
-    contact->modifyAddressField();
+	contact->modifyAddressField();
 
-    printf("\n====Remove field value from the new contact====\n");
-    contact->removeFieldValue(MA_PIM_FIELD_CONTACT_TEL, 0);
+	printf("\n====Remove field value from the new contact====\n");
+	contact->removeFieldValue(MA_PIM_FIELD_CONTACT_TEL, 0);
 }
 
 /**
@@ -242,9 +242,9 @@ void AppMoblet::modifyContact(PIMContact* contact)
  */
 void AppMoblet::removeContact(PIMContact* contact)
 {
-    printf("\n===========Remove the new contact=============\n");
-    int resultCode = maPimItemRemove(mContactsListHandle, contact->getHandle());
-    printResultCode(resultCode);
+	printf("\n===========Remove the new contact=============\n");
+	int resultCode = maPimItemRemove(mContactsListHandle, contact->getHandle());
+	printResultCode(resultCode);
 }
 
 /**
@@ -252,11 +252,11 @@ void AppMoblet::removeContact(PIMContact* contact)
  */
 void AppMoblet::closePIMContactsList()
 {
-    printf("\n ==============Close the contacts list=========\n");
-    printResultCode(maPimListClose(mContactsListHandle));
+	printf("\n ==============Close the contacts list=========\n");
+	printResultCode(maPimListClose(mContactsListHandle));
 
-    // Start again working with PIM>
-    this->startPIM();
+	// Start again working with PIM>
+	this->startPIM();
 }
 
 /**
@@ -264,11 +264,11 @@ void AppMoblet::closePIMContactsList()
  */
 void AppMoblet::printInfo()
 {
-    printf("\n==============================================");
-    printf("Drag from left to right to show the next \n contact");
-    printf("Drag from right to left to close the contacts \n list");
-    printf("==============================================\n\n");
+	printf("\n==============================================");
+	printf("Drag from left to right to show the next \n contact");
+	printf("Drag from right to left to close the contacts \n list");
+	printf("==============================================\n\n");
 
-    // Allow this moblet to handle pointer events.
-    mHandlePointerEvent = true;
+	// Allow this moblet to handle pointer events.
+	mHandlePointerEvent = true;
 }

@@ -32,6 +32,7 @@ stabs.tab
 .mosyncproject.local
 fp.xml
 profile.txt
+.DS_Store
 
 config_platform.h
 
