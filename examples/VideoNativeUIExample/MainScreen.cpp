@@ -25,6 +25,7 @@ MA 02110-1301, USA.
  * Here the application screens are created and connected to the main tab screen.
  */
 
+#include "Util.h"
 #include "MainScreen.h"
 
 /**
@@ -33,6 +34,8 @@ MA 02110-1301, USA.
 MainScreen::MainScreen():
 TabScreen()
 {
+	getScreenSize();
+
 	mVideoScreen = new VideoScreen();
 	mSettingsScreen = new SettingsScreen();
 
@@ -45,10 +48,10 @@ TabScreen()
 	// Load the default url at application startup.
 	mVideoScreen->loadDefaultUrl(mSettingsScreen->getDefaultUrl());
 
-	addTabScreenListener(this);
-
 	// Add listener for the list view from SettingsView.
 	mSettingsScreen->getSettingsListView()->addListViewListener(this);
+
+	addTabScreenListener(this);
 }
 
 /**

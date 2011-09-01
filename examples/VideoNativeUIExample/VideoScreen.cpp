@@ -57,13 +57,16 @@ VideoScreen::VideoScreen() :
 
 	setTitle("Video");
 
-	MAExtent screenSize = maGetScrSize();
-	mScreenWidth = EXTENT_X(screenSize);
-	mScreenHeight = EXTENT_Y(screenSize);
-
 	createMainLayout();
 
+	// Loading local videos is available only on Android.
+	if ( !isAndroid() )
+	{
+		mSetPath->setVisible(false);
+	}
+
 	mVideoView->addVideoViewListener(this);
+	mEditBox->addEditBoxListener(this);
 	mPlay->addButtonListener(this);
 	mPause->addButtonListener(this);
 	mStop->addButtonListener(this);
@@ -78,6 +81,7 @@ VideoScreen::VideoScreen() :
 VideoScreen::~VideoScreen()
 {
 	mVideoView->stop();
+	mEditBox->removeEditBoxListener(this);
     mVideoView->removeVideoViewListener(this);
     mPlay->removeButtonListener(this);
     mPause->removeButtonListener(this);
@@ -98,7 +102,7 @@ void VideoScreen::createMainLayout()
 	// Arrange the children to center.
 	mMainLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	// Add the layout to the screen.
-	Screen::setMainWidget(mMainLayout);
+	setMainWidget(mMainLayout);
 
 	addVideoWidgets();
 
@@ -114,7 +118,7 @@ void VideoScreen::createMainLayout()
 
 	mExitButton = new Button();
 	mExitButton->setText("Exit");
-	mExitButton->setWidth(mScreenWidth/2);
+	mExitButton->setWidth(getScreenWidth()/2);
 	// Set gradient background ( applicable only on Android).
 	mExitButton->setBackgroundGradient(LIGHT_BLUE, INTENSE_BLUE);
 	mMainLayout->addChild(mExitButton);
@@ -127,55 +131,44 @@ void VideoScreen::createPlaybackButtons()
 {
 	/**
 	 * Add 3 buttons in 1 row: Play, Pause and stop.
-	 * All buttons are disabled by default, until source can be played.
+	 * Pause and Stop are disabled by default, until source is playing.
 	 */
 	mButtonsLayout = new HorizontalLayout();
-	mButtonsLayout->wrapContentVertically();
 	mButtonsLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 
 	mPlay = new Button();
-	// Apply a gradient ( on Android, or blank color on iOS).
-	if ( mPlay->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN) != MAW_RES_OK )
-	{
-		mPlay->setBackgroundColor(DARK_SEA_GREEN);
-	}
+	// Apply a background gradient on Android.
+	mPlay->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN);
 	mPlay->setText("Play");
-	mPlay->setEnabled(false);
 	mPlay->setFontColor(INTENSE_BLUE);
 
 	mPause = new Button();
-	// Apply a gradient ( on Android, or blank color on iOS).
-	if ( mPause->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN) != MAW_RES_OK )
-	{
-		mPause->setBackgroundColor(DARK_SEA_GREEN);
-	}
+	// Apply a background gradient on Android.
+	mPause->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN);
 	mPause->setFontColor(INTENSE_BLUE);
 	mPause->setEnabled(false);
 	mPause->setText("Pause");
 
 	mStop = new Button();
 	mStop->setEnabled(false);
-	// Apply a gradient ( on Android, or blank color on iOS).
-	if ( mStop->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN) != MAW_RES_OK )
-	{
-		mStop->setBackgroundColor(DARK_SEA_GREEN);
-	}
+	// Apply a background gradient on Android.
+	mStop->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN);
 	mStop->setFontColor(INTENSE_BLUE);
 	mStop->setText("Stop");
 
 	HorizontalLayout* playLayout = new HorizontalLayout();
 	playLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	playLayout->setWidth(mScreenWidth/3);
+	playLayout->setWidth(getScreenWidth()/3);
 	playLayout->addChild(mPlay);
 
 	HorizontalLayout* pauseLayout = new HorizontalLayout();
 	pauseLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	pauseLayout->setWidth(mScreenWidth/3);
+	pauseLayout->setWidth(getScreenWidth()/3);
 	pauseLayout->addChild(mPause);
 
 	HorizontalLayout* stopLayout = new HorizontalLayout();
 	stopLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	stopLayout->setWidth(mScreenWidth/3);
+	stopLayout->setWidth(getScreenWidth()/3);
 	stopLayout->addChild(mStop);
 
 	mButtonsLayout->addChild(playLayout);
@@ -223,46 +216,38 @@ void VideoScreen::addVideoWidgets()
 	 * when the user touches the video view.
 	 */
 	mVideoView = new VideoView();
-	mVideoView->fillSpaceHorizontally();
-	mVideoView->setHeight(mScreenHeight/3);
-	mVideoView->setWidth(MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	mVideoView->setHeight(getScreenHeight()/3);
+	mVideoView->setWidth(getScreenWidth());
 	mMainLayout->addChild(mVideoView);
 
 	// Add an edit box for another urls or local paths.
 	mEditBox = new EditBox();
-//	mEditBox->setPlaceholder("Set video uri or path");
 	mEditBox->fillSpaceHorizontally();
 	mMainLayout->addChild(mEditBox);
 
 	// Add layout for load path or uri buttons.
 	mLoadLayout = new HorizontalLayout();
-	mLoadLayout->wrapContentVertically();
 
 	mSetUrl = new Button();
 	mSetUrl->setFontColor(INTENSE_BLUE);
-	// Apply a gradient ( on Android, or blank color on iOS).
-	if ( mSetUrl->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN) != MAW_RES_OK )
-	{
-		mSetUrl->setBackgroundColor(DARK_SEA_GREEN);
-	}
+	// Apply a gradient on Android.
+	mSetUrl->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN);
 	mSetUrl->setText("Load url");
 
+	// NOTE: playing video from local store is available only on Android.
 	mSetPath = new Button();
 	mSetPath->setFontColor(INTENSE_BLUE);
-	// Apply a gradient.
-	if ( mSetPath->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN) != MAW_RES_OK )
-	{
-		mSetPath->setBackgroundColor(DARK_SEA_GREEN);
-	}
+	// Apply a gradient on Android.
+	mSetPath->setBackgroundGradient(SEA_GREEN, DARK_SEA_GREEN);
 	mSetPath->setText("Load path");
 
 	HorizontalLayout* urlLayout = new HorizontalLayout();
-	urlLayout->setWidth(mScreenWidth/2);
+	urlLayout->setWidth(getScreenWidth()/2);
 	urlLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	urlLayout->addChild(mSetUrl);
 
 	HorizontalLayout* pathLayout = new HorizontalLayout();
-	pathLayout->setWidth(mScreenWidth/2);
+	pathLayout->setWidth(getScreenWidth()/2);
 	pathLayout->setChildHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	pathLayout->addChild(mSetPath);
 
@@ -302,7 +287,7 @@ void VideoScreen::buttonClicked(Widget* button)
     if (button == mPlay)
     {
         mVideoView->play();
-        // Display the duration label.
+        // Refresh the duration label.
         mDuration->setText(
 			"Duration: " +
 			MAUtil::integerToString(mVideoView->getDuration()));
@@ -353,6 +338,12 @@ void VideoScreen::videoViewStateChanged(
         {
             case MAW_VIDEO_VIEW_STATE_PLAYING:
                 text = SOURCE_PLAYING;
+                mPause->setEnabled(true);
+                mStop->setEnabled(true);
+                // Refresh the duration label.
+                mDuration->setText(
+					"Duration: " +
+					MAUtil::integerToString(mVideoView->getDuration()));
                 break;
             case MAW_VIDEO_VIEW_STATE_PAUSED:
                 text = SOURCE_PAUSED;
@@ -362,10 +353,13 @@ void VideoScreen::videoViewStateChanged(
                 break;
             case MAW_VIDEO_VIEW_STATE_SOURCE_READY:
                 text = SOURCE_READY;
-                // Only now source can be played.
-                mPlay->setEnabled(true);
+                // Now pause and stop can be enabled.
                 mPause->setEnabled(true);
                 mStop->setEnabled(true);
+                // Refresh the duration label.
+                mDuration->setText(
+					"Duration: " +
+					MAUtil::integerToString(mVideoView->getDuration()));
                 break;
             case MAW_VIDEO_VIEW_STATE_FINISHED:
                 text = SOURCE_FINISHED;
@@ -373,7 +367,6 @@ void VideoScreen::videoViewStateChanged(
             case MAW_VIDEO_VIEW_STATE_INTERRUPTED:
                 text = SOURCE_ERROR;
                 // Disable the control buttons.
-                mPlay->setEnabled(false);
                 mPause->setEnabled(false);
                 mStop->setEnabled(false);
                 break;
@@ -383,4 +376,16 @@ void VideoScreen::videoViewStateChanged(
         // Update the source status label.
         mSourceStatus->setText(text);
     }
+}
+
+/**
+ * This method is called when the return button was pressed.
+ * On iphone platform the virtual keyboard is not hidden after
+ * receiving this event.
+ * @param editBox The edit box object that generated the event.
+ */
+void VideoScreen::editBoxReturn(EditBox* editBox)
+{
+	// Make sure the virtual keyboard is closed when we hit return.
+	mEditBox->hideKeyboard();
 }
