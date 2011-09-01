@@ -31,13 +31,13 @@ MA 02110-1301, USA.
 #include "consts.h"
 
 // The list with sensor error codes.
-int gSensorError[SENSOR_TYPES];
+int gSensorError[SENSOR_TYPES + 1];
 // Values returned by sensors.
-float gSensorValue[SENSOR_TYPES][SENSOR_VALUES];
+float gSensorValue[SENSOR_TYPES + 1][SENSOR_VALUES];
 // Names of the available sensors.
-const char *gSensorName[SENSOR_TYPES] =
+const char *gSensorName[SENSOR_TYPES + 1] =
 {
-	TXT_SENSOR_NONE,
+	TXT_NONE,
 	TXT_SENSOR_ACCELEROMETER,
 	TXT_SENSOR_MAG_FIELD,
 	TXT_SENSOR_ORIENTATION,
@@ -116,7 +116,7 @@ char* getOrientationText(int orientation)
  */
 void registerSensors()
 {
-	for (int type=0; type<SENSOR_TYPES; type++)
+	for (int type=1; type<=SENSOR_TYPES; type++)
 	{
 		gSensorError[type] = maSensorStart(type, SENSOR_RATE_NORMAL);
 	}
@@ -127,7 +127,7 @@ void registerSensors()
  */
 void unregisterSensors()
 {
-	for (int type=0; type<SENSOR_TYPES; type++)
+	for (int type=1; type<=SENSOR_TYPES; type++)
 	{
 		maSensorStop(type);
 	}
@@ -193,7 +193,7 @@ void drawSensorOutput()
 	maSetColor(TEXT_COLOR);
 
 	int posY = 0;
-	for (int i=0; i<SENSOR_TYPES; i++)
+	for (int i=1; i<=SENSOR_TYPES; i++)
 	{
 		drawSensorStatus(i, 0, posY);
 		posY += OFFSET_Y;
@@ -207,12 +207,28 @@ void drawSensorOutput()
 	}
 }
 
+/*
+ * @brief Sets the font
+ * to display the sensors values.
+ */
+void setFont()
+{
+	int nrFonts = maFontGetCount();
+	char fontName[BUFFER_SIZE];
+	// get first font.
+	maFontGetName(0, fontName, BUFFER_SIZE);
+	// Load first font with size 20.
+	int fontHandle = maFontLoadWithName(fontName, TEXT_SIZE);
+	maFontSetCurrent(fontHandle);
+}
+
 extern "C" int MAMain()
 {
 	bool run = true;
 
 	updateScreenDimensions();
 	registerSensors();
+	setFont();
 
 	while (run)
 	{
