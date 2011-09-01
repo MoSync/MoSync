@@ -56,6 +56,7 @@ namespace NativeUI
 
         /**
          * Set the video path.
+         * Note: available only for Android.
          * @param path A valid path to a video file.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the property could be set.
