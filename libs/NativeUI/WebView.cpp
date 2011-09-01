@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file WebView.cpp
- * @author Mikael Kindborg
+ * @author Emma Tresanszki
  *
  * Class for web views.
  */
@@ -79,8 +79,8 @@ namespace NativeUI
 	 * points to the Assets folder in the local file system
 	 * ("file://pathToLocalFileSystem/Assets/").
 	 *
-	 * @note Use: #maGetSystemProperty ("mosync.path.local.url") to find the baseURL
-	 * for the local file system.
+	 * @note Use: #maGetSystemProperty ("mosync.path.local.url") to find
+	 * the baseURL for the local file system.
 	 * @param baseUrl Any valid URL schema.
 	 *
 	 */
@@ -269,7 +269,8 @@ namespace NativeUI
 	 */
 	bool WebView::isHorizontalScrollbarEnabled()
 	{
-		return ( this->getPropertyString(MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED) == "true" ? true : false );
+		return ( this->getPropertyString(
+			MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED) == "true" ? true : false );
 	}
 
 	/*
@@ -297,7 +298,8 @@ namespace NativeUI
 	 */
 	bool WebView::isVerticalScrollBarEnabled()
 	{
-		return ( this->getPropertyString(MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED) == "true" ? true : false );
+		return ( this->getPropertyString(
+			MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED) == "true" ? true : false );
 	}
 
     /**
@@ -342,17 +344,6 @@ namespace NativeUI
                 mWebViewListeners[i]->webViewContentLoading(
                     this,
                     widgetEventData->status);
-            }
-        }
-        if (MAW_EVENT_WEB_VIEW_URL_CHANGED == widgetEventData->eventType)
-        {
-            MAUtil::String newURL = this->getNewURL();
-
-            for (int i = 0; i < mWebViewListeners.size(); i++)
-            {
-                mWebViewListeners[i]->webViewUrlChanged(
-                    this,
-                    newURL);
             }
         }
         else if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)

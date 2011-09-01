@@ -17,7 +17,9 @@ MA 02110-1301, USA.
 
 package com.mosync.nativeui.ui.widgets;
 
+import android.graphics.Typeface;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -98,5 +100,18 @@ public class ListItemWidget extends Layout
 	public ViewGroup.LayoutParams createNativeLayoutParams(LayoutParams mosyncLayoutParams)
 	{
 		return new RelativeLayout.LayoutParams( mosyncLayoutParams.getWidth( ), mosyncLayoutParams.getHeight( ) );
+	}
+
+	/**
+	 * Sets the font typeface from mosync nativeUI.
+	 * It is called instead of the setProperty method,
+	 * as two params are needed.
+	 * @param aTypeface The typeface of MoSyncFontHandle
+	 * @param aSize The size of MoSyncFontHandle
+	 */
+	public void setFontTypeface(Typeface aTypeface, float aSize)
+	{
+		m_label.setTypeface(aTypeface);
+		m_label.setTextSize(aSize);
 	}
 }

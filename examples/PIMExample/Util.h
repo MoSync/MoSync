@@ -116,11 +116,6 @@ static const wchar_t* sEmailWork = L"brian@mosync.com";
 static const wchar_t* sEmailHome = L"brian13@yahoo.com";
 
 /**
- * Value for MA_PIM_FIELD_CONTACT_FORMATTED_ADDR field.
- */
-static const wchar_t* sFormattedAddress = L"formatted addr";
-
-/**
  * Value for MA_PIM_FIELD_CONTACT_PHOTO_URL field.
  */
 static const wchar_t* sPhotoURL =

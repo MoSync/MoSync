@@ -18,11 +18,11 @@ MA 02110-1301, USA.
 
 /**
  * @file WebScreen.h
+ * @author Emma Tresanszki
  *
  * This file contains the last screen of the application
  * It contains a top layout with a hint label and a button, and a web view.
  *
- * @author Emma Tresanszki
  */
 
 #ifndef WEBSCREENNUI_H_
@@ -39,43 +39,44 @@ namespace WikiNativeUI
 // Forward declaration.
 class SummaryScreen;
 
-/*
+/**
  * WebScreen: native UI screen
- * It contains a web view with the user selected article, and buttons for Back and NewSearch actions.
+ * It contains a web view with the user selected article, and buttons
+ * for Back and NewSearch actions.
  */
 class WebScreen : public BasicScreen,
 				  public MAUtil::CustomEventListener
 {
 public:
 
-	/*
-	 * constructor
+	/**
+	 * Constructor.
 	 * Pass the parent screen.
 	 */
 	WebScreen(SummaryScreen *parentScreen);
 
-	/*
-	 * destructor
+	/**
+	 * Destructor.
 	 */
     ~WebScreen();
 
-	/*
-	 * Show the screen
+	/**
+	 * Show the screen.
 	 */
 	void showScreen();
 
-	/*
+	/**
 	 * from CustomEventListener
 	 * The custom event listener interface.
 	 */
 	void customEvent(const MAEvent& event);
 
-	/*
+	/**
 	 * Handle events on screen's widgets.
 	 */
 	void widgetClicked(MAHandle widgetHandle);
 
-	/*
+	/**
 	 * Open a web view for a certain title
 	 * compose the url and display
 	 * @param The article title for which we want to open a wikipedia definition.
@@ -85,7 +86,7 @@ public:
 
 private: // methods
 
-	/*
+	/**
 	 * Lay out the widgets (portrait mode).
 	 */
 	void setupUI();

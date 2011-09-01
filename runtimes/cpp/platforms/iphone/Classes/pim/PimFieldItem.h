@@ -16,7 +16,7 @@
 */
 
 // The attribute is custom.
-#define CUSTOM_ATTRIBUTE -1
+#define NO_ATTRIBUTE -1
 
 #import <Foundation/Foundation.h>
 #import "PimFieldItemValue.h"
@@ -171,7 +171,7 @@ withLabel:(NSString*) label;
 /**
  * Gets the attribute id from a specifed label value.
  * @param label The given label.
- * @return The attribute id, or CUSTOM_ATTRIBUTE is the attribute is custom.
+ * @return The attribute id, or NO_ATTRIBUTE is the attribute is custom.
  */
 -(int) getAttributeFromLabel:(NSString*) label;
 

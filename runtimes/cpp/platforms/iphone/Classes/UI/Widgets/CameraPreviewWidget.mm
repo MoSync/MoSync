@@ -53,6 +53,11 @@
 	return @"";
 }
 
+- (void)showViewAgain{
+	//Give the UI system some time to hide the view before wee show it again
+	[view performSelector:@selector(showAgain) withObject:nil afterDelay:0.1];
+}
+
 
 @end
 
@@ -72,6 +77,12 @@
 	if(mWidget.previewLayer){
 		mWidget.previewLayer.frame = super.bounds;
 	}
+}
+
+- (void)showAgain
+{
+	self.hidden = NO;
+	[self setNeedsDisplay];
 }
 
 @end

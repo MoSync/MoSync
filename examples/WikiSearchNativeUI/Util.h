@@ -18,10 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file Util.h
+ * @author Emma Tresanszki
  *
  * This file contains the utility functions for the application.
  *
- * @author Emma Tresanszki
  */
 
 #ifndef UTIL_H_
@@ -110,7 +110,7 @@ const MAUtil::String ERROR_NO_RESULTS = "There are no results.";
 /** The results cannot be parsed. **/
 const MAUtil::String ERROR_INVALID_DATA = "Invalid results.Error:";
 
-/*
+/**
  * Utility functions for creating NativeUI widgets.
  */
 
@@ -134,7 +134,7 @@ MAWidgetHandle createLabel(int width, const char* text,int fontColor=BLUE, int f
  */
 MAWidgetHandle createSpacer(int width, int height);
 
-/*
+/**
  * Utility function to create a list view.
  * @param width List View width.
  * @param height List View height.
@@ -142,7 +142,7 @@ MAWidgetHandle createSpacer(int width, int height);
  */
 MAWidgetHandle createListView(int width, int height);
 
-/*
+/**
  * Utility function to create a web view.
  * @param width Web view width.
  * @param height Web view height.
@@ -150,7 +150,7 @@ MAWidgetHandle createListView(int width, int height);
  */
 MAWidgetHandle createWebView(int width, int height);
 
-/*
+/**
  * Utility function to create an edit box.
  * @param width Edit box width.
  * @param height Edit box height.
@@ -158,13 +158,13 @@ MAWidgetHandle createWebView(int width, int height);
  */
 MAWidgetHandle createEditBox(int width, int height);
 
-/*
+/**
  * Utility function to create a check box.
  * @return Handle to the new check box.
  */
 MAWidgetHandle createCheckBox();
 
-/*
+/**
  * Utility function to create a button.
  * Create a button with centered text.
  * By default, font size is 15, and color DARK GREY.
@@ -174,37 +174,38 @@ MAWidgetHandle createCheckBox();
  * @param width The widget width.
  * @param height The widget height.
  */
-MAWidgetHandle createButton(const char* text, int fontColor=DARK_GREY, int fontSize=FONT_LARGE,
-		                    int width = MAW_CONSTANT_WRAP_CONTENT, int height=MAW_CONSTANT_WRAP_CONTENT);
+MAWidgetHandle createButton(const char* text, int fontColor=DARK_GREY,
+	int fontSize=FONT_LARGE,int width = MAW_CONSTANT_WRAP_CONTENT,
+	int height=MAW_CONSTANT_WRAP_CONTENT);
 
 
-/*
+/**
  * Utility function to create a progress bar.
  * @return Handle to the new progress bar.
  */
 MAWidgetHandle createProgressBar();
 
-/*
+/**
  * Utility function to create a slider control.
  * @return Handle to the new slider.
  */
 MAWidgetHandle createSlider();
 
-/*
+/**
  * Set a text for a label.
  * @param aLabel Handle to the label.
  * @param aText Label text.
  */
 void setLabelText(MAWidgetHandle aLabel, MAUtil::String aText);
 
-/*
+/**
  * Set a text for a button.
  * @param aButton Handle to the button.
  * @param aText Button text.
  */
 void setButtonText(MAWidgetHandle aButton, MAUtil::String aText);
 
-/*
+/**
  * Utility function to set sizes of a widget.
  * @param widget The widget handle.
  * @param width The widget width.
@@ -212,7 +213,7 @@ void setButtonText(MAWidgetHandle aButton, MAUtil::String aText);
  */
 void setWidgetSize(MAWidgetHandle widget, int width, int height);
 
-/*
+/**
  * Apply an int property for a widget.
  * @param aWidget The handle for the widget.
  * @param aProperty A string representing which property to set.
@@ -228,24 +229,24 @@ void setWidgetSize(MAWidgetHandle widget, int width, int height);
  */
 int setWidgetProperty(MAWidgetHandle aWidget, const char* aProperty, int aValue, int base=10);
 
-/*
+/**
  * Utility functions for string handling
  * Converts the strings from xml into more human-readable strings.
  */
 
-/*
+/**
  * Replaces special characters.
  * @param The buffer that needs to be parsed.
  */
 void formatToUnicode(String& input);
 
-/*
+/**
  * Remove the span tags, keep only the search string.
  * @param The buffer that needs to be parsed.
  */
 void trimSpanTags(String& input);
 
-/*
+/**
  * Trim bold tags.
  * The b tags are encountered at the end, and contain dots ...
  * ( this is because the input is just a snippet, not the whole article)
@@ -253,25 +254,25 @@ void trimSpanTags(String& input);
  */
 void trimBoldTags(String& input);
 
-/*
+/**
  * Replace substrings from a string.
  *
  */
 char* strReplace(char* original, const char* remove, const char* replacement);
 
-/*
+/**
  * strreaplceFirst
  */
 char* strReplaceFirst(char* original, const char* remove, const char* replacement);
 
-/*
-*  Replaces the "remove" string with the "replacement" one in the "original" string.
-*      insert and remove operations require more time than the + operator
- *     replace for std::string was not ported for mosync string
-*  @param The original string.
-*  @param The string to be removed from the original one.
-*  @param The replacement.
-*/
+/**
+ * Replaces the "remove" string with the "replacement" one in the "original" string.
+ * Insert and remove operations require more time than the + operator.
+ * Replace for std::string was not ported for mosync string.
+ * @param The original string.
+ * @param The string to be removed from the original one.
+ * @param The replacement.
+ */
 void replaceString(String& original, const String& toRemove, const String& replacement);
 
 } // namespace WikiNativeUI

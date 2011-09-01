@@ -3347,15 +3347,20 @@ interface MAAPI {
 			INVALID_BUFFER = -19;
 			/// The field doesn't have attributes
 			NO_ATTRIBUTES = -20;
+			/// The specified list type is invalid.
+			INVALID_LIST_TYPE = -21;
+			/// The specified field is invalid.
+			INVALID_FIELD = -22;
 		}
 
 		/**
 		* \brief Opens a PimList. Use maPimListNext() to open the list's items.
 		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
-		* \returns     >= 0 A PimList handle, or \< 0 on error.
+		* \returns     >= 0 A PimList handle.
 		*              < 0 on error:
-		*                    #MA_PIM_ERR_LIST_NOT_OPENED if the list cannot be opened.
 		*                    #MA_PIM_ERR_LIST_ALREADY_OPENED if the list is already opened.
+		*					 #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not available on the current platform.
+		*                    #MA_PIM_ERR_INVALID_LIST_TYPE if the given list type is invalid.
 		*/
 		MAHandle maPimListOpen(in int listType);
 
@@ -3366,7 +3371,7 @@ interface MAAPI {
 		* \param list List handle provided by maPimListOpen(int listType).
 		* \returns     >= 0 A PimItem handle, or \< 0 on error.
 		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not opened.
+		*			   #MA_PIM_ERR_INVALID_HANDLE if the list handle is invalid.
 		*/
 		MAHandle maPimListNext(in MAHandle list);
 
@@ -3375,7 +3380,9 @@ interface MAAPI {
 		* so that maPimItemClose() is the only function you can safely use on them.
 		* \param list List handle provided by maPimListOpen(int listType).
 		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not opened.
+		*			   #MA_PIM_ERR_LIST_NOT_OPENED if the list is not opened.
+		*              #MA_PIM_ERR_UNAVAILABLE_LIST if the list is unavailable.
+		*			   #MA_PIM_ERR_INVALID_HANDLE if the list handle is invalid.
 		* \note This does not close the list's items, but it does invalidate them,
 		*/
 		int maPimListClose(in MAHandle list);
@@ -3385,7 +3392,7 @@ interface MAAPI {
 		* \param item Item handle provided by maPimListNext(MAHandle list).
 		* \returns     >=0 the number of field in the item.
 		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
+		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
 		*/
 		int maPimItemCount(in MAHandle item);
 
@@ -3395,7 +3402,7 @@ interface MAAPI {
 		* \param n \>= 0 and \< maPimItemCount().
 		* \returns     >=0 one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
+		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
 		*                    #MA_PIM_ERR_INVALID_INDEX if the param n is not valid.
 		*/
 		int maPimItemGetField(in MAHandle item, in int n);
@@ -3405,10 +3412,11 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \returns     >0 the number of values for the item.
-		*              =0 if the item does not exists / has no values.
+		*              =0 if the item field has no values.
 		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
+		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field is unsupported.
+		*                    #MA_PIM_ERR_INVALID_FIELD if the field is invalid.
 		*/
 		int maPimItemFieldCount(in MAHandle item, in int field);
 
@@ -3419,7 +3427,8 @@ interface MAAPI {
 		* \param index \>= 0 and \< maPimItemFieldCount().
 		* \returns     >=0 the attribute for the specified field.
 		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
+		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
+		*					 #MA_PIM_ERR_INVALID_FIELD if the field is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
 		*                    #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
 		*                    #MA_PIM_ERR_NO_ATTRIBUTES if the field doesn't have attributes.
@@ -4206,10 +4215,13 @@ group WidgetAPI "Widget API" {
 		GL2_VIEW = "GL2View";
 
 		/**
-		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
+		 * @brief A Camera preview widget is a widget that can bound to a camera and contain the live veiw data from the camera.
 		 */
 		CAMERA_PREVIEW="CameraPreview";
 
+		/**
+		 * @brief A web view is a widget used to render web pages. See \ref WidgetWebViewProperties "Web view properties" for the properties available.
+		 */
 		WEB_VIEW = "WebView";
 
 		/**
@@ -5079,8 +5091,8 @@ group WidgetAPI "Widget API" {
 		*    maFontGetName(1, buf, 256);
 		*    // Load that font for size 10.
 		*    int fontHandle = maFontLoadWithName(buf, 10);
-		*    // Set that font to the label.
-		*	maWidgetSetProperty(labelHandle, MAW_LIST_VIEW_ITEM_FONT_HANDLE, toString(fontHandle));
+		*    // Set that font to the list view item.
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_HANDLE, toString(fontHandle));
 		* \endcode
 		*/
 		FONT_HANDLE = "fontHandle";

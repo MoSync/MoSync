@@ -92,7 +92,19 @@ namespace NativeUI
         * - #MAW_RES_OK if the property could be set.
         * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
         * - #MAW_RES_ERROR otherwise.
-        */
+		* @par Example
+		* \code
+		*   int nrFonts = maFontGetCount();
+		*    char buf[256];
+		*    // Get first font name.
+		*    maFontGetName(1, buf, 256);
+		*    // Load that font for size 10.
+		*    int fontHandle = maFontLoadWithName(buf, 10);
+		*    // Set that font to the label.
+		*	maWidgetSetProperty(
+		*	    labelHandle, MAW_LABEL_FONT_HANDLE, toString(fontHandle));
+		* \endcode
+		*/
         virtual int setFont(const MAHandle fontHandle);
     };
 

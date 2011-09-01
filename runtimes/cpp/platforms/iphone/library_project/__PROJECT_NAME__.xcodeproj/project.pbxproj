@@ -7,12 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0B10E94A14065AE600B6DA6B /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B10E94914065AE600B6DA6B /* MessageUI.framework */; };
 		431869BF13F691E50051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869BE13F691E50051D97A /* CoreMotion.framework */; };
 		431869C913F69ECA0051D97A /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869C813F69ECA0051D97A /* EventKit.framework */; };
 		4370369E13E9487D00F22783 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4370369D13E9487D00F22783 /* AddressBook.framework */; };
-		43B449FF13F94467001F2492 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B449FE13F94467001F2492 /* AddressBook.framework */; };
-		43B44A0213F94474001F2492 /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B44A0113F94474001F2492 /* CoreMotion.framework */; };
-		43B44A0413F9447A001F2492 /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B44A0313F9447A001F2492 /* EventKit.framework */; };
 		43B44A0613F94480001F2492 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B44A0513F94480001F2492 /* MediaPlayer.framework */; };
 		85796C5512719251002B7859 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5312719251002B7859 /* Icon-72.png */; };
 		85796C5612719251002B7859 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5412719251002B7859 /* Icon.png */; };
@@ -34,6 +32,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		0B10E94914065AE600B6DA6B /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncAppDelegate.h; sourceTree = "<group>"; };
 		1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncAppDelegate.mm; sourceTree = "<group>"; };
@@ -45,9 +44,6 @@
 		431869BE13F691E50051D97A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		431869C813F69ECA0051D97A /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		4370369D13E9487D00F22783 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
-		43B449FE13F94467001F2492 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
-		43B44A0113F94474001F2492 /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
-		43B44A0313F9447A001F2492 /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		43B44A0513F94480001F2492 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		850944001185C440004A3B2D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
@@ -73,9 +69,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				43B44A0613F94480001F2492 /* MediaPlayer.framework in Frameworks */,
-				43B44A0413F9447A001F2492 /* EventKit.framework in Frameworks */,
-				43B44A0213F94474001F2492 /* CoreMotion.framework in Frameworks */,
-				43B449FF13F94467001F2492 /* AddressBook.framework in Frameworks */,
 				431869C913F69ECA0051D97A /* EventKit.framework in Frameworks */,
 				431869BF13F691E50051D97A /* CoreMotion.framework in Frameworks */,
 				4370369E13E9487D00F22783 /* AddressBook.framework in Frameworks */,
@@ -88,6 +81,7 @@
 				85DF23F0126745DA003A0FF6 /* libMoSyncLib.a in Frameworks */,
 				858B401012E67D8D0058DBFC /* OpenGLES.framework in Frameworks */,
 				858B403E12E67F790058DBFC /* QuartzCore.framework in Frameworks */,
+				0B10E94A14065AE600B6DA6B /* MessageUI.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -152,9 +146,6 @@
 			isa = PBXGroup;
 			children = (
 				43B44A0513F94480001F2492 /* MediaPlayer.framework */,
-				43B44A0313F9447A001F2492 /* EventKit.framework */,
-				43B44A0113F94474001F2492 /* CoreMotion.framework */,
-				43B449FE13F94467001F2492 /* AddressBook.framework */,
 				431869C813F69ECA0051D97A /* EventKit.framework */,
 				431869BE13F691E50051D97A /* CoreMotion.framework */,
 				4370369D13E9487D00F22783 /* AddressBook.framework */,
@@ -167,6 +158,7 @@
 				850943881185B35D004A3B2D /* AVFoundation.framework */,
 				858B400F12E67D8D0058DBFC /* OpenGLES.framework */,
 				858B403D12E67F790058DBFC /* QuartzCore.framework */,
+				0B10E94914065AE600B6DA6B /* MessageUI.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
