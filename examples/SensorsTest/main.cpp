@@ -209,13 +209,15 @@ void drawSensorOutput()
 
 extern "C" int MAMain()
 {
+	bool run = true;
+
 	updateScreenDimensions();
 	registerSensors();
 
-	while (true)
+	while (run)
 	{
 		/// Get any available events.
-		/// On MAK_0 press, close program.
+		/// On back press close program.
 		MAEvent event;
 		while(maGetEvent(&event))
 		{
@@ -224,10 +226,10 @@ extern "C" int MAMain()
 				memcpy(gSensorValue[event.sensor.type],
 						event.sensor.values, SENSOR_VALUES * sizeof(float));
 			}
-			else if ((event.type == EVENT_TYPE_KEY_PRESSED) &&
-					(event.key == MAK_0))
+			else if((event.type == EVENT_TYPE_KEY_PRESSED) &&
+					(event.key == MAK_BACK))
 			{
-				break;
+				run = false;
 			}
 
 			drawSensorOutput();
