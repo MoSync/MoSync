@@ -58,7 +58,7 @@ public:
 
 	bool isViewed;
 
-	int flashSupported;
+	bool flashSupported;
 
 	int numCameras;
 
@@ -83,8 +83,6 @@ private:
 	MAHandle mStackScreen;
 
 	MAHandle mPreviewWidget;
-
-	int zoomSupported;
 
 	int flashModeIndex;
 

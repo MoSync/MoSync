@@ -18,10 +18,9 @@ MA 02110-1301, USA.
 
 /**
  * @file Moblet.h
+ * @author Emma Tresanszki
  *
  * This file contains the moblet that manages the application.
- *
- * @author Emma Tresanszki
  */
 
 #ifndef MOBLET_H_
@@ -35,7 +34,7 @@ MA 02110-1301, USA.
 #include <MAUtil/Moblet.h>
 
 // The default screen, that is displayed when application starts
-#include "NativeScreen.h"
+#include "MainScreen.h"
 
 namespace Test
 {
@@ -43,12 +42,17 @@ namespace Test
 /*
  * The Moblet that will manage the application and handle events
  */
-class TestMoblet : public MAUtil::Moblet
+class VideoMoblet : public MAUtil::Moblet
 {
-	/*
-	 * ctor
+	/**
+	 * Constructor.
 	 */
-	TestMoblet();
+	VideoMoblet();
+
+	/**
+	 * Destructor.
+	 */
+	~VideoMoblet();
 
 public:
 
@@ -56,7 +60,7 @@ public:
 	 * Get the single instance of this Moblet.
 	 * @return The Moblet instance.
 	 */
-	static TestMoblet *getInstance();
+	static VideoMoblet *getInstance();
 
 	/**
 	 * Method called when a key is pressed.
@@ -69,10 +73,10 @@ public:
 	void closeEvent();
 
 private:
-	static TestMoblet *mInstance;
+	static VideoMoblet *mInstance;
 
 	/** The main screen of the application. **/
-	NativeScreen* mMainScreen;
+	MainScreen* mMainScreen;
 };
 
 }// namespace Test

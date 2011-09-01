@@ -90,6 +90,7 @@ typedef enum {
 
 /**
  * Gets the number of values for a given field ID.
+ * Does not check if field is supported.
  * @param field The specified field ID(one of the MA_PIM_FIELD constants).
  * @return The number of values for the given field, or 0 if the field ID
  *         has no values/does not exist.
@@ -98,6 +99,7 @@ typedef enum {
 
 /**
  * Gets the attribute for a given field value.
+ * Does not check if field is supported.
  * @param fieldID The specified field ID(one of the MA_PIM_FIELD constants).
  * @param index The index of the given field value.
  * @return One of MA_PIM_ATTR constants, or MA_PIM_ERR in case of error.
@@ -120,6 +122,7 @@ typedef enum {
 
 /**
  * Gets a custom label for a given field value.
+ * Does not check if field is supported.
  * @param args Common arguments.
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.

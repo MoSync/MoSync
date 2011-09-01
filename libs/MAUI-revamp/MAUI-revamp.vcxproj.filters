@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClInclude Include="AnimatedImage.h" />
+    <ClInclude Include="Button.h" />
+    <ClInclude Include="DefaultSkin.h" />
+    <ClInclude Include="Drawable.h" />
+    <ClInclude Include="Drawables.h" />
+    <ClInclude Include="EditBox.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="Font.h" />
+    <ClInclude Include="GridLayout.h" />
+    <ClInclude Include="Image.h" />
+    <ClInclude Include="ImageGenerators.h" />
+    <ClInclude Include="InputPolicy.h" />
+    <ClInclude Include="Label.h" />
+    <ClInclude Include="ListBox.h" />
+    <ClInclude Include="NativeEditBox.h" />
+    <ClInclude Include="RelativeLayout.h" />
+    <ClInclude Include="Scaler.h" />
+    <ClInclude Include="Screen.h" />
+    <ClInclude Include="Slider.h" />
+    <ClInclude Include="StackLayout.h" />
+    <ClInclude Include="Style.h" />
+    <ClInclude Include="TouchMotionTracker.h" />
+    <ClInclude Include="Widget.h" />
+    <ClInclude Include="WidgetSkin.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="AnimatedImage.cpp" />
+    <ClCompile Include="Button.cpp" />
+    <ClCompile Include="Drawable.cpp" />
+    <ClCompile Include="Drawables.cpp" />
+    <ClCompile Include="EditBox.cpp" />
+    <ClCompile Include="Engine.cpp" />
+    <ClCompile Include="Font.cpp" />
+    <ClCompile Include="GridLayout.cpp" />
+    <ClCompile Include="Image.cpp" />
+    <ClCompile Include="ImageGenerators.cpp" />
+    <ClCompile Include="InputPolicy.cpp" />
+    <ClCompile Include="Label.cpp" />
+    <ClCompile Include="ListBox.cpp" />
+    <ClCompile Include="NativeEditBox.cpp" />
+    <ClCompile Include="RelativeLayout.cpp" />
+    <ClCompile Include="Scaler.cpp" />
+    <ClCompile Include="Screen.cpp" />
+    <ClCompile Include="Slider.cpp" />
+    <ClCompile Include="StackLayout.cpp" />
+    <ClCompile Include="Style.cpp" />
+    <ClCompile Include="TouchMotionTracker.cpp" />
+    <ClCompile Include="Widget.cpp" />
+    <ClCompile Include="WidgetSkin.cpp" />
+  </ItemGroup>
+</Project>

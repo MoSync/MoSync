@@ -81,6 +81,9 @@ public:
 	{
 		// Make the AppScreen listen for events coming from widgets.
 		MAUtil::Environment::getEnvironment().addCustomEventListener(this);
+		char buffer[256];
+		int length = maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
+		maxZoom = atoi(buffer);
 		createMainScreen();
 		mStackScreen = maWidgetCreate(MAW_STACK_SCREEN);
 	}
@@ -88,18 +91,18 @@ public:
 	void createSettingsScreen()
 	{
 		mSettingsString = new SettingsScreen();
-		mSettingsString->initialize(mStackScreen, mCameraPreview);
 		mSettingsString->numCameras = maCameraNumber();
 		char buffer[256];
 		maCameraGetProperty(MA_CAMERA_FLASH_SUPPORTED, buffer, 256);
-		if(strcmp(buffer, "true") == 1)
+		if(strcmp(buffer, "true") == 0)
 		{
-			mSettingsString->flashSupported = 1;
+			mSettingsString->flashSupported = true;
 		}
 		else
 		{
-			mSettingsString->flashSupported = 0;
+			mSettingsString->flashSupported = false;
 		}
+		mSettingsString->initialize(mStackScreen, mCameraPreview);
 	}
 
 	void createImageScreen()
@@ -143,12 +146,11 @@ public:
 			MAW_WIDGET_HEIGHT,
 			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 
-		// the second layout is a horizontal layout that
-		//contains the buttons that control the camera
-
 		// Add the layout as the root of the screen's widget tree.
 		maWidgetAddChild(mScreen, mMainLayoutWidget);
 
+		//A wrapper that creates the preview widget that holds the
+		//live view from the camera
 		createCameraWidget();
 
 		//Camera Control buttons are created here
@@ -202,50 +204,55 @@ public:
 			mZoomInButton,
 			"+",
 			MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-			MAW_CONSTANT_WRAP_CONTENT
-			);
+			60);
 
 		mShowLastImageButton = maWidgetCreate(MAW_BUTTON);
 		setCameraButtonProperties(
 			mShowLastImageButton,
 			"Image",
 			MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-			MAW_CONSTANT_WRAP_CONTENT
-			);
+			60);
 
 		mSettingsButton = maWidgetCreate(MAW_BUTTON);
 		setCameraButtonProperties(
 			mSettingsButton,
 			"Settings",
 			MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-			MAW_CONSTANT_WRAP_CONTENT
-			);
+			60);
 
 		mZoomOutButton = maWidgetCreate(MAW_BUTTON);
 		setCameraButtonProperties(
 			mZoomOutButton,
 			"-",
 			MAW_CONSTANT_FILL_AVAILABLE_SPACE,
-			MAW_CONSTANT_WRAP_CONTENT
-			);
+			60);
 
 		mSecondLayoutWidget = maWidgetCreate(MAW_HORIZONTAL_LAYOUT);
 		widgetSetPropertyInt(
 			mSecondLayoutWidget,
 			MAW_WIDGET_WIDTH,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE
-			);
+			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 		widgetSetPropertyInt(
 			mSecondLayoutWidget,
 			MAW_WIDGET_HEIGHT,
-			65
-			);
+			MAW_CONSTANT_WRAP_CONTENT);
 
 		//Adding buttons to the horizontal Layout
 		maWidgetAddChild(mSecondLayoutWidget, mZoomInButton);
 		maWidgetAddChild(mSecondLayoutWidget, mShowLastImageButton);
 		maWidgetAddChild(mSecondLayoutWidget, mSettingsButton);
 		maWidgetAddChild(mSecondLayoutWidget, mZoomOutButton);
+
+		//Disable zoom buttons if zoom is not supported
+		if(maxZoom == 0)
+		{
+			maWidgetSetProperty(mZoomInButton,
+					MAW_WIDGET_ENABLED,
+					"false");
+			maWidgetSetProperty(mZoomOutButton,
+					MAW_WIDGET_ENABLED,
+					"false");
+		}
 
 		// Then we add the layout to its parent
 		maWidgetAddChild(mMainLayoutWidget, mSecondLayoutWidget);
@@ -268,7 +275,8 @@ public:
 
 	/**
 	 * A Wrapper function that creates the camera widget
-	 * and binds it to the default camera
+	 * and binds it to the default camera, The binding
+	 * can be changed through the settings screen
 	 */
 	void createCameraWidget()
 	{
@@ -302,6 +310,7 @@ public:
 		maCameraStart();
 		createSettingsScreen();
 		createImageScreen();
+
 	}
 
 	/**
@@ -419,6 +428,7 @@ public:
 		}
 		mLastEnc = maCreatePlaceholder();
 		maCameraSnapshot(-1, mLastEnc);
+		setupCameraProperties();
 		maCameraStart();
 	}
 
@@ -520,8 +530,8 @@ public:
 	 */
 	void keyPressEvent(int keyCode, int nativeCode)
 	{
-		// Close the application if the back key or key 0 is pressed.
-		if (MAK_BACK == keyCode || MAK_0 == keyCode)
+		// Close the application if the back key is pressed.
+		if (MAK_BACK == keyCode)
 		{
 			// Call close to exit the application.
 			close();

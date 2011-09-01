@@ -639,6 +639,31 @@ static PimUtils *sharedInstance = nil;
 }
 
 /**
+ * Checks if a given field supports attributes.
+ * @param fieldID The given field ID. One of the MA_PIM_FIELD_CONTACT contants.
+ * @return True if field supports attributes, false otherwise.
+ */
+-(bool) fieldSupportsAttribute:(const int) fieldID
+{
+    bool returnValue;
+    switch (fieldID)
+    {
+        case MA_PIM_FIELD_CONTACT_ADDR:
+        case MA_PIM_FIELD_CONTACT_EMAIL:
+        case MA_PIM_FIELD_CONTACT_TEL:
+        case MA_PIM_FIELD_CONTACT_URL:
+        case MA_PIM_FIELD_CONTACT_IM:
+        case MA_PIM_FIELD_CONTACT_RELATION:
+            returnValue = true;
+            break;
+        default:
+            returnValue = false;
+    }
+
+    return returnValue;
+}
+
+/**
  * Gets the absolute memory address for a specified address from MoSync memory pool.
  * @param address The given address from memory pool.
  * param size The size of the address in bytes.
