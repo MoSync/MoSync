@@ -20,19 +20,21 @@ MA 02110-1301, USA.
  * @author Emma Tresanszki
  *
  * This application provides an example on how to use the Native UI.
- * It performs text searches on the Wikipedia, based on user input ( tags ) and selected categories.
- * After searching for content that matches the given tags, the user may select the desired article titles,
- * and open  web views to see the entire articles.
+ * It performs text searches on the Wikipedia, based on user input ( tags )
+ * and selected categories. After searching for content that matches the given
+ * tags, the user may select the desired article titles, and open  web views
+ * to see the entire articles.
  * The application makes use of MoSync's Moblet framework to handle events.
  * On the first screen: HomeScreen, the user can provide some tags.
- * On the second screen: TitlesScreen, a list of available titles is displayed. Each title can be checked/unchecked.
- * On the third screen: SummaryScreen, the snippets are displayed, for the checked titles in the previous screen.
+ * On the second screen: TitlesScreen, a list of available titles is displayed.
+ * Each title can be checked/unchecked.
+ * On the third screen: SummaryScreen, the snippets are displayed, for the
+ * checked titles in the previous screen.
  * By clicking on each snippet, a Web view is shown in the WebScreen.
  * The application is exited by pressing the back button.
- *
  */
 
-// Include the library for the event manager, that manages the application main loop.
+// Library for the event manager, that manages the application main loop.
 #include <MAUtil/Moblet.h>
 
 // Include the header file for this application's moblet.
