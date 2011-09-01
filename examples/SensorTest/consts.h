@@ -25,17 +25,18 @@ MA 02110-1301, USA.
 #define CONSTS_H_
 
 // the number of sensors in MoSync
-#define SENSOR_TYPES					6
+#define SENSOR_TYPES					5
 // maximum number of values returned by a sensor
 #define SENSOR_VALUES					3
 
 #define BUFFER_SIZE						50
 #define BG_COLOR						0
 #define TEXT_COLOR						0xFF0000
+#define TEXT_SIZE						12
 #define OFFSET_Y						20
 
 // useful texts
-#define TXT_SENSOR_NONE					"None"
+#define TXT_NONE						""
 #define TXT_SENSOR_ACCELEROMETER		"Accelerometer"
 #define TXT_SENSOR_MAG_FIELD			"Magnetic field"
 #define TXT_SENSOR_ORIENTATION			"Orientation"
