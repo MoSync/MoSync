@@ -24,7 +24,6 @@ MA 02110-1301, USA.
  * This screen displays all the text snippets.
  * By clicking on each snippet, a Web view is shown in next screen:WebScreen.
  * A StartOver button is available.
- *
  */
 
 // Include library for string conversions.

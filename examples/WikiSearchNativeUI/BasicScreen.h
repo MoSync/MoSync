@@ -23,7 +23,6 @@ MA 02110-1301, USA.
  * This file contains the base screen of the application.
  * It contains the base screen constructors, and the creation
  * of a main layout that is common for some screens.
- *
  */
 
 #ifndef BASICSCREENNUI_H_

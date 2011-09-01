@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		0B10E8D214064DDB00B6DA6B /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B10E8D114064DDB00B6DA6B /* MessageUI.framework */; };
+		0B10E8D214064DDB00B6DA6B /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B10E8D114064DDB00B6DA6B /* MessageUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		0B90962B13E05C1400A91170 /* CameraPreviewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B9095BE13E053C900A91170 /* CameraPreviewWidget.mm */; };
 		0B90962C13E05C1500A91170 /* CameraPreviewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B9095BE13E053C900A91170 /* CameraPreviewWidget.mm */; };
 		0B90962D13E05C1B00A91170 /* CameraPreviewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B9095BD13E053C900A91170 /* CameraPreviewWidget.h */; };
@@ -47,13 +47,13 @@
 		431869A513F68D410051D97A /* PimUtil.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4318698413F68D410051D97A /* PimUtil.mm */; };
 		431869A813F68E560051D97A /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869A713F68E560051D97A /* AddressBook.framework */; };
 		431869A913F68E660051D97A /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869A713F68E560051D97A /* AddressBook.framework */; };
-		431869AB13F68E8A0051D97A /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869AA13F68E8A0051D97A /* EventKit.framework */; };
-		431869AC13F68E940051D97A /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869AA13F68E8A0051D97A /* EventKit.framework */; };
+		431869AB13F68E8A0051D97A /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869AA13F68E8A0051D97A /* EventKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		431869AC13F68E940051D97A /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869AA13F68E8A0051D97A /* EventKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		431869AF13F690C90051D97A /* MoSyncSensor.h in Headers */ = {isa = PBXBuildFile; fileRef = 431869AD13F690C90051D97A /* MoSyncSensor.h */; };
 		431869B013F690C90051D97A /* MoSyncSensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 431869AE13F690C90051D97A /* MoSyncSensor.mm */; };
 		431869B113F690C90051D97A /* MoSyncSensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 431869AE13F690C90051D97A /* MoSyncSensor.mm */; };
-		431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; };
-		431869B413F691B70051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; };
+		431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		431869B413F691B70051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A7684E1400F6BA009608A4 /* ImagePickerController.h */; };
 		43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
 		43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
@@ -213,7 +213,7 @@
 		85C9328912E07D8400CEB7EF /* MoSyncGLView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85C9328812E07D8400CEB7EF /* MoSyncGLView.mm */; };
 		85E2A0D61181D1B200CDB453 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */; };
 		85EF80EC1174AA1900B3E43A /* ThreadPoolImpl.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */; };
-		85F2551311AC12A700EB47EE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; };
+		85F2551311AC12A700EB47EE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		85F2551411AC12A700EB47EE /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */; };
 		85F2551511AC12A700EB47EE /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		85F2551611AC12A700EB47EE /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
@@ -250,7 +250,7 @@
 		85F2557F11AC155D00EB47EE /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		85F2558011AC155D00EB47EE /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
 		85F2558111AC155D00EB47EE /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */; };
-		85F2558211AC155D00EB47EE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; };
+		85F2558211AC155D00EB47EE /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850943881185B35D004A3B2D /* AVFoundation.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		85F2558311AC155D00EB47EE /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 850944001185C440004A3B2D /* CoreLocation.framework */; };
 		85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F2550D11AC125400EB47EE /* libMoSyncLib.a */; };
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
