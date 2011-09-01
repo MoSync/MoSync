@@ -22,7 +22,6 @@ MA 02110-1301, USA.
  *
  * This file contains the last screen of the application
  * It contains a top layout with a hint label and a button, and a web view.
- *
  */
 
 #ifndef WEBSCREENNUI_H_
