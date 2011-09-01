@@ -385,6 +385,24 @@ namespace NativeUI
     }
 
     /**
+     * Get the width of the widget.
+     * @return The width value.
+     */
+    int Widget::getWidth()
+    {
+		return getPropertyInt(MAW_WIDGET_WIDTH);
+    }
+
+    /**
+     * Get the height of the widget.
+     * @return The height value.
+     */
+    int Widget::getHeight()
+    {
+		return getPropertyInt(MAW_WIDGET_HEIGHT);
+    }
+
+    /**
      * Set the width of the widget.
      * @param width The width value.
      */

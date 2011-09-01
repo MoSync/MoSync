@@ -1265,7 +1265,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * maGetScrSize
 	 */
-	int maGetScrSize()
+	public int maGetScrSize()
 	{
 		SYSLOG("maGetScrSize");
 		return EXTENT(mWidth, mHeight);

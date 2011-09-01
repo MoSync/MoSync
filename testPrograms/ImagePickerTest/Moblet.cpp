@@ -6,7 +6,7 @@
  */
 
 #include <MAUtil/String.h>
-
+#include <MAUtil/util.h>
 // The header file of the class.
 #include "Moblet.h"
 #include "maapi.h"
@@ -24,7 +24,6 @@ TestMoblet::TestMoblet():mMainScreen(NULL)
 {
 	mMainScreen = new NativeScreen();
 	mMainScreen->showScreen();
-
 }
 
 /**

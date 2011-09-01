@@ -39,7 +39,7 @@ using namespace MAUtil;
  */
 extern "C" int MAMain()
 {
-	// Create an instance for WikiMoblet & run it to start the application.
+	// Create an instance for VideoMoblet & run it to start the application.
 	MAUtil::Moblet::run(Test::VideoMoblet::getInstance());
 
 	//MyMoblet will run until it is closed by the user pressing key 0. When
