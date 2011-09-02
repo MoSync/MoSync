@@ -65,12 +65,6 @@ public:
 	bool getDurationSettingValue();
 
 	/**
-	 * Detects if the current platform is Android.
-	 * @return true if the platform is Android, false otherwise.
-	 */
-	bool isAndroid();
-
-	/**
 	 * Set the default value for the homepage.
 	 * It is different depending on the platform, as they can play different
 	 * media formats.
