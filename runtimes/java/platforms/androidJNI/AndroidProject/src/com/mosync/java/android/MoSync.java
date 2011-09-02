@@ -61,6 +61,7 @@ import com.mosync.internal.android.MoSyncSingleTouchHandler;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
+import com.mosync.internal.android.nfc.MoSyncNFCService;
 
 /**
  * Main MoSync activity

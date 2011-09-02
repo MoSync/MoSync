@@ -1,4 +1,4 @@
-package com.mosync.java.android;
+package com.mosync.internal.android.nfc;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -7,8 +7,9 @@ import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.os.Parcelable;
+import android.util.Log;
 
-import com.mosync.internal.android.nfc.MoSyncNFC;
+import com.mosync.java.android.MoSync;
 
 public class MoSyncNFCService extends IntentService {
 
@@ -21,6 +22,14 @@ public class MoSyncNFCService extends IntentService {
 		handleNFCIntent(this, intent);
 	}
 
+	public static MoSyncNFC getDefault() {
+		try {
+			return MoSyncNFC.getDefault();
+		} catch (Throwable t) { // In case of a verify error
+			Log.e("@@@ÊMoSync", "NFC not available");
+			return null;
+		}
+	}
 	/**
 	 * Handles an NFC intent
 	 * @param context
@@ -29,11 +38,17 @@ public class MoSyncNFCService extends IntentService {
 	 */
 	public static boolean handleNFCIntent(Context context, Intent intent) {
 		String action = intent.getAction();
-		MoSyncNFC nfcContext = MoSyncNFC.getDefault();
-		if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
+		MoSyncNFC nfcContext = getDefault();
+		if (nfcContext == null) {
+			return false;
+		}
+
+		// ACTION_NDEF_DISCOVERED NOT YET SUPPORTED (because it complicates the APIs a bit)
+		// Uncomment later if needed.
+		/*if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
 			// If an NDEF tag is discovered, go ahead...
 			// (the androidManifest.xml contains filters
-			// for MIME/URI of the NDEF tag.
+			// for MIME/URI of the NDEF tag.)
 			Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
 			NdefMessage[] msgs;
 			if (rawMsgs != null) {
@@ -45,7 +60,7 @@ public class MoSyncNFCService extends IntentService {
 				activateMoSyncApp(context);
 				return true;
 			}
-		} else if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action) || NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)) {
+		} else*/ if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action) || NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)) {
 			// Or, we have some specific tag technology such as MIFARE
 			// (also filtered in the androidManifest.xml)
 			Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);

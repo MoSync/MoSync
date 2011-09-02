@@ -2255,8 +2255,26 @@ return 0; \
 		case maIOCtl_maNFCBatchRollback:
 			return _maNFCBatchRollback(a, mJNIEnv, mJThis);
 
+		case maIOCtl_maNFCTransceive:
+		{
+			int dst = SYSCALL_THIS->GetValidatedStackValue(0);
+			int dstLen = SYSCALL_THIS->GetValidatedStackValue(4);
+			return _maNFCTransceive(
+					a,
+					(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
+					c,
+					(int) SYSCALL_THIS->GetValidatedMemRange( dst, dstLen * sizeof(byte)),
+					dstLen,
+					(int)gCore->mem_ds,
+					mJNIEnv,
+					mJThis);
+		}
+
 		case maIOCtl_maNFCGetNDEFMessage:
 			return _maNFCGetNDEFMessage(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNFCReadNDEFMessage:
+			return _maNFCReadNDEFMessage(a, mJNIEnv, mJThis);
 
 		case maIOCtl_maNFCGetNDEFRecord:
 			return _maNFCGetNDEFRecord(a, b, mJNIEnv, mJThis);

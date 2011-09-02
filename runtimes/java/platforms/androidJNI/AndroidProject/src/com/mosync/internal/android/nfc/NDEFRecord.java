@@ -22,7 +22,7 @@ public class NDEFRecord extends ResourceBase {
 	}
 
 	int maNFCGetPayload(ByteBuffer result) {
-		byte[] payload = delegate.getId();
+		byte[] payload = delegate.getPayload();
 		int size = Math.min(result.remaining(), payload.length);
 		result.put(payload, 0, size);
 		return size;

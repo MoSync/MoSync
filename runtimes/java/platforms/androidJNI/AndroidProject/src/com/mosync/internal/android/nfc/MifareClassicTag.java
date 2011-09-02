@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import android.nfc.tech.MifareClassic;
 
-public class MifareClassicTag extends ResourceBase implements INFCTag {
+public class MifareClassicTag extends NFCTagBase<MifareClassic> {
 
 
 	public static INFCTag get(ResourcePool pool, GenericTag tag) {
@@ -17,32 +17,14 @@ public class MifareClassicTag extends ResourceBase implements INFCTag {
 		return null;
 	}
 
-	private final MifareClassic mfc;
-
 	private MifareClassicTag(ResourcePool pool, MifareClassic mfc) {
-		super(pool);
-		this.mfc = mfc;
+		super(pool, mfc, MA_NFC_TAG_TYPE_MIFARE_UL);
 	}
 
 	@Override
-	public void close() throws IOException {
-		mfc.close();
+	public byte[] transceive(byte[] buffer) throws IOException {
+		return nativeTag.transceive(buffer);
 	}
 
-	@Override
-	public void connect() throws IOException {
-		mfc.connect();
-	}
 
-	public MifareClassic getTag() {
-		return mfc;
-	}
-
-	@Override
-	public INFCTag toTypedTag(ResourcePool pool, int type) {
-		if (type == MA_NFC_TAG_TYPE_MIFARE_UL) {
-			return this;
-		}
-		return null;
-	}
 }

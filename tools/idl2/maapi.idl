@@ -800,7 +800,7 @@ interface MAAPI {
 	* MAConnEventData::opType set to #CONNOP_READ.
 	* The success value is the number of bytes read.
 	*
-	* \see maGetEven
+	* \see maGetEvent
 	*/
 	void maConnRead(in MAHandle conn, out MAAddress dst, in int size);
 
@@ -813,7 +813,7 @@ interface MAAPI {
 	*
 	* \warning The source data must remain available until the operation is complete,
 	* so if it was dynamically allocated, don't free it too early.
-	* \see maGetEven
+	* \see maGetEvent
 	*/
 	void maConnWrite(in MAHandle conn, in MAAddress src, in int size);
 
@@ -827,7 +827,7 @@ interface MAAPI {
 	* MAConnEventData::opType set to #CONNOP_READ.
 	* The success value is is the number of bytes read.
 	*
-	* \see maGetEven
+	* \see maGetEvent
 	*/
 	void maConnReadToData(in MAHandle conn, in MAHandle data, in int offset, in int size);
 
@@ -841,7 +841,7 @@ interface MAAPI {
 	* MAConnEventData::opType set to #CONNOP_WRITE.
 	* The success value is \> 0.
 	*
-	* \see maGetEven
+	* \see maGetEvent
 	*/
 	void maConnWriteFromData(in MAHandle conn, in MAHandle data, in int offset, in int size);
 
@@ -974,7 +974,7 @@ interface MAAPI {
 	* The success value is the HTTP response code.
 	*
 	* \param conn An unfinished HTTP connection handle.
-	* \see maGetEven
+	* \see maGetEvent
 	*/
 	void maHttpFinish(in MAHandle conn);
 
@@ -2893,8 +2893,8 @@ interface MAAPI {
 		*
 		* \param serv A server connection, opened with maConnect.
 		* \returns \< 0 on error, \> 0 on success.
-		* \see maConnec
-		* \see maGetEven
+		* \see maConnect
+		* \see maGetEvent
 		*/
 		int maAccept(in MAHandle serv);
 
@@ -6962,7 +6962,7 @@ group CameraFunctions "Camera Functions" {
 		* Starts a batch operation. No NFC I/O operations will be performed
 		* until maBatchCommit has been called.
 		* Note that only one active batch per tag is allowed.
-		* \param The tag on which to perform the batch operation
+		* \param The tag on which to perform the batch operation.
 		* \return A non-zero value if a batch is already started for this tag or if a batch
 		* could not be started, 0 otherwise.
 		*/
@@ -6972,29 +6972,66 @@ group CameraFunctions "Camera Functions" {
 		* Asynchronously performs all operations since the last call to maNFCBatchStart. The event
 		* delivered will be of the EVENT_TYPE_NFC_BATCH_OP type and
 		* with an MANFCEventData containing the tag's handle.
+		* \param The handle to the tag that is in batch mode.
 		*/
 		void maNFCBatchCommit(in MAHandle tagHandle);
 
 		/**
 		* Cancels all operations of the current batch.
+		* \param The handle to the tag that is in batch mode.
 		*/
 		void maNFCBatchRollback(in MAHandle tagHandle);
 
 		/**
-		* Returns a handle to an NDEF message, or a zero handle
-		* if the tag is not of the correct type.
+		* Sends a message to a tag. The response will come as
+		* an EVENT_TYPE_NFC_TAG_DATA_READ event, with the
+		* handle set to the handle passed into this method
+		* and the result field set to the number of bytes
+		* actually read.
+		* \param tag The tag to communicate with.
+		* \param src The data to send.
+		* \param len The length of the data to send.
+		* \return 0 if the tag can be transceived to, < 0 otherwise.
 		*/
-		MAHandle maNFCGetNDEFMessage(in MAHandle tag);
+		int maNFCTransceive(in MAHandle tag, in MAAddress src, in int srcLen, out MAAddress dst, out int dstLen);
 
 		/**
-		* Returns a handle to the ith NDEF record of an NDEF message,
+		* Reads an NDEF message from the given tag, which must
+		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_READ
+		* event  with the handle set to the handle passed into this method
+		* and the result field set to 0 on success and a value < 0 on error.
+		* After receiving the event, clients may call
+		* maNFCGetNDEFMessage() to get the actual message.
+		*
+		*/
+		int maNFCReadNDEFMessage(in MAHandle tag);
+
+		/**
+		* Gets the NDEF message from a tag, which must
+		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* \return The handle to the NDEF message, which
+		* may be subsequently used in NDEF specfic functions,
+		* or the zero handle if the tag has no NDEF message
+		* associated with it (in which case, clients may call
+		* maNFCReadNDEFMessage).
+		* IMPORTANT: Once the tag has been destroyed OR if
+		* maNFCReadNDEFMessage is called, any NDEF messages
+		* previously returned by this function
+		* will be destroyed with it and cannot
+		* be used.
+		*/
+		int maNFCGetNDEFMessage(in MAHandle tag);
+
+		/**
+		* \return A handle to the ith NDEF record of an NDEF message,
 		* or a zero handle if the handle given as argument does no
 		* represent an NDEF message.
 		*/
 		MAHandle maNFCGetNDEFRecord(in MAHandle ndef, in int ix);
 
 		/**
-		* Returns the number of NDEF records in an NDEF message,
+		* \return The number of NDEF records in an NDEF message,
 		* or MA_NFC_INVALID_TAG_TYPE if the handle given as argumen
 		* does not represent an NDEF message.
 		*/
@@ -7002,7 +7039,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		* Reads the variable length id of an NDEF record.
-		* Returns NFC_INVALID_TAG_TYPE if the handle given as
+		* \return NFC_INVALID_TAG_TYPE if the handle given as
 		* argument does not represent an NDEF message.
 		*/
 		int maNFCGetId(in MAHandle ndefRecord, out MAAddress dst, in int len);
@@ -7121,20 +7158,50 @@ group CameraFunctions "Camera Functions" {
 			TAG_CONNECTION_LOST = -3;
 
 			/**
-			* An error code if some I/O error occurred,
+			* An error code if trying to perform I/O on an unconnected
+			* tag.
+			*/
+			TAG_NOT_CONNECTED = -4;
+
+			/**
+			* An error code if some general I/O error occurred,
 			* other than the special case of tag connection being lost.
 			*/
-			TAG_IO_ERROR = -4;
+			TAG_IO_ERROR = -127;
 
 		}
 
 		constset int MA_NFC_TAG_TYPE_ {
 
+			/**
+			* Represents an NDEF (NFC Data Exchange Format) tag.
+			*/
 			NDEF = 1;
 
+			/**
+			* Represents a Mifare Classic tag.
+			*/
 			MIFARE_CL = 2;
 
+			/**
+			* Represents a Mifare Ultralight tag.
+			*/
 			MIFARE_UL = 3;
+
+			/**
+			* Represents an NfcA tag (ISO 14443-3A).
+			*/
+			NFC_A = 4;
+
+			/**
+			* Represents an NfcB tag (ISO 14443-3B).
+			*/
+			NFC_B = 5;
+
+			/**
+			* Represents an ISO-DEP tag (ISO 14443-4).
+			*/
+			ISO_DEP = 6;
 
 		}
 

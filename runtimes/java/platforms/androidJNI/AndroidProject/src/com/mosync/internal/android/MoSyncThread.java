@@ -25,7 +25,7 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_INVALID_TAG_TYPE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -98,6 +98,7 @@ import android.widget.FrameLayout;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.nfc.MoSyncNFC;
+import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
@@ -345,11 +346,9 @@ public class MoSyncThread extends Thread
 
 		mMoSyncPIM = new MoSyncPIM(this);
 
-		try {
-			mMoSyncNFC = MoSyncNFC.getDefault();
+		mMoSyncNFC = MoSyncNFCService.getDefault();
+		if (mMoSyncNFC != null) {
 			mMoSyncNFC.setMoSyncThread(this);
-		} catch (java.lang.VerifyError error) {
-			mMoSyncNFC = null;
 		}
 
 		nativeInitRuntime();
@@ -3707,7 +3706,7 @@ public class MoSyncThread extends Thread
 	}
 
 	int maNFCStart() {
-		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCStart();
+		return mMoSyncNFC == null ? MA_NFC_NOT_AVAILABLE : mMoSyncNFC.maNFCStart();
 	}
 
 	void maNFCStop() {
@@ -3750,6 +3749,10 @@ public class MoSyncThread extends Thread
 		}
 	}
 
+	public int maNFCTransceive(int tagHandle, int src, int len, int dst, int dstLen, int dstPtr) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCTransceive(tagHandle, src, len, dst, dstLen, dstPtr);
+	}
+
 	void maNFCConnectTag(int tagHandle) {
 		if (mMoSyncNFC != null) {
 			mMoSyncNFC.maNFCConnectTag(tagHandle);
@@ -3760,6 +3763,10 @@ public class MoSyncThread extends Thread
 		if (mMoSyncNFC != null) {
 			mMoSyncNFC.maNFCCloseTag(tagHandle);
 		}
+	}
+
+	int maNFCReadNDEFMessage(int tagHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadNDEFMessage(tagHandle);
 	}
 
 	int maNFCGetNDEFMessage(int tagHandle) {

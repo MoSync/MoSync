@@ -805,9 +805,29 @@ namespace Base
 
 	MAHandle _maNFCBatchRollback(MAHandle nfcContext, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maNFCTransceive(MAHandle tagHandle, int src, int srcLen, int dst, int dstLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
 	/**
-	* Returns a handle to an NDEF message, or a zero handle
-	* if the tag is not of the correct type.
+	* Reads an NDEF message from the given tag, which must
+	* be of the MA_NFC_TAG_TYPE_NDEF type.
+	* The response will come a an EVENT_TYPE_NFC_TAG_DATA_READ
+	* event  with the handle set to the handle passed into this method
+	* and the result field set to 0 on success and a value < 0 on error.
+	* After receiving the event, clients may call
+	* maNFCGetNDEFMessage() to get the actual message.
+	*
+	*/
+	int _maNFCReadNDEFMessage(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
+
+	/**
+	* Gets the NDEF message from a tag, which must
+	* be of the MA_NFC_TAG_TYPE_NDEF type.
+	* \return The handle to the NDEF message, which
+	* may be subsequently used in NDEF specfic functions,
+	* or the zero handle if the tag has no NDEF message
+	* associated with it (in which case, clients may call
+	* maNFCReadNDEFMessage).
+	*
 	*/
 	MAHandle _maNFCGetNDEFMessage(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 

@@ -1,17 +1,12 @@
 package com.mosync.internal.android.nfc;
 
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_TAG_RECEIVED;
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_BATCH_OP;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_INVALID_TAG_TYPE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_ENABLED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NDEF;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_MIFARE_CL;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_MIFARE_UL;
+import static com.mosync.internal.generated.MAAPI_consts.*;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -76,20 +71,35 @@ public class MoSyncNFC {
 		}
 
 		private final ArrayList<RunnableWithResult<NFCEvent>> operations = new ArrayList<RunnableWithResult<NFCEvent>>();
+		private final HashSet<RunnableWithResult<NFCEvent>> alwaysRun = new HashSet<RunnableWithResult<NFCEvent>>();
 
-		public void addOperation(RunnableWithResult<NFCEvent> op) {
+		/**
+		 * Adds an operation to this batch. Once an error occurs, no
+		 * more operations are performed except if added with
+		 * the {@code doAlwaysRun} flag set to {@code true}. (So
+		 * we may for example add close operations at the end)
+		 * @param op
+		 * @param doAlwaysRun
+		 */
+		public void addOperation(RunnableWithResult<NFCEvent> op, boolean doAlwaysRun) {
 			this.operations.add(op);
+			if (doAlwaysRun) {
+				alwaysRun.add(op);
+			}
 		}
 
 		@Override
 		public NFCEvent run() {
+			NFCEvent errorResult = null;
 			for (RunnableWithResult<NFCEvent> operation : operations) {
-				NFCEvent result = operation.run();
-				if (result.errorCodeOrLength < 0) {
-					return new NFCEvent(EVENT_TYPE_NFC_BATCH_OP, getHandle(), -1, result.handle);
+				if (errorResult == null || alwaysRun.contains(operation)) {
+					NFCEvent result = operation.run();
+					if (result.errorCodeOrLength < 0 && errorResult == null) {
+						errorResult = new NFCEvent(EVENT_TYPE_NFC_BATCH_OP, getHandle(), result.errorCodeOrLength, result.handle);
+					}
 				}
 			}
-			return new NFCEvent(0, handle, 0, 0);
+			return errorResult == null ? new NFCEvent(0, handle, 0, 0) : errorResult;
 		}
 
 	}
@@ -145,7 +155,7 @@ public class MoSyncNFC {
 
 	private NFCTagHandler handler = null;
 	private IOHandler ioHandler = null;
-	private boolean queueIncomingTags;
+	private boolean queueIncomingTags = false;
 	private final int handle;
 	private HashMap<Integer, NFCBatch> currentBatches = null;
 
@@ -169,7 +179,6 @@ public class MoSyncNFC {
 	}
 
 	private void init() {
-		queueIncomingTags = true;
 		ioHandler.start();
 	}
 
@@ -191,6 +200,7 @@ public class MoSyncNFC {
 			return MA_NFC_NOT_ENABLED;
 		}
 
+		queueIncomingTags = true;
 		init();
 		sendEventIfPendingTags();
 
@@ -225,7 +235,7 @@ public class MoSyncNFC {
 
 	public int maNFCIsType(int tagHandle, int type) {
 		// TODO: Supported technologies, how do we list them?
-		if (type < MA_NFC_TAG_TYPE_NDEF || type > MA_NFC_TAG_TYPE_MIFARE_UL) {
+		if (type < MA_NFC_TAG_TYPE_NDEF || type > MA_NFC_TAG_TYPE_ISO_DEP) {
 			return MA_NFC_INVALID_TAG_TYPE;
 		}
 		return maNFCGetTypedTag(ResourcePool.NULL, tagHandle, type) == null ? 0 : 1;
@@ -281,31 +291,46 @@ public class MoSyncNFC {
 		}
 	}
 
-	public ResourcePool getResourcePool() {
-		return pool;
+	public int maNFCTransceive(int tagHandle, int src, int len, int dst, int dstLen, int dstPtr) {
+		IResource tag = getResource(tagHandle);
+		if (tag instanceof INFCTag) {
+			performIO(tagHandle, new TagTransceive((INFCTag) tag, getMemoryAt(src, len), getMemoryAt(dst, dstLen), dstPtr));
+			return SUCCESS;
+		}
+		return MA_NFC_INVALID_TAG_TYPE;
 	}
 
 	public void maNFCConnectTag(int tagHandle) {
 		IResource tag = getResource(tagHandle);
-		if (tag != null && tag instanceof INFCTag) {
+		if (tag instanceof INFCTag) {
 			performIO(tagHandle, new TagConnect((INFCTag) tag));
 		}
 	}
 
 	public void maNFCCloseTag(int tagHandle) {
 		IResource tag = getResource(tagHandle);
-		if (tag != null && tag instanceof INFCTag) {
+		if (tag instanceof INFCTag) {
 			performIO(tagHandle, new TagClose((INFCTag) tag));
 		}
+	}
+
+	public int maNFCReadNDEFMessage(int tagHandle) {
+		IResource tag = getResource(tagHandle);
+		if (tag instanceof INDEFMessageHolder && tag instanceof INFCTag) {
+			performIO(tagHandle, new RequestNDEF(pool, (INFCTag) tag));
+			return SUCCESS;
+		}
+		return MA_NFC_INVALID_TAG_TYPE;
 	}
 
 
 	public int maNFCGetNDEFMessage(int tagHandle) {
 		IResource tag = getResource(tagHandle);
-		if (tag instanceof NDEFMessage) {
-			return tag.getHandle();
+		if (tag instanceof INDEFMessageHolder) {
+			NDEFMessage result = ((INDEFMessageHolder) tag).getNDEFMessage();
+			return result == null ? 0 : result.getHandle();
 		}
-		return NO_HANDLE;
+		return MA_NFC_INVALID_TAG_TYPE;
 	}
 
 	public int maNFCGetNDEFRecord(int ndefHandle, int ix) {
@@ -392,7 +417,7 @@ public class MoSyncNFC {
 		if (mifareTag != null) {
 			final byte[] keyBuffer = new byte[keyLen];
 			getMemoryAt(keySrc, keyLen).get(keyBuffer);
-			performIO(tagHandle, new MFCAuthenticateSectorWithKey(tagHandle, keyType, keyBuffer, mifareTag.getTag(), sectorIndex));
+			performIO(tagHandle, new MFCAuthenticateSectorWithKey(mifareTag, keyType, keyBuffer, sectorIndex));
 			return SUCCESS;
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
@@ -401,7 +426,7 @@ public class MoSyncNFC {
 	public int maNFCGetSectorCount(int tagHandle) {
 		MifareClassicTag mifareTag = getMifareClassicTag(tagHandle);
 		if (mifareTag != null) {
-			return mifareTag.getTag().getSectorCount();
+			return mifareTag.nativeTag().getSectorCount();
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
 	}
@@ -409,7 +434,7 @@ public class MoSyncNFC {
 	public int maNFCGetBlockCountInSector(int tagHandle, int sectorIndex) {
 		MifareClassicTag mifareTag = getMifareClassicTag(tagHandle);
 		if (mifareTag != null) {
-			return mifareTag.getTag().getBlockCountInSector(sectorIndex);
+			return mifareTag.nativeTag().getBlockCountInSector(sectorIndex);
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
 	}
@@ -417,7 +442,7 @@ public class MoSyncNFC {
 	public int maNFCSectorToBlock(int tagHandle, int sectorIndex) {
 		MifareClassicTag mifareTag = getMifareClassicTag(tagHandle);
 		if (mifareTag != null) {
-			return mifareTag.getTag().sectorToBlock(sectorIndex);
+			return mifareTag.nativeTag().sectorToBlock(sectorIndex);
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
 	}
@@ -425,7 +450,7 @@ public class MoSyncNFC {
 	public int maNFCReadBlock(int tagHandle, int block, int dst, int resultSize) {
 		MifareClassicTag mifareTag = getMifareClassicTag(tagHandle);
 		if (mifareTag != null) {
-			performIO(tagHandle, new MFCReadBlocks(tagHandle, mifareTag.getTag(), block, getMemoryAt(dst, resultSize)));
+			performIO(tagHandle, new MFCReadBlocks(mifareTag, block, getMemoryAt(dst, resultSize)));
 			return SUCCESS;
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
@@ -442,7 +467,7 @@ public class MoSyncNFC {
 	public int maNFCReadPages(int tagHandle, int firstPage, int dst, int resultSize) {
 		MifareUltralightTag mifareUTag = getMifareUltralightTag(tagHandle);
 		if (mifareUTag != null) {
-			performIO(tagHandle, new MFUReadPages(tagHandle, mifareUTag.getTag(), firstPage, getMemoryAt(dst, resultSize)));
+			performIO(tagHandle, new MFUReadPages(mifareUTag, firstPage, getMemoryAt(dst, resultSize)));
 			return SUCCESS;
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
@@ -457,10 +482,11 @@ public class MoSyncNFC {
 	}
 
 	public void handleMessages(NdefMessage[] msgs) {
-		for (NdefMessage msg : msgs) {
+		throw new UnsupportedOperationException("Implement later!");
+		/*for (NdefMessage msg : msgs) {
 			NDEFMessage ndefMsg = new NDEFMessage(pool, msg);
 			handleTag(ndefMsg);
-		}
+		}*/
 	}
 
 	public void handleMessages(Tag tag) {
@@ -492,7 +518,8 @@ public class MoSyncNFC {
 	private void performIO(int tagHandle, RunnableWithResult<NFCEvent> runnable) {
 		NFCBatch currentBatch = getBatch(tagHandle);
 		if (currentBatch != null) {
-			currentBatch.addOperation(runnable);
+			boolean doAlwaysRun = runnable instanceof TagClose;
+			currentBatch.addOperation(runnable, doAlwaysRun);
 		} else {
 			ioHandler.queue(runnable);
 		}
@@ -501,4 +528,5 @@ public class MoSyncNFC {
 	private NFCBatch getBatch(int tagHandle) {
 		return currentBatches == null ? null : currentBatches.get(tagHandle);
 	}
+
 }

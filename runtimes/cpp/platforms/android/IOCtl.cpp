@@ -2285,12 +2285,49 @@ namespace Base
 		return 1;
 	}
 
+	int _maNFCTransceive(MAHandle tagHandle, int src, int srcLen, int dst, int dstLen, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		int fixedSrc = src - memStart;
+		int fixedDst = dst - memStart;
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCTransceive",
+												 "(IIIIII)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle, fixedSrc, srcLen, fixedDst, dstLen, dst);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
 	MAHandle _maNFCGetNDEFMessage(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
 												 "maNFCGetNDEFMessage",
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maNFCReadNDEFMessage(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis)  {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCReadNDEFMessage",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
