@@ -223,7 +223,7 @@ public:
 		widgetSetPropertyInt(
 			widgetHandle,
 			MAW_WIDGET_HEIGHT,
-			50);
+			60);
 		maWidgetSetProperty(
 			widgetHandle,
 			MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT,
@@ -462,8 +462,11 @@ public:
 		else if (currentViewIndex == 4)
 		{
 			startCamera();
+			result = setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_OFF);
+			myAssert("MA_CAMERA_FLASH_OFF", result);
 			result = setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO);
 			myAssert("MA_CAMERA_FOCUS_AUTO", result);
+
 			char buffer[256];
 			sprintf(buffer, "Camera with\n  MA_CAMERA_FOCUS_AUTO: %s", getTextForResult(result));
 			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
