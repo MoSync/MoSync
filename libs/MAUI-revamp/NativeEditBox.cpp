@@ -97,6 +97,7 @@ void NativeEditBox::setMaxSize(int size) {
 	}
 	wchar_t *oldString = mString;
 	mString = new wchar_t[size];
+	mString[0] = 0;
 
 	if(oldString)  
 	{
@@ -148,7 +149,6 @@ bool NativeEditBox::pointerReleased(MAPoint2d p, int id) {
 }
 
 void NativeEditBox::activate() {
-	
 #ifdef USE_NEWLIB
 	swprintf(mString, mMaxSize, L"%s", mCaption.c_str());
 #else

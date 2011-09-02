@@ -1059,7 +1059,7 @@ void WRITE_REG(int reg, int value) {
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 		} while(RAW_MEMREF(char, address++) != 0);
 #ifdef MEMORY_PROTECTION	
-		checkProtection(address, address-a);
+		checkProtection(a, address-a);
 #endif
 		return ((char*)mem_ds) + a;
 	}
@@ -1073,7 +1073,7 @@ void WRITE_REG(int reg, int value) {
 				BIG_PHAT_ERROR(ERR_MEMORY_OOB);
 		} while(RAW_MEMREF(wchar, address) != 0);
 #ifdef MEMORY_PROTECTION	
-		checkProtection(address, address-a);
+		checkProtection(a, address-a);
 #endif
 		return (wchar*)(((char*)mem_ds) + a);
 	}
