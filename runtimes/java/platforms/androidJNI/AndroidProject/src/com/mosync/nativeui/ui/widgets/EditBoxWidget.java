@@ -81,6 +81,10 @@ public class EditBoxWidget extends LabelWidget
 				return KeyboardManager.hideKeyboardFor( getView( ) );
 			}
 		}
+		else if( property.equals( IX_WIDGET.MAW_EDIT_BOX_TEXT ) )
+		{
+			editTextView.setText( value );
+		}
 		else
 		{
 			return false;
@@ -88,5 +92,33 @@ public class EditBoxWidget extends LabelWidget
 		
 		return true;
 
+	}
+
+	/**
+	 * @see Widget.getProperty.
+	 */
+	@Override
+	public String getProperty(String property)
+	{
+		EditText editTextView = (EditText) getView( );
+		if( property.equals( IX_WIDGET.MAW_EDIT_BOX_TEXT ) )
+		{
+			if ( editTextView.getText() != null && editTextView.getText().length() > 0 )
+			{
+				return editTextView.getText().toString( );
+			}
+			else if ( editTextView.getHint() != null && editTextView.getHint().length() > 0 )
+			{
+				return editTextView.getHint().toString( );
+			}
+			else
+			{
+				return "";
+			}
+		}
+		else
+		{
+			return super.getProperty( property );
+		}
 	}
 }

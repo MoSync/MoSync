@@ -22,7 +22,6 @@ MA 02110-1301, USA.
  *
  * This file contains the search engine for the application.
  * Check the http://en.wikipedia.org/w/api.php link for more request types.
- *
  */
 
 // The header file of the engine.

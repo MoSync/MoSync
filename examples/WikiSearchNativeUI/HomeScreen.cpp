@@ -26,7 +26,6 @@ MA 02110-1301, USA.
  * a progress bar and a slider control.
  * After the user presses Search button, next screen with the
  * available article titles is displayed.
- *
  */
 
 // Include library for string conversions.
@@ -523,7 +522,8 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 			// Uncheck all.
 			for (int i=1; i < mCategoryBoxes.size(); i++)
 			{
-				maWidgetSetProperty(mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "false");
+				maWidgetSetProperty(
+					mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "false");
 			}
 		}
 	}

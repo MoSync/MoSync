@@ -110,6 +110,8 @@ void NativeEditBox::setMaxSize(int size) {
 }
 
 bool NativeEditBox::keyPressed(int keyCode, int nativeCode) {
+	if(!mEnabled)
+		return false;
 	if(keyCode == MAK_FIRE) {
 		activate();
 		return true;
@@ -118,12 +120,16 @@ bool NativeEditBox::keyPressed(int keyCode, int nativeCode) {
 }
 
 bool NativeEditBox::pointerPressed(MAPoint2d p, int id) {
+	if(!mEnabled)
+		return false;
 	mStartX = p.x;
 	mStartY = p.y;
 	return true;
 }
 
 bool NativeEditBox::pointerMoved(MAPoint2d p, int id) {
+	if(!mEnabled)
+		return false;
 	p.x-=mStartX;
 	p.y-=mStartY;
 	if((abs(p.x)<7) && (abs(p.y)<7)) {
@@ -135,6 +141,8 @@ bool NativeEditBox::pointerMoved(MAPoint2d p, int id) {
 }
 
 bool NativeEditBox::pointerReleased(MAPoint2d p, int id) {
+	if(!mEnabled)
+		return false;
 	activate();
 	return false;
 }

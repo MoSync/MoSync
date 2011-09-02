@@ -15,7 +15,7 @@ mod.class_eval do
 
 	def setup_base
 		@SOURCES = ["."]
-		@IGNORED_HEADERS = ["WidgetUtil.h"]
+		#@IGNORED_HEADERS = ["WidgetUtil.h"]
 		@INSTALL_INCDIR = "NativeUI"
 		@NAME = "nativeui"
 	end

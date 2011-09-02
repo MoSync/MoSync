@@ -256,6 +256,18 @@ namespace NativeUI
         virtual void setSize(const int width, const int height);
 
         /**
+         * Get the width of the widget.
+         * @return The width value.
+         */
+        virtual int getWidth();
+
+        /**
+         * Get the height of the widget.
+         * @return The height value.
+         */
+        virtual int getHeight();
+
+        /**
          * Set the width of the widget.
          * @param width The width value.
          */

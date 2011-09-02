@@ -741,11 +741,20 @@ int CAppView::GetKeys() {
 	return iKeys;
 }
 
+class CMyAknTextQueryDialog : public CAknTextQueryDialog {
+public:
+	CMyAknTextQueryDialog(TDes& outText) : CAknTextQueryDialog(outText) {}
+	// Inherited from CAknQueryDialog.
+	virtual void UpdateLeftSoftKeyL() {
+		MakeLeftSoftkeyVisible(ETrue); // Even if there is no text, shows the LSK.
+	}
+};
+
 int CAppView::TextBox(const TDesC& title, const TDesC& inText, TDes& outText, int constraints) {
 	if(iEngine->IsDrawing())
 		iEngine->StopDrawing();
 	outText.Copy(inText);
-	CAknTextQueryDialog* dlg = new (ELeave) CAknTextQueryDialog(outText);
+	CAknTextQueryDialog* dlg = new (ELeave) CMyAknTextQueryDialog(outText);
 	CleanupStack::PushL(dlg);
 	dlg->SetPromptL(title);
 	dlg->SetPredictiveTextInputPermitted(true);
