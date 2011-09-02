@@ -245,16 +245,6 @@ public:
 		maWidgetAddChild(mSecondLayoutWidget, mSettingsButton);
 		maWidgetAddChild(mSecondLayoutWidget, mZoomOutButton);
 
-		//Disable zoom buttons if zoom is not supported
-		if(maxZoom == 0)
-		{
-			maWidgetSetProperty(mZoomInButton,
-					MAW_WIDGET_ENABLED,
-					"false");
-			maWidgetSetProperty(mZoomOutButton,
-					MAW_WIDGET_ENABLED,
-					"false");
-		}
 
 		// Then we add the layout to its parent
 		maWidgetAddChild(mMainLayoutWidget, mSecondLayoutWidget);
@@ -312,7 +302,6 @@ public:
 		maCameraStart();
 		createSettingsScreen();
 		createImageScreen();
-
 	}
 
 	/**
@@ -321,6 +310,9 @@ public:
 	 */
 	void setupCameraProperties()
 	{
+		setupCameraSize();
+		char buffer2[256];
+		int length = maWidgetGetProperty(mCameraPreview, MAW_WIDGET_HEIGHT,buffer2, 256);
 		maCameraSelect(mSettingsString->getCurrentCamera());
 		maCameraSetPreview(mCameraPreview);
 		maCameraSetProperty(
@@ -328,9 +320,20 @@ public:
 				mSettingsString->getFLashMode()
 				);
 		char buffer[256];
-		int length = maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
+		length = maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
-		setupCameraSize();
+
+		//Disable zoom buttons if zoom is not supported
+		if(maxZoom == 0)
+		{
+			maWidgetSetProperty(mZoomInButton,
+					MAW_WIDGET_ENABLED,
+					"false");
+			maWidgetSetProperty(mZoomOutButton,
+					MAW_WIDGET_ENABLED,
+					"false");
+		}
+
 	}
 
 
@@ -450,6 +453,11 @@ public:
 	 */
 	void showImageButtonClicked()
 	{
+		if(mLastEnc == 0)
+		{
+			//do nothing when there is no image
+			return;
+		}
 		maCameraStop();
 		mImageScreen->setImageDataHandle(mLastEnc);
 		mImageScreen->pushImageScreen();
