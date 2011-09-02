@@ -104,8 +104,16 @@
 		return MA_PIM_ERR_INVALID_INDEX;
 	}
 
-	return [[mFieldValuesArray objectAtIndex:index] setLabel:customLabel];
+    // Check if the attribute is set to custom.
+    PimUtils* utils = [PimUtils sharedInstance];
+    int customAttribute = [utils getCustomAttributeForFieldID:mFieldConstant];
+    int valuesAttribute = [[mFieldValuesArray objectAtIndex:index] getAttribute];
+    if (customAttribute != valuesAttribute)
+    {
+        return MA_PIM_ERR_NO_LABEL;
+    }
 
+	return [[mFieldValuesArray objectAtIndex:index] setLabel:customLabel];
 }
 
 /**
@@ -123,8 +131,15 @@
 		return MA_PIM_ERR_INVALID_INDEX;
 	}
 
+    PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
+
+    // Check if the field supports attributes.
+    if (MA_PIM_ERR_NO_ATTRIBUTES == [itemValue getAttribute])
+    {
+        return MA_PIM_ERR_NO_LABEL;
+    }
+
 	// Check if the attribute is set to MA_PIM_ATTR_CUSTOM.
-	PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
     NSString* label = [itemValue getLabel];
 	int attribute = [self getAttributeFromLabel:label];
 	if (NO_ATTRIBUTE != attribute)
@@ -165,13 +180,35 @@
   withAttribute:(int) attribute
 {
 	int fieldValuesCount = [mFieldValuesArray count];
+    PimUtils* utils = [PimUtils sharedInstance];
+
 	if (0 > index || index >= fieldValuesCount)
     {
 		return MA_PIM_ERR_INVALID_INDEX;
 	}
 
+    // Check if field supports attributes.
+    bool setAttribute = false;
+    if ([utils fieldSupportsAttribute:mFieldConstant])
+    {
+        // Check if the attribute is allowed.
+        bool attributeAllowed = [self isAttributeValid:attribute];
+        if (!attributeAllowed)
+        {
+            return MA_PIM_ERR_COMBO_UNSUPPORTED;
+        }
+        else
+        {
+            setAttribute = true;
+        }
+    }
+
 	PimFieldItemValue* fieldValue = [mFieldValuesArray objectAtIndex:index];
 	[fieldValue setValue:value];
+    if (setAttribute)
+    {
+        [fieldValue setAttribute:attribute];
+    }
 
 	return MA_PIM_ERR_NONE;
 }
@@ -217,11 +254,10 @@
                 [mFieldValuesArray addObject:fieldValue];
                 returnValue = [mFieldValuesArray count] - 1;
             }
-
         }
         else
         {
-            // Field does not support attributes.
+            // Field does not support attributes, ignore the attribute.
             PimFieldItemValue* fieldValue = [[PimFieldItemValue alloc] init];
             [fieldValue setValue:value];
             [mFieldValuesArray addObject:fieldValue];

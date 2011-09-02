@@ -495,15 +495,17 @@ static PimUtils *sharedInstance = nil;
  * @param fieldId The given field ID(one of MA_PIM_FIELD_CONTACT constants).
  * @param type Will contain the field type (one of MA_PIM_TYPE constants).
  * @param singleValue Will be set to true if the field can contain only one value.
- * @return MA_PIM_ERR_NONE if the field is supported, or
- *         MA_PIM_ERR_FIELD_UNSUPPORTED in case the field is not supported.
+ * @return One of the next values:
+ * - MA_PIM_ERR_NONE if the field is supported and valid
+ * - MA_PIM_ERR_INVALID_FIELD if the field is invalid.
+ * - MA_PIM_ERR_FIELD_UNSUPPORTED in case the field is not supported.
  */
 -(int) fieldStructure:(const int) fieldID
               setType:(int*) type
      setIsSingleValue:(bool*) singleValue
 {
     int returnValue = MA_PIM_ERR_NONE;
-    *type = MA_PIM_ERR_FIELD_UNSUPPORTED;
+    *type = MA_PIM_ERR_INVALID_FIELD;
     *singleValue = true;
 
     switch (fieldID)
@@ -547,6 +549,12 @@ static PimUtils *sharedInstance = nil;
         case MA_PIM_FIELD_CONTACT_PHOTO_URL:
             *type = MA_PIM_TYPE_STRING;
             break;
+        case MA_PIM_FIELD_CONTACT_PUBLIC_KEY:
+            returnValue = MA_PIM_ERR_FIELD_UNSUPPORTED;
+            break;
+        case MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING:
+            returnValue = MA_PIM_ERR_FIELD_UNSUPPORTED;
+            break;
         case MA_PIM_FIELD_CONTACT_REVISION:
             *type = MA_PIM_TYPE_DATE;
             break;
@@ -573,7 +581,7 @@ static PimUtils *sharedInstance = nil;
             *singleValue = false;
             break;
         default:
-            returnValue = MA_PIM_ERR_FIELD_UNSUPPORTED;
+            returnValue = MA_PIM_ERR_INVALID_FIELD;
     }
 
     return returnValue;

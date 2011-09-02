@@ -152,10 +152,13 @@
 {
 	if (list == MA_PIM_CONTACTS)
 	{
-		return [mContactsList createItem];
+        if (mContactsList)
+        {
+            return [mContactsList createItem];
+        }
 	}
 
-	return MA_PIM_ERR_UNAVAILABLE_LIST;
+	return MA_PIM_ERR_INVALID_HANDLE;
 }
 
 /**
@@ -169,10 +172,13 @@
 {
 	if (list == MA_PIM_CONTACTS)
 	{
-		return [mContactsList removeItem:item];
+        if (mContactsList)
+        {
+            return [mContactsList removeItem:item];
+        }
 	}
 
-	return MA_PIM_ERR_UNAVAILABLE_LIST;
+	return MA_PIM_ERR_INVALID_HANDLE;
 }
 
 /**

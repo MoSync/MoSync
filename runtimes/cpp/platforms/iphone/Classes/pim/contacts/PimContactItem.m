@@ -143,6 +143,32 @@
 }
 
 /**
+ * Sets a custom label for a given field value.
+ * Checks if field is valid and supported.
+ * @param args Common arguments.
+ *             The item's handle is stored in args.item.
+ *             The field's ID is stored in args.field.
+ *             The custom label's value is stored in args.buf.
+ *             The size of the value(in bytes) is stored in args.bufSize.
+ * @param index Field's value index.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) setLabel:(const MA_PIM_ARGS*) args
+     indexValue:(const int) index
+{
+    if (![self isFieldSupported:args->field])
+    {
+        return MA_PIM_ERR_FIELD_UNSUPPORTED;
+    }
+    if (![self isFieldValid:args->field])
+    {
+        return MA_PIM_ERR_INVALID_FIELD;
+    }
+
+    return [super setLabel:args indexValue:index];
+}
+
+/**
  * Gets a custom label for a given field value.
  * Checks if field is valid and supported.
  * @param args Common arguments.
@@ -193,9 +219,13 @@
     {
         return MA_PIM_ERR_FIELD_UNSUPPORTED;
     }
+    if (![self isFieldValid:args->field])
+    {
+        return MA_PIM_ERR_INVALID_FIELD;
+    }
     if ([self isFieldWriteOnly:fieldID])
     {
-        return MA_PIM_ERR_READ_ONLY;
+        return MA_PIM_ERR_WRITE_ONLY;
     }
 
     NSString* key = [[NSString alloc] initWithFormat:@"%d", fieldID];
@@ -229,6 +259,10 @@
     {
         return MA_PIM_ERR_FIELD_UNSUPPORTED;
     }
+    if (![self isFieldValid:args->field])
+    {
+        return MA_PIM_ERR_INVALID_FIELD;
+    }
     if ([self isFieldReadOnly:fieldID])
     {
         return MA_PIM_ERR_READ_ONLY;
@@ -258,12 +292,38 @@
     {
         return MA_PIM_ERR_FIELD_UNSUPPORTED;
     }
+    if (![self isFieldValid:args->field])
+    {
+        return MA_PIM_ERR_INVALID_FIELD;
+    }
     if ([self isFieldReadOnly:fieldID])
     {
         return MA_PIM_ERR_READ_ONLY;
     }
 
     return [super setValue:args indexValue:index valueAttribute:atttribute];
+}
+
+/**
+ * Removes a value from a field.
+ * Checks if the field is valid or supported.
+ * @param field One of the MA_PIM_FIELD constants.
+ * @param index Field's value index.
+ * @return One of MA_PIM_ERR constants.
+ */
+-(int) removeValue:(const int) field
+           atIndex:(const int) index
+{
+    if (![self isFieldSupported:field])
+    {
+        return MA_PIM_ERR_FIELD_UNSUPPORTED;
+    }
+    if (![self isFieldValid:field])
+    {
+        return MA_PIM_ERR_INVALID_FIELD;
+    }
+
+    return [super removeValue:field atIndex:index];
 }
 
 /**

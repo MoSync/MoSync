@@ -120,6 +120,7 @@
 
 /**
  * Sets a custom label for a given field value.
+ * Does not check if field is supported or valid.
  * @param args Common arguments.
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
@@ -147,7 +148,7 @@
 
     if (nil == itemField)
     {
-        returnValue = MA_PIM_ERR_INVALID_INDEX;
+        returnValue = MA_PIM_ERR_EMPTY_FIELD;
     }
     else
     {
@@ -303,7 +304,7 @@
 
     if(nil == itemField)
     {
-        return MA_PIM_ERR_INVALID_INDEX;
+        return MA_PIM_ERR_EMPTY_FIELD;
     }
 
     // Check if there is a value at the given index.
@@ -414,6 +415,7 @@
 
 /**
  * Removes a value from a field.
+ * Does not check if the field is valid or supported.
  * @param field One of the MA_PIM_FIELD constants.
  * @param index Field's value index.
  * @return One of MA_PIM_ERR constants.
@@ -428,7 +430,7 @@
 
     if (nil == itemField)
     {
-        returnValue = MA_PIM_ERR_INVALID_INDEX;
+        returnValue = MA_PIM_ERR_EMPTY_FIELD;
     } else
     {
         returnValue = [itemField removeValue:index];

@@ -138,11 +138,24 @@ int Syscall::maPimFieldType(MAHandle list, int field)
 {
     bool singleFieldValue;
     int fieldType;
-    [[PimUtils sharedInstance] fieldStructure:field
-                                      setType:&fieldType
-                             setIsSingleValue:&singleFieldValue];
+    int resultCode;
 
-    return fieldType;
+    // Check if the list handle is valid.
+    if (MA_PIM_CONTACTS != list)
+    {
+        return MA_PIM_ERR_INVALID_HANDLE;
+    }
+
+    resultCode = [[PimUtils sharedInstance] fieldStructure:field
+                                                       setType:&fieldType
+                                              setIsSingleValue:&singleFieldValue];
+    // Check for errors.
+    if (MA_PIM_ERR_NONE == resultCode)
+    {
+        return fieldType;
+    }
+
+    return resultCode;
 }
 
 int Syscall::maPimItemGetValue(const MA_PIM_ARGS *args, int index)
@@ -218,33 +231,3 @@ int Syscall::maPimItemRemove(MAHandle list, MAHandle item)
 {
     return [sPimDatabase removeItem:list item:item];
 }
-
-//void* PimGetValidatedMemRange(const int address,const int size)
-//{
-//    return gSyscall->GetValidatedMemRange(address, size);
-//}
-//
-//void PimMaReadData(MAHandle data, void *dst, int offset, int size)
-//{
-//    maReadData(data, dst, offset, size);
-//}
-//
-//int PimMaGetDataSize(MAHandle data)
-//{
-//    return maGetDataSize(data);
-//}
-//
-//int PimMaCreatePlaceHolder()
-//{
-//    return maCreatePlaceholder();
-//}
-//
-//int PimMaCreateData(MAHandle placeholder, int size)
-//{
-//    return maCreateData(placeholder, size);
-//}
-//
-//void PimMaWriteData(MAHandle data, const void* src, int offset, int size)
-//{
-//    maWriteData(data, src, offset, size);
-//}
