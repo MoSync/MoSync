@@ -3380,8 +3380,6 @@ interface MAAPI {
 		* so that maPimItemClose() is the only function you can safely use on them.
 		* \param list List handle provided by maPimListOpen(int listType).
 		* \returns     #MA_PIM_ERR_NONE on success.
-		*			   #MA_PIM_ERR_LIST_NOT_OPENED if the list is not opened.
-		*              #MA_PIM_ERR_UNAVAILABLE_LIST if the list is unavailable.
 		*			   #MA_PIM_ERR_INVALID_HANDLE if the list handle is invalid.
 		* \note This does not close the list's items, but it does invalidate them,
 		*/
@@ -3444,6 +3442,7 @@ interface MAAPI {
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
 		* \returns     #MA_PIM_ERR_NONE on success.
+		*              #MA_PIM_ERR_INVALID_HANDLE if the item is not opened.
 		*              #MA_PIM_ERR_INVALID_FIELD if the field is invalid.
 		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
 		*			   #MA_PIM_ERR_EMPTY_FIELD if the given field doesn't have values.
@@ -3511,7 +3510,6 @@ interface MAAPI {
 		*              #MA_PIM_ERR_INVALID_HANDLE if the list handle is invalid.
 		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
 		*			   #MA_PIM_ERR_INVALID_FIELD if the field is invalid.
-		*			   #MA_PIM_ERR_COMBO_UNSUPPORTED if the field/attribute combination is not supported.
 		*              #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
 		*			   #MA_PIM_ERR_WRITE_ONLY if the field is write-only.
 		*              #MA_PIM_ERR_INVALID_BUFFER if the buffer is not correct.
