@@ -1,24 +1,22 @@
-/*
-Copyright (C) 2011 MoSync AB
+/* Copyright (C) 2011 Mobile Sorcery AB
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License, version 2, as published by
+ the Free Software Foundation.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program; see the file COPYING.  If not, write to the Free
+ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+ 02111-1307, USA.
+ */
 
 /**
  * @file PIMContact.cpp
- * @author Bogdan Iusco
  *
  * PIMContact class shows how to:
  * - read, modify and delete field values.
@@ -58,73 +56,6 @@ PIMContact::PIMContact(MAHandle pimItemHandle)
 PIMContact::~PIMContact()
 {
     delete[] mBuffer;
-}
-
-/**
- * Print all contact's field values.
- */
-void PIMContact::printContact()
-{
-    printf(sFieldSeparator);
-
-    printContactName();
-    waitForClick();
-
-    printAddress();
-    waitForClick();
-
-    printBirthday();
-    waitForClick();
-
-    printEmail();
-    waitForClick();
-
-    printFormattedAddress();
-    waitForClick();
-
-    printNickname();
-    waitForClick();
-
-    printNote();
-    waitForClick();
-
-    printOrg();
-    waitForClick();
-
-    printPhoto();
-    waitForClick();
-
-    printPublicKey();
-    waitForClick();
-
-    printPublicKeyString();
-    waitForClick();
-
-    printRevision();
-    waitForClick();
-
-    printPhone();
-    waitForClick();
-
-    printTitle();
-    waitForClick();
-
-    printUID();
-    waitForClick();
-
-    printURL();
-    waitForClick();
-
-    printIM();
-    waitForClick();
-
-    printRelation();
-    waitForClick();
-
-    printOrgInfo();
-    waitForClick();
-
-    printf("===============================================");
 }
 
 /**
@@ -195,10 +126,7 @@ void PIMContact::modifyAddressField()
     {
         MAUtil::String addressValueIndex = getAddressIndexString(i);
         const wchar* addressValue = sAddressModified[i];
-        if (*addressValue != 0)
-        {
-            printf("%s %S", addressValueIndex.c_str(), addressValue);
-        }
+        printf("%s %S", addressValueIndex.c_str(), addressValue);
     }
     printf("\n");
 
@@ -220,7 +148,7 @@ void PIMContact::modifyAddressField()
     mArgs.bufSize = copyWCharArray(mArgs.buf, sAddressLabel);
 
     // Set label value for address field at position 0.
-    /*checkResultCode(*/maPimItemSetLabel(&mArgs, 0)/*)*/;
+    checkResultCode(maPimItemSetLabel(&mArgs, 0));
     waitForClick();
 }
 
@@ -248,469 +176,6 @@ MAHandle PIMContact::getHandle() const
 }
 
 /**
- * Wait for a pointer released event.
- */
-void PIMContact::waitForClick()
-{
-    printf("\nTap the screen to continue......\n");
-    printf(sFieldSeparator);
-    MAEvent event;
-
-    while (true)
-    {
-        // Wait for a event.
-        maWait(-1);
-
-        // Get the event.
-        maGetEvent(&event);
-
-        // Check if the event is pointer released.
-        if (EVENT_TYPE_POINTER_RELEASED == event.type)
-        {
-            break;
-        }
-    }
-}
-
-/**
- * Print the attribute for a given index field value.
- * If the attribute is custom will print the label also.
- * @param field One of the MA_PIM_FIELD constants.
- * @param index The field's value index.
- * Must be >= 0 and < maPimItemFieldCount().
- * @param pointerToFunc A pointer to a function that returns the string
- * associated with the attribute.
- */
-void PIMContact::printAttribute(const int field, const int index,
-    MAUtil::String(*pointerToFunc)(const int))
-{
-    // Get the attribute.
-    int attribute = maPimItemGetAttributes(mItemHandle, field, index);
-    MAUtil::String attributeString = "";
-
-    // Check if the attribute contains a primary value combined with an
-    // attribute.
-    if (attribute >> 16)
-    {
-        attributeString = "primary ";
-
-        // Remove primary value from attribute.
-        attribute = (attribute & 0xFFFF);
-    }
-
-    // Print the string associated with the attribute.
-    attributeString += pointerToFunc(attribute);
-    printf("Attribute: %s", attributeString.c_str());
-
-    // Check if the attribute is custom.
-    MAUtil::String customAttributeValue = sCustomAttributeValue;
-    if (customAttributeValue == attributeString)
-    {
-        // Custom attribute. Get label value.
-        MA_PIM_ARGS labelArgs;
-        labelArgs.item = mItemHandle;
-        labelArgs.field = field;
-
-        char buf[BUF_SIZE];
-        labelArgs.buf = buf;
-        labelArgs.bufSize = BUF_SIZE;
-        int resultCode = maPimItemGetLabel(&labelArgs, index);
-        checkResultCode(resultCode);
-        printf("Label: %S", (wchar*) buf);
-    }
-}
-
-/**
- * Print the contact name field value.
- */
-void PIMContact::printContactName()
-{
-    printf("Contact name field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_NAME;
-
-    // Get value from name field at position 0.
-    checkResultCode(maPimItemGetValue(&mArgs, 0));
-
-    // Print data on the screen.
-    for (int i = 0; i < COUNT_NAME_INDICES; i++)
-    {
-        MAUtil::String contactNameType = getContactNameIndexString(i);
-        const wchar* contactNameValue = getWCharArrayFromBuf(mArgs.buf, i);
-        if (*contactNameValue != 0)
-        {
-            printf("%s %S", contactNameType.c_str(), contactNameValue);
-        }
-    }
-}
-
-/**
- * Print the address field values.
- */
-void PIMContact::printAddress()
-{
-    printf("Address field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_ADDR;
-
-    // Get the number of values.
-    int countValues = maPimItemFieldCount(
-        mItemHandle,
-        MA_PIM_FIELD_CONTACT_ADDR);
-    checkResultCode(countValues);
-
-    for (int i = 0; i < countValues; i++)
-    {
-        // Get the value at position i.
-        checkResultCode(maPimItemGetValue(&mArgs, i));
-
-        // Print the attribute for this value.
-        printAttribute(MA_PIM_FIELD_CONTACT_ADDR, i, getAddressAttributeString);
-
-        // Print data on the screen.
-        for (int j = 0; j < COUNT_ADDRESS_INDICES; j++)
-        {
-            MAUtil::String addressValueIndex = getAddressIndexString(j);
-            const wchar* addressValue = getWCharArrayFromBuf(mArgs.buf, j);
-            if (*addressValue != 0)
-            {
-                printf("%s %S", addressValueIndex.c_str(), addressValue);
-            }
-        }
-
-        printf("\n");
-    }
-}
-
-/**
- * Print birthday field value.
- */
-void PIMContact::printBirthday()
-{
-    printf("Birthday field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_BIRTHDAY;
-
-    // Get value from birthday field at position 0.
-    checkResultCode(maPimItemGetValue(&mArgs, 0));
-
-    // Print value on screen(the value it's in milliseconds - UNIX time).
-    int birthday = *(int*) mArgs.buf;
-    printf("Birthday: %d (in milliseconds)", birthday);
-}
-
-/**
- * Print email field values.
- */
-void PIMContact::printEmail()
-{
-    printf("Email field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_EMAIL;
-
-    // Get the number of value.
-    int countValues = maPimItemFieldCount(mItemHandle,
-        MA_PIM_FIELD_CONTACT_EMAIL);
-    checkResultCode(countValues);
-
-    for (int i = 0; i < countValues; i++)
-    {
-        // Get the value from email field at position i.
-        checkResultCode(maPimItemGetValue(&mArgs, i));
-
-        // Print the value's attribute.
-        printAttribute(MA_PIM_FIELD_CONTACT_EMAIL, i, getEmailAttributeString);
-
-        // Print email value on the screen.
-        printf("Email: %S \n\n", (wchar*) mArgs.buf);
-    }
-}
-
-/**
- * Print formatted address field value.
- */
-void PIMContact::printFormattedAddress()
-{
-    printf("Formatted address field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_FORMATTED_ADDR;
-
-    // Get the value from formatted address at position 0.
-    checkResultCode(maPimItemGetValue(&mArgs, 0));
-    printf("Formatted address: %S", (wchar*) mArgs.buf);
-}
-
-/**
- * Print nickname field value.
- */
-void PIMContact::printNickname()
-{
-    printf("Nickname field:");
-    mArgs.field = MA_PIM_FIELD_CONTACT_NICKNAME;
-
-    // Get value from nickname field at position 0.
-    checkResultCode(maPimItemGetValue(&mArgs, 0));
-    printf("Nickname: %S", (wchar*) mArgs.buf);
-}
-
-/**
- * Print note field value.
- */
-void PIMContact::printNote()
-{
-    printf("Note field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_NOTE;
-
-    // Get value from note field at position 0.
-    checkResultCode(maPimItemGetValue(&mArgs, 0));
-    printf("Note: %S", (wchar*) mArgs.buf);
-}
-
-/**
- * Print organization field value.
- */
-void PIMContact::printOrg()
-{
-    printf("Organization field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_ORG;
-
-    // Get the number of values.
-    int countValues =
-        maPimItemFieldCount(mItemHandle, MA_PIM_FIELD_CONTACT_ORG);
-    checkResultCode(countValues);
-
-    for (int i = 0; i < countValues; i++)
-    {
-        // Get value form org field at position i.
-        checkResultCode(maPimItemGetValue(&mArgs, i));
-        printf("Organization: %S \n\n", (wchar*) mArgs.buf);
-    }
-}
-
-/**
- * Print photo field value.
- */
-void PIMContact::printPhoto()
-{
-    printf("Photo field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_PHOTO;
-
-    // Get value from photo field at position 0.
-    // A data handle to the image will be returned.
-    checkResultCode(maPimItemGetValue(&mArgs, 0));
-
-    int handle = *(int*) mArgs.buf;
-    printf("Photo data handle: %d", handle);
-}
-
-/**
- * Print key field value.
- */
-void PIMContact::printPublicKey()
-{
-    printf("Public key field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_PUBLIC_KEY;
-    checkResultCode(maPimItemGetValue(&mArgs, 0));
-}
-
-/**
- * Print public key field value.
- */
-void PIMContact::printPublicKeyString()
-{
-    printf("Public key string field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING;
-    checkResultCode(maPimItemGetValue(&mArgs, 0));
-    printf("Public key string: %S", (wchar*) mArgs.buf);
-}
-
-/**
- * Print revision field value.
- */
-void PIMContact::printRevision()
-{
-    printf("Revision field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_REVISION;
-
-    // Get value from revision field at position 0;
-    // Returned value is a date in milliseconds(UNIX time).
-    checkResultCode(maPimItemGetValue(&mArgs, 0));
-
-    // Print date on the screen.
-    int revisionDate = *(int*) mArgs.buf;
-    printf("Revision date: %d (in milliseconds)", revisionDate);
-}
-
-/**
- * Print phone field values.
- */
-void PIMContact::printPhone()
-{
-    printf("Phone field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_TEL;
-
-    // Get the number of values.
-    int countValues =
-        maPimItemFieldCount(mItemHandle, MA_PIM_FIELD_CONTACT_TEL);
-    checkResultCode(countValues);
-
-    for (int i = 0; i < countValues; i++)
-    {
-        // Get value from tel field at position i.
-        checkResultCode(maPimItemGetValue(&mArgs, i));
-
-        // Print value's attribute.
-        printAttribute(MA_PIM_FIELD_CONTACT_TEL, i, getPhoneAttributeString);
-
-        printf("Phone: %S\n\n", (wchar*) mArgs.buf);
-    }
-}
-
-/**
- * Print title field value.
- */
-void PIMContact::printTitle()
-{
-    printf("Title field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_TITLE;
-
-    int countValues = maPimItemFieldCount(mItemHandle,
-        MA_PIM_FIELD_CONTACT_TITLE);
-    checkResultCode(countValues);
-
-    for (int i = 0; i < countValues; i++)
-    {
-        checkResultCode(maPimItemGetValue(&mArgs, i));
-        printAttribute(MA_PIM_FIELD_CONTACT_TITLE, i, getTitleAttributeString);
-        printf("Title: %S \n \n", (wchar*) mArgs.buf);
-    }
-}
-
-/**
- * Print UID field value.
- */
-void PIMContact::printUID()
-{
-    printf("UID field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_UID;
-    checkResultCode(maPimItemGetValue(&mArgs, 0));
-    printf("UID: %S", (wchar*) mArgs.buf);
-}
-
-/**
- * Print URL field values.
- */
-void PIMContact::printURL()
-{
-    printf("URL field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_URL;
-
-    // Get the number of values.
-    int countValues =
-        maPimItemFieldCount(mItemHandle, MA_PIM_FIELD_CONTACT_URL);
-    checkResultCode(countValues);
-
-    for (int i = 0; i < countValues; i++)
-    {
-        // Get the value from URL field at position 0.
-        checkResultCode(maPimItemGetValue(&mArgs, i));
-
-        // Print value's attribute.
-        printAttribute(MA_PIM_FIELD_CONTACT_URL, i, getWebsiteAttributeString);
-
-        // Print value on the screen.
-        printf("URL: %S\n\n", (wchar*) mArgs.buf);
-    }
-}
-
-/**
- * Print instant message field values.
- */
-void PIMContact::printIM()
-{
-    printf("Instant message field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_IM;
-
-    // Get the number of values.
-    int countValues = maPimItemFieldCount(mItemHandle, MA_PIM_FIELD_CONTACT_IM);
-    checkResultCode(countValues);
-
-    for (int i = 0; i < countValues; i++)
-    {
-        // Get value from im field at position i.
-        checkResultCode(maPimItemGetValue(&mArgs, i));
-
-        // Print value's attribute.
-        printAttribute(MA_PIM_FIELD_CONTACT_IM, i, getIMAttributeString);
-
-        // Print value on the screen.
-        const wchar* protocolValue = getWCharArrayFromBuf(
-            mArgs.buf,
-            MA_PIM_CONTACT_IM_PROTOCOL);
-        const wchar* usernameValue = getWCharArrayFromBuf(
-            mArgs.buf,
-            MA_PIM_CONTACT_IM_USERNAME);
-        printf("Username: %S \nProtocol: %S \n\n",
-            usernameValue,
-            protocolValue);
-    }
-}
-
-void PIMContact::printRelation()
-{
-    printf("Relation field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_RELATION;
-
-    // Get the number of values.
-    int countValues = maPimItemFieldCount(mItemHandle,
-        MA_PIM_FIELD_CONTACT_RELATION);
-    checkResultCode(countValues);
-
-    for (int i = 0; i < countValues; i++)
-    {
-        // Get value from relation field at position i.
-        checkResultCode(maPimItemGetValue(&mArgs, i));
-
-        // Print value's attribute.
-        printAttribute(MA_PIM_FIELD_CONTACT_RELATION, i,
-            getRelationAttributeString);
-
-        // Print value on the screen.
-        printf("Relation: %S\n\n", (wchar*) mArgs.buf);
-    }
-}
-
-/**
- * Print organization info field value.
- */
-void PIMContact::printOrgInfo()
-{
-    printf("Organization info field:\n\n");
-    mArgs.field = MA_PIM_FIELD_CONTACT_ORG_INFO;
-
-    // Get the number of values.
-    int countValues = maPimItemFieldCount(mItemHandle,
-        MA_PIM_FIELD_CONTACT_ORG_INFO);
-    checkResultCode(countValues);
-
-    for (int i = 0; i < countValues; i++)
-    {
-        // Get value from org info field at position i.
-        checkResultCode(maPimItemGetValue(&mArgs, i));
-
-        // Print value's attribute.
-        printAttribute(MA_PIM_FIELD_CONTACT_RELATION, i,
-            getOrgInfoAttributeString);
-
-        // Print value.
-        for (int j = 0; j < COUNT_ORG_INFO_INDICES; j++)
-        {
-            MAUtil::String orgInfoValueIndex = getOrgInfoIndexString(j);
-            const wchar* orgInfoValue = getWCharArrayFromBuf(mArgs.buf, j);
-            if (*orgInfoValue != 0)
-            {
-                printf("%s %S\n\n", orgInfoValueIndex.c_str(), orgInfoValue);
-            }
-        }
-    }
-}
-
-/**
  * Add value to contact name field.
  */
 void PIMContact::addContactName()
@@ -729,10 +194,7 @@ void PIMContact::addContactName()
     {
         MAUtil::String contactNameType = getContactNameIndexString(i);
         const wchar* contactNameValue = sContactName[i];
-        if (*contactNameValue != 0)
-        {
-            printf("%s %S", contactNameType.c_str(), contactNameValue);
-        }
+        printf("%s %S", contactNameType.c_str(), contactNameValue);
     }
 
     // Add value to field.
@@ -752,10 +214,7 @@ void PIMContact::addAddress()
     {
         MAUtil::String addressValueIndex = getAddressIndexString(i);
         const wchar* addressValue = sAddressHome[i];
-        if (*addressValue != 0)
-        {
-            printf("%s %S", addressValueIndex.c_str(), addressValue);
-        }
+        printf("%s %S", addressValueIndex.c_str(), addressValue);
     }
     printf("\n");
 
@@ -773,10 +232,7 @@ void PIMContact::addAddress()
     {
         MAUtil::String addressValueIndex = getAddressIndexString(i);
         const wchar* addressValue = sAddressWork[i];
-        if (*addressValue != 0)
-        {
-            printf("%s %S", addressValueIndex.c_str(), addressValue);
-        }
+        printf("%s %S", addressValueIndex.c_str(), addressValue);
     }
 
     // Write value to buffer.
@@ -1116,10 +572,7 @@ void PIMContact::addOrgInfo()
     {
         MAUtil::String orgInfoValueIndex = getOrgInfoIndexString(i);
         const wchar* orgInfoValue = sOrgInfo[i];
-        if (*orgInfoValue != 0)
-        {
-            printf("%s %S", orgInfoValueIndex.c_str(), orgInfoValue);
-        }
+        printf("%s %S", orgInfoValueIndex.c_str(), orgInfoValue);
     }
 
     // Write organization info value to buffer.

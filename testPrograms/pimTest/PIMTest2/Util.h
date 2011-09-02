@@ -1,31 +1,19 @@
 /*
-Copyright (C) 2011 MoSync AB
+ Copyright (C) 2011 MoSync AB
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License,
+ version 2, as published by the Free Software Foundation.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
-/**
- * @file Util.h
- * @author Bogdan Iusco
- *
- * This file contains:
- * - values for a new PIM contact.
- * - functions for reading/writing value from/to a buffer.
- * - functions for getting the string associated with a attribute.
- * - functions for getting the string associated with a field index.
- * - method for printing the string associated with a error code.
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ MA 02110-1301, USA.
  */
 
 #ifndef UTIL_H_
@@ -238,6 +226,11 @@ static const int COUNT_ORG_INFO_INDICES = 6;
 static const int COUNT_IM_INDICES = 2;
 
 /**
+ * Wait for a pointer released event.
+ */
+void waitForClick();
+
+/**
  * Copy wchar array.
  * @param destination Pointer to the destination array where the content will
  * be copied
@@ -356,5 +349,11 @@ MAUtil::String getRelationAttributeString(const int attribute);
  * @param index One of the MA_PIM_ATTR_ORG_INFO constants.
  */
 MAUtil::String getOrgInfoAttributeString(const int attribute);
+
+/**
+ * Return the string associated with a specified field id.
+ * @param index One of the MA_PIM_FIELD_CONTACT constants.
+ */
+MAUtil::String getFieldString(const int fieldID);
 
 #endif /* UTIL_H_ */

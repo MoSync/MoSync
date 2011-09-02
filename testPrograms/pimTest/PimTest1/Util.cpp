@@ -1,33 +1,47 @@
 /*
-Copyright (C) 2011 MoSync AB
+ Copyright (C) 2011 MoSync AB
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License,
+ version 2, as published by the Free Software Foundation.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
-/**
- * @file Util.cpp
- * @author Bogdan Iusco
- *
- * This file contains:
- * - functions for reading/writing value from/to a buffer.
- * - functions for getting the string associated with a attribute.
- * - functions for getting the string associated with a field index.
- * - method for printing the string associated with a error code.
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ MA 02110-1301, USA.
  */
 
 #include "Util.h"
+
+/**
+ * Wait for a pointer released event.
+ */
+void waitForClick()
+{
+    printf("\nTap the screen to continue......\n");
+    printf(sFieldSeparator);
+    MAEvent event;
+
+    while (true)
+    {
+        // Wait for a event.
+        maWait(-1);
+
+        // Get the event.
+        maGetEvent(&event);
+
+        // Check if the event is pointer released.
+        if (EVENT_TYPE_POINTER_RELEASED == event.type)
+        {
+            break;
+        }
+    }
+}
 
 /**
  * Copy wchar array.
@@ -163,6 +177,9 @@ void printResultCode(const int resultCode)
     case MA_PIM_ERR_LIST_NOT_OPENED:
         error = "MA_PIM_ERR_LIST_NOT_OPENED";
         break;
+    case MA_PIM_ERR_LIST_ALREADY_OPENED:
+        error = "MA_PIM_ERR_LIST_ALREADY_OPENED";
+        break;
     case MA_PIM_ERR_OPERATION_NOT_PERMITTED:
         error = "MA_PIM_ERR_OPERATION_NOT_PERMITTED";
         break;
@@ -172,6 +189,26 @@ void printResultCode(const int resultCode)
     case MA_PIM_ERR_EMPTY_FIELD:
         error = "MA_PIM_ERR_EMPTY_FIELD";
         break;
+    case MA_PIM_ERR_UNAVAILABLE_ITEM:
+        error = "MA_PIM_ERR_UNAVAILABLE_ITEM";
+        break;
+    case MA_PIM_ERR_BUFFER_TOO_SMALL:
+        error = "MA_PIM_ERR_BUFFER_TOO_SMALL";
+        break;
+    case MA_PIM_ERR_INVALID_BUFFER:
+        error = "MA_PIM_ERR_INVALID_BUFFER";
+        break;
+    case MA_PIM_ERR_NO_ATTRIBUTES:
+        error = "MA_PIM_NO_ATTRIBUTES";
+        break;
+    case MA_PIM_ERR_INVALID_LIST_TYPE:
+        error = "MA_PIM_ERR_INVALID_LIST_TYPE";
+        break;
+    case MA_PIM_ERR_INVALID_FIELD:
+        error = "MA_PIM_ERR_INVALID_FIELD";
+        break;
+    default:
+        error = "unhandled error case";
     }
 
     error = "Error: " + error;
