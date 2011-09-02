@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file main.cpp
- * @author Mattias Frånberg and Chris Hughes
+ * @authorAli Sarrafi
  *
  * This application provides a very basic example of how to work
  * with Native UI to position and and manipulate graphical user
@@ -71,9 +71,8 @@ public:
 		currentViewIndex = 0;
 		mNumFailure = 0;
 		mNumSuccess = 0;
-		char buffer[256];
-		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
-		maxZoom = atoi(buffer);
+		testIndex = 0;
+		mCameraStarted = false;
 	}
 
 	/**
@@ -87,14 +86,25 @@ public:
 	}
 
 
-	void myAssert(int cameraResult)
+	void myAssert(const char * testName, int cameraResult)
 	{
+
 		if((cameraResult == MA_CAMERA_RES_OK) ||
 				(cameraResult == MA_CAMERA_RES_PROPERTY_NOTSUPPORTED) ||
 				(cameraResult == MA_CAMERA_RES_VALUE_NOTSUPPORTED))
+		{
 			mNumSuccess++;
+			sprintf(testList[testIndex], "%s, %s", testName, "Pass");
+			testIndex++;
+		}
 		else
+		{
 			mNumFailure++;
+			sprintf(testList[testIndex], "%s, %s", testName, "Pass");
+			testIndex++;
+		}
+
+
 	}
 	/**
 	 * Here we create the user interface widgets.
@@ -170,7 +180,7 @@ public:
 		maWidgetSetProperty(
 			mInstructions,
 			MAW_LABEL_TEXT,
-			"Camera started with default properties!!!");
+			"Camera with default properties!!! Press start to start.");
 
 		//Adding the label to the layout
 		maWidgetAddChild(mMainLayoutWidget, mInstructions);
@@ -261,6 +271,20 @@ public:
 		//Add the capture button to the main layout so
 		//it will be larger than others.
 		maWidgetAddChild(mMainLayoutWidget, mCaptureButton);
+		char buffer[256];
+		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
+		maxZoom = atoi(buffer);
+
+		//Disable zoom buttons if zoom is not supported
+		if(maxZoom == 0)
+		{
+			maWidgetSetProperty(mZoomInButton,
+					MAW_WIDGET_ENABLED,
+					"false");
+			maWidgetSetProperty(mZoomOutButton,
+					MAW_WIDGET_ENABLED,
+					"false");
+		}
 
 	}
 
@@ -365,6 +389,7 @@ public:
 
 	void startCamera()
 	{
+		mCameraStarted = true;
 		int res = maCameraStart();
 		if (res != MA_CAMERA_RES_OK)
 			maPanic(res, "Failed to start the Preview");
@@ -373,6 +398,7 @@ public:
 
 	void stopCamera()
 	{
+		mCameraStarted = false;
 		int res = maCameraStop();
 		if (res != MA_CAMERA_RES_OK)
 			maPanic(res, "Failed to stop the Preview");
@@ -389,6 +415,10 @@ public:
 	 */
 	void captureButtonClicked()
 	{
+		if(mCameraStarted == false)
+		{
+			return;
+		}
 		if(mLastEnc != 0)
 			maDestroyObject(mLastEnc);
 		mLastEnc = maCreatePlaceholder();
@@ -401,48 +431,69 @@ public:
 
 	void setParameters(int index)
 	{
+		int result = 0;
 		if(currentViewIndex == 1)
 		{
 			startCamera();
-			myAssert(setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_ON));
-			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n  MA_CAMERA_FLASH_ON!!!");
+			result = setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_ON);
+			myAssert("MA_CAMERA_FLASH_ON", result);
+			char buffer[256];
+			sprintf(buffer, "Camera with\n  MA_CAMERA_FLASH_ON : %s", getTextForResult(result));
+			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 2)
 		{
 			startCamera();
-			myAssert(setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO));
-			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FLASH_AUTO!!!");
+			result = setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO);
+			myAssert("MA_CAMERA_FLASH_AUTO", result);
+			char buffer[256];
+			sprintf(buffer, "Camera with\n  MA_CAMERA_FLASH_AUTO: %s", getTextForResult(result));
+			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 3)
 		{
 			startCamera();
-			myAssert(setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_TORCH));
-			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FLASH_TORCH!!!");
+			result = setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_TORCH);
+			myAssert("MA_CAMERA_FLASH_TORCH", result);
+			char buffer[256];
+			sprintf(buffer, "Camera with\n  MA_CAMERA_FLASH_TORCH: %s", getTextForResult(result));
+			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 4)
 		{
 			startCamera();
-			myAssert(setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_OFF));
-			myAssert(setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO));
-			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FOCUS_AUTO!!!");
+			result = setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_AUTO);
+			myAssert("MA_CAMERA_FOCUS_AUTO", result);
+			char buffer[256];
+			sprintf(buffer, "Camera with\n  MA_CAMERA_FOCUS_AUTO: %s", getTextForResult(result));
+			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 5)
 		{
 			startCamera();
-			myAssert(setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_FIXED));
-			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FOCUS_FIXED!!!");
+			result = setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_FIXED);
+			myAssert("MA_CAMERA_FOCUS_FIXED", result);
+			char buffer[256];
+			sprintf(buffer, "Camera with\n  MA_CAMERA_FOCUS_FIXED: %s", getTextForResult(result));
+			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 6)
 		{
 			startCamera();
-			myAssert(setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_INFINITY));
-			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n\n  MA_CAMERA_FOCUS_INFINITY!!!");
+			result = setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_INFINITY);
+			myAssert("MA_CAMERA_FOCUS_INFINITY", result);
+			char buffer[256];
+			sprintf(buffer, "Camera with\n  MA_CAMERA_FOCUS_INFINITY: %s", getTextForResult(result));
+			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 7)
 		{
 			startCamera();
-			myAssert(setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO));
-			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FOCUS_MACRO!!!");
+			result = setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO);
+			myAssert("MA_CAMERA_FOCUS_MACRO", result);
+			char buffer[256];
+			sprintf(buffer, "Camera with\n  MA_CAMERA_FOCUS_MACRO: %s", getTextForResult(result));
+			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 8)
 		{
@@ -450,16 +501,30 @@ public:
 		}
 		else
 		{
-			myAssert(setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO));
+			myAssert("MA_CAMERA_FLASH_AUTO", setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO));
 			maWidgetSetProperty(mInstructions,MAW_LABEL_TEXT, "Camera with\n MA_CAMERA_FLASH_AUTO!!!");
 		}
 	}
 
+
+	char * getTextForResult(int result)
+	{
+		switch(result)
+		{
+		case MA_CAMERA_RES_VALUE_NOTSUPPORTED:
+			return "not Supported";
+		case MA_CAMERA_RES_FAILED:
+			return "Failed";
+		case MA_CAMERA_RES_OK:
+			return "supported";
+		};
+	}
 	void createNewUI()
 	{
 		stopCamera();
 		maWidgetDestroy(mScreen);
-		// Create a Native UI screen. As the screen is a member
+		maWidgetScreenShow(MAW_CONSTANT_MOSYNC_SCREEN_HANDLE);
+/*		// Create a Native UI screen. As the screen is a member
 		// variable (also called instance variable) we have
 		// prefixed the variable name with "m".
 		mScreen = maWidgetCreate(MAW_SCREEN);
@@ -648,7 +713,26 @@ public:
 				buffer4);
 		//Adding the label to the layout
 		maWidgetAddChild(mMainLayoutWidget, failureNumber);
-		maWidgetScreenShow(mScreen);
+		maWidgetScreenShow(mScreen);*/
+		int numCameras = maCameraNumber();
+		printf("Reading the Camera properties!!!");
+		printf("\n Number of Cameras:  %d", numCameras);
+		char buffer[256];
+		maCameraGetProperty(MA_CAMERA_FLASH_SUPPORTED, buffer, 256);
+		printf("\nMA_CAMERA_FLASH_SUPPORTED:%s", buffer);
+		char buffer2[256];
+		maCameraGetProperty(MA_CAMERA_ZOOM_SUPPORTED, buffer2, 256);
+		printf("\nMA_CAMERA_ZOOM_SUPPORTED:%s", buffer);
+
+		printf(
+			"\n %d test failed out of  %d total tests",
+			mNumFailure,
+			mNumFailure+mNumSuccess);
+
+		for (int ii = 0;ii<=testIndex;ii++)
+		{
+			printf(testList[ii]);
+		}
 	}
 
 
@@ -657,6 +741,10 @@ public:
 	 */
 	void showImageButtonClicked()
 	{
+		if(mLastEnc == 0)
+		{
+			return;
+		}
 		stopCamera();
 		if(mLastEnc != 0) {
 			if(mLastPic != 0) {
@@ -754,6 +842,12 @@ private:
 	int mNumSuccess;
 
 	int mNumFailure;
+
+	bool mCameraStarted;
+
+	char testList[256][256];
+
+	int testIndex;
 };
 
 // That's the screen class finished, now we move on to the Moblet that
