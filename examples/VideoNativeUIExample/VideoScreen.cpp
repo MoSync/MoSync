@@ -39,19 +39,21 @@
 VideoScreen::VideoScreen() :
 	Screen(),
 	mMainLayout(NULL),
-	mMiddleSpacerLayout(NULL),
+	mTopSpacerLayout(NULL),
 	mVideoView(NULL),
 	mSourceStatus(NULL),
 	mButtonsLayout(NULL),
+	mDuration(NULL),
 	mPlay(NULL),
 	mPause(NULL),
 	mStop(NULL),
-	mDuration(NULL),
 	mEditBox(NULL),
 	mLoadLayout(NULL),
 	mSetUrl(NULL),
 	mSetPath(NULL),
-	mSpacerBottomLayout(NULL)
+	mMiddleSpacerLayout(NULL),
+	mSpacerBottomLayout(NULL),
+	mExitButton(NULL)
 {
 	// Initialize the UI and set the listeners.
 
@@ -80,9 +82,9 @@ VideoScreen::VideoScreen() :
  */
 VideoScreen::~VideoScreen()
 {
-	mVideoView->stop();
-	mEditBox->removeEditBoxListener(this);
+//	mVideoView->stop();
     mVideoView->removeVideoViewListener(this);
+	mEditBox->removeEditBoxListener(this);
     mPlay->removeButtonListener(this);
     mPause->removeButtonListener(this);
     mStop->removeButtonListener(this);
@@ -304,11 +306,11 @@ void VideoScreen::buttonClicked(Widget* button)
     {
         mVideoView->setURL(mEditBox->getText());
     }
-    else if (button = mSetPath)
+    else if (button == mSetPath)
     {
 		mVideoView->setPath(mEditBox->getText());
     }
-    else if (button = mExitButton)
+    else if (button == mExitButton)
     {
 		Test::VideoMoblet::getInstance()->closeEvent();
     }
