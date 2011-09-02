@@ -62,7 +62,9 @@ public:
 
 		mCurrentZoomIndex = 0;
 		createUI();
+
 	}
+
 
 	/**
 	 * In the destructor, we destroy the widgets to release memory.
@@ -328,6 +330,16 @@ public:
 		char buffer[256];
 		int length = maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
+		setupCameraSize();
+	}
+
+
+	void setupCameraSize()
+	{
+		MA_CAMERA_FORMAT *cameraFormat = new(MA_CAMERA_FORMAT);
+		cameraFormat->height = 270;
+		cameraFormat->width = 270;
+		maCameraFormat(0, cameraFormat);
 	}
 
 	/**
@@ -427,7 +439,7 @@ public:
 			maDestroyObject(mLastEnc);
 		}
 		mLastEnc = maCreatePlaceholder();
-		maCameraSnapshot(-1, mLastEnc);
+		maCameraSnapshot(0, mLastEnc);
 		setupCameraProperties();
 		maCameraStart();
 	}
