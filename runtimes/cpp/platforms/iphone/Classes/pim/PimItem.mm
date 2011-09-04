@@ -56,7 +56,7 @@
     int fieldsCount = [mFieldsDictionary count];
     if (0 > fieldIndex || fieldIndex >= fieldsCount)
     {
-        return MA_PIM_ERR_INVALID_INDEX;
+        return MA_PIM_ERR_INDEX_INVALID;
     }
     else
     {
@@ -110,7 +110,7 @@
 
     if (nil == itemField)
     {
-        returnValue = MA_PIM_ERR_INVALID_FIELD;
+        returnValue = MA_PIM_ERR_FIELD_INVALID;
     } else {
         returnValue = [itemField getAttribute:index];
     }
@@ -148,7 +148,7 @@
 
     if (nil == itemField)
     {
-        returnValue = MA_PIM_ERR_EMPTY_FIELD;
+        returnValue = MA_PIM_ERR_FIELD_EMPTY;
     }
     else
     {
@@ -188,7 +188,7 @@
 
     if (nil == itemField)
     {
-        return MA_PIM_ERR_EMPTY_FIELD;
+        return MA_PIM_ERR_FIELD_EMPTY;
     }
 
     returnValue = [itemField getLabel:customLabel indexValue:index];
@@ -235,7 +235,7 @@
         0 > index  ||
         index > ([fieldItem count] - 1))
     {
-        return MA_PIM_ERR_INVALID_INDEX;
+        return MA_PIM_ERR_INDEX_INVALID;
     }
 
     int fieldType = [fieldItem getFieldType];
@@ -304,14 +304,14 @@
 
     if(nil == itemField)
     {
-        return MA_PIM_ERR_EMPTY_FIELD;
+        return MA_PIM_ERR_FIELD_EMPTY;
     }
 
     // Check if there is a value at the given index.
     valuesArray = [itemField getValue:index];
     if (nil == valuesArray)
     {
-        return MA_PIM_ERR_INVALID_INDEX;
+        return MA_PIM_ERR_INDEX_INVALID;
     }
 
     // Get the new value.
@@ -430,7 +430,7 @@
 
     if (nil == itemField)
     {
-        returnValue = MA_PIM_ERR_EMPTY_FIELD;
+        returnValue = MA_PIM_ERR_FIELD_EMPTY;
     } else
     {
         returnValue = [itemField removeValue:index];

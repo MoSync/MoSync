@@ -126,6 +126,7 @@ int writeWCharArraysToBuf(
 
     return (char*) dst - charBuffer;
 }
+
 /**
  * Print the result code.
  * If resultCode is different then MA_PIM_ERR_NONE prints
@@ -147,66 +148,62 @@ void printResultCode(const int resultCode)
     case MA_PIM_ERR_NATIVE_TYPE_MISMATCH:
         error = "MA_PIM_ERR_NATIVE_TYPE_MISMATCH";
         break;
-    case MA_PIM_ERR_FIELD_UNSUPPORTED:
-        error = "MA_PIM_ERR_FIELD_UNSUPPORTED";
+    case MA_PIM_ERR_LIST_TYPE_INVALID:
+        error = "MA_PIM_ERR_LIST_TYPE_INVALID";
         break;
-    case MA_PIM_ERR_READ_ONLY:
-        error = "MA_PIM_ERR_READ_ONLY";
-        break;
-    case MA_PIM_ERR_WRITE_ONLY:
-        error = "MA_PIM_ERR_WRITE_ONLY";
-        break;
-    case MA_PIM_ERR_COMBO_UNSUPPORTED:
-        error = "MA_PIM_ERR_COMBO_UNSUPPORTED";
-        break;
-    case MA_PIM_ERR_FIELD_COUNT_MAX:
-        error = "MA_PIM_ERR_FIELD_COUNT_MAX";
-        break;
-    case MA_PIM_ERR_NO_LABEL:
-        error = "MA_PIM_ERR_NO_LABEL";
-        break;
-    case MA_PIM_ERR_CUSTOM_ATTRIBUTE:
-        error = "MA_PIM_ERR_CUSTOM_ATTRIBUTE";
-        break;
-    case MA_PIM_ERR_INVALID_INDEX:
-        error = "MA_PIM_ERR_INVALID_INDEX";
-        break;
-    case MA_PIM_ERR_UNAVAILABLE_LIST:
-        error = "MA_PIM_ERR_UNAVAILABLE_LIST";
-        break;
-    case MA_PIM_ERR_LIST_NOT_OPENED:
-        error = "MA_PIM_ERR_LIST_NOT_OPENED";
+    case MA_PIM_ERR_LIST_UNAVAILABLE:
+        error = "MA_PIM_LIST_UNAVAILABLE";
         break;
     case MA_PIM_ERR_LIST_ALREADY_OPENED:
         error = "MA_PIM_ERR_LIST_ALREADY_OPENED";
         break;
-    case MA_PIM_ERR_OPERATION_NOT_PERMITTED:
-        error = "MA_PIM_ERR_OPERATION_NOT_PERMITTED";
+    case MA_PIM_ERR_FIELD_INVALID:
+        error = "MA_PIM_ERR_FIELD_INVALID";
         break;
-    case MA_PIM_ERR_INVALID_HANDLE:
-        error = "MA_PIM_ERR_INVALID_HANDLE";
+    case MA_PIM_ERR_FIELD_UNSUPPORTED:
+        error = "MA_PIM_ERR_FIELD_UNSUPPORTED";
         break;
-    case MA_PIM_ERR_EMPTY_FIELD:
-        error = "MA_PIM_ERR_EMPTY_FIELD";
+    case MA_PIM_ERR_FIELD_EMPTY:
+        error = "MA_PIM_ERR_FIELD_EMPTY";
         break;
-    case MA_PIM_ERR_UNAVAILABLE_ITEM:
-        error = "MA_PIM_ERR_UNAVAILABLE_ITEM";
+    case MA_PIM_ERR_FIELD_COUNT_MAX:
+        error = "MA_PIM_ERR_FIELD_COUNT_MAX";
+        break;
+    case MA_PIM_ERR_FIELD_READ_ONLY:
+        error = "MA_PIM_ERR_FIELD_READ_ONLY";
+        break;
+    case MA_PIM_ERR_FIELD_WRITE_ONLY:
+        error = "MA_PIM_ERR_FIELD_WRITE_ONLY";
+        break;
+    case MA_PIM_ERR_INDEX_INVALID:
+        error = "MA_PIM_ERR_INDEX_INVALID";
+        break;
+    case MA_PIM_ERR_HANDLE_INVALID:
+        error = "MA_PIM_ERR_HANDLE_INVALID";
+        break;
+    case MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED:
+        error = "MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED";
+        break;
+    case MA_PIM_ERR_ATTRIBUTE_CUSTOM:
+        error = "MA_PIM_ERR_ATTRIBUTE_CUSTOM";
+        break;
+    case MA_PIM_ERR_NO_ATTRIBUTES:
+        error = "MA_PIM_ERR_NO_ATTRIBUTES";
         break;
     case MA_PIM_ERR_BUFFER_TOO_SMALL:
         error = "MA_PIM_ERR_BUFFER_TOO_SMALL";
         break;
-    case MA_PIM_ERR_INVALID_BUFFER:
-        error = "MA_PIM_ERR_INVALID_BUFFER";
+    case MA_PIM_ERR_BUFFER_INVALID:
+        error = "MA_PIM_ERR_BUFFER_INVALID";
         break;
-    case MA_PIM_ERR_NO_ATTRIBUTES:
-        error = "MA_PIM_NO_ATTRIBUTES";
+    case MA_PIM_ERR_NO_LABEL:
+        error = "MA_PIM_ERR_NO_LABEL";
         break;
-    case MA_PIM_ERR_INVALID_LIST_TYPE:
-        error = "MA_PIM_ERR_INVALID_LIST_TYPE";
+    case MA_PIM_ERR_OPERATION_NOT_PERMITTED:
+        error = "MA_PIM_ERR_OPERATION_NOT_PERMITTED";
         break;
-    case MA_PIM_ERR_INVALID_FIELD:
-        error = "MA_PIM_ERR_INVALID_FIELD";
-        break;
+    default:
+        error = "unknown error code";
     }
 
     error = "Error: " + error;

@@ -66,7 +66,7 @@ public:
 
     /**
      * Open PIM list.
-     * @param listType One of the next contants:
+     * @param listType One of the next constants:
      * - MA_PIM_CONTACTS
      * - MA_PIM_EVENTS
      * - MA_PIM_TODOS

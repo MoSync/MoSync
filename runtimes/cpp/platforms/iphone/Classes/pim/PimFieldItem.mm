@@ -83,7 +83,7 @@
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 > index || index >= fieldValuesCount)
     {
-		return MA_PIM_ERR_INVALID_INDEX;
+		return MA_PIM_ERR_INDEX_INVALID;
 	}
 
 	return [[mFieldValuesArray objectAtIndex:index] getAttribute];
@@ -101,7 +101,7 @@
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 > index || index >= fieldValuesCount)
     {
-		return MA_PIM_ERR_INVALID_INDEX;
+		return MA_PIM_ERR_INDEX_INVALID;
 	}
 
     // Check if the attribute is set to custom.
@@ -128,7 +128,7 @@
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 > index || index >= fieldValuesCount)
     {
-		return MA_PIM_ERR_INVALID_INDEX;
+		return MA_PIM_ERR_INDEX_INVALID;
 	}
 
     PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
@@ -184,7 +184,7 @@
 
 	if (0 > index || index >= fieldValuesCount)
     {
-		return MA_PIM_ERR_INVALID_INDEX;
+		return MA_PIM_ERR_INDEX_INVALID;
 	}
 
     // Check if field supports attributes.
@@ -195,7 +195,7 @@
         bool attributeAllowed = [self isAttributeValid:attribute];
         if (!attributeAllowed)
         {
-            return MA_PIM_ERR_COMBO_UNSUPPORTED;
+            return MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
         }
         else
         {
@@ -242,7 +242,7 @@
             bool attributeAllowed = [self isAttributeValid:attribute];
             if (!attributeAllowed)
             {
-                returnValue = MA_PIM_ERR_COMBO_UNSUPPORTED;
+                returnValue = MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
             }
             else
             {
@@ -307,7 +307,7 @@
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 > index || index >= fieldValuesCount)
     {
-		return MA_PIM_ERR_INVALID_INDEX;
+		return MA_PIM_ERR_INDEX_INVALID;
 	}
 
 	[mFieldValuesArray removeObjectAtIndex:index];

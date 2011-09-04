@@ -114,7 +114,7 @@
     }
     if (![self isFieldValid:fieldID])
     {
-        return MA_PIM_ERR_INVALID_FIELD;
+        return MA_PIM_ERR_FIELD_INVALID;
     }
 
     return [super fieldCount:fieldID];
@@ -136,7 +136,7 @@
     }
     if (![self isFieldValid:fieldID])
     {
-        return MA_PIM_ERR_INVALID_FIELD;
+        return MA_PIM_ERR_FIELD_INVALID;
     }
 
     return [super getAttribute:fieldID indexValue:index];
@@ -162,7 +162,7 @@
     }
     if (![self isFieldValid:args->field])
     {
-        return MA_PIM_ERR_INVALID_FIELD;
+        return MA_PIM_ERR_FIELD_INVALID;
     }
 
     return [super setLabel:args indexValue:index];
@@ -192,7 +192,7 @@
     }
     if (![self isFieldValid:args->field])
     {
-        return MA_PIM_ERR_INVALID_FIELD;
+        return MA_PIM_ERR_FIELD_INVALID;
     }
 
     return [super getLabel:args indexValue:index];
@@ -221,11 +221,11 @@
     }
     if (![self isFieldValid:args->field])
     {
-        return MA_PIM_ERR_INVALID_FIELD;
+        return MA_PIM_ERR_FIELD_INVALID;
     }
     if ([self isFieldWriteOnly:fieldID])
     {
-        return MA_PIM_ERR_WRITE_ONLY;
+        return MA_PIM_ERR_FIELD_WRITE_ONLY;
     }
 
     NSString* key = [[NSString alloc] initWithFormat:@"%d", fieldID];
@@ -233,7 +233,7 @@
     [key release];
     if (nil == fieldItem)
     {
-        return MA_PIM_ERR_EMPTY_FIELD;
+        return MA_PIM_ERR_FIELD_EMPTY;
     }
 
     return [super getValue:args indexValue:index];
@@ -261,11 +261,11 @@
     }
     if (![self isFieldValid:args->field])
     {
-        return MA_PIM_ERR_INVALID_FIELD;
+        return MA_PIM_ERR_FIELD_INVALID;
     }
     if ([self isFieldReadOnly:fieldID])
     {
-        return MA_PIM_ERR_READ_ONLY;
+        return MA_PIM_ERR_FIELD_READ_ONLY;
     }
 
     return [super addValue:args withAttribute:attribute];
@@ -294,11 +294,11 @@
     }
     if (![self isFieldValid:args->field])
     {
-        return MA_PIM_ERR_INVALID_FIELD;
+        return MA_PIM_ERR_FIELD_INVALID;
     }
     if ([self isFieldReadOnly:fieldID])
     {
-        return MA_PIM_ERR_READ_ONLY;
+        return MA_PIM_ERR_FIELD_READ_ONLY;
     }
 
     return [super setValue:args indexValue:index valueAttribute:atttribute];
@@ -320,7 +320,7 @@
     }
     if (![self isFieldValid:field])
     {
-        return MA_PIM_ERR_INVALID_FIELD;
+        return MA_PIM_ERR_FIELD_INVALID;
     }
 
     return [super removeValue:field atIndex:index];

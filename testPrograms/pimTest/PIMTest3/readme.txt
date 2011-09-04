@@ -7,3 +7,4 @@ Test for the next syscalls:
 - maPimItemAddValue
 - maPimItemSetValue
 - maPimItemGetValue
+- maPimItemRemoveValue

@@ -505,7 +505,7 @@ static PimUtils *sharedInstance = nil;
      setIsSingleValue:(bool*) singleValue
 {
     int returnValue = MA_PIM_ERR_NONE;
-    *type = MA_PIM_ERR_INVALID_FIELD;
+    *type = MA_PIM_ERR_FIELD_INVALID;
     *singleValue = true;
 
     switch (fieldID)
@@ -581,7 +581,7 @@ static PimUtils *sharedInstance = nil;
             *singleValue = false;
             break;
         default:
-            returnValue = MA_PIM_ERR_INVALID_FIELD;
+            returnValue = MA_PIM_ERR_FIELD_INVALID;
     }
 
     return returnValue;
