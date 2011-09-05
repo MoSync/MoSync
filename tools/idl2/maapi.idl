@@ -3507,7 +3507,7 @@ interface MAAPI {
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		*			         #MA_PIM_ERR_FIELD_WRITE_ONLY if the field is write-only.
-		*                    #MA_PIM_ERR_BUFFER_INVALID if the buffer is not valid.
+		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
 

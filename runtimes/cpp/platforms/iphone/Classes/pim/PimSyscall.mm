@@ -212,14 +212,7 @@ int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index)
 
 int Syscall::maPimItemClose(MAHandle item)
 {
-    PimItem* pimItem = [sPimDatabase getItem:item];
-
-    if (!pimItem)
-    {
-        return MA_PIM_ERR_HANDLE_INVALID;
-    }
-
-    return [pimItem close];
+    return [sPimDatabase closeItem:item];
 }
 
 MAHandle Syscall::maPimItemCreate(MAHandle list)

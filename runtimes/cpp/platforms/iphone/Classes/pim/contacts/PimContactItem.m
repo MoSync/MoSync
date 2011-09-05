@@ -69,20 +69,19 @@
 -(int) close
 {
     bool writeDataIntoRecord;
-    if (kImportedItem == mItemStatus)
+    if (kNewItem == mItemStatus)
     {
-        writeDataIntoRecord = false;
+        writeDataIntoRecord = true;
     }
     else if (kImportedItem == mItemStatus)
     {
-        writeDataIntoRecord = true;
+        writeDataIntoRecord = false;
     }
     else if (kModifiedItem == mItemStatus)
     {
         writeDataIntoRecord = true;
     }
 
-    NSLog(@"close an contact item");
     if (writeDataIntoRecord)
     {
         NSArray* fieldsArray = [mFieldsDictionary allValues];
@@ -1207,7 +1206,7 @@
 {
     NSMutableArray* array;
     NSString* key;
-    PimFieldItem* itemField = [[PimFieldItem alloc] initWithFieldID:MA_PIM_FIELD_CONTACT_REVISION];;
+    PimFieldItem* itemField = [[PimFieldItem alloc] initWithFieldID:MA_PIM_FIELD_CONTACT_REVISION];
     NSDate* revision = (NSDate*) ABRecordCopyValue(mRecord, kABPersonModificationDateProperty);
     if (nil != revision)
     {
@@ -1217,7 +1216,26 @@
         [itemField addValue:array withAttribute:MA_PIM_ATTR_PREFERRED];
         [mFieldsDictionary setObject:itemField forKey:key];
     }
+}
 
+/**
+ * Reads the UID field from the record.
+ */
+-(void) readUIDField
+{
+    NSMutableArray* array;
+    NSString* key;
+    PimFieldItem* itemField = [[PimFieldItem alloc] initWithFieldID:MA_PIM_FIELD_CONTACT_UID];
+    int recordID = ABRecordGetRecordID(mRecord);
+    NSString* uid = [[NSString alloc] initWithFormat:@"%d", recordID];
+    if (nil != uid)
+    {
+        key = [[NSString alloc] initWithFormat:@"%d", MA_PIM_FIELD_CONTACT_UID];
+        array = [[NSMutableArray alloc] init];
+        [array addObject:uid];
+        [itemField addValue:array withAttribute:MA_PIM_ATTR_PREFERRED];
+        [mFieldsDictionary setObject:itemField forKey:key];
+    }
 }
 
 /**
@@ -1347,6 +1365,7 @@
     [self readURLField];
     [self readOrgInfoField];
     [self readRevisionField];
+    [self readUIDField];
     [self readIMField];
     [self readRelationField];
     [self readPhotoField];
@@ -1409,7 +1428,6 @@
         case MA_PIM_FIELD_CONTACT_FORMATTED_NAME:
         case MA_PIM_FIELD_CONTACT_PUBLIC_KEY:
         case MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING:
-        case MA_PIM_FIELD_CONTACT_UID:
             isSupported = false;
             break;
         default:
@@ -1468,7 +1486,6 @@
  */
 - (void) dealloc
 {
-    CFRelease(mRecord);
     [super dealloc];
 }
 

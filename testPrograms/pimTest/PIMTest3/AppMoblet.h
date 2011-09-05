@@ -97,6 +97,17 @@ public:
      * Test maPimItemRemoveValue syscall.
      */
     virtual void testMaPimItemRemoveValue();
+
+    /**
+     * Test maPimItemRemove syscall.
+     */
+    virtual void deleteAllContactsFromAddressBook();
+
+    /**
+     * Modify an existing contact.
+     */
+    virtual void modifyContact();
+
 private:
     /**
      * Handle to a pim list.

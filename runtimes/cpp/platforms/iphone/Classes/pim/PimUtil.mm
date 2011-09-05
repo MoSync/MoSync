@@ -204,7 +204,7 @@ static PimUtils *sharedInstance = nil;
 }
 
 /**
- * Get an array of string from a given address.
+ * Get an array of string from a given address for a specified field.
  * @param address The specified address.
  *                The address must have the following structure:
  *                     - the first element must be a 4-byte int that specifies
@@ -212,22 +212,30 @@ static PimUtils *sharedInstance = nil;
  *                     - first null terminated string(UTF-16 encoding).
  *                     - second null terminated string(UTF-16 encoding).
  *                     - etc
- * @return An array containing the strings.
+ * @param fieldID The given field.
+ * @param size The size of the string array(how many bytes can be read from the given address).
+ * @return An array containing the strings, or nil in case of error.
  */
--(NSMutableArray*) getStringArray:(void*) address;
+-(NSMutableArray*) getStringArray:(void*) address
+                       forFieldID:(const int) fieldID
+                         withSize:(const int) size
 {
 
     NSMutableArray* array = [[NSMutableArray alloc] init];
     int noStrings = *(int*) address;
-//    NSLog(@"PimUtil--getArray--noStrings = %d", noStrings);
+    int bytesRead = sizeof(int);
+    bool invalidBuffer = false;
 
     UInt16* src = (UInt16*) ((int)address + sizeof(int));
-    for (int i = 0; i < noStrings; i++) {
+    for (int i = 0; ((i < noStrings) && !invalidBuffer); i++)
+    {
         UInt16* stringSrc = src;
+
         // Calculate the length of the string.
         int stringLength = 0;
         bool condition = true;
-        while (condition) {
+        while (condition)
+        {
 
             if (0 == *src)
             {
@@ -239,15 +247,38 @@ static PimUtils *sharedInstance = nil;
                 src++;
                 stringLength += sizeof(UInt16);
             }
+
+            // Check if there are more bytes that can be read.
+            bytesRead += sizeof(UInt16);
+            if (bytesRead >= size)
+            {
+                invalidBuffer = true;
+                condition = false;
+            }
         }
-        // Create string with UTF-16 encoding.
-        NSString* string = [[NSString alloc] initWithBytes:stringSrc length:stringLength
+
+        if (!invalidBuffer)
+        {
+            // Create string with UTF-16 encoding.
+            NSString* string = [[NSString alloc] initWithBytes:stringSrc length:stringLength
                                                   encoding:NSUTF16LittleEndianStringEncoding];
-        [array addObject:string];
-        NSLog(@"PimUtil--getArray--string %d = %@", i, string);
+            [array addObject:string];
+            NSLog(@"PimUtil--getArray--string %d = %@", i, string);
+        }
     }
 
-    return array;
+    // Check if the number of strings read are valid for the given field id.
+    if (!invalidBuffer)
+    {
+        int noIndices = [self getNumberOfIndicesForField:fieldID];
+        if (noIndices == [array count])
+        {
+            return array;
+        }
+    }
+
+    [array release];
+    return nil;
 }
 
 /**
@@ -261,8 +292,8 @@ static PimUtils *sharedInstance = nil;
  *                     - second null terminated string(UTF-16 encoding).
  *                     - etc
  * @param size  The maximum size(in bytes) that can be written at the given address.
- * @return The size(in bytes) of the strings. If the size of the strings is greater than
- *         the maximum size(the size parameter) then the strings were not written.
+ * @return The size(in bytes) of the strings, or MA_PIM_ERR_BUFFER_TOO_SMALL if the size of
+ * the strings is bigger then size parameter.
  */
 -(int) writeStringArray:(NSMutableArray*) array
               atAddress:(void*) address
@@ -270,13 +301,20 @@ static PimUtils *sharedInstance = nil;
 {
     int noStrings = [array count];
     *(int*) address = noStrings;
-//    NSLog(@"PimUtil--writeStringArray--noStrings = %d", noStrings);
 
     UInt16* dst = (UInt16*) ((int)address + sizeof(int));
-    int countWrittenBytes = sizeof(UInt16);
-    for (int i = 0; i < noStrings; i++) {
+    int countWrittenBytes = sizeof(int);
+    for (int i = 0; i < noStrings; i++)
+    {
         NSString* currentString = [array objectAtIndex:i];
-        countWrittenBytes += [self writeString:currentString atAddress:(void*) dst maxSize:512];
+        int remainingSize = size - countWrittenBytes;
+
+        int result = [self writeString:currentString atAddress:(void*) dst maxSize:remainingSize];
+        if (MA_PIM_ERR_BUFFER_TOO_SMALL == result)
+        {
+            return MA_PIM_ERR_BUFFER_TOO_SMALL;
+        }
+        countWrittenBytes += result;
         dst += [currentString length] + 1;
     }
 
@@ -287,34 +325,18 @@ static PimUtils *sharedInstance = nil;
  * Get a string from a given address.
  * @param address The specified address.
  *                The address must contain a null terminated string(UTF-16 encoding).
+ * @param size The length of the string in bytes.
  * @return An array containing the string.
  */
 -(NSMutableArray*) getString:(void*) address
+                    withSize:(const int) size
 {
     NSMutableArray* array = [[NSMutableArray alloc] init];
-    UInt16* src = (UInt16*) (address);
 
-    // Calculate the length of the string.
-    int stringLength = 0;
-    bool condition = true;
-    while (condition) {
-
-        if (0 == *src)
-        {
-            src++;
-            condition = false;
-        }
-        else
-        {
-           src++;
-           stringLength += sizeof(UInt16);
-        }
-    }
     // Create string with UTF-16 encoding.
-    NSString* string = [[NSString alloc] initWithBytes:address length:stringLength
-                                                  encoding:NSUTF16LittleEndianStringEncoding];
+    NSString* string = [[NSString alloc] initWithBytes:address length:size
+                                              encoding:NSUTF16LittleEndianStringEncoding];
     [array addObject:string];
-//    NSLog(@"PimUtil--getString--string = %@", string);
 
     return array;
 }
@@ -326,25 +348,24 @@ static PimUtils *sharedInstance = nil;
  * @param value The given string.
  * @param address The specified address.
  *                The address will contain a null terminated string(UTF-16 encoding).
- * @return The string's size(in bytes).
+ * @return The string's size(in bytes), or MA_PIM_ERR_BUFFER_TOO_SMALL if the size of
+ * the string is bigger then size parameter.
  */
 -(int) writeString:(NSString*) value
          atAddress:(void*) address
            maxSize:(const int) size
 {
-
-//    NSLog(@"PimUtil--writeString--strings = %@", value);
-
     // Check the size of the string.
     int stringSize = ([value length] + 1) * sizeof(UInt16);
     if(stringSize > size)
     {
-        return stringSize;
+        return MA_PIM_ERR_BUFFER_TOO_SMALL;
     }
 
     // Write string at the given address.
     UInt16* dst = (UInt16*)address;
-    for (int charIndex = 0; charIndex < [value length]; charIndex++) {
+    for (int charIndex = 0; charIndex < [value length]; charIndex++)
+    {
         UniChar currentChar = [value characterAtIndex:charIndex];
         *dst = currentChar;
         dst++;
@@ -359,12 +380,11 @@ static PimUtils *sharedInstance = nil;
 /**
  * Gets a date from a given address.
  * @param address The specified address.
- *                The address must contain a 4-byte int representing the number of
+ *                The address must contain a 4-bytes int representing the number of
  *                seconds elapsed since January 1 1970(Unix time).
  * @return An array containing the date.
  */
--(NSMutableArray*) getDate:(void*) address;
-
+-(NSMutableArray*) getDate:(void*) address
 {
     int seconds = *(int*) address;
     NSData* date = [[NSDate alloc] initWithTimeIntervalSince1970:seconds];
@@ -378,22 +398,15 @@ static PimUtils *sharedInstance = nil;
  * Writes a date to a given address.
  * @param date The given date.
  * @param address The specified address.
- *                The address will contain a 4-byte int representing the number of
+ *                The address will contain a 4-bytes int representing the number of
  *                seconds elapsed since January 1 1970(Unix time).
- * @param size The maximum size(in bytes) that can be written at the given address.
- * @return The size(in bytes) of the date. If the size of the date is greater than
- *         the maximum size(the size parameter) the date was not written.
+ * @return The size(in bytes) of the date.
  */
 -(int) writeDate:(NSDate*) date
        atAddress:(void*) address
-         maxSize:(int) size
 {
     int seconds = [date timeIntervalSince1970];
-    if (sizeof(seconds) < size)
-    {
-        *(int*) address = seconds;
-    }
-
+    *(int*) address = seconds;
     return sizeof(seconds);
 }
 
@@ -416,20 +429,12 @@ static PimUtils *sharedInstance = nil;
  * Writes an int value to a given address.
  * @param value The given int value.
  * @param address The specified address.
- * @param size The maximum size(in bytes) that can be written at the given address.
- * @return The size(in bytes) of an int. If the size of the int is greater than
- *         the maximum size(the size parameter) the date was not written.
  */
--(int) writeIntValue:(const int) value
+-(int) writeIntValue:(NSNumber*) value
            atAddress:(void*) address
-             maxSize:(const int) size
 {
-    if (sizeof(value) < size)
-    {
-        *(int*) address = value;
-    }
-
-    return sizeof(value);
+    *(int*) address = [value intValue];;
+    return sizeof(int);
 }
 
 /**
@@ -443,7 +448,6 @@ static PimUtils *sharedInstance = nil;
     NSData* data = nil;
     int size = maGetDataSize(handle);
     int* dst = new int[size];
-//    PimMaReadData(handle, dst, 0, size);
     maReadData(handle, dst, 0, size);
     data = [NSData dataWithBytes:dst length:size];
     delete[] dst;
@@ -565,6 +569,9 @@ static PimUtils *sharedInstance = nil;
         case MA_PIM_FIELD_CONTACT_TITLE:
             *type = MA_PIM_TYPE_STRING;
             break;
+        case MA_PIM_FIELD_CONTACT_UID:
+            *type = MA_PIM_TYPE_STRING;
+            break;
         case MA_PIM_FIELD_CONTACT_URL:
             *type = MA_PIM_TYPE_STRING;
             *singleValue = false;
@@ -666,6 +673,42 @@ static PimUtils *sharedInstance = nil;
             break;
         default:
             returnValue = false;
+    }
+
+    return returnValue;
+}
+
+/**
+ * Get the number of indices for a given field.
+ * e.g. for MA_PIM_FIELD_CONTACT_NAME it will return 8 because the field contains
+ * the next indices:
+ * - MA_PIM_CONTACT_NAME_FAMILY
+ * - MA_PIM_CONTACT_NAME_GIVEN
+ * - MA_PIM_CONTACT_NAME_OTHER
+ * - MA_PIM_CONTACT_NAME_PREFIX
+ * - MA_PIM_CONTACT_NAME_SUFFIX
+ * - MA_PIM_CONTACT_NAME_PHONETIC_FAMILY
+ * - MA_PIM_CONTACT_NAME_PHONETIC_GIVEN
+ * - MA_PIM_CONTACT_NAME_PHONETIC_OTHER
+ */
+-(int) getNumberOfIndicesForField:(const int) fieldID
+{
+    int returnValue;
+    switch (fieldID)
+    {
+        case MA_PIM_FIELD_CONTACT_ADDR:
+        case MA_PIM_FIELD_CONTACT_NAME:
+            returnValue = 8;
+            break;
+        case MA_PIM_FIELD_CONTACT_ORG_INFO:
+            returnValue = 6;
+            break;
+        case MA_PIM_FIELD_CONTACT_IM:
+            returnValue = 2;
+            break;
+        default:
+            returnValue = 1;
+            break;
     }
 
     return returnValue;

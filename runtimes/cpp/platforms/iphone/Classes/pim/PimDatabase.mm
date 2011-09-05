@@ -138,7 +138,11 @@
  */
 -(PimItem*) getItem:(MAHandle) itemHandle
 {
-	PimItem* item = [mContactsList getItem:itemHandle];
+	PimItem* item = nil;
+    if (mContactsList)
+    {
+        return [mContactsList getItem:itemHandle];
+    }
 
 	return item;
 }
@@ -154,6 +158,21 @@
 	}
 
 	return MA_PIM_ERR_HANDLE_INVALID;
+}
+
+/**
+ * Closes a given item.
+ * @param itemHandle A handle to a pim item.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) closeItem:(MAHandle) itemHandle
+{
+    if (mContactsList)
+    {
+        return [mContactsList closeItem:itemHandle];
+    }
+
+    return MA_PIM_ERR_HANDLE_INVALID;
 }
 
 /**

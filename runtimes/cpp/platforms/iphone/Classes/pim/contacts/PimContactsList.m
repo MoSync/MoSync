@@ -161,7 +161,6 @@
 -(int) close
 {
     int returnedValue = MA_PIM_ERR_NONE;
-    CFErrorRef error = NULL;
 
     NSArray* keysArray = [mContactsDictionary allKeys];
     int countContacts = [keysArray count];
@@ -169,51 +168,16 @@
     {
         NSString* key = [keysArray objectAtIndex:i];
         PimContactItem* item = [mContactsDictionary objectForKey:key];
-        PimItemStatus status = [item getStatus];
-
-        if (kNewItem == status)
+        returnedValue = [self saveItemInAddressBook:item];
+        if (MA_PIM_ERR_NONE != returnedValue)
         {
-            // Write item's field into record.
-            [item close];
-
-            bool isAdded = ABAddressBookAddRecord(mAddressBook, [item getRecord], &error);
-
-            // Check if the item was added to Address Book.
-            if (!isAdded)
-            {
-                returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-                break;
-            }
-        }
-        else if (kModifiedItem == status)
-        {
-            // Remove the old record from Address Book.
-            bool isRemoved = ABAddressBookRemoveRecord(mAddressBook, [item getRecord], &error);
-            // Check if the item was removed from Address Book.
-            if (!isRemoved)
-            {
-                returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-                break;
-            }
-
-            // Write item's field into record.
-            [item close];
-
-            // Add the new item to Address Book.
-            bool isAdded = ABAddressBookAddRecord(mAddressBook, [item getRecord], &error);
-
-            // Check if the item was added to Address Book.
-            if (!isAdded)
-            {
-                returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-                break;
-            }
+            break;
         }
     }
 
     [keysArray release];
 
-    bool isSaved = ABAddressBookSave(mAddressBook, &error);
+    bool isSaved = ABAddressBookSave(mAddressBook, NULL);
 
     // Check if the Address Book was saved.
     if (!isSaved)
@@ -225,6 +189,59 @@
     if (MA_PIM_ERR_NONE == returnedValue)
     {
         [mContactsDictionary removeAllObjects];
+    }
+
+    return returnedValue;
+}
+
+/**
+ * Closes a given item.
+ * @param itemHandle A handle to a pim item.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) closeItem:(MAHandle) itemHandle
+{
+    PimContactItem* item = (PimContactItem*)[self getItem:itemHandle];
+    if(!item)
+    {
+        return MA_PIM_ERR_HANDLE_INVALID;
+    }
+
+    int resultCode = MA_PIM_ERR_NONE;
+    resultCode = [self saveItemInAddressBook:item];
+
+    bool isSaved = ABAddressBookSave(mAddressBook, NULL);
+    // Check if the Address Book was saved.
+    if (!isSaved)
+    {
+       resultCode = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
+   }
+
+    return resultCode;
+}
+
+/**
+ * Adds an item in Address Book.
+ * @param item The given item.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) saveItemInAddressBook:(PimContactItem*) item
+{
+    PimItemStatus status = [item getStatus];
+    int returnedValue = MA_PIM_ERR_NONE;
+
+    // Write item's field into record.
+    [item close];
+
+    if (kNewItem == status)
+    {
+        bool isAdded = ABAddressBookAddRecord(mAddressBook, [item getRecord], NULL);
+
+        // Check if the item was added to Address Book.
+        if (!isAdded)
+        {
+            returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
+        }
     }
 
     return returnedValue;
@@ -243,11 +260,17 @@
         return MA_PIM_ERR_HANDLE_INVALID;
     }
 
+    PimItemStatus status = [item getStatus];
     NSString* key = [[NSString alloc] initWithFormat:@"%d",itemHandle];
     ABAddressBookRemoveRecord(mAddressBook, [item getRecord], nil);
+
     [mContactsDictionary removeObjectForKey:key];
     [item release];
     [key release];
+    if (kNewItem != status)
+    {
+        mKeysArrayIndex--;
+    }
 
     return MA_PIM_ERR_NONE;
 }
@@ -257,7 +280,6 @@
  */
 - (void) dealloc
 {
-
     CFRelease(mAddressBook);
     [mContactsDictionary release];
 

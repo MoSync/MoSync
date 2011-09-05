@@ -336,6 +336,11 @@
 -(void) readRevisionField;
 
 /**
+ * Reads the UID field from the record.
+ */
+-(void) readUIDField;
+
+/**
  * Reads the instant message field from the record.
  */
 -(void) readIMField;

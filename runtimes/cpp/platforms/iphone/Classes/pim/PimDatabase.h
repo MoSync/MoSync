@@ -76,6 +76,13 @@
 -(MAHandle) createItem:(MAHandle) list;
 
 /**
+ * Closes a given item.
+ * @param itemHandle A handle to a pim item.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) closeItem:(MAHandle) itemHandle;
+
+/**
  * Removes an pim item from a specified list.
  * @param list The given list.
  * @param item The given item.

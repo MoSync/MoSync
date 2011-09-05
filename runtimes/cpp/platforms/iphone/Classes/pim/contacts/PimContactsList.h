@@ -83,6 +83,20 @@
 -(int) close;
 
 /**
+ * Closes a given item.
+ * @param itemHandle A handle to a pim item.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) closeItem:(MAHandle) itemHandle;
+
+/**
+ * Adds an item in Address Book.
+ * @param item The given item.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) saveItemInAddressBook:(PimContactItem*) item;
+
+/**
  * Removes an pim item from this list.
  * @param itemHandle The given item.
  * @return One of the MA_PIM_ERR constants.
