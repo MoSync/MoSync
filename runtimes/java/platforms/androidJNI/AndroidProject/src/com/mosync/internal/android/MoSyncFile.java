@@ -20,6 +20,7 @@ package com.mosync.internal.android;
 
 import java.io.File;
 import java.io.FilenameFilter;
+import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
@@ -55,6 +56,16 @@ public class MoSyncFile {
 	MoSyncThread mMoSyncThread;
 
 	int mFileHandleNext = 1;
+
+	void log(String s)
+	{
+		Log.i("MoSyncFile", s);
+	}
+
+	void logerr(String s)
+	{
+		Log.e("MoSyncFile ERROR", s);
+	}
 
 	/**
 	 * Internal file for handling files
@@ -109,7 +120,7 @@ public class MoSyncFile {
 			}
 			catch(Throwable t)
 			{
-				Log.e("MoSync File API","(Exception) File open : " + t);
+				logerr("openChannel Exception : " + t);
 				return MA_FERR_GENERIC;
 			}
 			return 0;
@@ -183,7 +194,7 @@ public class MoSyncFile {
 
 	/**
 	 * Constructor File API
-	 * @param thread The underlaying MoSync thread
+	 * @param thread The underlying MoSync thread
 	 */
 	public MoSyncFile(MoSyncThread thread)
 	{
@@ -222,25 +233,31 @@ public class MoSyncFile {
 	*/
 	int maFileOpen(String path, int mode)
 	{
-		Log.i("maFileOpen","("+path+", "+mode+"): "+mFileHandleNext);
+		log("maFileOpen ("+path+", "+mode+"): "+mFileHandleNext);
 		try
 		{
 			MoSyncFileHandle fileHandle = new MoSyncFileHandle(path, mode);
-			if(fileHandle.mFile.exists()) {
+			if(fileHandle.mFile.exists())
+			{
 				if(fileHandle.mIsAFile != fileHandle.mFile.isFile())
+				{
 					return MA_FERR_WRONG_TYPE;
+				}
+
 				if(fileHandle.mIsAFile)
 				{
 					int res = fileHandle.open();
 					if(res < 0)
+					{
 						return res;
+					}
 				}
 			}
 			mFileHandles.put(mFileHandleNext, fileHandle);
 		}
 		catch(Throwable t)
 		{
-			Log.e("MoSync File API","(Exception) maOpenFile : " + t);
+			logerr("maOpenFile Exception: " + t);
 			return MA_FERR_GENERIC;
 		}
 
@@ -253,8 +270,8 @@ public class MoSyncFile {
 	int maFileExists(int file)
 	{
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
-		Log.i("maFileExists","("+file+"): "+fileHandle.mFile.exists());
-		if(fileHandle.mFile.exists()) return 1;
+		log("maFileExists ("+file+"): "+fileHandle.mFile.exists());
+		if(fileHandle.mFile.exists()) { return 1; }
 		return 0;
 	}
 
@@ -263,7 +280,7 @@ public class MoSyncFile {
 	*/
 	int maFileClose(int file)
 	{
-		Log.i("maFileClose","("+file+")");
+		log("maFileClose ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -288,7 +305,7 @@ public class MoSyncFile {
 	*/
 	int maFileCreate(int file)
 	{
-		Log.i("maFileCreate","("+file+")");
+		log("maFileCreate ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -310,13 +327,15 @@ public class MoSyncFile {
 			else
 			{
 				if(!fileHandle.mFile.mkdirs())
+				{
 					return MA_FERR_GENERIC;
+				}
 				return 0;
 			}
 		}
 		catch (Throwable t)
 		{
-			Log.e("MoSync File API","Got exception:" + t.toString());
+			logerr("Got exception:" + t.toString());
 			return MA_FERR_GENERIC;
 		}
 	}
@@ -329,7 +348,7 @@ public class MoSyncFile {
 	*/
 	int maFileDelete(int file)
 	{
-		Log.i("maFileDelete","("+file+")");
+		log("maFileDelete ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -367,6 +386,8 @@ public class MoSyncFile {
 			return MA_FERR_FORBIDDEN;
 		}
 
+		log("maFileDelete success ("+file+")");
+
 		return 0;
 	}
 
@@ -377,6 +398,7 @@ public class MoSyncFile {
 	*/
 	int maFileSize(int file)
 	{
+		log("maFileSize ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -388,7 +410,17 @@ public class MoSyncFile {
 			return MA_FERR_GENERIC;
 		}
 
-		return (int)fileHandle.mFile.length();
+		try
+		{
+			log("maFileSize ("+file+") size:"+fileHandle.mFile.length());
+			log("maFileSize ("+file+") mFileChannel size:"+fileHandle.mFileChannel.size());
+			return (int)fileHandle.mFileChannel.size();
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+			return MA_FERR_GENERIC;
+		}
 	}
 
 	/**
@@ -400,6 +432,7 @@ public class MoSyncFile {
 	*/
 	int maFileAvailableSpace(int file)
 	{
+		log("maFileAvailableSpace ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -419,6 +452,7 @@ public class MoSyncFile {
 	*/
 	int maFileTotalSpace(int file)
 	{
+		log("maFileTotalSpace ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -438,6 +472,7 @@ public class MoSyncFile {
 	*/
 	int maFileDate(int file)
 	{
+		log("maFileDate ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -464,6 +499,7 @@ public class MoSyncFile {
 	*/
 	int maFileRename(int file, String newName)
 	{
+		log("maFileRename ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -490,8 +526,7 @@ public class MoSyncFile {
 		boolean success = fileHandle.mFile.renameTo(newFile);
 		if (success)
 		{
-			Log.i("MoSync",
-				"SUCCESS maFileRename from: " +
+			log("SUCCESS maFileRename from: " +
 				fileHandle.mFile.getAbsolutePath() +
 				" to: " + newFile.getAbsolutePath());
 
@@ -503,8 +538,7 @@ public class MoSyncFile {
 		}
 		else
 		{
-			Log.i("MoSync",
-				"FAIL maFileRename from: " +
+			log("FAIL maFileRename from: " +
 				fileHandle.mFile.getAbsolutePath() +
 				" to: " + newFile.getAbsolutePath());
 
@@ -533,6 +567,7 @@ public class MoSyncFile {
 	*/
 	int maFileTruncate(int file, int offset)
 	{
+		log("maFileTruncate ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -546,7 +581,7 @@ public class MoSyncFile {
 		}
 		catch (Throwable error)
 		{
-			Log.e("MoSync File API", "(Exception) maFileTruncate - " + error);
+			logerr("(Exception) maFileTruncate - " + error);
 			return MA_FERR_GENERIC;
 		}
 	}
@@ -562,7 +597,7 @@ public class MoSyncFile {
 		{
 			int ret = fileHandle.mFileChannel.write(byteBuffer);
 
-			Log.i("MoSync File API", "writeByteBufferToFile bytes written: "  + ret);
+			log("writeByteBufferToFile bytes written: "  + ret);
 
 			fileHandle.mCurrentPosition =
 				(int)fileHandle.mFileChannel.position();
@@ -571,7 +606,7 @@ public class MoSyncFile {
 		}
 		catch (Throwable t)
 		{
-			Log.e("MoSync File API", "(Exception) writeByteBufferToFile - " + t);
+			logerr("writeByteBufferToFile Exception - " + t);
 			t.printStackTrace();
 			return MA_FERR_GENERIC;
 		}
@@ -588,7 +623,7 @@ public class MoSyncFile {
 		{
 			int ret = fileHandle.mFileChannel.read(byteBuffer);
 
-			Log.i("MoSync File API", "readFileToByteBuffer bytes read: "  + ret);
+			log("readFileToByteBuffer bytes read: "  + ret);
 
 			fileHandle.mCurrentPosition =
 				(int)fileHandle.mFileChannel.position();
@@ -597,7 +632,7 @@ public class MoSyncFile {
 		}
 		catch(Throwable t)
 		{
-			Log.e("MoSync File API","(Exception) maWriteFile - " + t);
+			logerr("readFileToByteBuffer Exception - " + t);
 			return MA_FERR_GENERIC;
 		}
 	}
@@ -608,6 +643,7 @@ public class MoSyncFile {
 	*/
 	int maFileWrite(int file, int src, int len)
 	{
+		log("maFileWrite ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
@@ -639,23 +675,24 @@ public class MoSyncFile {
 	*/
 	int maFileWriteFromData(int file, int data, int offset, int len)
 	{
+		log("maFileWriteFromData ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
-			Log.i("MoSync File API", "maFileWriteFromData: file handle not found");
+			logerr("maFileWriteFromData: MA_FERR_NOTFOUND file handle not found");
 			return MA_FERR_NOTFOUND;
 		}
 
 		if (fileHandle.mAccessMode == MA_ACCESS_READ)
 		{
-			Log.i("MoSync File API", "maFileWriteFromData: writing forbidden");
+			logerr("maFileWriteFromData: MA_FERR_FORBIDDEN writing forbidden");
 			return MA_FERR_FORBIDDEN;
 		}
 
 		ByteBuffer byteBuffer = mMoSyncThread.getBinaryResource(data);
 		if (null == byteBuffer)
 		{
-			Log.e("MoSync File API","maFileWriteFromData: No such data resource");
+			logerr("maFileWriteFromData: MA_FERR_GENERIC No such data resource");
 			return MA_FERR_GENERIC;
 		}
 
@@ -665,26 +702,24 @@ public class MoSyncFile {
 		// If the whole object should be written, just write it.
 		if ((offset == 0) && (len == byteBuffer.capacity()))
 		{
-			Log.i("MoSync File API",
-				"maFileWriteFromData: writing whole buffer length: " + len);
+			log("maFileWriteFromData: writing whole buffer length: " + len);
 
 			int writtenBytes = writeByteBufferToFile(fileHandle, byteBuffer);
 			if (len != writtenBytes)
 			{
-				Log.e("MoSync File API","maFileWriteFromData: error: len != writtenBytes");
+				logerr("maFileWriteFromData: MA_FERR_GENERIC error: len != writtenBytes");
 				return MA_FERR_GENERIC;
 			}
 			else
 			{
 				// Success.
-				Log.i("MoSync File API", "maFileWriteFromData: success");
+				log("maFileWriteFromData: success");
 				return 0;
 			}
 		}
 		else
 		{
-			Log.i("MoSync File API",
-				"maFileWriteFromData: writing buffer slice length: " + len);
+			log("maFileWriteFromData: writing buffer slice length: " + len);
 
 			// Otherwise create a sliced buffer and write it to file.
 			ByteBuffer slicedBuffer = byteBuffer.slice();
@@ -693,13 +728,13 @@ public class MoSyncFile {
 			int writtenBytes = writeByteBufferToFile(fileHandle, slicedBuffer);
 			if (len != writtenBytes)
 			{
-				Log.e("MoSync File API","maFileWriteFromData: error: len != writtenBytes");
+				logerr("maFileWriteFromData: MA_FERR_GENERIC error: len != writtenBytes");
 				return MA_FERR_GENERIC;
 			}
 			else
 			{
 				// Success.
-				Log.i("MoSync File API", "maFileWriteFromData: success");
+				log("maFileWriteFromData: success");
 				return 0;
 			}
 		}
@@ -711,9 +746,12 @@ public class MoSyncFile {
 	*/
 	int maFileRead(int file, int dst, int len)
 	{
+		log("maFileRead ("+file+")");
+
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
+			logerr("maFileRead Error: MA_FERR_NOTFOUND ("+file+")");
 			return MA_FERR_NOTFOUND;
 		}
 
@@ -733,16 +771,19 @@ public class MoSyncFile {
 	*/
 	int maFileReadToData(int file, int data, int offset, int len)
 	{
+		log("maFileReadToData ("+file+")");
+
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
+			logerr("maFileReadToData MA_FERR_NOTFOUND ("+file+")");
 			return MA_FERR_NOTFOUND;
 		}
 
 		ByteBuffer byteBuffer = mMoSyncThread.getBinaryResource(data);
 		if (null == byteBuffer)
 		{
-			Log.e("MoSync File API","(Error) No such data resource");
+			logerr("maFileReadToData MA_FERR_GENERIC No such data resource ("+file+")");
 			return MA_FERR_GENERIC;
 		}
 
@@ -755,13 +796,13 @@ public class MoSyncFile {
 			int readBytes = readFileToByteBuffer(fileHandle, byteBuffer);
 			if (len != readBytes)
 			{
-				Log.e("MoSync File API","maFileReadToData: error: len != readBytes");
+				logerr("maFileReadToData: MA_FERR_GENERIC error: len != readBytes");
 				return MA_FERR_GENERIC;
 			}
 			else
 			{
 				// Success.
-				Log.i("MoSync File API", "maFileReadToData: success");
+				log("maFileReadToData: success");
 				return 0;
 			}
 		}
@@ -773,13 +814,13 @@ public class MoSyncFile {
 			int readBytes = readFileToByteBuffer(fileHandle, slicedBuffer);
 			if (len != readBytes)
 			{
-				Log.e("MoSync File API","maFileReadToData: error: len != readBytes");
+				logerr("maFileReadToData: MA_FERR_GENERIC error: len != readBytes");
 				return MA_FERR_GENERIC;
 			}
 			else
 			{
 				// Success.
-				Log.i("MoSync File API", "maFileReadToData: success");
+				log("maFileReadToData: success");
 				return 0;
 			}
 		}
@@ -791,9 +832,11 @@ public class MoSyncFile {
 	*/
 	int maFileTell(int file)
 	{
+		log("maFileTell ("+file+")");
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
+			logerr("maFileTell: MA_FERR_NOTFOUND");
 			return MA_FERR_NOTFOUND;
 		}
 
@@ -804,7 +847,7 @@ public class MoSyncFile {
 		}
 		catch(Throwable t)
 		{
-			Log.e("MoSync File API","(Exception) maFileTell : " + t);
+			logerr("maFileTell MA_FERR_GENERIC Exception: " + t);
 			return MA_FERR_GENERIC;
 		}
 	}
@@ -819,9 +862,12 @@ public class MoSyncFile {
 	*/
 	int maFileSeek(int file, int offset, int whence)
 	{
+		log("maFileSeek ("+file+")");
+
 		MoSyncFileHandle fileHandle = mFileHandles.get(file);
 		if (null == fileHandle)
 		{
+			logerr("maFileSeek: MA_FERR_NOTFOUND");
 			return MA_FERR_NOTFOUND;
 		}
 
@@ -832,7 +878,7 @@ public class MoSyncFile {
 			try {
 				offset = (int)fileHandle.mFile.length() + offset;
 			} catch(Throwable t) {
-				Log.e("MoSync File API","(Exception) maFileSeek : " + t.toString());
+				logerr("maFileSeek MA_FERR_GENERIC Exception: " + t.toString());
 				return MA_FERR_GENERIC;
 			}
 			break;
@@ -840,12 +886,12 @@ public class MoSyncFile {
 			try {
 				offset = (int)fileHandle.mFileChannel.position() + offset;
 			} catch(Throwable t) {
-				Log.e("MoSync File API","(Exception) maFileSeek : " + t.toString());
+				logerr("maFileSeek MA_FERR_GENERIC Exception: " + t.toString());
 				return MA_FERR_GENERIC;
 			}
 			break;
 		default:
-			throw new Error("maFileSeek: Invalid whence!");
+			throw new Error("maFileSeek: Invalid whence! Throwing Error");
 		}
 
 		try
@@ -854,7 +900,7 @@ public class MoSyncFile {
 		}
 		catch(Throwable t)
 		{
-			Log.e("MoSync File API","(Exception) maFileSeek : " + t.toString());
+			logerr("maFileSeek MA_FERR_GENERIC Exception: " + t.toString());
 			return MA_FERR_GENERIC;
 		}
 
@@ -877,6 +923,8 @@ public class MoSyncFile {
 	*/
 	int maFileListStart(String path, String filter)
 	{
+		log("maFileListStart ");
+
 		mNumFileListings++;
 
 		try
@@ -885,7 +933,7 @@ public class MoSyncFile {
 
 			if(path.equals(""))
 			{
-				Log.i("MoSync File API","Getting roots...");
+				log("maFileListStart Getting roots...");
 
 				// Only support for sdcard at this point
 
@@ -897,26 +945,27 @@ public class MoSyncFile {
 			else
 			{
 				// get a folder listing ( wildcards... not at this point )
-				Log.i("MoSync File API","Getting directory...");
+				log("maFileListStart Getting directory...");
 
 				File f = new File(path);
 				fileListing.mFiles = f.listFiles();
 			}
 
 			for(int i = 0; i != fileListing.mFiles.length; i++)
-				Log.i("MoSync File API", " dir: "
-						+ fileListing.mFiles[i].getPath());
+			{
+				log("maFileListStart dir: " + fileListing.mFiles[i].getPath());
+			}
 
 			mFileListings.put(mNumFileListings, fileListing);
 		}
 		catch(SecurityException se)
 		{
-			Log.e("MoSync File API"," ** SECURITY BREACH!!! ** ");
+			logerr("maFileListStart ** SECURITY BREACH!!! ** MA_FERR_FORBIDDEN");
 			return MA_FERR_FORBIDDEN;
 		}
 		catch(Throwable t)
 		{
-			Log.e("MoSync File API","(Exception) maFileListStart : " + t);
+			logerr("maFileListStart MA_FERR_GENERIC Exception: " + t);
 			return MA_FERR_GENERIC;
 		}
 
@@ -940,6 +989,8 @@ public class MoSyncFile {
 	*/
 	int maFileListNext(int list, int nameBuf, int bufSize)
 	{
+		log("maFileListNext");
+
 		MoSyncFileListing fileListing = mFileListings.get(list);
 
 		if(fileListing.mFiles.length == fileListing.mIndex) return 0;
@@ -947,21 +998,25 @@ public class MoSyncFile {
 		File file = fileListing.mFiles[fileListing.mIndex];
 		String name = file.getName();
 
-		Log.i("MoSync File API","current path: " + name);
+		log("maFileListNext current path: " + name);
 
 		byte[] nameChars = name.getBytes();
 		int len = nameChars.length+1;
 
 		if(file.isDirectory())
+		{
 			len++;
+		}
 
-		if(bufSize == 0) return len-1;
-		if(len > bufSize) return len-1;
+		if(bufSize == 0) { return len-1; }
+		if(len > bufSize) { return len-1; }
 
 		mMoSyncThread.mMemDataSection.position(nameBuf);
 		mMoSyncThread.mMemDataSection.put(nameChars);
 		if(file.isDirectory())
+		{
 			mMoSyncThread.mMemDataSection.putChar('/');
+		}
 		mMoSyncThread.mMemDataSection.put((byte)0);
 
 		fileListing.mIndex++;
@@ -976,6 +1031,8 @@ public class MoSyncFile {
 	*/
 	int maFileListClose(int list)
 	{
+		log("maFileListClose");
+
 		mFileListings.remove(list);
 		return 0;
 	}
