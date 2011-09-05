@@ -263,7 +263,6 @@ static PimUtils *sharedInstance = nil;
             NSString* string = [[NSString alloc] initWithBytes:stringSrc length:stringLength
                                                   encoding:NSUTF16LittleEndianStringEncoding];
             [array addObject:string];
-            NSLog(@"PimUtil--getArray--string %d = %@", i, string);
         }
     }
 

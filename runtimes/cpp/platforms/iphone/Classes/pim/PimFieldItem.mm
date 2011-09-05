@@ -28,7 +28,7 @@
  * Init function.
  * @param fieldID Must be one of MA_PIM_FIELD_CONTACT constants.
  * If the fieldID param is invalid or not supported on this platform,
- * the functions return nil.
+ * the function returns nil.
  */
 -(id) initWithFieldID:(int) fieldID
 {
@@ -142,7 +142,7 @@
 	// Check if the attribute is set to MA_PIM_ATTR_CUSTOM.
     NSString* label = [itemValue getLabel];
 	int attribute = [self getAttributeFromLabel:label];
-	if (NO_ATTRIBUTE != attribute)
+	if (CUSTOM_ATTRIBUTE != attribute)
 	{
 		return MA_PIM_ERR_NO_LABEL;
 	}
@@ -280,7 +280,7 @@
 {
     bool isAttributeCustom = false;
     int attributeId = [self getAttributeFromLabel:label];
-    if (NO_ATTRIBUTE == attributeId)
+    if (CUSTOM_ATTRIBUTE == attributeId)
     {
         // The attribute is custom.
         // Get the custom attribute value.
@@ -377,11 +377,11 @@
 /**
  * Gets the attribute id from a specifed label value.
  * @param label The given label.
- * @return The attribute id, or NO_ATTRIBUTE is the attribute is custom.
+ * @return The attribute id, or CUSTOM_ATTRIBUTE is the attribute is custom.
  */
 -(int) getAttributeFromLabel:(NSString*) label
 {
-    int attributeId = NO_ATTRIBUTE;
+    int attributeId = CUSTOM_ATTRIBUTE;
     NSMutableDictionary* allowedAttributes =
         [[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
     NSArray* attributesArray = [allowedAttributes allKeysForObject:label];
@@ -401,7 +401,6 @@
 - (void) dealloc
 {
 	[mFieldValuesArray release];
-
 	[super dealloc];
 }
 

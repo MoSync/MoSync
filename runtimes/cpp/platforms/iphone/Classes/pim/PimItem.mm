@@ -281,7 +281,7 @@
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
      indexValue:(const int) index
- valueAttribute:(const int) atttribute
+ valueAttribute:(const int) attribute
 {
     int returnValue;
     int field = args->field;
@@ -336,7 +336,7 @@
     }
 
     returnValue = [itemField setValue:valuesArray atIndex:index
-                        withAttribute:atttribute];
+                        withAttribute:attribute];
 
     // Modify item's status if it's imported.
     if (MA_PIM_ERR_NONE == returnValue &&

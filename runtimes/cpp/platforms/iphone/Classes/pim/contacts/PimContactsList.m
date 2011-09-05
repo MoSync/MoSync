@@ -67,7 +67,6 @@
 
         // Save the item into dictionary.
         [mContactsDictionary setObject:item forKey: key];
-        NSLog(@"contact item added-handle = %@", key);
         [key release];
     }
 
@@ -96,7 +95,7 @@
         return 0;
     }
 
-    // Sort the values in the array so the last values will last added.
+    // Sort the values in the array so the last values will be the last added.
     // The created contacts will be at the end of the array.
     NSArray* sortedKeysArray = [keysArray sortedArrayUsingComparator:
         ^(id obj1, id obj2)
@@ -143,7 +142,6 @@
     PimContactItem* item = [[PimContactItem alloc] init];
     int handle = [[PimUtils sharedInstance] getNextHandle];
     NSString* key = [[NSString alloc] initWithFormat:@"%d", handle];
-    NSLog(@"createItem PimContactList --- create item with key = %@", key);
 
     [mContactsDictionary setObject:item forKey: key];
     [key release];

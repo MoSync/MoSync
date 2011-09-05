@@ -78,7 +78,7 @@
  * Adds the new items into Address Book.
  * Saves the modified items into Address Book.
  * Removes all items from the list.
- * @return One of MA_PIM_ERR contants.
+ * @return One of MA_PIM_ERR constants.
  */
 -(int) close;
 

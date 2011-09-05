@@ -152,7 +152,7 @@
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
      indexValue:(const int) index
- valueAttribute:(const int) atttribute;
+ valueAttribute:(const int) attribute;
 
 /**
  * Removes a value from a field.

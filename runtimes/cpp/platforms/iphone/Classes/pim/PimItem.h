@@ -170,7 +170,7 @@ typedef enum {
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
      indexValue:(const int) index
- valueAttribute:(const int) atttribute;
+ valueAttribute:(const int) attribute;
 
 /**
  * Adds a value to a specified field.

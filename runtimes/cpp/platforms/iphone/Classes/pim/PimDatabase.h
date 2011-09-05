@@ -39,7 +39,7 @@
 /**
  * Opens a pim list.
  * @param listType One of MA_PIM constants.
- * @return A pim list handle, or MA_PIM_ERR_UNAVAILABLE_LIST in case of error.
+ * @return A pim list handle, or one of MA_PIM_ERR constants in case of error
  */
 -(MAHandle) pimListOpen:(const int) listType;
 
@@ -47,7 +47,7 @@
  * Gets a handle to the next pim item in the specified list.
  * @param list The specified list.
  * @return A handle to the next item, or 0 if there are no more items,
- * or one of MA_PIM_ERR_ in case of error.
+ * or one of MA_PIM_ERR in case of error.
  */
 -(MAHandle) pimListNext:(MAHandle) list;
 
@@ -73,6 +73,11 @@
  */
 -(PimItem*) getItem:(MAHandle) itemHandle;
 
+/**
+ * Creates a new pim item for a given pim list.
+ * @param list The given pim list.
+ * @return A handle to a new pim item.
+ */
 -(MAHandle) createItem:(MAHandle) list;
 
 /**
