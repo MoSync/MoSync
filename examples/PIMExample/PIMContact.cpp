@@ -220,7 +220,7 @@ void PIMContact::modifyAddressField()
     mArgs.bufSize = copyWCharArray(mArgs.buf, sAddressLabel);
 
     // Set label value for address field at position 0.
-    /*checkResultCode(*/maPimItemSetLabel(&mArgs, 0)/*)*/;
+    checkResultCode(maPimItemSetLabel(&mArgs, 0));
     waitForClick();
 }
 

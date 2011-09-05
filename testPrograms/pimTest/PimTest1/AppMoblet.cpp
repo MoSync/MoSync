@@ -133,12 +133,14 @@ void AppMoblet::testMaPimFieldType()
 
     // Test syscall with valid list handle and valid field.
     printf("Test syscall with valid list handle and valid field.");
-    printResultCode(maPimFieldType(list, MA_PIM_FIELD_CONTACT_NAME));
+    int fieldType = maPimFieldType(list, MA_PIM_FIELD_CONTACT_NAME);
+    printResultCode(fieldType);
+    printf("Field Type = %d", fieldType);
 }
 
 /**
  * Open PIM list.
- * @param listType One of the next contants:
+ * @param listType One of the next constants:
  * - MA_PIM_CONTACTS
  * - MA_PIM_EVENTS
  * - MA_PIM_TODOS

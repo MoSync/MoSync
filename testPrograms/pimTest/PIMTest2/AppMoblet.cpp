@@ -147,17 +147,16 @@ void AppMoblet::testSyscallsWithRandomValues(MAHandle item)
 
 
     printf("\n============maPimItemGetField syscall==========");
-    // Test with invalid handle.
+
     printf("Test syscall with a invalid handle");
     printResultCode(maPimItemGetField(112266, 0));
     printf("\n");
 
-    // Test with valid handle, invalid field.
+
     printf("Test syscall with a valid handle, invalid field index");
     printResultCode(maPimItemGetField(item, 33));
     printf("\n");
 
-    // Test with valid handle and valid field index.
     printf("Test syscall with a valid handle and valid field index");
     printResultCode(maPimItemGetField(item, 0));
     printf("\n");
@@ -165,27 +164,23 @@ void AppMoblet::testSyscallsWithRandomValues(MAHandle item)
 
 
     printf("\n============maPimItemFieldCount syscall=============");
-    // Test with invalid handle.
+
     printf("Test syscall with a invalid handle");
     printResultCode(maPimItemFieldCount(112266, 0));
     printf("\n");
 
-    // Test with valid handle, invalid field.
     printf("Test syscall with a valid handle, invalid field id");
     printResultCode(maPimItemFieldCount(item, 33));
     printf("\n");
 
-    // Test with valid handle, unsupported field.
     printf("Test syscall with a valid handle, unsupported field id");
     printResultCode(maPimItemFieldCount(item, MA_PIM_FIELD_CONTACT_CLASS));
     printf("\n");
 
-    // Test with valid handle, empty field.
     printf("Test syscall with a valid handle, empty field");
     printResultCode(maPimItemFieldCount(item, MA_PIM_FIELD_CONTACT_IM));
     printf("\n");
 
-    // Test with valid handle and valid field id.
     printf("Test syscall with a valid handle and valid field id");
     printResultCode(maPimItemFieldCount(item,MA_PIM_FIELD_CONTACT_NAME));
     printf("\n");
@@ -193,22 +188,19 @@ void AppMoblet::testSyscallsWithRandomValues(MAHandle item)
 
 
     printf("\n============maPimItemGetAttributes syscall=============");
-    // Test with invalid handle.
+
     printf("Test syscall with a invalid handle");
     printResultCode(maPimItemGetAttributes(112266, 0, 0));
     printf("\n");
 
-    // Test with valid handle, invalid field.
     printf("Test syscall with a valid handle, invalid field id");
     printResultCode(maPimItemGetAttributes(item, 33, 0));
     printf("\n");
 
-    // Test with valid handle, unsupported field.
     printf("Test syscall with a valid handle, unsupported field id");
     printResultCode(maPimItemGetAttributes(item, MA_PIM_FIELD_CONTACT_CLASS, 0));
     printf("\n");
 
-    // Test with valid handle, valid field id and invalid value index
     printf("Test syscall with a valid handle, valid field id and invalid value index");
     int attribute = maPimItemGetAttributes(
         item,
@@ -217,7 +209,6 @@ void AppMoblet::testSyscallsWithRandomValues(MAHandle item)
     printResultCode(attribute);
     printf("\n");
 
-    // Test with valid handle, valid field id and valid value index, but the field does not support attributes
     printf("Test syscall with a valid handle, valid field id and valid value index, but the field does not support attributes");
     attribute = maPimItemGetAttributes(
         item,
@@ -226,7 +217,6 @@ void AppMoblet::testSyscallsWithRandomValues(MAHandle item)
     printResultCode(attribute);
     printf("\n");
 
-    // Test with valid handle, valid field id, valid value index and the field supports attributes
     printf("Test syscall with a valid handle, valid field id, valid value index and the field supports attributes.");
     attribute = maPimItemGetAttributes(
         item,
@@ -239,44 +229,37 @@ void AppMoblet::testSyscallsWithRandomValues(MAHandle item)
 
     printf("\n============maPimItemGetLabel syscall=============");
     args.item = 1233;
-    // Test with invalid handle.
+
     printf("Test syscall with a invalid handle");
     printResultCode(maPimItemGetLabel(&args, 0));
     printf("\n");
 
-    // Test with valid handle, invalid field.
     printf("Test syscall with a valid handle, invalid field id");
     args.item = item;
     args.field = 1400;
     printResultCode(maPimItemGetLabel(&args, 0));
     printf("\n");
 
-    // Test with valid handle, unsupported field.
     printf("Test syscall with a valid handle, unsupported field id");
     args.field = MA_PIM_FIELD_CONTACT_CLASS;
     printResultCode(maPimItemGetLabel(&args, 0));
     printf("\n");
 
-    // Test with valid handle, valid field id, but the field has no values
     printf("Test syscall with a valid handle, valid field id, but the field has no values");
     args.field = MA_PIM_FIELD_CONTACT_ADDR;
     printResultCode(maPimItemGetLabel(&args, 100));
     printf("\n");
 
-    // Test with valid handle, valid field id and invalid value index
     printf("Test syscall with a valid handle, valid field id and invalid value index");
     args.field = MA_PIM_FIELD_CONTACT_TEL;
     printResultCode(maPimItemGetLabel(&args, 100));
     printf("\n");
 
-    // Test with valid handle, valid field id,valid value index but the field
-    // does not have custom attribute(label).
     printf("Test with valid handle, valid field id,valid value index but the field does not have custom attribute(label)");
     args.field = MA_PIM_FIELD_CONTACT_NAME;
     printResultCode(maPimItemGetLabel(&args, 0));
     printf("\n");
 
-    // Test with valid handle, valid field id and valid value index
     printf("Test syscall with a valid handle, valid field id and valid value index");
     args.field = MA_PIM_FIELD_CONTACT_TEL;
     printResultCode(maPimItemGetLabel(&args, 2));

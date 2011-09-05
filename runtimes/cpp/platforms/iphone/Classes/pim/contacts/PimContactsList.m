@@ -26,7 +26,7 @@
 -(id) init
 {
     mContactsDictionary = [[NSMutableDictionary alloc] init];
-    mKeysArrayIndex = MA_PIM_ERR_LIST_NOT_OPENED;
+    mKeysArrayIndex = MA_PIM_ERR_HANDLE_INVALID;
     return [super init];
 }
 
@@ -84,9 +84,9 @@
 -(MAHandle) getNextItem
 {
     // Check if the list is opened.
-    if(MA_PIM_ERR_LIST_NOT_OPENED == mKeysArrayIndex)
+    if(MA_PIM_ERR_HANDLE_INVALID == mKeysArrayIndex)
     {
-        return MA_PIM_ERR_LIST_NOT_OPENED;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     // Check if the are more items in list.
@@ -238,9 +238,9 @@
 -(int) removeItem:(MAHandle) itemHandle
 {
     PimContactItem* item = (PimContactItem*)[self getItem:itemHandle];
-    if (nil == item)
+    if (!item)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     NSString* key = [[NSString alloc] initWithFormat:@"%d",itemHandle];

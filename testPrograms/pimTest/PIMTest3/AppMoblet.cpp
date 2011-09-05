@@ -41,14 +41,14 @@
 AppMoblet::AppMoblet() :
     Moblet()
 {
-    //    this->startTesting();
-    //    this->testMaPimItemCreate();
-    //    this->testMaPimItemClose();
-//    this->testMaPimItemRemove();
-//    this->testMaPimItemSetLabel();
-//    this->testMaPimItemAddValue();
-//    this->testMaPimItemSetValue();
-//    this->testMaPimItemGetValue();
+    this->startTesting();
+    this->testMaPimItemCreate();
+    this->testMaPimItemClose();
+    this->testMaPimItemRemove();
+    this->testMaPimItemSetLabel();
+    this->testMaPimItemAddValue();
+    this->testMaPimItemSetValue();
+    this->testMaPimItemGetValue();
     this->testMaPimItemRemoveValue();
 }
 
@@ -102,6 +102,8 @@ void AppMoblet::testMaPimItemCreate()
     MAHandle list = maPimListOpen(MA_PIM_CONTACTS);
     printResultCode(list);
     printResultCode(maPimItemCreate(list));
+
+    maPimListClose(list);
 }
 
 /**
@@ -251,6 +253,7 @@ void AppMoblet::testMaPimItemAddValue()
 
     printf("\nTest syscall with invalid attribute");
     args.field = MA_PIM_FIELD_CONTACT_ADDR;
+    writeWCharArraysToBuf(args.buf, sAddressHome, 8);
     printResultCode(maPimItemAddValue(&args, 9099));
 
     printf("\nTest syscall with attribute from another field");
@@ -305,6 +308,7 @@ void AppMoblet::testMaPimItemSetValue()
     waitForClick();
 
     printf("\nTest syscall with invalid attribute");
+    writeWCharArraysToBuf(args.buf, sAddressHome, 8);
     printResultCode(maPimItemSetValue(&args, 0, 9099));
 
     printf("\nTest syscall with attribute from another field");

@@ -50,11 +50,11 @@
 	else if(MA_PIM_EVENTS == listType ||
             MA_PIM_TODOS == listType)
     {
-        return MA_PIM_ERR_UNAVAILABLE_LIST;
+        return MA_PIM_ERR_LIST_UNAVAILABLE;
     }
     else
 	{
-		return MA_PIM_ERR_INVALID_LIST_TYPE;
+		return MA_PIM_ERR_LIST_TYPE_INVALID;
 	}
 }
 
@@ -66,7 +66,7 @@
  */
 -(MAHandle) pimListNext:(MAHandle) list
 {
-	MAHandle returnedValue = MA_PIM_ERR_INVALID_HANDLE;
+	MAHandle returnedValue = MA_PIM_ERR_HANDLE_INVALID;
 
 	if (MA_PIM_CONTACTS == list)
 	{
@@ -96,14 +96,9 @@
 			mContactsList = nil;
 		}
 	}
-    else if(MA_PIM_EVENTS == list ||
-            MA_PIM_TODOS)
-    {
-        returnedValue = MA_PIM_ERR_UNAVAILABLE_LIST;
-    }
 	else
 	{
-		returnedValue = MA_PIM_ERR_INVALID_HANDLE;
+		returnedValue = MA_PIM_ERR_HANDLE_INVALID;
 	}
 
 	return returnedValue;
@@ -118,9 +113,9 @@
 {
 	int returnedValue;
 
-	if (nil == list)
+	if (!list)
 	{
-		returnedValue = MA_PIM_ERR_LIST_NOT_OPENED;
+		returnedValue = MA_PIM_ERR_HANDLE_INVALID;
 	}
 	else
 	{
@@ -158,7 +153,7 @@
         }
 	}
 
-	return MA_PIM_ERR_INVALID_HANDLE;
+	return MA_PIM_ERR_HANDLE_INVALID;
 }
 
 /**
@@ -178,7 +173,7 @@
         }
 	}
 
-	return MA_PIM_ERR_INVALID_HANDLE;
+	return MA_PIM_ERR_HANDLE_INVALID;
 }
 
 /**
