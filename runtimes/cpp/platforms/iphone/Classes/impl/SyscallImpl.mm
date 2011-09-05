@@ -1690,7 +1690,7 @@ return 0; \
 
 	SYSCALL(int, maCameraRecord(int stopStartFlag))
 	{		
-		return 1;
+		return -1;
 	}
 
 	SYSCALL(int, maCameraSetProperty(const char *property, const char* value))
