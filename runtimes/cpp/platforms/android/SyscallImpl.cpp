@@ -1251,7 +1251,6 @@ namespace Base
 	}
 
     void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
-        
         int* stringsArray = (int*)strings;
         const GLchar** strCopies = new const GLchar*[count];
         
@@ -1628,6 +1627,8 @@ namespace Base
 			SYSLOG("maIOCtl_maWidgetGetProperty");
 			int _widget = a;
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
+			//Read the fourth parameter from the register
+			//(the first three can be read directly)
 			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
@@ -1994,7 +1995,7 @@ namespace Base
 		case maIOCtl_maCameraGetProperty:
 		{
 			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
-			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBufferSize = c;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				b, 
 				_valueBufferSize * sizeof(char));
