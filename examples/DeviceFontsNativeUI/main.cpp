@@ -49,21 +49,21 @@ public:
 		maWidgetAddChild(screen, mList);
 
 		//Set a font size. This is independent of screen size.
-		int fontSize=20;
+		int fontSize = 20;
 
 		//Get the number of fonts installed in the device
-		int mNumFonts=maFontGetCount();
+		int mNumFonts = maFontGetCount();
 
 		//Set a buffer for font names
 		char buffer[64];
 
-		for(int i=0;i<mNumFonts;i++)
+		for (int i = 0; i < mNumFonts; i++)
 		{
 			//Get the i-th font name
-			if(maFontGetName(i,buffer,64))
+			if (maFontGetName(i, buffer, 64))
 			{
 				//Load the font, and get it's handle
-				MAHandle font=maFontLoadWithName(buffer,fontSize);
+				MAHandle font = maFontLoadWithName(buffer, fontSize);
 
 				//Create a list item
 				MAHandle listItem = maWidgetCreate(MAW_LIST_VIEW_ITEM);

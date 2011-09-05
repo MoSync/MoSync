@@ -21,40 +21,41 @@ public:
 	 */
 	MyMoblet()
 	{
-		MAExtent ex=maGetScrSize();
-		mScreenWidth=EXTENT_X(ex);
-		mScreenHeight=EXTENT_Y(ex);
-		mFontSize=mScreenHeight/40;
+		//Calculate the font size
+		MAExtent ex = maGetScrSize();
+		mScreenWidth = EXTENT_X(ex);
+		mScreenHeight = EXTENT_Y(ex);
+		mFontSize = mScreenHeight / 40;
 
 		//Here we load a default font, which is used for the first collumn
-		mDefaultFont=maFontLoadDefault(FONT_TYPE_SANS_SERIF,0,mFontSize);
+		mDefaultFont = maFontLoadDefault(FONT_TYPE_SANS_SERIF, 0, mFontSize);
 
 		//This variable is used for scrolling the screen
-		mCurrentPosition=0;
+		mCurrentPosition = 0;
 
 		//The additional empty space between two fonts
-		mFontSpacer=5;
+		mFontSpacer = 5;
 
 		//Buffer for holding a font name
 		char buffer[64];
 
 		//The number of fonts installed in the device
-		mNumFonts=maFontGetCount();
+		mNumFonts = maFontGetCount();
 
 		//A list of font handles
-		mFonts=new MAHandle[mNumFonts];
+		mFonts = new MAHandle[mNumFonts];
 
 		//A list of font names
-		mFontNames=new String*[mNumFonts];
+		mFontNames = new String*[mNumFonts];
 
-		for(int i=0;i<mNumFonts;i++)
+		for (int i = 0; i < mNumFonts; i++)
 		{
 			//Get the name of the font at position i
-			if(maFontGetName(i,buffer,64))
+			if (maFontGetName(i, buffer, 64))
 			{
 				//Load a font with that name, and get it's handle
-				mFonts[i]=maFontLoadWithName(buffer,mFontSize);
-				mFontNames[i]=new String(buffer,16);
+				mFonts[i] = maFontLoadWithName(buffer, mFontSize);
+				mFontNames[i] = new String(buffer, 16);
 			}
 		}
 
@@ -67,14 +68,14 @@ public:
 	void printFonts()
 	{
 		maSetColor(0x000000); //Background color
-		maFillRect(0,0,mScreenWidth,mScreenHeight);
+		maFillRect(0, 0, mScreenWidth,mScreenHeight);
 		maSetColor(0xFFFFFF); //Text color
 
 		//Position for the first font
-		int y=10-mCurrentPosition;
-		int x=10;
+		int y = 10 - mCurrentPosition;
+		int x = 10;
 
-		for(int i=0;i<mNumFonts;i++)
+		for (int i = 0; i < mNumFonts; i++)
 		{
 			//Set the font system to the default font
 			maFontSetCurrent(mDefaultFont);
@@ -86,12 +87,12 @@ public:
 			maFontSetCurrent(mFonts[i]);
 
 			//Print it with maDrawText
-			maDrawText(x+(mFontSize*10), y, "maDrawText");
+			maDrawText(x + (mFontSize * 10), y, "maDrawText");
 
 			//And again with maDrawTextW
-			maDrawTextW(x+(mFontSize*20), y, L"maDrawTextW");
+			maDrawTextW(x + (mFontSize * 20), y, L"maDrawTextW");
 
-			y+=(mFontSize+mFontSpacer);
+			y += (mFontSize + mFontSpacer);
 		}
 
 		maUpdateScreen();
@@ -123,13 +124,21 @@ public:
 	 */
 	void pointerMoveEvent(MAPoint2d point)
 	{
-		int d=mLastPointerPosition-point.y;
-		mLastPointerPosition=point.y;
+		//We find the distance that the pointed was moved
+		//since the last call to pointerMoveEvent
+		int d = mLastPointerPosition - point.y;
+		mLastPointerPosition = point.y;
 
-		mCurrentPosition+=d;
+		//We update our current position in the font list
+		mCurrentPosition += d;
 
-		mCurrentPosition=(mCurrentPosition<0)?0:mCurrentPosition;
-		mCurrentPosition=(mCurrentPosition>(mNumFonts-1)*(mFontSize+mFontSpacer))?(mNumFonts-1)*(mFontSize+mFontSpacer):mCurrentPosition;
+		//We make sure that we are not out of bounds
+		mCurrentPosition = (mCurrentPosition < 0)
+								?0
+								:mCurrentPosition;
+		mCurrentPosition = (mCurrentPosition > (mNumFonts - 1) * (mFontSize + mFontSpacer))
+								?(mNumFonts - 1) * (mFontSize + mFontSpacer)
+								:mCurrentPosition;
 
 		printFonts();
 	}
@@ -139,16 +148,16 @@ public:
 		mLastPointerPosition=point.y;
 	}
 private:
-	int mScreenWidth;
-	int mScreenHeight;
-	MAHandle *mFonts;
-	String **mFontNames;
-	int mNumFonts;
-	int mFontSize;
-	int mFontSpacer;
-	int mCurrentPosition;
-	int mLastPointerPosition;
-	MAHandle mDefaultFont;
+	int mScreenWidth;			//The width of the device screen
+	int mScreenHeight;			//The height of the device screen
+	MAHandle *mFonts;			//A pointer to an array of font handles
+	String **mFontNames;		//A pointer to an array of String pointers (the font names)
+	int mNumFonts;				//The number of fonts installed in the device
+	int mFontSize;				//The font size which will be used
+	int mFontSpacer;			//Vertical space between two lines
+	int mCurrentPosition;		//Current screen position for scrolling through the font list
+	int mLastPointerPosition;	//Helped variable for scrolling
+	MAHandle mDefaultFont;		//The default font, used here for printing font names
 };
 
 /**
