@@ -125,6 +125,18 @@ void AppMoblet::pointerPressEvent(MAPoint2d point)
 }
 
 /**
+ * Method called when a key is pressed.
+ */
+void AppMoblet::keyPressEvent(int keyCode, int nativeCode)
+{
+    // Close the application if the back key is pressed.
+    if(MAK_BACK == keyCode)
+    {
+        close();
+    }
+}
+
+/**
  * Start working with PIM.
  * Add, modify and remove a PIM contact.
  */

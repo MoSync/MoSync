@@ -71,6 +71,11 @@ public:
     virtual void pointerPressEvent(MAPoint2d point);
 
     /**
+     * Method called when a key is pressed.
+     */
+    void keyPressEvent(int keyCode, int nativeCode);
+
+    /**
      * Start working with PIM.
      * Add, modify and remove a PIM contact.
      */
