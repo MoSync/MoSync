@@ -412,8 +412,6 @@ public class MoSyncFile {
 
 		try
 		{
-			log("maFileSize ("+file+") size:"+fileHandle.mFile.length());
-			log("maFileSize ("+file+") mFileChannel size:"+fileHandle.mFileChannel.size());
 			return (int)fileHandle.mFileChannel.size();
 		}
 		catch (IOException e)
@@ -876,7 +874,7 @@ public class MoSyncFile {
 			break;
 		case MA_SEEK_END:
 			try {
-				offset = (int)fileHandle.mFile.length() + offset;
+				offset = (int)fileHandle.mFileChannel.size() + offset;
 			} catch(Throwable t) {
 				logerr("maFileSeek MA_FERR_GENERIC Exception: " + t.toString());
 				return MA_FERR_GENERIC;
