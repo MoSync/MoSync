@@ -37,7 +37,6 @@ namespace NativeUI
     /**
      * A navigation bar is an iPhone specific widget that shows a nav bar
      * with an optional title and back button.
-     * There is a replica available for Android.
      */
     class NavigationBar : public Widget
     {
