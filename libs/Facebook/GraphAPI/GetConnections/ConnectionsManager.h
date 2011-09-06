@@ -1,20 +1,3 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * ConnectionsManager.h
  *
@@ -80,6 +63,9 @@ public:
 	 */
 	void request(const MAUtil::String &connType, const MAUtil::Vector<MAUtil::String> &fields, const MAUtil::String &id = "me");
 
+	void limitTheNumberOfObjectsToFetch(int maxNumberOfObjects);
+
+	void fetchAllObjects();
 
 	/*
 	 * destructor.
@@ -87,6 +73,9 @@ public:
 	virtual ~ConnectionsManager();
 
 private:
+
+	bool allObjectsMustBeFetched();
+
 	friend class Facebook;
 
 	/*
@@ -94,19 +83,19 @@ private:
 	 * @param result - the JSON data retrieved from Facebook, in response to the connection request
 	 * @param connectionType - the connection requested.
 	 */
-	virtual void jsonDataReceived(YAJLDom::Value* result, const MAUtil::String &connectionType,
-		const MAUtil::String &objectId);
+	virtual void jsonDataReceived(YAJLDom::Value* result, const MAUtil::String &connectionType,	const MAUtil::String &objectId);
 
-	virtual void imageReceived(MAHandle image, const MAUtil::String &connType,
-		const MAUtil::String &objectId) GCCATTRIB(noreturn);
-	virtual void videoReceived(MAHandle video, const MAUtil::String &connType,
-		const MAUtil::String &objectId) GCCATTRIB(noreturn);
+	/*
+	 * This function is called when the "picture" connection is retrieved from server. The data retrieved
+	 * from the server is transformed into a image handle.
+	 */
+	virtual void imageReceived(MAHandle image, const MAUtil::String &connType, const MAUtil::String &objectId);
 
 	/*
 	 * Overwrite of RetrieveDataListener::queryError
 	 * @param code - HTTP error code received
 	 * @param path - the id of the object for which the connection was requested, and the connection, in the form: id/connection
-	 * e.g: me/feed, 575687658/picture
+	 * 				 e.g: me/feed, 575687658/picture
 	 */
 	virtual void queryError(int code, const MAUtil::String &path);
 
@@ -196,33 +185,32 @@ protected:
 	 */
 	void retrieveStatusMessages(YAJLDom::Value* result, const MAUtil::String &connType, const MAUtil::String &objectId);
 
-	/*
-	 * This function is called when the "picture" connection is retrieved from server.
-	 */
-	void retrievePicture(YAJLDom::Value* result, const MAUtil::String &connType,
-		const MAUtil::String &objectId) GCCATTRIB(noreturn);
-
 protected:
 	/*
-	 * Performs the actually connection request.
+	 * mFacebook - performs the actually connection request.
 	 */
-	Facebook *mFacebook;
+	Facebook 					*mFacebook;
 
 	/*
-	 * It is informed about the result of the request.
+	 * ConnectionsManagerListener object - it is informed about the result of the request.
 	 */
-	ConnectionsManagerListener *mConnectionListener;
+	ConnectionsManagerListener	*mConnectionListener;
 
 	typedef void (ConnectionsManager::*requestHandler)(YAJLDom::Value*, const MAUtil::String &, const MAUtil::String &);
 
 	/*
-	 * Contains the mapping between the connection name ("feed", "home" ect.), and the function that
+	 * mAvailableRequests - map that contains the mapping between the connection name ("feed", "home" ect.), and the function that
 	 * parses the JSON data retrieved from the server.
 	 * Contains all the connection requests handled by the ConnectionsManager.
 	 */
 	MAUtil::Map<MAUtil::String, requestHandler> mAvailableRequests;
 
 	MAUtil::Set<MAUtil::String> mFields;
+
+	int mMaxNumberOfObjectsToFetch;
 };
+
+
+
 
 #endif /* CONNECTIONSMANAGER_H_ */

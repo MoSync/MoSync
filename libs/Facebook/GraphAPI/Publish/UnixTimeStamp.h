@@ -1,20 +1,3 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * UnixTimeStamp.h
  *
@@ -32,8 +15,8 @@ MA 02110-1301, USA.
  */
 struct Date
 {
-	Date(const MAUtil::String &year, const MAUtil::String &month="", const MAUtil::String &day="")
-		: mYear(year), mMonth(month), mDay(day) {}
+	Date(const MAUtil::String &year, const MAUtil::String &month="", const MAUtil::String &day=""): mYear(year), mMonth(month), mDay(day) {}
+
 	MAUtil::String mYear;
 	MAUtil::String mMonth;
 	MAUtil::String mDay;
@@ -44,8 +27,8 @@ struct Date
  */
 struct Time
 {
-	Time(const MAUtil::String &hour, const MAUtil::String &minute="", const MAUtil::String &second="")
-		: mHour(hour), mMinute(minute), mSecond(second) {}
+	Time(const MAUtil::String &hour, const MAUtil::String &minute="", const MAUtil::String &second="") : mHour(hour), mMinute(minute), mSecond(second) {}
+
 	MAUtil::String mHour;
 	MAUtil::String mMinute;
 	MAUtil::String mSecond;

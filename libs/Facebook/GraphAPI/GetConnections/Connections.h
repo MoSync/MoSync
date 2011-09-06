@@ -1,20 +1,3 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * Connections.h
  *
@@ -361,7 +344,6 @@ struct Connections<User>
 		return "videos";
 	}
 };
-
 /*
  * Template class for retrieving the available connections for an Video object
  */
@@ -381,5 +363,8 @@ struct Connections<Video>
 		return "picture";
 	}
 };
+
+
+
 
 #endif /* CONNECTIONS_H_ */

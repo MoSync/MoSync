@@ -30,8 +30,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <conprint.h>
 #include <MAP/MemoryMgr.h>
 
-using namespace MAUtil;
+using namespace MAPUtil;
 
+namespace MAUtil {
 namespace YAJLDom {
 
 static NullValue sNullValue;
@@ -424,3 +425,4 @@ Value* parse(const unsigned char* jsonText, size_t jsonTextLength) {
 }
 
 } // namespace YAJLDom
+} // namespace MAUtil

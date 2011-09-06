@@ -1,20 +1,3 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * HTTPProtocol.h
  *
@@ -36,24 +19,22 @@ using namespace MAUtil;
 
 class HttpProtocolListener {
 public:
-	virtual void response(HttpRequest* request, HttpResponse* response) = 0;
-	virtual void cancel(HttpRequest* request) {}
+	virtual void response(HttpRequest* req, HttpResponse* res) {}
+	virtual void cancel(HttpRequest* req) {}
 };
 
 class HttpProtocol : public HttpQueryDownloadListener {
 public:
 	HttpProtocol();
 
-	void request(HttpRequest* request);
-	void request(UploadRequest* request);
+	void request(HttpRequest* req);
+	void request(UploadRequest* req);
 
 	void addListener(HttpProtocolListener* listener);
 
-	// HttpQueryDownloadListener
 	void httpQueryFinished(HttpQueryDownloader* downloader, const byte* data, int length);
-	void httpQueryFinished(HttpQueryDownloader* downloader, MAHandle resource) GCCATTRIB(noreturn);
-	void httpWriteFinished(HttpQueryDownloader* downloader, int code) GCCATTRIB(noreturn);
 	void httpQueryCancelled(HttpQueryDownloader* downloader);
+	void httpWriteFinished(HttpQueryDownloader* downloader);
 	void httpQueryError(HttpQueryDownloader *downloader, int code);
 
 	inline virtual ~HttpProtocol() {}

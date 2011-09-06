@@ -1,20 +1,3 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * ConnectionsManager.cpp
  *
@@ -23,9 +6,9 @@ MA 02110-1301, USA.
  */
 
 #include "ConnectionsManager.h"
-#include "JSON_lib/ParseJSONData.h"
+#include "../../JSON_lib/ParseJSONData.h"
 
-#include "LOG.h"
+#include "../../LOG.h"
 
 
 using MAUtil::String;
@@ -39,8 +22,9 @@ using MAUtil::String;
  * id of the object, for which the connection was made, are passed to the "ConnectionsManagerListener".
  */
 ConnectionsManager::ConnectionsManager(Facebook *facebook):
-	mFacebook(facebook),
-	mConnectionListener(NULL)
+				mFacebook(facebook),
+				mConnectionListener(NULL),
+				mMaxNumberOfObjectsToFetch(-1)
 {
 	mFacebook->setRetrieveDataListener((RetrieveDataListener*)this);
 
@@ -52,117 +36,113 @@ ConnectionsManager::ConnectionsManager(Facebook *facebook):
 	/*
 	 * The comments made on a Facebook object (Album, Post, Photo ect)
 	 */
-	mAvailableRequests["comments"] = &ConnectionsManager::retrieveComments;
+	mAvailableRequests["comments"]	 			= &ConnectionsManager::retrieveComments;
 
 	/*
 	 * User connections
 	 */
 
 	//The user's friends.
-	mAvailableRequests["friends"] = &ConnectionsManager::retrieveIdNamePairs;
+	mAvailableRequests["friends"] 				= &ConnectionsManager::retrieveIdNamePairs;
 
 	//The user's news feed.
-	mAvailableRequests["home"] = &ConnectionsManager::retrievePosts;
+	mAvailableRequests["home"] 					= &ConnectionsManager::retrievePosts;
 
 	//The user's wall.
-	mAvailableRequests["feed"] = &ConnectionsManager::retrievePosts;
+	mAvailableRequests["feed"] 					= &ConnectionsManager::retrievePosts;
 
 	//All the pages this user has liked.
-	mAvailableRequests["likes"] = &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["likes"] 				= &ConnectionsManager::retrieveCategoryData;
 
 	//The movies listed on the user's profile.
-	mAvailableRequests["movies"] = &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["movies"] 				= &ConnectionsManager::retrieveCategoryData;
 
 	//The music listed on the user's profile.
-	mAvailableRequests["music"] = &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["music"] 				= &ConnectionsManager::retrieveCategoryData;
 
 	//The books listed on the user's profile.
-	mAvailableRequests["books"] = &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["books"] 				= &ConnectionsManager::retrieveCategoryData;
 
 	//The user's notes.
-	mAvailableRequests["notes"] = &ConnectionsManager::retrieveNotes;
+	mAvailableRequests["notes"] 				= &ConnectionsManager::retrieveNotes;
 
 	//The photo albums this user has created.
-	mAvailableRequests["albums"] = &ConnectionsManager::retrieveAlbums;
+	mAvailableRequests["albums"] 				= &ConnectionsManager::retrieveAlbums;
 
 	//The videos this user has been tagged in.
-	mAvailableRequests["videos"] = &ConnectionsManager::retrieveVideos;
+	mAvailableRequests["videos"] 				= &ConnectionsManager::retrieveVideos;
 
 	//The videos this user has uploaded.
-	mAvailableRequests["videos/uploaded"] = &ConnectionsManager::retrieveVideos;
+	mAvailableRequests["videos/uploaded"] 		= &ConnectionsManager::retrieveVideos;
 
 	//The events this user is attending.
-	mAvailableRequests["events"] = &ConnectionsManager::retrieveEvents;
+	mAvailableRequests["events"] 				= &ConnectionsManager::retrieveEvents;
 
 	//The Groups that the user belongs to.
-	mAvailableRequests["groups"] = &ConnectionsManager::retrieveGroups;
+	mAvailableRequests["groups"] 				= &ConnectionsManager::retrieveGroups;
 
 	//The places that the user has checked-into.
-	mAvailableRequests["checkins"] = &ConnectionsManager::retrieveCheckins;
+	mAvailableRequests["checkins"]	 			= &ConnectionsManager::retrieveCheckins;
 
 	//The Facebook apps and pages owned by the current user.
-	mAvailableRequests["accounts"] = &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["accounts"]	 			= &ConnectionsManager::retrieveCategoryData;
 
 	//The activities listed on the user's profile.
-	mAvailableRequests["activities"] = &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["activities"]	 		= &ConnectionsManager::retrieveCategoryData;
 
 	//The user's friend lists.
-	mAvailableRequests["friendlists"] = &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["friendlists"]			= &ConnectionsManager::retrieveCategoryData;
 
 	//The interests listed on the user's profile.
-	mAvailableRequests["interests"] = &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["interests"]	 			= &ConnectionsManager::retrieveCategoryData;
 
 	//The links listed on the user's profile.
-	mAvailableRequests["links"] = &ConnectionsManager::retrieveLinks;
+	mAvailableRequests["links"]	 	 			= &ConnectionsManager::retrieveLinks;
 
 	//The user's own posts.
-	mAvailableRequests["posts"] = &ConnectionsManager::retrievePosts;
+	mAvailableRequests["posts"]	 	 			= &ConnectionsManager::retrievePosts;
 
 	//The user's status updates.
-	mAvailableRequests["statuses"] = &ConnectionsManager::retrieveStatusMessages;
+	mAvailableRequests["statuses"]	 			= &ConnectionsManager::retrieveStatusMessages;
 
 	//The television listed on the user's profile.
-	mAvailableRequests["television"] = &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["television"] 			= &ConnectionsManager::retrieveCategoryData;
 	/*
 	 * Photos the user (or friend) is tagged in
 	 */
-	mAvailableRequests["photos"] = &ConnectionsManager::retrievePhotos;
-	/*
-	 * The user's profile picture. You can retrieve the profile photo for a Group also. Or an Event.
-	 */
-	mAvailableRequests["picture"] = &ConnectionsManager::retrievePicture;
+	mAvailableRequests["photos"] 				= &ConnectionsManager::retrievePhotos;
 
 	/*
 	 * Event connections
 	 */
 
 	//All of the users who have been not yet responded to their invitation to this event.
-	mAvailableRequests["noreply"] = &ConnectionsManager::retrieveEventResponses;
+	mAvailableRequests["noreply"]	 			= &ConnectionsManager::retrieveEventResponses;
 
 	//All of the users who have been responded "Maybe" to their invitation to this event.
-	mAvailableRequests["maybe"] = &ConnectionsManager::retrieveEventResponses;
+	mAvailableRequests["maybe"]	 	 			= &ConnectionsManager::retrieveEventResponses;
 
 	//All of the users who have been invited to this event.
-	mAvailableRequests["invited"] = &ConnectionsManager::retrieveEventResponses;
+	mAvailableRequests["invited"]	 	 		= &ConnectionsManager::retrieveEventResponses;
 
 	//All of the users who have been responded "Attending" to their invitation to this event.
-	mAvailableRequests["attending"] = &ConnectionsManager::retrieveEventResponses;
+	mAvailableRequests["attending"]	 			= &ConnectionsManager::retrieveEventResponses;
 
 	//All of the users who have been responded "Declined" to their invitation to this event.
-	mAvailableRequests["declined"] = &ConnectionsManager::retrieveEventResponses;
+	mAvailableRequests["declined"]	 			= &ConnectionsManager::retrieveEventResponses;
 
 
 	/*
 	 * Group and FriendList connections
 	 */
 
-	mAvailableRequests["members"] = &ConnectionsManager::retrieveIdNamePairs;
+	mAvailableRequests["members"]	 			= &ConnectionsManager::retrieveIdNamePairs;
 	//"docs" connection: not implemented. TODO: implement
 
 	/*
 	 * Photo connections
 	 */
-	mAvailableRequests["tags"] = &ConnectionsManager::retrieveIdNamePairs;
+	mAvailableRequests["tags"]	 	 			= &ConnectionsManager::retrieveIdNamePairs;
 }
 
 /*
@@ -217,6 +197,16 @@ void ConnectionsManager::request(const MAUtil::String &connType, const MAUtil::V
 	mFacebook->requestGraph(RETRIEVE_DATA, JSON, id + "/" + connType, HTTP_GET, messageBodyParams);
 }
 
+void ConnectionsManager::limitTheNumberOfObjectsToFetch(int maxNumberOfObjects)
+{
+	mMaxNumberOfObjectsToFetch = maxNumberOfObjects;
+}
+
+void ConnectionsManager::fetchAllObjects()
+{
+	mMaxNumberOfObjectsToFetch = -1;
+}
+
 /*
  * This function is called when the "feed", "home"or "posts" connection is retrieved from server. It parses the
  * JSON data, and sends a vector of Post objects is send to the listener.
@@ -230,11 +220,25 @@ void ConnectionsManager::retrievePosts(YAJLDom::Value* result, const MAUtil::Str
 	MAUtil::Vector<Post> posts;
 	if(mFields.size()>0)
 	{
-		extract(posts, "data", result, mFields);
+		if(allObjectsMustBeFetched())
+		{
+			extract(posts, "data", result, mFields);
+		}
+		else
+		{
+			extract(posts, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(posts, "data",  result);
+		if(allObjectsMustBeFetched())
+		{
+			extract(posts, "data", result);
+		}
+		else
+		{
+			extract(posts, "data", result, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	mConnectionListener->received(posts, connType, objectId);
 }
@@ -253,11 +257,25 @@ void ConnectionsManager::retrieveIdNamePairs(YAJLDom::Value* result, const MAUti
 	MAUtil::Vector<IdNamePair> friends;
 	if(mFields.size()>0)
 	{
-		extract(friends, "data", result, mFields);
+		if( allObjectsMustBeFetched())
+		{
+			extract(friends, "data", result, mFields);
+		}
+		else
+		{
+			extract(friends, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(friends, "data", result);
+		if( allObjectsMustBeFetched())
+		{
+			extract(friends, "data", result);
+		}
+		else
+		{
+			extract(friends, "data", result, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	mConnectionListener->received(friends, connType, objectId);
 }
@@ -275,11 +293,27 @@ void ConnectionsManager::retrieveCategoryData(YAJLDom::Value* result, const MAUt
 	MAUtil::Vector<CategoryData> likes;
 	if(mFields.size()>0)
 	{
-		extract(likes, "data", result, mFields);
+		if( allObjectsMustBeFetched())
+		{
+			extract(likes, "data", result, mFields);
+		}
+		else
+		{
+			extract(likes, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
+
 	}
 	else
 	{
-		extract(likes, "data", result);
+		if( allObjectsMustBeFetched())
+		{
+			extract(likes, "data", result);
+		}
+		else
+		{
+			extract(likes, "data", result, mMaxNumberOfObjectsToFetch);
+		}
+
 	}
 	mConnectionListener->received(likes, connType, objectId);
 }
@@ -297,11 +331,27 @@ void ConnectionsManager::retrieveNotes(YAJLDom::Value* result, const MAUtil::Str
 	MAUtil::Vector<Note> notes;
 	if(mFields.size()>0)
 	{
-		extract(notes, "data", result, mFields);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(notes, "data", result, mFields);
+		}
+		else
+		{
+			extract(notes, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
+
 	}
 	else
 	{
-		extract(notes, "data", result);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(notes, "data", result);
+		}
+		else
+		{
+			extract(notes, "data", result, mMaxNumberOfObjectsToFetch);
+		}
+
 	}
 	mConnectionListener->received(notes, connType, objectId);
 }
@@ -319,11 +369,27 @@ void ConnectionsManager::retrievePhotos(YAJLDom::Value* result, const MAUtil::St
 	MAUtil::Vector<Photo> photos;
 	if(mFields.size()>0)
 	{
-		extract(photos, "data", result, mFields);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(photos, "data", result, mFields);
+		}
+		else
+		{
+			extract(photos, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
+
 	}
 	else
 	{
-		extract(photos, "data", result);
+		if( this->allObjectsMustBeFetched() )
+		{
+			extract(photos, "data", result);
+		}
+		else
+		{
+			extract(photos, "data", result, mMaxNumberOfObjectsToFetch);
+		}
+
 	}
 	mConnectionListener->received(photos, connType, objectId);
 }
@@ -338,15 +404,31 @@ void ConnectionsManager::retrieveAlbums(YAJLDom::Value* result, const MAUtil::St
 	{
 		return;
 	}
-	LOG("\t\tConnectionsManager::retrieveAlbums mFields.size()=%lu", mFields.size());
+
+	//LOG("\t\tConnectionsManager::retrieveAlbums mFields.size()=%d", mFields.size());
+
 	MAUtil::Vector<Album> albums;
 	if(mFields.size()>0)
 	{
-		extract(albums, "data", result, mFields);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(albums, "data", result, mFields);
+		}
+		else
+		{
+			extract(albums, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(albums, "data", result);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(albums, "data", result);
+		}
+		else
+		{
+			extract(albums, "data", result, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	mConnectionListener->received(albums, connType, objectId);
 }
@@ -364,11 +446,25 @@ void ConnectionsManager::retrieveVideos(YAJLDom::Value* result, const MAUtil::St
 	MAUtil::Vector<Video> videos;
 	if(mFields.size()>0)
 	{
-		extract(videos, "data", result, mFields);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(videos, "data", result, mFields);
+		}
+		else
+		{
+			extract(videos, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(videos, "data", result);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(videos, "data", result);
+		}
+		else
+		{
+			extract(videos, "data", result, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	mConnectionListener->received(videos, connType, objectId);
 }
@@ -387,11 +483,25 @@ void ConnectionsManager::retrieveEvents(YAJLDom::Value* result, const MAUtil::St
 	MAUtil::Vector<Event> events;
 	if(mFields.size()>0)
 	{
-		extract(events, "data", result, mFields);
+		if( allObjectsMustBeFetched())
+		{
+			extract(events, "data", result, mFields);
+		}
+		else
+		{
+			extract(events, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(events, "data", result);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(events, "data", result);
+		}
+		else
+		{
+			extract(events, "data", result, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	mConnectionListener->received(events, connTypes, objectId);
 }
@@ -409,11 +519,25 @@ void ConnectionsManager::retrieveGroups(YAJLDom::Value* result, const MAUtil::St
 	MAUtil::Vector<IdNamePair> groups;
 	if(mFields.size()>0)
 	{
-		extract(groups, "data", result, mFields);
+		if( allObjectsMustBeFetched())
+		{
+			extract(groups, "data", result, mFields);
+		}
+		else
+		{
+			extract(groups, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(groups, "data", result);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(groups, "data", result);
+		}
+		else
+		{
+			extract(groups, "data", result, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	mConnectionListener->received(groups, connType, objectId);
 }
@@ -427,11 +551,25 @@ void ConnectionsManager::retrieveCheckins(YAJLDom::Value* result, const MAUtil::
 	MAUtil::Vector<Checkin> checkins;
 	if(mFields.size()>0)
 	{
-		extract(checkins, "data", result, mFields);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(checkins, "data", result, mFields);
+		}
+		else
+		{
+			extract(checkins, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(checkins, "data", result);
+		if( allObjectsMustBeFetched())
+		{
+			extract(checkins, "data", result);
+		}
+		else
+		{
+			extract(checkins, "data", result, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	mConnectionListener->received(checkins, connType, objectId);
 }
@@ -449,11 +587,26 @@ void ConnectionsManager::retrieveComments(YAJLDom::Value* result, const MAUtil::
 	MAUtil::Vector<Comment> comments;
 	if(mFields.size()>0)
 	{
-		extract(comments, "data", result, mFields);
+		if( this->allObjectsMustBeFetched() )
+		{
+			extract(comments, "data", result, mFields);
+		}
+		else
+		{
+			extract(comments, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(comments, "data", result);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(comments, "data", result);
+		}
+		else
+		{
+			extract(comments, "data", result, mMaxNumberOfObjectsToFetch);
+		}
+
 	}
 	mConnectionListener->received(comments, connType, objectId);
 }
@@ -471,11 +624,26 @@ void ConnectionsManager::retrieveLinks(YAJLDom::Value* result, const MAUtil::Str
 	MAUtil::Vector<Link> links;
 	if(mFields.size()>0)
 	{
-		extract(links, "data", result, mFields);
+		if(allObjectsMustBeFetched())
+		{
+			extract(links, "data", result, mFields);
+		}
+		else
+		{
+			extract(links, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(links, "data", result);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(links, "data", result);
+		}
+		else
+		{
+			extract(links, "data", result, mMaxNumberOfObjectsToFetch);
+		}
+
 	}
 	mConnectionListener->received(links, connType, objectId);
 }
@@ -485,7 +653,7 @@ void ConnectionsManager::retrieveLinks(YAJLDom::Value* result, const MAUtil::Str
  * It parses the JSON data, and sends a vector of EventResponse objects is send to the listener.
  */
 void ConnectionsManager::retrieveEventResponses(YAJLDom::Value* result, const MAUtil::String &connType,
-	const MAUtil::String &objectId)
+		const MAUtil::String &objectId)
 {
 	if((NULL == mConnectionListener) || (NULL == result))
 	{
@@ -494,16 +662,34 @@ void ConnectionsManager::retrieveEventResponses(YAJLDom::Value* result, const MA
 	MAUtil::Vector<EventResponse> responses;
 	if(mFields.size()>0)
 	{
-		extract(responses, "data", result, mFields);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(responses, "data", result, mFields);
+		}
+		else
+		{
+			extract(responses, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(responses, "data", result);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(responses, "data", result);
+		}
+		else
+		{
+			extract(responses, "data", result, mMaxNumberOfObjectsToFetch);
+		}
 	}
 
 	mConnectionListener->received(responses, connType, objectId);
 }
 
+/*
+ * This function is called when the "statuses" connection is retrieved from server.
+ * It parses the JSON data, and sends a vector of StatusMessage objects is send to the listener.
+ */
 void ConnectionsManager::retrieveStatusMessages(YAJLDom::Value* result, const MAUtil::String &connType, const MAUtil::String &objectId)
 {
 	if((NULL == mConnectionListener) || (NULL == result))
@@ -513,23 +699,39 @@ void ConnectionsManager::retrieveStatusMessages(YAJLDom::Value* result, const MA
 	MAUtil::Vector<StatusMessage> messages;
 	if(mFields.size()>0)
 	{
-		extract(messages, "data", result, mFields);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(messages, "data", result, mFields);
+		}
+		else
+		{
+			extract(messages, "data", result, mFields, mMaxNumberOfObjectsToFetch);
+		}
 	}
 	else
 	{
-		extract(messages, "data", result);
+		if( allObjectsMustBeFetched() )
+		{
+			extract(messages, "data", result);
+		}
+		else
+		{
+			extract(messages, "data", result, mMaxNumberOfObjectsToFetch);
+		}
+
 	}
 
 	mConnectionListener->received(messages, connType, objectId);
 }
 
-void ConnectionsManager::retrievePicture(YAJLDom::Value* result, const MAUtil::String &connType, const MAUtil::String &objectId)
-{
-	PANIC_MESSAGE("not implemented");
-}
 
+/*
+ * Overwrite of RetrieveDataListener::jsonDataReceived
+ * @param result - the JSON data retrieved from Facebook, in response to the connection request
+ * @param connectionType - the connection requested.
+ */
 void ConnectionsManager::jsonDataReceived(YAJLDom::Value* result, const MAUtil::String &connectionType,
-	const MAUtil::String &objectId)
+		const MAUtil::String &objectId)
 {
 	if(mAvailableRequests.find(connectionType) != mAvailableRequests.end())
 	{
@@ -543,15 +745,25 @@ void ConnectionsManager::jsonDataReceived(YAJLDom::Value* result, const MAUtil::
 	}
 }
 
-void ConnectionsManager::imageReceived(MAHandle image, const MAUtil::String &connType, const MAUtil::String &objectId) {
-	PANIC_MESSAGE("not implemented");
-}
-void ConnectionsManager::videoReceived(MAHandle video, const MAUtil::String &connType, const MAUtil::String &objectId) {
-	PANIC_MESSAGE("not implemented");
+/*
+ * This function is called when the "picture" connection is retrieved from server. The data retrieved
+ * from the server is transformed into a image handle.
+ */
+void ConnectionsManager::imageReceived(MAHandle image, const MAUtil::String &connType, const MAUtil::String &objectId)
+{
+	mConnectionListener->received(image, connType, objectId);
 }
 
+/*
+ * Overwrite of RetrieveDataListener::queryError
+ * @param code - HTTP error code received
+ * @param path - the id of the object for which the connection was requested, and the connection, in the form: id/connection
+ * 				 e.g: me/feed, 575687658/picture
+ */
 void ConnectionsManager::queryError(int code, const MAUtil::String &path)
 {
+	LOG("\n\tConnectionsManager::queryError, mConnectionListener=%p", mConnectionListener);
+
 	if(mConnectionListener)
 	{
 		MAUtil::String connType;
@@ -568,6 +780,14 @@ void ConnectionsManager::queryError(int code, const MAUtil::String &path)
 	}
 }
 
+/*
+ * destructor.
+ */
 ConnectionsManager::~ConnectionsManager()
 {
+}
+
+bool ConnectionsManager::allObjectsMustBeFetched()
+{
+	return ( mMaxNumberOfObjectsToFetch <= 0 );
 }
