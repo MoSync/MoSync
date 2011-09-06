@@ -1225,19 +1225,26 @@ namespace Base {
 #ifdef SUPPORT_OPENGL_ES
 
 
-// remove implementations for broken bindings..
+// override implementations for broken bindings..
 #undef maIOCtl_glGetPointerv_case
 #define maIOCtl_glGetPointerv_case(func) \
 case maIOCtl_glGetPointerv: \
 {\
-return IOCTL_UNAVAILABLE; \
+GLenum _pname = (GLuint)a; \
+void* _pointer = GVMR(b, MAAddress);\
+wrap_glGetPointerv(_pname, _pointer); \
+return 0; \
 }
     
 #undef maIOCtl_glGetVertexAttribPointerv_case
 #define maIOCtl_glGetVertexAttribPointerv_case(func) \
 case maIOCtl_glGetVertexAttribPointerv: \
 {\
-return IOCTL_UNAVAILABLE; \
+GLuint _index = (GLuint)a; \
+GLenum _pname = (GLuint)b; \
+void* _pointer = GVMR(c, MAAddress);\
+wrap_glGetVertexAttribPointerv(_index, _pname, _pointer); \
+return 0; \
 }
     
 #undef maIOCtl_glShaderSource_case
@@ -1265,6 +1272,31 @@ return 0; \
         glShaderSource(shader, count, strCopies, length);
         delete strCopies;     
     }
+
+
+    void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
+        GLvoid* outPointer;
+        glGetVertexAttribPointerv(index, pname, &outPointer);
+        
+        if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
+            return;
+        
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
+    }
+    
+    void wrap_glGetPointerv(GLenum pname, void* pointer) {
+        GLvoid* outPointer;
+        glGetPointerv(pname, &outPointer);
+        
+        if(pname != GL_COLOR_ARRAY_POINTER &&
+           pname != GL_NORMAL_ARRAY_POINTER &&
+           pname != GL_POINT_SIZE_ARRAY_POINTER_OES &&
+           pname != GL_TEXTURE_COORD_ARRAY_POINTER &&
+           pname != GL_VERTEX_ARRAY_POINTER)
+            return;
+        
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);        
+    }    
     
 	int maOpenGLInitFullscreen(int glApi) {
 		if(sOpenGLScreen != -1) return 0;

@@ -369,6 +369,7 @@ void MainScreen::editBoxReturned(UIItem* item) {
 		if (!grid->setExpression(mExpression)) {
 			mEditBox->setProperty("placeholder", "invalid expression");
 			mEditBox->setProperty("text", "");
+			grid->setExpression("0");
 		}
 		mEditBox->setProperty("showKeyboard", "false");
 	}

@@ -56,10 +56,12 @@ int Base::Syscall::ValidatedStrLen(const char* ptr) {
 	return strlen(ptr);
 }
 const char* Base::Syscall::GetValidatedStr(int address) {
+    if(address == 0) return NULL;    
 	return (const char*)mem_ds+address;
 }
 
 const wchar* Base::Syscall::GetValidatedWStr(int address) {
+    if(address == 0) return NULL;
 	return (const wchar*)(mem_ds+address);
 }
 
@@ -69,6 +71,13 @@ int Base::Syscall::GetValidatedStackValue(int offset) {
 	//	BIG_PHAT_ERROR(ERR_STACK_OOB);
 	return *(int*)&mem_ds[address];	
 
+}
+
+int Base::Syscall::TranslateNativePointerToMoSyncPointer(void *nativePointer) {
+    if(nativePointer == NULL)
+        return 0;
+    else
+        return (byte*)nativePointer - (byte*)mem_ds;
 }
 
 void Base::Syscall::VM_Yield() {
@@ -211,7 +220,7 @@ void MoSync_ReloadProgram(MAHandle data, int reload) {
 }
 
 void MoSync_Exit() {
-	//[[UIApplication sharedApplication] terminateWithSuccess];
+    //[[UIApplication sharedApplication] terminateWithSuccess];
     exit(0);
 }
 
