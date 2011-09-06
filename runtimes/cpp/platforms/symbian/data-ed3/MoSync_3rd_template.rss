@@ -41,7 +41,8 @@ RESOURCE DIALOG r_textbox_query {
 				layout = EDataLayout;
 				label = "";
 				control = EDWIN {
-					flags = EEikEdwinNoHorizScrolling;
+					flags = EEikEdwinNoHorizScrolling | EEikEdwinResizable | EEikEdwinAllowUndo;
+					default_input_mode = EAknEditorTextInputMode;
 					width = 320;
 					maxlength = 4096;
 					max_view_height_in_lines = 64;

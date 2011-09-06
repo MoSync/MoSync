@@ -741,6 +741,11 @@ int CAppView::GetKeys() {
 	return iKeys;
 }
 
+class CMyAknQueryControl : CAknQueryControl {
+public:
+	CEikEdwin* getEdwin() { return iEdwin; }
+};
+
 class CMyAknTextQueryDialog : public CAknTextQueryDialog {
 public:
 	CMyAknTextQueryDialog(TDes& outText) : CAknTextQueryDialog(outText) {}
@@ -748,6 +753,40 @@ public:
 	virtual void UpdateLeftSoftKeyL() {
 		MakeLeftSoftkeyVisible(ETrue); // Even if there is no text, shows the LSK.
 	}
+#if 1
+	TKeyResponse OfferKeyEventL(const TKeyEvent &aKeyEvent, TEventCode aType) {
+		LOGD("CMyAknTextQueryDialog::OfferKeyEventL(%i, %i)\n", aKeyEvent.iCode, aType);
+		if(aKeyEvent.iCode == EKeyEnter) {
+			LOGD("Enter 7\n");
+			// offer this event to only the edit box.
+			// this prevents it from closing the dialog.
+			CEikEdwin* e = ((CMyAknQueryControl*)QueryControl())->getEdwin();
+			DEBUG_ASSERT(e != NULL);
+			//e->ClearSelectionL();
+			return e->OfferKeyEventL(aKeyEvent, aType);
+		}
+		return CAknTextQueryDialog::OfferKeyEventL(aKeyEvent, aType);
+	}
+#endif
+#if 0	// doesn't work (on X6 at least)
+	TKeyResponse OfferKeyEventL(const TKeyEvent &aKeyEvent, TEventCode aType) {
+		LOGD("CMyAknTextQueryDialog::OfferKeyEventL(%i, %i)\n", aKeyEvent.iCode, aType);
+		if(aKeyEvent.iCode == EKeyEnter) {
+			LOGD("Enter 5\n");
+			CAknQueryDialog::OfferKeyEventL(aKeyEvent, aType);
+			return EKeyWasNotConsumed;
+		}
+		return CAknTextQueryDialog::OfferKeyEventL(aKeyEvent, aType);
+	}
+	virtual TBool NeedToDismissQueryL(const TKeyEvent& aKeyEvent) {
+		LOGD("CMyAknTextQueryDialog::NeedToDismissQueryL(%i)\n", aKeyEvent.iCode);
+		if(aKeyEvent.iCode == EKeyEnter) {
+			LOG("Enter 1\n");
+			return false;
+		}
+		return CAknTextQueryDialog::NeedToDismissQueryL(aKeyEvent);
+	}
+#endif
 };
 
 int CAppView::TextBox(const TDesC& title, const TDesC& inText, TDes& outText, int constraints) {
