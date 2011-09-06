@@ -790,15 +790,43 @@ public:
 };
 
 int CAppView::TextBox(const TDesC& title, const TDesC& inText, TDes& outText, int constraints) {
+	int resourceId;
+	int type = constraints & 0xFFF;
+	switch(type) {
+	case MA_TB_TYPE_ANY:
+		resourceId = R_TEXTBOX_QUERY;
+		break;
+	case MA_TB_TYPE_EMAILADDR:
+	case MA_TB_TYPE_NUMERIC:
+	case MA_TB_TYPE_PHONENUMBER:
+	case MA_TB_TYPE_URL:
+	case MA_TB_TYPE_DECIMAL:
+	case MA_TB_TYPE_SINGLE_LINE:
+		resourceId = R_TEXTBOX_QUERY_SINGLE_LINE;
+		break;
+	default:
+		return MA_TB_RES_TYPE_UNAVAILABLE;
+	}
+
 	if(iEngine->IsDrawing())
 		iEngine->StopDrawing();
+
 	outText.Copy(inText);
 	CAknTextQueryDialog* dlg = new (ELeave) CMyAknTextQueryDialog(outText);
 	CleanupStack::PushL(dlg);
 	dlg->SetPromptL(title);
-	dlg->SetPredictiveTextInputPermitted(true);
 	dlg->SetMaxLength(outText.MaxLength());
-	TBool answer = dlg->ExecuteLD(R_TEXTBOX_QUERY);
+
+	if(type == MA_TB_TYPE_NUMERIC || type == MA_TB_TYPE_PHONENUMBER || type == MA_TB_TYPE_DECIMAL)
+		dlg->SetDefaultInputMode(EAknEditorNumericInputMode);
+
+	bool predict = (constraints & (MA_TB_FLAG_PASSWORD | MA_TB_FLAG_SENSITIVE |
+		MA_TB_FLAG_NON_PREDICTIVE)) == 0;
+	if(!(type == MA_TB_TYPE_ANY || type == MA_TB_TYPE_SINGLE_LINE))
+		predict = false;
+	dlg->SetPredictiveTextInputPermitted(predict);
+
+	TBool answer = dlg->ExecuteLD(resourceId);
 	CleanupStack::Pop(dlg);
 	return answer ? 1 : 0;
 }

@@ -6511,7 +6511,7 @@ group CameraFunctions "Camera Functions" {
 		* The text box will disappear.
 		* An event (#EVENT_TYPE_TEXTBOX) will be posted.
 		*
-		* \returns \>= 0.
+		* \returns \>= 0 on success, \< 0 on error.
 		*
 		* \param title The box's title.
 		* \param inText When the text box is created, it is populated with this string.
@@ -6541,12 +6541,20 @@ group CameraFunctions "Camera Functions" {
 			/// The user is allowed to enter a real number value.
 			/// This extends #MA_TB_TYPE_NUMERIC by allowing a decimal point.
 			DECIMAL = 5;
+			/** \brief The user is allowed to enter any text, except for line breaks.
+			* Unavailable on some platforms.
+			* In that case, maTextBox() will return #MA_TB_RES_TYPE_UNAVAILABLE.
+			* You can use #MA_TB_TYPE_ANY instead.
+			*/
+			SINGLE_LINE = 100;
 		}
 		constset int MA_TB_RES_ {
 			/// The user chose OK.
 			OK = 1;
 			/// The user chose Cancel.
 			CANCEL = 2;
+			/// The specified type is unavailable on this platform.
+			TYPE_UNAVAILABLE = -3;
 		}
 		constset int MA_TB_FLAG_ {
 			/// Indicates that the text entered is confidential data that should be
