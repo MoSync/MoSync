@@ -133,11 +133,14 @@ target :version do
 	rev = open('|git rev-parse --verify HEAD').read.strip
 	mod = open('|git status --porcelain').read.strip
 	mod = 'mod ' if(mod.length > 0)
-	open("#{mosyncdir}/bin/version.dat", 'w') do |file|
+	fn = "#{mosyncdir}/bin/version.dat"
+	open(fn, 'w') do |file|
 		file.puts("Developer local build")
 		file.puts(Time.new.strftime('%Y%m%d-%H%M'))
 		file.puts(mod+rev)
 	end
+	puts "Wrote #{fn}:"
+	puts open(fn).read.strip
 end
 
 target :clean_more do

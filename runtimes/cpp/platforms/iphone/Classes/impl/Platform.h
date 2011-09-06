@@ -140,7 +140,7 @@ public:
 	
 	void initFont() {
 		if(!context) return;
-
+		CGContextSelectFont(context, "Arial", height/40, kCGEncodingMacRoman);
 		CGAffineTransform xform = CGAffineTransformMake(
 														1.0,  0.0,
 														0.0, -1.0,

@@ -38,8 +38,9 @@ using namespace NativeUI;
 
 class VideoScreen:
 	public Screen,
-	public ButtonListener,
-	public VideoViewListener
+	public VideoViewListener,
+	public EditBoxListener,
+	public ButtonListener
 {
 
 public:
@@ -119,6 +120,13 @@ private:
         VideoView* videoView,
         const int videoViewState);
 
+    /**
+     * This method is called when the return button was pressed.
+     * On iphone platform the virtual keyboard is not hidden after
+     * receiving this event.
+     * @param editBox The edit box object that generated the event.
+     */
+    virtual void editBoxReturn(EditBox* editBox);
 private:
 	/**
 	 * Main layout.
@@ -172,16 +180,6 @@ private:
 	 * Exit button.
 	 */
 	Button* mExitButton;
-
-	/**
-	 * The screen width.
-	 */
-	int mScreenWidth;
-
-	/**
-	 * The screen height.
-	 */
-	int mScreenHeight;
 };
 
 #endif /* NATIVESCREEN_H_ */

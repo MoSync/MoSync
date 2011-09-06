@@ -26,8 +26,6 @@ MA 02110-1301, USA.
  *  - Reload the default link.
  */
 
-#include <maprofile.h>		// Profile database
-
 // Include application's Moblet class.
 #include "Moblet.h"
 
@@ -138,12 +136,15 @@ void SettingsScreen::createMainLayout()
 
 	// Add an item with the default homepage.
 	ListViewItem* homeUrlItem = new ListViewItem();
+	homeUrlItem->setWidth(getScreenWidth());
 	VerticalLayout* homeUrlLayout = new VerticalLayout();
 	Label* hintLabel = new Label();
 	hintLabel->setText(HOME_URL);
 	hintLabel->setFontColor(DARK_SEA_GREEN);
 	homeUrlLayout->addChild(hintLabel);
 	mHomeUrl = new Label();
+	mHomeUrl->setMaxNumberOfLines(2);
+	mHomeUrl->setWidth(getScreenWidth());
 	setDefaultHomepage();
 	homeUrlLayout->addChild(mHomeUrl);
 	homeUrlItem->addChild(homeUrlLayout);
@@ -152,22 +153,6 @@ void SettingsScreen::createMainLayout()
 	mReloadItem = new ListViewItem();
 	mReloadItem->setText(RESET_TO_DEFAULT);
 	mListView->addChild(mReloadItem);
-}
-
-/**
- * Detects if the current platform is Android.
- * @return true if the platform is Android, false otherwise.
- */
-bool SettingsScreen::isAndroid()
-{
-	if (NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
 }
 
 /**
