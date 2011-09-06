@@ -41,28 +41,29 @@ void NativeEditBox::textBoxClosed(int res, int length) {
 		MAUI_LOG("length: %d", length);
 		String str;
 		str.resize(length);
-		sprintf(str.pointer(), "%S", mString);
+
+		//sprintf(str.pointer(), "%S", mString);	// insufficient
+		for(int i=0; i<length; i++) {
+			if(mString[i] < 0xff)
+				str[i] = mString[i];
+			else
+				str[i] = mListener->nativeEditUnicode(mString[i]);
+		}
+
 		setCaption(str);
 		MAUI_LOG("%S", mString);
 		requestRepaint();
-		// TODO: Remove commented out code.
-		/*
-		if(mListener != NULL) {
-			mListener->nativeEditFinished();
-		}
-		*/		
 		ListenerSet_fire(
 			NativeEditBoxListener, 
 			mEditBoxListeners, 
 			nativeEditFinished(this, mCaption));
 		
 	}
-	// TODO: Remove commented out code.
-	//mListener = NULL;
 	Environment::getEnvironment().removeTextBoxListener(this);
 }
 
 NativeEditBox::NativeEditBox(
+	NativeEditBoxListener* mainListener,
 	int x, 
 	int y, 
 	int width, 
@@ -75,8 +76,11 @@ NativeEditBox::NativeEditBox(
 		mTitleString(titleString),
 		mString(NULL),
 		mOptions(options),
-		mEditBoxListeners(false)
+		mEditBoxListeners(false),
+		mListener(NULL)
 {
+	addNativeEditBoxListener(mainListener);
+	mListener = mainListener;
 	setMaxSize(maxSize);
 	setCaption(initialText);
 }
@@ -187,6 +191,7 @@ void NativeEditBox::addNativeEditBoxListener(NativeEditBoxListener* wl) {
 }
 
 void NativeEditBox::removeNativeEditBoxListener(NativeEditBoxListener* wl) {
+	MAASSERT(wl != mListener);
 	mEditBoxListeners.remove(wl);
 }
 
