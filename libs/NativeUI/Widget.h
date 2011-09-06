@@ -35,6 +35,7 @@ MA 02110-1301, USA.
 #include <MAUtil/Map.h>
 #include <MAUtil/Vector.h>
 #include <MAUtil/Environment.h>
+#include <MAUtil/util.h>
 
 #include <IX_WIDGET.h>
 #include "WidgetUtil.h"
