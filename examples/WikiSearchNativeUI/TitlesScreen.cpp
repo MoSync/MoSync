@@ -148,7 +148,7 @@ void TitleScreen::fillListBox()
 	if ( mListView != -1){
 		maWidgetDestroy(mListView);
 	}
-	mListView = createListView(mScreenWidth, MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	mListView = createListView(mScreenWidth, 7*mScreenHeight/8);
 	maWidgetAddChild(mMainLayout, mListView);
 
 	// Add a Select/Deselect All button.
