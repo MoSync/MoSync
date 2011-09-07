@@ -1,20 +1,3 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * TextScreen.cpp
  *
@@ -22,24 +5,24 @@ MA 02110-1301, USA.
  *      Author: gabi
  */
 
+#include <NativeUI/Label.h>
+#include <NativeUI/VerticalLayout.h>
+#include <NativeUI/Button.h>
+
 #include "TextScreen.h"
-#include <Facebook/LOG.h>
+#include "Facebook/LOG.h"
 
 namespace FacebookDemoGUI
 {
 
 TextScreen::TextScreen(FacebookDemoScreen *prev):FacebookDemoScreen(prev)
 {
-	mLabel = new MoSync::UI::Label();
-	initialize(mLabel);
-	setMainWidget(mLabel);
+	initialize();
 }
 
 TextScreen::TextScreen(): FacebookDemoScreen(0)
 {
-	mLabel = new MoSync::UI::Label();
-	initialize(mLabel);
-	setMainWidget(mLabel);
+	initialize();
 }
 
 void TextScreen::setText(const MAUtil::String &text)
@@ -52,19 +35,42 @@ void TextScreen::clear()
 	mLabel->setText("");
 }
 
-void TextScreen::addChild(MoSync::UI::Widget *widget)
+void TextScreen::buttonPressed(Widget* button)
 {
-	MoSync::UI::Screen::addChild(widget);
+
 }
 
-void TextScreen::initialize(MoSync::UI::Label *label)
+void TextScreen::buttonReleased(Widget* button)
 {
-	MAExtent screenSize = maGetScrSize();
-	int scrHeight = EXTENT_Y(screenSize);
-	label->setFontSize(scrHeight/16);
 
-	label->setProperty(MAW_LABEL_TEXT_VERTICAL_ALIGNMENT, MAW_ALIGNMENT_CENTER);
-	label->setProperty(MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_LEFT);
+}
+
+void TextScreen::buttonClicked(Widget* button)
+{
+	back();
+}
+
+void TextScreen::initialize()
+{
+	mLayout = new NativeUI::VerticalLayout();
+
+	mLabel = new NativeUI::Label();
+	mLabel->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	mLabel->fillSpaceHorizontally();
+	mLabel->fillSpaceVertically();
+
+	mBackButton = new NativeUI::Button();
+	mBackButton->setText("back");
+	mBackButton->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mBackButton->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	mBackButton->fillSpaceHorizontally();
+	mBackButton->addButtonListener(this);
+
+	mLayout->addChild(mLabel);
+	mLayout->addChild(mBackButton);
+
+	setMainWidget(mLayout);
 }
 
 }//namespace FacebookDemoGUI

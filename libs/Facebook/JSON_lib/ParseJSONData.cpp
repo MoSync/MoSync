@@ -1,20 +1,3 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * JSONParser.cpp
  *
@@ -26,27 +9,27 @@ MA 02110-1301, USA.
 
 #include "ParseJSONData.h"
 
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Album.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Comment.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Checkin.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Event.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Group.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Link.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Post.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Photo.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/StatusMessage.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/User.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Video.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Note.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Utilities.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/User.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Album.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Comment.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Checkin.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Event.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Group.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Link.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Post.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Photo.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/StatusMessage.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/User.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Video.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Note.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/Utilities.h"
+#include "../GraphAPI/GetFacebookObjects/FacebookObjects/User.h"
 
-#include "LOG.h"
+#include "../LOG.h"
 
 /*
  * function that parses the JSON data retrieved from server and and fills an Album object with it.
  */
-void parseJSONData(Album &album, YAJLDom::Value* result)
+void parseJSONData(Album &album, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 	IdNamePair id_name;
@@ -81,7 +64,7 @@ void parseJSONData(Album &album, YAJLDom::Value* result)
 
 }
 
-void parseJSONData(Album &album, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Album &album, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 	IdNamePair id_name;
@@ -127,7 +110,7 @@ void parseJSONData(Album &album, YAJLDom::Value* result, const MAUtil::Set<MAUti
 /*
  * function that parses the JSON data retrieved from server and fills an Comment object with it.
  */
-void parseJSONData(Comment &comment, YAJLDom::Value* result)
+void parseJSONData(Comment &comment, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 
@@ -146,7 +129,7 @@ void parseJSONData(Comment &comment, YAJLDom::Value* result)
 	comment.setLikes(likes);
 }
 
-void parseJSONData(Comment &comment, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Comment &comment, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 
@@ -182,7 +165,7 @@ void parseJSONData(Comment &comment, YAJLDom::Value* result, const MAUtil::Set<M
 /*
  * function that parses the JSON data retrieved from server and fills an Checkin object with it.
  */
-void parseJSONData(Checkin &checkin, YAJLDom::Value* result)
+void parseJSONData(Checkin &checkin, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 
@@ -196,14 +179,14 @@ void parseJSONData(Checkin &checkin, YAJLDom::Value* result)
 	extract(str, "message", result);
 	checkin.setMessage(str);
 
-	YAJLDom::Value *tagsValue = result->getValueForKey("tags");
+	MAUtil::YAJLDom::Value *tagsValue = result->getValueForKey("tags");
 	if(tagsValue)
 	{
 		MAUtil::Vector<IdNamePair> tags;
 		extract(tags, "data", tagsValue);
 	}
 
-	YAJLDom::Value *placeValue = result->getValueForKey("place");
+	MAUtil::YAJLDom::Value *placeValue = result->getValueForKey("place");
 	if(placeValue)
 	{
 		Place place;
@@ -215,7 +198,7 @@ void parseJSONData(Checkin &checkin, YAJLDom::Value* result)
 	extract(app, "application", result);
 	checkin.setApplication(app);
 
-	YAJLDom::Value *likesValue = result->getValueForKey("likes");
+	MAUtil::YAJLDom::Value *likesValue = result->getValueForKey("likes");
 	if(likesValue)
 	{
 		MAUtil::Vector<IdNamePair> likes;
@@ -223,7 +206,7 @@ void parseJSONData(Checkin &checkin, YAJLDom::Value* result)
 		checkin.setLikes(likes);
 	}
 
-	YAJLDom::Value *commentsValue = result->getValueForKey("comments");
+	MAUtil::YAJLDom::Value *commentsValue = result->getValueForKey("comments");
 	if(commentsValue)
 	{
 		MAUtil::Vector<Comment> comments;
@@ -232,7 +215,7 @@ void parseJSONData(Checkin &checkin, YAJLDom::Value* result)
 	}
 }
 
-void parseJSONData(Checkin &checkin, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Checkin &checkin, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 
@@ -257,7 +240,7 @@ void parseJSONData(Checkin &checkin, YAJLDom::Value* result, const MAUtil::Set<M
 
 	if(fields.find("tags") != fields.end())
 	{
-		YAJLDom::Value *tagsValue = result->getValueForKey("tags");
+		MAUtil::YAJLDom::Value *tagsValue = result->getValueForKey("tags");
 		if(tagsValue)
 		{
 			MAUtil::Vector<IdNamePair> tags;
@@ -271,7 +254,7 @@ void parseJSONData(Checkin &checkin, YAJLDom::Value* result, const MAUtil::Set<M
 
 	if(fields.find("place") != fields.end())
 	{
-		YAJLDom::Value *placeValue = result->getValueForKey("place");
+		MAUtil::YAJLDom::Value *placeValue = result->getValueForKey("place");
 		if(placeValue)
 		{
 			Place place;
@@ -291,7 +274,7 @@ void parseJSONData(Checkin &checkin, YAJLDom::Value* result, const MAUtil::Set<M
 
 	if(fields.find("likes") != fields.end())
 	{
-		YAJLDom::Value *likesValue = result->getValueForKey("likes");
+		MAUtil::YAJLDom::Value *likesValue = result->getValueForKey("likes");
 		if(likesValue)
 		{
 			MAUtil::Vector<IdNamePair> likes;
@@ -305,7 +288,7 @@ void parseJSONData(Checkin &checkin, YAJLDom::Value* result, const MAUtil::Set<M
 
 	if(fields.find("comments") != fields.end())
 	{
-		YAJLDom::Value *commentsValue = result->getValueForKey("comments");
+		MAUtil::YAJLDom::Value *commentsValue = result->getValueForKey("comments");
 		if(commentsValue)
 		{
 			MAUtil::Vector<Comment> comments;
@@ -320,7 +303,7 @@ void parseJSONData(Checkin &checkin, YAJLDom::Value* result, const MAUtil::Set<M
 /*
  * function that parses the JSON data retrieved from server and fills an Event object with it.
  */
-void parseJSONData(Event &event, YAJLDom::Value* result)
+void parseJSONData(Event &event, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 
@@ -354,7 +337,7 @@ void parseJSONData(Event &event, YAJLDom::Value* result)
 	event.setPrivacy(str);
 }
 
-void parseJSONData(Event &event, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Event &event, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 
@@ -415,7 +398,7 @@ void parseJSONData(Event &event, YAJLDom::Value* result, const MAUtil::Set<MAUti
 /*
  * function that parses the JSON data retrieved from server and fills an Group object with it.
  */
-void parseJSONData(Group &group, YAJLDom::Value* result)
+void parseJSONData(Group &group, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 
@@ -436,7 +419,7 @@ void parseJSONData(Group &group, YAJLDom::Value* result)
 	group.setPrivacy(str);
 }
 
-void parseJSONData(Group &group, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Group &group, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 
@@ -473,7 +456,7 @@ void parseJSONData(Group &group, YAJLDom::Value* result, const MAUtil::Set<MAUti
 /*
  * function that parses the JSON data retrieved from server and fills an Link object with it.
  */
-void parseJSONData(Link &link, YAJLDom::Value* result)
+void parseJSONData(Link &link, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 
@@ -504,7 +487,7 @@ void parseJSONData(Link &link, YAJLDom::Value* result)
 	link.setComments(comments);
 }
 
-void parseJSONData(Link &link, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Link &link, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 
@@ -560,7 +543,7 @@ void parseJSONData(Link &link, YAJLDom::Value* result, const MAUtil::Set<MAUtil:
 /*
  * function that parses the JSON data retrieved from server and fills an Post object with it.
  */
-void parseJSONData(Post &post, YAJLDom::Value* result)
+void parseJSONData(Post &post, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 	IdNamePair id_name;
@@ -626,7 +609,7 @@ void parseJSONData(Post &post, YAJLDom::Value* result)
 		post.setType(str);
 	}
 
-	YAJLDom::Value *likesValue = result->getValueForKey("likes");
+	MAUtil::YAJLDom::Value *likesValue = result->getValueForKey("likes");
 	if(likesValue)
 	{
 		MAUtil::Vector<IdNamePair> likes;
@@ -636,7 +619,7 @@ void parseJSONData(Post &post, YAJLDom::Value* result)
 		}
 	}
 
-	YAJLDom::Value *commentsValue = result->getValueForKey("comments");
+	MAUtil::YAJLDom::Value *commentsValue = result->getValueForKey("comments");
 	MAUtil::Vector<Comment> comments;
 	if(extract(comments, "data", commentsValue))
 	{
@@ -657,7 +640,7 @@ void parseJSONData(Post &post, YAJLDom::Value* result)
 	}
 }
 
-void parseJSONData(Post &post, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Post &post, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 	IdNamePair id_name;
@@ -728,7 +711,7 @@ void parseJSONData(Post &post, YAJLDom::Value* result, const MAUtil::Set<MAUtil:
 
 	if(fields.find("likes")!= fields.end())
 	{
-		YAJLDom::Value *likesValue = result->getValueForKey("likes");
+		MAUtil::YAJLDom::Value *likesValue = result->getValueForKey("likes");
 		if(likesValue)
 		{
 			MAUtil::Vector<IdNamePair> likes;
@@ -741,7 +724,7 @@ void parseJSONData(Post &post, YAJLDom::Value* result, const MAUtil::Set<MAUtil:
 
 	if(fields.find("comments")!= fields.end())
 	{
-		YAJLDom::Value *commentsValue = result->getValueForKey("comments");
+		MAUtil::YAJLDom::Value *commentsValue = result->getValueForKey("comments");
 		MAUtil::Vector<Comment> comments;
 		if(extract(comments, "data", commentsValue))
 		{
@@ -765,7 +748,7 @@ void parseJSONData(Post &post, YAJLDom::Value* result, const MAUtil::Set<MAUtil:
 /*
  * function that parses the JSON data retrieved from server and fills an Place object with it.
  */
-void parseJSONData(Place &place, YAJLDom::Value* result)
+void parseJSONData(Place &place, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 
@@ -774,7 +757,7 @@ void parseJSONData(Place &place, YAJLDom::Value* result)
 	extract(place.mLocation, "location", result);
 }
 
-void parseJSONData(Place &place, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Place &place, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 
@@ -796,7 +779,7 @@ void parseJSONData(Place &place, YAJLDom::Value* result, const MAUtil::Set<MAUti
 /*
  * function that parses the JSON data retrieved from server and fills an Photo object with it.
  */
-void parseJSONData(Photo &photo, YAJLDom::Value* result)
+void parseJSONData(Photo &photo, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 	IdNamePair id_name;
@@ -830,7 +813,7 @@ void parseJSONData(Photo &photo, YAJLDom::Value* result)
 		photo.setPositionInAlbum(iData);
 }
 
-void parseJSONData(Photo &photo, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Photo &photo, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 	IdNamePair id_name;
@@ -885,7 +868,7 @@ void parseJSONData(Photo &photo, YAJLDom::Value* result, const MAUtil::Set<MAUti
 /*
  * function that parses the JSON data retrieved from server and fills an StatusMessage object with it.
  */
-void parseJSONData(StatusMessage &msg, YAJLDom::Value* result)
+void parseJSONData(StatusMessage &msg, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 
@@ -900,7 +883,7 @@ void parseJSONData(StatusMessage &msg, YAJLDom::Value* result)
 	msg.setMessage(str);
 }
 
-void parseJSONData(StatusMessage &msg, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(StatusMessage &msg, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 
@@ -927,9 +910,9 @@ void parseJSONData(StatusMessage &msg, YAJLDom::Value* result, const MAUtil::Set
 /*
  * function that parses the JSON data retrieved from server and fills an User object with it.
  */
-void parseJSONData(User &user, YAJLDom::Value* result)
+void parseJSONData(User &user, MAUtil::YAJLDom::Value* result)
 {
-	YAJLDom::Value* data = NULL;
+	MAUtil::YAJLDom::Value* data = NULL;
 
 	data = result->getValueForKey("id");
 	if(data)
@@ -978,7 +961,7 @@ void parseJSONData(User &user, YAJLDom::Value* result)
 	}
 }
 
-void parseJSONData(User &user, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(User &user, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 
@@ -1026,7 +1009,7 @@ void parseJSONData(User &user, YAJLDom::Value* result, const MAUtil::Set<MAUtil:
 /*
  * function that parses the JSON data retrieved from server and fills an Video object with it.
  */
-void parseJSONData(Video &video, YAJLDom::Value* result)
+void parseJSONData(Video &video, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 	IdNamePair id_name;
@@ -1053,7 +1036,7 @@ void parseJSONData(Video &video, YAJLDom::Value* result)
 //	extract(comments, "comments",result);
 //	video.setComments(comments);
 
-	YAJLDom::Value *tags = result->getValueForKey("tags");
+	MAUtil::YAJLDom::Value *tags = result->getValueForKey("tags");
 	if(tags)
 	{
 		MAUtil::Vector<IdNamePair> tagsVector;
@@ -1062,7 +1045,7 @@ void parseJSONData(Video &video, YAJLDom::Value* result)
 	}
 }
 
-void parseJSONData(Video &video, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Video &video, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 	IdNamePair id_name;
@@ -1108,7 +1091,7 @@ void parseJSONData(Video &video, YAJLDom::Value* result, const MAUtil::Set<MAUti
 
 	if(fields.find("tags") != fields.end())
 	{
-		YAJLDom::Value *tags = result->getValueForKey("tags");
+		MAUtil::YAJLDom::Value *tags = result->getValueForKey("tags");
 		if(tags)
 		{
 			MAUtil::Vector<IdNamePair> tagsVector;
@@ -1123,7 +1106,7 @@ void parseJSONData(Video &video, YAJLDom::Value* result, const MAUtil::Set<MAUti
 /*
  * function that parses the JSON data retrieved from server and fills an CategoryData object with it.
  */
-void parseJSONData(CategoryData &like, YAJLDom::Value* result)
+void parseJSONData(CategoryData &like, MAUtil::YAJLDom::Value* result)
 {
 	extract(like.mId, "id", result);
 	extract(like.mName, "name", result);
@@ -1131,7 +1114,7 @@ void parseJSONData(CategoryData &like, YAJLDom::Value* result)
 	extract(like.mDateCreated, "created_time", result);
 }
 
-void parseJSONData(CategoryData &like, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(CategoryData &like, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	if(fields.find("id") != fields.end())
 	{
@@ -1157,7 +1140,7 @@ void parseJSONData(CategoryData &like, YAJLDom::Value* result, const MAUtil::Set
 /*
  * function that parses the JSON data retrieved from server and fills an Note object with it.
  */
-void parseJSONData(Note &note, YAJLDom::Value* result)
+void parseJSONData(Note &note, MAUtil::YAJLDom::Value* result)
 {
 	MAUtil::String str;
 	IdNamePair name_id;
@@ -1179,7 +1162,7 @@ void parseJSONData(Note &note, YAJLDom::Value* result)
 	note.setComments(comments);
 }
 
-void parseJSONData(Note &note, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Note &note, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	MAUtil::String str;
 	IdNamePair name_id;
@@ -1217,14 +1200,14 @@ void parseJSONData(Note &note, YAJLDom::Value* result, const MAUtil::Set<MAUtil:
 /*
  * function that parses the JSON data retrieved from server and fills an Action object with it.
  */
-void parseJSONData(Action &action, YAJLDom::Value* data)
+void parseJSONData(Action &action, MAUtil::YAJLDom::Value* data)
 {
 	action.mLink.clear();
 	action.mName.clear();
 
 	if(data)
 	{
-		YAJLDom::Value *temp = data->getValueForKey("name");
+		MAUtil::YAJLDom::Value *temp = data->getValueForKey("name");
 		if(temp)
 		{
 			action.mName = temp->toString();
@@ -1238,7 +1221,7 @@ void parseJSONData(Action &action, YAJLDom::Value* data)
 	}
 }
 
-void parseJSONData(Action &action, YAJLDom::Value* data,  const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(Action &action, MAUtil::YAJLDom::Value* data,  const MAUtil::Set<MAUtil::String> &fields)
 {
 	action.mLink.clear();
 	action.mName.clear();
@@ -1255,7 +1238,7 @@ void parseJSONData(Action &action, YAJLDom::Value* data,  const MAUtil::Set<MAUt
 
 //	if(data)
 //	{
-//		YAJLDom::Value *temp = data->getValueForKey("name");
+//		MAUtil::YAJLDom::Value *temp = data->getValueForKey("name");
 //		if(temp)
 //		{
 //			action.mName = temp->toString();
@@ -1272,14 +1255,14 @@ void parseJSONData(Action &action, YAJLDom::Value* data,  const MAUtil::Set<MAUt
 /*
  * function that parses the JSON data retrieved from server and fills an IdNamePair object with it.
  */
-void parseJSONData(IdNamePair &val, YAJLDom::Value* data)
+void parseJSONData(IdNamePair &val, MAUtil::YAJLDom::Value* data)
 {
 	val.mId.clear();
 	val.mName.clear();
 
 	if(data)
 	{
-		YAJLDom::Value *temp = data->getValueForKey("name");
+		MAUtil::YAJLDom::Value *temp = data->getValueForKey("name");
 		if(temp)
 		{
 			val.mName = temp->toString();
@@ -1293,7 +1276,7 @@ void parseJSONData(IdNamePair &val, YAJLDom::Value* data)
 	}
 }
 
-void parseJSONData(IdNamePair &val, YAJLDom::Value* data, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(IdNamePair &val, MAUtil::YAJLDom::Value* data, const MAUtil::Set<MAUtil::String> &fields)
 {
 	val.mId.clear();
 	val.mName.clear();
@@ -1310,7 +1293,7 @@ void parseJSONData(IdNamePair &val, YAJLDom::Value* data, const MAUtil::Set<MAUt
 
 //	if(data)
 //	{
-//		YAJLDom::Value *temp = data->getValueForKey("name");
+//		MAUtil::YAJLDom::Value *temp = data->getValueForKey("name");
 //		if(temp)
 //		{
 //			val.mName = temp->toString();
@@ -1327,7 +1310,7 @@ void parseJSONData(IdNamePair &val, YAJLDom::Value* data, const MAUtil::Set<MAUt
 /*
  * function that parses the JSON data retrieved from server and fills an EventResponse object with it.
  */
-void parseJSONData(EventResponse &event, YAJLDom::Value* result)
+void parseJSONData(EventResponse &event, MAUtil::YAJLDom::Value* result)
 {
 	event.mId.clear();
 	event.mName.clear();
@@ -1337,7 +1320,7 @@ void parseJSONData(EventResponse &event, YAJLDom::Value* result)
 	{
 		return;
 	}
-	YAJLDom::Value *temp = result->getValueForKey("id");
+	MAUtil::YAJLDom::Value *temp = result->getValueForKey("id");
 	if(temp)
 	{
 		event.mId = temp->toString();
@@ -1354,7 +1337,7 @@ void parseJSONData(EventResponse &event, YAJLDom::Value* result)
 	}
 }
 
-void parseJSONData(EventResponse &event, YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
+void parseJSONData(EventResponse &event, MAUtil::YAJLDom::Value* result, const MAUtil::Set<MAUtil::String> &fields)
 {
 	event.mId.clear();
 	event.mName.clear();
@@ -1380,7 +1363,7 @@ void parseJSONData(EventResponse &event, YAJLDom::Value* result, const MAUtil::S
 		extract(event.mRsvp_Status, "rsvp_status", result);
 	}
 
-//	YAJLDom::Value *temp = result->getValueForKey("id");
+//	MAUtil::YAJLDom::Value *temp = result->getValueForKey("id");
 //	if(temp)
 //	{
 //		event.mId = temp->toString();
@@ -1403,9 +1386,9 @@ void parseJSONData(EventResponse &event, YAJLDom::Value* result, const MAUtil::S
  * @param tag - the name of a JSON node.
  * @param result - the JSON data.
  */
-bool extract(MAUtil::String &str, const char *tag, YAJLDom::Value* result)
+bool extract(MAUtil::String &str, const char *tag, MAUtil::YAJLDom::Value* result)
 {
-	YAJLDom::Value* data = NULL;
+	MAUtil::YAJLDom::Value* data = NULL;
 	str.clear();
 
 	data = result->getValueForKey(tag);
@@ -1423,10 +1406,10 @@ bool extract(MAUtil::String &str, const char *tag, YAJLDom::Value* result)
  * @param tag - the name of a JSON node.
  * @param result - the JSON data.
  */
-bool extract(int &val, const char *tag, YAJLDom::Value* result)
+bool extract(int &val, const char *tag, MAUtil::YAJLDom::Value* result)
 {
 	val = 0;
-	YAJLDom::Value* data = NULL;
+	MAUtil::YAJLDom::Value* data = NULL;
 	data = result->getValueForKey(tag);
 
 	if(data)
@@ -1442,12 +1425,12 @@ bool extract(int &val, const char *tag, YAJLDom::Value* result)
  * @param tag - the name of a JSON node.
  * @param result - the JSON data.
  */
-bool extract(IdNamePair &val, const char *tag, YAJLDom::Value* result)
+bool extract(IdNamePair &val, const char *tag, MAUtil::YAJLDom::Value* result)
 {
 	val.mId.clear();
 	val.mName.clear();
 
-	YAJLDom::Value* data = NULL;
+	MAUtil::YAJLDom::Value* data = NULL;
 	data = result->getValueForKey(tag);
 
 	if(NULL == data)
@@ -1455,7 +1438,7 @@ bool extract(IdNamePair &val, const char *tag, YAJLDom::Value* result)
 		return false;
 	}
 
-	YAJLDom::Value *temp = data->getValueForKey("id");
+	MAUtil::YAJLDom::Value *temp = data->getValueForKey("id");
 	if(temp)
 	{
 		val.mId = temp->toString();
@@ -1475,16 +1458,16 @@ bool extract(IdNamePair &val, const char *tag, YAJLDom::Value* result)
  * @param tag - the name of a JSON node.
  * @param result - the JSON data.
  */
-bool extract(Venue &venue, const char *tag, YAJLDom::Value* result)
+bool extract(Venue &venue, const char *tag, MAUtil::YAJLDom::Value* result)
 {
 	venue.clear();
 
-	YAJLDom::Value* data = NULL;
+	MAUtil::YAJLDom::Value* data = NULL;
 	data = result->getValueForKey(tag);
 
 	if(data)
 	{
-		YAJLDom::Value *temp = NULL;
+		MAUtil::YAJLDom::Value *temp = NULL;
 
 //		temp = data->getValueForKey("street");
 //		if(temp)

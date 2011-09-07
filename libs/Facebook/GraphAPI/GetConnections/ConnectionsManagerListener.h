@@ -1,25 +1,8 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * FacebookConnectionListener.h
  *
- * Created on: Jul 4, 2011
- *     Author: gabi
+ *  Created on: Jul 4, 2011
+ *      Author: gabi
  */
 
 #ifndef FACEBOOKCONNECTIONLISTENER_H_
@@ -53,6 +36,7 @@ class StatusMessage;
 #include "../GetFacebookObjects/FacebookObjects/StatusMessage.h"
 
 #include "../GetFacebookObjects/FacebookObjects/Utilities.h"
+#include "../../HTTP/Facebook.h"
 
 /*
  * Listener for the ConnectionsManager class
@@ -66,94 +50,94 @@ class ConnectionsManagerListener
 {
 public:
 	/*
-	 * This function is called when a "photos" connection was requested.
-	 * @param photos - the Photos objects retrieved from the server
+	 *  This function is called when a "photos" connection was requested.
+	 *  @param photos - the Photos objects retrieved from the server
 	 */
 	virtual void received(const MAUtil::Vector<Photo> &photos, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when a "albums" connection was requested.
+	 *  This function is called when a "albums" connection was requested.
 	 */
 	virtual void received(const MAUtil::Vector<Album> &albums, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "friends", "members" or "tags"  connection was requested.
-	 * @param connType - the connectionType. It can have the following values: "friends", "members" or "tags"
+	 *  This function is called when the "friends", "members" or "tags"  connection was requested.
+	 *  @param connType - the connectionType. It can have the following values: "friends", "members" or "tags"
 	 */
 	virtual void received(const MAUtil::Vector<IdNamePair> &friends, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "noreply", "maybe", "attending" or "declined"  connection was requested.
+	 *  This function is called when the "noreply", "maybe", "attending" or "declined"  connection was requested.
 	 */
 	virtual void received(const MAUtil::Vector<EventResponse> &responses, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "groups"  connection was requested.
+	 *  This function is called when the "groups"  connection was requested.
 	 */
 	virtual void received(const MAUtil::Vector<Group> &groups, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "feed", "home" or "posts" connection was requested.
-	 * @param connType - the connectionType. It can have the following values: "feed", "home" or "posts".
+	 *  This function is called when the "feed", "home" or "posts" connection was requested.
+	 *  @param connType - the connectionType. It can have the following values: "feed", "home" or "posts".
 	 */
 	virtual void received(const MAUtil::Vector<Post> &posts, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "video" or "videos/uploaded" connection was requested.
-	 * @param connType - the connectionType. It can have the following values: "video" or "videos/uploaded".
+	 *  This function is called when the "video" or "videos/uploaded" connection was requested.
+	 *  @param connType - the connectionType. It can have the following values: "video" or "videos/uploaded".
 	 */
 	virtual void received(const MAUtil::Vector<Video> &video, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "likes", "movies", "music", "books", "accounts", "activity"
-	 * "friendlists", "interests" and "television" connection was requested.
-	 * @param connType - the connectionType. It can have the following values: "likes", "movies", "music",
-	 * "books", "accounts", "activity", "friendlists", "interests" and "television"
+	 *  This function is called when the "likes", "movies", "music", "books", "accounts", "activity"
+	 *  "friendlists", "interests" and "television" connection was requested.
+	 *  @param connType - the connectionType. It can have the following values: "likes", "movies", "music",
+	 *  "books", "accounts", "activity", "friendlists", "interests" and "television"
 	 */
 	virtual void received(const MAUtil::Vector<CategoryData> &likes, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "notes" connection was requested.
+	 *  This function is called when the "notes" connection was requested.
 	 */
 	virtual void received(const MAUtil::Vector<Note> &notes, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "events" connection was requested.
+	 *  This function is called when the "events" connection was requested.
 	 */
 	virtual void received(const MAUtil::Vector<Event> &events, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "comments" connection was requested.
+	 *  This function is called when the "comments" connection was requested.
 	 */
 	virtual void received(const MAUtil::Vector<Comment> &comments, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "checkins" connection was requested.
+	 *  This function is called when the "checkins" connection was requested.
 	 */
 	virtual void received(const MAUtil::Vector<Checkin> &comments, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "links" connection was requested.
+	 *  This function is called when the "links" connection was requested.
 	 */
 	virtual void received(const MAUtil::Vector<Link> &links, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "statuses" connection was requested.
+	 *  This function is called when the "statuses" connection was requested.
 	 */
 	virtual void received(const MAUtil::Vector<StatusMessage> &messages, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the "picture" connection was requested.
+	 *  This function is called when the "picture" connection was requested.
 	 */
 	virtual void received(const MAHandle pictureHandle, const MAUtil::String &connType, const MAUtil::String &objectId) {}
 
 	/*
-	 * This function is called when the the request failed.
-	 * @param code - the HTTP error code received from the server.
-	 * @param connType - the requested connection
-	 * @param id - the id of the object for which the connection was requested.
+	 *  This function is called when the the request failed.
+	 *  @param code - the HTTP error code received from the server.
+	 *  @param connType - the requested connection
+	 *  @param id - the id of the object for which the connection was requested.
 	 */
-	virtual void errorReceivingConnection(int code, const MAUtil::String &connType, const MAUtil::String &id) {}
+	virtual void errorReceivingConnection(int code, const MAUtil::String &connType, const MAUtil::String &id) = 0;
 };
 
 

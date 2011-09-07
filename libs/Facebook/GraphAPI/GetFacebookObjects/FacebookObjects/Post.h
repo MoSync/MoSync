@@ -1,20 +1,3 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * Post.h
  *
@@ -143,22 +126,22 @@ public:
 	const IdNamePair &getApplication() const;
 
 private:
-	IdNamePair mFrom;
-	IdNamePair mTo;
-	MAUtil::String mMessage;
-	MAUtil::String mPictureUrl;
-	MAUtil::String mLink;
-	MAUtil::String mName;
-	MAUtil::String mCaption;
-	MAUtil::String mDescription;
-	MAUtil::String mVideoUrl;
-	MAUtil::Vector<Action> mActions;
-	MAUtil::String mPrivacy;
-	MAUtil::String mType;
-	MAUtil::Vector<IdNamePair> mLikes;
+	IdNamePair				mFrom;
+	IdNamePair				mTo;
+	MAUtil::String 			mMessage;
+	MAUtil::String 			mPictureUrl;
+	MAUtil::String 			mLink;
+	MAUtil::String 			mName;
+	MAUtil::String 			mCaption;
+	MAUtil::String 			mDescription;
+	MAUtil::String 			mVideoUrl;
+	MAUtil::Vector<Action>	mActions;
+	MAUtil::String 			mPrivacy;
+	MAUtil::String 			mType;
+	MAUtil::Vector<IdNamePair>	mLikes;
 	MAUtil::Vector<Comment> mComments;
-	MAUtil::String mUploadedFileId;
-	IdNamePair mApplication;
+	MAUtil::String			mUploadedFileId;
+	IdNamePair				mApplication;
 };
 
 #endif /* POST_H_ */

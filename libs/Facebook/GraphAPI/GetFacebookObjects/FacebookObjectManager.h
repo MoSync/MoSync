@@ -1,20 +1,3 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * GraphAPI.h
  *
@@ -39,6 +22,8 @@ MA 02110-1301, USA.
 struct RequestHelperBase: public RetrieveDataListener
 {
 	virtual void requestFacebookObject(const MAUtil::String &id) = 0;
+	virtual void requestFacebookObject(const MAUtil::String &id,
+			const MAUtil::Vector<MAUtil::String> &fields) = 0;
 };
 
 /*
@@ -80,7 +65,8 @@ public:
 	 * @param fields - the properties of the object that we want to retrieve from server. For example
 	 * we can ask only for name, or name and message.
 	 */
-	virtual void requestFacebookObject(const MAUtil::String &id, MAUtil::Vector<MAUtil::String> &fields)
+	virtual void requestFacebookObject(const MAUtil::String &id,
+			const MAUtil::Vector<MAUtil::String> &fields)
 	{
 		MAUtil::Map<String, String> messageBodyParams;
 		if(fields.size()>0)
@@ -99,16 +85,19 @@ public:
 		mFacebook->requestGraph(RETRIEVE_DATA, JSON, id, HTTP_GET, messageBodyParams);
 	}
 
+	/*
+	 * destructor
+	 */
 	~RequestHelper()
 	{
 	}
 
 
 private:
-	friend class Facebook2;
+	friend class Facebook;
 
 	/*
-	 * Overloads RetrieveDataListener.
+	 * RetrieveDataListener overwrite
 	 * It is called when a Facebook object is retrieved from server
 	 */
 	virtual void jsonDataReceived(YAJLDom::Value* result, const MAUtil::String &connType)
@@ -118,7 +107,7 @@ private:
 	}
 
 	/*
-	 * Overloads RetrieveDataListener.
+	 * RetrieveDataListener overwrite
 	 * It is called when a Facebook object request has failed.
 	 * @param code - HTTP error code received from the server.
 	 * @param id - the id of the object the was requested from Facebook.
@@ -133,7 +122,7 @@ private:
 
 public:
 	ObjectType	mFacebookObject;
-	Facebook2	*mFacebook;
+	Facebook	*mFacebook;
 	ObjectRequestListener *mListener;
 };
 
@@ -167,7 +156,20 @@ public:
 		mRequester->requestFacebookObject(id);
 	}
 
-	virtual ~FacebookObjectManager();
+	template<class Type>
+	void requestFacebookObject(const MAUtil::String &id,
+			const MAUtil::Vector<MAUtil::String> &fields)
+	{
+		mRequester = new RequestHelper<Type>(mFacebook, this);
+		mRequester->requestFacebookObject(id, fields);
+	}
+
+
+
+	/*
+	 * destructor
+	 */
+	~FacebookObjectManager();
 
 	/*
 	 * Sets the listener of FacebookObjectManager.
@@ -244,22 +246,22 @@ public:
 
 private:
 	/*
-	 * Performs the actually connection request.
+	 * mFacebook - performs the actually connection request.
 	 */
-	Facebook *mFacebook;
+	Facebook					*mFacebook;
 
 	/*
-	 * It will be notified by the result of the request.
+	 * mListener - pointer to a ObjectRequestListener. It will be notified by the result of the request.
 	 * On success the retrieved object will be send to this listener (by calling his function facebookObjectReceived)
 	 * On failure the HTTP error code and the id of the object that was requested is send to the listener.
 	 */
-	ObjectRequestListener *mListener;
+	ObjectRequestListener		*mListener;
 
 	/*
-	 * Pointer to an object that is created each time a request is made. The type of the object
-	 * depends on the type of the requested object.
+	 * mRequester - Pointer to an object that is created each time a request is made. The type of the object
+	 * depends on the type of the requested  object.
 	 */
-	RequestHelperBase *mRequester;
+	RequestHelperBase			*mRequester;
 };
 
 

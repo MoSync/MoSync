@@ -1,20 +1,3 @@
-/* Copyright (C) 2011 MoSync AB
-
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
-
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
-
 /*
  * ListScreen.h
  *
@@ -28,17 +11,15 @@ MA 02110-1301, USA.
 #include <MAUtil/Environment.h>
 
 #include "FacebookDemoScreen.h"
-#include "NativeUI/Screen.h"
-#include "NativeUI/ListView.h"
-#include "NativeUI/WidgetEventListener.h"
-
+#include <NativeUI/WidgetEventListener.h>
 #include "ListItem.h"
 #include "FacebookDemoScreen.h"
+#include <NativeUI/Widgets.h>
 
 namespace FacebookDemoGUI
 {
 
-class ListScreen: public FacebookDemoScreen
+class ListScreen: public FacebookDemoScreen, public NativeUI::ListViewListener, public NativeUI::ButtonListener
 {
 public:
 	ListScreen(FacebookDemoScreen *prev);
@@ -47,29 +28,40 @@ public:
 	virtual void show();
 
 	void add(ListItem *btn);
-	void remove(ListItem *btn);
 
-	void clear();
+	void setListItemsColor(int color);
+	void setScreenColor(int color);
+
 	bool isEmpty() const;
 
-	void setBackgroundColor(int color);
+	void clear();
+	void clearScreenAfterLosingFocus(bool clearScreen);
 
-	//0.0 - not visible
-	//0.5 - half visible
-	//1.0 - fully visible
-	//1
-	void setTransparency(float alpha);
 	virtual ~ListScreen();
+
+
+    virtual void listViewItemClicked(NativeUI::ListView* listView, NativeUI::ListViewItem* listViewItem);
+
+    virtual void buttonClicked(Widget* button);
+
 private:
-	virtual void addChild(MoSync::UI::Widget *widget);
+	virtual int addChild(NativeUI::Widget* widget);
 
 private:
 	void initialize();
 
-private:
-	MoSync::UI::ListView *mList;
-	int 				mBackgroundColor;
-	float 				mTransparency;
+protected:
+	virtual void back();
+
+protected:
+	NativeUI::VerticalLayout 	*mLayout;
+	NativeUI::ListView 			*mList;
+	NativeUI::Button			*mBackButton;
+
+	int							mListItemsColor;
+	int							mScreenColor;
+
+	bool 						mClearScreenAfterLosingFocus;
 };
 
 }//namespace FacebookDemoGUI
