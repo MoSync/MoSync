@@ -135,8 +135,10 @@ namespace NativeUI
         if (-1 == result)
         {
             maPanic(0,
-                "NativeUI is only available on Android and iPhone. "
-                "You must run directly on the device or devices emulator.");
+				"This application uses Native UI, which currently "
+				"works on iOS and Android only - please select "
+				"an iOS or Android target profile in the "
+				"right-hand profile panel.");
         }
     }
 
