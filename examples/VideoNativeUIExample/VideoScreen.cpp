@@ -52,8 +52,7 @@ VideoScreen::VideoScreen() :
 	mSetUrl(NULL),
 	mSetPath(NULL),
 	mMiddleSpacerLayout(NULL),
-	mSpacerBottomLayout(NULL),
-	mExitButton(NULL)
+	mSpacerBottomLayout(NULL)
 {
 	// Initialize the UI and set the listeners.
 
@@ -74,7 +73,6 @@ VideoScreen::VideoScreen() :
 	mStop->addButtonListener(this);
 	mSetUrl->addButtonListener(this);
 	mSetPath->addButtonListener(this);
-	mExitButton->addButtonListener(this);
 }
 
 /**
@@ -90,7 +88,6 @@ VideoScreen::~VideoScreen()
     mStop->removeButtonListener(this);
     mSetUrl->removeButtonListener(this);
     mSetPath->removeButtonListener(this);
-    mExitButton->removeButtonListener(this);
 }
 
 /**
@@ -117,13 +114,6 @@ void VideoScreen::createMainLayout()
 	mSpacerBottomLayout->setBackgroundColor(INTENSE_BLUE);
 	mSpacerBottomLayout->setHeight(10);
 	mMainLayout->addChild(mSpacerBottomLayout);
-
-	mExitButton = new Button();
-	mExitButton->setText("Exit");
-	mExitButton->setWidth(getScreenWidth()/2);
-	// Set gradient background ( applicable only on Android).
-	mExitButton->setBackgroundGradient(LIGHT_BLUE, INTENSE_BLUE);
-	mMainLayout->addChild(mExitButton);
 }
 
 /**
@@ -192,41 +182,6 @@ void VideoScreen::addVideoWidgets()
 	mSourceStatus->setFontSize(12);
 	mMainLayout->addChild(mSourceStatus);
 
-	// Add a spacer of 10px before the buttons.
-	mTopSpacerLayout = new VerticalLayout();
-	mTopSpacerLayout->setBackgroundColor(INTENSE_BLUE);
-	mTopSpacerLayout->setHeight(10);
-	mMainLayout->addChild(mTopSpacerLayout);
-
-	createPlaybackButtons();
-
-	// Add duration label.
-	mDuration = new Label();
-	mDuration->setFontColor(INTENSE_BLUE);
-	mDuration->setText("Video Duration");
-	mMainLayout->addChild(mDuration);
-
-	// Add the video widget.
-	/**
-	 * A media controller is attached to this view, and acts differently
-	 * depending on platform.
-	 * On Android typically contains the buttons like "Play/Pause", "Rewind",
-	 * Fast Forward" and a progress slider. It takes care of synchronizing the
-	 * controls with the state of the MediaPlayer.
-	 * The set of controls are in a floating window next to the video widget.
-	 * The window will disappear if left idle for three seconds and reappear
-	 * when the user touches the video view.
-	 */
-	mVideoView = new VideoView();
-	mVideoView->setHeight(getScreenHeight()/3);
-	mVideoView->setWidth(getScreenWidth());
-	mMainLayout->addChild(mVideoView);
-
-	// Add an edit box for another urls or local paths.
-	mEditBox = new EditBox();
-	mEditBox->fillSpaceHorizontally();
-	mMainLayout->addChild(mEditBox);
-
 	// Add layout for load path or uri buttons.
 	mLoadLayout = new HorizontalLayout();
 
@@ -257,6 +212,41 @@ void VideoScreen::addVideoWidgets()
 	mLoadLayout->addChild(pathLayout);
 
 	mMainLayout->addChild(mLoadLayout);
+
+	// Add an edit box for another urls or local paths.
+	mEditBox = new EditBox();
+	mEditBox->fillSpaceHorizontally();
+	mMainLayout->addChild(mEditBox);
+
+	// Add the video widget.
+	/**
+	 * A media controller is attached to this view, and acts differently
+	 * depending on platform.
+	 * On Android typically contains the buttons like "Play/Pause", "Rewind",
+	 * Fast Forward" and a progress slider. It takes care of synchronizing the
+	 * controls with the state of the MediaPlayer.
+	 * The set of controls are in a floating window next to the video widget.
+	 * The window will disappear if left idle for three seconds and reappear
+	 * when the user touches the video view.
+	 */
+	mVideoView = new VideoView();
+	mVideoView->setHeight(getScreenHeight()/3);
+	mVideoView->setWidth(getScreenWidth());
+	mMainLayout->addChild(mVideoView);
+
+	// Add duration label.
+	mDuration = new Label();
+	mDuration->setFontColor(INTENSE_BLUE);
+	mDuration->setText("Video Duration");
+	mMainLayout->addChild(mDuration);
+
+	// Add a spacer of 10px before the buttons.
+	mTopSpacerLayout = new VerticalLayout();
+	mTopSpacerLayout->setBackgroundColor(INTENSE_BLUE);
+	mTopSpacerLayout->setHeight(10);
+	mMainLayout->addChild(mTopSpacerLayout);
+
+	createPlaybackButtons();
 }
 
 /**
@@ -304,15 +294,13 @@ void VideoScreen::buttonClicked(Widget* button)
     }
     else if (button == mSetUrl)
     {
+		mDuration->setText("Video Duration");
         mVideoView->setURL(mEditBox->getText());
     }
     else if (button == mSetPath)
     {
+		mDuration->setText("Video Duration");
 		mVideoView->setPath(mEditBox->getText());
-    }
-    else if (button == mExitButton)
-    {
-		Test::VideoMoblet::getInstance()->closeEvent();
     }
 }
 
@@ -358,10 +346,6 @@ void VideoScreen::videoViewStateChanged(
                 // Now pause and stop can be enabled.
                 mPause->setEnabled(true);
                 mStop->setEnabled(true);
-                // Refresh the duration label.
-                mDuration->setText(
-					"Duration: " +
-					MAUtil::integerToString(mVideoView->getDuration()));
                 break;
             case MAW_VIDEO_VIEW_STATE_FINISHED:
                 text = SOURCE_FINISHED;
