@@ -118,10 +118,6 @@ public:
 					break;
 
 				case EVENT_TYPE_KEY_PRESSED:
-					if (event.key == MAK_MENU)
-					{
-						// TODO: Show menu in HTML/JS.
-					}
 					if (event.key == MAK_BACK)
 					{
 						isRunning = false;
@@ -179,7 +175,7 @@ public:
 		}
 	}
 };
-// End of class WebViewMultiViews
+// End of class WebViewGeoLocationApp
 
 /**
  * Main function that is called when the program starts.

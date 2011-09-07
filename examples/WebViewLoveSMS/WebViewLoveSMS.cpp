@@ -109,10 +109,6 @@ public:
 			amor_png);
 
 		// Write main page.
-		// TODO: On iOS we need to insert a base tag with
-		// the base url, or find some other solution, since
-		// setting the "url" property does not seem to set
-		// the base url on iOS.
 		mPlatform->writeTextToFile(
 			mPlatform->getLocalPath() + "MainPage.html",
 			mPlatform->createTextFromHandle(MainPage_html));
@@ -177,10 +173,6 @@ public:
 					break;
 
 				case EVENT_TYPE_KEY_PRESSED:
-					if (event.key == MAK_MENU)
-					{
-						// TODO: Show menu in HTML/JS on Android.
-					}
 					if (event.key == MAK_BACK)
 					{
 						isRunning = false;
