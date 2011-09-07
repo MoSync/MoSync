@@ -41,7 +41,7 @@ void FacebookLoginScreen::setUrl(const MAUtil::String &url)
 MAUtil::String FacebookLoginScreen::getRedirectUrl() const
 {
 	//mWebView->getPropertyString("newurl");
-	mWebView->getNewURL();
+	return mWebView->getNewURL();
 }
 
 void FacebookLoginScreen::setListener(NativeUI::WebViewListener *listener)

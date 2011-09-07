@@ -7,7 +7,7 @@
 
 #include <maapi.h>
 #include <MAUtil/Set.h>
-#include <string.h>
+#include <mastdlib.h>
 
 #include "FacebookDemoMoblet.h"
 #include "Facebook/GetPermissions.h"
@@ -26,7 +26,6 @@
 #include <NativeUI/Image.h>
 
 #include <matime.h>
-#include <stdlib.h>
 
 /**
  * The constructor creates the user interface and the FacebookManager

@@ -9,7 +9,7 @@
 #define FACEBOOKDEMOSCREEN_H_
 
 #include <MAUtil/Environment.h>
-#include <NativeUI/Screen.h>
+#include "NativeUI/Screen.h"
 
 namespace FacebookDemoGUI
 {
