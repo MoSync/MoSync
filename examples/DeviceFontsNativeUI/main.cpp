@@ -1,3 +1,29 @@
+/*
+Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file main.cpp
+ * @author Iraklis Rossis
+ *
+ * This application provides a basic example of how to find and
+ * use fonts installed in your device using Native UI widgets
+ */
+
 #include <ma.h>
 #include <mavsprintf.h>
 #include <MAUtil/Moblet.h>
@@ -49,21 +75,21 @@ public:
 		maWidgetAddChild(screen, mList);
 
 		//Set a font size. This is independent of screen size.
-		int fontSize=20;
+		int fontSize = 20;
 
 		//Get the number of fonts installed in the device
-		int mNumFonts=maFontGetCount();
+		int mNumFonts = maFontGetCount();
 
 		//Set a buffer for font names
 		char buffer[64];
 
-		for(int i=0;i<mNumFonts;i++)
+		for (int i = 0; i < mNumFonts; i++)
 		{
 			//Get the i-th font name
-			if(maFontGetName(i,buffer,64))
+			if (maFontGetName(i, buffer, 64))
 			{
 				//Load the font, and get it's handle
-				MAHandle font=maFontLoadWithName(buffer,fontSize);
+				MAHandle font = maFontLoadWithName(buffer, fontSize);
 
 				//Create a list item
 				MAHandle listItem = maWidgetCreate(MAW_LIST_VIEW_ITEM);

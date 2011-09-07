@@ -521,20 +521,21 @@ namespace Base {
 
     SYSCALL(MAHandle, maFontLoadWithName(const char* name, int size)){
         CFStringRef fontName=CFStringCreateWithCString(NULL,name,kCFStringEncodingMacRoman);
-
+		if(size<=0)
+        {
+            return RES_FONT_INVALID_SIZE;
+        }
         //Getting a UIFont object is probably the least expensive way to test if it exists.
         //Also, it's more probably that a user will use the nativeUI system rather than
         //maDrawText(W)
         UIFont *uiFontObject=[UIFont fontWithName:(NSString*)fontName size:(GLfloat)size];
+
         if(!uiFontObject)
         {
             return RES_FONT_NAME_NONEXISTENT;
         }
 
-        if(size<=0)
-        {
-            return RES_FONT_INVALID_SIZE;
-        }
+        [uiFontObject retain];
         return createFontInfo(fontName,(CGFloat)size,uiFontObject,NULL);
 
     }
@@ -654,6 +655,7 @@ namespace Base {
             selectedFont->uiFontObject=
                             [[UIFont fontWithName:(NSString *) selectedFont->name size:selectedFont->size] retain];
         }
+		return selectedFont->uiFontObject;
     }
 
     //Used to instantiate the CGFont object only when needed
