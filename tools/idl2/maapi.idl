@@ -6232,32 +6232,32 @@ group CameraAPI "Camera API" {
 group CameraResultCodes "Camera Result Codes" {
 	constset int MA_CAMERA_RES_ {
 		/**
-		* @brief A constant that represents the flash being on.
+		* @brief A constant that represents successful camera operation.
 		*/
 		OK = 1;
 
 		/**
-		* @brief A constant that represents the flash being in the automatic mode.
+		* @brief A constant that represents a failed camera operation.
 		*/
 		FAILED = -2;
 
 		/**
-		* @brief A constant that represents the flash being in the automatic mode.
+		* @brief A constant that represents a camera failing to start.
 		*/
 		NOT_STARTED = -3;
 
 		/**
-		* @brief A constant that represents the flash being in the automatic mode.
+		* @brief A constant that represents a property not supported by the device.
 		*/
 		PROPERTY_NOTSUPPORTED = -4;
 
 		/**
-		* @brief A constant that represents the flash being in the automatic mode.
+		* @brief A constant that represents an invalid value for that property.
 		*/
 		INVALID_PROPERTY_VALUE = -5;
 
 		/**
-		* @brief A constant that represents the flash being in the automatic mode.
+		* @brief A constant that represents a property value not supported by the device.
 		*/
 		VALUE_NOTSUPPORTED = -6;
 
@@ -6287,7 +6287,7 @@ group FlashModes "Flash Modes" {
 		*/
 		TORCH = "torch";
 
-	} //end MAC_FLASH_
+	} //end MA_CAMERA_FLASH_
 }// end of FlashMode
 
 group FocusModes "Focus Modes" {
@@ -6312,7 +6312,7 @@ group FocusModes "Focus Modes" {
 		*/
 		FIXED = "fixed";
 
-	} //end MAC_FOCUS_
+	} //end MA_CAMERA_FOCUS_
 } //end of FocusMode
 
 group ImageFormat "Image Formats" {
