@@ -6,7 +6,7 @@ work = PipeExeWork.new
 work.instance_eval do
 	@SOURCES = ['.']
 	@LSTFILES = ['Resources/Resources.lst']
-	@LIBRARIES = ['mautil', 'maui', 'nativeui]
+	@LIBRARIES = ['mautil', 'maui', 'nativeui']
 	@NAME = 'NativeUIDemo'
 end
 
