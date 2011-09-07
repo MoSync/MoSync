@@ -14,7 +14,7 @@
 namespace FacebookDemoGUI
 {
 
-ListScreen::ListScreen(FacebookDemoScreen *prev):FacebookDemoScreen(prev), mClearScreenAfterLosingFocus(false)
+ListScreen::ListScreen(FacebookDemoScreen *prev): FacebookDemoScreen(prev)
 {
 	LOG("\n\tListScreen(%d) constructor", prev);
 	initialize();
@@ -34,6 +34,7 @@ void ListScreen::show()
 
 void ListScreen::add(ListItem *btn)
 {
+	btn->setBackgroundColor(mListItemsColor);
 	mList->addChild(btn);
 }
 
@@ -65,15 +66,21 @@ int ListScreen::addChild(NativeUI::Widget* widget)
 void ListScreen::initialize()
 {
 	LOG("\n\tListScreen::initialize()");
+	mClearScreenAfterLosingFocus = false;
+	mListItemsColor = 0x000088;
+	mScreenColor = 0x000000;
+
+	this->setBackgroundColor(mScreenColor);
+
 	NativeUI::VerticalLayout *layout = new NativeUI::VerticalLayout();
+	layout->setBackgroundColor(mScreenColor);
 
 	NativeUI::ListView *list = new NativeUI::ListView();
 	list->addListViewListener(this);
-	list->setBackgroundColor(0x000000);
+	list->setBackgroundColor(mScreenColor);
 
 	NativeUI::Button *button = new NativeUI::Button();
 	button->addButtonListener(this);
-	button->setBackgroundColor(0xF0F0F0);
 	button->setText("back");
 	button->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
 	button->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
@@ -87,8 +94,6 @@ void ListScreen::initialize()
 	mLayout = layout;
 	mList = list;
 	mBackButton = button;
-
-	this->setBackgroundColor(0x000000);
 }
 
 void ListScreen::back()

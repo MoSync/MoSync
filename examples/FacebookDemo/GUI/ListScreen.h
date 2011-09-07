@@ -29,6 +29,9 @@ public:
 
 	void add(ListItem *btn);
 
+	void setListItemsColor(int color);
+	void setScreenColor(int color);
+
 	bool isEmpty() const;
 
 	void clear();
@@ -54,6 +57,9 @@ protected:
 	NativeUI::VerticalLayout 	*mLayout;
 	NativeUI::ListView 			*mList;
 	NativeUI::Button			*mBackButton;
+
+	int							mListItemsColor;
+	int							mScreenColor;
 
 	bool 						mClearScreenAfterLosingFocus;
 };
