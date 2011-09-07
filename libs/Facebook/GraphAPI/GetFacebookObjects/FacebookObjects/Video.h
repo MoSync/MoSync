@@ -87,12 +87,12 @@ public:
 
 private:
 	IdNamePair					mFrom;
-	MAUtil::Vector<IdNamePair> 	mTags;
-	MAUtil::String 				mName;
-	MAUtil::String 				mDescription;
-	MAUtil::String 				mPictureUrl;
-	MAUtil::String 				mSource;
-	MAUtil::Vector<Comment> 	mComments;
+	MAUtil::Vector<IdNamePair>	mTags;
+	MAUtil::String				mName;
+	MAUtil::String				mDescription;
+	MAUtil::String				mPictureUrl;
+	MAUtil::String				mSource;
+	MAUtil::Vector<Comment>		mComments;
 };
 
 #endif /* VIDEO_H_ */

@@ -43,7 +43,7 @@ public:
 	~ImageScreen();
 
 private:
-	NativeUI::Image 		*mImage;
+	NativeUI::Image			*mImage;
 };
 
 }//namespace FacebookDemoGUI

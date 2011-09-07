@@ -78,12 +78,12 @@ public:
 	int getCount() const;
 
 private:
-	IdNamePair 			mFrom;
-	MAUtil::String 		mName;
-	MAUtil::String 		mDescription;
-	MAUtil::String 		mLink;
-	MAUtil::String 		mCoverPhotoId;
-	int 				mCount;
+	IdNamePair			mFrom;
+	MAUtil::String		mName;
+	MAUtil::String		mDescription;
+	MAUtil::String		mLink;
+	MAUtil::String		mCoverPhotoId;
+	int					mCount;
 };
 
 #endif /* PHOTOALBUM_H_ */

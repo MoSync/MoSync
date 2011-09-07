@@ -57,9 +57,9 @@ public:
 	int getLikes() const;
 
 private:
-	MAUtil::String 		mMessage;
+	MAUtil::String		mMessage;
 	IdNamePair			mFrom;
-	int 				mLikes;
+	int					mLikes;
 };
 
 #endif /* COMMENT_H_ */

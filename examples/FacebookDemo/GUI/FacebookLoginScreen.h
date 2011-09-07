@@ -46,7 +46,7 @@ public:
 
 private:
 	NativeUI::Screen					mScreen;
-	FacebookDemoGUI::FacebookWebView 	*mWebView;
+	FacebookDemoGUI::FacebookWebView	*mWebView;
 };
 
 }//namespace FacebookDemoGUI

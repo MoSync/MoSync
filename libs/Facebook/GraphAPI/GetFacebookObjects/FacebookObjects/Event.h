@@ -92,13 +92,13 @@ public:
 
 private:
 	IdNamePair		mOwner;
-	MAUtil::String 	mName;
-	MAUtil::String  mDescription;
-	MAUtil::String  mStartTime;
-	MAUtil::String  mEndTime;
-	MAUtil::String  mLocation;
+	MAUtil::String	mName;
+	MAUtil::String	mDescription;
+	MAUtil::String	mStartTime;
+	MAUtil::String	mEndTime;
+	MAUtil::String	mLocation;
 	Venue			mVenue;
-	MAUtil::String 	mPrivacy;
+	MAUtil::String	mPrivacy;
 };
 
 #endif /* EVENT_H_ */

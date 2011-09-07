@@ -143,16 +143,16 @@ public:
 private:
 	IdNamePair				mFrom;
 	IdNamePair				mTo;
-	MAUtil::String 			mMessage;
-	MAUtil::String 			mPictureUrl;
-	MAUtil::String 			mLink;
-	MAUtil::String 			mName;
-	MAUtil::String 			mCaption;
-	MAUtil::String 			mDescription;
-	MAUtil::String 			mVideoUrl;
+	MAUtil::String			mMessage;
+	MAUtil::String			mPictureUrl;
+	MAUtil::String			mLink;
+	MAUtil::String			mName;
+	MAUtil::String			mCaption;
+	MAUtil::String			mDescription;
+	MAUtil::String			mVideoUrl;
 	MAUtil::Vector<Action>	mActions;
-	MAUtil::String 			mPrivacy;
-	MAUtil::String 			mType;
+	MAUtil::String			mPrivacy;
+	MAUtil::String			mType;
 	MAUtil::Vector<IdNamePair>	mLikes;
 	MAUtil::Vector<Comment> mComments;
 	MAUtil::String			mUploadedFileId;
