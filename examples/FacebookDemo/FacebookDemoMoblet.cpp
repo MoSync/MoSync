@@ -7,7 +7,7 @@
 
 #include <maapi.h>
 #include <MAUtil/Set.h>
-#include <mastdlib.h>
+#include <mastring.h>
 
 #include "FacebookDemoMoblet.h"
 #include "Facebook/GetPermissions.h"
