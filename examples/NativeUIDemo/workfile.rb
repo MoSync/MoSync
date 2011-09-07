@@ -4,9 +4,9 @@ require File.expand_path('../../rules/mosync_exe.rb')
 
 work = PipeExeWork.new
 work.instance_eval do
-	@SOURCES = ['.', 'UIWrapper']
+	@SOURCES = ['.']
 	@LSTFILES = ['Resources/Resources.lst']
-	@LIBRARIES = ['mautil', 'maui']
+	@LIBRARIES = ['mautil', 'maui', 'nativeui]
 	@NAME = 'NativeUIDemo'
 end
 

@@ -28,9 +28,10 @@ MA 02110-1301, USA.
 #ifndef SCREEN_MAIN_H_
 #define SCREEN_MAIN_H_
 
-#include "UIWrapper/Widgets.h"
+// Include all the wrappers.
+#include <NativeUI/Widgets.h>
 
-using namespace MoSync::UI;
+using namespace NativeUI;
 
 /**
  * This is the main screen of the application.

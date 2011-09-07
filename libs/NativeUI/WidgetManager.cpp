@@ -23,6 +23,7 @@ MA 02110-1301, USA.
  * The WidgetManager manages widget events and dispatches
  * them to the target widgets.
  */
+
 #include <mastring.h>           // C string functions
 
 #include "WidgetManager.h"  // Header file for this class
