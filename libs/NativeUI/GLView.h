@@ -52,7 +52,7 @@ namespace NativeUI
 		 * GL1_VIEW
 		 * GL2_VIEW
 		 */
-		GLView(const MAUtil::String type);
+		GLView(const MAUtil::String& type);
 
 		/**
 		 * Destructor.

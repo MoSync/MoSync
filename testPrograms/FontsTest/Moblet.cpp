@@ -24,12 +24,13 @@ TestMoblet *TestMoblet::mInstance = NULL;
  */
 TestMoblet::TestMoblet()
 {
+	mShowing = 1;
 
 	maSetColor(0xC1FFC1);
 
 	int top = 10;
 	maDrawText(10,top, "--------- Display number of fonts with current font ---------");
-	int nrFonts = maFontGetCount();
+	nrFonts = maFontGetCount();
 	MAUtil::String tempNrFonts;
 	char buf1[10];
 	char buf2[256];
@@ -41,11 +42,9 @@ TestMoblet::TestMoblet()
 
 	maSetColor(0x00FFFF);
 	top+=40;
-	maDrawText(10,top,"--------- Display list of fonts --------- ");
+	maDrawText(10,top,"--------- Display list of fonts with default font size --------- ");
 	MAUtil::String tempFont;
-	MAUtil::String message;
 	int getNameError;
-	MAUtil::Vector<MAUtil::String> fontNames;
 
 	for ( int i=0; i<nrFonts; i++)
 	{
@@ -65,15 +64,28 @@ TestMoblet::TestMoblet()
 		}
 	}
 
+	maDrawText(10, top+40, "Tap screen to test maLoadWithName for each font");
+	maUpdateScreen();
+}
+
+void TestMoblet::testLoadWithName()
+{
+	mShowing = 2;
+
+	maSetColor(0x000000);
+	MAExtent size = maGetScrSize();
+	maFillRect(0,0,EXTENT_X(size),EXTENT_Y(size) );
+
 	maSetColor(0xCD5555);
-	top+=40;
+
+	int top = 0;
 	maDrawText(10,top,"--------- Test maFontLoadWithName(test each name from list) --------- ");
 	top += 20;
 
 	for (int i=0; i<fontNames.size(); i++)
 	{
 		top += 20;
-		int handle = maFontLoadWithName(fontNames[i].c_str(), 10);
+		int handle = maFontLoadWithName(fontNames[i].c_str(), 15);
 		if ( handle == RES_FONT_NAME_NONEXISTENT )
 		{
 			message = "Font nonexistent: " + fontNames[i];
@@ -87,8 +99,21 @@ TestMoblet::TestMoblet()
 		}
 	}
 
-	maSetColor(0xCD7F32);
-	top += 40;
+	maDrawText(10, top+40, "Tap screen to test maFontLoadDefault for some combinations");
+	maUpdateScreen();
+}
+
+void TestMoblet::testLoadDefault()
+{
+	mShowing = 3;
+
+	maSetColor(0x000000);
+	MAExtent size = maGetScrSize();
+	maFillRect(0,0,EXTENT_X(size),EXTENT_Y(size) );
+
+	maSetColor(0xCD5555);
+
+	int top = 0;
 	maDrawText(10,top,"--------- Test maFontLoadDefault ---------");
 
 	top += 20;
@@ -96,40 +121,39 @@ TestMoblet::TestMoblet()
 	testFont(FONT_TYPE_MONOSPACE,FONT_STYLE_NORMAL,-10,top);
 
 	top += 20;
-	maDrawText(10, top, "Test Monospace Bold 10");
-	testFont(FONT_TYPE_MONOSPACE, FONT_STYLE_BOLD, 10, top);
+	maDrawText(10, top, "Test Monospace Bold 15");
+	testFont(FONT_TYPE_MONOSPACE, FONT_STYLE_BOLD, 15, top);
 
 	top += 20;
-	maDrawText(10, top, "Test Monospace Italic 10");
-	testFont(FONT_TYPE_MONOSPACE, FONT_STYLE_ITALIC, 10, top);
+	maDrawText(10, top, "Test Monospace Italic 15");
+	testFont(FONT_TYPE_MONOSPACE, FONT_STYLE_ITALIC, 15, top);
 
 	top += 20;
-	maDrawText(10, top, "Test SansSerif Normal 10");
-	testFont(FONT_TYPE_SANS_SERIF, FONT_STYLE_NORMAL, 10, top);
+	maDrawText(10, top, "Test SansSerif Normal 15");
+	testFont(FONT_TYPE_SANS_SERIF, FONT_STYLE_NORMAL, 15, top);
 
 	top += 20;
-	maDrawText(10, top, "Test SansSerif Bold 10");
-	testFont(FONT_TYPE_SANS_SERIF, FONT_STYLE_BOLD, 10, top);
+	maDrawText(10, top, "Test SansSerif Bold 15");
+	testFont(FONT_TYPE_SANS_SERIF, FONT_STYLE_BOLD, 15, top);
 
 	top += 20;
-	maDrawText(10, top, "Test SansSerif Italic 10");
-	testFont(FONT_TYPE_SANS_SERIF, FONT_STYLE_ITALIC, 10, top);
+	maDrawText(10, top, "Test SansSerif Italic 15");
+	testFont(FONT_TYPE_SANS_SERIF, FONT_STYLE_ITALIC, 15, top);
 
 	top += 20;
-	maDrawText(10, top, "Test Serif Normal 10");
-	testFont(FONT_TYPE_SERIF, FONT_STYLE_NORMAL, 10, top);
+	maDrawText(10, top, "Test Serif Normal 15");
+	testFont(FONT_TYPE_SERIF, FONT_STYLE_NORMAL, 15, top);
 
 	top += 20;
-	maDrawText(10, top, "Test Serif Bold 10");
-	testFont(FONT_TYPE_SERIF, FONT_STYLE_BOLD, 10, top);
+	maDrawText(10, top, "Test Serif Bold 15");
+	testFont(FONT_TYPE_SERIF, FONT_STYLE_BOLD, 15, top);
 
 	top += 20;
-	maDrawText(10, top, "Test Serif Italic 10");
-	testFont(FONT_TYPE_SERIF, FONT_STYLE_ITALIC, 10, top);
+	maDrawText(10, top, "Test Serif Italic 15");
+	testFont(FONT_TYPE_SERIF, FONT_STYLE_ITALIC, 15, top);
 
-
+	maDrawText(10, top+40, "Tap screen to EXIT");
 	maUpdateScreen();
-
 }
 
 void TestMoblet::checkFont(int left, int top,MAHandle font)
@@ -147,20 +171,20 @@ void TestMoblet::testFont (int family, int style, int size, int top)
 	if ( font == RES_FONT_INVALID_SIZE)
 	{
 		maSetColor(0xCD3333);
-		maDrawText(150,top,"Invalid size");
+		maDrawText(200,top,"Invalid size");
 		maSetColor(0xC1FFC1);
 	}
 	else if( font == RES_FONT_NO_TYPE_STYLE_COMBINATION)
 	{
 		maSetColor(0xCD3333);
-		maDrawText(150,top,"No type style combination");
+		maDrawText(200,top,"No type style combination");
 		maSetColor(0xC1FFC1);
 	}
 	else
 	{
 		maFontSetCurrent(font);
 		MAUtil::String message = "Ok, handle: " + MAUtil::integerToString(font);
-		maDrawText(150, top, message.c_str());
+		maDrawText(200, top, message.c_str());
 	}
 }
 
@@ -196,6 +220,22 @@ void TestMoblet::keyPressEvent(int keyCode, int nativeCode)
     {
         closeEvent();
     }
+}
+
+void TestMoblet::pointerPressEvent(MAPoint2d p)
+{
+	if ( mShowing == 1)
+	{
+		testLoadWithName();
+	}
+	else if ( mShowing == 2)
+	{
+		testLoadDefault();
+	}
+	else if ( mShowing == 3)
+	{
+		closeEvent();
+	}
 }
 
 } // namespace Test

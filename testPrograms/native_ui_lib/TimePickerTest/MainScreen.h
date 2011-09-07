@@ -73,6 +73,7 @@ private:
 	VerticalLayout* mMainLayout;
 
 	TimePicker* mTimePicker;
+	Label* mTimePickerValue;
 };
 
 
