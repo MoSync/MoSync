@@ -104,9 +104,19 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 		if (thisOp.op == _POP)
 			continue;
 
-		// Check for a dest reg
-		
-		if (thisOp.flags & fetch_d)
+		//-----------------------------------------
+		// Deal with syscalls
+		// for some strange reason rd is the syscallId which will
+		// tag unused registers as used for void functions
+		//-----------------------------------------
+
+		if(thisOp.op == _SYSCALL)
+		{
+			FunctionReg_Syscall(&thisOp, fp);
+		}
+
+		// Check for a dest reg		
+		else if (thisOp.flags & fetch_d)
 		{
 			if (thisOp.rd < 32)
 			{
@@ -117,7 +127,7 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 				fp->dst_reg |= REGBIT(thisOp.rd);
 			}
 		}
-		
+
 		// Check for a source reg
 		
 		if (thisOp.flags & fetch_s)
@@ -157,7 +167,6 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 		{
 			FunctionReg_CallReg(&thisOp, fp);
 		}
-
 	}
 
 
@@ -189,6 +198,44 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 	return fp->reg_used;
 }
 
+//****************************************
+//		Deal with syscalls
+//****************************************
+
+// Add the call parameters to the used list
+
+void FunctionReg_Syscall(OpcodeInfo *thisOp, FuncProp *fp)
+{
+	SYMBOL* CallSym = FindSysCall(thisOp->imm);
+
+	if (CallSym)
+	{
+		int params = CallSym->Params;
+		int p;
+
+		for (p=0;p<params;p++)
+		{
+			// check if this reg was assigned previously, if it was'nt it is uninitialized before use
+	
+			int is_assigned = fp->assign_reg & REGBIT(REG_i0 + p);
+	
+			if (!is_assigned)
+				fp->uninit_reg |= REGBIT(REG_i0 + p);
+	
+			fp->src_reg |= REGBIT(REG_i0 + p);
+		}
+
+		// Check what the function returns
+		// Do nothing for void
+		
+		if (CallSym->RetType == RET_int   ||
+			CallSym->RetType == RET_float)
+			fp->dst_reg |= REGBIT(REG_r14);
+
+		if (CallSym->RetType == RET_double)
+			fp->dst_reg |= REGBIT(REG_r14) | REGBIT(REG_r15);
+	}
+}
 
 //****************************************
 //		Deal with immediate calls
@@ -223,8 +270,7 @@ void FunctionReg_Calli(OpcodeInfo *thisOp, FuncProp *fp)
 		// Do nothing for void
 		
 		if (CallSym->RetType == RET_int   ||
-			CallSym->RetType == RET_float ||
-			CallSym->RetType == RET_int)
+			CallSym->RetType == RET_float)
 			fp->dst_reg |= REGBIT(REG_r14);
 
 		if (CallSym->RetType == RET_double)
