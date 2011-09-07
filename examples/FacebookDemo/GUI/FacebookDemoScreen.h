@@ -35,7 +35,6 @@ protected:
 
 protected:
 	FacebookDemoScreen *mPreviousScreen;
-	bool				mBusy;
 };
 
 

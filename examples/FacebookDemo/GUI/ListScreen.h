@@ -35,7 +35,7 @@ public:
 	bool isEmpty() const;
 
 	void clear();
-	void clearScreenAfterLosingFocus(bool clear);
+	void clearScreenAfterLosingFocus(bool clearScreen);
 
 	virtual ~ListScreen();
 

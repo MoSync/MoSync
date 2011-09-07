@@ -16,7 +16,6 @@ namespace FacebookDemoGUI
 
 ListScreen::ListScreen(FacebookDemoScreen *prev): FacebookDemoScreen(prev)
 {
-	LOG("\n\tListScreen(%d) constructor", prev);
 	initialize();
 }
 
@@ -44,9 +43,9 @@ void ListScreen::clear()
 	initialize();
 }
 
-void ListScreen::clearScreenAfterLosingFocus(bool clear)
+void ListScreen::clearScreenAfterLosingFocus(bool clearScreen)
 {
-	mClearScreenAfterLosingFocus = clear;
+	mClearScreenAfterLosingFocus = clearScreen;
 }
 
 ListScreen::~ListScreen()
@@ -60,7 +59,7 @@ bool ListScreen::isEmpty() const
 
 int ListScreen::addChild(NativeUI::Widget* widget)
 {
-	NativeUI::Screen::addChild(widget);
+	return NativeUI::Screen::addChild(widget);
 }
 
 void ListScreen::initialize()

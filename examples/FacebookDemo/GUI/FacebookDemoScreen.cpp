@@ -11,9 +11,8 @@
 namespace FacebookDemoGUI
 {
 
-FacebookDemoScreen::FacebookDemoScreen(FacebookDemoScreen *prevScreen): mBusy(false), mPreviousScreen(prevScreen)
+FacebookDemoScreen::FacebookDemoScreen(FacebookDemoScreen *prevScreen): mPreviousScreen(prevScreen)
 {
-
 }
 
 void FacebookDemoScreen::show()
