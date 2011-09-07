@@ -49,14 +49,14 @@ public:
 	virtual ~HttpRequest();
 
 protected:
-	String 				mUrl;
+	String				mUrl;
 
 	Map<String, String> mMessageBodyParams;
 	Map<String, String> mRequestHeaders;
 
-	int 				mMethod;
+	int					mMethod;
 	const byte* 		mPostdata;
-	int 				mDataSize;
+	int					mDataSize;
 
 
 };

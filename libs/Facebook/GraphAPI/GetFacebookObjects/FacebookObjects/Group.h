@@ -70,11 +70,11 @@ public:
 	const MAUtil::String &getPrivacy() const;
 
 private:
-	IdNamePair 		mOwner;
-	MAUtil::String  mName;
-	MAUtil::String  mDescription;
-	MAUtil::String  mLink;
-	MAUtil::String  mPrivacy;
+	IdNamePair		mOwner;
+	MAUtil::String	mName;
+	MAUtil::String	mDescription;
+	MAUtil::String	mLink;
+	MAUtil::String	mPrivacy;
 };
 
 #endif /* GROUP_H_ */

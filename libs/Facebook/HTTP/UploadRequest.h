@@ -45,10 +45,10 @@ public:
 
 
 protected:
-	const byte 			*mFileRawData;
-	int 			mFileSize;
-	MAUtil::String 	mContentType;
-	MAUtil::String  mFileName;
+	const byte			*mFileRawData;
+	int					mFileSize;
+	MAUtil::String		mContentType;
+	MAUtil::String		mFileName;
 };
 
 #endif /* UPLOADREQUEST_H_ */

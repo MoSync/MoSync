@@ -251,19 +251,19 @@ void FacebookDemoMoblet::addPostOnWall(FacebookDemoGUI::ListScreen *menu)
 {
 	FacebookDemoApplication::PostOnWallCommand<Post> *addLinkCommand = new FacebookDemoApplication::PostOnWallCommand<Post>(mFacebookManager, menu, "me");
 	addLinkCommand->setPostParams(
-			"Post added with MOSYN SDK",  								//message
-			"http://www.youtube.com/watch?v=FL7yD-0pqZg", 							//link
-			"New post",														//name
-			"Link from You Tube",											//caption
-			"Testing adding a post on wall with MOSYNC_SDK");			//description
+			"Post added with MOSYN SDK", 										//message
+			"http://www.youtube.com/watch?v=FL7yD-0pqZg",						//link
+			"New post",															//name
+			"Link from You Tube",												//caption
+			"Testing adding a post on wall with MOSYNC_SDK");					//description
 
 	FacebookDemoGUI::ListItem *linkButton = new FacebookDemoGUI::ListItem(addLinkCommand, "add a post on wall (video)");
 	menu->add(linkButton);
 
 	FacebookDemoApplication::PostOnWallCommand<Post> *addPictureCommand = new FacebookDemoApplication::PostOnWallCommand<Post>(mFacebookManager, menu, "me");
 	addPictureCommand->setPostParams(
-				"Post added with MOSYN SDK",  																			//message
-				"http://1.bp.blogspot.com/_8kXsPIEkJZI/RyHy_sITYCI/AAAAAAAAADc/4HTZMEhiVlw/s400/cats-in-love.jpg", 		//link
+				"Post added with MOSYN SDK",																			//message
+				"http://1.bp.blogspot.com/_8kXsPIEkJZI/RyHy_sITYCI/AAAAAAAAADc/4HTZMEhiVlw/s400/cats-in-love.jpg",		//link
 				"New post",																								//name
 				"Cats",																									//caption
 				"Testing adding a post on wall with MOSYNC_SDK");														//description

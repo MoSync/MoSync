@@ -63,10 +63,10 @@ public:
 	const MAUtil::Vector<Comment> &getComments() const;
 
 private:
-	MAUtil::String 			mId;
-	IdNamePair  			mFrom;
-	MAUtil::String  		mSubject;
-	MAUtil::String  		mMessage;
+	MAUtil::String			mId;
+	IdNamePair				mFrom;
+	MAUtil::String			mSubject;
+	MAUtil::String			mMessage;
 	MAUtil::Vector<Comment> mComments;
 };
 

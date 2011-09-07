@@ -47,8 +47,4 @@ public:
 	virtual ~ErrorListener(){}
 };
 
-
-
-
-
 #endif /* ERROR_LISTENER_H_ */
