@@ -90,8 +90,11 @@ void AppMoblet::startTesting()
 
     printf("\n\n Test syscalls with random values\n\n");
     contactsListHandle = maPimListOpen(MA_PIM_CONTACTS);
-    MAHandle contactItemHandle = maPimListNext(contactsListHandle);
+    MAHandle contactItemHandle = maPimItemCreate(contactsListHandle);
     this->testSyscallsWithRandomValues(contactItemHandle);
+
+    maPimItemRemove(contactsListHandle, contactItemHandle);
+    maPimListClose(contactsListHandle);
 }
 
 /**
@@ -136,6 +139,7 @@ void AppMoblet::testSyscallsWithRandomValues(MAHandle item)
     char buf[1024];
     args.buf = buf;
     args.bufSize = 1024;
+    PIMContact* contact = new PIMContact(item);
 
     printf("\n============maPimItemCount syscall=============");
 
@@ -260,9 +264,20 @@ void AppMoblet::testSyscallsWithRandomValues(MAHandle item)
     printResultCode(maPimItemGetLabel(&args, 0));
     printf("\n");
 
+    printf("Test with invalid buffer size");
+    contact->addAddress();
+    contact->modifyAddressField();
+    args.field = MA_PIM_FIELD_CONTACT_ADDR;
+    args.bufSize = 2;
+    printResultCode(maPimItemGetLabel(&args, 0));
+    printf("\n");
+
     printf("Test syscall with a valid handle, valid field id and valid value index");
     args.field = MA_PIM_FIELD_CONTACT_TEL;
+    args.bufSize = 256;
     printResultCode(maPimItemGetLabel(&args, 2));
     printf("\n");
     waitForClick();
+
+    delete contact;
 }

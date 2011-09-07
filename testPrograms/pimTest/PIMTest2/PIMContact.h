@@ -54,12 +54,17 @@ public:
     void printContactField(const int fieldID);
 
     /**
+     * Modify the first value of the address field.
+     * Set a custom label for that value.
+     */
+    virtual void modifyAddressField();
+
+    /**
      * Get contact handle.
      * @return The contact's handle.
      */
     virtual MAHandle getHandle() const;
 
-private:
     /**
      * Print the attribute for a given index field value.
      * If the attribute is custom will print the label also.
@@ -168,6 +173,11 @@ private:
      * Print organization info field value.
      */
     void printOrgInfo();
+
+    /**
+     * Add values to address field.
+     */
+    void addAddress();
 
 private:
     /**

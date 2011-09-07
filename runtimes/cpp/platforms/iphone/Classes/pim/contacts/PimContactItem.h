@@ -152,7 +152,7 @@
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
      indexValue:(const int) index
- valueAttribute:(const int) atttribute;
+ valueAttribute:(const int) attribute;
 
 /**
  * Removes a value from a field.
@@ -334,6 +334,11 @@
  * Reads the revision field from the record.
  */
 -(void) readRevisionField;
+
+/**
+ * Reads the UID field from the record.
+ */
+-(void) readUIDField;
 
 /**
  * Reads the instant message field from the record.

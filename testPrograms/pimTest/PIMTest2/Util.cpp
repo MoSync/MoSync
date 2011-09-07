@@ -124,7 +124,7 @@ int writeWCharArraysToBuf(
         }
     }
 
-    return (char*) dst - charBuffer;
+    return (char*) dst - charBuffer + sizeof(int);
 }
 
 /**

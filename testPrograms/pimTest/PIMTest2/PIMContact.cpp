@@ -124,6 +124,47 @@ void PIMContact::printContactField(const int fieldID)
     }
 }
 
+
+/**
+ * Modify the first value of the address field.
+ * Set a custom label for that value.
+ */
+void PIMContact::modifyAddressField()
+{
+    printf("==============Modify address field=============\n\n");
+    mArgs.field = MA_PIM_FIELD_CONTACT_ADDR;
+
+    // Print new value on the screen.
+    for (int i = 0; i < COUNT_ADDRESS_INDICES; i++)
+    {
+        MAUtil::String addressValueIndex = getAddressIndexString(i);
+        const wchar* addressValue = sAddressModified[i];
+        printf("%s %S", addressValueIndex.c_str(), addressValue);
+    }
+    printf("\n");
+
+    // Write the address into the buffer.
+    mArgs.bufSize = writeWCharArraysToBuf(
+        mArgs.buf,
+        sAddressModified,
+        COUNT_ADDRESS_INDICES);
+
+    // Set the value for the address field at position 0.
+    // Use MA_PIM_ATTR_ADDR_CUSTOM so we can set the label later.
+    checkResultCode(maPimItemSetValue(&mArgs, 0, MA_PIM_ATTR_ADDR_CUSTOM));
+
+    // Set custom attribute(label) for the above address.
+    printf("\n Set label for the this address.");
+    printf("Label: %S", sAddressLabel);
+
+    // Write label value into buffer.
+    mArgs.bufSize = copyWCharArray(mArgs.buf, sAddressLabel);
+
+    // Set label value for address field at position 0.
+    checkResultCode(maPimItemSetLabel(&mArgs, 0));
+    waitForClick();
+}
+
 /**
  * Get contact handle.
  * @return The contact's handle.
@@ -531,4 +572,49 @@ void PIMContact::printOrgInfo()
             printf("%s %S\n\n", orgInfoValueIndex.c_str(), orgInfoValue);
         }
     }
+}
+
+
+/**
+ * Add values to address field.
+ */
+void PIMContact::addAddress()
+{
+    printf("Add values to address field\n\n");
+    mArgs.field = MA_PIM_FIELD_CONTACT_ADDR;
+
+    // Print value for home address.
+    for (int i = 0; i < COUNT_ADDRESS_INDICES; i++)
+    {
+        MAUtil::String addressValueIndex = getAddressIndexString(i);
+        const wchar* addressValue = sAddressHome[i];
+        printf("%s %S", addressValueIndex.c_str(), addressValue);
+    }
+    printf("\n");
+
+    // Write value to buffer.
+    mArgs.bufSize = writeWCharArraysToBuf(
+        mArgs.buf,
+        sAddressHome,
+        COUNT_ADDRESS_INDICES);
+
+    // Add value to address field.
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_ADDR_HOME));
+
+    // Print value for work address.
+    for (int i = 0; i < COUNT_ADDRESS_INDICES; i++)
+    {
+        MAUtil::String addressValueIndex = getAddressIndexString(i);
+        const wchar* addressValue = sAddressWork[i];
+        printf("%s %S", addressValueIndex.c_str(), addressValue);
+    }
+
+    // Write value to buffer.
+    mArgs.bufSize = writeWCharArraysToBuf(
+        mArgs.buf,
+        sAddressWork,
+        COUNT_ADDRESS_INDICES);
+
+    // Add value to address field.
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_ADDR_WORK));
 }

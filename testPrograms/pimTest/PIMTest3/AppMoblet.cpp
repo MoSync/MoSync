@@ -50,6 +50,8 @@ AppMoblet::AppMoblet() :
     this->testMaPimItemSetValue();
     this->testMaPimItemGetValue();
     this->testMaPimItemRemoveValue();
+//    this->deleteAllContactsFromAddressBook();
+//    this->modifyContact();
 }
 
 /**
@@ -71,18 +73,20 @@ void AppMoblet::startTesting()
 
     printf("\n===========Create new contact item===========");
     MAHandle newContactHandle = maPimItemCreate(list);
+    printf("newContactHandle = %d", newContactHandle);
     printResultCode(newContactHandle);
 
     printf("\n===========Add data to contact===========");
     PIMContact* contact = new PIMContact(newContactHandle);
     contact->addDataToContact();
-    delete contact;
 
     printf("\n===========Close new contact===========");
     printResultCode(maPimItemClose(newContactHandle));
 
     printf("\n===========Close contacts list===========");
     printResultCode(maPimListClose(list));
+
+    delete contact;
 }
 
 /**
@@ -101,8 +105,10 @@ void AppMoblet::testMaPimItemCreate()
     printf("\nTest with valid list handle and list is opened");
     MAHandle list = maPimListOpen(MA_PIM_CONTACTS);
     printResultCode(list);
-    printResultCode(maPimItemCreate(list));
+    MAHandle item = maPimItemCreate(list);
+    printResultCode(item);
 
+    maPimItemRemove(list, item);
     maPimListClose(list);
 }
 
@@ -213,7 +219,7 @@ void AppMoblet::testMaPimItemSetLabel()
     args.bufSize = copyWCharArray(args.buf, L"My label");
     printResultCode(maPimItemSetLabel(&args, index));
 
-    maPimItemClose(item);
+    maPimItemRemove(list, item);
     maPimListClose(list);
     waitForClick();
 }
@@ -259,7 +265,13 @@ void AppMoblet::testMaPimItemAddValue()
     printf("\nTest syscall with attribute from another field");
     printResultCode(maPimItemAddValue(&args, MA_PIM_ATTR_RELATION_BROTHER));
 
+    printf("\nTest syscall with invalid buffer size");
+    writeWCharArraysToBuf(args.buf, sAddressHome, 8);
+    args.bufSize = 10;
+    printResultCode(maPimItemAddValue(&args, MA_PIM_ATTR_ADDR_HOME));
+
     printf("\nTest syscall with valid parameters.");
+    args.bufSize = writeWCharArraysToBuf(args.buf, sAddressHome, 8);
     printResultCode(maPimItemAddValue(&args, MA_PIM_ATTR_ADDR_WORK));
 
     maPimItemRemove(list, item);
@@ -318,8 +330,15 @@ void AppMoblet::testMaPimItemSetValue()
     args.field = MA_PIM_FIELD_CONTACT_REVISION;
     printResultCode(maPimItemSetValue(&args, 0, MA_PIM_ATTR_ADDR_WORK));
 
+    printf("\nTest syscall with invalid buffer size.");
+    args.field = MA_PIM_FIELD_CONTACT_ADDR;
+    writeWCharArraysToBuf(args.buf, sAddressHome, 8);
+    args.bufSize = 20;
+    printResultCode(maPimItemSetValue(&args, 0, MA_PIM_ATTR_ADDR_WORK));
+
     printf("\nTest syscall with valid parameters.");
     args.field = MA_PIM_FIELD_CONTACT_ADDR;
+    args.bufSize = writeWCharArraysToBuf(args.buf, sAddressHome, 8);
     printResultCode(maPimItemSetValue(&args, 0, MA_PIM_ATTR_ADDR_WORK));
 
     delete contact;
@@ -373,8 +392,13 @@ void AppMoblet::testMaPimItemGetValue()
     printResultCode(maPimItemGetValue(&args, 0));
     waitForClick();
 
-    printf("\nTest syscall with valid parameters.");
+    printf("\nTest syscall with invalid buf size.");
     args.field = MA_PIM_FIELD_CONTACT_ADDR;
+    args.bufSize = 20;
+    printResultCode(maPimItemGetValue(&args, 0));
+
+    printf("\nTest syscall with valid parameters.");
+    args.bufSize = 1024;
     printResultCode(maPimItemGetValue(&args, 0));
 
     delete contact;
@@ -420,4 +444,38 @@ void AppMoblet::testMaPimItemRemoveValue()
     maPimItemRemove(list, item);
     maPimListClose(list);
     waitForClick();
+}
+
+/**
+ * Test maPimItemRemove syscall.
+ */
+void AppMoblet::deleteAllContactsFromAddressBook()
+{
+    MAHandle list = maPimListOpen(MA_PIM_CONTACTS);
+    while(true)
+    {
+        MAHandle item = maPimListNext(list);
+        if (item != 0)
+        {
+            maPimItemRemove(list, item);
+        }
+        else
+        {
+            break;
+        }
+    }
+    maPimListClose(list);
+}
+
+/**
+ * Modify an existing contact.
+ */
+void AppMoblet::modifyContact()
+{
+    MAHandle list = maPimListOpen(MA_PIM_CONTACTS);
+    MAHandle item = maPimListNext(list);
+    PIMContact* contact = new PIMContact(item);
+    contact->modifyAddressField();
+    maPimItemClose(item);
+    maPimListClose(list);
 }

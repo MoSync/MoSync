@@ -196,9 +196,9 @@
     // If no error occurred write custom label's value.
     if (MA_PIM_ERR_NONE == returnValue)
     {
-        [[PimUtils sharedInstance] writeString:customLabel
-                                     atAddress:address
-                                       maxSize:args->bufSize];
+        returnValue = [[PimUtils sharedInstance] writeString:customLabel
+                                                   atAddress:address
+                                                     maxSize:args->bufSize];
     }
 
     [customLabel release];
@@ -241,20 +241,14 @@
     int fieldType = [fieldItem getFieldType];
     NSMutableArray* valuesArray = [fieldItem getValue:index];
 
-    switch (fieldType) {
-        case MA_PIM_TYPE_BINARY:
-
-            break;
-        case MA_PIM_TYPE_BOOLEAN:
-
-            break;
+    switch (fieldType)
+    {
         case MA_PIM_TYPE_DATE:
             returnValue = [utils writeDate:[valuesArray objectAtIndex:0]
-                                 atAddress:address
-                                   maxSize:args->bufSize];
+                                 atAddress:address];
             break;
         case MA_PIM_TYPE_INT:
-
+            returnValue = [utils writeIntValue:[valuesArray objectAtIndex:0] atAddress:address];
             break;
         case MA_PIM_TYPE_STRING:
             returnValue = [utils writeString:[valuesArray objectAtIndex:0]
@@ -287,7 +281,7 @@
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
      indexValue:(const int) index
- valueAttribute:(const int) atttribute
+ valueAttribute:(const int) attribute
 {
     int returnValue;
     int field = args->field;
@@ -318,30 +312,38 @@
     int fieldType = [itemField getFieldType];
     switch (fieldType)
     {
-        case MA_PIM_TYPE_BINARY:
-
-            break;
-        case MA_PIM_TYPE_BOOLEAN:
-
-            break;
         case MA_PIM_TYPE_DATE:
             valuesArray = [utils getDate:address];
             break;
-        case MA_PIM_TYPE_INT:
-
-            break;
         case MA_PIM_TYPE_STRING:
-            valuesArray = [utils getString:address];
+            valuesArray = [utils getString:address withSize:args->bufSize];
+            break;
+        case MA_PIM_TYPE_INT:
+            valuesArray = [utils getIntValue:address];
             break;
         case MA_PIM_TYPE_STRING_ARRAY:
-            valuesArray = [utils getStringArray:address];
+            valuesArray = [utils getStringArray:address forFieldID:field withSize:args->bufSize];
             break;
         default:
+            valuesArray = nil;
             break;
     }
 
+    // Check if values were read from the buffer.
+    if (!valuesArray)
+    {
+        return MA_PIM_ERR_BUFFER_INVALID;
+    }
+
     returnValue = [itemField setValue:valuesArray atIndex:index
-                        withAttribute:atttribute];
+                        withAttribute:attribute];
+
+    // Modify item's status if it's imported.
+    if (MA_PIM_ERR_NONE == returnValue &&
+        mItemStatus == kImportedItem)
+    {
+        mItemStatus = kModifiedItem;
+    }
 
     return returnValue;
 }
@@ -390,10 +392,6 @@
     int fieldType = [itemField getFieldType];
     switch (fieldType)
     {
-        case MA_PIM_TYPE_BINARY:
-            break;
-        case MA_PIM_TYPE_BOOLEAN:
-            break;
         case MA_PIM_TYPE_DATE:
             valuesArray = [utils getDate:address];
             break;
@@ -401,16 +399,32 @@
             valuesArray = [utils getIntValue:address];
             break;
         case MA_PIM_TYPE_STRING:
-            valuesArray = [utils getString:address];
+            valuesArray = [utils getString:address withSize:args->bufSize];
             break;
         case MA_PIM_TYPE_STRING_ARRAY:
-            valuesArray = [utils getStringArray:address];
+            valuesArray = [utils getStringArray:address forFieldID:field withSize:args->bufSize];
             break;
         default:
+            valuesArray = nil;
             break;
     }
 
-    return [itemField addValue:valuesArray withAttribute:attribute];
+    // Check if values were read from the buffer.
+    if (!valuesArray)
+    {
+        return MA_PIM_ERR_BUFFER_INVALID;
+    }
+
+    int returnValue = [itemField addValue:valuesArray withAttribute:attribute];
+
+    // Modify item's status if it's imported.
+    if (MA_PIM_ERR_NONE == returnValue &&
+        mItemStatus == kImportedItem)
+    {
+        mItemStatus = kModifiedItem;
+    }
+
+    return returnValue;
 }
 
 /**

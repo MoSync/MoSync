@@ -69,20 +69,19 @@
 -(int) close
 {
     bool writeDataIntoRecord;
-    if (kImportedItem == mItemStatus)
+    if (kNewItem == mItemStatus)
     {
-        writeDataIntoRecord = false;
+        writeDataIntoRecord = true;
     }
     else if (kImportedItem == mItemStatus)
     {
-        writeDataIntoRecord = true;
+        writeDataIntoRecord = false;
     }
     else if (kModifiedItem == mItemStatus)
     {
         writeDataIntoRecord = true;
     }
 
-    NSLog(@"close an contact item");
     if (writeDataIntoRecord)
     {
         NSArray* fieldsArray = [mFieldsDictionary allValues];
@@ -268,7 +267,9 @@
         return MA_PIM_ERR_FIELD_READ_ONLY;
     }
 
-    return [super addValue:args withAttribute:attribute];
+    // Remove primary mask from attribute.
+    int newAttribute = (attribute & 0xFFFF);
+    return [super addValue:args withAttribute:newAttribute];
 }
 
 /**
@@ -285,7 +286,7 @@
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
      indexValue:(const int) index
- valueAttribute:(const int) atttribute
+ valueAttribute:(const int) attribute
 {
     int fieldID = args->field;
     if (![self isFieldSupported:fieldID])
@@ -301,7 +302,9 @@
         return MA_PIM_ERR_FIELD_READ_ONLY;
     }
 
-    return [super setValue:args indexValue:index valueAttribute:atttribute];
+    // Remove primary mask from attribute.
+    int newAttribute = (attribute & 0xFFFF);
+    return [super setValue:args indexValue:index valueAttribute:newAttribute];
 }
 
 /**
@@ -863,8 +866,6 @@
     if (!didSet)
     {
         returnValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-        NSLog(@"PimContactItem--setDataToRecord--field NOT set for value:%@ reason:%@",
-              (NSString*) value, [(NSError *)error localizedDescription]);
     }
 
     return returnValue;
@@ -931,7 +932,6 @@
         NSString* zip = (NSString*)CFDictionaryGetValue(aDict, kABPersonAddressZIPKey);
         NSString* country = (NSString*)CFDictionaryGetValue(aDict, kABPersonAddressCountryKey);
 
-        NSLog(@"%@ %@ %@ %@ %@ %@",(NSString*)addressLabel, street, city, state, zip, country);
         [utils addStringToArray:array string:@""];    // Add POBOX field.
         [utils addStringToArray:array string:@""];    // Add EXTRA field.
         [utils addStringToArray:array string:street]; // Add STREET field.
@@ -995,7 +995,6 @@
         array = [[NSMutableArray alloc] init];
         NSString* emailLabel = (NSString*)ABMultiValueCopyLabelAtIndex(multi, i);
         NSString* email = (NSString*)ABMultiValueCopyValueAtIndex(multi, i);
-        NSLog(@"%@ %@ ",emailLabel, email);
 
         [utils addStringToArray:array string:email];
         [itemField addValue:array withLabel:emailLabel];
@@ -1031,7 +1030,6 @@
         [array addObject:nickname];
         [itemField addValue:array withAttribute:MA_PIM_ATTR_PREFERRED];
         [mFieldsDictionary setObject:itemField forKey:key];
-        NSLog(@"nickname: %@", nickname);
     }
 }
 
@@ -1052,7 +1050,6 @@
         [array addObject:note];
         [itemField addValue:array withAttribute:MA_PIM_ATTR_PREFERRED];
         [mFieldsDictionary setObject:itemField forKey:key];
-        NSLog(@"note: %@", note);
     }
 }
 
@@ -1073,7 +1070,6 @@
         [array addObject:organization];
         [itemField addValue:array withAttribute:MA_PIM_ATTR_PREFERRED];
         [mFieldsDictionary setObject:itemField forKey:key];
-        NSLog(@"organization: %@", organization);
     }
 }
 
@@ -1095,7 +1091,6 @@
         array = [[NSMutableArray alloc] init];
         NSString* phoneLabel = (NSString*)ABMultiValueCopyLabelAtIndex(multi, i);
         NSString* phone = (NSString*)ABMultiValueCopyValueAtIndex(multi, i);
-        NSLog(@"%@ %@ ",phoneLabel, phone);
 
         [utils addStringToArray:array string:phone];
         [itemField addValue:array withLabel:phoneLabel];
@@ -1131,8 +1126,6 @@
         [array addObject:jobTitle];
         [itemField addValue:array withAttribute:MA_PIM_ATTR_PREFERRED];
         [mFieldsDictionary setObject:itemField forKey:key];
-        NSLog(@"jobTitle: %@", jobTitle);
-
     }
 }
 
@@ -1155,7 +1148,6 @@
         array = [[NSMutableArray alloc] init];
         NSString* urlLabel = (NSString*)ABMultiValueCopyLabelAtIndex(multi, i);
         NSString* url = (NSString*)ABMultiValueCopyValueAtIndex(multi, i);
-        NSLog(@"%@ %@ ",urlLabel, url);
 
         [utils addStringToArray:array string:url];
         [itemField addValue:array withLabel:urlLabel];
@@ -1196,7 +1188,6 @@
 
         [itemField addValue:array withAttribute:MA_PIM_ATTR_PREFERRED];
         [mFieldsDictionary setObject:itemField forKey:key];
-        NSLog(@"department: %@", department);
     }
 }
 
@@ -1207,7 +1198,7 @@
 {
     NSMutableArray* array;
     NSString* key;
-    PimFieldItem* itemField = [[PimFieldItem alloc] initWithFieldID:MA_PIM_FIELD_CONTACT_REVISION];;
+    PimFieldItem* itemField = [[PimFieldItem alloc] initWithFieldID:MA_PIM_FIELD_CONTACT_REVISION];
     NSDate* revision = (NSDate*) ABRecordCopyValue(mRecord, kABPersonModificationDateProperty);
     if (nil != revision)
     {
@@ -1217,7 +1208,26 @@
         [itemField addValue:array withAttribute:MA_PIM_ATTR_PREFERRED];
         [mFieldsDictionary setObject:itemField forKey:key];
     }
+}
 
+/**
+ * Reads the UID field from the record.
+ */
+-(void) readUIDField
+{
+    NSMutableArray* array;
+    NSString* key;
+    PimFieldItem* itemField = [[PimFieldItem alloc] initWithFieldID:MA_PIM_FIELD_CONTACT_UID];
+    int recordID = ABRecordGetRecordID(mRecord);
+    NSString* uid = [[NSString alloc] initWithFormat:@"%d", recordID];
+    if (nil != uid)
+    {
+        key = [[NSString alloc] initWithFormat:@"%d", MA_PIM_FIELD_CONTACT_UID];
+        array = [[NSMutableArray alloc] init];
+        [array addObject:uid];
+        [itemField addValue:array withAttribute:MA_PIM_ATTR_PREFERRED];
+        [mFieldsDictionary setObject:itemField forKey:key];
+    }
 }
 
 /**
@@ -1244,7 +1254,6 @@
         NSString* protocol = (NSString*) CFDictionaryGetValue(aDict, kABPersonInstantMessageServiceKey);
         NSString* username = (NSString*)CFDictionaryGetValue(aDict, kABPersonInstantMessageUsernameKey);
 
-        NSLog(@"label = %@ username = %@ protocol = %@",(NSString*)imLabel, username, protocol);
         [utils addStringToArray:array string:username];    // Add MA_PIM_CONTACT_IM_USERNAME.
         [utils addStringToArray:array string:protocol];    // Add MA_PIM_CONTACT_IM_PROTOCOL.
 
@@ -1283,7 +1292,6 @@
         array = [[NSMutableArray alloc] init];
         NSString* relationLabel = (NSString*)ABMultiValueCopyLabelAtIndex(multi, i);
         NSString* relationValue = (NSString*)ABMultiValueCopyValueAtIndex(multi, i);
-        NSLog(@"relationLabel = %@ -- relationValue = %@ ",relationLabel, relationValue);
 
         [utils addStringToArray:array string:relationValue];
         [itemField addValue:array withLabel:relationLabel];
@@ -1334,7 +1342,6 @@
  */
 -(void) importDataFromRecord
 {
-     NSLog(@"PimContactItem--importDataFromRecord--in");
     [self readContactNameField];
     [self readAddressField];
     [self readBirthdayField];
@@ -1347,6 +1354,7 @@
     [self readURLField];
     [self readOrgInfoField];
     [self readRevisionField];
+    [self readUIDField];
     [self readIMField];
     [self readRelationField];
     [self readPhotoField];
@@ -1409,7 +1417,6 @@
         case MA_PIM_FIELD_CONTACT_FORMATTED_NAME:
         case MA_PIM_FIELD_CONTACT_PUBLIC_KEY:
         case MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING:
-        case MA_PIM_FIELD_CONTACT_UID:
             isSupported = false;
             break;
         default:
@@ -1455,7 +1462,8 @@
  */
 -(bool) isFieldReadOnly:(const int) fieldID
 {
-    if (MA_PIM_FIELD_CONTACT_REVISION == fieldID)
+    if (MA_PIM_FIELD_CONTACT_REVISION == fieldID ||
+        MA_PIM_FIELD_CONTACT_UID == fieldID)
     {
         return true;
     }
@@ -1468,7 +1476,6 @@
  */
 - (void) dealloc
 {
-    CFRelease(mRecord);
     [super dealloc];
 }
 
