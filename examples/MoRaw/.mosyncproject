@@ -15,10 +15,12 @@
 <property key="build.prefs:app.permissions" value=""/>
 <property key="build.prefs:app.vendor" value="MoSync AB"/>
 <property key="build.prefs:dead.code.elim" value="false"/>
+<property key="build.prefs:dead.code.elim/Release" value="true"/>
 <property key="build.prefs:extra.link.sw" value="-datasize=4096000 -heapsize=2048000 -master-dump"/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw" value=""/>
 <property key="build.prefs:gcc.switches" value="-O3 -Wno-multichar"/>
+<property key="build.prefs:gcc.switches/Release" value="-O3"/>
 <property key="build.prefs:gcc.warnings" value="0"/>
 <property key="build.prefs:ignore.default.include.paths" value="true"/>
 <property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
@@ -29,8 +31,9 @@
 <property key="build.prefs:ignore.default.library.paths" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
-<property key="build.prefs:memory.data/Release" value="16384"/>
-<property key="build.prefs:memory.heap/Release" value="10000"/>
+<property key="build.prefs:memory.data/Release" value="4096"/>
+<property key="build.prefs:memory.heap/Release" value="3000"/>
+<property key="build.prefs:memory.stack/Release" value="128"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="debug" value="false"/>
 <property key="dependency.strategy" value="0"/>

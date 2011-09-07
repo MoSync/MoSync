@@ -136,7 +136,10 @@ MA 02110-1301, USA.
 *  any view can be added to it in order to create a custom appearance.
 *  
 *- \b GLView \n
-*  A widget to draw accelerated graphics using OpenGL for Embedded Systems version 1.0.
+*  A widget to draw accelerated graphics using OpenGL for Embedded Systems version 1.0/1.1.
+*  
+*- \b GL2View \n
+*  A widget to draw accelerated graphics using OpenGL for Embedded Systems version 2.0.
 *  
 *- \b WebView \n
 *  A widget to render web content.
