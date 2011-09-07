@@ -17,46 +17,32 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Image.h
- * @author TODO: Add author.
+ * @file Util.h
+ * @author Emma Tresanszki.
  *
- * Class for image widgets.
+ * Utility functions for the application.
  */
 
-#ifndef MOSYNC_UI_IMAGE_H_
-#define MOSYNC_UI_IMAGE_H_
+#ifndef UTIL_H_
+#define UTIL_H_
 
-#include "Widget.h"
+#include <maprofile.h>	// Profile database.
+#include <mastring.h>		// C string functions
 
-namespace MoSync
+/**
+ * Detects if the current platform is Android.
+ * @return true if the platform is Android, false otherwise.
+ */
+static bool isAndroid()
 {
-	namespace UI
+	if ( NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
 	{
-
-	/**
-	 * Class for buttons.
-	 */
-	class Image : public Widget
+		return true;
+	}
+	else
 	{
-	public:
-		/**
-		 * Constructor.
-		 */
-		Image();
+		return false;
+	}
+}
 
-		/**
-		 * Destructor.
-		 */
-		virtual ~Image();
-
-		/*
-		 * Set the image of the image widget.
-		 * @param imageHandle The handle of the image.
-		 */
-		void setImage(MAHandle imageHandle);
-	};
-
-	} // namespace UI
-} // namespace MoSync
-
-#endif
+#endif /* UTIL_H_ */

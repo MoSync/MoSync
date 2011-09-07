@@ -44,33 +44,10 @@ MA 02110-1301, USA.
 // Include the resources for images.
 #include "MAHeaders.h"
 
+#include "Util.h"
+
 // Include the web view screen.
 #include "ScreenWebView.h"
-
-// Set the pointer to ScreenWebView object to null.
-ScreenWebView* ScreenWebView::sScreenWebView = NULL;
-
-/**
- * Create the web view screen.
- */
-Screen* ScreenWebView::create()
-{
-	if (NULL == sScreenWebView)
-	{
-		sScreenWebView = new ScreenWebView();
-	}
-
-	return sScreenWebView->getScreen();
-}
-
-/**
- * Destroy the web view screen.
- */
-void ScreenWebView::destroy()
-{
-	delete sScreenWebView;
-	sScreenWebView = NULL;
-}
 
 /**
  * Constructor.
@@ -78,7 +55,7 @@ void ScreenWebView::destroy()
  * Initialize the objects.
  */
 ScreenWebView::ScreenWebView():
-	mScreen(NULL),
+	Screen(),
 	mWebView(NULL),
 	mNavBarWidget(NULL),
 	mOpenLinkButtonWidget(NULL),
@@ -88,22 +65,21 @@ ScreenWebView::ScreenWebView():
 	mScreenWidth(0),
 	mScreenHeight(0)
 {
-	mScreen = new Screen();
-	mScreen->setTitle(TAB_SCREEN_TITLE);
+	setTitle(TAB_SCREEN_TITLE);
 
 	// Get the screen size. This shows how to get a property
 	// value for a property for which there is no predefined method.
-	mScreenHeight = mScreen->getPropertyInt(MAW_WIDGET_HEIGHT);
-	mScreenWidth = mScreen->getPropertyInt(MAW_WIDGET_WIDTH);
+	mScreenHeight = getHeight();
+	mScreenWidth = getWidth();
 
 	// Create and add the main layout to the screen.
 	VerticalLayout* mainLayout = new VerticalLayout();
-	mScreen->setMainWidget(mainLayout);
+	setMainWidget(mainLayout);
 
-	if (WidgetManager::isAndroid())
+	if (isAndroid())
 	{
 		// Set the screen icon for Android.
-		mScreen->setIcon(RES_TAB_ICON_WEB_VIEW_ANDROID);
+		setIcon(RES_TAB_ICON_WEB_VIEW_ANDROID);
 
 		// Get the screen size.
 		MAExtent screenSize = maGetScrSize();
@@ -113,7 +89,7 @@ ScreenWebView::ScreenWebView():
 	else
 	{
 		// Set the screen icon for iOS.
-		mScreen->setIcon(RES_TAB_ICON_WEB_VIEW);
+		setIcon(RES_TAB_ICON_WEB_VIEW);
 
 		// Create and add the navigation bar to the main layout.
 		mNavBarWidget = new NavigationBar();
@@ -145,16 +121,8 @@ ScreenWebView::ScreenWebView():
  */
 ScreenWebView::~ScreenWebView()
 {
-	mOpenLinkButtonWidget->setEventListener(NULL);
-	mEditBoxWidget->setEventListener(NULL);
-
-	delete mScreen;
-	delete mWebView;
-	delete mOpenLinkButtonWidget;
-	delete mEditBoxWidget;
-	delete mNavBarWidget;
-	delete mAddressBarLayout;
-	delete mLineLayout;
+	mOpenLinkButtonWidget->removeButtonListener(this);
+	mEditBoxWidget->removeEditBoxListener(this);
 }
 
 /**
@@ -175,18 +143,18 @@ void ScreenWebView::createAddressBar()
 
 	// Create the edit box widget.
 	mEditBoxWidget = new EditBox();
-	mEditBoxWidget->setTextInputMode();
+	mEditBoxWidget->setEditMode(EDIT_BOX_MODE_TEXT);
 	mEditBoxWidget->setText(DEFAULT_URL_ADDRESS);
 	mEditBoxWidget->fillSpaceHorizontally();
 	mEditBoxWidget->wrapContentVertically();
-	mEditBoxWidget->setEventListener(this);
+	mEditBoxWidget->addEditBoxListener(this);
 
 	// Create the open link button widget.
 	mOpenLinkButtonWidget = new Button();
 	mOpenLinkButtonWidget->setText("Open");
 	mOpenLinkButtonWidget->wrapContentHorizontally();
 	mOpenLinkButtonWidget->wrapContentVertically();
-	mOpenLinkButtonWidget->setEventListener(this);
+	mOpenLinkButtonWidget->addButtonListener(this);
 
 	// Add widgets to the address bar layout.
 	mAddressBarLayout->addChild(mEditBoxWidget);
@@ -207,14 +175,47 @@ VerticalLayout* ScreenWebView::createSpacer(const int width, const int height)
 
 	// This shows how you set a property for which there is no
 	// predefined method.
-	layout->setProperty(
-		MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT,
-		MAW_ALIGNMENT_RIGHT);
-	layout->setProperty(
-		MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT,
-		MAW_ALIGNMENT_CENTER);
+	layout->setChildHorizontalAlignment(MAW_ALIGNMENT_RIGHT);
+	layout->setChildVerticalAlignment(MAW_ALIGNMENT_CENTER);
 
 	return layout;
+}
+
+/**
+ * This method is called if the touch-up event was inside the
+ *  bounds of the button.
+ *  @param button The button object that generated the event.
+ */
+void ScreenWebView::buttonClicked(Widget* button)
+{
+	if ( mOpenLinkButtonWidget == button )
+	{
+		//Hide the virtual keyboard. This is how you set a property
+		//for which there is no predefined method.
+		mEditBoxWidget->hideKeyboard();
+
+		// Open the web page.
+		mWebView->openURL( mEditBoxWidget->getText() );
+	}
+}
+
+/**
+ * This method is called when the return button was pressed.
+ * On iphone platform the virtual keyboard is not hidden after
+ * receiving this event.
+ * @param editBox The edit box object that generated the event.
+ */
+void ScreenWebView::editBoxReturn(EditBox* editBox)
+{
+	if ( mEditBoxWidget == editBox )
+	{
+		//Hide the virtual keyboard. This is how you set a property
+		//for which there is no predefined method.
+		mEditBoxWidget->hideKeyboard();
+
+		// Open the web page.
+		mWebView->openURL( mEditBoxWidget->getText() );
+	}
 }
 
 /**
@@ -222,40 +223,31 @@ VerticalLayout* ScreenWebView::createSpacer(const int width, const int height)
  * @param widget The widget object of the event.
  * @param widgetEventData The low-level event data.
  */
- void ScreenWebView::handleWidgetEvent(
-	Widget* widget,
-	MAWidgetEventData* widgetEventData)
-{
-	// Check that the event was a click (touch) event.
-	if (MAW_EVENT_CLICKED == widgetEventData->eventType)
-	{
-		if (widget == mEditBoxWidget || widget == mOpenLinkButtonWidget)
-		{
-			// Hide the virtual keyboard. This is how you set a property
-			// for which there is no predefined method.
-			mEditBoxWidget->setProperty(
-				MAW_EDIT_BOX_SHOW_KEYBOARD,
-				FALSE_CONST);
-
-			// This is how can get a property value for which there
-			// is no predefined method.
-			MAUtil::String webAddress =
-				mEditBoxWidget->getPropertyString("text");
-
-			// Open the web page.
-			mWebView->openURL(webAddress);
-		}
-	}
-}
-
-/**
- * Returns a pointer to the screen object.
- * Ownership is not passed to the caller!
- */
-Screen* ScreenWebView::getScreen() const
-{
-	return mScreen;
-}
+// void ScreenWebView::handleWidgetEvent(
+//	Widget* widget,
+//	MAWidgetEventData* widgetEventData)
+//{
+//	// Check that the event was a click (touch) event.
+//	if (MAW_EVENT_CLICKED == widgetEventData->eventType)
+//	{
+//		if (widget == mEditBoxWidget || widget == mOpenLinkButtonWidget)
+//		{
+//			// Hide the virtual keyboard. This is how you set a property
+//			// for which there is no predefined method.
+//			mEditBoxWidget->setProperty(
+//				MAW_EDIT_BOX_SHOW_KEYBOARD,
+//				FALSE_CONST);
+//
+//			// This is how can get a property value for which there
+//			// is no predefined method.
+//			MAUtil::String webAddress =
+//				mEditBoxWidget->getPropertyString("text");
+//
+//			// Open the web page.
+//			mWebView->openURL(webAddress);
+//		}
+//	}
+//}
 
 /**
  * Open a web page.

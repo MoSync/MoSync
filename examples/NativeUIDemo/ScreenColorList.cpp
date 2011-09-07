@@ -25,6 +25,7 @@ MA 02110-1301, USA.
  */
 
 #include "MAHeaders.h"
+#include "Util.h"
 #include "ScreenColorList.h"
 
 /**
@@ -65,55 +66,12 @@ static ColorData sColors[] =
 static const int sNumColors = sizeof(sColors) / sizeof(ColorData);
 
 /**
- * Event listener for the list view.
- */
-class ScreenColorListWidgetEventListener : public WidgetEventListener
-{
-public:
-	ScreenColorListWidgetEventListener(ScreenColorList* screen) :
-		mScreen(screen)
-	{
-	}
-
-	/**
-	 * This method is called when there is an event for this widget.
-	 * @param widget The widget object of the event.
-	 * @param widgetEventData The low-level event data.
-	 */
-	void handleWidgetEvent(
-		Widget* widget,
-		MAWidgetEventData* widgetEventData)
-	{
-		// Is this a click event?
-		if (MAW_EVENT_ITEM_CLICKED == widgetEventData->eventType)
-		{
-			mScreen->openColorScreen(widgetEventData->listItemIndex);
-		}
-	}
-
-private:
-	/**
-	 * The screen that we call back to.
-	 */
-	ScreenColorList* mScreen;
-};
-
-/**
- * Create the UI for the color list screen.
- * @return The main screen for the color list UI.
- */
-StackScreen* ScreenColorList::create()
-{
-	ScreenColorList* screen = new ScreenColorList();
-	screen->createUI();
-	return screen;
-}
-
-/**
  * Constructor.
  */
-ScreenColorList::ScreenColorList()
+ScreenColorList::ScreenColorList():
+	StackScreen()
 {
+	createUI();
 }
 
 /**
@@ -121,6 +79,7 @@ ScreenColorList::ScreenColorList()
  */
 ScreenColorList::~ScreenColorList()
 {
+	mListView->removeListViewListener(this);
 	// TODO: Deallocate the images we create!
 }
 
@@ -129,18 +88,15 @@ ScreenColorList::~ScreenColorList()
  */
 void ScreenColorList::createUI()
 {
-	// An instance of this class is a stack screen.
-	StackScreen* stackScreen = this;
-
 	// Set title and icon of the stack screen.
-	stackScreen->setTitle("Colors");
-	if (WidgetManager::isAndroid())
+	setTitle("Colors");
+	if (isAndroid())
 	{
-		stackScreen->setIcon(RES_TAB_ICON_COLORS_ANDROID);
+		setIcon(RES_TAB_ICON_COLORS_ANDROID);
 	}
 	else
 	{
-		stackScreen->setIcon(RES_TAB_ICON_COLORS);
+		setIcon(RES_TAB_ICON_COLORS);
 	}
 
 	// Create the top screen in the stack.
@@ -150,7 +106,7 @@ void ScreenColorList::createUI()
 	screen->setTitle("Colors");
 
 	// Create the list view widget.
-	ListView* listView = new ListView();
+	mListView = new ListView();
 
 	// Add items to the list view.
 	for (int i = 0; i < sNumColors; i++)
@@ -159,17 +115,18 @@ void ScreenColorList::createUI()
 		colorItem->setText(sColors[i].name);
 		// TODO: Fix hard coded value of image size.
 		colorItem->setIcon(createColorImage(sColors[i].color, 40, 40));
-		listView->addChild(colorItem);
+		mListViewItems.add(colorItem);
+		mListView->addChild(colorItem);
 	}
 
 	// Set event listener.
-	listView->setEventListener(new ScreenColorListWidgetEventListener(this));
+	mListView->addListViewListener(this);
 
 	// Set the list view as the main widget of the screen.
-	screen->setMainWidget(listView);
+	screen->setMainWidget(mListView);
 
 	// Push the top screen.
-	stackScreen->push(screen);
+	push(screen);
 }
 
 /**
@@ -203,8 +160,31 @@ void ScreenColorList::openColorScreen(int listItemIndex)
 	// The title of this screen is displayed on the
 	// navigation bar on iPhone/iPad.
 	screen->setTitle(sColors[listItemIndex].name);
-	Widget* widget = new VerticalLayout();
+	VerticalLayout* widget = new VerticalLayout();
 	widget->setBackgroundColor(sColors[listItemIndex].color);
 	screen->setMainWidget(widget);
 	this->push(screen);
+}
+
+/**
+ * This method is called when a list view item is clicked.
+ * @param listView The list view object that generated the event.
+ * @param listViewItem The ListViewItem object that was clicked.
+ */
+void ScreenColorList::listViewItemClicked(
+    ListView* listView,
+    ListViewItem* listViewItem)
+{
+	if ( listView == mListView )
+	{
+		// Get the index of the clicked item.
+		for (int i=0; i< mListViewItems.size(); i++)
+		{
+			if ( mListViewItems[i] == listViewItem )
+			{
+				openColorScreen(i);
+				break;
+			}
+		}
+	}
 }
