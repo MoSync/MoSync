@@ -187,6 +187,7 @@ namespace Core {
 	//for ioctl
 	void* GetValidatedMemRange(VMCore* core, int address, int size);
 	int GetValidatedStackValue(VMCore* core, int offset);
+	int TranslateNativePointerToMoSyncPointer(VMCore* core, void* ptr);
 	const char* GetValidatedStr(const VMCore* core, int address);
 	const wchar* GetValidatedWStr(const VMCore* core, int address);
 	void* GetCustomEventPointer(VMCore* core);
