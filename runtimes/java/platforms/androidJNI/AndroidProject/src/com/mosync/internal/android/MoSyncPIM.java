@@ -95,37 +95,31 @@ class MoSyncPIM
 
 	int maPimItemSetValue(int item, int field, int buffPointer, int buffSize, int index, int attributes)
 	{
-		return 0;
-		//return mPIM.maPimItemSetValue(item, field, buffPointer, buffSize, index, attributes);
+		return mPIM.maPimItemSetValue(item, field, buffPointer, buffSize, index, attributes);
 	}
 
 	int maPimItemAddValue(int item, int field, int buffPointer, int buffSize, int attributes)
 	{
-		return 0;
-		//return mPIM.maPimItemAddValue(item, field, buffPointer, buffSize, attributes);
+		return mPIM.maPimItemAddValue(item, field, buffPointer, buffSize, attributes);
 	}
 
 	int maPimItemRemoveValue(int item, int field, int index)
 	{
-		return 0;
-		//return mPIM.maPimItemRemoveValue(item, field, index);
+		return mPIM.maPimItemRemoveValue(item, field, index);
 	}
 
 	int maPimItemClose(int item)
 	{
-		return 0;
-		//return mPIM.maPimItemClose(item);
+		return mPIM.maPimItemClose(item);
 	}
 
 	int maPimItemCreate(int list)
 	{
-		return 0;
-		//return mPIM.maPimItemCreate(list);
+		return mPIM.maPimItemCreate(list);
 	}
 
 	int maPimItemRemove(int list, int item)
 	{
-		return 0;
-		//return mPIM.maPimItemRemove(list, item);
+		return mPIM.maPimItemRemove(list, item);
 	}
 }

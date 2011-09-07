@@ -84,4 +84,11 @@
  */
 -(int) close;
 
+/**
+ * Closes a given item.
+ * @param itemHandle A handle to a pim item.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) closeItem:(MAHandle) itemHandle;
+
 @end

@@ -321,6 +321,7 @@ namespace Base {
 	void MALibQuit() {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
+        MAPimClose();
 	}
 
 

@@ -109,6 +109,7 @@ typedef enum {
 
 /**
  * Sets a custom label for a given field value.
+ * Does not check if field is supported or valid.
  * @param args Common arguments.
  *             The item's handle is stored in args.item.
  *             The field's ID is stored in args.field.
@@ -169,7 +170,7 @@ typedef enum {
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
      indexValue:(const int) index
- valueAttribute:(const int) atttribute;
+ valueAttribute:(const int) attribute;
 
 /**
  * Adds a value to a specified field.
@@ -188,6 +189,7 @@ typedef enum {
 
 /**
  * Removes a value from a field.
+ * Does not check if the field is valid or supported.
  * @param field One of the MA_PIM_FIELD constants.
  * @param index Field's value index.
  * @return One of MA_PIM_ERR constants.
