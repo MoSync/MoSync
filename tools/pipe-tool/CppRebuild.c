@@ -1009,9 +1009,9 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 		RebuildEmit("//tfr        = %s\n", Bin32(ThisFunctionRegs));
 		RebuildEmit("\n");
 	}
+	else RebuildEmit("static ");
 
 	// Output function decl
-
 	switch(ThisFunctionRetType)
 	{
 		case RET_null:
@@ -1062,8 +1062,12 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 
 	// Remove regs that are already declared in func decl
 	
-	reg_used &= ~reg_alloc;
-	
+	// TODO: verify that this is ok.
+	// ok this has sort of been reverse engineered by looking at the bitmasks in the rebuilt code... ;)
+	reg_used &= ThisFunctionRegs | (1 << REG_r14) | (1 << REG_r14) | (1 << REG_i0) | (1 << REG_i1) | (1 << REG_i2) | (1 << REG_i3);
+
+	reg_used &= (~reg_alloc);
+		
 	// remove sp from locals
 	
 	reg_used &= ~(1 << REG_sp);
@@ -1270,7 +1274,7 @@ void RebuildCpp_EmitProtos()
 
 	RebuildEmit("\n// Prototypes\n\n");
 
-	RebuildEmit("int CallReg(int s, int i0, int i1, int i2, int i3);\n");
+	RebuildEmit("static int CallReg(int s, int i0, int i1, int i2, int i3);\n");
 
 	for (n=0;n<CodeIP+1;n++)
 	{
@@ -1316,8 +1320,9 @@ void RebuildCpp_CallReg()
 	RebuildEmit("int CallReg(int s, int i0, int i1, int i2, int i3)\n");
 	RebuildEmit("{\n");
 
-	RebuildEmit("	int r14,r15;\n");
-	RebuildEmit("	r14 = r15 = 0;\n\n");
+//	RebuildEmit("	int r14,r15;\n");
+//	RebuildEmit("	r14 = r15 = 0;\n\n");
+	RebuildEmit("	int r14 = 0;\n\n");
 
 	if (count)
 	{

@@ -1,22 +1,24 @@
-/* Copyright (C) 2011 Mobile Sorcery AB
+/*
+Copyright (C) 2011 MoSync AB
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License, version 2, as published by
- the Free Software Foundation.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; see the file COPYING.  If not, write to the Free
- Software Foundation, 59 Temple Place - Suite 330, Boston, MA
- 02111-1307, USA.
- */
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
 
 /**
  * @file PIMContact.cpp
+ * @author Bogdan Iusco
  *
  * PIMContact class shows how to:
  * - read, modify and delete field values.
@@ -193,7 +195,10 @@ void PIMContact::modifyAddressField()
     {
         MAUtil::String addressValueIndex = getAddressIndexString(i);
         const wchar* addressValue = sAddressModified[i];
-        printf("%s %S", addressValueIndex.c_str(), addressValue);
+        if (*addressValue != 0)
+        {
+            printf("%s %S", addressValueIndex.c_str(), addressValue);
+        }
     }
     printf("\n");
 
@@ -281,9 +286,20 @@ void PIMContact::printAttribute(const int field, const int index,
 {
     // Get the attribute.
     int attribute = maPimItemGetAttributes(mItemHandle, field, index);
+    MAUtil::String attributeString = "";
+
+    // Check if the attribute contains a primary value combined with an
+    // attribute.
+    if (attribute >> 16)
+    {
+        attributeString = "primary ";
+
+        // Remove primary value from attribute.
+        attribute = (attribute & 0xFFFF);
+    }
 
     // Print the string associated with the attribute.
-    MAUtil::String attributeString = pointerToFunc(attribute);
+    attributeString += pointerToFunc(attribute);
     printf("Attribute: %s", attributeString.c_str());
 
     // Check if the attribute is custom.
@@ -320,7 +336,10 @@ void PIMContact::printContactName()
     {
         MAUtil::String contactNameType = getContactNameIndexString(i);
         const wchar* contactNameValue = getWCharArrayFromBuf(mArgs.buf, i);
-        printf("%s %S", contactNameType.c_str(), contactNameValue);
+        if (*contactNameValue != 0)
+        {
+            printf("%s %S", contactNameType.c_str(), contactNameValue);
+        }
     }
 }
 
@@ -351,7 +370,10 @@ void PIMContact::printAddress()
         {
             MAUtil::String addressValueIndex = getAddressIndexString(j);
             const wchar* addressValue = getWCharArrayFromBuf(mArgs.buf, j);
-            printf("%s %S", addressValueIndex.c_str(), addressValue);
+            if (*addressValue != 0)
+            {
+                printf("%s %S", addressValueIndex.c_str(), addressValue);
+            }
         }
 
         printf("\n");
@@ -363,7 +385,7 @@ void PIMContact::printAddress()
  */
 void PIMContact::printBirthday()
 {
-    printf("birthday field:\n\n");
+    printf("Birthday field:\n\n");
     mArgs.field = MA_PIM_FIELD_CONTACT_BIRTHDAY;
 
     // Get value from birthday field at position 0.
@@ -680,7 +702,10 @@ void PIMContact::printOrgInfo()
         {
             MAUtil::String orgInfoValueIndex = getOrgInfoIndexString(j);
             const wchar* orgInfoValue = getWCharArrayFromBuf(mArgs.buf, j);
-            printf("%s %S\n\n", orgInfoValueIndex.c_str(), orgInfoValue);
+            if (*orgInfoValue != 0)
+            {
+                printf("%s %S\n\n", orgInfoValueIndex.c_str(), orgInfoValue);
+            }
         }
     }
 }
@@ -704,7 +729,10 @@ void PIMContact::addContactName()
     {
         MAUtil::String contactNameType = getContactNameIndexString(i);
         const wchar* contactNameValue = sContactName[i];
-        printf("%s %S", contactNameType.c_str(), contactNameValue);
+        if (*contactNameValue != 0)
+        {
+            printf("%s %S", contactNameType.c_str(), contactNameValue);
+        }
     }
 
     // Add value to field.
@@ -724,7 +752,10 @@ void PIMContact::addAddress()
     {
         MAUtil::String addressValueIndex = getAddressIndexString(i);
         const wchar* addressValue = sAddressHome[i];
-        printf("%s %S", addressValueIndex.c_str(), addressValue);
+        if (*addressValue != 0)
+        {
+            printf("%s %S", addressValueIndex.c_str(), addressValue);
+        }
     }
     printf("\n");
 
@@ -742,7 +773,10 @@ void PIMContact::addAddress()
     {
         MAUtil::String addressValueIndex = getAddressIndexString(i);
         const wchar* addressValue = sAddressWork[i];
-        printf("%s %S", addressValueIndex.c_str(), addressValue);
+        if (*addressValue != 0)
+        {
+            printf("%s %S", addressValueIndex.c_str(), addressValue);
+        }
     }
 
     // Write value to buffer.
@@ -1082,7 +1116,10 @@ void PIMContact::addOrgInfo()
     {
         MAUtil::String orgInfoValueIndex = getOrgInfoIndexString(i);
         const wchar* orgInfoValue = sOrgInfo[i];
-        printf("%s %S", orgInfoValueIndex.c_str(), orgInfoValue);
+        if (*orgInfoValue != 0)
+        {
+            printf("%s %S", orgInfoValueIndex.c_str(), orgInfoValue);
+        }
     }
 
     // Write organization info value to buffer.

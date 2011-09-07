@@ -51,7 +51,7 @@
 -(int) getNextHandle;
 
 /**
- * Get an array of string from a given address.
+ * Get an array of string from a given address for a specified field.
  * @param address The specified address.
  *                The address must have the following structure:
  *                     - the first element must be a 4-byte int that specifies
@@ -59,9 +59,13 @@
  *                     - first null terminated string(UTF-16 encoding).
  *                     - second null terminated string(UTF-16 encoding).
  *                     - etc
- * @return An array containing the strings.
+ * @param fieldID The given field.
+ * @param size The size of the string array(how many bytes can be read from the given address).
+ * @return An array containing the strings, or nil in case of error.
  */
--(NSMutableArray*) getStringArray:(void*) address;
+-(NSMutableArray*) getStringArray:(void*) address
+                       forFieldID:(const int) fieldID
+                         withSize:(const int) size;
 
 /**
  * Writes an array of strings at a given address.
@@ -74,8 +78,8 @@
  *                     - second null terminated string(UTF-16 encoding).
  *                     - etc
  * @param size  The maximum size(in bytes) that can be written at the given address.
- * @return The size(in bytes) of the strings. If the size of the strings is greater than
- *         the maximum size(the size parameter) then the strings were not written.
+ * @return The size(in bytes) of the strings, or MA_PIM_ERR_BUFFER_TOO_SMALL if the size of
+ * the strings is bigger then size parameter.
  */
 -(int) writeStringArray:(NSMutableArray*) array
                atAddress:(void*) address
@@ -85,9 +89,11 @@
  * Get a string from a given address.
  * @param address The specified address.
  *                The address must contain a null terminated string(UTF-16 encoding).
+ * @param size The length of the string in bytes.
  * @return An array containing the string.
  */
--(NSMutableArray*) getString:(void*) address;
+-(NSMutableArray*) getString:(void*) address
+                    withSize:(const int) size;
 
 /**
  * Writes a string to a given address.
@@ -96,7 +102,8 @@
  * @param value The given string.
  * @param address The specified address.
  *                The address will contain a null terminated string(UTF-16 encoding).
- * @return The string's size(in bytes).
+ * @return The string's size(in bytes), or MA_PIM_ERR_BUFFER_TOO_SMALL if the size of
+ * the string is bigger then size parameter.
  */
 -(int) writeString:(NSString*) value
          atAddress:(void*) address
@@ -105,7 +112,7 @@
 /**
  * Gets a date from a given address.
  * @param address The specified address.
- *                The address must contain a 4-byte int representing the number of
+ *                The address must contain a 4-bytes int representing the number of
  *                seconds elapsed since January 1 1970(Unix time).
  * @return An array containing the date.
  */
@@ -115,15 +122,12 @@
  * Writes a date to a given address.
  * @param date The given date.
  * @param address The specified address.
- *                The address will contain a 4-byte int representing the number of
+ *                The address will contain a 4-bytes int representing the number of
  *                seconds elapsed since January 1 1970(Unix time).
- * @param size The maximum size(in bytes) that can be written at the given address.
- * @return The size(in bytes) of the date. If the size of the date is greater than
- *         the maximum size(the size parameter) the date was not written.
+ * @return The size(in bytes) of the date.
  */
 -(int) writeDate:(NSDate*) date
-        atAddress:(void*) address
-         maxSize:(int) size;
+       atAddress:(void*) address;
 
 /**
  * Gets an int value from a given address.
@@ -136,13 +140,9 @@
  * Writes an int value to a given address.
  * @param value The given int value.
  * @param address The specified address.
- * @param size The maximum size(in bytes) that can be written at the given address.
- * @return The size(in bytes) of an int. If the size of the int is greater than
- *         the maximum size(the size parameter) the date was not written.
  */
--(int) writeIntValue:(const int) value
-           atAddress:(void*) address
-             maxSize:(const int) size;
+-(int) writeIntValue:(NSNumber*) value
+           atAddress:(void*) address;
 
 /**
  * Gets the image data from a data handle.
@@ -174,8 +174,10 @@
  * @param fieldId The given field ID(one of MA_PIM_FIELD_CONTACT constants).
  * @param type Will contain the field type (one of MA_PIM_TYPE constants).
  * @param singleValue Will be set to true if the field can contain only one value.
- * @return MA_PIM_ERR_NONE if the field is supported, or
- *         MA_PIM_ERR_FIELD_UNSUPPORTED in case the field is not supported.
+ * @return One of the next values:
+ * - MA_PIM_ERR_NONE if the field is supported and valid
+ * - MA_PIM_ERR_INVALID_FIELD if the field is invalid.
+ * - MA_PIM_ERR_FIELD_UNSUPPORTED in case the field is not supported.
  */
 -(int) fieldStructure:(const int) fieldID
                setType:(int*) type
@@ -206,6 +208,21 @@
  * @return True if field supports attributes, false otherwise.
  */
 -(bool) fieldSupportsAttribute:(const int) fieldID;
+
+/**
+ * Get the number of indices for a given field.
+ * e.g. for MA_PIM_FIELD_CONTACT_NAME it will return 8 because the field contains
+ * the next indices:
+ * - MA_PIM_CONTACT_NAME_FAMILY
+ * - MA_PIM_CONTACT_NAME_GIVEN
+ * - MA_PIM_CONTACT_NAME_OTHER
+ * - MA_PIM_CONTACT_NAME_PREFIX
+ * - MA_PIM_CONTACT_NAME_SUFFIX
+ * - MA_PIM_CONTACT_NAME_PHONETIC_FAMILY
+ * - MA_PIM_CONTACT_NAME_PHONETIC_GIVEN
+ * - MA_PIM_CONTACT_NAME_PHONETIC_OTHER
+ */
+-(int) getNumberOfIndicesForField:(const int) fieldID;
 
 /**
  * Gets the absolute memory address for a specified address from MoSync memory pool.

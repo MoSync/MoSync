@@ -323,15 +323,18 @@ public:
 		length = maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
 
-		//Disable zoom buttons if zoom is not supported
+		//Remove zoom buttons if zoom is not supported
 		if(maxZoom == 0)
 		{
-			maWidgetSetProperty(mZoomInButton,
-					MAW_WIDGET_ENABLED,
-					"false");
-			maWidgetSetProperty(mZoomOutButton,
-					MAW_WIDGET_ENABLED,
-					"false");
+			maWidgetRemoveChild(mZoomInButton);
+
+			maWidgetRemoveChild(mZoomOutButton);
+		}
+		else //Or add them if it's supported
+		{
+			maWidgetInsertChild(mSecondLayoutWidget, mZoomInButton, 0);
+
+			maWidgetInsertChild(mSecondLayoutWidget, mZoomOutButton, -1);
 		}
 
 	}

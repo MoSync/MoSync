@@ -32,7 +32,7 @@ MA 02110-1301, USA.
 #define BUFFER_SIZE						50
 #define BG_COLOR						0
 #define TEXT_COLOR						0xFF0000
-#define TEXT_SIZE						12
+#define TEXT_SIZE						20
 #define OFFSET_Y						20
 
 // useful texts
