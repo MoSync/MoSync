@@ -672,7 +672,7 @@ private:
 		sf->SetThingL(TPtrC8(CBP buf, bufSize));
 		return 0;
 	}
-	
+
 	static int getText(void* buf, int bufSize, CContactTextField* tf) {
 		TPtrC ptrc = tf->Text();
 		int size = ptrc.Size() + sizeof(wchar);
@@ -690,7 +690,7 @@ private:
 		SET_TEXTL(tf, ptr);
 		return 0;
 	}
-	
+
 	static int getDateTime(void* buf, int bufSize, CContactDateField* df) {
 		if(bufSize < 4)
 			return 4;
@@ -854,7 +854,7 @@ private:
 			}	//switch
 		}	//for
 		DUMPLOG(" Mapping: 0x%08X(%s)\n", ct.Mapping().iUid, ft2string(ct.Mapping().iUid));
-		
+
 		if(mosyncFieldType == MA_PIM_FIELD_CONTACT_ADDR) {
 			if(mAddr[arrayIndex] != -1) {
 				LOG("Duplicate address field: %i\n", arrayIndex);
@@ -1004,7 +1004,7 @@ void ContactItem::close() {
 //TODO
 class EventList : public PimList {
 	virtual ~EventList() {}
-	
+
 	virtual PimItem* next() {
 		return NULL;
 	}
@@ -1019,7 +1019,7 @@ MAHandle Syscall::maPimListOpen(int listType) {
 	//} else if(listType == MA_PIM_EVENTS) {
 	//	pl = new (ELeave) EventList();
 	} else {
-		return -2;
+		return MA_PIM_ERR_UNAVAILABLE_LIST;
 	}
 	mPimLists.insert(mPimListNextHandle, pl);
 	return mPimListNextHandle++;

@@ -39,27 +39,22 @@ using namespace MoSyncError;
  */
 -(MAHandle) pimListOpen:(const int) listType
 {
-    if (MA_PIM_CONTACTS == listType)
+	if (MA_PIM_CONTACTS == listType)
 	{
-        if (!mContactsList)
-        {
-            mContactsList = [[PimContactsList alloc] init];
-            [mContactsList openList];
-            return MA_PIM_CONTACTS;
-        }
-        else
-        {
-            return MA_PIM_ERR_LIST_ALREADY_OPENED;
-        }
+		if (!mContactsList)
+		{
+			mContactsList = [[PimContactsList alloc] init];
+			[mContactsList openList];
+			return MA_PIM_CONTACTS;
+		}
+		else
+		{
+			return MA_PIM_ERR_LIST_ALREADY_OPENED;
+		}
 	}
-	else if(MA_PIM_EVENTS == listType ||
-            MA_PIM_TODOS == listType)
-    {
-        return MA_PIM_ERR_UNAVAILABLE_LIST;
-    }
-    else
+	else
 	{
-		return MA_PIM_ERR_INVALID_LIST_TYPE;
+		return MA_PIM_ERR_UNAVAILABLE_LIST;
 	}
 }
 
@@ -71,13 +66,11 @@ using namespace MoSyncError;
  */
 -(MAHandle) pimListNext:(MAHandle) list
 {
-	MAHandle returnedValue = MA_PIM_ERR_INVALID_HANDLE;
-
 	if (MA_PIM_CONTACTS == list)
 	{
 		if (mContactsList)
 		{
-			BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
+			return [mContactsList getNextItem];
 		}
 	}
 	else
@@ -85,7 +78,6 @@ using namespace MoSyncError;
 		BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
 	}
 
-    return returnedValue;
 }
 
 /**
@@ -99,17 +91,17 @@ using namespace MoSyncError;
 
 	if (MA_PIM_CONTACTS == list)
 	{
-        returnedValue = [self closeList:mContactsList];
+		returnedValue = [self closeList:mContactsList];
 		if (MA_PIM_ERR_NONE == returnedValue)
 		{
 			mContactsList = nil;
 		}
 	}
-    else if(MA_PIM_EVENTS == list ||
-            MA_PIM_TODOS)
-    {
-        returnedValue = MA_PIM_ERR_UNAVAILABLE_LIST;
-    }
+	else if(MA_PIM_EVENTS == list ||
+			MA_PIM_TODOS)
+	{
+		returnedValue = MA_PIM_ERR_UNAVAILABLE_LIST;
+	}
 	else
 	{
 		BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);

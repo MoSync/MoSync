@@ -245,7 +245,7 @@ using namespace MoSyncError;
 {
 	bool isAttributeCustom = false;
 	int attributeId = [self getAttributeFromLabel:label];
-	if (CUSTOM_ATTRIBUTE == attributeId)
+	if (NO_ATTRIBUTE == attributeId)
 	{
 		// The attribute is custom.
 		// Get the custom attribute value.
@@ -346,7 +346,7 @@ using namespace MoSyncError;
  */
 -(int) getAttributeFromLabel:(NSString*) label
 {
-	int attributeId = CUSTOM_ATTRIBUTE;
+	int attributeId = NO_ATTRIBUTE;
 	NSMutableDictionary* allowedAttributes =
 		[[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
 	NSArray* attributesArray = [allowedAttributes allKeysForObject:label];

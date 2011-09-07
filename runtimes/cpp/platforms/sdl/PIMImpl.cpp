@@ -160,7 +160,7 @@ void TContactValue<int>::saveValue(ostream& stream) const {
 	default:
 		DEBIG_PHAT_ERROR;
 	}
-	
+
 	stream <<"\"";
 }
 
@@ -955,11 +955,11 @@ MAHandle Syscall::maPimListOpen(int listType) {
 			delete cl;
 			ContactParser::sCL = NULL;
 			SAFE_DELETE(ContactParser::sCI);
-			return -2;
+			return MA_PIM_ERR_UNAVAILABLE_LIST;
 		}
 		pl = cl;
 	} else {
-		return -2;
+		return MA_PIM_ERR_UNAVAILABLE_LIST;
 	}
 	mPimLists.insert(mPimListNextHandle, pl);
 	return mPimListNextHandle++;
