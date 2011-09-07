@@ -1224,31 +1224,40 @@ namespace Base
 // the wrapper generator can't yet handle a few set of functions
 // in the opengles 2.0 api (so we manually override them).
 // remove implementations for broken bindings..
-	#undef maIOCtl_glGetPointerv_case
-	#define maIOCtl_glGetPointerv_case(func) \
-	case maIOCtl_glGetPointerv: \
-	{ \
-	return IOCTL_UNAVAILABLE; \
-	}
+// override implementations for broken bindings..
+#undef maIOCtl_glGetPointerv_case
+#define maIOCtl_glGetPointerv_case(func) \
+case maIOCtl_glGetPointerv: \
+{\
+GLenum _pname = (GLuint)a; \
+void* _pointer = GVMR(b, MAAddress);\
+wrap_glGetPointerv(_pname, _pointer); \
+return 0; \
+}
     
-	#undef maIOCtl_glGetVertexAttribPointerv_case
-	#define maIOCtl_glGetVertexAttribPointerv_case(func) \
-	case maIOCtl_glGetVertexAttribPointerv: \
-	{ \
-	return IOCTL_UNAVAILABLE; \
-	}
+#undef maIOCtl_glGetVertexAttribPointerv_case
+#define maIOCtl_glGetVertexAttribPointerv_case(func) \
+case maIOCtl_glGetVertexAttribPointerv: \
+{\
+GLuint _index = (GLuint)a; \
+GLenum _pname = (GLuint)b; \
+void* _pointer = GVMR(c, MAAddress);\
+wrap_glGetVertexAttribPointerv(_index, _pname, _pointer); \
+return 0; \
+}
     
-	#undef maIOCtl_glShaderSource_case
-	#define maIOCtl_glShaderSource_case(func) \
-	case maIOCtl_glShaderSource: \
-	{ \
-	GLuint _shader = (GLuint)a; \
-	GLsizei _count = (GLsizei)b; \
-	void* _string = GVMR(c, MAAddress); \
-	const GLint* _length = GVMR(SYSCALL_THIS->GetValidatedStackValue(0 VSV_ARGPTR_USE), GLint); \
-	wrap_glShaderSource(_shader, _count, _string, _length); \
-	return 0; \
-	}
+    
+#undef maIOCtl_glShaderSource_case
+#define maIOCtl_glShaderSource_case(func) \
+case maIOCtl_glShaderSource: \
+{ \
+GLuint _shader = (GLuint)a; \
+GLsizei _count = (GLsizei)b; \
+void* _string = GVMR(c, MAAddress); \
+const GLint* _length = GVMR(SYSCALL_THIS->GetValidatedStackValue(0 VSV_ARGPTR_USE), GLint); \
+wrap_glShaderSource(_shader, _count, _string, _length); \
+return 0; \
+}
 
     void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
         int* stringsArray = (int*)strings;
@@ -1257,19 +1266,35 @@ namespace Base
         for(int i = 0; i < count; i++) {
             void* src = GVMR(stringsArray[i], MAAddress);
             strCopies[i] = (GLchar*)src;
-    		__android_log_write(ANDROID_LOG_INFO, 
-								"@@@ MoSync gl strings", 
-								strCopies[i]);
         }
-        
-        
-        char temp[1024];
-        sprintf(temp, "shader: %d, count: %d, length: %d, strCopies: %s", shader, count, length, strCopies[0]);
-    		__android_log_write(ANDROID_LOG_INFO, 
-								"@@@ MoSync glShaderSource", temp);        
+
         glShaderSource(shader, count, strCopies, length);
         delete strCopies;     
     }	
+
+    void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
+        GLvoid* outPointer;
+        glGetVertexAttribPointerv(index, pname, &outPointer);
+        
+        if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
+            return;
+        
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
+    }
+    
+    void wrap_glGetPointerv(GLenum pname, void* pointer) {
+        GLvoid* outPointer;
+        glGetPointerv(pname, &outPointer);
+        
+        if(pname != GL_COLOR_ARRAY_POINTER &&
+           pname != GL_NORMAL_ARRAY_POINTER &&
+           pname != GL_POINT_SIZE_ARRAY_POINTER_OES &&
+           pname != GL_TEXTURE_COORD_ARRAY_POINTER &&
+           pname != GL_VERTEX_ARRAY_POINTER)
+            return;
+        
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);        
+    }   
 
 	/**
 	 * Utility function for displaying and catching pending

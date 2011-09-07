@@ -23,6 +23,10 @@
 #include <helpers/cpp_defs.h>
 #include "Platform.h"
 
+#if 0
+#import <QuartzCore/QuartzCore.h>
+#endif
+
 @interface UIView (UIViewExpanded) 
 - (void)superLayoutSubviews;
 - (CGSize)superSizeThatFits:(CGSize)size;
@@ -141,9 +145,10 @@
 	if(addSubview) {
 		[view addSubview:childView];
 	}
-//	[self layout];
-	[view setNeedsLayout];
-	[view setNeedsDisplay];
+	//[self layout];
+	[child layout];
+    //[view setNeedsLayout];
+	//[view setNeedsDisplay];
 }
 
 - (void)addChild: (IWidget*)child {
@@ -161,8 +166,10 @@
 	if(addSubview) {
 		[view insertSubview:childView atIndex:indexValue];
 	}
-	[view setNeedsLayout];
-	
+	//[view setNeedsLayout];
+	//[self layout];
+    [child layout];
+    
 	return MAW_RES_OK;
 }
 
@@ -179,7 +186,8 @@
 	[child setParent:nil];
 	if(removeFromSuperview)
 		[[child getView] removeFromSuperview];
-	[view setNeedsLayout];
+	//[view setNeedsLayout];
+    [self layout];
 }
 
 - (int)remove {
@@ -231,7 +239,29 @@
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		view.backgroundColor = color;
-	} else
+	}
+    /*else
+    if([key isEqualToString:@"backgroundGradient"]) {
+        NSArray *colors = [value componentsSeparatedByString: @","];
+        UIColor *col1 = [UIColor colorWithHexString: [[colors objectAtIndex:0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+        UIColor *col2 = [UIColor colorWithHexString:[[colors objectAtIndex:1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];   
+        
+        if(!col1) return MAW_RES_INVALID_PROPERTY_VALUE;
+        if(!col2) return MAW_RES_INVALID_PROPERTY_VALUE;
+
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+        gradient.frame = CGRectMake(0, 0, 320, 480); //view.bounds;
+        gradient.colors = [NSArray arrayWithObjects:(id)col1.CGColor, (id)col2.CGColor, nil];
+        gradient.startPoint = CGPointMake(0.5f, 0.0f);
+        gradient.endPoint = CGPointMake(0.5f, 1.0f);
+        gradient.masksToBounds = YES;
+        [view.layer insertSublayer:gradient atIndex:0];
+       
+       // todo: Fix this. Make a setFrame function in IWidget that sets the frame of both the gradient layer (if available) and the
+       // view and call that wherever the frame of an IWidget is set (instead of view.frame = x).
+    }
+    */
+    else
 	if([key isEqualToString:@"alpha"]) {
 		float alpha = [value floatValue];
 		if(alpha<0.0 || alpha>1.0) return MAW_RES_INVALID_PROPERTY_VALUE;
@@ -280,11 +310,10 @@
 - (void)layout {
 	// the layouts should take care of the fill parent / wrap content layouting process..
 	// so no need to do it here.
-	//[view setNeedsLayout];
-	[view setNeedsLayout];
-//	[view layoutIfNeeded];
-	//[view setNeedsDisplay];	
-	//[view layoutIfNeeded];
+    
+    // somehow this seems to work
+    // otherwise some things aren't layouted correctly
+    [view layoutIfNeeded];
 }
 
 /**
