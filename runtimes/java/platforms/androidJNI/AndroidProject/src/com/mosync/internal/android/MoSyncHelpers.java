@@ -65,16 +65,16 @@ public class MoSyncHelpers
 	//#define EXTENT_X(e) ((short)((e) >> 16))
 	//#define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0x0FFFF)))
 
-	public static int EXTENT_X(int extent)
-	{
-		return ((short) extent) >> 16;
-	}
-	
-	public static int EXTENT_Y(int extent)
-	{
-		return (short) extent;
-	}
-	
+    public static int EXTENT_X(int extent)
+    {
+        return extent >>> 16;
+    }
+
+    public static int EXTENT_Y(int extent)
+    {
+        return extent & 0xffff;
+    }
+
 	public static int EXTENT(int x, int y)
 	{
 		return (x << 16) | (y & 0x0FFFF);
