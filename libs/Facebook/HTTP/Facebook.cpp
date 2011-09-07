@@ -1,4 +1,23 @@
 /*
+Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+
+/*
  * Facebook.cpp
  *
  * An Open Graph API implementation for MoSync. Can only be used with requests that don't
@@ -29,9 +48,6 @@
  *
  * Your listener.queryFinished (or queryCancelled or queryError) will be called when
  * the request is done.
- *
- *  Created on: Feb 22, 2011
- *      Author: Magnus Hult <magnus@magnushult.se>
  */
 
 #include <MAUtil/String.h>
