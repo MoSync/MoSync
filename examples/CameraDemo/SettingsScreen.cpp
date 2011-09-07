@@ -103,9 +103,6 @@ int SettingsScreen::initialize(MAHandle stackScreen, MAHandle previewWidget)
 {
 	mPreviewWidget = previewWidget;
 	mStackScreen = stackScreen;
-	char buffer1[256];
-	maCameraGetProperty(MA_CAMERA_FLASH_SUPPORTED, buffer1, 256);
-	flashSupported =  atoi(buffer1);
 	numCameras = maCameraNumber();
 	createUI();
 }
@@ -116,81 +113,92 @@ int SettingsScreen::initialize(MAHandle stackScreen, MAHandle previewWidget)
 void SettingsScreen::createUI()
 {
 	// Create a Native UI screen. As the screen is a member
-		// variable (also called instance variable) we have
-		// prefixed the variable name with "m".
-		mScreen = maWidgetCreate(MAW_SCREEN);
+	// variable (also called instance variable) we have
+	// prefixed the variable name with "m".
+	mScreen = maWidgetCreate(MAW_SCREEN);
 
-		// Create the screen's main layout widget.
-		mMainLayoutWidget = maWidgetCreate(MAW_VERTICAL_LAYOUT);
+	// Create the screen's main layout widget.
+	mMainLayoutWidget = maWidgetCreate(MAW_VERTICAL_LAYOUT);
 
-		// Make the layout fill the entire screen. For properties that
-		// take an integer parameter we use the widgetSetPropertyInt
-		// function, for properties that takes a string parameter
-		// we use the maWidgetSetProperty function.
-		widgetSetPropertyInt(
-			mMainLayoutWidget,
-			MAW_WIDGET_WIDTH,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		widgetSetPropertyInt(
-			mMainLayoutWidget,
-			MAW_WIDGET_HEIGHT,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	// Make the layout fill the entire screen. For properties that
+	// take an integer parameter we use the widgetSetPropertyInt
+	// function, for properties that takes a string parameter
+	// we use the maWidgetSetProperty function.
+	widgetSetPropertyInt(
+		mMainLayoutWidget,
+		MAW_WIDGET_WIDTH,
+		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	widgetSetPropertyInt(
+		mMainLayoutWidget,
+		MAW_WIDGET_HEIGHT,
+		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
 
-		// the second layout is a horizontal layout that
-		//contains the buttons that control the camera
 
-		// Add the layout as the root of the screen's widget tree.
-		maWidgetAddChild(mScreen, mMainLayoutWidget);
+	// Add the layout as the root of the screen's widget tree.
+	maWidgetAddChild(mScreen, mMainLayoutWidget);
 
-			mFlashModeButton = maWidgetCreate(MAW_BUTTON);
-			widgetSetPropertyInt(
-				mFlashModeButton,
-				MAW_WIDGET_WIDTH,
-				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-			widgetSetPropertyInt(
-				mFlashModeButton,
-				MAW_WIDGET_HEIGHT,
-				MAW_CONSTANT_WRAP_CONTENT);
-			maWidgetSetProperty(
-				mFlashModeButton,
-				MAW_LABEL_TEXT,
-				"Flash Mode: OFF");
-			maWidgetAddChild(mMainLayoutWidget, mFlashModeButton);
+	mFlashModeButton = maWidgetCreate(MAW_BUTTON);
+	widgetSetPropertyInt(
+		mFlashModeButton,
+		MAW_WIDGET_WIDTH,
+		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	widgetSetPropertyInt(
+		mFlashModeButton,
+		MAW_WIDGET_HEIGHT,
+		MAW_CONSTANT_WRAP_CONTENT);
+	maWidgetSetProperty(
+		mFlashModeButton,
+		MAW_LABEL_TEXT,
+		"Flash Mode: OFF");
+	maWidgetAddChild(mMainLayoutWidget, mFlashModeButton);
 
-		//Only show switch camera buttons if we have more than one camera
-		if(numCameras>1)
-		{
-			mSwapCameraButton = maWidgetCreate(MAW_BUTTON);
-			widgetSetPropertyInt(
-				mSwapCameraButton,
-				MAW_WIDGET_WIDTH,
-				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-			widgetSetPropertyInt(
-				mSwapCameraButton,
-				MAW_WIDGET_HEIGHT,
-				MAW_CONSTANT_WRAP_CONTENT);
-			maWidgetSetProperty(
-				mSwapCameraButton,
-				MAW_LABEL_TEXT,
-				"Camera Selected: Back");
-			maWidgetAddChild(mMainLayoutWidget, mSwapCameraButton);
-		}
+	mSwapCameraButton = maWidgetCreate(MAW_BUTTON);
+	widgetSetPropertyInt(
+		mSwapCameraButton,
+		MAW_WIDGET_WIDTH,
+		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	widgetSetPropertyInt(
+		mSwapCameraButton,
+		MAW_WIDGET_HEIGHT,
+		MAW_CONSTANT_WRAP_CONTENT);
+	maWidgetSetProperty(
+		mSwapCameraButton,
+		MAW_LABEL_TEXT,
+		"Camera Selected: Back");
+	maWidgetAddChild(mMainLayoutWidget, mSwapCameraButton);
 
-		//The button that finishes the setting operation
-		mOKButton = maWidgetCreate(MAW_BUTTON);
-		widgetSetPropertyInt(
+	//Only enable switch camera buttons if we have more than one camera
+	if(numCameras == 1)
+	{
+		maWidgetSetProperty(mSwapCameraButton,
+				MAW_WIDGET_ENABLED,
+				"false");
+	}
+
+	//If the phone does not support flash disable the flash button
+	if(flashSupported == false)
+	{
+		maWidgetSetProperty(mFlashModeButton,
+				MAW_WIDGET_ENABLED,
+				"false");
+	}
+
+
+	//The button that finishes the setting operation
+	mOKButton = maWidgetCreate(MAW_BUTTON);
+	widgetSetPropertyInt(
+		mOKButton,
+		MAW_WIDGET_WIDTH,
+		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	widgetSetPropertyInt(
+		mOKButton,
+		MAW_WIDGET_HEIGHT,
+		MAW_CONSTANT_WRAP_CONTENT);
+	maWidgetSetProperty(
 			mOKButton,
-			MAW_WIDGET_WIDTH,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		widgetSetPropertyInt(
-			mOKButton,
-			MAW_WIDGET_HEIGHT,
-			MAW_CONSTANT_WRAP_CONTENT);
-		maWidgetSetProperty(
-				mOKButton,
-			MAW_LABEL_TEXT,
-			"Back to Main Screen");
-		maWidgetAddChild(mMainLayoutWidget, mOKButton);
+		MAW_LABEL_TEXT,
+		"Back to Main Screen");
+	maWidgetAddChild(mMainLayoutWidget, mOKButton);
 }
 
 

@@ -75,6 +75,28 @@ public:
 	MyGLMoblet() : GLMoblet(GLMoblet::GL1) {
 	}
 
+
+	/**
+	 * This method is called when a key is pressed.
+	 */
+	void keyPressEvent(int keyCode, int nativeCode)
+	{
+		switch (keyCode)
+		{
+			// Close the application if the back key, key 0,
+			// or the left "softkey" is pressed (the left
+			// softkey is usually located at the top left of
+			// the keypad of phones that have a keypad, and
+			// is often used as a back navigation key).
+			case MAK_BACK:
+			case MAK_0:
+			case MAK_SOFTLEFT:
+				// Exit the application.
+				maExit(0);
+				break;
+		}
+	}
+
 	// setup viewport with a default perspective matrix and viewport.
 	void setViewport(int width, int height)
 	{

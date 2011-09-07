@@ -130,7 +130,7 @@ using namespace MoSyncError;
 	PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
     NSString* label = [itemValue getLabel];
 	int attribute = [self getAttributeFromLabel:label];
-	if (CUSTOM_ATTRIBUTE != attribute)
+	if (NO_ATTRIBUTE != attribute)
 	{
 		return MA_PIM_ERR_NO_LABEL;
 	}
@@ -189,6 +189,8 @@ using namespace MoSyncError;
   withAttribute:(const int) attribute
 {
 	int returnValue = MA_PIM_ERR_NONE;
+	PimUtils* utils = [PimUtils sharedInstance];
+
 	// Check if the field can contain more then one value.
 	int countFieldValues = [mFieldValuesArray count];
 	if (mIsSingleFieldValue &&
@@ -198,24 +200,36 @@ using namespace MoSyncError;
 	}
 	else
 	{
-		// Check if the attribute is allowed.
-		bool attributeAllowed = [self isAttributeValid:attribute];
-		if (!attributeAllowed)
+		// Check if field supports attributes.
+		if ([utils fieldSupportsAttribute:mFieldConstant])
 		{
-			returnValue = MA_PIM_ERR_COMBO_UNSUPPORTED;
+			// Check if the attribute is allowed.
+			bool attributeAllowed = [self isAttributeValid:attribute];
+			if (!attributeAllowed)
+			{
+				returnValue = MA_PIM_ERR_COMBO_UNSUPPORTED;
+			}
+			else
+			{
+				NSString* label = [self getStringAttribute:attribute];
+				PimFieldItemValue* fieldValue = [[PimFieldItemValue alloc] init];
+				[fieldValue setValue:value];
+				[fieldValue setAttribute:attribute];
+				[fieldValue setLabel:label];
+				[mFieldValuesArray addObject:fieldValue];
+				returnValue = [mFieldValuesArray count] - 1;
+			}
+
 		}
 		else
 		{
-			NSString* label = [self getStringAttribute:attribute];
+			// Field does not support attributes.
 			PimFieldItemValue* fieldValue = [[PimFieldItemValue alloc] init];
 			[fieldValue setValue:value];
-			[fieldValue setAttribute:attribute];
-			[fieldValue setLabel:label];
 			[mFieldValuesArray addObject:fieldValue];
 			returnValue = [mFieldValuesArray count] - 1;
 		}
 	}
-
 	return returnValue;
 }
 
@@ -328,7 +342,7 @@ using namespace MoSyncError;
 /**
  * Gets the attribute id from a specifed label value.
  * @param label The given label.
- * @return The attribute id, or CUSTOM_ATTRIBUTE is the attribute is custom.
+ * @return The attribute id, or NO_ATTRIBUTE is the attribute is custom.
  */
 -(int) getAttributeFromLabel:(NSString*) label
 {

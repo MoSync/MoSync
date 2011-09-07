@@ -2,8 +2,8 @@
 #include <mastdlib.h>
 #include <mavsprintf.h>
 #include <MAUtil/Moblet.h>
+#include <MAUtil/GLMoblet.h>
 #include <GLES/gl.h>
-#include <IX_WIDGET.h>
 
 using namespace MAUtil;
 
@@ -12,54 +12,55 @@ using namespace MAUtil;
  * The template program draws a rotating quad. Touch the
  * screen to change the depth coordinate.
  */
-class GLMoblet :
-	public Moblet,
-	public TimerListener
+class MyGLMoblet : public GLMoblet
 {
 public:
 
 	// ================== Constructor ==================
 
 	/**
-	 * The user interface is set up in the constructor.
+	 * Initialize rendering parameters.
 	 */
-	GLMoblet() :
-		mGLViewInitialized(false),
-		mRotation(0.0f),
-		mDepth(5.0f)
+	MyGLMoblet() :
+		GLMoblet(GLMoblet::GL1),
+		mDepth(5.0f),
+		mStartTime(maGetMilliSecondCount())
 	{
-		// Create a NativeUI screen that will hold the GL view.
-		MAHandle screen = maWidgetCreate(MAW_SCREEN);
-
-		// Error handling for devices that do not support NativeUI.
-		if (-1 == screen)
-		{
-			maPanic(0,
-				"OpenGL is only available on Android and iPhone. "
-				"You must run directly on the device or devices emulator.");
-		}
-
-		// Create a GL_VIEW widget and add it to the screen.
-		mGLView = maWidgetCreate(MAW_GL_VIEW);
-		widgetSetPropertyInt(
-			mGLView,
-			MAW_WIDGET_WIDTH,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		widgetSetPropertyInt(
-			mGLView,
-			MAW_WIDGET_HEIGHT,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		maWidgetAddChild(screen, mGLView);
-
-		// Show the screen.
-		maWidgetScreenShow(screen);
-
-		// Make the Moblet listen to custom events, so that we
-		// know when the GLView widget is ready to be drawn.
-		Environment::getEnvironment().addCustomEventListener(this);
 	}
 
 	// ================== Event methods ==================
+
+	/**
+	 * Called when a fullscreen window with an OpenGL context
+	 * has been created and is ready to be used.
+	 */
+	void init()
+	{
+		// Set the GL viewport to be the entire MoSync screen.
+		setViewport(
+			EXTENT_X(maGetScrSize()),
+			EXTENT_Y(maGetScrSize()));
+
+		// Initialize OpenGL.
+		initGL();
+
+		// Call draw 60 times per second.
+		setPreferredFramesPerSecond(60);
+	}
+
+	/**
+	 * Called when the application should render the model.
+	 * Use method setPreferredFramesPerSecond to set the
+	 * desired frame rate.
+	 */
+	void draw()
+	{
+		// Compute rotation.
+		GLfloat rotation = (maGetMilliSecondCount() - mStartTime) * -0.05f;
+
+		// Render scene.
+		draw(mDepth, rotation);
+	}
 
 	/**
 	 * Called when a key is pressed.
@@ -87,54 +88,6 @@ public:
 	void pointerMoveEvent(MAPoint2d point)
 	{
 		computeZoomFactor(point);
-	}
-
-	/**
-	 * Method that implements the custom event listener interface.
-	 * Widget events are sent as custom events.
-	 */
-	void customEvent(const MAEvent& event)
-	{
-		if (EVENT_TYPE_WIDGET == event.type)
-		{
-			// Get the widget event data structure.
-			MAWidgetEventData* eventData = (MAWidgetEventData*) event.data;
-
-			// MAW_EVENT_GL_VIEW_READY is sent when the GL view is
-			// ready for drawing.
-			if (MAW_EVENT_GL_VIEW_READY == eventData->eventType)
-			{
-				// Associate the OpenGL context with the GLView.
-				maWidgetSetProperty(mGLView, MAW_GL_VIEW_BIND, "");
-
-				// Set the GL viewport.
-				int viewWidth = widgetGetPropertyInt(mGLView, MAW_WIDGET_WIDTH);
-				int viewHeight = widgetGetPropertyInt(mGLView, MAW_WIDGET_HEIGHT);
-				setViewport(viewWidth, viewHeight);
-
-				// Initialize OpenGL.
-				initGL();
-
-				// The GLView has been initialized.
-				mGLViewInitialized = true;
-
-				// Draw the initial scene.
-				draw(mDepth, mRotation);
-
-				// Start timer that will redraw the scene.
-				// This calls runTimerEvent each 20 ms.
-				Environment::getEnvironment().addTimer(this, 20, -1);
-			}
-		}
-	}
-
-	/**
-	 * Called on a timer event.
-	 */
-	void runTimerEvent()
-	{
-		draw(mDepth, mRotation);
-		mRotation += 5.0f;
 	}
 
 private:
@@ -173,27 +126,10 @@ private:
 	}
 
 	/**
-	 * Compute the visible size of the quad by
-	 * setting the depth coordinate.
-	 */
-	void computeZoomFactor(MAPoint2d point)
-	{
-		float screenHeight = EXTENT_Y(maGetScrSize());
-		mDepth = 20.0f / screenHeight * point.y;
-		// Note: The quad gets redrawn by the timer.
-	}
-
-	/**
 	 * Render the model (draws a quad).
 	 */
 	void draw(GLfloat z, GLfloat rotation)
 	{
-		// The GL_View must be initialized before we can do any drawing.
-		if (!mGLViewInitialized)
-		{
-			return;
-		}
-
 		// Define quad vertices.
 	    GLfloat vertices[4][3];
 	    // Top right.
@@ -218,12 +154,17 @@ private:
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glFinish();
-
-		// Update the GLView.
-	    maWidgetSetProperty(mGLView, MAW_GL_VIEW_INVALIDATE, "");
 	}
 
-	// ================== Helper methods ==================
+	/**
+	 * Compute the visible size of the quad by
+	 * setting the depth coordinate.
+	 */
+	void computeZoomFactor(MAPoint2d point)
+	{
+		float screenHeight = EXTENT_Y(maGetScrSize());
+		mDepth = 20.0f / screenHeight * point.y;
+	}
 
 	/**
 	 * Standard OpenGL utility function for setting up the
@@ -245,38 +186,12 @@ private:
 		glFrustumf(xmin, xmax, ymin, ymax, zNear, zFar);
 	}
 
-	/**
-	 * Helper method for setting a widget property integer value.
-	 */
-	int widgetSetPropertyInt(MAHandle handle, const char *property, int value)
-	{
-		char buffer[256];
-		sprintf(buffer, "%i", value);
-		maWidgetSetProperty(handle, property, buffer);
-	}
-
-	/**
-	 * Helper method for getting a widget property integer value.
-	 */
-	int widgetGetPropertyInt(MAHandle handle, const char *property)
-	{
-		char buffer[256];
-		maWidgetGetProperty( handle, property, buffer, 256);
-		return atoi(buffer);
-	}
-
 private:
 
 	// ================== Instance variables ==================
 
-	/** Handle to the GLView widget. */
-	MAHandle mGLView;
-
-	/** GLView state (true = initialized and ready to be drawn). */
-	bool mGLViewInitialized;
-
-	/** Rotation. */
-	GLfloat mRotation;
+	/** Time stamp used to calculate rotation. */
+	GLfloat mStartTime;
 
 	/** Z-coordinate. */
 	GLfloat mDepth;
@@ -287,6 +202,6 @@ private:
  */
 extern "C" int MAMain()
 {
-	Moblet::run(new GLMoblet());
+	Moblet::run(new MyGLMoblet());
 	return 0;
 }

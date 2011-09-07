@@ -235,9 +235,9 @@ namespace Base {
 			case JPEG: imageRef = CGImageCreateWithJPEGDataProvider(dpr, NULL, true, kCGRenderingIntentDefault); break;
 			case PNG: imageRef = CGImageCreateWithPNGDataProvider(dpr, NULL, true, kCGRenderingIntentDefault); break;
             default: {
-             CGDataProviderRelease(dpr);                
+             CGDataProviderRelease(dpr);
              CFRelease(png_data);
-             return NULL;   
+             return NULL;
             }
 		}
 
@@ -1225,21 +1225,28 @@ namespace Base {
 #ifdef SUPPORT_OPENGL_ES
 
 
-// remove implementations for broken bindings..
+// override implementations for broken bindings..
 #undef maIOCtl_glGetPointerv_case
 #define maIOCtl_glGetPointerv_case(func) \
 case maIOCtl_glGetPointerv: \
 {\
-return IOCTL_UNAVAILABLE; \
+GLenum _pname = (GLuint)a; \
+void* _pointer = GVMR(b, MAAddress);\
+wrap_glGetPointerv(_pname, _pointer); \
+return 0; \
 }
-    
+
 #undef maIOCtl_glGetVertexAttribPointerv_case
 #define maIOCtl_glGetVertexAttribPointerv_case(func) \
 case maIOCtl_glGetVertexAttribPointerv: \
 {\
-return IOCTL_UNAVAILABLE; \
+GLuint _index = (GLuint)a; \
+GLenum _pname = (GLuint)b; \
+void* _pointer = GVMR(c, MAAddress);\
+wrap_glGetVertexAttribPointerv(_index, _pname, _pointer); \
+return 0; \
 }
-    
+
 #undef maIOCtl_glShaderSource_case
 #define maIOCtl_glShaderSource_case(func) \
 case maIOCtl_glShaderSource: \
@@ -1253,34 +1260,59 @@ return 0; \
 } \
 
     void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
-        
+
         int* stringsArray = (int*)strings;
         const GLchar** strCopies = new const GLchar*[count];
-        
+
         for(int i = 0; i < count; i++) {
             void* src = GVMR(stringsArray[i], MAAddress);
             strCopies[i] = (GLchar*)src;
         }
-        
+
         glShaderSource(shader, count, strCopies, length);
-        delete strCopies;     
+        delete strCopies;
     }
-    
+
+
+    void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
+        GLvoid* outPointer;
+        glGetVertexAttribPointerv(index, pname, &outPointer);
+
+        if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
+            return;
+
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
+    }
+
+    void wrap_glGetPointerv(GLenum pname, void* pointer) {
+        GLvoid* outPointer;
+        glGetPointerv(pname, &outPointer);
+
+        if(pname != GL_COLOR_ARRAY_POINTER &&
+           pname != GL_NORMAL_ARRAY_POINTER &&
+           pname != GL_POINT_SIZE_ARRAY_POINTER_OES &&
+           pname != GL_TEXTURE_COORD_ARRAY_POINTER &&
+           pname != GL_VERTEX_ARRAY_POINTER)
+            return;
+
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
+    }
+
 	int maOpenGLInitFullscreen(int glApi) {
 		if(sOpenGLScreen != -1) return 0;
-		
-        
+
+
         if(glApi == MA_GL_API_GL1)
             sOpenGLView = maWidgetCreate("GLView");
         else if(glApi == MA_GL_API_GL2)
             sOpenGLView = maWidgetCreate("GL2View");
-        else 
+        else
             return MA_GL_INIT_RES_UNAVAILABLE_API;
 
         if(sOpenGLView < 0) {
-            return MA_GL_INIT_RES_UNAVAILABLE_API;            
+            return MA_GL_INIT_RES_UNAVAILABLE_API;
         }
-        
+
         sOpenGLScreen = maWidgetCreate("Screen");
 		maWidgetSetProperty(sOpenGLView, "width", "-1");
 		maWidgetSetProperty(sOpenGLView, "height", "-1");
@@ -1381,7 +1413,7 @@ return 0; \
         AVCaptureStillImageOutput *stillImageOutput;
 		UIView *view;
 	};
-	
+
 	//There is only a single instance of this struct, and it holds info about the
 	//devices on the system, as well as which one is the selected one for the camera
 	//syscalls
@@ -1391,51 +1423,51 @@ return 0; \
 		BOOL initialized;
 		CameraInfo *cameraInfo;
 	};
-	
+
 	CameraSystemInfo gCameraSystem={0,0,FALSE,NULL};
-	
+
 	//This performs lazy initialization of the camera system, the first time
 	//a relevant camera syscall is called.
 	void initCameraSystem()
 	{
-		
+
 		if( gCameraSystem.initialized == FALSE )
 		{
 
 			CameraInfo *cameraInfo;
 			int numCameras = 0;
-			
+
 			//This will also include microphones and maybe other, non camera devices
 			NSArray *devices = [AVCaptureDevice devices];
 			AVCaptureDevice *backCamera = NULL;
 			AVCaptureDevice *frontCamera = NULL;
-			 
-			for ( AVCaptureDevice *device in devices) 
+
+			for ( AVCaptureDevice *device in devices)
 			{
 				//This weeds out the devices we don't need
-				if ( [device hasMediaType:AVMediaTypeVideo] ) 
+				if ( [device hasMediaType:AVMediaTypeVideo] )
 				{
 					numCameras++;
 					//The following code assumes that all cameras not facing back,
 					//will be facing forward. This works for the current phones,
 					//but it could probably fail if Apple ever introduces a device
 					//with three or more cameras
-					if ( [device position] == AVCaptureDevicePositionBack ) 
+					if ( [device position] == AVCaptureDevicePositionBack )
 					{
 						backCamera = device;
 					}
-					else 
+					else
 					{
 						frontCamera = device;
 					}
 				}
 			}
-			
+
 			if( numCameras > 0 )
 			{
 				int positionCounter = 0;
 				cameraInfo = new CameraInfo[numCameras];
-				
+
 				//Back facing camera should be first, then front facing, then the rest
 				if ( backCamera != NULL )
 				{
@@ -1447,36 +1479,36 @@ return 0; \
 					cameraInfo[positionCounter].device = frontCamera;
 					positionCounter++;
 				}
-				
-				for ( AVCaptureDevice *device in devices ) 
+
+				for ( AVCaptureDevice *device in devices )
 				{
-					if ( [device hasMediaType:AVMediaTypeVideo ] && 
-						device != backCamera && device != frontCamera) 
+					if ( [device hasMediaType:AVMediaTypeVideo ] &&
+						device != backCamera && device != frontCamera)
 					{
 						cameraInfo[positionCounter].device = device;
 						positionCounter++;
 					}
 				}
-				
+
 				for (int i=0; i<numCameras; i++) {
 					cameraInfo[i].captureSession = NULL;
 					cameraInfo[i].previewLayer = NULL;
 					cameraInfo[i].view = NULL;
 				}
 			}
-			
+
 			gCameraSystem.numCameras = numCameras;
 			gCameraSystem.cameraInfo = cameraInfo;
 			gCameraSystem.initialized = TRUE;
 		}
 	}
-	
+
 	//This function not only returns information about the currently selected amera, but
 	//also performs lazy initialization on the session object
 	CameraInfo *getCurrentCameraInfo()
 	{
 		initCameraSystem();
-		
+
 		if( gCameraSystem.numCameras == 0 )
 		{
 			return NULL;
@@ -1484,10 +1516,10 @@ return 0; \
 
 		CameraInfo *curCam = &gCameraSystem.cameraInfo[ gCameraSystem.currentCamera ];
 		if( curCam->captureSession == NULL ) {
-			
+
 			curCam->captureSession = [[AVCaptureSession alloc] init];
-			
-			
+
+
 			NSError *error = nil;
 			AVCaptureDeviceInput *input =
 			[AVCaptureDeviceInput deviceInputWithDevice:curCam->device error:&error];
@@ -1504,12 +1536,12 @@ return 0; \
 		}
 		return curCam;
 	}
-	
+
 	void StopAllCameraSessions()
 	{
 		if( gCameraSystem.initialized == TRUE )
 		{
-			for ( int i = 0; i < gCameraSystem.numCameras; i++ ) 
+			for ( int i = 0; i < gCameraSystem.numCameras; i++ )
 			{
 				if( gCameraSystem.cameraInfo[i].captureSession )
 				{
@@ -1518,9 +1550,9 @@ return 0; \
 			}
 		}
 	}
-	
-	SYSCALL(int, maCameraStart()) 
-	{	
+
+	SYSCALL(int, maCameraStart())
+	{
 		@try {
 				CameraInfo *info = getCurrentCameraInfo();
 				if( info )
@@ -1554,8 +1586,8 @@ return 0; \
 		}
 	}
 
-	SYSCALL(int, maCameraStop()) 
-	{	
+	SYSCALL(int, maCameraStop())
+	{
 		@try {
 			CameraInfo *info = getCurrentCameraInfo();
 			if( info )
@@ -1575,7 +1607,7 @@ return 0; \
 		}
 	}
 
-	SYSCALL(int, maCameraSetPreview(MAHandle widgetHandle)) 
+	SYSCALL(int, maCameraSetPreview(MAHandle widgetHandle))
 	{
 		@try {
 			CameraPreviewWidget *widget = (CameraPreviewWidget*) [getMoSyncUI() getWidget:widgetHandle];
@@ -1631,8 +1663,8 @@ return 0; \
 		}
 	}
 
-	SYSCALL(int, maCameraSelect(MAHandle cameraNumber)) 
-	{	
+	SYSCALL(int, maCameraSelect(MAHandle cameraNumber))
+	{
 		@try {
 			initCameraSystem();
 
@@ -1648,8 +1680,8 @@ return 0; \
 		}
 	}
 
-	SYSCALL(int, maCameraNumber()) 
-	{	
+	SYSCALL(int, maCameraNumber())
+	{
 		@try {
 			initCameraSystem();
 			return gCameraSystem.numCameras;
@@ -1659,7 +1691,7 @@ return 0; \
 		}
 	}
 
-	SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder)) 
+	SYSCALL(int, maCameraSnapshot(int formatIndex, MAHandle placeholder))
 	{
 		@try {
 			CameraInfo *info = getCurrentCameraInfo();
@@ -1689,8 +1721,8 @@ return 0; \
 	}
 
 	SYSCALL(int, maCameraRecord(int stopStartFlag))
-	{		
-		return 1;
+	{
+		return -1;
 	}
 
 	SYSCALL(int, maCameraSetProperty(const char *property, const char* value))
@@ -1735,7 +1767,7 @@ return 0; \
 			[retval release];
 			[propertyString release];
 			[configurator release];
-			
+
 			return realLength;
 		}
 		@catch (NSException * e) {
@@ -1743,7 +1775,7 @@ return 0; \
 		}
 	}
 
-	
+
 
     SYSCALL(int, maSensorStart(int sensor, int interval))
 	{
@@ -1815,7 +1847,7 @@ return 0; \
         maIOCtl_syscall_case(maFileListStart);
         maIOCtl_syscall_case(maFileListNext);
         maIOCtl_syscall_case(maFileListClose);
-		maIOCtl_case(maTextBox);		
+		maIOCtl_case(maTextBox);
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);
 		maIOCtl_case(maMessageBox);

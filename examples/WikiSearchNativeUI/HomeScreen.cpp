@@ -522,7 +522,8 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 			// Uncheck all.
 			for (int i=1; i < mCategoryBoxes.size(); i++)
 			{
-				maWidgetSetProperty(mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "false");
+				maWidgetSetProperty(
+					mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "false");
 			}
 		}
 	}

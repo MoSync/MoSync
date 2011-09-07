@@ -3340,10 +3340,9 @@ interface MAAPI {
 		/**
 		* \brief Opens a PimList. Use maPimListNext() to open the list's items.
 		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
-		* \returns     >= 0 A PimList handle, or \< 0 on error.
-		*              < 0 on error:
-		*                    #MA_PIM_ERR_LIST_NOT_OPENED if the list cannot be opened.
-		*                    #MA_PIM_ERR_LIST_ALREADY_OPENED if the list is already opened.
+		* \returns >= 0 A PimList handle, or \< 0 on error.
+		* #MA_PIM_ERR_LIST_ALREADY_OPENED if the list is already opened.
+		* #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not available on the current platform.
 		*/
 		MAHandle maPimListOpen(in int listType);
 
@@ -3352,39 +3351,35 @@ interface MAAPI {
 		* or \< 0 on error.
 		* You must use maPimItemClose() on every item to prevent memory leaks.
 		* \param list List handle provided by maPimListOpen(int listType).
-		* \returns     >= 0 A PimItem handle, or \< 0 on error.
-		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not opened.
+		* \returns >= 0 A PimItem handle, or \< 0 on error.
 		*/
 		MAHandle maPimListNext(in MAHandle list);
 
 		/**
 		* \brief Closes a PimList.
-		* so that maPimItemClose() is the only function you can safely use on them.
 		* \param list List handle provided by maPimListOpen(int listType).
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not opened.
+		* \returns #MA_PIM_ERR_NONE on success, or \< 0 on error.
+		* #MA_PIM_ERR_LIST_NOT_OPENED if the list is not opened.
+		* #MA_PIM_ERR_UNAVAILABLE_LIST if the list is unavailable.
+		* #MA_PIM_ERR_INVALID_HANDLE if the list handle is invalid.
 		* \note This does not close the list's items, but it does invalidate them,
+		* so that maPimItemClose() is the only function you can safely use on them.
 		*/
 		int maPimListClose(in MAHandle list);
 
 		/**
 		* \brief Returns the number of fields in the \a item.
 		* \param item Item handle provided by maPimListNext(MAHandle list).
-		* \returns     >=0 the number of field in the item.
-		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
+		* \returns The number of fields in the item.
 		*/
 		int maPimItemCount(in MAHandle item);
 
 		/**
 		* \brief Returns the field id of the item's n:th field.
+		* Panics on invalid indices.
 		* \param item Opened by maPimListNext().
 		* \param n \>= 0 and \< maPimItemCount().
-		* \returns     >=0 one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*                    #MA_PIM_ERR_INVALID_INDEX if the param n is not valid.
+		* \returns One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		*/
 		int maPimItemGetField(in MAHandle item, in int n);
 
@@ -3392,42 +3387,33 @@ interface MAAPI {
 		* \brief Returns the number of values in the field for a given item.
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		* \returns     >0 the number of values for the item.
-		*              =0 if the item does not exists / has no values.
-		*              < 0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
+		* \returns \>= 0 on success: The number of values in the field.
+		* \< 0 on error:
+		* #MA_PIM_ERR_FIELD_UNSUPPORTED if the field is unsupported.
 		*/
 		int maPimItemFieldCount(in MAHandle item, in int field);
 
 		/**
 		* \brief Returns the attribute for the specified value in a field and item.
+		* Panics on field/index combinations that don't exist in this item.
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns     >=0 the attribute for the specified field.
-		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*                    #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
-		*                    #MA_PIM_ERR_NO_ATTRIBUTES if the field doesn't have attributes.
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
 		/**
 		* \brief Sets a custom label for a value in a field and item.
+		* Panics on field/index combinations that don't exist in this item.
 		* The value's attribute must be set to MA_PIM_ATTR_CUSTOM.
 		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
 		* \a args.bufSize must be valid.
 		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*              #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
-		*              #MA_PIM_ERR_NO_LABEL if the buffer is invalid or the attribute is not set to custom.
-		* \note This function is available on Android or iOS.
+		* \returns #MA_PIM_ERR_NONE on success.
+		* #MA_PIM_ERR_NO_LABEL if the attribute is not set to custom.
+		* \note This function is available only on Android and iOS.
 		*/
 		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
 
@@ -3439,14 +3425,12 @@ interface MAAPI {
 		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
-		* \returns     >=0 the number of bytes occupied by the value.
-		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*                    #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
-		*                    #MA_PIM_ERR_NO_LABEL if the attribute type is not set to custom.
-		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
-		* \note This function is available on Android or iOS.
+		* \returns \>= 0 the number of bytes occupied by the label.
+		* This may be greater than \a args.bufsize; in that case, the value isn't copied,
+		* and you should allocate a larger buffer and try again.
+		* \< 0 on error:
+		* #MA_PIM_ERR_NO_LABEL if the attribute type is not set to custom.
+		* \note This function is available only on Android and iOS.
 		*/
 		int maPimItemGetLabel(in MA_PIM_ARGS args, in int index);
 
@@ -3455,10 +3439,9 @@ interface MAAPI {
 		* or \< 0 if the field does not exist in the list.
 		* \param list Opened by maPimListOpen().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		* \returns     >=0 any of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants.
-		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not available.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
+		* \returns \>= 0 on success. One of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants.
+		* \< 0 on error:
+		* #MA_PIM_ERR_FIELD_UNSUPPORTED if the field is unsupported.
 		*/
 		int maPimFieldType(in MAHandle list, in int field);
 
@@ -3481,12 +3464,9 @@ interface MAAPI {
 		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
-		* \returns     >=0 The number of bytes occupied by the value.
-		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*                    #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
-		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
+		* \returns The number of bytes occupied by the value.
+		* If this number is greater than bufSize, the value is not written,
+		* and you'll have to allocate a bigger buffer and try again.
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
 
@@ -3497,11 +3477,7 @@ interface MAAPI {
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
 		* \param attributes The value's new attributes.
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*              #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
-		*              #MA_PIM_ERR_INVALID_BUFFER if the buffer is not correct.
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3515,11 +3491,7 @@ interface MAAPI {
 		* Adds a new value to a field and item.
 		* \param args Common arguments.
 		* \param attributes The new value's attributes.
-		* \returns     >=0 the index of the new added value.
-		*              <0 on error:
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*              #MA_PIM_ERR_INVALID_BUFFER if the buffer is not correct.
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3531,10 +3503,7 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*              #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note The changes is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3544,8 +3513,7 @@ interface MAAPI {
 		/**
 		* Closes the handle to a PimItem, releasing resources used by the system.
 		* Writes any changes to disk.
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
+		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
 		* \note An item can also be closed by maPimItemRemove().
 		* \warning Does not write changes to disk if the item's List is closed.
 		* Make sure to keep the List open while editing items.
@@ -3554,19 +3522,15 @@ interface MAAPI {
 
 		/**
 		* Creates a new empty item in the specified list.
-		* \returns     >=0 A handle to the new item.
-		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not opened.
+		* \returns A handle to the new item, or \< 0 on error.
 		* \note The handle must be closed with maPimItemClose() to avoid memory leaks.
 		*/
 		MAHandle maPimItemCreate(in MAHandle list);
 
 		/**
 		* Removes an item from a list. This also has the effect of closing the item.
+		* \returns 0 on success and \< 0 on failure.
 		* \see maPimItemClose()
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not opened.
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
 		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
@@ -4184,12 +4148,12 @@ group WidgetAPI "Widget API" {
 		NAV_BAR = "NavBar";
 
 		/**
-		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
+		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL|ES 1.0/1.1 calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
 		 */
 		GL_VIEW = "GLView";
 
 		/**
-		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
+		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL|ES 2.0 calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
 		 */
 		GL2_VIEW = "GL2View";
 

@@ -31,11 +31,11 @@ import com.mosync.nativeui.ui.widgets.Widget;
 /**
  * A factory that creates button and sets up the default
  * behavior for sending events when clicked.
- * 
+ *
  * @author fmattias
  */
 public class EGLViewFactory implements AbstractViewFactory
-{	
+{
 	private int m_glApi;
 
 	public EGLViewFactory(int glApi) {
@@ -50,10 +50,18 @@ public class EGLViewFactory implements AbstractViewFactory
 	public Widget create(Activity activity, final int handle)
 	{
 		FrameLayout eglFrame = new FrameLayout( activity );
-		EGLView eglView = new EGLView( activity, m_glApi );
+		EGLView eglView = null;
+		try
+		{
+			eglView = new EGLView( activity, m_glApi );
+		}
+		catch(Exception e)
+		{
+			return null;
+		}
 		eglView.setLayoutParams( new LayoutParams( LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT ) );
 		eglView.setEglViewReadyListener( new EGLViewReadyListener( ) {
-			
+
 			@Override
 			public void eglViewReady()
 			{
@@ -61,7 +69,7 @@ public class EGLViewFactory implements AbstractViewFactory
 			}
 		});
 		eglFrame.addView( eglView );
-		
+
 		return new GLWidget( handle, eglFrame, eglView );
 	}
 }

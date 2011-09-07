@@ -73,7 +73,6 @@
 }
 
 /**
-
  * Set the label value.
  * @param label The new label's value.
  * @return MA_PIM_ERR_NONE is the label was set, or

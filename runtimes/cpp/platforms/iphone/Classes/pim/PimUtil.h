@@ -201,6 +201,13 @@
 -(int) getCustomAttributeForFieldID:(const int) fieldID;
 
 /**
+ * Checks if a given field supports attributes.
+ * @param fieldID The given field ID. One of the MA_PIM_FIELD_CONTACT contants.
+ * @return True if field supports attributes, false otherwise.
+ */
+-(bool) fieldSupportsAttribute:(const int) fieldID;
+
+/**
  * Gets the absolute memory address for a specified address from MoSync memory pool.
  * @param address The given address from memory pool.
  * param size The size of the address in bytes.

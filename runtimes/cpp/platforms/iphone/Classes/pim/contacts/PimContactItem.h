@@ -57,6 +57,43 @@
 -(int) close;
 
 /**
+ * Gets the number of values for a given field ID.
+ * Checks if field is valid and supported.
+ * @param field The specified field ID(one of the MA_PIM_FIELD constants).
+ * @return The number of values for the given field, or 0 if the field ID
+ *         has no values/does not exist.
+ */
+-(int) fieldCount:(const int) fieldID;
+
+/**
+ * Gets the attribute for a given field value.
+ * Checks if field is valid and supported.
+ * @param fieldID The specified field ID(one of the MA_PIM_FIELD constants).
+ * @param index The index of the given field value.
+ * @return One of MA_PIM_ATTR constants, or MA_PIM_ERR in case of error.
+ */
+-(int) getAttribute:(const int) fieldID
+         indexValue:(const int) index;
+
+/**
+ * Gets a custom label for a given field value.
+ * Checks if field is valid and supported.
+ * @param args Common arguments.
+ *             The item's handle is stored in args.item.
+ *             The field's ID is stored in args.field.
+ *             The custom label's value will be stored in args.buf.
+ *             The maximum size of the value(in bytes) is stored in args.bufSize.
+ * @param index Field's value index.
+ * @return The number of bytes occupied by the value. If the number is greater than
+ *         args.bufSize the value was not written into args.buf.
+ *         In case of error the function returns one of the MA_PIM_ERR constants.
+ *         If the field's value does not have a custom label, the function will
+ *         return MA_PIM_ERR_NO_LABEL.
+ */
+-(int) getLabel:(const MA_PIM_ARGS*) args
+     indexValue:(const int) index;
+
+/**
  * Gets a field's value at a given index.
  * Checks if field is supported or write-only.
  * @param args Common arguments.
@@ -303,6 +340,13 @@
  * @return True is the field is supported, false otherwise.
  */
 -(bool) isFieldSupported:(const int) fieldID;
+
+/**
+ * Checks if the field is valid.
+ * @param fieldID One of the MA_PIM_FIELD_CONTACT constants.
+ * @return True is the field is valid, false otherwise.
+ */
+-(bool) isFieldValid:(const int) fieldID;
 
 /**
  * Checks if the user can read data from a specified field.
