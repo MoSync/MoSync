@@ -50,7 +50,15 @@ public class EGLViewFactory implements AbstractViewFactory
 	public Widget create(Activity activity, final int handle)
 	{
 		FrameLayout eglFrame = new FrameLayout( activity );
-		EGLView eglView = new EGLView( activity, m_glApi );
+		EGLView eglView = null;
+		try
+		{
+			eglView = new EGLView( activity, m_glApi );
+		}
+		catch(Exception e)
+		{
+			return null;
+		} 
 		eglView.setLayoutParams( new LayoutParams( LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT ) );
 		eglView.setEglViewReadyListener( new EGLViewReadyListener( ) {
 			

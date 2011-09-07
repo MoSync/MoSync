@@ -68,6 +68,7 @@ namespace MoSync {
 		virtual void customEvent(const MAEvent& event);
 
 		virtual void buttonClicked(UIItem* item) {}
+		virtual void editBoxReturned(UIItem* item) {}
 		virtual void searchBarClicked(UIItem* item, int button) {}
 		virtual void checkboxStateChanged(UIItem* item, bool checked) {}
 		virtual void tabBarIndexChanged(UIItem* item, int index) {}
