@@ -76,14 +76,15 @@
 	
 //	if(!parent)
 //		view.frame = [[UIScreen mainScreen] bounds];
-	
+
 	for (IWidget *child in children)
     {
 		UIView* childView = [child getView];
 		[childView setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];		
 		
 		[child layout];
-	}	
+	}
+    
 	[view setNeedsLayout];
 }
 
