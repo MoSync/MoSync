@@ -141,6 +141,8 @@ namespace Base {
 		void* GetValidatedMemRange(int address, int size);
 		const char* GetValidatedStr(int address);
 		const wchar* GetValidatedWStr(int address);
+    
+        int TranslateNativePointerToMoSyncPointer(void *nativePointer);
 
 #ifndef VSV_ARGPTR_DECL
 #define VSV_ARGPTR_DECL
