@@ -21,6 +21,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "TouchHelper.h"
 #include "MoSyncSensor.h"
 
+// todo: remove all the functions that don't have to be here
+
 @interface MoSyncView : UIView <UITextFieldDelegate> {
 	CGImageRef mosyncView;
     MoSyncCLController *locationController;
