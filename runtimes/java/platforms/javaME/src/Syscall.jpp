@@ -2677,6 +2677,8 @@ public
 		int constraints) throws Exception
 	{
 		MYASSERT(mTextBox == null);
+		if((constraints & TextField.CONSTRAINT_MASK) == MA_TB_TYPE_SINGLE_LINE)
+			return MA_TB_RES_TYPE_UNAVAILABLE;
 		mTextBoxBuffer = outText;
 		mTextBoxMaxSize = maxSize;
 		mTextBox = new TextBox(title, inText, maxSize-1, constraints);
