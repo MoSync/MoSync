@@ -90,7 +90,7 @@ void MainScreen::createMainLayout() {
 		// Select first camera
 		maCameraSelect(0);
 		mCameraWidget = new CameraPreview();
-		maCameraSetPreview(mCameraWidget->getWidgetHandle());
+		mCameraWidget->bindToCurrentCamera();
 		mMainLayout->addChild(mCameraWidget);
 
 		mStartCamera = new Button();
