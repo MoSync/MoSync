@@ -299,11 +299,13 @@ public class NativeUI
 		}
 		
 		Layout parentAsLayout = (Layout) parent;
-		if ( parentAsLayout.containsChild(child) )
+
+		if ( child.getParent() != null )
 		{
-			Log.e( "MoSync", "maWidgetInsertChild: Child is already added to parent." );
+			Log.e( "MoSync", "maWidgetInsertChild: Child already has a parent." );
 			return IX_WIDGET.MAW_RES_ERROR;
 		}
+
 		parentAsLayout.addChildAt( child, index );
 		
 		return IX_WIDGET.MAW_RES_OK;
