@@ -303,17 +303,22 @@
 }
 
 - (void)dealloc {
+    [view release];
+    [children release];
     [super dealloc];
-	[view dealloc];
 }
 
 - (void)layout {
 	// the layouts should take care of the fill parent / wrap content layouting process..
-	// so no need to do it here.
+    // this should not be suboptimal, it will trigger a layout
+    // that runs once before draw..
+    [view setNeedsLayout];
+    if(view.superview)
+    {
+        [view.superview setNeedsLayout];
+    }
     
-    // somehow this seems to work
-    // otherwise some things aren't layouted correctly
-    [view layoutIfNeeded];
+   // [view layoutIfNeeded];    
 }
 
 /**

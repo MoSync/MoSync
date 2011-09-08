@@ -24,10 +24,7 @@
 @implementation ImageWidget
 
 - (id)init {
-    
-    // temporarily use a UIView placeholder until we have an image..
-	view = [[[UIView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
-	imageView = nil;
+    view = imageView = [[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];    
 	leftCapWidth = 0;
 	topCapHeight = 0;
 	id ret = [super init];
@@ -37,7 +34,8 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"image"]) {
+    
+    if([key isEqualToString:@"image"]) {
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
@@ -45,20 +43,7 @@
 		if(leftCapWidth != 0 || topCapHeight != 0) {
 			image = [image stretchableImageWithLeftCapWidth:leftCapWidth topCapHeight:topCapHeight];
 		}
-		if(imageView != nil)
-			[imageView removeFromSuperview];
-
-		imageView = [[UIImageView alloc] initWithImage:image];	
-		
-        //[view addSubview:imageView];
-        
-        [view.superview insertSubview:imageView belowSubview:view];
-        [view removeFromSuperview];
-        imageView.contentMode = view.contentMode;
-        [view release];
-        view = imageView;
-        //view.contentMode = UIViewContentModeCenter;
-        
+        imageView.image = image;
 		[self layout];
 	}
 	else if([key isEqualToString:@"leftCapWidth"]) {
