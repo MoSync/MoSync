@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * FacebookDemoMoblet.h
- *
- *  Created on: Aug 5, 2011
- *      Author: gabi
  */
 
 #ifndef FACEBOOKDEMOMOBLET_H_
@@ -34,34 +32,74 @@ MA 02110-1301, USA.
 #include "Facebook/FacebookManager.h"
 #include "GUI/ListScreen.h"
 #include "GUI/FacebookLoginScreen.h"
+#include "GUI/MainScreen.h"
 
 
 /**
- * Moblet to be used as a template for a Native UI application.
+ * Class that creates the main screen and handles key press events
  */
-class FacebookDemoMoblet : public MAUtil::Moblet
+class FacebookDemoMoblet : public MAUtil::Moblet, public NativeUI::WebViewListener
 {
 public:
 	/**
-	 * The constructor creates the user interface.
+	 * The constructor creates the user interface and the FacebookManager
 	 */
-	FacebookDemoMoblet(const MAUtil::String &appId, const MAUtil::String &appSecret);
+	FacebookDemoMoblet(const MAUtil::String &appId);
 
-	void keyPressEvent(int keyCode, int nativeCode);
-	void customEvent(const MAEvent &event);
+	virtual void webViewHookInvoked( NativeUI::WebView* webView, int hookType,
+			MAHandle urlData);
 
+	/**
+	 * WebViewListener overrides
+	 */
+	virtual void webViewContentLoading(
+			NativeUI::WebView* webView,
+			const int webViewState) {}
+
+	/**
+	 * destructor.
+	 */
 	~FacebookDemoMoblet();
+
+	/**
+	 * This method is called when the application is closed.
+	 */
+	void closeEvent() GCCATTRIB(noreturn);
 private:
-	void initializeFacebook(const MAUtil::String &appId, const MAUtil::String &appSecret);
+	void login();
+
+	/**
+	 * creates the FacebookManager object, that handles the requests to Facebook, retrieving data and publishing
+	 */
+	void initializeFacebook(const MAUtil::String &appId);
+
+	/**
+	 * creates the GUI
+	 */
 	void createGUI();
 
+
+	MAUtil::String extractAccessToken(const char *newurl);
+
 private:
-	//publish
+	/**
+	 * creation of buttons for the main menu
+	 */
+
+
+	/**
+	 * Creates a button and adds it to the main menu
+	 * Adds on the button a command that sends the publish request to Facebook
+	 */
 	void uploadProfilePhoto(FacebookDemoGUI::ListScreen *menu);
 	void addLinkOnWall(FacebookDemoGUI::ListScreen *menu);
 	void addPostOnWall(FacebookDemoGUI::ListScreen *menu);
 	void addStatusMessageOnWall(FacebookDemoGUI::ListScreen *menu);
-	//connections
+
+	/**
+	 * Creates a button and adds it to the main menu
+	 * Adds on the button a command that sends the connection request to Facebook
+	 */
 	void addActivitiesButton(FacebookDemoGUI::ListScreen *menu);
 	void addAlbumsButton(FacebookDemoGUI::ListScreen *menu);
 	void addBooksButton(FacebookDemoGUI::ListScreen *menu);
@@ -82,18 +120,16 @@ private:
 	void addNotesButton(FacebookDemoGUI::ListScreen *menu);
 	void addStatusMessagesButton(FacebookDemoGUI::ListScreen *menu);
 
-
 private:
-	FacebookManager 						*mFacebookManager;
-	FacebookDemoGUI::ListScreen				*mMainMenu;
+	/**
+	 * FacebookManager object: handles the requests to Facebook, retrieving data and publishing
+	 */
+	FacebookManager							*mFacebookManager;
+	FacebookDemoGUI::MainScreen				*mMainScreen;
 	FacebookDemoGUI::FacebookLoginScreen 	*mLoginScreen;
+	byte									*mImage;
+	int										mImageSize;
 
-
-	int 							*mPixels;
-	int 							mPictureWidth;
-	int 							mPictureHeight;
-
-	MAUtil::String 					mPicture;
 };
 
 #endif /* FACEBOOKDEMOMOBLET_H_ */

@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * ListItem.h
- *
- *  Created on: Aug 5, 2011
- *      Author: gabi
  */
 
 #ifndef LISTITEM_H_
@@ -28,14 +26,13 @@ MA 02110-1301, USA.
 #include <MAUtil/Environment.h>
 #include <MAUtil/String.h>
 
-#include "NativeUI/Button.h"
-#include "NativeUI/ListViewItem.h"
+#include <NativeUI/ListViewItem.h>
 #include "../Application/ICommand.h"
 
 namespace FacebookDemoGUI
 {
 
-class ListItem: public MoSync::UI::Button, public MAUtil::CustomEventListener
+class ListItem: public NativeUI::ListViewItem
 {
 public:
 	ListItem(FacebookDemoApplication::ICommand *cmd, const MAUtil::String &text);
@@ -43,9 +40,6 @@ public:
 
 	void setCommand(FacebookDemoApplication::ICommand *cmd);
 	void doClick();
-
-	//CustomEventListener
-	virtual void customEvent(const MAEvent& event);
 
 	virtual ~ListItem();
 

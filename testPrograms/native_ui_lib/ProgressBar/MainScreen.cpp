@@ -37,6 +37,7 @@ MainScreen::MainScreen() :
 	Screen(),
 	mMainLayout(NULL),
 	mProgressBar(NULL),
+	mProgressBarValue(NULL),
 	mSetProgressValueButton(NULL),
 	mGetProgressValueButton(NULL),
 	mIncreaseValueButton(NULL)
@@ -73,6 +74,7 @@ void MainScreen::buttonClicked(Widget* button)
     }
     else if (button == mGetProgressValueButton)
     {
+			mProgressBarValue->setText(MAUtil::integerToString(mProgressBar->getProgress()));
         int value = mProgressBar->getProgress();
         printf("progress value = %d", value);
     }
@@ -107,6 +109,9 @@ void MainScreen::createMainLayout() {
 	mGetProgressValueButton = new Button();
 	mGetProgressValueButton->setText("get progress");
 	mMainLayout->addChild(mGetProgressValueButton);
+
+	mProgressBarValue = new Label();
+	mMainLayout->addChild(mProgressBarValue);
 
 	mIncreaseValueButton = new Button();
 	mIncreaseValueButton->setText("increase value with 10");

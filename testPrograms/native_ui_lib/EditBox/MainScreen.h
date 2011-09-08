@@ -127,6 +127,7 @@ private:
 
 	Button* mSetTextButton;
 	Button* mGetTextButton;
+	Label* mGetTextLabel;
 	Button* mKeyboardButton;
 
 	bool mKeyboard;

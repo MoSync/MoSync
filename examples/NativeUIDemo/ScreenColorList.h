@@ -28,22 +28,18 @@ MA 02110-1301, USA.
 #define SCREEN_COLOR_LIST_H_
 
 #include <MAUtil/Vector.h>
-#include "UIWrapper/Widgets.h"
+#include "NativeUI/Widgets.h"
 
-using namespace MoSync::UI;
+using namespace NativeUI;
 
 /**
  * The main screen for the color list.
  */
-class ScreenColorList : public StackScreen
+class ScreenColorList :
+	public StackScreen,
+	public ListViewListener
 {
 public:
-	/**
-	 * Create the UI for the color list screen.
-	 * @return The main screen for the color list UI
-	 * (an instance of this class).
-	 */
-	static StackScreen* create();
 
 	/**
 	 * Constructor.
@@ -75,6 +71,26 @@ public:
 	 * @param listItemIndex The index of the list item that was clicked.
 	 */
 	void openColorScreen(int listItemIndex);
+
+    /**
+     * This method is called when a list view item is clicked.
+     * @param listView The list view object that generated the event.
+     * @param listViewItem The ListViewItem object that was clicked.
+     */
+    virtual void listViewItemClicked(
+        ListView* listView,
+        ListViewItem* listViewItem);
+
+private:
+    /**
+     * The list view widget.
+     */
+    ListView* mListView;
+
+    /**
+     * List of list view items.
+     */
+    MAUtil::Vector<ListViewItem*> mListViewItems;
 };
 
 #endif

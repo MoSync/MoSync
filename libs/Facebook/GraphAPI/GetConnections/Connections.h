@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * Connections.h
- *
- *  Created on: Jul 20, 2011
- *      Author: gabi
  */
 
 #ifndef CONNECTIONS_H_
@@ -361,7 +359,6 @@ struct Connections<User>
 		return "videos";
 	}
 };
-
 /*
  * Template class for retrieving the available connections for an Video object
  */
@@ -381,5 +378,8 @@ struct Connections<Video>
 		return "picture";
 	}
 };
+
+
+
 
 #endif /* CONNECTIONS_H_ */

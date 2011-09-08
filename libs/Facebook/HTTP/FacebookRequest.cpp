@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,20 +18,17 @@ MA 02110-1301, USA.
 
 /*
  * FacebookRequest.cpp
- *
- *  Created on: Jul 20, 2011
- *      Author: gabi
  */
 
 #include "FacebookRequest.h"
-#include "LOG.h"
+#include "../LOG.h"
 
 FacebookRequest::FacebookRequest(FACEBOOK_REQUEST_TYPE reqType,
-	FACEBOOK_RESPONSE_TYPE responseType,
-	const String& path,
-	String& accessToken,
-	int method,
-	const String postdata) : HttpRequest(FACEBOOK_OPEN_GRAPH_URLBASE + path, method),
+								 FACEBOOK_RESPONSE_TYPE responseType,
+								 const String& path,
+								 String& accessToken,
+								 int method,
+								 const String postdata) : HttpRequest(FACEBOOK_OPEN_GRAPH_URLBASE + path, method),
 	mPath(path.c_str()),
 	mType(reqType),
 	mResponseType(responseType)

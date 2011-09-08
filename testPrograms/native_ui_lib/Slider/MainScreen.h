@@ -98,6 +98,7 @@ private:
 
 	Button* mSetValueButton;
 	Button* mGetValueButton;
+	Label*  mGetValueLabel;
 	Button* mIncreaseValueButton;
 	Button* mDecreseValueButton;
 };

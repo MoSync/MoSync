@@ -17,9 +17,12 @@ work.instance_eval do
 		@EXTRA_INCLUDES = ['.']
 
 		copyFilesSubDir('GraphAPI/GetFacebookObjects/FacebookObjects')
+		copyFilesSubDir('GraphAPI/GetFacebookObjects')
 		copyFilesSubDir('GraphAPI/GetConnections')
 		copyFilesSubDir('GraphAPI/Publish')
 		copyFilesSubDir('GraphAPI')
+		copyFilesSubDir('JSON_lib')
+		copyFilesSubDir('HTTP')
 
 		@HEADER_DIRS = ['.']
 		@INSTALL_INCDIR = 'Facebook'

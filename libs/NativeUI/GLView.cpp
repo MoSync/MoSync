@@ -33,7 +33,7 @@ namespace NativeUI
 	/**
 	 * Constructor.
 	 */
-	GLView::GLView(const MAUtil::String type):
+	GLView::GLView(const MAUtil::String& type):
 		Widget(type)
 	{
 		// Set some common default values.

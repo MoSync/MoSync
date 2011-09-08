@@ -24,6 +24,11 @@ MA 02110-1301, USA.
  */
 extern "C" int MAMain()
 {
-	MAUtil::Moblet::run(new FacebookDemoMoblet(CONFIG_APPLICATION_ID, CONFIG_SECRET_ID));
+	FacebookDemoMoblet *appMoblet = new FacebookDemoMoblet(CONFIG_APPLICATION_ID);
+
+	MAUtil::Moblet::run(appMoblet);
+
+	delete appMoblet;
+
 	return 0;
 }
