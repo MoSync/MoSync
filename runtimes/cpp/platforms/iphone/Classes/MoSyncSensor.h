@@ -22,7 +22,7 @@
 /**
  * A class for handling sensors.
  */
-@interface MoSyncSensor : NSObject<UIAccelerometerDelegate, CLLocationManagerDelegate> {
+@interface MoSyncSensor : NSObject<UIAccelerometerDelegate> {
     /**
      * Accelerometer object.
      */
@@ -34,6 +34,11 @@
     CMMotionManager* motionManager;
 
     /**
+     * Used a timer for reading gyro data at a given time interval.
+     */
+    NSTimer* motionManagerTimer;
+
+    /**
      * Used by the gyroscope sensor to process data.
      */
     NSOperationQueue *operationQueue;
@@ -42,6 +47,12 @@
      * Used to acces data from the magnetometer(compass) sensor.
      */
     CLLocationManager *locationManager;
+
+    /**
+     * CLLocationManager does not offer a way of setting an update interval.
+     * Used a timer for reading location data at a given time interval.
+     */
+    NSTimer* locationManagerTimer;
 
     /**
      * The flag is set is the proximity sensor is started.
@@ -131,15 +142,28 @@
 
 /**
  * Start the magnetometer sensor.
+ * @param interval How fast to read data(time interval in milliseconds).
  * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
  */
--(int)startMagnetometer;
+-(int)startMagnetometer:(const int)interval;
 
 /**
  * Stop the magnetometer sensor.
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
 -(int) stopMagnetometer;
+
+/**
+ * Get the update interval associated with a rate constant.
+ * @param rate One of the next constants:
+ * - SENSOR_RATE_FASTEST
+ * - SENSOR_RATE_GAME
+ * - SENSOR_RATE_NORMAL
+ * - SENSOR_RATE_UI
+ * @return The update interval associated with the rate, or rate parameter
+ * if it's not one of the above constants.
+ */
+-(int) getUpdateIntervalFromRate:(const int) rate;
 
 /**
  * Delivers the latest acceleration data.
