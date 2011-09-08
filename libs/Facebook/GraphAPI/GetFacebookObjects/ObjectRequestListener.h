@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * ObjectRequestListener.h
- *
- *  Created on: Jul 22, 2011
- *      Author: gabi
  */
 
 #ifndef OBJECTREQUESTLISTENER_H_
@@ -51,60 +49,59 @@ struct ObjectRequestListener: public ErrorListener
 	/*
 	 * called when an Album object was received
 	 */
-	virtual void facebookObjectReceived(const Album &object) = 0;
+	virtual void facebookObjectReceived(const Album &object){};
 	/*
 	 * called when an Checkin object was received
 	 */
-	virtual void facebookObjectReceived(const Checkin &object) = 0;
+	virtual void facebookObjectReceived(const Checkin &object){};
 	/*
 	 * called when an Comment object was received
 	 */
-	virtual void facebookObjectReceived(const Comment &object) = 0;
+	virtual void facebookObjectReceived(const Comment &object){};
 	/*
 	 * called when an Event object was received
 	 */
-	virtual void facebookObjectReceived(const Event &object) = 0;
+	virtual void facebookObjectReceived(const Event &object){};
 	/*
 	 * called when an FriendList object was received
 	 */
-	virtual void facebookObjectReceived(const FriendList &object) = 0;
+	virtual void facebookObjectReceived(const FriendList &object){};
 	/*
 	 * called when an Group object was received
 	 */
-	virtual void facebookObjectReceived(const Group &object) = 0;
+	virtual void facebookObjectReceived(const Group &object){};
 	/*
 	 * called when an Link object was received
 	 */
-	virtual void facebookObjectReceived(const Link &object) = 0;
+	virtual void facebookObjectReceived(const Link &object){};
 	/*
 	 * called when an Note object was received
 	 */
-	virtual void facebookObjectReceived(const Note &object) = 0;
+	virtual void facebookObjectReceived(const Note &object){};
 	/*
 	 * called when an Photo object was received
 	 */
-	virtual void facebookObjectReceived(const Photo &object) = 0;
+	virtual void facebookObjectReceived(const Photo &object){};
 	/*
 	 * called when an Page object was received
 	 */
-	virtual void facebookObjectReceived(const Page &object) = 0;
+	virtual void facebookObjectReceived(const Page &object){};
 	/*
 	 * called when an Post object was received
 	 */
-	virtual void facebookObjectReceived(const Post &object) = 0;
+	virtual void facebookObjectReceived(const Post &object){};
 	/*
 	 * called when an StausMessage object was received
 	 */
-	virtual void facebookObjectReceived(const StausMessage &object) = 0;
+	virtual void facebookObjectReceived(const StausMessage &object){};
 	/*
 	 * called when an User object was received
 	 */
-	virtual void facebookObjectReceived(const User &object) = 0;
+	virtual void facebookObjectReceived(const User &object){};
 	/*
 	 * called when an Video object was received
 	 */
-	virtual void facebookObjectReceived(const Video &object) = 0;
-
+	virtual void facebookObjectReceived(const Video &object){};
 	virtual ~ObjectRequestListener() {}
 };
 

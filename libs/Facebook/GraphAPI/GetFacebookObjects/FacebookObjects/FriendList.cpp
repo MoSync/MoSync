@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,13 +18,14 @@ MA 02110-1301, USA.
 
 /*
  * FriendList.cpp
- *
- *  Created on: Jul 9, 2011
- *      Author: gabi
  */
 
 #include "FriendList.h"
 
+/**
+ * Setter/getter for the "name" field of an FriendList object.
+ * @param name - the friend list name
+ */
 void FriendList::setName(const MAUtil::String &name)
 {
 	mListName = name;

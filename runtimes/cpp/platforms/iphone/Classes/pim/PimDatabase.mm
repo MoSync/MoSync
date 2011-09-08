@@ -30,7 +30,7 @@
 /**
  * Opens a pim list.
  * @param listType One of MA_PIM constants.
- * @return A pim list handle, or MA_PIM_ERR_UNAVAILABLE_LIST in case of error.
+ * @return A pim list handle, or one of MA_PIM_ERR constants in case of error
  */
 -(MAHandle) pimListOpen:(const int) listType
 {
@@ -50,11 +50,11 @@
 	else if(MA_PIM_EVENTS == listType ||
             MA_PIM_TODOS == listType)
     {
-        return MA_PIM_ERR_UNAVAILABLE_LIST;
+        return MA_PIM_ERR_LIST_UNAVAILABLE;
     }
     else
 	{
-		return MA_PIM_ERR_INVALID_LIST_TYPE;
+		return MA_PIM_ERR_LIST_TYPE_INVALID;
 	}
 }
 
@@ -62,11 +62,11 @@
  * Gets a handle to the next pim item in the specified list.
  * @param list The specified list.
  * @return A handle to the next item, or 0 if there are no more items,
- * or one of MA_PIM_ERR_ in case of error.
+ * or one of MA_PIM_ERR in case of error.
  */
 -(MAHandle) pimListNext:(MAHandle) list
 {
-	MAHandle returnedValue = MA_PIM_ERR_INVALID_HANDLE;
+	MAHandle returnedValue = MA_PIM_ERR_HANDLE_INVALID;
 
 	if (MA_PIM_CONTACTS == list)
 	{
@@ -96,14 +96,9 @@
 			mContactsList = nil;
 		}
 	}
-    else if(MA_PIM_EVENTS == list ||
-            MA_PIM_TODOS)
-    {
-        returnedValue = MA_PIM_ERR_UNAVAILABLE_LIST;
-    }
 	else
 	{
-		returnedValue = MA_PIM_ERR_INVALID_HANDLE;
+		returnedValue = MA_PIM_ERR_HANDLE_INVALID;
 	}
 
 	return returnedValue;
@@ -118,9 +113,9 @@
 {
 	int returnedValue;
 
-	if (nil == list)
+	if (!list)
 	{
-		returnedValue = MA_PIM_ERR_LIST_NOT_OPENED;
+		returnedValue = MA_PIM_ERR_HANDLE_INVALID;
 	}
 	else
 	{
@@ -143,19 +138,46 @@
  */
 -(PimItem*) getItem:(MAHandle) itemHandle
 {
-	PimItem* item = [mContactsList getItem:itemHandle];
+	PimItem* item = nil;
+    if (mContactsList)
+    {
+        return [mContactsList getItem:itemHandle];
+    }
 
 	return item;
 }
 
+/**
+ * Creates a new pim item for a given pim list.
+ * @param list The given pim list.
+ * @return A handle to a new pim item.
+ */
 -(MAHandle) createItem:(MAHandle) list
 {
 	if (list == MA_PIM_CONTACTS)
 	{
-		return [mContactsList createItem];
+        if (mContactsList)
+        {
+            return [mContactsList createItem];
+        }
 	}
 
-	return MA_PIM_ERR_UNAVAILABLE_LIST;
+	return MA_PIM_ERR_HANDLE_INVALID;
+}
+
+/**
+ * Closes a given item.
+ * @param itemHandle A handle to a pim item.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) closeItem:(MAHandle) itemHandle
+{
+    if (mContactsList)
+    {
+        return [mContactsList closeItem:itemHandle];
+    }
+
+    return MA_PIM_ERR_HANDLE_INVALID;
 }
 
 /**
@@ -169,17 +191,20 @@
 {
 	if (list == MA_PIM_CONTACTS)
 	{
-		return [mContactsList removeItem:item];
+        if (mContactsList)
+        {
+            return [mContactsList removeItem:item];
+        }
 	}
 
-	return MA_PIM_ERR_UNAVAILABLE_LIST;
+	return MA_PIM_ERR_HANDLE_INVALID;
 }
 
 /**
  * Release all the objects.
  */
-- (void) dealloc {
-
+- (void) dealloc
+{
 	[mContactsList release];
 	[super dealloc];
 }

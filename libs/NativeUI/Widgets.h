@@ -51,6 +51,7 @@ MA 02110-1301, USA.
 #include "NumberPicker.h"
 #include "NumberPickerListener.h"
 #include "ProgressBar.h"
+#include "RelativeLayout.h"
 #include "Screen.h"
 #include "SearchBar.h"
 #include "SearchBarListener.h"

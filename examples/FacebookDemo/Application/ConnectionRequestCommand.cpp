@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,69 +18,100 @@ MA 02110-1301, USA.
 
 /*
  * ConnectionRequestCommand.cpp
- *
- *  Created on: Aug 5, 2011
- *      Author: gabi
  */
+
 #include <MAUtil/util.h>
 
-#include <Facebook/GraphAPI/GetConnections/Connections.h>
+#include "Facebook/GraphAPI/GetConnections/Connections.h"
 
 #include "ConnectionRequestCommand.h"
 #include "PublishRequestCommand.h"
 
-#include "../GUI/NativeUI/Button.h"
-#include "../GUI/ListItem.h"
-#include <Facebook/LOG.h>
+#include "../GUI/ListScreen.h"
+#include "Facebook/LOG.h"
+
+#include <NativeUI/Widgets.h>
 
 namespace FacebookDemoApplication
 {
 
+/*
+ * constructor
+ * @param facebookManager - the object that handles the requests to Facebook
+ * @param previousSCreen - the screen that will be shown when the user clicks the back button.
+ */
 ConnectionRequestCommand::ConnectionRequestCommand(FacebookManager *facebookManager,
 		FacebookDemoGUI::FacebookDemoScreen *previousScreen, const MAUtil::String &connection,
 		const MAUtil::String &id):
+		mMaxEntriesInList(4),
 		mFacebookManager(facebookManager),
 		mConnection(connection),
 		mId(id)
 
 {
+	LOG("\n\tConnectionRequestCommand constructor");
+	mFacebookManager->limitTheNumberOfObjectsToFetch(mMaxEntriesInList);
 	createGUI(previousScreen);
 }
 
+/*
+ * constructor
+ * @param facebookManager - the object that handles the requests to Facebook
+ * @param previousSCreen - the screen that will be shown when the user clicks the back button.
+ * @param fields - the fields from the Facebook object that  we want to retrieve.
+ */
 ConnectionRequestCommand::ConnectionRequestCommand(FacebookManager *facebookManager, FacebookDemoGUI::FacebookDemoScreen *previousScreen,
-		const MAUtil::String &connection, const MAUtil::Vector<MAUtil::String> &fields, const MAUtil::String &id):
+		const MAUtil::String &connection, const MAUtil::Vector<MAUtil::String> &fields,
+		const MAUtil::String &id):
+		mMaxEntriesInList(4),
 		mFacebookManager(facebookManager),
 		mConnection(connection),
 		mFields(fields),
 		mId(id)
 {
+	LOG("\n\tConnectionRequestCommand constructor");
+	mFacebookManager->limitTheNumberOfObjectsToFetch(mMaxEntriesInList);
 	createGUI(previousScreen);
 }
 
-//FacebookConnectionListener
+//*********************************************************************************************************************************
+/*
+ * ConnectionsManagerListener overrides
+ * These functions are called when the request is completed and sucessfull.
+ */
+
 void ConnectionRequestCommand::received(const MAUtil::Vector<Photo> &photos, const MAUtil::String &connType,
 		const MAUtil::String &objectId)
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d photos.\n", photos.size());
-	for(int i=0; i<photos.size(); i++)
+
+	int entries = photos.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i< entries; i++)
 	{
 		addToList(photos[i]);
 	}
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<Post> &feed, const MAUtil::String &connType,
 		const MAUtil::String &objectId)
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d posts.\n", feed.size());
-	int maxItems = feed.size();
-	if(feed.size()>8)
-		maxItems = 8;
-	for(int i=0; i<maxItems; i++)
+
+	int entries = feed.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i < entries; i++)
 	{
 		addToList(feed[i]);
 	}
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<Album> &albums, const MAUtil::String &connType,
@@ -87,12 +119,17 @@ void ConnectionRequestCommand::received(const MAUtil::Vector<Album> &albums, con
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d albums.\n", albums.size());
 
-	for(int i=0; i<albums.size(); i++)
+	int entries = albums.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i< entries; i++) //albums.size()
 	{
 		addToList(albums[i]);
 	}
 
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<IdNamePair> &data, const MAUtil::String &connType,
@@ -100,11 +137,16 @@ void ConnectionRequestCommand::received(const MAUtil::Vector<IdNamePair> &data, 
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d IdNamePairs.Connection: %s ", data.size(), connType.c_str());
 
-	for(int i=0; i<data.size(); i++)
+	int entries = data.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i < entries; i++)
 	{
 		addToList(data[i], connType, objectId);
 	}
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<CategoryData> &data, const MAUtil::String &connType,
@@ -112,12 +154,17 @@ void ConnectionRequestCommand::received(const MAUtil::Vector<CategoryData> &data
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d CategoryData objects. Connection: %s", data.size(), connType.c_str());
 
-	for(int i=0; i<data.size(); i++)
+	int entries = data.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i < entries; i++)
 	{
 		addToList(data[i], connType, objectId);
 	}
 
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<Note> &notes, const MAUtil::String &connType,
@@ -125,11 +172,16 @@ void ConnectionRequestCommand::received(const MAUtil::Vector<Note> &notes, const
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d Notes.", notes.size());
 
-	for(int i=0; i<notes.size(); i++)
+	int entries = notes.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i < entries; i++)
 	{
 		addToList(notes[i]);
 	}
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<Event> &events, const MAUtil::String &connType,
@@ -137,11 +189,16 @@ void ConnectionRequestCommand::received(const MAUtil::Vector<Event> &events, con
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d Events.", events.size());
 
-	for(int i=0; i<events.size(); i++)
+	int entries = events.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i < entries; i++)
 	{
 		addToList(events[i]);
 	}
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<Comment> &comments, const MAUtil::String &connType,
@@ -149,11 +206,16 @@ void ConnectionRequestCommand::received(const MAUtil::Vector<Comment> &comments,
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d Comments.", comments.size());
 
-	for(int i=0; i<comments.size(); i++)
+	int entries = comments.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i < entries; i++)
 	{
 		addToList(comments[i]);
 	}
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<Checkin> &checkins, const MAUtil::String &connType,
@@ -161,11 +223,16 @@ void ConnectionRequestCommand::received(const MAUtil::Vector<Checkin> &checkins,
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d Checkins.", checkins.size());
 
-	for(int i=0; i<checkins.size(); i++)
+	int entries = checkins.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i < entries; i++)
 	{
 		addToList(checkins[i]);
 	}
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<EventResponse> &responses, const MAUtil::String &connType,
@@ -173,11 +240,16 @@ void ConnectionRequestCommand::received(const MAUtil::Vector<EventResponse> &res
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d EventResponses.", responses.size());
 
-	for(int i=0; i<responses.size(); i++)
+	int entries = responses.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i < entries; i++)
 	{
 		addToList(responses[i]);
 	}
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<Link> &links, const MAUtil::String &connType,
@@ -185,11 +257,16 @@ void ConnectionRequestCommand::received(const MAUtil::Vector<Link> &links, const
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d Links.", links.size());
 
-	for(int i=0; i<links.size(); i++)
+	int entries = links.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i < entries; i++)
 	{
 		addToList(links[i]);
 	}
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
 void ConnectionRequestCommand::received(const MAUtil::Vector<StatusMessage> &messages, const MAUtil::String &connType,
@@ -197,14 +274,32 @@ void ConnectionRequestCommand::received(const MAUtil::Vector<StatusMessage> &mes
 {
 	LOG("\n\t\tConnectionRequestCommand::received %d StatusMessages.", messages.size());
 
-	for(int i=0; i<messages.size(); i++)
+	int entries = messages.size();
+	if(entries > mMaxEntriesInList)
+	{
+		entries = mMaxEntriesInList;
+	}
+	for(int i=0; i < entries; i++)
 	{
 		addToList(messages[i]);
 	}
-	mResponseScreen->show();
+	mJsonResponseScreen->show();
 }
 
-void ConnectionRequestCommand::errorReceivingConnecion(int code, const MAUtil::String &connType, const MAUtil::String &id)
+void ConnectionRequestCommand::received(MAHandle image, const MAUtil::String &connType, const MAUtil::String &objectId)
+{
+	LOG("\n\t\tConnectionRequestCommand::received image");
+	mImageResponseScreen->setImage(image);
+	mImageResponseScreen->show();
+}
+
+//*********************************************************************************************************************************
+
+
+/*
+ * This function is called when an error occurred.
+ */
+void ConnectionRequestCommand::errorReceivingConnection(int code, const MAUtil::String &connType, const MAUtil::String &id)
 {
 
 	LOG("\n\t\tConnectionRequestCommand::errorReceivingConnecion. connection=%s, id=%s", connType.c_str(), id.c_str());
@@ -212,19 +307,23 @@ void ConnectionRequestCommand::errorReceivingConnecion(int code, const MAUtil::S
 	MAUtil::String error = "Error retrieving connection " + connType +
 							". Error code: " + MAUtil::integerToString(code);
 
-	FacebookDemoGUI::ListItem *item = new FacebookDemoGUI::ListItem(NULL, error);
-	mResponseScreen->add(item);
-
-	mResponseScreen->show();
+	if(mPleaseWaitScreen)
+	{
+		mPleaseWaitScreen->setText(error);
+	}
 }
 
+/*
+ * sends the connection request to Facebook, using the FacebookManager object
+ */
 void ConnectionRequestCommand::execute()
 {
+	mPleaseWaitScreen->setText("Sending request. Please wait...");
 	mPleaseWaitScreen->show();
 
-	if(!mResponseScreen->isEmpty())
+	if(!mJsonResponseScreen->isEmpty())
 	{
-		mResponseScreen->clear();
+		mJsonResponseScreen->clear();
 	}
 
 	mFacebookManager->setConnectionRequestListener((ConnectionsManagerListener*)this);
@@ -240,77 +339,112 @@ void ConnectionRequestCommand::execute()
 
 ConnectionRequestCommand::~ConnectionRequestCommand()
 {
-	delete mResponseScreen;
+	delete mJsonResponseScreen;
+	delete mImageResponseScreen;
+	delete mPleaseWaitScreen;
 }
 
+/*
+ * creates the screen
+ */
 void ConnectionRequestCommand::createGUI(FacebookDemoGUI::FacebookDemoScreen *previousScreen)
 {
-	mResponseScreen = new FacebookDemoGUI::ListScreen(previousScreen);
+	LOG("\n\tConnectionRequestCommand::createGUI");
+	mJsonResponseScreen = new FacebookDemoGUI::ListScreen(previousScreen);
+	mJsonResponseScreen->clearScreenAfterLosingFocus(true);
+
+	mImageResponseScreen = new FacebookDemoGUI::ImageScreen(previousScreen);
+
 	mPleaseWaitScreen = new FacebookDemoGUI::TextScreen();
 	mPleaseWaitScreen->setText("Sending request. Please wait...");
 }
 
+/*
+ * creates a list item (on which a Facebook object will be displayed)
+ */
 FacebookDemoGUI::ListItem *ConnectionRequestCommand::createItem(FacebookDemoApplication::ICommand *command,
 		const MAUtil::String &itemText)
 {
 	FacebookDemoGUI::ListItem *item = new FacebookDemoGUI::ListItem(command, itemText);
 
-	item->setProperty(MAW_WIDGET_ALPHA, (float)0.0);
-	item->setFontColor(0xFFFFFF);
+//	item->setProperty(MAW_WIDGET_ALPHA, (float)0.0);
+//	item->setFontColor(0xFFFFFF);
 
-	item->setProperty(MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_LEFT);
-	item->centerTextVertically();
-	item->wrapContentVertically();
+//	item->setProperty(MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_LEFT);
+//	item->centerTextVertically();
+//	item->wrapContentVertically();
 
 	return item;
 }
 
+//*********************************************************************************************************************************
+/*
+ * adds to the list a item that displays a Facebook object (can be a Album, Comment ect)
+ */
 void ConnectionRequestCommand::addToList(const Album &album)
 {
-	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
-	addConnection(openMenuCmd, Connections<Album>::photos(),   album.getId());
-	addConnection(openMenuCmd, Connections<Album>::likes(), 	 album.getId());
-	addConnection(openMenuCmd, Connections<Album>::comments(), album.getId());
-	addConnection(openMenuCmd, Connections<Album>::picture() + MAUtil::String("(Android bug)"),  album.getId());
+	MAUtil::Vector<MAUtil::String> fields;
+	fields.add("id");
+	fields.add("name");
+	addConnection(openMenuCmd, Connections<Album>::photos(),  fields,  album.getId());
+	addConnection(openMenuCmd, Connections<Album>::likes(),   album.getId());
+
+	fields.clear();
+	fields.add("id");
+	fields.add("from");
+	fields.add("message");
+	addConnection(openMenuCmd, Connections<Album>::comments(), fields, album.getId());
+//	addConnection(openMenuCmd, Connections<Album>::picture(),  album.getId());
 
 	addComment(openMenuCmd, album.getId());
 	addLike(openMenuCmd, 	album.getId());
 	addUnlike(openMenuCmd, 	album.getId());
 
-	FacebookDemoGUI::ListItem *uploadPhoto = new FacebookDemoGUI::ListItem(NULL, "upload photo to this album");
-	openMenuCmd->addMenuItem(uploadPhoto);
+//	FacebookDemoGUI::ListItem *uploadPhoto = new FacebookDemoGUI::ListItem(NULL, "upload photo to this album");
+//	openMenuCmd->addMenuItem(uploadPhoto);
 
 	MAUtil::String result;
 	createString(album, result);
 
 	FacebookDemoGUI::ListItem *item = createItem(openMenuCmd, result);
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const Comment &comment)
 {
-	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
 	MAUtil::String result;
 	createString(comment, result);
 	FacebookDemoGUI::ListItem *item = createItem(openMenuCmd, result);
 
 	addConnection(openMenuCmd, Connections<Comment>::likes(), comment.getId());
+
 	addLike(openMenuCmd, 	comment.getId());
 	addUnlike(openMenuCmd, 	comment.getId());
-	removeComment(openMenuCmd, comment.getId(), item);
 
-	mResponseScreen->add(item);
+	if(comment.getMessage().find("MOSYNC") != MAUtil::String::npos)
+	{
+		removeComment(openMenuCmd, comment.getId(), item);
+	}
+
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const Photo &photo)
 {
-	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
+	MAUtil::Vector<MAUtil::String> fields;
+	fields.add("id");
+	fields.add("from");
+	fields.add("message");
 	addConnection(openMenuCmd, Connections<Photo>::comments(), photo.getId());
+
 	addConnection(openMenuCmd, Connections<Photo>::likes(),    photo.getId());
-	addConnection(openMenuCmd, Connections<Photo>::picture(),  photo.getId());
+//	addConnection(openMenuCmd, Connections<Photo>::picture(),  photo.getId());
 	addConnection(openMenuCmd, Connections<Photo>::tags(), 	 photo.getId());
 
 	addComment(openMenuCmd, photo.getId());
@@ -321,7 +455,7 @@ void ConnectionRequestCommand::addToList(const Photo &photo)
 	createString(photo, result);
 	FacebookDemoGUI::ListItem *item = createItem(openMenuCmd, result);
 
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const CategoryData &data, const MAUtil::String &connType, const MAUtil::String &objectId)
@@ -333,7 +467,7 @@ void ConnectionRequestCommand::addToList(const CategoryData &data, const MAUtil:
 	ICommand *itemCmd = NULL;
 	if(connType == "friendlists")
 	{
-		OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+		OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
 		addConnection(openMenuCmd, Connections<FriendList>::members(), data.mId);
 		removeFriendList(openMenuCmd, data.mId, item);
@@ -341,7 +475,7 @@ void ConnectionRequestCommand::addToList(const CategoryData &data, const MAUtil:
 		itemCmd = openMenuCmd;
 	}
 	item->setCommand(itemCmd);
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const IdNamePair &pair, const MAUtil::String &connType, const MAUtil::String &objectId)
@@ -353,26 +487,59 @@ void ConnectionRequestCommand::addToList(const IdNamePair &pair, const MAUtil::S
 	ICommand *itemCmd = NULL;
 	if( (connType == "members") || (connType == "friends") ) //retrieved Users
 	{
-		OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+		OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
+		MAUtil::Vector<MAUtil::String> fields;
 
 		addConnection(openMenuCmd, Connections<User>::accounts(), 	pair.mId);
 		addConnection(openMenuCmd, Connections<User>::activities(), pair.mId);
-		addConnection(openMenuCmd, Connections<User>::albums(), 	pair.mId);
+
+		fields.add("name");
+		fields.add("id");
+		addConnection(openMenuCmd, Connections<User>::albums(), 	fields, pair.mId);
 		addConnection(openMenuCmd, Connections<User>::books(), 		pair.mId);
-		addConnection(openMenuCmd, Connections<User>::checkins(), 	pair.mId);
+
+		fields.clear();
+		fields.add("id");
+		fields.add("place");
+		addConnection(openMenuCmd, Connections<User>::checkins(), 	fields, pair.mId);
+
+		fields.clear();
+		fields.add("id");
+		fields.add("name");
+	//	fields.add("start_time");
+		fields.add("location");
 		addConnection(openMenuCmd, Connections<User>::events(), 	pair.mId);
-		addConnection(openMenuCmd, Connections<User>::feed(), 		pair.mId);
-		addConnection(openMenuCmd, Connections<User>::home(), 		pair.mId);
+
+		fields.clear();
+		fields.add("id");
+		fields.add("from");
+		fields.add("name");
+//		fields.add("caption");
+		fields.add("message");
+		fields.add("application");
+		fields.add("type");
+		addConnection(openMenuCmd, Connections<User>::feed(), 		fields, pair.mId);
+
 		addConnection(openMenuCmd, Connections<User>::interests(), 	pair.mId);
 		addConnection(openMenuCmd, Connections<User>::likes(), 		pair.mId);
-		addConnection(openMenuCmd, Connections<User>::links(), 		pair.mId);
+
+		fields.clear();
+		fields.add("id");
+		fields.add("name");
+		addConnection(openMenuCmd, Connections<User>::links(), 		fields, pair.mId);
 		addConnection(openMenuCmd, Connections<User>::music(), 		pair.mId);
-		addConnection(openMenuCmd, Connections<User>::photos(), 	pair.mId);
-		addConnection(openMenuCmd, Connections<User>::picture(), 	pair.mId);
-		addConnection(openMenuCmd, Connections<User>::posts(), 		pair.mId);
+
+
+		fields.clear();
+		fields.add("from");
+		fields.add("name");
+		fields.add("id");
+		fields.add("count");
+		addConnection(openMenuCmd, Connections<User>::photos(), 	fields, pair.mId);
+//		addConnection(openMenuCmd, Connections<User>::picture(), 	pair.mId);
+
 		addConnection(openMenuCmd, Connections<User>::statuses(), 	pair.mId);
 		addConnection(openMenuCmd, Connections<User>::television(), pair.mId);
-		addConnection(openMenuCmd, Connections<User>::videos(), 	pair.mId);
 
 		if((connType == "members"))
 		{
@@ -383,57 +550,77 @@ void ConnectionRequestCommand::addToList(const IdNamePair &pair, const MAUtil::S
 	}
 
 	item->setCommand(itemCmd);
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const Post &post)
 {
-	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
-	addConnection(openMenuCmd, Connections<Post>::comments(), post.getId());
+	MAUtil::Vector<MAUtil::String> fields;
+	fields.add("id");
+	fields.add("message");
+	fields.add("from");
+	addConnection(openMenuCmd, Connections<Post>::comments(), fields, post.getId());
 	addConnection(openMenuCmd, Connections<Post>::likes(),    post.getId());
 
-	addComment(openMenuCmd, post.getId());
-	addLike(openMenuCmd, 	post.getId());
-	addUnlike(openMenuCmd, 	post.getId());
+	if(post.getType() != "status")		//Facebook bug: http://forum.developers.facebook.net/viewtopic.php?id=36750
+	{
+		addComment(openMenuCmd, post.getId());
+		addLike(openMenuCmd, 	post.getId());
+		addUnlike(openMenuCmd, 	post.getId());
+	}
 
 	MAUtil::String result;
 	createString(post, result);
 	FacebookDemoGUI::ListItem *item = createItem(openMenuCmd, result);
 
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const Note &note)
 {
-	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
 	MAUtil::String result;
 	createString(note, result);
 	FacebookDemoGUI::ListItem *item = createItem(openMenuCmd, result);
 
-	addConnection(openMenuCmd, Connections<Note>::comments(), note.getId());
+	MAUtil::Vector<MAUtil::String> fields;
+	fields.add("id");
+	fields.add("message");
+	fields.add("from");
+	addConnection(openMenuCmd, Connections<Note>::comments(), fields, note.getId());
 	addConnection(openMenuCmd, Connections<Note>::likes(),    note.getId());
 
 	addComment(openMenuCmd, note.getId());
-	addLike(openMenuCmd, 	note.getId());
-	addUnlike(openMenuCmd, 	note.getId());
-	removeNote(openMenuCmd, note.getId(), item);
+	addLike(openMenuCmd,	note.getId());
+	addUnlike(openMenuCmd,	note.getId());
+	removeNote(openMenuCmd,	note.getId(), item);
 
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const Event &event)
 {
-	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
-	addConnection(openMenuCmd, Connections<Event>::feed(), 	  	event.getId());
-	addConnection(openMenuCmd, Connections<Event>::noreply(),   event.getId());
-	addConnection(openMenuCmd, Connections<Event>::maybe(), 	event.getId());
-	addConnection(openMenuCmd, Connections<Event>::invited(),   event.getId());
-	addConnection(openMenuCmd, Connections<Event>::attending(), event.getId());
-	addConnection(openMenuCmd, Connections<Event>::declined(),  event.getId());
-	addConnection(openMenuCmd, Connections<Event>::picture(),   event.getId());
+	MAUtil::Vector<MAUtil::String> fields;
+	fields.add("id");
+	fields.add("message");
+	fields.add("from");
+	addConnection(openMenuCmd, Connections<Event>::feed(),		fields, event.getId());
+
+	addConnection(openMenuCmd, Connections<Event>::noreply(),	event.getId());
+
+
+	addConnection(openMenuCmd, Connections<Event>::maybe(),		event.getId());
+
+	addConnection(openMenuCmd, Connections<Event>::invited(),	event.getId());
+
+	addConnection(openMenuCmd, Connections<Event>::attending(),	event.getId());
+	addConnection(openMenuCmd, Connections<Event>::declined(),	event.getId());
+//	addConnection(openMenuCmd, Connections<Event>::picture(),	event.getId());
 
 	addStatusMessageOnWall(openMenuCmd, event.getId());
 	addLinkOnWall(openMenuCmd, event.getId());
@@ -447,24 +634,22 @@ void ConnectionRequestCommand::addToList(const Event &event)
 	createString(event, result);
 	FacebookDemoGUI::ListItem *item = createItem(openMenuCmd, result);
 
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const Checkin &checkin)
 {
-	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
-	addConnection(openMenuCmd, Connections<Checkin>::comments(), checkin.getId());
-	addConnection(openMenuCmd, Connections<Checkin>::likes(),    checkin.getId());
-	addComment(openMenuCmd, checkin.getId());
-	addLike(openMenuCmd, 	checkin.getId());
-	addUnlike(openMenuCmd, 	checkin.getId());
+	addConnection(openMenuCmd, Connections<Checkin>::comments(),	checkin.getId());
+	addConnection(openMenuCmd, Connections<Checkin>::likes(),	checkin.getId());
+
 
 	MAUtil::String result;
 	createString(checkin, result);
 	FacebookDemoGUI::ListItem *item = createItem(openMenuCmd, result);
 
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const EventResponse &response)
@@ -473,41 +658,59 @@ void ConnectionRequestCommand::addToList(const EventResponse &response)
 	createString(response, result);
 	FacebookDemoGUI::ListItem *item = createItem(NULL, result);
 
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const Link &link)
 {
-	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
-	addConnection(openMenuCmd, Connections<Link>::comments(), link.getId());
-	addConnection(openMenuCmd, Connections<Link>::likes(), link.getId());
+	MAUtil::Vector<MAUtil::String> fields;
+	fields.add("id");
+	fields.add("message");
+	fields.add("from");
+	addConnection(openMenuCmd, Connections<Link>::comments(), fields, link.getId());
+
+addConnection(openMenuCmd, Connections<Link>::likes(), link.getId());
 	addComment(openMenuCmd, link.getId());
 
 	MAUtil::String result;
 	createString(link, result);
 	FacebookDemoGUI::ListItem *item = createItem(openMenuCmd, result);
 
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
 
 void ConnectionRequestCommand::addToList(const StatusMessage &msg)
 {
-	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mResponseScreen);
+	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
-	addConnection(openMenuCmd, Connections<StatusMessage>::comments(), msg.getId());
+	MAUtil::Vector<MAUtil::String> fields;
+	fields.add("id");
+	fields.add("message");
+	fields.add("from");
+	addConnection(openMenuCmd, Connections<StatusMessage>::comments(), fields, msg.getId());
+
 	addConnection(openMenuCmd, Connections<StatusMessage>::likes(),    msg.getId());
-	addComment(openMenuCmd, msg.getId());
-	addLike(openMenuCmd, 	msg.getId());
-	addUnlike(openMenuCmd, 	msg.getId());
+
+	addComment(openMenuCmd,	msg.getId());
+	addLike(openMenuCmd,	msg.getId());
+	addUnlike(openMenuCmd,	msg.getId());
 
 	MAUtil::String result;
 	createString(msg, result);
 	FacebookDemoGUI::ListItem *item = createItem(openMenuCmd, result);
 
-	mResponseScreen->add(item);
+	mJsonResponseScreen->add(item);
 }
+//*********************************************************************************************************************************
 
+
+
+//*********************************************************************************************************************************
+/*
+ * converts a Facebook object into a string that can be displayed to the user
+ */
 void ConnectionRequestCommand::createString(const Album &album, MAUtil::String &result)
 {
 	result.clear();
@@ -675,54 +878,54 @@ void ConnectionRequestCommand::createString(const Post &post, MAUtil::String &re
 	result.clear();
 	if(post.getName().size()>0)
 	{
-		result += "name: " + post.getName();
+		result += "name: " + post.getName() + "\n";
 	}
 	if(post.getId().size()>0)
 	{
 		addNewline(result);
-		result += "id: " + post.getId();
+		result += "id: " + post.getId() + "\n";
 	}
 	if(post.getCaption().size()>0)
 	{
 		addNewline(result);
-		result += "caption: " + post.getCaption();
+		result += "caption: " + post.getCaption() + "\n";
 	}
 	if(post.getDescription().size()>0)
 	{
 		addNewline(result);
-		result += "description: " + post.getDescription();
+		result += "description: " + post.getDescription() + "\n";
 	}
 	if(post.getMessage().size()>0)
 	{
 		addNewline(result);
-		result += "message: " + post.getMessage();
+		result += "message: " + post.getMessage() + "\n";
 	}
 	if(post.getLink().size()>0)
 	{
 		addNewline(result);
-		result += "link: " + post.getLink();
+		result += "link: " + post.getLink() + "\n";
 	}
 	if(post.getToField().mName.size()>0)
 	{
 		addNewline(result);
 		result += "to: " + post.getToField().mName;
-		result += "   id: " + post.getToField().mId;
+		result += "   id: " + post.getToField().mId + "\n";
 	}
 	if(post.getPictureUrl().size()>0)
 	{
 		addNewline(result);
-		result += "picture URL: " + post.getPictureUrl();
+		result += "picture URL: " + post.getPictureUrl() + "\n";
 	}
 	if(post.getVideoUrl().size()>0)
 	{
 		addNewline(result);
-		result += "video URL: " + post.getVideoUrl();
+		result += "video URL: " + post.getVideoUrl() + "\n";
 	}
 	if(post.getApplication().mName.size()>0)
 	{
 		addNewline(result);
-		result += "application:  " + post.getApplication().mName;
-		result += "\t\t\tid: " + post.getApplication().mId;
+		result += "application:  " + post.getApplication().mName + "\n";
+		result += "\t\t\tid: " + post.getApplication().mId + "\n";
 	}
 	if(post.getComments().size()>0)
 	{
@@ -749,7 +952,7 @@ void ConnectionRequestCommand::createString(const Post &post, MAUtil::String &re
 	if(post.getType().size()>0)
 	{
 		addNewline(result);
-		result += "type: " + post.getType();
+		result += "type: " + post.getType() + "\n";
 	}
 	if(post.getFromField().mName.size()>0)
 	{
@@ -1018,7 +1221,7 @@ void ConnectionRequestCommand::createString(const EventResponse &response, MAUti
 	if(response.mRsvp_Status.size()>0)
 	{
 		addNewline(result);
-		result += "rsvp_status" + response.mRsvp_Status;
+		result += "rsvp_status: " + response.mRsvp_Status;
 	}
 }
 
@@ -1087,7 +1290,11 @@ void ConnectionRequestCommand::createString(const StatusMessage &msg, MAUtil::St
 		result += "\t\tid: " + msg.getFrom().mId;
 	}
 }
+//*********************************************************************************************************************************
 
+/*
+ * adds a newline to the end of the string (if the newline isn't added already)
+ */
 void ConnectionRequestCommand::addNewline(MAUtil::String &result)
 {
 	if(result.size()>0 && result[result.size()-1] != '\n')
@@ -1096,11 +1303,14 @@ void ConnectionRequestCommand::addNewline(MAUtil::String &result)
 	}
 }
 
+/*
+	 * adds a connection request command on a button. Adds the button to a menu (the screen contained in openMenuCmd)
+	 */
 void ConnectionRequestCommand::addConnection(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &connectionName,
 		const MAUtil::String &id)
 {
 
-	ConnectionRequestCommand *connectionRequest = new ConnectionRequestCommand( mFacebookManager,
+	ConnectionRequestCommand *connectionRequest = new ConnectionRequestCommand(	mFacebookManager,
 																				openMenuCmd->getMenuScreen(),
 																				connectionName,
 																				id);
@@ -1109,6 +1319,23 @@ void ConnectionRequestCommand::addConnection(FacebookDemoApplication::OpenMenuCo
 	openMenuCmd->addMenuItem(connection);
 }
 
+void ConnectionRequestCommand::addConnection( FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &connectionName,
+					const MAUtil::Vector<MAUtil::String> &fields, const MAUtil::String &id)
+{
+	ConnectionRequestCommand *connectionRequest = new ConnectionRequestCommand(	mFacebookManager,
+																				openMenuCmd->getMenuScreen(),
+																				connectionName,
+																				fields,
+																				id);
+
+		FacebookDemoGUI::ListItem *connection = new FacebookDemoGUI::ListItem(connectionRequest, connectionName);
+		openMenuCmd->addMenuItem(connection);
+}
+
+
+/*
+ * adds a like command on a button. Adds the button to a menu (the screen contained in openMenuCmd)
+ */
 void ConnectionRequestCommand::addLike(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &id)
 {
 	LikeCommand *likeCmd = new LikeCommand( mFacebookManager, openMenuCmd->getMenuScreen() , id);
@@ -1117,6 +1344,9 @@ void ConnectionRequestCommand::addLike(FacebookDemoApplication::OpenMenuCommand 
 	openMenuCmd->addMenuItem(likeItem);
 }
 
+/*
+ * adds a unlike command on a button. Adds the button to a menu (the Screen contained in openMenuCmd)
+ */
 void ConnectionRequestCommand::addUnlike(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &id)
 {
 	UnlikeCommand *unlikeCmd = new UnlikeCommand( mFacebookManager, openMenuCmd->getMenuScreen(), id);
@@ -1125,6 +1355,9 @@ void ConnectionRequestCommand::addUnlike(FacebookDemoApplication::OpenMenuComman
 	openMenuCmd->addMenuItem(unlikeItem);
 }
 
+/*
+ * adds a comment button to a menu screen. Adds the button to a menu (the Screen contained in openMenuCmd)
+ */
 void ConnectionRequestCommand::addComment(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &id)
 {
 	AddCommand<Comment> *createCommentCmd = new AddCommand<Comment>( mFacebookManager, openMenuCmd->getMenuScreen(), id);
@@ -1134,6 +1367,9 @@ void ConnectionRequestCommand::addComment(FacebookDemoApplication::OpenMenuComma
 	openMenuCmd->addMenuItem(createComment);
 }
 
+/*
+ * adds a "add a link to wall"  command on a button.
+ */
 void ConnectionRequestCommand::addLinkOnWall(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &id)
 {
 	PostOnWallCommand<Link> *postLinkCommand = new PostOnWallCommand<Link>(mFacebookManager, openMenuCmd->getMenuScreen(), id);
@@ -1143,23 +1379,28 @@ void ConnectionRequestCommand::addLinkOnWall(FacebookDemoApplication::OpenMenuCo
 	openMenuCmd->addMenuItem(postLinkButton);
 }
 
+/*
+ * adds a "add post to wall"  command on a button. Adds the button to a menu (the Screen contained in openMenuCmd)
+ */
 void ConnectionRequestCommand::addPostOnWall(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &id)
 {
 	PostOnWallCommand<Post> *addPostCommand = new PostOnWallCommand<Post>(mFacebookManager, openMenuCmd->getMenuScreen(), id);
 
 	addPostCommand->setPostParams(
-				"Post added with MOSYN SDK",  					//message
-				"http://www.youtube.com/watch?v=FL7yD-0pqZg", 	//link
-				"",												//picture URL. You can't post both both a link and a picture URL => change FacebookManager->addPost
-				"New Post object added with MOSYNC_SDK.",		//name
-				"Link from You Tube",							//caption
-				"Testing adding a post on wall with MOSYNC_SDK");//description
+				"Post added with MOSYN SDK",						//message
+				"http://www.youtube.com/watch?v=FL7yD-0pqZg",		//link
+				"New Post object added with MOSYNC_SDK.",			//name
+				"Link from You Tube",								//caption
+				"Testing adding a post on wall with MOSYNC_SDK");	//description
 
 
 	FacebookDemoGUI::ListItem *addPostButton = new FacebookDemoGUI::ListItem(addPostCommand, "add a post on wall");
 	openMenuCmd->addMenuItem(addPostButton);
 }
 
+/*
+ * adds a "add status message to wall"  request on a button. Adds the button to a menu (the Screen contained in openMenuCmd)
+ */
 void ConnectionRequestCommand::addStatusMessageOnWall(FacebookDemoApplication::OpenMenuCommand *openMenuCmd,
 		const MAUtil::String &id)
 {
@@ -1172,6 +1413,9 @@ void ConnectionRequestCommand::addStatusMessageOnWall(FacebookDemoApplication::O
 	openMenuCmd->addMenuItem(addStatusMessagButton);
 }
 
+/*
+ * adds a set event response command on a button. Adds the button to a menu (the Screen contained in openMenuCmd)
+ */
 void ConnectionRequestCommand::addEventResponse(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &eventId,
 		EVENT_RESPONSE_TYPE response)
 {
@@ -1199,38 +1443,50 @@ void ConnectionRequestCommand::addEventResponse(FacebookDemoApplication::OpenMen
 	openMenuCmd->addMenuItem(addEventResponseButton);
 }
 
+/*
+ * adds a "remove User"  request on button. Adds the button to a menu (the Screen contained in openMenuCmd)
+ */
 void ConnectionRequestCommand::removeUser(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &listId,
 		const MAUtil::String &userId, FacebookDemoGUI::ListItem *item)
 {
-	RemoveCommand<User> *removeUserCommand = new RemoveCommand<User>(mFacebookManager, openMenuCmd->getMenuScreen(), listId, item);
+	RemoveCommand<User> *removeUserCommand = new RemoveCommand<User>(mFacebookManager, openMenuCmd->getMenuScreen()->getPreviousScreen(), listId, item);
 	removeUserCommand->setUserId(userId);
 
 	FacebookDemoGUI::ListItem *removeUserButton = new FacebookDemoGUI::ListItem(removeUserCommand, "remove this user");
 	openMenuCmd->addMenuItem(removeUserButton);
 }
 
+/*
+ * adds a remove Comment command on a button. Adds the button to a menu (the Screen contained in openMenuCmd)
+ */
 void ConnectionRequestCommand::removeComment(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &id,
 		FacebookDemoGUI::ListItem *item)
 {
-	RemoveCommand<Comment> *removeCommentCmd = new RemoveCommand<Comment>(mFacebookManager, openMenuCmd->getMenuScreen(), id, item);
+	RemoveCommand<Comment> *removeCommentCmd = new RemoveCommand<Comment>(mFacebookManager, openMenuCmd->getMenuScreen()->getPreviousScreen(), id, item);
 
 	FacebookDemoGUI::ListItem *removeCommentButton = new FacebookDemoGUI::ListItem(removeCommentCmd, "remove this comment");
 	openMenuCmd->addMenuItem(removeCommentButton);
 }
 
+/*
+ * adds a remove Friendlist command on a button. Adds the button to a menu (the Screen contained in openMenuCmd)
+ */
 void ConnectionRequestCommand::removeFriendList(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &id,
 		FacebookDemoGUI::ListItem *item)
 {
-	RemoveCommand<FriendList> *removeFriendListCmd = new RemoveCommand<FriendList>(mFacebookManager, openMenuCmd->getMenuScreen(), id, item);
+	RemoveCommand<FriendList> *removeFriendListCmd = new RemoveCommand<FriendList>(mFacebookManager, openMenuCmd->getMenuScreen()->getPreviousScreen(), id, item);
 
 	FacebookDemoGUI::ListItem *removeFriendListButton = new FacebookDemoGUI::ListItem(removeFriendListCmd, "remove this friend list");
 	openMenuCmd->addMenuItem(removeFriendListButton);
 }
 
+/*
+ * adds a remove Note command on a button. Adds the button to a menu (the Screen contained in openMenuCmd)
+ */
 void ConnectionRequestCommand::removeNote(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &id,
 		FacebookDemoGUI::ListItem *item)
 {
-	RemoveCommand<Note> *removeNoteCmd = new RemoveCommand<Note>(mFacebookManager, openMenuCmd->getMenuScreen(), id, item);
+	RemoveCommand<Note> *removeNoteCmd = new RemoveCommand<Note>(mFacebookManager, openMenuCmd->getMenuScreen()->getPreviousScreen(), id, item);
 
 	FacebookDemoGUI::ListItem *removeNoteButton = new FacebookDemoGUI::ListItem(removeNoteCmd, "remove this note");
 	openMenuCmd->addMenuItem(removeNoteButton);

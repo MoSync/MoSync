@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * Link.h
- *
- *  Created on: Jul 2, 2011
- *      Author: gabi
  */
 
 #ifndef LINK_H_
@@ -86,13 +84,13 @@ public:
 	const MAUtil::String &getMessage() const;
 
 private:
-	IdNamePair mFrom;
-	MAUtil::String mLink;
-	MAUtil::String mName;
-	MAUtil::Vector<Comment> mComments;
-	MAUtil::String mDescription;
-	MAUtil::String mPicture;
-	MAUtil::String mMessage;
+	IdNamePair					mFrom;
+	MAUtil::String				mLink;
+	MAUtil::String				mName;
+	MAUtil::Vector<Comment>		mComments;
+	MAUtil::String				mDescription;
+	MAUtil::String				mPicture;
+	MAUtil::String				mMessage;
 };
 
 #endif /* LINK_H_ */

@@ -1,5 +1,7 @@
 package com.mosync.nativeui.ui.factories;
 
+import java.util.Calendar;
+
 import android.app.Activity;
 import android.widget.TimePicker;
 import android.widget.TimePicker.OnTimeChangedListener;
@@ -22,6 +24,11 @@ public class TimePickerFactory implements AbstractViewFactory
 		TimePicker timePicker = new TimePicker( activity);
 		// For the moment allow only 24hour mode.
 		timePicker.setIs24HourView(true);
+
+		// Init values.
+		Calendar today = Calendar.getInstance();
+		timePicker.setCurrentHour( today.get(Calendar.HOUR_OF_DAY) );
+		timePicker.setCurrentMinute( today.get(Calendar.MINUTE) );
 
 		timePicker.setOnTimeChangedListener( new OnTimeChangedListener()
 		{

@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * Video.h
- *
- *  Created on: Jul 1, 2011
- *      Author: gabi
  */
 
 #ifndef VIDEO_H_
@@ -88,13 +86,13 @@ public:
 	const MAUtil::Vector<Comment> &getComments() const;
 
 private:
-	IdNamePair mFrom;
-	MAUtil::Vector<IdNamePair> mTags;
-	MAUtil::String mName;
-	MAUtil::String mDescription;
-	MAUtil::String mPictureUrl;
-	MAUtil::String mSource;
-	MAUtil::Vector<Comment> mComments;
+	IdNamePair					mFrom;
+	MAUtil::Vector<IdNamePair>	mTags;
+	MAUtil::String				mName;
+	MAUtil::String				mDescription;
+	MAUtil::String				mPictureUrl;
+	MAUtil::String				mSource;
+	MAUtil::Vector<Comment>		mComments;
 };
 
 #endif /* VIDEO_H_ */

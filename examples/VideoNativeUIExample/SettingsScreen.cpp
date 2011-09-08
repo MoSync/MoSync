@@ -37,6 +37,7 @@ MA 02110-1301, USA.
  */
 SettingsScreen::SettingsScreen():
 	Screen(),
+	mMainLayout(NULL),
 	mListView(NULL),
 	mDisplayDuration(NULL),
 	mHomeUrl(NULL),
@@ -72,6 +73,7 @@ void SettingsScreen::listViewItemClicked(
 	if ( mListView == listView &&  mReloadItem == listViewItem )
 	{
 		// Reload the default source in VideoView.
+		// See this callback in MainScreen class.
 	}
 }
 

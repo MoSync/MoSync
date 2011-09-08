@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * FacebookRequest.h
- *
- *  Created on: Jul 20, 2011
- *      Author: gabi
  */
 
 #ifndef FACEBOOKREQUEST_H_
@@ -40,11 +38,11 @@ enum FACEBOOK_RESPONSE_TYPE { JSON = 2, IMAGE = 3, VIDEO = 4, STRING = 5, BOOLEA
 class FacebookRequest : public HttpRequest {
 public:
 	FacebookRequest(FACEBOOK_REQUEST_TYPE reqType,
-		FACEBOOK_RESPONSE_TYPE responseType,
-		const String& path,
-		String& accessToken,
-		int method,
-		const String postdata = "");
+					FACEBOOK_RESPONSE_TYPE responseType,
+					const String& path,
+					String& accessToken,
+					int method,
+					const String postdata = "");
 
 	virtual const String& getPath() const;
 

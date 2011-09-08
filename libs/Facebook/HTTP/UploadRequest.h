@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * UploadRequest.h
- *
- *  Created on: Aug 12, 2011
- *      Author: gabi
  */
 
 #ifndef UPLOADREQUEST_H_
@@ -29,42 +27,28 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include "FacebookRequest.h"
 
-class UploadRequest : public FacebookRequest {
+class UploadRequest : public FacebookRequest
+{
 public:
-	UploadRequest (const String& path,
-		String& accessToken,
-		const int *fileRawData,
-		int fileSize,
-		const MAUtil::String &contentType,
-		const MAUtil::String &fileName,
-		const MAUtil::String &message);
+	UploadRequest (	const String& path,
+					String& accessToken,
+					const byte *fileRawData,
+					int fileSize,
+					const MAUtil::String &contentType,
+					const MAUtil::String &fileName,
+					const MAUtil::String &message);
 
-	UploadRequest (const String& path,
-		String& accessToken,
-		const MAUtil::String &picture,
-		const MAUtil::String &contentType,
-		const MAUtil::String &fileName,
-		const MAUtil::String &message);
-
-	const int *getFileRawData()const;
+	const byte *getFileRawData()const;
 	int getFileRawDataSize() const;
 	const MAUtil::String &getContentType() const;
 	const MAUtil::String &getFileName() const;
 
-	const MAUtil::String &getPicture() const { return mPicture; }
 
 protected:
-	/*
-	 * Converts an array of ints into a string object.
-	 */
-	void convertIntArrayToString(int *pixels, MAUtil::String &str);
-protected:
-	const int *mFileRawData;
-	int mFileSize;
-	MAUtil::String mContentType;
-	MAUtil::String mFileName;
-
-	MAUtil::String mPicture;
+	const byte			*mFileRawData;
+	int					mFileSize;
+	MAUtil::String		mContentType;
+	MAUtil::String		mFileName;
 };
 
 #endif /* UPLOADREQUEST_H_ */

@@ -97,10 +97,13 @@ private:
 	Button* mSetDate;
 	Button* mGetDate;
 	Label*  mDisplayedDate;
+	HorizontalLayout* layout1;
 	Button* mSetMaxDate;
 	Button* mGetMaxDate;
+	HorizontalLayout* layout2;
 	Label*  mGetMaxDateValue;
 	Label*  mGetMinDateValue;
+	HorizontalLayout* layout3;
 	Button* mSetMinDate;
 	Button* mGetMinDate;
 

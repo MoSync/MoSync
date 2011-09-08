@@ -517,7 +517,7 @@ public:
 	}
 	int setValue(int field, int index, void* buf, int bufSize, int attributes) {
 		if(field == MA_PIM_FIELD_CONTACT_UID) {
-			return MA_PIM_ERR_READ_ONLY;
+			return MA_PIM_ERR_FIELD_READ_ONLY;
 		}
 		mIsModified = true;
 
@@ -534,14 +534,14 @@ public:
 		// special attributes
 		if(attributes & MA_PIM_ATTR_SMS) {
 			if(field != MA_PIM_FIELD_CONTACT_TEL) {
-				return MA_PIM_ERR_COMBO_UNSUPPORTED;
+				return MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
 			}
 			fieldType = KUidContactFieldSms;
 			mapping = KUidContactFieldVCardMapMSG;
 		}
 		if(attributes & MA_PIM_ATTR_FAX) {
 			if(field != MA_PIM_FIELD_CONTACT_TEL) {
-				return MA_PIM_ERR_COMBO_UNSUPPORTED;
+				return MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
 			}
 			fieldType = KUidContactFieldFax;
 			mapping = KUidContactFieldVCardMapTELFAX;
@@ -616,7 +616,7 @@ public:
 	int removeValue(int field, int index) {
 		LOGP("removeValue(%i, %i)\n", field, index);
 		if(field == MA_PIM_FIELD_CONTACT_UID) {
-			return MA_PIM_ERR_READ_ONLY;
+			return MA_PIM_ERR_FIELD_READ_ONLY;
 		}
 		mIsModified = true;
 

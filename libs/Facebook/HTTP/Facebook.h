@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -19,9 +20,6 @@ MA 02110-1301, USA.
  * Facebook.h
  *
  * A facebook implementation for MoSync
- *
- *  Created on: Feb 22, 2011
- *      Author: Magnus Hult <magnus@magnushult.se>
  */
 
 #ifndef FACEBOOK_H_
@@ -46,8 +44,8 @@ class RetrieveDataListener;
 class Facebook : public HttpProtocol, HttpProtocolListener {
 public:
 	Facebook(const String& appId, const MAUtil::Set<MAUtil::String>& permissions);
-
-	void setAppSecret(const MAUtil::String &appSecret);
+	Facebook(const String& appId, const MAUtil::Set<MAUtil::String> &permissions,
+			const MAUtil::String &oAuthUrl);
 
 	const String& getOAuthUrl() const;
 	void setPermissions(const MAUtil::Set<MAUtil::String>& permissions);
@@ -58,53 +56,54 @@ public:
 	void setRetrieveDataListener(RetrieveDataListener* listener);
 	void setPublishingListener(PublishingListener* listener);
 
-	void requestGraph(FACEBOOK_REQUEST_TYPE type,
-		FACEBOOK_RESPONSE_TYPE responseType,
-		const String& path,
-		int method,
-		const String postdata="");
+	void requestGraph(	FACEBOOK_REQUEST_TYPE type,
+						FACEBOOK_RESPONSE_TYPE responseType,
+						const String& path,
+						int method,
+						const String postdata="");
 
-	void requestGraph(FACEBOOK_REQUEST_TYPE type,
-		FACEBOOK_RESPONSE_TYPE responseType,
-		const String& path,
-		int method,
-		const Map<String, String>& messageBodyParams,
-		const String postdata="");
+	void requestGraph(	FACEBOOK_REQUEST_TYPE type,
+						FACEBOOK_RESPONSE_TYPE responseType,
+						const String& path,
+						int method,
+						const Map<String, String>& messageBodyParams,
+						const String postdata="");
 
-	void requestGraph(FACEBOOK_REQUEST_TYPE type,
-		FACEBOOK_RESPONSE_TYPE responseType,
-		const String& path,
-		int method,
-		const Map<String, String>& messageBodyParams,
-		const Map<String, String>& requestHeaders,
-		const String postdata="");
+	void requestGraph(	FACEBOOK_REQUEST_TYPE type,
+						FACEBOOK_RESPONSE_TYPE responseType,
+						const String& path,
+						int method,
+						const Map<String, String>& messageBodyParams,
+						const Map<String, String>& requestHeaders,
+						const String postdata="");
 
-	void postMultipartFormData(const MAUtil::String &ID, const MAUtil::String &reqType,
-		const int *pixels, int pictureArraySize,
-		const MAUtil::String &contentType,
-		const MAUtil::String &fileType, const MAUtil::String &fileName, const MAUtil::String &message ="" );
+	void postMultipartFormData(
+			const MAUtil::String &ID,
+			const MAUtil::String &reqType,
+			const byte *pixels,
+			int pictureArraySize,
+			const MAUtil::String &contentType,
+			const MAUtil::String &fileType,
+			const MAUtil::String &fileName,
+			const MAUtil::String &message ="" );
 
-	void postMultipartFormData(const MAUtil::String &ID, const MAUtil::String &reqType,
-		const MAUtil::String &picture,
-		const MAUtil::String &contentType,
-		const MAUtil::String &fileType, const MAUtil::String &fileName, const MAUtil::String &message ="" );
-
-	virtual void response(HttpRequest* request, HttpResponse* response);
+	virtual void response(HttpRequest* request, HttpResponse* res);
 
 	inline virtual ~Facebook() {}
 
 private:
 	bool extractConnectionTypeAndId(FacebookRequest *request, MAUtil::String &connectionType, MAUtil::String &id) const;
+	void initialize(const MAUtil::Set<MAUtil::String>& permissions);
+
 
 private:
 	String mAppId;
-	String mAppSecret;
 
 	String mAccessToken;
 	String mOAuthUrl;
 
-	RetrieveDataListener *mConnectionListener;
-	PublishingListener *mPublishingListener;
+	RetrieveDataListener 	*mConnectionListener;
+	PublishingListener 		*mPublishingListener;
 };
 
 #endif /* FACEBOOK_H_ */

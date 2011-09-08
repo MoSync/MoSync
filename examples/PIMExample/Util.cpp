@@ -1,19 +1,30 @@
 /*
- Copyright (C) 2011 MoSync AB
+Copyright (C) 2011 MoSync AB
 
- This program is free software; you can redistribute it and/or
- modify it under the terms of the GNU General Public License,
- version 2, as published by the Free Software Foundation.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
- GNU General Public License for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; if not, write to the Free Software
- Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
- MA 02110-1301, USA.
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
+/**
+ * @file Util.cpp
+ * @author Bogdan Iusco
+ *
+ * This file contains:
+ * - functions for reading/writing value from/to a buffer.
+ * - functions for getting the string associated with a attribute.
+ * - functions for getting the string associated with a field index.
+ * - method for printing the string associated with a error code.
  */
 
 #include "Util.h"
@@ -99,8 +110,9 @@ int writeWCharArraysToBuf(
         }
     }
 
-    return (char*) dst - charBuffer;
+    return ((char*) dst - charBuffer + sizeof(int));
 }
+
 /**
  * Print the result code.
  * If resultCode is different then MA_PIM_ERR_NONE prints
@@ -122,45 +134,62 @@ void printResultCode(const int resultCode)
     case MA_PIM_ERR_NATIVE_TYPE_MISMATCH:
         error = "MA_PIM_ERR_NATIVE_TYPE_MISMATCH";
         break;
+    case MA_PIM_ERR_LIST_TYPE_INVALID:
+        error = "MA_PIM_ERR_LIST_TYPE_INVALID";
+        break;
+    case MA_PIM_ERR_LIST_UNAVAILABLE:
+        error = "MA_PIM_LIST_UNAVAILABLE";
+        break;
+    case MA_PIM_ERR_LIST_ALREADY_OPENED:
+        error = "MA_PIM_ERR_LIST_ALREADY_OPENED";
+        break;
+    case MA_PIM_ERR_FIELD_INVALID:
+        error = "MA_PIM_ERR_FIELD_INVALID";
+        break;
     case MA_PIM_ERR_FIELD_UNSUPPORTED:
         error = "MA_PIM_ERR_FIELD_UNSUPPORTED";
         break;
-    case MA_PIM_ERR_READ_ONLY:
-        error = "MA_PIM_ERR_READ_ONLY";
-        break;
-    case MA_PIM_ERR_WRITE_ONLY:
-        error = "MA_PIM_ERR_WRITE_ONLY";
-        break;
-    case MA_PIM_ERR_COMBO_UNSUPPORTED:
-        error = "MA_PIM_ERR_COMBO_UNSUPPORTED";
+    case MA_PIM_ERR_FIELD_EMPTY:
+        error = "MA_PIM_ERR_FIELD_EMPTY";
         break;
     case MA_PIM_ERR_FIELD_COUNT_MAX:
         error = "MA_PIM_ERR_FIELD_COUNT_MAX";
         break;
+    case MA_PIM_ERR_FIELD_READ_ONLY:
+        error = "MA_PIM_ERR_FIELD_READ_ONLY";
+        break;
+    case MA_PIM_ERR_FIELD_WRITE_ONLY:
+        error = "MA_PIM_ERR_FIELD_WRITE_ONLY";
+        break;
+    case MA_PIM_ERR_INDEX_INVALID:
+        error = "MA_PIM_ERR_INDEX_INVALID";
+        break;
+    case MA_PIM_ERR_HANDLE_INVALID:
+        error = "MA_PIM_ERR_HANDLE_INVALID";
+        break;
+    case MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED:
+        error = "MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED";
+        break;
+    case MA_PIM_ERR_ATTRIBUTE_CUSTOM:
+        error = "MA_PIM_ERR_ATTRIBUTE_CUSTOM";
+        break;
+    case MA_PIM_ERR_NO_ATTRIBUTES:
+        error = "MA_PIM_ERR_NO_ATTRIBUTES";
+        break;
+    case MA_PIM_ERR_BUFFER_TOO_SMALL:
+        error = "MA_PIM_ERR_BUFFER_TOO_SMALL";
+        break;
+    case MA_PIM_ERR_BUFFER_INVALID:
+        error = "MA_PIM_ERR_BUFFER_INVALID";
+        break;
     case MA_PIM_ERR_NO_LABEL:
         error = "MA_PIM_ERR_NO_LABEL";
-        break;
-    case MA_PIM_ERR_CUSTOM_ATTRIBUTE:
-        error = "MA_PIM_ERR_CUSTOM_ATTRIBUTE";
-        break;
-    case MA_PIM_ERR_INVALID_INDEX:
-        error = "MA_PIM_ERR_INVALID_INDEX";
-        break;
-    case MA_PIM_ERR_UNAVAILABLE_LIST:
-        error = "MA_PIM_ERR_UNAVAILABLE_LIST";
-        break;
-    case MA_PIM_ERR_LIST_NOT_OPENED:
-        error = "MA_PIM_ERR_LIST_NOT_OPENED";
         break;
     case MA_PIM_ERR_OPERATION_NOT_PERMITTED:
         error = "MA_PIM_ERR_OPERATION_NOT_PERMITTED";
         break;
-    case MA_PIM_ERR_INVALID_HANDLE:
-        error = "MA_PIM_ERR_INVALID_HANDLE";
-        break;
-    case MA_PIM_ERR_EMPTY_FIELD:
-        error = "MA_PIM_ERR_EMPTY_FIELD";
-        break;
+    default:
+        error = "unknown error code";
     }
 
     error = "Error: " + error;

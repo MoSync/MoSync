@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * Note.h
- *
- *  Created on: Jul 6, 2011
- *      Author: gabi
  */
 
 #ifndef NOTE_H_
@@ -65,10 +63,10 @@ public:
 	const MAUtil::Vector<Comment> &getComments() const;
 
 private:
-	MAUtil::String mId;
-	IdNamePair mFrom;
-	MAUtil::String mSubject;
-	MAUtil::String mMessage;
+	MAUtil::String			mId;
+	IdNamePair				mFrom;
+	MAUtil::String			mSubject;
+	MAUtil::String			mMessage;
 	MAUtil::Vector<Comment> mComments;
 };
 

@@ -1,12 +1,21 @@
 package com.mosync.pim;
 
+import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.CommonDataKinds.Photo;
 
 public class PIMItem {
 
@@ -20,6 +29,12 @@ public class PIMItem {
 	void add(PIMField p)
 	{
 		mPIMFields.add(p);
+	}
+
+	void add(String itemType, String[] names)
+	{
+		PIMField p = new PIMField(itemType, names);
+		add(p);
 	}
 
 	PIMField getField(int type)
@@ -45,10 +60,10 @@ public class PIMItem {
 		return field.getMoSyncType();
 	}
 
-	void setID(String id, String type)
+	void setID(String id, String type, String[] names)
 	{
-		PIMField p = new PIMField(type);
-		p.add(new String[] {}, new String[] {id});
+		PIMField p = new PIMField(type, names);
+		p.add(new String[] {id});
 		add(p);
 	}
 
@@ -59,19 +74,59 @@ public class PIMItem {
 					+ Data.MIMETYPE + "='" + itemType + "'",
 					new String[] {String.valueOf(contactId)}, null);
 
+		PIMField p = new PIMField(itemType, columns);
 		if (cursor.getCount() > 0)
 		{
-			PIMField p = new PIMField(itemType);
 			while (cursor.moveToNext())
 		    {
+				DebugPrint("************START ENTRY");
 				String[] info = new String[columns.length];
 				for (int i=0; i<columns.length; i++)
-					info[i] = cursor.getString( cursor.getColumnIndex(columns[i]) );
+				{
+					if ( itemType.equals(Photo.CONTENT_ITEM_TYPE) && columns[i].equals(Photo.PHOTO))
+					{
+						info[i] = loadContactPhoto(cr, contactId);
+						if (info[i] != null)
+						{
+							DebugPrint(columns[i] + ": " + info[i] + "; length = " + info[i].length());
+						}
+						else
+						{
+							DebugPrint(columns[i] + " not available");
+						}
+					}
+					else
+					{
+						try
+						{
+							info[i] = cursor.getString( cursor.getColumnIndex(columns[i]) );
+							DebugPrint(columns[i] + ": " + info[i] + "; length = " + info[i].length());
+						}
+						catch (Exception e)
+						{
+							DebugPrint(columns[i] + " not available");
+						}
+					}
+				}
 
-				p.add(columns, info);
-		    }
-			add(p);
+				p.add(info);
+				DebugPrint("************END ENTRY");
+			}
 		}
+		DebugPrint("ADD: " + itemType);
+		add(p);
+	}
+
+	public String loadContactPhoto(ContentResolver cr, String id)
+	{
+		Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, Long.parseLong(id));
+		InputStream input = Contacts.openContactPhotoInputStream(cr, uri);
+		if (input == null)
+		{
+			return null;//getBitmapFromURL("http://thinkandroid.wordpress.com");
+		}
+
+		return Integer.toString(PIM.addImage(BitmapFactory.decodeStream(input)));
 	}
 
 	void updateField(ContentResolver cr, String dataIDName, String dataIDValue, String dataName, String dataValue)
