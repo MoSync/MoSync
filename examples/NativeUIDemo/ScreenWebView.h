@@ -27,28 +27,19 @@ MA 02110-1301, USA.
 #define SCREEN_WEB_VIEW_H_
 
 // Include all the wrappers.
-#include "UIWrapper/Widgets.h"
+#include <NativeUI/Widgets.h>
 
-using namespace MoSync::UI;
+using namespace NativeUI;
 
 /**
  * Class that creates a screen that displays a web view.
  */
 class ScreenWebView:
-    public WidgetEventListener // Used for listening widget events.
+	public Screen,
+	public ButtonListener,
+	public EditBoxListener
 {
 public:
-	/**
-	 * Create the web view screen.
-	 */
-	static Screen* create();
-
-	/**
-	 * Destroy the web view screen.
-	 */
-	static void destroy();
-
-private:
 	/**
 	 * Constructor.
 	 */
@@ -58,6 +49,23 @@ private:
 	 * Destructor.
 	 */
 	virtual ~ScreenWebView();
+
+    /**
+     * This method is called if the touch-up event was inside the
+     *  bounds of the button.
+     *  @param button The button object that generated the event.
+     */
+     virtual void buttonClicked(Widget* button);
+
+     /**
+      * This method is called when the return button was pressed.
+      * On iphone platform the virtual keyboard is not hidden after
+      * receiving this event.
+      * @param editBox The edit box object that generated the event.
+      */
+     virtual void editBoxReturn(EditBox* editBox);
+
+private:
 
 	/**
 	 * Creates the address bar widgets and layouts.
@@ -74,36 +82,12 @@ private:
 	VerticalLayout* createSpacer(const int width,const int height);
 
 	/**
-	 * This method is called when there is an event for a widget.
-	 * @param widget The widget object of the event.
-	 * @param widgetEventData The low-level event data.
-	 */
-	virtual void handleWidgetEvent(
-		Widget* widget,
-		MAWidgetEventData* widgetEventData);
-
-	/**
-	 * Returns a pointer to the screen object.
-	 * Ownership is not passed to the caller!
-	 */
-	Screen* getScreen() const;
-
-	/**
 	 * Open a web page.
 	 * @param url The desired URL web page.
 	 */
 	virtual void openURL(const MAUtil::String& url);
 
 private:
-	/**
-	 * Static ScreenWebView object(singleton design pattern).
-	 */
-	static ScreenWebView* sScreenWebView;
-
-	/**
-	 * A screen for this view.
-	 */
-	Screen* mScreen;
 
 	/**
 	 * Web view widget.

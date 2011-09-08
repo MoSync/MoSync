@@ -61,7 +61,7 @@ void MainScreen::createMainLayout() {
 	Screen::setMainWidget(mMainLayout);
 
 	mNavigationBar = new NavigationBar();
-	mNavigationBar->setBackBtnText("Back");
+	mNavigationBar->setBackButtonTitle("Back");
 	mNavigationBar->setTitle("My title");
 	mNavigationBar->fillSpaceHorizontally();
 	mMainLayout->addChild(mNavigationBar);

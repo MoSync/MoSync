@@ -173,6 +173,10 @@ void SettingsScreen::createUI()
 		maWidgetSetProperty(mSwapCameraButton,
 				MAW_WIDGET_ENABLED,
 				"false");
+
+		maWidgetSetProperty(mSwapCameraButton,
+				MAW_BUTTON_FONT_COLOR,
+				"0x969696");
 	}
 
 	//If the phone does not support flash disable the flash button
@@ -181,6 +185,10 @@ void SettingsScreen::createUI()
 		maWidgetSetProperty(mFlashModeButton,
 				MAW_WIDGET_ENABLED,
 				"false");
+
+		maWidgetSetProperty(mFlashModeButton,
+				MAW_BUTTON_FONT_COLOR,
+				"0x969696");
 	}
 
 

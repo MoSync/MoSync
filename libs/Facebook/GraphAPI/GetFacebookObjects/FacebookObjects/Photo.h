@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,11 +16,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*'
+/*
  * Photo.h
- *
- *  Created on: Jul 1, 2011
- *      Author: gabi
  */
 
 #ifndef PHOTO_H_
@@ -89,14 +87,14 @@ public:
 	int getPositionInAlbum() const;
 
 private:
-	IdNamePair mFrom;
-	MAUtil::String mName;
-	MAUtil::String mSmallSizedPictureUrl;
-	MAUtil::String mFullSizedPictureUrl;
-	int mWidth;
-	int mHeight;
-	MAUtil::String mLink;
-	int mPositionInAlbum;
+	IdNamePair		mFrom;
+	MAUtil::String	mName;
+	MAUtil::String	mSmallSizedPictureUrl;
+	MAUtil::String	mFullSizedPictureUrl;
+	int				mWidth;
+	int				mHeight;
+	MAUtil::String 	mLink;
+	int				mPositionInAlbum;
 };
 
 #endif

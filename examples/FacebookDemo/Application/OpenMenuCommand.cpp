@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,22 +18,18 @@ MA 02110-1301, USA.
 
 /*
  * OpenMenuCommand.cpp
- *
- *  Created on: Aug 5, 2011
- *      Author: gabi
  */
 
 #include "OpenMenuCommand.h"
-#include <Facebook/LOG.h>
+#include "Facebook/LOG.h"
 
 namespace FacebookDemoApplication
 {
 
 OpenMenuCommand::OpenMenuCommand(FacebookDemoGUI::FacebookDemoScreen *previousScreen)
 {
-//	LOG("\n\t\tOpenMenuCommand constructor BEGIN. this=%d", this);
 	mMenuScreen = new FacebookDemoGUI::ListScreen(previousScreen);
-//	LOG("\t\tOpenMenuCommand constructor END. this=%d\n", this);
+	mMenuScreen->clearScreenAfterLosingFocus(false);
 }
 
 void OpenMenuCommand::execute()
@@ -52,9 +49,7 @@ void OpenMenuCommand::addMenuItem(FacebookDemoGUI::ListItem *item)
 
 OpenMenuCommand::~OpenMenuCommand()
 {
-//	LOG("n\t\tOpenMenuCommand destructor BEGIN, this = %d");
 	delete mMenuScreen;
-//	LOG("\t\tOpenMenuCommand desctructor END, this=%d\n");
 }
 
 }//namespace FacebookDemoApplication

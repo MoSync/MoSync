@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,11 +18,9 @@ MA 02110-1301, USA.
 
 /*
  * FacebookMobletDemo.cpp
- *
- *  Created on: Aug 5, 2011
- *      Author: gabi
  */
 
+#include <maapi.h>
 #include <MAUtil/Set.h>
 #include <mastring.h>
 
@@ -38,78 +37,99 @@ MA 02110-1301, USA.
 #include "Application/ConnectionRequestCommand.h"
 #include "Application/PublishRequestCommand.h"
 
-#include "GUI/NativeUI/Screen.h"
-#include "GUI/NativeUI/Image.h"
+#include <NativeUI/Screen.h>
+#include <NativeUI/Image.h>
 
-FacebookDemoMoblet::FacebookDemoMoblet(const MAUtil::String &appId, const MAUtil::String &appSecret)
-{
-	initializeFacebook(appId, appSecret);
-	createGUI();
-
-	MAUtil::String oAuthUrl = mFacebookManager->getOAuthUrl();
-	LOG("\t\tOAuthUrl = %s", oAuthUrl.c_str());
-	mLoginScreen->setUrl(oAuthUrl);
-	mLoginScreen->show();
-}
+#include <matime.h>
 
 /**
- * Called when a key is pressed.
+ * The constructor creates the user interface and the FacebookManager
  */
-void FacebookDemoMoblet::keyPressEvent(int keyCode, int nativeCode)
+FacebookDemoMoblet::FacebookDemoMoblet(const MAUtil::String &appId):
+	mImage(NULL), mImageSize(0)
 {
-	LOG("\t\t!FacebookDemoMoblet::keyPressEvent keyCode=%d; ", keyCode);
-	if (MAK_HOME == keyCode )
-	{
-		close();
-	}
+
+	initializeFacebook(appId);
+
+	createGUI();
+
+	login();
 }
 
-void FacebookDemoMoblet::customEvent(const MAEvent &event)
+void FacebookDemoMoblet::login()
 {
-	if ( event.type != EVENT_TYPE_WIDGET )
-	{
+	MAUtil::String oAuthUrl = mFacebookManager->getOAuthUrl();
+	mLoginScreen->setUrl(oAuthUrl);
+	mLoginScreen->setListener(this);
+	mLoginScreen->show();
+
+	LOG("\t\tOAuthUrl = %s", oAuthUrl.c_str());
+}
+
+void FacebookDemoMoblet::webViewHookInvoked( NativeUI::WebView* webView, int hookType,
+		MAHandle urlData)
+{
+
+	int sz = maGetDataSize(urlData);
+
+	if(sz<=0)
 		return;
-	}
 
-	int eventType = ((MAWidgetEventData*) event.data)->eventType;
-	if ( eventType == MAW_EVENT_WEB_VIEW_URL_CHANGED )
+	char *newUrl = new char[sz];
+	maReadData(urlData, newUrl, 0, sz);
+	maDestroyObject(urlData);
+
+	LOG("\t\ttnew URL: %s", newUrl);
+
+	MAUtil::String access_token = extractAccessToken(newUrl);
+	if(access_token.size()>0)
 	{
-		const int BUFFER_SIZE = 16384;
-		char *newurl = new char[BUFFER_SIZE];
-		strcpy((char*) newurl, mLoginScreen->getRedirectUrl().c_str());
-		LOG("\n\t\t\tredirect url: %s", newurl);
-		if (strstr(newurl, "fbconnect://") == newurl)
-		{
-			char *accessToken = strstr(newurl, "access_token=") + strlen("access_token=");
-			char *expiresIn = strstr(newurl, "&expires_in=");
-			accessToken[expiresIn - accessToken] = 0;
-
-			mFacebookManager->setAccessToken(accessToken);
-
-			LOG("\t\t\tacces token receivied: %s\n", accessToken);
-
-			mMainMenu->show();
-			mMainMenu->receiveKeyEvents(true);
-		}
-		delete []newurl;
+		mFacebookManager->setAccessToken(access_token);
+		mMainScreen->show();
+		mMainScreen->receiveKeyEvents(true);
 	}
+
+	delete []newUrl;
+
+	LOG("\n\t\treceived access_token: %s", access_token.c_str());
 }
 
+void FacebookDemoMoblet::closeEvent()
+{
+	// Exit the app.
+	close();
+}
 
 FacebookDemoMoblet::~FacebookDemoMoblet()
 {
+	// cleanup
+	delete mFacebookManager;
 	delete mLoginScreen;
-	delete mMainMenu;
+	delete mMainScreen;
+	delete []mImage;
 }
 
-void FacebookDemoMoblet::initializeFacebook(const MAUtil::String &appId, const MAUtil::String &appSecret)
+/**
+ * creates the FacebookManager object, that handles the requests to Facebook, retrieving data and publishing
+ */
+void FacebookDemoMoblet::initializeFacebook(const MAUtil::String &appId)
 {
 	MAUtil::Set<MAUtil::String> permissions;
-	//access_token
+	//ask for a access_token
 	permissions.insert("offline_access");
 
+	/**
+	 * add to the "permissions" set the permission that we need for retrieving connections for
+	 * a User and publishing on a User's wall
+	 */
 	GetPermissionsFor<User>::Retrieve::onlyConnections(permissions);
 	GetPermissionsFor<User>::publishingData(permissions);
+
+
+	/**
+	 * add to the "permissions" set, the permissions that we need for retrieving an object, the connections for
+	 * that object and for publishing a object
+	 */
 	GetPermissionsFor<Album>::allPosibleRequests(permissions);
 	GetPermissionsFor<Checkin>::allPosibleRequests(permissions);
 	GetPermissionsFor<Comment>::allPosibleRequests(permissions);
@@ -124,51 +144,95 @@ void FacebookDemoMoblet::initializeFacebook(const MAUtil::String &appId, const M
 	mFacebookManager = new FacebookManager(appId, permissions);
 }
 
+/**
+ * creates the GUI
+ */
 void FacebookDemoMoblet::createGUI()
 {
 	using namespace FacebookDemoGUI;
 
+	/**
+	 * create the login screen and the main menu
+	 */
 	mLoginScreen = new FacebookLoginScreen();
-	mMainMenu = new ListScreen();
+	mMainScreen = new MainScreen(this);
+
+	/**
+	 * creation of buttons from the main menu
+	 */
 
 	//publish
-	uploadProfilePhoto(mMainMenu);
-	addLinkOnWall(mMainMenu);
-	addPostOnWall(mMainMenu);
-	addStatusMessageOnWall(mMainMenu);
+//	uploadProfilePhoto(mMainScreen);
+	addLinkOnWall(mMainScreen);
+	addPostOnWall(mMainScreen);
+	addStatusMessageOnWall(mMainScreen);
 
 	//connections
-	addActivitiesButton(mMainMenu);
-	addAlbumsButton(mMainMenu);
-	addBooksButton(mMainMenu);
-	addCheckinsButton(mMainMenu);
-	addFeedButton(mMainMenu);
-	addHomeButton(mMainMenu);
-	addInterestsButton(mMainMenu);
-	addLikesButton(mMainMenu);
-	addLinksButton(mMainMenu);
-	addMusicButton(mMainMenu);
-	addPhotosButton(mMainMenu);
-	addPictureButton(mMainMenu);
-	addPostsButton(mMainMenu);
-	addTelevisionButton(mMainMenu);
-	addEventsButton(mMainMenu);
-	addFriendsButton(mMainMenu);
-	addFriendListsButton(mMainMenu);
-	addNotesButton(mMainMenu);
-	addStatusMessagesButton(mMainMenu);
+	addActivitiesButton(mMainScreen);
+	addAlbumsButton(mMainScreen);
+	addBooksButton(mMainScreen);
+	addCheckinsButton(mMainScreen);
+	addFeedButton(mMainScreen);
+	addHomeButton(mMainScreen);
+	addInterestsButton(mMainScreen);
+	addLikesButton(mMainScreen);
+	addLinksButton(mMainScreen);
+	addMusicButton(mMainScreen);
+	addPhotosButton(mMainScreen);
+//	addPictureButton(mMainScreen);
+
+	addPostsButton(mMainScreen);
+	addTelevisionButton(mMainScreen);
+	addEventsButton(mMainScreen);
+	addFriendsButton(mMainScreen);
+	addFriendListsButton(mMainScreen);
+	addNotesButton(mMainScreen);
+	addStatusMessagesButton(mMainScreen);
 }
 
+
+MAUtil::String FacebookDemoMoblet::extractAccessToken(const char *newurl)
+{
+	MAUtil::String access_token;
+
+//	const int BUFFER_SIZE = 16384;
+//	char *newurl = new char[BUFFER_SIZE];
+//	strcpy((char*) newurl, newUrl.c_str());
+
+
+	if (strstr(newurl, "fbconnect://") == newurl)
+	{
+		Environment::getEnvironment().removeCustomEventListener(this);
+		char *accessToken = strstr(newurl, "access_token=") + strlen("access_token=");
+		char *expiresIn = strstr(newurl, "&expires_in=");
+		accessToken[expiresIn - accessToken] = 0;
+		access_token.append(accessToken, strlen(accessToken));
+	}
+
+	return access_token;
+}
+
+/**
+ * creates a button and adds it to the main menu
+ * adds on the button a command that sends the publish request to Facebook
+ */
 void FacebookDemoMoblet::uploadProfilePhoto(FacebookDemoGUI::ListScreen *menu)
 {
-	FacebookDemoApplication::AddCommand<Photo> *postPhotoCommand = new FacebookDemoApplication::AddCommand<Photo>(mFacebookManager, menu, "me");
-	postPhotoCommand->setPhoto(mPicture, "Some message. Testing.");
+	FacebookDemoApplication::AddCommand<Photo> *postPhotoCommand =
+			new FacebookDemoApplication::AddCommand<Photo>(mFacebookManager, menu, "me");
 
-	FacebookDemoGUI::ListItem *uploadButton = new FacebookDemoGUI::ListItem(NULL, "upload profile photo for user");
+	postPhotoCommand->setPhoto(mImage, mImageSize, "testing uploading a picture");
+
+	FacebookDemoGUI::ListItem *uploadButton = new FacebookDemoGUI::ListItem(postPhotoCommand,
+			"upload profile photo for user");
 	menu->add(uploadButton);
 
 }
 
+/**
+ * creates a button and adds it to the main menu
+ * adds on the button a command that sends the upload picture request to Facebook
+ */
 void FacebookDemoMoblet::addLinkOnWall(FacebookDemoGUI::ListScreen *menu)
 {
 
@@ -179,36 +243,69 @@ void FacebookDemoMoblet::addLinkOnWall(FacebookDemoGUI::ListScreen *menu)
 	menu->add(postLinkButton);
 }
 
+/**
+ * creates a button and adds it to the main menu
+ * adds on the button a command that sends the upload picture request to Facebook
+ */
 void FacebookDemoMoblet::addPostOnWall(FacebookDemoGUI::ListScreen *menu)
 {
-	FacebookDemoApplication::PostOnWallCommand<Post> *addPostCommand = new FacebookDemoApplication::PostOnWallCommand<Post>(mFacebookManager, menu, "me");
-	addPostCommand->setPostParams(
-		"Post added with MOSYN SDK",  					//message
-		"http://www.youtube.com/watch?v=FL7yD-0pqZg", 	//link
-		"",												//picture URL. You can't post both both a link and a picture URL => change FacebookManager->addPost
-		"New post :)",									//name
-		"Link from You Tube",							//caption
-		"Testing adding a post on wall with MOSYNC_SDK");//description
+	FacebookDemoApplication::PostOnWallCommand<Post> *addLinkCommand = new FacebookDemoApplication::PostOnWallCommand<Post>(mFacebookManager, menu, "me");
+	addLinkCommand->setPostParams(
+			"Post added with MOSYN SDK", 										//message
+			"http://www.youtube.com/watch?v=FL7yD-0pqZg",						//link
+			"New post",															//name
+			"Link from You Tube",												//caption
+			"Testing adding a post on wall with MOSYNC_SDK");					//description
 
-	FacebookDemoGUI::ListItem *addPostButton = new FacebookDemoGUI::ListItem(addPostCommand, "add a post on wall");
-	menu->add(addPostButton);
+	FacebookDemoGUI::ListItem *linkButton = new FacebookDemoGUI::ListItem(addLinkCommand, "add a post on wall (video)");
+	menu->add(linkButton);
+
+	FacebookDemoApplication::PostOnWallCommand<Post> *addPictureCommand = new FacebookDemoApplication::PostOnWallCommand<Post>(mFacebookManager, menu, "me");
+	addPictureCommand->setPostParams(
+				"Post added with MOSYN SDK",																			//message
+				"http://1.bp.blogspot.com/_8kXsPIEkJZI/RyHy_sITYCI/AAAAAAAAADc/4HTZMEhiVlw/s400/cats-in-love.jpg",		//link
+				"New post",																								//name
+				"Cats",																									//caption
+				"Testing adding a post on wall with MOSYNC_SDK");														//description
+
+	FacebookDemoGUI::ListItem *pictureButton = new FacebookDemoGUI::ListItem(addPictureCommand, "add a post on wall (picture)");
+	menu->add(pictureButton);
 }
 
+/**
+ * creates a button and adds it to the main menu
+ * adds on the button a command that sends the upload picture request to Facebook
+ */
 void FacebookDemoMoblet::addStatusMessageOnWall(FacebookDemoGUI::ListScreen *menu)
 {
 	FacebookDemoApplication::PostOnWallCommand<StatusMessage> *postStatusMessageCmd = new FacebookDemoApplication::PostOnWallCommand<StatusMessage>(mFacebookManager,
-		menu, "me");
-	postStatusMessageCmd->setMessage("Status message added on wall with MOSYNC_SDK");
+			menu, "me");
+	postStatusMessageCmd->setMessage("Status message added with MOSYNC_SDK");
 
 	FacebookDemoGUI::ListItem *addStatusMessagButton = new FacebookDemoGUI::ListItem(postStatusMessageCmd, "add a status message on wall");
 	menu->add(addStatusMessagButton);
 }
 
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addActivitiesButton(FacebookDemoGUI::ListScreen *menu)
 {
+	using namespace FacebookDemoGUI;
+	using namespace FacebookDemoApplication;
 
+	ConnectionRequestCommand *activitiesCmd = new ConnectionRequestCommand( mFacebookManager, menu,
+		Connections<User>::activities(), "me");
+
+	ListItem *button = new ListItem(activitiesCmd, "activities");
+	menu->add(button);
 }
 
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addAlbumsButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
@@ -216,21 +313,24 @@ void FacebookDemoMoblet::addAlbumsButton(FacebookDemoGUI::ListScreen *menu)
 
 	OpenMenuCommand *albumsButtonCmd = new OpenMenuCommand(menu);
 
-	//display the albums
+	/**
+	 * We only want to retrieve from Facebook the "name", "id", "description" and "count" fields from an Album object
+	 */
 	MAUtil::Vector<MAUtil::String> fields;
 	fields.add("name");
 	fields.add("id");
-	fields.add("description");
-	fields.add("count");
-	ConnectionRequestCommand *displayAlbumsCmd = new ConnectionRequestCommand(mFacebookManager,
-		albumsButtonCmd->getMenuScreen(),
-		Connections<User>::albums(), fields, "me");
+//	fields.add("description");
+//	fields.add("count");
+	ConnectionRequestCommand *displayAlbumsCmd = new ConnectionRequestCommand(  mFacebookManager,
+			albumsButtonCmd->getMenuScreen(),
+			Connections<User>::albums(), fields, "me");
 
 	ListItem *displayAlbums = new ListItem(displayAlbumsCmd, "display albums");
 	albumsButtonCmd->addMenuItem(displayAlbums);
 
 	//create new album
-	AddCommand<Album> *createAlbumCmd = new AddCommand<Album>(mFacebookManager, menu);
+	AddCommand<Album> *createAlbumCmd = new AddCommand<Album>( mFacebookManager,
+			albumsButtonCmd->getMenuScreen());
 	createAlbumCmd->setAlbumName("New album created with MOSYNC_SDK");
 
 	ListItem *createAlbum = new ListItem(createAlbumCmd, "create album");
@@ -240,18 +340,26 @@ void FacebookDemoMoblet::addAlbumsButton(FacebookDemoGUI::ListScreen *menu)
 	menu->add(albumsButton);
 }
 
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addBooksButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
 
 	ConnectionRequestCommand *displayActivitiesCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::activities(), "me");
+			Connections<User>::books(), "me");
 
-	ListItem *button = new ListItem(displayActivitiesCmd, "activities");
+	ListItem *button = new ListItem(displayActivitiesCmd, "books");
 	menu->add(button);
 }
 
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addCheckinsButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
@@ -259,19 +367,22 @@ void FacebookDemoMoblet::addCheckinsButton(FacebookDemoGUI::ListScreen *menu)
 
 	OpenMenuCommand *checkinsButtonCmd = new OpenMenuCommand(menu);
 
-	//display the checkins
+	/**
+	 * We only want to retrieve from Facebook the "place" and "id" fields from an Checkin object
+	 */
 	MAUtil::Vector<MAUtil::String> fields;
 	fields.add("id");
 	fields.add("place");
 	//fields.add("application");
 	ConnectionRequestCommand *displayCheckinsCmd = new ConnectionRequestCommand( mFacebookManager,
-		checkinsButtonCmd->getMenuScreen(), Connections<User>::checkins(), fields, "me");
+			checkinsButtonCmd->getMenuScreen(), Connections<User>::checkins(), fields, "me");
 
 	ListItem *displayCheckins = new ListItem(displayCheckinsCmd, "display checkins");
 	checkinsButtonCmd->addMenuItem(displayCheckins);
 
 	//create new checkin
-	AddCommand<Checkin> *createCheckinCmd = new AddCommand<Checkin>( mFacebookManager, checkinsButtonCmd->getMenuScreen());
+	AddCommand<Checkin> *createCheckinCmd = new AddCommand<Checkin>( mFacebookManager,
+			checkinsButtonCmd->getMenuScreen());
 	MAUtil::String placeIdMoSync = "126381597427662";
 	Coordinate coordMoSync;
 	coordMoSync.mLatitude = "59.339451";
@@ -285,60 +396,96 @@ void FacebookDemoMoblet::addCheckinsButton(FacebookDemoGUI::ListScreen *menu)
 	menu->add(checkinsButton);
 }
 
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addFeedButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
 
+	/**
+	 * We only want to retrieve from Facebook the "from", "id", "name" and "caption" fields from an Album object
+	 */
 	MAUtil::Vector<MAUtil::String> fields;
 	fields.add("id");
 	fields.add("from");
 	fields.add("name");
-	fields.add("caption"); //"application" "type"
+//	fields.add("caption");
+	fields.add("message");
+	fields.add("application");
+	fields.add("type");
 	ConnectionRequestCommand *displayFeedCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::feed(), fields, "me");
+			Connections<User>::feed(), fields, "me");
 
 	ListItem *feedButton = new ListItem(displayFeedCmd, "feed");
 	menu->add(feedButton);
 }
+
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addHomeButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
 
+	/**
+	 * We only want to retrieve from Facebook the "id", "name", and "caption"  fields from an Album object
+	 */
 	MAUtil::Vector<MAUtil::String> fields;
 	fields.add("id");
 	fields.add("from");
 	fields.add("name");
-	fields.add("caption"); //"application" "type"
+//	fields.add("caption");
+	fields.add("message");
+	fields.add("application");
+	fields.add("type");
 	ConnectionRequestCommand *displayHomeCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::home(), fields, "me");
+			Connections<User>::home(), fields, "me");
 
 	ListItem *homeButton = new ListItem(displayHomeCmd, "home");
 	menu->add(homeButton);
 }
+
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addInterestsButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
 
 	ConnectionRequestCommand *displayInterestsCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::interests(), "me");
+			Connections<User>::interests(), "me");
 
 	ListItem *button = new ListItem(displayInterestsCmd, "interests");
 	menu->add(button);
 }
+
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addLikesButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
 
 	ConnectionRequestCommand *displayLikesCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::likes(), "me");
+			Connections<User>::likes(), "me");
 
 	ListItem *button = new ListItem(displayLikesCmd, "likes");
 	menu->add(button);
 }
+
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addLinksButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
@@ -347,66 +494,100 @@ void FacebookDemoMoblet::addLinksButton(FacebookDemoGUI::ListScreen *menu)
 	MAUtil::Vector<MAUtil::String> fields;
 	fields.add("id");
 	fields.add("name");
-	fields.add("message");
+//	fields.add("message");
 	ConnectionRequestCommand *displayLinksCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::links(), fields, "me");
+			Connections<User>::links(), fields, "me");
 
 	ListItem *button = new ListItem(displayLinksCmd, "links");
 	menu->add(button);
 }
+
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addMusicButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
 
 	ConnectionRequestCommand *displayMusicCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::music(), "me");
+			Connections<User>::music(), "me");
 
 	ListItem *button = new ListItem(displayMusicCmd, "music");
 	menu->add(button);
 }
+
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addPhotosButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
 
+	/**
+	 * We only want to retrieve from Facebook the "from", "name" and "id" fields from an Photo object
+	 */
 	MAUtil::Vector<MAUtil::String> fields;
 	fields.add("from");
-	fields.add("name");
+//	fields.add("name");
 	fields.add("id");
 	ConnectionRequestCommand *displayPhotosCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::photos(), fields, "me");
+			Connections<User>::photos(), fields, "me");
 
 	ListItem *button = new ListItem(displayPhotosCmd, "photos");
 	menu->add(button);
 }
+
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addPictureButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
 
 	ConnectionRequestCommand *displayPictureCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::picture(), "me");
+			Connections<User>::picture(), "me");
 
 	ListItem *button = new ListItem(displayPictureCmd, "picture");
 	menu->add(button);
 }
+
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addPostsButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
 
+	/**
+	 * We only want to retrieve from Facebook the "id", "from", "name" and "caption" fields from an Album object
+	 */
 	MAUtil::Vector<MAUtil::String> fields;
 	fields.add("id");
 	fields.add("from");
 	fields.add("name");
-	fields.add("caption"); //"application" "type"
+//	fields.add("caption");
+	fields.add("message");
+	fields.add("application");
+	fields.add("type");
 	ConnectionRequestCommand *displayPostsCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::posts(), fields, "me");
+			Connections<User>::posts(), fields, "me");
 
 	ListItem *button = new ListItem(displayPostsCmd, "posts");
 	menu->add(button);
 }
+
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addTelevisionButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
@@ -419,6 +600,10 @@ void FacebookDemoMoblet::addTelevisionButton(FacebookDemoGUI::ListScreen *menu)
 	menu->add(button);
 }
 
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addEventsButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
@@ -426,30 +611,30 @@ void FacebookDemoMoblet::addEventsButton(FacebookDemoGUI::ListScreen *menu)
 
 	OpenMenuCommand *eventsButtonCmd = new OpenMenuCommand(menu);
 
-	//display the events
+	/**
+	 * We only want to retrieve from Facebook the "name", "id", "name" and "start_time" and "location" fields from an Event object
+	 */
 	MAUtil::Vector<MAUtil::String> fields;
 	fields.add("id");
 	fields.add("name");
-	fields.add("start_time");
+//	fields.add("start_time");
 	fields.add("location");
-	ConnectionRequestCommand *displayEventsCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::events(), fields, "me");
+	ConnectionRequestCommand *displayEventsCmd = new ConnectionRequestCommand( mFacebookManager,
+			eventsButtonCmd->getMenuScreen(), Connections<User>::events(), fields, "me");
 
 	ListItem *displayEvents = new ListItem(displayEventsCmd, "Display events");
 	eventsButtonCmd->addMenuItem(displayEvents);
 
 	//create new event
-	AddCommand<Event> *createEventCmd = new AddCommand<Event>( mFacebookManager, menu);
+	AddCommand<Event> *createEventCmd = new AddCommand<Event>( mFacebookManager,
+			eventsButtonCmd->getMenuScreen());
 
 	//event
-//	UnixTimeStamp startTimeStamp(Date("2012", "01", "10"), Time("8"));
-//	UnixTimeStamp endTimeStamp(Date("2012", "02", "10"), Time("10"));
-
 	UnixTimeStamp startTimeStamp(Date("2012", "10", "6"), Time("4","15","30"));
 	UnixTimeStamp endTimeStamp(Date("2012", "10", "6"), Time("5", "20","00"));
 
 	createEventCmd->setEventParams("New event created with MOSYNC_SDK", startTimeStamp, endTimeStamp,
-		"Testing creating an event", "Stockholm");
+			"Testing creating an event", "Stockholm");
 
 	ListItem *createEvent = new ListItem(createEventCmd, "Create event");
 	eventsButtonCmd->addMenuItem(createEvent);
@@ -458,6 +643,10 @@ void FacebookDemoMoblet::addEventsButton(FacebookDemoGUI::ListScreen *menu)
 	menu->add(eventsButton);
 }
 
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addFriendsButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
@@ -465,12 +654,16 @@ void FacebookDemoMoblet::addFriendsButton(FacebookDemoGUI::ListScreen *menu)
 
 	//display the friends
 	ConnectionRequestCommand *displayFriendsCmd = new ConnectionRequestCommand( mFacebookManager, menu,
-		Connections<User>::friends(), "me");
+			Connections<User>::friends(), "me");
 
 	ListItem *listsButton = new ListItem(displayFriendsCmd, "friends");
 	menu->add(listsButton);
 }
 
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addFriendListsButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
@@ -479,13 +672,34 @@ void FacebookDemoMoblet::addFriendListsButton(FacebookDemoGUI::ListScreen *menu)
 	OpenMenuCommand *listsButtonCmd = new OpenMenuCommand(menu);
 
 	//display the friend lists
-	ConnectionRequestCommand *displayListsCmd = new ConnectionRequestCommand( mFacebookManager, menu, Connections<User>::friendlists(), "me");
+	ConnectionRequestCommand *displayListsCmd = new ConnectionRequestCommand( mFacebookManager,
+			listsButtonCmd->getMenuScreen(),
+			Connections<User>::friendlists(), "me");
 	ListItem *displayLists = new ListItem(displayListsCmd, "Display friend lists");
 	listsButtonCmd->addMenuItem(displayLists);
 
 	//create new friend list
-	AddCommand<FriendList> *createListCmd = new AddCommand<FriendList>( mFacebookManager, menu );
-	createListCmd->setFriendlistName("New friendlist");
+	tm tmTimeStamp;
+	split_time(maLocalTime(), &tmTimeStamp);
+	MAUtil::String strTimeStamp;
+	strTimeStamp = MAUtil::integerToString(tmTimeStamp.tm_year + 1900);
+	strTimeStamp += "/";
+	strTimeStamp += MAUtil::integerToString(tmTimeStamp.tm_mon);
+	strTimeStamp += "/";
+	strTimeStamp += MAUtil::integerToString(tmTimeStamp.tm_mday);
+	strTimeStamp += "_";
+	strTimeStamp += MAUtil::integerToString(tmTimeStamp.tm_hour);
+	strTimeStamp += ":";
+	strTimeStamp += MAUtil::integerToString(tmTimeStamp.tm_min);
+	strTimeStamp += ":";
+	strTimeStamp += MAUtil::integerToString(tmTimeStamp.tm_sec);
+
+//	strTimeStamp += MAUtil::integerToString(tmTimeStamp.tm_sec + rand());
+
+	AddCommand<FriendList> *createListCmd = new AddCommand<FriendList>( mFacebookManager,
+			listsButtonCmd->getMenuScreen() );
+	createListCmd->setFriendlistName(strTimeStamp);
+
 	ListItem *createList = new ListItem(createListCmd, "Create friend list");
 	listsButtonCmd->addMenuItem(createList);
 
@@ -493,6 +707,10 @@ void FacebookDemoMoblet::addFriendListsButton(FacebookDemoGUI::ListScreen *menu)
 	menu->add(listsButton);
 }
 
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addNotesButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
@@ -500,19 +718,23 @@ void FacebookDemoMoblet::addNotesButton(FacebookDemoGUI::ListScreen *menu)
 
 	OpenMenuCommand *notesButtonCmd = new OpenMenuCommand(menu);
 
-	//display the notes
+	/**
+	 * We only want to retrieve from Facebook the "id", "subject" and "from" fields from an Album object
+	 */
 	MAUtil::Vector<MAUtil::String> fields;
 	fields.add("id");
 	fields.add("subject");
-	fields.add("from");
-	ConnectionRequestCommand *displayNotesCmd = new ConnectionRequestCommand( mFacebookManager, menu, Connections<User>::notes(),
-		fields, "me");
+//	fields.add("from");
+	ConnectionRequestCommand *displayNotesCmd = new ConnectionRequestCommand( mFacebookManager,
+			notesButtonCmd->getMenuScreen(),
+			Connections<User>::notes(), fields, "me");
 	ListItem *displayNotes = new ListItem(displayNotesCmd, "Display notes");
 	notesButtonCmd->addMenuItem(displayNotes);
 
 	//create new friend list
-	AddCommand<Note> *createNoteCmd = new AddCommand<Note>( mFacebookManager, menu);
-	createNoteCmd->setNoteParams("New note created with MOSYNC_SDK", "Testing creating a note with Facebook lib");
+	AddCommand<Note> *createNoteCmd = new AddCommand<Note>( mFacebookManager,
+			notesButtonCmd->getMenuScreen());
+	createNoteCmd->setNoteParams("New note created with MOSYNC_SDK", "Testing creating a note with Facebook library");
 	ListItem *createNote = new ListItem(createNoteCmd, "Create Note");
 	notesButtonCmd->addMenuItem(createNote);
 
@@ -520,6 +742,10 @@ void FacebookDemoMoblet::addNotesButton(FacebookDemoGUI::ListScreen *menu)
 	menu->add(listsButton);
 }
 
+/**
+ * Creates a button and adds it to the main menu
+ * Adds on the button a command that sends the connection request to Facebook
+ */
 void FacebookDemoMoblet::addStatusMessagesButton(FacebookDemoGUI::ListScreen *menu)
 {
 	using namespace FacebookDemoGUI;
@@ -527,12 +753,14 @@ void FacebookDemoMoblet::addStatusMessagesButton(FacebookDemoGUI::ListScreen *me
 
 	OpenMenuCommand *statusButtonCmd = new OpenMenuCommand(menu);
 
-	//display status messages
+	/**
+	 * We only want to retrieve from Facebook the "name", "id", "message" fields from an StatusMessage object
+	 */
 	MAUtil::Vector<MAUtil::String> fields;
 	fields.add("id");
 	fields.add("message");
 	ConnectionRequestCommand *displayStatusesCmd = new ConnectionRequestCommand( mFacebookManager,
-		menu, Connections<User>::statuses(), fields, "me");
+			menu, Connections<User>::statuses(), fields, "me");
 	ListItem *displayStatuses = new ListItem(displayStatusesCmd, "Display status messages");
 	statusButtonCmd->addMenuItem(displayStatuses);
 

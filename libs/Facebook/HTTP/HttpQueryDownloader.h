@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -14,6 +15,7 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
+
 
 #ifndef _HTTP_QUERY_DOWNLOADER_H_
 #define _HTTP_QUERY_DOWNLOADER_H_
@@ -51,17 +53,17 @@ private:
 class HttpQueryDownloadListener {
 public:
 	virtual void httpQueryFinished(HttpQueryDownloader* downloader,
-		const byte* data,
-		int length) = 0;
-	virtual void httpQueryFinished(HttpQueryDownloader* downloader, MAHandle resource) = 0;
+									const byte* data,
+									int length) {}
+	virtual void httpQueryFinished(HttpQueryDownloader* downloader, MAHandle resource) {}
 	virtual void httpQueryCancelled(HttpQueryDownloader* downloader);
 	virtual void httpQueryError(HttpQueryDownloader* downloader, int code) GCCATTRIB(noreturn);
-	virtual void httpWriteFinished(HttpQueryDownloader* downloader, int result) = 0;
+	virtual void httpWriteFinished(HttpQueryDownloader* downloader, int result) {}
 };
 
 class HttpQueryDownloader : MAUtil::DownloadListener, MAUtil::HttpConnectionListener {
 public:
-	HttpQueryDownloader(bool deliverResource = false);
+	HttpQueryDownloader();
 
 	void clearFields();
 	void addField(const HttpQueryField& field);
@@ -75,12 +77,9 @@ public:
 
 	void addListener(HttpQueryDownloadListener* listener);
 
-	// will start and perform the actual query
-	void doQuery();
+	void sendRequest(HttpRequest *req);
+	void sendRequest(UploadRequest *req);
 
-	void sendRequest(HttpRequest *request);
-
-	void sendRequest(UploadRequest *request);
 
 	// for posts, we can then write to it
 	void write(const byte* data, int length);
@@ -89,18 +88,17 @@ public:
 
 
 private:
-	void addEncodedFieldsToUrl(MAUtil::String &url);
-
-	void getMultipartFormData(MAUtil::String &url, const int *fileRawData, int fileSize,
-		const MAUtil::String &contentType, const MAUtil::String &fileName);
-
-	void addMultipartFormDataField(MAUtil::String &url, const MAUtil::String &key, const MAUtil::String &value);
-	void addFile(MAUtil::String &url, const int *const fileRawData, int fileSize, const MAUtil::String &contentType,
-		const MAUtil::String &fileName="Tami.jpg");
-
 	void writeMessageBody(const MAUtil::Map<String, String> &params);
 	void writeHeaders(const Map<String, String> &params);
-	void convertIntArrayToString(const int *const pixels, int arraySize, MAUtil::String &str);
+	void addEncodedFieldsToUrl(MAUtil::String &url);
+	void addMultipartFormDataField(MAUtil::String &url, const MAUtil::String &key, const MAUtil::String &value);
+
+
+	void getMultipartFormData(MAUtil::String &url, const byte *fileRawData, int fileSize,
+			const MAUtil::String &contentType, const MAUtil::String &fileName);
+
+	void addFile(MAUtil::String &url, const byte *const fileRawData, int fileSize, const MAUtil::String &contentType,
+			const MAUtil::String &fileName);
 private:
 	void finishedDownloading(MAUtil::Downloader* downloader, MAHandle data);
 	void downloadCancelled(MAUtil::Downloader* downloader);
@@ -111,27 +109,24 @@ private:
     void connReadFinished(MAUtil::Connection *conn, int result);
     void connWriteFinished(MAUtil::Connection* conn, int result);
 
-	MAHandle mDataPlaceholder;
-	MAUtil::Vector<HttpQueryField> mFields;
+private:
+	MAHandle 									mDataPlaceholder;
+	MAUtil::Vector<HttpQueryField> 				mFields;
 	MAUtil::Map<MAUtil::String, MAUtil::String> mHeaders;
 
 	typedef HeaderDownloader<MAUtil::Downloader> HeaderDownloader;
-	HeaderDownloader* mDownloader;
+	HeaderDownloader* 							mDownloader;
 
-	MAUtil::HttpConnection* mHttpConnection;
-	char mHttpConnectionBuffer[CONNECTION_BUFFER_SIZE];
+	MAUtil::HttpConnection* 					mHttpConnection;
+	char 										mHttpConnectionBuffer[CONNECTION_BUFFER_SIZE];
 
-	int mMethod;
-	MAUtil::String mURL;
+	int 										mMethod;
+	MAUtil::String 								mURL;
+	MAUtil::String								mMultipartFormDataBoundary;
+
+	MAUtil::String  							*mMultipartFormData;
 
 	MAUtil::Vector<HttpQueryDownloadListener*> mListeners;
-
-	bool mDeliverResource;
-
-	MAUtil::String mMultipartFormDataBoundary;
-
-	MAUtil::String PICTURE;
-	MAUtil::String *multipartFormData;
 };
 
-#endif	//_HTTP_QUERY_DOWNLOADER_H_
+#endif

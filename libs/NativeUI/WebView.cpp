@@ -269,8 +269,14 @@ namespace NativeUI
 	 */
 	bool WebView::isHorizontalScrollbarEnabled()
 	{
-		return ( this->getPropertyString(
-			MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED) == "true" ? true : false );
+        MAUtil::String value = MAUtil::lowerString(
+			this->getPropertyString(MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED));
+        if ( strcmp(value.c_str(),"true") == 0 )
+        {
+            return true;
+        }
+
+        return false;
 	}
 
 	/*
@@ -298,8 +304,14 @@ namespace NativeUI
 	 */
 	bool WebView::isVerticalScrollBarEnabled()
 	{
-		return ( this->getPropertyString(
-			MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED) == "true" ? true : false );
+        MAUtil::String value = MAUtil::lowerString(
+			this->getPropertyString(MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED));
+        if ( strcmp(value.c_str(),"true") == 0 )
+        {
+            return true;
+        }
+
+        return false;
 	}
 
     /**

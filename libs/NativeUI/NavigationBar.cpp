@@ -52,7 +52,7 @@ namespace NativeUI
      * - #MAW_RES_OK if the property could be set.
      * - #MAW_RES_ERROR otherwise.
      */
-    int NavigationBar::setTitle(const MAUtil::String title)
+    int NavigationBar::setTitle(const MAUtil::String& title)
     {
         return setProperty(MAW_NAV_BAR_TITLE, title);
     }
@@ -73,7 +73,7 @@ namespace NativeUI
      * - #MAW_RES_OK if the property could be set.
      * - #MAW_RES_ERROR otherwise.
      */
-    int NavigationBar::setBackBtnText(const MAUtil::String text)
+    int NavigationBar::setBackButtonTitle(const MAUtil::String& text)
     {
         return setProperty(MAW_NAV_BAR_BACK_BTN, text);
     }
@@ -82,7 +82,7 @@ namespace NativeUI
      * Get the text on the back button.
      * @return The text displayed ont he back button.
      */
-    MAUtil::String NavigationBar::getBackBtnText() const
+    MAUtil::String NavigationBar::getBackButtonTitle() const
     {
         return getPropertyString(MAW_NAV_BAR_BACK_BTN);
     }

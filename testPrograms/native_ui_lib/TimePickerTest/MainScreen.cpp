@@ -35,7 +35,8 @@
 MainScreen::MainScreen() :
 	Screen(),
 	mMainLayout(NULL),
-	mTimePicker(NULL)
+	mTimePicker(NULL),
+	mTimePickerValue(NULL)
 {
 	createMainLayout();
 
@@ -60,10 +61,13 @@ void MainScreen::createMainLayout() {
 	Screen::setMainWidget(mMainLayout);
 
 	mTimePicker = new TimePicker();
-	mTimePicker->setHour(14);
-	mTimePicker->setMinute(0);
 	mTimePicker->fillSpaceHorizontally();
 	mMainLayout->addChild(mTimePicker);
+
+	mTimePickerValue = new Label();
+	mTimePickerValue->setText( MAUtil::integerToString(mTimePicker->getHour())
+	+ " : " + MAUtil::integerToString(mTimePicker->getMinute()) );
+	mMainLayout->addChild(mTimePickerValue);
 }
 
 /**
@@ -79,6 +83,8 @@ void MainScreen::timePickerValueChanged(
 {
     if (timePicker == mTimePicker)
     {
+		mTimePickerValue->setText( MAUtil::integerToString(mTimePicker->getHour())
+		+ " : " + MAUtil::integerToString(mTimePicker->getMinute()) );
         printf("mTimePicker value changed = %d:%d", hour, minute);
     }
 }

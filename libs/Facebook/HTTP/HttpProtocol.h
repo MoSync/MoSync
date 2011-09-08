@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * HTTPProtocol.h
- *
- *  Created on: Feb 23, 2011
- *      Author: magnus
  */
 
 #ifndef HTTPPROTOCOL_H_
@@ -36,24 +34,22 @@ using namespace MAUtil;
 
 class HttpProtocolListener {
 public:
-	virtual void response(HttpRequest* request, HttpResponse* response) = 0;
-	virtual void cancel(HttpRequest* request) {}
+	virtual void response(HttpRequest* req, HttpResponse* res) {}
+	virtual void cancel(HttpRequest* req) {}
 };
 
 class HttpProtocol : public HttpQueryDownloadListener {
 public:
 	HttpProtocol();
 
-	void request(HttpRequest* request);
-	void request(UploadRequest* request);
+	void request(HttpRequest* req);
+	void request(UploadRequest* req);
 
 	void addListener(HttpProtocolListener* listener);
 
-	// HttpQueryDownloadListener
 	void httpQueryFinished(HttpQueryDownloader* downloader, const byte* data, int length);
-	void httpQueryFinished(HttpQueryDownloader* downloader, MAHandle resource) GCCATTRIB(noreturn);
-	void httpWriteFinished(HttpQueryDownloader* downloader, int code) GCCATTRIB(noreturn);
 	void httpQueryCancelled(HttpQueryDownloader* downloader);
+	void httpWriteFinished(HttpQueryDownloader* downloader);
 	void httpQueryError(HttpQueryDownloader *downloader, int code);
 
 	inline virtual ~HttpProtocol() {}
