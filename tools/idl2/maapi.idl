@@ -6511,6 +6511,11 @@ group CameraFunctions "Camera Functions" {
 			* You can use #MA_TB_TYPE_ANY instead.
 			*/
 			SINGLE_LINE = 100;
+
+			/** Use this to separate types from flags in the \a constraints parameter.
+			* This is not a valid type value.
+			*/
+			MASK = 0xFFFF;
 		}
 		constset int MA_TB_RES_ {
 			/// The user chose OK.
