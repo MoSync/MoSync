@@ -39,7 +39,6 @@ class TextScreen: public FacebookDemoScreen, public NativeUI::ButtonListener
 {
 public:
 	TextScreen(FacebookDemoScreen *prev);
-	TextScreen();
 
 	void setText(const MAUtil::String &text);
 	void clear();
@@ -71,9 +70,9 @@ private:
 	void initialize();
 
 private:
-	NativeUI::Label 		*mLabel;
-	NativeUI::VerticalLayout *mLayout;
-	NativeUI::Button		*mBackButton;
+	NativeUI::Label 			*mLabel;
+	NativeUI::VerticalLayout 	*mLayout;
+	NativeUI::Button			*mBackButton;
 };
 
 }//namespace FacebookDemoGUI

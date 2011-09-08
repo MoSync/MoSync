@@ -48,22 +48,20 @@ MA 02110-1301, USA.
 FacebookDemoMoblet::FacebookDemoMoblet(const MAUtil::String &appId):
 	mImage(NULL), mImageSize(0)
 {
-
 	initializeFacebook(appId);
-
 	createGUI();
-
 	login();
 }
 
 void FacebookDemoMoblet::login()
 {
+
 	MAUtil::String oAuthUrl = mFacebookManager->getOAuthUrl();
+	LOG("\t\tOAuthUrl = %s", oAuthUrl.c_str());
+
 	mLoginScreen->setUrl(oAuthUrl);
 	mLoginScreen->setListener(this);
 	mLoginScreen->show();
-
-	LOG("\t\tOAuthUrl = %s", oAuthUrl.c_str());
 }
 
 void FacebookDemoMoblet::webViewHookInvoked( NativeUI::WebView* webView, int hookType,
@@ -79,7 +77,7 @@ void FacebookDemoMoblet::webViewHookInvoked( NativeUI::WebView* webView, int hoo
 	maReadData(urlData, newUrl, 0, sz);
 	maDestroyObject(urlData);
 
-	LOG("\t\ttnew URL: %s", newUrl);
+	LOG("\t\ttnew URL: %s, sz=%d", newUrl, sz);
 
 	MAUtil::String access_token = extractAccessToken(newUrl);
 	if(access_token.size()>0)
@@ -89,7 +87,7 @@ void FacebookDemoMoblet::webViewHookInvoked( NativeUI::WebView* webView, int hoo
 		mMainScreen->receiveKeyEvents(true);
 	}
 
-	delete []newUrl;
+	//delete []newUrl;
 
 	LOG("\n\t\treceived access_token: %s", access_token.c_str());
 }

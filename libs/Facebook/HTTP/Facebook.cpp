@@ -231,7 +231,7 @@ void Facebook::response(HttpRequest* req, HttpResponse* res)
 
 			mConnectionListener->jsonDataReceived(jsonData, connType, id);
 		}
-		else if (fbRequest->getResponseType() == IMAGE)
+		else if(fbRequest->getResponseType() == IMAGE)
 		{
 			mConnectionListener->imageReceived(fbResponse.getImageData(), connType, id);
 		}
@@ -242,7 +242,7 @@ void Facebook::response(HttpRequest* req, HttpResponse* res)
 
 	if((fbRequest->getType() == PUBLISH) && mPublishingListener)
 	{
-		if(fbResponse.getDataSize()==0)
+		if( (fbResponse.getDataSize()==0) || (fbResponse.getJsonData() == NULL) )
 		{
 			mPublishingListener->queryError(fbResponse.getCode(), fbRequest->getPath());
 			delete req;
@@ -262,7 +262,6 @@ void Facebook::response(HttpRequest* req, HttpResponse* res)
 		}
 
 	}
-
 	delete req;
 	delete res;
 }

@@ -26,6 +26,8 @@ MA 02110-1301, USA.
 #include <NativeUI/Button.h>
 #include <NativeUI/ListView.h>
 
+#include "LOG.h"
+
 namespace FacebookDemoGUI
 {
 
@@ -43,7 +45,6 @@ ListScreen::ListScreen():FacebookDemoScreen(0)
 void ListScreen::show()
 {
 	FacebookDemoScreen::show();
-	receiveKeyEvents(true);
 }
 
 void ListScreen::add(ListItem *btn)

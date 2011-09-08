@@ -397,6 +397,7 @@ public:
 	virtual void execute()
 	{
 		showPleaseWaitMessage();
+		mFacebookManager->setPublishingListener(this);
 		mFacebookManager->addEventResponse(mEventId, mResponse);
 	}
 private:
@@ -949,7 +950,6 @@ public:
 	 */
 	virtual void execute()
 	{
-
 		showPleaseWaitMessage();
 		mFacebookManager->setPublishingListener(this);
 		mFacebookManager->removeComment(mCommentId);
