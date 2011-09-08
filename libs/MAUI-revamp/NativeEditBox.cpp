@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * \brief Class that implements wrapper for maTextBox.
  * \author Patrick Broman and Niklas Nummelin
  */
- 
+
 #include "NativeEditBox.h"
 #ifdef USE_NEWLIB
 #include <stdlib.h>
@@ -54,23 +54,23 @@ void NativeEditBox::textBoxClosed(int res, int length) {
 		MAUI_LOG("%S", mString);
 		requestRepaint();
 		ListenerSet_fire(
-			NativeEditBoxListener, 
-			mEditBoxListeners, 
+			NativeEditBoxListener,
+			mEditBoxListeners,
 			nativeEditFinished(this, mCaption));
-		
+
 	}
 	Environment::getEnvironment().removeTextBoxListener(this);
 }
 
 NativeEditBox::NativeEditBox(
 	NativeEditBoxListener* mainListener,
-	int x, 
-	int y, 
-	int width, 
-	int height, 
-	int maxSize, 
+	int x,
+	int y,
+	int width,
+	int height,
+	int maxSize,
 	int options,
-	const String& initialText, 
+	const String& initialText,
 	const WString& titleString)
 		: Label(x, y, width, height, initialText),
 		mTitleString(titleString),
@@ -103,14 +103,14 @@ void NativeEditBox::setMaxSize(int size) {
 	mString = new wchar_t[size];
 	mString[0] = 0;
 
-	if(oldString)  
+	if(oldString)
 	{
 		int minSize = (mMaxSize<size)?mMaxSize:size;
 		memcpy(mString, oldString, minSize);
 		mString[size-1] = 0;
 		delete oldString;
 	}
-	
+
 	mMaxSize = size;
 }
 
@@ -158,13 +158,24 @@ void NativeEditBox::activate() {
 #else
 	wsprintf(mString, L"%s", mCaption.c_str());
 #endif
-	int res = 
+	int res =
 		maTextBox(
-			(const wchar*)mTitleString.c_str(), 
+			(const wchar*)mTitleString.c_str(),
 			(wchar*)mString,
-			(wchar*)mString, 
-			mMaxSize, 
+			(wchar*)mString,
+			mMaxSize,
 			mOptions);
+	if(res == MA_TB_RES_TYPE_UNAVAILABLE &&
+		(mOptions & MA_TB_TYPE_MASK) == MA_TB_TYPE_SINGLE_LINE)
+	{
+		mOptions = MA_TB_TYPE_ANY | (mOptions & ~MA_TB_TYPE_MASK);
+		res = maTextBox(
+			(const wchar*)mTitleString.c_str(),
+			(wchar*)mString,
+			(wchar*)mString,
+			mMaxSize,
+			mOptions);
+	}
 	if(res < 0) {
 		PANIC_MESSAGE("maTextBox failed");
 	}
