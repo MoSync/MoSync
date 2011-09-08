@@ -36,7 +36,10 @@ MainScreen::MainScreen(MAUtil::Moblet *moblet)
 
 void MainScreen::keyPressEvent(int keyCode, int nativeCode)
 {
-	closeApplication();
+	if( MAK_BACK == keyCode)
+	{
+		closeApplication();
+	}
 }
 
 void MainScreen::buttonClicked(Widget* button)

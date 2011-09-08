@@ -33,7 +33,7 @@ MA 02110-1301, USA.
 class	ObjectRequestListener;
 class	ConnectionsManager;
 class	ConnectionsManagerListener;
-class   PublishingListener;
+class	PublishingListener;
 class	FacebookPublisher2;
 class	Facebook;
 
@@ -41,10 +41,10 @@ class	Facebook;
 /*
  * Class that manages the connections requests, Facebook objects and publishing.
  * It can handle the following connections requests:
- * 		"friends", "home", "feed", "likes", "movies", "music", "books", "notes", "permissions"
- * 		"photos", "picture", "albums", "videos", "videos/uploaded", "events", "groups", "checkins",
- * 		"comments", "noreply", "maybe", "attending", "declined", "members", "accounts", "activity",
- * 		"friendlists", "interests", "links", "posts", "statuses", "television"
+ *		"friends", "home", "feed", "likes", "movies", "music", "books", "notes", "permissions"
+ *		"photos", "picture", "albums", "videos", "videos/uploaded", "events", "groups", "checkins",
+ *		"comments", "noreply", "maybe", "attending", "declined", "members", "accounts", "activity",
+ *		"friendlists", "interests", "links", "posts", "statuses", "television"
  *
  */
 class FacebookManager
@@ -194,10 +194,10 @@ public:
 	 * @param location - the name of the location
 	 * @param privacyType - string containing 'OPEN' (default), 'CLOSED', or 'SECRET'
 	 */
-	void addEvent(const MAUtil::String &PROFILE_ID,      const MAUtil::String &eventName,
-				  const UnixTimeStamp &eventStart_time,  const UnixTimeStamp &eventEnd_time = UnixTimeStamp(),
-				  const MAUtil::String &message="",      const MAUtil::String &location = ""
-			      ,const MAUtil::String &privacyType = "OPEN");
+	void addEvent(const MAUtil::String &PROFILE_ID, const MAUtil::String &eventName,
+				const UnixTimeStamp &eventStart_time, const UnixTimeStamp &eventEnd_time = UnixTimeStamp(),
+				const MAUtil::String &message="", const MAUtil::String &location = "",
+				const MAUtil::String &privacyType = "OPEN");
 
 	/*
 	 * Adds a Photo object to a User's wall or to an Album.
@@ -215,7 +215,7 @@ public:
 	 * @param videoDescpription - the video description, that will be posted along with the video.
 	 */
 	void addVideo(const MAUtil::String &PROFILE_ID, int *videoSource, const MAUtil::String &videoTitle = "",
-			 const MAUtil::String &videoDescription = "");
+				const MAUtil::String &videoDescription = "");
 
 	/*
 	 * Adds a Checkin object for a User
@@ -225,8 +225,8 @@ public:
 	 * @param tags - list of tagged friends. String containing comma separated list of user id's.
 	 * @param message - the message that will be posted along with the Checkin
 	 */
-	void addCheckin(const MAUtil::String &PROFILE_ID, const MAUtil::String &placeId, 	  const Coordinate &coord,
-					const MAUtil::String &tags = "",  const MAUtil::String &message = "");
+	void addCheckin(const MAUtil::String &PROFILE_ID, const MAUtil::String &placeId, const Coordinate &coord,
+					const MAUtil::String &tags = "", const MAUtil::String &message = "");
 
 	/*
 	 * Adds a Post object to a to a User wall.
@@ -238,7 +238,7 @@ public:
 	 * @param description - a description of what is posted
 	 */
 	void addPostOnWall(const MAUtil::String &ID, const MAUtil::String &message, const MAUtil::String &link,
-			const MAUtil::String &name = "", const MAUtil::String &caption = "", const MAUtil::String &description = "");
+					const MAUtil::String &name = "", const MAUtil::String &caption = "", const MAUtil::String &description = "");
 
 	/*
 	 * Adds a Link object to a to a User wall.

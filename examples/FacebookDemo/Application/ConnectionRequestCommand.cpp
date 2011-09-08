@@ -594,9 +594,9 @@ void ConnectionRequestCommand::addToList(const Note &note)
 	addConnection(openMenuCmd, Connections<Note>::likes(),    note.getId());
 
 	addComment(openMenuCmd, note.getId());
-	addLike(openMenuCmd, 	note.getId());
-	addUnlike(openMenuCmd, 	note.getId());
-	removeNote(openMenuCmd, note.getId(), item);
+	addLike(openMenuCmd,	note.getId());
+	addUnlike(openMenuCmd,	note.getId());
+	removeNote(openMenuCmd,	note.getId(), item);
 
 	mJsonResponseScreen->add(item);
 }
@@ -609,18 +609,18 @@ void ConnectionRequestCommand::addToList(const Event &event)
 	fields.add("id");
 	fields.add("message");
 	fields.add("from");
-	addConnection(openMenuCmd, Connections<Event>::feed(), 	  	fields, event.getId());
+	addConnection(openMenuCmd, Connections<Event>::feed(),		fields, event.getId());
 
-	addConnection(openMenuCmd, Connections<Event>::noreply(),   event.getId());
+	addConnection(openMenuCmd, Connections<Event>::noreply(),	event.getId());
 
 
-	addConnection(openMenuCmd, Connections<Event>::maybe(), 	event.getId());
+	addConnection(openMenuCmd, Connections<Event>::maybe(),		event.getId());
 
-	addConnection(openMenuCmd, Connections<Event>::invited(),   event.getId());
+	addConnection(openMenuCmd, Connections<Event>::invited(),	event.getId());
 
-	addConnection(openMenuCmd, Connections<Event>::attending(), event.getId());
-	addConnection(openMenuCmd, Connections<Event>::declined(),  event.getId());
-//	addConnection(openMenuCmd, Connections<Event>::picture(),   event.getId());
+	addConnection(openMenuCmd, Connections<Event>::attending(),	event.getId());
+	addConnection(openMenuCmd, Connections<Event>::declined(),	event.getId());
+//	addConnection(openMenuCmd, Connections<Event>::picture(),	event.getId());
 
 	addStatusMessageOnWall(openMenuCmd, event.getId());
 	addLinkOnWall(openMenuCmd, event.getId());
@@ -641,8 +641,8 @@ void ConnectionRequestCommand::addToList(const Checkin &checkin)
 {
 	OpenMenuCommand *openMenuCmd = new OpenMenuCommand(mJsonResponseScreen);
 
-	addConnection(openMenuCmd, Connections<Checkin>::comments(), checkin.getId());
-	addConnection(openMenuCmd, Connections<Checkin>::likes(),    checkin.getId());
+	addConnection(openMenuCmd, Connections<Checkin>::comments(),	checkin.getId());
+	addConnection(openMenuCmd, Connections<Checkin>::likes(),	checkin.getId());
 
 
 	MAUtil::String result;
@@ -693,9 +693,9 @@ void ConnectionRequestCommand::addToList(const StatusMessage &msg)
 
 	addConnection(openMenuCmd, Connections<StatusMessage>::likes(),    msg.getId());
 
-	addComment(openMenuCmd, msg.getId());
-	addLike(openMenuCmd, 	msg.getId());
-	addUnlike(openMenuCmd, 	msg.getId());
+	addComment(openMenuCmd,	msg.getId());
+	addLike(openMenuCmd,	msg.getId());
+	addUnlike(openMenuCmd,	msg.getId());
 
 	MAUtil::String result;
 	createString(msg, result);
@@ -1310,7 +1310,7 @@ void ConnectionRequestCommand::addConnection(FacebookDemoApplication::OpenMenuCo
 		const MAUtil::String &id)
 {
 
-	ConnectionRequestCommand *connectionRequest = new ConnectionRequestCommand( mFacebookManager,
+	ConnectionRequestCommand *connectionRequest = new ConnectionRequestCommand(	mFacebookManager,
 																				openMenuCmd->getMenuScreen(),
 																				connectionName,
 																				id);
@@ -1322,7 +1322,7 @@ void ConnectionRequestCommand::addConnection(FacebookDemoApplication::OpenMenuCo
 void ConnectionRequestCommand::addConnection( FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &connectionName,
 					const MAUtil::Vector<MAUtil::String> &fields, const MAUtil::String &id)
 {
-	ConnectionRequestCommand *connectionRequest = new ConnectionRequestCommand( mFacebookManager,
+	ConnectionRequestCommand *connectionRequest = new ConnectionRequestCommand(	mFacebookManager,
 																				openMenuCmd->getMenuScreen(),
 																				connectionName,
 																				fields,
@@ -1387,11 +1387,11 @@ void ConnectionRequestCommand::addPostOnWall(FacebookDemoApplication::OpenMenuCo
 	PostOnWallCommand<Post> *addPostCommand = new PostOnWallCommand<Post>(mFacebookManager, openMenuCmd->getMenuScreen(), id);
 
 	addPostCommand->setPostParams(
-				"Post added with MOSYN SDK",  					//message
-				"http://www.youtube.com/watch?v=FL7yD-0pqZg", 	//link
-				"New Post object added with MOSYNC_SDK.",		//name
-				"Link from You Tube",							//caption
-				"Testing adding a post on wall with MOSYNC_SDK");//description
+				"Post added with MOSYN SDK",						//message
+				"http://www.youtube.com/watch?v=FL7yD-0pqZg",		//link
+				"New Post object added with MOSYNC_SDK.",			//name
+				"Link from You Tube",								//caption
+				"Testing adding a post on wall with MOSYNC_SDK");	//description
 
 
 	FacebookDemoGUI::ListItem *addPostButton = new FacebookDemoGUI::ListItem(addPostCommand, "add a post on wall");

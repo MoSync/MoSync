@@ -35,53 +35,61 @@ using namespace MAUtil;
 
 /* Converts a hex character to its integer value */
 char from_hex(char ch) {
-  return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
+	return isdigit(ch) ? ch - '0' : tolower(ch) - 'a' + 10;
 }
 
 /* Converts an integer value to its hex character*/
 char to_hex(char code) {
-  static char hex[] = "0123456789abcdef";
-  return hex[code & 15];
+	static char hex[] = "0123456789abcdef";
+	return hex[code & 15];
 }
 
 /* Returns a url-encoded version of str */
 /* IMPORTANT: be sure to free() the returned string after use */
 char *url_encode(const char *str) {
-  const char *pstr = str;
-  char *buf = (char*)malloc(strlen(str) * 3 + 1), *pbuf = buf;
-  while (*pstr) {
-    if (isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~')
-      *pbuf++ = *pstr;
-    else if (*pstr == ' ')
-      *pbuf++ = '+';
-    else
-      *pbuf++ = '%', *pbuf++ = to_hex(*pstr >> 4), *pbuf++ = to_hex(*pstr & 15);
-    pstr++;
+	const char *pstr = str;
+	char *buf = (char*)malloc(strlen(str) * 3 + 1), *pbuf = buf;
+	while (*pstr)
+	{
+		if (isalnum(*pstr) || *pstr == '-' || *pstr == '_' || *pstr == '.' || *pstr == '~')
+			*pbuf++ = *pstr;
+		else if (*pstr == ' ')
+				*pbuf++ = '+';
+		else
+			*pbuf++ = '%', *pbuf++ = to_hex(*pstr >> 4), *pbuf++ = to_hex(*pstr & 15);
+		pstr++;
   }
-  *pbuf = '\0';
-  return buf;
+	*pbuf = '\0';
+	return buf;
 }
 
 /* Returns a url-decoded version of str */
 /* IMPORTANT: be sure to free() the returned string after use */
 char *url_decode(const char *str) {
-  const char *pstr = str;
-  char *buf = (char*)malloc(strlen(str) + 1), *pbuf = buf;
-  while (*pstr) {
-    if (*pstr == '%') {
-      if (pstr[1] && pstr[2]) {
-        *pbuf++ = from_hex(pstr[1]) << 4 | from_hex(pstr[2]);
-        pstr += 2;
-      }
-    } else if (*pstr == '+') {
-      *pbuf++ = ' ';
-    } else {
-      *pbuf++ = *pstr;
-    }
-    pstr++;
-  }
-  *pbuf = '\0';
-  return buf;
+	const char *pstr = str;
+	char *buf = (char*)malloc(strlen(str) + 1), *pbuf = buf;
+	while (*pstr)
+	{
+		if(*pstr == '%')
+		{
+			if (pstr[1] && pstr[2])
+			{
+				*pbuf++ = from_hex(pstr[1]) << 4 | from_hex(pstr[2]);
+				pstr += 2;
+			}
+		}
+		else if (*pstr == '+')
+		{
+			*pbuf++ = ' ';
+		}
+		else
+		{
+			*pbuf++ = *pstr;
+		}
+		pstr++;
+	}
+	*pbuf = '\0';
+	return buf;
 }
 
 //------------------------------------------------------------------------------------
@@ -404,19 +412,21 @@ void HttpQueryDownloader::httpFinished(MAUtil::HttpConnection *conn, int result)
    String contentLengthStr;
 
 	int responseBytes = mHttpConnection->getResponseHeader("Content-Length", &contentLengthStr);
-    LOG("\n\n\t\tHttpQueryDownloader::httpFinished contentLength=%s", contentLengthStr.c_str());
-    int contentLength = 0;
-    if(responseBytes != CONNERR_NOHEADER)
-        contentLength = atoi(contentLengthStr.c_str());
+	LOG("\n\n\t\tHttpQueryDownloader::httpFinished contentLength=%s", contentLengthStr.c_str());
+	int contentLength = 0;
+	if(responseBytes != CONNERR_NOHEADER)
+		contentLength = atoi(contentLengthStr.c_str());
 
-    if(contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0) {
+	if(contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0) {
 		maPanic(1, "finished: HTTP RECV not supported");
 		mHttpConnection->recv(mHttpConnectionBuffer, CONNECTION_BUFFER_SIZE);
 
-    } else {
-        mHttpConnectionBuffer[contentLength] = 0;
-        mHttpConnection->read(mHttpConnectionBuffer, contentLength);
-    }
+	}
+	else
+	{
+		mHttpConnectionBuffer[contentLength] = 0;
+		mHttpConnection->read(mHttpConnectionBuffer, contentLength);
+	}
 }
 
 void HttpQueryDownloader::connRecvFinished(MAUtil::Connection *conn, int result) {
@@ -429,7 +439,7 @@ void HttpQueryDownloader::connReadFinished(MAUtil::Connection *conn, int result)
 
 	mHttpConnection->close();
 
-    int dataLength = strlen(mHttpConnectionBuffer);
+	int dataLength = strlen(mHttpConnectionBuffer);
 
 	for(int i = 0; i < mListeners.size(); i++) {
 		mListeners[i]->httpQueryFinished(this, (const byte*)mHttpConnectionBuffer, dataLength);

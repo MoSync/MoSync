@@ -167,7 +167,7 @@ private:
 	/*
 	 * adds a connection request command on a button. Adds the button to a menu (the screen contained in openMenuCmd)
 	 */
-	void addConnection( FacebookDemoApplication::OpenMenuCommand *openMenuCmd,
+	void addConnection(	FacebookDemoApplication::OpenMenuCommand *openMenuCmd,
 						const MAUtil::String &connectionName,
 						const MAUtil::String &id);
 	void addConnection( FacebookDemoApplication::OpenMenuCommand *openMenuCmd,
@@ -208,9 +208,9 @@ private:
 	/*
 	 * adds a set event response command on a button. Adds the button to a menu (the Screen contained in openMenuCmd)
 	 */
-	void addEventResponse(FacebookDemoApplication::OpenMenuCommand *openMenuCmd,
-						  const MAUtil::String &eventId,
-						  EVENT_RESPONSE_TYPE response);
+	void addEventResponse(	FacebookDemoApplication::OpenMenuCommand *openMenuCmd,
+							const MAUtil::String &eventId,
+							EVENT_RESPONSE_TYPE response);
 
 	/*
 	 * adds a "remove User"  request on button. Adds the button to a menu (the Screen contained in openMenuCmd)
@@ -236,14 +236,14 @@ private:
 private:
 	const int mMaxEntriesInList;
 
-	FacebookDemoGUI::ListScreen 	*mJsonResponseScreen;
-	FacebookDemoGUI::ImageScreen 	*mImageResponseScreen;
-	FacebookDemoGUI::TextScreen 	*mPleaseWaitScreen;
+	FacebookDemoGUI::ListScreen		*mJsonResponseScreen;
+	FacebookDemoGUI::ImageScreen	*mImageResponseScreen;
+	FacebookDemoGUI::TextScreen		*mPleaseWaitScreen;
 
 	FacebookManager					*mFacebookManager;
 	MAUtil::String					mConnection;
-	MAUtil::Vector<MAUtil::String> 	mFields;
-	MAUtil::String  				mId;
+	MAUtil::Vector<MAUtil::String>	mFields;
+	MAUtil::String					mId;
 };
 
 }//namespace Application

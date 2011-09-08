@@ -262,13 +262,13 @@ void FacebookManager::addAlbum(const MAUtil::String &PROFILE_ID, const MAUtil::S
  * @param message - the message to be posted alog with the event
  * @param location - the name of the location
  */
-void FacebookManager::addEvent(const MAUtil::String &PROFILE_ID,  const MAUtil::String &eventName,
-			  const UnixTimeStamp &eventStart_time,  const UnixTimeStamp &eventEnd_time,
-			  const MAUtil::String &message,         const MAUtil::String &location,
-		      const MAUtil::String &privacyType)
+void FacebookManager::addEvent(const MAUtil::String &PROFILE_ID, const MAUtil::String &eventName,
+			const UnixTimeStamp &eventStart_time, const UnixTimeStamp &eventEnd_time,
+			const MAUtil::String &message, const MAUtil::String &location,
+			const MAUtil::String &privacyType)
 {
 	mPublishingManager->addEvent(PROFILE_ID, eventName, eventStart_time, eventEnd_time,
-								 message, location, privacyType);
+								message, location, privacyType);
 }
 
 /*
@@ -292,7 +292,7 @@ void FacebookManager::addPhoto(const MAUtil::String &OBJECT_ID, const byte *pixe
  * @param videoDescpription - the video description, that will be posted along with the video.
  */
 void FacebookManager::addVideo(const MAUtil::String &PROFILE_ID, int *videoSource, const MAUtil::String &videoTitle,
-		 const MAUtil::String &videoDescription)
+		const MAUtil::String &videoDescription)
 {
 	mPublishingManager->addVideo(PROFILE_ID, videoSource, videoTitle, videoDescription);
 }

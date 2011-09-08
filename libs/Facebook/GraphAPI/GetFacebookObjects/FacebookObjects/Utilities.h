@@ -75,9 +75,9 @@ struct Venue
 
 struct Place
 {
-	MAUtil::String 	mId;
-	MAUtil::String 	mName;
-	Venue 			mLocation;
+	MAUtil::String	mId;
+	MAUtil::String	mName;
+	Venue			mLocation;
 };
 
 #endif /* UTILITIES_H_ */

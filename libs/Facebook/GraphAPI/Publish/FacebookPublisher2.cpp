@@ -218,9 +218,9 @@ void FacebookPublisher2::addPhoto(const MAUtil::String &OBJECT_ID, const byte *p
  * @param location - the name of the location
  * @param privacyType - a string that can have the following values: "PUBLIC",
  */
-void FacebookPublisher2::addEvent(const MAUtil::String &PROFILE_ID,  	const MAUtil::String &name,
-									const UnixTimeStamp &start_time, 	const UnixTimeStamp &end_time,
-									const MAUtil::String &message, 		const MAUtil::String &location,
+void FacebookPublisher2::addEvent(const MAUtil::String &PROFILE_ID,		const MAUtil::String &name,
+									const UnixTimeStamp &start_time,	const UnixTimeStamp &end_time,
+									const MAUtil::String &message,		const MAUtil::String &location,
 									const MAUtil::String &privacyType)
 {
 	MAUtil::String postdata = "name=" + name;
@@ -283,8 +283,8 @@ void FacebookPublisher2::addVideo( const MAUtil::String &PROFILE_ID, int *videoS
  * @param tags - list of tagged friends. String containing comma separated list of user id's.
  * @param message - the message that will be posted along with the Checkin
  */
-void FacebookPublisher2::addCheckin(const MAUtil::String &PROFILE_ID, const MAUtil::String &placeId,
-									const Coordinate &coord,     	  const MAUtil::String &tags,
+void FacebookPublisher2::addCheckin(const MAUtil::String &PROFILE_ID,	const MAUtil::String &placeId,
+									const Coordinate &coord,			const MAUtil::String &tags,
 									const MAUtil::String &message)
 {
 

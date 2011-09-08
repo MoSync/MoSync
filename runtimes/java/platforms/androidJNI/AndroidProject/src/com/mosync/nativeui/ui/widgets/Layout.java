@@ -133,7 +133,17 @@ public class Layout extends Widget
 		ViewGroup layout = getView( );
 		layout.addView( child.getRootView( ), listIndex );
 	}
-	
+
+	/**
+	 * Check if a widget is already in the children list.
+	 * @param child The widget to be checked.
+	 * @return true if the widget is already in the list of children.
+	 */
+	public Boolean containsChild(Widget child)
+	{
+		return m_children.contains(child);
+	}
+
 	/**
 	 * Returns the children of this layout.
 	 * 

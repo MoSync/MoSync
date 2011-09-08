@@ -85,12 +85,12 @@ public:
 
 private:
 	IdNamePair					mFrom;
-	MAUtil::String 				mLink;
-	MAUtil::String 				mName;
-	MAUtil::Vector<Comment> 	mComments;
-	MAUtil::String 				mDescription;
-	MAUtil::String 				mPicture;
-	MAUtil::String 				mMessage;
+	MAUtil::String				mLink;
+	MAUtil::String				mName;
+	MAUtil::Vector<Comment>		mComments;
+	MAUtil::String				mDescription;
+	MAUtil::String				mPicture;
+	MAUtil::String				mMessage;
 };
 
 #endif /* LINK_H_ */

@@ -51,113 +51,113 @@ ConnectionsManager::ConnectionsManager(Facebook *facebook):
 	/*
 	 * The comments made on a Facebook object (Album, Post, Photo ect)
 	 */
-	mAvailableRequests["comments"]	 			= &ConnectionsManager::retrieveComments;
+	mAvailableRequests["comments"]				= &ConnectionsManager::retrieveComments;
 
 	/*
 	 * User connections
 	 */
 
 	//The user's friends.
-	mAvailableRequests["friends"] 				= &ConnectionsManager::retrieveIdNamePairs;
+	mAvailableRequests["friends"]				= &ConnectionsManager::retrieveIdNamePairs;
 
 	//The user's news feed.
-	mAvailableRequests["home"] 					= &ConnectionsManager::retrievePosts;
+	mAvailableRequests["home"]					= &ConnectionsManager::retrievePosts;
 
 	//The user's wall.
-	mAvailableRequests["feed"] 					= &ConnectionsManager::retrievePosts;
+	mAvailableRequests["feed"]					= &ConnectionsManager::retrievePosts;
 
 	//All the pages this user has liked.
-	mAvailableRequests["likes"] 				= &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["likes"]					= &ConnectionsManager::retrieveCategoryData;
 
 	//The movies listed on the user's profile.
-	mAvailableRequests["movies"] 				= &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["movies"]				= &ConnectionsManager::retrieveCategoryData;
 
 	//The music listed on the user's profile.
-	mAvailableRequests["music"] 				= &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["music"]					= &ConnectionsManager::retrieveCategoryData;
 
 	//The books listed on the user's profile.
-	mAvailableRequests["books"] 				= &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["books"]					= &ConnectionsManager::retrieveCategoryData;
 
 	//The user's notes.
-	mAvailableRequests["notes"] 				= &ConnectionsManager::retrieveNotes;
+	mAvailableRequests["notes"]					= &ConnectionsManager::retrieveNotes;
 
 	//The photo albums this user has created.
-	mAvailableRequests["albums"] 				= &ConnectionsManager::retrieveAlbums;
+	mAvailableRequests["albums"]				= &ConnectionsManager::retrieveAlbums;
 
 	//The videos this user has been tagged in.
-	mAvailableRequests["videos"] 				= &ConnectionsManager::retrieveVideos;
+	mAvailableRequests["videos"]				= &ConnectionsManager::retrieveVideos;
 
 	//The videos this user has uploaded.
 	mAvailableRequests["videos/uploaded"] 		= &ConnectionsManager::retrieveVideos;
 
 	//The events this user is attending.
-	mAvailableRequests["events"] 				= &ConnectionsManager::retrieveEvents;
+	mAvailableRequests["events"]				= &ConnectionsManager::retrieveEvents;
 
 	//The Groups that the user belongs to.
-	mAvailableRequests["groups"] 				= &ConnectionsManager::retrieveGroups;
+	mAvailableRequests["groups"]				= &ConnectionsManager::retrieveGroups;
 
 	//The places that the user has checked-into.
-	mAvailableRequests["checkins"]	 			= &ConnectionsManager::retrieveCheckins;
+	mAvailableRequests["checkins"]				= &ConnectionsManager::retrieveCheckins;
 
 	//The Facebook apps and pages owned by the current user.
-	mAvailableRequests["accounts"]	 			= &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["accounts"]				= &ConnectionsManager::retrieveCategoryData;
 
 	//The activities listed on the user's profile.
-	mAvailableRequests["activities"]	 		= &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["activities"]			= &ConnectionsManager::retrieveCategoryData;
 
 	//The user's friend lists.
 	mAvailableRequests["friendlists"]			= &ConnectionsManager::retrieveCategoryData;
 
 	//The interests listed on the user's profile.
-	mAvailableRequests["interests"]	 			= &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["interests"]				= &ConnectionsManager::retrieveCategoryData;
 
 	//The links listed on the user's profile.
-	mAvailableRequests["links"]	 	 			= &ConnectionsManager::retrieveLinks;
+	mAvailableRequests["links"]		 			= &ConnectionsManager::retrieveLinks;
 
 	//The user's own posts.
-	mAvailableRequests["posts"]	 	 			= &ConnectionsManager::retrievePosts;
+	mAvailableRequests["posts"]					= &ConnectionsManager::retrievePosts;
 
 	//The user's status updates.
-	mAvailableRequests["statuses"]	 			= &ConnectionsManager::retrieveStatusMessages;
+	mAvailableRequests["statuses"]				= &ConnectionsManager::retrieveStatusMessages;
 
 	//The television listed on the user's profile.
-	mAvailableRequests["television"] 			= &ConnectionsManager::retrieveCategoryData;
+	mAvailableRequests["television"]			= &ConnectionsManager::retrieveCategoryData;
 	/*
 	 * Photos the user (or friend) is tagged in
 	 */
-	mAvailableRequests["photos"] 				= &ConnectionsManager::retrievePhotos;
+	mAvailableRequests["photos"]				= &ConnectionsManager::retrievePhotos;
 
 	/*
 	 * Event connections
 	 */
 
 	//All of the users who have been not yet responded to their invitation to this event.
-	mAvailableRequests["noreply"]	 			= &ConnectionsManager::retrieveEventResponses;
+	mAvailableRequests["noreply"]				= &ConnectionsManager::retrieveEventResponses;
 
 	//All of the users who have been responded "Maybe" to their invitation to this event.
-	mAvailableRequests["maybe"]	 	 			= &ConnectionsManager::retrieveEventResponses;
+	mAvailableRequests["maybe"]					= &ConnectionsManager::retrieveEventResponses;
 
 	//All of the users who have been invited to this event.
-	mAvailableRequests["invited"]	 	 		= &ConnectionsManager::retrieveEventResponses;
+	mAvailableRequests["invited"]		 		= &ConnectionsManager::retrieveEventResponses;
 
 	//All of the users who have been responded "Attending" to their invitation to this event.
-	mAvailableRequests["attending"]	 			= &ConnectionsManager::retrieveEventResponses;
+	mAvailableRequests["attending"]				= &ConnectionsManager::retrieveEventResponses;
 
 	//All of the users who have been responded "Declined" to their invitation to this event.
-	mAvailableRequests["declined"]	 			= &ConnectionsManager::retrieveEventResponses;
+	mAvailableRequests["declined"]				= &ConnectionsManager::retrieveEventResponses;
 
 
 	/*
 	 * Group and FriendList connections
 	 */
 
-	mAvailableRequests["members"]	 			= &ConnectionsManager::retrieveIdNamePairs;
+	mAvailableRequests["members"]				= &ConnectionsManager::retrieveIdNamePairs;
 	//"docs" connection: not implemented. TODO: implement
 
 	/*
 	 * Photo connections
 	 */
-	mAvailableRequests["tags"]	 	 			= &ConnectionsManager::retrieveIdNamePairs;
+	mAvailableRequests["tags"]		 			= &ConnectionsManager::retrieveIdNamePairs;
 }
 
 /*

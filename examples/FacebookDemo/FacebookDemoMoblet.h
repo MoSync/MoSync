@@ -46,13 +46,13 @@ public:
 	 */
 	FacebookDemoMoblet(const MAUtil::String &appId);
 
-    virtual void webViewHookInvoked( NativeUI::WebView* webView, int hookType,
+	virtual void webViewHookInvoked( NativeUI::WebView* webView, int hookType,
 			MAHandle urlData);
 
 	/**
 	 * WebViewListener overrides
 	 */
-    virtual void webViewContentLoading(
+	virtual void webViewContentLoading(
 			NativeUI::WebView* webView,
 			const int webViewState) {}
 
@@ -124,10 +124,10 @@ private:
 	/**
 	 * FacebookManager object: handles the requests to Facebook, retrieving data and publishing
 	 */
-	FacebookManager 						*mFacebookManager;
+	FacebookManager							*mFacebookManager;
 	FacebookDemoGUI::MainScreen				*mMainScreen;
 	FacebookDemoGUI::FacebookLoginScreen 	*mLoginScreen;
-	byte 									*mImage;
+	byte									*mImage;
 	int										mImageSize;
 
 };

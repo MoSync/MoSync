@@ -302,11 +302,11 @@ public:
 	}
 
 private:
-	MAUtil::String 	mId;
-	MAUtil::String 	mPlaceId;
-	Coordinate 		mCoordinate;
-	MAUtil::String  mTags;
-	MAUtil::String  mMessage;
+	MAUtil::String	mId;
+	MAUtil::String	mPlaceId;
+	Coordinate		mCoordinate;
+	MAUtil::String	mTags;
+	MAUtil::String	mMessage;
 };
 
 /*
@@ -331,8 +331,8 @@ public:
 	/*
 	 * sets the request parameters
 	 */
-	void setEventParams(const MAUtil::String &eventName, const UnixTimeStamp &eventStart_time,  const UnixTimeStamp &eventEnd_time = UnixTimeStamp(),
-				  const MAUtil::String &message="",      const MAUtil::String &location = "" ,const MAUtil::String &privacyType = "OPEN")
+	void setEventParams(const MAUtil::String &eventName,	const UnixTimeStamp &eventStart_time,	const UnixTimeStamp &eventEnd_time = UnixTimeStamp(),
+						const MAUtil::String &message="",	const MAUtil::String &location = "",	const MAUtil::String &privacyType = "OPEN")
 	{
 		mEventName = eventName;
 		mStartTime = eventStart_time;
@@ -444,8 +444,8 @@ public:
 	}
 
 private:
-	MAUtil::String 	mId;
-	MAUtil::String 	mName;
+	MAUtil::String	mId;
+	MAUtil::String	mName;
 	int 			mCreatedObjectsCount;
 };
 
@@ -661,10 +661,10 @@ public:
 	}
 
 private:
-	MAUtil::String 	mObjectId;	//album
-	const byte 	    *mPixels;
+	MAUtil::String	mObjectId;	//album
+	const byte		*mPixels;
 	int 			mPixelsArraySize;
-	MAUtil::String 	mMessage;
+	MAUtil::String	mMessage;
 };
 
 /*
@@ -707,9 +707,9 @@ public:
 	}
 
 private:
-	MAUtil::String 	mObjectId;
+	MAUtil::String	mObjectId;
 	int 			*mVideoSource;
-	MAUtil::String 	mTitle;
+	MAUtil::String	mTitle;
 	MAUtil::String	mDescription;
 };
 
@@ -824,9 +824,9 @@ public:
 	/*
 	 * sets the request parameters
 	 */
-	void setPostParams(const MAUtil::String &message, const MAUtil::String &link, const MAUtil::String &pictureUrl = "",
-				  const MAUtil::String &name = "", const MAUtil::String &caption = "", const MAUtil::String &description = "",
-				  const MAUtil::Vector<Action> &actions = MAUtil::Vector<Action>() )
+	void setPostParams(	const MAUtil::String &message,		const MAUtil::String &link,			const MAUtil::String &pictureUrl = "",
+						const MAUtil::String &name = "",	const MAUtil::String &caption = "",	const MAUtil::String &description = "",
+						const MAUtil::Vector<Action> &actions = MAUtil::Vector<Action>() )
 	{
 		mMessage = message;
 		mLink = link;
@@ -874,8 +874,8 @@ public:
 	 * @param targetObjectID - the id of the object on which the post is made
 	 * @param item - the item from the ListScreen that we will remove, after the request is completed
 	 */
-	RemoveCommand(FacebookManager *facebookManager, FacebookDemoGUI::FacebookDemoScreen *prevScreen,
-			const MAUtil::String &targetObjectID, FacebookDemoGUI::ListItem *item) : PublishCommand(facebookManager, prevScreen)
+	RemoveCommand(	FacebookManager *facebookManager,		FacebookDemoGUI::FacebookDemoScreen *prevScreen,
+					const MAUtil::String &targetObjectID,	FacebookDemoGUI::ListItem *item) : PublishCommand(facebookManager, prevScreen)
 	{
 		mListId = targetObjectID;
 		mDeletedItem = item;
@@ -915,10 +915,10 @@ public:
 			result = "Publishing failed.";
 		}
 
-	    if(mMessageScreen->getPreviousScreen())
-	    {
+		if(mMessageScreen->getPreviousScreen())
+		{
 			mMessageScreen->getPreviousScreen()->removeChild(mDeletedItem);
-	    }
+		}
 		mMessageScreen->setText(result);
 		mMessageScreen->receiveKeyEvents(true);
 		mMessageScreen->show();

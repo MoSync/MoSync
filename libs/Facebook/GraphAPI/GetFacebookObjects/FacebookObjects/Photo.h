@@ -87,14 +87,14 @@ public:
 	int getPositionInAlbum() const;
 
 private:
-	IdNamePair 		mFrom;
-	MAUtil::String  mName;
-	MAUtil::String 	mSmallSizedPictureUrl;
-	MAUtil::String 	mFullSizedPictureUrl;
-	int 			mWidth;
-	int 			mHeight;
+	IdNamePair		mFrom;
+	MAUtil::String	mName;
+	MAUtil::String	mSmallSizedPictureUrl;
+	MAUtil::String	mFullSizedPictureUrl;
+	int				mWidth;
+	int				mHeight;
 	MAUtil::String 	mLink;
-	int 			mPositionInAlbum;
+	int				mPositionInAlbum;
 };
 
 #endif

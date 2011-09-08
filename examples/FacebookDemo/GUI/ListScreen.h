@@ -55,9 +55,9 @@ public:
 	virtual ~ListScreen();
 
 
-    virtual void listViewItemClicked(NativeUI::ListView* listView, NativeUI::ListViewItem* listViewItem);
+	virtual void listViewItemClicked(NativeUI::ListView* listView, NativeUI::ListViewItem* listViewItem);
 
-    virtual void buttonClicked(Widget* button);
+	virtual void buttonClicked(Widget* button);
 
 private:
 	virtual int addChild(NativeUI::Widget* widget);
