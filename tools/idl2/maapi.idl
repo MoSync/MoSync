@@ -6524,22 +6524,22 @@ group CameraFunctions "Camera Functions" {
 			/// Indicates that the text entered is confidential data that should be
 			/// obscured whenever possible.
 			/// This implies #MA_TB_FLAG_SENSITIVE.
-			PASSWORD = 0x1000;
+			PASSWORD = 0x10000;
 			/// Indicates that editing is disallowed.
-			UNEDITABLE = 0x2000;
+			UNEDITABLE = 0x20000;
 			/// Indicates that the text entered is sensitive data that the implementation
 			/// must never store into a dictionary or table for use in predictive, auto-completing,
 			/// or other accelerated input schemes. A credit card number is an example of sensitive data.
-			SENSITIVE = 0x4000;
+			SENSITIVE = 0x40000;
 			/// Indicates that the text entered does not consist of words that are likely
 			/// to be found in dictionaries typically used by predictive input schemes.
-			NON_PREDICTIVE = 0x8000;
+			NON_PREDICTIVE = 0x80000;
 			/// This flag is a hint to the implementation that during text editing,
 			/// the initial letter of each word should be capitalized.
-			INITIAL_CAPS_WORD = 0x10000;
+			INITIAL_CAPS_WORD = 0x100000;
 			/// This flag is a hint to the implementation that during text editing,
 			/// the initial letter of each sentence should be capitalized.
-			INITIAL_CAPS_SENTENCE = 0x20000;
+			INITIAL_CAPS_SENTENCE = 0x200000;
 		}
 
 		/**
