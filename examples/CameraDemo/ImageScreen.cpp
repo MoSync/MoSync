@@ -30,37 +30,24 @@ MA 02110-1301, USA.
 #include <mavsprintf.h>
 #include "WidgetUtil.h"
 
-
+using namespace NativeUI;
 
 /**
- * This method implements a custom event listener.
- * Widget events are sent as custom events.
+ * This method implements a button event listener.
+ * Button click events are sent here.
  */
-void ImageScreen::customEvent(const MAEvent& event)
+void ImageScreen::buttonClicked(Widget* button)
 {
-	// Check if this is a widget event.
-	if (EVENT_TYPE_WIDGET == event.type)
+	if(mOKButton == button)
 	{
-		// Get the widget event data structure.
-		MAWidgetEventData* eventData = (MAWidgetEventData*) event.data;
-
-		// Here we handle clicked events.
-		if (MAW_EVENT_CLICKED == eventData->eventType)
-		{
-			if(mOKButton == eventData->widgetHandle)
-			{
-				isViewed = false;
-				maWidgetStackScreenPop(mStackScreen);
-			}
-
-		}
+		mStackScreen->pop();
 	}
 }
 
 /**
  * Lazy initializations
  */
-int ImageScreen::initialize(MAHandle stackScreen)
+int ImageScreen::initialize(StackScreen* stackScreen)
 {
 	mStackScreen = stackScreen;
 	createUI();
@@ -72,58 +59,37 @@ int ImageScreen::initialize(MAHandle stackScreen)
 void ImageScreen::createUI()
 {
 	// Create a Native UI screen. As the screen is a member
-		// variable (also called instance variable) we have
-		// prefixed the variable name with "m".
-		mScreen = maWidgetCreate(MAW_SCREEN);
+	// variable (also called instance variable) we have
+	// prefixed the variable name with "m".
+	mScreen = new Screen();
 
-		// Create the screen's main layout widget.
-		mMainLayoutWidget = maWidgetCreate(MAW_VERTICAL_LAYOUT);
+	mScreen->setTitle("Captured Image");
+	// Create the screen's main layout widget.
+	mMainLayoutWidget = new VerticalLayout();
 
-		// Make the layout fill the entire screen. For properties that
-		// take an integer parameter we use the widgetSetPropertyInt
-		// function, for properties that takes a string parameter
-		// we use the maWidgetSetProperty function.
-		widgetSetPropertyInt(
-				mMainLayoutWidget,
-				MAW_WIDGET_WIDTH,
-				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		widgetSetPropertyInt(
-				mMainLayoutWidget,
-				MAW_WIDGET_HEIGHT,
-				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
+	// Make the layout fill the entire screen.
+	mMainLayoutWidget->fillSpaceHorizontally();
+	mMainLayoutWidget->fillSpaceVertically();
 
-		// the second layout is a horizontal layout that
-		//contains the buttons that control the camera
+	// Add the layout as the root of the screen's widget tree.
+	mScreen->setMainWidget(mMainLayoutWidget);
 
-		// Add the layout as the root of the screen's widget tree.
-		maWidgetAddChild(mScreen, mMainLayoutWidget);
+	mImageWidget = new Image();
 
-		mImageWidget = maWidgetCreate(MAW_IMAGE);
-		widgetSetPropertyInt(
-				mImageWidget,
-				MAW_WIDGET_WIDTH,
-				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		widgetSetPropertyInt(
-				mImageWidget,
-				MAW_WIDGET_HEIGHT,
-				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		maWidgetAddChild(mMainLayoutWidget, mImageWidget);
+	mImageWidget->fillSpaceHorizontally();
+	mImageWidget->fillSpaceVertically();
+
+	mMainLayoutWidget->addChild(mImageWidget);
 
 
-		mOKButton = maWidgetCreate(MAW_BUTTON);
-		widgetSetPropertyInt(
-				mOKButton,
-				MAW_WIDGET_WIDTH,
-				MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		widgetSetPropertyInt(
-				mOKButton,
-				MAW_WIDGET_HEIGHT,
-				MAW_CONSTANT_WRAP_CONTENT);
-		maWidgetSetProperty(
-				mOKButton,
-				MAW_LABEL_TEXT,
-				"Back to Main Screen");
-		maWidgetAddChild(mMainLayoutWidget, mOKButton);
+	mOKButton = new Button();
+
+	mOKButton->fillSpaceHorizontally();
+	mOKButton->wrapContentVertically();
+	mOKButton->setText("Back to Main Screen");
+	mOKButton->addButtonListener(this);
+
+	mMainLayoutWidget->addChild(mOKButton);
 }
 
 
@@ -132,8 +98,7 @@ void ImageScreen::createUI()
  */
 void ImageScreen::pushImageScreen()
 {
-	isViewed = true;
-	maWidgetStackScreenPush(mStackScreen, mScreen);
+	mStackScreen->push(mScreen);
 }
 
 /**
@@ -142,25 +107,21 @@ void ImageScreen::pushImageScreen()
  */
 void ImageScreen::setImageDataHandle(MAHandle dataHandle)
 {
-		if(imageHandle != 0) {
-			maDestroyObject(imageHandle);
-		}
-		imageHandle = maCreatePlaceholder();
-		int res = maCreateImageFromData(
-					imageHandle,
-					dataHandle,
-					0,
-					maGetDataSize(dataHandle));
-
+	if(mImageHandle != 0) {
+		maDestroyObject(mImageHandle);
+	}
+	mImageHandle = maCreatePlaceholder();
+	int res = maCreateImageFromData(
+			mImageHandle,
+				dataHandle,
+				0,
+				maGetDataSize(dataHandle));
 		if(res != RES_OK)
-		{
-			maPanic(res, "failed to create the image");
-		}
+	{
+		maPanic(res, "failed to create the image");
+	}
+		//Set the image to the image widget
+	mImageWidget->setScaleMode(IMAGE_SCALE_PRESERVE_ASPECT);
+	mImageWidget->setImage(mImageHandle);
 
-		//destroy the cmaera preview and replace it with an image widget
-		maWidgetSetProperty(mImageWidget, MAW_IMAGE_SCALE_MODE, "scalePreserveAspect");
-		res = widgetSetPropertyInt(
-				mImageWidget,
-				MAW_IMAGE_IMAGE,
-				imageHandle);
 }
