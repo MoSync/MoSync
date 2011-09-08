@@ -59,8 +59,6 @@ public:
 /**
  * \brief Widget that displays text and opens a native edit box
  * to edit the text.
- * TODO: Consider renaming this class to NativeTextBox, since the
- * syscall it wraps is called maTextBox.
  */
 class NativeEditBox : public Label, public TextBoxListener {
 public:
@@ -75,8 +73,6 @@ public:
 	 * \param options Textbox options.
 	 * \param initialText The text to be initially displayed.
 	 * \param titleString The title of the textbox.
-	 * TODO: Verify that param maxSize is correctly documented.
-	 * TODO: Why is titleString a wide string but not initialText?
 	 */
 	NativeEditBox(
 		NativeEditBoxListener* mainListener,
@@ -101,7 +97,6 @@ public:
 	void setOptions(int options);
 	
 	/**
-	 * TODO: Is this comment corrent?
 	 * Set the max number of characters in the textbox.
 	 * \param size The max number of characters.
 	 */
@@ -158,12 +153,7 @@ public:
 	void removeNativeEditBoxListener(NativeEditBoxListener* listener);
 	
 protected:
-	/**
-	 * TODO: Is this comment correct?
-	 * Called when the native textbox is closed.
-	 * \param res ?
-	 * \param length ?
-	 */
+	/// TextBoxListener
 	void textBoxClosed(int res, int length);
 
 	/**
