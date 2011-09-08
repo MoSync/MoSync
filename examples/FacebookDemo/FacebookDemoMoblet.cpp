@@ -87,7 +87,7 @@ void FacebookDemoMoblet::webViewHookInvoked( NativeUI::WebView* webView, int hoo
 		mMainScreen->receiveKeyEvents(true);
 	}
 
-	//delete []newUrl;
+	delete []newUrl;
 
 	LOG("\n\t\treceived access_token: %s", access_token.c_str());
 }
