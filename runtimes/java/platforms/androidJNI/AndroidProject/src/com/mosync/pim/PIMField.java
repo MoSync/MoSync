@@ -2,6 +2,10 @@ package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -9,7 +13,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import android.content.ContentProviderOperation;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.provider.ContactsContract.CommonDataKinds.Im;
@@ -148,8 +160,24 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_INFO_CUSTOM;
 //preferred attribute
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
 
+//protocols
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_AIM;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_MSN;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_YAHOO;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_SKYPE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_QQ;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_GOOGLE_TALK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_ICQ;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_JABBER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_NETMEETING;
+
+
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_ATTRIBUTES;
+
 public class PIMField
 {
+	public enum State { NONE, ADDED, UPDATED, DELETED }
+
 	Map<Integer,Integer> mAddressAttributes = new HashMap<Integer,Integer>();
 	Map<Integer,Integer> mEmailAttributes = new HashMap<Integer,Integer>();
 	Map<Integer,Integer> mFormattedAddressAttributes = new HashMap<Integer,Integer>();
@@ -161,9 +189,12 @@ public class PIMField
 	Map<Integer,Integer> mRelationAttributes = new HashMap<Integer,Integer>();
 	Map<Integer,Integer> mOrgInfoAttributes = new HashMap<Integer,Integer>();
 
+	Map<Integer,String> mProtocols = new HashMap<Integer,String>();
+
 	String[] mStrNames;
 	ArrayList<String[]> mStrInfos;
 	String mStrType;
+	ArrayList<State> mState;
 
 	PIMField(String type, String[] names)
 	{
@@ -171,10 +202,11 @@ public class PIMField
 		System.arraycopy(names, 0, mStrNames, 0, names.length);
 		mStrInfos = new ArrayList<String[]>();
 		mStrType = type;
-		createAttributesMap();
+		createMaps();
+		mState = new ArrayList<State>();
 	}
 
-	void createAttributesMap()
+	void createMaps()
 	{
 		// Address attributes
 		mAddressAttributes.put(MA_PIM_ATTR_ADDR_HOME, StructuredPostal.TYPE_HOME);
@@ -265,7 +297,81 @@ public class PIMField
 		mOrgInfoAttributes.put(MA_PIM_ATTR_ORG_INFO_WORK, Organization.TYPE_WORK);
 		mOrgInfoAttributes.put(MA_PIM_ATTR_ORG_INFO_OTHER, Organization.TYPE_OTHER);
 		mOrgInfoAttributes.put(MA_PIM_ATTR_ORG_INFO_CUSTOM, Organization.TYPE_CUSTOM);
+
+		//Protocols
+		mProtocols.put(Im.PROTOCOL_AIM, MA_PIM_CONTACT_IM_PROTOCOL_AIM);
+		mProtocols.put(Im.PROTOCOL_MSN, MA_PIM_CONTACT_IM_PROTOCOL_MSN);
+		mProtocols.put(Im.PROTOCOL_YAHOO, MA_PIM_CONTACT_IM_PROTOCOL_YAHOO);
+		mProtocols.put(Im.PROTOCOL_SKYPE, MA_PIM_CONTACT_IM_PROTOCOL_SKYPE);
+		mProtocols.put(Im.PROTOCOL_QQ, MA_PIM_CONTACT_IM_PROTOCOL_QQ);
+		mProtocols.put(Im.PROTOCOL_GOOGLE_TALK, MA_PIM_CONTACT_IM_PROTOCOL_GOOGLE_TALK);
+		mProtocols.put(Im.PROTOCOL_ICQ, MA_PIM_CONTACT_IM_PROTOCOL_ICQ);
+		mProtocols.put(Im.PROTOCOL_JABBER, MA_PIM_CONTACT_IM_PROTOCOL_JABBER);
+		mProtocols.put(Im.PROTOCOL_NETMEETING, MA_PIM_CONTACT_IM_PROTOCOL_NETMEETING);
+		mProtocols.put(Im.PROTOCOL_CUSTOM, "OTHER");
 	}
+
+	void read(ContentResolver cr, Cursor cursor, String contactId, String[] columns, String itemType)
+	{
+		DebugPrint("************START ENTRY");
+		String[] info = new String[columns.length];
+		for (int i=0; i<columns.length; i++)
+		{
+			if ( itemType.equals(Photo.CONTENT_ITEM_TYPE) && columns[i].equals(Photo.PHOTO))
+			{
+				info[i] = loadPhoto(cr, contactId);
+			}
+			else
+			{
+				try
+				{
+					info[i] = cursor.getString( cursor.getColumnIndex(columns[i]) );
+					DebugPrint(columns[i] + ": " + info[i] + "; length = " + info[i].length());
+				}
+				catch (Exception e)
+				{
+					DebugPrint(columns[i] + " not available");
+				}
+			}
+		}
+
+		add(info);
+		DebugPrint("************END ENTRY");
+	}
+
+	public String loadPhoto(ContentResolver cr, String id)
+	{
+		Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, Long.parseLong(id));
+		InputStream input = Contacts.openContactPhotoInputStream(cr, uri);
+		if (input == null)
+		{
+			return null;//getBitmapFromURL("http://thinkandroid.wordpress.com");
+		}
+
+		return Integer.toString(PIM.addImage(BitmapFactory.decodeStream(input)));
+	}
+
+	public String loadPhoto(String url)
+	{
+		return Integer.toString(PIM.addImage(getBitmapFromURL(url)));
+	}
+
+	public Bitmap getBitmapFromURL(String src)
+	{
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection)
+            url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 	public static Object getKeyFromValue(Map<?, ?> hm, Object value)
 	{
@@ -282,6 +388,7 @@ public class PIMField
 	void add(String[] infos)
 	{
 		mStrInfos.add(infos);
+		mState.add(State.NONE);
 	}
 
 	void remove(int index)
@@ -554,7 +661,7 @@ public class PIMField
 
 	int getAttribute(int index)
 	{
-		int ret = 0;
+		int ret = MA_PIM_ERR_NO_ATTRIBUTES;
 		String[] names = mStrNames;
 		String[] infos = mStrInfos.get(index);
 
@@ -595,7 +702,7 @@ public class PIMField
 			case MA_PIM_FIELD_CONTACT_TEL:
 				ret = getPhoneAttribute(getFieldIntValue(names, infos, Phone.TYPE));
 				if ((ret == MA_PIM_ATTR_PHONE_CUSTOM) ||
-						((getCustomLabel(index)!= null) && getCustomLabel(index).equals("iPhone")))
+					((getCustomLabel(index)!= null) && getCustomLabel(index).equals("iPhone")))
 					ret = MA_PIM_ATTR_PHONE_IPHONE;
 				if (getFieldIntValue(names, infos, Phone.IS_PRIMARY) != 0)
 					ret |= MA_PIM_ATTRPREFERRED;
@@ -783,9 +890,9 @@ public class PIMField
 		return ret;
 	}
 
-	public String setCustomLabel(int index, String label)
+	public void setCustomLabel(int index, String label)
 	{
-		String ret = null;
+		setState(index, State.UPDATED);
 		String[] names = mStrNames;
 		String[] infos = mStrInfos.get(index);
 
@@ -793,38 +900,29 @@ public class PIMField
 		{
 			case MA_PIM_FIELD_CONTACT_ADDR:
 			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
-				if ( getFieldIntValue(names, infos, StructuredPostal.TYPE) == StructuredPostal.TYPE_CUSTOM )
-					setFieldValue(names, infos, StructuredPostal.LABEL, label);
+				setFieldValue(names, infos, StructuredPostal.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_EMAIL:
-				if ( getFieldIntValue(names, infos, Email.TYPE) == Email.TYPE_CUSTOM )
-					setFieldValue(names, infos, Email.LABEL, label);
+				setFieldValue(names, infos, Email.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG:
 			case MA_PIM_FIELD_CONTACT_TITLE:
 			case MA_PIM_FIELD_CONTACT_ORG_INFO:
-				if ( getFieldIntValue(names, infos, Organization.TYPE) == Organization.TYPE_CUSTOM )
-					setFieldValue(names, infos, Organization.LABEL, label);
+				setFieldValue(names, infos, Organization.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_TEL:
-				if ( getFieldIntValue(names, infos, Phone.TYPE) == Phone.TYPE_CUSTOM )
-					setFieldValue(names, infos, Phone.LABEL, label);
+				setFieldValue(names, infos, Phone.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_URL:
-				if ( getFieldIntValue(names, infos, Website.TYPE) == Website.TYPE_CUSTOM )
-					setFieldValue(names, infos, Website.LABEL, label);
+				setFieldValue(names, infos, Website.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_IM:
-				if ( getFieldIntValue(names, infos, Im.TYPE) == Im.TYPE_CUSTOM )
-					setFieldValue(names, infos, Im.LABEL, label);
+				setFieldValue(names, infos, Im.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_RELATION:
-				if ( getFieldIntValue(names, infos, Relation.TYPE) == Relation.TYPE_CUSTOM )
-					setFieldValue(names, infos, Relation.LABEL, label);
+				setFieldValue(names, infos, Relation.LABEL, label);
 				break;
 		}
-
-		return ret;
 	}
 
 	static int getDataType(int fieldType)
@@ -925,14 +1023,37 @@ public class PIMField
 			DebugPrint(names[i] + ": " + infos[i]);
 			if ( (infos[i] != null) && (names[i] != PIM.DUMMY) )
 			{
-				DebugPrint("ADD");
-				System.arraycopy(infos[i].toCharArray(), 0, buffer, retIndex, infos[i].length());
-				retIndex += infos[i].length();
+				if ((getMoSyncType() == MA_PIM_FIELD_CONTACT_IM) && (names[i] == Im.PROTOCOL))
+				{
+					String protocolName = getProtocolName(infos[i]);
+					System.arraycopy(protocolName.toCharArray(), 0, buffer, retIndex, protocolName.length());
+					retIndex += protocolName.length();
+				}
+				else
+				{
+					System.arraycopy(infos[i].toCharArray(), 0, buffer, retIndex, infos[i].length());
+					retIndex += infos[i].length();
+				}
 			}
-			DebugPrint("ZERO");
 			buffer[retIndex++] = 0;
 		}
 		return retIndex;
+	}
+
+	String getProtocolName(String value)
+	{
+		int val = Integer.parseInt(value);
+		if (!mProtocols.containsKey(val))
+			return "OTHER";
+		return mProtocols.get(val);
+	}
+
+	String getProtocolID(String name)
+	{
+		Integer id = ((Integer)getKeyFromValue(mProtocols, name)).intValue();
+		if (id == null)
+			return Integer.toString(Im.PROTOCOL_CUSTOM);
+		return id.toString();
 	}
 
 	void readStringArray(String[] names, String[] infos, char[] buffer)
@@ -966,12 +1087,14 @@ public class PIMField
 		{
 			case MA_PIM_TYPE_INT:
 			{
+				DebugPrint("INT DATA " + infos[1]);
 				int data = Integer.parseInt(infos[1]);
 				writeInt(data, buffer, 0);
 				return 2;
 			}
 			case MA_PIM_TYPE_DATE:
 			{
+				DebugPrint("DATE DATA " + infos[1]);
 				SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
 				Date dateObj = null;
 				try
@@ -990,18 +1113,19 @@ public class PIMField
 			}
 			case MA_PIM_TYPE_STRING:
 			{
+				DebugPrint("STRING DATA " + infos[1]);
 				System.arraycopy(infos[1].toCharArray(), 0, buffer, 0, infos[1].length());
 				return infos[1].length();
 			}
 			case MA_PIM_TYPE_STRING_ARRAY:
 			{
+				DebugPrint("STRING ARRAY DATA " + infos.length);
+				for (int i=0; i<infos.length; i++)
+					if (infos[i] != null)
+					{
+						DebugPrint( i + ":" + infos[i]);
+					}
 				return writeStringArray(names, infos, buffer);
-			}
-			case MA_PIM_TYPE_BINARY:
-			{
-				DebugPrint("INFOS = " + infos[1]);
-				//System.arraycopy(infos[1]., 0, buffer, 0, infos[1].length());
-				return infos[1].length();
 			}
 			default:
 			{
@@ -1012,6 +1136,7 @@ public class PIMField
 
 	int setData(int index, char[] buffer)
 	{
+		setState(index, State.UPDATED);
 		String[] names = mStrNames;
 		String[] infos = mStrInfos.get(index);
 
@@ -1042,6 +1167,10 @@ public class PIMField
 				char[] tmp = new char[len];
 				System.arraycopy(buffer, 0, tmp, 0, len);
 				infos[1] = new String(tmp);
+				if (getMoSyncType() == MA_PIM_FIELD_CONTACT_PHOTO_URL)
+				{
+					infos[1] = loadPhoto(infos[1]);
+				}
 				DebugPrint("INFOS = " + infos[1]);
 				break;
 			}
@@ -1066,6 +1195,7 @@ public class PIMField
 		String[] infos = new String[names.length];
 		mStrInfos.add(infos);
 		int index = mStrInfos.size() - 1;
+		setState(index, State.ADDED);
 		return setData(index, buffer);
 	}
 
@@ -1073,5 +1203,145 @@ public class PIMField
 	{
 		String[] infos = mStrInfos.get(index);
 		return infos[0];
+	}
+
+	boolean hasCustomLabel(int index)
+	{
+		String[] names = mStrNames;
+		String[] infos = mStrInfos.get(index);
+
+		int type = getMoSyncType();
+		switch (type)
+		{
+			case MA_PIM_FIELD_CONTACT_BIRTHDAY:
+			case MA_PIM_FIELD_CONTACT_NAME:
+			case MA_PIM_FIELD_CONTACT_NICKNAME:
+			case MA_PIM_FIELD_CONTACT_NOTE:
+			case MA_PIM_FIELD_CONTACT_PHOTO:
+			case MA_PIM_FIELD_CONTACT_PHOTO_URL:
+				return false;
+			case MA_PIM_FIELD_CONTACT_ADDR:
+			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
+				if ( getFieldIntValue(names, infos, StructuredPostal.TYPE) != StructuredPostal.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_EMAIL:
+				if ( getFieldIntValue(names, infos, Email.TYPE) != Email.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_ORG:
+			case MA_PIM_FIELD_CONTACT_TITLE:
+			case MA_PIM_FIELD_CONTACT_ORG_INFO:
+				if ( getFieldIntValue(names, infos, Organization.TYPE) != Organization.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_TEL:
+				if ( getFieldIntValue(names, infos, Phone.TYPE) != Phone.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_URL:
+				if ( getFieldIntValue(names, infos, Website.TYPE) != Website.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_IM:
+				if ( getFieldIntValue(names, infos, Im.TYPE) != Im.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_RELATION:
+				if ( getFieldIntValue(names, infos, Relation.TYPE) != Relation.TYPE_CUSTOM )
+					return false;
+				break;
+		}
+		return true;
+	}
+
+	boolean isReadOnly()
+	{
+		int type = getMoSyncType();
+		if ((type == MA_PIM_FIELD_CONTACT_UID) ||
+			(type == MA_PIM_FIELD_CONTACT_REVISION))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	boolean isWriteOnly()
+	{
+		if (getMoSyncType() == MA_PIM_FIELD_CONTACT_PHOTO_URL)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	void setState(int index, State state)
+	{
+		if (state == State.ADDED)
+		{
+			mState.add(State.ADDED);
+		}
+		else if ((mState.get(index) == State.NONE) ||
+			(mState.get(index) == State.UPDATED))
+		{
+			mState.set(index, state);
+		}
+	}
+
+	void close()
+	{
+//		for (int i=0; i<mState.size(); i++)
+//		{
+//			if (mState.get(i) == State.ADDED)
+//			{
+//				add(mStrNames, mStrInfos.get(i));
+//			}
+//			else if (mState.get(i) == State.UPDATED)
+//			{
+//				update(mStrNames, mStrInfos.get(i));
+//			}
+//			else if (mState.get(i) == State.DELETED)
+//			{
+//				delete();
+//			}
+//		}
+	}
+
+	void add()
+	{
+//		ArrayList<ContentProviderOperation> ops =
+//			new ArrayList<ContentProviderOperation>();
+//
+//		ops.add(ContentProviderOperation.newInsert(Data.CONTENT_URI)
+//				.withValue(Data.RAW_CONTACT_ID, rawContactId)
+//				.withValue(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE)
+//				.withValue(Phone.NUMBER, "            1-800-GOOG-411      ")
+//				.withValue(Phone.TYPE, Phone.TYPE_CUSTOM)
+//				.withValue(Phone.LABEL, "free directory assistance")
+//				.build());
+//		getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+	}
+
+	void update()
+	{
+//		ArrayList<ContentProviderOperation> ops =
+//			new ArrayList<ContentProviderOperation>();
+//
+//		ops.add(ContentProviderOperation.newUpdate(Data.CONTENT_URI)
+//				.withSelection(Data._ID + "=?", new String[]{String.valueOf(dataId)})
+//				.withValue(Email.DATA, "somebody@android.com")
+//				.build());
+//		getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+	}
+
+	void delete()
+	{
+//		ArrayList<ContentProviderOperation> ops =
+//			new ArrayList<ContentProviderOperation>();
+//
+//		ops.add(ContentProviderOperation.newDelete(Data.CONTENT_URI)
+//				.withSelection(Data._ID + "=?", new String[]{String.valueOf(dataId)})
+//				.build());
+//		getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
 	}
 }
