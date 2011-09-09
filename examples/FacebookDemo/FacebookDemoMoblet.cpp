@@ -193,11 +193,6 @@ MAUtil::String FacebookDemoMoblet::extractAccessToken(const char *newurl)
 {
 	MAUtil::String access_token;
 
-//	const int BUFFER_SIZE = 16384;
-//	char *newurl = new char[BUFFER_SIZE];
-//	strcpy((char*) newurl, newUrl.c_str());
-
-
 	if (strstr(newurl, "fbconnect://") == newurl)
 	{
 		Environment::getEnvironment().removeCustomEventListener(this);

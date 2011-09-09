@@ -25,6 +25,8 @@ MA 02110-1301, USA.
 #include <NativeUI/Button.h>
 #include <NativeUI/ListView.h>
 
+#include "../PlatformInfo.h"
+
 namespace FacebookDemoGUI
 {
 
@@ -46,7 +48,14 @@ void ListScreen::show()
 
 void ListScreen::add(ListItem *btn)
 {
-	btn->setBackgroundColor(mListItemsColor);
+	if(FacebookDemoApplication::isAndroid())
+	{
+		btn->setBackgroundColor(mItemsColor_Android);
+	}
+	else
+	{
+		btn->setBackgroundColor(mItemsColor_iPhone);
+	}
 	mList->addChild(btn);
 }
 
@@ -79,7 +88,10 @@ void ListScreen::initialize()
 {
 	LOG("\n\tListScreen::initialize()");
 	mClearScreenAfterLosingFocus = false;
-	mListItemsColor = 0x000088;
+
+	mItemsColor_Android = 0x000000;
+	mItemsColor_iPhone = 0x99999A;
+
 	mScreenColor = 0x000000;
 
 	this->setBackgroundColor(mScreenColor);

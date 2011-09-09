@@ -73,7 +73,14 @@ protected:
 	NativeUI::ListView 			*mList;
 	NativeUI::Button			*mBackButton;
 
-	int							mListItemsColor;
+	//we can't set the font color for a ListViewItem yet, so we set
+	//the background of the item. The default font color on Android is white
+	//and the default font color on iPhone is black.
+	//So we set the background color of the items to black for Android and
+	//light gray for iPhone.
+	int							mItemsColor_Android;
+	int 						mItemsColor_iPhone;
+
 	int							mScreenColor;
 
 	bool 						mClearScreenAfterLosingFocus;
