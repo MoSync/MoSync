@@ -6390,7 +6390,7 @@ group CameraProperties "Camera Properties" {
 
 
 		/**
-		* @brief Sets the focus mode for the camera.
+		* @brief Sets the zoom level for the camera.
 		*
 		* @validvalue an int string that can be between 0 and #MA_CAMERA_MAX_ZOOM
 		*

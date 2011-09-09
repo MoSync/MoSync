@@ -226,30 +226,17 @@ public class PIM {
 	    while (cur.moveToNext())
 	    {
 			String contactId = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
-			DebugPrint("CONTACT ID = " + contactId);
+
 			PIMItem pimItem = new PIMItem();
-
-			DebugPrint("Fields Columns = " + PIMFieldsColumns.length);
-
-			pimItem.setID(contactId, PIMFieldsTypes[0], PIMFieldsColumns[0]);
-
-			for (int i = 1; i < PIMFieldsColumns.length; i++)
-			{
-				DebugPrint("FIELD = " + i);
-				pimItem.readField(getContentResolver(), contactId, PIMFieldsColumns[i], PIMFieldsTypes[i]);
-			}
+			pimItem.read(getContentResolver(), contactId, PIMFieldsTypes, PIMFieldsColumns);
 
 			mPIMContactsList.add(pimItem);
 	    }
 
 	    mPIMIterator = mPIMContactsList.iterator();
 
-	    DebugPrint("Add list at key " + mResourceIndex);
-
 	    mPIMLists.put(mResourceIndex, mPIMContactsList);
 	    mPIMIterators.put(mResourceIndex, mPIMIterator);
-
-	    DebugPrint("Iterator: " + mPIMIterator.hasNext());
 
 	    return mResourceIndex++;
 	}
@@ -287,6 +274,13 @@ public class PIM {
 		if ((list < 0) || (!mPIMLists.containsKey(list)) )
 		{
 			return MA_PIM_ERR_HANDLE_INVALID;
+		}
+
+		Iterator<PIMItem> it = mPIMLists.get(list).iterator();
+
+		while (it.hasNext())
+		{
+			it.next().close();
 		}
 
 		mPIMContactsList = mPIMLists.remove(list);
@@ -369,7 +363,7 @@ public class PIM {
 		{
 			return MA_PIM_ERR_INDEX_INVALID;
 		}
-		//MA_PIM_ERR_NO_ATTRIBUTES fleu TODO
+
 		return pimField.getAttribute(index);
 	}
 
@@ -403,14 +397,14 @@ public class PIM {
 			return MA_PIM_ERR_INDEX_INVALID;
 		}
 
-		char[] buffer = readStringFromMemory(buffPointer, buffSize >> 1);
-		if (buffer == null)
+		if (!pimField.hasCustomLabel(index))
 		{
-			return MA_PIM_ERR_NO_LABEL; //fleu TODO
+			return MA_PIM_ERR_NO_LABEL;
 		}
 
-		//pimField.setCustomLabel(index, buffer); //fleu TODO
-		//pimItem.updateField(getContentResolver(), BaseColumns._ID, pimField.getId(index), "data3", buffer);
+		char[] buffer = readStringFromMemory(buffPointer, buffSize >> 1);
+
+		pimField.setCustomLabel(index, new String(buffer));
 
 		return MA_PIM_ERR_NONE;
 	}
@@ -445,63 +439,19 @@ public class PIM {
 			return MA_PIM_ERR_INDEX_INVALID;
 		}
 
-		char[] buffer = pimField.getCustomLabel(index).toCharArray();
-
-		if (buffer == null)
+		if (!pimField.hasCustomLabel(index))
 		{
 			return MA_PIM_ERR_NO_LABEL;
 		}
 
+		char[] buffer = pimField.getCustomLabel(index).toCharArray();
+
 		if ( buffer.length > buffSize )
 			return MA_PIM_ERR_BUFFER_TOO_SMALL;
 
-		DebugPrint("Data: " + getMemDataSection() + "; Position: " + Integer.toHexString(buffPointer) + "; Size: " + buffSize);
 		copyStringToMemory(buffPointer, buffer);
 
 		return buffer.length;
-	}
-
-	/**
-	 * @return The MoSync data section memory buffer.
-	 */
-	public ByteBuffer getMemDataSection()
-	{
-		return mMoSyncThread.mMemDataSection;
-	}
-
-	/**
-	 * Copy a String value to the given address in the system memory.
-	 */
-	void copyStringToMemory(int address, char[] str)
-	{
-		copyStringToMemory(address, str, str.length);
-	}
-
-	/**
-	 * Copy a String value to the given address in the system memory.
-	 */
-	void copyStringToMemory(int address, char[] str, int length)
-	{
-		getMemDataSection().position(address);
-		for (int i=0; i<length; i++)
-		{
-			getMemDataSection().putChar(str[i]);
-		}
-		getMemDataSection().put((byte)0); // Terminating null char.
-	}
-
-	/**
-	 * Read string from system memory.
-	 */
-	char[] readStringFromMemory(int address, int length)
-	{
-		char[] buffer = new char[length];
-		getMemDataSection().position(address);
-		for (int i=0; i<length; i++)
-		{
-			buffer[i] = getMemDataSection().getChar();
-		}
-		return buffer;
 	}
 
 	public int maPimFieldType(int list, int field)
@@ -527,7 +477,6 @@ public class PIM {
 
 	public int maPimItemGetValue(int item, int field, int buffPointer, int buffSize, int index)
 	{
-		DebugPrint("PIM ITEM GET VALUE " + item + "   " + field);
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
@@ -551,17 +500,21 @@ public class PIM {
 			return MA_PIM_ERR_INDEX_INVALID;
 		}
 
-		//return MA_PIM_ERR_FIELD_WRITE_ONLY; fleu TODO
+		if (pimField.isWriteOnly())
+		{
+			return MA_PIM_ERR_FIELD_WRITE_ONLY;
+		}
 
-		char[] buffer = new char[512];
+		char[] buffer = new char[1024];
 		int length = pimField.getData(index, buffer);
 
 		if ( length > buffSize )
+		{
 			return MA_PIM_ERR_BUFFER_INVALID;
+		}
 
 		if (length > 0)
 			copyStringToMemory(buffPointer, buffer, length);
-
 		return length;
 	}
 
@@ -585,7 +538,10 @@ public class PIM {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
 
-		//return MA_PIM_ERR_READ_ONLY; fleu TODO
+		if (pimField.isReadOnly())
+		{
+			return MA_PIM_ERR_FIELD_READ_ONLY;
+		}
 
 		if ( (index < 0) || (index >= pimField.length()) )
 		{
@@ -623,7 +579,11 @@ public class PIM {
 		{
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
-		//return MA_PIM_ERR_FIELD_READ_ONLY; fleu TODO
+
+		if (pimField.isReadOnly())
+		{
+			return MA_PIM_ERR_FIELD_READ_ONLY;
+		}
 
 		DebugPrint("BUFFSIZE = " + buffSize);
 		char[] buffer = readStringFromMemory(buffPointer, buffSize >> 1);
@@ -677,10 +637,13 @@ public class PIM {
 
 	public int maPimItemClose(int item)
 	{
-		if ( (item < 0) || (mPIMItems.get(item) == null) )
+		PIMItem pimItem = null;
+		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
 			return MA_PIM_ERR_HANDLE_INVALID;
 		}
+		pimItem.close();
+
 		return MA_PIM_ERR_NONE;
 	}
 
@@ -724,5 +687,48 @@ public class PIM {
 				new ImageCache(null, img));
 
 		return mImagePlaceholder++;
+	}
+
+	/**
+	 * @return The MoSync data section memory buffer.
+	 */
+	public ByteBuffer getMemDataSection()
+	{
+		return mMoSyncThread.mMemDataSection;
+	}
+
+	/**
+	 * Copy a String value to the given address in the system memory.
+	 */
+	void copyStringToMemory(int address, char[] str)
+	{
+		copyStringToMemory(address, str, str.length);
+	}
+
+	/**
+	 * Copy a String value to the given address in the system memory.
+	 */
+	void copyStringToMemory(int address, char[] str, int length)
+	{
+		getMemDataSection().position(address);
+		for (int i=0; i<length; i++)
+		{
+			getMemDataSection().putChar(str[i]);
+		}
+		getMemDataSection().put((byte)0); // Terminating null char.
+	}
+
+	/**
+	 * Read string from system memory.
+	 */
+	char[] readStringFromMemory(int address, int length)
+	{
+		char[] buffer = new char[length];
+		getMemDataSection().position(address);
+		for (int i=0; i<length; i++)
+		{
+			buffer[i] = getMemDataSection().getChar();
+		}
+		return buffer;
 	}
 }

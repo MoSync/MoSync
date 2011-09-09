@@ -19,9 +19,11 @@
 #import "ScreenWidget.h"
 
 @interface StackScreenWidget : ScreenWidget <UINavigationControllerDelegate> {
+    NSMutableArray* stack;
 }
 
 - (id)init;
+- (void)dealloc;
 //- (void)addChild: (IWidget*)child;
 //- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index;
 //- (void)removeChild: (IWidget*)child;

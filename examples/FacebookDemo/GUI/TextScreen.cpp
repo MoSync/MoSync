@@ -35,11 +35,6 @@ TextScreen::TextScreen(FacebookDemoScreen *prev):FacebookDemoScreen(prev)
 	initialize();
 }
 
-TextScreen::TextScreen(): FacebookDemoScreen(0)
-{
-	initialize();
-}
-
 void TextScreen::setText(const MAUtil::String &text)
 {
 	mLabel->setText(text);
@@ -52,17 +47,19 @@ void TextScreen::clear()
 
 void TextScreen::buttonPressed(Widget* button)
 {
-
 }
 
 void TextScreen::buttonReleased(Widget* button)
 {
-
 }
 
 void TextScreen::buttonClicked(Widget* button)
 {
-	back();
+	if( button = mBackButton )
+	{
+		back();
+		mPreviousScreen->show();
+	}
 }
 
 void TextScreen::initialize()

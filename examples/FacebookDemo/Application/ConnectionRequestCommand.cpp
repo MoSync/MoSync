@@ -43,14 +43,14 @@ namespace FacebookDemoApplication
 ConnectionRequestCommand::ConnectionRequestCommand(FacebookManager *facebookManager,
 		FacebookDemoGUI::FacebookDemoScreen *previousScreen, const MAUtil::String &connection,
 		const MAUtil::String &id):
-		mMaxEntriesInList(4),
+		mMaxEntriesInList(3),
 		mFacebookManager(facebookManager),
 		mConnection(connection),
 		mId(id)
 
 {
-	LOG("\n\tConnectionRequestCommand constructor");
 	mFacebookManager->limitTheNumberOfObjectsToFetch(mMaxEntriesInList);
+	mFacebookManager->setConnectionRequestListener(this);
 	createGUI(previousScreen);
 }
 
@@ -63,14 +63,14 @@ ConnectionRequestCommand::ConnectionRequestCommand(FacebookManager *facebookMana
 ConnectionRequestCommand::ConnectionRequestCommand(FacebookManager *facebookManager, FacebookDemoGUI::FacebookDemoScreen *previousScreen,
 		const MAUtil::String &connection, const MAUtil::Vector<MAUtil::String> &fields,
 		const MAUtil::String &id):
-		mMaxEntriesInList(4),
+		mMaxEntriesInList(3),
 		mFacebookManager(facebookManager),
 		mConnection(connection),
 		mFields(fields),
 		mId(id)
 {
-	LOG("\n\tConnectionRequestCommand constructor");
 	mFacebookManager->limitTheNumberOfObjectsToFetch(mMaxEntriesInList);
+	mFacebookManager->setConnectionRequestListener(this);
 	createGUI(previousScreen);
 }
 
@@ -304,12 +304,13 @@ void ConnectionRequestCommand::errorReceivingConnection(int code, const MAUtil::
 
 	LOG("\n\t\tConnectionRequestCommand::errorReceivingConnecion. connection=%s, id=%s", connType.c_str(), id.c_str());
 
-	MAUtil::String error = "Error retrieving connection " + connType +
-							". Error code: " + MAUtil::integerToString(code);
+	MAUtil::String error = "Error retrieving connection \"" + connType +
+							"\". Error code: " + MAUtil::integerToString(code);
 
 	if(mPleaseWaitScreen)
 	{
 		mPleaseWaitScreen->setText(error);
+		mPleaseWaitScreen->show();
 	}
 }
 
@@ -355,7 +356,7 @@ void ConnectionRequestCommand::createGUI(FacebookDemoGUI::FacebookDemoScreen *pr
 
 	mImageResponseScreen = new FacebookDemoGUI::ImageScreen(previousScreen);
 
-	mPleaseWaitScreen = new FacebookDemoGUI::TextScreen();
+	mPleaseWaitScreen = new FacebookDemoGUI::TextScreen(previousScreen);
 	mPleaseWaitScreen->setText("Sending request. Please wait...");
 }
 

@@ -26,54 +26,55 @@ MA 02110-1301, USA.
 
 // Include MoSync syscalls.
 #include <maapi.h>
-#include <IX_WIDGET.h>
+
+// Include NativeUI class interface
+#include <NativeUI/Widgets.h>
+
 #ifndef IMAGESCREEN_H_
 #define IMAGESCREEN_H_
 
+using namespace NativeUI;
 
 /**
  * A class that encapsulates the behavior of ImageScreen
  */
-class ImageScreen
+class ImageScreen : public ButtonListener
 {
 public:
-	ImageScreen():isViewed(false)
+	ImageScreen()
 	{
-		//do nothing
+		mImageHandle = 0;
 	}
 
 	virtual ~ImageScreen()
 	{
-		maWidgetDestroy(mScreen);
+		delete mScreen;
 	}
 
-	void customEvent(const MAEvent& event);
+	virtual void buttonClicked(Widget* button);
 
-	int initialize(MAHandle stackScreen);
+	int initialize(StackScreen* stackScreen);
 
 	void pushImageScreen();
 
 	void setImageDataHandle(MAHandle dataHandle);
 
-	bool isViewed;
 
 private:
 
 	void createUI();
 
-	MAHandle mScreen;
+	Screen *mScreen;
 
-	MAHandle mOKButton;
+	Button *mOKButton;
 
-	MAHandle mMainLayoutWidget;
+	VerticalLayout *mMainLayoutWidget;
 
-	MAHandle mStackScreen;
+	StackScreen *mStackScreen;
 
-	MAHandle mImageWidget;
+	Image *mImageWidget;
 
-	MAHandle dataHandle;
-
-	MAHandle imageHandle;
+	MAHandle mImageHandle;
 };
 
 #endif /* IMAGESCREEN_H_ */

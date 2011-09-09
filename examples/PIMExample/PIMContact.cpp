@@ -736,7 +736,7 @@ void PIMContact::addContactName()
     }
 
     // Add value to field.
-    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTRPREFERRED));
 }
 
 /**
@@ -805,7 +805,7 @@ void PIMContact::addBirthday()
     *(int*) mArgs.buf = birthday;
 
     // Add value to birthday field.
-    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTRPREFERRED));
 }
 
 /**
@@ -856,7 +856,7 @@ void PIMContact::addNickname()
     mArgs.bufSize = copyWCharArray(mArgs.buf, sNickname);
 
     // Add value to nickname field.
-    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTRPREFERRED));
 }
 
 /**
@@ -874,7 +874,7 @@ void PIMContact::addNote()
     mArgs.bufSize = copyWCharArray(mArgs.buf, sNote);
 
     // Add value to note field.
-    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTRPREFERRED));
 }
 
 /**
@@ -892,7 +892,7 @@ void PIMContact::addOrg()
     mArgs.bufSize = copyWCharArray(mArgs.buf, sOrg);
 
     // Add value to organization field.
-    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTRPREFERRED | MA_PIM_ATTR_ORG_WORK));
 }
 
 /**
@@ -911,7 +911,7 @@ void PIMContact::addPhoto()
     *(int*) mArgs.buf = RES_IMAGE;
 
     // Add value to photo field.
-    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTRPREFERRED));
 }
 
 /**
@@ -929,7 +929,7 @@ void PIMContact::addPhotoURL()
     mArgs.bufSize = copyWCharArray(mArgs.buf, sPhotoURL);
 
     // Add value to photo URL field.
-    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTRPREFERRED));
 }
 
 /**
@@ -992,7 +992,7 @@ void PIMContact::addTitle()
     mArgs.bufSize = copyWCharArray(mArgs.buf, sTitle);
 
     // Add value to title field.
-    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTRPREFERRED | MA_PIM_ATTR_TITLE_WORK));
 }
 
 /**
@@ -1129,5 +1129,5 @@ void PIMContact::addOrgInfo()
         COUNT_ORG_INFO_INDICES);
 
     // Add value to organization info field.
-    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTR_PREFERRED));
+    checkResultCode(maPimItemAddValue(&mArgs, MA_PIM_ATTRPREFERRED | MA_PIM_ATTR_ORG_INFO_WORK));
 }

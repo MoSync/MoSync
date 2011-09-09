@@ -36,6 +36,8 @@ void FacebookDemoScreen::show()
 	{
 		mPreviousScreen->receiveKeyEvents(false);
 	}
+
+	receiveKeyEvents(true);
 	NativeUI::Screen::show();
 }
 
@@ -82,9 +84,9 @@ FacebookDemoScreen::~FacebookDemoScreen()
 
 void FacebookDemoScreen::back()
 {
-	receiveKeyEvents(false);
 	if(0 != mPreviousScreen)
 	{
+		receiveKeyEvents(false);
 		mPreviousScreen->show();
 	}
 }
