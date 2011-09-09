@@ -511,8 +511,8 @@ public class MoSyncThread extends Thread
 	{
 		new Exception("STACKTRACE: threadPanic").printStackTrace();
 
-		Log.i("@@@ MoSync",
-			"PANIC - errorCode: " + errorCode + " message: " + message);
+		//Log.i("@@@ MoSync",
+		//	"PANIC - errorCode: " + errorCode + " message: " + message);
 
 		mHasDied = true;
 
@@ -735,9 +735,9 @@ public class MoSyncThread extends Thread
 		}
 		else
 		{
-			Log.i(
-				"@@@ MoSyncThread.postEvent",
-				"Did not call interrupt, not in maWait (this is good!)");
+			//Log.i(
+			//	"@@@ MoSyncThread.postEvent",
+			//	"Did not call interrupt, not in maWait (this is good!)");
 		}
 	}
 
@@ -748,7 +748,7 @@ public class MoSyncThread extends Thread
 	@Override
 	public void run()
 	{
-		Log.i("MoSync Thread", "run");
+		//Log.i("MoSync Thread", "run");
 
 		// Load the program.
 		if (false == loadProgram())
@@ -1582,8 +1582,8 @@ public class MoSyncThread extends Thread
 		}
 		} catch(Exception e) {
 			e.printStackTrace();
-			Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
-				imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
+			//Log.i("_maGetImageData", "("+image+", "+srcLeft+","+srcTop+", "+srcWidth+"x"+srcHeight+"): "+
+			//	imageResource.mBitmap.getWidth()+"x"+imageResource.mBitmap.getHeight()+"\n");
 			maPanic(-1, "maGetImageData");
 		}
 	}
@@ -2260,7 +2260,7 @@ public class MoSyncThread extends Thread
 		else if (key.equals("mosync.path.local"))
 		{
 			String path = getActivity().getFilesDir().getAbsolutePath() + "/";
-			Log.i("@@@ MoSync", "Property mosync.path.local: " + path);
+			//Log.i("@@@ MoSync", "Property mosync.path.local: " + path);
 			property = path;
 		}
 		else if (key.equals("mosync.path.local.urlPrefix"))
@@ -2271,7 +2271,7 @@ public class MoSyncThread extends Thread
 		{
 			String url = "file://" +
 				getActivity().getFilesDir().getAbsolutePath() + "/";
-			Log.i("@@@ MoSync", "Property mosync.path.local.url: " + url);
+			//Log.i("@@@ MoSync", "Property mosync.path.local.url: " + url);
 			property = url;
 		}
 
@@ -2307,7 +2307,7 @@ public class MoSyncThread extends Thread
 	{
 		if (url.startsWith("http://") || url.startsWith("https://"))
 		{
-			Log.i("maPlatformRequest","Starting browser:" + url);
+			//Log.i("maPlatformRequest","Starting browser:" + url);
 			Intent intent = new Intent(Intent.ACTION_VIEW);
 			intent.setData(Uri.parse(url));
 			((Activity)mContext).startActivity(intent);
@@ -2466,12 +2466,12 @@ public class MoSyncThread extends Thread
 		{
 			mImageResources.remove(resourceIndex);
 		}
-		else
-		{
-			Log.e("MoSyncThread", "destroyResource bad handle: " + resourceIndex);
-		}
+		//else
+		//{
+		//	Log.e("MoSyncThread", "destroyResource bad handle: " + resourceIndex);
+		//}
 
-		Log.i("MoSyncThread", "Resource deleted, force GC");
+		//Log.i("MoSyncThread", "Resource deleted, force GC");
 		System.gc();
 	}
 
@@ -2499,7 +2499,7 @@ public class MoSyncThread extends Thread
 		bundle.putInt("CONSTRAINTS", constraints);
 		intent.putExtras(bundle);
 		mContext.startActivity(intent);
-		Log.i("MoSync", "New activity started for InputBox");
+		//Log.i("MoSync", "New activity started for InputBox");
 		return 0;
 	}
 
@@ -2558,7 +2558,7 @@ public class MoSyncThread extends Thread
 	 */
 	int maNotificationAdd(int type, int id, String title, String text)
 	{
-		Log.i("MoSync", "maNotificationAdd");
+		//Log.i("MoSync", "maNotificationAdd");
 
 		// This is the only notification type we support at the moment.
 		if (NOTIFICATION_TYPE_APPLICATION_LAUNCHER != type)
@@ -2586,7 +2586,7 @@ public class MoSyncThread extends Thread
 	 */
 	int maNotificationRemove(int notificationId)
 	{
-		Log.i("MoSync", "maNotificationRemove");
+		//Log.i("MoSync", "maNotificationRemove");
 
 		// Stop the service if this is the service notification id.
 		if (MoSyncService.sNotificationId == notificationId)
@@ -2612,7 +2612,7 @@ public class MoSyncThread extends Thread
 	 */
 	int maSendToBackground()
 	{
-		Log.i("MoSync", "maSendToBackground");
+		//Log.i("MoSync", "maSendToBackground");
 
 		final Activity activity = mContext;
 
@@ -2634,8 +2634,8 @@ public class MoSyncThread extends Thread
 
 	int maScreenSetOrientation(int orientation)
 	{
-		Log.i("MoSync", "maScreenSetOrientation orientation: "
-			+ orientation);
+		//Log.i("MoSync", "maScreenSetOrientation orientation: "
+		//	+ orientation);
 
 		if (SCREEN_ORIENTATION_LANDSCAPE == orientation)
 		{
@@ -2676,7 +2676,7 @@ public class MoSyncThread extends Thread
 
 	int maScreenSetFullscreen(final int fullscreen)
 	{
-		Log.i("MoSync", "maScreenSetFullscreen");
+		//Log.i("MoSync", "maScreenSetFullscreen");
 
 		if (1 == fullscreen)
 		{
@@ -3368,7 +3368,7 @@ public class MoSyncThread extends Thread
 		}
 		catch (Throwable t)
 		{
-			Log.i("MoSyncThread", "Exception in loadGlTexture: " + t.toString());
+			//Log.i("MoSyncThread", "Exception in loadGlTexture: " + t.toString());
 			t.printStackTrace();
 		}
 		finally
@@ -3389,7 +3389,7 @@ public class MoSyncThread extends Thread
 		}
 		else
 		{
-			Log.i("MoSyncThread", "Could not load texture glGetError returned: 0x" + Integer.toHexString(glError));
+			//Log.i("MoSyncThread", "Could not load texture glGetError returned: 0x" + Integer.toHexString(glError));
 			return -3; // Texture could not be loaded.
 		}
 	}
@@ -3787,7 +3787,7 @@ public class MoSyncThread extends Thread
 			if (intent.getAction().equals(Intent.ACTION_SCREEN_ON))
 			{
 				// Send ON event.
-				Log.i("@@@MoSync", "@@@ Sending EVENT_TYPE_SCREEN_STATE_ON");
+				//Log.i("@@@MoSync", "@@@ Sending EVENT_TYPE_SCREEN_STATE_ON");
 				int[] event = new int[1];
 				event[0] = EVENT_TYPE_SCREEN_STATE_ON;
 				mMoSyncThread.postEvent(event);
@@ -3795,7 +3795,7 @@ public class MoSyncThread extends Thread
 			else if (intent.getAction().equals(Intent.ACTION_SCREEN_OFF))
 			{
 				// Send OFF event.
-				Log.i("@@@MoSync", "@@@ Sending EVENT_TYPE_SCREEN_STATE_OFF");
+				//Log.i("@@@MoSync", "@@@ Sending EVENT_TYPE_SCREEN_STATE_OFF");
 				int[] event = new int[1];
 				event[0] = EVENT_TYPE_SCREEN_STATE_OFF;
 				mMoSyncThread.postEvent(event);

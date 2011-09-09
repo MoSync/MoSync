@@ -85,7 +85,7 @@ public class MoSync extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState) 
 	{
-		Log.i("MoSync", "onCreate");
+		//Log.i("MoSync", "onCreate");
 		
 		super.onCreate(savedInstanceState);
 		
@@ -152,7 +152,7 @@ public class MoSync extends Activity
 	@Override
 	public void onConfigurationChanged(Configuration newConfig)
 	{
-		Log.i("MoSync", "onConfigurationChanged");
+		//Log.i("MoSync", "onConfigurationChanged");
 
 		super.onConfigurationChanged(newConfig);
 	}
@@ -160,7 +160,7 @@ public class MoSync extends Activity
 	@Override
     protected void onStart()
 	{
-		Log.i("MoSync", "onStart");
+		//Log.i("MoSync", "onStart");
 		
 		super.onStart();
 		
@@ -170,7 +170,7 @@ public class MoSync extends Activity
     @Override
     protected void onStop()
 	{
-		Log.i("MoSync", "onStop");
+		//Log.i("MoSync", "onStop");
 		mMoSyncThread.releaseHardware();
 		super.onStop();
 		
@@ -180,7 +180,7 @@ public class MoSync extends Activity
 	@Override
     protected void onResume()
 	{
-		Log.i("MoSync", "onResume");
+		//Log.i("MoSync", "onResume");
 		
 		super.onResume();
 		
@@ -201,7 +201,7 @@ public class MoSync extends Activity
 	@Override
     protected void onPause()
 	{
-		Log.i("MoSync", "onPause");
+		//Log.i("MoSync", "onPause");
 		mMoSyncThread.releaseHardware();
 		super.onPause();
 		
@@ -221,7 +221,7 @@ public class MoSync extends Activity
 	@Override
     protected void onRestart()
 	{
-		Log.i("MoSync", "onRestart");
+		//Log.i("MoSync", "onRestart");
 		
 		super.onRestart();
 		
@@ -231,7 +231,7 @@ public class MoSync extends Activity
 	@Override
     protected void onDestroy()
 	{
-    	Log.i("MoSync", "onDestroy");
+		//Log.i("MoSync", "onDestroy");
 		
 		super.onDestroy();
 		
@@ -272,7 +272,7 @@ public class MoSync extends Activity
 	 */
 	private MoSyncView createMoSyncView()
 	{
-		Log.i("MoSync", "createMoSyncView");
+		//Log.i("MoSync", "createMoSyncView");
 		
 		try 
 		{
@@ -397,12 +397,12 @@ public class MoSync extends Activity
 			try
 			{
 				mTouchHandler = new MoSyncMultiTouchHandler();
-				Log.i("MoSync TouchEvent","Multi touch device!");
+				//Log.i("MoSync TouchEvent","Multi touch device!");
 			}
 			catch(java.lang.VerifyError error)
 			{
 				mTouchHandler = new MoSyncSingleTouchHandler();
-				Log.i("MoSync TouchEvent","Single touch device!");
+				//Log.i("MoSync TouchEvent","Single touch device!");
 			}
 		}
 		
@@ -525,7 +525,7 @@ public class MoSync extends Activity
 			@Override
 			public void onReceive(Context context, Intent intent)
 			{	
-				Log.i("@@@MoSync", "@@@ ACTION_SHUTDOWN Intent = " + intent);
+				//Log.i("@@@MoSync", "@@@ ACTION_SHUTDOWN Intent = " + intent);
 
 				// Send EVENT_TYPE_CLOSE.
 				sendCloseEvent();
