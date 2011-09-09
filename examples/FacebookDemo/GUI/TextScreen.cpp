@@ -27,6 +27,8 @@ MA 02110-1301, USA.
 #include "TextScreen.h"
 #include "Facebook/LOG.h"
 
+#include "../PlatformInfo.h"
+
 namespace FacebookDemoGUI
 {
 
@@ -71,6 +73,17 @@ void TextScreen::initialize()
 	mLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 	mLabel->fillSpaceHorizontally();
 	mLabel->fillSpaceVertically();
+
+	if( FacebookDemoApplication::isAndroid())
+	{
+		mLayout->setBackgroundColor(0x000000);
+		mLabel->setBackgroundColor(0x000000);
+	}
+	else
+	{
+		mLayout->setBackgroundColor(0x99999A);
+		mLabel->setBackgroundColor(0x99999A);
+	}
 
 	mBackButton = new NativeUI::Button();
 	mBackButton->setText("back");
