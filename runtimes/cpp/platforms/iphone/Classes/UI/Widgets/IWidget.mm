@@ -298,7 +298,13 @@
 	else if([key isEqualToString:@"top"]) {
 		return [[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue];
 	}
-	
+	else if([key isEqualToString:@"visible"]) {
+        return view.hidden ? @"false" : @"true";
+    }
+    else if([key isEqualToString:@"enabled"]) {
+        UIControl* controller = (UIControl*) view;
+        return controller.enabled ? @"true" : @"false";
+    }
 	return nil;
 }
 
