@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * Comment.h
- *
- *  Created on: Jul 2, 2011
- *      Author: gabi
  */
 
 #ifndef COMMENT_H_
@@ -59,9 +57,9 @@ public:
 	int getLikes() const;
 
 private:
-	MAUtil::String mMessage;
-	IdNamePair mFrom;
-	int mLikes;
+	MAUtil::String		mMessage;
+	IdNamePair			mFrom;
+	int					mLikes;
 };
 
 #endif /* COMMENT_H_ */

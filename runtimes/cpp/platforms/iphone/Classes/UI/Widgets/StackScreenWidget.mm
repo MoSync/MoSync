@@ -54,7 +54,8 @@
 	UINavigationController* navigationController = (UINavigationController*)controller;
 	
 	NSArray *vcs = navigationController.viewControllers;
-		
+
+	[stack removeLastObject];
 	UIViewController* fromViewController = navigationController.topViewController;
 	UIViewController* toViewController = ([vcs count] <= 1)?NULL:[vcs objectAtIndex:[vcs count] - 2];
 
@@ -78,60 +79,32 @@
 }
 
 - (id)init {
-    //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 	UINavigationController* navigationController = [[UINavigationController alloc] init];
-	//controller = navigationController;
+  	stack = [[NSMutableArray alloc] init];
 	navigationController.viewControllers = [NSArray array];	
-	//view = controller.view;
-	navigationController.delegate = self;
-	
+	navigationController.delegate = self;	
 	return [super initWithController:navigationController];
+}
+
+- (void)dealloc {
+    [stack release];
+    [super dealloc];
 }
 
 - (void)addChild: (IWidget*)child {
 
 }
 
-/*
-- (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index {
-	int ret = [super insertChild:child atIndex:index toSubview:NO];
-	if(ret!=MAW_RES_OK)
-		return ret;
-	
-	UINavigationController* navigationController = (UINavigationController*)controller;
-	ScreenWidget* screen = (ScreenWidget*)child;
-	NSMutableArray *newItems = [NSMutableArray arrayWithArray:navigationController.viewControllers];
-	[newItems insertObject:[screen getController] atIndex:[index intValue]];
-	navigationController.viewControllers = newItems;
-	
-	//[super addChild:child];
-//	[navigationController popToRootViewControllerAnimated:YES];
-
-	return MAW_RES_OK;
-}
-*/
-
-/*
-- (void)removeChild: (IWidget*)child {	
-	[super removeChild:child fromSuperview:NO];
-}
-*/
-
 - (void)push: (IWidget*)child {
 	UINavigationController* navigationController = (UINavigationController*)controller;
 	ScreenWidget* screen = (ScreenWidget*)child;
 	[navigationController pushViewController:[screen getController] animated:YES];
-	
-	/*
-	 [super addChild:child toSubview:NO];
-*/
+	[stack addObject:child];
 	int navBarHeight = navigationController.toolbar.bounds.size.height;
-	int viewWidth = view.frame.size.width; 
-	int viewHeight = view.frame.size.height - navBarHeight; 	
+    int viewWidth = view.frame.size.width; 
+	int viewHeight = view.frame.size.height - navBarHeight;   
 	UIView* childView = [screen getView];
 	[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
-//	[view setNeedsLayout];
-	//[child layout];
 	[child show];
 }
 
@@ -162,6 +135,20 @@
 
 - (UIViewController*) getController {
 	return controller;
+}
+
+- (void)layout {
+	UINavigationController* navigationController = (UINavigationController*)controller;
+	int navBarHeight = navigationController.toolbar.bounds.size.height;
+    int viewWidth = view.frame.size.width; 
+	int viewHeight = view.frame.size.height - navBarHeight;   
+	[view setNeedsLayout];
+	for (IWidget *child in stack)
+    {
+		UIView* childView = [child getView];
+		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
+        [child layout];
+	}
 }
 
 @end

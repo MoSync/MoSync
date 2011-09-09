@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * ICommand.h
- *
- *  Created on: Aug 5, 2011
- *      Author: gabi
  */
 
 #ifndef ICOMMAND_H_
@@ -28,6 +26,9 @@ MA 02110-1301, USA.
 namespace FacebookDemoApplication
 {
 
+/*
+ * base class for all the commands used in this application
+ */
 class ICommand
 {
 public:

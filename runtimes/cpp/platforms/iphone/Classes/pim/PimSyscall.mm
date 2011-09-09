@@ -45,7 +45,8 @@ void MAPimClose() {
 }
 
 
-MAHandle Syscall::maPimListOpen(int listType) {
+MAHandle Syscall::maPimListOpen(int listType)
+{
     return [sPimDatabase pimListOpen:listType];
 }
 
@@ -63,9 +64,9 @@ int Syscall::maPimItemCount(MAHandle item)
 {
     PimItem* pimItem = [sPimDatabase getItem:item];
 
-    if (nil == pimItem)
+    if (!pimItem)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     return [pimItem count];
@@ -75,9 +76,9 @@ int Syscall::maPimItemGetField(MAHandle item, int n)
 {
     PimItem* pimItem = [sPimDatabase getItem:item];
 
-    if (nil == pimItem)
+    if (!pimItem)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     return [pimItem getFieldID:n];
@@ -87,9 +88,9 @@ int Syscall::maPimItemFieldCount(MAHandle item, int field)
 {
     PimItem* pimItem = [sPimDatabase getItem:item];
 
-    if (nil == pimItem)
+    if (!pimItem)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     return [pimItem fieldCount:field];
@@ -99,9 +100,9 @@ int Syscall::maPimItemGetAttributes(MAHandle item, int field, int index)
 {
     PimItem* pimItem = [sPimDatabase getItem:item];
 
-    if (nil == pimItem)
+    if (!pimItem)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     return [pimItem getAttribute:field indexValue:index];
@@ -113,22 +114,21 @@ int Syscall::maPimItemSetLabel(const MA_PIM_ARGS* args, int index)
 
     PimItem* pimItem = [sPimDatabase getItem:args->item];
 
-    if (nil == pimItem)
+    if (!pimItem)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
-    return [pimItem setLabel:args
-                  indexValue:index];
+    return [pimItem setLabel:args indexValue:index];
 }
 
 int Syscall::maPimItemGetLabel(const MA_PIM_ARGS* args, int index)
 {
     PimItem* pimItem = [sPimDatabase getItem:args->item];
 
-    if (nil == pimItem)
+    if (!pimItem)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     return [pimItem getLabel:args indexValue:index];
@@ -138,20 +138,33 @@ int Syscall::maPimFieldType(MAHandle list, int field)
 {
     bool singleFieldValue;
     int fieldType;
-    [[PimUtils sharedInstance] fieldStructure:field
-                                      setType:&fieldType
-                             setIsSingleValue:&singleFieldValue];
+    int resultCode;
 
-    return fieldType;
+    // Check if the list handle is valid.
+    if (MA_PIM_CONTACTS != list)
+    {
+        return MA_PIM_ERR_HANDLE_INVALID;
+    }
+
+    resultCode = [[PimUtils sharedInstance] fieldStructure:field
+                                                       setType:&fieldType
+                                              setIsSingleValue:&singleFieldValue];
+    // Check for errors.
+    if (MA_PIM_ERR_NONE == resultCode)
+    {
+        return fieldType;
+    }
+
+    return resultCode;
 }
 
 int Syscall::maPimItemGetValue(const MA_PIM_ARGS *args, int index)
 {
     PimItem* pimItem = [sPimDatabase getItem:args->item];
 
-    if (nil == pimItem)
+    if (!pimItem)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     return [pimItem getValue:args indexValue:index];
@@ -162,9 +175,9 @@ int Syscall::maPimItemSetValue(const MA_PIM_ARGS* args, int index, int attribute
 {
     PimItem* pimItem = [sPimDatabase getItem:args->item];
 
-    if (nil == pimItem)
+    if (!pimItem)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     return [pimItem setValue:args
@@ -176,9 +189,9 @@ int Syscall::maPimItemAddValue(const MA_PIM_ARGS* args, int attributes)
 {
     PimItem* pimItem = [sPimDatabase getItem:args->item];
 
-    if (nil == pimItem)
+    if (!pimItem)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     return [pimItem addValue:args
@@ -189,9 +202,9 @@ int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index)
 {
     PimItem* pimItem = [sPimDatabase getItem:item];
 
-    if (nil == pimItem)
+    if (!pimItem)
     {
-        return MA_PIM_ERR_INVALID_HANDLE;
+        return MA_PIM_ERR_HANDLE_INVALID;
     }
 
     return [pimItem removeValue:field atIndex:index];
@@ -199,14 +212,7 @@ int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index)
 
 int Syscall::maPimItemClose(MAHandle item)
 {
-    PimItem* pimItem = [sPimDatabase getItem:item];
-
-    if (nil == pimItem)
-    {
-        return MA_PIM_ERR_INVALID_HANDLE;
-    }
-
-    return [pimItem close];
+    return [sPimDatabase closeItem:item];
 }
 
 MAHandle Syscall::maPimItemCreate(MAHandle list)
@@ -218,33 +224,3 @@ int Syscall::maPimItemRemove(MAHandle list, MAHandle item)
 {
     return [sPimDatabase removeItem:list item:item];
 }
-
-//void* PimGetValidatedMemRange(const int address,const int size)
-//{
-//    return gSyscall->GetValidatedMemRange(address, size);
-//}
-//
-//void PimMaReadData(MAHandle data, void *dst, int offset, int size)
-//{
-//    maReadData(data, dst, offset, size);
-//}
-//
-//int PimMaGetDataSize(MAHandle data)
-//{
-//    return maGetDataSize(data);
-//}
-//
-//int PimMaCreatePlaceHolder()
-//{
-//    return maCreatePlaceholder();
-//}
-//
-//int PimMaCreateData(MAHandle placeholder, int size)
-//{
-//    return maCreateData(placeholder, size);
-//}
-//
-//void PimMaWriteData(MAHandle data, const void* src, int offset, int size)
-//{
-//    maWriteData(data, src, offset, size);
-//}

@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * Checkin.h
- *
- *  Created on: Jul 8, 2011
- *      Author: gabi
  */
 
 #ifndef CHECKIN_H_
@@ -85,13 +83,13 @@ public:
 	const IdNamePair &getApplication() const;
 
 private:
-	IdNamePair mFrom;
-	MAUtil::Vector<IdNamePair> mTags;
-	Place mPlace;
-	MAUtil::Vector<IdNamePair> mLikes;
-	MAUtil::String mMessage;
-	MAUtil::Vector<Comment> mComments;
-	IdNamePair mApplication;
+	IdNamePair					mFrom;
+	MAUtil::Vector<IdNamePair> 	mTags;
+	Place						mPlace;
+	MAUtil::Vector<IdNamePair> 	mLikes;
+	MAUtil::String				mMessage;
+	MAUtil::Vector<Comment>		mComments;
+	IdNamePair					mApplication;
 };
 
 #endif /* CHECKIN_H_ */

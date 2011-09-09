@@ -5,6 +5,7 @@
 <properties>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
 <property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
+<property key="build.prefs:app.permissions" value="Contacts Contacts/Read Contacts/Write File\ Storage Internet\ Access Vibrate"/>
 <property key="template.id" value="project.nativeui"/>
 </properties>
 </project>

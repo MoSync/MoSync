@@ -3,22 +3,34 @@
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
-<property key="build.prefs:additional.include.paths/Release" value="%mosync-home%/include/newlib,  %mosync-home%/include/MAUtil , %mosync-home%/include"/>
+<property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include/newlib,  %mosync-home%/include/MAUtil , %mosync-home%/include,  %mosync-home%/include/NativeUI,  %mosync-home%/include/Facebook"/>
+<property key="build.prefs:additional.include.paths/Release" value="%mosync-home%/include/newlib,  %mosync-home%/include/MAUtil , %mosync-home%/include,  %mosync-home%/include/NativeUI,  %mosync-home%/newlib/include/Facebook"/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib,  newlib.lib, MTXml.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtil.lib,  newlib.lib, MTXml.lib, nativeui.lib, Facebook.lib, yajl.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib,  newlib.lib, MTXml.lib, nativeui.lib, Facebook.lib, yajl.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%/lib/newlib_debug"/>
 <property key="build.prefs:additional.library.paths/Release" value="%mosync-home%/lib/newlib_release"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
 <property key="build.prefs:extra.res.sw/Release" value=""/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
+<property key="build.prefs:ignore.default.include.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Debug" value="true"/>
 <property key="build.prefs:ignore.default.libraries/Release" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
+<property key="build.prefs:memory.data/Debug" value="16384"/>
 <property key="build.prefs:memory.data/Release" value="4096"/>
+<property key="build.prefs:memory.heap/Debug" value="8192"/>
 <property key="build.prefs:memory.heap/Release" value="2048"/>
+<property key="build.prefs:memory.stack/Debug" value="4096"/>
 <property key="build.prefs:memory.stack/Release" value="1024"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
+<property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
 <property key="template.id" value="project.nativeui"/>
 </properties>

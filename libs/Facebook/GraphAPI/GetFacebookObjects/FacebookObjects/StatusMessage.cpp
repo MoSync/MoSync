@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,14 +18,16 @@ MA 02110-1301, USA.
 
 /*
  * StatusMessage.cpp
- *
- *  Created on: Jul 1, 2011
- *      Author: gabi
  */
 
 
 #include "StatusMessage.h"
 
+/**
+ * Setter/getter for the "from" field of an StatusMessage object.
+ * @param from - it represents the person/application that created the status message.
+ * It contains an id and name.
+ */
 void StatusMessage::setFrom(const IdNamePair &from)
 {
 	mFrom = from;
@@ -34,6 +37,10 @@ const IdNamePair &StatusMessage::getFrom() const
 	return mFrom;
 }
 
+/**
+ * Setter/getter for the "message" field of an StatusMessage object.
+ * @param message - the status message content.
+ */
 void StatusMessage::setMessage(const MAUtil::String &message)
 {
 	mMessage = message;

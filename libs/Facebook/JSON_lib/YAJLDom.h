@@ -29,114 +29,117 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MAUtil/Map.h>
 #include <MAUtil/String.h>
 
+namespace MAUtil {
 namespace YAJLDom {
 
 class Value {
-public:
-	enum Type {
-		NUL,
-		BOOLEAN,
-		NUMBER,
-		ARRAY,
-		MAP,
-		STRING
+	public:
+		enum Type {
+			NUL,
+			BOOLEAN,
+			NUMBER,
+			ARRAY,
+			MAP,
+			STRING
+		};
+
+		Value(Type type);
+		virtual ~Value();
+
+		Type getType() const;
+
+		virtual MAUtil::String toString() const = 0;
+		virtual bool toBoolean() const;
+		virtual int toInt() const;
+		virtual double toDouble() const;
+		virtual Value* getValueForKey(const MAUtil::String& key);
+		virtual Value* getValueByIndex(int i);
+
+		virtual const Value* getValueForKey(const MAUtil::String& key) const;
+		virtual  const Value* getValueByIndex(int i) const;
+
+		virtual int getNumChildValues() const;
+
+	private:
+		Type mType;
+
 	};
 
-	Value(Type type);
-	virtual ~Value();
+	class NullValue : public Value {
+	public:
+		NullValue();
+		MAUtil::String toString() const;
+	};
 
-	Type getType() const;
+	class BooleanValue : public Value {
+	public:
+		BooleanValue(bool value);
+		MAUtil::String toString() const;
+		bool toBoolean() const;
+		void setBoolean(bool value);
 
-	virtual MAUtil::String toString() const = 0;
-	virtual bool toBoolean() const;
-	virtual int toInt() const;
-	virtual double toDouble() const;
-	virtual Value* getValueForKey(const MAUtil::String& key);
-	virtual Value* getValueByIndex(int i);
+	private:
+		bool mValue;
+	};
 
-	virtual const Value* getValueForKey(const MAUtil::String& key) const;
-	virtual  const Value* getValueByIndex(int i) const;
+	class NumberValue : public Value {
+	public:
+		NumberValue(double num);
+		MAUtil::String toString() const;
+		int toInt() const;
+		double toDouble() const;
 
-	virtual int getNumChildValues() const;
+	private:
+		double mValue;
+	};
 
-private:
-	Type mType;
+	class StringValue : public Value {
+	public:
+		StringValue(const char* str, size_t length);
+		StringValue(const MAUtil::String& str);
+		MAUtil::String toString() const;
+	private:
+		MAUtil::String mValue;
+	};
 
-};
+	class MapValue : public Value {
+	public:
+		MapValue();
+		~MapValue();
 
-class NullValue : public Value {
-public:
-	NullValue();
-	MAUtil::String toString() const;
-};
+		void setValueForKey(const MAUtil::String& key, Value* value);
+		Value* getValueForKey(const MAUtil::String& key);
+		const Value* getValueForKey(const MAUtil::String& key) const;
 
-class BooleanValue : public Value {
-public:
-	BooleanValue(bool value);
-	MAUtil::String toString() const;
-	bool toBoolean() const;
-	void setBoolean(bool value);
+		MAUtil::String toString() const;
 
-private:
-	bool mValue;
-};
+	private:
+		MAUtil::Map<MAUtil::String, Value*> mMap;
+	};
 
-class NumberValue : public Value {
-public:
-	NumberValue(double num);
-	MAUtil::String toString() const;
-	int toInt() const;
-	double toDouble() const;
+	class ArrayValue : public Value {
+	public:
+		ArrayValue();
+		~ArrayValue();
 
-private:
-	double mValue;
-};
+		void addValue(Value* value);
 
-class StringValue : public Value {
-public:
-	StringValue(const char* str, size_t length);
-	StringValue(const MAUtil::String& str);
-	MAUtil::String toString() const;
-private:
-	MAUtil::String mValue;
-};
+		Value* getValueByIndex(int i);
+		const Value* getValueByIndex(int i) const;
+		int getNumChildValues() const;
 
-class MapValue : public Value {
-public:
-	MapValue();
-	~MapValue();
+		const MAUtil::Vector<Value*>& getValues() const;
 
-	void setValueForKey(const MAUtil::String& key, Value* value);
-	Value* getValueForKey(const MAUtil::String& key);
-	const Value* getValueForKey(const MAUtil::String& key) const;
+		MAUtil::String toString() const;
+	private:
+		MAUtil::Vector<Value*> mValues;
+	};
 
-	MAUtil::String toString() const;
 
-private:
-	MAUtil::Map<MAUtil::String, Value*> mMap;
-};
-
-class ArrayValue : public Value {
-public:
-	ArrayValue();
-	~ArrayValue();
-
-	void addValue(Value* value);
-
-	Value* getValueByIndex(int i);
-	const Value* getValueByIndex(int i) const;
-	int getNumChildValues() const;
-
-	const MAUtil::Vector<Value*>& getValues() const;
-
-	MAUtil::String toString() const;
-private:
-	MAUtil::Vector<Value*> mValues;
-};
-
-Value* parse(const unsigned char* jsonText, size_t jsonTextLength);
+	Value* parse(const unsigned char* jsonText, size_t jsonTextLength);
 
 } // namespace YAJLDom
+} // namespace MAUtil
 
 
 #endif // _YAJL_DOM_H_

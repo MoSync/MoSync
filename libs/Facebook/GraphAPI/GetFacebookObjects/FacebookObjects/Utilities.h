@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * Utilities.h
- *
- *  Created on: Jul 2, 2011
- *      Author: gabi
  */
 
 #ifndef UTILITIES_H_
@@ -70,16 +68,16 @@ struct Venue
 	MAUtil::String mState;
 	MAUtil::String mZip;
 	MAUtil::String mCountry;
-	Coordinate mCoordinate;
+	Coordinate     mCoordinate;
 
 	void clear();
 };
 
 struct Place
 {
-	MAUtil::String mId;
-	MAUtil::String mName;
-	Venue mLocation;
+	MAUtil::String	mId;
+	MAUtil::String	mName;
+	Venue			mLocation;
 };
 
 #endif /* UTILITIES_H_ */

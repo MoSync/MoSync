@@ -202,7 +202,7 @@ void drawSensorOutput()
 		if (gSensorError[i] != 0)
 			continue;
 
-		drawSensorValue(i, 0, posY);
+		drawSensorValue(i, OFFSET_X, posY);
 		posY += OFFSET_Y;
 	}
 }
@@ -216,7 +216,7 @@ void setFont()
 	int nrFonts = maFontGetCount();
 	char fontName[BUFFER_SIZE];
 	// get first font.
-	maFontGetName(0, fontName, BUFFER_SIZE);
+	maFontGetName(FONT_ID, fontName, BUFFER_SIZE);
 	// Load first font with size 20.
 	int fontHandle = maFontLoadWithName(fontName, TEXT_SIZE);
 	maFontSetCurrent(fontHandle);

@@ -2,12 +2,26 @@ package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import android.content.ContentProviderOperation;
+import android.content.ContentResolver;
+import android.content.ContentUris;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.CommonDataKinds.Email;
 import android.provider.ContactsContract.CommonDataKinds.Event;
 import android.provider.ContactsContract.CommonDataKinds.Im;
@@ -21,234 +35,343 @@ import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.CommonDataKinds.Website;
 
+// field types
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_ADDR;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_BIRTHDAY;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_CLASS;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_EMAIL;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_FORMATTED_ADDR;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_FORMATTED_NAME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_NAME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_NICKNAME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_NOTE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_ORG;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_PHOTO;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_PHOTO_URL;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_PUBLIC_KEY;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_REVISION;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_TEL;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_TITLE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_UID;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_URL;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_IM;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_RELATION;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_ORG_INFO;
+
+// field data types
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_BINARY;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_BOOLEAN;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_DATE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_INT;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_STRING_ARRAY;
+
+//address field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ADDR_CUSTOM;
+
+//email field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_MOBILE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_EMAIL_CUSTOM;
+
+//formatted address field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM;
+
+//organization field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_CUSTOM;
+
+//phone field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_MOBILE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_HOME_FAX;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_WORK_FAX;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_PAGER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_IPHONE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_CALLBACK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_CAR;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_COMPANY_MAIN;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_ISDN;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_OTHER_FAX;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_RADIO;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_TELEX;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_TTY_TDD;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_WORK_MOBILE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_WORK_PAGER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_ASSISTANT;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_MMS;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_CUSTOM;
+
+//title field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_TITLE_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_TITLE_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_TITLE_CUSTOM;
+
+//website field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_HOMEPAGE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_BLOG;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_PROFILE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_FTP;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_WEBSITE_CUSTOM;
+
+//im field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_HOME;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_IM_CUSTOM;
+
+//relation field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_MOTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_FATHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_PARENT;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_SISTER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_BROTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_CHILD;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_FRIEND;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_SPOUSE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_PARTNER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_MANAGER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_ASSISTANT;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_REFERRED_BY;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_RELATIVE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_RELATION_CUSTOM;
+
+//organization info field attributes
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_INFO_WORK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_INFO_OTHER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_ORG_INFO_CUSTOM;
+
+//preferred attribute
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
+
+//protocols
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_AIM;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_MSN;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_YAHOO;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_SKYPE;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_QQ;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_GOOGLE_TALK;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_ICQ;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_JABBER;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_NETMEETING;
+
+
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_ATTRIBUTES;
+
 public class PIMField
 {
-	// field types
-	final static int MA_PIM_FIELD_CONTACT_ADDR = 100;
-	final static int MA_PIM_FIELD_CONTACT_BIRTHDAY = 101;
-	final static int MA_PIM_FIELD_CONTACT_CLASS = 102;
-	final static int MA_PIM_FIELD_CONTACT_EMAIL = 103;
-	final static int MA_PIM_FIELD_CONTACT_FORMATTED_ADDR = 104;
-	final static int MA_PIM_FIELD_CONTACT_FORMATTED_NAME = 105;
-	final static int MA_PIM_FIELD_CONTACT_NAME = 106;
-	final static int MA_PIM_FIELD_CONTACT_NICKNAME = 107;
-	final static int MA_PIM_FIELD_CONTACT_NOTE = 108;
-	final static int MA_PIM_FIELD_CONTACT_ORG = 109;
-	final static int MA_PIM_FIELD_CONTACT_PHOTO = 110;
-	final static int MA_PIM_FIELD_CONTACT_PHOTO_URL = 111;
-	final static int MA_PIM_FIELD_CONTACT_PUBLIC_KEY = 112;
-	final static int MA_PIM_FIELD_CONTACT_PUBLIC_KEY_STRING = 113;
-	final static int MA_PIM_FIELD_CONTACT_REVISION = 114;
-	final static int MA_PIM_FIELD_CONTACT_TEL = 115;
-	final static int MA_PIM_FIELD_CONTACT_TITLE = 116;
-	final static int MA_PIM_FIELD_CONTACT_UID = 117;
-	final static int MA_PIM_FIELD_CONTACT_URL = 118;
-	final static int MA_PIM_FIELD_CONTACT_IM = 119;
-	final static int MA_PIM_FIELD_CONTACT_RELATION = 120;
-	final static int MA_PIM_FIELD_CONTACT_ORG_INFO = 121;
+	public enum State { NONE, ADDED, UPDATED, DELETED }
 
-	// field data types
-	private final static int MA_PIM_TYPE_INVALID = -1;
-	private final static int MA_PIM_TYPE_BINARY = 0;
-	//private final static int MA_PIM_TYPE_BOOLEAN = 1;
-	private final static int MA_PIM_TYPE_DATE = 2;
-	private final static int MA_PIM_TYPE_INT = 3;
-	private final static int MA_PIM_TYPE_STRING = 4;
-	private final static int MA_PIM_TYPE_STRING_ARRAY = 5;
+	Map<Integer,Integer> mAddressAttributes = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> mEmailAttributes = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> mFormattedAddressAttributes = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> mOrganizationAttributes = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> mPhoneAttributes = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> mTitleAttributes = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> mWebsiteAttributes = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> mIMAttributes = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> mRelationAttributes = new HashMap<Integer,Integer>();
+	Map<Integer,Integer> mOrgInfoAttributes = new HashMap<Integer,Integer>();
 
-	//address field attributes
-	final static int MA_PIM_ATTR_ADDR_HOME = 101;
-	final static int MA_PIM_ATTR_ADDR_WORK = 102;
-	final static int MA_PIM_ATTR_ADDR_OTHER = 103;
-	final static int MA_PIM_ATTR_ADDR_CUSTOM = 104;
+	Map<Integer,String> mProtocols = new HashMap<Integer,String>();
 
-	//email field attributes
-	final static int MA_PIM_ATTR_EMAIL_HOME = 201;
-	final static int MA_PIM_ATTR_EMAIL_WORK = 202;
-	final static int MA_PIM_ATTR_EMAIL_MOBILE = 203;
-	final static int MA_PIM_ATTR_EMAIL_OTHER = 204;
-	final static int MA_PIM_ATTR_EMAIL_CUSTOM = 205;
-
-	//formatted address field attributes
-	final static int MA_PIM_ATTR_FORMATTED_ADDR_HOME = 301;
-	final static int MA_PIM_ATTR_FORMATTED_ADDR_WORK = 302;
-	final static int MA_PIM_ATTR_FORMATTED_ADDR_OTHER = 303;
-	final static int MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM = 304;
-
-	//organization field attributes
-	final static int MA_PIM_ATTR_ORG_WORK = 401;
-	final static int MA_PIM_ATTR_ORG_OTHER = 402;
-	final static int MA_PIM_ATTR_ORG_CUSTOM = 403;
-
-	//phone field attributes
-	final static int MA_PIM_ATTR_PHONE_HOME = 501;
-	final static int MA_PIM_ATTR_PHONE_MOBILE = 502;
-	final static int MA_PIM_ATTR_PHONE_HOME_FAX = 503;
-	final static int MA_PIM_ATTR_PHONE_WORK_FAX = 504;
-	final static int MA_PIM_ATTR_PHONE_PAGER = 505;
-	final static int MA_PIM_ATTR_PHONE_IPHONE = 506;
-	final static int MA_PIM_ATTR_PHONE_WORK = 507;
-	final static int MA_PIM_ATTR_PHONE_CALLBACK = 508;
-	final static int MA_PIM_ATTR_PHONE_CAR = 509;
-	final static int MA_PIM_ATTR_PHONE_COMPANY_MAIN = 510;
-	final static int MA_PIM_ATTR_PHONE_ISDN = 511;
-	final static int MA_PIM_ATTR_PHONE_OTHER_FAX = 512;
-	final static int MA_PIM_ATTR_PHONE_RADIO = 513;
-	final static int MA_PIM_ATTR_PHONE_TELEX = 514;
-	final static int MA_PIM_ATTR_PHONE_TTY_TDD = 515;
-	final static int MA_PIM_ATTR_PHONE_WORK_MOBILE = 516;
-	final static int MA_PIM_ATTR_PHONE_WORK_PAGER = 517;
-	final static int MA_PIM_ATTR_PHONE_ASSISTANT = 518;
-	final static int MA_PIM_ATTR_PHONE_MMS = 519;
-	final static int MA_PIM_ATTR_PHONE_OTHER = 520;
-	final static int MA_PIM_ATTR_PHONE_CUSTOM = 521;
-
-	//title field attributes
-	final static int MA_PIM_ATTR_TITLE_WORK = 601;
-	final static int MA_PIM_ATTR_TITLE_OTHER = 602;
-	final static int MA_PIM_ATTR_TITLE_CUSTOM = 603;
-
-	//website field attributes
-	final static int MA_PIM_ATTR_WEBSITE_HOMEPAGE = 701;
-	final static int MA_PIM_ATTR_WEBSITE_BLOG = 702;
-	final static int MA_PIM_ATTR_WEBSITE_PROFILE = 703;
-	final static int MA_PIM_ATTR_WEBSITE_HOME = 704;
-	final static int MA_PIM_ATTR_WEBSITE_WORK = 705;
-	final static int MA_PIM_ATTR_WEBSITE_FTP = 706;
-	final static int MA_PIM_ATTR_WEBSITE_OTHER = 707;
-	final static int MA_PIM_ATTR_WEBSITE_CUSTOM = 708;
-
-	//im field attributes
-	final static int MA_PIM_ATTR_IM_HOME = 801;
-	final static int MA_PIM_ATTR_IM_WORK = 802;
-	final static int MA_PIM_ATTR_IM_OTHER = 803;
-	final static int MA_PIM_ATTR_IM_CUSTOM = 804;
-
-	//relation field attributes
-	final static int MA_PIM_ATTR_RELATION_MOTHER = 901;
-	final static int MA_PIM_ATTR_RELATION_FATHER = 902;
-	final static int MA_PIM_ATTR_RELATION_PARENT = 903;
-	final static int MA_PIM_ATTR_RELATION_SISTER = 904;
-	final static int MA_PIM_ATTR_RELATION_BROTHER = 905;
-	final static int MA_PIM_ATTR_RELATION_CHILD = 906;
-	final static int MA_PIM_ATTR_RELATION_FRIEND = 907;
-	final static int MA_PIM_ATTR_RELATION_SPOUSE = 908;
-	final static int MA_PIM_ATTR_RELATION_PARTNER = 909;
-	final static int MA_PIM_ATTR_RELATION_MANAGER = 910;
-	final static int MA_PIM_ATTR_RELATION_ASSISTANT = 911;
-	final static int MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER = 912;
-	final static int MA_PIM_ATTR_RELATION_REFERRED_BY = 913;
-	final static int MA_PIM_ATTR_RELATION_RELATIVE = 914;
-	final static int MA_PIM_ATTR_RELATION_CUSTOM = 915;
-
-	//organization info field attributes
-	final static int MA_PIM_ATTR_ORG_INFO_WORK = 1001;
-	final static int MA_PIM_ATTR_ORG_INFO_OTHER = 1002;
-	final static int MA_PIM_ATTR_ORG_INFO_CUSTOM = 1003;
-
-	//preferred attribute
-	final static int MA_PIM_ATTR_PREFERRED = 0x10000;
-
-	Map<Integer,Integer> mAttributes = new HashMap<Integer,Integer>();
-
-	ArrayList<String[]> mStrNames;
+	String[] mStrNames;
 	ArrayList<String[]> mStrInfos;
 	String mStrType;
+	ArrayList<State> mState;
 
-	PIMField(String type)
+	PIMField(String type, String[] names)
 	{
-		mStrNames = new ArrayList<String[]>();
+		mStrNames = new String[names.length];
+		System.arraycopy(names, 0, mStrNames, 0, names.length);
 		mStrInfos = new ArrayList<String[]>();
 		mStrType = type;
+		createMaps();
+		mState = new ArrayList<State>();
 	}
 
-	void createAttributesMap()
+	void createMaps()
 	{
 		// Address attributes
-		mAttributes.put(MA_PIM_ATTR_ADDR_HOME, StructuredPostal.TYPE_HOME);
-		mAttributes.put(MA_PIM_ATTR_ADDR_WORK, StructuredPostal.TYPE_WORK);
-		mAttributes.put(MA_PIM_ATTR_ADDR_OTHER, StructuredPostal.TYPE_OTHER);
-		mAttributes.put(MA_PIM_ATTR_ADDR_CUSTOM, StructuredPostal.TYPE_CUSTOM);
+		mAddressAttributes.put(MA_PIM_ATTR_ADDR_HOME, StructuredPostal.TYPE_HOME);
+		mAddressAttributes.put(MA_PIM_ATTR_ADDR_WORK, StructuredPostal.TYPE_WORK);
+		mAddressAttributes.put(MA_PIM_ATTR_ADDR_OTHER, StructuredPostal.TYPE_OTHER);
+		mAddressAttributes.put(MA_PIM_ATTR_ADDR_CUSTOM, StructuredPostal.TYPE_CUSTOM);
 
 		// Email attributes
-		mAttributes.put(MA_PIM_ATTR_EMAIL_HOME, Email.TYPE_HOME);
-		mAttributes.put(MA_PIM_ATTR_EMAIL_WORK, Email.TYPE_WORK);
-		mAttributes.put(MA_PIM_ATTR_EMAIL_MOBILE, Email.TYPE_MOBILE);
-		mAttributes.put(MA_PIM_ATTR_EMAIL_OTHER, Email.TYPE_OTHER);
-		mAttributes.put(MA_PIM_ATTR_EMAIL_CUSTOM, Email.TYPE_CUSTOM);
+		mEmailAttributes.put(MA_PIM_ATTR_EMAIL_HOME, Email.TYPE_HOME);
+		mEmailAttributes.put(MA_PIM_ATTR_EMAIL_WORK, Email.TYPE_WORK);
+		mEmailAttributes.put(MA_PIM_ATTR_EMAIL_MOBILE, Email.TYPE_MOBILE);
+		mEmailAttributes.put(MA_PIM_ATTR_EMAIL_OTHER, Email.TYPE_OTHER);
+		mEmailAttributes.put(MA_PIM_ATTR_EMAIL_CUSTOM, Email.TYPE_CUSTOM);
 
 		// Formatted adress attributes
-		mAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_HOME, StructuredPostal.TYPE_HOME);
-		mAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_WORK, StructuredPostal.TYPE_WORK);
-		mAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_OTHER, StructuredPostal.TYPE_OTHER);
-		mAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM, StructuredPostal.TYPE_CUSTOM);
+		mFormattedAddressAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_HOME, StructuredPostal.TYPE_HOME);
+		mFormattedAddressAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_WORK, StructuredPostal.TYPE_WORK);
+		mFormattedAddressAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_OTHER, StructuredPostal.TYPE_OTHER);
+		mFormattedAddressAttributes.put(MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM, StructuredPostal.TYPE_CUSTOM);
 
 		// Organization attributes
-		mAttributes.put(MA_PIM_ATTR_ORG_WORK, Organization.TYPE_WORK);
-		mAttributes.put(MA_PIM_ATTR_ORG_OTHER, Organization.TYPE_OTHER);
-		mAttributes.put(MA_PIM_ATTR_ORG_CUSTOM, Organization.TYPE_CUSTOM);
+		mOrganizationAttributes.put(MA_PIM_ATTR_ORG_WORK, Organization.TYPE_WORK);
+		mOrganizationAttributes.put(MA_PIM_ATTR_ORG_OTHER, Organization.TYPE_OTHER);
+		mOrganizationAttributes.put(MA_PIM_ATTR_ORG_CUSTOM, Organization.TYPE_CUSTOM);
 
 		// Phone attributes
-		mAttributes.put(MA_PIM_ATTR_PHONE_HOME, Phone.TYPE_HOME);
-		mAttributes.put(MA_PIM_ATTR_PHONE_MOBILE, Phone.TYPE_MOBILE);
-		mAttributes.put(MA_PIM_ATTR_PHONE_HOME_FAX, Phone.TYPE_FAX_HOME);
-		mAttributes.put(MA_PIM_ATTR_PHONE_WORK_FAX, Phone.TYPE_FAX_WORK);
-		mAttributes.put(MA_PIM_ATTR_PHONE_PAGER, Phone.TYPE_PAGER);
-		mAttributes.put(MA_PIM_ATTR_PHONE_IPHONE, Phone.TYPE_CUSTOM);
-		mAttributes.put(MA_PIM_ATTR_PHONE_WORK, Phone.TYPE_WORK);
-		mAttributes.put(MA_PIM_ATTR_PHONE_CALLBACK, Phone.TYPE_CALLBACK);
-		mAttributes.put(MA_PIM_ATTR_PHONE_CAR, Phone.TYPE_CAR);
-		mAttributes.put(MA_PIM_ATTR_PHONE_COMPANY_MAIN, Phone.TYPE_COMPANY_MAIN);
-		mAttributes.put(MA_PIM_ATTR_PHONE_ISDN, Phone.TYPE_ISDN);
-		mAttributes.put(MA_PIM_ATTR_PHONE_OTHER_FAX, Phone.TYPE_OTHER_FAX);
-		mAttributes.put(MA_PIM_ATTR_PHONE_RADIO, Phone.TYPE_RADIO);
-		mAttributes.put(MA_PIM_ATTR_PHONE_TELEX, Phone.TYPE_TELEX);
-		mAttributes.put(MA_PIM_ATTR_PHONE_TTY_TDD, Phone.TYPE_TTY_TDD);
-		mAttributes.put(MA_PIM_ATTR_PHONE_WORK_MOBILE, Phone.TYPE_WORK_MOBILE);
-		mAttributes.put(MA_PIM_ATTR_PHONE_WORK_PAGER, Phone.TYPE_WORK_PAGER);
-		mAttributes.put(MA_PIM_ATTR_PHONE_ASSISTANT, Phone.TYPE_ASSISTANT);
-		mAttributes.put(MA_PIM_ATTR_PHONE_MMS, Phone.TYPE_MMS);
-		mAttributes.put(MA_PIM_ATTR_PHONE_OTHER, Phone.TYPE_OTHER);
-		mAttributes.put(MA_PIM_ATTR_PHONE_CUSTOM, Phone.TYPE_CUSTOM);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_HOME, Phone.TYPE_HOME);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_MOBILE, Phone.TYPE_MOBILE);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_HOME_FAX, Phone.TYPE_FAX_HOME);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_WORK_FAX, Phone.TYPE_FAX_WORK);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_PAGER, Phone.TYPE_PAGER);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_IPHONE, Phone.TYPE_CUSTOM);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_WORK, Phone.TYPE_WORK);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_CALLBACK, Phone.TYPE_CALLBACK);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_CAR, Phone.TYPE_CAR);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_COMPANY_MAIN, Phone.TYPE_COMPANY_MAIN);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_ISDN, Phone.TYPE_ISDN);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_OTHER_FAX, Phone.TYPE_OTHER_FAX);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_RADIO, Phone.TYPE_RADIO);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_TELEX, Phone.TYPE_TELEX);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_TTY_TDD, Phone.TYPE_TTY_TDD);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_WORK_MOBILE, Phone.TYPE_WORK_MOBILE);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_WORK_PAGER, Phone.TYPE_WORK_PAGER);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_ASSISTANT, Phone.TYPE_ASSISTANT);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_MMS, Phone.TYPE_MMS);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_OTHER, Phone.TYPE_OTHER);
+		mPhoneAttributes.put(MA_PIM_ATTR_PHONE_CUSTOM, Phone.TYPE_CUSTOM);
 
 		// Title attributes
-		mAttributes.put(MA_PIM_ATTR_TITLE_WORK, Organization.TYPE_WORK);
-		mAttributes.put(MA_PIM_ATTR_TITLE_OTHER, Organization.TYPE_OTHER);
-		mAttributes.put(MA_PIM_ATTR_TITLE_CUSTOM, Organization.TYPE_CUSTOM);
+		mTitleAttributes.put(MA_PIM_ATTR_TITLE_WORK, Organization.TYPE_WORK);
+		mTitleAttributes.put(MA_PIM_ATTR_TITLE_OTHER, Organization.TYPE_OTHER);
+		mTitleAttributes.put(MA_PIM_ATTR_TITLE_CUSTOM, Organization.TYPE_CUSTOM);
 
 		// Website attributes
-		mAttributes.put(MA_PIM_ATTR_WEBSITE_HOMEPAGE, Website.TYPE_HOMEPAGE);
-		mAttributes.put(MA_PIM_ATTR_WEBSITE_BLOG, Website.TYPE_BLOG);
-		mAttributes.put(MA_PIM_ATTR_WEBSITE_PROFILE, Website.TYPE_PROFILE);
-		mAttributes.put(MA_PIM_ATTR_WEBSITE_HOME, Website.TYPE_HOME);
-		mAttributes.put(MA_PIM_ATTR_WEBSITE_WORK, Website.TYPE_WORK);
-		mAttributes.put(MA_PIM_ATTR_WEBSITE_FTP, Website.TYPE_FTP);
-		mAttributes.put(MA_PIM_ATTR_WEBSITE_OTHER, Website.TYPE_OTHER);
-		mAttributes.put(MA_PIM_ATTR_WEBSITE_CUSTOM, Website.TYPE_CUSTOM);
+		mWebsiteAttributes.put(MA_PIM_ATTR_WEBSITE_HOMEPAGE, Website.TYPE_HOMEPAGE);
+		mWebsiteAttributes.put(MA_PIM_ATTR_WEBSITE_BLOG, Website.TYPE_BLOG);
+		mWebsiteAttributes.put(MA_PIM_ATTR_WEBSITE_PROFILE, Website.TYPE_PROFILE);
+		mWebsiteAttributes.put(MA_PIM_ATTR_WEBSITE_HOME, Website.TYPE_HOME);
+		mWebsiteAttributes.put(MA_PIM_ATTR_WEBSITE_WORK, Website.TYPE_WORK);
+		mWebsiteAttributes.put(MA_PIM_ATTR_WEBSITE_FTP, Website.TYPE_FTP);
+		mWebsiteAttributes.put(MA_PIM_ATTR_WEBSITE_OTHER, Website.TYPE_OTHER);
+		mWebsiteAttributes.put(MA_PIM_ATTR_WEBSITE_CUSTOM, Website.TYPE_CUSTOM);
 
 		// IM attributes
-		mAttributes.put(MA_PIM_ATTR_IM_HOME, Im.TYPE_HOME);
-		mAttributes.put(MA_PIM_ATTR_IM_WORK, Im.TYPE_WORK);
-		mAttributes.put(MA_PIM_ATTR_IM_OTHER, Im.TYPE_OTHER);
-		mAttributes.put(MA_PIM_ATTR_IM_CUSTOM, Im.TYPE_CUSTOM);
+		mIMAttributes.put(MA_PIM_ATTR_IM_HOME, Im.TYPE_HOME);
+		mIMAttributes.put(MA_PIM_ATTR_IM_WORK, Im.TYPE_WORK);
+		mIMAttributes.put(MA_PIM_ATTR_IM_OTHER, Im.TYPE_OTHER);
+		mIMAttributes.put(MA_PIM_ATTR_IM_CUSTOM, Im.TYPE_CUSTOM);
 
 		// Relation attributes
-		mAttributes.put(MA_PIM_ATTR_RELATION_MOTHER, Relation.TYPE_MOTHER);
-		mAttributes.put(MA_PIM_ATTR_RELATION_FATHER, Relation.TYPE_FATHER);
-		mAttributes.put(MA_PIM_ATTR_RELATION_PARENT, Relation.TYPE_PARENT);
-		mAttributes.put(MA_PIM_ATTR_RELATION_SISTER, Relation.TYPE_SISTER);
-		mAttributes.put(MA_PIM_ATTR_RELATION_BROTHER, Relation.TYPE_BROTHER);
-		mAttributes.put(MA_PIM_ATTR_RELATION_CHILD, Relation.TYPE_CHILD);
-		mAttributes.put(MA_PIM_ATTR_RELATION_FRIEND, Relation.TYPE_FRIEND);
-		mAttributes.put(MA_PIM_ATTR_RELATION_SPOUSE, Relation.TYPE_SPOUSE);
-		mAttributes.put(MA_PIM_ATTR_RELATION_PARTNER, Relation.TYPE_PARTNER);
-		mAttributes.put(MA_PIM_ATTR_RELATION_MANAGER, Relation.TYPE_MANAGER);
-		mAttributes.put(MA_PIM_ATTR_RELATION_ASSISTANT, Relation.TYPE_ASSISTANT);
-		mAttributes.put(MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER, Relation.TYPE_DOMESTIC_PARTNER);
-		mAttributes.put(MA_PIM_ATTR_RELATION_REFERRED_BY, Relation.TYPE_REFERRED_BY);
-		mAttributes.put(MA_PIM_ATTR_RELATION_RELATIVE, Relation.TYPE_RELATIVE);
-		mAttributes.put(MA_PIM_ATTR_RELATION_CUSTOM, Relation.TYPE_CUSTOM);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_MOTHER, Relation.TYPE_MOTHER);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_FATHER, Relation.TYPE_FATHER);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_PARENT, Relation.TYPE_PARENT);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_SISTER, Relation.TYPE_SISTER);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_BROTHER, Relation.TYPE_BROTHER);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_CHILD, Relation.TYPE_CHILD);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_FRIEND, Relation.TYPE_FRIEND);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_SPOUSE, Relation.TYPE_SPOUSE);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_PARTNER, Relation.TYPE_PARTNER);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_MANAGER, Relation.TYPE_MANAGER);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_ASSISTANT, Relation.TYPE_ASSISTANT);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER, Relation.TYPE_DOMESTIC_PARTNER);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_REFERRED_BY, Relation.TYPE_REFERRED_BY);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_RELATIVE, Relation.TYPE_RELATIVE);
+		mRelationAttributes.put(MA_PIM_ATTR_RELATION_CUSTOM, Relation.TYPE_CUSTOM);
+
+		// Organization info
+		mOrgInfoAttributes.put(MA_PIM_ATTR_ORG_INFO_WORK, Organization.TYPE_WORK);
+		mOrgInfoAttributes.put(MA_PIM_ATTR_ORG_INFO_OTHER, Organization.TYPE_OTHER);
+		mOrgInfoAttributes.put(MA_PIM_ATTR_ORG_INFO_CUSTOM, Organization.TYPE_CUSTOM);
+
+		//Protocols
+		mProtocols.put(Im.PROTOCOL_AIM, MA_PIM_CONTACT_IM_PROTOCOL_AIM);
+		mProtocols.put(Im.PROTOCOL_MSN, MA_PIM_CONTACT_IM_PROTOCOL_MSN);
+		mProtocols.put(Im.PROTOCOL_YAHOO, MA_PIM_CONTACT_IM_PROTOCOL_YAHOO);
+		mProtocols.put(Im.PROTOCOL_SKYPE, MA_PIM_CONTACT_IM_PROTOCOL_SKYPE);
+		mProtocols.put(Im.PROTOCOL_QQ, MA_PIM_CONTACT_IM_PROTOCOL_QQ);
+		mProtocols.put(Im.PROTOCOL_GOOGLE_TALK, MA_PIM_CONTACT_IM_PROTOCOL_GOOGLE_TALK);
+		mProtocols.put(Im.PROTOCOL_ICQ, MA_PIM_CONTACT_IM_PROTOCOL_ICQ);
+		mProtocols.put(Im.PROTOCOL_JABBER, MA_PIM_CONTACT_IM_PROTOCOL_JABBER);
+		mProtocols.put(Im.PROTOCOL_NETMEETING, MA_PIM_CONTACT_IM_PROTOCOL_NETMEETING);
+		mProtocols.put(Im.PROTOCOL_CUSTOM, "OTHER");
 	}
+
+	void read(ContentResolver cr, Cursor cursor, String contactId, String[] columns, String itemType)
+	{
+		DebugPrint("************START ENTRY");
+		String[] info = new String[columns.length];
+		for (int i=0; i<columns.length; i++)
+		{
+			if ( itemType.equals(Photo.CONTENT_ITEM_TYPE) && columns[i].equals(Photo.PHOTO))
+			{
+				info[i] = loadPhoto(cr, contactId);
+			}
+			else
+			{
+				try
+				{
+					info[i] = cursor.getString( cursor.getColumnIndex(columns[i]) );
+					DebugPrint(columns[i] + ": " + info[i] + "; length = " + info[i].length());
+				}
+				catch (Exception e)
+				{
+					DebugPrint(columns[i] + " not available");
+				}
+			}
+		}
+
+		add(info);
+		DebugPrint("************END ENTRY");
+	}
+
+	public String loadPhoto(ContentResolver cr, String id)
+	{
+		Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, Long.parseLong(id));
+		InputStream input = Contacts.openContactPhotoInputStream(cr, uri);
+		if (input == null)
+		{
+			return null;//getBitmapFromURL("http://thinkandroid.wordpress.com");
+		}
+
+		return Integer.toString(PIM.addImage(BitmapFactory.decodeStream(input)));
+	}
+
+	public String loadPhoto(String url)
+	{
+		return Integer.toString(PIM.addImage(getBitmapFromURL(url)));
+	}
+
+	public Bitmap getBitmapFromURL(String src)
+	{
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection)
+            url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 	public static Object getKeyFromValue(Map<?, ?> hm, Object value)
 	{
@@ -262,21 +385,20 @@ public class PIMField
 		return null;
 	}
 
-	void add(String[] names, String[] infos)
+	void add(String[] infos)
 	{
-		mStrNames.add(names);
 		mStrInfos.add(infos);
+		mState.add(State.NONE);
 	}
 
 	void remove(int index)
 	{
-		mStrNames.remove(index);
 		mStrInfos.remove(index);
 	}
 
 	int length()
 	{
-		return mStrNames.size();
+		return mStrInfos.size();
 	}
 
 	String getType()
@@ -288,9 +410,9 @@ public class PIMField
 	{
 		if ( mStrType.equals(StructuredPostal.CONTENT_ITEM_TYPE) )
 		{
-			if (!mStrNames.isEmpty())
+			if (mStrNames.length > 0)
 			{
-				if ( mStrNames.get(0)[1].equals(StructuredPostal.FORMATTED_ADDRESS) )
+				if ( mStrNames[1].equals(StructuredPostal.FORMATTED_ADDRESS) )
 					return MA_PIM_FIELD_CONTACT_FORMATTED_ADDR;
 				else
 					return MA_PIM_FIELD_CONTACT_ADDR;
@@ -330,13 +452,13 @@ public class PIMField
 		}
 		if ( mStrType.equals(Organization.CONTENT_ITEM_TYPE) )
 		{
-			if (!mStrNames.isEmpty())
+			if (mStrNames.length > 0)
 			{
-				if ( mStrNames.get(0)[1].equals(Organization.COMPANY) )
+				if ( mStrNames[1].equals(Organization.COMPANY) )
 				{
 					return MA_PIM_FIELD_CONTACT_ORG;
 				}
-				else if ( mStrNames.get(0)[1].equals(Organization.TITLE) )
+				else if ( mStrNames[1].equals(Organization.TITLE) )
 				{
 					return MA_PIM_FIELD_CONTACT_TITLE;
 				}
@@ -399,446 +521,148 @@ public class PIMField
 
 	int getAddressAttribute(int attr)
 	{
-		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
-//		switch (attr)
-//		{
-//			case StructuredPostal.TYPE_HOME:
-//				return MA_PIM_ATTR_ADDR_HOME;
-//			case StructuredPostal.TYPE_WORK:
-//				return MA_PIM_ATTR_ADDR_WORK;
-//			case StructuredPostal.TYPE_CUSTOM:
-//				return MA_PIM_ATTR_ADDR_CUSTOM;
-//			default:
-//				return MA_PIM_ATTR_ADDR_OTHER;
-//		}
+		if (attr > 0)
+			return ((Integer)getKeyFromValue(mAddressAttributes, attr)).intValue();
+		return 0;
 	}
 
 	int getAddressNativeAttribute(int attr)
 	{
-		return mAttributes.get(attr);
-//		switch (attr)
-//		{
-//			case MA_PIM_ATTR_ADDR_HOME:
-//				return StructuredPostal.TYPE_HOME;
-//			case MA_PIM_ATTR_ADDR_WORK:
-//				return StructuredPostal.TYPE_WORK;
-//			case MA_PIM_ATTR_ADDR_CUSTOM:
-//				return StructuredPostal.TYPE_CUSTOM;
-//			default:
-//				return StructuredPostal.TYPE_OTHER;
-//		}
+		if (!mAddressAttributes.containsKey(attr))
+			return -1;
+		return mAddressAttributes.get(attr);
 	}
 
 	int getEmailAttribute(int attr)
 	{
-		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
-//		switch (attr)
-//		{
-//			case Email.TYPE_HOME:
-//				return MA_PIM_ATTR_EMAIL_HOME;
-//			case Email.TYPE_WORK:
-//				return MA_PIM_ATTR_EMAIL_WORK;
-//			case Email.TYPE_MOBILE:
-//				return MA_PIM_ATTR_EMAIL_MOBILE;
-//			case Email.TYPE_CUSTOM:
-//				return MA_PIM_ATTR_EMAIL_CUSTOM;
-//			default:
-//				return MA_PIM_ATTR_EMAIL_OTHER;
-//		}
+		if (attr > 0)
+			return ((Integer)getKeyFromValue(mEmailAttributes, attr)).intValue();
+		return 0;
 	}
 
 	int getEmailNativeAttribute(int attr)
 	{
-		return mAttributes.get(attr);
-//		switch (attr)
-//		{
-//			case MA_PIM_ATTR_EMAIL_HOME:
-//				return Email.TYPE_HOME;
-//			case MA_PIM_ATTR_EMAIL_WORK:
-//				return Email.TYPE_WORK;
-//			case MA_PIM_ATTR_EMAIL_MOBILE:
-//				return Email.TYPE_MOBILE;
-//			case MA_PIM_ATTR_EMAIL_CUSTOM:
-//				return Email.TYPE_CUSTOM;
-//			default:
-//				return Email.TYPE_OTHER;
-//		}
+		if (!mEmailAttributes.containsKey(attr))
+			return -1;
+		return mEmailAttributes.get(attr);
 	}
 
 	int getFormattedAddressAttribute(int attr)
 	{
-		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
-//		switch (attr)
-//		{
-//			case StructuredPostal.TYPE_HOME:
-//				return MA_PIM_ATTR_FORMATTED_ADDR_HOME;
-//			case StructuredPostal.TYPE_WORK:
-//				return MA_PIM_ATTR_FORMATTED_ADDR_WORK;
-//			case StructuredPostal.TYPE_CUSTOM:
-//				return MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM;
-//			default:
-//				return MA_PIM_ATTR_FORMATTED_ADDR_OTHER;
-//		}
+		if (attr > 0)
+			return ((Integer)getKeyFromValue(mFormattedAddressAttributes, attr)).intValue();
+		return 0;
 	}
 
 	int getFormattedAddressNativeAttribute(int attr)
 	{
-		return mAttributes.get(attr);
-//		switch (attr)
-//		{
-//			case MA_PIM_ATTR_FORMATTED_ADDR_HOME:
-//				return StructuredPostal.TYPE_HOME;
-//			case MA_PIM_ATTR_FORMATTED_ADDR_WORK:
-//				return StructuredPostal.TYPE_WORK;
-//			case MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM:
-//				return StructuredPostal.TYPE_CUSTOM;
-//			default:
-//				return StructuredPostal.TYPE_OTHER;
-//		}
+		if (!mFormattedAddressAttributes.containsKey(attr))
+			return -1;
+		return mFormattedAddressAttributes.get(attr);
 	}
 
 	int getOrganizationAttribute(int attr)
 	{
-		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
-//		switch (attr)
-//		{
-//			case Organization.TYPE_WORK:
-//				return MA_PIM_ATTR_ORG_WORK;
-//			case Organization.TYPE_CUSTOM:
-//				return MA_PIM_ATTR_ORG_CUSTOM;
-//			default:
-//				return MA_PIM_ATTR_ORG_OTHER;
-//		}
+		if (attr > 0)
+			return ((Integer)getKeyFromValue(mOrganizationAttributes, attr)).intValue();
+		return 0;
 	}
 
 	int getOrganizationNativeAttribute(int attr)
 	{
-		return mAttributes.get(attr);
-//		switch (attr)
-//		{
-//			case MA_PIM_ATTR_ORG_WORK:
-//				return Organization.TYPE_WORK;
-//			case MA_PIM_ATTR_ORG_CUSTOM:
-//				return Organization.TYPE_CUSTOM;
-//			default:
-//				return Organization.TYPE_OTHER;
-//		}
+		if (!mOrganizationAttributes.containsKey(attr))
+			return -1;
+		return mOrganizationAttributes.get(attr);
 	}
 
 	int getPhoneAttribute(int attr)
 	{
-		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
-//		switch (attr)
-//		{
-//			case Phone.TYPE_CUSTOM:
-//				return MA_PIM_ATTR_PHONE_CUSTOM;
-//			case Phone.TYPE_HOME:
-//				return MA_PIM_ATTR_PHONE_HOME;
-//			case Phone.TYPE_MOBILE:
-//				return MA_PIM_ATTR_PHONE_MOBILE;
-//			case Phone.TYPE_WORK:
-//				return MA_PIM_ATTR_PHONE_WORK;
-//			case Phone.TYPE_FAX_WORK:
-//				return MA_PIM_ATTR_PHONE_WORK_FAX;
-//			case Phone.TYPE_FAX_HOME:
-//				return MA_PIM_ATTR_PHONE_HOME_FAX;
-//			case Phone.TYPE_PAGER:
-//				return MA_PIM_ATTR_PHONE_PAGER;
-//			case Phone.TYPE_CALLBACK:
-//				return MA_PIM_ATTR_PHONE_CALLBACK;
-//			case Phone.TYPE_CAR:
-//				return MA_PIM_ATTR_PHONE_CAR;
-//			case Phone.TYPE_COMPANY_MAIN:
-//				return MA_PIM_ATTR_PHONE_COMPANY_MAIN;
-//			case Phone.TYPE_ISDN:
-//				return MA_PIM_ATTR_PHONE_ISDN;
-//			case Phone.TYPE_OTHER_FAX:
-//				return MA_PIM_ATTR_PHONE_OTHER_FAX;
-//			case Phone.TYPE_RADIO:
-//				return MA_PIM_ATTR_PHONE_RADIO;
-//			case Phone.TYPE_TELEX:
-//				return MA_PIM_ATTR_PHONE_TELEX;
-//			case Phone.TYPE_TTY_TDD:
-//				return MA_PIM_ATTR_PHONE_TTY_TDD;
-//			case Phone.TYPE_WORK_MOBILE:
-//				return MA_PIM_ATTR_PHONE_WORK_MOBILE;
-//			case Phone.TYPE_WORK_PAGER:
-//				return MA_PIM_ATTR_PHONE_WORK_PAGER;
-//			case Phone.TYPE_ASSISTANT:
-//				return MA_PIM_ATTR_PHONE_ASSISTANT;
-//			case Phone.TYPE_MMS:
-//				return MA_PIM_ATTR_PHONE_MMS;
-//			case Phone.TYPE_OTHER:
-//			case Phone.TYPE_MAIN:
-//			default:
-//				return MA_PIM_ATTR_PHONE_OTHER;
-//		}
+		if (attr > 0)
+			return ((Integer)getKeyFromValue(mPhoneAttributes, attr)).intValue();
+		return 0;
 	}
 
 	int getPhoneNativeAttribute(int attr)
 	{
-		return mAttributes.get(attr);
-//		switch (attr)
-//		{
-//			case MA_PIM_ATTR_PHONE_CUSTOM:
-//				return Phone.TYPE_CUSTOM;
-//			case MA_PIM_ATTR_PHONE_HOME:
-//				return Phone.TYPE_HOME;
-//			case MA_PIM_ATTR_PHONE_MOBILE:
-//				return Phone.TYPE_MOBILE;
-//			case MA_PIM_ATTR_PHONE_WORK:
-//				return Phone.TYPE_WORK;
-//			case MA_PIM_ATTR_PHONE_WORK_FAX:
-//				return Phone.TYPE_FAX_WORK;
-//			case MA_PIM_ATTR_PHONE_HOME_FAX:
-//				return Phone.TYPE_FAX_HOME;
-//			case MA_PIM_ATTR_PHONE_PAGER:
-//				return Phone.TYPE_PAGER;
-//			case MA_PIM_ATTR_PHONE_CALLBACK:
-//				return Phone.TYPE_CALLBACK;
-//			case MA_PIM_ATTR_PHONE_CAR:
-//				return Phone.TYPE_CAR;
-//			case MA_PIM_ATTR_PHONE_COMPANY_MAIN:
-//				return Phone.TYPE_COMPANY_MAIN;
-//			case MA_PIM_ATTR_PHONE_ISDN:
-//				return Phone.TYPE_ISDN;
-//			case MA_PIM_ATTR_PHONE_OTHER_FAX:
-//				return Phone.TYPE_OTHER_FAX;
-//			case MA_PIM_ATTR_PHONE_RADIO:
-//				return Phone.TYPE_RADIO;
-//			case MA_PIM_ATTR_PHONE_TELEX:
-//				return Phone.TYPE_TELEX;
-//			case MA_PIM_ATTR_PHONE_TTY_TDD:
-//				return Phone.TYPE_TTY_TDD;
-//			case MA_PIM_ATTR_PHONE_WORK_MOBILE:
-//				return Phone.TYPE_WORK_MOBILE;
-//			case MA_PIM_ATTR_PHONE_WORK_PAGER:
-//				return Phone.TYPE_WORK_PAGER;
-//			case MA_PIM_ATTR_PHONE_ASSISTANT:
-//				return Phone.TYPE_ASSISTANT;
-//			case MA_PIM_ATTR_PHONE_MMS:
-//				return Phone.TYPE_MMS;
-//			default:
-//				return Phone.TYPE_OTHER;
-//		}
+		if (!mPhoneAttributes.containsKey(attr))
+			return -1;
+		return mPhoneAttributes.get(attr);
 	}
 
 	int getTitleAttribute(int attr)
 	{
-		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
-//		switch (attr)
-//		{
-//			case Organization.TYPE_WORK:
-//				return MA_PIM_ATTR_TITLE_WORK;
-//			case Organization.TYPE_CUSTOM:
-//				return MA_PIM_ATTR_TITLE_CUSTOM;
-//			default:
-//				return MA_PIM_ATTR_TITLE_OTHER;
-//		}
+		if (attr > 0)
+			return ((Integer)getKeyFromValue(mTitleAttributes, attr)).intValue();
+		return 0;
 	}
 
 	int getTitleNativeAttribute(int attr)
 	{
-		return mAttributes.get(attr);
-//		switch (attr)
-//		{
-//			case MA_PIM_ATTR_TITLE_WORK:
-//				return Organization.TYPE_WORK;
-//			case MA_PIM_ATTR_TITLE_CUSTOM:
-//				return Organization.TYPE_CUSTOM;
-//			default:
-//				return Organization.TYPE_OTHER;
-//		}
+		if (!mTitleAttributes.containsKey(attr))
+			return -1;
+		return mTitleAttributes.get(attr);
 	}
 
 	int getOrganizationInfoAttribute(int attr)
 	{
-		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
-//		switch (attr)
-//		{
-//			case Organization.TYPE_WORK:
-//				return MA_PIM_ATTR_ORG_INFO_WORK;
-//			case Organization.TYPE_CUSTOM:
-//				return MA_PIM_ATTR_ORG_INFO_CUSTOM;
-//			default:
-//				return MA_PIM_ATTR_ORG_INFO_OTHER;
-//		}
+		if (attr > 0)
+			return ((Integer)getKeyFromValue(mOrgInfoAttributes, attr)).intValue();
+		return 0;
 	}
 
 	int getOrganizationInfoNativeAttribute(int attr)
 	{
-		return mAttributes.get(attr);
-//		switch (attr)
-//		{
-//			case MA_PIM_ATTR_ORG_INFO_WORK:
-//				return Organization.TYPE_WORK;
-//			case MA_PIM_ATTR_ORG_INFO_CUSTOM:
-//				return Organization.TYPE_CUSTOM;
-//			default:
-//				return Organization.TYPE_OTHER;
-//		}
+		if (!mOrgInfoAttributes.containsKey(attr))
+			return -1;
+		return mOrgInfoAttributes.get(attr);
 	}
 
 	int getWebsiteAttribute(int attr)
 	{
-		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
-//		switch (attr)
-//		{
-//			case Website.TYPE_HOMEPAGE:
-//				return MA_PIM_ATTR_WEBSITE_HOMEPAGE;
-//			case Website.TYPE_BLOG:
-//				return MA_PIM_ATTR_WEBSITE_BLOG;
-//			case Website.TYPE_PROFILE:
-//				return MA_PIM_ATTR_WEBSITE_PROFILE;
-//			case Website.TYPE_HOME:
-//				return MA_PIM_ATTR_WEBSITE_HOME;
-//			case Website.TYPE_WORK:
-//				return MA_PIM_ATTR_WEBSITE_WORK;
-//			case Website.TYPE_FTP:
-//				return MA_PIM_ATTR_WEBSITE_FTP;
-//			case Website.TYPE_CUSTOM:
-//				return MA_PIM_ATTR_WEBSITE_CUSTOM;
-//			default:
-//				return MA_PIM_ATTR_WEBSITE_OTHER;
-//		}
+		if (attr > 0)
+			return ((Integer)getKeyFromValue(mWebsiteAttributes, attr)).intValue();
+		return 0;
 	}
 
 	int getWebsiteNativeAttribute(int attr)
 	{
-		return mAttributes.get(attr);
-//		switch (attr)
-//		{
-//			case MA_PIM_ATTR_WEBSITE_HOMEPAGE:
-//				return Website.TYPE_HOMEPAGE;
-//			case MA_PIM_ATTR_WEBSITE_BLOG:
-//				return Website.TYPE_BLOG;
-//			case MA_PIM_ATTR_WEBSITE_PROFILE:
-//				return Website.TYPE_PROFILE;
-//			case MA_PIM_ATTR_WEBSITE_HOME:
-//				return Website.TYPE_HOME;
-//			case MA_PIM_ATTR_WEBSITE_WORK:
-//				return Website.TYPE_WORK;
-//			case MA_PIM_ATTR_WEBSITE_FTP:
-//				return Website.TYPE_FTP;
-//			case MA_PIM_ATTR_WEBSITE_CUSTOM:
-//				return Website.TYPE_CUSTOM;
-//			default:
-//				return Website.TYPE_OTHER;
-//		}
+		if (!mWebsiteAttributes.containsKey(attr))
+			return -1;
+		return mWebsiteAttributes.get(attr);
 	}
 
 	int getImAttribute(int attr)
 	{
-		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
-//		switch (attr)
-//		{
-//			case Im.TYPE_HOME:
-//				return MA_PIM_ATTR_IM_HOME;
-//			case Im.TYPE_WORK:
-//				return MA_PIM_ATTR_IM_WORK;
-//			case Im.TYPE_CUSTOM:
-//				return MA_PIM_ATTR_IM_CUSTOM;
-//			default:
-//				return MA_PIM_ATTR_IM_OTHER;
-//		}
+		if (attr > 0)
+			return ((Integer)getKeyFromValue(mIMAttributes, attr)).intValue();
+		return 0;
 	}
 
 	int getImNativeAttribute(int attr)
 	{
-		return mAttributes.get(attr);
-//		switch (attr)
-//		{
-//			case MA_PIM_ATTR_IM_HOME:
-//				return Im.TYPE_HOME;
-//			case MA_PIM_ATTR_IM_WORK:
-//				return Im.TYPE_WORK;
-//			case MA_PIM_ATTR_IM_CUSTOM:
-//				return Im.TYPE_CUSTOM;
-//			default:
-//				return Im.TYPE_OTHER;
-//		}
+		if (!mIMAttributes.containsKey(attr))
+			return -1;
+		return mIMAttributes.get(attr);
 	}
 
 	int getRelationAttribute(int attr)
 	{
-		return ((Integer)getKeyFromValue(mAttributes, attr)).intValue();
-//		switch (attr)
-//		{
-//			case Relation.TYPE_MOTHER:
-//				return MA_PIM_ATTR_RELATION_MOTHER;
-//			case Relation.TYPE_FATHER:
-//				return MA_PIM_ATTR_RELATION_FATHER;
-//			case Relation.TYPE_PARENT:
-//				return MA_PIM_ATTR_RELATION_PARENT;
-//			case Relation.TYPE_SISTER:
-//				return MA_PIM_ATTR_RELATION_SISTER;
-//			case Relation.TYPE_BROTHER:
-//				return MA_PIM_ATTR_RELATION_BROTHER;
-//			case Relation.TYPE_CHILD:
-//				return MA_PIM_ATTR_RELATION_CHILD;
-//			case Relation.TYPE_FRIEND:
-//				return MA_PIM_ATTR_RELATION_FRIEND;
-//			case Relation.TYPE_SPOUSE:
-//				return MA_PIM_ATTR_RELATION_SPOUSE;
-//			case Relation.TYPE_PARTNER:
-//				return MA_PIM_ATTR_RELATION_PARTNER;
-//			case Relation.TYPE_MANAGER:
-//				return MA_PIM_ATTR_RELATION_MANAGER;
-//			case Relation.TYPE_ASSISTANT:
-//				return MA_PIM_ATTR_RELATION_ASSISTANT;
-//			case Relation.TYPE_DOMESTIC_PARTNER:
-//				return MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER;
-//			case Relation.TYPE_REFERRED_BY:
-//				return MA_PIM_ATTR_RELATION_REFERRED_BY;
-//			case Relation.TYPE_CUSTOM:
-//				return MA_PIM_ATTR_RELATION_CUSTOM;
-//			default:
-//				return MA_PIM_ATTR_RELATION_RELATIVE;
-//		}
+		if (attr > 0)
+			return ((Integer)getKeyFromValue(mRelationAttributes, attr)).intValue();
+		return 0;
 	}
 
 	int getRelationNativeAttribute(int attr)
 	{
-		return mAttributes.get(attr);
-//		switch (attr)
-//		{
-//			case MA_PIM_ATTR_RELATION_MOTHER:
-//				return Relation.TYPE_MOTHER;
-//			case MA_PIM_ATTR_RELATION_FATHER:
-//				return Relation.TYPE_FATHER;
-//			case MA_PIM_ATTR_RELATION_PARENT:
-//				return Relation.TYPE_PARENT;
-//			case MA_PIM_ATTR_RELATION_SISTER:
-//				return Relation.TYPE_SISTER;
-//			case MA_PIM_ATTR_RELATION_BROTHER:
-//				return Relation.TYPE_BROTHER;
-//			case MA_PIM_ATTR_RELATION_CHILD:
-//				return Relation.TYPE_CHILD;
-//			case MA_PIM_ATTR_RELATION_FRIEND:
-//				return Relation.TYPE_FRIEND;
-//			case MA_PIM_ATTR_RELATION_SPOUSE:
-//				return Relation.TYPE_SPOUSE;
-//			case MA_PIM_ATTR_RELATION_PARTNER:
-//				return Relation.TYPE_PARTNER;
-//			case MA_PIM_ATTR_RELATION_MANAGER:
-//				return Relation.TYPE_MANAGER;
-//			case MA_PIM_ATTR_RELATION_ASSISTANT:
-//				return Relation.TYPE_ASSISTANT;
-//			case MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER:
-//				return Relation.TYPE_DOMESTIC_PARTNER;
-//			case MA_PIM_ATTR_RELATION_REFERRED_BY:
-//				return Relation.TYPE_REFERRED_BY;
-//			case MA_PIM_ATTR_RELATION_CUSTOM:
-//				return Relation.TYPE_CUSTOM;
-//			default:
-//				return Relation.TYPE_RELATIVE;
-//		}
+		if (!mRelationAttributes.containsKey(attr))
+			return -1;
+		return mRelationAttributes.get(attr);
 	}
 
 	int getAttribute(int index)
 	{
-		int ret = 0;
-		String[] names = mStrNames.get(index);
+		int ret = MA_PIM_ERR_NO_ATTRIBUTES;
+		String[] names = mStrNames;
 		String[] infos = mStrInfos.get(index);
 
 		DebugPrint("TYPE: " + getMoSyncType());
@@ -848,52 +672,55 @@ public class PIMField
 			case MA_PIM_FIELD_CONTACT_ADDR:
 				ret = getAddressAttribute(getFieldIntValue(names, infos, StructuredPostal.TYPE));
 				if (getFieldIntValue(names, infos, StructuredPostal.IS_PRIMARY) != 0)
-					ret |= MA_PIM_ATTR_PREFERRED;
+					ret |= MA_PIM_ATTRPREFERRED;
 				break;
 			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
 				ret = getFormattedAddressAttribute(getFieldIntValue(names, infos, StructuredPostal.TYPE));
 				if (getFieldIntValue(names, infos, StructuredPostal.IS_PRIMARY) != 0)
-					ret |= MA_PIM_ATTR_PREFERRED;
+					ret |= MA_PIM_ATTRPREFERRED;
 				break;
 			case MA_PIM_FIELD_CONTACT_EMAIL:
 				ret = getEmailAttribute(getFieldIntValue(names, infos, Email.TYPE));
 				if (getFieldIntValue(names, infos, Email.IS_PRIMARY) != 0)
-					ret |= MA_PIM_ATTR_PREFERRED;
+					ret |= MA_PIM_ATTRPREFERRED;
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG:
 				ret = getOrganizationAttribute(getFieldIntValue(names, infos, Organization.TYPE));
 				if (getFieldIntValue(names, infos, Organization.IS_PRIMARY) != 0)
-					ret |= MA_PIM_ATTR_PREFERRED;
+					ret |= MA_PIM_ATTRPREFERRED;
 				break;
 			case MA_PIM_FIELD_CONTACT_TITLE:
 				ret = getTitleAttribute(getFieldIntValue(names, infos, Organization.TYPE));
 				if (getFieldIntValue(names, infos, Organization.IS_PRIMARY) != 0)
-					ret |= MA_PIM_ATTR_PREFERRED;
+					ret |= MA_PIM_ATTRPREFERRED;
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG_INFO:
 				ret = getOrganizationInfoAttribute(getFieldIntValue(names, infos, Organization.TYPE));
 				if (getFieldIntValue(names, infos, Organization.IS_PRIMARY) != 0)
-					ret |= MA_PIM_ATTR_PREFERRED;
+					ret |= MA_PIM_ATTRPREFERRED;
 				break;
 			case MA_PIM_FIELD_CONTACT_TEL:
 				ret = getPhoneAttribute(getFieldIntValue(names, infos, Phone.TYPE));
+				if ((ret == MA_PIM_ATTR_PHONE_CUSTOM) ||
+					((getCustomLabel(index)!= null) && getCustomLabel(index).equals("iPhone")))
+					ret = MA_PIM_ATTR_PHONE_IPHONE;
 				if (getFieldIntValue(names, infos, Phone.IS_PRIMARY) != 0)
-					ret |= MA_PIM_ATTR_PREFERRED;
+					ret |= MA_PIM_ATTRPREFERRED;
 				break;
 			case MA_PIM_FIELD_CONTACT_URL:
 				ret = getWebsiteAttribute(getFieldIntValue(names, infos, Website.TYPE));
 				if (getFieldIntValue(names, infos, Website.IS_PRIMARY) != 0)
-					ret |= MA_PIM_ATTR_PREFERRED;
+					ret |= MA_PIM_ATTRPREFERRED;
 				break;
 			case MA_PIM_FIELD_CONTACT_IM:
 				ret = getImAttribute(getFieldIntValue(names, infos, Im.TYPE));
 				if (getFieldIntValue(names, infos, Im.IS_PRIMARY) != 0)
-					ret |= MA_PIM_ATTR_PREFERRED;
+					ret |= MA_PIM_ATTRPREFERRED;
 				break;
 			case MA_PIM_FIELD_CONTACT_RELATION:
 				ret = getRelationAttribute(getFieldIntValue(names, infos, Relation.TYPE));
 				if (getFieldIntValue(names, infos, Relation.IS_PRIMARY) != 0)
-					ret |= MA_PIM_ATTR_PREFERRED;
+					ret |= MA_PIM_ATTRPREFERRED;
 				break;
 		}
 
@@ -902,9 +729,8 @@ public class PIMField
 
 	int setAttribute(int index, int attribute)
 	{
-		int ret = 0;
 		int attrNativeValue = 0;
-		String[] names = mStrNames.get(index);
+		String[] names = mStrNames;
 		String[] infos = mStrInfos.get(index);
 
 		DebugPrint("TYPE: " + getMoSyncType());
@@ -912,104 +738,114 @@ public class PIMField
 		switch ( getMoSyncType() )
 		{
 			case MA_PIM_FIELD_CONTACT_ADDR:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, StructuredPostal.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				attrNativeValue = getAddressNativeAttribute(attrNativeValue);
-				setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
+				attribute &= 0xFFFF;
+				attrNativeValue = getAddressNativeAttribute(attribute);
+				if (attrNativeValue > 0)
+					setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, StructuredPostal.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				attrNativeValue = getFormattedAddressNativeAttribute(attrNativeValue);
-				setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
+				attribute &= 0xFFFF;
+				attrNativeValue = getFormattedAddressNativeAttribute(attribute);
+				if (attrNativeValue > 0)
+					setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_EMAIL:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Email.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				 attrNativeValue = getEmailNativeAttribute(attrNativeValue);
-				setFieldValue( names, infos, Email.TYPE, Integer.toString(attrNativeValue) );
+				attribute &= 0xFFFF;
+				attrNativeValue = getEmailNativeAttribute(attribute);
+				if (attrNativeValue > 0)
+					setFieldValue( names, infos, Email.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Organization.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				attrNativeValue = getOrganizationNativeAttribute(attrNativeValue);
-				setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
+				attribute &= 0xFFFF;
+				DebugPrint("Organization attribute = " + attribute);
+				attrNativeValue = getOrganizationNativeAttribute(attribute);
+				if (attrNativeValue > 0)
+					setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_TITLE:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Organization.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				attrNativeValue = getTitleNativeAttribute(attrNativeValue);
-				setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
+				attribute &= 0xFFFF;
+				attrNativeValue = getTitleNativeAttribute(attribute);
+				if (attrNativeValue > 0)
+					setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG_INFO:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Organization.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				attrNativeValue = getOrganizationInfoNativeAttribute(attrNativeValue);
-				setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
+				attribute &= 0xFFFF;
+				attrNativeValue = getOrganizationInfoNativeAttribute(attribute);
+				if (attrNativeValue > 0)
+					setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_TEL:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Phone.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				attrNativeValue = getPhoneNativeAttribute(attrNativeValue);
-				setFieldValue( names, infos, Phone.TYPE, Integer.toString(attrNativeValue) );
+				attribute &= 0xFFFF;
+				attrNativeValue = getPhoneNativeAttribute(attribute);
+				if (attrNativeValue > 0)
+					setFieldValue( names, infos, Phone.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_URL:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Website.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				attrNativeValue = getWebsiteNativeAttribute(attrNativeValue);
-				setFieldValue( names, infos, Website.TYPE, Integer.toString(attrNativeValue) );
+				attribute &= 0xFFFF;
+				attrNativeValue = getWebsiteNativeAttribute(attribute);
+				if (attrNativeValue > 0)
+					setFieldValue( names, infos, Website.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_IM:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Im.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				attrNativeValue = getImNativeAttribute(attrNativeValue);
-				setFieldValue( names, infos, Im.TYPE, Integer.toString(attrNativeValue) );
+				attribute &= 0xFFFF;
+				attrNativeValue = getImNativeAttribute(attribute);
+				if (attrNativeValue > 0)
+					setFieldValue( names, infos, Im.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_RELATION:
-				if ( (ret | MA_PIM_ATTR_PREFERRED) != 0 )
+				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
 				{
 					setFieldValue( names, infos, Relation.IS_PRIMARY, Integer.toString(attribute) );
-					ret &= 0xFFFF;
 				}
-				attrNativeValue = getRelationNativeAttribute(attrNativeValue);
-				setFieldValue( names, infos, Relation.TYPE, Integer.toString(attrNativeValue) );
+				attribute &= 0xFFFF;
+				attrNativeValue = getRelationNativeAttribute(attribute);
+				if (attrNativeValue > 0)
+					setFieldValue( names, infos, Relation.TYPE, Integer.toString(attrNativeValue) );
 				break;
 		}
-
-		return ret;
+		return attrNativeValue;
 	}
 
 	public String getCustomLabel(int index)
 	{
 		String ret = null;
-		String[] names = mStrNames.get(index);
+		String[] names = mStrNames;
 		String[] infos = mStrInfos.get(index);
 
 		switch ( getMoSyncType() )
@@ -1054,48 +890,39 @@ public class PIMField
 		return ret;
 	}
 
-	public String setCustomLabel(int index, String label)
+	public void setCustomLabel(int index, String label)
 	{
-		String ret = null;
-		String[] names = mStrNames.get(index);
+		setState(index, State.UPDATED);
+		String[] names = mStrNames;
 		String[] infos = mStrInfos.get(index);
 
 		switch ( getMoSyncType() )
 		{
 			case MA_PIM_FIELD_CONTACT_ADDR:
 			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
-				if ( getFieldIntValue(names, infos, StructuredPostal.TYPE) == StructuredPostal.TYPE_CUSTOM )
-					setFieldValue(names, infos, StructuredPostal.LABEL, label);
+				setFieldValue(names, infos, StructuredPostal.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_EMAIL:
-				if ( getFieldIntValue(names, infos, Email.TYPE) == Email.TYPE_CUSTOM )
-					setFieldValue(names, infos, Email.LABEL, label);
+				setFieldValue(names, infos, Email.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG:
 			case MA_PIM_FIELD_CONTACT_TITLE:
 			case MA_PIM_FIELD_CONTACT_ORG_INFO:
-				if ( getFieldIntValue(names, infos, Organization.TYPE) == Organization.TYPE_CUSTOM )
-					setFieldValue(names, infos, Organization.LABEL, label);
+				setFieldValue(names, infos, Organization.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_TEL:
-				if ( getFieldIntValue(names, infos, Phone.TYPE) == Phone.TYPE_CUSTOM )
-					setFieldValue(names, infos, Phone.LABEL, label);
+				setFieldValue(names, infos, Phone.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_URL:
-				if ( getFieldIntValue(names, infos, Website.TYPE) == Website.TYPE_CUSTOM )
-					setFieldValue(names, infos, Website.LABEL, label);
+				setFieldValue(names, infos, Website.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_IM:
-				if ( getFieldIntValue(names, infos, Im.TYPE) == Im.TYPE_CUSTOM )
-					setFieldValue(names, infos, Im.LABEL, label);
+				setFieldValue(names, infos, Im.LABEL, label);
 				break;
 			case MA_PIM_FIELD_CONTACT_RELATION:
-				if ( getFieldIntValue(names, infos, Relation.TYPE) == Relation.TYPE_CUSTOM )
-					setFieldValue(names, infos, Relation.LABEL, label);
+				setFieldValue(names, infos, Relation.LABEL, label);
 				break;
 		}
-
-		return ret;
 	}
 
 	static int getDataType(int fieldType)
@@ -1123,7 +950,7 @@ public class PIMField
 			case MA_PIM_FIELD_CONTACT_ORG:
 				return MA_PIM_TYPE_STRING;
 			case MA_PIM_FIELD_CONTACT_PHOTO:
-				return MA_PIM_TYPE_BINARY;
+				return MA_PIM_TYPE_INT;
 			case MA_PIM_FIELD_CONTACT_PHOTO_URL:
 				return MA_PIM_TYPE_STRING;
 			case MA_PIM_FIELD_CONTACT_PUBLIC_KEY:
@@ -1147,19 +974,25 @@ public class PIMField
 			case MA_PIM_FIELD_CONTACT_ORG_INFO:
 				return MA_PIM_TYPE_STRING_ARRAY;
 			default:
-				return MA_PIM_TYPE_INVALID;
+				return -1;
 		}
 	}
 
-	String getData(int index)
+	void writeInt(int val, char[] buffer, int index)
 	{
-		byte ret[] = new byte[1024];
+		buffer[index++] = (char)(val & 0xFFFF);
+		buffer[index++] = (char)((val >> 16) & 0xFFFF);
+	}
+
+	int readInt(char[] buffer, int index)
+	{
+		return (buffer[index] | (buffer[index + 1] << 16));
+	}
+
+	int writeStringArray(String[] names, String[] infos, char[] buffer)
+	{
 		int retIndex = 0;
 		int length = 0;
-		String str;
-		String[] names = mStrNames.get(index);
-		String[] infos = mStrInfos.get(index);
-
 		switch ( getMoSyncType() )
 		{
 			case MA_PIM_FIELD_CONTACT_ADDR:
@@ -1183,94 +1016,186 @@ public class PIMField
 				length = names.length - 2;
 				break;
 		}
-		str = Integer.toString(length);
-		for (int i=0; i<str.length(); i++)
-		{
-			ret[retIndex++] = (byte)str.charAt(i);
-		}
-		ret[retIndex++] = 0;
+		writeInt(length, buffer, retIndex);
+		retIndex += 2;
 		for (int i=1; i<length + 1; i++)
 		{
+			DebugPrint(names[i] + ": " + infos[i]);
 			if ( (infos[i] != null) && (names[i] != PIM.DUMMY) )
 			{
-				for (int j=0; j<infos[i].length(); j++)
+				if ((getMoSyncType() == MA_PIM_FIELD_CONTACT_IM) && (names[i] == Im.PROTOCOL))
 				{
-					ret[retIndex++] += (byte)infos[i].charAt(j);
+					String protocolName = getProtocolName(infos[i]);
+					System.arraycopy(protocolName.toCharArray(), 0, buffer, retIndex, protocolName.length());
+					retIndex += protocolName.length();
+				}
+				else
+				{
+					System.arraycopy(infos[i].toCharArray(), 0, buffer, retIndex, infos[i].length());
+					retIndex += infos[i].length();
 				}
 			}
-			ret[retIndex++] = 0;
+			buffer[retIndex++] = 0;
 		}
-		return ret.toString();
+		return retIndex;
 	}
 
-	int setData(int index, String buffer)
+	String getProtocolName(String value)
 	{
-		byte tmp[] = new byte[10];
-		int bufIndex = 0;
-		int length = 0;
-		String[] names = mStrNames.get(index);
+		int val = Integer.parseInt(value);
+		if (!mProtocols.containsKey(val))
+			return "OTHER";
+		return mProtocols.get(val);
+	}
+
+	String getProtocolID(String name)
+	{
+		Integer id = ((Integer)getKeyFromValue(mProtocols, name)).intValue();
+		if (id == null)
+			return Integer.toString(Im.PROTOCOL_CUSTOM);
+		return id.toString();
+	}
+
+	void readStringArray(String[] names, String[] infos, char[] buffer)
+	{
+		int buffIndex = 0;
+		int length = readInt(buffer, buffIndex);
+		DebugPrint("LENGTH = " + length);
+		buffIndex += 2;
+		for (int i=1; i<length + 1; i++)
+		{
+			int crtIndex = buffIndex;
+			while (buffer[crtIndex++] != 0);
+			crtIndex--;
+			int len = crtIndex - buffIndex;
+			char[] tmp = new char[len];
+			System.arraycopy(buffer, buffIndex, tmp, 0, len);
+			infos[i] = new String(tmp);
+			DebugPrint("INFOS[" + i + "]=" + infos[i]);
+			tmp = null;
+			buffIndex += infos[i].length();
+			buffIndex++;
+		}
+	}
+
+	int getData(int index, char[] buffer)
+	{
+		String[] names = mStrNames;
 		String[] infos = mStrInfos.get(index);
 
-		switch ( getMoSyncType() )
+		switch (getDataType(getMoSyncType()))
 		{
-			case MA_PIM_FIELD_CONTACT_ADDR:
-			case MA_PIM_FIELD_CONTACT_BIRTHDAY:
-			case MA_PIM_FIELD_CONTACT_EMAIL:
-			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
-			case MA_PIM_FIELD_CONTACT_ORG:
-			case MA_PIM_FIELD_CONTACT_TEL:
-			case MA_PIM_FIELD_CONTACT_TITLE:
-			case MA_PIM_FIELD_CONTACT_URL:
-			case MA_PIM_FIELD_CONTACT_IM:
-			case MA_PIM_FIELD_CONTACT_RELATION:
-			case MA_PIM_FIELD_CONTACT_ORG_INFO:
-				length = names.length - 4;
-				break;
-			case MA_PIM_FIELD_CONTACT_NAME:
-			case MA_PIM_FIELD_CONTACT_NICKNAME:
-			case MA_PIM_FIELD_CONTACT_NOTE:
-			case MA_PIM_FIELD_CONTACT_PHOTO:
-			case MA_PIM_FIELD_CONTACT_UID:
-				length = names.length - 2;
-				break;
-		}
-		while (buffer.charAt(bufIndex) != 0)
-		{
-			tmp[bufIndex] = (byte)buffer.charAt(bufIndex);
-			bufIndex++;
-		}
-		tmp[bufIndex++] = 0;
-
-		int count = Integer.parseInt( tmp.toString() );
-
-		if (length - 4 != count)
-			return -1;
-
-		for (int i=0; i<count; i++)
-		{
-			int tmpIndex = 0;
-			while (buffer.charAt(bufIndex) != 0)
+			case MA_PIM_TYPE_INT:
 			{
-				tmp[tmpIndex++] = (byte)buffer.charAt(bufIndex++);
+				DebugPrint("INT DATA " + infos[1]);
+				int data = Integer.parseInt(infos[1]);
+				writeInt(data, buffer, 0);
+				return 2;
 			}
-			tmp[tmpIndex++] = 0;
-			if ( (infos[i + 1] != null) && (names[i + 1] != PIM.DUMMY) )
+			case MA_PIM_TYPE_DATE:
 			{
-				infos[i + 1] = tmp.toString();
+				DebugPrint("DATE DATA " + infos[1]);
+				SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
+				Date dateObj = null;
+				try
+				{
+					dateObj = curFormater.parse(infos[1]);
+				}
+				catch (ParseException e)
+				{
+					e.printStackTrace();
+					return 0;
+				}
+				int date = (int)dateObj.getTime();
+				DebugPrint("WriteInt " + date);
+				writeInt(date, buffer, 0);
+				return 2;
+			}
+			case MA_PIM_TYPE_STRING:
+			{
+				DebugPrint("STRING DATA " + infos[1]);
+				System.arraycopy(infos[1].toCharArray(), 0, buffer, 0, infos[1].length());
+				return infos[1].length();
+			}
+			case MA_PIM_TYPE_STRING_ARRAY:
+			{
+				DebugPrint("STRING ARRAY DATA " + infos.length);
+				for (int i=0; i<infos.length; i++)
+					if (infos[i] != null)
+					{
+						DebugPrint( i + ":" + infos[i]);
+					}
+				return writeStringArray(names, infos, buffer);
+			}
+			default:
+			{
+				return 0;
+			}
+		}
+	}
+
+	int setData(int index, char[] buffer)
+	{
+		setState(index, State.UPDATED);
+		String[] names = mStrNames;
+		String[] infos = mStrInfos.get(index);
+
+		switch (getDataType(getMoSyncType()))
+		{
+			case MA_PIM_TYPE_INT:
+			{
+				infos[1] = Integer.toString(readInt(buffer, 0));
+				DebugPrint("INFOS = " + infos[1]);
+				break;
+			}
+			case MA_PIM_TYPE_DATE:
+			{
+				int data = readInt(buffer, 0);
+				SimpleDateFormat curFormater = new SimpleDateFormat("yyyy-MM-dd");
+				Date dateObj = new Date();
+				dateObj.setTime(data);
+				infos[1] = curFormater.format(dateObj);
+				DebugPrint("INFOS = " + infos[1]);
+				break;
+			}
+			case MA_PIM_TYPE_STRING:
+			{
+				int crtIndex = 0;
+				while (buffer[crtIndex++] != 0);
+				crtIndex--;
+				int len = crtIndex;
+				char[] tmp = new char[len];
+				System.arraycopy(buffer, 0, tmp, 0, len);
+				infos[1] = new String(tmp);
+				if (getMoSyncType() == MA_PIM_FIELD_CONTACT_PHOTO_URL)
+				{
+					infos[1] = loadPhoto(infos[1]);
+				}
+				DebugPrint("INFOS = " + infos[1]);
+				break;
+			}
+			case MA_PIM_TYPE_STRING_ARRAY:
+			{
+				readStringArray(names, infos, buffer);
+				break;
+			}
+			default:
+			{
+				return -1;
 			}
 		}
 		return 0;
 	}
 
-	int addData(String buffer)
+	int addData(char[] buffer)
 	{
-		String[] names = mStrNames.get(0);
+		String[] names = mStrNames;
 		if (names == null)
 			return -1;
 		String[] infos = new String[names.length];
-		mStrNames.add(names);
 		mStrInfos.add(infos);
-		int index = mStrNames.size() - 1;
+		int index = mStrInfos.size() - 1;
+		setState(index, State.ADDED);
 		return setData(index, buffer);
 	}
 
@@ -1278,5 +1203,145 @@ public class PIMField
 	{
 		String[] infos = mStrInfos.get(index);
 		return infos[0];
+	}
+
+	boolean hasCustomLabel(int index)
+	{
+		String[] names = mStrNames;
+		String[] infos = mStrInfos.get(index);
+
+		int type = getMoSyncType();
+		switch (type)
+		{
+			case MA_PIM_FIELD_CONTACT_BIRTHDAY:
+			case MA_PIM_FIELD_CONTACT_NAME:
+			case MA_PIM_FIELD_CONTACT_NICKNAME:
+			case MA_PIM_FIELD_CONTACT_NOTE:
+			case MA_PIM_FIELD_CONTACT_PHOTO:
+			case MA_PIM_FIELD_CONTACT_PHOTO_URL:
+				return false;
+			case MA_PIM_FIELD_CONTACT_ADDR:
+			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
+				if ( getFieldIntValue(names, infos, StructuredPostal.TYPE) != StructuredPostal.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_EMAIL:
+				if ( getFieldIntValue(names, infos, Email.TYPE) != Email.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_ORG:
+			case MA_PIM_FIELD_CONTACT_TITLE:
+			case MA_PIM_FIELD_CONTACT_ORG_INFO:
+				if ( getFieldIntValue(names, infos, Organization.TYPE) != Organization.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_TEL:
+				if ( getFieldIntValue(names, infos, Phone.TYPE) != Phone.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_URL:
+				if ( getFieldIntValue(names, infos, Website.TYPE) != Website.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_IM:
+				if ( getFieldIntValue(names, infos, Im.TYPE) != Im.TYPE_CUSTOM )
+					return false;
+				break;
+			case MA_PIM_FIELD_CONTACT_RELATION:
+				if ( getFieldIntValue(names, infos, Relation.TYPE) != Relation.TYPE_CUSTOM )
+					return false;
+				break;
+		}
+		return true;
+	}
+
+	boolean isReadOnly()
+	{
+		int type = getMoSyncType();
+		if ((type == MA_PIM_FIELD_CONTACT_UID) ||
+			(type == MA_PIM_FIELD_CONTACT_REVISION))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	boolean isWriteOnly()
+	{
+		if (getMoSyncType() == MA_PIM_FIELD_CONTACT_PHOTO_URL)
+		{
+			return true;
+		}
+		return false;
+	}
+
+	void setState(int index, State state)
+	{
+		if (state == State.ADDED)
+		{
+			mState.add(State.ADDED);
+		}
+		else if ((mState.get(index) == State.NONE) ||
+			(mState.get(index) == State.UPDATED))
+		{
+			mState.set(index, state);
+		}
+	}
+
+	void close()
+	{
+//		for (int i=0; i<mState.size(); i++)
+//		{
+//			if (mState.get(i) == State.ADDED)
+//			{
+//				add(mStrNames, mStrInfos.get(i));
+//			}
+//			else if (mState.get(i) == State.UPDATED)
+//			{
+//				update(mStrNames, mStrInfos.get(i));
+//			}
+//			else if (mState.get(i) == State.DELETED)
+//			{
+//				delete();
+//			}
+//		}
+	}
+
+	void add()
+	{
+//		ArrayList<ContentProviderOperation> ops =
+//			new ArrayList<ContentProviderOperation>();
+//
+//		ops.add(ContentProviderOperation.newInsert(Data.CONTENT_URI)
+//				.withValue(Data.RAW_CONTACT_ID, rawContactId)
+//				.withValue(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE)
+//				.withValue(Phone.NUMBER, "            1-800-GOOG-411      ")
+//				.withValue(Phone.TYPE, Phone.TYPE_CUSTOM)
+//				.withValue(Phone.LABEL, "free directory assistance")
+//				.build());
+//		getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+	}
+
+	void update()
+	{
+//		ArrayList<ContentProviderOperation> ops =
+//			new ArrayList<ContentProviderOperation>();
+//
+//		ops.add(ContentProviderOperation.newUpdate(Data.CONTENT_URI)
+//				.withSelection(Data._ID + "=?", new String[]{String.valueOf(dataId)})
+//				.withValue(Email.DATA, "somebody@android.com")
+//				.build());
+//		getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+	}
+
+	void delete()
+	{
+//		ArrayList<ContentProviderOperation> ops =
+//			new ArrayList<ContentProviderOperation>();
+//
+//		ops.add(ContentProviderOperation.newDelete(Data.CONTENT_URI)
+//				.withSelection(Data._ID + "=?", new String[]{String.valueOf(dataId)})
+//				.build());
+//		getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
 	}
 }
