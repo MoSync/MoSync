@@ -32,6 +32,7 @@
 	controller = _controller;
 	controller.title = @"";
 	view = controller.view;
+    [view retain];
 	return [super init];
 }
 

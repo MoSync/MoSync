@@ -34,8 +34,8 @@
 {
     if(!view)
     {
-        UIProgressView* progressView = [[UIProgressView alloc] init];
-        view = [[progressView initWithProgressViewStyle: UIProgressViewStyleBar] retain];
+        //UIProgressView* progressView = [[UIProgressView alloc] init];
+        view = [[[UIProgressView alloc] initWithProgressViewStyle: UIProgressViewStyleBar] retain];
     }
 
     mMaxValue = DEFAULT_MAXIMUM_VALUE;

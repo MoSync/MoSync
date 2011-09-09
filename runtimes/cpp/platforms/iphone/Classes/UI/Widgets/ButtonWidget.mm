@@ -191,7 +191,7 @@
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@"text"]) {
 		UIButton* button = (UIButton*) view;
-		return button.titleLabel.text;
+		return [button.titleLabel.text retain];
 	} else {
 		return [super getPropertyWithKey:key];
 	}

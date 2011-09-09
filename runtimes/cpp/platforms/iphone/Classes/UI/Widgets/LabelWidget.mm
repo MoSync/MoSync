@@ -174,10 +174,10 @@ typedef enum VerticalAlignment {
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@"text"]) {
 		UILabel* label = (UILabel*) view;		
-		return label.text;
+		return [label.text retain];
 	} else if([key isEqualToString:@"maxNumberOfLines"]) {
 		UILabel* label = (UILabel*) view;
-        return [[NSNumber numberWithInt: label.numberOfLines] stringValue];
+        return [[[NSNumber numberWithInt: label.numberOfLines] stringValue] retain];
 	} else {	
 		return [super getPropertyWithKey:key];
 	}

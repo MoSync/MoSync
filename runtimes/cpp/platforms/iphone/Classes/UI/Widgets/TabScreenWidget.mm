@@ -120,7 +120,7 @@
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@"currentTab"]) {
 		UITabBarController* tabBarController = (UITabBarController*)controller;
-		return [[NSNumber numberWithInt: tabBarController.selectedIndex] stringValue];
+		return [[[NSNumber numberWithInt: tabBarController.selectedIndex] stringValue] retain];
 	}
 	else {
 		return [super getPropertyWithKey:key];

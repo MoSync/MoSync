@@ -35,6 +35,10 @@
 	return [super init];	
 }
 
+- (void)dealloc {
+    [super dealloc];
+}
+
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"someproperty"]) {
 	} else {
@@ -50,7 +54,7 @@
 		return [super getPropertyWithKey:key];
 	}
 	
-	return @"";
+	return [[NSString alloc] initWithString: @""];
 }
 
 - (void)showViewAgain{

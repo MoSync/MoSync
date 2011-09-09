@@ -100,8 +100,8 @@
 
 	parent = nil;
 	children = [[NSMutableArray alloc] init];
-	[self setAutoSizeParamX:FIXED_SIZE andY:FIXED_SIZE];	
-
+	[self setAutoSizeParamX:FIXED_SIZE andY:FIXED_SIZE];
+	
 	if(view) {
 		[view setUserInteractionEnabled:YES];
 		view.contentMode = UIViewContentModeRedraw;
@@ -147,8 +147,6 @@
 	}
 	//[self layout];
 	[child layout];
-    //[view setNeedsLayout];
-	//[view setNeedsDisplay];
 }
 
 - (void)addChild: (IWidget*)child {
@@ -166,7 +164,6 @@
 	if(addSubview) {
 		[view insertSubview:childView atIndex:indexValue];
 	}
-	//[view setNeedsLayout];
 	//[self layout];
     [child layout];
     
@@ -186,7 +183,6 @@
 	[child setParent:nil];
 	if(removeFromSuperview)
 		[[child getView] removeFromSuperview];
-	//[view setNeedsLayout];
     [self layout];
 }
 
@@ -287,16 +283,16 @@
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	
 	if([key isEqualToString:@"width"]) {		
-		return [[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue];
+		return [[[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@"height"]) {
-		return [[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue];
+		return [[[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@"left"]) {		
-		return [[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue];
+		return [[[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue] retain];
 	}
 	else if([key isEqualToString:@"top"]) {
-		return [[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue];
+		return [[[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue] retain];
 	}
 	
 	return nil;
@@ -313,12 +309,13 @@
     // this should not be suboptimal, it will trigger a layout
     // that runs once before draw..
     [view setNeedsLayout];
+    
     if(view.superview)
     {
         [view.superview setNeedsLayout];
     }
     
-   // [view layoutIfNeeded];    
+    [view layoutIfNeeded];    
 }
 
 /**

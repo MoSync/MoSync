@@ -1028,6 +1028,7 @@ namespace Base {
 		MoSync_ShowMessageBox(nil, message, true);
 		gRunning = false;
 		pthread_exit(NULL);
+        //[[NSThread currentThread] exit];
 	}
 
 	SYSCALL(int, maPlatformRequest(const char* url))

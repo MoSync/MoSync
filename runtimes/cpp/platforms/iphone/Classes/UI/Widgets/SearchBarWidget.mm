@@ -85,7 +85,7 @@
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@"text"]) {
-		return searchBar.text;
+		return [searchBar.text retain];
 	}	
 	
 	return [super getPropertyWithKey:key];

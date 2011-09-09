@@ -33,7 +33,9 @@
 	[navbar pushNavigationItem:currNavitem animated:false];
 	view = navbar;		
 	
-	return [super init];	
+	id ret = [super init];	
+   	[self setAutoSizeParamX:FILL_PARENT andY:WRAP_CONTENT];	
+    return ret;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -41,7 +43,7 @@
     {
 		currNavitem.title = value;
 	}
-	else if([key isEqualToString:@"backButtonTitle"])
+	else if([key isEqualToString:@"backBtn"])
     {
 		//navitem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:value style:UIBarButtonItemStylePlain target:nil action:nil];
 		//navitem.hidesBackButton = YES;

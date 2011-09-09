@@ -102,7 +102,7 @@
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@"text"]) {
-		return textField.text;
+		return [textField.text retain];
 	}
 
 	return [super getPropertyWithKey:key];

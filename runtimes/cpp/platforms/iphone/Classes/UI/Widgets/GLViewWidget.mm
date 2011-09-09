@@ -44,7 +44,7 @@
 }
 
 - (void)setWidgetHandle:(int)_handle {
-	[super setWidgetHandle:handle];
+	[super setWidgetHandle:_handle];
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;

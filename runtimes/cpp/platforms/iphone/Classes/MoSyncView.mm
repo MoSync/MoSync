@@ -197,7 +197,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 }
  
 -(void) showMessageBox: (NSString*)msg withTitle: (NSString*)title shouldKill: (bool)kill {
-	MessageBoxHandler *mbh = [MessageBoxHandler alloc];
+	MessageBoxHandler *mbh = [[MessageBoxHandler alloc] retain];
 	mbh.kill = kill;
 	mbh.title = title;
 	mbh.msg = msg;
