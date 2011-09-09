@@ -48,6 +48,11 @@ MA 02110-1301, USA.
 FacebookDemoMoblet::FacebookDemoMoblet(const MAUtil::String &appId):
 	mImage(NULL), mImageSize(0)
 {
+	if(appId.size()==0)
+	{
+		maPanic(1, "This application requires an application id. Please see file config.h");
+	}
+
 	initializeFacebook(appId);
 	createGUI();
 	login();
