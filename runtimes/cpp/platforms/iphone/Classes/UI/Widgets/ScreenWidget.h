@@ -25,6 +25,7 @@
 
 - (id)init;
 - (id)initWithController:(UIViewController*)controller;
+- (void)dealloc;
 - (void)addChild: (IWidget*)child;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;

@@ -40,6 +40,15 @@ namespace NativeUI
 	}
 
 	/**
+	 * Bind the preview to the currently selected camera.
+	 * @return 1 on success or 0 for failure
+	 */
+	int CameraPreview::bindToCurrentCamera()
+	{
+		return maCameraSetPreview(this->getWidgetHandle());
+	}
+
+	/**
 	 * Destructor.
 	 */
 	CameraPreview::~CameraPreview()

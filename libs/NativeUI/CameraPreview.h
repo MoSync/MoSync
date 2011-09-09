@@ -38,7 +38,8 @@ namespace NativeUI
 	 * So this widget is only used to enable the camera controller to be
 	 * mapped with UI in devices that support Native UI.
 	 * After creating the widget, remember to bind it to the camera controller
-	 * via a call to #maCameraSetPreview .
+	 * via a call to #maCameraSetPreview (passing the value from it's
+	 * getWidgetHandle() method), or by calling the bindToCurrentCamera() method.
 	 */
 	class CameraPreview : public Widget
 	{
@@ -47,6 +48,12 @@ namespace NativeUI
 		 * Constructor.
 		 */
 		CameraPreview();
+
+		/**
+         * Bind the preview to the currently selected camera.
+		 * @return 1 on success or 0 for failure
+         */
+        virtual int bindToCurrentCamera();
 
 		/**
 		 * Destructor.

@@ -18,7 +18,6 @@
 			if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_ON]]) {
 				if ([device isFlashModeSupported:AVCaptureFlashModeOn]) {
 					device.flashMode = AVCaptureFlashModeOn;
-				}else if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
 					device.torchMode = AVCaptureTorchModeOff;
 				}
 				else {
@@ -30,7 +29,6 @@
 			else if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_OFF]]) {
 					if ([device isFlashModeSupported:AVCaptureFlashModeOff]) {
 						device.flashMode = AVCaptureFlashModeOff;
-					}else if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
 						device.torchMode = AVCaptureTorchModeOff;
 					}
 					else {
@@ -40,7 +38,6 @@
 			else if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_AUTO]]) {
 					if ([device isFlashModeSupported:AVCaptureFlashModeAuto]) {
 						device.flashMode = AVCaptureFlashModeAuto;
-					}else if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
 						device.torchMode = AVCaptureTorchModeOff;
 					}
 					else {
@@ -48,9 +45,8 @@
 					}
 			}
 			else if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_TORCH]]) {
-					if ([device isFlashModeSupported:AVCaptureFlashModeOff]) {
+					if ([device isTorchModeSupported:AVCaptureTorchModeOn]) {
 						device.flashMode = AVCaptureFlashModeOff;
-					}else if ([device isTorchModeSupported:AVCaptureTorchModeOn]) {
 						device.torchMode = AVCaptureTorchModeOn;
 					}
 					else {
@@ -135,6 +131,10 @@
 				result = [NSString stringWithUTF8String:MA_CAMERA_FOCUS_AUTO];
 			}
 		}
+		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_MAX_ZOOM]])
+		{
+			result = @"0";
+		}
 		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_ZOOM_SUPPORTED]]) 
 		{
 			result = @"false";
@@ -163,6 +163,6 @@
 	[device release];
 	[error release];
 	return result;
-	
+
 }
 @end

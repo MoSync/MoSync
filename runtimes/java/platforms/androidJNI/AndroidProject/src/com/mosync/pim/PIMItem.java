@@ -19,11 +19,28 @@ import android.provider.ContactsContract.CommonDataKinds.Photo;
 
 public class PIMItem {
 
+	public enum State { NONE, ADDED, UPDATED, DELETED }
+
 	ArrayList<PIMField> mPIMFields;
+	State mState;
 
 	PIMItem()
 	{
 		mPIMFields = new ArrayList<PIMField>();
+		mState = State.NONE;
+	}
+
+	void read(ContentResolver cr, String contactId, String[] types, String[][] columns)
+	{
+		DebugPrint("Fields Columns = " + columns.length);
+
+		setID(contactId, types[0], columns[0]);
+
+		for (int i = 1; i < columns.length; i++)
+		{
+			DebugPrint("FIELD = " + i);
+			readField(cr, contactId, columns[i], types[i]);
+		}
 	}
 
 	void add(PIMField p)
@@ -79,72 +96,19 @@ public class PIMItem {
 		{
 			while (cursor.moveToNext())
 		    {
-				DebugPrint("************START ENTRY");
-				String[] info = new String[columns.length];
-				for (int i=0; i<columns.length; i++)
-				{
-					if ( itemType.equals(Photo.CONTENT_ITEM_TYPE) && columns[i].equals(Photo.PHOTO))
-					{
-						info[i] = loadContactPhoto(cr, contactId);
-						if (info[i] != null)
-						{
-							DebugPrint(columns[i] + ": " + info[i] + "; length = " + info[i].length());
-						}
-						else
-						{
-							DebugPrint(columns[i] + " not available");
-						}
-					}
-					else
-					{
-						try
-						{
-							info[i] = cursor.getString( cursor.getColumnIndex(columns[i]) );
-							DebugPrint(columns[i] + ": " + info[i] + "; length = " + info[i].length());
-						}
-						catch (Exception e)
-						{
-							DebugPrint(columns[i] + " not available");
-						}
-					}
-				}
-
-				p.add(info);
-				DebugPrint("************END ENTRY");
+				p.read(cr, cursor, contactId, columns, itemType);
 			}
 		}
 		DebugPrint("ADD: " + itemType);
 		add(p);
 	}
 
-	public String loadContactPhoto(ContentResolver cr, String id)
+	void close()
 	{
-		Uri uri = ContentUris.withAppendedId(Contacts.CONTENT_URI, Long.parseLong(id));
-		InputStream input = Contacts.openContactPhotoInputStream(cr, uri);
-		if (input == null)
+		Iterator <PIMField> it = mPIMFields.iterator();
+		while (it.hasNext())
 		{
-			return null;//getBitmapFromURL("http://thinkandroid.wordpress.com");
+			it.next().close();
 		}
-
-		return Integer.toString(PIM.addImage(BitmapFactory.decodeStream(input)));
-	}
-
-	void updateField(ContentResolver cr, String dataIDName, String dataIDValue, String dataName, String dataValue)
-	{
-		ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-
-		ops.add(ContentProviderOperation.newUpdate(Data.CONTENT_URI)
-				.withSelection(dataIDName + "=?",
-				new String[] {dataIDValue})
-				.withValue(dataName, dataValue)
-				.build());
-//		try
-//		{
-//			cr.applyBatch(ContactsContract.AUTHORITY, ops);
-//		}
-//		catch (Exception e)
-//		{
-//			e.printStackTrace();
-//		}
 	}
 }
