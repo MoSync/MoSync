@@ -45,7 +45,7 @@ void NativeEditBox::textBoxClosed(int res, int length) {
 		//sprintf(str.pointer(), "%S", mString);	// insufficient
 		for(int i=0; i<length; i++) {
 			if(mString[i] < 0xff)
-				str[i] = mString[i];
+				str[i] = (byte)mString[i];
 			else
 				str[i] = mListener->nativeEditUnicode(mString[i]);
 		}
