@@ -22,11 +22,8 @@ MA 02110-1301, USA.
 
 #include "ListScreen.h"
 #include "Facebook/LOG.h"
-
 #include <NativeUI/Button.h>
 #include <NativeUI/ListView.h>
-
-#include "LOG.h"
 
 namespace FacebookDemoGUI
 {
