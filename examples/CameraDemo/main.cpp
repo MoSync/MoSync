@@ -335,8 +335,11 @@ public:
 	            Screen* fromScreen,
 	            Screen* toScreen)
 	{
-		setupCameraProperties();
-		maCameraStart();
+		if (toScreen == mScreen)
+		{
+			setupCameraProperties();
+			maCameraStart();
+		}
 	}
 
 	/**
