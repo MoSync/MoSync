@@ -48,6 +48,11 @@ MA 02110-1301, USA.
 FacebookDemoMoblet::FacebookDemoMoblet(const MAUtil::String &appId):
 	mImage(NULL), mImageSize(0)
 {
+	if(appId.size()==0)
+	{
+		maPanic(1, "This application requires an application id. Please see file config.h");
+	}
+
 	initializeFacebook(appId);
 	createGUI();
 	login();
@@ -192,11 +197,6 @@ void FacebookDemoMoblet::createGUI()
 MAUtil::String FacebookDemoMoblet::extractAccessToken(const char *newurl)
 {
 	MAUtil::String access_token;
-
-//	const int BUFFER_SIZE = 16384;
-//	char *newurl = new char[BUFFER_SIZE];
-//	strcpy((char*) newurl, newUrl.c_str());
-
 
 	if (strstr(newurl, "fbconnect://") == newurl)
 	{

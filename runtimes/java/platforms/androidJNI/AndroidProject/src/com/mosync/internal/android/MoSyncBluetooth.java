@@ -573,10 +573,11 @@ public class MoSyncBluetooth
 		// Do we have an enabled Bluetooth adapter?
 		if (null != mBluetoothAdapter && mBluetoothAdapter.isEnabled())
 		{
-			Log.i("@@@ MoSync", 
-				"Found cached and enabled Bluetooth adapter with address: "
-				+ mBluetoothAdapter.getAddress());
-			
+/*
+			//Log.i("@@@ MoSync",
+			//	"Found cached and enabled Bluetooth adapter with address: "
+			//	+ mBluetoothAdapter.getAddress());
+*/
 			return mBluetoothAdapter;
 		}
 		
@@ -600,6 +601,7 @@ public class MoSyncBluetooth
 		}
 	
 		// Print log message with the Bluetooth address.
+/*
 		if (null != mBluetoothAdapter)
 		{
 			Log.i("@@@ MoSync", 
@@ -610,7 +612,7 @@ public class MoSyncBluetooth
 		{
 			Log.i("@@@ MoSync", "Enabled Bluetooth adapter not found.");
 		}
-		
+*/
 		return mBluetoothAdapter;
 	}
 
@@ -700,17 +702,17 @@ public class MoSyncBluetooth
 						{
 							if (adapter.isEnabled())
 							{
-								Log.i("@@@ MoSync",  
-									"btGetBluetoothAdapter: Adapter is ON");
-								
+								//Log.i("@@@ MoSync",
+								//	"btGetBluetoothAdapter: Adapter is ON");
+
 								// Adapter is available and enabled.
 								mQueue.offer(new ObjectRef(adapter));
 							}
 							else
 							{
-								Log.i("@@@ MoSync",  
-									"btGetBluetoothAdapter: Adapter is OFF");
-								
+								//Log.i("@@@ MoSync",
+								//	"btGetBluetoothAdapter: Adapter is OFF");
+
 								// Adapter is NOT available.
 								mQueue.offer(new ObjectRef(null));
 							}
@@ -728,9 +730,9 @@ public class MoSyncBluetooth
 				// Set the mediator's handler.
 				Mediator.getInstance().mBluetoothEnableMessageHandler = handler;
 
-				Log.i("@@@ MoSync", 
-					"btGetBluetoothAdapter: Adapter NOT enabled, " +
-					"displaying enable dialog.");
+				//Log.i("@@@ MoSync",
+				//	"btGetBluetoothAdapter: Adapter NOT enabled, " +
+				//	"displaying enable dialog.");
 
 				// Open the activity.
 				Intent btPermissionIntent = new Intent(
@@ -744,8 +746,8 @@ public class MoSyncBluetooth
 			}
 			else // Adapter is enabled.
 			{
-				Log.i("@@@ MoSync",  
-					"btGetBluetoothAdapter: Cached adapter is ON");
+				//Log.i("@@@ MoSync",
+				//	"btGetBluetoothAdapter: Cached adapter is ON");
 
 				// Cached adapter is available and enabled.
 				mQueue.offer(new ObjectRef(adapter));
@@ -921,14 +923,14 @@ public class MoSyncBluetooth
 				{		
 					final String action = intent.getAction();
 					
-					Log.i("BluetoothDeviceDiscoveryThread", 
-						"*** Intent action: " + action);
-					
+					//Log.i("BluetoothDeviceDiscoveryThread",
+					//	"*** Intent action: " + action);
+
 					if (action.equals(BluetoothDevice.ACTION_FOUND))
 					{
-						Log.i("BluetoothDeviceDiscoveryThread", 
-							"*** Found device!");
-						
+						//Log.i("BluetoothDeviceDiscoveryThread",
+						//	"*** Found device!");
+
 						// Add found device to list of devices.
 						BluetoothDevice device = intent.getParcelableExtra(
 							BluetoothDevice.EXTRA_DEVICE);
@@ -940,20 +942,20 @@ public class MoSyncBluetooth
 						if (BLUETOOTH_DISCOVERY_ABORTED == 
 							mBluetoothDeviceDiscoveryState.get())
 						{
-							Log.i("BluetoothDeviceDiscoveryThread", 
-								"ACTION_DISCOVERY_FINISHED - SCAN ABORTED");
+							//Log.i("BluetoothDeviceDiscoveryThread",
+							//	"ACTION_DISCOVERY_FINISHED - SCAN ABORTED");
 
 							// Scan was canceled, report Bluetooth event 
 							// with state CONNERR_CANCELED.
 							deviceDiscoveryCanceled();
-							
+
 							// Stop discovery thread and cleanup.
 							stopDeviceDiscovery();
 						}
 						else
 						{
-							Log.i("BluetoothDeviceDiscoveryThread", 
-								"ACTION_DISCOVERY_FINISHED - SCAN FINISHED");
+							//Log.i("BluetoothDeviceDiscoveryThread",
+							//	"ACTION_DISCOVERY_FINISHED - SCAN FINISHED");
 							
 							// Scan is successfully finished, report Bluetooth 
 							// event with the result.
@@ -999,21 +1001,23 @@ public class MoSyncBluetooth
 				// Add device only if it is not already present.
 				if (!deviceSet.containsKey(device.getAddress()))
 				{
-					Log.i("BluetoothDeviceDiscoveryThread", 
-						"Adding device: " + device.getName() + 
-						" " + device.getAddress());
+					//Log.i("BluetoothDeviceDiscoveryThread",
+					//	"Adding device: " + device.getName() +
+					//	" " + device.getAddress());
 				
 					deviceSet.put(device.getAddress(), true);
 					deviceList.add(device);
 					// State zero means "still working".
 					btPostBluetoothMessage(0);
 				}
+/*
 				else
 				{
 					Log.i("BluetoothDeviceDiscoveryThread", 
 						"Duplicate found: " + device.getName() + 
 						" " + device.getAddress());
 				}
+*/
 			}
 		}
 		

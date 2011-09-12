@@ -102,9 +102,9 @@ public class MoSyncSound
 			AudioStore audioStore = obtainAudioStoreObject(soundResource);
 			if (audioStore == null)
 			{
-				Log.e("MoSyncSound.maSoundPlay", 
-					"No audio resource with handle: " 
-						+ soundResource + " found!");
+				//Log.e("MoSyncSound.maSoundPlay",
+				//	"No audio resource with handle: "
+				//		+ soundResource + " found!");
 				return -1;
 			}
 		
@@ -115,7 +115,7 @@ public class MoSyncSound
 			
 			if (null == fileDesc) 
 			{
-				Log.e("MoSyncSound.maSoundPlay", "File Descriptor was null!");
+				//Log.e("MoSyncSound.maSoundPlay", "File Descriptor was null!");
 				return -1;
 			}
 			
@@ -126,7 +126,7 @@ public class MoSyncSound
 		}
 		catch (Exception ex)
 		{
-			Log.e("MoSyncAudio.maSoundPlay", "Exception:" + ex.toString());
+			//Log.e("MoSyncAudio.maSoundPlay", "Exception:" + ex.toString());
 			ex.printStackTrace();
 			return -1;
 		}
@@ -332,8 +332,8 @@ public class MoSyncSound
 		}
 		catch (Exception ex)
 		{
-			Log.e("MoSyncSound.storeIfBinaryAudioResource", 
-				"Unable to save temporary audio file.");
+			//Log.e("MoSyncSound.storeIfBinaryAudioResource",
+			//	"Unable to save temporary audio file.");
 			ex.printStackTrace();
 		}
 	}
@@ -458,8 +458,8 @@ public class MoSyncSound
 		// No point in checking audio type unless we have at least five bytes.
 		if (audioData.capacity() < 5)
 		{
-			Log.e("MoSyncAudio.checkIfMimeAudioType", 
-				"Resource was smaller than 5 bytes");
+			//Log.e("MoSyncAudio.checkIfMimeAudioType",
+			//	"Resource was smaller than 5 bytes");
 			return false;
 		}
 		

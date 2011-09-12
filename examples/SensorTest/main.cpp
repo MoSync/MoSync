@@ -230,6 +230,10 @@ extern "C" int MAMain()
 	registerSensors();
 	setFont();
 
+	// Force output for devices which hasn't got any sensors
+	drawSensorOutput();
+	maUpdateScreen();
+
 	while (run)
 	{
 		/// Get any available events.
