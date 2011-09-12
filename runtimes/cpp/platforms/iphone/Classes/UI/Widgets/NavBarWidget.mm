@@ -41,7 +41,7 @@
     {
 		currNavitem.title = value;
 	}
-	else if([key isEqualToString:@"backButtonTitle"])
+	else if([key isEqualToString:@MAW_NAV_BAR_BACK_BTN])
     {
 		//navitem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:value style:UIBarButtonItemStylePlain target:nil action:nil];
 		//navitem.hidesBackButton = YES;

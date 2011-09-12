@@ -94,6 +94,11 @@ private:
 	 */
 	void createMainLayout();
 
+	/**
+	 * Detects if the current platform is Android.
+	 * @return true if the platform is Android, false otherwise.
+	 */
+	bool isAndroid();
 private:
 	/**
 	 * Main layout.
