@@ -30,7 +30,7 @@ MA 02110-1301, USA.
 namespace FacebookDemoGUI
 {
 
-class MainScreen: public ListScreen
+class MainScreen: public FacebookDemoScreen, public NativeUI::ButtonListener, public NativeUI::ListViewListener
 {
 public:
 	MainScreen(MAUtil::Moblet *moblet);
@@ -41,7 +41,15 @@ public:
 	 */
 	virtual void keyPressEvent(int keyCode, int nativeCode);
 
+	virtual void listViewItemClicked(NativeUI::ListView* listView, NativeUI::ListViewItem* listViewItem);
+
 	virtual void buttonClicked(Widget* button);
+
+private:
+	virtual int addChild(NativeUI::Widget* widget);
+
+private:
+	void initialize();
 
 private:
 	void closeApplication();
