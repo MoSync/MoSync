@@ -96,6 +96,8 @@ void ScreenImageSwiper::createUI()
 		// Remove the navigation's bar back button.
 		mTitleWidget->setBackButtonTitle("");
 
+		mTitleWidget->fillSpaceHorizontally();
+
 		// Add the navigation bar to the main layout of the screen.
 		mMainLayout->addChild(mTitleWidget);
 
