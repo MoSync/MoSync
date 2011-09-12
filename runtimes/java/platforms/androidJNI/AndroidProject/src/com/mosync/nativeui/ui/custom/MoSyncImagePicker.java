@@ -156,9 +156,9 @@ public class MoSyncImagePicker
 
 			Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(0), mDecodingOptions);
 			preview.setImageBitmap(bitmap);
-			if ( bitmap.getWidth() >= preview.getLayoutParams().width
-					||
-				bitmap.getHeight() >= preview.getLayoutParams().height )
+			if ( bitmap.getWidth() > preview.getLayoutParams().width
+					&&
+				bitmap.getHeight() > preview.getLayoutParams().height )
             {
 				// Scale it to fit.
 				preview.setScaleType(ScaleType.FIT_XY);
@@ -167,7 +167,7 @@ public class MoSyncImagePicker
             {
 				// If image is smaller that the layout params of this imageview,
 				// scale center.
-				preview.setScaleType(ScaleType.FIT_CENTER);
+				preview.setScaleType(ScaleType.CENTER_INSIDE);
             }
 			layout.addView(preview);
 
@@ -179,6 +179,20 @@ public class MoSyncImagePicker
                 {
 					Toast.makeText(getActivity(), mNames.get(pos) ,
 					        Toast.LENGTH_SHORT).show();
+
+					if ( mBitmapCache.get(pos).getWidth() > preview.getLayoutParams().width
+							&&
+							mBitmapCache.get(pos).getHeight() > preview.getLayoutParams().height )
+		            {
+						// Scale it to fit.
+						preview.setScaleType(ScaleType.FIT_XY);
+		            }
+		            else
+		            {
+						// If image is smaller that the layout params of this imageview,
+						// scale center.
+						preview.setScaleType(ScaleType.CENTER_INSIDE);
+		            }
 
 					// Refresh the preview image.
 					// Get the bitmap stored by the Adapter.
@@ -328,11 +342,13 @@ public class MoSyncImagePicker
         // Create handle.
         int dataHandle = mMoSyncThread.nativeCreatePlaceholder();
 
+        // Return the scaled image.
         Bitmap tempBitmap = BitmapFactory.decodeFile(absPath, mDecodingOptions);
 
 			if(null == tempBitmap)
 			{
 				Log.i("MoSync","maImagePickerOpen Cannot create handle");
+				return -1;
 //				maPanic(1, "maImagePickerOpen: Unable to create handle");
 			}
 
@@ -383,9 +399,22 @@ public class MoSyncImagePicker
             {
 				mBitmapCache.add( BitmapFactory.decodeFile(mPaths.get(position), mDecodingOptions) );
             }
+            // DO not scale the image if it smaller than the layout params.
+			if ( mBitmapCache.get(position).getWidth() > imgView.getLayoutParams().width
+					&&
+				mBitmapCache.get(position).getHeight() > imgView.getLayoutParams().height )
+            {
+				// Scale it to fit.
+				imgView.setScaleType(ScaleType.FIT_XY);
+            }
+            else
+            {
+				// If image is smaller that the layout params of this image view,
+				// scale the image uniformly.
+				imgView.setScaleType(ScaleType.CENTER_INSIDE);
+            }
 
             imgView.setImageBitmap(mBitmapCache.get(position));
-            imgView.setScaleType(ScaleType.FIT_XY);
             imgView.setBackgroundResource(mGalleryItemBackg);
 
             return imgView;

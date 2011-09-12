@@ -26,7 +26,7 @@
 @implementation WebViewWidget
 
 - (id)init {
-	UIWebView* webView = [[[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)] retain]; // TODO: do have to do this (retain)??
+	UIWebView* webView = [[UIWebView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)];
 	view = webView;
 	webView.delegate = self;
 	newurl = @"";
@@ -35,8 +35,14 @@
     javaScriptIdentifier = @"javascript:";
 	baseUrl = [[self getDefaultBaseURL] retain];
     urlsToNotHook=[[NSMutableDictionary alloc] init];
-    [urlsToNotHook retain];
-	return [super init];
+	id ret = [super init];
+    [self setAutoSizeParamX:FILL_PARENT andY:FILL_PARENT];
+    return ret;
+}
+
+- (void)dealloc {
+    [urlsToNotHook release];
+    [super dealloc];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
@@ -134,19 +140,19 @@
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@MAW_WEB_VIEW_URL]) {
 		UIWebView* webView = (UIWebView*)view;
-		return webView.request.URL.absoluteString;
+		return [webView.request.URL.absoluteString retain];
 
 	} else if([key isEqualToString:@MAW_WEB_VIEW_NEW_URL]) {
-		return newurl;
+		return [newurl retain];
 
     } else if([key isEqualToString:@MAW_WEB_VIEW_SOFT_HOOK]) {
-		return softHookPattern;
+		return [softHookPattern retain];
 
 	} else if([key isEqualToString:@MAW_WEB_VIEW_HARD_HOOK]) {
-		return hardHookPattern;
+		return [hardHookPattern retain];
 
     } else if ([key isEqualToString:@MAW_WEB_VIEW_BASE_URL]) {
-		return  baseUrl;
+		return [baseUrl retain];
 	} else {
 		return [super getPropertyWithKey:key];
 	}
@@ -267,6 +273,7 @@
     }
 
     //Deprecated
+   [newurl release];
     newurl = [[NSString stringWithString:request.URL.absoluteString] retain]; // TODO: do have to do this (retain)??
 
 	MAEvent event;

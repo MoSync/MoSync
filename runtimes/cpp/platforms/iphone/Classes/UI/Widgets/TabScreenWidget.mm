@@ -44,21 +44,13 @@
 	eventData->widgetHandle = handle;
 	eventData->tabIndex = index;
 	event.data = (int)eventData;
-	Base::gEventQueue.put(event);	
-	
-	//if(index < [children count])
-	//	[[children objectAtIndex:index] layout];
+	Base::gEventQueue.put(event);		
 }
 
 - (id)init {
-    //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	UITabBarController* tabBarController = [[[UITabBarController alloc] init] retain];
-	//controller = tabBarController;
+	UITabBarController* tabBarController = [[UITabBarController alloc] init];
 	tabBarController.viewControllers = [NSArray array];	
-	//view = controller.view;
-	//controller.view = view;
-	tabBarController.delegate = self;
-	
+	tabBarController.delegate = self;	
 	return [super initWithController:tabBarController];	
 }
 
@@ -68,16 +60,7 @@
 	NSMutableArray *newItems = [NSMutableArray arrayWithArray:tabBarController.viewControllers];
 	[newItems addObject:[screen getController]];
 	tabBarController.viewControllers = newItems;
-	
-	//[super addChild:child];
 	[super addChild:child toSubview:NO];
-	
-	//UIView *childView = [screen getView];	
-	//[childView setFrame: view.frame];
-
-	//view.autoresizesSubviews = YES;	
-	//[view setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
-
 }
 
 - (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index {
@@ -100,16 +83,14 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"title"]) {
+	if([key isEqualToString:@MAW_SCREEN_TITLE]) {
 		controller.title = value;
 	} 
-	else if([key isEqualToString:@"currentTab"]) {
+	else if([key isEqualToString:@MAW_TAB_SCREEN_CURRENT_TAB]) {
 		unsigned int index = [value intValue];
 		UITabBarController* tabBarController = (UITabBarController*)controller;
 		if(index >= [tabBarController.viewControllers count]) return MAW_RES_INVALID_INDEX;
 		tabBarController.selectedViewController = [tabBarController.viewControllers objectAtIndex:index]; 
-		//tabBarController.selectedIndex = [value intValue];
-		//[tabBarController.selectedViewController viewDidAppear:YES];
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
@@ -118,9 +99,9 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@"currentTab"]) {
+	if([key isEqualToString:@MAW_TAB_SCREEN_CURRENT_TAB]) {
 		UITabBarController* tabBarController = (UITabBarController*)controller;
-		return [[NSNumber numberWithInt: tabBarController.selectedIndex] stringValue];
+		return [[[NSNumber numberWithInt: tabBarController.selectedIndex] stringValue] retain];
 	}
 	else {
 		return [super getPropertyWithKey:key];
@@ -133,14 +114,11 @@
 
 - (void)layout {
 	UITabBarController* tabBarController = (UITabBarController*)controller;
-	
 	int tabBarHeight = tabBarController.tabBar.bounds.size.height;
 	int viewWidth = view.frame.size.width; 
 	int viewHeight = view.frame.size.height - tabBarHeight; 
-	
-	
 	[view setNeedsLayout];
-	//[view setNeedsDisplay]
+    
 	for (IWidget *child in children)
     {
 		UIView* childView = [child getView];
