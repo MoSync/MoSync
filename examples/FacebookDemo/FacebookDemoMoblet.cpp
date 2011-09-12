@@ -211,7 +211,7 @@ MAUtil::String FacebookDemoMoblet::extractAccessToken(const char *newurl)
  * creates a button and adds it to the main menu
  * adds on the button a command that sends the upload picture request to Facebook
  */
-void FacebookDemoMoblet::addLinkOnWall(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addLinkOnWall(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 
 	FacebookDemoApplication::PostOnWallCommand<Link> *postLinkCommand = new FacebookDemoApplication::PostOnWallCommand<Link>(mFacebookManager, menu, "me");
@@ -225,7 +225,7 @@ void FacebookDemoMoblet::addLinkOnWall(FacebookDemoGUI::ListScreen *menu)
  * creates a button and adds it to the main menu
  * adds on the button a command that sends the upload picture request to Facebook
  */
-void FacebookDemoMoblet::addPostOnWall(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addPostOnWall(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	FacebookDemoApplication::PostOnWallCommand<Post> *addLinkCommand = new FacebookDemoApplication::PostOnWallCommand<Post>(mFacebookManager, menu, "me");
 	addLinkCommand->setPostParams(
@@ -254,7 +254,7 @@ void FacebookDemoMoblet::addPostOnWall(FacebookDemoGUI::ListScreen *menu)
  * creates a button and adds it to the main menu
  * adds on the button a command that sends the upload picture request to Facebook
  */
-void FacebookDemoMoblet::addStatusMessageOnWall(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addStatusMessageOnWall(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	FacebookDemoApplication::PostOnWallCommand<StatusMessage> *postStatusMessageCmd = new FacebookDemoApplication::PostOnWallCommand<StatusMessage>(mFacebookManager,
 			menu, "me");
@@ -268,7 +268,7 @@ void FacebookDemoMoblet::addStatusMessageOnWall(FacebookDemoGUI::ListScreen *men
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addActivitiesButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addActivitiesButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -284,7 +284,7 @@ void FacebookDemoMoblet::addActivitiesButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addAlbumsButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addAlbumsButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -322,7 +322,7 @@ void FacebookDemoMoblet::addAlbumsButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addBooksButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addBooksButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -338,7 +338,7 @@ void FacebookDemoMoblet::addBooksButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addCheckinsButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addCheckinsButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -378,7 +378,7 @@ void FacebookDemoMoblet::addCheckinsButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addFeedButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addFeedButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -405,7 +405,7 @@ void FacebookDemoMoblet::addFeedButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addHomeButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addHomeButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -432,7 +432,7 @@ void FacebookDemoMoblet::addHomeButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addInterestsButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addInterestsButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -448,7 +448,7 @@ void FacebookDemoMoblet::addInterestsButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addLikesButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addLikesButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -464,7 +464,7 @@ void FacebookDemoMoblet::addLikesButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addLinksButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addLinksButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -484,7 +484,7 @@ void FacebookDemoMoblet::addLinksButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addMusicButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addMusicButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -500,7 +500,7 @@ void FacebookDemoMoblet::addMusicButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addPhotosButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addPhotosButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -523,7 +523,7 @@ void FacebookDemoMoblet::addPhotosButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addPictureButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addPictureButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -539,7 +539,7 @@ void FacebookDemoMoblet::addPictureButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addPostsButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addPostsButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -566,7 +566,7 @@ void FacebookDemoMoblet::addPostsButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addTelevisionButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addTelevisionButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -582,7 +582,7 @@ void FacebookDemoMoblet::addTelevisionButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addEventsButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addEventsButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -625,7 +625,7 @@ void FacebookDemoMoblet::addEventsButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addFriendsButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addFriendsButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -642,7 +642,7 @@ void FacebookDemoMoblet::addFriendsButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addFriendListsButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addFriendListsButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -689,7 +689,7 @@ void FacebookDemoMoblet::addFriendListsButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addNotesButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addNotesButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;
@@ -724,7 +724,7 @@ void FacebookDemoMoblet::addNotesButton(FacebookDemoGUI::ListScreen *menu)
  * Creates a button and adds it to the main menu
  * Adds on the button a command that sends the connection request to Facebook
  */
-void FacebookDemoMoblet::addStatusMessagesButton(FacebookDemoGUI::ListScreen *menu)
+void FacebookDemoMoblet::addStatusMessagesButton(FacebookDemoGUI::FacebookDemoScreen *menu)
 {
 	using namespace FacebookDemoGUI;
 	using namespace FacebookDemoApplication;

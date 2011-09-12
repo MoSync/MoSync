@@ -22,8 +22,8 @@ MA 02110-1301, USA.
 
 #include "ListScreen.h"
 #include "Facebook/LOG.h"
-#include <NativeUI/Button.h>
-#include <NativeUI/ListView.h>
+//#include <NativeUI/Button.h>
+//#include <NativeUI/ListView.h>
 
 #include "../PlatformInfo.h"
 
@@ -46,85 +46,42 @@ void ListScreen::show()
 	FacebookDemoScreen::show();
 }
 
-void ListScreen::add(ListItem *btn)
-{
-	if(FacebookDemoApplication::isAndroid())
-	{
-		btn->setBackgroundColor(mItemsColor_Android);
-	}
-	else
-	{
-		btn->setBackgroundColor(mItemsColor_iPhone);
-	}
-	mList->addChild(btn);
-}
-
 void ListScreen::clear()
 {
 	LOG("\n\tListScreen::clear()");
-	initialize();
-}
-
-void ListScreen::clearScreenAfterLosingFocus(bool clearScreen)
-{
-	mClearScreenAfterLosingFocus = clearScreen;
+	this->initialize();
 }
 
 ListScreen::~ListScreen()
 {
 }
 
-bool ListScreen::isEmpty() const
-{
-	return (mList->countChildWidgets() == 0);
-}
-
-int ListScreen::addChild(NativeUI::Widget* widget)
-{
-	return NativeUI::Screen::addChild(widget);
-}
-
 void ListScreen::initialize()
 {
-	LOG("\n\tListScreen::initialize()");
 	mClearScreenAfterLosingFocus = false;
 
-	mItemsColor_Android = 0x000000;
-	mItemsColor_iPhone = 0x99999A;
-
-	mScreenColor = 0x000000;
-
-	this->setBackgroundColor(mScreenColor);
+	NativeUI::VerticalLayout *layout = new NativeUI::VerticalLayout();
+	layout->setBackgroundColor(mScreenColor);
 
 	NativeUI::ListView *list = new NativeUI::ListView();
 	list->addListViewListener(this);
 	list->setBackgroundColor(mScreenColor);
 
-	if( FacebookDemoApplication::isAndroid() )
-	{
-		NativeUI::VerticalLayout *layout = new NativeUI::VerticalLayout();
-		layout->setBackgroundColor(mScreenColor);
+	NativeUI::Button *button = new NativeUI::Button();
+	button->addButtonListener(this);
+	button->setText("back");
+	button->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	button->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+	button->fillSpaceHorizontally();
 
-		NativeUI::Button *button = new NativeUI::Button();
-		button->addButtonListener(this);
-		button->setText("back");
-		button->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-		button->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
-		button->fillSpaceHorizontally();
+	layout->addChild(list);
+	layout->addChild(button);
 
-		layout->addChild(list);
-		layout->addChild(button);
+	setMainWidget(layout);
 
-		setMainWidget(layout);
-		mLayout = layout;
-		mBackButton = button;
-	}
-	else
-	{
-		setMainWidget(list);
-	}
+	mLayout = layout;
 	mList = list;
-
+	mBackButton = button;
 }
 
 void ListScreen::back()

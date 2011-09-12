@@ -91,33 +91,33 @@ private:
 	 * Creates a button and adds it to the main menu
 	 * Adds on the button a command that sends the publish request to Facebook
 	 */
-	void addLinkOnWall(FacebookDemoGUI::ListScreen *menu);
-	void addPostOnWall(FacebookDemoGUI::ListScreen *menu);
-	void addStatusMessageOnWall(FacebookDemoGUI::ListScreen *menu);
+	void addLinkOnWall(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addPostOnWall(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addStatusMessageOnWall(FacebookDemoGUI::FacebookDemoScreen *menu);
 
 	/**
 	 * Creates a button and adds it to the main menu
 	 * Adds on the button a command that sends the connection request to Facebook
 	 */
-	void addActivitiesButton(FacebookDemoGUI::ListScreen *menu);
-	void addAlbumsButton(FacebookDemoGUI::ListScreen *menu);
-	void addBooksButton(FacebookDemoGUI::ListScreen *menu);
-	void addCheckinsButton(FacebookDemoGUI::ListScreen *menu);
-	void addFeedButton(FacebookDemoGUI::ListScreen *menu);
-	void addHomeButton(FacebookDemoGUI::ListScreen *menu);
-	void addInterestsButton(FacebookDemoGUI::ListScreen *menu);
-	void addLikesButton(FacebookDemoGUI::ListScreen *menu);
-	void addLinksButton(FacebookDemoGUI::ListScreen *menu);
-	void addMusicButton(FacebookDemoGUI::ListScreen *menu);
-	void addPhotosButton(FacebookDemoGUI::ListScreen *menu);
-	void addPictureButton(FacebookDemoGUI::ListScreen *menu);
-	void addPostsButton(FacebookDemoGUI::ListScreen *menu);
-	void addTelevisionButton(FacebookDemoGUI::ListScreen *menu);
-	void addEventsButton(FacebookDemoGUI::ListScreen *menu);
-	void addFriendsButton(FacebookDemoGUI::ListScreen *menu);
-	void addFriendListsButton(FacebookDemoGUI::ListScreen *menu);
-	void addNotesButton(FacebookDemoGUI::ListScreen *menu);
-	void addStatusMessagesButton(FacebookDemoGUI::ListScreen *menu);
+	void addActivitiesButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addAlbumsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addBooksButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addCheckinsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addFeedButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addHomeButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addInterestsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addLikesButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addLinksButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addMusicButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addPhotosButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addPictureButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addPostsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addTelevisionButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addEventsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addFriendsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addFriendListsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addNotesButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addStatusMessagesButton(FacebookDemoGUI::FacebookDemoScreen *menu);
 
 private:
 	/**
