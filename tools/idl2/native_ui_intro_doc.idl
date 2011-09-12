@@ -104,45 +104,70 @@ MA 02110-1301, USA.
 *
 *There are many different kinds of Views. They are all leaf-nodes in the UI tree.
 *
-*Today these view are available:
+*Today these views are available:
+*
+*- \b ActivityIndicator \n
+*	Used for displaying the indeterminate progress of a task over time.
 *
 *- \b Button \n
 *  Just a simple click-able button that can have a title.
 *
-*- \b ImageButton \n
-*  Same as button but can also have an background image instead of the default button style.
-*  
+*- \b CameraPreview \n
+*	A view that allows users to visualize the camera controller.
+*
 *- \b CheckBox \n
-*  A switch/toggle button.
-*  
-*- \b Label \n
-*  A text label.
-*  
+*	A switch/toggle button.
+*
+*- \b DatePicker \n
+*	A widget that allows the user to select dates.
+*
 *- \b EditBox \n
-*  A text field that can be edited using the virtual keyboard.
-*  
-*- \b SearchBar \n
-*  Like an editbox on a toolbar with a default look and feel and a button for performing the search.
-*  
-*- \b NavBar \n
-*  A toolbar-like view that can have a back button and a title. A NavBar will automatically appear
-*  if you're using a StackScreen. It is only available on iOS for now.
+*	A text field that can be edited using the virtual keyboard.
+*
+*- \b GLView \n
+*	A widget to draw accelerated graphics using OpenGL for Embedded Systems version 1.0 or 2.0.
+*
+*- \b Image \n
+*	A view that displays an image. The images are loaded from resources and they can be scaled.
+*
+*- \b ImageButton \n
+*	Same as button but can also have an background image instead of the default button style.
+*
+*- \b Label \n
+*	A text label.
 *
 *- \b ListView \n
-*  A scrollable list of ListViewItems.
+*	A scrollable list of ListViewItems.
 *
 *- \b ListViewItem \n
-*  A widget that can be put in a ListView. It has a default layout for placing a text and a icon. But 
-*  any view can be added to it in order to create a custom appearance.
-*  
-*- \b GLView \n
-*  A widget to draw accelerated graphics using OpenGL for Embedded Systems version 1.0/1.1.
-*  
-*- \b GL2View \n
-*  A widget to draw accelerated graphics using OpenGL for Embedded Systems version 2.0.
-*  
+*	A widget that can be put in a ListView. It has a default layout for placing a text and a icon. But any view can be added to it in order to create a custom appearance.
+*
+*- \b NavBar \n
+*	A toolbar-like view that can have a back button and a title. A NavBar will automatically appear if you're using a StackScreen. It is only available on iOS for now.
+*
+*- \b NumberPicker \n
+*	A widget that enables the user to select a number from a predefined range. It is only available on iOS for now.
+*
+*- \b ProgressBar \n
+*	Used to display the progress of a task over time.
+*
+*- \b SearchBar \n
+*	Like an editbox on a toolbar with a default look and feel and a button for performing the search.
+*
+*- \b Slider \n
+*	A widget with allows users to set a value by moving an indicator, usually in a horizontal fashion.
+*
+*- \b TimePicker \n
+*	A view for selecting the time of day, in 24 hour mode.
+*
+*- \b ToggleButton \n
+*	Displays checked/unchecked states as a button with a "light" indicator and by default accompanied with the text "ON" or "OFF". It is available only on Android, and it is similar to the CheckBox on iOS.
+*
+*- \b VideoView \n
+*	Manages the playback of a movie from a file or a network stream.</li>
+*
 *- \b WebView \n
-*  A widget to render web content.
+*	A powerful widget that renders web content using the same WebKit rendering engines that powers the Safari and Android web browsers.
 *
 *
 *\b Properties
@@ -177,15 +202,5 @@ void customEvent(const MAEvent& event) {
 }
 \endcode
 *
-*
-*\b Future \b plans
-*
-*As this API is rather low-level, we plan to make a higher-level abstraction layer. A layer that
-*unifies how the programmer can design UIs for all different phones using either MAUI (the custom UI
-*system implemented entirely in MoSync) or Native UI. This library would then choose the most 
-*appropriate UI system for the platform the application is currently running on.
-*
-*We also have an experimental UI editor in the works that makes it possible to develop Native UIs and 
-*instantly see the results on both Android and iPhone devices/emulators.
 *
 */

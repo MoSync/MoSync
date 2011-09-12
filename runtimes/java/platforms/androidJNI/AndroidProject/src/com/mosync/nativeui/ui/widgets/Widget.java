@@ -185,8 +185,8 @@ public class Widget
 			}
 			else
 			{
-				// Hide it, and do not take any space.
-				getView( ).setVisibility( View.GONE );
+				// Hide it, but still take up the space.
+				getView( ).setVisibility( View.INVISIBLE );
 			}
 			return true;
 		}
@@ -274,7 +274,7 @@ public class Widget
 			if ( visible == View.VISIBLE ){
 				return "true";
 			}
-			else if ( visible == View.GONE ){
+			else if ( visible == View.INVISIBLE ){
 				return "false";
 			}
 		}
