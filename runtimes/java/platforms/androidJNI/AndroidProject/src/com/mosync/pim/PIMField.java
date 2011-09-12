@@ -34,6 +34,7 @@ import android.provider.ContactsContract.CommonDataKinds.Relation;
 import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.CommonDataKinds.StructuredPostal;
 import android.provider.ContactsContract.CommonDataKinds.Website;
+import android.provider.ContactsContract.Data;
 
 // field types
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_ADDR;
@@ -313,6 +314,13 @@ public class PIMField
 
 	void read(ContentResolver cr, Cursor cursor, String contactId, String[] columns, String itemType)
 	{
+		if (((getMoSyncType() == MA_PIM_FIELD_CONTACT_ORG) ||
+			(getMoSyncType() == MA_PIM_FIELD_CONTACT_TITLE) ||
+			(getMoSyncType() == MA_PIM_FIELD_CONTACT_ORG_INFO)) &&
+			(cursor.getString(cursor.getColumnIndex(columns[1])) == null))
+		{
+			return;
+		}
 		DebugPrint("************START ENTRY");
 		String[] info = new String[columns.length];
 		for (int i=0; i<columns.length; i++)
@@ -345,7 +353,7 @@ public class PIMField
 		InputStream input = Contacts.openContactPhotoInputStream(cr, uri);
 		if (input == null)
 		{
-			return null;//getBitmapFromURL("http://thinkandroid.wordpress.com");
+			return null;
 		}
 
 		return Integer.toString(PIM.addImage(BitmapFactory.decodeStream(input)));
@@ -388,12 +396,19 @@ public class PIMField
 	void add(String[] infos)
 	{
 		mStrInfos.add(infos);
-		mState.add(State.NONE);
 	}
 
 	void remove(int index)
 	{
-		mStrInfos.remove(index);
+		if (mState.get(index) == State.ADDED)
+		{
+			mStrInfos.remove(index);
+			mState.remove(index);
+		}
+		else
+		{
+			setState(index, State.DELETED);
+		}
 	}
 
 	int length()
@@ -1071,6 +1086,10 @@ public class PIMField
 			char[] tmp = new char[len];
 			System.arraycopy(buffer, buffIndex, tmp, 0, len);
 			infos[i] = new String(tmp);
+			if ((getMoSyncType() == MA_PIM_FIELD_CONTACT_IM) && (names[i] == Im.PROTOCOL))
+			{
+				infos[i] = getProtocolID(infos[i]);
+			}
 			DebugPrint("INFOS[" + i + "]=" + infos[i]);
 			tmp = null;
 			buffIndex += infos[i].length();
@@ -1081,6 +1100,7 @@ public class PIMField
 	int getData(int index, char[] buffer)
 	{
 		String[] names = mStrNames;
+		DebugPrint("index = " + index + "; length = " + mStrInfos.size());
 		String[] infos = mStrInfos.get(index);
 
 		switch (getDataType(getMoSyncType()))
@@ -1113,18 +1133,36 @@ public class PIMField
 			}
 			case MA_PIM_TYPE_STRING:
 			{
-				DebugPrint("STRING DATA " + infos[1]);
-				System.arraycopy(infos[1].toCharArray(), 0, buffer, 0, infos[1].length());
-				return infos[1].length();
+				if (getMoSyncType() == MA_PIM_FIELD_CONTACT_UID)
+				{
+					if (infos[0] == null)
+					{
+						return 0;
+					}
+					System.arraycopy(infos[0].toCharArray(), 0, buffer, 0, infos[0].length());
+					return infos[0].length();
+				}
+				else
+				{
+					if (infos[1] == null)
+					{
+						return 0;
+					}
+					DebugPrint("STRING DATA " + infos[1]);
+					System.arraycopy(infos[1].toCharArray(), 0, buffer, 0, infos[1].length());
+					return infos[1].length();
+				}
 			}
 			case MA_PIM_TYPE_STRING_ARRAY:
 			{
 				DebugPrint("STRING ARRAY DATA " + infos.length);
 				for (int i=0; i<infos.length; i++)
+				{
 					if (infos[i] != null)
 					{
 						DebugPrint( i + ":" + infos[i]);
 					}
+				}
 				return writeStringArray(names, infos, buffer);
 			}
 			default:
@@ -1288,60 +1326,87 @@ public class PIMField
 		}
 	}
 
-	void close()
+	void close(ArrayList<ContentProviderOperation> ops, int contactIndex)
 	{
-//		for (int i=0; i<mState.size(); i++)
-//		{
-//			if (mState.get(i) == State.ADDED)
-//			{
-//				add(mStrNames, mStrInfos.get(i));
-//			}
-//			else if (mState.get(i) == State.UPDATED)
-//			{
-//				update(mStrNames, mStrInfos.get(i));
-//			}
-//			else if (mState.get(i) == State.DELETED)
-//			{
-//				delete();
-//			}
-//		}
+		for (int i=0; i<mState.size(); i++)
+		{
+			if (mState.get(i) == State.ADDED)
+			{
+				addToDisk(ops, contactIndex, mStrNames, mStrInfos.get(i));
+				mState.set(i, State.NONE);
+			}
+			else if (mState.get(i) == State.UPDATED)
+			{
+				updateToDisk(ops, contactIndex, mStrNames, mStrInfos.get(i));
+				mState.set(i, State.NONE);
+			}
+			else if (mState.get(i) == State.DELETED)
+			{
+				deleteFromDisk(ops, contactIndex, mStrNames, mStrInfos.get(i));
+			}
+		}
 	}
 
-	void add()
+	void addToDisk(ArrayList<ContentProviderOperation> ops, int rawContactInsertIndex, String[] names, String[] infos)
 	{
-//		ArrayList<ContentProviderOperation> ops =
-//			new ArrayList<ContentProviderOperation>();
-//
-//		ops.add(ContentProviderOperation.newInsert(Data.CONTENT_URI)
-//				.withValue(Data.RAW_CONTACT_ID, rawContactId)
-//				.withValue(Data.MIMETYPE, Phone.CONTENT_ITEM_TYPE)
-//				.withValue(Phone.NUMBER, "            1-800-GOOG-411      ")
-//				.withValue(Phone.TYPE, Phone.TYPE_CUSTOM)
-//				.withValue(Phone.LABEL, "free directory assistance")
-//				.build());
-//		getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+		DebugPrint("ADD TO DISK");
+		switch (getMoSyncType())
+		{
+			case MA_PIM_FIELD_CONTACT_PHOTO:
+				break;
+			default:
+				DebugPrint("ADD " + mStrType);
+				ContentProviderOperation.Builder builder =
+					ContentProviderOperation.newInsert(Data.CONTENT_URI)
+						.withValueBackReference(Data.RAW_CONTACT_ID, rawContactInsertIndex)
+		                .withValue(ContactsContract.Data.MIMETYPE, mStrType);
+
+				for (int i=0; i<names.length; i++)
+				{
+					if ( (infos[i] != null) && (names[i] != PIM.DUMMY) )
+					{
+						DebugPrint("i = " + i + "; " + names[i] + ":" + infos[i]);
+						builder = builder.withValue(names[i], infos[i]);
+					}
+				}
+
+				ops.add(builder.build());
+				break;
+		}
 	}
 
-	void update()
+	void updateToDisk(ArrayList<ContentProviderOperation> ops, int rawContactId, String[] names, String[] infos)
 	{
-//		ArrayList<ContentProviderOperation> ops =
-//			new ArrayList<ContentProviderOperation>();
-//
-//		ops.add(ContentProviderOperation.newUpdate(Data.CONTENT_URI)
-//				.withSelection(Data._ID + "=?", new String[]{String.valueOf(dataId)})
-//				.withValue(Email.DATA, "somebody@android.com")
-//				.build());
-//		getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+		DebugPrint("UPDATE TO DISK");
+		switch (getMoSyncType())
+		{
+			case MA_PIM_FIELD_CONTACT_PHOTO:
+				break;
+			default:
+				DebugPrint("UPDATE " + mStrType);
+				ContentProviderOperation.Builder builder =
+					ContentProviderOperation.newUpdate(Data.CONTENT_URI)
+						.withSelection(Contacts._ID + "=?", new String[]{Integer.toString(rawContactId)})
+		                .withValue(ContactsContract.Data.MIMETYPE, mStrType);
+
+				for (int i=0; i<names.length; i++)
+				{
+					if ( (infos[i] != null) && (names[i] != PIM.DUMMY) )
+					{
+						DebugPrint("i = " + i + "; " + names[i] + ":" + infos[i]);
+						builder = builder.withValue(names[i], infos[i]);
+					}
+				}
+
+				ops.add(builder.build());
+				break;
+		}
 	}
 
-	void delete()
+	void deleteFromDisk(ArrayList<ContentProviderOperation> ops, int rawContactId, String[] names, String[] infos)
 	{
-//		ArrayList<ContentProviderOperation> ops =
-//			new ArrayList<ContentProviderOperation>();
-//
-//		ops.add(ContentProviderOperation.newDelete(Data.CONTENT_URI)
-//				.withSelection(Data._ID + "=?", new String[]{String.valueOf(dataId)})
-//				.build());
-//		getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+		ops.add(ContentProviderOperation.newDelete(Data.CONTENT_URI)
+				.withSelection(Contacts._ID + "=?", new String[]{Integer.toString(rawContactId)})
+				.build());
 	}
 }

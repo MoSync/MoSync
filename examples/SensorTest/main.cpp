@@ -215,9 +215,9 @@ void setFont()
 {
 	int nrFonts = maFontGetCount();
 	char fontName[BUFFER_SIZE];
-	// get first font.
+	// get font with the specified ID.
 	maFontGetName(FONT_ID, fontName, BUFFER_SIZE);
-	// Load first font with size 20.
+	// Load font with size 20.
 	int fontHandle = maFontLoadWithName(fontName, TEXT_SIZE);
 	maFontSetCurrent(fontHandle);
 }
