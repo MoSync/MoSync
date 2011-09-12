@@ -4414,7 +4414,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A boolean string 'true' or 'false', where true is visible and false is invisible.
 		*
-		* @setonly
+		* @setandget
 		*
 		* @par Example
 		* \code

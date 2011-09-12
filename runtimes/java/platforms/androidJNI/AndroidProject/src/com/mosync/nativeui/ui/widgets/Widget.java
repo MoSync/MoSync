@@ -25,7 +25,9 @@ import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.Toast;
 
+import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
 import com.mosync.nativeui.core.Types;
@@ -175,12 +177,18 @@ public class Widget
 			boolean shouldBeVisible = BooleanConverter.convert( value );
 			if( shouldBeVisible )
 			{
-				getView( ).setVisibility( View.VISIBLE );
+				// No need to show it if it was visible before.
+				if ( getView().getVisibility() != View.VISIBLE )
+				{
+					getView( ).setVisibility( View.VISIBLE );
+				}
 			}
 			else
 			{
-				getView( ).setVisibility( View.INVISIBLE );
+				// Hide it, and do not take any space.
+				getView( ).setVisibility( View.GONE );
 			}
+			return true;
 		}
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_ENABLED ))
 		{
@@ -260,10 +268,17 @@ public class Widget
 		{
 			return Boolean.toString( getView().isEnabled() );
 		}
-		else
+		else if( property.equals( IX_WIDGET.MAW_WIDGET_VISIBLE ))
 		{
-			return "";
+			int visible = getView().getVisibility();
+			if ( visible == View.VISIBLE ){
+				return "true";
+			}
+			else if ( visible == View.GONE ){
+				return "false";
+			}
 		}
+		return "";
 	}
 	
 	/**
