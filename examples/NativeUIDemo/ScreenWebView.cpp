@@ -95,6 +95,7 @@ ScreenWebView::ScreenWebView():
 		mNavBarWidget = new NavigationBar();
 		mNavBarWidget->setTitle(SCREEN_TITLE);
 		mNavBarWidget->setBackButtonTitle("");
+		mNavBarWidget->fillSpaceHorizontally();
 		mainLayout->addChild(mNavBarWidget);
 	}
 
@@ -112,6 +113,8 @@ ScreenWebView::ScreenWebView():
 
 	// Create and add the web view widget to the main layout.
 	mWebView = new WebView();
+	mWebView->fillSpaceHorizontally();
+	mWebView->fillSpaceVertically();
 	mWebView->openURL(DEFAULT_URL_ADDRESS);
 	mainLayout->addChild(mWebView);
 }

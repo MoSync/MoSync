@@ -98,7 +98,7 @@ public class PIM {
 
 	final static String[] PIMFieldsTypes =
 	{
-		ContactsContract.Contacts.LOOKUP_KEY,
+		ContactsContract.Contacts._ID,
 		StructuredPostal.CONTENT_ITEM_TYPE,
 		Event.CONTENT_ITEM_TYPE,
 		Email.CONTENT_ITEM_TYPE,
@@ -276,11 +276,13 @@ public class PIM {
 			return MA_PIM_ERR_HANDLE_INVALID;
 		}
 
+		DebugPrint("PIM LIST CLOSE " + mPIMLists.get(list).size());
 		Iterator<PIMItem> it = mPIMLists.get(list).iterator();
 
 		while (it.hasNext())
 		{
-			it.next().close();
+			DebugPrint("ITEM");
+			it.next().close(getContentResolver());
 		}
 
 		mPIMContactsList = mPIMLists.remove(list);
@@ -495,6 +497,8 @@ public class PIM {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
 		}
 
+		DebugPrint("INDEX = " + index);
+		DebugPrint("FIELD LENGTH = " + pimField.length());
 		if ( (index < 0) || (index >= pimField.length()) )
 		{
 			return MA_PIM_ERR_INDEX_INVALID;
@@ -642,7 +646,7 @@ public class PIM {
 		{
 			return MA_PIM_ERR_HANDLE_INVALID;
 		}
-		pimItem.close();
+		pimItem.close(getContentResolver());
 
 		return MA_PIM_ERR_NONE;
 	}
@@ -655,10 +659,8 @@ public class PIM {
 		}
 
 		PIMItem p = new PIMItem();
-		for (int i = 1; i < PIMFieldsColumns.length; i++)
-		{
-			p.add(PIMFieldsTypes[i], PIMFieldsColumns[i]);
-		}
+		p.create(PIMFieldsTypes, PIMFieldsColumns);
+		mPIMContactsList.add(p);
 		mPIMItems.put(mResourceIndex, p);
 
 		return mResourceIndex++;
@@ -671,10 +673,13 @@ public class PIM {
 			return MA_PIM_ERR_HANDLE_INVALID;
 		}
 
-		if ( (item < 0) || (mPIMItems.get(item) == null) )
+		PIMItem pimItem = null;
+		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
 		{
 			return MA_PIM_ERR_HANDLE_INVALID;
 		}
+
+		pimItem.delete(getContentResolver());
 
 		mPIMItems.remove(item);
 

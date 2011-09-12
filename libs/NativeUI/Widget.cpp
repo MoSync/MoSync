@@ -525,8 +525,7 @@ namespace NativeUI
      */
     void Widget::setVisible(const bool visible)
     {
-        MAUtil::String value = visible ? "true" : "false";
-        setProperty(MAW_WIDGET_VISIBLE, value);
+		setProperty(MAW_WIDGET_VISIBLE, (visible ? "true" : "false") );
     }
 
     /**
