@@ -39,7 +39,37 @@
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);
-		UIImage* image = [UIImage imageWithCGImage:imageResource->image];
+		UIImageOrientation orientation = UIImageOrientationUp;
+		NSLog(@"Surface orientation %d",imageResource->orientation);
+		switch (imageResource->orientation) {
+			case 1:
+				orientation = UIImageOrientationUp;
+				break;
+			case 2:
+				orientation = UIImageOrientationUpMirrored;
+				break;
+			case 3:
+				orientation = UIImageOrientationDown;
+				break;
+			case 4:
+				orientation = UIImageOrientationDownMirrored;
+				break;
+			case 5:
+				orientation = UIImageOrientationLeftMirrored;
+				break;
+			case 6:
+				orientation = UIImageOrientationRight;
+				break;
+			case 7:
+				orientation = UIImageOrientationRightMirrored;
+				break;
+			case 8:
+				orientation = UIImageOrientationLeft;
+				break;
+			default:
+				break;
+		}
+		UIImage* image = [UIImage imageWithCGImage:imageResource->image scale:1.0 orientation:orientation];
 		if(leftCapWidth != 0 || topCapHeight != 0) {
 			image = [image stretchableImageWithLeftCapWidth:leftCapWidth topCapHeight:topCapHeight];
 		}

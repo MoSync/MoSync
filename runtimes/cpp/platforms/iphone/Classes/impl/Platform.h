@@ -206,7 +206,7 @@ public:
 		if(mDataRef) CFRelease(mDataRef);
 	}
 	
-	int width, height, rowBytes;
+	int width, height, rowBytes, orientation;
 	CGImageRef image;
 	CGContextRef context;
 	CGRect rect;
