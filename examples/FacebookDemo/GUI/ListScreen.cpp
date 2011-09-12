@@ -96,28 +96,35 @@ void ListScreen::initialize()
 
 	this->setBackgroundColor(mScreenColor);
 
-	NativeUI::VerticalLayout *layout = new NativeUI::VerticalLayout();
-	layout->setBackgroundColor(mScreenColor);
-
 	NativeUI::ListView *list = new NativeUI::ListView();
 	list->addListViewListener(this);
 	list->setBackgroundColor(mScreenColor);
 
-	NativeUI::Button *button = new NativeUI::Button();
-	button->addButtonListener(this);
-	button->setText("back");
-	button->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
-	button->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
-	button->fillSpaceHorizontally();
+	if( FacebookDemoApplication::isAndroid() )
+	{
+		NativeUI::VerticalLayout *layout = new NativeUI::VerticalLayout();
+		layout->setBackgroundColor(mScreenColor);
 
-	layout->addChild(list);
-	layout->addChild(button);
+		NativeUI::Button *button = new NativeUI::Button();
+		button->addButtonListener(this);
+		button->setText("back");
+		button->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+		button->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
+		button->fillSpaceHorizontally();
 
-	setMainWidget(layout);
+		layout->addChild(list);
+		layout->addChild(button);
 
-	mLayout = layout;
+		setMainWidget(layout);
+		mLayout = layout;
+		mBackButton = button;
+	}
+	else
+	{
+		setMainWidget(list);
+	}
 	mList = list;
-	mBackButton = button;
+
 }
 
 void ListScreen::back()
