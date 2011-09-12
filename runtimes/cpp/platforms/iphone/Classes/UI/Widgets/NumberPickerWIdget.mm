@@ -31,7 +31,7 @@
     if (!view)
     {
         UIPickerView* numberPicker = [[UIPickerView alloc] init];
-        view = [numberPicker retain];
+        view = numberPicker;
 
         [numberPicker setDelegate:self];
         [numberPicker setDataSource:self];
@@ -55,7 +55,7 @@
     UIPickerView* numberPicker = (UIPickerView*) view;
     int paramValue = [value intValue];
 
-    if ([key isEqualToString:@"minValue"])
+    if ([key isEqualToString:@MAW_NUMBER_PICKER_MAX_VALUE])
     {
         // Check if the param is valid.
         if (paramValue > mMaxValue) {
@@ -65,7 +65,7 @@
         mMinValue = paramValue;
         [numberPicker reloadComponent:0];
     }
-    else if ([key isEqualToString:@"maxValue"])
+    else if ([key isEqualToString:@MAW_NUMBER_PICKER_MIN_VALUE])
     {
         // Check if the param is valid.
         if (paramValue < mMinValue) {
@@ -75,7 +75,7 @@
         mMaxValue = paramValue;
         [numberPicker reloadComponent:0];
     }
-    else if ([key isEqualToString:@"value"])
+    else if ([key isEqualToString:@MAW_NUMBER_PICKER_VALUE])
     {
         // Check if the param is valid.
         if (mMinValue > paramValue ||  paramValue > mMaxValue)
@@ -103,15 +103,15 @@
 {
     UIPickerView* numberPicker = (UIPickerView*) view;
 
-    if([key isEqualToString:@"minValue"])
+    if([key isEqualToString:@MAW_NUMBER_PICKER_MIN_VALUE])
     {
         return [[NSString alloc] initWithFormat:@"%d",mMinValue];
 	}
-    else if([key isEqualToString:@"maxValue"])
+    else if([key isEqualToString:@MAW_NUMBER_PICKER_MAX_VALUE])
     {
         return [[NSString alloc] initWithFormat:@"%d",mMaxValue];
 	}
-    else if([key isEqualToString:@"value"])
+    else if([key isEqualToString:@MAW_NUMBER_PICKER_VALUE])
     {
         int selectedRow = [numberPicker selectedRowInComponent:0];
         return [[NSString alloc] initWithFormat:@"%d",selectedRow];

@@ -30,8 +30,8 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 
 	static NSString *SimpleTableIdentifier = @"SimpleTableIdentifier";
 	MoSyncUITableViewCell *cell = nil;
-	cell = [[[MoSyncUITableViewCell alloc]initWithStyle:UITableViewCellStyleDefault
-							   reuseIdentifier:SimpleTableIdentifier] retain];
+	cell = [[MoSyncUITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+							   reuseIdentifier:SimpleTableIdentifier];
 	[cell setWidget:self];
 	cell.selectionStyle =  UITableViewCellSelectionStyleNone;
 	view = cell;
@@ -47,13 +47,13 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"text"]) {
+	if([key isEqualToString:@MAW_LIST_VIEW_ITEM_TEXT]) {
 		UITableViewCell* cell = (UITableViewCell*) view;
 		UILabel* label = cell.textLabel;
 		label.text = value;
 		[self layout];
 	}
-    else if ([key isEqualToString:@"fontHandle"])
+    else if ([key isEqualToString:@MAW_LIST_VIEW_ITEM_FONT_HANDLE])
     {
         UITableViewCell* cell = (UITableViewCell*) view;
 		UILabel* label = cell.textLabel;
@@ -65,7 +65,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
         [label setFont:font];
         [self layout];
     }
-	else if([key isEqualToString:@"icon"]) {
+	else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_ICON]) {
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_HANDLE;
 		UITableViewCell* cell = (UITableViewCell*) view;
@@ -73,7 +73,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);		
 		imageView.image = [UIImage imageWithCGImage:imageResource->image];
 	}
-	else if([key isEqualToString:@"backgroundColor"]) {
+	else if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR]) {
 		UITableViewCell *cell = (UITableViewCell*)view;
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
@@ -82,7 +82,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
 		cell.textLabel.backgroundColor = color;
 		cell.accessoryView.backgroundColor = color;		
 	} 
-    else if([key isEqualToString:@"accessoryType"]) {
+    else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE]) {
 		UITableViewCell *cell = (UITableViewCell*)view;
 		
 		if([value isEqualToString:@"hasChildren"]) {

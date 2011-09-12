@@ -209,7 +209,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	// maybe set scroll indicator style..
 	
-	if([key isEqualToString:@"childVerticalAlignment"]) {
+	if([key isEqualToString:@MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT]) {
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;
 		if([value isEqualToString:@"top"])
 			[alv setVerticalAlignment:UIControlContentVerticalAlignmentTop];
@@ -217,7 +217,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			[alv setVerticalAlignment:UIControlContentVerticalAlignmentCenter];
 		else if([value isEqualToString:@"bottom"])
 			[alv setVerticalAlignment:UIControlContentVerticalAlignmentBottom];		
-	} else if([key isEqualToString:@"childHorizontalAlignment"]) {
+	} else if([key isEqualToString:@MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT]) {
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;
 		if([value isEqualToString:@"left"])
 			[alv setHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
