@@ -1,6 +1,8 @@
 package com.mosync.nativeui.ui.factories;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import android.app.Activity;
 import android.widget.DatePicker;
@@ -34,8 +36,8 @@ public class DatePickerFactory implements AbstractViewFactory
 		};
 
 		// Initialize the state with the current system date.
-		Date today = new Date();
-		datePicker.init(today.getYear(), today.getMonth(), today.getDay(), mDateChangedListener);
+		Calendar today = Calendar.getInstance();
+		datePicker.init(today.get(Calendar.YEAR), today.get(Calendar.MONTH), today.get(Calendar.DAY_OF_MONTH), mDateChangedListener);
 
 		return new DatePickerWidget( handle, datePicker );
 	}
