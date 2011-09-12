@@ -45,8 +45,7 @@ MA 02110-1301, USA.
 /**
  * The constructor creates the user interface and the FacebookManager
  */
-FacebookDemoMoblet::FacebookDemoMoblet(const MAUtil::String &appId):
-	mImage(NULL), mImageSize(0)
+FacebookDemoMoblet::FacebookDemoMoblet(const MAUtil::String &appId)
 {
 	if(appId.size()==0)
 	{
@@ -109,7 +108,6 @@ FacebookDemoMoblet::~FacebookDemoMoblet()
 	delete mFacebookManager;
 	delete mLoginScreen;
 	delete mMainScreen;
-	delete []mImage;
 }
 
 /**
@@ -165,7 +163,6 @@ void FacebookDemoMoblet::createGUI()
 	 */
 
 	//publish
-//	uploadProfilePhoto(mMainScreen);
 	addLinkOnWall(mMainScreen);
 	addPostOnWall(mMainScreen);
 	addStatusMessageOnWall(mMainScreen);
@@ -212,30 +209,13 @@ MAUtil::String FacebookDemoMoblet::extractAccessToken(const char *newurl)
 
 /**
  * creates a button and adds it to the main menu
- * adds on the button a command that sends the publish request to Facebook
- */
-void FacebookDemoMoblet::uploadProfilePhoto(FacebookDemoGUI::ListScreen *menu)
-{
-	FacebookDemoApplication::AddCommand<Photo> *postPhotoCommand =
-			new FacebookDemoApplication::AddCommand<Photo>(mFacebookManager, menu, "me");
-
-	postPhotoCommand->setPhoto(mImage, mImageSize, "testing uploading a picture");
-
-	FacebookDemoGUI::ListItem *uploadButton = new FacebookDemoGUI::ListItem(postPhotoCommand,
-			"upload profile photo for user");
-	menu->add(uploadButton);
-
-}
-
-/**
- * creates a button and adds it to the main menu
  * adds on the button a command that sends the upload picture request to Facebook
  */
 void FacebookDemoMoblet::addLinkOnWall(FacebookDemoGUI::ListScreen *menu)
 {
 
 	FacebookDemoApplication::PostOnWallCommand<Link> *postLinkCommand = new FacebookDemoApplication::PostOnWallCommand<Link>(mFacebookManager, menu, "me");
-	postLinkCommand->setLinkParams("http://www.youtube.com/watch?v=1JzFNaCT-KA", "Link posted with MOSYNC_SDK");
+	postLinkCommand->setLinkParams("http://www.youtube.com/watch?v=UUjwSzFuk7w", "Link posted with MOSYNC_SDK");
 
 	FacebookDemoGUI::ListItem *postLinkButton = new FacebookDemoGUI::ListItem(postLinkCommand, "post a link on wall");
 	menu->add(postLinkButton);
@@ -250,7 +230,7 @@ void FacebookDemoMoblet::addPostOnWall(FacebookDemoGUI::ListScreen *menu)
 	FacebookDemoApplication::PostOnWallCommand<Post> *addLinkCommand = new FacebookDemoApplication::PostOnWallCommand<Post>(mFacebookManager, menu, "me");
 	addLinkCommand->setPostParams(
 			"Post added with MOSYN SDK", 										//message
-			"http://www.youtube.com/watch?v=FL7yD-0pqZg",						//link
+			"http://www.youtube.com/watch?v=9-A5q54b5J4",						//link
 			"New post",															//name
 			"Link from You Tube",												//caption
 			"Testing adding a post on wall with MOSYNC_SDK");					//description
@@ -261,9 +241,9 @@ void FacebookDemoMoblet::addPostOnWall(FacebookDemoGUI::ListScreen *menu)
 	FacebookDemoApplication::PostOnWallCommand<Post> *addPictureCommand = new FacebookDemoApplication::PostOnWallCommand<Post>(mFacebookManager, menu, "me");
 	addPictureCommand->setPostParams(
 				"Post added with MOSYN SDK",																			//message
-				"http://1.bp.blogspot.com/_8kXsPIEkJZI/RyHy_sITYCI/AAAAAAAAADc/4HTZMEhiVlw/s400/cats-in-love.jpg",		//link
+				"http://a1.sphotos.ak.fbcdn.net/hphotos-ak-ash4/s720x720/314847_10150297818876545_69819861544_8095955_1938447479_n.jpg",		//link
 				"New post",																								//name
-				"Cats",																									//caption
+				"MoSync developers",																									//caption
 				"Testing adding a post on wall with MOSYNC_SDK");														//description
 
 	FacebookDemoGUI::ListItem *pictureButton = new FacebookDemoGUI::ListItem(addPictureCommand, "add a post on wall (picture)");

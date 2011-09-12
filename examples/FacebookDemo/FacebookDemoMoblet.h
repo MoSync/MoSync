@@ -91,7 +91,6 @@ private:
 	 * Creates a button and adds it to the main menu
 	 * Adds on the button a command that sends the publish request to Facebook
 	 */
-	void uploadProfilePhoto(FacebookDemoGUI::ListScreen *menu);
 	void addLinkOnWall(FacebookDemoGUI::ListScreen *menu);
 	void addPostOnWall(FacebookDemoGUI::ListScreen *menu);
 	void addStatusMessageOnWall(FacebookDemoGUI::ListScreen *menu);
@@ -127,9 +126,6 @@ private:
 	FacebookManager							*mFacebookManager;
 	FacebookDemoGUI::MainScreen				*mMainScreen;
 	FacebookDemoGUI::FacebookLoginScreen 	*mLoginScreen;
-	byte									*mImage;
-	int										mImageSize;
-
 };
 
 #endif /* FACEBOOKDEMOMOBLET_H_ */
