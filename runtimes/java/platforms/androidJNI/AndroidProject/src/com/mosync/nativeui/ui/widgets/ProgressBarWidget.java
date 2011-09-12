@@ -40,26 +40,21 @@ public class ProgressBarWidget extends Widget
 
 		ProgressBar progressBar = (ProgressBar) getView( );
 
+		if ( IntConverter.convert( value ) < 0 )
+		{
+			throw new InvalidPropertyValueException(property, value);
+		}
+
 		if( property.equals( IX_WIDGET.MAW_PROGRESS_BAR_MAX ) )
 		{
 			progressBar.setMax(IntConverter.convert( value ));
 		}
 		else if( property.equals( IX_WIDGET.MAW_PROGRESS_BAR_PROGRESS ))
 		{
-			if ( IntConverter.convert(value) < 0 )
-			{
-				throw new InvalidPropertyValueException(property, value);
-			}
-
 			progressBar.setProgress(IntConverter.convert(value));
 		}
 		else if( property.equals(IX_WIDGET.MAW_PROGRESS_BAR_INCREMENT_PROGRESS ))
 		{
-			if ( IntConverter.convert( value ) < 0 )
-			{
-				throw new InvalidPropertyValueException(property, value);
-			}
-
 			progressBar.incrementProgressBy(IntConverter.convert( value ));
 		}
 		else

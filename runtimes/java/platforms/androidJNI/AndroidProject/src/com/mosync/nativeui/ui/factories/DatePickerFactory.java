@@ -1,8 +1,6 @@
 package com.mosync.nativeui.ui.factories;
 
 import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 
 import android.app.Activity;
 import android.widget.DatePicker;
