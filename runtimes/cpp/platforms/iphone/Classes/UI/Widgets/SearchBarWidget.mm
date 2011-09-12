@@ -49,7 +49,7 @@
 
 
 - (id)init {
-	searchBar = [[[UISearchBar alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];
+	searchBar = [[UISearchBar alloc] initWithFrame:CGRectMake(0, 10, 100, 30)];
 	searchBar.placeholder = @"Search";
 
 	
@@ -64,13 +64,13 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"text"]) {
+	if([key isEqualToString:@MAW_SEARCH_BAR_TEXT]) {
 		searchBar.text = value;
 	}
-	else if([key isEqualToString:@"placeholder"]) {
+	else if([key isEqualToString:@MAW_SEARCH_BAR_PLACEHOLDER]) {
 		searchBar.placeholder = value;
 	}
-	else if([key isEqualToString:@"showKeyboard"]) {
+	else if([key isEqualToString:@MAW_SEARCH_BAR_SHOW_KEYBOARD]) {
 		if([value isEqualToString:@"true"]) {
 			[searchBar becomeFirstResponder];
 		} else {
@@ -84,9 +84,9 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@"text"]) {
+	if([key isEqualToString:@MAW_SEARCH_BAR_TEXT]) {
 		return [searchBar.text retain];
-	}	
+	}
 	
 	return [super getPropertyWithKey:key];
 }

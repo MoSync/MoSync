@@ -205,12 +205,8 @@ static IWidget* sOldScreen = nil;
 - (int) destroyWidgetInstance:(IWidget*)widget {
 	int handle = [widget getWidgetHandle];	
 
-    NSLog(@"retainCount 1: %d", [widget retainCount]);
-
     [widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
-    
-    NSLog(@"retainCount 2: %d", [widget retainCount]);
-    
+        
 	int ret;
 	int removeRet = [widget remove];
 	if(removeRet<0)
@@ -222,13 +218,11 @@ static IWidget* sOldScreen = nil;
     NSNumber* numHandle = [[NSNumber alloc] initWithInt:handle];
     [unusedWidgetHandles addObject:numHandle];
     [numHandle release];
-
-    NSLog(@"retainCount 3: %d", [widget retainCount]);
     
 	return ret;
 }
 
-- (void) setPropertyOf: (IWidget*) widget withKey: (NSString*)key toValue: (NSString*)value {	
+- (void) setPropertyOf: (IWidget*) widget withKey: (NSString*)key toValue: (NSString*)value {
 	[widget setPropertyWithKey:key toValue:value];
 }
 

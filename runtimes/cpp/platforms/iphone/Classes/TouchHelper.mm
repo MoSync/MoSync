@@ -26,6 +26,7 @@ MA 02110-1301, USA.
 
 - (void) dealloc {
     [touchArray release];
+    [super dealloc];
 }
 
 - (int) addTouch: (UITouch*) touch 

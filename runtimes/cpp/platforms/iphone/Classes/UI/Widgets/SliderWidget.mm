@@ -37,7 +37,7 @@
     if(!view)
     {
         UISlider* slider = [[UISlider alloc] init];
-        view = [slider retain];
+        view = slider;
         [slider addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventTouchDragInside];
     }
 
@@ -58,7 +58,7 @@
     UISlider* slider = (UISlider*) view;
     float paramValue = [value floatValue];
 
-    if([key isEqualToString:@"max"])
+    if([key isEqualToString:@MAW_SLIDER_MAX])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
 
@@ -73,7 +73,7 @@
             [slider setValue:mProgressValue];
         }
     }
-    else if([key isEqualToString:@"value"])
+    else if([key isEqualToString:@MAW_SLIDER_VALUE])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
         mProgressValue = paramValue;
@@ -87,7 +87,7 @@
         // Set the new value for the slider.
         [slider setValue:mProgressValue];
     }
-    else if([key isEqualToString:@"increaseValue"])
+    else if([key isEqualToString:@MAW_SLIDER_INCREASE_VALUE])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
         mProgressValue += paramValue;
@@ -101,7 +101,7 @@
         // Set the new value for the slider.
         [slider setValue:mProgressValue];
     }
-    else if([key isEqualToString:@"decreaseValue"])
+    else if([key isEqualToString:@MAW_SLIDER_DECREASE_VALUE])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
         mProgressValue -= paramValue;
@@ -130,12 +130,12 @@
  */
 - (NSString*)getPropertyWithKey: (NSString*)key {
 
-	if([key isEqualToString:@"max"])
+	if([key isEqualToString:@MAW_SLIDER_MAX])
     {
         // Return the maximum value for the slider.
         return[[NSString alloc] initWithFormat:@"%d", (int)mMaxValue];
 	}
-    else if([key isEqualToString:@"value"])
+    else if([key isEqualToString:@MAW_SLIDER_VALUE])
     {
         // Return the value of the slider.
         return[[NSString alloc] initWithFormat:@"%d", (int)mProgressValue];

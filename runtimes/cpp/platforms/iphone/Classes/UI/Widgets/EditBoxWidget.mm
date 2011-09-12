@@ -26,7 +26,7 @@
 @implementation EditBoxWidget
 
 - (id)init {
-	textField = [[[UITextField alloc] initWithFrame:CGRectMake(0, 10, 100, 30)] retain];
+	textField = [[UITextField alloc] initWithFrame:CGRectMake(0, 10, 100, 30)];
 	textField.borderStyle = UITextBorderStyleRoundedRect;
 	view = textField;			
 	id ret = [super init];
@@ -37,13 +37,13 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"text"]) {
+	if([key isEqualToString:@MAW_EDIT_BOX_TEXT]) {
 		textField.text = value;
 	}
-	else if([key isEqualToString:@"placeholder"]) {
+	else if([key isEqualToString:@MAW_EDIT_BOX_PLACEHOLDER]) {
 		textField.placeholder = value;
 	}	
-	else if([key isEqualToString:@"showKeyboard"]) {
+	else if([key isEqualToString:@MAW_EDIT_BOX_SHOW_KEYBOARD]) {
 		if([value isEqualToString:@"true"]) {
 			[textField becomeFirstResponder];
 		} else {
@@ -57,7 +57,7 @@
 			textField.autocorrectionType = UITextAutocorrectionTypeNo;
 		}
 	}	
-	else if([key isEqualToString:@"textHorizontalAlignment"]) {
+	else if([key isEqualToString:@MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT]) {
 		if([value isEqualToString:@"left"]) {
 			textField.textAlignment = UITextAlignmentLeft;
 		}
@@ -68,23 +68,24 @@
 			textField.textAlignment = UITextAlignmentRight;
 		}		
 	}
-	else if([key isEqualToString:@"textVerticalAlignment"]) {
+	else if([key isEqualToString:@MAW_LABEL_TEXT_VERTICAL_ALIGNMENT]) {
 		// This isn't trivial on iphone.
 
 		//UILabel* label = (UILabel*) view;
 		//if([value isEqualToString:@"center"]) {
 		//}
+        return MAW_RES_INVALID_PROPERTY_VALUE;
 	}
-	else if([key isEqualToString:@"fontColor"]) {
+	else if([key isEqualToString:@MAW_LABEL_FONT_COLOR]) {
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		textField.textColor = color;
 	}
-	else if([key isEqualToString:@"fontSize"]) {
+	else if([key isEqualToString:@MAW_LABEL_FONT_SIZE]) {
 		float fontSize = [value floatValue];
 		textField.font = [UIFont boldSystemFontOfSize:fontSize];
 	}
-	else if([key isEqualToString:@"editMode"]) {
+	else if([key isEqualToString:@MAW_EDIT_BOX_EDIT_MODE]) {
 
 		if(
 		   [value isEqualToString:@"password"])
@@ -101,7 +102,7 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@"text"]) {
+	if([key isEqualToString:@MAW_EDIT_BOX_TEXT]) {
 		return [textField.text retain];
 	}
 

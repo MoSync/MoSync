@@ -35,8 +35,8 @@
 }
 
 - (id)initWithApi:(EAGLRenderingAPI)api {
-	view = [[[MoSyncGLView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) 
-                                         andApi:api] retain]; // TODO: do have to do this (retain)??
+	view = [[MoSyncGLView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) 
+                                         andApi:api];
     if(view == nil) return nil;
 	id ret = [super init];
 	view.backgroundColor = [UIColor colorWithHexString:@"000000ff"];
@@ -55,11 +55,11 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"bind"]) {
+	if([key isEqualToString:@MAW_GL_VIEW_BIND]) {
 		MoSyncGLView* glView = (MoSyncGLView*) view;
 		[glView bindContext];
 	}
-	else if([key isEqualToString:@"invalidate"]) {
+	else if([key isEqualToString:@MAW_GL_VIEW_INVALIDATE]) {
 		MoSyncGLView* glView = (MoSyncGLView*) view;		
 		[glView renderContext];
 	}

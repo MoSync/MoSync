@@ -24,7 +24,7 @@
 @implementation CheckBoxWidget
 
 - (id)init {
-	UISwitch* checkBox = [[[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];
+	UISwitch* checkBox = [[UISwitch alloc] initWithFrame:CGRectMake(0, 0, 100, 60)];
 	view = checkBox;
 	[checkBox addTarget:self action:@selector(checkBoxPressed) forControlEvents:UIControlEventTouchUpInside];
 	return [super init];
@@ -44,7 +44,7 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"checked"]) {
+	if([key isEqualToString:@MAW_CHECK_BOX_CHECKED]) {
 		bool checked = [value boolValue];
 		UISwitch* checkBox = (UISwitch*) view;
 		checkBox.on = checked;
@@ -55,7 +55,7 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@"checked"]) {
+	if([key isEqualToString:@MAW_CHECK_BOX_CHECKED]) {
 		UISwitch* checkBox = (UISwitch*) view;
 		return [[NSString alloc] initWithString:(checkBox.on?@"true":@"false")];
 	} else {	

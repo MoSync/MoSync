@@ -110,13 +110,14 @@ int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char*
 	
 	NSString *valueString = stringFromChar(value);
     NSArray* arguments = [[NSArray alloc] initWithObjects: propertyString, valueString, nil];
+        
 	[NSObject performSelectorOnMainThread:@selector(setPropertyWithKey:toValue:)
 							   withTarget:widget
 							  withObjects:arguments
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
-	
-    [arguments release];
+	    
+    [arguments release];    
     [valueString release];
 	[propertyString release];
     
@@ -130,14 +131,15 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 	
 	NSString* propertyString = stringFromChar(property);
 	NSString* retval;
-    NSArray* arguments = [[NSArray alloc] initWithObjects: propertyString, nil];    
+    NSArray* arguments = [[NSArray alloc] initWithObjects: propertyString, nil];
+    
 	[NSObject performSelectorOnMainThread:@selector(getPropertyWithKey:)
 							   withTarget:widget
 							  withObjects:arguments
 							waitUntilDone:YES
 						   andReturnValue:&retval];
-	
-	//[arguments release];
+
+	[arguments release];
     
 	if(retval == nil) return MAW_RES_ERROR;
 	int length = maxSize;
@@ -149,7 +151,7 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 	[retval getCString:value maxLength:length encoding:NSASCIIStringEncoding];
 	[retval release];
     [propertyString release];
-	
+
 	return realLength;
 }
 

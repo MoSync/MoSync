@@ -40,7 +40,7 @@
         NSLocale* locale = [[NSLocale alloc] initWithLocaleIdentifier:@"en_UK"];;
         [datePicker setLocale:locale];
 
-        view = [datePicker retain];
+        view = datePicker;
     }
 
     return [super init];
@@ -57,8 +57,8 @@
     UIDatePicker* timePicker = (UIDatePicker*) view;
     int paramValue = [value intValue];
 
-    if ([key isEqualToString:@"currentHour"] ||
-        [key isEqualToString:@"currentMinute"])
+    if ([key isEqualToString:@MAW_TIME_PICKER_CURRENT_HOUR] ||
+        [key isEqualToString:@MAW_TIME_PICKER_CURRENT_MINUTE])
     {
         // Set a specified time into time picker.
         unsigned unitFlags = NSHourCalendarUnit | NSMinuteCalendarUnit;
@@ -66,7 +66,7 @@
         NSCalendar* defaultCalendar = [NSCalendar currentCalendar];
         NSDateComponents *components = [defaultCalendar components:unitFlags fromDate:selectedDate];
 
-        if ([key isEqualToString:@"currentHour"])
+        if ([key isEqualToString:@MAW_TIME_PICKER_CURRENT_HOUR])
         {
             // Check if the param is a valid hour.
             if (paramValue < 0 || paramValue > 23)
@@ -76,7 +76,7 @@
 
             [components setHour:paramValue];
         }
-        else if ([key isEqualToString:@"currentMinute"])
+        else if ([key isEqualToString:@MAW_TIME_PICKER_CURRENT_MINUTE])
         {
             // Check if the param is a valid minute.
             if (paramValue < 0 || paramValue > 59)
@@ -107,7 +107,7 @@
 {
     UIDatePicker* timePicker = (UIDatePicker*) view;
 
-    if([key isEqualToString:@"currentHour"])
+    if([key isEqualToString:@MAW_TIME_PICKER_CURRENT_HOUR])
     {
         // Return the selected month from the date picker.
         NSDate* date = [timePicker date];
@@ -115,7 +115,7 @@
         NSInteger hour = [components hour];
         return[[NSString alloc] initWithFormat:@"%d", hour];
 	}
-    else if([key isEqualToString:@"currentMinute"])
+    else if([key isEqualToString:@MAW_TIME_PICKER_CURRENT_MINUTE])
     {
         // Return the selected day from the date picker.
         NSDate* date = [timePicker date];

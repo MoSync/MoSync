@@ -35,7 +35,7 @@
     if(!view)
     {
         //UIProgressView* progressView = [[UIProgressView alloc] init];
-        view = [[[UIProgressView alloc] initWithProgressViewStyle: UIProgressViewStyleBar] retain];
+        view = [[UIProgressView alloc] initWithProgressViewStyle: UIProgressViewStyleBar];
     }
 
     mMaxValue = DEFAULT_MAXIMUM_VALUE;
@@ -55,7 +55,7 @@
     UIProgressView* progressView = (UIProgressView*) view;
     float paramValue = [value floatValue];
 
-    if([key isEqualToString:@"max"])
+    if([key isEqualToString:@MAW_PROGRESS_BAR_MAX])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
         mMaxValue = paramValue;
@@ -70,7 +70,7 @@
         float currentPercentage = mProgressValue / mMaxValue;
         [progressView setProgress:currentPercentage];
     }
-    else if([key isEqualToString:@"progress"])
+    else if([key isEqualToString:@MAW_PROGRESS_BAR_PROGRESS])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
         mProgressValue = [value floatValue];
@@ -88,7 +88,7 @@
             [progressView setProgress:currentPercent];
         }
     }
-    else if([key isEqualToString:@"incrementProgress"])
+    else if([key isEqualToString:@MAW_PROGRESS_BAR_INCREMENT_PROGRESS])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
         mProgressValue += [value floatValue];
@@ -121,12 +121,12 @@
  */
 - (NSString*)getPropertyWithKey: (NSString*)key
 {
-	if([key isEqualToString:@"max"])
+	if([key isEqualToString:@MAW_PROGRESS_BAR_MAX])
     {
         // Return the maximum value for the progress bar.
 		return [[NSString alloc] initWithFormat:@"%d", (int)mMaxValue];
 	}
-    else if([key isEqualToString:@"progress"])
+    else if([key isEqualToString:@MAW_PROGRESS_BAR_PROGRESS])
     {
         // Return the progress value of the progress bar.
         return [[NSString alloc] initWithFormat:@"%d", (int)mProgressValue];

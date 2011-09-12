@@ -60,8 +60,7 @@
 
 - (id)init {
 	tableViewController = [[UITableViewController alloc] init];
-	view = tableViewController.tableView;		
-    [view retain];
+	view = [tableViewController.tableView retain];		
 	tableViewController.tableView.delegate = self;
 	tableViewController.tableView.dataSource = self;
 	id obj = [super init];		
