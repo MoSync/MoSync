@@ -152,7 +152,7 @@ public:
 	{
 
 		mZoomInButton = new Button();
-		mZoomInButton->setText("+");
+		mZoomInButton->setText("Zoom +");
 		mZoomInButton->fillSpaceHorizontally();
 		mZoomInButton->setHeight(60);
 		mZoomInButton->addButtonListener(this);
@@ -170,7 +170,7 @@ public:
 		mSettingsButton->addButtonListener(this);
 
 		mZoomOutButton = new Button();
-		mZoomOutButton->setText("-");
+		mZoomOutButton->setText("Zoom -");
 		mZoomOutButton->fillSpaceHorizontally();
 		mZoomOutButton->setHeight(60);
 		mZoomOutButton->addButtonListener(this);
@@ -255,18 +255,22 @@ public:
 		int length = maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
 
-		//Hide zoom buttons if zoom is not supported
+		//Disable the zoom buttons if zoom is not supported
 		if(maxZoom == 0)
 		{
-			mZoomInButton->setVisible(false);
+			mZoomInButton->setEnabled(false);
+			mZoomInButton->setFontColor(0x969696);
 
-			mZoomOutButton->setVisible(false);
+			mZoomOutButton->setEnabled(false);
+			mZoomOutButton->setFontColor(0x969696);
 		}
-		else //Or show them if it's supported
+		else //Or enable show them if it's supported
 		{
-			mZoomInButton->setVisible(true);
+			mZoomInButton->setEnabled(true);
+			mZoomInButton->setFontColor(0x000000);
 
-			mZoomOutButton->setVisible(true);
+			mZoomOutButton->setEnabled(true);
+			mZoomOutButton->setFontColor(0x000000);
 		}
 
 	}
