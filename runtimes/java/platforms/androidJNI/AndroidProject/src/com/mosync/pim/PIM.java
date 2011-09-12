@@ -19,7 +19,7 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_COMBO_UNSUPPORTED;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_COUNT_MAX;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_LABEL;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_CUSTOM_ATTRIBUTE;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_UNAVAILABLE_LIST;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_LIST_UNAVAILABLE;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_OPERATION_NOT_PERMITTED;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_CANNOT_OPEN;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_ALREADY_OPEN;
@@ -172,7 +172,7 @@ public class PIM {
 //			case PIM_TYPE_EVENTS:
 //				return openEventsList();
 		}
-		return MA_PIM_ERR_UNAVAILABLE_LIST;
+		return MA_PIM_ERR_LIST_UNAVAILABLE;
 	}
 
 	/*
