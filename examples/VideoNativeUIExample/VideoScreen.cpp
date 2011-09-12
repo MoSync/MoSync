@@ -43,10 +43,10 @@ VideoScreen::VideoScreen() :
 	mVideoView(NULL),
 	mSourceStatus(NULL),
 	mButtonsLayout(NULL),
-	mDuration(NULL),
 	mPlay(NULL),
 	mPause(NULL),
 	mStop(NULL),
+	mDuration(NULL),
 	mEditBox(NULL),
 	mLoadLayout(NULL),
 	mSetUrl(NULL),
@@ -279,10 +279,13 @@ void VideoScreen::buttonClicked(Widget* button)
     if (button == mPlay)
     {
         mVideoView->play();
-        // Refresh the duration label.
+        // Refresh the duration label if there's no error.
+        if ( mVideoView->getDuration() > 0 )
+        {
         mDuration->setText(
 			"Duration: " +
 			MAUtil::integerToString(mVideoView->getDuration()));
+        }
     }
     else if (button == mPause)
     {

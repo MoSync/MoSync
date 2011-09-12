@@ -184,7 +184,7 @@ public class MoSyncNetwork
 	 */
 	int maConnect(final String url) 
 	{
-		Log.i("MoSyncSyscall", "maConnect url: " + url);
+		//Log.i("MoSyncSyscall", "maConnect url: " + url);
 	
 		if (isMaxNumberOfConnectionsReached())
 		{
@@ -256,19 +256,19 @@ public class MoSyncNetwork
 		}
 		catch (MalformedURLException ex)
 		{
-			Log.i("MoSyncSyscall", "maConnect MalformedURLException: " + ex);
+			//Log.i("MoSyncSyscall", "maConnect MalformedURLException: " + ex);
 			ex.printStackTrace();
 			return CONNERR_URL;
 		}
 		catch (IOException ex)
 		{
-			Log.i("MoSyncSyscall", "maConnect IOException: " + ex);
+			//Log.i("MoSyncSyscall", "maConnect IOException: " + ex);
 			ex.printStackTrace();
 			return CONNERR_GENERIC;
 		}
 		catch (Exception ex)
 		{
-			Log.i("MoSyncSyscall", "maConnect Exception: " + ex);
+			//Log.i("MoSyncSyscall", "maConnect Exception: " + ex);
 			ex.printStackTrace();
 			return CONNERR_GENERIC;
 		}
@@ -281,7 +281,7 @@ public class MoSyncNetwork
 	 */
 	int maConnGetAddr(int connHandle, int addrPointer)
 	{
-		Log.i("MoSyncSyscall", "maConnGetAddr");
+		//Log.i("MoSyncSyscall", "maConnGetAddr");
 		
 		// Is this a request for a local address?
 		if (HANDLE_LOCAL == connHandle)
@@ -303,7 +303,7 @@ public class MoSyncNetwork
 	{
 		try
 		{
-			Log.i("MoSyncSyscall", "maConnClose: " + connHandle);
+			//Log.i("MoSyncSyscall", "maConnClose: " + connHandle);
 			
 			ConnectionObject connObj = getConnectionObject(connHandle);
 			
@@ -317,7 +317,7 @@ public class MoSyncNetwork
 		}
 		catch (IOException ex)
 		{
-			Log.i("MoSyncSyscall", "maConnClose IOException: " + ex);
+			//Log.i("MoSyncSyscall", "maConnClose IOException: " + ex);
 			ex.printStackTrace();
 		}
 	}
@@ -325,9 +325,9 @@ public class MoSyncNetwork
 	void maConnRead(int connHandle, int dst, int size)
 	{
 		// TODO: Remove Log.i() printout when debugging is done.
-		Log.i("MoSyncSyscall",
-			"maConnRead connHandle:" + connHandle + 
-			" dst:" + dst + " size:" + size);
+		//Log.i("MoSyncSyscall",
+		//	"maConnRead connHandle:" + connHandle +
+		//	" dst:" + dst + " size:" + size);
 		SYSLOG("maConnRead connHandle:" + connHandle + 
 			" dst:" + dst + " size:" + size);
 		
@@ -340,8 +340,8 @@ public class MoSyncNetwork
 	void maConnWrite(int connHandle, int src, int size)
 	{
 		// TODO: Remove Log.i() printout when debugging is done.
-		Log.i("MoSyncSyscall", "maConnWrite connHandle:" + connHandle + 
-			" src:" + src + " size:" + size);
+		//Log.i("MoSyncSyscall", "maConnWrite connHandle:" + connHandle +
+		//	" src:" + src + " size:" + size);
 		SYSLOG("maConnWrite connHandle:" + connHandle + 
 			" src:" + src + " size:" + size);
 		
@@ -354,8 +354,8 @@ public class MoSyncNetwork
 	void maConnReadToData(int connHandle, int data, int offset, int size)
 	{
 		// TODO: Remove Log.i() printout when debugging is done.
-		Log.i("@MoSyncSyscall", "maConnReadToData connHandle:" + connHandle + 
-			" dataHandle:" + data + " offset:" + offset + " size:" + size);
+		//Log.i("@MoSyncSyscall", "maConnReadToData connHandle:" + connHandle +
+		//	" dataHandle:" + data + " offset:" + offset + " size:" + size);
 		SYSLOG("maConnReadToData connHandle:" + connHandle + 
 			" dataHandle:" + data + " size:" + size);
 			
@@ -374,8 +374,8 @@ public class MoSyncNetwork
 		int size)
 	{
 		// TODO: Remove Log.i() printout when debugging is done.
-		Log.i("@MoSyncSyscall", "maConnWriteFromData connHandle:" + connHandle +
-			" dataHandle:" + data + " offset:" + offset + " size:" + size);
+		//Log.i("@MoSyncSyscall", "maConnWriteFromData connHandle:" + connHandle +
+		//	" dataHandle:" + data + " offset:" + offset + " size:" + size);
 		SYSLOG("maConnWriteFromData connHandle:" + connHandle + 
 			" dataHandle:" + data + " size:" + size);
 	
@@ -389,12 +389,12 @@ public class MoSyncNetwork
 	
 	int maHttpCreate(String url, int method)
 	{
-		Log.i("MoSyncSyscall", "maHttpCreate");
+		//Log.i("MoSyncSyscall", "maHttpCreate");
 		
 		// Have we reached the max number of connections?
 		if (isMaxNumberOfConnectionsReached())
 		{
-			Log.i("MoSyncSyscall", "maHttpCreate CONNERR_MAX");
+			//Log.i("MoSyncSyscall", "maHttpCreate CONNERR_MAX");
 			return CONNERR_MAX;
 		}
 		
@@ -423,14 +423,14 @@ public class MoSyncNetwork
 			return CONNERR_GENERIC;
 		}
 		
-		Log.i("MoSyncSyscall", "maHttpCreate returning handle: " + connHandle);
+		//Log.i("MoSyncSyscall", "maHttpCreate returning handle: " + connHandle);
 		
 		return connHandle;
 	}
 	
 	void maHttpSetRequestHeader(int connHandle, String key, String value)
 	{
-		Log.i("MoSyncSyscall", "maHttpSetRequestHeader");
+		//Log.i("MoSyncSyscall", "maHttpSetRequestHeader");
 	
 		ConnectionObject connObj = getConnectionObject(connHandle);
 		connObj.setRequestProperty(key, value);
@@ -442,7 +442,7 @@ public class MoSyncNetwork
 		int address, 
 		int bufSize)
 	{
-		Log.i("MoSyncSyscall", "maHttpGetResponseHeader");
+		//Log.i("MoSyncSyscall", "maHttpGetResponseHeader");
 		
 		ConnectionObject connObj = getConnectionObject(connHandle);
 		return connObj.getResponseHeader(key, address, bufSize);
@@ -450,7 +450,7 @@ public class MoSyncNetwork
 	
 	void maHttpFinish(int connHandle)
 	{
-		Log.i("MoSyncSyscall", "maHttpFinish connHandle: " + connHandle);
+		//Log.i("MoSyncSyscall", "maHttpFinish connHandle: " + connHandle);
 		
 		ConnectionObject connObj = getConnectionObject(connHandle);
 		connObj.startFinishConnectThread();
@@ -458,7 +458,7 @@ public class MoSyncNetwork
 	
 	int maAccept(int connHandle)
 	{
-		Log.i("MoSyncSyscall", "maAccept connHandle = " + connHandle);
+		//Log.i("MoSyncSyscall", "maAccept connHandle = " + connHandle);
 		
 		// Find the connection object. 
 		ConnectionObject connObj = getConnectionObject(connHandle);
@@ -498,8 +498,8 @@ public class MoSyncNetwork
 		synchronized (mConnectionTable)
 		{
 			++mNumberOfOpenConnections;
-			Log.i("@@@ networkAddConnectionObject", 
-				"Number of open connections: " + mNumberOfOpenConnections);
+			//Log.i("@@@ networkAddConnectionObject",
+			//	"Number of open connections: " + mNumberOfOpenConnections);
 			mConnectionTable.put(connObj.mHandle, connObj);
 		}
 	}
@@ -725,12 +725,12 @@ public class MoSyncNetwork
 		 */
 		public synchronized void postResultEvent(int opType, int result)
 		{
-			Log.i("ConnectionObject.postResultEvent", 
-				"mHandle: " + mHandle + 
-				" mState: " + mState + 
-				" opType: " + opType + 
-				" result: " + result + 
-				" connobj (this): " + this);
+			//Log.i("ConnectionObject.postResultEvent",
+			//	"mHandle: " + mHandle +
+			//	" mState: " + mState +
+			//	" opType: " + opType +
+			//	" result: " + result +
+			//	" connobj (this): " + this);
 	
 			// Check that state is ongoing.
 			MYASSERT((mState & opType) != 0);
@@ -744,8 +744,8 @@ public class MoSyncNetwork
 			event[2] = opType;
 			event[3] = result;
 			
-			Log.i("ConnectionObject.postResultEvent", 
-				"Calling nativePostEvent");
+			//Log.i("ConnectionObject.postResultEvent",
+			//	"Calling nativePostEvent");
 			mMoSyncNetwork.postEvent(event);
 		}
 		
@@ -762,15 +762,15 @@ public class MoSyncNetwork
 			
 			if (getInputStream() != null)
 			{
-				Log.i("@@ConnectionObject", "closing input stream");
+				//Log.i("@@ConnectionObject", "closing input stream");
 				getInputStream().close();
-				Log.i("@@ConnectionObject", "closing input stream done");
+				//Log.i("@@ConnectionObject", "closing input stream done");
 			}
 			if (getOutputStream() != null)
 			{
-				Log.i("@@ConnectionObject", "closing output stream");
+				//Log.i("@@ConnectionObject", "closing output stream");
 				getOutputStream().close();
-				Log.i("@@ConnectionObject", "closing output stream done");
+				//Log.i("@@ConnectionObject", "closing output stream done");
 			}
 		}
 		
@@ -825,8 +825,8 @@ public class MoSyncNetwork
 						} 
 						else 
 						{
-							Log.i("@@ConnectionObject", "ConnRead error " 
-								+ result);
+							//Log.i("@@ConnectionObject", "ConnRead error "
+							//	+ result);
 							postResultEvent(opType, CONNERR_INTERNAL);
 						}
 					}
@@ -920,8 +920,8 @@ public class MoSyncNetwork
 						} 
 						else 
 						{
-							Log.i("ConnectionReaderWriter", 
-								"ConnRead error " + result);
+							//Log.i("ConnectionReaderWriter",
+							//	"ConnRead error " + result);
 							postResultEvent(opType, CONNERR_INTERNAL);
 						}
 					}
@@ -1399,7 +1399,7 @@ public class MoSyncNetwork
 				{
 					if (mCancelled) 
 					{
-						Log.i("UrlConnectionObject", "connection canceled");
+						//Log.i("UrlConnectionObject", "connection canceled");
 						postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
 						return;
 					}
@@ -1415,7 +1415,7 @@ public class MoSyncNetwork
 			}
 			catch (UnknownHostException ex)
 			{
-				Log.i("@@@ MoSync", "UnknownHostException");
+				//Log.i("@@@ MoSync", "UnknownHostException");
 				ex.printStackTrace();
 				postResultEvent(CONNOP_FINISH, CONNERR_DNS);
 			}
@@ -1495,7 +1495,7 @@ public class MoSyncNetwork
 			}
 			catch (UnknownHostException ex)
 			{
-				Log.i("@@@ MoSync", "UnknownHostException");
+				//Log.i("@@@ MoSync", "UnknownHostException");
 				ex.printStackTrace();
 				postResultEvent(CONNOP_FINISH, CONNERR_DNS);
 			}
@@ -1635,7 +1635,7 @@ public class MoSyncNetwork
 				if (null == socket)
 				{
 					// Error
-					Log.i("SocketConnectionObject", "socket is null");
+					//Log.i("SocketConnectionObject", "socket is null");
 					postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 					return;
 				}
@@ -1643,7 +1643,7 @@ public class MoSyncNetwork
 				if (!socket.isConnected())
 				{
 					// Error.
-					Log.i("SocketConnectionObject", "socket is not connected");
+					//Log.i("SocketConnectionObject", "socket is not connected");
 					postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 					return;
 				}		
@@ -1655,8 +1655,8 @@ public class MoSyncNetwork
 				{
 					if (mCancelled) 
 					{
-						Log.i("SocketConnectionObject", 
-							"connection was canceled");
+						//Log.i("SocketConnectionObject",
+						//	"connection was canceled");
 						postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
 						return;
 					}
@@ -1689,7 +1689,7 @@ public class MoSyncNetwork
 		Socket createSocket(String socketAddress, int socketPort) 
 			throws IOException, InterruptedIOException
 		{
-			Log.i("SocketConnectionObject", "creating socket");
+			//Log.i("SocketConnectionObject", "creating socket");
 			return new Socket(socketAddress, socketPort);
 		}
 		
@@ -1713,7 +1713,7 @@ public class MoSyncNetwork
 		Socket createSocket(String socketAddress, int socketPort) 
 			throws IOException, InterruptedIOException
 		{
-			Log.i("SecureSocketConnectionObject", "creating secure socket");
+			//Log.i("SecureSocketConnectionObject", "creating secure socket");
 			SocketFactory factory = SSLCertificateSocketFactory.getDefault(
 				SSL_HANDSHAKE_TIMEOUT_MILLIS);
 			return factory.createSocket(socketAddress, socketPort);
@@ -1778,8 +1778,8 @@ public class MoSyncNetwork
 			int handle)
 		throws IOException
 		{
-			Log.i("@@BluetoothConnectionObject", 
-				"createWithBluetoothSocket handle " + handle);
+			//Log.i("@@BluetoothConnectionObject",
+			//	"createWithBluetoothSocket handle " + handle);
 				
 			mHandle = handle;
 			setBluetoothSocketAndOpenStreams(socket);
@@ -1802,8 +1802,8 @@ public class MoSyncNetwork
 		public ConnectionObject create(String url, int handle)
 			throws MalformedURLException, IOException, Exception
 		{
-			Log.i("@@BluetoothConnectionObject", 
-				"create handle " + handle + " url: " + url);
+			//Log.i("@@BluetoothConnectionObject",
+			//	"create handle " + handle + " url: " + url);
 			
 			// Set the handle for this connection.
 			mHandle = handle;
@@ -1845,10 +1845,10 @@ public class MoSyncNetwork
 				throw new MalformedURLException("Malformed URL: " + url);
 			}
 			
-			Log.i("@@BluetoothConnectionObject", 
-				"mDeviceAddress = " + mDeviceAddress);
-			Log.i("@@BluetoothConnectionObject", "mChannel = " + mChannel);
-			Log.i("@@BluetoothConnectionObject", "mUUID = " + mUUID);
+			//Log.i("@@BluetoothConnectionObject",
+			//	"mDeviceAddress = " + mDeviceAddress);
+			//Log.i("@@BluetoothConnectionObject", "mChannel = " + mChannel);
+			//Log.i("@@BluetoothConnectionObject", "mUUID = " + mUUID);
 				
 			return this;
 		}
@@ -1899,8 +1899,8 @@ public class MoSyncNetwork
 		@Override
 		public void closeConnection(boolean softCancel) throws IOException
 		{
-			Log.i("@@BluetoothConnectionObject", 
-				"closing connection handle: " + mHandle);
+			//Log.i("@@BluetoothConnectionObject",
+			//	"closing connection handle: " + mHandle);
 			
 			super.closeConnection(softCancel);
 			
@@ -1912,10 +1912,10 @@ public class MoSyncNetwork
 				
 				if (null != mBluetoothSocket)
 				{
-					Log.i("@@BluetoothConnectionObject", "closing socket");
+					//Log.i("@@BluetoothConnectionObject", "closing socket");
 					mBluetoothSocket.close();
 					mBluetoothSocket = null;
-					Log.i("@@BluetoothConnectionObject", "closing socket done");
+					//Log.i("@@BluetoothConnectionObject", "closing socket done");
 				}
 			}
 			catch (IOException ioException)
@@ -1924,9 +1924,9 @@ public class MoSyncNetwork
 			}
 			catch (RuntimeException runtimeException)
 			{
-				Log.i("@@BluetoothConnectionObject", 
-					"Caught a RuntimeException to prevent further errors, " +
-					"see stack trace:");
+				//Log.i("@@BluetoothConnectionObject",
+				//	"Caught a RuntimeException to prevent further errors, " +
+				//	"see stack trace:");
 				runtimeException.printStackTrace();
 			}
 		}
@@ -1960,7 +1960,7 @@ public class MoSyncNetwork
 		@Override
 		public void startConnectThread()
 		{
-			Log.i("@@BluetoothConnectionObject", "startConnectThread");
+			//Log.i("@@BluetoothConnectionObject", "startConnectThread");
 			
 			sConnectionThreadPool.execute(new Runnable()
 			{
@@ -1989,7 +1989,7 @@ public class MoSyncNetwork
 		
 		public void doConnect()
 		{
-			Log.i("@@BluetoothConnectionObject", "doConnect");
+			//Log.i("@@BluetoothConnectionObject", "doConnect");
 				
 			try
 			{
@@ -1997,27 +1997,27 @@ public class MoSyncNetwork
 					getMoSyncBluetooth().getBluetoothAdapter();
 				if (null == adapter)
 				{
-					Log.i("@@BluetoothConnectionObject", 
-						"Bluetooth adapter not found");
+					//Log.i("@@BluetoothConnectionObject",
+					//	"Bluetooth adapter not found");
 					postResultEvent(CONNOP_CONNECT, CONNERR_UNAVAILABLE);
 					return;
 				}
-				Log.i("@@BluetoothConnectionObject", "Bluetooth adapter FOUND");
+				//Log.i("@@BluetoothConnectionObject", "Bluetooth adapter FOUND");
 				
 				BluetoothDevice device = 
 					getMoSyncBluetooth().btGetBluetoothDevice(mDeviceAddress);
 				if (null == device)
 				{
-					Log.i("@@BluetoothConnectionObject", 
-						"Device not found at address: " + mDeviceAddress);
+					//Log.i("@@BluetoothConnectionObject",
+					//	"Device not found at address: " + mDeviceAddress);
 					postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 					return;
 				}
 				
 				if (mIsChannelClientConnectionRequest)
 				{
-					Log.i("@@BluetoothConnectionObject", 
-						"mIsChannelClientConnectionRequest");
+					//Log.i("@@BluetoothConnectionObject",
+					//	"mIsChannelClientConnectionRequest");
 					
 					// Get undocumented method via reflection 
 					// to connect to a channel.
@@ -2026,8 +2026,8 @@ public class MoSyncNetwork
 						new Class[] { int.class });
 					if (null == createRfcommSocket)
 					{
-						Log.i("@@BluetoothConnectionObject", 
-							"Could not find method createRfcommSocket");
+						//Log.i("@@BluetoothConnectionObject",
+						//	"Could not find method createRfcommSocket");
 						postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 						return;
 					}
@@ -2036,8 +2036,8 @@ public class MoSyncNetwork
 						createRfcommSocket.invoke(device, mChannel);
 					if (null == socket)
 					{
-						Log.i("@@BluetoothConnectionObject", 
-							"Could not create socket via createRfcommSocket");
+						//Log.i("@@BluetoothConnectionObject",
+						//	"Could not create socket via createRfcommSocket");
 						postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 						return;
 					}
@@ -2045,52 +2045,52 @@ public class MoSyncNetwork
 				}
 				else if (mIsUUIDClientConnectionRequest)
 				{
-					Log.i("@@BluetoothConnectionObject", 
-						"mIsUUIDClientConnectionRequest");
+					//Log.i("@@BluetoothConnectionObject",
+					//	"mIsUUIDClientConnectionRequest");
 					String uuid = 
 						getMoSyncBluetooth().formatServiceUUID(mUUID);
-					Log.i("@@BluetoothConnectionObject", 
-						"Connecting to service uuid: " + uuid);
+					//Log.i("@@BluetoothConnectionObject",
+					//	"Connecting to service uuid: " + uuid);
 					BluetoothSocket socket = 
 						device.createRfcommSocketToServiceRecord(
 							java.util.UUID.fromString(uuid));
 					if (null == socket)
 					{
-						Log.i("@@BluetoothConnectionObject", 
-							"handle: " 
-							+ mHandle 
-							+ " No socket created via"
-							+ " createRfcommSocketToServiceRecord");
+						//Log.i("@@BluetoothConnectionObject",
+						//	"handle: "
+						//	+ mHandle
+						//	+ " No socket created via"
+						//	+ " createRfcommSocketToServiceRecord");
 						postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 						return;
 					}
 					setBluetoothSocketAndOpenStreams(socket);
 				}
 				
-				Log.i("@@BluetoothConnectionObject", "connect 1");
+				//Log.i("@@BluetoothConnectionObject", "connect 1");
 				getBluetoothSocket().connect();
-				Log.i("@@BluetoothConnectionObject", "connect 2");
+				//Log.i("@@BluetoothConnectionObject", "connect 2");
 					
 				postResultEvent(CONNOP_CONNECT, CONNOP_CONNECT_SUCCESS);
 			}
 			catch (InterruptedIOException ex)
 			{
-				Log.i("@@BluetoothConnectionObject", 
-					"InterruptedIOException " + ex);
+				//Log.i("@@BluetoothConnectionObject",
+				//	"InterruptedIOException " + ex);
 				ex.printStackTrace();
 				postResultEvent(CONNOP_CONNECT, CONNERR_CANCELED);
 				return;
 			}
 			catch (IOException ex)
 			{
-				Log.i("@@BluetoothConnectionObject", "IOException " + ex);
+				//Log.i("@@BluetoothConnectionObject", "IOException " + ex);
 				ex.printStackTrace();
 				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 				return;
 			}
 			catch (Exception ex)
 			{
-				Log.i("@@BluetoothConnectionObject", "Exception " + ex);
+				//Log.i("@@BluetoothConnectionObject", "Exception " + ex);
 				ex.printStackTrace();
 				postResultEvent(CONNOP_CONNECT, CONNERR_GENERIC);
 				return;
@@ -2129,8 +2129,8 @@ public class MoSyncNetwork
 		public ConnectionObject create(String url, int handle)
 			throws MalformedURLException, IOException, Exception
 		{
-			Log.i("@@BluetoothServerConnectionObject", 
-				"create handle : " + handle + " url: " + url);
+			//Log.i("@@BluetoothServerConnectionObject",
+			//	"create handle : " + handle + " url: " + url);
 			
 			// Set the handle for this connection.
 			mHandle = handle;
@@ -2153,10 +2153,10 @@ public class MoSyncNetwork
 				mServiceName = splitUrl[1];
 			}
 			
-			Log.i("@BT", "realServerUrl = " + realUrl);
-			Log.i("@BT", "splitUrl.length = " + splitUrl.length);
-			Log.i("@BT", "mUUID = " + mUUID);
-			Log.i("@BT", "mServiceName = " + mServiceName);
+			//Log.i("@BT", "realServerUrl = " + realUrl);
+			//Log.i("@BT", "splitUrl.length = " + splitUrl.length);
+			//Log.i("@BT", "mUUID = " + mUUID);
+			//Log.i("@BT", "mServiceName = " + mServiceName);
 				
 			return this;
 		}
@@ -2181,8 +2181,8 @@ public class MoSyncNetwork
 		@Override
 		public void closeConnection(boolean softCancel) throws IOException
 		{
-			Log.i("@@BluetoothServerConnectionObject", 
-				"closing connection handle: " + mHandle);
+			//Log.i("@@BluetoothServerConnectionObject",
+			//	"closing connection handle: " + mHandle);
 			
 			try
 			{
@@ -2235,8 +2235,8 @@ public class MoSyncNetwork
 		{
 			try
 			{
-				Log.i("@@BluetoothServerConnectionObject", 
-					"connect handle: " + mHandle);
+				//Log.i("@@BluetoothServerConnectionObject",
+				//	"connect handle: " + mHandle);
 				
 				// Do NOT post a connect event when creating a server 
 				// with maConnect.
@@ -2247,8 +2247,8 @@ public class MoSyncNetwork
 					getMoSyncBluetooth().getBluetoothAdapter();
 				if (null == adapter)
 				{
-					Log.i("@@BluetoothServerConnectionObject", 
-						"Bluetooth adapter not found");
+					//Log.i("@@BluetoothServerConnectionObject",
+					//	"Bluetooth adapter not found");
 					// Should NOT post event.
 					//postResultEvent(CONNOP_ACCEPT, CONNERR_UNAVAILABLE); 
 					return CONNERR_UNAVAILABLE;
@@ -2284,8 +2284,8 @@ public class MoSyncNetwork
 		@Override
 		public int startAcceptThread()
 		{
-			Log.i("@@BluetoothServerConnectionObject", 
-				"startAcceptThread handle: " + mHandle);
+			//Log.i("@@BluetoothServerConnectionObject",
+			//	"startAcceptThread handle: " + mHandle);
 			
 			// Must do this before spawning thread, cannot do
 			// this in thread code, because the it is too late.
@@ -2309,9 +2309,9 @@ public class MoSyncNetwork
 					catch (Exception ex)
 					{
 						postResultEvent(CONNOP_ACCEPT, CONNERR_CANCELED);
-						Log.i("@@BluetoothServerConnectionObject", 
-							"startAcceptThread handle: " + mHandle + 
-							" exception: " + ex);
+						//Log.i("@@BluetoothServerConnectionObject",
+						//	"startAcceptThread handle: " + mHandle +
+						//	" exception: " + ex);
 						ex.printStackTrace();
 					}
 				}
@@ -2327,8 +2327,8 @@ public class MoSyncNetwork
 		{
 			BluetoothSocket socket = null;
 			
-			Log.i("@@BluetoothServerConnectionObject", 
-				"doAccept handle: " + mHandle);
+			//Log.i("@@BluetoothServerConnectionObject",
+			//	"doAccept handle: " + mHandle);
 	
 			// Accept. Will block. Terminate by calling close  
 			// on the server socket.
@@ -2341,9 +2341,9 @@ public class MoSyncNetwork
 				if (mCancelled)
 				{
 					// The server socket was closed.
-					Log.i("@@BluetoothServerConnectionObject", 
-						"Server socket was closed, mCancelled == true, "
-						+ " handle: " + mHandle);
+					//Log.i("@@BluetoothServerConnectionObject",
+					//	"Server socket was closed, mCancelled == true, "
+					//	+ " handle: " + mHandle);
 					postResultEvent(CONNOP_ACCEPT, CONNERR_CANCELED);
 					return;
 				}
@@ -2359,8 +2359,8 @@ public class MoSyncNetwork
 				}
 			}
 			
-			Log.i("@@BluetoothServerConnectionObject", 
-				"doAccept; socket accepted handle: " + mHandle);
+			//Log.i("@@BluetoothServerConnectionObject",
+			//	"doAccept; socket accepted handle: " + mHandle);
 
 			// TODO: Delete this commented out test code.
 			// Write mock data for testing.
@@ -2379,9 +2379,9 @@ public class MoSyncNetwork
 			
 			try
 			{
-				Log.i("@@BluetoothServerConnectionObject", 
-					"doAccept - create BluetoothConnectionObject handle: " 
-					+ newConnHandle);
+				//Log.i("@@BluetoothServerConnectionObject",
+				//	"doAccept - create BluetoothConnectionObject handle: "
+				//	+ newConnHandle);
 				
 				// Create new connection object. The connection object is
 				// added to the connections table in createWithBluetoothSocket.
@@ -2397,14 +2397,14 @@ public class MoSyncNetwork
 				return;
 			}
 			
-			Log.i("@@BluetoothServerConnectionObject", 
-				"doAccept - post event handle: " + mHandle);
+			//Log.i("@@BluetoothServerConnectionObject",
+			//	"doAccept - post event handle: " + mHandle);
 			
 			// Post result event on server handle.
 			postResultEvent(CONNOP_ACCEPT, newConnHandle);
 			
-			Log.i("@@BluetoothServerConnectionObject", 
-				"doAccept - done handle: " + mHandle);
+			//Log.i("@@BluetoothServerConnectionObject",
+			//	"doAccept - done handle: " + mHandle);
 		}
 		
 	} // End of class BluetoothServerConnectionObject

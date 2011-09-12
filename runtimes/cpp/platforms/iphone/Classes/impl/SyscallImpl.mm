@@ -41,7 +41,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MoSyncUISyscalls.h"
 #import "CameraPreviewWidget.h"
 #import "CameraConfirgurator.h"
-
+#import "ImagePickerController.h"
 #include "netImpl.h"
 
 #define NETWORKING_H
@@ -322,6 +322,7 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
+        [ImagePickerController deleteInstance];
 	}
 
 

@@ -21,7 +21,7 @@ MA 02110-1301, USA.
  * @author Emma Tresanszki
  *
  * Class for number picker.
- * NOTE: This widget is available for Android only from level 11.
+ * NOTE: This widget is available on iOS for the moment.
  */
 
 #ifndef NATIVEUI_NUMBER_PICKER_H_
@@ -38,9 +38,7 @@ namespace NativeUI
 	/**
 	 * A Number Picker is a widget that enables the user to select a number
 	 * from a predefined range.
-	 * Note that this type of widget is available on Android since API level 11,
-	 * so instantiating it on an older device will return a
-	 * MAW_RES_FEATURE_NOT_AVAILABLE error code.
+	 * Note that this type of widget is available only on iOS for the moment.
 	 */
 	class NumberPicker : public Widget
 	{

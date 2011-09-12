@@ -17,38 +17,43 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file RelativeLayout.h
+ * @file Layout.cpp
  * @author Emma Tresanszki
  *
- * Class for relative layout of widgets.
+ * Class for layouts.
  */
 
-#ifndef NATIVEUI_RELATIVE_LAYOUT_H_
-#define NATIVEUI_RELATIVE_LAYOUT_H_
-
-#include "Widget.h"
 #include "Layout.h"
+#include "WidgetUtil.h"
 
 namespace NativeUI
 {
-	/**
-	 * A relative layout is a layout that layouts widgets relative
-	 * to its coordinate system.
-	 */
-	class RelativeLayout : public Layout
-	{
-	public:
-		/**
-		 * Constructor.
-		 */
-		RelativeLayout();
 
-		/**
-		 * Destructor.
-		 */
-		virtual ~RelativeLayout();
-	};
+    /**
+     * Constructor is protected because actual widget instances
+     * should be subclasses of this class.
+     * @widgetType The string constant that identifies the widget type
+     *             (one of the MAW_ constants).
+     */
+    Layout::Layout(const MAUtil::String& widgetType) :
+        Widget(widgetType)
+    {
+    }
+
+    /**
+     * Destructor.
+     */
+    Layout::~Layout()
+     {
+     }
+
+	/**
+	 * Sets whether the layout can be scrollable or not.
+	 * @param If true, the layout can be scrollable.
+	 */
+    void Layout::setScrollable(const bool isScrollable)
+    {
+		setProperty("isScrollable", (isScrollable ? "true" : "false") );
+    }
 
 } // namespace NativeUI
-
-#endif
