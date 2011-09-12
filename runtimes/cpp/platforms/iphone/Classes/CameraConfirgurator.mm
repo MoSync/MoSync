@@ -18,34 +18,37 @@
 			if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_ON]]) {
 				if ([device isFlashModeSupported:AVCaptureFlashModeOn]) {
 					device.flashMode = AVCaptureFlashModeOn;
-				}
-				if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
 					device.torchMode = AVCaptureTorchModeOff;
 				}
-
+				else {
+					result = MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+				}
 			}
 			else if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_OFF]]) {
 					if ([device isFlashModeSupported:AVCaptureFlashModeOff]) {
 						device.flashMode = AVCaptureFlashModeOff;
-					}
-					if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
 						device.torchMode = AVCaptureTorchModeOff;
+					}
+					else {
+						result = MA_CAMERA_RES_VALUE_NOTSUPPORTED;
 					}
 			}
 			else if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_AUTO]]) {
 					if ([device isFlashModeSupported:AVCaptureFlashModeAuto]) {
 						device.flashMode = AVCaptureFlashModeAuto;
-					}
-					if ([device isTorchModeSupported:AVCaptureTorchModeOff]) {
 						device.torchMode = AVCaptureTorchModeOff;
+					}
+					else {
+						result = MA_CAMERA_RES_VALUE_NOTSUPPORTED;
 					}
 			}
 			else if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_TORCH]]) {
-					if ([device isFlashModeSupported:AVCaptureFlashModeOff]) {
-						device.flashMode = AVCaptureFlashModeOff;
-					}
 					if ([device isTorchModeSupported:AVCaptureTorchModeOn]) {
+						device.flashMode = AVCaptureFlashModeOff;
 						device.torchMode = AVCaptureTorchModeOn;
+					}
+					else {
+						result = MA_CAMERA_RES_VALUE_NOTSUPPORTED;
 					}
 			}
 			else {
@@ -66,7 +69,7 @@
 				}
 			}
 			else {
-				result = MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+				result = MA_CAMERA_RES_INVALID_PROPERTY_VALUE;
 			}
 
 		}
@@ -125,6 +128,10 @@
 			else {
 				result = [NSString stringWithUTF8String:MA_CAMERA_FOCUS_AUTO];
 			}
+		}
+		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_MAX_ZOOM]])
+		{
+			result = @"0";
 		}
 		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_ZOOM_SUPPORTED]])
 		{

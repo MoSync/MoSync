@@ -24,7 +24,6 @@
 @implementation ScreenWidget
 
 - (id)init {
-	//if(!controller && [self class] == [ScreenWidget class])
 	UIViewController* c = [[ScreenWidgetController alloc] init];
 	return [self initWithController:c];
 }
@@ -33,14 +32,15 @@
 	controller = _controller;
 	controller.title = @"";
 	view = controller.view;
-	//view.bounds = [[UIScreen mainScreen] bounds];
 	return [super init];
 }
 
-- (void)addChild: (IWidget*)child {
-	//if(!parent)
-	//	[child getView].frame = [[UIScreen mainScreen] bounds];
+- (void)dealloc {
+    [controller release];
+    [super dealloc];
+}
 
+- (void)addChild: (IWidget*)child {
 	[super addChild:child];
 }
 

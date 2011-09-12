@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -16,10 +17,7 @@ MA 02110-1301, USA.
 */
 
 /*
- * PhotoAlbum.h
- *
- *  Created on: Jul 1, 2011
- *      Author: gabi
+ * Album.h
  */
 
 #ifndef PHOTOALBUM_H_
@@ -80,12 +78,12 @@ public:
 	int getCount() const;
 
 private:
-	IdNamePair mFrom;
-	MAUtil::String mName;
-	MAUtil::String mDescription;
-	MAUtil::String mLink;
-	MAUtil::String mCoverPhotoId;
-	int mCount;
+	IdNamePair			mFrom;
+	MAUtil::String		mName;
+	MAUtil::String		mDescription;
+	MAUtil::String		mLink;
+	MAUtil::String		mCoverPhotoId;
+	int					mCount;
 };
 
 #endif /* PHOTOALBUM_H_ */

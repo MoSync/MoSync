@@ -32,7 +32,11 @@ MA 02110-1301, USA.
 #define BUFFER_SIZE						50
 #define BG_COLOR						0
 #define TEXT_COLOR						0xFF0000
-#define TEXT_SIZE						12
+#define FONT_ID							3
+#define BASE_SCREEN_WIDTH				240
+#define SCALE_FACTOR 					(gScreenWidth / BASE_SCREEN_WIDTH)
+#define TEXT_SIZE						(10 * SCALE_FACTOR)
+#define OFFSET_X						(10 * SCALE_FACTOR)
 #define OFFSET_Y						20
 
 // useful texts

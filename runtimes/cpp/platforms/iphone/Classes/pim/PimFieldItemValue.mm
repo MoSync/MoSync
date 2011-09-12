@@ -75,9 +75,7 @@
 /**
  * Set the label value.
  * @param label The new label's value.
- * @return MA_PIM_ERR_NONE is the label was set, or
- *		 MA_PIM_ERR_CUSTOM_ATTRIBUTE if the attibute
- *		 is not set to custom.
+ * @return One of the MA_PIM_ERR constants.
  */
 -(int) setLabel:(NSString*) label
 {

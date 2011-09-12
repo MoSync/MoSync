@@ -40,6 +40,7 @@ MainScreen::MainScreen() :
 	mEditBox(NULL),
 	mSetValueButton(NULL),
 	mGetValueButton(NULL),
+	mGetValueLabel(NULL),
 	mIncreaseValueButton(NULL),
 	mDecreseValueButton(NULL)
 {
@@ -62,8 +63,6 @@ MainScreen::~MainScreen()
     mIncreaseValueButton->removeButtonListener(NULL);
     mDecreseValueButton->removeButtonListener(NULL);
     mSlider->removeSliderListener(this);
-
-	delete mMainLayout;
 }
 
 /**
@@ -93,6 +92,9 @@ void MainScreen::createMainLayout() {
     mGetValueButton->setText("get value");
     mMainLayout->addChild(mGetValueButton);
 
+    mGetValueLabel = new Label();
+    mMainLayout->addChild(mGetValueLabel);
+
 	mIncreaseValueButton = new Button();
 	mIncreaseValueButton->setText("increase value with 10");
 	mMainLayout->addChild(mIncreaseValueButton);
@@ -119,6 +121,7 @@ void MainScreen::buttonClicked(Widget* button)
     }
     else if (button == mGetValueButton)
     {
+		mGetValueLabel->setText(MAUtil::integerToString(mSlider->getValue()));
         int value = mSlider->getValue();
         printf("slier's value = %d", value);
     }

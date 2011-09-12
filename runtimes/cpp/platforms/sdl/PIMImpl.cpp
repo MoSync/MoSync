@@ -955,11 +955,11 @@ MAHandle Syscall::maPimListOpen(int listType) {
 			delete cl;
 			ContactParser::sCL = NULL;
 			SAFE_DELETE(ContactParser::sCI);
-			return MA_PIM_ERR_UNAVAILABLE_LIST;
+			return MA_PIM_ERR_LIST_UNAVAILABLE;
 		}
 		pl = cl;
 	} else {
-		return MA_PIM_ERR_UNAVAILABLE_LIST;
+		return MA_PIM_ERR_LIST_UNAVAILABLE;
 	}
 	mPimLists.insert(mPimListNextHandle, pl);
 	return mPimListNextHandle++;

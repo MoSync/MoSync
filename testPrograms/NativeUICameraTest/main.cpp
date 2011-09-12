@@ -73,6 +73,7 @@ public:
 		mNumSuccess = 0;
 		testIndex = 0;
 		mCameraStarted = false;
+		mNativeUIRunning = true;
 	}
 
 	/**
@@ -89,9 +90,7 @@ public:
 	void myAssert(const char * testName, int cameraResult)
 	{
 
-		if((cameraResult == MA_CAMERA_RES_OK) ||
-				(cameraResult == MA_CAMERA_RES_PROPERTY_NOTSUPPORTED) ||
-				(cameraResult == MA_CAMERA_RES_VALUE_NOTSUPPORTED))
+		if(cameraResult == MA_CAMERA_RES_OK)
 		{
 			mNumSuccess++;
 			sprintf(testList[testIndex], "%s, %s", testName, "Pass");
@@ -100,7 +99,7 @@ public:
 		else
 		{
 			mNumFailure++;
-			sprintf(testList[testIndex], "%s, %s", testName, "Pass");
+			sprintf(testList[testIndex], "%s, %s", testName, "Fail");
 			testIndex++;
 		}
 
@@ -547,6 +546,7 @@ public:
 		{
 			printf(testList[ii]);
 		}
+		mNativeUIRunning = false;
 	}
 
 
@@ -591,6 +591,11 @@ public:
 					mLastPic);
 
 		}
+	}
+
+	bool isNativeUIRunning()
+	{
+		return mNativeUIRunning;
 	}
 
 private:
@@ -662,6 +667,8 @@ private:
 	char testList[256][256];
 
 	int testIndex;
+
+	bool mNativeUIRunning;
 };
 
 // That's the screen class finished, now we move on to the Moblet that
@@ -703,6 +710,15 @@ public:
 	{
 		// Close the application if the back key or key 0 is pressed.
 		if (MAK_BACK == keyCode || MAK_0 == keyCode)
+		{
+			// Call close to exit the application.
+			close();
+		}
+	}
+
+	virtual void pointerPressEvent(MAPoint2d p)
+	{
+		if(!mAppScreen->isNativeUIRunning())
 		{
 			// Call close to exit the application.
 			close();

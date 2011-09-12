@@ -46,7 +46,7 @@ using namespace MoSyncError;
  */
 -(int) count
 {
-   return [mFieldsDictionary count];
+	return [mFieldsDictionary count];
 }
 
 /**
@@ -116,11 +116,12 @@ using namespace MoSyncError;
 
 /**
  * Sets a custom label for a given field value.
+ * Does not check if field is supported or valid.
  * @param args Common arguments.
- *			 The item's handle is stored in args.item.
- *			 The field's ID is stored in args.field.
- *			 The custom label's value is stored in args.buf.
- *			 The size of the value(in bytes) is stored in args.bufSize.
+ *	The item's handle is stored in args.item.
+ *	The field's ID is stored in args.field.
+ *	The custom label's value is stored in args.buf.
+ *	The size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @return One of the MA_PIM_ERR constants.
  */
@@ -163,7 +164,7 @@ using namespace MoSyncError;
 	 indexValue:(const int) index
 {
 	int returnValue = MA_PIM_ERR_NONE;
-	NSString* customLabel = [[NSString alloc] init];
+	NSMutableString* customLabel = [[NSMutableString alloc] init];
 	PimUtils* utils = [PimUtils sharedInstance];
 	void* address = [utils getValidatedMemRange:(int)args->buf withSize: args->bufSize];
 	int field = args->item;
@@ -179,7 +180,7 @@ using namespace MoSyncError;
 	// If no error occurred write custom label's value.
 	if (MA_PIM_ERR_NONE == returnValue)
 	{
-		[[PimUtils sharedInstance] writeString:customLabel
+		returnValue = [[PimUtils sharedInstance] writeString:customLabel
 			atAddress:address
 			maxSize:args->bufSize];
 	}
@@ -192,14 +193,14 @@ using namespace MoSyncError;
  * Gets a field's value at a given index.
  * Does not check if field is supported or write-only.
  * @param args Common arguments.
- *			 The item's handle is stored in args.item.
- *			 The field's ID is stored in args.field.
- *			 The field's value will be stored in args.buf.
- *			 The maximum size of the value(in bytes) is stored in args.bufSize.
+ *	The item's handle is stored in args.item.
+ *	The field's ID is stored in args.field.
+ *	The field's value will be stored in args.buf.
+ *	The maximum size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @return The number of bytes occupied by the value. If the number is greater than
- *		 args.bufSize the value was not written into args.buf.
- *		 In case of error the function returns one of the MA_PIM_ERR constants.
+ *	args.bufSize the value was not written into args.buf.
+ *	In case of error the function returns one of the MA_PIM_ERR constants.
  */
 -(int) getValue:(const MA_PIM_ARGS*) args
 	 indexValue:(const int) index
@@ -232,11 +233,10 @@ using namespace MoSyncError;
 			break;
 		case MA_PIM_TYPE_DATE:
 			returnValue = [utils writeDate:[valuesArray objectAtIndex:0]
-				atAddress:address
-				maxSize:args->bufSize];
+                                 atAddress:address];
 			break;
 		case MA_PIM_TYPE_INT:
-			DEBIG_PHAT_ERROR;
+			returnValue = [utils writeIntValue:[valuesArray objectAtIndex:0] atAddress:address];
 			break;
 		case MA_PIM_TYPE_STRING:
 			returnValue = [utils writeString:[valuesArray objectAtIndex:0]
@@ -259,17 +259,17 @@ using namespace MoSyncError;
  * Sets a field's value and attribute at a given index.
  * Does not check if field is supported or write-only.
  * @param args Common arguments.
- *			 The item's handle is stored in args.item.
- *			 The field's ID is stored in args.field.
- *			 The field's value is stored in args.buf.
- *			 The size of the value(in bytes) is stored in args.bufSize.
+ *	The item's handle is stored in args.item.
+ *	The field's ID is stored in args.field.
+ *	The field's value is stored in args.buf.
+ *	The size of the value(in bytes) is stored in args.bufSize.
  * @param index Field's value index.
  * @param attribute Field's value attribute.
  * @return One of the MA_PIM_ERR constants.
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
-	 indexValue:(const int) index
- valueAttribute:(const int) atttribute
+	indexValue:(const int) index
+	valueAttribute:(const int) attribute
 {
 	int returnValue;
 	int field = args->field;
@@ -296,28 +296,33 @@ using namespace MoSyncError;
 	{
 		case MA_PIM_TYPE_BINARY:
 			DEBIG_PHAT_ERROR;
-			break;
 		case MA_PIM_TYPE_BOOLEAN:
 			DEBIG_PHAT_ERROR;
-			break;
 		case MA_PIM_TYPE_DATE:
 			valuesArray = [utils getDate:address];
 			break;
-		case MA_PIM_TYPE_INT:
-			DEBIG_PHAT_ERROR;
-			break;
 		case MA_PIM_TYPE_STRING:
-			valuesArray = [utils getString:address];
+			valuesArray = [utils getString:address withSize:args->bufSize];
+			break;
+		case MA_PIM_TYPE_INT:
+			valuesArray = [utils getIntValue:address];
 			break;
 		case MA_PIM_TYPE_STRING_ARRAY:
-			valuesArray = [utils getStringArray:address];
+			valuesArray = [utils getStringArray:address forFieldID:field withSize:args->bufSize];
 			break;
 		default:
-			break;
+			DEBIG_PHAT_ERROR;
 	}
 
 	returnValue = [itemField setValue:valuesArray atIndex:index
-		withAttribute:atttribute];
+		withAttribute:attribute];
+
+	// Modify item's status if it's imported.
+	if (MA_PIM_ERR_NONE == returnValue &&
+		mItemStatus == kImportedItem)
+	{
+		mItemStatus = kModifiedItem;
+	}
 
 	return returnValue;
 }
@@ -368,10 +373,8 @@ using namespace MoSyncError;
 	{
 		case MA_PIM_TYPE_BINARY:
 			DEBIG_PHAT_ERROR;
-			break;
 		case MA_PIM_TYPE_BOOLEAN:
 			DEBIG_PHAT_ERROR;
-			break;
 		case MA_PIM_TYPE_DATE:
 			valuesArray = [utils getDate:address];
 			break;
@@ -379,26 +382,36 @@ using namespace MoSyncError;
 			valuesArray = [utils getIntValue:address];
 			break;
 		case MA_PIM_TYPE_STRING:
-			valuesArray = [utils getString:address];
+			valuesArray = [utils getString:address withSize:args->bufSize];
 			break;
 		case MA_PIM_TYPE_STRING_ARRAY:
-			valuesArray = [utils getStringArray:address];
+			valuesArray = [utils getStringArray:address forFieldID:field withSize:args->bufSize];
 			break;
 		default:
-			break;
+			DEBIG_PHAT_ERROR;
 	}
 
-	return [itemField addValue:valuesArray withAttribute:attribute];
+	int returnValue = [itemField addValue:valuesArray withAttribute:attribute];
+
+	// Modify item's status if it's imported.
+	if (MA_PIM_ERR_NONE == returnValue &&
+		mItemStatus == kImportedItem)
+	{
+		mItemStatus = kModifiedItem;
+	}
+
+	return returnValue;
 }
 
 /**
  * Removes a value from a field.
+ * Does not check if the field is valid or supported.
  * @param field One of the MA_PIM_FIELD constants.
  * @param index Field's value index.
  * @return One of MA_PIM_ERR constants.
  */
 -(int) removeValue:(const int) field
-		   atIndex:(const int) index
+	atIndex:(const int) index
 {
 	NSString* key = [[NSString alloc] initWithFormat:@"%d",field];
 	PimFieldItem* itemField = [mFieldsDictionary objectForKey:key];

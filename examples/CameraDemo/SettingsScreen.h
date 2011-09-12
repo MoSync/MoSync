@@ -26,15 +26,19 @@ MA 02110-1301, USA.
 
 // Include MoSync syscalls.
 #include <maapi.h>
-#include <IX_WIDGET.h>
+
+// Include NativeUI class interface
+#include <NativeUI/Widgets.h>
+
 #ifndef SETTINGSSCREEN_H_
 #define SETTINGSSCREEN_H_
 
+using namespace NativeUI;
 
 /**
  * A class that encapsulates the behavior of Settings Screen
  */
-class SettingsScreen
+class SettingsScreen : public ButtonListener
 {
 public:
 	SettingsScreen():currentCamera(0)
@@ -43,20 +47,18 @@ public:
 	}
 	virtual ~SettingsScreen()
 	{
-		maWidgetDestroy(mScreen);
+		delete mScreen;
 	}
 
-	void customEvent(const MAEvent& event);
+	virtual void buttonClicked(Widget* button);
 
-	int initialize(MAHandle stackScreen, MAHandle previewWidget);
+	int initialize(StackScreen* stackScreen, CameraPreview* previewWidget);
 
 	void pushSettingsScreen();
 
 	int getCurrentCamera();
 
 	char * getFLashMode();
-
-	bool isViewed;
 
 	bool flashSupported;
 
@@ -68,21 +70,19 @@ private:
 
 	char * getModeForIndex(int index);
 
-	MAHandle mScreen;
+	Screen *mScreen;
 
-	MAHandle mflashTitle;
+	Button *mSwapCameraButton;
 
-	MAHandle mSwapCameraButton;
+	Button *mOKButton;
 
-	MAHandle mOKButton;
+	Button *mFlashModeButton;
 
-	MAHandle mFlashModeButton;
+	VerticalLayout *mMainLayoutWidget;
 
-	MAHandle mMainLayoutWidget;
+	StackScreen *mStackScreen;
 
-	MAHandle mStackScreen;
-
-	MAHandle mPreviewWidget;
+	CameraPreview *mPreviewWidget;
 
 	int flashModeIndex;
 

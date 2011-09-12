@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,19 +18,15 @@ MA 02110-1301, USA.
 
 /*
  * HTTPProtocol.cpp
- *
- *  Created on: Feb 23, 2011
- *      Author: Magnus Hult <magnus@magnushult.se>
  */
 
 #include <MAUtil/String.h>
 #include <MAUtil/Map.h>
 #include <mavsprintf.h>
-#include <maassert.h>
 
 #include "HttpQueryDownloader.h"
 #include "HttpProtocol.h"
-#include "LOG.h"
+#include "../LOG.h"
 
 using namespace MAUtil;
 
@@ -38,7 +35,8 @@ HttpProtocol::HttpProtocol() {
 
 void HttpProtocol::request(HttpRequest* req)
 {
-	HttpQueryDownloader* downloader = new HttpQueryDownloader(false);
+
+	HttpQueryDownloader* downloader = new HttpQueryDownloader();
 	// We store the mapping downloader -> request to be able to give the
 	// request instead of the downloader to the listener
 	mRequests[downloader] = req;
@@ -51,7 +49,7 @@ void HttpProtocol::request(HttpRequest* req)
 
 void HttpProtocol::request(UploadRequest* req)
 {
-	HttpQueryDownloader* downloader = new HttpQueryDownloader(false);
+	HttpQueryDownloader* downloader = new HttpQueryDownloader();
 	// We store the mapping downloader -> request to be able to give the
 	// request instead of the downloader to the listener
 	mRequests[downloader] = req;
@@ -67,20 +65,20 @@ void HttpProtocol::addListener(HttpProtocolListener* listener) {
 }
 
 void HttpProtocol::httpQueryFinished(HttpQueryDownloader *downloader,
-	const byte* data, int length)
+		const byte* data, int length)
 {
 	HttpRequest *req = getRequest(downloader);
-	HttpResponse *response = new HttpResponse(200, length, data);
+	HttpResponse *res = new HttpResponse(200, length, data);
 
 	for (int i = 0; i < mListeners.size(); i++) {
-		mListeners[i]->response(req, response);
+		mListeners[i]->response(req, res);
 	}
 
-	delete response;
 	delete downloader;
 }
 
-void HttpProtocol::httpQueryCancelled(HttpQueryDownloader *downloader) {
+void HttpProtocol::httpQueryCancelled(HttpQueryDownloader *downloader)
+{
 	HttpRequest *req = getRequest(downloader);
 
 	for (int i = 0; i < mListeners.size(); i++) {
@@ -90,27 +88,24 @@ void HttpProtocol::httpQueryCancelled(HttpQueryDownloader *downloader) {
 	delete downloader;
 }
 
-void HttpProtocol::httpQueryError(HttpQueryDownloader *downloader, int code) {
+void HttpProtocol::httpQueryError(HttpQueryDownloader *downloader, int code)
+{
+	LOG("\n\tHttpProtocol::httpQueryError code = %d", code);
+
 	HttpRequest *req = getRequest(downloader);
-	HttpResponse *response = new HttpResponse(code);
+	HttpResponse *res = new HttpResponse(code);
 
 	for (int i = 0; i < mListeners.size(); i++) {
-		mListeners[i]->response(req, response);
+		mListeners[i]->response(req, res);
 	}
 
 	mRequests.erase(downloader);
-	delete response;
-	delete downloader;
+	//delete downloader;
 }
 
-void HttpProtocol::httpQueryFinished(HttpQueryDownloader* downloader, MAHandle resource) {
-	PANIC_MESSAGE("not implemented");
-}
-void HttpProtocol::httpWriteFinished(HttpQueryDownloader* downloader, int code) {
-	PANIC_MESSAGE("not implemented");
-}
+HttpRequest* HttpProtocol::getRequest(HttpQueryDownloader* downloader)
+{
 
-HttpRequest* HttpProtocol::getRequest(HttpQueryDownloader* downloader) {
 	HttpRequest *req = mRequests[downloader];
 	if (req == NULL)
 		maPanic(1, "No request found");

@@ -35,7 +35,7 @@ using namespace MoSyncError;
 /**
  * Opens a pim list.
  * @param listType One of MA_PIM constants.
- * @return A pim list handle, or MA_PIM_ERR_UNAVAILABLE_LIST in case of error.
+ * @return A pim list handle, or one of MA_PIM_ERR constants in case of error
  */
 -(MAHandle) pimListOpen:(const int) listType
 {
@@ -54,7 +54,7 @@ using namespace MoSyncError;
 	}
 	else
 	{
-		return MA_PIM_ERR_UNAVAILABLE_LIST;
+		return MA_PIM_ERR_LIST_UNAVAILABLE;
 	}
 }
 
@@ -62,7 +62,7 @@ using namespace MoSyncError;
  * Gets a handle to the next pim item in the specified list.
  * @param list The specified list.
  * @return A handle to the next item, or 0 if there are no more items,
- * or one of MA_PIM_ERR_ in case of error.
+ * or one of MA_PIM_ERR in case of error.
  */
 -(MAHandle) pimListNext:(MAHandle) list
 {
@@ -97,11 +97,6 @@ using namespace MoSyncError;
 			mContactsList = nil;
 		}
 	}
-	else if(MA_PIM_EVENTS == list ||
-			MA_PIM_TODOS)
-	{
-		returnedValue = MA_PIM_ERR_UNAVAILABLE_LIST;
-	}
 	else
 	{
 		BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
@@ -135,16 +130,43 @@ using namespace MoSyncError;
  */
 -(PimItem*) getItem:(MAHandle) itemHandle
 {
-	PimItem* item = [mContactsList getItem:itemHandle];
+	PimItem* item = nil;
+	if (mContactsList)
+	{
+		return [mContactsList getItem:itemHandle];
+	}
 
 	return item;
 }
 
+/**
+ * Creates a new pim item for a given pim list.
+ * @param list The given pim list.
+ * @return A handle to a new pim item.
+ */
 -(MAHandle) createItem:(MAHandle) list
 {
 	if (list == MA_PIM_CONTACTS)
 	{
-		return [mContactsList createItem];
+		if (mContactsList)
+		{
+			return [mContactsList createItem];
+		}
+	}
+
+	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
+}
+
+/**
+ * Closes a given item.
+ * @param itemHandle A handle to a pim item.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) closeItem:(MAHandle) itemHandle
+{
+	if (mContactsList)
+	{
+		return [mContactsList closeItem:itemHandle];
 	}
 
 	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
@@ -161,7 +183,10 @@ using namespace MoSyncError;
 {
 	if (list == MA_PIM_CONTACTS)
 	{
-		return [mContactsList removeItem:item];
+		if (mContactsList)
+		{
+			return [mContactsList removeItem:item];
+		}
 	}
 
 	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
@@ -170,8 +195,8 @@ using namespace MoSyncError;
 /**
  * Release all the objects.
  */
-- (void) dealloc {
-
+- (void) dealloc
+{
 	[mContactsList release];
 	[super dealloc];
 }

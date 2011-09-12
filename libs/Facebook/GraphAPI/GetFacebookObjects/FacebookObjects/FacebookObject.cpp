@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,17 +18,22 @@ MA 02110-1301, USA.
 
 /*
  * FacebookObject.cpp
- *
- *  Created on: Jun 30, 2011
- *      Author: gabi
  */
 
 #include "FacebookObject.h"
 
+/**
+ * The constructor is made protected, to indicate that the purpose of this  class is
+ * to be reused (by inheriting).
+ */
 FacebookObject::FacebookObject()
 {
 }
 
+/**
+ * Setter/getter for the "id" field of an Facebook object.
+ * @param id - the id of the object.
+ */
 void FacebookObject::setId(const MAUtil::String &id)
 {
 	mId = id;

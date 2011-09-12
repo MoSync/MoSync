@@ -1,25 +1,57 @@
 package com.mosync.pim;
 
+import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
+
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.provider.ContactsContract.Contacts;
 import android.provider.ContactsContract.Data;
+import android.provider.ContactsContract.CommonDataKinds.Photo;
 
 public class PIMItem {
 
+	public enum State { NONE, ADDED, UPDATED, DELETED }
+
 	ArrayList<PIMField> mPIMFields;
+	State mState;
 
 	PIMItem()
 	{
 		mPIMFields = new ArrayList<PIMField>();
+		mState = State.NONE;
+	}
+
+	void read(ContentResolver cr, String contactId, String[] types, String[][] columns)
+	{
+		DebugPrint("Fields Columns = " + columns.length);
+
+		setID(contactId, types[0], columns[0]);
+
+		for (int i = 1; i < columns.length; i++)
+		{
+			DebugPrint("FIELD = " + i);
+			readField(cr, contactId, columns[i], types[i]);
+		}
 	}
 
 	void add(PIMField p)
 	{
 		mPIMFields.add(p);
+	}
+
+	void add(String itemType, String[] names)
+	{
+		PIMField p = new PIMField(itemType, names);
+		add(p);
 	}
 
 	PIMField getField(int type)
@@ -45,10 +77,10 @@ public class PIMItem {
 		return field.getMoSyncType();
 	}
 
-	void setID(String id, String type)
+	void setID(String id, String type, String[] names)
 	{
-		PIMField p = new PIMField(type);
-		p.add(new String[] {}, new String[] {id});
+		PIMField p = new PIMField(type, names);
+		p.add(new String[] {id});
 		add(p);
 	}
 
@@ -59,37 +91,24 @@ public class PIMItem {
 					+ Data.MIMETYPE + "='" + itemType + "'",
 					new String[] {String.valueOf(contactId)}, null);
 
+		PIMField p = new PIMField(itemType, columns);
 		if (cursor.getCount() > 0)
 		{
-			PIMField p = new PIMField(itemType);
 			while (cursor.moveToNext())
 		    {
-				String[] info = new String[columns.length];
-				for (int i=0; i<columns.length; i++)
-					info[i] = cursor.getString( cursor.getColumnIndex(columns[i]) );
-
-				p.add(columns, info);
-		    }
-			add(p);
+				p.read(cr, cursor, contactId, columns, itemType);
+			}
 		}
+		DebugPrint("ADD: " + itemType);
+		add(p);
 	}
 
-	void updateField(ContentResolver cr, String dataIDName, String dataIDValue, String dataName, String dataValue)
+	void close()
 	{
-		ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
-
-		ops.add(ContentProviderOperation.newUpdate(Data.CONTENT_URI)
-				.withSelection(dataIDName + "=?",
-				new String[] {dataIDValue})
-				.withValue(dataName, dataValue)
-				.build());
-//		try
-//		{
-//			cr.applyBatch(ContactsContract.AUTHORITY, ops);
-//		}
-//		catch (Exception e)
-//		{
-//			e.printStackTrace();
-//		}
+		Iterator <PIMField> it = mPIMFields.iterator();
+		while (it.hasNext())
+		{
+			it.next().close();
+		}
 	}
 }

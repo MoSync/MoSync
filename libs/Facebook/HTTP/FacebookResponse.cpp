@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * FacebookResponse.cpp
- *
- *  Created on: Jul 20, 2011
- *      Author: gabi
  */
 
 #include <MAUtil/PlaceholderPool.h>
@@ -35,7 +33,6 @@ YAJLDom::Value* FacebookResponse::getJsonData() const {
 	// this must be set to make sure multi-byte conversions are correct.
 	setlocale(LC_CTYPE, "en_US.UTF-8");
 #endif
-
 	YAJLDom::Value* value = NULL;
 
 	if(getDataSize()>0)

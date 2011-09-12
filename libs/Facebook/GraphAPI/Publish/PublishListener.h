@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * PublishListener.h
- *
- *  Created on: Jul 22, 2011
- *      Author: gabi
  */
 
 #ifndef PUBLISHLISTENER_H_
@@ -28,6 +26,9 @@ MA 02110-1301, USA.
 #include <maapi.h>
 #include <MAUtil/String.h>
 #include "../ErrorListener.h"
+
+class MAUtil::YAJLDom::Value;
+
 
 /*
  * Listener for the FacebookPublisher2 class
@@ -45,16 +46,17 @@ public:
 	 * @param success - the response from server, telling if the request was done.
 	 * This function is called when a remove or an unlike request was made.
 	 */
-	virtual void publishingResponseReceived(bool success, const MAUtil::String &path) = 0;
+	virtual void publishingResponseReceived(bool success, const MAUtil::String &path) {};
 
 	/*
 	 * Called when the request was successful.
 	 * @param newId - the id of the new object.
 	 * @param path - contains the id of the object on which the publish request was made and the request name.
-	 * e.g: id/feed, id/likes
+	 * 				  e.g: id/feed, id/likes
 	 * This function is called when a new object is created (Album, Like, Comment, StatusMessage ect).
 	 */
-	virtual void publishingResponseReceived(const MAUtil::String  &data, const MAUtil::String &path) = 0;
+	virtual void publishingResponseReceived(const MAUtil::String  &data, const MAUtil::String &path){}
 };
+
 
 #endif /* PUBLISHLISTENER_H_ */

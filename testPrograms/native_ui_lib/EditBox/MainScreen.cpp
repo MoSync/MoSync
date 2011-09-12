@@ -39,6 +39,7 @@ MainScreen::MainScreen() :
 	mEditBox(NULL),
 	mSetTextButton(NULL),
 	mGetTextButton(NULL),
+	mGetTextLabel(NULL),
 	mKeyboardButton(NULL),
 	mKeyboard(false)
 {
@@ -70,10 +71,12 @@ void MainScreen::buttonClicked(Widget* button)
 {
     if (button == mSetTextButton)
     {
-        mEditBox->setText("set text");
+        mEditBox->setText("DEFAULT");
     }
     else if (button == mGetTextButton)
     {
+		mGetTextLabel->setText(mEditBox->getText());
+
         MAUtil::String text = mEditBox->getText();
         printf("get text = %s", text.c_str());
     }
@@ -97,7 +100,7 @@ void MainScreen::buttonClicked(Widget* button)
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
-	mMainLayout->setBackgroundColor(0xFF0000);
+//	mMainLayout->setBackgroundColor(0xFF0000);
 	Screen::setMainWidget(mMainLayout);
 
 	mEditBox = new EditBox();
@@ -106,16 +109,22 @@ void MainScreen::createMainLayout() {
 	mMainLayout->addChild(mEditBox);
 
 	mSetTextButton = new Button();
-	mSetTextButton->setText("Set text");
+	mSetTextButton->setText("Reset text to DEFAULT ");
 	mMainLayout->addChild(mSetTextButton);
 
 	mGetTextButton = new Button();
 	mGetTextButton->setText("Get text");
 	mMainLayout->addChild(mGetTextButton);
 
+	mGetTextLabel = new Label();
+//	mGetTextLabel->setText("No text, just placeholder");
+	mMainLayout->addChild(mGetTextLabel);
+
 	mKeyboardButton = new Button();
 	mKeyboardButton->setText("Show/hide keyboard");
 	mMainLayout->addChild(mKeyboardButton);
+
+	maSetColor(0x8A2BE2);
 }
 
 /**

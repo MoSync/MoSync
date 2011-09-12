@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * Event.h
- *
- *  Created on: Jul 2, 2011
- *      Author: gabi
  */
 
 #ifndef EVENT_H_
@@ -93,14 +91,14 @@ public:
 	const MAUtil::String &getPrivacy() const;
 
 private:
-	IdNamePair mOwner;
-	MAUtil::String mName;
-	MAUtil::String mDescription;
-	MAUtil::String mStartTime;
-	MAUtil::String mEndTime;
-	MAUtil::String mLocation;
-	Venue mVenue;
-	MAUtil::String mPrivacy;
+	IdNamePair		mOwner;
+	MAUtil::String	mName;
+	MAUtil::String	mDescription;
+	MAUtil::String	mStartTime;
+	MAUtil::String	mEndTime;
+	MAUtil::String	mLocation;
+	Venue			mVenue;
+	MAUtil::String	mPrivacy;
 };
 
 #endif /* EVENT_H_ */

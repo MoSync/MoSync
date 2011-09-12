@@ -25,8 +25,9 @@
 @implementation ButtonWidget
 
 - (id)init {
+    // this gives me an autoreleased object. We don't own the object until we retain it.
 	if(!view)
-		view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain]; // TODO: do have to do this (retain)??
+		view = [[UIButton buttonWithType:UIButtonTypeRoundedRect] retain];
         
 	UIButton* button = (UIButton*) view;
     button.contentEdgeInsets = UIEdgeInsetsMake(1.0, 1.0, 1.0, 1.0);

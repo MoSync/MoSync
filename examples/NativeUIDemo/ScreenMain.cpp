@@ -39,19 +39,21 @@ MA 02110-1301, USA.
 /**
  * This is a main screen with three tabs.
  */
-class ScreenMainWithThreeTabs : public ScreenMain
+class ScreenMainWithThreeTabs :
+	public ScreenMain,
+	public TabScreenListener
 {
 public:
 	ScreenMainWithThreeTabs() : ScreenMain()
 	{
 		// Create child screens.
-		mColorScreen = ScreenColorList::create();
-		Screen* webScreen = ScreenWebView::create();
-		mImageScreen = ScreenImageSwiper::create();
+		mColorScreen = new ScreenColorList();
+		mWebScreen = new ScreenWebView();
+		mImageScreen = new ScreenImageSwiper();
 
 		// Add them as tabs.
 		this->addTab(mColorScreen);
-		this->addTab(webScreen);
+		this->addTab(mWebScreen);
 		this->addTab(mImageScreen);
 	}
 
@@ -104,7 +106,7 @@ public:
 	 */
 	void handlePointerPressed(MAPoint2d point)
 	{
-		if (SWIPER_TAB == getActiveTab())
+		if (SWIPER_TAB == getActiveTabIndex())
 		{
 			mImageScreen->handlePointerPressed(point);
 		}
@@ -115,7 +117,7 @@ public:
 	 */
 	void handlePointerMoved(MAPoint2d point)
 	{
-		if (SWIPER_TAB == getActiveTab())
+		if (SWIPER_TAB == getActiveTabIndex())
 		{
 			mImageScreen->handlePointerMoved(point);
 		}
@@ -126,11 +128,24 @@ public:
 	 */
 	void handlePointerReleased(MAPoint2d point)
 	{
-		if (SWIPER_TAB == getActiveTab())
+		if (SWIPER_TAB == getActiveTabIndex())
 		{
 			mImageScreen->handlePointerReleased(point);
 		}
 	}
+
+    /**
+     * This method is called when a tab screen has changed to a new tab.
+     * @param tabScreen The tab screen object that generated the event.
+     * @param tabScreenIndex The index of the new tab.
+     */
+    void tabScreenTabChanged(
+        TabScreen* tabScreen,
+        const int tabScreenIndex)
+    {
+		// Here we save the current tab index.
+		mCurrentTabIndex = tabScreenIndex;
+    }
 
 private:
 	/**
@@ -141,12 +156,17 @@ private:
 	/**
 	 * The color screen.
 	 */
-	StackScreen* mColorScreen;
+	ScreenColorList* mColorScreen;
 
 	/**
 	 * The image screen.
 	 */
-	Screen* mImageScreen;
+	ScreenImageSwiper* mImageScreen;
+
+	/**
+	 * The web screen.
+	 */
+	ScreenWebView* mWebScreen;
 };
 
 /**
@@ -160,7 +180,8 @@ ScreenMain* ScreenMain::createThreeTabUI()
 /**
  * Constructor.
  */
-ScreenMain::ScreenMain()
+ScreenMain::ScreenMain():
+	TabScreen()
 {
 }
 

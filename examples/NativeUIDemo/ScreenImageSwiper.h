@@ -30,12 +30,15 @@ MA 02110-1301, USA.
 
 #include <MAUtil/String.h>
 #include <MAUtil/Vector.h>
-#include "UIWrapper/Widgets.h"
+
+// Include all the wrappers.
+#include <NativeUI/Widgets.h>
+
 #include "MAHeaders.h"
 
 #include "conprint.h"
 
-using namespace MoSync::UI;
+using namespace NativeUI;
 
 enum eScrollingDirection
 {
@@ -220,12 +223,6 @@ public:
 	void setupImages(int width, int height);
 
 	/**
-	 * Create the Swiper Screen.
-	 * @return An instance of class ScreenImageSwiper.
-	 */
-	static Screen* create();
-
-	/**
 	 * Handle pointer presses.
 	 * @param point The pointer position on the screen.
 	 */
@@ -283,6 +280,7 @@ private:
 	 */
 	Image* createBackgroundGradient();
 
+private:
 	/**
 	 * Screen width.
 	 */
@@ -304,7 +302,7 @@ private:
 	RelativeLayout* mImagesLayout;
 
 	/**
-	 * Layout for the label that displayes the image name.
+	 * Layout for the label that displays the image name.
 	 */
 	Label* mLabelLayout;
 

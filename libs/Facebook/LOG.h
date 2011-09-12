@@ -44,8 +44,6 @@ MA 02110-1301, USA.
 
 #define LOG lprintfln
 
-//#define APPID "29283dab-912a-40ad-a5a3-ac270da7cfaa"
-//#define ENCRYPTIONKEY "dddad23f-9e15-499c-8890-745cb8ac8b3d"
 
 void display(const Venue &venue, const MAUtil::String &prefix = "\t");
 void display(const Place &place, const MAUtil::String &prefix = "\t");

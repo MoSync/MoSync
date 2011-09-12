@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * FacebookDemoScreen.h
- *
- *  Created on: Aug 8, 2011
- *      Author: gabi
  */
 
 #ifndef FACEBOOKDEMOSCREEN_H_
@@ -31,15 +29,12 @@ MA 02110-1301, USA.
 namespace FacebookDemoGUI
 {
 
-class FacebookDemoScreen: public MoSync::UI::Screen, public MAUtil::KeyListener//, public MAUtil::FocusListener
+class FacebookDemoScreen: public NativeUI::Screen, public MAUtil::KeyListener
 {
 public:
 	FacebookDemoScreen(FacebookDemoScreen *prevScreen);
 	virtual void show();
 	void receiveKeyEvents(bool receive);
-
-	void setBusy(bool busy);
-	bool isBusy() const;
 
 	/**
 	 * Called when a key is pressed.
@@ -51,8 +46,10 @@ public:
 	virtual ~FacebookDemoScreen();
 
 protected:
+	virtual void back();
+
+protected:
 	FacebookDemoScreen *mPreviousScreen;
-	bool mBusy;
 };
 
 

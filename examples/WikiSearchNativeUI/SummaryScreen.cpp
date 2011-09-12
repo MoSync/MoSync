@@ -201,14 +201,17 @@ void SummaryScreen::customEvent(const MAEvent& event)
 		widgetClicked(widgetEventData->widgetHandle);
 	}
 	// Check the event that was sent from a list view.
-	else if (widgetEventData->eventType == MAW_EVENT_ITEM_CLICKED )
-	{
-		// By clicking on an item, the corresponding web view is opened
-		// in the WebSsreen.
-		mWebScreen->showScreen();
-		mWebScreen->openWebView(
-			mWiki->getTitleForIndex( widgetEventData->listItemIndex) );
-	}
+    else if (widgetEventData->widgetHandle == mListView)
+    {
+        if (widgetEventData->eventType == MAW_EVENT_ITEM_CLICKED)
+        {
+            // By clicking on an item, the corresponding web view is opened
+            // in the WebSsreen.
+            mWebScreen->showScreen();
+            mWebScreen->openWebView(
+                mWiki->getTitleForIndex( widgetEventData->listItemIndex) );
+        }
+    }
 	return;
 }
 

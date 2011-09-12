@@ -16,7 +16,7 @@
 */
 
 // The attribute is custom.
-#define NO_ATTRIBUTE -1
+#define CUSTOM_ATTRIBUTE -1
 
 #import <Foundation/Foundation.h>
 #import "PimFieldItemValue.h"
@@ -29,7 +29,7 @@
 @interface PimFieldItem: NSObject {
 	/**
 	* Type of the field. Must be one of
-	* MA_PIM_TYPE_ constants.
+	* MA_PIM_TYPE constants.
 	*/
 	int mFieldType;
 
@@ -54,7 +54,7 @@
  * Init function.
  * @param fieldID Must be one of MA_PIM_FIELD_CONTACT constants.
  * If the fieldID param is invalid or not supported on this platform,
- * the functions return nil.
+ * the function returns nil.
  */
 -(id) initWithFieldID:(int) fieldID;
 
@@ -170,7 +170,7 @@ withLabel:(NSString*) label;
 /**
  * Gets the attribute id from a specifed label value.
  * @param label The given label.
- * @return The attribute id, or NO_ATTRIBUTE is the attribute is custom.
+ * @return The attribute id, or CUSTOM_ATTRIBUTE is the attribute is custom.
  */
 -(int) getAttributeFromLabel:(NSString*) label;
 

@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * FacebookManager.h
- *
- *  Created on: Jul 11, 2011
- *      Author: gabi
  */
 
 #ifndef FACEBOOKMANAGER_H_
@@ -28,24 +26,25 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <MAUtil/Set.h>
 
-#include "UnixTimeStamp.h"
-#include "GraphAPI/GetFacebookObjects/FacebookObjects/Utilities.h"
+#include "GraphAPI/GetFacebookObjects/FacebookObjectManager.h"
 
-class ObjectRequestListener;
-class ConnectionsManager;
-class ConnectionsManagerListener;
-class PublishingListener;
-class FacebookPublisher2;
-class Facebook;
-class FacebookObjectManager;
+#include "GraphAPI/Publish/UnixTimeStamp.h"
+
+class	ObjectRequestListener;
+class	ConnectionsManager;
+class	ConnectionsManagerListener;
+class	PublishingListener;
+class	FacebookPublisher2;
+class	Facebook;
+
 
 /*
  * Class that manages the connections requests, Facebook objects and publishing.
  * It can handle the following connections requests:
- * "friends", "home", "feed", "likes", "movies", "music", "books", "notes", "permissions"
- * "photos", "picture", "albums", "videos", "videos/uploaded", "events", "groups", "checkins",
- * "comments", "noreply", "maybe", "attending", "declined", "members", "accounts", "activity",
- * "friendlists", "interests", "links", "posts", "statuses", "television"
+ *		"friends", "home", "feed", "likes", "movies", "music", "books", "notes", "permissions"
+ *		"photos", "picture", "albums", "videos", "videos/uploaded", "events", "groups", "checkins",
+ *		"comments", "noreply", "maybe", "attending", "declined", "members", "accounts", "activity",
+ *		"friendlists", "interests", "links", "posts", "statuses", "television"
  *
  */
 class FacebookManager
@@ -56,7 +55,7 @@ public:
 	 * @param appId - the application's id
 	 * @param appSecret - the application's secret.
 	 */
-	FacebookManager(const MAUtil::String &appId, const MAUtil::String &appSecret = "");
+	FacebookManager(const MAUtil::String &appId);
 
 	/*
 	 * constructor
@@ -64,7 +63,7 @@ public:
 	 * @param permissions - the permissions that the application wants to request.
 	 * @param appSecret - the application's secret.
 	 */
-	FacebookManager(const MAUtil::String &appId, const MAUtil::Set<MAUtil::String> &permissions, const MAUtil::String &appSecret="");
+	FacebookManager(const MAUtil::String &appId, const MAUtil::Set<MAUtil::String> &permissions);
 
 	/*
 	 * sets the access token retrieved from Facebook.
@@ -77,7 +76,7 @@ public:
 	const MAUtil::String &getOAuthUrl() const;
 
 	///////////////////////////////////////////////////////////////////////////////////////
-	// request objects
+	//							request objects
 	///////////////////////////////////////////////////////////////////////////////////////
 	/*
 	 * Sets the ObjectRequestListener. The listener will be notified when a Facebook object
@@ -93,8 +92,11 @@ public:
 	template<class Type>
 	void requestObject(const MAUtil::String &id);
 
+	template<class Type>
+	void requestObject(const MAUtil::String &id, const MAUtil::Vector<MAUtil::String> &fields);
+
 	///////////////////////////////////////////////////////////////////////////////////////
-	// request connections
+	//							request connections
 	///////////////////////////////////////////////////////////////////////////////////////
 	/*
 	 * Sets a ConnectionsManagerListener, that will be informed when a connection request
@@ -109,10 +111,14 @@ public:
 	 */
 	void requestConnection(const MAUtil::String &connType, const MAUtil::String &id = "me");
 	void requestConnection(const MAUtil::String &connType, const MAUtil::Vector<MAUtil::String> &fields,
-		const MAUtil::String &id = "me");
+				const MAUtil::String &id = "me");
+
+	void limitTheNumberOfObjectsToFetch(int maxNumberOfObjects);
+
+	void fetchAllObjects();
 
 	///////////////////////////////////////////////////////////////////////////////////////
-	// publish on Facebook
+	//							publish on Facebook
 	///////////////////////////////////////////////////////////////////////////////////////
 
 	/*
@@ -166,8 +172,8 @@ public:
 	 * @param subject - the subject of the Note.
 	 * @param message - the message of the Note.
 	 */
-	void addNote(const MAUtil::String &OBJECT_ID, const MAUtil::String &subject,
-		const MAUtil::String &message);
+	void addNote(const MAUtil::String &OBJECT_ID, 	const MAUtil::String &subject,
+				 const MAUtil::String &message);
 
 	/*
 	 * Adds a Album object.
@@ -176,7 +182,7 @@ public:
 	 * @param message - the message of the Album.
 	 */
 	void addAlbum(const MAUtil::String &PROFILE_ID, const MAUtil::String &name,
-		const MAUtil::String &message="");
+			      const MAUtil::String &message="");
 
 	/*
 	 * Adds a Event object for a User.
@@ -184,13 +190,14 @@ public:
 	 * @param eventName - the name of the event.
 	 * @param eventStartTime - the start time of the Event.
 	 * @param eventEndTime - the end time of the Event.
-	 * @param message - the message to be posted alog with the event
+	 * @param message - the message to be posted along with the event
 	 * @param location - the name of the location
+	 * @param privacyType - string containing 'OPEN' (default), 'CLOSED', or 'SECRET'
 	 */
 	void addEvent(const MAUtil::String &PROFILE_ID, const MAUtil::String &eventName,
-		const UnixTimeStamp &eventStart_time, const UnixTimeStamp &eventEnd_time = UnixTimeStamp(),
-		const MAUtil::String &message="", const MAUtil::String &location = "",
-		const MAUtil::String &privacyType = "OPEN");
+				const UnixTimeStamp &eventStart_time, const UnixTimeStamp &eventEnd_time = UnixTimeStamp(),
+				const MAUtil::String &message="", const MAUtil::String &location = "",
+				const MAUtil::String &privacyType = "OPEN");
 
 	/*
 	 * Adds a Photo object to a User's wall or to an Album.
@@ -199,8 +206,8 @@ public:
 	 * @param pixels - the raw data of the image.
 	 * @param message - the message to be posted along with the Photo.
 	 */
-	void addPhoto(const MAUtil::String &OBJECT_ID, const int *pixels, int pixelsArraySize, const MAUtil::String &message="");
-	void addPhoto(const MAUtil::String &OBJECT_ID, const MAUtil::String &picture, const MAUtil::String &message="");
+	void addPhoto(const MAUtil::String &OBJECT_ID, const byte *pixels, int pixelsArraySize, const MAUtil::String &message="");
+
 	/*
 	 * Adds a Video object to a User's wall..
 	 * @param PROFILE_ID - the id of the User for which the Video is posted.
@@ -208,7 +215,7 @@ public:
 	 * @param videoDescpription - the video description, that will be posted along with the video.
 	 */
 	void addVideo(const MAUtil::String &PROFILE_ID, int *videoSource, const MAUtil::String &videoTitle = "",
-		const MAUtil::String &videoDescription = "");
+				const MAUtil::String &videoDescription = "");
 
 	/*
 	 * Adds a Checkin object for a User
@@ -219,19 +226,19 @@ public:
 	 * @param message - the message that will be posted along with the Checkin
 	 */
 	void addCheckin(const MAUtil::String &PROFILE_ID, const MAUtil::String &placeId, const Coordinate &coord,
-		const MAUtil::String &tags = "", const MAUtil::String &message = "");
+					const MAUtil::String &tags = "", const MAUtil::String &message = "");
 
 	/*
 	 * Adds a Post object to a to a User wall.
+	 * @param ID - the id of the user on which wall the post will be displayed.
 	 * @param message - the message to be posted
 	 * @param link - the link to be included in post.
-	 * @param pictureUrl - a picture url to be included in post.
-	 * @param actions - a Vector of Action objects (objects containing name and link) to be included in the post.
-	 * @param id - the id of the user on which wall the post will be displayed.
+	 * @param name - the name of the post
+	 * @param caption - the caption of the post
+	 * @param description - a description of what is posted
 	 */
-	void addPostOnWall(const MAUtil::String &ID, const MAUtil::String &message, const MAUtil::String &link, const MAUtil::String &pictureUrl = "",
-		const MAUtil::String &name = "", const MAUtil::String &caption = "", const MAUtil::String &description = "",
-		MAUtil::Vector<Action> &actions = MAUtil::Vector<Action>() /*const Privacy &privacy,*/);
+	void addPostOnWall(const MAUtil::String &ID, const MAUtil::String &message, const MAUtil::String &link,
+					const MAUtil::String &name = "", const MAUtil::String &caption = "", const MAUtil::String &description = "");
 
 	/*
 	 * Adds a Link object to a to a User wall.
@@ -248,7 +255,7 @@ public:
 	 */
 	void addStatusMessageOnWall(const MAUtil::String &ID, const MAUtil::String &message);
 	///////////////////////////////////////////////////////////////////////////////////////
-	// delete from Facebook
+	//							delete from Facebook
 	///////////////////////////////////////////////////////////////////////////////////////
 
 	/*
@@ -292,25 +299,45 @@ private:
 	 * @param permissions - the permissions to request from Facebook.
 	 * @param appSecret - the appliction's secret.
 	 */
-	void initialize(const MAUtil::String &appId, const MAUtil::Set<MAUtil::String> &permissions, const MAUtil::String &appSecret);
+	void initialize(const MAUtil::String &appId, const MAUtil::Set<MAUtil::String> &permissions);
 
 private:
 	/*
 	 *  FacebookObjectManager - handles the request of Facebook objects and the retrieving of the server's response.
 	 */
-	FacebookObjectManager *mObjectManager;
+	FacebookObjectManager			*mObjectManager;
 
 	/*
 	 * ConnectionsManager - handles the request of connections and the retrieving of the server's response.
 	 */
-	ConnectionsManager *mConnectionsManager;
+	ConnectionsManager				*mConnectionsManager;
 
 	/*
 	 * FacebookPublisher2 - handles the publish requests and the retrieving of the server's response.
 	 */
-	FacebookPublisher2 *mPublishingManager;
+	FacebookPublisher2				*mPublishingManager;
 
-	Facebook *mFacebook;
+	Facebook						*mFacebook;
 };
+
+
+/*
+ * Requests a Facebook object.
+ * The "Type" template parameter is the type of the object that is requested.
+ * @param id - the id of the requested object.
+ */
+template<class Type>
+void FacebookManager::requestObject(const MAUtil::String &id)
+{
+	mObjectManager->requestFacebookObject<Type>(id);
+}
+
+template<class Type>
+void FacebookManager::requestObject(const MAUtil::String &id, const MAUtil::Vector<MAUtil::String> &fields)
+{
+	mObjectManager->requestFacebookObject<Type>(id, fields);
+}
+
+//const MAUtil::Vector<MAUtil::String> &fields
 
 #endif /* FACEBOOKMANAGER_H_ */

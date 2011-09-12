@@ -46,7 +46,8 @@ void MAPimClose() {
 }
 
 
-MAHandle Syscall::maPimListOpen(int listType) {
+MAHandle Syscall::maPimListOpen(int listType)
+{
 	return [sPimDatabase pimListOpen:listType];
 }
 
@@ -57,7 +58,7 @@ MAHandle Syscall::maPimListNext(MAHandle list)
 
 int Syscall::maPimListClose(MAHandle list)
 {
-	 return [sPimDatabase pimListClose:list];
+	return [sPimDatabase pimListClose:list];
 }
 
 int Syscall::maPimItemCount(MAHandle item)
@@ -93,8 +94,7 @@ int Syscall::maPimItemSetLabel(const MA_PIM_ARGS* args, int index)
 {
 	PimItem* pimItem = [sPimDatabase getItem:args->item];
 	MYASSERT(nil != pimItem, ERR_INVALID_PIM_HANDLE);
-	return [pimItem setLabel:args
-		indexValue:index];
+	return [pimItem setLabel:args indexValue:index];
 }
 
 int Syscall::maPimItemGetLabel(const MA_PIM_ARGS* args, int index)
@@ -108,11 +108,21 @@ int Syscall::maPimFieldType(MAHandle list, int field)
 {
 	bool singleFieldValue;
 	int fieldType;
-	[[PimUtils sharedInstance] fieldStructure:field
+	int resultCode;
+
+	// Check if the list handle is valid.
+	MYASSERT(MA_PIM_CONTACTS != list, ERR_INVALID_PIM_HANDLE);
+
+	resultCode = [[PimUtils sharedInstance] fieldStructure:field
 		setType:&fieldType
 		setIsSingleValue:&singleFieldValue];
+	// Check for errors.
+	if (MA_PIM_ERR_NONE == resultCode)
+	{
+		return fieldType;
+	}
 
-	return fieldType;
+	return resultCode;
 }
 
 int Syscall::maPimItemGetValue(const MA_PIM_ARGS *args, int index)
@@ -148,9 +158,7 @@ int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index)
 
 int Syscall::maPimItemClose(MAHandle item)
 {
-	PimItem* pimItem = [sPimDatabase getItem:item];
-	MYASSERT(nil != pimItem, ERR_INVALID_PIM_HANDLE);
-	return [pimItem close];
+	return [sPimDatabase closeItem:item];
 }
 
 MAHandle Syscall::maPimItemCreate(MAHandle list)

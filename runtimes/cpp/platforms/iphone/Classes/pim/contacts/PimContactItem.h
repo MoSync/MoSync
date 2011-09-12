@@ -76,6 +76,20 @@
          indexValue:(const int) index;
 
 /**
+ * Sets a custom label for a given field value.
+ * Checks if field is valid and supported.
+ * @param args Common arguments.
+ *             The item's handle is stored in args.item.
+ *             The field's ID is stored in args.field.
+ *             The custom label's value is stored in args.buf.
+ *             The size of the value(in bytes) is stored in args.bufSize.
+ * @param index Field's value index.
+ * @return One of the MA_PIM_ERR constants.
+ */
+-(int) setLabel:(const MA_PIM_ARGS*) args
+     indexValue:(const int) index;
+
+/**
  * Gets a custom label for a given field value.
  * Checks if field is valid and supported.
  * @param args Common arguments.
@@ -138,7 +152,17 @@
  */
 -(int) setValue:(const MA_PIM_ARGS*) args
      indexValue:(const int) index
- valueAttribute:(const int) atttribute;
+ valueAttribute:(const int) attribute;
+
+/**
+ * Removes a value from a field.
+ * Checks if the field is valid or supported.
+ * @param field One of the MA_PIM_FIELD constants.
+ * @param index Field's value index.
+ * @return One of MA_PIM_ERR constants.
+ */
+-(int) removeValue:(const int) field
+           atIndex:(const int) index;
 
 /**
  * Get the item's record.
@@ -310,6 +334,11 @@
  * Reads the revision field from the record.
  */
 -(void) readRevisionField;
+
+/**
+ * Reads the UID field from the record.
+ */
+-(void) readUIDField;
 
 /**
  * Reads the instant message field from the record.

@@ -535,7 +535,14 @@ namespace NativeUI
      */
     bool Widget::isVisible() const
     {
-        return (getPropertyString(MAW_WIDGET_VISIBLE) == "true") ? true : false;
+        MAUtil::String value = MAUtil::lowerString(
+			this->getPropertyString(MAW_WIDGET_VISIBLE));
+        if ( strcmp(value.c_str(),"true") == 0 )
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -553,7 +560,14 @@ namespace NativeUI
      */
     bool Widget::isEnabled()
     {
-        return (getPropertyString(MAW_WIDGET_ENABLED)=="true") ? true : false;
+        MAUtil::String value = MAUtil::lowerString(
+			this->getPropertyString(MAW_WIDGET_ENABLED));
+        if ( strcmp(value.c_str(),"true") == 0 )
+        {
+            return true;
+        }
+
+        return false;
     }
 
     /**

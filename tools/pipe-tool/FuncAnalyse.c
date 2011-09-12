@@ -49,9 +49,9 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 	fp->dst_reg = 0;
 	fp->assign_reg = 0;
 	fp->uninit_reg = 0;
-	
+
 	// Make sure we have a valid symbol
-	
+
 	if (!sym)
 		return -1;
 
@@ -66,14 +66,14 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 	ip = (uchar *) ArrayPtr(&CodeMemArray, sym->Value);
 
 	// Set up the parameter regs
-	
+
 	params = sym->Params;
-	
+
 	for (n=0;n<params;n++)
 	{
 		fp->assign_reg |=  REGBIT(REG_i0 + n);
 	}
-	
+
 	// Scan the function
 
 #ifdef AFDEBUG
@@ -81,7 +81,7 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 #endif
 
 	while(1)
-	{		
+	{
 		if (ip > ip_end)
 			break;
 
@@ -93,44 +93,54 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 			printf("%s\n", buf);
 		}
 #endif
-	
+
 		ip = DecodeOpcode(&thisOp, ip);
 
 		// Ignor push and pop
-		
+
 		if (thisOp.op == _PUSH)
 			continue;
 
 		if (thisOp.op == _POP)
 			continue;
 
+		//-----------------------------------------
+		// Deal with syscalls
+		// for some strange reason rd is the syscallId which will
+		// tag unused registers as used for void functions
+		//-----------------------------------------
+
+		if(thisOp.op == _SYSCALL)
+		{
+			FunctionReg_Syscall(&thisOp, fp);
+		}
+
 		// Check for a dest reg
-		
-		if (thisOp.flags & fetch_d)
+		else if (thisOp.flags & fetch_d)
 		{
 			if (thisOp.rd < 32)
 			{
 				// Since this is a dst regs we say its initialized
 				fp->assign_reg |=  REGBIT(thisOp.rd);
-	
+
 				// Say this reg was used as a dst reg
 				fp->dst_reg |= REGBIT(thisOp.rd);
 			}
 		}
-		
+
 		// Check for a source reg
-		
+
 		if (thisOp.flags & fetch_s)
 		{
 			if (thisOp.rs < 32)
 			{
 				// check if this reg was assigned previously, if it was'nt it is uninitialized before use
-			
+
 				int is_assigned = fp->assign_reg & REGBIT(thisOp.rs);
-			
+
 				if (!is_assigned)
 					fp->uninit_reg |= REGBIT(thisOp.rs);
-			
+
 				fp->src_reg |= REGBIT(thisOp.rs);
 			}
 		}
@@ -138,7 +148,7 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 		//-----------------------------------------
 		//		Deal with immediate calls
 		//-----------------------------------------
-		
+
 		// Add the call parameters to the used list
 
 		if (thisOp.op == _CALLI)
@@ -150,14 +160,13 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 		//-----------------------------------------
 		//		Deal with register calls
 		//-----------------------------------------
-		
+
 		// Add the call parameters to the used list
 
 		if (thisOp.op == _CALL)
 		{
 			FunctionReg_CallReg(&thisOp, fp);
 		}
-
 	}
 
 
@@ -179,7 +188,7 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 #endif
 
 	// Make sure zr is never uninitialized
-	
+
 	fp->uninit_reg &= ~REGBIT(REG_zero);
 
 	// Make a composit of which reg's were used
@@ -189,6 +198,44 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 	return fp->reg_used;
 }
 
+//****************************************
+//		Deal with syscalls
+//****************************************
+
+// Add the call parameters to the used list
+
+void FunctionReg_Syscall(OpcodeInfo *thisOp, FuncProp *fp)
+{
+	SYMBOL* CallSym = FindSysCall(thisOp->imm);
+
+	if (CallSym)
+	{
+		int params = CallSym->Params;
+		int p;
+
+		for (p=0;p<params;p++)
+		{
+			// check if this reg was assigned previously, if it was'nt it is uninitialized before use
+
+			int is_assigned = fp->assign_reg & REGBIT(REG_i0 + p);
+
+			if (!is_assigned)
+				fp->uninit_reg |= REGBIT(REG_i0 + p);
+
+			fp->src_reg |= REGBIT(REG_i0 + p);
+		}
+
+		// Check what the function returns
+		// Do nothing for void
+
+		if (CallSym->RetType == RET_int   ||
+			CallSym->RetType == RET_float)
+			fp->dst_reg |= REGBIT(REG_r14);
+
+		if (CallSym->RetType == RET_double)
+			fp->dst_reg |= REGBIT(REG_r14) | REGBIT(REG_r15);
+	}
+}
 
 //****************************************
 //		Deal with immediate calls
@@ -199,7 +246,7 @@ int FunctionRegAnalyse(SYMBOL *sym, FuncProp *fp)
 void FunctionReg_Calli(OpcodeInfo *thisOp, FuncProp *fp)
 {
 	SYMBOL *CallSym;
-	
+
 	CallSym = (SYMBOL *) ArrayGet(&CallArray, thisOp->rip);
 
 	if (CallSym)
@@ -210,21 +257,20 @@ void FunctionReg_Calli(OpcodeInfo *thisOp, FuncProp *fp)
 		for (p=0;p<params;p++)
 		{
 			// check if this reg was assigned previously, if it was'nt it is uninitialized before use
-	
+
 			int is_assigned = fp->assign_reg & REGBIT(REG_i0 + p);
-	
+
 			if (!is_assigned)
 				fp->uninit_reg |= REGBIT(REG_i0 + p);
-	
+
 			fp->src_reg |= REGBIT(REG_i0 + p);
 		}
 
 		// Check what the function returns
 		// Do nothing for void
-		
+
 		if (CallSym->RetType == RET_int   ||
-			CallSym->RetType == RET_float ||
-			CallSym->RetType == RET_int)
+			CallSym->RetType == RET_float)
 			fp->dst_reg |= REGBIT(REG_r14);
 
 		if (CallSym->RetType == RET_double)

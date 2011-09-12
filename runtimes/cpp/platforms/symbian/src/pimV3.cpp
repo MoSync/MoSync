@@ -1019,7 +1019,7 @@ MAHandle Syscall::maPimListOpen(int listType) {
 	//} else if(listType == MA_PIM_EVENTS) {
 	//	pl = new (ELeave) EventList();
 	} else {
-		return MA_PIM_ERR_UNAVAILABLE_LIST;
+		return MA_PIM_ERR_LIST_UNAVAILABLE;
 	}
 	mPimLists.insert(mPimListNextHandle, pl);
 	return mPimListNextHandle++;

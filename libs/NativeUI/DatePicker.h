@@ -145,6 +145,8 @@ namespace NativeUI
 		 * @return Any of the following result codes:
 		 * - #MAW_RES_OK if the property could be set.
 		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+		 * - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported
+		 * by the curent framework version.
 		 * - #MAW_RES_ERROR otherwise.
 		 */
 		virtual int setMinDate( const struct Date minDate);
@@ -166,6 +168,8 @@ namespace NativeUI
 		 * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 		 * - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+		 * - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported
+		 * by the curent framework version.
 		 * - #MAW_RES_ERROR otherwise.
 		 */
 		virtual int setMaxDate( const struct Date maxDate);

@@ -175,11 +175,6 @@ private:
 
 	VerticalLayout* mMiddleSpacerLayout;
 	VerticalLayout* mSpacerBottomLayout;
-
-	/**
-	 * Exit button.
-	 */
-	Button* mExitButton;
 };
 
 #endif /* NATIVESCREEN_H_ */

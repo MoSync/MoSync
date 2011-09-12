@@ -32,7 +32,7 @@ using namespace MoSyncError;
  * Init function.
  * @param fieldID Must be one of MA_PIM_FIELD_CONTACT constants.
  * If the fieldID param is invalid or not supported on this platform,
- * the functions return nil.
+ * the function returns nil.
  */
 -(id) initWithFieldID:(int) fieldID
 {
@@ -107,8 +107,16 @@ using namespace MoSyncError;
 		BIG_PHAT_ERROR(ERR_INVALID_PIM_FIELD_INDEX);
 	}
 
-	return [[mFieldValuesArray objectAtIndex:index] setLabel:customLabel];
+	// Check if the attribute is set to custom.
+	PimUtils* utils = [PimUtils sharedInstance];
+	int customAttribute = [utils getCustomAttributeForFieldID:mFieldConstant];
+	int valuesAttribute = [[mFieldValuesArray objectAtIndex:index] getAttribute];
+	if (customAttribute != valuesAttribute)
+	{
+		return MA_PIM_ERR_NO_LABEL;
+	}
 
+	return [[mFieldValuesArray objectAtIndex:index] setLabel:customLabel];
 }
 
 /**
@@ -126,11 +134,18 @@ using namespace MoSyncError;
 		BIG_PHAT_ERROR(ERR_INVALID_PIM_FIELD_INDEX);
 	}
 
-	// Check if the attribute is set to MA_PIM_ATTR_CUSTOM.
 	PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
-    NSString* label = [itemValue getLabel];
+
+	// Check if the field supports attributes.
+	if (0 == [itemValue getAttribute])
+	{
+		return MA_PIM_ERR_NO_LABEL;
+	}
+
+	// Check if the attribute is set to MA_PIM_ATTR_CUSTOM.
+	NSString* label = [itemValue getLabel];
 	int attribute = [self getAttributeFromLabel:label];
-	if (NO_ATTRIBUTE != attribute)
+	if (CUSTOM_ATTRIBUTE != attribute)
 	{
 		return MA_PIM_ERR_NO_LABEL;
 	}
@@ -168,12 +183,33 @@ using namespace MoSyncError;
   withAttribute:(int) attribute
 {
 	int fieldValuesCount = [mFieldValuesArray count];
+	PimUtils* utils = [PimUtils sharedInstance];
 	if (0 > index || index <= fieldValuesCount) {
 		BIG_PHAT_ERROR(ERR_INVALID_PIM_VALUE_INDEX);
 	}
 
+    // Check if field supports attributes.
+	bool setAttribute = false;
+	if ([utils fieldSupportsAttribute:mFieldConstant])
+	{
+        // Check if the attribute is allowed.
+        bool attributeAllowed = [self isAttributeValid:attribute];
+        if (!attributeAllowed)
+        {
+            return MA_PIM_ERR_COMBO_UNSUPPORTED;
+        }
+        else
+        {
+            setAttribute = true;
+        }
+	}
+
 	PimFieldItemValue* fieldValue = [mFieldValuesArray objectAtIndex:index];
 	[fieldValue setValue:value];
+	if (setAttribute)
+	{
+		[fieldValue setAttribute:attribute];
+	}
 
 	return MA_PIM_ERR_NONE;
 }
@@ -219,11 +255,10 @@ using namespace MoSyncError;
 				[mFieldValuesArray addObject:fieldValue];
 				returnValue = [mFieldValuesArray count] - 1;
 			}
-
 		}
 		else
 		{
-			// Field does not support attributes.
+			// Field does not support attributes, ignore the attribute.
 			PimFieldItemValue* fieldValue = [[PimFieldItemValue alloc] init];
 			[fieldValue setValue:value];
 			[mFieldValuesArray addObject:fieldValue];
@@ -245,7 +280,7 @@ using namespace MoSyncError;
 {
 	bool isAttributeCustom = false;
 	int attributeId = [self getAttributeFromLabel:label];
-	if (NO_ATTRIBUTE == attributeId)
+	if (CUSTOM_ATTRIBUTE == attributeId)
 	{
 		// The attribute is custom.
 		// Get the custom attribute value.
@@ -342,11 +377,11 @@ using namespace MoSyncError;
 /**
  * Gets the attribute id from a specifed label value.
  * @param label The given label.
- * @return The attribute id, or NO_ATTRIBUTE is the attribute is custom.
+ * @return The attribute id, or CUSTOM_ATTRIBUTE is the attribute is custom.
  */
 -(int) getAttributeFromLabel:(NSString*) label
 {
-	int attributeId = NO_ATTRIBUTE;
+	int attributeId = CUSTOM_ATTRIBUTE;
 	NSMutableDictionary* allowedAttributes =
 		[[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
 	NSArray* attributesArray = [allowedAttributes allKeysForObject:label];
@@ -366,7 +401,6 @@ using namespace MoSyncError;
 - (void) dealloc
 {
 	[mFieldValuesArray release];
-
 	[super dealloc];
 }
 
