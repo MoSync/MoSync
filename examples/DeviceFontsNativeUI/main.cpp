@@ -27,22 +27,33 @@ MA 02110-1301, USA.
 #include <ma.h>
 #include <mavsprintf.h>
 #include <MAUtil/Moblet.h>
-#include <IX_WIDGET.h>
+#include <NativeUI/Widgets.h>
 
 using namespace MAUtil;
+using namespace NativeUI;
 
 /**
  * Moblet to be used as a template for a Native UI application.
  */
-class NativeUIMoblet : public Moblet
+class DeviceFontsNativeUI : public Moblet
 {
 public:
 	/**
 	 * The constructor creates the user interface.
 	 */
-	NativeUIMoblet()
+	DeviceFontsNativeUI()
 	{
 		createUI();
+	}
+
+	/**
+	 * In the destructor, we destroy the widgets to release memory.
+	 * Destroying a widget automatically destroys all child widgets.
+	 */
+	virtual ~DeviceFontsNativeUI()
+	{
+		// Destroying the screen widget destroys all of its children.
+		delete mScreen;
 	}
 
 	/**
@@ -51,28 +62,15 @@ public:
 	void createUI()
 	{
 		// Create a NativeUI screen that will hold layout and widgets.
-		MAHandle screen = maWidgetCreate(MAW_SCREEN);
-
-		// Error handling for devices that do not support NativeUI.
-		if (-1 == screen)
-		{
-			maPanic(0,
-				"NativeUI is only available on Android and iPhone. "
-				"You must run directly on the device or devices emulator.");
-		}
+		mScreen = new Screen();
 
 		// Create a list view.
-		mList = maWidgetCreate(MAW_LIST_VIEW);
-		widgetSetPropertyInt(
-				mList,
-			MAW_WIDGET_WIDTH,
-			MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-		widgetSetPropertyInt(
-				mList,
-			MAW_WIDGET_HEIGHT,
-			MAW_CONSTANT_WRAP_CONTENT);
+		mList = new ListView();
 
-		maWidgetAddChild(screen, mList);
+		mList->fillSpaceHorizontally();
+		mList->wrapContentVertically();
+
+		mScreen->setMainWidget(mList);
 
 		//Set a font size. This is independent of screen size.
 		int fontSize = 20;
@@ -92,48 +90,19 @@ public:
 				MAHandle font = maFontLoadWithName(buffer, fontSize);
 
 				//Create a list item
-				MAHandle listItem = maWidgetCreate(MAW_LIST_VIEW_ITEM);
+				ListViewItem *listItem = new ListViewItem();
 
-				widgetSetPropertyInt(
-						listItem,
-					MAW_WIDGET_WIDTH,
-					MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-				widgetSetPropertyInt(
-						listItem,
-					MAW_WIDGET_HEIGHT,
-					MAW_CONSTANT_WRAP_CONTENT);
+				listItem->fillSpaceHorizontally();
+				listItem->wrapContentVertically();
+				listItem->setText(buffer);
+				listItem->setFont(font);
 
-				//Create a label that goes in the list item
-				MAHandle listLabel = maWidgetCreate(MAW_LABEL);
-				widgetSetPropertyInt(
-						listLabel,
-					MAW_WIDGET_WIDTH,
-					MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-				widgetSetPropertyInt(
-						listLabel,
-					MAW_WIDGET_HEIGHT,
-					MAW_CONSTANT_WRAP_CONTENT);
-
-				//Set the label text as the font name
-				maWidgetSetProperty(
-						listLabel,
-						MAW_LABEL_TEXT,
-						buffer);
-
-				//Set the font of the label as the font we just loaded
-				widgetSetPropertyInt(
-						listLabel,
-						"fontHandle",
-						font);
-
-				maWidgetAddChild(listItem, listLabel);
-
-				maWidgetAddChild(mList, listItem);
+				mList->addChild(listItem);
 			}
 		}
 
 		// Show the screen.
-		maWidgetScreenShow(screen);
+		mScreen->show();
 
 		// Make the Moblet listen to widget events.
 		Environment::getEnvironment().addCustomEventListener(this);
@@ -157,26 +126,14 @@ public:
 	 */
 	void customEvent(const MAEvent& event)
 	{
-		if (EVENT_TYPE_WIDGET == event.type)
-		{
-			// Get the widget event data structure.
-			MAWidgetEventData* widgetEvent = (MAWidgetEventData*) event.data;
 
-		}
-	}
-
-	/**
-	 * Helper method for setting a widget property integer value.
-	 */
-	int widgetSetPropertyInt(MAHandle handle, const char *property, int value)
-	{
-		char buffer[256];
-		sprintf(buffer, "%i", value);
-		maWidgetSetProperty(handle, property, buffer);
 	}
 
 private:
-	MAHandle mList;
+
+	Screen *mScreen;
+
+	ListView *mList;
 
 };
 
@@ -185,6 +142,6 @@ private:
  */
 extern "C" int MAMain()
 {
-	Moblet::run(new NativeUIMoblet());
+	Moblet::run(new DeviceFontsNativeUI());
 	return 0;
 }

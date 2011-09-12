@@ -5646,14 +5646,12 @@ group WidgetAPI "Widget API" {
 	/**
 	* The available widget properties for a #MAW_DATE_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
-
-group WidgetDatePickerProperties "Date Picker properties" {
-
+	group WidgetDatePickerProperties "Date Picker properties" {
 	constset MAString MAW_DATE_PICKER_ {
 		/**
 		* @brief Sets or gets  maximal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00.
 		* NOTE: On Android the default maximal date is 12/31/2100.
-		*
+		* NOTE: The property can be set on iOS only.
 		* @validvalue A long int that specifies the upper range of this date picker.
 		*
 		* @setandget
@@ -5669,6 +5667,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		/**
 		* @brief Sets or gets  minimal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00
 		* Note: On Android the default minimal date is 01/01/1900.
+		* NOTE: The property can be set on iOS only.
 		* @validvalue A long int that specifies the minimal supported date.
 		*
 		* @setandget
@@ -5836,7 +5835,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	constset MAString MAW_VIDEO_VIEW_ {
 		/**
 		* @brief Sets the video path.
-		*
+		* Note: available only for Android.
 		* @validvalue Any valid path.
 		*
 		* @setonly

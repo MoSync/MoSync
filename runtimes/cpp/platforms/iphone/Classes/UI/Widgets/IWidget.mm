@@ -62,7 +62,7 @@
 - (void)layoutSubviews:(UIView*)_view {
 //- (void)layoutSubviews {
 	for (IWidget *child in children)
-    {
+	{
 		UIView* childView = [child getView];
 
 		int viewWidth = childView.frame.size.width;
@@ -112,7 +112,7 @@
 
 		//[[view layer] setBorderWidth:1.0];
 		//[[view layer] setBorderColor:[UIColor redColor].CGColor];
-    }
+	}
 
 	return self;
 }
@@ -147,7 +147,7 @@
 	}
 	//[self layout];
 	[child layout];
-    //[view setNeedsLayout];
+	//[view setNeedsLayout];
 	//[view setNeedsDisplay];
 }
 
@@ -168,7 +168,7 @@
 	}
 	//[view setNeedsLayout];
 	//[self layout];
-    [child layout];
+	[child layout];
 
 	return MAW_RES_OK;
 }
@@ -187,7 +187,7 @@
 	if(removeFromSuperview)
 		[[child getView] removeFromSuperview];
 	//[view setNeedsLayout];
-    [self layout];
+	[self layout];
 }
 
 - (int)remove {
@@ -240,28 +240,28 @@
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		view.backgroundColor = color;
 	}
-    /*else
-    if([key isEqualToString:@"backgroundGradient"]) {
-        NSArray *colors = [value componentsSeparatedByString: @","];
-        UIColor *col1 = [UIColor colorWithHexString: [[colors objectAtIndex:0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
-        UIColor *col2 = [UIColor colorWithHexString:[[colors objectAtIndex:1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+	/*else
+	if([key isEqualToString:@"backgroundGradient"]) {
+		NSArray *colors = [value componentsSeparatedByString: @","];
+		UIColor *col1 = [UIColor colorWithHexString: [[colors objectAtIndex:0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+		UIColor *col2 = [UIColor colorWithHexString:[[colors objectAtIndex:1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
 
-        if(!col1) return MAW_RES_INVALID_PROPERTY_VALUE;
-        if(!col2) return MAW_RES_INVALID_PROPERTY_VALUE;
+		if(!col1) return MAW_RES_INVALID_PROPERTY_VALUE;
+		if(!col2) return MAW_RES_INVALID_PROPERTY_VALUE;
 
-        CAGradientLayer *gradient = [CAGradientLayer layer];
-        gradient.frame = CGRectMake(0, 0, 320, 480); //view.bounds;
-        gradient.colors = [NSArray arrayWithObjects:(id)col1.CGColor, (id)col2.CGColor, nil];
-        gradient.startPoint = CGPointMake(0.5f, 0.0f);
-        gradient.endPoint = CGPointMake(0.5f, 1.0f);
-        gradient.masksToBounds = YES;
-        [view.layer insertSublayer:gradient atIndex:0];
+		CAGradientLayer *gradient = [CAGradientLayer layer];
+		gradient.frame = CGRectMake(0, 0, 320, 480); //view.bounds;
+		gradient.colors = [NSArray arrayWithObjects:(id)col1.CGColor, (id)col2.CGColor, nil];
+		gradient.startPoint = CGPointMake(0.5f, 0.0f);
+		gradient.endPoint = CGPointMake(0.5f, 1.0f);
+		gradient.masksToBounds = YES;
+		[view.layer insertSublayer:gradient atIndex:0];
 
-       // todo: Fix this. Make a setFrame function in IWidget that sets the frame of both the gradient layer (if available) and the
-       // view and call that wherever the frame of an IWidget is set (instead of view.frame = x).
-    }
-    */
-    else
+		// todo: Fix this. Make a setFrame function in IWidget that sets the frame of both the gradient layer (if available) and the
+		// view and call that wherever the frame of an IWidget is set (instead of view.frame = x).
+	}
+	*/
+	else
 	if([key isEqualToString:@"alpha"]) {
 		float alpha = [value floatValue];
 		if(alpha<0.0 || alpha>1.0) return MAW_RES_INVALID_PROPERTY_VALUE;
@@ -273,12 +273,12 @@
 	if([key isEqualToString:@"visible"]){
 		view.hidden = not [value boolValue];
 	} else
-    if([key isEqualToString:@"enabled"]){
-        UIControl* controller = (UIControl*) view;
-        controller.enabled = [value boolValue];
-    }
-    else {
-			return MAW_RES_ERROR;
+	if([key isEqualToString:@"enabled"]){
+		UIControl* controller = (UIControl*) view;
+		controller.enabled = [value boolValue];
+	}
+	else {
+		return MAW_RES_ERROR;
 	}
 
 	return MAW_RES_OK;
@@ -298,27 +298,33 @@
 	else if([key isEqualToString:@"top"]) {
 		return [[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue];
 	}
-
+	else if([key isEqualToString:@"visible"]) {
+		return view.hidden ? @"false" : @"true";
+	}
+	else if([key isEqualToString:@"enabled"]) {
+		UIControl* controller = (UIControl*) view;
+		return controller.enabled ? @"true" : @"false";
+	}
 	return nil;
 }
 
 - (void)dealloc {
-    [view release];
-    [children release];
-    [super dealloc];
+	[view release];
+	[children release];
+	[super dealloc];
 }
 
 - (void)layout {
 	// the layouts should take care of the fill parent / wrap content layouting process..
-    // this should not be suboptimal, it will trigger a layout
-    // that runs once before draw..
-    [view setNeedsLayout];
-    if(view.superview)
-    {
-        [view.superview setNeedsLayout];
-    }
+	// this should not be suboptimal, it will trigger a layout
+	// that runs once before draw..
+	[view setNeedsLayout];
+	if(view.superview)
+	{
+		[view.superview setNeedsLayout];
+	}
 
-   // [view layoutIfNeeded];
+	// [view layoutIfNeeded];
 }
 
 /**
@@ -327,7 +333,7 @@
  */
 - (void) sendEvent:(const int) eventDataType
 {
-    MAEvent event;
+	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
 	eventData->eventType = eventDataType;
@@ -339,7 +345,7 @@
 - (void)show {
 	[self layout];
 	for (IWidget *child in children)
-    {
+	{
 		[child show];
 	}
 }

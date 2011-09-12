@@ -38,8 +38,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
-//#define SYSLOG(...)
+//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
+#define SYSLOG(...)
 
 namespace Base
 {
@@ -135,7 +135,7 @@ namespace Base
 
 		char* b = (char*)malloc(200);
 		sprintf(b, "loadBinary index:%d size:%d", resourceIndex, size);
-		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
+		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
 		free(b);
 
 		char* buffer = (char*)malloc(size);
@@ -164,7 +164,7 @@ namespace Base
 	{
 		char* b = (char*)malloc(200);
 		sprintf(b, "loadBinaryStore index:%d size:%d", resourceIndex, size);
-		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
+		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
 		free(b);
 		return maCreateData(resourceIndex, size);
 	}
@@ -946,7 +946,7 @@ namespace Base
 	{
 		SYSLOG("maLoadProgram");
 
-		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "@@@@ MA LOAD PROGRAM");
+		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "@@@@ MA LOAD PROGRAM");
 
 		mReloadHandle = data;
 
@@ -1306,10 +1306,10 @@ return 0; \
 		exc = env->ExceptionOccurred();
 		if (exc)
 		{
-			__android_log_write(
-								ANDROID_LOG_INFO,
-								"@@@ MoSync",
-								"Found pending exception");
+			//__android_log_write(
+			//					ANDROID_LOG_INFO,
+			//					"@@@ MoSync",
+			//					"Found pending exception");
 			env->ExceptionDescribe();
 			env->ExceptionClear();
 		}
@@ -1346,7 +1346,11 @@ return 0; \
 
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");
-			return _maWriteLog((const char*)gSyscall->GetValidatedMemRange(a, b), b, mJNIEnv, mJThis);
+			#ifdef LOGGING_ENABLED
+				return _maWriteLog((const char*)gSyscall->GetValidatedMemRange(a, b), b, mJNIEnv, mJThis);
+			#else
+				return -1;
+			#endif
 
 		case maIOCtl_maSendTextSMS:
 			SYSLOG("maIOCtl_maSendTextSMS");
@@ -1377,14 +1381,14 @@ return 0; \
 
 		// int maBtStartDeviceDiscovery(int names)
 		case maIOCtl_maBtStartDeviceDiscovery:
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartDeviceDiscovery");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartDeviceDiscovery");
 			SYSLOG("maIOCtl_maBtStartDeviceDiscovery");
 			return _maBtStartDeviceDiscovery(a, mJNIEnv, mJThis);
 
 		// int maBtGetNewDevice(MABtDevice* d)
 		case maIOCtl_maBtGetNewDevice:
 		{
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewDevice");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewDevice");
 			SYSLOG("maIOCtl_maBtGetNewDevice");
 
 			// a is pointer to struct MABtDevice
@@ -1419,7 +1423,7 @@ return 0; \
 		// int maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid)
 		case maIOCtl_maBtStartServiceDiscovery:
 			SYSLOG("maIOCtl_maBtStartServiceDiscovery NOT IMPLEMENTED");
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartServiceDiscovery NOT IMPLEMENTED");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartServiceDiscovery NOT IMPLEMENTED");
 			return -1;
 		/*
 		{
@@ -1443,7 +1447,7 @@ return 0; \
 		// int maBtGetNextServiceSize(MABtServiceSize* dst)
 		case maIOCtl_maBtGetNextServiceSize:
 			SYSLOG("maIOCtl_maBtGetNextServiceSize NOT IMPLEMENTED");
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNextServiceSize NOT IMPLEMENTED");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNextServiceSize NOT IMPLEMENTED");
 			return -1;
 		/*
 		{
@@ -1467,7 +1471,7 @@ return 0; \
 		// int maBtGetNewService(MABtService* dst)
 		case maIOCtl_maBtGetNewService:
 			SYSLOG("maIOCtl_maBtGetNewService NOT IMPLEMENTED");
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewService NOT IMPLEMENTED");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewService NOT IMPLEMENTED");
 			return -1;
 		/*
 		{
@@ -1505,7 +1509,7 @@ return 0; \
 
 		case maIOCtl_maBtCancelDiscovery:
 			SYSLOG("maIOCtl_maBtCancelDiscovery");
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtCancelDiscovery");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtCancelDiscovery");
 			return _maBtCancelDiscovery(mJNIEnv, mJThis);
 
 		// Server syscalls
@@ -2233,18 +2237,17 @@ bool reloadProgram()
 
 void MoSyncExit(int errorCode)
 {
-	__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!",
-											"Program has exited!");
+	//__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Program has exited!");
 
 	if(false == reloadProgram())
 	{
-		__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "nahh.. just die now");
+		//__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "nahh.. just die now");
 
 		exit(errorCode);
 	}
 	else
 	{
-		__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Should reload program");
+		//__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Should reload program");
 
 		Base::gEventFifo.clear();
 
@@ -2258,7 +2261,7 @@ void MoSyncErrorExit(int errorCode)
 	{
 		char* b = (char*)malloc(200);
 		sprintf(b, "MoSync error: %i", errorCode);
-		__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", b);
+		//__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", b);
 		jstring jstr = Base::mJNIEnv->NewStringUTF(b);
 		free(b);
 
