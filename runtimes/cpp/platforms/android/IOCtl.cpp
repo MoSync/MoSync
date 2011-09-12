@@ -81,10 +81,10 @@ namespace Base
 	{
 		int rdata = (int)data - memStart;
 
-		char* b = (char*)malloc(200);
-		sprintf(b,"Framebuffer data: %i", rdata);
-		__android_log_write(ANDROID_LOG_INFO,"JNI",b);
-		free(b);
+		//char* b = (char*)malloc(200);
+		//sprintf(b,"Framebuffer data: %i", rdata);
+		//__android_log_write(ANDROID_LOG_INFO,"JNI",b);
+		//free(b);
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "_enableFramebuffer", "(I)V");
@@ -110,7 +110,7 @@ namespace Base
 
 	int _maBtStartDeviceDiscovery(int names, JNIEnv* jNIEnv, jobject jThis)
 	{
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery begin");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery begin");
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtStartDeviceDiscovery", "(I)I");
@@ -119,7 +119,7 @@ namespace Base
 
 		jNIEnv->DeleteLocalRef(cls);
 
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery end");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartDeviceDiscovery end");
 
 		return (int)ret;
 	}
@@ -136,7 +136,7 @@ namespace Base
 		JNIEnv* jNIEnv,
 		jobject jThis)
 	{
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewDevice begin");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewDevice begin");
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtGetNewDevice", "(IIII)I");
@@ -152,14 +152,14 @@ namespace Base
 
 		jNIEnv->DeleteLocalRef(cls);
 
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewDevice end");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewDevice end");
 
 		return (int)ret;
 	}
 
 	int _maBtStartServiceDiscovery(MABtAddr* addr, MAUUID* uuid, JNIEnv* jNIEnv, jobject jThis)
 	{
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartServiceDiscovery begin");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartServiceDiscovery begin");
 
 		// Device address converted to string.
 		char addressBuf[64];
@@ -184,7 +184,7 @@ namespace Base
 		jNIEnv->DeleteLocalRef(jstrAddress);
 		jNIEnv->DeleteLocalRef(jstrUUID);
 
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartServiceDiscovery end");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtStartServiceDiscovery end");
 
 		return (int)ret;
 	}
@@ -196,7 +196,7 @@ namespace Base
 		JNIEnv* jNIEnv,
 		jobject jThis)
 	{
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNextServiceSize begin");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNextServiceSize begin");
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtGetNextServiceSize", "(II)I");
@@ -210,7 +210,7 @@ namespace Base
 
 		jNIEnv->DeleteLocalRef(cls);
 
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNextServiceSize end");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNextServiceSize end");
 
 		return (int)ret;
 	}
@@ -224,7 +224,7 @@ namespace Base
 		JNIEnv* jNIEnv,
 		jobject jThis)
 	{
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewService begin");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewService begin");
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtGetNewService", "(IIII)I");
@@ -240,20 +240,22 @@ namespace Base
 
 		jNIEnv->DeleteLocalRef(cls);
 
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewService end");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtGetNewService end");
 
 		return (int)ret;
 	}
 
 	int _maBtCancelDiscovery(JNIEnv* jNIEnv, jobject jThis)
 	{
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtCancelDiscovery begin");
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtCancelDiscovery begin");
+
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maBtCancelDiscovery", "()I");
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
 		jNIEnv->DeleteLocalRef(cls);
-		__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtCancelDiscovery end");
+
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Syscalls", "_maBtCancelDiscovery end");
 
 		return (int)ret;
 	}

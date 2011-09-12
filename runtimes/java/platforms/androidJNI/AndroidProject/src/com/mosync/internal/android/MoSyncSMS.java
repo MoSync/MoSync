@@ -86,12 +86,12 @@ public class MoSyncSMS
 			{
 				if (Activity.RESULT_OK == getResultCode())
 				{
-					Log.i("@@@ MoSync", "SMS sent");
+					//Log.i("@@@ MoSync", "SMS sent");
 					postSMSEvent(MA_SMS_RESULT_SENT);
 				}
 				else
 				{
-					Log.i("@@@ MoSync", "SMS not sent");
+					//Log.i("@@@ MoSync", "SMS not sent");
 					postSMSEvent(MA_SMS_RESULT_NOT_SENT);
 				}
 
@@ -100,19 +100,19 @@ public class MoSyncSMS
 				switch (getResultCode())
 				{
 					case Activity.RESULT_OK:
-						Log.i("@@@ MoSync", "SMS sent RESULT_OK");
+						//Log.i("@@@ MoSync", "SMS sent RESULT_OK");
 						break;
 					case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
-						Log.i("@@@ MoSync", "SMS sent RESULT_ERROR_GENERIC_FAILURE");
+						//Log.i("@@@ MoSync", "SMS sent RESULT_ERROR_GENERIC_FAILURE");
 						break;
 					case SmsManager.RESULT_ERROR_NO_SERVICE:
-						Log.i("@@@ MoSync", "SMS sent RESULT_ERROR_NO_SERVICE");
+						//Log.i("@@@ MoSync", "SMS sent RESULT_ERROR_NO_SERVICE");
 						break;
 					case SmsManager.RESULT_ERROR_NULL_PDU:
-						Log.i("@@@ MoSync", "SMS sent RESULT_ERROR_NULL_PDU");
+						//Log.i("@@@ MoSync", "SMS sent RESULT_ERROR_NULL_PDU");
 						break;
 					case SmsManager.RESULT_ERROR_RADIO_OFF:
-						Log.i("@@@ MoSync", "SMS sent RESULT_ERROR_RADIO_OFF");
+						//Log.i("@@@ MoSync", "SMS sent RESULT_ERROR_RADIO_OFF");
 						break;
 				}
 			}
@@ -128,12 +128,12 @@ public class MoSyncSMS
 			{
 				if (Activity.RESULT_OK == getResultCode())
 				{
-					Log.i("@@@ MoSync", "SMS delivered");
+					//Log.i("@@@ MoSync", "SMS delivered");
 					postSMSEvent(MA_SMS_RESULT_DELIVERED);
 				}
 				else
 				{
-					Log.i("@@@ MoSync", "SMS not delivered");
+					//Log.i("@@@ MoSync", "SMS not delivered");
 					postSMSEvent(MA_SMS_RESULT_NOT_DELIVERED);
 				}
 			}

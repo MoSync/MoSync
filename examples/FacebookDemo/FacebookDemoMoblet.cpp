@@ -48,22 +48,25 @@ MA 02110-1301, USA.
 FacebookDemoMoblet::FacebookDemoMoblet(const MAUtil::String &appId):
 	mImage(NULL), mImageSize(0)
 {
+	if(appId.size()==0)
+	{
+		maPanic(1, "This application requires an application id. Please see file config.h");
+	}
 
 	initializeFacebook(appId);
-
 	createGUI();
-
 	login();
 }
 
 void FacebookDemoMoblet::login()
 {
+
 	MAUtil::String oAuthUrl = mFacebookManager->getOAuthUrl();
+	LOG("\t\tOAuthUrl = %s", oAuthUrl.c_str());
+
 	mLoginScreen->setUrl(oAuthUrl);
 	mLoginScreen->setListener(this);
 	mLoginScreen->show();
-
-	LOG("\t\tOAuthUrl = %s", oAuthUrl.c_str());
 }
 
 void FacebookDemoMoblet::webViewHookInvoked( NativeUI::WebView* webView, int hookType,
@@ -79,7 +82,7 @@ void FacebookDemoMoblet::webViewHookInvoked( NativeUI::WebView* webView, int hoo
 	maReadData(urlData, newUrl, 0, sz);
 	maDestroyObject(urlData);
 
-	LOG("\t\ttnew URL: %s", newUrl);
+	LOG("\t\ttnew URL: %s, sz=%d", newUrl, sz);
 
 	MAUtil::String access_token = extractAccessToken(newUrl);
 	if(access_token.size()>0)
@@ -194,11 +197,6 @@ void FacebookDemoMoblet::createGUI()
 MAUtil::String FacebookDemoMoblet::extractAccessToken(const char *newurl)
 {
 	MAUtil::String access_token;
-
-//	const int BUFFER_SIZE = 16384;
-//	char *newurl = new char[BUFFER_SIZE];
-//	strcpy((char*) newurl, newUrl.c_str());
-
 
 	if (strstr(newurl, "fbconnect://") == newurl)
 	{

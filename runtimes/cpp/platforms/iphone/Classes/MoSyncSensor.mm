@@ -17,10 +17,10 @@
 
 
 // sensor update interval values in milliseconds
-#define SENSOR_RATE_FASTEST_IOS 20
-#define SENSOR_RATE_GAME_IOS 50
-#define SENSOR_RATE_NORMAL_IOS 70
-#define SENSOR_RATE_UI_IOS 100
+#define SENSOR_RATE_FASTEST_IOS 50
+#define SENSOR_RATE_GAME_IOS 80
+#define SENSOR_RATE_NORMAL_IOS 140
+#define SENSOR_RATE_UI_IOS 160
 
 // used for converting milliseconds in seconds
 #define SECOND 1000.0
@@ -69,7 +69,7 @@
 			result = [self startOrientation];
 			break;
 		case SENSOR_TYPE_MAGNETIC_FIELD:
-			result = [self startMagnetometer];
+			result = [self startMagnetometer:value];
 			break;
 		default:
 			result = SENSOR_ERROR_NOT_AVAILABLE;
@@ -180,34 +180,33 @@
 	}
 
 	// check if gyroscope is available.
-	if([motionManager isGyroAvailable]) {
-
-		// set the update interval(the value must be in seconds so we need to convert it from milliseconds).
-		float updateValue = interval;
-		motionManager.gyroUpdateInterval = updateValue / SECOND;
-
-		// start gyroscope sensor.
-		[motionManager startGyroUpdatesToQueue:operationQueue
-			withHandler: ^(CMGyroData *gyroData, NSError *error)
-			{
-				CMRotationRate rotate = gyroData.rotationRate;
-
-				MAEvent event;
-				event.type = EVENT_TYPE_SENSOR;
-				event.sensor.type = SENSOR_TYPE_GYROSCOPE;
-
-				event.sensor.values[0] = rotate.x;
-				event.sensor.values[1] = rotate.y;
-				event.sensor.values[2] = rotate.z;
-
-				Base::gEventQueue.put(event);
-			}];
-
-	} else {
+	if([motionManager isGyroAvailable])
+    {
+		NSNumber* updateInterval = [[NSNumber numberWithInt:interval] autorelease];
+        [NSThread detachNewThreadSelector:@selector(startGyroscopeOnNewThread:) toTarget:self withObject:updateInterval];
+	}
+    else
+    {
 		return SENSOR_ERROR_NOT_AVAILABLE;
 	}
 
 	return SENSOR_ERROR_NONE;
+}
+
+ -(void) startGyroscopeOnNewThread:(NSNumber*) interval
+{
+    // set the update interval(the value must be in seconds so we need to convert it from milliseconds).
+    double intervalInMilliseconds = [self getUpdateIntervalFromRate:[interval intValue]];
+    NSTimeInterval updateInterval = intervalInMilliseconds / SECOND ;
+    motionManager.gyroUpdateInterval = updateInterval;
+    [motionManager startGyroUpdates];
+    motionManagerTimer =  [NSTimer scheduledTimerWithTimeInterval:updateInterval
+                                                             target:self
+                                                           selector:@selector(readGyroData:)
+                                                           userInfo:nil
+                                                            repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:motionManagerTimer forMode:NSDefaultRunLoopMode];
+    [[NSRunLoop currentRunLoop] run];
 }
 
 /**
@@ -218,6 +217,10 @@
 	if(![motionManager isGyroActive]) {
 		return SENSOR_ERROR_NOT_ENABLED;
 	}
+
+    [motionManagerTimer invalidate];
+    [motionManagerTimer release];
+    motionManagerTimer = nil;
 
 	[motionManager stopGyroUpdates];
 	return SENSOR_ERROR_NONE;
@@ -282,6 +285,7 @@
 	[device beginGeneratingDeviceOrientationNotifications];
 	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged) name:UIDeviceOrientationDidChangeNotification object:nil];
 	isOrientationSensorRunning = TRUE;
+    [self performSelector:@selector(orientationChanged)];
 
 	return SENSOR_ERROR_NONE;
 }
@@ -306,9 +310,11 @@
 
 /**
  * Start the magnetometer sensor.
+ * @param interval How fast to read data(time interval in milliseconds).
  * @return SENSOR_ERROR_NONE if the sensor has been started, or a code error otherwise.
  */
--(int)startMagnetometer {
+-(int)startMagnetometer:(const int)interval
+{
 	if(![CLLocationManager headingAvailable]) {
 		return SENSOR_ERROR_NOT_AVAILABLE;
 	}
@@ -317,28 +323,89 @@
 		return SENSOR_ERROR_ALREADY_ENABLED;
 	}
 
-	// start the magnetometer sensor
-	locationManager.delegate = self;
-	[locationManager startUpdatingHeading];
-	isMagnetometerSensorRunning = TRUE;
+    NSNumber* updateInterval = [[NSNumber numberWithInt:interval] autorelease];
+    [NSThread detachNewThreadSelector:@selector(startMagnetometerOnNewThread:) toTarget:self withObject:updateInterval];
 
 	return SENSOR_ERROR_NONE;
+}
+
+-(void) startMagnetometerOnNewThread:(NSNumber*) interval
+{
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    [locationManager startUpdatingHeading];
+
+	// Start the magnetometer sensor.
+    // Location manager does not have an update interval property and it sends too fast data
+    // for our current event system.
+    // Used a timer that reads location data at a specified interval.
+    double intervalInMilliseconds = [self getUpdateIntervalFromRate:[interval intValue]];
+    NSTimeInterval updateInterval = intervalInMilliseconds / SECOND;
+    locationManagerTimer =  [NSTimer scheduledTimerWithTimeInterval:updateInterval
+                                                             target:self
+                                                           selector:@selector(readMagnetometerData:)
+                                                           userInfo:nil
+                                                            repeats:YES];
+    [[NSRunLoop currentRunLoop] addTimer:locationManagerTimer forMode:NSDefaultRunLoopMode];
+    [[NSRunLoop currentRunLoop] run];
+
+	isMagnetometerSensorRunning = TRUE;
+    [pool release];
 }
 
 /**
  * Stop the magnetometer sensor.
  * @return SENSOR_ERROR_NONE if the sensor has been stopped, or a code error otherwise.
  */
--(int)stopMagnetometer {
-	if(isMagnetometerSensorRunning) {
-		locationManager.delegate = self;
+-(int)stopMagnetometer
+{
+	if(isMagnetometerSensorRunning)
+    {
+		[locationManagerTimer invalidate];
+        [locationManagerTimer release];
+        locationManagerTimer = nil;
+
 		[locationManager stopUpdatingHeading];
 		isMagnetometerSensorRunning = FALSE;
-	} else {
+	}
+    else
+    {
 		return SENSOR_ERROR_NOT_ENABLED;
 	}
 
 	return SENSOR_ERROR_NONE;
+}
+
+/**
+ * Get the update interval associated with a rate constant.
+ * @param rate One of the next constants:
+ * - SENSOR_RATE_FASTEST
+ * - SENSOR_RATE_GAME
+ * - SENSOR_RATE_NORMAL
+ * - SENSOR_RATE_UI
+ * @return The update interval associated with the rate, or rate parameter
+ * if it's not one of the above constants.
+ */
+-(int) getUpdateIntervalFromRate:(const int) rate
+{
+    int returnValue = 0;
+	switch (rate) {
+		case SENSOR_RATE_FASTEST:
+			returnValue = SENSOR_RATE_FASTEST_IOS;
+			break;
+		case SENSOR_RATE_GAME:
+			returnValue = SENSOR_RATE_GAME_IOS;
+			break;
+		case SENSOR_RATE_NORMAL:
+			returnValue = SENSOR_RATE_NORMAL_IOS;
+			break;
+		case SENSOR_RATE_UI:
+			returnValue = SENSOR_RATE_UI_IOS;
+			break;
+		default:
+			returnValue = rate;
+	}
+
+    return returnValue;
 }
 
 /**
@@ -356,6 +423,27 @@
 	event.sensor.values[2] = acceleration.z;
 
 	Base::gEventQueue.put(event);
+}
+
+/**
+ * This method is invoked at a specified interval.
+ * Sends events with gyro data.
+ * @param timer Timer used for this call.
+ */
+- (void)readGyroData:(NSTimer*) timer
+{
+    CMGyroData* gyroData = [motionManager gyroData];
+    if (gyroData)
+    {
+        CMRotationRate rotate = gyroData.rotationRate;
+        MAEvent event;
+        event.type = EVENT_TYPE_SENSOR;
+        event.sensor.type = SENSOR_TYPE_GYROSCOPE;
+        event.sensor.values[0] = rotate.x;
+        event.sensor.values[1] = rotate.y;
+        event.sensor.values[2] = rotate.z;
+        Base::gEventQueue.put(event);
+    }
 }
 
 /**
@@ -393,20 +481,23 @@
 }
 
 /**
- * This delegate method is invoked when the magnetometer sensor has new data.
- * @param manager The location manager object.
- * @param heading The new heading data.
+ * This method is invoked at a specified interval.
+ * Sends events with magnetometer data.
+ * @param timer Timer used for this call.
  */
- - (void)locationManager:(CLLocationManager *)manager didUpdateHeading:(CLHeading *)heading {
-	MAEvent event;
-	event.type = EVENT_TYPE_SENSOR;
-	event.sensor.type = SENSOR_TYPE_MAGNETIC_FIELD;
-
-	event.sensor.values[0] = heading.x;
-	event.sensor.values[1] = heading.y;
-	event.sensor.values[2] = heading.z;
-
-	Base::gEventQueue.put(event);
+ - (void)readMagnetometerData:(NSTimer*) timer
+{
+    CLHeading* heading = [locationManager heading];
+    if (heading)
+    {
+        MAEvent event;
+        event.type = EVENT_TYPE_SENSOR;
+        event.sensor.type = SENSOR_TYPE_MAGNETIC_FIELD;
+        event.sensor.values[0] = heading.x;
+        event.sensor.values[1] = heading.y;
+        event.sensor.values[2] = heading.z;
+        Base::gEventQueue.put(event);
+    }
 }
 
 /**

@@ -259,6 +259,8 @@ static IWidget* sOldScreen = nil;
 
 - (void) showModalHelper: (UIViewController*) controller {
 	[[(ScreenWidget*)sOldScreen getController] presentModalViewController:controller animated:NO];
+	[[UIApplication sharedApplication] setStatusBarHidden:YES
+                                            withAnimation:UIStatusBarAnimationFade];
 }
 
 - (void) hideModal {

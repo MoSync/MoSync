@@ -409,6 +409,7 @@ void HttpQueryDownloader::error(Downloader* downloader, int code)
 void HttpQueryDownloader::httpFinished(MAUtil::HttpConnection *conn, int result) {
 
    LOG("\n\n\t\tHttpQueryDownloader::httpFinished %d", result);
+
    String contentLengthStr;
 
 	int responseBytes = mHttpConnection->getResponseHeader("Content-Length", &contentLengthStr);
@@ -417,10 +418,10 @@ void HttpQueryDownloader::httpFinished(MAUtil::HttpConnection *conn, int result)
 	if(responseBytes != CONNERR_NOHEADER)
 		contentLength = atoi(contentLengthStr.c_str());
 
-	if(contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0) {
+	if(contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0)
+	{
 		maPanic(1, "finished: HTTP RECV not supported");
 		mHttpConnection->recv(mHttpConnectionBuffer, CONNECTION_BUFFER_SIZE);
-
 	}
 	else
 	{
@@ -444,11 +445,13 @@ void HttpQueryDownloader::connReadFinished(MAUtil::Connection *conn, int result)
 	for(int i = 0; i < mListeners.size(); i++) {
 		mListeners[i]->httpQueryFinished(this, (const byte*)mHttpConnectionBuffer, dataLength);
 	}
+
 	lprintfln("data: %s", mHttpConnectionBuffer);
 }
 
 void HttpQueryDownloader::connWriteFinished(MAUtil::Connection *conn, int result) {
 	LOG("\t\tHttpQueryDownloader::connWriteFinished %d", result);
+
 	for(int i = 0; i < mListeners.size(); i++)
 	{
 		mListeners[i]->httpWriteFinished(this, result);

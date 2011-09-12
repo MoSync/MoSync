@@ -34,7 +34,7 @@ public class MoSyncSensor implements SensorEventListener {
 //	private static final int SENSOR_TYPE_GRAVITY = 9;
 //	private static final int SENSOR_TYPE_LINEAR_ACCELERATION = 10;
 //	private static final int SENSOR_TYPE_ROTATION_VECTOR = 11;
-	private static final int SENSOR_TYPES = 5;
+	private static final int SENSOR_TYPES = 6;
 
 	private static final int SENSOR_ERROR_NONE = 0;
 	/*
@@ -146,8 +146,8 @@ public class MoSyncSensor implements SensorEventListener {
     public void onSensorChanged(SensorEvent arg0) {
 
 		// If the sensor data is unreliable return
-		if (arg0.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE)
-			return;
+		//if (arg0.accuracy == SensorManager.SENSOR_STATUS_UNRELIABLE)
+		//	return;
 
 		int[] event = new int[SEVENT_SIZE];
 

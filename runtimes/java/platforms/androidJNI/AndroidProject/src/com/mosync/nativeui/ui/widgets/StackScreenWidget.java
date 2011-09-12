@@ -106,7 +106,8 @@ public class StackScreenWidget extends ScreenWidget
 		int poppedToScreenHandle = getHandle( );
 		if( m_screenStack.size( ) >= 2 )
 		{
-			poppedToScreenHandle = m_screenStack.get( 1 ).getHandle( );
+			// Get the previous screen before the last one.
+			poppedToScreenHandle = m_screenStack.get(m_screenStack.size()-2).getHandle();
 		}
 		
 		EventQueue.getDefault( ).postWidgetStackScreenPoppedEvent(

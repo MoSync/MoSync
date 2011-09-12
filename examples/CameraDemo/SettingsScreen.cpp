@@ -30,76 +30,58 @@ MA 02110-1301, USA.
 
 #include "WidgetUtil.h"
 
-
+using namespace NativeUI;
 
 /**
- * This method implements a custom event listener.
- * Widget events are sent as custom events.
+ * This method implements a button event listener.
+ * Button click events are sent here.
  */
-void SettingsScreen::customEvent(const MAEvent& event)
+void SettingsScreen::buttonClicked(Widget* button)
 {
-	// Check if this is a widget event.
-	if (EVENT_TYPE_WIDGET == event.type)
+	if(mFlashModeButton == button)
 	{
-		// Get the widget event data structure.
-		MAWidgetEventData* eventData = (MAWidgetEventData*) event.data;
-
-		// Here we handle clicked events.
-		if (MAW_EVENT_CLICKED == eventData->eventType)
+		if(flashModeIndex < 3)
 		{
-			if(mFlashModeButton == eventData->widgetHandle)
-			{
-				if(flashModeIndex < 3)
-				{
-					flashModeIndex++;
-				}
-				else
-				{
-					flashModeIndex = 0;
-				}
-				char buffer[128];
-				sprintf(buffer, "Flash Mode: %s", getModeForIndex(flashModeIndex));
-				maWidgetSetProperty(mFlashModeButton,MAW_BUTTON_TEXT, buffer);
-			}
-			else if(mSwapCameraButton == eventData->widgetHandle)
-			{
-				if(currentCamera < numCameras-1)
-				{
-					currentCamera++;
-				}
-				else
-				{
-					currentCamera = 0;
-				}
-
-				if(currentCamera == 0)
-				{
-					maWidgetSetProperty(
-							mSwapCameraButton,
-							MAW_LABEL_TEXT,
-							"Camera Selected: Back");
-				}
-				else
-				{
-					maWidgetSetProperty(
-							mSwapCameraButton,
-							MAW_LABEL_TEXT,
-							"Camera Selected: Front");
-				}
-			}
-			else if(mOKButton == eventData->widgetHandle)
-			{
-				isViewed= false;
-				maWidgetStackScreenPop(mStackScreen);
-			}
+			flashModeIndex++;
 		}
+		else
+		{
+			flashModeIndex = 0;
+		}
+		char buffer[128];
+		sprintf(buffer, "Flash Mode: %s", getModeForIndex(flashModeIndex));
+		mFlashModeButton->setText(buffer);
+	}
+	else if(mSwapCameraButton == button)
+	{
+		if(currentCamera < numCameras-1)
+		{
+			currentCamera++;
+		}
+		else
+		{
+			currentCamera = 0;
+		}
+
+		if(currentCamera == 0)
+		{
+			mSwapCameraButton->setText("Camera Selected: Back");
+		}
+		else
+		{
+			mSwapCameraButton->setText("Camera Selected: Front");
+		}
+	}
+	else if(mOKButton == button)
+	{
+		mStackScreen->pop();
 	}
 }
 
 /**
  * Lazy initialization
  */
-int SettingsScreen::initialize(MAHandle stackScreen, MAHandle previewWidget)
+int SettingsScreen::initialize(StackScreen* stackScreen, CameraPreview* previewWidget)
 {
 	mPreviewWidget = previewWidget;
 	mStackScreen = stackScreen;
@@ -115,98 +97,62 @@ void SettingsScreen::createUI()
 	// Create a Native UI screen. As the screen is a member
 	// variable (also called instance variable) we have
 	// prefixed the variable name with "m".
-	mScreen = maWidgetCreate(MAW_SCREEN);
+	mScreen = new Screen();
+
+	mScreen->setTitle("Settings");
 
 	// Create the screen's main layout widget.
-	mMainLayoutWidget = maWidgetCreate(MAW_VERTICAL_LAYOUT);
+	mMainLayoutWidget = new VerticalLayout;
 
-	// Make the layout fill the entire screen. For properties that
-	// take an integer parameter we use the widgetSetPropertyInt
-	// function, for properties that takes a string parameter
-	// we use the maWidgetSetProperty function.
-	widgetSetPropertyInt(
-		mMainLayoutWidget,
-		MAW_WIDGET_WIDTH,
-		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-	widgetSetPropertyInt(
-		mMainLayoutWidget,
-		MAW_WIDGET_HEIGHT,
-		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-
+	// Make the layout fill the entire screen.
+	mMainLayoutWidget->fillSpaceHorizontally();
+	mMainLayoutWidget->fillSpaceVertically();
 
 	// Add the layout as the root of the screen's widget tree.
-	maWidgetAddChild(mScreen, mMainLayoutWidget);
+	mScreen->setMainWidget(mMainLayoutWidget);
 
-	mFlashModeButton = maWidgetCreate(MAW_BUTTON);
-	widgetSetPropertyInt(
-		mFlashModeButton,
-		MAW_WIDGET_WIDTH,
-		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-	widgetSetPropertyInt(
-		mFlashModeButton,
-		MAW_WIDGET_HEIGHT,
-		MAW_CONSTANT_WRAP_CONTENT);
-	maWidgetSetProperty(
-		mFlashModeButton,
-		MAW_LABEL_TEXT,
-		"Flash Mode: OFF");
-	maWidgetAddChild(mMainLayoutWidget, mFlashModeButton);
+	mFlashModeButton = new Button();
 
-	mSwapCameraButton = maWidgetCreate(MAW_BUTTON);
-	widgetSetPropertyInt(
-		mSwapCameraButton,
-		MAW_WIDGET_WIDTH,
-		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-	widgetSetPropertyInt(
-		mSwapCameraButton,
-		MAW_WIDGET_HEIGHT,
-		MAW_CONSTANT_WRAP_CONTENT);
-	maWidgetSetProperty(
-		mSwapCameraButton,
-		MAW_LABEL_TEXT,
-		"Camera Selected: Back");
-	maWidgetAddChild(mMainLayoutWidget, mSwapCameraButton);
+	mFlashModeButton->fillSpaceHorizontally();
+	mFlashModeButton->wrapContentVertically();
+	mFlashModeButton->setText("Flash Mode: OFF");
+	mFlashModeButton->addButtonListener(this);
+
+	mMainLayoutWidget->addChild(mFlashModeButton);
+
+	mSwapCameraButton = new Button();
+
+	mSwapCameraButton->fillSpaceHorizontally();
+	mSwapCameraButton->wrapContentVertically();
+	mSwapCameraButton->setText("Camera Selected: Back");
+	mSwapCameraButton->addButtonListener(this);
+
+	mMainLayoutWidget->addChild(mSwapCameraButton);
 
 	//Only enable switch camera buttons if we have more than one camera
 	if(numCameras == 1)
 	{
-		maWidgetSetProperty(mSwapCameraButton,
-				MAW_WIDGET_ENABLED,
-				"false");
-
-		maWidgetSetProperty(mSwapCameraButton,
-				MAW_BUTTON_FONT_COLOR,
-				"0x969696");
+		mSwapCameraButton->setEnabled(false);
+		mSwapCameraButton->setFontColor(0x969696);
 	}
 
 	//If the phone does not support flash disable the flash button
 	if(flashSupported == false)
 	{
-		maWidgetSetProperty(mFlashModeButton,
-				MAW_WIDGET_ENABLED,
-				"false");
-
-		maWidgetSetProperty(mFlashModeButton,
-				MAW_BUTTON_FONT_COLOR,
-				"0x969696");
+		mFlashModeButton->setEnabled(false);
+		mFlashModeButton->setFontColor(0x969696);
 	}
 
 
 	//The button that finishes the setting operation
-	mOKButton = maWidgetCreate(MAW_BUTTON);
-	widgetSetPropertyInt(
-		mOKButton,
-		MAW_WIDGET_WIDTH,
-		MAW_CONSTANT_FILL_AVAILABLE_SPACE);
-	widgetSetPropertyInt(
-		mOKButton,
-		MAW_WIDGET_HEIGHT,
-		MAW_CONSTANT_WRAP_CONTENT);
-	maWidgetSetProperty(
-			mOKButton,
-		MAW_LABEL_TEXT,
-		"Back to Main Screen");
-	maWidgetAddChild(mMainLayoutWidget, mOKButton);
+	mOKButton = new Button();
+
+	mOKButton->fillSpaceHorizontally();
+	mOKButton->wrapContentVertically();
+	mOKButton->setText("Back to Main Screen");
+	mOKButton->addButtonListener(this);
+
+	mMainLayoutWidget->addChild(mOKButton);
 }
 
 
@@ -215,8 +161,7 @@ void SettingsScreen::createUI()
  */
 void SettingsScreen::pushSettingsScreen()
 {
-	isViewed = true;
-	maWidgetStackScreenPush(mStackScreen, mScreen);
+	mStackScreen->push(mScreen);
 }
 
 /**

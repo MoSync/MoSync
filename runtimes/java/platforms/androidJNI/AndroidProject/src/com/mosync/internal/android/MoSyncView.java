@@ -78,14 +78,14 @@ public class MoSyncView extends SurfaceView implements SurfaceHolder.Callback
 					android.view.SurfaceHolder.SURFACE_TYPE_NORMAL);
 			}
 		}
-
+/*
 		switch (mode)
 		{
 			case 1: Log.i("MoSync", "Hardware accelerated surface"); break;
 			case 2: Log.i("MoSync", "GPU accelerated surface"); break;
 			default: Log.i("MoSync", "No hardware acceleration available");
 		}
-				
+*/
 		mSurfaceHolder.addCallback(this);    
 		
 		setVisibility(VISIBLE);

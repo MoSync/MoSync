@@ -27,15 +27,12 @@ MA 02110-1301, USA.
 #include "TextScreen.h"
 #include "Facebook/LOG.h"
 
+#include "../PlatformInfo.h"
+
 namespace FacebookDemoGUI
 {
 
 TextScreen::TextScreen(FacebookDemoScreen *prev):FacebookDemoScreen(prev)
-{
-	initialize();
-}
-
-TextScreen::TextScreen(): FacebookDemoScreen(0)
 {
 	initialize();
 }
@@ -52,17 +49,19 @@ void TextScreen::clear()
 
 void TextScreen::buttonPressed(Widget* button)
 {
-
 }
 
 void TextScreen::buttonReleased(Widget* button)
 {
-
 }
 
 void TextScreen::buttonClicked(Widget* button)
 {
-	back();
+	if( button = mBackButton )
+	{
+		back();
+		mPreviousScreen->show();
+	}
 }
 
 void TextScreen::initialize()
@@ -74,6 +73,17 @@ void TextScreen::initialize()
 	mLabel->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 	mLabel->fillSpaceHorizontally();
 	mLabel->fillSpaceVertically();
+
+	if( FacebookDemoApplication::isAndroid())
+	{
+		mLayout->setBackgroundColor(0x000000);
+		mLabel->setBackgroundColor(0x000000);
+	}
+	else
+	{
+		mLayout->setBackgroundColor(0x99999A);
+		mLabel->setBackgroundColor(0x99999A);
+	}
 
 	mBackButton = new NativeUI::Button();
 	mBackButton->setText("back");

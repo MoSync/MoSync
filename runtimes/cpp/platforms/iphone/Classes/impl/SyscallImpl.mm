@@ -41,7 +41,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MoSyncUISyscalls.h"
 #import "CameraPreviewWidget.h"
 #import "CameraConfirgurator.h"
-
+#import "ImagePickerController.h"
 #include "netImpl.h"
 
 #define NETWORKING_H
@@ -322,6 +322,7 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
+        [ImagePickerController deleteInstance];
 	}
 
 
@@ -1430,6 +1431,8 @@ return 0; \
 	
 	CameraSystemInfo gCameraSystem={0,0,FALSE,NULL};
 	
+	CameraConfirgurator *gCameraConfigurator;
+
 	//This performs lazy initialization of the camera system, the first time
 	//a relevant camera syscall is called.
 	void initCameraSystem()
@@ -1437,7 +1440,7 @@ return 0; \
 		
 		if( gCameraSystem.initialized == FALSE )
 		{
-
+			gCameraConfigurator = [[CameraConfirgurator alloc] init];
 			CameraInfo *cameraInfo;
 			int numCameras = 0;
 			
@@ -1582,6 +1585,14 @@ return 0; \
 					[info->captureSession	performSelectorOnMainThread:@selector(startRunning)
 														   withObject:nil
 														waitUntilDone:YES];
+
+					if(info->device.torchMode == AVCaptureTorchModeOn)
+					{
+						[info->device lockForConfiguration:nil];
+						info->device.torchMode = AVCaptureTorchModeOff;
+						info->device.torchMode = AVCaptureTorchModeOn;
+						[info->device unlockForConfiguration];
+					}
 				}
 				return 1;
 		}
@@ -1734,16 +1745,13 @@ return 0; \
 		@try {
 			int result = 0;
 			CameraInfo *info = getCurrentCameraInfo();
-
 			NSString *propertyString = [NSString stringWithUTF8String:property];
 			NSString *valueString = [NSString stringWithUTF8String:value];
-			CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
-			result = [configurator	setCameraProperty: info->device
+			result = [gCameraConfigurator	setCameraProperty: info->device
 										withProperty: propertyString
 										   withValue: valueString];
 			[propertyString release];
 			[valueString release];
-			[configurator release];
 			return result;
 		}
 		@catch (NSException * e) {
