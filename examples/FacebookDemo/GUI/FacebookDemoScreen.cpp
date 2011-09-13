@@ -20,14 +20,32 @@ MA 02110-1301, USA.
  * FacebookDemoScreen.cpp
  */
 
+//#include <NativeUI/Button.h>
+//#include <NativeUI/ListView.h>
+//#include <NativeUI/ListViewListener.h>
+//#include <NativeUI/Screen.h>
+
 #include "FacebookDemoScreen.h"
 #include "Facebook/LOG.h"
+
+#include "../PlatformInfo.h"
 
 namespace FacebookDemoGUI
 {
 
-FacebookDemoScreen::FacebookDemoScreen(FacebookDemoScreen *prevScreen): mPreviousScreen(prevScreen)
+FacebookDemoScreen::FacebookDemoScreen(FacebookDemoScreen *prevScreen): mPreviousScreen(prevScreen),
+		mLayout(0),
+		mList(0),
+		mBackButton(0)
 {
+	mClearScreenAfterLosingFocus = false;
+
+	mItemsColor_Android = 0x000000;
+	mItemsColor_iPhone = 0x99999A;
+
+	mScreenColor = 0x000000;
+
+	this->setBackgroundColor(mScreenColor);
 }
 
 void FacebookDemoScreen::show()
@@ -75,6 +93,35 @@ void FacebookDemoScreen::keyPressEvent(int keyCode, int nativeCode)
 FacebookDemoScreen *FacebookDemoScreen::getPreviousScreen()
 {
 	return mPreviousScreen;
+}
+
+void FacebookDemoScreen::add(ListItem *btn)
+{
+	if(FacebookDemoApplication::isAndroid())
+	{
+		btn->setBackgroundColor(mItemsColor_Android);
+	}
+	else
+	{
+		btn->setBackgroundColor(mItemsColor_iPhone);
+	}
+	mList->addChild(btn);
+}
+
+
+void FacebookDemoScreen::clearScreenAfterLosingFocus(bool clearScreen)
+{
+	mClearScreenAfterLosingFocus = clearScreen;
+}
+
+bool FacebookDemoScreen::isEmpty() const
+{
+	return (mList->countChildWidgets() == 0);
+}
+
+int FacebookDemoScreen::addChild(NativeUI::Widget* widget)
+{
+	return NativeUI::Screen::addChild(widget);
 }
 
 FacebookDemoScreen::~FacebookDemoScreen()

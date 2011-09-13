@@ -34,7 +34,7 @@
         [datePicker setDatePickerMode:UIDatePickerModeDate];
         [datePicker addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
 
-        view = [datePicker retain];
+        view = datePicker;
     }
 
     return [super init];
@@ -51,7 +51,7 @@
     UIDatePicker* datePicker = (UIDatePicker*) view;
     double paramValue = [value doubleValue];
 
-    if([key isEqualToString:@"maxDate"])
+    if([key isEqualToString:@MAW_DATE_PICKER_MAX_DATE])
     {
         // Set a maximum date into date picker.
         NSDate* maxDate = [NSDate dateWithTimeIntervalSince1970:paramValue];
@@ -67,7 +67,7 @@
             [datePicker setMaximumDate:maxDate];
         }
     }
-    else if([key isEqualToString:@"minDate"])
+    else if([key isEqualToString:@MAW_DATE_PICKER_MIN_DATE])
     {
         // Set a minimum date into date picker.
         NSDate* minDate = [NSDate dateWithTimeIntervalSince1970:paramValue];
@@ -83,9 +83,9 @@
             [datePicker setMinimumDate:minDate];
         }
     }
-    else if ([key isEqualToString:@"dayOfMonth"] ||
-             [key isEqualToString:@"month"]      ||
-             [key isEqualToString:@"year"])
+    else if ([key isEqualToString:@MAW_DATE_PICKER_DAY_OF_MONTH] ||
+             [key isEqualToString:@MAW_DATE_PICKER_MONTH]      ||
+             [key isEqualToString:@MAW_DATE_PICKER_YEAR])
     {
         TEST_FOR_NEGATIVE_VALUE(paramValue);
 
@@ -95,15 +95,15 @@
         NSCalendar* defaultCalendar = [NSCalendar currentCalendar];
         NSDateComponents *components = [defaultCalendar components:unitFlags fromDate:selectedDate];
 
-        if ([key isEqualToString:@"dayOfMonth"])
+        if ([key isEqualToString:@MAW_DATE_PICKER_DAY_OF_MONTH])
         {
             [components setDay:paramValue];
         }
-        else if ([key isEqualToString:@"month"])
+        else if ([key isEqualToString:@MAW_DATE_PICKER_MONTH])
         {
             [components setMonth:paramValue];
         }
-        else if ([key isEqualToString:@"year"])
+        else if ([key isEqualToString:@MAW_DATE_PICKER_YEAR])
         {
             [components setYear:paramValue];
         }
@@ -128,14 +128,14 @@
 {
 
     UIDatePicker* datePicker = (UIDatePicker*) view;
-	if([key isEqualToString:@"maxDate"])
+	if([key isEqualToString:@MAW_DATE_PICKER_MAX_DATE])
     {
         // return the maximum date for the date picker.
         NSDate* maxDate = [datePicker maximumDate];
         NSTimeInterval timeInterval = [maxDate timeIntervalSince1970];
         return[[NSString alloc] initWithFormat:@"%d", (int)timeInterval];
 	}
-    else if([key isEqualToString:@"minDate"])
+    else if([key isEqualToString:@MAW_DATE_PICKER_MIN_DATE])
     {
         // return the minimum date for the date picker.
         NSDate* minDate = [datePicker minimumDate];
@@ -143,7 +143,7 @@
         return[[NSString alloc] initWithFormat:@"%d", (int)timeInterval];
 
 	}
-    else if([key isEqualToString:@"year"])
+    else if([key isEqualToString:@MAW_DATE_PICKER_YEAR])
     {
         // return the selected year from the date picker.
         NSDate* date = [datePicker date];
@@ -151,7 +151,7 @@
         NSInteger year = [components year];
         return[[NSString alloc] initWithFormat:@"%d", year];
 	}
-    else if([key isEqualToString:@"month"])
+    else if([key isEqualToString:@MAW_DATE_PICKER_MONTH])
     {
         // return the selected month from the date picker.
         NSDate* date = [datePicker date];
@@ -159,7 +159,7 @@
         NSInteger month = [components month];
         return[[NSString alloc] initWithFormat:@"%d", month];
 	}
-    else if([key isEqualToString:@"dayOfMonth"])
+    else if([key isEqualToString:@MAW_DATE_PICKER_DAY_OF_MONTH])
     {
         // return the selected day from the date picker.
         NSDate* date = [datePicker date];

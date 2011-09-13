@@ -25,7 +25,7 @@
 @implementation NavBarWidget
 
 - (id)init {	
-	UINavigationBar* navbar = [[[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, 100, 44)] retain];
+	UINavigationBar* navbar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, 100, 44)];
 	navbar.delegate = self;
 	prevNavitem = [[UINavigationItem alloc] init];
 	currNavitem = [[UINavigationItem alloc] init];
@@ -33,21 +33,23 @@
 	[navbar pushNavigationItem:currNavitem animated:false];
 	view = navbar;		
 	
-	return [super init];	
+	id ret = [super init];	
+   	[self setAutoSizeParamX:FILL_PARENT andY:WRAP_CONTENT];	
+    return ret;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"title"])
+	if([key isEqualToString:@MAW_NAV_BAR_TITLE])
     {
 		currNavitem.title = value;
 	}
-	else if([key isEqualToString:@"backButtonTitle"])
+	else if([key isEqualToString:@MAW_NAV_BAR_BACK_BTN])
     {
 		//navitem.leftBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:value style:UIBarButtonItemStylePlain target:nil action:nil];
 		//navitem.hidesBackButton = YES;
 		prevNavitem.title = value;
 	}
-    else if([key isEqualToString:@"backgroundColor"])
+    else if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR])
     {
         // The background color property must be handled different.
         // For the rest of the widgets the property is handled by

@@ -41,7 +41,7 @@ void logWithNSLog(const char *str, int length) {
 const char *getReadablePath(const char* path) {
 	NSString *stringFromChar = [[NSString alloc] initWithBytes:path length:strlen(path) encoding:NSUTF8StringEncoding];  	
 	NSString *nspath = [[NSBundle mainBundle] pathForResource:stringFromChar ofType:@""];
-//	NSString *source = [NSString stringWithContentsOfFile:nspath encoding:NSUTF8StringEncoding error:NULL];
+    [stringFromChar release];
 	return [nspath UTF8String];
 }
 
@@ -51,6 +51,7 @@ const char *getWriteablePath(const char* path) {
 	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES); 
 	NSString *documentsDirectoryPath = [paths objectAtIndex:0];	
 	NSString *myFilePath = [documentsDirectoryPath stringByAppendingPathComponent:stringFromChar];
+    [stringFromChar release];
 	return [myFilePath UTF8String];	
 }
 
@@ -106,6 +107,7 @@ bool platformRequest(const char *urlstr) {
 //	NSString *stringFromChar = [NSString stringWithCString:urlstr length:strlen(urlstr)];
 	NSString *stringFromChar = [[NSString alloc] initWithBytes:urlstr length:strlen(urlstr) encoding:NSUTF8StringEncoding];
 	NSURL *url = [NSURL URLWithString:stringFromChar];
+    [stringFromChar release];
 	if (![[UIApplication sharedApplication] openURL:url])
 		return false;
 	return true;

@@ -21,7 +21,6 @@
 
 @interface ListViewWidget : IWidget <UITableViewDelegate, UITableViewDataSource> {
 	UITableViewController* tableViewController;
-	NSMutableArray* mDataForMyTable;	
 }
 
 - (id)init;
