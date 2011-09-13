@@ -45,19 +45,7 @@ using namespace MoSync;
 Platform* Platform::create()
 {
 	Platform::checkNativeUISupport();
-
-	if (Platform::isAndroid())
-	{
-		return new PlatformAndroid();
-	}
-	else if (Platform::isIOS())
-	{
-		return new PlatformIOS();
-	}
-	else
-	{
-		return NULL;
-	}
+	return new Platform();
 }
 
 /**
@@ -337,40 +325,6 @@ MAUtil::String Platform::createTextFromHandle(MAHandle handle)
 
     // Return text object.
     return text;
-}
-
-// ================= Class PlatformUtilAndroid =================
-
-/**
- * Constructor.
- */
-PlatformAndroid::PlatformAndroid()
-{
-}
-
-/**
- * Destructor.
- */
-PlatformAndroid::~PlatformAndroid()
-{
-	// Nothing needs to be explicitly destroyed.
-}
-
-// ================= Class PlatformUtilIOS =================
-
-/**
- * Constructor.
- */
-PlatformIOS::PlatformIOS()
-{
-}
-
-/**
- * Destructor.
- */
-PlatformIOS::~PlatformIOS()
-{
-	// Nothing needs to be explicitly destroyed.
 }
 
 // ================= Class WebViewMessage =================
