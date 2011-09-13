@@ -88,7 +88,7 @@ namespace NativeUI
 		 * Get the currently displayed date.
 		 * @return A Date struct that specifies the displayed date.
 		 */
-		virtual Date getDate() const;
+		virtual Date getDate();
 
 		/**
 		 * Set the current year of the picker.
@@ -104,7 +104,7 @@ namespace NativeUI
 		 * Get the currently displayed year.
 		 * @return An int that specifies the current year.
 		 */
-		virtual int getYear() const;
+		virtual int getYear();
 
 		/**
 		 * Set the current month of the picker.
@@ -120,7 +120,7 @@ namespace NativeUI
 		 * Get the currently displayed month.
 		 * @return An int that specifies the current month.
 		 */
-		virtual int getMonth() const;
+		virtual int getMonth();
 
 		/**
 		 * Set the current day of month.
@@ -136,7 +136,7 @@ namespace NativeUI
 		 * Get the currently displayed day.
 		 * @return An int that specifies the current day of month.
 		 */
-		virtual int getDayOfMonth() const;
+		virtual int getDayOfMonth();
 
 		/**
 		 * Set the minimum date of the picker.

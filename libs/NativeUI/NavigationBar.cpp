@@ -61,7 +61,7 @@ namespace NativeUI
      * Get the title.
      * @return The displayed title.
      */
-    MAUtil::String NavigationBar::getTitle() const
+    MAUtil::String NavigationBar::getTitle()
     {
         return getPropertyString(MAW_NAV_BAR_TITLE);
     }
@@ -82,7 +82,7 @@ namespace NativeUI
      * Get the text on the back button.
      * @return The text displayed ont he back button.
      */
-    MAUtil::String NavigationBar::getBackButtonTitle() const
+    MAUtil::String NavigationBar::getBackButtonTitle()
     {
         return getPropertyString(MAW_NAV_BAR_BACK_BTN);
     }

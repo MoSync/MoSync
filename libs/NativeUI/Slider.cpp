@@ -62,7 +62,7 @@ namespace NativeUI
      * Get the upper range of the slider.
      * @return The upper range of the slider.
      */
-    int Slider::getMaximumValue() const
+    int Slider::getMaximumValue()
     {
         return this->getPropertyInt(MAW_SLIDER_MAX);
     }
@@ -84,7 +84,7 @@ namespace NativeUI
      * Get the current value of the slider.
      * @return The slider's current value.
      */
-    int Slider::getValue() const
+    int Slider::getValue()
     {
         return this->getPropertyInt(MAW_SLIDER_VALUE);
     }

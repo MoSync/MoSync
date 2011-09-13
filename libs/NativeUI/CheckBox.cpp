@@ -58,7 +58,7 @@ namespace NativeUI
      * Get the state of the check box.
      * @return True if the check box is checked, false otherwise.
      */
-    bool CheckBox::isChecked() const
+    bool CheckBox::isChecked()
     {
         MAUtil::String value = MAUtil::lowerString(
 			this->getPropertyString(MAW_CHECK_BOX_CHECKED));

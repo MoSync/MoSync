@@ -62,7 +62,7 @@ namespace NativeUI
      * Get the maximum number of lines used for rendering text.
      * @return The maximum number of lines.
      */
-    int Label::getMaxNumberOfLines() const
+    int Label::getMaxNumberOfLines()
     {
         return getPropertyInt(MAW_LABEL_MAX_NUMBER_OF_LINES);
     }

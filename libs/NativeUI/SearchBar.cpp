@@ -60,7 +60,7 @@ namespace NativeUI
      * Get the current text of the search bar.
      * @return The text.
      */
-    MAUtil::String SearchBar::getText() const
+    MAUtil::String SearchBar::getText()
     {
         return this->getPropertyString(MAW_SEARCH_BAR_TEXT);
     }

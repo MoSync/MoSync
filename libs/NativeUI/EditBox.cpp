@@ -59,7 +59,7 @@ namespace NativeUI
      * Get the text entered in the edit box.
      * @return The text entered in the edit box.
      */
-    MAUtil::String EditBox::getText() const
+    MAUtil::String EditBox::getText()
     {
         return this->getPropertyString(MAW_EDIT_BOX_TEXT);
     }
