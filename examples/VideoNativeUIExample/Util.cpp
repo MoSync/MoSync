@@ -67,3 +67,32 @@ bool isAndroid()
 		return false;
 	}
 }
+
+/**
+ * Converts milliseconds value into a more readable output.
+ * @param milliseconds An int.
+ * @return A string in the form: HH::MM::SS.
+ */
+MAUtil::String getFormatedDuration(int milliseconds)
+{
+	MAUtil::String output;
+	int hours(0), minutes(0), seconds(0);
+
+	seconds = milliseconds / 1000;
+	minutes = milliseconds / ( 1000 * 60 );
+	hours = milliseconds / ( 1000 * 60 * 60 );
+
+	if ( hours == 0 )
+		output+= "0";
+	output += MAUtil::integerToString(hours);
+	output += ":";
+	if ( minutes == 0 )
+		output += "0";
+	output += MAUtil::integerToString(minutes);
+	output += ":";
+	if ( seconds == 0 )
+		output += "0";
+	output += MAUtil::integerToString(seconds);
+
+	return output;
+}
