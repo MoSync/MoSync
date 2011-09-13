@@ -279,13 +279,6 @@ void VideoScreen::buttonClicked(Widget* button)
     if (button == mPlay)
     {
         mVideoView->play();
-        // Refresh the duration label if there's no error.
-        if ( mVideoView->getDuration() > 0 )
-        {
-        mDuration->setText(
-			"Duration: " +
-			MAUtil::integerToString(mVideoView->getDuration()));
-        }
     }
     else if (button == mPause)
     {
@@ -319,6 +312,11 @@ void VideoScreen::buttonClicked(Widget* button)
  * - #MAW_VIDEO_VIEW_STATE_FINISHED the video has finished playing.
  * - #MAW_VIDEO_VIEW_STATE_INTERRUPTED Playback is temporarily
  * interruped(maybe there's no data in the buffer).
+ * NOTE: there is a slightly different behaviour depending on the platform:
+ *  - on iOS the source is loaded into memory when
+ *  MAW_VIDEO_VIEW_STATE_PLAYING is received.
+ *   - on Android the source is loaded into memory when
+ *  MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
  */
 void VideoScreen::videoViewStateChanged(
     VideoView* videoView,
@@ -333,10 +331,14 @@ void VideoScreen::videoViewStateChanged(
                 text = SOURCE_PLAYING;
                 mPause->setEnabled(true);
                 mStop->setEnabled(true);
-                // Refresh the duration label.
+                // On iOS the source is loaded into memory and the duration
+                // can be retrieved.
+                if ( mVideoView->getDuration() > 0 )
+                {
                 mDuration->setText(
 					"Duration: " +
 					MAUtil::integerToString(mVideoView->getDuration()));
+                }
                 break;
             case MAW_VIDEO_VIEW_STATE_PAUSED:
                 text = SOURCE_PAUSED;
@@ -349,6 +351,14 @@ void VideoScreen::videoViewStateChanged(
                 // Now pause and stop can be enabled.
                 mPause->setEnabled(true);
                 mStop->setEnabled(true);
+                // On Android the source is loaded into memory at this point,
+                // and the duration can be retrieved.
+                if ( mVideoView->getDuration() > 0 )
+                {
+                mDuration->setText(
+					"Duration: " +
+					MAUtil::integerToString(mVideoView->getDuration()));
+                }
                 break;
             case MAW_VIDEO_VIEW_STATE_FINISHED:
                 text = SOURCE_FINISHED;
