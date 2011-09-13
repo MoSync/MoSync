@@ -132,40 +132,6 @@ public:
 };
 
 /**
- * Class that contains Android platform utility methods.
- */
-class PlatformAndroid : public Platform
-{
-public:
-	/**
-	 * Constructor.
-	 */
-	PlatformAndroid();
-
-	/**
-	 * Destructor.
-	 */
-	virtual ~PlatformAndroid();
-};
-
-/**
- * Class that contains iOS platform utility methods.
- */
-class PlatformIOS : public Platform
-{
-public:
-	/**
-	 * Constructor.
-	 */
-	PlatformIOS();
-
-	/**
-	 * Destructor.
-	 */
-	virtual ~PlatformIOS();
-};
-
-/**
  * Class that reads and parses messages in the form of urls
  * sent from a web view as MAW_EVENT_WEB_VIEW_HOOK_INVOKED events.
  *
