@@ -116,21 +116,19 @@ public class PIM {
 		Organization.CONTENT_ITEM_TYPE,
 	};
 
-	private final static int PIM_ERROR_LIST_TYPE_NOT_SUPPORTED = -3;
-
 	/*
 	 * PIM list
 	 */
 	private ArrayList<PIMItem> mPIMContactsList;
-	private Iterator<PIMItem> mPIMIterator;
+	private int mPIMIterator;
 
 	/**
 	 * Table that holds PIM resources.
 	 */
 	private Hashtable<Integer, ArrayList<PIMItem>> mPIMLists =
 		new Hashtable<Integer, ArrayList<PIMItem>>();
-	private Hashtable<Integer, Iterator<PIMItem>> mPIMIterators =
-		new Hashtable<Integer, Iterator<PIMItem>>();
+	private Hashtable<Integer, Integer> mPIMIterators =
+		new Hashtable<Integer, Integer>();
 	private Hashtable<Integer, PIMItem> mPIMItems =
 		new Hashtable<Integer, PIMItem>();
 
@@ -233,7 +231,7 @@ public class PIM {
 			mPIMContactsList.add(pimItem);
 	    }
 
-	    mPIMIterator = mPIMContactsList.iterator();
+	    mPIMIterator = 0;
 
 	    mPIMLists.put(mResourceIndex, mPIMContactsList);
 	    mPIMIterators.put(mResourceIndex, mPIMIterator);
@@ -252,14 +250,18 @@ public class PIM {
 	public int maPimListNext(int list)
 	{
 		DebugPrint("maPimListNext " + list);
-		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
+		if ((list < 0) || (!mPIMIterators.containsKey(list)))
 		{
 			return MA_PIM_ERR_HANDLE_INVALID;
 		}
 
-	    if (mPIMIterator.hasNext())
+		mPIMIterator = mPIMIterators.get(list);
+
+	    if (mPIMIterator < mPIMContactsList.size())
 	    {
-			mPIMItems.put(mResourceIndex, mPIMIterator.next());
+			mPIMItems.put(mResourceIndex, mPIMContactsList.get(mPIMIterator));
+			mPIMIterator++;
+			mPIMIterators.put(list, mPIMIterator);
 	    }
 	    else
 	    {
@@ -458,7 +460,7 @@ public class PIM {
 
 	public int maPimFieldType(int list, int field)
 	{
-		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
+		if ((list < 0) || (!mPIMIterators.containsKey(list)))
 		{
 			return MA_PIM_ERR_HANDLE_INVALID;
 		}
@@ -653,7 +655,8 @@ public class PIM {
 
 	public int maPimItemCreate(int list)
 	{
-		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
+		DebugPrint("maPimItemCreate");
+		if ((list < 0) || (!mPIMIterators.containsKey(list)))
 		{
 			return MA_PIM_ERR_HANDLE_INVALID;
 		}
@@ -668,10 +671,12 @@ public class PIM {
 
 	public int maPimItemRemove(int list, int item)
 	{
-		if ((list < 0) || ((mPIMIterator = mPIMIterators.get(list)) == null))
+		if ((list < 0) || (!mPIMIterators.containsKey(list)))
 		{
 			return MA_PIM_ERR_HANDLE_INVALID;
 		}
+
+		mPIMIterator = mPIMIterators.get(list);
 
 		PIMItem pimItem = null;
 		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
@@ -682,6 +687,12 @@ public class PIM {
 		pimItem.delete(getContentResolver());
 
 		mPIMItems.remove(item);
+		if ((item == mPIMIterator) && (mPIMIterator > 0))
+		{
+			mPIMIterator--;
+			mPIMIterators.put(list, mPIMIterator);
+		}
+		mPIMContactsList.remove(item);
 
 		return MA_PIM_ERR_NONE;
 	}

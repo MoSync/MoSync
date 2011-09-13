@@ -50,6 +50,11 @@ namespace NativeUI
          * - #MAW_VIDEO_VIEW_STATE_FINISHED the video has finished playing.
          * - #MAW_VIDEO_VIEW_STATE_INTERRUPTED Playback is temporarily
          * interruped(maybe there's no data in the buffer).
+         * NOTE: there is a slightly different behaviour depending on the platform:
+         *  - on iOS the source is loaded into memory when
+         *  MAW_VIDEO_VIEW_STATE_PLAYING is received.
+         *   - on Android the source is loaded into memory when
+         *  MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
          */
         virtual void videoViewStateChanged(
             VideoView* videoView,
