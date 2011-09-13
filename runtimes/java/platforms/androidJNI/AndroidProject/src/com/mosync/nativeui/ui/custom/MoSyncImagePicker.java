@@ -261,8 +261,12 @@ public class MoSyncImagePicker
 		            filePath = aCursor.getString(pathColumn);
 		            title = aCursor.getString(titleColumn);
 
-		            if ( filePath.endsWith(".jpg") || filePath.endsWith(".png") || filePath.endsWith(".jpeg") )
-		            {
+		            if ( filePath.toLowerCase().endsWith(".jpg")
+							||
+						filePath.toLowerCase().endsWith(".png")
+							||
+						filePath.toLowerCase().endsWith(".jpeg") )
+					{
 						mPaths.add(filePath);
 						mNames.add(title);
 		            }
