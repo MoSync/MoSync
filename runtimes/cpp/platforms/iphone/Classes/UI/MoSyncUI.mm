@@ -126,6 +126,8 @@ static IWidget* sOldScreen = nil;
 	IWidget *widget = nil;
 	if(handle<0 || handle>=[widgetArray count]) return NULL;
 	widget = [widgetArray objectAtIndex:(NSUInteger)handle];
+    if([NSNull null]==(id)widget)
+        return NULL;
 	return widget;
 }
 
@@ -166,13 +168,14 @@ static IWidget* sOldScreen = nil;
 	IWidget *created = nil;
 	NSString* realName = [name stringByAppendingString:@"Widget"];
 	Class widgetClass = NSClassFromString(realName);
+    if(widgetClass == [IWidget class]) {
+        return MAW_RES_ERROR;
+    }
+
 	if(widgetClass != nil) {
 		created = [[widgetClass alloc] init];
-		
         if(created == nil)
             return MAW_RES_ERROR;
-		if(widgetClass == [IWidget class]) 
-			return MAW_RES_ERROR;
 		
 	} else {
 		//created = [[ReflectionWidget alloc] initWithName:name];
@@ -194,14 +197,16 @@ static IWidget* sOldScreen = nil;
 	}
 	
 	[created setWidgetHandle:ret];	
+    [created release];
 	
 	return ret;
 }
 
 - (int) destroyWidgetInstance:(IWidget*)widget {
 	int handle = [widget getWidgetHandle];	
-	[widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
-	
+
+    [widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
+        
 	int ret;
 	int removeRet = [widget remove];
 	if(removeRet<0)
@@ -209,15 +214,15 @@ static IWidget* sOldScreen = nil;
 	else
 		ret = MAW_RES_OK;
 
-	
 	//[widget dealloc];
-	[widget release];
-	[unusedWidgetHandles addObject:[[NSNumber alloc] initWithInt:handle]];
-
+    NSNumber* numHandle = [[NSNumber alloc] initWithInt:handle];
+    [unusedWidgetHandles addObject:numHandle];
+    [numHandle release];
+    
 	return ret;
 }
 
-- (void) setPropertyOf: (IWidget*) widget withKey: (NSString*)key toValue: (NSString*)value {	
+- (void) setPropertyOf: (IWidget*) widget withKey: (NSString*)key toValue: (NSString*)value {
 	[widget setPropertyWithKey:key toValue:value];
 }
 

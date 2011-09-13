@@ -27,13 +27,14 @@ MA 02110-1301, USA.
 #define NATIVEUI_HORIZONTAL_LAYOUT_H_
 
 #include "Widget.h"
+#include "Layout.h"
 
 namespace NativeUI
 {
 	/**
 	 * A horizontal layout is a layout that stacks widgets in the horizontal axis.
 	 */
-	class HorizontalLayout : public Widget
+	class HorizontalLayout : public Layout
 	{
 	public:
 		/**

@@ -110,9 +110,8 @@ void WebScreen::showScreen()
  * Open a web view for a certain title
  * compose the url and display
  * @param The article title for which we want to open a wikipedia definition.
- * @return false if some error occur.
  */
-bool WebScreen::openWebView(MAUtil::String title)
+void WebScreen::openWebView(MAUtil::String title)
 {
 	MAUtil::String url = "http://en.wikipedia.org/wiki/" + title;
 

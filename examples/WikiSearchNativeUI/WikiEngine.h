@@ -92,7 +92,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~MediaWiki();
+	virtual ~MediaWiki();
 
 	/**
 	 * Set the parent screen.

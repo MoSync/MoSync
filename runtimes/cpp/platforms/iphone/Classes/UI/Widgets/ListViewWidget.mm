@@ -60,12 +60,17 @@
 
 - (id)init {
 	tableViewController = [[UITableViewController alloc] init];
-	view = tableViewController.tableView;		
+	view = [tableViewController.tableView retain];		
 	tableViewController.tableView.delegate = self;
 	tableViewController.tableView.dataSource = self;
 	id obj = [super init];		
 	
 	return obj;
+}
+
+- (void)dealloc {
+    [tableViewController release];
+    [super dealloc];
 }
 
 - (void)addChild: (IWidget*)child toSubview:(bool)toSubview {

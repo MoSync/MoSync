@@ -27,6 +27,7 @@
 #include <maassert.h>
 #include <mawstring.h>
 #include <mastdlib.h>
+#include <maprofile.h>
 
 #include "MainScreen.h"
 /**
@@ -89,14 +90,12 @@ void MainScreen::createMainLayout() {
 	mMainLayout->addChild(mVideoView);
 
 	mEditBox = new EditBox();
-	mEditBox->setText("http://www.jhepple.com/SampleMovies/niceday.wmv");
 	mEditBox->fillSpaceHorizontally();
 	mMainLayout->addChild(mEditBox);
 
 	mSetUrl = new Button();
 	mSetUrl->setText("Set url");
-	// Android example link: "http://www.jhepple.com/SampleMovies/niceday.wmv"
-	// iOS example link: "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8"
+
 	mMainLayout->addChild(mSetUrl);
 
     mPlay = new Button();
@@ -126,6 +125,15 @@ void MainScreen::createMainLayout() {
     mCurrentTime->setText("Current time");
     layout->addChild(mCurrentTime);
 
+    if (isAndroid())
+    {
+        mEditBox->setText("http://www.mosync.com/files/videos/heineken.3gp");
+    }
+    else
+    {
+        mEditBox->setText("http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8");
+    }
+    mVideoView->setURL(mEditBox->getText());
 }
 
 /**
@@ -217,4 +225,20 @@ void MainScreen::videoViewStateChanged(
 
         printf("%s", text.c_str());
     }
+}
+
+/**
+ * Detects if the current platform is Android.
+ * @return true if the platform is Android, false otherwise.
+ */
+bool MainScreen::isAndroid()
+{
+	if (NULL != strstr(MA_PROF_STRING_PLATFORM, "android"))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
