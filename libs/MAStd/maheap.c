@@ -27,6 +27,7 @@ realloc_hook gReallocHook = NULL;
 block_size_hook gBlockSizeHook = NULL;
 
 static void* sHeapBase;
+static int sHeapLength;
 
 #ifdef MOSYNCDEBUG
 //#define MEMORY_PROTECTION
@@ -168,6 +169,7 @@ void ansi_heap_init_crt0(char *start, int length)
 	MASTD_HEAP_LOG("heap: start 0x%p len 0x%x", start, length);
 
 	sHeapBase = start;
+	sHeapLength = length;
 
 	if(length <= 0)
 		return;
@@ -184,7 +186,7 @@ void ansi_heap_init_crt0(char *start, int length)
 }
 
 size_t heapTotalMemory(void) {
-	return get_max_size(sHeapBase);
+	return sHeapLength;
 }
 size_t heapFreeMemory(void) {
 	return heapTotalMemory() - get_used_size(sHeapBase);
