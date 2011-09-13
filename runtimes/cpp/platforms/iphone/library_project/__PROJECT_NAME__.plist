@@ -24,8 +24,6 @@
 	<string>__VERSION__</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
-	<key>UIApplicationExitsOnSuspend</key>
-	<string>YES</string>
 
 </dict>
 </plist>
