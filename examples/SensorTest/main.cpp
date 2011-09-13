@@ -148,7 +148,7 @@ void drawSensorValue(int index, int x, int y)
 		case SENSOR_TYPE_ACCELEROMETER:
 		case SENSOR_TYPE_MAGNETIC_FIELD:
 		case SENSOR_TYPE_GYROSCOPE:
-			sprintf(buffer, "Values: X:%f; Y:%f; Z:%f",
+			sprintf(buffer, "Values: X:%0.4f; Y:%0.4f; Z:%0.4f",
 					values[0], values[1], values[2]);
 			break;
 		case SENSOR_TYPE_ORIENTATION:
