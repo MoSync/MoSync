@@ -114,8 +114,13 @@ public class MoSyncImagePicker
 		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which)
 			{
+				// Display only the name of the selected image.
+				Toast.makeText(getActivity(), mNames.get(mPosition),
+						Toast.LENGTH_SHORT).show();
+
 				// Clear the bitmap cache before closing the dialog.
 				mBitmapCache.clear();
+
 				if ( !mPaths.isEmpty() )
 				{
 					// Save the handle of the selected item and post event.
@@ -177,8 +182,9 @@ public class MoSyncImagePicker
                 public void onItemSelected(AdapterView<?> arg0, View arg1,
                         int pos, long id)
                 {
-					Toast.makeText(getActivity(), mNames.get(pos) ,
-					        Toast.LENGTH_SHORT).show();
+					// Do not show the names, because they could be shown with delay,
+					// even after the dialog is closed.
+//					Toast.makeText(getActivity(), mNames.get(pos), Toast.LENGTH_SHORT).show();
 
 					if ( mBitmapCache.get(pos).getWidth() > preview.getLayoutParams().width
 							&&
