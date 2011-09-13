@@ -75,7 +75,7 @@ namespace NativeUI
          * Get the text entered in the edit box.
          * @return The text entered in the edit box.
          */
-        virtual MAUtil::String getText() const;
+        virtual MAUtil::String getText();
 
         /**
          * Set a text in the edit box that acts as a placeholder when an

@@ -113,13 +113,13 @@ namespace NativeUI
          * Only for Android platform.
          * @return The buffer percentage of the played video file.
          */
-        virtual int getBufferPercentage() const;
+        virtual int getBufferPercentage();
 
         /**
          * Get the current video time.
          * @return The current video time.
          */
-        virtual int currentPlaybackTime() const;
+        virtual int currentPlaybackTime();
 
         /**
          * Add an video view event listener.

@@ -37,6 +37,7 @@ namespace NativeUI
     /**
      * A navigation bar is an iPhone specific widget that shows a nav bar
      * with an optional title and back button.
+     * Available only on iOS for the moment.
      */
     class NavigationBar : public Widget
     {
@@ -64,7 +65,7 @@ namespace NativeUI
          * Get the title.
          * @return The displayed title.
          */
-        virtual MAUtil::String getTitle() const;
+        virtual MAUtil::String getTitle();
 
         /**
          * Set the text on the back button.
@@ -79,7 +80,7 @@ namespace NativeUI
          * Get the text on the back button.
          * @return The text displayed ont he back button.
          */
-        virtual MAUtil::String getBackButtonTitle() const;
+        virtual MAUtil::String getBackButtonTitle();
 
         /**
          * Add an navigation bar event listener.

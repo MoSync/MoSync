@@ -63,7 +63,7 @@ namespace NativeUI
      * Get the current hour in 24h mode( in the range: 0-23 ).
      * @return An int that specifies the current hour.
      */
-    int TimePicker::getHour() const
+    int TimePicker::getHour()
     {
         return this->getPropertyInt(MAW_TIME_PICKER_CURRENT_HOUR);
     }
@@ -85,7 +85,7 @@ namespace NativeUI
      * Get the current minute (0-59).
      * @return An int that specifies the current minute.
      */
-    int TimePicker::getMinute() const
+    int TimePicker::getMinute()
     {
         return this->getPropertyInt(MAW_TIME_PICKER_CURRENT_MINUTE);
     }

@@ -62,7 +62,7 @@ namespace NativeUI
          * Get the state of the check box.
          * @return True if the check box is checked, false otherwise.
          */
-        virtual bool isChecked() const;
+        virtual bool isChecked();
 
         /**
          * Add an check box event listener.
