@@ -1,37 +1,53 @@
 <html>
 <head>
-<script>
-function StartTrackingGeoLocation()
-{
-  document.getElementById("LocationStatus").innerHTML =
-  "Location tracking started"
-  document.location = "mosync://StartTrackingGeoLocation"
-}
+	<script>
+	function StartTrackingGeoLocation()
+	{
+		SetLocationStatus("Location tracking started");
+		SetLocationData("");
 
-function StopTrackingGeoLocation()
-{
-  document.getElementById("LocationStatus").innerHTML =
-  "Location tracking stopped"
-  document.getElementById("LocationData").innerHTML = ""
-  document.location = "mosync://StopTrackingGeoLocation"
-}
+		// This results in MoSync C++ code being called.
+		document.location = "mosync://StartTrackingGeoLocation";
+	}
 
-function GeoLocationUpdated(lat, lon)
-{
-  document.getElementById("LocationData").innerHTML =
-  "Latitude: " + lat + "<br />Longitude: " + lon
-}
-</script>
+	function StopTrackingGeoLocation()
+	{
+		SetLocationStatus("Location tracking stopped");
+		SetLocationData("");
+
+		// This results in MoSync C++ code being called.
+		document.location = "mosync://StopTrackingGeoLocation";
+	}
+
+	function SetLocationStatus(message)
+	{
+		document.getElementById("LocationStatus").innerHTML = message;
+	}
+
+	function SetLocationData(message)
+	{
+		document.getElementById("LocationData").innerHTML = message;
+	}
+
+	function GeoLocationUpdated(lat, lon)
+	{
+		SetLocationData("Latitude: " + lat + "<br />Longitude: " + lon);
+	}
+	</script>
 </head>
 <body>
-<div>
-	<h2>Location Tracker</h2>
-</div>
-<div>
-	<input type="button" value="Start" onclick="StartTrackingGeoLocation()" />
-	<input type="button" value="Stop" onclick="StopTrackingGeoLocation()" />
-</div>
-<div><p id="LocationStatus"></p></div>
-<div><p id="LocationData"></p></div>
+	<div>
+		<h2>Location Tracker</h2>
+	</div>
+	<div>
+		<input type="button" value="Start" onclick="StartTrackingGeoLocation()" />
+		<input type="button" value="Stop" onclick="StopTrackingGeoLocation()" />
+	</div>
+	<div>
+		<p id="LocationStatus"></p>
+	</div>
+	<div>
+		<p id="LocationData"></p>
+	</div>
 </body>
 </html>

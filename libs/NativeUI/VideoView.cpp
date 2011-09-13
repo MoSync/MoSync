@@ -103,9 +103,11 @@ namespace NativeUI
 
     /**
      * Get the video duration.
-     * For an video url this value is known only after receiving
-     * MAW_VIDEO_WIDGET_STATE_SOURCE_READY event is received.
-     * @return The video's duration in seconds.
+     * On Android: this value is known only after
+     *     MAW_VIDEO_WIDGET_STATE_SOURCE_READY event is received.
+     * On iOS: this value can be retrieved after
+     *     MAW_VIDEO_STATE_PLAYING event is received.
+     * @return The video's duration in milliseconds.
      */
     int VideoView::getDuration()
     {

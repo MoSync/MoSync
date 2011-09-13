@@ -71,6 +71,13 @@ int getScreenHeight();
 bool isAndroid();
 
 /**
+ * Converts milliseconds value into a more readable output.
+ * @param milliseconds An int.
+ * @return A string in the form: HH::MM::SS.
+ */
+MAUtil::String getFormatedDuration(int milliseconds);
+
+/**
  * The screen width.
  */
 extern int screenWidth;
