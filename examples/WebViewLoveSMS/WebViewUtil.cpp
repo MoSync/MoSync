@@ -28,9 +28,10 @@ MA 02110-1301, USA.
 #include <maheap.h>			// C memory allocation
 #include <mastring.h>		// C string functions
 #include <mavsprintf.h>		// C string functions
+#include <mastdlib.h>		// C string conversion functions
 #include <MAUtil/String.h>	// C++ String class
 #include <IX_WIDGET.h>		// Widget API
-#include <conprint.h>
+#include <conprint.h>		// Debug printing.
 #include "WebViewUtil.h"
 
 using namespace MoSync;
@@ -45,19 +46,7 @@ using namespace MoSync;
 Platform* Platform::create()
 {
 	Platform::checkNativeUISupport();
-
-	if (Platform::isAndroid())
-	{
-		return new PlatformAndroid();
-	}
-	else if (Platform::isIOS())
-	{
-		return new PlatformIOS();
-	}
-	else
-	{
-		return NULL;
-	}
+	return new Platform();
 }
 
 /**
@@ -237,7 +226,6 @@ bool Platform::readTextFromFile(
 	int size = maFileSize(file);
 	if (size < 1)
 	{
-		lprintfln("Platform::readTextFromFile: size < 1");
 		return false;
 	}
 
@@ -245,17 +233,11 @@ bool Platform::readTextFromFile(
 	char* buffer = (char*) malloc(sizeof(char) * (size + 1));
 
 	int result = maFileRead(file, buffer, size);
-	lprintfln("Platform::readTextFromFile: maFileRead result: %i", result);
-	if (0 == result)
-	{
-		// Success, copy string data.
-		buffer[size] = 0;
-		inText = buffer;
-	}
-
-	free(buffer);
 
 	maFileClose(file);
+
+	buffer[size] = 0;
+	inText = buffer;
 
 	return result == 0;
 }
@@ -346,40 +328,6 @@ MAUtil::String Platform::createTextFromHandle(MAHandle handle)
     return text;
 }
 
-// ================= Class PlatformUtilAndroid =================
-
-/**
- * Constructor.
- */
-PlatformAndroid::PlatformAndroid()
-{
-}
-
-/**
- * Destructor.
- */
-PlatformAndroid::~PlatformAndroid()
-{
-	// Nothing needs to be explicitly destroyed.
-}
-
-// ================= Class PlatformUtilIOS =================
-
-/**
- * Constructor.
- */
-PlatformIOS::PlatformIOS()
-{
-}
-
-/**
- * Destructor.
- */
-PlatformIOS::~PlatformIOS()
-{
-	// Nothing needs to be explicitly destroyed.
-}
-
 // ================= Class WebViewMessage =================
 
 /**
@@ -392,6 +340,43 @@ void WebViewMessage::getMessagesFor(MAWidgetHandle webView)
 		webView,
 		MAW_WEB_VIEW_HARD_HOOK,
 		"mosync://.*");
+}
+
+/**
+ * Take a string that is "percent encoded" and decode it.
+ * @param url Encoded string.
+ * @return The decoded string.
+ */
+MAUtil::String WebViewMessage::unescape(const MAUtil::String& url)
+{
+	// The decoded string.
+	MAUtil::String result = "";
+
+	for (int i = 0; i < url.length(); ++i)
+	{
+		// If the current character is the '%' escape char...
+		if ('%' == (char) url[i])
+		{
+			// Get the char value of the two digit hex value.
+			MAUtil::String hex = url.substr(i + 1, 2);
+			long charValue = strtol(
+				hex.c_str(),
+				NULL,
+				16);
+			// Append to result.
+			result += (char) charValue;
+
+			// Skip over the hex chars.
+			i += 2;
+		}
+		else
+		{
+			// Not encoded, just copy the character.
+			result += url[i];
+		}
+	}
+
+	return result;
 }
 
 /**
@@ -413,9 +398,12 @@ WebViewMessage::WebViewMessage(MAHandle dataHandle)
 		// Zero terminate.
 		stringData[dataSize] = 0;
 
-		// Set string data.
+		// Point to message data.
 		char* p = stringData + strlen("mosync://");
-		mMessageString = p;
+
+		// Decode "percent encoded" characters
+		// and set the message string.
+		mMessageString = unescape(p);
 
 		// Destroy string data.
 		free(stringData);

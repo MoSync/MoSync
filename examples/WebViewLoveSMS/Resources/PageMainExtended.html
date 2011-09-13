@@ -1,4 +1,9 @@
 <html>
+<!--
+  Not used. Contains unfinished code for an about screen.
+  This is for a future version of the application.
+-->
+
 <head>
 <style type="text/css">
 body
@@ -189,13 +194,21 @@ function ShowHelp()
   var element = document.getElementById("HelpPage");
   var parent = document.getElementById("MainPage");
   //var parent = element.parentNode;
-  var width = parent.clientWidth - 40;
-  var height = parent.clientHeight - 40;
-  element.style.left = "20px";
-  element.style.top = "20px";
+  var width = parent.clientWidth - 5;
+  var height = parent.clientHeight - 5;
+//  alert("parentNode: " + element.parentNode + " MainPage: " +  parent);
+  alert("parent.clientWidth: " + parent.clientWidth +
+	  " window.innerWidth: " + window.innerWidth +
+	  " element.parentNode.clientWidth: " + element.parentNode.clientWidth +
+	  " document.documentElement.clientWidth: " + document.documentElement.clientWidth);
+  element.style.left = "2px";
+  element.style.top = "2px";
   element.style.width = width + "px";
   element.style.height = height + "px";
   element.style.visibility = "visible";
+
+  element.style.borderStyle = "solid";
+  element.style.borderWidth = "1px";
 }
 
 function HideHelp()
