@@ -157,7 +157,9 @@ public class MoSyncImagePicker
 			layout.addView(gallery);
 
 			final ImageView preview = new ImageView(getActivity());
-			preview.setLayoutParams(new LayoutParams(mScrWidth/2,mScrHeight/2));
+			// Set fixed size, otherwise the widget will resize itself each time an item is selected.
+			preview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, mScrHeight/2) );
+			preview.setMinimumWidth(mScrWidth/2);
 
 			Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(0), mDecodingOptions);
 			preview.setImageBitmap(bitmap);
@@ -166,7 +168,7 @@ public class MoSyncImagePicker
 				bitmap.getHeight() > preview.getLayoutParams().height )
             {
 				// Scale it to fit.
-				preview.setScaleType(ScaleType.FIT_XY);
+				preview.setScaleType(ScaleType.FIT_CENTER);
             }
             else
             {
@@ -188,10 +190,10 @@ public class MoSyncImagePicker
 
 					if ( mBitmapCache.get(pos).getWidth() > preview.getLayoutParams().width
 							&&
-							mBitmapCache.get(pos).getHeight() > preview.getLayoutParams().height )
+						mBitmapCache.get(pos).getHeight() > preview.getLayoutParams().height )
 		            {
 						// Scale it to fit.
-						preview.setScaleType(ScaleType.FIT_XY);
+						preview.setScaleType(ScaleType.FIT_CENTER);
 		            }
 		            else
 		            {

@@ -27,7 +27,7 @@ MA 02110-1301, USA.
  */
 
 // Minimum number of values for drag events.
-#define MIN_DRAG_VALUES 10
+#define MIN_DRAG_VALUES 5
 
 #include <conprint.h>
 #include <IX_PIM.h>

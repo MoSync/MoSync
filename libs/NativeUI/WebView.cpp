@@ -58,7 +58,7 @@ namespace NativeUI
 	 * Get the currently displayed url in the web view.
 	 * @return The displayed url.
 	 */
-	MAUtil::String WebView::getURL() const
+	MAUtil::String WebView::getURL()
 	{
 		return this->getPropertyString(MAW_WEB_VIEW_URL);
 	}
@@ -99,7 +99,7 @@ namespace NativeUI
 	 * @return The url.
 	 *
 	 */
-	MAUtil::String WebView::getBaseUrl() const
+	MAUtil::String WebView::getBaseUrl()
 	{
 		return this->getPropertyString(MAW_WEB_VIEW_BASE_URL);
 	}
@@ -318,7 +318,7 @@ namespace NativeUI
      * Get the new URL whenever the web view changes it.
      * @return The new URL.
      */
-    MAUtil::String WebView::getNewURL() const
+    MAUtil::String WebView::getNewURL()
     {
         return this->getPropertyString(MAW_WEB_VIEW_NEW_URL);
     }

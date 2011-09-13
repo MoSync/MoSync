@@ -60,7 +60,7 @@ namespace NativeUI
      * Get the upper range of the progress bar.
      * @return The upper range of the progress bar.
      */
-    int ProgressBar::getMaximumValue() const
+    int ProgressBar::getMaximumValue()
     {
         return this->getPropertyInt(MAW_PROGRESS_BAR_MAX);
     }
@@ -83,7 +83,7 @@ namespace NativeUI
      * Get the current progress value to the progress bar.
      * @return The current progress value.
      */
-    int ProgressBar::getProgress() const
+    int ProgressBar::getProgress()
     {
         return this->getPropertyInt(MAW_PROGRESS_BAR_PROGRESS);
     }

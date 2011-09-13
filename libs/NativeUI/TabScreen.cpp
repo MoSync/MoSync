@@ -74,7 +74,7 @@ namespace NativeUI
      * Index starts at zero.
      * @return The index of the current tab.
      */
-    int TabScreen::getActiveTabIndex() const
+    int TabScreen::getActiveTabIndex()
     {
         return (this->getPropertyInt(MAW_TAB_SCREEN_CURRENT_TAB));
     }

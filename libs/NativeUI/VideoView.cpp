@@ -131,7 +131,7 @@ namespace NativeUI
      * Only for Android platform.
      * @return The buffer percentage of the played video file.
      */
-    int VideoView::getBufferPercentage() const
+    int VideoView::getBufferPercentage()
     {
         return this->getPropertyInt(MAW_VIDEO_VIEW_BUFFER_PERCENTAGE);
     }
@@ -140,7 +140,7 @@ namespace NativeUI
      * Get the current video time.
      * @return The current video time.
      */
-    int VideoView::currentPlaybackTime() const
+    int VideoView::currentPlaybackTime()
     {
         return this->getPropertyInt(MAW_VIDEO_VIEW_CURRENT_POSITION);
     }

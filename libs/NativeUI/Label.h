@@ -66,7 +66,7 @@ namespace NativeUI
          * Get the maximum number of lines used for rendering text.
          * @return The maximum number of lines.
          */
-        virtual int getMaxNumberOfLines() const;
+        virtual int getMaxNumberOfLines();
     };
 
 } // namespace NativeUI

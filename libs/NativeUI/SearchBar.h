@@ -59,7 +59,7 @@ namespace NativeUI
          * Get the current text of the search bar.
          * @return The text.
          */
-        virtual MAUtil::String getText() const;
+        virtual MAUtil::String getText();
 
         /**
          * Set a text in the search bar that acts as a placeholder
