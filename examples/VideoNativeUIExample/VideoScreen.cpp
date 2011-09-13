@@ -336,9 +336,8 @@ void VideoScreen::videoViewStateChanged(
                 if ( mVideoView->getDuration() > 0 )
                 {
                 mDuration->setText(
-					"Duration: " +
-					MAUtil::integerToString(mVideoView->getDuration()));
-                }
+					"Duration " +
+					getFormatedDuration( mVideoView->getDuration() ) );                }
                 break;
             case MAW_VIDEO_VIEW_STATE_PAUSED:
                 text = SOURCE_PAUSED;
@@ -356,8 +355,8 @@ void VideoScreen::videoViewStateChanged(
                 if ( mVideoView->getDuration() > 0 )
                 {
                 mDuration->setText(
-					"Duration: " +
-					MAUtil::integerToString(mVideoView->getDuration()));
+					"Duration " +
+					getFormatedDuration( mVideoView->getDuration() ) );
                 }
                 break;
             case MAW_VIDEO_VIEW_STATE_FINISHED:
