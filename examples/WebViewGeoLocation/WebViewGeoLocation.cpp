@@ -26,17 +26,17 @@ MA 02110-1301, USA.
  * The application displays the current location, which is fetched
  * via MoSync C++ code (sycalls maLocationStart and maLocationStop,
  * and events of type EVENT_TYPE_LOCATION) and communicated back
- * to the WebView by calling JavaScript.
+ * to the WebView by calling JavaScript from C++.
  */
 
-#include <ma.h>
-#include <maheap.h>
-#include <mastring.h>
-#include <mavsprintf.h>
-#include <MAUtil/String.h>
-#include <IX_WIDGET.h>
-#include "MAHeaders.h"
-#include "WebViewUtil.h"
+#include <ma.h>				// MoSync API (base API).
+#include <maheap.h>			// C memory allocation functions.
+#include <mastring.h>		// C String functions.
+#include <mavsprintf.h>		// sprintf etc.
+#include <MAUtil/String.h>	// Class String.
+#include <IX_WIDGET.h>		// Widget API.
+#include "MAHeaders.h"		// Resource identifiers, not a physical file.
+#include "WebViewUtil.h"	// Classes Platform and WebViewMessage.
 
 using namespace MoSync;
 
@@ -53,7 +53,7 @@ private:
 public:
 	WebViewGeoLocationApp()
 	{
-		// Create an file utility object.
+		// Create an object that provides platform services.
 		mPlatform = Platform::create();
 
 		// Create the user interface.
@@ -69,9 +69,9 @@ public:
 	{
 		// Create screen that holds the WebView.
 		mScreen = maWidgetCreate(MAW_SCREEN);
-		widgetShouldBeValid(mScreen, "Could not create screen");
+		widgetShouldBeValid(mScreen, "Could not create Screen");
 
-		// Create web view.
+		// Create the WebView.
 		mWebView = createWebView();
 
 		// Compose objects.
@@ -83,9 +83,9 @@ public:
 
 	MAWidgetHandle createWebView()
 	{
-		// Create web view
+		// Create the WebView
 		MAWidgetHandle webView = maWidgetCreate(MAW_WEB_VIEW);
-		widgetShouldBeValid(webView, "Could not create web view");
+		widgetShouldBeValid(webView, "Could not create WebView");
 
 		// Set size of the WebView to fill the parent.
 		maWidgetSetProperty(webView, "width", "-1");
@@ -99,7 +99,7 @@ public:
 		MAUtil::String html =
 			mPlatform->createTextFromHandle(GeoLocationPage_html);
 
-		// Set the HTML the web view displays.
+		// Set the HTML the WebView displays.
 		maWidgetSetProperty(webView, "html", html.c_str());
 
 		// Register a handler for JavaScript messages.

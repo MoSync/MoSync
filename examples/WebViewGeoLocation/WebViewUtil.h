@@ -164,6 +164,13 @@ public:
 	 */
 	static void getMessagesFor(MAWidgetHandle webView);
 
+	/**
+	 * Take a string that is "percent encoded" and decode it.
+	 * @param url Encoded string.
+	 * @return The decoded string.
+	 */
+	static MAUtil::String unescape(const MAUtil::String& url);
+
 public:
 	/**
 	 * Constructor.
