@@ -63,7 +63,7 @@ namespace NativeUI
      * image buttons do not have text attached.
      * @return The text displayed by the widget.
      */
-     MAUtil::String ImageButton::getText() const
+     MAUtil::String ImageButton::getText()
      {
          return this->getPropertyString(MAW_IMAGE_BUTTON_TEXT);
      }

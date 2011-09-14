@@ -88,7 +88,7 @@ namespace NativeUI
 	 * Get the currently displayed date.
 	 * @return A Date struct that specifies the displayed date.
 	 */
-	Date DatePicker::getDate() const
+	Date DatePicker::getDate()
 	{
 		Date displayedDate;
 		displayedDate.year = this->getPropertyInt(MAW_DATE_PICKER_YEAR);
@@ -115,7 +115,7 @@ namespace NativeUI
 	 * Get the currently displayed year.
 	 * @return An int that specifies the current year.
 	 */
-	int DatePicker::getYear() const
+	int DatePicker::getYear()
 	{
 		return this->getPropertyInt(MAW_DATE_PICKER_YEAR);
 	}
@@ -137,7 +137,7 @@ namespace NativeUI
 	 * Get the currently displayed month.
 	 * @return An int that specifies the current month.
 	 */
-	int DatePicker::getMonth() const
+	int DatePicker::getMonth()
 	{
 		return this->getPropertyInt(MAW_DATE_PICKER_MONTH);
 	}
@@ -159,7 +159,7 @@ namespace NativeUI
 	 * Get the currently displayed day.
 	 * @return An int that specifies the current day of month.
 	 */
-	int DatePicker::getDayOfMonth() const
+	int DatePicker::getDayOfMonth()
 	{
 		return this->getPropertyInt(MAW_DATE_PICKER_DAY_OF_MONTH);
 	}

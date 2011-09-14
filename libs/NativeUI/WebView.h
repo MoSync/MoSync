@@ -60,7 +60,7 @@ namespace NativeUI
 		 * Get the currently displayed url in the web view.
 		 * @return The displayed url.
 		 */
-		virtual MAUtil::String getURL() const;
+		virtual MAUtil::String getURL();
 
 		/**
 		 * Set the currently displayed HTML data in the web view.
@@ -92,7 +92,7 @@ namespace NativeUI
 		 * @return The url.
 		 *
 		 */
-		virtual MAUtil::String getBaseUrl() const;
+		virtual MAUtil::String getBaseUrl();
 
 		/**
 		* Set the pattern used to "soft hook" urls, to get notified
@@ -257,7 +257,7 @@ namespace NativeUI
 		 * Get the new URL whenever the web view changes it.
 		 * @return The new URL.
 		 */
-		virtual MAUtil::String getNewURL() const;
+		virtual MAUtil::String getNewURL();
 
         /**
          * Add an web view event listener.

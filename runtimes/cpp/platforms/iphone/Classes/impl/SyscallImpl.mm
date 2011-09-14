@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <FileStream.h>
 #include "Syscall.h"
 #include "PimSyscall.h"
+#include <CoreMedia/CoreMedia.h>
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
@@ -214,11 +215,18 @@ namespace Base {
 	{
 		int len;
 		TEST(s.length(len));
-		const unsigned char *data = (const unsigned char*)s.ptrc();
+		unsigned char *data = (unsigned char*)s.ptrc();
 		ImageFormat format;
+		int orientation = 1; //Default orientation
 #define E(x, y) (data[x]==y)
 		if(len>3 && E(0, 0xff) && E(1, 0xd8)) {
 			format = JPEG;
+			for(int i=0;i<len;i++){
+				if(E(i,0x01) && E(i+1,0x12)){ //The orientation tag
+					orientation = (int)data[i+9]; //The orientation value
+					break;
+				}
+			}
 		}
 		else if(len>7 && E(0, 0x89) && E(1, 0x50) && E(2, 0x4e) && E(3, 0x47) && E(4, 0x0d) && E(5, 0x0a) && E(6, 0x1a) && E(7, 0x0a) ) {
 			format = PNG;
@@ -245,7 +253,11 @@ namespace Base {
 
 		CFRelease(png_data);
 
-		return new Surface(imageRef);
+		Surface *imageSurface = new Surface(imageRef);
+
+		imageSurface->orientation = orientation;
+
+		return imageSurface;
 	}
 
 	Surface* Syscall::loadSprite(void* surface, ushort left, ushort top,

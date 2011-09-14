@@ -21,7 +21,7 @@ MA 02110-1301, USA.
  * @author Emma Tresanszki
  *
  * Class for number picker.
- * NOTE: This widget is available on iOS for the moment.
+ * Note that this type of widget is available only on iOS for the moment.
  */
 
 #ifndef NATIVEUI_NUMBER_PICKER_H_
@@ -70,7 +70,7 @@ namespace NativeUI
 		 * Get the current value for the number picker.
 		 * @return An int that specifies the picker value.
 		 */
-		virtual int getValue() const;
+		virtual int getValue();
 
 		/**
 		 * Set the minimum value of the picker.
@@ -86,7 +86,7 @@ namespace NativeUI
 		 * Get the minimum value of the picker.
 		 * @return An int that specifies the minimum value.
 		 */
-		virtual int getMinValue() const;
+		virtual int getMinValue();
 
 		/**
 		 * Set the maximum value of the picker.
@@ -102,7 +102,7 @@ namespace NativeUI
 		 * Get the maximum value of the picker.
 		 * @return An int that specifies the maximum value.
 		 */
-		virtual int getMaxValue() const;
+		virtual int getMaxValue();
 
         /**
          * Add an number picker event listener.

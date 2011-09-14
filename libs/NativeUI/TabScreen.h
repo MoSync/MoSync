@@ -75,7 +75,7 @@ namespace NativeUI
          * Index starts at zero.
          * @return The index of the current tab.
          */
-        virtual int getActiveTabIndex() const;
+        virtual int getActiveTabIndex();
 
         /**
          * Add an tab screen event listener.

@@ -87,6 +87,8 @@ public class MoSyncImagePicker
 	 */
 	public void loadGallery()
 	{
+		mDecodingOptions.inSampleSize = 4;
+
 		// Initialize the selected image handle.
 		mImageHandle = -1;
 		// Initialize the current position inside the gallery.
@@ -118,14 +120,14 @@ public class MoSyncImagePicker
 				Toast.makeText(getActivity(), mNames.get(mPosition),
 						Toast.LENGTH_SHORT).show();
 
-				// Clear the bitmap cache before closing the dialog.
-				mBitmapCache.clear();
-
 				if ( !mPaths.isEmpty() )
 				{
 					// Save the handle of the selected item and post event.
-					mImageHandle = getSelectedImageHandle(mPaths.get(mPosition));
+					mImageHandle = getSelectedImageHandle(mBitmapCache.get(mPosition));
 				}
+				// Clear the bitmap cache before closing the dialog.
+				mBitmapCache.clear();
+
 				postImagePickerEvent(PICKER_READY);
 			}
 		});
@@ -157,7 +159,9 @@ public class MoSyncImagePicker
 			layout.addView(gallery);
 
 			final ImageView preview = new ImageView(getActivity());
-			preview.setLayoutParams(new LayoutParams(mScrWidth/2,mScrHeight/2));
+			// Set fixed size, otherwise the widget will resize itself each time an item is selected.
+			preview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, mScrHeight/2) );
+			preview.setMinimumWidth(mScrWidth/2);
 
 			Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(0), mDecodingOptions);
 			preview.setImageBitmap(bitmap);
@@ -166,7 +170,7 @@ public class MoSyncImagePicker
 				bitmap.getHeight() > preview.getLayoutParams().height )
             {
 				// Scale it to fit.
-				preview.setScaleType(ScaleType.FIT_XY);
+				preview.setScaleType(ScaleType.FIT_CENTER);
             }
             else
             {
@@ -188,10 +192,10 @@ public class MoSyncImagePicker
 
 					if ( mBitmapCache.get(pos).getWidth() > preview.getLayoutParams().width
 							&&
-							mBitmapCache.get(pos).getHeight() > preview.getLayoutParams().height )
+						mBitmapCache.get(pos).getHeight() > preview.getLayoutParams().height )
 		            {
 						// Scale it to fit.
-						preview.setScaleType(ScaleType.FIT_XY);
+						preview.setScaleType(ScaleType.FIT_CENTER);
 		            }
 		            else
 		            {
@@ -347,22 +351,44 @@ public class MoSyncImagePicker
      * Further, post it in a EVENT_TYPE_IMAGE_PICKER event.
      * @return The new handle.
      */
-    private int getSelectedImageHandle(final String absPath)
+    private int getSelectedImageHandle(Bitmap scaledBitmap)
     {
         // Create handle.
         int dataHandle = mMoSyncThread.nativeCreatePlaceholder();
 
-        // Return the scaled image.
-        Bitmap tempBitmap = BitmapFactory.decodeFile(absPath, mDecodingOptions);
+		// The bitmap was decoded using sample size 4.
+        int originalSizeW = scaledBitmap.getWidth()*4;
+        int originalSizeH = scaledBitmap.getHeight()*4;
 
-			if(null == tempBitmap)
-			{
-				Log.i("MoSync","maImagePickerOpen Cannot create handle");
-				return -1;
-//				maPanic(1, "maImagePickerOpen: Unable to create handle");
-			}
+        if ( originalSizeW > mScrWidth * 4
+				||
+			originalSizeH > mScrHeight *4)
+        {
+			mImageTable.put(dataHandle, new ImageCache(null, scaledBitmap));
+            return dataHandle;
+        }
+        else if ( originalSizeW > mScrWidth  *2
+					||
+				originalSizeH > mScrHeight * 2 )
+        {
+            // If the image is nearly twice as big as the screen, scale to factor 2.
+			mDecodingOptions.inSampleSize = 2;
+        }
+        else
+        {
+            // If the image is close the the screen, do not subsample it.
+			mDecodingOptions.inSampleSize = 1;
+        }
 
-			mImageTable.put(dataHandle, new ImageCache(null, tempBitmap));
+        Bitmap newBitmap = BitmapFactory.decodeFile(mPaths.get(mPosition), mDecodingOptions);
+		if (null == newBitmap)
+		{
+			Log.i("MoSync","maImagePickerOpen Cannot create handle");
+			return -1;
+//			maPanic(1, "maImagePickerOpen: Unable to create handle");
+		}
+
+		mImageTable.put(dataHandle, new ImageCache(null, newBitmap));
 
         return dataHandle;
     }

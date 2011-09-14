@@ -42,9 +42,14 @@ namespace NativeUI
      * (one of the MAW_ constants).
      */
     Widget::Widget(const MAUtil::String& widgetType) :
-        mWidgetManager(WidgetManager::getInstance())
+        mWidgetManager(WidgetManager::getInstance()),
+        mLastError(LastError())
     {
         mWidgetHandle = maWidgetCreate(widgetType.c_str());
+        if ( mWidgetHandle == MAW_RES_INVALID_TYPE_NAME )
+        {
+			setLastErrorCode(mWidgetHandle, "maWidgetCreate");
+        }
         mWidgetManager->registerWidget(mWidgetHandle, this);
     }
 
@@ -107,10 +112,17 @@ namespace NativeUI
         const MAUtil::String& property,
         const MAUtil::String& value)
     {
-        return maWidgetSetProperty(
+		int resultCode =
+			maWidgetSetProperty(
             mWidgetHandle,
             property.c_str(),
             value.c_str());
+
+		if ( resultCode < 0 )
+		{
+			setLastErrorCode(resultCode, property);
+		}
+		return resultCode;
     }
 
     /**
@@ -130,7 +142,14 @@ namespace NativeUI
     {
         char buffer[BUF_SIZE];
         sprintf(buffer, "%d", value);
-        return maWidgetSetProperty(mWidgetHandle, property.c_str(), buffer);
+        int errCode =
+			maWidgetSetProperty(mWidgetHandle, property.c_str(), buffer);
+
+        if ( errCode != MAW_RES_OK )
+        {
+			setLastErrorCode(errCode, property);
+        }
+        return errCode;
     }
 
     /**
@@ -149,7 +168,14 @@ namespace NativeUI
     {
         char buffer[BUF_SIZE];
         sprintf(buffer, "%f", value);
-        return maWidgetSetProperty(mWidgetHandle, property.c_str(), buffer);
+        int errCode =
+			maWidgetSetProperty(mWidgetHandle, property.c_str(), buffer);
+
+        if ( errCode != MAW_RES_OK )
+        {
+			setLastErrorCode(errCode, property);
+        }
+        return errCode;
     }
 
     /**
@@ -157,6 +183,7 @@ namespace NativeUI
      * @param property A string representing which property to set.
      * @param resultCode Will contain the result code of the syscall.
      *                   Can be any of the following result codes:
+     *                   - #MAW_RES_OK.
      *                   - #MAW_RES_INVALID_HANDLE if the handle was invalid.
      *                   - #MAW_RES_INVALID_PROPERTY_NAME if the property
      *                     name was invalid.
@@ -168,7 +195,7 @@ namespace NativeUI
      * @return The property value.
      */
     int Widget::getPropertyInt(
-        const MAUtil::String& property, int& resultCode) const
+        const MAUtil::String& property, int& resultCode)
     {
         char buffer[BUF_SIZE];
         resultCode = maWidgetGetProperty(
@@ -177,11 +204,14 @@ namespace NativeUI
             buffer,
             BUF_SIZE);
 
-        if (0 < resultCode)
+        if ( resultCode >= 0 )
         {
             resultCode = MAW_RES_OK;
         }
-
+        else
+        {
+			setLastErrorCode(resultCode, property);
+        }
         return atoi(buffer);
     }
 
@@ -191,10 +221,20 @@ namespace NativeUI
      * @return The property value.
      */
     int Widget::getPropertyInt(
-        const MAUtil::String& property) const
+        const MAUtil::String& property)
     {
         char buffer[BUF_SIZE];
-        maWidgetGetProperty(mWidgetHandle, property.c_str(), buffer, BUF_SIZE);
+        int resultCode =
+			maWidgetGetProperty(
+			mWidgetHandle,
+			property.c_str(),
+			buffer, BUF_SIZE);
+
+        if ( resultCode < 0 )
+        {
+			setLastErrorCode(resultCode, property);
+        }
+
         return atoi(buffer);
     }
 
@@ -216,7 +256,7 @@ namespace NativeUI
      */
     MAUtil::String Widget::getPropertyString(
         const MAUtil::String& property,
-        int& resultCode) const
+        int& resultCode)
     {
         char buffer[BUF_SIZE];
         resultCode = maWidgetGetProperty(
@@ -225,9 +265,13 @@ namespace NativeUI
             buffer,
             BUF_SIZE);
 
-        if (0 < resultCode)
+        if ( resultCode >= 0 )
         {
             resultCode = MAW_RES_OK;
+        }
+        else
+        {
+			setLastErrorCode(resultCode, property);
         }
 
         return buffer;
@@ -239,7 +283,7 @@ namespace NativeUI
      * @return The property value.
      */
     MAUtil::String Widget::getPropertyString(
-        const MAUtil::String& property) const
+        const MAUtil::String& property)
     {
         int resultCode;
         return getPropertyString(property,resultCode);
@@ -264,7 +308,14 @@ namespace NativeUI
 
         // Add the widget handle as a child, this will add
         // the native widget as a child.
-        return maWidgetAddChild(mWidgetHandle, widget->getWidgetHandle());
+        int resultCode =
+			maWidgetAddChild(mWidgetHandle, widget->getWidgetHandle());
+
+        if ( resultCode < 0 )
+        {
+			setLastErrorCode(resultCode, "addChild");
+        }
+        return resultCode;
     }
 
     /**
@@ -287,10 +338,17 @@ namespace NativeUI
 
         // Add the widget handle as a child, this will add
         // the native widget as a child.
-        return maWidgetInsertChild(
+        int resultCode =
+			maWidgetInsertChild(
             mWidgetHandle,
             widget->getWidgetHandle(),
             index);
+
+        if ( resultCode < 0 )
+        {
+			setLastErrorCode(resultCode, "insertChild");
+        }
+        return resultCode;
     }
 
     /**
@@ -315,8 +373,13 @@ namespace NativeUI
                 break;
             }
         }
+        int resultCode = maWidgetRemoveChild(widget->getWidgetHandle());
 
-        return maWidgetRemoveChild(widget->getWidgetHandle());
+        if ( resultCode < 0 )
+        {
+			setLastErrorCode(resultCode, "removeChild");
+        }
+        return resultCode;
     }
 
     /**
@@ -532,7 +595,7 @@ namespace NativeUI
      * Check if the widget is visible.
      * @return True if is visible, false otherwise.
      */
-    bool Widget::isVisible() const
+    bool Widget::isVisible()
     {
         MAUtil::String value = MAUtil::lowerString(
 			this->getPropertyString(MAW_WIDGET_VISIBLE));
@@ -602,6 +665,26 @@ namespace NativeUI
         {
             mWidgetEventListeners[i]->handleWidgetEvent(this, widgetEventData);
         }
+    }
+
+    /**
+     * Get a handle to the last error that occurred.
+     * @return a LastError structure that holds details about the error.
+     */
+    LastError Widget::getLastError()
+    {
+		return mLastError;
+    }
+
+    /**
+     * Save the last error information.
+     * @param errCode The error code.
+     * @param cause The method/property that caused the error.
+     */
+    void Widget::setLastErrorCode(int& errCode, const MAUtil::String& cause)
+    {
+		mLastError.errorCode = errCode;
+		mLastError.errorCause = cause;
     }
 
 } // namespace NativeUI
