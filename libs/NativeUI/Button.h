@@ -66,7 +66,7 @@ namespace NativeUI
          * Get the text displayed by the widget.
          * @return The text displayed by the widget.
          */
-        virtual MAUtil::String getText() const;
+        virtual MAUtil::String getText();
 
         /**
          * Add an button event listener.

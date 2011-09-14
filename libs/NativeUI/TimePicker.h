@@ -68,7 +68,7 @@ namespace NativeUI
          * Get the current hour in 24h mode( in the range: 0-23 ).
          * @return An int that specifies the current hour.
          */
-        virtual int getHour() const;
+        virtual int getHour();
 
         /**
          * Set the current minute (0-59).
@@ -84,7 +84,7 @@ namespace NativeUI
          * Get the current minute (0-59).
          * @return An int that specifies the current minute.
          */
-        virtual int getMinute() const;
+        virtual int getMinute();
 
         /**
          * Add an time picker event listener.

@@ -22,8 +22,8 @@ MA 02110-1301, USA.
 
 #include "ListScreen.h"
 #include "Facebook/LOG.h"
-#include <NativeUI/Button.h>
-#include <NativeUI/ListView.h>
+//#include <NativeUI/Button.h>
+//#include <NativeUI/ListView.h>
 #include "../PlatformInfo.h"
 
 namespace FacebookDemoGUI
@@ -45,55 +45,19 @@ void ListScreen::show()
 	FacebookDemoScreen::show();
 }
 
-void ListScreen::add(ListItem *btn)
-{
-	if(FacebookDemoApplication::isAndroid())
-	{
-		btn->setBackgroundColor(mItemsColor_Android);
-	}
-	else
-	{
-		btn->setBackgroundColor(mItemsColor_iPhone);
-	}
-	mList->addChild(btn);
-}
-
 void ListScreen::clear()
 {
 	LOG("\n\tListScreen::clear()");
-	initialize();
-}
-
-void ListScreen::clearScreenAfterLosingFocus(bool clearScreen)
-{
-	mClearScreenAfterLosingFocus = clearScreen;
+	this->initialize();
 }
 
 ListScreen::~ListScreen()
 {
 }
 
-bool ListScreen::isEmpty() const
-{
-	return (mList->countChildWidgets() == 0);
-}
-
-int ListScreen::addChild(NativeUI::Widget* widget)
-{
-	return NativeUI::Screen::addChild(widget);
-}
-
 void ListScreen::initialize()
 {
-	LOG("\n\tListScreen::initialize()");
 	mClearScreenAfterLosingFocus = false;
-
-	mItemsColor_Android = 0x000000;
-	mItemsColor_iPhone = 0x99999A;
-
-	mScreenColor = 0x000000;
-
-	this->setBackgroundColor(mScreenColor);
 
 	NativeUI::VerticalLayout *layout = new NativeUI::VerticalLayout();
 	layout->setBackgroundColor(mScreenColor);

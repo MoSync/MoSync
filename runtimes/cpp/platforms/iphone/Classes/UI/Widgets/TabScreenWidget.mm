@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 MoSync AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -26,7 +26,7 @@
 -(void)tabBarController:(UITabBarController*)tabBarController didSelectViewController:(UIViewController*)viewController {
 	MAHandle controllerHandle = 0;
 	NSUInteger index = 0;
-	
+
 	for (UIViewController *child in tabBarController.viewControllers)
     {
 		if(child == viewController) {
@@ -44,22 +44,14 @@
 	eventData->widgetHandle = handle;
 	eventData->tabIndex = index;
 	event.data = (int)eventData;
-	Base::gEventQueue.put(event);	
-	
-	//if(index < [children count])
-	//	[[children objectAtIndex:index] layout];
+	Base::gEventQueue.put(event);
 }
 
 - (id)init {
-    //view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-	UITabBarController* tabBarController = [[[UITabBarController alloc] init] retain];
-	//controller = tabBarController;
-	tabBarController.viewControllers = [NSArray array];	
-	//view = controller.view;
-	//controller.view = view;
+	UITabBarController* tabBarController = [[UITabBarController alloc] init];
+	tabBarController.viewControllers = [NSArray array];
 	tabBarController.delegate = self;
-	
-	return [super initWithController:tabBarController];	
+	return [super initWithController:tabBarController];
 }
 
 - (void)addChild: (IWidget*)child {
@@ -68,48 +60,37 @@
 	NSMutableArray *newItems = [NSMutableArray arrayWithArray:tabBarController.viewControllers];
 	[newItems addObject:[screen getController]];
 	tabBarController.viewControllers = newItems;
-	
-	//[super addChild:child];
 	[super addChild:child toSubview:NO];
-	
-	//UIView *childView = [screen getView];	
-	//[childView setFrame: view.frame];
-
-	//view.autoresizesSubviews = YES;	
-	//[view setAutoresizingMask:UIViewAutoresizingFlexibleWidth|UIViewAutoresizingFlexibleHeight];
-
 }
 
 - (int)insertChild: (IWidget*)child atIndex:(NSNumber*)index {
 	int ret = [super insertChild:child atIndex:index toSubview:NO];
 	if(ret!=MAW_RES_OK)
 		return ret;
-	
+
 	UITabBarController* tabBarController = (UITabBarController*)controller;
 	ScreenWidget* screen = (ScreenWidget*)child;
 	NSMutableArray *newItems = [NSMutableArray arrayWithArray:tabBarController.viewControllers];
 	[newItems insertObject:[screen getController] atIndex:[index intValue]];
 	tabBarController.viewControllers = newItems;
-	
+
 	return MAW_RES_OK;
 
 }
 
 - (void)removeChild: (IWidget*)child {
-	[super removeChild:child fromSuperview:NO];	
+	[super removeChild:child fromSuperview:NO];
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"title"]) {
+	if([key isEqualToString:@MAW_SCREEN_TITLE]) {
 		controller.title = value;
-	} 
-	else if([key isEqualToString:@"currentTab"]) {
+	}
+	else if([key isEqualToString:@MAW_TAB_SCREEN_CURRENT_TAB]) {
 		unsigned int index = [value intValue];
 		UITabBarController* tabBarController = (UITabBarController*)controller;
 		if(index >= [tabBarController.viewControllers count]) return MAW_RES_INVALID_INDEX;
-		tabBarController.selectedViewController = [tabBarController.viewControllers objectAtIndex:index]; 
-		//tabBarController.selectedIndex = [value intValue];
-		//[tabBarController.selectedViewController viewDidAppear:YES];
+		tabBarController.selectedViewController = [tabBarController.viewControllers objectAtIndex:index];
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
@@ -118,9 +99,9 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@"currentTab"]) {
+	if([key isEqualToString:@MAW_TAB_SCREEN_CURRENT_TAB]) {
 		UITabBarController* tabBarController = (UITabBarController*)controller;
-		return [[NSNumber numberWithInt: tabBarController.selectedIndex] stringValue];
+		return [[[NSNumber numberWithInt: tabBarController.selectedIndex] stringValue] retain];
 	}
 	else {
 		return [super getPropertyWithKey:key];
@@ -133,21 +114,18 @@
 
 - (void)layout {
 	UITabBarController* tabBarController = (UITabBarController*)controller;
-	
 	int tabBarHeight = tabBarController.tabBar.bounds.size.height;
-	int viewWidth = view.frame.size.width; 
-	int viewHeight = view.frame.size.height - tabBarHeight; 
-	
-	
+	int viewWidth = view.frame.size.width;
+	int viewHeight = view.frame.size.height - tabBarHeight;
 	[view setNeedsLayout];
-	//[view setNeedsDisplay]
+
 	for (IWidget *child in children)
     {
 		UIView* childView = [child getView];
-		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];		
-		
+		[childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
+
 		[child layout];
-		
+
 	}
 }
 

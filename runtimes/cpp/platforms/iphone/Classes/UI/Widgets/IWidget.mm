@@ -147,8 +147,6 @@
 	}
 	//[self layout];
 	[child layout];
-	//[view setNeedsLayout];
-	//[view setNeedsDisplay];
 }
 
 - (void)addChild: (IWidget*)child {
@@ -166,7 +164,6 @@
 	if(addSubview) {
 		[view insertSubview:childView atIndex:indexValue];
 	}
-	//[view setNeedsLayout];
 	//[self layout];
 	[child layout];
 
@@ -186,7 +183,6 @@
 	[child setParent:nil];
 	if(removeFromSuperview)
 		[[child getView] removeFromSuperview];
-	//[view setNeedsLayout];
 	[self layout];
 }
 
@@ -197,15 +193,15 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
-	if([key isEqualToString:@"left"]) {
+	if([key isEqualToString:@MAW_WIDGET_LEFT]) {
 		[view setFrame:CGRectMake([value floatValue]/getScreenScale(), view.frame.origin.y, view.frame.size.width, view.frame.size.height)];
 		[self layout];
 	} else
-	if([key isEqualToString:@"top"]) {
+	if([key isEqualToString:@MAW_WIDGET_TOP]) {
 		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue]/getScreenScale(), view.frame.size.width, view.frame.size.height)];
 		[self layout];
 	} else
-	if([key isEqualToString:@"width"]) {
+	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {
 		float width = [value floatValue];
 
 		if(width == -2 || width == -1) {
@@ -220,7 +216,7 @@
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width/getScreenScale(), view.frame.size.height)];
 		[self layout];
 	} else
-	if([key isEqualToString:@"height"]) {
+	if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
 		float height = [value floatValue];
 
 		if(height == -2 || height == -1) {
@@ -235,7 +231,7 @@
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height/getScreenScale())];
 		[self layout];
 	} else
-	if([key isEqualToString:@"backgroundColor"]) {
+	if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR]) {
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		view.backgroundColor = color;
@@ -262,7 +258,7 @@
 	}
 	*/
 	else
-	if([key isEqualToString:@"alpha"]) {
+	if([key isEqualToString:@MAW_WIDGET_ALPHA]) {
 		float alpha = [value floatValue];
 		if(alpha<0.0 || alpha>1.0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		view.alpha = [value floatValue];
@@ -270,10 +266,10 @@
 	if([key isEqualToString:@"opaque"]){
 		view.opaque = [value boolValue];
 	} else
-	if([key isEqualToString:@"visible"]){
+	if([key isEqualToString:@MAW_WIDGET_VISIBLE]){
 		view.hidden = not [value boolValue];
 	} else
-	if([key isEqualToString:@"enabled"]){
+	if([key isEqualToString:@MAW_WIDGET_ENABLED]){
 		UIControl* controller = (UIControl*) view;
 		controller.enabled = [value boolValue];
 	}
@@ -286,25 +282,25 @@
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
 
-	if([key isEqualToString:@"width"]) {
-		return [[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue];
+	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {
+		return [[[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue] retain];
 	}
-	else if([key isEqualToString:@"height"]) {
-		return [[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue];
+	else if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
+		return [[[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue] retain];
 	}
-	else if([key isEqualToString:@"left"]) {
-		return [[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue];
+	else if([key isEqualToString:@MAW_WIDGET_LEFT]) {
+		return [[[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue] retain];
 	}
-	else if([key isEqualToString:@"top"]) {
-		return [[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue];
+	else if([key isEqualToString:@MAW_WIDGET_TOP]) {
+		return [[[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue] retain];
 	}
-	else if([key isEqualToString:@"visible"]) {
-		return view.hidden ? @"false" : @"true";
-	}
-	else if([key isEqualToString:@"enabled"]) {
-		UIControl* controller = (UIControl*) view;
-		return controller.enabled ? @"true" : @"false";
-	}
+	else if([key isEqualToString:@MAW_WIDGET_VISIBLE]) {
+        return view.hidden ? @"false" : @"true";
+    }
+    else if([key isEqualToString:@MAW_WIDGET_ENABLED]) {
+        UIControl* controller = (UIControl*) view; // TODO: is this correct?
+        return controller.enabled ? @"true" : @"false";
+    }
 	return nil;
 }
 
@@ -314,17 +310,28 @@
 	[super dealloc];
 }
 
+// let's do this to make sure it is always released on the main thread..
+- (oneway void)release
+{
+    if (![NSThread isMainThread]) {
+        [self performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
+    } else {
+        [super release];
+    }
+}
+
 - (void)layout {
 	// the layouts should take care of the fill parent / wrap content layouting process..
-	// this should not be suboptimal, it will trigger a layout
-	// that runs once before draw..
-	[view setNeedsLayout];
-	if(view.superview)
-	{
-		[view.superview setNeedsLayout];
-	}
+    // this should not be suboptimal, it will trigger a layout
+    // that runs once before draw..
+    [view setNeedsLayout];
 
-	// [view layoutIfNeeded];
+    if(view.superview)
+    {
+        [view.superview setNeedsLayout];
+    }
+
+	[view layoutIfNeeded];
 }
 
 /**

@@ -64,12 +64,12 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"text"]) {
+	if([key isEqualToString:@MAW_BUTTON_TEXT]) {
 		UIButton* button = (UIButton*) view;
 		[button setTitle:value forState:UIControlStateNormal];
 		[self layout];
 	} else
-	if([key isEqualToString:@"fontSize"]) {
+	if([key isEqualToString:@MAW_BUTTON_FONT_SIZE]) {
         TEST_FOR_NEGATIVE_VALUE([value floatValue]);
 		UIButton* button = (UIButton*) view;
         UILabel* label = button.titleLabel;
@@ -80,7 +80,7 @@
         [label setFont:newFont];
 		[self layout];
 	} else
-    if([key isEqualToString:@"fontHandle"]) {
+    if([key isEqualToString:@MAW_BUTTON_FONT_HANDLE]) {
         UIButton* button = (UIButton*) view;
         UILabel* label = button.titleLabel;
         UIFont* font = Base::getUIFontObject([value intValue]);
@@ -91,13 +91,13 @@
         [label setFont:font];
         [self layout];
     } else
-	if([key isEqualToString:@"fontColor"]) {
+	if([key isEqualToString:@MAW_BUTTON_FONT_COLOR]) {
 		UIButton* button = (UIButton*) view;
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		[button setTitleColor:color forState:UIControlStateNormal];
 	} else			
-	if([key isEqualToString:@"backgroundImage"]) {
+	if([key isEqualToString:@MAW_IMAGE_BUTTON_BACKGROUND_IMAGE]) {
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		UIButton* button = (UIButton*) view;
@@ -106,7 +106,7 @@
 		[button setBackgroundImage:image forState:UIControlStateNormal];
 	}
     else			
-    if([key isEqualToString:@"image"]) {
+    if([key isEqualToString:@MAW_IMAGE_BUTTON_IMAGE]) {
         int imageHandle = [value intValue];
         if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
         UIButton* button = (UIButton*) view;
@@ -153,7 +153,7 @@
 		}
 		topCapHeight = newTopCapHeight;
 	}	
-	else if([key isEqualToString:@"textHorizontalAlignment"]) {
+	else if([key isEqualToString:@MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT]) {
 		UIButton* button = (UIButton*) view;
         if([value isEqualToString:@"left"]) {
 			[button setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
@@ -168,7 +168,7 @@
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
 	}
-    else if([key isEqualToString:@"textVerticalAlignment"]) {
+    else if([key isEqualToString:@MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT]) {
 		UIButton* button = (UIButton*) view;
 		if([value isEqualToString:@"top"]) {
 			[button setContentVerticalAlignment:UIControlContentVerticalAlignmentTop];
@@ -189,9 +189,9 @@
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	if([key isEqualToString:@"text"]) {
+	if([key isEqualToString:@MAW_BUTTON_TEXT]) {
 		UIButton* button = (UIButton*) view;
-		return button.titleLabel.text;
+		return [button.titleLabel.text retain];
 	} else {
 		return [super getPropertyWithKey:key];
 	}

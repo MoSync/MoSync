@@ -367,14 +367,6 @@ FacebookDemoGUI::ListItem *ConnectionRequestCommand::createItem(FacebookDemoAppl
 		const MAUtil::String &itemText)
 {
 	FacebookDemoGUI::ListItem *item = new FacebookDemoGUI::ListItem(command, itemText);
-
-//	item->setProperty(MAW_WIDGET_ALPHA, (float)0.0);
-//	item->setFontColor(0xFFFFFF);
-
-//	item->setProperty(MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT, MAW_ALIGNMENT_LEFT);
-//	item->centerTextVertically();
-//	item->wrapContentVertically();
-
 	return item;
 }
 
@@ -925,8 +917,8 @@ void ConnectionRequestCommand::createString(const Post &post, MAUtil::String &re
 	if(post.getApplication().mName.size()>0)
 	{
 		addNewline(result);
-		result += "application:  " + post.getApplication().mName + "\n";
-		result += "\t\t\tid: " + post.getApplication().mId + "\n";
+		result += "application: " + post.getApplication().mName + "\n";
+		result += "\t\t\t\t\t    id: " + post.getApplication().mId + "\n";
 	}
 	if(post.getComments().size()>0)
 	{
@@ -958,8 +950,8 @@ void ConnectionRequestCommand::createString(const Post &post, MAUtil::String &re
 	if(post.getFromField().mName.size()>0)
 	{
 		addNewline(result);
-		result += "from:     " + post.getFromField().mName + "\n";
-		result += "\t\tid: " + post.getFromField().mId;
+		result += "from: " + post.getFromField().mName + "\n";
+		result += "\t\t\t id: " + post.getFromField().mId;
 	}
 }
 
@@ -1374,7 +1366,7 @@ void ConnectionRequestCommand::addComment(FacebookDemoApplication::OpenMenuComma
 void ConnectionRequestCommand::addLinkOnWall(FacebookDemoApplication::OpenMenuCommand *openMenuCmd, const MAUtil::String &id)
 {
 	PostOnWallCommand<Link> *postLinkCommand = new PostOnWallCommand<Link>(mFacebookManager, openMenuCmd->getMenuScreen(), id);
-	postLinkCommand->setLinkParams("http://www.youtube.com/watch?v=1JzFNaCT-KA", "Link posted with MOSYNC_SDK");
+	postLinkCommand->setLinkParams("http://www.youtube.com/watch?v=UUjwSzFuk7w", "Link posted with MOSYNC_SDK");
 
 	FacebookDemoGUI::ListItem *postLinkButton = new FacebookDemoGUI::ListItem(postLinkCommand, "post a link on wall");
 	openMenuCmd->addMenuItem(postLinkButton);
@@ -1389,7 +1381,7 @@ void ConnectionRequestCommand::addPostOnWall(FacebookDemoApplication::OpenMenuCo
 
 	addPostCommand->setPostParams(
 				"Post added with MOSYN SDK",						//message
-				"http://www.youtube.com/watch?v=FL7yD-0pqZg",		//link
+				"http://www.youtube.com/watch?v=9-A5q54b5J4",		//link
 				"New Post object added with MOSYNC_SDK.",			//name
 				"Link from You Tube",								//caption
 				"Testing adding a post on wall with MOSYNC_SDK");	//description

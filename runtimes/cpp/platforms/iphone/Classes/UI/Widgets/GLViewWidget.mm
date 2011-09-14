@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 MoSync AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -35,8 +35,8 @@
 }
 
 - (id)initWithApi:(EAGLRenderingAPI)api {
-	view = [[[MoSyncGLView alloc] initWithFrame:CGRectMake(0, 0, 100, 100) 
-                                         andApi:api] retain]; // TODO: do have to do this (retain)??
+	view = [[MoSyncGLView alloc] initWithFrame:CGRectMake(0, 0, 100, 100)
+                                         andApi:api];
     if(view == nil) return nil;
 	id ret = [super init];
 	view.backgroundColor = [UIColor colorWithHexString:@"000000ff"];
@@ -44,7 +44,7 @@
 }
 
 - (void)setWidgetHandle:(int)_handle {
-	[super setWidgetHandle:handle];
+	[super setWidgetHandle:_handle];
 	MAEvent event;
 	event.type = EVENT_TYPE_WIDGET;
 	MAWidgetEventData *eventData = new MAWidgetEventData;
@@ -55,22 +55,22 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
-	if([key isEqualToString:@"bind"]) {
+	if([key isEqualToString:@MAW_GL_VIEW_BIND]) {
 		MoSyncGLView* glView = (MoSyncGLView*) view;
 		[glView bindContext];
 	}
-	else if([key isEqualToString:@"invalidate"]) {
-		MoSyncGLView* glView = (MoSyncGLView*) view;		
+	else if([key isEqualToString:@MAW_GL_VIEW_INVALIDATE]) {
+		MoSyncGLView* glView = (MoSyncGLView*) view;
 		[glView renderContext];
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MAW_RES_OK;	
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
-	
+
 	return [super getPropertyWithKey:key];
 }
 

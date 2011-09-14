@@ -88,7 +88,7 @@ public class PIM {
 
 	final static String[] PIMFieldsTypes =
 	{
-		ContactsContract.Contacts.LOOKUP_KEY,
+		ContactsContract.Contacts._ID,
 		StructuredPostal.CONTENT_ITEM_TYPE,
 		Event.CONTENT_ITEM_TYPE,
 		Email.CONTENT_ITEM_TYPE,
@@ -110,14 +110,14 @@ public class PIM {
 	 * PIM list
 	 */
 	private ArrayList<PIMItem> mPIMContactsList;
-	private Iterator<PIMItem> mPIMIterator;
+	private int mPIMIterator;
 	/**
 	 * Table that holds PIM resources.
 	 */
 	private Hashtable<Integer, ArrayList<PIMItem>> mPIMLists =
 		new Hashtable<Integer, ArrayList<PIMItem>>();
-	private Hashtable<Integer, Iterator<PIMItem>> mPIMIterators =
-		new Hashtable<Integer, Iterator<PIMItem>>();
+	private Hashtable<Integer, Integer> mPIMIterators =
+		new Hashtable<Integer, Integer>();
 	private Hashtable<Integer, PIMItem> mPIMItems =
 		new Hashtable<Integer, PIMItem>();
 
@@ -216,7 +216,7 @@ public class PIM {
 			mPIMContactsList.add(pimItem);
 		}
 
-		mPIMIterator = mPIMContactsList.iterator();
+		mPIMIterator = 0;
 
 		mPIMLists.put(mResourceIndex, mPIMContactsList);
 		mPIMIterators.put(mResourceIndex, mPIMIterator);
@@ -236,9 +236,11 @@ public class PIM {
 		DebugPrint("maPimListNext " + list);
 		mPIMIterator = mPIMIterators.get(list);
 
-		if (mPIMIterator.hasNext())
+		if (mPIMIterator < mPIMContactsList.size())
 		{
-			mPIMItems.put(mResourceIndex, mPIMIterator.next());
+			mPIMItems.put(mResourceIndex, mPIMContactsList.get(mPIMIterator));
+			mPIMIterator++;
+			mPIMIterators.put(list, mPIMIterator);
 		}
 		else
 		{
@@ -255,10 +257,12 @@ public class PIM {
 			throw new BigPhatError("Invalid PIM list handle");
 		}
 
+		DebugPrint("PIM LIST CLOSE " + mPIMLists.get(list).size());
 		Iterator<PIMItem> it = mPIMLists.get(list).iterator();
 		while (it.hasNext())
 		{
-			it.next().close();
+			DebugPrint("ITEM");
+			it.next().close(getContentResolver());
 		}
 		mPIMContactsList = mPIMLists.remove(list);
 		mPIMContactsList = null;
@@ -333,7 +337,17 @@ public class PIM {
 		PIMItem pimItem = mPIMItems.get(item);
 		PIMField pimField = pimItem.getField(field);
 
-		char[] buffer = new char[buffSize >> 1];
+		char[] buffer = new char[1024];
+		if ( (pimField = pimItem.getField(field)) == null )
+		{
+			return MA_PIM_ERR_FIELD_UNSUPPORTED;
+		}
+
+		if (pimField.isWriteOnly())
+		{
+			return MA_PIM_ERR_WRITE_ONLY;
+		}
+
 		int length = pimField.getData(index, buffer);
 
 		if ( length > buffSize )
@@ -378,23 +392,47 @@ public class PIM {
 
 	public int maPimItemClose(int item)
 	{
-		throw new BigPhatError("maPimItemClose not implemented");
+		PIMItem pimItem = null;
+		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
+		{
+			throw new BigPhatError("Invalid PIM item handle");
+		}
+		pimItem.close(getContentResolver());
+
+		return MA_PIM_ERR_NONE;
 	}
 
 	public int maPimItemCreate(int list)
 	{
+		DebugPrint("maPimItemCreate");
 		PIMItem p = new PIMItem();
-		for (int i = 1; i < PIMFieldsColumns.length; i++)
-		{
-			p.add(PIMFieldsTypes[i], PIMFieldsColumns[i]);
-		}
+		p.create(PIMFieldsTypes, PIMFieldsColumns);
+		mPIMContactsList.add(p);
 		mPIMItems.put(mResourceIndex, p);
 		return mResourceIndex++;
 	}
 
 	public int maPimItemRemove(int list, int item)
 	{
-		throw new BigPhatError("maPimItemRemove not implemented");
+		mPIMIterator = mPIMIterators.get(list);
+
+		PIMItem pimItem = null;
+		if ( (item < 0) || ((pimItem = mPIMItems.get(item)) == null) )
+		{
+			throw new BigPhatError("Invalid PIM item handle");
+		}
+
+		pimItem.delete(getContentResolver());
+
+		mPIMItems.remove(item);
+		if ((item == mPIMIterator) && (mPIMIterator > 0))
+		{
+			mPIMIterator--;
+			mPIMIterators.put(list, mPIMIterator);
+		}
+		mPIMContactsList.remove(item);
+
+		return MA_PIM_ERR_NONE;
 	}
 
 	static int addImage(Bitmap img)	{

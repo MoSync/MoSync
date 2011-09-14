@@ -45,13 +45,15 @@ namespace WikiNativeUI
  * Here instance variables are initialized.
  */
 BasicScreen::BasicScreen():
+	mScreenWidth(0),
+	mScreenHeight(0),
+	mFontSize(0),
+	mPaddingSize(0),
 	mScreen(-1),
 	mMainLayout(-1),
 	mTopLabel(-1),
 	mTopButtonPrevious(-1),
-	mTopButtonNext(-1),
-	mScreenWidth(0),
-	mScreenHeight(0)
+	mTopButtonNext(-1)
 {
 	// Set the screen size, available for each screen.
 	MAExtent screenSize = maGetScrSize();

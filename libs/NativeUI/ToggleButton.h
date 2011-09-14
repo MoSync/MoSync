@@ -63,7 +63,7 @@ namespace NativeUI
 		 * Gets the current toggle button state.
 		 * @return The toggle button state.
 		 */
-		virtual bool isChecked() const;
+		virtual bool isChecked();
 
         /**
          * Add a toggle button event listener.

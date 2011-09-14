@@ -92,7 +92,7 @@ public:
 	/**
 	 * Destructor.
 	 */
-	~MediaWiki();
+	virtual ~MediaWiki();
 
 	/**
 	 * Set the parent screen.
@@ -175,6 +175,12 @@ public:
 	 * Only for the checked ones.
 	 */
 	MAUtil::Vector<MAUtil::String> getAllSnippetsWithTitle();
+
+	/**
+	 * Provides the titles.
+	 * Only for the checked ones.
+	 */
+	MAUtil::Vector<MAUtil::String> getAllCheckedTitles();
 
 	/**
 	 * Get the title on a given position.

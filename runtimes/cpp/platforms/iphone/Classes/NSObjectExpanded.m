@@ -41,13 +41,10 @@
 						[invocation setArgument:&obj atIndex:i+2];
 					}
 				}
-				
-				[invocation retainArguments];
-				//if(retLoc!=nil)
-				//	[invocation setReturnValue:retLoc];
+				//[invocation retainArguments];
 				[invocation performSelectorOnMainThread:@selector(invoke)
 												 withObject:nil
-											  waitUntilDone:YES];
+											  waitUntilDone:waitUntilDone];
 				if(retLoc!=nil)
 					[invocation getReturnValue:retLoc];
 			}
@@ -57,7 +54,7 @@
 			@finally {
 				//[signature release];
 				//[invocation release];
-			}
+ 			}
         }
     }
 }

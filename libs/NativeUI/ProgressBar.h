@@ -63,7 +63,7 @@ namespace NativeUI
          * Get the upper range of the progress bar.
          * @return The upper range of the progress bar.
          */
-        virtual int getMaximumValue() const;
+        virtual int getMaximumValue();
 
         /**
          * Set the current progress value to the progress bar.
@@ -80,7 +80,7 @@ namespace NativeUI
          * Get the current progress value to the progress bar.
          * @return The current progress value.
          */
-        virtual int getProgress() const;
+        virtual int getProgress();
 
         /**
          * Increase the progress bar's progress value with the specified amount.

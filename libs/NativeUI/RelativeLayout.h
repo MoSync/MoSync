@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 #define NATIVEUI_RELATIVE_LAYOUT_H_
 
 #include "Widget.h"
+#include "Layout.h"
 
 namespace NativeUI
 {
@@ -34,7 +35,7 @@ namespace NativeUI
 	 * A relative layout is a layout that layouts widgets relative
 	 * to its coordinate system.
 	 */
-	class RelativeLayout : public Widget
+	class RelativeLayout : public Layout
 	{
 	public:
 		/**

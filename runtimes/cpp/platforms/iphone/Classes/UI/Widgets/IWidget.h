@@ -102,7 +102,11 @@ IWidget* mWidget;\
 - (void)removeChild: (IWidget*)child;
 - (void)removeChild: (IWidget*)child fromSuperview:(bool)removeFromSuperview;
 
+// the caller is responsible for releasing the 'key' and the 'value'
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+
+// the caller is responsible for releasing the return value
+// if you implement this make sure you pass ownership to the caller.
 - (NSString*)getPropertyWithKey: (NSString*)key;
 
 - (void)layout;

@@ -47,6 +47,8 @@ java_files = packages.map { |package| File.join(package_root, package) }.join(" 
 
 # Compile all the java files into class files
 sh(
-	"javac -Xlint:deprecation -source 1.6 -target 1.6 -g -d #{class_dir} " +
+	"javac "+
+	#"-Xlint:deprecation "+
+	"-source 1.6 -target 1.6 -g -d #{class_dir} " +
 	"-classpath " +
 	"#{File.join(androidSDKPath, "android.jar")} " + java_files)

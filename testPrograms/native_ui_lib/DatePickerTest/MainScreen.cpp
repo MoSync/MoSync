@@ -111,6 +111,8 @@ void MainScreen::createMainLayout() {
 
     mGetMaxDateValue = new Label();
     mGetMaxDateValue->setText("Max:");
+    mGetMaxDateValue->wrapContentVertically();
+    mGetMaxDateValue->fillSpaceHorizontally();
     mMainLayout->addChild(mGetMaxDateValue);
 
     layout3 = new HorizontalLayout();
@@ -126,6 +128,8 @@ void MainScreen::createMainLayout() {
 
     mGetMinDateValue = new Label();
     mGetMinDateValue->setText("Min:");
+    mGetMinDateValue->wrapContentVertically();
+    mGetMinDateValue->fillSpaceHorizontally();
     mMainLayout->addChild(mGetMinDateValue);
 }
 

@@ -17,23 +17,32 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file WebViewMultiViews.cpp
+ * @file WebGeoLocation.cpp
  * @author Mikael Kindborg
  *
- * Application for testing multiple WebView widgets.
+ * Application for testing communication between JavaScript in a
+ * WebView and MoSync C++ code.
+ *
+ * The application displays the current location, which is fetched
+ * via MoSync C++ code (sycalls maLocationStart and maLocationStop,
+ * and events of type EVENT_TYPE_LOCATION) and communicated back
+ * to the WebView by calling JavaScript from C++.
  */
 
-#include <ma.h>
-#include <maheap.h>
-#include <mastring.h>
-#include <mavsprintf.h>
-#include <MAUtil/String.h>
-#include <IX_WIDGET.h>
-#include "MAHeaders.h"
-#include "WebViewUtil.h"
+#include <ma.h>				// MoSync API (base API).
+#include <maheap.h>			// C memory allocation functions.
+#include <mastring.h>		// C String functions.
+#include <mavsprintf.h>		// sprintf etc.
+#include <MAUtil/String.h>	// Class String.
+#include <IX_WIDGET.h>		// Widget API.
+#include "MAHeaders.h"		// Resource identifiers, not a physical file.
+#include "WebViewUtil.h"	// Classes Platform and WebViewMessage.
 
 using namespace MoSync;
 
+/**
+ * Class that handles the application life cycle.
+ */
 class WebViewGeoLocationApp
 {
 private:
@@ -44,6 +53,10 @@ private:
 public:
 	WebViewGeoLocationApp()
 	{
+		// Create an object that provides platform services.
+		mPlatform = Platform::create();
+
+		// Create the user interface.
 		createUI();
 	}
 
@@ -54,19 +67,12 @@ public:
 
 	void createUI()
 	{
-		// Create utility object.
-		mPlatform = Platform::create();
-
-		// Get the HTML for the page.
-		MAUtil::String html =
-			mPlatform->createTextFromHandle(GeoLocationPage_html);
-
-		// Create screen.
+		// Create screen that holds the WebView.
 		mScreen = maWidgetCreate(MAW_SCREEN);
-		widgetShouldBeValid(mScreen, "Could not create screen");
+		widgetShouldBeValid(mScreen, "Could not create Screen");
 
-		// Create web view.
-		mWebView = createWebView(html);
+		// Create the WebView.
+		mWebView = createWebView();
 
 		// Compose objects.
 		maWidgetAddChild(mScreen, mWebView);
@@ -75,22 +81,28 @@ public:
 		maWidgetScreenShow(mScreen);
 	}
 
-	MAWidgetHandle createWebView(const MAUtil::String& html)
+	MAWidgetHandle createWebView()
 	{
-		// Create web view
+		// Create the WebView
 		MAWidgetHandle webView = maWidgetCreate(MAW_WEB_VIEW);
-		widgetShouldBeValid(webView, "Could not create web view");
+		widgetShouldBeValid(webView, "Could not create WebView");
 
-		// Set size of vew view to fill the parent.
+		// Set size of the WebView to fill the parent.
 		maWidgetSetProperty(webView, "width", "-1");
 		maWidgetSetProperty(webView, "height", "-1");
 
-		// Enable zooming.
-		maWidgetSetProperty(webView, "enableZoom", "true");
+		// Disable zooming. This should make the page display
+		// in a readable zoom state.
+		maWidgetSetProperty(webView, "enableZoom", "false");
 
-		// Set the HTML the web view displays.
+		// Get the HTML for the page from a resource.
+		MAUtil::String html =
+			mPlatform->createTextFromHandle(GeoLocationPage_html);
+
+		// Set the HTML the WebView displays.
 		maWidgetSetProperty(webView, "html", html.c_str());
 
+		// Register a handler for JavaScript messages.
 		WebViewMessage::getMessagesFor(webView);
 
 		return webView;
@@ -156,6 +168,11 @@ public:
 		}
 	}
 
+	/**
+	 * Call a JavaScript function with the updated location data.
+	 * Setting the "url" property using the "javascript:" scheme
+	 * evaluates the JavaScript code in the WebView.
+	 */
 	void handleGeoLocationEvent(MALocation* location)
 	{
 		char script[512];
@@ -167,6 +184,9 @@ public:
 		maWidgetSetProperty(mWebView, "url", script);
 	}
 
+	/**
+	 * Just a simple test that the widget was created.
+	 */
 	void widgetShouldBeValid(MAWidgetHandle widget, const char* panicMessage)
 	{
 		if (widget <= 0)

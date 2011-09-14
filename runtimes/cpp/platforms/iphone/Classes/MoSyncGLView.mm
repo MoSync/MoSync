@@ -73,7 +73,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 			
 		WorkingContext = nil;	
 		
-		touchHelper = [[TouchHelper alloc] init];
+		touchHelper = [[[TouchHelper alloc] init] retain];
 		self.multipleTouchEnabled = YES;
 			
 		[self setupView];
@@ -167,6 +167,7 @@ void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
         [EAGLContext setCurrentContext:nil];
     }
     
+    [touchHelper release];
     [context release];  
     [super dealloc];
 }

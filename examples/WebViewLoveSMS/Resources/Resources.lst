@@ -1,7 +1,7 @@
-.res MainPage_html
+.res PageMain_html
 .bin
 .include "PageMain.html"
 
-.res amor_png
+.res amor128x128_png
 .bin
-.include "amor.png"
+.include "amor128x128.png"

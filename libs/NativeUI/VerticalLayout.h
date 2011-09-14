@@ -24,16 +24,17 @@ MA 02110-1301, USA.
  */
 
 #ifndef NATIVEUI_VERICAL_LAYOUT_H_
-#define NATIVEUIUI_VERICAL_LAYOUT_H_
+#define NATIVEUI_VERICAL_LAYOUT_H_
 
 #include "Widget.h"
+#include "Layout.h"
 
 namespace NativeUI
 {
 	/**
 	 * Class for vertical layouts.
 	 */
-	class VerticalLayout : public Widget
+	class VerticalLayout : public Layout
 	{
 	public:
 		/**

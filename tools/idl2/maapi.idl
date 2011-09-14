@@ -2489,7 +2489,8 @@ interface MAAPI {
 		* to arrive unaltered. 8-bit Latin-1 characters should work in most cases.
 		*
 		* \returns 0 on success. A \link #CONNERR_GENERIC CONNERR \endlink code \< 0 on error.
-		* #CONNERR_FORBIDDEN if the user denied permission.
+		* #CONNERR_FORBIDDEN if the user denied permission, and CONNERR_UNAVAILABLE if the
+		* device cannot send SMS messages.
 		*
 		* \note Will create a text file on PC platforms, instead of sending anything.
 		*/
@@ -3953,6 +3954,11 @@ group WidgetAPI "Widget API" {
    /**
 	* Events for the video view. When the state of the video view changes an event with one
 	* of the next constants will be send.
+    * NOTE: there is a slightly different behaviour depending on the platform:
+    *  - on iOS the source is loaded into memory when
+    *  MAW_VIDEO_VIEW_STATE_PLAYING is received.
+    *   - on Android the source is loaded into memory when
+    *  MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
 	*/
 	group VideoViewEvent "Video view event" {
 	constset int MAW_VIDEO_VIEW_STATE_ {
@@ -3977,7 +3983,9 @@ group WidgetAPI "Widget API" {
 		FINISHED = 4;
 
 		/**
-		* @brief The source is loaded into memory.
+		* @brief The source is ready to be played.
+		* NOTE: On Android this event is received after loading url/path.
+		*       On iOS this event is received after PLAYING event is received.
 		*/
 		SOURCE_READY = 5;
 
@@ -4350,7 +4358,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A boolean string 'true' or 'false', where true is visible and false is invisible.
 		*
-		* @setonly
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -5895,6 +5903,8 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Gets the video file duration.
 		*
+		* NOTE: On Android this value can be retrieved after MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
+		*       On iOS this value can be retrieved after MAW_VIDEO_STATE_PLAYING is received.
 		* @validvalue An int.
 		*
 		* @getonly

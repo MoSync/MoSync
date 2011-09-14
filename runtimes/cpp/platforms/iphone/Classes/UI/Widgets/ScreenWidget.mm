@@ -31,7 +31,7 @@
 - (id)initWithController:(UIViewController*)_controller {
 	controller = _controller;
 	controller.title = @"";
-	view = controller.view;
+	view = [controller.view retain];
 	return [super init];
 }
 
@@ -46,10 +46,10 @@
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 
-	if([key isEqualToString:@"title"]) {
+	if([key isEqualToString:@MAW_SCREEN_TITLE]) {
 		controller.title = value;
 	}
-	else if([key isEqualToString:@"icon"]) {
+	else if([key isEqualToString:@MAW_SCREEN_ICON]) {
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);

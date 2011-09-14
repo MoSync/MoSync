@@ -40,7 +40,7 @@
         mMoviePlayerController = [[MPMoviePlayerController alloc] init];
 
         CGRect viewRect = CGRectMake(DEFAULT_RECT_X, DEFAULT_RECT_Y, DEFAULT_RECT_WIDTH, DEFAULT_RECT_HEIGHT);
-        UIView* smallView = [[[UIView alloc] initWithFrame:viewRect] retain];
+        UIView* smallView = [[UIView alloc] initWithFrame:viewRect];
 
         [mMoviePlayerController.view setFrame: smallView.bounds];
         view = smallView;
@@ -77,6 +77,8 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:MPMoviePlayerLoadStateDidChangeNotification
                                                   object:mMoviePlayerController];
+
+    [mMoviePlayerController release];
     [super dealloc];
 }
 
@@ -88,7 +90,7 @@
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    if ([key isEqualToString:@"path"])
+    if ([key isEqualToString:@MAW_VIDEO_VIEW_PATH])
     {
         NSString *filepath = [[NSBundle mainBundle] pathForResource:value ofType:@"m4v"];
         if (filepath)
@@ -97,22 +99,22 @@
             [mMoviePlayerController setContentURL:fileURL];
         }
     }
-    else if ([key isEqualToString:@"url"])
+    else if ([key isEqualToString:@MAW_VIDEO_VIEW_URL])
     {
         NSURL *webURL = [NSURL URLWithString:value];
         [mMoviePlayerController setContentURL:webURL];
     }
-    else if ([key isEqualToString:@"action"])
+    else if ([key isEqualToString:@MAW_VIDEO_VIEW_ACTION])
     {
         [self handleAction:value];
     }
-    else if ([key isEqualToString:@"width"] ||
-             [key isEqualToString:@"height"])
+    else if ([key isEqualToString:@MAW_WIDGET_WIDTH] ||
+             [key isEqualToString:@MAW_WIDGET_HEIGHT])
     {
         [super setPropertyWithKey:key toValue:value];
         [mMoviePlayerController.view setFrame: view.bounds];
     }
-    else if ([key isEqualToString:@"seekTo"])
+    else if ([key isEqualToString:@MAW_VIDEO_VIEW_SEEK_TO])
     {
         TEST_FOR_NEGATIVE_VALUE([value floatValue]);
         [mMoviePlayerController setCurrentPlaybackTime:[value floatValue]];
@@ -132,11 +134,11 @@
  */
 - (NSString*)getPropertyWithKey: (NSString*)key
 {
-	if([key isEqualToString:@"duration"])
+	if([key isEqualToString:@MAW_VIDEO_VIEW_DURATION])
     {
         return[[NSString alloc] initWithFormat:@"%f", [mMoviePlayerController duration]];
 	}
-    if([key isEqualToString:@"currentPosition"])
+    if([key isEqualToString:@MAW_VIDEO_VIEW_CURRENT_POSITION])
     {
         return[[NSString alloc] initWithFormat:@"%f", [mMoviePlayerController currentPlaybackTime]];
 	}

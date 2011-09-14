@@ -87,6 +87,8 @@ public class MoSyncImagePicker
 	 */
 	public void loadGallery()
 	{
+		mDecodingOptions.inSampleSize = 4;
+
 		// Initialize the selected image handle.
 		mImageHandle = -1;
 		// Initialize the current position inside the gallery.
@@ -114,13 +116,18 @@ public class MoSyncImagePicker
 		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which)
 			{
-				// Clear the bitmap cache before closing the dialog.
-				mBitmapCache.clear();
+				// Display only the name of the selected image.
+				Toast.makeText(getActivity(), mNames.get(mPosition),
+						Toast.LENGTH_SHORT).show();
+
 				if ( !mPaths.isEmpty() )
 				{
 					// Save the handle of the selected item and post event.
-					mImageHandle = getSelectedImageHandle(mPaths.get(mPosition));
+					mImageHandle = getSelectedImageHandle(mBitmapCache.get(mPosition));
 				}
+				// Clear the bitmap cache before closing the dialog.
+				mBitmapCache.clear();
+
 				postImagePickerEvent(PICKER_READY);
 			}
 		});
@@ -152,22 +159,24 @@ public class MoSyncImagePicker
 			layout.addView(gallery);
 
 			final ImageView preview = new ImageView(getActivity());
-			preview.setLayoutParams(new LayoutParams(mScrWidth/2,mScrHeight/2));
+			// Set fixed size, otherwise the widget will resize itself each time an item is selected.
+			preview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, mScrHeight/2) );
+			preview.setMinimumWidth(mScrWidth/2);
 
 			Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(0), mDecodingOptions);
 			preview.setImageBitmap(bitmap);
-			if ( bitmap.getWidth() >= preview.getLayoutParams().width
-					||
-				bitmap.getHeight() >= preview.getLayoutParams().height )
+			if ( bitmap.getWidth() > preview.getLayoutParams().width
+					&&
+				bitmap.getHeight() > preview.getLayoutParams().height )
             {
 				// Scale it to fit.
-				preview.setScaleType(ScaleType.FIT_XY);
+				preview.setScaleType(ScaleType.FIT_CENTER);
             }
             else
             {
 				// If image is smaller that the layout params of this imageview,
 				// scale center.
-				preview.setScaleType(ScaleType.FIT_CENTER);
+				preview.setScaleType(ScaleType.CENTER_INSIDE);
             }
 			layout.addView(preview);
 
@@ -177,8 +186,23 @@ public class MoSyncImagePicker
                 public void onItemSelected(AdapterView<?> arg0, View arg1,
                         int pos, long id)
                 {
-					Toast.makeText(getActivity(), mNames.get(pos) ,
-					        Toast.LENGTH_SHORT).show();
+					// Do not show the names, because they could be shown with delay,
+					// even after the dialog is closed.
+//					Toast.makeText(getActivity(), mNames.get(pos), Toast.LENGTH_SHORT).show();
+
+					if ( mBitmapCache.get(pos).getWidth() > preview.getLayoutParams().width
+							&&
+						mBitmapCache.get(pos).getHeight() > preview.getLayoutParams().height )
+		            {
+						// Scale it to fit.
+						preview.setScaleType(ScaleType.FIT_CENTER);
+		            }
+		            else
+		            {
+						// If image is smaller that the layout params of this imageview,
+						// scale center.
+						preview.setScaleType(ScaleType.CENTER_INSIDE);
+		            }
 
 					// Refresh the preview image.
 					// Get the bitmap stored by the Adapter.
@@ -247,8 +271,12 @@ public class MoSyncImagePicker
 		            filePath = aCursor.getString(pathColumn);
 		            title = aCursor.getString(titleColumn);
 
-		            if ( filePath.endsWith(".jpg") || filePath.endsWith(".png") || filePath.endsWith(".jpeg") )
-		            {
+		            if ( filePath.toLowerCase().endsWith(".jpg")
+							||
+						filePath.toLowerCase().endsWith(".png")
+							||
+						filePath.toLowerCase().endsWith(".jpeg") )
+					{
 						mPaths.add(filePath);
 						mNames.add(title);
 		            }
@@ -323,20 +351,44 @@ public class MoSyncImagePicker
      * Further, post it in a EVENT_TYPE_IMAGE_PICKER event.
      * @return The new handle.
      */
-    private int getSelectedImageHandle(final String absPath)
+    private int getSelectedImageHandle(Bitmap scaledBitmap)
     {
         // Create handle.
         int dataHandle = mMoSyncThread.nativeCreatePlaceholder();
 
-        Bitmap tempBitmap = BitmapFactory.decodeFile(absPath, mDecodingOptions);
+		// The bitmap was decoded using sample size 4.
+        int originalSizeW = scaledBitmap.getWidth()*4;
+        int originalSizeH = scaledBitmap.getHeight()*4;
 
-			if(null == tempBitmap)
-			{
-				Log.i("MoSync","maImagePickerOpen Cannot create handle");
-//				maPanic(1, "maImagePickerOpen: Unable to create handle");
-			}
+        if ( originalSizeW > mScrWidth * 4
+				||
+			originalSizeH > mScrHeight *4)
+        {
+			mImageTable.put(dataHandle, new ImageCache(null, scaledBitmap));
+            return dataHandle;
+        }
+        else if ( originalSizeW > mScrWidth  *2
+					||
+				originalSizeH > mScrHeight * 2 )
+        {
+            // If the image is nearly twice as big as the screen, scale to factor 2.
+			mDecodingOptions.inSampleSize = 2;
+        }
+        else
+        {
+            // If the image is close the the screen, do not subsample it.
+			mDecodingOptions.inSampleSize = 1;
+        }
 
-			mImageTable.put(dataHandle, new ImageCache(null, tempBitmap));
+        Bitmap newBitmap = BitmapFactory.decodeFile(mPaths.get(mPosition), mDecodingOptions);
+		if (null == newBitmap)
+		{
+			Log.i("MoSync","maImagePickerOpen Cannot create handle");
+			return -1;
+//			maPanic(1, "maImagePickerOpen: Unable to create handle");
+		}
+
+		mImageTable.put(dataHandle, new ImageCache(null, newBitmap));
 
         return dataHandle;
     }
@@ -383,9 +435,22 @@ public class MoSyncImagePicker
             {
 				mBitmapCache.add( BitmapFactory.decodeFile(mPaths.get(position), mDecodingOptions) );
             }
+            // DO not scale the image if it smaller than the layout params.
+			if ( mBitmapCache.get(position).getWidth() > imgView.getLayoutParams().width
+					&&
+				mBitmapCache.get(position).getHeight() > imgView.getLayoutParams().height )
+            {
+				// Scale it to fit.
+				imgView.setScaleType(ScaleType.FIT_XY);
+            }
+            else
+            {
+				// If image is smaller that the layout params of this image view,
+				// scale the image uniformly.
+				imgView.setScaleType(ScaleType.CENTER_INSIDE);
+            }
 
             imgView.setImageBitmap(mBitmapCache.get(position));
-            imgView.setScaleType(ScaleType.FIT_XY);
             imgView.setBackgroundResource(mGalleryItemBackg);
 
             return imgView;
