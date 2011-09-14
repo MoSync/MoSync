@@ -917,8 +917,8 @@ void ConnectionRequestCommand::createString(const Post &post, MAUtil::String &re
 	if(post.getApplication().mName.size()>0)
 	{
 		addNewline(result);
-		result += "application:  " + post.getApplication().mName + "\n";
-		result += "\t\t\tid: " + post.getApplication().mId + "\n";
+		result += "application: " + post.getApplication().mName + "\n";
+		result += "\t\t\t\t\t    id: " + post.getApplication().mId + "\n";
 	}
 	if(post.getComments().size()>0)
 	{
@@ -950,8 +950,8 @@ void ConnectionRequestCommand::createString(const Post &post, MAUtil::String &re
 	if(post.getFromField().mName.size()>0)
 	{
 		addNewline(result);
-		result += "from:     " + post.getFromField().mName + "\n";
-		result += "\t\tid: " + post.getFromField().mId;
+		result += "from: " + post.getFromField().mName + "\n";
+		result += "\t\t\t id: " + post.getFromField().mId;
 	}
 }
 
