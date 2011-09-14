@@ -1128,6 +1128,10 @@ namespace Base {
 	}
 
 	SYSCALL(int, maSendTextSMS(const char* dst, const char* msg)) {
+		if ([MFMessageComposeViewController canSendText] == NO) {
+			return CONNERR_UNAVAILABLE;
+		}
+
 		MFMessageComposeViewController *smsController = [[MFMessageComposeViewController alloc] init];
 
 		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst]];
