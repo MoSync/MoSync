@@ -226,7 +226,11 @@ static IWidget* sOldScreen = nil;
 	[widget setPropertyWithKey:key toValue:value];
 }
 
-- (int)show: (IWidget*) widget {	
+- (int)show: (IWidget*) widget {
+	
+    if(sOldScreen == widget)
+        return MAW_RES_OK;
+    
 	if(sOldScreen != nil) {
 		UIView* actualView = [sOldScreen getView];
 		[actualView removeFromSuperview];
