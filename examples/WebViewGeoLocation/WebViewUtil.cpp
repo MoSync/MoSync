@@ -28,9 +28,10 @@ MA 02110-1301, USA.
 #include <maheap.h>			// C memory allocation
 #include <mastring.h>		// C string functions
 #include <mavsprintf.h>		// C string functions
+#include <mastdlib.h>		// C string conversion functions
 #include <MAUtil/String.h>	// C++ String class
 #include <IX_WIDGET.h>		// Widget API
-#include <conprint.h>
+#include <conprint.h>		// Debug printing.
 #include "WebViewUtil.h"
 
 using namespace MoSync;
@@ -342,6 +343,43 @@ void WebViewMessage::getMessagesFor(MAWidgetHandle webView)
 }
 
 /**
+ * Take a string that is "percent encoded" and decode it.
+ * @param url Encoded string.
+ * @return The decoded string.
+ */
+MAUtil::String WebViewMessage::unescape(const MAUtil::String& url)
+{
+	// The decoded string.
+	MAUtil::String result = "";
+
+	for (int i = 0; i < url.length(); ++i)
+	{
+		// If the current character is the '%' escape char...
+		if ('%' == (char) url[i])
+		{
+			// Get the char value of the two digit hex value.
+			MAUtil::String hex = url.substr(i + 1, 2);
+			long charValue = strtol(
+				hex.c_str(),
+				NULL,
+				16);
+			// Append to result.
+			result += (char) charValue;
+
+			// Skip over the hex chars.
+			i += 2;
+		}
+		else
+		{
+			// Not encoded, just copy the character.
+			result += url[i];
+		}
+	}
+
+	return result;
+}
+
+/**
  * Constructor.
  */
 WebViewMessage::WebViewMessage(MAHandle dataHandle)
@@ -360,9 +398,12 @@ WebViewMessage::WebViewMessage(MAHandle dataHandle)
 		// Zero terminate.
 		stringData[dataSize] = 0;
 
-		// Set string data.
+		// Point to message data.
 		char* p = stringData + strlen("mosync://");
-		mMessageString = p;
+
+		// Decode "percent encoded" characters
+		// and set the message string.
+		mMessageString = unescape(p);
 
 		// Destroy string data.
 		free(stringData);
