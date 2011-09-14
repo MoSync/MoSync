@@ -297,8 +297,8 @@ void HomeScreen::setupUI()
 	// Create a slider control for selecting the desired number of results.
 	mSlider = createSlider();
 	setWidgetProperty(mSlider, MAW_SLIDER_MAX, SLIDER_MAX_VALUE);
-	// Set the current slider value to 1.
-	setWidgetProperty(mSlider, MAW_SLIDER_VALUE, 1);
+	// Set the current slider value to 10.
+	setWidgetProperty(mSlider, MAW_SLIDER_VALUE, 10);
 	maWidgetAddChild(mMainLayout, mSlider);
 
 	// Add two labels with minimum and maximum value of the slider.

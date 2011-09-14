@@ -54,8 +54,13 @@ MA 02110-1301, USA.
 using namespace MoSync;
 
 // Set to true to actually send SMS.
+// You can turn off SMS sending during debugging
+// by setting this variable to false.
 static bool G_SendSMSForReal = true;
 
+/**
+ * The application class.
+ */
 class WebViewLoveSMSApp
 {
 private:
@@ -70,31 +75,11 @@ public:
 	{
 		mPlatform = Platform::create();
 		createUI();
-		createMessageStrings();
 	}
 
 	virtual ~WebViewLoveSMSApp()
 	{
 		destroyUI();
-	}
-
-	void createMessageStrings()
-	{
-		// Create a message string with lots of
-		// heart smileys!
-		mLoveMessage = "";
-		while (mLoveMessage.length() < 150)
-		{
-			mLoveMessage += "<3 ";
-		}
-
-		// Create a message string with lots of
-		// kiss smileys!
-		mKissMessage = "";
-		while (mKissMessage.length() < 150)
-		{
-			mKissMessage += ":-* ";
-		}
 	}
 
 	void createUI()
@@ -105,26 +90,19 @@ public:
 
 		// Write background image file.
 		mPlatform->writeDataToFile(
-			mPlatform->getLocalPath() + "amor.png",
-			amor_png);
+			mPlatform->getLocalPath() + "amor128x128.png",
+			amor128x128_png);
 
 		// Write main page.
 		mPlatform->writeTextToFile(
-			mPlatform->getLocalPath() + "MainPage.html",
-			mPlatform->createTextFromHandle(MainPage_html));
-
-		// Get HTML data.
-		MAUtil::String html =
-			mPlatform->createTextFromHandle(MainPage_html);
+			mPlatform->getLocalPath() + "PageMain.html",
+			mPlatform->createTextFromHandle(PageMain_html));
 
 		// Create web view.
 		mWebView = createWebView();
 
-		// Set the HTML the web view displays.
-		// maWidgetSetProperty(mWebView, "html", html.c_str());
-
 		// Display the main page.
-		maWidgetSetProperty(mWebView, "url", "MainPage.html");
+		maWidgetSetProperty(mWebView, "url", "PageMain.html");
 
 		// Compose objects.
 		maWidgetAddChild(mScreen, mWebView);
@@ -139,13 +117,15 @@ public:
 		MAWidgetHandle webView = maWidgetCreate(MAW_WEB_VIEW);
 		widgetShouldBeValid(webView, "Could not create web view");
 
-		// Set size of vew view to fill the parent.
+		// Set size of web view to fill the parent.
 		maWidgetSetProperty(webView, "width", "-1");
 		maWidgetSetProperty(webView, "height", "-1");
 
-		// Enable zooming.
-		maWidgetSetProperty(webView, "enableZoom", "true");
+		// Disable zooming to make page display in readable size
+		// on all devices.
+		maWidgetSetProperty(webView, "enableZoom", "false");
 
+		// Register a handler for JavaScript messages.
 		WebViewMessage::getMessagesFor(webView);
 
 		return webView;
@@ -186,19 +166,19 @@ public:
 				case EVENT_TYPE_SMS:
 					if (MA_SMS_RESULT_SENT == event.status)
 					{
-						callJSFunction("StatusMessageSMSSent");
+						callJSFunction("SMSSent");
 					}
 					if (MA_SMS_RESULT_NOT_SENT == event.status)
 					{
-						callJSFunction("StatusMessageSMSNotSent");
+						callJSFunction("SMSNotSent");
 					}
 					if (MA_SMS_RESULT_DELIVERED == event.status)
 					{
-						callJSFunction("StatusMessageSMSDelivered");
+						callJSFunction("SMSDelivered");
 					}
 					if (MA_SMS_RESULT_NOT_DELIVERED == event.status)
 					{
-						callJSFunction("StatusMessageSMSNotDelivered");
+						callJSFunction("SMSNotDelivered");
 					}
 					break;
 			}
@@ -207,13 +187,6 @@ public:
 
 	void handleWidgetEvent(MAWidgetEventData* widgetEvent)
 	{
-		// Has page been loaded?
-		if (MAW_EVENT_WEB_VIEW_CONTENT_LOADING == widgetEvent->eventType &&
-			MAW_CONSTANT_DONE == widgetEvent->status)
-		{
-			lprintfln("MAW_EVENT_WEB_VIEW_CONTENT_LOADING DONE");
-		}
-
 		// Handle messages from the WebView widget.
 		if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEvent->eventType &&
 			MAW_CONSTANT_HARD == widgetEvent->hookType)
@@ -221,22 +194,14 @@ public:
 			// Get message.
 			WebViewMessage message(widgetEvent->urlData);
 
-			if (message.is("SendLoveSMS"))
+			if (message.is("SendSMS"))
 			{
 				// Save phone no and send SMS.
 				savePhoneNoAndSendSMS(
 					message.getParam(0),
-					mLoveMessage);
+					message.getParam(1));
 			}
-
-			if (message.is("SendKissSMS"))
-			{
-				// Save phone no and send SMS.
-				savePhoneNoAndSendSMS(
-					message.getParam(0),
-					mKissMessage);
-			}
-
+			else
 			if (message.is("PageLoaded"))
 			{
 				// Set saved phone number here.
@@ -251,8 +216,8 @@ public:
 		const MAUtil::String& phoneNo,
 		const MAUtil::String&  message)
 	{
-		lprintfln("*** SMS to: %s", phoneNo.c_str());
-		lprintfln("*** SMS data: %s", message.c_str());
+		lprintfln("*** SMS to: %s\n", phoneNo.c_str());
+		lprintfln("*** SMS data: %s\n", message.c_str());
 
 		// Save the phone number.
 		savePhoneNo(phoneNo);
@@ -267,12 +232,12 @@ public:
 			// Provide feedback via JS.
 			if (0 > result)
 			{
-				callJSFunction("StatusMessageSMSNotSent");
+				callJSFunction("SMSNotSent");
 			}
 		}
 		else
 		{
-			callJSFunction("StatusMessageSMSNotSent");
+			callJSFunction("SMSNotSent");
 		}
 	}
 
@@ -315,11 +280,7 @@ public:
 	 */
 	void savePhoneNo(const MAUtil::String& phoneNo)
 	{
-		MAUtil::String path =
-			mPlatform->getLocalPath() +
-			"SavedPhoneNo";
-		lprintfln("Saving phoneNo: %s to: %s", phoneNo.c_str(), path.c_str());
-		mPlatform->writeTextToFile(path, phoneNo);
+		mPlatform->writeTextToFile(phoneNoPath(), phoneNo);
 	}
 
 	/**
@@ -327,21 +288,21 @@ public:
 	 */
 	MAUtil::String loadPhoneNo()
 	{
-		MAUtil::String path =
-			mPlatform->getLocalPath() +
-			"SavedPhoneNo";
 		MAUtil::String phoneNo;
-		bool success = mPlatform->readTextFromFile(path, phoneNo);
+		bool success = mPlatform->readTextFromFile(phoneNoPath(), phoneNo);
 		if (success)
 		{
-			lprintfln("Loaded phoneNo: %s", phoneNo.c_str());
 			return phoneNo;
 		}
 		else
 		{
-			lprintfln("Loading phoneNo failed");
 			return "";
 		}
+	}
+
+	MAUtil::String phoneNoPath()
+	{
+		return mPlatform->getLocalPath() + "SavedPhoneNo";
 	}
 
 	void widgetShouldBeValid(MAWidgetHandle widget, const char* panicMessage)

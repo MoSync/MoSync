@@ -130,8 +130,11 @@ private: // members
 	/** The list with all the snippets. **/
 	MAWidgetHandle mListView;
 
-	/** The strings for all the snippets. */
+	/** The strings for all the snippets in this screen. */
 	MAUtil::Vector<MAUtil::String> mSnippets;
+
+	/** The string with all the titles in this screen. */
+	MAUtil::Vector<MAUtil::String> mTitles;
 
 	/** All the label widgets containing snippets. */
 	MAUtil::Vector<MAWidgetHandle> mSnippetLabels;

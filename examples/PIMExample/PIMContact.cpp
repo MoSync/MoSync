@@ -65,6 +65,8 @@ PIMContact::~PIMContact()
  */
 void PIMContact::printContact()
 {
+	mArgs.bufSize = BUF_SIZE;
+
     printf(sFieldSeparator);
 
     printContactName();
