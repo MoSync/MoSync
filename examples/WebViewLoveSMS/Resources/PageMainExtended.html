@@ -14,6 +14,8 @@ body
 
 html, body
 {
+  width: 100%;
+  height: 100%;
   margin: 0;
   padding: 0;
   font-family: sans-serif;
@@ -125,32 +127,28 @@ html, body
   margin: 0px;
   top: 0px;
   left: 0px;
-  width: 100px;
-  height: 100px;
+  /*width: 100px;
+  height: 100px;*/
 
-  padding: 0.3em 0.5em;
-  border-radius: 0.3em;
-  -moz-border-radius: 0.3em;
-  -webkit-border-radius: 0.3em;
+  padding: 0px;
+  border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  -webkit-border-radius: 0.5em;
 
-  /*font-size: 1.5em;*/
-  font-weight: bold;
-  text-align: center;
-
-  color: black;
   background-color: FF88AA;
 
   visibility: hidden;
+  display: none;
 }
 
 #HelpText
 {
+  margin: 0em 1em;
   font-size: 1.5em;
   font-weight: bold;
-  text-align: center;
+  text-align: left;
 
-  color: black;
-  background-color: FF88AA;
+  color: F9F9F9;
 }
 </style>
 
@@ -194,27 +192,26 @@ function ShowHelp()
   var element = document.getElementById("HelpPage");
   var parent = document.getElementById("MainPage");
   //var parent = element.parentNode;
-  var width = parent.clientWidth - 5;
-  var height = parent.clientHeight - 5;
+  var width = parent.clientWidth - 40;
+  var height = parent.clientHeight - 40;
 //  alert("parentNode: " + element.parentNode + " MainPage: " +  parent);
-  alert("parent.clientWidth: " + parent.clientWidth +
-	  " window.innerWidth: " + window.innerWidth +
-	  " element.parentNode.clientWidth: " + element.parentNode.clientWidth +
-	  " document.documentElement.clientWidth: " + document.documentElement.clientWidth);
-  element.style.left = "2px";
-  element.style.top = "2px";
+//  alert("parent.clientWidth: " + parent.clientWidth +
+//	  " window.innerWidth: " + window.innerWidth +
+//	  " element.parentNode.clientWidth: " + element.parentNode.clientWidth +
+//	  " document.documentElement.clientWidth: " + document.documentElement.clientWidth);
+  element.style.left = "20px";
+  element.style.top = "20px";
   element.style.width = width + "px";
-  element.style.height = height + "px";
+  element.style.minHeight = height + "px";
   element.style.visibility = "visible";
-
-  element.style.borderStyle = "solid";
-  element.style.borderWidth = "1px";
+  element.style.display = "block";
 }
 
 function HideHelp()
 {
   var element = document.getElementById("HelpPage");
   element.style.visibility = "hidden";
+  element.style.display = "none";
 }
 
 var DisplayMessageTimer = 0;
@@ -339,10 +336,18 @@ function IsDigit(ch)
 </div>
 <div id="HelpPage">
   <div id="HelpText">
-    <p>Created with MoSync</p>
+    <h1>LoveSMS<img src="package_favorite.png" style="float: right;" /> </h1>
+	<p>This application was created to make it easy to send loving
+	smileys to the one you love.</p>
+	<p>Author: Mikael Kindborg</p>
+    <p>Created with MoSync - Open Source Cross Platform Mobile Development Tool</p>
     <p><a href="mosync://OpenMoSyncWebSite">www.mosync.com</a></p>
+
   </div>
-  <div class="button buttonhelp" onclick="HideHelp()">Close</div>
+  <div>
+    <!-- <img src="package_toys.png" style="float: left;"> -->
+    <div class="button buttonhelp" onclick="HideHelp()">Close</div>
+  </div>
 </div>
 <!--<script>
   SendMoSyncMessage('PageLoaded')
