@@ -1,4 +1,4 @@
-.res MainPage_html
+.res PageMain_html
 .bin
 .include "PageMain.html"
 
