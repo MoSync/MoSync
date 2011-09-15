@@ -43,6 +43,7 @@ namespace NativeUI
 
         /**
          * This method is called when MAW_EVENT_WEB_VIEW_HOOK_INVOKED is received.
+         * @param webView The web view object that generated the event.
          * @param hookType The type of hook that has been invoked.
 		 * One of:
 		 *  -#MAW_CONSTANT_SOFT
@@ -63,7 +64,7 @@ namespace NativeUI
         /**
          * This method is called when the web view content is loading.
          * @param webView The web view object that generated the event.
-         * Any of the following constants:
+         * @param webViewState  Any of the following constants:
          * - #MAW_CONSTANT_STARTED
 		 * - #MAW_CONSTANT_DONE
 		 * - #MAW_CONSTANT_STOPPED

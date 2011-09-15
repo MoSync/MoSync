@@ -80,7 +80,7 @@ namespace NativeUI
         /**
          * Set a text in the edit box that acts as a placeholder when an
          * edit box is empty.
-         * @param The given text.
+         * @param text The given text.
          */
         virtual void setPlaceholder(const MAUtil::String& text);
 

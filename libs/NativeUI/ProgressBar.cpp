@@ -67,7 +67,7 @@ namespace NativeUI
 
     /**
      * Set the current progress value to the progress bar.
-     * @param An integer that specifies the new progress,
+     * @param progressValue An integer that specifies the new progress,
      * between 0 and maximum value.
      * @return Any of the following result codes:
      * - #MAW_RES_OK if the property could be set.

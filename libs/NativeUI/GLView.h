@@ -48,7 +48,7 @@ namespace NativeUI
 	public:
 		/**
 		 * Constructor.
-		 * @param GL_VIEW of the constants:
+		 * @param type One of the constants:
 		 * GL1_VIEW
 		 * GL2_VIEW
 		 */

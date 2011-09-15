@@ -4225,7 +4225,7 @@ group WidgetAPI "Widget API" {
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
 		 * This is an iOS specific widget.
-		 * See \ref WidgetNavigationBarProperties "Navigation Bar properties" for the properties available.
+		 * See \ref WidgetNavBarProperties "Navigation Bar properties" for the properties available.
 		 */
 		NAV_BAR = "NavBar";
 
@@ -5602,7 +5602,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Set or gets the current progress to the specified value.
 		*
-		* @validvalue An int that specifies the new progress, between 0 and max value. See \ref PROGRESS_BAR_MAX.
+		* @validvalue An int that specifies the new progress, between 0 and max value. See \ref MAW_PROGRESS_BAR_MAX.
 		*
 		* @setandget
 		*
@@ -5673,7 +5673,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Set or gets the current value to the slider.
 		*
-		* @validvalue An int that specifies the new value, between 0 and max value. See \ref SLIDER_MAX.
+		* @validvalue An int that specifies the new value, between 0 and max value. See \ref MAW_SLIDER_MAX.
 		*
 		* @setandget
 		*
@@ -6016,7 +6016,7 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetVideoViewProperties
 
 	/**
-	* The available widget properties for a #MAW_NAVIGATION_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+	* The available widget properties for a #MAW_NAV_BAR. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetNavBarProperties "Navigation Bar properties" {
 	constset MAString MAW_NAV_BAR_ {

@@ -39,7 +39,7 @@ namespace NativeUI
     public:
         /**
          * This method is called when the selected time was changed by the user.
-         * @param button The time picker object that generated the event.
+         * @param timePicker The time picker object that generated the event.
          * @param hour The selected hour.
          * @param minute The selected minute
          */

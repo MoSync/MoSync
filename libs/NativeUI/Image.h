@@ -42,7 +42,7 @@ namespace NativeUI
     };
 
     /**
-     * Class for buttons.
+     * Class for images.
      */
     class Image : public Widget
     {
