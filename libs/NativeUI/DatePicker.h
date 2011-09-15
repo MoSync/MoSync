@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file DatePicker.h
  * @author Emma Tresanszki
  *
- * An instance of DatePicker allow to an users to select dates.
+ * \brief An instance of DatePicker allow to an users to select dates.
  * For date picker events see DatePickerListener.
  */
 
@@ -38,7 +38,7 @@ namespace NativeUI
     class DatePickerListener;
 
 /**
- * Struct to hold a date.
+ * \brief Struct to hold a date.
  */
 	struct Date{
 		int day; // Range: 1-31.
@@ -50,9 +50,9 @@ namespace NativeUI
 	};
 
 	/**
-	 * A Date Picker is a widget for selecting a date.
-	 * The date picker is initialized with system date.
+	 * \brief A Date Picker is a widget for selecting a date.
 	 *
+	 * The date picker is initialized with system date.
 	 * The date can be selected by a year, month, and day spinners.
 	 * The minimal and maximal date from which dates to be selected
 	 * can be customized.

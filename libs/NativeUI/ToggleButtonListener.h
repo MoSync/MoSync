@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file ToggleButtonListener.h
  * @author Emma Tresanszki
  *
- * Listener for ToggleButton events.
+ * \brief Listener for ToggleButton events.
  */
 
 #ifndef NATIVEUI_TOGGLE_BUTTON_LISTENER_H_
@@ -32,7 +32,7 @@ namespace NativeUI
     class ToggleButton;
 
     /**
-     * Listener for ToggleButton events.
+     * \brief Listener for ToggleButton events.
      */
     class ToggleButtonListener
     {

@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Layout.h
  * @author Emma Tresanszki
  *
- * Class for layouts.
+ * \brief Class for layouts.
  */
 
 #ifndef NATIVEUI_LAYOUT_H_
@@ -31,7 +31,7 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 	/**
-	 * A basic layout.
+	 * \brief Class for layouts.
 	 */
 	class Layout : public Widget
 	{

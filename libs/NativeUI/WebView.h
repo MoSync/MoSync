@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file WebView.h
  * @author Emma Tresanszki
  *
- * Class for web views.
+ * \brief Class for web views.
  */
 
 #ifndef NATIVEUI_WEBVIEW_H_
@@ -35,7 +35,7 @@ namespace NativeUI
     class WebViewListener;
 
 	/**
-	 * A web view is a widget used to render web pages.
+	 * \brief A web view is a widget used to render web pages.
 	 */
 	class WebView : public Widget
 	{

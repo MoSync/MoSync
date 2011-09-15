@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file EditBox.h
  * @author Bogdan Iusco
  *
- * Class for edit box.
+ * \brief Class for edit box.
  * You can use this widget to gather small amounts of text from the user.
  * The edit box supports the use of an observer to handle editing-related
  * events.
@@ -47,7 +47,8 @@ namespace NativeUI
     };
 
     /**
-     * Class for edit box.
+     * \brief Class for edit box.
+     *
      * You can use this widget to gather small amounts of text from the user.
      * The edit box supports the use of an observer to handle editing-related
      * events.

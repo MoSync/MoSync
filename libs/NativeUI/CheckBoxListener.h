@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file CheckBoxListener.h
  * @author Bogdan Iusco
  *
- * Listener for CheckBox events.
+ * \brief Listener for CheckBox events.
  */
 
 #ifndef NATIVEUI_CHECK_BOX_LISTENER_H_
@@ -32,7 +32,7 @@ namespace NativeUI
     class CheckBox;
 
     /**
-     * Listener for CheckBox events.
+     * \brief Listener for CheckBox events.
      */
     class CheckBoxListener
     {

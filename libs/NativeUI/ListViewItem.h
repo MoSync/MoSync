@@ -20,8 +20,8 @@ MA 02110-1301, USA.
  * @file ListViewItem.h
  * @author Bogdan Iusco
  *
- * The ListViewItem class defines the attributes and behavior of the items
- * that appear in ListView objects.
+ * \brief The ListViewItem class defines the attributes and behavior of the
+ * items that appear in ListView objects.
  */
 
 #ifndef NATIVEUI_LIST_VIEW_ITEM_H_
@@ -33,8 +33,8 @@ namespace NativeUI
 {
 
     /**
-     * The ListViewItem class defines the attributes and behavior of the items
-     * that appear in ListView objects.
+     * The ListViewItem class defines the attributes and behavior of the
+     * items that appear in ListView objects.
      */
     enum ListViewItemAccessory
     {
@@ -45,7 +45,7 @@ namespace NativeUI
     };
 
     /**
-     * Class for list view items.
+     * \brief Class for list view items.
      */
     class ListViewItem : public Widget
     {

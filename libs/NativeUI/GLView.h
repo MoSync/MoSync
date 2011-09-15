@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file GLView.h
  * @author Mikael Kindborg and Emma Tresanszki
  *
- * Class for gl view.
+ * \brief Class for gl view.
  */
 
 #ifndef NATIVEUI_GL_VIEW_H_
@@ -40,8 +40,8 @@ namespace NativeUI
     class GLViewListener;
 
 	/**
-	 * A GL view is a widget that is used to display graphics rendered by the
-	 * GPU using OpenGL calls.
+	 * \brief A GL view is a widget that is used to display graphics rendered
+	 * by the GPU using OpenGL calls.
 	 */
 	class GLView : public Widget
 	{

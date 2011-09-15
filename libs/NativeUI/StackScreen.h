@@ -19,6 +19,9 @@ MA 02110-1301, USA.
 /**
  * @file StackScreen.h
  * @author Emma Tresanszki
+ *
+ * \brief A stack screen is a special type of screen that manages navigation
+* between a set of screens.
  */
 
 #ifndef NATIVEUI_STACK_SCREEN_H_
@@ -37,6 +40,20 @@ namespace NativeUI
     // Forward declaration.
     class StackScreenListener;
 
+    /**
+     * \brief A stack screen is a special type of screen that manages navigation
+     * between a set of screens.
+     *
+     * The screen stack can be pushed or popped. Pushing a given screen will
+     * hide the current screen and display the pushed screen. Popping a screen
+     * hides the current screen and shows the previous screen in the stack.
+     * See push() and pop().
+     * Navigation between the screens in the stack is handled according to the
+     * norm on the specific platform. On iPhone a navigation bar is added to
+     * each pushed screen that can be used to go back, while on Android there
+     * is no extra UI added and the back button is used to go back to the
+     * previous screen.
+     */
     class StackScreen : public Screen
     {
     public:

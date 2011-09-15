@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file WebViewListener.h
  * @author Emma Tresanszki
  *
- * Listener for WebView events.
+ * \brief Listener for WebView events.
  *
  */
 
@@ -35,7 +35,7 @@ namespace NativeUI
     class WebView;
 
     /**
-     * Listener for WebView events.
+     * \brief Listener for WebView events.
      */
     class WebViewListener
     {

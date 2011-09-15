@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file DatePickerListener.h
  * @author Bogdan Iusco
  *
- * Listener for DatePicker events.
+ * \brief Listener for DatePicker events.
  */
 
 #ifndef NATIVEUI_DATE_PICKER_LISTENER_H_
@@ -33,7 +33,7 @@ namespace NativeUI
     struct Date;
 
     /**
-     * Listener for DatePicker events.
+     * \brief Listener for DatePicker events.
      */
     class DatePickerListener
     {

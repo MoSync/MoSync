@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file NumberPicker.h
  * @author Emma Tresanszki
  *
- * Class for number picker.
+ * \brief Class for number picker.
  * Note that this type of widget is available only on iOS for the moment.
  */
 
@@ -36,8 +36,9 @@ namespace NativeUI
     class NumberPickerListener;
 
 	/**
-	 * A Number Picker is a widget that enables the user to select a number
-	 * from a predefined range.
+	 * \brief  A Number Picker is a widget that enables the user to select a
+	 * number from a predefined range.
+	 *
 	 * Note that this type of widget is available only on iOS for the moment.
 	 */
 	class NumberPicker : public Widget

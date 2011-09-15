@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file TimePickerListener.h
  * @author Bogdan Iusco
  *
- * Listener for TimePicker events.
+ * \brief Listener for TimePicker events.
  */
 
 #ifndef NATIVEUI_TIME_PICKER_LISTENER_H_
@@ -32,7 +32,7 @@ namespace NativeUI
     class TimePicker;
 
     /**
-     * Listener for TimePicker events.
+     * \brief Listener for TimePicker events.
      */
     class TimePickerListener
     {
