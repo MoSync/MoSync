@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file TimePickerListener.h
  * @author Bogdan Iusco
  *
- * Listener for TimePicker events.
+ * \brief Listener for TimePicker events.
  */
 
 #ifndef NATIVEUI_TIME_PICKER_LISTENER_H_
@@ -32,14 +32,14 @@ namespace NativeUI
     class TimePicker;
 
     /**
-     * Listener for TimePicker events.
+     * \brief Listener for TimePicker events.
      */
     class TimePickerListener
     {
     public:
         /**
          * This method is called when the selected time was changed by the user.
-         * @param button The time picker object that generated the event.
+         * @param timePicker The time picker object that generated the event.
          * @param hour The selected hour.
          * @param minute The selected minute
          */

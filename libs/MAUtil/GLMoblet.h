@@ -39,6 +39,9 @@ namespace MAUtil {
 
 class GLMobletListener;
 
+/**
+* \brief OpenGL|ES fullscreen moblet.
+*/
 class GLMoblet : public Moblet
 {
 public:

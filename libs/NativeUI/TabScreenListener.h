@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file TabScreenListener.h
  * @author Bogdan Iusco
  *
- * Listener for TabScreen events.
+ * \brief Listener for TabScreen events.
  */
 
 #ifndef NATIVEUI_TAB_SCREEN_LISTENER_H_
@@ -32,7 +32,7 @@ namespace NativeUI
     class TabScreen;
 
     /**
-     * Interface for tab screen event listeners.
+     * \brief Interface for tab screen event listeners.
      */
     class TabScreenListener
     {

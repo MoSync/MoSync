@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Widget.h
  * @author Mikael Kindborg, Emma Tresanszki and Bogdan Iusco.
  *
- * Widget is the base class of all widgets. This class is
+ * \brief Widget is the base class of all widgets. This class is
  * used to wrap native widget handles and provides common
  * methods for widgets and event support.
  */
@@ -43,14 +43,16 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 	/**
-	 * A structure that holds information about the last error that occurred
-	 * by using the wrapper methods.
-	 * Caused may be any of the following:
+	 * \brief A structure that holds information about the last error that
+	 * occurred by using the wrapper methods.
+	 *
+	 * Causes might be any of the following:
 	 *  - A widget was instantiated but it's type is not yet available
 	 *  on the target platform.
 	 *  - A property was set/get on a widget that is not yet available on the
 	 *  target platform.
 	 *  - A setter/getter method received an invalid property name.
+	 *  - A syscall has failed due to invalid parameters.
 	 *
 	 * NOTE: In order to have this structure empty, make sure you read carefully
 	 * the documentation before you use the NativeUI library.
@@ -67,6 +69,15 @@ namespace NativeUI
 		MAUtil::String errorCause;
 		/**
 		 * The error code.
+		 * Any of the following:
+		 *  - MAW_RES_ERROR
+		 *  - MAW_RES_INVALID_PROPERTY_NAME
+		 *  - MAW_RES_INVALID_PROPERTY_VALUE
+		 *  - MAW_RES_INVALID_HANDLE
+		 *  - MAW_RES_INVALID_TYPE_NAME
+		 *  - MAW_RES_INVALID_INDEX
+		 *  - MAW_RES_INVALID_STRING_BUFFER_SIZE
+		 *  - MAW_RES_INVALID_LAYOUT
 		 */
 		int errorCode;
 		LastError(
@@ -82,7 +93,7 @@ namespace NativeUI
     class WidgetEventListener;
 
     /**
-     * Base class for all widgets.
+     * \brief Base class for all widgets.
      */
     class Widget
     {

@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file VerticalLayout.h
  * @author Mikael Kindborg
  *
- * Class for vertical layout of widgets.
+ * \brief Class for vertical layout of widgets.
  */
 
 #ifndef NATIVEUI_VERICAL_LAYOUT_H_
@@ -32,7 +32,7 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 	/**
-	 * Class for vertical layouts.
+	 * \brief Class for vertical layouts.
 	 */
 	class VerticalLayout : public Layout
 	{

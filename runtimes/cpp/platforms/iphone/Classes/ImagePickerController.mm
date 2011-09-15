@@ -68,10 +68,11 @@ static ImagePickerController *sharedInstance = nil;
 -(void) show
 {
     MoSyncUI* mosyncUI = getMoSyncUI();
-    ScreenWidget* shownScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
-    UIViewController* controller = [shownScreen getController];
+    [mosyncUI showModal:mImagePicker];
+	//ScreenWidget* shownScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
+    //UIViewController* controller = [shownScreen getController];
 
-    [self performSelectorOnMainThread: @ selector(displayImagePicker:) withObject:controller waitUntilDone:YES];
+    //[self performSelectorOnMainThread: @ selector(displayImagePicker:) withObject:controller waitUntilDone:YES];
 }
 
 /**
@@ -81,9 +82,10 @@ static ImagePickerController *sharedInstance = nil;
 -(void) hide
 {
     MoSyncUI* mosyncUI = getMoSyncUI();
-    ScreenWidget* shownScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
-    UIViewController* controller = [shownScreen getController];
-    [controller dismissModalViewControllerAnimated:YES];
+	[mosyncUI hideModal];
+    //ScreenWidget* shownScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
+    //UIViewController* controller = [shownScreen getController];
+    //[controller dismissModalViewControllerAnimated:YES];
 }
 
 /**
@@ -109,7 +111,7 @@ static ImagePickerController *sharedInstance = nil;
 /**
  * The user has cancelled the pick operation.
  * @param picker The controller object managing the image picker interface.
- */ 
+ */
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
     MAEvent event;
@@ -121,15 +123,25 @@ static ImagePickerController *sharedInstance = nil;
 }
 
 /**
+ * The user has cancelled the pick operation on an iPad.
+ * @param picker The controller object managing the popover window.
+ */
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popover
+{
+	[self imagePickerControllerDidCancel:popover.contentViewController];
+}
+
+
+/**
  * Displays the image picker.
  * This function must be called on the main thread.
  * @param The current UIViewController object.
  */
--(void) displayImagePicker:(id) obj
+/*-(void) displayImagePicker:(id) obj
 {
     UIViewController* controller = (UIViewController*) obj;
-    [controller presentModalViewController:mImagePicker animated:true];    
-}
+	[controller presentModalViewController:mImagePicker animated:false];
+}*/
 
 /**
  * Gets an image handle for a given image.

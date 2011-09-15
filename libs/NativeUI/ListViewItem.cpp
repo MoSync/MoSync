@@ -55,7 +55,7 @@ namespace NativeUI
     /**
      * Set an icon of the list view item that is placed to the left
      * of the text.
-     * @param image MoSync handle to an uncompressed image resource.
+     * @param icon MoSync handle to an uncompressed image resource.
      * @return Any of the following result codes:
      * - #MAW_RES_OK if the property could be set.
      * - #MAW_RES_INVALID_PROPERTY_VALUE if the icon handle was invalid.

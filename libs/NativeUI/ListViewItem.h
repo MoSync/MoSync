@@ -20,8 +20,8 @@ MA 02110-1301, USA.
  * @file ListViewItem.h
  * @author Bogdan Iusco
  *
- * The ListViewItem class defines the attributes and behavior of the items
- * that appear in ListView objects.
+ * \brief The ListViewItem class defines the attributes and behavior of the
+ * items that appear in ListView objects.
  */
 
 #ifndef NATIVEUI_LIST_VIEW_ITEM_H_
@@ -33,8 +33,8 @@ namespace NativeUI
 {
 
     /**
-     * The ListViewItem class defines the attributes and behavior of the items
-     * that appear in ListView objects.
+     * The ListViewItem class defines the attributes and behavior of the
+     * items that appear in ListView objects.
      */
     enum ListViewItemAccessory
     {
@@ -45,7 +45,7 @@ namespace NativeUI
     };
 
     /**
-     * Class for list view items.
+     * \brief Class for list view items.
      */
     class ListViewItem : public Widget
     {
@@ -70,7 +70,7 @@ namespace NativeUI
         /**
          * Set an icon of the list view item that is placed to the left
          * of the text.
-         * @param image MoSync handle to an uncompressed image resource.
+         * @param icon MoSync handle to an uncompressed image resource.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the property could be set.
          * - #MAW_RES_INVALID_PROPERTY_VALUE if the icon handle was invalid.

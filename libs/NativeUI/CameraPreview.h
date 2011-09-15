@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file CameraPreview.h
  * @author Emma Tresanszki
  *
- * An instance of CameraPreview allows users to visualize the camera controller.
+ * \brief An instance of CameraPreview allows users to visualize the camera controller.
  */
 
 #ifndef NATIVEUI_CAMERAPREVIEW_H_
@@ -30,7 +30,9 @@ MA 02110-1301, USA.
 
 namespace NativeUI
 {
-	/**
+	/** \brief An instance of CameraPreview allows users to visualize the
+	 * camera controller.
+	 *
 	 * A Camera Preview is a widget that is used to display  a live view
 	 * of the camera rendered by the viewfinder.
 	 * It has no specific properties (besides the base widget properties)

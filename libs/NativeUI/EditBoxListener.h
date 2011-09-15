@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file EditBoxListener.h
  * @author Bogdan Iusco
  *
- * Listener for EditBox events.
+ * \brief Listener for EditBox events.
  */
 
 #ifndef NATIVEUI_EDIT_BOX_LISTENER_H_
@@ -33,7 +33,7 @@ namespace NativeUI
     class EditBox;
 
     /**
-     * Listener for EditBox events.
+     * \brief Listener for EditBox events.
      */
     class EditBoxListener
     {

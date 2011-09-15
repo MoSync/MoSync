@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file RelativeLayout.h
  * @author Emma Tresanszki
  *
- * Class for relative layout of widgets.
+ * \brief Class for relative layout of widgets.
  */
 
 #ifndef NATIVEUI_RELATIVE_LAYOUT_H_
@@ -32,7 +32,7 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 	/**
-	 * A relative layout is a layout that layouts widgets relative
+	 * \brief A relative layout is a layout that layouts widgets relative
 	 * to its coordinate system.
 	 */
 	class RelativeLayout : public Layout
