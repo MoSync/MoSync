@@ -398,6 +398,23 @@ MAUtil::Vector<MAUtil::String> MediaWiki::getAllSnippetsWithTitle()
 }
 
 /**
+ * Provides the titles.
+ * Only for the checked ones.
+ */
+MAUtil::Vector<MAUtil::String> MediaWiki::getAllCheckedTitles()
+{
+	MAUtil::Vector<MAUtil::String> list;
+	for (int i=0; i < mWiki->titleResults.size(); i++)
+	{
+		if ( !isItemHidden(i) )
+		{
+			list.add(mWiki->titleResults[i]);
+		}
+	}
+	return list;
+}
+
+/**
  * Get the title on a given position.
  * @param index The position for which to search the array of titles.
  */

@@ -16,8 +16,10 @@
 <property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
-<property key="build.prefs:memory.data/Release" value="780"/>
-<property key="build.prefs:memory.heap/Release" value="640"/>
+<property key="build.prefs:memory.data/Debug" value="2048"/>
+<property key="build.prefs:memory.data/Release" value="2048"/>
+<property key="build.prefs:memory.heap/Debug" value="1024"/>
+<property key="build.prefs:memory.heap/Release" value="1024"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>

@@ -177,6 +177,12 @@ public:
 	MAUtil::Vector<MAUtil::String> getAllSnippetsWithTitle();
 
 	/**
+	 * Provides the titles.
+	 * Only for the checked ones.
+	 */
+	MAUtil::Vector<MAUtil::String> getAllCheckedTitles();
+
+	/**
 	 * Get the title on a given position.
 	 * @param index The position for which to search the array of titles.
 	 */

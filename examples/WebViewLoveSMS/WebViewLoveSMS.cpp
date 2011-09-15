@@ -247,7 +247,7 @@ public:
 				message.c_str());
 
 			// Provide feedback via JS.
-			if (0 > result)
+			if (0 != result)
 			{
 				callJSFunction("SMSNotSent");
 			}
