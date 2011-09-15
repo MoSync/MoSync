@@ -8,6 +8,8 @@ include FileUtils::Verbose
 MOSYNC_DOXYGEN_OUTPUT_DIR = "#{ENV['MOSYNCDIR']}/docs/"
 MOSYNC_INCLUDE_DIR = "#{ENV['MOSYNCDIR']}/include/"
 
+mkdir_p(MOSYNC_DOXYGEN_OUTPUT_DIR)
+
 cp('release_notes.txt', MOSYNC_DOXYGEN_OUTPUT_DIR)
 cp('changelog.txt', MOSYNC_DOXYGEN_OUTPUT_DIR)
 
