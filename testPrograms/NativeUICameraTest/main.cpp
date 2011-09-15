@@ -523,9 +523,11 @@ public:
 	}
 	void createNewUI()
 	{
+
 		stopCamera();
-		maWidgetDestroy(mScreen);
+
 		maWidgetScreenShow(MAW_CONSTANT_MOSYNC_SCREEN_HANDLE);
+		maWidgetDestroy(mScreen);
 
 		int numCameras = maCameraNumber();
 		printf("Reading the Camera properties!!!");

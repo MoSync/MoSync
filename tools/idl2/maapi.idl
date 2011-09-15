@@ -2489,7 +2489,8 @@ interface MAAPI {
 		* to arrive unaltered. 8-bit Latin-1 characters should work in most cases.
 		*
 		* \returns 0 on success. A \link #CONNERR_GENERIC CONNERR \endlink code \< 0 on error.
-		* #CONNERR_FORBIDDEN if the user denied permission.
+		* #CONNERR_FORBIDDEN if the user denied permission, and CONNERR_UNAVAILABLE if the
+		* device cannot send SMS messages.
 		*
 		* \note Will create a text file on PC platforms, instead of sending anything.
 		*/
