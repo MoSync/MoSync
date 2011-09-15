@@ -154,7 +154,7 @@ static IWidget* sOldScreen = nil;
 	[widgetArray addObject:mosyncScreen];
 	[mosyncScreen setWidgetHandle:0]; // MAW_CONSTANT_MOSYNC_SCREEN_HANDLE
 	
-	sOldScreen = mosyncScreen;
+	sOldScreen = nil; // show will set this after the screen is shown.
 	[self show: mosyncScreen];
 	return self;
 }
@@ -206,7 +206,13 @@ static IWidget* sOldScreen = nil;
 	int handle = [widget getWidgetHandle];	
 
     [widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
-        
+    
+    if(widget == sOldScreen) {
+        UIView* actualView = [sOldScreen getView];
+		[actualView removeFromSuperview];
+        sOldScreen = nil;
+    }
+    
 	int ret;
 	int removeRet = [widget remove];
 	if(removeRet<0)
@@ -234,10 +240,8 @@ static IWidget* sOldScreen = nil;
 	if(sOldScreen != nil) {
 		UIView* actualView = [sOldScreen getView];
 		[actualView removeFromSuperview];
-	} else {
-		return MAW_RES_ERROR;
 	}
-	
+    
 	[mainWindow insertSubview:[widget getView] atIndex:0];
 	
 	[widget layout];
