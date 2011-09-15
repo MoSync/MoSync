@@ -76,11 +76,10 @@ bool isAndroid()
 MAUtil::String getFormatedDuration(int milliseconds)
 {
 	MAUtil::String output;
-	int hours(0), minutes(0), seconds(0);
 
-	seconds = milliseconds / 1000;
-	minutes = milliseconds / ( 1000 * 60 );
-	hours = milliseconds / ( 1000 * 60 * 60 );
+	int hours = milliseconds / (1000*60*60);
+	int minutes = (milliseconds % (1000*60*60)) / (1000*60);
+	int seconds = ((milliseconds % (1000*60*60)) % (1000*60)) / 1000;
 
 	if ( hours < 10 )
 		output+= "0";
