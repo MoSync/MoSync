@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Widgets.h
  * @author Mikael Kindborg
  *
- * You can include all widget classes by just including
+ * \brief You can include all widget classes by just including
  * this file, to make things a bit easier.
  */
 

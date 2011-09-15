@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Button.h
  * @author Bogdan Iusco
  *
- * Class for buttons.
+ * \brief Class for buttons.
  * A button intercepts touch events and notifies the observers.
  * Methods for setting the text, alignment, font size and color are inherited
  * from TextWidget.
@@ -38,7 +38,8 @@ namespace NativeUI
     class ButtonListener;
 
     /**
-     * Class for buttons.
+     * \brief Class for buttons.
+     *
      * A button intercepts touch events and notifies the observers.
      * Methods for setting the text, alignment, font size and color are
      * inherited from TextWidget.

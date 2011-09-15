@@ -20,8 +20,8 @@ MA 02110-1301, USA.
  * @file ActivityIndicator.h
  * @author Bogdan Iusco
  *
- * An instance of ActivityIndicator is used for displaying the indeterminate
- * progress of a task over time.
+ * \brief An instance of ActivityIndicator is used for displaying the
+ * indeterminate progress of a task over time.
  */
 
 #ifndef NATIVEUI_ACTIVITY_INDICATOR_H_
@@ -32,8 +32,8 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
     /**
-     * An instance of ActivityIndicator is used for displaying the indeterminate
-     * progress of a task over time.
+     * \brief An instance of ActivityIndicator is used for displaying the
+     * indeterminate progress of a task over time.
      */
     class ActivityIndicator : public Widget
     {

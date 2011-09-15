@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Slider.h
  * @author Bogdan Iusco
  *
- * An instance of Slider is used for selecting a single value from a
+ * \brief An instance of Slider is used for selecting a single value from a
  * continuous range of values.
  */
 
@@ -36,7 +36,7 @@ namespace NativeUI
     class SliderListener;
 
     /**
-     * An instance of Slider is used for selecting a single value from a
+     * \brief An instance of Slider is used for selecting a single value from a
      * continuous range of values.
      */
     class Slider : public Widget
