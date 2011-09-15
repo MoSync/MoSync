@@ -82,15 +82,15 @@ MAUtil::String getFormatedDuration(int milliseconds)
 	minutes = milliseconds / ( 1000 * 60 );
 	hours = milliseconds / ( 1000 * 60 * 60 );
 
-	if ( hours == 0 )
+	if ( hours < 10 )
 		output+= "0";
 	output += MAUtil::integerToString(hours);
 	output += ":";
-	if ( minutes == 0 )
+	if ( minutes < 10 )
 		output += "0";
 	output += MAUtil::integerToString(minutes);
 	output += ":";
-	if ( seconds == 0 )
+	if ( seconds < 10 )
 		output += "0";
 	output += MAUtil::integerToString(seconds);
 
