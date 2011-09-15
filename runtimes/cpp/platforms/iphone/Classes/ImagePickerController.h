@@ -21,7 +21,7 @@
 /**
  * Dispalys an image piker to the user.
  */
-@interface ImagePickerController :  NSObject<UINavigationControllerDelegate,UIImagePickerControllerDelegate> {
+@interface ImagePickerController :  NSObject<UINavigationControllerDelegate,UIImagePickerControllerDelegate,UIPopoverControllerDelegate> {
 
     UIImagePickerController* mImagePicker;
 }
@@ -57,10 +57,16 @@
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info;
 
 /**
- * The user has cancelled the pick operation.
+ * The user has cancelled the pick operation on an iPhone.
  * @param picker The controller object managing the image picker interface.
- */ 
+ */
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker;
+
+/**
+ * The user has cancelled the pick operation on an iPad.
+ * @param picker The controller object managing the popover window.
+ */
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popover;
 
 /**
  * Displays the image picker.
