@@ -2496,6 +2496,7 @@ public class MoSyncThread extends Thread
 		bundle.putString("TITLE", title);
 		bundle.putString("TEXT", inText);
 		bundle.putInt("OUTPUT", outText);
+		bundle.putInt("MAXSIZE", maxSize);
 		bundle.putInt("CONSTRAINTS", constraints);
 		intent.putExtras(bundle);
 		mContext.startActivity(intent);
