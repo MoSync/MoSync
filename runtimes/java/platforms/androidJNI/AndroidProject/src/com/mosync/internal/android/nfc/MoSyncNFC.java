@@ -1,12 +1,17 @@
 package com.mosync.internal.android.nfc;
 
-import static com.mosync.internal.generated.MAAPI_consts.*;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_BATCH_OP;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_TAG_RECEIVED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_INVALID_TAG_TYPE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_ENABLED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_ISO_DEP;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NDEF;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.IdentityHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -21,8 +26,17 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.mosync.internal.android.MoSyncThread;
-import com.mosync.internal.android.nfc.MFCAuthenticateSectorWithKey.KeyType;
-import com.mosync.internal.android.nfc.MoSyncNFC.NFCBatch;
+import com.mosync.internal.android.nfc.ops.MFCAuthenticateSectorWithKey;
+import com.mosync.internal.android.nfc.ops.MFCReadBlocks;
+import com.mosync.internal.android.nfc.ops.MFCWriteBlocks;
+import com.mosync.internal.android.nfc.ops.MFUReadPages;
+import com.mosync.internal.android.nfc.ops.MFUWritePages;
+import com.mosync.internal.android.nfc.ops.RequestNDEF;
+import com.mosync.internal.android.nfc.ops.SetReadOnly;
+import com.mosync.internal.android.nfc.ops.TagClose;
+import com.mosync.internal.android.nfc.ops.TagConnect;
+import com.mosync.internal.android.nfc.ops.TagTransceive;
+import com.mosync.internal.android.nfc.ops.WriteNDEF;
 
 
 public class MoSyncNFC {
@@ -323,6 +337,20 @@ public class MoSyncNFC {
 		return MA_NFC_INVALID_TAG_TYPE;
 	}
 
+	public int maNFCWriteNDEFMessage(int tagHandle, int ndefMessageHandle) {
+		IResource tag = getResource(tagHandle);
+		NDEFMessage ndefMessage = getNDEFMessage(ndefMessageHandle);
+		if (tag instanceof INDEFMessageHolder && tag instanceof INFCTag && ndefMessage != null) {
+			performIO(tagHandle, new WriteNDEF((INFCTag) tag, ndefMessage));
+			return SUCCESS;
+		}
+		return MA_NFC_INVALID_TAG_TYPE;
+	}
+
+	public int maNFCCreateNDEFMessage(int recordCount) {
+		NDEFMessage msg = new NDEFMessage(pool, recordCount);
+		return msg.getHandle();
+	}
 
 	public int maNFCGetNDEFMessage(int tagHandle) {
 		IResource tag = getResource(tagHandle);
@@ -396,23 +424,47 @@ public class MoSyncNFC {
 		return MA_NFC_INVALID_TAG_TYPE;
 	}
 
-	public int maNFCAuthenticateSectorWithKeyA(int tagHandle, int sectorIndex, int keySrc, int keyLen) {
-		return maNFCAuthenticateSectorWithKey(KeyType.A, tagHandle, sectorIndex, keySrc, keyLen);
-	}
-
-	public int maNFCAuthenticateSectorWithKeyB(int tagHandle, int sectorIndex, int keySrc, int keyLen) {
-		return maNFCAuthenticateSectorWithKey(KeyType.B, tagHandle, sectorIndex, keySrc, keyLen);
-	}
-
-	private MifareClassicTag getMifareClassicTag(int tagHandle) {
-		IResource res = getResource(tagHandle);
-		if (res instanceof MifareClassicTag) {
-			return (MifareClassicTag) res;
+	public int maNFCSetId(int ndefRecordHandle, int dst, int len) {
+		IResource ndefRecord = getResource(ndefRecordHandle);
+		if (ndefRecord instanceof NDEFRecord) {
+			NDEFRecord rec = (NDEFRecord) ndefRecord;
+			rec.maNFCSetId(getMemoryAt(dst, len));
+			return SUCCESS;
 		}
-		return null;
+		return MA_NFC_INVALID_TAG_TYPE;
 	}
 
-	private int maNFCAuthenticateSectorWithKey(KeyType keyType, int tagHandle, int sectorIndex, int keySrc, int keyLen) {
+	public int maNFCSetPayload(int ndefRecordHandle, int dst, int len) {
+		IResource ndefRecord = getResource(ndefRecordHandle);
+		if (ndefRecord instanceof NDEFRecord) {
+			NDEFRecord rec = (NDEFRecord) ndefRecord;
+			rec.maNFCSetPayload(getMemoryAt(dst, len));
+			return SUCCESS;
+		}
+		return MA_NFC_INVALID_TAG_TYPE;
+	}
+
+	public int maNFCSetTnf(int ndefRecordHandle, int tnf) {
+		IResource ndefRecord = getResource(ndefRecordHandle);
+		if (ndefRecord instanceof NDEFRecord) {
+			NDEFRecord rec = (NDEFRecord) ndefRecord;
+			rec.maNFCSetTnf((short) tnf);
+			return SUCCESS;
+		}
+		return MA_NFC_INVALID_TAG_TYPE;
+	}
+
+	public int maNFCSetType(int ndefRecordHandle, int dst, int len) {
+		IResource ndefRecord = getResource(ndefRecordHandle);
+		if (ndefRecord instanceof NDEFRecord) {
+			NDEFRecord rec = (NDEFRecord) ndefRecord;
+			rec.maNFCSetType(getMemoryAt(dst, len));
+			return SUCCESS;
+		}
+		return MA_NFC_INVALID_TAG_TYPE;
+	}
+
+	public int maNFCAuthenticateSector(int tagHandle, int keyType, int sectorIndex, int keySrc, int keyLen) {
 		MifareClassicTag mifareTag = getMifareClassicTag(tagHandle);
 		if (mifareTag != null) {
 			final byte[] keyBuffer = new byte[keyLen];
@@ -421,6 +473,14 @@ public class MoSyncNFC {
 			return SUCCESS;
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
+	}
+
+	private MifareClassicTag getMifareClassicTag(int tagHandle) {
+		IResource res = getResource(tagHandle);
+		if (res instanceof MifareClassicTag) {
+			return (MifareClassicTag) res;
+		}
+		return null;
 	}
 
 	public int maNFCGetSectorCount(int tagHandle) {
@@ -447,10 +507,19 @@ public class MoSyncNFC {
 		return MA_NFC_INVALID_TAG_TYPE;
 	}
 
-	public int maNFCReadBlock(int tagHandle, int block, int dst, int resultSize) {
+	public int maNFCReadBlocks(int tagHandle, int firstBlock, int dst, int resultSize) {
 		MifareClassicTag mifareTag = getMifareClassicTag(tagHandle);
 		if (mifareTag != null) {
-			performIO(tagHandle, new MFCReadBlocks(mifareTag, block, getMemoryAt(dst, resultSize)));
+			performIO(tagHandle, new MFCReadBlocks(mifareTag, firstBlock, getMemoryAt(dst, resultSize)));
+			return SUCCESS;
+		}
+		return MA_NFC_INVALID_TAG_TYPE;
+	}
+
+	public int maNFCWriteBlocks(int tagHandle, int firstBlock, int src, int len) {
+		MifareClassicTag mifareTag = getMifareClassicTag(tagHandle);
+		if (mifareTag != null) {
+			performIO(tagHandle, new MFCWriteBlocks(mifareTag, firstBlock, getMemoryAt(src, len)));
 			return SUCCESS;
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
@@ -469,6 +538,32 @@ public class MoSyncNFC {
 		if (mifareUTag != null) {
 			performIO(tagHandle, new MFUReadPages(mifareUTag, firstPage, getMemoryAt(dst, resultSize)));
 			return SUCCESS;
+		}
+		return MA_NFC_INVALID_TAG_TYPE;
+	}
+
+	public int maNFCWritePages(int tagHandle, int firstPage, int src, int len) {
+		MifareUltralightTag mifareUTag = getMifareUltralightTag(tagHandle);
+		if (mifareUTag != null) {
+			performIO(tagHandle, new MFUWritePages(mifareUTag, firstPage, getMemoryAt(src, len)));
+			return SUCCESS;
+		}
+		return MA_NFC_INVALID_TAG_TYPE;
+	}
+
+	public int maNFCSetReadOnly(int tagHandle) {
+		IResource resource = getResource(tagHandle);
+		if (resource instanceof IReadOnlySupport) {
+			performIO(tagHandle, new SetReadOnly((INFCTag) resource));
+			return SUCCESS;
+		}
+		return MA_NFC_INVALID_TAG_TYPE;
+	}
+
+	public int maNFCIsReadOnly(int tagHandle) {
+		IResource resource = getResource(tagHandle);
+		if (resource instanceof IReadOnlySupport) {
+			return ((IReadOnlySupport) resource).isReadOnly() ? 1 : 0;
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
 	}

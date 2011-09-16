@@ -244,8 +244,8 @@ namespace Base
 							const char* value,
 							JNIEnv* jNIEnv, jobject jThis);
 
-	int _maWidgetGetProperty(int memStart, int widget, const char *property, 
-								int memBuffer, int memBufferSize, 
+	int _maWidgetGetProperty(int memStart, int widget, const char *property,
+								int memBuffer, int memBufferSize,
 								JNIEnv* jNIEnv, jobject jThis);
 
 	int _maWidgetScreenShow(int screenWidget, JNIEnv* jNIEnv, jobject jThis);
@@ -732,7 +732,7 @@ namespace Base
 	* \see maPimItemClose()
 	*/
 	int _maPimItemRemove(MAHandle list, MAHandle item, JNIEnv* jNIEnv, jobject jThis);
-	
+
 	int _maCameraStart(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraStop(JNIEnv* jNIEnv, jobject jThis);
@@ -746,53 +746,28 @@ namespace Base
 	int _maCameraSnapshot(int formatIndex, MAHandle placeHolder, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maCameraRecord(int flag, JNIEnv* jNIEnv, jobject jThis);
-	
+
 	int _maCameraFormatNumber(JNIEnv* jNIEnv, jobject jThis);
-	
+
 	int _maCameraFormat(int index, int width, int height, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maCameraSetProperty(const char *property, const char* value, 
+	int _maCameraSetProperty(const char *property, const char* value,
 							JNIEnv* jNIEnv, jobject jThis);
-							
-	int _maCameraGetProperty(int memStart, const char *property, 
-								int memBuffer, int memBufferSize, 
+
+	int _maCameraGetProperty(int memStart, const char *property,
+								int memBuffer, int memBufferSize,
 								JNIEnv* jNIEnv, jobject jThis);
 
-	/*
-	* Start listening to NFC events.
-	* @return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
-	* MA_NFC_NOT_AVAILABLE if NFC is not at all available, or
-	* 0 otherwise.
-	*/
 	int _maNFCStart(JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Stop listening to NFC events.
-	*/
 	int _maNFCStop(JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Reads the next available tag.
-	* @return A zero handle if no tag currently available
-	*/
 	MAHandle _maNFCReadTag(MAHandle nfcContext, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Destroys the tag. Clients are responsible for calling
-	* this function for every corresponding maNFCReadTag.
-	*/
 	int _maNFCDestroyTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Connects to a tag, enabling further I/O operations to be
-	* performed on it.
-	*/
 	int _maNFCConnectTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Closes I/O operations for a tag, disabling further I/O operations to be
-	* performed on it.
-	*/
 	int _maNFCCloseTag(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNFCIsType(MAHandle tagHandle, int tagType, JNIEnv* jNIEnv, jobject jThis);
@@ -807,74 +782,35 @@ namespace Base
 
 	int _maNFCTransceive(MAHandle tagHandle, int src, int srcLen, int dst, int dstLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Reads an NDEF message from the given tag, which must
-	* be of the MA_NFC_TAG_TYPE_NDEF type.
-	* The response will come a an EVENT_TYPE_NFC_TAG_DATA_READ
-	* event  with the handle set to the handle passed into this method
-	* and the result field set to 0 on success and a value < 0 on error.
-	* After receiving the event, clients may call
-	* maNFCGetNDEFMessage() to get the actual message.
-	*
-	*/
 	int _maNFCReadNDEFMessage(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Gets the NDEF message from a tag, which must
-	* be of the MA_NFC_TAG_TYPE_NDEF type.
-	* \return The handle to the NDEF message, which
-	* may be subsequently used in NDEF specfic functions,
-	* or the zero handle if the tag has no NDEF message
-	* associated with it (in which case, clients may call
-	* maNFCReadNDEFMessage).
-	*
-	*/
+	int _maNFCWriteNDEFMessage(MAHandle tag, MAHandle ndefMessage, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCCreateNDEFMessage(int recordCount, JNIEnv* jNIEnv, jobject jThis);
+
 	MAHandle _maNFCGetNDEFMessage(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Returns a handle to the ith NDEF record of an NDEF message,
-	* or a zero handle if the handle given as argument does not
-	* represent an NDEF message.
-	*/
 	MAHandle _maNFCGetNDEFRecord(MAHandle ndef, int ix, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Returns the number of NDEF records in an NDEF message,
-	* or MA_NFC_INVALID_TAG_TYPE if the handle given as argument
-	* does not represent an NDEF message.
-	*/
 	int _maNFCGetNDEFRecordCount(MAHandle ndef, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Reads the variable length id of an NDEF record.
-	* Returns NFC_INVALID_TAG_TYPE if the handle given as
-	* argument does not represent an NDEF message.
-	*/
 	int _maNFCGetId(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Reads the variable length payload of an NDEF record.
-	* Returns NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF message.
-	*/
 	int _maNFCGetPayload(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	 * Returns the 3-bit TNF of an NDEF record,
-	 * or NFC_INVALID_TAG_TYPE if the handle given as argument
-	 * does not represent an NDEF message.
-	 */
 	int _maNFCGetTnf(MAHandle ndefRecord, JNIEnv* jNIEnv, jobject jThis);
 
-	/**
-	* Returns the variable length type field of an NDEF record,
-	* or NFC_INVALID_TAG_TYPE if the handle given as argument
-	* does not represent an NDEF message.
-	*/
 	int _maNFCGetType(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCAuthenticateSectorWithKeyA(MAHandle mfcTag, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCSetId(MAHandle ndefRecord, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCAuthenticateSectorWithKeyB(MAHandle mfcTag, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCSetPayload(MAHandle ndefRecord, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCSetTnf(MAHandle ndefRecord, int tnf, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCSetType(MAHandle ndefRecord, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCAuthenticateSector(MAHandle mfcTag, int keyType, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNFCGetSectorCount(MAHandle mfcTag, JNIEnv* jNIEnv, jobject jThis);
 
@@ -886,4 +822,11 @@ namespace Base
 
 	int _maNFCReadPages(MAHandle mfcTag, int firstPage, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maNFCWriteBlocks(MAHandle mfcTag, int firstBlock, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCWritePages(MAHandle mfcTag, int firstPage, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCSetReadOnly(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNFCIsReadOnly(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 }

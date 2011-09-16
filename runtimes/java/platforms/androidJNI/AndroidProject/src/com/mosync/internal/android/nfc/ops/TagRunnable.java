@@ -1,6 +1,11 @@
-package com.mosync.internal.android.nfc;
+package com.mosync.internal.android.nfc.ops;
 
 import static com.mosync.internal.generated.MAAPI_consts.*;
+
+import com.mosync.internal.android.nfc.INFCTag;
+import com.mosync.internal.android.nfc.NFCEvent;
+import com.mosync.internal.android.nfc.RunnableWithResult;
+
 import android.nfc.TagLostException;
 
 /**

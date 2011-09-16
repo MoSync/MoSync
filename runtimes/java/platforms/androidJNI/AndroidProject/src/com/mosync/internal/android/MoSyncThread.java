@@ -3773,6 +3773,14 @@ public class MoSyncThread extends Thread
 		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetNDEFMessage(tagHandle);
 	}
 
+	int maNFCWriteNDEFMessage(int tagHandle, int ndefHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCWriteNDEFMessage(tagHandle, ndefHandle);
+	}
+
+	int maNFCCreateNDEFMessage(int recordCount) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCCreateNDEFMessage(recordCount);
+	}
+
 	int maNFCGetNDEFRecord(int ndefHandle, int ix) {
 		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetNDEFRecord(ndefHandle, ix);
 	}
@@ -3797,12 +3805,24 @@ public class MoSyncThread extends Thread
 		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetType(ndefRecordHandle, dst, len);
 	}
 
-	public int maNFCAuthenticateSectorWithKeyA(int tagHandle, int sectorIndex, int keySrc, int keyLen) {
-		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCAuthenticateSectorWithKeyA(tagHandle, sectorIndex, keySrc, keyLen);
+	int maNFCSetId(int ndefRecordHandle, int src, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSetId(ndefRecordHandle, src, len);
 	}
 
-	public int maNFCAuthenticateSectorWithKeyB(int tagHandle, int sectorIndex, int keySrc, int keyLen) {
-		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCAuthenticateSectorWithKeyB(tagHandle, sectorIndex, keySrc, keyLen);
+	int maNFCSetPayload(int ndefRecordHandle, int src, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSetPayload(ndefRecordHandle, src, len);
+	}
+
+	int maNFCSetTnf(int ndefRecordHandle, int tnf) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSetTnf(ndefRecordHandle, tnf);
+	}
+
+	int maNFCSetType(int ndefRecordHandle, int src, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSetType(ndefRecordHandle, src, len);
+	}
+
+	public int maNFCAuthenticateSector(int tagHandle, int keyType, int sectorIndex, int keySrc, int keyLen) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCAuthenticateSector(tagHandle, keyType, sectorIndex, keySrc, keyLen);
 	}
 
 	public int maNFCGetSectorCount(int tagHandle) {
@@ -3818,11 +3838,27 @@ public class MoSyncThread extends Thread
 	}
 
 	public int maNFCReadBlocks(int tagHandle, int block, int dst, int resultSize) {
-		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadBlock(tagHandle, block, dst, resultSize);
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadBlocks(tagHandle, block, dst, resultSize);
 	}
 
 	public int maNFCReadPages(int tagHandle, int firstPage, int dst, int resultSize) {
 		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadPages(tagHandle, firstPage, dst, resultSize);
+	}
+
+	int maNFCWriteBlocks(int tagHandle, int firstBlock, int src, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCWriteBlocks(tagHandle, firstBlock, src, len);
+	}
+
+	int maNFCWritePages(int tagHandle, int firstPage, int src, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCWritePages(tagHandle, firstPage, src, len);
+	}
+
+	int maNFCSetReadOnly(int tagHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSetReadOnly(tagHandle);
+	}
+
+	int maNFCIsReadOnly(int tagHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCIsReadOnly(tagHandle);
 	}
 
 	/**

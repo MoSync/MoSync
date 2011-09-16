@@ -1,14 +1,14 @@
-package com.mosync.internal.android.nfc;
+package com.mosync.internal.android.nfc.ops;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_TAG_DATA_READ;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_CONNECTION_LOST;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_IO_ERROR;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import android.nfc.TagLostException;
 import android.nfc.tech.MifareUltralight;
+
+import com.mosync.internal.android.nfc.MifareUltralightTag;
+import com.mosync.internal.android.nfc.NFCEvent;
 
 public class MFUReadPages extends TagRunnable<MifareUltralightTag> {
 

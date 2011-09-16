@@ -18,4 +18,11 @@ public interface INDEFMessageHolder extends IResource {
 	 */
 	public NDEFMessage getNDEFMessage();
 
+	/**
+	 * Writes an NDE message
+	 * @param message
+	 * @throws IOException
+	 */
+	public void writeNDEFMessage(NDEFMessage message) throws IOException;
+
 }

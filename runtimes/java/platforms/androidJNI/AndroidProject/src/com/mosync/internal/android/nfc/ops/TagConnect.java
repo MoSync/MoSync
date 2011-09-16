@@ -1,6 +1,10 @@
-package com.mosync.internal.android.nfc;
+package com.mosync.internal.android.nfc.ops;
 
 import java.io.IOException;
+
+import com.mosync.internal.android.nfc.INFCTag;
+import com.mosync.internal.android.nfc.NFCEvent;
+import com.mosync.internal.android.nfc.RunnableWithResult;
 
 public class TagConnect implements RunnableWithResult<NFCEvent> {
 

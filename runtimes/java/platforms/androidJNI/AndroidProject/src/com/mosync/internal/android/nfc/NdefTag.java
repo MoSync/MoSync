@@ -53,4 +53,13 @@ public class NdefTag extends NFCTagBase<Ndef> implements INDEFMessageHolder {
 		return cachedNDEFMessage;
 	}
 
+	@Override
+	public void writeNDEFMessage(NDEFMessage message) throws IOException {
+		try {
+			nativeTag.writeNdefMessage(message.toNativeNDEFMessage());
+		} catch (FormatException e) {
+			throw new IOException(e);
+		}
+	}
+
 }

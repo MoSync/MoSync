@@ -1,4 +1,4 @@
-package com.mosync.internal.android.nfc;
+package com.mosync.internal.android.nfc.ops;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_TAG_DATA_READ;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_CONNECTION_LOST;
@@ -6,6 +6,9 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_IO_ERROR;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
+import com.mosync.internal.android.nfc.MifareClassicTag;
+import com.mosync.internal.android.nfc.NFCEvent;
 
 import android.nfc.TagLostException;
 import android.nfc.tech.MifareClassic;
@@ -26,7 +29,7 @@ public class MFCReadBlocks extends TagRunnable<MifareClassicTag> {
 
 	@Override
 	public NFCEvent doRun() throws IOException {
-		int resultSize = dstBuffer.capacity();
+		int resultSize = dstBuffer.limit();
 		int blockIndex = firstBlock;
 		byte[] result = new byte[resultSize];
 		int readCount = 0;

@@ -1341,13 +1341,13 @@ interface MAAPI {
 		NFC_TAG_RECEIVED = 34;
 
 		/** \brief New tag data was read
-		* The results of an asynchronous NFC tag read operation was
+		* An asynchronous NFC tag read operation was
 		* completed.
 		*/
 		NFC_TAG_DATA_READ = 35;
 
 		/** \brief New tag data was written
-		* The results of an asynchronous NFC tag write operation was
+		* An asynchronous NFC tag write operation was
 		* completed.
 		*/
 		NFC_TAG_DATA_WRITTEN = 36;
@@ -1357,10 +1357,16 @@ interface MAAPI {
 		NFC_BATCH_OP = 37;
 
 		/** \brief Tag authentication was performed
-		* The results of an asynchronous NFC tag authentication read was
+		* An asynchronous NFC tag authentication read was
 		* completed.
 		*/
 		NFC_TAG_AUTH_COMPLETE = 38;
+
+		/**
+		* \brief Tag was made read only
+		*  An asynchronous NFC tag read only operation was completed.
+		*/
+		NFC_TAG_READ_ONLY = 39;
 	}
 
 	/**
@@ -6996,16 +7002,58 @@ group CameraFunctions "Camera Functions" {
 		int maNFCTransceive(in MAHandle tag, in MAAddress src, in int srcLen, out MAAddress dst, out int dstLen);
 
 		/**
+		* Makes a tag read-only (this operation cannot be reverted).
+		* The response will come as an EVENT_TYPE_NFC_TAG_READ_ONLY event, with the
+		* handle set to the handle passed into this method.
+		* \param tag The tag to make read only.
+		* \return MA_NFC_INVALID_TAG_TYPE if the handle given as argument
+		* cannot be made read-only.
+		*/
+		int maNFCSetReadOnly(in MAHandle tag);
+
+		/**
+		* Checks whether a tag is read-only.
+		* \param tag The tag to check for read/write permissions.
+		* \return MA_NFC_INVALID_TAG_TYPE if this operation is
+		* not applicable, a value > 0 if it is read-only, or
+		* 0 if it is read-only.
+		*/
+		int maNFCIsReadOnly(in MAHandle tag);
+
+		/**
 		* Reads an NDEF message from the given tag, which must
 		* be of the MA_NFC_TAG_TYPE_NDEF type.
 		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_READ
-		* event  with the handle set to the handle passed into this method
+		* event with the handle set to the handle passed into this method
 		* and the result field set to 0 on success and a value < 0 on error.
 		* After receiving the event, clients may call
 		* maNFCGetNDEFMessage() to get the actual message.
 		*
 		*/
 		int maNFCReadNDEFMessage(in MAHandle tag);
+
+		/**
+		* Writes an NDEF message to the given tag, which must
+		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_WRITE
+		* event with the handle set to the handle passed into this method
+		* and the result field set to 0 on success and a value < 0 on error.
+		* \param tag The tag handle to write to
+		* \param ndefMessage The message to write
+		* \return MA_NFC_INVALID_TAG_TYPE if the handle given as argument
+		* does not represent an NDEF message.
+		*
+		*/
+		int maNFCWriteNDEFMessage(in MAHandle tag, in MAHandle ndefMessage);
+
+		/**
+		* Creates a new NDEF message, to be used primarily by
+		* \code maNFCWriteDefMessage.
+		* \param recordCount The number of records in the created message
+		* \return The handle to the created NDEF message; clients are
+		* responsible for destroying the message.
+		*/
+		MAHandle maNFCCreateNDEFMessage(in int recordCount);
 
 		/**
 		* Gets the NDEF message from a tag, which must
@@ -7032,57 +7080,79 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		* \return The number of NDEF records in an NDEF message,
-		* or MA_NFC_INVALID_TAG_TYPE if the handle given as argumen
-		* does not represent an NDEF message.
+		* or MA_NFC_INVALID_TAG_TYPE if the handle given as argument
+		* does not represent an NDEF record.
 		*/
 		int maNFCGetNDEFRecordCount(in MAHandle ndef);
 
 		/**
 		* Reads the variable length id of an NDEF record.
 		* \return NFC_INVALID_TAG_TYPE if the handle given as
-		* argument does not represent an NDEF message.
+		* argument does not represent an NDEF record.
 		*/
 		int maNFCGetId(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		* Reads the variable length payload of an NDEF record.
-		* Returns NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF message.
+		* Returns NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF record.
 		*/
 		int maNFCGetPayload(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		 * Returns the 3-bit TNF of an NDEF record,
-		 * or NFC_INVALID_TAG_TYPE if the handle given as argumen
-		 * does not represent an NDEF message.
+		 * or NFC_INVALID_TAG_TYPE if the handle given as argument
+		 * does not represent an NDEF record.
 		 */
 		int maNFCGetTnf(in MAHandle ndefRecord);
 
 		/**
 		* Returns the variable length type field of an NDEF record,
 		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
-		* does not represent an NDEF message.
+		* does not represent an NDEF record.
 		*/
 		int maNFCGetType(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
-		* Authenticates a MIFARE Classic tag using key A. Authentication must take place
-		* before reading/writing to a certain sector.
-		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_AUTH_COMPLETE
-		* event, unless part of a batch operation.
-		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
-		* tag type is not supported by the device), 0 if authentication can take place.
+		* Sets the variable length id of an NDEF record.
+		* \return NFC_INVALID_TAG_TYPE if the handle given as
+		* argument does not represent an NDEF message.
 		*/
-		int maNFCAuthenticateSectorWithKeyA(in MAHandle tagHandle, in int sectorIndex, in MAAddress keySrc, in int keyLen);
+		int maNFCSetId(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
-		* Authenticates a MIFARE Classic tag using key B. Authentication must take place
+		* Sets the variable length payload of an NDEF record.
+		* \return NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF message.
+		*/
+		int maNFCSetPayload(in MAHandle ndefRecord, in MAAddress dst, in int len);
+
+		/**
+		 * Sets the 3-bit TNF of an NDEF record,
+		 * \return NFC_INVALID_TAG_TYPE if the handle given as argument
+		 * does not represent an NDEF record.
+		 */
+		int maNFCSetTnf(in MAHandle ndefRecord, in int tnf);
+
+		/**
+		* Returns the variable length type field of an NDEF record,
+		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
+		* does not represent an NDEF record.
+		*/
+		int maNFCSetType(in MAHandle ndefRecord, in MAAddress dst, in int len);
+
+		/**
+		* Authenticates a MIFARE Classic tag using the A or B key. Authentication must take place
 		* before reading/writing to a certain sector.
 		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_AUTH_COMPLETE
 		* event, unless part of a batch operation.
+		* \param tagHandle The tag to authenticate
+		* \param keyType Either MA_NFC_MIFARE_KEY_A or MA_NFC_MIFARE_KEY_B.
+		* \param sectorIndex The sector to authenticate
+		* \param keySrc The address to the key to authenticate with
+		* \param keyLen The length of the key to authenticate with
 		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
 		* tag type is not supported by the device), 0 if authentication can take place.
 		*/
-		int maNFCAuthenticateSectorWithKeyB(in MAHandle tagHandle, in int sectorIndex, in MAAddress keySrc, in int keyLen);
+		int maNFCAuthenticateSector(in MAHandle tagHandle, in int keyType, in int sectorIndex, in MAAddress keySrc, in int keyLen);
 
 		/**
 		* Returns the number of sectors of a MIFARE Classic tag.
@@ -7124,6 +7194,19 @@ group CameraFunctions "Camera Functions" {
 		int maNFCReadBlocks(in MAHandle tagHandle, in int firstBlock, out MAAddress dst, in int len);
 
 		/**
+		* Writes a number of blocks to a MIFARE Classic tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_WRITE
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to write to.
+		* \param dst The memory address to read from.
+		* \param len The number of bytes to write. Several blocks may be written, depending
+		* on len (A block is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a write operation can be performed.
+		*/
+		int maNFCWriteBlocks(in MAHandle tagHandle, in int firstBlock, in MAAddress dst, in int len);
+
+		/**
 		* Reads a number of blocks of a MIFARE Ultralight tag.
 		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_READ
 		* event, unless part of a batch operation.
@@ -7136,16 +7219,29 @@ group CameraFunctions "Camera Functions" {
 		*/
 		int maNFCReadPages(in MAHandle tagHandle, in int firstPage, out MAAddress dst, in int len);
 
+		/**
+		* Writes a number of blocks of a MIFARE Ultralight tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_WRITE
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to write to.
+		* \param dst The memory address to read from.
+		* \param len The number of bytes to write. Several pages may be written, depending
+		* on len (A page is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a write operation can be performed.
+		*/
+		int maNFCWritePages(in MAHandle tagHandle, in int firstPage, in MAAddress dst, in int len);
+
 		constset int MA_NFC_ {
 			/**
 			* A constant indicating there is no NFC support on the device.
 			*/
-			NOT_AVAILABLE = 1;
+			NOT_AVAILABLE = -1;
 
 			/**
 			* A constant indicating NFC is not enabled on the device. (But there is hardware support).
 			*/
-			NOT_ENABLED = 2;
+			NOT_ENABLED = -2;
 
 			/**
 			* A constant indicating an invalid tag type.
@@ -7205,6 +7301,19 @@ group CameraFunctions "Camera Functions" {
 
 		}
 
+		constset int MA_NFC_MIFARE_ {
+
+			/**
+			* The A key for MiFare Classic authentication
+			*/
+			KEY_A = 1;
+
+			/**
+			* The B key for MiFare Classic authentication
+			*/
+			KEY_B = 2;
+
+		}
 
 	}
 

@@ -1,9 +1,12 @@
-package com.mosync.internal.android.nfc;
+package com.mosync.internal.android.nfc.ops;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_TAG_DATA_READ;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
+
+import com.mosync.internal.android.nfc.INFCTag;
+import com.mosync.internal.android.nfc.NFCEvent;
 
 public class TagTransceive extends TagRunnable<INFCTag> {
 

@@ -5,7 +5,7 @@ import java.util.HashMap;
 import android.util.Log;
 
 
-class ResourcePool {
+public class ResourcePool {
 
 	public final static ResourcePool NULL = new ResourcePool() {
 		@Override
