@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * FriendList.h
+/**
+ * @file FriendList.h
+ * @author Gabriela Rata
  */
 
 #ifndef FRIENDLIST_H_
@@ -27,8 +28,8 @@ MA 02110-1301, USA.
 #include "FacebookObject.h"
 
 /**
- * Implements an FriendList Facebook object.
- * http://developers.facebook.com/docs/reference/api/FriendList/
+ * \brief Implements an FriendList Facebook object.
+ * See: http://developers.facebook.com/docs/reference/api/FriendList/
  */
 class FriendList: public FacebookObject
 {

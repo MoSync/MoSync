@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Group.h
+/**
+ * @file Group.h
+ * @author Gabriela Rata
  */
 
 #ifndef GROUP_H_
@@ -27,12 +28,13 @@ MA 02110-1301, USA.
 #include "Utilities.h"
 
 /**
- * Implements an Group Facebook object.
+ * \brief Implements an Group Facebook object.
  * See: http://developers.facebook.com/docs/reference/api/group/
  */
 class Group: public FacebookObject
 {
 public:
+
 	/**
 	 * Setter/getter for the "owner" field of an Group object.
 	 * @param message - the profile that created the group.

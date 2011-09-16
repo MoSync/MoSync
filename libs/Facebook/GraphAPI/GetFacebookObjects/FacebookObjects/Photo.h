@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Photo.h
+/**
+ * @file Photo.h
+ * @author Gabriela Rata
  */
 
 #ifndef PHOTO_H_
@@ -26,13 +27,22 @@ MA 02110-1301, USA.
 #include "FacebookObject.h"
 #include "Utilities.h"
 
+/**
+ * \brief Implements an Photo Facebook object type.
+ * See: http://developers.facebook.com/docs/reference/api/photo/
+ */
 class Photo: public FacebookObject
 {
 public:
+	/**
+	 * Constructor.
+	 */
 	Photo();
+
 	/**
 	 * Setter/getter for the "from" field of an Photo object.
-	 * @param from - it represents the person/application that posted the photo. It contains an id and name.
+	 * @param from - it represents the person/application that posted the photo.
+	 * It contains an id and name.
 	 */
 	void setFrom(const IdNamePair &from);
 	const IdNamePair &getFrom() const;

@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Checkin.h
+/**
+ * @file Checkin.h
+ * @author Gabriela Rata
  */
 
 #ifndef CHECKIN_H_
@@ -28,11 +29,13 @@ MA 02110-1301, USA.
 #include "Comment.h"
 
 /**
- * Implements an Checkin Facebook object.  See: http://developers.facebook.com/docs/reference/api/checkin/
+ * \brief Implements an Checkin Facebook object.
+ * See: http://developers.facebook.com/docs/reference/api/checkin/
  */
 class Checkin: public FacebookObject
 {
 public:
+
 	/**
 	 * Setter/getter for the "from" field of an Checkin object.
 	 * @param from - it represents the person/application that created the checkin. It contains the id and the name.

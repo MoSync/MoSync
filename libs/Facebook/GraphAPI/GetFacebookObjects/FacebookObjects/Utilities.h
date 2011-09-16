@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Utilities.h
+/**
+ * @file Utilities.h
+ * @author Gabriela Rata
  */
 
 #ifndef UTILITIES_H_

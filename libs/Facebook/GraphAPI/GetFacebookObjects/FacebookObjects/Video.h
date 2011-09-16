@@ -16,9 +16,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Video.h
+/**
+ * @file Video.h
+ * @author Gabriela Rata
  */
+
 
 #ifndef VIDEO_H_
 #define VIDEO_H_
@@ -29,9 +31,10 @@ MA 02110-1301, USA.
 #include "Comment.h"
 
 /**
- * Implements an Video Facebook object type.
+ * \brief Implements an Video Facebook object type.
  * See: http://developers.facebook.com/docs/reference/api/video/
  */
+
 class Video: public FacebookObject
 {
 public:
