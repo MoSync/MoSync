@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file VideoViewListener.h
  * @author Bogdan Iusco
  *
- * Interface for video view event listeners.
+ * \brief Interface for video view event listeners.
  *
  */
 
@@ -33,7 +33,7 @@ namespace NativeUI
     class VideoView;
 
     /**
-     * Interface for video view event listeners.
+     * \brief Interface for video view event listeners.
      */
     class VideoViewListener
     {

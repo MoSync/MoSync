@@ -142,9 +142,11 @@ void SummaryScreen::fillListBox()
 	// Clear previous data.
 	mSnippetLabels.clear();
 	mSnippets.clear();
+	mTitles.clear();
 
 	// For each snippet we need to know the article title.
 	mSnippets = mWiki->getAllSnippetsWithTitle();
+	mTitles = mWiki->getAllCheckedTitles();
 
 	// Destroy the list view, and recreate it.
 	if ( mListView != -1){
@@ -208,8 +210,7 @@ void SummaryScreen::customEvent(const MAEvent& event)
             // By clicking on an item, the corresponding web view is opened
             // in the WebSsreen.
             mWebScreen->showScreen();
-            mWebScreen->openWebView(
-                mWiki->getTitleForIndex( widgetEventData->listItemIndex) );
+            mWebScreen->openWebView(mTitles[widgetEventData->listItemIndex]);
         }
     }
 	return;

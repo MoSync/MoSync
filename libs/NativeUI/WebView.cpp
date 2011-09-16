@@ -202,7 +202,7 @@ namespace NativeUI
 	* This way of loading a page is excluded from the hook mechanism to
 	* prevent "loops" when loading pages.
 	*
-	* @param ulr A string with a url pattern.
+	* @param url A string with a url pattern.
 	* Example:
 	*   // Hook urls that start with "mosync:".
 	*	setHardHook("mosync://.*");

@@ -93,7 +93,7 @@ void NativeScreen::customEvent(const MAEvent& event)
 	}
 
 	// Check that the event was a click (touch) event.
-	if (widgetEventData->eventType == MAW_EVENT_CLICKED || widgetEventData->eventType == MAW_EVENT_POINTER_PRESSED)
+	if (widgetEventData->eventType == MAW_EVENT_CLICKED)
 	{
 		// Handle the event emitted by the widget
 		widgetClicked(widgetEventData->widgetHandle);

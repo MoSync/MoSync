@@ -70,6 +70,12 @@
 					device.focusMode = AVCaptureFocusModeLocked;
 				}
 			}
+			else if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FOCUS_INFINITY]]) {
+				result = MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+			}
+			else if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FOCUS_MACRO]]) {
+				result = MA_CAMERA_RES_VALUE_NOTSUPPORTED;
+			}
 			else {
 				result = MA_CAMERA_RES_INVALID_PROPERTY_VALUE;
 			}

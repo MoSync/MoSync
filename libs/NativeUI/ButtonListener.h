@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file ButtonListener.h
  * @author Bogdan Iusco
  *
- * Listener for button events.
+ * \brief Listener for button events.
  *
  */
 
@@ -33,7 +33,7 @@ namespace NativeUI
     class Widget;
 
     /**
-     * Listener for button events.
+     * \brief Listener for button events.
      */
     class ButtonListener
     {

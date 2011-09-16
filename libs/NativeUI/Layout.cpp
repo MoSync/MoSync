@@ -32,11 +32,11 @@ namespace NativeUI
     /**
      * Constructor is protected because actual widget instances
      * should be subclasses of this class.
-     * @widgetType The string constant that identifies the widget type
+     * @param layoutType The string constant that identifies the widget type
      *             (one of the MAW_ constants).
      */
-    Layout::Layout(const MAUtil::String& widgetType) :
-        Widget(widgetType)
+    Layout::Layout(const MAUtil::String& layoutType) :
+        Widget(layoutType)
     {
     }
 
@@ -49,7 +49,7 @@ namespace NativeUI
 
 	/**
 	 * Sets whether the layout can be scrollable or not.
-	 * @param If true, the layout can be scrollable.
+	 * @param isScrollable If true, the layout can be scrollable.
 	 */
     void Layout::setScrollable(const bool isScrollable)
     {
