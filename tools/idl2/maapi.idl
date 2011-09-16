@@ -6495,6 +6495,10 @@ group CameraFunctions "Camera Functions" {
 		* The text box will disappear.
 		* An event (#EVENT_TYPE_TEXTBOX) will be posted.
 		*
+		* The text box will allow input of up to (\a maxSize - 1) characters, but no more.
+		* Additional keypresses at that point may be ignored, or may cause an error message,
+		* at the discretion of the underlying implementation.
+		*
 		* \returns \>= 0 on success, \< 0 on error.
 		*
 		* \param title The box's title.
