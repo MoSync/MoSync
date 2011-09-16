@@ -361,7 +361,7 @@ void HomeScreen::showScreen()
 	maWidgetSetProperty(mProgressBar,MAW_WIDGET_VISIBLE, "false");
 
 	// Reset the slider value.
-	setWidgetProperty(mSlider, MAW_SLIDER_VALUE, 1);
+	setWidgetProperty(mSlider, MAW_SLIDER_VALUE, 10);
 
 	// Clear the edit box.
 	maWidgetSetProperty(mEditBox, MAW_EDIT_BOX_TEXT, "");
