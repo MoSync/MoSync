@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file ImageButton.h
  * @author Bogdan Iusco
  *
- * Class for image buttons.
+ * \brief Class for image buttons.
  * A image button intercepts touch events and notifies the observers.
  * Methods for setting the text, alignment, font size and color are inherited
  * from TextWidget.
@@ -38,7 +38,8 @@ namespace NativeUI
     class ButtonListener;
 
     /**
-     * Class for image buttons.
+     * \brief Class for image buttons.
+     *
      * A image button intercepts touch events and notifies the observers.
      * Methods for setting the text, alignment, font size and color are inherited
      * from TextWidget.

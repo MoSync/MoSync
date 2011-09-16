@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Image.h
  * @author Bogdan Iusco
  *
- * Class for images.
+ * \brief Class for images.
  */
 
 #ifndef NATIVEUI_IMAGE_H_
@@ -42,7 +42,7 @@ namespace NativeUI
     };
 
     /**
-     * Class for buttons.
+     * \brief Class for images.
      */
     class Image : public Widget
     {

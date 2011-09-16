@@ -79,9 +79,7 @@ public:
 		// of writing this program.
 		if (-1 == screen)
 		{
-			maPanic(0,
-				"OpenGL is only available on Android and iPhone. "
-				"You must run directly on the device or devices emulator.");
+			maPanic(0, "OpenGL is only available on Android and iOS.");
 		}
 
 		// Create a GL_VIEW widget and add it to the screen.

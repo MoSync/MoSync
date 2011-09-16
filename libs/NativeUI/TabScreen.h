@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file TabScreen.h
  * @author Bogdan Iusco
  *
- * Class that represents a screen with tabs.
+ * \brief Class that represents a screen with tabs.
  * A tab screen is a special type of screen that can have a number of
  * sub-screens each switchable using a tab bar.
  */
@@ -37,7 +37,8 @@ namespace NativeUI
     class TabScreenListener;
 
     /**
-     * Class that represents a screen with tabs.
+     * \brief Class that represents a screen with tabs.
+     *
      * A tab screen is a special type of screen that can have a number of
      * sub-screens each switchable using a tab bar.
      */

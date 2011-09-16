@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file SearchBarListener.h
  * @author Bogdan Iusco
  *
- * Listener for SearchBar events.
+ * \brief Listener for SearchBar events.
  *
  */
 
@@ -33,7 +33,7 @@ namespace NativeUI
     class SearchBar;
 
     /**
-     * Interface for search bar event listeners.
+     * \brief Interface for search bar event listeners.
      */
     class SearchBarListener
     {

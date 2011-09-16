@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Link.h
+/**
+ * @file Link.h
+ * @author Gabriela Rata
  */
 
 #ifndef LINK_H_
@@ -28,7 +29,8 @@ MA 02110-1301, USA.
 #include <MAUtil/Vector.h>
 
 /**
- * Implements an Link Facebook object. Represents a link shared on a user's wall.
+ * \brief Implements an Link Facebook object. Represents a link shared on a
+ * user's wall.
  * See: http://developers.facebook.com/docs/reference/api/group/
  */
 class Link: public FacebookObject
@@ -36,7 +38,8 @@ class Link: public FacebookObject
 public:
 	/**
 	 * Setter/getter for the "from" field of an Link object.
-	 * @param from - it represents the user that created the link. It contains an id and name.
+	 * @param from - it represents the user that created the link. It contains
+	 * an id and name.
 	 */
 	void setFrom(const IdNamePair &from);
 	const IdNamePair &getFrom() const;

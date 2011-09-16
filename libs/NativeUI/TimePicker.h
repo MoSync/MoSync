@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file TimePicker.h
  * @author Emma Tresanszki
  *
- * An instance of TimePicker allow to an users to select times.
+ * \brief An instance of TimePicker allow to an users to select times.
  * For time picker events see TimePickerListener.
  */
 
@@ -35,9 +35,9 @@ namespace NativeUI
     class TimePickerListener;
 
     /**
-     * A Time Picker is a widget for selecting time of day in 24 hour mode.
-     * The time picker is initialized with system time.
+     * \brief A Time Picker is a widget for selecting time of day in 24 hour mode.
      *
+     * The time picker is initialized with system time.
      * The hour and each minute digit can be controlled by vertical spinners.
      * The hour can be entered by keyboard input.
      */

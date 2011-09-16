@@ -20,6 +20,7 @@
 #import "ListViewWidget.h"
 #import "ScreenWidget.h"
 #import "ReflectionWidget.h"
+#import "UIKit/UIPopoverController.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include "TouchHelper.h"
@@ -115,6 +116,7 @@ int currentWidgetIndex = 0;
 
 UIWindow* mainWindow;
 UIViewController *mainController;
+UIPopoverController *popOverController; //For iPads
 
 static IWidget* sOldScreen = nil;
 
@@ -137,7 +139,6 @@ static IWidget* sOldScreen = nil;
 	unusedWidgetHandles = [[NSMutableArray alloc] init];
 	
 	if(!window) {
-		//window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 		window = [[MoSyncUIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 		[window makeKeyAndVisible];
 	}
@@ -162,6 +163,10 @@ static IWidget* sOldScreen = nil;
 - (void) close {
 	[widgetArray dealloc];
 	[unusedWidgetHandles dealloc];
+	if (popOverController != nil) {
+		[popOverController release];
+		popOverController = nil;
+	}
 }
 
 - (int) createWidget: (NSString*)name {
@@ -206,13 +211,13 @@ static IWidget* sOldScreen = nil;
 	int handle = [widget getWidgetHandle];	
 
     [widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
-    
+
     if(widget == sOldScreen) {
         UIView* actualView = [sOldScreen getView];
 		[actualView removeFromSuperview];
         sOldScreen = nil;
     }
-    
+
 	int ret;
 	int removeRet = [widget remove];
 	if(removeRet<0)
@@ -241,7 +246,7 @@ static IWidget* sOldScreen = nil;
 		UIView* actualView = [sOldScreen getView];
 		[actualView removeFromSuperview];
 	}
-    
+
 	[mainWindow insertSubview:[widget getView] atIndex:0];
 	
 	[widget layout];
@@ -259,13 +264,35 @@ static IWidget* sOldScreen = nil;
 
 }
 
-- (void) showModalHelper: (UIViewController*) controller {
-	[[(ScreenWidget*)sOldScreen getController] presentModalViewController:controller animated:NO];
+- (void) showModalHelper: (UINavigationController*) controller {
+
+	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
+		[[(ScreenWidget*)sOldScreen getController] presentModalViewController:controller animated:YES];
+	}
+	else {
+		if(popOverController == nil)
+		{
+			popOverController = [[UIPopoverController alloc] initWithContentViewController:controller];
+		}
+		popOverController.contentViewController = controller;
+		popOverController.delegate = controller.delegate;
+		[popOverController presentPopoverFromRect:[sOldScreen getView].frame inView:[sOldScreen getView] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
+	}
+
 	[[UIApplication sharedApplication] setStatusBarHidden:YES
                                             withAnimation:UIStatusBarAnimationFade];
 }
 
 - (void) hideModal {
-	[[(ScreenWidget*)sOldScreen getController] dismissModalViewControllerAnimated:NO];
+	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
+		[[(ScreenWidget*)sOldScreen getController] dismissModalViewControllerAnimated:NO];
+	}
+	else {
+		if(popOverController != nil)
+		{
+			[popOverController dismissPopoverAnimated:NO];
+		}
+	}
+
 }
 @end
