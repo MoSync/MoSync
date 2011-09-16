@@ -93,6 +93,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40073, ERR_EXT_VERSION, "Extension version mismatch")\
 	m(40074, ERR_EXT_LOAD, "Failed to load extensions")\
 	m(40075, ERR_EXT_CALL, "Invalid extension call")\
+	m(40076, ERR_FILE_LIST_SORT, "Invalid file list sorting option")\
 
 DECLARE_ERROR_ENUM(BASE)
 

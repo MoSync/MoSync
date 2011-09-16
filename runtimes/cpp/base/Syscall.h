@@ -128,7 +128,7 @@ namespace Base {
 		int maFileTell(MAHandle file);
 		int maFileSeek(MAHandle file, int offset, int whence);
 
-		MAHandle maFileListStart(const char* path, const char* filter);
+		MAHandle maFileListStart(const char* path, const char* filter, int sorting);
 		int maFileListNext(MAHandle list, char* nameBuf, int bufSize);
 		int maFileListClose(MAHandle list);
 

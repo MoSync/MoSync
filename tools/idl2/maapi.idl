@@ -2422,6 +2422,24 @@ interface MAAPI {
 			END = 2;
 		}
 
+		constset int MA_FL_SORT_ {
+			/// Don't sort the files.
+			NONE = 0;
+			/// Sort the files by date. See maFileDate().
+			DATE = 1;
+			/// Sort the files by name. Case-sensitive?
+			NAME = 2;
+			/// Sort the files by size. See maFileSize().
+			SIZE = 3;
+		}
+
+		constset int MA_FL_ORDER_ {
+			/// Oldest / smallest / A first.
+			ASCENDING = 0x10000;
+			/// Newest / biggest / Z first.
+			DESCENDING = 0x20000;
+		}
+
 		/**
 		* Creates a listing of names of files and directories, or file systems.
 		* Call maFileListNext() repeatedly to retrieve the names. Call maFileListClose() to
@@ -2434,10 +2452,16 @@ interface MAAPI {
 		* Which root file systems are listed vary between platforms.
 		* \param filter A string to match names with. May include an asterisk ('*') wildcard
 		* to represent 0 or more characters. Ignored if \a path is empty.
+		* \param sorting One of the \link #MA_FL_SORT_DATE MA_FL_SORT \endlink flags,
+		* OR'd with one of the \link #MA_FL_ORDER_ASCENDING MA_FL_ORDER \endlink flags.
+		* #MA_FL_SORT_NONE must not be combined with an
+		* \link #MA_FL_ORDER_ASCENDING MA_FL_ORDER \endlink flag.
+		* \note Sorting is not supported on JavaME. If it is attempted,
+		* this function will fail with #MA_FERR_SORTING_UNSUPPORTED.
 		*
 		* \returns A File Listing handle, or \< 0 on error.
 		*/
-		MAHandle maFileListStart(in MAString path, in MAString filter);
+		MAHandle maFileListStart(in MAString path, in MAString filter, in int sorting);
 
 		/**
 		* Writes the name of the next file in the list to the specified buffer.
@@ -2469,6 +2493,8 @@ interface MAAPI {
 			RENAME_FILESYSTEM = -5;
 			RENAME_DIRECTORY = -6;
 			WRONG_TYPE = -7;
+			/// The sorting method requested is unsupported on the current platform.
+			SORTING_UNSUPPORTED = -8;
 		}
 
 		//maybe add support for "hidden" files
