@@ -137,7 +137,6 @@ static IWidget* sOldScreen = nil;
 	unusedWidgetHandles = [[NSMutableArray alloc] init];
 	
 	if(!window) {
-		//window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 		window = [[MoSyncUIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 		[window makeKeyAndVisible];
 	}
