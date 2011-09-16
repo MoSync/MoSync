@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file NumberPickerListener.h
  * @author Bogdan Iusco
  *
- * Listener for NumberPicker events.
+ * \brief Listener for NumberPicker events.
  */
 
 #ifndef NATIVEUI_NUMBER_PICKER_LISTENER_H_
@@ -32,7 +32,7 @@ namespace NativeUI
     class NumberPicker;
 
     /**
-     * Listener for NumberPicker events.
+     * \brief Listener for NumberPicker events.
      */
     class NumberPickerListener
     {

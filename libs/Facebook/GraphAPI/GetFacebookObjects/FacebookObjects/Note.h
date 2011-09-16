@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Note.h
+/**
+ * @file Note.h
+ * @author Gabriela Rata
  */
 
 #ifndef NOTE_H_
@@ -29,14 +30,17 @@ MA 02110-1301, USA.
 #include "Utilities.h"
 
 /**
- * Implements an Note. See: http://developers.facebook.com/docs/reference/api/note/
+ * \brief Implements an Note.
+ * See: http://developers.facebook.com/docs/reference/api/note/
  */
 class Note: public FacebookObject
 {
 public:
+
 	/**
 	 * Setter/getter for the "from" field of an Note object.
-	 * @param from - it represents the user/application that created the note. It contains an id and name.
+	 * @param from - it represents the user/application that created the note.
+	 * It contains an id and name.
 	 */
 	void setFrom(const IdNamePair & from);
 	const IdNamePair &getFrom() const;

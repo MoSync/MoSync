@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file NumberPicker.h
  * @author Emma Tresanszki
  *
- * Class for number picker.
+ * \brief Class for number picker.
  * Note that this type of widget is available only on iOS for the moment.
  */
 
@@ -36,8 +36,9 @@ namespace NativeUI
     class NumberPickerListener;
 
 	/**
-	 * A Number Picker is a widget that enables the user to select a number
-	 * from a predefined range.
+	 * \brief  A Number Picker is a widget that enables the user to select a
+	 * number from a predefined range.
+	 *
 	 * Note that this type of widget is available only on iOS for the moment.
 	 */
 	class NumberPicker : public Widget
@@ -59,6 +60,7 @@ namespace NativeUI
 		 * the current value is set to min.
 		 * If the value is greater than MAW_NUMBER_PICKER_MAX_VALUE value,
 		 * the current value is set to max.
+		 * @param value The value that we want to set.
 		 * @return Any of the following result codes:
 		 * - #MAW_RES_OK if the property could be set.
 		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
@@ -74,7 +76,7 @@ namespace NativeUI
 
 		/**
 		 * Set the minimum value of the picker.
-		 * @param minute An int that specifies the minimum value.
+		 * @param min An int that specifies the minimum value.
 		 * @return Any of the following result codes:
 		 * - #MAW_RES_OK if the property could be set.
 		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
@@ -90,7 +92,7 @@ namespace NativeUI
 
 		/**
 		 * Set the maximum value of the picker.
-		 * @param minute An int that specifies the maximum value.
+		 * @param max An int that specifies the maximum value.
 		 * @return Any of the following result codes:
 		 * - #MAW_RES_OK if the property could be set.
 		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.

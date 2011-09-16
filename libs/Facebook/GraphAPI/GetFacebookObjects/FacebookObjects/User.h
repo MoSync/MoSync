@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * User.h
+/**
+ * @file User.h
+ * @author Gabriela Rata
  */
 
 #ifndef USER_H_
@@ -26,7 +27,7 @@ MA 02110-1301, USA.
 #include "FacebookObject.h"
 
 /**
- * Implements an User Facebook object type. It represents user profile.
+ * \brief Implements an User Facebook object type. It represents a user profile.
  * See: http://developers.facebook.com/docs/reference/api/user/
  */
 class User : public FacebookObject

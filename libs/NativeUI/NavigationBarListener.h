@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file NavigationBarListener.h
  * @author Bogdan Iusco
  *
- * Listener for NavigationBar events.
+ * \brief Listener for NavigationBar events.
  */
 
 #ifndef NATIVEUI_NAVIGATION_BAR_LISTENER_H_
@@ -33,7 +33,7 @@ namespace NativeUI
     class NavigationBar;
 
     /**
-     * Listener for NavigationBar events.
+     * \brief Listener for NavigationBar events.
      */
     class NavigationBarListener
     {

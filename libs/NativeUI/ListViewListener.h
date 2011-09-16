@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file ListViewListener.h
  * @author Bogdan Iusco
  *
- * Listener for ListView events.
+ * \brief Listener for ListView events.
  */
 
 #ifndef NATIVEUI_LIST_VIEW_LISTENER_H_
@@ -34,7 +34,7 @@ namespace NativeUI
     class ListViewItem;
 
     /**
-     * Listener for ListView events.
+     * \brief Listener for ListView events.
      */
     class ListViewListener
     {

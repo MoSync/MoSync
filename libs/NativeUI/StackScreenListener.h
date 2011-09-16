@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file StackScreenListener.h
  * @author Bogdan Iusco
  *
- * Listener for StackScreen events.
+ * \brief Listener for StackScreen events.
  *
  */
 
@@ -33,7 +33,7 @@ namespace NativeUI
     class StackScreen;
 
     /**
-     * Interface for button event listeners.
+     * \brief Listener for StackScreen events.
      */
     class StackScreenListener
     {

@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * FacebookObject.h
+/**
+ * @file FacebookObject.h
+ * @author Gabriela Rata
  */
 
 #ifndef FACEBOOKOBJECT_H_
@@ -27,19 +28,23 @@ MA 02110-1301, USA.
 #include <MAUtil/Map.h>
 
 /**
- * Base class for all the Facebook objects.
+ * \brief Base class for all the Facebook objects.
  * It contains the "id" field, that all the Facebook objects must have.
  */
 class FacebookObject
 {
 protected:
+
 	/**
-	 * The constructor is made protected, to indicate that the purpose of this  class is
+	 * Constructor
+	 * The constructor is made protected, to indicate that the purpose of this
+	 * class is
 	 * to be reused (by inheriting it).
 	 */
 	FacebookObject();
 
 public:
+
 	/**
 	 * Setter/getter for the "id" field of an Facebook object.
 	 * @param id - the id of the object.

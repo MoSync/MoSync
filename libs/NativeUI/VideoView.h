@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file VideoView.h
  * @author Bogdan Iusco
  *
- * An instance of VideoView is used for managing the playback of a movie
+ * \brief An instance of VideoView is used for managing the playback of a movie
  * from a file or a network stream.
  * For video view events see VideoViewListener.
  */
@@ -37,8 +37,9 @@ namespace NativeUI
     class VideoViewListener;
 
     /**
-     * An instance of VideoView is used for managing the playback of a movie
-     * from a file or a network stream.
+     * \brief An instance of VideoView is used for managing the playback of a
+     * movie from a file or a network stream.
+     *
      * For video view events see VideoViewListener.
      */
     class VideoView : public Widget

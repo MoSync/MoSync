@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file SliderListener.h
  * @author Bogdan Iusco
  *
- * Listener for Slider events.
+ * \brief Listener for Slider events.
  */
 
 #ifndef NATIVEUI_SLIDER_LISTENER_H_
@@ -32,7 +32,7 @@ namespace NativeUI
     class Slider;
 
     /**
-     * Listener for Slider events.
+     * \brief Listener for Slider events.
      */
     class SliderListener
     {

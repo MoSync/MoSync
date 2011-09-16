@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Layout.h
  * @author Emma Tresanszki
  *
- * Class for layouts.
+ * \brief Class for layouts.
  */
 
 #ifndef NATIVEUI_LAYOUT_H_
@@ -31,7 +31,7 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 	/**
-	 * A basic layout.
+	 * \brief Class for layouts.
 	 */
 	class Layout : public Widget
 	{
@@ -43,14 +43,14 @@ namespace NativeUI
 
 		/**
 		 * Sets whether the layout can be scrollable or not.
-		 * @param If true, the layout can be scrollable.
+		 * @param isScrollable If true, the layout can be scrollable.
 		 */
 		virtual void setScrollable(const bool isScrollable);
     protected:
         /**
          * Constructor is protected because actual widget instances
          * should be subclasses of this class.
-         * @layoutType The string constant that identifies the widget type
+         * @param layoutType The string constant that identifies the widget type
          *             (one of the MAW_ constants).
          */
         Layout(const MAUtil::String& layoutType);
