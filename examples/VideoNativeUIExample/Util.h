@@ -56,7 +56,7 @@ const MAUtil::String SOURCE_ERROR       = "Some error occurred";
  */
 const MAUtil::String DISPLAY_DURATION 	 = " Display Duration ";
 const MAUtil::String HOME_URL			 = " Home URL ";
-const MAUtil::String HOME_URL_ANDROID 	 = "http://www.mosync.com/files/videos/heineken.3gp";
+const MAUtil::String HOME_URL_ANDROID 	 = "http://www.mosync.com/files/videos/Video.3gp";
 const MAUtil::String HOME_URL_IOS 		 = "http://www.mosync.com/files/videos/ExVideo.m3u8";
 const MAUtil::String RESET_TO_DEFAULT 	 = "Reload default source";
 
