@@ -56,6 +56,9 @@ void testIOSCert(const SETTINGS&);
 void testIOSSdk(const SETTINGS&);
 void testCppOutputDir(const SETTINGS&);
 
+void testIOSCert(const SETTINGS&);
+void testIOSSdk(const SETTINGS&);
+
 const char* mosyncdir();
 void sh(const char* cmd, bool hideOutput = false);
 

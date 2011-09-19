@@ -216,6 +216,18 @@ void testCppOutputDir(const SETTINGS& s) {
 		exit(1);
 	}
 }
+void testIOSCert(const SETTINGS& s) {
+	if(!s.iOSCert) {
+		printf("Must specify iOS certificate!\n");
+		exit(1);
+	}
+}
+void testIOSSdk(const SETTINGS& s) {
+	if(!s.iOSSdk) {
+		printf("Must specify iOS SDK!\n");
+		exit(1);
+	}
+}
 
 const char* mosyncdir() {
 	static const char* md = NULL;
