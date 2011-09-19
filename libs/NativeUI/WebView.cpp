@@ -244,6 +244,39 @@ namespace NativeUI
 		this->setProperty(MAW_WEB_VIEW_NAVIGATE, "forward");
 	}
 
+	/*
+	 * Get whether the webview can navigate back
+	 * in the browsing history.
+	 * @return true if the webview can navigate back, false otherwise.
+	 */
+	bool WebView::canNavigateBack()
+	{
+		MAUtil::String value = this->getPropertyString(MAW_WEB_VIEW_NAVIGATE);
+		if (strstr(value.c_str(), "back")) {
+			return true;
+		}
+		else {
+			return false;
+		}
+
+	}
+
+	/*
+	 * Get whether the webview can navigate forward
+	 * in the browsing history.
+	 * @return true if the webview can navigate forward, false otherwise.
+	 */
+	bool WebView::canNavigateForward()
+	{
+		MAUtil::String value = this->getPropertyString(MAW_WEB_VIEW_NAVIGATE);
+		if (strstr(value.c_str(), "forward")) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	/**
 	 * Set the horizontal scroll bar to be drawn.
 	 * Available only on Android for the moment.

@@ -5546,7 +5546,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
+		*   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
 		* \endcode
 		*/
 		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
@@ -5566,18 +5566,22 @@ group WidgetAPI "Widget API" {
 		ENABLE_ZOOM = "enableZoom";
 
 		/**
-		* @brief Navigate forward or back the browsing history.
+		* @brief Navigate forward or back the browsing history with setWidgetProperty,
+		* or query whether you can navigate forward or backward with getWidgetProperty.
+		* getWidgetProperty will return a string that will either contain "back",
+		* "forward" or "backforward".
 		*
 		* @validvalue "back" or "forward".
 		*
-		* @setonly
+		* @setandget
 		*
 		* @par Example
 		* @code
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_NAVIGATE, "back");
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_NAVIGATE, back);
 		* @endcode
 		*/
 		NAVIGATE = "navigate";
+
 	}
 
 	} // end of WidgetWebViewProperties

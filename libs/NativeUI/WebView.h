@@ -215,6 +215,20 @@ namespace NativeUI
 		 */
 		virtual void navigateForward();
 
+		/*
+		 * Get whether the webview can navigate back
+		 * in the browsing history.
+		 * @return true if the webview can navigate back, false otherwise.
+		 */
+		virtual bool canNavigateBack();
+
+		/*
+		 * Get whether the webview can navigate forward
+		 * in the browsing history.
+		 * @return true if the webview can navigate forward, false otherwise.
+		 */
+		virtual bool canNavigateForward();
+
 		/**
 		 * Set the horizontal scroll bar to be painted.
 		 * Available only on Android for the moment.
