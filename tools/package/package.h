@@ -27,9 +27,16 @@ struct SETTINGS {
 	const char* dst;
 	const char* name;
 	const char* vendor;
+	const char* version;
+	const char* permissions;
 	const char* uid;
 	bool debug;
 	bool silent;
+
+	// iOS specific settings
+	const char* iOSCert;
+	const char* iOSSdk;
+	bool iOSgenerateOnly;
 };
 
 void package(const SETTINGS&);
@@ -39,6 +46,7 @@ void testModel(const SETTINGS&);
 void testDst(const SETTINGS&);
 void testName(const SETTINGS&);
 void testVendor(const SETTINGS& s);
+void testVersion(const SETTINGS& s);
 void testUid(const SETTINGS&);
 
 const char* mosyncdir();
