@@ -49,6 +49,9 @@ void testVendor(const SETTINGS& s);
 void testVersion(const SETTINGS& s);
 void testUid(const SETTINGS&);
 
+void testIOSCert(const SETTINGS&);
+void testIOSSdk(const SETTINGS&);
+
 const char* mosyncdir();
 void sh(const char* cmd, bool hideOutput = false);
 

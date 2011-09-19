@@ -82,7 +82,7 @@ bool existsFile(const char* filename) {
 	if (file) {
 		file.close();
 	}
-	return file;
+	return file.good();
 }
 
 streamoff getFileSize(const char* filename) {

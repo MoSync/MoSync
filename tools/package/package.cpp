@@ -101,9 +101,9 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.uid);
 		} else if(streq(argv[i], "--debug")) {
 			s.debug = true;
-		} else if(streq(argv[i], "--cert")) { // iOS specific
+		} else if(streq(argv[i], "--ios-cert")) { // iOS specific
 			setString(i, argc, argv, s.iOSCert);
-		} else if(streq(argv[i], "--sdk")) { // iOS specific
+		} else if(streq(argv[i], "--ios-sdk")) { // iOS specific
 			setString(i, argc, argv, s.iOSSdk);
 		} else if(streq(argv[i], "--project-only")) { // iOS specific
 			s.iOSgenerateOnly = true;
@@ -158,6 +158,18 @@ void testVersion(const SETTINGS& s) {
 void testUid(const SETTINGS& s) {
 	if(!s.uid) {
 		printf("Must specify uid!\n");
+		exit(1);
+	}
+}
+void testIOSCert(const SETTINGS& s) {
+	if(!s.iOSCert) {
+		printf("Must specify iOS certificate!\n");
+		exit(1);
+	}
+}
+void testIOSSdk(const SETTINGS& s) {
+	if(!s.iOSSdk) {
+		printf("Must specify iOS SDK!\n");
 		exit(1);
 	}
 }

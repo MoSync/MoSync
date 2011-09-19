@@ -1219,7 +1219,7 @@ namespace Base {
 		default:
 			BIG_PHAT_ERROR(ERR_FILE_LIST_SORT);
 		}
-		switch(sorting) {
+		switch(sortType) {
 		case MA_FL_SORT_DATE:
 			if(sortDesc)
 				return s.st_mtime > o.s.st_mtime;

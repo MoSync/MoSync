@@ -19,6 +19,7 @@
 #include <list>
 #include <sstream>
 #include <fstream>
+#include <stdlib.h>
 #include "packagers.h"
 #include "util.h"
 
@@ -29,6 +30,13 @@
 using namespace std;
 
 void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
+	testDst(s);
+	testProgram(s);
+	testName(s);
+	testVendor(s);
+	testIOSCert(s);
+	testIOSSdk(s);
+
 	std::ostringstream generateCmd;
 	std::ostringstream buildCmd;
 
@@ -47,13 +55,10 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 	copyFile((xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), (dst + "/../rebuild.build.cpp").c_str());
 	copyFile((xcodeprojOutput + "/data_section.bin").c_str(), (dst + "/../data_section.bin").c_str());
 
-	string resourceFile = string(s.dst) + "/resources";
 	string resourceFileCopy = xcodeprojOutput + "/resources";
-	if (existsFile(resourceFile.c_str())) {
-		copyFile(resourceFile.c_str(), resourceFileCopy.c_str());
-	}
-	else
-	{
+	if(s.resource) {
+		copyFile(s.resource, resourceFileCopy.c_str());
+	} else {
 		ofstream empty(resourceFileCopy.c_str());
 		empty.close();
 	}

@@ -97,6 +97,7 @@
   <ItemGroup>
     <ClCompile Include="android.cpp" />
     <ClCompile Include="blackberry.cpp" />
+    <ClCompile Include="iphone.cpp" />
     <ClCompile Include="javame.cpp" />
     <ClCompile Include="package.cpp" />
     <ClCompile Include="s60.cpp" />
