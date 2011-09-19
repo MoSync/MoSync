@@ -77,6 +77,14 @@ void appendFile(const char* dst, const char* src) {
 	writeCopy(in, out);
 }
 
+bool existsFile(const char* filename) {
+	ifstream file(filename);
+	if (file) {
+		file.close();
+	}
+	return file;
+}
+
 streamoff getFileSize(const char* filename) {
 	ifstream in(filename, ios_base::binary);
 	setName(in, filename);

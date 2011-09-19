@@ -26,6 +26,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 void copyFile(const char* dst, const char* src);
 void appendFile(const char* dst, const char* src);
+bool existsFile(const char* file);
 
 std::string readFileToString(const char* src);
 

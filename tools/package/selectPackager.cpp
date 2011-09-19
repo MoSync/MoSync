@@ -93,6 +93,8 @@ void package(const SETTINGS& s) {
 		packageMoblin(s, ri);
 	} else if(runtimeName.find("android") == 0) {	//begins with
 		packageAndroid(s, ri);
+	} else if(runtimeName == "iphoneos") {
+		packageIOS(s, ri);
 	} else {
 		printf("Error: unknown runtime '%s'\n", runtimeName.c_str());
 		exit(1);

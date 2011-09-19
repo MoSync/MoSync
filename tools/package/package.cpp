@@ -38,6 +38,7 @@ static const char* sUsage =
 " -d, --dst <path>             Output: target directory.\n"
 " -n, --name <name>            Output: application name.\n"
 "     --vendor <name>          Output: application vendor's name.\n"
+"     --version <version>      Output: application version.\n"
 "     --debug                  Output: use debug runtime.\n"
 "     --uid <8-digit hex>      Output: Symbian UID.\n"
 " -s, --silent                 Output: Supress additional output, e.g. warnings."
@@ -92,10 +93,20 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.name);
 		} else if(streq(argv[i], "--vendor")) {
 			setString(i, argc, argv, s.vendor);
+		} else if(streq(argv[i], "--version")) {
+			setString(i, argc, argv, s.version);
+		} else if(streq(argv[i], "--permissions")) {
+			setString(i, argc, argv, s.permissions);
 		} else if(streq(argv[i], "--uid")) {
 			setString(i, argc, argv, s.uid);
 		} else if(streq(argv[i], "--debug")) {
 			s.debug = true;
+		} else if(streq(argv[i], "--cert")) { // iOS specific
+			setString(i, argc, argv, s.iOSCert);
+		} else if(streq(argv[i], "--sdk")) { // iOS specific
+			setString(i, argc, argv, s.iOSSdk);
+		} else if(streq(argv[i], "--project-only")) { // iOS specific
+			s.iOSgenerateOnly = true;
 		} else if(streq(argv[i], "-s") || streq(argv[i], "--silent")) {
 			s.silent = true;
 		} else {
@@ -135,6 +146,12 @@ void testName(const SETTINGS& s) {
 void testVendor(const SETTINGS& s) {
 	if(!s.vendor) {
 		printf("Must specify vendor!\n");
+		exit(1);
+	}
+}
+void testVersion(const SETTINGS& s) {
+	if (!s.version) {
+		printf("Must specify version!\n");
 		exit(1);
 	}
 }
