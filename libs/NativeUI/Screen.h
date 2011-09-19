@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Screen.h
  * @author Mikael Kindborg
  *
- * Class that represents a visible screen. Only one screen
+ * \brief Class that represents a visible screen. Only one screen
  * is visible at a time.
  */
 
@@ -33,7 +33,7 @@ namespace NativeUI
 {
 
 	/**
-	 * Class that represents a visible screen.
+	 * \brief Class that represents a visible screen.
 	 */
 	class Screen : public Widget
 	{

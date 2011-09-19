@@ -89,11 +89,9 @@ public:
 		// of writing this program.
 		if (-1 == mScreen)
 		{
-			maPanic(0,
-				"NativeUI is only available on Android and iPhone. "
-				"You must run directly on the device or devices emulator.");
+			maPanic(0, "NativeUI is only available on Android and iOS.");
 		}
-	   
+
 		// Create the screen's main layout widget.
 		mMainLayoutWidget = maWidgetCreate(MAW_VERTICAL_LAYOUT);
 

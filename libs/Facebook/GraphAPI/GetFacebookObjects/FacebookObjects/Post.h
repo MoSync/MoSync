@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Post.h
+/**
+ * @file Post.h
+ * @author Gabriela Rata
  */
 
 #ifndef POST_H_
@@ -28,7 +29,8 @@ MA 02110-1301, USA.
 #include "Comment.h"
 
 /**
- * Implements an Post Facebook object type. It represents an individual entry in a profile's feed.
+ * \brief Implements a Post Facebook object type. It represents an individual
+ * entry in a profile's feed.
  * See: http://developers.facebook.com/docs/reference/api/post/
  */
 class Post: public FacebookObject

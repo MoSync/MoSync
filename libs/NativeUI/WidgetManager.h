@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file WidgetManager.h
  * @author Mikael Kindborg
  *
- * The WidgetManager manages widget events and dispatches
+ * \brief The WidgetManager manages widget events and dispatches
  * them to the target widgets.
  */
 
@@ -42,7 +42,7 @@ namespace NativeUI
 {
 
     /**
-     * Class that handles widget events.
+     * \brief Class that handles widget events.
      */
     class WidgetManager : public MAUtil::CustomEventListener
     {

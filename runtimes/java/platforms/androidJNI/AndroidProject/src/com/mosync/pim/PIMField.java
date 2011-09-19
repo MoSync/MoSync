@@ -1125,7 +1125,7 @@ public class PIMField
 					e.printStackTrace();
 					return 0;
 				}
-				int date = (int)dateObj.getTime();
+				int date = (int)(dateObj.getTime()/1000);
 				DebugPrint("WriteInt " + date);
 				writeInt(date, buffer, 0);
 				return 2;

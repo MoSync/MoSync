@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file ListView.h
  * @author Bogdan Iusco
  *
- * An instance of ListView is used for displaying list of information.
+ * \brief An instance of ListView is used for displaying list of information.
  * For list view events see ListViewListener.
  */
 
@@ -36,7 +36,8 @@ namespace NativeUI
     class ListViewListener;
 
     /**
-     * An instance of ListView is used for displaying list of information.
+     * \brief An instance of ListView is used for displaying list of information.
+     *
      * For list view events see ListViewListener.
      */
     class ListView : public Widget

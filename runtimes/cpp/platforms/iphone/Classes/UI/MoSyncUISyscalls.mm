@@ -46,9 +46,9 @@ NSString* stringFromChar(const char* str) {
 }
 
 MAWidgetHandle maWidgetCreate(const char *widgetType) {
-//	NSLog(@"maWidgetCreate(%s)\n", widgetType);
-
 	int returnValue;
+    if(widgetType == NULL)
+        return MAW_RES_INVALID_TYPE_NAME;
 	NSString* widgetTypeString = stringFromChar(widgetType);
     NSArray *arguments = [[NSArray alloc] initWithObjects: widgetTypeString, nil];
 	[NSObject performSelectorOnMainThread:@selector(createWidget:)
@@ -66,7 +66,6 @@ int maWidgetDestroy(MAWidgetHandle handle) {
 	int returnValue;
 
     IWidget* widget = [mosyncUI getWidget:handle];
-	NSLog(@"retainCount after getWidget: %d", [widget retainCount]);
     if(widget == NULL) return MAW_RES_INVALID_HANDLE;
 
 	bool isCurrentlyShownScreen = widget==[mosyncUI getCurrentlyShownScreen];
@@ -88,8 +87,6 @@ int maWidgetDestroy(MAWidgetHandle handle) {
 }
 
 int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char* value) {
-//	NSLog(@"maWidgetSetProperty(%d, %s, %s)\n", handle, property, value);
-
 	IWidget* widget = [mosyncUI getWidget:handle];
 	if(widget == NULL) return MAW_RES_INVALID_HANDLE;
 
@@ -106,6 +103,12 @@ int maWidgetSetProperty(MAWidgetHandle handle, const char *property, const char*
 		}
 	}
 
+    if(property == NULL)
+        return MAW_RES_INVALID_PROPERTY_NAME;
+    
+    if(value == NULL)
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+    
 	int returnValue;
 
 	NSString *valueString = stringFromChar(value);
@@ -129,6 +132,13 @@ int maWidgetGetProperty(MAWidgetHandle handle, const char *property, char *value
 	IWidget* widget = [mosyncUI getWidget:handle];
 	if(!widget) return MAW_RES_INVALID_HANDLE;
 
+    if(property == NULL)
+        return MAW_RES_INVALID_PROPERTY_NAME;
+    
+    if(value == NULL)
+        return MAW_RES_INVALID_PROPERTY_VALUE;
+       
+    
 	NSString* propertyString = stringFromChar(property);
 	NSString* retval;
     NSArray* arguments = [[NSArray alloc] initWithObjects: propertyString, nil];
@@ -162,8 +172,6 @@ int maWidgetPerformAction(MAWidgetHandle widget, const char *action, const char 
 }
 
 int maWidgetAddChild(MAWidgetHandle parentHandle, MAHandle childHandle) {
-//	NSLog(@"maWidgetAddChild(%d, %d)\n", parentHandle, childHandle);
-
 	IWidget* parent = [mosyncUI getWidget:parentHandle];
 	IWidget* child = [mosyncUI getWidget:childHandle];
 	if(!parent) return MAW_RES_INVALID_HANDLE;

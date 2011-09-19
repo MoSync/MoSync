@@ -1,35 +1,26 @@
 /*
-Copyright (C) 2011 MoSync AB
 
+Copyright (C) 2011 MoSync AB
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
 version 2, as published by the Free Software Foundation.
-
 This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
 GNU General Public License for more details.
-
 You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Connections.h
+/**
+ * @file Connections.h
+ * @author Gabriela Rata
  */
 
 #ifndef CONNECTIONS_H_
 #define CONNECTIONS_H_
-
-/*
- * All of the objects in the Facebook are connected to each other via relationships.
- * Those those relationships are called connections in Graph API.
- * The connections between objects can be retrieved by using the URL:
- * https://graph.facebook.com/ID/CONNECTION_TYPE
- * The connections supported for each type of Facebook object are listed below:
- */
 
 class Link;
 class Album;
@@ -47,9 +38,17 @@ class Video;
 
 template<class ObjType>
 struct Connections;
+/**
+ * All of the objects in the Facebook are connected to each other via
+ * relationships. Those relationships are called connections in Graph API.
+ * The connections between objects can be retrieved by using the URL:
+ * https://graph.facebook.com/ID/CONNECTION_TYPE
+ * The connections supported for each type of Facebook object are listed below.
+ */
 
-/*
- * Template class for retrieving the available connections for an Album object
+/**
+ * \brief Template class for retrieving the available connections for an Album
+ * object.
  */
 template<>
 struct Connections<Album>
@@ -72,8 +71,9 @@ struct Connections<Album>
 	}
 };
 
-/*
- * Template class for retrieving the available connections for an Checkin object
+/**
+ * \brief Template class for retrieving the available connections for an
+ * Checkin object.
  */
 template<>
 struct Connections<Checkin>
@@ -86,10 +86,12 @@ struct Connections<Checkin>
 	{
 		return "likes";
 	}
+
 };
 
-/*
- * Template class for retrieving the available connections for an Comment object
+/**
+ * \brief Template class for retrieving the available connections for an Comment
+ * object.
  */
 template<>
 struct Connections<Comment>
@@ -100,8 +102,9 @@ struct Connections<Comment>
 	}
 };
 
-/*
- * Template class for retrieving the available connections for an Event object
+/**
+ * \brief Template class for retrieving the available connections for an Event
+ * object
  */
 template<>
 struct Connections<Event>
@@ -136,8 +139,9 @@ struct Connections<Event>
 	}
 };
 
-/*
- * Template class for retrieving the available connections for an FriendList object
+/**
+ * \brief Template class for retrieving the available connections for an
+ * FriendList object
  */
 template<>
 struct Connections<FriendList>
@@ -148,8 +152,8 @@ struct Connections<FriendList>
 	}
 };
 
-/*
- * Template class for retrieving the available connections for an Group object
+/**
+ * \brief Template class for retrieving the available connections for an Group object
  */
 template<>
 struct Connections<Group>
@@ -168,8 +172,9 @@ struct Connections<Group>
 	}
 };
 
-/*
- * Template class for retrieving the available connections for an Link object
+/**
+ * \brief Template class for retrieving the available connections for an Link
+ * object
  */
 template<>
 struct Connections<Link>
@@ -184,8 +189,9 @@ struct Connections<Link>
 	}
 };
 
-/*
- * Template class for retrieving the available connections for an Note object
+/**
+ * \brief Template class for retrieving the available connections for an Note
+ * object
  */
 template<>
 struct Connections<Note>
@@ -200,8 +206,9 @@ struct Connections<Note>
 	}
 };
 
-/*
- * Template class for retrieving the available connections for an Photo object
+/**
+ * \brief Template class for retrieving the available connections for an Photo
+ * object
  */
 template<>
 struct Connections<Photo>
@@ -224,8 +231,9 @@ struct Connections<Photo>
 	}
 };
 
-/*
- * Template class for retrieving the available connections for an Post object
+/**
+ * \brief Template class for retrieving the available connections for an Post
+ * object
  */
 template<>
 struct Connections<Post>
@@ -240,8 +248,9 @@ struct Connections<Post>
 	}
 };
 
-/*
- * Template class for retrieving the available connections for an StatusMessage object
+/**
+ * \brief Template class for retrieving the available connections for a
+ * StatusMessage object
  */
 template<>
 struct Connections<StatusMessage>
@@ -256,8 +265,9 @@ struct Connections<StatusMessage>
 	}
 };
 
-/*
- * Template class for retrieving the available connections for an User object
+/**
+ * \brief Template class for retrieving the available connections for an User
+ * object
  */
 template<>
 struct Connections<User>
@@ -359,8 +369,10 @@ struct Connections<User>
 		return "videos";
 	}
 };
-/*
- * Template class for retrieving the available connections for an Video object
+
+/**
+ * \brief Template class for retrieving the available connections for an Video
+ * object
  */
 template<>
 struct Connections<Video>
@@ -378,8 +390,4 @@ struct Connections<Video>
 		return "picture";
 	}
 };
-
-
-
-
 #endif /* CONNECTIONS_H_ */

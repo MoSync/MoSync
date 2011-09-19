@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file EditBox.h
  * @author Bogdan Iusco
  *
- * Class for edit box.
+ * \brief Class for edit box.
  * You can use this widget to gather small amounts of text from the user.
  * The edit box supports the use of an observer to handle editing-related
  * events.
@@ -47,7 +47,8 @@ namespace NativeUI
     };
 
     /**
-     * Class for edit box.
+     * \brief Class for edit box.
+     *
      * You can use this widget to gather small amounts of text from the user.
      * The edit box supports the use of an observer to handle editing-related
      * events.
@@ -80,7 +81,7 @@ namespace NativeUI
         /**
          * Set a text in the edit box that acts as a placeholder when an
          * edit box is empty.
-         * @param The given text.
+         * @param text The given text.
          */
         virtual void setPlaceholder(const MAUtil::String& text);
 

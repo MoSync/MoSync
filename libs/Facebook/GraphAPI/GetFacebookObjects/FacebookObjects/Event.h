@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Event.h
+/**
+ * @file Event.h
+ * @author Gabriela Rata
  */
 
 #ifndef EVENT_H_
@@ -27,12 +28,13 @@ MA 02110-1301, USA.
 #include "Utilities.h"
 
 /**
- * Implements an Event Facebook object.
+ * \brief Implements an Event Facebook object.
  * See: http://developers.facebook.com/docs/reference/api/event/
  */
 class Event: public FacebookObject
 {
 public:
+
 	/**
 	 * Setter/getter for the "owner" field of an Event object.
 	 * @param owner - the profile that created the event.
