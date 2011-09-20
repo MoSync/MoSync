@@ -29,7 +29,8 @@ struct SETTINGS {
 	const char* vendor;
 	const char* version;
 	const char* permissions;
-	const char* uid;
+	const char* s60v3uid;
+	const char* s60v2uid;
 	bool debug;
 	bool silent;
 
@@ -45,9 +46,10 @@ void testProgram(const SETTINGS&);
 void testModel(const SETTINGS&);
 void testDst(const SETTINGS&);
 void testName(const SETTINGS&);
-void testVendor(const SETTINGS& s);
-void testVersion(const SETTINGS& s);
-void testUid(const SETTINGS&);
+void testVendor(const SETTINGS&);
+void testVersion(const SETTINGS&);
+void testS60v3Uid(const SETTINGS&);
+void testS60v2Uid(const SETTINGS&);
 
 void testIOSCert(const SETTINGS&);
 void testIOSSdk(const SETTINGS&);

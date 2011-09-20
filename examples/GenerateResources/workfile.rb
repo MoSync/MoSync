@@ -66,7 +66,7 @@ lstTask = GeneratedLstTask.new(@work, ALL_RESOURCES, P)
 
 # Define the Work.
 @work.instance_eval do
-	@resourceTask = PipeTask.new(self, "build/resources", [lstTask], ' -xerr -R')
+	@resourceTask = PipeTask.new(self, 'build/resources', [lstTask], ' -xerr -R')
 	@SOURCES = ['src']
 	@EXTRA_INCLUDES = ["#{mosyncdir}/profiles/vendors/#{PROFILE}", '.', 'build']
 	@LIBRARIES = ['mautil', 'maui']
@@ -77,6 +77,8 @@ lstTask = GeneratedLstTask.new(@work, ALL_RESOURCES, P)
 	@EXTRA_LINKFLAGS = " -datasize=#{data} -stacksize=#{stack} -heapsize=#{heap}"
 
 	@NAME = 'GenerateResources'
+	@PACK_MODEL = PROFILE
+	@PACK_PARAMETERS = ' --s60v3uid ed784a93 --s60v2uid 05b99094'
 end
 
 # Define command-line targets.

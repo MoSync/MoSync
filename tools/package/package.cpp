@@ -38,9 +38,11 @@ static const char* sUsage =
 " -d, --dst <path>             Output: target directory.\n"
 " -n, --name <name>            Output: application name.\n"
 "     --vendor <name>          Output: application vendor's name.\n"
-"     --version <version>      Output: application version.\n"
+"     --version <version>      Output: application version. Format: major[.minor][.micro][.qualifier]\n"
+"                              Some parts may be ignored by some platforms.\n"
 "     --debug                  Output: use debug runtime.\n"
-"     --uid <8-digit hex>      Output: Symbian UID.\n"
+"     --s60v3uid <8-digit hex> Output: Symbian UID, 3rd edition.\n"
+"     --s60v2uid <8-digit hex> Output: Symbian UID, 2nd edition.\n"
 " -s, --silent                 Output: Supress additional output, e.g. warnings."
 "\n"
 "Environment variables used:\n"
@@ -97,8 +99,10 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.version);
 		} else if(streq(argv[i], "--permissions")) {
 			setString(i, argc, argv, s.permissions);
-		} else if(streq(argv[i], "--uid")) {
-			setString(i, argc, argv, s.uid);
+		} else if(streq(argv[i], "--s60v3uid")) {
+			setString(i, argc, argv, s.s60v3uid);
+		} else if(streq(argv[i], "--s60v2uid")) {
+			setString(i, argc, argv, s.s60v2uid);
 		} else if(streq(argv[i], "--debug")) {
 			s.debug = true;
 		} else if(streq(argv[i], "--ios-cert")) { // iOS specific
@@ -155,11 +159,32 @@ void testVersion(const SETTINGS& s) {
 		exit(1);
 	}
 }
-void testUid(const SETTINGS& s) {
-	if(!s.uid) {
-		printf("Must specify uid!\n");
+static void testUid(const char* uid) {
+	if(strlen(uid) == 8) {
+		bool good = true;
+		for(int i=0; i<8; i++) {
+			if(!isxdigit(uid[i]))
+				good = false;
+		}
+		if(good)
+			return;
+	}
+	printf("Invalid UID format!\n");
+	exit(1);
+}
+void testS60v3Uid(const SETTINGS& s) {
+	if(!s.s60v3uid) {
+		printf("Must specify s60v3uid!\n");
 		exit(1);
 	}
+	testUid(s.s60v3uid);
+}
+void testS60v2Uid(const SETTINGS& s) {
+	if(!s.s60v2uid) {
+		printf("Must specify s60v2uid!\n");
+		exit(1);
+	}
+	testUid(s.s60v2uid);
 }
 void testIOSCert(const SETTINGS& s) {
 	if(!s.iOSCert) {

@@ -46,27 +46,24 @@ end
 # Packs a MoSync program for installation.
 # resource can be nil. all other parameters must be valid.
 class MoSyncPackTask < Task
-	def initialize(work, tempdir, buildpath, model, program, resource, name)
+	def initialize(work, options = {})
 		super(work)
-		@model = model
-		@program = program
-		@resource = resource
-		@packpath = buildpath + model
-		@name = name
-		@tempdir = tempdir
-		@prerequisites = [@program, DirTask.new(work, @packpath)]
-		@prerequisites << @resource if(@resource)
+		@o = options
+		@o[:packpath] = @o[:buildpath] + @o[:model] if(!@o[:packpath])
+		@prerequisites = [@o[:program], DirTask.new(work, @o[:packpath])]
+		@prerequisites << @o[:resource] if(@o[:resource])
+		@o[:vendor] = 'Built with MoSync' if(!@o[:vendor])
 	end
 	def execute
-		if(@resource)
-			r = File.expand_path(@resource)
+		if(@o[:resource])
+			r = File.expand_path(@o[:resource])
 			resArg = " -r \"#{r}\""
 		end
-		p = File.expand_path(@program)
-		d = File.expand_path(@packpath)
-		FileUtils.cd(@tempdir, :verbose => true) do
-			sh "#{mosyncdir}/bin/package -p \"#{p}\"#{resArg} -m \"#{@model}\""+
-				" -d \"#{d}\" -n \"#{@name}\" --vendor MoSync"
+		p = File.expand_path(@o[:program])
+		d = File.expand_path(@o[:packpath])
+		FileUtils.cd(@o[:tempdir], :verbose => true) do
+			sh "#{mosyncdir}/bin/package -p \"#{p}\"#{resArg} -m \"#{@o[:model]}\""+
+				" -d \"#{d}\" -n \"#{@o[:name]}\" --vendor \"#{@o[:vendor]}\"#{@o[:extraParameters]}"
 		end
 	end
 end
@@ -150,8 +147,17 @@ class PipeExeWork < PipeGccWork
 			@TARGET.extend(PipeElimTask)
 		end
 		if(defined?(PACK))
-			@prerequisites << @TARGET = MoSyncPackTask.new(self, @BUILDDIR_BASE, @buildpath,
-				PACK, @TARGET, @resourceTask, @NAME)
+			@PACK_MODEL = PACK if(!@PACK_MODEL)
+			@prerequisites << @TARGET = MoSyncPackTask.new(self,
+				:tempdir => @BUILDDIR_BASE,
+				:buildpath => @buildpath,
+				:model => @PACK_MODEL,
+				:program => @TARGET,
+				:resource => @resourceTask,
+				:name => @NAME,
+				:vendor => @VENDOR,
+				:extraParameters => @PACK_PARAMETERS,
+				)
 		end
 	end
 	def emuCommandLine
