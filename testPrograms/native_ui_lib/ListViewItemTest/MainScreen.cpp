@@ -64,7 +64,7 @@ MainScreen::~MainScreen()
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
-	mMainLayout->setBackgroundColor(0xFF0000);
+	mMainLayout->setBackgroundColor(0x99CCFF);
 	Screen::setMainWidget(mMainLayout);
 
 	int nrFonts = maFontGetCount();
@@ -76,9 +76,15 @@ void MainScreen::createMainLayout() {
 
 	mListView = new ListView();
 
-	// The first item has different font.
+	ListViewItem* item1 = new ListViewItem();
+	item1->setText("First item: red color and size 20");
+	item1->setFontSize(20);
+	item1->setFontColor(0xFF0000);
+	mListView->addChild(item1);
+
+	// The second item has different font.
 	ListViewItem* item = new ListViewItem();
-	item->setText("Test-First font was set for this item");
+	item->setText("Second item- First font was set");
 	item->setFont(fontHandle);
 	mListView->addChild(item);
 

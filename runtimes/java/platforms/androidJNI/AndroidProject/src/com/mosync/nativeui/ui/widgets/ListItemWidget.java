@@ -26,6 +26,8 @@ import android.widget.TextView;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.NativeUI;
+import com.mosync.nativeui.util.properties.ColorConverter;
+import com.mosync.nativeui.util.properties.FloatConverter;
 import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
@@ -75,6 +77,14 @@ public class ListItemWidget extends Layout
 		{
 			int imageHandle = IntConverter.convert( value );
 			m_icon.setImageBitmap( NativeUI.getBitmap( imageHandle ) );
+		}
+		else if ( property.equals( IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_COLOR ) )
+		{
+			m_label.setTextColor( ColorConverter.convert(value) );
+		}
+		else if (property.equals( IX_WIDGET.MAW_LIST_VIEW_ITEM_FONT_SIZE ) )
+		{
+			m_label.setTextSize( FloatConverter.convert(value) );
 		}
 		else
 		{
