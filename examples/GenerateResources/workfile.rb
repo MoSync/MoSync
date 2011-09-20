@@ -65,13 +65,8 @@ ALL_RESOURCES = SCALED_IMAGES + FONTS + STATICS
 lstTask = GeneratedLstTask.new(@work, ALL_RESOURCES, P)
 
 # Define the Work.
-@work.instance_eval do 
-	@lstTask = lstTask
-	def setup
-		super
-		pTask = PipeTask.new(self, "build/resources", [@lstTask], ' -xerr -R')
-		@prerequisites = [pTask] + @prerequisites
-	end
+@work.instance_eval do
+	@resourceTask = PipeTask.new(self, "build/resources", [lstTask], ' -xerr -R')
 	@SOURCES = ['src']
 	@EXTRA_INCLUDES = ["#{mosyncdir}/profiles/vendors/#{PROFILE}", '.', 'build']
 	@LIBRARIES = ['mautil', 'maui']

@@ -125,7 +125,9 @@ class PipeExeWork < PipeGccWork
 				@LSTFILES = []
 			end
 		end
-		if(@LSTFILES.size > 0)
+		if(@resourceTask)
+			@prerequisites << @resourceTask
+		elsif(@LSTFILES.size > 0)
 			lstTasks = @LSTFILES.collect do |name| FileTask.new(self, name) end
 			@resourceTask = PipeResourceTask.new(self, "build/resources", lstTasks)
 			@prerequisites << @resourceTask
