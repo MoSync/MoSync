@@ -1,7 +1,3 @@
-.res PageMain_html
-.bin
-.include "PageMain.html"
-
-.res amor128x128_png
-.bin
-.include "amor128x128.png"
+.res LOCAL_FILES_BIN
+.ubin
+.include "LocalFiles.bin"
