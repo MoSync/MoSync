@@ -103,6 +103,7 @@
     <ClCompile Include="s60.cpp" />
     <ClCompile Include="selectPackager.cpp" />
     <ClCompile Include="util.cpp" />
+    <ClCompile Include="windowsMobile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="package.h" />

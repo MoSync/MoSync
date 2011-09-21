@@ -16,6 +16,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include <fstream>
 #include <sstream>
 #include "util.h"
@@ -83,6 +84,15 @@ bool existsFile(const char* filename) {
 		file.close();
 	}
 	return file.good();
+}
+
+void renameFile(const string& dst, const string& src) {
+	int _res = rename(src.c_str(), dst.c_str());
+	if(_res != 0) {
+		printf("rename(%s, %s) failed: %i %i(%s)\n",
+			src.c_str(), dst.c_str(), _res, errno, strerror(errno));
+		exit(1);
+	}
 }
 
 streamoff getFileSize(const char* filename) {
@@ -185,6 +195,10 @@ void applyTemplate(const char* dst, const char* src, const TemplateMap& tm) {
 void toDir(std::string& str) {
 	if(str[str.size()-1] != '/')
 		str += '/';
+}
+
+std::string getDir(const std::string& name) {
+	return name.substr(0, name.find_last_of('/'));
 }
 
 string fullpathString(const char* name) {

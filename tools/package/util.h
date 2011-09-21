@@ -27,6 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 void copyFile(const char* dst, const char* src);
 void appendFile(const char* dst, const char* src);
 bool existsFile(const char* file);
+void renameFile(const std::string& dst, const std::string& src);
 
 std::string readFileToString(const char* src);
 
@@ -44,8 +45,14 @@ void applyTemplate(const char* dst, const char* src, const TemplateMap&);
 // convert all \ to /
 void toSlashes(std::string&);
 
+// convert all / to '\'
+void toBackSlashes(std::string&);
+
 // add / to end of string, if one wasn't already there.
 void toDir(std::string&);
+
+// returns the directory part of the name. assumes front-slashes.
+std::string getDir(const std::string& name);
 
 std::string fullpathString(const char* name);
 

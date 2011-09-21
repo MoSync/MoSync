@@ -106,6 +106,11 @@ void toSlashes(string& str) {
 		str[i] = (str[i] == '\\' ? '/' : str[i]);
 	}
 }
+void toBackSlashes(std::string& str) {
+	for(size_t i=0; i<str.size(); i++) {
+		str[i] = (str[i] == '/' ? '\\' : str[i]);
+	}
+}
 
 static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 	// read file
@@ -230,10 +235,6 @@ static bool parseProfileHeader(const char* filename, RuntimeInfo& pi) {
 	return true;
 }
 
-void packageWM(const SETTINGS&, const RuntimeInfo& ri) {
-	printf("not implemented\n");
-	exit(1);
-}
 void packageMoblin(const SETTINGS&, const RuntimeInfo& ri) {
 	printf("not implemented\n");
 	exit(1);

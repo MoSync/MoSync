@@ -114,12 +114,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	string classesSo = classes + "/libmosync.so";
 	string armeabiSo = armeabi + "/libmosync.so";
 	remove(armeabiSo.c_str());
-	int _res = rename(classesSo.c_str(), armeabiSo.c_str());
-	if(_res != 0) {
-		printf("rename(%s, %s) failed: %i %i\n",
-			classesSo.c_str(), armeabiSo.c_str(), _res, errno);
-		exit(1);
-	}
+	renameFile(armeabiSo, classesSo);
 
 	// run android/dx.jar
 	string classesDex = classes + "/classes.dex";

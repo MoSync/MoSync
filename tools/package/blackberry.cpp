@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include <errno.h>
 #include "packagers.h"
+#include "util.h"
 
 using namespace std;
 
@@ -66,9 +67,5 @@ void packageBlackberry(const SETTINGS& s, const RuntimeInfo& ri) {
 	codName += ".cod";
 	std::string newName = s.dst + ("/" + codName);
 	remove(newName.c_str());
-	int res = rename(codName.c_str(), newName.c_str());
-	if(res != 0) {
-		printf("rename error %i, %i\n", res, errno);
-		exit(1);
-	}
+	renameFile(newName, codName);
 }
