@@ -106,11 +106,13 @@ std::list<File> File::listFiles ( void )
 		return l;
 	
 	g_fileList = &l;
-#ifndef WIN32
-	g_currentPath = "";
-#else
+
+// FIX (niklas): I don't know why this should work in another way?
+//#ifndef WIN32
+//	g_currentPath = "";
+//#else
 	g_currentPath = m_path + F_SEPERATOR;
-#endif	
+//#endif
 	scanDirectory( (m_path + "/*").c_str( ), callback );
 	g_fileList = NULL;
 
