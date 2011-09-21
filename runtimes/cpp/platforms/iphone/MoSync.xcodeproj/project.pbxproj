@@ -80,6 +80,8 @@
 		43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
 		43D8048013EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
 		43D8048413EFBEEE00183387 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D8048213EFBCC700183387 /* MediaPlayer.framework */; };
+		43DEB44B142883D400913804 /* OptionDialogView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43DEB44A142883D400913804 /* OptionDialogView.mm */; };
+		43DEB45D1428900F00913804 /* OptionDialogView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43DEB44A142883D400913804 /* OptionDialogView.mm */; };
 		85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
 		85037841133A2275009251E2 /* StackScreenWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 8503783E133A2275009251E2 /* StackScreenWidget.h */; };
 		85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
@@ -322,6 +324,8 @@
 		43D8046A13EFBCB200183387 /* VideoViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewWidget.h; sourceTree = "<group>"; };
 		43D8046B13EFBCB200183387 /* VideoViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoViewWidget.mm; sourceTree = "<group>"; };
 		43D8048213EFBCC700183387 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		43DEB449142883D400913804 /* OptionDialogView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OptionDialogView.h; sourceTree = "<group>"; };
+		43DEB44A142883D400913804 /* OptionDialogView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OptionDialogView.mm; sourceTree = "<group>"; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
@@ -708,6 +712,8 @@
 				85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */,
 				85A158F612F80E520044BBE1 /* ScreenWidgetController.h */,
 				85A158F712F80E520044BBE1 /* ScreenWidgetController.m */,
+				43DEB449142883D400913804 /* OptionDialogView.h */,
+				43DEB44A142883D400913804 /* OptionDialogView.mm */,
 				85A158FA12F80E520044BBE1 /* Widgets */,
 			);
 			path = UI;
@@ -1186,6 +1192,7 @@
 				43D8047C13EFBCB200183387 /* TimePickerWidget.mm in Sources */,
 				43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */,
 				43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */,
+				43DEB44B142883D400913804 /* OptionDialogView.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1268,6 +1275,7 @@
 				43D8047A13EFBCB200183387 /* SliderWidget.mm in Sources */,
 				43D8047D13EFBCB200183387 /* TimePickerWidget.mm in Sources */,
 				43D8048013EFBCB200183387 /* VideoViewWidget.mm in Sources */,
+				43DEB45D1428900F00913804 /* OptionDialogView.mm in Sources */,
 				43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
