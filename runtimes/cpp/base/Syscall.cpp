@@ -63,12 +63,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #if defined(LINUX) || defined(__IPHONE__) || defined(DARWIN)
 #include <sys/statvfs.h>
+#define stricmp(x, y) strcasecmp(x, y)
 #endif
 
 using namespace Base;
 
 namespace Base {
-	
+
 	uint getMaxCustomEventSize() {
 		#define COUNT_CUSTOM_EVENT(eventType, dataType)\
 			if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
@@ -76,8 +77,8 @@ namespace Base {
 		uint maxCustomEventSize = 0;
 		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
 		DUMPHEX(maxCustomEventSize);
-		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
-		
+		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)
+
 		return maxCustomEventSize;
 	}
 
@@ -171,7 +172,7 @@ namespace Base {
 			if(type == 0)
 				break;
 
-			//dispose flag 
+			//dispose flag
 
 			DAR_UVINT(size);
 			LOG_RES("Type %i, size %i\n", type, size);
@@ -194,10 +195,10 @@ namespace Base {
 				break;
 			case RT_UBIN:
 				{
-					int pos;			
+					int pos;
 					MYASSERT(aFilename, ERR_RES_LOAD_UBIN);
 					TEST(file.tell(pos));
-#ifndef _android					
+#ifndef _android
 					ROOM(resources.dadd_RT_BINARY(rI,
 						new LimitedFileStream(aFilename, pos, size)));
 #else
@@ -261,7 +262,7 @@ namespace Base {
 						left, top, width, height, cx, cy)));
 #endif
 				}
-				break;	
+				break;
 			case RT_LABEL:
 				{
 					MemStream b(size);
@@ -480,7 +481,7 @@ namespace Base {
 #else
 		char* b = SYSCALL_THIS->loadBinary(placeholder, size);
 		if(b == NULL) return RES_OUT_OF_MEMORY;
-		
+
 		MemStream* ms = new MemStream(b, size);
 #endif
 		if(ms == 0) return RES_OUT_OF_MEMORY;
@@ -521,11 +522,11 @@ namespace Base {
 #define STORE_PATH "stores/"
 #endif
 
-	SYSCALL(MAHandle, maOpenStore(const char* name, int flags)) 
+	SYSCALL(MAHandle, maOpenStore(const char* name, int flags))
 	{
 		const char* path;
 		int len;
-#ifdef _WIN32_WCE 
+#ifdef _WIN32_WCE
 		char temp[256];
 		TCHAR wtemp[256];
 		getWorkingDirectory(temp, 256);
@@ -585,7 +586,7 @@ namespace Base {
 		return SYSCALL_THIS->gStoreNextId++;
 	}
 
-	SYSCALL(int, maWriteStore(MAHandle store, MAHandle data)) 
+	SYSCALL(int, maWriteStore(MAHandle store, MAHandle data))
 	{
 		const char* name = SYSCALL_THIS->gStores.find(store);
 		MYASSERT(name, ERR_STORE_HANDLE_INVALID);
@@ -602,7 +603,7 @@ namespace Base {
 		return 1;
 	}
 
-	SYSCALL(int, maReadStore(MAHandle store, MAHandle placeholder)) 
+	SYSCALL(int, maReadStore(MAHandle store, MAHandle placeholder))
 	{
 		const char* name = SYSCALL_THIS->gStores.find(store);
 		MYASSERT(name, ERR_STORE_HANDLE_INVALID);
@@ -1180,6 +1181,9 @@ namespace Base {
 	static FileList sFileList;
 	static std::string sFileListRealDir;
 	static int sFileListSorting;
+#ifdef _WIN32
+	typedef ino_t _ino_t;
+#endif
 
 	static void fileListCallback(const char* filename) {
 		if(!strcmp(filename, ".") || !strcmp(filename, ".."))
@@ -1195,7 +1199,7 @@ namespace Base {
 			// hack: we store an ordinal in st_ino.
 			// looks like it would break on Windows if a directory has
 			// more than 65k files. I don't care to fix it.
-			fli.s.st_ino = (_ino_t)sFileList.files.size();
+			fli.s.st_ino = (ino_t)sFileList.files.size();
 		else
 			stat(fn.c_str(), &fli.s);
 

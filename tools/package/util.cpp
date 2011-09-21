@@ -53,7 +53,7 @@ static void writeCopy(istream& in, ostream& out) {
 	streamoff pos = 0;
 	while(pos < size) {
 		char buffer[64*1024];	// arbitrary size
-		streamoff todo = MIN(size - pos, sizeof(buffer));
+		streamoff todo = MIN(size - pos, (streamoff)sizeof(buffer));
 		in.read(buffer, todo);
 		beGood(in);
 		out.write(buffer, todo);
