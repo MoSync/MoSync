@@ -25,6 +25,7 @@
 #import "ListViewItemWidget.h"
 #import "ListViewWidget.h"
 #import "GLViewWidget.h"
+#import "OptionDialogView.h"
 
 MoSyncUI* mosyncUI;
 
@@ -316,3 +317,12 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	return returnValue;
 }
 
+int maWidgetShowOptionDialog(const char* title, const char* destructiveButtonTitle, const char* cancelButtonTitle,
+                             const void* otherButtonTitles)
+{
+    [[OptionDialogView getInstance] show:title
+                  destructiveButtonTitle:destructiveButtonTitle
+                       cancelButtonTitle:cancelButtonTitle
+                       otherButtonTitles:otherButtonTitles];
+    return MAW_RES_OK;
+}

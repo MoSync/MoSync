@@ -3756,6 +3756,11 @@ group WidgetAPI "Widget API" {
 			* One of the MAW_VIDEO_WIDGET_STATE constants.
 			*/
 			int videoViewState;
+
+			/**
+			* Send by the OptionDialog view when a button is clicked.
+			*/
+			int optionDialogButtonIndex;
 		}
 	}
 
@@ -3899,6 +3904,11 @@ group WidgetAPI "Widget API" {
 		* and/or #MAW_WEB_VIEW_HARD_HOOK.
 		*/
 		WEB_VIEW_HOOK_INVOKED = 21;
+
+		/**
+		* Send by OptionDialog view when a button is clicked.
+		*/
+		OPTION_DIALOG_BUTTON_CLICKED = 22;
 	}
 
 	} // end of WidgetEventTypes
@@ -6260,6 +6270,8 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+	int maWidgetShowOptionDialog(in MAString title,in MAString destructiveButtonTitle, in MAString cancelButtonTitle, in MAAddress otherButtonTitles);
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI
