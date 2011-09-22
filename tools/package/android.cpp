@@ -28,15 +28,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-static void writeManifest(const char* filename, const string& packageName,
-	const SETTINGS& s, const RuntimeInfo& ri);
+static void writeManifest(const char* filename, const SETTINGS& s, const RuntimeInfo& ri);
 static void writeMain(const char* filename, const SETTINGS& s, const RuntimeInfo& ri);
 static void writeStrings(const char* filename, const SETTINGS& s, const RuntimeInfo& ri);
 static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri);
-static void sign(const SETTINGS& s, const RuntimeInfo& ri, const char* unsignedApk, const char* signedApk);
+static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, string& signedApk);
+static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden);
 static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri);
 static void writePermission(ostream& stream, bool flag, const char* nativePerm);
-static string appNameToPackageName(const string& appName);
 static string packageNameToByteCodeName(const string& packageName);
 
 void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
@@ -44,6 +43,8 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	testProgram(s);
 	testName(s);
 	testVendor(s);
+	testAndroidPackage(s);
+	testAndroidVersionCode(s);
 
 	// copy program and resource files to add/assets/*.mp3
 	// build AndroidManifest.xml, res/layout/main.xml, res/values/strings.xml
@@ -81,10 +82,8 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	// Inject icon
 	injectIcons(s, ri);
 
-	const string packageName = "com.mosync.app_" + appNameToPackageName(s.name);
-
 	string manifestXml = dstDir + "/AndroidManifest.xml";
-	writeManifest(manifestXml.c_str(), packageName, s, ri);
+	writeManifest(manifestXml.c_str(), s, ri);
 	string mainXml = layout + "/main.xml";
 	writeMain(mainXml.c_str(), s, ri);
 	string stringsXml = values + "/strings.xml";
@@ -128,7 +127,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	cmd.str("");
 	cmd <<"java -jar \""<<mosyncdir()<<"/bin/android/dx.jar\""<<
 		" --dex --patch-string com/mosync/java/android"
-		" "<<packageNameToByteCodeName(packageName)<<""
+		" "<<packageNameToByteCodeName(s.androidPackage)<<""
 		" \"--output="<<classesDex<<"\" \""<<classes<<"\"";
 	sh(cmd.str().c_str());
 
@@ -142,45 +141,65 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		" -nf \""<<addlib<<"\"";
 	sh(cmd.str().c_str());
 
-	sign(s, ri);
+
+	string signedApk = dstDir + "/" + string(s.name) + ".apk";
+	sign(s, ri, unsignedApk, signedApk);
 
 	// there, that should do it.
 }
 
-static void sign(const SETTINGS& s, const RuntimeInfo& ri, const char* unsignedApk, const char* signedApk) {
-	// todo: support non-default keys
+static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, string& signedApk) {
 	string keystore = mosyncdir() + string("/etc/mosync.keystore");
 	string alias = "mosync.keystore";
 	string storepass = "default";
 	string keypass = "default";
-	if(isDirectory(keystore.c_str()) < 0) {	// does not exist
-		// create default keystore
-		cmd.str("");
-		cmd << "keytool -genkeypair -v -alias "<<alias<<
-			" -validity 3650 -keypass "<<keypass<<
-			" -keystore \""<<keystore<<"\""
-			" -storepass "<<storepass<<
-			" -dname \"cn=MoSync, ou=MoSync, o=MoSync, c=SE\"";
-		sh(cmd.str().c_str());
+	ostringstream cmd;
+	ostringstream hiddenCmd;
+
+	if (s.androidKeystore) {
+		keystore = s.androidKeystore;
+		alias = s.androidAlias;
+		storepass = s.androidStorePass;
+		keypass = s.androidKeyPass;
+	} else {
+		if (!s.silent) {
+			printf("Android: No certficate provided, falling back to default signing options");
+		}
+		if(isDirectory(keystore.c_str()) < 0) {	// does not exist
+			// create default keystore
+			ostringstream createKeystoreCmd;
+			createKeystoreCmd.str("");
+			createKeystoreCmd << "keytool -genkeypair -v -alias "<<alias<<
+				" -validity 3650 -keypass "<<keypass<<
+				" -keystore \""<<keystore<<"\""
+				" -storepass "<<storepass<<
+				" -dname \"cn=MoSync, ou=MoSync, o=MoSync, c=SE\"";
+			sh(createKeystoreCmd.str().c_str());
+		}
 	}
 
 	// run android/tools-stripped.jar, for signing
-	string signedApk = dstDir + "/" + string(s.name) + ".apk";
-	cmd.str("");
+	createSignCmd(cmd, keystore, alias, storepass, keypass, signedApk, unsignedApk, false);
+	createSignCmd(hiddenCmd, keystore, alias, storepass, keypass, signedApk, unsignedApk, true);
+
+	string cmdStr = cmd.str();
+	sh(cmdStr.c_str(), true, s.showPasswords ? cmdStr.c_str() : hiddenCmd.str().c_str());
+}
+
+static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden) {
+	storepass = hidden ? "*** HIDDEN ***" : storepass;
+	keypass = hidden ? "*** HIDDEN ***" : keypass;
+
 	cmd <<"java -jar \""<<mosyncdir()<<"/bin/android/tools-stripped.jar\""
 		" -keystore \""<<keystore<<"\" -storepass \""<<storepass<<"\""
 		" -keypass \""<<keypass<<"\" "
 		" -signedjar \""<<signedApk<<"\""
 		" \""<<unsignedApk<<"\""
 		" "<<alias;
-	sh(cmd.str().c_str());
-
 }
 
 static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 	if (s.icon) {
-		printf("Android platform: %d", ri.androidVersion);
-
 		vector<string> sizes = vector<string>();
 		vector<string> directories = vector<string>();
 
@@ -188,16 +207,17 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 		directories.push_back("/res/drawable");
 
 		if (ri.androidVersion >= 4) {
+			printf("Multiple screen support not yet impl!");
 			// For Android >= 1.6
 			//36x36 for low-density (ldpi)
 			//48x48 for medium-density (mdpi)
 			//72x72 for high-density (hdpi)
-			sizes.push_back("36x36");
+			/*sizes.push_back("36x36");
 			sizes.push_back("48x48");
 			sizes.push_back("72x72");
 			directories.push_back("/res/drawable-ldpi");
 			directories.push_back("/res/drawable-mdpi");
-			directories.push_back("/res/drawable-hdpi");
+			directories.push_back("/res/drawable-hdpi");*/
 		}
 
 		if (ri.androidVersion >= 8) {
@@ -219,15 +239,6 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 	}
 }
 
-static string appNameToPackageName(const string& appName) {
-	string pn = appName;
-	for(size_t i=0; i<pn.size(); i++) {
-		if(pn[i] == ' ')
-			pn[i] = '_';
-	}
-	return pn;
-}
-
 static string packageNameToByteCodeName(const string& packageName) {
 	string bcn = packageName;
 	for(size_t i=0; i<bcn.size(); i++) {
@@ -237,15 +248,18 @@ static string packageNameToByteCodeName(const string& packageName) {
 	return bcn;
 }
 
-static void writeManifest(const char* filename, const string& packageName,
-	const SETTINGS& s, const RuntimeInfo& ri)
+static void writeManifest(const char* filename, const SETTINGS& s, const RuntimeInfo& ri)
 {
+	string packageName = string(s.androidPackage);
+	string versionCode = string(s.androidVersionCode);
+	string version = string(s.version);
+
 	ofstream file(filename, ios::binary);
 	file <<"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 		<<"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n"
 		<<"\tpackage=\"" << packageName << "\" >\n"
-		<<"\tandroid:versionCode=\"1\"\n"
-		<<"\tandroid:versionName=\"1.0\">\n"
+		<<"\tandroid:versionCode=\"" << versionCode << "\"\n"
+		<<"\tandroid:versionName=\"" << version << "\">\n"
 		<<"\t<application\n";
 	if (s.icon) {
 		file <<"\t\tandroid:icon=\"@drawable/icon\"\n";

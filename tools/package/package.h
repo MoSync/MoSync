@@ -34,6 +34,7 @@ struct SETTINGS {
 	const char* s60v2uid;
 	bool debug;
 	bool silent;
+	bool showPasswords;
 
 	// API specific settings
 	const char* nfc;
@@ -42,6 +43,14 @@ struct SETTINGS {
 	const char* iOSCert;
 	const char* iOSSdk;
 	bool iOSgenerateOnly;
+
+	// Android specific settings
+    const char* androidPackage;
+    const char* androidVersionCode;
+    const char* androidKeystore;
+    const char* androidStorePass;
+    const char* androidAlias;
+    const char* androidKeyPass;
 };
 
 void package(const SETTINGS&);
@@ -62,7 +71,10 @@ void testCppOutputDir(const SETTINGS&);
 void testIOSCert(const SETTINGS&);
 void testIOSSdk(const SETTINGS&);
 
+void testAndroidPackage(const SETTINGS&);
+void testAndroidVersionCode(const SETTINGS&);
+
 const char* mosyncdir();
-void sh(const char* cmd, bool hideOutput = false);
+void sh(const char* cmd, bool hideOutput = false, const char* hideCmdLine = 0);
 
 #endif	//PACKAGE_H
