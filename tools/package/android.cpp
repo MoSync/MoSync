@@ -17,11 +17,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "packagers.h"
 #include "util.h"
+#include "permissions.h"
 #include "helpers/mkdir.h"
 #include "filelist/filelist.h"
 #include <fstream>
 #include <sstream>
 #include <errno.h>
+#include <vector>
 #include <stdlib.h>
 
 using namespace std;
@@ -30,8 +32,10 @@ static void writeManifest(const char* filename, const string& packageName,
 	const SETTINGS& s, const RuntimeInfo& ri);
 static void writeMain(const char* filename, const SETTINGS& s, const RuntimeInfo& ri);
 static void writeStrings(const char* filename, const SETTINGS& s, const RuntimeInfo& ri);
-
-static void writePermission(ostream& stream, const char* perm);
+static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri);
+static void sign(const SETTINGS& s, const RuntimeInfo& ri, const char* unsignedApk, const char* signedApk);
+static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri);
+static void writePermission(ostream& stream, bool flag, const char* nativePerm);
 static string appNameToPackageName(const string& appName);
 static string packageNameToByteCodeName(const string& packageName);
 
@@ -73,6 +77,9 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	_mkdir(res.c_str());
 	_mkdir(layout.c_str());
 	_mkdir(values.c_str());
+
+	// Inject icon
+	injectIcons(s, ri);
 
 	const string packageName = "com.mosync.app_" + appNameToPackageName(s.name);
 
@@ -135,6 +142,12 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		" -nf \""<<addlib<<"\"";
 	sh(cmd.str().c_str());
 
+	sign(s, ri);
+
+	// there, that should do it.
+}
+
+static void sign(const SETTINGS& s, const RuntimeInfo& ri, const char* unsignedApk, const char* signedApk) {
 	// todo: support non-default keys
 	string keystore = mosyncdir() + string("/etc/mosync.keystore");
 	string alias = "mosync.keystore";
@@ -162,7 +175,48 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 		" "<<alias;
 	sh(cmd.str().c_str());
 
-	// there, that should do it.
+}
+
+static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
+	if (s.icon) {
+		printf("Android platform: %d", ri.androidVersion);
+
+		vector<string> sizes = vector<string>();
+		vector<string> directories = vector<string>();
+
+		sizes.push_back("36x36");
+		directories.push_back("/res/drawable");
+
+		if (ri.androidVersion >= 4) {
+			// For Android >= 1.6
+			//36x36 for low-density (ldpi)
+			//48x48 for medium-density (mdpi)
+			//72x72 for high-density (hdpi)
+			sizes.push_back("36x36");
+			sizes.push_back("48x48");
+			sizes.push_back("72x72");
+			directories.push_back("/res/drawable-ldpi");
+			directories.push_back("/res/drawable-mdpi");
+			directories.push_back("/res/drawable-hdpi");
+		}
+
+		if (ri.androidVersion >= 8) {
+			//96x96 for extra high-density (xhdpi)
+			sizes.push_back("96x96");
+			directories.push_back("/res/drawable-xhdpi");
+		}
+
+		for(size_t i = 0; i < sizes.size(); i++) {
+			std::ostringstream iconInjectCmd;
+			string size = sizes.at(i);
+			string outputDir = string(s.dst) + directories.at(i);
+			_mkdir(outputDir.c_str());
+			string outputIcon = outputDir + "/icon.png";
+			iconInjectCmd << "\"" << mosyncdir() << "/bin/icon-injector\" -platform android -src \"" <<
+					s.icon << "\" -size " << size.c_str() << " -dst \"" << outputIcon.c_str() << "\"";
+				sh(iconInjectCmd.str().c_str(), s.silent);
+		}
+	}
 }
 
 static string appNameToPackageName(const string& appName) {
@@ -192,11 +246,13 @@ static void writeManifest(const char* filename, const string& packageName,
 		<<"\tpackage=\"" << packageName << "\" >\n"
 		<<"\tandroid:versionCode=\"1\"\n"
 		<<"\tandroid:versionName=\"1.0\">\n"
-		<<"\t<application\n"
-		<<"\t\tandroid:icon=\"@drawable/icon\"\n"
-		<<"\t\tandroid:label=\"@string/app_name\">\n"
+		<<"\t<application\n";
+	if (s.icon) {
+		file <<"\t\tandroid:icon=\"@drawable/icon\"\n";
+	}
+	file <<"\t\tandroid:label=\"@string/app_name\">\n"
 		<<"\t\t<activity android:name=\".MoSync\"\n"
-		// Use portrait orientation as default. 
+		// Use portrait orientation as default.
 		<<"\t\t\tandroid:screenOrientation=\"portrait\"\n"
 		<<"\t\t\tandroid:configChanges=\"keyboardHidden|orientation\"\n"
 		<<"\t\t\tandroid:label=\"@string/app_name\">\n"
@@ -225,24 +281,7 @@ static void writeManifest(const char* filename, const string& packageName,
 			;
 	}
 
-	//todo: variable permissions
-	//writePermission(file, "VIBRATE");
-	writePermission(file, "INTERNET");
-	//writePermission(file, "ACCESS_COARSE_LOCATION");
-	//writePermission(file, "ACCESS_FINE_LOCATION");
-	//writePermission(file, "BATTERY_STATS");
-	//writePermission(file, "READ_CALENDAR");
-	//writePermission(file, "WRITE_CALENDAR");
-	//writePermission(file, "READ_CONTACTS");
-	//writePermission(file, "WRITE_CONTACTS");
-	//writePermission(file, "READ_SMS");
-	//writePermission(file, "SEND_SMS");
-	//writePermission(file, "RECEIVE_SMS");
-	//writePermission(file, "CAMERA");
-	writePermission(file, "BLUETOOTH");
-	writePermission(file, "BLUETOOTH_ADMIN");
-	writePermission(file, "WRITE_EXTERNAL_STORAGE");
-	writePermission(file, "READ_PHONE_STATE");
+	writePermissions(file, s, ri);
 
 	file <<"</manifest>\n";
 	if(!file.good()) {
@@ -251,8 +290,60 @@ static void writeManifest(const char* filename, const string& packageName,
 	}
 }
 
-static void writePermission(ostream& stream, const char* perm) {
-	stream <<"\t<uses-permission android:name=\"android.permission."<<perm<<"\" />\n";
+static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri) {
+	if (!s.permissions) {
+		return;
+	}
+
+	set<string> permissionSet = set<string>();
+	parsePermissions(permissionSet, s.permissions);
+
+	writePermission(stream, isPermissionSet(permissionSet, VIBRATE), "android.permission.VIBRATE");
+	writePermission(stream, isPermissionSet(permissionSet, INTERNET), "android.permission.INTERNET");
+	writePermission(stream, isPermissionSet(permissionSet, INTERNET), "android.permission.ACCESS_NETWORK_STATE");
+	writePermission(stream, isPermissionSet(permissionSet, LOCATION_COARSE), "android.permission.ACCESS_COARSE_LOCATION");
+	writePermission(stream, isPermissionSet(permissionSet, LOCATION_FINE), "android.permission.ACCESS_FINE_LOCATION");
+	writePermission(stream, isPermissionSet(permissionSet, POWER_MANAGEMENT), "android.permission.BATTERY_STATS");
+	writePermission(stream, isPermissionSet(permissionSet, CALENDAR_READ), "android.permission.READ_CALENDAR");
+	writePermission(stream, isPermissionSet(permissionSet, CALENDAR_WRITE), "android.permission.WRITE_CALENDAR");
+	writePermission(stream, isPermissionSet(permissionSet, CONTACTS_READ), "android.permission.READ_CONTACTS");
+	writePermission(stream, isPermissionSet(permissionSet, CONTACTS_WRITE), "android.permission.WRITE_CONTACTS");
+	writePermission(stream, isPermissionSet(permissionSet, SMS_READ), "android.permission.READ_SMS");
+	writePermission(stream, isPermissionSet(permissionSet, SMS_SEND), "android.permission.SEND_SMS");
+	writePermission(stream, isPermissionSet(permissionSet, SMS_RECEIVE), "android.permission.RECEIVE_SMS");
+	writePermission(stream, isPermissionSet(permissionSet, CAMERA), "android.permission.CAMERA");
+	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "android.permission.GET_TASKS");
+	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "android.permission.SET_WALLPAPER");
+	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "android.permission.SET_WALLPAPER_HINTS");
+	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "com.android.launcher.permission.INSTALL_SHORTCUT");
+	writePermission(stream, isPermissionSet(permissionSet, HOMESCREEN), "com.android.launcher.permission.UNINSTALL_SHORTCUT");
+	writePermission(stream, isPermissionSet(permissionSet, AUTOSTART), "android.permission.RECEIVE_BOOT_COMPLETED");
+
+	// Only add this for android 1.6 and higher.
+	if (ri.androidVersion >= 4)
+	{
+		// And always enable it to be able to log in debug runtime
+		writePermission(stream, s.debug || isPermissionSet(permissionSet, FILE_STORAGE_WRITE), "android.permission.WRITE_EXTERNAL_STORAGE");
+	}
+
+	// Only add this for android 2.0 and higher.
+	if (ri.androidVersion >= 7)
+	{
+		writePermission(stream, isPermissionSet(permissionSet, BLUETOOTH), "android.permission.BLUETOOTH");
+		writePermission(stream, isPermissionSet(permissionSet, BLUETOOTH), "android.permission.BLUETOOTH_ADMIN");
+	}
+
+	//if (ri.androidVersion >= 10) {
+		writePermission(stream, isPermissionSet(permissionSet, NFC), "android.permission.NFC");
+	//}
+
+	// Always add this.
+	writePermission(stream, true, "android.permission.READ_PHONE_STATE");
+}
+static void writePermission(ostream& stream, bool flag, const char* nativePerm) {
+	if (flag) {
+		stream <<"\t<uses-permission android:name=\""<<nativePerm<<"\" />\n";
+	}
 }
 
 static void writeMain(const char* filename, const SETTINGS& s, const RuntimeInfo& ri) {

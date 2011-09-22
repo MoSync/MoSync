@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define UTIL_H
 
 #include <map>
+#include <set>
 #include <string>
 #include <ios>
 

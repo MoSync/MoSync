@@ -22,6 +22,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 
 #include "package.h"
+#include "util.h"
 
 // Maximum line length: 80 characters.
 static const char* sUsage =
@@ -115,11 +116,13 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.s60v2uid);
 		} else if(streq(argv[i], "--debug")) {
 			s.debug = true;
+		} else if(streq(argv[i], "--nfc")) { // NFC specific
+			setString(i, argc, argv, s.nfc);
 		} else if(streq(argv[i], "--ios-cert")) { // iOS specific
 			setString(i, argc, argv, s.iOSCert);
 		} else if(streq(argv[i], "--ios-sdk")) { // iOS specific
 			setString(i, argc, argv, s.iOSSdk);
-		} else if(streq(argv[i], "--project-only")) { // iOS specific
+		} else if(streq(argv[i], "--ios-project-only")) { // iOS specific
 			s.iOSgenerateOnly = true;
 		} else if(streq(argv[i], "--cpp-output")) {
 			setString(i, argc, argv, s.cppOutputDir);
@@ -150,6 +153,10 @@ void testModel(const SETTINGS& s) {
 void testDst(const SETTINGS& s) {
 	if(!s.dst) {
 		printf("Must specify target directory!\n");
+		exit(1);
+	}
+	if (!existsFile(s.dst)) {
+		printf("Destination directory must exist! (Try 'mkdir %s')\n", s.dst);
 		exit(1);
 	}
 }

@@ -35,6 +35,9 @@ struct SETTINGS {
 	bool debug;
 	bool silent;
 
+	// API specific settings
+	const char* nfc;
+
 	// iOS specific settings
 	const char* iOSCert;
 	const char* iOSSdk;
