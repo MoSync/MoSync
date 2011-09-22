@@ -58,4 +58,59 @@ namespace NativeUI
 		setProperty("isScrollable", (isScrollable ? "true" : "false") );
     }
 
+	/**
+	 * Set the left padding.
+	 *
+	 * @param value The left padding in pixels.
+	 * @return Any of the following result codes:
+	 * - #MAW_RES_OK if the property could be set.
+	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	 * - #MAW_RES_ERROR otherwise.
+	 */
+	int Layout::setPaddingLeft( const int value)
+	{
+		return this->setPropertyInt(MAW_HORIZONTAL_LAYOUT_PADDING_LEFT, value);
+	}
+
+	/**
+	 * Set the top padding.
+	 *
+	 * @param value The top padding in pixels.
+	 * @return Any of the following result codes:
+	 * - #MAW_RES_OK if the property could be set.
+	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	 * - #MAW_RES_ERROR otherwise.
+	 */
+	int Layout::setPaddingTop( const int value)
+	{
+		return this->setPropertyInt(MAW_HORIZONTAL_LAYOUT_PADDING_TOP, value);
+	}
+
+	/**
+	 * Set the right padding.
+	 *
+	 * @param value The right padding in pixels.
+	 * @return Any of the following result codes:
+	 * - #MAW_RES_OK if the property could be set.
+	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	 * - #MAW_RES_ERROR otherwise.
+	 */
+	int Layout::setPaddingRight( const int value)
+	{
+		return this->setPropertyInt(MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT, value);
+	}
+
+	/**
+	 * Set the bottom padding.
+	 *
+	 * @param value The bottom padding in pixels.
+	 * @return Any of the following result codes:
+	 * - #MAW_RES_OK if the property could be set.
+	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	 * - #MAW_RES_ERROR otherwise.
+	 */
+	int Layout::setPaddingBottom( const int value)
+	{
+		return this->setPropertyInt(MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM, value);
+	}
 } // namespace NativeUI
