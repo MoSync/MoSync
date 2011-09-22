@@ -19,8 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 #include <fstream>
 #include <sstream>
-#include <helpers/mkdir.h>
 #include <cerrno>
+#include <sys/stat.h>
 #include "util.h"
 #include "filelist/filelist.h"
 
@@ -86,6 +86,19 @@ bool existsFile(const char* filename) {
 		file.close();
 	}
 	return file.good();
+}
+
+bool existsDir(const char* dir) {
+	struct stat s;
+	int res = stat(dir, &s);
+	if(res == 0) {
+		return (s.st_mode & S_IFDIR) != 0;
+	}
+	if(errno == ENOENT)
+		return false;
+	printf("stat(%s) failed: %i(%s)\n",
+		dir, errno, strerror(errno));
+	exit(1);
 }
 
 void renameFile(const string& dst, const string& src) {

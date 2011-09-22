@@ -79,7 +79,14 @@ class MoSyncPackTask < Task
 				" -d \"#{d}\" -n \"#{@o[:name]}\" --vendor \"#{@o[:vendor]}\""+
 				" --version #{@o[:version]}"+
 				" --ios-cert \"#{@o[:iosCert]}\""+
-				" --cpp-output \"#{co}\" --project-only"+
+				" --cpp-output \"#{co}\" --ios-project-only"+
+				" --android-package \"#{@o[:androidPackage]}\""+
+				" --android-version-code \"#{@o[:androidVersionCode]}\""+
+				" --android-keystore \"#{@o[:androidKeystore]}\""+
+				" --android-storepass \"#{@o[:androidStorepass]}\""+
+				" --android-alias \"#{@o[:androidAlias]}\""+
+				" --android-keypass \"#{@o[:androidKeypass]}\""+
+				" --show-passwords"+
 				@o[:extraParameters].to_s
 		end
 	end
@@ -165,10 +172,16 @@ class PipeExeWork < PipeGccWork
 		all_objects += libs
 
 		if(defined?(PACK))
-			@PACK_MODEL = PACK if(!@PACK_MODEL)
-			@PACK_VERSION = '1.0' if(!@PACK_VERSION)
-			@PACK_IOS_CERT = 'iPhone developer' if(!@PACK_IOS_CERT)
-			@PACK_CPP_OUTPUT = @buildpath if(!@PACK_CPP_OUTPUT)
+			default(:PACK_MODEL, PACK)
+			default(:PACK_VERSION, '1.0')
+			default(:PACK_IOS_CERT, 'iPhone developer')
+			default(:PACK_CPP_OUTPUT, @buildpath)
+			default(:PACK_ANDROID_PACKAGE, "com.mosync.app_#{@NAME}")
+			default(:PACK_ANDROID_VERSION_CODE, 1)
+			default(:PACK_ANDROID_KEYSTORE, mosyncdir+'/etc/mosync.keystore')
+			default(:PACK_ANDROID_STOREPASS, 'default')
+			default(:PACK_ANDROID_ALIAS, 'mosync.keystore')
+			default(:PACK_ANDROID_KEYPASS, 'default')
 		end
 
 		super
@@ -188,6 +201,12 @@ class PipeExeWork < PipeGccWork
 				:version => @PACK_VERSION,
 				:iosCert => @PACK_IOS_CERT,
 				:cppOutput => @PACK_CPP_OUTPUT,
+				:androidPackage => @PACK_ANDROID_PACKAGE,
+				:androidVersionCode => @PACK_ANDROID_VERSION_CODE,
+				:androidKeystore => @PACK_ANDROID_KEYSTORE,
+				:androidStorepass => @PACK_ANDROID_STOREPASS,
+				:androidAlias => @PACK_ANDROID_ALIAS,
+				:androidKeypass => @PACK_ANDROID_KEYPASS,
 				:extraParameters => @PACK_PARAMETERS,
 				)
 		end

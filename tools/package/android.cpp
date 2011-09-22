@@ -233,8 +233,8 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 			_mkdir(outputDir.c_str());
 			string outputIcon = outputDir + "/icon.png";
 			iconInjectCmd << "\"" << mosyncdir() << "/bin/icon-injector\" -platform android -src \"" <<
-					s.icon << "\" -size " << size.c_str() << " -dst \"" << outputIcon.c_str() << "\"";
-				sh(iconInjectCmd.str().c_str(), s.silent);
+				s.icon << "\" -size " << size.c_str() << " -dst \"" << outputIcon.c_str() << "\"";
+			sh(iconInjectCmd.str().c_str(), s.silent);
 		}
 	}
 }

@@ -28,6 +28,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 void copyFile(const char* dst, const char* src);
 void appendFile(const char* dst, const char* src);
 bool existsFile(const char* file);
+bool existsDir(const char* dir);
 void renameFile(const std::string& dst, const std::string& src);
 
 std::string readFileToString(const char* src);
