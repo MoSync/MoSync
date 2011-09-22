@@ -14,10 +14,7 @@ work.instance_eval do
 			files.reject! {|file| @IGNORED_HEADERS.member?(File.basename(file)) }
 		end
 		files.reject! {|file| File.directory?(file) }
-		if(ignoreSourceFiles)
-			files.reject! {|file| file.getExt.to_s.beginsWith(ignoreSourceFiles)}
-		end
-			return files.collect do |file| FileTask.new(self, file) end
+		return files.collect do |file| FileTask.new(self, file) end
 	end
 
 	def copyFiles(endings = [''])
