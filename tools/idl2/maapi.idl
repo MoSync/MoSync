@@ -4315,6 +4315,12 @@ group WidgetAPI "Widget API" {
 		 * When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetToggleButtonProperties "Toggle button properties" for the properties available.
 		 */
 		TOGGLE_BUTTON = "ToggleButton";
+
+		/**
+		 * @brief A Popover is a type of screen that appears on top of the currently visible screen, in a smaller window. You can change it's size, or have it adapt to it's contents.
+		 * It is available only on iPad.
+		 */
+		POPOVER = "Popover";
 	}
 	} // end of WidgetTypes
 
@@ -6202,6 +6208,29 @@ group WidgetAPI "Widget API" {
 	 * - #MAW_RES_ERROR if something else than a screen stack was passed.
 	 */
 	int maWidgetStackScreenPop(in MAWidgetHandle stackScreen);
+
+	/**
+	 * Shows a dialog on top of the currently visible screen. Specific behavior depends
+	 * on the type of dialog.
+	 *
+	 * \param dialogHandle A handle to a #MAW_POPOVER dialog.
+	 *
+	 * \return Any of the following result codes:
+	 * - #MAW_RES_OK if the dialog could be shown.
+	 * - #MAW_RES_INVALID_HANDLE if the \a dialogHandle is not a handle to a dialog.
+	 */
+	int maWidgetDialogShow(in MAWidgetHandle dialogHandle);
+
+	/**
+	 * Hides a previously shown dialog.
+	 *
+	 * \param dialogHandle A handle to a #MAW_POPOVER dialog.
+	 *
+	 * \return Any of the following result codes:
+	 * - #MAW_RES_OK if the dialog could be hidden.
+	 * - #MAW_RES_INVALID_HANDLE if the \a dialogHandle is not a handle to a dialog.
+	 */
+	int maWidgetDialogHide(in MAWidgetHandle dialogHandle);
 
 	/**
 	* Sets a specified property on the given widget.

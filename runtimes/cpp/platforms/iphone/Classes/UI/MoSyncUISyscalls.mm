@@ -20,6 +20,7 @@
 
 #import "ScreenWidget.h"
 #import "StackScreenWidget.h"
+#import "PopoverWidget.h"
 #import "LayoutWidgets.h"
 #import "RelativeLayoutWidget.h"
 #import "ListViewItemWidget.h"
@@ -316,3 +317,40 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	return returnValue;
 }
 
+int maWidgetDialogShow(MAWidgetHandle dialogHandle) {
+	IWidget* popover = [mosyncUI getWidget:dialogHandle];
+	if(!popover) return MAW_RES_INVALID_HANDLE;
+
+	if(!([popover class] == [PopoverWidget class])) {
+		return MAW_RES_INVALID_HANDLE;
+	}
+
+	int returnValue;
+    NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
+	[NSObject performSelectorOnMainThread:@selector(show)
+							   withTarget:popover
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+    [arguments release];
+	return returnValue;
+}
+
+int maWidgetDialogHide(MAWidgetHandle dialogHandle) {
+	IWidget* popover = [mosyncUI getWidget:dialogHandle];
+	if(!popover) return MAW_RES_INVALID_HANDLE;
+
+	if(!([popover class] == [PopoverWidget class])) {
+		return MAW_RES_INVALID_HANDLE;
+	}
+
+	int returnValue;
+    NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
+	[NSObject performSelectorOnMainThread:@selector(hide)
+							   withTarget:popover
+							  withObjects:arguments
+							waitUntilDone:YES
+						   andReturnValue:&returnValue];
+    [arguments release];
+	return returnValue;
+}

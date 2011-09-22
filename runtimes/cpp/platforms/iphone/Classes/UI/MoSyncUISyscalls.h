@@ -55,4 +55,8 @@ int maWidgetStackScreenPop(MAWidgetHandle stackScreen);
 
 int maWidgetScreenShow(MAWidgetHandle screenHandle);
 
+int maWidgetDialogShow(MAWidgetHandle dialogHandle);
+
+int maWidgetDialogHide(MAWidgetHandle dialogHandle);
+
 #endif // _MOSYNC_UI_SYSCALLS_
