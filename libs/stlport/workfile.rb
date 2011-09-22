@@ -5,7 +5,7 @@ require File.expand_path('../../rules/mosync_lib.rb')
 
 work = PipeLibWork.new
 work.instance_eval do
-	def collect_files(ending)
+	def collect_files(ending, ignoreSourceFiles = 'nil')
 		default(:HEADER_DIRS, @SOURCES)
 		files = []
 		@HEADER_DIRS.each {|dir| files += Dir[dir+"/*"+ending]}
@@ -14,14 +14,17 @@ work.instance_eval do
 			files.reject! {|file| @IGNORED_HEADERS.member?(File.basename(file)) }
 		end
 		files.reject! {|file| File.directory?(file) }
-		return files.collect do |file| FileTask.new(self, file) end
+		if(ignoreSourceFiles)
+			files.reject! {|file| file.getExt.to_s.beginsWith(ignoreSourceFiles)}
+		end
+			return files.collect do |file| FileTask.new(self, file) end
 	end
 
 	def copyFiles(endings = [''])
 		dir = mosync_include + "/" + @INSTALL_INCDIR
 		# create a bunch of CopyFileTasks, then invoke them all.
 		endings.each do |ending|
-			collect_files(ending).each do |ending|
+			collect_files(ending, '.c').each do |ending|
 			task = CopyFileTask.new(self, dir + "/" + File.basename(ending.to_s), ending)
 			@prerequisites = [task] + @prerequisites
 		end
