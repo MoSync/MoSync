@@ -43,6 +43,8 @@ namespace NativeUI
 
 		/**
 		 * Sets whether the layout can be scrollable or not.
+		 * Note: make sure you call this after you add all the children to it,
+		 * otherwise it would have no effect.
 		 * @param isScrollable If true, the layout can be scrollable.
 		 */
 		virtual void setScrollable(const bool isScrollable);

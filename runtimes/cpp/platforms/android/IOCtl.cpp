@@ -487,6 +487,29 @@ namespace Base
 		return ret;
 	}
 
+	int _maWidgetShowOptionDialog(const char* title, const char* cancelText, const char* destructiveText, int bufPointer, int bufSize,
+						JNIEnv* jNIEnv, jobject jThis)
+	{
+		Base::gSyscall->VM_Yield();
+
+		jstring jstrTitle = jNIEnv->NewStringUTF(title);
+		jstring jstrCancelText = jNIEnv->NewStringUTF(cancelText);
+		jstring jstrText = jNIEnv->NewStringUTF(destructiveText);
+
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetShowOptionDialog", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTitle, jstrCancelText, jstrText, bufPointer, bufSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrTitle);
+		jNIEnv->DeleteLocalRef(jstrCancelText);
+		jNIEnv->DeleteLocalRef(jstrText);
+
+		return ret;
+	}
+
 	/**
 	 * Add a notification item.
 	 *

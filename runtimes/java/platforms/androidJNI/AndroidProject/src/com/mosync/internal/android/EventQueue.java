@@ -234,6 +234,23 @@ public class EventQueue
 		sMoSyncThread.postEvent(event);
 	}
 
+	/**
+	 * Sends the clicked option of the OptionsDialog.
+	 * It doesn't have a widget handle because it is not in the widget table.
+	 * @param index The index of the option that was clicked.
+	 */
+	public void postOptionsDialogClicked(int index)
+	{
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED;
+		event[2] = -1;
+		event[3] = index;
+
+		sMoSyncThread.postEvent(event);
+	}
+
 	public static EventQueue getDefault()
 	{
 		return DEFAULT;

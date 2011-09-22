@@ -3758,7 +3758,7 @@ group WidgetAPI "Widget API" {
 			int videoViewState;
 
 			/**
-			* Send by the OptionDialog view when a button is clicked.
+			* Send by the OptionDialog view when a #MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED event is received.
 			*/
 			int optionDialogButtonIndex;
 		}
@@ -6271,7 +6271,36 @@ group WidgetAPI "Widget API" {
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
 
-	int maWidgetShowOptionDialog(in MAString title,in MAString destructiveButtonTitle, in MAString cancelButtonTitle, in MAAddress otherButtonTitles);
+	/**
+	* Arguments for OptionsDialog syscall.
+	*/
+	struct MA_OPTION_DIALOG_ARGS {
+		// The dialog title.
+		MAString title;
+		// The dialog's Cancel button text. If left empty, the dialog is not cancelable.
+		MAString cancelButtonTitle;
+		// The destructive button text.
+		// This is an iOS specific feature: it has different color than the other options,
+		// and it indicates that it's action has destructive behaviour.
+		// On Android it is treated and it looks like a normal option.
+		MAString destructiveButtonTitle;
+		// The address to the buffer that stores the list of options.
+		MAAddress buf;
+		// The size of the buffer, in bytes.
+		int bufSize;
+	}
+
+	/**
+	* Displays a special kind of dialog that has a list of possible choices.
+	* The list of options is displayed as buttons on iOS, and as text views on Android.
+	* By clicking any option the dialog gets dismissed and a #MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED event is sent back.
+	*
+	* \param dialogArgs The arguments of the dialog.
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the dialog could be displayed.
+	* - #MAW_RES_ERR generic error.
+	*/
+	int maWidgetShowOptionDialog(in MA_OPTION_DIALOG_ARGS dialogArgs);
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI

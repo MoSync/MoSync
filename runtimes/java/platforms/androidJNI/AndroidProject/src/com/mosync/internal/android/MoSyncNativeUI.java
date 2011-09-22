@@ -31,6 +31,7 @@ import com.mosync.nativeui.core.NativeUI.RootViewReplacedListener;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.AsyncWait;
 import com.mosync.nativeui.ui.custom.MoSyncImagePicker;
+import com.mosync.nativeui.ui.custom.MoSyncOptionsDialog;
 
 /**
  * Wrapper for Native UI Syscalls to avoid cluttering
@@ -45,11 +46,6 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	MoSyncThread mMoSyncThread;
 
 	private NativeUI mNativeUI;
-
-	/**
-	 * The custom image picker handle.
-	 */
-	private MoSyncImagePicker mImagePicker = null;
 
 	/**
 	 * Constructor.
@@ -368,15 +364,37 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	 */
 	public int maImagePickerOpen()
 	{
-		if ( mImagePicker == null )
-		{
-			mImagePicker = new MoSyncImagePicker(mMoSyncThread, mNativeUI.getImageTable());
-		}
+		final MoSyncImagePicker imagePicker = new MoSyncImagePicker(mMoSyncThread, mNativeUI.getImageTable());
+		getActivity().runOnUiThread(new Runnable() {
+			public void run()
+			{
+				imagePicker.loadGallery();
+			}
+		});
+
+		return 0;
+	}
+
+	/**
+	 * Internal wrapper for maWidgetShowOptionDialog that runs
+	 * the call in the UI thread.
+	 * Create and show the dialog.
+	 * @return MAW_RES_OK, or MAW_RES_OPTION_DIALOG_ERROR if the dialog was not created.
+	 */
+	public int maWidgetShowOptionDialog(final String title, final String destructiveButtonTitle,
+			final String cancelButtonTitle,final int buffPointer, final int buffSize)
+	{
+		Log.e( "MoSync", "maWidgetShowOptionDialog" );
 
 		getActivity().runOnUiThread(new Runnable() {
 			public void run()
 			{
-				mImagePicker.loadGallery();
+				final MoSyncOptionsDialog optionsDialog = new MoSyncOptionsDialog(mMoSyncThread);
+				// Parse the options array. Add to the array the destructiveButtonTitle at the first position,
+				// The clicks on cancelButtonTitle will send MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED with the index = array length.
+				final String[] options;
+				options = optionsDialog.parseStringFromMemory(buffPointer, buffSize);
+				optionsDialog.showDialog(title, destructiveButtonTitle, cancelButtonTitle, options);
 			}
 		});
 

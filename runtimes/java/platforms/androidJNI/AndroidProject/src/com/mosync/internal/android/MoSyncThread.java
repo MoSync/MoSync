@@ -2550,6 +2550,17 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Internal wrapper for showing the options dialog.
+	 * It takes the title, the text for the destructive button, the Cancel button text, and the options for the dialog.
+	 * The destructive button is iOS specific, so here it is not treated separately.
+	 * @return
+	 */
+	int maWidgetShowOptionDialog(String title, String cancelButtonTitle, String destructiveButtonTitle, int buffPointer, int buffSize)
+	{
+		return mMoSyncNativeUI.maWidgetShowOptionDialog(title, destructiveButtonTitle, cancelButtonTitle, buffPointer, buffSize);
+	}
+
+	/**
 	 * Display a notification.
 	 * @param type
 	 * @param id

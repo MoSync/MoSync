@@ -252,6 +252,8 @@ namespace Base
 	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetStackScreenPop(int stackScreenWidget, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maWidgetShowOptionDialog(const char* title, const char* cancelText, const char* destructiveText, int bufPointer, int bufSize,
+						JNIEnv* jNIEnv, jobject jThis);
 	// Open GL API
 	/**
 	 * Internal function that initializes an Open GL

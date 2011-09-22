@@ -1758,6 +1758,21 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maWidgetShowOptionDialog:
+			{
+			SYSLOG("maIOCtl_maWidgetShowOptionDialog");
+			MA_OPTION_DIALOG_ARGS* args = (MA_OPTION_DIALOG_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_OPTION_DIALOG_ARGS));
+
+			return _maWidgetShowOptionDialog(
+				SYSCALL_THIS->GetValidatedStr(args->title),
+				SYSCALL_THIS->GetValidatedStr(args->cancelButtonTitle),
+				SYSCALL_THIS->GetValidatedStr(args->destructiveButtonTitle),
+				args->buf,
+				args->bufSize,
+				mJNIEnv,
+				mJThis);
+			}
+
 		case maIOCtl_maFileOpen:
 			SYSLOG("maIOCtl_maFileOpen");
 			return _maFileOpen(
