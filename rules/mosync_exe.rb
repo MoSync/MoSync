@@ -43,6 +43,18 @@ module PipeElimTask
 	end
 end
 
+class PipeCppTask < PipeTask
+	def initialize(work, name, objects, linkflags)
+		@targetDir = File.dirname(name)
+		super(work, name, objects, linkflags + ' -cpp', [@targetDir + '/rebuild.build.cpp', @targetDir + '/data_section.bin'])
+	end
+	def execute
+		super
+		FileUtils.mv('rebuild.build.cpp', @targetDir + '/rebuild.build.cpp')
+		FileUtils.mv('data_section.bin', @targetDir + '/data_section.bin')
+	end
+end
+
 # Packs a MoSync program for installation.
 # resource can be nil. all other parameters must be valid.
 class MoSyncPackTask < Task
@@ -61,9 +73,14 @@ class MoSyncPackTask < Task
 		end
 		p = File.expand_path(@o[:program])
 		d = File.expand_path(@o[:packpath])
+		co = File.expand_path(@o[:cppOutput])
 		FileUtils.cd(@o[:tempdir], :verbose => true) do
 			sh "#{mosyncdir}/bin/package -p \"#{p}\"#{resArg} -m \"#{@o[:model]}\""+
-				" -d \"#{d}\" -n \"#{@o[:name]}\" --vendor \"#{@o[:vendor]}\"#{@o[:extraParameters]}"
+				" -d \"#{d}\" -n \"#{@o[:name]}\" --vendor \"#{@o[:vendor]}\""+
+				" --version #{@o[:version]}"+
+				" --ios-cert \"#{@o[:iosCert]}\""+
+				" --cpp-output \"#{co}\" --project-only"+
+				@o[:extraParameters].to_s
 		end
 	end
 end
@@ -113,6 +130,12 @@ class PipeExeWork < PipeGccWork
 		@prerequisites << MxConfigTask.new(self, "#{@COMMON_BASEDIR}/build/#{CONFIG}", @EXTENSIONS) if(@EXTENSIONS)
 		super
 	end
+	def isPackingForIOS
+		return (defined?(PACK) && @PACK_MODEL.beginsWith('Apple/'))
+	end
+	def pipeTaskClass
+		return (isPackingForIOS ? PipeCppTask : super)
+	end
 	def setup3(all_objects, have_cppfiles)
 		# resource compilation
 		if(!defined?(@LSTFILES))
@@ -141,13 +164,19 @@ class PipeExeWork < PipeGccWork
 		end
 		all_objects += libs
 
+		if(defined?(PACK))
+			@PACK_MODEL = PACK if(!@PACK_MODEL)
+			@PACK_VERSION = '1.0' if(!@PACK_VERSION)
+			@PACK_IOS_CERT = 'iPhone developer' if(!@PACK_IOS_CERT)
+			@PACK_CPP_OUTPUT = @buildpath if(!@PACK_CPP_OUTPUT)
+		end
+
 		super
 
 		if(ELIM)
 			@TARGET.extend(PipeElimTask)
 		end
 		if(defined?(PACK))
-			@PACK_MODEL = PACK if(!@PACK_MODEL)
 			@prerequisites << @TARGET = MoSyncPackTask.new(self,
 				:tempdir => @BUILDDIR_BASE,
 				:buildpath => @buildpath,
@@ -156,6 +185,9 @@ class PipeExeWork < PipeGccWork
 				:resource => @resourceTask,
 				:name => @NAME,
 				:vendor => @VENDOR,
+				:version => @PACK_VERSION,
+				:iosCert => @PACK_IOS_CERT,
+				:cppOutput => @PACK_CPP_OUTPUT,
 				:extraParameters => @PACK_PARAMETERS,
 				)
 		end

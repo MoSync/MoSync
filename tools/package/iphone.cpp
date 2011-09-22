@@ -31,20 +31,21 @@ using namespace std;
 
 void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 	testDst(s);
-	testProgram(s);
 	testName(s);
 	testVendor(s);
+	testVersion(s);
 	testIOSCert(s);
-	testIOSSdk(s);
+	testCppOutputDir(s);
 
 	std::ostringstream generateCmd;
 	std::ostringstream buildCmd;
 
-	string dst = string(s.dst);
+	string dst = s.dst;
+	string src = s.cppOutputDir;
 	string templateLocation = string(ri.path) + "/template";
 	string xcodeprojOutput = dst + "/xcode-proj";
 
-	generateCmd << "\"" << mosyncdir() << "/bin/iphone-builder\" generate -project-name \"" <<
+	generateCmd << mosyncdir() << "/bin/iphone-builder generate -project-name \"" <<
 		s.name << "\" -version \"" << s.version << "\" -company-name \"" <<
 		s.vendor << "\" -cert \"" << s.iOSCert << "\" -input \"" << templateLocation <<
 		"\" -output \"" << xcodeprojOutput << "\"";
@@ -52,12 +53,12 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 	sh(generateCmd.str().c_str(), s.silent);
 
 	// Copy program files to xcode template
-	copyFile((xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), (dst + "/../rebuild.build.cpp").c_str());
-	copyFile((xcodeprojOutput + "/data_section.bin").c_str(), (dst + "/../data_section.bin").c_str());
+	copyFile((xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), (src + "/rebuild.build.cpp").c_str());
+	copyFile((xcodeprojOutput + "/data_section.bin").c_str(), (src + "/data_section.bin").c_str());
 
 	string resourceFileCopy = xcodeprojOutput + "/resources";
 	if(s.resource) {
-		copyFile(s.resource, resourceFileCopy.c_str());
+		copyFile(resourceFileCopy.c_str(), s.resource);
 	} else {
 		ofstream empty(resourceFileCopy.c_str());
 		empty.close();
@@ -72,7 +73,7 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 			std::ostringstream iconInjectCmd;
 			string size = sizes[i];
 			string outputIcon = xcodeprojOutput + "/" + filenames[i];
-			iconInjectCmd << "\"" << mosyncdir() << "/bin/icon-injector\" -lenient yes -platform iOS -src \"" <<
+			iconInjectCmd << mosyncdir() << "/bin/icon-injector -lenient yes -platform iOS -src \"" <<
 					s.icon << "\" -size " << size.c_str() << " -dst \"" << outputIcon.c_str() << "\"";
 			sh(iconInjectCmd.str().c_str(), s.silent);
 		}
@@ -80,6 +81,7 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	if (!s.iOSgenerateOnly) {
 #ifdef PLATFORM_OSX
+		testIOSSdk(s);
 		chdir(xcodeprojOutput.c_str());
 		buildCmd << "xcodebuild -project \"" << s.name << ".xcodeproj\"";
 		if (s.iOSSdk) {

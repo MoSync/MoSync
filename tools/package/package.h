@@ -23,6 +23,7 @@ struct SETTINGS {
 	const char* program;
 	const char* resource;
 	const char* icon;
+	const char* cppOutputDir;
 	const char* model;
 	const char* dst;
 	const char* name;
@@ -53,6 +54,7 @@ void testS60v2Uid(const SETTINGS&);
 
 void testIOSCert(const SETTINGS&);
 void testIOSSdk(const SETTINGS&);
+void testCppOutputDir(const SETTINGS&);
 
 const char* mosyncdir();
 void sh(const char* cmd, bool hideOutput = false);
