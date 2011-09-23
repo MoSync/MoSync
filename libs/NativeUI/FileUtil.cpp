@@ -28,10 +28,16 @@ MA 02110-1301, USA.
 #include <mastring.h>		// C string functions
 #include <mavsprintf.h>		// C string functions
 #include <mastdlib.h>		// C string conversion functions
-#include <MAFS/File.h>		// Library for working with file system bundle
 #include <MAUtil/String.h>	// C++ String class
 #include <IX_WIDGET.h>		// Widget API
-#include <conprint.h>		// Debug printing.
+
+// Since MAFS redefines types used in newlib, we need to prevent
+// them from being defined when using newlib.
+#ifdef USE_NEWLIB
+#define DONT_USE_TYPE_DEFINES
+#endif
+#include <MAFS/File.h>		// Library for working with file system bundle
+
 #include "FileUtil.h"
 
 namespace NativeUI

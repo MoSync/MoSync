@@ -23,15 +23,16 @@ MA 02110-1301, USA.
  * Class for working with messages from a WebView.
  */
 
+
+
 #include <ma.h>				// MoSync API
 #include <maheap.h>			// C memory allocation
 #include <mastring.h>		// C string functions
 #include <mavsprintf.h>		// C string functions
 #include <mastdlib.h>		// C string conversion functions
-#include <MAFS/File.h>		// Library for working with file system bundle
 #include <MAUtil/String.h>	// C++ String class
 #include <IX_WIDGET.h>		// Widget API
-#include <conprint.h>		// Debug printing.
+
 #include "WebViewMessage.h"
 
 namespace NativeUI
