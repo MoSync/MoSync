@@ -6247,7 +6247,8 @@ group WidgetAPI "Widget API" {
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
 
-	int maWidgetShowOptionDialog(in MAString title,in MAString destructiveButtonTitle, in MAString cancelButtonTitle, in MAAddress otherButtonTitles);
+	int maWidgetShowOptionsDialog(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle,
+								 in MAAddress otherButtonTitles, in int otherButtonTitlesSize);
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI
