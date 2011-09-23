@@ -1766,15 +1766,18 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maWidgetShowOptionDialog:
+		case maIOCtl_maWidgetShowOptionsDialog:
 			{
-			SYSLOG("maIOCtl_maWidgetShowOptionDialog");
-			//MA_OPTION_DIALOG_ARGS* args = (MA_OPTION_DIALOG_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_OPTION_DIALOG_ARGS));
+			SYSLOG("maIOCtl_maWidgetShowOptionsDialog");
+			const wchar* _title = GVWS(a);
+			const wchar* _text = GVWS(b);
+			const wchar* _cancel = GVWS(c);
+
 			// Read the fourth and fifth parameter from the register.
-			return _maWidgetShowOptionDialog(
-				SYSCALL_THIS->GetValidatedStr(a),
-				SYSCALL_THIS->GetValidatedStr(b),
-				SYSCALL_THIS->GetValidatedStr(c),
+			return _maWidgetShowOptionsDialog(
+				_title,
+				_text,
+				_cancel,
 				SYSCALL_THIS->GetValidatedStackValue(0),
 				SYSCALL_THIS->GetValidatedStackValue(4),
 				mJNIEnv,

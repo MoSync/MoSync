@@ -3764,8 +3764,8 @@ group WidgetAPI "Widget API" {
 
 			/**
 			* Send by the Dialog widget when a #MAW_EVENT_DIALOG_BUTTON_CLICKED event is received.
-			* If index is 0 that means that the cancel button was clicked. On iOS the cancel button is the left button on the nav bar.
-			* If index is 1 than the ok/done button was clicked. On iOS the done button is the right button on the nav bar.
+			* If index is 0 that means that the cancel button was clicked.
+			* If index is 1 than the ok/done button was clicked.
 			*/
 			int dialogButtonIndex;
 		}
@@ -6272,9 +6272,9 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets the text for the left side button.
-		* On Android this button is located at the bottom and it indicates a positive action, like Done/OK.
-		* On Android the dialog gets hidden if this button is clicked.
-		* On iOS this button is located at the top in the navigation bar.
+		* Note: it is available on Android only.
+		* This button is located at the bottom and it indicates a positive action, like Done/OK.
+		* The dialog gets hidden if this button is clicked.
 		* If the property receives am empty string then the button becomes invisible.
 		*
 		* @validvalue A null-terminated string.
@@ -6290,9 +6290,9 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets the text for the right side button.
-		* On Android this button is located at the bottom and it indicates a negative action, like Cancel.
-		* On Android the dialog gets hidden if this button is clicked.
-		* On iOS this button is located at the top in the navigation bar.
+		* Note: it is available on Android only.
+		* This button is located at the bottom and it indicates a negative action, like Cancel.
+		* The dialog gets hidden if this button is clicked.
 		* If the property receives am empty string then the button becomes invisible.
 		*
 		* @validvalue A null-terminated string.
@@ -6510,7 +6510,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_OK if the dialog could be displayed.
 	* - #MAW_RES_ERR generic error.
 	*/
-	int maWidgetShowOptionDialog(in MAString title,in MAString destructiveButtonTitle, in MAString cancelButtonTitle, in MAAddress otherButtonTitles, in int bufSize);
+	int maWidgetShowOptionsDialog(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle, in MAAddress otherButtonTitles, in int bufSize);
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI

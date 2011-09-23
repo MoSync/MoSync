@@ -487,25 +487,28 @@ namespace Base
 		return ret;
 	}
 
-	int _maWidgetShowOptionDialog(const char* title, const char* destructiveText, const char* cancelText, int bufPointer, int bufSize,
+	int _maWidgetShowOptionsDialog(const wchar* title, const wchar* destructiveText, const wchar* cancelText, int bufPointer, int bufSize,
 						JNIEnv* jNIEnv, jobject jThis)
 	{
 		Base::gSyscall->VM_Yield();
 
-		jstring jstrTitle = jNIEnv->NewStringUTF(title);
-		jstring jstrText = jNIEnv->NewStringUTF(destructiveText);
-		jstring jstrCancelText = jNIEnv->NewStringUTF(cancelText);
+		jstring jstrTitle = jNIEnv->NewString((jchar*)title, wideCharStringLength(title));
+		jstring jstrText = jNIEnv->NewString((jchar*)destructiveText, wideCharStringLength(destructiveText));
+		jstring jstrCancelText = jNIEnv->NewString((jchar*)cancelText, wideCharStringLength(cancelText));
+		//jstring jstrTitle = jNIEnv->NewStringUTF(title);
+		//jstring jstrText = jNIEnv->NewStringUTF(destructiveText);
+		//jstring jstrCancelText = jNIEnv->NewStringUTF(cancelText);
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetShowOptionDialog", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetShowOptionsDialog", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I");
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTitle, jstrText, jstrCancelText, bufPointer, bufSize);
 
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrTitle);
-		jNIEnv->DeleteLocalRef(jstrCancelText);
 		jNIEnv->DeleteLocalRef(jstrText);
+		jNIEnv->DeleteLocalRef(jstrCancelText);
 
 		return ret;
 	}

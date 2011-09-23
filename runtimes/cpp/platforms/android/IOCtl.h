@@ -256,7 +256,7 @@ namespace Base
 	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetStackScreenPop(int stackScreenWidget, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maWidgetShowOptionDialog(const char* title, const char* destructiveText, const char* cancelText, int bufPointer, int bufSize,
+	int _maWidgetShowOptionsDialog(const wchar* title, const wchar* destructiveText, const wchar* cancelText, int bufPointer, int bufSize,
 						JNIEnv* jNIEnv, jobject jThis);
 	// Open GL API
 	/**
