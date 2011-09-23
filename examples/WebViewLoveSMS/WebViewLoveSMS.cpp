@@ -295,7 +295,6 @@ private:
 };
 // End of class LoveSMSMoblet
 
-
 /**
  * Class that listens for WebView events.
  * Here we receive messages from JavScript.
