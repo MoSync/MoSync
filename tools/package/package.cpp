@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 
 #include <string>
-
+#include <cctype>
 #include "package.h"
 #include "util.h"
 
@@ -256,8 +256,56 @@ void testAndroidPackage(const SETTINGS& s) {
 		exit(1);
 	}
 
-	// TODO: check package name format.
+	// NOTE: We support only ASCII package names!
+	bool valid = true;
+	bool isStart = true;
+	bool isSeparator = false;
+	int packageCount = 1;
+	int len = strlen(s.androidPackage);
+	for (int i = 0; i < len; i++) {
+		char ch = s.androidPackage[i];
 
+		bool wasSeparator = isSeparator;
+		isSeparator = ch == '.';
+
+		// Not two . in a row
+		valid &= !isSeparator || !wasSeparator;
+
+		valid &= isStart ?
+				isJavaIdentifierStart(ch) :
+				isJavaIdentifierPart(ch) || isSeparator;
+
+		// After every ., new package part
+		isStart = isSeparator;
+		if (isSeparator) {
+			packageCount++;
+		}
+	}
+
+	// Must not end with .
+	valid &= !isSeparator;
+
+	// At least 2 package parts.
+	valid &= packageCount > 1;
+
+	if (!valid) {
+		printf("Invalid Android package name (%s). Android package names:\n", s.androidPackage);
+		printf("* Have at least two package parts\n");
+		printf("* Package parts are separated by the '.' character\n");
+		printf("* Package parts cannot be empty (ie not two consecutive '.')\n");
+		printf("* The first character of a package part is a letter, '$', or '_'\n");
+		printf("* Each of the rest of the package part's characters may also be a digit\n");
+		printf("* Only ASCII package names are supported\n");
+		exit(1);
+	}
+}
+
+bool isJavaIdentifierStart(char ch) {
+	return isalpha(ch) || ch == '_' || ch == '$';
+}
+
+bool isJavaIdentifierPart(char ch) {
+	return (isJavaIdentifierStart(ch)) || isdigit(ch);
 }
 
 void testAndroidVersionCode(const SETTINGS& s) {
