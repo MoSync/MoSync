@@ -240,6 +240,10 @@ namespace Base
 							JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetRemoveChild(int child,
 							JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetDialogShow(int dialog, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maWidgetDialogHide(int dialog, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maWidgetSetProperty(int widget, const char *property,
 							const char* value,
 							JNIEnv* jNIEnv, jobject jThis);
@@ -252,7 +256,7 @@ namespace Base
 	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetStackScreenPop(int stackScreenWidget, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maWidgetShowOptionDialog(const char* title, const char* cancelText, const char* destructiveText, int bufPointer, int bufSize,
+	int _maWidgetShowOptionDialog(const char* title, const char* destructiveText, const char* cancelText, int bufPointer, int bufSize,
 						JNIEnv* jNIEnv, jobject jThis);
 	// Open GL API
 	/**

@@ -487,20 +487,20 @@ namespace Base
 		return ret;
 	}
 
-	int _maWidgetShowOptionDialog(const char* title, const char* cancelText, const char* destructiveText, int bufPointer, int bufSize,
+	int _maWidgetShowOptionDialog(const char* title, const char* destructiveText, const char* cancelText, int bufPointer, int bufSize,
 						JNIEnv* jNIEnv, jobject jThis)
 	{
 		Base::gSyscall->VM_Yield();
 
 		jstring jstrTitle = jNIEnv->NewStringUTF(title);
-		jstring jstrCancelText = jNIEnv->NewStringUTF(cancelText);
 		jstring jstrText = jNIEnv->NewStringUTF(destructiveText);
+		jstring jstrCancelText = jNIEnv->NewStringUTF(cancelText);
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetShowOptionDialog", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I");
 		if (methodID == 0) return 0;
-		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTitle, jstrCancelText, jstrText, bufPointer, bufSize);
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTitle, jstrText, jstrCancelText, bufPointer, bufSize);
 
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrTitle);
@@ -809,6 +809,43 @@ namespace Base
 
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, child);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+	int _maWidgetDialogShow(int dialog, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetDialogShow", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, dialog);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maWidgetDialogHide(int dialog, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetDialogHide", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, dialog);
 
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);

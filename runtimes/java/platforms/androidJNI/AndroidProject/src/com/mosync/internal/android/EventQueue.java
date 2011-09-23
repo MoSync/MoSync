@@ -251,6 +251,24 @@ public class EventQueue
 		sMoSyncThread.postEvent(event);
 	}
 
+	/**
+	 * Sends the index of the clicked button from a Dialog.
+	 * The dialog can have at most two buttons, that indicate a positive or a negative action.
+	 * @param widgetHandle The dialog that sends the event.
+	 * @param index The button index.
+	 */
+	public void postDialogButtonClicked(int widgetHandle, int index)
+	{
+		int event[] = new int[4];
+
+		event[0] = EVENT_TYPE_WIDGET;
+		event[1] = IX_WIDGET.MAW_EVENT_DIALOG_BUTTON_CLICKED;
+		event[2] = widgetHandle;
+		event[3] = index;
+
+		sMoSyncThread.postEvent(event);
+	}
+
 	public static EventQueue getDefault()
 	{
 		return DEFAULT;

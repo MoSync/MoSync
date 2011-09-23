@@ -213,7 +213,57 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			return -1;
 		}
 	}
-	
+
+	/**
+	 * Internal wrapper for maWidgetDialogShow that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetDialogShow(final int dialogHandle)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable()
+			{
+				public void run()
+				{
+					int result = mNativeUI.maWidgetDialogShow(dialogHandle);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
+	/**
+	 * Internal wrapper for maWidgetDialogHide that runs
+	 * the call in the UI thread.
+	 */
+	public int maWidgetDialogHide(final int dialogHandle)
+	{
+		try
+		{
+			final AsyncWait<Integer> waiter = new AsyncWait<Integer>();
+			getActivity().runOnUiThread(new Runnable()
+			{
+				public void run()
+				{
+					int result = mNativeUI.maWidgetDialogHide(dialogHandle);
+					waiter.setResult(result);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			return -1;
+		}
+	}
+
 	/**
 	 * Internal wrapper for maWidgetScreenShow that runs
 	 * the call in the UI thread.
@@ -385,11 +435,11 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			final String cancelButtonTitle,final int buffPointer, final int buffSize)
 	{
 		Log.e( "MoSync", "maWidgetShowOptionDialog" );
+		final MoSyncOptionsDialog optionsDialog = new MoSyncOptionsDialog(mMoSyncThread);
 
 		getActivity().runOnUiThread(new Runnable() {
 			public void run()
 			{
-				final MoSyncOptionsDialog optionsDialog = new MoSyncOptionsDialog(mMoSyncThread);
 				// Parse the options array. Add to the array the destructiveButtonTitle at the first position,
 				// The clicks on cancelButtonTitle will send MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED with the index = array length.
 				final String[] options;

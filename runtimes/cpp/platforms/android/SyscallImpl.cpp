@@ -1647,6 +1647,14 @@ return 0; \
 			SYSLOG("maIOCtl_maWidgetRemoveChild");
 			return _maWidgetRemoveChild(a, mJNIEnv, mJThis);
 
+		case maIOCtl_maWidgetDialogShow:
+			SYSLOG("maIOCtl_maWidgetDialogShow");
+			return _maWidgetDialogShow(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maWidgetDialogHide:
+			SYSLOG("maIOCtl_maWidgetDialogHide");
+			return _maWidgetDialogHide(a, mJNIEnv, mJThis);
+
 		case maIOCtl_maWidgetSetProperty:
 			SYSLOG("maIOCtl_maWidgetSetProperty");
 			return _maWidgetSetProperty(a, SYSCALL_THIS->GetValidatedStr(b), SYSCALL_THIS->GetValidatedStr(c), mJNIEnv, mJThis);
@@ -1761,14 +1769,14 @@ return 0; \
 		case maIOCtl_maWidgetShowOptionDialog:
 			{
 			SYSLOG("maIOCtl_maWidgetShowOptionDialog");
-			MA_OPTION_DIALOG_ARGS* args = (MA_OPTION_DIALOG_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_OPTION_DIALOG_ARGS));
-
+			//MA_OPTION_DIALOG_ARGS* args = (MA_OPTION_DIALOG_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_OPTION_DIALOG_ARGS));
+			// Read the fourth and fifth parameter from the register.
 			return _maWidgetShowOptionDialog(
-				SYSCALL_THIS->GetValidatedStr(args->title),
-				SYSCALL_THIS->GetValidatedStr(args->cancelButtonTitle),
-				SYSCALL_THIS->GetValidatedStr(args->destructiveButtonTitle),
-				args->buf,
-				args->bufSize,
+				SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b),
+				SYSCALL_THIS->GetValidatedStr(c),
+				SYSCALL_THIS->GetValidatedStackValue(0),
+				SYSCALL_THIS->GetValidatedStackValue(4),
 				mJNIEnv,
 				mJThis);
 			}

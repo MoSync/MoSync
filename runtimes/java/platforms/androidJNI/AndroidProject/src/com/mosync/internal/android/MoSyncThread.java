@@ -2985,6 +2985,26 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Internal wrapper for maWidgetDialogShow.
+	 * @param dialogHandle
+	 */
+	public int maWidgetDialogShow(
+			final int dialogHandle)
+	{
+		return mMoSyncNativeUI.maWidgetDialogShow(dialogHandle);
+	}
+
+	/**
+	 * Internal wrapper for maWidgetDialogHide.
+	 * @param dialogHandle
+	 */
+	public int maWidgetDialogHide(
+			final int dialogHandle)
+	{
+		return mMoSyncNativeUI.maWidgetDialogHide(dialogHandle);
+	}
+
+	/**
 	 * Internal wrapper for maWidgetScreenShow that runs
 	 * the call in the UI thread.
 	 */

@@ -342,6 +342,16 @@ public class Widget
 	{
 		return false;
 	}
+
+	/**
+	 * Returns true if the given widget is in fact a dialog.
+	 *
+	 * @return
+	 */
+	public boolean isDialog()
+	{
+		return false;
+	}
 	
 	/**
 	 * Handle a key press to the back button.
