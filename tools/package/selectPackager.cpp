@@ -30,7 +30,7 @@ using namespace std;
 static bool parseRuntimeTxt(const char* filename, string& path, string& name);
 static bool parseProfileHeader(const char* filename, RuntimeInfo& pi);
 static bool parseIntProp(const string& line, const char* key, int& value);
-static bool parseStringProp(const string& line, const char* key, string& value);
+//static bool parseStringProp(const string& line, const char* key, string& value);
 
 void package(const SETTINGS& s) {
 	// Read runtime.txt and maprofile.h to find which runtime to use.
@@ -182,6 +182,7 @@ static bool parseIntProp(const string& line, const char* key, int& value) {
 	return false;
 }
 
+#if 0	// unused
 static bool parseStringProp(const string& line, const char* key, string& value) {
 	const char* val = findProp(line, key);
 	if(val) {
@@ -195,12 +196,14 @@ static bool parseStringProp(const string& line, const char* key, string& value) 
 	}
 	return false;
 }
+#endif
 
 static bool parseProfileHeader(const char* filename, RuntimeInfo& pi) {
 	ifstream file(filename);
 	setName(file, filename);
 	if(!file.good())
 		return false;
+	bool hasBbMajor = false, hasBbMinor = false;
 	pi.isBlackberry = false;
 	pi.hasLimitedResourceSize = false;
 	pi.isCldc10 = false;
@@ -210,23 +213,18 @@ static bool parseProfileHeader(const char* filename, RuntimeInfo& pi) {
 	while(file.good()) {
 		string line;
 		getline(file, line);
-		if(line.find("#define MA_PROF_SUPPORT_BLACKBERRY") == 0) {
-			pi.isBlackberry = true;
-		}
 		if(line.find("#define MA_PROF_BUG_RESOURCE_SIZE_LIMITED") == 0) {
 			pi.hasLimitedResourceSize = true;
 		}
-		parseStringProp(line, "MA_PROF_CONST_BLACKBERRY_VERSION", pi.blackberryVersion);
+		hasBbMajor |= parseIntProp(line, "MA_PROF_BLACKBERRY_VERSION", pi.blackberryVersion);
+		hasBbMinor |= parseIntProp(line, "MA_PROF_BLACKBERRY_VERSION_MINOR", pi.blackberryMinor);
 		if(line.find("#define MA_PROF_SUPPORT_CLDC_10") == 0) {
 			pi.isCldc10 = true;
 		}
 		parseIntProp(line, "MA_PROF_CONST_ICONSIZE_X", iconX);
 		parseIntProp(line, "MA_PROF_CONST_ICONSIZE_Y", iconY);
 	}
-	if(pi.isBlackberry && pi.blackberryVersion.empty()) {
-		printf("Error: missing MA_PROF_CONST_BLACKBERRY_VERSION.\n");
-		return false;
-	}
+	pi.isBlackberry = (hasBbMajor && hasBbMinor);
 	if(iconX > 0 && iconY > 0) {
 		char buf[32];
 		sprintf(buf, "%ix%i", iconX, iconY);
