@@ -6504,13 +6504,15 @@ group WidgetAPI "Widget API" {
 	* and it indicates that it's action has destructive behaviour. On Android it is treated and it looks like a normal option.
 	* \param cancelButtonTitle The dialog's Cancel button text. If left empty, the dialog is not cancelable.
 	* \param otherButtonTitles The address to the buffer that stores the list of options.
-	* \param bufSize The size of the buffer, in bytes.
+	* \param otherButtonTitlesSize The size of the buffer, in bytes.
 	*
 	* \returns Any of the following result codes:
 	* - #MAW_RES_OK if the dialog could be displayed.
 	* - #MAW_RES_ERR generic error.
 	*/
-	int maWidgetShowOptionsDialog(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle, in MAAddress otherButtonTitles, in int bufSize);
+	int maWidgetShowOptionsDialog(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle,
+								 in MAAddress otherButtonTitles, in int otherButtonTitlesSize);
+
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI

@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <FileStream.h>
 #include "Syscall.h"
 #include "PimSyscall.h"
+#include "OptionsDialogView.h"
 #include <CoreMedia/CoreMedia.h>
 
 #include <helpers/CPP_IX_GUIDO.h>
@@ -43,7 +44,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "CameraPreviewWidget.h"
 #import "CameraConfirgurator.h"
 #import "ImagePickerController.h"
-#import "OptionDialogView.h"
 #include "netImpl.h"
 
 #define NETWORKING_H
@@ -335,6 +335,7 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
+        [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
 	}
 
