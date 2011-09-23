@@ -21,6 +21,9 @@
 
 @interface PopoverWidget : ScreenWidget <UIPopoverControllerDelegate>{
 	UIPopoverController* popoverController;
+	UINavigationController* container;
+	UIPopoverArrowDirection direction;
+	BOOL dismissable;
 	int top;
 	int left;
 }
@@ -31,5 +34,7 @@
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
 - (NSString*)getPropertyWithKey: (NSString*)key;
 - (void)dealloc;
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController;
+- (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController;
 
 @end

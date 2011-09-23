@@ -29,21 +29,22 @@
 	id res = [super init];
 	top = 0;
 	left = 0;
-	popoverController = [[UIPopoverController alloc] initWithContentViewController:controller];
+	dismissable = YES;
+	direction = UIPopoverArrowDirectionAny;
+	container = [[UINavigationController alloc] initWithRootViewController:controller];
+	popoverController = [[UIPopoverController alloc] initWithContentViewController:container];
+	popoverController.delegate = self;
 	return res;
 }
 
 - (int)show {
-	[self layoutSubviews:view];
-	//[self layout];
-	//[popoverController setPopoverContentSize:view.frame.size animated:YES];
-
+	[super show];
 
 	IWidget* shownScreen = [getMoSyncUI() getCurrentlyShownScreen];
 
 	[popoverController presentPopoverFromRect:CGRectMake(left,top,0,0)
 									   inView:[shownScreen getView]
-					 permittedArrowDirections:UIPopoverArrowDirectionAny
+					 permittedArrowDirections:direction
 									 animated:YES];
 	return MAW_RES_OK;
 }
@@ -59,6 +60,29 @@
 		left = [value intValue];
 	} else if([key isEqualToString:@MAW_WIDGET_TOP]) {
 		top = [value intValue];
+	} else if([key isEqualToString:@MAW_POPOVER_ARROW_POSITION]) {
+		int msDirection = [value intValue];
+		direction = 0;
+		if (msDirection & MAW_CONSTANT_ARROW_UP) {
+			direction |= UIPopoverArrowDirectionUp;
+		}
+		if (msDirection & MAW_CONSTANT_ARROW_DOWN) {
+			direction |= UIPopoverArrowDirectionDown;
+		}
+		if (msDirection & MAW_CONSTANT_ARROW_LEFT) {
+			direction |= UIPopoverArrowDirectionLeft;
+		}
+		if (msDirection & MAW_CONSTANT_ARROW_RIGHT) {
+			direction |= UIPopoverArrowDirectionRight;
+		}
+	} else if([key isEqualToString:@MAW_POPOVER_USER_CAN_DISMISS]) {
+		if ([value isEqualToString:@"true"]){
+			dismissable = YES;
+		}
+		else {
+			dismissable = NO;
+		}
+
 	} else {
 		res = [super setPropertyWithKey:key toValue:value];
 		if ([key isEqualToString:@MAW_WIDGET_WIDTH] || [key isEqualToString:@MAW_WIDGET_HEIGHT]) {
@@ -68,7 +92,7 @@
 	return res;
 }
 
-- (NSString*)getPropertyWithKey: (NSString*)key {
+/*- (NSString*)getPropertyWithKey: (NSString*)key {
 
 	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {
 		return [[[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue] retain];
@@ -90,9 +114,15 @@
         return controller.enabled ? @"true" : @"false";
     }
 	return nil;
+}*/
+
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
+	[super sendEvent:MAW_EVENT_POPOVER_DISMISSED];
 }
 
-
+- (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController {
+	return dismissable;
+}
 
 - (void)dealloc {
 	[popoverController release];
