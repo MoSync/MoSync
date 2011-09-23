@@ -21,11 +21,15 @@
 
 @interface PopoverWidget : ScreenWidget <UIPopoverControllerDelegate>{
 	UIPopoverController* popoverController;
+	int top;
+	int left;
 }
 
 - (id)init;
 - (int)show;
 - (int)hide;
+- (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+- (NSString*)getPropertyWithKey: (NSString*)key;
 - (void)dealloc;
 
 @end

@@ -27,16 +27,21 @@
 
 - (id)init {
 	id res = [super init];
+	top = 0;
+	left = 0;
 	popoverController = [[UIPopoverController alloc] initWithContentViewController:controller];
 	return res;
 }
 
 - (int)show {
-	[self layout];
+	[self layoutSubviews:view];
+	//[self layout];
+	//[popoverController setPopoverContentSize:view.frame.size animated:YES];
+
 
 	IWidget* shownScreen = [getMoSyncUI() getCurrentlyShownScreen];
 
-	[popoverController presentPopoverFromRect:[shownScreen getView].frame
+	[popoverController presentPopoverFromRect:CGRectMake(left,top,0,0)
 									   inView:[shownScreen getView]
 					 permittedArrowDirections:UIPopoverArrowDirectionAny
 									 animated:YES];
@@ -47,6 +52,46 @@
 	[popoverController dismissPopoverAnimated:YES];
 	return MAW_RES_OK;
 }
+
+- (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
+	int res;
+	if([key isEqualToString:@MAW_WIDGET_LEFT]) {
+		left = [value intValue];
+	} else if([key isEqualToString:@MAW_WIDGET_TOP]) {
+		top = [value intValue];
+	} else {
+		res = [super setPropertyWithKey:key toValue:value];
+		if ([key isEqualToString:@MAW_WIDGET_WIDTH] || [key isEqualToString:@MAW_WIDGET_HEIGHT]) {
+			[popoverController setPopoverContentSize:view.frame.size animated:YES];
+		}
+	}
+	return res;
+}
+
+- (NSString*)getPropertyWithKey: (NSString*)key {
+
+	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {
+		return [[[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue] retain];
+	}
+	else if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
+		return [[[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue] retain];
+	}
+	else if([key isEqualToString:@MAW_WIDGET_LEFT]) {
+		return [[[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue] retain];
+	}
+	else if([key isEqualToString:@MAW_WIDGET_TOP]) {
+		return [[[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue] retain];
+	}
+	else if([key isEqualToString:@MAW_WIDGET_VISIBLE]) {
+        return view.hidden ? @"false" : @"true";
+    }
+    else if([key isEqualToString:@MAW_WIDGET_ENABLED]) {
+        UIControl* controller = (UIControl*) view; // TODO: is this correct?
+        return controller.enabled ? @"true" : @"false";
+    }
+	return nil;
+}
+
 
 
 - (void)dealloc {
