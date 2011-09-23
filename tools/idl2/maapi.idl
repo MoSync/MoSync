@@ -2914,6 +2914,8 @@ interface MAAPI {
 		*/
 		int maGetSystemProperty(in MAString key, out MAString buf range("size"), in int size);
 
+group PIMAPI "PIM API" {		
+		
 #if IX_PIM
 		constset int MA_PIM_ {
 			/**
@@ -3611,7 +3613,7 @@ interface MAAPI {
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
-
+}
 #if IX_WIDGET
 #include "native_ui_intro_doc.idl"
 group WidgetAPI "Widget API" {
