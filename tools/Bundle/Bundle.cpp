@@ -83,12 +83,17 @@ VolumeEntry *g_root;
 
 static int readFile(std::string name) {
 	FILE *file = fopen(name.c_str(), "rb");
+	if(!file) {
+		printf("failure reading '%s'\n", name.c_str());
+		exit(1);
+	}
+
 	fseek(file, 0, SEEK_END);
 	int len = ftell(file);
 	fseek(file, 0, SEEK_SET);
 	int res = fread(&fileData[fileDataPtr], 1, len, file);
 	if(res != len) {
-		printf("failure reading %s\n", name.c_str());
+		printf("failure reading '%s'\n", name.c_str());
 		exit(1);
 	}
 	fileDataPtr+=len;
@@ -151,7 +156,7 @@ static void parseDirectory(File file, VolumeEntry *vol)
 	}
 	
 	if(file.isDirectory()) {
-		printf("-\n %s\n", file.getAbsolutePath( ).c_str( ));		
+		printf("- %s\n", file.getName( ).c_str( ));
 	}
 }
 
@@ -168,7 +173,7 @@ void parse(File file, VolumeEntry *vol) {
 				vol->name[i] = to_lower( vol->name[i] );
 		}
 
-		printf("+\"%s\"\n", vol->name.c_str());
+		printf("+ %s\n", vol->name.c_str());
 
 		vol->type = 0;
 		parseDirectory(file, vol);
@@ -185,7 +190,7 @@ void parse(File file, VolumeEntry *vol) {
 				vol->name[i] = to_lower( vol->name[i] );
 		}
 
-		printf("\"%s\"\n", file.getAbsolutePath().c_str() );//vol->name.c_str());		
+		printf("++ %s\n", vol->name.c_str());
 
 		vol->type = 1;
 		vol->dataOffset = fileDataPtr;
