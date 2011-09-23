@@ -122,10 +122,11 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_SLIDER, new SliderFactory( ) );
 		addFactory( IX_WIDGET.MAW_DATE_PICKER, new DatePickerFactory( ) );
 		addFactory( IX_WIDGET.MAW_TIME_PICKER, new TimePickerFactory( ) );
-		addFactory(IX_WIDGET.MAW_VIDEO_VIEW, new VideoViewFactory( ) );
-		addFactory(IX_WIDGET.MAW_TOGGLE_BUTTON, new ToggleButtonFactory( ) );
+		addFactory( IX_WIDGET.MAW_VIDEO_VIEW, new VideoViewFactory( ) );
+		addFactory( IX_WIDGET.MAW_TOGGLE_BUTTON, new ToggleButtonFactory( ) );
+		addFactory( IX_WIDGET.MAW_DIALOG, new DialogFactory( ) );
 	}
-	
+
 	/**
 	 * Adds a mapping between a type and a factory.
 	 * 

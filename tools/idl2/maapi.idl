@@ -3758,9 +3758,16 @@ group WidgetAPI "Widget API" {
 			int videoViewState;
 
 			/**
-			* Send by the OptionDialog view when a button is clicked.
+			* Send by the OptionDialog view when a #MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED event is received.
 			*/
 			int optionDialogButtonIndex;
+
+			/**
+			* Send by the Dialog widget when a #MAW_EVENT_DIALOG_BUTTON_CLICKED event is received.
+			* If index is 0 that means that the cancel button was clicked. On iOS the cancel button is the left button on the nav bar.
+			* If index is 1 than the ok/done button was clicked. On iOS the done button is the right button on the nav bar.
+			*/
+			int dialogButtonIndex;
 		}
 	}
 
@@ -3909,6 +3916,11 @@ group WidgetAPI "Widget API" {
 		* Send by OptionDialog view when a button is clicked.
 		*/
 		OPTION_DIALOG_BUTTON_CLICKED = 22;
+
+		/**
+		* Send by a Dialog widget when one of the two buttons(left/right) are clicked.
+		*/
+		DIALOG_BUTTON_CLICKED = 23;
 	}
 
 	} // end of WidgetEventTypes
@@ -4135,6 +4147,13 @@ group WidgetAPI "Widget API" {
 		* @brief Indicates that a syscall tried to access a feature that is not supported by the current framework version.
 		*/
 		FEATURE_NOT_AVAILABLE = -11;
+
+		/**
+		* @brief Indicates that a syscall tried to add a dialog to a parent, which cannot be done because dialogs are in fact
+		* containers for other widgets.
+		*/
+		CANNOT_INSERT_DIALOG = -12;
+
 	}
 	} // end of WidgetResultCodes
 
@@ -4325,6 +4344,17 @@ group WidgetAPI "Widget API" {
 		 * When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetToggleButtonProperties "Toggle button properties" for the properties available.
 		 */
 		TOGGLE_BUTTON = "ToggleButton";
+
+		/**
+		* @brief A dialog is a sort of modal view, that can look different depending on the platform.
+		* A Dialog gets visible only after calling maWidgetDialogShow().
+		* On Android it is a modal alert dialog.
+		* On iPad it is a PopoverController, and on iPhone it is a view.
+		* When a Dialog widget is created it is empty, it has no content. Any type of widget can be added inside it via #maWidgetAddChild syscalls.
+		* To show a Dialog call #maWidgetDialogShow(dialogHandle), to dismiss it call: #maWidgetDialogHide(dialogHandle), and to delete it call #maWidgetDestroy.
+		* See \ref WidgetDialogProperties "Dialog properties" for the properties available.
+		*/
+		DIALOG = "Dialog";
 	}
 	} // end of WidgetTypes
 
@@ -5112,6 +5142,34 @@ group WidgetAPI "Widget API" {
 		ACCESSORY_TYPE = "accessoryType";
 
 		/**
+		* @brief Sets the font color of the text part.
+		*
+		* @validvalue  A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example set the font color to red.
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_COLOR, "0xFF0000");
+		* \endcode
+		*/
+		FONT_COLOR = "fontColor";
+
+		/**
+		* @brief Sets the font size in points of the text part.
+		*
+		* @validvalue A float that specifies the number of points.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_SIZE, "13.0");
+		* \endcode
+		*/
+		FONT_SIZE = "fontSize";
+
+		/**
 		* @brief Sets the typeface and style in which the text should be displayed.
 		*
 		* @validvalue A font handle received from loading fonts using
@@ -5205,6 +5263,63 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+
+		/**
+		* @brief Sets the top padding.
+		*
+		* @validvalue The top padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*  // Set a 50px top padding.
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_TOP, "50");
+		* \endcode
+		*/
+		PADDING_TOP = "paddingTop";
+
+		/**
+		* @brief Sets the left padding.
+		*
+		* @validvalue The left padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_LEFT, "50");
+		* \endcode
+		*/
+		PADDING_LEFT = "paddingLeft";
+
+		/**
+		* @brief Sets the right padding.
+		*
+		* @validvalue The right padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT, "50");
+		* \endcode
+		*/
+		PADDING_RIGHT = "paddingRight";
+
+		/**
+		* @brief Sets the bottom padding.
+		*
+		* @validvalue The bottom padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM, "50");
+		* \endcode
+		*/
+		PADDING_BOTTOM = "paddingBottom";
 	}
 	} // end of WidgetHorizontalLayoutProperties
 
@@ -5240,6 +5355,63 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+
+		/**
+		* @brief Sets the top padding.
+		*
+		* @validvalue The top padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*  // Set a 50px top padding.
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_TOP, "50");
+		* \endcode
+		*/
+		PADDING_TOP = "paddingTop";
+
+		/**
+		* @brief Sets the left padding.
+		*
+		* @validvalue The left padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_LEFT, "50");
+		* \endcode
+		*/
+		PADDING_LEFT = "paddingLeft";
+
+		/**
+		* @brief Sets the right padding.
+		*
+		* @validvalue The right padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_RIGHT, "50");
+		* \endcode
+		*/
+		PADDING_RIGHT = "paddingRight";
+
+		/**
+		* @brief Sets the bottom padding.
+		*
+		* @validvalue The bottom padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_BOTTOM, "50");
+		* \endcode
+		*/
+		PADDING_BOTTOM = "paddingBottom";
 	}
 	} // end of WidgetVerticalLayoutProperties
 
@@ -6074,14 +6246,67 @@ group WidgetAPI "Widget API" {
         *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x101010");
 		* \endcode
 		*
-		* @par Example
-		* \code
-        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B");
-		* \endcode
 		*/
 		COLOR = "color";
 	}
 	} // end of WidgetNavBarProperties
+
+	/**
+	* The available widget properties for a #MAW_DIALOG. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetDialogProperties "Dialog properties" {
+	constset MAString MAW_DIALOG_ {
+		/**
+		* @brief Sets or gets the title.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_TITLE, "MyDialog");
+		* \endcode
+		*/
+		TITLE = "title";
+
+		/**
+		* @brief Sets the text for the left side button.
+		* On Android this button is located at the bottom and it indicates a positive action, like Done/OK.
+		* On Android the dialog gets hidden if this button is clicked.
+		* On iOS this button is located at the top in the navigation bar.
+		* If the property receives am empty string then the button becomes invisible.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_LEFT_BTN_TITLE, "Done");
+		* \endcode
+		*/
+		LEFT_BUTTON_TITLE = "leftButtonTitle";
+
+		/**
+		* @brief Sets the text for the right side button.
+		* On Android this button is located at the bottom and it indicates a negative action, like Cancel.
+		* On Android the dialog gets hidden if this button is clicked.
+		* On iOS this button is located at the top in the navigation bar.
+		* If the property receives am empty string then the button becomes invisible.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_RIGHT_BTN_TITLE, "Cancel");
+		* \endcode
+		*/
+		RIGHT_BUTTON_TITLE = "rightButtonTitle";
+	}
+	} // end of WidgetDialogProperties
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;
@@ -6166,6 +6391,28 @@ group WidgetAPI "Widget API" {
 	int maWidgetRemoveChild(in MAWidgetHandle child);
 
 	/**
+	* Shows a dialog widget.
+	* \param dialog The dialog that will be shown.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be removed from the parent.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetDialogShow(in MAWidgetHandle dialog);
+
+	/**
+	* Hides/Dismisses a currently displayed dialog.
+	* \param dialog The dialog that will be hidden.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be removed from the parent.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetDialogHide(in MAWidgetHandle dialog);
+
+	/**
 	* Shows a screen. If native UI hasn't been initialized, it is also initialized
 	* and disables regular MoSync drawing.
 	*
@@ -6247,8 +6494,25 @@ group WidgetAPI "Widget API" {
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
 
+	/**
+	* Displays a special kind of dialog that has a list of possible choices.
+	* The list of options is displayed as buttons on iOS, and as text views on Android.
+	* By clicking any option the dialog gets dismissed and a #MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED event is sent back.
+	*
+	* \param title The dialog title.
+	* \param destructiveButtontext The destructive button text. This is an iOS specific feature: it has different color than the other options,
+	* and it indicates that it's action has destructive behaviour. On Android it is treated and it looks like a normal option.
+	* \param cancelButtonTitle The dialog's Cancel button text. If left empty, the dialog is not cancelable.
+	* \param otherButtonTitles The address to the buffer that stores the list of options.
+	* \param otherButtonTitlesSize The size of the buffer, in bytes.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the dialog could be displayed.
+	* - #MAW_RES_ERR generic error.
+	*/
 	int maWidgetShowOptionsDialog(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle,
 								 in MAAddress otherButtonTitles, in int otherButtonTitlesSize);
+
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI
