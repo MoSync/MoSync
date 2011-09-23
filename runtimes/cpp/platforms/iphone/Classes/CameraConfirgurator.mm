@@ -23,8 +23,6 @@
 				else {
 					result = MA_CAMERA_RES_VALUE_NOTSUPPORTED;
 				}
-
-						  
 			}
 			else if ([value isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_OFF]]) {
 					if ([device isFlashModeSupported:AVCaptureFlashModeOff]) {
@@ -81,18 +79,18 @@
 			}
 
 		}
-		else 
+		else
 		{
 			result = MA_CAMERA_RES_PROPERTY_NOTSUPPORTED;
 		}
-		
+
 		[device unlockForConfiguration];
 	}
-	else 
+	else
 	{
 		result = MA_CAMERA_RES_FAILED;
-		
-	}	
+
+	}
 	[device release];
 	[error release];
 	return result;
@@ -104,7 +102,7 @@
 	NSError *error = nil;
 	if([device lockForConfiguration:&error])
 	{
-		
+
 		if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_MODE]])
 		{
 			if (device.torchMode == AVCaptureTorchModeOn) {
@@ -123,9 +121,9 @@
 				result = [NSString stringWithUTF8String:MA_CAMERA_FLASH_OFF];
 			}
 
-			
+
 		}
-		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FOCUS_MODE]]) 
+		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FOCUS_MODE]])
 		{
 			if (device.focusMode == AVCaptureFocusModeAutoFocus) {
 				result = [NSString stringWithUTF8String:MA_CAMERA_FOCUS_AUTO];
@@ -141,11 +139,11 @@
 		{
 			result = @"0";
 		}
-		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_ZOOM_SUPPORTED]]) 
+		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_ZOOM_SUPPORTED]])
 		{
 			result = @"false";
 		}
-		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_SUPPORTED]]) 
+		else if([property isEqualToString:[NSString stringWithUTF8String:MA_CAMERA_FLASH_SUPPORTED]])
 		{
 			if (device.hasFlash) {
 				result = @"true";
@@ -154,18 +152,18 @@
 				result = @"false";
 			}
 		}
-		else 
+		else
 		{
 			result =nil;
 		}
-		
+
 		[device unlockForConfiguration];
 	}
-	else 
+	else
 	{
 		result = nil;
-		
-	}	
+
+	}
 	[device release];
 	[error release];
 	return result;

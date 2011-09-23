@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 MoSync AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -86,12 +86,12 @@ typedef enum VerticalAlignment {
 
 @implementation LabelWidget
 
-- (id)init {	
+- (id)init {
 	UILabel* label = [[UILabelWithVerticalAlignment alloc] initWithFrame:CGRectMake(0, 0, 200, 60)];
 	label.opaque = NO;
 	view = label;
 	//label.numberOfLines = 0;
-	id ret = [super init];	
+	id ret = [super init];
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
     isWidthWrapContent = true;
 	return ret;
@@ -101,22 +101,22 @@ typedef enum VerticalAlignment {
 	if([key isEqualToString:@MAW_LABEL_TEXT]) {
 		UILabel* label = (UILabel*) view;
 		[label setText: value];
-        if (isWidthWrapContent)
-        {
-            CGSize textSize = [label.text sizeWithFont:label.font];
-            CGRect rect = label.frame;
-            rect.size.width = textSize.width;
-            label.frame = rect;
-        }
+		if (isWidthWrapContent)
+		{
+			CGSize textSize = [label.text sizeWithFont:label.font];
+			CGRect rect = label.frame;
+			rect.size.width = textSize.width;
+			label.frame = rect;
+		}
 		[self layout];
 		//[label sizeToFit];
-	} 
+	}
 	else if([key isEqualToString:@MAW_LABEL_MAX_NUMBER_OF_LINES]) {
         TEST_FOR_NEGATIVE_VALUE([value intValue]);
 		UILabel* label = (UILabel*) view;
 		label.numberOfLines = [value intValue];
 		[self layout];
-	} 
+	}
 	else if([key isEqualToString:@MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT]) {
 		UILabel* label = (UILabel*) view;
 		if([value isEqualToString:@"left"]) {
@@ -152,7 +152,7 @@ typedef enum VerticalAlignment {
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		label.textColor = color;
-	}	
+	}
 	else if([key isEqualToString:@MAW_LABEL_FONT_SIZE]) {
 		UILabel* label = (UILabel*) view;
 		float fontSize = [value floatValue];
@@ -191,17 +191,17 @@ typedef enum VerticalAlignment {
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}
-	return MAW_RES_OK;	
+	return MAW_RES_OK;
 }
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	if([key isEqualToString:@MAW_LABEL_TEXT]) {
-		UILabel* label = (UILabel*) view;		
+		UILabel* label = (UILabel*) view;
 		return [label.text retain];
 	} else if([key isEqualToString:@MAW_LABEL_MAX_NUMBER_OF_LINES]) {
 		UILabel* label = (UILabel*) view;
         return [[[NSNumber numberWithInt: label.numberOfLines] stringValue] retain];
-	} else {	
+	} else {
 		return [super getPropertyWithKey:key];
 	}
 }

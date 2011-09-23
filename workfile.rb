@@ -13,18 +13,20 @@ PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist"]
 
 if(HOST == :win32) then
 	INTLIB_PLATFORM = "windows"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv",
-		"tools/rcomp", "tools/package", "tools/uidcrc", "tools/MoSyncUpdater"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4",
+		"tools/MoSyncUpdater"]
 	ADDITIONAL_INTLIBS = ["intlibs/dgles-0.5"]
 elsif(HOST == :darwin)
 	INTLIB_PLATFORM = "linux"
 	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix",
-		"tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
+		]
 	ADDITIONAL_INTLIBS = []
 else
 	INTLIB_PLATFORM = HOST
 	# todo: add lcab
-	PLATFORM_TOOLS = []
+	PLATFORM_TOOLS = [
+		'tools/MoCab',
+	]
 	ADDITIONAL_INTLIBS = []
 end
 
@@ -48,6 +50,7 @@ TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/B
 	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack",
 	"tools/mx-invoker",
 	"tools/mx-config",
+	"tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc",
 	]
 
 MAIN_DIRS = BASE_DIRS + TOOL_DIRS + PIPE_DIRS

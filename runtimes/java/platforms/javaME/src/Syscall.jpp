@@ -2350,8 +2350,13 @@ public
 			disposeStreamingVideo();
 
 			DEBUG_MEDIA_STREAM("createPlayer Streaming Video...\n");
-
+#ifdef BB_RIM_NETWORKING
+			InputConnection videoConnection =
+				(InputConnection)BlackBerryConnectionFactory.openConnection(url);
+			mStreamPlayer = Manager.createPlayer(videoConnection.openInputStream(), "video/mp4");
+#else
 			mStreamPlayer = Manager.createPlayer(url);
+#endif
 			if(mStreamPlayer==null) { DEBUG_ALWAYS("Couldn't create Player."); BIG_PHAT_ERROR; }
 
 			DEBUG_MEDIA_STREAM("realize...\n");
@@ -2677,6 +2682,8 @@ public
 		int constraints) throws Exception
 	{
 		MYASSERT(mTextBox == null);
+		if((constraints & TextField.CONSTRAINT_MASK) == MA_TB_TYPE_SINGLE_LINE)
+			return MA_TB_RES_TYPE_UNAVAILABLE;
 		mTextBoxBuffer = outText;
 		mTextBoxMaxSize = maxSize;
 		mTextBox = new TextBox(title, inText, maxSize-1, constraints);

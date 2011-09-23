@@ -1,14 +1,14 @@
 # Copyright (C) 2010 MoSync AB
-# 
+#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
 # the Free Software Foundation.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; see the file COPYING.  If not, write to the Free
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -86,7 +86,7 @@ debug = (debugFlag == nil) ? "" : "D"
 outdir = ".."
 if configPath != nil
 	outdir = configPath
-	
+
 	# change name on the current config_platform.h to config_platform.h.saved
 
 	conf_file = File.join(mosyncppsource, "config_platform.h")
@@ -97,7 +97,7 @@ if configPath != nil
 
 	runtime_config = File.join(configPath, "config#{debug}.h")
 	puts "using runtime #{runtime_config}"
-	
+
 	# copy the config.h file to it's correct position and change it's name to config_platform.h
 	FileUtils.copy_file( runtime_config, conf_file)
 end
@@ -114,7 +114,7 @@ if ENV['OS'] == "Windows_NT"
 		cygPath = ""
 	elsif(nil != ENV["CYGPATH"])
 		cygPath = ENV["CYGPATH"]
-	elsif(sh("bash.exe pwd"))
+	elsif(system("bash.exe pwd"))
 		cygPath = ""
 	else
 		msg = "Can not find the cygwin installation.\n" +
@@ -143,7 +143,7 @@ cd ".."
 puts pwd
 
 # Create temporary directory used for output.
-# First make sure delete it if it exists to make 
+# First make sure delete it if it exists to make
 # sure we get an empty directory.
 class_dir = "temp/"
 if File.exist? class_dir
@@ -163,7 +163,7 @@ sh( "#{File.join(androidSDKPath, "tools/aapt")} package -f -v " +
 	"-I #{File.join(androidSDKPath, "android.jar")} " +
 	"-S #{File.join(package_root, "res")} " +
 	"-m -J #{File.join(package_root, "gen")}");
-	
+
 puts "Compiling Java Source Files\n\n"
 
 packages = ["src/com/mosync/java/android/*.java",

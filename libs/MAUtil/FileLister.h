@@ -24,6 +24,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define FILELISTER_H
 
 #include <MAUtil/String.h>
+#include <maapi.h>
 
 /**
 * \brief Lists the contents of a device's file system.
@@ -40,7 +41,7 @@ public:
 	* Closes the active list, if any.
 	* Returns \< 0 on error.
 	*/
-	int start(const char* dir, const char* filter = "*");
+	int start(const char* dir, const char* filter = "*", int sorting = MA_FL_SORT_NONE);
 
 	/**
 	* Writes the name of the next file in the list to \a dst.

@@ -1,6 +1,7 @@
 package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
+import com.mosync.internal.android.BigPhatError;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -172,8 +173,6 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_IC
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_JABBER;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_CONTACT_IM_PROTOCOL_NETMEETING;
 
-
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_ATTRIBUTES;
 
 public class PIMField
 {
@@ -676,7 +675,7 @@ public class PIMField
 
 	int getAttribute(int index)
 	{
-		int ret = MA_PIM_ERR_NO_ATTRIBUTES;
+		int ret = 0;
 		String[] names = mStrNames;
 		String[] infos = mStrInfos.get(index);
 
@@ -760,7 +759,7 @@ public class PIMField
 				attribute &= 0xFFFF;
 				attrNativeValue = getAddressNativeAttribute(attribute);
 				if (attrNativeValue > 0)
-					setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
+				setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_FORMATTED_ADDR:
 				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
@@ -770,7 +769,7 @@ public class PIMField
 				attribute &= 0xFFFF;
 				attrNativeValue = getFormattedAddressNativeAttribute(attribute);
 				if (attrNativeValue > 0)
-					setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
+				setFieldValue( names, infos, StructuredPostal.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_EMAIL:
 				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
@@ -780,7 +779,7 @@ public class PIMField
 				attribute &= 0xFFFF;
 				attrNativeValue = getEmailNativeAttribute(attribute);
 				if (attrNativeValue > 0)
-					setFieldValue( names, infos, Email.TYPE, Integer.toString(attrNativeValue) );
+				setFieldValue( names, infos, Email.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG:
 				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
@@ -791,7 +790,7 @@ public class PIMField
 				DebugPrint("Organization attribute = " + attribute);
 				attrNativeValue = getOrganizationNativeAttribute(attribute);
 				if (attrNativeValue > 0)
-					setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
+				setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_TITLE:
 				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
@@ -801,7 +800,7 @@ public class PIMField
 				attribute &= 0xFFFF;
 				attrNativeValue = getTitleNativeAttribute(attribute);
 				if (attrNativeValue > 0)
-					setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
+				setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_ORG_INFO:
 				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
@@ -811,7 +810,7 @@ public class PIMField
 				attribute &= 0xFFFF;
 				attrNativeValue = getOrganizationInfoNativeAttribute(attribute);
 				if (attrNativeValue > 0)
-					setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
+				setFieldValue( names, infos, Organization.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_TEL:
 				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
@@ -821,7 +820,7 @@ public class PIMField
 				attribute &= 0xFFFF;
 				attrNativeValue = getPhoneNativeAttribute(attribute);
 				if (attrNativeValue > 0)
-					setFieldValue( names, infos, Phone.TYPE, Integer.toString(attrNativeValue) );
+				setFieldValue( names, infos, Phone.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_URL:
 				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
@@ -831,7 +830,7 @@ public class PIMField
 				attribute &= 0xFFFF;
 				attrNativeValue = getWebsiteNativeAttribute(attribute);
 				if (attrNativeValue > 0)
-					setFieldValue( names, infos, Website.TYPE, Integer.toString(attrNativeValue) );
+				setFieldValue( names, infos, Website.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_IM:
 				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
@@ -841,7 +840,7 @@ public class PIMField
 				attribute &= 0xFFFF;
 				attrNativeValue = getImNativeAttribute(attribute);
 				if (attrNativeValue > 0)
-					setFieldValue( names, infos, Im.TYPE, Integer.toString(attrNativeValue) );
+				setFieldValue( names, infos, Im.TYPE, Integer.toString(attrNativeValue) );
 				break;
 			case MA_PIM_FIELD_CONTACT_RELATION:
 				if ( (attribute | MA_PIM_ATTRPREFERRED) != 0 )
@@ -851,7 +850,7 @@ public class PIMField
 				attribute &= 0xFFFF;
 				attrNativeValue = getRelationNativeAttribute(attribute);
 				if (attrNativeValue > 0)
-					setFieldValue( names, infos, Relation.TYPE, Integer.toString(attrNativeValue) );
+				setFieldValue( names, infos, Relation.TYPE, Integer.toString(attrNativeValue) );
 				break;
 		}
 		return attrNativeValue;
@@ -1173,13 +1172,13 @@ public class PIMField
 	}
 
 	int setData(int index, char[] buffer)
-	{
+		{
 		setState(index, State.UPDATED);
 		String[] names = mStrNames;
 		String[] infos = mStrInfos.get(index);
 
 		switch (getDataType(getMoSyncType()))
-		{
+			{
 			case MA_PIM_TYPE_INT:
 			{
 				infos[1] = Integer.toString(readInt(buffer, 0));
@@ -1208,7 +1207,7 @@ public class PIMField
 				if (getMoSyncType() == MA_PIM_FIELD_CONTACT_PHOTO_URL)
 				{
 					infos[1] = loadPhoto(infos[1]);
-				}
+		}
 				DebugPrint("INFOS = " + infos[1]);
 				break;
 			}
@@ -1229,12 +1228,12 @@ public class PIMField
 	{
 		String[] names = mStrNames;
 		if (names == null)
-			return -1;
+			throw new BigPhatError("PIMField.addData");
 		String[] infos = new String[names.length];
 		mStrInfos.add(infos);
 		int index = mStrInfos.size() - 1;
 		setState(index, State.ADDED);
-		return setData(index, buffer);
+		return index;
 	}
 
 	String getId(int index)
@@ -1289,7 +1288,7 @@ public class PIMField
 				if ( getFieldIntValue(names, infos, Relation.TYPE) != Relation.TYPE_CUSTOM )
 					return false;
 				break;
-		}
+}
 		return true;
 	}
 

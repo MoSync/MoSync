@@ -1220,7 +1220,7 @@ namespace Base
 	{
 		return _maOpenGLCloseFullscreen(mJNIEnv, mJThis);
 	}
-	
+
 // the wrapper generator can't yet handle a few set of functions
 // in the opengles 2.0 api (so we manually override them).
 // remove implementations for broken bindings..
@@ -1234,7 +1234,7 @@ void* _pointer = GVMR(b, MAAddress);\
 wrap_glGetPointerv(_pname, _pointer); \
 return 0; \
 }
-    
+
 #undef maIOCtl_glGetVertexAttribPointerv_case
 #define maIOCtl_glGetVertexAttribPointerv_case(func) \
 case maIOCtl_glGetVertexAttribPointerv: \
@@ -1245,8 +1245,8 @@ void* _pointer = GVMR(c, MAAddress);\
 wrap_glGetVertexAttribPointerv(_index, _pname, _pointer); \
 return 0; \
 }
-    
-    
+
+
 #undef maIOCtl_glShaderSource_case
 #define maIOCtl_glShaderSource_case(func) \
 case maIOCtl_glShaderSource: \
@@ -1262,39 +1262,39 @@ return 0; \
     void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
         int* stringsArray = (int*)strings;
         const GLchar** strCopies = new const GLchar*[count];
-        
+
         for(int i = 0; i < count; i++) {
             void* src = GVMR(stringsArray[i], MAAddress);
             strCopies[i] = (GLchar*)src;
         }
 
         glShaderSource(shader, count, strCopies, length);
-        delete strCopies;     
-    }	
+        delete strCopies;
+    }
 
     void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
         GLvoid* outPointer;
         glGetVertexAttribPointerv(index, pname, &outPointer);
-        
+
         if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
             return;
-        
+
         *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
     }
-    
+
     void wrap_glGetPointerv(GLenum pname, void* pointer) {
         GLvoid* outPointer;
         glGetPointerv(pname, &outPointer);
-        
+
         if(pname != GL_COLOR_ARRAY_POINTER &&
            pname != GL_NORMAL_ARRAY_POINTER &&
            pname != GL_POINT_SIZE_ARRAY_POINTER_OES &&
            pname != GL_TEXTURE_COORD_ARRAY_POINTER &&
            pname != GL_VERTEX_ARRAY_POINTER)
             return;
-        
-        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);        
-    }   
+
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
+    }
 
 	/**
 	 * Utility function for displaying and catching pending
@@ -1949,7 +1949,7 @@ return 0; \
 				a,
 				mJNIEnv,
 				mJThis);
-				
+
 		case maIOCtl_maCameraStart:
 			return _maCameraStart(
 				mJNIEnv,
@@ -1984,7 +1984,7 @@ return 0; \
 				a,
 				mJNIEnv,
 				mJThis);
-				
+
 		case maIOCtl_maCameraRecord:
 			return _maCameraRecord(
 				a,
@@ -1995,7 +1995,7 @@ return 0; \
 			return _maCameraFormatNumber(
 				mJNIEnv,
 				mJThis);
-				
+
 		case maIOCtl_maCameraFormat:
 		{
 
@@ -2008,7 +2008,7 @@ return 0; \
 			// Size of buffer to store device name.
 			int height = sizeInfo->height;
 
-			
+
 			// Returns 1 for success, 0 for no more devices.
 			return _maCameraFormat(
 				a,
@@ -2026,11 +2026,11 @@ return 0; \
 			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
 			int _valueBufferSize = c;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
-				b, 
+				b,
 				_valueBufferSize * sizeof(char));
-			
+
 			return _maCameraGetProperty((int)gCore->mem_ds, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
-		}		
+		}
 
 		case maIOCtl_maSensorStart:
 			SYSLOG("maIOCtl_maSensorStart");

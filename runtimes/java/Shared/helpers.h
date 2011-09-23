@@ -120,6 +120,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define GET_RESOURCE(name) getClass().getResourceAsStream(name)
 #endif
 
+#ifdef MA_PROF_BLACKBERRY_VERSION
+#define BB_RIM_API
+
+#if (MA_PROF_BLACKBERRY_VERSION >= 5) || (MA_PROF_BLACKBERRY_VERSION_MINOR >= 7)
+#define BB_HAS_KEY_MENU
+#endif	// 4.7
+
+// TODO: Is this needed on BB 6?
+#if MA_PROF_BLACKBERRY_VERSION >= 5
+#define BB_RIM_NETWORKING
+#endif
+
+#endif
+
 #define FSI final static int
 
 #define IN_FILE_ON_LINE DEBUG_ALWAYS(IN_FILE_ON_LINE_STRING)
