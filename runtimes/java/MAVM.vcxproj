@@ -50,7 +50,7 @@ work.bat</NMakeBuildCommandLine>
     <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</OutDir>
     <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
     <NMakeBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">cd platforms\javaME\
-work.bat</NMakeBuildCommandLine>
+work.bat pack</NMakeBuildCommandLine>
     <NMakeReBuildCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <NMakeCleanCommandLine Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
     <NMakeOutput Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" />
