@@ -225,16 +225,20 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, HLayoutView)
 			[alv setHorizontalAlignment:UIControlContentHorizontalAlignmentCenter];
 		else if([value isEqualToString:@"right"])
 			[alv setHorizontalAlignment:UIControlContentHorizontalAlignmentRight];		
-	} else if([key isEqualToString:@"leftMargin"]) {
+	} else if([key isEqualToString:@MAW_HORIZONTAL_LAYOUT_PADDING_LEFT]) {
+        // Is applied to MAW_VERTICAL_LAYOUT_PADDING_LEFT too.
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;
 		[alv setLeftMargin:[value intValue]];
-	} else if([key isEqualToString:@"rightMargin"]) {
+	} else if([key isEqualToString:@MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT]) {
+        // Is applied to MAW_VERTICAL_LAYOUT_PADDING_RIGHT too.
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;
 		[alv setRightMargin:[value intValue]];
-	} else if([key isEqualToString:@"topMargin"]) {
+	} else if([key isEqualToString:@MAW_HORIZONTAL_LAYOUT_PADDING_TOP]) {
+        // Is applied to MAW_VERTICAL_LAYOUT_PADDING_TOP too.
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;
 		[alv setTopMargin:[value intValue]];
-	} else if([key isEqualToString:@"bottomMargin"]) {
+	} else if([key isEqualToString:@MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM]) {
+        // Is applied to MAW_VERTICAL_LAYOUT_PADDING_BOTTOM too.
 		AbstractLayoutView* alv = (AbstractLayoutView*)view;
 		[alv setBottomMargin:[value intValue]];
 	} else if([key isEqualToString:@"spacing"]) {
