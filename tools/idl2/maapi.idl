@@ -6747,9 +6747,12 @@ group CameraFunctions "Camera Functions" {
 		 * @return \< 0 on error.
 		 */
 		int maScreenStateEventsOff();
-
-#include "opengl_non_generated.idl"
-#include "opengl_generated.idl"
+		
+group OpenGLESAPI "OpenGLES API" 
+{	
+	#include "opengl_non_generated.idl"
+	#include "opengl_generated.idl"
+}
 
 		/**
 		 * Logs information about the state of all current resources.
@@ -6771,6 +6774,8 @@ group CameraFunctions "Camera Functions" {
 		*/
 		void maImagePickerOpen();
 
+group SensorAPI "Sensor API" {			
+		
 		constset int SENSOR_TYPE_ {
 			// A constant describing an accelerometer sensor type.
 			ACCELEROMETER = 1;
@@ -6855,7 +6860,7 @@ group CameraFunctions "Camera Functions" {
 		*/
 		int maSensorStop(in int sensor);
 	}
-
+}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}
