@@ -20,12 +20,12 @@ MA 02110-1301, USA.
 * This applications demonstrates basic usage of the Moblet class.
 * A Moblet is a class that wraps the standard procedural MoSync
 * event system in a more OOP-style interface. Instead of implementing
-* an event loop to recieve events, you implement a virtual function for 
-* each type of MoSync event. These include key events and close events.  
+* an event loop to recieve events, you implement a virtual function for
+* each type of MoSync event. These include key events and close events.
 *
 * The static function Moblet::run() implements the actual event loop. In
 * addition to providing a more object-oriented approach, using Moblets
-* makes it easier to implement well-behaved MoSync programs. For instance, 
+* makes it easier to implement well-behaved MoSync programs. For instance,
 * it will respond to close events by default.
 */
 
@@ -39,16 +39,16 @@ public:
 
 	/**
 	 * Your Moblet's constructor is a good place to do initialization and
-	 * setting up the member variables in your class. In this case, we're 
+	 * setting up the member variables in your class. In this case, we're
 	 * initializing a counter that keeps track of how many times the user
 	 * has released a key. We also print a message, in order to illustrate
-	 * when the constructor gets called. 
+	 * when the constructor gets called.
 	**/
 
 	MyMoblet() : numKeyReleases(0) {
 		printf("Hello moblet!\n");
 	}
-	
+
 	/**
 	 * The Moblet class inherits KeyListener, and automatically registers itself
 	 * to recieve key events. Therefore, it must implement the functions keyPressEvent
@@ -61,16 +61,16 @@ public:
 	void keyPressEvent(int keyCode, int nativeCode) {
 		switch(keyCode) {
 			case MAK_LEFT:
-				printf("Pressed left");
+				printf("Pressed left (%i)", nativeCode);
 				break;
 			case MAK_RIGHT:
-				printf("Pressed right");
+				printf("Pressed right (%i)", nativeCode);
 				break;
 			case MAK_UP:
-				printf("Pressed up");
+				printf("Pressed up (%i)", nativeCode);
 				break;
 			case MAK_DOWN:
-				printf("Pressed down");
+				printf("Pressed down (%i)", nativeCode);
 				break;
 			case MAK_SOFTRIGHT:
 			case MAK_0:
