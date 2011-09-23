@@ -477,6 +477,25 @@ public class MoSyncThread extends Thread
 			+ " height:" + mBitmap.getHeight());
 	}
 
+	/**
+	 * @brief Returns a slice of the memory ByteBuffer
+	 *
+	 * All calls which are accessing memory shall use this function!
+	 * The use of .position in any other call is strictly forbidden!
+	 *
+	 * @param addr	The address to the beginning of memory block
+	 * @param len	The size of the block, -1 means that the whole
+	 * 				block should be used.
+	 * @return
+	 */
+	public synchronized ByteBuffer getMemorySlice(int addr, int len)
+	{
+		mMemDataSection.position(addr);
+		ByteBuffer slice = mMemDataSection.slice();
+		if(-1 != len)
+			slice.limit(len);
+		return slice;
+	}
 
 	/**
 	 * Allocate memory for the program data section.
@@ -788,7 +807,7 @@ public class MoSyncThread extends Thread
 		}
 		catch(InterruptedException ie)
 		{
-			Log.i("MoSync", "Couldn't create raw image.");
+			Log.i("MoSync", "Couldn't create empty bitmap.");
 		}
 		return null;
 	}
@@ -821,7 +840,7 @@ public class MoSyncThread extends Thread
 		}
 		catch(InterruptedException ie)
 		{
-			Log.i("MoSync", "Couldn't read image data.");
+			Log.i("MoSync", "Couldn't create bitmap from pixel data.");
 			return null;
 		}
 	}
@@ -1047,9 +1066,10 @@ public class MoSyncThread extends Thread
 			maPanic(1,"maFillTriangleStrip takes more than 3 vertices");
 		}
 
-		mMemDataSection.position(address);
+		//mMemDataSection.position(address);
+		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = mMemDataSection.asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1108,9 +1128,10 @@ public class MoSyncThread extends Thread
 			maPanic(1, "maFillTriangleFan takes more than 3 vertices");
 		}
 
-		mMemDataSection.position(address);
+		//mMemDataSection.position(address);
+		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = mMemDataSection.asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1336,8 +1357,11 @@ public class MoSyncThread extends Thread
 			{
 				if (mUsingFrameBuffer)
 				{
-					mMemDataSection.position(mFrameBufferAddress);
-					mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
+					//mMemDataSection.position(mFrameBufferAddress);
+					//mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
+
+					ByteBuffer framebufferSlice = getMemorySlice(mFrameBufferAddress, -1);
+					mFrameBufferBitmap.copyPixelsFromBuffer(framebufferSlice);
 
 					// Clear the screen.. in this case draw the canvas black
 					lockedCanvas.drawRGB(0,0,0);
@@ -1419,9 +1443,10 @@ public class MoSyncThread extends Thread
 
 		int pixels[] = new int[srcRectWidth];
 
-		mMemDataSection.position(mem);
+		//mMemDataSection.position(mem);
+		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = mMemDataSection.asIntBuffer();
+		IntBuffer ib = getMemorySlice(mem, -1).asIntBuffer();
 
 		for (int y = 0; y < srcRectHeight; y++)
 		{
@@ -1658,9 +1683,10 @@ public class MoSyncThread extends Thread
 
 		temporaryCanvas.drawColor(0xff000000, Mode.DST_ATOP);
 
-		mMemDataSection.position(dst);
+		//mMemDataSection.position(dst);
+		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = mMemDataSection.asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
 
 		try {
 
@@ -2402,10 +2428,15 @@ public class MoSyncThread extends Thread
 
 		// Write this property to memory.
 		byte[] ba = property.getBytes();
-		mMemDataSection.position(buf);
-		mMemDataSection.put(ba);
+
+		//mMemDataSection.position(buf);
+		//mMemDataSection.put(ba);
 		// Add null termination character.
-		mMemDataSection.put((byte)0);
+		//mMemDataSection.put((byte)0);
+
+		ByteBuffer slicedBuffer = getMemorySlice(buf, -1);
+		slicedBuffer.put(ba);
+		slicedBuffer.put((byte)0);
 
 		return property.length() + 1;
 	}
