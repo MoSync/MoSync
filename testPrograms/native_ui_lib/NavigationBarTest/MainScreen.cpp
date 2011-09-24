@@ -30,6 +30,8 @@
 
 #include "MainScreen.h"
 
+#include "MAHeaders.h"
+
 /**
  * Constructor.
  */
@@ -63,7 +65,10 @@ void MainScreen::createMainLayout() {
 	mNavigationBar = new NavigationBar();
 	mNavigationBar->setBackButtonTitle("Back");
 	mNavigationBar->setTitle("My title");
-	mNavigationBar->fillSpaceHorizontally();
+	mNavigationBar->setTitleFontColor(0x104E8B);
+//	mNavigationBar->setTitleFontSize(20);
+//	mNavigationBar->setIcon(RES_IMAGE);
+//	mNavigationBar->fillSpaceHorizontally();
 	mMainLayout->addChild(mNavigationBar);
 }
 

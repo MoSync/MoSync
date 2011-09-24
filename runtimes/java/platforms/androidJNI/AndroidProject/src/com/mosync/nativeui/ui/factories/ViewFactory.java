@@ -125,6 +125,7 @@ public class ViewFactory
 		addFactory( IX_WIDGET.MAW_VIDEO_VIEW, new VideoViewFactory( ) );
 		addFactory( IX_WIDGET.MAW_TOGGLE_BUTTON, new ToggleButtonFactory( ) );
 		addFactory( IX_WIDGET.MAW_DIALOG, new DialogFactory( ) );
+		addFactory( IX_WIDGET.MAW_NAV_BAR, new NavigationBarFactory( ) );
 	}
 
 	/**

@@ -43,6 +43,7 @@ import com.mosync.nativeui.ui.widgets.LabelWidget;
 import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.ListItemWidget;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
+import com.mosync.nativeui.ui.widgets.NavigationBarWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
@@ -576,6 +577,13 @@ public class NativeUI
 				{
 					ListItemWidget listItemWidget = (ListItemWidget) widget;
 					listItemWidget.setFontTypeface(
+							currentFont.getTypeface(),
+							currentFont.getFontSize());
+				}
+				else if ( widget instanceof NavigationBarWidget )
+				{
+					NavigationBarWidget navBar = (NavigationBarWidget) widget;
+					navBar.setTitleFontTypeface(
 							currentFont.getTypeface(),
 							currentFont.getFontSize());
 				}
