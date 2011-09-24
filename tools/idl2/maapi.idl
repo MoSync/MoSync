@@ -6274,7 +6274,7 @@ group WidgetAPI "Widget API" {
 		* @brief Sets the text for the left side button.
 		* Note: it is available on Android only.
 		* This button is located at the bottom and it indicates a positive action, like Done/OK.
-		* The dialog gets hidden if this button is clicked.
+		* The dialog gets hidden after this button is clicked.
 		* If the property receives am empty string then the button becomes invisible.
 		*
 		* @validvalue A null-terminated string.
@@ -6283,7 +6283,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_LEFT_BTN_TITLE, "Done");
+        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_LEFT_BUTTON_TITLE, "Done");
 		* \endcode
 		*/
 		LEFT_BUTTON_TITLE = "leftButtonTitle";
@@ -6292,7 +6292,7 @@ group WidgetAPI "Widget API" {
 		* @brief Sets the text for the right side button.
 		* Note: it is available on Android only.
 		* This button is located at the bottom and it indicates a negative action, like Cancel.
-		* The dialog gets hidden if this button is clicked.
+		* The dialog gets hidden after this button is clicked.
 		* If the property receives am empty string then the button becomes invisible.
 		*
 		* @validvalue A null-terminated string.
@@ -6301,7 +6301,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_RIGHT_BTN_TITLE, "Cancel");
+        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_RIGHT_BUTTON_TITLE, "Cancel");
 		* \endcode
 		*/
 		RIGHT_BUTTON_TITLE = "rightButtonTitle";
