@@ -23,13 +23,34 @@ struct SETTINGS {
 	const char* program;
 	const char* resource;
 	const char* icon;
+	const char* cppOutputDir;
 	const char* model;
 	const char* dst;
 	const char* name;
 	const char* vendor;
-	const char* uid;
+	const char* version;
+	const char* permissions;
+	const char* s60v3uid;
+	const char* s60v2uid;
 	bool debug;
 	bool silent;
+	bool showPasswords;
+
+	// API specific settings
+	const char* nfc;
+
+	// iOS specific settings
+	const char* iOSCert;
+	const char* iOSSdk;
+	bool iOSgenerateOnly;
+
+	// Android specific settings
+    const char* androidPackage;
+    const char* androidVersionCode;
+    const char* androidKeystore;
+    const char* androidStorePass;
+    const char* androidAlias;
+    const char* androidKeyPass;
 };
 
 void package(const SETTINGS&);
@@ -38,10 +59,22 @@ void testProgram(const SETTINGS&);
 void testModel(const SETTINGS&);
 void testDst(const SETTINGS&);
 void testName(const SETTINGS&);
-void testVendor(const SETTINGS& s);
-void testUid(const SETTINGS&);
+void testVendor(const SETTINGS&);
+void testVersion(const SETTINGS&);
+void testS60v3Uid(const SETTINGS&);
+void testS60v2Uid(const SETTINGS&);
+
+void testIOSCert(const SETTINGS&);
+void testIOSSdk(const SETTINGS&);
+void testCppOutputDir(const SETTINGS&);
+
+void testIOSCert(const SETTINGS&);
+void testIOSSdk(const SETTINGS&);
+
+void testAndroidPackage(const SETTINGS&);
+void testAndroidVersionCode(const SETTINGS&);
 
 const char* mosyncdir();
-void sh(const char* cmd, bool hideOutput = false);
+void sh(const char* cmd, bool hideOutput = false, const char* hideCmdLine = 0);
 
 #endif	//PACKAGE_H

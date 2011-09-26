@@ -3076,7 +3076,15 @@ int Syscall::maTextBox(const wchar* title, const wchar* inText, wchar* outText,
 	int res = gAppView.TextBox(tTitle, tInText, tOutText, constraints);
 	DEBUG_ASSERT(tOutText.Length() < maxSize);
 	outText[tOutText.Length()] = 0;
-	
+
+#ifdef DEBUGGING_MODE
+	LOGD("maTextBox out: %i chars, %i bytes.\n", tOutText.Length(), tOutText.Size());
+	const byte* bp = (byte*)outText;
+	for(int i=0; i<tOutText.Size(); i++) {
+		LOGD("0x%02x\n", bp[i]);
+	}
+#endif
+
 	// send message
 	MAEvent e;
 	e.type = EVENT_TYPE_TEXTBOX;

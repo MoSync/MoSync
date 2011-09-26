@@ -16,8 +16,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include <fstream>
 #include <sstream>
+#include <cerrno>
+#include <sys/stat.h>
 #include "util.h"
 #include "filelist/filelist.h"
 
@@ -52,7 +55,7 @@ static void writeCopy(istream& in, ostream& out) {
 	streamoff pos = 0;
 	while(pos < size) {
 		char buffer[64*1024];	// arbitrary size
-		streamoff todo = MIN(size - pos, sizeof(buffer));
+		streamoff todo = MIN(size - pos, (streamoff)sizeof(buffer));
 		in.read(buffer, todo);
 		beGood(in);
 		out.write(buffer, todo);
@@ -75,6 +78,36 @@ void appendFile(const char* dst, const char* src) {
 	ofstream out(dst, ios_base::binary | ios_base::app);
 	setName(out, dst);
 	writeCopy(in, out);
+}
+
+bool existsFile(const char* filename) {
+	ifstream file(filename);
+	if (file) {
+		file.close();
+	}
+	return file.good();
+}
+
+bool existsDir(const char* dir) {
+	struct stat s;
+	int res = stat(dir, &s);
+	if(res == 0) {
+		return (s.st_mode & S_IFDIR) != 0;
+	}
+	if(errno == ENOENT)
+		return false;
+	printf("stat(%s) failed: %i(%s)\n",
+		dir, errno, strerror(errno));
+	exit(1);
+}
+
+void renameFile(const string& dst, const string& src) {
+	int _res = rename(src.c_str(), dst.c_str());
+	if(_res != 0) {
+		printf("rename(%s, %s) failed: %i %i(%s)\n",
+			src.c_str(), dst.c_str(), _res, errno, strerror(errno));
+		exit(1);
+	}
 }
 
 streamoff getFileSize(const char* filename) {
@@ -177,6 +210,10 @@ void applyTemplate(const char* dst, const char* src, const TemplateMap& tm) {
 void toDir(std::string& str) {
 	if(str[str.size()-1] != '/')
 		str += '/';
+}
+
+std::string getDir(const std::string& name) {
+	return name.substr(0, name.find_last_of('/'));
 }
 
 string fullpathString(const char* name) {

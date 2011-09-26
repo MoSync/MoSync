@@ -215,7 +215,11 @@ NETSYSCALL(MAHandle) maHttpCreate(String url, int method) throws Exception {
 	}
 	HttpConnection http;
 	try {
+#ifdef BB_RIM_NETWORKING
+		http = (HttpConnection)BlackBerryConnectionFactory.openConnection(url);
+#else
 		http = (HttpConnection)Connector.open(url, rw, true);
+#endif
 		http.setRequestMethod(methString);
 	} catch(SecurityException e) {
 		PRINT_STACK_TRACE;

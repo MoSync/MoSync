@@ -15,7 +15,12 @@
  02111-1307, USA.
 */
 
+#include "config_platform.h"
 #import "PimDatabase.h"
+#include <helpers/helpers.h>
+
+#include <base_errors.h>
+using namespace MoSyncError;
 
 @implementation PimDatabase
 
@@ -34,27 +39,22 @@
  */
 -(MAHandle) pimListOpen:(const int) listType
 {
-    if (MA_PIM_CONTACTS == listType)
+	if (MA_PIM_CONTACTS == listType)
 	{
-        if (!mContactsList)
-        {
-            mContactsList = [[PimContactsList alloc] init];
-            [mContactsList openList];
-            return MA_PIM_CONTACTS;
-        }
-        else
-        {
-            return MA_PIM_ERR_LIST_ALREADY_OPENED;
-        }
+		if (!mContactsList)
+		{
+			mContactsList = [[PimContactsList alloc] init];
+			[mContactsList openList];
+			return MA_PIM_CONTACTS;
+		}
+		else
+		{
+			return MA_PIM_ERR_LIST_ALREADY_OPENED;
+		}
 	}
-	else if(MA_PIM_EVENTS == listType ||
-            MA_PIM_TODOS == listType)
-    {
-        return MA_PIM_ERR_LIST_UNAVAILABLE;
-    }
-    else
+	else
 	{
-		return MA_PIM_ERR_LIST_TYPE_INVALID;
+		return MA_PIM_ERR_LIST_UNAVAILABLE;
 	}
 }
 
@@ -66,17 +66,18 @@
  */
 -(MAHandle) pimListNext:(MAHandle) list
 {
-	MAHandle returnedValue = MA_PIM_ERR_HANDLE_INVALID;
-
 	if (MA_PIM_CONTACTS == list)
 	{
 		if (mContactsList)
 		{
-            returnedValue = [mContactsList getNextItem];
+			return [mContactsList getNextItem];
 		}
 	}
+	else
+	{
+		BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
+	}
 
-    return returnedValue;
 }
 
 /**
@@ -90,7 +91,7 @@
 
 	if (MA_PIM_CONTACTS == list)
 	{
-        returnedValue = [self closeList:mContactsList];
+		returnedValue = [self closeList:mContactsList];
 		if (MA_PIM_ERR_NONE == returnedValue)
 		{
 			mContactsList = nil;
@@ -98,7 +99,7 @@
 	}
 	else
 	{
-		returnedValue = MA_PIM_ERR_HANDLE_INVALID;
+		BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
 	}
 
 	return returnedValue;
@@ -112,21 +113,12 @@
 -(int) closeList:(PimList*) list;
 {
 	int returnedValue;
-
-	if (!list)
+	MYASSERT(nil != list, ERR_INVALID_PIM_HANDLE);
+	returnedValue = [list close];
+	if (MA_PIM_ERR_NONE == returnedValue)
 	{
-		returnedValue = MA_PIM_ERR_HANDLE_INVALID;
+		[list release];
 	}
-	else
-	{
-		returnedValue = [list close];
-
-		if (MA_PIM_ERR_NONE == returnedValue)
-		{
-			[list release];
-		}
-	}
-
 	return returnedValue;
 }
 
@@ -139,10 +131,10 @@
 -(PimItem*) getItem:(MAHandle) itemHandle
 {
 	PimItem* item = nil;
-    if (mContactsList)
-    {
-        return [mContactsList getItem:itemHandle];
-    }
+	if (mContactsList)
+	{
+		return [mContactsList getItem:itemHandle];
+	}
 
 	return item;
 }
@@ -156,13 +148,13 @@
 {
 	if (list == MA_PIM_CONTACTS)
 	{
-        if (mContactsList)
-        {
-            return [mContactsList createItem];
-        }
+		if (mContactsList)
+		{
+			return [mContactsList createItem];
+		}
 	}
 
-	return MA_PIM_ERR_HANDLE_INVALID;
+	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
 }
 
 /**
@@ -172,12 +164,12 @@
  */
 -(int) closeItem:(MAHandle) itemHandle
 {
-    if (mContactsList)
-    {
-        return [mContactsList closeItem:itemHandle];
-    }
+	if (mContactsList)
+	{
+		return [mContactsList closeItem:itemHandle];
+	}
 
-    return MA_PIM_ERR_HANDLE_INVALID;
+	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
 }
 
 /**
@@ -191,13 +183,13 @@
 {
 	if (list == MA_PIM_CONTACTS)
 	{
-        if (mContactsList)
-        {
-            return [mContactsList removeItem:item];
-        }
+		if (mContactsList)
+		{
+			return [mContactsList removeItem:item];
+		}
 	}
 
-	return MA_PIM_ERR_HANDLE_INVALID;
+	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
 }
 
 /**
