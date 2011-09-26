@@ -3756,6 +3756,18 @@ group WidgetAPI "Widget API" {
 			* One of the MAW_VIDEO_WIDGET_STATE constants.
 			*/
 			int videoViewState;
+
+			/**
+			* Send by the OptionDialog view when a #MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED event is received.
+			*/
+			int optionDialogButtonIndex;
+
+			/**
+			* Send by the Dialog widget when a #MAW_EVENT_DIALOG_BUTTON_CLICKED event is received.
+			* If index is 0 that means that the cancel button was clicked. On iOS the cancel button is the left button on the nav bar.
+			* If index is 1 than the ok/done button was clicked. On iOS the done button is the right button on the nav bar.
+			*/
+			int dialogButtonIndex;
 		}
 	}
 
@@ -3839,12 +3851,6 @@ group WidgetAPI "Widget API" {
 		 */
 		VIDEO_STATE_CHANGED = 15;
 
-		/**
-		 * @brief Sent when a user dismisses a popover by tapping outside of it.
-		 * It will not be sent if it was dismissed by calling #maWidgetDialogHide()
-		 */
-		POPOVER_DISMISSED = 16;
-
         /**
          * @brief Sent from the Edit box when it gains focus(the user selects the widget).
          * The virtual keyboard is shown.
@@ -3905,6 +3911,23 @@ group WidgetAPI "Widget API" {
 		* and/or #MAW_WEB_VIEW_HARD_HOOK.
 		*/
 		WEB_VIEW_HOOK_INVOKED = 21;
+
+		/**
+		* Send by OptionDialog view when a button is clicked.
+		*/
+		OPTION_DIALOG_BUTTON_CLICKED = 22;
+
+		/**
+		* Send by a Dialog widget when one of the two buttons(left/right) are clicked.
+		*/
+		DIALOG_BUTTON_CLICKED = 23;
+
+		/**
+		* Send by a Dialog widget when when a user dismisses a popover by tapping outside of it.
+		* It will not be sent if it was dismissed by calling #maWidgetDialogHide().
+		* Available only n the iPad
+		*/
+		DIALOG_DISMISSED = 24;
 	}
 
 	} // end of WidgetEventTypes
@@ -3969,33 +3992,34 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief The popover arrow should point up. Used in
-		* #MAW_POPOVER_ARROW_POSITION
+		* #MAW_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_UP = 1;
 
 		/**
 		* @brief The popover arrow should point down. Used in
-		* #MAW_POPOVER_ARROW_POSITION
+		* #MAW_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_DOWN = 2;
 
 		/**
 		* @brief The popover arrow should point left. Used in
-		* #MAW_POPOVER_ARROW_POSITION
+		* #MAW_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_LEFT = 4;
 
 		/**
 		* @brief The popover arrow should point right. Used in
-		* #MAW_POPOVER_ARROW_POSITION
+		* #MAW_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_RIGHT = 8;
 
 		/**
 		* @brief The popover arrow can point anywhere. Used in
-		* #MAW_POPOVER_ARROW_POSITION
+		* #MAW_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_ANY = 15;
+
 	}
 	}
 
@@ -4161,6 +4185,13 @@ group WidgetAPI "Widget API" {
 		* @brief Indicates that a syscall tried to access a feature that is not supported by the current framework version.
 		*/
 		FEATURE_NOT_AVAILABLE = -11;
+
+		/**
+		* @brief Indicates that a syscall tried to add a dialog to a parent, which cannot be done because dialogs are in fact
+		* containers for other widgets.
+		*/
+		CANNOT_INSERT_DIALOG = -12;
+
 	}
 	} // end of WidgetResultCodes
 
@@ -4353,10 +4384,15 @@ group WidgetAPI "Widget API" {
 		TOGGLE_BUTTON = "ToggleButton";
 
 		/**
-		 * @brief A Popover is a type of screen that appears on top of the currently visible screen, in a smaller window. You can change it's size, or have it adapt to it's contents.
-		 * It is available only on iPad.
-		 */
-		POPOVER = "Popover";
+		* @brief A dialog is a sort of modal view, that can look different depending on the platform.
+		* A Dialog gets visible only after calling maWidgetDialogShow().
+		* On Android it is a modal alert dialog.
+		* On iPad it is a PopoverController, and on iPhone it is a view.
+		* When a Dialog widget is created it is empty, it has no content. Any type of widget can be added inside it via #maWidgetAddChild syscalls.
+		* To show a Dialog call #maWidgetDialogShow(dialogHandle), to dismiss it call: #maWidgetDialogHide(dialogHandle), and to delete it call #maWidgetDestroy.
+		* See \ref WidgetDialogProperties "Dialog properties" for the properties available.
+		*/
+		DIALOG = "Dialog";
 	}
 	} // end of WidgetTypes
 
@@ -5144,6 +5180,34 @@ group WidgetAPI "Widget API" {
 		ACCESSORY_TYPE = "accessoryType";
 
 		/**
+		* @brief Sets the font color of the text part.
+		*
+		* @validvalue  A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example set the font color to red.
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_COLOR, "0xFF0000");
+		* \endcode
+		*/
+		FONT_COLOR = "fontColor";
+
+		/**
+		* @brief Sets the font size in points of the text part.
+		*
+		* @validvalue A float that specifies the number of points.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_SIZE, "13.0");
+		* \endcode
+		*/
+		FONT_SIZE = "fontSize";
+
+		/**
 		* @brief Sets the typeface and style in which the text should be displayed.
 		*
 		* @validvalue A font handle received from loading fonts using
@@ -5237,6 +5301,63 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+
+		/**
+		* @brief Sets the top padding.
+		*
+		* @validvalue The top padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*  // Set a 50px top padding.
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_TOP, "50");
+		* \endcode
+		*/
+		PADDING_TOP = "paddingTop";
+
+		/**
+		* @brief Sets the left padding.
+		*
+		* @validvalue The left padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_LEFT, "50");
+		* \endcode
+		*/
+		PADDING_LEFT = "paddingLeft";
+
+		/**
+		* @brief Sets the right padding.
+		*
+		* @validvalue The right padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT, "50");
+		* \endcode
+		*/
+		PADDING_RIGHT = "paddingRight";
+
+		/**
+		* @brief Sets the bottom padding.
+		*
+		* @validvalue The bottom padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM, "50");
+		* \endcode
+		*/
+		PADDING_BOTTOM = "paddingBottom";
 	}
 	} // end of WidgetHorizontalLayoutProperties
 
@@ -5272,6 +5393,63 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+
+		/**
+		* @brief Sets the top padding.
+		*
+		* @validvalue The top padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*  // Set a 50px top padding.
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_TOP, "50");
+		* \endcode
+		*/
+		PADDING_TOP = "paddingTop";
+
+		/**
+		* @brief Sets the left padding.
+		*
+		* @validvalue The left padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_LEFT, "50");
+		* \endcode
+		*/
+		PADDING_LEFT = "paddingLeft";
+
+		/**
+		* @brief Sets the right padding.
+		*
+		* @validvalue The right padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_RIGHT, "50");
+		* \endcode
+		*/
+		PADDING_RIGHT = "paddingRight";
+
+		/**
+		* @brief Sets the bottom padding.
+		*
+		* @validvalue The bottom padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_BOTTOM, "50");
+		* \endcode
+		*/
+		PADDING_BOTTOM = "paddingBottom";
 	}
 	} // end of WidgetVerticalLayoutProperties
 
@@ -5588,7 +5766,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-		*   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
+        *   maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_VERTICAL_SCROLLBAR_ENABLED, "false");
 		* \endcode
 		*/
 		VERTICAL_SCROLL_BAR_ENABLED = "verticalScrollBarEnabled";
@@ -5608,22 +5786,18 @@ group WidgetAPI "Widget API" {
 		ENABLE_ZOOM = "enableZoom";
 
 		/**
-		* @brief Navigate forward or back the browsing history with setWidgetProperty,
-		* or query whether you can navigate forward or backward with getWidgetProperty.
-		* getWidgetProperty will return a string that will either contain "back",
-		* "forward" or "backforward".
+		* @brief Navigate forward or back the browsing history.
 		*
 		* @validvalue "back" or "forward".
 		*
-		* @setandget
+		* @setonly
 		*
 		* @par Example
 		* @code
-		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_NAVIGATE, back);
+		*	maWidgetSetProperty(webViewHandle, MAW_WEB_VIEW_NAVIGATE, "back");
 		* @endcode
 		*/
 		NAVIGATE = "navigate";
-
 	}
 
 	} // end of WidgetWebViewProperties
@@ -6110,52 +6284,99 @@ group WidgetAPI "Widget API" {
         *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x101010");
 		* \endcode
 		*
-		* @par Example
-		* \code
-        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B");
-		* \endcode
 		*/
 		COLOR = "color";
 	}
 	} // end of WidgetNavBarProperties
 
 	/**
-	* The available widget properties for a #MAW_POPOVER. See \ref WidgetProperties "Widget properties" for more properties.
+	* The available widget properties for a #MAW_DIALOG. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
-	group WidgetPopoverProperties "Popover properties" {
-	constset MAString MAW_POPOVER_ {
+	group WidgetDialogProperties "Dialog properties" {
+	constset MAString MAW_DIALOG_ {
 		/**
-		* @brief Sets the origin arrow position for the popover
+		* @brief Sets or gets the title.
 		*
-		* @validvalue One of the five MAW_CONSTANT_ARROW_ values, or a bitwise or combination.
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_TITLE, "MyDialog");
+		* \endcode
+		*/
+		TITLE = "title";
+
+		/**
+		* @brief Sets the text for the left side button.
+		* On Android this button is located at the bottom and it indicates a positive action, like Done/OK.
+		* On Android the dialog gets hidden if this button is clicked.
+		* On iOS this button is located at the top in the navigation bar.
+		* If the property receives am empty string then the button becomes invisible.
+		*
+		* @validvalue A null-terminated string.
 		*
 		* @setonly
 		*
 		* @par Example
 		* \code
-		*   // Allow the popover to use any arrow.
-		*   maWidgetSetProperty(popoverHandle, MAW_POPOVER_ARROW_POSITION, MAW_CONSTANT_ARROW_ANY);
+        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_LEFT_BTN_TITLE, "Done");
+		* \endcode
+		*/
+		LEFT_BUTTON_TITLE = "leftButtonTitle";
+
+		/**
+		* @brief Sets the text for the right side button.
+		* On Android this button is located at the bottom and it indicates a negative action, like Cancel.
+		* On Android the dialog gets hidden if this button is clicked.
+		* On iOS this button is located at the top in the navigation bar.
+		* If the property receives am empty string then the button becomes invisible.
+		*
+		* @validvalue A null-terminated string.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_RIGHT_BTN_TITLE, "Cancel");
+		* \endcode
+		*/
+		RIGHT_BUTTON_TITLE = "rightButtonTitle";
+
+		/**
+		* @brief Sets the origin arrow position for a popover dialog.
+		* This property is only available on the iPad
+		*
+		* @validvalue One of the five MAW_CONSTANT_ARROW_ values, or a bitwise or combination of them.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Allow the popover to use any arrow
+		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_ARROW_POSITION, MAW_CONSTANT_ARROW_ANY);
 		* \endcode
 		*/
 		ARROW_POSITION = "arrowPosition";
 
 		/**
-		* @brief Allows or prohibits the user from dismissing the popover by tapping outside of it.
+		* @brief Allow or prohibits the user from dismissing a popover dialog by tapping outside of it.
+		* This property is only available on the iPad
 		*
-		* @validvalue "true" or "false".
+		* @validvalue "true"or "false".
 		*
 		* @setonly
 		*
 		* @par Example
 		* \code
-		*   // Prohibit the user from dismissing the popover.
-		*   maWidgetSetProperty(popoverHandle, MAW_POPOVER_USER_CAN_DISMISS, "false");
+		*   // Prohibit the user from dismissing the popover
+		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_USER_CAN_DISMISS, "false");
 		* \endcode
 		*/
 		USER_CAN_DISMISS = "userCanDismiss";
 	}
-	} // end of WidgetPopoverProperties
-
+	} // end of WidgetDialogProperties
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;
@@ -6240,6 +6461,28 @@ group WidgetAPI "Widget API" {
 	int maWidgetRemoveChild(in MAWidgetHandle child);
 
 	/**
+	* Shows a dialog widget.
+	* \param dialog The dialog that will be shown.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be removed from the parent.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetDialogShow(in MAWidgetHandle dialog);
+
+	/**
+	* Hides/Dismisses a currently displayed dialog.
+	* \param dialog The dialog that will be hidden.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be removed from the parent.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetDialogHide(in MAWidgetHandle dialog);
+
+	/**
 	* Shows a screen. If native UI hasn't been initialized, it is also initialized
 	* and disables regular MoSync drawing.
 	*
@@ -6284,29 +6527,6 @@ group WidgetAPI "Widget API" {
 	int maWidgetStackScreenPop(in MAWidgetHandle stackScreen);
 
 	/**
-	 * Shows a dialog on top of the currently visible screen. Specific behavior depends
-	 * on the type of dialog.
-	 *
-	 * \param dialogHandle A handle to a #MAW_POPOVER dialog.
-	 *
-	 * \return Any of the following result codes:
-	 * - #MAW_RES_OK if the dialog could be shown.
-	 * - #MAW_RES_INVALID_HANDLE if the \a dialogHandle is not a handle to a dialog.
-	 */
-	int maWidgetDialogShow(in MAWidgetHandle dialogHandle);
-
-	/**
-	 * Hides a previously shown dialog.
-	 *
-	 * \param dialogHandle A handle to a #MAW_POPOVER dialog.
-	 *
-	 * \return Any of the following result codes:
-	 * - #MAW_RES_OK if the dialog could be hidden.
-	 * - #MAW_RES_INVALID_HANDLE if the \a dialogHandle is not a handle to a dialog.
-	 */
-	int maWidgetDialogHide(in MAWidgetHandle dialogHandle);
-
-	/**
 	* Sets a specified property on the given widget.
 	*
 	* \param widget Handle to the widget.
@@ -6343,6 +6563,26 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+	/**
+	* Displays a special kind of dialog that has a list of possible choices.
+	* The list of options is displayed as buttons on iOS, and as text views on Android.
+	* By clicking any option the dialog gets dismissed and a #MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED event is sent back.
+	*
+	* \param title The dialog title.
+	* \param destructiveButtontext The destructive button text. This is an iOS specific feature: it has different color than the other options,
+	* and it indicates that it's action has destructive behaviour. On Android it is treated and it looks like a normal option.
+	* \param cancelButtonTitle The dialog's Cancel button text. If left empty, the dialog is not cancelable.
+	* \param otherButtonTitles The address to the buffer that stores the list of options.
+	* \param otherButtonTitlesSize The size of the buffer, in bytes.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the dialog could be displayed.
+	* - #MAW_RES_ERR generic error.
+	*/
+	int maWidgetShowOptionsDialog(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle,
+								 in MAAddress otherButtonTitles, in int otherButtonTitlesSize);
+
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI

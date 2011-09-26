@@ -15,7 +15,7 @@
  02111-1307, USA.
  */
 
-#import "PopoverWidget.h"
+#import "DialogWidget.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include "Platform.h"
@@ -23,34 +23,48 @@
 #include "MoSyncUISyscalls.h"
 
 
-@implementation PopoverWidget
+@implementation DialogWidget
 
 - (id)init {
 	id res = [super init];
-	top = 0;
-	left = 0;
-	dismissable = YES;
-	direction = UIPopoverArrowDirectionAny;
-	container = [[UINavigationController alloc] initWithRootViewController:controller];
-	popoverController = [[UIPopoverController alloc] initWithContentViewController:container];
-	popoverController.delegate = self;
+	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
+		//iPhone implementation goes here
+	}
+	else {
+		top = 0;
+		left = 0;
+		dismissable = YES;
+		direction = UIPopoverArrowDirectionAny;
+		container = [[UINavigationController alloc] initWithRootViewController:controller];
+		popoverController = [[UIPopoverController alloc] initWithContentViewController:container];
+		popoverController.delegate = self;
+	}
 	return res;
 }
 
 - (int)show {
 	[super show];
+	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
+		//iPhone implementation goes here
+	}
+	else {
+		IWidget* shownScreen = [getMoSyncUI() getCurrentlyShownScreen];
 
-	IWidget* shownScreen = [getMoSyncUI() getCurrentlyShownScreen];
-
-	[popoverController presentPopoverFromRect:CGRectMake(left,top,0,0)
-									   inView:[shownScreen getView]
-					 permittedArrowDirections:direction
-									 animated:YES];
+		[popoverController presentPopoverFromRect:CGRectMake(left,top,0,0)
+										   inView:[shownScreen getView]
+						 permittedArrowDirections:direction
+										 animated:YES];
+	}
 	return MAW_RES_OK;
 }
 
 - (int)hide {
-	[popoverController dismissPopoverAnimated:YES];
+	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
+		//iPhone implementation goes here
+	}
+	else {
+		[popoverController dismissPopoverAnimated:YES];
+	}
 	return MAW_RES_OK;
 }
 
@@ -60,7 +74,15 @@
 		left = [value intValue];
 	} else if([key isEqualToString:@MAW_WIDGET_TOP]) {
 		top = [value intValue];
-	} else if([key isEqualToString:@MAW_POPOVER_ARROW_POSITION]) {
+	} else if([key isEqualToString:@MAW_DIALOG_TITLE]) {
+		if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
+			//iPhone implementation goes here
+		}
+		else {
+			[controller.title release];
+			controller.title = value;
+		}
+	} else if([key isEqualToString:@MAW_DIALOG_ARROW_POSITION]) {
 		int msDirection = [value intValue];
 		direction = 0;
 		if (msDirection & MAW_CONSTANT_ARROW_UP) {
@@ -75,7 +97,7 @@
 		if (msDirection & MAW_CONSTANT_ARROW_RIGHT) {
 			direction |= UIPopoverArrowDirectionRight;
 		}
-	} else if([key isEqualToString:@MAW_POPOVER_USER_CAN_DISMISS]) {
+	} else if([key isEqualToString:@MAW_DIALOG_USER_CAN_DISMISS]) {
 		if ([value isEqualToString:@"true"]){
 			dismissable = YES;
 		}
@@ -85,15 +107,17 @@
 
 	} else {
 		res = [super setPropertyWithKey:key toValue:value];
-		if ([key isEqualToString:@MAW_WIDGET_WIDTH] || [key isEqualToString:@MAW_WIDGET_HEIGHT]) {
-			[popoverController setPopoverContentSize:view.frame.size animated:YES];
+		if (UIUserInterfaceIdiomPhone != UI_USER_INTERFACE_IDIOM()) {
+			if ([key isEqualToString:@MAW_WIDGET_WIDTH] || [key isEqualToString:@MAW_WIDGET_HEIGHT]) {
+				[popoverController setPopoverContentSize:view.frame.size animated:YES];
+			}
 		}
 	}
 	return res;
 }
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
-	[super sendEvent:MAW_EVENT_POPOVER_DISMISSED];
+	[super sendEvent:MAW_EVENT_DIALOG_DISMISSED];
 }
 
 - (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController {

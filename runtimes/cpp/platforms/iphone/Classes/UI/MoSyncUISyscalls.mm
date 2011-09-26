@@ -20,7 +20,7 @@
 
 #import "ScreenWidget.h"
 #import "StackScreenWidget.h"
-#import "PopoverWidget.h"
+#import "DialogWidget.h"
 #import "LayoutWidgets.h"
 #import "RelativeLayoutWidget.h"
 #import "ListViewItemWidget.h"

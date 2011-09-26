@@ -19,7 +19,7 @@
 #import "ScreenWidget.h"
 #import "ScreenWidgetController.h"
 
-@interface PopoverWidget : ScreenWidget <UIPopoverControllerDelegate>{
+@interface DialogWidget : ScreenWidget <UIPopoverControllerDelegate>{
 	UIPopoverController* popoverController;
 	UINavigationController* container;
 	UIPopoverArrowDirection direction;
