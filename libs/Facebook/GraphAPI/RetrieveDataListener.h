@@ -16,8 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * RetrieveDataListener.h
+/**
+ * @file RetrieveDataListener.h
+ * @author Gabriela Rata
  */
 
 #ifndef RETRIEVEDATALISTENER_H_
@@ -31,29 +32,37 @@ MA 02110-1301, USA.
 class FacebookRequest;
 class MAUtil::YAJLDom::Value;
 
-/*
- * Listener for the retrieving data from the server. All responses are JSON objects
+/**
+ * \brief Listener for the retrieving data from the server.
+ * All responses are JSON objects.
  */
 class RetrieveDataListener: public ErrorListener
 {
 public:
-	/*
-	 * This function is called when the requested data was not a image or a video.
+	/**
+	 * This function is called when the requested data was not a image or
+	 * a video.
 	 */
-	virtual void jsonDataReceived(MAUtil::YAJLDom::Value* result, const MAUtil::String &connType, const MAUtil::String &objectId) {};
+	virtual void jsonDataReceived(MAUtil::YAJLDom::Value* result,
+			const MAUtil::String &connType, const MAUtil::String &objectId) {};
 
-	/*
-	 * This function is called when the requested data was a image. The data retrieved
-	 * from the server is transformed into a image handle.
+	/**
+	 * This function is called when the requested data was a image. The data
+	 * retrieved from the server is transformed into a image handle.
 	 */
-	virtual void imageReceived(MAHandle image, const MAUtil::String &connType, const MAUtil::String &objectId) {};
+	virtual void imageReceived(MAHandle image, const MAUtil::String &connType,
+			const MAUtil::String &objectId) {};
 
-	/*
-	 * This function is called when the requested data was a image. The data retrieved
-	 * from the server is transformed into a video handle.
+	/**
+	 * This function is called when the requested data was a image. The data
+	 * retrieved from the server is transformed into a video handle.
 	 */
-	virtual void videoReceived(MAHandle video, const MAUtil::String &connType, const MAUtil::String &objectId) {};
+	virtual void videoReceived(MAHandle video, const MAUtil::String &connType,
+			const MAUtil::String &objectId) {};
 
+	/**
+	 * destructor
+	 */
 	virtual ~RetrieveDataListener(){}
 };
 

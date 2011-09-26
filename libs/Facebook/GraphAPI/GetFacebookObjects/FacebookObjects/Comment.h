@@ -17,7 +17,8 @@ MA 02110-1301, USA.
 */
 
 /*
- * Comment.h
+ * @file Comment.h
+ * @author Gabriela Rata
  */
 
 #ifndef COMMENT_H_
@@ -27,14 +28,18 @@ MA 02110-1301, USA.
 #include "Utilities.h"
 
 /**
- * Implements an Comment Facebook object.
+ * \brief Implements an Comment Facebook object.
  * See: http://developers.facebook.com/docs/reference/api/Comment/
  */
 class Comment: public FacebookObject
 {
 
 public:
+	/**
+	 * Constructor
+	 */
 	Comment();
+
 	/**
 	 * Setter/getter for the "message" field of an Comment object.
 	 * @param message - the comment text

@@ -134,7 +134,7 @@ public:
 		"}                           \n";
 
 		char fragmentShaderSource[] =
-		"precision mediump float;\n"
+		"precision highp float;\n"
 		"uniform vec2 resolution;\n"
 		"uniform float time;\n"
 		"void main(void)\n"

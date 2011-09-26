@@ -30,11 +30,6 @@ MA 02110-1301, USA.
 
 namespace NativeUI
 {
-	/**
-	 * Types of gl view.
-	 */
-	const MAUtil::String GL1_VIEW = "GLView";
-	const MAUtil::String GL2_VIEW = "GL2View";
 
     // Forward declaration.
     class GLViewListener;
@@ -49,8 +44,8 @@ namespace NativeUI
 		/**
 		 * Constructor.
 		 * @param type One of the constants:
-		 * GL1_VIEW
-		 * GL2_VIEW
+		 * #MAW_GL_VIEW
+		 * #MAW_GL2_VIEW
 		 */
 		GLView(const MAUtil::String& type);
 

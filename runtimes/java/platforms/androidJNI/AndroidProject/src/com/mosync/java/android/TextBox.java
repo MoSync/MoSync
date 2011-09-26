@@ -42,6 +42,7 @@ import android.app.Activity;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.InputFilter;
 import android.text.InputType;
 import android.util.Log;
 import android.view.Display;
@@ -177,7 +178,7 @@ public class TextBox extends Activity implements OnClickListener {
 		mHandler= new Handler();
 
 		// Fullscreen mode
-		// COmmented out fullscreen mode, as fullscreen does not make
+		// Commented out fullscreen mode, as fullscreen does not make
 		// sense for the textbox activity.
 //		this.requestWindowFeature(Window.FEATURE_NO_TITLE);
 //		this.getWindow().setFlags(
@@ -195,15 +196,27 @@ public class TextBox extends Activity implements OnClickListener {
 		String text = bundle.getString("TEXT");
 		mOutputMemPtr = bundle.getInt("OUTPUT");
 		mConstraints = bundle.getInt("CONSTRAINTS");
+		// This is the max number of characters - 1 (for null char).
+		int maxLength = bundle.getInt("MAXSIZE") - 1;
+		// Truncate default input text to maxLength.
+		if (text.length() > maxLength)
+		{
+			text = text.substring(0, maxLength);
+		}
 
 		// Initialize layout components
 		mEdit = new EditText(this);
 		mEdit.setWidth(width);
 		mEdit.setHeight(height/3);
-		// The line below creates a bug on HTC Desire.
+		// The commented out line below creates a bug on HTC Desire.
 		// mEdit.setGravity(Gravity.TOP);
 		mEdit.setText(text);
 		mEdit.setInputType( this.convertInputConstraints(mConstraints) );
+		// Set an InputFilter to restrict input length.
+		mEdit.setFilters(new InputFilter[] {
+			new InputFilter.LengthFilter(maxLength)
+		});
+
 		mCancelButton = new Button(this);
 		mCancelButton.setText("Cancel");
 		mCancelButton.setId(1000);
@@ -290,6 +303,10 @@ public class TextBox extends Activity implements OnClickListener {
 		{
 			Log.i("InputBox", "OK clicked.");
 			String output = mEdit.getText().toString();
+
+			// TODO: We could add a check that maxLength is not exceeded.
+			// In this case, make maxLength an instance variable, rename
+			// it to mMaxLength.
 
 			// Write text directly to the MoSync memory
 			char[] ca = output.toCharArray();

@@ -55,6 +55,12 @@ public:
 
 		//Here we load a default font, which is used for the first collumn
 		mDefaultFont = maFontLoadDefault(FONT_TYPE_SANS_SERIF, 0, mFontSize);
+                
+		//Check if it's implemented on the current platform
+		if(-1 == mDefaultFont)
+		{
+			maPanic(0, "Device fonts is only available on Android and iOS.");
+		}
 
 		//This variable is used for scrolling the screen
 		mCurrentPosition = 0;
