@@ -23,35 +23,39 @@ require '../../rules/mosync_util.rb'
 
 class RuntimeBuilder 
 
-	# If version is not defined, 2.2 (API level 8) will be used.
-	# In fact we currently use API level 8 for all runtime versions.
+	# If version is not defined, 2.3.3 (API level 10) will be used.
+	# In fact we currently use API level 10 for all runtime versions.
 	def android(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "8")
+		return androidBuilder(runtime_dir, mode, "10")
 	end
 	
 	def android_3(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "8")
+		return androidBuilder(runtime_dir, mode, "10")
 	end
 	
 	def android_4(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "8")
+		return androidBuilder(runtime_dir, mode, "10")
 	end
 	
 	def android_5(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "8")
+		return androidBuilder(runtime_dir, mode, "10")
 	end
 	
 	def android_6(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "8")
+		return androidBuilder(runtime_dir, mode, "10")
 	end
 	
 	def android_7(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "8")
+		return androidBuilder(runtime_dir, mode, "10")
 	end
 	
-	def android_8(runtime_dir, mode)
-		return androidBuilder(runtime_dir, mode, "8")
+	def android_10(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "10")
 	end
+
+        def android_10(runtime_dir, mode)
+                return androidBuilder(runtime_dir, mode, "10")
+        end
 
 	def androidBuilder(runtime_dir, mode, version)
 		debug = (mode=="debug") ? "D" : ""

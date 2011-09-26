@@ -224,7 +224,7 @@ static bool parseProfileHeader(const char* filename, RuntimeInfo& pi) {
 		parseIntProp(line, "MA_PROF_CONST_ICONSIZE_X", iconX);
 		parseIntProp(line, "MA_PROF_CONST_ICONSIZE_Y", iconY);
 	}
-	pi.isBlackberry = (hasBbMajor && hasBbMinor);
+	//pi.isBlackberry = (hasBbMajor && hasBbMinor);	//rapc is not available.
 	if(iconX > 0 && iconY > 0) {
 		char buf[32];
 		sprintf(buf, "%ix%i", iconX, iconY);

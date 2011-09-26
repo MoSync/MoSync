@@ -358,13 +358,30 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 
 		return 0;
 	}
-		
+
+#ifdef BB_RIM_API
+	private final int convertKeyCodeBB(int nativeCode) {
+		switch(nativeCode) {
+		case 2: return MAK_LEFT;
+		case 6: return MAK_DOWN;
+		case 1: return MAK_UP;
+		case 5: return MAK_RIGHT;
+		case -8: return MAK_FIRE;
+		default: return nativeCode;
+		}
+	}
+#endif
+
 	private final void handleKeyEvent(int keyCode, boolean released) {
 		//DEBUG_TEMP("handleKeyEvent()\n");
 #if defined(PUBLIC_DEBUG) && !defined(JDB_DEBUG)
 		try {
 #endif
+#ifdef BB_RIM_API
+			int mak = convertKeyCodeBB(keyCode);
+#else
 			int mak = convertKeyCode(keyCode);
+#endif
 
 			int[] event = new int[3];
 			if(released == true) {

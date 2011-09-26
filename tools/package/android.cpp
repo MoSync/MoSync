@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "packagers.h"
 #include "util.h"
 #include "permissions.h"
+#include "nfc.h"
 #include "helpers/mkdir.h"
 #include "filelist/filelist.h"
 #include <fstream>
@@ -36,6 +37,8 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden);
 static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri);
 static void writePermission(ostream& stream, bool flag, const char* nativePerm);
+static void writeNFCDirectives(ostream& stream, const SETTINGS& s);
+static void writeNFCResource(ostream& stream, const SETTINGS& s);
 static string packageNameToByteCodeName(const string& packageName);
 
 void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
@@ -273,8 +276,11 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t\t<intent-filter>\n"
 		<<"\t\t\t\t<action android:name=\"android.intent.action.MAIN\" />\n"
 		<<"\t\t\t\t<category android:name=\"android.intent.category.LAUNCHER\" />\n"
-		<<"\t\t\t</intent-filter>\n"
-		<<"\t\t</activity>\n"
+		<<"\t\t\t</intent-filter>\n";
+	if (s.nfc) {
+		writeNFCDirectives(file, s);
+	}
+	file <<"\t\t</activity>\n"
 		<<"\t\t<activity android:name=\".MoSyncPanicDialog\"\n"
 		<<"\t\t\tandroid:label=\"@string/app_name\">\n"
 		<<"\t\t</activity>\n"
@@ -296,6 +302,15 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 	}
 
 	writePermissions(file, s, ri);
+
+	if (s.nfc) {
+		string nfcResourceDir = string(s.dst) + "/res/xml/";
+		_mkdir(nfcResourceDir.c_str());
+		string nfcResource = string(nfcResourceDir) + "nfc.xml";
+		ofstream nfcFile(nfcResource.c_str(), ios::binary);
+		writeNFCResource(nfcFile, s);
+		nfcFile.close();
+	}
 
 	file <<"</manifest>\n";
 	if(!file.good()) {
@@ -358,6 +373,42 @@ static void writePermission(ostream& stream, bool flag, const char* nativePerm) 
 	if (flag) {
 		stream <<"\t<uses-permission android:name=\""<<nativePerm<<"\" />\n";
 	}
+}
+
+static void writeNFCDirectives(ostream& stream, const SETTINGS& s) {
+	// Only TECH_DISCOVERED at this point.
+	stream << "\t\t\t<intent-filter>\n";
+	stream << "\t\t\t\t<action android:name=\"android.nfc.action.TECH_DISCOVERED\"/>\n";
+	stream << "\t\t\t</intent-filter>\n";
+	stream << "\t\t\t<meta-data android:name=\"android.nfc.action.TECH_DISCOVERED\" android:resource=\"@xml/nfc\"/>\n";
+}
+
+static void writeNFCResource(ostream& stream, const SETTINGS& s) {
+	if (!s.nfc || !existsFile(s.nfc)) {
+		printf("If NFC permissions are set, then\n"
+				"1.the --nfc parameter must be set, and\n"
+				"2. that file must exist.");
+		exit(1);
+	}
+
+	NfcInfo* nfcInfo = NfcInfo::parse(string(s.nfc));
+	vector<TechList*> techLists = nfcInfo->getTechLists();
+	stream << "<resources xmlns:xliff=\"urn:oasis:names:tc:xliff:document:1.2\">\n";
+	for (size_t i = 0; i < techLists.size(); i++) {
+		TechList* techList = techLists.at(i);
+		vector<string> technologies = techList->technologies;
+		stream << "\t<tech-list>\n";
+		for (size_t j = 0; j < technologies.size(); j++) {
+			stream << "\t\t<tech>";
+			// Simple for now :)
+			string tech = technologies.at(j);
+			stream << "android.nfc.tech." << tech;
+			stream << "</tech>\n";
+		}
+		stream << "\t</tech-list>\n";
+	}
+	stream << "</resources>";
+	//TODO: delete nfcInfo;
 }
 
 static void writeMain(const char* filename, const SETTINGS& s, const RuntimeInfo& ri) {

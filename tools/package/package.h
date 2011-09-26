@@ -74,6 +74,9 @@ void testIOSSdk(const SETTINGS&);
 void testAndroidPackage(const SETTINGS&);
 void testAndroidVersionCode(const SETTINGS&);
 
+bool isJavaIdentifierStart(char ch);
+bool isJavaIdentifierPart(char ch);
+
 const char* mosyncdir();
 void sh(const char* cmd, bool hideOutput = false, const char* hideCmdLine = 0);
 

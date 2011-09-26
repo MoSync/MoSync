@@ -55,7 +55,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *  syscalls, but it cannot be accessed directly.
 * Each resource (aka Object) is represented by a
 * handle. There are different types of resources, for example
-* Image, Binary data, Sound or Placeholder. A placeholder object is not a real object, but
+* Image, Binary data, Sound or Placeholder. A placeholder object is not a real object, bu
 * just a handle which you can use to construct new objects dynamically.
 * Resources can also be defined at compile time, by using MoSync's resource compiler.
 * Placeholders can either be defined at compile time using a resource compiler directive
@@ -126,7 +126,7 @@ interface MAAPI {
 	* \param result Passed to the operating system, where applicable. Ignored otherwise.
 	* \param message The message should be short, not more than 40 characters,
 	* to ensure its visibility on all screen sizes.
-	* \see MAPanicReport
+	* \see MAPanicRepor
 	*/
 	noreturn maPanic(in int result, in MAString message);
 
@@ -317,7 +317,7 @@ interface MAAPI {
 	* Sets the clipping rectangle for the current draw target.
 	* The screen and every drawable image each maintains a clipping rectangle.
 	* Drawing operations have no effect outside the clipping rectangle.
-	* The default clipping rectangle covers the entire draw target, so that
+	* The default clipping rectangle covers the entire draw target, so tha
 	* clipping occurs at the draw target's edges.
 	*/
 	void maSetClipRect(in int left, in int top, in int width, in int height);
@@ -726,7 +726,7 @@ interface MAAPI {
 	* On a few devices, using ports numbered below 1024 may cause system crashes.
 	* Therefore, it is advisable to use ports above 1024 if you can choose.
 	*
-	* On some J2ME devices, connections to port 443 (except from https) is not
+	* On some J2ME devices, connections to port 443 (except from https) is no
 	* allowed and might cause a system exception.
 	*
 	* For the <tt>btspp</tt> protocol, \a \<address\> is 12 hexadecimal digits and
@@ -959,7 +959,7 @@ interface MAAPI {
 		out MAString buffer range("bufSize"), in int bufSize);
 
 
-	//not needed yet
+	//not needed ye
 	//int maHttpGetResponseMessage(in MAHandle conn, out MAString buffer, in int bufSize);
 	//int maHttpGetRequestHeader(in MAHandle conn, in MAString key, out MAString buffer, in int bufSize);
 
@@ -1183,7 +1183,7 @@ interface MAAPI {
 	}
 
 	/**
-	* Returns a bitmask consisting of \link #MAKB_LEFT MAKB \endlink flags describing the current
+	* Returns a bitmask consisting of \link #MAKB_LEFT MAKB \endlink flags describing the curren
 	* key state.
 	*/
 	int maGetKeys();
@@ -1333,6 +1333,40 @@ interface MAAPI {
 		* \see maSensorStart()
 		*/
 		SENSOR = 33;
+
+		/** \brief A new NFC tag was received
+		* A new tag has been received, use maGetNextTag to
+		* retreive it.
+		*/
+		NFC_TAG_RECEIVED = 34;
+
+		/** \brief New tag data was read
+		* An asynchronous NFC tag read operation was
+		* completed.
+		*/
+		NFC_TAG_DATA_READ = 35;
+
+		/** \brief New tag data was written
+		* An asynchronous NFC tag write operation was
+		* completed.
+		*/
+		NFC_TAG_DATA_WRITTEN = 36;
+
+		/** \brief A batch operation was performed
+		*/
+		NFC_BATCH_OP = 37;
+
+		/** \brief Tag authentication was performed
+		* An asynchronous NFC tag authentication read was
+		* completed.
+		*/
+		NFC_TAG_AUTH_COMPLETE = 38;
+
+		/**
+		* \brief Tag was made read only
+		*  An asynchronous NFC tag read only operation was completed.
+		*/
+		NFC_TAG_READ_ONLY = 39;
 	}
 
 	/**
@@ -1355,6 +1389,19 @@ interface MAAPI {
 		float values[3];
 	}
 
+	/**
+	* \brief An event containing the result of an NFC asynchronous operation
+	*/
+	struct MANFCEventData {
+		/// The handle this event pertains to.
+		MAHandle handle;
+		/// The result of the asynchronous operation, usually a length if >= 0,
+		/// or an error code of < 0.
+		int result;
+		/// The destination of any read or write operation. Could be a memory
+		/// address, a block number, or some other value depending on the operation.
+		int dstId;
+	}
 
 	/**
 	* \brief An event; a message indicating that something has happened, e.g. that a key has been pressed.
@@ -1440,6 +1487,11 @@ interface MAAPI {
 			MASensor sensor;
 
 			/**
+			* NFC event data
+			*/
+			MANFCEventData nfc;
+
+			/**
 			* Used by custom events. See invididual event descriptions.
 			*/
 			void* data;
@@ -1456,7 +1508,7 @@ interface MAAPI {
 	*
 	* When the \link #EVENT_TYPE_CLOSE Close event \endlink is posted,
 	* you must call maExit as soon as possible, or
-	* your program will be forcibly terminated. The timeout is device-dependent, but
+	* your program will be forcibly terminated. The timeout is device-dependent, bu
 	* never longer than #EVENT_CLOSE_TIMEOUT milliseconds.
 	*
 	* After the Close event has been posted, most syscalls will stop working,
@@ -1571,7 +1623,7 @@ interface MAAPI {
 	*
 	* To properly read an instance of this struct from a store, you should allocate a
 	* chunk of memory whose size is equal to the size of the store, then read the entire store
-	* into that chunk of memory. Then you should make a pointer of type MAPanicReport and point it
+	* into that chunk of memory. Then you should make a pointer of type MAPanicReport and point i
 	* to the chunk. Then you can read normally, using that pointer.
 	*
 	* \see maOpenStore()
@@ -1917,7 +1969,7 @@ interface MAAPI {
 			int nameBufSize;
 			///out, the length of the name, excluding the terminating zero.
 			int actualNameLength;
-			///out
+			///ou
 			MABtAddr address;
 		}
 
@@ -2002,7 +2054,7 @@ interface MAAPI {
 		* is 248 bytes, excluding the terminating zero. However, it's recommended that you
 		* don't provide buffers larger than what your application has a use for.
 		*
-		* Note that you need to fill the MABtDevice structure before passing it
+		* Note that you need to fill the MABtDevice structure before passing i
 		* as a parameter, otherwise you will get memory access problems.
 		*
 		* \returns 1 if successful, zero if the queue is empty.
@@ -2074,7 +2126,7 @@ interface MAAPI {
 		* \brief A WLAN access point.
 		*/
 		struct MAWlanAp {
-			/// out
+			/// ou
 			MAWlanAddr address;
 			/// in(ptr), out(content)
 			char* name;
@@ -2368,7 +2420,7 @@ interface MAAPI {
 		* this function MAY increase the size of the file.
 		* You can determine if it did so by calling maFileSeek() with #MA_SEEK_END.
 		*
-		* If the file's current position is greater than \a offset, it is reset
+		* If the file's current position is greater than \a offset, it is rese
 		* to be equal to \a offset.
 		*
 		* The file must exist prior to calling this function.
@@ -2955,12 +3007,12 @@ interface MAAPI {
 			/// bytes
 			/// the bytes are not null-terminated.
 			BINARY = 0;
-			/// int
+			/// in
 			BOOLEAN = 1;
-			/// int
+			/// in
 			/// unix time.
 			DATE = 2;
-			/// int
+			/// in
 			INT = 3;
 			/// wide-string '\\0'
 			STRING = 4;
@@ -4296,7 +4348,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in number of pixels.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* \code
@@ -4310,7 +4362,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in number of pixels.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* \code
@@ -4324,7 +4376,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* \code
@@ -4339,7 +4391,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* \code
@@ -4481,14 +4533,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A 0-indexed tab number.
 		*
-		* @setandget
+		* @setandge
 		*
-		* @par Example set
+		* @par Example se
 		* \code
 		*	maWidgetSetProperty(tabScreenHandle, MAW_TAB_SCREEN_CURRENT_TAB, "1");
 		* \endcode
 		*
-		* @par Example get
+		* @par Example ge
 		* \code
 		* 	char currentTabBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(
@@ -4550,14 +4602,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandget
+		* @setandge
 		*
-		* @par Example set
+		* @par Example se
 		* \code
 		*	maWidgetSetProperty(labelHandle, MAW_LABEL_TEXT, "My label");
 		* \endcode
 		*
-		* @par Example get
+		* @par Example ge
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
@@ -4674,14 +4726,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandget
+		* @setandge
 		*
-		* @par Example set
+		* @par Example se
 		* \code
 		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_TEXT, "My button");
 		* \endcode
 		*
-		* @par Example get
+		* @par Example ge
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
@@ -4783,14 +4835,14 @@ group WidgetAPI "Widget API" {
 		* Note: It is not available on Android, as native image buttons do not have text attached.
 		* @validvalue A null-terminated string.
 		*
-		* @setandget
+		* @setandge
 		*
-		* @par Example set
+		* @par Example se
 		* \code
 		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, "My button");
 		* \endcode
 		*
-		* @par Example get
+		* @par Example ge
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
@@ -4955,20 +5007,20 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandget
+		* @setandge
 		*
-		* @par Example set
+		* @par Example se
 		* \code
 		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, "My label");
 		* \endcode
 		*
-		* @par Example get
+		* @par Example ge
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
 		* 	if (result > 0)
 		* 	{
-		* 	    // Do something with the edit box text
+		* 	    // Do something with the edit box tex
 		* 	}
 		* \endcode
 		*/
@@ -5205,7 +5257,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* \code
@@ -5298,7 +5350,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue Any valid URL.
 		*
-		* @setandget
+		* @setandge
 		*
 		* @par Example
 		* @code
@@ -6831,9 +6883,421 @@ group CameraFunctions "Camera Functions" {
 		* \see #EVENT_TYPE_SENSOR
 		*/
 		int maSensorStop(in int sensor);
+
+		/**
+		* Start listening to NFC events.
+		* \return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
+		* MA_NFC_NOT_AVAILABLE if NFC is not at all available, or
+		* 0 otherwise.
+		*/
+		int maNFCStart();
+
+		/**
+		* Stop listening to NFC events.
+		*/
+		void maNFCStop();
+
+		/**
+		* Reads the next available tag.
+		* @return A zero handle if no tag currently available
+		*/
+		MAHandle maNFCReadTag(in MAHandle nfcContext);
+
+		/**
+		* Destroys the tag. Clients are responsible for calling
+		* this function for every corresponding maNFCReadTag.
+		*/
+		void maNFCDestroyTag(in MAHandle tagHandle);
+
+		/**
+		* Connects to a tag, enabling further I/O operations to be
+		* performed on it.
+		*/
+		void maNFCConnectTag(in MAHandle tagHandle);
+
+		/**
+		* Closes I/O operations for a tag, disabling further I/O operations to be
+		* performed on it.
+		*/
+		void maNFCCloseTag(in MAHandle tagHandle);
+
+		/**
+		* Determines whether a tag is of a certain type.
+		* Use the constants prefixed with MA_NFC_TAG_TYPE_ to
+		* see the available tag types.
+		* \return > 0 if the tag is a the specified type, 0 if it is not,
+		* and MA_NFC_INVALID_TAG_TYPE if the tag type is not supported
+		* by this platform.
+		*/
+		int maNFCIsType(in MAHandle tagHandle, in int type);
+
+		/**
+		* To be able to call functions tag require the tag to be of
+		* a certain type (see maNFCIsType), the tag received
+		* must be converted to the proper type (see MA_NFC_TAG_TYPE_*
+		* constants).
+		* Clients are responsible for destroying the returned handle
+		* using maNFCDestroyTag.
+		* \return A handle if the type was convertable to the specified
+		* type.
+		*/
+		MAHandle maNFCGetTypedTag(in MAHandle tagHandle, in int type);
+
+		/**
+		* Starts a batch operation. No NFC I/O operations will be performed
+		* until maBatchCommit has been called.
+		* Note that only one active batch per tag is allowed.
+		* \param The tag on which to perform the batch operation.
+		* \return A non-zero value if a batch is already started for this tag or if a batch
+		* could not be started, 0 otherwise.
+		*/
+		int maNFCBatchStart(in MAHandle tagHandle);
+
+		/**
+		* Asynchronously performs all operations since the last call to maNFCBatchStart. The event
+		* delivered will be of the EVENT_TYPE_NFC_BATCH_OP type and
+		* with an MANFCEventData containing the tag's handle.
+		* \param The handle to the tag that is in batch mode.
+		*/
+		void maNFCBatchCommit(in MAHandle tagHandle);
+
+		/**
+		* Cancels all operations of the current batch.
+		* \param The handle to the tag that is in batch mode.
+		*/
+		void maNFCBatchRollback(in MAHandle tagHandle);
+
+		/**
+		* Sends a message to a tag. The response will come as
+		* an EVENT_TYPE_NFC_TAG_DATA_READ event, with the
+		* handle set to the handle passed into this method
+		* and the result field set to the number of bytes
+		* actually read.
+		* \param tag The tag to communicate with.
+		* \param src The data to send.
+		* \param len The length of the data to send.
+		* \return 0 if the tag can be transceived to, < 0 otherwise.
+		*/
+		int maNFCTransceive(in MAHandle tag, in MAAddress src, in int srcLen, out MAAddress dst, out int dstLen);
+
+		/**
+		* Makes a tag read-only (this operation cannot be reverted).
+		* The response will come as an EVENT_TYPE_NFC_TAG_READ_ONLY event, with the
+		* handle set to the handle passed into this method.
+		* \param tag The tag to make read only.
+		* \return MA_NFC_INVALID_TAG_TYPE if the handle given as argument
+		* cannot be made read-only.
+		*/
+		int maNFCSetReadOnly(in MAHandle tag);
+
+		/**
+		* Checks whether a tag is read-only.
+		* \param tag The tag to check for read/write permissions.
+		* \return MA_NFC_INVALID_TAG_TYPE if this operation is
+		* not applicable, a value > 0 if it is read-only, or
+		* 0 if it is read-only.
+		*/
+		int maNFCIsReadOnly(in MAHandle tag);
+
+		/**
+		* Reads an NDEF message from the given tag, which must
+		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_READ
+		* event with the handle set to the handle passed into this method
+		* and the result field set to 0 on success and a value < 0 on error.
+		* After receiving the event, clients may call
+		* maNFCGetNDEFMessage() to get the actual message.
+		*
+		*/
+		int maNFCReadNDEFMessage(in MAHandle tag);
+
+		/**
+		* Writes an NDEF message to the given tag, which must
+		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_WRITE
+		* event with the handle set to the handle passed into this method
+		* and the result field set to 0 on success and a value < 0 on error.
+		* \param tag The tag handle to write to
+		* \param ndefMessage The message to write
+		* \return MA_NFC_INVALID_TAG_TYPE if the handle given as argument
+		* does not represent an NDEF message.
+		*
+		*/
+		int maNFCWriteNDEFMessage(in MAHandle tag, in MAHandle ndefMessage);
+
+		/**
+		* Creates a new NDEF message, to be used primarily by
+		* \code maNFCWriteDefMessage.
+		* \param recordCount The number of records in the created message
+		* \return The handle to the created NDEF message; clients are
+		* responsible for destroying the message.
+		*/
+		MAHandle maNFCCreateNDEFMessage(in int recordCount);
+
+		/**
+		* Gets the NDEF message from a tag, which must
+		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* \return The handle to the NDEF message, which
+		* may be subsequently used in NDEF specfic functions,
+		* or the zero handle if the tag has no NDEF message
+		* associated with it (in which case, clients may call
+		* maNFCReadNDEFMessage).
+		* IMPORTANT: Once the tag has been destroyed OR if
+		* maNFCReadNDEFMessage is called, any NDEF messages
+		* previously returned by this function
+		* will be destroyed with it and cannot
+		* be used.
+		*/
+		int maNFCGetNDEFMessage(in MAHandle tag);
+
+		/**
+		* \return A handle to the ith NDEF record of an NDEF message,
+		* or a zero handle if the handle given as argument does no
+		* represent an NDEF message.
+		*/
+		MAHandle maNFCGetNDEFRecord(in MAHandle ndef, in int ix);
+
+		/**
+		* \return The number of NDEF records in an NDEF message,
+		* or MA_NFC_INVALID_TAG_TYPE if the handle given as argument
+		* does not represent an NDEF record.
+		*/
+		int maNFCGetNDEFRecordCount(in MAHandle ndef);
+
+		/**
+		* Reads the variable length id of an NDEF record.
+		* \return NFC_INVALID_TAG_TYPE if the handle given as
+		* argument does not represent an NDEF record.
+		*/
+		int maNFCGetId(in MAHandle ndefRecord, out MAAddress dst, in int len);
+
+		/**
+		* Reads the variable length payload of an NDEF record.
+		* Returns NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF record.
+		*/
+		int maNFCGetPayload(in MAHandle ndefRecord, out MAAddress dst, in int len);
+
+		/**
+		 * Returns the 3-bit TNF of an NDEF record,
+		 * or NFC_INVALID_TAG_TYPE if the handle given as argument
+		 * does not represent an NDEF record.
+		 */
+		int maNFCGetTnf(in MAHandle ndefRecord);
+
+		/**
+		* Returns the variable length type field of an NDEF record,
+		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
+		* does not represent an NDEF record.
+		*/
+		int maNFCGetType(in MAHandle ndefRecord, out MAAddress dst, in int len);
+
+		/**
+		* Sets the variable length id of an NDEF record.
+		* \return NFC_INVALID_TAG_TYPE if the handle given as
+		* argument does not represent an NDEF message.
+		*/
+		int maNFCSetId(in MAHandle ndefRecord, in MAAddress dst, in int len);
+
+		/**
+		* Sets the variable length payload of an NDEF record.
+		* \return NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF message.
+		*/
+		int maNFCSetPayload(in MAHandle ndefRecord, in MAAddress dst, in int len);
+
+		/**
+		 * Sets the 3-bit TNF of an NDEF record,
+		 * \return NFC_INVALID_TAG_TYPE if the handle given as argument
+		 * does not represent an NDEF record.
+		 */
+		int maNFCSetTnf(in MAHandle ndefRecord, in int tnf);
+
+		/**
+		* Returns the variable length type field of an NDEF record,
+		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
+		* does not represent an NDEF record.
+		*/
+		int maNFCSetType(in MAHandle ndefRecord, in MAAddress dst, in int len);
+
+		/**
+		* Authenticates a MIFARE Classic tag using the A or B key. Authentication must take place
+		* before reading/writing to a certain sector.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_AUTH_COMPLETE
+		* event, unless part of a batch operation.
+		* \param tagHandle The tag to authenticate
+		* \param keyType Either MA_NFC_MIFARE_KEY_A or MA_NFC_MIFARE_KEY_B.
+		* \param sectorIndex The sector to authenticate
+		* \param keySrc The address to the key to authenticate with
+		* \param keyLen The length of the key to authenticate with
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if authentication can take place.
+		*/
+		int maNFCAuthenticateSector(in MAHandle tagHandle, in int keyType, in int sectorIndex, in MAAddress keySrc, in int keyLen);
+
+		/**
+		* Returns the number of sectors of a MIFARE Classic tag.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), otherwise the number of sectors
+		* is returned.
+		*/
+		int maNFCGetSectorCount(in MAHandle tagHandle);
+
+		/**
+		* Returns the number of blocks in a sector of a MIFARE Classic tag.
+		* \param sector The sector to get the number of blocks in.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), otherwise the number of sectors
+		* is returned.
+		*/
+		int maNFCGetBlockCountInSector(in MAHandle tagHandle, in int sector);
+
+		/**
+		* Returns the first block of a sector of a MIFARE Classic tag.
+		* \param sector The sector of which to get the first block.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), otherwise the index of the
+		* first block of the sector is returned.
+		*/
+		int maNFCSectorToBlock(in MAHandle tagHandle, in int sector);
+
+		/**
+		* Reads a number of blocks of a MIFARE Classic tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_READ
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to read from.
+		* \param dst The memory address to write to.
+		* \param len The number of bytes to read. Several blocks may be read, depending
+		* on len (A block is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a read operation can be performed.
+		*/
+		int maNFCReadBlocks(in MAHandle tagHandle, in int firstBlock, out MAAddress dst, in int len);
+
+		/**
+		* Writes a number of blocks to a MIFARE Classic tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_WRITE
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to write to.
+		* \param dst The memory address to read from.
+		* \param len The number of bytes to write. Several blocks may be written, depending
+		* on len (A block is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a write operation can be performed.
+		*/
+		int maNFCWriteBlocks(in MAHandle tagHandle, in int firstBlock, in MAAddress dst, in int len);
+
+		/**
+		* Reads a number of blocks of a MIFARE Ultralight tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_READ
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to read from.
+		* \param dst The memory address to write to.
+		* \param len The number of bytes to read. Several pages may be read, depending
+		* on len (A page is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a read operation can be performed.
+		*/
+		int maNFCReadPages(in MAHandle tagHandle, in int firstPage, out MAAddress dst, in int len);
+
+		/**
+		* Writes a number of blocks of a MIFARE Ultralight tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_WRITE
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to write to.
+		* \param dst The memory address to read from.
+		* \param len The number of bytes to write. Several pages may be written, depending
+		* on len (A page is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a write operation can be performed.
+		*/
+		int maNFCWritePages(in MAHandle tagHandle, in int firstPage, in MAAddress dst, in int len);
+
+		constset int MA_NFC_ {
+			/**
+			* A constant indicating there is no NFC support on the device.
+			*/
+			NOT_AVAILABLE = -1;
+
+			/**
+			* A constant indicating NFC is not enabled on the device. (But there is hardware support).
+			*/
+			NOT_ENABLED = -2;
+
+			/**
+			* A constant indicating an invalid tag type.
+			*/
+			INVALID_TAG_TYPE = -2;
+
+			/**
+			* An error code if tag connection is lost.
+			*/
+			TAG_CONNECTION_LOST = -3;
+
+			/**
+			* An error code if trying to perform I/O on an unconnected
+			* tag.
+			*/
+			TAG_NOT_CONNECTED = -4;
+
+			/**
+			* An error code if some general I/O error occurred,
+			* other than the special case of tag connection being lost.
+			*/
+			TAG_IO_ERROR = -127;
+
+		}
+
+		constset int MA_NFC_TAG_TYPE_ {
+
+			/**
+			* Represents an NDEF (NFC Data Exchange Format) tag.
+			*/
+			NDEF = 1;
+
+			/**
+			* Represents a Mifare Classic tag.
+			*/
+			MIFARE_CL = 2;
+
+			/**
+			* Represents a Mifare Ultralight tag.
+			*/
+			MIFARE_UL = 3;
+
+			/**
+			* Represents an NfcA tag (ISO 14443-3A).
+			*/
+			NFC_A = 4;
+
+			/**
+			* Represents an NfcB tag (ISO 14443-3B).
+			*/
+			NFC_B = 5;
+
+			/**
+			* Represents an ISO-DEP tag (ISO 14443-4).
+			*/
+			ISO_DEP = 6;
+
+		}
+
+		constset int MA_NFC_MIFARE_ {
+
+			/**
+			* The A key for MiFare Classic authentication
+			*/
+			KEY_A = 1;
+
+			/**
+			* The B key for MiFare Classic authentication
+			*/
+			KEY_B = 2;
+
+		}
+
 	}
 
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}
+
 }
