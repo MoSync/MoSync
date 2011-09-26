@@ -304,7 +304,9 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 	writePermissions(file, s, ri);
 
 	if (s.nfc) {
-		string nfcResource = string(s.dst) + "res/xml/nfc.xml";
+		string nfcResourceDir = string(s.dst) + "/res/xml/";
+		_mkdir(nfcResourceDir.c_str());
+		string nfcResource = string(nfcResourceDir) + "nfc.xml";
 		ofstream nfcFile(nfcResource.c_str(), ios::binary);
 		writeNFCResource(nfcFile, s);
 		nfcFile.close();
@@ -375,10 +377,10 @@ static void writePermission(ostream& stream, bool flag, const char* nativePerm) 
 
 static void writeNFCDirectives(ostream& stream, const SETTINGS& s) {
 	// Only TECH_DISCOVERED at this point.
-	stream << "\t<intent-filter>";
-	stream << "\t<action android:name=\"android.nfc.action.TAG_DISCOVERED\"/>";
-	stream << "\t</intent-filter>";
-	stream << "\t<meta-data android:name=\"android.nfc.action.TECH_DISCOVERED\" android:resource=\"@xml/nfc\"/>";
+	stream << "\t\t\t<intent-filter>\n";
+	stream << "\t\t\t\t<action android:name=\"android.nfc.action.TECH_DISCOVERED\"/>\n";
+	stream << "\t\t\t</intent-filter>\n";
+	stream << "\t\t\t<meta-data android:name=\"android.nfc.action.TECH_DISCOVERED\" android:resource=\"@xml/nfc\"/>\n";
 }
 
 static void writeNFCResource(ostream& stream, const SETTINGS& s) {
@@ -399,14 +401,13 @@ static void writeNFCResource(ostream& stream, const SETTINGS& s) {
 		for (size_t j = 0; j < technologies.size(); j++) {
 			stream << "\t\t<tech>";
 			// Simple for now :)
-			string tech = technologies.at(i);
+			string tech = technologies.at(j);
 			stream << "android.nfc.tech." << tech;
-			stream << "\t\t</tech>";
+			stream << "</tech>\n";
 		}
 		stream << "\t</tech-list>\n";
 	}
-	stream << "<resources>";
-
+	stream << "</resources>";
 	//TODO: delete nfcInfo;
 }
 

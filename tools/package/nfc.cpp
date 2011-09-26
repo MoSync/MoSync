@@ -31,7 +31,7 @@ static void start(void *data, const char *el, const char **attr) {
 		result = new NfcInfo();
 	}
 
-	if (!strcmp(el, "techlist")) {
+	if (!strcmp(el, "tech-list")) {
 		if (currTechList) {
 			printf("Nested techlist tags not allowed.");
 			exit(1);
@@ -56,8 +56,9 @@ static void start(void *data, const char *el, const char **attr) {
 }
 
 static void end(void *data, const char *el) {
-	if (!strcmp(el, "techlist")) {
+	if (!strcmp(el, "tech-list")) {
 		result->addTechList(currTechList);
+		currTechList = 0;
 	}
 }
 
