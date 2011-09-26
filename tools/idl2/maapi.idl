@@ -3928,6 +3928,7 @@ group WidgetAPI "Widget API" {
 		* Available only n the iPad
 		*/
 		DIALOG_DISMISSED = 24;
+
 	}
 
 	} // end of WidgetEventTypes
@@ -6303,7 +6304,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_TITLE, "MyDialog");
+		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_TITLE, "MyDialog");
 		* \endcode
 		*/
 		TITLE = "title";
@@ -6321,14 +6322,13 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_LEFT_BTN_TITLE, "Done");
+		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_LEFT_BTN_TITLE, "Done");
 		* \endcode
 		*/
 		LEFT_BUTTON_TITLE = "leftButtonTitle";
 
 		/**
 		* @brief Sets the text for the right side button.
-		* On Android this button is located at the bottom and it indicates a negative action, like Cancel.
 		* On Android the dialog gets hidden if this button is clicked.
 		* On iOS this button is located at the top in the navigation bar.
 		* If the property receives am empty string then the button becomes invisible.
@@ -6339,7 +6339,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_RIGHT_BTN_TITLE, "Cancel");
+		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_RIGHT_BTN_TITLE, "Cancel");
 		* \endcode
 		*/
 		RIGHT_BUTTON_TITLE = "rightButtonTitle";

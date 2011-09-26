@@ -26,6 +26,7 @@
 #import "ListViewItemWidget.h"
 #import "ListViewWidget.h"
 #import "GLViewWidget.h"
+#import "OptionsDialogView.h"
 
 MoSyncUI* mosyncUI;
 
@@ -318,17 +319,17 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 }
 
 int maWidgetDialogShow(MAWidgetHandle dialogHandle) {
-	IWidget* popover = [mosyncUI getWidget:dialogHandle];
-	if(!popover) return MAW_RES_INVALID_HANDLE;
+	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
+	if(!dialog) return MAW_RES_INVALID_HANDLE;
 
-	if(!([popover class] == [PopoverWidget class])) {
+	if(!([dialog class] == [DialogWidget class])) {
 		return MAW_RES_INVALID_HANDLE;
 	}
 
 	int returnValue;
     NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
 	[NSObject performSelectorOnMainThread:@selector(show)
-							   withTarget:popover
+							   withTarget:dialog
 							  withObjects:arguments
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
@@ -337,20 +338,31 @@ int maWidgetDialogShow(MAWidgetHandle dialogHandle) {
 }
 
 int maWidgetDialogHide(MAWidgetHandle dialogHandle) {
-	IWidget* popover = [mosyncUI getWidget:dialogHandle];
-	if(!popover) return MAW_RES_INVALID_HANDLE;
+	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
+	if(!dialog) return MAW_RES_INVALID_HANDLE;
 
-	if(!([popover class] == [PopoverWidget class])) {
+	if(!([dialog class] == [DialogWidget class])) {
 		return MAW_RES_INVALID_HANDLE;
 	}
 
 	int returnValue;
     NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
 	[NSObject performSelectorOnMainThread:@selector(hide)
-							   withTarget:popover
+							   withTarget:dialog
 							  withObjects:arguments
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
     [arguments release];
 	return returnValue;
+}
+
+int maWidgetShowOptionsDialog(const wchar* title, const wchar* destructiveButtonTitle, const wchar* cancelButtonTitle,
+                             const void* otherButtonTitles, const int otherButtonTitlesSize)
+{
+    [[OptionsDialogView getInstance] show:title
+                  destructiveButtonTitle:destructiveButtonTitle
+                       cancelButtonTitle:cancelButtonTitle
+                       otherButtonTitles:otherButtonTitles
+                   otherButtonTitlesSize:otherButtonTitlesSize];
+    return MAW_RES_OK;
 }

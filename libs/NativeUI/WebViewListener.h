@@ -59,7 +59,7 @@ namespace NativeUI
         virtual void webViewHookInvoked(
 			WebView* webView,
 			int hookType,
-			MAHandle urlData) = 0;
+			MAHandle urlData);
 
         /**
          * This method is called when the web view content is loading.
@@ -72,7 +72,7 @@ namespace NativeUI
          */
         virtual void webViewContentLoading(
 			WebView* webView,
-			const int webViewState) = 0;
+			const int webViewState);
     };
 
 } // namespace NativeUI
