@@ -99,19 +99,10 @@ public:
 		// Create the web view.
 		mWebView = createWebView();
 
-		// We need to write the HTML/Media files to the application's
-		// local storage directory. The WebView will load the files
-		// from that location.
-
-		// Write the main page.
-		mPlatform->writeTextToFile(
-			mPlatform->getLocalPath() + "PageMain.html",
-			mPlatform->createTextFromHandle(PageMain_html));
-
-		// Write the background image file.
-		mPlatform->writeDataToFile(
-			mPlatform->getLocalPath() + "amor128x128.png",
-			amor128x128_png);
+		// We need to copy the bundle with HTML/Media files to
+		// the application's local storage directory. The WebView
+		// will load the files from that location.
+		mPlatform->extractLocalFiles();
 
 		// Now we set the main page. This will load the page
 		// we saved, which in turn will load the background icon.

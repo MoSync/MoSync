@@ -67,10 +67,10 @@ typedef struct MA_FILE_t MA_FILE;
 typedef unsigned int fpos_t;
 #endif
 
-/** 
-* Opens the file whose name is specified in the parameter filename and associates 
-* it with a stream that can be identified in future operations by the FILE object whose pointer 
-* is returned. The operations that are allowed on the stream and how these are performed are 
+/**
+* Opens the file whose name is specified in the parameter filename and associates
+* it with a stream that can be identified in future operations by the FILE object whose pointer
+* is returned. The operations that are allowed on the stream and how these are performed are
 * defined by the mode parameter. Whenever writing is requested the file is represented using
 * a store. If the file is opened as read-only the system first checks if the file exist as a store.
 * If not it searches through the mounted file system for the file.
@@ -78,7 +78,7 @@ typedef unsigned int fpos_t;
 * \param filename C string containing a file name. (note '..' isn't supported yet)
 * \param mode C string containing a file access modes.
 
-* \return If the file has been succesfully opened the function will return a pointer to a FILE object 
+* \return If the file has been succesfully opened the function will return a pointer to a FILE object
 * that is used to identify the stream on all further operations involving it. Otherwise, a null pointer is returned.
 */
 MA_FILE * MA_fopen ( const char * filename, const char * mode );
@@ -90,7 +90,7 @@ MA_FILE * MA_fopen ( const char * filename, const char * mode );
 * If the file has been written to, it is saved to a store.
 
 * \param stream Pointer to a FILE object that specifies the stream to be closed.
- 
+
 * \return If the stream is successfully closed, a zero value is returned. On failure, EOF is returned.
 */
 int MA_fclose ( MA_FILE * stream );
@@ -100,12 +100,12 @@ int MA_fclose ( MA_FILE * stream );
 * Reads an array of count elements, each one with a size of size bytes, from the stream and stores them in the block of memory specified by ptr.
 * The postion indicator of the stream is advanced by the total amount of bytes read.
 * The total amount of bytes read if successful is (size * count).
- 
+
 * \param ptr Pointer to a block of memory with a minimum size of (size*count) bytes.
 * \param size Size in bytes of each element to be read.
 * \param count Number of elements, each one with a size of size bytes.
 * \param stream Pointer to a FILE object that specifies an input stream.
- 
+
 * \return The total number of elements successfully read is returned as a size_t object, which is an integral data type.
 * If this number differs from the count parameter, either an error occured or the End Of File was reached.
 * You can use either ferror or feof to check whether an error happened or the End-of-File was reached.
@@ -382,7 +382,7 @@ int MA_fsetpos ( MA_FILE * stream, const fpos_t * pos );
 #endif
 #define FILE MA_FILE
 
-/** 
+/**
 * Mounts a file system image, stored as a binary resource.
 * Only one file system image may be mounted at a time.
 * All following calls to the file api functions will use this image.
@@ -393,10 +393,22 @@ int MA_fsetpos ( MA_FILE * stream, const fpos_t * pos );
 */
 void setCurrentFileSystem(MAHandle fileSystem, int caseSensitive);
 
-/** 
+/**
 * Frees the resources allocated for the current file system.
 */
 void freeCurrentFileSystem(void);
+
+/**
+* Extract the current file system bundle to the local file
+* system on the device/emulator.
+*
+* \param destPath Path to the directory on the local file system
+* where the file tree should be extracted. The path MUST end with
+* a path delimeter.
+*
+* \return 1 on success, -1 on error.
+*/
+int extractCurrentFileSystem(const char* destPath);
 
 /*
 // not implemented yet

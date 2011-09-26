@@ -1239,6 +1239,7 @@ namespace Base {
 			[documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
 			[documentsDirectoryPath release];
 			[paths release];
+			res = size;
 		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
 			[@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
 		}
