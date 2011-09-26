@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1.2">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
+<properties>
+<property key="android:package.name" value="com.mosync.tweetreader"/>
+<property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
+<property key="build.prefs:additional.include.paths/Debug" value=""/>
+<property key="build.prefs:additional.include.paths/Release" value=""/>
+<property key="build.prefs:additional.libraries" value="mastd.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, MAFS.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, MAFS.lib"/>
+<property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
+<property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:app.permissions" value="File\ Storage File\ Storage/Read File\ Storage/Write Internet\ Access SMS/Send"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
+<property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
+<property key="build.prefs:gcc.warnings/Release" value="0"/>
+<property key="build.prefs:ignore.default.include.paths" value="true"/>
+<property key="build.prefs:ignore.default.include.paths/Debug" value="false"/>
+<property key="build.prefs:ignore.default.include.paths/Release" value="false"/>
+<property key="build.prefs:ignore.default.libraries" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Debug" value="false"/>
+<property key="build.prefs:ignore.default.libraries/Release" value="false"/>
+<property key="build.prefs:ignore.default.library.paths" value="true"/>
+<property key="build.prefs:ignore.default.library.paths/Debug" value="false"/>
+<property key="build.prefs:ignore.default.library.paths/Release" value="false"/>
+<property key="build.prefs:memory.data/Debug" value="16384"/>
+<property key="build.prefs:memory.data/Release" value="2048"/>
+<property key="build.prefs:memory.heap/Debug" value="8192"/>
+<property key="build.prefs:memory.heap/Release" value="1024"/>
+<property key="build.prefs:memory.stack/Debug" value="4096"/>
+<property key="build.prefs:memory.stack/Release" value="256"/>
+<property key="build.prefs:project.type" value=""/>
+<property key="dependency.strategy" value="0"/>
+<property key="excludes/Debug" value=""/>
+<property key="excludes/Release" value=""/>
+<property key="template.id" value="project.c"/>
+</properties>
+</project>

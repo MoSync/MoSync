@@ -322,7 +322,7 @@ public class WebWidget extends Widget
 		{
 			webView.setVerticalScrollBarEnabled(BooleanConverter.convert(value));
 		}
-		
+
 		return true;
 	}
 
@@ -594,8 +594,8 @@ public class WebWidget extends Widget
 
 			Toast.makeText(
 				view.getContext(),
-				"JsAlert: " + message,
-				Toast.LENGTH_SHORT).show();
+				message,
+				Toast.LENGTH_LONG).show();
 
 			// This is needed to end the alert state.
 			result.confirm();
