@@ -1922,8 +1922,36 @@ static int translateFileListErrorCode(int sym) {
 	}
 }
 
-MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
-	LOGD("maFileListStart(%s, %s)\n", path, filter);
+static TUint convertSorting(int sorting) {
+	// parse sorting
+	if(sorting == MA_FL_SORT_NONE)
+		return ESortNone;
+	TUint entrySortKey;
+	int sortType = sorting & 0xFFFF;
+	int sortOrder = sorting & 0xFFFF0000;
+	switch(sortType) {
+	case MA_FL_SORT_DATE: entrySortKey = ESortByDate; break;
+	case MA_FL_SORT_SIZE: entrySortKey = ESortBySize; break;
+	case MA_FL_SORT_NAME: entrySortKey = ESortByName; break;
+	default:
+		BIG_PHAT_ERROR(ERR_FILE_LIST_SORT);
+	}
+	switch(sortOrder) {
+	case MA_FL_ORDER_ASCENDING:
+		entrySortKey |= EAscending;
+		break;
+	case MA_FL_ORDER_DESCENDING:
+		entrySortKey |= EDescending;
+		break;
+	default:
+		BIG_PHAT_ERROR(ERR_FILE_LIST_SORT);
+	}
+	return entrySortKey;
+}
+
+MAHandle Syscall::maFileListStart(const char* path, const char* filter, int sorting) {
+	LOGD("maFileListStart(%s, %s, 0x%x)\n", path, filter, sorting);
+	TUint entrySortKey = convertSorting(sorting);
 	TCleaner<FileList> fl(NULL);
 	MyRFs myrfs;
 	myrfs.Connect();
@@ -1957,7 +1985,7 @@ MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
 		Append(des, filterPtrC8);
 		Smartie<HBufC8> temp8(CreateHBufC8FromDesC16L(des));
 		LOGD("GetDir '%S'\n", temp8());
-		int res = FSS.GetDir(des, KEntryAttMaskSupported, ESortNone, dfl->mDir);
+		int res = FSS.GetDir(des, KEntryAttMaskSupported, entrySortKey, dfl->mDir);
 		LOGD("res: %i\n", res);
 		if(res < 0)
 			return translateFileListErrorCode(res);
