@@ -92,30 +92,6 @@
 	return res;
 }
 
-/*- (NSString*)getPropertyWithKey: (NSString*)key {
-
-	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {
-		return [[[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue] retain];
-	}
-	else if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
-		return [[[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue] retain];
-	}
-	else if([key isEqualToString:@MAW_WIDGET_LEFT]) {
-		return [[[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue] retain];
-	}
-	else if([key isEqualToString:@MAW_WIDGET_TOP]) {
-		return [[[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue] retain];
-	}
-	else if([key isEqualToString:@MAW_WIDGET_VISIBLE]) {
-        return view.hidden ? @"false" : @"true";
-    }
-    else if([key isEqualToString:@MAW_WIDGET_ENABLED]) {
-        UIControl* controller = (UIControl*) view; // TODO: is this correct?
-        return controller.enabled ? @"true" : @"false";
-    }
-	return nil;
-}*/
-
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
 	[super sendEvent:MAW_EVENT_POPOVER_DISMISSED];
 }

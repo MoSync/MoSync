@@ -32,7 +32,6 @@
 - (int)show;
 - (int)hide;
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
-- (NSString*)getPropertyWithKey: (NSString*)key;
 - (void)dealloc;
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController;
 - (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController;
