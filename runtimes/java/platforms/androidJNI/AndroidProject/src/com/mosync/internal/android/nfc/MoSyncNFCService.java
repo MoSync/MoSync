@@ -26,7 +26,7 @@ public class MoSyncNFCService extends IntentService {
 		try {
 			return MoSyncNFC.getDefault();
 		} catch (Throwable t) { // In case of a verify error
-			Log.e("@@@ÊMoSync", "NFC not available");
+			Log.e("@@@ MoSync", "NFC not available");
 			return null;
 		}
 	}

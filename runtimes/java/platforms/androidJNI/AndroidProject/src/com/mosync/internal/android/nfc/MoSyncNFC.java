@@ -130,7 +130,7 @@ public class MoSyncNFC {
 			handler.post(new Runnable() {
 				@Override
 				public void run() {
-					Log.d("@@@ÊMoSync NFC", "Executing operation: " + operation);
+					Log.d("@@@ MoSync NFC", "Executing operation: " + operation);
 					NFCEvent result = operation.run();
 					if (result != null) {
 						postResult(result);

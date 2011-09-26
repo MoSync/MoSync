@@ -102,7 +102,15 @@ namespace Base {
 #endif	//RESOURCE_MEMORY_LIMIT
 
 #if !defined(SYMBIAN) && !defined(_android)
-	struct FileList;
+#if defined(_WIN32_WCE)
+	struct FileListItem {
+		std::string name;
+	};
+	struct FileList {
+		std::vector<FileListItem> files;
+		std::vector<FileListItem>::const_iterator itr;
+	};
+#else
 	struct FileListItem {
 		std::string name;
 		struct stat s;
@@ -113,6 +121,7 @@ namespace Base {
 		std::set<FileListItem> files;
 		std::set<FileListItem>::const_iterator itr;
 	};
+#endif	//_WIN32_WCE
 	typedef std::map<int, FileList> FileListMap;
 	typedef FileListMap::iterator FileListItr;
 	static FileListMap sFileListings;
@@ -1180,10 +1189,12 @@ namespace Base {
 #ifndef SYMBIAN
 	static FileList sFileList;
 	static std::string sFileListRealDir;
+#ifndef _WIN32_WCE
 	static int sFileListSorting;
 #ifdef _WIN32
 	typedef ino_t _ino_t;
 #endif
+#endif	//_WIN32_WCE
 
 	static void fileListCallback(const char* filename) {
 		if(!strcmp(filename, ".") || !strcmp(filename, ".."))
@@ -1192,6 +1203,9 @@ namespace Base {
 		if(isDirectory((sFileListRealDir + fn).c_str())) {
 			fn += "/";
 		}
+#ifdef _WIN32_WCE
+		sFileList.files.push_back(fn);
+#else
 		struct FileListItem fli;
 		fli.name = fn;
 		fli.sorting = sFileListSorting;
@@ -1204,8 +1218,10 @@ namespace Base {
 			stat(fn.c_str(), &fli.s);
 
 		sFileList.files.insert(fli);
+#endif	//_WIN32_WCE
 	}
 
+#ifndef _WIN32_WCE
 	bool FileListItem::operator<(const FileListItem& o) const {
 		DEBUG_ASSERT(sorting == o.sorting);
 		if(sorting == MA_FL_SORT_NONE)
@@ -1243,16 +1259,21 @@ namespace Base {
 			BIG_PHAT_ERROR(ERR_FILE_LIST_SORT);
 		}
 	}
+#endif	//_WIN32_WCE
 
 	// if this is MoRE, the emulator,
 	// we'll put all filesystem access into a separate directory, like chroot.
 	MAHandle Syscall::maFileListStart(const char* path, const char* filter, int sorting) {
 		LOGF("maFileListStart(%s, %s, 0x%x)\n", path, filter, sorting);
+#ifndef _WIN32_WCE
 		sFileListSorting = sorting;
+#endif
 		sFileList.files.clear();
 		if(path[0] == 0) {	//empty string
 			//list filesystem roots
-#if FILESYSTEM_CHROOT || defined(LINUX) || defined(__IPHONE__) || defined(_WIN32_WCE)
+#ifdef _WIN32_WCE
+			sFileList.files.push_back("/");
+#elif FILESYSTEM_CHROOT || defined(LINUX) || defined(__IPHONE__)
 			FileListItem fli;
 			fli.name = "/";
 			fli.sorting = MA_FL_SORT_NONE;
