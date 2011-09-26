@@ -50,7 +50,7 @@
 - (int)show: (IWidget*) handle;
 
 // shows a modal view controller
-- (void) showModal: (UIViewController*)controller;
+- (void) showModal: (UINavigationController*)controller;
 
 // hides a view controller that was shown modally
 - (void) hideModal;

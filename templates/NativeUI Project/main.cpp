@@ -31,9 +31,7 @@ public:
 		// Error handling for devices that do not support NativeUI.
 		if (-1 == screen)
 		{
-			maPanic(0,
-				"NativeUI is only available on Android and iPhone. "
-				"You must run directly on the device or devices emulator.");
+			maPanic(0, "NativeUI is only available on Android and iOS.");
 		}
 
 		// Create a layout object.

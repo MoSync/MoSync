@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file NavigationBar.h
  * @author Emma Tresanszki
  *
- * Class for navigation bar.
+ * \brief Class for navigation bar.
  */
 
 #ifndef NATIVEUI_NAVIGATION_BAR_H_
@@ -35,8 +35,9 @@ namespace NativeUI
     class NavigationBarListener;
 
     /**
-     * A navigation bar is an iPhone specific widget that shows a nav bar
+     * \brief A navigation bar is an iPhone specific widget that shows a nav bar
      * with an optional title and back button.
+     *
      * Available only on iOS for the moment.
      */
     class NavigationBar : public Widget

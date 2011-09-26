@@ -541,9 +541,7 @@ void PlayScreen::setupUI()
 	// Error handling for devices that do not support NativeUI.
 	if ( -1 == mScreen )
 	{
-		maPanic(0,
-				"NativeUI is only available on Android and iPhone. "
-				"You must run directly on the device or devices emulator.");
+		maPanic(0, "NativeUI is only available on Android and iOS.");
 	}
 
 	// Get the screen size.

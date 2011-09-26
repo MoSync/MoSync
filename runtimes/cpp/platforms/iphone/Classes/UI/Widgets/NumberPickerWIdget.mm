@@ -55,7 +55,7 @@
     UIPickerView* numberPicker = (UIPickerView*) view;
     int paramValue = [value intValue];
 
-    if ([key isEqualToString:@MAW_NUMBER_PICKER_MAX_VALUE])
+    if ([key isEqualToString:@MAW_NUMBER_PICKER_MIN_VALUE])
     {
         // Check if the param is valid.
         if (paramValue > mMaxValue) {
@@ -65,7 +65,7 @@
         mMinValue = paramValue;
         [numberPicker reloadComponent:0];
     }
-    else if ([key isEqualToString:@MAW_NUMBER_PICKER_MIN_VALUE])
+    else if ([key isEqualToString:@MAW_NUMBER_PICKER_MAX_VALUE])
     {
         // Check if the param is valid.
         if (paramValue < mMinValue) {

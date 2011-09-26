@@ -29,6 +29,7 @@ MA 02110-1301, USA.
 #include <mastring.h>		// C string functions
 #include <mavsprintf.h>		// C string functions
 #include <mastdlib.h>		// C string conversion functions
+#include <MAFS/File.h>		// Library for working with file system bundle
 #include <MAUtil/String.h>	// C++ String class
 #include <IX_WIDGET.h>		// Widget API
 #include <conprint.h>		// Debug printing.
@@ -58,9 +59,7 @@ void Platform::checkNativeUISupport()
 	int widget = maWidgetCreate(MAW_WEB_VIEW);
 	if (-1 == widget)
 	{
-		maPanic(0,
-			"NativeUI is only available on Android and iPhone. "
-			"You must run directly on the device or devices emulator.");
+		maPanic(0, "NativeUI is only available on Android and iOS.");
 	}
 	else
 	{
@@ -125,6 +124,95 @@ MAUtil::String Platform::getLocalPath()
 	}
 
 	return buffer;
+}
+
+/**
+ * Extract a file system bundle to a directory in the
+ * local file system on the device/emulator.
+ * @param handle The resource handle of the bundled
+ * file system. Bundles are created with the Bundle tool
+ * that comes with MoSync.
+ * @param destinationPath The path of the directory where
+ * the file system will be extracted.
+ */
+bool Platform::extractFileSystem(
+	MAHandle handle,
+	const MAUtil::String& destinationPath)
+{
+	setCurrentFileSystem(handle, 0);
+	int result = extractCurrentFileSystem(destinationPath.c_str());
+	freeCurrentFileSystem();
+	return 1 == result;
+}
+
+/**
+ * Extract the files in the file system bundle defined
+ * as the first resource in the resource file. Files are
+ * extracted to the root of the local file system on the
+ * device/emulator.
+ *
+ * This function is intended as a high-level way to
+ * extract files packaged in the standard way used in
+ * the HTML5/Javascript MoSync project template.
+ */
+bool Platform::extractLocalFiles()
+{
+	return extractFileSystem(1, getLocalPath());
+}
+
+/**
+ * Open a file for writing.
+ * Create the file if it does not exist.
+ * Note: Will truncate the file if it exists.
+ * @return Handle to the open file, <0 on error.
+ */
+MAHandle Platform::openFileForWriting(const MAUtil::String& filePath)
+{
+	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	if (maFileExists(file))
+	{
+		// If the file exists, truncate it to zero size.
+		// We do this to prevent problems with old data
+		// at the end of the file if the new file is
+		// shorter than the old file.
+		maFileTruncate(file, 0);
+	}
+	else
+	{
+		// If the file does not exist, create it.
+		int result = maFileCreate(file);
+		if (result < 0)
+		{
+			return -1;
+		}
+	}
+
+	return file;
+}
+
+/**
+ * Open a file for reading.
+ * @return Handle to the open file, <0 on error.
+ */
+MAHandle Platform::openFileForReading(const MAUtil::String& filePath)
+{
+	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	if (!maFileExists(file))
+	{
+		return -1;
+	}
+
+	return file;
 }
 
 /**
@@ -240,61 +328,6 @@ bool Platform::readTextFromFile(
 	inText = buffer;
 
 	return result == 0;
-}
-
-/**
- * Open a file for write (and read) access.
- * Create the file if it does not exist.
- * Note: Will truncate the file if it exists.
- * @return Handle to the open file, <0 on error.
- */
-MAHandle Platform::openFileForWriting(const MAUtil::String& filePath)
-{
-	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ_WRITE);
-	if (file < 0)
-	{
-		return -1;
-	}
-
-	if (maFileExists(file))
-	{
-		// If the file exists, truncate it to zero size.
-		// We do this to prevent problems with old data
-		// at the end of the file if the new file is
-		// shorter than the old file.
-		maFileTruncate(file, 0);
-	}
-	else
-	{
-		// If the file does not exist, create it.
-		int result = maFileCreate(file);
-		if (result < 0)
-		{
-			return -1;
-		}
-	}
-
-	return file;
-}
-
-/**
- * Open a file for read access.
- * @return Handle to the open file, <0 on error.
- */
-MAHandle Platform::openFileForReading(const MAUtil::String& filePath)
-{
-	MAHandle file = maFileOpen(filePath.c_str(), MA_ACCESS_READ);
-	if (file < 0)
-	{
-		return -1;
-	}
-
-	if (!maFileExists(file))
-	{
-		return -1;
-	}
-
-	return file;
 }
 
 /**

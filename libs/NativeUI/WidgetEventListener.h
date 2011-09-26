@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file WidgetEventListener.h
  * @author Mikael Kindborg
  *
- * Interface for widget event listeners.
+ * \brief Interface for widget event listeners.
  */
 
 #ifndef NATIVEUI_WIDGET_EVENT_LISTENER_H_
@@ -33,7 +33,7 @@ namespace NativeUI
 	class Widget;
 
 	/**
-	 * Interface for widget event listeners.
+	 * \brief Interface for widget event listeners.
 	 */
 	class WidgetEventListener
 	{

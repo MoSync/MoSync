@@ -243,11 +243,7 @@ void BasicScreen::setupUI()
 	// Error handling for devices that do not support NativeUI.
 	if ( -1 == mScreen )
 	{
-        maPanic(0,
-			"This application uses Native UI, which currently "
-			"works on iOS and Android only - please select "
-			"an iOS or Android target profile in the "
-			"right-hand profile panel.");
+		maPanic(0, "NativeUI is only available on Android and iOS.");
 	}
 
 	// Create the main layout.

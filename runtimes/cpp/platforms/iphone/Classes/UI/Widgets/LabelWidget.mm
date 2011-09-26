@@ -93,13 +93,21 @@ typedef enum VerticalAlignment {
 	//label.numberOfLines = 0;
 	id ret = [super init];	
 	[self setAutoSizeParamX:WRAP_CONTENT andY:WRAP_CONTENT];
+    isWidthWrapContent = true;
 	return ret;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@MAW_LABEL_TEXT]) {
 		UILabel* label = (UILabel*) view;
-		[label setText: value];       
+		[label setText: value];
+        if (isWidthWrapContent)
+        {
+            CGSize textSize = [label.text sizeWithFont:label.font];
+            CGRect rect = label.frame;
+            rect.size.width = textSize.width;
+            label.frame = rect;
+        }
 		[self layout];
 		//[label sizeToFit];
 	} 
@@ -166,6 +174,20 @@ typedef enum VerticalAlignment {
         [label setFont:font];
         [self layout];
 	}
+    else if([key isEqualToString:@MAW_WIDGET_WIDTH])
+    {
+        // If the width of the label is MAW_CONSTANT_WRAP_CONTENT
+        // the label is not resized correctly so it will be set manually.
+        if ([value intValue] == MAW_CONSTANT_WRAP_CONTENT)
+        {
+            isWidthWrapContent = true;
+        }
+        else
+        {
+            isWidthWrapContent = false;
+        }
+        [super setPropertyWithKey:key toValue:value];
+    }
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

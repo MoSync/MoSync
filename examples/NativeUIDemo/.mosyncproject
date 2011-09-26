@@ -7,7 +7,7 @@
 <property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Release" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.libraries" value="mastd.lib, MAUtil.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="mastdD.lib, MAUtilD.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="mastdD.lib, MAUtilD.lib, NativeUI.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="mastd.lib, MAUtil.lib, NativeUI.lib"/>
 <property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%/lib/pipe"/>

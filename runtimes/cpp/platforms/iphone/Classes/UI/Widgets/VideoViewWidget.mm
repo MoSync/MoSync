@@ -136,7 +136,9 @@
 {
 	if([key isEqualToString:@MAW_VIDEO_VIEW_DURATION])
     {
-        return[[NSString alloc] initWithFormat:@"%f", [mMoviePlayerController duration]];
+        // Convert from seconds to milliseconds.
+        int duration = [mMoviePlayerController duration] * 1000;
+        return[[NSString alloc] initWithFormat:@"%d", duration];
 	}
     if([key isEqualToString:@MAW_VIDEO_VIEW_CURRENT_POSITION])
     {

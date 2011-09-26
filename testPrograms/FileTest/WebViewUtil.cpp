@@ -69,9 +69,7 @@ void Platform::checkNativeUISupport()
 	int widget = maWidgetCreate(MAW_WEB_VIEW);
 	if (-1 == widget)
 	{
-		maPanic(0,
-			"NativeUI is only available on Android and iPhone. "
-			"You must run directly on the device or devices emulator.");
+		maPanic(0, "NativeUI is only available on Android and iOS.");
 	}
 	else
 	{

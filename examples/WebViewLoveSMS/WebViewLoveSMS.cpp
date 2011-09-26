@@ -39,17 +39,25 @@ MA 02110-1301, USA.
  * considerations etc. Some teams may prefer to be C++ centric,
  * white others may prefer to do most of the development using
  * JavScript and web technologies.
+ *
+ * In this application, much of the application logic is written
+ * in JavaScript, and the C++ layer is used for sending text
+ * messages and for saving/loading the phone number entered
+ * in the user interface. There is only one phone number saved,
+ * because, after all, this is an application to be used with
+ * your loved one. ;-)
  */
 
-#include <ma.h>
-#include <maheap.h>
-#include <mastring.h>
-#include <mavsprintf.h>
-#include <MAUtil/String.h>
-#include <IX_WIDGET.h>
-#include <conprint.h>
-#include "MAHeaders.h"
-#include "WebViewUtil.h"
+#include <ma.h>				// MoSync API (base API).
+#include <maheap.h>			// C memory allocation functions.
+#include <mastring.h>		// C String functions.
+#include <mavsprintf.h>		// sprintf etc.
+#include <MAUtil/String.h>	// Class String.
+#include <IX_WIDGET.h>		// Widget API.
+#include <conprint.h>		// Debug logging, must build in debug mode
+							// for log messages to display.
+#include "MAHeaders.h"		// Resource identifiers, not a physical file.
+#include "WebViewUtil.h"	// Classes Platform and WebViewMessage.
 
 using namespace MoSync;
 
@@ -84,27 +92,23 @@ public:
 
 	void createUI()
 	{
-		// Create screen.
+		// Create the screen that will hold the web view.
 		mScreen = maWidgetCreate(MAW_SCREEN);
 		widgetShouldBeValid(mScreen, "Could not create screen");
 
-		// Write background image file.
-		mPlatform->writeDataToFile(
-			mPlatform->getLocalPath() + "amor128x128.png",
-			amor128x128_png);
-
-		// Write main page.
-		mPlatform->writeTextToFile(
-			mPlatform->getLocalPath() + "PageMain.html",
-			mPlatform->createTextFromHandle(PageMain_html));
-
-		// Create web view.
+		// Create the web view.
 		mWebView = createWebView();
 
-		// Display the main page.
+		// We need to copy the bundle with HTML/Media files to
+		// the application's local storage directory. The WebView
+		// will load the files from that location.
+		mPlatform->extractLocalFiles();
+
+		// Now we set the main page. This will load the page
+		// we saved, which in turn will load the background icon.
 		maWidgetSetProperty(mWebView, "url", "PageMain.html");
 
-		// Compose objects.
+		// Add the web view to the screen.
 		maWidgetAddChild(mScreen, mWebView);
 
 		// Show the screen.
@@ -164,19 +168,24 @@ public:
 					break;
 
 				case EVENT_TYPE_SMS:
+					// Depending on the event status, we call
+					// different JavaScript functions. These are
+					// currently hard-coded, but could be passed
+					// as parameters to decouple the JavaScript
+					// code from the C++ code.
 					if (MA_SMS_RESULT_SENT == event.status)
 					{
 						callJSFunction("SMSSent");
 					}
-					if (MA_SMS_RESULT_NOT_SENT == event.status)
+					else if (MA_SMS_RESULT_NOT_SENT == event.status)
 					{
 						callJSFunction("SMSNotSent");
 					}
-					if (MA_SMS_RESULT_DELIVERED == event.status)
+					else if (MA_SMS_RESULT_DELIVERED == event.status)
 					{
 						callJSFunction("SMSDelivered");
 					}
-					if (MA_SMS_RESULT_NOT_DELIVERED == event.status)
+					else if (MA_SMS_RESULT_NOT_DELIVERED == event.status)
 					{
 						callJSFunction("SMSNotDelivered");
 					}
@@ -201,13 +210,12 @@ public:
 					message.getParam(0),
 					message.getParam(1));
 			}
-			else
-			if (message.is("PageLoaded"))
+			else if (message.is("PageLoaded"))
 			{
-				// Set saved phone number here.
+				// Load and set saved phone number.
+				// We could implement a JavaScript File API to do
+				// this, which would be a much more general way.
 				setSavedPhoneNo();
-				//callJS("document.body.innerHTML='<p>Hello</p>'");
-				lprintfln("PageLoaded");
 			}
 		}
 	}
@@ -230,7 +238,7 @@ public:
 				message.c_str());
 
 			// Provide feedback via JS.
-			if (0 > result)
+			if (0 != result)
 			{
 				callJSFunction("SMSNotSent");
 			}

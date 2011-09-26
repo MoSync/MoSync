@@ -1128,6 +1128,10 @@ namespace Base {
 	}
 
 	SYSCALL(int, maSendTextSMS(const char* dst, const char* msg)) {
+		if ([MFMessageComposeViewController canSendText] == NO) {
+			return CONNERR_UNAVAILABLE;
+		}
+
 		MFMessageComposeViewController *smsController = [[MFMessageComposeViewController alloc] init];
 
 		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst]];
@@ -1233,6 +1237,7 @@ namespace Base {
 			[documentsDirectoryPath getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
 			[documentsDirectoryPath release];
 			[paths release];
+			res = size;
 		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
 			[@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
 		}

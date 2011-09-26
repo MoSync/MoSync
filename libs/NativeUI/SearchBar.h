@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file SearchBar.h
  * @author Emma Tresanszki
  *
- * Class for a special kind of edit box that is used for searching.
+ * \brief Class for a special kind of edit box that is used for searching.
  */
 
 #ifndef NATIVEUI_SEARCH_BAR_H_
@@ -34,7 +34,8 @@ namespace NativeUI
     class SearchBarListener;
 
     /**
-     * A search bar is a special kind of edit box that is used for searching.
+     * \brief A search bar is a special kind of edit box that is used for
+     * searching.
      */
     class SearchBar : public Widget
     {
