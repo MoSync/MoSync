@@ -64,11 +64,12 @@ work.instance_eval do
 		copyFilesSubDir("stlport", "using")
 		copyFilesSubDir("stlport", "using/h")
 
-		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + "newlib" + "/new",
-			FileTask.new(self, "../libsupc++/new"))
-
-		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + "newlib" + "/macpp.h",
-			FileTask.new(self, "../libsupc++/macpp.h"))
+		if(USE_NEWLIB)
+			@prerequisites << CopyFileTask.new(self, mosync_include + "/" + "newlib" + "/new",
+				FileTask.new(self, "../libsupc++/new"))
+			@prerequisites << CopyFileTask.new(self, mosync_include + "/" + "newlib" + "/macpp.h",
+				FileTask.new(self, "../libsupc++/macpp.h"))
+		end
 
 		@HEADER_DIRS = ["."]
 
