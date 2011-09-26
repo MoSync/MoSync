@@ -2392,7 +2392,7 @@ public class MoSyncThread extends Thread
 	 * the other runtimes this is necessary. There isn't a duplicate stored
 	 * on the JNI side.
 	 */
-	boolean loadBinary(int resourceIndex, ByteBuffer buffer)
+	public boolean loadBinary(int resourceIndex, ByteBuffer buffer)
 	{
 		SYSLOG("loadBinary index:" + resourceIndex);
 
@@ -2431,7 +2431,7 @@ public class MoSyncThread extends Thread
 		mMoSyncSound.storeIfAudioUBin(ubinData, resourceIndex);
 	}
 
-	ByteBuffer destroyBinary(int resourceIndex)
+	public ByteBuffer destroyBinary(int resourceIndex)
 	{
 		ByteBuffer buffer =  mBinaryResources.get(resourceIndex);
 
