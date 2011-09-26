@@ -59,7 +59,7 @@ MainScreen::~MainScreen()
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
-	mMainLayout->setBackgroundColor(0xFF0000);
+	mMainLayout->setBackgroundColor(0xC1FFC1);
 	Screen::setMainWidget(mMainLayout);
 
 	mNavigationBar = new NavigationBar();
@@ -67,7 +67,7 @@ void MainScreen::createMainLayout() {
 	mNavigationBar->setTitle("My title");
 	mNavigationBar->setTitleFontColor(0x104E8B);
 //	mNavigationBar->setTitleFontSize(20);
-//	mNavigationBar->setIcon(RES_IMAGE);
+	mNavigationBar->setIcon(RES_IMAGE);
 //	mNavigationBar->fillSpaceHorizontally();
 	mMainLayout->addChild(mNavigationBar);
 }
