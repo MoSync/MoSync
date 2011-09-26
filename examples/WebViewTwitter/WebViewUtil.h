@@ -78,6 +78,44 @@ public:
 	virtual MAUtil::String getLocalPath();
 
 	/**
+	 * Extract a file system bundle to a directory in the
+	 * local file system on the device/emulator.
+	 * @param handle The resource handle of the bundled
+	 * file system. Bundles are created with the Bundle tool
+	 * that comes with MoSync.
+	 * @param destinationPath The path of the directory where
+	 * the file system will be extracted.
+	 */
+	virtual bool Platform::extractFileSystem(
+		MAHandle handle,
+		const MAUtil::String& destinationPath);
+
+	/**
+	 * Extract the files in the file system bundle defined
+	 * as the first resource in the resource file. Files are
+	 * extracted to the root of the local file system on the
+	 * device/emulator.
+	 *
+	 * This function is intended as a high-level way to
+	 * extract files packaged in the standard way used in
+	 * the HTML5/Javascript MoSync project template.
+	 */
+	bool Platform::extractLocalFiles();
+
+	/**
+	 * Open a file for writing.
+	 * Create the file if it does not exist.
+	 * Note: Will truncate the file if it exists.
+	 * @return Handle to the open file, <0 on error.
+	 */
+	virtual MAHandle openFileForWriting(const MAUtil::String& filePath);
+
+	/**
+	 * Open a file for reading.
+	 * @return Handle to the open file, <0 on error.
+	 */
+	virtual MAHandle openFileForReading(const MAUtil::String& filePath);
+	/**
 	 * Write a data object to a file.
 	 * @return true on success, false on error.
 	 */
@@ -115,20 +153,6 @@ public:
 	 * Create a text string from data handle.
 	 */
 	virtual MAUtil::String createTextFromHandle(MAHandle data);
-
-	/**
-	 * Open a file for write (and read) access.
-	 * Create the file if it does not exist.
-	 * Note: Will truncate the file if it exists.
-	 * @return Handle to the open file, <0 on error.
-	 */
-	virtual MAHandle openFileForWriting(const MAUtil::String& filePath);
-
-	/**
-	 * Open a file for read access.
-	 * @return Handle to the open file, <0 on error.
-	 */
-	virtual MAHandle openFileForReading(const MAUtil::String& filePath);
 };
 
 /**

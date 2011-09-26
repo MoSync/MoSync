@@ -271,6 +271,28 @@ namespace NativeUI
          */
         virtual void removeWebViewListener(WebViewListener* listener);
 
+		/**
+		 * Register this web view to receive messages from JavaScript.
+		 * This will set a hook for urls with the "mosync://"
+		 * scheme. Messages will arrive in in the
+		 * WebViewListener::webViewHookInvoked() method. Use class
+		 * WebViewMessage to inspect and parse messages.
+		 */
+		virtual void enableWebViewMessages();
+
+		/**
+		 * Unregister this web view from receiving messages sent
+		 * from JavaScript. This will clear the web view url hook.
+		 */
+		virtual void disableWebViewMessages();
+
+		/**
+		 * Run JavaScript code in the web view.
+		 * @param script The JavaScript code to run.
+		 * @return #MAW_RES_OK on success, <0 on error.
+		 */
+		virtual int callJS(const MAUtil::String& script);
+
     protected:
         /**
          * This method is called when there is an event for this widget.

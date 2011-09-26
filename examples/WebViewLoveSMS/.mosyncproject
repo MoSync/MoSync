@@ -8,8 +8,8 @@
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="mastd.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, MAFSD.lib, NativeUID.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, MAFS.lib, NativeUI.lib"/>
 <property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
@@ -31,8 +31,8 @@
 <property key="build.prefs:ignore.default.library.paths/Release" value="false"/>
 <property key="build.prefs:memory.data/Debug" value="2048"/>
 <property key="build.prefs:memory.data/Release" value="2048"/>
-<property key="build.prefs:memory.heap/Debug" value="1024"/>
-<property key="build.prefs:memory.heap/Release" value="1024"/>
+<property key="build.prefs:memory.heap/Debug" value="1280"/>
+<property key="build.prefs:memory.heap/Release" value="1280"/>
 <property key="build.prefs:memory.stack/Debug" value="256"/>
 <property key="build.prefs:memory.stack/Release" value="256"/>
 <property key="build.prefs:project.type" value=""/>

@@ -783,8 +783,8 @@ namespace Base {
 			}
 		}
 #elif defined(__IPHONE__)
-		std::string newPath = getWriteablePath(fn);
-		fn = newPath.c_str();
+		std::string newPath = fn;
+		//fn = newPath.c_str();
 		size = newPath.size();
 		fh.name.resize(size+1);
 		memcpy(fh.name, fn, size);

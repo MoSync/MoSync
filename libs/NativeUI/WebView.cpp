@@ -340,6 +340,47 @@ namespace NativeUI
 		removeListenerFromVector(mWebViewListeners, listener);
     }
 
+	/**
+	 * Register this web view to receive messages from JavaScript.
+	 * This will set a hook for urls with the "mosync://"
+	 * scheme. Messages will arrive in in the
+	 * WebViewListener::webViewHookInvoked() method. Use class
+	 * WebViewMessage to inspect and parse messages.
+	 */
+	void WebView::enableWebViewMessages()
+	{
+		maWidgetSetProperty(
+			getWidgetHandle(),
+			MAW_WEB_VIEW_HARD_HOOK,
+			"mosync://.*");
+	}
+
+	/**
+	 * Unregister this web view from receiving messages sent
+	 * from JavaScript. This will clear the web view url hook.
+	 */
+	void WebView::disableWebViewMessages()
+	{
+		maWidgetSetProperty(
+			getWidgetHandle(),
+			MAW_WEB_VIEW_HARD_HOOK,
+			"");
+	}
+
+	/**
+	 * Run JavaScript code in the web view.
+	 * @param script The JavaScript code to run.
+	 * @return #MAW_RES_OK on success, <0 on error.
+	 */
+	int WebView::callJS(const MAUtil::String& script)
+	{
+		MAUtil::String url = "javascript:" + script;
+		return maWidgetSetProperty(
+			getWidgetHandle(),
+			MAW_WEB_VIEW_URL,
+			url.c_str());
+	}
+
     /**
      * This method is called when there is an event for this widget.
      * It passes on the event to all widget's listeners.
