@@ -20,10 +20,8 @@ MA 02110-1301, USA.
  * @file WebViewMessage.cpp
  * @author Mikael Kindborg
  *
- * Class for working with messages from a WebView.
+ * Class for parsing messages from a WebView.
  */
-
-
 
 #include <ma.h>				// MoSync API
 #include <maheap.h>			// C memory allocation
@@ -79,33 +77,7 @@ namespace NativeUI
 	 */
 	WebViewMessage::WebViewMessage(MAHandle dataHandle)
 	{
-		if (NULL != dataHandle)
-		{
-			// Get length of the data, it is not zero terminated.
-			int dataSize = maGetDataSize(dataHandle);
-
-			// Allocate buffer for string data.
-			char* stringData = (char*) malloc(dataSize + 1);
-
-			// Get the data.
-			maReadData(dataHandle, stringData, 0, dataSize);
-
-			// Zero terminate.
-			stringData[dataSize] = 0;
-
-			// Point to message data.
-			char* p = stringData + strlen("mosync://");
-
-			// Decode "percent encoded" characters
-			// and set the message string.
-			mMessageString = unescape(p);
-
-			// Destroy string data.
-			free(stringData);
-
-			// Destroy the data handle
-			maDestroyObject(dataHandle);
-		}
+		parse(dataHandle);
 	}
 
 	/**
@@ -117,80 +89,113 @@ namespace NativeUI
 	}
 
 	/**
-	 * Returns the message string.
-	 */
-	MAUtil::String WebViewMessage::getMessageString()
-	{
-		return mMessageString.c_str();
-	}
-
-	/**
 	 * Checks if this message matches the given message name.
 	 */
 	bool WebViewMessage::is(const MAUtil::String& messageName)
 	{
-		// Start of messageName should be found at start of message string.
-		return 0 == mMessageString.find(messageName);
+		return mMessageName == messageName;
 	}
 
 	/**
-	 * Returns the parameter part of a message.
+	 * Returns a message parameter by param name.
 	 */
-	MAUtil::String WebViewMessage::getParams()
+	MAUtil::String WebViewMessage::getParam(const MAUtil::String& paramName)
 	{
-		// Must be at least three characters in a message
-		// that has a data part.
-		if (mMessageString.length() < 3)
-		{
-			return "";
-		}
-
-		// Find first slash.
-		int index = mMessageString.find("/");
-		if (MAUtil::String::npos == index)
-		{
-			return "";
-		}
-
-		// Return the substring after the slash.
-		return mMessageString.substr(index + 1);
+		return mMessageParams[paramName];
 	}
 
 	/**
-	 * Returns a message parameter by index.
-	 * Parameters are separated by slashes.
+	 * Parse the message. This finds the message name and
+	 * creates a dictionary with the message parameters.
 	 */
-	MAUtil::String WebViewMessage::getParam(int index)
+	void WebViewMessage::parse(MAHandle dataHandle)
 	{
-		// Get params.
-		MAUtil::String params = getParams();
+		// Set message name to empty string as default.
+		mMessageName = "";
 
-		// Find start slash of the param we look for.
-		int start = 0;
-		for (int i = 0; i < index; ++i)
+		// We must have data.
+		if (NULL == dataHandle)
 		{
-			start = params.find("/", start);
-			if (MAUtil::String::npos == start)
-			{
-				// Param not found.
-				return "";
-			}
-			// Move to position after slash.
-			start = start + 1;
+			return;
 		}
 
-		// Is this the last param?
-		int end = params.find("/", start);
+		// Get length of the data, it is not zero terminated.
+		int dataSize = maGetDataSize(dataHandle);
+
+		// Allocate buffer for string data.
+		char* stringData = (char*) malloc(dataSize + 1);
+
+		// Get the data.
+		maReadData(dataHandle, stringData, 0, dataSize);
+
+		// Zero terminate.
+		stringData[dataSize] = 0;
+
+		// Create String object with message.
+		MAUtil::String messageString = stringData;
+
+		// Find schema.
+		int start = messageString.find("mosync://");
+		if (0 != start)
+		{
+			return;
+		}
+
+		// Set start of message name.
+		start = 9;
+
+		// Find end of message name.
+		int end = messageString.find("?", start);
 		if (MAUtil::String::npos == end)
 		{
-			// Yes, last param, return rest of the string.
-			return params.substr(start);
+			// No params, set message name to rest of string.
+			mMessageName = messageString.substr(start);
+			return;
 		}
-		else
+
+		// Set message name.
+		mMessageName = messageString.substr(start, end - start);
+
+		while (1)
 		{
-			// No, not last param, return param part of the string.
-			return params.substr(start, end);
+			// Find param name.
+			start = end + 1;
+			end = messageString.find("=", start);
+			if (MAUtil::String::npos == end)
+			{
+				// No param name found, we are done.
+				break;
+			}
+
+			// Set param name.
+			MAUtil::String paramName = messageString.substr(start, end - start);
+			MAUtil::String paramValue;
+
+			// Find end of param value.
+			start = end + 1;
+			end = messageString.find("&", start);
+			if (MAUtil::String::npos == end)
+			{
+				// Last param, set param value to rest of string.
+				paramValue = messageString.substr(start);
+			}
+			else
+			{
+				paramValue = messageString.substr(start, end - start);
+			}
+
+			// Add param to table.
+			mMessageParams.insert(unescape(paramName), unescape(paramValue));
+
+			// If no more params we are done.
+			if (MAUtil::String::npos == end)
+			{
+				break;
+			}
 		}
+
+		// Free string data.
+		free(stringData);
 	}
 
 } // namespace NativeUI

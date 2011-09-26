@@ -66,8 +66,8 @@ body {
     background: none;
     -webkit-border-image: url(img/button.png) 0 5 0 5;
 }
-#jqt .button.active, 
-#jqt .cancel.active, 
+#jqt .button.active,
+#jqt .cancel.active,
 #jqt .add.active {
     -webkit-border-image: url(img/buttonActive.png) 0 5 0 5;
 }
@@ -172,7 +172,7 @@ body {
     -webkit-tap-highlight-color: rgba(0,0,0,0);
     text-shadow: rgba(0,0,0,.2) 0 1px 1px;
 }
-#jqt ul li a.active, 
+#jqt ul li a.active,
 #jqt ul li a.button {
     background-color: #53b401;
     color: #fff;

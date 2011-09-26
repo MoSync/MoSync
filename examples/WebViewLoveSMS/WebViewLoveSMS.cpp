@@ -48,17 +48,11 @@ MA 02110-1301, USA.
  * your loved one. ;-)
  */
 
-#include <ma.h>					// MoSync API (base API).
-#include <maheap.h>				// C memory allocation functions.
-#include <mastring.h>			// C String functions.
-#include <mavsprintf.h>			// sprintf etc.
-#include <MAUtil/Moblet.h>		// Class Moblet.
-#include <MAUtil/String.h>		// Class String.
-#include <NativeUI/FileUtil.h>	// File utility functions.
-#include <NativeUI/Screen.h>	// The Screen widget.
-#include <NativeUI/WebView.h>	// The WebView widget.
-#include <NativeUI/WebViewListener.h>	// WebView event listener.
-#include <NativeUI/WebViewMessage.h>	// JavaScript to C++ messages.
+#include <ma.h>						// MoSync API (base API).
+#include <maheap.h>					// C memory allocation functions.
+#include <mastring.h>				// C String functions.
+#include <mavsprintf.h>				// sprintf etc.
+#include <NativeUI/WebAppMoblet.h>	// Moblet for web applications.
 
 using namespace MAUtil;
 using namespace NativeUI;
@@ -68,7 +62,7 @@ using namespace NativeUI;
  * You can turn off SMS sending during debugging
  * by setting this variable to false.
  */
-static bool sSendSMSForReal = true;
+static bool sSendSMSForReal = false;
 
 // Forward declaration.
 class LoveSMSWebViewListener;
@@ -76,60 +70,13 @@ class LoveSMSWebViewListener;
 /**
  * The application class.
  */
-class LoveSMSMoblet : public Moblet
+class LoveSMSMoblet : public WebAppMoblet
 {
 public:
 	LoveSMSMoblet()
 	{
-		extractFileSystem();
-		createUI();
-	}
-
-	virtual ~LoveSMSMoblet()
-	{
-		// Deleting the root widget will also delete child widgets.
-		delete mScreen;
-
-		// Delete the file utility object.
-		delete mFileUtil;
-	}
-
-	void extractFileSystem()
-	{
-		// Create file utility object.
-		mFileUtil = FileUtil::create();
-
-		// Extract bundled files to the local file system.
-		mFileUtil->extractLocalFiles();
-	}
-
-	void createUI()
-	{
-		// Create and configure the WebView.
-		WebView* webView = new WebView();
-		webView->fillSpaceHorizontally();
-		webView->fillSpaceVertically();
-		webView->disableZoom();
-		webView->enableWebViewMessages();
-		webView->openURL("PageMain.html");
-
-		// Create and show the screen that holds the WebView.
-		Screen* screen = new Screen();
-		screen->setMainWidget(webView);
-		screen->show();
-	}
-
-	/**
-	 * This method is called when a key is pressed, and closes
-	 * the application when the back key (on Android) is pressed.
-	 */
-	void keyPressEvent(int keyCode, int nativeCode)
-	{
-		if (MAK_BACK == keyCode)
-		{
-			// Call close to exit the application.
-			close();
-		}
+		getWebView()->disableZoom();
+		showPage("PageMain.html");
 	}
 
 	/**
@@ -168,14 +115,14 @@ public:
 	/**
 	 * Here we handle messages sent from JavaScript.
 	 */
-	void handleWebViewMessage(WebViewMessage& message)
+	void handleWebViewMessage(WebView* webView, WebViewMessage& message)
 	{
 		if (message.is("SendSMS"))
 		{
 			// Save phone no and send SMS.
 			savePhoneNoAndSendSMS(
-				message.getParam(0),
-				message.getParam(1));
+				message.getParam("phoneNo"),
+				message.getParam("message"));
 		}
 		else if (message.is("PageLoaded"))
 		{
@@ -190,9 +137,6 @@ public:
 		const String& phoneNo,
 		const String&  message)
 	{
-		lprintfln("*** SMS to: %s\n", phoneNo.c_str());
-		lprintfln("*** SMS data: %s\n", message.c_str());
-
 		// Save the phone number.
 		savePhoneNo(phoneNo);
 
@@ -234,7 +178,7 @@ public:
 	 */
 	void savePhoneNo(const String& phoneNo)
 	{
-		mFileUtil->writeTextToFile(phoneNoPath(), phoneNo);
+		getFileUtil()->writeTextToFile(phoneNoPath(), phoneNo);
 	}
 
 	/**
@@ -243,7 +187,7 @@ public:
 	String loadPhoneNo()
 	{
 		MAUtil::String phoneNo;
-		bool success = mFileUtil->readTextFromFile(phoneNoPath(), phoneNo);
+		bool success = getFileUtil()->readTextFromFile(phoneNoPath(), phoneNo);
 		if (success)
 		{
 			return phoneNo;
@@ -256,7 +200,7 @@ public:
 
 	String phoneNoPath()
 	{
-		return mFileUtil->getLocalPath() + "SavedPhoneNo";
+		return getFileUtil()->getLocalPath() + "SavedPhoneNo";
 	}
 
 	/**
@@ -266,87 +210,11 @@ public:
 	{
 		char code[512];
 		sprintf(code, "%s()", fun.c_str());
-		mWebView->callJS(code);
+		callJS(code);
 	}
 
-	/**
-	 * Run JavaScript code.
-	 */
-	void callJS(const String& script)
-	{
-		mWebView->callJS(script);
-	}
-
-private:
-	/**
-	 * The screen widget that is the root of the UI.
-	 */
-	Screen* mScreen;
-
-	/**
-	 * The WebView widget that displays the application UI.
-	 */
-	WebView* mWebView;
-
-	/**
-	 * File utility object.
-	 */
-	FileUtil* mFileUtil;
 };
 // End of class LoveSMSMoblet
-
-/**
- * Class that listens for WebView events.
- * Here we receive messages from JavScript.
- */
-class LoveSMSWebViewListener : public WebViewListener
-{
-public:
-	/**
-	 * Constructor that saves the pointer to the
-	 * application moblet.
-	 */
-	LoveSMSWebViewListener(LoveSMSMoblet* moblet)
-	{
-		mMoblet = moblet;
-	}
-
-	/**
-	 * This method is called when a "mosync://" url is
-	 * invoked in the WebView.
-	 */
-    virtual void webViewHookInvoked(
-		WebView* webView,
-		int hookType,
-		MAHandle urlData)
-    {
-		// Create message object
-		WebViewMessage message(urlData);
-
-		// Let the moblet handle the message.
-		mMoblet->handleWebViewMessage(message);
-
-		// Deallocate the url data. Note that this is
-		// very important to do, as memory will get
-		// consumed otherwise. Each hook invoked event
-		// allocates a new data object with the url data.
-		maDestroyObject(urlData);
-    }
-
-    // TODO: Remove when made non-abstract.
-    virtual void webViewContentLoading(
-		WebView* webView,
-		const int webViewState)
-    {
-    }
-
-private:
-    /**
-     * Pointer to the application moblet.
-     */
-    LoveSMSMoblet* mMoblet;
-};
-// End of class LoveSMSWebViewListener
 
 /**
  * Main function that is called when the program starts.

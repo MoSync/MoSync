@@ -30,7 +30,6 @@ MA 02110-1301, USA.
 
 namespace NativeUI
 {
-
     // Forward declaration.
     class WebViewListener;
 
@@ -294,11 +293,16 @@ namespace NativeUI
 		virtual int callJS(const MAUtil::String& script);
 
     protected:
-        /**
-         * This method is called when there is an event for this widget.
-         * It passes on the event to all widget's listeners.
-         * @param widgetEventData The data for the widget event.
-         */
+		/**
+		 * This method is called when there is an event for this widget.
+		 * It passes on the event to all widget's listeners.
+		 *
+		 * If the event is #MAW_EVENT_WEB_VIEW_HOOK_INVOKED the data
+		 * parameter "urlData" gets deleted automatically after the
+		 * event is processed.
+		 *
+		 * @param widgetEventData The data for the widget event.
+		 */
         virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
 
     private:
