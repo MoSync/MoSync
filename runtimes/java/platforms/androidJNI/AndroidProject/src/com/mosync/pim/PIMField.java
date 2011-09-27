@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.mosync.internal.android.SingletonObject;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -57,6 +59,20 @@ abstract class PIMField {
 	}
 
 	abstract void createMaps();
+
+	/**
+	 * @param errorCode
+	 *            The error code returned by the syscall.
+	 * @param panicCode
+	 *            The panic code for this error.
+	 * @param panicText
+	 *            The panic text for this error.
+	 * @return
+	 */
+	public int throwError(int errorCode, int panicCode, String panicText) {
+		return SingletonObject.getSingletonObject().error(errorCode, panicCode,
+				panicText);
+	}
 
 	/**
 	 * Read field
@@ -112,10 +128,12 @@ abstract class PIMField {
 	 */
 	int getAttributes(int index) {
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		int attr = getAndroidAttribute(index);
@@ -144,11 +162,13 @@ abstract class PIMField {
 	 */
 	int getLabel(int index, int buffPointer, int buffSize) {
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		if (!hasCustomLabel(index)) {
@@ -179,11 +199,13 @@ abstract class PIMField {
 		DebugPrint("PIMField.setLabel(" + index + ", " + buffPointer + ", "
 				+ buffSize + ")");
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		if (isReadOnly()) {
@@ -220,11 +242,13 @@ abstract class PIMField {
 	 */
 	int getValue(int index, int buffPointer, int buffSize) {
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		if (isWriteOnly()) {
@@ -252,11 +276,13 @@ abstract class PIMField {
 		}
 
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		char[] buffer = PIMUtil
@@ -323,11 +349,13 @@ abstract class PIMField {
 		}
 
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		if (mStates.get(index) != State.ADDED) {

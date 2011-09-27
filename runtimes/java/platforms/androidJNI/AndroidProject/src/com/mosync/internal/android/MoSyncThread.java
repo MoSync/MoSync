@@ -293,6 +293,8 @@ public class MoSyncThread extends Thread
 		EventQueue.sMoSyncThread = this;
 		sMoSyncThread = this;
 
+		SingletonObject.getSingletonObject().setThread(this);
+
 		mHasDied = false;
 
 		mMoSyncNetwork = new MoSyncNetwork(this);
