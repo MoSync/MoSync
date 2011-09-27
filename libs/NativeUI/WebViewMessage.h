@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file WebViewMessage.h
  * @author Mikael Kindborg
  *
- * Class for working with messages from a WebView.
+ * Class for parsing messages from a WebView.
  */
 
 #ifndef NATIVEUI_WEB_VIEW_MESSAGE_H_
@@ -28,26 +28,23 @@ MA 02110-1301, USA.
 
 #include <ma.h>
 #include <MAUtil/String.h>
+#include <MAUtil/HashMap.h>
 #include <IX_WIDGET.h>
 
 namespace NativeUI
 {
 
 /**
- * Class that reads and parses messages in the form of urls
- * sent from a web view as MAW_EVENT_WEB_VIEW_HOOK_INVOKED events.
+ * Class that parses messages in the form of urls sent from a
+ * WebView as MAW_EVENT_WEB_VIEW_HOOK_INVOKED events.
  *
  * Message (urls) used with this class has the format:
  *
- *   mosync://MessageName/Param1/Param2/...
+ *   mosync://MessageName?Param1=Value1&Param2=Value2&...
  *
  * Example JavaScript call (with no parameters):
  *
  *   document.location = "mosync://GetGeoLocation";
- *
- * To receive messages from a web from do an initial call to:
- *
- *   WebViewUtil::getMessagesFor(webView);
  *
  * TODO: Add copy constructor and assignment operator.
  */
@@ -72,32 +69,32 @@ public:
 	virtual ~WebViewMessage();
 
 	/**
-	 * Returns the message string.
-	 */
-	MAUtil::String getMessageString();
-
-	/**
 	 * Checks if this message matches the given message name.
 	 */
 	bool is(const MAUtil::String& messageName);
 
 	/**
-	 * Returns the parameter part of a message.
+	 * Returns a message parameter by param name.
 	 */
-	MAUtil::String getParams();
+	MAUtil::String getParam(const MAUtil::String& paramName);
 
+protected:
 	/**
-	 * Returns a message parameter by index.
-	 * Parameters are separated by slashes.
+	 * Parse the message. This finds the message name and
+	 * creates a dictionary with the message parameters.
 	 */
-	MAUtil::String getParam(int index);
+	void parse(MAHandle dataHandle);
 
 private:
 	/**
-	 * The message string.
+	 * The message name is the "command name".
 	 */
-	MAUtil::String mMessageString;
+	MAUtil::String mMessageName;
 
+	/**
+	 * Table for message parameters.
+	 */
+	MAUtil::HashMap<MAUtil::String, MAUtil::String> mMessageParams;
 };
 
 } // namespace NativeUI
