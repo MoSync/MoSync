@@ -74,7 +74,7 @@
 		left = [value intValue];
 	} else if([key isEqualToString:@MAW_WIDGET_TOP]) {
 		top = [value intValue];
-	} else if([key isEqualToString:@MAW_DIALOG_TITLE]) {
+	} else if([key isEqualToString:@MAW_MODAL_DIALOG_TITLE]) {
 		if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
 			//iPhone implementation goes here
 		}
@@ -82,7 +82,7 @@
 			[controller.title release];
 			controller.title = value;
 		}
-	} else if([key isEqualToString:@MAW_DIALOG_ARROW_POSITION]) {
+	} else if([key isEqualToString:@MAW_MODAL_DIALOG_ARROW_POSITION]) {
 		int msDirection = [value intValue];
 		direction = 0;
 		if (msDirection & MAW_CONSTANT_ARROW_UP) {
@@ -97,7 +97,7 @@
 		if (msDirection & MAW_CONSTANT_ARROW_RIGHT) {
 			direction |= UIPopoverArrowDirectionRight;
 		}
-	} else if([key isEqualToString:@MAW_DIALOG_USER_CAN_DISMISS]) {
+	} else if([key isEqualToString:@MAW_MODAL_DIALOG_USER_CAN_DISMISS]) {
 		if ([value isEqualToString:@"true"]){
 			dismissable = YES;
 		}

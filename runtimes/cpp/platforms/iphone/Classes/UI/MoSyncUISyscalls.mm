@@ -318,18 +318,18 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	return returnValue;
 }
 
-int maWidgetDialogShow(MAWidgetHandle dialogHandle) {
-	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
-	if(!dialog) return MAW_RES_INVALID_HANDLE;
+int maWidgetModalDialogShow(MAWidgetHandle dialog) {
+	IWidget* dialogWidget = [mosyncUI getWidget:dialog];
+	if(!dialogWidget) return MAW_RES_INVALID_HANDLE;
 
-	if(!([dialog class] == [DialogWidget class])) {
+	if(!([dialogWidget class] == [DialogWidget class])) {
 		return MAW_RES_INVALID_HANDLE;
 	}
 
 	int returnValue;
     NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
 	[NSObject performSelectorOnMainThread:@selector(show)
-							   withTarget:dialog
+							   withTarget:dialogWidget
 							  withObjects:arguments
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
@@ -337,18 +337,18 @@ int maWidgetDialogShow(MAWidgetHandle dialogHandle) {
 	return returnValue;
 }
 
-int maWidgetDialogHide(MAWidgetHandle dialogHandle) {
-	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
-	if(!dialog) return MAW_RES_INVALID_HANDLE;
+int maWidgetModalDialogHide(MAWidgetHandle dialog) {
+	IWidget* dialogWidget = [mosyncUI getWidget:dialog];
+	if(!dialogWidget) return MAW_RES_INVALID_HANDLE;
 
-	if(!([dialog class] == [DialogWidget class])) {
+	if(!([dialogWidget class] == [DialogWidget class])) {
 		return MAW_RES_INVALID_HANDLE;
 	}
 
 	int returnValue;
     NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
 	[NSObject performSelectorOnMainThread:@selector(hide)
-							   withTarget:dialog
+							   withTarget:dialogWidget
 							  withObjects:arguments
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];

@@ -1422,6 +1422,11 @@ return 0; \
 		MoSync_ShowMessageBox(title, message, false);
 	}
 
+	SYSCALL(void, maAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3))
+	{
+		MoSync_ShowAlert(title, message, button1, button2, button3);
+	}
+
     SYSCALL(void, maImagePickerOpen())
 	{
 		MoSync_ShowImagePicker();
@@ -1882,6 +1887,7 @@ return 0; \
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);
 		maIOCtl_case(maMessageBox);
+		maIOCtl_case(maAlert);
 		maIOCtl_case(maCameraStart);
 		maIOCtl_case(maCameraStop);
 		maIOCtl_case(maCameraSetPreview);
