@@ -1422,6 +1422,7 @@ return 0; \
 		MoSync_ShowMessageBox(title, message, false);
 	}
 
+	//Shows an alert box with up to three buttons
 	SYSCALL(void, maAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3))
 	{
 		MoSync_ShowAlert(title, message, button1, button2, button3);

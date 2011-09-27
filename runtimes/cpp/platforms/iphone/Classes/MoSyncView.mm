@@ -48,6 +48,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 @property (copy, nonatomic) NSString* button3Title;
 
 - (void)alertViewCancel:(UIAlertView *)alertView;
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
 
 @end
 
@@ -61,15 +62,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 @synthesize button2Title;
 @synthesize button3Title;
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)alertViewCancel:(UIAlertView *)alertView {
+	// don't know if this is allowed...
+	[self release];
 	if(kill)
 		MoSync_Exit();
 }
 
-- (void)alertViewCancel:(UIAlertView *)alertView {
-	// don't know if this is allowed...
-	if(kill)
-		MoSync_Exit();
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+	MAEvent event;
+	event.type = EVENT_TYPE_ALERT;
+	event.alertButtonIndex = buttonIndex + 1;
+	Base::gEventQueue.put(event);
+	[self release];
 }
 
 @end
@@ -203,7 +208,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
                           otherButtonTitles:mbh.button1Title, mbh.button2Title, mbh.button3Title, nil];
 	
 	[touchHelper clearTouches];
-	
+	if (mbh.cancelTitle == nil) {
+		alert.cancelButtonIndex = -1;
+	}
     [alert show];
     [alert release];
 }
