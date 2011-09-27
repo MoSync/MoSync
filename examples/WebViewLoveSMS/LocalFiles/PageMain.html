@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <!--
   This file contains CSS, JavaScript and HTML for the application.
@@ -98,6 +99,8 @@ html, body
 }
 </style>
 
+<script src="js/josync.js"></script>
+
 <script>
 // Global variables that hold message content.
 var G_LoveMessage = "";
@@ -120,14 +123,6 @@ function CreateMessageStrings()
   }
 }
 
-function SendMoSyncMessage(message)
-{
-  // We escape the message string ("percent encoding").
-  // This is done automatically anyhow, but we do it
-  // just in case to ensure playform consistency.
-  //document.location = 'mosync://' + escape(message);
-}
-
 function SendLoveSMS()
 {
   SendSMS(G_LoveMessage);
@@ -143,62 +138,12 @@ function SendSMS(message)
   if (ValidatePhoneNo())
   {
     DisplayMessage('Sending...');
-    SendMoSyncMessage('SendSMS/' + GetPhoneNo() + '/' + message);
+    SendMoSyncMessage(
+      'SendSMS',
+      'phoneNo', GetPhoneNo(),
+      'message', message);
   }
 }
-
-/* THIS IS A SKETCH OF A CALLBACK BASED MESSAGE SENDER
-var MessageHandler = function()
-{
-  var self = {};
-  var funTable = {};
-  var funId = 0;
-
-  self.send = function(message, callback)
-  {
-    funId = funId + 1;
-    funTable[funId] = callback;
-    document.location = 'mosync://' + funId + '/' + escape(message);
-  }
-
-  callJS("MessageHandler.reply(45, 1)");
-
-  self.reply = function(id)
-  {
-    var callback = funTable[id];
-    if (undefined != callback)
-    {
-      -- Remove the first param, the function id.
-      var args = Array.prototype.slice.call(arguments);
-      args.shift()
-      -- Call the function.
-      callback.apply(null, args);
-    }
-  }
-
-  return self;
-}()
-
-
-MessageHandler.send('ReadFile/"Dir/Data.txt"', function(data) {
-  if (null != data) {
-    alert(data);
-  }
-});
-
-MessageHandler.send('WriteFile//dir/Data.txt', 'HelloWorld', function(result) {
-  if (null != result) {
-    alert(result);
-  }
-});
-
-function SendSMS(phoneNo, message, callback)
-{
-  MessageHandler.send(
-    'SendSMS/' + id + '/' + phoneNo + '/' + message,
-    callback);
-}
-*/
 
 var DisplayMessageTimer = 0;
 

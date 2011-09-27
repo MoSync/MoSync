@@ -322,6 +322,7 @@ namespace NativeUI
     {
         return this->getPropertyString(MAW_WEB_VIEW_NEW_URL);
     }
+
     /**
      * Add an web view event listener.
      * @param listener The listener that will receive web view events.
@@ -384,6 +385,11 @@ namespace NativeUI
     /**
      * This method is called when there is an event for this widget.
      * It passes on the event to all widget's listeners.
+	 *
+	 * If the event is #MAW_EVENT_WEB_VIEW_HOOK_INVOKED the data
+	 * parameter "urlData" gets deleted automatically after the
+	 * event is processed.
+	 *
      * @param widgetEventData The data for the widget event.
      */
     void WebView::handleWidgetEvent(MAWidgetEventData* widgetEventData)
@@ -401,7 +407,7 @@ namespace NativeUI
         }
         else if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
         {
-		int hookType = widgetEventData->hookType;
+			int hookType = widgetEventData->hookType;
 			MAHandle url = widgetEventData->urlData;
 
             for (int i = 0; i < mWebViewListeners.size(); i++)
@@ -411,6 +417,8 @@ namespace NativeUI
 					hookType,
 					url);
             }
+
+			// Here the data object gets detroyed.
             maDestroyObject(url);
         }
     }

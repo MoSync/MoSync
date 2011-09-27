@@ -139,7 +139,7 @@ public class WebWidget extends Widget
 		// Should we hook this url?
 		if (mNonHookedUrls.contains(url))
 		{
-			Log.i("@@@ MoSync", "Non-hooked url detected: " + url);
+			//Log.i("@@@ MoSync", "Non-hooked url detected: " + url);
 
 			// This url should NOT be hooked. Since the check
 			// is now done, we remove it from the non-hooked urls.
@@ -171,7 +171,7 @@ public class WebWidget extends Widget
 			}
 		}
 
-		Log.i("@@@ MoSync", "No hook detected for url: " + url);
+		//Log.i("@@@ MoSync", "No hook detected for url: " + url);
 
 		// When there is no hook pattern, the url
 		// should NOT be hooked.
@@ -457,12 +457,12 @@ public class WebWidget extends Widget
 			Log.i("@@@ MoSync",
 				"MoSyncWebViewClient.shouldOverrideUrlLoading url: " + url);
 
-			// Should we soft hook this url?
+			// Should we hook this url?
 			int hookType = mWebWidget.checkHookType(url);
 			if (IX_WIDGET.MAW_CONSTANT_SOFT == hookType ||
 				IX_WIDGET.MAW_CONSTANT_HARD == hookType)
 			{
-				Log.i("@@@ MoSync", "Url is hooked: " + url);
+				//Log.i("@@@ MoSync", "Url is hooked: " + url);
 
 				// Store the message in a data object.
 				String messageString = url;
@@ -488,7 +488,7 @@ public class WebWidget extends Widget
 			}
 			else
 			{
-				Log.i("@@@ MoSync", "Processing standard url: " + url);
+				//Log.i("@@@ MoSync", "Processing standard url: " + url);
 
 				// TODO: Remove the following code for handling
 				// the deprecated MAW_EVENT_WEB_VIEW_URL_CHANGED.
