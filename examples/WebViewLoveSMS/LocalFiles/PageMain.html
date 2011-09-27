@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
 <!--
   This file contains CSS, JavaScript and HTML for the application.
@@ -98,6 +99,8 @@ html, body
 }
 </style>
 
+<script src="js/josync.js"></script>
+
 <script>
 // Global variables that hold message content.
 var G_LoveMessage = "";
@@ -120,14 +123,6 @@ function CreateMessageStrings()
   }
 }
 
-function SendMoSyncMessage(message)
-{
-  // We escape the message string ("percent encoding").
-  // This is done automatically anyhow, but we do it
-  // just in case to ensure playform consistency.
-  document.location = 'mosync://' + escape(message);
-}
-
 function SendLoveSMS()
 {
   SendSMS(G_LoveMessage);
@@ -143,7 +138,10 @@ function SendSMS(message)
   if (ValidatePhoneNo())
   {
     DisplayMessage('Sending...');
-    SendMoSyncMessage('SendSMS/' + GetPhoneNo() + '/' + message);
+    SendMoSyncMessage(
+      'SendSMS',
+      'phoneNo', GetPhoneNo(),
+      'message', message);
   }
 }
 

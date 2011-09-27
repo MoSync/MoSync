@@ -1,20 +1,22 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 
 <html>
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 		<title>Tweet Reader</title>
 
-
 		<!-- import JQTouch -->
-		<script src="jqtouch/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
+		<script src="js/jqtouch/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
 
 		<!-- Import JQTouch default style (iPhone look). Replace the string "themes/default" with "themes/jqt" for a neutral (black) theme -->
-		<link type="text/css" rel="stylesheet" media="screen" href="jqtouch/jqtouch.css">
-		<link type="text/css" rel="stylesheet" media="screen" href="themes/apple/theme.css">
+		<link type="text/css" rel="stylesheet" media="screen" href="js/jqtouch/jqtouch.css">
+		<link type="text/css" rel="stylesheet" media="screen" href="js/themes/apple/theme.css">
 		<!-- include JQuery through Google API => Always have the latest version -->
-		<script src="jqtouch/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
-		<script src="jqtouch/jqtouch.js" type="application/x-javascript" charset="utf-8"></script>
+		<script src="js/jqtouch/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jqtouch/jqtouch.js" type="application/x-javascript" charset="utf-8"></script>
+
+		<!-- Import MoSync JavaScript library. -->
+		<script src="js/josync.js"></script>
 
 		<!-- JavaScript goes here -->
 		<script type="text/javascript">
@@ -22,124 +24,135 @@
 			var jQT = $.jQTouch({
 				statusBar: 'black'
 			});
-			function SendMoSyncMessage(message)
-			{
-				// We escape the message string ("percent encoding").
-				// This is done automatically anyhow, but we do it
-				// just in case to ensure playform consistency.
-				document.location = 'mosync://' + escape(message);
-			}
-			
-			//We defince the parsed favorites as global functions because we use them in multiple places
+
+			// We defince the parsed favorites as global functions because
+			// we use them in multiple places.
 			var parsedFavorites = "";
-			
-			//make sure we get the correct event type on every touch system
+
+			// Make sure we get the correct event type on every touch system.
 			var userAgent = navigator.userAgent.toLowerCase();
-			var isiPhone = (userAgent.indexOf('iphone') != -1 || userAgent.indexOf('ipod') != -1) ? true : false;
-			clickEvent = isiPhone ? 'tap' : 'click';
-			
+			var isiPhone =
+				(userAgent.indexOf('iphone') != -1 ||
+				userAgent.indexOf('ipod') != -1)
+					? true : false;
+			var clickEvent = isiPhone ? 'tap' : 'click';
+
 			/**
 			 * Outputs the received tweets to the user-interface
-			 * @param tweets The tweets as an array. Each element represents one tweet and can be accessed via tweets[i].text
+			 * @param tweets The tweets as an array. Each element
+			 * represents one tweet and can be accessed via tweets[i].text
 			 */
-			function showTweets(tweets, username){
+			function showTweets(tweets, username)
+			{
 				var tweetsTitle = document.getElementById("TweetsTitle");
 				tweetsTitle.innerHTML = username;
 				var results_ul = document.getElementById("results_ul");
-				//if it is the loading indicator do not parse it
-				if(tweets == "loading..."){
-				results_ul.innerHTML = "<li>" + tweets + "</li>";
+				// If it is the loading indicator do not parse it.
+				if (tweets == "loading...")
+				{
+					results_ul.innerHTML = "<li>" + tweets + "</li>";
 				}
-				else{
-				var results = "";
-				if(tweets.length == 0){
-					results = "<li>No tweets could be found check the username!!! </li>";
-				}
-				else{
-					for (var i=0; i<tweets.length; i++){
-						results += "<li>" + tweets[i].text + "</li>";
+				else
+				{
+					var results = "";
+					if (tweets.length == 0)
+					{
+						results = "<li>No tweets could be found check the username!!!</li>";
 					}
+					else
+					{
+						for (var i=0; i<tweets.length; i++)
+						{
+							results += "<li>" + tweets[i].text + "</li>";
+						}
+					}
+					results_ul.innerHTML = results;
 				}
-				results_ul.innerHTML = results;
-				}					
 			}
-			
+
 			/**
-			 * Navigates back one page
+			 * Navigates back one page.
 			 */
-			function goBack(){
+			function goBack()
+			{
 				jQT.goBack();
 			}
 
 			/**
-			 * Downloads the Tweets for an specific user 
-			 * @param username the username that should be used for downloading
-			 * 
+			 * Downloads the Tweets for an specific user.
+			 * @param username the username that should be used
+			 * for downloading.
 			 */
-			function getTweetsForUser(username) {
+			function getTweetsForUser(username)
+			{
 				showTweets("loading...", username);
-				// Prepare the Twitter url, so it can be passed as a GET parameter
+				// Prepare the Twitter url, so it can be passed as a GET parameter.
 				var twitterUrl = "http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" + username;
-				
-				// Do the ajax call with JSON
-				$.getJSON(twitterUrl,function(d){
+
+				// Do the ajax call with JSON.
+				$.getJSON(twitterUrl,function(d)
+				{
 					showTweets(d, username);
 				});
 				jQT.goTo('#tweets');
 			}
 
 			/**
-			 * Gets the tweets for the user indicated in the input form
-			 * 
-			 */ 
-			function getTweets() {
-				// Get the username from the input field
+			 * Gets the tweets for the user indicated in the input form.
+			 */
+			function getTweets()
+			{
+				// Get the username from the input field.
 				var username = document.getElementById("username_input").value;
 				getTweetsForUser(username)
 			}
-			
+
 			/**
-			 * This function uses calls to Mosync for accessing files and saving the favorites
+			 * This function uses calls to Mosync for accessing files
+			 * and saving the favorites-
 			 */
 			function addToFavorites(){
 				// Get the username from the input field
 				var username = document.getElementById("username_input").value;
-				SendMoSyncMessage("addToFavorites/"+ username);
+				SendMoSyncMessage("AddToFavorites", "userName", username);
 			}
-			
+
 			/**
-			 * Parses the List return by MoSync Code
-			 * 
-			 */ 
-			function parseFavorites(list){
+			 * Parses the list  of user names returned by MoSync C++ code.
+			 */
+			function parseFavorites(list)
+			{
 				return list.split(",");
 			}
 
-
-			function setFavorites(favoriteList){
+			function setFavorites(favoriteList)
+			{
 				parsedFavorites = parseFavorites(favoriteList);
 				var favorites_ul = document.getElementById("favorites");
 				var myID = "";
 				favorites_ul.innerHTML = "<li> Favorites: </li>";
-				for(i = 0;i < parsedFavorites.length;i++){
-					myID = "#submitButton"+i;
-					favorites_ul.innerHTML += "<li class='arrow'><a id='submitButton"+
-						i+
-						"')' onclick='getTweetsForUser(\""+
-						parsedFavorites[i]+
+				for (var i = 0; i < parsedFavorites.length; i++)
+				{
+					myID = "#submitButton" + i;
+					favorites_ul.innerHTML += "<li class='arrow'><a id='submitButton" +
+						i +
+						"')' onclick='getTweetsForUser(\"" +
+						parsedFavorites[i] +
 						"\")'>" +
 						parsedFavorites[i] +
 						"</a></li>";
 				}
 			}
-		
+
 			/**
-			 * Event-listener. Gets called if the user presses a button on his keyboard
-			 * in the input field.
+			 * Event-listener. Gets called if the user presses a button
+			 * on his keyboard in the input field.
 			 * @param keynum The pressed key (as an ASCii value)
 			 */
-			function keydown(keynum){
-				if (keynum == 13){
+			function keydown(keynum)
+			{
+				if (keynum == 13)
+				{
 					$("#submitButton").trigger(clickEvent);
 				}
 			}
@@ -147,17 +160,21 @@
 			/**
 			 * Will be called after all the markup in <body> was loaded
 			 */
-			function init(){
-				$("#submitButton").bind(clickEvent, function(e){
+			function init()
+			{
+				$("#submitButton").bind(clickEvent, function(e)
+				{
 					getTweets();
 				});
-				$("#favoriteButton").bind(clickEvent, function(e){
+				$("#favoriteButton").bind(clickEvent, function(e)
+				{
 					addToFavorites();
 				});
-				$("#backButton").bind(clickEvent, function(e){
+				$("#backButton").bind(clickEvent, function(e)
+				{
 					goBack();
 				});
-	
+
 				//send a message to Mosync side so it knows that we are done with front processing
 				SendMoSyncMessage("PageLoaded");
 			}
@@ -177,7 +194,7 @@
 				<h1>Tweet Reader</h1>
 			</div>
 			<ul class="rounded">
-				<li><input onkeydown="keydown(event.which);" 
+				<li><input onkeydown="keydown(event.which);"
 					   type="text"
 					   placeholder="User name"
 					   name="username"
@@ -185,12 +202,12 @@
 					   autocapitalize="off"
 					   autocorrect="off"
 					   autocomplete="off"></li>
-				
+
 				<li class="arrow">
 					<a id="submitButton" >View Tweets by this user</a></li>
 				<li><a id="favoriteButton">Add to Favorites List</a></li>
 			</ul>
-			
+
 			<ul id="favorites" class="rounded">
 				<li>Favorites:</li>
 			</ul>
@@ -203,12 +220,12 @@
 				<h1 id="TweetsTitle">Tweets By ...</h1>
 				<a class="button back" href="#theform" id="backButton">Back</a>
 			</div>
-			
+
 			<ul id="results_ul" class="rounded">
 				<li>Loading...</li>
 			</ul>
 		</ul>
-			
+
 	</div>
 
 </body>
