@@ -2,8 +2,6 @@ package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_ATTRIBUTES;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_BUFFER_TOO_SMALL;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_EMPTY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_READ_ONLY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_WRITE_ONLY;
@@ -15,6 +13,8 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_COUNT_MAX;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+
+import com.mosync.internal.android.SingletonObject;
 
 import android.content.ContentProviderOperation;
 import android.content.ContentResolver;
@@ -57,6 +57,20 @@ abstract class PIMField {
 	}
 
 	abstract void createMaps();
+
+	/**
+	 * @param errorCode
+	 *            The error code returned by the syscall.
+	 * @param panicCode
+	 *            The panic code for this error.
+	 * @param panicText
+	 *            The panic text for this error.
+	 * @return
+	 */
+	public int throwError(int errorCode, int panicCode, String panicText) {
+		return SingletonObject.getSingletonObject().error(errorCode, panicCode,
+				panicText);
+	}
 
 	/**
 	 * Read field
@@ -112,16 +126,18 @@ abstract class PIMField {
 	 */
 	int getAttributes(int index) {
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		int attr = getAndroidAttribute(index);
 
 		if (attr < 0) {
-			return MA_PIM_ERR_NO_ATTRIBUTES;
+			return 0;
 		}
 
 		int ret = ((Integer) PIMUtil.getKeyFromValue(mAttributes, attr))
@@ -144,11 +160,13 @@ abstract class PIMField {
 	 */
 	int getLabel(int index, int buffPointer, int buffSize) {
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		if (!hasCustomLabel(index)) {
@@ -157,8 +175,8 @@ abstract class PIMField {
 
 		char[] buffer = getLabel(index);
 
-		if (buffer.length > buffSize)
-			return MA_PIM_ERR_BUFFER_TOO_SMALL;
+		if (buffer.length > (buffSize >> 1))
+			return (buffer.length << 1);
 
 		PIMUtil.copyBufferToMemory(buffPointer, buffer);
 
@@ -179,11 +197,13 @@ abstract class PIMField {
 		DebugPrint("PIMField.setLabel(" + index + ", " + buffPointer + ", "
 				+ buffSize + ")");
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		if (isReadOnly()) {
@@ -220,11 +240,13 @@ abstract class PIMField {
 	 */
 	int getValue(int index, int buffPointer, int buffSize) {
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		if (isWriteOnly()) {
@@ -234,7 +256,7 @@ abstract class PIMField {
 		char[] buffer = getData(index);
 
 		if (buffer.length > (buffSize >> 1))
-			return MA_PIM_ERR_BUFFER_TOO_SMALL;
+			return (buffer.length << 1);
 
 		PIMUtil.copyBufferToMemory(buffPointer, buffer);
 
@@ -252,11 +274,13 @@ abstract class PIMField {
 		}
 
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		char[] buffer = PIMUtil
@@ -323,11 +347,13 @@ abstract class PIMField {
 		}
 
 		if (isEmpty()) {
-			return MA_PIM_ERR_FIELD_EMPTY;
+			return throwError(MA_PIM_ERR_FIELD_EMPTY,
+					PIMError.PANIC_FIELD_EMPTY, PIMError.sStrFieldEmpty);
 		}
 
 		if ((index < 0) || (index >= length())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		if (mStates.get(index) != State.ADDED) {

@@ -8,6 +8,8 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_INDEX_INVALID;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.mosync.internal.android.SingletonObject;
+
 import android.content.ContentProviderOperation;
 import android.content.ContentProviderResult;
 import android.content.ContentResolver;
@@ -107,6 +109,20 @@ public class PIMItem {
 	}
 
 	/**
+	 * @param errorCode
+	 *            The error code returned by the syscall.
+	 * @param panicCode
+	 *            The panic code for this error.
+	 * @param panicText
+	 *            The panic text for this error.
+	 * @return
+	 */
+	public int throwError(int errorCode, int panicCode, String panicText) {
+		return SingletonObject.getSingletonObject().error(errorCode, panicCode,
+				panicText);
+	}
+
+	/**
 	 * Read the item with contactId.
 	 * @param cr
 	 * @param contactId
@@ -164,7 +180,8 @@ public class PIMItem {
 	int getFieldType(int index) {
 		DebugPrint("PIMItem.getFieldType(" + index + ")");
 		if ((index < 0) || (index >= mPIMFields.size())) {
-			return MA_PIM_ERR_INDEX_INVALID;
+			return throwError(MA_PIM_ERR_INDEX_INVALID,
+					PIMError.PANIC_INDEX_INVALID, PIMError.sStrIndexInvalid);
 		}
 
 		return mPIMFields.get(index).getType();
@@ -180,7 +197,8 @@ public class PIMItem {
 		PIMField pimField = getField(field);
 
 		if (pimField == null) {
-			return MA_PIM_ERR_FIELD_INVALID;
+			return throwError(MA_PIM_ERR_FIELD_INVALID,
+					PIMError.PANIC_FIELD_INVALID, PIMError.sStrFieldInvalid);
 		}
 		if (!pimField.isSupported()) {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
@@ -199,7 +217,8 @@ public class PIMItem {
 		PIMField pimField = getField(field);
 
 		if (pimField == null) {
-			return MA_PIM_ERR_FIELD_INVALID;
+			return throwError(MA_PIM_ERR_FIELD_INVALID,
+					PIMError.PANIC_FIELD_INVALID, PIMError.sStrFieldInvalid);
 		}
 		if (!pimField.isSupported()) {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
@@ -222,7 +241,8 @@ public class PIMItem {
 		PIMField pimField = getField(field);
 
 		if (pimField == null) {
-			return MA_PIM_ERR_FIELD_INVALID;
+			return throwError(MA_PIM_ERR_FIELD_INVALID,
+					PIMError.PANIC_FIELD_INVALID, PIMError.sStrFieldInvalid);
 		}
 		if (!pimField.isSupported()) {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
@@ -245,7 +265,8 @@ public class PIMItem {
 		PIMField pimField = getField(field);
 
 		if (pimField == null) {
-			return MA_PIM_ERR_FIELD_INVALID;
+			return throwError(MA_PIM_ERR_FIELD_INVALID,
+					PIMError.PANIC_FIELD_INVALID, PIMError.sStrFieldInvalid);
 		}
 		if (!pimField.isSupported()) {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
@@ -269,7 +290,8 @@ public class PIMItem {
 		PIMField pimField = getField(field);
 
 		if (pimField == null) {
-			return MA_PIM_ERR_FIELD_INVALID;
+			return throwError(MA_PIM_ERR_FIELD_INVALID,
+					PIMError.PANIC_FIELD_INVALID, PIMError.sStrFieldInvalid);
 		}
 		if (!pimField.isSupported()) {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
@@ -293,7 +315,8 @@ public class PIMItem {
 		PIMField pimField = getField(field);
 
 		if (pimField == null) {
-			return MA_PIM_ERR_FIELD_INVALID;
+			return throwError(MA_PIM_ERR_FIELD_INVALID,
+					PIMError.PANIC_FIELD_INVALID, PIMError.sStrFieldInvalid);
 		}
 		if (!pimField.isSupported()) {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
@@ -317,7 +340,8 @@ public class PIMItem {
 		PIMField pimField = getField(field);
 
 		if (pimField == null) {
-			return MA_PIM_ERR_FIELD_INVALID;
+			return throwError(MA_PIM_ERR_FIELD_INVALID,
+					PIMError.PANIC_FIELD_INVALID, PIMError.sStrFieldInvalid);
 		}
 		if (!pimField.isSupported()) {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
@@ -339,7 +363,8 @@ public class PIMItem {
 		PIMField pimField = getField(field);
 
 		if (pimField == null) {
-			return MA_PIM_ERR_FIELD_INVALID;
+			return throwError(MA_PIM_ERR_FIELD_INVALID,
+					PIMError.PANIC_FIELD_INVALID, PIMError.sStrFieldInvalid);
 		}
 		if (!pimField.isSupported()) {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
@@ -357,7 +382,8 @@ public class PIMItem {
 		PIMField pimField = getField(field);
 
 		if (pimField == null) {
-			return MA_PIM_ERR_FIELD_INVALID;
+			return throwError(MA_PIM_ERR_FIELD_INVALID,
+					PIMError.PANIC_FIELD_INVALID, PIMError.sStrFieldInvalid);
 		}
 		if (!pimField.isSupported()) {
 			return MA_PIM_ERR_FIELD_UNSUPPORTED;
