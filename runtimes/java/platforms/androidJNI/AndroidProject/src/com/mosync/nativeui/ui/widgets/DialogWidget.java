@@ -22,7 +22,6 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.view.ViewGroup;
 
-
 import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
@@ -161,7 +160,7 @@ public class DialogWidget extends Layout
 
 					@Override
 					public void onClick(DialogInterface dialog, int position) {
-						EventQueue.getDefault().postDialogButtonClicked(m_handle, 0);
+						EventQueue.getDefault().postDialogButtonClicked(m_handle, 1);
 
 					}
 				});
@@ -177,7 +176,7 @@ public class DialogWidget extends Layout
 
 				@Override
 				public void onClick(DialogInterface dialog, int position) {
-					EventQueue.getDefault().postDialogButtonClicked(m_handle, 1);
+					EventQueue.getDefault().postDialogButtonClicked(m_handle, 0);
 
 				}
 			});

@@ -42,9 +42,9 @@ namespace NativeUI
 {
 
 	/**
-	 * Use the OptionsDialog class to present the user a set of alternatives
-	 * for how to proceed with a given task. You can also use this class to
-	 * prompt the user to confirm a potentially dangerous action.
+	 * \brief Use the OptionsDialog class to present the user a set of
+	 * alternatives for how to proceed with a given task. You can also use this
+	 * class to prompt the user to confirm a potentially dangerous action.
 	 * The OptionsDialog contains an optional title and one or more buttons,
 	 * each corresponds to an action to take.
 	 * OptionsDialog class uses singleton pattern so make sure you reset

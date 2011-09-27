@@ -3764,8 +3764,8 @@ group WidgetAPI "Widget API" {
 
 			/**
 			* Send by the Dialog widget when a #MAW_EVENT_DIALOG_BUTTON_CLICKED event is received.
-			* If index is 0 that means that the cancel button was clicked.
-			* If index is 1 than the ok/done button was clicked.
+			* If index is 0 that means that the left button was clicked.
+			* If index is 1 than the right button was clicked.
 			*/
 			int dialogButtonIndex;
 		}
@@ -4293,7 +4293,6 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
-		 * This is an iOS specific widget.
 		 * See \ref WidgetNavBarProperties "Navigation Bar properties" for the properties available.
 		 */
 		NAV_BAR = "NavBar";
@@ -6257,9 +6256,25 @@ group WidgetAPI "Widget API" {
 		TITLE = "title";
 
 		/**
+		* Sets the icon of the nav bar. This won't be scaled at all.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in the nav bar.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_ICON, toString(R_MY_IMAGE));
+		* \endcode
+		*/
+		ICON = "icon";
+
+		/**
 		* @brief Sets the text for the back button.
 		* This can be set only when the navigation bar was
 		* attached to a screen that is not part of a stack screen.
+		* Note: this is available only on iOS.
+		* On Android the back behavior is handled by the device's back button.
 		*
 		* @validvalue A null-terminated string.
 		*
@@ -6273,8 +6288,7 @@ group WidgetAPI "Widget API" {
 		BACK_BTN = "backBtn";
 
 		/**
-		* @brief Sets the background color. The default color is light blue.
-		* The color is in RGB8 format (0xRRGGBB).
+		* @brief Sets the font color of the title.
 		*
 		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
 		*
@@ -6282,11 +6296,46 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x101010");
+		*	maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_TITLE_FONT_COLOR, "0xff0000");
 		* \endcode
-		*
 		*/
-		COLOR = "color";
+		TITLE_FONT_COLOR = "titleFontColor";
+
+		/**
+		* @brief Sets the font size in points of the title.
+		*
+		* @validvalue A float that specifies the number of points.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_TITLE_FONT_SIZE, "13.0");
+		* \endcode
+		*/
+		TITLE_FONT_SIZE = "titleFontSize";
+
+		/**
+		* @brief Sets the typeface and style in which the title should be displayed.
+		*
+		* @validvalue A font handle received from loading fonts using
+		* #maFontGetName and #maFontLoadWithName syscalls.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   int nrFonts = maFontGetCount();
+		*    char buf[256];
+		*    // Get first font name.
+		*    maFontGetName(1, buf, 256);
+		*    // Load that font for size 10.
+		*    int fontHandle = maFontLoadWithName(buf, 10);
+		*    // Set that font to the label.
+		*	maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_TITLE_FONT_HANDLE, toString(fontHandle));
+		* \endcode
+		*/
+		TITLE_FONT_HANDLE = "titleFontHandle";
 	}
 	} // end of WidgetNavBarProperties
 
