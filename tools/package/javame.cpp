@@ -125,7 +125,7 @@ static void writeManifest(const SETTINGS& s, const RuntimeInfo& ri,
 	stream << "MicroEdition-Profile: MIDP-2.0\n";
 	stream << "MicroEdition-Configuration: CLDC-1."<<(ri.isCldc10 ? "0" : "1")<<"\n";
 	if(isJad) {
-		stream << "MIDlet-Jar-URL: "<<jarFileName<<".jar\n";
+		stream << "MIDlet-Jar-URL: "<<jarFileName<<"\n";
 		stream << "MIDlet-Jar-Size: "<<getFileSize(jarFileName.c_str())<<"\n";
 	}
 	beGood(stream);

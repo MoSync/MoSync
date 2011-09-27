@@ -16,14 +16,12 @@
 		1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1D30AB110D05D00D00671497 /* Foundation.framework */; };
 		1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1DF5F4DF0D08C38300B7A737 /* UIKit.framework */; };
 		288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 288765A40DF7441C002DB57D /* CoreGraphics.framework */; };
+		29B46B3D1407FAA5009491A6 /* PimContactItem.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3B1407FAA5009491A6 /* PimContactItem.mm */; };
+		29B46B3E1407FAA5009491A6 /* PimContactsList.mm in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.mm */; };
 		4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
 		41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */ = {isa = PBXBuildFile; fileRef = 4192E7B613F5801900C10302 /* CameraConfirgurator.h */; };
 		4318698513F68D410051D97A /* PimContactItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318696E13F68D410051D97A /* PimContactItem.h */; };
-		4318698613F68D410051D97A /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318696F13F68D410051D97A /* PimContactItem.m */; };
-		4318698713F68D410051D97A /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318696F13F68D410051D97A /* PimContactItem.m */; };
 		4318698813F68D410051D97A /* PimContactsList.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697013F68D410051D97A /* PimContactsList.h */; };
-		4318698913F68D410051D97A /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318697113F68D410051D97A /* PimContactsList.m */; };
-		4318698A13F68D410051D97A /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 4318697113F68D410051D97A /* PimContactsList.m */; };
 		4318699113F68D410051D97A /* PimDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697713F68D410051D97A /* PimDatabase.h */; };
 		4318699213F68D410051D97A /* PimDatabase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4318697813F68D410051D97A /* PimDatabase.mm */; };
 		4318699313F68D410051D97A /* PimDatabase.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4318697813F68D410051D97A /* PimDatabase.mm */; };
@@ -278,14 +276,14 @@
 		1DF5F4DF0D08C38300B7A737 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		288765A40DF7441C002DB57D /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
 		28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncViewController.h; sourceTree = "<group>"; };
+		29B46B3B1407FAA5009491A6 /* PimContactItem.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PimContactItem.mm; sourceTree = "<group>"; };
+		29B46B3C1407FAA5009491A6 /* PimContactsList.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PimContactsList.mm; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
 		4192E7B613F5801900C10302 /* CameraConfirgurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraConfirgurator.h; sourceTree = "<group>"; };
 		4192E7B713F5801900C10302 /* CameraConfirgurator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraConfirgurator.mm; sourceTree = "<group>"; };
 		4318696E13F68D410051D97A /* PimContactItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactItem.h; sourceTree = "<group>"; };
-		4318696F13F68D410051D97A /* PimContactItem.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PimContactItem.m; sourceTree = "<group>"; };
 		4318697013F68D410051D97A /* PimContactsList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactsList.h; sourceTree = "<group>"; };
-		4318697113F68D410051D97A /* PimContactsList.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PimContactsList.m; sourceTree = "<group>"; };
 		4318697713F68D410051D97A /* PimDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimDatabase.h; sourceTree = "<group>"; };
 		4318697813F68D410051D97A /* PimDatabase.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = PimDatabase.mm; sourceTree = "<group>"; };
 		4318697913F68D410051D97A /* PimFieldItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimFieldItem.h; sourceTree = "<group>"; };
@@ -662,10 +660,10 @@
 		4318696D13F68D410051D97A /* contacts */ = {
 			isa = PBXGroup;
 			children = (
+				29B46B3B1407FAA5009491A6 /* PimContactItem.mm */,
+				29B46B3C1407FAA5009491A6 /* PimContactsList.mm */,
 				4318696E13F68D410051D97A /* PimContactItem.h */,
-				4318696F13F68D410051D97A /* PimContactItem.m */,
 				4318697013F68D410051D97A /* PimContactsList.h */,
-				4318697113F68D410051D97A /* PimContactsList.m */,
 			);
 			path = contacts;
 			sourceTree = "<group>";
@@ -1168,8 +1166,6 @@
 				85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */,
 				0B90962C13E05C1500A91170 /* CameraPreviewWidget.mm in Sources */,
 				4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */,
-				4318698613F68D410051D97A /* PimContactItem.m in Sources */,
-				4318698913F68D410051D97A /* PimContactsList.m in Sources */,
 				4318699213F68D410051D97A /* PimDatabase.mm in Sources */,
 				4318699513F68D410051D97A /* PimFieldItem.mm in Sources */,
 				4318699813F68D410051D97A /* PimFieldItemValue.mm in Sources */,
@@ -1186,6 +1182,8 @@
 				43D8047C13EFBCB200183387 /* TimePickerWidget.mm in Sources */,
 				43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */,
 				43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */,
+				29B46B3D1407FAA5009491A6 /* PimContactItem.mm in Sources */,
+				29B46B3E1407FAA5009491A6 /* PimContactsList.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1251,8 +1249,6 @@
 				8594B8A113258A970059D79B /* LayoutWidgets.mm in Sources */,
 				85037842133A2275009251E2 /* StackScreenWidget.mm in Sources */,
 				0B90962B13E05C1400A91170 /* CameraPreviewWidget.mm in Sources */,
-				4318698713F68D410051D97A /* PimContactItem.m in Sources */,
-				4318698A13F68D410051D97A /* PimContactsList.m in Sources */,
 				4318699313F68D410051D97A /* PimDatabase.mm in Sources */,
 				4318699613F68D410051D97A /* PimFieldItem.mm in Sources */,
 				4318699913F68D410051D97A /* PimFieldItemValue.mm in Sources */,

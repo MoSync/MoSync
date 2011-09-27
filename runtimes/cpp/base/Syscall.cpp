@@ -47,6 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #if !defined(SYMBIAN) && !defined(_android)
 #include <vector>
+#include <set>
 #include "helpers/mkdir.h"
 #endif
 
@@ -62,12 +63,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #if defined(LINUX) || defined(__IPHONE__) || defined(DARWIN)
 #include <sys/statvfs.h>
+#define stricmp(x, y) strcasecmp(x, y)
 #endif
 
 using namespace Base;
 
 namespace Base {
-	
+
 	uint getMaxCustomEventSize() {
 		#define COUNT_CUSTOM_EVENT(eventType, dataType)\
 			if(maxCustomEventSize < sizeof(dataType)) maxCustomEventSize = sizeof(dataType);
@@ -75,8 +77,8 @@ namespace Base {
 		uint maxCustomEventSize = 0;
 		CUSTOM_EVENTS(COUNT_CUSTOM_EVENT);
 		DUMPHEX(maxCustomEventSize);
-		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)	
-		
+		maxCustomEventSize = (maxCustomEventSize+0x3) & (~0x3); // align to sizeof(int)
+
 		return maxCustomEventSize;
 	}
 
@@ -100,10 +102,26 @@ namespace Base {
 #endif	//RESOURCE_MEMORY_LIMIT
 
 #if !defined(SYMBIAN) && !defined(_android)
-	struct FileList {
-		std::vector<std::string> files;
-		size_t pos;
+#if defined(_WIN32_WCE)
+	struct FileListItem {
+		std::string name;
 	};
+	struct FileList {
+		std::vector<FileListItem> files;
+		std::vector<FileListItem>::const_iterator itr;
+	};
+#else
+	struct FileListItem {
+		std::string name;
+		struct stat s;
+		int sorting;
+		bool operator<(const FileListItem&) const;
+	};
+	struct FileList {
+		std::set<FileListItem> files;
+		std::set<FileListItem>::const_iterator itr;
+	};
+#endif	//_WIN32_WCE
 	typedef std::map<int, FileList> FileListMap;
 	typedef FileListMap::iterator FileListItr;
 	static FileListMap sFileListings;
@@ -163,7 +181,7 @@ namespace Base {
 			if(type == 0)
 				break;
 
-			//dispose flag 
+			//dispose flag
 
 			DAR_UVINT(size);
 			LOG_RES("Type %i, size %i\n", type, size);
@@ -186,10 +204,10 @@ namespace Base {
 				break;
 			case RT_UBIN:
 				{
-					int pos;			
+					int pos;
 					MYASSERT(aFilename, ERR_RES_LOAD_UBIN);
 					TEST(file.tell(pos));
-#ifndef _android					
+#ifndef _android
 					ROOM(resources.dadd_RT_BINARY(rI,
 						new LimitedFileStream(aFilename, pos, size)));
 #else
@@ -253,7 +271,7 @@ namespace Base {
 						left, top, width, height, cx, cy)));
 #endif
 				}
-				break;	
+				break;
 			case RT_LABEL:
 				{
 					MemStream b(size);
@@ -472,7 +490,7 @@ namespace Base {
 #else
 		char* b = SYSCALL_THIS->loadBinary(placeholder, size);
 		if(b == NULL) return RES_OUT_OF_MEMORY;
-		
+
 		MemStream* ms = new MemStream(b, size);
 #endif
 		if(ms == 0) return RES_OUT_OF_MEMORY;
@@ -513,11 +531,11 @@ namespace Base {
 #define STORE_PATH "stores/"
 #endif
 
-	SYSCALL(MAHandle, maOpenStore(const char* name, int flags)) 
+	SYSCALL(MAHandle, maOpenStore(const char* name, int flags))
 	{
 		const char* path;
 		int len;
-#ifdef _WIN32_WCE 
+#ifdef _WIN32_WCE
 		char temp[256];
 		TCHAR wtemp[256];
 		getWorkingDirectory(temp, 256);
@@ -577,7 +595,7 @@ namespace Base {
 		return SYSCALL_THIS->gStoreNextId++;
 	}
 
-	SYSCALL(int, maWriteStore(MAHandle store, MAHandle data)) 
+	SYSCALL(int, maWriteStore(MAHandle store, MAHandle data))
 	{
 		const char* name = SYSCALL_THIS->gStores.find(store);
 		MYASSERT(name, ERR_STORE_HANDLE_INVALID);
@@ -594,7 +612,7 @@ namespace Base {
 		return 1;
 	}
 
-	SYSCALL(int, maReadStore(MAHandle store, MAHandle placeholder)) 
+	SYSCALL(int, maReadStore(MAHandle store, MAHandle placeholder))
 	{
 		const char* name = SYSCALL_THIS->gStores.find(store);
 		MYASSERT(name, ERR_STORE_HANDLE_INVALID);
@@ -1171,6 +1189,12 @@ namespace Base {
 #ifndef SYMBIAN
 	static FileList sFileList;
 	static std::string sFileListRealDir;
+#ifndef _WIN32_WCE
+	static int sFileListSorting;
+#ifdef _WIN32
+	typedef ino_t _ino_t;
+#endif
+#endif	//_WIN32_WCE
 
 	static void fileListCallback(const char* filename) {
 		if(!strcmp(filename, ".") || !strcmp(filename, ".."))
@@ -1179,19 +1203,81 @@ namespace Base {
 		if(isDirectory((sFileListRealDir + fn).c_str())) {
 			fn += "/";
 		}
+#ifdef _WIN32_WCE
 		sFileList.files.push_back(fn);
+#else
+		struct FileListItem fli;
+		fli.name = fn;
+		fli.sorting = sFileListSorting;
+		if(sFileListSorting == MA_FL_SORT_NONE)
+			// hack: we store an ordinal in st_ino.
+			// looks like it would break on Windows if a directory has
+			// more than 65k files. I don't care to fix it.
+			fli.s.st_ino = (ino_t)sFileList.files.size();
+		else
+			stat(fn.c_str(), &fli.s);
+
+		sFileList.files.insert(fli);
+#endif	//_WIN32_WCE
 	}
+
+#ifndef _WIN32_WCE
+	bool FileListItem::operator<(const FileListItem& o) const {
+		DEBUG_ASSERT(sorting == o.sorting);
+		if(sorting == MA_FL_SORT_NONE)
+			return s.st_ino < o.s.st_ino;
+		int sortType = sorting & 0xFFFF;
+		int sortOrder = sorting & 0xFFFF0000;
+		bool sortDesc;
+		switch(sortOrder) {
+		case MA_FL_ORDER_ASCENDING:
+			sortDesc = false;
+			break;
+		case MA_FL_ORDER_DESCENDING:
+			sortDesc = true;
+			break;
+		default:
+			BIG_PHAT_ERROR(ERR_FILE_LIST_SORT);
+		}
+		switch(sortType) {
+		case MA_FL_SORT_DATE:
+			if(sortDesc)
+				return s.st_mtime > o.s.st_mtime;
+			else
+				return s.st_mtime < o.s.st_mtime;
+		case MA_FL_SORT_SIZE:
+			if(sortDesc)
+				return s.st_size > o.s.st_size;
+			else
+				return s.st_size < o.s.st_size;
+		case MA_FL_SORT_NAME:
+			if(sortDesc)
+				return stricmp(name.c_str(), o.name.c_str()) < 0;
+			else
+				return stricmp(name.c_str(), o.name.c_str()) > 0;
+		default:
+			BIG_PHAT_ERROR(ERR_FILE_LIST_SORT);
+		}
+	}
+#endif	//_WIN32_WCE
 
 	// if this is MoRE, the emulator,
 	// we'll put all filesystem access into a separate directory, like chroot.
-	MAHandle Syscall::maFileListStart(const char* path, const char* filter) {
-		LOGF("maFileListStart(%s, %s)\n", path, filter);
+	MAHandle Syscall::maFileListStart(const char* path, const char* filter, int sorting) {
+		LOGF("maFileListStart(%s, %s, 0x%x)\n", path, filter, sorting);
+#ifndef _WIN32_WCE
+		sFileListSorting = sorting;
+#endif
 		sFileList.files.clear();
-		sFileList.pos = 0;
 		if(path[0] == 0) {	//empty string
 			//list filesystem roots
-#if FILESYSTEM_CHROOT || defined(LINUX) || defined(__IPHONE__) || defined(_WIN32_WCE)
+#ifdef _WIN32_WCE
 			sFileList.files.push_back("/");
+#elif FILESYSTEM_CHROOT || defined(LINUX) || defined(__IPHONE__)
+			FileListItem fli;
+			fli.name = "/";
+			fli.sorting = MA_FL_SORT_NONE;
+			sFileList.files.insert(fli);
 #else
 #ifdef WIN32
 			DWORD res = GetLogicalDrives();
@@ -1200,7 +1286,9 @@ namespace Base {
 			for(int i=0; i<32; i++) {
 				if((res & (1 << i)) != 0) {
 					buf[0] = 'A' + i;
-					sFileList.files.push_back(buf);
+					fli.name = buf;
+					fli.s.st_ino = i;
+					sFileList.files.insert(fli);
 				}
 			}
 #else
@@ -1228,6 +1316,8 @@ namespace Base {
 		std::pair<FileListItr, bool> ires = sFileListings.insert(
 			std::pair<int, FileList>(sFileListNextHandle, sFileList));
 		DEBUG_ASSERT(ires.second);
+		FileList& fl(ires.first->second);
+		fl.itr = fl.files.begin();
 		return sFileListNextHandle++;
 	}
 
@@ -1235,13 +1325,13 @@ namespace Base {
 		FileListItr itr = sFileListings.find(list);
 		MYASSERT(itr != sFileListings.end(), ERR_FILE_HANDLE_INVALID);
 		FileList& fl(itr->second);
-		if(fl.pos == fl.files.size())
+		if(fl.itr == fl.files.end())
 			return 0;
-		const std::string& name(fl.files[fl.pos]);
+		const std::string& name(fl.itr->name);
 		if((int)name.size() >= bufSize)
 			return name.size();
 		memcpy(nameBuf, name.c_str(), name.size() + 1);
-		fl.pos++;
+		fl.itr++;
 		return name.size();
 	}
 

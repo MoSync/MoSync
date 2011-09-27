@@ -27,27 +27,27 @@
  * the MA_PIM_FIELD_CONTACT constants.
  */
 @interface PimFieldItem: NSObject {
-    /**
-     * Type of the field. Must be one of
-     * MA_PIM_TYPE constants.
-     */
-    int mFieldType;
+	/**
+	* Type of the field. Must be one of
+	* MA_PIM_TYPE constants.
+	*/
+	int mFieldType;
 
-    /**
-     * Must be one of MA_PIM_FIELD_CONTACT constants.
-     */
-    int mFieldConstant;
+	/**
+	* Must be one of MA_PIM_FIELD_CONTACT constants.
+	*/
+	int mFieldConstant;
 
-    /**
-     * Stores the values.
-     */
-    NSMutableArray* mFieldValuesArray;
+	/**
+	* Stores the values.
+	*/
+	NSMutableArray* mFieldValuesArray;
 
-    /**
-     * True is this field is an single field value(e.g. this field can
-     * contain only one value).
-     */
-    bool mIsSingleFieldValue;
+	/**
+	* True is this field is an single field value(e.g. this field can
+	* contain only one value).
+	*/
+	bool mIsSingleFieldValue;
 }
 
 /**
@@ -79,8 +79,7 @@
 /**
  * Get the attribute of a specified value.
  * @param index The specified index value.
- * @return One of MA_PIM_ATTR constants, or MA_PIM_ERR_INVALID_INDEX
- *         if index param is not valid.
+ * @return One of MA_PIM_ATTR constants.
  */
 -(int) getAttribute:(int) index;
 

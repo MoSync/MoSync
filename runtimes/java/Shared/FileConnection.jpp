@@ -378,7 +378,9 @@ final int maFileReadToData(MAHandle file, MAHandle data, int offset, int len) {
 //FileList Functions
 //***************************************************************************
 
-final int maFileListStart(String path, String filter) {
+final int maFileListStart(String path, String filter, int sorting) {
+	if(sorting != MA_FL_SORT_NONE)
+		return MA_FERR_SORTING_UNSUPPORTED;
 	Enumeration en;
 	FileConnection fc = null;
 	if(path.length() == 0) {
