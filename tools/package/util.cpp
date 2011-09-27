@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 #include <fstream>
 #include <sstream>
+#include <ostream>
 #include <cerrno>
 #include <sys/stat.h>
 #include "util.h"
@@ -225,4 +226,28 @@ string fullpathString(const char* name) {
 	string s = res;
 	free(res);
 	return s;
+}
+
+
+std::string delim(std::vector<std::string>& input, const std::string& delim) {
+	std::string result = std::string();
+	for (size_t i = 0; i < input.size(); i++) {
+		result.append(input.at(i));
+		if (i < input.size() - 1) {
+			result.append(delim);
+		}
+	}
+	return result;
+}
+
+void write72line(std::ostream& output, const std::string& input) {
+	std::vector<std::string> splitLines = std::vector<std::string>();
+	int len = 72;
+	for (size_t i = 0; i < input.length(); i+= len) {
+		len = i < 2 ? 72 : 71; // Don't forget the initial space
+		splitLines.push_back(input.substr(i, len));
+	}
+	// Newline + first char of next must be space
+	output << delim(splitLines, string("\n "));
+
 }
