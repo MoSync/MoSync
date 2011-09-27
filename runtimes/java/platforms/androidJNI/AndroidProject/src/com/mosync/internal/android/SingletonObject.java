@@ -4,7 +4,7 @@ public class SingletonObject {
 
 	private static SingletonObject singletonObject;
 	private MoSyncThread mMoSyncThread;
-	boolean mFlag;
+	boolean mFlag = false;
 
 	private SingletonObject() {
 	}
