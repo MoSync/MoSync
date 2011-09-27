@@ -3991,31 +3991,31 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief The popover arrow should point up. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_UP = 1;
 
 		/**
 		* @brief The popover arrow should point down. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_DOWN = 2;
 
 		/**
 		* @brief The popover arrow should point left. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_LEFT = 4;
 
 		/**
 		* @brief The popover arrow should point right. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_RIGHT = 8;
 
 		/**
 		* @brief The popover arrow can point anywhere. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_ANY = 15;
 
@@ -6368,7 +6368,7 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* \code
 		*   // Allow the popover to use any arrow
-		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_ARROW_POSITION, MAW_CONSTANT_ARROW_ANY);
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_ARROW_POSITION, MAW_CONSTANT_ARROW_ANY);
 		* \endcode
 		*/
 		ARROW_POSITION = "arrowPosition";
@@ -6384,7 +6384,7 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* \code
 		*   // Prohibit the user from dismissing the popover
-		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_USER_CAN_DISMISS, "false");
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_USER_CAN_DISMISS, "false");
 		* \endcode
 		*/
 		USER_CAN_DISMISS = "userCanDismiss";
