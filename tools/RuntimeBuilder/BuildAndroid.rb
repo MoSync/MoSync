@@ -49,7 +49,11 @@ class RuntimeBuilder
 		return androidBuilder(runtime_dir, mode, "10")
 	end
 	
-	def android_10(runtime_dir, mode)
+	def android_8(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "10")
+	end
+
+	def android_9(runtime_dir, mode)
 		return androidBuilder(runtime_dir, mode, "10")
 	end
 
@@ -59,7 +63,7 @@ class RuntimeBuilder
 
 	def androidBuilder(runtime_dir, mode, version)
 		debug = (mode=="debug") ? "D" : ""
-		
+		android_tools = "#{$SETTINGS[:android_sdk]}/platform-tools"
 		android_sdk = "#{$SETTINGS[:android_sdk]}/platforms/android-#{version}"
 		android_ndk = "#{$SETTINGS[:android_ndk]}"
 		
@@ -72,7 +76,7 @@ class RuntimeBuilder
 		
 		Dir.chdir "../../runtimes/java/platforms/androidJNI"
 		
-		sh("ruby buildJNI.rb #{android_ndk} #{android_sdk} #{runtime_dir} #{debug}")
+		sh("ruby buildJNI.rb #{android_ndk} #{android_sdk} #{android_tools} #{runtime_dir} #{debug}")
 		
 		Dir.chdir cpath
 		

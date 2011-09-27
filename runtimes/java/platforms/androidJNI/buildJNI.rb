@@ -50,8 +50,9 @@ sh "ruby addLibraries.rb"
 
 androidNDKPath = ARGV[0]
 androidSDKPath = ARGV[1]
-configPath = ARGV[2]
-debugFlag = ARGV[3]
+androidSDKTools = ARGV[2]
+configPath = ARGV[3]
+debugFlag = ARGV[4]
 
 if ENV['MOSYNC_SRC'] == nil
 	cd "../../../../"
@@ -158,7 +159,7 @@ if(!File.exist?("#{package_root}/gen"))
 	mkdir("#{package_root}/gen")
 end
 
-sh( "#{File.join(androidSDKPath, "tools/aapt")} package -f -v " +
+sh( "#{File.join(androidSDKTools, "/aapt")} package -f -v " +
 	"-M #{File.join(package_root,"AndroidManifest.xml")} -F resources.ap_ " +
 	"-I #{File.join(androidSDKPath, "android.jar")} " +
 	"-S #{File.join(package_root, "res")} " +

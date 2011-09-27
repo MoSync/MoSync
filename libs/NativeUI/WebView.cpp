@@ -322,6 +322,7 @@ namespace NativeUI
     {
         return this->getPropertyString(MAW_WEB_VIEW_NEW_URL);
     }
+
     /**
      * Add an web view event listener.
      * @param listener The listener that will receive web view events.
@@ -340,9 +341,55 @@ namespace NativeUI
 		removeListenerFromVector(mWebViewListeners, listener);
     }
 
+	/**
+	 * Register this web view to receive messages from JavaScript.
+	 * This will set a hook for urls with the "mosync://"
+	 * scheme. Messages will arrive in in the
+	 * WebViewListener::webViewHookInvoked() method. Use class
+	 * WebViewMessage to inspect and parse messages.
+	 */
+	void WebView::enableWebViewMessages()
+	{
+		maWidgetSetProperty(
+			getWidgetHandle(),
+			MAW_WEB_VIEW_HARD_HOOK,
+			"mosync://.*");
+	}
+
+	/**
+	 * Unregister this web view from receiving messages sent
+	 * from JavaScript. This will clear the web view url hook.
+	 */
+	void WebView::disableWebViewMessages()
+	{
+		maWidgetSetProperty(
+			getWidgetHandle(),
+			MAW_WEB_VIEW_HARD_HOOK,
+			"");
+	}
+
+	/**
+	 * Run JavaScript code in the web view.
+	 * @param script The JavaScript code to run.
+	 * @return #MAW_RES_OK on success, <0 on error.
+	 */
+	int WebView::callJS(const MAUtil::String& script)
+	{
+		MAUtil::String url = "javascript:" + script;
+		return maWidgetSetProperty(
+			getWidgetHandle(),
+			MAW_WEB_VIEW_URL,
+			url.c_str());
+	}
+
     /**
      * This method is called when there is an event for this widget.
      * It passes on the event to all widget's listeners.
+	 *
+	 * If the event is #MAW_EVENT_WEB_VIEW_HOOK_INVOKED the data
+	 * parameter "urlData" gets deleted automatically after the
+	 * event is processed.
+	 *
      * @param widgetEventData The data for the widget event.
      */
     void WebView::handleWidgetEvent(MAWidgetEventData* widgetEventData)
@@ -360,7 +407,7 @@ namespace NativeUI
         }
         else if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEventData->eventType)
         {
-		int hookType = widgetEventData->hookType;
+			int hookType = widgetEventData->hookType;
 			MAHandle url = widgetEventData->urlData;
 
             for (int i = 0; i < mWebViewListeners.size(); i++)
@@ -370,6 +417,8 @@ namespace NativeUI
 					hookType,
 					url);
             }
+
+			// Here the data object gets detroyed.
             maDestroyObject(url);
         }
     }
