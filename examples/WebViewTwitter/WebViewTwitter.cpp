@@ -34,11 +34,12 @@ MA 02110-1301, USA.
 #include <maheap.h>					// C memory allocation functions.
 #include <mastring.h>				// C String functions.
 #include <mavsprintf.h>				// sprintf etc.
-#include <NativeUI/WebAppMoblet.h>	// Moblet for web applications.
+#include <josync/WebAppMoblet.h>	// Moblet for web applications.
 #include <conprint.h>				// Debug logging (you must build in
 									// debug mode for output to show).
 using namespace MAUtil;
 using namespace NativeUI;
+using namespace josync;
 
 /**
  * The application class.
@@ -48,6 +49,7 @@ class TwitterMoblet : public WebAppMoblet
 public:
 	TwitterMoblet()
 	{
+		enableWebViewMessages();
 		getWebView()->disableZoom();
 		showPage("index.html");
 	}

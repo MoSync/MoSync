@@ -52,20 +52,18 @@ MA 02110-1301, USA.
 #include <maheap.h>					// C memory allocation functions.
 #include <mastring.h>				// C String functions.
 #include <mavsprintf.h>				// sprintf etc.
-#include <NativeUI/WebAppMoblet.h>	// Moblet for web applications.
+#include <josync/WebAppMoblet.h>	// Moblet for web applications.
 
 using namespace MAUtil;
 using namespace NativeUI;
+using namespace josync;
 
 /**
  * Set to true to actually send SMS.
  * You can turn off SMS sending during debugging
  * by setting this variable to false.
  */
-static bool sSendSMSForReal = false;
-
-// Forward declaration.
-class LoveSMSWebViewListener;
+static bool sSendSMSForReal = true;
 
 /**
  * The application class.
@@ -75,6 +73,7 @@ class LoveSMSMoblet : public WebAppMoblet
 public:
 	LoveSMSMoblet()
 	{
+		enableWebViewMessages();
 		getWebView()->disableZoom();
 		showPage("PageMain.html");
 	}
