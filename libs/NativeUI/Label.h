@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Label.h
  * @author Bogdan Iusco
  *
- * Class for labels.
+ * \brief Class for labels.
  * Methods for setting the text, alignment, font size and color are inherited
  * from TextWidget.
  */
@@ -33,7 +33,8 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
     /**
-     * Class for labels.
+     * \brief Class for labels.
+     *
      * Methods for setting the text, alignment, font size and color are
      * inherited from TextWidget.
      */
@@ -66,7 +67,7 @@ namespace NativeUI
          * Get the maximum number of lines used for rendering text.
          * @return The maximum number of lines.
          */
-        virtual int getMaxNumberOfLines() const;
+        virtual int getMaxNumberOfLines();
     };
 
 } // namespace NativeUI

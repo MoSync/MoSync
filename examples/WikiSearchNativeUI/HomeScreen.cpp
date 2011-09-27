@@ -297,8 +297,8 @@ void HomeScreen::setupUI()
 	// Create a slider control for selecting the desired number of results.
 	mSlider = createSlider();
 	setWidgetProperty(mSlider, MAW_SLIDER_MAX, SLIDER_MAX_VALUE);
-	// Set the current slider value to 1.
-	setWidgetProperty(mSlider, MAW_SLIDER_VALUE, 1);
+	// Set the current slider value to 10.
+	setWidgetProperty(mSlider, MAW_SLIDER_VALUE, 10);
 	maWidgetAddChild(mMainLayout, mSlider);
 
 	// Add two labels with minimum and maximum value of the slider.
@@ -361,7 +361,7 @@ void HomeScreen::showScreen()
 	maWidgetSetProperty(mProgressBar,MAW_WIDGET_VISIBLE, "false");
 
 	// Reset the slider value.
-	setWidgetProperty(mSlider, MAW_SLIDER_VALUE, 1);
+	setWidgetProperty(mSlider, MAW_SLIDER_VALUE, 10);
 
 	// Clear the edit box.
 	maWidgetSetProperty(mEditBox, MAW_EDIT_BOX_TEXT, "");
@@ -522,7 +522,8 @@ void HomeScreen::widgetClicked(MAHandle widgetHandle)
 			// Uncheck all.
 			for (int i=1; i < mCategoryBoxes.size(); i++)
 			{
-				maWidgetSetProperty(mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "false");
+				maWidgetSetProperty(
+					mCategoryBoxes[i], MAW_CHECK_BOX_CHECKED, "false");
 			}
 		}
 	}

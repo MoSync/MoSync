@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Widgets.h
  * @author Mikael Kindborg
  *
- * You can include all widget classes by just including
+ * \brief You can include all widget classes by just including
  * this file, to make things a bit easier.
  */
 
@@ -51,6 +51,7 @@ MA 02110-1301, USA.
 #include "NumberPicker.h"
 #include "NumberPickerListener.h"
 #include "ProgressBar.h"
+#include "RelativeLayout.h"
 #include "Screen.h"
 #include "SearchBar.h"
 #include "SearchBarListener.h"

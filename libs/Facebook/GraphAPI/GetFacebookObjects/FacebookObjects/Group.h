@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,11 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Group.h
- *
- *  Created on: Jul 1, 2011
- *      Author: gabi
+/**
+ * @file Group.h
+ * @author Gabriela Rata
  */
 
 #ifndef GROUP_H_
@@ -29,12 +28,13 @@ MA 02110-1301, USA.
 #include "Utilities.h"
 
 /**
- * Implements an Group Facebook object.
+ * \brief Implements an Group Facebook object.
  * See: http://developers.facebook.com/docs/reference/api/group/
  */
 class Group: public FacebookObject
 {
 public:
+
 	/**
 	 * Setter/getter for the "owner" field of an Group object.
 	 * @param message - the profile that created the group.
@@ -72,11 +72,11 @@ public:
 	const MAUtil::String &getPrivacy() const;
 
 private:
-	IdNamePair mOwner;
-	MAUtil::String mName;
-	MAUtil::String mDescription;
-	MAUtil::String mLink;
-	MAUtil::String mPrivacy;
+	IdNamePair		mOwner;
+	MAUtil::String	mName;
+	MAUtil::String	mDescription;
+	MAUtil::String	mLink;
+	MAUtil::String	mPrivacy;
 };
 
 #endif /* GROUP_H_ */

@@ -58,12 +58,11 @@ namespace NativeUI
      * Get the state of the check box.
      * @return True if the check box is checked, false otherwise.
      */
-    bool CheckBox::isChecked() const
+    bool CheckBox::isChecked()
     {
-        MAUtil::String value = this->getPropertyString(MAW_CHECK_BOX_CHECKED);
-        // Add string because iOS cannot compile lib if there are warnings.
-        MAUtil::String trueStr = "true";
-        if (value.c_str() == trueStr.c_str() )
+        MAUtil::String value = MAUtil::lowerString(
+			this->getPropertyString(MAW_CHECK_BOX_CHECKED));
+        if ( strcmp(value.c_str(),"true") == 0 )
         {
             return true;
         }

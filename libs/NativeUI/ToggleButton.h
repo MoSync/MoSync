@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file ToggleButton.h
  * @author Emma Tresanszki
  *
- * Class for a a special kind of check button.
+ * \brief Class for a a special kind of check button.
  * It is available only on Android, and it's similar to the Check Box on iOS.
  * For toggle button events see ToggleButtonListener
  */
@@ -36,7 +36,8 @@ namespace NativeUI
 	class ToggleButtonListener;
 
 	/**
-	 * A Toggle Button is a widget that acts like a physical switch.
+	 * \brief A Toggle Button is a widget that acts like a physical switch.
+	 *
 	 * Displays checked/unchecked states as a button with a "light" indicator
 	 * and by default accompanied with the text "ON" or "OFF".
 	 */
@@ -63,7 +64,7 @@ namespace NativeUI
 		 * Gets the current toggle button state.
 		 * @return The toggle button state.
 		 */
-		virtual bool isChecked() const;
+		virtual bool isChecked();
 
         /**
          * Add a toggle button event listener.

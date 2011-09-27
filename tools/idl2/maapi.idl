@@ -2489,7 +2489,8 @@ interface MAAPI {
 		* to arrive unaltered. 8-bit Latin-1 characters should work in most cases.
 		*
 		* \returns 0 on success. A \link #CONNERR_GENERIC CONNERR \endlink code \< 0 on error.
-		* #CONNERR_FORBIDDEN if the user denied permission.
+		* #CONNERR_FORBIDDEN if the user denied permission, and CONNERR_UNAVAILABLE if the
+		* device cannot send SMS messages.
 		*
 		* \note Will create a text file on PC platforms, instead of sending anything.
 		*/
@@ -2951,12 +2952,15 @@ interface MAAPI {
 			BIRTHDAY = 101;
 			/// #MA_PIM_TYPE_INT. Access class. May be one of #MA_PIM_CONTACT_CLASS_CONFIDENTIAL,
 			/// #MA_PIM_CONTACT_CLASS_PRIVATE, or #MA_PIM_CONTACT_CLASS_PUBLIC.
+			/// Not available on Android and iOS.
 			CLASS = 102;
 			/// #MA_PIM_TYPE_STRING.
 			EMAIL = 103;
 			/// #MA_PIM_TYPE_STRING.
+			/// Not available on iOS.
 			FORMATTED_ADDR = 104;
 			/// #MA_PIM_TYPE_STRING.
+			/// Not available on Android and iOS.
 			FORMATTED_NAME = 105;
 			/// #MA_PIM_TYPE_STRING_ARRAY.
 			/// Has \link #MA_PIM_CONTACT_NAME_FAMILY MA_PIM_CONTACT_NAME \endlink indices.
@@ -2972,8 +2976,10 @@ interface MAAPI {
 			/// #MA_PIM_TYPE_STRING. Connected with PHOTO.
 			PHOTO_URL = 111;
 			/// #MA_PIM_TYPE_BINARY. Connected with PUBLIC_KEY_STRING.
+			/// Not available on Android and iOS.
 			PUBLIC_KEY = 112;
 			/// #MA_PIM_TYPE_STRING. Connected with PUBLIC_KEY.
+			/// Not available on Android and iOS.
 			PUBLIC_KEY_STRING = 113;
 			/// #MA_PIM_TYPE_DATE.
 			REVISION = 114;
@@ -3035,7 +3041,7 @@ interface MAAPI {
 
 		constset int MA_PIM_CONTACT_ORG_INFO_ {
 			/// #MA_PIM_TYPE_STRING.
-			/// Only for Android devices.
+			/// Only for Android and iOS devices.
 			DEPARTMENT = 0;
 			/// #MA_PIM_TYPE_STRING.
 			/// Only for Android devices.
@@ -3213,11 +3219,14 @@ interface MAAPI {
 
 		constset int MA_PIM_ATTR_TITLE_ {
 			/// The constant describes a work title.
+			/// Not available on iOS.
 			WORK = 601;
 			/// The constant describes a different title type.
+			/// Not available on iOS.
 			OTHER = 602;
 			/// The constant describes a custom title type.
 			/// The field's label can be set.
+			/// Not available on iOS.
 			CUSTOM = 603;
 		}
 
@@ -3284,16 +3293,20 @@ interface MAAPI {
 			RELATIVE = 914;
 			/// The constant describes a custom relation type.
 			/// The field's label can be set.
+			/// Not available on iOS.
 			CUSTOM = 915;
 		}
 
 		constset int MA_PIM_ATTR_ORG_INFO_ {
 			/// The constant describes a work organization.
+			/// Not available on iOS.
 			WORK = 1001;
 			/// The constant describes a different organization type.
+			/// Not available on iOS.
 			OTHER = 1002;
 			/// The constant describes a custom organization type.
 			/// The field's label can be set.
+			/// Not available on iOS.
 			CUSTOM = 1003;
 		}
 
@@ -3310,57 +3323,52 @@ interface MAAPI {
 			UNAVAILABLE = -1;
 			/// The native database's data type for the given field did not match the MoSync API.
 			NATIVE_TYPE_MISMATCH = -2;
-			/// The field type is not supported.
-			FIELD_UNSUPPORTED = -3;
-			/// The field is read-only.
-			READ_ONLY = -4;
-			/// The field is read-only.
-			WRITE_ONLY = -5;
-			/// The field/attribute combination is not supported.
-			COMBO_UNSUPPORTED = -6;
-			/// More values in this field is not supported.
-			FIELD_COUNT_MAX = -7;
-			/// The value does not have a custom label.
-			NO_LABEL = -8;
-			/// The values's attribute is not set to custom.
-			CUSTOM_ATTRIBUTE = -9;
-			/// The given index is not valid.
-			/// This value is returned by maPimItemGetField(), maPimItemSetValue().
-			INVALID_INDEX = -10;
-			/// The specified pim list is not available on the current platform.
-			UNAVAILABLE_LIST = -11;
-			/// The specified list is not opened. Call maPimListOpen() first.
-			LIST_NOT_OPENED = -12;
-			/// The specified list is already opened.
-			LIST_ALREADY_OPENED = -13;
-			/// The operation is not allowed by the Address Book database.
-			OPERATION_NOT_PERMITTED = -14;
-			/// Invalid handle.
-			INVALID_HANDLE = -15;
-			/// The requested field doesn't have a value.
-			EMPTY_FIELD = -16;
-			/// The specified pim item is not available.
-			UNAVAILABLE_ITEM = -17;
-			/// The allocated buffer is too small
-			BUFFER_TOO_SMALL = -18;
-			/// Invalid buffer structure
-			INVALID_BUFFER = -19;
-			/// The field doesn't have attributes
-			NO_ATTRIBUTES = -20;
 			/// The specified list type is invalid.
-			INVALID_LIST_TYPE = -21;
+			LIST_TYPE_INVALID = -3;
+			/// The specified pim list is not available on the current platform.
+			LIST_UNAVAILABLE = -4;
+			/// The specified list is already opened.
+			LIST_ALREADY_OPENED = -5;
 			/// The specified field is invalid.
-			INVALID_FIELD = -22;
+			FIELD_INVALID = -6;
+			/// The field type is not supported.
+			FIELD_UNSUPPORTED = -7;
+			/// The requested field doesn't have a value.
+			FIELD_EMPTY = -8;
+			/// More values in this field are not supported.
+			FIELD_COUNT_MAX = -9;
+			/// The field is read-only.
+			FIELD_READ_ONLY = -10;
+			/// The field is write-only.
+			FIELD_WRITE_ONLY = -11;
+			/// The given index is not valid.
+			INDEX_INVALID = -12;
+			/// Invalid handle.
+			HANDLE_INVALID = -13;
+			/// The field/attribute combination is not supported.
+			ATTRIBUTE_COMBO_UNSUPPORTED = -14;
+			/// The values's attribute is not set to custom.
+			ATTRIBUTE_CUSTOM = -15;
+			/// The field doesn't have attributes.
+			NO_ATTRIBUTES = -16;
+			/// The allocated buffer is too small.
+			BUFFER_TOO_SMALL = -17;
+			/// Invalid buffer structure.
+			BUFFER_INVALID = -18;
+			/// The value does not have a custom label.
+			NO_LABEL = -19;
+			/// The operation is not allowed by the Address Book database.
+			OPERATION_NOT_PERMITTED = -20;
 		}
 
 		/**
 		* \brief Opens a PimList. Use maPimListNext() to open the list's items.
 		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
-		* \returns     >= 0 A PimList handle.
-		*              < 0 on error:
+		* \returns \>= 0 A PimList handle.
+		*          \<  0 on error:
 		*                    #MA_PIM_ERR_LIST_ALREADY_OPENED if the list is already opened.
-		*					 #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not available on the current platform.
-		*                    #MA_PIM_ERR_INVALID_LIST_TYPE if the given list type is invalid.
+		*					 #MA_PIM_ERR_LIST_UNAVAILABLE if the list is not available on the current platform.
+		*                    #MA_PIM_ERR_LIST_TYPE_INVALID if the given list type is invalid.
 		*/
 		MAHandle maPimListOpen(in int listType);
 
@@ -3369,30 +3377,29 @@ interface MAAPI {
 		* or \< 0 on error.
 		* You must use maPimItemClose() on every item to prevent memory leaks.
 		* \param list List handle provided by maPimListOpen(int listType).
-		* \returns     >= 0 A PimItem handle, or \< 0 on error.
-		*              < 0 on error:
-		*			   #MA_PIM_ERR_INVALID_HANDLE if the list handle is invalid.
+		* \returns \> 0 a PimItem handle.
+		*		   \= 0 if there are no more items.
+		*          \< 0 on error:
+		*					 #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
 		*/
 		MAHandle maPimListNext(in MAHandle list);
 
 		/**
 		* \brief Closes a PimList.
-		* so that maPimItemClose() is the only function you can safely use on them.
 		* \param list List handle provided by maPimListOpen(int listType).
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*			   #MA_PIM_ERR_LIST_NOT_OPENED if the list is not opened.
-		*              #MA_PIM_ERR_UNAVAILABLE_LIST if the list is unavailable.
-		*			   #MA_PIM_ERR_INVALID_HANDLE if the list handle is invalid.
-		* \note This does not close the list's items, but it does invalidate them,
+		* \returns           #MA_PIM_ERR_NONE on success.
+		*			         #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
+		* \note This does not close the list's items, but it does invalidate them.
+		*  Use maPimItemClose() for closing list's items.
 		*/
 		int maPimListClose(in MAHandle list);
 
 		/**
 		* \brief Returns the number of fields in the \a item.
 		* \param item Item handle provided by maPimListNext(MAHandle list).
-		* \returns     >=0 the number of field in the item.
-		*              < 0 on error:
-		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
+		* \returns \>= 0 the number of field in the item.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
 		*/
 		int maPimItemCount(in MAHandle item);
 
@@ -3400,10 +3407,10 @@ interface MAAPI {
 		* \brief Returns the field id of the item's n:th field.
 		* \param item Opened by maPimListNext().
 		* \param n \>= 0 and \< maPimItemCount().
-		* \returns     >=0 one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		*              < 0 on error:
-		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
-		*                    #MA_PIM_ERR_INVALID_INDEX if the param n is not valid.
+		* \returns \> 0 one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+		*          \< 0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the param n is not valid.
 		*/
 		int maPimItemGetField(in MAHandle item, in int n);
 
@@ -3411,12 +3418,12 @@ interface MAAPI {
 		* \brief Returns the number of values in the field for a given item.
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		* \returns     >0 the number of values for the item.
-		*              =0 if the item field has no values.
-		*              < 0 on error:
-		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
+		* \returns \> 0 the number of values for the item.
+		*          \= 0 if the item field has no values.
+		*          \< 0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field is unsupported.
-		*                    #MA_PIM_ERR_INVALID_FIELD if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*/
 		int maPimItemFieldCount(in MAHandle item, in int field);
 
@@ -3425,29 +3432,31 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns     >=0 the attribute for the specified field.
-		*              <0 on error:
-		*                    #MA_PIM_ERR_INVALID_HANDLE if the item handle is invalid.
-		*					 #MA_PIM_ERR_INVALID_FIELD if the field is invalid.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*                    #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
+		* \returns \> 0 the attribute for the specified field.
+		*          \< 0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		*                    #MA_PIM_ERR_NO_ATTRIBUTES if the field doesn't have attributes.
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
 		/**
 		* \brief Sets a custom label for a value in a field and item.
-		* The value's attribute must be set to MA_PIM_ATTR_CUSTOM.
+		* The value's attribute must be set to custom.
 		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
 		* \a args.bufSize must be valid.
 		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*              #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
-		*              #MA_PIM_ERR_NO_LABEL if the buffer is invalid or the attribute is not set to custom.
+		* \returns           #MA_PIM_ERR_NONE on success.
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*			         #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		*                    #MA_PIM_ERR_NO_LABEL if the attribute is not set to custom.
 		* \note This function is available on Android or iOS.
 		*/
 		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
@@ -3460,11 +3469,13 @@ interface MAAPI {
 		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
-		* \returns     >=0 the number of bytes occupied by the value.
-		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*                    #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
+		* \returns \>= 0 the number of bytes occupied by the value.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*					 #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		*                    #MA_PIM_ERR_NO_LABEL if the attribute type is not set to custom.
 		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
 		* \note This function is available on Android or iOS.
@@ -3472,14 +3483,14 @@ interface MAAPI {
 		int maPimItemGetLabel(in MA_PIM_ARGS args, in int index);
 
 		/**
-		* Returns one of the type of the field.
-		* or \< 0 if the field does not exist in the list.
+		* Returns one of the type of the field or \< 0 in case of error.
 		* \param list Opened by maPimListOpen().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		* \returns     >=0 any of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants.
-		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not available.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
+		* \returns \>= 0 any of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
+		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
 		*/
 		int maPimFieldType(in MAHandle list, in int field);
 
@@ -3502,11 +3513,13 @@ interface MAAPI {
 		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
-		* \returns     >=0 The number of bytes occupied by the value.
-		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*                    #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
+		* \returns \>= 0 The number of bytes occupied by the value.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		*			         #MA_PIM_ERR_FIELD_WRITE_ONLY if the field is write-only.
 		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
@@ -3518,11 +3531,14 @@ interface MAAPI {
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
 		* \param attributes The value's new attributes.
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*              #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
-		*              #MA_PIM_ERR_INVALID_BUFFER if the buffer is not correct.
+		* \returns           #MA_PIM_ERR_NONE on success.
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*			         #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		*			         #MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED if the field/attribute combination is not supported.
+		*                    #MA_PIM_ERR_BUFFER_INVALID if the buffer is not valid.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3536,11 +3552,14 @@ interface MAAPI {
 		* Adds a new value to a field and item.
 		* \param args Common arguments.
 		* \param attributes The new value's attributes.
-		* \returns     >=0 the index of the new added value.
-		*              <0 on error:
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*              #MA_PIM_ERR_INVALID_BUFFER if the buffer is not correct.
+		* \returns />= 0 the index of the new added value.
+		*          /<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*			         #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*			         #MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED if the field/attribute combination is not supported.
+		*                    #MA_PIM_ERR_BUFFER_INVALID if the buffer is not valid.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3552,10 +3571,11 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
-		*              #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is invalid.
-		*              #MA_PIM_ERR_INVALID_INDEX if the index is invalid.
+		* \returns           #MA_PIM_ERR_NONE on success.
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		* \note The changes is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3565,19 +3585,19 @@ interface MAAPI {
 		/**
 		* Closes the handle to a PimItem, releasing resources used by the system.
 		* Writes any changes to disk.
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
+		* \returns           #MA_PIM_ERR_NONE on success.
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid, or if the item's list is closed.
 		* \note An item can also be closed by maPimItemRemove().
-		* \warning Does not write changes to disk if the item's List is closed.
-		* Make sure to keep the List open while editing items.
+		* \warning Does not write changes to disk if the item's list is closed.
+		* Make sure to keep the list open while editing items.
 		*/
 		int maPimItemClose(in MAHandle item);
 
 		/**
 		* Creates a new empty item in the specified list.
-		* \returns     >=0 A handle to the new item.
-		*              <0 on error:
-		*                    #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not opened.
+		* \returns \>= 0 A handle to the new item.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
 		* \note The handle must be closed with maPimItemClose() to avoid memory leaks.
 		*/
 		MAHandle maPimItemCreate(in MAHandle list);
@@ -3585,9 +3605,8 @@ interface MAAPI {
 		/**
 		* Removes an item from a list. This also has the effect of closing the item.
 		* \see maPimItemClose()
-		* \returns     #MA_PIM_ERR_NONE on success.
-		*              #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not opened.
-		*              #MA_PIM_ERR_UNAVAILABLE_ITEM if the item is not opened.
+		* \returns           #MA_PIM_ERR_NONE on success.
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle or item handle are invalid.
 		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
@@ -3999,6 +4018,11 @@ group WidgetAPI "Widget API" {
    /**
 	* Events for the video view. When the state of the video view changes an event with one
 	* of the next constants will be send.
+    * NOTE: there is a slightly different behaviour depending on the platform:
+    *  - on iOS the source is loaded into memory when
+    *  MAW_VIDEO_VIEW_STATE_PLAYING is received.
+    *   - on Android the source is loaded into memory when
+    *  MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
 	*/
 	group VideoViewEvent "Video view event" {
 	constset int MAW_VIDEO_VIEW_STATE_ {
@@ -4023,7 +4047,9 @@ group WidgetAPI "Widget API" {
 		FINISHED = 4;
 
 		/**
-		* @brief The source is loaded into memory.
+		* @brief The source is ready to be played.
+		* NOTE: On Android this event is received after loading url/path.
+		*       On iOS this event is received after PLAYING event is received.
 		*/
 		SOURCE_READY = 5;
 
@@ -4200,17 +4226,17 @@ group WidgetAPI "Widget API" {
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
 		 * This is an iOS specific widget.
-		 * See \ref WidgetNavigationBarProperties "Navigation Bar properties" for the properties available.
+		 * See \ref WidgetNavBarProperties "Navigation Bar properties" for the properties available.
 		 */
 		NAV_BAR = "NavBar";
 
 		/**
-		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
+		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL|ES 1.0/1.1 calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
 		 */
 		GL_VIEW = "GLView";
 
 		/**
-		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
+		 * @brief A GL view is a widget that is used to display graphics rendered by the GPU using OpenGL|ES 2.0 calls. See \ref WidgetGLViewProperties "GL view properties" for the properties available.
 		 */
 		GL2_VIEW = "GL2View";
 
@@ -4396,7 +4422,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A boolean string 'true' or 'false', where true is visible and false is invisible.
 		*
-		* @setonly
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -5577,7 +5603,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Set or gets the current progress to the specified value.
 		*
-		* @validvalue An int that specifies the new progress, between 0 and max value. See \ref PROGRESS_BAR_MAX.
+		* @validvalue An int that specifies the new progress, between 0 and max value. See \ref MAW_PROGRESS_BAR_MAX.
 		*
 		* @setandget
 		*
@@ -5648,7 +5674,7 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Set or gets the current value to the slider.
 		*
-		* @validvalue An int that specifies the new value, between 0 and max value. See \ref SLIDER_MAX.
+		* @validvalue An int that specifies the new value, between 0 and max value. See \ref MAW_SLIDER_MAX.
 		*
 		* @setandget
 		*
@@ -5692,14 +5718,12 @@ group WidgetAPI "Widget API" {
 	/**
 	* The available widget properties for a #MAW_DATE_PICKER. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
-
-group WidgetDatePickerProperties "Date Picker properties" {
-
+	group WidgetDatePickerProperties "Date Picker properties" {
 	constset MAString MAW_DATE_PICKER_ {
 		/**
 		* @brief Sets or gets  maximal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00.
 		* NOTE: On Android the default maximal date is 12/31/2100.
-		*
+		* NOTE: The property can be set on iOS only.
 		* @validvalue A long int that specifies the upper range of this date picker.
 		*
 		* @setandget
@@ -5715,6 +5739,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		/**
 		* @brief Sets or gets  minimal date supported by this DatePicker in milliseconds since January 1, 1970 00:00:00
 		* Note: On Android the default minimal date is 01/01/1900.
+		* NOTE: The property can be set on iOS only.
 		* @validvalue A long int that specifies the minimal supported date.
 		*
 		* @setandget
@@ -5882,7 +5907,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	constset MAString MAW_VIDEO_VIEW_ {
 		/**
 		* @brief Sets the video path.
-		*
+		* Note: available only for Android.
 		* @validvalue Any valid path.
 		*
 		* @setonly
@@ -5942,6 +5967,8 @@ group WidgetDatePickerProperties "Date Picker properties" {
 		/**
 		* @brief Gets the video file duration.
 		*
+		* NOTE: On Android this value can be retrieved after MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
+		*       On iOS this value can be retrieved after MAW_VIDEO_STATE_PLAYING is received.
 		* @validvalue An int.
 		*
 		* @getonly
@@ -5990,7 +6017,7 @@ group WidgetDatePickerProperties "Date Picker properties" {
 	} // end of WidgetVideoViewProperties
 
 	/**
-	* The available widget properties for a #MAW_NAVIGATION_BAR. See \ref WidgetProperties "Widget properties" for more properties.
+	* The available widget properties for a #MAW_NAV_BAR. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
 	group WidgetNavBarProperties "Navigation Bar properties" {
 	constset MAString MAW_NAV_BAR_ {
@@ -6232,32 +6259,32 @@ group CameraAPI "Camera API" {
 group CameraResultCodes "Camera Result Codes" {
 	constset int MA_CAMERA_RES_ {
 		/**
-		* @brief A constant that represents the flash being on.
+		* @brief A constant that represents successful camera operation.
 		*/
 		OK = 1;
 
 		/**
-		* @brief A constant that represents the flash being in the automatic mode.
+		* @brief A constant that represents a failed camera operation.
 		*/
 		FAILED = -2;
 
 		/**
-		* @brief A constant that represents the flash being in the automatic mode.
+		* @brief A constant that represents a camera failing to start.
 		*/
 		NOT_STARTED = -3;
 
 		/**
-		* @brief A constant that represents the flash being in the automatic mode.
+		* @brief A constant that represents a property not supported by the device.
 		*/
 		PROPERTY_NOTSUPPORTED = -4;
 
 		/**
-		* @brief A constant that represents the flash being in the automatic mode.
+		* @brief A constant that represents an invalid value for that property.
 		*/
 		INVALID_PROPERTY_VALUE = -5;
 
 		/**
-		* @brief A constant that represents the flash being in the automatic mode.
+		* @brief A constant that represents a property value not supported by the device.
 		*/
 		VALUE_NOTSUPPORTED = -6;
 
@@ -6287,7 +6314,7 @@ group FlashModes "Flash Modes" {
 		*/
 		TORCH = "torch";
 
-	} //end MAC_FLASH_
+	} //end MA_CAMERA_FLASH_
 }// end of FlashMode
 
 group FocusModes "Focus Modes" {
@@ -6312,7 +6339,7 @@ group FocusModes "Focus Modes" {
 		*/
 		FIXED = "fixed";
 
-	} //end MAC_FOCUS_
+	} //end MA_CAMERA_FOCUS_
 } //end of FocusMode
 
 group ImageFormat "Image Formats" {
@@ -6372,7 +6399,7 @@ group CameraProperties "Camera Properties" {
 
 
 		/**
-		* @brief Sets the focus mode for the camera.
+		* @brief Sets the zoom level for the camera.
 		*
 		* @validvalue an int string that can be between 0 and #MA_CAMERA_MAX_ZOOM
 		*

@@ -31,7 +31,7 @@ namespace NativeUI
 	 * Constructor.
 	 */
 	RelativeLayout::RelativeLayout() :
-		Widget(MAW_RELATIVE_LAYOUT)
+		Layout(MAW_RELATIVE_LAYOUT)
 	{
 		// Set some common default values.
 		fillSpaceVertically();

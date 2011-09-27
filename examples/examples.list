@@ -34,6 +34,7 @@ MoTrix
 OtaLoad
 GLMoblet_OpenGLES1 = OpenGLES/GLMoblet_OpenGLES1
 GLMoblet_OpenGLES2 = OpenGLES/GLMoblet_OpenGLES2
+AccelerometerOpenGLES = OpenGLES/AccelerometerOpenGLES
 ScreenOrientation
 QuakeMDL
 CameraDemo
@@ -44,3 +45,5 @@ FacebookDemo
 SensorTest
 DeviceFonts
 DeviceFontsNativeUI
+WebViewGeoLocation
+WebViewLoveSMS

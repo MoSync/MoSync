@@ -60,7 +60,7 @@ namespace NativeUI
       * Get the text displayed by the widget.
       * @return The text displayed by the widget.
       */
-      MAUtil::String Button::getText() const
+      MAUtil::String Button::getText()
       {
           return this->getPropertyString(MAW_BUTTON_TEXT);
       }

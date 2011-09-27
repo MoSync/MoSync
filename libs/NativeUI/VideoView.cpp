@@ -47,6 +47,7 @@ namespace NativeUI
 
     /**
      * Set the video path.
+     * Note: available only for Android.
      * @param path A valid path to a video file.
      * @return Any of the following result codes:
      * - #MAW_RES_OK if the property could be set.
@@ -102,9 +103,11 @@ namespace NativeUI
 
     /**
      * Get the video duration.
-     * For an video url this value is known only after receiving
-     * MAW_VIDEO_WIDGET_STATE_SOURCE_READY event is received.
-     * @return The video's duration in seconds.
+     * On Android: this value is known only after
+     *     MAW_VIDEO_WIDGET_STATE_SOURCE_READY event is received.
+     * On iOS: this value can be retrieved after
+     *     MAW_VIDEO_STATE_PLAYING event is received.
+     * @return The video's duration in milliseconds.
      */
     int VideoView::getDuration()
     {
@@ -128,7 +131,7 @@ namespace NativeUI
      * Only for Android platform.
      * @return The buffer percentage of the played video file.
      */
-    int VideoView::getBufferPercentage() const
+    int VideoView::getBufferPercentage()
     {
         return this->getPropertyInt(MAW_VIDEO_VIEW_BUFFER_PERCENTAGE);
     }
@@ -137,7 +140,7 @@ namespace NativeUI
      * Get the current video time.
      * @return The current video time.
      */
-    int VideoView::currentPlaybackTime() const
+    int VideoView::currentPlaybackTime()
     {
         return this->getPropertyInt(MAW_VIDEO_VIEW_CURRENT_POSITION);
     }

@@ -26,6 +26,10 @@ MA 02110-1301, USA.
 #ifndef UTIL_H_
 #define UTIL_H_
 
+#include <MAUtil/String.h>
+#include <mastring.h>
+#include <MAUtil/util.h>
+
 // Colors used for fonts & background.
 enum Colors
 {
@@ -50,10 +54,37 @@ const MAUtil::String SOURCE_ERROR       = "Some error occurred";
 /**
  * Strings for the Settings Screen.
  */
-const MAUtil::String DISPLAY_DURATION 	 = " Display Video Duration ";
+const MAUtil::String DISPLAY_DURATION 	 = " Display Duration ";
 const MAUtil::String HOME_URL			 = " Home URL ";
-const MAUtil::String HOME_URL_ANDROID 	 = "http://www.jhepple.com/SampleMovies/niceday.wmv";
-const MAUtil::String HOME_URL_IOS 		 = "http://qthttp.apple.com.edgesuite.net/1010qwoeiuryfg/sl.m3u8";
+const MAUtil::String HOME_URL_ANDROID 	 = "http://www.mosync.com/files/videos/Video.3gp";
+const MAUtil::String HOME_URL_IOS 		 = "http://www.mosync.com/files/videos/ExVideo.m3u8";
 const MAUtil::String RESET_TO_DEFAULT 	 = "Reload default source";
+
+void getScreenSize();
+int getScreenWidth();
+int getScreenHeight();
+
+/**
+ * Detects if the current platform is Android.
+ * @return true if the platform is Android, false otherwise.
+ */
+bool isAndroid();
+
+/**
+ * Converts milliseconds value into a more readable output.
+ * @param milliseconds An int.
+ * @return A string in the form: HH::MM::SS.
+ */
+MAUtil::String getFormatedDuration(int milliseconds);
+
+/**
+ * The screen width.
+ */
+extern int screenWidth;
+
+/**
+ * The screen height.
+ */
+extern int screenHeight;
 
 #endif /* UTIL_H_ */

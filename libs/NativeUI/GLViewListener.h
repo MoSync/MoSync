@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file GLViewListener.h
  * @author Bogdan Iusco
  *
- * Listener for GLView events.
+ * \brief Listener for GLView events.
  */
 
 #ifndef NATIVEUI_GL_VIEW_LISTENER_H_
@@ -32,7 +32,7 @@ namespace NativeUI
     class GLView;
 
     /**
-     * Listener for GLView events.
+     * \brief Listener for GLView events.
      */
     class GLViewListener
     {

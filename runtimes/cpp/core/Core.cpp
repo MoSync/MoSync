@@ -1052,6 +1052,13 @@ void WRITE_REG(int reg, int value) {
 		return mem_ds[address];
 	}
 
+	int TranslateNativePointerToMoSyncPointer(void *nativePointer) {
+	    if(nativePointer == NULL)
+	        return 0;
+	    else
+	        return (int)PTR2ADDRESS(nativePointer);
+	}
+
 	const char* GetValidatedStr(int a) const {
 		unsigned address = a;
 		do {
@@ -1412,6 +1419,9 @@ void* GetValidatedMemRange(VMCore* core, int address, int size) {
 int GetValidatedStackValue(VMCore* core, int offset) {
   return CORE->GetValidatedStackValue(offset);
 }
+int TranslateNativePointerToMoSyncPointer(VMCore* core, void *nativePointer) {
+	return CORE->TranslateNativePointerToMoSyncPointer(nativePointer);
+}
 const char* GetValidatedStr(const VMCore* core, int address) {
 	return CORE->GetValidatedStr(address);
 }
@@ -1482,6 +1492,9 @@ void* Base::Syscall::GetValidatedMemRange(int address, int size) {
 }
 int Base::Syscall::GetValidatedStackValue(int offset VSV_ARGPTR_DECL) {
 	return Core::GetValidatedStackValue(gCore, offset);
+}
+int Base::Syscall::TranslateNativePointerToMoSyncPointer(void *nativePointer) {
+	return Core::TranslateNativePointerToMoSyncPointer(gCore, nativePointer);
 }
 const char* Base::Syscall::GetValidatedStr(int address) {
 	return Core::GetValidatedStr(gCore, address);

@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file WebView.h
  * @author Emma Tresanszki
  *
- * Class for web views.
+ * \brief Class for web views.
  */
 
 #ifndef NATIVEUI_WEBVIEW_H_
@@ -35,7 +35,7 @@ namespace NativeUI
     class WebViewListener;
 
 	/**
-	 * A web view is a widget used to render web pages.
+	 * \brief A web view is a widget used to render web pages.
 	 */
 	class WebView : public Widget
 	{
@@ -60,7 +60,7 @@ namespace NativeUI
 		 * Get the currently displayed url in the web view.
 		 * @return The displayed url.
 		 */
-		virtual MAUtil::String getURL() const;
+		virtual MAUtil::String getURL();
 
 		/**
 		 * Set the currently displayed HTML data in the web view.
@@ -92,7 +92,7 @@ namespace NativeUI
 		 * @return The url.
 		 *
 		 */
-		virtual MAUtil::String getBaseUrl() const;
+		virtual MAUtil::String getBaseUrl();
 
 		/**
 		* Set the pattern used to "soft hook" urls, to get notified
@@ -188,7 +188,7 @@ namespace NativeUI
 		* This way of loading a page is excluded from the hook mechanism to
 		* prevent "loops" when loading pages.
 		*
-		* @param ulr A string with a url pattern.
+		* @param url A string with a url pattern.
 		* Example:
 		*   // Hook urls that start with "mosync:".
 		*	setHardHook("mosync://.*");
@@ -257,7 +257,7 @@ namespace NativeUI
 		 * Get the new URL whenever the web view changes it.
 		 * @return The new URL.
 		 */
-		virtual MAUtil::String getNewURL() const;
+		virtual MAUtil::String getNewURL();
 
         /**
          * Add an web view event listener.

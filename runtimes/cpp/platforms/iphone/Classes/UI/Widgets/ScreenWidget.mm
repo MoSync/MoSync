@@ -24,7 +24,6 @@
 @implementation ScreenWidget
 
 - (id)init {
-	//if(!controller && [self class] == [ScreenWidget class])
 	UIViewController* c = [[ScreenWidgetController alloc] init];
 	return [self initWithController:c];
 }
@@ -32,24 +31,25 @@
 - (id)initWithController:(UIViewController*)_controller {
 	controller = _controller;
 	controller.title = @"";
-	view = controller.view;
-	//view.bounds = [[UIScreen mainScreen] bounds];	
+	view = [controller.view retain];
 	return [super init];
 }
 
+- (void)dealloc {
+    [controller release];
+    [super dealloc];
+}
+
 - (void)addChild: (IWidget*)child {
-	//if(!parent)
-	//	[child getView].frame = [[UIScreen mainScreen] bounds];
-	
 	[super addChild:child];	
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 
-	if([key isEqualToString:@"title"]) {
+	if([key isEqualToString:@MAW_SCREEN_TITLE]) {
 		controller.title = value;
 	} 
-	else if([key isEqualToString:@"icon"]) {
+	else if([key isEqualToString:@MAW_SCREEN_ICON]) {
 		int imageHandle = [value intValue];
 		if(imageHandle<=0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		Surface* imageResource = Base::gSyscall->resources.get_RT_IMAGE(imageHandle);		
@@ -76,14 +76,15 @@
 	
 //	if(!parent)
 //		view.frame = [[UIScreen mainScreen] bounds];
-	
+
 	for (IWidget *child in children)
     {
 		UIView* childView = [child getView];
 		[childView setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];		
 		
 		[child layout];
-	}	
+	}
+    
 	[view setNeedsLayout];
 }
 

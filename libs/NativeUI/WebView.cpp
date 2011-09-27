@@ -58,7 +58,7 @@ namespace NativeUI
 	 * Get the currently displayed url in the web view.
 	 * @return The displayed url.
 	 */
-	MAUtil::String WebView::getURL() const
+	MAUtil::String WebView::getURL()
 	{
 		return this->getPropertyString(MAW_WEB_VIEW_URL);
 	}
@@ -99,7 +99,7 @@ namespace NativeUI
 	 * @return The url.
 	 *
 	 */
-	MAUtil::String WebView::getBaseUrl() const
+	MAUtil::String WebView::getBaseUrl()
 	{
 		return this->getPropertyString(MAW_WEB_VIEW_BASE_URL);
 	}
@@ -202,7 +202,7 @@ namespace NativeUI
 	* This way of loading a page is excluded from the hook mechanism to
 	* prevent "loops" when loading pages.
 	*
-	* @param ulr A string with a url pattern.
+	* @param url A string with a url pattern.
 	* Example:
 	*   // Hook urls that start with "mosync:".
 	*	setHardHook("mosync://.*");
@@ -269,8 +269,14 @@ namespace NativeUI
 	 */
 	bool WebView::isHorizontalScrollbarEnabled()
 	{
-		return ( this->getPropertyString(
-			MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED) == "true" ? true : false );
+        MAUtil::String value = MAUtil::lowerString(
+			this->getPropertyString(MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED));
+        if ( strcmp(value.c_str(),"true") == 0 )
+        {
+            return true;
+        }
+
+        return false;
 	}
 
 	/*
@@ -298,15 +304,21 @@ namespace NativeUI
 	 */
 	bool WebView::isVerticalScrollBarEnabled()
 	{
-		return ( this->getPropertyString(
-			MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED) == "true" ? true : false );
+        MAUtil::String value = MAUtil::lowerString(
+			this->getPropertyString(MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED));
+        if ( strcmp(value.c_str(),"true") == 0 )
+        {
+            return true;
+        }
+
+        return false;
 	}
 
     /**
      * Get the new URL whenever the web view changes it.
      * @return The new URL.
      */
-    MAUtil::String WebView::getNewURL() const
+    MAUtil::String WebView::getNewURL()
     {
         return this->getPropertyString(MAW_WEB_VIEW_NEW_URL);
     }

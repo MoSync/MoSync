@@ -148,7 +148,7 @@ void drawSensorValue(int index, int x, int y)
 		case SENSOR_TYPE_ACCELEROMETER:
 		case SENSOR_TYPE_MAGNETIC_FIELD:
 		case SENSOR_TYPE_GYROSCOPE:
-			sprintf(buffer, "Values: %f; %f; %f",
+			sprintf(buffer, "Values: X:%0.4f; Y:%0.4f; Z:%0.4f",
 					values[0], values[1], values[2]);
 			break;
 		case SENSOR_TYPE_ORIENTATION:
@@ -202,7 +202,7 @@ void drawSensorOutput()
 		if (gSensorError[i] != 0)
 			continue;
 
-		drawSensorValue(i, 0, posY);
+		drawSensorValue(i, OFFSET_X, posY);
 		posY += OFFSET_Y;
 	}
 }
@@ -215,9 +215,9 @@ void setFont()
 {
 	int nrFonts = maFontGetCount();
 	char fontName[BUFFER_SIZE];
-	// get first font.
-	maFontGetName(0, fontName, BUFFER_SIZE);
-	// Load first font with size 20.
+	// get font with the specified ID.
+	maFontGetName(FONT_ID, fontName, BUFFER_SIZE);
+	// Load font with size 20.
 	int fontHandle = maFontLoadWithName(fontName, TEXT_SIZE);
 	maFontSetCurrent(fontHandle);
 }
@@ -229,6 +229,10 @@ extern "C" int MAMain()
 	updateScreenDimensions();
 	registerSensors();
 	setFont();
+
+	// Force output for devices which hasn't got any sensors
+	drawSensorOutput();
+	maUpdateScreen();
 
 	while (run)
 	{

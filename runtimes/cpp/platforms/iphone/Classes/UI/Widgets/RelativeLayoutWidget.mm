@@ -21,26 +21,54 @@
 
 MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 
+@interface MoSyncTouchEnabledScrollView : MoSyncUIScrollView {
+@private
+}
+@end
+@implementation MoSyncTouchEnabledScrollView
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (self.scrollEnabled == NO)
+        [[self nextResponder] touchesBegan:touches withEvent:event];
+}
+
+- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (self.scrollEnabled == NO)
+        [[self nextResponder] touchesMoved:touches withEvent:event];
+}
+
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (self.scrollEnabled == NO)
+        [[self nextResponder] touchesEnded:touches withEvent:event];
+}
+
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event
+{
+    if (self.scrollEnabled == NO)
+        [[self nextResponder] touchesCancelled:touches withEvent:event];
+}
+@end
+
 @implementation RelativeLayoutWidget
 
 - (id)init {	
-    MoSyncUIScrollView* scrollView = [[[MoSyncUIScrollView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)] retain];	;
+    MoSyncTouchEnabledScrollView* scrollView = [[MoSyncTouchEnabledScrollView alloc] initWithFrame:CGRectMake(0, 0, 100, 60)];
 	view = scrollView;
     scrollView.scrollEnabled = NO;
+    scrollView.userInteractionEnabled = YES;
 	[scrollView setWidget:self];
 	id ret = [super init];
-    
-    // if it doesn't scroll it shouldn't absorb events :)
-    scrollView.userInteractionEnabled = NO;
+
     return ret;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {
 	if([key isEqualToString:@"isScrollable"]) {
-		MoSyncUIScrollView* sv = (MoSyncUIScrollView*)view;
+		MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*)view;
         BOOL enabled =  [value boolValue];
 		sv.scrollEnabled = enabled;
-        sv.userInteractionEnabled = enabled;
 	}
 	else {
 		return [super setPropertyWithKey:key toValue:value];
@@ -73,7 +101,7 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UIScrollView)
 			maxY = childView.frame.origin.y+childView.frame.size.height;
 	}
 	
-	MoSyncUIScrollView* sv = (MoSyncUIScrollView*)view;
+	MoSyncTouchEnabledScrollView* sv = (MoSyncTouchEnabledScrollView*)view;
 	//sv.contentSize = CGSizeMake(maxX-minX, maxY-minY);
 	sv.contentSize = CGSizeMake(maxX, maxY); // negative values aren't supported.
 }

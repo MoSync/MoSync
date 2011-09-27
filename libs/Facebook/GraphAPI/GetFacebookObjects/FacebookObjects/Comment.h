@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -16,10 +17,8 @@ MA 02110-1301, USA.
 */
 
 /*
- * Comment.h
- *
- *  Created on: Jul 2, 2011
- *      Author: gabi
+ * @file Comment.h
+ * @author Gabriela Rata
  */
 
 #ifndef COMMENT_H_
@@ -29,14 +28,18 @@ MA 02110-1301, USA.
 #include "Utilities.h"
 
 /**
- * Implements an Comment Facebook object.
+ * \brief Implements an Comment Facebook object.
  * See: http://developers.facebook.com/docs/reference/api/Comment/
  */
 class Comment: public FacebookObject
 {
 
 public:
+	/**
+	 * Constructor
+	 */
 	Comment();
+
 	/**
 	 * Setter/getter for the "message" field of an Comment object.
 	 * @param message - the comment text
@@ -59,9 +62,9 @@ public:
 	int getLikes() const;
 
 private:
-	MAUtil::String mMessage;
-	IdNamePair mFrom;
-	int mLikes;
+	MAUtil::String		mMessage;
+	IdNamePair			mFrom;
+	int					mLikes;
 };
 
 #endif /* COMMENT_H_ */

@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,19 +18,34 @@ MA 02110-1301, USA.
 
 /*
  * FacebookDemoScreen.cpp
- *
- *  Created on: Aug 8, 2011
- *      Author: gabi
  */
 
+//#include <NativeUI/Button.h>
+//#include <NativeUI/ListView.h>
+//#include <NativeUI/ListViewListener.h>
+//#include <NativeUI/Screen.h>
+
 #include "FacebookDemoScreen.h"
-#include <Facebook/LOG.h>
+#include "Facebook/LOG.h"
+
+#include "../PlatformInfo.h"
 
 namespace FacebookDemoGUI
 {
 
-FacebookDemoScreen::FacebookDemoScreen(FacebookDemoScreen *prevScreen): mPreviousScreen(prevScreen), mBusy(false)
+FacebookDemoScreen::FacebookDemoScreen(FacebookDemoScreen *prevScreen): mPreviousScreen(prevScreen),
+		mLayout(0),
+		mList(0),
+		mBackButton(0)
 {
+	mClearScreenAfterLosingFocus = false;
+
+	mItemsColor_Android = 0x000000;
+	mItemsColor_iPhone = 0x99999A;
+
+	mScreenColor = 0x000000;
+
+	this->setBackgroundColor(mScreenColor);
 }
 
 void FacebookDemoScreen::show()
@@ -38,7 +54,9 @@ void FacebookDemoScreen::show()
 	{
 		mPreviousScreen->receiveKeyEvents(false);
 	}
-	MoSync::UI::Screen::show();
+
+	receiveKeyEvents(true);
+	NativeUI::Screen::show();
 }
 
 void FacebookDemoScreen::receiveKeyEvents(bool receive)
@@ -61,35 +79,14 @@ void FacebookDemoScreen::receiveKeyEvents(bool receive)
 	}
 }
 
-void FacebookDemoScreen::FacebookDemoScreen::setBusy(bool busy)
-{
-	mBusy = busy;
-}
-
-bool FacebookDemoScreen::FacebookDemoScreen::isBusy() const
-{
-	return mBusy;
-}
-
 /**
  * Called when a key is pressed.
  */
 void FacebookDemoScreen::keyPressEvent(int keyCode, int nativeCode)
 {
-	LOG("\t\t!FacebookDemoScreen::keyPressEvent keyCode=%d; mPrevScreen=%p, nativeCode=%d",
-		keyCode, mPreviousScreen, nativeCode);
 	if (MAK_BACK == keyCode )
 	{
-
-		receiveKeyEvents(false);
-		if(0 != mPreviousScreen)
-		{
-			mPreviousScreen->show();
-		}
-	}
-	if( MAK_HOME == keyCode)
-	{
-		maExit(0);
+		back();
 	}
 }
 
@@ -98,10 +95,47 @@ FacebookDemoScreen *FacebookDemoScreen::getPreviousScreen()
 	return mPreviousScreen;
 }
 
+void FacebookDemoScreen::add(ListItem *btn)
+{
+	if(FacebookDemoApplication::isAndroid())
+	{
+		btn->setBackgroundColor(mItemsColor_Android);
+	}
+	else
+	{
+		btn->setBackgroundColor(mItemsColor_iPhone);
+	}
+	mList->addChild(btn);
+}
+
+
+void FacebookDemoScreen::clearScreenAfterLosingFocus(bool clearScreen)
+{
+	mClearScreenAfterLosingFocus = clearScreen;
+}
+
+bool FacebookDemoScreen::isEmpty() const
+{
+	return (mList->countChildWidgets() == 0);
+}
+
+int FacebookDemoScreen::addChild(NativeUI::Widget* widget)
+{
+	return NativeUI::Screen::addChild(widget);
+}
+
 FacebookDemoScreen::~FacebookDemoScreen()
 {
 	receiveKeyEvents(false);
-//	LOG("\n\t\tFacebookDemoScreen DESTRUCTOR\n this=%d", this);
+}
+
+void FacebookDemoScreen::back()
+{
+	if(0 != mPreviousScreen)
+	{
+		receiveKeyEvents(false);
+		mPreviousScreen->show();
+	}
 }
 
 }//namespace FacebookDemoGUI

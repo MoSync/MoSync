@@ -15,6 +15,11 @@
  02111-1307, USA.
  */
 
+#define TEST_RESULT(resultCode) if(0 > resultCode)\
+                                {\
+                                    return resultCode;\
+                                }
+
 #import "ImagePickerController.h"
 #import "MoSyncUISyscalls.h"
 #import "ScreenWidget.h"
@@ -36,7 +41,7 @@ static ImagePickerController *sharedInstance = nil;
     {
         sharedInstance = [[ImagePickerController alloc] init];
     }
-    
+
     return sharedInstance;
 }
 
@@ -50,11 +55,10 @@ static ImagePickerController *sharedInstance = nil;
 
 - (id)init
 {
-    
     mImagePicker = [[UIImagePickerController alloc] init];
     mImagePicker.sourceType = UIImagePickerControllerSourceTypePhotoLibrary;
     mImagePicker.delegate = self;
-    
+
     return [super init];
 }
 
@@ -63,12 +67,12 @@ static ImagePickerController *sharedInstance = nil;
  */
 -(void) show
 {
-//    NSLog(@"show Image Picker");
     MoSyncUI* mosyncUI = getMoSyncUI();
-    ScreenWidget* shownScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
-    UIViewController* controller = [shownScreen getController];    
-	
-    [self performSelectorOnMainThread: @ selector(displayImagePicker:) withObject:controller waitUntilDone:YES];
+    [mosyncUI showModal:mImagePicker];
+	//ScreenWidget* shownScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
+    //UIViewController* controller = [shownScreen getController];
+
+    //[self performSelectorOnMainThread: @ selector(displayImagePicker:) withObject:controller waitUntilDone:YES];
 }
 
 /**
@@ -78,9 +82,10 @@ static ImagePickerController *sharedInstance = nil;
 -(void) hide
 {
     MoSyncUI* mosyncUI = getMoSyncUI();
-    ScreenWidget* shownScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
-    UIViewController* controller = [shownScreen getController];
-    [controller dismissModalViewControllerAnimated:YES];
+	[mosyncUI hideModal];
+    //ScreenWidget* shownScreen = (ScreenWidget*)[mosyncUI getCurrentlyShownScreen];
+    //UIViewController* controller = [shownScreen getController];
+    //[controller dismissModalViewControllerAnimated:YES];
 }
 
 /**
@@ -91,47 +96,52 @@ static ImagePickerController *sharedInstance = nil;
  */
 - (void)imagePickerController:(UIImagePickerController *)picker didFinishPickingMediaWithInfo:(NSDictionary *)info
 {
-    NSLog(@"didFinishPickingMediaWithInfo %@", info);
     UIImage* selectedImage = (UIImage*) [info objectForKey:UIImagePickerControllerOriginalImage];
     MAHandle handle = [self getImageHandle:selectedImage];
-    NSLog(@"image handle = %d", handle);
-    
+
     MAEvent event;
 	event.type = EVENT_TYPE_IMAGE_PICKER;
 	event.imagePickerState = 1;
     event.imagePickerItem = handle;
-    
     Base::gEventQueue.put(event);
-    
+
     [self hide];
 }
 
 /**
  * The user has cancelled the pick operation.
  * @param picker The controller object managing the image picker interface.
- */ 
+ */
 - (void)imagePickerControllerDidCancel:(UIImagePickerController *)picker
 {
-    //    NSLog(@"imagePickerControllerDidCancel");  
     MAEvent event;
 	event.type = EVENT_TYPE_IMAGE_PICKER;
     event.imagePickerState = 0;
     Base::gEventQueue.put(event);
-    
+
     [self hide];
 }
+
+/**
+ * The user has cancelled the pick operation on an iPad.
+ * @param picker The controller object managing the popover window.
+ */
+- (void)popoverControllerDidDismissPopover:(UIPopoverController *)popover
+{
+	[self imagePickerControllerDidCancel:popover.contentViewController];
+}
+
 
 /**
  * Displays the image picker.
  * This function must be called on the main thread.
  * @param The current UIViewController object.
  */
--(void) displayImagePicker:(id) obj
+/*-(void) displayImagePicker:(id) obj
 {
-    //    NSLog(@"main thread display picker");
     UIViewController* controller = (UIViewController*) obj;
-    [controller presentModalViewController:mImagePicker animated:true];    
-}
+	[controller presentModalViewController:mImagePicker animated:false];
+}*/
 
 /**
  * Gets an image handle for a given image.
@@ -142,14 +152,17 @@ static ImagePickerController *sharedInstance = nil;
 {
     NSData* data = UIImageJPEGRepresentation(image, 0);
     int size = [data length];
-    
-    MAHandle placeholder = maCreatePlaceholder();
-    int result = maCreateData(placeholder, size);
-    NSLog(@"reuslt maCreateData = %d", result);
-    const void* src = [data bytes];
-    maWriteData(placeholder,src,0,size);
 
-    return placeholder;
+    MAHandle dataPlaceholder = maCreatePlaceholder();
+    TEST_RESULT(maCreateData(dataPlaceholder, size));
+    const void* src = [data bytes];
+    maWriteData(dataPlaceholder,src,0,size);
+
+    MAHandle imageHandle = maCreatePlaceholder();
+    TEST_RESULT(maCreateImageFromData(imageHandle, dataPlaceholder, 0, size));
+    maDestroyObject(dataPlaceholder);
+
+    return imageHandle;
 }
 
 @end

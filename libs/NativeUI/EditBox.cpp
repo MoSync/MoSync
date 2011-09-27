@@ -59,7 +59,7 @@ namespace NativeUI
      * Get the text entered in the edit box.
      * @return The text entered in the edit box.
      */
-    MAUtil::String EditBox::getText() const
+    MAUtil::String EditBox::getText()
     {
         return this->getPropertyString(MAW_EDIT_BOX_TEXT);
     }
@@ -67,7 +67,7 @@ namespace NativeUI
     /**
      * Set a text in the edit box that acts as a placeholder when an
      * edit box is empty.
-     * @param The given text.
+     * @param text The given text.
      */
     void EditBox::setPlaceholder(const MAUtil::String& text)
     {

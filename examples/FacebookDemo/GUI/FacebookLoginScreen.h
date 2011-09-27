@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * FacebookLoginScreen.h
- *
- *  Created on: Jun 23, 2011
- *      Author: gabi
  */
 
 #ifndef FACEBOOKLOGINSCREEN_H_
@@ -27,8 +25,8 @@ MA 02110-1301, USA.
 
 
 #include <MAUtil/String.h>
-#include "NativeUI/WebView.h"
-#include "NativeUI/Screen.h"
+#include "FacebookWebView.h"
+#include <NativeUI/Screen.h>
 
 namespace FacebookDemoGUI{
 
@@ -37,15 +35,18 @@ class FacebookLoginScreen
 public:
 	FacebookLoginScreen();
 	void setSize(int width, int height);
+
 	void setUrl(const MAUtil::String &url);
 	MAUtil::String getRedirectUrl() const;
+
+	void setListener(NativeUI::WebViewListener *listener);
 
 	void show();
 	~FacebookLoginScreen();
 
 private:
-	MoSync::UI::Screen	mScreen;
-	MoSync::UI::WebView *mWebView;
+	NativeUI::Screen					mScreen;
+	FacebookDemoGUI::FacebookWebView	*mWebView;
 };
 
 }//namespace FacebookDemoGUI

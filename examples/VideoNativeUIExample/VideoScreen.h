@@ -38,8 +38,9 @@ using namespace NativeUI;
 
 class VideoScreen:
 	public Screen,
-	public ButtonListener,
-	public VideoViewListener
+	public VideoViewListener,
+	public EditBoxListener,
+	public ButtonListener
 {
 
 public:
@@ -114,11 +115,23 @@ private:
      * - #MAW_VIDEO_VIEW_STATE_FINISHED the video has finished playing.
      * - #MAW_VIDEO_VIEW_STATE_INTERRUPTED Playback is temporarily
      * interruped(maybe there's no data in the buffer).
+     * NOTE: there is a slightly different behaviour depending on the platform:
+     *  - on iOS the source is loaded into memory when
+     *  MAW_VIDEO_VIEW_STATE_PLAYING is received.
+     *   - on Android the source is loaded into memory when
+     *  MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
      */
     virtual void videoViewStateChanged(
         VideoView* videoView,
         const int videoViewState);
 
+    /**
+     * This method is called when the return button was pressed.
+     * On iphone platform the virtual keyboard is not hidden after
+     * receiving this event.
+     * @param editBox The edit box object that generated the event.
+     */
+    virtual void editBoxReturn(EditBox* editBox);
 private:
 	/**
 	 * Main layout.
@@ -167,21 +180,6 @@ private:
 
 	VerticalLayout* mMiddleSpacerLayout;
 	VerticalLayout* mSpacerBottomLayout;
-
-	/**
-	 * Exit button.
-	 */
-	Button* mExitButton;
-
-	/**
-	 * The screen width.
-	 */
-	int mScreenWidth;
-
-	/**
-	 * The screen height.
-	 */
-	int mScreenHeight;
 };
 
 #endif /* NATIVESCREEN_H_ */

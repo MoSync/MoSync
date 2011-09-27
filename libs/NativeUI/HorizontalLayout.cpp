@@ -34,7 +34,7 @@ namespace NativeUI
 	 * available space in the parent widget horizontally and vertically.
 	 */
 	HorizontalLayout::HorizontalLayout() :
-		Widget(MAW_HORIZONTAL_LAYOUT)
+		Layout(MAW_HORIZONTAL_LAYOUT)
 	{
 		// Set some common default values.
 		fillSpaceVertically();

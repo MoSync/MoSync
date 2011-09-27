@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file CheckBox.h
  * @author Bogdan Iusco
  *
- * An instance of CheckBox is used for displaying an two-states button.
+ * \brief An instance of CheckBox is used for displaying an two-states button.
  * For check box events see CheckBoxListener.
  */
 
@@ -36,7 +36,8 @@ namespace NativeUI
     class CheckBoxListener;
 
     /**
-     * An instance of CheckBox is used for displaying an two-states button.
+     * \brief An instance of CheckBox is used for displaying an two-states button.
+     *
      * For check box events see CheckBoxListener.
      */
     class CheckBox : public Widget
@@ -62,7 +63,7 @@ namespace NativeUI
          * Get the state of the check box.
          * @return True if the check box is checked, false otherwise.
          */
-        virtual bool isChecked() const;
+        virtual bool isChecked();
 
         /**
          * Add an check box event listener.

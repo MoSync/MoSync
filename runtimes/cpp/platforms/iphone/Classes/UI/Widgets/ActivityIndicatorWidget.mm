@@ -37,7 +37,7 @@ NSString *const kFalseValueString = @"false";
         UIActivityIndicatorView* activityIndicatorView = [[UIActivityIndicatorView alloc]
             initWithActivityIndicatorStyle: UIActivityIndicatorViewStyleGray];
 
-        view = [activityIndicatorView retain];
+        view = activityIndicatorView;
         [activityIndicatorView startAnimating];
     }
 
@@ -52,7 +52,7 @@ NSString *const kFalseValueString = @"false";
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    if([key isEqualToString:@"inProgress"]) {
+    if([key isEqualToString:@MAW_ACTIVITY_INDICATOR_IN_PROGRESS]) {
         UIActivityIndicatorView* activityIndicatorView = (UIActivityIndicatorView*) view;
 
         if([value isEqualToString: kTrueValueString])

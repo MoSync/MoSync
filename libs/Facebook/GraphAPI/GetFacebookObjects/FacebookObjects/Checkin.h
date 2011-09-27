@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,11 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Checkin.h
- *
- *  Created on: Jul 8, 2011
- *      Author: gabi
+/**
+ * @file Checkin.h
+ * @author Gabriela Rata
  */
 
 #ifndef CHECKIN_H_
@@ -30,11 +29,13 @@ MA 02110-1301, USA.
 #include "Comment.h"
 
 /**
- * Implements an Checkin Facebook object.  See: http://developers.facebook.com/docs/reference/api/checkin/
+ * \brief Implements an Checkin Facebook object.
+ * See: http://developers.facebook.com/docs/reference/api/checkin/
  */
 class Checkin: public FacebookObject
 {
 public:
+
 	/**
 	 * Setter/getter for the "from" field of an Checkin object.
 	 * @param from - it represents the person/application that created the checkin. It contains the id and the name.
@@ -85,13 +86,13 @@ public:
 	const IdNamePair &getApplication() const;
 
 private:
-	IdNamePair mFrom;
-	MAUtil::Vector<IdNamePair> mTags;
-	Place mPlace;
-	MAUtil::Vector<IdNamePair> mLikes;
-	MAUtil::String mMessage;
-	MAUtil::Vector<Comment> mComments;
-	IdNamePair mApplication;
+	IdNamePair					mFrom;
+	MAUtil::Vector<IdNamePair> 	mTags;
+	Place						mPlace;
+	MAUtil::Vector<IdNamePair> 	mLikes;
+	MAUtil::String				mMessage;
+	MAUtil::Vector<Comment>		mComments;
+	IdNamePair					mApplication;
 };
 
 #endif /* CHECKIN_H_ */

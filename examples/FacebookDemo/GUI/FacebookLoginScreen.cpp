@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * FacebookLoginScreen.cpp
- *
- *  Created on: Jun 23, 2011
- *      Author: gabi
  */
 
 
@@ -30,15 +28,16 @@ namespace FacebookDemoGUI{
 
 FacebookLoginScreen::FacebookLoginScreen()
 {
-	using namespace MoSync::UI;
+	using namespace NativeUI;
 
-	mWebView = new WebView();
+	mWebView = new FacebookDemoGUI::FacebookWebView();
 
 	mWebView->fillSpaceHorizontally();
 	mWebView->fillSpaceVertically();
-	mWebView->setProperty("title", "Web");
 
 	mScreen.setMainWidget(mWebView);
+
+	mWebView->setSoftHook(".*");
 }
 
 void FacebookLoginScreen::setSize(int width, int height)
@@ -48,18 +47,21 @@ void FacebookLoginScreen::setSize(int width, int height)
 
 void FacebookLoginScreen::setUrl(const MAUtil::String &url)
 {
-	mWebView->setProperty("url", url.c_str());
 	mWebView->openURL(url);
 }
 
 MAUtil::String FacebookLoginScreen::getRedirectUrl() const
 {
-	return mWebView->getPropertyString("newurl");
+	return mWebView->getNewURL();
+}
+
+void FacebookLoginScreen::setListener(NativeUI::WebViewListener *listener)
+{
+	mWebView->addWebViewListener(listener);
 }
 
 void FacebookLoginScreen::show()
 {
-
 	mScreen.show();
 }
 

@@ -33,6 +33,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <FileStream.h>
 #include "Syscall.h"
 #include "PimSyscall.h"
+#include <CoreMedia/CoreMedia.h>
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
@@ -41,7 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "MoSyncUISyscalls.h"
 #import "CameraPreviewWidget.h"
 #import "CameraConfirgurator.h"
-
+#import "ImagePickerController.h"
 #include "netImpl.h"
 
 #define NETWORKING_H
@@ -214,11 +215,18 @@ namespace Base {
 	{
 		int len;
 		TEST(s.length(len));
-		const unsigned char *data = (const unsigned char*)s.ptrc();
+		unsigned char *data = (unsigned char*)s.ptrc();
 		ImageFormat format;
+		int orientation = 1; //Default orientation
 #define E(x, y) (data[x]==y)
 		if(len>3 && E(0, 0xff) && E(1, 0xd8)) {
 			format = JPEG;
+			for(int i=0;i<len;i++){
+				if(E(i,0x01) && E(i+1,0x12)){ //The orientation tag
+					orientation = (int)data[i+9]; //The orientation value
+					break;
+				}
+			}
 		}
 		else if(len>7 && E(0, 0x89) && E(1, 0x50) && E(2, 0x4e) && E(3, 0x47) && E(4, 0x0d) && E(5, 0x0a) && E(6, 0x1a) && E(7, 0x0a) ) {
 			format = PNG;
@@ -245,7 +253,11 @@ namespace Base {
 
 		CFRelease(png_data);
 
-		return new Surface(imageRef);
+		Surface *imageSurface = new Surface(imageRef);
+
+		imageSurface->orientation = orientation;
+
+		return imageSurface;
 	}
 
 	Surface* Syscall::loadSprite(void* surface, ushort left, ushort top,
@@ -321,6 +333,8 @@ namespace Base {
 	void MALibQuit() {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
+        MAPimClose();
+        [ImagePickerController deleteInstance];
 	}
 
 
@@ -521,20 +535,21 @@ namespace Base {
 
     SYSCALL(MAHandle, maFontLoadWithName(const char* name, int size)){
         CFStringRef fontName=CFStringCreateWithCString(NULL,name,kCFStringEncodingMacRoman);
-
+		if(size<=0)
+        {
+            return RES_FONT_INVALID_SIZE;
+        }
         //Getting a UIFont object is probably the least expensive way to test if it exists.
         //Also, it's more probably that a user will use the nativeUI system rather than
         //maDrawText(W)
         UIFont *uiFontObject=[UIFont fontWithName:(NSString*)fontName size:(GLfloat)size];
+
         if(!uiFontObject)
         {
             return RES_FONT_NAME_NONEXISTENT;
         }
 
-        if(size<=0)
-        {
-            return RES_FONT_INVALID_SIZE;
-        }
+        [uiFontObject retain];
         return createFontInfo(fontName,(CGFloat)size,uiFontObject,NULL);
 
     }
@@ -654,6 +669,7 @@ namespace Base {
             selectedFont->uiFontObject=
                             [[UIFont fontWithName:(NSString *) selectedFont->name size:selectedFont->size] retain];
         }
+		return selectedFont->uiFontObject;
     }
 
     //Used to instantiate the CGFont object only when needed
@@ -1025,6 +1041,7 @@ namespace Base {
 		MoSync_ShowMessageBox(nil, message, true);
 		gRunning = false;
 		pthread_exit(NULL);
+        //[[NSThread currentThread] exit];
 	}
 
 	SYSCALL(int, maPlatformRequest(const char* url))
@@ -1111,6 +1128,10 @@ namespace Base {
 	}
 
 	SYSCALL(int, maSendTextSMS(const char* dst, const char* msg)) {
+		if ([MFMessageComposeViewController canSendText] == NO) {
+			return CONNERR_UNAVAILABLE;
+		}
+
 		MFMessageComposeViewController *smsController = [[MFMessageComposeViewController alloc] init];
 
 		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst]];
@@ -1225,19 +1246,26 @@ namespace Base {
 #ifdef SUPPORT_OPENGL_ES
 
 
-// remove implementations for broken bindings..
+// override implementations for broken bindings..
 #undef maIOCtl_glGetPointerv_case
 #define maIOCtl_glGetPointerv_case(func) \
 case maIOCtl_glGetPointerv: \
 {\
-return IOCTL_UNAVAILABLE; \
+GLenum _pname = (GLuint)a; \
+void* _pointer = GVMR(b, MAAddress);\
+wrap_glGetPointerv(_pname, _pointer); \
+return 0; \
 }
     
 #undef maIOCtl_glGetVertexAttribPointerv_case
 #define maIOCtl_glGetVertexAttribPointerv_case(func) \
 case maIOCtl_glGetVertexAttribPointerv: \
 {\
-return IOCTL_UNAVAILABLE; \
+GLuint _index = (GLuint)a; \
+GLenum _pname = (GLuint)b; \
+void* _pointer = GVMR(c, MAAddress);\
+wrap_glGetVertexAttribPointerv(_index, _pname, _pointer); \
+return 0; \
 }
     
 #undef maIOCtl_glShaderSource_case
@@ -1265,6 +1293,31 @@ return 0; \
         glShaderSource(shader, count, strCopies, length);
         delete strCopies;     
     }
+
+
+    void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
+        GLvoid* outPointer;
+        glGetVertexAttribPointerv(index, pname, &outPointer);
+        
+        if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
+            return;
+        
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
+    }
+    
+    void wrap_glGetPointerv(GLenum pname, void* pointer) {
+        GLvoid* outPointer;
+        glGetPointerv(pname, &outPointer);
+        
+        if(pname != GL_COLOR_ARRAY_POINTER &&
+           pname != GL_NORMAL_ARRAY_POINTER &&
+           pname != GL_POINT_SIZE_ARRAY_POINTER_OES &&
+           pname != GL_TEXTURE_COORD_ARRAY_POINTER &&
+           pname != GL_VERTEX_ARRAY_POINTER)
+            return;
+        
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);        
+    }    
     
 	int maOpenGLInitFullscreen(int glApi) {
 		if(sOpenGLScreen != -1) return 0;
@@ -1394,6 +1447,8 @@ return 0; \
 	
 	CameraSystemInfo gCameraSystem={0,0,FALSE,NULL};
 	
+	CameraConfirgurator *gCameraConfigurator;
+
 	//This performs lazy initialization of the camera system, the first time
 	//a relevant camera syscall is called.
 	void initCameraSystem()
@@ -1401,7 +1456,7 @@ return 0; \
 		
 		if( gCameraSystem.initialized == FALSE )
 		{
-
+			gCameraConfigurator = [[CameraConfirgurator alloc] init];
 			CameraInfo *cameraInfo;
 			int numCameras = 0;
 			
@@ -1546,6 +1601,14 @@ return 0; \
 					[info->captureSession	performSelectorOnMainThread:@selector(startRunning)
 														   withObject:nil
 														waitUntilDone:YES];
+
+					if(info->device.torchMode == AVCaptureTorchModeOn)
+					{
+						[info->device lockForConfiguration:nil];
+						info->device.torchMode = AVCaptureTorchModeOff;
+						info->device.torchMode = AVCaptureTorchModeOn;
+						[info->device unlockForConfiguration];
+					}
 				}
 				return 1;
 		}
@@ -1690,7 +1753,7 @@ return 0; \
 
 	SYSCALL(int, maCameraRecord(int stopStartFlag))
 	{		
-		return 1;
+		return -1;
 	}
 
 	SYSCALL(int, maCameraSetProperty(const char *property, const char* value))
@@ -1698,16 +1761,13 @@ return 0; \
 		@try {
 			int result = 0;
 			CameraInfo *info = getCurrentCameraInfo();
-
 			NSString *propertyString = [NSString stringWithUTF8String:property];
 			NSString *valueString = [NSString stringWithUTF8String:value];
-			CameraConfirgurator *configurator = [[CameraConfirgurator alloc] init];
-			result = [configurator	setCameraProperty: info->device
+			result = [gCameraConfigurator	setCameraProperty: info->device
 										withProperty: propertyString
 										   withValue: valueString];
 			[propertyString release];
 			[valueString release];
-			[configurator release];
 			return result;
 		}
 		@catch (NSException * e) {

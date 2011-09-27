@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,11 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * PhotoAlbum.h
- *
- *  Created on: Jul 1, 2011
- *      Author: gabi
+/**
+ * @file Album.h
+ * @author Gabriela Rata
  */
 
 #ifndef PHOTOALBUM_H_
@@ -29,17 +28,22 @@ MA 02110-1301, USA.
 #include "Utilities.h"
 
 /**
- * Implements an Album.  See: http://developers.facebook.com/docs/reference/api/album/
+ * \brief Implements an Album object type.
+ * See: http://developers.facebook.com/docs/reference/api/album/
  */
 class Album : public FacebookObject
 {
 public:
 
+	/**
+	 * Constructor
+	 */
 	Album();
 
 	/**
 	 * Setter/getter for the "from" field of an Album object.
-	 * @param from - it represents the person/application that created the album. It contains an id and name.
+	 * @param from - it represents the person/application that created the
+	 * album. It contains an id and name.
 	 */
 	void setFromField(const IdNamePair &from);
 	const IdNamePair &getFromField() const;
@@ -80,12 +84,12 @@ public:
 	int getCount() const;
 
 private:
-	IdNamePair mFrom;
-	MAUtil::String mName;
-	MAUtil::String mDescription;
-	MAUtil::String mLink;
-	MAUtil::String mCoverPhotoId;
-	int mCount;
+	IdNamePair			mFrom;
+	MAUtil::String		mName;
+	MAUtil::String		mDescription;
+	MAUtil::String		mLink;
+	MAUtil::String		mCoverPhotoId;
+	int					mCount;
 };
 
 #endif /* PHOTOALBUM_H_ */

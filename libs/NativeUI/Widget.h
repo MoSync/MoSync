@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file Widget.h
  * @author Mikael Kindborg, Emma Tresanszki and Bogdan Iusco.
  *
- * Widget is the base class of all widgets. This class is
+ * \brief Widget is the base class of all widgets. This class is
  * used to wrap native widget handles and provides common
  * methods for widgets and event support.
  */
@@ -35,19 +35,65 @@ MA 02110-1301, USA.
 #include <MAUtil/Map.h>
 #include <MAUtil/Vector.h>
 #include <MAUtil/Environment.h>
+#include <MAUtil/util.h>
 
 #include <IX_WIDGET.h>
 #include "WidgetUtil.h"
 
 namespace NativeUI
 {
+	/**
+	 * \brief A structure that holds information about the last error that
+	 * occurred by using the wrapper methods.
+	 *
+	 * Causes might be any of the following:
+	 *  - A widget was instantiated but it's type is not yet available
+	 *  on the target platform.
+	 *  - A property was set/get on a widget that is not yet available on the
+	 *  target platform.
+	 *  - A setter/getter method received an invalid property name.
+	 *  - A syscall has failed due to invalid parameters.
+	 *
+	 * NOTE: In order to have this structure empty, make sure you read carefully
+	 * the documentation before you use the NativeUI library.
+	 */
+	struct LastError{
+		/**
+		 * It contains a value if an error occurred.
+		 * It can be:
+		 *  - either a property name that is invalid.
+		 *  (Invalid means that the property is not available on this widget.)
+		 *  - either a function call that didn't succeed ( for instance:
+		 *  addChild, insertChild, removeChild etc).
+		 */
+		MAUtil::String errorCause;
+		/**
+		 * The error code.
+		 * Any of the following:
+		 *  - MAW_RES_ERROR
+		 *  - MAW_RES_INVALID_PROPERTY_NAME
+		 *  - MAW_RES_INVALID_PROPERTY_VALUE
+		 *  - MAW_RES_INVALID_HANDLE
+		 *  - MAW_RES_INVALID_TYPE_NAME
+		 *  - MAW_RES_INVALID_INDEX
+		 *  - MAW_RES_INVALID_STRING_BUFFER_SIZE
+		 *  - MAW_RES_INVALID_LAYOUT
+		 */
+		int errorCode;
+		LastError(
+			const MAUtil::String& cause,
+			const int code):
+			errorCause(cause),
+			errorCode(code){};
+		LastError(){};
+	};
 
     // Forward declaration.
     class WidgetManager;
     class WidgetEventListener;
 
     /**
-     * Base class for all widgets.
+     * \brief Base class for all widgets.
      */
     class Widget
     {
@@ -119,7 +165,7 @@ namespace NativeUI
          * @param property A string representing which property to set.
          * @param resultCode Will contain the result code of the syscall.
          *                   Can be any of the following result codes:
-         *                   - #MAW_RES_OK no error occurred.
+         *                   - #MAW_RES_OK.
          *                   - #MAW_RES_INVALID_HANDLE if the handle was invalid.
          *                   - #MAW_RES_INVALID_PROPERTY_NAME if the property
          *                     name was invalid.
@@ -132,7 +178,7 @@ namespace NativeUI
          */
         virtual int getPropertyInt(
             const MAUtil::String& property,
-            int& resultCode) const;
+            int& resultCode);
 
         /**
          * Get a widget property value as an integer.
@@ -140,7 +186,7 @@ namespace NativeUI
          * @return The property value.
          */
         virtual int getPropertyInt(
-            const MAUtil::String& property) const;
+            const MAUtil::String& property);
 
         /**
          * Get a widget property as a string, setting also the result code.
@@ -160,7 +206,7 @@ namespace NativeUI
          */
         virtual MAUtil::String getPropertyString(
             const MAUtil::String& property,
-            int& resultCode) const;
+            int& resultCode);
 
         /**
          * Get a widget property as a string.
@@ -168,7 +214,7 @@ namespace NativeUI
          * @return The property value.
          */
         virtual MAUtil::String getPropertyString(
-            const MAUtil::String& property) const;
+            const MAUtil::String& property);
 
         /**
          * Add a widget as a child of this widget.
@@ -256,6 +302,18 @@ namespace NativeUI
         virtual void setSize(const int width, const int height);
 
         /**
+         * Get the width of the widget.
+         * @return The width value.
+         */
+        virtual int getWidth();
+
+        /**
+         * Get the height of the widget.
+         * @return The height value.
+         */
+        virtual int getHeight();
+
+        /**
          * Set the width of the widget.
          * @param width The width value.
          */
@@ -341,7 +399,7 @@ namespace NativeUI
          * Check if the widget is visible.
          * @return True if is visible, false otherwise.
          */
-        virtual bool isVisible() const;
+        virtual bool isVisible();
 
         /**
          * Enable the widget.
@@ -378,6 +436,12 @@ namespace NativeUI
          */
         virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
 
+        /**
+         * Get a handle to the last error that occurred.
+         * @return a LastError structure that holds details about the error.
+         */
+        struct LastError getLastError();
+
     protected:
         /**
          * Constructor is protected because actual widget instances
@@ -386,6 +450,13 @@ namespace NativeUI
          * (one of the MAW_ constants).
          */
         Widget(const MAUtil::String& widgetType);
+
+        /**
+         * Save the last error information.
+         * @param errCode The error code.
+         * @param cause The method/property that caused the error.
+         */
+        void setLastErrorCode(int& errCode, const MAUtil::String& cause);
 
     private:
         /**
@@ -407,6 +478,12 @@ namespace NativeUI
          * List of child widgets.
          */
         MAUtil::Vector<Widget*> mChildren;
+
+        /**
+         * The last error that occurred.
+         * Contains information about the cause of the error, as well as it's code.
+         */
+        struct LastError mLastError;
     };
 
 } // namespace NativeUI

@@ -45,13 +45,15 @@ namespace WikiNativeUI
  * Here instance variables are initialized.
  */
 BasicScreen::BasicScreen():
+	mScreenWidth(0),
+	mScreenHeight(0),
+	mFontSize(0),
+	mPaddingSize(0),
 	mScreen(-1),
 	mMainLayout(-1),
 	mTopLabel(-1),
 	mTopButtonPrevious(-1),
-	mTopButtonNext(-1),
-	mScreenWidth(0),
-	mScreenHeight(0)
+	mTopButtonNext(-1)
 {
 	// Set the screen size, available for each screen.
 	MAExtent screenSize = maGetScrSize();
@@ -241,8 +243,7 @@ void BasicScreen::setupUI()
 	// Error handling for devices that do not support NativeUI.
 	if ( -1 == mScreen )
 	{
-		maPanic(0, " This application uses NativeUI, which currently is supported"
-				   " only on Android and iOS devices.");
+		maPanic(0, "NativeUI is only available on Android and iOS.");
 	}
 
 	// Create the main layout.

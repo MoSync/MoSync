@@ -26,6 +26,7 @@ MA 02110-1301, USA.
  */
 
 #include "MAHeaders.h"
+#include "Util.h"
 #include "ScreenImageSwiper.h"
 
 /**
@@ -47,22 +48,14 @@ MA 02110-1301, USA.
 
 #define DEFAULT_IMAGE_INDEX				0
 
-/**
- * Create the Swiper Screen.
- * @return An instance of class ScreenImageSwiper.
- */
-Screen* ScreenImageSwiper::create()
-{
-	ScreenImageSwiper* screen = new ScreenImageSwiper();
-	screen->createUI();
-	return screen;
-}
-
 /*
  * Constructor
  */
-ScreenImageSwiper::ScreenImageSwiper()
+ScreenImageSwiper::ScreenImageSwiper():
+	Screen()
 {
+	createUI();
+
 	// Add a timer to keep the update at a 20 FPS rate
 	MAUtil::Environment::getEnvironment().addTimer(this, FRAME_DELAY, 0);
 }
@@ -84,10 +77,10 @@ void ScreenImageSwiper::createUI()
 	// Create the main layout for this screen.
 	mMainLayout = new VerticalLayout();
 
-	// Set the screne title.
+	// Set the screen title.
 	setTitle(TXT_SCREEN_TITLE);
 
-	if (WidgetManager::isAndroid())
+	if (isAndroid())
 	{
 		// Set screen icon for Android.
 		setIcon(RES_TAB_ICON_IMAGE_SWIPER_ANDROID);
@@ -102,6 +95,8 @@ void ScreenImageSwiper::createUI()
 
 		// Remove the navigation's bar back button.
 		mTitleWidget->setBackButtonTitle("");
+
+		mTitleWidget->fillSpaceHorizontally();
 
 		// Add the navigation bar to the main layout of the screen.
 		mMainLayout->addChild(mTitleWidget);
@@ -140,8 +135,8 @@ void ScreenImageSwiper::createUI()
 	mLabelLayout->setBackgroundColor(LABEL_BG_COLOR);
 	mLabelLayout->setText(mImages[DEFAULT_IMAGE_INDEX]->getName());
 	mLabelLayout->setFontColor(FONT_COLOR);
-	mLabelLayout->centerTextHorizontally();
-	mLabelLayout->centerTextVertically();
+	mLabelLayout->setTextHorizontalAlignment(MAW_ALIGNMENT_CENTER);
+	mLabelLayout->setTextVerticalAlignment(MAW_ALIGNMENT_CENTER);
 
 	// Adds the created layouts as childrens of the main one.
 	mMainLayout->addChild(mImagesLayout);
@@ -183,7 +178,7 @@ void ScreenImageSwiper::setupImages(int width, int height)
  */
 void ScreenImageSwiper::getScreenSize()
 {
-	if (WidgetManager::isAndroid())
+	if (isAndroid())
 	{
 		/// Get screen dimensions.
 		MAExtent size = maGetScrSize();
@@ -197,10 +192,10 @@ void ScreenImageSwiper::getScreenSize()
 	else
 	{
 		/// Extract the screen width
-		mScreenWidth = getPropertyInt(MAW_WIDGET_WIDTH);
+		mScreenWidth = getWidth();
 
 		/// Extract the screen height
-		mScreenHeight = getPropertyInt(MAW_WIDGET_HEIGHT);
+		mScreenHeight = getHeight();
 	}
 }
 

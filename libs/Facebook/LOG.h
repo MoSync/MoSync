@@ -15,11 +15,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * LOG.h
- *
- *  Created on: Jul 1, 2011
- *      Author: gabi
+/**
+ * @file LOG.h
+ * @author Gabriela Rata
  */
 
 #ifndef LOG_H_
@@ -44,8 +42,11 @@ MA 02110-1301, USA.
 
 #define LOG lprintfln
 
-//#define APPID "29283dab-912a-40ad-a5a3-ac270da7cfaa"
-//#define ENCRYPTIONKEY "dddad23f-9e15-499c-8890-745cb8ac8b3d"
+/**
+   * \brief Functions for displaying a Facebook object.
+   * It adds to the string parameter, all the fields of the object.
+   */
+
 
 void display(const Venue &venue, const MAUtil::String &prefix = "\t");
 void display(const Place &place, const MAUtil::String &prefix = "\t");

@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,11 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Event.h
- *
- *  Created on: Jul 2, 2011
- *      Author: gabi
+/**
+ * @file Event.h
+ * @author Gabriela Rata
  */
 
 #ifndef EVENT_H_
@@ -29,12 +28,13 @@ MA 02110-1301, USA.
 #include "Utilities.h"
 
 /**
- * Implements an Event Facebook object.
+ * \brief Implements an Event Facebook object.
  * See: http://developers.facebook.com/docs/reference/api/event/
  */
 class Event: public FacebookObject
 {
 public:
+
 	/**
 	 * Setter/getter for the "owner" field of an Event object.
 	 * @param owner - the profile that created the event.
@@ -93,14 +93,14 @@ public:
 	const MAUtil::String &getPrivacy() const;
 
 private:
-	IdNamePair mOwner;
-	MAUtil::String mName;
-	MAUtil::String mDescription;
-	MAUtil::String mStartTime;
-	MAUtil::String mEndTime;
-	MAUtil::String mLocation;
-	Venue mVenue;
-	MAUtil::String mPrivacy;
+	IdNamePair		mOwner;
+	MAUtil::String	mName;
+	MAUtil::String	mDescription;
+	MAUtil::String	mStartTime;
+	MAUtil::String	mEndTime;
+	MAUtil::String	mLocation;
+	Venue			mVenue;
+	MAUtil::String	mPrivacy;
 };
 
 #endif /* EVENT_H_ */

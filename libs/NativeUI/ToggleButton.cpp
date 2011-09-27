@@ -61,10 +61,16 @@ namespace NativeUI
 	 * Gets the current toggle button state.
 	 * @return The toggle button state.
 	 */
-	bool ToggleButton::isChecked() const
+	bool ToggleButton::isChecked()
 	{
-		return (this->getPropertyString(
-			MAW_TOGGLE_BUTTON_CHECKED)=="true" ? true : false );
+        MAUtil::String value = MAUtil::lowerString(
+			this->getPropertyString(MAW_TOGGLE_BUTTON_CHECKED));
+        if ( strcmp(value.c_str(),"true") == 0 )
+        {
+            return true;
+        }
+
+        return false;
 	}
 
 	/**

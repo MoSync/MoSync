@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file TextWidget.h
  * @author Bogdan Iusco
  *
- * Base class for widgets that have a text property.
+ * \brief Base class for widgets that have a text property.
  */
 
 #ifndef NATIVEUI_TEXT_WIDGET_H_
@@ -32,7 +32,7 @@ namespace NativeUI
 {
 
     /**
-     * Base class for widgets that have a text property.
+     * \brief Base class for widgets that have a text property.
      */
     class TextWidget : public Widget
     {
@@ -52,7 +52,7 @@ namespace NativeUI
          * Get the text displayed by the widget.
          * @return The text displayed by the widget.
          */
-        virtual MAUtil::String getText() const;
+        virtual MAUtil::String getText();
 
         /**
          * Set the vertical alignment of the text inside the widget.

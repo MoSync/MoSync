@@ -20,20 +20,22 @@ MA 02110-1301, USA.
  * @file HorizontalLayout.h
  * @author Mikael Kindborg
  *
- * Class for horizontal layout of widgets.
+ * \brief Class for horizontal layout of widgets.
  */
 
 #ifndef NATIVEUI_HORIZONTAL_LAYOUT_H_
 #define NATIVEUI_HORIZONTAL_LAYOUT_H_
 
 #include "Widget.h"
+#include "Layout.h"
 
 namespace NativeUI
 {
 	/**
-	 * A horizontal layout is a layout that stacks widgets in the horizontal axis.
+	 * \brief A horizontal layout is a layout that stacks widgets in the
+	 * horizontal axis.
 	 */
-	class HorizontalLayout : public Widget
+	class HorizontalLayout : public Layout
 	{
 	public:
 		/**

@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,11 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Post.h
- *
- *  Created on: Jul 2, 2011
- *      Author: gabi
+/**
+ * @file Post.h
+ * @author Gabriela Rata
  */
 
 #ifndef POST_H_
@@ -30,7 +29,8 @@ MA 02110-1301, USA.
 #include "Comment.h"
 
 /**
- * Implements an Post Facebook object type. It represents an individual entry in a profile's feed.
+ * \brief Implements a Post Facebook object type. It represents an individual
+ * entry in a profile's feed.
  * See: http://developers.facebook.com/docs/reference/api/post/
  */
 class Post: public FacebookObject
@@ -143,22 +143,22 @@ public:
 	const IdNamePair &getApplication() const;
 
 private:
-	IdNamePair mFrom;
-	IdNamePair mTo;
-	MAUtil::String mMessage;
-	MAUtil::String mPictureUrl;
-	MAUtil::String mLink;
-	MAUtil::String mName;
-	MAUtil::String mCaption;
-	MAUtil::String mDescription;
-	MAUtil::String mVideoUrl;
-	MAUtil::Vector<Action> mActions;
-	MAUtil::String mPrivacy;
-	MAUtil::String mType;
-	MAUtil::Vector<IdNamePair> mLikes;
+	IdNamePair				mFrom;
+	IdNamePair				mTo;
+	MAUtil::String			mMessage;
+	MAUtil::String			mPictureUrl;
+	MAUtil::String			mLink;
+	MAUtil::String			mName;
+	MAUtil::String			mCaption;
+	MAUtil::String			mDescription;
+	MAUtil::String			mVideoUrl;
+	MAUtil::Vector<Action>	mActions;
+	MAUtil::String			mPrivacy;
+	MAUtil::String			mType;
+	MAUtil::Vector<IdNamePair>	mLikes;
 	MAUtil::Vector<Comment> mComments;
-	MAUtil::String mUploadedFileId;
-	IdNamePair mApplication;
+	MAUtil::String			mUploadedFileId;
+	IdNamePair				mApplication;
 };
 
 #endif /* POST_H_ */

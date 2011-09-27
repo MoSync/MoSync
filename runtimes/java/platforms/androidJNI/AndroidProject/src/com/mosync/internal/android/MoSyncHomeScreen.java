@@ -144,7 +144,7 @@ public class MoSyncHomeScreen
 	 */
 	int maHomeScreenEventsOnOff(final int eventsOn)
 	{
-		Log.i("MoSync", "maHomeScreenEventsOnOff");
+		//Log.i("MoSync", "maHomeScreenEventsOnOff");
 		
 		homeScreenPanicIfPermissionsAreNotSet();
 		
@@ -154,8 +154,8 @@ public class MoSyncHomeScreen
 			// Thread should not be started.
 			if (null != mHomeScreenDetectionThread)
 			{
-				Log.i("MoSyncSyscalls", 
-					"maHomeScreenEventsOnOff - thread already running");
+				//Log.i("MoSyncSyscalls",
+				//	"maHomeScreenEventsOnOff - thread already running");
 				return -2;
 			}
 			
@@ -234,7 +234,7 @@ public class MoSyncHomeScreen
 		
 		public void run()
 		{
-			Log.i("MoSyncSyscalls", "HomeScreenDetectionThread is starting");
+			//Log.i("MoSyncSyscalls", "HomeScreenDetectionThread is starting");
 			
 			// Used for printing debug messages at a reduced interval.
 			int debugPrintAliveCounter = 0;
@@ -247,10 +247,10 @@ public class MoSyncHomeScreen
 					// Will print every 10 seconds.
 					if (debugPrintAliveCounter++ % 10 == 0)
 					{
-						Log.i("MoSyncSyscalls", 
-							"HomeScreenDetectionThread is alive."
-							+ " mHomeScreenTaskId: " + mHomeScreenTaskId 
-							+ " Timestamp: " + System.currentTimeMillis());
+						//Log.i("MoSyncSyscalls",
+						//	"HomeScreenDetectionThread is alive."
+						//	+ " mHomeScreenTaskId: " + mHomeScreenTaskId
+						//	+ " Timestamp: " + System.currentTimeMillis());
 					}
 					
 					boolean isOnHomeScreen = isHomeScreenVisible();
@@ -265,16 +265,16 @@ public class MoSyncHomeScreen
 						int[] event = new int[1];
 						if (mIsOnHomeScreen)
 						{
-							Log.i("MoSyncSyscalls", 
-								"HOMESCREEN IS SHOWN Timestamp: " 
-								+ System.currentTimeMillis());
+							//Log.i("MoSyncSyscalls",
+							//	"HOMESCREEN IS SHOWN Timestamp"
+							//	+ System.currentTimeMillis());
 							event[0] = EVENT_TYPE_HOMESCREEN_SHOWN;
 						}
 						else
 						{
-							Log.i("MoSyncSyscalls", 
-								"HOMESCREEN IS HIDDEN Timestamp: " 
-								+ System.currentTimeMillis());
+							//Log.i("MoSyncSyscalls",
+							//	"HOMESCREEN IS HIDDEN Timestamp: "
+							//	+ System.currentTimeMillis());
 							event[0] = EVENT_TYPE_HOMESCREEN_HIDDEN;
 						}
 						mMoSyncThread.postEvent(event);

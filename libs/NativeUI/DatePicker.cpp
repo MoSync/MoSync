@@ -88,7 +88,7 @@ namespace NativeUI
 	 * Get the currently displayed date.
 	 * @return A Date struct that specifies the displayed date.
 	 */
-	Date DatePicker::getDate() const
+	Date DatePicker::getDate()
 	{
 		Date displayedDate;
 		displayedDate.year = this->getPropertyInt(MAW_DATE_PICKER_YEAR);
@@ -115,7 +115,7 @@ namespace NativeUI
 	 * Get the currently displayed year.
 	 * @return An int that specifies the current year.
 	 */
-	int DatePicker::getYear() const
+	int DatePicker::getYear()
 	{
 		return this->getPropertyInt(MAW_DATE_PICKER_YEAR);
 	}
@@ -137,14 +137,14 @@ namespace NativeUI
 	 * Get the currently displayed month.
 	 * @return An int that specifies the current month.
 	 */
-	int DatePicker::getMonth() const
+	int DatePicker::getMonth()
 	{
 		return this->getPropertyInt(MAW_DATE_PICKER_MONTH);
 	}
 
 	/**
 	 * Set the current day of month.
-	 * @param day An int that specifies the current day of month.
+	 * @param dayOfMonth An int that specifies the current day of month.
 	 * @return Any of the following result codes:
 	 * - #MAW_RES_OK if the property could be set.
 	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
@@ -159,17 +159,20 @@ namespace NativeUI
 	 * Get the currently displayed day.
 	 * @return An int that specifies the current day of month.
 	 */
-	int DatePicker::getDayOfMonth() const
+	int DatePicker::getDayOfMonth()
 	{
 		return this->getPropertyInt(MAW_DATE_PICKER_DAY_OF_MONTH);
 	}
 
 	/**
 	 * Set the minimum date of the picker.
-	 * @param date A struct that specifies the minimum date.
+	 * Note: this property is not yet available for Android.
+	 * @param minDate A struct that specifies the minimum date.
 	 * @return Any of the following result codes:
 	 * - #MAW_RES_OK if the property could be set.
 	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	 * - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported
+	 * by the curent framework version.
 	 * - #MAW_RES_ERROR otherwise.
 	 */
 	int DatePicker::setMinDate( const struct Date minDate)
@@ -186,10 +189,11 @@ namespace NativeUI
 	 */
 	Date DatePicker::getMinDate()
 	{
-		if ( MAW_RES_FEATURE_NOT_AVAILABLE ==
-			this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE))
+		int resCode;
+		this->getPropertyInt(MAW_DATE_PICKER_MIN_DATE,resCode);
+		if ( MAW_RES_FEATURE_NOT_AVAILABLE == resCode )
 		{
-			Date defaultDate = Date(1,1,1990);
+			struct Date defaultDate = Date(1,1,1900);
 			return defaultDate;
 		}
 
@@ -204,10 +208,16 @@ namespace NativeUI
 
 	/**
 	 * Set the maximum date of the picker.
-	 * @param date A struct that specifies the maximum date.
+	 * Note: this property is not yet available for Android.
+	 * Note: The default maximal date on Android is 12/31/2100.
+	 * @param maxDate A struct that specifies the maximum date.
 	 * @return Any of the following result codes:
 	 * - #MAW_RES_OK if the property could be set.
+	 * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	 * - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+	 * - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported
+	 * by the curent framework version.
 	 * - #MAW_RES_ERROR otherwise.
 	 */
 	int DatePicker::setMaxDate( const struct Date maxDate)
@@ -223,10 +233,11 @@ namespace NativeUI
 	 */
 	struct Date DatePicker::getMaxDate()
 	{
-		if ( MAW_RES_FEATURE_NOT_AVAILABLE ==
-			this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE))
+		int resCode;
+		this->getPropertyInt(MAW_DATE_PICKER_MAX_DATE, resCode);
+		if ( MAW_RES_FEATURE_NOT_AVAILABLE == resCode )
 		{
-			Date defaultDate = Date(12,31,2100);
+			struct Date defaultDate = Date(12,31,2100);
 			return defaultDate;
 		}
 

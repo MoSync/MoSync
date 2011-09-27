@@ -32,7 +32,7 @@ namespace NativeUI
 	 * Constructor.
 	 */
 	VerticalLayout::VerticalLayout() :
-		Widget(MAW_VERTICAL_LAYOUT)
+		Layout(MAW_VERTICAL_LAYOUT)
 	{
 		// Set some common default values.
 		fillSpaceVertically();

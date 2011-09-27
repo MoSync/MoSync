@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * OpenMenuCommand.h
- *
- *  Created on: Aug 5, 2011
- *      Author: gabi
  */
 
 #ifndef OPENMENUCOMMAND_H_
@@ -34,6 +32,9 @@ MA 02110-1301, USA.
 namespace FacebookDemoApplication
 {
 
+/*
+ * class for opening a menu. Each menu item (button) will have a command on it.
+ */
 class OpenMenuCommand : public ICommand
 {
 

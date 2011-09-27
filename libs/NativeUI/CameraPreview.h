@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file CameraPreview.h
  * @author Emma Tresanszki
  *
- * An instance of CameraPreview allows users to visualize the camera controller.
+ * \brief An instance of CameraPreview allows users to visualize the camera controller.
  */
 
 #ifndef NATIVEUI_CAMERAPREVIEW_H_
@@ -30,7 +30,9 @@ MA 02110-1301, USA.
 
 namespace NativeUI
 {
-	/**
+	/** \brief An instance of CameraPreview allows users to visualize the
+	 * camera controller.
+	 *
 	 * A Camera Preview is a widget that is used to display  a live view
 	 * of the camera rendered by the viewfinder.
 	 * It has no specific properties (besides the base widget properties)
@@ -38,7 +40,8 @@ namespace NativeUI
 	 * So this widget is only used to enable the camera controller to be
 	 * mapped with UI in devices that support Native UI.
 	 * After creating the widget, remember to bind it to the camera controller
-	 * via a call to #maCameraSetPreview .
+	 * via a call to #maCameraSetPreview (passing the value from it's
+	 * getWidgetHandle() method), or by calling the bindToCurrentCamera() method.
 	 */
 	class CameraPreview : public Widget
 	{
@@ -47,6 +50,12 @@ namespace NativeUI
 		 * Constructor.
 		 */
 		CameraPreview();
+
+		/**
+         * Bind the preview to the currently selected camera.
+		 * @return 1 on success or 0 for failure
+         */
+        virtual int bindToCurrentCamera();
 
 		/**
 		 * Destructor.

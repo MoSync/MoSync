@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file DatePicker.h
  * @author Emma Tresanszki
  *
- * An instance of DatePicker allow to an users to select dates.
+ * \brief An instance of DatePicker allow to an users to select dates.
  * For date picker events see DatePickerListener.
  */
 
@@ -38,7 +38,7 @@ namespace NativeUI
     class DatePickerListener;
 
 /**
- * Struct to hold a date.
+ * \brief Struct to hold a date.
  */
 	struct Date{
 		int day; // Range: 1-31.
@@ -50,9 +50,9 @@ namespace NativeUI
 	};
 
 	/**
-	 * A Date Picker is a widget for selecting a date.
-	 * The date picker is initialized with system date.
+	 * \brief A Date Picker is a widget for selecting a date.
 	 *
+	 * The date picker is initialized with system date.
 	 * The date can be selected by a year, month, and day spinners.
 	 * The minimal and maximal date from which dates to be selected
 	 * can be customized.
@@ -88,7 +88,7 @@ namespace NativeUI
 		 * Get the currently displayed date.
 		 * @return A Date struct that specifies the displayed date.
 		 */
-		virtual Date getDate() const;
+		virtual Date getDate();
 
 		/**
 		 * Set the current year of the picker.
@@ -104,7 +104,7 @@ namespace NativeUI
 		 * Get the currently displayed year.
 		 * @return An int that specifies the current year.
 		 */
-		virtual int getYear() const;
+		virtual int getYear();
 
 		/**
 		 * Set the current month of the picker.
@@ -120,11 +120,11 @@ namespace NativeUI
 		 * Get the currently displayed month.
 		 * @return An int that specifies the current month.
 		 */
-		virtual int getMonth() const;
+		virtual int getMonth();
 
 		/**
 		 * Set the current day of month.
-		 * @param day An int that specifies the current day of month.
+		 * @param dayOfMonth An int that specifies the current day of month.
 		 * @return Any of the following result codes:
 		 * - #MAW_RES_OK if the property could be set.
 		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
@@ -136,15 +136,17 @@ namespace NativeUI
 		 * Get the currently displayed day.
 		 * @return An int that specifies the current day of month.
 		 */
-		virtual int getDayOfMonth() const;
+		virtual int getDayOfMonth();
 
 		/**
 		 * Set the minimum date of the picker.
 		 * Note: this property is not yet available for Android.
-		 * @param date A struct that specifies the minimum date.
+		 * @param minDate A struct that specifies the minimum date.
 		 * @return Any of the following result codes:
 		 * - #MAW_RES_OK if the property could be set.
 		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+		 * - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported
+		 * by the curent framework version.
 		 * - #MAW_RES_ERROR otherwise.
 		 */
 		virtual int setMinDate( const struct Date minDate);
@@ -160,12 +162,14 @@ namespace NativeUI
 		 * Set the maximum date of the picker.
 		 * Note: this property is not yet available for Android.
 		 * Note: The default maximal date on Android is 12/31/2100.
-		 * @param date A struct that specifies the maximum date.
+		 * @param maxDate A struct that specifies the maximum date.
 		 * @return Any of the following result codes:
 		 * - #MAW_RES_OK if the property could be set.
 		 * - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 		 * - #MAW_RES_INVALID_PROPERTY_NAME if the property name was invalid.
 		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+		 * - #MAW_RES_FEATURE_NOT_AVAILABLE if the widget type is not supported
+		 * by the curent framework version.
 		 * - #MAW_RES_ERROR otherwise.
 		 */
 		virtual int setMaxDate( const struct Date maxDate);

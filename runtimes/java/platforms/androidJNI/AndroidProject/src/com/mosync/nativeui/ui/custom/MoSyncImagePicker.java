@@ -19,15 +19,12 @@ package com.mosync.nativeui.ui.custom;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_IMAGE_PICKER;
 
-import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.List;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.TypedArray;
@@ -46,7 +43,6 @@ import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.BaseAdapter;
 import android.widget.Gallery;
 import android.widget.ImageView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ImageView.ScaleType;
 import android.widget.LinearLayout;
 import android.widget.Toast;
@@ -77,8 +73,12 @@ public class MoSyncImagePicker
 		mImageTable = imageTable;
 		mPaths = new ArrayList<String>();
 		mNames = new ArrayList<String>();
+		mBitmapCache = new ArrayList<Bitmap>();
 		// Set the decoder options for the bitmaps.
 		mDecodingOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
+		// Decode to a smaller image to save memory and run faster.
+		// Powers of 2 are often faster/easier for the decoder to honor.
+        mDecodingOptions.inSampleSize = 4;
 	}
 
 	/*
@@ -87,10 +87,15 @@ public class MoSyncImagePicker
 	 */
 	public void loadGallery()
 	{
+		mDecodingOptions.inSampleSize = 4;
+
 		// Initialize the selected image handle.
 		mImageHandle = -1;
-
+		// Initialize the current position inside the gallery.
 		mPosition = -1;
+
+		// Reset the bitmap cache.
+		mBitmapCache.clear();
 
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		builder.setCancelable(true);
@@ -102,6 +107,8 @@ public class MoSyncImagePicker
 			        @Override
 			        public void onClick(DialogInterface dialog, int which)
 			        {
+						// Clear the bitmap cache before closing the dialog.
+						mBitmapCache.clear();
 				        postImagePickerEvent(PICKER_CANCELED);
 			        }
 		        });
@@ -109,17 +116,29 @@ public class MoSyncImagePicker
 		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which)
 			{
+				// Display only the name of the selected image.
+				Toast.makeText(getActivity(), mNames.get(mPosition),
+						Toast.LENGTH_SHORT).show();
+
 				if ( !mPaths.isEmpty() )
 				{
 					// Save the handle of the selected item and post event.
-					mImageHandle = getSelectedImageHandle(mPaths.get(mPosition));
+					mImageHandle = getSelectedImageHandle(mBitmapCache.get(mPosition));
 				}
+				// Clear the bitmap cache before closing the dialog.
+				mBitmapCache.clear();
+
 				postImagePickerEvent(PICKER_READY);
 			}
 		});
 
 		if ( getImagesUsingCursor() )
 		{
+	        // Use the screen size at scaling the gallery and preview image.
+	        int screenExtent = mMoSyncThread.maGetScrSize();
+	        mScrWidth = screenExtent >> 16;
+	        mScrHeight = screenExtent & 0xffff;
+
 			// Provide a linear layout with a gallery and a preview of the
 			// selected item.
 			LinearLayout layout = new LinearLayout(getActivity());
@@ -130,7 +149,9 @@ public class MoSyncImagePicker
 			        LayoutParams.FILL_PARENT, LayoutParams.FILL_PARENT));
 
 			Gallery gallery = new Gallery(getActivity());
-			gallery.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, 100));
+			gallery.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT,
+					LayoutParams.FILL_PARENT));
+			// Do not call onItemSelected during fling to be faster.
 			gallery.setCallbackDuringFling(false);
 
 			// Fill the gallery view with images.
@@ -138,15 +159,25 @@ public class MoSyncImagePicker
 			layout.addView(gallery);
 
 			final ImageView preview = new ImageView(getActivity());
-			preview.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,
-					LayoutParams.WRAP_CONTENT));
+			// Set fixed size, otherwise the widget will resize itself each time an item is selected.
+			preview.setLayoutParams(new LayoutParams(LayoutParams.FILL_PARENT, mScrHeight/2) );
+			preview.setMinimumWidth(mScrWidth/2);
 
-            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(0), mDecodingOptions);
-            // Scale the bitmap, as scrolling would take to long otherwise.
-            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, 300, 250, true);
-            preview.setImageBitmap(bitmapScaled);
-			preview.setScaleType(ScaleType.FIT_CENTER);
-
+			Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(0), mDecodingOptions);
+			preview.setImageBitmap(bitmap);
+			if ( bitmap.getWidth() > preview.getLayoutParams().width
+					&&
+				bitmap.getHeight() > preview.getLayoutParams().height )
+            {
+				// Scale it to fit.
+				preview.setScaleType(ScaleType.FIT_CENTER);
+            }
+            else
+            {
+				// If image is smaller that the layout params of this imageview,
+				// scale center.
+				preview.setScaleType(ScaleType.CENTER_INSIDE);
+            }
 			layout.addView(preview);
 
 			gallery.setOnItemSelectedListener(new OnItemSelectedListener() {
@@ -155,13 +186,27 @@ public class MoSyncImagePicker
                 public void onItemSelected(AdapterView<?> arg0, View arg1,
                         int pos, long id)
                 {
-					Toast.makeText(getActivity(), mNames.get(pos) ,
-					        Toast.LENGTH_SHORT).show();
+					// Do not show the names, because they could be shown with delay,
+					// even after the dialog is closed.
+//					Toast.makeText(getActivity(), mNames.get(pos), Toast.LENGTH_SHORT).show();
+
+					if ( mBitmapCache.get(pos).getWidth() > preview.getLayoutParams().width
+							&&
+						mBitmapCache.get(pos).getHeight() > preview.getLayoutParams().height )
+		            {
+						// Scale it to fit.
+						preview.setScaleType(ScaleType.FIT_CENTER);
+		            }
+		            else
+		            {
+						// If image is smaller that the layout params of this imageview,
+						// scale center.
+						preview.setScaleType(ScaleType.CENTER_INSIDE);
+		            }
 
 					// Refresh the preview image.
-		            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(pos), mDecodingOptions);
-		            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, 300, 250, true);
-		            preview.setImageBitmap(bitmapScaled);
+					// Get the bitmap stored by the Adapter.
+		            preview.setImageBitmap(mBitmapCache.get(pos));
 
 		            // Save the position of the last selected images.
 		            mPosition = pos;
@@ -170,13 +215,10 @@ public class MoSyncImagePicker
 				@Override
                 public void onNothingSelected(AdapterView<?> arg0)
                 {
-
                 }
 
 			});
-
 			builder.setView(layout);
-
 		}
 		else
 		{
@@ -229,8 +271,12 @@ public class MoSyncImagePicker
 		            filePath = aCursor.getString(pathColumn);
 		            title = aCursor.getString(titleColumn);
 
-		            if ( filePath.endsWith(".jpg") || filePath.endsWith(".png") || filePath.endsWith(".jpeg") )
-		            {
+		            if ( filePath.toLowerCase().endsWith(".jpg")
+							||
+						filePath.toLowerCase().endsWith(".png")
+							||
+						filePath.toLowerCase().endsWith(".jpeg") )
+					{
 						mPaths.add(filePath);
 						mNames.add(title);
 		            }
@@ -305,20 +351,44 @@ public class MoSyncImagePicker
      * Further, post it in a EVENT_TYPE_IMAGE_PICKER event.
      * @return The new handle.
      */
-    private int getSelectedImageHandle(final String absPath)
+    private int getSelectedImageHandle(Bitmap scaledBitmap)
     {
         // Create handle.
         int dataHandle = mMoSyncThread.nativeCreatePlaceholder();
 
-        Bitmap tempBitmap = BitmapFactory.decodeFile(absPath, mDecodingOptions);
+		// The bitmap was decoded using sample size 4.
+        int originalSizeW = scaledBitmap.getWidth()*4;
+        int originalSizeH = scaledBitmap.getHeight()*4;
 
-			if(null == tempBitmap)
-			{
-				Log.i("MoSync","maImagePickerOpen Cannot create handle");
-//				maPanic(1, "maImagePickerOpen: Unable to create handle");
-			}
+        if ( originalSizeW > mScrWidth * 4
+				||
+			originalSizeH > mScrHeight *4)
+        {
+			mImageTable.put(dataHandle, new ImageCache(null, scaledBitmap));
+            return dataHandle;
+        }
+        else if ( originalSizeW > mScrWidth  *2
+					||
+				originalSizeH > mScrHeight * 2 )
+        {
+            // If the image is nearly twice as big as the screen, scale to factor 2.
+			mDecodingOptions.inSampleSize = 2;
+        }
+        else
+        {
+            // If the image is close the the screen, do not subsample it.
+			mDecodingOptions.inSampleSize = 1;
+        }
 
-			mImageTable.put(dataHandle, new ImageCache(null, tempBitmap));
+        Bitmap newBitmap = BitmapFactory.decodeFile(mPaths.get(mPosition), mDecodingOptions);
+		if (null == newBitmap)
+		{
+			Log.i("MoSync","maImagePickerOpen Cannot create handle");
+			return -1;
+//			maPanic(1, "maImagePickerOpen: Unable to create handle");
+		}
+
+		mImageTable.put(dataHandle, new ImageCache(null, newBitmap));
 
         return dataHandle;
     }
@@ -356,14 +426,31 @@ public class MoSyncImagePicker
         public View getView(int position, View convertView, ViewGroup parent)
         {
             ImageView imgView = new ImageView(mContext);
+            // Scale the gallery images to be smaller that the preview.
+            // Make them square.
+            imgView.setLayoutParams(new Gallery.LayoutParams(mScrWidth/3, mScrWidth/3));
 
-            Bitmap bitmap = BitmapFactory.decodeFile(mPaths.get(position), mDecodingOptions);
-            Bitmap bitmapScaled = Bitmap.createScaledBitmap(bitmap, 150, 100, true);
-            imgView.setImageBitmap(bitmapScaled);
-            imgView.setLayoutParams(new Gallery.LayoutParams(LayoutParams.FILL_PARENT,
-			        LayoutParams.FILL_PARENT));
+            // Check if the bitmap is already in cache.
+            if ( mBitmapCache.size() <= position )
+            {
+				mBitmapCache.add( BitmapFactory.decodeFile(mPaths.get(position), mDecodingOptions) );
+            }
+            // DO not scale the image if it smaller than the layout params.
+			if ( mBitmapCache.get(position).getWidth() > imgView.getLayoutParams().width
+					&&
+				mBitmapCache.get(position).getHeight() > imgView.getLayoutParams().height )
+            {
+				// Scale it to fit.
+				imgView.setScaleType(ScaleType.FIT_XY);
+            }
+            else
+            {
+				// If image is smaller that the layout params of this image view,
+				// scale the image uniformly.
+				imgView.setScaleType(ScaleType.CENTER_INSIDE);
+            }
 
-            imgView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+            imgView.setImageBitmap(mBitmapCache.get(position));
             imgView.setBackgroundResource(mGalleryItemBackg);
 
             return imgView;
@@ -393,6 +480,11 @@ public class MoSyncImagePicker
 	private List<String> mNames;
 
 	/**
+	 * Cache for bitmaps.
+	 */
+	private List<Bitmap> mBitmapCache;
+
+	/**
 	 * The handle of the selected image.
 	 */
 	private int mImageHandle = -1;
@@ -401,6 +493,9 @@ public class MoSyncImagePicker
 	 * The current image index.
 	 */
 	private int mPosition = -1;
+
+	private int mScrWidth = 0;
+	private int mScrHeight = 0;
 
 	/**
 	 * Decoding options used for bitmaps.

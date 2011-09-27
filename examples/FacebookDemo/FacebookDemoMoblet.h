@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * FacebookDemoMoblet.h
- *
- *  Created on: Aug 5, 2011
- *      Author: gabi
  */
 
 #ifndef FACEBOOKDEMOMOBLET_H_
@@ -34,66 +32,100 @@ MA 02110-1301, USA.
 #include "Facebook/FacebookManager.h"
 #include "GUI/ListScreen.h"
 #include "GUI/FacebookLoginScreen.h"
+#include "GUI/MainScreen.h"
 
 
 /**
- * Moblet to be used as a template for a Native UI application.
+ * Class that creates the main screen and handles key press events
  */
-class FacebookDemoMoblet : public MAUtil::Moblet
+class FacebookDemoMoblet : public MAUtil::Moblet, public NativeUI::WebViewListener
 {
 public:
 	/**
-	 * The constructor creates the user interface.
+	 * The constructor creates the user interface and the FacebookManager
 	 */
-	FacebookDemoMoblet(const MAUtil::String &appId, const MAUtil::String &appSecret);
+	FacebookDemoMoblet(const MAUtil::String &appId);
 
-	void keyPressEvent(int keyCode, int nativeCode);
-	void customEvent(const MAEvent &event);
+	virtual void webViewHookInvoked( NativeUI::WebView* webView, int hookType,
+			MAHandle urlData);
 
+	/**
+	 * WebViewListener overrides
+	 */
+	virtual void webViewContentLoading(
+			NativeUI::WebView* webView,
+			const int webViewState) {}
+
+	/**
+	 * destructor.
+	 */
 	~FacebookDemoMoblet();
+
+	/**
+	 * This method is called when the application is closed.
+	 */
+	void closeEvent() GCCATTRIB(noreturn);
 private:
-	void initializeFacebook(const MAUtil::String &appId, const MAUtil::String &appSecret);
+	void login();
+
+	/**
+	 * creates the FacebookManager object, that handles the requests to Facebook, retrieving data and publishing
+	 */
+	void initializeFacebook(const MAUtil::String &appId);
+
+	/**
+	 * creates the GUI
+	 */
 	void createGUI();
 
-private:
-	//publish
-	void uploadProfilePhoto(FacebookDemoGUI::ListScreen *menu);
-	void addLinkOnWall(FacebookDemoGUI::ListScreen *menu);
-	void addPostOnWall(FacebookDemoGUI::ListScreen *menu);
-	void addStatusMessageOnWall(FacebookDemoGUI::ListScreen *menu);
-	//connections
-	void addActivitiesButton(FacebookDemoGUI::ListScreen *menu);
-	void addAlbumsButton(FacebookDemoGUI::ListScreen *menu);
-	void addBooksButton(FacebookDemoGUI::ListScreen *menu);
-	void addCheckinsButton(FacebookDemoGUI::ListScreen *menu);
-	void addFeedButton(FacebookDemoGUI::ListScreen *menu);
-	void addHomeButton(FacebookDemoGUI::ListScreen *menu);
-	void addInterestsButton(FacebookDemoGUI::ListScreen *menu);
-	void addLikesButton(FacebookDemoGUI::ListScreen *menu);
-	void addLinksButton(FacebookDemoGUI::ListScreen *menu);
-	void addMusicButton(FacebookDemoGUI::ListScreen *menu);
-	void addPhotosButton(FacebookDemoGUI::ListScreen *menu);
-	void addPictureButton(FacebookDemoGUI::ListScreen *menu);
-	void addPostsButton(FacebookDemoGUI::ListScreen *menu);
-	void addTelevisionButton(FacebookDemoGUI::ListScreen *menu);
-	void addEventsButton(FacebookDemoGUI::ListScreen *menu);
-	void addFriendsButton(FacebookDemoGUI::ListScreen *menu);
-	void addFriendListsButton(FacebookDemoGUI::ListScreen *menu);
-	void addNotesButton(FacebookDemoGUI::ListScreen *menu);
-	void addStatusMessagesButton(FacebookDemoGUI::ListScreen *menu);
 
+	MAUtil::String extractAccessToken(const char *newurl);
 
 private:
-	FacebookManager 						*mFacebookManager;
-	FacebookDemoGUI::ListScreen				*mMainMenu;
+	/**
+	 * creation of buttons for the main menu
+	 */
+
+
+	/**
+	 * Creates a button and adds it to the main menu
+	 * Adds on the button a command that sends the publish request to Facebook
+	 */
+	void addLinkOnWall(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addPostOnWall(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addStatusMessageOnWall(FacebookDemoGUI::FacebookDemoScreen *menu);
+
+	/**
+	 * Creates a button and adds it to the main menu
+	 * Adds on the button a command that sends the connection request to Facebook
+	 */
+	void addActivitiesButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addAlbumsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addBooksButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addCheckinsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addFeedButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addHomeButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addInterestsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addLikesButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addLinksButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addMusicButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addPhotosButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addPictureButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addPostsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addTelevisionButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addEventsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addFriendsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addFriendListsButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addNotesButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+	void addStatusMessagesButton(FacebookDemoGUI::FacebookDemoScreen *menu);
+
+private:
+	/**
+	 * FacebookManager object: handles the requests to Facebook, retrieving data and publishing
+	 */
+	FacebookManager							*mFacebookManager;
+	FacebookDemoGUI::MainScreen				*mMainScreen;
 	FacebookDemoGUI::FacebookLoginScreen 	*mLoginScreen;
-
-
-	int 							*mPixels;
-	int 							mPictureWidth;
-	int 							mPictureHeight;
-
-	MAUtil::String 					mPicture;
 };
 
 #endif /* FACEBOOKDEMOMOBLET_H_ */

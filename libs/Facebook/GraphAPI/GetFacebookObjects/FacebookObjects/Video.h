@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,12 +16,11 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Video.h
- *
- *  Created on: Jul 1, 2011
- *      Author: gabi
+/**
+ * @file Video.h
+ * @author Gabriela Rata
  */
+
 
 #ifndef VIDEO_H_
 #define VIDEO_H_
@@ -31,9 +31,10 @@ MA 02110-1301, USA.
 #include "Comment.h"
 
 /**
- * Implements an Video Facebook object type.
+ * \brief Implements an Video Facebook object type.
  * See: http://developers.facebook.com/docs/reference/api/video/
  */
+
 class Video: public FacebookObject
 {
 public:
@@ -88,13 +89,13 @@ public:
 	const MAUtil::Vector<Comment> &getComments() const;
 
 private:
-	IdNamePair mFrom;
-	MAUtil::Vector<IdNamePair> mTags;
-	MAUtil::String mName;
-	MAUtil::String mDescription;
-	MAUtil::String mPictureUrl;
-	MAUtil::String mSource;
-	MAUtil::Vector<Comment> mComments;
+	IdNamePair					mFrom;
+	MAUtil::Vector<IdNamePair>	mTags;
+	MAUtil::String				mName;
+	MAUtil::String				mDescription;
+	MAUtil::String				mPictureUrl;
+	MAUtil::String				mSource;
+	MAUtil::Vector<Comment>		mComments;
 };
 
 #endif /* VIDEO_H_ */

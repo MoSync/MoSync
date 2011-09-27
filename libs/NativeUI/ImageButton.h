@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file ImageButton.h
  * @author Bogdan Iusco
  *
- * Class for image buttons.
+ * \brief Class for image buttons.
  * A image button intercepts touch events and notifies the observers.
  * Methods for setting the text, alignment, font size and color are inherited
  * from TextWidget.
@@ -38,7 +38,8 @@ namespace NativeUI
     class ButtonListener;
 
     /**
-     * Class for image buttons.
+     * \brief Class for image buttons.
+     *
      * A image button intercepts touch events and notifies the observers.
      * Methods for setting the text, alignment, font size and color are inherited
      * from TextWidget.
@@ -70,7 +71,7 @@ namespace NativeUI
          * image buttons do not have text attached.
          * @return The text displayed by the widget.
          */
-        virtual MAUtil::String getText() const;
+        virtual MAUtil::String getText();
 
         /**
          * Set the foreground image of the button. This won't be scaled at all.

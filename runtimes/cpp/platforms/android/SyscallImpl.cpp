@@ -38,8 +38,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
-#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
-//#define SYSLOG(...)
+//#define SYSLOG(a) __android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", a);
+#define SYSLOG(...)
 
 namespace Base
 {
@@ -135,7 +135,7 @@ namespace Base
 
 		char* b = (char*)malloc(200);
 		sprintf(b, "loadBinary index:%d size:%d", resourceIndex, size);
-		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
+		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
 		free(b);
 
 		char* buffer = (char*)malloc(size);
@@ -164,7 +164,7 @@ namespace Base
 	{
 		char* b = (char*)malloc(200);
 		sprintf(b, "loadBinaryStore index:%d size:%d", resourceIndex, size);
-		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
+		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
 		free(b);
 		return maCreateData(resourceIndex, size);
 	}
@@ -946,7 +946,7 @@ namespace Base
 	{
 		SYSLOG("maLoadProgram");
 
-		__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "@@@@ MA LOAD PROGRAM");
+		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "@@@@ MA LOAD PROGRAM");
 
 		mReloadHandle = data;
 
@@ -1224,53 +1224,77 @@ namespace Base
 // the wrapper generator can't yet handle a few set of functions
 // in the opengles 2.0 api (so we manually override them).
 // remove implementations for broken bindings..
-	#undef maIOCtl_glGetPointerv_case
-	#define maIOCtl_glGetPointerv_case(func) \
-	case maIOCtl_glGetPointerv: \
-	{ \
-	return IOCTL_UNAVAILABLE; \
-	}
+// override implementations for broken bindings..
+#undef maIOCtl_glGetPointerv_case
+#define maIOCtl_glGetPointerv_case(func) \
+case maIOCtl_glGetPointerv: \
+{\
+GLenum _pname = (GLuint)a; \
+void* _pointer = GVMR(b, MAAddress);\
+wrap_glGetPointerv(_pname, _pointer); \
+return 0; \
+}
     
-	#undef maIOCtl_glGetVertexAttribPointerv_case
-	#define maIOCtl_glGetVertexAttribPointerv_case(func) \
-	case maIOCtl_glGetVertexAttribPointerv: \
-	{ \
-	return IOCTL_UNAVAILABLE; \
-	}
+#undef maIOCtl_glGetVertexAttribPointerv_case
+#define maIOCtl_glGetVertexAttribPointerv_case(func) \
+case maIOCtl_glGetVertexAttribPointerv: \
+{\
+GLuint _index = (GLuint)a; \
+GLenum _pname = (GLuint)b; \
+void* _pointer = GVMR(c, MAAddress);\
+wrap_glGetVertexAttribPointerv(_index, _pname, _pointer); \
+return 0; \
+}
     
-	#undef maIOCtl_glShaderSource_case
-	#define maIOCtl_glShaderSource_case(func) \
-	case maIOCtl_glShaderSource: \
-	{ \
-	GLuint _shader = (GLuint)a; \
-	GLsizei _count = (GLsizei)b; \
-	void* _string = GVMR(c, MAAddress); \
-	const GLint* _length = GVMR(SYSCALL_THIS->GetValidatedStackValue(0 VSV_ARGPTR_USE), GLint); \
-	wrap_glShaderSource(_shader, _count, _string, _length); \
-	return 0; \
-	}
+    
+#undef maIOCtl_glShaderSource_case
+#define maIOCtl_glShaderSource_case(func) \
+case maIOCtl_glShaderSource: \
+{ \
+GLuint _shader = (GLuint)a; \
+GLsizei _count = (GLsizei)b; \
+void* _string = GVMR(c, MAAddress); \
+const GLint* _length = GVMR(SYSCALL_THIS->GetValidatedStackValue(0 VSV_ARGPTR_USE), GLint); \
+wrap_glShaderSource(_shader, _count, _string, _length); \
+return 0; \
+}
 
     void wrap_glShaderSource(GLuint shader, GLsizei count, void* strings, const GLint* length) {
-        
         int* stringsArray = (int*)strings;
         const GLchar** strCopies = new const GLchar*[count];
         
         for(int i = 0; i < count; i++) {
             void* src = GVMR(stringsArray[i], MAAddress);
             strCopies[i] = (GLchar*)src;
-    		__android_log_write(ANDROID_LOG_INFO, 
-								"@@@ MoSync gl strings", 
-								strCopies[i]);
         }
-        
-        
-        char temp[1024];
-        sprintf(temp, "shader: %d, count: %d, length: %d, strCopies: %s", shader, count, length, strCopies[0]);
-    		__android_log_write(ANDROID_LOG_INFO, 
-								"@@@ MoSync glShaderSource", temp);        
+
         glShaderSource(shader, count, strCopies, length);
         delete strCopies;     
     }	
+
+    void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
+        GLvoid* outPointer;
+        glGetVertexAttribPointerv(index, pname, &outPointer);
+        
+        if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
+            return;
+        
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
+    }
+    
+    void wrap_glGetPointerv(GLenum pname, void* pointer) {
+        GLvoid* outPointer;
+        glGetPointerv(pname, &outPointer);
+        
+        if(pname != GL_COLOR_ARRAY_POINTER &&
+           pname != GL_NORMAL_ARRAY_POINTER &&
+           pname != GL_POINT_SIZE_ARRAY_POINTER_OES &&
+           pname != GL_TEXTURE_COORD_ARRAY_POINTER &&
+           pname != GL_VERTEX_ARRAY_POINTER)
+            return;
+        
+        *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);        
+    }   
 
 	/**
 	 * Utility function for displaying and catching pending
@@ -1282,10 +1306,10 @@ namespace Base
 		exc = env->ExceptionOccurred();
 		if (exc)
 		{
-			__android_log_write(
-								ANDROID_LOG_INFO,
-								"@@@ MoSync",
-								"Found pending exception");
+			//__android_log_write(
+			//					ANDROID_LOG_INFO,
+			//					"@@@ MoSync",
+			//					"Found pending exception");
 			env->ExceptionDescribe();
 			env->ExceptionClear();
 		}
@@ -1322,7 +1346,11 @@ namespace Base
 
 		case maIOCtl_maWriteLog:
 			SYSLOG("maIOCtl_maWriteLog");
-			return _maWriteLog((const char*)gSyscall->GetValidatedMemRange(a, b), b, mJNIEnv, mJThis);
+			#ifdef LOGGING_ENABLED
+				return _maWriteLog((const char*)gSyscall->GetValidatedMemRange(a, b), b, mJNIEnv, mJThis);
+			#else
+				return -1;
+			#endif
 
 		case maIOCtl_maSendTextSMS:
 			SYSLOG("maIOCtl_maSendTextSMS");
@@ -1353,14 +1381,14 @@ namespace Base
 
 		// int maBtStartDeviceDiscovery(int names)
 		case maIOCtl_maBtStartDeviceDiscovery:
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartDeviceDiscovery");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartDeviceDiscovery");
 			SYSLOG("maIOCtl_maBtStartDeviceDiscovery");
 			return _maBtStartDeviceDiscovery(a, mJNIEnv, mJThis);
 
 		// int maBtGetNewDevice(MABtDevice* d)
 		case maIOCtl_maBtGetNewDevice:
 		{
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewDevice");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewDevice");
 			SYSLOG("maIOCtl_maBtGetNewDevice");
 
 			// a is pointer to struct MABtDevice
@@ -1395,7 +1423,7 @@ namespace Base
 		// int maBtStartServiceDiscovery(const MABtAddr* address, const MAUUID* uuid)
 		case maIOCtl_maBtStartServiceDiscovery:
 			SYSLOG("maIOCtl_maBtStartServiceDiscovery NOT IMPLEMENTED");
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartServiceDiscovery NOT IMPLEMENTED");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtStartServiceDiscovery NOT IMPLEMENTED");
 			return -1;
 		/*
 		{
@@ -1419,7 +1447,7 @@ namespace Base
 		// int maBtGetNextServiceSize(MABtServiceSize* dst)
 		case maIOCtl_maBtGetNextServiceSize:
 			SYSLOG("maIOCtl_maBtGetNextServiceSize NOT IMPLEMENTED");
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNextServiceSize NOT IMPLEMENTED");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNextServiceSize NOT IMPLEMENTED");
 			return -1;
 		/*
 		{
@@ -1443,7 +1471,7 @@ namespace Base
 		// int maBtGetNewService(MABtService* dst)
 		case maIOCtl_maBtGetNewService:
 			SYSLOG("maIOCtl_maBtGetNewService NOT IMPLEMENTED");
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewService NOT IMPLEMENTED");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtGetNewService NOT IMPLEMENTED");
 			return -1;
 		/*
 		{
@@ -1481,7 +1509,7 @@ namespace Base
 
 		case maIOCtl_maBtCancelDiscovery:
 			SYSLOG("maIOCtl_maBtCancelDiscovery");
-			__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtCancelDiscovery");
+			//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", "maIOCtl_maBtCancelDiscovery");
 			return _maBtCancelDiscovery(mJNIEnv, mJThis);
 
 		// Server syscalls
@@ -1628,6 +1656,8 @@ namespace Base
 			SYSLOG("maIOCtl_maWidgetGetProperty");
 			int _widget = a;
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
+			//Read the fourth parameter from the register
+			//(the first three can be read directly)
 			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
@@ -1994,7 +2024,7 @@ namespace Base
 		case maIOCtl_maCameraGetProperty:
 		{
 			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
-			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBufferSize = c;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				b, 
 				_valueBufferSize * sizeof(char));
@@ -2207,18 +2237,17 @@ bool reloadProgram()
 
 void MoSyncExit(int errorCode)
 {
-	__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!",
-											"Program has exited!");
+	//__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Program has exited!");
 
 	if(false == reloadProgram())
 	{
-		__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "nahh.. just die now");
+		//__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "nahh.. just die now");
 
 		exit(errorCode);
 	}
 	else
 	{
-		__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Should reload program");
+		//__android_log_write(ANDROID_LOG_INFO, "MoSyncExit!", "Should reload program");
 
 		Base::gEventFifo.clear();
 
@@ -2232,7 +2261,7 @@ void MoSyncErrorExit(int errorCode)
 	{
 		char* b = (char*)malloc(200);
 		sprintf(b, "MoSync error: %i", errorCode);
-		__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", b);
+		//__android_log_write(ANDROID_LOG_INFO, "MoSyncErrorExit!", b);
 		jstring jstr = Base::mJNIEnv->NewStringUTF(b);
 		free(b);
 

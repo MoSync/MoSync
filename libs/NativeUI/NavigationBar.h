@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file NavigationBar.h
  * @author Emma Tresanszki
  *
- * Class for navigation bar.
+ * \brief Class for navigation bar.
  */
 
 #ifndef NATIVEUI_NAVIGATION_BAR_H_
@@ -35,9 +35,10 @@ namespace NativeUI
     class NavigationBarListener;
 
     /**
-     * A navigation bar is an iPhone specific widget that shows a nav bar
+     * \brief A navigation bar is an iPhone specific widget that shows a nav bar
      * with an optional title and back button.
-     * There is a replica available for Android.
+     *
+     * Available only on iOS for the moment.
      */
     class NavigationBar : public Widget
     {
@@ -59,13 +60,13 @@ namespace NativeUI
          * - #MAW_RES_OK if the property could be set.
          * - #MAW_RES_ERROR otherwise.
          */
-        virtual int setTitle(const MAUtil::String title);
+        virtual int setTitle(const MAUtil::String& title);
 
         /*
          * Get the title.
          * @return The displayed title.
          */
-        virtual MAUtil::String getTitle() const;
+        virtual MAUtil::String getTitle();
 
         /**
          * Set the text on the back button.
@@ -74,13 +75,13 @@ namespace NativeUI
          * - #MAW_RES_OK if the property could be set.
          * - #MAW_RES_ERROR otherwise.
          */
-        virtual int setBackBtnText(const MAUtil::String text);
+        virtual int setBackButtonTitle(const MAUtil::String& text);
 
         /*
          * Get the text on the back button.
          * @return The text displayed ont he back button.
          */
-        virtual MAUtil::String getBackBtnText() const;
+        virtual MAUtil::String getBackButtonTitle();
 
         /**
          * Add an navigation bar event listener.

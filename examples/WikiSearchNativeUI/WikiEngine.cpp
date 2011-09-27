@@ -245,33 +245,46 @@ void MediaWiki::search(MAUtil::String searchTerm, int resultsLimit)
  */
 void MediaWiki::httpFinished(MAUtil::HttpConnection *conn, int result)
  {
-	MAUtil::String contentLengthStr;
-	int responseBytes = mHttp.getResponseHeader("Content-Length",
-			&contentLengthStr);
+	if ( result >= 0)
+	{
+		MAUtil::String contentLengthStr;
+		int responseBytes = mHttp.getResponseHeader("Content-Length",
+				&contentLengthStr);
 
-	int contentLength = 0;
-	contentLength = atoi(contentLengthStr.c_str());
+		int contentLength = 0;
+		contentLength = atoi(contentLengthStr.c_str());
 
-	if (contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0) {
-		// Receive in chunks.
-		// Calculate how many chunks we receive, so that we can increment
-		// a progress bar for this action.
-		div_t divide = div(contentLength, CONNECTION_BUFFER_SIZE);
-		int steps = divide.quot;
-		if (divide.rem != 0) {
-			steps++;
-			// Notify the UI of the number of increments the progress bar
-			// will need for this action.
-			mHomeScreen->engineNrSteps(steps);
+		if (contentLength >= CONNECTION_BUFFER_SIZE || contentLength == 0) {
+			// Receive in chunks.
+			// Calculate how many chunks we receive, so that we can increment
+			// a progress bar for this action.
+			div_t divide = div(contentLength, CONNECTION_BUFFER_SIZE);
+			int steps = divide.quot;
+			if (divide.rem != 0) {
+				steps++;
+				// Notify the UI of the number of increments the progress bar
+				// will need for this action.
+				mHomeScreen->engineNrSteps(steps);
+			}
+
+			mHttp.recv(mBuffer, CONNECTION_BUFFER_SIZE);
 		}
+		else
+		{
+			// In this case the progress bar for this action will jump
+			// immediately to the max value.
+			mHomeScreen->engineNrSteps(1);
+			mBuffer[contentLength] = 0;
+			mHttp.read(mBuffer, contentLength);
+		}
+	}
+	else
+	{
+		// Notify UI on the error.
+		mHomeScreen->engineError( ERROR_NO_CONNECTION );
 
-		mHttp.recv(mBuffer, CONNECTION_BUFFER_SIZE);
-	} else {
-		// In this case the progress bar for this action will jump
-		// immediately to the max value.
-		mHomeScreen->engineNrSteps(1);
-		mBuffer[contentLength] = 0;
-		mHttp.read(mBuffer, contentLength);
+		mHttp.close();
+		mIsConnected = false;
 	}
 }
 
@@ -379,6 +392,23 @@ MAUtil::Vector<MAUtil::String> MediaWiki::getAllSnippetsWithTitle()
 				"\n" +
 				mWiki->snippetResults[i] ;
 			list.add(line);
+		}
+	}
+	return list;
+}
+
+/**
+ * Provides the titles.
+ * Only for the checked ones.
+ */
+MAUtil::Vector<MAUtil::String> MediaWiki::getAllCheckedTitles()
+{
+	MAUtil::Vector<MAUtil::String> list;
+	for (int i=0; i < mWiki->titleResults.size(); i++)
+	{
+		if ( !isItemHidden(i) )
+		{
+			list.add(mWiki->titleResults[i]);
 		}
 	}
 	return list;

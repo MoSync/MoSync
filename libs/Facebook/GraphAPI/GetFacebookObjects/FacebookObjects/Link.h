@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,11 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * Link.h
- *
- *  Created on: Jul 2, 2011
- *      Author: gabi
+/**
+ * @file Link.h
+ * @author Gabriela Rata
  */
 
 #ifndef LINK_H_
@@ -30,7 +29,8 @@ MA 02110-1301, USA.
 #include <MAUtil/Vector.h>
 
 /**
- * Implements an Link Facebook object. Represents a link shared on a user's wall.
+ * \brief Implements an Link Facebook object. Represents a link shared on a
+ * user's wall.
  * See: http://developers.facebook.com/docs/reference/api/group/
  */
 class Link: public FacebookObject
@@ -38,7 +38,8 @@ class Link: public FacebookObject
 public:
 	/**
 	 * Setter/getter for the "from" field of an Link object.
-	 * @param from - it represents the user that created the link. It contains an id and name.
+	 * @param from - it represents the user that created the link. It contains
+	 * an id and name.
 	 */
 	void setFrom(const IdNamePair &from);
 	const IdNamePair &getFrom() const;
@@ -86,13 +87,13 @@ public:
 	const MAUtil::String &getMessage() const;
 
 private:
-	IdNamePair mFrom;
-	MAUtil::String mLink;
-	MAUtil::String mName;
-	MAUtil::Vector<Comment> mComments;
-	MAUtil::String mDescription;
-	MAUtil::String mPicture;
-	MAUtil::String mMessage;
+	IdNamePair					mFrom;
+	MAUtil::String				mLink;
+	MAUtil::String				mName;
+	MAUtil::Vector<Comment>		mComments;
+	MAUtil::String				mDescription;
+	MAUtil::String				mPicture;
+	MAUtil::String				mMessage;
 };
 
 #endif /* LINK_H_ */

@@ -20,8 +20,8 @@ MA 02110-1301, USA.
  * @file ProgressBar.h
  * @author Bogdan Iusco
  *
- * An instance of ProgressBar is used for displaying the progress of a task
- * over time.
+ * \brief An instance of ProgressBar is used for displaying the progress of a
+ * task over time.
  */
 
 #ifndef NATIVEUI_PROGRESS_BAR_H_
@@ -32,8 +32,8 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
     /**
-     * An instance of ProgressBar is used for displaying the progress of a task
-     * over time.
+     * \brief An instance of ProgressBar is used for displaying the progress of
+     * a task over time.
      */
     class ProgressBar : public Widget
     {
@@ -63,11 +63,11 @@ namespace NativeUI
          * Get the upper range of the progress bar.
          * @return The upper range of the progress bar.
          */
-        virtual int getMaximumValue() const;
+        virtual int getMaximumValue();
 
         /**
          * Set the current progress value to the progress bar.
-         * @param An integer that specifies the new progress,
+         * @param progressValue An integer that specifies the new progress,
          * between 0 and maximum value.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the property could be set.
@@ -80,7 +80,7 @@ namespace NativeUI
          * Get the current progress value to the progress bar.
          * @return The current progress value.
          */
-        virtual int getProgress() const;
+        virtual int getProgress();
 
         /**
          * Increase the progress bar's progress value with the specified amount.

@@ -22,17 +22,20 @@ MA 02110-1301, USA.
  *
  * This is the main entry point for the example application
  * that demonstrates NativeUI on MoSync.
+ * The application uses the NativeUI library for handling widgets.
  */
 
 #include <ma.h> 				// Syscalls
 #include <MAUtil/String.h>		// C++ String class
 #include <MAUtil/Moblet.h>		// Moblet class
 #include <conprint.h>			// lprintfln for logging
-#include "UIWrapper/Widgets.h"	// Include all widgets
+
+#include <NativeUI/Widgets.h>// Include all widgets
+
 #include "ScreenMain.h"			// Main UI screen
 
 using namespace MAUtil;
-using namespace MoSync::UI;
+using namespace NativeUI;
 
 /**
  * Moblet for the  application.

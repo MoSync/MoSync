@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,11 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*'
- * Photo.h
- *
- *  Created on: Jul 1, 2011
- *      Author: gabi
+/**
+ * @file Photo.h
+ * @author Gabriela Rata
  */
 
 #ifndef PHOTO_H_
@@ -28,13 +27,22 @@ MA 02110-1301, USA.
 #include "FacebookObject.h"
 #include "Utilities.h"
 
+/**
+ * \brief Implements an Photo Facebook object type.
+ * See: http://developers.facebook.com/docs/reference/api/photo/
+ */
 class Photo: public FacebookObject
 {
 public:
+	/**
+	 * Constructor.
+	 */
 	Photo();
+
 	/**
 	 * Setter/getter for the "from" field of an Photo object.
-	 * @param from - it represents the person/application that posted the photo. It contains an id and name.
+	 * @param from - it represents the person/application that posted the photo.
+	 * It contains an id and name.
 	 */
 	void setFrom(const IdNamePair &from);
 	const IdNamePair &getFrom() const;
@@ -89,14 +97,14 @@ public:
 	int getPositionInAlbum() const;
 
 private:
-	IdNamePair mFrom;
-	MAUtil::String mName;
-	MAUtil::String mSmallSizedPictureUrl;
-	MAUtil::String mFullSizedPictureUrl;
-	int mWidth;
-	int mHeight;
-	MAUtil::String mLink;
-	int mPositionInAlbum;
+	IdNamePair		mFrom;
+	MAUtil::String	mName;
+	MAUtil::String	mSmallSizedPictureUrl;
+	MAUtil::String	mFullSizedPictureUrl;
+	int				mWidth;
+	int				mHeight;
+	MAUtil::String 	mLink;
+	int				mPositionInAlbum;
 };
 
 #endif

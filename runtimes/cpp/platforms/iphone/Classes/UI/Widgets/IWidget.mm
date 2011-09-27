@@ -23,6 +23,10 @@
 #include <helpers/cpp_defs.h>
 #include "Platform.h"
 
+#if 0
+#import <QuartzCore/QuartzCore.h>
+#endif
+
 @interface UIView (UIViewExpanded) 
 - (void)superLayoutSubviews;
 - (CGSize)superSizeThatFits:(CGSize)size;
@@ -96,8 +100,8 @@
 
 	parent = nil;
 	children = [[NSMutableArray alloc] init];
-	[self setAutoSizeParamX:FIXED_SIZE andY:FIXED_SIZE];	
-
+	[self setAutoSizeParamX:FIXED_SIZE andY:FIXED_SIZE];
+	
 	if(view) {
 		[view setUserInteractionEnabled:YES];
 		view.contentMode = UIViewContentModeRedraw;
@@ -141,9 +145,8 @@
 	if(addSubview) {
 		[view addSubview:childView];
 	}
-//	[self layout];
-	[view setNeedsLayout];
-	[view setNeedsDisplay];
+	//[self layout];
+	[child layout];
 }
 
 - (void)addChild: (IWidget*)child {
@@ -161,8 +164,9 @@
 	if(addSubview) {
 		[view insertSubview:childView atIndex:indexValue];
 	}
-	[view setNeedsLayout];
-	
+	//[self layout];
+    [child layout];
+    
 	return MAW_RES_OK;
 }
 
@@ -179,7 +183,7 @@
 	[child setParent:nil];
 	if(removeFromSuperview)
 		[[child getView] removeFromSuperview];
-	[view setNeedsLayout];
+    [self layout];
 }
 
 - (int)remove {
@@ -189,15 +193,15 @@
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
-	if([key isEqualToString:@"left"]) {
+	if([key isEqualToString:@MAW_WIDGET_LEFT]) {
 		[view setFrame:CGRectMake([value floatValue]/getScreenScale(), view.frame.origin.y, view.frame.size.width, view.frame.size.height)];
 		[self layout];		
-	} else 
-	if([key isEqualToString:@"top"]) {
+	} else
+	if([key isEqualToString:@MAW_WIDGET_TOP]) {
 		[view setFrame:CGRectMake(view.frame.origin.x, [value floatValue]/getScreenScale(), view.frame.size.width, view.frame.size.height)];
 		[self layout];
 	} else 
-	if([key isEqualToString:@"width"]) {
+	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {
 		float width = [value floatValue];
 		
 		if(width == -2 || width == -1) {
@@ -212,7 +216,7 @@
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, width/getScreenScale(), view.frame.size.height)];
 		[self layout];
 	} else
-	if([key isEqualToString:@"height"]) {
+	if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
 		float height = [value floatValue];
 				
 		if(height == -2 || height == -1) {
@@ -227,12 +231,34 @@
 		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, view.frame.size.width, height/getScreenScale())];
 		[self layout];		
 	} else 
-	if([key isEqualToString:@"backgroundColor"]) {
+	if([key isEqualToString:@MAW_WIDGET_BACKGROUND_COLOR]) {
 		UIColor* color = [UIColor colorWithHexString:value];
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		view.backgroundColor = color;
-	} else
-	if([key isEqualToString:@"alpha"]) {
+	}
+    /*else
+    if([key isEqualToString:@"backgroundGradient"]) {
+        NSArray *colors = [value componentsSeparatedByString: @","];
+        UIColor *col1 = [UIColor colorWithHexString: [[colors objectAtIndex:0] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];
+        UIColor *col2 = [UIColor colorWithHexString:[[colors objectAtIndex:1] stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceAndNewlineCharacterSet]]];   
+        
+        if(!col1) return MAW_RES_INVALID_PROPERTY_VALUE;
+        if(!col2) return MAW_RES_INVALID_PROPERTY_VALUE;
+
+        CAGradientLayer *gradient = [CAGradientLayer layer];
+        gradient.frame = CGRectMake(0, 0, 320, 480); //view.bounds;
+        gradient.colors = [NSArray arrayWithObjects:(id)col1.CGColor, (id)col2.CGColor, nil];
+        gradient.startPoint = CGPointMake(0.5f, 0.0f);
+        gradient.endPoint = CGPointMake(0.5f, 1.0f);
+        gradient.masksToBounds = YES;
+        [view.layer insertSublayer:gradient atIndex:0];
+       
+       // todo: Fix this. Make a setFrame function in IWidget that sets the frame of both the gradient layer (if available) and the
+       // view and call that wherever the frame of an IWidget is set (instead of view.frame = x).
+    }
+    */
+    else
+	if([key isEqualToString:@MAW_WIDGET_ALPHA]) {
 		float alpha = [value floatValue];
 		if(alpha<0.0 || alpha>1.0) return MAW_RES_INVALID_PROPERTY_VALUE;
 		view.alpha = [value floatValue];
@@ -240,10 +266,10 @@
 	if([key isEqualToString:@"opaque"]){
 		view.opaque = [value boolValue];
 	} else
-	if([key isEqualToString:@"visible"]){
+	if([key isEqualToString:@MAW_WIDGET_VISIBLE]){
 		view.hidden = not [value boolValue];
 	} else
-    if([key isEqualToString:@"enabled"]){
+    if([key isEqualToString:@MAW_WIDGET_ENABLED]){
         UIControl* controller = (UIControl*) view;
         controller.enabled = [value boolValue];
     }
@@ -256,35 +282,56 @@
 
 - (NSString*)getPropertyWithKey: (NSString*)key {
 	
-	if([key isEqualToString:@"width"]) {		
-		return [[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue];
+	if([key isEqualToString:@MAW_WIDGET_WIDTH]) {		
+		return [[[NSNumber numberWithInt: view.frame.size.width*getScreenScale()] stringValue] retain];
 	}
-	else if([key isEqualToString:@"height"]) {
-		return [[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue];
+	else if([key isEqualToString:@MAW_WIDGET_HEIGHT]) {
+		return [[[NSNumber numberWithInt: view.frame.size.height*getScreenScale()] stringValue] retain];
 	}
-	else if([key isEqualToString:@"left"]) {		
-		return [[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue];
+	else if([key isEqualToString:@MAW_WIDGET_LEFT]) {		
+		return [[[NSNumber numberWithInt: view.frame.origin.x*getScreenScale()] stringValue] retain];
 	}
-	else if([key isEqualToString:@"top"]) {
-		return [[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue];
+	else if([key isEqualToString:@MAW_WIDGET_TOP]) {
+		return [[[NSNumber numberWithInt: view.frame.origin.y*getScreenScale()] stringValue] retain];
 	}
-	
+	else if([key isEqualToString:@MAW_WIDGET_VISIBLE]) {
+        return view.hidden ? @"false" : @"true";
+    }
+    else if([key isEqualToString:@MAW_WIDGET_ENABLED]) {
+        UIControl* controller = (UIControl*) view; // TODO: is this correct?
+        return controller.enabled ? @"true" : @"false";
+    }
 	return nil;
 }
 
 - (void)dealloc {
+    [view release];
+    [children release];
     [super dealloc];
-	[view dealloc];
+}
+
+// let's do this to make sure it is always released on the main thread..
+- (oneway void)release
+{
+    if (![NSThread isMainThread]) {
+        [self performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
+    } else {
+        [super release];
+    }
 }
 
 - (void)layout {
 	// the layouts should take care of the fill parent / wrap content layouting process..
-	// so no need to do it here.
-	//[view setNeedsLayout];
-	[view setNeedsLayout];
-//	[view layoutIfNeeded];
-	//[view setNeedsDisplay];	
-	//[view layoutIfNeeded];
+    // this should not be suboptimal, it will trigger a layout
+    // that runs once before draw..
+    [view setNeedsLayout];
+    
+    if(view.superview)
+    {
+        [view.superview setNeedsLayout];
+    }
+    
+    [view layoutIfNeeded];    
 }
 
 /**

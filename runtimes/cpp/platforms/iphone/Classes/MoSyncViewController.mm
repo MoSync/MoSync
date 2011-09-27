@@ -17,7 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #import "MoSyncViewController.h"
 
-@class MoSyncView;
+@interface MoSyncView : UIView <UITextFieldDelegate>
+@end
 
 @implementation MoSyncViewController
 

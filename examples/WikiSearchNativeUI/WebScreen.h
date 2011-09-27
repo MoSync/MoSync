@@ -79,9 +79,8 @@ public:
 	 * Open a web view for a certain title
 	 * compose the url and display
 	 * @param The article title for which we want to open a wikipedia definition.
-	 * @return false if some error occur.
 	 */
-	bool openWebView(MAUtil::String title);
+	void openWebView(MAUtil::String title);
 
 private: // methods
 

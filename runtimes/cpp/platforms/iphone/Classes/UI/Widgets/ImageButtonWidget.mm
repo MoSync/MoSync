@@ -27,7 +27,7 @@
 @implementation ImageButtonWidget
 
 - (id)init {
-	view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // TODO: do have to do this (retain)??
+	view = [[UIButton buttonWithType:UIButtonTypeCustom] retain]; // need to retain this, it's not owned by us until we do.
     return [super init];
 }
 

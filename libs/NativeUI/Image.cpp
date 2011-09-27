@@ -71,6 +71,7 @@ namespace NativeUI
                 break;
             case IMAGE_SCALE_PRESERVE_ASPECT:
                 scaleModeString = "scalePreserveAspect";
+				break;
             case IMAGE_SCALE_NONE:
             default:
                 scaleModeString = "none";

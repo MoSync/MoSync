@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,9 +18,6 @@ MA 02110-1301, USA.
 
 /*
  * ListScreen.h
- *
- *  Created on: Aug 5, 2011
- *      Author: gabi
  */
 
 #ifndef LISTSCREEN_H_
@@ -28,17 +26,15 @@ MA 02110-1301, USA.
 #include <MAUtil/Environment.h>
 
 #include "FacebookDemoScreen.h"
-#include "NativeUI/Screen.h"
-#include "NativeUI/ListView.h"
-#include "NativeUI/WidgetEventListener.h"
 
 #include "ListItem.h"
 #include "FacebookDemoScreen.h"
+#include <NativeUI/Widgets.h>
 
 namespace FacebookDemoGUI
 {
 
-class ListScreen: public FacebookDemoScreen
+class ListScreen: public FacebookDemoScreen, public NativeUI::ButtonListener, public NativeUI::ListViewListener
 {
 public:
 	ListScreen(FacebookDemoScreen *prev);
@@ -46,30 +42,20 @@ public:
 
 	virtual void show();
 
-	void add(ListItem *btn);
-	void remove(ListItem *btn);
-
 	void clear();
-	bool isEmpty() const;
 
-	void setBackgroundColor(int color);
+	virtual void listViewItemClicked(NativeUI::ListView* listView, NativeUI::ListViewItem* listViewItem);
 
-	//0.0 - not visible
-	//0.5 - half visible
-	//1.0 - fully visible
-	//1
-	void setTransparency(float alpha);
+	virtual void buttonClicked(Widget* button);
+
 	virtual ~ListScreen();
-private:
-	virtual void addChild(MoSync::UI::Widget *widget);
 
 private:
 	void initialize();
 
-private:
-	MoSync::UI::ListView *mList;
-	int 				mBackgroundColor;
-	float 				mTransparency;
+protected:
+	virtual void back();
+
 };
 
 }//namespace FacebookDemoGUI

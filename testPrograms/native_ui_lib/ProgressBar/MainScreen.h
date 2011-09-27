@@ -88,6 +88,7 @@ private:
 	VerticalLayout* mMainLayout;
 
 	ProgressBar* mProgressBar;
+	Label* mProgressBarValue;
 	EditBox* mEditBox;
 
 	Button* mSetProgressValueButton;

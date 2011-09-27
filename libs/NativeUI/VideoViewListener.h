@@ -20,7 +20,7 @@ MA 02110-1301, USA.
  * @file VideoViewListener.h
  * @author Bogdan Iusco
  *
- * Interface for video view event listeners.
+ * \brief Interface for video view event listeners.
  *
  */
 
@@ -33,7 +33,7 @@ namespace NativeUI
     class VideoView;
 
     /**
-     * Interface for video view event listeners.
+     * \brief Interface for video view event listeners.
      */
     class VideoViewListener
     {
@@ -50,6 +50,11 @@ namespace NativeUI
          * - #MAW_VIDEO_VIEW_STATE_FINISHED the video has finished playing.
          * - #MAW_VIDEO_VIEW_STATE_INTERRUPTED Playback is temporarily
          * interruped(maybe there's no data in the buffer).
+         * NOTE: there is a slightly different behaviour depending on the platform:
+         *  - on iOS the source is loaded into memory when
+         *  MAW_VIDEO_VIEW_STATE_PLAYING is received.
+         *   - on Android the source is loaded into memory when
+         *  MAW_VIDEO_VIEW_STATE_SOURCE_READY is received.
          */
         virtual void videoViewStateChanged(
             VideoView* videoView,

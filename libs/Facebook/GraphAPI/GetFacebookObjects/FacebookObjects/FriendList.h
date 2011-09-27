@@ -1,4 +1,5 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -15,11 +16,9 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-/*
- * FriendList.h
- *
- *  Created on: Jul 8, 2011
- *      Author: gabi
+/**
+ * @file FriendList.h
+ * @author Gabriela Rata
  */
 
 #ifndef FRIENDLIST_H_
@@ -29,8 +28,8 @@ MA 02110-1301, USA.
 #include "FacebookObject.h"
 
 /**
- * Implements an FriendList Facebook object.
- * http://developers.facebook.com/docs/reference/api/FriendList/
+ * \brief Implements an FriendList Facebook object.
+ * See: http://developers.facebook.com/docs/reference/api/FriendList/
  */
 class FriendList: public FacebookObject
 {

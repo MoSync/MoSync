@@ -21,7 +21,7 @@
  * @author Emma Tresanszki
  *
  * Class for number picker.
- * NOTE: This widget is available for Android only from level 11.
+ * Note that this type of widget is available only on iOS for the moment.
  */
 
 #include "NumberPicker.h"
@@ -52,6 +52,7 @@ namespace NativeUI
 	 * the current value is set to min.
 	 * If the value is greater than MAW_NUMBER_PICKER_MAX_VALUE value,
 	 * the current value is set to max.
+	 * @param value The value that we want to set.
 	 * @return Any of the following result codes:
 	 * - #MAW_RES_OK if the property could be set.
 	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
@@ -66,14 +67,14 @@ namespace NativeUI
 	 * Get the current value for the number picker.
 	 * @return An int that specifies the picker value.
 	 */
-	int NumberPicker::getValue() const
+	int NumberPicker::getValue()
 	{
 		return this->getPropertyInt(MAW_NUMBER_PICKER_VALUE);
 	}
 
 	/**
 	 * Set the minimum value of the picker.
-	 * @param minute An int that specifies the minimum value.
+	 * @param min An int that specifies the minimum value.
 	 * @return Any of the following result codes:
 	 * - #MAW_RES_OK if the property could be set.
 	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
@@ -88,14 +89,14 @@ namespace NativeUI
 	 * Get the minimum value of the picker.
 	 * @return An int that specifies the minimum value.
 	 */
-	int NumberPicker::getMinValue() const
+	int NumberPicker::getMinValue()
 	{
 		return this->getPropertyInt(MAW_NUMBER_PICKER_MIN_VALUE);
 	}
 
 	/**
 	 * Set the maximum value of the picker.
-	 * @param minute An int that specifies the maximum value.
+	 * @param max An int that specifies the maximum value.
 	 * @return Any of the following result codes:
 	 * - #MAW_RES_OK if the property could be set.
 	 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
@@ -110,7 +111,7 @@ namespace NativeUI
 	 * Get the maximum value of the picker.
 	 * @return An int that specifies the maximum value.
 	 */
-	int NumberPicker::getMaxValue() const
+	int NumberPicker::getMaxValue()
 	{
 		return this->getPropertyInt(MAW_NUMBER_PICKER_MAX_VALUE);
 	}

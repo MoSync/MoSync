@@ -1,22 +1,24 @@
-/* Copyright (C) 2011 Mobile Sorcery AB
+/*
+Copyright (C) 2011 MoSync AB
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License, version 2, as published by
- the Free Software Foundation.
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
 
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- for more details.
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
 
- You should have received a copy of the GNU General Public License
- along with this program; see the file COPYING.  If not, write to the Free
- Software Foundation, 59 Temple Place - Suite 330, Boston, MA
- 02111-1307, USA.
- */
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
 
 /**
  * @file AppMoblet.cpp
+ * @author Bogdan Iusco
  *
  * AppMoblet class shows how to:
  * - open and close contacts list.
@@ -25,7 +27,7 @@
  */
 
 // Minimum number of values for drag events.
-#define MIN_DRAG_VALUES 10
+#define MIN_DRAG_VALUES 5
 
 #include <conprint.h>
 #include <IX_PIM.h>
@@ -123,6 +125,18 @@ void AppMoblet::pointerPressEvent(MAPoint2d point)
 }
 
 /**
+ * Method called when a key is pressed.
+ */
+void AppMoblet::keyPressEvent(int keyCode, int nativeCode)
+{
+    // Close the application if the back key is pressed.
+    if(MAK_BACK == keyCode)
+    {
+        close();
+    }
+}
+
+/**
  * Start working with PIM.
  * Add, modify and remove a PIM contact.
  */
@@ -132,7 +146,7 @@ void AppMoblet::startPIM()
     this->openPIMContactsList();
 
     // Create new contact and add data into fields.
-    PIMContact* newContact = this->createContact();
+    PIMContact* newContact = this->createContact(mContactsListHandle);
     if (NULL == newContact)
     {
         return;
@@ -200,14 +214,15 @@ void AppMoblet::printNextContact()
 
 /**
  * Create a new contact.
+ * @param listHandle Handle to a PIM list.
  * @return The new created contact, or NULL in case of error.
  * The ownership of the result is passed to the caller.
  */
-PIMContact* AppMoblet::createContact()
+PIMContact* AppMoblet::createContact(MAHandle listHandle)
 {
     // Get a handle to the new created contact.
     printf("\n==============Create new contact==============\n");
-    MAHandle newContantHandle = maPimItemCreate(MA_PIM_CONTACTS);
+    MAHandle newContantHandle = maPimItemCreate(listHandle);
 
     // Check for errors.
     if (0 > newContantHandle)

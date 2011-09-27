@@ -20,6 +20,10 @@
 
 @interface LabelWidget : IWidget {
 	
+    /**
+     * This flag is set if the width of the label is MAW_CONSTANT_WRAP_CONTENT.
+     */
+    bool isWidthWrapContent;
 }
 
 - (id)init;
