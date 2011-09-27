@@ -2,8 +2,6 @@ package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_ATTRIBUTES;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_BUFFER_TOO_SMALL;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_EMPTY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_READ_ONLY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_WRITE_ONLY;
@@ -139,7 +137,7 @@ abstract class PIMField {
 		int attr = getAndroidAttribute(index);
 
 		if (attr < 0) {
-			return MA_PIM_ERR_NO_ATTRIBUTES;
+			return 0;
 		}
 
 		int ret = ((Integer) PIMUtil.getKeyFromValue(mAttributes, attr))
@@ -177,8 +175,8 @@ abstract class PIMField {
 
 		char[] buffer = getLabel(index);
 
-		if (buffer.length > buffSize)
-			return MA_PIM_ERR_BUFFER_TOO_SMALL;
+		if (buffer.length > (buffSize >> 1))
+			return (buffer.length << 1);
 
 		PIMUtil.copyBufferToMemory(buffPointer, buffer);
 
@@ -258,7 +256,7 @@ abstract class PIMField {
 		char[] buffer = getData(index);
 
 		if (buffer.length > (buffSize >> 1))
-			return MA_PIM_ERR_BUFFER_TOO_SMALL;
+			return (buffer.length << 1);
 
 		PIMUtil.copyBufferToMemory(buffPointer, buffer);
 

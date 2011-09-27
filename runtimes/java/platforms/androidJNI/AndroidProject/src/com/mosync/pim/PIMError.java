@@ -19,6 +19,4 @@ public class PIMError {
 	static String sStrIndexInvalid = "Invalid index.";
 	static String sStrHandleInvalid = "Invalid handle.";
 	static String sStrBufferInvalid = "Invalid buffer structure.";
-	// /// The operation is not allowed by the Address Book database.
-	// OPERATION_NOT_PERMITTED = -20;
 }
