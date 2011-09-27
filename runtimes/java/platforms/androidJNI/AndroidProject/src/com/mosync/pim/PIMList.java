@@ -5,6 +5,8 @@ import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import com.mosync.internal.android.SingletonObject;
+
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract.Contacts;
@@ -23,6 +25,20 @@ public class PIMList {
 	}
 
 	/**
+	 * @param errorCode
+	 *            The error code returned by the syscall.
+	 * @param panicCode
+	 *            The panic code for this error.
+	 * @param panicText
+	 *            The panic text for this error.
+	 * @return
+	 */
+	public int throwError(int errorCode, int panicCode, String panicText) {
+		return SingletonObject.getSingletonObject().error(errorCode, panicCode,
+				panicText);
+	}
+
+	/**
 	 * Read the list
 	 */
 	int read(ContentResolver cr) {
@@ -33,11 +49,15 @@ public class PIMList {
 			cur = cr.query(Contacts.CONTENT_URI, new String[] { Contacts._ID },
 					null, null, null);
 		} catch (Exception e) {
-			return MA_PIM_ERR_LIST_UNAVAILABLE;
+			return throwError(MA_PIM_ERR_LIST_UNAVAILABLE,
+					PIMError.PANIC_LIST_UNAVAILABLE,
+					PIMError.sStrListUnavailable);
 		}
 
 		if (cur == null) {
-			return MA_PIM_ERR_LIST_UNAVAILABLE;
+			return throwError(MA_PIM_ERR_LIST_UNAVAILABLE,
+					PIMError.PANIC_LIST_UNAVAILABLE,
+					PIMError.sStrListUnavailable);
 		}
 
 		// read each item

@@ -3412,39 +3412,26 @@ interface MAAPI {
 			FIELD_UNSUPPORTED = -7;
 			/// The requested field doesn't have a value.
 			FIELD_EMPTY = -8;
+			/// More values in this field are not supported.
+			FIELD_COUNT_MAX = -9;
 			/// The field is read-only.
-			READ_ONLY = -9;
-			/// The field is read-only.
-			WRITE_ONLY = -10;
-			/// The field/attribute combination is not supported.
-			COMBO_UNSUPPORTED = -11;
-			/// More values in this field is not supported.
-			FIELD_COUNT_MAX = -12;
+			FIELD_READ_ONLY = -10;
+			/// The field is write-only.
+			FIELD_WRITE_ONLY = -11;
 			/// The given index is not valid.
-			INDEX_INVALID = -13;
-			/// The value does not have a custom label.
-			NO_LABEL = -14;
-			/// The values's attribute is not set to custom.
-			CUSTOM_ATTRIBUTE = -15;
-			/// The operation is not allowed by the Address Book database.
-			OPERATION_NOT_PERMITTED = -16;
-			/// The list or item could not be opened.
-			CANNOT_OPEN = -17;
-			/// The list or item is already opened and locked by the system.
-			/// It must be closed before it can be opened again.
-			ALREADY_OPEN = -18;
+			INDEX_INVALID = -12;
 			/// Invalid handle.
-			HANDLE_INVALID = -19;
+			HANDLE_INVALID = -13;
 			/// The field/attribute combination is not supported.
-			ATTRIBUTE_COMBO_UNSUPPORTED = -20;
+			ATTRIBUTE_COMBO_UNSUPPORTED = -14;
 			/// The values's attribute is not set to custom.
-			ATTRIBUTE_CUSTOM = -21;
-			/// The field doesn't have attributes.
-			NO_ATTRIBUTES = -22;
+			ATTRIBUTE_CUSTOM = -15;
 			/// Invalid buffer structure.
-			BUFFER_INVALID = -23;
-			/// The allocated buffer is too small.
-			BUFFER_TOO_SMALL = -24;
+			BUFFER_INVALID = -16;
+			/// The value does not have a custom label.
+			NO_LABEL = -17;
+			/// The operation is not allowed by the Address Book database.
+			OPERATION_NOT_PERMITTED = -18;
 		}
 
 		/**
@@ -3510,13 +3497,13 @@ interface MAAPI {
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
 		* \returns \> 0 the attribute for the specified field.
+		*          \= 0 if the field doesn't have attributes.
 		*          \< 0 on error:
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
 		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
 		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
-		*                    #MA_PIM_ERR_NO_ATTRIBUTES if the field doesn't have attributes.
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
@@ -3602,7 +3589,6 @@ interface MAAPI {
 		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		*                    #MA_PIM_ERR_FIELD_WRITE_ONLY if the field is write-only.
-		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
 
