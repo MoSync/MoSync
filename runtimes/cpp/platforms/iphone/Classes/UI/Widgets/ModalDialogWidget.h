@@ -19,8 +19,10 @@
 #import "ScreenWidget.h"
 #import "ScreenWidgetController.h"
 
-@interface DialogWidget : ScreenWidget <UIPopoverControllerDelegate>{
+@interface ModalDialogWidget : ScreenWidget <UIPopoverControllerDelegate>{
 	UIPopoverController* popoverController;
+    UIViewController* mModalViewController;
+    UINavigationItem* mNavigationItem;
 	UINavigationController* container;
 	UIPopoverArrowDirection direction;
 	BOOL dismissable;
@@ -31,7 +33,22 @@
 - (id)init;
 - (int)show;
 - (int)hide;
+
+/**
+ * Sets a modal dialog/popover property.
+ * @param key The property of the modal dialog/popover widget that should be set.
+ * @param value The value of the property.
+ * @return MAW_RES_OK if the property was set, or an error code otherwise.
+ */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value;
+
+/**
+ * Returns a property value of the modal dialog/popover widget.
+ * @param key The property of the modal dialog/popover widget.
+ * @return The value for the given property.
+ */
+- (NSString*)getPropertyWithKey: (NSString*)key;
+
 - (void)dealloc;
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController;
 - (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController;

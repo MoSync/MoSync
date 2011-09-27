@@ -20,7 +20,7 @@
 
 #import "ScreenWidget.h"
 #import "StackScreenWidget.h"
-#import "DialogWidget.h"
+#import "ModalDialogWidget.h"
 #import "LayoutWidgets.h"
 #import "RelativeLayoutWidget.h"
 #import "ListViewItemWidget.h"
@@ -318,11 +318,11 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	return returnValue;
 }
 
-int maWidgetDialogShow(MAWidgetHandle dialogHandle) {
+int maWidgetModalDialogShow(MAWidgetHandle dialogHandle) {
 	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
 	if(!dialog) return MAW_RES_INVALID_HANDLE;
 
-	if(!([dialog class] == [DialogWidget class])) {
+	if(!([dialog class] == [ModalDialogWidget class])) {
 		return MAW_RES_INVALID_HANDLE;
 	}
 
@@ -337,11 +337,11 @@ int maWidgetDialogShow(MAWidgetHandle dialogHandle) {
 	return returnValue;
 }
 
-int maWidgetDialogHide(MAWidgetHandle dialogHandle) {
+int maWidgetModalDialogHide(MAWidgetHandle dialogHandle) {
 	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
 	if(!dialog) return MAW_RES_INVALID_HANDLE;
 
-	if(!([dialog class] == [DialogWidget class])) {
+	if(!([dialog class] == [ModalDialogWidget class])) {
 		return MAW_RES_INVALID_HANDLE;
 	}
 
