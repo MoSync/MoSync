@@ -23,14 +23,13 @@ MA 02110-1301, USA.
  * High-level utility functions for working with files.
  */
 
-#ifndef NATIVEUI_FILE_UTIL_H_
-#define NATIVEUI_FILE_UTIL_H_
+#ifndef JOSYNC_FILE_UTIL_H_
+#define JOSYNC_FILE_UTIL_H_
 
 #include <ma.h>
 #include <MAUtil/String.h>
-#include <IX_WIDGET.h>
 
-namespace NativeUI
+namespace josync
 {
 /**
  * Class that contains utility methods.
@@ -139,6 +138,6 @@ class FileUtil
 		virtual MAUtil::String createTextFromHandle(MAHandle data);
 	};
 
-} // namespace NativeUI
+} // namespace
 
-#endif // NATIVEUI_FILE_UTIL_H_
+#endif

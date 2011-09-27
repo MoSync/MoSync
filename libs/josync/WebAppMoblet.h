@@ -24,20 +24,20 @@ MA 02110-1301, USA.
  * communication between a JavaScript and C++.
  */
 
-#ifndef NATIVEUI_WEB_APP_MOBLET_H_
-#define NATIVEUI_WEB_APP_MOBLET_H_
+#ifndef JOSYNC_WEB_APP_MOBLET_H_
+#define JOSYNC_WEB_APP_MOBLET_H_
 
 #include <MAUtil/Moblet.h>
 #include <MAUtil/String.h>
-#include "Screen.h"
-#include "WebView.h"
-#include "WebViewMessage.h"
+#include <NativeUI/Screen.h>
+#include <NativeUI/WebView.h>
+#include <NativeUI/WebViewMessage.h>
 #include "FileUtil.h"
 
-namespace NativeUI
+namespace josync
 {
     // Forward declaration.
-    class WebAppMobletWebViewListener;
+    class WebAppMoblet_WebViewListener;
 
 	/**
 	 * \brief A web view is a widget used to render web pages.
@@ -59,7 +59,7 @@ namespace NativeUI
 		 * Get the WebView widget displayed by this moblet.
 		 * @return Pointer to the WebView instance.
 		 */
-		WebView* getWebView();
+		NativeUI::WebView* getWebView();
 
 		/**
 		 * Get a file utility object used for accessing the
@@ -67,6 +67,16 @@ namespace NativeUI
 		 * @return Pointer to a FileUtil instance.
 		 */
 		FileUtil* getFileUtil();
+
+		/**
+		 * Enable JavaScript to C++ communication.
+		 */
+		void enableWebViewMessages();
+
+		/**
+		 * Disable JavaScript to C++ communication.
+		 */
+		void disableWebViewMessages();
 
 		/**
 		 * Display a page in the WebView of this moblet.
@@ -80,21 +90,21 @@ namespace NativeUI
 		void callJS(const MAUtil::String& script);
 
 		/**
-		 * This method is called when a key is pressed. It closes
-		 * the application when the back key (on Android) is pressed.
-		 * Override to implement your own behaviour.
-		 */
-		virtual void keyPressEvent(int keyCode, int nativeCode);
-
-		/**
 		 * Implement this method in a subclass to handle messages
 		 * sent from JavaScript.
 		 * @param webView The WebView that sent the message.
 		 * @param message Object used to access message content.
 		 */
 		virtual void handleWebViewMessage(
-			WebView* webView,
-			WebViewMessage& message) = 0;
+			NativeUI::WebView* webView,
+			NativeUI::WebViewMessage& message);
+
+		/**
+		 * This method is called when a key is pressed. It closes
+		 * the application when the back key (on Android) is pressed.
+		 * Override to implement your own behaviour.
+		 */
+		virtual void keyPressEvent(int keyCode, int nativeCode);
 
 	protected:
 		/**
@@ -113,17 +123,17 @@ namespace NativeUI
 		/**
 		 * The screen widget that is the root of the UI.
 		 */
-		Screen* mScreen;
+		NativeUI::Screen* mScreen;
 
 		/**
 		 * The WebView widget that displays the application UI.
 		 */
-		WebView* mWebView;
+		NativeUI::WebView* mWebView;
 
 		/**
 		 * JavsScript message listener.
 		 */
-		WebAppMobletWebViewListener* mWebViewListener;
+		WebAppMoblet_WebViewListener* mWebViewListener;
 
 		/**
 		 * File utility object.
@@ -132,4 +142,4 @@ namespace NativeUI
 	};
 } // namespace NativeUI
 
-#endif // NATIVEUI_WEB_APP_MOBLET_H_
+#endif
