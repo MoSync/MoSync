@@ -20,8 +20,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <map>
 #include <set>
+#include <vector>
 #include <string>
 #include <ios>
+#include <ostream>
 
 // All these functions exit() on error.
 
@@ -57,6 +59,11 @@ void toDir(std::string&);
 std::string getDir(const std::string& name);
 
 std::string fullpathString(const char* name);
+
+std::string delim(std::vector<std::string>& input, const std::string& delim);
+
+// Writes a line that is "manifest-safe", by splitting it every 72 characters.
+void write72line(std::ostream& output, const std::string& input);
 
 // Stores the pointer as a name for the stream.
 void setName(std::ios& i, const char* name);

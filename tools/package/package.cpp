@@ -66,6 +66,12 @@ static const char* sUsage =
 "     --android-alias <alias>  Key alias (Android only).\n"
 "     --android-keypass <password>\n"
 "                              Key password (Android only).\n"
+"     --javame-keystore <file> Keystore for signing (JavaME only).\n"
+"     --javame-storepass <password>"
+"                              Keystore password (JavaME only).\n"
+"     --javame-alias <alias>   Key alias (JavaME only).\n"
+"     --javame-keypass <password>"
+"                              Key password (JavaME only).\n"
 " -s, --silent                 Output: Supress additional output, e.g. warnings.\n"
 "\n"
 "Environment variables used:\n"
@@ -150,6 +156,14 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.androidAlias);
 		} else if(streq(argv[i], "--android-keypass")) {
 			setString(i, argc, argv, s.androidKeyPass);
+		} else if(streq(argv[i], "--javame-keystore")) {
+			setString(i, argc, argv, s.javameKeystore);
+		} else if(streq(argv[i], "--javame-storepass")) {
+			setString(i, argc, argv, s.javameStorePass);
+		} else if(streq(argv[i], "--javame-alias")) {
+			setString(i, argc, argv, s.javameAlias);
+		} else if(streq(argv[i], "--javame-keypass")) {
+			setString(i, argc, argv, s.javameKeyPass);
 		} else if(streq(argv[i], "-s") || streq(argv[i], "--silent")) {
 			s.silent = true;
 		} else if(streq(argv[i], "--show-passwords")) {
@@ -315,6 +329,14 @@ void testAndroidVersionCode(const SETTINGS& s) {
 	}
 	if (atoi(s.androidVersionCode) < 1) {
 		printf("Android version code must be a number > 0!\n");
+		exit(1);
+	}
+}
+
+void testJavaMESigning(const SETTINGS& s) {
+	if (!(s.javameAlias && s.javameKeyPass && s.javameKeystore && s.javameStorePass) &&
+		(s.javameAlias || s.javameKeyPass || s.javameKeystore || s.javameStorePass)) {
+		printf("JavaME signing options must either all be specified or none!\n");
 		exit(1);
 	}
 }

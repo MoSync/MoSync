@@ -186,7 +186,7 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 	createSignCmd(hiddenCmd, keystore, alias, storepass, keypass, signedApk, unsignedApk, true);
 
 	string cmdStr = cmd.str();
-	sh(cmdStr.c_str(), true, s.showPasswords ? cmdStr.c_str() : hiddenCmd.str().c_str());
+	sh(cmdStr.c_str(), false, s.showPasswords ? cmdStr.c_str() : hiddenCmd.str().c_str());
 }
 
 static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, string& storepass, string& keypass, string& signedApk, string& unsignedApk, bool hidden) {

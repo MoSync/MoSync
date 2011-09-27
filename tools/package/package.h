@@ -51,6 +51,12 @@ struct SETTINGS {
     const char* androidStorePass;
     const char* androidAlias;
     const char* androidKeyPass;
+
+    // JavaME specific settings
+    const char* javameKeystore;
+    const char* javameStorePass;
+    const char* javameAlias;
+    const char* javameKeyPass;
 };
 
 void package(const SETTINGS&);
@@ -73,6 +79,8 @@ void testIOSSdk(const SETTINGS&);
 
 void testAndroidPackage(const SETTINGS&);
 void testAndroidVersionCode(const SETTINGS&);
+
+void testJavaMESigning(const SETTINGS& s);
 
 bool isJavaIdentifierStart(char ch);
 bool isJavaIdentifierPart(char ch);
