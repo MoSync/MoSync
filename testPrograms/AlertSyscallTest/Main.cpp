@@ -72,13 +72,13 @@ public:
 			MAUtil::String temp = "";
 			switch( event.alertButtonIndex)
 			{
-			case 0:
+			case 1:
 				temp += "First ";
 				break;
-			case 1:
+			case 2:
 				temp += "Second ";
 				break;
-			case 2:
+			case 3:
 				temp += "Third ";
 				break;
 			default:

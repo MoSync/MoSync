@@ -2580,7 +2580,7 @@ public class MoSyncThread extends Thread
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(0);
+							postAlertEvent(1);
 						}
 					});
 				}
@@ -2590,7 +2590,7 @@ public class MoSyncThread extends Thread
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(1);
+							postAlertEvent(2);
 						}
 					});
 				}
@@ -2601,7 +2601,7 @@ public class MoSyncThread extends Thread
 
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
-							postAlertEvent(2);
+							postAlertEvent(3);
 						}
 					});
 				}
