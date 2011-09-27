@@ -3981,6 +3981,37 @@ group WidgetAPI "Widget API" {
 		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		*/
 		HARD = 6;
+
+		/**
+		* @brief The popover arrow should point up. Used in
+		* #MAW_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_UP = 1;
+
+		/**
+		* @brief The popover arrow should point down. Used in
+		* #MAW_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_DOWN = 2;
+
+		/**
+		* @brief The popover arrow should point left. Used in
+		* #MAW_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_LEFT = 4;
+
+		/**
+		* @brief The popover arrow should point right. Used in
+		* #MAW_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_RIGHT = 8;
+
+		/**
+		* @brief The popover arrow can point anywhere. Used in
+		* #MAW_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_ANY = 15;
+
 	}
 	}
 

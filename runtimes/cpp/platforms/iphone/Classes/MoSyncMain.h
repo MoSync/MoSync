@@ -60,6 +60,8 @@ void MoSync_AddTouchMovedEvent(int x, int y, int touchId);
 void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 void MoSync_AddScreenChangedEvent();
 void MoSync_AddCloseEvent();
+void MoSync_AddFocusLostEvent();
+void MoSync_AddFocusGainedEvent();
 void MoSync_ShowImagePicker();
 void* MoSync_GetCustomEventData();
 void* MoSync_GetCustomEventDataMoSyncPointer();

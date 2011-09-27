@@ -354,6 +354,19 @@ public class WebWidget extends Widget
 		{
 			return Boolean.toString(webView.isVerticalScrollBarEnabled());
 		}
+		else if (property.equals( IX_WIDGET.MAW_WEB_VIEW_NAVIGATE ))
+		{
+			String status = "";
+			if (webView.canGoBack())
+			{
+				status = status + "back";
+			}
+			if (webView.canGoForward())
+			{
+				status = status + "forward";
+			}
+			return status;
+		}
 		else
 		{
 			return super.getProperty(property);

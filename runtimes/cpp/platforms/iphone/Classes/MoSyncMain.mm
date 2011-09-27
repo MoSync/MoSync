@@ -275,6 +275,21 @@ void MoSync_AddCloseEvent() {
 	Base::gEventQueue.addCloseEvent();
 }
 
+void MoSync_AddFocusLostEvent() {
+	MAEvent event;
+    event.type = EVENT_TYPE_FOCUS_LOST;
+    Base::gEventQueue.put(event);
+    return;
+}
+
+void MoSync_AddFocusGainedEvent() {
+	MAEvent event;
+    event.type = EVENT_TYPE_FOCUS_GAINED;
+    Base::gEventQueue.put(event);
+    return;
+}
+
+
 void MoSync_AddEvent(const MAEvent &e) {
 	Base::gEventQueue.put(e);
 }
