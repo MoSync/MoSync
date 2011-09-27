@@ -24,22 +24,22 @@ MA 02110-1301, USA.
  * communication between a JavaScript and C++.
  */
 
+#include <NativeUI/WebViewListener.h>
 #include "WebAppMoblet.h"
-#include "WebViewListener.h"
 
-namespace NativeUI
+namespace josync
 {
 	/**
 	 * Class that listens for WebView events.
 	 * Here we receive messages from JavaScript.
 	 */
-	class WebAppMobletWebViewListener : public WebViewListener
+	class WebAppMoblet_WebViewListener : public NativeUI::WebViewListener
 	{
 	public:
 		/**
 		 * Constructor that saves the pointer to the moblet.
 		 */
-		WebAppMobletWebViewListener(WebAppMoblet* moblet)
+		WebAppMoblet_WebViewListener(WebAppMoblet* moblet)
 		{
 			mMoblet = moblet;
 		}
@@ -52,12 +52,12 @@ namespace NativeUI
 		 * by the WebView after this call finishes.
 		 */
 		virtual void webViewHookInvoked(
-			WebView* webView,
+			NativeUI::WebView* webView,
 			int hookType,
 			MAHandle urlData)
 		{
 			// Create message object
-			WebViewMessage message(urlData);
+			NativeUI::WebViewMessage message(urlData);
 
 			// Let the moblet handle the message.
 			mMoblet->handleWebViewMessage(webView, message);
@@ -70,7 +70,7 @@ namespace NativeUI
 		 * TODO: Remove when made non-abstract.
 		 */
 		virtual void webViewContentLoading(
-			WebView* webView,
+			NativeUI::WebView* webView,
 			const int webViewState)
 		{
 		}
@@ -81,7 +81,7 @@ namespace NativeUI
 		 */
 		WebAppMoblet* mMoblet;
 	};
-	// End of class WebAppMobletWebViewListener
+	// End of class WebAppMoblet_WebViewListener
 
 	/**
 	 * Constructor.
@@ -100,8 +100,12 @@ namespace NativeUI
 		// Deleting the root widget will also delete child widgets.
 		delete mScreen;
 
-		// Deleting the WebView listener.
-		delete mWebViewListener;
+		// Delete the WebView listener.
+		if (NULL != mWebViewListener)
+		{
+			delete mWebViewListener;
+			mWebViewListener = NULL;
+		}
 
 		// Delete the file utility object.
 		delete mFileUtil;
@@ -111,7 +115,7 @@ namespace NativeUI
 	 * Get the WebView widget displayed by this moblet.
 	 * @return Pointer to a WebView instance.
 	 */
-	WebView* WebAppMoblet::getWebView()
+	NativeUI::WebView* WebAppMoblet::getWebView()
 	{
 		return mWebView;
 	}
@@ -124,6 +128,33 @@ namespace NativeUI
 	FileUtil* WebAppMoblet::getFileUtil()
 	{
 		return mFileUtil;
+	}
+
+	/**
+	 * Enable JavaScript to C++ communication.
+	 */
+	void WebAppMoblet::enableWebViewMessages()
+	{
+		if (NULL == mWebViewListener)
+		{
+			mWebViewListener = new WebAppMoblet_WebViewListener(this);
+			mWebView->addWebViewListener(mWebViewListener);
+			mWebView->enableWebViewMessages();
+		}
+	}
+
+	/**
+	 * Disable JavaScript to C++ communication.
+	 */
+	void WebAppMoblet::disableWebViewMessages()
+	{
+		if (NULL != mWebViewListener)
+		{
+			mWebView->removeWebViewListener(mWebViewListener);
+			mWebView->disableWebViewMessages();
+			delete mWebViewListener;
+			mWebViewListener = NULL;
+		}
 	}
 
 	/**
@@ -141,6 +172,18 @@ namespace NativeUI
 	void WebAppMoblet::callJS(const MAUtil::String& script)
 	{
 		mWebView->callJS(script);
+	}
+
+	/**
+	 * Implement this method in a subclass to handle messages
+	 * sent from JavaScript.
+	 * @param webView The WebView that sent the message.
+	 * @param message Object used to access message content.
+	 */
+	void WebAppMoblet::handleWebViewMessage(
+		NativeUI::WebView* webView,
+		NativeUI::WebViewMessage& message)
+	{
 	}
 
 	/**
@@ -177,17 +220,14 @@ namespace NativeUI
 	void WebAppMoblet::createUI()
 	{
 		// Create and configure the WebView.
-		mWebView = new WebView();
-		mWebViewListener = new WebAppMobletWebViewListener(this);
-		mWebView->addWebViewListener(mWebViewListener);
-		mWebView->enableWebViewMessages();
+		mWebView = new NativeUI::WebView();
 		mWebView->fillSpaceHorizontally();
 		mWebView->fillSpaceVertically();
 
 		// Create and show the screen that holds the WebView.
-		mScreen = new Screen();
+		mScreen = new NativeUI::Screen();
 		mScreen->setMainWidget(mWebView);
 		mScreen->show();
 	}
 
-} // namespace NativeUI
+} // namespace
