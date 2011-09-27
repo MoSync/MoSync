@@ -118,6 +118,9 @@ void TitleScreen::setupUI()
  */
 void TitleScreen::showScreen(bool needsRefresh)
 {
+	// Make the screen listen for key events.
+	MAUtil::Environment::getEnvironment().addKeyListener(this);
+
 	if (needsRefresh)
 	{
 		// Each time a new search is initiated, refresh the check box list.
@@ -235,6 +238,22 @@ void TitleScreen::showHomeScreen()
 }
 
 /**
+ * From KeyListener.
+ * This function is called with a \link #MAK_FIRST MAK_ code \endlink when
+ * a key is pressed.
+ */
+void TitleScreen::keyPressEvent(int keyCode, int nativeCode)
+{
+    // Go back to the HomeScreen if the back key is pressed.
+    if(MAK_BACK == keyCode)
+    {
+		// Unregister from key listener.
+		MAUtil::Environment::getEnvironment().removeKeyListener(this);
+		showHomeScreen();
+    }
+}
+
+/**
  * from CustomEventListener
  * The custom event listener interface.
  */
@@ -265,6 +284,9 @@ void TitleScreen::widgetClicked(MAHandle widgetHandle)
 
 	if ( widgetHandle == mNextButton )
 	{
+		// Unregister from key listener.
+		MAUtil::Environment::getEnvironment().removeKeyListener(this);
+
 		// For selected titles, a short snippet will be displayed ( in a separate screen).
 		updateWikiTitles();
 
@@ -273,6 +295,8 @@ void TitleScreen::widgetClicked(MAHandle widgetHandle)
 	}
 	else if ( widgetHandle == mBackButton )
 	{
+		// Unregister from key listener.
+		MAUtil::Environment::getEnvironment().removeKeyListener(this);
 		// Go back to the home screen.
 		showHomeScreen();
 	}

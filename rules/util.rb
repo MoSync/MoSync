@@ -55,15 +55,14 @@ class String
 	end
 	
 	def getExt
-		doti = rindex('.')
-		slashi = rindex('/')
-		if(doti && slashi) then
-			if(slashi > doti) then
-				return nil
-			end
-		end
+	doti = rindex('.')
+	slashi = rindex('/')
+	if(doti)
+		return nil if(slashi && slashi > doti)
 		return self[doti..self.length]
 	end
+  return nil
+ end
 	
 	def noExt
 		doti = rindex('.')

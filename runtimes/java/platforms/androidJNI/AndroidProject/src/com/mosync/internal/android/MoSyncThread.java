@@ -43,6 +43,7 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -2505,6 +2506,7 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * @deprecated Use maAlert instead.
 	 * Opens a message box.
 	 * @param title
 	 * @param text
@@ -2541,6 +2543,98 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Opens a message box.
+	 * The dialog can be dismissed using one of the 3 optional buttons.
+	 * @param title
+	 * @param message
+	 * @param buttonPositive
+	 * @param buttonNeutral
+	 * @param buttonNegative
+	 * @return
+	 */
+	int maAlert(
+		final String title,
+		final String message,
+		final String buttonPositive,
+		final String buttonNeutral,
+		final String buttonNegative)
+	{
+		// Get parameters from the parent activity
+		mContext.runOnUiThread( new Runnable( ) {
+
+			@Override
+			public void run()
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+				if ( title.length() > 0 )
+				{
+					builder.setTitle(title);
+				}
+				if ( message.length() > 0 )
+				{
+					builder.setMessage(message);
+				}
+				if ( buttonPositive.length() > 0 )
+				{
+					builder.setPositiveButton(buttonPositive, new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							postAlertEvent(0);
+						}
+					});
+				}
+				if ( buttonNeutral.length() > 0 )
+				{
+					builder.setNeutralButton(buttonNeutral, new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							postAlertEvent(1);
+						}
+					});
+				}
+				if ( buttonNegative.length() > 0 )
+				{
+					builder.setCancelable(true);
+					builder.setNegativeButton(buttonNegative, new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							postAlertEvent(2);
+						}
+					});
+				}
+				else
+				{
+					builder.setCancelable(false);
+				}
+
+				AlertDialog alertDialog = builder.create();
+				alertDialog.show();
+			}
+		});
+
+		return 0;
+	}
+
+	/**
+	 * Post a message to the MoSync event queue.
+	 * This event it sent when one of the buttons in the alert was pressed.
+	 * See maAlert syscall that pops-up an alert.
+	 * The state is: Ready or Canceled.
+	 */
+	private void postAlertEvent(int index)
+	{
+		int[] event = new int[2];
+		event[0] = EVENT_TYPE_ALERT;
+		// Send the button index.
+		event[1] = index;
+
+		postEvent(event);
+	}
+
+	/**
 	 * Internal wrapper for maImagePickerOpen that runs
 	 * the call in the UI thread.
 	 */
@@ -2555,7 +2649,7 @@ public class MoSyncThread extends Thread
 	 * The destructive button is iOS specific, so here it is not treated separately.
 	 * @return
 	 */
-	int maWidgetShowOptionDialog(String title, String cancelButtonTitle, String destructiveButtonTitle, int buffPointer, int buffSize)
+	int maWidgetShowOptionsDialog(String title, String destructiveButtonTitle, String cancelButtonTitle, int buffPointer, int buffSize)
 	{
 		return mMoSyncNativeUI.maWidgetShowOptionDialog(title, destructiveButtonTitle, cancelButtonTitle, buffPointer, buffSize);
 	}
@@ -2985,20 +3079,20 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Internal wrapper for maWidgetDialogShow.
+	 * Internal wrapper for maWidgetModalDialogShow.
 	 * @param dialogHandle
 	 */
-	public int maWidgetDialogShow(
+	public int maWidgetModalDialogShow(
 			final int dialogHandle)
 	{
 		return mMoSyncNativeUI.maWidgetDialogShow(dialogHandle);
 	}
 
 	/**
-	 * Internal wrapper for maWidgetDialogHide.
+	 * Internal wrapper for maWidgetModalDialogHide.
 	 * @param dialogHandle
 	 */
-	public int maWidgetDialogHide(
+	public int maWidgetModalDialogHide(
 			final int dialogHandle)
 	{
 		return mMoSyncNativeUI.maWidgetDialogHide(dialogHandle);

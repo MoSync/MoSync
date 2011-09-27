@@ -1647,13 +1647,13 @@ return 0; \
 			SYSLOG("maIOCtl_maWidgetRemoveChild");
 			return _maWidgetRemoveChild(a, mJNIEnv, mJThis);
 
-		case maIOCtl_maWidgetDialogShow:
-			SYSLOG("maIOCtl_maWidgetDialogShow");
-			return _maWidgetDialogShow(a, mJNIEnv, mJThis);
+		case maIOCtl_maWidgetModalDialogShow:
+			SYSLOG("maIOCtl_maWidgetModalDialogShow");
+			return _maWidgetModalDialogShow(a, mJNIEnv, mJThis);
 
-		case maIOCtl_maWidgetDialogHide:
-			SYSLOG("maIOCtl_maWidgetDialogHide");
-			return _maWidgetDialogHide(a, mJNIEnv, mJThis);
+		case maIOCtl_maWidgetModalDialogHide:
+			SYSLOG("maIOCtl_maWidgetModalDialogHide");
+			return _maWidgetModalDialogHide(a, mJNIEnv, mJThis);
 
 		case maIOCtl_maWidgetSetProperty:
 			SYSLOG("maIOCtl_maWidgetSetProperty");
@@ -1760,21 +1760,37 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maAlert:
+			SYSLOG("maIOCtl_maAlert");
+			return _maAlert(
+				SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b),
+				SYSCALL_THIS->GetValidatedStr(c),
+				SYSCALL_THIS->GetValidatedStr(
+					SYSCALL_THIS->GetValidatedStackValue(0)),
+				SYSCALL_THIS->GetValidatedStr(
+					SYSCALL_THIS->GetValidatedStackValue(4)),
+				mJNIEnv,
+				mJThis);
+
 		case maIOCtl_maImagePickerOpen:
 			SYSLOG("maIOCtl_maImagePickerOpen");
 			return _maImagePickerOpen(
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maWidgetShowOptionDialog:
+		case maIOCtl_maWidgetShowOptionsDialog:
 			{
-			SYSLOG("maIOCtl_maWidgetShowOptionDialog");
-			//MA_OPTION_DIALOG_ARGS* args = (MA_OPTION_DIALOG_ARGS*) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MA_OPTION_DIALOG_ARGS));
+			SYSLOG("maIOCtl_maWidgetShowOptionsDialog");
+			const wchar* _title = GVWS(a);
+			const wchar* _text = GVWS(b);
+			const wchar* _cancel = GVWS(c);
+
 			// Read the fourth and fifth parameter from the register.
-			return _maWidgetShowOptionDialog(
-				SYSCALL_THIS->GetValidatedStr(a),
-				SYSCALL_THIS->GetValidatedStr(b),
-				SYSCALL_THIS->GetValidatedStr(c),
+			return _maWidgetShowOptionsDialog(
+				_title,
+				_text,
+				_cancel,
 				SYSCALL_THIS->GetValidatedStackValue(0),
 				SYSCALL_THIS->GetValidatedStackValue(4),
 				mJNIEnv,

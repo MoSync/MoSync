@@ -17,7 +17,7 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file Screen.h
+ * @file Screen.cpp
  * @author Mikael Kindborg
  *
  * Class that represents a visible screen. Only one screen

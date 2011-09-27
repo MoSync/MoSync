@@ -355,6 +355,9 @@ MAUtil::String HomeScreen::getCheckedCategories()
  */
 void HomeScreen::showScreen()
 {
+	// Make the home screen listen for key events.
+	MAUtil::Environment::getEnvironment().addKeyListener(this);
+
 	// Reset the progress bar value to 0, and dismiss it.
 	maWidgetSetProperty(mProgressLabel,MAW_WIDGET_VISIBLE, "false");
 	setWidgetProperty(mProgressBar,MAW_PROGRESS_BAR_PROGRESS, 0);
@@ -385,6 +388,9 @@ void HomeScreen::showScreen()
  */
 void HomeScreen::engineFinished()
 {
+	// Unregister from key listener.
+	MAUtil::Environment::getEnvironment().removeKeyListener(this);
+
 	// Set the progress bar to it's max value.
 	setWidgetProperty(
 		mProgressBar,MAW_PROGRESS_BAR_PROGRESS, PROGRESS_BAR_MAX_VALUE);
@@ -426,6 +432,20 @@ void HomeScreen::engineError(MAUtil::String errorMessage)
 void HomeScreen::engineNrSteps(int nrSteps)
 {
 	mSteps = nrSteps;
+}
+
+/**
+ * From KeyListener.
+ * This function is called with a \link #MAK_FIRST MAK_ code \endlink when
+ * a key is pressed.
+ */
+void HomeScreen::keyPressEvent(int keyCode, int nativeCode)
+{
+    // Close the application if the back key is pressed.
+    if(MAK_BACK == keyCode)
+    {
+        WikiMoblet::getInstance()->closeEvent();
+    }
 }
 
 /**

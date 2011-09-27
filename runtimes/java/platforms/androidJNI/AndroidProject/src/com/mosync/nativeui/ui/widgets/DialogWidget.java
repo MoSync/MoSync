@@ -18,13 +18,10 @@ MA 02110-1301, USA.
 package com.mosync.nativeui.ui.widgets;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
-import android.content.DialogInterface;
 import android.view.ViewGroup;
 
-
-import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.generated.IX_WIDGET;
+import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -43,11 +40,6 @@ public class DialogWidget extends Layout
 	 */
 	private AlertDialog m_dialog;
 	private AlertDialog.Builder m_dialogBuilder;
-
-	/**
-	 * The widget handle of this view.
-	 */
-	private int m_handle;
 
 	/**
 	 * The container layout.
@@ -70,8 +62,8 @@ public class DialogWidget extends Layout
 		super( handle, view );
 		m_dialogBuilder = builder;
 		m_dialog = m_dialogBuilder.create();
+		m_dialog.setCancelable(false);
 		m_container = view;
-		m_handle = handle;
 	}
 
 	public void show()
@@ -146,43 +138,29 @@ public class DialogWidget extends Layout
 	public boolean setProperty(String property, String value)
 			throws PropertyConversionException, InvalidPropertyValueException
 	{
-		if( property.equals( IX_WIDGET.MAW_DIALOG_TITLE ) )
+		if( property.equals( IX_WIDGET.MAW_MODAL_DIALOG_TITLE ) )
 		{
 			m_title = value;
 			m_dialog.setTitle(value);
 		}
-		else if ( property.equals( IX_WIDGET.MAW_DIALOG_LEFT_BUTTON_TITLE ) )
-		{
-			if ( value.length() > 0 )
-			{
-				m_dialog.setCancelable(true);
-
-				m_dialog.setButton(Dialog.BUTTON_NEGATIVE, value, new DialogInterface.OnClickListener() {
-
-					@Override
-					public void onClick(DialogInterface dialog, int position) {
-						EventQueue.getDefault().postDialogButtonClicked(m_handle, 0);
-
-					}
-				});
-			}
-			else
-			{
-				m_dialog.setCancelable(false);
-			}
-		}
-		else if ( property.equals( IX_WIDGET.MAW_DIALOG_RIGHT_BUTTON_TITLE ) )
-		{
-			m_dialog.setButton(Dialog.BUTTON_POSITIVE, value, new DialogInterface.OnClickListener() {
-
-				@Override
-				public void onClick(DialogInterface dialog, int position) {
-					EventQueue.getDefault().postDialogButtonClicked(m_handle, 1);
-
-				}
-			});
-		}
 		// Do not get any other properties besides those ones.
+		// Because the size and the position of a dialog cannot be set.
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_BACKGROUND_GRADIENT ) )
+		{
+			super.setProperty(property, value);
+		}
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_ALPHA ) )
+		{
+			super.setProperty(property, value);
+		}
+		else if ( property.equals( IX_WIDGET.MAW_WIDGET_BACKGROUND_COLOR ) )
+		{
+			super.setProperty(property, value);
+		}
+		else if ( property.equals(  Types.BACKGROUND_IMAGE ) )
+		{
+			super.setProperty(property, value);
+		}
 		else
 		{
 			return false;
@@ -198,7 +176,7 @@ public class DialogWidget extends Layout
 	public String getProperty(String property)
 	{
 		// Get only those properties.
-		if( property.equals( IX_WIDGET.MAW_DIALOG_TITLE ) )
+		if( property.equals( IX_WIDGET.MAW_MODAL_DIALOG_TITLE ) )
 		{
 			return m_title;
 		}
