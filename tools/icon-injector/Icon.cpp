@@ -27,12 +27,12 @@ namespace MoSync {
 
 static int Depth = 0;
 static Icon* retIcon = 0;
-	
+
 static void start(void *data, const char *el, const char **attr) {
   int i;
 
   if(!strcmp(el, "icon")) {
-	  printf("We have an icon!");
+	  //printf("We have an icon!");
 	  retIcon = new Icon();
   }
 
@@ -51,7 +51,7 @@ static void start(void *data, const char *el, const char **attr) {
 	  retIcon->addInstance(size, src);
   }
 
-  printf("\n");
+  //printf("\n");
   Depth++;
 }  /* End of start handler */
 
@@ -75,19 +75,19 @@ static void end(void *data, const char *el) {
 		XML_Parser parser = XML_ParserCreate(NULL);
 		XML_SetUserData(parser, &depth);
 		XML_SetElementHandler(parser, start, end);
-		printf("about to parse...\n");
-		
+		//printf("about to parse...\n");
+
 		do {
 			/*get a piece of input into the buffer
 			done = whether this bufferful is the last bufferful */
 			len = fread(buf, 1, 1024, f);
 			if (!XML_Parse(parser, buf, (int)len, done)) {
 			  //handle parse error
-				errorExit("XML parsing failed");		
+				errorExit("XML parsing failed");
 			}
 			//ïf(len <= 0) done = true;
 		} while (!feof(f));
-		printf("parsed\n");
+		//printf("parsed\n");
 		XML_ParserFree(parser);
 
 		string absolutePath = getAbsolutePath(filename);
