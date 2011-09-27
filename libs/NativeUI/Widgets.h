@@ -36,7 +36,6 @@ MA 02110-1301, USA.
 #include "DatePicker.h"
 #include "DatePickerListener.h"
 #include "Dialog.h"
-#include "DialogListener.h"
 #include "EditBox.h"
 #include "EditBoxListener.h"
 #include "GLView.h"

@@ -340,6 +340,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.status = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_ALERT)
+	{
+		event.alertButtonIndex = intArray[1];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*
@@ -403,9 +407,6 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 *
 		 * MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED
 		 * intArray[3] - The index of the clicked button in the list of options.
-		 *
-		 * MAW_EVENT_DIALOG_BUTTON_CLICKED
-		 * intArray[3] - The index of the clicked button in the dialog.
 		 *
 		 */
 
@@ -471,10 +472,6 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		else if (widgetEventType == MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED)
 		{
 			widgetEvent->optionDialogButtonIndex = intArray[3];
-		}
-		else if (widgetEventType == MAW_EVENT_DIALOG_BUTTON_CLICKED)
-		{
-			widgetEvent->dialogButtonIndex = intArray[3];
 		}
 
 		event.data = (int)widgetEvent;

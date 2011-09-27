@@ -1333,6 +1333,12 @@ interface MAAPI {
 		* \see maSensorStart()
 		*/
 		SENSOR = 33;
+
+		/**
+		* \bried The maAlert message box was dismissed by one of the available buttons.
+		* See #EVENT_TYPE_ALERT for the event.
+		*/
+		ALERT = 34;
 	}
 
 	/**
@@ -1427,6 +1433,11 @@ interface MAAPI {
 				*/
 				MAHandle imagePickerItem;
 			} imagePicker;
+
+			/**
+			* #EVENT_TYPE_ALERT event. The index of the selected button.
+			*/
+			int alertButtonIndex;
 
 			/**
 			* In #EVENT_TYPE_SMS events, this will be one of the
@@ -3761,13 +3772,6 @@ group WidgetAPI "Widget API" {
 			* Send by the OptionDialog view when a #MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED event is received.
 			*/
 			int optionDialogButtonIndex;
-
-			/**
-			* Send by the Dialog widget when a #MAW_EVENT_DIALOG_BUTTON_CLICKED event is received.
-			* If index is 0 that means that the left button was clicked.
-			* If index is 1 than the right button was clicked.
-			*/
-			int dialogButtonIndex;
 		}
 	}
 
@@ -3916,11 +3920,6 @@ group WidgetAPI "Widget API" {
 		* Send by OptionDialog view when a button is clicked.
 		*/
 		OPTION_DIALOG_BUTTON_CLICKED = 22;
-
-		/**
-		* Send by a Dialog widget when one of the two buttons(left/right) are clicked.
-		*/
-		DIALOG_BUTTON_CLICKED = 23;
 	}
 
 	} // end of WidgetEventTypes
@@ -4346,14 +4345,14 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief A dialog is a sort of modal view, that can look different depending on the platform.
-		* A Dialog gets visible only after calling maWidgetDialogShow().
+		* A Dialog gets visible only after calling maWidgetModalDialogShow().
 		* On Android it is a modal alert dialog.
-		* On iPad it is a PopoverController, and on iPhone it is a view.
+		* On iPad it is a PopoverController, and on iPhone it is a modal view.
 		* When a Dialog widget is created it is empty, it has no content. Any type of widget can be added inside it via #maWidgetAddChild syscalls.
-		* To show a Dialog call #maWidgetDialogShow(dialogHandle), to dismiss it call: #maWidgetDialogHide(dialogHandle), and to delete it call #maWidgetDestroy.
-		* See \ref WidgetDialogProperties "Dialog properties" for the properties available.
+		* To show a Dialog call #maWidgetModalDialogShow(dialogHandle), to dismiss it call: #maWidgetModalDialogHide(dialogHandle), and to delete it call #maWidgetDestroy.
+		* See \ref WidgetModalDialogProperties "Modal Dialog properties" for the properties available.
 		*/
-		DIALOG = "Dialog";
+		MODAL_DIALOG = "ModalDialog";
 	}
 	} // end of WidgetTypes
 
@@ -6301,61 +6300,25 @@ group WidgetAPI "Widget API" {
 	} // end of WidgetNavBarProperties
 
 	/**
-	* The available widget properties for a #MAW_DIALOG. See \ref WidgetProperties "Widget properties" for more properties.
+	* The available widget properties for a #MAW_MODAL_DIALOG. See \ref WidgetProperties "Widget properties" for more properties.
 	*/
-	group WidgetDialogProperties "Dialog properties" {
-	constset MAString MAW_DIALOG_ {
+	group WidgetModalDialogProperties "Modal Dialog properties" {
+	constset MAString MAW_MODAL_DIALOG_ {
 		/**
 		* @brief Sets or gets the title.
-		*
+		* If the property receives am empty string then the title bar becomes invisible.
 		* @validvalue A null-terminated string.
 		*
 		* @setandget
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_TITLE, "MyDialog");
+        *   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_TITLE, "MyDialog");
 		* \endcode
 		*/
 		TITLE = "title";
-
-		/**
-		* @brief Sets the text for the left side button.
-		* Note: it is available on Android only.
-		* This button is located at the bottom and it indicates a positive action, like Done/OK.
-		* The dialog gets hidden after this button is clicked.
-		* If the property receives am empty string then the button becomes invisible.
-		*
-		* @validvalue A null-terminated string.
-		*
-		* @setonly
-		*
-		* @par Example
-		* \code
-        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_LEFT_BUTTON_TITLE, "Done");
-		* \endcode
-		*/
-		LEFT_BUTTON_TITLE = "leftButtonTitle";
-
-		/**
-		* @brief Sets the text for the right side button.
-		* Note: it is available on Android only.
-		* This button is located at the bottom and it indicates a negative action, like Cancel.
-		* The dialog gets hidden after this button is clicked.
-		* If the property receives am empty string then the button becomes invisible.
-		*
-		* @validvalue A null-terminated string.
-		*
-		* @setonly
-		*
-		* @par Example
-		* \code
-        *   maWidgetSetProperty(dialogHandle, MAW_DIALOG_RIGHT_BUTTON_TITLE, "Cancel");
-		* \endcode
-		*/
-		RIGHT_BUTTON_TITLE = "rightButtonTitle";
 	}
-	} // end of WidgetDialogProperties
+	} // end of WidgetmodalDialogProperties
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;
@@ -6407,6 +6370,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_OK if the child could be added to the parent.
 	* - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
 	* - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+	* - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a modal dialog.
 	* - #MAW_RES_ERROR if it could not be added for some other reason.
 	*/
 	int maWidgetAddChild(in MAWidgetHandle parent, in MAWidgetHandle child);
@@ -6424,6 +6388,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
 	* - #MAW_RES_INVALID_INDEX if the index was out of bounds.
 	* - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+	* - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a modal dialog.
 	* - #MAW_RES_ERROR if it could not be added for some other reason.
 	*/
 	int maWidgetInsertChild(in MAWidgetHandle parent, in MAWidgetHandle child, in int index);
@@ -6448,7 +6413,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_ERROR otherwise.
 	*/
-	int maWidgetDialogShow(in MAWidgetHandle dialog);
+	int maWidgetModalDialogShow(in MAWidgetHandle dialog);
 
 	/**
 	* Hides/Dismisses a currently displayed dialog.
@@ -6459,7 +6424,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_ERROR otherwise.
 	*/
-	int maWidgetDialogHide(in MAWidgetHandle dialog);
+	int maWidgetModalDialogHide(in MAWidgetHandle dialog);
 
 	/**
 	* Shows a screen. If native UI hasn't been initialized, it is also initialized
@@ -7081,7 +7046,8 @@ group CameraFunctions "Camera Functions" {
 		void maReportResourceInformation();
 
 		/**
-		 * Displays a message to the user
+		 * @deprecated use #maAlert instead.
+		 * Displays a message to the user.
 		 * \param title The title of the message box shown
 		 * \param message The message should be short, not more than 40 characters,
 		 * to ensure its visibility on all screen sizes.
@@ -7089,9 +7055,23 @@ group CameraFunctions "Camera Functions" {
 		void maMessageBox(in MAString title, in MAString message);
 
 		/**
+		* Displays a message to the user.
+		* It contains optional title, message and 3 buttons for selection.
+		* On Android the buttons point to a positive, negative or neutral action.
+		* When a selection is made a #MAW_EVENT_TYPE_ALERT event is sent with the button index.
+		* \param title The title of the message box shown.
+		* \param message The message should be short, not more than 40 characters,
+		* to ensure its visibility on all screen sizes.
+		* \button1 The text on the first button.
+		* \button2 The text on the second button.
+		* \button3 The text on the third button.
+		*/
+		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
+
+		/**
 		* Displays an image picker to the user.
 		* It's display depends on the platform.
-		* Note: when a selection is made a #MAW_EVENT_TYPE_IMAGE_PICKER is sent.
+		* Note: when a selection is made a #EVENT_TYPE_IMAGE_PICKER event is sent.
 		*/
 		void maImagePickerOpen();
 

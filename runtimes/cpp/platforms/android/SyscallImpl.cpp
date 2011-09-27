@@ -1647,13 +1647,13 @@ return 0; \
 			SYSLOG("maIOCtl_maWidgetRemoveChild");
 			return _maWidgetRemoveChild(a, mJNIEnv, mJThis);
 
-		case maIOCtl_maWidgetDialogShow:
-			SYSLOG("maIOCtl_maWidgetDialogShow");
-			return _maWidgetDialogShow(a, mJNIEnv, mJThis);
+		case maIOCtl_maWidgetModalDialogShow:
+			SYSLOG("maIOCtl_maWidgetModalDialogShow");
+			return _maWidgetModalDialogShow(a, mJNIEnv, mJThis);
 
-		case maIOCtl_maWidgetDialogHide:
-			SYSLOG("maIOCtl_maWidgetDialogHide");
-			return _maWidgetDialogHide(a, mJNIEnv, mJThis);
+		case maIOCtl_maWidgetModalDialogHide:
+			SYSLOG("maIOCtl_maWidgetModalDialogHide");
+			return _maWidgetModalDialogHide(a, mJNIEnv, mJThis);
 
 		case maIOCtl_maWidgetSetProperty:
 			SYSLOG("maIOCtl_maWidgetSetProperty");
@@ -1757,6 +1757,19 @@ return 0; \
 			return _maMessageBox(
 				SYSCALL_THIS->GetValidatedStr(a),
 				SYSCALL_THIS->GetValidatedStr(b),
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maAlert:
+			SYSLOG("maIOCtl_maAlert");
+			return _maAlert(
+				SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b),
+				SYSCALL_THIS->GetValidatedStr(c),
+				SYSCALL_THIS->GetValidatedStr(
+					SYSCALL_THIS->GetValidatedStackValue(0)),
+				SYSCALL_THIS->GetValidatedStr(
+					SYSCALL_THIS->GetValidatedStackValue(4)),
 				mJNIEnv,
 				mJThis);
 

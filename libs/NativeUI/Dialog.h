@@ -25,17 +25,16 @@ MA 02110-1301, USA.
  * A dialog is a sort of modal view, that can look different depending on
  * the platform:
  *  - On Android it is a modal alert dialog.
- *  - On iPad it is a PopoverController, and on iPhone it is a view.
+ *  - On iPad it is a PopoverController, and on iPhone it is a modal view.
  *
  * When a Dialog widget is created it is empty, it has no content.
  * Use setMainWidget(widget) to set the main widget of the dialog.
- * Besides the containing widgets, the Dialog can have two buttons on Android:
- *  - one left button that points to a Ready state.
- *  - one right button that points to a Cancel state.
- *  Those buttons are visible on the bottom of the dialog.
  *
  * A Dialog gets visible only after calling show() method.
  * To show a Dialog call show(), to hide it call: hide().
+ *
+ * Note that on Android setting widget specific properties has effects only in
+ * the dialog content(that is in fact the main widget), and not on the title bar.
  */
 
 #ifndef NATIVEUI_DIALOG_H_
@@ -46,7 +45,6 @@ MA 02110-1301, USA.
 namespace NativeUI
 {
 
-	class DialogListener;
 
 	/**
 	 * \brief Class that represents a modal dialog.
@@ -70,28 +68,6 @@ namespace NativeUI
 		 * @param title The dialog title.
 		 */
 		virtual void setTitle(const MAUtil::String& title);
-
-		/**
-		 * Sets the text for the left side button.
-		 * Note: it is available on Android only.
-		 * This button is located at the bottom and it indicates a positive
-		 * action, like Done/OK.
-		 * The dialog gets hidden after this button is clicked.
-		 * If the property receives am empty string then the button becomes
-		 * invisible.
-		 */
-		virtual void setLeftButtonTitle(const MAUtil::String& title);
-
-		/**
-		 * Sets the text for the right side button.
-		 * Note: it is available on Android only.
-		 * This button is located at the bottom and it indicates a cancel
-		 * action.
-		 * The dialog gets hidden after this button is clicked.
-		 * If the property receives am empty string then the button becomes
-		 * invisible.
-		 */
-		virtual void setRightButtonTitle(const MAUtil::String& title);
 
 		/**
 		 * Set the main widget of the dialog.
@@ -118,32 +94,6 @@ namespace NativeUI
 		 * Hides a dialog if it is visible.
 		 */
 		virtual void hide();
-
-        /**
-         * Add an dialog event listener.
-         * @param listener The listener that will receive dialog events.
-         */
-        virtual void addDialogListener(DialogListener* listener);
-
-        /**
-         * Remove the dialog listener.
-         * @param listener The listener that receives dialog events.
-         */
-        virtual void removeDialogListener(DialogListener* listener);
-
-    protected:
-        /**
-         * This method is called when there is an event for this widget.
-         * It passes on the event to all widget's listeners.
-         * @param widgetEventData The data for the widget event.
-         */
-        virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
-
-    private:
-        /**
-         * Array with dialog listeners.
-         */
-        MAUtil::Vector<DialogListener*> mDialogListeners;
 	};
 
 } // namespace NativeUI
