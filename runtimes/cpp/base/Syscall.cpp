@@ -1203,11 +1203,11 @@ namespace Base {
 		if(isDirectory((sFileListRealDir + fn).c_str())) {
 			fn += "/";
 		}
-#ifdef _WIN32_WCE
-		sFileList.files.push_back(fn);
-#else
 		struct FileListItem fli;
 		fli.name = fn;
+#ifdef _WIN32_WCE
+		sFileList.files.push_back(fli);
+#else
 		fli.sorting = sFileListSorting;
 		if(sFileListSorting == MA_FL_SORT_NONE)
 			// hack: we store an ordinal in st_ino.
@@ -1271,14 +1271,16 @@ namespace Base {
 		sFileList.files.clear();
 		if(path[0] == 0) {	//empty string
 			//list filesystem roots
-#ifdef _WIN32_WCE
-			sFileList.files.push_back("/");
-#elif FILESYSTEM_CHROOT || defined(LINUX) || defined(__IPHONE__)
+#if FILESYSTEM_CHROOT || defined(LINUX) || defined(__IPHONE__) || defined(_WIN32_WCE)
 			FileListItem fli;
 			fli.name = "/";
+#ifdef _WIN32_WCE
+			sFileList.files.push_back(fli);
+#else
 			fli.sorting = MA_FL_SORT_NONE;
 			sFileList.files.insert(fli);
-#else
+#endif	//_WIN32_WCE
+#else	//FILESYSTEM_CHROOT
 #ifdef WIN32
 			DWORD res = GetLogicalDrives();
 			GLE(res);
