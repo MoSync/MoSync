@@ -121,6 +121,7 @@ public class MoSyncNFC {
 	class IOHandler implements Runnable {
 		private Handler handler;
 		private Looper looper;
+		private boolean started;
 
 		IOHandler() {
 
@@ -139,18 +140,20 @@ public class MoSyncNFC {
 			});
 		}
 
-		public void start() {
-			if (looper == null) {
+		public synchronized void start() {
+			if (!started) {
 				Thread thread = new Thread(this);
 				thread.start();
 			}
+			started = true;
 		}
 
-		public void stop() {
+		public synchronized void stop() {
 			if (looper != null) {
 				looper.quit();
 				looper = null;
 			}
+			started = false;
 		}
 
 		@Override

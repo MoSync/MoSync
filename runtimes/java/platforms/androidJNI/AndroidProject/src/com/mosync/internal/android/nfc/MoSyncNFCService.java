@@ -30,8 +30,10 @@ public class MoSyncNFCService extends IntentService {
 			return null;
 		}
 	}
+
 	/**
 	 * Handles an NFC intent
+	 *
 	 * @param context
 	 * @param intent
 	 * @return {@code true} If the intent was an NFC intent and handled.
@@ -43,24 +45,21 @@ public class MoSyncNFCService extends IntentService {
 			return false;
 		}
 
-		// ACTION_NDEF_DISCOVERED NOT YET SUPPORTED (because it complicates the APIs a bit)
+		// ACTION_NDEF_DISCOVERED NOT YET SUPPORTED (because it complicates the
+		// APIs a bit)
 		// Uncomment later if needed.
-		/*if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
-			// If an NDEF tag is discovered, go ahead...
-			// (the androidManifest.xml contains filters
-			// for MIME/URI of the NDEF tag.)
-			Parcelable[] rawMsgs = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
-			NdefMessage[] msgs;
-			if (rawMsgs != null) {
-				msgs = new NdefMessage[rawMsgs.length];
-				for (int i = 0; i < rawMsgs.length; i++) {
-					msgs[i] = (NdefMessage) rawMsgs[i];
-				}
-				nfcContext.handleMessages(msgs);
-				activateMoSyncApp(context);
-				return true;
-			}
-		} else*/ if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action) || NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)) {
+		/*
+		 * if (NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) { // If an NDEF
+		 * tag is discovered, go ahead... // (the androidManifest.xml contains
+		 * filters // for MIME/URI of the NDEF tag.) Parcelable[] rawMsgs =
+		 * intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES);
+		 * NdefMessage[] msgs; if (rawMsgs != null) { msgs = new
+		 * NdefMessage[rawMsgs.length]; for (int i = 0; i < rawMsgs.length; i++)
+		 * { msgs[i] = (NdefMessage) rawMsgs[i]; }
+		 * nfcContext.handleMessages(msgs); activateMoSyncApp(context); return
+		 * true; } } else
+		 */if (NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
+				|| NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)) {
 			// Or, we have some specific tag technology such as MIFARE
 			// (also filtered in the androidManifest.xml)
 			Tag tag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
@@ -74,10 +73,9 @@ public class MoSyncNFCService extends IntentService {
 
 	private static void activateMoSyncApp(Context context) {
 		Intent launcherIntent = new Intent(context, MoSync.class);
-		launcherIntent.addFlags(
-			Intent.FLAG_ACTIVITY_NEW_TASK |
-			Intent.FLAG_ACTIVITY_REORDER_TO_FRONT |
-			Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		launcherIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+				| Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+				| Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		context.startActivity(launcherIntent);
 	}
 

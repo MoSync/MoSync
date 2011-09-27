@@ -27,7 +27,7 @@ public class NdefTag extends NFCTagBase<Ndef> implements INDEFMessageHolder {
 		if (cachedNDEFMessage != null) {
 			cachedNDEFMessage.destroy(pool);
 		}
-		cachedNDEFMessage = new NDEFMessage(pool, newMessage);
+		cachedNDEFMessage = newMessage == null ? null : new NDEFMessage(pool, newMessage);
 	}
 
 	private NdefTag(ResourcePool pool, Ndef ndef) {
