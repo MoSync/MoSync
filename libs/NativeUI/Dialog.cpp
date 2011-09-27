@@ -29,17 +29,12 @@ MA 02110-1301, USA.
  *
  * When a Dialog widget is created it is empty, it has no content.
  * Use setMainWidget(widget) to set the main widget of the dialog.
- * Besides the containing widgets, the Dialog can have two buttons on Android:
- *  - one left button that points to a Ready state.
- *  - one right button that points to a Cancel state.
- *  Those buttons are visible on the bottom of the dialog.
  *
  * A Dialog gets visible only after calling show() method.
  * To show a Dialog call show(), to hide it call: hide().
  */
 
 #include "Dialog.h"
-#include "DialogListener.h"
 
 namespace NativeUI
 {
@@ -48,7 +43,7 @@ namespace NativeUI
 	 * Constructor.
 	 */
 	Dialog::Dialog() :
-		Widget(MAW_DIALOG)
+		Widget(MAW_MODAL_DIALOG)
 	{
 	}
 
@@ -66,35 +61,7 @@ namespace NativeUI
 	 */
 	void Dialog::setTitle(const MAUtil::String& title)
 	{
-		setProperty(MAW_DIALOG_TITLE, title.c_str());
-	}
-
-	/**
-	 * Sets the text for the left side button.
-	 * Note: it is available on Android only.
-	 * This button is located at the bottom and it indicates a positive
-	 * action, like Done/OK.
-	 * The dialog gets hidden after this button is clicked.
-	 * If the property receives am empty string then the button becomes
-	 * invisible.
-	 */
-	void Dialog::setLeftButtonTitle(const MAUtil::String& title)
-	{
-		setProperty(MAW_DIALOG_LEFT_BUTTON_TITLE, title);
-	}
-
-	/**
-	 * Sets the text for the right side button.
-	 * Note: it is available on Android only.
-	 * This button is located at the bottom and it indicates a cancel
-	 * action.
-	 * The dialog gets hidden after this button is clicked.
-	 * If the property receives am empty string then the button becomes
-	 * invisible.
-	 */
-	void Dialog::setRightButtonTitle(const MAUtil::String& title)
-	{
-		setProperty(MAW_DIALOG_RIGHT_BUTTON_TITLE, title);
+		setProperty(MAW_MODAL_DIALOG_TITLE, title.c_str());
 	}
 
 	/**
@@ -127,7 +94,7 @@ namespace NativeUI
 	 */
 	void Dialog::show()
 	{
-		maWidgetDialogShow(getWidgetHandle());
+		maWidgetModalDialogShow(getWidgetHandle());
 	}
 
 	/**
@@ -135,53 +102,7 @@ namespace NativeUI
 	 */
 	void Dialog::hide()
 	{
-		maWidgetDialogHide(getWidgetHandle());
+		maWidgetModalDialogHide(getWidgetHandle());
 	}
-
-    /**
-     * Add an dialog event listener.
-     * @param listener The listener that will receive dialog events.
-     */
-    void Dialog::addDialogListener(DialogListener* listener)
-    {
-        addListenerToVector(mDialogListeners, listener);
-    }
-
-    /**
-     * Remove the dialog listener.
-     * @param listener The listener that receives dialog events.
-     */
-    void Dialog::removeDialogListener(DialogListener* listener)
-    {
-        removeListenerFromVector(mDialogListeners, listener);
-    }
-
-    /**
-     * This method is called when there is an event for this widget.
-     * It passes on the event to all widget's listeners.
-     * @param widgetEventData The data for the widget event.
-     */
-    void Dialog::handleWidgetEvent(MAWidgetEventData* widgetEventData)
-    {
-        Widget::handleWidgetEvent(widgetEventData);
-
-        if (MAW_EVENT_DIALOG_BUTTON_CLICKED == widgetEventData->eventType)
-        {
-			if ( widgetEventData->dialogButtonIndex == 0 )
-			{
-				for (int i=0; i < mDialogListeners.size(); i++)
-				{
-				mDialogListeners[i]->dialogLeftButtonClicked(this);
-				}
-			}
-			else if ( widgetEventData->dialogButtonIndex == 1 )
-			{
-				for (int i=0; i < mDialogListeners.size(); i++)
-				{
-					mDialogListeners[i]->dialogRightButtonClicked(this);
-				}
-			}
-        }
-    }
 
 } // namespace NativeUI
