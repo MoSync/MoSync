@@ -25,6 +25,7 @@ build-one.rb
 /libs/yasper
 /libs/SDL
 /libs/yajl/
+/libs/stlport/
 
 /intlibs/gsm_amr
 /intlibs/sqlite
