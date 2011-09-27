@@ -48,198 +48,99 @@ MA 02110-1301, USA.
  * your loved one. ;-)
  */
 
-#include <ma.h>				// MoSync API (base API).
-#include <maheap.h>			// C memory allocation functions.
-#include <mastring.h>		// C String functions.
-#include <mavsprintf.h>		// sprintf etc.
-#include <MAUtil/String.h>	// Class String.
-#include <IX_WIDGET.h>		// Widget API.
-#include <conprint.h>		// Debug logging, must build in debug mode
-							// for log messages to display.
-#include "MAHeaders.h"		// Resource identifiers, not a physical file.
-#include "WebViewUtil.h"	// Classes Platform and WebViewMessage.
+#include <ma.h>						// MoSync API (base API).
+#include <maheap.h>					// C memory allocation functions.
+#include <mastring.h>				// C String functions.
+#include <mavsprintf.h>				// sprintf etc.
+#include <NativeUI/WebAppMoblet.h>	// Moblet for web applications.
 
-using namespace MoSync;
+using namespace MAUtil;
+using namespace NativeUI;
 
-// Set to true to actually send SMS.
-// You can turn off SMS sending during debugging
-// by setting this variable to false.
-static bool G_SendSMSForReal = true;
+/**
+ * Set to true to actually send SMS.
+ * You can turn off SMS sending during debugging
+ * by setting this variable to false.
+ */
+static bool sSendSMSForReal = false;
+
+// Forward declaration.
+class LoveSMSWebViewListener;
 
 /**
  * The application class.
  */
-class WebViewLoveSMSApp
+class LoveSMSMoblet : public WebAppMoblet
 {
-private:
-	MAWidgetHandle mScreen;
-	MAWidgetHandle mWebView;
-	Platform* mPlatform;
-	MAUtil::String mLoveMessage;
-	MAUtil::String mKissMessage;
-
 public:
-	WebViewLoveSMSApp()
+	LoveSMSMoblet()
 	{
-		mPlatform = Platform::create();
-		createUI();
+		getWebView()->disableZoom();
+		showPage("PageMain.html");
 	}
 
-	virtual ~WebViewLoveSMSApp()
+	/**
+	 * SMS events are handled as custom events in the moblet.
+	 */
+	void customEvent(const MAEvent& event)
 	{
-		destroyUI();
-	}
-
-	void createUI()
-	{
-		// Create the screen that will hold the web view.
-		mScreen = maWidgetCreate(MAW_SCREEN);
-		widgetShouldBeValid(mScreen, "Could not create screen");
-
-		// Create the web view.
-		mWebView = createWebView();
-
-		// We need to write the HTML/Media files to the application's
-		// local storage directory. The WebView will load the files
-		// from that location.
-
-		// Write the main page.
-		mPlatform->writeTextToFile(
-			mPlatform->getLocalPath() + "PageMain.html",
-			mPlatform->createTextFromHandle(PageMain_html));
-
-		// Write the background image file.
-		mPlatform->writeDataToFile(
-			mPlatform->getLocalPath() + "amor128x128.png",
-			amor128x128_png);
-
-		// Now we set the main page. This will load the page
-		// we saved, which in turn will load the background icon.
-		maWidgetSetProperty(mWebView, "url", "PageMain.html");
-
-		// Add the web view to the screen.
-		maWidgetAddChild(mScreen, mWebView);
-
-		// Show the screen.
-		maWidgetScreenShow(mScreen);
-	}
-
-	MAWidgetHandle createWebView()
-	{
-		// Create web view
-		MAWidgetHandle webView = maWidgetCreate(MAW_WEB_VIEW);
-		widgetShouldBeValid(webView, "Could not create web view");
-
-		// Set size of web view to fill the parent.
-		maWidgetSetProperty(webView, "width", "-1");
-		maWidgetSetProperty(webView, "height", "-1");
-
-		// Disable zooming to make page display in readable size
-		// on all devices.
-		maWidgetSetProperty(webView, "enableZoom", "false");
-
-		// Register a handler for JavaScript messages.
-		WebViewMessage::getMessagesFor(webView);
-
-		return webView;
-	}
-
-	void destroyUI()
-	{
-		maWidgetDestroy(mScreen);
-		delete mPlatform;
-	}
-
-	void runEventLoop()
-	{
-		MAEvent event;
-
-		bool isRunning = true;
-		while (isRunning)
+		switch (event.type)
 		{
-			maWait(0);
-			maGetEvent(&event);
-			switch (event.type)
-			{
-				case EVENT_TYPE_CLOSE:
-					isRunning = false;
-					break;
-
-				case EVENT_TYPE_KEY_PRESSED:
-					if (event.key == MAK_BACK)
-					{
-						isRunning = false;
-					}
-					break;
-
-				case EVENT_TYPE_WIDGET:
-					handleWidgetEvent((MAWidgetEventData*) event.data);
-					break;
-
-				case EVENT_TYPE_SMS:
-					// Depending on the event status, we call
-					// different JavaScript functions. These are
-					// currently hard-coded, but could be passed
-					// as parameters to decouple the JavaScript
-					// code from the C++ code.
-					if (MA_SMS_RESULT_SENT == event.status)
-					{
-						callJSFunction("SMSSent");
-					}
-					else if (MA_SMS_RESULT_NOT_SENT == event.status)
-					{
-						callJSFunction("SMSNotSent");
-					}
-					else if (MA_SMS_RESULT_DELIVERED == event.status)
-					{
-						callJSFunction("SMSDelivered");
-					}
-					else if (MA_SMS_RESULT_NOT_DELIVERED == event.status)
-					{
-						callJSFunction("SMSNotDelivered");
-					}
-					break;
-			}
+			case EVENT_TYPE_SMS:
+				// Depending on the event status, we call
+				// different JavaScript functions. These are
+				// currently hard-coded, but could be passed
+				// as parameters to decouple the JavaScript
+				// code from the C++ code.
+				if (MA_SMS_RESULT_SENT == event.status)
+				{
+					callJSFunction("SMSSent");
+				}
+				else if (MA_SMS_RESULT_NOT_SENT == event.status)
+				{
+					callJSFunction("SMSNotSent");
+				}
+				else if (MA_SMS_RESULT_DELIVERED == event.status)
+				{
+					callJSFunction("SMSDelivered");
+				}
+				else if (MA_SMS_RESULT_NOT_DELIVERED == event.status)
+				{
+					callJSFunction("SMSNotDelivered");
+				}
+				break;
 		}
 	}
 
-	void handleWidgetEvent(MAWidgetEventData* widgetEvent)
+	/**
+	 * Here we handle messages sent from JavaScript.
+	 */
+	void handleWebViewMessage(WebView* webView, WebViewMessage& message)
 	{
-		// Handle messages from the WebView widget.
-		if (MAW_EVENT_WEB_VIEW_HOOK_INVOKED == widgetEvent->eventType &&
-			MAW_CONSTANT_HARD == widgetEvent->hookType)
+		if (message.is("SendSMS"))
 		{
-			// Get message.
-			WebViewMessage message(widgetEvent->urlData);
-
-			if (message.is("SendSMS"))
-			{
-				// Save phone no and send SMS.
-				savePhoneNoAndSendSMS(
-					message.getParam(0),
-					message.getParam(1));
-			}
-			else if (message.is("PageLoaded"))
-			{
-				// Load and set saved phone number.
-				// We could implement a JavaScript File API to do
-				// this, which would be a much more general way.
-				setSavedPhoneNo();
-			}
+			// Save phone no and send SMS.
+			savePhoneNoAndSendSMS(
+				message.getParam("phoneNo"),
+				message.getParam("message"));
+		}
+		else if (message.is("PageLoaded"))
+		{
+			// Load and set saved phone number.
+			// We could implement a JavaScript File API to do
+			// this, which would be a much more general way.
+			setSavedPhoneNo();
 		}
 	}
 
 	void savePhoneNoAndSendSMS(
-		const MAUtil::String& phoneNo,
-		const MAUtil::String&  message)
+		const String& phoneNo,
+		const String&  message)
 	{
-		lprintfln("*** SMS to: %s\n", phoneNo.c_str());
-		lprintfln("*** SMS data: %s\n", message.c_str());
-
 		// Save the phone number.
 		savePhoneNo(phoneNo);
 
-		if (G_SendSMSForReal)
+		if (sSendSMSForReal)
 		{
 			// Send the message.
 			int result = maSendTextSMS(
@@ -259,26 +160,6 @@ public:
 	}
 
 	/**
-	 * Call a JavaScript function.
-	 */
-	void callJSFunction(const MAUtil::String& fun)
-	{
-		char code[512];
-		sprintf(code, "%s()", fun.c_str());
-		callJS(code);
-	}
-
-	/**
-	 * Run JavaScript code.
-	 */
-	void callJS(const MAUtil::String& code)
-	{
-		char script[512];
-		sprintf(script, "javascript:%s", code.c_str());
-		maWidgetSetProperty(mWebView, "url", script);
-	}
-
-	/**
 	 * Read saved phone number and set it on
 	 * the JavaScript side.
 	 */
@@ -287,26 +168,26 @@ public:
 		char script[512];
 		sprintf(
 			script,
-			"javascript:SetPhoneNo('%s')",
+			"SetPhoneNo('%s')",
 			loadPhoneNo().c_str());
-		maWidgetSetProperty(mWebView, "url", script);
+		callJS(script);
 	}
 
 	/**
 	 * Save the phone number.
 	 */
-	void savePhoneNo(const MAUtil::String& phoneNo)
+	void savePhoneNo(const String& phoneNo)
 	{
-		mPlatform->writeTextToFile(phoneNoPath(), phoneNo);
+		getFileUtil()->writeTextToFile(phoneNoPath(), phoneNo);
 	}
 
 	/**
 	 * Load the phone number.
 	 */
-	MAUtil::String loadPhoneNo()
+	String loadPhoneNo()
 	{
 		MAUtil::String phoneNo;
-		bool success = mPlatform->readTextFromFile(phoneNoPath(), phoneNo);
+		bool success = getFileUtil()->readTextFromFile(phoneNoPath(), phoneNo);
 		if (success)
 		{
 			return phoneNo;
@@ -317,27 +198,30 @@ public:
 		}
 	}
 
-	MAUtil::String phoneNoPath()
+	String phoneNoPath()
 	{
-		return mPlatform->getLocalPath() + "SavedPhoneNo";
+		return getFileUtil()->getLocalPath() + "SavedPhoneNo";
 	}
 
-	void widgetShouldBeValid(MAWidgetHandle widget, const char* panicMessage)
+	/**
+	 * Call a JavaScript function.
+	 */
+	void callJSFunction(const String& fun)
 	{
-		if (widget <= 0)
-		{
-			maPanic(0, panicMessage);
-		}
+		char code[512];
+		sprintf(code, "%s()", fun.c_str());
+		callJS(code);
 	}
+
 };
-// End of class WebViewLoveSMSApp
+// End of class LoveSMSMoblet
 
 /**
  * Main function that is called when the program starts.
+ * This function needs to be declared as extern "C".
  */
 extern "C" int MAMain()
 {
-	WebViewLoveSMSApp app;
-	app.runEventLoop();
+	Moblet::run(new LoveSMSMoblet());
 	return 0;
 }
