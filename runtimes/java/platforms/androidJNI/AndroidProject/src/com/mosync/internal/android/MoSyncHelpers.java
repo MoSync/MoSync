@@ -23,7 +23,7 @@ import com.mosync.internal.android.BigPhatError;
 public class MoSyncHelpers
 {
 	private static boolean sLoggingIsOn = false;
-	private static boolean sDebuggingIsOn = true;
+	private static boolean sDebuggingIsOn = false;
 	
 	public static void SyslogOn(boolean on)
 	{

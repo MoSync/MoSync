@@ -3400,31 +3400,51 @@ interface MAAPI {
 			UNAVAILABLE = -1;
 			/// The native database's data type for the given field did not match the MoSync API.
 			NATIVE_TYPE_MISMATCH = -2;
-			/// The field type is not supported.
-			FIELD_UNSUPPORTED = -3;
-			/// The field is read-only.
-			READ_ONLY = -4;
-			/// The field is read-only.
-			WRITE_ONLY = -5;
-			/// The field/attribute combination is not supported.
-			COMBO_UNSUPPORTED = -6;
-			/// More values in this field is not supported.
-			FIELD_COUNT_MAX = -7;
-			/// The value does not have a custom label.
-			NO_LABEL = -8;
-			/// The values's attribute is not set to custom.
-			CUSTOM_ATTRIBUTE = -9;
+			/// The specified list type is invalid.
+			LIST_TYPE_INVALID = -3;
 			/// The specified pim list is not available on the current platform.
-			LIST_UNAVAILABLE = -11;
+			LIST_UNAVAILABLE = -4;
 			/// The specified list is already opened.
-			LIST_ALREADY_OPENED = -13;
+			LIST_ALREADY_OPENED = -5;
+			/// The specified field is invalid.
+			FIELD_INVALID = -6;
+			/// The field type is not supported.
+			FIELD_UNSUPPORTED = -7;
+			/// The requested field doesn't have a value.
+			FIELD_EMPTY = -8;
+			/// The field is read-only.
+			READ_ONLY = -9;
+			/// The field is read-only.
+			WRITE_ONLY = -10;
+			/// The field/attribute combination is not supported.
+			COMBO_UNSUPPORTED = -11;
+			/// More values in this field is not supported.
+			FIELD_COUNT_MAX = -12;
+			/// The given index is not valid.
+			INDEX_INVALID = -13;
+			/// The value does not have a custom label.
+			NO_LABEL = -14;
+			/// The values's attribute is not set to custom.
+			CUSTOM_ATTRIBUTE = -15;
 			/// The operation is not allowed by the Address Book database.
-			OPERATION_NOT_PERMITTED = -14;
+			OPERATION_NOT_PERMITTED = -16;
 			/// The list or item could not be opened.
-			CANNOT_OPEN = -15;
+			CANNOT_OPEN = -17;
 			/// The list or item is already opened and locked by the system.
 			/// It must be closed before it can be opened again.
-			ALREADY_OPEN = -16;
+			ALREADY_OPEN = -18;
+			/// Invalid handle.
+			HANDLE_INVALID = -19;
+			/// The field/attribute combination is not supported.
+			ATTRIBUTE_COMBO_UNSUPPORTED = -20;
+			/// The values's attribute is not set to custom.
+			ATTRIBUTE_CUSTOM = -21;
+			/// The field doesn't have attributes.
+			NO_ATTRIBUTES = -22;
+			/// Invalid buffer structure.
+			BUFFER_INVALID = -23;
+			/// The allocated buffer is too small.
+			BUFFER_TOO_SMALL = -24;
 		}
 
 		/**
@@ -3489,6 +3509,14 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
+		* \returns \> 0 the attribute for the specified field.
+		*          \< 0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		*                    #MA_PIM_ERR_NO_ATTRIBUTES if the field doesn't have attributes.
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
@@ -3501,9 +3529,15 @@ interface MAAPI {
 		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
-		* \returns #MA_PIM_ERR_NONE on success.
-		* #MA_PIM_ERR_NO_LABEL if the attribute is not set to custom.
-		* \note This function is available only on Android and iOS.
+		* \returns           #MA_PIM_ERR_NONE on success.
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		*                    #MA_PIM_ERR_NO_LABEL if the attribute is not set to custom.
+		* \note This function is available on Android or iOS.
 		*/
 		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
 
@@ -3515,12 +3549,16 @@ interface MAAPI {
 		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
-		* \returns \>= 0 the number of bytes occupied by the label.
-		* This may be greater than \a args.bufsize; in that case, the value isn't copied,
-		* and you should allocate a larger buffer and try again.
-		* \< 0 on error:
-		* #MA_PIM_ERR_NO_LABEL if the attribute type is not set to custom.
-		* \note This function is available only on Android and iOS.
+		* \returns \>= 0 the number of bytes occupied by the value.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		*                    #MA_PIM_ERR_NO_LABEL if the attribute type is not set to custom.
+		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
+		* \note This function is available on Android or iOS.
 		*/
 		int maPimItemGetLabel(in MA_PIM_ARGS args, in int index);
 
@@ -3529,9 +3567,11 @@ interface MAAPI {
 		* or \< 0 if the field does not exist in the list.
 		* \param list Opened by maPimListOpen().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		* \returns \>= 0 on success. One of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants.
-		* \< 0 on error:
-		* #MA_PIM_ERR_FIELD_UNSUPPORTED if the field is unsupported.
+		* \returns \>= 0 any of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
 		*/
 		int maPimFieldType(in MAHandle list, in int field);
 
@@ -3554,9 +3594,15 @@ interface MAAPI {
 		* \param args Common arguments.
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
-		* \returns The number of bytes occupied by the value.
-		* If this number is greater than bufSize, the value is not written,
-		* and you'll have to allocate a bigger buffer and try again.
+		* \returns \>= 0 The number of bytes occupied by the value.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		*                    #MA_PIM_ERR_FIELD_WRITE_ONLY if the field is write-only.
+		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
 
@@ -3567,7 +3613,15 @@ interface MAAPI {
 		* \param index An index into the field's value array.
 		* This is a number \>= 0 and \< the return value of maPimItemFieldCount().
 		* \param attributes The value's new attributes.
-		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
+		* \returns           #MA_PIM_ERR_NONE on success.
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		*                    #MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED if the field/attribute combination is not supported.
+		*                    #MA_PIM_ERR_BUFFER_INVALID if the buffer is not valid.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3581,7 +3635,15 @@ interface MAAPI {
 		* Adds a new value to a field and item.
 		* \param args Common arguments.
 		* \param attributes The new value's attributes.
-		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
+		* \returns />= 0 the index of the new added value.
+		*          /<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*                    #MA_PIM_ERR_FIELD_COUNT_MAX if more values cannot be added to this field.
+		*                    #MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED if the field/attribute combination is not supported.
+		*                    #MA_PIM_ERR_BUFFER_INVALID if the buffer is not valid.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3593,7 +3655,13 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
+		* \returns           #MA_PIM_ERR_NONE on success.
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		* \note The changes is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
