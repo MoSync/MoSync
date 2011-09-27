@@ -54,6 +54,10 @@ int maWidgetStackScreenPop(MAWidgetHandle stackScreen);
 
 int maWidgetScreenShow(MAWidgetHandle screenHandle);
 
+int maWidgetDialogShow(MAWidgetHandle dialogHandle);
+
+int maWidgetDialogHide(MAWidgetHandle dialogHandle);
+
 int maWidgetShowOptionsDialog(const wchar* title, const wchar* destructiveButtonTitle, const wchar* cancelButtonTitle,
                              const void* otherButtonTitles, const int otherButtonTitlesSize);
 
