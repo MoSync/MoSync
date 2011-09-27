@@ -6344,10 +6344,43 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_TITLE, "MyDialog");
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_TITLE, "MyDialog");
 		* \endcode
 		*/
 		TITLE = "title";
+
+		/**
+		* @brief Sets the origin arrow position for a popover dialog.
+		* This property is only available on the iPad
+		*
+		* @validvalue One of the five MAW_CONSTANT_ARROW_ values, or a bitwise or combination of them.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Allow the popover to use any arrow
+		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_ARROW_POSITION, MAW_CONSTANT_ARROW_ANY);
+		* \endcode
+		*/
+		ARROW_POSITION = "arrowPosition";
+
+		/**
+		* @brief Allow or prohibits the user from dismissing a popover dialog by tapping outside of it.
+		* This property is only available on the iPad
+		*
+		* @validvalue "true"or "false".
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Prohibit the user from dismissing the popover
+		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_USER_CAN_DISMISS, "false");
+		* \endcode
+		*/
+		USER_CAN_DISMISS = "userCanDismiss";
+
 	}
 	} // end of WidgetmodalDialogProperties
 	} // end of WidgetProperties
