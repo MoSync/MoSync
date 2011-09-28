@@ -123,9 +123,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef MA_PROF_BLACKBERRY_VERSION
 #define BB_RIM_API
 
-#if (MA_PROF_BLACKBERRY_VERSION >= 5) || (MA_PROF_BLACKBERRY_VERSION_MINOR >= 7)
+#if (MA_PROF_BLACKBERRY_VERSION >= 5) || (MA_PROF_BLACKBERRY_VERSION_MINOR >= 2)
 #define BB_HAS_KEY_MENU
-#endif	// 4.7
+#endif	// 4.2
 
 // TODO: Is this needed on BB 6?
 #if MA_PROF_BLACKBERRY_VERSION >= 5

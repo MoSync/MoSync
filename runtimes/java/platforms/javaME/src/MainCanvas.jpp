@@ -123,6 +123,15 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #ifndef JDB_DEBUG
 		try {
 #endif
+#ifdef PUBLIC_DEBUG
+			InputStream is = getClass().getResourceAsStream("debug.url");
+			if(is!=null) {
+				byte[] b = new byte[is.available()];
+				is.read(b);
+				String debugUrl = new String(b);
+				MAMidlet.out = mMidlet.makeConnectionPrintStream(debugUrl);
+			}
+#endif
 			//if(firstRun)
 			{
 				int w = getWidth();
