@@ -55,7 +55,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *  syscalls, but it cannot be accessed directly.
 * Each resource (aka Object) is represented by a
 * handle. There are different types of resources, for example
-* Image, Binary data, Sound or Placeholder. A placeholder object is not a real object, bu
+* Image, Binary data, Sound or Placeholder. A placeholder object is not a real object, but
 * just a handle which you can use to construct new objects dynamically.
 * Resources can also be defined at compile time, by using MoSync's resource compiler.
 * Placeholders can either be defined at compile time using a resource compiler directive
@@ -126,7 +126,7 @@ interface MAAPI {
 	* \param result Passed to the operating system, where applicable. Ignored otherwise.
 	* \param message The message should be short, not more than 40 characters,
 	* to ensure its visibility on all screen sizes.
-	* \see MAPanicRepor
+	* \see MAPanicReport
 	*/
 	noreturn maPanic(in int result, in MAString message);
 
@@ -317,7 +317,7 @@ interface MAAPI {
 	* Sets the clipping rectangle for the current draw target.
 	* The screen and every drawable image each maintains a clipping rectangle.
 	* Drawing operations have no effect outside the clipping rectangle.
-	* The default clipping rectangle covers the entire draw target, so tha
+	* The default clipping rectangle covers the entire draw target, so that
 	* clipping occurs at the draw target's edges.
 	*/
 	void maSetClipRect(in int left, in int top, in int width, in int height);
@@ -726,7 +726,7 @@ interface MAAPI {
 	* On a few devices, using ports numbered below 1024 may cause system crashes.
 	* Therefore, it is advisable to use ports above 1024 if you can choose.
 	*
-	* On some J2ME devices, connections to port 443 (except from https) is no
+	* On some J2ME devices, connections to port 443 (except from https) is not
 	* allowed and might cause a system exception.
 	*
 	* For the <tt>btspp</tt> protocol, \a \<address\> is 12 hexadecimal digits and
@@ -959,7 +959,7 @@ interface MAAPI {
 		out MAString buffer range("bufSize"), in int bufSize);
 
 
-	//not needed ye
+	//not needed yet
 	//int maHttpGetResponseMessage(in MAHandle conn, out MAString buffer, in int bufSize);
 	//int maHttpGetRequestHeader(in MAHandle conn, in MAString key, out MAString buffer, in int bufSize);
 
@@ -1183,7 +1183,7 @@ interface MAAPI {
 	}
 
 	/**
-	* Returns a bitmask consisting of \link #MAKB_LEFT MAKB \endlink flags describing the curren
+	* Returns a bitmask consisting of \link #MAKB_LEFT MAKB \endlink flags describing the current
 	* key state.
 	*/
 	int maGetKeys();
@@ -1508,7 +1508,7 @@ interface MAAPI {
 	*
 	* When the \link #EVENT_TYPE_CLOSE Close event \endlink is posted,
 	* you must call maExit as soon as possible, or
-	* your program will be forcibly terminated. The timeout is device-dependent, bu
+	* your program will be forcibly terminated. The timeout is device-dependent, but
 	* never longer than #EVENT_CLOSE_TIMEOUT milliseconds.
 	*
 	* After the Close event has been posted, most syscalls will stop working,
@@ -1623,7 +1623,7 @@ interface MAAPI {
 	*
 	* To properly read an instance of this struct from a store, you should allocate a
 	* chunk of memory whose size is equal to the size of the store, then read the entire store
-	* into that chunk of memory. Then you should make a pointer of type MAPanicReport and point i
+	* into that chunk of memory. Then you should make a pointer of type MAPanicReport and point it
 	* to the chunk. Then you can read normally, using that pointer.
 	*
 	* \see maOpenStore()
@@ -1969,7 +1969,7 @@ interface MAAPI {
 			int nameBufSize;
 			///out, the length of the name, excluding the terminating zero.
 			int actualNameLength;
-			///ou
+			///out
 			MABtAddr address;
 		}
 
@@ -2054,7 +2054,7 @@ interface MAAPI {
 		* is 248 bytes, excluding the terminating zero. However, it's recommended that you
 		* don't provide buffers larger than what your application has a use for.
 		*
-		* Note that you need to fill the MABtDevice structure before passing i
+		* Note that you need to fill the MABtDevice structure before passing it
 		* as a parameter, otherwise you will get memory access problems.
 		*
 		* \returns 1 if successful, zero if the queue is empty.
@@ -2126,7 +2126,7 @@ interface MAAPI {
 		* \brief A WLAN access point.
 		*/
 		struct MAWlanAp {
-			/// ou
+			/// out
 			MAWlanAddr address;
 			/// in(ptr), out(content)
 			char* name;
@@ -2420,7 +2420,7 @@ interface MAAPI {
 		* this function MAY increase the size of the file.
 		* You can determine if it did so by calling maFileSeek() with #MA_SEEK_END.
 		*
-		* If the file's current position is greater than \a offset, it is rese
+		* If the file's current position is greater than \a offset, it is reset
 		* to be equal to \a offset.
 		*
 		* The file must exist prior to calling this function.
@@ -3007,12 +3007,12 @@ interface MAAPI {
 			/// bytes
 			/// the bytes are not null-terminated.
 			BINARY = 0;
-			/// in
+			/// int
 			BOOLEAN = 1;
-			/// in
+			/// int
 			/// unix time.
 			DATE = 2;
-			/// in
+			/// int
 			INT = 3;
 			/// wide-string '\\0'
 			STRING = 4;
@@ -3437,9 +3437,11 @@ interface MAAPI {
 		/**
 		* \brief Opens a PimList. Use maPimListNext() to open the list's items.
 		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
-		* \returns >= 0 A PimList handle, or \< 0 on error.
-		* #MA_PIM_ERR_LIST_ALREADY_OPENED if the list is already opened.
-		* #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not available on the current platform.
+		* \returns \>= 0 A PimList handle.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_LIST_ALREADY_OPENED if the list is already opened.
+		*                    #MA_PIM_ERR_LIST_UNAVAILABLE if the list is not available on the current platform.
+		*                    #MA_PIM_ERR_LIST_TYPE_INVALID if the given list type is invalid.
 		*/
 		MAHandle maPimListOpen(in int listType);
 
@@ -3448,7 +3450,10 @@ interface MAAPI {
 		* or \< 0 on error.
 		* You must use maPimItemClose() on every item to prevent memory leaks.
 		* \param list List handle provided by maPimListOpen(int listType).
-		* \returns >= 0 A PimItem handle, or \< 0 on error.
+		* \returns \> 0 a PimItem handle.
+		*          \= 0 if there are no more items.
+		*          \< 0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
 		*/
 		MAHandle maPimListNext(in MAHandle list);
 
@@ -3467,7 +3472,9 @@ interface MAAPI {
 		/**
 		* \brief Returns the number of fields in the \a item.
 		* \param item Item handle provided by maPimListNext(MAHandle list).
-		* \returns The number of fields in the item.
+		* \returns \>= 0 the number of fields in the item.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
 		*/
 		int maPimItemCount(in MAHandle item);
 
@@ -3476,7 +3483,11 @@ interface MAAPI {
 		* Panics on invalid indices.
 		* \param item Opened by maPimListNext().
 		* \param n \>= 0 and \< maPimItemCount().
-		* \returns One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+		* \returns \> 0 one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+		*          \< 0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the param n is not valid.
+		* \note On Android and iOS the panic system can be disabled so you'll get error codes instead.
 		*/
 		int maPimItemGetField(in MAHandle item, in int n);
 
@@ -3484,9 +3495,12 @@ interface MAAPI {
 		* \brief Returns the number of values in the field for a given item.
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		* \returns \>= 0 on success: The number of values in the field.
-		* \< 0 on error:
-		* #MA_PIM_ERR_FIELD_UNSUPPORTED if the field is unsupported.
+		* \returns \> 0 the number of values in the field.
+		*          \= 0 if the item field has no values.
+		*          \< 0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field is unsupported.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*/
 		int maPimItemFieldCount(in MAHandle item, in int field);
 
@@ -3504,13 +3518,14 @@ interface MAAPI {
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
 		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		* \note On Android and iOS the panic system can be disabled so you'll get error codes instead.
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
 		/**
 		* \brief Sets a custom label for a value in a field and item.
 		* Panics on field/index combinations that don't exist in this item.
-		* The value's attribute must be set to MA_PIM_ATTR_CUSTOM.
+		* The value's attribute must be set to custom.
 		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
 		* \a args.bufSize must be valid.
 		* \param args Common arguments.
@@ -3524,7 +3539,8 @@ interface MAAPI {
 		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		*                    #MA_PIM_ERR_NO_LABEL if the attribute is not set to custom.
-		* \note This function is available on Android or iOS.
+		* \note This function is available only on Android or iOS.
+		* \note On Android and iOS the panic system can be disabled so you'll get error codes instead.
 		*/
 		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
 
@@ -3551,7 +3567,6 @@ interface MAAPI {
 
 		/**
 		* Returns one of the type of the field.
-		* or \< 0 if the field does not exist in the list.
 		* \param list Opened by maPimListOpen().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \returns \>= 0 any of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants.
@@ -3641,13 +3656,13 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns           #MA_PIM_ERR_NONE on success.
-		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
-		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
-		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
-		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
-		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		* \returns #MA_PIM_ERR_NONE on success.
+		*          #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*          #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*          #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*          #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*          #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*          #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		* \note The changes is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3657,7 +3672,8 @@ interface MAAPI {
 		/**
 		* Closes the handle to a PimItem, releasing resources used by the system.
 		* Writes any changes to disk.
-		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
+		* \returns #MA_PIM_ERR_NONE on success.
+		*          #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid, or if the item's list is closed.
 		* \note An item can also be closed by maPimItemRemove().
 		* \warning Does not write changes to disk if the item's List is closed.
 		* Make sure to keep the List open while editing items.
@@ -3666,15 +3682,18 @@ interface MAAPI {
 
 		/**
 		* Creates a new empty item in the specified list.
-		* \returns A handle to the new item, or \< 0 on error.
+		* \returns \>= 0 A handle to the new item.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
 		* \note The handle must be closed with maPimItemClose() to avoid memory leaks.
 		*/
 		MAHandle maPimItemCreate(in MAHandle list);
 
 		/**
 		* Removes an item from a list. This also has the effect of closing the item.
-		* \returns 0 on success and \< 0 on failure.
 		* \see maPimItemClose()
+		* \returns #MA_PIM_ERR_NONE on success.
+		*          #MA_PIM_ERR_HANDLE_INVALID if the list handle or item handle are invalid.
 		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
@@ -4402,7 +4421,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in number of pixels.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -4416,7 +4435,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in number of pixels.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -4430,7 +4449,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -4445,7 +4464,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -4587,14 +4606,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A 0-indexed tab number.
 		*
-		* @setandge
+		* @setandget
 		*
-		* @par Example se
+		* @par Example set
 		* \code
 		*	maWidgetSetProperty(tabScreenHandle, MAW_TAB_SCREEN_CURRENT_TAB, "1");
 		* \endcode
 		*
-		* @par Example ge
+		* @par Example get
 		* \code
 		* 	char currentTabBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(
@@ -4656,14 +4675,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandge
+		* @setandget
 		*
-		* @par Example se
+		* @par Example set
 		* \code
 		*	maWidgetSetProperty(labelHandle, MAW_LABEL_TEXT, "My label");
 		* \endcode
 		*
-		* @par Example ge
+		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
@@ -4780,14 +4799,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandge
+		* @setandget
 		*
-		* @par Example se
+		* @par Example set
 		* \code
 		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_TEXT, "My button");
 		* \endcode
 		*
-		* @par Example ge
+		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
@@ -4889,14 +4908,14 @@ group WidgetAPI "Widget API" {
 		* Note: It is not available on Android, as native image buttons do not have text attached.
 		* @validvalue A null-terminated string.
 		*
-		* @setandge
+		* @setandget
 		*
-		* @par Example se
+		* @par Example set
 		* \code
 		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, "My button");
 		* \endcode
 		*
-		* @par Example ge
+		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
@@ -5061,20 +5080,20 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandge
+		* @setandget
 		*
-		* @par Example se
+		* @par Example set
 		* \code
 		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, "My label");
 		* \endcode
 		*
-		* @par Example ge
+		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
 		* 	if (result > 0)
 		* 	{
-		* 	    // Do something with the edit box tex
+		* 	    // Do something with the edit box text
 		* 	}
 		* \endcode
 		*/
@@ -5311,7 +5330,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -5404,7 +5423,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue Any valid URL.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* @code
