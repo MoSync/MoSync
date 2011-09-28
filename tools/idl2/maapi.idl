@@ -55,7 +55,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 *  syscalls, but it cannot be accessed directly.
 * Each resource (aka Object) is represented by a
 * handle. There are different types of resources, for example
-* Image, Binary data, Sound or Placeholder. A placeholder object is not a real object, bu
+* Image, Binary data, Sound or Placeholder. A placeholder object is not a real object, but
 * just a handle which you can use to construct new objects dynamically.
 * Resources can also be defined at compile time, by using MoSync's resource compiler.
 * Placeholders can either be defined at compile time using a resource compiler directive
@@ -126,7 +126,7 @@ interface MAAPI {
 	* \param result Passed to the operating system, where applicable. Ignored otherwise.
 	* \param message The message should be short, not more than 40 characters,
 	* to ensure its visibility on all screen sizes.
-	* \see MAPanicRepor
+	* \see MAPanicReport
 	*/
 	noreturn maPanic(in int result, in MAString message);
 
@@ -317,7 +317,7 @@ interface MAAPI {
 	* Sets the clipping rectangle for the current draw target.
 	* The screen and every drawable image each maintains a clipping rectangle.
 	* Drawing operations have no effect outside the clipping rectangle.
-	* The default clipping rectangle covers the entire draw target, so tha
+	* The default clipping rectangle covers the entire draw target, so that
 	* clipping occurs at the draw target's edges.
 	*/
 	void maSetClipRect(in int left, in int top, in int width, in int height);
@@ -726,7 +726,7 @@ interface MAAPI {
 	* On a few devices, using ports numbered below 1024 may cause system crashes.
 	* Therefore, it is advisable to use ports above 1024 if you can choose.
 	*
-	* On some J2ME devices, connections to port 443 (except from https) is no
+	* On some J2ME devices, connections to port 443 (except from https) is not
 	* allowed and might cause a system exception.
 	*
 	* For the <tt>btspp</tt> protocol, \a \<address\> is 12 hexadecimal digits and
@@ -959,7 +959,7 @@ interface MAAPI {
 		out MAString buffer range("bufSize"), in int bufSize);
 
 
-	//not needed ye
+	//not needed yet
 	//int maHttpGetResponseMessage(in MAHandle conn, out MAString buffer, in int bufSize);
 	//int maHttpGetRequestHeader(in MAHandle conn, in MAString key, out MAString buffer, in int bufSize);
 
@@ -1183,7 +1183,7 @@ interface MAAPI {
 	}
 
 	/**
-	* Returns a bitmask consisting of \link #MAKB_LEFT MAKB \endlink flags describing the curren
+	* Returns a bitmask consisting of \link #MAKB_LEFT MAKB \endlink flags describing the current
 	* key state.
 	*/
 	int maGetKeys();
@@ -1508,7 +1508,7 @@ interface MAAPI {
 	*
 	* When the \link #EVENT_TYPE_CLOSE Close event \endlink is posted,
 	* you must call maExit as soon as possible, or
-	* your program will be forcibly terminated. The timeout is device-dependent, bu
+	* your program will be forcibly terminated. The timeout is device-dependent, but
 	* never longer than #EVENT_CLOSE_TIMEOUT milliseconds.
 	*
 	* After the Close event has been posted, most syscalls will stop working,
@@ -1623,7 +1623,7 @@ interface MAAPI {
 	*
 	* To properly read an instance of this struct from a store, you should allocate a
 	* chunk of memory whose size is equal to the size of the store, then read the entire store
-	* into that chunk of memory. Then you should make a pointer of type MAPanicReport and point i
+	* into that chunk of memory. Then you should make a pointer of type MAPanicReport and point it
 	* to the chunk. Then you can read normally, using that pointer.
 	*
 	* \see maOpenStore()
@@ -1969,7 +1969,7 @@ interface MAAPI {
 			int nameBufSize;
 			///out, the length of the name, excluding the terminating zero.
 			int actualNameLength;
-			///ou
+			///out
 			MABtAddr address;
 		}
 
@@ -2054,7 +2054,7 @@ interface MAAPI {
 		* is 248 bytes, excluding the terminating zero. However, it's recommended that you
 		* don't provide buffers larger than what your application has a use for.
 		*
-		* Note that you need to fill the MABtDevice structure before passing i
+		* Note that you need to fill the MABtDevice structure before passing it
 		* as a parameter, otherwise you will get memory access problems.
 		*
 		* \returns 1 if successful, zero if the queue is empty.
@@ -2126,7 +2126,7 @@ interface MAAPI {
 		* \brief A WLAN access point.
 		*/
 		struct MAWlanAp {
-			/// ou
+			/// out
 			MAWlanAddr address;
 			/// in(ptr), out(content)
 			char* name;
@@ -2420,7 +2420,7 @@ interface MAAPI {
 		* this function MAY increase the size of the file.
 		* You can determine if it did so by calling maFileSeek() with #MA_SEEK_END.
 		*
-		* If the file's current position is greater than \a offset, it is rese
+		* If the file's current position is greater than \a offset, it is reset
 		* to be equal to \a offset.
 		*
 		* The file must exist prior to calling this function.
@@ -3007,12 +3007,12 @@ interface MAAPI {
 			/// bytes
 			/// the bytes are not null-terminated.
 			BINARY = 0;
-			/// in
+			/// int
 			BOOLEAN = 1;
-			/// in
+			/// int
 			/// unix time.
 			DATE = 2;
-			/// in
+			/// int
 			INT = 3;
 			/// wide-string '\\0'
 			STRING = 4;
@@ -4421,7 +4421,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in number of pixels.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -4435,7 +4435,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in number of pixels.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -4449,7 +4449,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -4464,7 +4464,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A positive integer in pixles, or any of the constants #MAW_CONSTANT_FILL_AVAILABLE_SPACE, #MAW_CONSTANT_WRAP_CONTENT.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -4606,14 +4606,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A 0-indexed tab number.
 		*
-		* @setandge
+		* @setandget
 		*
-		* @par Example se
+		* @par Example set
 		* \code
 		*	maWidgetSetProperty(tabScreenHandle, MAW_TAB_SCREEN_CURRENT_TAB, "1");
 		* \endcode
 		*
-		* @par Example ge
+		* @par Example get
 		* \code
 		* 	char currentTabBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(
@@ -4675,14 +4675,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandge
+		* @setandget
 		*
-		* @par Example se
+		* @par Example set
 		* \code
 		*	maWidgetSetProperty(labelHandle, MAW_LABEL_TEXT, "My label");
 		* \endcode
 		*
-		* @par Example ge
+		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(labelHandle, MAW_LABEL_TEXT, textBuffer, BUFFER_SIZE);
@@ -4799,14 +4799,14 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandge
+		* @setandget
 		*
-		* @par Example se
+		* @par Example set
 		* \code
 		*	maWidgetSetProperty(buttonHandle, MAW_BUTTON_TEXT, "My button");
 		* \endcode
 		*
-		* @par Example ge
+		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(buttonHandle, MAW_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
@@ -4908,14 +4908,14 @@ group WidgetAPI "Widget API" {
 		* Note: It is not available on Android, as native image buttons do not have text attached.
 		* @validvalue A null-terminated string.
 		*
-		* @setandge
+		* @setandget
 		*
-		* @par Example se
+		* @par Example set
 		* \code
 		*	maWidgetSetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, "My button");
 		* \endcode
 		*
-		* @par Example ge
+		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(imageButtonHandle, MAW_IMAGE_BUTTON_TEXT, textBuffer, BUFFER_SIZE);
@@ -5080,20 +5080,20 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandge
+		* @setandget
 		*
-		* @par Example se
+		* @par Example set
 		* \code
 		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, "My label");
 		* \endcode
 		*
-		* @par Example ge
+		* @par Example get
 		* \code
 		* 	char textBuffer[BUFFER_SIZE];
 		* 	int result = maWidgetGetProperty(editBoxHandle, MAW_EDIT_BOX_TEXT, textBuffer, BUFFER_SIZE);
 		* 	if (result > 0)
 		* 	{
-		* 	    // Do something with the edit box tex
+		* 	    // Do something with the edit box text
 		* 	}
 		* \endcode
 		*/
@@ -5330,7 +5330,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue A null-terminated string.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* \code
@@ -5423,7 +5423,7 @@ group WidgetAPI "Widget API" {
 		*
 		* @validvalue Any valid URL.
 		*
-		* @setandge
+		* @setandget
 		*
 		* @par Example
 		* @code
