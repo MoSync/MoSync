@@ -1436,6 +1436,9 @@ interface MAAPI {
 
 			/**
 			* #EVENT_TYPE_ALERT event. The index of the selected button.
+			* If button1 is pressed, the value is 1.
+			* If button2 is pressed, the value is 2.
+			* If button3 is pressed, the value is 3.
 			*/
 			int alertButtonIndex;
 
@@ -6351,7 +6354,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Sets the origin arrow position for a popover dialog.
-		* This property is only available on the iPad
+		* Note: This property is only available on the iPad.
 		*
 		* @validvalue One of the five MAW_CONSTANT_ARROW_ values, or a bitwise or combination of them.
 		*
@@ -6360,14 +6363,14 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* \code
 		*   // Allow the popover to use any arrow
-		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_ARROW_POSITION, MAW_CONSTANT_ARROW_ANY);
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_ARROW_POSITION, MAW_CONSTANT_ARROW_ANY);
 		* \endcode
 		*/
 		ARROW_POSITION = "arrowPosition";
 
 		/**
 		* @brief Allow or prohibits the user from dismissing a popover dialog by tapping outside of it.
-		* This property is only available on the iPad
+		* Note: This property is only available on the iPad.
 		*
 		* @validvalue "true"or "false".
 		*
@@ -6376,7 +6379,7 @@ group WidgetAPI "Widget API" {
 		* @par Example
 		* \code
 		*   // Prohibit the user from dismissing the popover
-		*   maWidgetSetProperty(dialogHandle, MAW_DIALOG_USER_CAN_DISMISS, "false");
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_USER_CAN_DISMISS, "false");
 		* \endcode
 		*/
 		USER_CAN_DISMISS = "userCanDismiss";
@@ -6470,25 +6473,25 @@ group WidgetAPI "Widget API" {
 
 	/**
 	* Shows a dialog widget.
-	* \param dialog The dialog that will be shown.
+	* \param dialogHandle The handle of the dialog that will be shown.
 	*
 	* \returns Any of the following result codes:
 	* - #MAW_RES_OK if the child could be removed from the parent.
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_ERROR otherwise.
 	*/
-	int maWidgetModalDialogShow(in MAWidgetHandle dialog);
+	int maWidgetModalDialogShow(in MAWidgetHandle dialogHandle);
 
 	/**
 	* Hides/Dismisses a currently displayed dialog.
-	* \param dialog The dialog that will be hidden.
+	* \param dialogHandle The handle of the dialog that will be hidden.
 	*
 	* \returns Any of the following result codes:
 	* - #MAW_RES_OK if the child could be removed from the parent.
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_ERROR otherwise.
 	*/
-	int maWidgetModalDialogHide(in MAWidgetHandle dialog);
+	int maWidgetModalDialogHide(in MAWidgetHandle dialogHandle);
 
 	/**
 	* Shows a screen. If native UI hasn't been initialized, it is also initialized
@@ -7122,13 +7125,14 @@ group CameraFunctions "Camera Functions" {
 		* Displays a message to the user.
 		* It contains optional title, message and 3 buttons for selection.
 		* On Android the buttons point to a positive, negative or neutral action.
-		* When a selection is made a #MAW_EVENT_TYPE_ALERT event is sent with the button index.
+		* When one of the buttons are clicked the alert is automatically dismissed.
+		* When a selection is made a #EVENT_TYPE_ALERT event is sent with the button index.
 		* \param title The title of the message box shown.
 		* \param message The message should be short, not more than 40 characters,
 		* to ensure its visibility on all screen sizes.
-		* \button1 The text on the first button.
-		* \button2 The text on the second button.
-		* \button3 The text on the third button.
+		* \button1 The text on the first button. On Android it indicates a positive selection.
+		* \button2 The text on the second button. On Android it indicates a neutral selection.
+		* \button3 The text on the third button. On Android it indicates that a negative selection.
 		*/
 		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
 
