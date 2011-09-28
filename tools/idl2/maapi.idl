@@ -3927,6 +3927,7 @@ group WidgetAPI "Widget API" {
 		* Available only n the iPad
 		*/
 		DIALOG_DISMISSED = 23;
+
 	}
 
 	} // end of WidgetEventTypes
@@ -6323,7 +6324,6 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-
 		*   int nrFonts = maFontGetCount();
 		*    char buf[256];
 		*    // Get first font name.
@@ -6485,7 +6485,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_ERROR otherwise.
 	*/
-	int maWidgetModalDialogShow(in MAWidgetHandle dialog);
+	int maWidgetModalDialogShow(in MAWidgetHandle dialogHandle);
 
 	/**
 	* Hides/Dismisses a currently displayed dialog.
@@ -6496,7 +6496,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_ERROR otherwise.
 	*/
-	int maWidgetModalDialogHide(in MAWidgetHandle dialog);
+	int maWidgetModalDialogHide(in MAWidgetHandle dialogHandle);
 
 	/**
 	* Shows a screen. If native UI hasn't been initialized, it is also initialized

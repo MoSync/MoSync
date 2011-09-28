@@ -20,7 +20,7 @@
 
 #import "ScreenWidget.h"
 #import "StackScreenWidget.h"
-#import "DialogWidget.h"
+#import "ModalDialogWidget.h"
 #import "LayoutWidgets.h"
 #import "RelativeLayoutWidget.h"
 #import "ListViewItemWidget.h"
@@ -318,18 +318,18 @@ int maWidgetScreenShow(MAWidgetHandle screenHandle) {
 	return returnValue;
 }
 
-int maWidgetModalDialogShow(MAWidgetHandle dialog) {
-	IWidget* dialogWidget = [mosyncUI getWidget:dialog];
-	if(!dialogWidget) return MAW_RES_INVALID_HANDLE;
+int maWidgetModalDialogShow(MAWidgetHandle dialogHandle) {
+	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
+	if(!dialog) return MAW_RES_INVALID_HANDLE;
 
-	if(!([dialogWidget class] == [DialogWidget class])) {
+	if(!([dialog class] == [ModalDialogWidget class])) {
 		return MAW_RES_INVALID_HANDLE;
 	}
 
 	int returnValue;
     NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
 	[NSObject performSelectorOnMainThread:@selector(show)
-							   withTarget:dialogWidget
+							   withTarget:dialog
 							  withObjects:arguments
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];
@@ -337,18 +337,18 @@ int maWidgetModalDialogShow(MAWidgetHandle dialog) {
 	return returnValue;
 }
 
-int maWidgetModalDialogHide(MAWidgetHandle dialog) {
-	IWidget* dialogWidget = [mosyncUI getWidget:dialog];
-	if(!dialogWidget) return MAW_RES_INVALID_HANDLE;
+int maWidgetModalDialogHide(MAWidgetHandle dialogHandle) {
+	IWidget* dialog = [mosyncUI getWidget:dialogHandle];
+	if(!dialog) return MAW_RES_INVALID_HANDLE;
 
-	if(!([dialogWidget class] == [DialogWidget class])) {
+	if(!([dialog class] == [ModalDialogWidget class])) {
 		return MAW_RES_INVALID_HANDLE;
 	}
 
 	int returnValue;
     NSArray* arguments = [[NSArray alloc] initWithObjects:nil];
 	[NSObject performSelectorOnMainThread:@selector(hide)
-							   withTarget:dialogWidget
+							   withTarget:dialog
 							  withObjects:arguments
 							waitUntilDone:YES
 						   andReturnValue:&returnValue];

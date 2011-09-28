@@ -11,9 +11,9 @@
 		0B436B8A143089BD00E69AB2 /* OptionsDialogView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B436B89143089BD00E69AB2 /* OptionsDialogView.mm */; };
 		0B436B8B143089BD00E69AB2 /* OptionsDialogView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B436B88143089BD00E69AB2 /* OptionsDialogView.h */; };
 		0B436B8C143089BD00E69AB2 /* OptionsDialogView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B436B89143089BD00E69AB2 /* OptionsDialogView.mm */; };
-		0B436B9F14308D5400E69AB2 /* DialogWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B436B9E14308D5400E69AB2 /* DialogWidget.mm */; };
-		0B436BA014308D5400E69AB2 /* DialogWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B436B9D14308D5400E69AB2 /* DialogWidget.h */; };
-		0B436BA114308D5400E69AB2 /* DialogWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B436B9E14308D5400E69AB2 /* DialogWidget.mm */; };
+		0B436B9F14308D5400E69AB2 /* ModalDialogWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B436B9E14308D5400E69AB2 /* ModalDialogWidget.mm */; };
+		0B436BA014308D5400E69AB2 /* ModalDialogWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B436B9D14308D5400E69AB2 /* ModalDialogWidget.h */; };
+		0B436BA114308D5400E69AB2 /* ModalDialogWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B436B9E14308D5400E69AB2 /* ModalDialogWidget.mm */; };
 		0B90962B13E05C1400A91170 /* CameraPreviewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B9095BE13E053C900A91170 /* CameraPreviewWidget.mm */; };
 		0B90962C13E05C1500A91170 /* CameraPreviewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 0B9095BE13E053C900A91170 /* CameraPreviewWidget.mm */; };
 		0B90962D13E05C1B00A91170 /* CameraPreviewWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 0B9095BD13E053C900A91170 /* CameraPreviewWidget.h */; };
@@ -277,8 +277,8 @@
 		0B10E8D114064DDB00B6DA6B /* MessageUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MessageUI.framework; path = System/Library/Frameworks/MessageUI.framework; sourceTree = SDKROOT; };
 		0B436B88143089BD00E69AB2 /* OptionsDialogView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OptionsDialogView.h; sourceTree = "<group>"; };
 		0B436B89143089BD00E69AB2 /* OptionsDialogView.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = OptionsDialogView.mm; sourceTree = "<group>"; };
-		0B436B9D14308D5400E69AB2 /* DialogWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DialogWidget.h; sourceTree = "<group>"; };
-		0B436B9E14308D5400E69AB2 /* DialogWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = DialogWidget.mm; sourceTree = "<group>"; };
+		0B436B9D14308D5400E69AB2 /* ModalDialogWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ModalDialogWidget.h; sourceTree = "<group>"; };
+		0B436B9E14308D5400E69AB2 /* ModalDialogWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ModalDialogWidget.mm; sourceTree = "<group>"; };
 		0B9095BD13E053C900A91170 /* CameraPreviewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraPreviewWidget.h; sourceTree = "<group>"; };
 		0B9095BE13E053C900A91170 /* CameraPreviewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraPreviewWidget.mm; sourceTree = "<group>"; };
 		1D30AB110D05D00D00671497 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -744,8 +744,8 @@
 		85A158FA12F80E520044BBE1 /* Widgets */ = {
 			isa = PBXGroup;
 			children = (
-				0B436B9D14308D5400E69AB2 /* DialogWidget.h */,
-				0B436B9E14308D5400E69AB2 /* DialogWidget.mm */,
+				0B436B9D14308D5400E69AB2 /* ModalDialogWidget.h */,
+				0B436B9E14308D5400E69AB2 /* ModalDialogWidget.mm */,
 				43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */,
 				43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */,
 				43D8046013EFBCB200183387 /* DatePickerWidget.h */,
@@ -1008,7 +1008,7 @@
 				43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */,
 				41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */,
 				0B436B8B143089BD00E69AB2 /* OptionsDialogView.h in Headers */,
-				0B436BA014308D5400E69AB2 /* DialogWidget.h in Headers */,
+				0B436BA014308D5400E69AB2 /* ModalDialogWidget.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1203,7 +1203,7 @@
 				43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */,
 				43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */,
 				0B436B8A143089BD00E69AB2 /* OptionsDialogView.mm in Sources */,
-				0B436B9F14308D5400E69AB2 /* DialogWidget.mm in Sources */,
+				0B436B9F14308D5400E69AB2 /* ModalDialogWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1288,7 +1288,7 @@
 				43D8048013EFBCB200183387 /* VideoViewWidget.mm in Sources */,
 				43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */,
 				0B436B8C143089BD00E69AB2 /* OptionsDialogView.mm in Sources */,
-				0B436BA114308D5400E69AB2 /* DialogWidget.mm in Sources */,
+				0B436BA114308D5400E69AB2 /* ModalDialogWidget.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
