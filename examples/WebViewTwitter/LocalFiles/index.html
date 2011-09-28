@@ -27,7 +27,7 @@
 
 			// We defince the parsed favorites as global functions because
 			// we use them in multiple places.
-			var parsedFavorites = "";
+			var gParsedFavorites = "";
 
 			// Make sure we get the correct event type on every touch system.
 			var userAgent = navigator.userAgent.toLowerCase();
@@ -44,7 +44,7 @@
 			 */
 			function showTweets(tweets, username)
 			{
-				var tweetsTitle = document.getElementById("TweetsTitle");
+				var tweetsTitle = document.getElementById("tweetsTitle");
 				tweetsTitle.innerHTML = username;
 				var results_ul = document.getElementById("results_ul");
 				// If it is the loading indicator do not parse it.
@@ -57,7 +57,7 @@
 					var results = "";
 					if (tweets.length == 0)
 					{
-						results = "<li>No tweets could be found check the username!!!</li>";
+						results = "<li>No tweets could be found check the username!</li>";
 					}
 					else
 					{
@@ -86,6 +86,7 @@
 			function getTweetsForUser(username)
 			{
 				showTweets("loading...", username);
+
 				// Prepare the Twitter url, so it can be passed as a GET parameter.
 				var twitterUrl = "http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" + username;
 
@@ -94,6 +95,7 @@
 				{
 					showTweets(d, username);
 				});
+
 				jQT.goTo('#tweets');
 			}
 
@@ -103,45 +105,137 @@
 			function getTweets()
 			{
 				// Get the username from the input field.
-				var username = document.getElementById("username_input").value;
+				var username = document.getElementById("usernameInput").value;
 				getTweetsForUser(username)
 			}
 
 			/**
-			 * This function uses calls to Mosync for accessing files
-			 * and saving the favorites-
+			 * Read the list of favourite users, then
+			 * call the supplied callback function
+			 * with two parameters, the user data
+			 * and the path to the data file.
 			 */
-			function addToFavorites(){
-				// Get the username from the input field
-				var username = document.getElementById("username_input").value;
-				SendMoSyncMessage("AddToFavorites", "userName", username);
+			function readFavoriteUsers(callbackFun)
+			{
+				// Path to file with user data.
+				var filePath;
+
+				// Get path to local file directory, then
+				// read favourite users from that directory.
+				josync.file.getLocalPath(read);
+
+				function read(path)
+				{
+					if (null == path)
+					{
+						alert("Could not read user list");
+						return;
+					}
+
+					filePath = path + "SavedUsers";
+					josync.file.read(filePath, handleResult);
+				}
+
+				function handleResult(data)
+				{
+					callbackFun(data, filePath);
+				}
 			}
 
 			/**
-			 * Parses the list  of user names returned by MoSync C++ code.
+			 * Read and display list of favourite users.
 			 */
-			function parseFavorites(list)
+			function readAndDisplayFavoriteUsers()
 			{
-				return list.split(",");
+				readFavoriteUsers(displayFavoriteUsers);
 			}
 
-			function setFavorites(favoriteList)
+			/**
+			 * This function uses calls to Mosync for accessing files
+			 * and saving favorite users.
+			 */
+			function addFavoriteUser()
 			{
-				parsedFavorites = parseFavorites(favoriteList);
+				// Get the username from the input field
+				var userName = document.getElementById("usernameInput").value;
+				//displayFavoriteUsers("!one!!two!");
+				//return;
+
+				var userList;
+
+				readFavoriteUsers(addUser);
+
+				function addUser(userData, filePath)
+				{
+					userList = userData;
+					if (null == userList)
+					{
+						userList = "";
+					}
+
+					// Create a unique string, "!" is not in any
+					// Twitter user name.
+					var separatedUserName = "!" + userName + "!";
+
+					// Add user only if not in string.
+					if (-1 == userList.indexOf(separatedUserName))
+					{
+						userList += separatedUserName;
+					}
+
+					// Write user list.
+					josync.file.write(filePath, userList, reportResult);
+				}
+
+				function reportResult(success)
+				{
+					if (success)
+					{
+						displayFavoriteUsers(userList);
+						alert("User successfully saved");
+					}
+					else
+					{
+						alert("Could not save user");
+					}
+				}
+			}
+
+			function displayFavoriteUsers(userData)
+			{
+				if (null == userData)
+				{
+					return;
+				}
+
+				gParsedFavoriteUsers = parseFavoriteUsers(userData);
+
 				var favorites_ul = document.getElementById("favorites");
 				var myID = "";
 				favorites_ul.innerHTML = "<li> Favorites: </li>";
-				for (var i = 0; i < parsedFavorites.length; i++)
+				for (var i = 0; i < gParsedFavoriteUsers.length; i++)
 				{
+
 					myID = "#submitButton" + i;
 					favorites_ul.innerHTML += "<li class='arrow'><a id='submitButton" +
 						i +
 						"')' onclick='getTweetsForUser(\"" +
-						parsedFavorites[i] +
+						gParsedFavoriteUsers[i] +
 						"\")'>" +
-						parsedFavorites[i] +
+						gParsedFavoriteUsers[i] +
 						"</a></li>";
 				}
+			}
+
+			/**
+			 * Parse a string with a list of user names.
+			 * Format of userData is "!user1!!user2!!...!!userN!"
+			 */
+			function parseFavoriteUsers(userData)
+			{
+				// Split string into elements, remove empty strings.
+				return userData.split("!").filter(
+					function(x){ return x.length > 0 });
 			}
 
 			/**
@@ -160,7 +254,7 @@
 			/**
 			 * Will be called after all the markup in <body> was loaded
 			 */
-			function init()
+			function initialize()
 			{
 				$("#submitButton").bind(clickEvent, function(e)
 				{
@@ -168,15 +262,14 @@
 				});
 				$("#favoriteButton").bind(clickEvent, function(e)
 				{
-					addToFavorites();
+					addFavoriteUser();
 				});
 				$("#backButton").bind(clickEvent, function(e)
 				{
 					goBack();
 				});
 
-				//send a message to Mosync side so it knows that we are done with front processing
-				SendMoSyncMessage("PageLoaded");
+				readAndDisplayFavoriteUsers();
 			}
 		</script>
 
@@ -187,21 +280,23 @@
 	</head>
 
 	<!-- A simple JQTouch layout consisting of two views -->
-	<body  onload="init()">
+	<body onload="initialize()">
 		<!-- "Page 1" -->
 		<div id="theform">
 			<div class="toolbar">
 				<h1>Tweet Reader</h1>
 			</div>
 			<ul class="rounded">
-				<li><input onkeydown="keydown(event.which);"
-					   type="text"
-					   placeholder="User name"
-					   name="username"
-					   id="username_input"
-					   autocapitalize="off"
-					   autocorrect="off"
-					   autocomplete="off"></li>
+				<li>
+					<input onkeydown="keydown(event.which);"
+						type="text"
+						placeholder="User name"
+						name="username"
+						id="usernameInput"
+						autocapitalize="off"
+						autocorrect="off"
+						autocomplete="off">
+				</li>
 
 				<li class="arrow">
 					<a id="submitButton" >View Tweets by this user</a></li>
@@ -217,7 +312,7 @@
 		<!-- "Page 2" - Will contain the tweets found -->
 		<div id="tweets">
 			<div class="toolbar">
-				<h1 id="TweetsTitle">Tweets By ...</h1>
+				<h1 id="tweetsTitle">Tweets By ...</h1>
 				<a class="button back" href="#theform" id="backButton">Back</a>
 			</div>
 
@@ -227,6 +322,5 @@
 		</ul>
 
 	</div>
-
 </body>
 </html>

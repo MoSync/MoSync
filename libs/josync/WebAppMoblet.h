@@ -31,7 +31,8 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <NativeUI/Screen.h>
 #include <NativeUI/WebView.h>
-#include <NativeUI/WebViewMessage.h>
+#include "WebViewMessage.h"
+#include "WebViewMessageHandler.h"
 #include "FileUtil.h"
 
 namespace josync
@@ -59,45 +60,63 @@ namespace josync
 		 * Get the WebView widget displayed by this moblet.
 		 * @return Pointer to the WebView instance.
 		 */
-		NativeUI::WebView* getWebView();
+		virtual NativeUI::WebView* getWebView();
 
 		/**
 		 * Get a file utility object used for accessing the
 		 * device's local file system.
 		 * @return Pointer to a FileUtil instance.
 		 */
-		FileUtil* getFileUtil();
+		virtual FileUtil* getFileUtil();
 
 		/**
 		 * Enable JavaScript to C++ communication.
 		 */
-		void enableWebViewMessages();
+		virtual void enableWebViewMessages();
 
 		/**
 		 * Disable JavaScript to C++ communication.
 		 */
-		void disableWebViewMessages();
+		virtual void disableWebViewMessages();
 
 		/**
 		 * Display a page in the WebView of this moblet.
 		 * @param url Url of page to open.
 		 */
-		void showPage(const MAUtil::String& url);
+		virtual void showPage(const MAUtil::String& url);
 
 		/**
 		 * Run JavaScript code in the WebView.
 		 */
-		void callJS(const MAUtil::String& script);
+		virtual void callJS(const MAUtil::String& script);
+
+		/**
+		 * This method passes the event to JavaScript.
+		 *
+		 * Note that currently you need to call this method
+		 * explicitly from your C++ event handling code.
+		 *
+		 * At present, we just pass on the event type
+		 * and the first three int parameters.
+		 *
+		 * TODO: And more sophisticated event detection.
+		 */
+		virtual void passEventToJS(MAEvent* event);
 
 		/**
 		 * Implement this method in a subclass to handle messages
 		 * sent from JavaScript.
-		 * @param webView The WebView that sent the message.
 		 * @param message Object used to access message content.
 		 */
-		virtual void handleWebViewMessage(
+		virtual void handleWebViewMessage(WebViewMessage& message);
+
+		/**
+		 * This method handles messages sent from the WebView
+		 * via urls. It calls handleWebViewMessage.
+		 */
+		virtual void processWebViewMessage(
 			NativeUI::WebView* webView,
-			NativeUI::WebViewMessage& message);
+			MAHandle urlData);
 
 		/**
 		 * This method is called when a key is pressed. It closes
@@ -110,16 +129,16 @@ namespace josync
 		/**
 		 * Extract HTML/CSS/JS/Media files to the local file system.
 		 */
-		void extractFileSystem();
+		virtual void extractFileSystem();
 
 		/**
 		 * Create the user interface of the application.
 		 * This creates a full screen WebView and configures
 		 * it to receive messages from JavaScript.
 		 */
-		void createUI();
+		virtual void createUI();
 
-	private:
+	protected:
 		/**
 		 * The screen widget that is the root of the UI.
 		 */
@@ -134,6 +153,11 @@ namespace josync
 		 * JavsScript message listener.
 		 */
 		WebAppMoblet_WebViewListener* mWebViewListener;
+
+		/**
+		 * This class implements the standard josync message API.
+		 */
+		WebViewMessageHandler* mWebViewMessageHandler;
 
 		/**
 		 * File utility object.

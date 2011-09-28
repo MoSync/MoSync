@@ -63,7 +63,7 @@ using namespace josync;
  * You can turn off SMS sending during debugging
  * by setting this variable to false.
  */
-static bool sSendSMSForReal = true;
+static bool sSendSMSForReal = false;
 
 /**
  * The application class.
@@ -114,7 +114,7 @@ public:
 	/**
 	 * Here we handle messages sent from JavaScript.
 	 */
-	void handleWebViewMessage(WebView* webView, WebViewMessage& message)
+	void handleWebViewMessage(WebViewMessage& message)
 	{
 		if (message.is("SendSMS"))
 		{
@@ -129,6 +129,10 @@ public:
 			// We could implement a JavaScript File API to do
 			// this, which would be a much more general way.
 			setSavedPhoneNo();
+		}
+		else
+		{
+			message.defaultHandler();
 		}
 	}
 
@@ -211,7 +215,6 @@ public:
 		sprintf(code, "%s()", fun.c_str());
 		callJS(code);
 	}
-
 };
 // End of class LoveSMSMoblet
 
