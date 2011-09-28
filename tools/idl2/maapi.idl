@@ -3437,9 +3437,11 @@ interface MAAPI {
 		/**
 		* \brief Opens a PimList. Use maPimListNext() to open the list's items.
 		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
-		* \returns >= 0 A PimList handle, or \< 0 on error.
-		* #MA_PIM_ERR_LIST_ALREADY_OPENED if the list is already opened.
-		* #MA_PIM_ERR_UNAVAILABLE_LIST if the list is not available on the current platform.
+		* \returns \>= 0 A PimList handle.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_LIST_ALREADY_OPENED if the list is already opened.
+		*                    #MA_PIM_ERR_LIST_UNAVAILABLE if the list is not available on the current platform.
+		*                    #MA_PIM_ERR_LIST_TYPE_INVALID if the given list type is invalid.
 		*/
 		MAHandle maPimListOpen(in int listType);
 
@@ -3448,7 +3450,10 @@ interface MAAPI {
 		* or \< 0 on error.
 		* You must use maPimItemClose() on every item to prevent memory leaks.
 		* \param list List handle provided by maPimListOpen(int listType).
-		* \returns >= 0 A PimItem handle, or \< 0 on error.
+		* \returns \> 0 a PimItem handle.
+		*          \= 0 if there are no more items.
+		*          \< 0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
 		*/
 		MAHandle maPimListNext(in MAHandle list);
 
@@ -3467,7 +3472,9 @@ interface MAAPI {
 		/**
 		* \brief Returns the number of fields in the \a item.
 		* \param item Item handle provided by maPimListNext(MAHandle list).
-		* \returns The number of fields in the item.
+		* \returns \>= 0 the number of fields in the item.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
 		*/
 		int maPimItemCount(in MAHandle item);
 
@@ -3476,7 +3483,10 @@ interface MAAPI {
 		* Panics on invalid indices.
 		* \param item Opened by maPimListNext().
 		* \param n \>= 0 and \< maPimItemCount().
-		* \returns One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+		* \returns \> 0 one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
+		*          \< 0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_INDEX_INVALID if the param n is not valid.
 		*/
 		int maPimItemGetField(in MAHandle item, in int n);
 
@@ -3484,9 +3494,12 @@ interface MAAPI {
 		* \brief Returns the number of values in the field for a given item.
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		* \returns \>= 0 on success: The number of values in the field.
-		* \< 0 on error:
-		* #MA_PIM_ERR_FIELD_UNSUPPORTED if the field is unsupported.
+		* \returns \> 0 the number of values in the field.
+		*          \= 0 if the item field has no values.
+		*          \< 0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field is unsupported.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*/
 		int maPimItemFieldCount(in MAHandle item, in int field);
 
@@ -3510,7 +3523,7 @@ interface MAAPI {
 		/**
 		* \brief Sets a custom label for a value in a field and item.
 		* Panics on field/index combinations that don't exist in this item.
-		* The value's attribute must be set to MA_PIM_ATTR_CUSTOM.
+		* The value's attribute must be set to custom.
 		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
 		* \a args.bufSize must be valid.
 		* \param args Common arguments.
@@ -3551,7 +3564,6 @@ interface MAAPI {
 
 		/**
 		* Returns one of the type of the field.
-		* or \< 0 if the field does not exist in the list.
 		* \param list Opened by maPimListOpen().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \returns \>= 0 any of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants.
@@ -3641,13 +3653,13 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns           #MA_PIM_ERR_NONE on success.
-		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
-		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
-		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
-		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
-		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		* \returns #MA_PIM_ERR_NONE on success.
+		*          #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*          #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*          #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*          #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*          #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*          #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		* \note The changes is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3657,7 +3669,8 @@ interface MAAPI {
 		/**
 		* Closes the handle to a PimItem, releasing resources used by the system.
 		* Writes any changes to disk.
-		* \returns One of the \link #MA_PIM_ERR_NONE MA_PIM_ERR \endlink constants.
+		* \returns #MA_PIM_ERR_NONE on success.
+		*          #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid, or if the item's list is closed.
 		* \note An item can also be closed by maPimItemRemove().
 		* \warning Does not write changes to disk if the item's List is closed.
 		* Make sure to keep the List open while editing items.
@@ -3666,15 +3679,18 @@ interface MAAPI {
 
 		/**
 		* Creates a new empty item in the specified list.
-		* \returns A handle to the new item, or \< 0 on error.
+		* \returns \>= 0 A handle to the new item.
+		*          \<  0 on error:
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
 		* \note The handle must be closed with maPimItemClose() to avoid memory leaks.
 		*/
 		MAHandle maPimItemCreate(in MAHandle list);
 
 		/**
 		* Removes an item from a list. This also has the effect of closing the item.
-		* \returns 0 on success and \< 0 on failure.
 		* \see maPimItemClose()
+		* \returns #MA_PIM_ERR_NONE on success.
+		*          #MA_PIM_ERR_HANDLE_INVALID if the list handle or item handle are invalid.
 		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
