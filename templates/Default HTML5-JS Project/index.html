@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+#TouchMe
+{
+	font-size: 3em;
+}
+#Items
+{
+	font-size: 2em;
+}
+</style>
+<script>
+function AddItem()
+{
+	var items = document.getElementById("Items");
+	var item = document.createElement("p");
+	item.innerHTML = "Hello World";
+	items.appendChild(item);
+}
+</script>
+</head>
+<body>
+<div id="TouchMe" class="FontBig" onclick="AddItem()">Touch Me</div>
+<div id="Items" class="FontMedium"></div>
+</body>
+</html>
