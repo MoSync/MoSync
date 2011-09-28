@@ -196,7 +196,7 @@ using namespace MoSyncError;
         bool attributeAllowed = [self isAttributeValid:attribute];
         if (!attributeAllowed)
         {
-            return MA_PIM_ERR_COMBO_UNSUPPORTED;
+            return MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
         }
         else
         {
@@ -243,7 +243,7 @@ using namespace MoSyncError;
 			bool attributeAllowed = [self isAttributeValid:attribute];
 			if (!attributeAllowed)
 			{
-				returnValue = MA_PIM_ERR_COMBO_UNSUPPORTED;
+				returnValue = MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
 			}
 			else
 			{

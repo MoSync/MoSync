@@ -129,7 +129,7 @@ using namespace MoSyncError;
 	}
 	if ([self isFieldWriteOnly:fieldID])
 	{
-		return MA_PIM_ERR_READ_ONLY;
+		return MA_PIM_ERR_FIELD_READ_ONLY;
 	}
 
 	NSString* key = [[NSString alloc] initWithFormat:@"%d", fieldID];
@@ -162,7 +162,7 @@ using namespace MoSyncError;
 	}
 	if ([self isFieldReadOnly:fieldID])
 	{
-		return MA_PIM_ERR_READ_ONLY;
+		return MA_PIM_ERR_FIELD_READ_ONLY;
 	}
 
 	return [super addValue:args withAttribute:attribute];
@@ -191,7 +191,7 @@ using namespace MoSyncError;
     }
     if ([self isFieldReadOnly:fieldID])
     {
-        return MA_PIM_ERR_READ_ONLY;
+        return MA_PIM_ERR_FIELD_READ_ONLY;
     }
 
     return [super setValue:args indexValue:index valueAttribute:atttribute];
