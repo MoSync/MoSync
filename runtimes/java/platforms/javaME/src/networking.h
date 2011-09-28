@@ -174,8 +174,12 @@ static class Connect implements Runnable {
 		boolean http = url.startsWith("http");
 		int result = 1;
 		try {
-			StreamConnection conn = (StreamConnection)Connector.open(url,
-				http ? Connector.READ : Connector.READ_WRITE, true);
+			StreamConnection conn = (StreamConnection)
+#ifdef BB_RIM_NETWORKING
+				BlackBerryConnectionFactory.openConnection(url);
+#else
+				Connector.open(url, http ? Connector.READ : Connector.READ_WRITE, true);
+#endif
 			if(http) {
 				HttpConnection httpConn = (HttpConnection)conn;
 				result = httpConn.getResponseCode();
