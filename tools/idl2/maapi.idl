@@ -3487,6 +3487,7 @@ interface MAAPI {
 		*          \< 0 on error:
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the param n is not valid.
+		* \note On Android and iOS the panic system can be disabled so you'll get error codes instead.
 		*/
 		int maPimItemGetField(in MAHandle item, in int n);
 
@@ -3517,6 +3518,7 @@ interface MAAPI {
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
 		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		* \note On Android and iOS the panic system can be disabled so you'll get error codes instead.
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
@@ -3537,7 +3539,8 @@ interface MAAPI {
 		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		*                    #MA_PIM_ERR_NO_LABEL if the attribute is not set to custom.
-		* \note This function is available on Android or iOS.
+		* \note This function is available only on Android or iOS.
+		* \note On Android and iOS the panic system can be disabled so you'll get error codes instead.
 		*/
 		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
 
