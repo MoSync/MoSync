@@ -1290,6 +1290,10 @@ public
 	final boolean startSound(InputStream input, String mimeString) throws Exception {
 		disposeSound();
 
+#ifdef MA_PROF_BLACKBERRY_VERSION
+		// prefetch() hangs.
+		return false;
+#else
 		/*DEBUG_ALWAYS("Mime: "+mimeString+"\n");
 		DEBUG_ALWAYS("Equality: "+mimeString.equals("audio/mpeg")+"\n");
 		DEBUG_ALWAYS("Comparison: "+mimeString.compareTo("audio/mpeg")+"\n");*/
@@ -1320,6 +1324,7 @@ public
 		mPlayer.start();
 		DEBUG_SOUND("started\n");
 		return true;
+#endif	//MA_PROF_BLACKBERRY_VERSION
 	}
 
 
@@ -1567,6 +1572,8 @@ public
 		return RES_OK;
 	}
 #endif
+
+	// TODO: on Blackberry, use net.rim.device.api.system.PersistentStore instead.
 
 	SYSCALL(MAHandle) maOpenStore(String name, int flags) throws RecordStoreException {
 		DEBUG_ALWAYS("maOpenStore("+name+")\n");
@@ -2350,8 +2357,13 @@ public
 			disposeStreamingVideo();
 
 			DEBUG_MEDIA_STREAM("createPlayer Streaming Video...\n");
-
+#ifdef BB_RIM_NETWORKING
+			InputConnection videoConnection =
+				(InputConnection)BlackBerryConnectionFactory.openConnection(url);
+			mStreamPlayer = Manager.createPlayer(videoConnection.openInputStream(), "video/mp4");
+#else
 			mStreamPlayer = Manager.createPlayer(url);
+#endif
 			if(mStreamPlayer==null) { DEBUG_ALWAYS("Couldn't create Player."); BIG_PHAT_ERROR; }
 
 			DEBUG_MEDIA_STREAM("realize...\n");
@@ -2677,6 +2689,8 @@ public
 		int constraints) throws Exception
 	{
 		MYASSERT(mTextBox == null);
+		if((constraints & TextField.CONSTRAINT_MASK) == MA_TB_TYPE_SINGLE_LINE)
+			return MA_TB_RES_TYPE_UNAVAILABLE;
 		mTextBoxBuffer = outText;
 		mTextBoxMaxSize = maxSize;
 		mTextBox = new TextBox(title, inText, maxSize-1, constraints);

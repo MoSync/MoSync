@@ -32,6 +32,7 @@ stabs.tab
 .mosyncproject.local
 fp.xml
 profile.txt
+.DS_Store
 
 config_platform.h
 
@@ -116,6 +117,7 @@ config_platform.h
 /runtimes/cpp/platforms/symbian/sis*/*.SIS
 
 /runtimes/cpp/platforms/symbian/group*/setPath.bat
+/runtimes/cpp/platforms/symbian/group*/setPath5.bat
 /runtimes/cpp/platforms/symbian/group*/ABLD.BAT
 /runtimes/cpp/platforms/symbian/group*/MOSYNC.xml
 /runtimes/cpp/platforms/symbian/group*/MoSync.xml

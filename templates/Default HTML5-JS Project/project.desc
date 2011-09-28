@@ -1,0 +1,11 @@
+id = project.html5.default
+type = html5
+name = Default HTML5/JavaScript project
+description = The default HTML5/JavaScript project
+
+[Files]
+index.html -> LocalFiles/index.html
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib,NativeUI.lib
+build.prefs:additional.libraries/Debug=MAUtilD.lib,NativeUID.lib

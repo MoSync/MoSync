@@ -25,7 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 void WriteDataTypeArray(int type, int size)
 {
 	int info = (type << 24) | (size & 0x00ffffff);
-	
+
 	if 	((Section == SECT_res) || (Section == SECT_code))
 		return;
 
@@ -51,9 +51,9 @@ void WriteDataTypeArray(int type, int size)
 void WriteTypeAccessArray(int data_addr, int typebits)
 {
 	int v;
-				
+
 	v = ArrayGet(&DataMixArray, data_addr) | typebits;
-	ArraySet(&DataMixArray, data_addr, v);		
+	ArraySet(&DataMixArray, data_addr, v);
 	return;
 }
 
@@ -96,7 +96,7 @@ int GetDataMem(int addr)
 	if (addr >= MAX_DATA_MEM)
 		return 0;
 
-	return ArrayGet(&DataMemArray, addr);		
+	return ArrayGet(&DataMemArray, addr);
 }
 
 //***************************************
@@ -119,12 +119,12 @@ int GetDataMemLong(int index)
 {
 	int max_addr = ((index + 1) * sizeof(int)) - 1;
 	int *ptr;
-	
+
 	if (max_addr >= MAX_DATA_MEM)
 		return 0;
 
 	ptr = (int *) ArrayPtrBound(&DataMemArray, (index*4), (index*4)+4);
-		
+
 	return *ptr;
 }
 
@@ -145,7 +145,7 @@ void WriteAlignByte()
 	}
 
 	if 	(Section == SECT_code)
-	{	
+	{
 		Error(Error_Skip, "!!!!!! whoops -- code align 0x%x\n",CodeIP);
 	}
 
@@ -234,7 +234,7 @@ void WriteByteSpace(int Value)
 	if 	(Section == SECT_data)
 	{
 		ArraySet(&DataMemArray, DataIP, (char) Value);
-		DataIP += 1;	
+		DataIP += 1;
 		return;
 	}
 
@@ -313,7 +313,7 @@ void WriteLongRef(int Value, SYMBOL *ref)
 void AddAlignRef(int immVal)
 {
 	int imm_copy = immVal;
-	
+
 	if 	(Section != SECT_data)
 		Error(Error_Skip, "illegal alignref outside data section");
 
@@ -325,7 +325,7 @@ void AddAlignRef(int immVal)
 		immVal = 7;
 	else
 		return;						// bad align so return
-					
+
 	while(GetSectIP() & immVal)
 	{
 		WriteAlignByte();
@@ -369,7 +369,7 @@ void WriteLong(int Value)
 
 		if (LIST)
 			printf("0x%-4x Word %x : code\n",CodeIP,Value);
-		
+
 		WriteByteQuiet(Value & 0xff);
 		WriteByteQuiet((Value >> 8) & 0xff);
 		WriteByteQuiet((Value >> 16) & 0xff);
@@ -439,7 +439,7 @@ void WriteModule()
 {
 	MA_HEAD	Head;
 	SYMBOL *ep;
-	
+
 	int DataLen = DataIP;
 	int CodeLen = CodeIP;
 	int BssLen  = BssIP;
@@ -451,7 +451,7 @@ void WriteModule()
 	{
 		printf("*Warning* stack size very small !!\n");
 	}
-	
+
 	if (Default_DataSize == 0)
 	{
 			printf("Info: data section auto expands\n");
@@ -460,12 +460,12 @@ void WriteModule()
 	{
 		// !! compute memory overflow problems here !!
 		// Test for datasection overflow
-		
+
 		if (BssLen >= Default_DataSize)
 			printf("*Warning* BSS section exceeds chosen data section size\n");
 
 		// test for underflow
-		
+
 		mem_needed = Default_StackSize + Default_HeapSize + DataIP + BssIP + 16;
 
 		v = Default_DataSize - mem_needed;
@@ -489,11 +489,11 @@ void WriteModule()
 				Default_DataSize++;
 
 			printf("Runtime Warning: data section is too small for the stack, heap & BSS\n");
-			printf("(changed to -datasize=%d)\n", Default_DataSize);
-
+			//printf("(changed to -datasize=%d)\n", Default_DataSize);
+			Error(Error_Fatal, "Data section is too small!");
 		}
 	}
-	
+
 	Head.Magic		= 'XDAM'; 							//'MADX' Mobile Author Dynamic eXecutable
 	Head.CodeLen	= CodeLen;
 	Head.DataLen	= DataLen;

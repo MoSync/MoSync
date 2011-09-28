@@ -90,6 +90,7 @@ sh('doxygen')
 cd("#{MOSYNC_SRC}tools/SplashScreenGenerator")
 sh("ruby main.rb #{VERSION} #{REVISION}")
 cp('splash.bmp', "#{ECLIPSE_SRC}com.mobilesorcery.sdk.product/")
+cp('about.png', "#{ECLIPSE_SRC}com.mobilesorcery.sdk.product/")
 
 # Build MoSync IDE
 cd("#{ECLIPSE_SRC}com.mobilesorcery.sdk.product/build")

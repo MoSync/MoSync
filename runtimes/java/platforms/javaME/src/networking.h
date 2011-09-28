@@ -174,8 +174,12 @@ static class Connect implements Runnable {
 		boolean http = url.startsWith("http");
 		int result = 1;
 		try {
-			StreamConnection conn = (StreamConnection)Connector.open(url,
-				http ? Connector.READ : Connector.READ_WRITE, true);
+			StreamConnection conn = (StreamConnection)
+#ifdef BB_RIM_NETWORKING
+				BlackBerryConnectionFactory.openConnection(url);
+#else
+				Connector.open(url, http ? Connector.READ : Connector.READ_WRITE, true);
+#endif
 			if(http) {
 				HttpConnection httpConn = (HttpConnection)conn;
 				result = httpConn.getResponseCode();
@@ -576,3 +580,34 @@ static class HttpFinish implements Runnable {
 		}
 	}
 }
+
+// -----------------------------------------
+// Blackberry-specific additions for BB OS 5
+// -----------------------------------------
+#ifdef BB_RIM_NETWORKING
+
+#define TRANSPORT net.rim.device.api.io.transport
+
+static class BlackBerryConnectionFactory {
+	static TRANSPORT.ConnectionFactory connFactory =
+		new TRANSPORT.ConnectionFactory();
+	static int[] preferredTransports = {
+		TRANSPORT.TransportInfo.TRANSPORT_TCP_WIFI,
+		TRANSPORT.TransportInfo.TRANSPORT_WAP2,
+		TRANSPORT.TransportInfo.TRANSPORT_TCP_CELLULAR,
+		TRANSPORT.TransportInfo.TRANSPORT_MDS
+	};
+	static {
+		connFactory.setPreferredTransportTypes(preferredTransports);
+		connFactory.setConnectionMode(TRANSPORT.ConnectionFactory.ACCESS_READ_WRITE);
+	};
+
+	static Connection openConnection(String url) throws IOException {
+		TRANSPORT.ConnectionDescriptor connDesc = connFactory.getConnection(url);
+		if(null == connDesc) {
+			throw new IOException("No path to destination url");
+		}
+		return connDesc.getConnection();
+	}
+};
+#endif	//BB_RIM_NETWORKING

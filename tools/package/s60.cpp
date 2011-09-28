@@ -28,7 +28,6 @@ static void setupS60(const SETTINGS& s, string& dstPath, string& combName) {
 	testProgram(s);
 	testName(s);
 	testVendor(s);
-	testUid(s);
 
 	dstPath = s.dst;
 	toSlashes(dstPath);
@@ -47,16 +46,18 @@ static void setupS60(const SETTINGS& s, string& dstPath, string& combName) {
 void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 	string dstPath, combName;
 	setupS60(s, dstPath, combName);
+	testS60v3Uid(s);
+	const char* uid = s.s60v3uid;
 
 	// set up resource templates
-	string rscBaseName = (dstPath + s.uid);
+	string rscBaseName = (dstPath + uid);
 	string rsgName = rscBaseName + ".rsg";
 	const string& runtimePath = ri.path;
 
 	TemplateMap tm;
 	tm["app-name"] = s.name;
-	tm["uid"] = s.uid;
-	tm["resource-header"] = "#include \""+string(s.uid)+".rsg\"";
+	tm["uid"] = uid;
+	tm["resource-header"] = "#include \""+string(uid)+".rsg\"";
 
 	// use template .prs
 	string templateRssName = runtimePath + "MoSync_3rd_template.prs";
@@ -92,21 +93,21 @@ void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 	// call e32hack
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/e32hack \""<<runtimePath<<"MoSync"<<(s.debug ? "D" : "")<<".exe\" \""<<
-		dstPath<<s.uid<<".exe\" "<<s.uid;
+		dstPath<<uid<<".exe\" "<<uid;
 	sh(cmd.str().c_str(), s.silent);
 
 	// call icon-injector
 	if(s.icon) {
 		cmd.str("");
 		cmd << mosyncdir()<<"/bin/icon-injector -src \""<<s.icon<<"\" -size "<<ri.iconSize<<
-			" -platform symbian9 -dst \""<<dstPath<<"/"<<s.uid<<"_icon.mif\"";
+			" -platform symbian9 -dst \""<<dstPath<<"/"<<uid<<"_icon.mif\"";
 		sh(cmd.str().c_str(), s.silent);
 	}
 
 	// use template .pkg
 	string templatePkgName = runtimePath + "MoSync-template.pkg";
-	string genPkgName = (dstPath + s.uid) + ".pkg";
-	string unsignedSisName = (dstPath + s.uid) + ".sis";
+	string genPkgName = (dstPath + uid) + ".pkg";
+	string unsignedSisName = (dstPath + uid) + ".sis";
 	string signedSisName = (dstPath + s.name) + ".sisx";
 
 	tm["project-name"] = s.name;
@@ -136,14 +137,16 @@ void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 void packageS60v2(const SETTINGS& s, const RuntimeInfo& ri) {
 	string dstPath, combName;
 	setupS60(s, dstPath, combName);
+	testS60v2Uid(s);
+	const char* uid = s.s60v2uid;
 
 	// set up resource templates
-	string rscBaseName = (dstPath + s.uid);
+	string rscBaseName = (dstPath + uid);
 	const string& runtimePath = ri.path;
 
 	TemplateMap tm;
 	tm["app-name"] = s.name;
-	tm["uid"] = s.uid;
+	tm["uid"] = uid;
 
 	// use template .prs
 	string templateRssName = runtimePath + "MoSync_caption_template.prs";
@@ -163,7 +166,7 @@ void packageS60v2(const SETTINGS& s, const RuntimeInfo& ri) {
 	// call e32hack
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/e32hack \""<<runtimePath<<"MoSync"<<(s.debug ? "D" : "")<<".app\" \""<<
-		dstPath<<s.uid<<".app\" "<<s.uid<<" -v2";
+		dstPath<<uid<<".app\" "<<uid<<" -v2";
 	sh(cmd.str().c_str(), s.silent);
 
 	// use template .pkg

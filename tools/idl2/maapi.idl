@@ -1333,6 +1333,40 @@ interface MAAPI {
 		* \see maSensorStart()
 		*/
 		SENSOR = 33;
+
+		/** \brief A new NFC tag was received
+		* A new tag has been received, use maGetNextTag to
+		* retreive it.
+		*/
+		NFC_TAG_RECEIVED = 34;
+
+		/** \brief New tag data was read
+		* An asynchronous NFC tag read operation was
+		* completed.
+		*/
+		NFC_TAG_DATA_READ = 35;
+
+		/** \brief New tag data was written
+		* An asynchronous NFC tag write operation was
+		* completed.
+		*/
+		NFC_TAG_DATA_WRITTEN = 36;
+
+		/** \brief A batch operation was performed
+		*/
+		NFC_BATCH_OP = 37;
+
+		/** \brief Tag authentication was performed
+		* An asynchronous NFC tag authentication read was
+		* completed.
+		*/
+		NFC_TAG_AUTH_COMPLETE = 38;
+
+		/**
+		* \brief Tag was made read only
+		*  An asynchronous NFC tag read only operation was completed.
+		*/
+		NFC_TAG_READ_ONLY = 39;
 	}
 
 	/**
@@ -1355,6 +1389,19 @@ interface MAAPI {
 		float values[3];
 	}
 
+	/**
+	* \brief An event containing the result of an NFC asynchronous operation
+	*/
+	struct MANFCEventData {
+		/// The handle this event pertains to.
+		MAHandle handle;
+		/// The result of the asynchronous operation, usually a length if >= 0,
+		/// or an error code of < 0.
+		int result;
+		/// The destination of any read or write operation. Could be a memory
+		/// address, a block number, or some other value depending on the operation.
+		int dstId;
+	}
 
 	/**
 	* \brief An event; a message indicating that something has happened, e.g. that a key has been pressed.
@@ -1438,6 +1485,11 @@ interface MAAPI {
 			* Valid in \link #EVENT_TYPE_SENSOR SENSOR \endlink events.
 			*/
 			MASensor sensor;
+
+			/**
+			* NFC event data
+			*/
+			MANFCEventData nfc;
 
 			/**
 			* Used by custom events. See invididual event descriptions.
@@ -2422,6 +2474,24 @@ interface MAAPI {
 			END = 2;
 		}
 
+		constset int MA_FL_SORT_ {
+			/// Don't sort the files.
+			NONE = 0;
+			/// Sort the files by date. See maFileDate().
+			DATE = 1;
+			/// Sort the files by name. Case-sensitive?
+			NAME = 2;
+			/// Sort the files by size. See maFileSize().
+			SIZE = 3;
+		}
+
+		constset int MA_FL_ORDER_ {
+			/// Oldest / smallest / A first.
+			ASCENDING = 0x10000;
+			/// Newest / biggest / Z first.
+			DESCENDING = 0x20000;
+		}
+
 		/**
 		* Creates a listing of names of files and directories, or file systems.
 		* Call maFileListNext() repeatedly to retrieve the names. Call maFileListClose() to
@@ -2434,10 +2504,16 @@ interface MAAPI {
 		* Which root file systems are listed vary between platforms.
 		* \param filter A string to match names with. May include an asterisk ('*') wildcard
 		* to represent 0 or more characters. Ignored if \a path is empty.
+		* \param sorting One of the \link #MA_FL_SORT_DATE MA_FL_SORT \endlink flags,
+		* OR'd with one of the \link #MA_FL_ORDER_ASCENDING MA_FL_ORDER \endlink flags.
+		* #MA_FL_SORT_NONE must not be combined with an
+		* \link #MA_FL_ORDER_ASCENDING MA_FL_ORDER \endlink flag.
+		* \note Sorting is not supported on JavaME. If it is attempted,
+		* this function will fail with #MA_FERR_SORTING_UNSUPPORTED.
 		*
 		* \returns A File Listing handle, or \< 0 on error.
 		*/
-		MAHandle maFileListStart(in MAString path, in MAString filter);
+		MAHandle maFileListStart(in MAString path, in MAString filter, in int sorting);
 
 		/**
 		* Writes the name of the next file in the list to the specified buffer.
@@ -2469,6 +2545,8 @@ interface MAAPI {
 			RENAME_FILESYSTEM = -5;
 			RENAME_DIRECTORY = -6;
 			WRONG_TYPE = -7;
+			/// The sorting method requested is unsupported on the current platform.
+			SORTING_UNSUPPORTED = -8;
 		}
 
 		//maybe add support for "hidden" files
@@ -3310,8 +3388,7 @@ interface MAAPI {
 			CUSTOM = 1003;
 		}
 
-		constset int MA_PIM_ATTR
-		{
+		constset int MA_PIM_ATTR {
 			/// The constant describes a preferred field.
 			PREFERRED = 0x10000;
 		}
@@ -3349,16 +3426,12 @@ interface MAAPI {
 			ATTRIBUTE_COMBO_UNSUPPORTED = -14;
 			/// The values's attribute is not set to custom.
 			ATTRIBUTE_CUSTOM = -15;
-			/// The field doesn't have attributes.
-			NO_ATTRIBUTES = -16;
-			/// The allocated buffer is too small.
-			BUFFER_TOO_SMALL = -17;
 			/// Invalid buffer structure.
-			BUFFER_INVALID = -18;
+			BUFFER_INVALID = -16;
 			/// The value does not have a custom label.
-			NO_LABEL = -19;
+			NO_LABEL = -17;
 			/// The operation is not allowed by the Address Book database.
-			OPERATION_NOT_PERMITTED = -20;
+			OPERATION_NOT_PERMITTED = -18;
 		}
 
 		/**
@@ -3367,7 +3440,7 @@ interface MAAPI {
 		* \returns \>= 0 A PimList handle.
 		*          \<  0 on error:
 		*                    #MA_PIM_ERR_LIST_ALREADY_OPENED if the list is already opened.
-		*					 #MA_PIM_ERR_LIST_UNAVAILABLE if the list is not available on the current platform.
+		*                    #MA_PIM_ERR_LIST_UNAVAILABLE if the list is not available on the current platform.
 		*                    #MA_PIM_ERR_LIST_TYPE_INVALID if the given list type is invalid.
 		*/
 		MAHandle maPimListOpen(in int listType);
@@ -3378,26 +3451,28 @@ interface MAAPI {
 		* You must use maPimItemClose() on every item to prevent memory leaks.
 		* \param list List handle provided by maPimListOpen(int listType).
 		* \returns \> 0 a PimItem handle.
-		*		   \= 0 if there are no more items.
+		*          \= 0 if there are no more items.
 		*          \< 0 on error:
-		*					 #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
+		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
 		*/
 		MAHandle maPimListNext(in MAHandle list);
 
 		/**
 		* \brief Closes a PimList.
 		* \param list List handle provided by maPimListOpen(int listType).
-		* \returns           #MA_PIM_ERR_NONE on success.
-		*			         #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
-		* \note This does not close the list's items, but it does invalidate them.
-		*  Use maPimItemClose() for closing list's items.
+		* \returns #MA_PIM_ERR_NONE on success, or \< 0 on error.
+		* #MA_PIM_ERR_LIST_NOT_OPENED if the list is not opened.
+		* #MA_PIM_ERR_UNAVAILABLE_LIST if the list is unavailable.
+		* #MA_PIM_ERR_INVALID_HANDLE if the list handle is invalid.
+		* \note This does not close the list's items, but it does invalidate them,
+		* so that maPimItemClose() is the only function you can safely use on them.
 		*/
 		int maPimListClose(in MAHandle list);
 
 		/**
 		* \brief Returns the number of fields in the \a item.
 		* \param item Item handle provided by maPimListNext(MAHandle list).
-		* \returns \>= 0 the number of field in the item.
+		* \returns \>= 0 the number of fields in the item.
 		*          \<  0 on error:
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
 		*/
@@ -3405,12 +3480,14 @@ interface MAAPI {
 
 		/**
 		* \brief Returns the field id of the item's n:th field.
+		* Panics on invalid indices.
 		* \param item Opened by maPimListNext().
 		* \param n \>= 0 and \< maPimItemCount().
 		* \returns \> 0 one of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		*          \< 0 on error:
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the param n is not valid.
+		* \note On Android and iOS the panic system can be disabled so you'll get error codes instead.
 		*/
 		int maPimItemGetField(in MAHandle item, in int n);
 
@@ -3418,7 +3495,7 @@ interface MAAPI {
 		* \brief Returns the number of values in the field for a given item.
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
-		* \returns \> 0 the number of values for the item.
+		* \returns \> 0 the number of values in the field.
 		*          \= 0 if the item field has no values.
 		*          \< 0 on error:
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
@@ -3429,21 +3506,25 @@ interface MAAPI {
 
 		/**
 		* \brief Returns the attribute for the specified value in a field and item.
+		* Panics on field/index combinations that don't exist in this item.
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
 		* \returns \> 0 the attribute for the specified field.
+		*          \= 0 if the field doesn't have attributes.
 		*          \< 0 on error:
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
-		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
-		*                    #MA_PIM_ERR_NO_ATTRIBUTES if the field doesn't have attributes.
+		* \note On Android and iOS the panic system can be disabled so you'll get error codes instead.
 		*/
 		int maPimItemGetAttributes(in MAHandle item, in int field, in int index);
 
 		/**
 		* \brief Sets a custom label for a value in a field and item.
+		* Panics on field/index combinations that don't exist in this item.
 		* The value's attribute must be set to custom.
 		* The label has #MA_PIM_TYPE_STRING and is stored in \a args.buf.
 		* \a args.bufSize must be valid.
@@ -3454,10 +3535,12 @@ interface MAAPI {
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
 		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
-		*			         #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		*                    #MA_PIM_ERR_NO_LABEL if the attribute is not set to custom.
-		* \note This function is available on Android or iOS.
+		* \note This function is available only on Android or iOS.
+		* \note On Android and iOS the panic system can be disabled so you'll get error codes instead.
 		*/
 		int maPimItemSetLabel(in MA_PIM_ARGS args, in int index);
 
@@ -3472,9 +3555,9 @@ interface MAAPI {
 		* \returns \>= 0 the number of bytes occupied by the value.
 		*          \<  0 on error:
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
-		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
-		*					 #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		*                    #MA_PIM_ERR_NO_LABEL if the attribute type is not set to custom.
 		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
@@ -3483,13 +3566,13 @@ interface MAAPI {
 		int maPimItemGetLabel(in MA_PIM_ARGS args, in int index);
 
 		/**
-		* Returns one of the type of the field or \< 0 in case of error.
+		* Returns one of the type of the field.
 		* \param list Opened by maPimListOpen().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \returns \>= 0 any of the \link #MA_PIM_TYPE_BINARY MA_PIM_TYPE \endlink constants.
 		*          \<  0 on error:
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle is invalid.
-		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
 		*/
 		int maPimFieldType(in MAHandle list, in int field);
@@ -3516,11 +3599,11 @@ interface MAAPI {
 		* \returns \>= 0 The number of bytes occupied by the value.
 		*          \<  0 on error:
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
-		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
-		*			         #MA_PIM_ERR_FIELD_WRITE_ONLY if the field is write-only.
-		*                    #MA_PIM_ERR_BUFFER_TOO_SMALL if the size of the value is greaten than bufSize.
+		*                    #MA_PIM_ERR_FIELD_WRITE_ONLY if the field is write-only.
 		*/
 		int maPimItemGetValue(in MA_PIM_ARGS args, in int index);
 
@@ -3533,11 +3616,12 @@ interface MAAPI {
 		* \param attributes The value's new attributes.
 		* \returns           #MA_PIM_ERR_NONE on success.
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
-		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
-		*			         #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*                    #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
 		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
-		*			         #MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED if the field/attribute combination is not supported.
+		*                    #MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED if the field/attribute combination is not supported.
 		*                    #MA_PIM_ERR_BUFFER_INVALID if the buffer is not valid.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
@@ -3555,10 +3639,11 @@ interface MAAPI {
 		* \returns />= 0 the index of the new added value.
 		*          /<  0 on error:
 		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
-		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*                    #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
 		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
-		*			         #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
-		*			         #MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED if the field/attribute combination is not supported.
+		*                    #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*                    #MA_PIM_ERR_FIELD_COUNT_MAX if more values cannot be added to this field.
+		*                    #MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED if the field/attribute combination is not supported.
 		*                    #MA_PIM_ERR_BUFFER_INVALID if the buffer is not valid.
 		* \note The new value is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
@@ -3571,11 +3656,13 @@ interface MAAPI {
 		* \param item Opened by maPimListNext().
 		* \param field One of the \link #MA_PIM_FIELD_CONTACT_ADDR MA_PIM_FIELD \endlink constants.
 		* \param index \>= 0 and \< maPimItemFieldCount().
-		* \returns           #MA_PIM_ERR_NONE on success.
-		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
-		*					 #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
-		*                    #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
-		*                    #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
+		* \returns #MA_PIM_ERR_NONE on success.
+		*          #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid.
+		*          #MA_PIM_ERR_FIELD_INVALID if the field is invalid.
+		*          #MA_PIM_ERR_FIELD_UNSUPPORTED if the field type is unsupported.
+		*          #MA_PIM_ERR_FIELD_READ_ONLY if the field is read-only.
+		*          #MA_PIM_ERR_FIELD_EMPTY if the given field doesn't have values.
+		*          #MA_PIM_ERR_INDEX_INVALID if the index is invalid.
 		* \note The changes is not actually written to disk until
 		* the item is closed with maPimItemClose(). If the program exits before then,
 		* the changes are lost.
@@ -3585,11 +3672,11 @@ interface MAAPI {
 		/**
 		* Closes the handle to a PimItem, releasing resources used by the system.
 		* Writes any changes to disk.
-		* \returns           #MA_PIM_ERR_NONE on success.
-		*                    #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid, or if the item's list is closed.
+		* \returns #MA_PIM_ERR_NONE on success.
+		*          #MA_PIM_ERR_HANDLE_INVALID if the item handle is invalid, or if the item's list is closed.
 		* \note An item can also be closed by maPimItemRemove().
-		* \warning Does not write changes to disk if the item's list is closed.
-		* Make sure to keep the list open while editing items.
+		* \warning Does not write changes to disk if the item's List is closed.
+		* Make sure to keep the List open while editing items.
 		*/
 		int maPimItemClose(in MAHandle item);
 
@@ -3605,8 +3692,8 @@ interface MAAPI {
 		/**
 		* Removes an item from a list. This also has the effect of closing the item.
 		* \see maPimItemClose()
-		* \returns           #MA_PIM_ERR_NONE on success.
-		*                    #MA_PIM_ERR_HANDLE_INVALID if the list handle or item handle are invalid.
+		* \returns #MA_PIM_ERR_NONE on success.
+		*          #MA_PIM_ERR_HANDLE_INVALID if the list handle or item handle are invalid.
 		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
@@ -6559,7 +6646,11 @@ group CameraFunctions "Camera Functions" {
 		* The text box will disappear.
 		* An event (#EVENT_TYPE_TEXTBOX) will be posted.
 		*
-		* \returns \>= 0.
+		* The text box will allow input of up to (\a maxSize - 1) characters, but no more.
+		* Additional keypresses at that point may be ignored, or may cause an error message,
+		* at the discretion of the underlying implementation.
+		*
+		* \returns \>= 0 on success, \< 0 on error.
 		*
 		* \param title The box's title.
 		* \param inText When the text box is created, it is populated with this string.
@@ -6589,33 +6680,46 @@ group CameraFunctions "Camera Functions" {
 			/// The user is allowed to enter a real number value.
 			/// This extends #MA_TB_TYPE_NUMERIC by allowing a decimal point.
 			DECIMAL = 5;
+			/** \brief The user is allowed to enter any text, except for line breaks.
+			* Unavailable on some platforms.
+			* In that case, maTextBox() will return #MA_TB_RES_TYPE_UNAVAILABLE.
+			* You can use #MA_TB_TYPE_ANY instead.
+			*/
+			SINGLE_LINE = 100;
+
+			/** Use this to separate types from flags in the \a constraints parameter.
+			* This is not a valid type value.
+			*/
+			MASK = 0xFFFF;
 		}
 		constset int MA_TB_RES_ {
 			/// The user chose OK.
 			OK = 1;
 			/// The user chose Cancel.
 			CANCEL = 2;
+			/// The specified type is unavailable on this platform.
+			TYPE_UNAVAILABLE = -3;
 		}
 		constset int MA_TB_FLAG_ {
 			/// Indicates that the text entered is confidential data that should be
 			/// obscured whenever possible.
 			/// This implies #MA_TB_FLAG_SENSITIVE.
-			PASSWORD = 0x1000;
+			PASSWORD = 0x10000;
 			/// Indicates that editing is disallowed.
-			UNEDITABLE = 0x2000;
+			UNEDITABLE = 0x20000;
 			/// Indicates that the text entered is sensitive data that the implementation
 			/// must never store into a dictionary or table for use in predictive, auto-completing,
 			/// or other accelerated input schemes. A credit card number is an example of sensitive data.
-			SENSITIVE = 0x4000;
+			SENSITIVE = 0x40000;
 			/// Indicates that the text entered does not consist of words that are likely
 			/// to be found in dictionaries typically used by predictive input schemes.
-			NON_PREDICTIVE = 0x8000;
+			NON_PREDICTIVE = 0x80000;
 			/// This flag is a hint to the implementation that during text editing,
 			/// the initial letter of each word should be capitalized.
-			INITIAL_CAPS_WORD = 0x10000;
+			INITIAL_CAPS_WORD = 0x100000;
 			/// This flag is a hint to the implementation that during text editing,
 			/// the initial letter of each sentence should be capitalized.
-			INITIAL_CAPS_SENTENCE = 0x20000;
+			INITIAL_CAPS_SENTENCE = 0x200000;
 		}
 
 		/**
@@ -6852,9 +6956,421 @@ group CameraFunctions "Camera Functions" {
 		* \see #EVENT_TYPE_SENSOR
 		*/
 		int maSensorStop(in int sensor);
+
+		/**
+		* Start listening to NFC events.
+		* \return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
+		* MA_NFC_NOT_AVAILABLE if NFC is not at all available, or
+		* 0 otherwise.
+		*/
+		int maNFCStart();
+
+		/**
+		* Stop listening to NFC events.
+		*/
+		void maNFCStop();
+
+		/**
+		* Reads the next available tag.
+		* @return A zero handle if no tag currently available
+		*/
+		MAHandle maNFCReadTag(in MAHandle nfcContext);
+
+		/**
+		* Destroys the tag. Clients are responsible for calling
+		* this function for every corresponding maNFCReadTag.
+		*/
+		void maNFCDestroyTag(in MAHandle tagHandle);
+
+		/**
+		* Connects to a tag, enabling further I/O operations to be
+		* performed on it.
+		*/
+		void maNFCConnectTag(in MAHandle tagHandle);
+
+		/**
+		* Closes I/O operations for a tag, disabling further I/O operations to be
+		* performed on it.
+		*/
+		void maNFCCloseTag(in MAHandle tagHandle);
+
+		/**
+		* Determines whether a tag is of a certain type.
+		* Use the constants prefixed with MA_NFC_TAG_TYPE_ to
+		* see the available tag types.
+		* \return > 0 if the tag is a the specified type, 0 if it is not,
+		* and MA_NFC_INVALID_TAG_TYPE if the tag type is not supported
+		* by this platform.
+		*/
+		int maNFCIsType(in MAHandle tagHandle, in int type);
+
+		/**
+		* To be able to call functions tag require the tag to be of
+		* a certain type (see maNFCIsType), the tag received
+		* must be converted to the proper type (see MA_NFC_TAG_TYPE_*
+		* constants).
+		* Clients are responsible for destroying the returned handle
+		* using maNFCDestroyTag.
+		* \return A handle if the type was convertable to the specified
+		* type.
+		*/
+		MAHandle maNFCGetTypedTag(in MAHandle tagHandle, in int type);
+
+		/**
+		* Starts a batch operation. No NFC I/O operations will be performed
+		* until maBatchCommit has been called.
+		* Note that only one active batch per tag is allowed.
+		* \param The tag on which to perform the batch operation.
+		* \return A non-zero value if a batch is already started for this tag or if a batch
+		* could not be started, 0 otherwise.
+		*/
+		int maNFCBatchStart(in MAHandle tagHandle);
+
+		/**
+		* Asynchronously performs all operations since the last call to maNFCBatchStart. The event
+		* delivered will be of the EVENT_TYPE_NFC_BATCH_OP type and
+		* with an MANFCEventData containing the tag's handle.
+		* \param The handle to the tag that is in batch mode.
+		*/
+		void maNFCBatchCommit(in MAHandle tagHandle);
+
+		/**
+		* Cancels all operations of the current batch.
+		* \param The handle to the tag that is in batch mode.
+		*/
+		void maNFCBatchRollback(in MAHandle tagHandle);
+
+		/**
+		* Sends a message to a tag. The response will come as
+		* an EVENT_TYPE_NFC_TAG_DATA_READ event, with the
+		* handle set to the handle passed into this method
+		* and the result field set to the number of bytes
+		* actually read.
+		* \param tag The tag to communicate with.
+		* \param src The data to send.
+		* \param len The length of the data to send.
+		* \return 0 if the tag can be transceived to, < 0 otherwise.
+		*/
+		int maNFCTransceive(in MAHandle tag, in MAAddress src, in int srcLen, out MAAddress dst, out int dstLen);
+
+		/**
+		* Makes a tag read-only (this operation cannot be reverted).
+		* The response will come as an EVENT_TYPE_NFC_TAG_READ_ONLY event, with the
+		* handle set to the handle passed into this method.
+		* \param tag The tag to make read only.
+		* \return MA_NFC_INVALID_TAG_TYPE if the handle given as argument
+		* cannot be made read-only.
+		*/
+		int maNFCSetReadOnly(in MAHandle tag);
+
+		/**
+		* Checks whether a tag is read-only.
+		* \param tag The tag to check for read/write permissions.
+		* \return MA_NFC_INVALID_TAG_TYPE if this operation is
+		* not applicable, a value > 0 if it is read-only, or
+		* 0 if it is read-only.
+		*/
+		int maNFCIsReadOnly(in MAHandle tag);
+
+		/**
+		* Reads an NDEF message from the given tag, which must
+		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_READ
+		* event with the handle set to the handle passed into this method
+		* and the result field set to 0 on success and a value < 0 on error.
+		* After receiving the event, clients may call
+		* maNFCGetNDEFMessage() to get the actual message.
+		*
+		*/
+		int maNFCReadNDEFMessage(in MAHandle tag);
+
+		/**
+		* Writes an NDEF message to the given tag, which must
+		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_WRITE
+		* event with the handle set to the handle passed into this method
+		* and the result field set to 0 on success and a value < 0 on error.
+		* \param tag The tag handle to write to
+		* \param ndefMessage The message to write
+		* \return MA_NFC_INVALID_TAG_TYPE if the handle given as argument
+		* does not represent an NDEF message.
+		*
+		*/
+		int maNFCWriteNDEFMessage(in MAHandle tag, in MAHandle ndefMessage);
+
+		/**
+		* Creates a new NDEF message, to be used primarily by
+		* \code maNFCWriteDefMessage.
+		* \param recordCount The number of records in the created message
+		* \return The handle to the created NDEF message; clients are
+		* responsible for destroying the message.
+		*/
+		MAHandle maNFCCreateNDEFMessage(in int recordCount);
+
+		/**
+		* Gets the NDEF message from a tag, which must
+		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* \return The handle to the NDEF message, which
+		* may be subsequently used in NDEF specfic functions,
+		* or the zero handle if the tag has no NDEF message
+		* associated with it (in which case, clients may call
+		* maNFCReadNDEFMessage).
+		* IMPORTANT: Once the tag has been destroyed OR if
+		* maNFCReadNDEFMessage is called, any NDEF messages
+		* previously returned by this function
+		* will be destroyed with it and cannot
+		* be used.
+		*/
+		int maNFCGetNDEFMessage(in MAHandle tag);
+
+		/**
+		* \return A handle to the ith NDEF record of an NDEF message,
+		* or a zero handle if the handle given as argument does no
+		* represent an NDEF message.
+		*/
+		MAHandle maNFCGetNDEFRecord(in MAHandle ndef, in int ix);
+
+		/**
+		* \return The number of NDEF records in an NDEF message,
+		* or MA_NFC_INVALID_TAG_TYPE if the handle given as argument
+		* does not represent an NDEF record.
+		*/
+		int maNFCGetNDEFRecordCount(in MAHandle ndef);
+
+		/**
+		* Reads the variable length id of an NDEF record.
+		* \return NFC_INVALID_TAG_TYPE if the handle given as
+		* argument does not represent an NDEF record.
+		*/
+		int maNFCGetId(in MAHandle ndefRecord, out MAAddress dst, in int len);
+
+		/**
+		* Reads the variable length payload of an NDEF record.
+		* Returns NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF record.
+		*/
+		int maNFCGetPayload(in MAHandle ndefRecord, out MAAddress dst, in int len);
+
+		/**
+		 * Returns the 3-bit TNF of an NDEF record,
+		 * or NFC_INVALID_TAG_TYPE if the handle given as argument
+		 * does not represent an NDEF record.
+		 */
+		int maNFCGetTnf(in MAHandle ndefRecord);
+
+		/**
+		* Returns the variable length type field of an NDEF record,
+		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
+		* does not represent an NDEF record.
+		*/
+		int maNFCGetType(in MAHandle ndefRecord, out MAAddress dst, in int len);
+
+		/**
+		* Sets the variable length id of an NDEF record.
+		* \return NFC_INVALID_TAG_TYPE if the handle given as
+		* argument does not represent an NDEF message.
+		*/
+		int maNFCSetId(in MAHandle ndefRecord, in MAAddress dst, in int len);
+
+		/**
+		* Sets the variable length payload of an NDEF record.
+		* \return NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF message.
+		*/
+		int maNFCSetPayload(in MAHandle ndefRecord, in MAAddress dst, in int len);
+
+		/**
+		 * Sets the 3-bit TNF of an NDEF record,
+		 * \return NFC_INVALID_TAG_TYPE if the handle given as argument
+		 * does not represent an NDEF record.
+		 */
+		int maNFCSetTnf(in MAHandle ndefRecord, in int tnf);
+
+		/**
+		* Returns the variable length type field of an NDEF record,
+		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
+		* does not represent an NDEF record.
+		*/
+		int maNFCSetType(in MAHandle ndefRecord, in MAAddress dst, in int len);
+
+		/**
+		* Authenticates a MIFARE Classic tag using the A or B key. Authentication must take place
+		* before reading/writing to a certain sector.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_AUTH_COMPLETE
+		* event, unless part of a batch operation.
+		* \param tagHandle The tag to authenticate
+		* \param keyType Either MA_NFC_MIFARE_KEY_A or MA_NFC_MIFARE_KEY_B.
+		* \param sectorIndex The sector to authenticate
+		* \param keySrc The address to the key to authenticate with
+		* \param keyLen The length of the key to authenticate with
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if authentication can take place.
+		*/
+		int maNFCAuthenticateSector(in MAHandle tagHandle, in int keyType, in int sectorIndex, in MAAddress keySrc, in int keyLen);
+
+		/**
+		* Returns the number of sectors of a MIFARE Classic tag.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), otherwise the number of sectors
+		* is returned.
+		*/
+		int maNFCGetSectorCount(in MAHandle tagHandle);
+
+		/**
+		* Returns the number of blocks in a sector of a MIFARE Classic tag.
+		* \param sector The sector to get the number of blocks in.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), otherwise the number of sectors
+		* is returned.
+		*/
+		int maNFCGetBlockCountInSector(in MAHandle tagHandle, in int sector);
+
+		/**
+		* Returns the first block of a sector of a MIFARE Classic tag.
+		* \param sector The sector of which to get the first block.
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), otherwise the index of the
+		* first block of the sector is returned.
+		*/
+		int maNFCSectorToBlock(in MAHandle tagHandle, in int sector);
+
+		/**
+		* Reads a number of blocks of a MIFARE Classic tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_READ
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to read from.
+		* \param dst The memory address to write to.
+		* \param len The number of bytes to read. Several blocks may be read, depending
+		* on len (A block is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a read operation can be performed.
+		*/
+		int maNFCReadBlocks(in MAHandle tagHandle, in int firstBlock, out MAAddress dst, in int len);
+
+		/**
+		* Writes a number of blocks to a MIFARE Classic tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_WRITE
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to write to.
+		* \param dst The memory address to read from.
+		* \param len The number of bytes to write. Several blocks may be written, depending
+		* on len (A block is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a write operation can be performed.
+		*/
+		int maNFCWriteBlocks(in MAHandle tagHandle, in int firstBlock, in MAAddress dst, in int len);
+
+		/**
+		* Reads a number of blocks of a MIFARE Ultralight tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_READ
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to read from.
+		* \param dst The memory address to write to.
+		* \param len The number of bytes to read. Several pages may be read, depending
+		* on len (A page is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a read operation can be performed.
+		*/
+		int maNFCReadPages(in MAHandle tagHandle, in int firstPage, out MAAddress dst, in int len);
+
+		/**
+		* Writes a number of blocks of a MIFARE Ultralight tag.
+		* The operation is asyncronous and will result in an EVENT_TYPE_NFC_TAG_WRITE
+		* event, unless part of a batch operation.
+		* \param firstBlock The first block to write to.
+		* \param dst The memory address to read from.
+		* \param len The number of bytes to write. Several pages may be written, depending
+		* on len (A page is 16 bytes).
+		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
+		* tag type is not supported by the device), 0 if a write operation can be performed.
+		*/
+		int maNFCWritePages(in MAHandle tagHandle, in int firstPage, in MAAddress dst, in int len);
+
+		constset int MA_NFC_ {
+			/**
+			* A constant indicating there is no NFC support on the device.
+			*/
+			NOT_AVAILABLE = -1;
+
+			/**
+			* A constant indicating NFC is not enabled on the device. (But there is hardware support).
+			*/
+			NOT_ENABLED = -2;
+
+			/**
+			* A constant indicating an invalid tag type.
+			*/
+			INVALID_TAG_TYPE = -2;
+
+			/**
+			* An error code if tag connection is lost.
+			*/
+			TAG_CONNECTION_LOST = -3;
+
+			/**
+			* An error code if trying to perform I/O on an unconnected
+			* tag.
+			*/
+			TAG_NOT_CONNECTED = -4;
+
+			/**
+			* An error code if some general I/O error occurred,
+			* other than the special case of tag connection being lost.
+			*/
+			TAG_IO_ERROR = -127;
+
+		}
+
+		constset int MA_NFC_TAG_TYPE_ {
+
+			/**
+			* Represents an NDEF (NFC Data Exchange Format) tag.
+			*/
+			NDEF = 1;
+
+			/**
+			* Represents a Mifare Classic tag.
+			*/
+			MIFARE_CL = 2;
+
+			/**
+			* Represents a Mifare Ultralight tag.
+			*/
+			MIFARE_UL = 3;
+
+			/**
+			* Represents an NfcA tag (ISO 14443-3A).
+			*/
+			NFC_A = 4;
+
+			/**
+			* Represents an NfcB tag (ISO 14443-3B).
+			*/
+			NFC_B = 5;
+
+			/**
+			* Represents an ISO-DEP tag (ISO 14443-4).
+			*/
+			ISO_DEP = 6;
+
+		}
+
+		constset int MA_NFC_MIFARE_ {
+
+			/**
+			* The A key for MiFare Classic authentication
+			*/
+			KEY_A = 1;
+
+			/**
+			* The B key for MiFare Classic authentication
+			*/
+			KEY_B = 2;
+
+		}
+
 	}
 
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}
+
 }

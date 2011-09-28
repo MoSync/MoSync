@@ -515,4 +515,3 @@ extern "C" int MAMain() {
 	Moblet::run(new GraphunApp());
 	return 0;
 }
-

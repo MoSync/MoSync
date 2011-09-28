@@ -86,37 +86,36 @@ public:
 		}
 	}
 
-    /**
-     * This method is called when there is an touch-down event for
-     * a button.
-     * Only for iphone platform.
-     * @param button The button object that generated the event.
-     */
-    virtual void buttonPressed(Widget* button)
-    {
-    	((Button*) button)->setText(HELLO_WORLD_MESSAGE);
-    };
+	/**
+	* This method is called when there is an touch-down event for
+	* a button.
+	* Only for iphone platform.
+	* @param button The button object that generated the event.
+	*/
+	virtual void buttonPressed(Widget* button)
+	{
+		((Button*) button)->setText(HELLO_WORLD_MESSAGE);
+	};
 
-    /**
-     * This method is called when there is an touch-up event for
-     * a button.
-     * Only for iphone platform.
-     * @param button The button object that generated the event.
-     */
-    virtual void buttonReleased(Widget* button)
-    {
-    	((Button*) button)->setText(PRESS_ME_MESSAGE);
-    };
+	/**
+	* This method is called when there is an touch-up event for
+	* a button.
+	* Only for iphone platform.
+	* @param button The button object that generated the event.
+	*/
+	virtual void buttonReleased(Widget* button)
+	{
+		((Button*) button)->setText(PRESS_ME_MESSAGE);
+	};
 
-    /**
-     * This method is called if the touch-up event was inside the
-     * bounds of the button.
-     * @param button The button object that generated the event.
-     */
-    virtual void buttonClicked(Widget* button)
-    {
-
-    }
+	/**
+	* This method is called if the touch-up event was inside the
+	* bounds of the button.
+	* @param button The button object that generated the event.
+	*/
+	virtual void buttonClicked(Widget* button)
+	{
+	}
 
 private:
     Screen* mScreen;			//A Native UI screen

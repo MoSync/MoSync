@@ -107,7 +107,7 @@ struct LOW_FD {
 	int lowFd;
 	int refCount;
 	int flags;
-	
+
 	// valid only if flags & O_DIRECTORY.
 	char* name;
 	int listHandle;
@@ -264,7 +264,7 @@ static int baseStat(MAHandle h, struct stat* st) {
 		st->st_size = 4*1024;	// default directory size.
 	}
 	CHECK(st->st_mtime = maFileDate(h), EIO);
-	
+
 	// we don't support the rest of the fields, but let's give them dummy values anyway.
 	st->st_ino = 0;
 	st->st_dev = 0;
@@ -275,7 +275,7 @@ static int baseStat(MAHandle h, struct stat* st) {
 	st->st_ctime = st->st_mtime;
 	st->st_blocks = (st->st_size / 512) + 1;
 	st->st_blksize = 1024 * 4;	// arbitrary
-	
+
 	return 0;
 }
 
@@ -316,7 +316,7 @@ int fstatat(int __fd, const char* path, struct stat* st, int flag) {
 
 	LOGD("fstatat(%i, %s)", __fd, path);
 	TEST(getRealPath(__fd, temp, path, 2046));
-	
+
 	// check if it's a directory.
 	length = strlen(temp);
 	if(temp[length-1] != '/') {
@@ -335,7 +335,7 @@ int fstatat(int __fd, const char* path, struct stat* st, int flag) {
 		if(errno != EEXIST)
 			STDFAIL;
 	}
-	
+
 	// see if we can find a regular file.
 	temp[length-1] = 0;	// remove the ending slash
 	TEST(h = errnoFileOpen(temp, MA_ACCESS_READ));
@@ -397,14 +397,14 @@ int read(int __fd, void *__buf, size_t __nbyte) {
 
 	CHECK(fileSize = maFileSize(file), EIO);
 	CHECK(fileTell = maFileTell(file), EIO);
- 
+
 	remaining = fileSize - fileTell;
 	// seeking past the end of the file is allowed. it's treated like ordinary EOF.
 	if(remaining <= 0) return 0;
 	//FAILIF(remaining < 0, EIO);
 	if(remaining < __nbyte)
 		__nbyte = remaining;
-	
+
 	CHECK(maFileRead(file, __buf, __nbyte), EIO);
 	return __nbyte;
 }
@@ -513,7 +513,7 @@ int openat(int __fd, const char * __filename, int __mode, ...) {
 	char temp[2048];
 	LOGD("openat(%i, %s, 0x%x)", __fd, __filename, __mode);
 	TEST(getRealPath(__fd, temp, __filename, 2046));
-	
+
 	if((__mode & 3) == O_RDWR || (__mode & 3) == O_WRONLY) {
 		ma_mode = MA_ACCESS_READ_WRITE;
 	} else if((__mode & 3) == O_RDONLY) {
@@ -525,18 +525,18 @@ int openat(int __fd, const char * __filename, int __mode, ...) {
 		PANIC_MESSAGE("unsupported mode: O_NONBLOCK");
 	}
 	// O_SHLOCK, O_EXLOCK and O_NOATIME are unsupported. we drop them silently.
-	
+
 	// Check to see if we're opening a directory.
 	__mode &= ~O_DIRECTORY;
 	length = strlen(temp);
 	if(temp[length-1] == '/') {
 		__mode |= O_DIRECTORY;
 	}
-	
+
 	// Find a spot in the descriptor array.
 	CHECK(newFd = findFreeFd(), EMFILE);
 	newLfd = findFreeLfd();
-	
+
 	if(!(__mode & O_DIRECTORY)) {
 		handle = errnoFileOpen(temp, ma_mode);
 		if(handle < 0) {
@@ -555,7 +555,7 @@ int openat(int __fd, const char * __filename, int __mode, ...) {
 		CHECK(maFileClose(handle), EIO);
 		STDFAIL;
 	}
-	
+
 	newLfd->lowFd = handle + LOWFD_OFFSET;
 	newLfd->refCount = 1;
 	newLfd->flags = __mode;
@@ -578,7 +578,7 @@ int mkdirat(int __fd, const char* path, mode_t mode) {
 	char temp[2048];
 	int length;
 	int res;
-	
+
 	TEST(getRealPath(__fd, temp, path, 2046));
 	length = strlen(temp);
 	if(temp[length-1]!='/') {
@@ -714,12 +714,12 @@ static int checkDirRaw(char* temp) {
 			CHECK(ret, EIO);
 			FAILIF(ret > 0, ENOTDIR);
 		}
-		
+
 		temp[length] = '/';
 		length++;
 		temp[length] = 0;
 	}
-	
+
 	LOGD("checkDirRaw dir(%s)", temp);
 	CHECK(file = maFileOpen(temp, MA_ACCESS_READ), EIO);
 	ret = maFileExists(file);
@@ -825,11 +825,11 @@ int getdents(int __fd, dirent* dp, int count) {
 	LOWFD;
 	MAASSERT(count >= sizeof(dirent));
 	LOGD("getdents(%i)\n", __fd);
-	
+
 	// if we don't have an open list, open a list.
 	if(plfd->listHandle <= 0) {
 		MAASSERT(plfd->name != NULL);
-		plfd->listHandle = maFileListStart(plfd->name, "*");
+		plfd->listHandle = maFileListStart(plfd->name, "*", MA_FL_SORT_NONE);
 		TEST(checkMAResult(plfd->listHandle));
 	}
 	CHECK(dp->d_namlen = maFileListNext(plfd->listHandle, dp->d_name, sizeof(dp->d_name)), EIO);
@@ -880,7 +880,7 @@ DIR* opendir(const char *name) {
 DIR* fdopendir(int __fd) {
 	DIR *dirp;
 	int rc = 0;
-	
+
 	struct LOW_FD* plfd = getLowFd(__fd);
 	if(!plfd) {
 		LOGFAIL;
@@ -891,7 +891,7 @@ DIR* fdopendir(int __fd) {
 		errno = ENOTDIR;
 		return NULL;
 	}
-	
+
 	if (rc == -1 ||
 	    (dirp = (DIR *)malloc(sizeof(DIR))) == NULL) {
 		return NULL;

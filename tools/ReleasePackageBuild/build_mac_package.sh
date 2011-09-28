@@ -88,6 +88,7 @@ echo "----------------------------------------------------"
 cd $SOURCEDIR/tools/SplashScreenGenerator
 if /opt/local/bin/ruby main.rb "$BUILDTYPE build $DATE" $MOSYNC_HASH $ECLIPSE_HASH; then
 	cp splash.bmp $ECLIPSEDIR/com.mobilesorcery.sdk.product/
+	cp about.png $ECLIPSEDIR/com.mobilesorcery.sdk.product/
 else
 	error_exit "Could not generate splashscreen."
 fi

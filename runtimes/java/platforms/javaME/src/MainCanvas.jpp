@@ -27,8 +27,11 @@ import java.util.Vector;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public final class MainCanvas extends GameCanvas implements Runnable, CommandListener {
-
+public final class MainCanvas extends GameCanvas implements Runnable, CommandListener
+#ifdef BB_RIM_API
+, net.rim.device.api.system.KeyListener
+#endif
+{
 	public MAMidlet mMidlet;
 	public Core mCore;
 	private boolean mStop, mDestroy;
@@ -52,7 +55,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	private int mTimeout = 0;
 
 	private int	mKeyState = 0;
-	
+
 	private Alert mErrorAlert;
 #ifndef MOSYNC_COMMERCIAL
 	private Alert mStartupAlert;
@@ -66,7 +69,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	public Display mDisplay;
 
 	MainCanvas(MAMidlet aMidlet) throws Exception {
-		super(false);	
+		super(false);
 		mMidlet = aMidlet;
 		mDisplay = Display.getDisplay(mMidlet);
 #ifdef SPLASH_SCREEN
@@ -120,6 +123,15 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #ifndef JDB_DEBUG
 		try {
 #endif
+#ifdef PUBLIC_DEBUG
+			InputStream is = getClass().getResourceAsStream("debug.url");
+			if(is!=null) {
+				byte[] b = new byte[is.available()];
+				is.read(b);
+				String debugUrl = new String(b);
+				MAMidlet.out = mMidlet.makeConnectionPrintStream(debugUrl);
+			}
+#endif
 			//if(firstRun)
 			{
 				int w = getWidth();
@@ -161,10 +173,10 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 					long time = System.currentTimeMillis() - startTime;
 					if(time == 0) time++;
 
-#ifdef MA_PROF_SUPPORT_CLDC_10				
+#ifdef MA_PROF_SUPPORT_CLDC_10
 					DEBUG_CORE(""+mCore.mInstCount+" instructions in "+time+" ms: "+
 						((mCore.mInstCount) / time)+" KIPS\n");
-#else				
+#else
 					DEBUG_CORE(""+mCore.mInstCount+" instructions in "+time+" ms: "+
 						(((double)mCore.mInstCount) / time)+" KIPS\n");
 #endif
@@ -304,7 +316,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 			//TODO: check to see if running
 			(SYSCALL_NUMBER_IS_VALID(mCore.mLastSyscall) ?
 			("s" + Integer.toString(mCore.mLastSyscall)) : "") +
-			".i" + Integer.toHexString(mCore.mIP) + "." + 
+			".i" + Integer.toHexString(mCore.mIP) + "." +
 #endif
 			new String(appCode);
 	}
@@ -355,19 +367,41 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 
 		return 0;
 	}
-		
+
+#ifdef BB_RIM_API
+	private final int convertKeyCodeBB(int nativeCode) {
+		switch(nativeCode) {
+		case 2: return MAK_LEFT;
+		case 6: return MAK_DOWN;
+		case 1: return MAK_UP;
+		case 5: return MAK_RIGHT;
+		case -8: return MAK_FIRE;
+
+		// see keyDown()
+		case -20: return MAK_MENU;
+		case -11: return MAK_BACK;
+
+		default: return nativeCode;
+		}
+	}
+#endif
+
 	private final void handleKeyEvent(int keyCode, boolean released) {
 		//DEBUG_TEMP("handleKeyEvent()\n");
 #if defined(PUBLIC_DEBUG) && !defined(JDB_DEBUG)
 		try {
 #endif
+#ifdef BB_RIM_API
+			int mak = convertKeyCodeBB(keyCode);
+#else
 			int mak = convertKeyCode(keyCode);
+#endif
 
 			int[] event = new int[3];
 			if(released == true) {
 				mKeyState &= ~convertKeyBit(keyCode);
 			} else {
-				mKeyState |= convertKeyBit(keyCode);				
+				mKeyState |= convertKeyBit(keyCode);
 			}
 
 			EI_TYPE = released ? EVENT_TYPE_KEY_RELEASED : EVENT_TYPE_KEY_PRESSED;
@@ -418,7 +452,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		EI_TOUCH_ID = 0;
 		postEvent(event);
 	}
-	
+
 	protected final void pointerReleased(int x, int y) {
 		DEBUG_TEMP("pointerReleased "+x+" "+y+"\n");
 		int[] event = new int[4];
@@ -426,9 +460,9 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		EI_POINTX = x;
 		EI_POINTY = y;
 		EI_TOUCH_ID = 0;
-		postEvent(event);	
+		postEvent(event);
 	}
-	
+
 	protected final void pointerDragged(int x, int y) {
 		DEBUG_TEMP("pointerDragged "+x+" "+y+"\n");
 		int[] event = new int[4];
@@ -439,7 +473,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		postEvent(event);
 	}
 #endif	//MA_PROF_SUPPORT_STYLUS
-		
+
 	synchronized protected final void keyPressed(int keyCode) {
 		DEBUG_KEYS("keyPressed "+keyCode+"\n");
 		handleKeyEvent(keyCode, false);
@@ -739,4 +773,65 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		event[0] = EVENT_TYPE_FOCUS_GAINED;
 		postEvent(event);
 	}
+
+#ifdef BB_RIM_API
+	/*************************************/
+	/* BLACKBERRY SPECIAL EVENT HANDLING */
+	/*************************************/
+	public boolean keyChar(char key, int status, int time) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean keyDown(int keycode, int time) {
+		DEBUG_ALWAYS("BB Hard key pressed "+keycode+"\n");
+#ifdef BB_HAS_KEY_MENU
+		if (net.rim.device.api.ui.Keypad.key(keycode) == net.rim.device.api.ui.Keypad.KEY_MENU) {
+			DEBUG_KEYS("Pressed BB Menu button\n");
+			//this is the menu key, code 1769472
+			handleKeyEvent(-20, false); // See syscall_helpers.h, row 41
+			return true;
+		} else
+#endif	//BB_HAS_KEY_MENU
+		if (net.rim.device.api.ui.Keypad.key(keycode) == net.rim.device.api.ui.Keypad.KEY_ESCAPE) {
+			DEBUG_KEYS("Pressed BB Back button\n");
+			// this is the escape key, code 268566528
+			handleKeyEvent(-11, false); // See syscall_helpers.h, row 41
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public boolean keyRepeat(int keycode, int time) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean keyStatus(int keycode, int time) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	public boolean keyUp(int keycode, int time) {
+		DEBUG_KEYS("BB Hard key released "+keycode+"\n");
+#ifdef BB_HAS_KEY_MENU
+		if (keycode == net.rim.device.api.ui.Keypad.KEY_MENU) {
+			// this is the menu key, code 1769472
+			handleKeyEvent(-20, true);
+			return true;
+		} else
+#endif	//BB_HAS_KEY_MENU
+		if (keycode == net.rim.device.api.ui.Keypad.KEY_ESCAPE) {
+			// this is the escape key, code 268566528
+			handleKeyEvent(-11, true);
+			return true;
+		} else {
+			return false;
+		}
+	}
+	/*****************************************/
+	/* END BLACKBERRY SPECIAL EVENT HANDLING */
+	/*****************************************/
+#endif
 }
