@@ -27,6 +27,9 @@ using namespace std;
 
 // Parses a comma-separated list of permissions
 void parsePermissions(set<string>& out, const char* permissions) {
+	if (permissions == NULL) {
+		return;
+	}
 	string permissionStr = string(permissions);
 
 	string::size_type lastPos = permissionStr.find_first_not_of(",", 0);
