@@ -60,6 +60,10 @@
 		431869B113F690C90051D97A /* MoSyncSensor.mm in Sources */ = {isa = PBXBuildFile; fileRef = 431869AE13F690C90051D97A /* MoSyncSensor.mm */; };
 		431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		431869B413F691B70051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869B213F691A30051D97A /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		432B98C81431FE5F00BDB926 /* MoSyncPanic.h in Headers */ = {isa = PBXBuildFile; fileRef = 432B98C61431FE5F00BDB926 /* MoSyncPanic.h */; };
+		432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
+		432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
+		432B98CC1432040B00BDB926 /* PimError.h in Headers */ = {isa = PBXBuildFile; fileRef = 432B98CB1432040B00BDB926 /* PimError.h */; };
 		43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A7684E1400F6BA009608A4 /* ImagePickerController.h */; };
 		43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
 		43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
@@ -315,6 +319,9 @@
 		431869AD13F690C90051D97A /* MoSyncSensor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncSensor.h; sourceTree = "<group>"; };
 		431869AE13F690C90051D97A /* MoSyncSensor.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncSensor.mm; sourceTree = "<group>"; };
 		431869B213F691A30051D97A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
+		432B98C61431FE5F00BDB926 /* MoSyncPanic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncPanic.h; sourceTree = "<group>"; };
+		432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncPanic.mm; sourceTree = "<group>"; };
+		432B98CB1432040B00BDB926 /* PimError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimError.h; sourceTree = "<group>"; };
 		43A7684E1400F6BA009608A4 /* ImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerController.h; sourceTree = "<group>"; };
 		43A7684F1400F6BA009608A4 /* ImagePickerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImagePickerController.mm; sourceTree = "<group>"; };
 		43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorWidget.h; sourceTree = "<group>"; };
@@ -580,6 +587,8 @@
 				4192E7B713F5801900C10302 /* CameraConfirgurator.mm */,
 				43A7684E1400F6BA009608A4 /* ImagePickerController.h */,
 				43A7684F1400F6BA009608A4 /* ImagePickerController.mm */,
+				432B98C61431FE5F00BDB926 /* MoSyncPanic.h */,
+				432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -665,6 +674,7 @@
 				4318698213F68D410051D97A /* PimSyscall.mm */,
 				4318698313F68D410051D97A /* PimUtil.h */,
 				4318698413F68D410051D97A /* PimUtil.mm */,
+				432B98CB1432040B00BDB926 /* PimError.h */,
 			);
 			path = pim;
 			sourceTree = "<group>";
@@ -1009,6 +1019,8 @@
 				41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */,
 				0B436B8B143089BD00E69AB2 /* OptionsDialogView.h in Headers */,
 				0B436BA014308D5400E69AB2 /* ModalDialogWidget.h in Headers */,
+				432B98C81431FE5F00BDB926 /* MoSyncPanic.h in Headers */,
+				432B98CC1432040B00BDB926 /* PimError.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1204,6 +1216,7 @@
 				43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */,
 				0B436B8A143089BD00E69AB2 /* OptionsDialogView.mm in Sources */,
 				0B436B9F14308D5400E69AB2 /* ModalDialogWidget.mm in Sources */,
+				432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1289,6 +1302,7 @@
 				43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */,
 				0B436B8C143089BD00E69AB2 /* OptionsDialogView.mm in Sources */,
 				0B436BA114308D5400E69AB2 /* ModalDialogWidget.mm in Sources */,
+				432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

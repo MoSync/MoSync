@@ -34,6 +34,8 @@
 
 #import "PimContactItem.h"
 #include "PimSyscall.h"
+#import "PimError.h"
+#import "MoSyncPanic.h"
 
 @implementation PimContactItem
 
@@ -113,7 +115,9 @@
     }
     if (![self isFieldValid:fieldID])
     {
-        return MA_PIM_ERR_FIELD_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_INVALID
+                                  withPanicCode:PANIC_FIELD_INVALID
+                                  withPanicText:@PANIC_FIELD_INVALID_TEXT];
     }
 
     return [super fieldCount:fieldID];
@@ -135,7 +139,9 @@
     }
     if (![self isFieldValid:fieldID])
     {
-        return MA_PIM_ERR_FIELD_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_INVALID
+                                  withPanicCode:PANIC_FIELD_INVALID
+                                  withPanicText:@PANIC_FIELD_INVALID_TEXT];
     }
 
     return [super getAttribute:fieldID indexValue:index];
@@ -161,7 +167,9 @@
     }
     if (![self isFieldValid:args->field])
     {
-        return MA_PIM_ERR_FIELD_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_INVALID
+                                  withPanicCode:PANIC_FIELD_INVALID
+                                  withPanicText:@PANIC_FIELD_INVALID_TEXT];
     }
 
     return [super setLabel:args indexValue:index];
@@ -191,7 +199,9 @@
     }
     if (![self isFieldValid:args->field])
     {
-        return MA_PIM_ERR_FIELD_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_INVALID
+                                  withPanicCode:PANIC_FIELD_INVALID
+                                  withPanicText:@PANIC_FIELD_INVALID_TEXT];
     }
 
     return [super getLabel:args indexValue:index];
@@ -220,7 +230,9 @@
     }
     if (![self isFieldValid:args->field])
     {
-        return MA_PIM_ERR_FIELD_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_INVALID
+                                  withPanicCode:PANIC_FIELD_INVALID
+                                  withPanicText:@PANIC_FIELD_INVALID_TEXT];
     }
     if ([self isFieldWriteOnly:fieldID])
     {
@@ -232,7 +244,9 @@
     [key release];
     if (nil == fieldItem)
     {
-        return MA_PIM_ERR_FIELD_EMPTY;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_EMPTY
+                                  withPanicCode:PANIC_FIELD_EMPTY
+                                  withPanicText:@PANIC_FIELD_EMPTY_TEXT];
     }
 
     return [super getValue:args indexValue:index];
@@ -260,7 +274,9 @@
     }
     if (![self isFieldValid:args->field])
     {
-        return MA_PIM_ERR_FIELD_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_INVALID
+                                  withPanicCode:PANIC_FIELD_INVALID
+                                  withPanicText:@PANIC_FIELD_INVALID_TEXT];
     }
     if ([self isFieldReadOnly:fieldID])
     {
@@ -295,7 +311,9 @@
     }
     if (![self isFieldValid:args->field])
     {
-        return MA_PIM_ERR_FIELD_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_INVALID
+                                  withPanicCode:PANIC_FIELD_INVALID
+                                  withPanicText:@PANIC_FIELD_INVALID_TEXT];
     }
     if ([self isFieldReadOnly:fieldID])
     {
@@ -323,7 +341,9 @@
     }
     if (![self isFieldValid:field])
     {
-        return MA_PIM_ERR_FIELD_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_INVALID
+                                  withPanicCode:PANIC_FIELD_INVALID
+                                  withPanicText:@PANIC_FIELD_INVALID_TEXT];
     }
 
     return [super removeValue:field atIndex:index];
@@ -332,80 +352,69 @@
 /**
  * Write a given field into record.
  * @param field The specified field.
- * @return One of MA_PIM_ERR constants.
  */
--(int) writeField:(PimFieldItem*) itemField
+-(void) writeField:(PimFieldItem*) itemField
 {
-    CheckFieldValues([itemField count]);
     int fieldConstant = [itemField getFieldConstant];
-    int returnValue;
     switch (fieldConstant)
     {
         case MA_PIM_FIELD_CONTACT_ADDR:
-            returnValue = [self writeAddresField:itemField];
+            [self writeAddresField:itemField];
             break;
         case MA_PIM_FIELD_CONTACT_BIRTHDAY:
-            returnValue = [self writeSingleFieldValue:itemField propertyID:kABPersonBirthdayProperty];
+            [self writeSingleFieldValue:itemField propertyID:kABPersonBirthdayProperty];
             break;
         case MA_PIM_FIELD_CONTACT_EMAIL:
-            returnValue = [self writeEmailField:itemField];
+            [self writeEmailField:itemField];
             break;
         case MA_PIM_FIELD_CONTACT_NAME:
-            returnValue = [self writeContactNameField:itemField];
+            [self writeContactNameField:itemField];
             break;
         case MA_PIM_FIELD_CONTACT_NICKNAME:
-            returnValue = [self writeSingleFieldValue:itemField propertyID:kABPersonNicknameProperty];
+            [self writeSingleFieldValue:itemField propertyID:kABPersonNicknameProperty];
             break;
         case MA_PIM_FIELD_CONTACT_NOTE:
-            returnValue = [self writeSingleFieldValue:itemField propertyID:kABPersonNoteProperty];
+            [self writeSingleFieldValue:itemField propertyID:kABPersonNoteProperty];
             break;
         case MA_PIM_FIELD_CONTACT_ORG:
-            returnValue = [self writeSingleFieldValue:itemField propertyID:kABPersonOrganizationProperty];
+            [self writeSingleFieldValue:itemField propertyID:kABPersonOrganizationProperty];
             break;
         case MA_PIM_FIELD_CONTACT_PHOTO:
-            returnValue = [self writePhotoField:itemField];
+            [self writePhotoField:itemField];
             break;
         case MA_PIM_FIELD_CONTACT_PHOTO_URL:
-             returnValue = [self writePhotoURLField:itemField];
+            [self writePhotoURLField:itemField];
             break;
         case MA_PIM_FIELD_CONTACT_REVISION:
-            returnValue = [self writeSingleFieldValue:itemField propertyID:kABPersonModificationDateProperty];
+            [self writeSingleFieldValue:itemField propertyID:kABPersonModificationDateProperty];
             break;
         case MA_PIM_FIELD_CONTACT_TEL:
-            returnValue = [self writePhoneField:itemField];
+            [self writePhoneField:itemField];
             break;
         case MA_PIM_FIELD_CONTACT_TITLE:
-            returnValue = [self writeSingleFieldValue:itemField propertyID:kABPersonJobTitleProperty];
+            [self writeSingleFieldValue:itemField propertyID:kABPersonJobTitleProperty];
             break;
         case MA_PIM_FIELD_CONTACT_URL:
-            returnValue = [self writeURLField:itemField];
+            [self writeURLField:itemField];
             break;
         case MA_PIM_FIELD_CONTACT_ORG_INFO:
-            returnValue = [self writeOrgInfoField:itemField];
+            [self writeOrgInfoField:itemField];
             break;
         case MA_PIM_FIELD_CONTACT_IM:
-            returnValue = [self writeIMField:itemField];
+            [self writeIMField:itemField];
             break;
         case MA_PIM_FIELD_CONTACT_RELATION:
-            returnValue = [self writeRelationField:itemField];
-            break;
-        default:
+            [self writeRelationField:itemField];
             break;
     }
-
-    return returnValue;
 }
 
 /**
  * Writes the address field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writeAddresField:(PimFieldItem*) itemField
+-(void) writeAddresField:(PimFieldItem*) itemField
 {
-    int returnValue = MA_PIM_ERR_NONE;
-    bool didAdd;
-
     // Add the address to the multivalue.
     ABMultiValueIdentifier identifier;
     ABMutableMultiValueRef multiValue =
@@ -447,35 +456,21 @@
             &kCFCopyStringDictionaryKeyCallBacks,
             &kCFTypeDictionaryValueCallBacks);
 
-        didAdd = ABMultiValueAddValueAndLabel(multiValue, aDict, label, &identifier);
+        ABMultiValueAddValueAndLabel(multiValue, aDict, label, &identifier);
         CFRelease(aDict);
-
-        if (!didAdd)
-        {
-            returnValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-            break;
-        }
     }
 
-    // Check if the values were added.
-    if (MA_PIM_ERR_NONE == returnValue)
-    {
-        returnValue = [self setDataToRecord:multiValue propertyID:kABPersonAddressProperty checkLength:false];
-    }
+    [self setDataToRecord:multiValue propertyID:kABPersonAddressProperty checkLength:false];
 
     CFRelease(multiValue);
-    return returnValue;
 }
 
 /**
  * Writes the contact name field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writeContactNameField:(PimFieldItem*) itemField
+-(void) writeContactNameField:(PimFieldItem*) itemField
 {
-    int returnValue = MA_PIM_ERR_NONE;
-
     NSMutableArray* array = [itemField getValue:0];
     NSString* firstName = [array objectAtIndex:MA_PIM_CONTACT_NAME_GIVEN];
     NSString* lastName = [array objectAtIndex:MA_PIM_CONTACT_NAME_FAMILY];
@@ -486,35 +481,22 @@
     NSString* phoneticFirstName = [array objectAtIndex:MA_PIM_CONTACT_NAME_PHONETIC_GIVEN];
     NSString* phoneticMiddleName = [array objectAtIndex:MA_PIM_CONTACT_NAME_PHONETIC_OTHER];
 
-    returnValue = [self setDataToRecord:firstName propertyID:kABPersonFirstNameProperty checkLength:true];
-    CheckErrorCode(returnValue);
-    returnValue = [self setDataToRecord:lastName propertyID:kABPersonLastNameProperty checkLength:true];
-    CheckErrorCode(returnValue);
-    returnValue = [self setDataToRecord:middleName propertyID:kABPersonMiddleNameProperty checkLength:true];
-    CheckErrorCode(returnValue);
-    returnValue = [self setDataToRecord:prefix propertyID:kABPersonPrefixProperty checkLength:true];
-    CheckErrorCode(returnValue);
-    returnValue = [self setDataToRecord:suffix propertyID:kABPersonSuffixProperty checkLength:true];
-    CheckErrorCode(returnValue);
-    returnValue = [self setDataToRecord:phoneticFirstName propertyID:kABPersonFirstNamePhoneticProperty checkLength:true];
-    CheckErrorCode(returnValue);
-    returnValue = [self setDataToRecord:phoneticLastName propertyID:kABPersonLastNamePhoneticProperty checkLength:true];
-    CheckErrorCode(returnValue);
-    returnValue = [self setDataToRecord:phoneticMiddleName propertyID:kABPersonMiddleNamePhoneticProperty checkLength:true];
-    CheckErrorCode(returnValue);
-
-    return MA_PIM_ERR_NONE;
+    [self setDataToRecord:firstName propertyID:kABPersonFirstNameProperty checkLength:true];
+    [self setDataToRecord:lastName propertyID:kABPersonLastNameProperty checkLength:true];
+    [self setDataToRecord:middleName propertyID:kABPersonMiddleNameProperty checkLength:true];
+    [self setDataToRecord:prefix propertyID:kABPersonPrefixProperty checkLength:true];
+    [self setDataToRecord:suffix propertyID:kABPersonSuffixProperty checkLength:true];
+    [self setDataToRecord:phoneticFirstName propertyID:kABPersonFirstNamePhoneticProperty checkLength:true];
+    [self setDataToRecord:phoneticLastName propertyID:kABPersonLastNamePhoneticProperty checkLength:true];
+    [self setDataToRecord:phoneticMiddleName propertyID:kABPersonMiddleNamePhoneticProperty checkLength:true];
 }
 
 /**
  * Writes the email field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writeEmailField:(PimFieldItem*) itemField
+-(void) writeEmailField:(PimFieldItem*) itemField
 {
-    int returnValue = MA_PIM_ERR_NONE;
-
     // Add the email addresses to the multivalue.
     ABMultiValueIdentifier identifier;
     ABMutableMultiValueRef multiValue =
@@ -526,72 +508,47 @@
         NSMutableArray* array = [itemField getValue:i];
         NSString* email = [array objectAtIndex:0];
         CFStringRef label = (CFStringRef) [[itemField getItem:i] getLabel];
-        bool didAdd = ABMultiValueAddValueAndLabel(
-            multiValue,
-            (CFStringRef) email,
-            label,
-            &identifier);
-
-        if (!didAdd)
-        {
-            returnValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-            break;
-        }
+        ABMultiValueAddValueAndLabel(multiValue, (CFStringRef) email, label, &identifier);
     }
 
-    // Check if the values were added.
-    if (MA_PIM_ERR_NONE == returnValue)
-    {
-        returnValue = [self setDataToRecord:multiValue propertyID:kABPersonEmailProperty checkLength:false];
-    }
-
+    [self setDataToRecord:multiValue propertyID:kABPersonEmailProperty checkLength:false];
     CFRelease(multiValue);
-    return returnValue;
 }
 
 /**
  * Writes the photo field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writePhotoField:(PimFieldItem*) itemField
+-(void) writePhotoField:(PimFieldItem*) itemField
 {
     NSMutableArray* array = [itemField getValue:0];
     NSNumber* handle = [array objectAtIndex:0];
     NSData* data = [[PimUtils sharedInstance] getImageDataFromHandle:[handle intValue]];
-    bool didSet = ABPersonSetImageData (mRecord, (CFDataRef) data, nil);
+    ABPersonSetImageData (mRecord, (CFDataRef) data, nil);
     [data release];
-
-    return didSet? MA_PIM_ERR_NONE : MA_PIM_ERR_OPERATION_NOT_PERMITTED;
 }
 
 /**
  * Writes the photo url field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writePhotoURLField:(PimFieldItem*) itemField
+-(void) writePhotoURLField:(PimFieldItem*) itemField
 {
     NSString* photoURL = [[itemField getValue:0] objectAtIndex:0];
     NSURL *url = [NSURL URLWithString:photoURL];
     NSData *data = [NSData dataWithContentsOfURL:url];
 
-    bool didSet = ABPersonSetImageData(mRecord, (CFDataRef) data, nil);
+    ABPersonSetImageData(mRecord, (CFDataRef) data, nil);
     [url release];
     [data release];
-
-    return didSet? MA_PIM_ERR_NONE : MA_PIM_ERR_OPERATION_NOT_PERMITTED;
 }
 
 /**
  * Writes the phone field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writePhoneField:(PimFieldItem*) itemField
+-(void) writePhoneField:(PimFieldItem*) itemField
 {
-    int returnValue = MA_PIM_ERR_NONE;
-
     // Add the phone numbers to the multivalue.
     ABMultiValueIdentifier identifier;
     ABMutableMultiValueRef multiValue =
@@ -603,38 +560,19 @@
         NSMutableArray* array = [itemField getValue:i];
         NSString* phone = [array objectAtIndex:0];
         CFStringRef label = (CFStringRef) [[itemField getItem:i] getLabel];
-        bool didAdd = ABMultiValueAddValueAndLabel(
-            multiValue,
-            (CFStringRef) phone,
-            label,
-            &identifier);
-
-        if (!didAdd)
-        {
-            returnValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-            break;
-        }
-
+        ABMultiValueAddValueAndLabel(multiValue, (CFStringRef) phone, label, &identifier);
     }
 
-    // Check if the values were added.
-    if (MA_PIM_ERR_NONE == returnValue)
-    {
-        returnValue = [self setDataToRecord:multiValue propertyID:kABPersonPhoneProperty checkLength:false];
-    }
+    [self setDataToRecord:multiValue propertyID:kABPersonPhoneProperty checkLength:false];
     CFRelease(multiValue);
-    return returnValue;
 }
 
 /**
  * Writes the URL field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writeURLField:(PimFieldItem*) itemField
+-(void) writeURLField:(PimFieldItem*) itemField
 {
-    int returnValue = MA_PIM_ERR_NONE;
-
     // Add the URLs to the multivalue.
     ABMultiValueIdentifier identifier;
     ABMutableMultiValueRef multiValue =
@@ -646,48 +584,29 @@
         NSMutableArray* array = [itemField getValue:i];
         NSString* url = [array objectAtIndex:0];
         CFStringRef label = (CFStringRef) [[itemField getItem:i] getLabel];
-        bool didAdd = ABMultiValueAddValueAndLabel(
-            multiValue,
-            (CFStringRef) url,
-            label,
-            &identifier);
-
-        if (!didAdd)
-        {
-            returnValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-            break;
-        }
+        ABMultiValueAddValueAndLabel(multiValue, (CFStringRef) url, label, &identifier);
     }
 
-    // Check if the values were added.
-    if (MA_PIM_ERR_NONE == returnValue)
-    {
-        returnValue = [self setDataToRecord:multiValue propertyID:kABPersonURLProperty checkLength:false];
-    }
+    [self setDataToRecord:multiValue propertyID:kABPersonURLProperty checkLength:false];
     CFRelease(multiValue);
-    return returnValue;
 }
 
 /**
  * Writes the supplemental info organization field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writeOrgInfoField:(PimFieldItem*) itemField
+-(void) writeOrgInfoField:(PimFieldItem*) itemField
 {
     NSString* department = [[itemField getValue:0] objectAtIndex:MA_PIM_CONTACT_ORG_INFO_DEPARTMENT];
-    return [self setDataToRecord:department propertyID:kABPersonDepartmentProperty checkLength:true];
+    [self setDataToRecord:department propertyID:kABPersonDepartmentProperty checkLength:true];
 }
 
 /**
  * Writes the anniversary field into record.
  * @param itemField The specified field.
- * @return One of MA_PIM_ERR constants.
  */
--(int) writeAnniversaryField:(PimFieldItem*) itemField
+-(void) writeAnniversaryField:(PimFieldItem*) itemField
 {
-    int returnValue = MA_PIM_ERR_NONE;
-
     // Add the anniversary to the multivalue.
     ABMultiValueIdentifier identifier;
     ABMutableMultiValueRef multiValue =
@@ -699,37 +618,19 @@
         NSMutableArray* array = [itemField getValue:i];
         NSDate* anniversary = [array objectAtIndex:0];
         CFStringRef label = (CFStringRef) [[itemField getItem:i] getLabel];
-        bool didAdd = ABMultiValueAddValueAndLabel(
-            multiValue,
-            (CFStringRef) anniversary,
-            label,
-            &identifier);
-
-        if (!didAdd)
-        {
-            returnValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-            break;
-        }
+        ABMultiValueAddValueAndLabel(multiValue, (CFStringRef) anniversary, label, &identifier);
     }
 
-    // Check if the values were added.
-    if (MA_PIM_ERR_NONE == returnValue)
-    {
-        returnValue = [self setDataToRecord:multiValue propertyID:kABPersonDateProperty checkLength:false];
-    }
+    [self setDataToRecord:multiValue propertyID:kABPersonDateProperty checkLength:false];
     CFRelease(multiValue);
-    return returnValue;
 }
 
 /**
  * Writes the instant message field into record.
  * @param itemField The specified field.
- * @return One of MA_PIM_ERR constants.
  */
--(int) writeIMField:(PimFieldItem*) itemField
+-(void) writeIMField:(PimFieldItem*) itemField
 {
-    int returnValue = MA_PIM_ERR_NONE;
-
     // Add the im values to the multivalue.
     ABMultiValueIdentifier identifier;
     ABMutableMultiValueRef multiValue =
@@ -765,37 +666,20 @@
                                                    &kCFCopyStringDictionaryKeyCallBacks,
                                                    &kCFTypeDictionaryValueCallBacks);
 
-        bool didAdd = ABMultiValueAddValueAndLabel(
-                                                   multiValue,
-                                                   aDict,
-                                                   label,
-                                                   &identifier);
+        ABMultiValueAddValueAndLabel(multiValue, aDict, label, &identifier);
         CFRelease(aDict);
-
-        if (!didAdd)
-        {
-            returnValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-            break;
-        }
     }
 
-    // Check if the values were added.
-    if (MA_PIM_ERR_NONE == returnValue)
-    {
-        returnValue = [self setDataToRecord:multiValue propertyID:kABPersonInstantMessageProperty checkLength:false];
-    }
+    [self setDataToRecord:multiValue propertyID:kABPersonInstantMessageProperty checkLength:false];
     CFRelease(multiValue);
-    return returnValue;
 }
 
 /**
  * Writes the relation field into record.
  * @param itemField The specified field.
- * @return One of MA_PIM_ERR constants.
  */
--(int) writeRelationField:(PimFieldItem*) itemField
+-(void) writeRelationField:(PimFieldItem*) itemField
 {
-    int returnValue = MA_PIM_ERR_NONE;
     ABMutableMultiValueRef multi =
         ABMultiValueCreateMutable(kABMultiStringPropertyType);
 
@@ -805,29 +689,19 @@
         NSMutableArray* array = [itemField getValue:i];
         const CFStringRef value = (CFStringRef)[array objectAtIndex:0];
         const CFStringRef label = (CFStringRef) [[itemField getItem:i] getLabel];
-        bool didAdd = ABMultiValueAddValueAndLabel(multi, value, label, NULL);
-        if (!didAdd)
-        {
-            returnValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-            break;
-        }
+        ABMultiValueAddValueAndLabel(multi, value, label, NULL);
     }
 
-    if ( MA_PIM_ERR_NONE == returnValue)
-    {
-        returnValue = [self setDataToRecord:multi propertyID:kABPersonRelatedNamesProperty checkLength:false];
-    }
+    [self setDataToRecord:multi propertyID:kABPersonRelatedNamesProperty checkLength:false];
     CFRelease(multi);
-    return returnValue;
 }
 
 /**
  * Writes a single field value into record.
  * @param itemField The given field.
  * @param property The property of whose value is being set.
- * @return One of MA_PIM_ERR constants.
  */
--(int) writeSingleFieldValue:(PimFieldItem*) itemField
+-(void) writeSingleFieldValue:(PimFieldItem*) itemField
                   propertyID:(ABPropertyID) property
 {
     NSArray* valueArray = [itemField getValue:0];
@@ -837,7 +711,7 @@
         checkValueLength = true;
     }
     CFStringRef value = (CFStringRef)[valueArray objectAtIndex:0];
-    return [self setDataToRecord:value propertyID:property checkLength:checkValueLength];
+    [self setDataToRecord:value propertyID:property checkLength:checkValueLength];
 }
 
 /**
@@ -846,29 +720,17 @@
  * @param property The property of whose value is being set.
  * @param verify If true the length of the value is checked.
  *               If the length is zero the value is not written.
- * @return One of MA_PIM_ERR constants.
  */
--(int) setDataToRecord:(CFTypeRef) value
+-(void) setDataToRecord:(CFTypeRef) value
             propertyID:(ABPropertyID) property
            checkLength:(bool) verify
 {
-    CFErrorRef error;
-    bool didSet;
-    int returnValue = MA_PIM_ERR_NONE;
-
     // Check for a empty value.
     if (verify && 0 == CFStringGetLength(value))
     {
-        return MA_PIM_ERR_NONE;
+        return;
     }
-
-    didSet = ABRecordSetValue(mRecord, property, value, &error);
-    if (!didSet)
-    {
-        returnValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-    }
-
-    return returnValue;
+    ABRecordSetValue(mRecord, property, value, nil);
 }
 
 /**

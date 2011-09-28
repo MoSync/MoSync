@@ -21,6 +21,8 @@
 #import "helpers/cpp_ix_pim.h"
 #import "PimSyscall.h"
 #import "PimUtil.h"
+#import "MoSyncPanic.h"
+#import "PimError.h"
 
 @implementation PimFieldItem
 
@@ -102,6 +104,9 @@
 	if (0 > index || index >= fieldValuesCount)
     {
 		return MA_PIM_ERR_INDEX_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
 	}
 
     // Check if the attribute is set to custom.
@@ -128,7 +133,9 @@
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 > index || index >= fieldValuesCount)
     {
-		return MA_PIM_ERR_INDEX_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
 	}
 
     PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
@@ -184,7 +191,9 @@
 
 	if (0 > index || index >= fieldValuesCount)
     {
-		return MA_PIM_ERR_INDEX_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
 	}
 
     // Check if field supports attributes.
@@ -307,7 +316,9 @@
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 > index || index >= fieldValuesCount)
     {
-		return MA_PIM_ERR_INDEX_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
 	}
 
 	[mFieldValuesArray removeObjectAtIndex:index];

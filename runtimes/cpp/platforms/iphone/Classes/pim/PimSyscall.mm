@@ -20,6 +20,8 @@
 #import "syscall.h"
 #include "PimDatabase.h"
 #import "PimUtil.h"
+#import "PimError.h"
+#import "MoSyncPanic.h"
 
 using namespace MoSyncError;
 using namespace Base;
@@ -66,7 +68,9 @@ int Syscall::maPimItemCount(MAHandle item)
 
     if (!pimItem)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     return [pimItem count];
@@ -78,7 +82,9 @@ int Syscall::maPimItemGetField(MAHandle item, int n)
 
     if (!pimItem)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     return [pimItem getFieldID:n];
@@ -90,7 +96,9 @@ int Syscall::maPimItemFieldCount(MAHandle item, int field)
 
     if (!pimItem)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     return [pimItem fieldCount:field];
@@ -102,7 +110,9 @@ int Syscall::maPimItemGetAttributes(MAHandle item, int field, int index)
 
     if (!pimItem)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     return [pimItem getAttribute:field indexValue:index];
@@ -116,7 +126,9 @@ int Syscall::maPimItemSetLabel(const MA_PIM_ARGS* args, int index)
 
     if (!pimItem)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     return [pimItem setLabel:args indexValue:index];
@@ -128,7 +140,9 @@ int Syscall::maPimItemGetLabel(const MA_PIM_ARGS* args, int index)
 
     if (!pimItem)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     return [pimItem getLabel:args indexValue:index];
@@ -143,7 +157,9 @@ int Syscall::maPimFieldType(MAHandle list, int field)
     // Check if the list handle is valid.
     if (MA_PIM_CONTACTS != list)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     resultCode = [[PimUtils sharedInstance] fieldStructure:field
@@ -164,7 +180,9 @@ int Syscall::maPimItemGetValue(const MA_PIM_ARGS *args, int index)
 
     if (!pimItem)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     return [pimItem getValue:args indexValue:index];
@@ -177,7 +195,9 @@ int Syscall::maPimItemSetValue(const MA_PIM_ARGS* args, int index, int attribute
 
     if (!pimItem)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     return [pimItem setValue:args
@@ -191,7 +211,9 @@ int Syscall::maPimItemAddValue(const MA_PIM_ARGS* args, int attributes)
 
     if (!pimItem)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     return [pimItem addValue:args
@@ -204,7 +226,9 @@ int Syscall::maPimItemRemoveValue(MAHandle item, int field, int index)
 
     if (!pimItem)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     return [pimItem removeValue:field atIndex:index];

@@ -16,6 +16,8 @@
 */
 
 #import "PimDatabase.h"
+#import "MoSyncPanic.h"
+#import "PimError.h"
 
 @implementation PimDatabase
 
@@ -50,11 +52,15 @@
 	else if(MA_PIM_EVENTS == listType ||
             MA_PIM_TODOS == listType)
     {
-        return MA_PIM_ERR_LIST_UNAVAILABLE;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_LIST_UNAVAILABLE
+                                  withPanicCode:PANIC_LIST_UNAVAILABLE
+                                  withPanicText:@PANIC_LIST_UNAVAILABLE_TEXT];
     }
     else
 	{
-		return MA_PIM_ERR_LIST_TYPE_INVALID;
+		return [[MoSyncPanic getInstance] error:MA_PIM_ERR_LIST_TYPE_INVALID
+                                  withPanicCode:PANIC_LIST_TYPE_INVALID
+                                  withPanicText:@PANIC_LIST_TYPE_INVALID_TEXT];
 	}
 }
 
@@ -98,7 +104,9 @@
 	}
 	else
 	{
-		returnedValue = MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
 	}
 
 	return returnedValue;
@@ -115,7 +123,9 @@
 
 	if (!list)
 	{
-		returnedValue = MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
 	}
 	else
 	{
@@ -162,7 +172,9 @@
         }
 	}
 
-	return MA_PIM_ERR_HANDLE_INVALID;
+    return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                              withPanicCode:PANIC_HANDLE_INVALID
+                              withPanicText:@PANIC_HANDLE_INVALID_TEXT];
 }
 
 /**
@@ -177,7 +189,9 @@
         return [mContactsList closeItem:itemHandle];
     }
 
-    return MA_PIM_ERR_HANDLE_INVALID;
+    return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                              withPanicCode:PANIC_HANDLE_INVALID
+                              withPanicText:@PANIC_HANDLE_INVALID_TEXT];
 }
 
 /**
@@ -197,7 +211,9 @@
         }
 	}
 
-	return MA_PIM_ERR_HANDLE_INVALID;
+    return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                              withPanicCode:PANIC_HANDLE_INVALID
+                              withPanicText:@PANIC_HANDLE_INVALID_TEXT];
 }
 
 /**

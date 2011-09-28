@@ -22,6 +22,8 @@
 #import "helpers/cpp_ix_pim.h"
 #include "Syscall.h"
 #import <AddressBook/AddressBook.h>
+#import "PimError.h"
+#import "MoSyncPanic.h"
 
 static PimUtils *sharedInstance = nil;
 
@@ -263,6 +265,7 @@ static PimUtils *sharedInstance = nil;
             NSString* string = [[NSString alloc] initWithBytes:stringSrc length:stringLength
                                                   encoding:NSUTF16LittleEndianStringEncoding];
             [array addObject:string];
+            [string release];
         }
     }
 
@@ -336,6 +339,7 @@ static PimUtils *sharedInstance = nil;
     NSString* string = [[NSString alloc] initWithBytes:address length:size
                                               encoding:NSUTF16LittleEndianStringEncoding];
     [array addObject:string];
+    [string release];
 
     return array;
 }
@@ -389,7 +393,7 @@ static PimUtils *sharedInstance = nil;
     NSData* date = [[NSDate alloc] initWithTimeIntervalSince1970:seconds];
     NSMutableArray* array = [[NSMutableArray alloc] init];
     [array addObject:date];
-
+    [date release];
     return array;
 }
 
