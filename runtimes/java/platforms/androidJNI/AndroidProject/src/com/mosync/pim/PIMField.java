@@ -3,8 +3,8 @@ package com.mosync.pim;
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_EMPTY;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_READ_ONLY;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_WRITE_ONLY;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_READ_ONLY;
+import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_WRITE_ONLY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_INDEX_INVALID;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_LABEL;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_BUFFER_INVALID;
@@ -207,7 +207,7 @@ abstract class PIMField {
 		}
 
 		if (isReadOnly()) {
-			return MA_PIM_ERR_READ_ONLY;
+			return MA_PIM_ERR_FIELD_READ_ONLY;
 		}
 
 		if (!hasCustomLabel(index)) {
@@ -250,7 +250,7 @@ abstract class PIMField {
 		}
 
 		if (isWriteOnly()) {
-			return MA_PIM_ERR_WRITE_ONLY;
+			return MA_PIM_ERR_FIELD_WRITE_ONLY;
 		}
 
 		char[] buffer = getData(index);
@@ -270,7 +270,7 @@ abstract class PIMField {
 	 */
 	int setValue(int index, int buffPointer, int buffSize, int attributes) {
 		if (isReadOnly()) {
-			return MA_PIM_ERR_READ_ONLY;
+			return MA_PIM_ERR_FIELD_READ_ONLY;
 		}
 
 		if (isEmpty()) {
@@ -306,7 +306,7 @@ abstract class PIMField {
 	 */
 	int addValue(int buffPointer, int buffSize, int attributes) {
 		if (isReadOnly()) {
-			return MA_PIM_ERR_READ_ONLY;
+			return MA_PIM_ERR_FIELD_READ_ONLY;
 		}
 
 		if (length() >= MAX_SIZE) {
@@ -343,7 +343,7 @@ abstract class PIMField {
 	 */
 	int removeValue(int index) {
 		if (isReadOnly()) {
-			return MA_PIM_ERR_READ_ONLY;
+			return MA_PIM_ERR_FIELD_READ_ONLY;
 		}
 
 		if (isEmpty()) {

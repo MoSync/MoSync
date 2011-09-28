@@ -2,7 +2,6 @@ package com.mosync.pim;
 
 import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_ATTRIBUTES;
 
 import com.mosync.pim.PIMField.State;
 
@@ -40,7 +39,7 @@ public class PIMFieldUID extends PIMField {
 	}
 
 	int getAttributes(int index) {
-		return MA_PIM_ERR_NO_ATTRIBUTES;
+		return 0;
 	}
 
 	int checkForPreferredAttribute(int index) {

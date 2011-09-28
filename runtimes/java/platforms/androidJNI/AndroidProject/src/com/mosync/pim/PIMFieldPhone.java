@@ -26,7 +26,6 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTR_PHONE_CUSTOM;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ATTRPREFERRED;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_EMPTY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_INDEX_INVALID;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_ATTRIBUTES;
 
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
@@ -95,7 +94,7 @@ public class PIMFieldPhone extends PIMField {
 		int attr = getAndroidAttribute(index);
 
 		if (attr < 0) {
-			return MA_PIM_ERR_NO_ATTRIBUTES;
+			return 0;
 		}
 
 		int ret = 0;
