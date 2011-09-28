@@ -12,7 +12,6 @@ import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_ATTRIBUTE_COMBO_UN
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_FIELD_EMPTY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_INDEX_INVALID;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NONE;
-import static com.mosync.internal.generated.IX_PIM.MA_PIM_ERR_NO_ATTRIBUTES;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_FIELD_CONTACT_BIRTHDAY;
 import static com.mosync.internal.generated.IX_PIM.MA_PIM_TYPE_DATE;
 

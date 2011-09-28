@@ -2279,6 +2279,7 @@ namespace Base {
 				}
 				SetWindowTextW(sEditBox, in.c_str());
 			}
+			SendMessage(sEditBox, EM_SETLIMITTEXT, sTextBoxOutSize - 1, 0);
 			SetFocus(sEditBox);
 			break;
 		case WM_COMMAND:

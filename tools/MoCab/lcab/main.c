@@ -83,7 +83,7 @@ char *strippath( char *filename )
 {
 	char *tmp;
 	if( !( tmp = strrchr( filename, '/' ) ) ) tmp = filename;
-	else *tmp++;
+	else tmp++;
 	return tmp;
 }
 
@@ -91,13 +91,13 @@ char *strippath( char *filename )
 char *changepath( char *filename )
 {
 	char *tmp;
-	int i = 0;
+	unsigned int i = 0;
 	int j = 0;
 
 	tmp = (char *) calloc( strlen(filename)+1, sizeof(char) );
 	for( i=0; i<strlen(filename); ++i )
 	{
-		if( filename[i] != '/' ) tmp[j] = filename[i]; 
+		if( filename[i] != '/' ) tmp[j] = filename[i];
 		else tmp[j] = '\\';
 		++j;
 	}
@@ -110,7 +110,7 @@ int maketempfile( int nof, FILE *fp )
 {
 	int i;
 	FILE *fp2;
-	char *tmp;
+	byte *tmp;
 
 	for( i=0; i<nof; ++i )
 	{
@@ -125,14 +125,15 @@ int maketempfile( int nof, FILE *fp )
 			fclose( fp2 );
 		}
 	}
-	
+
 	return 1;
 }
 
 /* print the uasge of lcab */
-void usage(char **argv)
+static void usage(char **argv) __attribute__((noreturn));
+static void usage(char **argv)
 {
-    printf("usage: %s [options] inputfiles outputfile.cab\n", strippath(argv[0])); 
+    printf("usage: %s [options] inputfiles outputfile.cab\n", strippath(argv[0]));
     printf("\nlcab will create a Cabinet File from inputfiles.\n");
     printf("Inputfiles can also be directories together with option -r.\n");
     printf("\nOptions:\n");
@@ -208,7 +209,7 @@ int main(int argc, char *argv[])
 	struct mycfile *prevcfile = NULL;
 	struct mycfile *mycfiles = NULL;
 
-// with or without paths ? 
+// with or without paths ?
 // with or without recursive dirs ?
 
 	while ((opt = getopt(argc, argv, "nrhq")) != EOF) {
@@ -234,12 +235,12 @@ int main(int argc, char *argv[])
 	printf("%s v%s (2003) by Rien (rien@geekshop.be)\n", strippath(argv[0]), VERSION);
 
 // list files to add
-	nof = argc-2-makenopath-recursive; 
-	for (i = 0; optind < argc - 1; optind++) 
+	nof = argc-2-makenopath-recursive;
+	for (i = 0; optind < argc - 1; optind++)
 	{
 		struct stat st;
 
-	    	if (stat(argv[optind], &st) == -1) 
+		if (stat(argv[optind], &st) == -1)
 		{
 			warn("%s", argv[optind]);
 			continue;
@@ -249,7 +250,7 @@ int main(int argc, char *argv[])
 		if( !strncmp( argv[optind], "..", 2 ) ) printf("##### WARNING : %s has a .. in front of it! #####\n", argv[optind] );
 
 	    	/* if the given input file argument is a dir, loop through it */
-	    	if (S_ISDIR(st.st_mode) && recursive) 
+		if (S_ISDIR(st.st_mode) && recursive)
 		{
 			recurse_directory(argv[optind], &i);
 			continue;
@@ -258,14 +259,14 @@ int main(int argc, char *argv[])
 	    	inputfiles[i] = realloc(inputfiles[i], (i + 2) * sizeof(char *));
 	    	inputfiles[i++] = strdup(argv[optind]);
 	}
-	
+
 	inputfiles[i] = NULL;
-	
+
 	/* we need all files, don't skip the last one (nof doesn't count from 1) */
 	nof = i;
 
 
-// init 
+// init
 	nod = number_of_datablocks(nof);
 	outputfile = (char *) calloc(MAXSIZE,sizeof(char));
 	strcpy( outputfile, argv[argc - 1]);
@@ -275,7 +276,7 @@ int main(int argc, char *argv[])
 	printf("recursive       : "); recursive ? printf("yes\n") : printf("no\n");
 	printf("quiet           : "); quiet ? printf("yes\n") : printf("no\n");
 
-	if (!quiet) 
+	if (!quiet)
 	{
 		printf("inputfiles      : ");
 	    	for(i=0;i<nof;++i) printf("%s ", inputfiles[i]);
@@ -285,7 +286,7 @@ int main(int argc, char *argv[])
 // HEADER INIT
 	cheader_init( &mycheader, "MSCF", 1, nof, 0, 1234, 0 );
 	cheader_offsetfiles( &mycheader, CFI_START );
-// HEADER SIZE PART 1	
+// HEADER SIZE PART 1
 	mysize2 = CFI_START + nof*16;									/* first part of cfile struct = 16 bytes */
 	for( i=0; i<nof; ++i )
 		mysize2 += strlen( makenopath? strippath( inputfiles[i] ) : changepath( inputfiles[i] ) ) + 1;		/* + 1 for \0 ! */
@@ -313,7 +314,7 @@ int main(int argc, char *argv[])
 		cdata_ncbytes( &ptrdbs->cd, mysize );
 		cdata_nubytes( &ptrdbs->cd, mysize );
 		mysize2 += mysize;							/* header part 2 */
-	}	
+	}
 	else
 	{
 		for( i=0; i<nod; ++i )
@@ -323,7 +324,7 @@ int main(int argc, char *argv[])
 				cdata_ncbytes( &ptrdbs->cd, DATABLOCKSIZE );
 				cdata_nubytes( &ptrdbs->cd, DATABLOCKSIZE );
 				mysize2 += DATABLOCKSIZE;				/* header part 2 */
-			
+
 				ptrdbs->next = (struct mydatablock *) calloc( 1, sizeof(struct mydatablock) );
 				ptrdbs = ptrdbs->next;
 				ptrdbs->next = NULL;
@@ -336,7 +337,7 @@ int main(int argc, char *argv[])
 				cdata_nubytes( &ptrdbs->cd, mysize );
 				mysize2 += mysize;					/* header part 2 */
 			}
-			
+
 		}
 	}
 
@@ -370,7 +371,7 @@ int main(int argc, char *argv[])
 			ptrcfs->next = (struct mycfile *) calloc( 1, sizeof( struct mycfile ) );
 			prevcfile = ptrcfs;
 			ptrcfs = ptrcfs->next;
-			ptrcfs->next = NULL;		
+			ptrcfs->next = NULL;
 		}
 	}
 
@@ -400,7 +401,7 @@ int main(int argc, char *argv[])
 			ptrcfs = ptrcfs->next;
 			if( !cfilewrite( &ptrcfs->cf, fp ) ) { printf("error: could not write header\n"); fclose( fp ); return 0; }
 			if( !quiet ) printf(".");
-		} 
+		}
 
 
 		fptmp = fopen( "lcab.tmp", "rb" );
@@ -411,10 +412,10 @@ int main(int argc, char *argv[])
 			pos = cdatawrite( &ptrdbs->cd, fp, pos, fptmp );
 			if( pos == -1 )
 			{
-				printf("error: could not write datablock at pos: %ld\n", pos);	
+				printf("error: could not write datablock at pos: %ld\n", pos);
 				fclose(fptmp);
 				fclose(fp);
-				if( remove( "lcab.tmp" ) ) printf("could not remove lcab.tmp\n");		
+				if( remove( "lcab.tmp" ) ) printf("could not remove lcab.tmp\n");
 			}
 			while( ptrdbs->next != NULL )
 			{
@@ -422,10 +423,10 @@ int main(int argc, char *argv[])
 				pos = cdatawrite( &ptrdbs->cd, fp, pos, fptmp );
 				if( pos == -1 )
 				{
-					printf("error: could not write datablock at pos: %ld\n", pos);	
+					printf("error: could not write datablock at pos: %ld\n", pos);
 					fclose(fptmp);
 					fclose(fp);
-					if( remove( "lcab.tmp" ) ) printf("could not remove lcab.tmp\n");		
+					if( remove( "lcab.tmp" ) ) printf("could not remove lcab.tmp\n");
 				}
 			}
 
@@ -435,7 +436,7 @@ int main(int argc, char *argv[])
 		fclose( fp );
 
 	}
-	if( !quiet ) printf("\n");	
+	if( !quiet ) printf("\n");
 
 
 	if( remove( "lcab.tmp" ) ) printf("could not remove lcab.tmp\n");

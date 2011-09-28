@@ -403,7 +403,7 @@ public class MoSyncCameraController {
 	 */
 	public void acquireCamera()
 	{
-		if(mCamera == null)
+		if(mCamera == null && mPreview != null)
 		{
 			mCamera = Camera.open();
 			if(mPreview != null)

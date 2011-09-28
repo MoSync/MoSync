@@ -115,6 +115,9 @@ public final class MAMidlet extends MIDlet {
 		try {
 			if(mCanvas != null) {
 				if(!mStarted) {
+#ifdef BB_RIM_API
+					net.rim.device.api.system.Application.getApplication().addKeyListener(mCanvas);
+#endif
 #ifdef MOSYNC_COMMERCIAL
 					mCanvas.createCore();
 					mCanvas.initDisplay();
