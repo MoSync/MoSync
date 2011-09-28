@@ -23,9 +23,9 @@
 //     flags (multiple folder/set)
 //     set ID
 //     cabinet ID
-void cheader_init(struct cheader *ch, char *sign, 
-		    int nfolders, int nfiles, 
-		    int flags, int setID, 
+void cheader_init(struct cheader *ch, const char *sign,
+		    int nfolders, int nfiles,
+		    int flags, int setID,
 		    int cabID)
 {
 	int i;
@@ -44,14 +44,14 @@ void cheader_init(struct cheader *ch, char *sign,
 }
 
 // set total cabinet file size
-void cheader_size(struct cheader *ch, int size) 
-{ 
-	ch->size = size; 
+void cheader_size(struct cheader *ch, int size)
+{
+	ch->size = size;
 }
 
 // offset where cabfile-entries start
-void cheader_offsetfiles(struct cheader *ch, int offset) 
-{ 	
-	ch->offsetfiles = offset; 
+void cheader_offsetfiles(struct cheader *ch, int offset)
+{
+	ch->offsetfiles = offset;
 }
 

@@ -20,31 +20,31 @@
 // set filesize
 //     index
 //     filename
-void cfile_init( struct cfile *cf, int usize, int index, char *filename, char *origFilename )
+void cfile_init( struct cfile *cf, int usize, int _index, char *filename, char *origFilename )
 {
 	struct stat attributes;
 	struct tm *fts;	// file last modified timestamp
 
 	cf->usize = usize;
-	cf->index = index;
+	cf->index = _index;
 	stat(origFilename,&attributes);
 	fts=localtime(&(attributes.st_mtime));
 	printf("cfileInit: %s localtime:\n",filename);
 
 					// it can simply be -80
-	cf->date = ( ( fts->tm_year + 1900 - 1980 ) << 9 ) + ( (fts->tm_mon+1) << 5 ) + ( fts->tm_mday); 
-		
-	cf->time = ( fts->tm_hour << 11 ) + ( fts->tm_min << 5 ) + ( fts->tm_sec / 2 ); 
-	
-	//cf->fattr = ATTR_e | ATTR_a;  // default ATTR_e is not good idea
-	cf->fattr = ATTR_a;  
+	cf->date = ( ( fts->tm_year + 1900 - 1980 ) << 9 ) + ( (fts->tm_mon+1) << 5 ) + ( fts->tm_mday);
 
-	strcpy(cf->name, filename);
-	cf->name[strlen(filename)] = STRINGTERM; 
+	cf->time = ( fts->tm_hour << 11 ) + ( fts->tm_min << 5 ) + ( fts->tm_sec / 2 );
+
+	//cf->fattr = ATTR_e | ATTR_a;  // default ATTR_e is not good idea
+	cf->fattr = ATTR_a;
+
+	strcpy((char*)cf->name, filename);
+	cf->name[strlen(filename)] = STRINGTERM;
 }
 
 // uncompressed offset where file resides in datablocks
-void cfile_uoffset( struct cfile *cf, int offset ) 
-{ 
-	cf->uoffset = offset; 
+void cfile_uoffset( struct cfile *cf, int offset )
+{
+	cf->uoffset = offset;
 }

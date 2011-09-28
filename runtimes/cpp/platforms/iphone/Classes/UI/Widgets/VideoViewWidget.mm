@@ -77,7 +77,7 @@
     [[NSNotificationCenter defaultCenter] removeObserver:self
                                                     name:MPMoviePlayerLoadStateDidChangeNotification
                                                   object:mMoviePlayerController];
-    
+
     [mMoviePlayerController release];
     [super dealloc];
 }

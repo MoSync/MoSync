@@ -167,3 +167,7 @@ img = img.composite(copyright.first, 20, 358, Magick::ScreenCompositeOp)
 
 img.write('bmp3:splash.bmp')
 img2.write('bmp3:installer_splash.bmp')
+
+about = img.scale(450, 288);
+about.write('about.png');
+
