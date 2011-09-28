@@ -161,6 +161,11 @@ public class MoSyncCameraController {
 	 */
 	public int numberOfCameras()
 	{
+		if(mNumCameras != 0)
+		{
+			//Do not do the costly operation of reflection again
+			return mNumCameras;
+		}
 		 try
 		 {
 			 if(mCamera == null)
@@ -172,6 +177,8 @@ public class MoSyncCameraController {
 				 mCamera.release();
 				 tempCamera = Camera.open(currentCameraIndex);
 			 }
+
+			 //We have to use and static instance of the camera in the reflection here
 			 mGetNumberofCameras = tempCamera.getClass().getMethod(
 					 "getNumberOfCameras");
 			 tempCamera.release();
@@ -184,6 +191,7 @@ public class MoSyncCameraController {
 		 }
 		 catch (NoSuchMethodException nsme)
 		 {
+			 tempCamera.release();
 			 SYSLOG("ANDROID Version is less than 2.3!!");
 			 //before 2.3 only one camera is supported
 			 return 1;
