@@ -126,30 +126,30 @@
 			controller.title = value;
 		}
 	}
-//        else if([key isEqualToString:@MAW_DIALOG_ARROW_POSITION]) {
-//		int msDirection = [value intValue];
-//		direction = 0;
-//		if (msDirection & MAW_CONSTANT_ARROW_UP) {
-//			direction |= UIPopoverArrowDirectionUp;
-//		}
-//		if (msDirection & MAW_CONSTANT_ARROW_DOWN) {
-//			direction |= UIPopoverArrowDirectionDown;
-//		}
-//		if (msDirection & MAW_CONSTANT_ARROW_LEFT) {
-//			direction |= UIPopoverArrowDirectionLeft;
-//		}
-//		if (msDirection & MAW_CONSTANT_ARROW_RIGHT) {
-//			direction |= UIPopoverArrowDirectionRight;
-//		}
-//	} else if([key isEqualToString:@MAW_DIALOG_USER_CAN_DISMISS]) {
-//		if ([value isEqualToString:@"true"]){
-//			dismissable = YES;
-//		}
-//		else {
-//			dismissable = NO;
-//		}
-//
-//	}
+        else if([key isEqualToString:@MAW_MODAL_DIALOG_ARROW_POSITION]) {
+		int msDirection = [value intValue];
+		direction = 0;
+		if (msDirection & MAW_CONSTANT_ARROW_UP) {
+			direction |= UIPopoverArrowDirectionUp;
+		}
+		if (msDirection & MAW_CONSTANT_ARROW_DOWN) {
+			direction |= UIPopoverArrowDirectionDown;
+		}
+		if (msDirection & MAW_CONSTANT_ARROW_LEFT) {
+			direction |= UIPopoverArrowDirectionLeft;
+		}
+		if (msDirection & MAW_CONSTANT_ARROW_RIGHT) {
+			direction |= UIPopoverArrowDirectionRight;
+		}
+	} else if([key isEqualToString:@MAW_MODAL_DIALOG_USER_CAN_DISMISS]) {
+		if ([value isEqualToString:@"true"]){
+			dismissable = YES;
+		}
+		else {
+			dismissable = NO;
+		}
+
+	}
     else {
 		res = [super setPropertyWithKey:key toValue:value];
 		if (UIUserInterfaceIdiomPhone != UI_USER_INTERFACE_IDIOM()) {
@@ -176,7 +176,7 @@
 }
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
-//	[super sendEvent:MAW_EVENT_DIALOG_DISMISSED];
+	[super sendEvent:MAW_EVENT_DIALOG_DISMISSED];
 }
 
 - (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController {

@@ -3923,6 +3923,14 @@ group WidgetAPI "Widget API" {
 		* Send by OptionDialog view when a button is clicked.
 		*/
 		OPTION_DIALOG_BUTTON_CLICKED = 22;
+
+		/**
+		* Send by a Dialog widget when when a user dismisses a popover by tapping outside of it.
+		* It will not be sent if it was dismissed by calling #maWidgetDialogHide().
+		* Available only n the iPad
+		*/
+		DIALOG_DISMISSED = 23;
+
 	}
 
 	} // end of WidgetEventTypes
@@ -3987,31 +3995,31 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief The popover arrow should point up. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_UP = 1;
 
 		/**
 		* @brief The popover arrow should point down. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_DOWN = 2;
 
 		/**
 		* @brief The popover arrow should point left. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_LEFT = 4;
 
 		/**
 		* @brief The popover arrow should point right. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_RIGHT = 8;
 
 		/**
 		* @brief The popover arrow can point anywhere. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_ANY = 15;
 
