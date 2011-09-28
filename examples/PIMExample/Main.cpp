@@ -33,6 +33,6 @@ MA 02110-1301, USA.
  */
 extern "C" int MAMain()
 {
-    MAUtil::Moblet::run(new AppMoblet());
-    return 0;
+	MAUtil::Moblet::run(new AppMoblet());
+	return 0;
 }

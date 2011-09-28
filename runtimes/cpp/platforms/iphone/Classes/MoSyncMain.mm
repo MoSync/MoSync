@@ -49,14 +49,14 @@ void* Base::Syscall::GetValidatedMemRange(int address, int size) {
     if(address == 0) return NULL;
 	return (byte*)mem_ds + address;
 }
-void Base::Syscall::ValidateMemRange(const void* ptr, int size) {	
+void Base::Syscall::ValidateMemRange(const void* ptr, int size) {
 }
 
 int Base::Syscall::ValidatedStrLen(const char* ptr) {
 	return strlen(ptr);
 }
 const char* Base::Syscall::GetValidatedStr(int address) {
-    if(address == 0) return NULL;    
+    if(address == 0) return NULL;
 	return (const char*)mem_ds+address;
 }
 
@@ -69,7 +69,7 @@ int Base::Syscall::GetValidatedStackValue(int offset) {
 	int address = sp + offset;
 	//if(((address&0x03)!=0) || uint(address)<STACK_BOTTOM || uint(address)>STACK_TOP)
 	//	BIG_PHAT_ERROR(ERR_STACK_OOB);
-	return *(int*)&mem_ds[address];	
+	return *(int*)&mem_ds[address];
 
 }
 
@@ -88,14 +88,14 @@ unsigned char* CppInitReadData(const char* file, int fileSize, int mallocSize) {
 	memset(data, 0, mallocSize);
 	Base::FileStream fileStream(getReadablePath(file));
 	fileStream.read(data, fileSize);
-	
+
 	// setup some stuff here.
 	int mces =  Base::getMaxCustomEventSize();
 	sp -= mces;
 	sDataSize = mallocSize;
 	sCustomEventDataPointer = mallocSize-mces;
 	sCustomEventData = &data[sCustomEventDataPointer];
-	
+
 	return data;
 }
 
@@ -121,13 +121,13 @@ static int sWidth, sHeight;
 
 int MoSync_ThreadMain(void *args) {
 	NSAutoreleasePool	 *autoreleasepool = [[NSAutoreleasePool alloc] init];
-	
+
 	const char *resources = getReadablePath("resources");
 
 #ifdef LOGGING_ENABLED
 	InitLog(getWriteablePath("log.txt"));
 #endif
-	
+
 	Base::Syscall *syscall = 0;
 	syscall = new Base::Syscall(sWidth, sHeight);
 
@@ -135,7 +135,7 @@ int MoSync_ThreadMain(void *args) {
 	{
 		FileStream res(resources);
 		if(!syscall->loadResources(res, resources))
-			BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);	
+			BIG_PHAT_ERROR(ERR_PROGRAM_LOAD_FAILED);
 	}
 	cpp_main();
 #else
@@ -144,10 +144,10 @@ int MoSync_ThreadMain(void *args) {
 	gCore = Core::CreateCore(*syscall);
 	MYASSERT(Core::LoadVMApp(gCore, program, resources), ERR_PROGRAM_LOAD_FAILED);
 	gRunning = true;
-	
+
 	while(gRunning) {
 		Core::Run2(gCore);
-		
+
 		if(gReloadHandle > 0) {
 			Base::Stream* stream = Base::gSyscall->resources.extract_RT_BINARY(gReloadHandle);
 			if(!stream->seek(Seek::Start, 0))
@@ -160,10 +160,10 @@ int MoSync_ThreadMain(void *args) {
 			}
 		}
 	}
-#endif	
-	
+#endif
+
 	[autoreleasepool release];
-	
+
 	return 0;
 }
 
@@ -185,7 +185,7 @@ void MoSync_UpdateView(CGImageRef ref) {
 }
 
 void MoSync_DoneUpdatingView() {
-	
+
 	mViewSemaphore.post();
 }
 
@@ -196,17 +196,17 @@ void MoSync_ShowMessageBox(const char *title, const char *msg, bool kill) {
 
 	[sMoSyncView showMessageBox:[[NSString alloc] initWithBytes:msg length:strlen(msg) encoding:NSUTF8StringEncoding]
 					  withTitle:nsTitle
-					  shouldKill:kill];  	
+					  shouldKill:kill];
 }
 
 void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
-	[sMoSyncView 
+	[sMoSyncView
 	 showTextBox:[[NSString alloc] initWithCharacters:(const unichar*)title length:wcharLength(title)]
 	 withInText:[[NSString alloc] initWithCharacters:(const unichar*)inText length:wcharLength(inText)]
 	 outText:(wchar*)outText
 	 maxSize:maxSize
 	 andConstraints:constraints
-	 ];  	
+	 ];
 }
 
 void MoSync_ReloadProgram(MAHandle data, int reload) {
@@ -307,7 +307,7 @@ void* MoSync_GetCustomEventDataMoSyncPointer() {
 	return (void*) sCustomEventDataPointer;
 #else
 	return (void*) (gCore->Head.DataSize-Base::getMaxCustomEventSize());
-	
+
 #endif
 }
 

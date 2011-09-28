@@ -24,10 +24,10 @@
 #define CHEADERH
 
 
-void cheader_init(struct cheader *ch,	char *sign, 
-		int nfolders, int nfiles, 
-    		int flags, int setID, 
-    		int cabID);
+void cheader_init(struct cheader *ch, const char *sign,
+	int nfolders, int nfiles,
+	int flags, int setID,
+	int cabID);
 
 void cheader_size(struct cheader *ch, int size);
 

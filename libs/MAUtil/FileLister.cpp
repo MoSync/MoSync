@@ -18,9 +18,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "FileLister.h"
 #include <maassert.h>
 
-int FileLister::start(const char* dir, const char* filter) {
+int FileLister::start(const char* dir, const char* filter, int sorting) {
 	close();
-	return mList = maFileListStart(dir, filter);
+	return mList = maFileListStart(dir, filter, sorting);
 }
 
 int FileLister::next(MAUtil::String& dst) {

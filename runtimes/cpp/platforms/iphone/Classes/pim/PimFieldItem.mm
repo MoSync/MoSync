@@ -141,7 +141,7 @@
     PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
 
     // Check if the field supports attributes.
-    if (MA_PIM_ERR_NO_ATTRIBUTES == [itemValue getAttribute])
+    if (0 == [itemValue getAttribute])
     {
         return MA_PIM_ERR_NO_LABEL;
     }

@@ -294,8 +294,7 @@ static PimUtils *sharedInstance = nil;
  *                     - second null terminated string(UTF-16 encoding).
  *                     - etc
  * @param size  The maximum size(in bytes) that can be written at the given address.
- * @return The size(in bytes) of the strings, or MA_PIM_ERR_BUFFER_TOO_SMALL if the size of
- * the strings is bigger then size parameter.
+ * @return The size(in bytes) of the strings.
  */
 -(int) writeStringArray:(NSMutableArray*) array
               atAddress:(void*) address
@@ -312,10 +311,6 @@ static PimUtils *sharedInstance = nil;
         int remainingSize = size - countWrittenBytes;
 
         int result = [self writeString:currentString atAddress:(void*) dst maxSize:remainingSize];
-        if (MA_PIM_ERR_BUFFER_TOO_SMALL == result)
-        {
-            return MA_PIM_ERR_BUFFER_TOO_SMALL;
-        }
         countWrittenBytes += result;
         dst += [currentString length] + 1;
     }
@@ -351,8 +346,7 @@ static PimUtils *sharedInstance = nil;
  * @param value The given string.
  * @param address The specified address.
  *                The address will contain a null terminated string(UTF-16 encoding).
- * @return The string's size(in bytes), or MA_PIM_ERR_BUFFER_TOO_SMALL if the size of
- * the string is bigger then size parameter.
+ * @return The string's size(in bytes).
  */
 -(int) writeString:(NSString*) value
          atAddress:(void*) address
@@ -360,10 +354,6 @@ static PimUtils *sharedInstance = nil;
 {
     // Check the size of the string.
     int stringSize = ([value length] + 1) * sizeof(UInt16);
-    if(stringSize > size)
-    {
-        return MA_PIM_ERR_BUFFER_TOO_SMALL;
-    }
 
     // Write string at the given address.
     UInt16* dst = (UInt16*)address;

@@ -20,18 +20,17 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #include <errno.h>
 #include "packagers.h"
+#include "util.h"
 
 using namespace std;
 
-static string parseBlackberryVersion(const string& v) {
-	unsigned major, minor;
-	int res = sscanf(v.c_str(), "%u.%u", &major, &minor);
+static string parseBlackberryVersion(const RuntimeInfo& ri) {
+	unsigned major = ri.blackberryVersion, minor = ri.blackberryMinor;
 	bool bad = false;
-	bad |= (res != 2);
 	bad |= major < 4;
 	bad |= major > 6;
 	if(bad) {
-		printf("Error: bad Blackberry version (%s)\n", v.c_str());
+		printf("Error: bad Blackberry version (%i.%i)\n", major, minor);
 		exit(1);
 	}
 	switch(major) {
@@ -54,7 +53,7 @@ void packageBlackberry(const SETTINGS& s, const RuntimeInfo& ri) {
 	testDst(s);
 	testName(s);
 	std::stringstream cmd;
-	string bbdir = mosyncdir()+string("/bin/bb")+parseBlackberryVersion(ri.blackberryVersion);
+	string bbdir = mosyncdir()+string("/bin/bb")+parseBlackberryVersion(ri);
 	cmd << "java -Xmx256m -classpath \""<<bbdir<<"/rapc.jar\""
 		" net.rim.tools.compiler.Compiler"
 		" \"import="<<bbdir<<"/net_rim_api.jar\""
@@ -66,9 +65,7 @@ void packageBlackberry(const SETTINGS& s, const RuntimeInfo& ri) {
 	codName += ".cod";
 	std::string newName = s.dst + ("/" + codName);
 	remove(newName.c_str());
-	int res = rename(codName.c_str(), newName.c_str());
-	if(res != 0) {
-		printf("rename error %i, %i\n", res, errno);
-		exit(1);
-	}
+	renameFile(newName, codName);
+
+	// TODO: if the COD is a zip file, re-zip it for better compression.
 }
