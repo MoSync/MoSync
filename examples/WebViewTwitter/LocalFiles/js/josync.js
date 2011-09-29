@@ -129,18 +129,6 @@ var josync = function()
 			}
 		};
 
-		self.sendPendingMessages = function()
-		{
-			// If there are more messages, send the next
-			// message in the queue.
-			if (messageQueue.length > 0)
-			{
-				var message = messageQueue[0];
-				messageQueue.shift();
-				document.location = message;
-			}
-		};
-
 		/**
 		 * This function is called from C++ to tell the message
 		 * handler that the last message sent has been processed.
