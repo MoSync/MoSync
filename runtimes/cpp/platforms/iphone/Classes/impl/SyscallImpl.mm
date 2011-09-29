@@ -38,6 +38,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
+#include "MoSyncPanic.h"
 
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
@@ -1834,6 +1835,18 @@ return 0; \
 		return MoSync_SensorStop(sensor);
 	}
 
+    SYSCALL(int, maSyscallPanicsEnable())
+	{
+        [[MoSyncPanic getInstance] setThowPanic:true];
+        return RES_OK;
+	}
+
+    SYSCALL(int, maSyscallPanicsDisable())
+	{
+        [[MoSyncPanic getInstance] setThowPanic:false];
+        return RES_OK;
+	}
+
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
@@ -1913,6 +1926,8 @@ return 0; \
         maIOCtl_case(maSensorStop);
 		maIOCtl_case(maImagePickerOpen);
 		maIOCtl_case(maSendTextSMS);
+		maIOCtl_case(maSyscallPanicsEnable);
+		maIOCtl_case(maSyscallPanicsDisable);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
