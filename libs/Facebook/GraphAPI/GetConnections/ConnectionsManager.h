@@ -307,4 +307,5 @@ protected:
 
 	int mMaxNumberOfObjectsToFetch;
 };
+
 #endif /* CONNECTIONSMANAGER_H_ */

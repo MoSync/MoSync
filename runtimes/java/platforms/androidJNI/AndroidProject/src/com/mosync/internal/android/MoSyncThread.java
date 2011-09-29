@@ -106,6 +106,7 @@ import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
+import com.mosync.nativeui.util.AsyncWait;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -296,6 +297,8 @@ public class MoSyncThread extends Thread
 		EventQueue.sMoSyncThread = this;
 		sMoSyncThread = this;
 
+		SingletonObject.getSingletonObject().setThread(this);
+
 		mHasDied = false;
 
 		mMoSyncNetwork = new MoSyncNetwork(this);
@@ -470,8 +473,8 @@ public class MoSyncThread extends Thread
 		mWidth = width;
 		mHeight = height;
 
-		Bitmap bitmap = Bitmap.createBitmap(
-			mWidth, mHeight, Bitmap.Config.ARGB_8888);
+		Bitmap bitmap = createBitmap(mWidth, mHeight);
+
 		Canvas canvas = new Canvas(bitmap);
 		mDrawTargetScreen = new ImageCache(canvas, bitmap);
 
@@ -484,6 +487,25 @@ public class MoSyncThread extends Thread
 			+ " height:" + mBitmap.getHeight());
 	}
 
+	/**
+	 * @brief Returns a slice of the memory ByteBuffer
+	 *
+	 * All calls which are accessing memory shall use this function!
+	 * The use of .position in any other call is strictly forbidden!
+	 *
+	 * @param addr	The address to the beginning of memory block
+	 * @param len	The size of the block, -1 means that the whole
+	 * 				block should be used.
+	 * @return
+	 */
+	public synchronized ByteBuffer getMemorySlice(int addr, int len)
+	{
+		mMemDataSection.position(addr);
+		ByteBuffer slice = mMemDataSection.slice();
+		if(-1 != len)
+			slice.limit(len);
+		return slice;
+	}
 
 	/**
 	 * Allocate memory for the program data section.
@@ -719,6 +741,120 @@ public class MoSyncThread extends Thread
 		mMoSyncSound.storeIfBinaryAudioResource(soundHandle);
 	}
 
+	/*
+	 * @brief Function that decodes an image into a Bitmap
+	 *
+	 * @param	data	The decoded image data
+	 * @param	options	The bitmapFactory options
+	 *
+	 * @return	The created Bitmap, null if it failed
+	 */
+	Bitmap decodeImageFromData(final byte[] data, final BitmapFactory.Options options)
+	{
+		try
+		{
+			final AsyncWait<Bitmap> waiter = new AsyncWait<Bitmap>();
+			getActivity().runOnUiThread(new Runnable()
+			{
+				public void run()
+				{
+					Bitmap bitmap = BitmapFactory.decodeByteArray(
+							data, 0, data.length, options);
+
+					waiter.setResult(bitmap);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			Log.i("MoSync", "Couldn't decode image data.");
+			return null;
+		}
+	}
+
+	/*
+	 * @brief Recycles the bitmap
+	 *
+	 * @param	bitmap	The bitmap which is being recycled
+	 */
+	void recycleImageData(final Bitmap bitmap)
+	{
+		getActivity().runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				bitmap.recycle();
+			}
+		});
+		return;
+	}
+
+	/*
+	 * @brief Function that creates an empty Bitmap
+	 *
+	 * @param	width	The width of the created Bitmap
+	 * @param	height	The width of the created Bitmap
+	 *
+	 * @return	The created Bitmap, null if it failed
+	 */
+	Bitmap createBitmap(final int width, final int height)
+	{
+		try
+		{
+			final AsyncWait<Bitmap> waiter = new AsyncWait<Bitmap>();
+			getActivity().runOnUiThread(new Runnable()
+			{
+				public void run()
+				{
+					Bitmap bitmap = Bitmap.createBitmap(
+							width, height, Bitmap.Config.ARGB_8888);
+
+					waiter.setResult(bitmap);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			Log.i("MoSync", "Couldn't create empty bitmap.");
+		}
+		return null;
+	}
+
+	/*
+	 * @brief Function that creates a Bitmap from pixel data
+	 *
+	 * @param	width	The width of the created Bitmap
+	 * @param	height	The width of the created Bitmap
+	 * @param	pixels	The pixel data
+	 *
+	 * @return	The created Bitmap, null if it failed
+	 */
+	Bitmap createBitmapFromData(final int width, final int height, final int[] pixels)
+	{
+		try
+		{
+			final AsyncWait<Bitmap> waiter = new AsyncWait<Bitmap>();
+			getActivity().runOnUiThread(new Runnable()
+			{
+				public void run()
+				{
+					Bitmap bitmap = Bitmap.createBitmap(
+							pixels, width, height, Bitmap.Config.ARGB_8888);
+
+					waiter.setResult(bitmap);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			Log.i("MoSync", "Couldn't create bitmap from pixel data.");
+			return null;
+		}
+	}
+
 	/**
 	 * Redraws the screen.
 	 */
@@ -940,9 +1076,10 @@ public class MoSyncThread extends Thread
 			maPanic(1,"maFillTriangleStrip takes more than 3 vertices");
 		}
 
-		mMemDataSection.position(address);
+		//mMemDataSection.position(address);
+		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = mMemDataSection.asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1001,9 +1138,10 @@ public class MoSyncThread extends Thread
 			maPanic(1, "maFillTriangleFan takes more than 3 vertices");
 		}
 
-		mMemDataSection.position(address);
+		//mMemDataSection.position(address);
+		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = mMemDataSection.asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1229,8 +1367,11 @@ public class MoSyncThread extends Thread
 			{
 				if (mUsingFrameBuffer)
 				{
-					mMemDataSection.position(mFrameBufferAddress);
-					mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
+					//mMemDataSection.position(mFrameBufferAddress);
+					//mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
+
+					ByteBuffer framebufferSlice = getMemorySlice(mFrameBufferAddress, -1);
+					mFrameBufferBitmap.copyPixelsFromBuffer(framebufferSlice);
 
 					// Clear the screen.. in this case draw the canvas black
 					lockedCanvas.drawRGB(0,0,0);
@@ -1312,9 +1453,10 @@ public class MoSyncThread extends Thread
 
 		int pixels[] = new int[srcRectWidth];
 
-		mMemDataSection.position(mem);
+		//mMemDataSection.position(mem);
+		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = mMemDataSection.asIntBuffer();
+		IntBuffer ib = getMemorySlice(mem, -1).asIntBuffer();
 
 		for (int y = 0; y < srcRectHeight; y++)
 		{
@@ -1542,10 +1684,8 @@ public class MoSyncThread extends Thread
 			image and the result are added with the alpha values
 			and the result is stored in the given memory location.
 		*/
-		Bitmap temporaryBitmap = Bitmap.createBitmap(
-			srcWidth,
-			srcHeight,
-			Bitmap.Config.ARGB_8888);
+
+		Bitmap temporaryBitmap = createBitmap(srcWidth, srcHeight);
 
 		Canvas temporaryCanvas = new Canvas(temporaryBitmap);
 
@@ -1553,9 +1693,10 @@ public class MoSyncThread extends Thread
 
 		temporaryCanvas.drawColor(0xff000000, Mode.DST_ATOP);
 
-		mMemDataSection.position(dst);
+		//mMemDataSection.position(dst);
+		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = mMemDataSection.asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
 
 		try {
 
@@ -1726,8 +1867,8 @@ public class MoSyncThread extends Thread
 			 * the specified format and use the format of the screen, usually
 			 * RGB 565.
 			 */
-			Bitmap decodedImage = BitmapFactory.decodeByteArray(
-				resourceData, 0, resourceData.length, options);
+
+			Bitmap decodedImage = decodeImageFromData(resourceData, options);
 
 			if (decodedImage == null)
 			{
@@ -1740,12 +1881,10 @@ public class MoSyncThread extends Thread
 			int height = decodedImage.getHeight();
 			int[] pixels = new int[width * height];
 			decodedImage.getPixels(pixels, 0, width, 0, 0, width, height);
-			decodedImage.recycle( );
-			Bitmap argbImage = Bitmap.createBitmap(
-					pixels,
-					width,
-					height,
-					Bitmap.Config.ARGB_8888);
+
+			recycleImageData(decodedImage);
+
+			Bitmap argbImage = createBitmapFromData(width, height, pixels);
 
 			mImageResources.put(
 				placeholder, new ImageCache(null, argbImage));
@@ -1779,8 +1918,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maCreateImageRaw");
 
-		Bitmap bitmap = Bitmap.createBitmap(
-			width, height, Bitmap.Config.ARGB_8888);
+		Bitmap bitmap = createBitmap(width, height);
 
 		if(null == bitmap)
 		{
@@ -1803,8 +1941,9 @@ public class MoSyncThread extends Thread
 		SYSLOG("maCreateDrawableImage");
 		try
 		{
-			Bitmap bitmap = Bitmap.createBitmap(
-				width, height, Bitmap.Config.ARGB_8888);
+
+			Bitmap bitmap = createBitmap(width, height);
+
 			Canvas canvas = new Canvas(bitmap);
 
 			mImageResources.put(
@@ -2181,8 +2320,9 @@ public class MoSyncThread extends Thread
 		// address is pointing at a byte but that array is an int array.
 		mFrameBufferAddress = address;
 		mFrameBufferSize = mWidth*mHeight;
-		mFrameBufferBitmap = Bitmap.createBitmap(
-			mWidth, mHeight, Bitmap.Config.ARGB_8888);
+
+		mFrameBufferBitmap = createBitmap(mWidth, mHeight);
+
 	}
 
 	/**
@@ -2299,10 +2439,15 @@ public class MoSyncThread extends Thread
 		// Write this property to memory.
 		byte[] ba = property.getBytes();
 
-		mMemDataSection.position(buf);
-		mMemDataSection.put(ba);
+		//mMemDataSection.position(buf);
+		//mMemDataSection.put(ba);
+
 		// Add null termination character.
-		mMemDataSection.put((byte)0);
+		//mMemDataSection.put((byte)0);
+
+		ByteBuffer slicedBuffer = getMemorySlice(buf, -1);
+		slicedBuffer.put(ba);
+		slicedBuffer.put((byte)0);
 
 		return property.length() + 1;
 	}
@@ -2401,7 +2546,7 @@ public class MoSyncThread extends Thread
 	 * the other runtimes this is necessary. There isn't a duplicate stored
 	 * on the JNI side.
 	 */
-	boolean loadBinary(int resourceIndex, ByteBuffer buffer)
+	public boolean loadBinary(int resourceIndex, ByteBuffer buffer)
 	{
 		SYSLOG("loadBinary index:" + resourceIndex);
 
@@ -2440,7 +2585,7 @@ public class MoSyncThread extends Thread
 		mMoSyncSound.storeIfAudioUBin(ubinData, resourceIndex);
 	}
 
-	ByteBuffer destroyBinary(int resourceIndex)
+	public ByteBuffer destroyBinary(int resourceIndex)
 	{
 		ByteBuffer buffer =  mBinaryResources.get(resourceIndex);
 
@@ -3385,7 +3530,7 @@ public class MoSyncThread extends Thread
 		{
 			if (bitmap != texture.mBitmap)
 			{
-				bitmap.recycle();
+				recycleImageData(bitmap);
 			}
 		}
 
@@ -3427,10 +3572,8 @@ public class MoSyncThread extends Thread
 		int newWidth = loadGlTextureHelperGetNextPowerOf2(width);
 		int newHeight = loadGlTextureHelperGetNextPowerOf2(height);
 
-		Bitmap newBitmap = Bitmap.createBitmap(
-			newWidth,
-			newHeight,
-			Bitmap.Config.ARGB_8888);
+		Bitmap newBitmap = createBitmap(newWidth, newHeight);
+
 		if (null == newBitmap)
 		{
 			return null;

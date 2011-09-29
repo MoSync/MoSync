@@ -85,7 +85,7 @@ static void end(void *data, const char *el) {
 			  //handle parse error
 				errorExit("XML parsing failed");
 			}
-			//ïf(len <= 0) done = true;
+			//if(len <= 0) done = true;
 		} while (!feof(f));
 		//printf("parsed\n");
 		XML_ParserFree(parser);

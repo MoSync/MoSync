@@ -57,9 +57,9 @@ class RuntimeBuilder
 		return androidBuilder(runtime_dir, mode, "10")
 	end
 
-        def android_10(runtime_dir, mode)
-                return androidBuilder(runtime_dir, mode, "10")
-        end
+	def android_10(runtime_dir, mode)
+		return androidBuilder(runtime_dir, mode, "10")
+	end
 
 	def androidBuilder(runtime_dir, mode, version)
 		debug = (mode=="debug") ? "D" : ""
