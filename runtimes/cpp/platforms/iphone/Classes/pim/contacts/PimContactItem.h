@@ -18,12 +18,12 @@
 #import <Foundation/Foundation.h>
 #import <AddressBook/AddressBook.h>
 
-#include "helpers/cpp_defs.h"
-#include "helpers/cpp_ix_pim.h"
-
 #import "PimUtil.h"
 #import "PimFieldItem.h"
 #import "PimItem.h"
+
+#include "helpers/cpp_defs.h"
+#include "helpers/cpp_ix_pim.h"
 
 @interface PimContactItem: PimItem {
 
@@ -173,94 +173,81 @@
 /**
  * Writes a given field into record.
  * @param itemField The specified field.
- * @return One of MA_PIM_ERR constants.
  */
--(int) writeField:(PimFieldItem*) itemField;
+-(void) writeField:(PimFieldItem*) itemField;
 
 /**
  * Writes an address field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writeAddresField:(PimFieldItem*) itemField;
+-(void) writeAddresField:(PimFieldItem*) itemField;
 
 /**
  * Writes the contact name field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writeContactNameField:(PimFieldItem*) itemField;
+-(void) writeContactNameField:(PimFieldItem*) itemField;
 
 /**
  * Writes the email field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writeEmailField:(PimFieldItem*) itemField;
+-(void) writeEmailField:(PimFieldItem*) itemField;
 
 /**
  * Writes the photo field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writePhotoField:(PimFieldItem*) itemField;
+-(void) writePhotoField:(PimFieldItem*) itemField;
 
 /**
  * Writes the photo url field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writePhotoURLField:(PimFieldItem*) itemField;
+-(void) writePhotoURLField:(PimFieldItem*) itemField;
 
 /**
  * Writes the phone field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writePhoneField:(PimFieldItem*) itemField;
+-(void) writePhoneField:(PimFieldItem*) itemField;
 
 /**
  * Writes the URL field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writeURLField:(PimFieldItem*) itemField;
+-(void) writeURLField:(PimFieldItem*) itemField;
 
 /**
  * Writes the supplemental info organization field into record.
  * @param itemField The specified field.
- * @return One of the MA_PIM_ERR constants.
  */
--(int) writeOrgInfoField:(PimFieldItem*) itemField;
+-(void) writeOrgInfoField:(PimFieldItem*) itemField;
 
 /**
  * Writes the anniversary field into record.
  * @param itemField The specified field.
- * @return One of MA_PIM_ERR constants.
  */
--(int) writeAnniversaryField:(PimFieldItem*) itemField;
+-(void) writeAnniversaryField:(PimFieldItem*) itemField;
 
 /**
  * Writes the instant message field into record.
  * @param itemField The specified field.
- * @return One of MA_PIM_ERR constants.
  */
--(int) writeIMField:(PimFieldItem*) itemField;
+-(void) writeIMField:(PimFieldItem*) itemField;
 
 /**
  * Writes the relation field into record.
  * @param itemField The specified field.
- * @return One of MA_PIM_ERR constants.
  */
--(int) writeRelationField:(PimFieldItem*) itemField;
+-(void) writeRelationField:(PimFieldItem*) itemField;
 
 /**
  * Writes a single field value into record.
  * @param itemField The given field.
  * @param property The property of whose value is being set.
- * @return One of MA_PIM_ERR constants.
  */
--(int) writeSingleFieldValue:(PimFieldItem*) itemField
+-(void) writeSingleFieldValue:(PimFieldItem*) itemField
                   propertyID:(ABPropertyID) property;
 
 /**
@@ -269,9 +256,8 @@
  * @param property The property of whose value is being set.
  * @param verify If true the length of the value is checked.
  *               If the length is zero the value is not written.
- * @return One of MA_PIM_ERR constants.
  */
--(int) setDataToRecord:(CFTypeRef) value
+-(void) setDataToRecord:(CFTypeRef) value
             propertyID:(ABPropertyID) property
            checkLength:(bool) verify;
 

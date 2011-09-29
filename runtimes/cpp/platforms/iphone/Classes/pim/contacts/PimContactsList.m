@@ -15,14 +15,10 @@
  02111-1307, USA.
 */
 
-#include "config_platform.h"
-#import "PimList.h"
 #import "PimContactsList.h"
 #import "PimUtil.h"
-#include <helpers/helpers.h>
-
-#include <base_errors.h>
-using namespace MoSyncError;
+#import "MoSyncPanic.h"
+#import "PimError.h"
 
 @implementation PimContactsList
 
@@ -32,7 +28,7 @@ using namespace MoSyncError;
 -(id) init
 {
     mContactsDictionary = [[NSMutableDictionary alloc] init];
-    mAddressBook = nil;
+    mKeysArrayIndex = MA_PIM_ERR_HANDLE_INVALID;
     return [super init];
 }
 
@@ -89,7 +85,12 @@ using namespace MoSyncError;
 -(MAHandle) getNextItem
 {
     // Check if the list is opened.
-    MYASSERT(mAddressBook != nil, ERR_INVALID_PIM_HANDLE);
+    if(MA_PIM_ERR_HANDLE_INVALID == mKeysArrayIndex)
+    {
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
+    }
 
     // Check if the are more items in list.
     NSArray* keysArray = [mContactsDictionary allKeys];
@@ -172,9 +173,9 @@ using namespace MoSyncError;
         returnedValue = [self saveItemInAddressBook:item];
         if (MA_PIM_ERR_NONE != returnedValue)
         {
-                break;
-            }
+            break;
         }
+    }
 
     [keysArray release];
 
@@ -182,18 +183,18 @@ using namespace MoSyncError;
 
     // Check if the Address Book was saved.
     if (!isSaved)
-            {
-                returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-            }
+    {
+        returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
+    }
 
     // If no error occurred remove all the items from dictionary.
     if (MA_PIM_ERR_NONE == returnedValue)
     {
         [mContactsDictionary removeAllObjects];
-        }
+    }
 
     return returnedValue;
-    }
+}
 
 /**
  * Closes a given item.
@@ -205,7 +206,9 @@ using namespace MoSyncError;
     PimContactItem* item = (PimContactItem*)[self getItem:itemHandle];
     if(!item)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     int resultCode = MA_PIM_ERR_NONE;
@@ -216,7 +219,7 @@ using namespace MoSyncError;
     if (!isSaved)
     {
        resultCode = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-    }
+   }
 
     return resultCode;
 }
@@ -227,7 +230,7 @@ using namespace MoSyncError;
  * @return One of the MA_PIM_ERR constants.
  */
 -(int) saveItemInAddressBook:(PimContactItem*) item
-    {
+{
     PimItemStatus status = [item getStatus];
     int returnedValue = MA_PIM_ERR_NONE;
 
@@ -242,7 +245,7 @@ using namespace MoSyncError;
         if (!isAdded)
         {
             returnedValue = MA_PIM_ERR_OPERATION_NOT_PERMITTED;
-    }
+        }
     }
 
     return returnedValue;
@@ -258,7 +261,9 @@ using namespace MoSyncError;
     PimContactItem* item = (PimContactItem*)[self getItem:itemHandle];
     if (!item)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     PimItemStatus status = [item getStatus];

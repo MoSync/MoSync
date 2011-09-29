@@ -100,10 +100,17 @@ class SplitResourceStream extends InputStream {
 	}
 
 	public long skip(long n) throws IOException {
-		if(mIndex < mFiles.length) {
-			return mFiles[mIndex].skip(n);
+		long pos = 0;
+		while(mIndex < mFiles.length && pos != n) {
+			long res = mFiles[mIndex].skip(n - pos);
+			if(res < 0)
+				return res;
+			else if(res == 0)
+				mIndex++;
+			else	//res > 0
+				pos += res;
 		}
-		return 0;
+		return pos;
 	}
 
 	public boolean markSupported() {

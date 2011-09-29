@@ -15,12 +15,9 @@
  02111-1307, USA.
 */
 
-#include "config_platform.h"
 #import "PimDatabase.h"
-#include <helpers/helpers.h>
-
-#include <base_errors.h>
-using namespace MoSyncError;
+#import "MoSyncPanic.h"
+#import "PimError.h"
 
 @implementation PimDatabase
 
@@ -39,22 +36,31 @@ using namespace MoSyncError;
  */
 -(MAHandle) pimListOpen:(const int) listType
 {
-	if (MA_PIM_CONTACTS == listType)
+    if (MA_PIM_CONTACTS == listType)
 	{
-		if (!mContactsList)
-		{
-			mContactsList = [[PimContactsList alloc] init];
-			[mContactsList openList];
-			return MA_PIM_CONTACTS;
-		}
-		else
-		{
-			return MA_PIM_ERR_LIST_ALREADY_OPENED;
-		}
+        if (!mContactsList)
+        {
+            mContactsList = [[PimContactsList alloc] init];
+            [mContactsList openList];
+            return MA_PIM_CONTACTS;
+        }
+        else
+        {
+            return MA_PIM_ERR_LIST_ALREADY_OPENED;
+        }
 	}
-	else
+	else if(MA_PIM_EVENTS == listType ||
+            MA_PIM_TODOS == listType)
+    {
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_LIST_UNAVAILABLE
+                                  withPanicCode:PANIC_LIST_UNAVAILABLE
+                                  withPanicText:@PANIC_LIST_UNAVAILABLE_TEXT];
+    }
+    else
 	{
-		return MA_PIM_ERR_LIST_UNAVAILABLE;
+		return [[MoSyncPanic getInstance] error:MA_PIM_ERR_LIST_TYPE_INVALID
+                                  withPanicCode:PANIC_LIST_TYPE_INVALID
+                                  withPanicText:@PANIC_LIST_TYPE_INVALID_TEXT];
 	}
 }
 
@@ -66,18 +72,17 @@ using namespace MoSyncError;
  */
 -(MAHandle) pimListNext:(MAHandle) list
 {
+	MAHandle returnedValue = MA_PIM_ERR_HANDLE_INVALID;
+
 	if (MA_PIM_CONTACTS == list)
 	{
 		if (mContactsList)
 		{
-			return [mContactsList getNextItem];
+            returnedValue = [mContactsList getNextItem];
 		}
 	}
-	else
-	{
-		BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
-	}
 
+    return returnedValue;
 }
 
 /**
@@ -91,7 +96,7 @@ using namespace MoSyncError;
 
 	if (MA_PIM_CONTACTS == list)
 	{
-		returnedValue = [self closeList:mContactsList];
+        returnedValue = [self closeList:mContactsList];
 		if (MA_PIM_ERR_NONE == returnedValue)
 		{
 			mContactsList = nil;
@@ -99,7 +104,9 @@ using namespace MoSyncError;
 	}
 	else
 	{
-		BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
 	}
 
 	return returnedValue;
@@ -113,12 +120,23 @@ using namespace MoSyncError;
 -(int) closeList:(PimList*) list;
 {
 	int returnedValue;
-	MYASSERT(nil != list, ERR_INVALID_PIM_HANDLE);
-	returnedValue = [list close];
-	if (MA_PIM_ERR_NONE == returnedValue)
+
+	if (!list)
 	{
-		[list release];
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
 	}
+	else
+	{
+		returnedValue = [list close];
+
+		if (MA_PIM_ERR_NONE == returnedValue)
+		{
+			[list release];
+		}
+	}
+
 	return returnedValue;
 }
 
@@ -131,10 +149,10 @@ using namespace MoSyncError;
 -(PimItem*) getItem:(MAHandle) itemHandle
 {
 	PimItem* item = nil;
-	if (mContactsList)
-	{
-		return [mContactsList getItem:itemHandle];
-	}
+    if (mContactsList)
+    {
+        return [mContactsList getItem:itemHandle];
+    }
 
 	return item;
 }
@@ -148,13 +166,15 @@ using namespace MoSyncError;
 {
 	if (list == MA_PIM_CONTACTS)
 	{
-		if (mContactsList)
-		{
-			return [mContactsList createItem];
-		}
+        if (mContactsList)
+        {
+            return [mContactsList createItem];
+        }
 	}
 
-	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
+    return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                              withPanicCode:PANIC_HANDLE_INVALID
+                              withPanicText:@PANIC_HANDLE_INVALID_TEXT];
 }
 
 /**
@@ -164,12 +184,14 @@ using namespace MoSyncError;
  */
 -(int) closeItem:(MAHandle) itemHandle
 {
-	if (mContactsList)
-	{
-		return [mContactsList closeItem:itemHandle];
-	}
+    if (mContactsList)
+    {
+        return [mContactsList closeItem:itemHandle];
+    }
 
-	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
+    return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                              withPanicCode:PANIC_HANDLE_INVALID
+                              withPanicText:@PANIC_HANDLE_INVALID_TEXT];
 }
 
 /**
@@ -183,13 +205,15 @@ using namespace MoSyncError;
 {
 	if (list == MA_PIM_CONTACTS)
 	{
-		if (mContactsList)
-		{
-			return [mContactsList removeItem:item];
-		}
+        if (mContactsList)
+        {
+            return [mContactsList removeItem:item];
+        }
 	}
 
-	BIG_PHAT_ERROR(ERR_INVALID_PIM_HANDLE);
+    return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                              withPanicCode:PANIC_HANDLE_INVALID
+                              withPanicText:@PANIC_HANDLE_INVALID_TEXT];
 }
 
 /**

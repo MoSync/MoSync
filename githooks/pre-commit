@@ -68,21 +68,3 @@ then
 	echo "Errors detected. Commit aborted."
 	exit 1
 fi
-
-# check all modified text files for invalid utf-8.
-# the "git show" command filters out binary files.
-
-if ! git diff-index --cached $against --name-only -z -- | xargs -0 sh -c '
-	e=""
-	for f; do
-		if ! git show :"$f" | iconv -f UTF-8 -t UTF-8 >/dev/null 2>&1; then
-			e=1
-			echo "Not UTF-8: $f"
-			exit 255 # to abort after first non-UTF-8 file
-		fi
-	done
-	test -z "$e"
-' -
-then
-	exit 1
-fi

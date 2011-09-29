@@ -1290,6 +1290,10 @@ public
 	final boolean startSound(InputStream input, String mimeString) throws Exception {
 		disposeSound();
 
+#ifdef MA_PROF_BLACKBERRY_VERSION
+		// prefetch() hangs.
+		return false;
+#else
 		/*DEBUG_ALWAYS("Mime: "+mimeString+"\n");
 		DEBUG_ALWAYS("Equality: "+mimeString.equals("audio/mpeg")+"\n");
 		DEBUG_ALWAYS("Comparison: "+mimeString.compareTo("audio/mpeg")+"\n");*/
@@ -1320,6 +1324,7 @@ public
 		mPlayer.start();
 		DEBUG_SOUND("started\n");
 		return true;
+#endif	//MA_PROF_BLACKBERRY_VERSION
 	}
 
 
@@ -1567,6 +1572,8 @@ public
 		return RES_OK;
 	}
 #endif
+
+	// TODO: on Blackberry, use net.rim.device.api.system.PersistentStore instead.
 
 	SYSCALL(MAHandle) maOpenStore(String name, int flags) throws RecordStoreException {
 		DEBUG_ALWAYS("maOpenStore("+name+")\n");

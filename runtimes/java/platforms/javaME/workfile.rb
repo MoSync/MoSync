@@ -145,7 +145,7 @@ target :default do
 end
 
 target :pack => :default do
-	sh "cd #{CLASS_DIR} && zip -u0 #{BIN_DIR}\\#{PROJECT_NAME}.jar *.class"
+	sh "cd #{CLASS_DIR} && zip -u9 #{BIN_DIR}\\#{PROJECT_NAME}.jar *.class"
 end
 
 # parses ARGV
