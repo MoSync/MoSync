@@ -23,15 +23,15 @@ MA 02110-1301, USA.
  * Class for parsing messages from a WebView.
  */
 
-#ifndef NATIVEUI_WEB_VIEW_MESSAGE_H_
-#define NATIVEUI_WEB_VIEW_MESSAGE_H_
+#ifndef JOSYNC_WEB_VIEW_MESSAGE_H_
+#define JOSYNC_WEB_VIEW_MESSAGE_H_
 
 #include <ma.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashMap.h>
-#include <IX_WIDGET.h>
+#include <NativeUI/WebView.h>
 
-namespace NativeUI
+namespace josync
 {
 
 /**
@@ -61,7 +61,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	WebViewMessage(MAHandle dataHandle);
+	WebViewMessage(NativeUI::WebView* webView, MAHandle dataHandle);
 
 	/**
 	 * Destructor.
@@ -78,6 +78,41 @@ public:
 	 */
 	MAUtil::String getParam(const MAUtil::String& paramName);
 
+	/**
+	 * Checks if the given parameter name is in the message.
+	 */
+	bool hasParam(const MAUtil::String& paramName);
+
+
+	/**
+	 * Calls a JavaScript callback function using the "callbackId"
+	 * parameter. The callbackId is supplied automatically when
+	 * using the josync.messagehandler.send function.
+	 * @param result A string that contains the data to be returned
+	 * to the JavaScript callback function.
+	 * @return true on success, false on error.
+	 */
+	bool replyString(const MAUtil::String& result);
+
+	/**
+	 * Calls a JavaScript callback function using the "callbackId"
+	 * parameter. The callbackId is supplied automatically when
+	 * using the josync.messagehandler.send function.
+	 * @param result A boolean to be returned
+	 * to the JavaScript callback function.
+	 * @return true on success, false on error.
+	 */
+	bool replyBoolean(bool result);
+
+	/**
+	 * Calls a JavaScript callback function using the "callbackId"
+	 * parameter. Returns null to the callback function.
+	 * The callbackId is supplied automatically when
+	 * using the josync.messagehandler.send function.
+	 * @return true on success, false on error.
+	 */
+	bool replyNull();
+
 protected:
 	/**
 	 * Parse the message. This finds the message name and
@@ -86,6 +121,11 @@ protected:
 	void parse(MAHandle dataHandle);
 
 private:
+	/**
+	 * The WebView of this message.
+	 */
+	NativeUI::WebView* mWebView;
+
 	/**
 	 * The message name is the "command name".
 	 */

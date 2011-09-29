@@ -94,6 +94,7 @@ html
 }
 </style>
 
+<!-- Import the josync library. -->
 <script src="js/josync.js"></script>
 
 <script>
@@ -128,15 +129,16 @@ function SendKissSMS()
   SendSMS(G_KissMessage);
 }
 
-function SendSMS(message)
+function SendSMS(textMessage)
 {
   if (ValidatePhoneNo())
   {
     DisplayMessage('Sending...');
-    SendMoSyncMessage(
-      'SendSMS',
-      'phoneNo', GetPhoneNo(),
-      'message', message);
+    josync.messagehandler.send(
+      { messageName: 'SendSMS',
+        phoneNo: GetPhoneNo(),
+        message: textMessage },
+      null);
   }
 }
 
@@ -259,7 +261,7 @@ CreateMessageStrings();
 </div>
 <script>
   // This informs the application that the page is loaded.
-  SendMoSyncMessage('PageLoaded');
+  josync.messagehandler.send({ messageName: 'PageLoaded' }, null);
 </script>
 </body>
 </html>
