@@ -55,7 +55,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	private int mTimeout = 0;
 
 	private int	mKeyState = 0;
-	
+
 	private Alert mErrorAlert;
 #ifndef MOSYNC_COMMERCIAL
 	private Alert mStartupAlert;
@@ -69,7 +69,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 	public Display mDisplay;
 
 	MainCanvas(MAMidlet aMidlet) throws Exception {
-		super(false);	
+		super(false);
 		mMidlet = aMidlet;
 		mDisplay = Display.getDisplay(mMidlet);
 #ifdef SPLASH_SCREEN
@@ -123,6 +123,15 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 #ifndef JDB_DEBUG
 		try {
 #endif
+#ifdef PUBLIC_DEBUG
+			InputStream is = getClass().getResourceAsStream("debug.url");
+			if(is!=null) {
+				byte[] b = new byte[is.available()];
+				is.read(b);
+				String debugUrl = new String(b);
+				MAMidlet.out = mMidlet.makeConnectionPrintStream(debugUrl);
+			}
+#endif
 			//if(firstRun)
 			{
 				int w = getWidth();
@@ -164,10 +173,10 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 					long time = System.currentTimeMillis() - startTime;
 					if(time == 0) time++;
 
-#ifdef MA_PROF_SUPPORT_CLDC_10				
+#ifdef MA_PROF_SUPPORT_CLDC_10
 					DEBUG_CORE(""+mCore.mInstCount+" instructions in "+time+" ms: "+
 						((mCore.mInstCount) / time)+" KIPS\n");
-#else				
+#else
 					DEBUG_CORE(""+mCore.mInstCount+" instructions in "+time+" ms: "+
 						(((double)mCore.mInstCount) / time)+" KIPS\n");
 #endif
@@ -307,7 +316,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 			//TODO: check to see if running
 			(SYSCALL_NUMBER_IS_VALID(mCore.mLastSyscall) ?
 			("s" + Integer.toString(mCore.mLastSyscall)) : "") +
-			".i" + Integer.toHexString(mCore.mIP) + "." + 
+			".i" + Integer.toHexString(mCore.mIP) + "." +
 #endif
 			new String(appCode);
 	}
@@ -367,6 +376,11 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		case 1: return MAK_UP;
 		case 5: return MAK_RIGHT;
 		case -8: return MAK_FIRE;
+
+		// see keyDown()
+		case -20: return MAK_MENU;
+		case -11: return MAK_BACK;
+
 		default: return nativeCode;
 		}
 	}
@@ -387,7 +401,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 			if(released == true) {
 				mKeyState &= ~convertKeyBit(keyCode);
 			} else {
-				mKeyState |= convertKeyBit(keyCode);				
+				mKeyState |= convertKeyBit(keyCode);
 			}
 
 			EI_TYPE = released ? EVENT_TYPE_KEY_RELEASED : EVENT_TYPE_KEY_PRESSED;
@@ -438,7 +452,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		EI_TOUCH_ID = 0;
 		postEvent(event);
 	}
-	
+
 	protected final void pointerReleased(int x, int y) {
 		DEBUG_TEMP("pointerReleased "+x+" "+y+"\n");
 		int[] event = new int[4];
@@ -446,9 +460,9 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		EI_POINTX = x;
 		EI_POINTY = y;
 		EI_TOUCH_ID = 0;
-		postEvent(event);	
+		postEvent(event);
 	}
-	
+
 	protected final void pointerDragged(int x, int y) {
 		DEBUG_TEMP("pointerDragged "+x+" "+y+"\n");
 		int[] event = new int[4];
@@ -459,7 +473,7 @@ public final class MainCanvas extends GameCanvas implements Runnable, CommandLis
 		postEvent(event);
 	}
 #endif	//MA_PROF_SUPPORT_STYLUS
-		
+
 	synchronized protected final void keyPressed(int keyCode) {
 		DEBUG_KEYS("keyPressed "+keyCode+"\n");
 		handleKeyEvent(keyCode, false);
