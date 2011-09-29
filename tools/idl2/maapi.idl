@@ -2992,8 +2992,8 @@ interface MAAPI {
 		*/
 		int maGetSystemProperty(in MAString key, out MAString buf range("size"), in int size);
 
-group PIMAPI "PIM API" {		
-		
+group PIMAPI "PIM API" {
+
 #if IX_PIM
 		constset int MA_PIM_ {
 			/**
@@ -3005,6 +3005,7 @@ group PIMAPI "PIM API" {
 			TODOS = 3;
 		}
 
+	group PIMConsts "PIM Constants" {
 		constset int MA_PIM_TYPE_ {
 			/// bytes
 			/// the bytes are not null-terminated.
@@ -3435,7 +3436,9 @@ group PIMAPI "PIM API" {
 			/// The operation is not allowed by the Address Book database.
 			OPERATION_NOT_PERMITTED = -18;
 		}
+	}
 
+	group PIMFunctions "PIM Functions"{
 		/**
 		* \brief Opens a PimList. Use maPimListNext() to open the list's items.
 		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
@@ -3699,6 +3702,8 @@ group PIMAPI "PIM API" {
 		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
+		} //end of pim functions
+
 #endif	//IX_PIM
 }
 #if IX_WIDGET
@@ -6851,13 +6856,11 @@ group CameraFunctions "Camera Functions" {
 		 * @return \< 0 on error.
 		 */
 		int maScreenStateEventsOff();
-		
-group OpenGLESAPI "OpenGLES API" 
-{	
-	#include "opengl_non_generated.idl"
-	#include "opengl_generated.idl"
-}
 
+group OpenGLES "OpenGLES" {
+#include "opengl_non_generated.idl"
+#include "opengl_generated.idl"
+}
 		/**
 		 * Logs information about the state of all current resources.
 		 */
@@ -6878,8 +6881,8 @@ group OpenGLESAPI "OpenGLES API"
 		*/
 		void maImagePickerOpen();
 
-group SensorAPI "Sensor API" {			
-		
+group SensorAPI "Sensor API" {
+		group SensorTypes "Sensor Types" {
 		constset int SENSOR_TYPE_ {
 			// A constant describing an accelerometer sensor type.
 			ACCELEROMETER = 1;
@@ -6893,6 +6896,9 @@ group SensorAPI "Sensor API" {
 			PROXIMITY = 5;
 		}
 
+		} // end of sensor types
+
+		group SensorConsts "Sensor Constants" {
 		constset int SENSOR_RATE_ {
 			// Get sensor data as fast as possible.
 			FASTEST = 0;
@@ -6939,6 +6945,9 @@ group SensorAPI "Sensor API" {
 			NEAR = 1;
 		}
 
+		} //end of sensor constants
+
+	group SensorFunctions "Sensor Functions" {
 		/**
 		* \brief Enables a sensor and starts sending events if the sensor is available.
 		* If the sensor is already enabled this call will have no effect.
@@ -6964,6 +6973,9 @@ group SensorAPI "Sensor API" {
 		*/
 		int maSensorStop(in int sensor);
 
+	}//End of Sensor Functions
+
+group NFCAPI "NFC API" {
 		/**
 		* Start listening to NFC events.
 		* \return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
@@ -7373,7 +7385,7 @@ group SensorAPI "Sensor API" {
 			KEY_B = 2;
 
 		}
-
+	}
 	}
 }
 	constset int IOCTL_ {
