@@ -1375,14 +1375,9 @@ interface MAAPI {
 		NFC_TAG_READ_ONLY = 40;
 
 		/**
-		* \bried The maAlert message box was dismissed by one of the available buttons.
-		*/
-		ALERT = 41;
-
-		/**
 		* Send by maOptionsBox dialog when one of the option buttons is clicked.
 		*/
-		OPTIONS_BOX_BUTTON_CLICKED = 42;
+		OPTIONS_BOX_BUTTON_CLICKED = 41;
 	}
 
 	/**
