@@ -30,6 +30,8 @@
 
 #include "MainScreen.h"
 
+#include "MAHeaders.h"
+
 /**
  * Constructor.
  */
@@ -57,13 +59,16 @@ MainScreen::~MainScreen()
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
-	mMainLayout->setBackgroundColor(0xFF0000);
+	mMainLayout->setBackgroundColor(0xC1FFC1);
 	Screen::setMainWidget(mMainLayout);
 
 	mNavigationBar = new NavigationBar();
 	mNavigationBar->setBackButtonTitle("Back");
 	mNavigationBar->setTitle("My title");
-	mNavigationBar->fillSpaceHorizontally();
+	mNavigationBar->setTitleFontColor(0x104E8B);
+//	mNavigationBar->setTitleFontSize(20);
+	mNavigationBar->setIcon(RES_IMAGE);
+//	mNavigationBar->fillSpaceHorizontally();
 	mMainLayout->addChild(mNavigationBar);
 }
 

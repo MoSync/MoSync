@@ -116,19 +116,23 @@ public class MoSyncImagePicker
 		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
 			public void onClick(DialogInterface dialog, int which)
 			{
-				// Display only the name of the selected image.
-				Toast.makeText(getActivity(), mNames.get(mPosition),
-						Toast.LENGTH_SHORT).show();
-
-				if ( !mPaths.isEmpty() )
-				{
-					// Save the handle of the selected item and post event.
-					mImageHandle = getSelectedImageHandle(mBitmapCache.get(mPosition));
-				}
 				// Clear the bitmap cache before closing the dialog.
 				mBitmapCache.clear();
 
-				postImagePickerEvent(PICKER_READY);
+				if ( !mPaths.isEmpty() )
+				{
+					// Display only the name of the selected image.
+					Toast.makeText(getActivity(), mNames.get(mPosition), Toast.LENGTH_SHORT).show();
+
+					// Save the handle of the selected item and post event.
+					mImageHandle = getSelectedImageHandle(mBitmapCache.get(mPosition));
+
+					postImagePickerEvent(PICKER_READY);
+				}
+				else
+				{
+					postImagePickerEvent(PICKER_CANCELED);
+				}
 			}
 		});
 

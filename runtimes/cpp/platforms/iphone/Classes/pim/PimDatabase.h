@@ -24,11 +24,11 @@
 #import "PimUtil.h"
 #import "PimItem.h"
 
-@interface PimDatabase: NSObject {
-	/**
-	* List with contact items.
-	*/
-	PimList* mContactsList;
+@interface PimDatabase:  NSObject {
+    /**
+     * List with contact items.
+     */
+    PimList* mContactsList;
 }
 
 /**

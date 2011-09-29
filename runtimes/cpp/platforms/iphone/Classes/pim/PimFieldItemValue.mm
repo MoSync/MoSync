@@ -28,11 +28,11 @@
  */
 -(id) init
 {
-	mValuesArray = [[NSMutableArray alloc] init];
-	mAttributeID = -1;
-	mLabel = [[NSString alloc] init];
+    mValuesArray = [[NSMutableArray alloc] init];
+    mAttributeID = 0;
+    mLabel = [[NSString alloc] init];
 
-	return [super init];
+    return [super init];
 }
 
 /**
@@ -41,8 +41,8 @@
  */
 -(void) setValue:(NSMutableArray*) value
 {
-	[mValuesArray release];
-	mValuesArray = value;
+    [mValuesArray release];
+    mValuesArray = value;
 }
 
 /**
@@ -51,7 +51,7 @@
  */
 -(NSMutableArray*) getValue
 {
-	return mValuesArray;
+    return mValuesArray;
 }
 
 /**
@@ -60,7 +60,7 @@
  */
 -(void) setAttribute:(int) attributeID
 {
-	mAttributeID = attributeID;
+    mAttributeID = attributeID;
 }
 
 /**
@@ -69,7 +69,7 @@
  */
 -(int) getAttribute
 {
-	return mAttributeID;
+    return mAttributeID;
 }
 
 /**
@@ -79,23 +79,23 @@
  */
 -(int) setLabel:(NSString*) label
 {
-	if (nil != label)
-	{
-		[mLabel release];
-		mLabel = [NSString stringWithString:label];
-	}
-	return MA_PIM_ERR_NONE;
+    if (nil != label)
+    {
+        [mLabel release];
+        mLabel = [NSString stringWithString:label];
+    }
+    return MA_PIM_ERR_NONE;
 }
 
 /**
  * Get the label value.
  * @return A string containing the label value, or
- *		 nil if the attribute is not set to custom.
+ *         nil if the attribute is not set to custom.
  */
 
 -(NSString*) getLabel
 {
-	return mLabel;
+    return mLabel;
 }
 
 /**
@@ -103,9 +103,9 @@
  */
 - (void) dealloc
 {
-	[mValuesArray release];
-	[mLabel release];
-	[super dealloc];
+    [mValuesArray release];
+    [mLabel release];
+    [super dealloc];
 }
 
 @end

@@ -151,8 +151,8 @@ void printResultCode(const int resultCode)
 	case MA_PIM_ERR_NO_LABEL:
 		error = "MA_PIM_ERR_NO_LABEL";
 		break;
-	case MA_PIM_ERR_CUSTOM_ATTRIBUTE:
-		error = "MA_PIM_ERR_CUSTOM_ATTRIBUTE";
+	case MA_PIM_ERR_ATTRIBUTE_CUSTOM:
+		error = "MA_PIM_ERR_ATTRIBUTE_CUSTOM";
 		break;
 	case MA_PIM_ERR_LIST_UNAVAILABLE:
 		error = "MA_PIM_ERR_LIST_UNAVAILABLE";

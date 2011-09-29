@@ -44,7 +44,8 @@ class SummaryScreen;
  * for Back and NewSearch actions.
  */
 class WebScreen : public BasicScreen,
-				  public MAUtil::CustomEventListener
+				  public CustomEventListener,
+				  public KeyListener
 {
 public:
 
@@ -63,6 +64,13 @@ public:
 	 * Show the screen.
 	 */
 	void showScreen();
+
+	/**
+	 * From KeyListener.
+	 * This function is called with a \link #MAK_FIRST MAK_ code \endlink when
+	 * a key is pressed.
+	 */
+	virtual void keyPressEvent(int keyCode, int nativeCode);
 
 	/**
 	 * from CustomEventListener
