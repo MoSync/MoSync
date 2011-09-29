@@ -2992,6 +2992,8 @@ interface MAAPI {
 		*/
 		int maGetSystemProperty(in MAString key, out MAString buf range("size"), in int size);
 
+group PIMAPI "PIM API" {		
+		
 #if IX_PIM
 		constset int MA_PIM_ {
 			/**
@@ -3698,7 +3700,7 @@ interface MAAPI {
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
 #endif	//IX_PIM
-
+}
 #if IX_WIDGET
 #include "native_ui_intro_doc.idl"
 group WidgetAPI "Widget API" {
@@ -6849,9 +6851,12 @@ group CameraFunctions "Camera Functions" {
 		 * @return \< 0 on error.
 		 */
 		int maScreenStateEventsOff();
-
-#include "opengl_non_generated.idl"
-#include "opengl_generated.idl"
+		
+group OpenGLESAPI "OpenGLES API" 
+{	
+	#include "opengl_non_generated.idl"
+	#include "opengl_generated.idl"
+}
 
 		/**
 		 * Logs information about the state of all current resources.
@@ -6873,6 +6878,8 @@ group CameraFunctions "Camera Functions" {
 		*/
 		void maImagePickerOpen();
 
+group SensorAPI "Sensor API" {			
+		
 		constset int SENSOR_TYPE_ {
 			// A constant describing an accelerometer sensor type.
 			ACCELEROMETER = 1;
@@ -7368,7 +7375,7 @@ group CameraFunctions "Camera Functions" {
 		}
 
 	}
-
+}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}
