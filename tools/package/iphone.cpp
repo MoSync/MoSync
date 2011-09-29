@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include "packagers.h"
 #include "util.h"
+#include "tools.h"
 
 #if defined (__MACH__) || defined(__APPLE__)
 #define PLATFORM_OSX
@@ -73,9 +74,7 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 			std::ostringstream iconInjectCmd;
 			string size = sizes[i];
 			string outputIcon = xcodeprojOutput + "/" + filenames[i];
-			iconInjectCmd << mosyncdir() << "/bin/icon-injector -lenient yes -platform iOS -src \"" <<
-					s.icon << "\" -size " << size.c_str() << " -dst \"" << outputIcon.c_str() << "\"";
-			sh(iconInjectCmd.str().c_str(), s.silent);
+			injectIcon("iOS", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
 		}
 	}
 
