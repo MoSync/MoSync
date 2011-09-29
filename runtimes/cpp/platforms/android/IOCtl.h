@@ -233,6 +233,9 @@ namespace Base
 
 	int _maImagePickerOpen(JNIEnv* jNIEnv, jobject jThis);
 
+	int _maOptionsBox(const wchar* title, const wchar* destructiveText, const wchar* cancelText, int bufPointer, int bufSize,
+						JNIEnv* jNIEnv, jobject jThis);
+
 	// Widget API
 	int _maWidgetCreate(const char *widgetType,
 						JNIEnv* jNIEnv, jobject jThis);
@@ -259,8 +262,6 @@ namespace Base
 	int _maWidgetStackScreenPush(int stackScreenWidget, int newScreen, JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetStackScreenPop(int stackScreenWidget, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maWidgetShowOptionsDialog(const wchar* title, const wchar* destructiveText, const wchar* cancelText, int bufPointer, int bufSize,
-						JNIEnv* jNIEnv, jobject jThis);
 	// Open GL API
 	/**
 	 * Internal function that initializes an Open GL

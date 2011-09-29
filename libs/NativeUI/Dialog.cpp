@@ -35,6 +35,7 @@ MA 02110-1301, USA.
  */
 
 #include "Dialog.h"
+#include "DialogListener.h"
 
 namespace NativeUI
 {
@@ -141,6 +142,42 @@ namespace NativeUI
 	void Dialog::hide()
 	{
 		maWidgetModalDialogHide(getWidgetHandle());
+	}
+
+	/**
+	 * Add a dialog event listener.
+	 * @param listener The listener that will receive dialog events.
+	 */
+	void Dialog::addDialogListener(DialogListener* listener)
+	{
+		addListenerToVector(mDialogListeners, listener);
+	}
+
+	/**
+	 * Remove the dialog listener.
+	 * @param listener The listener that receives dialogs events.
+	 */
+	void Dialog::removeDialogListener(DialogListener* listener)
+	{
+		removeListenerFromVector(mDialogListeners, listener);
+	}
+
+	/**
+	 * This method is called when there is an event for this widget.
+	 * It passes on the event to all widget's listeners.
+	 * @param widgetEventData The data for the widget event.
+	 */
+	void Dialog::handleWidgetEvent(MAWidgetEventData* widgetEventData)
+	{
+		Widget::handleWidgetEvent(widgetEventData);
+
+		if ( MAW_EVENT_DIALOG_DISMISSED == widgetEventData->eventType )
+		{
+			for (int i = 0; i < mDialogListeners.size(); i++)
+			{
+				mDialogListeners[i]->dialogDismissed(this);
+			}
+		}
 	}
 
 } // namespace NativeUI

@@ -41,6 +41,8 @@ MA 02110-1301, USA.
  *
  * Note that on Android setting widget specific properties has effects only in
  * the dialog content(that is in fact the main widget), and not on the title bar.
+ *
+ * For dialog events see DialogListener.
  */
 
 #ifndef NATIVEUI_DIALOG_H_
@@ -50,6 +52,8 @@ MA 02110-1301, USA.
 
 namespace NativeUI
 {
+	// Forward declaration
+	class DialogListener;
 
 	/**
 	 * \brief Class that represents a modal dialog.
@@ -130,6 +134,32 @@ namespace NativeUI
 		 * Hides a dialog if it is visible.
 		 */
 		virtual void hide();
+
+        /**
+         * Add an dialog event listener.
+         * @param listener The listener that will receive dialog events.
+         */
+        virtual void addDialogListener(DialogListener* listener);
+
+        /**
+         * Remove the dialog listener.
+         * @param listener The listener that receives dialog events.
+         */
+        virtual void removeDialogListener(DialogListener* listener);
+
+    protected:
+        /**
+         * This method is called when there is an event for this widget.
+         * It passes on the event to all widget's listeners.
+         * @param widgetEventData The data for the widget event.
+         */
+        virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
+
+    private:
+        /**
+         * Array with dialog listeners.
+         */
+        MAUtil::Vector<DialogListener*> mDialogListeners;
 	};
 
 } // namespace NativeUI

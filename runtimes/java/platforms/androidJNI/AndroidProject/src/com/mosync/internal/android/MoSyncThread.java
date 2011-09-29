@@ -2803,9 +2803,9 @@ public class MoSyncThread extends Thread
 	 * The destructive button is iOS specific, so here it is not treated separately.
 	 * @return
 	 */
-	int maWidgetShowOptionsDialog(String title, String destructiveButtonTitle, String cancelButtonTitle, int buffPointer, int buffSize)
+	int maOptionsBox(String title, String destructiveButtonTitle, String cancelButtonTitle, int buffPointer, int buffSize)
 	{
-		return mMoSyncNativeUI.maWidgetShowOptionDialog(title, destructiveButtonTitle, cancelButtonTitle, buffPointer, buffSize);
+		return mMoSyncNativeUI.maOptionsBox(title, destructiveButtonTitle, cancelButtonTitle, buffPointer, buffSize);
 	}
 
 	/**

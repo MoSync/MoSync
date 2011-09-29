@@ -514,7 +514,7 @@ namespace Base
 		return ret;
 	}
 
-	int _maWidgetShowOptionsDialog(const wchar* title, const wchar* destructiveText, const wchar* cancelText, int bufPointer, int bufSize,
+	int _maOptionsBox(const wchar* title, const wchar* destructiveText, const wchar* cancelText, int bufPointer, int bufSize,
 						JNIEnv* jNIEnv, jobject jThis)
 	{
 		Base::gSyscall->VM_Yield();
@@ -525,7 +525,7 @@ namespace Base
 
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetShowOptionsDialog", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maOptionsBox", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I");
 		if (methodID == 0) return 0;
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTitle, jstrText, jstrCancelText, bufPointer, bufSize);
 

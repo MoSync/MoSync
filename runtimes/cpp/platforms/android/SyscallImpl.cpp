@@ -1779,15 +1779,15 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maWidgetShowOptionsDialog:
+		case maIOCtl_maOptionsBox:
 			{
-			SYSLOG("maIOCtl_maWidgetShowOptionsDialog");
+			SYSLOG("maIOCtl_maOptionsBox");
 			const wchar* _title = GVWS(a);
 			const wchar* _text = GVWS(b);
 			const wchar* _cancel = GVWS(c);
 
 			// Read the fourth and fifth parameter from the register.
-			return _maWidgetShowOptionsDialog(
+			return _maOptionsBox(
 				_title,
 				_text,
 				_cancel,

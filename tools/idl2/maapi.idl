@@ -1370,9 +1370,13 @@ interface MAAPI {
 
 		/**
 		* \bried The maAlert message box was dismissed by one of the available buttons.
-		* See #EVENT_TYPE_ALERT for the event.
 		*/
 		ALERT = 40;
+
+		/**
+		* Send by maOptionsBox dialog when one of the option buttons is clicked.
+		*/
+		OPTIONS_BOX_BUTTON_CLICKED = 41;
 	}
 
 	/**
@@ -1480,6 +1484,11 @@ interface MAAPI {
 				*/
 				MAHandle imagePickerItem;
 			} imagePicker;
+
+			/**
+			* #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event, contains the index of the selected option.
+			*/
+			int optionsBoxButtonIndex;
 
 			/**
 			* #EVENT_TYPE_ALERT event. The index of the selected button.
@@ -3988,16 +3997,11 @@ group WidgetAPI "Widget API" {
 		WEB_VIEW_HOOK_INVOKED = 21;
 
 		/**
-		* Send by OptionDialog view when a button is clicked.
-		*/
-		OPTION_DIALOG_BUTTON_CLICKED = 22;
-
-		/**
 		* Send by a Dialog widget when when a user dismisses a popover by tapping outside of it.
-		* It will not be sent if it was dismissed by calling #maWidgetDialogHide().
-		* Available only n the iPad
+		* It will not be sent if it was dismissed by calling #maWidgetModalDialogHide().
+		* Available only on the iPad.
 		*/
-		DIALOG_DISMISSED = 23;
+		DIALOG_DISMISSED = 22;
 
 	}
 
@@ -4459,7 +4463,7 @@ group WidgetAPI "Widget API" {
 		* On Android it is a modal alert dialog.
 		* On iPad it is a PopoverController, and on iPhone it is a modal view.
 		* When a Dialog widget is created it is empty, it has no content. Any type of widget can be added inside it via #maWidgetAddChild syscalls.
-		* To show a Dialog call #maWidgetModalDialogShow(dialogHandle), to dismiss it call: #maWidgetModalDialogHide(dialogHandle), and to delete it call #maWidgetDestroy.
+		* To show a Dialog call #maWidgetModalDialogShow(), to dismiss it call: #maWidgetModalDialogHide(), and to delete it call #maWidgetDestroy.
 		* See \ref WidgetModalDialogProperties "Modal Dialog properties" for the properties available.
 		*/
 		MODAL_DIALOG = "ModalDialog";
@@ -6651,25 +6655,6 @@ group WidgetAPI "Widget API" {
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
 
-	/**
-	* Displays a special kind of dialog that has a list of possible choices.
-	* The list of options is displayed as buttons on iOS, and as text views on Android.
-	* By clicking any option the dialog gets dismissed and a #MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED event is sent back.
-	*
-	* \param title The dialog title.
-	* \param destructiveButtontext The destructive button text. This is an iOS specific feature: it has different color than the other options,
-	* and it indicates that it's action has destructive behaviour. On Android it is treated and it looks like a normal option.
-	* \param cancelButtonTitle The dialog's Cancel button text. If left empty, the dialog is not cancelable.
-	* \param otherButtonTitles The address to the buffer that stores the list of options.
-	* \param otherButtonTitlesSize The size of the buffer, in bytes.
-	*
-	* \returns Any of the following result codes:
-	* - #MAW_RES_OK if the dialog could be displayed.
-	* - #MAW_RES_ERR generic error.
-	*/
-	int maWidgetShowOptionsDialog(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle,
-								 in MAAddress otherButtonTitles, in int otherButtonTitlesSize);
-
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI
@@ -7235,6 +7220,25 @@ group CameraFunctions "Camera Functions" {
 		* Note: when a selection is made a #EVENT_TYPE_IMAGE_PICKER event is sent.
 		*/
 		void maImagePickerOpen();
+
+		/**
+		* Displays a special kind of dialog that has a list of possible choices.
+		* The list of options is displayed as buttons on iOS, and as text views on Android.
+		* By clicking any option the dialog gets dismissed and a #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event is sent back.
+		*
+		* \param title The dialog title.
+		* \param destructiveButtonTitle The destructive button text. This is an iOS specific feature: it has different color than the other options,
+		* and it indicates that it's action has destructive behaviour. On Android it is treated and it looks like a normal option.
+		* \param cancelButtonTitle The dialog's Cancel button text. If left empty, the dialog is not cancelable.
+		* \param otherButtonTitles The address to the buffer that stores the list of options.
+		* \param otherButtonTitlesSize The size of the buffer, in bytes.
+		*
+		* \returns Any of the following result codes:
+		* - #MAW_RES_OK if the dialog could be displayed.
+		* - #MAW_RES_ERR generic error.
+		*/
+		int maOptionsBox(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle,
+								 in MAAddress otherButtonTitles, in int otherButtonTitlesSize);
 
 		constset int SENSOR_TYPE_ {
 			// A constant describing an accelerometer sensor type.

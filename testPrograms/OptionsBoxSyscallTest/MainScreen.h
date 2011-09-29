@@ -30,15 +30,16 @@ MA 02110-1301, USA.
 #include <IX_PIM.h>
 #include <maapi.h>
 #include <MAUtil/util.h>
-#include <NativeUI/OptionsDialog.h>
-#include <NativeUI/OptionsDialogListener.h>
+
+#include "OptionsBox.h"
+#include "OptionsBoxListener.h"
 
 using namespace NativeUI;
 
 class MainScreen:
 	public Screen,
 	public ButtonListener,
-	public OptionsDialogListener
+	public OptionsBoxListener
 {
 
 public:
@@ -77,13 +78,13 @@ public:
      * This method is called when the destructive button from options
      * dialog was clicked.
      */
-    virtual void optionsDialogDestructiveButtonClicked();
+    virtual void optionsBoxDestructiveButtonClicked();
 
     /**
      * This method is called when the cancel button from options dialog was
      * clicked.
      */
-    virtual void optionsDialogCancelButtonClicked();
+    virtual void optionsBoxCancelButtonClicked();
 
     /**
      * This method is called when a button from options dialog was
@@ -93,7 +94,7 @@ public:
      * @param buttonIndex The index of the button that was clicked.
      * @param buttonTitle The title of the button that was clicked.
      */
-    virtual void optionsDialogButtonClicked(
+    virtual void optionsBoxButtonClicked(
 			const int buttonIndex,
 			const MAUtil::WString& buttonTitle);
 
@@ -122,6 +123,7 @@ private:
 	VerticalLayout* mMainLayout;
 
 	Button* mButton;
+	Label* mLabel;
 };
 
 

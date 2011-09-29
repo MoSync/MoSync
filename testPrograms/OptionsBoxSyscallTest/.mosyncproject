@@ -7,7 +7,7 @@
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
 <property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
@@ -26,6 +26,6 @@
 <property key="dependency.strategy" value="0"/>
 <property key="excludes/Debug" value=""/>
 <property key="excludes/Release" value=""/>
-<property key="template.id" value="project.nativeui"/>
+<property key="template.id" value="project.empty"/>
 </properties>
 </project>
