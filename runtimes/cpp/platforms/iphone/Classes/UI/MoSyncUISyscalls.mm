@@ -355,14 +355,3 @@ int maWidgetModalDialogHide(MAWidgetHandle dialogHandle) {
     [arguments release];
 	return returnValue;
 }
-
-int maWidgetShowOptionsDialog(const wchar* title, const wchar* destructiveButtonTitle, const wchar* cancelButtonTitle,
-                             const void* otherButtonTitles, const int otherButtonTitlesSize)
-{
-    [[OptionsDialogView getInstance] show:title
-                  destructiveButtonTitle:destructiveButtonTitle
-                       cancelButtonTitle:cancelButtonTitle
-                       otherButtonTitles:otherButtonTitles
-                   otherButtonTitlesSize:otherButtonTitlesSize];
-    return MAW_RES_OK;
-}

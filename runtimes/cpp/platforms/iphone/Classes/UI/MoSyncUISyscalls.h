@@ -58,7 +58,4 @@ int maWidgetModalDialogShow(MAWidgetHandle dialogHandle);
 
 int maWidgetModalDialogHide(MAWidgetHandle dialogHandle);
 
-int maWidgetShowOptionsDialog(const wchar* title, const wchar* destructiveButtonTitle, const wchar* cancelButtonTitle,
-                             const void* otherButtonTitles, const int otherButtonTitlesSize);
-
 #endif // _MOSYNC_UI_SYSCALLS_
