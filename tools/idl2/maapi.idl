@@ -4007,6 +4007,14 @@ group WidgetAPI "Widget API" {
 		* Send by OptionDialog view when a button is clicked.
 		*/
 		OPTION_DIALOG_BUTTON_CLICKED = 22;
+
+		/**
+		* Send by a Dialog widget when when a user dismisses a popover by tapping outside of it.
+		* It will not be sent if it was dismissed by calling #maWidgetDialogHide().
+		* Available only n the iPad
+		*/
+		DIALOG_DISMISSED = 23;
+
 	}
 
 	} // end of WidgetEventTypes
@@ -4071,31 +4079,31 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief The popover arrow should point up. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_UP = 1;
 
 		/**
 		* @brief The popover arrow should point down. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_DOWN = 2;
 
 		/**
 		* @brief The popover arrow should point left. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_LEFT = 4;
 
 		/**
 		* @brief The popover arrow should point right. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_RIGHT = 8;
 
 		/**
 		* @brief The popover arrow can point anywhere. Used in
-		* #MAW_DIALOG_ARROW_POSITION.
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
 		*/
 		ARROW_ANY = 15;
 
@@ -6431,10 +6439,43 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_TITLE, "MyDialog");
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_TITLE, "MyDialog");
 		* \endcode
 		*/
 		TITLE = "title";
+
+		/**
+		* @brief Sets the origin arrow position for a popover dialog.
+		* This property is only available on the iPad
+		*
+		* @validvalue One of the five MAW_CONSTANT_ARROW_ values, or a bitwise or combination of them.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Allow the popover to use any arrow
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_ARROW_POSITION, MAW_CONSTANT_ARROW_ANY);
+		* \endcode
+		*/
+		ARROW_POSITION = "arrowPosition";
+
+		/**
+		* @brief Allow or prohibits the user from dismissing a popover dialog by tapping outside of it.
+		* This property is only available on the iPad
+		*
+		* @validvalue "true"or "false".
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Prohibit the user from dismissing the popover
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_USER_CAN_DISMISS, "false");
+		* \endcode
+		*/
+		USER_CAN_DISMISS = "userCanDismiss";
+
 	}
 	} // end of WidgetmodalDialogProperties
 	} // end of WidgetProperties
@@ -6531,7 +6572,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_ERROR otherwise.
 	*/
-	int maWidgetModalDialogShow(in MAWidgetHandle dialog);
+	int maWidgetModalDialogShow(in MAWidgetHandle dialogHandle);
 
 	/**
 	* Hides/Dismisses a currently displayed dialog.
@@ -6542,7 +6583,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
 	* - #MAW_RES_ERROR otherwise.
 	*/
-	int maWidgetModalDialogHide(in MAWidgetHandle dialog);
+	int maWidgetModalDialogHide(in MAWidgetHandle dialogHandle);
 
 	/**
 	* Shows a screen. If native UI hasn't been initialized, it is also initialized

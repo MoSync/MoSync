@@ -27,6 +27,8 @@ MA 02110-1301, USA.
 
 #include "WebViewListener.h"
 
+#include "mastring.h"
+
 namespace NativeUI
 {
 	/**

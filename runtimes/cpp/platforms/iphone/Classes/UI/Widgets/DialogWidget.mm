@@ -14,9 +14,8 @@
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  02111-1307, USA.
  */
-#define NAVIGATION_BAR_HEIGHT 50
 
-#import "ModalDialogWidget.h"
+#import "DialogWidget.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 #include "Platform.h"
@@ -24,39 +23,12 @@
 #include "MoSyncUISyscalls.h"
 
 
-@implementation ModalDialogWidget
+@implementation DialogWidget
 
 - (id)init {
-	id ret = [super init];
+	id res = [super init];
 	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
-		CGRect screenSize = [[UIScreen mainScreen] bounds];
-        mModalViewController = [[UIViewController alloc] init];
-
-        // Will contain the navigation bar and the view where the widgets will be added.
-        UIView* bigView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenSize.size.width, screenSize.size.height)];
-        bigView.backgroundColor = [UIColor grayColor];
-        mModalViewController.view = bigView;
-
-        // Add navigation bar to the big view.
-        UINavigationBar* navigationBar = [[UINavigationBar alloc] initWithFrame:
-                                          CGRectMake(0, 0, bigView.frame.size.width, NAVIGATION_BAR_HEIGHT)];
-        [bigView addSubview:navigationBar];
-
-        // Add navigation item to navigation bar.
-        mNavigationItem = [[UINavigationItem alloc] init];
-        [navigationBar pushNavigationItem:mNavigationItem animated:NO];
-        [navigationBar release];
-
-        // Add a small view where the widgets will be added.
-        UIView* smallView = [[UIView alloc] initWithFrame:
-                             CGRectMake(0,
-                                        NAVIGATION_BAR_HEIGHT,
-                                        screenSize.size.width,
-                                        screenSize.size.height - NAVIGATION_BAR_HEIGHT)];
-        [bigView addSubview:smallView];
-        view = smallView;
-        [bigView release];
-
+		//iPhone implementation goes here
 	}
 	else {
 		top = 0;
@@ -67,30 +39,15 @@
 		popoverController = [[UIPopoverController alloc] initWithContentViewController:container];
 		popoverController.delegate = self;
 	}
-
-    return ret;
+	return res;
 }
 
 - (int)show {
+	[super show];
 	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
-		int viewWidth = view.frame.size.width;
-        int viewHeight = view.frame.size.height;
-
-        for (IWidget *child in children)
-        {
-            UIView* childView = [child getView];
-            [childView setFrame:CGRectMake(0, 0, viewWidth, viewHeight)];
-
-            [child layout];
-        }
-
-        [view setNeedsLayout];
-
-        MoSyncUI* mosyncUI = getMoSyncUI();
-        [mosyncUI showModal:(UINavigationController*)mModalViewController];
+		//iPhone implementation goes here
 	}
 	else {
-        [super show];
 		IWidget* shownScreen = [getMoSyncUI() getCurrentlyShownScreen];
 
 		[popoverController presentPopoverFromRect:CGRectMake(left,top,0,0)
@@ -103,7 +60,7 @@
 
 - (int)hide {
 	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
-        [mModalViewController dismissModalViewControllerAnimated:YES];
+		//iPhone implementation goes here
 	}
 	else {
 		[popoverController dismissPopoverAnimated:YES];
@@ -119,14 +76,13 @@
 		top = [value intValue];
 	} else if([key isEqualToString:@MAW_MODAL_DIALOG_TITLE]) {
 		if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
-            mNavigationItem.title = value;
+			//iPhone implementation goes here
 		}
 		else {
 			[controller.title release];
 			controller.title = value;
 		}
-	}
-        else if([key isEqualToString:@MAW_MODAL_DIALOG_ARROW_POSITION]) {
+	} else if([key isEqualToString:@MAW_MODAL_DIALOG_ARROW_POSITION]) {
 		int msDirection = [value intValue];
 		direction = 0;
 		if (msDirection & MAW_CONSTANT_ARROW_UP) {
@@ -149,8 +105,7 @@
 			dismissable = NO;
 		}
 
-	}
-    else {
+	} else {
 		res = [super setPropertyWithKey:key toValue:value];
 		if (UIUserInterfaceIdiomPhone != UI_USER_INTERFACE_IDIOM()) {
 			if ([key isEqualToString:@MAW_WIDGET_WIDTH] || [key isEqualToString:@MAW_WIDGET_HEIGHT]) {
@@ -159,20 +114,6 @@
 		}
 	}
 	return res;
-}
-
-/**
- * Returns a property value of the modal dialog/popover widget.
- * @param key The property of the modal dialog/popover widget.
- * @return The value for the given property.
- */
-- (NSString*)getPropertyWithKey: (NSString*)key
-{
-    if ([key isEqualToString:@MAW_MODAL_DIALOG_TITLE])
-    {
-        return [mNavigationItem.title retain];
-    }
-	return [super getPropertyWithKey:key];
 }
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
@@ -185,9 +126,6 @@
 
 - (void)dealloc {
 	[popoverController release];
-    [mModalViewController release];
-    [mNavigationItem release];
-
 	[super dealloc];
 }
 

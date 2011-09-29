@@ -33,13 +33,22 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	BOOL kill;
 	NSString *title;
 	NSString *msg;
+	NSString *cancelTitle;
+	NSString *button1Title;
+	NSString *button2Title;
+	NSString *button3Title;
 }
 
 @property BOOL kill;
 @property (copy, nonatomic) NSString* title;
 @property (copy, nonatomic) NSString* msg;
+@property (copy, nonatomic) NSString* cancelTitle;
+@property (copy, nonatomic) NSString* button1Title;
+@property (copy, nonatomic) NSString* button2Title;
+@property (copy, nonatomic) NSString* button3Title;
 
 - (void)alertViewCancel:(UIAlertView *)alertView;
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex;
 
 @end
 
@@ -48,16 +57,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 @synthesize kill;
 @synthesize title;
 @synthesize msg;
+@synthesize cancelTitle;
+@synthesize button1Title;
+@synthesize button2Title;
+@synthesize button3Title;
 
-- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+- (void)alertViewCancel:(UIAlertView *)alertView {
+	// don't know if this is allowed...
+	[self release];
 	if(kill)
 		MoSync_Exit();
 }
 
-- (void)alertViewCancel:(UIAlertView *)alertView {
-	// don't know if this is allowed...
-	if(kill)
-		MoSync_Exit();
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex {
+	MAEvent event;
+	event.type = EVENT_TYPE_ALERT;
+	event.alertButtonIndex = buttonIndex + 1;
+	Base::gEventQueue.put(event);
+	[self release];
 }
 
 @end
@@ -187,11 +204,13 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
                           initWithTitle:mbh.title
                           message:mbh.msg
                           delegate:mbh
-                          cancelButtonTitle:@"OK"
-                          otherButtonTitles:nil];
+                          cancelButtonTitle:mbh.cancelTitle
+                          otherButtonTitles:mbh.button1Title, mbh.button2Title, mbh.button3Title, nil];
 	
 	[touchHelper clearTouches];
-	
+	if (mbh.cancelTitle == nil) {
+		alert.cancelButtonIndex = -1;
+	}
     [alert show];
     [alert release];
 }
@@ -201,8 +220,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	mbh.kill = kill;
 	mbh.title = title;
 	mbh.msg = msg;
+	mbh.cancelTitle = @"OK";
 	[self performSelectorOnMainThread: @ selector(messageBox:) withObject:(id)mbh waitUntilDone:NO];
 }
+
+-(void) showAlert:(NSString*)msg withTitle:(NSString*)title
+	 button1Title:(NSString*)buton1
+	 button2Title:(NSString*)buton2
+	 button3Title:(NSString*)buton3 {
+	MessageBoxHandler *mbh = [[MessageBoxHandler alloc] retain];
+	mbh.kill = NO;
+	mbh.title = title;
+	mbh.msg = msg;
+	mbh.cancelTitle = nil;
+	mbh.button1Title = buton1;
+	mbh.button2Title = buton2;
+	mbh.button3Title = buton3;
+	[self performSelectorOnMainThread: @ selector(messageBox:) withObject:(id)mbh waitUntilDone:NO];
+}
+
 
 -(void) textBox:(id) obj {
 	TextBoxData *textBoxData = (TextBoxData*)obj;
