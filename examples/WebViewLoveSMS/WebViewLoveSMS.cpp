@@ -63,7 +63,7 @@ using namespace josync;
  * You can turn off SMS sending during debugging
  * by setting this variable to false.
  */
-static bool sSendSMSForReal = false;
+static bool sSendSMSForReal = true;
 
 /**
  * The application class.
@@ -129,10 +129,6 @@ public:
 			// We could implement a JavaScript File API to do
 			// this, which would be a much more general way.
 			setSavedPhoneNo();
-		}
-		else
-		{
-			message.defaultHandler();
 		}
 	}
 
