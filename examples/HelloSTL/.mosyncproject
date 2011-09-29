@@ -23,7 +23,7 @@
 <property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="dependency.strategy" value="0"/>
-<property key="excludes/Debug" value=""/>
+<property key="excludes/Debug" value="Containers/Example_using_list.cpp Containers/Example_using_map.cpp Containers/Example_using_multiset.cpp Containers/Example_using_priority_queue.cpp Containers/Example_using_queue.cpp Containers/Example_using_set.cpp Containers/Example_using_stack.cpp Containers/Example_using_deque.cpp"/>
 <property key="excludes/Release" value=""/>
 <property key="template.id" value="project.cpp"/>
 </properties>

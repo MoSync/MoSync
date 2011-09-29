@@ -85,6 +85,7 @@ void STLMoblet::keyPressEvent(int keyCode)
 void STLMoblet::STL_containers()
 {
 	STL_vector();
+	STL_bitset();
 }
 
 

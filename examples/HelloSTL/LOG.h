@@ -39,15 +39,23 @@ MA 02110-1301, USA.
 #define TRACE(ARG) lprintfln(#ARG); ARG
 
 template<unsigned int numBits>
-void print(const std::bitset<numBits> &b, const std::string &msg)
+void log_to_console(const std::bitset<numBits> &b, const std::string &msg)
 {
-	LOG("\n");
-	LOG(msg.c_str());
+	std::string bits;
 	for(int i=0; i<b.size(); ++i)
 	{
-		LOG("%d", b[i]);
+		//LOG("%d ", b[i]);
+		char bit = '0';
+		if(b[i] == 1)
+		{
+			bit = '1';
+		}
+		bits.append(1, bit);
+		bits += " ";
 	}
-	LOG("\n");
+
+	std::string final_msg = msg + bits;
+	LOG(final_msg.c_str());
 }
 
 void log_to_console(int *array, int arraySize, const std::string &msg);
@@ -62,6 +70,7 @@ void log_to_console(const std::deque<char> &d, const std::string &msg);
 void log_to_console(const char* val, const std::string &msg="");
 void log_to_console(int i, const std::string &msg="");
 void log_to_console(float i, const std::string &msg="");
+void log_to_console(unsigned long u, const std::string &msg = "");
 void log_to_console(char c, const std::string &msg="");
 void log_to_console(bool b, const std::string &msg="");
 void log_to_console(const Employee &e, const std::string &msg = "");

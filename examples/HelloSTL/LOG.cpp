@@ -164,6 +164,18 @@ void log_to_console(float i, const std::string &msg)
 	}
 }
 
+void log_to_console(unsigned long u, const std::string &msg )
+{
+	if(msg.size()>0)
+	{
+		LOG("%s %l ", msg.c_str(), u);
+	}
+	else
+	{
+		LOG("%l ", u);
+	}
+}
+
 void log_to_console(char c, const std::string &msg)
 {
 	if(msg.size()>0)
