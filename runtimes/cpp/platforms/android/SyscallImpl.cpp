@@ -2454,6 +2454,18 @@ return 0; \
 					mJNIEnv,
 					mJThis);
 
+		case maIOCtl_maSyscallPanicsEnable:
+			SYSLOG("maIOCtl_maSyscallPanicsEnable");
+			return _maSyscallPanicsEnable(
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maSyscallPanicsDisable:
+			SYSLOG("maIOCtl_maSyscallPanicsDisable");
+			return _maSyscallPanicsDisable(
+				mJNIEnv,
+				mJThis);
+
 		} // End of switch
 
 		return IOCTL_UNAVAILABLE;

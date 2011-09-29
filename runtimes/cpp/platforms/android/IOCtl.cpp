@@ -2764,4 +2764,27 @@ namespace Base
 
 		return (int)result;
 	}
+
+	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSyscallPanicsEnable", "()I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)ret;
+	}
+
+	int _maSyscallPanicsDisable(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSyscallPanicsEnable", "()I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)ret;
+	}
+
 }
