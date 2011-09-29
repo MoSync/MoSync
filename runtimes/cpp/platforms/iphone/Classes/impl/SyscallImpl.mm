@@ -1428,6 +1428,16 @@ return 0; \
 		MoSync_ShowAlert(title, message, button1, button2, button3);
 	}
 
+	SYSCALL(void, maOptionsBox(const wchar* title, const wchar* destructiveButtonTitle, const wchar* cancelButtonTitle,
+                          const void* otherButtonTitles, const int otherButtonTitlesSize))
+	{
+        [[OptionsDialogView getInstance] show:title
+                       destructiveButtonTitle:destructiveButtonTitle
+                            cancelButtonTitle:cancelButtonTitle
+                            otherButtonTitles:otherButtonTitles
+                        otherButtonTitlesSize:otherButtonTitlesSize];
+	}
+
     SYSCALL(void, maImagePickerOpen())
 	{
 		MoSync_ShowImagePicker();
@@ -1889,6 +1899,7 @@ return 0; \
 		maIOCtl_case(maReportResourceInformation);
 		maIOCtl_case(maMessageBox);
 		maIOCtl_case(maAlert);
+        maIOCtl_case(maOptionsBox);
 		maIOCtl_case(maCameraStart);
 		maIOCtl_case(maCameraStop);
 		maIOCtl_case(maCameraSetPreview);

@@ -7252,12 +7252,8 @@ group CameraFunctions "Camera Functions" {
 		* \param cancelButtonTitle The dialog's Cancel button text. If left empty, the dialog is not cancelable.
 		* \param otherButtonTitles The address to the buffer that stores the list of options.
 		* \param otherButtonTitlesSize The size of the buffer, in bytes.
-		*
-		* \returns Any of the following result codes:
-		* - #MAW_RES_OK if the dialog could be displayed.
-		* - #MAW_RES_ERR generic error.
 		*/
-		int maOptionsBox(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle,
+		void maOptionsBox(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle,
 								 in MAAddress otherButtonTitles, in int otherButtonTitlesSize);
 
 		constset int SENSOR_TYPE_ {
