@@ -33,8 +33,16 @@ MA 02110-1301, USA.
  * A Dialog gets visible only after calling show() method.
  * To show a Dialog call show(), to hide it call: hide().
  *
+ * On iPad there are two specific methods:
+ * 	- setArrowPosition that sets the position of the popover origin arrow on
+ * the screen.
+ *  - canBeDismissed that allows or prohibits the user from dismissing a
+ *  popover dialog by tapping outside of it.
+ *
  * Note that on Android setting widget specific properties has effects only in
  * the dialog content(that is in fact the main widget), and not on the title bar.
+ *
+ * For dialog events see DialogListener.
  */
 
 #ifndef NATIVEUI_DIALOG_H_
@@ -44,7 +52,8 @@ MA 02110-1301, USA.
 
 namespace NativeUI
 {
-
+	// Forward declaration
+	class DialogListener;
 
 	/**
 	 * \brief Class that represents a modal dialog.
@@ -85,6 +94,37 @@ namespace NativeUI
 		virtual int setMainWidget(Widget* widget);
 
 		/**
+		 * Sets the origin arrow position for a popover dialog.
+		 * Note: This property is only available on the iPad.
+		 * @param position one of the constants:
+		 *  - #MAW_CONSTANT_ARROW_UP The popover arrow should point up.
+		 *  - #MAW_CONSTANT_ARROW_DOWN The popover arrow should point down.
+		 *  - #MAW_CONSTANT_ARROW_LEFT The popover arrow should point left.
+		 *  - #MAW_CONSTANT_ARROW_RIGHT The popover arrow should point right.
+		 *  - #MAW_CONSTANT_ARROW_ANY The popover arrow can point anywhere.
+		 * @return Any of the following result codes:
+         * - #MAW_RES_OK if the property could be set.
+         * - #MAW_RES_INVALID_PROPERTY_NAME if the property is not available.
+         * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+         * - #MAW_RES_ERROR otherwise.
+		 */
+		virtual int setArrrowPosition(const int position);
+
+		/**
+		 * Allow or prohibits the user from dismissing a popover dialog by
+		 * tapping outside of it.
+		 * Note: This property is only available on the iPad.
+		 * @param state If true allows it to be dismissed, if false
+		 * prohibits it.
+		 * @return Any of the following result codes:
+         * - #MAW_RES_OK if the property could be set.
+         * - #MAW_RES_INVALID_PROPERTY_NAME if the property is not available.
+         * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+         * - #MAW_RES_ERROR otherwise.
+		 */
+		virtual int canBeDismissed(bool state);
+
+		/**
 		 * Shows the dialog. Only one dialog at a time is visible.
 		 * It will become visible on top of the UI.
 		 */
@@ -94,6 +134,32 @@ namespace NativeUI
 		 * Hides a dialog if it is visible.
 		 */
 		virtual void hide();
+
+        /**
+         * Add an dialog event listener.
+         * @param listener The listener that will receive dialog events.
+         */
+        virtual void addDialogListener(DialogListener* listener);
+
+        /**
+         * Remove the dialog listener.
+         * @param listener The listener that receives dialog events.
+         */
+        virtual void removeDialogListener(DialogListener* listener);
+
+    protected:
+        /**
+         * This method is called when there is an event for this widget.
+         * It passes on the event to all widget's listeners.
+         * @param widgetEventData The data for the widget event.
+         */
+        virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
+
+    private:
+        /**
+         * Array with dialog listeners.
+         */
+        MAUtil::Vector<DialogListener*> mDialogListeners;
 	};
 
 } // namespace NativeUI

@@ -16,23 +16,12 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-
 /**
- * @file main.cpp
- * @author Mattias Frånberg and Chris Hughes
+ * @file Main.cpp
+ * @author Mikael Kindborg
  *
- * This application provides a very basic example of how to work
- * with Native UI to position and and manipulate graphical user
- * interface elements. The code is very well commented so that you
- * can see what's happening at each step. The application uses one
- * screen and a some widgets to provide a password entry box and
- * some control buttons.
- *
- * NOTE: This example application has the same functionality as
- * our example application "HelloMAUI". Compare the two examples
- * to see how we do similar things in MAUI and in Native UI.
- *
- *
+ * This is the main entry point for the example application
+ * that demonstrates NativeUI on MoSync.
  */
 #include <ma.h> 				// Syscalls
 #include <MAUtil/String.h>		// C++ String class
@@ -60,8 +49,7 @@ public:
 		// Create the main user interface screen.
 		mMainScreen = new MainScreen();
 
-		// Display the NativeUI screen.
-		// Note: This would hide any previously visible screen.
+		// Show the screen.
 		mMainScreen->show();
 	}
 

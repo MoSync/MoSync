@@ -344,6 +344,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.alertButtonIndex = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED)
+	{
+		event.optionsBoxButtonIndex = intArray[1];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*
@@ -404,9 +408,6 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		 * intArray[3] - Hook type.
 		 * intArray[4] - Handle to url data.
-		 *
-		 * MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED
-		 * intArray[3] - The index of the clicked button in the list of options.
 		 *
 		 */
 
@@ -469,10 +470,6 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 			widgetEvent->hookType = intArray[3];
 			widgetEvent->urlData = intArray[4];
 		}
-		else if (widgetEventType == MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED)
-		{
-			widgetEvent->optionDialogButtonIndex = intArray[3];
-		}
 
 		event.data = (int)widgetEvent;
 	}
@@ -480,15 +477,6 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.sensor.type = intArray[1];
 		memcpy( event.sensor.values, intArray + 2, (arrayLength - 2) * sizeof(jint) );
-	}
-	else if (event.type == EVENT_TYPE_NFC_TAG_RECEIVED ||
-			event.type == EVENT_TYPE_NFC_TAG_DATA_READ ||
-			event.type == EVENT_TYPE_NFC_TAG_DATA_WRITTEN ||
-			event.type == EVENT_TYPE_NFC_BATCH_OP ||
-			event.type == EVENT_TYPE_NFC_TAG_AUTH_COMPLETE) {
-		event.nfc.handle = intArray[1];
-		event.nfc.result = intArray[2];
-		event.nfc.dstId = intArray[3];
 	}
 
 	// Release the memory used for the int array.

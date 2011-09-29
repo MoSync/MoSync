@@ -1,52 +1,50 @@
 /*
-Copyright (C) 2011 MoSync AB
+ Copyright (C) 2011 MoSync AB
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License,
-version 2, as published by the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License,
+ version 2, as published by the Free Software Foundation.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
-MA 02110-1301, USA.
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ MA 02110-1301, USA.
+ */
 
 /**
- * @file OptionsDialog.cpp
+ * @file OptionsBox.cpp
  * @author Bogdan Iusco.
  *
- * \brief Use the OptionsDialog class to present the user a set of alternatives
+ * \brief Use the OptionsBox class to present the user a set of alternatives
  * for how to proceed with a given task. You can also use this class to prompt
  * the user to confirm a potentially dangerous action.
- * The OptionsDialog contains an optional title and one or more buttons, each
+ * The OptionsBox contains an optional title and one or more buttons, each
  * corresponds to an action to take.
- * OptionsDialog class uses singleton pattern so make sure you reset dialog's
+ * OptionsBox class uses singleton pattern so make sure you reset dialog's
  * content each time before you use it.
  */
 
-#include "OptionsDialog.h"
-
-#include <IX_WIDGET.h>
+//#include <IX_WIDGET.h>
 #include <maapi.h>
 
-#include "WidgetUtil.h"
+#include "OptionsBox.h"
+#include "OptionsBoxListener.h"
+#include "Util.h"
 
-namespace NativeUI
-{
 	/**
 	 * Initialize the singleton variable to NULL.
 	 */
-	OptionsDialog* OptionsDialog::sInstance = NULL;
+	OptionsBox* OptionsBox::sInstance = NULL;
 
 	/**
 	 * Constructor.
 	 */
-	OptionsDialog::OptionsDialog()
+	OptionsBox::OptionsBox()
 	{
 		mDialogTitle = new MAUtil::WString();
 		mDestructiveButtonTitle = new MAUtil::WString();
@@ -59,7 +57,7 @@ namespace NativeUI
 	/**
 	 * Destructor.
 	 */
-	OptionsDialog::~OptionsDialog()
+	OptionsBox::~OptionsBox()
 	{
 		delete mDialogTitle;
 		delete mDestructiveButtonTitle;
@@ -74,11 +72,11 @@ namespace NativeUI
 	 * Get the singleton instance.
 	 * @return The shared singleton instance.
 	 */
-	OptionsDialog* OptionsDialog::getInstance()
+	OptionsBox* OptionsBox::getInstance()
 	{
-		if (NULL == OptionsDialog::sInstance)
+		if ( NULL == OptionsBox::sInstance )
 		{
-			OptionsDialog::sInstance = new OptionsDialog();
+			OptionsBox::sInstance = new OptionsBox();
 		}
 
 		return sInstance;
@@ -88,24 +86,24 @@ namespace NativeUI
 	 * Destroy the single instance of this class.
 	 * Call this method only when the application will exit.
 	 */
-	void OptionsDialog::destroyInstance()
+	void OptionsBox::destroyInstance()
 	{
-		delete OptionsDialog::sInstance;
+		delete OptionsBox::sInstance;
 	}
 
 	/**
 	 * Display the options dialog.
 	 */
-	void OptionsDialog::show()
+	void OptionsBox::show()
 	{
 		MAUtil::WString destructiveBtn = L"";
-		if (mIsDestructiveButtonVisible)
+		if ( mIsDestructiveButtonVisible )
 		{
 			destructiveBtn = *mDestructiveButtonTitle;
 		}
 
 		MAUtil::WString canceBtn = L"";
-		if (mIsCancelButtonVisible)
+		if ( mIsCancelButtonVisible )
 		{
 			canceBtn = *mCancelButtonTitle;
 		}
@@ -134,7 +132,7 @@ namespace NativeUI
 			{
 				*dst = *array;
 				dst++;
-				if (*array == 0)
+				if ( *array == 0 )
 				{
 					break;
 				}
@@ -143,12 +141,8 @@ namespace NativeUI
 		}
 
 		MAAddress memoryAddress = buffer;
-		maWidgetShowOptionsDialog(
-				mDialogTitle->pointer(),
-				destructiveBtn.pointer(),
-				canceBtn.pointer(),
-				memoryAddress,
-				countBytes);
+		maOptionsBox(mDialogTitle->pointer(), destructiveBtn.pointer(),
+			canceBtn.pointer(), memoryAddress, countBytes);
 
 		delete[] buffer;
 	}
@@ -157,7 +151,7 @@ namespace NativeUI
 	 * Set dialog's title.
 	 * @param title A string to display in the title area of the dialog.
 	 */
-	void OptionsDialog::setTitle(const MAUtil::WString& title)
+	void OptionsBox::setTitle(const MAUtil::WString& title)
 	{
 		*mDialogTitle = title;
 	}
@@ -166,7 +160,7 @@ namespace NativeUI
 	 * Get dialog's title.
 	 * @return The string displayed in the title area of the dialog.
 	 */
-	MAUtil::WString OptionsDialog::getTitle() const
+	MAUtil::WString OptionsBox::getTitle() const
 	{
 		return *mDialogTitle;
 	}
@@ -181,8 +175,7 @@ namespace NativeUI
 	 * @param buttonTitle The given button title.
 	 * If the param is an empty string the button will not be added.
 	 */
-	void OptionsDialog::setDestructiveButtonTitle(
-			const MAUtil::WString& buttonTitle)
+	void OptionsBox::setDestructiveButtonTitle(const MAUtil::WString& buttonTitle)
 	{
 		*mDestructiveButtonTitle = buttonTitle;
 	}
@@ -192,7 +185,7 @@ namespace NativeUI
 	 * @param visible If true destructive button will be shown, otherwise
 	 * it will be hidden.
 	 */
-	void OptionsDialog::setDestructiveButtonVisible(const bool visible)
+	void OptionsBox::setDestructiveButtonVisible(const bool visible)
 	{
 		mIsDestructiveButtonVisible = visible;
 	}
@@ -201,7 +194,7 @@ namespace NativeUI
 	 * Check if destructive button is visible.
 	 * @return true if it's visible, false otherwise.
 	 */
-	bool OptionsDialog::isDestructiveButtonVisible() const
+	bool OptionsBox::isDestructiveButtonVisible() const
 	{
 		return mIsDestructiveButtonVisible;
 	}
@@ -216,7 +209,7 @@ namespace NativeUI
 	 * @param buttonTitle The given button title.
 	 * If the param is an empty string the button will not be shown.
 	 */
-	void OptionsDialog::setCancelButtonTitle(const MAUtil::WString& buttonTitle)
+	void OptionsBox::setCancelButtonTitle(const MAUtil::WString& buttonTitle)
 	{
 		*mCancelButtonTitle = buttonTitle;
 	}
@@ -226,7 +219,7 @@ namespace NativeUI
 	 * @param visible If true cancel button will be shown, otherwise
 	 * it will be hidden.
 	 */
-	void OptionsDialog::setCancelButtonVisible(const bool visible)
+	void OptionsBox::setCancelButtonVisible(const bool visible)
 	{
 		mIsCancelButtonVisible = visible;
 	}
@@ -235,7 +228,7 @@ namespace NativeUI
 	 * Check if cancel button is visible.
 	 * @return true if it's visible, false otherwise.
 	 */
-	bool OptionsDialog::isCancelButtonVisible() const
+	bool OptionsBox::isCancelButtonVisible() const
 	{
 		return mIsCancelButtonVisible;
 	}
@@ -245,9 +238,9 @@ namespace NativeUI
 	 * @param buttonTitle The title of the button.
 	 * If the param is an empty string the button will not be shown.
 	 */
-	void OptionsDialog::addButton(const MAUtil::WString& buttonTitle)
+	void OptionsBox::addButton(const MAUtil::WString& buttonTitle)
 	{
-		if (0 != buttonTitle.size())
+		if ( 0 != buttonTitle.size() )
 		{
 			MAUtil::WString* string = new MAUtil::WString();
 			*string = buttonTitle;
@@ -261,7 +254,7 @@ namespace NativeUI
 	 * The destructive and cancel button are not counted.
 	 * @return The number of buttons.
 	 */
-	int OptionsDialog::countButtons() const
+	int OptionsBox::countButtons() const
 	{
 		return mOtherButtonTitles.size();
 	}
@@ -275,20 +268,20 @@ namespace NativeUI
 	 * @return MAW_RES_OK if the button was inserted, or
 	 * MAW_RES_INVALID_PROPERTY_VALUE if the index param is invalid.
 	 */
-	 int OptionsDialog::insertButton(const MAUtil::WString& buttonTitle,
-			const int index)
+	int OptionsBox::insertButton(const MAUtil::WString& buttonTitle,
+		const int index)
 	{
-		 if (0 <= index && index < mOtherButtonTitles.size())
-		 {
-			 MAUtil::WString* string = new MAUtil::WString();
-			 *string = buttonTitle;
-			 mOtherButtonTitles.insert(index, string);
-			 return MAW_RES_OK;
-		 }
-		 else
-		 {
-			 return MAW_RES_INVALID_PROPERTY_VALUE;
-		 }
+		if ( 0 <= index && index < mOtherButtonTitles.size() )
+		{
+			MAUtil::WString* string = new MAUtil::WString();
+			*string = buttonTitle;
+			mOtherButtonTitles.insert(index, string);
+			return MAW_RES_OK;
+		}
+		else
+		{
+			return MAW_RES_INVALID_PROPERTY_VALUE;
+		}
 	}
 
 	/**
@@ -298,19 +291,19 @@ namespace NativeUI
 	 * @return MAW_RES_OK if the button was removed, or
 	 * MAW_RES_INVALID_PROPERTY_VALUE if the index param is invalid.
 	 */
-	int OptionsDialog::removeButton(const int index)
+	int OptionsBox::removeButton(const int index)
 	{
-		 if (0 <= index && index < mOtherButtonTitles.size())
-		 {
-			 MAUtil::WString* string = mOtherButtonTitles[index];
-			 delete string;
-			 mOtherButtonTitles.remove(index);
-			 return MAW_RES_OK;
-		 }
-		 else
-		 {
-			 return MAW_RES_INVALID_PROPERTY_VALUE;
-		 }
+		if ( 0 <= index && index < mOtherButtonTitles.size() )
+		{
+			MAUtil::WString* string = mOtherButtonTitles[index];
+			delete string;
+			mOtherButtonTitles.remove(index);
+			return MAW_RES_OK;
+		}
+		else
+		{
+			return MAW_RES_INVALID_PROPERTY_VALUE;
+		}
 	}
 
 	/**
@@ -319,7 +312,7 @@ namespace NativeUI
 	 * Use setDestructiveButtonVisible() and setCancelButtonVisible()
 	 * methods to hide the buttons.
 	 */
-	void OptionsDialog::removeAllButtons()
+	void OptionsBox::removeAllButtons()
 	{
 		this->deleteAllButtons();
 	}
@@ -328,7 +321,7 @@ namespace NativeUI
 	 * Remove all the buttons.
 	 * The destructive and cancel button are removed too.
 	 */
-	void OptionsDialog::resetDialog()
+	void OptionsBox::resetDialog()
 	{
 		*mDialogTitle = L"";
 
@@ -345,18 +338,16 @@ namespace NativeUI
 	 * Add an options dialog event listener.
 	 * @param listener The listener that will receive options dialog events.
 	 */
-	void OptionsDialog::addOptionsDialogListener(
-			OptionsDialogListener* listener)
+	void OptionsBox::addOptionsBoxListener(OptionsBoxListener* listener)
 	{
-		mListeners.add(listener);
+		addListenerToVector(mListeners, listener);
 	}
 
 	/**
 	 * Remove an options dialog even listener.
 	 * @param listener The listener that receives options dialog even events.
 	 */
-	void OptionsDialog::removeOptionsDialogListener(
-			OptionsDialogListener* listener)
+	void OptionsBox::removeOptionsBoxListener(OptionsBoxListener* listener)
 	{
 		removeListenerFromVector(mListeners, listener);
 	}
@@ -367,63 +358,47 @@ namespace NativeUI
 	 * widget event generated by the system.
 	 * @param event The new received event.
 	 */
-	void OptionsDialog::customEvent(const MAEvent& event)
+	void OptionsBox::customEvent(const MAEvent& event)
 	{
-		// Check if this is a widget event.
-		if (EVENT_TYPE_WIDGET == event.type)
+		if ( EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED == event.type )
 		{
-			// Get the widget event data structure.
-			MAWidgetEventData* eventData = (MAWidgetEventData*) event.data;
-			if (MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED == eventData->eventType)
+			// Check if the destructive button was pressed.
+			int buttonIndex = event.optionsBoxButtonIndex;
+			if ( mIsDestructiveButtonVisible && 0 == buttonIndex )
 			{
-				// Check if the destructive button was pressed.
-				int buttonIndex = eventData->optionDialogButtonIndex;
-				if (mIsDestructiveButtonVisible &&
-						0 == buttonIndex)
+				for (int listenerIndex = 0; listenerIndex < mListeners.size(); listenerIndex++)
 				{
-					for (int listenerIndex = 0;
-							listenerIndex < mListeners.size();
-							listenerIndex++)
-					{
-						mListeners[listenerIndex]->optionsDialogDestructiveButtonClicked();
-					}
-					return;
+					mListeners[listenerIndex]->optionsBoxDestructiveButtonClicked();
 				}
+				return;
+			}
 
-				// Check if the cancel button was pressed.
-				int cancelButtonIndex = 0;
-				if (mIsDestructiveButtonVisible)
+			// Check if the cancel button was pressed.
+			int cancelButtonIndex = 0;
+			if ( mIsDestructiveButtonVisible )
+			{
+				cancelButtonIndex++;
+			}
+			cancelButtonIndex += mOtherButtonTitles.size();
+			if ( mIsCancelButtonVisible && cancelButtonIndex == buttonIndex )
+			{
+				for (int listenerIndex = 0; listenerIndex < mListeners.size(); listenerIndex++)
 				{
-					cancelButtonIndex++;
+					mListeners[listenerIndex]->optionsBoxCancelButtonClicked();
 				}
-				cancelButtonIndex += mOtherButtonTitles.size();
-				if (mIsCancelButtonVisible &&
-						cancelButtonIndex == buttonIndex)
-				{
-					for (int listenerIndex = 0;
-							listenerIndex < mListeners.size();
-							listenerIndex++)
-					{
-						mListeners[listenerIndex]->optionsDialogCancelButtonClicked();
-					}
-					return;
-				}
+				return;
+			}
 
-				// Other button was pressed.
-				if (mIsDestructiveButtonVisible)
-				{
-					buttonIndex--;
-				}
-				MAUtil::WString* buttonTitle = mOtherButtonTitles[buttonIndex];
-				for (int listenerIndex = 0;
-					listenerIndex < mListeners.size();
-					listenerIndex++)
-				{
-					mListeners[listenerIndex]->optionsDialogButtonClicked(
-							buttonIndex,
-							*buttonTitle);
-				}
-
+			// Other button was pressed.
+			if ( mIsDestructiveButtonVisible )
+			{
+				buttonIndex--;
+			}
+			MAUtil::WString* buttonTitle = mOtherButtonTitles[buttonIndex];
+			for (int listenerIndex = 0; listenerIndex < mListeners.size(); listenerIndex++)
+			{
+				mListeners[listenerIndex]->optionsBoxButtonClicked(buttonIndex,
+					*buttonTitle);
 			}
 		}
 	}
@@ -431,14 +406,13 @@ namespace NativeUI
 	/**
 	 * Deletes all strings(button titles) from vector.
 	 */
-	void OptionsDialog::deleteAllButtons()
+	void OptionsBox::deleteAllButtons()
 	{
-		for (int stringIndex = 0; stringIndex < mOtherButtonTitles.size();
-				stringIndex++)
+		for (int stringIndex = 0; stringIndex < mOtherButtonTitles.size(); stringIndex++)
 		{
 			MAUtil::WString* string = mOtherButtonTitles[stringIndex];
 			delete string;
 		}
 		mOtherButtonTitles.clear();
 	}
-} // namespace NativeUI
+

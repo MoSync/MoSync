@@ -18,27 +18,26 @@ MA 02110-1301, USA.
 
 /**
  * @file MainScreen.h
- * @author Bogdan Iusco.
+ * @author emma
  */
 
 #ifndef MAINSCREEN_H_
 #define MAINSCREEN_H_
 
+#include <maapi.h>
+
+#include <MAUtil/util.h>
+
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
-
-#include <IX_PIM.h>
-#include <maapi.h>
-#include <MAUtil/util.h>
-#include <NativeUI/OptionsDialog.h>
-#include <NativeUI/OptionsDialogListener.h>
 
 using namespace NativeUI;
 
 class MainScreen:
 	public Screen,
 	public ButtonListener,
-	public OptionsDialogListener
+	public CheckBoxListener,
+	public SliderListener
 {
 
 public:
@@ -52,19 +51,21 @@ public:
 	 */
 	~MainScreen();
 
+private:
+
     /**
      * This method is called when there is an touch-down event for
      * a button.
      * @param button The button object that generated the event.
      */
-    virtual void buttonPressed(Widget* button);
+    virtual void buttonPressed(Widget* button) {};
 
     /**
      * This method is called when there is an touch-up event for
      * a button.
      * @param button The button object that generated the event.
      */
-    virtual void buttonReleased(Widget* button);
+    virtual void buttonReleased(Widget* button) {};
 
     /**
      * This method is called if the touch-up event was inside the
@@ -74,54 +75,51 @@ public:
     virtual void buttonClicked(Widget* button);
 
     /**
-     * This method is called when the destructive button from options
-     * dialog was clicked.
+     * This method is called when the state of the check box has changed.
+     * @param checkBox The check box object that generated the event.
+     * @param state True if the check box is checked, false otherwise.
      */
-    virtual void optionsDialogDestructiveButtonClicked();
+    virtual void checkBoxStateChanged(
+        CheckBox* checkBox,
+        bool state);
 
     /**
-     * This method is called when the cancel button from options dialog was
-     * clicked.
+     * This method is called when the value of the slider was modified by
+     * the user.
+     * @param slider The slider object that generated the event.
+     * @param sliderValue The new slider's value.
      */
-    virtual void optionsDialogCancelButtonClicked();
-
-    /**
-     * This method is called when a button from options dialog was
-     * clicked.
-     * This method is not called if the destructive or cancel button were
-     * clicked.
-     * @param buttonIndex The index of the button that was clicked.
-     * @param buttonTitle The title of the button that was clicked.
-     */
-    virtual void optionsDialogButtonClicked(
-			const int buttonIndex,
-			const MAUtil::WString& buttonTitle);
-
-private:
+    virtual void sliderValueChanged(
+        Slider* slider,
+        const int sliderValue);
 
 	/**
 	 * Creates and adds main layout to the screen.
 	 */
 	void createMainLayout();
 
-	/**
-	 * Write n wchar-arrays to buffer.
-	 * @param buffer The given buffer.
-	 * The first value in buffer will be the number of wchar-arrays(n argument).
-	 * @param src Contains the n wchar-arrays that will be written into buffer.
-	 * @return The number of written bytes.
-	 */
-	int MainScreen::writeWCharArraysToBuf(
-	    void* buffer,
-	    const wchar_t** src,
-	    const int n);
+	void createDialogMainLayout();
+
 private:
 	/**
 	 * Main layout.
 	 */
 	VerticalLayout* mMainLayout;
 
-	Button* mButton;
+	Label* myGender;
+	Label* myAge;
+
+	Button* mButtonForm;
+
+	// Widgets for dialog
+	Dialog* mDialog;
+	CheckBox* mGenderFemale;
+	CheckBox* mGenderMale;
+	Slider* mAge;
+	Label* mAgeLabel;
+
+	Button* mDialogDismiss;
+
 };
 
 

@@ -426,12 +426,11 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	}
 
 	/**
-	 * Internal wrapper for maWidgetShowOptionDialog that runs
+	 * Internal wrapper for maOptionsBox that runs
 	 * the call in the UI thread.
 	 * Create and show the dialog.
-	 * @return MAW_RES_OK, or MAW_RES_OPTION_DIALOG_ERROR if the dialog was not created.
 	 */
-	public int maWidgetShowOptionDialog(final String title, final String destructiveButtonTitle,
+	public int maOptionsBox(final String title, final String destructiveButtonTitle,
 			final String cancelButtonTitle,final int buffPointer, final int buffSize)
 	{
 		Log.e( "MoSync", "maWidgetShowOptionDialog" );
@@ -442,9 +441,12 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 			{
 				// Parse the options array. Add to the array the destructiveButtonTitle at the first position,
 				// The clicks on cancelButtonTitle will send MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED with the index = array length.
-				final String[] options;
-				options = optionsDialog.parseStringFromMemory(buffPointer, buffSize);
-				optionsDialog.showDialog(title, destructiveButtonTitle, cancelButtonTitle, options);
+//				final String[] options;
+//				options = optionsDialog.parseStringFromMemory(buffPointer, buffSize);
+				optionsDialog.showDialog(title,
+						destructiveButtonTitle,
+						cancelButtonTitle,
+						optionsDialog.parseStringFromMemory(buffPointer, buffSize));
 			}
 		});
 

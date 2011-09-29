@@ -16,80 +16,86 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
-
 /**
- * @file main.cpp
- * @author Mattias Frånberg and Chris Hughes
+ * @file Main.cpp
+ * @author Mikael Kindborg
  *
- * This application provides a very basic example of how to work
- * with Native UI to position and and manipulate graphical user
- * interface elements. The code is very well commented so that you
- * can see what's happening at each step. The application uses one
- * screen and a some widgets to provide a password entry box and
- * some control buttons.
- *
- * NOTE: This example application has the same functionality as
- * our example application "HelloMAUI". Compare the two examples
- * to see how we do similar things in MAUI and in Native UI.
- *
- *
+ * This is the main entry point for the example application
+ * that demonstrates NativeUI on MoSync.
  */
 #include <ma.h> 				// Syscalls
 #include <MAUtil/String.h>		// C++ String class
 #include <MAUtil/Moblet.h>		// Moblet class
 #include <conprint.h>			// lprintfln for logging
 
-#include <NativeUI/Widgets.h>	// Include all widgets
-
-#include "MainScreen.h"			// Main UI screen
-
 using namespace MAUtil;
-using namespace NativeUI;
 
 /**
  * Moblet for the  application.
  */
-class NativeUIMoblet : public Moblet
+class TestMoblet : public Moblet
 {
 public:
 	/**
-	 * Constructor that creates the UI.
+	 * Constructor.
 	 */
-	NativeUIMoblet()
+	TestMoblet()
 	{
-		// Create the main user interface screen.
-		mMainScreen = new MainScreen();
-
-		// Display the NativeUI screen.
-		// Note: This would hide any previously visible screen.
-		mMainScreen->show();
+		// Call the maAlert syscall with all 3 buttons.
+		maAlert("Title", "This is a message", "Ok", "Maybe", "Cancel");
 	}
 
 	/**
 	 * Destructor.
 	 */
-	virtual ~NativeUIMoblet()
+	virtual ~TestMoblet()
 	{
-		delete mMainScreen;
 	}
 
 	/**
 	 * This method is called when the application is closed.
 	 */
-	void NativeUIMoblet::closeEvent()
+	void TestMoblet::closeEvent()
 	{
-		// Deallocate the main screen.
-		delete mMainScreen;
-		mMainScreen = NULL;
-
 		// Exit the app.
 		close();
 	}
 
 	/**
+	* This function is called when an event that Moblet doesn't recognize is recieved.
+	*/
+	void TestMoblet::customEvent(const MAEvent& event)
+	{
+		if ( event.type == EVENT_TYPE_ALERT)
+		{
+//			printf("\n =========== Alert Event received ======\n");
+			MAUtil::String temp = "";
+			switch( event.alertButtonIndex)
+			{
+			case 1:
+				temp += "First ";
+				break;
+			case 2:
+				temp += "Second ";
+				break;
+			case 3:
+				temp += "Third ";
+				break;
+			default:
+				temp = "err";
+			}
+			temp += " button was clicked";
+//			maMessageBox("Alert Event received", temp.c_str());
+			printf(temp.c_str());
+			printf("\n ------------- This was all ------------- \n");
+		}
+
+	}
+
+	/**
 	 * Method called when a key is pressed.
 	 */
-	void NativeUIMoblet::keyPressEvent(int keyCode, int nativeCode)
+	void TestMoblet::keyPressEvent(int keyCode, int nativeCode)
 	{
 	    // Close the application if the back key is pressed.
 	    if(MAK_BACK == keyCode)
@@ -97,9 +103,6 @@ public:
 	        closeEvent();
 	    }
 	}
-
-private:
-	MainScreen* mMainScreen;
 };
 
 /**
@@ -108,7 +111,7 @@ private:
 extern "C" int MAMain()
 {
 	// Create a moblet.
-	NativeUIMoblet* moblet = new NativeUIMoblet();
+	TestMoblet* moblet = new TestMoblet();
 
 	// Run the moblet event loop.
 	Moblet::run(moblet);

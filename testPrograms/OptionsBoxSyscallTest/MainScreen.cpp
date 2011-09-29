@@ -47,8 +47,8 @@ MainScreen::MainScreen() :
 	createMainLayout();
 	mButton->addButtonListener(this);
 
-	OptionsDialog* optionsDialog = OptionsDialog::getInstance();
-	optionsDialog->addOptionsDialogListener(this);
+	OptionsBox* optionsBox = OptionsBox::getInstance();
+	optionsBox->addOptionsBoxListener(this);
 
 }
 
@@ -59,8 +59,8 @@ MainScreen::~MainScreen()
 {
 	mButton->removeButtonListener(this);
 
-	OptionsDialog* optionsDialog = OptionsDialog::getInstance();
-	optionsDialog->removeOptionsDialogListener(this);
+	OptionsBox* optionsBox = OptionsBox::getInstance();
+	optionsBox->removeOptionsBoxListener(this);
 }
 
 /**
@@ -83,12 +83,16 @@ void MainScreen::buttonPressed(Widget* button)
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
+	mMainLayout->setBackgroundColor(0xC1FFC1);
 	Screen::setMainWidget(mMainLayout);
 
 	mButton = new Button();
-	mButton->setText("Show Option dialog");
+	mButton->setText("Show Options dialog");
 	mButton->wrapContentHorizontally();
 	mMainLayout->addChild(mButton);
+
+	mLabel = new Label();
+	mMainLayout->addChild(mLabel);
 
 }
 
@@ -115,18 +119,18 @@ void MainScreen::buttonClicked(Widget* button)
 	if (button == mButton)
 	{
 		printf("mButton buttonClickedEvent");
-		OptionsDialog* optionsDialog = OptionsDialog::getInstance();
-		optionsDialog->resetDialog();
-		optionsDialog->setTitle(L"My dialog");
-		optionsDialog->setDestructiveButtonTitle(L"Delete");
-		optionsDialog->setDestructiveButtonVisible(true);
-		optionsDialog->setCancelButtonTitle(L"Cancel");
-		optionsDialog->setCancelButtonVisible(true);
-		optionsDialog->addButton(L"Button 1");
-		optionsDialog->addButton(L"Button 2");
+		OptionsBox* optionsBox = OptionsBox::getInstance();
+		optionsBox->resetDialog();
+		optionsBox->setTitle(L"My dialog");
+		optionsBox->setDestructiveButtonTitle(L"Delete");
+		optionsBox->setDestructiveButtonVisible(true);
+		optionsBox->setCancelButtonTitle(L"Cancel");
+		optionsBox->setCancelButtonVisible(true);
+		optionsBox->addButton(L"Button 1");
+		optionsBox->addButton(L"Button 2");
 		MAUtil::WString btn3 = L"Button 3";
-		optionsDialog->addButton(btn3);
-		optionsDialog->show();
+		optionsBox->addButton(btn3);
+		optionsBox->show();
 	}
 }
 
@@ -165,18 +169,20 @@ int MainScreen::writeWCharArraysToBuf(
  * This method is called when the destructive button from options
  * dialog was clicked.
  */
-void MainScreen::optionsDialogDestructiveButtonClicked()
+void MainScreen::optionsBoxDestructiveButtonClicked()
 {
 	printf("destructive button pressed");
+	mLabel->setText("Destructive button was hit");
 }
 
 /**
  * This method is called when the cancel button from options dialog was
  * clicked.
  */
-void MainScreen::optionsDialogCancelButtonClicked()
+void MainScreen::optionsBoxCancelButtonClicked()
 {
 	printf("cancel button pressed");
+	mLabel->setText("cancel was hit");
 }
 
 /**
@@ -187,9 +193,10 @@ void MainScreen::optionsDialogCancelButtonClicked()
  * @param buttonIndex The index of the button that was clicked.
  * @param buttonTitle The title of the button that was clicked.
  */
-void MainScreen::optionsDialogButtonClicked(
+void MainScreen::optionsBoxButtonClicked(
 		const int buttonIndex,
 		const MAUtil::WString& buttonTitle)
 {
 	printf("%S button pressed. buttonIndex = %d", buttonTitle.pointer(), buttonIndex);
+	mLabel->setText("Button on index " + MAUtil::integerToString(buttonIndex) + " was hit");
 }

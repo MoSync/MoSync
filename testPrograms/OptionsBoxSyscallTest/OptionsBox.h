@@ -32,14 +32,14 @@ MA 02110-1301, USA.
 #ifndef NATIVEUI_OPTIONS_DIALOG_H_
 #define NATIVEUI_OPTIONS_DIALOG_H_
 
+#include <IX_WIDGET.h>
 #include <MAUtil/String.h>
 #include <MAUtil/Environment.h>
 #include <MAUtil/Vector.h>
 
-#include "OptionsDialogListener.h"
+//#include "OptionsBoxListener.h"
 
-namespace NativeUI
-{
+	class OptionsBoxListener;
 
 	/**
 	 * \brief Use the OptionsDialog class to present the user a set of
@@ -50,14 +50,14 @@ namespace NativeUI
 	 * OptionsDialog class uses singleton pattern so make sure you reset
 	 * dialog's content each time before you use it.
 	 */
-	class OptionsDialog: public MAUtil::CustomEventListener
+	class OptionsBox: public MAUtil::CustomEventListener
 	{
 	public:
 		/**
 		 * Get the singleton instance.
 		 * @return The shared singleton instance.
 		 */
-		static OptionsDialog* getInstance();
+		static OptionsBox* getInstance();
 
 		/**
 		 * Destroy the single instance of this class.
@@ -186,15 +186,15 @@ namespace NativeUI
 		 * Add an options dialog event listener.
 		 * @param listener The listener that will receive options dialog events.
 		 */
-		virtual void addOptionsDialogListener(
-				OptionsDialogListener* listener);
+		virtual void addOptionsBoxListener(
+				OptionsBoxListener* listener);
 
 		/**
 		 * Remove an options dialog even listener.
 		 * @param listener The listener that receives options dialog even events.
 		 */
-		virtual void removeOptionsDialogListener(
-				OptionsDialogListener* listener);
+		virtual void removeOptionsBoxListener(
+				OptionsBoxListener* listener);
 
 		/**
 		 * Implementation of CustomEventListener interface.
@@ -208,12 +208,12 @@ namespace NativeUI
 		/**
 		 * Constructor is protected since this is a singleton.
 		 */
-		OptionsDialog();
+		OptionsBox();
 
 		/**
 		 * Destructor.
 		 */
-		virtual ~OptionsDialog();
+		virtual ~OptionsBox();
 
 		/**
 		 * Deletes all strings(button titles) from vector.
@@ -224,12 +224,12 @@ namespace NativeUI
 		/**
 		 * The single instance of this class.
 		 */
-		static OptionsDialog* sInstance;
+		static OptionsBox* sInstance;
 
 		/**
 		 * Array with listeners.
 		 */
-		MAUtil::Vector<OptionsDialogListener*> mListeners;
+		MAUtil::Vector<OptionsBoxListener*> mListeners;
 
 		/**
 		 * The title of the dialog.
@@ -262,6 +262,5 @@ namespace NativeUI
 		bool mIsCancelButtonVisible;
 	};
 
-} // namespace NativeUI
 
 #endif /* NATIVEUI_OPTIONS_DIALOG_H_ */
