@@ -67,7 +67,7 @@ public class MoSyncOptionsDialog
 				        public void onClick(DialogInterface dialog, int index)
 				        {
 							// Compute the index: cancel gets the last position.
-							postOptionDialogEvent(mOptionItems.size()+1);
+							postOptionDialogEvent(mOptionItems.size());
 				        }
 			        });
 		}
