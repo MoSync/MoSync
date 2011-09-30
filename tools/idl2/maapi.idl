@@ -7769,20 +7769,6 @@ group NFCAPI "NFC API" {
 
 		}
 	}//end of NFC API
-	/**
-	* Enable panic system.
-	* If a panic is raised a message will be displayed to the user and the program will be shut down.
-	* \return #RES_OK.
-	*/
-	int maSyscallPanicsEnable();
-
-	/**
-	* Disable panic system.
-	* If an error occurs in the syscall, an error code will be returned by the syscall and the
-	* program will continue running.
-	* \return #RES_OK.
-	*/
-	int maSyscallPanicsDisable();
 
 	/**
 	* Enable panic system.
@@ -7798,7 +7784,6 @@ group NFCAPI "NFC API" {
 	* \return #RES_OK.
 	*/
 	int maSyscallPanicsDisable();
-
 	}
 
 }
