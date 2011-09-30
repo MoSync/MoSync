@@ -27,7 +27,9 @@ MA 02110-1301, USA.
 #include <string>
 #include <bitset>
 #include <vector>
+#include <set>
 #include <deque>
+#include <list>
 #include <MAUtil/util.h>
 #include <mavsprintf.h>
 
@@ -39,29 +41,41 @@ MA 02110-1301, USA.
 #define TRACE(ARG) lprintfln(#ARG); ARG
 
 template<unsigned int numBits>
-void print(const std::bitset<numBits> &b, const std::string &msg)
+void log_to_console(const std::bitset<numBits> &b, const std::string &msg)
 {
-	LOG("\n");
-	LOG(msg.c_str());
+	std::string bits;
 	for(int i=0; i<b.size(); ++i)
 	{
-		LOG("%d", b[i]);
+		//LOG("%d ", b[i]);
+		char bit = '0';
+		if(b[i] == 1)
+		{
+			bit = '1';
+		}
+		bits.append(1, bit);
+		bits += " ";
 	}
-	LOG("\n");
+
+	std::string final_msg = msg + bits;
+	LOG(final_msg.c_str());
 }
 
 void log_to_console(int *array, int arraySize, const std::string &msg);
 void log_to_console(char *array, int arraySize, const std::string &msg);
 void log_to_console(std::string *array, int arraySize, const std::string &msg);
 void log_to_console(const std::vector<int> &v, const std::string &msg);
+void log_to_console(const std::list<int> &l, const std::string &msg);
+void log_to_console(const std::set<int> &s, const std::string &msg);
 void log_to_console(const std::vector<char> &v, const std::string &msg);
 void log_to_console(const std::vector<Employee> &v, const std::string &msg);
+void log_to_console(const std::set<Employee, LessExperienceFunctor> &s, const std::string &msg);
 void log_to_console(Employee *array, int arraySize, const std::string &msg);
 void log_to_console(const std::deque<char> &d, const std::string &msg);
 
 void log_to_console(const char* val, const std::string &msg="");
 void log_to_console(int i, const std::string &msg="");
 void log_to_console(float i, const std::string &msg="");
+void log_to_console(unsigned long u, const std::string &msg = "");
 void log_to_console(char c, const std::string &msg="");
 void log_to_console(bool b, const std::string &msg="");
 void log_to_console(const Employee &e, const std::string &msg = "");
