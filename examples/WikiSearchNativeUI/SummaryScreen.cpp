@@ -117,6 +117,9 @@ void SummaryScreen::setupUI()
  */
 void SummaryScreen::showScreen(bool needsRefresh) {
 
+	// Make the screen listen for key events.
+	MAUtil::Environment::getEnvironment().addKeyListener(this);
+
 	// Each time this screen is shown, refresh the list taken from the engine.
 	if ( needsRefresh ){
 		fillListBox();
@@ -183,6 +186,24 @@ void SummaryScreen::fillListBox()
 }
 
 /**
+ * From KeyListener.
+ * This function is called with a \link #MAK_FIRST MAK_ code \endlink when
+ * a key is pressed.
+ */
+void SummaryScreen::keyPressEvent(int keyCode, int nativeCode)
+{
+    // Go back to the TitlesScreen if the back key is pressed.
+    if(MAK_BACK == keyCode)
+    {
+		// Unregister from key listener.
+		MAUtil::Environment::getEnvironment().removeKeyListener(this);
+		// Go back to the previous screen.
+		// And there is no need for refreshing the results list.
+		mPrevScreen->showScreen(false);
+    }
+}
+
+/**
  * from CustomEventListener
  * The custom event listener interface.
  */
@@ -207,6 +228,8 @@ void SummaryScreen::customEvent(const MAEvent& event)
     {
         if (widgetEventData->eventType == MAW_EVENT_ITEM_CLICKED)
         {
+			// Unregister from key listener.
+			MAUtil::Environment::getEnvironment().removeKeyListener(this);
             // By clicking on an item, the corresponding web view is opened
             // in the WebSsreen.
             mWebScreen->showScreen();
@@ -223,11 +246,15 @@ void SummaryScreen::widgetClicked(MAHandle widgetHandle)
 {
 	if (widgetHandle == mHomeButton)
 	{
+		// Unregister from key listener.
+		MAUtil::Environment::getEnvironment().removeKeyListener(this);
 		// Go back to home screen.
 		mPrevScreen->showHomeScreen();
 	}
 	else if (widgetHandle == mBackButton)
 	{
+		// Unregister from key listener.
+		MAUtil::Environment::getEnvironment().removeKeyListener(this);
 		// Go back to the previous screen.
 		// And there is no need for refreshing the results list.
 		mPrevScreen->showScreen(false);

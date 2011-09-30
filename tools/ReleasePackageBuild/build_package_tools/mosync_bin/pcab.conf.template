@@ -1,0 +1,3 @@
+"%project-name%".exe %CE1%/"%project-name%" "%project-name%" %CE11%
+program %CE1%/"%project-name%"
+resources %CE1%/"%project-name%"

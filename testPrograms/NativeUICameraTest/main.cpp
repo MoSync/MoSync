@@ -74,6 +74,7 @@ public:
 		testIndex = 0;
 		mCameraStarted = false;
 		mNativeUIRunning = true;
+		sprintf(currentCameraName, "back");
 	}
 
 	/**
@@ -90,16 +91,18 @@ public:
 	void myAssert(const char * testName, int cameraResult)
 	{
 
-		if(cameraResult == MA_CAMERA_RES_OK)
+		if((cameraResult == MA_CAMERA_RES_OK) ||
+				(cameraResult == MA_CAMERA_RES_PROPERTY_NOTSUPPORTED) ||
+				(cameraResult == MA_CAMERA_RES_VALUE_NOTSUPPORTED))
 		{
 			mNumSuccess++;
-			sprintf(testList[testIndex], "%s, %s", testName, "Pass");
+			sprintf(testList[testIndex], "Camera %s %s, %s", currentCameraName, testName, "Pass");
 			testIndex++;
 		}
 		else
 		{
 			mNumFailure++;
-			sprintf(testList[testIndex], "%s, %s", testName, "Fail");
+			sprintf(testList[testIndex], "Camera %s %s, %s", currentCameraName, testName, "Fail");
 			testIndex++;
 		}
 
@@ -179,7 +182,7 @@ public:
 		maWidgetSetProperty(
 			mInstructions,
 			MAW_LABEL_TEXT,
-			"Camera with default properties!!! Press start to start.");
+			"Default Camera with default properties!!! Press start to start.");
 
 		//Adding the label to the layout
 		maWidgetAddChild(mMainLayoutWidget, mInstructions);
@@ -437,7 +440,7 @@ public:
 			result = setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_ON);
 			myAssert("MA_CAMERA_FLASH_ON", result);
 			char buffer[256];
-			sprintf(buffer, "Camera with\n  MA_CAMERA_FLASH_ON : %s", getTextForResult(result));
+			sprintf(buffer, "Camera  %s with\n  MA_CAMERA_FLASH_ON : %s", currentCameraName, getTextForResult(result));
 			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 2)
@@ -446,7 +449,7 @@ public:
 			result = setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_AUTO);
 			myAssert("MA_CAMERA_FLASH_AUTO", result);
 			char buffer[256];
-			sprintf(buffer, "Camera with\n  MA_CAMERA_FLASH_AUTO: %s", getTextForResult(result));
+			sprintf(buffer, "Camera  %s with\n  MA_CAMERA_FLASH_AUTO: %s", currentCameraName, getTextForResult(result));
 			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 3)
@@ -455,7 +458,7 @@ public:
 			result = setCameraProperty(MA_CAMERA_FLASH_MODE, MA_CAMERA_FLASH_TORCH);
 			myAssert("MA_CAMERA_FLASH_TORCH", result);
 			char buffer[256];
-			sprintf(buffer, "Camera with\n  MA_CAMERA_FLASH_TORCH: %s", getTextForResult(result));
+			sprintf(buffer, "Camera  %s with\n  MA_CAMERA_FLASH_TORCH: %s", currentCameraName, getTextForResult(result));
 			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 4)
@@ -467,7 +470,7 @@ public:
 			myAssert("MA_CAMERA_FOCUS_AUTO", result);
 
 			char buffer[256];
-			sprintf(buffer, "Camera with\n  MA_CAMERA_FOCUS_AUTO: %s", getTextForResult(result));
+			sprintf(buffer, "Camera  %s with\n  MA_CAMERA_FOCUS_AUTO: %s", currentCameraName, getTextForResult(result));
 			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 5)
@@ -476,7 +479,7 @@ public:
 			result = setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_FIXED);
 			myAssert("MA_CAMERA_FOCUS_FIXED", result);
 			char buffer[256];
-			sprintf(buffer, "Camera with\n  MA_CAMERA_FOCUS_FIXED: %s", getTextForResult(result));
+			sprintf(buffer, "Camera  %s with\n  MA_CAMERA_FOCUS_FIXED: %s", currentCameraName,  getTextForResult(result));
 			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 6)
@@ -485,7 +488,7 @@ public:
 			result = setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_INFINITY);
 			myAssert("MA_CAMERA_FOCUS_INFINITY", result);
 			char buffer[256];
-			sprintf(buffer, "Camera with\n  MA_CAMERA_FOCUS_INFINITY: %s", getTextForResult(result));
+			sprintf(buffer, "Camera  %s with\n  MA_CAMERA_FOCUS_INFINITY: %s",currentCameraName,  getTextForResult(result));
 			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 7)
@@ -494,12 +497,32 @@ public:
 			result = setCameraProperty(MA_CAMERA_FOCUS_MODE, MA_CAMERA_FOCUS_MACRO);
 			myAssert("MA_CAMERA_FOCUS_MACRO", result);
 			char buffer[256];
-			sprintf(buffer, "Camera with\n  MA_CAMERA_FOCUS_MACRO: %s", getTextForResult(result));
+			sprintf(buffer, "Camera %s with\n  MA_CAMERA_FOCUS_MACRO: %s", currentCameraName, getTextForResult(result));
 			maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
 		}
 		else if (currentViewIndex == 8)
 		{
-			createNewUI();
+			if(mCurrentCamera <(mNumCameras -1))
+			{
+				currentViewIndex = 0;
+				sprintf(currentCameraName, "front");
+				mCurrentCamera++;
+				maCameraStop();
+				maWidgetDestroy(mCameraPreview);
+				createCameraWidget();
+				maCameraSelect(mCurrentCamera);
+				//bind the widget to the default camera
+				maCameraSetPreview(mCameraPreview);
+				startCamera();
+				char buffer[256];
+				sprintf(buffer, "Camera  %s with\n  Default properties", currentCameraName);
+				maWidgetSetProperty(mInstructions, MAW_LABEL_TEXT, buffer);
+
+			}
+			else
+			{
+				createNewUI();
+			}
 		}
 		else
 		{
@@ -651,6 +674,10 @@ private:
 	int mCurrentSizeIndex;
 
 	int mNumCameras;
+
+	int mCurrentCamera;
+
+	char currentCameraName[32];
 
 	int mActiveCamera;
 

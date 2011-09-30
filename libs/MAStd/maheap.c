@@ -27,6 +27,7 @@ realloc_hook gReallocHook = NULL;
 block_size_hook gBlockSizeHook = NULL;
 
 static void* sHeapBase;
+static int sHeapLength;
 
 #ifdef MOSYNCDEBUG
 //#define MEMORY_PROTECTION
@@ -166,8 +167,9 @@ void ansi_heap_init_crt0(char *start, int length)
 	}
 
 	MASTD_HEAP_LOG("heap: start 0x%p len 0x%x", start, length);
-	
+
 	sHeapBase = start;
+	sHeapLength = length;
 
 	if(length <= 0)
 		return;
@@ -179,12 +181,12 @@ void ansi_heap_init_crt0(char *start, int length)
 	set_free_hook(tlsf_free);
 	set_realloc_hook((realloc_hook)tlsf_realloc);
 	set_block_size_hook((block_size_hook)tlsf_block_size);
-		
+
 	MASTD_HEAP_LOG("TLSF initialized!");
 }
 
 size_t heapTotalMemory(void) {
-	return get_max_size(sHeapBase);
+	return sHeapLength;
 }
 size_t heapFreeMemory(void) {
 	return heapTotalMemory() - get_used_size(sHeapBase);
@@ -200,6 +202,9 @@ void * malloc(int size)
 
 #ifdef MEMORY_PROTECTION
 	int wasMemoryProtected = maGetMemoryProtection();
+	if(wasMemoryProtected < 0) {
+		maPanic(0, "maGetMemoryProtection fail");
+	}
 	maSetMemoryProtection(FALSE);
 #endif
 	MASTD_HEAP_LOG("malloc(%d)\n", size);
@@ -266,7 +271,7 @@ void free(void *mem)
 	wasMemoryProtected = maGetMemoryProtection();
 	maSetMemoryProtection(FALSE);
 	if(gBlockSizeHook)
-		maProtectMemory(mem, gBlockSizeHook(mem));	
+		maProtectMemory(mem, gBlockSizeHook(mem));
 #endif
 
 #ifdef MOSYNCDEBUG
@@ -276,11 +281,11 @@ void free(void *mem)
 #endif
 
 	gFreeHook(mem);
-	
+
 #ifdef MEMORY_PROTECTION
 	maSetMemoryProtection(wasMemoryProtected);
 #endif
-	
+
 }
 
 //****************************************

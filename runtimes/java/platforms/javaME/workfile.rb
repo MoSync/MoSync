@@ -51,13 +51,13 @@ class JavaPreprocessTask < FileTask
 		@dir = dir
 		@name = name
 		@prerequisites = [FileTask.new(work, "#{@dir}/#{@name}.jpp")]
-		
+
 		@DEPFILE = "build/#{@name}.mf"
 		if(!needed?(false)) then
 			@prerequisites = MakeDependLoader.load(@DEPFILE, @NAME)
 		end
 	end
-	
+
 	def needed?(log = true)
 		return true if(super(log))
 		if(!File.exists?(@DEPFILE))
@@ -66,25 +66,25 @@ class JavaPreprocessTask < FileTask
 		end
 		return false
 	end
-	
+
 	def execute
 		$stderr.puts "preprocessing #{@dir}/#{@name}.jpp"
-		
+
 		tempDepFileName = "build/#{@name}.mft"
-		
+
 		#@REM sed reformats gcc's error output so that Visual Studio can understand it
 		sh("xgcc -x c -E -MMD -MF #{tempDepFileName} -D_JavaME -I#{SHARED_DIR} -Isrc" +
 			" -o build/#{@name}.jtmp \"#{@prerequisites[0]}\" 2>&1 | sed -re s/\([a-zA-Z/]\+\)\(.[a-zA-Z]\+\):\([0-9]\+\):/\\1\\2(\\3):/")
-		
+
 		# problem: if xgcc fails due to a preprocessing error, it doesn't return an error value.
 		# it does, however, output an empty dependency file, which causes later rebuilds to fail.
 		# we have to check for this emtpy file and throw an error if we find it.
 		if(File.size(tempDepFileName) == 0)
 			error("xgcc failed silently")
 		end
-		
+
 		sh("sed s/#{@name}.o/#{escape(@NAME)}/ < build/#{@name}.mft > #{@DEPFILE}")
-		
+
 		#@REM sed changes gcc's file position lines into comments
 		#@REM the second sed changes source code filenames into numbers for the PUBLIC_DEBUG version
 		sh("sed \"s/^# /\\/\\//\" < build/#{@name}.jtmp > \"#{@NAME}\"")
@@ -108,10 +108,13 @@ class JavaCompileTask < Task
 		else
 			error("Unsupported platform: #{PLATFORM}")
 		end
+		bb_api_root = File.expand_path(File.dirname(__FILE__) +
+			'../../../../../../tools/ReleasePackageBuild/build_package_tools/mosync_bin')
 		jars = "#{JAVA_ME_LIB}\\jsr082.jar;#{JAVA_ME_LIB}\\#{baseJar}.jar;" +
 			"#{JAVA_ME_LIB}\\midpapi20.jar;#{JAVA_ME_LIB}\\wma20.jar;" +
 			"#{JAVA_ME_LIB}\\jsr179.jar;#{JAVA_ME_LIB}\\jsr75.jar;" +
-			"#{JAVA_ME_LIB}\\mmapi.jar"
+			"#{JAVA_ME_LIB}\\mmapi.jar;"+
+			"#{bb_api_root}/bb500/net_rim_api.jar"
 		sh("javac -source 1.4 -target 1.4 -d #{TMPCLASS_DIR} -classpath #{TMPCLASS_DIR} " +
 			"-bootclasspath #{jars} #{JAVA_DIR}/*.java")
 		# preverify
@@ -124,14 +127,14 @@ work.instance_eval do
 	def setup
 		javaFiles = JAVAME_SOURCES.collect { |n| JavaPreprocessTask.new(self, 'src', n) }
 		javaFiles += SHARED_SOURCES.collect { |n| JavaPreprocessTask.new(self, SHARED_DIR, n) }
-		
+
 		default_const(:PLATFORM, 'cldc11')
 		if(PLATFORM == 'cldc10')
 			javaFiles += CLDC10_SOURCES.collect { |n| JavaPreprocessTask.new(self, 'src', n) }
 		elsif(PLATFORM != 'cldc11')
 			error("Unsupported platform: #{PLATFORM}")
 		end
-		
+
 		@prerequisites = [DirTask.new(self, 'build'), DirTask.new(self, CLASS_DIR), DirTask.new(@self, JAVA_DIR),
 			DirTask.new(self, TMPCLASS_DIR), JavaCompileTask.new(self, javaFiles)]
 	end
@@ -142,7 +145,7 @@ target :default do
 end
 
 target :pack => :default do
-	sh "cd #{CLASS_DIR} && zip -u0 #{BIN_DIR}\\#{PROJECT_NAME}.jar *.class"
+	sh "cd #{CLASS_DIR} && zip -u9 #{BIN_DIR}\\#{PROJECT_NAME}.jar *.class"
 end
 
 # parses ARGV

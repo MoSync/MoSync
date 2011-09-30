@@ -39,7 +39,7 @@ int cheaderwrite(struct cheader *ch, FILE *fpout)
        	if(!fwrite((char *) &ch->cabID, 2, 1, fpout)) error=1;
 
 	return !error;
-}      
+}
 
 // write folder-entry of cabfile
 int cfolderwrite(struct cfolder *cf, FILE *fpout)
@@ -67,7 +67,7 @@ int cfilewrite( struct cfile *cf, FILE *fpout )
        	if(!fwrite((char *) &cf->date, 2, 1, fpout)) error=1;
        	if(!fwrite((char *) &cf->time, 2, 1, fpout)) error=1;
        	if(!fwrite((char *) &cf->fattr, 2, 1, fpout)) error=1;
-       	if(!fwrite((char *) &cf->name, strlen(cf->name)+1, 1, fpout)) error=1;
+	if(!fwrite((char *) &cf->name, strlen((char*)cf->name)+1, 1, fpout)) error=1;
 
 	return !error;
 }
@@ -77,16 +77,16 @@ int cfilewrite( struct cfile *cf, FILE *fpout )
 // write cabdata-header and data itself
 long writedata( struct cdata *cd, long pos, FILE *fpout, FILE *fptemp )
 {
-  	char *tmp;
+	byte *tmp;
 	CHECKSUM csum=0;
-  
+
   	fseek( fptemp,pos, SEEK_SET );
   	tmp = (byte *) calloc( cd->ncbytes, sizeof(byte) );
   	fread( tmp, cd->ncbytes, 1, fptemp );
 
      // compute checksum
-	csum = compute_checksum( (byte *) &cd->ncbytes, 
-				sizeof( cd->ncbytes ) + sizeof( cd->nubytes ), 
+	csum = compute_checksum( (byte *) &cd->ncbytes,
+				sizeof( cd->ncbytes ) + sizeof( cd->nubytes ),
 				compute_checksum( tmp, cd->ncbytes, 0 ) );
 	cd->checksum = csum;
      // file header
@@ -104,12 +104,12 @@ long writedata( struct cdata *cd, long pos, FILE *fpout, FILE *fptemp )
 long cdatawrite( struct cdata *cd, FILE *fpout, long pos, FILE *fptemp )
 {
        	pos = writedata( cd, pos, fpout,fptemp );
-	if(pos!=-1) 
-	{ 
-		return pos; 
+	if(pos!=-1)
+	{
+		return pos;
 	}
-	else 
-	{ 
+	else
+	{
 		return pos;
 	}
 }

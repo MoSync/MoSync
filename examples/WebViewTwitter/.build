@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <buildSequence>
 <buildStep type="cmd">
-<cmd foe="true" name="Bundle local files" pf="false" pt="">%mosync-bin%/Bundle -in %project:WebViewTwitter%/LocalFiles -out %project:WebViewTwitter%/Resources/LocalFiles.bin</cmd>
+<cmd foe="true" name="Bundle local files" pf="false" pt="">%mosync-bin%/Bundle -in %current-project%/LocalFiles -out %current-project%/Resources/LocalFiles.bin</cmd>
 </buildStep>
 <buildStep type="resource"/>
 <buildStep type="compile"/>

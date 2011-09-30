@@ -3,6 +3,7 @@ package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 
+import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,8 +11,10 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.ReentrantLock;
 
 import android.app.Activity;
+import android.content.res.Configuration;
 import android.hardware.Camera;
 import android.hardware.Camera.PictureCallback;
+
 import android.util.Log;
 
 import com.mosync.internal.generated.MAAPI_consts;
@@ -36,6 +39,29 @@ public class MoSyncCameraController {
 
 	private Camera mCamera;
 
+
+
+	/**
+	 * Static Attributes used for reflection of some functions in the API
+	 */
+	private static Method mGetNumberofCameras;
+	private static Camera tempCamera;
+
+	/**
+	* Stores number of availabe cameras on the device
+	*/
+	private int mNumCameras;
+
+	/**
+	* Indicates the current camera index
+	*/
+	private int currentCameraIndex;
+
+	/**
+	* Stores the paramters for each camera
+	*/
+	List<Camera.Parameters> mCameraParametersList;
+
 	/**
 	 * A flag that indicates the format of the image to be taken
 	 */
@@ -45,6 +71,7 @@ public class MoSyncCameraController {
 	 * the data place holder in each snapshot
 	 */
 	private int resourceIndex;
+
 
 	/**
 	 * Arrays to store user assigned sizes
@@ -78,8 +105,45 @@ public class MoSyncCameraController {
 		dataReady = false;
 		userWidths = new ArrayList<Integer>();
 		userHeights = new ArrayList<Integer>();
-		mCamera = Camera.open();
+		mCameraParametersList = new ArrayList<Camera.Parameters>();
+		mNumCameras = numberOfCameras();
+		initilizeCameras();
 		rawMode = false;
+
+	}
+
+	/**
+	* Lazy initialization of the cameras so we can use the number of cameras
+	*/
+	private void initilizeCameras()
+	{
+		try
+		{
+			currentCameraIndex = 0;
+			if(mNumCameras <= 1)
+			{
+				mCamera = Camera.open();
+				mCameraParametersList.add(mCamera.getParameters());
+			}
+			else
+			{
+				if(mCamera != null)
+					mCamera.release();
+				for(int ii=0; ii < mNumCameras; ii++)
+				{
+
+					mCamera = Camera.open(ii);
+					mCameraParametersList.add(mCamera.getParameters());
+					mCamera.release();
+				}
+				mCamera = Camera.open(currentCameraIndex);
+			}
+		}
+		catch(Exception e)
+		{
+			SYSLOG("Failed to assign Cameras");
+		}
+
 	}
 
 	/**
@@ -95,10 +159,46 @@ public class MoSyncCameraController {
 	 * queries the number of available cameras
 	 * @return number of cameras on the device
 	 */
-	public static int numberOfCameras()
+	public int numberOfCameras()
 	{
-		//Currently Anroid API Level 8 only supports one camera
-		return 1;
+		if(mNumCameras != 0)
+		{
+			//Do not do the costly operation of reflection again
+			return mNumCameras;
+		}
+		 try
+		 {
+			 if(mCamera == null)
+			 {
+				 tempCamera = Camera.open();
+			 }
+			 else
+			 {
+				 mCamera.release();
+				 tempCamera = Camera.open(currentCameraIndex);
+			 }
+
+			 //We have to use and static instance of the camera in the reflection here
+			 mGetNumberofCameras = tempCamera.getClass().getMethod(
+					 "getNumberOfCameras");
+			 tempCamera.release();
+			 if(mCamera != null)
+			 {
+				 mCamera = Camera.open(currentCameraIndex);
+			 }
+			 return Camera.getNumberOfCameras();
+
+		 }
+		 catch (NoSuchMethodException nsme)
+		 {
+			 tempCamera.release();
+			 SYSLOG("ANDROID Version is less than 2.3!!");
+			 //before 2.3 only one camera is supported
+			 return 1;
+		 } catch (RuntimeException e) {
+			 SYSLOG("Failed to set camera Parameters");
+			 return MAAPI_consts.MA_CAMERA_RES_FAILED;
+		 }
 	}
 
 	/**
@@ -109,7 +209,7 @@ public class MoSyncCameraController {
 	public int getNumberOfPictureSizes()
 	{
 		List <Camera.Size> sizeList;
-		Camera.Parameters parameters = mCamera.getParameters();
+		Camera.Parameters parameters = getCurrentParameters();
 		sizeList = parameters.getSupportedPictureSizes();
 		return sizeList.size();
 	}
@@ -150,8 +250,19 @@ public class MoSyncCameraController {
 	 */
 	public int setActiveCamera(int CameraNumber)
 	{
-		//android API Level 8 only support one camera
-		return 1;
+		if(mNumCameras > 1)
+		{
+			if(currentCameraIndex != CameraNumber)
+			{
+				currentCameraIndex = CameraNumber;
+				mCamera.release();
+				mPreview.mCamera = null;
+				mCamera = Camera.open(CameraNumber);
+				mCamera.setParameters(getCurrentParameters());
+			}
+
+		}
+		return MAAPI_consts.MA_CAMERA_RES_OK;
 	}
 
 	/**
@@ -250,6 +361,11 @@ public class MoSyncCameraController {
 		  }
 	}
 
+	private Camera.Parameters getCurrentParameters()
+	{
+		return mCameraParametersList.get(currentCameraIndex);
+	}
+
 	public int setCameraProperty(String key, String value)
 	{
 		if(mCamera == null)
@@ -258,7 +374,7 @@ public class MoSyncCameraController {
 		}
 		try
 		{
-			Camera.Parameters param = mCamera.getParameters();
+			Camera.Parameters param = getCurrentParameters();
 			if(key.equals(MAAPI_consts.MA_CAMERA_IMAGE_FORMAT))
 			{
 				if(value.equals(MAAPI_consts.MA_CAMERA_IMAGE_RAW))
@@ -327,7 +443,7 @@ public class MoSyncCameraController {
 		{
 			return MAAPI_consts.MA_CAMERA_RES_FAILED;
 		}
-		Camera.Parameters param = mCamera.getParameters();
+		Camera.Parameters param = getCurrentParameters();
 		String result;
 		if(key.equals(MAAPI_consts.MA_CAMERA_IMAGE_FORMAT))
 		{
@@ -403,7 +519,7 @@ public class MoSyncCameraController {
 	 */
 	public void acquireCamera()
 	{
-		if(mCamera == null)
+		if(mCamera == null && mPreview != null)
 		{
 			mCamera = Camera.open();
 			if(mPreview != null)
@@ -422,7 +538,7 @@ public class MoSyncCameraController {
 		int height = userHeights.get(formatIndex).intValue();
     	try
     	{
-			Camera.Parameters parameters = mCamera.getParameters();
+			Camera.Parameters parameters = getCurrentParameters();
 			List <Camera.Size> supportedSizes =  parameters.getSupportedPictureSizes();
 			Camera.Size optimalPictureSize = mPreview.getOptimalSize(supportedSizes, width, height);
 			parameters.setPictureSize(optimalPictureSize.width,optimalPictureSize.height);

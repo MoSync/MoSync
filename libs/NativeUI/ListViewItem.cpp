@@ -93,6 +93,33 @@ namespace NativeUI
     }
 
     /**
+     * Set the font color of the item's text.
+     * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
+     *              red, green and blue components respectively.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the color value was invalid.
+     */
+    int ListViewItem::setFontColor(const int color)
+    {
+        char buffer[BUF_SIZE];
+        sprintf(buffer, "0x%.6X", color);
+        return this->setProperty(MAW_LIST_VIEW_ITEM_FONT_COLOR, buffer);
+    }
+
+    /**
+     * Set the font size in points of the item's text.
+     * @param size A float that specifies the number of points.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the size value was invalid.
+     */
+    int ListViewItem::setFontSize(const float size)
+    {
+        return this->setPropertyFloat(MAW_LIST_VIEW_ITEM_FONT_SIZE, size);
+    }
+
+    /**
     * Set the typeface and style in which the text should be displayed.
     * @param fontHandle A font handle received from loading fonts using
     *  #maFontGetName and #maFontLoadWithName syscalls.

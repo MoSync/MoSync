@@ -340,6 +340,14 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.status = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_ALERT)
+	{
+		event.alertButtonIndex = intArray[1];
+	}
+	else if (event.type == EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED)
+	{
+		event.optionsBoxButtonIndex = intArray[1];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*
@@ -400,6 +408,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		 * intArray[3] - Hook type.
 		 * intArray[4] - Handle to url data.
+		 *
 		 */
 
 		// Allocate the widget event data structure.

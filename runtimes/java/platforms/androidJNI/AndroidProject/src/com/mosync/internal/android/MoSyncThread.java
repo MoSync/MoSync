@@ -18,7 +18,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 package com.mosync.internal.android;
 
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
-import static com.mosync.internal.android.MoSyncHelpers.EXTENT_Y;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_ON;
@@ -26,6 +25,7 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE_ON;
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -43,6 +43,7 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_NONE;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT180;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 
 import java.io.File;
 import java.io.FileDescriptor;
@@ -97,6 +98,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
+import com.mosync.internal.android.nfc.MoSyncNFC;
+import com.mosync.internal.android.nfc.MoSyncNFCService;
 import com.mosync.internal.generated.IX_OPENGL_ES;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
@@ -104,6 +107,7 @@ import com.mosync.java.android.MoSyncPanicDialog;
 import com.mosync.java.android.MoSyncService;
 import com.mosync.java.android.TextBox;
 import com.mosync.nativeui.ui.widgets.MoSyncCameraPreview;
+import com.mosync.nativeui.util.AsyncWait;
 
 /**
  * Thread that runs the MoSync virtual machine and handles all syscalls.
@@ -153,6 +157,7 @@ public class MoSyncThread extends Thread
 	MoSyncSMS mMoSyncSMS;
 	MoSyncSensor mMoSyncSensor;
 	MoSyncPIM mMoSyncPIM;
+	MoSyncNFC mMoSyncNFC;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -293,6 +298,8 @@ public class MoSyncThread extends Thread
 		EventQueue.sMoSyncThread = this;
 		sMoSyncThread = this;
 
+		SingletonObject.getSingletonObject().setThread(this);
+
 		mHasDied = false;
 
 		mMoSyncNetwork = new MoSyncNetwork(this);
@@ -342,6 +349,11 @@ public class MoSyncThread extends Thread
 		mMoSyncSensor = new MoSyncSensor(this);
 
 		mMoSyncPIM = new MoSyncPIM(this);
+
+		mMoSyncNFC = MoSyncNFCService.getDefault();
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.setMoSyncThread(this);
+		}
 
 		nativeInitRuntime();
 	}
@@ -462,8 +474,8 @@ public class MoSyncThread extends Thread
 		mWidth = width;
 		mHeight = height;
 
-		Bitmap bitmap = Bitmap.createBitmap(
-			mWidth, mHeight, Bitmap.Config.ARGB_8888);
+		Bitmap bitmap = createBitmap(mWidth, mHeight);
+
 		Canvas canvas = new Canvas(bitmap);
 		mDrawTargetScreen = new ImageCache(canvas, bitmap);
 
@@ -476,6 +488,25 @@ public class MoSyncThread extends Thread
 			+ " height:" + mBitmap.getHeight());
 	}
 
+	/**
+	 * @brief Returns a slice of the memory ByteBuffer
+	 *
+	 * All calls which are accessing memory shall use this function!
+	 * The use of .position in any other call is strictly forbidden!
+	 *
+	 * @param addr	The address to the beginning of memory block
+	 * @param len	The size of the block, -1 means that the whole
+	 * 				block should be used.
+	 * @return
+	 */
+	public synchronized ByteBuffer getMemorySlice(int addr, int len)
+	{
+		mMemDataSection.position(addr);
+		ByteBuffer slice = mMemDataSection.slice();
+		if(-1 != len)
+			slice.limit(len);
+		return slice;
+	}
 
 	/**
 	 * Allocate memory for the program data section.
@@ -711,6 +742,120 @@ public class MoSyncThread extends Thread
 		mMoSyncSound.storeIfBinaryAudioResource(soundHandle);
 	}
 
+	/*
+	 * @brief Function that decodes an image into a Bitmap
+	 *
+	 * @param	data	The decoded image data
+	 * @param	options	The bitmapFactory options
+	 *
+	 * @return	The created Bitmap, null if it failed
+	 */
+	Bitmap decodeImageFromData(final byte[] data, final BitmapFactory.Options options)
+	{
+		try
+		{
+			final AsyncWait<Bitmap> waiter = new AsyncWait<Bitmap>();
+			getActivity().runOnUiThread(new Runnable()
+			{
+				public void run()
+				{
+					Bitmap bitmap = BitmapFactory.decodeByteArray(
+							data, 0, data.length, options);
+
+					waiter.setResult(bitmap);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			Log.i("MoSync", "Couldn't decode image data.");
+			return null;
+		}
+	}
+
+	/*
+	 * @brief Recycles the bitmap
+	 *
+	 * @param	bitmap	The bitmap which is being recycled
+	 */
+	void recycleImageData(final Bitmap bitmap)
+	{
+		getActivity().runOnUiThread(new Runnable()
+		{
+			public void run()
+			{
+				bitmap.recycle();
+			}
+		});
+		return;
+	}
+
+	/*
+	 * @brief Function that creates an empty Bitmap
+	 *
+	 * @param	width	The width of the created Bitmap
+	 * @param	height	The width of the created Bitmap
+	 *
+	 * @return	The created Bitmap, null if it failed
+	 */
+	Bitmap createBitmap(final int width, final int height)
+	{
+		try
+		{
+			final AsyncWait<Bitmap> waiter = new AsyncWait<Bitmap>();
+			getActivity().runOnUiThread(new Runnable()
+			{
+				public void run()
+				{
+					Bitmap bitmap = Bitmap.createBitmap(
+							width, height, Bitmap.Config.ARGB_8888);
+
+					waiter.setResult(bitmap);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			Log.i("MoSync", "Couldn't create empty bitmap.");
+		}
+		return null;
+	}
+
+	/*
+	 * @brief Function that creates a Bitmap from pixel data
+	 *
+	 * @param	width	The width of the created Bitmap
+	 * @param	height	The width of the created Bitmap
+	 * @param	pixels	The pixel data
+	 *
+	 * @return	The created Bitmap, null if it failed
+	 */
+	Bitmap createBitmapFromData(final int width, final int height, final int[] pixels)
+	{
+		try
+		{
+			final AsyncWait<Bitmap> waiter = new AsyncWait<Bitmap>();
+			getActivity().runOnUiThread(new Runnable()
+			{
+				public void run()
+				{
+					Bitmap bitmap = Bitmap.createBitmap(
+							pixels, width, height, Bitmap.Config.ARGB_8888);
+
+					waiter.setResult(bitmap);
+				}
+			});
+			return waiter.getResult();
+		}
+		catch(InterruptedException ie)
+		{
+			Log.i("MoSync", "Couldn't create bitmap from pixel data.");
+			return null;
+		}
+	}
+
 	/**
 	 * Redraws the screen.
 	 */
@@ -932,9 +1077,10 @@ public class MoSyncThread extends Thread
 			maPanic(1,"maFillTriangleStrip takes more than 3 vertices");
 		}
 
-		mMemDataSection.position(address);
+		//mMemDataSection.position(address);
+		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = mMemDataSection.asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -993,9 +1139,10 @@ public class MoSyncThread extends Thread
 			maPanic(1, "maFillTriangleFan takes more than 3 vertices");
 		}
 
-		mMemDataSection.position(address);
+		//mMemDataSection.position(address);
+		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = mMemDataSection.asIntBuffer();
+		IntBuffer ib = getMemorySlice(address, -1).asIntBuffer();
 
 		int[] vertices = new int[count*2];
 		ib.get(vertices);
@@ -1221,8 +1368,11 @@ public class MoSyncThread extends Thread
 			{
 				if (mUsingFrameBuffer)
 				{
-					mMemDataSection.position(mFrameBufferAddress);
-					mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
+					//mMemDataSection.position(mFrameBufferAddress);
+					//mFrameBufferBitmap.copyPixelsFromBuffer(mMemDataSection);
+
+					ByteBuffer framebufferSlice = getMemorySlice(mFrameBufferAddress, -1);
+					mFrameBufferBitmap.copyPixelsFromBuffer(framebufferSlice);
 
 					// Clear the screen.. in this case draw the canvas black
 					lockedCanvas.drawRGB(0,0,0);
@@ -1304,9 +1454,10 @@ public class MoSyncThread extends Thread
 
 		int pixels[] = new int[srcRectWidth];
 
-		mMemDataSection.position(mem);
+		//mMemDataSection.position(mem);
+		//IntBuffer ib = mMemDataSection.asIntBuffer();
 
-		IntBuffer ib = mMemDataSection.asIntBuffer();
+		IntBuffer ib = getMemorySlice(mem, -1).asIntBuffer();
 
 		for (int y = 0; y < srcRectHeight; y++)
 		{
@@ -1534,10 +1685,8 @@ public class MoSyncThread extends Thread
 			image and the result are added with the alpha values
 			and the result is stored in the given memory location.
 		*/
-		Bitmap temporaryBitmap = Bitmap.createBitmap(
-			srcWidth,
-			srcHeight,
-			Bitmap.Config.ARGB_8888);
+
+		Bitmap temporaryBitmap = createBitmap(srcWidth, srcHeight);
 
 		Canvas temporaryCanvas = new Canvas(temporaryBitmap);
 
@@ -1545,9 +1694,10 @@ public class MoSyncThread extends Thread
 
 		temporaryCanvas.drawColor(0xff000000, Mode.DST_ATOP);
 
-		mMemDataSection.position(dst);
+		//mMemDataSection.position(dst);
+		//IntBuffer intBuffer = mMemDataSection.asIntBuffer();
 
-		IntBuffer intBuffer = mMemDataSection.asIntBuffer();
+		IntBuffer intBuffer = getMemorySlice(dst, -1).asIntBuffer();
 
 		try {
 
@@ -1718,8 +1868,8 @@ public class MoSyncThread extends Thread
 			 * the specified format and use the format of the screen, usually
 			 * RGB 565.
 			 */
-			Bitmap decodedImage = BitmapFactory.decodeByteArray(
-				resourceData, 0, resourceData.length, options);
+
+			Bitmap decodedImage = decodeImageFromData(resourceData, options);
 
 			if (decodedImage == null)
 			{
@@ -1732,12 +1882,10 @@ public class MoSyncThread extends Thread
 			int height = decodedImage.getHeight();
 			int[] pixels = new int[width * height];
 			decodedImage.getPixels(pixels, 0, width, 0, 0, width, height);
-			decodedImage.recycle( );
-			Bitmap argbImage = Bitmap.createBitmap(
-					pixels,
-					width,
-					height,
-					Bitmap.Config.ARGB_8888);
+
+			recycleImageData(decodedImage);
+
+			Bitmap argbImage = createBitmapFromData(width, height, pixels);
 
 			mImageResources.put(
 				placeholder, new ImageCache(null, argbImage));
@@ -1771,8 +1919,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maCreateImageRaw");
 
-		Bitmap bitmap = Bitmap.createBitmap(
-			width, height, Bitmap.Config.ARGB_8888);
+		Bitmap bitmap = createBitmap(width, height);
 
 		if(null == bitmap)
 		{
@@ -1795,8 +1942,9 @@ public class MoSyncThread extends Thread
 		SYSLOG("maCreateDrawableImage");
 		try
 		{
-			Bitmap bitmap = Bitmap.createBitmap(
-				width, height, Bitmap.Config.ARGB_8888);
+
+			Bitmap bitmap = createBitmap(width, height);
+
 			Canvas canvas = new Canvas(bitmap);
 
 			mImageResources.put(
@@ -2173,8 +2321,9 @@ public class MoSyncThread extends Thread
 		// address is pointing at a byte but that array is an int array.
 		mFrameBufferAddress = address;
 		mFrameBufferSize = mWidth*mHeight;
-		mFrameBufferBitmap = Bitmap.createBitmap(
-			mWidth, mHeight, Bitmap.Config.ARGB_8888);
+
+		mFrameBufferBitmap = createBitmap(mWidth, mHeight);
+
 	}
 
 	/**
@@ -2290,10 +2439,16 @@ public class MoSyncThread extends Thread
 
 		// Write this property to memory.
 		byte[] ba = property.getBytes();
-		mMemDataSection.position(buf);
-		mMemDataSection.put(ba);
+
+		//mMemDataSection.position(buf);
+		//mMemDataSection.put(ba);
+
 		// Add null termination character.
-		mMemDataSection.put((byte)0);
+		//mMemDataSection.put((byte)0);
+
+		ByteBuffer slicedBuffer = getMemorySlice(buf, -1);
+		slicedBuffer.put(ba);
+		slicedBuffer.put((byte)0);
 
 		return property.length() + 1;
 	}
@@ -2392,7 +2547,7 @@ public class MoSyncThread extends Thread
 	 * the other runtimes this is necessary. There isn't a duplicate stored
 	 * on the JNI side.
 	 */
-	boolean loadBinary(int resourceIndex, ByteBuffer buffer)
+	public boolean loadBinary(int resourceIndex, ByteBuffer buffer)
 	{
 		SYSLOG("loadBinary index:" + resourceIndex);
 
@@ -2431,7 +2586,7 @@ public class MoSyncThread extends Thread
 		mMoSyncSound.storeIfAudioUBin(ubinData, resourceIndex);
 	}
 
-	ByteBuffer destroyBinary(int resourceIndex)
+	public ByteBuffer destroyBinary(int resourceIndex)
 	{
 		ByteBuffer buffer =  mBinaryResources.get(resourceIndex);
 
@@ -2505,6 +2660,7 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * @deprecated Use maAlert instead.
 	 * Opens a message box.
 	 * @param title
 	 * @param text
@@ -2541,12 +2697,115 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Opens a message box.
+	 * The dialog can be dismissed using one of the 3 optional buttons.
+	 * @param title
+	 * @param message
+	 * @param buttonPositive
+	 * @param buttonNeutral
+	 * @param buttonNegative
+	 * @return
+	 */
+	int maAlert(
+		final String title,
+		final String message,
+		final String buttonPositive,
+		final String buttonNeutral,
+		final String buttonNegative)
+	{
+		// Get parameters from the parent activity
+		mContext.runOnUiThread( new Runnable( ) {
+
+			@Override
+			public void run()
+			{
+				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+				if ( title.length() > 0 )
+				{
+					builder.setTitle(title);
+				}
+				if ( message.length() > 0 )
+				{
+					builder.setMessage(message);
+				}
+				if ( buttonPositive.length() > 0 )
+				{
+					builder.setPositiveButton(buttonPositive, new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							postAlertEvent(1);
+						}
+					});
+				}
+				if ( buttonNeutral.length() > 0 )
+				{
+					builder.setNeutralButton(buttonNeutral, new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							postAlertEvent(2);
+						}
+					});
+				}
+				if ( buttonNegative.length() > 0 )
+				{
+					builder.setCancelable(true);
+					builder.setNegativeButton(buttonNegative, new DialogInterface.OnClickListener() {
+
+						@Override
+						public void onClick(DialogInterface dialog, int which) {
+							postAlertEvent(3);
+						}
+					});
+				}
+				else
+				{
+					builder.setCancelable(false);
+				}
+
+				AlertDialog alertDialog = builder.create();
+				alertDialog.show();
+			}
+		});
+
+		return 0;
+	}
+
+	/**
+	 * Post a message to the MoSync event queue.
+	 * This event it sent when one of the buttons in the alert was pressed.
+	 * See maAlert syscall that pops-up an alert.
+	 * The state is: Ready or Canceled.
+	 */
+	private void postAlertEvent(int index)
+	{
+		int[] event = new int[2];
+		event[0] = EVENT_TYPE_ALERT;
+		// Send the button index.
+		event[1] = index;
+
+		postEvent(event);
+	}
+
+	/**
 	 * Internal wrapper for maImagePickerOpen that runs
 	 * the call in the UI thread.
 	 */
 	int maImagePickerOpen()
 	{
 		return mMoSyncNativeUI.maImagePickerOpen();
+	}
+
+	/**
+	 * Internal wrapper for showing the options dialog.
+	 * It takes the title, the text for the destructive button, the Cancel button text, and the options for the dialog.
+	 * The destructive button is iOS specific, so here it is not treated separately.
+	 * @return
+	 */
+	int maOptionsBox(String title, String destructiveButtonTitle, String cancelButtonTitle, int buffPointer, int buffSize)
+	{
+		return mMoSyncNativeUI.maOptionsBox(title, destructiveButtonTitle, cancelButtonTitle, buffPointer, buffSize);
 	}
 
 	/**
@@ -2974,6 +3233,26 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Internal wrapper for maWidgetModalDialogShow.
+	 * @param dialogHandle
+	 */
+	public int maWidgetModalDialogShow(
+			final int dialogHandle)
+	{
+		return mMoSyncNativeUI.maWidgetDialogShow(dialogHandle);
+	}
+
+	/**
+	 * Internal wrapper for maWidgetModalDialogHide.
+	 * @param dialogHandle
+	 */
+	public int maWidgetModalDialogHide(
+			final int dialogHandle)
+	{
+		return mMoSyncNativeUI.maWidgetDialogHide(dialogHandle);
+	}
+
+	/**
 	 * Internal wrapper for maWidgetScreenShow that runs
 	 * the call in the UI thread.
 	 */
@@ -3376,7 +3655,7 @@ public class MoSyncThread extends Thread
 		{
 			if (bitmap != texture.mBitmap)
 			{
-				bitmap.recycle();
+				recycleImageData(bitmap);
 			}
 		}
 
@@ -3418,10 +3697,8 @@ public class MoSyncThread extends Thread
 		int newWidth = loadGlTextureHelperGetNextPowerOf2(width);
 		int newHeight = loadGlTextureHelperGetNextPowerOf2(height);
 
-		Bitmap newBitmap = Bitmap.createBitmap(
-			newWidth,
-			newHeight,
-			Bitmap.Config.ARGB_8888);
+		Bitmap newBitmap = createBitmap(newWidth, newHeight);
+
 		if (null == newBitmap)
 		{
 			return null;
@@ -3460,7 +3737,6 @@ public class MoSyncThread extends Thread
 
 		return powerOf2;
 	}
-
 
 
 	private int mOpenGLScreen = -1;
@@ -3698,6 +3974,161 @@ public class MoSyncThread extends Thread
 		return mMoSyncPIM.maPimItemRemove(list, item);
 	}
 
+	int maNFCStart() {
+		return mMoSyncNFC == null ? MA_NFC_NOT_AVAILABLE : mMoSyncNFC.maNFCStart();
+	}
+
+	void maNFCStop() {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCStop();
+		}
+	}
+
+	int maNFCReadTag(int nfcContext) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadTag(nfcContext);
+	}
+
+	void maNFCDestroyTag(int tagHandle) {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCDestroyTag(tagHandle);
+		}
+	}
+
+	int maNFCIsType(int tagHandle, int type) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCIsType(tagHandle, type);
+	}
+
+	int maNFCGetTypedTag(int tagHandle, int type) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetTypedTag(tagHandle, type);
+	}
+
+	int maNFCBatchStart(int nfcContext) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCBatchStart(nfcContext);
+	}
+
+	void maNFCBatchCommit(int nfcContext) {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCBatchCommit(nfcContext);
+		}
+	}
+
+	void maNFCBatchRollback(int nfcContext) {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCBatchRollback(nfcContext);
+		}
+	}
+
+	public int maNFCTransceive(int tagHandle, int src, int len, int dst, int dstLen, int dstPtr) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCTransceive(tagHandle, src, len, dst, dstLen, dstPtr);
+	}
+
+	void maNFCConnectTag(int tagHandle) {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCConnectTag(tagHandle);
+		}
+	}
+
+	void maNFCCloseTag(int tagHandle) {
+		if (mMoSyncNFC != null) {
+			mMoSyncNFC.maNFCCloseTag(tagHandle);
+		}
+	}
+
+	int maNFCReadNDEFMessage(int tagHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadNDEFMessage(tagHandle);
+	}
+
+	int maNFCGetNDEFMessage(int tagHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetNDEFMessage(tagHandle);
+	}
+
+	int maNFCWriteNDEFMessage(int tagHandle, int ndefHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCWriteNDEFMessage(tagHandle, ndefHandle);
+	}
+
+	int maNFCCreateNDEFMessage(int recordCount) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCCreateNDEFMessage(recordCount);
+	}
+
+	int maNFCGetNDEFRecord(int ndefHandle, int ix) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetNDEFRecord(ndefHandle, ix);
+	}
+
+	int maNFCGetNDEFRecordCount(int ndefHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetNDEFRecordCount(ndefHandle);
+	}
+
+	int maNFCGetId(int ndefRecordHandle, int dst, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetId(ndefRecordHandle, dst, len);
+	}
+
+	int maNFCGetPayload(int ndefRecordHandle, int dst, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetPayload(ndefRecordHandle, dst, len);
+	}
+
+	int maNFCGetTnf(int ndefRecordHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetTnf(ndefRecordHandle);
+	}
+
+	int maNFCGetType(int ndefRecordHandle, int dst, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetType(ndefRecordHandle, dst, len);
+	}
+
+	int maNFCSetId(int ndefRecordHandle, int src, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSetId(ndefRecordHandle, src, len);
+	}
+
+	int maNFCSetPayload(int ndefRecordHandle, int src, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSetPayload(ndefRecordHandle, src, len);
+	}
+
+	int maNFCSetTnf(int ndefRecordHandle, int tnf) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSetTnf(ndefRecordHandle, tnf);
+	}
+
+	int maNFCSetType(int ndefRecordHandle, int src, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSetType(ndefRecordHandle, src, len);
+	}
+
+	public int maNFCAuthenticateSector(int tagHandle, int keyType, int sectorIndex, int keySrc, int keyLen) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCAuthenticateSector(tagHandle, keyType, sectorIndex, keySrc, keyLen);
+	}
+
+	public int maNFCGetSectorCount(int tagHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetSectorCount(tagHandle);
+	}
+
+	public int maNFCGetBlockCountInSector(int tagHandle, int sectorIndex) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCGetBlockCountInSector(tagHandle, sectorIndex);
+	}
+
+	public int maNFCSectorToBlock(int tagHandle, int sectorIndex) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSectorToBlock(tagHandle, sectorIndex);
+	}
+
+	public int maNFCReadBlocks(int tagHandle, int block, int dst, int resultSize) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadBlocks(tagHandle, block, dst, resultSize);
+	}
+
+	public int maNFCReadPages(int tagHandle, int firstPage, int dst, int resultSize) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCReadPages(tagHandle, firstPage, dst, resultSize);
+	}
+
+	int maNFCWriteBlocks(int tagHandle, int firstBlock, int src, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCWriteBlocks(tagHandle, firstBlock, src, len);
+	}
+
+	int maNFCWritePages(int tagHandle, int firstPage, int src, int len) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCWritePages(tagHandle, firstPage, src, len);
+	}
+
+	int maNFCSetReadOnly(int tagHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCSetReadOnly(tagHandle);
+	}
+
+	int maNFCIsReadOnly(int tagHandle) {
+		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCIsReadOnly(tagHandle);
+	}
 
 	/**
 	 * Class that holds image data.

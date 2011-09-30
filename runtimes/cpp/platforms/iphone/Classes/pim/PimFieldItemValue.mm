@@ -29,7 +29,7 @@
 -(id) init
 {
     mValuesArray = [[NSMutableArray alloc] init];
-    mAttributeID = MA_PIM_ERR_NO_ATTRIBUTES;
+    mAttributeID = 0;
     mLabel = [[NSString alloc] init];
 
     return [super init];

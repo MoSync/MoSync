@@ -24,9 +24,9 @@ module MoSyncInclude
 	def sub_include; USE_NEWLIB ? "/newlib" : ""; end
 end
 
-class PipeTask < FileTask
-	def initialize(work, name, objects, linkflags)
-		super(work, name)
+class PipeTask < MultiFileTask
+	def initialize(work, name, objects, linkflags, files = [])
+		super(work, name, files)
 		@FLAGS = linkflags
 		dirTask = DirTask.new(work, File.dirname(name))
 		@objects = objects
@@ -122,6 +122,8 @@ class PipeGccWork < GccWork
 
 	def object_ending; ".s"; end
 
+	def pipeTaskClass; PipeTask; end
+
 	def setup3(all_objects, have_cppfiles)
 		#puts all_objects
 		llo = @LOCAL_LIBS.collect { |ll| FileTask.new(self, @COMMON_BUILDDIR + ll + ".lib") }
@@ -134,7 +136,7 @@ class PipeGccWork < GccWork
 				@TARGET_PATH += "e"
 			end
 		end
-		@TARGET = PipeTask.new(self, @TARGET_PATH, all_objects + llo, @FLAGS + @EXTRA_LINKFLAGS)
+		@TARGET = pipeTaskClass.new(self, @TARGET_PATH, (all_objects + llo), @FLAGS + @EXTRA_LINKFLAGS)
 		@prerequisites += [@TARGET]
 	end
 end

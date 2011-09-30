@@ -33,6 +33,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_EMAILADDR;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_NUMERIC;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_PHONENUMBER;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_URL;
+import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_SINGLE_LINE;
 
 import java.nio.CharBuffer;
 
@@ -124,6 +125,10 @@ public class TextBox extends Activity implements OnClickListener {
 					InputType.TYPE_CLASS_NUMBER |
 					InputType.TYPE_NUMBER_FLAG_DECIMAL |
 					InputType.TYPE_NUMBER_FLAG_SIGNED;
+				break;
+			case MA_TB_TYPE_SINGLE_LINE:
+				androidInputConstraints =
+					InputType.TYPE_CLASS_TEXT;
 				break;
 			// Default case is normal text with several lines
 			default:

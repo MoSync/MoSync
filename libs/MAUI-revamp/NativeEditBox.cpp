@@ -20,7 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
  * \brief Class that implements wrapper for maTextBox.
  * \author Patrick Broman and Niklas Nummelin
  */
- 
+
 #include "NativeEditBox.h"
 #ifdef USE_NEWLIB
 #include <stdlib.h>
@@ -41,42 +41,46 @@ void NativeEditBox::textBoxClosed(int res, int length) {
 		MAUI_LOG("length: %d", length);
 		String str;
 		str.resize(length);
-		sprintf(str.pointer(), "%S", mString);
+
+		//sprintf(str.pointer(), "%S", mString);	// insufficient
+		for(int i=0; i<length; i++) {
+			if(mString[i] < 0xff)
+				str[i] = (byte)mString[i];
+			else
+				str[i] = mListener->nativeEditUnicode(mString[i]);
+		}
+
 		setCaption(str);
 		MAUI_LOG("%S", mString);
 		requestRepaint();
-		// TODO: Remove commented out code.
-		/*
-		if(mListener != NULL) {
-			mListener->nativeEditFinished();
-		}
-		*/		
 		ListenerSet_fire(
-			NativeEditBoxListener, 
-			mEditBoxListeners, 
+			NativeEditBoxListener,
+			mEditBoxListeners,
 			nativeEditFinished(this, mCaption));
-		
+
 	}
-	// TODO: Remove commented out code.
-	//mListener = NULL;
 	Environment::getEnvironment().removeTextBoxListener(this);
 }
 
 NativeEditBox::NativeEditBox(
-	int x, 
-	int y, 
-	int width, 
-	int height, 
-	int maxSize, 
+	NativeEditBoxListener* mainListener,
+	int x,
+	int y,
+	int width,
+	int height,
+	int maxSize,
 	int options,
-	const String& initialText, 
+	const String& initialText,
 	const WString& titleString)
 		: Label(x, y, width, height, initialText),
 		mTitleString(titleString),
 		mString(NULL),
 		mOptions(options),
-		mEditBoxListeners(false)
+		mEditBoxListeners(false),
+		mListener(NULL)
 {
+	addNativeEditBoxListener(mainListener);
+	mListener = mainListener;
 	setMaxSize(maxSize);
 	setCaption(initialText);
 }
@@ -97,15 +101,16 @@ void NativeEditBox::setMaxSize(int size) {
 	}
 	wchar_t *oldString = mString;
 	mString = new wchar_t[size];
+	mString[0] = 0;
 
-	if(oldString)  
+	if(oldString)
 	{
 		int minSize = (mMaxSize<size)?mMaxSize:size;
 		memcpy(mString, oldString, minSize);
 		mString[size-1] = 0;
 		delete oldString;
 	}
-	
+
 	mMaxSize = size;
 }
 
@@ -148,19 +153,29 @@ bool NativeEditBox::pointerReleased(MAPoint2d p, int id) {
 }
 
 void NativeEditBox::activate() {
-	
 #ifdef USE_NEWLIB
 	swprintf(mString, mMaxSize, L"%s", mCaption.c_str());
 #else
 	wsprintf(mString, L"%s", mCaption.c_str());
 #endif
-	int res = 
+	int res =
 		maTextBox(
-			(const wchar*)mTitleString.c_str(), 
+			(const wchar*)mTitleString.c_str(),
 			(wchar*)mString,
-			(wchar*)mString, 
-			mMaxSize, 
+			(wchar*)mString,
+			mMaxSize,
 			mOptions);
+	if(res == MA_TB_RES_TYPE_UNAVAILABLE &&
+		(mOptions & MA_TB_TYPE_MASK) == MA_TB_TYPE_SINGLE_LINE)
+	{
+		mOptions = MA_TB_TYPE_ANY | (mOptions & ~MA_TB_TYPE_MASK);
+		res = maTextBox(
+			(const wchar*)mTitleString.c_str(),
+			(wchar*)mString,
+			(wchar*)mString,
+			mMaxSize,
+			mOptions);
+	}
 	if(res < 0) {
 		PANIC_MESSAGE("maTextBox failed");
 	}
@@ -187,6 +202,7 @@ void NativeEditBox::addNativeEditBoxListener(NativeEditBoxListener* wl) {
 }
 
 void NativeEditBox::removeNativeEditBoxListener(NativeEditBoxListener* wl) {
+	MAASSERT(wl != mListener);
 	mEditBoxListeners.remove(wl);
 }
 

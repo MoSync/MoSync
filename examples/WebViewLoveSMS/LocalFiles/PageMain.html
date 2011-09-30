@@ -7,20 +7,15 @@
 -->
 <head>
 <style type="text/css">
-html, body
+html
 {
   margin: 0;
   padding: 0;
-  background: FF5577;
-  font-family: sans-serif;
-}
-
-#PageContainer
-{
   width: 100%;
   height: 100%;
-  margin: auto;
   background-image:url('amor128x128.png');
+  background-color: #FF5577;
+  font-family: sans-serif;
 }
 
 #HeadingElement
@@ -46,7 +41,7 @@ html, body
   font-weight: bold;
   color: black;
   text-align: center;
-  background-color: FF88AA;
+  background-color: #FF88AA;
   visibility: hidden;
 }
 
@@ -72,8 +67,8 @@ html, body
   border-right: solid 1px #82A528;
   border-bottom: solid 1px #58701B;
 
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#99CF00), to(#6DB700));
-  background: -moz-linear-gradient(19% 75% 90deg, #6DB700, #99CF00);
+  background-color: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#99CF00), to(#6DB700));
+  background-color: -moz-linear-gradient(19% 75% 90deg, #6DB700, #99CF00);
 
   cursor: pointer;
 
@@ -82,8 +77,8 @@ html, body
 
 .button:active
 {
-  background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6DB700), to(#99CF00));
-  background: -moz-linear-gradient(19% 75% 90deg,#99CF00, #6DB700);
+  background-color: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6DB700), to(#99CF00));
+  background-color: -moz-linear-gradient(19% 75% 90deg,#99CF00, #6DB700);
 }
 
 #PhoneNo
@@ -99,6 +94,7 @@ html, body
 }
 </style>
 
+<!-- Import the josync library. -->
 <script src="js/josync.js"></script>
 
 <script>
@@ -133,15 +129,16 @@ function SendKissSMS()
   SendSMS(G_KissMessage);
 }
 
-function SendSMS(message)
+function SendSMS(textMessage)
 {
   if (ValidatePhoneNo())
   {
     DisplayMessage('Sending...');
-    SendMoSyncMessage(
-      'SendSMS',
-      'phoneNo', GetPhoneNo(),
-      'message', message);
+    josync.messagehandler.send(
+      { messageName: 'SendSMS',
+        phoneNo: GetPhoneNo(),
+        message: textMessage },
+      null);
   }
 }
 
@@ -264,7 +261,7 @@ CreateMessageStrings();
 </div>
 <script>
   // This informs the application that the page is loaded.
-  SendMoSyncMessage('PageLoaded');
+  josync.messagehandler.send({ messageName: 'PageLoaded' }, null);
 </script>
 </body>
 </html>
