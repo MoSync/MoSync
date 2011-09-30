@@ -35,6 +35,7 @@ MA 02110-1301, USA.
  */
 
 #include "Dialog.h"
+#include "DialogListener.h"
 
 namespace NativeUI
 {
@@ -89,6 +90,44 @@ namespace NativeUI
 	}
 
 	/**
+	 * Sets the origin arrow position for a popover dialog.
+	 * Note: This property is only available on the iPad.
+	 * @param position one of the constants:
+	 *  - #MAW_CONSTANT_ARROW_UP The popover arrow should point up.
+	 *  - #MAW_CONSTANT_ARROW_DOWN The popover arrow should point down.
+	 *  - #MAW_CONSTANT_ARROW_LEFT The popover arrow should point left.
+	 *  - #MAW_CONSTANT_ARROW_RIGHT The popover arrow should point right.
+	 *  - #MAW_CONSTANT_ARROW_ANY The popover arrow can point anywhere.
+	 * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_NAME if the property is not available.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+     * - #MAW_RES_ERROR otherwise.
+	 */
+	int Dialog::setArrrowPosition(const int position)
+	{
+		return setPropertyInt(MAW_MODAL_DIALOG_ARROW_POSITION, position);
+	}
+
+	/**
+	 * Allow or prohibits the user from dismissing a popover dialog by
+	 * tapping outside of it.
+	 * Note: This property is only available on the iPad.
+	 * @param state If true allows it to be dismissed, if false
+	 * prohibits it.
+	 * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_NAME if the property is not available.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+     * - #MAW_RES_ERROR otherwise.
+	 */
+	int Dialog::canBeDismissed(bool state)
+	{
+		return setProperty(MAW_MODAL_DIALOG_USER_CAN_DISMISS,
+			(state ? "true" : "false"));
+	}
+
+	/**
 	 * Shows the dialog. Only one dialog at a time is visible.
 	 * It will become visible on top of the UI.
 	 */
@@ -103,6 +142,42 @@ namespace NativeUI
 	void Dialog::hide()
 	{
 		maWidgetModalDialogHide(getWidgetHandle());
+	}
+
+	/**
+	 * Add a dialog event listener.
+	 * @param listener The listener that will receive dialog events.
+	 */
+	void Dialog::addDialogListener(DialogListener* listener)
+	{
+		addListenerToVector(mDialogListeners, listener);
+	}
+
+	/**
+	 * Remove the dialog listener.
+	 * @param listener The listener that receives dialogs events.
+	 */
+	void Dialog::removeDialogListener(DialogListener* listener)
+	{
+		removeListenerFromVector(mDialogListeners, listener);
+	}
+
+	/**
+	 * This method is called when there is an event for this widget.
+	 * It passes on the event to all widget's listeners.
+	 * @param widgetEventData The data for the widget event.
+	 */
+	void Dialog::handleWidgetEvent(MAWidgetEventData* widgetEventData)
+	{
+		Widget::handleWidgetEvent(widgetEventData);
+
+		if ( MAW_EVENT_DIALOG_DISMISSED == widgetEventData->eventType )
+		{
+			for (int i = 0; i < mDialogListeners.size(); i++)
+			{
+				mDialogListeners[i]->dialogDismissed(this);
+			}
+		}
 	}
 
 } // namespace NativeUI

@@ -174,13 +174,8 @@ otherButtonTitlesSize:(const int) otherButtonTitlesSize
 -(void)actionSheet:(UIActionSheet *)actionSheet clickedButtonAtIndex:(NSInteger)buttonIndex
 {
     MAEvent event;
-	event.type = EVENT_TYPE_WIDGET;
-
-	MAWidgetEventData *eventData = new MAWidgetEventData;
-	eventData->eventType = MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED;
-    eventData->optionDialogButtonIndex = buttonIndex;
-
-    event.data = (int)eventData;
+	event.type = EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED;
+    event.optionsBoxButtonIndex = buttonIndex;
     Base::gEventQueue.put(event);
 }
 

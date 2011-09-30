@@ -23,6 +23,8 @@
 #import "PimItem.h"
 #import "PimSyscall.h"
 #import "PimFieldItem.h"
+#include "MoSyncPanic.h"
+#include "PimError.h"
 
 @implementation PimItem
 
@@ -56,7 +58,9 @@
     int fieldsCount = [mFieldsDictionary count];
     if (0 > fieldIndex || fieldIndex >= fieldsCount)
     {
-        return MA_PIM_ERR_INDEX_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
     }
     else
     {
@@ -111,6 +115,9 @@
     if (nil == itemField)
     {
         returnValue = MA_PIM_ERR_FIELD_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_INVALID
+                                  withPanicCode:PANIC_FIELD_INVALID
+                                  withPanicText:@PANIC_FIELD_INVALID_TEXT];
     } else {
         returnValue = [itemField getAttribute:index];
     }
@@ -148,7 +155,9 @@
 
     if (nil == itemField)
     {
-        returnValue = MA_PIM_ERR_FIELD_EMPTY;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_EMPTY
+                                  withPanicCode:PANIC_FIELD_EMPTY
+                                  withPanicText:@PANIC_FIELD_EMPTY_TEXT];
     }
     else
     {
@@ -188,7 +197,9 @@
 
     if (nil == itemField)
     {
-        return MA_PIM_ERR_FIELD_EMPTY;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_EMPTY
+                                  withPanicCode:PANIC_FIELD_EMPTY
+                                  withPanicText:@PANIC_FIELD_EMPTY_TEXT];
     }
 
     returnValue = [itemField getLabel:customLabel indexValue:index];
@@ -235,7 +246,9 @@
         0 > index  ||
         index > ([fieldItem count] - 1))
     {
-        return MA_PIM_ERR_INDEX_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
     }
 
     int fieldType = [fieldItem getFieldType];
@@ -298,14 +311,18 @@
 
     if(nil == itemField)
     {
-        return MA_PIM_ERR_FIELD_EMPTY;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_EMPTY
+                                  withPanicCode:PANIC_FIELD_EMPTY
+                                  withPanicText:@PANIC_FIELD_EMPTY_TEXT];
     }
 
     // Check if there is a value at the given index.
     valuesArray = [itemField getValue:index];
     if (nil == valuesArray)
     {
-        return MA_PIM_ERR_INDEX_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
     }
 
     // Get the new value.
@@ -332,7 +349,9 @@
     // Check if values were read from the buffer.
     if (!valuesArray)
     {
-        return MA_PIM_ERR_BUFFER_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_BUFFER_INVALID
+                                  withPanicCode:PANIC_BUFFER_INVALID
+                                  withPanicText:@PANIC_BUFFER_INVALID_TEXT];
     }
 
     returnValue = [itemField setValue:valuesArray atIndex:index
@@ -412,7 +431,9 @@
     // Check if values were read from the buffer.
     if (!valuesArray)
     {
-        return MA_PIM_ERR_BUFFER_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_BUFFER_INVALID
+                                  withPanicCode:PANIC_BUFFER_INVALID
+                                  withPanicText:@PANIC_BUFFER_INVALID_TEXT];
     }
 
     int returnValue = [itemField addValue:valuesArray withAttribute:attribute];
@@ -444,7 +465,9 @@
 
     if (nil == itemField)
     {
-        returnValue = MA_PIM_ERR_FIELD_EMPTY;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_FIELD_EMPTY
+                                  withPanicCode:PANIC_FIELD_EMPTY
+                                  withPanicText:@PANIC_FIELD_EMPTY_TEXT];
     } else
     {
         returnValue = [itemField removeValue:index];

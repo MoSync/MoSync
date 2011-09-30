@@ -78,8 +78,7 @@
  *                     - second null terminated string(UTF-16 encoding).
  *                     - etc
  * @param size  The maximum size(in bytes) that can be written at the given address.
- * @return The size(in bytes) of the strings, or MA_PIM_ERR_BUFFER_TOO_SMALL if the size of
- * the strings is bigger then size parameter.
+ * @return The size(in bytes) of the strings.
  */
 -(int) writeStringArray:(NSMutableArray*) array
                atAddress:(void*) address
@@ -102,8 +101,7 @@
  * @param value The given string.
  * @param address The specified address.
  *                The address will contain a null terminated string(UTF-16 encoding).
- * @return The string's size(in bytes), or MA_PIM_ERR_BUFFER_TOO_SMALL if the size of
- * the string is bigger then size parameter.
+ * @return The string's size(in bytes).
  */
 -(int) writeString:(NSString*) value
          atAddress:(void*) address

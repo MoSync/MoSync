@@ -1,0 +1,16 @@
+id = project.html5.hybrid
+type = html5
+name = Hybrid HTML5/C project
+description = A hybrid HTML5-JavaScript and C project
+
+[Files]
+index.html -> LocalFiles/index.html
+main.cpp
+WebViewMessage.cpp
+WebViewMessage.h
+FileUtil.cpp
+FileUtil.h
+
+[Settings]
+build.prefs:additional.libraries=MAUtil.lib,NativeUI.lib
+build.prefs:additional.libraries/Debug=MAUtilD.lib,NativeUID.lib

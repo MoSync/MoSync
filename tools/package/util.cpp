@@ -16,8 +16,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <stdlib.h>
+#include <string.h>
 #include <fstream>
 #include <sstream>
+#include <ostream>
+#include <cerrno>
+#include <sys/stat.h>
 #include "util.h"
 #include "filelist/filelist.h"
 
@@ -52,7 +56,7 @@ static void writeCopy(istream& in, ostream& out) {
 	streamoff pos = 0;
 	while(pos < size) {
 		char buffer[64*1024];	// arbitrary size
-		streamoff todo = MIN(size - pos, sizeof(buffer));
+		streamoff todo = MIN(size - pos, (streamoff)sizeof(buffer));
 		in.read(buffer, todo);
 		beGood(in);
 		out.write(buffer, todo);
@@ -75,6 +79,36 @@ void appendFile(const char* dst, const char* src) {
 	ofstream out(dst, ios_base::binary | ios_base::app);
 	setName(out, dst);
 	writeCopy(in, out);
+}
+
+bool existsFile(const char* filename) {
+	ifstream file(filename);
+	if (file) {
+		file.close();
+	}
+	return file.good();
+}
+
+bool existsDir(const char* dir) {
+	struct stat s;
+	int res = stat(dir, &s);
+	if(res == 0) {
+		return (s.st_mode & S_IFDIR) != 0;
+	}
+	if(errno == ENOENT)
+		return false;
+	printf("stat(%s) failed: %i(%s)\n",
+		dir, errno, strerror(errno));
+	exit(1);
+}
+
+void renameFile(const string& dst, const string& src) {
+	int _res = rename(src.c_str(), dst.c_str());
+	if(_res != 0) {
+		printf("rename(%s, %s) failed: %i %i(%s)\n",
+			src.c_str(), dst.c_str(), _res, errno, strerror(errno));
+		exit(1);
+	}
 }
 
 streamoff getFileSize(const char* filename) {
@@ -179,6 +213,10 @@ void toDir(std::string& str) {
 		str += '/';
 }
 
+std::string getDir(const std::string& name) {
+	return name.substr(0, name.find_last_of('/'));
+}
+
 string fullpathString(const char* name) {
 	char* res = fullpath(name);
 	if(!res) {
@@ -188,4 +226,28 @@ string fullpathString(const char* name) {
 	string s = res;
 	free(res);
 	return s;
+}
+
+
+std::string delim(std::vector<std::string>& input, const std::string& delim) {
+	std::string result = std::string();
+	for (size_t i = 0; i < input.size(); i++) {
+		result.append(input.at(i));
+		if (i < input.size() - 1) {
+			result.append(delim);
+		}
+	}
+	return result;
+}
+
+void write72line(std::ostream& output, const std::string& input) {
+	std::vector<std::string> splitLines = std::vector<std::string>();
+	int len = 72;
+	for (size_t i = 0; i < input.length(); i+= len) {
+		len = i < 2 ? 72 : 71; // Don't forget the initial space
+		splitLines.push_back(input.substr(i, len));
+	}
+	// Newline + first char of next must be space
+	output << delim(splitLines, string("\n "));
+
 }

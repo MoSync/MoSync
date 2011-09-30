@@ -105,7 +105,7 @@ namespace Base {
 		typedef HashMap<FileHandle> FileMap;
 		FileMap gFileHandles;
 		int gFileNextHandle;
-		
+
 		FileHandle& getFileHandle(MAHandle file);
 
 		MAHandle maFileOpen(const char* path, int mode);
@@ -128,7 +128,7 @@ namespace Base {
 		int maFileTell(MAHandle file);
 		int maFileSeek(MAHandle file, int offset, int whence);
 
-		MAHandle maFileListStart(const char* path, const char* filter);
+		MAHandle maFileListStart(const char* path, const char* filter, int sorting);
 		int maFileListNext(MAHandle list, char* nameBuf, int bufSize);
 		int maFileListClose(MAHandle list);
 
@@ -141,7 +141,7 @@ namespace Base {
 		void* GetValidatedMemRange(int address, int size);
 		const char* GetValidatedStr(int address);
 		const wchar* GetValidatedWStr(int address);
-    
+
         int TranslateNativePointerToMoSyncPointer(void *nativePointer);
 
 #ifndef VSV_ARGPTR_DECL

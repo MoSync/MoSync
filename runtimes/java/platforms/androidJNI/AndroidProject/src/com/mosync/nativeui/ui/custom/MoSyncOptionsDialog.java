@@ -1,5 +1,7 @@
 package com.mosync.nativeui.ui.custom;
 
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +11,6 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.widget.ArrayAdapter;
 
-import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.android.MoSyncThread;
 
 /*
@@ -184,7 +185,11 @@ public class MoSyncOptionsDialog
 	 */
 	private void postOptionDialogEvent(int index)
 	{
-		EventQueue.getDefault().postOptionsDialogClicked( index );
+		int[] event = new int[2];
+		event[0] = EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED;
+		event[1] = index;
+
+		mMoSyncThread.postEvent(event);
 	}
 
 	/**
