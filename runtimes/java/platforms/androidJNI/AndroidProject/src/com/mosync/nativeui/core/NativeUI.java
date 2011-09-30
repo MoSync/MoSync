@@ -22,9 +22,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
-import android.app.LauncherActivity.ListItem;
 import android.graphics.Bitmap;
-import android.test.IsolatedContext;
 import android.util.Log;
 import android.view.View;
 
@@ -40,10 +38,12 @@ import com.mosync.nativeui.ui.factories.CameraPreviewFactory;
 import com.mosync.nativeui.ui.factories.ViewFactory;
 import com.mosync.nativeui.ui.widgets.ButtonWidget;
 import com.mosync.nativeui.ui.widgets.CameraPreviewWidget;
+import com.mosync.nativeui.ui.widgets.DialogWidget;
 import com.mosync.nativeui.ui.widgets.LabelWidget;
 import com.mosync.nativeui.ui.widgets.Layout;
 import com.mosync.nativeui.ui.widgets.ListItemWidget;
 import com.mosync.nativeui.ui.widgets.MoSyncScreenWidget;
+import com.mosync.nativeui.ui.widgets.NavigationBarWidget;
 import com.mosync.nativeui.ui.widgets.ScreenWidget;
 import com.mosync.nativeui.ui.widgets.StackScreenWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
@@ -276,7 +276,7 @@ public class NativeUI
 		
 		Widget parent = m_widgetTable.get( parentHandle );
 		Widget child = m_widgetTable.get( childHandle );
-		
+
 		if( child == null )
 		{
 			Log.e( "MoSync", "maWidgetInsertChild: Invalid child widget handle: " + childHandle );
@@ -287,27 +287,36 @@ public class NativeUI
 			Log.e( "MoSync", "maWidgetInsertChild: Invalid parent widget handle: " + parentHandle );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
-		if( !parent.isLayout( ) )
+		if ( child.getParent() != null )
 		{
-			Log.e( "MoSync", "maWidgetInsertChild: Parent " + parentHandle + " is not a layout." );
-			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
+			Log.e( "MoSync", "maWidgetInsertChild: Child already has a parent." );
+			return IX_WIDGET.MAW_RES_ERROR;
 		}
 		if( index < -1 )
 		{
 			Log.e( "MoSync", "maWidgetInsertChild: Invalid index: " + index );
 			return IX_WIDGET.MAW_RES_INVALID_INDEX;
 		}
-		
-		Layout parentAsLayout = (Layout) parent;
-
-		if ( child.getParent() != null )
+		if ( child.isDialog() )
 		{
-			Log.e( "MoSync", "maWidgetInsertChild: Child already has a parent." );
-			return IX_WIDGET.MAW_RES_ERROR;
+			Log.e( "MoSync", "maWidgetInsertChild: Cannot add a dialog to a widget. " );
+			return IX_WIDGET.MAW_RES_CANNOT_INSERT_DIALOG;
 		}
-
-		parentAsLayout.addChildAt( child, index );
-		
+		if ( parent.isDialog() )
+		{
+			DialogWidget parentAsDialog = (DialogWidget) parent;
+			parentAsDialog.addChildAt(child, index);
+		}
+		else if ( parent.isLayout() )
+		{
+			Layout parentAsLayout = (Layout) parent;
+			parentAsLayout.addChildAt( child, index );
+		}
+		else
+		{
+			Log.e( "MoSync", "maWidgetInsertChild: Parent " + parentHandle + " is not a layout or a dialog." );
+			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
+		}
 		return IX_WIDGET.MAW_RES_OK;
 	}
 	
@@ -333,19 +342,81 @@ public class NativeUI
 			Log.e( "MoSync", "maWidgetRemove: Widget " + childHandle + " has no parent." );
 			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
 		}
-		
-		if( !parent.isLayout( ) )
+
+		if ( parent.isDialog() )
 		{
-			Log.e( "MoSync", "maWidgetRemove: Parent for " + childHandle + " is not a layout." );
+			DialogWidget parentAsDialog = (DialogWidget) parent;
+			parentAsDialog.removeChild(child);
+		}
+		else if ( parent.isLayout() )
+		{
+			Layout parentAsLayout = (Layout) parent;
+			parentAsLayout.removeChild( child );
+		}
+		else
+		{
+			Log.e( "MoSync", "maWidgetRemove: Parent for " + childHandle + " is not a layout or a dialog." );
 			return IX_WIDGET.MAW_RES_INVALID_LAYOUT;
 		}
 
-		Layout parentAsLayout = (Layout) parent;
-		parentAsLayout.removeChild( child );
+		return IX_WIDGET.MAW_RES_OK;
+	}
+
+	/**
+	 * Internal function for the maWidgetDialogShow system call.
+	 * It displays the given dialog.
+	 *
+	 * Note: Should only be called on the UI thread.
+	 */
+	public int maWidgetDialogShow(int dialogHandle)
+	{
+		Widget parent = m_widgetTable.get( dialogHandle );
+		if( parent == null )
+		{
+			Log.e( "MoSync", "maWidgetDialogShow: Invalid dialog widget handle: " + dialogHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+
+		if ( !(parent instanceof DialogWidget) )
+		{
+			Log.e( "MoSync", "maWidgetScreenShow: Widget is not a dialog: " + dialogHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+
+		DialogWidget dialog = (DialogWidget) parent;
+		dialog.show();
 		
 		return IX_WIDGET.MAW_RES_OK;
 	}
-	
+
+	/**
+	 * Internal function for the maWidgetCreate system call.
+	 * It uses the ViewFactory to create a widget of the
+	 * given type, puts it in the handle table and returns it.
+	 *
+	 * Note: Should only be called on the UI thread.
+	 */
+	public int maWidgetDialogHide(int dialogHandle)
+	{
+		Widget parent = m_widgetTable.get( dialogHandle );
+		if( parent == null )
+		{
+			Log.e( "MoSync", "maWidgetDialogShow: Invalid dialog widget handle: " + dialogHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+
+		if ( !(parent instanceof DialogWidget) )
+		{
+			Log.e( "MoSync", "maWidgetScreenShow: Widget is not a dialog: " + dialogHandle );
+			return IX_WIDGET.MAW_RES_INVALID_HANDLE;
+		}
+
+		DialogWidget dialog = (DialogWidget) parent;
+		dialog.hide();
+
+		return IX_WIDGET.MAW_RES_OK;
+	}
+
 	/**
 	 * Internal function for the maWidgetScreenShow system call.
 	 * Sets the root widget to the root of the given screen, but
@@ -506,6 +577,13 @@ public class NativeUI
 				{
 					ListItemWidget listItemWidget = (ListItemWidget) widget;
 					listItemWidget.setFontTypeface(
+							currentFont.getTypeface(),
+							currentFont.getFontSize());
+				}
+				else if ( widget instanceof NavigationBarWidget )
+				{
+					NavigationBarWidget navBar = (NavigationBarWidget) widget;
+					navBar.setTitleFontTypeface(
 							currentFont.getTypeface(),
 							currentFont.getFontSize());
 				}

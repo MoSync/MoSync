@@ -33,10 +33,12 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <FileStream.h>
 #include "Syscall.h"
 #include "PimSyscall.h"
+#include "OptionsDialogView.h"
 #include <CoreMedia/CoreMedia.h>
 
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
+#include "MoSyncPanic.h"
 
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
@@ -334,6 +336,7 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
+        [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
 	}
 
@@ -1420,6 +1423,22 @@ return 0; \
 		MoSync_ShowMessageBox(title, message, false);
 	}
 
+	//Shows an alert box with up to three buttons
+	SYSCALL(void, maAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3))
+	{
+		MoSync_ShowAlert(title, message, button1, button2, button3);
+	}
+
+	SYSCALL(void, maOptionsBox(const wchar* title, const wchar* destructiveButtonTitle, const wchar* cancelButtonTitle,
+                          const void* otherButtonTitles, const int otherButtonTitlesSize))
+	{
+        [[OptionsDialogView getInstance] show:title
+                       destructiveButtonTitle:destructiveButtonTitle
+                            cancelButtonTitle:cancelButtonTitle
+                            otherButtonTitles:otherButtonTitles
+                        otherButtonTitlesSize:otherButtonTitlesSize];
+	}
+
     SYSCALL(void, maImagePickerOpen())
 	{
 		MoSync_ShowImagePicker();
@@ -1816,6 +1835,18 @@ return 0; \
 		return MoSync_SensorStop(sensor);
 	}
 
+    SYSCALL(int, maSyscallPanicsEnable())
+	{
+        [[MoSyncPanic getInstance] setThowPanic:true];
+        return RES_OK;
+	}
+
+    SYSCALL(int, maSyscallPanicsDisable())
+	{
+        [[MoSyncPanic getInstance] setThowPanic:false];
+        return RES_OK;
+	}
+
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
@@ -1880,6 +1911,8 @@ return 0; \
 		maIOCtl_case(maGetSystemProperty);
 		maIOCtl_case(maReportResourceInformation);
 		maIOCtl_case(maMessageBox);
+		maIOCtl_case(maAlert);
+        maIOCtl_case(maOptionsBox);
 		maIOCtl_case(maCameraStart);
 		maIOCtl_case(maCameraStop);
 		maIOCtl_case(maCameraSetPreview);
@@ -1893,6 +1926,8 @@ return 0; \
         maIOCtl_case(maSensorStop);
 		maIOCtl_case(maImagePickerOpen);
 		maIOCtl_case(maSendTextSMS);
+		maIOCtl_case(maSyscallPanicsEnable);
+		maIOCtl_case(maSyscallPanicsDisable);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;

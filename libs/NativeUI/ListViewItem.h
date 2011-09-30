@@ -85,6 +85,25 @@ namespace NativeUI
         virtual void setAccessoryType(ListViewItemAccessory type);
 
         /**
+         * Set the font color of the item's text.
+         * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
+         *              red, green and blue components respectively.
+         * @return Any of the following result codes:
+         * - #MAW_RES_OK if the property could be set.
+         * - #MAW_RES_INVALID_PROPERTY_VALUE if the color value was invalid.
+         */
+        virtual int setFontColor(const int color);
+
+        /**
+         * Set the font size in points of the item's text.
+         * @param size A float that specifies the number of points.
+         * @return Any of the following result codes:
+         * - #MAW_RES_OK if the property could be set.
+         * - #MAW_RES_INVALID_PROPERTY_VALUE if the size value was invalid.
+         */
+        virtual int setFontSize(const float size);
+
+        /**
         * Set the typeface and style in which the text should be displayed.
         * @param fontHandle A font handle received from loading fonts using
         *  #maFontGetName and #maFontLoadWithName syscalls.

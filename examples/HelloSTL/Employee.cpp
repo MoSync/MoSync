@@ -74,18 +74,8 @@ bool operator!=(const Employee &lv, const Employee &rv)
 }
 
 
-bool lessExperience(const Employee &lv, const Employee &rv)
+bool lessExperiencePredicate(const Employee &lv, const Employee &rv)
 {
-//	if(lv.getExperience() < rv.getExperience())
-//	{
-//		LOG("Calling binary predicate lessExperience(%s, %s). Returns true.",
-//				lv.getName().c_str(), rv.getName().c_str());
-//	}
-//	else
-//	{
-//		LOG("Calling binary predicate lessExperience(%s, %s). Returns false.",
-//						lv.getName().c_str(), rv.getName().c_str());
-//	}
 	return lv.getExperience() < rv.getExperience();
 }
 
@@ -101,4 +91,9 @@ Employee &increaseSalary(Employee &e, int amount)
 bool equalSalary(const Employee &lv, const Employee &rv)
 {
 	return lv.getSalary() == rv.getSalary();
+}
+
+bool LessExperienceFunctor::operator()(const Employee &e1, const Employee &e2) const
+{
+	return e1.getExperience() < e2.getExperience();
 }

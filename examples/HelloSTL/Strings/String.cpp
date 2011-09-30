@@ -37,13 +37,11 @@ void STLMoblet::STL_string()
 
 
 	LOG("\n");
-	LOG("=================================================================");
-	LOG("		example using string 						  ");
+	LOG("========================= string ================================================================================");
 	log_to_console("\n    std::string is a template class designed to manipulate "
 					"sequences of characters."
 					"\n    It is a container of characters."
 					"\n    The string class is defined in the <string> header.");
-	LOG("=================================================================\n");
 
 
 	log_to_console(	 "\n    /**"

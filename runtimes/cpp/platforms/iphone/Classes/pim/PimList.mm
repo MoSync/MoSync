@@ -29,7 +29,7 @@
  */
 -(id) init
 {
-	return [super init];
+    return [super init];
 }
 
 /**
@@ -37,28 +37,28 @@
  */
 -(void) openList
 {
-	methodNotImplemented();
+    methodNotImplemented();
 }
 
 /**
  * Gets a handle to the next item in list.
  * @return A handle to the next item in list, or 0 if the are no more items,
- *		 or one of the MA_PIM_ERR constants in case of error.
+ *         or one of the MA_PIM_ERR constants in case of error.
  */
 -(MAHandle) getNextItem
 {
-	methodNotImplemented();
+    methodNotImplemented();
 }
 
 /**
  * Gets an pim item for a given handle.
  * @param itemHandle The specified handle.
  * @return The item, or nil if the database does not contain
- *		 an item with the given handle.
+ *         an item with the given handle.
  */
 -(PimItem*) getItem:(MAHandle) itemHandle
 {
-	methodNotImplemented();
+    methodNotImplemented();
 }
 
 /**
@@ -67,7 +67,7 @@
  */
 -(MAHandle) createItem
 {
-	methodNotImplemented();
+    methodNotImplemented();
 }
 
 /**
@@ -77,7 +77,7 @@
  **/
 -(int) removeItem:(MAHandle) itemHandle
 {
-	methodNotImplemented();
+    methodNotImplemented();
 }
 
 /**
@@ -89,7 +89,7 @@
  */
 -(int) close
 {
-	methodNotImplemented();
+    methodNotImplemented();
 }
 
 /**
@@ -107,7 +107,7 @@
  */
 - (void) dealloc
 {
-	[super dealloc];
+    [super dealloc];
 }
 
 @end

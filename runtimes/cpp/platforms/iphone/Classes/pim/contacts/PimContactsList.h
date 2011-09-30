@@ -17,10 +17,11 @@
 
 #import <Foundation/Foundation.h>
 #import <AddressBook/AddressBook.h>
-#import "PimUtil.h"
+
 #include "helpers/cpp_defs.h"
 #include "helpers/cpp_ix_pim.h"
 #include "PimContactItem.h"
+#include "PimUtil.h"
 #import "PimList.h"
 
 @interface PimContactsList:  PimList {

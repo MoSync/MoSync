@@ -100,7 +100,29 @@ MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION(MoSync, UITableViewCell)
         {
             return MAW_RES_INVALID_PROPERTY_VALUE;
         }
-	} 
+	}
+    else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_FONT_COLOR])
+    {
+        UITableViewCell* cell = (UITableViewCell*) view;
+		UILabel* label = cell.textLabel;
+        UIColor* color = [UIColor colorWithHexString:value];
+		if(!color)
+        {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+        label.textColor = color;
+    }
+    else if([key isEqualToString:@MAW_LIST_VIEW_ITEM_FONT_SIZE])
+    {
+        UITableViewCell* cell = (UITableViewCell*) view;
+		UILabel* label = cell.textLabel;
+		float fontSize = [value floatValue];
+        UIFont* currentFont = label.font;
+        NSString* currentFontName = [currentFont fontName];
+        UIFont* newFont = [UIFont fontWithName:currentFontName size:fontSize];
+        [label setFont:newFont];
+		[self layout];
+    }
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

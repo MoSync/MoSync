@@ -15,16 +15,14 @@
  02111-1307, USA.
 */
 
-#include "config_platform.h"
+
 #import "PimFieldItem.h"
 #import "helpers/cpp_defs.h"
 #import "helpers/cpp_ix_pim.h"
 #import "PimSyscall.h"
 #import "PimUtil.h"
-#include <helpers/helpers.h>
-
-#include <base_errors.h>
-using namespace MoSyncError;
+#import "MoSyncPanic.h"
+#import "PimError.h"
 
 @implementation PimFieldItem
 
@@ -79,14 +77,15 @@ using namespace MoSyncError;
 /**
  * Get the attribute of a specified value.
  * @param index The specified index value.
- * @return One of MA_PIM_ATTR constants.
+ * @return One of MA_PIM_ATTR constants, or MA_PIM_ERR_INVALID_INDEX
+ *		 if index param is not valid.
  */
 -(int) getAttribute:(int) index
 {
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 > index || index >= fieldValuesCount)
-	{
-		BIG_PHAT_ERROR(ERR_INVALID_PIM_FIELD_INDEX);
+    {
+		return MA_PIM_ERR_INDEX_INVALID;
 	}
 
 	return [[mFieldValuesArray objectAtIndex:index] getAttribute];
@@ -103,18 +102,21 @@ using namespace MoSyncError;
 {
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 > index || index >= fieldValuesCount)
-	{
-		BIG_PHAT_ERROR(ERR_INVALID_PIM_FIELD_INDEX);
+    {
+		return MA_PIM_ERR_INDEX_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
 	}
 
-	// Check if the attribute is set to custom.
-	PimUtils* utils = [PimUtils sharedInstance];
-	int customAttribute = [utils getCustomAttributeForFieldID:mFieldConstant];
-	int valuesAttribute = [[mFieldValuesArray objectAtIndex:index] getAttribute];
-	if (customAttribute != valuesAttribute)
-	{
-		return MA_PIM_ERR_NO_LABEL;
-	}
+    // Check if the attribute is set to custom.
+    PimUtils* utils = [PimUtils sharedInstance];
+    int customAttribute = [utils getCustomAttributeForFieldID:mFieldConstant];
+    int valuesAttribute = [[mFieldValuesArray objectAtIndex:index] getAttribute];
+    if (customAttribute != valuesAttribute)
+    {
+        return MA_PIM_ERR_NO_LABEL;
+    }
 
 	return [[mFieldValuesArray objectAtIndex:index] setLabel:customLabel];
 }
@@ -130,20 +132,22 @@ using namespace MoSyncError;
 {
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 > index || index >= fieldValuesCount)
-	{
-		BIG_PHAT_ERROR(ERR_INVALID_PIM_FIELD_INDEX);
+    {
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
 	}
 
-	PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
+    PimFieldItemValue* itemValue = [mFieldValuesArray objectAtIndex:index];
 
-	// Check if the field supports attributes.
-	if (0 == [itemValue getAttribute])
-	{
-		return MA_PIM_ERR_NO_LABEL;
-	}
+    // Check if the field supports attributes.
+    if (0 == [itemValue getAttribute])
+    {
+        return MA_PIM_ERR_NO_LABEL;
+    }
 
 	// Check if the attribute is set to MA_PIM_ATTR_CUSTOM.
-	NSString* label = [itemValue getLabel];
+    NSString* label = [itemValue getLabel];
 	int attribute = [self getAttributeFromLabel:label];
 	if (CUSTOM_ATTRIBUTE != attribute)
 	{
@@ -164,7 +168,7 @@ using namespace MoSyncError;
 {
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 > index || index >= fieldValuesCount)
-	{
+    {
 		return nil;
 	}
 
@@ -183,15 +187,19 @@ using namespace MoSyncError;
   withAttribute:(int) attribute
 {
 	int fieldValuesCount = [mFieldValuesArray count];
-	PimUtils* utils = [PimUtils sharedInstance];
-	if (0 > index || index <= fieldValuesCount) {
-		BIG_PHAT_ERROR(ERR_INVALID_PIM_VALUE_INDEX);
+    PimUtils* utils = [PimUtils sharedInstance];
+
+	if (0 > index || index >= fieldValuesCount)
+    {
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
 	}
 
     // Check if field supports attributes.
-	bool setAttribute = false;
-	if ([utils fieldSupportsAttribute:mFieldConstant])
-	{
+    bool setAttribute = false;
+    if ([utils fieldSupportsAttribute:mFieldConstant])
+    {
         // Check if the attribute is allowed.
         bool attributeAllowed = [self isAttributeValid:attribute];
         if (!attributeAllowed)
@@ -202,14 +210,14 @@ using namespace MoSyncError;
         {
             setAttribute = true;
         }
-	}
+    }
 
 	PimFieldItemValue* fieldValue = [mFieldValuesArray objectAtIndex:index];
 	[fieldValue setValue:value];
-	if (setAttribute)
-	{
-		[fieldValue setAttribute:attribute];
-	}
+    if (setAttribute)
+    {
+        [fieldValue setAttribute:attribute];
+    }
 
 	return MA_PIM_ERR_NONE;
 }
@@ -224,48 +232,49 @@ using namespace MoSyncError;
 -(int) addValue:(NSMutableArray*) value
   withAttribute:(const int) attribute
 {
-	int returnValue = MA_PIM_ERR_NONE;
-	PimUtils* utils = [PimUtils sharedInstance];
+    int returnValue = MA_PIM_ERR_NONE;
+    PimUtils* utils = [PimUtils sharedInstance];
 
-	// Check if the field can contain more then one value.
-	int countFieldValues = [mFieldValuesArray count];
-	if (mIsSingleFieldValue &&
-		1 == countFieldValues)
-	{
-		returnValue = MA_PIM_ERR_FIELD_COUNT_MAX;
-	}
-	else
-	{
-		// Check if field supports attributes.
-		if ([utils fieldSupportsAttribute:mFieldConstant])
-		{
-			// Check if the attribute is allowed.
-			bool attributeAllowed = [self isAttributeValid:attribute];
-			if (!attributeAllowed)
-			{
-				returnValue = MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
-			}
-			else
-			{
-				NSString* label = [self getStringAttribute:attribute];
-				PimFieldItemValue* fieldValue = [[PimFieldItemValue alloc] init];
-				[fieldValue setValue:value];
-				[fieldValue setAttribute:attribute];
-				[fieldValue setLabel:label];
-				[mFieldValuesArray addObject:fieldValue];
-				returnValue = [mFieldValuesArray count] - 1;
-			}
-		}
-		else
-		{
-			// Field does not support attributes, ignore the attribute.
-			PimFieldItemValue* fieldValue = [[PimFieldItemValue alloc] init];
-			[fieldValue setValue:value];
-			[mFieldValuesArray addObject:fieldValue];
-			returnValue = [mFieldValuesArray count] - 1;
-		}
-	}
-	return returnValue;
+    // Check if the field can contain more then one value.
+    int countFieldValues = [mFieldValuesArray count];
+    if (mIsSingleFieldValue &&
+        1 == countFieldValues) 
+    {
+        returnValue = MA_PIM_ERR_FIELD_COUNT_MAX;
+    }
+    else
+    {
+        // Check if field supports attributes.
+        if ([utils fieldSupportsAttribute:mFieldConstant])
+        {
+            // Check if the attribute is allowed.
+            bool attributeAllowed = [self isAttributeValid:attribute];
+            if (!attributeAllowed)
+            {
+                returnValue = MA_PIM_ERR_ATTRIBUTE_COMBO_UNSUPPORTED;
+            }
+            else
+            {
+                NSString* label = [self getStringAttribute:attribute];
+                PimFieldItemValue* fieldValue = [[PimFieldItemValue alloc] init];
+                [fieldValue setValue:value];
+                [fieldValue setAttribute:attribute];
+                [fieldValue setLabel:label];
+                [mFieldValuesArray addObject:fieldValue];
+                returnValue = [mFieldValuesArray count] - 1;
+            }
+        }
+        else
+        {
+            // Field does not support attributes, ignore the attribute.
+            PimFieldItemValue* fieldValue = [[PimFieldItemValue alloc] init];
+            [fieldValue setValue:value];
+            [mFieldValuesArray addObject:fieldValue];
+            returnValue = [mFieldValuesArray count] - 1;
+        }
+    }
+
+    return returnValue;
 }
 
 /**
@@ -273,28 +282,28 @@ using namespace MoSyncError;
  * @param value The value.
  * @param attribute The specified string attribute.
  * @return The new value's index, or one of MA_PIM_ERR constants in
- *		 case of error.
+ *         case of error.
  */
 -(int) addValue:(NSMutableArray*) value
-	  withLabel:(NSString*) label
+      withLabel:(NSString*) label
 {
-	bool isAttributeCustom = false;
-	int attributeId = [self getAttributeFromLabel:label];
-	if (CUSTOM_ATTRIBUTE == attributeId)
-	{
-		// The attribute is custom.
-		// Get the custom attribute value.
-		attributeId = [[PimUtils sharedInstance] getCustomAttributeForFieldID:mFieldConstant];
-		isAttributeCustom = true;
-	}
+    bool isAttributeCustom = false;
+    int attributeId = [self getAttributeFromLabel:label];
+    if (CUSTOM_ATTRIBUTE == attributeId)
+    {
+        // The attribute is custom.
+        // Get the custom attribute value.
+        attributeId = [[PimUtils sharedInstance] getCustomAttributeForFieldID:mFieldConstant];
+        isAttributeCustom = true;
+    }
 
-	int returnValue = [self addValue:value withAttribute:attributeId];
-	if (returnValue >= 0 && isAttributeCustom)
-	{
-		[self setLabel:label atIndex:returnValue];
-	}
+    int returnValue = [self addValue:value withAttribute:attributeId];
+    if (returnValue >= 0 && isAttributeCustom)
+    {
+        [self setLabel:label atIndex:returnValue];
+    }
 
-	return returnValue;
+    return returnValue;
 }
 
 /**
@@ -305,9 +314,11 @@ using namespace MoSyncError;
 -(int) removeValue:(int) index
 {
 	int fieldValuesCount = [mFieldValuesArray count];
-	if (0 > index || index <= fieldValuesCount)
-	{
-		BIG_PHAT_ERROR(ERR_INVALID_PIM_VALUE_INDEX);
+	if (0 > index || index >= fieldValuesCount)
+    {
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_INDEX_INVALID
+                                  withPanicCode:PANIC_INDEX_INVALID
+                                  withPanicText:@PANIC_INDEX_INVALID_TEXT];
 	}
 
 	[mFieldValuesArray removeObjectAtIndex:index];
@@ -324,8 +335,8 @@ using namespace MoSyncError;
 {
 	int fieldValuesCount = [mFieldValuesArray count];
 	if (0 < index || index <= fieldValuesCount)
-	{
-		return [mFieldValuesArray objectAtIndex:index];
+    {
+		return [mFieldValuesArray objectAtIndex:index];;
 	}
 
 	return nil;
@@ -339,25 +350,25 @@ using namespace MoSyncError;
 -(bool) isAttributeValid:(const int) attributeID
 {
 
-	bool returnValue = false;
-	NSString* stringAttribute = [[NSString alloc] initWithFormat:@"%d",attributeID];
-	NSMutableDictionary* allowedAttributes =
-		[[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
+    bool returnValue = false;
+    NSString* stringAttribute = [[NSString alloc] initWithFormat:@"%d",attributeID];
+    NSMutableDictionary* allowedAttributes =
+        [[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
 
-	// Check if the field does not have attributes and if the attribute is preffered.
-	if (0 == [[allowedAttributes allKeys] count] &&
-		MA_PIM_ATTR_PREFERRED == attributeID)
-	{
-		returnValue = true;
-	}
-	else
-	{
-		NSString* value = [allowedAttributes valueForKey:stringAttribute];
-		returnValue = (nil == value) ? false : true;
-	}
+    // Check if the field does not have attributes and if the attribute is preffered.
+    if (0 == [[allowedAttributes allKeys] count] &&
+        MA_PIM_ATTR_PREFERRED == attributeID)
+    {
+        returnValue = true;
+    }
+    else
+    {
+        NSString* value = [allowedAttributes valueForKey:stringAttribute];
+        returnValue = (nil == value) ? false : true;
+    }
 
-	[stringAttribute release];
-	return returnValue;
+    [stringAttribute release];
+    return returnValue;
 }
 
 /**
@@ -366,12 +377,12 @@ using namespace MoSyncError;
  */
 -(NSString*) getStringAttribute:(const int) attributeID
 {
-	NSString* stringAttribute = [[NSString alloc] initWithFormat:@"%d",attributeID];
-	NSMutableDictionary* allowedAttributes =
-		[[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
-	NSString* value = [allowedAttributes valueForKey:stringAttribute];
+    NSString* stringAttribute = [[NSString alloc] initWithFormat:@"%d",attributeID];
+    NSMutableDictionary* allowedAttributes =
+        [[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
+    NSString* value = [allowedAttributes valueForKey:stringAttribute];
 
-	return value;
+    return value;
 }
 
 /**
@@ -381,18 +392,18 @@ using namespace MoSyncError;
  */
 -(int) getAttributeFromLabel:(NSString*) label
 {
-	int attributeId = CUSTOM_ATTRIBUTE;
-	NSMutableDictionary* allowedAttributes =
-		[[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
-	NSArray* attributesArray = [allowedAttributes allKeysForObject:label];
-	// Check if the attribute is a pre-defined one.
-	if ([attributesArray count] > 0)
-	{
-		NSString* stringAttribute = (NSString*) [attributesArray objectAtIndex:0];
-		attributeId = [stringAttribute intValue];
-	}
+    int attributeId = CUSTOM_ATTRIBUTE;
+    NSMutableDictionary* allowedAttributes =
+        [[PimUtils sharedInstance] getAttributesForFieldId:mFieldConstant];
+    NSArray* attributesArray = [allowedAttributes allKeysForObject:label];
+    // Check if the attribute is a pre-defined one.
+    if ([attributesArray count] > 0)
+    {
+        NSString* stringAttribute = (NSString*) [attributesArray objectAtIndex:0];
+        attributeId = [stringAttribute intValue];
+    }
 
-	return attributeId;
+    return attributeId;
 }
 
 /**
