@@ -37,6 +37,7 @@ var josync = function()
 		var self = {};
 		var callbackTable = {};
 		var callbackIdCounter = 0;
+		var messageQueue = [];
 
 		/**
 		 * Utility function that creates a mosync:// url
@@ -68,7 +69,7 @@ var josync = function()
 				// Do not add the messageName parameter.
 				if ("messageName" == key)
 				{
-					break;
+					continue;
 				}
 
 				if (addParamStartSeparator)
@@ -111,12 +112,41 @@ var josync = function()
 			{
 				callbackIdCounter = callbackIdCounter + 1;
 				callbackTable[callbackIdCounter] = callbackFun;
-				message.callbackId = callbackIdCounter;
+				message["callbackId"] = callbackIdCounter;
 			}
 
 			// Create message url and invoke the url.
 			var messageUrl = self.createMessageUrl(message);
-			document.location = messageUrl;
+
+			// Add message to queue.
+			messageQueue.push(messageUrl);
+			if (1 == messageQueue.length)
+			{
+				// No messages waiting, send it.
+				setTimeout(function() {
+					document.location = messageUrl; },
+					1);
+			}
+		};
+
+		/**
+		 * This function is called from C++ to tell the message
+		 * handler that the last message sent has been processed.
+		 */
+		self.processedMessage = function()
+		{
+			// Remove first message.
+			if (messageQueue.length > 0)
+			{
+				messageQueue.shift();
+			}
+
+			// If there are more messages, send the next
+			// message in the queue.
+			if (messageQueue.length > 0)
+			{
+				document.location = messageQueue[0];
+			}
 		};
 
 		/**
@@ -201,7 +231,7 @@ var josync = function()
 	{
 		jo.messagehandler.send(
 			{ "messageName": "josync.file.getLocalPath" },
-			callbackfun);
+			callbackFun);
 	};
 
 	jo.file.read = function(filePath, callbackFun)
@@ -209,16 +239,26 @@ var josync = function()
 		jo.messagehandler.send(
 			{ "messageName": "josync.file.read",
 			  "filePath": filePath },
-			callbackfun);
+			callbackFun);
 	};
 
-	jo.file.read = function(filePath, data, callbackFun)
+	jo.file.write = function(filePath, data, callbackFun)
 	{
 		jo.messagehandler.send(
-			{ "messageName": "josync.file.read",
+			{ "messageName": "josync.file.write",
 			  "filePath": filePath,
 			  "data": data },
-			callbackfun);
+			callbackFun);
+	};
+
+	// Top level functions.
+
+	jo.log = function(message)
+	{
+		jo.messagehandler.send(
+			{ "messageName": "josync.log",
+			  "message": message },
+			null);
 	};
 
 	// Return the library object.
