@@ -58,12 +58,12 @@ void STLMoblet::aux_functions()
 	TRACE(Employee junior(1, "Jimmy"););
 	TRACE(Employee bigBoss(12, "Alex"););
 
-	Employee smallE = std::min(junior, bigBoss, lessExperience);
+	Employee smallE = std::min(junior, bigBoss, lessExperiencePredicate);
 
 	log_to_console(smallE, "Employee smaller = std::min(junior, bigBoss, "
 			"lessExperience);	//smallE = ");
 
-	Employee bigE = std::max(junior, bigBoss, lessExperience);
+	Employee bigE = std::max(junior, bigBoss, lessExperiencePredicate);
 	log_to_console(bigE, "Employee big = std::max(junior, bigBoss, lessExperience);	//bigE = ");
 	log_to_console("\n");
 

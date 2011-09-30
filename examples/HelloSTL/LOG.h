@@ -27,7 +27,9 @@ MA 02110-1301, USA.
 #include <string>
 #include <bitset>
 #include <vector>
+#include <set>
 #include <deque>
+#include <list>
 #include <MAUtil/util.h>
 #include <mavsprintf.h>
 
@@ -62,8 +64,11 @@ void log_to_console(int *array, int arraySize, const std::string &msg);
 void log_to_console(char *array, int arraySize, const std::string &msg);
 void log_to_console(std::string *array, int arraySize, const std::string &msg);
 void log_to_console(const std::vector<int> &v, const std::string &msg);
+void log_to_console(const std::list<int> &l, const std::string &msg);
+void log_to_console(const std::set<int> &s, const std::string &msg);
 void log_to_console(const std::vector<char> &v, const std::string &msg);
 void log_to_console(const std::vector<Employee> &v, const std::string &msg);
+void log_to_console(const std::set<Employee, LessExperienceFunctor> &s, const std::string &msg);
 void log_to_console(Employee *array, int arraySize, const std::string &msg);
 void log_to_console(const std::deque<char> &d, const std::string &msg);
 

@@ -45,9 +45,9 @@ private:
 
 	void STL_bitset();
 //	void STL_deque();
-//	void STL_list();
+	void STL_list();
 //	void STL_map();
-//	void STL_set();
+	void STL_set();
 //	void STL_multiset();
 //	void STL_priority_queue();
 //	void STL_queue();

@@ -50,10 +50,16 @@ private:
 bool operator==(const Employee &lv, const Employee &rv);
 bool operator!=(const Employee &lv, const Employee &rv);
 
-bool lessExperience(const Employee &lv, const Employee &rv);
+bool lessExperiencePredicate(const Employee &lv, const Employee &rv);
 bool equalSalary(const Employee &lv, const Employee &rv);
 
 Employee &increaseSalary(Employee &e, int amount = 100);
+
+class LessExperienceFunctor
+{
+public:
+	bool operator()(const Employee &e1, const Employee &e2) const;
+};
 
 
 #endif /* EMPLOYEE_H_ */
