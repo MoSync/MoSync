@@ -23,6 +23,7 @@
 #include "packagers.h"
 #include "util.h"
 #include "tools.h"
+#include "helpers/mkdir.h"
 
 #if defined (__MACH__) || defined(__APPLE__)
 #define PLATFORM_OSX
@@ -46,18 +47,18 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 	string templateLocation = string(ri.path) + "/template";
 	string xcodeprojOutput = dst + "/xcode-proj";
 
-	generateCmd << mosyncdir() << "/bin/iphone-builder generate -project-name \"" <<
-		s.name << "\" -version \"" << s.version << "\" -company-name \"" <<
-		s.vendor << "\" -cert \"" << s.iOSCert << "\" -input \"" << templateLocation <<
-		"\" -output \"" << xcodeprojOutput << "\"";
+	generateCmd << getBinary("iphone-builder") << " generate -project-name " <<
+		arg(s.name) << " -version " << s.version << " -company-name " <<
+		arg(s.vendor) << " -cert " << arg(s.iOSCert) << " -input " << file(templateLocation) <<
+		" -output " << file(xcodeprojOutput);
 
 	sh(generateCmd.str().c_str(), s.silent);
 
 	// Copy program files to xcode template
-	copyFile((xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), (src + "/rebuild.build.cpp").c_str());
-	copyFile((xcodeprojOutput + "/data_section.bin").c_str(), (src + "/data_section.bin").c_str());
+	copyFile(file(xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), file(src + "/rebuild.build.cpp").c_str());
+	copyFile(file(xcodeprojOutput + "/data_section.bin").c_str(), file(src + "/data_section.bin").c_str());
 
-	string resourceFileCopy = xcodeprojOutput + "/resources";
+	string resourceFileCopy = file(xcodeprojOutput + "/resources");
 	if(s.resource) {
 		copyFile(resourceFileCopy.c_str(), s.resource);
 	} else {
@@ -82,9 +83,9 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 #ifdef PLATFORM_OSX
 		testIOSSdk(s);
 		chdir(xcodeprojOutput.c_str());
-		buildCmd << "xcodebuild -project \"" << s.name << ".xcodeproj\"";
+		buildCmd << "xcodebuild -project " << arg(string(s.name) + ".xcodeproj");
 		if (s.iOSSdk) {
-			buildCmd << " -sdk \"" << s.iOSSdk << "\"";
+			buildCmd << " -sdk " << arg(s.iOSSdk);
 		}
 		sh(buildCmd.str().c_str(), s.silent);
 #else
