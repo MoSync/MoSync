@@ -590,7 +590,7 @@ namespace Base
 	* \brief Disables a sensor so that it doesn’t send any further events
 	* \param sensor    The sensor which should be disabled
 	* \return        0 on success
-	*            	-1 if this sensor wasn’t enabled
+	*               -1 if this sensor wasn’t enabled
 	*            	-2 if there was a problem disabling the sensor
 	*/
 	int _maSensorStop(int sensor, JNIEnv* jNIEnv, jobject jThis);
@@ -839,4 +839,8 @@ namespace Base
 	int _maNFCSetReadOnly(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNFCIsReadOnly(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maSyscallPanicsDisable(JNIEnv* jNIEnv, jobject jThis);
 }
