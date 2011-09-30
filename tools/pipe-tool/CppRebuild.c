@@ -799,7 +799,7 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 
 	RebuildEmit(");");
 
-	if (rettype == RET_double && emit_r15)
+	if (rettype == RET_double && emit_r15 && (ThisFunctionRegs & REGBIT(REG_r15)))
 	{
 		RebuildEmit("\n	r15 = __dbl_high;");
 		SetRegInit(REG_r15);
