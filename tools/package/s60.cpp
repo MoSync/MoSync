@@ -98,7 +98,7 @@ void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 	sh(cmd.str().c_str(), s.silent);
 
 	// call icon-injector
-	if(s.icon) {
+	if(s.icon && &ri.iconSize != 0) {
 		cmd.str("");
 		injectIcon("symbian9", ri.iconSize.c_str(), s.icon, (dstPath + "/" + uid + "_icon.mif").c_str(), s.silent);
 	}
