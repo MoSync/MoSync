@@ -50,14 +50,18 @@ then
 	exit 1
 fi
 
+diffResult=0
+
+if ! ruby $(git rev-parse --show-toplevel)/githooks/checkUtf8.rb
+then
+	diffResult=1
+fi
+
 # Check whitespace conventions.
 if ! git diff-index --check --cached $against --
 then
 	#echo "dr 1"
 	diffResult=1
-else
-	#echo "dr 0"
-	diffResult=0
 fi
 
 # Remove the temporary attributes file no matter the result.
