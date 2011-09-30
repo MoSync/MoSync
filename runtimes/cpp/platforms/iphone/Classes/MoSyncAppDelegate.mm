@@ -24,6 +24,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 void getScreenResolution(int &w, int &h);
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
 void MoSync_AddCloseEvent();
+void MoSync_AddFocusLostEvent();
+void MoSync_AddFocusGainedEvent();
 void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 
 @implementation MoSyncAppDelegate
@@ -46,6 +48,17 @@ void MoSync_Main(int width, int height, MoSyncView* mosyncView);
     
     return YES;
 }
+
+- (void)applicationDidEnterBackground:(UIApplication *)application {
+	MoSync_AddFocusLostEvent();
+    return;
+}
+
+- (void)applicationWillEnterForeground:(UIApplication *)application {
+	MoSync_AddFocusGainedEvent();
+    return;
+}
+
 
 /*
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    

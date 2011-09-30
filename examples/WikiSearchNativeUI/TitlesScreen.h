@@ -52,7 +52,8 @@ class HomeScreen;
  * For each selected title, the corresponding article will be displayed.
  */
 class TitleScreen : public BasicScreen,
-			        public MAUtil::CustomEventListener
+			        public CustomEventListener,
+			        public KeyListener
 {
 public:
 	/**
@@ -72,6 +73,13 @@ public:
 	 *  The list box need refresh when this is called from the home screen.
 	 */
 	void showScreen(bool needsRefresh);
+
+	/**
+	 * From KeyListener.
+	 * This function is called with a \link #MAK_FIRST MAK_ code \endlink when
+	 * a key is pressed.
+	 */
+	virtual void keyPressEvent(int keyCode, int nativeCode);
 
 	/**
 	 * from CustomEventListener

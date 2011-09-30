@@ -199,6 +199,31 @@ void MoSync_ShowMessageBox(const char *title, const char *msg, bool kill) {
 					  shouldKill:kill];
 }
 
+void MoSync_ShowAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3)
+{
+	NSString* nsTitle = nil;
+	if(title != nil)
+		nsTitle = [[NSString alloc] initWithBytes:title length:strlen(title) encoding:NSUTF8StringEncoding];
+
+	NSString* nsButton1 = nil;
+	if(button1 != nil)
+		nsButton1 = [[NSString alloc] initWithBytes:button1 length:strlen(button1) encoding:NSUTF8StringEncoding];
+
+	NSString* nsButton2 = nil;
+	if(button2 != nil)
+		nsButton2 = [[NSString alloc] initWithBytes:button2 length:strlen(button2) encoding:NSUTF8StringEncoding];
+
+	NSString* nsButton3 = nil;
+	if(button3 != nil)
+		nsButton3 = [[NSString alloc] initWithBytes:button3 length:strlen(button3) encoding:NSUTF8StringEncoding];
+
+	[sMoSyncView showAlert:[[NSString alloc] initWithBytes:message length:strlen(message) encoding:NSUTF8StringEncoding]
+				 withTitle:nsTitle
+			  button1Title:nsButton1
+			  button2Title:nsButton2
+			  button3Title:nsButton3];
+}
+
 void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints) {
 	[sMoSyncView
 	 showTextBox:[[NSString alloc] initWithCharacters:(const unichar*)title length:wcharLength(title)]
@@ -274,6 +299,21 @@ void MoSync_AddScreenChangedEvent() {
 void MoSync_AddCloseEvent() {
 	Base::gEventQueue.addCloseEvent();
 }
+
+void MoSync_AddFocusLostEvent() {
+	MAEvent event;
+    event.type = EVENT_TYPE_FOCUS_LOST;
+    Base::gEventQueue.put(event);
+    return;
+}
+
+void MoSync_AddFocusGainedEvent() {
+	MAEvent event;
+    event.type = EVENT_TYPE_FOCUS_GAINED;
+    Base::gEventQueue.put(event);
+    return;
+}
+
 
 void MoSync_AddEvent(const MAEvent &e) {
 	Base::gEventQueue.put(e);

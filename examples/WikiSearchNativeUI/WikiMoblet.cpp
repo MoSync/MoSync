@@ -72,10 +72,10 @@ void WikiMoblet::closeEvent()
 void WikiMoblet::keyPressEvent(int keyCode, int nativeCode)
 {
     // Close the application if the back key is pressed.
-    if(MAK_BACK == keyCode)
-    {
-        closeEvent();
-    }
+//    if(MAK_BACK == keyCode)
+//    {
+//        closeEvent();
+//    }
 }
 
 } // namespace WikiNativeUI

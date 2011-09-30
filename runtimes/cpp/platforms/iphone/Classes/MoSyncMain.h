@@ -30,6 +30,9 @@ void MoSync_UpdateView(CGImageRef ref);
 void MoSync_DoneUpdatingView();
 
 void MoSync_ShowMessageBox(const char *title, const char *msg, bool kill);
+
+//Shows an alert box with up to three buttons
+void MoSync_ShowAlert(const char* title, const char* message, const char* button1, const char* button2, const char* button3);
 void MoSync_ShowTextBox(const wchar* title, const wchar* inText, wchar* outText, int maxSize, int constraints);
 
 void MoSync_Exit();
@@ -60,6 +63,8 @@ void MoSync_AddTouchMovedEvent(int x, int y, int touchId);
 void MoSync_AddTouchReleasedEvent(int x, int y, int touchId);
 void MoSync_AddScreenChangedEvent();
 void MoSync_AddCloseEvent();
+void MoSync_AddFocusLostEvent();
+void MoSync_AddFocusGainedEvent();
 void MoSync_ShowImagePicker();
 void* MoSync_GetCustomEventData();
 void* MoSync_GetCustomEventDataMoSyncPointer();

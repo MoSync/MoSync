@@ -1647,6 +1647,14 @@ return 0; \
 			SYSLOG("maIOCtl_maWidgetRemoveChild");
 			return _maWidgetRemoveChild(a, mJNIEnv, mJThis);
 
+		case maIOCtl_maWidgetModalDialogShow:
+			SYSLOG("maIOCtl_maWidgetModalDialogShow");
+			return _maWidgetModalDialogShow(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maWidgetModalDialogHide:
+			SYSLOG("maIOCtl_maWidgetModalDialogHide");
+			return _maWidgetModalDialogHide(a, mJNIEnv, mJThis);
+
 		case maIOCtl_maWidgetSetProperty:
 			SYSLOG("maIOCtl_maWidgetSetProperty");
 			return _maWidgetSetProperty(a, SYSCALL_THIS->GetValidatedStr(b), SYSCALL_THIS->GetValidatedStr(c), mJNIEnv, mJThis);
@@ -1752,11 +1760,42 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
+		case maIOCtl_maAlert:
+			SYSLOG("maIOCtl_maAlert");
+			return _maAlert(
+				SYSCALL_THIS->GetValidatedStr(a),
+				SYSCALL_THIS->GetValidatedStr(b),
+				SYSCALL_THIS->GetValidatedStr(c),
+				SYSCALL_THIS->GetValidatedStr(
+					SYSCALL_THIS->GetValidatedStackValue(0)),
+				SYSCALL_THIS->GetValidatedStr(
+					SYSCALL_THIS->GetValidatedStackValue(4)),
+				mJNIEnv,
+				mJThis);
+
 		case maIOCtl_maImagePickerOpen:
 			SYSLOG("maIOCtl_maImagePickerOpen");
 			return _maImagePickerOpen(
 				mJNIEnv,
 				mJThis);
+
+		case maIOCtl_maOptionsBox:
+			{
+			SYSLOG("maIOCtl_maOptionsBox");
+			const wchar* _title = GVWS(a);
+			const wchar* _text = GVWS(b);
+			const wchar* _cancel = GVWS(c);
+
+			// Read the fourth and fifth parameter from the register.
+			return _maOptionsBox(
+				_title,
+				_text,
+				_cancel,
+				SYSCALL_THIS->GetValidatedStackValue(0),
+				SYSCALL_THIS->GetValidatedStackValue(4),
+				mJNIEnv,
+				mJThis);
+			}
 
 		case maIOCtl_maFileOpen:
 			SYSLOG("maIOCtl_maFileOpen");

@@ -472,6 +472,33 @@ namespace Base
 		return ret;
 	}
 
+	int _maAlert(const char* title, const char* message, const char* button1,
+					const char* button2, const char* button3, JNIEnv* jNIEnv, jobject jThis)
+	{
+		Base::gSyscall->VM_Yield();
+
+		jstring jstrTitle = jNIEnv->NewStringUTF(title);
+		jstring jstrText = jNIEnv->NewStringUTF(message);
+		jstring jstrBtn1 = jNIEnv->NewStringUTF(button1);
+		jstring jstrBtn2 = jNIEnv->NewStringUTF(button2);
+		jstring jstrBtn3 = jNIEnv->NewStringUTF(button3);
+
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maAlert", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTitle, jstrText, jstrBtn1, jstrBtn2, jstrBtn3);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrTitle);
+		jNIEnv->DeleteLocalRef(jstrText);
+		jNIEnv->DeleteLocalRef(jstrBtn1);
+		jNIEnv->DeleteLocalRef(jstrBtn2);
+		jNIEnv->DeleteLocalRef(jstrBtn3);
+
+		return ret;
+	}
+
 	int _maImagePickerOpen(JNIEnv* jNIEnv, jobject jThis)
 	{
 		Base::gSyscall->VM_Yield();
@@ -483,6 +510,29 @@ namespace Base
 		jint ret = jNIEnv->CallIntMethod(jThis, methodID);
 
 		jNIEnv->DeleteLocalRef(cls);
+
+		return ret;
+	}
+
+	int _maOptionsBox(const wchar* title, const wchar* destructiveText, const wchar* cancelText, int bufPointer, int bufSize,
+						JNIEnv* jNIEnv, jobject jThis)
+	{
+		Base::gSyscall->VM_Yield();
+
+		jstring jstrTitle = jNIEnv->NewString((jchar*)title, wideCharStringLength(title));
+		jstring jstrText = jNIEnv->NewString((jchar*)destructiveText, wideCharStringLength(destructiveText));
+		jstring jstrCancelText = jNIEnv->NewString((jchar*)cancelText, wideCharStringLength(cancelText));
+
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maOptionsBox", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;II)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, jstrTitle, jstrText, jstrCancelText, bufPointer, bufSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrTitle);
+		jNIEnv->DeleteLocalRef(jstrText);
+		jNIEnv->DeleteLocalRef(jstrCancelText);
 
 		return ret;
 	}
@@ -786,6 +836,43 @@ namespace Base
 
 		// Call the java method
 		int result = jNIEnv->CallIntMethod(jThis, methodID, child);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+	int _maWidgetModalDialogShow(int dialog, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetModalDialogShow", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, dialog);
+
+		// Delete allocated memory
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maWidgetModalDialogHide(int dialog, JNIEnv* jNIEnv, jobject jThis)
+	{
+		// Get the Java method
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maWidgetModalDialogHide", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		// Call the java method
+		int result = jNIEnv->CallIntMethod(jThis, methodID, dialog);
 
 		// Delete allocated memory
 		jNIEnv->DeleteLocalRef(cls);

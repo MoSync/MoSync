@@ -228,7 +228,13 @@ namespace Base
 	int _maMessageBox(const char* title, const char* text,
 						JNIEnv* jNIEnv, jobject jThis);
 
+	int _maAlert(const char* title, const char* message, const char* button1,
+					const char* button2, const char* button3, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maImagePickerOpen(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maOptionsBox(const wchar* title, const wchar* destructiveText, const wchar* cancelText, int bufPointer, int bufSize,
+						JNIEnv* jNIEnv, jobject jThis);
 
 	// Widget API
 	int _maWidgetCreate(const char *widgetType,
@@ -240,6 +246,10 @@ namespace Base
 							JNIEnv* jNIEnv, jobject jThis);
 	int _maWidgetRemoveChild(int child,
 							JNIEnv* jNIEnv, jobject jThis);
+	int _maWidgetModalDialogShow(int dialog, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maWidgetModalDialogHide(int dialog, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maWidgetSetProperty(int widget, const char *property,
 							const char* value,
 							JNIEnv* jNIEnv, jobject jThis);
