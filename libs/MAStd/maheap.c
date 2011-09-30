@@ -219,10 +219,12 @@ void * malloc(int size)
 		result = gMallocHook(size);
 	}
 #ifdef MOSYNCDEBUG
-	gNumMallocs++;
-	gUsedMem += gBlockSizeHook(result);
-	gWastedMem += gBlockSizeHook(result) - size;
-	dumpStack(size, gBlockSizeHook(result), result);
+	if(result != NULL) {
+		gNumMallocs++;
+		gUsedMem += gBlockSizeHook(result);
+		gWastedMem += gBlockSizeHook(result) - size;
+		dumpStack(size, gBlockSizeHook(result), result);
+	}
 #endif
 
 #ifdef MEMORY_PROTECTION
@@ -297,9 +299,11 @@ void* realloc(void* old, int size) {
 
 #ifdef MOSYNCDEBUG
 	// we'll count it as a free + malloc
-	gNumFrees++;
-	gUsedMem -= gBlockSizeHook(old);
-	dumpStack(-1, gBlockSizeHook(old), old);
+	if (old != NULL) {
+		gNumFrees++;
+		gUsedMem -= gBlockSizeHook(old);
+		dumpStack(-1, gBlockSizeHook(old), old);
+	}
 #endif
 
 	result = gReallocHook(old, size);
@@ -312,10 +316,12 @@ void* realloc(void* old, int size) {
 	}
 
 #ifdef MOSYNCDEBUG
-	gNumMallocs++;
-	gUsedMem += gBlockSizeHook(result);
-	gWastedMem += gBlockSizeHook(result) - size;
-	dumpStack(size, gBlockSizeHook(result), result);
+	if(result != NULL) {
+		gNumMallocs++;
+		gUsedMem += gBlockSizeHook(result);
+		gWastedMem += gBlockSizeHook(result) - size;
+		dumpStack(size, gBlockSizeHook(result), result);
+	}
 #endif
 
 	return result;
