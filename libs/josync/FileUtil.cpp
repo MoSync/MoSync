@@ -43,16 +43,6 @@ MA 02110-1301, USA.
 namespace josync
 {
 	/**
-	 * Create a FileUtil instance.
-	 * The caller has the responsibility of deallocating the
-	 * returned instance.
-	 */
-	FileUtil* FileUtil::create()
-	{
-		return new FileUtil();
-	}
-
-	/**
 	 * Constructor.
 	 */
 	FileUtil::FileUtil()
@@ -73,7 +63,7 @@ namespace josync
 	 */
 	MAUtil::String FileUtil::getLocalPath()
 	{
-		int bufferSize = 512;
+		int bufferSize = 1024;
 		char buffer[bufferSize];
 
 		int size = maGetSystemProperty(

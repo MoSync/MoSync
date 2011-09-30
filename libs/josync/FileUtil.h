@@ -33,18 +33,13 @@ namespace josync
 {
 /**
  * Class that contains utility methods.
+ * TODO: Add copy constructor and assignment operator.
  */
 class FileUtil
 {
 	public:
 		/**
-		 * Factory method to create an instance of the FileUtil class.
-		 */
-		static FileUtil* create();
-
-	private:
-		/**
-		 * Private constructor.
+		 * Constructor.
 		 */
 		FileUtil();
 
