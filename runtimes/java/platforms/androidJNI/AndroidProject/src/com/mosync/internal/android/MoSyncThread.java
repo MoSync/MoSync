@@ -3887,6 +3887,21 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * Panics
+	 */
+	int maSyscallPanicsEnable()
+	{
+		SingletonObject.getSingletonObject().setFlag(true);
+		return 0;
+	}
+
+	int maSyscallPanicsDisable()
+	{
+		SingletonObject.getSingletonObject().setFlag(false);
+		return 0;
+	}
+
+	/**
 	 * PIM related methods
 	 */
 	int maPimListOpen(int listType)
