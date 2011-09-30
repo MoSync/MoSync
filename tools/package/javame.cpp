@@ -123,8 +123,7 @@ void packageJavaME(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	// Inject icon
 	std::ostringstream iconInjectCmd;
-	string outputIcon = dstPath + "/icon.png";
-	if (&ri.iconSize != 0) {
+	if (s.icon && &ri.iconSize != 0) {
 		// For java me, the -dst is the JAR!
 		injectIcon("j2me", ri.iconSize.c_str(), s.icon, appJarName.c_str(), s.silent);
 	}
