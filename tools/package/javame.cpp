@@ -110,11 +110,6 @@ void packageJavaME(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	sh(cmd.str().c_str());
 
-
-	// write JAD
-	string appJad = string(s.name) + ".jad";
-	writeManifest(s, ri, appJad.c_str(), true, appJarName);
-
 	// pack manifest
 	cmd.str("");
 	cmd << "zip -9 -r \""<<appJarName<<"\" META-INF";
@@ -123,12 +118,16 @@ void packageJavaME(const SETTINGS& s, const RuntimeInfo& ri) {
 	// Inject icon
 	std::ostringstream iconInjectCmd;
 	string outputIcon = dstPath + "/icon.png";
-	if (&ri.iconSize != 0) {
+	if (ri.iconSize.size() != 0 && s.icon) {
 		// For java me, the -dst is the JAR!
 		iconInjectCmd << "\"" << mosyncdir() << "/bin/icon-injector\" -platform j2me -src \"" <<
 			s.icon << "\" -size " << ri.iconSize << " -dst \"" << appJarName.c_str() << "\"";
 		sh(iconInjectCmd.str().c_str());
 	}
+
+	// write JAD
+	string appJad = string(s.name) + ".jad";
+	writeManifest(s, ri, appJad.c_str(), true, appJarName);
 
 	// Sign
 	if (s.javameKeystore) {
@@ -158,23 +157,23 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, const char* jar, cons
 
 static void createJadToolCommand(ostringstream& jadToolCmd, const SETTINGS& s, const RuntimeInfo& ri, const char* jad, bool hidden) {
 	jadToolCmd << "java -jar " << mosyncdir() << "/bin/javame/JadTool.jar -addcert -alias \"" <<
-			s.javameAlias << "\" -keystore \"" << s.javameKeystore <<
-			"\" -inputjad \"" << jad << "\" -outputjad \"" << jad <<
-			"\" -storepass \"" << (hidden ? "*** HIDDEN ***" : s.javameStorePass) << "\"";
+		s.javameAlias << "\" -keystore \"" << s.javameKeystore <<
+		"\" -inputjad \"" << jad << "\" -outputjad \"" << jad <<
+		"\" -storepass \"" << (hidden ? "*** HIDDEN ***" : s.javameStorePass) << "\"";
 }
 
 static void createJarSignCommand(ostringstream& jarSignCmd, const SETTINGS& s, const RuntimeInfo& ri, const char* jar, const char* jad, bool hidden) {
 	jarSignCmd << "java -jar " << mosyncdir() << "/bin/javame/JadTool.jar -addjarsig -jarfile \"" <<
-			jar << "\" -keystore " << s.javameKeystore << " -storepass \"" <<
-			(hidden ? "*** HIDDEN ***" : s.javameStorePass) << "\" -alias \"" << s.javameAlias <<
-			"\" -keypass \"" << (hidden ? "*** HIDDEN ***" : s.javameKeyPass) << "\" -inputjad \"" <<
-			jad << "\" -outputjad \"" << jad << "\"";
+		jar << "\" -keystore " << s.javameKeystore << " -storepass \"" <<
+		(hidden ? "*** HIDDEN ***" : s.javameStorePass) << "\" -alias \"" << s.javameAlias <<
+		"\" -keypass \"" << (hidden ? "*** HIDDEN ***" : s.javameKeyPass) << "\" -inputjad \"" <<
+		jad << "\" -outputjad \"" << jad << "\"";
 }
 
 static void writeManifest(const SETTINGS& s, const RuntimeInfo& ri,
 	const char* filename, bool isJad, const string& jarFileName)
 {
-	ofstream stream(filename);
+	ofstream stream(filename, ios::binary);
 	setName(stream, filename);
 	if(!isJad) {
 		stream << "Manifest-Version: 1.0\n";
@@ -188,8 +187,11 @@ static void writeManifest(const SETTINGS& s, const RuntimeInfo& ri,
 	stream << "MicroEdition-Profile: MIDP-2.0\n";
 	stream << "MicroEdition-Configuration: CLDC-1."<<(ri.isCldc10 ? "0" : "1")<<"\n";
 	if(isJad) {
-		stream << "MIDlet-Jar-URL: "<<jarFileName<<"\n";
+		// This line order is crucial for installation on Blackberry 8320
+		// (and probably related models).
+		// If it is changed, you will get error 904 (Incorrect JAR file size).
 		stream << "MIDlet-Jar-Size: "<<getFileSize(jarFileName.c_str())<<"\n";
+		stream << "MIDlet-Jar-URL: "<<jarFileName<<"\n";
 	}
 	beGood(stream);
 	stream.flush();

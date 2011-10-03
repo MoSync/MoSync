@@ -255,5 +255,4 @@ void write72line(std::ostream& output, const std::string& input) {
 	}
 	// Newline + first char of next must be space
 	output << delim(splitLines, string("\n "));
-
 }
