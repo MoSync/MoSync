@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <sstream>
 #include "packagers.h"
 #include "util.h"
+#include "tools.h"
 #include "helpers/types.h"
 
 using namespace std;
@@ -97,11 +98,9 @@ void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 	sh(cmd.str().c_str(), s.silent);
 
 	// call icon-injector
-	if(s.icon) {
+	if(s.icon && &ri.iconSize != 0) {
 		cmd.str("");
-		cmd << mosyncdir()<<"/bin/icon-injector -src \""<<s.icon<<"\" -size "<<ri.iconSize<<
-			" -platform symbian9 -dst \""<<dstPath<<"/"<<uid<<"_icon.mif\"";
-		sh(cmd.str().c_str(), s.silent);
+		injectIcon("symbian9", ri.iconSize.c_str(), s.icon, (dstPath + "/" + uid + "_icon.mif").c_str(), s.silent);
 	}
 
 	// use template .pkg

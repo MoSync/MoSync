@@ -75,16 +75,9 @@ public:
 		}
 	}
 
-	void pointerPressEvent(MAPoint2d p) {
-		printf("X=%d,Y=%d", p.x, p.y);
-	}
-
 	void customEvent(const MAEvent& event) {
 		if (EVENT_TYPE_NFC_TAG_RECEIVED == event.type) {
 			MANFCEventData nfcEventData = event.nfc;
-			printf("EVENT STATE: %d", event.state);
-			printf("RECV : %X,%X,%X,%X", event.type, nfcEventData.handle,
-					nfcEventData.result, nfcEventData.dstId);
 			MAHandle tag = maNFCReadTag(nfcEventData.handle);
 			if (tag) {
 				if (maNFCIsType(tag, MA_NFC_TAG_TYPE_NDEF)) {
@@ -95,31 +88,77 @@ public:
 					MAHandle mfc = maNFCGetTypedTag(tag,
 							MA_NFC_TAG_TYPE_MIFARE_CL);
 					printf("Found RFID (MiFare Classic) tag");
-					maNFCConnectTag(mfc);
-					maNFCReadBlocks(mfc, 0, payload, BUF_SIZE);
-					maNFCCloseTag(mfc);
+					handleMifareClassic(mfc);
 				} else if (maNFCIsType(tag, MA_NFC_TAG_TYPE_MIFARE_UL)) {
 					MAHandle mfu = maNFCGetTypedTag(tag,
 							MA_NFC_TAG_TYPE_MIFARE_UL);
 					printf("Found RFID (MiFare Ultralight) tag");
-					maNFCConnectTag(mfu);
-					maNFCReadPages(mfu, 0, payload, BUF_SIZE);
-					maNFCCloseTag(mfu);
+					handleMifareUltralight(mfu);
 				}
 				maNFCDestroyTag(tag);
 			}
 		} else if (EVENT_TYPE_NFC_TAG_DATA_READ == event.type) {
 			MANFCEventData& data = (MANFCEventData&) event.nfc;
-			printf("%d,0x%X,0x%X,0x%X", event.type, data.handle, data.result,
-					data.dstId);
 			int tag = data.handle;
-			if (data.result > 0) {
-				dumpPayload(data.result);
+			if (data.result < 0) {
+				printf("Failed to read tag (try again.) Error code: %d", data.result);
 			} else {
-				printf("Failed to read tag (try again.)");
+				if (maNFCIsType(tag, MA_NFC_TAG_TYPE_NDEF)) {
+					handleNDEF(tag);
+				} else {
+					if (data.result > 0) {
+						dumpPayload(data.result);
+						dumpPayloadAsText(data.result);
+					} else {
+
+					}
+				}
 			}
 			maNFCDestroyTag(tag);
 		}
+	}
+
+	void handleNDEF(MAHandle msg) {
+		MAHandle ndef = maNFCGetNDEFMessage(msg);
+		if (ndef == 0) {
+			maNFCConnectTag(msg);
+			maNFCReadNDEFMessage(msg);
+			maNFCCloseTag(msg);
+		} else {
+			int records = maNFCGetNDEFRecordCount(ndef);
+			printf("Record count: %i", records);
+			for (int i = 0; i < records; i++) {
+				MAHandle record = maNFCGetNDEFRecord(ndef, i);
+				int len = maNFCGetPayload(record, payload, BUF_SIZE);
+				//dumpPayload(len);
+				dumpPayloadAsText(len);
+			}
+		}
+	}
+
+	void handleMifareClassic(MAHandle mfc) {
+		int size = 0;
+		int sectors = maNFCGetSectorCount(mfc);
+		for (int i = 0; i < sectors; i++) {
+			int blocks = maNFCGetBlockCountInSector(mfc, i);
+			// Every block is 4 bytes
+			size = size + 4 * blocks;
+		}
+		printf("Size: %d bytes", size);
+	}
+
+	void handleMifareUltralight(MAHandle mfu) {
+		maNFCConnectTag(mfu);
+		maNFCReadPages(mfu, 0, payload, BUF_SIZE);
+		maNFCCloseTag(mfu);
+	}
+
+	void toHex(byte* data, int len, char* output) {
+		for (int i = 0; i < len; i++) {
+			output[2 * i] = HEX_CHARS[(data[i] >> 4) & 0xf];
+			output[2 * i + 1] = HEX_CHARS[data[i] & 0xf];
+		}
+		output[2 * len] = '\0';
 	}
 
 	void dumpPayload(int len) {
@@ -129,29 +168,6 @@ public:
 
 	void dumpPayloadAsText(int len) {
 		printf("Read tag, payload as text: %s", payload);
-	}
-
-	void handleNDEF(MAHandle msg) {
-		MAHandle ndef = maNFCGetNDEFMessage(msg);
-		printf("Tag handle %i, msg handle %i", msg, ndef);
-		int records = maNFCGetNDEFRecordCount(ndef);
-		printf("Record count: %i", records);
-		for (int i = 0; i < records; i++) {
-			MAHandle record = maNFCGetNDEFRecord(ndef, i);
-			int len = maNFCGetPayload(record, payload, BUF_SIZE);
-			if (len >= 0) {
-				dumpPayloadAsText(len);
-				dumpPayloadAsText(len);
-			}
-		}
-	}
-
-	void toHex(byte* data, int len, char* output) {
-		for (int i = 0; i < len; i++) {
-			output[2 * i] = HEX_CHARS[(data[i] >> 4) & 0xf];
-			output[2 * i + 1] = HEX_CHARS[data[i] & 0xf];
-		}
-		output[2 * len] = '\0';
 	}
 
 	void closeEvent() {
