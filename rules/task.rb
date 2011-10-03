@@ -71,15 +71,20 @@ class Work < TaskBase
 
 		# If you invoke a work without setting up any targets,
 		# we will check for the "clean" goal here.
+		# Let's also check for "run".
+		doRun = false
 		if(Targets.size == 0)
 			Targets.setup
 			if(Targets.goals.include?(:clean))
 				self.execute_clean
 				return
 			end
+			doRun = true if(Targets.goals.include?(:run))
 		end
 
 		@prerequisites.each do |p| p.invoke end
+
+		sh @TARGET if(doRun)
 	end
 
 	def invoke_clean

@@ -69,10 +69,36 @@ void log_to_console(std::string *array, int arraySize, const std::string &msg)
 void log_to_console(const std::vector<int> &v, const std::string &msg)
 {
 	std::string final_msg = msg;
-	for(int i=0; i<v.size(); ++i)
+	for(int i=0; i < v.size(); ++i)
 	{
 		char buf[10];
 		itoa( v[i], buf, 10);
+		std::string str(buf);
+		final_msg += str + " ";
+	}
+	LOG(final_msg.c_str());
+}
+
+void log_to_console(const std::list<int> &l, const std::string &msg)
+{
+	std::string final_msg = msg;
+
+	for(std::list<int>::const_iterator it = l.begin(); it!=l.end(); ++it)
+	{
+		char buf[10];
+		itoa( *it, buf, 10);
+		std::string str(buf);
+		final_msg += str + " ";
+	}
+	LOG(final_msg.c_str());
+}
+void log_to_console(const std::set<int> &s, const std::string &msg)
+{
+	std::string final_msg = msg;
+	for(std::set<int>::const_iterator it = s.begin(); it!=s.end(); ++it)
+	{
+		char buf[10];
+		itoa( *it, buf, 10);
 		std::string str(buf);
 		final_msg += str + " ";
 	}
@@ -98,6 +124,22 @@ void log_to_console(const std::vector<Employee> &v, const std::string &msg)
 		final_msg += v[i].getName();
 		final_msg += "( exp: ";
 		final_msg += toString(v[i].getExperience());
+		//final_msg += ", salary: ";
+		//final_msg += toString(v[i].getSalary());
+		final_msg += ") ";
+		final_msg += " ";
+	}
+	LOG(final_msg.c_str());
+}
+
+void log_to_console(const std::set<Employee, LessExperienceFunctor> &s, const std::string &msg)
+{
+	std::string final_msg = msg;
+	for(std::set<Employee>::const_iterator it = s.begin(); it!=s.end(); ++it)
+	{
+		final_msg += it->getName();
+		final_msg += "( exp: ";
+		final_msg += toString(it->getExperience());
 		//final_msg += ", salary: ";
 		//final_msg += toString(v[i].getSalary());
 		final_msg += ") ";
@@ -161,6 +203,18 @@ void log_to_console(float i, const std::string &msg)
 	else
 	{
 		LOG("%f ", i);
+	}
+}
+
+void log_to_console(unsigned long u, const std::string &msg )
+{
+	if(msg.size()>0)
+	{
+		LOG("%s %l ", msg.c_str(), u);
+	}
+	else
+	{
+		LOG("%l ", u);
 	}
 }
 

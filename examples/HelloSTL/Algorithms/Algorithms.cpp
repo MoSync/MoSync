@@ -1217,7 +1217,7 @@ void sorting_algorithms()
 	log_to_console(myStaff, "\n    myStaff contains: ");
 
 	//sort by experience
-	std::sort(myStaff.begin(), myStaff.end(), lessExperience);
+	std::sort(myStaff.begin(), myStaff.end(), lessExperiencePredicate);
 	log_to_console(myStaff, "myStaff after sort(myStaff.begin(), myStaff.end(),"
 			" lessExperience): ");
 
@@ -1235,7 +1235,7 @@ void sorting_algorithms()
 	* 			BinaryPredicate somePredicate);
 	*/
 	std::stable_sort(myOrderedStaff.begin(), myOrderedStaff.end(),
-			lessExperience); //Compare by experience.
+			lessExperiencePredicate); //Compare by experience.
 
 	log_to_console(myOrderedStaff, "myOrderedStaff after calling "
 			"stable_sort(myOrderedStaff.begin(), myOrderedStaff.end(),"
@@ -1276,7 +1276,7 @@ void sorting_algorithms()
 				" them into ascending order.");
 
 	std::partial_sort( devStaff.begin(), middle, devStaff.end(),
-			lessExperience); //middle = Castor
+			lessExperiencePredicate); //middle = Castor
 
 
 	log_to_console(devStaff, "devStaff after partial_sort( devStaff.begin(), "

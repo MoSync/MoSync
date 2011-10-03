@@ -31,6 +31,10 @@ class RuntimeBuilder
 		return javameBuilder(runtime_dir, mode, false, ["#{BB_API_ROOT}/bb40/net_rim_api.jar"])
 	end
 
+	def bb42(runtime_dir, mode)
+		return javameBuilder(runtime_dir, mode, false, ["#{BB_API_ROOT}/bb42/net_rim_api.jar"])
+	end
+
 	def bb47(runtime_dir, mode)
 		return javameBuilder(runtime_dir, mode, false, ["#{BB_API_ROOT}/bb47/net_rim_api.jar"])
 	end

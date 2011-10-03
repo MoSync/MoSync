@@ -89,7 +89,7 @@ void STLMoblet::predicates_explained()
 	LOG("*/");
 	LOG("\n");
 
-	TRACE(std::sort(myStaff.begin(), myStaff.end(), lessExperience));;
+	TRACE(std::sort(myStaff.begin(), myStaff.end(), lessExperiencePredicate));;
 
 	log_to_console(myStaff, "myStaff contains now: ");
 
