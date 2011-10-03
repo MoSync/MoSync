@@ -35,7 +35,8 @@ using namespace std;
 
 static void writeManifest(const SETTINGS& s, const RuntimeInfo& ri,
 	const char* filename, bool isJad, const string& jarFileName);
-static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri);
+static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri, bool isJad);
+static void writeToManifest(ostream& stream, const string& line, bool isJad);
 static void addMIDletPermission(vector<string>& permissions, bool flag, const char* nativePerm);
 static void sign(const SETTINGS& s, const RuntimeInfo& ri, const char* jar, const char* jad);
 static void createJadToolCommand(ostringstream& jadToolCmd, const SETTINGS& s, const RuntimeInfo& ri, const char* jad, bool hidden);
@@ -177,12 +178,12 @@ static void writeManifest(const SETTINGS& s, const RuntimeInfo& ri,
 	if(!isJad) {
 		stream << "Manifest-Version: 1.0\n";
 	}
-	write72line(stream, string("MIDlet-Vendor: ") + s.vendor + "\n");
-	write72line(stream, string("MIDlet-Name: ") + s.name + "\n");
+	writeToManifest(stream, string("MIDlet-Vendor: ") + s.vendor + "\n", isJad);
+	writeToManifest(stream, string("MIDlet-Name: ") + s.name + "\n", isJad);
 	stream << "MIDlet-Version: 1.0\n";
 	stream << "Created-By: MoSync package\n";	//todo: add version number and git hash
-	write72line(stream, string("MIDlet-1: ") + s.name + ", " + s.name + ".png, MAMidlet\n");
-	writePermissions(stream, s, ri);
+	writeToManifest(stream, string("MIDlet-1: ") + s.name + ", " + s.name + ".png, MAMidlet\n", isJad);
+	writePermissions(stream, s, ri, isJad);
 	stream << "MicroEdition-Profile: MIDP-2.0\n";
 	stream << "MicroEdition-Configuration: CLDC-1."<<(ri.isCldc10 ? "0" : "1")<<"\n";
 	if(isJad) {
@@ -193,7 +194,15 @@ static void writeManifest(const SETTINGS& s, const RuntimeInfo& ri,
 	stream.flush();
 }
 
-static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri) {
+static void writeToManifest(ostream& stream, const string& line, bool isJad) {
+	if (isJad) {
+		stream << line;
+	} else {
+		write72line(stream, line);
+	}
+}
+
+static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeInfo& ri, bool isJad) {
 	set<string> permissionSet = set<string>();
 	parsePermissions(permissionSet, s.permissions);
 
@@ -243,11 +252,11 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	// Ehrm... what if line length > max for manifests?
 	const string permissionDelim = string(", ");
 	if (outPermissions.size() > 0) {
-		write72line(stream, string("MIDlet-Permissions: ") + delim(outPermissions, permissionDelim));
+		writeToManifest(stream, string("MIDlet-Permissions: ") + delim(outPermissions, permissionDelim), isJad);
 		stream << "\n";
 	}
 	if (outOptPermissions.size() > 0) {
-		write72line(stream, string("MIDlet-Permissions-Opt: ") + delim(outOptPermissions, permissionDelim));
+		writeToManifest(stream, string("MIDlet-Permissions-Opt: ") + delim(outOptPermissions, permissionDelim), isJad);
 		stream << "\n";
 	}
 }
