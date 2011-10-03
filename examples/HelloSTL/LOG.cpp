@@ -105,6 +105,32 @@ void log_to_console(const std::set<int> &s, const std::string &msg)
 	LOG(final_msg.c_str());
 }
 
+void log_to_console(const std::multiset<int> &ms, const std::string &msg)
+{
+	std::string final_msg = msg;
+	for(std::multiset<int>::const_iterator it = ms.begin(); it != ms.end(); ++it)
+	{
+		char buf[10];
+		itoa( *it, buf, 10);
+		std::string str(buf);
+		final_msg += str + " ";
+	}
+	LOG(final_msg.c_str());
+}
+
+void log_to_console(const std::deque<int> &d, const std::string &msg)
+{
+	std::string final_msg = msg;
+	for(int i=0; i < d.size(); ++i)
+	{
+		char buf[10];
+		itoa( d[i], buf, 10);
+		std::string str(buf);
+		final_msg += str + " ";
+	}
+	LOG(final_msg.c_str());
+}
+
 void log_to_console(const std::vector<char> &v, const std::string &msg)
 {
 	std::string final_msg = msg;
@@ -124,8 +150,6 @@ void log_to_console(const std::vector<Employee> &v, const std::string &msg)
 		final_msg += v[i].getName();
 		final_msg += "( exp: ";
 		final_msg += toString(v[i].getExperience());
-		//final_msg += ", salary: ";
-		//final_msg += toString(v[i].getSalary());
 		final_msg += ") ";
 		final_msg += " ";
 	}
@@ -135,13 +159,25 @@ void log_to_console(const std::vector<Employee> &v, const std::string &msg)
 void log_to_console(const std::set<Employee, LessExperienceFunctor> &s, const std::string &msg)
 {
 	std::string final_msg = msg;
-	for(std::set<Employee>::const_iterator it = s.begin(); it!=s.end(); ++it)
+	for(std::set<Employee, LessExperienceFunctor>::const_iterator it = s.begin(); it!=s.end(); ++it)
+	{
+		final_msg += it->getName();
+		final_msg += " (exp: ";
+		final_msg += toString(it->getExperience());
+		final_msg += ") ";
+		final_msg += " ";
+	}
+	LOG(final_msg.c_str());
+}
+
+void log_to_console(const std::multiset<Employee, LessExperienceFunctor> &ms, const std::string &msg)
+{
+	std::string final_msg = msg;
+	for(std::multiset<Employee, LessExperienceFunctor>::const_iterator it = ms.begin(); it != ms.end(); ++it)
 	{
 		final_msg += it->getName();
 		final_msg += "( exp: ";
 		final_msg += toString(it->getExperience());
-		//final_msg += ", salary: ";
-		//final_msg += toString(v[i].getSalary());
 		final_msg += ") ";
 		final_msg += " ";
 	}
@@ -166,6 +202,44 @@ void log_to_console(const std::deque<char> &d, const std::string &msg)
 	{
 		final_msg.append(1, d[i]);
 		final_msg += " ";
+	}
+	LOG(final_msg.c_str());
+}
+
+void log_to_console(const std::map<int, Employee> &m, const std::string &msg)
+{
+	std::string final_msg = msg;
+	for(std::map<int, Employee>::const_iterator it = m.begin(); it!=m.end(); ++it)
+	{
+		final_msg += "[key: ";
+		final_msg += toString(it->first);
+		final_msg += "] - [";
+		final_msg += "value: ";
+		final_msg += it->second.getName()+ ", ";
+		final_msg += toString(it->second.getSalary());
+		final_msg += "(salary), ";
+		final_msg += toString(it->second.getExperience());
+		final_msg += "(exp) ";
+		final_msg += "]; ";
+	}
+	LOG(final_msg.c_str());
+}
+
+void log_to_console(const std::map<int, Employee, std::greater<int> > &m, const std::string &msg)
+{
+	std::string final_msg = msg;
+	for(std::map<int, Employee, std::greater<int> >::const_iterator it = m.begin(); it!=m.end(); ++it)
+	{
+		final_msg += "[key: ";
+		final_msg += toString(it->first);
+		final_msg += "] - [";
+		final_msg += "value: ";
+		final_msg += it->second.getName() + ", ";
+		final_msg += toString(it->second.getSalary());
+		final_msg += "(salary), ";
+		final_msg += toString(it->second.getExperience());
+		final_msg += "(exp) ";
+		final_msg += "]; ";
 	}
 	LOG(final_msg.c_str());
 }
@@ -253,5 +327,23 @@ void log_to_console(const Employee &e, const std::string &msg)
 {
 	std::string final_msg = msg;
 	final_msg += e.getName();
+	LOG(final_msg.c_str());
+}
+
+void log_to_console(const std::pair<int, Employee> &p, const std::string &msg)
+{
+	std::string final_msg = msg;
+
+	final_msg += "[key: ";
+	final_msg += toString(p.first);
+	final_msg += "] - [";
+	final_msg += "value: ";
+	final_msg += p.second.getName() + ", ";
+	final_msg += toString(p.second.getSalary());
+	final_msg += "(salary), ";
+	final_msg += toString(p.second.getExperience());
+	final_msg += "(exp) ";
+	final_msg += "]; ";
+
 	LOG(final_msg.c_str());
 }
