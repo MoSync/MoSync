@@ -28,7 +28,7 @@
 
 - (id)init {
 	id ret = [super init];
-	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
+	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) { //The Modal View code for iPhone
 		CGRect screenSize = [[UIScreen mainScreen] bounds];
         mModalViewController = [[UIViewController alloc] init];
 
@@ -58,11 +58,19 @@
         [bigView release];
 
 	}
-	else {
+	else {//The Popover code for iPad
+		//Default position is on the top left corner
 		top = 0;
 		left = 0;
+		//width and height: more or less the iPhone dimentions (minus the navbar) in order to make
+		//it analogus to the iPhone modal screen. But the user can change them anyway.
+		[self setPropertyWithKey:@MAW_WIDGET_WIDTH toValue:@"320"];
+		[self setPropertyWithKey:@MAW_WIDGET_HEIGHT toValue:@"450"];
 		dismissable = YES;
 		direction = UIPopoverArrowDirectionAny;
+		autoSizeParamX = FIXED_SIZE;
+		autoSizeParamY = FIXED_SIZE;
+		//The navigation controller is needed for the title bar to appear
 		container = [[UINavigationController alloc] initWithRootViewController:controller];
 		popoverController = [[UIPopoverController alloc] initWithContentViewController:container];
 		popoverController.delegate = self;
@@ -72,7 +80,7 @@
 }
 
 - (int)show {
-	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
+	if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {//Show a Modal View for iPhone
 		int viewWidth = view.frame.size.width;
         int viewHeight = view.frame.size.height;
 
@@ -89,10 +97,47 @@
         MoSyncUI* mosyncUI = getMoSyncUI();
         [mosyncUI showModal:(UINavigationController*)mModalViewController];
 	}
-	else {
-        [super show];
+	else { //Show a Popover for iPad
+        [self layout];
+
+		//if the popover should wrap to the content, try to find the correct size
+		int newWidth = 0;
+		int newHeight = 0;
+		for (IWidget *child in children)
+		{
+			[child show];
+			if ([self getAutoSizeParamX] == WRAP_CONTENT) {
+				int childWidth = [child getView].frame.origin.x + [child getView].frame.size.width;
+				if(childWidth > newWidth){
+					newWidth = childWidth;
+				}
+			}
+			if ([self getAutoSizeParamY] == WRAP_CONTENT) {
+				int childHeight = [child getView].frame.origin.y + [child getView].frame.size.height;
+				if(childHeight > newHeight){
+					newHeight = childHeight;
+				}
+			}
+		}
+
+		int viewHeight = view.frame.size.height;
+		int viewWidth = view.frame.size.width;
+
+		if([self getAutoSizeParamX] == WRAP_CONTENT) {
+			viewWidth = newWidth;
+		}
+		if([self getAutoSizeParamY] == WRAP_CONTENT) {
+			viewHeight = newHeight;
+		}
+
+		[view setFrame:CGRectMake(view.frame.origin.x, view.frame.origin.y, viewWidth, viewHeight)];
+		//At this point it should have the correct size
+		controller.contentSizeForViewInPopover = view.frame.size;
+
+		//The screen that was active when the popover was shown
 		IWidget* shownScreen = [getMoSyncUI() getCurrentlyShownScreen];
 
+		//Show the popover
 		[popoverController presentPopoverFromRect:CGRectMake(left,top,0,0)
 										   inView:[shownScreen getView]
 						 permittedArrowDirections:direction
@@ -113,6 +158,7 @@
 
 - (int)setPropertyWithKey: (NSString*)key toValue:(NSString*)value {
 	int res;
+	//The popover makes use of the "left" and "top" properties
 	if([key isEqualToString:@MAW_WIDGET_LEFT]) {
 		left = [value intValue];
 	} else if([key isEqualToString:@MAW_WIDGET_TOP]) {
@@ -125,10 +171,11 @@
 			[controller.title release];
 			controller.title = value;
 		}
-	}
-        else if([key isEqualToString:@MAW_MODAL_DIALOG_ARROW_POSITION]) {
+	} else if([key isEqualToString:@MAW_MODAL_DIALOG_ARROW_POSITION]) {
 		int msDirection = [value intValue];
 		direction = 0;
+		//Handles both single position cases, as well as the user
+		//using | between a few
 		if (msDirection & MAW_CONSTANT_ARROW_UP) {
 			direction |= UIPopoverArrowDirectionUp;
 		}
@@ -142,6 +189,8 @@
 			direction |= UIPopoverArrowDirectionRight;
 		}
 	} else if([key isEqualToString:@MAW_MODAL_DIALOG_USER_CAN_DISMISS]) {
+		//Used by the popover only, whether the user can dismiss the popover
+		//by tapping outside or not
 		if ([value isEqualToString:@"true"]){
 			dismissable = YES;
 		}
@@ -154,6 +203,8 @@
 		res = [super setPropertyWithKey:key toValue:value];
 		if (UIUserInterfaceIdiomPhone != UI_USER_INTERFACE_IDIOM()) {
 			if ([key isEqualToString:@MAW_WIDGET_WIDTH] || [key isEqualToString:@MAW_WIDGET_HEIGHT]) {
+				//If the user changed the height, we need to change the popover again,
+				//because it might already be shown on screen
 				[popoverController setPopoverContentSize:view.frame.size animated:YES];
 			}
 		}
@@ -170,21 +221,30 @@
 {
     if ([key isEqualToString:@MAW_MODAL_DIALOG_TITLE])
     {
-        return [mNavigationItem.title retain];
+		if (UIUserInterfaceIdiomPhone == UI_USER_INTERFACE_IDIOM()) {
+			return [mNavigationItem.title retain];
+		}
+		else {
+			return [controller.title retain];
+		}
+
     }
 	return [super getPropertyWithKey:key];
 }
 
 - (void)popoverControllerDidDismissPopover:(UIPopoverController *)popoverController {
+	//The user dismissed the popover by tapping outside of it
 	[super sendEvent:MAW_EVENT_DIALOG_DISMISSED];
 }
 
 - (BOOL)popoverControllerShouldDismissPopover:(UIPopoverController *)popoverController {
+	//Prihibit or allow the user to dismiss the popover by tapping outside of it
 	return dismissable;
 }
 
 - (void)dealloc {
 	[popoverController release];
+	[container release];
     [mModalViewController release];
     [mNavigationItem release];
 
