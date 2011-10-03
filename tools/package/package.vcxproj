@@ -65,7 +65,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\..\intlibs\filelist\$(Configuration)\filelist.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\intlibs\filelist\$(Configuration)\filelist.lib;libexpat.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
@@ -83,7 +83,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>..\..\intlibs\filelist\$(Configuration)\filelist.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>..\..\intlibs\filelist\$(Configuration)\filelist.lib;libexpat.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -99,6 +99,7 @@
     <ClCompile Include="blackberry.cpp" />
     <ClCompile Include="iphone.cpp" />
     <ClCompile Include="javame.cpp" />
+    <ClCompile Include="nfc.cpp" />
     <ClCompile Include="package.cpp" />
     <ClCompile Include="permissions.cpp" />
     <ClCompile Include="s60.cpp" />
@@ -107,6 +108,7 @@
     <ClCompile Include="windowsMobile.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="nfc.h" />
     <ClInclude Include="package.h" />
     <ClInclude Include="packagers.h" />
     <ClInclude Include="permissions.h" />
