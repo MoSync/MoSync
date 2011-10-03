@@ -5,7 +5,7 @@ import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import com.mosync.internal.android.SingletonObject;
+import com.mosync.internal.android.MoSyncError;
 
 import android.content.ContentResolver;
 import android.database.Cursor;
@@ -34,7 +34,7 @@ public class PIMList {
 	 * @return
 	 */
 	public int throwError(int errorCode, int panicCode, String panicText) {
-		return SingletonObject.getSingletonObject().error(errorCode, panicCode,
+		return MoSyncError.getSingletonObject().error(errorCode, panicCode,
 				panicText);
 	}
 

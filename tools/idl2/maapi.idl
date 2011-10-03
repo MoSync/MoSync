@@ -3136,9 +3136,9 @@ group PIMAPI "PIM API" {
 			PREFIX = 3;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
 			SUFFIX = 4;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic first name.
-			PHONETIC_FAMILY = 5;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic last name.
+			PHONETIC_FAMILY = 5;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic first name.
 			PHONETIC_GIVEN = 6;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic middle name.
 			PHONETIC_OTHER = 7;
@@ -7769,6 +7769,7 @@ group NFCAPI "NFC API" {
 
 		}
 	}//end of NFC API
+
 	/**
 	* Enable panic system.
 	* If a panic is raised a message will be displayed to the user and the program will be shut down.
@@ -7778,12 +7779,11 @@ group NFCAPI "NFC API" {
 
 	/**
 	* Disable panic system.
-	* If an error occurs in the syscall, an error code will be returned by the syscall and the
+	* If an error occurs in the syscall, an error code will be returned by the syscall and the 
 	* program will continue running.
 	* \return #RES_OK.
 	*/
 	int maSyscallPanicsDisable();
-
 	}
 
 }
