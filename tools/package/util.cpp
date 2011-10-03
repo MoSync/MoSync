@@ -214,7 +214,13 @@ void toDir(std::string& str) {
 }
 
 std::string getDir(const std::string& name) {
-	return name.substr(0, name.find_last_of('/'));
+	size_t index = name.find_last_of('/');
+#ifdef WIN32
+	size_t bi = name.find_last_of('\\');
+	if(bi > index || index == string::npos)
+		index = bi;
+#endif
+	return name.substr(0, index);
 }
 
 string fullpathString(const char* name) {
