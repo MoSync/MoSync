@@ -34,7 +34,7 @@
 
         // Will contain the navigation bar and the view where the widgets will be added.
         UIView* bigView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenSize.size.width, screenSize.size.height)];
-        bigView.backgroundColor = [UIColor grayColor];
+
         mModalViewController.view = bigView;
 
         // Add navigation bar to the big view.
@@ -70,6 +70,7 @@
 		direction = UIPopoverArrowDirectionAny;
 		autoSizeParamX = FIXED_SIZE;
 		autoSizeParamY = FIXED_SIZE;
+		view.backgroundColor = [UIColor whiteColor];
 		//The navigation controller is needed for the title bar to appear
 		container = [[UINavigationController alloc] initWithRootViewController:controller];
 		popoverController = [[UIPopoverController alloc] initWithContentViewController:container];
