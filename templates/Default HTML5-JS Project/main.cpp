@@ -1,8 +1,7 @@
 /**
  * @file main.cpp
  *
- * Sample application that illustrates how to call into C++
- * from JavaScript.
+ * Sample web application packaged as a MoSync application.
  */
 
 // Include Moblet for web applications.
@@ -20,9 +19,6 @@ class MyMoblet : public WebAppMoblet
 public:
 	MyMoblet()
 	{
-		// Enable message sending from JavaScript to C++.
-		enableWebViewMessages();
-
 		// Remove this line to enable the user to
 		// zoom the web page. To disable zoom is one
 		// way of making web pages display in a
@@ -33,20 +29,6 @@ public:
 		// The page in the "LocalFiles" folder to
 		// show when the application starts.
 		showPage("index.html");
-	}
-
-	/**
-	 * Here we handle messages sent from JavaScript.
-	 */
-	void handleWebViewMessage(WebViewMessage& message)
-	{
-		if (message.is("Vibrate"))
-		{
-			// Make device vibrate for half a second.
-			// On iOS, the vibration length will be constant,
-			// regardless of the time parameter value.
-			maVibrate(500);
-		}
 	}
 };
 
