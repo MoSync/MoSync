@@ -102,6 +102,8 @@ void WebScreen::setupUI()
  */
 void WebScreen::showScreen()
 {
+	// Make the screen listen for key events.
+	MAUtil::Environment::getEnvironment().addKeyListener(this);
 	// When this screen is shown, the url is set to the web view.
 	BasicScreen::showScreen();
 }
@@ -120,6 +122,23 @@ void WebScreen::openWebView(MAUtil::String title)
 
 	// Display the article.
 	maWidgetSetProperty(mWebView,MAW_WEB_VIEW_URL,url.c_str() );
+}
+
+/**
+ * From KeyListener.
+ * This function is called with a \link #MAK_FIRST MAK_ code \endlink when
+ * a key is pressed.
+ */
+void WebScreen::keyPressEvent(int keyCode, int nativeCode)
+{
+    // Go back to the SummaryScreeb if the back key is pressed.
+    if(MAK_BACK == keyCode)
+    {
+		// Unregister from key listener.
+		MAUtil::Environment::getEnvironment().removeKeyListener(this);
+		// Go back, and do not refresh the list in the SummaryScreen.
+		mPrevScreen->showScreen(false);
+    }
 }
 
 /**
@@ -172,11 +191,14 @@ void WebScreen::widgetClicked(MAHandle widgetHandle)
 {
 	if ( widgetHandle == mBackButton )
 	{
+
 		// Go back, and do not refresh the list in the SummaryScreen.
 		mPrevScreen->showScreen(false);
 	}
 	else if ( widgetHandle == mNewSearchButton )
 	{
+		// Unregister from key listener.
+		MAUtil::Environment::getEnvironment().removeKeyListener(this);
 		// Go back to HomeScreen.
 		mPrevScreen->showHomeScreen();
 	}

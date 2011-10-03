@@ -24,8 +24,6 @@ import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.drawable.GradientDrawable.Orientation;
 import android.view.View;
-import android.widget.CheckBox;
-import android.widget.Toast;
 
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
@@ -339,6 +337,16 @@ public class Widget
 	 * @return
 	 */
 	public boolean isLayout()
+	{
+		return false;
+	}
+
+	/**
+	 * Returns true if the given widget is in fact a dialog.
+	 *
+	 * @return
+	 */
+	public boolean isDialog()
 	{
 		return false;
 	}

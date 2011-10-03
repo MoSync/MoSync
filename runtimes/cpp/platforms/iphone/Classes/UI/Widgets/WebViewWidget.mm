@@ -33,6 +33,10 @@
     softHookPattern = @"";
 	hardHookPattern = @"";
     javaScriptIdentifier = @"javascript:";
+	cantNavigate = @"";
+	canNavigateForward = @"forward";
+	canNavigateBack = @"back";
+	canNavigateEither = [[canNavigateBack stringByAppendingString:canNavigateForward] retain];
 	baseUrl = [[self getDefaultBaseURL] retain];
     urlsToNotHook=[[NSMutableDictionary alloc] init];
 	id ret = [super init];
@@ -153,6 +157,21 @@
 
     } else if ([key isEqualToString:@MAW_WEB_VIEW_BASE_URL]) {
 		return [baseUrl retain];
+	} else if ([key isEqualToString:@MAW_WEB_VIEW_NAVIGATE]) {
+		UIWebView* webView = (UIWebView*)view;
+		if(webView.canGoBack && webView.canGoForward){
+			return [canNavigateEither retain];
+		}
+		else if(webView.canGoBack){
+			return [canNavigateBack retain];
+		}
+		else if(webView.canGoForward){
+			return [canNavigateForward retain];
+		}
+		else {
+			return [cantNavigate retain];
+		}
+
 	} else {
 		return [super getPropertyWithKey:key];
 	}

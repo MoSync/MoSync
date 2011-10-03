@@ -45,12 +45,12 @@ class ConvertToPngTask < FileTask
 	def execute
 		if(@src.to_s.getExt == '.svg')
 			sh "java -jar \"#{mosyncdir}/bin/batik/batik-rasterizer.jar\" -w #{@width} -h #{@height}"+
-				" -d #{File.expand_path(@NAME)} #{File.expand_path(@src)}"
+				" -d \"#{File.expand_path(@NAME)}\" \"#{File.expand_path(@src)}\""
 			if(!File.exist?(@NAME))	# in case batik fails silently.
 				error('batik failed!')
 			end
 		else
-			sh "#{mosyncdir}/bin/ImageMagick/convert -resize #{@width}x#{@height} -background none #{@src} #{@NAME}"
+			sh "#{mosyncdir}/bin/ImageMagick/convert -resize #{@width}x#{@height} -background none \"#{@src}\" \"#{@NAME}\""
 		end
 	end
 	# Read the pixel dimensions of the SVG src and calculate the appropriate size.

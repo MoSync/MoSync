@@ -1334,39 +1334,50 @@ interface MAAPI {
 		*/
 		SENSOR = 33;
 
+		/**
+		* \bried The maAlert message box was dismissed by one of the available buttons.
+		* See #EVENT_TYPE_ALERT for the event.
+		*/
+		ALERT = 34;
+
 		/** \brief A new NFC tag was received
 		* A new tag has been received, use maGetNextTag to
 		* retreive it.
 		*/
-		NFC_TAG_RECEIVED = 34;
+		NFC_TAG_RECEIVED = 35;
 
 		/** \brief New tag data was read
 		* An asynchronous NFC tag read operation was
 		* completed.
 		*/
-		NFC_TAG_DATA_READ = 35;
+		NFC_TAG_DATA_READ = 36;
 
 		/** \brief New tag data was written
 		* An asynchronous NFC tag write operation was
 		* completed.
 		*/
-		NFC_TAG_DATA_WRITTEN = 36;
+		NFC_TAG_DATA_WRITTEN = 37;
 
 		/** \brief A batch operation was performed
 		*/
-		NFC_BATCH_OP = 37;
+		NFC_BATCH_OP = 38;
 
 		/** \brief Tag authentication was performed
 		* An asynchronous NFC tag authentication read was
 		* completed.
 		*/
-		NFC_TAG_AUTH_COMPLETE = 38;
+		NFC_TAG_AUTH_COMPLETE = 39;
 
 		/**
 		* \brief Tag was made read only
 		*  An asynchronous NFC tag read only operation was completed.
 		*/
-		NFC_TAG_READ_ONLY = 39;
+		NFC_TAG_READ_ONLY = 40;
+
+		/**
+		* Send by maOptionsBox dialog when one of the option buttons is clicked.
+		*/
+		OPTIONS_BOX_BUTTON_CLICKED = 41;
 	}
 
 	/**
@@ -1474,6 +1485,19 @@ interface MAAPI {
 				*/
 				MAHandle imagePickerItem;
 			} imagePicker;
+
+			/**
+			* #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event, contains the index of the selected option.
+			*/
+			int optionsBoxButtonIndex;
+
+			/**
+			* #EVENT_TYPE_ALERT event. The index of the selected button.
+			* If button1 is pressed, the value is 1.
+			* If button2 is pressed, the value is 2.
+			* If button3 is pressed, the value is 3.
+			*/
+			int alertButtonIndex;
 
 			/**
 			* In #EVENT_TYPE_SMS events, this will be one of the
@@ -2992,6 +3016,8 @@ interface MAAPI {
 		*/
 		int maGetSystemProperty(in MAString key, out MAString buf range("size"), in int size);
 
+group PIMAPI "PIM API" {
+
 #if IX_PIM
 		constset int MA_PIM_ {
 			/**
@@ -3003,6 +3029,7 @@ interface MAAPI {
 			TODOS = 3;
 		}
 
+	group PIMConsts "PIM Constants" {
 		constset int MA_PIM_TYPE_ {
 			/// bytes
 			/// the bytes are not null-terminated.
@@ -3433,7 +3460,9 @@ interface MAAPI {
 			/// The operation is not allowed by the Address Book database.
 			OPERATION_NOT_PERMITTED = -18;
 		}
+	}
 
+	group PIMFunctions "PIM Functions"{
 		/**
 		* \brief Opens a PimList. Use maPimListNext() to open the list's items.
 		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
@@ -3697,8 +3726,10 @@ interface MAAPI {
 		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
-#endif	//IX_PIM
+		} //end of pim functions
 
+#endif	//IX_PIM
+}
 #if IX_WIDGET
 #include "native_ui_intro_doc.idl"
 group WidgetAPI "Widget API" {
@@ -3843,6 +3874,11 @@ group WidgetAPI "Widget API" {
 			* One of the MAW_VIDEO_WIDGET_STATE constants.
 			*/
 			int videoViewState;
+
+			/**
+			* Send by the OptionDialog view when a #MAW_EVENT_OPTION_DIALOG_BUTTON_CLICKED event is received.
+			*/
+			int optionDialogButtonIndex;
 		}
 	}
 
@@ -3986,6 +4022,14 @@ group WidgetAPI "Widget API" {
 		* and/or #MAW_WEB_VIEW_HARD_HOOK.
 		*/
 		WEB_VIEW_HOOK_INVOKED = 21;
+
+		/**
+		* Send by a Dialog widget when when a user dismisses a popover by tapping outside of it.
+		* It will not be sent if it was dismissed by calling #maWidgetModalDialogHide().
+		* Available only on the iPad.
+		*/
+		DIALOG_DISMISSED = 22;
+
 	}
 
 	} // end of WidgetEventTypes
@@ -4047,6 +4091,37 @@ group WidgetAPI "Widget API" {
 		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		*/
 		HARD = 6;
+
+		/**
+		* @brief The popover arrow should point up. Used in
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_UP = 1;
+
+		/**
+		* @brief The popover arrow should point down. Used in
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_DOWN = 2;
+
+		/**
+		* @brief The popover arrow should point left. Used in
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_LEFT = 4;
+
+		/**
+		* @brief The popover arrow should point right. Used in
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_RIGHT = 8;
+
+		/**
+		* @brief The popover arrow can point anywhere. Used in
+		* #MAW_MODAL_DIALOG_ARROW_POSITION.
+		*/
+		ARROW_ANY = 15;
+
 	}
 	}
 
@@ -4212,6 +4287,13 @@ group WidgetAPI "Widget API" {
 		* @brief Indicates that a syscall tried to access a feature that is not supported by the current framework version.
 		*/
 		FEATURE_NOT_AVAILABLE = -11;
+
+		/**
+		* @brief Indicates that a syscall tried to add a dialog to a parent, which cannot be done because dialogs are in fact
+		* containers for other widgets.
+		*/
+		CANNOT_INSERT_DIALOG = -12;
+
 	}
 	} // end of WidgetResultCodes
 
@@ -4312,7 +4394,6 @@ group WidgetAPI "Widget API" {
 
 		/**
 		 * @brief A nav bar is an iphone specific widget that shows a nav bar with an optional title and back button. See \ref WidgetNavBarProperties "Nav bar properties" for the properties available.
-		 * This is an iOS specific widget.
 		 * See \ref WidgetNavBarProperties "Navigation Bar properties" for the properties available.
 		 */
 		NAV_BAR = "NavBar";
@@ -4402,6 +4483,17 @@ group WidgetAPI "Widget API" {
 		 * When pressed it will toggle its internal state that can either be checked or non-checked. See \ref WidgetToggleButtonProperties "Toggle button properties" for the properties available.
 		 */
 		TOGGLE_BUTTON = "ToggleButton";
+
+		/**
+		* @brief A dialog is a sort of modal view, that can look different depending on the platform.
+		* A Dialog gets visible only after calling maWidgetModalDialogShow().
+		* On Android it is a modal alert dialog.
+		* On iPad it is a PopoverController, and on iPhone it is a modal view.
+		* When a Dialog widget is created it is empty, it has no content. Any type of widget can be added inside it via #maWidgetAddChild syscalls.
+		* To show a Dialog call #maWidgetModalDialogShow(), to dismiss it call: #maWidgetModalDialogHide(), and to delete it call #maWidgetDestroy.
+		* See \ref WidgetModalDialogProperties "Modal Dialog properties" for the properties available.
+		*/
+		MODAL_DIALOG = "ModalDialog";
 	}
 	} // end of WidgetTypes
 
@@ -5189,6 +5281,34 @@ group WidgetAPI "Widget API" {
 		ACCESSORY_TYPE = "accessoryType";
 
 		/**
+		* @brief Sets the font color of the text part.
+		*
+		* @validvalue  A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example set the font color to red.
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_COLOR, "0xFF0000");
+		* \endcode
+		*/
+		FONT_COLOR = "fontColor";
+
+		/**
+		* @brief Sets the font size in points of the text part.
+		*
+		* @validvalue A float that specifies the number of points.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(listViewItemHandle, MAW_LIST_VIEW_ITEM_FONT_SIZE, "13.0");
+		* \endcode
+		*/
+		FONT_SIZE = "fontSize";
+
+		/**
 		* @brief Sets the typeface and style in which the text should be displayed.
 		*
 		* @validvalue A font handle received from loading fonts using
@@ -5282,6 +5402,63 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+
+		/**
+		* @brief Sets the top padding.
+		*
+		* @validvalue The top padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*  // Set a 50px top padding.
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_TOP, "50");
+		* \endcode
+		*/
+		PADDING_TOP = "paddingTop";
+
+		/**
+		* @brief Sets the left padding.
+		*
+		* @validvalue The left padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_LEFT, "50");
+		* \endcode
+		*/
+		PADDING_LEFT = "paddingLeft";
+
+		/**
+		* @brief Sets the right padding.
+		*
+		* @validvalue The right padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT, "50");
+		* \endcode
+		*/
+		PADDING_RIGHT = "paddingRight";
+
+		/**
+		* @brief Sets the bottom padding.
+		*
+		* @validvalue The bottom padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(horizontalLayoutHandle, MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM, "50");
+		* \endcode
+		*/
+		PADDING_BOTTOM = "paddingBottom";
 	}
 	} // end of WidgetHorizontalLayoutProperties
 
@@ -5317,6 +5494,63 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		CHILD_HORIZONTAL_ALIGNMENT = "childHorizontalAlignment";
+
+		/**
+		* @brief Sets the top padding.
+		*
+		* @validvalue The top padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*  // Set a 50px top padding.
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_TOP, "50");
+		* \endcode
+		*/
+		PADDING_TOP = "paddingTop";
+
+		/**
+		* @brief Sets the left padding.
+		*
+		* @validvalue The left padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_LEFT, "50");
+		* \endcode
+		*/
+		PADDING_LEFT = "paddingLeft";
+
+		/**
+		* @brief Sets the right padding.
+		*
+		* @validvalue The right padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_RIGHT, "50");
+		* \endcode
+		*/
+		PADDING_RIGHT = "paddingRight";
+
+		/**
+		* @brief Sets the bottom padding.
+		*
+		* @validvalue The bottom padding in pixels.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(verticalLayoutHandle, MAW_VERTICAL_LAYOUT_PADDING_BOTTOM, "50");
+		* \endcode
+		*/
+		PADDING_BOTTOM = "paddingBottom";
 	}
 	} // end of WidgetVerticalLayoutProperties
 
@@ -6123,9 +6357,25 @@ group WidgetAPI "Widget API" {
 		TITLE = "title";
 
 		/**
+		* Sets the icon of the nav bar. This won't be scaled at all.
+		*
+		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to fit in the nav bar.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_ICON, toString(R_MY_IMAGE));
+		* \endcode
+		*/
+		ICON = "icon";
+
+		/**
 		* @brief Sets the text for the back button.
 		* This can be set only when the navigation bar was
 		* attached to a screen that is not part of a stack screen.
+		* Note: this is available only on iOS.
+		* On Android the back behavior is handled by the device's back button.
 		*
 		* @validvalue A null-terminated string.
 		*
@@ -6139,8 +6389,7 @@ group WidgetAPI "Widget API" {
 		BACK_BTN = "backBtn";
 
 		/**
-		* @brief Sets the background color. The default color is light blue.
-		* The color is in RGB8 format (0xRRGGBB).
+		* @brief Sets the font color of the title.
 		*
 		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
 		*
@@ -6148,17 +6397,102 @@ group WidgetAPI "Widget API" {
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x101010");
+		*	maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_TITLE_FONT_COLOR, "0xff0000");
 		* \endcode
+		*/
+		TITLE_FONT_COLOR = "titleFontColor";
+
+		/**
+		* @brief Sets the font size in points of the title.
+		*
+		* @validvalue A float that specifies the number of points.
+		*
+		* @setonly
 		*
 		* @par Example
 		* \code
-        *   maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_COLOR, "0x27408B");
+		*	maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_TITLE_FONT_SIZE, "13.0");
 		* \endcode
 		*/
-		COLOR = "color";
+		TITLE_FONT_SIZE = "titleFontSize";
+
+		/**
+		* @brief Sets the typeface and style in which the title should be displayed.
+		*
+		* @validvalue A font handle received from loading fonts using
+		* #maFontGetName and #maFontLoadWithName syscalls.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   int nrFonts = maFontGetCount();
+		*    char buf[256];
+		*    // Get first font name.
+		*    maFontGetName(1, buf, 256);
+		*    // Load that font for size 10.
+		*    int fontHandle = maFontLoadWithName(buf, 10);
+		*    // Set that font to the label.
+		*	maWidgetSetProperty(navBarHandle, MAW_NAV_BAR_TITLE_FONT_HANDLE, toString(fontHandle));
+		* \endcode
+		*/
+		TITLE_FONT_HANDLE = "titleFontHandle";
 	}
 	} // end of WidgetNavBarProperties
+
+	/**
+	* The available widget properties for a #MAW_MODAL_DIALOG. See \ref WidgetProperties "Widget properties" for more properties.
+	*/
+	group WidgetModalDialogProperties "Modal Dialog properties" {
+	constset MAString MAW_MODAL_DIALOG_ {
+		/**
+		* @brief Sets or gets the title.
+		* If the property receives am empty string then the title bar becomes invisible.
+		* @validvalue A null-terminated string.
+		*
+		* @setandget
+		*
+		* @par Example
+		* \code
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_TITLE, "MyDialog");
+		* \endcode
+		*/
+		TITLE = "title";
+
+		/**
+		* @brief Sets the origin arrow position for a popover dialog.
+		* Note: This property is only available on the iPad.
+		*
+		* @validvalue One of the five MAW_CONSTANT_ARROW_ values, or a bitwise or combination of them.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Allow the popover to use any arrow
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_ARROW_POSITION, MAW_CONSTANT_ARROW_ANY);
+		* \endcode
+		*/
+		ARROW_POSITION = "arrowPosition";
+
+		/**
+		* @brief Allow or prohibits the user from dismissing a popover dialog by tapping outside of it.
+		* Note: This property is only available on the iPad.
+		*
+		* @validvalue "true"or "false".
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*   // Prohibit the user from dismissing the popover
+		*   maWidgetSetProperty(dialogHandle, MAW_MODAL_DIALOG_USER_CAN_DISMISS, "false");
+		* \endcode
+		*/
+		USER_CAN_DISMISS = "userCanDismiss";
+
+	}
+	} // end of WidgetmodalDialogProperties
 	} // end of WidgetProperties
 
 	typedef int MAWidgetHandle;
@@ -6210,6 +6544,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_OK if the child could be added to the parent.
 	* - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
 	* - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+	* - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a modal dialog.
 	* - #MAW_RES_ERROR if it could not be added for some other reason.
 	*/
 	int maWidgetAddChild(in MAWidgetHandle parent, in MAWidgetHandle child);
@@ -6227,6 +6562,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
 	* - #MAW_RES_INVALID_INDEX if the index was out of bounds.
 	* - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+	* - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a modal dialog.
 	* - #MAW_RES_ERROR if it could not be added for some other reason.
 	*/
 	int maWidgetInsertChild(in MAWidgetHandle parent, in MAWidgetHandle child, in int index);
@@ -6241,6 +6577,28 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetRemoveChild(in MAWidgetHandle child);
+
+	/**
+	* Shows a dialog widget.
+	* \param dialogHandle The handle of the dialog that will be shown.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be removed from the parent.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetModalDialogShow(in MAWidgetHandle dialogHandle);
+
+	/**
+	* Hides/Dismisses a currently displayed dialog.
+	* \param dialogHandle The handle of the dialog that will be hidden.
+	*
+	* \returns Any of the following result codes:
+	* - #MAW_RES_OK if the child could be removed from the parent.
+	* - #MAW_RES_INVALID_HANDLE if the handle was invalid.
+	* - #MAW_RES_ERROR otherwise.
+	*/
+	int maWidgetModalDialogHide(in MAWidgetHandle dialogHandle);
 
 	/**
 	* Shows a screen. If native UI hasn't been initialized, it is also initialized
@@ -6323,6 +6681,7 @@ group WidgetAPI "Widget API" {
 	* - #MAW_RES_ERROR otherwise.
 	*/
 	int maWidgetGetProperty(in MAWidgetHandle widget, in MAString property, out MAString value range("bufSize"), in int bufSize);
+
 	} // end of group WidgetAPIFunctions
 
 } // end of group WidgetAPI
@@ -6850,16 +7209,18 @@ group CameraFunctions "Camera Functions" {
 		 */
 		int maScreenStateEventsOff();
 
+group OpenGLES "OpenGLES" {
 #include "opengl_non_generated.idl"
 #include "opengl_generated.idl"
-
+}
 		/**
 		 * Logs information about the state of all current resources.
 		 */
 		void maReportResourceInformation();
 
 		/**
-		 * Displays a message to the user
+		 * @deprecated use #maAlert instead.
+		 * Displays a message to the user.
 		 * \param title The title of the message box shown
 		 * \param message The message should be short, not more than 40 characters,
 		 * to ensure its visibility on all screen sizes.
@@ -6867,12 +7228,44 @@ group CameraFunctions "Camera Functions" {
 		void maMessageBox(in MAString title, in MAString message);
 
 		/**
+		* Displays a message to the user.
+		* It contains optional title, message and 3 buttons for selection.
+		* On Android the buttons point to a positive, negative or neutral action.
+		* When one of the buttons are clicked the alert is automatically dismissed.
+		* When a selection is made a #EVENT_TYPE_ALERT event is sent with the button index.
+		* \param title The title of the message box shown.
+		* \param message The message should be short, not more than 40 characters,
+		* to ensure its visibility on all screen sizes.
+		* \button1 The text on the first button. On Android it indicates a positive selection.
+		* \button2 The text on the second button. On Android it indicates a neutral selection.
+		* \button3 The text on the third button. On Android it indicates that a negative selection.
+		*/
+		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
+
+		/**
 		* Displays an image picker to the user.
 		* It's display depends on the platform.
-		* Note: when a selection is made a #MAW_EVENT_TYPE_IMAGE_PICKER is sent.
+		* Note: when a selection is made a #EVENT_TYPE_IMAGE_PICKER event is sent.
 		*/
 		void maImagePickerOpen();
 
+		/**
+		* Displays a special kind of dialog that has a list of possible choices.
+		* The list of options is displayed as buttons on iOS, and as text views on Android.
+		* By clicking any option the dialog gets dismissed and a #EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED event is sent back.
+		*
+		* \param title The dialog title.
+		* \param destructiveButtonTitle The destructive button text. This is an iOS specific feature: it has different color than the other options,
+		* and it indicates that it's action has destructive behaviour. On Android it is treated and it looks like a normal option.
+		* \param cancelButtonTitle The dialog's Cancel button text. If left empty, the dialog is not cancelable.
+		* \param otherButtonTitles The address to the buffer that stores the list of options.
+		* \param otherButtonTitlesSize The size of the buffer, in bytes.
+		*/
+		void maOptionsBox(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle,
+								 in MAAddress otherButtonTitles, in int otherButtonTitlesSize);
+
+group SensorAPI "Sensor API" {
+		group SensorTypes "Sensor Types" {
 		constset int SENSOR_TYPE_ {
 			// A constant describing an accelerometer sensor type.
 			ACCELEROMETER = 1;
@@ -6886,6 +7279,9 @@ group CameraFunctions "Camera Functions" {
 			PROXIMITY = 5;
 		}
 
+		} // end of sensor types
+
+		group SensorConsts "Sensor Constants" {
 		constset int SENSOR_RATE_ {
 			// Get sensor data as fast as possible.
 			FASTEST = 0;
@@ -6932,6 +7328,9 @@ group CameraFunctions "Camera Functions" {
 			NEAR = 1;
 		}
 
+		} //end of sensor constants
+
+	group SensorFunctions "Sensor Functions" {
 		/**
 		* \brief Enables a sensor and starts sending events if the sensor is available.
 		* If the sensor is already enabled this call will have no effect.
@@ -6957,6 +7356,9 @@ group CameraFunctions "Camera Functions" {
 		*/
 		int maSensorStop(in int sensor);
 
+	}//End of Sensor Functions
+
+group NFCAPI "NFC API" {
 		/**
 		* Start listening to NFC events.
 		* \return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
@@ -7366,9 +7768,25 @@ group CameraFunctions "Camera Functions" {
 			KEY_B = 2;
 
 		}
+	}//end of NFC API
+	/**
+	* Enable panic system.
+	* If a panic is raised a message will be displayed to the user and the program will be shut down.
+	* \return #RES_OK.
+	*/
+	int maSyscallPanicsEnable();
+
+	/**
+	* Disable panic system.
+	* If an error occurs in the syscall, an error code will be returned by the syscall and the
+	* program will continue running.
+	* \return #RES_OK.
+	*/
+	int maSyscallPanicsDisable();
 
 	}
 
+}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}

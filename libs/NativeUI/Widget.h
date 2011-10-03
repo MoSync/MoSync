@@ -226,6 +226,7 @@ namespace NativeUI
          * - #MAW_RES_OK if the child could be added to the parent.
          * - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
          * - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+         * - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a dialog.
          * - #MAW_RES_ERROR if it could not be added for some other reason.
          */
         virtual int addChild(Widget* widget);
@@ -242,6 +243,7 @@ namespace NativeUI
          * - #MAW_RES_INVALID_HANDLE if any of the handles were invalid.
          * - #MAW_RES_INVALID_INDEX if the index was out of bounds.
          * - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
+         * - #MAW_RES_CANNOT_INSERT_DIALOG if the child is a dialog.
          * - #MAW_RES_ERROR if it could not be added for some other reason.
          */
         virtual int insertChild(Widget* widget,const int index);

@@ -207,7 +207,7 @@ class PipeExeWork < PipeGccWork
 				:androidStorepass => @PACK_ANDROID_STOREPASS,
 				:androidAlias => @PACK_ANDROID_ALIAS,
 				:androidKeypass => @PACK_ANDROID_KEYPASS,
-				:extraParameters => @PACK_PARAMETERS,
+				:extraParameters => @PACK_PARAMETERS
 				)
 		end
 	end

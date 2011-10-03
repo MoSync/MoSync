@@ -24,7 +24,6 @@
 
 #import <Foundation/Foundation.h>
 #import "MoSyncUI.h"
-#import "MoSyncUISyscalls.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
 
@@ -54,5 +53,9 @@ int maWidgetStackScreenPush(MAWidgetHandle stackScreen, MAWidgetHandle screen);
 int maWidgetStackScreenPop(MAWidgetHandle stackScreen);
 
 int maWidgetScreenShow(MAWidgetHandle screenHandle);
+
+int maWidgetModalDialogShow(MAWidgetHandle dialogHandle);
+
+int maWidgetModalDialogHide(MAWidgetHandle dialogHandle);
 
 #endif // _MOSYNC_UI_SYSCALLS_

@@ -123,9 +123,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifdef MA_PROF_BLACKBERRY_VERSION
 #define BB_RIM_API
 
-// Currently set to 4.7.
-// TODO: Change to 4.2 once we have API JARs for that version.
-#if (MA_PROF_BLACKBERRY_VERSION >= 5) || (MA_PROF_BLACKBERRY_VERSION_MINOR >= 7)
+#if (MA_PROF_BLACKBERRY_VERSION >= 5) || (MA_PROF_BLACKBERRY_VERSION_MINOR >= 2)
 #define BB_HAS_KEY_MENU
 #endif
 

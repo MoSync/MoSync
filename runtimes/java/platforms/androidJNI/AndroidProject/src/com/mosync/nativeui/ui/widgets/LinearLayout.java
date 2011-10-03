@@ -21,6 +21,7 @@ import android.view.ViewGroup;
 
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.properties.HorizontalAlignment;
+import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 import com.mosync.nativeui.util.properties.VerticalAlignment;
@@ -95,13 +96,8 @@ public class LinearLayout extends Layout
 	public boolean setProperty(String property, String value)
 			throws PropertyConversionException, InvalidPropertyValueException
 	{
-		if( super.setProperty( property, value ) )
-		{
-			return true;
-		}
-		
 		android.widget.LinearLayout layout = (android.widget.LinearLayout) getView( );
-		
+
 		if( property.equals( IX_WIDGET.MAW_HORIZONTAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT ) ||
 				property.equals( IX_WIDGET.MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT ) )
 		{
@@ -112,11 +108,30 @@ public class LinearLayout extends Layout
 		{
 			layout.setVerticalGravity( VerticalAlignment.convert( value ) );
 		}
+		else if ( property.equals( IX_WIDGET.MAW_HORIZONTAL_LAYOUT_PADDING_LEFT ) )
+		{
+			layout.setPadding(IntConverter.convert(value), layout.getPaddingTop(), layout.getPaddingRight(), layout.getPaddingBottom());
+		}
+		else if (property.equals( IX_WIDGET.MAW_HORIZONTAL_LAYOUT_PADDING_TOP ))
+		{
+			layout.setPadding( layout.getPaddingLeft(), IntConverter.convert(value), layout.getPaddingRight(), layout.getPaddingBottom());
+		}
+		else if (property.equals( IX_WIDGET.MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT ))
+		{
+			layout.setPadding( layout.getPaddingLeft(), layout.getPaddingTop(), IntConverter.convert(value), layout.getPaddingBottom());
+		}
+		else if (property.equals( IX_WIDGET.MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM))
+		{
+			layout.setPadding( layout.getPaddingLeft(), layout.getPaddingTop(), layout.getPaddingRight(), IntConverter.convert(value));
+		}
+		else if( super.setProperty( property, value ) )
+		{
+			return true;
+		}
 		else
 		{
 			return false;
 		}
-		
 		return true;
 	}
 }
