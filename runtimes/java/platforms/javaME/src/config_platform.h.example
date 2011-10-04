@@ -25,6 +25,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#define _DEBUG	//very slow
 #define DEBUG_MEMORY	//defined by _DEBUG
 //#define DEBUG_SYSCALLS	//defined by _DEBUG
+#define DEBUG_SYSCALLS_MIN 8	// syscalls numbered <= this will not be logged.
 
 //#define JDB_DEBUG	//disables main exception handling
 

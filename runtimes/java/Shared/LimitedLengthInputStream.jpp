@@ -79,26 +79,34 @@ final class LimitedLengthInputStream extends InputStream {
 		return stream.markSupported();
 	}
 	public final int read() throws IOException {
+		DEBUG("LimitedLengthInputStream.read()\n");
 		if(pos >= length)
 			return -1;
-		pos++;
-		return stream.read();
+		int res = stream.read();
+		if(res >= 0)
+			pos++;
+		return res;
 	}
 	public final int read(byte[] b) throws IOException {
 		return read(b, 0, b.length);
 	}
 	public final int read(byte[] b, int off, int len) throws IOException {
+		DEBUG("LimitedLengthInputStream.read(byte[], "+off+", "+len+")\n");
 		int trueLen = MIN(available(), len);
-		if(trueLen <= 0)
+		if(trueLen < 0) {
 			return -1;
-		pos += trueLen;
-		return stream.read(b, off, trueLen);
+		}
+		int res = stream.read(b, off, trueLen);
+		pos += res;
+		return res;
 	}
 	public final long skip(long n) throws IOException {
+		DEBUG("LimitedLengthInputStream.skip("+n+")\n");
 		long trueN = MIN(available(), n);
 		if(trueN < 0)
 			throw new SkipLongException();
-		pos += trueN;
-		return stream.skip(trueN);
+		long res = stream.skip(trueN);
+		pos += res;
+		return res;
 	}
 }	//LimitedLengthInputStream
