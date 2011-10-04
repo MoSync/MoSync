@@ -95,6 +95,17 @@ void MainScreen::buttonClicked(Widget* button)
 		mGenderFemale->setState(false);
 		mGenderMale->setState(false);
 		mAge->setValue(18);
+
+		//The following commands concern the modal dialog
+		//on the iPad only. They position the popover arrow
+		//over the mButtonForm button.
+		mDialog->setArrrowPosition(MAW_CONSTANT_ARROW_UP);
+		int buttonTop = mButtonForm->getPropertyInt(MAW_WIDGET_TOP);
+		int buttonLeft = mButtonForm->getPropertyInt(MAW_WIDGET_LEFT);
+		int buttonHeight = mButtonForm->getHeight();
+		int buttonWidth = mButtonForm->getWidth();
+		mDialog->setPosition(buttonLeft + buttonWidth/2, buttonTop + buttonHeight/2);
+
 		mDialog->show();
     }
 }
@@ -184,6 +195,7 @@ void MainScreen::createDialogMainLayout()
 
 	Label* info = new Label();
 	info->setText(" Please fill in all the fields ");
+	info->fillSpaceHorizontally();
 	dialogLayout->addChild(info);
 
 	VerticalLayout* genderLayout = new VerticalLayout();
@@ -243,7 +255,6 @@ void MainScreen::createDialogMainLayout()
 	mDialog = new Dialog();
 	mDialog->setTitle("My Form");
 	mDialog->canBeDismissed(false);
-//	mDialog->setBackgroundColor(0x556B2F); //this will be set to dialogLayout
-	mDialog->setProperty(MAW_WIDGET_ALPHA, "0.0");
+
 	mDialog->setMainWidget(dialogLayout);
 }
