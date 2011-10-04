@@ -28,6 +28,11 @@ Employee::Employee():mExperience(0), mSalary(0)
 {
 }
 
+void Employee::setExperience(int exp)
+{
+	mExperience = exp;
+}
+
 Employee::Employee(int exp, const std::string &name):
 	mExperience(exp),
 	mName(name)

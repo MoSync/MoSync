@@ -19,6 +19,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "packagers.h"
 #include "util.h"
+#include "permissions.h"
+#include "tools.h"
 #include "helpers/mkdir.h"
 #include "helpers/helpers.h"
 #include <fstream>
@@ -28,7 +30,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <vector>
 #include <set>
 #include <ostream>
-#include "permissions.h"
 
 using namespace std;
 
@@ -103,10 +104,10 @@ void packageJavaME(const SETTINGS& s, const RuntimeInfo& ri) {
 	// pack program and resource files.
 	// done separately from the other package parts in order to "junk" path names.
 	cmd.str("");
-	cmd << "zip -9 -j \""<<appJarName<<"\" \""<<
-		(ri.hasLimitedResourceSize ? split(program) : program)<<"\"";
+	cmd << "zip -9 -j "<<file(appJarName)<<" "<<
+		file((ri.hasLimitedResourceSize ? split(program) : program));
 	if(s.resource)
-		cmd << " \""<<(ri.hasLimitedResourceSize ? split(resource) : resource)<<"\"";
+		cmd << " " << file(ri.hasLimitedResourceSize ? split(resource) : resource);
 
 	sh(cmd.str().c_str());
 
@@ -117,17 +118,14 @@ void packageJavaME(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	// pack manifest
 	cmd.str("");
-	cmd << "zip -9 -r \""<<appJarName<<"\" META-INF";
+	cmd << "zip -9 -r "<<file(appJarName)<<" META-INF";
 	sh(cmd.str().c_str());
 
 	// Inject icon
 	std::ostringstream iconInjectCmd;
-	string outputIcon = dstPath + "/icon.png";
-	if (&ri.iconSize != 0) {
+	if (s.icon && &ri.iconSize != 0) {
 		// For java me, the -dst is the JAR!
-		iconInjectCmd << "\"" << mosyncdir() << "/bin/icon-injector\" -platform j2me -src \"" <<
-			s.icon << "\" -size " << ri.iconSize << " -dst \"" << appJarName.c_str() << "\"";
-		sh(iconInjectCmd.str().c_str());
+		injectIcon("j2me", ri.iconSize.c_str(), s.icon, appJarName.c_str(), s.silent);
 	}
 
 	// Sign
@@ -157,18 +155,18 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, const char* jar, cons
 }
 
 static void createJadToolCommand(ostringstream& jadToolCmd, const SETTINGS& s, const RuntimeInfo& ri, const char* jad, bool hidden) {
-	jadToolCmd << "java -jar " << mosyncdir() << "/bin/javame/JadTool.jar -addcert -alias \"" <<
-			s.javameAlias << "\" -keystore \"" << s.javameKeystore <<
-			"\" -inputjad \"" << jad << "\" -outputjad \"" << jad <<
-			"\" -storepass \"" << (hidden ? "*** HIDDEN ***" : s.javameStorePass) << "\"";
+	jadToolCmd << "java -jar " << getBinary("javame/JadTool.jar") << " -addcert -alias " <<
+			arg(s.javameAlias) << " -keystore " << file(s.javameKeystore) <<
+			" -inputjad " << file(jad) << " -outputjad " << file(jad) <<
+			" -storepass " << (hidden ? "*** HIDDEN ***" : arg(s.javameStorePass));
 }
 
 static void createJarSignCommand(ostringstream& jarSignCmd, const SETTINGS& s, const RuntimeInfo& ri, const char* jar, const char* jad, bool hidden) {
-	jarSignCmd << "java -jar " << mosyncdir() << "/bin/javame/JadTool.jar -addjarsig -jarfile \"" <<
-			jar << "\" -keystore " << s.javameKeystore << " -storepass \"" <<
-			(hidden ? "*** HIDDEN ***" : s.javameStorePass) << "\" -alias \"" << s.javameAlias <<
-			"\" -keypass \"" << (hidden ? "*** HIDDEN ***" : s.javameKeyPass) << "\" -inputjad \"" <<
-			jad << "\" -outputjad \"" << jad << "\"";
+	jarSignCmd << "java -jar " << getBinary("javame/JadTool.jar") << " -addjarsig -jarfile " <<
+			file(jar) << " -keystore " << file(s.javameKeystore) << " -storepass " <<
+			(hidden ? "*** HIDDEN ***" : arg(s.javameStorePass)) << " -alias " << arg(s.javameAlias) <<
+			" -keypass " << (hidden ? "*** HIDDEN ***" : arg(s.javameKeyPass)) << " -inputjad " <<
+			file(jad) << " -outputjad " << file(jad);
 }
 
 static void writeManifest(const SETTINGS& s, const RuntimeInfo& ri,
