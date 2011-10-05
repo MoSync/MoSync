@@ -220,6 +220,12 @@ public:
 			MAUtil::String message = Util::createTextFromHandle(
 				widgetEvent->urlData);
 
+			// Note: It is very important to free the data handle
+			// when we are done with using it, since a new data object
+			// is allocated for each message. (In the high-level library
+			// this is done automatically.)
+			maDestroyObject(widgetEvent->urlData);
+
 			// Check the message string and execute the corresponding syscall.
 			if (0 == message.find("mosync://StartTrackingGeoLocation"))
 			{
