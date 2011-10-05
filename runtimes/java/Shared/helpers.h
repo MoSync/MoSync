@@ -74,7 +74,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #endif	//_DEBUG
 
 #ifdef DEBUG_SYSCALLS
+#ifdef DEBUG_SYSCALLS_MIN
+#define DEBUG_SC(a) if(mLastSyscall > DEBUG_SYSCALLS_MIN) { DEBUG_ALWAYS(a); }
+#else
 #define DEBUG_SC(a) DEBUG_ALWAYS(a)
+#endif	//DEBUG_SYSCALLS_MIN
 #else
 #define DEBUG_SC(a)
 #endif	//DEBUG_SYSCALLS
