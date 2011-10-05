@@ -33,8 +33,9 @@ class Employee
 {
 public:
 	Employee();
-	Employee(int exp, const std::string &name);
+	Employee(int exp, const std::string &name = "");
 
+	void setExperience(int exp);
 	int getExperience() const;
 	const std::string &getName() const;
 

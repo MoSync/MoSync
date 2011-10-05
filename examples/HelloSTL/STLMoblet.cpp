@@ -84,10 +84,16 @@ void STLMoblet::keyPressEvent(int keyCode)
 
 void STLMoblet::STL_containers()
 {
-	STL_vector();
 	STL_bitset();
 	STL_list();
+	STL_map();
 	STL_set();
+	STL_multiset();
+	STL_priority_queue();
+	STL_queue();
+	STL_stack();
+	STL_vector();
+	STL_deque();
 }
 
 

@@ -13,7 +13,7 @@
 <property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
-<property key="build.prefs:app.name/Debug" value="LoveSMS"/>
+<property key="build.prefs:app.name/Debug" value="WebViewLoveSMS"/>
 <property key="build.prefs:app.name/Release" value="LoveSMS"/>
 <property key="build.prefs:app.permissions" value="File\ Storage File\ Storage/Read File\ Storage/Write SMS/Send"/>
 <property key="build.prefs:app.vendor/Debug" value="MoSync"/>

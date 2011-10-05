@@ -256,3 +256,40 @@ void write72line(std::ostream& output, const std::string& input) {
 	// Newline + first char of next must be space
 	output << delim(splitLines, string("\n "));
 }
+
+string arg(const char* arg) {
+	string result = string(arg);
+	if (result.find(' ') != string::npos) {
+		result = "\"" + result + "\"";
+	}
+	return result;
+}
+
+string arg(string argArg) {
+	return arg(argArg.c_str());
+}
+
+string file(const char* argArg) {
+	string argStr = string(argArg);
+#ifdef WIN32
+	toBackSlashes(argStr);
+#else
+	toSlashes(argStr);
+#endif
+	return arg(argStr.c_str());
+}
+
+string file(std::string arg) {
+	return file(arg.c_str());
+}
+
+void toSlashes(string& str) {
+	for(size_t i=0; i<str.size(); i++) {
+		str[i] = (str[i] == '\\' ? '/' : str[i]);
+	}
+}
+void toBackSlashes(std::string& str) {
+	for(size_t i=0; i<str.size(); i++) {
+		str[i] = (str[i] == '/' ? '\\' : str[i]);
+	}
+}

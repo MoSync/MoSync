@@ -101,17 +101,6 @@ void package(const SETTINGS& s) {
 	}
 }
 
-void toSlashes(string& str) {
-	for(size_t i=0; i<str.size(); i++) {
-		str[i] = (str[i] == '\\' ? '/' : str[i]);
-	}
-}
-void toBackSlashes(std::string& str) {
-	for(size_t i=0; i<str.size(); i++) {
-		str[i] = (str[i] == '/' ? '\\' : str[i]);
-	}
-}
-
 static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 	// read file
 	ifstream file(filename);
