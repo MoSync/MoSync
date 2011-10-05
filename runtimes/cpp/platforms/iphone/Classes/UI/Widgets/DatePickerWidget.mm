@@ -15,6 +15,12 @@
  02111-1307, USA.
  */
 
+/**
+ * Default size values for picker.
+ */
+#define DEFAULT_PICKER_HEIGHT 180
+#define DEFAULT_PICKER_WIDTH 240
+
 #import "DatePickerWidget.h"
 #include <helpers/cpp_defs.h>
 #include <helpers/CPP_IX_WIDGET.h>
@@ -30,7 +36,10 @@
 {
     if(!view)
     {
-        UIDatePicker* datePicker = [[UIDatePicker alloc] init];
+        UIDatePicker* datePicker = [[UIDatePicker alloc] initWithFrame:CGRectMake(0,
+                                                                                  0,
+                                                                                  DEFAULT_PICKER_WIDTH,
+                                                                                  DEFAULT_PICKER_HEIGHT)];
         [datePicker setDatePickerMode:UIDatePickerModeDate];
         [datePicker addTarget:self action:@selector(valueChanged:) forControlEvents:UIControlEventValueChanged];
 
