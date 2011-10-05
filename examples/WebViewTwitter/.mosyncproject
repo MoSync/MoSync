@@ -14,7 +14,7 @@
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.name/Debug" value="TweetReader"/>
-<property key="build.prefs:app.name/Release" value="TweetReader"/>
+<property key="build.prefs:app.name/Release" value="WebViewTwitter"/>
 <property key="build.prefs:app.permissions" value="File\ Storage File\ Storage/Read File\ Storage/Write Internet\ Access SMS/Send"/>
 <property key="build.prefs:app.vendor/Debug" value="MoSync"/>
 <property key="build.prefs:app.vendor/Release" value="MoSync"/>
