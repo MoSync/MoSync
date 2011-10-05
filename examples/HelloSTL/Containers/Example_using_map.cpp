@@ -80,7 +80,7 @@ void STLMoblet::STL_map()
 	LOG("\n");
 	LOG("/**");
 	LOG(" * operator[] - returns the value that corresponds to the key (supplied as a parameter to operator[])");
-	LOG(" * If you are trying to find an object by passing in a key to operator[ ] and that object doesn’t exist");
+	LOG(" * If you are trying to find an object by passing in a key to operator[ ] and that object doesn't exist");
 	LOG(" * operator[ ] will automatically insert a new key-value pair into the map (using the default constructor).");
 	LOG(" for the value object.");
 	LOG(" */");

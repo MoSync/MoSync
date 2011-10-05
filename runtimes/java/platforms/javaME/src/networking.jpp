@@ -191,7 +191,11 @@ NETSYSCALL(MAHandle) maHttpCreate(String url, int method) throws Exception {
 	String methString;
 	switch(method) {
 	case HTTP_GET:
+#ifdef MA_PROF_BLACKBERRY_VERSION
+		rw = Connector.READ_WRITE;
+#else
 		rw = Connector.READ;
+#endif
 		methString = HttpConnection.GET;
 		break;
 	case HTTP_POST:
@@ -203,7 +207,7 @@ NETSYSCALL(MAHandle) maHttpCreate(String url, int method) throws Exception {
 		methString = "PUT";//HttpConnection.PUT;
 		break;
 	case HTTP_DELETE:
-		rw = Connector.READ;
+		rw = Connector.READ_WRITE;
 		methString = "DELETE";//HttpConnection.DELETE;
 		break;
 	case HTTP_HEAD:
@@ -218,6 +222,9 @@ NETSYSCALL(MAHandle) maHttpCreate(String url, int method) throws Exception {
 #ifdef BB_RIM_NETWORKING
 		http = (HttpConnection)BlackBerryConnectionFactory.openConnection(url);
 #else
+#if MA_PROF_BLACKBERRY_VERSION == 4
+		url+=";interface=wifi";
+#endif
 		http = (HttpConnection)Connector.open(url, rw, true);
 #endif
 		http.setRequestMethod(methString);

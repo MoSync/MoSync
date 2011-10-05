@@ -41,14 +41,14 @@ class SplitResourceStream extends InputStream {
 		int i=0;
 		while(true) {
 			String name = baseName + i;
-			DEBUG_TEMP("try: "+name+"\n");
+			//DEBUG_TEMP("try: "+name+"\n");
 			InputStream is = mClass.getResourceAsStream(name);
 			if(is == null)
 				break;
 			files.addElement(is);
 			i++;
 		}
-		DEBUG_TEMP("SplitResourceStream.get("+baseName+"): "+files.size()+"\n");
+		DEBUG("SplitResourceStream.get("+baseName+"): "+files.size()+"\n");
 		if(files.size() == 0)
 			return null;
 		InputStream[] a = new InputStream[files.size()];
@@ -63,6 +63,7 @@ class SplitResourceStream extends InputStream {
 	}
 
 	public int read() throws IOException {
+		DEBUG("SplitResourceStream.read()\n");
 		// while we haven't reached the end
 		while(mIndex < mFiles.length) {
 			// try to read a byte
@@ -82,10 +83,10 @@ class SplitResourceStream extends InputStream {
 	}
 
 	public int read(byte[] b, int off, int len) throws IOException {
-		DEBUG("read("+off+", "+len+")\n");
+		DEBUG("SplitResourceStream.read(byte[], "+off+", "+len+")\n");
 		while(mIndex < mFiles.length) {
 			int res = mFiles[mIndex].read(b, off, len);
-			if(res > 0)
+			if(res >= 0)
 				return res;
 			mIndex++;
 		}
@@ -100,6 +101,7 @@ class SplitResourceStream extends InputStream {
 	}
 
 	public long skip(long n) throws IOException {
+		DEBUG("SplitResourceStream.skip("+n+")\n");
 		long pos = 0;
 		while(mIndex < mFiles.length && pos != n) {
 			long res = mFiles[mIndex].skip(n - pos);

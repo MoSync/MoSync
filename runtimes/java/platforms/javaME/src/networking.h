@@ -54,6 +54,7 @@ public class MAConn {
 		MYASSERT((state & opType) != 0);
 		state &= ~opType;
 
+		//DEBUG_TEMP("handleResult("+opType+", "+result+")\n");
 		int[] event = new int[4];
 		EI_TYPE = EVENT_TYPE_CONN;
 		EI_CONN_HANDLE = handle;
@@ -174,6 +175,9 @@ static class Connect implements Runnable {
 		boolean http = url.startsWith("http");
 		int result = 1;
 		try {
+#if MA_PROF_BLACKBERRY_VERSION == 4
+				String url = this.url+";interface=wifi";
+#endif
 			StreamConnection conn = (StreamConnection)
 #ifdef BB_RIM_NETWORKING
 				BlackBerryConnectionFactory.openConnection(url);
@@ -284,7 +288,11 @@ public static final int recv(InputStream in, byte[] bytes, int offset, int size)
 throws IOException
 {
 	//DEBUG_TEMP("special recv\n");
+#if (MA_PROF_BLACKBERRY_VERSION == 4)
+	int res = in.read(bytes, offset, 1);
+#else
 	int res = in.read(bytes, offset, size);
+#endif
 	if(res == 1) {
 		int len = size - 1;
 		if(len > 0) {
@@ -320,7 +328,7 @@ class ConnRead implements Runnable {
 		byte[] bytes = new byte[size];
 		int res;
 		try {
-			//DEBUG_ALWAYS("ConnRead " + size + "\n");
+			//DEBUG_TEMP("ConnRead " + size + "\n");
 #if 0
 			// if connect failed, mac still exists, but in is null.
 			// this means that if you try to read from a broken connection,
