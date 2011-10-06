@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+html
+{
+	/* Set page attributes. */
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+/*background: 
+			-webkit-gradient(radial, 50% 60%, 0, 53% 50%, 50, from(rgba(255,255,255,0)), color-stop(99%,rgba(255,255,255,.15)), to(rgba(255,255,255,0))),
+			-webkit-gradient(radial, 50% 50%, 0, 50% 50%, 100, from(rgba(255,255,255,0)), color-stop(99%,rgba(255,255,255,.1)), to(rgba(255,255,255,0))),
+			-webkit-gradient(radial, 50% 50%, 0, 50% 50%, 200, from(rgba(255,255,255,0)), color-stop(99%,rgba(255,255,255,.1)), to(rgba(255,255,255,0))),
+			-webkit-gradient(radial, 40% 50%, 0, 40% 55%, 25, from(rgba(255,255,255,0)), color-stop(99%,rgba(255,255,255,.1)), to(rgba(255,255,255,0))),
+			-webkit-gradient(linear, 0% 0%, 0% 100%, from(#8D4212), to(#28580C), color-stop(.5,#DA881B));
+		background-size: 400px 400px, 470px 470px, 600px 600px, 300px 300px, 100% 100%;
+		background-color: #28580C;*/
+background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAUUlEQVQYGWP4mae3+f///wz4MEgNI0gBPvArX38zSJ6JGEVsEy/64lQIMwmkCKeJ6IqwKsSmCEMhLkUoCvEpgiskpAikkBEUmCAGzHcgNjYAAEq1Qc4F4xeWAAAAAElFTkSuQmCC);	/* Disable text selection in all browsers. */
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+#WriteToTagButton
+{
+	/* Text attributes. */
+	font-size: 1.5em;
+	font-family: sans-serif;
+	font-weight: bold;
+	text-align: right;
+	border-radius: 50px;
+	background-color: rgb(249, 107, 45);
+	padding: 5px;
+	margin: 10px;
+}
+
+#TitleText
+{
+	/* Text attributes. */
+	font-size: 0.8em;
+	font-family: sans-serif;
+	font-weight: normal;
+	text-align: center;
+	border-width: 1px;
+	border-style: solid;
+	border-color: rgb(249, 107, 45);
+	border-radius: 20px;
+	background: white;
+	margin: 10px;
+	padding: 10px;
+	opacity: 0.9;
+}
+.InfoBox
+{
+	/* Text attributes. */
+	font-size: 0.8em;
+	font-family: monospace;
+	font-weight: normal;
+	text-align: right;
+	border: 2px;
+	border-color: rgb(249, 107, 45);
+	border-radius: 20px;
+	background: white;
+	margin: 10px;
+	padding: 10px;
+	opacity: 0.9;
+}
+
+.spacer
+{
+	clear: both;
+}
+</style>
+
+<!--
+	Import the josync library to enable communication
+	between JavaScript and C++ .
+-->
+<script src="js/josync.js"></script>
+
+<script>
+
+function WriteToTag() {
+	var writeToTagButton = document.getElementById("WriteToTagButton");
+	josync.messagehandler.send({messageName: "WriteSampleTag"}, null);
+	updateInfo("write_tag", "Ready to write.\nPlease hold a tag close to the device to write to it.\nPress BACK to cancel.");
+	Vibrate();
+}
+
+function showWriteAlert() {
+	
+}
+
+function updateInfo(icon, info) {
+	var infoBox = document.getElementById("InfoBoxContents");
+	infoBox.innerHTML = info;
+	var infoIcon = document.getElementById("InfoIcon");
+	infoIcon.src = "images/" + icon + ".png";
+}
+
+/**
+ * Make device vibrate!
+ */
+function Vibrate() 
+{
+	josync.messagehandler.send({messageName: "Vibrate"}, null);
+}
+
+</script>
+</head>
+
+<body>
+<div id="TitleText">
+<br/>
+<img alt="MoSync" src="images/MoSyncLogo.png">
+<br/>
+<br/>
+<b>MoSync NFC Example</b><br/>
+Hold a tag close to the device to dump it's contents onto the screen.<br/><br/>
+To write an example tag, click one of the buttons below. Then hold a writable tag close to the device.<br/><br/>
+</div>
+<div id="WriteToTagButton" onclick="WriteToTag()">
+Write URL &gt;&nbsp;&nbsp;
+</div><div id="WriteToTagButton" onclick="WriteToTag()">
+Write vCard &gt;&nbsp;&nbsp;
+</div>
+<div class="InfoBox">
+<div style="float: left; padding: 12px;">
+<img src="images/info.png" id="InfoIcon"/>
+</div>
+<div id="InfoBoxContents">
+&lt;No messages yet&gt;
+</div>
+<div class="spacer"></div>
+</div>
+</body>
+<script>
+josync.messagehandler.send({messageName: "StartNFC"}, null);
+</script>
+</html>

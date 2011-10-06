@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project supports-build-configs="true" version="1.2">
+<build.cfg id="Debug" types="Debug"/>
+<build.cfg id="Release" types="Release"/>
+<properties>
+<property key="android:package.name" value="com.mosync.NFCExample"/>
+<property key="build.prefs:additional.libraries" value="MAUtil.lib, NativeUI.lib, MAFS.lib, josync.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFS.lib, josync.lib"/>
+<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access NFC Vibrate"/>
+<property key="build.prefs:memory.data/Debug" value="4096"/>
+<property key="build.prefs:memory.data/Release" value="4096"/>
+<property key="build.prefs:memory.heap/Debug" value="3072"/>
+<property key="build.prefs:memory.heap/Release" value="3072"/>
+<property key="build.prefs:memory.stack/Debug" value="512"/>
+<property key="build.prefs:memory.stack/Release" value="512"/>
+<property key="com.mobilesorcery.sdk.html5.support" value="true"/>
+<property key="template.id" value="project.html5.hybrid"/>
+</properties>
+</project>
