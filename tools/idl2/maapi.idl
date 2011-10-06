@@ -3074,12 +3074,25 @@ group PIMAPI "PIM API" {
 			NICKNAME = 107;
 			/// #MA_PIM_TYPE_STRING. Supplemental information, or a comment.
 			NOTE = 108;
-			/// #MA_PIM_TYPE_STRING. Organization/company name.
+
+			/**
+			* @brief The organization name of the contact.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @attributes Work, Other, Custom.
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			ORG = 109;
+
 			/// #MA_PIM_TYPE_INT. Connected with PHOTO_URL.
 			PHOTO = 110;
+
 			/// #MA_PIM_TYPE_STRING. Connected with PHOTO.
 			PHOTO_URL = 111;
+
 			/// #MA_PIM_TYPE_BINARY. Connected with PUBLIC_KEY_STRING.
 			/// Not available on Android and iOS.
 			PUBLIC_KEY = 112;
@@ -7779,7 +7792,7 @@ group NFCAPI "NFC API" {
 
 	/**
 	* Disable panic system.
-	* If an error occurs in the syscall, an error code will be returned by the syscall and the 
+	* If an error occurs in the syscall, an error code will be returned by the syscall and the
 	* program will continue running.
 	* \return #RES_OK.
 	*/
