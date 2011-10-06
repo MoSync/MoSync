@@ -55,10 +55,10 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 	sh(generateCmd.str().c_str(), s.silent);
 
 	// Copy program files to xcode template
-	copyFile(file(xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), file(src + "/rebuild.build.cpp").c_str());
-	copyFile(file(xcodeprojOutput + "/data_section.bin").c_str(), file(src + "/data_section.bin").c_str());
+	copyFile((xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), (src + "/rebuild.build.cpp").c_str());
+	copyFile((xcodeprojOutput + "/data_section.bin").c_str(), (src + "/data_section.bin").c_str());
 
-	string resourceFileCopy = file(xcodeprojOutput + "/resources");
+	string resourceFileCopy = xcodeprojOutput + "/resources";
 	if(s.resource) {
 		copyFile(resourceFileCopy.c_str(), s.resource);
 	} else {
