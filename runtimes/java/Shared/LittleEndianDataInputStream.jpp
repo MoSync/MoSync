@@ -66,12 +66,14 @@ final class LittleEndianDataInputStream extends InputStream {
 		return res;
 	}
 	public final int read(byte[] b) throws IOException {
+		DEBUG("LittleEndianDataInputStream.read(byte[])\n");
 		int res = stream.read(b);
 		if(res > 0)
 			pos += res;
 		return res;
 	}
 	public final int read(byte[] b, int off, int len) throws IOException {
+		DEBUG("LittleEndianDataInputStream.read(byte[], "+off+", "+len+")\n");
 		int res = stream.read(b, off, len);
 		if(res > 0)
 			pos += res;
@@ -83,6 +85,7 @@ final class LittleEndianDataInputStream extends InputStream {
 		return res;
 	}
 	public final void readFully(byte[] b) throws IOException {
+		DEBUG("LittleEndianDataInputStream.readFully(byte[])\n");
 		stream.readFully(b);
 		pos += b.length;
 	}

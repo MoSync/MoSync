@@ -14,6 +14,13 @@ open('|git diff-index --numstat --cached HEAD --').each do |line|
 		next
 	end
 	name.strip!
+	if(!File.exist?(name))
+		if(added != '0')
+			puts name
+			raise hell
+		end
+		next
+	end
 	file = open(name, 'r')
 	count = 0
 	file.each do |fl|

@@ -84,7 +84,11 @@ class Work < TaskBase
 
 		@prerequisites.each do |p| p.invoke end
 
-		sh @TARGET if(doRun)
+		if(doRun)
+			if(!self.respond_to?(:run))
+				sh @TARGET
+			end
+		end
 	end
 
 	def invoke_clean
