@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "packagers.h"
 #include "util.h"
+#include "tools.h"
 #include "permissions.h"
 #include "nfc.h"
 #include "helpers/mkdir.h"
@@ -97,11 +98,11 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	string resourcesAp_ = dstDir + "/resources.ap_";
 
 	cmd.str("");
-	cmd <<""<<mosyncdir()<<"/bin/android/aapt package -f -M \""<<manifestXml<<"\""
-		" -F \""<<resourcesAp_<<"\""
+	cmd <<getBinary("android/aapt")<<" package -f -M "<<file(manifestXml)<<
+		" -F "<<file(resourcesAp_)<<
 		" -I \""<<mosyncdir()<<"/bin/android/android-"<<ri.androidVersion<<".jar\""<<
-		" -S \""<<res<<"\""
-		" -0 -A \""<<add<<"\"";
+		" -S "<<file(res)<<
+		" -0 -A "<<file(add);
 	sh(cmd.str().c_str());
 
 	// unzip Runtime class files
@@ -109,7 +110,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	_mkdir(classes.c_str());
 
 	cmd.str("");
-	cmd <<""<<mosyncdir()<<"/bin/unzip"
+	cmd <<getBinary("unzip")<<
 		" -o -q \""<<ri.path<<"MoSyncRuntime"<<(s.debug ? "D" : "")<<".zip\""
 		" -d \""<<classes<<"\"";
 	sh(cmd.str().c_str());
@@ -128,7 +129,7 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	// run android/dx.jar
 	string classesDex = classes + "/classes.dex";
 	cmd.str("");
-	cmd <<"java -jar \""<<mosyncdir()<<"/bin/android/dx.jar\""<<
+	cmd <<"java -jar "<<getBinary("android/dx.jar")<<
 		" --dex --patch-string com/mosync/java/android"
 		" "<<packageNameToByteCodeName(s.androidPackage)<<""
 		" \"--output="<<classesDex<<"\" \""<<classes<<"\"";
@@ -137,11 +138,11 @@ void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
 	// run android/apkbuilder.jar
 	string unsignedApk = dstDir + "/" + string(s.name) + "_unsigned.apk";
 	cmd.str("");
-	cmd <<"java -jar \""<<mosyncdir()<<"/bin/android/apkbuilder.jar\""
-		" \""<<unsignedApk<<"\""
-		" -u -z \""<<resourcesAp_<<"\""
-		" -f \""<<classesDex<<"\""
-		" -nf \""<<addlib<<"\"";
+	cmd <<"java -jar "<<getBinary("android/apkbuilder.jar")<<
+		" "<<file(unsignedApk)<<
+		" -u -z "<<file(resourcesAp_)<<
+		" -f "<<file(classesDex)<<
+		" -nf "<<file(addlib);
 	sh(cmd.str().c_str());
 
 
@@ -174,8 +175,8 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 			createKeystoreCmd.str("");
 			createKeystoreCmd << "keytool -genkeypair -v -alias "<<alias<<
 				" -validity 3650 -keypass "<<keypass<<
-				" -keystore \""<<keystore<<"\""
-				" -storepass "<<storepass<<
+				" -keystore "<< file(keystore)<<
+				" -storepass "<< arg(storepass)<<
 				" -dname \"cn=MoSync, ou=MoSync, o=MoSync, c=SE\"";
 			sh(createKeystoreCmd.str().c_str());
 		}
@@ -193,12 +194,12 @@ static void createSignCmd(ostringstream& cmd, string& keystore, string& alias, s
 	storepass = hidden ? "*** HIDDEN ***" : storepass;
 	keypass = hidden ? "*** HIDDEN ***" : keypass;
 
-	cmd <<"java -jar \""<<mosyncdir()<<"/bin/android/tools-stripped.jar\""
-		" -keystore \""<<keystore<<"\" -storepass \""<<storepass<<"\""
-		" -keypass \""<<keypass<<"\" "
-		" -signedjar \""<<signedApk<<"\""
-		" \""<<unsignedApk<<"\""
-		" "<<alias;
+	cmd <<"java -jar "<<getBinary("android/tools-stripped.jar")<<
+		" -keystore "<<arg(keystore)<<" -storepass "<<arg(storepass)<<
+		" -keypass "<<arg(keypass)<<
+		" -signedjar "<<file(signedApk)<<
+		" "<<file(unsignedApk)<<
+		" "<<arg(alias);
 }
 
 static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
@@ -235,9 +236,7 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 			string outputDir = string(s.dst) + directories.at(i);
 			_mkdir(outputDir.c_str());
 			string outputIcon = outputDir + "/icon.png";
-			iconInjectCmd << "\"" << mosyncdir() << "/bin/icon-injector\" -platform android -src \"" <<
-				s.icon << "\" -size " << size.c_str() << " -dst \"" << outputIcon.c_str() << "\"";
-			sh(iconInjectCmd.str().c_str(), s.silent);
+			injectIcon("android", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
 		}
 	}
 }

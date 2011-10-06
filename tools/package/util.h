@@ -55,6 +55,14 @@ void toBackSlashes(std::string&);
 // add / to end of string, if one wasn't already there.
 void toDir(std::string&);
 
+// Makes sure arguments with spaces are quoted
+std::string arg(const char* arg);
+std::string arg(std::string arg);
+
+// Makes sure a command line argument is properly slashed and quoted
+std::string file(const char* arg);
+std::string file(std::string arg);
+
 // returns the directory part of the name. assumes front-slashes.
 std::string getDir(const std::string& name);
 

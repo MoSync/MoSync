@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <buildSequence>
-<buildStep type="cmd">
-<cmd foe="true" name="Bundle local files" pf="false" pt="">%mosync-bin%/Bundle -in %project:WebViewLoveSMS%/LocalFiles -out %project:WebViewLoveSMS%/Resources/LocalFiles.bin</cmd>
+<buildStep type="bundle">
+<bundle foe="true" inFile="%current-project%/LocalFiles" name="Bundle LocalFiles" outFile="%current-project%/Resources/LocalFiles.bin"/>
 </buildStep>
 <buildStep type="resource"/>
 <buildStep type="compile"/>

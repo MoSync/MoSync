@@ -40,6 +40,20 @@ namespace NativeUI
     class WebViewListener
     {
     public:
+		/**
+		 * Constructor.
+		 */
+		WebViewListener()
+		{
+		}
+
+		/**
+		 * We need to define an virtual destructor for
+		 * the library to build in Debug mode.
+		 */
+		virtual ~WebViewListener()
+		{
+		}
 
         /**
          * This method is called when MAW_EVENT_WEB_VIEW_HOOK_INVOKED is received.
@@ -59,7 +73,9 @@ namespace NativeUI
         virtual void webViewHookInvoked(
 			WebView* webView,
 			int hookType,
-			MAHandle urlData);
+			MAHandle urlData)
+		{
+		}
 
         /**
          * This method is called when the web view content is loading.
@@ -72,7 +88,9 @@ namespace NativeUI
          */
         virtual void webViewContentLoading(
 			WebView* webView,
-			const int webViewState);
+			const int webViewState)
+		{
+		}
     };
 
 } // namespace NativeUI

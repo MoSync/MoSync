@@ -298,7 +298,7 @@ public class MoSyncThread extends Thread
 		EventQueue.sMoSyncThread = this;
 		sMoSyncThread = this;
 
-		SingletonObject.getSingletonObject().setThread(this);
+		MoSyncError.getSingletonObject().setThread(this);
 
 		mHasDied = false;
 
@@ -3884,6 +3884,21 @@ public class MoSyncThread extends Thread
 	int maSensorStop(int sensor)
 	{
 		return mMoSyncSensor.maSensorStop(sensor);
+	}
+
+	/**
+	 * Panics
+	 */
+	int maSyscallPanicsEnable()
+	{
+		MoSyncError.getSingletonObject().setFlag(true);
+		return 0;
+	}
+
+	int maSyscallPanicsDisable()
+	{
+		MoSyncError.getSingletonObject().setFlag(false);
+		return 0;
 	}
 
 	/**

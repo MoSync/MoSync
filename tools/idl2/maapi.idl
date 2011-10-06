@@ -3016,6 +3016,8 @@ interface MAAPI {
 		*/
 		int maGetSystemProperty(in MAString key, out MAString buf range("size"), in int size);
 
+group PIMAPI "PIM API" {
+
 #if IX_PIM
 		constset int MA_PIM_ {
 			/**
@@ -3027,6 +3029,7 @@ interface MAAPI {
 			TODOS = 3;
 		}
 
+	group PIMConsts "PIM Constants" {
 		constset int MA_PIM_TYPE_ {
 			/// bytes
 			/// the bytes are not null-terminated.
@@ -3071,12 +3074,25 @@ interface MAAPI {
 			NICKNAME = 107;
 			/// #MA_PIM_TYPE_STRING. Supplemental information, or a comment.
 			NOTE = 108;
-			/// #MA_PIM_TYPE_STRING. Organization/company name.
+
+			/**
+			* @brief The organization name of the contact.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @attributes Work, Other, Custom.
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			ORG = 109;
+
 			/// #MA_PIM_TYPE_INT. Connected with PHOTO_URL.
 			PHOTO = 110;
+
 			/// #MA_PIM_TYPE_STRING. Connected with PHOTO.
 			PHOTO_URL = 111;
+
 			/// #MA_PIM_TYPE_BINARY. Connected with PUBLIC_KEY_STRING.
 			/// Not available on Android and iOS.
 			PUBLIC_KEY = 112;
@@ -3133,9 +3149,9 @@ interface MAAPI {
 			PREFIX = 3;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Suffix. (ex. "M.D.")
 			SUFFIX = 4;
-			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic first name.
-			PHONETIC_FAMILY = 5;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic last name.
+			PHONETIC_FAMILY = 5;
+			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic first name.
 			PHONETIC_GIVEN = 6;
 			/// Index for #MA_PIM_FIELD_CONTACT_NAME. Phonetic middle name.
 			PHONETIC_OTHER = 7;
@@ -3457,7 +3473,9 @@ interface MAAPI {
 			/// The operation is not allowed by the Address Book database.
 			OPERATION_NOT_PERMITTED = -18;
 		}
+	}
 
+	group PIMFunctions "PIM Functions"{
 		/**
 		* \brief Opens a PimList. Use maPimListNext() to open the list's items.
 		* \param listType One of the \link #MA_PIM_CONTACTS MA_PIM \endlink constants.
@@ -3721,8 +3739,10 @@ interface MAAPI {
 		* \note If this function fails, the item is not closed.
 		*/
 		int maPimItemRemove(in MAHandle list, in MAHandle item);
-#endif	//IX_PIM
+		} //end of pim functions
 
+#endif	//IX_PIM
+}
 #if IX_WIDGET
 #include "native_ui_intro_doc.idl"
 group WidgetAPI "Widget API" {
@@ -7202,9 +7222,10 @@ group CameraFunctions "Camera Functions" {
 		 */
 		int maScreenStateEventsOff();
 
+group OpenGLES "OpenGLES" {
 #include "opengl_non_generated.idl"
 #include "opengl_generated.idl"
-
+}
 		/**
 		 * Logs information about the state of all current resources.
 		 */
@@ -7256,6 +7277,8 @@ group CameraFunctions "Camera Functions" {
 		void maOptionsBox(in MAWString title,in MAWString destructiveButtonTitle, in MAWString cancelButtonTitle,
 								 in MAAddress otherButtonTitles, in int otherButtonTitlesSize);
 
+group SensorAPI "Sensor API" {
+		group SensorTypes "Sensor Types" {
 		constset int SENSOR_TYPE_ {
 			// A constant describing an accelerometer sensor type.
 			ACCELEROMETER = 1;
@@ -7269,6 +7292,9 @@ group CameraFunctions "Camera Functions" {
 			PROXIMITY = 5;
 		}
 
+		} // end of sensor types
+
+		group SensorConsts "Sensor Constants" {
 		constset int SENSOR_RATE_ {
 			// Get sensor data as fast as possible.
 			FASTEST = 0;
@@ -7315,6 +7341,9 @@ group CameraFunctions "Camera Functions" {
 			NEAR = 1;
 		}
 
+		} //end of sensor constants
+
+	group SensorFunctions "Sensor Functions" {
 		/**
 		* \brief Enables a sensor and starts sending events if the sensor is available.
 		* If the sensor is already enabled this call will have no effect.
@@ -7340,6 +7369,9 @@ group CameraFunctions "Camera Functions" {
 		*/
 		int maSensorStop(in int sensor);
 
+	}//End of Sensor Functions
+
+group NFCAPI "NFC API" {
 		/**
 		* Start listening to NFC events.
 		* \return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
@@ -7749,9 +7781,25 @@ group CameraFunctions "Camera Functions" {
 			KEY_B = 2;
 
 		}
+	}//end of NFC API
 
+	/**
+	* Enable panic system.
+	* If a panic is raised a message will be displayed to the user and the program will be shut down.
+	* \return #RES_OK.
+	*/
+	int maSyscallPanicsEnable();
+
+	/**
+	* Disable panic system.
+	* If an error occurs in the syscall, an error code will be returned by the syscall and the
+	* program will continue running.
+	* \return #RES_OK.
+	*/
+	int maSyscallPanicsDisable();
 	}
 
+}
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;
 	}

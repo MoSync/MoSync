@@ -214,7 +214,13 @@ void toDir(std::string& str) {
 }
 
 std::string getDir(const std::string& name) {
-	return name.substr(0, name.find_last_of('/'));
+	size_t index = name.find_last_of('/');
+#ifdef WIN32
+	size_t bi = name.find_last_of('\\');
+	if(bi > index || index == string::npos)
+		index = bi;
+#endif
+	return name.substr(0, index);
 }
 
 string fullpathString(const char* name) {
@@ -249,5 +255,41 @@ void write72line(std::ostream& output, const std::string& input) {
 	}
 	// Newline + first char of next must be space
 	output << delim(splitLines, string("\n "));
+}
 
+string arg(const char* arg) {
+	string result = string(arg);
+	if (result.find(' ') != string::npos) {
+		result = "\"" + result + "\"";
+	}
+	return result;
+}
+
+string arg(string argArg) {
+	return arg(argArg.c_str());
+}
+
+string file(const char* argArg) {
+	string argStr = string(argArg);
+#ifdef WIN32
+	toBackSlashes(argStr);
+#else
+	toSlashes(argStr);
+#endif
+	return arg(argStr.c_str());
+}
+
+string file(std::string arg) {
+	return file(arg.c_str());
+}
+
+void toSlashes(string& str) {
+	for(size_t i=0; i<str.size(); i++) {
+		str[i] = (str[i] == '\\' ? '/' : str[i]);
+	}
+}
+void toBackSlashes(std::string& str) {
+	for(size_t i=0; i<str.size(); i++) {
+		str[i] = (str[i] == '/' ? '\\' : str[i]);
+	}
 }

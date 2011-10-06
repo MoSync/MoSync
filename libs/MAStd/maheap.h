@@ -83,6 +83,8 @@ void free(void *mem);
 * If successful, returns a pointer to the resized memory block.
 * The pointer may be identical to the \a old, or different.
 * Returns NULL on failure, leaving the old memory block untouched.
+* If \a old is NULL, a new block is allocated.
+* If \a size is 0, the block is freed, and NULL is returned.
 *
 * \param old The old block of memory.
 * \param size The requested size.

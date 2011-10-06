@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<!--
+	This application shows how to communicate from JavaScript to C++.
+	When the LogoBox is touched, a call is made to C++ to make the
+	device vibrate. The C++ code that gets called is in main.cpp.
+-->
+<html>
+<head>
+<style>
+html
+{
+	/* Set page attributes. */
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #FFFFFF;
+
+	/* Disable text selection in all browsers. */
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+#LogoBox
+{
+	/* Center element horizontally. */
+	display: table;
+	margin: auto auto;
+
+	/* Set width of box. */
+	width: 16em;
+
+	/* Use a hand pointer. */
+	cursor: pointer;
+}
+
+#LogoBox img
+{
+	/* Make image same with as LogoBox. */
+	width: 16em;
+}
+
+#TextBox
+{
+	/* Text attributes. */
+	font-size: 2.5em;
+	font-family: sans-serif;
+	font-weight: bold;
+	text-align: center;
+}
+</style>
+
+<!--
+	Import the josync library to enable communication
+	between JavaScript and C++ .
+-->
+<script src="js/josync.js"></script>
+
+<script>
+/**
+ * Array with texts for the TextBox.
+ */
+var TextArray = ["Touch Me!", "Welcome to MoSync and HTML5!"];
+
+/**
+ * Change the text in the TextBox. Swaps between array elements.
+ */
+function SwapText()
+{
+	var textBox = document.getElementById("TextBox");
+	if (textBox.innerHTML == TextArray[0])
+	{
+		textBox.innerHTML = TextArray[1];
+	}
+	else
+	{
+		textBox.innerHTML = TextArray[0];
+	}
+}
+
+/**
+ * Make device virbrate and update the text shown
+ * in the user interface.
+ */
+function OnTouch()
+{
+	Vibrate();
+	SwapText();
+}
+
+/**
+ * Make device virbrate and update the text shown
+ * in the user interface.
+ */
+function Vibrate()
+{
+	// This is how a message is passed to C++ when
+	// using the josync library.
+	josync.messagehandler.send({messageName: "Vibrate"}, null);
+}
+</script>
+</head>
+
+<body>
+<div id="LogoBox" onclick="OnTouch()">
+	<img src="images/MoSyncLogo.png"/>
+	<div id="TextBox"></div>
+</div>
+</body>
+<script>
+	// Page elements has loaded, show initial text.
+	SwapText();
+</script>
+</html>
