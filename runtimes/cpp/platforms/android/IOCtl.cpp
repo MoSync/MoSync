@@ -2436,7 +2436,7 @@ namespace Base
 		if (methodID == 0)
 			return 0;
 
-		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle);
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle, ndefMessage);
 
 		jNIEnv->DeleteLocalRef(cls);
 
@@ -2612,7 +2612,7 @@ namespace Base
 		if (methodID == 0)
 			return 0;
 
-		jint result = jNIEnv->CallIntMethod(jThis, methodID, ndefRecordHandle);
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, ndefRecordHandle, tnf);
 
 		jNIEnv->DeleteLocalRef(cls);
 
