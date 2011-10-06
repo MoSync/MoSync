@@ -95,7 +95,7 @@ import javax.microedition.pim.*;
 
 #define CORE mCore
 
-final class Syscall 
+final class Syscall
 #define IMPLEMENTS implements
 
 #ifdef MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH
@@ -216,8 +216,8 @@ IMPLEMENTS MoSync
 
 	Player mPlayer = null;
 	int mSoundVolume = 100;
-	
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI	
+
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI
 	int mStreamState = SS_IDLE;
 	Player mStreamPlayer = null;
 	VideoControl mStreamVideoControl = null;
@@ -237,7 +237,7 @@ IMPLEMENTS MoSync
 
 	Hashtable mStores = new Hashtable();
 	int mMaxStoreId = 0;
-	
+
 	final long mStartTime = System.currentTimeMillis();
 
 	boolean mUseFrameBuffer = false;
@@ -415,7 +415,7 @@ IMPLEMENTS MoSync
 					DEBUG_ALWAYS("s "+file.readVarSignedInt()+"\n");
 					break;
 #endif	//PHONE_RELEASE
-				case RT_LABEL:  
+				case RT_LABEL:
 					byte tempLabel[] = new byte[size-1];
 					file.readFully(tempLabel);
 					MYASSERT(file.read() == 0);	// read null terminator
@@ -778,7 +778,7 @@ public
 		int b;
 		DEBUG_ALWAYS(input + "\n");
 		while((b=input.read())!=0) {
-			if(b==-1) BIG_PHAT_ERROR; 
+			if(b==-1) BIG_PHAT_ERROR;
 			sb.append((char)b);
 		}
 		return new String(sb);
@@ -942,7 +942,7 @@ public
 
 	#include "FloatingPointMath.jpp"
 
-	SYSCALL(int) maGetKeys() {	
+	SYSCALL(int) maGetKeys() {
 		if(G_CLOSING)
 			return 0;
 		YIELD;
@@ -961,7 +961,7 @@ public
 		mClipWidth = width;
 		mClipHeight = height;
 	}
-	
+
 	SYSCALL(void) maGetClipRect(Address rect) {
 #ifdef DEBUG_MEMORY
 		MYASSERT((rect & 3) == 0);
@@ -972,7 +972,7 @@ public
 		mem_ds[rect+1] = mClipTop;
 		mem_ds[rect+2] = mClipWidth;
 		mem_ds[rect+3] = mClipHeight;
-	}	
+	}
 
 	SYSCALL(void) maPlot(int posX, int posY) {
 		//mGraphics.fillRect(posX, posY, 1, 1);
@@ -1015,10 +1015,10 @@ public
 			mGraphics.fillTriangle(xc, yc, xa, ya, xb, yb);
 			i++;
 			if(i >= count)
-				break;			
+				break;
 		}
 	}
-	
+
 
 	SYSCALL(void) maFillTriangleFan(Address address, int count) {
 		int i = 2;
@@ -1112,7 +1112,7 @@ public
 				mCanvas.getWidth(),
 				mCanvas.getHeight(),
 				false);
-		} 
+		}
 
 		mCanvas.flushGraphics();
 	}
@@ -1198,38 +1198,38 @@ public
 		//The transformMode values that are passed to this function are in different order
 		// Reordering them here to make JavaME runtime behave like others
 		int transformModeReordered;
-		
-		switch (transformMode) 
+
+		switch (transformMode)
 		{
-			case TRANS_NONE: 
+			case TRANS_NONE:
 				transformModeReordered = 0;
 				break;
-			case TRANS_MIRROR_ROT180: 
+			case TRANS_MIRROR_ROT180:
 				transformModeReordered = 1;
 				break;
-			case TRANS_MIRROR: 
+			case TRANS_MIRROR:
 				transformModeReordered = 2;
 				break;
-			case TRANS_ROT180: 
+			case TRANS_ROT180:
 				transformModeReordered = 3;
 				break;
-			case TRANS_MIRROR_ROT270: 
+			case TRANS_MIRROR_ROT270:
 				transformModeReordered = 4;
 				break;
-			case TRANS_ROT90: 
+			case TRANS_ROT90:
 				transformModeReordered = 5;
 				break;
-			case TRANS_ROT270: 
+			case TRANS_ROT270:
 				transformModeReordered = 6;
 				break;
-			case TRANS_MIRROR_ROT90: 
+			case TRANS_MIRROR_ROT90:
 				transformModeReordered = 7;
 				break;
-			default: 
+			default:
 				transformModeReordered = 0;
 				break;
 		}
-		
+
 		mGraphics.drawRegion(img, srcRect_left, srcRect_top, srcRect_width, srcRect_height,
 			transformModeReordered, dstTopLeft_x, dstTopLeft_y, Graphics.TOP|Graphics.LEFT);
 	}
@@ -1290,10 +1290,6 @@ public
 	final boolean startSound(InputStream input, String mimeString) throws Exception {
 		disposeSound();
 
-#ifdef MA_PROF_BLACKBERRY_VERSION
-		// prefetch() hangs.
-		return false;
-#else
 		/*DEBUG_ALWAYS("Mime: "+mimeString+"\n");
 		DEBUG_ALWAYS("Equality: "+mimeString.equals("audio/mpeg")+"\n");
 		DEBUG_ALWAYS("Comparison: "+mimeString.compareTo("audio/mpeg")+"\n");*/
@@ -1307,7 +1303,7 @@ public
 		mPlayer = Manager.createPlayer(input, mimeString);
 		//if(mPlayer==null) { DEBUG_ALWAYS("Couldn't create Player."); BIG_PHAT_ERROR; }
 		if(mPlayer==null) { DEBUG_ALWAYS("Couldn't create Player."); return false; }
-		
+
 		DEBUG_SOUND("realize...\n");
 		mPlayer.realize();
 		DEBUG_SOUND("realized\n");
@@ -1324,7 +1320,6 @@ public
 		mPlayer.start();
 		DEBUG_SOUND("started\n");
 		return true;
-#endif	//MA_PROF_BLACKBERRY_VERSION
 	}
 
 
@@ -1335,18 +1330,18 @@ public
 		if(mPlayer.getState() == Player.STARTED) {
 			mPlayer.stop();
 		}
-	}	
+	}
 
 	SYSCALL(void) maSoundSetVolume(int vol) {	//vol is in range 0 - 100
 		if(vol<0) vol = 0;
 		else if(vol>100) vol = 100;
 		mSoundVolume = vol;
 	}
-	
+
 	SYSCALL(int) maSoundGetVolume() {
 		return mSoundVolume;
 	}
-	
+
 	// returns 1 if the sound is playing, otherwise 0
 	SYSCALL(int) maSoundIsPlaying() {
 		if(mPlayer == null) return 0;
@@ -1495,8 +1490,8 @@ public
 		}
 		return -1;
 	}
-	
-	SYSCALL(int) maCreateImageFromData(MAHandle placeholder, MAHandle data, int offset, int size) 
+
+	SYSCALL(int) maCreateImageFromData(MAHandle placeholder, MAHandle data, int offset, int size)
 		throws Exception
 	{
 		BinaryInterface bi = (BinaryInterface)getResource(data);
@@ -1520,11 +1515,11 @@ public
 		return RES_OK;
 	}
 
-	SYSCALL(int) maCreateImageRaw(MAHandle placeholder, Address src, MAExtent size, int alpha) 
+	SYSCALL(int) maCreateImageRaw(MAHandle placeholder, Address src, MAExtent size, int alpha)
 		throws Exception
 	{
 		MYASSERT(BYTEPART(src) == 0);
-		int width = EXTENT_X(size);		
+		int width = EXTENT_X(size);
 		int height = EXTENT_Y(size);
 
 		try {
@@ -1844,7 +1839,7 @@ public
 			return maWriteLog(a, b);
 #endif
 
-#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH 
+#ifdef MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH
 		case maIOCtl_maBtStartDeviceDiscovery:
 			return maBtStartDeviceDiscovery(a);
 		case maIOCtl_maBtGetNewDevice:
@@ -1923,7 +1918,7 @@ public
 			return maStreamVideoStart(readMemString(a));
 		case maIOCtl_maStreamClose:
 			return maStreamClose(a);
-		case maIOCtl_maStreamPause: 
+		case maIOCtl_maStreamPause:
 			return maStreamPause(a);
 		case maIOCtl_maStreamResume:
 			return maStreamResume(a);
@@ -1948,7 +1943,7 @@ public
 
 #ifdef MA_IX_AUDIOBUFFER
 		case maIOCtl_maAudioBufferInit:
-			return maAudioBufferInit(a);		
+			return maAudioBufferInit(a);
 		case maIOCtl_maAudioBufferReady:
 			return maAudioBufferReady();
 		case maIOCtl_maAudioBufferClose:
@@ -2163,7 +2158,7 @@ public
 	}
 #endif	//MA_SUPPORT_STREAMING
 
-	int maFrameBufferGetInfo(Address info) 
+	int maFrameBufferGetInfo(Address info)
 	{
 		//struct MAFrameBufferInfo {
 		int addr = info;
@@ -2184,11 +2179,11 @@ public
 		WINT(addr+52, mCanvas.getHeight()); // int height;
 		WINT(addr+56, mCanvas.getWidth()<<2); // int pitch;
 		WINT(addr+60, 0); // int supportsGfxSyscalls;
-		//}			
-		return 1;			
+		//}
+		return 1;
 	}
 
-	int maFrameBufferInit(Address data) 
+	int maFrameBufferInit(Address data)
 	{
 		mUseFrameBuffer = true;
 		mFrameBufferAddr = data;
@@ -2346,7 +2341,7 @@ public
 						mStreamVideoControl.setVisible(true);
 					}
 				}
-			}	
+			}
 		}
 	};
 
@@ -2372,7 +2367,7 @@ public
 			/*
 			VolumeControl v = (VolumeControl)mStreamPlayer.getControl("VolumeControl");
 			if(v != null) v.setLevel(mSoundVolume);
-			*/			
+			*/
 			mStreamPlayer.setLoopCount(1);
 			mStreamPlayer.addPlayerListener(new MoSyncStreamVideoListener());
 
@@ -2510,7 +2505,7 @@ public
 		{
 			PRINT_STACK_TRACE;
 		}
-		return mt;	
+		return mt;
 	}
 #endif
 
@@ -2682,6 +2677,9 @@ public
 			mTextBox = null;
 			mCanvas.mDisplay.setCurrent(mCanvas);
 			mCanvas.setFullScreenMode(true);
+#ifdef BB_RIM_API
+			net.rim.device.api.system.Application.getApplication().addKeyListener(mCanvas);
+#endif
 		}
 	}
 
@@ -2699,6 +2697,9 @@ public
 		TextBoxCommandListener tbcl = new TextBoxCommandListener();
 		mTextBox.setCommandListener(tbcl);
 
+#ifdef BB_RIM_API
+		net.rim.device.api.system.Application.getApplication().removeKeyListener(mCanvas);
+#endif
 		mCanvas.mDisplay.setCurrent(mTextBox);
 		return 0;
 	}

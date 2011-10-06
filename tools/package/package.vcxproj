@@ -104,6 +104,7 @@
     <ClCompile Include="permissions.cpp" />
     <ClCompile Include="s60.cpp" />
     <ClCompile Include="selectPackager.cpp" />
+    <ClCompile Include="tools.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="windowsMobile.cpp" />
   </ItemGroup>
@@ -112,6 +113,7 @@
     <ClInclude Include="package.h" />
     <ClInclude Include="packagers.h" />
     <ClInclude Include="permissions.h" />
+    <ClInclude Include="tools.h" />
     <ClInclude Include="util.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

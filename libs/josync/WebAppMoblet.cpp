@@ -63,15 +63,6 @@ namespace josync
 			mMoblet->processWebViewMessage(webView, urlData);
 		}
 
-		/**
-		 * TODO: Remove when made non-abstract.
-		 */
-		virtual void webViewContentLoading(
-			NativeUI::WebView* webView,
-			const int webViewState)
-		{
-		}
-
 	private:
 		/**
 		 * Pointer to the moblet.
