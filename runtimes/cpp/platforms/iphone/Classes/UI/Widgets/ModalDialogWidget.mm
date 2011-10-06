@@ -23,6 +23,31 @@
 #include <base/Syscall.h>
 #include "MoSyncUISyscalls.h"
 
+//Custom UIView to be used with the Popover.
+//Based on the MAKE_UIWRAPPER_LAYOUTING_IMPLEMENTATION macro
+//that I couldn't get to work.
+//No need to override any IWidget methods, works with the default ones
+@interface MoSyncPopoverView : UIView {
+	IWidget* mWidget;
+}
+- (void)setWidget:(IWidget*)widget;
+- (void)layoutSubviews;
+- (void)superLayoutSubviews;
+@end
+
+@implementation MoSyncPopoverView 
+- (void)setWidget:(IWidget*)widget { 
+	mWidget = widget; 
+}
+- (void)layoutSubviews {
+	[mWidget layoutSubviews:self];
+}
+
+- (void)superLayoutSubviews {
+	[super layoutSubviews];
+}
+
+@end
 
 @implementation ModalDialogWidget
 
@@ -34,7 +59,7 @@
 
         // Will contain the navigation bar and the view where the widgets will be added.
         UIView* bigView = [[UIView alloc] initWithFrame:CGRectMake(0, 0, screenSize.size.width, screenSize.size.height)];
-        bigView.backgroundColor = [UIColor grayColor];
+
         mModalViewController.view = bigView;
 
         // Add navigation bar to the big view.
@@ -59,6 +84,11 @@
 
 	}
 	else {//The Popover code for iPad
+		//First, replace the default vanilla view with MoSyncPopoverView
+		[view release];
+		view = [[MoSyncPopoverView alloc] initWithFrame:CGRectMake(0, 0, 10, 10)];
+		controller.view = view;
+		[(MoSyncPopoverView*)view setWidget:self];
 		//Default position is on the top left corner
 		top = 0;
 		left = 0;
@@ -70,10 +100,14 @@
 		direction = UIPopoverArrowDirectionAny;
 		autoSizeParamX = FIXED_SIZE;
 		autoSizeParamY = FIXED_SIZE;
+		view.backgroundColor = [UIColor whiteColor];
 		//The navigation controller is needed for the title bar to appear
 		container = [[UINavigationController alloc] initWithRootViewController:controller];
 		popoverController = [[UIPopoverController alloc] initWithContentViewController:container];
 		popoverController.delegate = self;
+
+		//Hide the title bar by default
+		container.navigationBarHidden = YES;
 	}
 
     return ret;
@@ -170,6 +204,14 @@
 		else {
 			[controller.title release];
 			controller.title = value;
+			//Hide or show the title based ont he string
+			if ([controller.title isEqualToString:@""]){
+				container.navigationBarHidden = YES;
+			}
+			else {
+				container.navigationBarHidden = NO;
+			}
+
 		}
 	} else if([key isEqualToString:@MAW_MODAL_DIALOG_ARROW_POSITION]) {
 		int msDirection = [value intValue];
