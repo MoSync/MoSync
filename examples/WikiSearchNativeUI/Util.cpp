@@ -28,6 +28,8 @@ MA 02110-1301, USA.
 
 // Include library for string conversions.
 #include <mastdlib.h>
+#include <mactype.h>
+#include <maxtoa.h>
 
 // Include the resources for images.
 //#include "MAHeaders.h"
@@ -305,7 +307,7 @@ void formatToUnicode(String& input)
   replaceString(input, "&bull;", "•");
   replaceString(input, "&dagger;", "†");
   replaceString(input, "&copy;", "©");
-  replaceString(input, "&reg;", "&reg");
+  replaceString(input, "&reg;", "®");
   replaceString(input, "&deg;", "°");
   replaceString(input, "&micro;", "µ");
   replaceString(input, "&middot;", "·");

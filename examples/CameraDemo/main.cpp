@@ -86,7 +86,7 @@ public:
 		// Make the AppScreen listen for events coming from widgets.
 		//MAUtil::Environment::getEnvironment().addCustomEventListener(this);
 		char buffer[256];
-		int length = maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
+		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
 		createMainScreen();
 		mStackScreen = new StackScreen();
@@ -248,11 +248,11 @@ public:
 		maCameraSelect(mSettingsScreen->getCurrentCamera());
 		mCameraPreview->bindToCurrentCamera();
 		maCameraSetProperty(
-				MA_CAMERA_FLASH_MODE,
-				mSettingsScreen->getFLashMode()
-				);
+			MA_CAMERA_FLASH_MODE,
+			mSettingsScreen->getFLashMode()
+			);
 		char buffer[256];
-		int length = maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
+		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
 
 		//Disable the zoom buttons if zoom is not supported

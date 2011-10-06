@@ -19,7 +19,7 @@ MA 02110-1301, USA.
 
 /**
  * @file main.cpp
- * @author Mattias Frånberg and Chris Hughes
+ * @author Mattias FrÃ¥nberg and Chris Hughes
  *
  * This application provides a very basic example of how to work
  * with Native UI to position and and manipulate graphical user
@@ -77,6 +77,7 @@ public:
 	 * This method is called when the application is closed.
 	 */
 	void NativeUIMoblet::closeEvent()
+	GCCATTRIB(noreturn)
 	{
 		// Deallocate the main screen.
 		delete mMainScreen;

@@ -118,7 +118,7 @@ target :examples => :base do
 end
 
 target :all => :default do
-	Work.invoke_subdirs(EXAM_DIRS)
+	Work.invoke_subdirs_ex(true, EXAM_DIRS)
 end
 
 target :more => :base do
@@ -162,7 +162,7 @@ target :clean do
 end
 
 target :clean_examples do
-	Work.invoke_subdirs(EXAM_DIRS, "clean")
+	Work.invoke_subdirs_ex(true, EXAM_DIRS, "clean")
 end
 
 
