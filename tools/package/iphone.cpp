@@ -87,6 +87,9 @@ void packageIOS(const SETTINGS& s, const RuntimeInfo& ri) {
 		if (s.iOSSdk) {
 			buildCmd << " -sdk " << arg(s.iOSSdk);
 		}
+		if (s.iOSXcodeTarget) {
+			buildCmd << " -configuration " << arg(s.iOSXcodeTarget);
+		}
 		sh(buildCmd.str().c_str(), s.silent);
 #else
 		printf("Building Xcode projects is only supported on Mac OS X");

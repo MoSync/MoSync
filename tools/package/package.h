@@ -42,6 +42,7 @@ struct SETTINGS {
 	// iOS specific settings
 	const char* iOSCert;
 	const char* iOSSdk;
+	const char* iOSXcodeTarget;
 	bool iOSgenerateOnly;
 
 	// Android specific settings

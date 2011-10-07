@@ -140,6 +140,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.iOSCert);
 		} else if(streq(argv[i], "--ios-sdk")) { // iOS specific
 			setString(i, argc, argv, s.iOSSdk);
+		} else if(streq(argv[i], "--ios-xcode-target")) { // iOS specific
+			setString(i, argc, argv, s.iOSXcodeTarget);
 		} else if(streq(argv[i], "--ios-project-only")) { // iOS specific
 			s.iOSgenerateOnly = true;
 		} else if(streq(argv[i], "--cpp-output")) {
