@@ -349,10 +349,14 @@ public class MoSyncThread extends Thread
 		mMoSyncSensor = new MoSyncSensor(this);
 
 		mMoSyncPIM = new MoSyncPIM(this);
-
-		mMoSyncNFC = MoSyncNFCService.getDefault();
-		if (mMoSyncNFC != null) {
-			mMoSyncNFC.setMoSyncThread(this);
+		try{
+			mMoSyncNFC = MoSyncNFCService.getDefault();
+			if (mMoSyncNFC != null) {
+				mMoSyncNFC.setMoSyncThread(this);
+			}
+		} catch (Throwable t)
+		{
+			mMoSyncNFC = null;
 		}
 
 		nativeInitRuntime();
