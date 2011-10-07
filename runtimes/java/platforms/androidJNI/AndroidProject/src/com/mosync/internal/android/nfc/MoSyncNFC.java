@@ -422,7 +422,7 @@ public class MoSyncNFC {
 		IResource ndefRecord = getResource(ndefRecordHandle);
 		if (ndefRecord instanceof NDEFRecord) {
 			NDEFRecord rec = (NDEFRecord) ndefRecord;
-			return rec.maNFCGetPayload(getMemoryAt(dst, len));
+			return rec.maNFCGetType(getMemoryAt(dst, len));
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
 	}
