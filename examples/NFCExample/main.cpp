@@ -20,28 +20,29 @@ using namespace josync; // Class WebAppMoblet
 #define WRITE_TAG_ICON "write_tag"
 #define CONTACT_ICON "contact"
 #define URL_ICON "at"
+#define TOAST_PERIOD 5000
 
 enum Mode { _read, _write };
 
 /**
  * The application class.
  */
-class MyMoblet : public WebAppMoblet
+class MyMoblet : public WebAppMoblet, TimerListener
 {
 private:
 	byte payload[BUF_SIZE];
+	byte type[BUF_SIZE];
 	char hexEncoded[2 * BUF_SIZE];
 	char infoBuffer[3 * BUF_SIZE];
 	char jsFnCall[3 * BUF_SIZE];
 	const char* HEX_CHARS;
 	MAHandle sampleTag;
-	Mode mode;
+	Mode fMode;
 public:
 
 	MyMoblet()
 	{
 		initWebView();
-		mode = _read;
 		HEX_CHARS = "0123456789ABCDEF";
 	}
 
@@ -62,13 +63,11 @@ public:
 	{
 		if (message.is("StartNFC")) {
 			initNFC();
+			setMode(_read);
 		}
-		if (message.is("Vibrate"))
-		{
-			// Just some tactile user feedback
+		if (message.is("WriteSampleTag")) {
+			setMode(_write);
 			maVibrate(100);
-		} else if (message.is("WriteSampleTag")) {
-			mode = _write;
 		}
 	}
 
@@ -77,9 +76,8 @@ public:
 	 */
 	void keyPressEvent(int keyCode, int nativeCode) {
 		if (MAK_BACK == keyCode || MAK_0 == keyCode) {
-			if (mode == _write) {
-				mode = _read;
-				info(INFO_ICON, "Cancelled write.");
+			if (fMode == _write) {
+				setMode(_read);
 			} else {
 				// Call close to exit the application.
 				close();
@@ -88,16 +86,7 @@ public:
 	}
 
 	void customEvent(const MAEvent& event) {
-		if (EVENT_TYPE_NFC_TAG_DATA_WRITTEN == event.type) {
-			if (maNFCIsType(event.nfc.handle, MA_NFC_TAG_TYPE_NDEF)) {
-				maNFCDestroyTag(event.nfc.handle);
-				if (sampleTag != 0) {
-					maNFCDestroyTag(sampleTag);
-					mode = _read;
-				}
-			}
-		}
-		switch (mode) {
+		switch (fMode) {
 		case _write:
 			customEventWrite(event);
 			break;
@@ -130,26 +119,12 @@ public:
 			int tag = data.handle;
 			if (data.result < 0) {
 				sprintf(infoBuffer, "Failed to read tag (try again.) Error code: %d", data.result);
-				info(ERROR_ICON, infoBuffer);
-			} else {
-				if (maNFCIsType(tag, MA_NFC_TAG_TYPE_NDEF)) {
-					handleNDEF(tag);
-				} else {
-					if (data.result > 0) {
-						dumpPayload(data.result);
-						dumpPayloadAsText(data.result);
-					} else {
-
-					}
-				}
+				showStatus(ERROR_ICON, infoBuffer, TOAST_PERIOD);
+			} else if (maNFCIsType(tag, MA_NFC_TAG_TYPE_NDEF)) {
+				handleNDEF(tag);
 			}
 			maNFCDestroyTag(tag);
 		}
-	}
-
-	void info(const char* icon, const char* info) {
-		sprintf(jsFnCall, "updateInfo(\"%s\",\"%s\")", icon, info);
-		callJS(jsFnCall);
 	}
 
 	void customEventWrite(const MAEvent& event) {
@@ -157,13 +132,55 @@ public:
 			MANFCEventData nfcEventData = event.nfc;
 			MAHandle tag = maNFCReadTag(nfcEventData.handle);
 			if (tag && maNFCIsType(tag, MA_NFC_TAG_TYPE_NDEF)) {
-				sampleTag = createSampleTag();
 				MAHandle ndef = maNFCGetTypedTag(tag, MA_NFC_TAG_TYPE_NDEF);
 				maNFCDestroyTag(tag);
-				maNFCConnectTag(ndef);
-				maNFCWriteNDEFMessage(ndef, sampleTag);
-				maNFCCloseTag(ndef);
+				if (maNFCIsReadOnly(ndef) > 0) {
+					showStatus(ERROR_ICON, "Tag is read-only, cannot write.", TOAST_PERIOD);
+					setMode(_read);
+				} else {
+					writeSampleTag(ndef);
+				}
 			}
+		} else if (EVENT_TYPE_NFC_TAG_DATA_WRITTEN == event.type) {
+			MANFCEventData nfcEventData = event.nfc;
+			MAHandle ndef = nfcEventData.handle;
+			if (maNFCIsType(ndef, MA_NFC_TAG_TYPE_NDEF)) {
+				maNFCDestroyTag(ndef);
+				if (sampleTag != 0) {
+					maNFCDestroyTag(sampleTag);
+					setMode(_read);
+				}
+				showStatus(INFO_ICON, "Wrote tag.", TOAST_PERIOD);
+				maVibrate(100);
+			}
+		}
+	}
+
+	void writeSampleTag(MAHandle ndef) {
+		sampleTag = createSampleTag();
+		maNFCConnectTag(ndef);
+		maNFCWriteNDEFMessage(ndef, sampleTag);
+		maNFCCloseTag(ndef);
+	}
+
+	void setMode(Mode mode) {
+		fMode = mode;
+		switch (mode) {
+		case _write:
+			showStatus(WRITE_TAG_ICON, "<b>Ready to write</b><br/>Please hold a tag close to the device to write to it.<br/>Press BACK to cancel.", 0);
+			break;
+		default:
+			showStatus(READ_TAG_ICON, "<b>Waiting for a tag</b><br/>Hold a tag close to the device to show its contents.", 0);
+		}
+	}
+
+	void showStatus(const char* icon, const char* info, int period) {
+		sprintf(jsFnCall, "updateInfo(\"%s\",\"%s\")", icon, info);
+		callJS(jsFnCall);
+		if (period > 0) {
+			addTimer(this, period, 1);
+		} else {
+			removeTimer(this);
 		}
 	}
 
@@ -171,8 +188,8 @@ public:
 		MAHandle msg = maNFCCreateNDEFMessage(1);
 		MAHandle rec = maNFCGetNDEFRecord(msg, 0);
 		maNFCSetTnf(rec, 0x01); // TNF well known -- fix constants!
-		byte id[] = {(byte) 0x55};
-		maNFCSetType(rec, id, 1);
+		byte type[] = {(byte) 0x55}; // URI
+		maNFCSetType(rec, type, 1);
 		char* mosync = "www.mosync.com";
 		maNFCSetPayload(rec, mosync, strlen(mosync));
 		return msg;
@@ -186,13 +203,16 @@ public:
 			maNFCCloseTag(msg);
 		} else {
 			int records = maNFCGetNDEFRecordCount(ndef);
-			sprintf(infoBuffer, "Record count: %i", records);
-			info(INFO_ICON, infoBuffer);
 			for (int i = 0; i < records; i++) {
 				MAHandle record = maNFCGetNDEFRecord(ndef, i);
 				int len = maNFCGetPayload(record, payload, BUF_SIZE);
-				//dumpPayload(len);
-				dumpPayloadAsText(len);
+				int tnf = maNFCGetTnf(record);
+				maNFCGetType(record, type, BUF_SIZE);
+				char* icon = INFO_ICON;
+				if (tnf == 0x1 && type[0] == 0x55) {
+					icon = URL_ICON;
+				}
+				dumpPayloadAsText(icon, len);
 			}
 		}
 	}
@@ -205,8 +225,8 @@ public:
 			// Every block is 4 bytes
 			size = size + 4 * blocks;
 		}
-		sprintf(infoBuffer, "Size: %d bytes", size);
-		info(INFO_ICON, infoBuffer);
+		sprintf(infoBuffer, "<b>Mifare Classic tag</b><br/>Size: %d bytes", size);
+		showStatus(INFO_ICON, infoBuffer, 0);
 	}
 
 	void handleMifareUltralight(MAHandle mfu) {
@@ -223,20 +243,19 @@ public:
 		output[2 * len] = '\0';
 	}
 
-	void dumpPayload(int len) {
-		toHex(payload, len, hexEncoded);
-		sprintf(infoBuffer, "Read tag, payload: %s", hexEncoded);
-		info(INFO_ICON, infoBuffer);
-	}
-
-	void dumpPayloadAsText(int len) {
-		sprintf(infoBuffer, "Read tag, payload as text: %s", payload);
-		info(INFO_ICON, infoBuffer);
+	void dumpPayloadAsText(const char* icon, int len) {
+		sprintf(infoBuffer, "<b>Contents</b><br/>%s", payload);
+		showStatus(icon, infoBuffer, 0);
 	}
 
 	void closeEvent() {
 		// Ok, we're quitting -- stop listening to NFC events.
 		maNFCStop();
+	}
+
+	void runTimerEvent() {
+		// Just show the default message
+		setMode(fMode);
 	}
 };
 

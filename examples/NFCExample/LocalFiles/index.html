@@ -87,8 +87,6 @@ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+
 function WriteToTag() {
 	var writeToTagButton = document.getElementById("WriteToTagButton");
 	josync.messagehandler.send({messageName: "WriteSampleTag"}, null);
-	updateInfo("write_tag", "Ready to write.\nPlease hold a tag close to the device to write to it.\nPress BACK to cancel.");
-	Vibrate();
 }
 
 function showWriteAlert() {

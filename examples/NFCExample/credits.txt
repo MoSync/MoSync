@@ -1,0 +1,15 @@
+The images for this example app were downloaded from NounProject.com as SVG
+files and then converted into 32x32 PNGs.
+
+at.png; Public Domain, created by unknown
+contact.png; Public Domain, created by Roger Cook, Don Shanosky
+error.png; Public Domain, created by unknown
+info.png; Public Domain, created by unknown
+read_tag.png; Creative Commons - Attribution (CC BY 3.0), created by the Noun
+    Project
+unknown.png; Public Domain, created by Roger Cook, Don Shanosky
+write_tag; Creative Commons - Attribution (CC BY 3.0), created by the Noun
+    Project
+
+The HTML background was created using the CSS pattern generator at 
+http://www.patternify.com.
