@@ -88,9 +88,12 @@ public:
 		char buffer[256];
 		maCameraGetProperty(MA_CAMERA_MAX_ZOOM, buffer, 256);
 		maxZoom = atoi(buffer);
-		createMainScreen();
 		mStackScreen = new StackScreen();
 		mStackScreen->addStackScreenListener(this);
+		createSettingsScreen();
+		createMainScreen();
+		createImageScreen();
+		setupCameraProperties();
 	}
 
 	void createSettingsScreen()
@@ -107,7 +110,7 @@ public:
 		{
 			mSettingsScreen->flashSupported = false;
 		}
-		mSettingsScreen->initialize(mStackScreen, mCameraPreview);
+		mSettingsScreen->initialize(mStackScreen);
 	}
 
 	void createImageScreen()
@@ -231,10 +234,7 @@ public:
 		// Note: This would hide any previously visible screen.
 		mStackScreen->push(mScreen);
 		mStackScreen->show();
-		setupCameraProperties();
 		maCameraStart();
-		createSettingsScreen();
-		createImageScreen();
 	}
 
 	/**
@@ -244,7 +244,6 @@ public:
 	void setupCameraProperties()
 	{
 		setupCameraSize();
-
 		maCameraSelect(mSettingsScreen->getCurrentCamera());
 		mCameraPreview->bindToCurrentCamera();
 		maCameraSetProperty(

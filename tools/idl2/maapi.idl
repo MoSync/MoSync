@@ -3050,72 +3050,289 @@ group PIMAPI "PIM API" {
 		}
 
 		constset int MA_PIM_FIELD_CONTACT_ {
-			/// #MA_PIM_TYPE_STRING_ARRAY.
-			/// Has \link #MA_PIM_CONTACT_ADDR_POBOX MA_PIM_CONTACT_ADDR \endlink indices.
+			/**
+			* @brief The addresses of the contact. Multiple string arrays. Has \link #MA_PIM_CONTACT_ADDR_POBOX MA_PIM_CONTACT_ADDR \endlink indices.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
+			*
+			* @addsetget
+			*
+			* @attributes MA_PIM_ATTR_ADDR_HOME, MA_PIM_ATTR_ADDR_WORK, MA_PIM_ATTR_ADDR_OTHER, MA_PIM_ATTR_ADDR_CUSTOM.
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			ADDR = 100;
-			/// #MA_PIM_TYPE_DATE.
-			BIRTHDAY = 101;
-			/// #MA_PIM_TYPE_INT. Access class. May be one of #MA_PIM_CONTACT_CLASS_CONFIDENTIAL,
-			/// #MA_PIM_CONTACT_CLASS_PRIVATE, or #MA_PIM_CONTACT_CLASS_PUBLIC.
-			/// Not available on Android and iOS.
-			CLASS = 102;
-			/// #MA_PIM_TYPE_STRING.
-			EMAIL = 103;
-			/// #MA_PIM_TYPE_STRING.
-			/// Not available on iOS.
-			FORMATTED_ADDR = 104;
-			/// #MA_PIM_TYPE_STRING.
-			/// Not available on Android and iOS.
-			FORMATTED_NAME = 105;
-			/// #MA_PIM_TYPE_STRING_ARRAY.
-			/// Has \link #MA_PIM_CONTACT_NAME_FAMILY MA_PIM_CONTACT_NAME \endlink indices.
-			NAME = 106;
-			/// #MA_PIM_TYPE_STRING.
-			NICKNAME = 107;
-			/// #MA_PIM_TYPE_STRING. Supplemental information, or a comment.
-			NOTE = 108;
 
 			/**
-			* @brief The organization name of the contact.
+			* @brief The birthday of the contact. Single date.
+			*
+			* @validvalue #MA_PIM_TYPE_DATE.
+			*
+			* @addsetget
+			*
+			* @platforms Android, iOS.
+			*
+			*/
+			BIRTHDAY = 101;
+
+			/**
+			* @brief Access class. Single integer. May be one of #MA_PIM_CONTACT_CLASS_CONFIDENTIAL, #MA_PIM_CONTACT_CLASS_PRIVATE, or #MA_PIM_CONTACT_CLASS_PUBLIC.
+			*
+			* @validvalue #MA_PIM_TYPE_INT.
+			*
+			* @addsetget
+			*
+			* @platforms Symbian.
+			*
+			*/
+			CLASS = 102;
+
+			/**
+			* @brief The email addresses of the contact. Multiple strings.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING.
 			*
-			* @attributes Work, Other, Custom.
+			* @addsetget
+			*
+			* @attributes MA_PIM_ATTR_EMAIL_HOME, MA_PIM_ATTR_EMAIL_WORK, MA_PIM_ATTR_EMAIL_MOBILE, MA_PIM_ATTR_EMAIL_OTHER, MA_PIM_ATTR_EMAIL_CUSTOM.
+			*
+			* @platforms Android, iOS.
+			*
+			*/
+			EMAIL = 103;
+
+			/**
+			* @brief The formatted addresses of the contact. Single string.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @getonly
+			*
+			* @attributes MA_PIM_ATTR_FORMATTED_ADDR_HOME, MA_PIM_ATTR_FORMATTED_ADDR_WORK, MA_PIM_ATTR_FORMATTED_ADDR_OTHER, MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM.
+			*
+			* @platforms Android.
+			*
+			*/
+			FORMATTED_ADDR = 104;
+
+			/**
+			* @brief The formatted name of the contact. Single string.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @getonly
+			*
+			* @platforms Symbian.
+			*
+			*/
+			FORMATTED_NAME = 105;
+
+			/**
+			* @brief The name of the contact. Single string array containing Family name, Given name, Middle name, Prefix,
+			* Suffix, Phonetic family name, Phonetic given name, Phonetic middle name. Has \link #MA_PIM_CONTACT_NAME_FAMILY MA_PIM_CONTACT_NAME \endlink indices.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
+			*
+			* @getonly
+			*
+			* @platforms Android, iOS.
+			*
+			*/
+			NAME = 106;
+
+			/**
+			* @brief The nickname of the contact. Single string.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @addsetget
+			*
+			* @platforms Android, iOS.
+			*
+			*/
+			NICKNAME = 107;
+
+			/**
+			* @brief Supplementary information, or a comment. Multiple string.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @addsetget
+			*
+			* @platforms Android, iOS.
+			*
+			*/
+			NOTE = 108;
+
+			/**
+			* @brief The organization name of the contact. Multiple string.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @addsetget
+			*
+			* @attributes MA_PIM_ATTR_ORG_WORK, MA_PIM_ATTR_ORG_OTHER, MA_PIM_ATTR_ORG_CUSTOM.
 			*
 			* @platforms Android, iOS.
 			*
 			*/
 			ORG = 109;
 
-			/// #MA_PIM_TYPE_INT. Connected with PHOTO_URL.
+			/**
+			* @brief The contact's photo. A single int representing a data handle. Connected with PHOTO_URL.
+			*
+			* @validvalue #MA_PIM_TYPE_INT.
+			*
+			* @addsetget
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			PHOTO = 110;
 
-			/// #MA_PIM_TYPE_STRING. Connected with PHOTO.
+			/**
+			* @brief The contact's photo url. A single string representing the URL of a photo. Connected with PHOTO.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @setonly
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			PHOTO_URL = 111;
 
-			/// #MA_PIM_TYPE_BINARY. Connected with PUBLIC_KEY_STRING.
-			/// Not available on Android and iOS.
+			/**
+			* @brief The public key of the contact. Connected with PUBLIC_KEY_STRING.
+			*
+			* @validvalue #MA_PIM_TYPE_BINARY.
+			*
+			* @addsetget
+			*
+			* @platforms Symbian.
+			*
+			*/
 			PUBLIC_KEY = 112;
-			/// #MA_PIM_TYPE_STRING. Connected with PUBLIC_KEY.
-			/// Not available on Android and iOS.
+
+			/**
+			* @brief A string representation of the contact's public key. Connected with PUBLIC_KEY.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @addsetget
+			*
+			* @platforms Symbian.
+			*
+			*/
 			PUBLIC_KEY_STRING = 113;
-			/// #MA_PIM_TYPE_DATE.
+
+			/**
+			* @brief The revision date of the field. Single date.
+			*
+			* @validvalue #MA_PIM_TYPE_DATE.
+			*
+			* @getonly
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			REVISION = 114;
-			/// #MA_PIM_TYPE_STRING. Telephone number.
+
+			/**
+			* @brief The telephone numbers of the contact. Multiple strings.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @addsetget
+			*
+			* @attributes MA_PIM_ATTR_PHONE_HOME, MA_PIM_ATTR_PHONE_MOBILE, MA_PIM_ATTR_PHONE_HOME_FAX, MA_PIM_ATTR_PHONE_WORK_FAX, MA_PIM_ATTR_PHONE_PAGER, MA_PIM_ATTR_PHONE_IPHONE, MA_PIM_ATTR_PHONE_WORK, MA_PIM_ATTR_PHONE_CALLBACK, MA_PIM_ATTR_PHONE_CAR, MA_PIM_ATTR_PHONE_COMPANY_MAIN, MA_PIM_ATTR_PHONE_ISDN, MA_PIM_ATTR_PHONE_OTHER_FAX, MA_PIM_ATTR_PHONE_RADIO, MA_PIM_ATTR_PHONE_TELEX, MA_PIM_ATTR_PHONE_TTY_TDD, MA_PIM_ATTR_PHONE_WORK_MOBILE, MA_PIM_ATTR_PHONE_WORK_PAGER, MA_PIM_ATTR_PHONE_ASSISTANT, MA_PIM_ATTR_PHONE_MMS, MA_PIM_ATTR_PHONE_OTHER, MA_PIM_ATTR_PHONE_CUSTOM.
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			TEL = 115;
-			/// #MA_PIM_TYPE_STRING. Professional title.
+
+			/**
+			* @brief The professional title of the contact inside the organization. Multiple strings.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @addsetget
+			*
+			* @attributes MA_PIM_ATTR_TITLE_WORK, MA_PIM_ATTR_TITLE_OTHER, MA_PIM_ATTR_TITLE_CUSTOM.
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			TITLE = 116;
-			/// #MA_PIM_TYPE_STRING. Unique identifier for the contact on the current device.
+
+			/**
+			* @brief The unique identifier of the contact on the current device. Single string.
+			*
+			* @validvalue Single #MA_PIM_TYPE_STRING.
+			*
+			* @getonly
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			UID = 117;
-			/// #MA_PIM_TYPE_STRING. Uniform Resource Locator associated with the contact.
+
+			/**
+			* @brief Uniform Resource Locators associated with the contact. Multiple strings.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @addsetget
+			*
+			* @attributes MA_PIM_ATTR_WEBSITE_HOMEPAGE, MA_PIM_ATTR_WEBSITE_BLOG, MA_PIM_ATTR_WEBSITE_PROFILE, MA_PIM_ATTR_WEBSITE_HOME, MA_PIM_ATTR_WEBSITE_WORK, MA_PIM_ATTR_WEBSITE_FTP, MA_PIM_ATTR_WEBSITE_OTHER, MA_PIM_ATTR_WEBSITE_CUSTOM.
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			URL = 118;
-			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing an IM address .
-			/// Has \link #MA_PIM_CONTACT_IM_USERNAME MA_PIM_CONTACT_IM \endlink indices.
+
+			/**
+			* @brief The IM addresses of the contact. Multiple arrays. Has \link #MA_PIM_CONTACT_IM_USERNAME MA_PIM_CONTACT_IM \endlink indices.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
+			*
+			* @addsetget
+			*
+			* @attributes MA_PIM_ATTR_IM_HOME, MA_PIM_ATTR_IM_WORK, MA_PIM_ATTR_IM_OTHER, MA_PIM_ATTR_IM_CUSTOM.
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			IM = 119;
-			/// #MA_PIM_TYPE_STRING. A data kind representing a relation.
+
+			/**
+			* @brief A relation of the contact.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING.
+			*
+			* @addsetget
+			*
+			* @attributes MA_PIM_ATTR_RELATION_MOTHER, MA_PIM_ATTR_RELATION_FATHER, MA_PIM_ATTR_RELATION_PARENT, MA_PIM_ATTR_RELATION_SISTER, MA_PIM_ATTR_RELATION_BROTHER, MA_PIM_ATTR_RELATION_CHILD, MA_PIM_ATTR_RELATION_FRIEND, MA_PIM_ATTR_RELATION_SPOUSE, MA_PIM_ATTR_RELATION_PARTNER, MA_PIM_ATTR_RELATION_MANAGER, MA_PIM_ATTR_RELATION_ASSISTANT, MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER, MA_PIM_ATTR_RELATION_REFERRED_BY, MA_PIM_ATTR_RELATION_RELATIVE, MA_PIM_ATTR_RELATION_CUSTOM.
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			RELATION = 120;
-			/// #MA_PIM_TYPE_STRING_ARRAY. A data kind representing a organization.
-			/// Has \link #MA_PIM_CONTACT_ORGANIZATION_NAME MA_PIM_CONTACT_ORGANIZATION \endlink indices.
+
+			/**
+			* @brief Information about the organization. Has \link #MA_PIM_CONTACT_ORGANIZATION_NAME MA_PIM_CONTACT_ORGANIZATION \endlink indices.
+			*
+			* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
+			*
+			* @addsetget
+			*
+			* @attributes MA_PIM_ATTR_ORG_INFO_WORK, MA_PIM_ATTR_ORG_INFO_OTHER, MA_PIM_ATTR_ORG_INFO_CUSTOM.
+			*
+			* @platforms Android, iOS.
+			*
+			*/
 			ORG_INFO = 121;
 		}
 
@@ -7348,9 +7565,9 @@ group SensorAPI "Sensor API" {
 		* \brief Enables a sensor and starts sending events if the sensor is available.
 		* If the sensor is already enabled this call will have no effect.
 		* \param sensor       The sensor which should be enabled.
+		* One of the \link #SENSOR_TYPE_ACCELEROMETER SENSOR_TYPE \endlink constants.
 		* \param interval     Time interval in which a sensor update shall be triggered.
-		*            >0 interval time in milliseconds.
-		*            <=0 Any of SensorUpdate enums.
+		* Can be one of the \link #SENSOR_RATE_FASTEST SENSOR_RATE \endlink constants or a time interval in milliseconds.
 		* \return    #SENSOR_ERROR_NONE  on success.
 		*            #SENSOR_ERROR_NOT_AVAILABLE if this sensor wasn't available.
 		*            #SENSOR_ERROR_INTERVAL_NOT_SET if the interval wasn't set, could be due to platform limitations.
@@ -7362,6 +7579,7 @@ group SensorAPI "Sensor API" {
 		/**
 		* \brief Disables a sensor so that it doesn't send any further events.
 		* \param sensor    The sensor which should be disabled.
+		* One of the \link #SENSOR_TYPE_ACCELEROMETER SENSOR_TYPE \endlink constants.
 		* \return    #SENSOR_ERROR_NONE on success.
 		*            #SENSOR_ERROR_NOT_ENABLED if this sensor wasn't enabled.
 		*            #SENSOR_ERROR_CANNOT_DISABLE if there was a problem disabling the sensor.
@@ -7370,6 +7588,7 @@ group SensorAPI "Sensor API" {
 		int maSensorStop(in int sensor);
 
 	}//End of Sensor Functions
+} //End of Sensor API group
 
 group NFCAPI "NFC API" {
 		/**
@@ -7797,7 +8016,6 @@ group NFCAPI "NFC API" {
 	* \return #RES_OK.
 	*/
 	int maSyscallPanicsDisable();
-	}
 
 }
 	constset int IOCTL_ {

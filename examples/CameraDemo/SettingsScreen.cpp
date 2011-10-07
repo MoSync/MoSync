@@ -81,9 +81,8 @@ void SettingsScreen::buttonClicked(Widget* button)
 /**
  * Lazy initialization
  */
-void SettingsScreen::initialize(StackScreen* stackScreen, CameraPreview* previewWidget)
+int SettingsScreen::initialize(StackScreen* stackScreen)
 {
-	mPreviewWidget = previewWidget;
 	mStackScreen = stackScreen;
 	numCameras = maCameraNumber();
 	createUI();
@@ -115,7 +114,9 @@ void SettingsScreen::createUI()
 
 	mFlashModeButton->fillSpaceHorizontally();
 	mFlashModeButton->wrapContentVertically();
-	mFlashModeButton->setText("Flash Mode: OFF");
+	char buffer[128];
+	sprintf(buffer, "Flash Mode: %s", MA_CAMERA_FLASH_OFF);
+	mFlashModeButton->setText(buffer);
 	mFlashModeButton->addButtonListener(this);
 
 	mMainLayoutWidget->addChild(mFlashModeButton);

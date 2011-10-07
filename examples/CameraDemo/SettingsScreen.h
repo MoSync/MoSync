@@ -43,6 +43,7 @@ class SettingsScreen : public ButtonListener
 public:
 	SettingsScreen():currentCamera(0)
 	{
+		currentCamera = 0;
 		//do nothing
 	}
 	virtual ~SettingsScreen()
@@ -52,7 +53,7 @@ public:
 
 	virtual void buttonClicked(Widget* button);
 
-	void initialize(StackScreen* stackScreen, CameraPreview* previewWidget);
+	int initialize(StackScreen* stackScreen);
 
 	void pushSettingsScreen();
 
@@ -81,8 +82,6 @@ private:
 	VerticalLayout *mMainLayoutWidget;
 
 	StackScreen *mStackScreen;
-
-	CameraPreview *mPreviewWidget;
 
 	int flashModeIndex;
 
