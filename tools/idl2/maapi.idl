@@ -7770,6 +7770,55 @@ group NFCAPI "NFC API" {
 
 		}
 
+		constset int MA_NFC_NDEF_TNF_ {
+
+			/**
+			* Indicates the NDEF message is empty.
+			*/
+			EMPTY = 0;
+
+			/**
+			* Indicates the NDEF message is of a 'well-known' type;
+			* it may be further identified using the MA_NFC_NDEF_RTD_*
+			* constants.
+			*/
+			WELL_KNOWN = 1;
+
+			/**
+			* Indicates the NDEF message contains mime media;
+			* use maNFCGetType() to get the mime type.
+			*/
+			MIME_MEDIA = 2;
+
+			/**
+			* Indicates the NDEF message contains an absolute URI,
+			* the type conforming to RFC 3986.
+			*/
+			ABSOLUTE_URI = 3;
+
+			/**
+			* Indicates the type of the NDEF message being 'external'.
+			*/
+			EXTERNAL_TYPE = 4;
+
+			/**
+			* Indicates the contents of the NDEF message to be of
+			* an unknown type. The type of the NDEF message should
+			* be empty.
+			*/
+			UNKNOWN = 5;
+
+			/**
+			* Constant for chunked NDEF messages.
+			*/
+			UNCHANGED = 6;
+
+			/**
+			* Reserved constant.
+			*/
+			RESERVED = 7;
+		}
+
 		constset int MA_NFC_MIFARE_ {
 
 			/**
