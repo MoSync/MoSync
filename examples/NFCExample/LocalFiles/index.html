@@ -9,15 +9,8 @@ html
 	padding: 0;
 	width: 100%;
 	height: 100%;
-/*background: 
-			-webkit-gradient(radial, 50% 60%, 0, 53% 50%, 50, from(rgba(255,255,255,0)), color-stop(99%,rgba(255,255,255,.15)), to(rgba(255,255,255,0))),
-			-webkit-gradient(radial, 50% 50%, 0, 50% 50%, 100, from(rgba(255,255,255,0)), color-stop(99%,rgba(255,255,255,.1)), to(rgba(255,255,255,0))),
-			-webkit-gradient(radial, 50% 50%, 0, 50% 50%, 200, from(rgba(255,255,255,0)), color-stop(99%,rgba(255,255,255,.1)), to(rgba(255,255,255,0))),
-			-webkit-gradient(radial, 40% 50%, 0, 40% 55%, 25, from(rgba(255,255,255,0)), color-stop(99%,rgba(255,255,255,.1)), to(rgba(255,255,255,0))),
-			-webkit-gradient(linear, 0% 0%, 0% 100%, from(#8D4212), to(#28580C), color-stop(.5,#DA881B));
-		background-size: 400px 400px, 470px 470px, 600px 600px, 300px 300px, 100% 100%;
-		background-color: #28580C;*/
-background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAUUlEQVQYGWP4mae3+f///wz4MEgNI0gBPvArX38zSJ6JGEVsEy/64lQIMwmkCKeJ6IqwKsSmCEMhLkUoCvEpgiskpAikkBEUmCAGzHcgNjYAAEq1Qc4F4xeWAAAAAElFTkSuQmCC);	/* Disable text selection in all browsers. */
+	/* Background: diagonal lines colored with MoSync Orange */
+	background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAUUlEQVQYGWP4mae3+f///wz4MEgNI0gBPvArX38zSJ6JGEVsEy/64lQIMwmkCKeJ6IqwKsSmCEMhLkUoCvEpgiskpAikkBEUmCAGzHcgNjYAAEq1Qc4F4xeWAAAAAElFTkSuQmCC);	/* Disable text selection in all browsers. */
 	-webkit-user-select: none;
 	-khtml-user-select: none;
 	-moz-user-select: none;
@@ -84,9 +77,12 @@ background:url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+
 
 <script>
 
-function WriteToTag() {
-	var writeToTagButton = document.getElementById("WriteToTagButton");
-	josync.messagehandler.send({messageName: "WriteSampleTag"}, null);
+function WriteURLToTag() {
+	josync.messagehandler.send({messageName: "WriteSampleURL"}, null);
+}
+
+function WriteVCardToTag() {
+	josync.messagehandler.send({messageName: "WriteSampleVCard"}, null);
 }
 
 function showWriteAlert() {
@@ -121,9 +117,9 @@ function Vibrate()
 Hold a tag close to the device to dump it's contents onto the screen.<br/><br/>
 To write an example tag, click one of the buttons below. Then hold a writable tag close to the device.<br/><br/>
 </div>
-<div id="WriteToTagButton" onclick="WriteToTag()">
-Write URL &gt;&nbsp;&nbsp;
-</div><div id="WriteToTagButton" onclick="WriteToTag()">
+<div id="WriteToTagButton" onclick="WriteURLToTag()">
+Write Web Address &gt;&nbsp;&nbsp;
+</div><div id="WriteToTagButton" onclick="WriteVCardToTag()">
 Write vCard &gt;&nbsp;&nbsp;
 </div>
 <div class="InfoBox">

@@ -20,6 +20,7 @@ using namespace josync; // Class WebAppMoblet
 #define WRITE_TAG_ICON "write_tag"
 #define CONTACT_ICON "contact"
 #define URL_ICON "at"
+#define VCARD_MIME_TYPE "text/x-vcard"
 #define TOAST_PERIOD 5000
 
 enum Mode { _read, _write };
@@ -31,7 +32,6 @@ class MyMoblet : public WebAppMoblet, TimerListener
 {
 private:
 	byte payload[BUF_SIZE];
-	byte type[BUF_SIZE];
 	char hexEncoded[2 * BUF_SIZE];
 	char infoBuffer[3 * BUF_SIZE];
 	char jsFnCall[3 * BUF_SIZE];
@@ -65,9 +65,13 @@ public:
 			initNFC();
 			setMode(_read);
 		}
-		if (message.is("WriteSampleTag")) {
+		if (message.is("WriteSampleURL")) {
 			setMode(_write);
-			maVibrate(100);
+			sampleTag = createSampleURLTag();
+		}
+		if (message.is("WriteSampleVCard")) {
+			setMode(_write);
+			sampleTag = createSampleVCardTag();
 		}
 	}
 
@@ -146,21 +150,24 @@ public:
 			MAHandle ndef = nfcEventData.handle;
 			if (maNFCIsType(ndef, MA_NFC_TAG_TYPE_NDEF)) {
 				maNFCDestroyTag(ndef);
-				if (sampleTag != 0) {
-					maNFCDestroyTag(sampleTag);
-					setMode(_read);
+				destroySampleTag();
+				setMode(_read);
+				if (nfcEventData.result >= 0) {
+					showStatus(INFO_ICON, "Wrote tag.", TOAST_PERIOD);
+				} else {
+					showStatus(ERROR_ICON, "Unable to write tag", TOAST_PERIOD);
 				}
-				showStatus(INFO_ICON, "Wrote tag.", TOAST_PERIOD);
 				maVibrate(100);
 			}
 		}
 	}
 
 	void writeSampleTag(MAHandle ndef) {
-		sampleTag = createSampleTag();
-		maNFCConnectTag(ndef);
-		maNFCWriteNDEFMessage(ndef, sampleTag);
-		maNFCCloseTag(ndef);
+		if (sampleTag) {
+			maNFCConnectTag(ndef);
+			maNFCWriteNDEFMessage(ndef, sampleTag);
+			maNFCCloseTag(ndef);
+		}
 	}
 
 	void setMode(Mode mode) {
@@ -168,6 +175,7 @@ public:
 		switch (mode) {
 		case _write:
 			showStatus(WRITE_TAG_ICON, "<b>Ready to write</b><br/>Please hold a tag close to the device to write to it.<br/>Press BACK to cancel.", 0);
+			maVibrate(100);
 			break;
 		default:
 			showStatus(READ_TAG_ICON, "<b>Waiting for a tag</b><br/>Hold a tag close to the device to show its contents.", 0);
@@ -184,14 +192,37 @@ public:
 		}
 	}
 
-	MAHandle createSampleTag() {
+	void destroySampleTag() {
+		if (sampleTag) {
+			maNFCDestroyTag(sampleTag);
+		}
+	}
+
+	MAHandle createSampleURLTag() {
+		destroySampleTag();
 		MAHandle msg = maNFCCreateNDEFMessage(1);
 		MAHandle rec = maNFCGetNDEFRecord(msg, 0);
-		maNFCSetTnf(rec, 0x01); // TNF well known -- fix constants!
+		maNFCSetTnf(rec, MA_NFC_NDEF_TNF_WELL_KNOWN);
 		byte type[] = {(byte) 0x55}; // URI
 		maNFCSetType(rec, type, 1);
 		char* mosync = "www.mosync.com";
 		maNFCSetPayload(rec, mosync, strlen(mosync));
+		return msg;
+	}
+
+	MAHandle createSampleVCardTag() {
+		destroySampleTag();
+		MAHandle msg = maNFCCreateNDEFMessage(1);
+		MAHandle rec = maNFCGetNDEFRecord(msg, 0);
+		maNFCSetTnf(rec, MA_NFC_NDEF_TNF_MIME_MEDIA);
+		char* type = VCARD_MIME_TYPE;
+		maNFCSetType(rec, type, strlen(VCARD_MIME_TYPE));
+		char* vCard = "BEGIN:VCARD\n"
+				"VERSION:2.1\n"
+				"N:X;Mr\n"
+				"ORG:MoSync\n"
+				"END:VCARD";
+		maNFCSetPayload(rec, vCard, strlen(vCard));
 		return msg;
 	}
 
@@ -206,15 +237,23 @@ public:
 			for (int i = 0; i < records; i++) {
 				MAHandle record = maNFCGetNDEFRecord(ndef, i);
 				int len = maNFCGetPayload(record, payload, BUF_SIZE);
-				int tnf = maNFCGetTnf(record);
-				maNFCGetType(record, type, BUF_SIZE);
-				char* icon = INFO_ICON;
-				if (tnf == 0x1 && type[0] == 0x55) {
-					icon = URL_ICON;
-				}
+				char* icon = getIcon(record);
 				dumpPayloadAsText(icon, len);
 			}
 		}
+	}
+
+	char* getIcon(MAHandle record) {
+		byte type[256];
+		char* icon = INFO_ICON;
+		int tnf = maNFCGetTnf(record);
+		size_t typeLen = maNFCGetType(record, type, 256);
+		if (tnf == MA_NFC_NDEF_TNF_WELL_KNOWN && typeLen == 1 && type[0] == 0x55) {
+			icon = URL_ICON;
+		} else if (tnf == MA_NFC_NDEF_TNF_MIME_MEDIA && strncmp(VCARD_MIME_TYPE, (char*) type, typeLen)) {
+			icon = CONTACT_ICON;
+		}
+		return icon;
 	}
 
 	void handleMifareClassic(MAHandle mfc) {
