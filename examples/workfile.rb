@@ -12,4 +12,12 @@ target :clean do
 	Work.invoke_subdirs(SUBDIRS, 'clean')
 end
 
+Targets.setup
+
+if(!USE_NEWLIB)
+	SUBDIRS.reject! do |dir|
+		dir == 'HelloSTL'
+	end
+end
+
 Targets.invoke

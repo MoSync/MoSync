@@ -81,7 +81,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 /**
  * Lazy initialization
  */
-int SettingsScreen::initialize(StackScreen* stackScreen)
+void SettingsScreen::initialize(StackScreen* stackScreen)
 {
 	mStackScreen = stackScreen;
 	numCameras = maCameraNumber();

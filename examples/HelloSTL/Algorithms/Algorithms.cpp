@@ -484,11 +484,12 @@ void algorithms_for_modifying_sequences()
 	* The relative order of elements after the partition is the same, as before
 	* the partition.
 	*/
-	std::vector<int>::iterator result = std::stable_partition(
-			sVector.begin(), sVector.end(), NumericUtilities::isEven);
+	//std::vector<int>::iterator result =
+	std::stable_partition(
+		sVector.begin(), sVector.end(), NumericUtilities::isEven);
 
 	log_to_console(sVector, "sVector after calling std::stable_partition("
-			"sVector.begin(), sVector.end(),isEven): ");
+		"sVector.begin(), sVector.end(),isEven): ");
 }
 
 //*****************************************************************************
@@ -1044,10 +1045,11 @@ void algorithms_for_removing()
 	*
 	* Returns an iterator indicating the past-the-end value the new range.
 	*/
-	std::vector<int>::iterator endIt = std::remove_copy(array,
-			array + arraySize, v3.begin(), -99);
+	//std::vector<int>::iterator endIt =
+	std::remove_copy(array,
+		array + arraySize, v3.begin(), -99);
 	log_to_console(v3, "v3 after calling remove_copy(array, array + arraySize,"
-			" v3.begin(), -99): ");
+		" v3.begin(), -99): ");
 
 	std::vector<int> v4;
 	v4.resize(arraySize + 5); //resize the vector to hold 6 + 5 elements
@@ -1060,11 +1062,12 @@ void algorithms_for_removing()
 	* OutputIterator remove_copy_if(InputIterator first, InputIterator last,
 	* 		OutputIterator result, Predicate somePredicate);
 	*/
-	std::vector<int>::iterator endIt_v4 = std::remove_copy_if(array,
-			array + arraySize, v4.begin(),
-			NumericUtilities::isNegative);
+	//std::vector<int>::iterator endIt_v4 =
+	std::remove_copy_if(array,
+		array + arraySize, v4.begin(),
+		NumericUtilities::isNegative);
 	log_to_console(v4, "v4 after calling remove_copy_if(array, "
-			"array + arraySize, v4.begin(), isNegative)");
+		"array + arraySize, v4.begin(), isNegative)");
 
 	int duplicateValues[] = { 1, 1, 1, 1, 2, 3, 2 };
 	int duplicateValuesSize = sizeof(duplicateValues)/sizeof(duplicateValues[0]);
