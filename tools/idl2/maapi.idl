@@ -3056,66 +3056,66 @@ group PIMAPI "PIM API" {
 			* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
 			*
 			* @addsetget
-			*			
+			*
 			* @attributes MA_PIM_ATTR_ADDR_HOME, MA_PIM_ATTR_ADDR_WORK, MA_PIM_ATTR_ADDR_OTHER, MA_PIM_ATTR_ADDR_CUSTOM.
 			*
 			* @platforms Android, iOS.
 			*
 			*/
 			ADDR = 100;
-			
+
 			/**
 			* @brief The birthday of the contact. Single date.
 			*
 			* @validvalue #MA_PIM_TYPE_DATE.
 			*
 			* @addsetget
-			*			
+			*
 			* @platforms Android, iOS.
 			*
 			*/
 			BIRTHDAY = 101;
-			
+
 			/**
 			* @brief Access class. Single integer. May be one of #MA_PIM_CONTACT_CLASS_CONFIDENTIAL, #MA_PIM_CONTACT_CLASS_PRIVATE, or #MA_PIM_CONTACT_CLASS_PUBLIC.
 			*
 			* @validvalue #MA_PIM_TYPE_INT.
 			*
 			* @addsetget
-			*			
+			*
 			* @platforms Symbian.
 			*
 			*/
 			CLASS = 102;
-			
+
 			/**
 			* @brief The email addresses of the contact. Multiple strings.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING.
 			*
 			* @addsetget
-			*			
+			*
 			* @attributes MA_PIM_ATTR_EMAIL_HOME, MA_PIM_ATTR_EMAIL_WORK, MA_PIM_ATTR_EMAIL_MOBILE, MA_PIM_ATTR_EMAIL_OTHER, MA_PIM_ATTR_EMAIL_CUSTOM.
 			*
 			* @platforms Android, iOS.
 			*
 			*/
 			EMAIL = 103;
-			
+
 			/**
 			* @brief The formatted addresses of the contact. Single string.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING.
 			*
 			* @getonly
-			*			
+			*
 			* @attributes MA_PIM_ATTR_FORMATTED_ADDR_HOME, MA_PIM_ATTR_FORMATTED_ADDR_WORK, MA_PIM_ATTR_FORMATTED_ADDR_OTHER, MA_PIM_ATTR_FORMATTED_ADDR_CUSTOM.
 			*
 			* @platforms Android.
 			*
 			*/
 			FORMATTED_ADDR = 104;
-			
+
 			/**
 			* @brief The formatted name of the contact. Single string.
 			*
@@ -3127,10 +3127,10 @@ group PIMAPI "PIM API" {
 			*
 			*/
 			FORMATTED_NAME = 105;
-			
+
 			/**
-			* @brief The name of the contact. Single string array containing Family name, Given name, Middle name, Prefix, 
-			* Suffix, Phonetic family name, Phonetic given name, Phonetic middle name. Has \link #MA_PIM_CONTACT_NAME_FAMILY MA_PIM_CONTACT_NAME \endlink indices. 
+			* @brief The name of the contact. Single string array containing Family name, Given name, Middle name, Prefix,
+			* Suffix, Phonetic family name, Phonetic given name, Phonetic middle name. Has \link #MA_PIM_CONTACT_NAME_FAMILY MA_PIM_CONTACT_NAME \endlink indices.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
 			*
@@ -3140,7 +3140,7 @@ group PIMAPI "PIM API" {
 			*
 			*/
 			NAME = 106;
-			
+
 			/**
 			* @brief The nickname of the contact. Single string.
 			*
@@ -3152,7 +3152,7 @@ group PIMAPI "PIM API" {
 			*
 			*/
 			NICKNAME = 107;
-			
+
 			/**
 			* @brief Supplementary information, or a comment. Multiple string.
 			*
@@ -3164,14 +3164,14 @@ group PIMAPI "PIM API" {
 			*
 			*/
 			NOTE = 108;
-			
+
 			/**
 			* @brief The organization name of the contact. Multiple string.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING.
 			*
 			* @addsetget
-			*			
+			*
 			* @attributes MA_PIM_ATTR_ORG_WORK, MA_PIM_ATTR_ORG_OTHER, MA_PIM_ATTR_ORG_CUSTOM.
 			*
 			* @platforms Android, iOS.
@@ -3180,9 +3180,9 @@ group PIMAPI "PIM API" {
 			ORG = 109;
 
 			/**
-			* @brief The contact’s photo. A single int representing a data handle. Connected with PHOTO_URL.
+			* @brief The contact's photo. A single int representing a data handle. Connected with PHOTO_URL.
 			*
-			* @validvalue #MA_PIM_TYPE_INT. 
+			* @validvalue #MA_PIM_TYPE_INT.
 			*
 			* @addsetget
 			*
@@ -3192,7 +3192,7 @@ group PIMAPI "PIM API" {
 			PHOTO = 110;
 
 			/**
-			* @brief The contact’s photo url. A single string representing the URL of a photo. Connected with PHOTO.
+			* @brief The contact's photo url. A single string representing the URL of a photo. Connected with PHOTO.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING.
 			*
@@ -3214,11 +3214,11 @@ group PIMAPI "PIM API" {
 			*
 			*/
 			PUBLIC_KEY = 112;
-			
+
 			/**
 			* @brief A string representation of the contact's public key. Connected with PUBLIC_KEY.
 			*
-			* @validvalue #MA_PIM_TYPE_STRING. 
+			* @validvalue #MA_PIM_TYPE_STRING.
 			*
 			* @addsetget
 			*
@@ -3226,7 +3226,7 @@ group PIMAPI "PIM API" {
 			*
 			*/
 			PUBLIC_KEY_STRING = 113;
-			
+
 			/**
 			* @brief The revision date of the field. Single date.
 			*
@@ -3238,35 +3238,35 @@ group PIMAPI "PIM API" {
 			*
 			*/
 			REVISION = 114;
-			
+
 			/**
 			* @brief The telephone numbers of the contact. Multiple strings.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING.
 			*
 			* @addsetget
-			*			
+			*
 			* @attributes MA_PIM_ATTR_PHONE_HOME, MA_PIM_ATTR_PHONE_MOBILE, MA_PIM_ATTR_PHONE_HOME_FAX, MA_PIM_ATTR_PHONE_WORK_FAX, MA_PIM_ATTR_PHONE_PAGER, MA_PIM_ATTR_PHONE_IPHONE, MA_PIM_ATTR_PHONE_WORK, MA_PIM_ATTR_PHONE_CALLBACK, MA_PIM_ATTR_PHONE_CAR, MA_PIM_ATTR_PHONE_COMPANY_MAIN, MA_PIM_ATTR_PHONE_ISDN, MA_PIM_ATTR_PHONE_OTHER_FAX, MA_PIM_ATTR_PHONE_RADIO, MA_PIM_ATTR_PHONE_TELEX, MA_PIM_ATTR_PHONE_TTY_TDD, MA_PIM_ATTR_PHONE_WORK_MOBILE, MA_PIM_ATTR_PHONE_WORK_PAGER, MA_PIM_ATTR_PHONE_ASSISTANT, MA_PIM_ATTR_PHONE_MMS, MA_PIM_ATTR_PHONE_OTHER, MA_PIM_ATTR_PHONE_CUSTOM.
 			*
 			* @platforms Android, iOS.
 			*
 			*/
 			TEL = 115;
-			
+
 			/**
 			* @brief The professional title of the contact inside the organization. Multiple strings.
 			*
-			* @validvalue #MA_PIM_TYPE_STRING. 
+			* @validvalue #MA_PIM_TYPE_STRING.
 			*
 			* @addsetget
-			*			
+			*
 			* @attributes MA_PIM_ATTR_TITLE_WORK, MA_PIM_ATTR_TITLE_OTHER, MA_PIM_ATTR_TITLE_CUSTOM.
 			*
 			* @platforms Android, iOS.
 			*
 			*/
 			TITLE = 116;
-			
+
 			/**
 			* @brief The unique identifier of the contact on the current device. Single string.
 			*
@@ -3278,56 +3278,56 @@ group PIMAPI "PIM API" {
 			*
 			*/
 			UID = 117;
-			
+
 			/**
 			* @brief Uniform Resource Locators associated with the contact. Multiple strings.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING.
 			*
 			* @addsetget
-			*			
+			*
 			* @attributes MA_PIM_ATTR_WEBSITE_HOMEPAGE, MA_PIM_ATTR_WEBSITE_BLOG, MA_PIM_ATTR_WEBSITE_PROFILE, MA_PIM_ATTR_WEBSITE_HOME, MA_PIM_ATTR_WEBSITE_WORK, MA_PIM_ATTR_WEBSITE_FTP, MA_PIM_ATTR_WEBSITE_OTHER, MA_PIM_ATTR_WEBSITE_CUSTOM.
 			*
 			* @platforms Android, iOS.
 			*
 			*/
 			URL = 118;
-			
+
 			/**
 			* @brief The IM addresses of the contact. Multiple arrays. Has \link #MA_PIM_CONTACT_IM_USERNAME MA_PIM_CONTACT_IM \endlink indices.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
 			*
 			* @addsetget
-			*			
+			*
 			* @attributes MA_PIM_ATTR_IM_HOME, MA_PIM_ATTR_IM_WORK, MA_PIM_ATTR_IM_OTHER, MA_PIM_ATTR_IM_CUSTOM.
 			*
 			* @platforms Android, iOS.
 			*
 			*/
 			IM = 119;
-			
+
 			/**
 			* @brief A relation of the contact.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING.
 			*
 			* @addsetget
-			*			
+			*
 			* @attributes MA_PIM_ATTR_RELATION_MOTHER, MA_PIM_ATTR_RELATION_FATHER, MA_PIM_ATTR_RELATION_PARENT, MA_PIM_ATTR_RELATION_SISTER, MA_PIM_ATTR_RELATION_BROTHER, MA_PIM_ATTR_RELATION_CHILD, MA_PIM_ATTR_RELATION_FRIEND, MA_PIM_ATTR_RELATION_SPOUSE, MA_PIM_ATTR_RELATION_PARTNER, MA_PIM_ATTR_RELATION_MANAGER, MA_PIM_ATTR_RELATION_ASSISTANT, MA_PIM_ATTR_RELATION_DOMESTIC_PARTNER, MA_PIM_ATTR_RELATION_REFERRED_BY, MA_PIM_ATTR_RELATION_RELATIVE, MA_PIM_ATTR_RELATION_CUSTOM.
 			*
 			* @platforms Android, iOS.
 			*
 			*/
 			RELATION = 120;
-			
+
 			/**
 			* @brief Information about the organization. Has \link #MA_PIM_CONTACT_ORGANIZATION_NAME MA_PIM_CONTACT_ORGANIZATION \endlink indices.
 			*
 			* @validvalue #MA_PIM_TYPE_STRING_ARRAY.
 			*
 			* @addsetget
-			*			
+			*
 			* @attributes MA_PIM_ATTR_ORG_INFO_WORK, MA_PIM_ATTR_ORG_INFO_OTHER, MA_PIM_ATTR_ORG_INFO_CUSTOM.
 			*
 			* @platforms Android, iOS.
