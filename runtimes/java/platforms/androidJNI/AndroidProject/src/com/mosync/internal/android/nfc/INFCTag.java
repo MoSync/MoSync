@@ -10,7 +10,7 @@ public interface INFCTag<NativeTagType extends TagTechnology> extends IResource 
 
 	void connect() throws IOException;
 
-	INFCTag toTypedTag(ResourcePool pool, int type);
+	INFCTag getTypedTag(ResourcePool pool, int type);
 
 	NativeTagType nativeTag();
 

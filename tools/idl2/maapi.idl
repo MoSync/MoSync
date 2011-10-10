@@ -7643,8 +7643,9 @@ group NFCAPI "NFC API" {
 		* a certain type (see maNFCIsType), the tag received
 		* must be converted to the proper type (see MA_NFC_TAG_TYPE_*
 		* constants).
-		* Clients are responsible for destroying the returned handle
-		* using maNFCDestroyTag.
+		* All typed tags returned by this function will be destroyed
+		* when the tag used to produce them is destroyed. Ie no
+		* explicit destruction of typed tags is necessary (but allowed).
 		* \return A handle if the type was convertable to the specified
 		* type.
 		*/
@@ -7728,8 +7729,9 @@ group NFCAPI "NFC API" {
 		* Writes an NDEF message to the given tag, which must
 		* be of the MA_NFC_TAG_TYPE_NDEF type.
 		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_WRITE
-		* event with the handle set to the handle passed into this method
-		* and the result field set to 0 on success and a value < 0 on error.
+		* event with the handle set to the handle passed into this method,
+		* the result field set to 0 on success and a value < 0 on error,
+		* and the dstId field set to the ndefMessage written.
 		* \param tag The tag handle to write to
 		* \param ndefMessage The message to write
 		* \return MA_NFC_INVALID_TAG_TYPE if the handle given as argument

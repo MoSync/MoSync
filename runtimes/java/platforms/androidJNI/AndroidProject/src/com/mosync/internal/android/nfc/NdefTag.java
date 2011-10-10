@@ -57,4 +57,12 @@ public class NdefTag extends NFCTagBase<Ndef> implements INDEFMessageHolder {
 		}
 	}
 
+	@Override
+	public void destroy(ResourcePool pool) {
+		super.destroy(pool);
+		if (cachedNDEFMessage != null) {
+			cachedNDEFMessage.destroy(pool);
+		}
+	}
+
 }

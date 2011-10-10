@@ -262,7 +262,7 @@ public class MoSyncNFC {
 	public INFCTag maNFCGetTypedTag(ResourcePool pool, int tagHandle, int type) {
 		IResource res = getResource(tagHandle);
 		if (res instanceof INFCTag) {
-			INFCTag typedTag = ((INFCTag) res).toTypedTag(pool, type);
+			INFCTag typedTag = ((INFCTag) res).getTypedTag(pool, type);
 			return typedTag;
 		}
 		return null;

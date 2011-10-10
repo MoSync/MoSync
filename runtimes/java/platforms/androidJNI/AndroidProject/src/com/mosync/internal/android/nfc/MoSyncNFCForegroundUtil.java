@@ -1,10 +1,13 @@
 package com.mosync.internal.android.nfc;
 
+import com.mosync.java.android.MoSync;
+
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentFilter.MalformedMimeTypeException;
+import android.content.pm.PackageManager;
 import android.nfc.NfcAdapter;
 import android.nfc.tech.IsoDep;
 import android.nfc.tech.MifareClassic;
@@ -76,6 +79,10 @@ public class MoSyncNFCForegroundUtil {
 	 * @return
 	 */
 	public static MoSyncNFCForegroundUtil create(Activity activity) {
-		return new MoSyncNFCForegroundUtil(activity);
+		if (activity.getPackageManager().checkPermission("android.permission.NFC", activity.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+			return new MoSyncNFCForegroundUtil(activity);
+		} else {
+			return null;
+		}
 	}
 }
