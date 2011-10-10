@@ -14,19 +14,19 @@ work.instance_eval do
 		@HEADER_DIRS = ["libc/include/" + name]
 		copyHeaders
 	end
-	
+
 	def copyGlHeaders()
 		@INSTALL_INCDIR = "GLES"
 		@HEADER_DIRS = ["../MAStd/GLES"]
 		copyHeaders
 	end
-	
+
 	def copyGl2Headers()
 		@INSTALL_INCDIR = "GLES2"
 		@HEADER_DIRS = ["../MAStd/GLES2"]
 		copyHeaders
-	end	
-	
+	end
+
 	def setup_pipe
 		@SOURCES = ["libc/sys/mosync", "libc/sys/mosync/libgcc", "../libsupc++", "libc/sys/mosync/quad",
 			"libc/misc", "libc/unix", "libc/posix", "libc/locale", "libc/reent", "libc/stdio",
@@ -81,20 +81,25 @@ work.instance_eval do
 			"regcomp.c" => " -Wno-char-subscripts",
 			"mktemp.c" => " -DHAVE_MKDIR",
 		}
-		
+
 		@IGNORED_FILES = ["engine.c"]
-		
+
 		@EXTRA_OBJECTS = [FileTask.new(self, "libc/sys/mosync/crtlib.s")]
-		
+
 		# copy subdirs
 		copyHeaderDir("sys")
 		copyHeaderDir("machine")
 		copyGlHeaders()
 		copyGl2Headers()
 
+		@prerequisites << CopyFileTask.new(self, mosync_include + '/new',
+			FileTask.new(self, '../libsupc++/new'))
+		@prerequisites << CopyFileTask.new(self, mosync_include + '/macpp.h',
+			FileTask.new(self, '../libsupc++/macpp.h'))
+
 		@HEADER_DIRS = ["libc/include", "libc/sys/mosync"]
 		@INSTALL_INCDIR = "."
-		
+
 		@NAME = "newlib"
 	end
 end

@@ -6,7 +6,7 @@ work = PipeExeWork.new
 work.instance_eval do
 	@SOURCES = ["."]
 	@LIBRARIES = ["mautil"]
-	@NAME = "HelloWorld"
+	@NAME = "GLMoblet_OpenGLES1"
 end
 
 work.invoke

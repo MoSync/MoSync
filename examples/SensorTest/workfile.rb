@@ -4,11 +4,11 @@ require File.expand_path(ENV['MOSYNCDIR']+'/rules/mosync_exe.rb')
 
 work = PipeExeWork.new
 work.instance_eval do
-	@SOURCES = ["."]
-	@LSTFILES = ["Res/res.lst"]
-	@LIBRARIES = ["mautil", "map", "maui"]
+	@SOURCES = ['.']
+	@LIBRARIES = ['mautil']
+	@EXTRA_CPPFLAGS = ' -Wno-float-equal'
 	@EXTRA_LINKFLAGS = standardMemorySettings(11)
-	@NAME = "HelloMap"
+	@NAME = 'SensorTest'
 end
 
 work.invoke

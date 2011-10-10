@@ -46,7 +46,7 @@ template<unsigned int numBits>
 void log_to_console(const std::bitset<numBits> &b, const std::string &msg)
 {
 	std::string bits;
-	for(int i=0; i<b.size(); ++i)
+	for(size_t i=0; i<b.size(); ++i)
 	{
 		char bit = '0';
 		if(b[i] == 1)

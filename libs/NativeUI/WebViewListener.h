@@ -17,12 +17,12 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file WebViewListener.h
- * @author Emma Tresanszki
- *
- * \brief Listener for WebView events.
- *
- */
+* @file WebViewListener.h
+* @author Emma Tresanszki
+*
+* \brief Listener for WebView events.
+*
+*/
 
 #ifndef NATIVEUI_WEB_VIEW_LISTENER_H_
 #define NATIVEUI_WEB_VIEW_LISTENER_H_
@@ -31,67 +31,49 @@ MA 02110-1301, USA.
 
 namespace NativeUI
 {
-    // Forward declaration.
-    class WebView;
+	// Forward declaration.
+	class WebView;
 
-    /**
-     * \brief Listener for WebView events.
-     */
-    class WebViewListener
-    {
-    public:
-		/**
-		 * Constructor.
-		 */
-		WebViewListener()
-		{
-		}
+	/**
+	* \brief Listener for WebView events.
+	*/
+	class WebViewListener
+	{
+	public:
 
 		/**
-		 * We need to define an virtual destructor for
-		 * the library to build in Debug mode.
-		 */
-		virtual ~WebViewListener()
-		{
-		}
-
-        /**
-         * This method is called when MAW_EVENT_WEB_VIEW_HOOK_INVOKED is received.
-         * @param webView The web view object that generated the event.
-         * @param hookType The type of hook that has been invoked.
-		 * One of:
-		 *  -#MAW_CONSTANT_SOFT
-		 *  -#MAW_CONSTANT_HARD
-		 *
-		 * @param urlData The handle to url data. This is string data,
-		 * there is NO null terminating character. The encoding
-		 * of the data is determined by the application.
-		 * The data MUST be deallocated with maDestroyObject after
-		 * it hs been used. Each event allocates a new data object
-		 * for the url data.
-         */
-        virtual void webViewHookInvoked(
+		* This method is called when MAW_EVENT_WEB_VIEW_HOOK_INVOKED is received.
+		* @param webView The web view object that generated the event.
+		* @param hookType The type of hook that has been invoked.
+		* One of:
+		*  -#MAW_CONSTANT_SOFT
+		*  -#MAW_CONSTANT_HARD
+		*
+		* @param urlData The handle to url data. This is string data,
+		* there is NO null terminating character. The encoding
+		* of the data is determined by the application.
+		* The data MUST be deallocated with maDestroyObject after
+		* it hs been used. Each event allocates a new data object
+		* for the url data.
+		*/
+		virtual void webViewHookInvoked(
 			WebView* webView,
 			int hookType,
-			MAHandle urlData)
-		{
-		}
+			MAHandle urlData) = 0;
 
-        /**
-         * This method is called when the web view content is loading.
-         * @param webView The web view object that generated the event.
-         * @param webViewState  Any of the following constants:
-         * - #MAW_CONSTANT_STARTED
-		 * - #MAW_CONSTANT_DONE
-		 * - #MAW_CONSTANT_STOPPED
-		 * - #MAW_CONSTANT_ERROR
-         */
-        virtual void webViewContentLoading(
+		/**
+		* This method is called when the web view content is loading.
+		* @param webView The web view object that generated the event.
+		* @param webViewState  Any of the following constants:
+		* - #MAW_CONSTANT_STARTED
+		* - #MAW_CONSTANT_DONE
+		* - #MAW_CONSTANT_STOPPED
+		* - #MAW_CONSTANT_ERROR
+		*/
+		virtual void webViewContentLoading(
 			WebView* webView,
-			const int webViewState)
-		{
-		}
-    };
+			const int webViewState) = 0;
+	};
 
 } // namespace NativeUI
 

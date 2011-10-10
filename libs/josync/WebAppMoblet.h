@@ -37,8 +37,8 @@ MA 02110-1301, USA.
 
 namespace josync
 {
-    // Forward declaration.
-    class WebAppMoblet_WebViewListener;
+	// Forward declaration.
+	class WebAppMoblet_WebViewListener;
 
 	/**
 	 * \brief A web view is a widget used to render web pages.

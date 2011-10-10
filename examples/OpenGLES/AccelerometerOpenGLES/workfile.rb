@@ -6,7 +6,7 @@ work = PipeExeWork.new
 work.instance_eval do
 	@SOURCES = ["."]
 	@LIBRARIES = ["mautil"]
-	@NAME = "HelloWorld"
+	@NAME = "AccelerometerOpenGLES"
 end
 
 work.invoke

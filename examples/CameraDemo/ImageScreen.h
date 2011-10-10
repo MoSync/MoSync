@@ -53,7 +53,7 @@ public:
 
 	virtual void buttonClicked(Widget* button);
 
-	int initialize(StackScreen* stackScreen);
+	void initialize(StackScreen* stackScreen);
 
 	void pushImageScreen();
 

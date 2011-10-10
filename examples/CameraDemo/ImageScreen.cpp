@@ -47,7 +47,7 @@ void ImageScreen::buttonClicked(Widget* button)
 /**
  * Lazy initializations
  */
-int ImageScreen::initialize(StackScreen* stackScreen)
+void ImageScreen::initialize(StackScreen* stackScreen)
 {
 	mStackScreen = stackScreen;
 	createUI();

@@ -53,13 +53,13 @@ public:
 
 	virtual void buttonClicked(Widget* button);
 
-	int initialize(StackScreen* stackScreen);
+	void initialize(StackScreen* stackScreen);
 
 	void pushSettingsScreen();
 
 	int getCurrentCamera();
 
-	char * getFLashMode();
+	const char * getFLashMode();
 
 	bool flashSupported;
 
@@ -69,7 +69,7 @@ private:
 
 	void createUI();
 
-	char * getModeForIndex(int index);
+	const char * getModeForIndex(int index);
 
 	Screen *mScreen;
 

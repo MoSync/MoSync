@@ -37,7 +37,7 @@ public:
 
 	int operator()(const Employee &rv)
 	{
-		mTotalCost += rv.getSalary();
+		return mTotalCost += rv.getSalary();
 	}
 
 	int getResult()
