@@ -35,11 +35,6 @@ public class NdefTag extends NFCTagBase<Ndef> implements INDEFMessageHolder {
 	}
 
 	@Override
-	public byte[] transceive(byte[] buffer) throws IOException {
-		throw new IOException("Cannot transceive.");
-	}
-
-	@Override
 	public void requestNDEFMessage(ResourcePool pool) throws IOException {
 		try {
 			cacheNDEFMessage(pool, nativeTag.getNdefMessage());

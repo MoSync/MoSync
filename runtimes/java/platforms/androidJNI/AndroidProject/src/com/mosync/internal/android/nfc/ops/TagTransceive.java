@@ -6,15 +6,16 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 import com.mosync.internal.android.nfc.INFCTag;
+import com.mosync.internal.android.nfc.ITransceivable;
 import com.mosync.internal.android.nfc.NFCEvent;
 
-public class TagTransceive extends TagRunnable<INFCTag> {
+public class TagTransceive extends TagRunnable<ITransceivable> {
 
 	private final ByteBuffer src;
 	private final ByteBuffer dst;
 	private final int dstPtr;
 
-	public TagTransceive(INFCTag tag, ByteBuffer src, ByteBuffer dst, int dstPtr) {
+	public TagTransceive(ITransceivable tag, ByteBuffer src, ByteBuffer dst, int dstPtr) {
 		super(tag, EVENT_TYPE_NFC_TAG_DATA_READ);
 		this.src = src;
 		this.dst = dst;

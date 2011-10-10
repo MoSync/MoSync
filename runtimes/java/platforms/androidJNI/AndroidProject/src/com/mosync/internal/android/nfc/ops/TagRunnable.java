@@ -6,6 +6,7 @@ import com.mosync.internal.android.nfc.INFCTag;
 import com.mosync.internal.android.nfc.NFCEvent;
 import com.mosync.internal.android.nfc.RunnableWithResult;
 
+import android.nfc.FormatException;
 import android.nfc.TagLostException;
 
 /**
@@ -32,6 +33,8 @@ public abstract class TagRunnable<TagType extends INFCTag> implements RunnableWi
 		}
 		try {
 			return doRun();
+		} catch (FormatException e) {
+			return createDefaultEvent(MA_NFC_FORMAT_FAILED);
 		} catch (TagLostException e) {
 			return createDefaultEvent(MA_NFC_TAG_CONNECTION_LOST);
 		} catch (Exception e) {

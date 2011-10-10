@@ -2309,6 +2309,9 @@ return 0; \
 					mJThis);
 		}
 
+		case maIOCtl_maNFCGetSize:
+			return _maNFCGetSize(a, mJNIEnv, mJThis);
+
 		case maIOCtl_maNFCGetNDEFMessage:
 			return _maNFCGetNDEFMessage(a, mJNIEnv, mJThis);
 

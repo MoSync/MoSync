@@ -12,8 +12,6 @@ public interface INFCTag<NativeTagType extends TagTechnology> extends IResource 
 
 	INFCTag toTypedTag(ResourcePool pool, int type);
 
-	byte[] transceive(byte[] buffer) throws IOException;
-
 	NativeTagType nativeTag();
 
 }

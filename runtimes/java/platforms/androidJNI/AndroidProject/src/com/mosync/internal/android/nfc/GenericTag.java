@@ -1,11 +1,12 @@
 package com.mosync.internal.android.nfc;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_ISO_DEP;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_MIFARE_CL;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_MIFARE_UL;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NDEF;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NDEF_FORMATTABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NFC_A;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NFC_B;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_ISO_DEP;
 
 import java.io.IOException;
 
@@ -44,6 +45,8 @@ public class GenericTag extends ResourceBase implements INFCTag {
 			return NfcBTag.get(pool, this);
 		case MA_NFC_TAG_TYPE_ISO_DEP:
 			return IsoDepTag.get(pool, this);
+		case MA_NFC_TAG_TYPE_NDEF_FORMATTABLE:
+			return NdefFormatableTag.get(pool, this);
 		default:
 			return null;
 		}
@@ -57,12 +60,6 @@ public class GenericTag extends ResourceBase implements INFCTag {
 	@Override
 	public void connect() throws IOException {
 		// Does nothing
-	}
-
-	@Override
-	public byte[] transceive(byte[] buffer) {
-		// Does nothing
-		return new byte[0];
 	}
 
 	@Override

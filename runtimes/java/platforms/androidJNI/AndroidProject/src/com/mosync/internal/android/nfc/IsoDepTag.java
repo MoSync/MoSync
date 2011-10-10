@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import android.nfc.tech.IsoDep;
 
-public class IsoDepTag extends NFCTagBase<IsoDep> {
+public class IsoDepTag extends NFCTagBase<IsoDep> implements ITransceivable<IsoDep> {
 
 	public static IsoDepTag get(ResourcePool pool, GenericTag tag) {
 		IsoDep isoDep = IsoDep.get(tag.getTag());

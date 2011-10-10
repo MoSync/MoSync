@@ -3,6 +3,7 @@ package com.mosync.internal.android.nfc.ops;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_TAG_DATA_WRITTEN;
 
 import com.mosync.internal.android.nfc.INDEFMessageHolder;
+import com.mosync.internal.android.nfc.INDEFMessageWritable;
 import com.mosync.internal.android.nfc.INFCTag;
 import com.mosync.internal.android.nfc.NDEFMessage;
 import com.mosync.internal.android.nfc.NFCEvent;
