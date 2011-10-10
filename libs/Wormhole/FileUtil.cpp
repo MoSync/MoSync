@@ -40,7 +40,7 @@ MA 02110-1301, USA.
 
 #include "FileUtil.h"
 
-namespace josync
+namespace Wormhole
 {
 	/**
 	 * Constructor.

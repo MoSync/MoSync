@@ -94,8 +94,8 @@ html
 }
 </style>
 
-<!-- Import the josync library. -->
-<script src="js/josync.js"></script>
+<!-- Import the JavScript to C++ bridge. -->
+<script src="js/bridge.js"></script>
 
 <script>
 // Global variables that hold message content.
@@ -134,7 +134,7 @@ function SendSMS(textMessage)
   if (ValidatePhoneNo())
   {
     DisplayMessage('Sending...');
-    josync.messagehandler.send(
+    bridge.messagehandler.send(
       { messageName: 'SendSMS',
         phoneNo: GetPhoneNo(),
         message: textMessage },
@@ -261,7 +261,7 @@ CreateMessageStrings();
 </div>
 <script>
   // This informs the application that the page is loaded.
-  josync.messagehandler.send({ messageName: 'PageLoaded' }, null);
+  bridge.messagehandler.send({ messageName: 'PageLoaded' }, null);
 </script>
 </body>
 </html>

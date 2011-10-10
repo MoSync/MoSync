@@ -5,11 +5,11 @@
  */
 
 // Include Moblet for web applications.
-#include <josync/WebAppMoblet.h>
+#include <Wormhole/WebAppMoblet.h>
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
-using namespace josync; // Class WebAppMoblet
+using namespace Wormhole; // Class WebAppMoblet
 
 /**
  * The application class.

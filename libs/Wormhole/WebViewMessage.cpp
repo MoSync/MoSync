@@ -31,7 +31,7 @@ MA 02110-1301, USA.
 
 #include "WebViewMessage.h"
 
-namespace josync
+namespace Wormhole
 {
 	/**
 	 * Take a string that is "percent encoded" and decode it.
@@ -90,6 +90,15 @@ namespace josync
 	}
 
 	/**
+	 * Get the WebView widget associated with this message.
+	 * @return Pointer to WebView object.
+	 */
+	NativeUI::WebView* WebViewMessage::getWebView()
+	{
+		return mWebView;
+	}
+
+	/**
 	 * Checks if this message matches the given message name.
 	 */
 	bool WebViewMessage::is(const MAUtil::String& messageName)
@@ -98,11 +107,24 @@ namespace josync
 	}
 
 	/**
-	 * Returns a message parameter by param name.
+	 * Returns the string value of a message parameter.
+	 * @return The param value as a string.
 	 */
 	MAUtil::String WebViewMessage::getParam(const MAUtil::String& paramName)
 	{
 		return mMessageParams[paramName];
+	}
+
+	/**
+	 * Returns the integer value of a message parameter.
+	 * @return The param value as an int.
+	 */
+	int WebViewMessage::getParamInt(const MAUtil::String& paramName)
+	{
+		return (int) strtol(
+			mMessageParams[paramName].c_str(),
+			NULL,
+			10);
 	}
 
 	/**
@@ -111,94 +133,6 @@ namespace josync
 	bool WebViewMessage::hasParam(const MAUtil::String& paramName)
 	{
 		return mMessageParams.find(paramName) != mMessageParams.end();
-	}
-
-
-	/**
-	 * Calls a JavaScript callback function using the "callbackId"
-	 * parameter. The callbackId is supplied automatically when
-	 * using the josync.messagehandler.send function.
-	 * @param result A string that contains the data to be returned
-	 * to the JavaScript callback function.
-	 * @return true on success, false on error.
-	 */
-	bool WebViewMessage::replyString(const MAUtil::String& result)
-	{
-		// Message must have an callbackId parameter.
-		if (!hasParam("callbackId"))
-		{
-			return false;
-		}
-
-		// Get the callbackID parameter.
-		MAUtil::String callbackId = getParam("callbackId");
-
-		// Call JavaScript reply handler.
-		MAUtil::String script = "josync.messagehandler.reply(";
-		script += callbackId + ", " + "'" + result + "')";
-		mWebView->callJS(script);
-
-		return true;
-	}
-
-	/**
-	 * Calls a JavaScript callback function using the "callbackId"
-	 * parameter. The callbackId is supplied automatically when
-	 * using the josync.messagehandler.send function.
-	 * @param result A boolean to be returned
-	 * to the JavaScript callback function.
-	 * @return true on success, false on error.
-	 */
-	bool WebViewMessage::replyBoolean(bool result)
-	{
-		// Message must have an callbackId parameter.
-		if (!hasParam("callbackId"))
-		{
-			return false;
-		}
-
-		// Get the callbackID parameter.
-		MAUtil::String callbackId = getParam("callbackId");
-
-		// Call JavaScript reply handler.
-		MAUtil::String script = "josync.messagehandler.reply(";
-		if (result)
-		{
-			script += callbackId + ", true)";
-		}
-		else
-		{
-			script += callbackId + ", false)";
-		}
-		mWebView->callJS(script);
-
-		return true;
-	}
-
-	/**
-	 * Calls a JavaScript callback function using the "callbackId"
-	 * parameter. Returns null to the callback function.
-	 * The callbackId is supplied automatically when
-	 * using the josync.messagehandler.send function.
-	 * @return true on success, false on error.
-	 */
-	bool WebViewMessage::replyNull()
-	{
-		// Message must have an callbackId parameter.
-		if (!hasParam("callbackId"))
-		{
-			return false;
-		}
-
-		// Get the callbackID parameter.
-		MAUtil::String callbackId = getParam("callbackId");
-
-		// Call JavaScript reply handler.
-		MAUtil::String script = "josync.messagehandler.reply(";
-		script += callbackId + ", null)";
-		mWebView->callJS(script);
-
-		return true;
 	}
 
 	/**
