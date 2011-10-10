@@ -3,12 +3,12 @@
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
-<property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%\include\stlport,  %mosync-home%\include\newlib"/>
-<property key="build.prefs:additional.include.paths/Release" value="%mosync-home%\include\stlport, %mosync-home%\include\newlib"/>
+<property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include/, %mosync-home%/include/newlib/stlport,  %mosync-home%/include/newlib"/>
+<property key="build.prefs:additional.include.paths/Release" value="%mosync-home%\include\newlib\stlport, %mosync-home%\include\newlib"/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib"/>
 <property key="build.prefs:additional.libraries/Debug" value="MAUtil.lib,  newlib.lib, stlport.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib,  newlib.lib, stlportD.lib"/>
-<property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%\lib\newlib_debug, %mosync-home%\lib\pipe_debug"/>
+<property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%/lib/newlib_debug, %mosync-home%/lib/pipe_debug"/>
 <property key="build.prefs:additional.library.paths/Release" value="%mosync-home%\lib\newlib_release"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
