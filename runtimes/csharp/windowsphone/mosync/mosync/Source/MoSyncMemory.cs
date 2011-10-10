@@ -8,7 +8,10 @@ namespace MoSync
     // This is the interface to the data memory segment for the mosync core.
     // It is also used for binary resources among other things.
     // This should probably implement the stream interface in order to be able to pass it to functions that require streams.
-
+    // TODO: maybe this should implement another interface (like Stream) 
+    // so that code can be efficiently shared between binary resources
+    // and unloaded binary resources. Now ubins are loaded into memory also,
+    // in order to get something up and running quickly.
 	public class Memory
     {
         protected byte[] mData;

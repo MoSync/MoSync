@@ -24,11 +24,6 @@ namespace MoSync
                 MoSync.Util.CriticalError(message + "\ncode: " + code);
             };
 
-            syscalls.maWait = delegate(int time)
-            {
-
-            };
-
             DateTime startDate = System.DateTime.Now;
             syscalls.maGetMilliSecondCount = delegate() {
                 System.TimeSpan offset = (System.DateTime.Now - startDate);

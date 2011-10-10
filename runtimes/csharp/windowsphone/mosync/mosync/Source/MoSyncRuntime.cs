@@ -33,6 +33,7 @@ namespace MoSync
         private List<ISyscallGroup> mSyscallGroups = new List<ISyscallGroup>();
         private List<Memory> mEvents = new List<Memory>();
         private test_mosync.MainPage mMainPage;
+        private AutoResetEvent mEventWaiter = new AutoResetEvent(false);
 
         private void InitSyscalls()
         {
@@ -55,21 +56,39 @@ namespace MoSync
         {
             mMainPage = mainPage;
 
+            // this could probably be generated
+            const int MAEvent_type = 0;
+            const int MAEvent_point_x = 4;
+            const int MAEvent_point_y = 8;
+            const int MAEvent_point_touchId = 12;
+
             mainPage.MouseLeftButtonDown += delegate(Object sender, MouseButtonEventArgs e)
             {
                 Memory mem = new Memory(4 * 3);
-                mem.WriteInt32(0, MoSync.Constants.EVENT_TYPE_POINTER_PRESSED);
-                mem.WriteInt32(4, 0); // x
-                mem.WriteInt32(8, 0); // y
+                mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_PRESSED);
+                mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
+                mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
+                mem.WriteInt32(MAEvent_point_touchId, 0);
+                PostEvent(mem);
+            };
+
+            mainPage.MouseMove += delegate(Object sender, MouseEventArgs e)
+            {
+                Memory mem = new Memory(4 * 3);
+                mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_DRAGGED);
+                mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
+                mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
+                mem.WriteInt32(MAEvent_point_touchId, 0);
                 PostEvent(mem);
             };
 
             mainPage.MouseLeftButtonUp += delegate(Object sender, MouseButtonEventArgs e)
             {
                 Memory mem = new Memory(4 * 3);
-                mem.WriteInt32(0, MoSync.Constants.EVENT_TYPE_POINTER_RELEASED);
-                mem.WriteInt32(4, 0); // x
-                mem.WriteInt32(8, 0); // y
+                mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_RELEASED);
+                mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
+                mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
+                mem.WriteInt32(MAEvent_point_touchId, 0);
                 PostEvent(mem);
             };
 
@@ -82,15 +101,28 @@ namespace MoSync
             {
                 if (mEvents.Count != 0)
                 {
-                    Memory mem = mEvents[0];
-                    mEvents.RemoveAt(0);
-                    mCore.GetDataMemory().WriteMemoryAtAddress(ptr, mem, 0, mem.GetSizeInBytes());
+                    lock (mEvents)
+                    {
+                        Memory mem = mEvents[0];
+                        mEvents.RemoveAt(0);
+                        mCore.GetDataMemory().WriteMemoryAtAddress(ptr, mem, 0, mem.GetSizeInBytes());
+                    }
                     return 1;
                 }
                 else
                 {
                     return 0;
                 }
+            };
+
+            mSyscalls.maWait = delegate(int timeout)
+            {
+                mEventWaiter.WaitOne(timeout);
+            };
+
+            mSyscalls.maIOCtl = delegate(int id, int a, int b, int c)
+            {
+                return MoSync.Constants.IOCTL_UNAVAILABLE;
             };
         }
 
@@ -106,7 +138,12 @@ namespace MoSync
 
         public void PostEvent(Memory memory)
         {
-            mEvents.Add(memory);
+            lock (mEvents)
+            {
+                mEvents.Add(memory);
+            }
+
+            mEventWaiter.Set();
         }
 
         // resource specific packed integer.
