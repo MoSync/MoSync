@@ -184,6 +184,11 @@ class PipeExeWork < PipeGccWork
 			default(:PACK_ANDROID_KEYPASS, 'default')
 		end
 
+		pipeFlags = @FLAGS + @EXTRA_LINKFLAGS
+		if(!pipeFlags.include?(' -datasize') && USE_NEWLIB)
+			@EXTRA_LINKFLAGS << standardMemorySettings(10)
+		end
+
 		super
 
 		if(ELIM)
@@ -211,6 +216,23 @@ class PipeExeWork < PipeGccWork
 				)
 		end
 	end
+
+	# Returns pipe-tool flags for memory settings,
+	# with a datasize of 2^pow2kb KiB.
+	# For example, for 2 MiB, call standardMemorySettings(11).
+	# A power-of-2 argument may seem strange, but because the runtimes
+	# force datasize to the closest upper power-of-2 anyway,
+	# it should minimize accidental memory waste.
+	def standardMemorySettings(pow2kb)
+		raise "Insufficient memory. Need at least 64 KiB." if(pow2kb < 6)
+		d = (1 << (pow2kb + 10))
+		h = d - (d >> 2)
+		#newlibStaticDataSize = 128*1024
+		#h -= newlibStaticDataSize if(USE_NEWLIB)
+		s = (d >> 4)
+		return " -datasize=#{d} -heapsize=#{h} -stacksize=#{s}"
+	end
+
 	def emuCommandLine
 		if(@resourceTask)
 			resArg = " -resource \"#{@resourceTask}\""

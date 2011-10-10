@@ -32,6 +32,9 @@ struct SETTINGS {
 	const char* permissions;
 	const char* s60v3uid;
 	const char* s60v2uid;
+	const char* s60cert;
+	const char* s60key;
+	const char* s60pass;
 	bool debug;
 	bool silent;
 	bool showPasswords;

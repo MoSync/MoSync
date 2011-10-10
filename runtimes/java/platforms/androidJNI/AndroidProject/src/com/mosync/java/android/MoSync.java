@@ -92,9 +92,13 @@ public class MoSync extends Activity
 
 		super.onCreate(savedInstanceState);
 
-		// If triggered by an NFC event, must handle it this way.
-		MoSyncNFCService.handleNFCIntent(this, getIntent());
-		nfcForegroundHandler = MoSyncNFCForegroundUtil.create(this);
+		try {
+			// If triggered by an NFC event, must handle it this way.
+			MoSyncNFCService.handleNFCIntent(this, getIntent());
+			nfcForegroundHandler = MoSyncNFCForegroundUtil.create(this);
+		}catch(Throwable t){
+			SYSLOG("No NFC");
+		}
 
 		// Initialize.
 		mMoSyncView = null;

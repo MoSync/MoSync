@@ -300,7 +300,7 @@ void STLMoblet::STL_vector()
 	LOG(" * throw a out_of_range exception if the requested index is out of range.");
 	LOG(" */");
 
-	int x2 = v4.at(0);
+	//int x2 = v4.at(0);
 	log_to_console(v4[0], "int x2 = v4.at(0);	//x = ");
 
 	LOG("\n");
