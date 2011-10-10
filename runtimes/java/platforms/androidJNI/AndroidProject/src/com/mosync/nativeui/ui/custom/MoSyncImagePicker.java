@@ -101,41 +101,6 @@ public class MoSyncImagePicker
 		builder.setCancelable(true);
 		builder.setTitle("Image Picker");
 
-		builder.setNegativeButton("Cancel",
-		        new DialogInterface.OnClickListener() {
-
-			        @Override
-			        public void onClick(DialogInterface dialog, int which)
-			        {
-						// Clear the bitmap cache before closing the dialog.
-						mBitmapCache.clear();
-				        postImagePickerEvent(PICKER_CANCELED);
-			        }
-		        });
-
-		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
-			public void onClick(DialogInterface dialog, int which)
-			{
-				// Clear the bitmap cache before closing the dialog.
-				mBitmapCache.clear();
-
-				if ( !mPaths.isEmpty() )
-				{
-					// Display only the name of the selected image.
-					Toast.makeText(getActivity(), mNames.get(mPosition), Toast.LENGTH_SHORT).show();
-
-					// Save the handle of the selected item and post event.
-					mImageHandle = getSelectedImageHandle(mBitmapCache.get(mPosition));
-
-					postImagePickerEvent(PICKER_READY);
-				}
-				else
-				{
-					postImagePickerEvent(PICKER_CANCELED);
-				}
-			}
-		});
-
 		if ( getImagesUsingCursor() )
 		{
 	        // Use the screen size at scaling the gallery and preview image.
@@ -229,6 +194,37 @@ public class MoSyncImagePicker
 			builder.setMessage("No images were found on the device!");
 		}
 
+		builder.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which)
+			{
+				if ( !mPaths.isEmpty() )
+				{
+					// Display only the name of the selected image.
+					Toast.makeText(getActivity(), mNames.get(mPosition), Toast.LENGTH_SHORT).show();
+
+					// Save the handle of the selected item and post event.
+					mImageHandle = getSelectedImageHandle(mBitmapCache.get(mPosition));
+					// Clear the bitmap cache before closing the dialog.
+					mBitmapCache.clear();
+					postImagePickerEvent(PICKER_READY);
+				}
+				else
+				{
+					postImagePickerEvent(PICKER_CANCELED);
+				}
+			}
+		});
+		builder.setNegativeButton("Cancel",
+		        new DialogInterface.OnClickListener() {
+
+			        @Override
+			        public void onClick(DialogInterface dialog, int which)
+			        {
+						// Clear the bitmap cache before closing the dialog.
+						mBitmapCache.clear();
+				        postImagePickerEvent(PICKER_CANCELED);
+			        }
+		        });
 		AlertDialog alertDialog = builder.create();
 
 		// Display the dialog until user provides a selection, or cancels the
