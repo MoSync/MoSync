@@ -2392,6 +2392,23 @@ namespace Base
 		return (int)result;
 	}
 
+	int _maNFCGetSize(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+												 cls,
+												 "maNFCGetSize",
+												 "(I)I");
+		if (methodID == 0)
+			return 0;
+
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
 	MAHandle _maNFCGetNDEFMessage(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
@@ -2436,7 +2453,7 @@ namespace Base
 		if (methodID == 0)
 			return 0;
 
-		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle);
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, tagHandle, ndefMessage);
 
 		jNIEnv->DeleteLocalRef(cls);
 
@@ -2612,7 +2629,7 @@ namespace Base
 		if (methodID == 0)
 			return 0;
 
-		jint result = jNIEnv->CallIntMethod(jThis, methodID, ndefRecordHandle);
+		jint result = jNIEnv->CallIntMethod(jThis, methodID, ndefRecordHandle, tnf);
 
 		jNIEnv->DeleteLocalRef(cls);
 

@@ -79,7 +79,7 @@ public class PIMList {
 	 * Checks if we reached the end of the list.
 	 */
 	boolean hasNext() {
-		return mListIterator < mList.size();
+		return ( mListIterator < mList.size() && mList.size() > 0 );
 	}
 
 	/**

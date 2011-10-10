@@ -199,10 +199,10 @@ void STLMoblet::STL_string()
 	string str = "STL";
 	log_to_console("string str = \"STL\";");
 
-	std::string::iterator it = str.begin();
+	//std::string::iterator it = str.begin();
 	log_to_console("std::string::iterator it = str.begin();");
 
-	for( std::string::iterator it = str.begin(); it!= str.end(); ++it)
+	for(std::string::iterator it = str.begin(); it!= str.end(); ++it)
 	{
 		*it = 'A';
 	}

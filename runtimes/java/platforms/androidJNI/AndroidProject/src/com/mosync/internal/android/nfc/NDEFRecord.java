@@ -5,7 +5,7 @@ import java.nio.ByteBuffer;
 import android.nfc.NdefRecord;
 
 
-public class NDEFRecord extends ResourceBase {
+public class NDEFRecord extends ResourceBase implements ISizeHolder {
 
 	private final NdefRecord delegate;
 	private byte[] id;
@@ -98,6 +98,12 @@ public class NDEFRecord extends ResourceBase {
 		byte[] id = internalGetId();
 		byte[] payload = internalGetPayload();
 		return new NdefRecord(tnf, type, id, payload);
+	}
+
+	@Override
+	public int getSize() {
+		// TODO Not very efficient, right?
+		return toNativeNDEFRecord().toByteArray().length;
 	}
 
 }

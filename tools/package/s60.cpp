@@ -122,11 +122,17 @@ void packageS60v3(const SETTINGS& s, const RuntimeInfo& ri) {
 	cmd << mosyncdir()<<"/bin/makesis-4 \""<<genPkgName<<"\"";
 	sh(cmd.str().c_str(), s.silent);
 
+	// support non-default keys
+	string s60cert = s.s60cert ? s.s60cert : mosyncdir()+string("/etc/default.cert");
+	toSlashes(s60cert);
+	string s60key = s.s60key ? s.s60key : mosyncdir()+string("/etc/default.key");
+	toSlashes(s60key);
+	string s60pass = s.s60pass ? s.s60pass : "default";
+
 	// call signsis
-	// todo: support non-default keys
 	cmd.str("");
 	cmd << mosyncdir()<<"/bin/signsis-4 -s \""<<unsignedSisName<<"\" \""<<signedSisName<<"\" \""<<
-		mosyncdir()<<"/etc/default.cert\" \""<<mosyncdir()<<"/etc/default.key\" default";
+		s60cert<<"\" \""<<s60key<<"\" \""<<s60pass<<"\"";
 	sh(cmd.str().c_str(), s.silent);
 
 	// and we're done!

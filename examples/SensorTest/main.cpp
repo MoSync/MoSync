@@ -68,29 +68,25 @@ static void updateScreenDimensions()
 /*
  * Get the error message using the sensor error code.
  */
-char* getErrorText(int errorCode)
+static const char* getErrorText(int errorCode)
 {
 	switch (errorCode)
 	{
 		case SENSOR_ERROR_NOT_AVAILABLE:
 			return TXT_NOT_AVAILABLE;
-			break;
 		case SENSOR_ERROR_INTERVAL_NOT_SET:
 			return TXT_INTERVAL;
-			break;
 		case SENSOR_ERROR_ALREADY_ENABLED:
 			return TXT_ENABLED;
-			break;
 		default:
 			return TXT_AVAILABLE;
-			break;
 	}
 }
 
 /*
  * @brief Get the orientation text using the sensor orientation code.
  */
-char* getOrientationText(int orientation)
+static const char* getOrientationText(int orientation)
 {
 	switch (orientation)
 	{
@@ -108,6 +104,8 @@ char* getOrientationText(int orientation)
 			return TXT_FACE_UP;
 		case UIDEVICE_ORIENTATION_FACE_DOWN:
 			return TXT_FACE_DOWN;
+		default:
+			maPanic(1, "getOrientationText");
 	}
 }
 
@@ -213,7 +211,7 @@ void drawSensorOutput()
  */
 void setFont()
 {
-	int nrFonts = maFontGetCount();
+	//int nrFonts = maFontGetCount();
 	char fontName[BUFFER_SIZE];
 	// get font with the specified ID.
 	maFontGetName(FONT_ID, fontName, BUFFER_SIZE);
@@ -259,4 +257,5 @@ extern "C" int MAMain()
 	}
 
 	unregisterSensors();
-};
+	return 0;
+}

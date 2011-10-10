@@ -251,10 +251,6 @@ public class MoSyncNFC {
 	}
 
 	public int maNFCIsType(int tagHandle, int type) {
-		// TODO: Supported technologies, how do we list them?
-		if (type < MA_NFC_TAG_TYPE_NDEF || type > MA_NFC_TAG_TYPE_ISO_DEP) {
-			return MA_NFC_INVALID_TAG_TYPE;
-		}
 		return maNFCGetTypedTag(ResourcePool.NULL, tagHandle, type) == null ? 0 : 1;
 	}
 
@@ -266,12 +262,19 @@ public class MoSyncNFC {
 	public INFCTag maNFCGetTypedTag(ResourcePool pool, int tagHandle, int type) {
 		IResource res = getResource(tagHandle);
 		if (res instanceof INFCTag) {
-			INFCTag typedTag = ((INFCTag) res).toTypedTag(pool, type);
+			INFCTag typedTag = ((INFCTag) res).getTypedTag(pool, type);
 			return typedTag;
 		}
 		return null;
 	}
 
+	public int maNFCGetSize(int tagHandle) {
+		IResource resource = getResource(tagHandle);
+		if (resource instanceof ISizeHolder) {
+			return ((ISizeHolder) resource).getSize();
+		}
+		return -1;
+	}
 	public int maNFCBatchStart(int tagHandle) {
 		if (currentBatches != null) {
 			return MA_NFC_NOT_AVAILABLE;
@@ -310,8 +313,8 @@ public class MoSyncNFC {
 
 	public int maNFCTransceive(int tagHandle, int src, int len, int dst, int dstLen, int dstPtr) {
 		IResource tag = getResource(tagHandle);
-		if (tag instanceof INFCTag) {
-			performIO(tagHandle, new TagTransceive((INFCTag) tag, getMemoryAt(src, len), getMemoryAt(dst, dstLen), dstPtr));
+		if (tag instanceof ITransceivable) {
+			performIO(tagHandle, new TagTransceive((ITransceivable) tag, getMemoryAt(src, len), getMemoryAt(dst, dstLen), dstPtr));
 			return SUCCESS;
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
@@ -343,7 +346,7 @@ public class MoSyncNFC {
 	public int maNFCWriteNDEFMessage(int tagHandle, int ndefMessageHandle) {
 		IResource tag = getResource(tagHandle);
 		NDEFMessage ndefMessage = getNDEFMessage(ndefMessageHandle);
-		if (tag instanceof INDEFMessageHolder && tag instanceof INFCTag && ndefMessage != null) {
+		if (tag instanceof INDEFMessageWritable && tag instanceof INFCTag && ndefMessage != null) {
 			performIO(tagHandle, new WriteNDEF((INFCTag) tag, ndefMessage));
 			return SUCCESS;
 		}
@@ -422,7 +425,7 @@ public class MoSyncNFC {
 		IResource ndefRecord = getResource(ndefRecordHandle);
 		if (ndefRecord instanceof NDEFRecord) {
 			NDEFRecord rec = (NDEFRecord) ndefRecord;
-			return rec.maNFCGetPayload(getMemoryAt(dst, len));
+			return rec.maNFCGetType(getMemoryAt(dst, len));
 		}
 		return MA_NFC_INVALID_TAG_TYPE;
 	}

@@ -211,7 +211,6 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 		directories.push_back("/res/drawable");
 
 		if (ri.androidVersion >= 4) {
-			printf("Multiple screen support not yet impl!");
 			// For Android >= 1.6
 			//36x36 for low-density (ldpi)
 			//48x48 for medium-density (mdpi)
@@ -236,7 +235,7 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 			string outputDir = string(s.dst) + directories.at(i);
 			_mkdir(outputDir.c_str());
 			string outputIcon = outputDir + "/icon.png";
-			injectIcon("android", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
+			injectIcon("android", size.c_str(), s.icon, file(outputIcon).c_str(), s.silent);
 		}
 	}
 }

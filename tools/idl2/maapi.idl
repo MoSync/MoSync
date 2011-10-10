@@ -7643,8 +7643,9 @@ group NFCAPI "NFC API" {
 		* a certain type (see maNFCIsType), the tag received
 		* must be converted to the proper type (see MA_NFC_TAG_TYPE_*
 		* constants).
-		* Clients are responsible for destroying the returned handle
-		* using maNFCDestroyTag.
+		* All typed tags returned by this function will be destroyed
+		* when the tag used to produce them is destroyed. Ie no
+		* explicit destruction of typed tags is necessary (but allowed).
 		* \return A handle if the type was convertable to the specified
 		* type.
 		*/
@@ -7707,6 +7708,12 @@ group NFCAPI "NFC API" {
 		int maNFCIsReadOnly(in MAHandle tag);
 
 		/**
+		* Returns the capacity/size of a tag,
+		* or -1 if unknown.
+		*/
+		int maNFCGetSize(in MAHandle tag);
+
+		/**
 		* Reads an NDEF message from the given tag, which must
 		* be of the MA_NFC_TAG_TYPE_NDEF type.
 		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_READ
@@ -7722,8 +7729,9 @@ group NFCAPI "NFC API" {
 		* Writes an NDEF message to the given tag, which must
 		* be of the MA_NFC_TAG_TYPE_NDEF type.
 		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_WRITE
-		* event with the handle set to the handle passed into this method
-		* and the result field set to 0 on success and a value < 0 on error.
+		* event with the handle set to the handle passed into this method,
+		* the result field set to 0 on success and a value < 0 on error,
+		* and the dstId field set to the ndefMessage written.
 		* \param tag The tag handle to write to
 		* \param ndefMessage The message to write
 		* \return MA_NFC_INVALID_TAG_TYPE if the handle given as argument
@@ -7824,6 +7832,26 @@ group NFCAPI "NFC API" {
 		* does not represent an NDEF record.
 		*/
 		int maNFCSetType(in MAHandle ndefRecord, in MAAddress dst, in int len);
+
+		/**
+		* Returns a non-zero value if a tag can be formatted as an NDEF container,
+		* ie if an NDEF tag can be written to it.
+		* (Please note that NDEF tags will return zero.)
+		*/
+		int maNFCCanFormatNDEF(in MAHandle tag);
+
+		/**
+		* Format a tag as an NDEF container and write an NDEF message to it.
+		* The response will come as an event exactly as if maNFCWriteNDEF was
+		* called, but with the additional error code MA_NFC_FORMAT_FAILED
+		* if the format operation failed.
+		* \param tag The tag to format
+		* \param ndefMessage The message to write to the tag (or 0 if no message
+		* should be written)
+		* \return NFC_INVALID_TAG_TYPE if the handle given as argument
+		* does not represent a tag that can be formatted as an NDEF container.
+		*/
+		int maNFCFormatNDEF(in MAHandle tag, in MAHandle ndefMessage);
 
 		/**
 		* Authenticates a MIFARE Classic tag using the A or B key. Authentication must take place
@@ -7946,6 +7974,12 @@ group NFCAPI "NFC API" {
 			TAG_NOT_CONNECTED = -4;
 
 			/**
+			* An error code used by maNFCWriteNDEF if maNFCWriteNDEF was
+			* performed on an NDEF_FORMATTABLE tag and failed.
+			*/
+			FORMAT_FAILED = -5;
+
+			/**
 			* An error code if some general I/O error occurred,
 			* other than the special case of tag connection being lost.
 			*/
@@ -7985,6 +8019,61 @@ group NFCAPI "NFC API" {
 			*/
 			ISO_DEP = 6;
 
+			/**
+			* Represents an 'abstract' tag that can
+			* accept requests for formatting it into
+			* an NDEF tag.
+			*/
+			NDEF_FORMATTABLE = 128;
+		}
+
+		constset int MA_NFC_NDEF_TNF_ {
+
+			/**
+			* Indicates the NDEF message is empty.
+			*/
+			EMPTY = 0;
+
+			/**
+			* Indicates the NDEF message is of a 'well-known' type;
+			* it may be further identified using the MA_NFC_NDEF_RTD_*
+			* constants.
+			*/
+			WELL_KNOWN = 1;
+
+			/**
+			* Indicates the NDEF message contains mime media;
+			* use maNFCGetType() to get the mime type.
+			*/
+			MIME_MEDIA = 2;
+
+			/**
+			* Indicates the NDEF message contains an absolute URI,
+			* the type conforming to RFC 3986.
+			*/
+			ABSOLUTE_URI = 3;
+
+			/**
+			* Indicates the type of the NDEF message being 'external'.
+			*/
+			EXTERNAL_TYPE = 4;
+
+			/**
+			* Indicates the contents of the NDEF message to be of
+			* an unknown type. The type of the NDEF message should
+			* be empty.
+			*/
+			UNKNOWN = 5;
+
+			/**
+			* Constant for chunked NDEF messages.
+			*/
+			UNCHANGED = 6;
+
+			/**
+			* Reserved constant.
+			*/
+			RESERVED = 7;
 		}
 
 		constset int MA_NFC_MIFARE_ {

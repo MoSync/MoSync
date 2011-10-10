@@ -5,6 +5,7 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_NFC_TAG_DATA
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
+import android.database.CursorJoiner.Result;
 import android.nfc.tech.MifareUltralight;
 
 import com.mosync.internal.android.nfc.MifareUltralightTag;
@@ -26,13 +27,14 @@ public class MFUReadPages extends TagRunnable<MifareUltralightTag> {
 
 	@Override
 	public NFCEvent doRun() throws IOException {
-		int resultSize = dstBuffer.limit();
+		int size = tag.getSize();
+		int resultSize = size > 0 ? Math.min(size, dstBuffer.limit()) : dstBuffer.limit();
 		int pageOffset = firstPage;
 		byte[] result = new byte[resultSize];
 		int readCount = 0;
 		int pageCount = 0;
 		while (resultSize > 0) {
-			byte[] readPages = mifareTag.readPages(pageOffset + pageCount);
+			byte[] readPages = mifareTag.readPages((pageOffset + pageCount) % size);
 			int length = Math.min(resultSize, readPages.length);
 			System.arraycopy(readPages, 0, result, readCount, length);
 			readCount += length;

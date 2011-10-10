@@ -27,7 +27,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <jni.h>
 #include <GLES/gl.h>
+#ifndef _android_1
 #include <GLES2/gl2.h>
+#endif
 
 #include "helpers/CPP_IX_AUDIOBUFFER.h"
 #include "helpers/CPP_IX_OPENGL_ES.h"
@@ -1267,18 +1269,20 @@ return 0; \
             void* src = GVMR(stringsArray[i], MAAddress);
             strCopies[i] = (GLchar*)src;
         }
-
+#ifndef _android_1
         glShaderSource(shader, count, strCopies, length);
+#endif
         delete strCopies;
     }
 
     void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
         GLvoid* outPointer;
+#ifndef _android_1
         glGetVertexAttribPointerv(index, pname, &outPointer);
 
         if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
             return;
-
+#endif
         *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
     }
 
@@ -1341,7 +1345,9 @@ return 0; \
 		{
 		maIOCtl_IX_OPENGL_ES_caselist
 		maIOCtl_IX_GL1_caselist
+#ifndef _android_1
 		maIOCtl_IX_GL2_caselist
+#endif
 	//	maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist
 
 		case maIOCtl_maWriteLog:
@@ -2308,6 +2314,9 @@ return 0; \
 					mJNIEnv,
 					mJThis);
 		}
+
+		case maIOCtl_maNFCGetSize:
+			return _maNFCGetSize(a, mJNIEnv, mJThis);
 
 		case maIOCtl_maNFCGetNDEFMessage:
 			return _maNFCGetNDEFMessage(a, mJNIEnv, mJThis);

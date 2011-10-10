@@ -1,6 +1,7 @@
 package com.mosync.internal.android.nfc;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import android.util.Log;
 
@@ -44,9 +45,14 @@ public class ResourcePool {
 		if (!handleToResource.isEmpty()) {
 			Log.w("@@@ MoSync", "Not all resource handles have been destroyed, implicitly destroying them now.");
 		}
-		for (Integer handle : handleToResource.keySet()) {
+		HashSet<Integer> handles = new HashSet<Integer>(handleToResource.keySet());
+		for (Integer handle : handles) {
 			destroy(handle);
 		}
+	}
+
+	public String toString() {
+		return handleToResource.size() + " handles: " + handleToResource;
 	}
 
 }

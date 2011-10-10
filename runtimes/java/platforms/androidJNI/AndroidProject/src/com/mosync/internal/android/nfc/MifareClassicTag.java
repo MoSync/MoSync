@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import android.nfc.tech.MifareClassic;
 
-public class MifareClassicTag extends NFCTagBase<MifareClassic> {
+public class MifareClassicTag extends NFCTagBase<MifareClassic> implements ITransceivable<MifareClassic>, ISizeHolder {
 
 
 	public static INFCTag get(ResourcePool pool, GenericTag tag) {
@@ -24,6 +24,11 @@ public class MifareClassicTag extends NFCTagBase<MifareClassic> {
 	@Override
 	public byte[] transceive(byte[] buffer) throws IOException {
 		return nativeTag.transceive(buffer);
+	}
+
+	@Override
+	public int getSize() {
+		return nativeTag.getSize();
 	}
 
 

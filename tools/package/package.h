@@ -32,6 +32,9 @@ struct SETTINGS {
 	const char* permissions;
 	const char* s60v3uid;
 	const char* s60v2uid;
+	const char* s60cert;
+	const char* s60key;
+	const char* s60pass;
 	bool debug;
 	bool silent;
 	bool showPasswords;
@@ -42,6 +45,7 @@ struct SETTINGS {
 	// iOS specific settings
 	const char* iOSCert;
 	const char* iOSSdk;
+	const char* iOSXcodeTarget;
 	bool iOSgenerateOnly;
 
 	// Android specific settings

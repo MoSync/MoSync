@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import android.nfc.tech.NfcA;
 
-public class NfcATag extends NFCTagBase<NfcA> {
+public class NfcATag extends NFCTagBase<NfcA> implements ITransceivable<NfcA> {
 
 	public static NfcATag get(ResourcePool pool, GenericTag tag) {
 		NfcA nfcA = NfcA.get(tag.getTag());

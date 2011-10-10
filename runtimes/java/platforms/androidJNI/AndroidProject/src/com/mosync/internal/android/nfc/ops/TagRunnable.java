@@ -6,6 +6,7 @@ import com.mosync.internal.android.nfc.INFCTag;
 import com.mosync.internal.android.nfc.NFCEvent;
 import com.mosync.internal.android.nfc.RunnableWithResult;
 
+import android.nfc.FormatException;
 import android.nfc.TagLostException;
 
 /**
@@ -17,7 +18,7 @@ import android.nfc.TagLostException;
  */
 public abstract class TagRunnable<TagType extends INFCTag> implements RunnableWithResult<NFCEvent> {
 
-	private final int eventType;
+	protected final int eventType;
 	protected final TagType tag;
 
 	public TagRunnable(TagType tag, int eventType) {
@@ -28,17 +29,22 @@ public abstract class TagRunnable<TagType extends INFCTag> implements RunnableWi
 	@Override
 	public NFCEvent run() {
 		if (!tag.nativeTag().isConnected()) {
-			return new NFCEvent(eventType, tag.getHandle(), MA_NFC_TAG_NOT_CONNECTED, -1);
+			return createDefaultEvent(MA_NFC_TAG_NOT_CONNECTED);
 		}
 		try {
 			return doRun();
+		} catch (FormatException e) {
+			return createDefaultEvent(MA_NFC_FORMAT_FAILED);
 		} catch (TagLostException e) {
-			return new NFCEvent(eventType, tag.getHandle(), MA_NFC_TAG_CONNECTION_LOST, -1);
+			return createDefaultEvent(MA_NFC_TAG_CONNECTION_LOST);
 		} catch (Exception e) {
-			return new NFCEvent(eventType, tag.getHandle(), MA_NFC_TAG_IO_ERROR, -1);
+			return createDefaultEvent(MA_NFC_TAG_IO_ERROR);
 		}
 	}
 
 	protected abstract NFCEvent doRun() throws Exception;
 
+	protected NFCEvent createDefaultEvent(int result) {
+		return new NFCEvent(eventType, tag.getHandle(), MA_NFC_TAG_CONNECTION_LOST, -1);
+	}
 }

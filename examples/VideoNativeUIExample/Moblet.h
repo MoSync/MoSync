@@ -70,7 +70,7 @@ public:
 	/**
 	 * This method is called when the application is closed.
 	 */
-	void closeEvent();
+	void closeEvent() GCCATTRIB(noreturn);
 
 private:
 	static VideoMoblet *mInstance;

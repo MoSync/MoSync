@@ -792,6 +792,8 @@ namespace Base
 
 	int _maNFCTransceive(MAHandle tagHandle, int src, int srcLen, int dst, int dstLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maNFCGetSize(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maNFCReadNDEFMessage(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNFCWriteNDEFMessage(MAHandle tag, MAHandle ndefMessage, JNIEnv* jNIEnv, jobject jThis);

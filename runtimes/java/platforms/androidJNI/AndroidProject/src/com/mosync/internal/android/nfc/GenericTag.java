@@ -1,19 +1,22 @@
 package com.mosync.internal.android.nfc;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_ISO_DEP;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_MIFARE_CL;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_MIFARE_UL;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NDEF;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NDEF_FORMATTABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NFC_A;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_NFC_B;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_TAG_TYPE_ISO_DEP;
 
 import java.io.IOException;
+import java.util.HashMap;
 
 import android.nfc.Tag;
 import android.nfc.tech.TagTechnology;
 
 public class GenericTag extends ResourceBase implements INFCTag {
 
+	private HashMap<Integer, INFCTag> typedTags = new HashMap<Integer, INFCTag>();
 	private final Tag tag;
 
 	public GenericTag(ResourcePool pool, Tag tag) {
@@ -26,11 +29,20 @@ public class GenericTag extends ResourceBase implements INFCTag {
 	}
 
 	public boolean isType(int type) {
-		return toTypedTag(ResourcePool.NULL, type) != null;
+		return createTypedTag(ResourcePool.NULL, type) != null;
 	}
 
 	@Override
-	public INFCTag toTypedTag(ResourcePool pool, int type) {
+	public INFCTag getTypedTag(ResourcePool pool, int type) {
+		INFCTag typedTag = typedTags.get(type);
+		if (typedTag == null || typedTag.isDestroyed()) {
+			typedTag = createTypedTag(pool, type);
+			typedTags.put(type, typedTag);
+		}
+		return typedTag;
+	}
+
+	private INFCTag createTypedTag(ResourcePool pool, int type) {
 		switch (type) {
 		case MA_NFC_TAG_TYPE_NDEF:
 			return NdefTag.get(pool, this);
@@ -44,9 +56,20 @@ public class GenericTag extends ResourceBase implements INFCTag {
 			return NfcBTag.get(pool, this);
 		case MA_NFC_TAG_TYPE_ISO_DEP:
 			return IsoDepTag.get(pool, this);
+		case MA_NFC_TAG_TYPE_NDEF_FORMATTABLE:
+			return NdefFormatableTag.get(pool, this);
 		default:
 			return null;
 		}
+	}
+
+	@Override
+	public void destroy(ResourcePool pool) {
+		super.destroy(pool);
+		for (INFCTag typedTag : typedTags.values()) {
+			typedTag.destroy(pool);
+		}
+		typedTags.clear();
 	}
 
 	@Override
@@ -57,12 +80,6 @@ public class GenericTag extends ResourceBase implements INFCTag {
 	@Override
 	public void connect() throws IOException {
 		// Does nothing
-	}
-
-	@Override
-	public byte[] transceive(byte[] buffer) {
-		// Does nothing
-		return new byte[0];
 	}
 
 	@Override

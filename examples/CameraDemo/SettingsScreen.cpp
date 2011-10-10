@@ -81,7 +81,7 @@ void SettingsScreen::buttonClicked(Widget* button)
 /**
  * Lazy initialization
  */
-int SettingsScreen::initialize(StackScreen* stackScreen)
+void SettingsScreen::initialize(StackScreen* stackScreen)
 {
 	mStackScreen = stackScreen;
 	numCameras = maCameraNumber();
@@ -168,7 +168,7 @@ void SettingsScreen::pushSettingsScreen()
 /**
  * A wrapper for iterating over flash modes
  */
-char* SettingsScreen::getModeForIndex( int index)
+const char* SettingsScreen::getModeForIndex( int index)
 {
 	switch(index)
 	{
@@ -196,7 +196,7 @@ int SettingsScreen::getCurrentCamera()
 /**
  * Returns the selected flash mode
  */
-char * SettingsScreen::getFLashMode()
+const char * SettingsScreen::getFLashMode()
 {
 	return getModeForIndex(flashModeIndex);
 }

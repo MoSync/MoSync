@@ -26,7 +26,7 @@ public abstract class NFCTagBase<NativeTagType extends TagTechnology> extends Re
 	}
 
 	@Override
-	public INFCTag toTypedTag(ResourcePool pool, int type) {
+	public INFCTag getTypedTag(ResourcePool pool, int type) {
 		if (type == typeId) {
 			return this;
 		}

@@ -208,3 +208,13 @@ class GeneratedLstTask < MemoryGeneratedFileTask
 		@buf = io.string
 	end
 end
+
+class BundleTask < FileTask
+	def initialize(work, target, srcDir)
+		super(work, target)
+		@srcDir = srcDir
+	end
+	def execute
+		sh "#{mosyncdir}/bin/Bundle -in \"#{@srcDir}\" -out \"#{@NAME}\""
+	end
+end

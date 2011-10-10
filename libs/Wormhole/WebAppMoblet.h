@@ -36,8 +36,8 @@ MA 02110-1301, USA.
 
 namespace Wormhole
 {
-    // Forward declaration.
-    class WebAppMoblet_WebViewListener;
+	// Forward declaration.
+	class WebAppMoblet_WebViewListener;
 
 	/**
 	 * \brief A web view is a widget used to render web pages.

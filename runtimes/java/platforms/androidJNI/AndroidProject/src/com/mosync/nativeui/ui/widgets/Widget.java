@@ -44,7 +44,7 @@ import com.mosync.nativeui.util.properties.VerticalAlignment;
  * is to contain the custom logic imposed by certain
  * views in a subclass of Widget, instead of having it
  * scattered in the syscalls.
- * 
+ *
  * @author fmattias
  */
 public class Widget
@@ -53,30 +53,30 @@ public class Widget
 	 * The view that is wrapped by this widget.
 	 */
 	private View m_view;
-	
+
 	/**
 	 * The parent of this widget, is null when this widget
 	 * has not parent.
 	 */
 	private Widget m_parent = null;
-	
+
 	/**
 	 * Default layout params.
 	 */
 	private LayoutParams m_layoutParams = new LayoutParams( );
-	
+
 	/**
 	 * The alpha is stored here to enable us to the alpha before
 	 * a background drawable is set. This means that as soon as
 	 * the background is changed, the alpha must also be set.
 	 */
 	private int m_alpha = 0xff;
-	
+
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * Note: The id of the view is always equal to its handle.
-	 * 
+	 *
 	 * @param handle Integer handle corresponding to this instance.
 	 * @param view A view wrapped by this widget.
 	 */
@@ -85,17 +85,17 @@ public class Widget
 		m_view = view;
 		m_view.setId( handle );
 	}
-	
+
 	/**
 	 * Sets the property on the given widget.
-	 * 
+	 *
 	 * TODO: More sensible implementation.
-	 * 
+	 *
 	 * @param property The property of the widget that should be set.
 	 * @param value The value of the property, this will be converted
 	 *              to the appropriate type.
 	 * @return true if the property was set, false otherwise.
-	 * 
+	 *
 	 * @throws PropertyConversionException If a value could not be converted
 	 *                                     to a value suitable for the given property.
 	 * @throws InvalidPropertyValueException If the converted value was out of range
@@ -118,7 +118,7 @@ public class Widget
 		{
 			layoutParams.marginLeft = IntConverter.convert( value );
 		}
-		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_TOP ) || 
+		else if( property.equals( Types.WIDGET_PROPERTY_MARGIN_TOP ) ||
 				 property.equals( IX_WIDGET.MAW_WIDGET_TOP ) )
 		{
 			layoutParams.marginTop = IntConverter.convert( value );
@@ -165,7 +165,7 @@ public class Widget
 			{
 				throw new InvalidPropertyValueException( value, property );
 			}
-			
+
 			int intAlpha = (int) (alpha * 255.0f);
 			m_alpha = intAlpha;
 			updateAlpha( m_alpha );
@@ -191,6 +191,8 @@ public class Widget
 		else if( property.equals( IX_WIDGET.MAW_WIDGET_ENABLED ))
 		{
 			 getView().setEnabled(BooleanConverter.convert(value));
+			 // No need to update the layout params.
+			 return true;
 		}
 		else if (property.equals( IX_WIDGET.MAW_WIDGET_BACKGROUND_GRADIENT ))
 		{
@@ -222,22 +224,22 @@ public class Widget
 		{
 			return false;
 		}
-		
+
 		// Notify parent that the layout params has changed.
 		Layout parent = (Layout) getParent( );
 		if( getParent( ) != null )
 		{
 			parent.updateLayoutParamsForChild( this );
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Returns the property of the wrapped widget.
-	 * 
+	 *
 	 * @param property
-	 * @return the property of the wrapped widget. If no property is found, 
+	 * @return the property of the wrapped widget. If no property is found,
 	 *         an empty string is returned.
 	 */
 	public String getProperty(String property)
@@ -252,7 +254,7 @@ public class Widget
 		{
 			// shouldn't return the layout params.. Now it returns the actual pixel height.
 			//return Integer.toString(  getLayoutParams( ).getHeight() );
-			return Integer.toString( getView( ).getHeight() );			
+			return Integer.toString( getView( ).getHeight() );
 		}
 		else if ( property.equals( IX_WIDGET.MAW_WIDGET_LEFT ) )
 		{
@@ -278,20 +280,20 @@ public class Widget
 		}
 		return "";
 	}
-	
+
 	/**
 	 * Sets the parent of this widget.
-	 * 
+	 *
 	 * @param parent The new parent of this widget.
 	 */
 	public void setParent(Widget parent)
 	{
 		m_parent = parent;
 	}
-	
+
 	/**
 	 * Returns the parent of this widget.
-	 * 
+	 *
 	 * @return Returns the parent of this widget, or
 	 *         null if it does not have a parent.
 	 */
@@ -299,10 +301,10 @@ public class Widget
 	{
 		return m_parent;
 	}
-	
+
 	/**
 	 * Returns the view associated with this widget.
-	 * 
+	 *
 	 * @return The view associated with this widget.
 	 */
 	public View getView()
@@ -312,7 +314,7 @@ public class Widget
 
 	/**
 	 * Returns the root view associated with this widget (if the mosync widgets contain an internal tree).
-	 * 
+	 *
 	 * @return The root view associated with this widget.
 	 */
 	public View getRootView()
@@ -320,20 +322,20 @@ public class Widget
 		return m_view;
 	}
 
-	
+
 	/**
 	 * Returns the handle of this widget.
-	 * 
+	 *
 	 * @return The handle associated with this widget.
 	 */
 	public int getHandle()
 	{
 		return m_view.getId( );
 	}
-	
+
 	/**
 	 * Returns true if the given widget can layout other widgets.
-	 * 
+	 *
 	 * @return
 	 */
 	public boolean isLayout()
@@ -350,10 +352,10 @@ public class Widget
 	{
 		return false;
 	}
-	
+
 	/**
 	 * Handle a key press to the back button.
-	 * 
+	 *
 	 * @return Returns true if the back button was handled,
 	 *         false otherwise.
 	 */
@@ -361,10 +363,10 @@ public class Widget
 	{
 		return false;
 	}
-	
+
 	/**
 	 * Returns the layout parameters.
-	 * 
+	 *
 	 * @return The layout parameters, these are never null.
 	 */
 	public LayoutParams getLayoutParams()
@@ -372,14 +374,14 @@ public class Widget
 		assert( m_layoutParams != null );
 		return m_layoutParams;
 	}
-	
+
 	/**
 	 * Updates the alpha of the background of the underlying view.
-	 * 
+	 *
 	 * @param alpha The new alpha of the underlying view.
 	 */
 	public void updateAlpha(int alpha)
-	{		
+	{
 		Drawable background = getView( ).getBackground( );
 		if( background == null )
 		{

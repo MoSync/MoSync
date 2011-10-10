@@ -61,6 +61,7 @@ import com.mosync.internal.android.MoSyncSingleTouchHandler;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
+import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
 
 /**
@@ -77,6 +78,7 @@ public class MoSync extends Activity
 	private MoSyncTouchHandler mTouchHandler;
 	private BroadcastReceiver mShutdownListener;
 	private boolean mEventTypeCloseHasBeenSent = false;
+	private MoSyncNFCForegroundUtil nfcForegroundHandler;
 
 	/**
 	 * Sets screen and window properties.
@@ -90,8 +92,13 @@ public class MoSync extends Activity
 
 		super.onCreate(savedInstanceState);
 
-		// If triggered by an NFC event, must handle it this way.
-		MoSyncNFCService.handleNFCIntent(this, getIntent());
+		try {
+			// If triggered by an NFC event, must handle it this way.
+			MoSyncNFCService.handleNFCIntent(this, getIntent());
+			nfcForegroundHandler = MoSyncNFCForegroundUtil.create(this);
+		}catch(Throwable t){
+			SYSLOG("No NFC");
+		}
 
 		// Initialize.
 		mMoSyncView = null;
@@ -203,7 +210,9 @@ public class MoSync extends Activity
 		mMoSyncThread.acquireHardware();
 
 		mMoSyncThread.onResume();
-
+		if (nfcForegroundHandler != null) {
+			nfcForegroundHandler.enableForeground();
+		}
 		SYSLOG("Posting EVENT_TYPE_FOCUS_GAINED to MoSync");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_FOCUS_GAINED;
@@ -223,7 +232,9 @@ public class MoSync extends Activity
 		mMoSyncThread.setMoSyncView(null);
 
 		mMoSyncThread.onPause();
-
+		if (nfcForegroundHandler != null) {
+			nfcForegroundHandler.disableForeground();
+		}
 		SYSLOG("Posting EVENT_TYPE_FOCUS_LOST to MoSync");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_FOCUS_LOST;
