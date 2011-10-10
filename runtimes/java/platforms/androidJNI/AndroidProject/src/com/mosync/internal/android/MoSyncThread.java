@@ -308,7 +308,14 @@ public class MoSyncThread extends Thread
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
 		mMoSyncFile = new MoSyncFile(this);
-		mMoSyncFont = new MoSyncFont(this);
+		try
+		{
+			mMoSyncFont = new MoSyncFont(this);
+		}
+		catch (Throwable e)
+		{
+			mMoSyncFont = null;
+		}
 
 		//Do not access camera if it is not available
 		try
@@ -1234,6 +1241,10 @@ public class MoSyncThread extends Thread
 	*/
 	int maFontLoadDefault(int type, int style, int size)
 	{
+		if(null == mMoSyncFont)
+		{
+			return -1;
+		}
 		SYSLOG("maFontCreateDefault");
 
 		return mMoSyncFont.maFontLoadDefault(type, style, size);
@@ -1247,6 +1258,11 @@ public class MoSyncThread extends Thread
 	*/
 	int maFontSetCurrent(int fontHandle)
 	{
+		if(null == mMoSyncFont)
+		{
+			return -1;
+		}
+
 		SYSLOG("maFontSetCurrent");
 
 		return mMoSyncFont.maFontSetCurrent(fontHandle);
@@ -1259,6 +1275,10 @@ public class MoSyncThread extends Thread
 	*/
 	int maFontGetCount()
 	{
+		if(null == mMoSyncFont)
+		{
+			return -1;
+		}
 		SYSLOG("maFontGetCount");
 
 		return mMoSyncFont.maFontGetCount();
@@ -1278,6 +1298,10 @@ public class MoSyncThread extends Thread
 			final int memBuffer,
 			final int memBufferSize)
 	{
+		if(null == mMoSyncFont)
+		{
+			return -1;
+		}
 		SYSLOG("maFontGetName");
 
 		return mMoSyncFont.maFontGetName(index, memBuffer, memBufferSize);
@@ -1291,6 +1315,10 @@ public class MoSyncThread extends Thread
 	*/
 	int maFontLoadWithName(final String postScriptName, int size)
 	{
+		if(null == mMoSyncFont)
+		{
+			return -1;
+		}
 		SYSLOG("maFontLoadWithName");
 
 		return mMoSyncFont.maFontLoadWithName(postScriptName, size);
@@ -1303,6 +1331,10 @@ public class MoSyncThread extends Thread
 	*/
 	int maFontDelete(int fontHandle)
 	{
+		if(null == mMoSyncFont)
+		{
+			return -1;
+		}
 		SYSLOG("maFontDelete");
 
 		return mMoSyncFont.maFontDelete(fontHandle);
