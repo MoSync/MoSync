@@ -37,8 +37,8 @@ MA 02110-1301, USA.
 
 #include "Employee.h"
 
-//#define LOG printf
-#define LOG lprintfln
+#define LOG printf
+//#define LOG lprintfln
 
 #define TRACE(ARG) lprintfln(#ARG); ARG
 
