@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Collections.Generic;
 
 // This is the core that interprets mosync 
 // byte code (produced by pipe-tool).
@@ -173,6 +174,12 @@ namespace MoSync
             mRegisters[Reg.R14] = BitConverter.ToInt32(BitConverter.GetBytes(value), 0);
         }
 
+        public void SetReturnValue(long value)
+        {
+            mRegisters[Reg.R14] = (int)(value & 0xffffffff);
+            mRegisters[Reg.R15] = (int)(((ulong)value) >> 32);
+        }
+
         new public int GetStackPointer()
         {
             return mRegisters[Reg.SP];
@@ -256,7 +263,8 @@ namespace MoSync
 
             GenerateConstantTable();
 
-            uint customEventDataSize = 24;
+            //uint customEventDataSize = 24;
+            uint customEventDataSize = 60;
             mRegisters[Reg.SP] = (int)(mDataSegmentSize - customEventDataSize - 4);
             mRegisters[Reg.I0] = (int)mDataSegmentSize;
             mRegisters[Reg.I1] = (int)mProgramHeader.mStackSize;
@@ -265,14 +273,84 @@ namespace MoSync
 
         }
 
+        struct StateChange
+        {
+            public int ip, instCount, reg, before, after;
+        };
+        private bool mDebugLogStateChangesInitialized = false;
+        private int[] mOldRegisters = new int[128];
+        private List<StateChange> mStateChanges = new List<StateChange>();
+        private int mStateChangeInstCount = 0;
+
+        private void DebugWriteStateChanges()
+        {
+            System.Text.StringBuilder res = new System.Text.StringBuilder();
+
+            foreach (StateChange s in mStateChanges)
+            {
+                res.Append(String.Format("{0:x}, {1:d}: REG{2:d}: {3:x} != {4:x}\n",
+                    s.ip, s.instCount, s.reg, s.before, s.after));
+            }
+
+            MoSync.Util.WriteTextToFile(res.ToString(), "stateChanges.txt", FileMode.Append);
+        }
+
+        private void DebugLogStateChanges()
+        {
+            const int STATE_BUFFER_SIZE = 1024;
+            if(!mDebugLogStateChangesInitialized)
+            {
+                mDebugLogStateChangesInitialized = true;
+                System.Array.Copy(mRegisters, mOldRegisters, 128);
+                mStateChangeInstCount = 0;
+                MoSync.Util.WriteTextToFile("", "stateChanges.txt", FileMode.Create);
+            }
+
+            int i = 128;
+            mStateChangeInstCount++;
+            while ((i--)!=0)
+            {
+                if (mOldRegisters[i] != mRegisters[i])
+                {
+                    StateChange stateChange = new StateChange();
+                    stateChange.ip = mIp;
+                    stateChange.reg = i;
+                    stateChange.before = mOldRegisters[i];
+                    stateChange.after = mRegisters[i];
+                    stateChange.instCount = mStateChangeInstCount;
+                    mStateChanges.Add(stateChange);
+                    if (mStateChanges.Count >= STATE_BUFFER_SIZE)
+                    {
+                        DebugWriteStateChanges();
+                        mStateChanges.Clear();
+                    }
+
+                    mOldRegisters[i] = mRegisters[i];
+                }
+            }
+        }
+
 		public new void Run()
 		{
 			int imm32;
 			byte rd;
 			byte rs;
 
-			while(mRunning)
+            int oldIp = 0;
+
+			//while(mRunning)
+            while(true)
 			{
+                //DebugLogStateChanges();
+                /*
+                if (mIp == 0x2eee)
+                {
+                    int a = 2;
+                }
+                */
+          
+                oldIp = mIp;
+
 				byte op = mProgramMemory[mIp++];
 				switch(op)
 				{
@@ -318,13 +396,15 @@ namespace MoSync
 						//console.log("calli addr: " + callAddr);
 						mRegisters[Reg.RT] = mIp;
 						mIp = imm32;
-						break;
+					break;
 
                     case Op.LDB: // LDB
                     {
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
-                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                            mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
+                            mConstantPool[imm32];
                         mRegisters[rd] = mDataMemory.ReadUInt8(mRegisters[rs] + imm32);
                     }
                     break;
@@ -333,7 +413,9 @@ namespace MoSync
                     {
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
-                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                            mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
+                            mConstantPool[imm32];
                         mDataMemory.WriteUInt8(mRegisters[rd] + imm32, (byte)mRegisters[rs]);
                     }
                     break;
@@ -342,7 +424,9 @@ namespace MoSync
                     {
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
-                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                            mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
+                            mConstantPool[imm32];
                         mRegisters[rd] = mDataMemory.ReadUInt16(mRegisters[rs] + imm32);
                     }
                     break;
@@ -351,7 +435,10 @@ namespace MoSync
                     {
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
-                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                            mConstantPool[(((imm32 & 127) << 8) |
+                            mProgramMemory[mIp++])] :
+                            mConstantPool[imm32];
                         mDataMemory.WriteUInt16(mRegisters[rd] + imm32, (ushort)mRegisters[rs]);
                     }
                     break;
@@ -359,20 +446,26 @@ namespace MoSync
 					case Op.LDW: // LDW
 						rd = mProgramMemory[mIp++];
 						rs = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];
+						imm32 = ((imm32=mProgramMemory[mIp++])>127) ?
+                            mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])] :
+                            mConstantPool[imm32];
                         mRegisters[rd] = mDataMemory.ReadInt32(mRegisters[rs] + imm32);
 					break;
 				
 					case Op.STW: // STW
 						rd = mProgramMemory[mIp++];
 						rs = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];
+						imm32 = ((imm32=mProgramMemory[mIp++])>127) ?
+                            mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])] :
+                            mConstantPool[imm32];
                         mDataMemory.WriteInt32(mRegisters[rd] + imm32, mRegisters[rs]);
 					break;
 				
 					case Op.LDI: // LDI
 						rd = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];
+						imm32 = ((imm32=mProgramMemory[mIp++])>127) ?
+                            mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])] :
+                            mConstantPool[imm32];
 						mRegisters[rd] = imm32;
 					break;
 				
@@ -470,7 +563,7 @@ namespace MoSync
 					case Op.DIV: // DIV
 						rd = mProgramMemory[mIp++];
 						rs = mProgramMemory[mIp++];
-						mRegisters[rd] /= mRegisters[rs];
+                        mRegisters[rd] /= mRegisters[rs];
 					break;
 				
 					case Op.DIVI: // DIVI
@@ -655,13 +748,17 @@ namespace MoSync
 					case Op.XB: // XB
 						rd = mProgramMemory[mIp++];
 						rs = mProgramMemory[mIp++];
-						mRegisters[rd] = (int)(((mRegisters[rs]&0x80) == 0) ? ((uint)mRegisters[rs] & 0xff) : ((uint)mRegisters[rs] | 0xffffff00));
+						mRegisters[rd] = (int)(((mRegisters[rs]&0x80) == 0) ?
+                            ((uint)mRegisters[rs] & 0xff) :
+                            ((uint)mRegisters[rs] | 0xffffff00));
 					break;
 				
 					case Op.XH: // XH
 						rd = mProgramMemory[mIp++];
 						rs = mProgramMemory[mIp++];
-						mRegisters[rd] = (int)(((mRegisters[rs]&0x8000) == 0) ? ((uint)mRegisters[rs] & 0xffff) : ((uint)mRegisters[rs] | 0xffff0000));
+						mRegisters[rd] = (int)(((mRegisters[rs]&0x8000) == 0) ?
+                            ((uint)mRegisters[rs] & 0xffff) :
+                            ((uint)mRegisters[rs] | 0xffff0000));
 					break;
 
 					case Op.SYSCALL: // SYSCALL

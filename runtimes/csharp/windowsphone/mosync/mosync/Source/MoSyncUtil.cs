@@ -1,9 +1,11 @@
 using System;
 using System.IO;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.GamerServices;
+using System.IO.IsolatedStorage;
 using System.Windows;
 using System.Threading;
+
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.GamerServices;
 
 namespace MoSync
 {	
@@ -24,7 +26,7 @@ namespace MoSync
 		public static short StreamReadInt16(Stream stream) {
 			int a = stream.ReadByte();
 			int b = stream.ReadByte();
-			return (short)(b << 8 | a);			
+			return (short)((b << 8) | a);			
 		}	
 		
 		public static int StreamReadInt32(Stream stream) {
@@ -32,7 +34,7 @@ namespace MoSync
 			int b = stream.ReadByte();
 			int c = stream.ReadByte();
 			int d = stream.ReadByte();
-			return d << 24 | c << 16 | b << 8 | a;			
+			return (d << 24) | (c << 16) | (b << 8) | a;			
 		}
 		
 		public static byte StreamReadUint8(Stream stream) {
@@ -42,15 +44,15 @@ namespace MoSync
 		public static ushort StreamReadUint16(Stream stream) {
 			int a = stream.ReadByte();
 			int b = stream.ReadByte();
-			return (ushort)(b << 8 | a);			
+			return (ushort)((b << 8) | a);			
 		}	
 		
 		public static uint StreamReadUint32(Stream stream) {
 			int a = stream.ReadByte();
 			int b = stream.ReadByte();
-			int c = stream.ReadByte();;
+			int c = stream.ReadByte();
 			int d = stream.ReadByte();
-			return (uint)(d << 24 | c << 16 | b << 8 | a);			
+			return (uint)((d << 24) | (c << 16) | (b << 8) | a);			
 		}
 
         public static double ConvertToDouble(int a, int b)
@@ -72,11 +74,31 @@ namespace MoSync
         {
             return BitConverter.ToSingle(BitConverter.GetBytes(a), 0);
         }
-		
+
+
+        private static bool sLoggingStarted = false;
+        private static void InitLogging()
+        {
+            if (!sLoggingStarted)
+            {
+                WriteTextToFile(null, "log.txt", FileMode.Create);
+                sLoggingStarted = true;
+            }
+
+        }
+
 		public static void Log(String text)
 		{
 			Console.Write(text);
-		}
+            InitLogging();
+            WriteTextToFile(text, "log.txt");
+    	}
+
+        public static void Log(byte[] bytes)
+        {
+            InitLogging();
+            WriteBytesToFile(bytes, "log.txt");
+        }
 		
 		public static void CriticalError(String text) {
 			Log(text);
@@ -101,6 +123,28 @@ namespace MoSync
                     are.Set();
                 });
                 are.WaitOne();
+            }
+        }
+
+        public static void WriteTextToFile(string message, string file, FileMode fileMode=FileMode.Append)
+        {
+            using (IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
+            using (StreamWriter streamWriter = new StreamWriter(new IsolatedStorageFileStream(file, fileMode, isolatedStorage)))
+            {
+                if(message != null)
+                    streamWriter.WriteLine(message);
+                streamWriter.Close();
+            }
+        }
+
+        public static void WriteBytesToFile(byte[] bytes, string file, FileMode fileMode = FileMode.Append)
+        {
+            using (IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
+            using (BinaryWriter binaryWriter = new BinaryWriter(new IsolatedStorageFileStream(file, fileMode, isolatedStorage)))
+            {
+                if(bytes != null)
+                    binaryWriter.Write(bytes);
+                binaryWriter.Close();
             }
         }
 	}

@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace MoSync
 {
-    public class MiscSyscalls : ISyscallGroup
+    public class MiscSyscalls : ISyscallGroup, IIoctlGroup
     {
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
@@ -39,7 +39,17 @@ namespace MoSync
             syscalls.maResetBacklight = delegate()
             {
             };
-  
+        }
+
+        public void Init(Ioctls ioctls, Core core, Runtime runtime)
+        {
+            ioctls.maWriteLog = delegate(int src, int size)
+            {
+                byte[] bytes = new byte[size];
+                core.GetDataMemory().ReadBytes(bytes, src, size);
+                MoSync.Util.Log(bytes);
+                return 0;
+            };
         }
 	}
 }

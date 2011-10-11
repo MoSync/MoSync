@@ -10,7 +10,7 @@ using System.Windows.Controls;
 
 namespace MoSync
 {
-    public class GraphicsSyscalls : ISyscallGroup
+    public class GraphicsSyscalls : ISyscallGroup, IIoctlGroup
     {
         public WriteableBitmap mFrontBuffer;
         public WriteableBitmap mBackBuffer;
@@ -19,6 +19,19 @@ namespace MoSync
         private uint mCurrentColor = 0xff000000;
         private System.Windows.Media.Color mCurrentWindowsColor;
         private double mCurrentFontSize = 12;
+
+        protected void InvalidateWriteableBitmapOnMainThread(WriteableBitmap bitmap)
+        {
+            using (AutoResetEvent are = new AutoResetEvent(false))
+            {
+                Deployment.Current.Dispatcher.BeginInvoke(() =>
+                {
+                    bitmap.Invalidate();
+                    are.Set();
+                });
+                are.WaitOne();
+            }
+        }
 
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
@@ -47,7 +60,7 @@ namespace MoSync
                         (byte)(mCurrentColor >> 16),
                         (byte)(mCurrentColor >> 8),
                         (byte)(mCurrentColor));
-                return oldColor;
+                return oldColor&0xffffff;
             };
 
             syscalls.maSetClipRect = delegate(int x, int y, int w, int h)
@@ -66,15 +79,7 @@ namespace MoSync
             syscalls.maUpdateScreen = delegate()
             {
                 System.Array.Copy(mBackBuffer.Pixels, mFrontBuffer.Pixels, mFrontBuffer.PixelWidth * mFrontBuffer.PixelHeight);
-                using (AutoResetEvent are = new AutoResetEvent(false))
-                {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                    {
-                        mFrontBuffer.Invalidate();
-                        are.Set();
-                    });
-                    are.WaitOne();
-                }
+                InvalidateWriteableBitmapOnMainThread(mFrontBuffer);
             };
 
             syscalls.maFillRect = delegate(int x, int y, int w, int h)
@@ -88,8 +93,8 @@ namespace MoSync
             };
 
             TextBlock textBlock = new TextBlock();
-            textBlock.MaxWidth = 100000.0;
-            textBlock.MaxHeight = 100000.0;
+            //textBlock.MaxWidth = 100000.0;
+            //textBlock.MaxHeight = 100000.0;
             textBlock.FontSize = mCurrentFontSize;
 
             syscalls.maDrawText = delegate(int left, int top, int str)
@@ -102,11 +107,11 @@ namespace MoSync
                         textBlock.Text = text;
                         textBlock.Foreground = new SolidColorBrush(mCurrentWindowsColor);
                         mCurrentDrawTarget.Render(textBlock, new TranslateTransform() { X = left, Y = top });
+
                         are.Set();
                     });
                     are.WaitOne();
                 }
-
             };
 
             syscalls.maGetTextSize = delegate(int str)
@@ -144,7 +149,6 @@ namespace MoSync
                     });
                     are.WaitOne();
                 }
-
             };
 
             syscalls.maGetTextSizeW = delegate(int str)
@@ -289,6 +293,76 @@ namespace MoSync
                 return MoSync.Constants.RES_OK;
             };
         }
+
+        protected Syscalls.Delegate_maUpdateScreen mOldUpdateScreenImplementation;
+        public void Init(Ioctls ioctls, Core core, Runtime runtime)
+        {
+
+            ioctls.maFrameBufferInit = delegate(int frameBufferPointer)
+            {
+                Syscalls syscalls = runtime.GetSyscalls();
+                mOldUpdateScreenImplementation = syscalls.maUpdateScreen;
+
+                syscalls.maUpdateScreen = delegate()
+                {
+                    int[] dst = mFrontBuffer.Pixels;
+                    Memory mem = core.GetDataMemory();
+                    for (int i = 0; i < dst.Length; i++)
+                    {
+                        dst[i] = mem.ReadInt32(frameBufferPointer + i * 4);
+                    }
+
+                    InvalidateWriteableBitmapOnMainThread(mFrontBuffer);
+                };
+
+                return 1;
+            };
+
+            ioctls.maFrameBufferClose = delegate()
+            {
+                Syscalls syscalls = runtime.GetSyscalls();
+                syscalls.maUpdateScreen = mOldUpdateScreenImplementation;
+                return 1;
+            };
+
+            ioctls.maFrameBufferGetInfo = delegate(int info)
+            {
+                const int MAFrameBufferInfo_sizeInBytes = 0;
+                const int MAFrameBufferInfo_bytesPerPixel = 4;
+                const int MAFrameBufferInfo_bitsPerPixel = 8;
+                const int MAFrameBufferInfo_redMask = 12;
+                const int MAFrameBufferInfo_redBits = 16;
+                const int MAFrameBufferInfo_redShift = 20;
+                const int MAFrameBufferInfo_greenMask = 24;
+                const int MAFrameBufferInfo_greenBits = 28;
+                const int MAFrameBufferInfo_greenShift = 32;
+                const int MAFrameBufferInfo_blueMask = 36;
+                const int MAFrameBufferInfo_blueBits = 40;
+                const int MAFrameBufferInfo_blueShift = 44;
+                const int MAFrameBufferInfo_width = 48;
+                const int MAFrameBufferInfo_height = 52;
+                const int MAFrameBufferInfo_pitch = 56;
+                const int MAFrameBufferInfo_supportsGfxSyscalls = 60;
+
+                Memory mem = core.GetDataMemory();
+                mem.WriteInt32(info+MAFrameBufferInfo_sizeInBytes, mBackBuffer.PixelWidth*mBackBuffer.PixelHeight*4);
+                mem.WriteInt32(info+MAFrameBufferInfo_bytesPerPixel, 4);
+                mem.WriteInt32(info+MAFrameBufferInfo_bitsPerPixel, 32);
+                mem.WriteUInt32(info+MAFrameBufferInfo_redMask, 0x00ff0000);
+                mem.WriteUInt32(info+MAFrameBufferInfo_redBits, 8);
+                mem.WriteUInt32(info+MAFrameBufferInfo_redShift, 16);
+                mem.WriteUInt32(info+MAFrameBufferInfo_greenMask, 0x0000ff00);
+                mem.WriteUInt32(info+MAFrameBufferInfo_greenBits, 8);
+                mem.WriteUInt32(info+MAFrameBufferInfo_greenShift, 8);
+                mem.WriteUInt32(info+MAFrameBufferInfo_blueMask, 0x000000ff);
+                mem.WriteUInt32(info+MAFrameBufferInfo_blueBits, 8);
+                mem.WriteUInt32(info+MAFrameBufferInfo_blueShift, 0);
+                mem.WriteInt32(info+MAFrameBufferInfo_width, mBackBuffer.PixelWidth);
+                mem.WriteInt32(info+MAFrameBufferInfo_height, mBackBuffer.PixelHeight);
+                mem.WriteInt32(info+MAFrameBufferInfo_pitch, mBackBuffer.PixelWidth*4);
+                mem.WriteUInt32(info+MAFrameBufferInfo_supportsGfxSyscalls, 0);
+                return 1;
+            };
+        }
     }
 }
-

@@ -24,17 +24,34 @@ namespace MoSync
         void Init(Syscalls syscalls, Core core, Runtime runtime);
     }
 
+    public interface IIoctlGroup
+    {
+        void Init(Ioctls ioctls, Core core, Runtime runtime);
+    }
+
     // This is the runtime
     // It has a Syscalls instance which contains
     // delegates to the implementations of all syscalls
     // it also loads and manages resources
     public partial class Runtime
     {
+        // these might overlap (i.e. the same group instance might be in both sets)
         private List<ISyscallGroup> mSyscallGroups = new List<ISyscallGroup>();
+        private List<IIoctlGroup> mIoctlGroups = new List<IIoctlGroup>();
+
+        protected Core mCore;
+        protected Syscalls mSyscalls;
+        protected Ioctls mIoctls;
+        protected IoctlInvoker mIoctlInvoker;
+
+        protected Dictionary<int, Resource> mResources = new Dictionary<int, Resource>();
+        protected int mCurrentResourceHandle;
+
         private List<Memory> mEvents = new List<Memory>();
-        private test_mosync.MainPage mMainPage;
         private AutoResetEvent mEventWaiter = new AutoResetEvent(false);
 
+        private test_mosync.MainPage mMainPage;
+      
         private void InitSyscalls()
         {
 
@@ -42,12 +59,24 @@ namespace MoSync
             // and make an instance of each and call their Init method.
             foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
             {
+                ISyscallGroup syscallGroupInstance = null;
+                IIoctlGroup ioctlGroupInstance = null;
                 if (t.GetInterface("MoSync.ISyscallGroup", false) != null)
                 {
-                    ISyscallGroup instance = Activator.CreateInstance(t) as ISyscallGroup;
-                    mSyscallGroups.Add(instance);
-                    instance.Init(mSyscalls, mCore, this);
+                    syscallGroupInstance = Activator.CreateInstance(t) as ISyscallGroup;
+                    mSyscallGroups.Add(syscallGroupInstance);
+                    syscallGroupInstance.Init(mSyscalls, mCore, this);
                 }
+                if (t.GetInterface("MoSync.IIoctlGroup", false) != null)
+                {
+                    if (syscallGroupInstance != null)
+                        ioctlGroupInstance = (IIoctlGroup)syscallGroupInstance;
+                    else
+                        ioctlGroupInstance = Activator.CreateInstance(t) as IIoctlGroup;
+                    mIoctlGroups.Add(ioctlGroupInstance);
+                    ioctlGroupInstance.Init(mIoctls, mCore, this);
+                }
+     
             }
 
         }
@@ -55,6 +84,11 @@ namespace MoSync
         public Runtime(Core core, test_mosync.MainPage mainPage)
         {
             mMainPage = mainPage;
+            mCore = core;
+            mSyscalls = new Syscalls();
+            mIoctls = new Ioctls();
+            mIoctlInvoker = new IoctlInvoker(mCore, mIoctls);
+
 
             // this could probably be generated
             const int MAEvent_type = 0;
@@ -64,7 +98,7 @@ namespace MoSync
 
             mainPage.MouseLeftButtonDown += delegate(Object sender, MouseButtonEventArgs e)
             {
-                Memory mem = new Memory(4 * 3);
+                Memory mem = new Memory(4 * 4);
                 mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_PRESSED);
                 mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
                 mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
@@ -74,7 +108,7 @@ namespace MoSync
 
             mainPage.MouseMove += delegate(Object sender, MouseEventArgs e)
             {
-                Memory mem = new Memory(4 * 3);
+                Memory mem = new Memory(4 * 4);
                 mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_DRAGGED);
                 mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
                 mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
@@ -84,16 +118,13 @@ namespace MoSync
 
             mainPage.MouseLeftButtonUp += delegate(Object sender, MouseButtonEventArgs e)
             {
-                Memory mem = new Memory(4 * 3);
+                Memory mem = new Memory(4 * 4);
                 mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_RELEASED);
                 mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
                 mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
                 mem.WriteInt32(MAEvent_point_touchId, 0);
                 PostEvent(mem);
             };
-
-            mCore = core;
-            mSyscalls = new Syscalls();
 
             InitSyscalls();
 
@@ -122,7 +153,7 @@ namespace MoSync
 
             mSyscalls.maIOCtl = delegate(int id, int a, int b, int c)
             {
-                return MoSync.Constants.IOCTL_UNAVAILABLE;
+                return mIoctlInvoker.InvokeIoctl(id, a, b, c);
             };
         }
 
@@ -255,11 +286,6 @@ namespace MoSync
             mResources.Add(mCurrentResourceHandle++, res);
             return mCurrentResourceHandle - 1;
         }
-
-        protected Core mCore;
-        protected Syscalls mSyscalls;
-        protected Dictionary<int, Resource> mResources = new Dictionary<int, Resource>();
-        protected int mCurrentResourceHandle;
     }
 }
 

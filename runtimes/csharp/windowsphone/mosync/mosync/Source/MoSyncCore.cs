@@ -53,7 +53,6 @@ namespace MoSync
         }
 
 		protected Runtime mRuntime = null;
-		//protected int[] mDataMemory;
         protected Memory mDataMemory;
 		protected uint mDataSegmentSize;
 		protected uint mDataSegmentMask;

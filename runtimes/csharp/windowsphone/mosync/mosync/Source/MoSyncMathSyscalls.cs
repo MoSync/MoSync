@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace MoSync
 {
-    public class MathSyscalls : ISyscallGroup
+    public class MathSyscalls : ISyscallGroup, IIoctlGroup
     {
         public void Init(Syscalls mSyscalls, Core mCore, Runtime mRuntime)
         {
@@ -36,6 +36,26 @@ namespace MoSync
             mSyscalls.cos = delegate(double v) { return System.Math.Cos(v); };
             mSyscalls.tan = delegate(double v) { return System.Math.Tan(v); };
             mSyscalls.sqrt = delegate(double v) { return System.Math.Sqrt(v); };
+        }
+
+        public void Init(Ioctls ioctls, Core core, Runtime runtime)
+        {
+            ioctls.sinh = delegate(double d)
+            {
+                return BitConverter.DoubleToInt64Bits(Math.Sinh(d));
+            };
+
+            ioctls.cosh = delegate(double d)
+            {
+                return BitConverter.DoubleToInt64Bits(Math.Cosh(d));
+            };
+
+            ioctls.atanh = delegate(double d)
+            {
+                double value = (Math.Log(1.0 + d) - Math.Log(1.0 - d))/2.0;
+                return BitConverter.DoubleToInt64Bits(value); 
+            };
+
         }
 	}
 }

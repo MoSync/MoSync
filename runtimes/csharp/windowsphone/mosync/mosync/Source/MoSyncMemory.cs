@@ -108,6 +108,11 @@ namespace MoSync
             return System.Text.UnicodeEncoding.Unicode.GetString(mData, address, endaddress - address);
         }
 
+        public void ReadBytes(byte[] bytes, int src, int size)
+        {
+            System.Array.Copy(mData, src, bytes, 0, size);
+        }
+
         public void WriteMemoryAtAddress(int dstaddress, Memory memory, int srcaddress, int length)
         {
             byte[] srcBytes = memory.mData;
