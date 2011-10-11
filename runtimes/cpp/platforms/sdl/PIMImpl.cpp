@@ -38,6 +38,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdexcept>
 #include <fstream>
 
+#ifdef WIN32
+#include <stdio.h>
+#include <time.h>
+static time_t timegm (struct tm* brokentime) {
+	const char* old = getenv("TZ");
+	_putenv("TZ=UTC");
+	_tzset();
+	time_t t = mktime(brokentime);
+
+	// restore old TZ, or remove it if it did not exist.
+	char buf[128] = "TZ=";
+	if(old)
+		strcat(buf, old);
+	_putenv(buf);
+	_tzset();
+	return t;
+}
+#endif
+
 using namespace MoSyncError;
 using namespace Base;
 using namespace std;
