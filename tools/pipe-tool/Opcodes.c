@@ -36,7 +36,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 			SkipWhiteSpace();				\
 			method(ThisOpName,opnum,opimm);	\
 			return;							\
-		}		
+		}
 
 char ThisOpName[128];
 char *AsmCharPtr = 0;
@@ -57,7 +57,7 @@ void Instructions()
 	// Clear all the special variables
 
 	farop = imm = rd = rs = rt = op = 0;
-	
+
 	SkipWhiteSpace();
 
 	AsmCharPtr = FilePtr;
@@ -66,17 +66,17 @@ void Instructions()
 
 	ArraySet(&AsmCharIPArray, (int) (AsmCharPtr - FileTop) , CodeIP + 1);
 
-	GetToken();	
+	GetToken();
 	t = ScanAsmToken();
 
 	strcpy(ThisOpName, Name);
 
 	switch(t)
 	{
-		Opcode(opc_syscall,Get_syscall,0,0);		
+		Opcode(opc_syscall,Get_syscall,0,0);
 		Opcode(opc_break,Get_break,0,0);
-		Opcode(opc_case,Get_case,_CASE,0);		
-		Opcode(opc_push,Get_push_pop,_PUSH,0);		
+		Opcode(opc_case,Get_case,_CASE,0);
+		Opcode(opc_push,Get_push_pop,_PUSH,0);
 		Opcode(opc_call,Get_call,_CALL,_CALLI);
 		Opcode(opc_divu,Get_Arith2,_DIVU,_DIVUI);
 		Opcode(opc_ldb,Get_load_store,_LDB,_STB);
@@ -98,7 +98,7 @@ void Instructions()
 		Opcode(opc_neg,Get_rd_rs,_NEG,0);
 		Opcode(opc_ld,Get_load_store,_LDW,_STW);
 		Opcode(opc_jc,Get_jmp_cond,_CALL,_CALLI);
-		Opcode(opc_jp,Get_jmp,_JPR,_JPI);		
+		Opcode(opc_jp,Get_jmp,_JPR,_JPI);
 		Opcode(opc_or,Get_Arith2,_OR,_ORI);
 		Opcode(opc_xb,Get_rd_rs,_XB,0);
 		Opcode(opc_xh,Get_rd_rs,_XH,0);
@@ -120,7 +120,7 @@ void Instructions()
 		{										\
 			method(string,opnum,opimm);			\
 			return;								\
-		}		
+		}
 
 void Instructions()
 {
@@ -161,13 +161,13 @@ void Instructions()
 	Opcode("neg",Get_rd_rs,_NEG,0);
 	Opcode("ld",Get_load_store,_LDW,_STW);
 	Opcode("jc",Get_jmp_cond,_CALL,_CALLI);
-	Opcode("jp",Get_jmp,_JPR,_JPI);		
+	Opcode("jp",Get_jmp,_JPR,_JPI);
 	Opcode("or",Get_Arith2,_OR,_ORI);
 	Opcode("xb",Get_rd_rs,_XB,0);
 	Opcode("xh",Get_rd_rs,_XH,0);
 
 	// Special opcodes
-	
+
 	Error(Error_Skip, "Illegal instruction '%s'",Name);
 }
 
@@ -193,9 +193,11 @@ void NullInst(char *AsmName,int Opcode, int OpcodeImm)
 
 void Get_break(char *AsmName,int Opcode, int OpcodeImm)
 {
+#if 0
 	Opcode = 0;
 	OpcodeImm = 0;
 	AsmName = 0;
+#endif
 }
 
 //****************************************
@@ -214,11 +216,11 @@ void Get_case(char *AsmName,int Opcode, int OpcodeImm)
 {
 	int case_dataip;
 	int oldsect;
-	
-	OpcodeImm = 0;
-	
+
+	//OpcodeImm = 0;
+
 	// Get the switch register
-	
+
 	case_reg = GetReg(1);
 
 	// Skip the comma
@@ -246,7 +248,7 @@ void Get_case(char *AsmName,int Opcode, int OpcodeImm)
 	CheckBadCodeRef();		// Make sure no code ref in write
 
 	case_length_imm = imm;
-	
+
 	// Skip the comma
 
 	NeedToken(",");
@@ -295,12 +297,12 @@ void Get_case(char *AsmName,int Opcode, int OpcodeImm)
 	AlignDataSection();
 
 	// Get the data section address of the top of the case data
-	
+
 	case_dataip = DataIP >> 2;
 
 	// Save the case data
 	// Save the current section and select the data section
-		
+
 	oldsect = Section;
 	Section = SECT_data;
 
@@ -336,7 +338,7 @@ void Get_call(char *AsmName,int Opcode, int OpcodeImm)
 	//int entry_sym = 0;
 
 	if (Token("&"))
-	{		
+	{
 		// Check for a _SYSCALL
 
 		GetAsmName();
@@ -350,8 +352,8 @@ void Get_call(char *AsmName,int Opcode, int OpcodeImm)
 		}
 
 		// Check for Thunks
-		
-		if (NextToken("%"))	
+
+		if (NextToken("%"))
 			GetAsmThunkName();
 
 		// Evaluate the enum
@@ -373,7 +375,7 @@ void Get_call(char *AsmName,int Opcode, int OpcodeImm)
 		}
 
 		op = OpcodeImm;
-		WriteOpcode(AsmName, use_addr);	
+		WriteOpcode(AsmName, use_addr);
 		return;
 	}
 
@@ -412,7 +414,7 @@ void Get_call(char *AsmName,int Opcode, int OpcodeImm)
 		}
 
 		op = OpcodeImm;
-		WriteOpcode(AsmName, use_addr);	
+		WriteOpcode(AsmName, use_addr);
 		return;
 	}
 
@@ -426,10 +428,10 @@ void Get_call(char *AsmName,int Opcode, int OpcodeImm)
 //****************************************
 
 void Get_syscall(char *AsmName,int Opcode, int OpcodeImm)
-{	
-	AsmName = 0;
-	Opcode = OpcodeImm = 0;
-	
+{
+	//AsmName = 0;
+	//Opcode = OpcodeImm = 0;
+
 	imm = GetExpression();					// Get the syscall number
 	op = _SYSCALL;
 	WriteOpcode("SysCall", use_int8);		// was use_int
@@ -444,7 +446,7 @@ void Get_syscall(char *AsmName,int Opcode, int OpcodeImm)
 void CheckLocalBounds(int branch_ip)
 {
 	SYMBOL *sym = CurrentFunction;
-	
+
 	if (AllowFarBranches)
 		return;
 
@@ -458,10 +460,10 @@ void CheckLocalBounds(int branch_ip)
 	{
 		Error(Error_Skip, "branch above function scope in '%s' (ip=%d)", sym->Name, branch_ip);
 	}
-	
+
 	if (sym->EndIP == 0)
 		return;
-	
+
 	if (branch_ip > sym->EndIP)
 	{
 		Error(Error_Skip, "branch below function scope in '%s' (ip=%d)", sym->Name, branch_ip);
@@ -487,7 +489,7 @@ void Get_jmp(char *AsmName,int Opcode, int OpcodeImm)
 
 		GetAsmName();
 		strcpy(JumpTargetName, Name);
-		
+
 		imm = GetEnumValue(Name);
 
 		if (ArgVerifierOff == 0)
@@ -508,7 +510,7 @@ void Get_jmp(char *AsmName,int Opcode, int OpcodeImm)
 		return;
 	}
 
-	rd = GetReg(0);	
+	rd = GetReg(0);
 
 	if (rd == -1)
 	{
@@ -530,7 +532,7 @@ void Get_jmp(char *AsmName,int Opcode, int OpcodeImm)
 					Error(Error_Skip, "jmp targets a function");
 
 		ArraySet(&CallArray, CodeIP, (int) GetLastSymbolRef());
-	
+
 		if (imm & 0xffff0000)	// Check for far jumps
 		{
 			farop = 1;
@@ -564,7 +566,7 @@ void Get_jmp_cond(char *AsmName,int Opcode, int OpcodeImm)
 #endif
 
 	//int cond = 0;
-	
+
 	imm = 0;
 
 	if (Token("gtu"))
@@ -587,16 +589,16 @@ void Get_jmp_cond(char *AsmName,int Opcode, int OpcodeImm)
 		op = _JC_LT;
 	else if (Token("le"))
 		op = _JC_LE;
-	else 
+	else
 		Error(Error_Skip, "Unknown jump condition");
 
 	NeedToken(",");
 
-	rd = GetReg(1);	
+	rd = GetReg(1);
 
 	NeedToken(",");
 
-	rs = GetReg(1);	
+	rs = GetReg(1);
 
 	NeedToken(",");
 
@@ -611,9 +613,9 @@ void Get_jmp_cond(char *AsmName,int Opcode, int OpcodeImm)
 		NeedToken("#");
 		GetAsmName();
 	}
-	
+
 	// get name
-	
+
 	strcpy(JumpTargetName, Name);
 
 	imm = GetEnumValue(Name);
@@ -677,7 +679,7 @@ void CheckDataAccess_LoadStore(int opcode)
 	SYMBOL *ref = GetLastSymbolRef();
 	int size = 0;
 	int addr;
-	
+
 	if (!ref)
 		return;
 
@@ -692,12 +694,12 @@ void CheckDataAccess_LoadStore(int opcode)
 		case _STB:
 			size = 1;
 			break;
-		
+
 		case _LDH:
 		case _STH:
 			size = 2;
 			break;
-		
+
 		case _LDI:
 		case _LDR:
 		case _LDW:
@@ -760,7 +762,7 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 
 			op = OpcodeStore;
 			WriteOpcode(AsmName, use_rd | use_rs | use_int);		// ld [rd, imm], rs
-			return;	
+			return;
 		}
 
 		// Is offset address
@@ -768,7 +770,7 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 		rd = GetReg(1);
 
 		// test for offset
-		
+
 		if (Token(","))
 		{
 			Token("&");				// There may be a '&' token !!
@@ -787,7 +789,7 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 
 		op = OpcodeStore;
 		WriteOpcode(AsmName, use_rd | use_rs | use_int);		// ld [rd, imm], rs
-		return;	
+		return;
 
 	}
 
@@ -795,7 +797,7 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 	// Is a load instruction		ld rd,
 	//----------------------------------------
 
-	rd = GetReg(1);	
+	rd = GetReg(1);
 
 	// Print a warning
 
@@ -828,17 +830,17 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 		CheckDataAccess_LoadStore(_LDI);
 
 		// If the expression had a coderef then force int to fully expand
-	
+
 		if (GetExpFlags() & REF_code)
 		{
 			op = _LDI;
 			WriteOpcode(AsmName, use_rd | use_int16);	// ld rd, #coderef
-			return;		
+			return;
 		}
 
 		op = _LDI;
 		WriteOpcode(AsmName, use_rd | use_int);	// ld rd, #imm
-		return;		
+		return;
 	}
 
 	if (Token("&"))				// ld rd,&
@@ -866,17 +868,17 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 		CheckDataAccess_LoadStore(_LDI);
 
 		// If the expression had a coderef then force int to fully expand
-	
+
 		if (GetExpFlags() & REF_code)
 		{
 			op = _LDI;
 			WriteOpcode(AsmName, use_rd | use_int16);	// ld rd, #coderef
-			return;		
+			return;
 		}
 
 		op = _LDI;
 		WriteOpcode(AsmName, use_rd | use_int); // ld rd, &addr
-		return;		
+		return;
 	}
 
 	if (Token("["))
@@ -897,14 +899,14 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 
 			op = OpcodeLoad;
 			WriteOpcode(AsmName, use_rd | use_rs | use_int);	// ld rd, [rs, imm]
-			return;		
+			return;
 
 		}
 
 		rs = GetReg(1);
 
 		// test for offset, if no offset imm=0
-		
+
 		if (Token(","))
 		{
 			Token("&");				// There may be a '&' token !!
@@ -920,14 +922,14 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 
 		op = OpcodeLoad;
 		WriteOpcode(AsmName, use_rd | use_rs | use_int);	// ld rd, [rs, imm]
-		return;			
+		return;
 	}
 
 	// Must be a move
 
 	// Note this is a getreg and test
-	
-	rs = GetReg(0);	
+
+	rs = GetReg(0);
 
 	if (rs == -1)
 	{
@@ -940,7 +942,7 @@ void Get_load_store(char *AsmName,int OpcodeLoad, int OpcodeStore)
 
 		op = _LDI;
 		WriteOpcode(AsmName, use_rd | use_int);	// ld rs, imm
-		return;		
+		return;
 	}
 
 	// Really is a move
@@ -961,9 +963,9 @@ void Get_rd_rs(char *AsmName,int Opcode, int OpcodeImm)
 #pragma unused(OpcodeImm)
 #endif
 
-	rd = GetReg(1);	
+	rd = GetReg(1);
 	NeedToken(",");
-	rs = GetReg(1);	
+	rs = GetReg(1);
 
 	imm = 0;
 	op = Opcode;
@@ -981,11 +983,11 @@ void Get_push_pop(char *AsmName,int Opcode, int OpcodeImm)
 #pragma unused(OpcodeImm)
 #endif
 
-	rd = GetReg(1);	
+	rd = GetReg(1);
 
 	NeedToken(",");
 
-	rs = GetReg(1);	
+	rs = GetReg(1);
 
 	if (rs < rd)
 		Error(Error_Skip, "Push/Pop registers have wrong order");
@@ -994,7 +996,7 @@ void Get_push_pop(char *AsmName,int Opcode, int OpcodeImm)
 
 	if (Opcode == _POP)
 		rd = rd + rs - 1;		// Reverse regs
-		
+
 	imm = 0;
 	op = Opcode;
 
@@ -1007,16 +1009,16 @@ void Get_push_pop(char *AsmName,int Opcode, int OpcodeImm)
 //****************************************
 
 void Get_Arith2(char *AsmName,int Opcode,int OpcodeImm)
-{	
+{
 	int const_subst;
-	
-	rd = GetReg(1);	
+
+	rd = GetReg(1);
 	NeedToken(",");
-		
+
 	if (Token("#") || Token("&"))
 	{
 		// Test for constant registers
-		
+
 		const_subst = HandleExprConst();
 		//CheckBadCodeRef();	//Fredrik
 
@@ -1033,12 +1035,12 @@ void Get_Arith2(char *AsmName,int Opcode,int OpcodeImm)
 		}
 
 		// If the expression had a coderef then force int to fully expand
-	
+
 		if (GetExpFlags() & REF_code)
 		{
 			op = OpcodeImm;
 			WriteOpcode(AsmName, use_rd | use_int16);	// arith rd, #coderef
-			return;		
+			return;
 		}
 
 		op = OpcodeImm;
@@ -1046,8 +1048,8 @@ void Get_Arith2(char *AsmName,int Opcode,int OpcodeImm)
 		return;
 	}
 
-	rs = GetReg(1);	
-		
+	rs = GetReg(1);
+
 	op = Opcode;
 	WriteOpcode(AsmName, use_rd | use_rs);
 	return;
@@ -1059,9 +1061,9 @@ void Get_Arith2(char *AsmName,int Opcode,int OpcodeImm)
 
 void Get_Shift(char *AsmName,int Opcode,int OpcodeImm)
 {
-	rd = GetReg(1);	
+	rd = GetReg(1);
 	NeedToken(",");
-		
+
 	if (Token("#"))
 	{
 		// Const substitution not needed here
@@ -1077,8 +1079,8 @@ void Get_Shift(char *AsmName,int Opcode,int OpcodeImm)
 		return;
 	}
 
-	rs = GetReg(1);	
-		
+	rs = GetReg(1);
+
 	op = Opcode;
 	WriteOpcode(AsmName, use_rd | use_rs);
 	return;
@@ -1090,12 +1092,12 @@ void Get_Shift(char *AsmName,int Opcode,int OpcodeImm)
 
 void HandleExpr()
 {
-	short	Type;
+	//short	Type;
 
 	// MAHandle internal Lables
-	
+
 	imm = GetExpression();					// Evaluate the expression
-	Type = (short)GetExpType();					// Get its type
+	/*Type = (short)*/GetExpType();					// Get its type
 
 	return;
 }
@@ -1107,22 +1109,22 @@ void HandleExpr()
 
 void HandleExprImm()
 {
-	short	flags;
-	
+	//short	flags;
+
 	// MAHandle internal Lables
-	
+
 	imm = GetExpression();					// Evaluate the expression
-	flags = GetExpFlags();
+	/*flags =*/ GetExpFlags();
 
 	// If the expression contained a symbol that is unresolved
 	// then don't create a constant for that address
-	
+
 	if (GetExpResolved() == -1)
 	{
 		imm = 0;
 		return;
 	}
-		
+
 	imm = FindVar(imm);
 	return;
 }
@@ -1137,9 +1139,9 @@ int HandleExprConst()				// Const or Imm
 {
 	int		ConstReg;
 	int		flags;
-	
+
 	// MAHandle internal Lables
-	
+
 	imm = GetExpression();					// Evaluate the expression
 
 	// If the expression contains a code ref then don't
@@ -1161,13 +1163,13 @@ int HandleExprConst()				// Const or Imm
 
 	// If the expression contained a symbol that is unresolved
 	// then don't create a constant for that address
-	
+
 	if (GetExpResolved() == -1)
 	{
 		imm = 0;
 		return 0;
 	}
-	
+
 	imm = FindVar(imm);
 	return 0;
 }
@@ -1228,7 +1230,7 @@ int GetReg(int err)
 			Error(Error_Skip, "Illegal register r%d", reg);
 			return 0;
 		}
-		
+
 		return reg;
 	}
 
@@ -1237,7 +1239,7 @@ int GetReg(int err)
 		GetName();
 		Error(Error_Skip, "Unknown register '%s'", Name);
 	}
-	
+
 	return reg;
 }
 
@@ -1251,7 +1253,7 @@ int Last_Instruction = 0;
 void WriteOpcode(char *AsmName, int field)
 {
 	int StartCodeIP = CodeIP;
-		
+
 	char *CodePtr = (char *) ArrayPtrBound(&CodeMemArray, CodeIP, CodeIP + 32);
 	//char *StartCodePtr = CodePtr;
 
@@ -1259,10 +1261,10 @@ void WriteOpcode(char *AsmName, int field)
 
 	if (AsmCharPtr)
 		ArraySet(&AsmCharArray, CodeIP, (int) AsmCharPtr);
-		
+
 	if (!CurrentFunction)
 		Error(Error_Fatal, "Opcodes can't be outside a function");
-	
+
 	if (Section != SECT_code)
 	{
 		Warning("Opcode '%s' : not in code section, switching to code section\n",AsmName,GetSectIP(),GetSectName((short)Section));
@@ -1323,13 +1325,13 @@ void WriteOpcode(char *AsmName, int field)
 	}
 
 	// If size optimization is off force to 16 bit indices
-	
+
 	if (SizeConstOpt && (field & use_int))
 	{
 		field &= ~use_int;
 		field |= use_int16;
 	}
-	
+
 
 	*CodePtr++ = (char)op;
 	CodeIP++;
@@ -1339,7 +1341,7 @@ void WriteOpcode(char *AsmName, int field)
 		*CodePtr++ = (char)rd;
 		CodeIP++;
 	}
-	
+
 	if (field & use_rs)
 	{
 		*CodePtr++ = (char)rs;
@@ -1368,14 +1370,14 @@ void WriteOpcode(char *AsmName, int field)
 	else if (field & use_int)
 	{
 		// 8 and 16 bit ints
-		
+
 		if (imm < 128)
-		{	
+		{
 			*CodePtr++ = (char)imm;
 			CodeIP++;
 		}
 		else
-		{	
+		{
 			*CodePtr++ = (char)(imm >> 8) | 0x80;
 			CodeIP++;
 
@@ -1397,7 +1399,7 @@ void WriteOpcode(char *AsmName, int field)
 
 	}
 	else if (field & use_int24)
-	{		
+	{
 		*CodePtr++ = (char)(imm >> 16);
 		CodeIP++;
 
@@ -1407,9 +1409,9 @@ void WriteOpcode(char *AsmName, int field)
 		*CodePtr++ = (char)(imm & 0xff);
 		CodeIP++;
 	}
-		
+
 	// Debug list
-		
+
 	if (LIST)
 	{
 		int len = (CodeIP - StartCodeIP);
@@ -1427,7 +1429,7 @@ void WriteOpcode(char *AsmName, int field)
 int BranchNextInst(char *AsmName)
 {
 	int dest = CodeIP + 3;			// 3 is the normal length of a branch
-	
+
 	if (farop)
 		dest++;
 
@@ -1491,7 +1493,7 @@ void StackChecking(char *AsmName)
 		case _POP:
 			if (rd > REG_sp)
 				return;
-		
+
 	}
 
 stack_err:
@@ -1519,7 +1521,7 @@ void CheckRT(int field, char *AsmName)
 			Error(Error_Warning, "verification failed : RT used in opcode '%s'", AsmName);
 			return;
 		}
-	}	
+	}
 
 	if (field & use_rs)
 	{
@@ -1528,7 +1530,7 @@ void CheckRT(int field, char *AsmName)
 			Error(Error_Warning, "verification failed : RT used in opcode '%s'", AsmName);
 			return;
 		}
-	}	
+	}
 
 
 }
@@ -1542,10 +1544,10 @@ void CheckIndexAlign(int opc, int immVal, char *AsmName)
 	if (!Final_Pass)
 		return;
 
-	// this doesn't work (niklas) gcc seem to emit a misaligned 
-	// offsets, which is offset back to an aligned address with 
+	// this doesn't work (niklas) gcc seem to emit a misaligned
+	// offsets, which is offset back to an aligned address with
 	// this instruction.
-	return; 
+	return;
 
 	switch(opc)
 	{

@@ -266,6 +266,7 @@ static GLenum draw_elements(GLenum mode, GLsizei count, GLenum type,
 	 * to GL_SHORT and GL_FLOAT */
 
 	{
+#if 0
 		int need_conv = 0;
 
 		if (state.vptr.type || state.vptr.type == GL_FIXED)
@@ -279,6 +280,7 @@ static GLenum draw_elements(GLenum mode, GLsizei count, GLenum type,
 				if (state.tptr[0].type == GL_BYTE ||
 				    state.tptr[0].type == GL_FIXED)
 					need_conv = 1;
+#endif
 
 		/* Get number of elements to convert */
 

@@ -43,6 +43,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //******************************************************************************
 
 #ifdef LOGGING_ENABLED
+#ifndef NULL
+#define NULL 0
+#endif
 void InitLog(const char* filenameOverride = NULL);
 
 void LogV(const char* fmt, VA_LIST vaList) PRINTF_ATTRIB(1, 0);

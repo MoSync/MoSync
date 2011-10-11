@@ -40,7 +40,7 @@ void ResourceMain()
 	DEBUG = 0;
 	LIST = 0;
 	INFO = 0;
-	
+
 	AsmAllocMem();
 	SetResPtrs();
 
@@ -64,7 +64,7 @@ void ResourceMain()
 	DEBUG = 0;
 	LIST = 0;
 	INFO = 0;
-	
+
 	AsmAllocMem();
 	SetResPtrs();
 
@@ -110,7 +110,7 @@ void ResourceComp()
 		SkipWhiteSpace();
 
 		Line++;
-	
+
 		if (EndComp)
 			break;
 
@@ -120,12 +120,12 @@ void ResourceComp()
 		if (*FilePtr == '{' || *FilePtr == '}')
 		{
 			FilePtr++;
-			continue;	
+			continue;
 		}
-	
+
 		if (*FilePtr == 0)
 			break;
-	
+
 		if (ResourceCommands())
 		{
 			SkipWhiteSpace();
@@ -134,7 +134,7 @@ void ResourceComp()
 	}
 
 	FilePtr = FPtr;
-	
+
 	ExitErrorCount();
 	SetErrorReset();
 }
@@ -157,11 +157,11 @@ void SetResPtrs()
 void SetResAsmPtrs()
 {
 	LocalScope = 0;
-	
+
 	CodeIP = 0;
 	DataIP = 0;
 	BssIP = 0;
-		
+
 	CurrentFunction = 0;
 
 	CurrentFile[0] = 0;
@@ -174,7 +174,7 @@ void SetResAsmPtrs()
 void hex8(int v)
 {
 	char hextab[] = "0123456789abcdef";
-	
+
 	printf("%c%c ", hextab[v >> 4], hextab[v & 0xf]);
 }
 
@@ -213,7 +213,7 @@ void WriteEncodedInt(unsigned int v)
 void WriteEncodedSignedInt(int v)
 {
 	int sign = 0;
-	
+
 	if (v < 0)
 	{
 		sign = 1;
@@ -253,7 +253,7 @@ void ResetResource()
 	IndexWidth = 0;
 
 	// Set name to null
-	
+
 	ResName[0] = 0;
 }
 
@@ -264,7 +264,7 @@ void ResetResource()
 short spr_ind, spr_x, spr_y, spr_w, spr_h, spr_cx, spr_cy;
 
 short ResourceCommands()
-{	
+{
 	char *filemem;
 	int filelen;
 	int n,v;
@@ -288,7 +288,7 @@ short ResourceCommands()
 		SkipWhiteSpace();
 
 		GetLFileName();
-		
+
 		GetRelPath(Name);
 		return 1;
 	}
@@ -324,13 +324,13 @@ short ResourceCommands()
 			GetName();						// Get the new type Name
 			strcpy(ResName, Name);
 		}
-		
+
 
 		// Clear index table
-		
+
 		IndexCount = 0;
 		IndexWidth = 0;
-		
+
 		MakeNewResource(Name);				// Make this symbolic
 		return 1;
 	}
@@ -342,7 +342,7 @@ short ResourceCommands()
 	if (QToken(".index"))
 	{
 		int IndexOffset = GetDataIndex();
-		
+
 		SkipWhiteSpace();
 
 		Name[0] = 0;
@@ -351,11 +351,11 @@ short ResourceCommands()
 			GetName();						// Get the index ref name
 
 		// add index to table
-		
+
 		IndexTable[IndexCount] = IndexOffset;
 
 //		MakeIndexedResource(IndexName, IndexCount);
-		
+
 		infoprintf("%d: index = %d ('%s')\n",IndexCount, IndexOffset, Name);
 
 		if (Pass == 2)
@@ -373,7 +373,7 @@ short ResourceCommands()
 	if (QToken(".wideindex"))
 	{
 		IndexWidth = 1;
-		SkipWhiteSpace();	
+		SkipWhiteSpace();
 		return 1;
 	}
 
@@ -384,7 +384,7 @@ short ResourceCommands()
 	if (QToken(".extension"))
 	{
 		SkipWhiteSpace();
-		
+
 		v = GetExpression();		// x
 
 		ResType = v;
@@ -400,7 +400,7 @@ short ResourceCommands()
 	if (QToken(".dispose"))
 	{
 		SkipWhiteSpace();
-		
+
 		ResDispose = 1;
 		return 1;
 	}
@@ -442,7 +442,7 @@ short ResourceCommands()
 		infoprintf("%d: Binary\n",CurrentResource);
 		return 1;
 	}
-	
+
 //------------------------------------
 //
 //------------------------------------
@@ -460,7 +460,7 @@ short ResourceCommands()
 //------------------------------------
 
 	if (QToken(".media"))
-	{	
+	{
 		int slen;
 
 		SkipWhiteSpace();
@@ -469,7 +469,7 @@ short ResourceCommands()
 		GetStringName(128);
 
 		slen = strlen(Name) + 1;
-		
+
 		for (n=0;n<slen;n++)
 			WriteByte(Name[n]);
 
@@ -484,13 +484,13 @@ short ResourceCommands()
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
-		
+
 		if (!filemem)
 		{
 			Error(Error_Fatal, "Error reading data file '%s'", Name);
 			return 1;
 		}
-		
+
 		filelen = FileAlloc_Len();
 
 		for (n=0;n<filelen;n++)
@@ -509,7 +509,7 @@ short ResourceCommands()
 //------------------------------------
 
 	if (QToken(".umedia"))
-	{	
+	{
 		int slen;
 
 		SkipWhiteSpace();
@@ -518,7 +518,7 @@ short ResourceCommands()
 		GetStringName(128);
 
 		slen = strlen(Name) + 1;
-		
+
 		for (n=0;n<slen;n++)
 			WriteByte(Name[n]);
 
@@ -533,13 +533,13 @@ short ResourceCommands()
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
-		
+
 		if (!filemem)
 		{
 			Error(Error_Fatal, "Error reading data file '%s'", Name);
 			return 1;
 		}
-		
+
 		filelen = FileAlloc_Len();
 
 		for (n=0;n<filelen;n++)
@@ -566,13 +566,13 @@ short ResourceCommands()
 		GetStringName(128);
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
-		
+
 		if (!filemem)
 		{
 			Error("Error reading data file '%s'", Name);
 			return 1;
 		}
-		
+
 		filelen = FileAlloc_Len();
 
 		for (n=0;n<filelen;n++)
@@ -582,7 +582,7 @@ short ResourceCommands()
 
 		Free_File(filemem);
 
-		printf("%d: File '%s' size %d\n", CurrentResource, Name, filelen);		
+		printf("%d: File '%s' size %d\n", CurrentResource, Name, filelen);
 		return 1;
 	}
 */
@@ -601,7 +601,7 @@ short ResourceCommands()
 		GetStringName(128);
 
 		slen = strlen(Name) + 1;
-		
+
 		for (n=0;n<slen;n++)
 			WriteByte(Name[n]);
 
@@ -625,7 +625,7 @@ short ResourceCommands()
 
 		ResType = ResType_TileSet;
 
-		GetStringName(128);		
+		GetStringName(128);
 
 		SkipWhiteSpace();
 		NeedToken(",");
@@ -647,7 +647,7 @@ short ResourceCommands()
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
-		
+
 		if (!filemem)
 		{
 			Error(Error_Fatal, "Error reading tileset file '%s'", Name);
@@ -681,7 +681,7 @@ short ResourceCommands()
 
 		ResType = ResType_TileMap;
 
-		GetStringName(128);		
+		GetStringName(128);
 
 		SkipWhiteSpace();
 		NeedToken(",");
@@ -700,7 +700,7 @@ short ResourceCommands()
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
-		
+
 		if (!filemem)
 		{
 			Error(Error_Fatal, "Error reading tilemap file '%s'", Name);
@@ -739,7 +739,7 @@ short ResourceCommands()
 
 		ResType = ResType_Image;
 
-		GetStringName(128);		
+		GetStringName(128);
 
 /*
 		spr_cx = spr_cy = 0;
@@ -765,13 +765,13 @@ short ResourceCommands()
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
-		
+
 		if (!filemem)
 		{
 			Error(Error_Fatal, "Error reading image file '%s'", Name);
 			return 1;
 		}
-		
+
 		filelen = FileAlloc_Len();
 
 		// write the length
@@ -894,23 +894,23 @@ short ResourceCommands()
 		if (QToken("$"))
 		{
 			char VarName[256];
-			
+
 			// Accept a string
 
 			GetName();							// Get the new type Name
-			strcpy(VarName, Name);			
+			strcpy(VarName, Name);
 			NeedToken("=");
 			GetStringName(128);
 
 			printf("string set %s = '%s'\n", VarName, Name);
-			
+
 			RedefENumString(VarName, Name);
 			return 1;
 		}
 
-		GetName();							// Get the new type Name	
+		GetName();							// Get the new type Name
 		NeedToken("=");
-		RedefENum(Name, GetExpression());	
+		RedefENum(Name, GetExpression());
 		return 1;
 	}
 
@@ -920,7 +920,7 @@ short ResourceCommands()
 
 	if (QToken(".debug"))
 	{
-		DEBUG = (short)GetExpression();	
+		DEBUG = (short)GetExpression();
 		return 1;
 	}
 
@@ -930,7 +930,7 @@ short ResourceCommands()
 
 	if (QToken(".info"))
 	{
-		INFO = (short)GetExpression();	
+		INFO = (short)GetExpression();
 		return 1;
 	}
 
@@ -940,7 +940,7 @@ short ResourceCommands()
 
 	if (QToken(".list"))
 	{
-		LIST = (short)GetExpression();	
+		LIST = (short)GetExpression();
 		return 1;
 	}
 
@@ -951,12 +951,12 @@ short ResourceCommands()
 	if (QToken(".show"))
 	{
 		int exp = GetExpression();
-		
+
 		printf("%d",exp);
 
 		if (!Token(";"))
 			printf("\n");
-	
+
 		return 1;
 	}
 
@@ -968,16 +968,16 @@ short ResourceCommands()
 	{
 		int exp;
 		char c;
-	
+
 		if (Token("\""))
 		{
-			while(1)	
+			while(1)
 			{
 				c = *FilePtr;
-				
+
 				if (c == 0 || c == '"')
 					break;
-				
+
 				printf("%c",c);
 
 				FilePtr++;
@@ -997,7 +997,7 @@ short ResourceCommands()
 
 		if (!Token(";"))
 			printf("\n");
-	
+
 		return 1;
 	}
 
@@ -1025,7 +1025,7 @@ short ResourceCommands()
 	{
 		GetName();							// Get the new type Name
 		SkipWhiteSpace();
-		
+
 		if (!SymbolExists(Name, section_Script, -1))
 		{
 			if (NextToken("{"))
@@ -1043,9 +1043,9 @@ short ResourceCommands()
 
 	if (QToken(".ifndef"))
 	{
-		GetName();							// Get the new type Name	
+		GetName();							// Get the new type Name
 		SkipWhiteSpace();
-		
+
 		if (SymbolExists(Name, section_Script, -1))
 		{
 			if (NextToken("{"))
@@ -1062,7 +1062,7 @@ short ResourceCommands()
 
 	if (QToken(".while"))
 	{
-	
+
 		if (GetExpression())
 		{
 			FilePtr = SearchScope(FilePtr);
@@ -1088,20 +1088,20 @@ short ResourceCommands()
 	{
 		SkipWhiteSpace();
 
-		GetStringName(128);		
+		GetStringName(128);
 
 		if(Do_Export_Dependencies && Pass == 2) {
 			ExportFileDependency(Name);
 		}
 
 		filemem = Open_FileAlloc(AddRelPrefix(Name));
-		
+
 		if (!filemem)
 		{
 			Error(Error_Fatal, "Error reading include file '%s'", Name);
 			return 1;
 		}
-		
+
 		filelen = FileAlloc_Len();
 
 		for (n=0;n<filelen;n++)
@@ -1137,7 +1137,7 @@ short ResourceCommands()
 	{
 		do
 		{
-			imm = GetExpression();					// Get the number			
+			imm = GetExpression();					// Get the number
 			WriteEncodedSignedInt(imm);
 		}
 		while (QToken(","));
@@ -1169,7 +1169,7 @@ short ResourceCommands()
 
 	if (QToken(".half"))
 	{
-	
+
 		do
 		{
 			imm = GetExpression();					// Get the number
@@ -1204,14 +1204,14 @@ short ResourceCommands()
 	if (QToken(".fill"))
 	{
 		imm = GetExpression();					// Get the number
-	
+
 		if (!imm)
 			return 1;
-	
+
 		NeedToken(",");
-	
+
 		v = GetExpression();
-		
+
 		do
 		{
 			WriteByte(v);
@@ -1236,15 +1236,15 @@ short ResourceCommands()
 		WriteByte(0);
 
 		// Get current data location
-		
+
 		dataStart = DataIP;
-		
+
 		// read string to mem
 
 		GetStrings();
-		
+
 		// find the string length
-		
+
 		len = DataIP - dataStart;
 
 		if (len > 255)
@@ -1252,15 +1252,15 @@ short ResourceCommands()
 			Error(Error_Skip, "pstring is longer that 255 chars\n");
 			return 1;
 		}
-		
+
 		// Patch the string length
-		
+
 		ArraySet(&DataMemArray, dataStart-1, len);
 
-		
+
 		return 1;
 	}
-	
+
 //------------------------------------
 //
 //------------------------------------
@@ -1269,17 +1269,17 @@ short ResourceCommands()
 	{
 		GetStrings();
 		WriteByte(0);
-		
+
 		return 1;
 	}
-	
+
 //------------------------------------
 //
 //------------------------------------
 
 	if (QToken(".string"))
 	{
-		GetStrings();		
+		GetStrings();
 		return 1;
 	}
 
@@ -1333,9 +1333,9 @@ void MakeNewResource(char *name)
 		return;
 
 	Sym = FindSymbolsOld(name,section_Resource,section_Resource);
-	
+
 	// Symbol found
-	
+
 	if (Sym)
 	{
 		if (Pass == 1)
@@ -1344,9 +1344,9 @@ void MakeNewResource(char *name)
 		Sym->Value	= CurrentResource;
 		return;
 	}
-	
+
 	// Symbol not found
-	
+
 	if (Pass == 2)
 	{
 		Error(Error_Skip, "Strange error symbol '%s' defined in second pass",name);
@@ -1375,7 +1375,7 @@ void MakeIndexedResource(char *name, int index)
 		return;
 
 	Sym = FindSymbolsOld(name,section_Resource,section_Resource);
-	
+
 	if (Sym)
 	{
 		Error(Error_Skip, "Symbol '%s' is already defined",name);
@@ -1405,12 +1405,12 @@ int GetDataIndex()
 void FinalizeResource()
 {
 	int n;
-	
-	int DataLen = DataIP;	
+
+	int DataLen = DataIP;
 	int ResStart = ResIP;
 
-	int ResLen, IndexSize;
-	
+	int IndexSize;
+
 	// Save the resource header
 
 	Section = SECT_res;
@@ -1431,11 +1431,11 @@ void FinalizeResource()
 	if (IndexCount)
 	{
 		if (IndexWidth)
-		{			
+		{
 			// ** 4 byte index tables **
 
 			// Write data size + index size
-			
+
 			IndexSize = 2 + (IndexCount*4);
 			WriteEncodedInt(DataLen + IndexSize);
 
@@ -1453,11 +1453,11 @@ void FinalizeResource()
 			}
 		}
 		else
-		{			
+		{
 			// ** 2 byte index tables **
 
 			// Write data size + index size
-			
+
 			IndexSize = 2 + (IndexCount*2);
 			WriteEncodedInt(DataLen + IndexSize);
 
@@ -1504,8 +1504,6 @@ void FinalizeResource()
 		WriteResByte(ArrayGet(&DataMemArray, n));
 	}
 
-	ResLen = ResIP - ResStart;
-	
 	if (Pass == 2)
 	{
 		printf("Res %d Total %d", CurrentResource, ResIP - ResStart);
@@ -1530,7 +1528,7 @@ void FinalizeResource()
 	// Initialize new resource
 
 	ResetResource();
-	
+
 	// Move to next resource
 
 	CurrentResource++;
@@ -1553,22 +1551,22 @@ void WriteResources()
 	char nullbyte = 0;
 
 	// Write the header
-	
+
 	SetResAsmPtrs();
 
 	DataIP = 0;
 	Section = SECT_data;
-	
+
 	// Write magic
-	
+
 	WriteLong('SRAM');
 
 	// Write total object entries
-	
+
 	WriteEncodedInt(Entries);
 
 	// Write total data length
-	
+
 	WriteEncodedInt(ResLen);
 
 	// Write the header info
@@ -1579,7 +1577,7 @@ void WriteResources()
 		ArrayWriteFP(&DataMemArray, CodeFile, DataLen);
 
 	// Write the resouce data
-	
+
 	if (ResLen > 0)
 		ArrayWriteFP(&ResMemArray, CodeFile, ResLen);
 

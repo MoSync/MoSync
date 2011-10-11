@@ -27,7 +27,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <set>
 
-using namespace std; 
+using namespace std;
 
 #define MAX_STRING_SIZE 128
 
@@ -89,7 +89,7 @@ void ExpressionParser::init() {
 	mTokenMatchers.push_back(new TokenFixed(TOKEN_SHR, ">>"));
 	mTokenMatchers.push_back(new TokenFixed(TOKEN_AND, "&"));
 	mTokenMatchers.push_back(new TokenFixed(TOKEN_OR, "|"));
-	mTokenMatchers.push_back(new TokenFixed(TOKEN_XOR, "^"));	
+	mTokenMatchers.push_back(new TokenFixed(TOKEN_XOR, "^"));
 	mTokenMatchers.push_back(new TokenFixed(TOKEN_TILDE, "~"));
 
 	mTokenMatchers.push_back(new TokenFixed(TOKEN_ANDAND, "&&"));
@@ -103,9 +103,9 @@ void ExpressionParser::init() {
 	mTokenMatchers.push_back(new TokenFixed(TOKEN_GE, ">"));
 
 	mTokenMatchers.push_back(new TokenFixed(TOKEN_LBRACK, "["));
-	mTokenMatchers.push_back(new TokenFixed(TOKEN_RBRACK, "]"));	
-	mTokenMatchers.push_back(new TokenFixed(TOKEN_DOT, "."));	
-	mTokenMatchers.push_back(new TokenFixed(TOKEN_ARROW, "->"));	
+	mTokenMatchers.push_back(new TokenFixed(TOKEN_RBRACK, "]"));
+	mTokenMatchers.push_back(new TokenFixed(TOKEN_DOT, "."));
+	mTokenMatchers.push_back(new TokenFixed(TOKEN_ARROW, "->"));
 
 	mTokenMatchers.push_back(new TokenFixed(TOKEN_UNSIGNED, "unsigned"));
 	mTokenMatchers.push_back(new TokenFixed(TOKEN_SIGNED, "signed"));
@@ -157,8 +157,10 @@ const TypeBase* findTypeByNameAndPC(const std::string& t) {
 ExpressionTreeNode* ExpressionParser::getTypeNode() {
 	const char *expr = mExpr;
 
-	bool isType = false;
-	while(accept(TOKEN_CONST) || accept(TOKEN_VOLATILE)) { isType = true; }
+	//bool isType = false;
+	while(accept(TOKEN_CONST) || accept(TOKEN_VOLATILE)) {
+		//isType = true;
+	}
 
 	Token t;
 	std::string subType = "";
@@ -167,36 +169,36 @@ ExpressionTreeNode* ExpressionParser::getTypeNode() {
 	int howShort = 0;
 	int numStars = 0;
 
-	TypeBase::Type type = TypeBase::eUnknown; 
+	TypeBase::Type type = TypeBase::eUnknown;
 	const TypeBase *typeInfo = NULL;
 
 	while(1) {
 		if(accept(TOKEN_CONST)) {
 		}
-		else if(accept(TOKEN_STRUCT)) { 
-			if(type != TypeBase::eUnknown) 
-				ExpressionCommon::error("Parse error"); 
-			type=TypeBase::eStruct; 
+		else if(accept(TOKEN_STRUCT)) {
+			if(type != TypeBase::eUnknown)
+				ExpressionCommon::error("Parse error");
+			type=TypeBase::eStruct;
 		}
-		else if(accept(TOKEN_UNION)) { 
-			if(type != TypeBase::eUnknown) 
-				ExpressionCommon::error("Parse error"); 
-			type=TypeBase::eStruct; 
+		else if(accept(TOKEN_UNION)) {
+			if(type != TypeBase::eUnknown)
+				ExpressionCommon::error("Parse error");
+			type=TypeBase::eStruct;
 		}
-		else if(accept(TOKEN_ENUM)) { 
-			if(type != TypeBase::eUnknown) 
-				ExpressionCommon::error("Parse error"); 
-			type=TypeBase::eEnum; 
+		else if(accept(TOKEN_ENUM)) {
+			if(type != TypeBase::eUnknown)
+				ExpressionCommon::error("Parse error");
+			type=TypeBase::eEnum;
 		}
-		else if(accept(TOKEN_CLASS)) { 
-			if(type != TypeBase::eUnknown) 
-				ExpressionCommon::error("Parse error"); 
-			type=TypeBase::eStruct;  
+		else if(accept(TOKEN_CLASS)) {
+			if(type != TypeBase::eUnknown)
+				ExpressionCommon::error("Parse error");
+			type=TypeBase::eStruct;
 		}
 		else if(accept(TOKEN_SIGNED, t) || accept(TOKEN_UNSIGNED, t)) {
 			if(type != TypeBase::eUnknown && type != TypeBase::eBuiltin)
 				ExpressionCommon::error("Parse error");
-			if(isSigned != 0) 
+			if(isSigned != 0)
 				ExpressionCommon::error("Cannot have multiple signedness keywords");
 			if(t.getTokenType() == TOKEN_SIGNED) isSigned = 1;
 			else isSigned = 2;
@@ -208,15 +210,15 @@ ExpressionTreeNode* ExpressionParser::getTypeNode() {
 
 			howLong++;
 			type = TypeBase::eBuiltin;
-		} 			
+		}
 		else if(accept(TOKEN_SHORT)) {
 			if(type != TypeBase::eUnknown && type != TypeBase::eBuiltin)
 				ExpressionCommon::error("Parse error");
 			howShort++;
 			type = TypeBase::eBuiltin;
-		} 	
+		}
 		else if(accept(TOKEN_IDENT, t)) {
-			if(subType != "") 
+			if(subType != "")
 				ExpressionCommon::error("Multiple types");
 			subType = t.toString();
 			std::set<std::string>::const_iterator iter = sTypeSet.find(t.toString());
@@ -247,11 +249,11 @@ ExpressionTreeNode* ExpressionParser::getTypeNode() {
 
 	if(type != TypeBase::eUnknown) {
 			if(type == TypeBase::eBuiltin) {
-				if(howLong && howShort) 
+				if(howLong && howShort)
 					ExpressionCommon::error("Cannot have both long and short keyword");
-				if(howLong >= 3) 
+				if(howLong >= 3)
 					ExpressionCommon::error("Too long");
-				if(howShort > 1) 
+				if(howShort > 1)
 					ExpressionCommon::error("Too short");
 				if((howLong || howShort) && (subType=="char" || subType=="float" || subType == "double"))
 					ExpressionCommon::error("Invalid keyword for type");
@@ -272,7 +274,7 @@ ExpressionTreeNode* ExpressionParser::getTypeNode() {
 						typeBase = sBuiltins[i].type;
 					}
 				}
-				if(typeBase == NULL) 
+				if(typeBase == NULL)
 					ExpressionCommon::error("Missing type");
 			} else {
 				//const Type* typeInfo = stabsFindTypeByName(t.toString(), 0);
@@ -427,36 +429,36 @@ ExpressionTreeNode* ExpressionParser::castExpression() {
 		int howShort = 0;
 		int numStars = 0;
 
-		TypeBase::Type type = TypeBase::eUnknown; 
+		TypeBase::Type type = TypeBase::eUnknown;
 		const TypeBase *typeInfo = NULL;
 
 		while(1) {
 			if(accept(TOKEN_CONST)) {
 			}
-			else if(accept(TOKEN_STRUCT)) { 
-				if(type != TypeBase::eUnknown) 
-					ExpressionCommon::error("Parse error"); 
-				type=TypeBase::eStruct; 
+			else if(accept(TOKEN_STRUCT)) {
+				if(type != TypeBase::eUnknown)
+					ExpressionCommon::error("Parse error");
+				type=TypeBase::eStruct;
 			}
-			else if(accept(TOKEN_UNION)) { 
-				if(type != TypeBase::eUnknown) 
-					ExpressionCommon::error("Parse error"); 
-				type=TypeBase::eStruct; 
+			else if(accept(TOKEN_UNION)) {
+				if(type != TypeBase::eUnknown)
+					ExpressionCommon::error("Parse error");
+				type=TypeBase::eStruct;
 			}
-			else if(accept(TOKEN_ENUM)) { 
-				if(type != TypeBase::eUnknown) 
-					ExpressionCommon::error("Parse error"); 
-				type=TypeBase::eEnum; 
+			else if(accept(TOKEN_ENUM)) {
+				if(type != TypeBase::eUnknown)
+					ExpressionCommon::error("Parse error");
+				type=TypeBase::eEnum;
 			}
-			else if(accept(TOKEN_CLASS)) { 
-				if(type != TypeBase::eUnknown) 
-					ExpressionCommon::error("Parse error"); 
-				type=TypeBase::eStruct;  
+			else if(accept(TOKEN_CLASS)) {
+				if(type != TypeBase::eUnknown)
+					ExpressionCommon::error("Parse error");
+				type=TypeBase::eStruct;
 			}
 			else if(accept(TOKEN_SIGNED, t) || accept(TOKEN_UNSIGNED, t)) {
 				if(type != TypeBase::eUnknown && type != TypeBase::eBuiltin)
 					ExpressionCommon::error("Parse error");
-				if(isSigned != 0) 
+				if(isSigned != 0)
 					ExpressionCommon::error("Cannot have multiple signedness keywords");
 				if(t.getTokenType() == TOKEN_SIGNED) isSigned = 1;
 				else isSigned = 2;
@@ -468,15 +470,15 @@ ExpressionTreeNode* ExpressionParser::castExpression() {
 
 				howLong++;
 				type = TypeBase::eBuiltin;
-			} 			
+			}
 			else if(accept(TOKEN_SHORT)) {
 				if(type != TypeBase::eUnknown && type != TypeBase::eBuiltin)
 					ExpressionCommon::error("Parse error");
 				howShort++;
 				type = TypeBase::eBuiltin;
-			} 	
+			}
 			else if(accept(TOKEN_IDENT, t)) {
-				if(subType != "") 
+				if(subType != "")
 					ExpressionCommon::error("Multiple types");
 				subType = t.toString();
 				std::set<std::string>::const_iterator iter = sTypeSet.find(t.toString());
@@ -509,11 +511,11 @@ ExpressionTreeNode* ExpressionParser::castExpression() {
 		if(type != TypeBase::eUnknown) {
 			if(accept(TOKEN_RPAREN)) {
 				if(type == TypeBase::eBuiltin) {
-					if(howLong && howShort) 
+					if(howLong && howShort)
 						ExpressionCommon::error("Cannot have both long and short keyword");
-					if(howLong >= 3) 
+					if(howLong >= 3)
 						ExpressionCommon::error("Too long");
-					if(howShort > 1) 
+					if(howShort > 1)
 						ExpressionCommon::error("Too short");
 					if((howLong || howShort) && (subType=="char" || subType=="float" || subType == "double"))
 						ExpressionCommon::error("Invalid keyword for type");
@@ -534,7 +536,7 @@ ExpressionTreeNode* ExpressionParser::castExpression() {
 							typeBase = sBuiltins[i].type;
 						}
 					}
-					if(typeBase == NULL) 
+					if(typeBase == NULL)
 						ExpressionCommon::error("Missing type");
 				} else {
 					//const Type* typeInfo = stabsFindTypeByName(t.toString(), 0);
@@ -575,7 +577,7 @@ ExpressionTreeNode* ExpressionParser::unaryExpression() {
 	Token t;
 	if(accept(TOKEN_SIZEOF)) {
 		throw ParseException("Unimplemented operation");
-	} 
+	}
 	else if(
 		accept(TOKEN_AND, t) ||
 		accept(TOKEN_STAR, t) ||
@@ -598,7 +600,7 @@ ExpressionTreeNode* ExpressionParser::unaryExpression() {
 				throw ParseException("Unsupported operation");
 			}
 	} else {
-		return postfixExpression();	
+		return postfixExpression();
 	}
 //	return NULL;
 }
@@ -625,7 +627,7 @@ ExpressionTreeNode* ExpressionParser::postfixExpression() {
 		} else if(accept(TOKEN_LBRACK, t)) {
 			ExpressionTreeNode *expr = expression();
 			ExpressionTreeNode *indexNode = new IndexNode(sExpressionTree, child, expr);
-			child = indexNode; 
+			child = indexNode;
 			if(!accept(TOKEN_RBRACK))
 				throw ParseException("Missing right bracket.");
 		}
@@ -803,7 +805,7 @@ static int evaluateThread(void* data) {
 		sReturnValue = sExpressionTree->evaluate();
 
 		if(sReturnValue.isType() == false) {
-			const TypeBase* deref = NULL;	
+			const TypeBase* deref = NULL;
 			if(sReturnValue.getType()==TypeBase::eArray) {
 				deref = (const ArrayType*)sReturnValue.getSymbol().type->resolve();
 			} else if(sReturnValue.getType()==TypeBase::ePointer) {
@@ -892,7 +894,7 @@ static void stackLoaded() {
 		ExpressionTree *tree;
 		try {
 			tree = ExpressionParser::parse(sExpression.c_str());
-		} 
+		}
 		catch(ParseException& e) {
 			error("%s", e.what());
 			return;
@@ -969,10 +971,10 @@ std::string getType(const TypeBase *tb, bool complex) {
 std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat fmt) {
 	StringPrintFunctor spf;
 	//const char *caddr = (const char*)addr;
-	
+
 	// this isn't always true because some values has been evaluated in memory, should be a flag stating if this is the case.
 	//if(caddr<gMemBuf || caddr+tb->size()>&gMemBuf[gMemSize]) return "";
-	
+
 	tb->printMI(spf, addr, fmt);
 
 	// special treatment for (const) char* and char[].
@@ -1017,7 +1019,7 @@ std::string getValue(const TypeBase* tb, const void* addr, TypeBase::PrintFormat
 					}
 				}
 			}
-		}	
+		}
 	}
 
 	if(spf.length() <= 0) {

@@ -46,7 +46,7 @@ int InitVarPool()
 
 	ThisVar = VarPool;
 	VarCount = 0;
-	
+
 	StoreVarPool(0);			// Store defualt 0
 	return 1;
 }
@@ -75,7 +75,7 @@ void ClearVarPool()
 {
 	ThisVar = VarPool;
 	VarCount = 0;
-	
+
 	StoreVarPool(0);			// Store defualt 0
 }
 
@@ -91,12 +91,12 @@ int SearchVarPool(int v)
 	// Failed so look again
 
 	vptr = VarPool;
-	
+
 	for (n=0;n<VarCount;n++)
 	{
 		if (v == *vptr++)
 			return n;
-	
+
 	}
 
 	return -1;
@@ -109,15 +109,15 @@ int SearchVarPool(int v)
 int StoreVarPool(int v)
 {
 	int idx;
-	
+
 	if (VarCount >= VARMAX)
 		Error(Error_Fatal, "Var Pool is full");
 
 	*ThisVar++ = v;
-	
+
 	idx = VarCount;
 	VarCount++;
-	return idx;	
+	return idx;
 }
 
 //****************************************
@@ -127,9 +127,9 @@ int StoreVarPool(int v)
 int FindVar(int v)
 {
 	int idx;
-		
+
 	idx = SearchVarPool(v);
-	
+
 	if (idx == -1)
 	{
 //		if (Pass == 2)
@@ -138,7 +138,7 @@ int FindVar(int v)
 		idx = StoreVarPool(v);
 	}
 	// Increase the frequency of access
-	
+
 	if (Pass == 1)
 		VarFreq[idx]++;
 
@@ -151,7 +151,7 @@ int FindVar(int v)
 
 #if 1
 
-#define INV_IND(ind) (VarCount-ind-1)	
+#define INV_IND(ind) (VarCount-ind-1)
 
 void SortVarPool()
 {
@@ -215,12 +215,12 @@ void varpool_q_sort(int left, int right)
 void SortVarPool()
 {
 	int n, mod=1, tmp;
-	
+
 	if (VarCount < 3)
 		return;
 
 	while(mod)
-	{	
+	{
 		mod = 0;
 
 		for (n=0;n<VarCount-1;n++)
@@ -236,8 +236,8 @@ void SortVarPool()
 				tmp = VarPool[n];
 				VarPool[n] = VarPool[n+1];
 				VarPool[n+1] = tmp;
-				
-				mod = 1;			
+
+				mod = 1;
 			}
 		}
 	}
@@ -258,7 +258,7 @@ void SortVarPool()
 void SortVarPool()
 {
 	int i, j, inc, tmp1, tmp2;
-	
+
 	inc = 3;
 
 	while (inc > 0)
@@ -323,7 +323,7 @@ void DumpVarPool()
 	int n;
 
 	printf("\nInteger Pool\n\n");
-	
+
 	for (n=0;n<VarCount;n++)
 	{
 		printf("%d: 0x%x Freq %d\n", n, VarPool[n], VarFreq[n]);
@@ -343,14 +343,14 @@ int HashVarPool()
 	int *vptr = VarPool;
 	int n;
 	int v = 41;
-	
+
 	for (n=0;n<VarCount;n++)
 	{
 		v += HASHFUNC(*vptr);
 		vptr++;
 	}
 
-	return v;	
+	return v;
 }
 
 //****************************************
@@ -359,17 +359,17 @@ int HashVarPool()
 
 void TestVarPool()
 {
-	int n,v,i;
+	int n,v;
 
 	InitVarPool();
-	
+
 	for (n=0;n<20;n++)
 	{
 		v = rand() & 7;
-		i = FindVar(v);
+		/*i =*/ FindVar(v);
 		printf("inserted %d\n",  v);
 	}
-	
+
 	DumpVarPool();
 
 	printf("\nSorted");

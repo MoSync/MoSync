@@ -128,12 +128,6 @@ string readFileToString(const char* src) {
 	setName(in, src);
 	beGood(in);
 
-	streamoff size;
-	in.seekg(0, ios_base::end);
-	size = in.tellg();
-	in.seekg(0, ios_base::beg);
-	beGood(in);
-
 	ostringstream oss;
 	oss << in.rdbuf();
 	beGood(in);

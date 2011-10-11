@@ -49,7 +49,7 @@ typedef long int ssize_t;
 
 #define PFZT PFZT_PREFIX "u"
 #if defined(__GNUC__) && (__GNUC__ == 4) && defined(WIN32)
-# define PFSZT "li"
+# define PFSZT "i"
 #else
 # define PFSZT PFZT_PREFIX "i"
 #endif

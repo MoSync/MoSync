@@ -69,14 +69,14 @@ int InitSymbolTable(void)
 
 	if (!SymTab)
 		return 0;
-	
+
 	Sym = SymTab;
 	n = SYMMAX;
 
 	do
 	{
 		Sym->Section	= 0;
-		Sym->Name		= NULL;	
+		Sym->Name		= NULL;
 		Sym->LocalScope	= 0;
 		Sym->LabelType	= 0;
 		Sym->VirtualIndex = 0;
@@ -97,7 +97,7 @@ int InitSymbolTable(void)
 	NextFreeSym = SymTab;
 	NextSymbolCount = 0;
 
-	SymbolCount = 0;	
+	SymbolCount = 0;
 	return 1;
 }
 
@@ -116,7 +116,7 @@ void CloseSymbolTable(void)
 
 	if (SymTab)
 		DisposePtr((char *) SymTab);
-		
+
 	SymTab = 0;
 }
 
@@ -131,7 +131,7 @@ void DisposeSymbols()
 	SYMBOL *Sym = SymTab;
 
 	n = SYMMAX;
-	
+
 	do
 	{
 		DelSymbol(Sym);
@@ -163,7 +163,7 @@ SYMBOL * FreeSymbol(void)
 	SYMBOL *Sym = SymTab;
 
 	n = SYMMAX;
-	
+
 	do
 	{
 		if (Sym->Section == 0 )
@@ -189,9 +189,9 @@ void ClearSymbolFlags(int bits)
 	SYMBOL *Sym = SymTab;
 	int	n;
 	int mask = ~bits;
-	
+
 	n = SYMMAX;
-	
+
 	do
 	{
 		Sym->Flags &= mask;
@@ -212,9 +212,9 @@ SYMBOL * GetSymbol(int num)
 
 	if (num > SYMMAX)
 		return NULL;
-	
+
 	Sym = &SymTab[num];
-	
+
 	if (Sym->Section == 0 )
 		return NULL;
 
@@ -232,9 +232,9 @@ int HashSymbol(char *string, int scope, int section)
 {
 	uint v, n;
 	uint len;
-	
+
 	len = strlen(string);
-	
+
 	v = 41;
 	v += HASHFUNC(scope);
 	v += HASHFUNC(section);
@@ -249,7 +249,7 @@ int HashSymbol(char *string, int scope, int section)
 //****************************************
 //  *Symbol	FindSymbols (Ptr string)
 //
-//	Trys to find the Symbol at *string 
+//	Trys to find the Symbol at *string
 // (ASCZ terminated) returns a Ptr to a
 //  Symbol containing the Symbol data.
 // if NULL returned then the Symbol
@@ -275,11 +275,11 @@ SYMBOL * FindSymbolsOld(char *string,int sectionStart,int sectionEnd)
 
 		if (Sym == 0)
 			return NULL;
-			
+
 		if (elem == -1)
 			return NULL;
 
-		if ( (Sym->Len == len) && 
+		if ( (Sym->Len == len) &&
 			 (Sym->Section != 0)  &&
 			 (Sym->Section >= sectionStart) &&
 			 (Sym->Section <= sectionEnd) &&
@@ -312,7 +312,7 @@ SYMBOL * FindSymbolsOld(char *string,int sectionStart,int sectionEnd)
 	n=SYMMAX;
 	do
 	{
-		if ( (Sym->Len == len) && 
+		if ( (Sym->Len == len) &&
 			 (Sym->Section != 0)  &&
 			 (Sym->Section >= sectionStart) &&
 			 (Sym->Section <= sectionEnd) &&
@@ -335,7 +335,7 @@ SYMBOL * FindSymbolsOld(char *string,int sectionStart,int sectionEnd)
 //****************************************
 //  *Symbol	FindSymbols (Ptr string)
 //
-//	Trys to find the Symbol at *string 
+//	Trys to find the Symbol at *string
 // (ASCZ terminated) returns a Ptr to a
 //  Symbol containing the Symbol data.
 // if NULL returned then the Symbol
@@ -363,12 +363,12 @@ SYMBOL * FindSymbols(char *string,int sectionStart,int sectionEnd, int scope)
 
 		if (Sym == 0)
 			return NULL;
-			
+
 		if (elem == -1)
 			return NULL;
 
 		if ( (Sym->LocalScope == scope) &&
-			 (Sym->Len == len) && 
+			 (Sym->Len == len) &&
 			 (Sym->Section != 0)  &&
 			 (Sym->Section >= sectionStart) &&
 			 (Sym->Section <= sectionEnd) &&
@@ -403,7 +403,7 @@ SYMBOL * FindSymbols(char *string,int sectionStart,int sectionEnd, int scope)
 	do
 	{
 		if ( (Sym->LocalScope == scope) &&
-			 (Sym->Len == len) && 
+			 (Sym->Len == len) &&
 			 (Sym->Section != 0)  &&
 			 (Sym->Section >= sectionStart) &&
 			 (Sym->Section <= sectionEnd) &&
@@ -454,7 +454,7 @@ SYMBOL * ReverseFindSymbols(int v,int sectionStart,int sectionEnd)
 //****************************************
 //  *Symbol	FindNextSymbol (Ptr string)
 //
-//	Trys to find the next Symbol at *string 
+//	Trys to find the next Symbol at *string
 // (ASCZ terminated) returns a Ptr to a
 //  Symbol containing the Symbol data.
 // if NULL returned then the Symbol
@@ -468,7 +468,7 @@ SYMBOL * FindNextSymbol(SYMBOL *Sym,char *string,int sectionStart,int sectionEnd
 
 	n = LastSymCount - 1;
 	Sym++;
-	
+
 	if (n <= 0)
 		return NULL;
 
@@ -509,7 +509,7 @@ SYMBOL * StoreSymbol(SYMBOL *NewSym,char *string)
 	int entry;
 
 	StringLen = strlen(string) + 1;	// Get length of string
-	
+
 	// if there was not Symbol space quit
 
 	if (Sym == NULL)
@@ -585,9 +585,9 @@ SYMBOL * DeclareEnum(char *ThisName,int Value,short Section)
 {
 	SYMBOL	sym;
 	SYMBOL	*Sym;
-		
+
 	Sym = FindSymbols(ThisName,section_Enum,section_Enum);
-	
+
 	if (Sym)
 	{
 		Sym->Size	= Value;			// Revalue enum
@@ -611,13 +611,13 @@ SYMBOL * DefineGlobal(char *ThisName,int Value)
 {
 	SYMBOL	sym;
 	SYMBOL	*theSym;
-	
+
 	theSym = FindSymbols(ThisName,section_Global,section_Global, 0);
-	
+
 	if (theSym)
 	{
 		// Allow redefinition
-		
+
 		theSym->Size = Value;
 		theSym->Type = 0;
 		return theSym;
@@ -639,9 +639,9 @@ SYMBOL * DefineExtern(char *ThisName)
 {
 	SYMBOL	sym;
 	SYMBOL	*theSym;
-	
+
 	theSym = FindSymbols(ThisName,section_Extern,section_Extern, LocalScope);
-	
+
 	if (theSym)
 		Error("External symbol '%s' has already been defined", ThisName);
 
@@ -665,17 +665,17 @@ SYMBOL * RedefENum(char *ThisName,int Value)
 	char	str[32];
 
 	// Build string
-	
+
 	sprintf(str, "%i", Value);
-	
+
 	// see if the symbols exists
-	
+
 	theSym = FindSymbolsOld(ThisName,section_Script,section_Script);
-	
+
 	if (theSym)
 	{
 		// Allow redefinition
-		
+
 		theSym->Value = Value;
 		theSym->Interface = CreateRedefString(str, theSym->Interface);
 		return theSym;
@@ -698,13 +698,13 @@ SYMBOL * RedefENumString(char *ThisName, char *str)
 {
 	SYMBOL	sym;
 	SYMBOL	*theSym;
-	
+
 	theSym = FindSymbolsOld(ThisName,section_Script,section_Script);
-	
+
 	if (theSym)
 	{
 		// Allow redefinition
-		
+
 		theSym->Interface = CreateRedefString(str, theSym->Interface);
 
 		if (isdigit(*str))
@@ -712,7 +712,7 @@ SYMBOL * RedefENumString(char *ThisName, char *str)
 
 		return theSym;
 	}
-	
+
 	// Create new string
 
 	sym.Section		= section_Script;
@@ -723,7 +723,7 @@ SYMBOL * RedefENumString(char *ThisName, char *str)
 
 	if (isdigit(*str))
 		sym.Value = atoi(str);
-	
+
 	return	StoreSymbol(&sym,ThisName);
 }
 
@@ -737,7 +737,7 @@ char * CreateRedefString(char *str, char *ref)
 
 	int newlen = strlen(str) + 1;
 	int reflen;
-	
+
 	// New strings don't have a previous reference, so create new
 
 	if (!ref)
@@ -752,21 +752,21 @@ char * CreateRedefString(char *str, char *ref)
 			return ref;
 		}
 
-		strcpy(newstr, str);		
+		strcpy(newstr, str);
 		return newstr;
 	}
-	
+
 	// Must be an existing ref
-	
+
 	reflen = strlen(ref) + 1;		// get the current allocated length
 
 	// Do we have a large enough string already ?
-	
+
 	if (reflen >= newlen)
 	{
 		// We don't need to reallocate becuase the existing
 		// space is big enough
-		
+
 		strcpy(ref, str);
 		return ref;
 	}
@@ -782,13 +782,13 @@ char * CreateRedefString(char *str, char *ref)
 		Error(Error_Fatal, "Could'nt allocate string");
 		return ref;
 	}
-	
+
 	strcpy(newstr, str);
 
 	// Delete the old ref
 
 	DisposePtr(ref);
-	
+
 	return newstr;
 }
 
@@ -799,12 +799,12 @@ char * CreateRedefString(char *str, char *ref)
 int SymbolExists(char *ThisName, int sect, int scope)
 {
 	SYMBOL	*theSym;
-	
+
 	if (scope != -1)
 		theSym = FindSymbols(ThisName, sect, sect, scope);
 	else
 		theSym = FindSymbolsOld(ThisName, sect, sect);
-	
+
 	if (theSym)
 		return 1;
 
@@ -821,9 +821,9 @@ SYMBOL * AddSysCall(char *ThisName, int Value, int Param, int RetType, char *ist
 	SYMBOL	*theSym;
 	char	*iptr = 0;
 	int		len;
-		
+
 	theSym = FindSymbolsOld(ThisName,section_SysCall,section_SysCall);
-	
+
 	if (theSym)
 		Error(Error_Fatal, "SysCall '%s' has already been defined", ThisName);
 
@@ -831,7 +831,7 @@ SYMBOL * AddSysCall(char *ThisName, int Value, int Param, int RetType, char *ist
 	{
 		len = strlen(istr);
 		iptr = NewPtr(len + 2);
-		
+
 		if (!iptr)
 			Error(Error_Fatal, "failed to allocate syscall interface");
 
@@ -857,9 +857,9 @@ SYMBOL * AddToken(char *ThisName,int Value)
 {
 	SYMBOL	sym;
 	SYMBOL	*theSym;
-	
+
 	theSym = FindSymbolsOld(ThisName,section_Token,section_Token);
-	
+
 	if (theSym)
 		Error(Error_Fatal, "Token '%s' has already been defined", ThisName);
 
@@ -880,10 +880,10 @@ SYMBOL * AddToken(char *ThisName,int Value)
 SYMBOL * AddFileSym(char *ThisName,int Value)
 {
 	SYMBOL	sym;
-	
+
 	if (Pass != 1)
 		return 0;
-		
+
 	sym.Section		= section_File;
 	sym.Type		= 0;
 	sym.Value		= Value;
@@ -914,20 +914,20 @@ int Get_SLD_FileNo(char *ThisName)
 	SYMBOL	*theSym;
 	int n;
 	int len;
-	
+
 	len = strlen(ThisName);
-	
+
 	for (n=0;n<len;n++)
 	{
 		if (ThisName[n] == '/')
 			ThisName[n] = '\\';
 	}
-	
+
 	theSym = FindSymbolsOld(ThisName,section_SLD_File,section_SLD_File);
-	
+
 	if (theSym)
 		return theSym->Value;
-		
+
 	sym.Section		= section_SLD_File;
 	sym.Type		= LocalScope;				// Was 0
 	sym.Value		= Current_SLD_FileNo++;
@@ -1010,7 +1010,7 @@ int GetEnumValue(char *ThisName)
 	if (ThisName[0] == '%')
 	{
 		int v;
-		
+
 		PushTokenPtr(ThisName, 0);
 
 		if (!Token("%"))
@@ -1022,7 +1022,7 @@ int GetEnumValue(char *ThisName)
 			Error(Error_Fatal, "Missing Thunk Number");
 
 		PopTokenPtr();
-	
+
 		theSym = GetThunk(v);
 
 		if (!theSym)
@@ -1034,19 +1034,19 @@ int GetEnumValue(char *ThisName)
 			doCannotEvaluate(ThisName+1);
 			return 0;
 		}
-		
+
 		SetLastSymbolRef(theSym);
 		return theSym->Value;
 	}
 
 	// Now deal with all other symbols
-	
+
 	theSym = FindSymbols(ThisName,section_Enum,section_Enum, LocalScope);
-		
+
 	if (theSym)			// Variable was found in local scope
 	{
 		// Add one more reference to this symbol
-		
+
 		//theSym->Ref++;
 
 		SetLastSymbolRef(theSym);
@@ -1059,17 +1059,17 @@ int GetEnumValue(char *ThisName)
 	else
 	{
 		// Variable wasnt found is local scope, so check global scope
-		
+
 		theSym = FindSymbols(ThisName,section_Enum,section_Enum, 0);
 
 		if (theSym)
 		{
 			// Found a global, so extract the scope of this global
-			
+
 			scope = theSym->Value;
 
 			theSym = FindSymbols(ThisName,section_Enum,section_Enum, scope);
-		
+
 			if (theSym)
 			{
 				// Add one more reference to this symbol
@@ -1104,19 +1104,19 @@ int GetGlobalValue(char *ThisName)
 {
 	SYMBOL	*theSym;
 	int 	scope;
-	
+
 	// Variable wasnt found is local scope, so check global scope
-	
+
 	theSym = FindSymbols(ThisName,section_Enum,section_Enum, 0);
 
 	if (theSym)
 	{
 		// Found a global, so extract the scope of this global
-		
+
 		scope = theSym->Value;
 
 		theSym = FindSymbols(ThisName,section_Enum,section_Enum, scope);
-	
+
 		if (theSym)
 			return theSym->Value;
 	}
@@ -1132,19 +1132,19 @@ SYMBOL * GetGlobalSym(char *ThisName)
 {
 	SYMBOL	*theSym;
 	int 	scope;
-	
+
 	// Variable wasnt found is local scope, so check global scope
-	
+
 	theSym = FindSymbols(ThisName,section_Enum,section_Enum, 0);
 
 	if (theSym)
 	{
 		// Found a global, so extract the scope of this global
-		
+
 		scope = theSym->Value;
 
 		theSym = FindSymbols(ThisName,section_Enum,section_Enum, scope);
-	
+
 		if (theSym)
 			return theSym;
 	}
@@ -1169,13 +1169,13 @@ void DumpEnumEntry(SYMBOL *Sym)
 #if 0
 	if (Sym < SymTab)
 		return;
-		
+
 	if ((int) Sym >= (int)((int) SymTab + sizeof(SYMBOL) * SYMMAX) )
 		return;
 #endif
 
 	if ((Sym->Section == section_Enum) && (Sym->LocalScope != 0))
-	{				
+	{
 		if ((Sym->Flags & SymFlag_Ref) == 0)
 			printf("*Unref* ");
 
@@ -1190,9 +1190,9 @@ void DumpEnumEntry(SYMBOL *Sym)
 
 		printf("0x%s ",Hex32(Sym->Value));
 		printf("- 0x%s ",Hex32(Sym->EndIP));
-						
+
 		printf("'%s'",Sym->Name);
-		
+
 		switch(Sym->LabelType)
 		{
 			case label_Local:
@@ -1202,7 +1202,7 @@ void DumpEnumEntry(SYMBOL *Sym)
 			case label_Function:
 			printf(" (Function)(%d)", Sym->Params);
 			break;
-			
+
 			case label_Virtual:
 			printf(" (Virtual Function 0x%x)(%d)", Sym->VirtualIndex, Sym->Params);
 			break;
@@ -1260,7 +1260,7 @@ void DumpSymbols(int unref_only)
 		{
 			DumpEnumEntry(Sym);
 		}
-		
+
 		Sym++;
 	}
 	while(--n);
@@ -1274,7 +1274,7 @@ void DumpSymbols(int unref_only)
 	do
 	{
 		if (Sym->Section == section_File)
-		{				
+		{
 				printf("Scope %2d ",Sym->Value);
 				printf("File '%s' ",Sym->Name);
 				printf("\n");
@@ -1298,14 +1298,14 @@ void SortVirtuals()
 {
 	SYMBOL	*Sym;
 	int		n, i, vCount;
-	
+
 	vCount = GetVirtualIndex();
 
 	if (!vCount)
 		return;
 
 //	printf("\nVIRTUALS (%d)\n\n", vCount);
-	
+
 	vtable = (int *) NewPtrClear((vCount+2) * sizeof(int *));
 
 	if (!vtable)
@@ -1317,7 +1317,7 @@ void SortVirtuals()
 	do
 	{
 		if ((Sym->Section == section_Enum) && (Sym->LocalScope != 0))
-		{				
+		{
 			if (Sym->LabelType == label_Virtual)
 			{
 				i = Sym->VirtualIndex & 0xffff;
@@ -1372,7 +1372,7 @@ int CountUsedSymbols()
 	{
 		if (Sym->Section)
 			SymCount++;
-	
+
 		Sym++;
 	}
 	while(--n);
@@ -1400,7 +1400,7 @@ char * GetFileNumString(int file)
 			if (Sym->Value == file)
 				return Sym->Name;
 		}
-	
+
 		Sym++;
 	}
 	while(--n);
@@ -1423,7 +1423,7 @@ char * GetFileIdString(int id)
 			if (Sym->Type == id)
 				return Sym->Name;
 		}
-	
+
 		Sym++;
 	}
 	while(--n);
@@ -1471,14 +1471,14 @@ void DumpIPTrans()
 				MustConvertPaths = 1;
 				LastSLDSym = Sym;
 			}
-		
+
 			if(MustConvertPaths) {
 				char *ParentPath = GetFileIdString(Sym->Type);
-				GetRelPath(ParentPath); 
+				GetRelPath(ParentPath);
 				len = strlen(Sym->Name);
 #define IS_SLASH(c) ((c)=='/' || (c)=='\\')
 				if((len>2 && Sym->Name[1]==':' && IS_SLASH(Sym->Name[2])) || (len>0 && IS_SLASH(Sym->Name[0]))) {
-					
+
 				} else {
 					SymName = AddRelPrefix(Sym->Name);
 				}
@@ -1493,7 +1493,7 @@ void DumpIPTrans()
 						i++;
 					}
 					temp[j++] = '/';
-				} else 
+				} else
 					temp[j++] = SymName[i];
 			}
 
@@ -1501,19 +1501,19 @@ void DumpIPTrans()
 
 			fprintf(SldFile, "%d:%d:%s\n", Sym->Value, Sym->Type, temp);
 		}
-	
+
 		Sym++;
 	}
 	while(--n);
 
 	fprintf(SldFile, "SLD\n");
-	
+
 	if (!SLD_Line_Array.array)
 		return;
 
 	for (n=SLD_Line_Array.lo;n<SLD_Line_Array.hi+1;n++)
 	{
-	
+
 		line = ArrayGet(&SLD_Line_Array, n);
 		file= ArrayGet(&SLD_File_Array, n);
 
@@ -1529,7 +1529,7 @@ void DumpIPTrans()
 	Dump_MasterIP_Trans(SldFile);
 
 	fprintf(SldFile, "END\n");
-	
+
 	fclose(SldFile);
 	return;
 }
@@ -1631,7 +1631,7 @@ void DumpMetaData ( FILE *out )
 {
 	SYMBOL	*Sym;
 	int lastVal = -1;
-	int lastEnd = -1;
+	//int lastEnd = -1;
 	int		n;
 	static char *returnType[RET_double+1];
 
@@ -1663,14 +1663,14 @@ void DumpMetaData ( FILE *out )
 			}
 
 			lastVal = Sym->Value;
-			lastEnd = Sym->EndIP;
+			//lastEnd = Sym->EndIP;
 		}
 		/*
 		else if (((Sym->LabelType == label_Local))
 			&& (Sym->Section == section_Enum) && (Sym->Type == SECT_code))
 		{
 			if(Sym->Value <= lastEnd) {
-				// Skip debug labels				
+				// Skip debug labels
 				if (! IsDebugLabel( Sym->Name ) )
 				{
 					fprintf(out, "L<%s,",Sym->Name);
@@ -1683,7 +1683,7 @@ void DumpMetaData ( FILE *out )
 		else if ((Sym->Section == section_SysCall))
 		{
 			fprintf(out, "S<%s,", Sym->Name);
-			fprintf(out, "%s,", Hex32(Sym->Value));			
+			fprintf(out, "%s,", Hex32(Sym->Value));
 			fprintf(out, "%d,", Sym->Params > 4 ? 4 : Sym->Params );
 			fprintf(out, "%s", returnType[(int)(Sym->RetType)]);
 			fprintf(out, ">\n");
@@ -1781,7 +1781,7 @@ void Dump_MasterIP_Trans(FILE *out)
 	line = 0;
 
 	fprintf(out, "\nLINEIP\n");
-	
+
 	if (!AsmCharArray.array)
 		return;
 
@@ -1823,7 +1823,7 @@ void Dump_MasterIP_Trans(FILE *out)
 	while(1)
 	{
 		c = FileTop[offset];
-					
+
 		if (c == 0x00)
 			break;
 
@@ -1853,7 +1853,7 @@ void DumpEnumEntry(SYMBOL *Sym)
 
 
 	if ((Sym->Section == section_Enum) && (Sym->LocalScope != 0))
-	{				
+	{
 		if ((Sym->Flags & SymFlag_Ref) == 0)
 			printf("*Unref* ");
 
@@ -1868,9 +1868,9 @@ void DumpEnumEntry(SYMBOL *Sym)
 
 		printf("0x%s ",Hex32(Sym->Value));
 		printf("- 0x%s ",Hex32(Sym->EndIP));
-						
+
 		printf("'%s'",Sym->Name);
-		
+
 		switch(Sym->LabelType)
 		{
 			case label_Local:
@@ -1880,7 +1880,7 @@ void DumpEnumEntry(SYMBOL *Sym)
 			case label_Function:
 			printf(" (Function)(%d)", Sym->Params);
 			break;
-			
+
 			case label_Virtual:
 			printf(" (Virtual Function 0x%x)(%d)", Sym->VirtualIndex, Sym->Params);
 			break;

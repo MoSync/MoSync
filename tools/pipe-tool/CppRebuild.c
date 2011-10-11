@@ -773,7 +773,6 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 {
 	int param_count, need_comma, n;
 	int rettype = ref->RetType;
-	int regs;
 
 	CppEmitReturnType(rettype);
 
@@ -785,8 +784,6 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 		param_count = 4;
 
 	need_comma = 0;
-
-	regs = funcprop.reg_used;
 
 	for (n=0;n<param_count;n++)
 	{

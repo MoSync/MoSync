@@ -70,7 +70,7 @@ namespace MoRE {
 		return surf;
 	}
 
-	GenericSkin::GenericSkin(const DeviceProfile* profile) 
+	GenericSkin::GenericSkin(const DeviceProfile* profile)
 		:
 		DeviceSkin(profile),
 		mPressedKey(0),
@@ -81,19 +81,19 @@ namespace MoRE {
 
 	bool GenericSkin::init() {
 		const char *dir = getenv("MOSYNCDIR");
-		
+
 		if(!dir) return false;
 
-		if(!sSkinImage) 
+		if(!sSkinImage)
 			sSkinImage        = loadPNGImage((std::string(dir)+"/skins/skinImage.png").c_str());
 		if(!sSkinImage) return false;
-		if(!sSelectedKeypad) 
+		if(!sSelectedKeypad)
 			sSelectedKeypad   = loadPNGImage((std::string(dir)+"/skins/keypadSelected.png").c_str());
 		if(!sSelectedKeypad) return false;
-		if(!sUnselectedKeypad) 
+		if(!sUnselectedKeypad)
 			sUnselectedKeypad = loadPNGImage((std::string(dir)+"/skins/keypadUnselected.png").c_str());
 		if(!sUnselectedKeypad) return false;
-		if(!sMultiTouchImage) 
+		if(!sMultiTouchImage)
 			sMultiTouchImage = loadPNGImage((std::string(dir)+"/skins/multitouchMarker.png").c_str());
 		if(!sMultiTouchImage) return false;
 
@@ -104,7 +104,7 @@ namespace MoRE {
 		selectedPhone   = createSurface(w, h);
 
 		generatePhone();
-		
+
 		int keysX=0, keysY=0;
 
 		if(mProfile->mKeyboardType == DeviceProfile::DKT_KEYPAD) {
@@ -112,9 +112,9 @@ namespace MoRE {
 			keysY = h - sUnselectedKeypad->h - 24;
 		} else if(mProfile->mKeyboardType == DeviceProfile::DKT_JOYSTICK) {
 			keysX = w/2 - sUnselectedKeypad->w/2;
-			keysY = h - 74 - 24;	
+			keysY = h - 74 - 24;
 		}
-	
+
 #define OFFSET_X (27-keysX)
 #define OFFSET_Y (368-keysY)
 		if(mProfile->mKeyboardType == DeviceProfile::DKT_JOYSTICK || mProfile->mKeyboardType == DeviceProfile::DKT_KEYPAD) {
@@ -149,7 +149,7 @@ namespace MoRE {
 		screenRect.x = w/2 - mProfile->mScreenWidth/2;
 		screenRect.y = 24;
 		screenRect.w = mProfile->mScreenWidth;
-		screenRect.h = mProfile->mScreenHeight;	
+		screenRect.h = mProfile->mScreenHeight;
 
 		windowRect.x = 0;
 		windowRect.y = 0;
@@ -163,7 +163,7 @@ namespace MoRE {
 		int w =  mProfile->mScreenWidth + 48;
 		return w > 260 ? w : 260;
 	}
-	
+
 	int GenericSkin::getWindowHeight() const {
 		int extra = 0;
 
@@ -239,7 +239,7 @@ namespace MoRE {
 		SDL_SetClipRect(getWindowSurface(), &clipRect);
 
 		//Base::pixelDoubledBlit(0, 0, getWindowSurface(), unselectedPhone, unselectedPhone->clip_rect, 1);
-				
+
 		// draw screen
 
 		//fillRect(width/2 - mProfile->mScreenWidth/2, 24, mProfile->mScreenWidth, mProfile->mScreenHeight, 0xff00ff);
@@ -249,7 +249,7 @@ namespace MoRE {
 	void GenericSkin::drawScreen() const {
 		//int width  = getWindowWidth();
 		//fillRect(width/2 - mProfile->mScreenWidth/2, 24, mProfile->mScreenWidth, mProfile->mScreenHeight, 0xff00ff);
-		
+
 		SDL_Rect clipRect;
 		SDL_GetClipRect(getWindowSurface(), &clipRect);
 		SDL_SetClipRect(getWindowSurface(), &windowRect);
@@ -289,7 +289,7 @@ namespace MoRE {
 
 		SDL_BlitSurface(sMultiTouchImage, NULL, getWindowSurface(), &dstRect);
 
-		SDL_UpdateRect(getWindowSurface(), windowRect.x, windowRect.y, 
+		SDL_UpdateRect(getWindowSurface(), windowRect.x, windowRect.y,
 											windowRect.w, windowRect.h);
 
 		SDL_SetClipRect(getWindowSurface(), &clipRect);
@@ -297,7 +297,7 @@ namespace MoRE {
 
 	void GenericSkin::skinPhone(SDL_Surface* surface, SDL_Surface* keypad) const {
 		//surface = getWindowSurface();
-		
+
 		SDL_Rect srcRect;
 		SDL_Rect dstRect;
 
@@ -460,13 +460,6 @@ namespace MoRE {
 			SDL_BlitSurface(keypad, &srcRect2, surface, &dstRect2);
 		}
 		else if(mProfile->mKeyboardType == DeviceProfile::DKT_JOYSTICK) {
-			SDL_Rect srcRect2, dstRect2;
-			srcRect2.x = 0;
-			srcRect2.y = 0;
-			dstRect2.w = srcRect2.w = sUnselectedKeypad->w;
-			dstRect2.h = srcRect2.h = 74;
-			dstRect2.x = width/2 - sUnselectedKeypad->w/2;
-			dstRect2.y = height - 74 - 24;
 			SDL_BlitSurface(keypad, &srcRect, surface, &dstRect);
 		}
 
@@ -506,14 +499,14 @@ namespace MoRE {
 		*/
 
 	}
-	
+
 	void GenericSkin::rotateCW() {
 	}
-	
+
 	void GenericSkin::rotateCCW() {
-	
+
 	}
-	
+
 	void GenericSkin::mouseDragged(int x, int y) {
 		if(mPressedKey) return;
 
@@ -537,7 +530,7 @@ namespace MoRE {
 			}
 		}
 	}
-	
+
 	void GenericSkin::mousePressed(int x, int y) {
 		if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
 			y>=screenRect.y && y<screenRect.y+screenRect.h) {
@@ -557,7 +550,7 @@ namespace MoRE {
 			}
 		}
 	}
-	
+
 	void GenericSkin::mouseReleased(int x, int y) {
 		if(mTouchedInside) {
 			mTouchedInside = false;
@@ -590,19 +583,19 @@ namespace MoRE {
 
 				// Calculates the delta movement from the mouse
 				// and adds the same distance to the mirrored touch event
-				mLastKnownMousePosition[1].first += 
+				mLastKnownMousePosition[1].first +=
 							( mLastKnownMousePosition[0].first - xPosition);
-				mLastKnownMousePosition[1].second += 
+				mLastKnownMousePosition[1].second +=
 							( mLastKnownMousePosition[0].second - yPosition);
 
 				mListener->onMoSyncPointerDrag(x-screenRect.x,
 												y-screenRect.y, 0);
 
 				mListener->onMoSyncPointerDrag(
-											mLastKnownMousePosition[1].first, 
+											mLastKnownMousePosition[1].first,
 											mLastKnownMousePosition[1].second,
 											1);
-				
+
 				mLastKnownMousePosition[0].first = xPosition;
 				mLastKnownMousePosition[0].second = yPosition;
 
@@ -620,7 +613,7 @@ namespace MoRE {
 			}
 		}
 	}
-	
+
 	void GenericSkin::mouseMultiPressed(int x, int y) {
 		if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
 			y>=screenRect.y && y<screenRect.y+screenRect.h) {
@@ -656,7 +649,7 @@ namespace MoRE {
 			}
 		}
 	}
-	
+
 	void GenericSkin::mouseMultiReleased(int x, int y) {
 		if(mTouchedInside) {
 			mTouchedInside = false;
@@ -669,9 +662,9 @@ namespace MoRE {
 
 			if( x>=screenRect.x && x<screenRect.x+screenRect.w &&
 				y>=screenRect.y && y<screenRect.y+screenRect.h) {
-					mListener->onMoSyncPointerRelease(x-screenRect.x, 
+					mListener->onMoSyncPointerRelease(x-screenRect.x,
 														y-screenRect.y, 0);
-					mListener->onMoSyncPointerRelease(x-screenRect.x, 
+					mListener->onMoSyncPointerRelease(x-screenRect.x,
 														y-screenRect.y, 1);
 					return;
 			}
@@ -723,7 +716,7 @@ namespace MoRE {
 
 				SDL_Rect src = { (Sint16)keyRects[i].x, (Sint16)keyRects[i].y,
 					(Uint16)keyRects[i].w, (Uint16)keyRects[i].h };
-				SDL_BlitSurface(unselectedPhone, &src, getWindowSurface(), &src);	
+				SDL_BlitSurface(unselectedPhone, &src, getWindowSurface(), &src);
 				SDL_UpdateRect(getWindowSurface(), src.x, src.y, src.w, src.h);
 				SDL_SetClipRect(getWindowSurface(), &clipRect);
 				return;
@@ -734,10 +727,10 @@ namespace MoRE {
 	DeviceSkin* GenericSkinFactory::createInstanceFor(const DeviceProfile* dp) const {
 		return new GenericSkin(dp);
 	}
-	
+
 	SkinFactory::Fitness GenericSkinFactory::getFitnessFor(const DeviceProfile* dp) const {
 		return SkinFactory::SKIN_FITNESS_COMPATIBLE;
 	}
 
-	
+
 }

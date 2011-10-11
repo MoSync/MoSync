@@ -34,7 +34,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 
 //****************************************
-//	
+//
 //****************************************
 
 void RebuildInit()
@@ -51,7 +51,7 @@ void Peeper(uchar *ip, uchar *ip_end)
 	uchar *start_ip = ip;
 	int n;
 	int op_count = 0;
-	
+
 	for (n=0;n<4;n++)
 	{
 		if (ip > ip_end)
@@ -70,13 +70,13 @@ void Peeper(uchar *ip, uchar *ip_end)
 	while(1)
 	{
 /*
-	ld r0,r14	
-	ld r1,r15	
-	ld r14,r0	
-	ld r15,r1	
+	ld r0,r14
+	ld r1,r15
+	ld r14,r0
+	ld r15,r1
 */
 		// All are ldr
-		
+
 		if (opi[0].op != _LDR)
 			break;
 		if (opi[1].op != _LDR)
@@ -119,15 +119,15 @@ void Peeper(uchar *ip, uchar *ip_end)
 		*start_ip++ = 0;
 		return;
 	}
-	
-	
+
+
 	// Register to register switches
-	
+
 	while(1)
 	{
 /*
-		ld r0,r1	
-		ld r1,r0	
+		ld r0,r1
+		ld r1,r0
 */
 		// All are ldr
 
@@ -153,14 +153,14 @@ void Peeper(uchar *ip, uchar *ip_end)
 		*start_ip++ = 0;
 		return;
 	}
-	
-	
+
+
 	//memset(start_ip, 0, start_ip - ip);
 }
 
 
 //***************************************
-// 
+//
 //***************************************
 
 void RebuildEmit(char *Template, ...)
@@ -168,7 +168,7 @@ void RebuildEmit(char *Template, ...)
 		char 	Str[1024];
 		va_list args;
 		int n,len;
-		
+
 		va_start(args,Template);
 		vsprintf(Str,Template,args);
 		va_end(args);
@@ -176,7 +176,7 @@ void RebuildEmit(char *Template, ...)
 		//printf("%s",Str);
 
 		len = strlen(Str);
-		
+
 		for (n=0;n<len;n++)
 			ArrayAppend(&RebuildArray, Str[n]);
 
@@ -222,7 +222,7 @@ void RebuildFunc(SYMBOL *sym)
 	SYMBOL *ref;
 
 	uchar *ip, *ip_end, *ip_last;
-	
+
 	int real_ip;
 	char str[256];
 
@@ -264,12 +264,12 @@ void RebuildFunc(SYMBOL *sym)
 	while(1)
 	{
 		ip_last = ip;
-		
+
 		if (ip > ip_end)
 			break;
 
 		// Print labels
-		
+
 		ref = (SYMBOL *) ArrayGet(&CodeLabelArray, real_ip);
 
 		if (ref)
@@ -279,7 +279,7 @@ void RebuildFunc(SYMBOL *sym)
 		}
 
 		RebuildEmitStabs(real_ip);
-	
+
 //		Peeper(ip, ip_end);
 
 		if (ArgSkipElim == 0)
@@ -297,17 +297,17 @@ void RebuildFunc(SYMBOL *sym)
 
 		if (ArgDebugRebuild)
 		{
-			int len = 4 + strlen(str);		
+			int len = 4 + strlen(str);
 			str[0] = 0;
-			
+
 			while(len < 40)
 			{
 				RebuildEmit(" ", str);
 				len++;
 			}
-			
+
 			RebuildEmit("; 0x%x - ", real_ip);
-			
+
 			DisassembleFromSource(real_ip, str);
 			RebuildEmit("%s", str);
 		}
@@ -315,7 +315,7 @@ void RebuildFunc(SYMBOL *sym)
 		RebuildEmit("\n");
 
 		// Check for case statement, which need case data after them
-		
+
 		if (CaseRef)
 		{
 			RebuildEmit(".data\n");
@@ -323,7 +323,7 @@ void RebuildFunc(SYMBOL *sym)
 			RebuildEmit(".code\n");
 		}
 
-		real_ip += (ip - ip_last);	
+		real_ip += (ip - ip_last);
 	}
 }
 
@@ -341,7 +341,7 @@ void RebuildEmitStabs(int ip)
 	int line  = ArrayGet(&SLD_Line_Array, ip);
 	int file = ArrayGet(&SLD_File_Array, ip);
 	char *FileStr;
-	
+
 	if (line == 0)
 		return;
 
@@ -405,7 +405,7 @@ int Rebuild_CanMoveToBss(int ip, int len)
 	for (n=ip;n<ip+len;n++)
 	{
 		// if a symbol exists in this data, don't optimize
-		
+
 		thisSym = (SYMBOL *) ArrayGet(&DataArray, n);
 
 		if (thisSym)
@@ -429,17 +429,16 @@ void Rebuild_Data(SYMBOL *sym)
 	SYMBOL *thisSym;
 
 	//uint ta = 0;
-	
+
 	int ip;
 	int len;
 	int n;
-	int c;
 	int left;
 	int align;
 	int opt_bss;
 
 	// decode the field
-	
+
 	ip = sym->Value;
 
 	if (sym->Type == SECT_bss)
@@ -456,7 +455,7 @@ void Rebuild_Data(SYMBOL *sym)
 	// Mark as done
 
 	ArraySet(&LabelDone, ip, 1);
-	
+
 	if (!len)
 	{
 		len = FindLabelExtent(ip);
@@ -476,13 +475,13 @@ void Rebuild_Data(SYMBOL *sym)
 	}
 
 	align = ArrayGet(&DataAlignArray, ip);
-	
+
 	if (sym->Type == SECT_bss)
 	{
 		RebuildEmit("\t.comm %s_%d,%d\n", sym->Name, sym->LocalScope, len);
 		return;
 	}
-	
+
 	if (sym->Type != SECT_data)
 		Error(Error_System, "(Rebuild_Data) Illegal section in data output");
 
@@ -495,10 +494,10 @@ void Rebuild_Data(SYMBOL *sym)
 	{
 		// Make sure bss output is aligned
 		int bss_len = len;
-		
+
 		while(bss_len & 3)
 			bss_len++;
-		
+
 		RebuildEmit("\t.comm %s_%d,%d	//moved to bss\n", sym->Name, sym->LocalScope, bss_len);
 		return;
 	}
@@ -512,8 +511,6 @@ void Rebuild_Data(SYMBOL *sym)
 	RebuildEmit("%s_%d:\n", sym->Name, sym->LocalScope );
 
 	// write array
-
-	c = 0;
 
 	for (n=ip;n<ip+len;n++)
 	{
@@ -536,7 +533,7 @@ void Rebuild_Data(SYMBOL *sym)
 				int addr;
 
 				addr = thisSym->Value;
-	
+
 				if (thisSym->Type == SECT_code)
 				{
 					labref = (SYMBOL *) ArrayGet(&CodeLabelArray, addr);
@@ -561,12 +558,12 @@ void Rebuild_Data(SYMBOL *sym)
 					if (labref == 0)
 						Error(Error_System, "Could not repoint label !!");
 				}
-	
+
 				if(labref == NULL)
 					Error(Error_System, "Broken label");
 
 				RebuildEmit("\t.word %s_%d\n", labref->Name, labref->LocalScope);
-	
+
 				left-=4;
 				n+=3;
 
@@ -628,7 +625,7 @@ void Rebuild_Main()
 	Rebuild_Memory();
 
 	ArrayWrite(&RebuildArray, "rebuild.s");
-} 
+}
 
 //****************************************
 

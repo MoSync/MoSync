@@ -22,7 +22,7 @@ struct InstructionBucket {
 	const char *opName;
 };
 
-std::vector<InstructionBucket> gInstructionUseCount; 
+std::vector<InstructionBucket> gInstructionUseCount;
 
 void countInstructionUse(const char* opName, byte x) {
 	gInstructionUseCount[x].count++;
@@ -49,7 +49,7 @@ void logInstructionUse() {
 		gInstructionUseCount.end(), &Core::VMCoreInt::UDgreater);
 
 	char temp[1024];
-	Base::WriteFileStream use("instruction_use.txt", false);	
+	Base::WriteFileStream use("instruction_use.txt", false);
 	for(int i = 0; i < _ENDOP; i++) {
 		int len = sprintf(temp, "inst %s: %d\n", gInstructionUseCount[i].opName, gInstructionUseCount[i].count);
 		use.write(temp, len);
@@ -67,11 +67,13 @@ byte* RUN_NAME(byte* ip) {
 
 #ifdef _WIN32
 	static LARGE_INTEGER iCounterFreq;
-	static double lastTime;
 	LARGE_INTEGER iCounter;
 	QueryPerformanceFrequency(&iCounterFreq);
 	QueryPerformanceCounter(&iCounter);
-	lastTime = (double)iCounter.QuadPart * 1000.0 / (double)iCounterFreq.QuadPart;	
+#ifdef USE_DELAY
+	static double lastTime;
+	lastTime = (double)iCounter.QuadPart * 1000.0 / (double)iCounterFreq.QuadPart;
+#endif
 #endif	//_WIN32
 
 	//	printf("VM IP at %d\n",(int32_t) ip - (int32_t) mem_cs);
@@ -111,7 +113,7 @@ VMLOOP_LABEL
 			double diff = time-lastTime;
 			double a = DELAY_BATCH_TIME;
 			QueryPerformanceCounter(&iCounter);
-			time = (double)iCounter.QuadPart * 1000.0 / (double)iCounterFreq.QuadPart;				
+			time = (double)iCounter.QuadPart * 1000.0 / (double)iCounterFreq.QuadPart;
 		}
 
 		lastTime = time;
@@ -215,21 +217,21 @@ VMLOOP_LABEL
 
 		OPC(STB)
 		{
-			FETCH_RD_RS_CONST			
+			FETCH_RD_RS_CONST
 			MEM(byte, RD + IMM, WRITE) = RS;
 		}
 		EOP;
 
 		OPC(STH)
 		{
-			FETCH_RD_RS_CONST		
+			FETCH_RD_RS_CONST
 			MEM(unsigned short, RD + IMM, WRITE) = RS;
 		}
 		EOP;
 
 		OPC(STW)
 		{
-			FETCH_RD_RS_CONST			
+			FETCH_RD_RS_CONST
 			MEM(unsigned int, RD + IMM, WRITE) = RS;
 		}
 		EOP;
