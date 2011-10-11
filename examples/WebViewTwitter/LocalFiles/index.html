@@ -58,7 +58,7 @@
 				else
 				{
 					var results = "";
-					if (tweets.length == 0)
+					if ((tweets.length == 0) || (tweets.error == "Not found"))
 					{
 						results = "<li>No tweets could be found check the username!</li>";
 					}
@@ -109,6 +109,11 @@
 			{
 				// Get the username from the input field.
 				var username = document.getElementById("usernameInput").value;
+				if(userName.length == 0)
+				{
+					alert("Invalid username!!!")
+					return;
+				}
 				getTweetsForUser(username)
 			}
 
@@ -161,9 +166,12 @@
 			{
 				// Get the username from the input field
 				var userName = document.getElementById("usernameInput").value;
-				//displayFavoriteUsers("!one!!two!");
-				//return;
 
+				if(userName.length == 0)
+				{
+					alert("Invalid username!!!")
+					return;
+				}
 				var userList;
 
 				readFavoriteUsers(addUser);
