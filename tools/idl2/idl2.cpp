@@ -178,6 +178,9 @@ int main() {
 		copy("Output/MAAPI_consts.java",
 			"../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated/");
 
+		// Copy windows phone file.
+		copy("Output/maapi.cs", "../../runtimes/csharp/windowsphone/mosync/mosync/Source/");
+
 		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
 		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");
 		copy("maapi_defs.h", "../../intlibs/helpers/");
@@ -410,14 +413,22 @@ static void outputMaapiJavascript(const vector<string>& ixs, const Interface& ma
 }
 
 
-static std::string getCSharpType(const Interface& maapi, const std::string& maapiType) {
-	std::string returnType = jType(maapi, maapiType);
+static std::string getCSharpType(const Interface& maapi, const std::string& maapiType, bool in) {
+	std::string resolvedMaapiType = resolveType(maapi, maapiType);
+	if(resolvedMaapiType == "unsigned char" || resolvedMaapiType == "unsigned int" || resolvedMaapiType == "unsigned long"
+		|| resolvedMaapiType == "unsigned short" || resolvedMaapiType == "long int")
+		resolvedMaapiType = "int";
 
-	if(maapiType == "double")
+	if(in == false)
+		resolvedMaapiType += "*";
+
+	std::string returnType = jType(maapi, resolvedMaapiType);
+
+	if(resolvedMaapiType == "double")
 		returnType = "double";
-	else if(maapiType == "float")
+	else if(resolvedMaapiType == "float")
 		returnType = "float";
-	else if(maapiType == "long long")
+	else if(resolvedMaapiType == "long long")
 		returnType = "long";
 	
 	if(returnType == "noreturn")
@@ -431,7 +442,6 @@ static std::string getCSharpType(const Interface& maapi, const std::string& maap
 		returnType = "int";
 	else if(returnType == "MAHandle")
 		returnType = "int";
-
 	return returnType;
 }
 
@@ -445,7 +455,7 @@ static void outputCSharpSyscallArg(ofstream& maapiFile, int i) {
 
 static void outputCSharpIoctlArg(ofstream& maapiFile, int i) {
 	if(i < 3) {
-		maapiFile << ('a'+i);
+		maapiFile << (char)('a'+i);
 	} else {
 		maapiFile << "mCore.GetStackValue(" << ((i-3)<<2) << ")";
 	}
@@ -486,14 +496,14 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 		const Function& f(maapi.functions[j]);
 
 		//maapiFile << "\t\tcase " << f.number << ":\n";
-		std::string returnType = getCSharpType(maapi, f.returnType);
+		std::string returnType = getCSharpType(maapi, f.returnType, true);
 		maapiFile << "\tpublic delegate " << returnType << " Delegate_" << f.name << "(";
 		for(size_t k=0; k<f.args.size(); k++) {
 			const Argument& a(f.args[k]);
 			if(k != 0)
 				maapiFile << ", ";
 
-			std::string argType = getCSharpType(maapi, a.type);
+			std::string argType = getCSharpType(maapi, a.type, a.in);
 			maapiFile << argType << " _" << a.name;
 		}
 		maapiFile << ");\n";
@@ -518,7 +528,7 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 
 		maapiFile << "\t\t\tcase " << f.number << ":\n";
 
-		std::string returnType = getCSharpType(maapi, f.returnType);
+		std::string returnType = getCSharpType(maapi, f.returnType, true);
 		maapiFile << "\t\t\t";
 		if(returnType != "noreturn" && returnType != "void")
 			maapiFile << "mCore.SetReturnValue(";
@@ -528,9 +538,10 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 		int i = 0;
 		for(size_t k=0; k<f.args.size(); k++) {
 			const Argument& a(f.args[k]);
+			std::string argType = getCSharpType(maapi, a.type, a.in);
 			if(k != 0)
 				maapiFile << ", ";
-			if(a.type == "double") {
+			if(argType == "double") {
 				//maapiFile << "this.regs[Reg.i" << i << "], ";
 				maapiFile << "MoSync.Util.ConvertToDouble(";
 				outputCSharpSyscallArg(maapiFile, i);
@@ -541,7 +552,7 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 				i++;
 				maapiFile << ")";
 			}
-			else if(a.type == "float") {
+			else if(argType == "float") {
 				maapiFile << "MoSync.Util.ConvertToFloat(";
 				outputCSharpSyscallArg(maapiFile, i);
 				i++;
@@ -571,7 +582,8 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 	for(size_t i=0; i<ioctls.size(); i++) {
 		const Ioctl& ioctl(ioctls[i]);
 		for(size_t j=0; j<ioctl.functions.size(); j++) {
-		const Function& f(maapi.functions[j]);
+		const IoctlFunction& ifunc(ioctl.functions[j]);
+		const Function& f(ifunc.f);
 
 		std::string returnType = "long";//getCSharpType(maapi, f.returnType);
 		maapiFile << "\tpublic delegate " << returnType << " Delegate_" << f.name << "(";
@@ -580,7 +592,7 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 			if(k != 0)
 				maapiFile << ", ";
 
-			std::string argType = getCSharpType(maapi, a.type);
+			std::string argType = getCSharpType(maapi, a.type, a.in);
 			maapiFile << argType << " _" << a.name;
 		}
 		maapiFile << ");\n";
@@ -589,12 +601,12 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 	}
 	maapiFile << "}\n\n";
 
-	// generate syscall invoker
+	// generate ioctl invoker
 
 	maapiFile << "public class IoctlInvoker {\n\n";
-	maapiFile << "\tprivate CoreInterpreted mCore;\n";
+	maapiFile << "\tprivate Core mCore;\n";
 	maapiFile << "\tprivate Ioctls mIoctls;\n\n";
-	maapiFile << "\tpublic SyscallInvoker(CoreInterpreted core, Ioctls ioctls) {\n";
+	maapiFile << "\tpublic IoctlInvoker(Core core, Ioctls ioctls) {\n";
 	maapiFile << "\t\tmCore = core;\n";
 	maapiFile << "\t\tmIoctls = ioctls;\n";
 	maapiFile << "\t}\n\n";
@@ -604,7 +616,8 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 	for(size_t i=0; i<ioctls.size(); i++) {
 		const Ioctl& ioctl(ioctls[i]);
 		for(size_t j=0; j<ioctl.functions.size(); j++) {
-		const Function& f(maapi.functions[j]);
+		const IoctlFunction& ifunc(ioctl.functions[j]);
+		const Function& f(ifunc.f);
 
 		maapiFile << "\t\t\tcase " << f.number << ":\n";
 
@@ -616,9 +629,10 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 		int i = 0;
 		for(size_t k=0; k<f.args.size(); k++) {
 			const Argument& a(f.args[k]);
+			std::string argType = getCSharpType(maapi, a.type, a.in);
 			if(k != 0)
 				maapiFile << ", ";
-			if(a.type == "double") {
+			if(argType == "double") {
 				maapiFile << "MoSync.Util.ConvertToDouble(";
 				outputCSharpIoctlArg(maapiFile, i);
 				maapiFile << ", ";
@@ -627,23 +641,22 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 				i++;
 				maapiFile << ")";
 			}
-			else if(a.type == "float") {
+			else if(argType == "float") {
 				maapiFile << "MoSync.Util.ConvertToFloat(";
 				outputCSharpIoctlArg(maapiFile, i);
 				i++;
 				maapiFile << ")";				
 			} else {
 				//maapiFile << "this.regs[Reg.i" << i << "] ";
-				outputCSharpSyscallArg(maapiFile, i);
+				outputCSharpIoctlArg(maapiFile, i);
 				i++;
 			}
 		}
-		maapiFile << ");";
-
-		maapiFile << "\t\t\tbreak;\n";
+		maapiFile << ");\n";
 		}
 	}
 	maapiFile << "\t\t}\n";
+	maapiFile << "\t\treturn MoSync.Constants.IOCTL_UNAVAILABLE;\n";
 	maapiFile << "\t}\n";
 	maapiFile << "}\n\n";
 
