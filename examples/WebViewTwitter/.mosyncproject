@@ -8,12 +8,12 @@
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="mastd.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, josyncD.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib, josync.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib"/>
 <property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
-<property key="build.prefs:app.name/Debug" value="TweetReader"/>
+<property key="build.prefs:app.name/Debug" value="WebViewTwitter"/>
 <property key="build.prefs:app.name/Release" value="WebViewTwitter"/>
 <property key="build.prefs:app.permissions" value="File\ Storage File\ Storage/Read File\ Storage/Write Internet\ Access SMS/Send"/>
 <property key="build.prefs:app.vendor/Debug" value="MoSync"/>

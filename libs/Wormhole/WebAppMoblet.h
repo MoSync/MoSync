@@ -20,22 +20,21 @@ MA 02110-1301, USA.
  * @file WebAppMoblet.h
  * @author Mikael KIndborg
  *
- * \brief High-level moblet that has a WebView and supports
+ * @brief High-level moblet that has a WebView and supports
  * communication between a JavaScript and C++.
  */
 
-#ifndef JOSYNC_WEB_APP_MOBLET_H_
-#define JOSYNC_WEB_APP_MOBLET_H_
+#ifndef WORMHOLE_WEB_APP_MOBLET_H_
+#define WORMHOLE_WEB_APP_MOBLET_H_
 
 #include <MAUtil/Moblet.h>
 #include <MAUtil/String.h>
 #include <NativeUI/Screen.h>
 #include <NativeUI/WebView.h>
 #include "WebViewMessage.h"
-#include "WebViewMessageHandler.h"
 #include "FileUtil.h"
 
-namespace josync
+namespace Wormhole
 {
 	// Forward declaration.
 	class WebAppMoblet_WebViewListener;
@@ -91,30 +90,15 @@ namespace josync
 		virtual void callJS(const MAUtil::String& script);
 
 		/**
-		 * This method passes the event to JavaScript.
-		 *
-		 * Note that currently you need to call this method
-		 * explicitly from your C++ event handling code.
-		 *
-		 * At present, we just pass on the event type
-		 * and the first three int parameters.
-		 *
-		 * TODO: And more sophisticated event detection.
+		 * This method handles messages sent from the WebView.
+		 * Implement this method in a subclass of this class.
+		 * @param webView The WebView that sent the message.
+		 * @param urlData Data object that holds message content.
+		 * Note that the data object will be valid only during
+		 * the life-time of the call of this method, then it
+		 * will be deallocated.
 		 */
-		virtual void passEventToJS(MAEvent* event);
-
-		/**
-		 * Implement this method in a subclass to handle messages
-		 * sent from JavaScript.
-		 * @param message Object used to access message content.
-		 */
-		virtual void handleWebViewMessage(WebViewMessage& message);
-
-		/**
-		 * This method handles messages sent from the WebView
-		 * via urls. It calls handleWebViewMessage.
-		 */
-		virtual void processWebViewMessage(
+		virtual void handleWebViewMessage(
 			NativeUI::WebView* webView,
 			MAHandle urlData);
 
@@ -155,15 +139,10 @@ namespace josync
 		WebAppMoblet_WebViewListener* mWebViewListener;
 
 		/**
-		 * This class implements the standard josync message API.
-		 */
-		WebViewMessageHandler* mWebViewMessageHandler;
-
-		/**
 		 * File utility object.
 		 */
 		FileUtil* mFileUtil;
 	};
-} // namespace NativeUI
+} // namespace
 
 #endif

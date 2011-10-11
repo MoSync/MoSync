@@ -23,13 +23,13 @@ MA 02110-1301, USA.
  * High-level utility functions for working with files.
  */
 
-#ifndef JOSYNC_FILE_UTIL_H_
-#define JOSYNC_FILE_UTIL_H_
+#ifndef WORMHOLE_FILE_UTIL_H_
+#define WORMHOLE_FILE_UTIL_H_
 
 #include <ma.h>
 #include <MAUtil/String.h>
 
-namespace josync
+namespace Wormhole
 {
 /**
  * Class that contains utility methods.
