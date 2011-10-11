@@ -101,6 +101,7 @@
     <ClCompile Include="Icon.cpp" />
     <ClCompile Include="IconFileLoader.cpp" />
     <ClCompile Include="Injector.cpp" />
+    <ClCompile Include="IOSInjector.cpp" />
     <ClCompile Include="JavaInjector.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MoreInjector.cpp" />
@@ -115,6 +116,7 @@
     <ClInclude Include="IconFileLoader.h" />
     <ClInclude Include="IconFileStructs.h" />
     <ClInclude Include="Injector.h" />
+    <ClInclude Include="IOSInjector.h" />
     <ClInclude Include="JavaInjector.h" />
     <ClInclude Include="MoreInjector.h" />
     <ClInclude Include="Shared.h" />
