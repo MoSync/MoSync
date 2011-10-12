@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace MoSync
 {
-    public class MathSyscalls : ISyscallGroup, IIoctlGroup
+    public class MathModule : ISyscallModule, IIoctlModule
     {
         public void Init(Syscalls mSyscalls, Core mCore, Runtime mRuntime)
         {

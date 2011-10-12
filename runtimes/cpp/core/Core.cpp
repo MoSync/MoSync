@@ -124,7 +124,22 @@ public:
 	int csRegs[128];
 	int *csMem;
 
-	struct StateChange { int ip, instCount, reg, before, after; };
+	struct StateChange { 
+		int type; // 0 = reg state change, 1 = mem state change
+		int ip, instCount;
+		struct regdata
+		{
+			int reg, before, after;
+		};
+		struct memdata
+		{
+			int address;
+			unsigned char before, after;
+		};
+	
+		regdata regdata;
+		memdata memdata;
+	};
 
 #define STATE_BUFFER_SIZE 1024
 	StateChange stateChanges[STATE_BUFFER_SIZE];
@@ -155,27 +170,43 @@ public:
 #endif
 		stateChangeAppend = true;
 
-		//stateLog.write(stateChanges, STATE_BUFFER_SIZE*sizeof(StateChange));
 		for(int i = 0; i < curStateChange; i++) {
 			int len;
-			//if(stateChanges[i].reg == 0xffffffff) {
-			//	len = sprintf(temp, "%d, %x\n", stateChanges[i].before, stateChanges[i].ip);
-			//} else {
+			char temp[1024];
+			if(stateChanges[i].type == 0) {
+
 #ifdef SYMBIAN
 			TBuf8<1024> buf;
 			char* temp = (char*)buf.Ptr();
 			_LIT8(KFmt, "%x, %d: REG%d: %x != %x\n");
 			buf.Format(KFmt,
 #else
-			char temp[1024];
 			len = sprintf(temp, "%x, %d: REG%d: %x != %x\n",
 #endif
 				stateChanges[i].ip, stateChanges[i].instCount,
-				stateChanges[i].reg, stateChanges[i].before, stateChanges[i].after);
+				stateChanges[i].regdata.reg, stateChanges[i].regdata.before, stateChanges[i].regdata.after);
 			//}
 #ifdef SYMBIAN
 			len = buf.Length();
 #endif
+			} else {
+#ifdef SYMBIAN
+			TBuf8<1024> buf;
+			char* temp = (char*)buf.Ptr();
+			_LIT8(KFmt, "%x, %d: REG%d: %x != %x\n");
+			buf.Format(KFmt,
+#else
+			len = sprintf(temp, "%x, %d: ADDR(0x%x): %x != %x\n",
+#endif
+				stateChanges[i].ip, stateChanges[i].instCount,
+				stateChanges[i].memdata.address, stateChanges[i].memdata.before, stateChanges[i].memdata.after);
+			//}
+#ifdef SYMBIAN
+			len = buf.Length();
+#endif
+			}
+
+
 			stateLog.write(temp, len);
 		}
 
@@ -187,17 +218,52 @@ public:
 		
 		if(!csMem) {
 			curStateChange = 0;
-			//csMem = new int[gCore->DATA_SEGMENT_SIZE>>2];
+#if 0
+			csMem = new int[gCore->DATA_SEGMENT_SIZE>>2];
+#else
 			csMem = (int*)1;
+#endif
 			for(unsigned int i = 0; i < 128; i++) {
 				csRegs[i] = regs[i];
 			}
-			//for(unsigned int i = 0; i < gCore->DATA_SEGMENT_SIZE>>2; i++) {
-			//	csMem[i] = gCore->mem_ds[i];
-			//}
+
+#if 0
+			for(unsigned int i = 0; i < gCore->DATA_SEGMENT_SIZE>>2; i++) {
+				csMem[i] = gCore->mem_ds[i];
+			}
+#endif
 
 			stateChangeInstCount = 0;
 			stateChangeAppend = false;
+
+#if 0
+			// dump initial state
+			Base::WriteFileStream stateLog(STATE_LOG_DIR "more_initial_state.txt");
+
+			for(unsigned int i = 0; i < 128; i++) {
+				char temp[1024];
+				int len = sprintf(temp, "REG%d: %x\n", i, regs[i]);
+				stateLog.write(temp, len);
+			}
+
+			for(unsigned int i = 0; i < gCore->DATA_SEGMENT_SIZE; i++) {
+				char temp[1024];
+				int len = sprintf(temp, "ADDR(%x): %x\n", i, ((unsigned char*)gCore->mem_ds)[i]);
+				stateLog.write(temp, len);
+			}
+
+			for(int i = 0; i < gCore->Head.IntLen; i++) {
+				char temp[1024];
+				int len = sprintf(temp, "CONSTANT(%d): %x\n", i, gCore->mem_cp[i]);
+				stateLog.write(temp, len);
+			}
+
+			for(unsigned int i = 0; i < gCore->CODE_SEGMENT_SIZE; i++) {
+				char temp[1024];
+				int len = sprintf(temp, "CODE(%x): %x\n", i, gCore->mem_cs[i]);
+				stateLog.write(temp, len);
+			}
+#endif
 		}
 		stateChangeInstCount++;
 
@@ -208,11 +274,12 @@ public:
 			if(csRegs[i] != regs[i]) {
 				//LOG("R%d: 0x%x != %d\n", i, csRegs[i], gCore->regs[i]);
 				
+				stateChanges[curStateChange].type = 0;
 				stateChanges[curStateChange].ip = ip;
 				stateChanges[curStateChange].instCount = stateChangeInstCount;
-				stateChanges[curStateChange].reg = i;
-				stateChanges[curStateChange].before = csRegs[i];
-				stateChanges[curStateChange].after = regs[i];
+				stateChanges[curStateChange].regdata.reg = i;
+				stateChanges[curStateChange].regdata.before = csRegs[i];
+				stateChanges[curStateChange].regdata.after = regs[i];
 				curStateChange++;
 				if(curStateChange>=STATE_BUFFER_SIZE) {
 					writeStateChanges();
@@ -221,14 +288,26 @@ public:
 				csRegs[i] = regs[i];
 			}
 		}
-		/*
-		for(unsigned int i = 0; i < gCore->DATA_SEGMENT_SIZE>>2; i++) {
-			if(csMem[i] != gCore->mem_ds[i]) {
-				LOG("%x: %x\n", i, gCore->mem_ds[i]);
-				csMem[i] = gCore->mem_ds[i];
+
+#if 0
+		unsigned char* mem = (unsigned char*)gCore->mem_ds;
+		unsigned char* oldmem = (unsigned char*)csMem;
+		for(unsigned int i = 0; i < gCore->DATA_SEGMENT_SIZE; i++) {
+			if(oldmem[i] != mem[i]) {
+				stateChanges[curStateChange].type = 1;
+				stateChanges[curStateChange].ip = ip;
+				stateChanges[curStateChange].instCount = stateChangeInstCount;
+				stateChanges[curStateChange].memdata.address = i;
+				stateChanges[curStateChange].memdata.before = oldmem[i];
+				stateChanges[curStateChange].memdata.after = mem[i];
+				curStateChange++;
+				if(curStateChange>=STATE_BUFFER_SIZE) {
+					writeStateChanges();
+				}
+				oldmem[i] = mem[i];
 			}
 		}
-		*/
+#endif
 		//LOG("logStateChange ends\n");
 	}
 #endif

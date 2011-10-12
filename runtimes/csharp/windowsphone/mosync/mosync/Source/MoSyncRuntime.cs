@@ -19,12 +19,12 @@ namespace MoSync
     // should set those delegates corresponding to the
     // group in the Syscalls instance to an implementation.
 
-    public interface ISyscallGroup
+    public interface ISyscallModule
     {
         void Init(Syscalls syscalls, Core core, Runtime runtime);
     }
 
-    public interface IIoctlGroup
+    public interface IIoctlModule
     {
         void Init(Ioctls ioctls, Core core, Runtime runtime);
     }
@@ -36,8 +36,8 @@ namespace MoSync
     public partial class Runtime
     {
         // these might overlap (i.e. the same group instance might be in both sets)
-        private List<ISyscallGroup> mSyscallGroups = new List<ISyscallGroup>();
-        private List<IIoctlGroup> mIoctlGroups = new List<IIoctlGroup>();
+        private List<ISyscallModule> mSyscallGroups = new List<ISyscallModule>();
+        private List<IIoctlModule> mIoctlGroups = new List<IIoctlModule>();
 
         protected Core mCore;
         protected Syscalls mSyscalls;
@@ -59,20 +59,20 @@ namespace MoSync
             // and make an instance of each and call their Init method.
             foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
             {
-                ISyscallGroup syscallGroupInstance = null;
-                IIoctlGroup ioctlGroupInstance = null;
-                if (t.GetInterface("MoSync.ISyscallGroup", false) != null)
+                ISyscallModule syscallGroupInstance = null;
+                IIoctlModule ioctlGroupInstance = null;
+                if (t.GetInterface("MoSync.ISyscallModule", false) != null)
                 {
-                    syscallGroupInstance = Activator.CreateInstance(t) as ISyscallGroup;
+                    syscallGroupInstance = Activator.CreateInstance(t) as ISyscallModule;
                     mSyscallGroups.Add(syscallGroupInstance);
                     syscallGroupInstance.Init(mSyscalls, mCore, this);
                 }
-                if (t.GetInterface("MoSync.IIoctlGroup", false) != null)
+                if (t.GetInterface("MoSync.IIoctlModule", false) != null)
                 {
                     if (syscallGroupInstance != null)
-                        ioctlGroupInstance = (IIoctlGroup)syscallGroupInstance;
+                        ioctlGroupInstance = (IIoctlModule)syscallGroupInstance;
                     else
-                        ioctlGroupInstance = Activator.CreateInstance(t) as IIoctlGroup;
+                        ioctlGroupInstance = Activator.CreateInstance(t) as IIoctlModule;
                     mIoctlGroups.Add(ioctlGroupInstance);
                     ioctlGroupInstance.Init(mIoctls, mCore, this);
                 }
@@ -270,8 +270,11 @@ namespace MoSync
             }
             else
             {
+                /*
+                 * should work for ubins and bins.
                 if (ret.GetResourceType() != type)
                     return null;
+                */
                 return ret;
             }
         }

@@ -35,26 +35,41 @@ namespace MoSync
 
         public void WriteUInt16(int address, ushort b)
         {
-            byte[] bytes = BitConverter.GetBytes(b);
-            System.Array.Copy(bytes, 0, mData, address, bytes.Length);
+            //byte[] bytes = BitConverter.GetBytes(b);
+            //System.Array.Copy(bytes, 0, mData, address, bytes.Length);
+            mData[address + 0] = (byte)(b & 0xff);
+            mData[address + 1] = (byte)((b >> 8) & 0xff);
         }
 
         public void WriteInt16(int address, short b)
         {
-            byte[] bytes = BitConverter.GetBytes(b);
-            System.Array.Copy(bytes, 0, mData, address, bytes.Length);
+            //byte[] bytes = BitConverter.GetBytes(b);
+            //System.Array.Copy(bytes, 0, mData, address, bytes.Length);
+            mData[address + 0] = (byte)(b & 0xff);
+            mData[address + 1] = (byte)((b >> 8) & 0xff);
         }
 
         public void WriteUInt32(int address, uint b)
         {
+            /*
             byte[] bytes = BitConverter.GetBytes(b);
             System.Array.Copy(bytes, 0, mData, address, bytes.Length);
+            */
+            mData[address + 0] = (byte)(b & 0xff);
+            mData[address + 1] = (byte)((b >> 8) & 0xff);
+            mData[address + 2] = (byte)((b >> 16) & 0xff);
+            mData[address + 3] = (byte)((b >> 24) & 0xff);
         }
 
         public void WriteInt32(int address, int b)
         {
-            byte[] bytes = BitConverter.GetBytes(b);
-            System.Array.Copy(bytes, 0, mData, address, bytes.Length);
+            //byte[] bytes = BitConverter.GetBytes(b);
+            //System.Array.Copy(bytes, 0, mData, address, bytes.Length);
+            mData[address + 0] = (byte)(b & 0xff);
+            mData[address + 1] = (byte)((b >> 8) & 0xff);
+            mData[address + 2] = (byte)((b >> 16) & 0xff);
+            mData[address + 3] = (byte)((b >> 24) & 0xff);
+ 
         }
 
         public byte ReadUInt8(int address)

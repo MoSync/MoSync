@@ -100,6 +100,7 @@ namespace MoSync
             public const int SP = 1;
             public const int RT = 2;
             public const int FR = 3;
+
             public const int D0 = 4;
             public const int D1 = 5;
             public const int D2 = 6;
@@ -108,6 +109,7 @@ namespace MoSync
             public const int D5 = 9;
             public const int D6 = 10;
             public const int D7 = 11;
+
             public const int I0 = 12;
             public const int I1 = 13;
             public const int I2 = 14;
@@ -161,10 +163,6 @@ namespace MoSync
         public void SetReturnValue(double value)
         {
             ulong ret = (ulong)BitConverter.DoubleToInt64Bits(value);
-            /*
-            mRegisters[Reg.R14] = (int)(ret >> 32);
-            mRegisters[Reg.R15] = (int)(ret & 0xffffffffL);
-            */
             mRegisters[Reg.R14] = (int)(ret & 0xffffffffL);
             mRegisters[Reg.R15] = (int)(ret >> 32);
         }
@@ -249,11 +247,12 @@ namespace MoSync
             mDataSegmentSize = Util.NextPowerOfTwo(2, mProgramHeader.mDataSize);
             mDataSegmentMask = mDataSegmentSize - 1;
             mDataMemory = new Memory((int)mDataSegmentSize); // new int[mDataSegmentSize >> 2];
-
+          
             for (int i = 0; i < mProgramHeader.mDataLength; i++)
             {
                 mDataMemory.WriteUInt8(i, Util.StreamReadUint8(program));
             }
+
 
             mConstantPool = new int[mProgramHeader.mIntLength];
             for (int i = 0; i < mProgramHeader.mIntLength; i++)
@@ -263,24 +262,30 @@ namespace MoSync
 
             GenerateConstantTable();
 
-            //uint customEventDataSize = 24;
             uint customEventDataSize = 60;
             mRegisters[Reg.SP] = (int)(mDataSegmentSize - customEventDataSize - 4);
             mRegisters[Reg.I0] = (int)mDataSegmentSize;
             mRegisters[Reg.I1] = (int)mProgramHeader.mStackSize;
             mRegisters[Reg.I2] = (int)mProgramHeader.mHeapSize;
             mCustomEventPointer = (int)(mDataSegmentSize - customEventDataSize);
-
         }
 
+
+        // ---------------- BEGIN FUGLY DEBUG FACILITIES ----------------------------
         struct StateChange
         {
-            public int ip, instCount, reg, before, after;
+            public int type; // 0 = reg, 1 = mem
+            public int ip, instCount;
+            public int reg;
+            public int address;
+            public int before, after;
         };
+
         private bool mDebugLogStateChangesInitialized = false;
         private int[] mOldRegisters = new int[128];
         private List<StateChange> mStateChanges = new List<StateChange>();
         private int mStateChangeInstCount = 0;
+        private byte[] mStateChangeOldMemory;
 
         private void DebugWriteStateChanges()
         {
@@ -288,8 +293,16 @@ namespace MoSync
 
             foreach (StateChange s in mStateChanges)
             {
-                res.Append(String.Format("{0:x}, {1:d}: REG{2:d}: {3:x} != {4:x}\n",
-                    s.ip, s.instCount, s.reg, s.before, s.after));
+                if (s.type == 0)
+                {
+                    res.Append(String.Format("{0:x}, {1:d}: REG{2:d}: {3:x} != {4:x}\n",
+                        s.ip, s.instCount, s.reg, s.before, s.after));
+                }
+                else
+                {
+                    res.Append(String.Format("{0:x}, {1:d}: ADDR(0x{2:x}): {3:x} != {4:x}\n",
+                        s.ip, s.instCount, s.address, s.before, s.after));
+                }
             }
 
             MoSync.Util.WriteTextToFile(res.ToString(), "stateChanges.txt", FileMode.Append);
@@ -298,12 +311,15 @@ namespace MoSync
         private void DebugLogStateChanges()
         {
             const int STATE_BUFFER_SIZE = 1024;
+
             if(!mDebugLogStateChangesInitialized)
             {
                 mDebugLogStateChangesInitialized = true;
                 System.Array.Copy(mRegisters, mOldRegisters, 128);
                 mStateChangeInstCount = 0;
                 MoSync.Util.WriteTextToFile("", "stateChanges.txt", FileMode.Create);
+                mStateChangeOldMemory = new byte[mDataMemory.GetSizeInBytes()];
+                mDataMemory.ReadBytes(mStateChangeOldMemory, 0, mDataMemory.GetSizeInBytes());
             }
 
             int i = 128;
@@ -313,6 +329,7 @@ namespace MoSync
                 if (mOldRegisters[i] != mRegisters[i])
                 {
                     StateChange stateChange = new StateChange();
+                    stateChange.type = 0;
                     stateChange.ip = mIp;
                     stateChange.reg = i;
                     stateChange.before = mOldRegisters[i];
@@ -328,9 +345,63 @@ namespace MoSync
                     mOldRegisters[i] = mRegisters[i];
                 }
             }
+
+            for (i = 0; i < mStateChangeOldMemory.Length; i++)
+            {
+                byte newByte = mDataMemory.ReadUInt8(i);
+                if (mStateChangeOldMemory[i] != newByte)
+                {
+                    StateChange stateChange = new StateChange();
+                    stateChange.type = 1;
+                    stateChange.ip = mIp;
+                    stateChange.address = i;
+                    stateChange.before = mStateChangeOldMemory[i];
+                    stateChange.after = newByte;
+                    stateChange.instCount = mStateChangeInstCount;
+                    mStateChanges.Add(stateChange);
+                    if (mStateChanges.Count >= STATE_BUFFER_SIZE)
+                    {
+                        DebugWriteStateChanges();
+                        mStateChanges.Clear();
+                    }
+
+                    mStateChangeOldMemory[i] = newByte;
+                }
+            }
         }
 
-		public new void Run()
+        public void DebugDumpState()
+        {
+            System.Text.StringBuilder res = new System.Text.StringBuilder();
+            for (int i = 0; i < mRegisters.Length; i++)
+            {
+                res.Append(String.Format("REG{0:d}: {1:x}\n", i, mRegisters[i]));
+            }
+
+            int dataMemoryLength = mDataMemory.GetSizeInBytes();
+            for (int i = 0; i < dataMemoryLength; i++)
+            {
+                res.Append(String.Format("ADDR({0:x}): {1:x}\n", i, mDataMemory.ReadUInt8(i)));
+            }
+
+            int constantPoolSize = mConstantPool.Length;
+            for (int i = 0; i < constantPoolSize; i++)
+            {
+                res.Append(String.Format("CONSTANT({0:d}): {1:x}\n", i, mConstantPool[i]));
+            }
+
+            for (int i = 0; i < mProgramMemory.Length; i++)
+            {
+                res.Append(String.Format("CODE({0:x}): {1:x}\n", i, mProgramMemory[i]));
+            }
+
+            MoSync.Util.WriteTextToFile(res.ToString(), "initialstate.txt", FileMode.Create);
+        }
+
+        // ---------------- END FUGLY DEBUG FACILITIES ----------------------------
+
+
+        public new void Run()
 		{
 			int imm32;
 			byte rd;
@@ -338,12 +409,14 @@ namespace MoSync
 
             int oldIp = 0;
 
+            //DebugDumpState();
+
 			//while(mRunning)
             while(true)
 			{
                 //DebugLogStateChanges();
                 /*
-                if (mIp == 0x2eee)
+                if (mIp == 16754)
                 {
                     int a = 2;
                 }
@@ -388,7 +461,7 @@ namespace MoSync
 					case Op.CALL: // CALL
 						rd = mProgramMemory[mIp++];
 						mRegisters[Reg.RT] = mIp;
-						mIp = (int)((uint)mRegisters[rd] & mProgramSegmentMask);
+						mIp = mRegisters[rd];
 					break;
 
 					case Op.CALLI: // CALLI
@@ -405,7 +478,8 @@ namespace MoSync
                         imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
                             mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
                             mConstantPool[imm32];
-                        mRegisters[rd] = mDataMemory.ReadUInt8(mRegisters[rs] + imm32);
+                        //mRegisters[rd] = mDataMemory.ReadUInt8(mRegisters[rs] + imm32);
+                        mRegisters[rd] = mDataMemory.ReadInt8(mRegisters[rs] + imm32);
                     }
                     break;
 
@@ -427,7 +501,8 @@ namespace MoSync
                         imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
                             mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
                             mConstantPool[imm32];
-                        mRegisters[rd] = mDataMemory.ReadUInt16(mRegisters[rs] + imm32);
+                        //mRegisters[rd] = mDataMemory.ReadUInt16(mRegisters[rs] + imm32);
+                        mRegisters[rd] = mDataMemory.ReadInt16(mRegisters[rs] + imm32);
                     }
                     break;
 
@@ -451,15 +526,17 @@ namespace MoSync
                             mConstantPool[imm32];
                         mRegisters[rd] = mDataMemory.ReadInt32(mRegisters[rs] + imm32);
 					break;
-				
-					case Op.STW: // STW
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127) ?
-                            mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])] :
+
+                    case Op.STW: // STW
+                    {
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                            mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
                             mConstantPool[imm32];
                         mDataMemory.WriteInt32(mRegisters[rd] + imm32, mRegisters[rs]);
-					break;
+                    }
+                    break;
 				
 					case Op.LDI: // LDI
 						rd = mProgramMemory[mIp++];

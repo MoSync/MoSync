@@ -79,17 +79,17 @@
     </Compile>
     <Compile Include="Source\MoSyncCore.cs" />
     <Compile Include="Source\MoSyncCoreInterpreted.cs" />
-    <Compile Include="Source\MoSyncGraphicsSyscalls.cs" />
-    <Compile Include="Source\MoSyncMathSyscalls.cs" />
     <Compile Include="Source\MoSyncMemory.cs" />
-    <Compile Include="Source\MoSyncMemorySyscalls.cs" />
-    <Compile Include="Source\MoSyncMiscSyscalls.cs" />
     <Compile Include="Source\MoSyncResource.cs" />
     <Compile Include="Source\MoSyncRuntime.cs" />
     <Compile Include="Source\MoSyncThread.cs" />
     <Compile Include="Source\MoSyncUtil.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AppServiceProvider.cs" />
+    <Compile Include="Source\Modules\MoSyncGraphicsModule.cs" />
+    <Compile Include="Source\Modules\MoSyncMathModule.cs" />
+    <Compile Include="Source\Modules\MoSyncMemoryModule.cs" />
+    <Compile Include="Source\Modules\MoSyncMiscModule.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

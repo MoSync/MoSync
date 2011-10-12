@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace MoSync
 {
-    public class MemorySyscalls : ISyscallGroup
+    public class MemoryModule : ISyscallModule
     {
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
@@ -58,6 +58,34 @@ namespace MoSync
                 Memory mem = (Memory)res.GetInternalObject();
                 return mem.GetSizeInBytes();
             };
+
+            syscalls.maCopyData = delegate(int _params)
+            {
+
+            };
+
+            syscalls.maOpenStore = delegate(int name, int flags)
+            {
+                // Returns STERR_NONEXISTENT if !(flags & MAS_CREATE_IF_NECESSARY) and the store does not exist. Returns another STERR code if the store could not be opened for another reason.
+                return MoSync.Constants.STERR_NONEXISTENT;
+            };
+
+            syscalls.maWriteStore = delegate(int store, int data)
+            {
+                //Returns > 0 on success, STERR_FULL if the storage system is full, or another STERR code if the write failed for another reason.
+                return 1;
+            };
+
+            syscalls.maReadStore = delegate(int store, int placeholder)
+            {
+                //return RES_OUT_OF_MEMORY if failed.
+                return MoSync.Constants.RES_OK;
+            };
+
+            syscalls.maCloseStore = delegate(int store, int delete)
+            {
+            };
+
 
         }
 	}

@@ -10,7 +10,7 @@ using System.Windows.Controls;
 
 namespace MoSync
 {
-    public class GraphicsSyscalls : ISyscallGroup, IIoctlGroup
+    public class GraphicsModule : ISyscallModule, IIoctlModule
     {
         public WriteableBitmap mFrontBuffer;
         public WriteableBitmap mBackBuffer;
@@ -18,7 +18,7 @@ namespace MoSync
         public int mCurrentDrawTargetIndex = MoSync.Constants.HANDLE_SCREEN;
         private uint mCurrentColor = 0xff000000;
         private System.Windows.Media.Color mCurrentWindowsColor;
-        private double mCurrentFontSize = 12;
+        private double mCurrentFontSize = 24;
 
         protected void InvalidateWriteableBitmapOnMainThread(WriteableBitmap bitmap)
         {
@@ -106,8 +106,10 @@ namespace MoSync
                     {
                         textBlock.Text = text;
                         textBlock.Foreground = new SolidColorBrush(mCurrentWindowsColor);
-                        mCurrentDrawTarget.Render(textBlock, new TranslateTransform() { X = left, Y = top });
-
+                        WriteableBitmap b = new WriteableBitmap(textBlock, null);
+                        mCurrentDrawTarget.Blit(new Rect(left, top, b.PixelWidth, b.PixelHeight),
+                            b,
+                            new Rect(0, 0, b.PixelWidth, b.PixelHeight));
                         are.Set();
                     });
                     are.WaitOne();
@@ -138,13 +140,28 @@ namespace MoSync
             syscalls.maDrawTextW = delegate(int left, int top, int str)
             {
                 String text = core.GetDataMemory().ReadWStringAtAddress(str);
+                if (text.Length == 0) return;
                 using (AutoResetEvent are = new AutoResetEvent(false))
                 {
                     Deployment.Current.Dispatcher.BeginInvoke(() =>
                     {
                         textBlock.Text = text;
                         textBlock.Foreground = new SolidColorBrush(mCurrentWindowsColor);
-                        mCurrentDrawTarget.Render(textBlock, new TranslateTransform() { X = left, Y = top });
+                        WriteableBitmap b = new WriteableBitmap(textBlock, null);
+                        Rect dstRect = new Rect(left, top, b.PixelWidth, b.PixelHeight);
+                        Rect srcRect = new Rect(0, 0, b.PixelWidth, b.PixelHeight);
+                        // cliprect..
+                        Rect clipRect = new Rect(0, 0, mBackBuffer.PixelWidth, mBackBuffer.PixelHeight);
+                        clipRect.Intersect(dstRect);
+                        if(clipRect.IsEmpty == true)
+                        {
+                            are.Set();
+                            return;
+                        }
+
+                        mCurrentDrawTarget.Blit(dstRect,
+                            b,
+                            srcRect);
                         are.Set();
                     });
                     are.WaitOne();
@@ -309,7 +326,7 @@ namespace MoSync
                     Memory mem = core.GetDataMemory();
                     for (int i = 0; i < dst.Length; i++)
                     {
-                        dst[i] = mem.ReadInt32(frameBufferPointer + i * 4);
+                        dst[i] = (int)(0xff000000 | mem.ReadUInt32(frameBufferPointer + i * 4));
                     }
 
                     InvalidateWriteableBitmapOnMainThread(mFrontBuffer);
@@ -331,14 +348,14 @@ namespace MoSync
                 const int MAFrameBufferInfo_bytesPerPixel = 4;
                 const int MAFrameBufferInfo_bitsPerPixel = 8;
                 const int MAFrameBufferInfo_redMask = 12;
-                const int MAFrameBufferInfo_redBits = 16;
-                const int MAFrameBufferInfo_redShift = 20;
+                const int MAFrameBufferInfo_redShift = 16;
+                const int MAFrameBufferInfo_redBits = 20;
                 const int MAFrameBufferInfo_greenMask = 24;
-                const int MAFrameBufferInfo_greenBits = 28;
-                const int MAFrameBufferInfo_greenShift = 32;
+                const int MAFrameBufferInfo_greenShift = 28;
+                const int MAFrameBufferInfo_greenBits = 32;
                 const int MAFrameBufferInfo_blueMask = 36;
-                const int MAFrameBufferInfo_blueBits = 40;
-                const int MAFrameBufferInfo_blueShift = 44;
+                const int MAFrameBufferInfo_blueShift = 40;
+                const int MAFrameBufferInfo_blueBits = 44;
                 const int MAFrameBufferInfo_width = 48;
                 const int MAFrameBufferInfo_height = 52;
                 const int MAFrameBufferInfo_pitch = 56;

@@ -47,7 +47,14 @@ class MoSyncThread
 
     private void Run()
     {
-        mCore.Run();
+        //try
+        {
+            mCore.Run();
+        }
+        //catch (Exception e)
+        //{
+        //   MoSync.Util.CriticalError(e.ToString());
+        //};
     }
 
     public void StartThread()

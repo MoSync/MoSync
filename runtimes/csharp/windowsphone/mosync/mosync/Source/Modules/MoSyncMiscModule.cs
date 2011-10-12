@@ -6,7 +6,7 @@ using System.Windows;
 
 namespace MoSync
 {
-    public class MiscSyscalls : ISyscallGroup, IIoctlGroup
+    public class MiscModule : ISyscallModule, IIoctlModule
     {
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
@@ -24,11 +24,26 @@ namespace MoSync
                 MoSync.Util.CriticalError(message + "\ncode: " + code);
             };
 
+            syscalls.maExit = delegate(int res)
+            {
+                MoSync.Util.Exit(res);
+            };
+
             DateTime startDate = System.DateTime.Now;
             syscalls.maGetMilliSecondCount = delegate() {
                 System.TimeSpan offset = (System.DateTime.Now - startDate);
 
                 return offset.Milliseconds+(offset.Seconds+(offset.Minutes+(offset.Hours+offset.Days*24)*60)*60)*1000;
+            };
+
+            syscalls.maTime = delegate()
+            {
+                return 0;
+            };
+
+            syscalls.maLocalTime = delegate()
+            {
+                return 0;
             };
 
             syscalls.maCreatePlaceholder = delegate()

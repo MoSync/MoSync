@@ -108,6 +108,12 @@ namespace MoSync
             //throw new Exception("ExitAppException");
 		}
 
+        public static void Exit(int res)
+        {
+            CriticalError("Exited!");
+            throw new Exception("ExitAppException");
+        }
+
         public static int CreateExtent(int w, int h) 
         {
             return (w << 16) | h;
@@ -131,8 +137,10 @@ namespace MoSync
             using (IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
             using (StreamWriter streamWriter = new StreamWriter(new IsolatedStorageFileStream(file, fileMode, isolatedStorage)))
             {
-                if(message != null)
-                    streamWriter.WriteLine(message);
+                if (message != null)
+                    streamWriter.Write(message);
+                    //streamWriter.WriteLine(message);
+
                 streamWriter.Close();
             }
         }
