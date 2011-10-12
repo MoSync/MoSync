@@ -30,9 +30,9 @@ public class MoSyncNFCForegroundUtil {
 
 	private final String[][] techLists;
 
-	public MoSyncNFCForegroundUtil(Activity activity) {
+	private MoSyncNFCForegroundUtil(Activity activity, NfcAdapter nfc) {
 	    this.activity = activity;
-	    nfc = NfcAdapter.getDefaultAdapter(activity.getApplicationContext());
+	    this.nfc = nfc;
 
 	    intent = PendingIntent.getActivity(activity, 0, new Intent(activity, activity.getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
@@ -62,7 +62,9 @@ public class MoSyncNFCForegroundUtil {
 	}
 
 	public void enableForeground() {
-	    nfc.enableForegroundDispatch(activity, intent, intentFilters, techLists);
+		if (nfc != null) {
+			nfc.enableForegroundDispatch(activity, intent, intentFilters, techLists);
+		}
 	}
 
 	public void disableForeground() {
@@ -79,10 +81,16 @@ public class MoSyncNFCForegroundUtil {
 	 * @return
 	 */
 	public static MoSyncNFCForegroundUtil create(Activity activity) {
+		try {
 		if (activity.getPackageManager().checkPermission("android.permission.NFC", activity.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
-			return new MoSyncNFCForegroundUtil(activity);
-		} else {
-			return null;
+		    NfcAdapter nfc = NfcAdapter.getDefaultAdapter(activity.getApplicationContext());
+			if (nfc != null) {
+				return new MoSyncNFCForegroundUtil(activity, nfc);
+			}
 		}
+		} catch (Throwable t) {
+			// We could end having a VerifyError or something.
+		}
+		return null;
 	}
 }

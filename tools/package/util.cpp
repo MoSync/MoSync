@@ -259,7 +259,9 @@ void write72line(std::ostream& output, const std::string& input) {
 
 string arg(const char* arg) {
 	string result = string(arg);
-	if (result.find(' ') != string::npos) {
+	bool isQuoted = (result.size() > 2) &&
+			(result.at(0) == '\"');
+	if (!isQuoted && result.find(' ') != string::npos) {
 		result = "\"" + result + "\"";
 	}
 	return result;
