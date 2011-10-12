@@ -12,7 +12,7 @@ extern "C" int MAMain()
 {
 	MAEvent event;
 
-	printf("Press zero or back to exit");
+	printf("Press zero or back to exit\n");
 
 	while (TRUE)
 	{
@@ -32,7 +32,7 @@ extern "C" int MAMain()
 				break;
 			}
 
-			printf("You typed: %c", event.key);
+			printf("You typed: %c\n", event.key);
 		}
 	}
 

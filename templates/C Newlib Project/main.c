@@ -1,5 +1,9 @@
+/*
+ * This project is set up to use the Newlib standard C library.
+ */
+
 #include <ma.h>
-#include <conprint.h>
+#include <stdio.h>
 
 /**
  * Entry point of the program.
