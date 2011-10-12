@@ -15,8 +15,11 @@
 		<script src="js/jqtouch/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
 		<script src="js/jqtouch/jqtouch.js" type="application/x-javascript" charset="utf-8"></script>
 
-		<!-- Import MoSync JavaScript library. -->
-		<script src="js/josync.js"></script>
+		<!-- Import the bridge library. -->
+		<script src="js/bridge.js"></script>
+
+		<!-- Import file extensions. -->
+		<script src="js/file.js"></script>
 
 		<!-- JavaScript goes here -->
 		<script type="text/javascript">
@@ -55,7 +58,7 @@
 				else
 				{
 					var results = "";
-					if (tweets.length == 0)
+					if ((tweets.length == 0) || (tweets.error == "Not found"))
 					{
 						results = "<li>No tweets could be found check the username!</li>";
 					}
@@ -106,6 +109,11 @@
 			{
 				// Get the username from the input field.
 				var username = document.getElementById("usernameInput").value;
+				if(userName.length == 0)
+				{
+					alert("Invalid username!!!")
+					return;
+				}
 				getTweetsForUser(username)
 			}
 
@@ -122,7 +130,7 @@
 
 				// Get path to local file directory, then
 				// read favourite users from that directory.
-				josync.file.getLocalPath(read);
+				bridge.file.getLocalPath(read);
 
 				function read(path)
 				{
@@ -133,7 +141,7 @@
 					}
 
 					filePath = path + "SavedUsers";
-					josync.file.read(filePath, handleResult);
+					bridge.file.read(filePath, handleResult);
 				}
 
 				function handleResult(data)
@@ -158,9 +166,12 @@
 			{
 				// Get the username from the input field
 				var userName = document.getElementById("usernameInput").value;
-				//displayFavoriteUsers("!one!!two!");
-				//return;
 
+				if(userName.length == 0)
+				{
+					alert("Invalid username!!!")
+					return;
+				}
 				var userList;
 
 				readFavoriteUsers(addUser);
@@ -184,7 +195,7 @@
 					}
 
 					// Write user list.
-					josync.file.write(filePath, userList, reportResult);
+					bridge.file.write(filePath, userList, reportResult);
 				}
 
 				function reportResult(success)
@@ -240,7 +251,7 @@
 
 			/**
 			 * Event-listener. Gets called if the user presses a button
-			 * on his keyboard in the input field.
+			 * on his/her keyboard in the input field.
 			 * @param keynum The pressed key (as an ASCii value)
 			 */
 			function keydown(keynum)

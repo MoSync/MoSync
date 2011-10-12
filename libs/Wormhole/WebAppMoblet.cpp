@@ -18,9 +18,9 @@ MA 02110-1301, USA.
 
 /**
  * @file WebAppMoblet.cpp
- * @author Mikael KIndborg
+ * @author Mikael Kindborg
  *
- * \brief High-level moblet that has a WebView and supports
+ * @brief High-level moblet that has a WebView and supports
  * communication between a JavaScript and C++.
  */
 
@@ -28,7 +28,7 @@ MA 02110-1301, USA.
 #include <NativeUI/WebViewListener.h>
 #include "WebAppMoblet.h"
 
-namespace josync
+namespace Wormhole
 {
 	/**
 	 * Class that listens for WebView events.
@@ -60,13 +60,7 @@ namespace josync
 			// Note: urlData is deallocated automatically by
 			// the framework, we should not deallocate it here.
 
-			mMoblet->processWebViewMessage(webView, urlData);
-		}
-
-		virtual void webViewContentLoading(
-			NativeUI::WebView* webView,
-			const int webViewState)
-		{
+			mMoblet->handleWebViewMessage(webView, urlData);
 		}
 
 	private:
@@ -169,65 +163,19 @@ namespace josync
 	}
 
 	/**
-	 * This method passes the event to JavaScript.
-	 *
-	 * Note that currently you need to call this method
-	 * explicitly from your C++ event handling code.
-	 *
-	 * At present, we just pass on the event type
-	 * and the first three int parameters.
-	 *
-	 * TODO: And more sophisticated event detection.
-	 */
-	void WebAppMoblet::passEventToJS(MAEvent* event)
-	{
-		char script[512];
-		sprintf(
-			script,
-			"josync.messagehandler.processEvent(%d, %d, %d, %d)",
-			event->type,
-			*(((int*)event) + 1),
-			*(((int*)event) + 2),
-			*(((int*)event) + 3));
-		callJS(script);
-	}
-
-	/**
-	 * Implement this method in a subclass to handle messages
-	 * sent from JavaScript.
+	 * This method handles messages sent from the WebView.
+	 * Implement this method in a subclass of this class.
 	 * @param webView The WebView that sent the message.
-	 * @param message Object used to access message content.
+	 * @param urlData Data object that holds message content.
+	 * Note that the data object will be valid only during
+	 * the life-time of the call of this method, then it
+	 * will be deallocated.
 	 */
-	void WebAppMoblet::handleWebViewMessage(WebViewMessage& message)
-	{
-	}
-
-	/**
-	 * This method handles messages sent from the WebView
-	 * via urls. It calls handleWebViewMessage.
-	 */
-	void WebAppMoblet::processWebViewMessage(
+	void WebAppMoblet::handleWebViewMessage(
 		NativeUI::WebView* webView,
 		MAHandle urlData)
 	{
-		// Tell the WebView that we have the message, so that
-		// it can send the next one.
-		callJS("josync.messagehandler.processedMessage()");
-
-		// Create message object
-		WebViewMessage message(webView, urlData);
-
-		// Handle josync messages.
-		bool handled = mWebViewMessageHandler->handleMessage(message);
-
-		// If not a josync message, let a subclass
-		// handle the message.
-		if (!handled)
-		{
-			handleWebViewMessage(message);
-		}
 	}
-
 
 	/**
 	 * This method is called when a key is pressed. It closes

@@ -8,6 +8,7 @@ work.instance_eval do
 	@EXTRA_CPPFLAGS = ' -Wno-shadow -Wno-float-equal'
 	@LSTFILES = ['res/res.lst']
 	@LIBRARIES = ['mautil']
+	@PACK_PARAMETERS = " --icon #{File.expand_path('graphun.icon')}"
 	@NAME = 'Graphun'
 end
 

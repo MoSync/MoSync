@@ -15,8 +15,8 @@ mod.class_eval do
 
 	def setup_base
 		@SOURCES = ["."]
-		@INSTALL_INCDIR = "josync"
-		@NAME = "josync"
+		@INSTALL_INCDIR = "Wormhole"
+		@NAME = "Wormhole"
 	end
 end
 

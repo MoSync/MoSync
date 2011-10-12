@@ -23,15 +23,15 @@ MA 02110-1301, USA.
  * Class for parsing messages from a WebView.
  */
 
-#ifndef JOSYNC_WEB_VIEW_MESSAGE_H_
-#define JOSYNC_WEB_VIEW_MESSAGE_H_
+#ifndef WORMHOLE_WEB_VIEW_MESSAGE_H_
+#define WORMHOLE_WEB_VIEW_MESSAGE_H_
 
 #include <ma.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashMap.h>
 #include <NativeUI/WebView.h>
 
-namespace josync
+namespace Wormhole
 {
 
 /**
@@ -69,58 +69,40 @@ public:
 	virtual ~WebViewMessage();
 
 	/**
-	 * Checks if this message matches the given message name.
+	 * Get the WebView widget associated with this message.
+	 * @return Pointer to WebView object.
 	 */
-	bool is(const MAUtil::String& messageName);
+	virtual NativeUI::WebView* getWebView();
 
 	/**
-	 * Returns a message parameter by param name.
+	 * Checks if this message matches the given message name.
 	 */
-	MAUtil::String getParam(const MAUtil::String& paramName);
+	virtual bool is(const MAUtil::String& messageName);
+
+	/**
+	 * Returns the string value of a message parameter.
+	 * @return The param value as a string.
+	 */
+	virtual MAUtil::String getParam(const MAUtil::String& paramName);
+
+	/**
+	 * Returns the integer value of a message parameter.
+	 * @return The param value as an int.
+	 */
+	virtual int getParamInt(const MAUtil::String& paramName);
 
 	/**
 	 * Checks if the given parameter name is in the message.
 	 */
-	bool hasParam(const MAUtil::String& paramName);
-
-
-	/**
-	 * Calls a JavaScript callback function using the "callbackId"
-	 * parameter. The callbackId is supplied automatically when
-	 * using the josync.messagehandler.send function.
-	 * @param result A string that contains the data to be returned
-	 * to the JavaScript callback function.
-	 * @return true on success, false on error.
-	 */
-	bool replyString(const MAUtil::String& result);
-
-	/**
-	 * Calls a JavaScript callback function using the "callbackId"
-	 * parameter. The callbackId is supplied automatically when
-	 * using the josync.messagehandler.send function.
-	 * @param result A boolean to be returned
-	 * to the JavaScript callback function.
-	 * @return true on success, false on error.
-	 */
-	bool replyBoolean(bool result);
-
-	/**
-	 * Calls a JavaScript callback function using the "callbackId"
-	 * parameter. Returns null to the callback function.
-	 * The callbackId is supplied automatically when
-	 * using the josync.messagehandler.send function.
-	 * @return true on success, false on error.
-	 */
-	bool replyNull();
+	virtual bool hasParam(const MAUtil::String& paramName);
 
 protected:
 	/**
 	 * Parse the message. This finds the message name and
 	 * creates a dictionary with the message parameters.
 	 */
-	void parse(MAHandle dataHandle);
+	virtual void parse(MAHandle dataHandle);
 
-private:
 	/**
 	 * The WebView of this message.
 	 */
@@ -137,6 +119,6 @@ private:
 	MAUtil::HashMap<MAUtil::String, MAUtil::String> mMessageParams;
 };
 
-} // namespace NativeUI
+} // namespace
 
-#endif // NATIVEUI_WEB_VIEW_MESSAGE_H_
+#endif
