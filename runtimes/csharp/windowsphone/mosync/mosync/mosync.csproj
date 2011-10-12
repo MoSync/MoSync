@@ -77,6 +77,8 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
+    <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\MoSyncCore.cs" />
     <Compile Include="Source\MoSyncCoreInterpreted.cs" />
     <Compile Include="Source\MoSyncMemory.cs" />
@@ -129,6 +131,9 @@
       <Project>{7746202B-A479-49BE-8FF9-205EB13DDE07}</Project>
       <Name>mosyncLib</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Source\Modules\NativeUI\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />

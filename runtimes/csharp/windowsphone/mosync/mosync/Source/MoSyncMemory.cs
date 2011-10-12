@@ -123,6 +123,28 @@ namespace MoSync
             return System.Text.UnicodeEncoding.Unicode.GetString(mData, address, endaddress - address);
         }
 
+        public void WriteStringAtAddress(int address, String str, int maxSize)
+        {
+            char[] data = str.ToCharArray();
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (i > maxSize)
+                    break;
+                WriteUInt8(address + i, (byte)data[i]);
+            }
+        }
+
+        public void WriteWStringAtAddress(int address, String str, int maxSize)
+        {
+            char[] data = str.ToCharArray();
+            for (int i = 0; i < data.Length; i++)
+            {
+                if (i > maxSize)
+                    break;
+                WriteInt16(address + i * 2, (short)data[i]);
+            }
+        }
+
         public void ReadBytes(byte[] bytes, int src, int size)
         {
             System.Array.Copy(mData, src, bytes, 0, size);
