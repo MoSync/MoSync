@@ -17,10 +17,10 @@
 			y="-4.6094184"
 			transform="translate(0,924.36218)"
 			id="rect3006"
-			style="fill:#000000" />
+			fill="#000000" />
 		<g
 			id="text2985"
-			style="font-size:34.23506927px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;font-family:Times New Roman;-inkscape-font-specification:'Times New Roman, Bold'">
+			fill="#ffffff">
 			<path
 				d="m 14.067278,993.2912 -13.60710275,0 0,-0.36776 8.59220005,-14.24232 -2.5074514,0 c -1.0809955,1e-5 -1.8555186,0.0975 -2.3235716,0.29253 -0.4680612,0.19504 -0.8469646,0.50708 -1.1367113,0.93612 -0.2897526,0.42906 -0.5906465,1.19523 -0.9026825,2.29849 l -0.585072,0 0,-4.54684 13.1557615,0 0,0.45134 -8.5253346,14.10859 1.0698459,0 c 2.1396825,0 3.6831567,-0.30646 4.6304267,-0.9194 0.947247,-0.61293 1.660477,-1.73292 2.139692,-3.35998 l 0.468058,0 z"
 				id="path3009" />
