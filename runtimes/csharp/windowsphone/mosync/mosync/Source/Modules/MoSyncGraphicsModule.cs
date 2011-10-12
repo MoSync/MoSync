@@ -7,6 +7,7 @@ using System.Windows.Media.Imaging;
 using System.Threading;
 using System.Windows.Media;
 using System.Windows.Controls;
+using Microsoft.Phone.Controls;
 
 namespace MoSync
 {
@@ -35,7 +36,8 @@ namespace MoSync
 
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
-            test_mosync.MainPage mainPage = runtime.GetMainPage();
+            PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+            test_mosync.MainPage mainPage = frame.Content as test_mosync.MainPage;
 
             mBackBuffer = new WriteableBitmap(
                 (int)mainPage.ViewPortContainer.Width,

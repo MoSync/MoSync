@@ -83,6 +83,10 @@ namespace test_mosync
         // This code will not execute when the application is reactivated
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
+            RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
+            {
+                MoSyncThread.CreateAndStart("program", "resources");
+            };
         }
 
         // Code to execute when the application is activated (brought to foreground)

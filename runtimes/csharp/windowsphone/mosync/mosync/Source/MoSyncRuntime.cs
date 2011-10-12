@@ -7,6 +7,7 @@ using System.Windows;
 using System.Threading;
 using System.Reflection;
 using System.Windows.Input;
+using Microsoft.Phone.Controls;
 
 namespace MoSync
 {
@@ -50,7 +51,7 @@ namespace MoSync
         private List<Memory> mEvents = new List<Memory>();
         private AutoResetEvent mEventWaiter = new AutoResetEvent(false);
 
-        private test_mosync.MainPage mMainPage;
+        //private test_mosync.MainPage mMainPage;
       
         private void InitSyscalls()
         {
@@ -81,9 +82,9 @@ namespace MoSync
 
         }
   
-        public Runtime(Core core, test_mosync.MainPage mainPage)
+        public Runtime(Core core)
         {
-            mMainPage = mainPage;
+//            mMainPage = mainPage;
             mCore = core;
             mSyscalls = new Syscalls();
             mIoctls = new Ioctls();
@@ -95,6 +96,8 @@ namespace MoSync
             const int MAEvent_point_x = 4;
             const int MAEvent_point_y = 8;
             const int MAEvent_point_touchId = 12;
+
+            PhoneApplicationFrame mainPage = (PhoneApplicationFrame)Application.Current.RootVisual;
 
             mainPage.MouseLeftButtonDown += delegate(Object sender, MouseButtonEventArgs e)
             {
@@ -157,10 +160,12 @@ namespace MoSync
             };
         }
 
+        /*
         public test_mosync.MainPage GetMainPage()
         {
             return mMainPage;
         }
+         * */
 
         // will reset the runtime.
         public void Init()

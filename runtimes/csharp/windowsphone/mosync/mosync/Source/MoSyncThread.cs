@@ -26,11 +26,11 @@ class MoSyncThread
     {
     }
 
-    public void Init(Stream program, Stream resources, test_mosync.MainPage mainPage)
+    public void Init(Stream program, Stream resources)
     {
         mCore = new MoSync.CoreInterpreted();
         mCore.LoadProgram(program);
-        mRuntime = new MoSync.Runtime(mCore, mainPage);
+        mRuntime = new MoSync.Runtime(mCore);
         mCore.SetRuntime(mRuntime);
 
         if (resources != null)
@@ -70,7 +70,7 @@ class MoSyncThread
         mThread.Join();
     }
 
-    public static void CreateAndStart(String programFile, String resourceFile, test_mosync.MainPage mainPage)
+    public static void CreateAndStart(String programFile, String resourceFile)
     {
         StreamResourceInfo programResInfo = Application.GetResourceStream(new Uri(programFile, UriKind.Relative));
         StreamResourceInfo resourcesResInfo = Application.GetResourceStream(new Uri(resourceFile, UriKind.Relative));
@@ -85,7 +85,7 @@ class MoSyncThread
             resources = resourcesResInfo.Stream;
 
         MoSyncThread mosyncThread = new MoSyncThread();
-        mosyncThread.Init(programResInfo.Stream, resources, mainPage);
+        mosyncThread.Init(programResInfo.Stream, resources);
         mosyncThread.StartThread();
     }
 }

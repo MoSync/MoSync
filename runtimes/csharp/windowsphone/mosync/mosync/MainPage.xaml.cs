@@ -19,7 +19,6 @@ namespace test_mosync
         public MainPage()
         {
             InitializeComponent();
-            MoSyncThread.CreateAndStart("program", "resources", this);
         }
 
         // Simple button Click event handler to take us to the second page

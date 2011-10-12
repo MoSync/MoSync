@@ -78,7 +78,9 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
-    <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncNativeUIModule.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncNativeUI.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncNativeUIWindowsPhone.cs" />
     <Compile Include="Source\MoSyncCore.cs" />
     <Compile Include="Source\MoSyncCoreInterpreted.cs" />
     <Compile Include="Source\MoSyncMemory.cs" />
@@ -132,9 +134,7 @@
       <Name>mosyncLib</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Source\Modules\NativeUI\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.$(TargetFrameworkProfile).Overrides.targets" />
   <Import Project="$(MSBuildExtensionsPath)\Microsoft\Silverlight for Phone\$(TargetFrameworkVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
