@@ -217,7 +217,7 @@ std::string getDir(const std::string& name) {
 	size_t index = name.find_last_of('/');
 #ifdef WIN32
 	size_t bi = name.find_last_of('\\');
-	if(bi > index || index == string::npos)
+	if((bi > index || index == string::npos) && bi != string::npos)
 		index = bi;
 #endif
 	return name.substr(0, index);
