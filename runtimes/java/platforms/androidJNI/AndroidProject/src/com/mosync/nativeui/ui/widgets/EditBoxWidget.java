@@ -29,14 +29,14 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 /**
  * This class represents an editable text area.
- * 
+ *
  * @author fmattias
  */
 public class EditBoxWidget extends LabelWidget
 {
 	/**
 	 * Constructor.
-	 * 
+	 *
 	 * @param handle handle Integer handle corresponding to this instance.
 	 * @param view An editable text view wrapped by this widget.
 	 */
@@ -45,7 +45,7 @@ public class EditBoxWidget extends LabelWidget
 		super( handle, editView );
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	/**
 	 * @see LabelWidget.setProperty.
 	 */
@@ -56,7 +56,7 @@ public class EditBoxWidget extends LabelWidget
 		{
 			return true;
 		}
-		
+
 		EditText editTextView = (EditText) getView( );
 		if( property.equals( Types.WIDGET_PROPERTY_EDIT_MODE ) )
 		{
@@ -89,7 +89,7 @@ public class EditBoxWidget extends LabelWidget
 		{
 			return false;
 		}
-		
+
 		return true;
 
 	}
@@ -103,13 +103,9 @@ public class EditBoxWidget extends LabelWidget
 		EditText editTextView = (EditText) getView( );
 		if( property.equals( IX_WIDGET.MAW_EDIT_BOX_TEXT ) )
 		{
-			if ( editTextView.getText() != null && editTextView.getText().length() > 0 )
+			if ( editTextView.getText() != null )
 			{
 				return editTextView.getText().toString( );
-			}
-			else if ( editTextView.getHint() != null && editTextView.getHint().length() > 0 )
-			{
-				return editTextView.getHint().toString( );
 			}
 			else
 			{

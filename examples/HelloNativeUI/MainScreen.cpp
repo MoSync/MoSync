@@ -152,7 +152,6 @@ MA 02110-1301, USA.
 	{
 		// Empty the contents of the edit box.
 		mPasswordBox->setText("");
-		submitEditBoxContent();
 	}
 
 	/**

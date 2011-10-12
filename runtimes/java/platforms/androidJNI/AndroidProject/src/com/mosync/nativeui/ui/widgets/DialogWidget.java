@@ -186,7 +186,7 @@ public class DialogWidget extends Layout
 		}
 		else
 		{
-			return "";
+			return INVALID_PROPERTY_NAME;
 		}
 	}
 
