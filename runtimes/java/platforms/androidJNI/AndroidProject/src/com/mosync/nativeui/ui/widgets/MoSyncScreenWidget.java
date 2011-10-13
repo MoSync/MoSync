@@ -25,14 +25,14 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  * This screen widget represents the default MoSync canvas
  * screen. It has no properties and does not act as a layout.
  * It only exists so that it can be a part of the widget table.
- * 
+ *
  * @author fmattias
  */
 public class MoSyncScreenWidget extends Widget
 {
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param handle handle Integer handle corresponding to this instance.
 	 * @param view The MoSyncView wrapped by this widget.
 	 */
@@ -51,7 +51,7 @@ public class MoSyncScreenWidget extends Widget
 	@Override
 	public String getProperty(String property)
 	{
-		return "";
+		return INVALID_PROPERTY_NAME;
 	}
 
 	@Override
