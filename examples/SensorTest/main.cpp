@@ -211,13 +211,13 @@ void drawSensorOutput()
  */
 void setFont()
 {
-	//int nrFonts = maFontGetCount();
-	char fontName[BUFFER_SIZE];
-	// get font with the specified ID.
-	maFontGetName(FONT_ID, fontName, BUFFER_SIZE);
-	// Load font with size 20.
-	int fontHandle = maFontLoadWithName(fontName, TEXT_SIZE);
-	maFontSetCurrent(fontHandle);
+	MAHandle defaultFont = maFontLoadDefault(FONT_TYPE_SANS_SERIF, 0, TEXT_SIZE);
+	//Check if it's implemented on the current platform.
+	if (0 > defaultFont)
+	{
+		maPanic(0, "Device fonts is only available on Android and iOS.");
+	}
+	maFontSetCurrent(defaultFont);
 }
 
 extern "C" int MAMain()
