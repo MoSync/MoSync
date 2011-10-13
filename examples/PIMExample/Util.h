@@ -42,6 +42,18 @@ MA 02110-1301, USA.
 		return;\
 	}
 
+/**
+ * Check the a given field is supported on current platform and
+ * if it has values.
+ */
+#define checkIfFieldIsSupported(contactHandle, fieldID) \
+	int result = maPimItemFieldCount(contactHandle, fieldID); \
+	if (0 >= result) \
+	{\
+		printResultCode(result);\
+		return;\
+	}
+
 #include <conprint.h>
 #include <wchar.h>
 #include <ma.h>
@@ -68,7 +80,7 @@ int copyWCharArray(void* destination, const wchar_t* source);
  * be read from buffer address.
  * @param arrayIndex The index of the array.
  * @return A pointer to the wchar array if the arrayIndex is valid, or
- * a pointer to the latest wchar array from buffer otherwise.
+ * NULL otherwise.
  */
 const wchar* getWCharArrayFromBuf(void* buffer, const int arrayIndex);
 
