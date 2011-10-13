@@ -211,13 +211,16 @@ void drawSensorOutput()
  */
 void setFont()
 {
-	//int nrFonts = maFontGetCount();
-	char fontName[BUFFER_SIZE];
-	// get font with the specified ID.
-	maFontGetName(FONT_ID, fontName, BUFFER_SIZE);
-	// Load font with size 20.
-	int fontHandle = maFontLoadWithName(fontName, TEXT_SIZE);
-	maFontSetCurrent(fontHandle);
+	int countFonts = maFontGetCount();
+	if (countFonts > FONT_ID)
+	{
+		char fontName[BUFFER_SIZE];
+		// get font with the specified ID.
+		maFontGetName(FONT_ID, fontName, BUFFER_SIZE);
+		// Load font with size 20.
+		int fontHandle = maFontLoadWithName(fontName, TEXT_SIZE);
+		maFontSetCurrent(fontHandle);
+	}
 }
 
 extern "C" int MAMain()
