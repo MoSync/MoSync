@@ -27,7 +27,7 @@ void addAndPrint(std::vector<int>& v, int n)
 	}
 
 	// Print numbers with a space between them.
-	for (vector<int>::const_iterator it = v.begin(); it != v.end(); ++it)
+	for (std::vector<int>::const_iterator it = v.begin(); it != v.end(); ++it)
 	{
 		printf("%d ", *it);
 	}
