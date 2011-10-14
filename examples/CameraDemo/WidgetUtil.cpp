@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file WidgetUtil.h
- * @author Mattias Frånberg and Chris Hughes
+ * @author Mattias FrÃ¥nberg and Chris Hughes
  *
  * Implementation of basic utilities that get and set widget properties.
  */
@@ -46,7 +46,7 @@ int widgetSetPropertyInt(MAHandle handle, const char *property, int value)
 {
 	char buffer[256];
 	sprintf(buffer, "%i", value);
-	maWidgetSetProperty( handle, property, buffer );
+	return maWidgetSetProperty( handle, property, buffer );
 }
 
 /**

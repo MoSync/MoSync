@@ -18,7 +18,7 @@
 		<nickname value="Nickname" />
 		<note value="Note" attr="assistant,auto,other" />
 		<org value="Organization" />
-		<revision value="2010-04-30T16:04:39Z" />
+		<revision value="2010-04-30T16:04:39" />
 
 		<!--pretty sure most of these are mutually exclusive in reality-->
 		<tel value="007" attr="fax,home,mobile,work,pager,sms,preferred" />

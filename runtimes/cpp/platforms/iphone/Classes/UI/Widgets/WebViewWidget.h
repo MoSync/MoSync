@@ -23,6 +23,10 @@
 	NSString* baseUrl;
     NSString* softHookPattern;
 	NSString* hardHookPattern;
+	NSString* cantNavigate;
+	NSString* canNavigateForward;
+	NSString* canNavigateBack;
+	NSString* canNavigateEither;
     NSString* javaScriptIdentifier; //"javascript:"
     NSMutableDictionary* urlsToNotHook; //Used to let the set url property to bypass the hooks
 }

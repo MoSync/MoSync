@@ -71,15 +71,24 @@ class Work < TaskBase
 
 		# If you invoke a work without setting up any targets,
 		# we will check for the "clean" goal here.
+		# Let's also check for "run".
+		doRun = false
 		if(Targets.size == 0)
 			Targets.setup
 			if(Targets.goals.include?(:clean))
 				self.execute_clean
 				return
 			end
+			doRun = true if(Targets.goals.include?(:run))
 		end
 
 		@prerequisites.each do |p| p.invoke end
+
+		if(doRun)
+			if(!self.respond_to?(:run))
+				sh @TARGET
+			end
+		end
 	end
 
 	def invoke_clean
@@ -95,6 +104,9 @@ class Work < TaskBase
 
 	# Invoke the workfile of another directory, as if it would have been called from the command line.
 	def Work.invoke_subdir(dir, *args)
+		Work.invoke_subdir_ex(false, dir, *args)
+	end
+	def Work.invoke_subdir_ex(reload, dir, *args)
 		puts File.expand_path(dir) + " " + args.inspect
 		fn = dir + "/workfile.rb"
 		if(!File.exists?(fn))
@@ -107,15 +119,16 @@ class Work < TaskBase
 
 		oldDir = Dir.getwd
 		Dir.chdir(dir)
-		if(RELOAD)
+		if(RELOAD || reload)
 			args = args.join(' ')
 			if(USE_NEWLIB)
-				args += " USE_NEWLIB=\"\""
+				args << ' USE_NEWLIB='
 			end
 			if(FULLSCREEN == "true")
-				args += " FULLSCREEN=\"true\""
+				args << " FULLSCREEN=\"true\""
 			end
-			cmd = "workfile.rb #{args} CONFIG=\"#{CONFIG}\" RELOAD=\"\""
+			args << ' RELOAD=' if(RELOAD)
+			cmd = "workfile.rb #{args} CONFIG=\"#{CONFIG}\""
 			if(HOST == :win32)
 				sh "ruby #{cmd}"
 			else
@@ -128,7 +141,10 @@ class Work < TaskBase
 	end
 
 	def Work.invoke_subdirs(dirs, *args)
-		dirs.each do |dir| Work.invoke_subdir(dir, *args) end
+		Work.invoke_subdirs_ex(false, dirs, *args)
+	end
+	def Work.invoke_subdirs_ex(reload, dirs, *args)
+		dirs.each do |dir| Work.invoke_subdir_ex(reload, dir, *args) end
 	end
 end
 
@@ -145,6 +161,7 @@ class BuildWork < Work
 		if(@TARGETDIR)
 			@prerequisites << DirTask.new(self, @TARGETDIR)
 		end
+		@prerequisites += @PREREQUISITES
 		setup2
 		#dump(0)
 		if(@INSTALLDIR)

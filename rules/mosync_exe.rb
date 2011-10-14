@@ -43,30 +43,51 @@ module PipeElimTask
 	end
 end
 
+class PipeCppTask < PipeTask
+	def initialize(work, name, objects, linkflags)
+		@targetDir = File.dirname(name)
+		super(work, name, objects, linkflags + ' -cpp', [@targetDir + '/rebuild.build.cpp', @targetDir + '/data_section.bin'])
+	end
+	def execute
+		super
+		FileUtils.mv('rebuild.build.cpp', @targetDir + '/rebuild.build.cpp')
+		FileUtils.mv('data_section.bin', @targetDir + '/data_section.bin')
+	end
+end
+
 # Packs a MoSync program for installation.
 # resource can be nil. all other parameters must be valid.
 class MoSyncPackTask < Task
-	def initialize(work, tempdir, buildpath, model, program, resource, name)
+	def initialize(work, options = {})
 		super(work)
-		@model = model
-		@program = program
-		@resource = resource
-		@packpath = buildpath + model
-		@name = name
-		@tempdir = tempdir
-		@prerequisites = [@program, DirTask.new(work, @packpath)]
-		@prerequisites << @resource if(@resource)
+		@o = options
+		@o[:packpath] = @o[:buildpath] + @o[:model] if(!@o[:packpath])
+		@prerequisites = [@o[:program], DirTask.new(work, @o[:packpath])]
+		@prerequisites << @o[:resource] if(@o[:resource])
+		@o[:vendor] = 'Built with MoSync' if(!@o[:vendor])
 	end
 	def execute
-		if(@resource)
-			r = File.expand_path(@resource)
+		if(@o[:resource])
+			r = File.expand_path(@o[:resource])
 			resArg = " -r \"#{r}\""
 		end
-		p = File.expand_path(@program)
-		d = File.expand_path(@packpath)
-		FileUtils.cd(@tempdir, :verbose => true) do
-			sh "#{mosyncdir}/bin/package -p \"#{p}\"#{resArg} -m \"#{@model}\""+
-				" -d \"#{d}\" -n \"#{@name}\" --vendor MoSync"
+		p = File.expand_path(@o[:program])
+		d = File.expand_path(@o[:packpath])
+		co = File.expand_path(@o[:cppOutput])
+		FileUtils.cd(@o[:tempdir], :verbose => true) do
+			sh "#{mosyncdir}/bin/package -p \"#{p}\"#{resArg} -m \"#{@o[:model]}\""+
+				" -d \"#{d}\" -n \"#{@o[:name]}\" --vendor \"#{@o[:vendor]}\""+
+				" --version #{@o[:version]}"+
+				" --ios-cert \"#{@o[:iosCert]}\""+
+				" --cpp-output \"#{co}\" --ios-project-only"+
+				" --android-package \"#{@o[:androidPackage]}\""+
+				" --android-version-code \"#{@o[:androidVersionCode]}\""+
+				" --android-keystore \"#{@o[:androidKeystore]}\""+
+				" --android-storepass \"#{@o[:androidStorepass]}\""+
+				" --android-alias \"#{@o[:androidAlias]}\""+
+				" --android-keypass \"#{@o[:androidKeypass]}\""+
+				" --show-passwords"+
+				@o[:extraParameters].to_s
 		end
 	end
 end
@@ -116,6 +137,12 @@ class PipeExeWork < PipeGccWork
 		@prerequisites << MxConfigTask.new(self, "#{@COMMON_BASEDIR}/build/#{CONFIG}", @EXTENSIONS) if(@EXTENSIONS)
 		super
 	end
+	def isPackingForIOS
+		return (defined?(PACK) && @PACK_MODEL.beginsWith('Apple/'))
+	end
+	def pipeTaskClass
+		return (isPackingForIOS ? PipeCppTask : super)
+	end
 	def setup3(all_objects, have_cppfiles)
 		# resource compilation
 		if(!defined?(@LSTFILES))
@@ -125,7 +152,9 @@ class PipeExeWork < PipeGccWork
 				@LSTFILES = []
 			end
 		end
-		if(@LSTFILES.size > 0)
+		if(@resourceTask)
+			@prerequisites << @resourceTask
+		elsif(@LSTFILES.size > 0)
 			lstTasks = @LSTFILES.collect do |name| FileTask.new(self, name) end
 			@resourceTask = PipeResourceTask.new(self, "build/resources", lstTasks)
 			@prerequisites << @resourceTask
@@ -142,16 +171,68 @@ class PipeExeWork < PipeGccWork
 		end
 		all_objects += libs
 
+		if(defined?(PACK))
+			default(:PACK_MODEL, PACK)
+			default(:PACK_VERSION, '1.0')
+			default(:PACK_IOS_CERT, 'iPhone developer')
+			default(:PACK_CPP_OUTPUT, @buildpath)
+			default(:PACK_ANDROID_PACKAGE, "com.mosync.app_#{@NAME}")
+			default(:PACK_ANDROID_VERSION_CODE, 1)
+			default(:PACK_ANDROID_KEYSTORE, mosyncdir+'/etc/mosync.keystore')
+			default(:PACK_ANDROID_STOREPASS, 'default')
+			default(:PACK_ANDROID_ALIAS, 'mosync.keystore')
+			default(:PACK_ANDROID_KEYPASS, 'default')
+		end
+
+		pipeFlags = @FLAGS + @EXTRA_LINKFLAGS
+		if(!pipeFlags.include?(' -datasize') && USE_NEWLIB)
+			@EXTRA_LINKFLAGS << standardMemorySettings(10)
+		end
+
 		super
 
 		if(ELIM)
 			@TARGET.extend(PipeElimTask)
 		end
 		if(defined?(PACK))
-			@prerequisites << @TARGET = MoSyncPackTask.new(self, @BUILDDIR_BASE, @buildpath,
-				PACK, @TARGET, @resourceTask, @NAME)
+			@prerequisites << @TARGET = MoSyncPackTask.new(self,
+				:tempdir => @BUILDDIR_BASE,
+				:buildpath => @buildpath,
+				:model => @PACK_MODEL,
+				:program => @TARGET,
+				:resource => @resourceTask,
+				:name => @NAME,
+				:vendor => @VENDOR,
+				:version => @PACK_VERSION,
+				:iosCert => @PACK_IOS_CERT,
+				:cppOutput => @PACK_CPP_OUTPUT,
+				:androidPackage => @PACK_ANDROID_PACKAGE,
+				:androidVersionCode => @PACK_ANDROID_VERSION_CODE,
+				:androidKeystore => @PACK_ANDROID_KEYSTORE,
+				:androidStorepass => @PACK_ANDROID_STOREPASS,
+				:androidAlias => @PACK_ANDROID_ALIAS,
+				:androidKeypass => @PACK_ANDROID_KEYPASS,
+				:extraParameters => @PACK_PARAMETERS
+				)
 		end
 	end
+
+	# Returns pipe-tool flags for memory settings,
+	# with a datasize of 2^pow2kb KiB.
+	# For example, for 2 MiB, call standardMemorySettings(11).
+	# A power-of-2 argument may seem strange, but because the runtimes
+	# force datasize to the closest upper power-of-2 anyway,
+	# it should minimize accidental memory waste.
+	def standardMemorySettings(pow2kb)
+		raise "Insufficient memory. Need at least 64 KiB." if(pow2kb < 6)
+		d = (1 << (pow2kb + 10))
+		h = d - (d >> 2)
+		#newlibStaticDataSize = 128*1024
+		#h -= newlibStaticDataSize if(USE_NEWLIB)
+		s = (d >> 4)
+		return " -datasize=#{d} -heapsize=#{h} -stacksize=#{s}"
+	end
+
 	def emuCommandLine
 		if(@resourceTask)
 			resArg = " -resource \"#{@resourceTask}\""

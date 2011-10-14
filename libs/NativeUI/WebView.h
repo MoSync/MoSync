@@ -30,7 +30,6 @@ MA 02110-1301, USA.
 
 namespace NativeUI
 {
-
     // Forward declaration.
     class WebViewListener;
 
@@ -215,6 +214,20 @@ namespace NativeUI
 		 */
 		virtual void navigateForward();
 
+		/*
+		 * Get whether the webview can navigate back
+		 * in the browsing history.
+		 * @return true if the webview can navigate back, false otherwise.
+		 */
+		virtual bool canNavigateBack();
+
+		/*
+		 * Get whether the webview can navigate forward
+		 * in the browsing history.
+		 * @return true if the webview can navigate forward, false otherwise.
+		 */
+		virtual bool canNavigateForward();
+
 		/**
 		 * Set the horizontal scroll bar to be painted.
 		 * Available only on Android for the moment.
@@ -271,12 +284,39 @@ namespace NativeUI
          */
         virtual void removeWebViewListener(WebViewListener* listener);
 
+		/**
+		 * Register this web view to receive messages from JavaScript.
+		 * This will set a hook for urls with the "mosync://"
+		 * scheme. Messages will arrive in in the
+		 * WebViewListener::webViewHookInvoked() method. Use class
+		 * WebViewMessage to inspect and parse messages.
+		 */
+		virtual void enableWebViewMessages();
+
+		/**
+		 * Unregister this web view from receiving messages sent
+		 * from JavaScript. This will clear the web view url hook.
+		 */
+		virtual void disableWebViewMessages();
+
+		/**
+		 * Run JavaScript code in the web view.
+		 * @param script The JavaScript code to run.
+		 * @return #MAW_RES_OK on success, <0 on error.
+		 */
+		virtual int callJS(const MAUtil::String& script);
+
     protected:
-        /**
-         * This method is called when there is an event for this widget.
-         * It passes on the event to all widget's listeners.
-         * @param widgetEventData The data for the widget event.
-         */
+		/**
+		 * This method is called when there is an event for this widget.
+		 * It passes on the event to all widget's listeners.
+		 *
+		 * If the event is #MAW_EVENT_WEB_VIEW_HOOK_INVOKED the data
+		 * parameter "urlData" gets deleted automatically after the
+		 * event is processed.
+		 *
+		 * @param widgetEventData The data for the widget event.
+		 */
         virtual void handleWidgetEvent(MAWidgetEventData* widgetEventData);
 
     private:

@@ -39,7 +39,7 @@ public final class MAMidlet extends MIDlet {
 	static PrintStream out = null;
 #endif
 #if defined(BLUETOOTH_LOG) || defined(TCP_LOG) || defined(PUBLIC_DEBUG)
-	private static final PrintStream makeConnectionPrintStream(final String url) throws Exception {
+	public static final PrintStream makeConnectionPrintStream(final String url) throws Exception {
 		StreamConnection sc = (StreamConnection)Connector.open(url, Connector.WRITE);
 #if !defined(PHONE_RELEASE) && defined(MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION)
 		if(sc instanceof FileConnection) {
@@ -66,7 +66,7 @@ public final class MAMidlet extends MIDlet {
 			out = makeConnectionPrintStream("socket://130.237.3.118:1717");	//MS-FREDRIK
 #endif
 
-#ifdef PUBLIC_DEBUG
+#if defined(PUBLIC_DEBUG) && !defined(DEBUG_URL_IN_CANVAS)
 			InputStream is = getClass().getResourceAsStream("debug.url");
 			if(is!=null) {
 				byte[] b = new byte[is.available()];
@@ -115,6 +115,9 @@ public final class MAMidlet extends MIDlet {
 		try {
 			if(mCanvas != null) {
 				if(!mStarted) {
+#ifdef BB_RIM_API
+					net.rim.device.api.system.Application.getApplication().addKeyListener(mCanvas);
+#endif
 #ifdef MOSYNC_COMMERCIAL
 					mCanvas.createCore();
 					mCanvas.initDisplay();

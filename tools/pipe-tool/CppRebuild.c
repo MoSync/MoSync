@@ -56,7 +56,7 @@ static FuncProp funcprop;
 
 
 //****************************************
-//			 
+//
 //****************************************
 #ifdef CPP_SHOW_LINES
 
@@ -81,7 +81,7 @@ void InitFiles() {
 		FILE *f;
 		const char *fileName;
 		if(fileInfo[file].numLines!=-1) continue;
-		fileName = GetFileNumString(file);	
+		fileName = GetFileNumString(file);
 		f = fopen(fileName, "rb");
 		if(f)
 		{
@@ -89,7 +89,7 @@ void InitFiles() {
 			fseek(f, 0, SEEK_END);
 			dataSize = ftell(f);
 
-			fileInfo[file].fileData = (char*) malloc(dataSize+1);		
+			fileInfo[file].fileData = (char*) malloc(dataSize+1);
 
 			fileInfo[file].fileData[dataSize] = 0;
 			fseek(f, 0, SEEK_SET);
@@ -103,7 +103,7 @@ void InitFiles() {
 				if(fileInfo[file].fileData[i] == '\n') line++;
 			}
 			fileInfo[file].numLines = line;
-		
+
 			fileInfo[file].lines = (char**) malloc(sizeof(char*)*(line+1));
 
 			line = 0;
@@ -155,9 +155,9 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		int line = ArrayGet(&SLD_Line_Array, ip);
 		int file = ArrayGet(&SLD_File_Array, ip);
 
-		if(line!=0) {	
+		if(line!=0) {
 			RebuildEmit("\n	// %s:%d\n", GetFileNumString(file), line);
-			RebuildEmit("	// %s\n", GetFileLine(file, line));	
+			RebuildEmit("	// %s\n", GetFileLine(file, line));
 		}
 	}
 #endif
@@ -172,7 +172,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 				RebuildEmit("	sp -= %d;\n",theOp->rs*4);
 			}
 		return 1;
-			
+
 		case _POP:
 			RebuildEmit("	//pop  %s,%d\n",Cpp_reg[theOp->rd], theOp->rs);
 
@@ -201,7 +201,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		break;
 
 		case _LDI:
-			RebuildEmit("	%s = 0x%x;", Cpp_reg[theOp->rd], theOp->imm);			
+			RebuildEmit("	%s = 0x%x;", Cpp_reg[theOp->rd], theOp->imm);
 		break;
 
 		case _LDR:
@@ -209,12 +209,12 @@ int RebuildCppInst(OpcodeInfo *theOp)
 			if (IsRegConst(theOp->rs))
 				RebuildEmit("	%s = 0x%x;", Cpp_reg[theOp->rd], ConstRegValue(theOp->rs));
 			else
-				RebuildEmit("	%s = %s;", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);		
+				RebuildEmit("	%s = %s;", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
 		}
 		break;
 
 		// Arithmatic
-		
+
 		case _ADD:
 			CppEmitArith(theOp,"+", 0);
 		break;
@@ -306,7 +306,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		break;
 
 		case _NOT:
-			RebuildEmit("	%s = ~%s;", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);		
+			RebuildEmit("	%s = ~%s;", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
 		break;
 
 		case _NEG:
@@ -396,11 +396,11 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		break;
 
 		case _XB:
-			RebuildEmit("	%s = (int)((char) %s);", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);		
+			RebuildEmit("	%s = (int)((char) %s);", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
 		break;
 
 		case _XH:
-			RebuildEmit("	%s = (int)((short) %s);", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);		
+			RebuildEmit("	%s = (int)((short) %s);", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
 		break;
 
 		default:
@@ -422,9 +422,9 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		/*
 		int n;
 		for (n=0;n<32;n++)
-		{		
+		{
 			if (reg_used & (1 << n))
-			{		
+			{
 				RebuildEmit("if(last_%s != %s) { LOG_REGISTER(%s); last_%s = %s;}\n", Cpp_reg[n], Cpp_reg[n], Cpp_reg[n], Cpp_reg[n], Cpp_reg[n]);
 			}
 		}
@@ -440,7 +440,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 
 
 //****************************************
-//			 
+//
 //****************************************
 
 void CppDecodeReturn(int shouldPassR15)
@@ -469,7 +469,7 @@ void CppDecodeReturn(int shouldPassR15)
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 void CppDecodeReturnNull()
@@ -497,7 +497,7 @@ void CppDecodeReturnNull()
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 void CppDecodeSysCall(OpcodeInfo *theOp)
@@ -531,8 +531,8 @@ void CppDecodeSysCall(OpcodeInfo *theOp)
 	for (n=0;n<param_count;n++)
 	{
 		if (need_comma)
-			RebuildEmit(", ");				
-	
+			RebuildEmit(", ");
+
 		RebuildEmit("%s", Cpp_reg[REG_i0 + n]);
 		need_comma = 1;
 	}
@@ -544,15 +544,15 @@ void CppDecodeSysCall(OpcodeInfo *theOp)
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 void CppForceSysCallUsed(char *name)
 {
 	SYMBOL	*sym;
-		
+
 	sym = FindSymbolsOld(name,section_SysCall,section_SysCall);
-	
+
 	if (!sym)
 		return;
 
@@ -560,12 +560,12 @@ void CppForceSysCallUsed(char *name)
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 void Cpp_LoadMem(OpcodeInfo *theOp, char *str)
 {
-	
+
 	if (theOp->rs == 0)
 	{
 		RebuildEmit("	%s = %s(0x%x);", Cpp_reg[theOp->rd], str, theOp->imm);
@@ -577,13 +577,13 @@ void Cpp_LoadMem(OpcodeInfo *theOp, char *str)
 		RebuildEmit("	%s = %s(%s);", Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs]);
 		return;
 	}
-		
+
 	RebuildEmit("	%s = %s(%s+0x%x);", Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs], theOp->imm);
 }
 
 
 //****************************************
-//			 
+//
 //****************************************
 
 void Cpp_StoreMem(OpcodeInfo *theOp, char *str)
@@ -606,7 +606,7 @@ void Cpp_StoreMem(OpcodeInfo *theOp, char *str)
 
 
 //****************************************
-//			 
+//
 //****************************************
 
 int CppDecodeLabel(OpcodeInfo *theOp, char *str)
@@ -614,21 +614,21 @@ int CppDecodeLabel(OpcodeInfo *theOp, char *str)
 
 	SYMBOL *ref, *labref;
 	int addr;
-	
+
 	ref = (SYMBOL *) ArrayGet(&CallArray, theOp->rip);
-	
+
 	// !! Check if what it points to in lablearry and use that !!
-			
+
 	if (!ref)
 		return 0;
 
 	addr = ref->Value;
-	
+
 	labref = (SYMBOL *) ArrayGet(&CodeLabelArray, addr);
 
 	if (!labref)
 		return 0;
-	
+
 	ref = labref;
 
 	RebuildEmit(str, ref->LabelEnum);
@@ -637,35 +637,35 @@ int CppDecodeLabel(OpcodeInfo *theOp, char *str)
 
 
 //****************************************
-//			 
+//
 //****************************************
 
 int CppDecodeCall(OpcodeInfo *theOp)
 {
 	SYMBOL *ref, *labref;
 	int addr;
-		
+
 	ref = (SYMBOL *) ArrayGet(&CallArray, theOp->rip);
-	
+
 	// !! Check if what it points to in lablearry and use that !!
-			
+
 	if (!ref)
 		return 0;
 
 	addr = ref->Value;
-	
+
 	labref = (SYMBOL *) ArrayGet(&CodeLabelArray, addr);
 
 	if (!labref)
 		return 0;
-	
+
 	ref = labref;
 
 	return CppCallFunction(ref, 1);
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 void CppDecodeCallReg(OpcodeInfo *theOp)
@@ -682,17 +682,17 @@ void CppDecodeCallReg(OpcodeInfo *theOp)
 		RebuildEmit(", i0");
 	else
 		RebuildEmit(", 0");
-	
+
 	if (i1)
 		RebuildEmit(", i1");
 	else
 		RebuildEmit(", 0");
-	
+
 	if (i2)
 		RebuildEmit(", i2");
 	else
 		RebuildEmit(", 0");
-	
+
 	if (i3)
 		RebuildEmit(", i3");
 	else
@@ -703,37 +703,38 @@ void CppDecodeCallReg(OpcodeInfo *theOp)
 	RebuildEmit(");\n");
 
 	// r14 and r15 are always scratch registers after a function call (they may have changed. So we can safely overwrite the content here).
-	if (ThisFunctionRegs & REGBIT(REG_r15)) {
+	if(funcprop.reg_used & REGBIT(REG_r15))
+	{
 		RebuildEmit("	r15 = __dbl_high;\n");
 	}
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 int CppDecodeCase(int ip)
 {
 	SYMBOL *ref;
-	
+
 	ref = (SYMBOL *) ArrayGet(&CodeLabelArray, ip);
 
 	if (!ref)
 		return 0;
-	
+
 	RebuildEmit("goto label_%d;", ref->LabelEnum);
 	return 1;
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 int CppDecodeSwitch(OpcodeInfo *theOp)
 {
 	int start, len, data_ip, def_ip, i;
 	int lab_ip;
-	
+
 	data_ip = theOp->imm;
 
 	start	= GetDataMemLong(data_ip++);
@@ -766,7 +767,7 @@ int CppDecodeSwitch(OpcodeInfo *theOp)
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 int CppCallFunction(SYMBOL *ref, int emit_r15)
@@ -774,13 +775,13 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 	int param_count, need_comma, n;
 	int rettype = ref->RetType;
 	int regs;
-	
+
 	CppEmitReturnType(rettype);
 
 	RebuildEmit("%s_%d(", ref->Name, ref->LocalScope);
-	
+
 	param_count = ref->Params;
-	
+
 	if (param_count > 4)
 		param_count = 4;
 
@@ -791,15 +792,15 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 	for (n=0;n<param_count;n++)
 	{
 		if (need_comma)
-			RebuildEmit(", ");				
+			RebuildEmit(", ");
 
 		RebuildEmit("%s", Cpp_reg[REG_i0 + n]);
 		need_comma = 1;
 	}
 
 	RebuildEmit(");");
-	
-	if (rettype == RET_double && emit_r15)
+
+	if (rettype == RET_double && emit_r15 && (regs & REGBIT(REG_r15)))
 	{
 		RebuildEmit("\n	r15 = __dbl_high;");
 		SetRegInit(REG_r15);
@@ -808,7 +809,7 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 void CppEmitArith(OpcodeInfo *theOp, char *str, int imm)
@@ -818,19 +819,19 @@ void CppEmitArith(OpcodeInfo *theOp, char *str, int imm)
 		RebuildEmit("	%s %s= 0x%x;", Cpp_reg[theOp->rd], str, theOp->imm);
 		return;
 	}
-	
+
 	RebuildEmit("	%s %s= %s;", Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs]);
 	return;
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 void CppEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
 {
 	char *us = "";
-	
+
 	if (issigned)
 		us = "(unsigned int)";
 
@@ -843,7 +844,7 @@ void CppEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
 	RebuildEmit("%s %s", us, Cpp_reg[theOp->rd]);
 
 	// Operator
-	
+
 	RebuildEmit(" %s ", oper);
 
 	if (imm)
@@ -857,14 +858,14 @@ void CppEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 void CppEmitDiv(OpcodeInfo *theOp, int imm)
 {
 	if ((theOp->rs == 0) || (theOp->imm == 0))
 		printf(" ");
-	
+
 	if (imm)
 	{
 		if (theOp->imm == 0)
@@ -880,7 +881,7 @@ void CppEmitDiv(OpcodeInfo *theOp, int imm)
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 void CppEmitDivu(OpcodeInfo *theOp, int imm)
@@ -900,7 +901,7 @@ void CppEmitDivu(OpcodeInfo *theOp, int imm)
 }
 
 //****************************************
-//			 
+//
 //****************************************
 
 void CppEmitJumpCond(OpcodeInfo *theOp, char *str, int unsign)
@@ -980,13 +981,13 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 	int param_count;
 	int need_comma;
 	int n;
-		
+
 	// Find registers used in function
-	
+
 	reg_used = FunctionRegAnalyse(sym, &funcprop);
-	
+
 	reg_alloc = 0;
-	
+
 	// Output helpful header
 
 	if (isproto == 0)
@@ -995,7 +996,7 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 		RebuildEmit("// Function: %s\n", sym->Name);
 		RebuildEmit("//****************************************\n\n");
 	}
-	
+
 	if (!isproto)
 	{
 		RebuildEmit("//             rrrrrrrrrrrrrrrriiiiddddddddfrsz\n");
@@ -1032,7 +1033,7 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 	RebuildEmit("%s_%d(", sym->Name, sym->LocalScope);
 
 	param_count = sym->Params;
-	
+
 	if (param_count > 4)
 		param_count = 4;
 
@@ -1041,8 +1042,8 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 	for (n=0;n<param_count;n++)
 	{
 		if (need_comma)
-			RebuildEmit(", ");				
-	
+			RebuildEmit(", ");
+
 		RebuildEmit("int %s", Cpp_reg[REG_i0 + n]);
 		need_comma = 1;
 
@@ -1061,15 +1062,15 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 	// Write local decl
 
 	// Remove regs that are already declared in func decl
-	
-	// TODO: verify that this is ok.
+
 	// ok this has sort of been reverse engineered by looking at the bitmasks in the rebuilt code... ;)
-	reg_used &= ThisFunctionRegs | (1 << REG_r14) | (1 << REG_r14) | (1 << REG_i0) | (1 << REG_i1) | (1 << REG_i2) | (1 << REG_i3);
+	// this is added to remove warnings about unusued variables.
+	reg_used &= ThisFunctionRegs | (1 << REG_r14) | (1 << REG_r15) | (1 << REG_i0) | (1 << REG_i1) | (1 << REG_i2) | (1 << REG_i3);
 
 	reg_used &= (~reg_alloc);
-		
+
 	// remove sp from locals
-	
+
 	reg_used &= ~(1 << REG_sp);
 	reg_used &= ~(1 << REG_zero);
 
@@ -1077,7 +1078,7 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 		reg_used |= (1 << REG_r14);
 	if (ThisFunctionRetType == RET_double)
 		reg_used |= (1 << REG_r15);
-	
+
 	if (reg_used)
 	{
 		RebuildEmit("\tint ");
@@ -1085,11 +1086,11 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 		need_comma = 0;
 
 		for (n=0;n<32;n++)
-		{		
+		{
 			if (reg_used & (1 << n))
 			{
 				if (need_comma)
-					RebuildEmit(", ");				
+					RebuildEmit(", ");
 
 				RebuildEmit("%s", Cpp_reg[n]);
 
@@ -1130,9 +1131,9 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 {
 	OpcodeInfo thisOp;
 	SYMBOL *ref;
-	
+
 	uchar *ip, *ip_end, *ip_last;
-	
+
 	int real_ip;
 //	char str[256];
 
@@ -1168,12 +1169,12 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 	while(1)
 	{
 		ip_last = ip;
-		
+
 		if (ip > ip_end)
 			break;
 
 		// Print labels
-		
+
 		ref = (SYMBOL *) ArrayGet(&CodeLabelArray, real_ip);
 
 		if (ref)
@@ -1186,7 +1187,7 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 				RebuildEmit("label_%d:;\n", ref->LabelEnum);
 			}
 		}
-	
+
 		if (ArrayGet(&CodeTouchArray, real_ip) == 0)
 			RebuildEmit("// ");
 
@@ -1195,9 +1196,9 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 		ip = DecodeOpcode(&thisOp, ip);
 
 		ThisFunctionExit = 0;
-	
+
 		if (ip > ip_end)
-			ThisFunctionExit = 1;	
+			ThisFunctionExit = 1;
 
 		RebuildCppInst(&thisOp);
 
@@ -1206,15 +1207,15 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 
 #ifdef CPP_DEBUG
 		{
-			int len = 4 + strlen(str);		
+			int len = 4 + strlen(str);
 			str[0] = 0;
-			
+
 			while(len < 40)
 			{
 				RebuildEmit(" ", str);
 				len++;
 			}
-			
+
 			DisassembleFromSource(real_ip, str);
 			RebuildEmit(";%s", str);
 		}
@@ -1223,7 +1224,7 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 //		RebuildEmit("\n");
 
 		// Check for case statement, which need case data after them
-		
+
 /*		if (CaseRef)
 		{
 			RebuildEmit(".data\n");
@@ -1231,7 +1232,7 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 			RebuildEmit(".code\n");
 		}
 */
-		real_ip += (ip - ip_last);	
+		real_ip += (ip - ip_last);
 	}
 
 	RebuildCppEpilog(sym);
@@ -1310,7 +1311,7 @@ void RebuildCpp_CallReg()
 		RebuildEmit("\n// No virtuals\n\n");
 		return;
 	}
-	
+
 	RebuildEmit("\n");
 	RebuildEmit("//****************************************\n");
 	RebuildEmit("//             CallReg Sink\n");
@@ -1328,7 +1329,7 @@ void RebuildCpp_CallReg()
 	{
 		RebuildEmit("	switch(s & 0xffffff)\n");
 		RebuildEmit("	{\n");
-		
+
 		for (n=0;n<count;n++)
 		{
 			sym = FetchVirtual(n);
@@ -1376,7 +1377,7 @@ void RebuildCpp_EmitDS()
 	int need_comma;
 	int count;
 	int n;
-	
+
 	RebuildEmit("\n");
 	RebuildEmit("//****************************************\n");
 	RebuildEmit("//             Data Section\n");
@@ -1391,7 +1392,7 @@ void RebuildCpp_EmitDS()
 }
 #endif
 //****************************************
-// 
+//
 //****************************************
 
 void RebuildCpp_StartUp()
@@ -1409,15 +1410,15 @@ void RebuildCpp_StartUp()
 	{
 	int n;
 	for(n = 0; n < 32; n++) {
-		RebuildEmit("static int last_%s = 0;\n", Cpp_reg[n]);				
+		RebuildEmit("static int last_%s = 0;\n", Cpp_reg[n]);
 	}
 
 
 	RebuildEmit("#define LOG_REGISTER_STATE_CHANGES(reg_used)\\\n");
 	for(n = 0; n < 32; n++) {
-		RebuildEmit("if((regused&(1<<%d)) && (last_%s != %s)) { last_%s = %s; LOG_REGISTER(%s); }\\\n", n, Cpp_reg[n], Cpp_reg[n], Cpp_reg[n], Cpp_reg[n], Cpp_reg[n], Cpp_reg[n]);				
+		RebuildEmit("if((regused&(1<<%d)) && (last_%s != %s)) { last_%s = %s; LOG_REGISTER(%s); }\\\n", n, Cpp_reg[n], Cpp_reg[n], Cpp_reg[n], Cpp_reg[n], Cpp_reg[n], Cpp_reg[n]);
 	}
-	RebuildEmit("\n");				
+	RebuildEmit("\n");
 	}
 #endif
 
@@ -1453,13 +1454,13 @@ void RebuildCpp_StartUp()
 
 	if (ep)
 		CppCallFunction(ep, 1);
-	
+
 	RebuildEmit("\n}\n");
 
 }
 
 //****************************************
-// 
+//
 //****************************************
 
 void RebuildCpp_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
@@ -1468,7 +1469,7 @@ void RebuildCpp_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
 
 	if (!stub)
 		if (!sym->Interface)
-			return;	
+			return;
 
 	if (!proto)
 	{
@@ -1478,7 +1479,7 @@ void RebuildCpp_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
 		RebuildEmit("//****************************************\n");
 		RebuildEmit("\n");
 	}
-	
+
 	param_count = sym->Params;
 
 	CppEmitReturnDecl(sym->RetType);
@@ -1493,8 +1494,8 @@ void RebuildCpp_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
 	for (n=0;n<param_count;n++)
 	{
 		if (need_comma)
-			RebuildEmit(", ");				
-	
+			RebuildEmit(", ");
+
 		RebuildEmit("int %s", Cpp_reg[REG_i0 + n]);
 		need_comma = 1;
 	}
@@ -1516,12 +1517,12 @@ void RebuildCpp_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
 		ThisFunctionRetType = sym->RetType;
 		CppDecodeReturnNull();
 	}
-	
+
 	RebuildEmit("\n}\n");
 }
 
 //****************************************
-// 
+//
 //****************************************
 
 void RebuildCpp_EmitExtensions(int stub)
@@ -1529,7 +1530,7 @@ void RebuildCpp_EmitExtensions(int stub)
 	SYMBOL *sym;
 	int len = sizeof(CppSyscallUsed);
 	int n;
-	
+
 	for (n=0;n<len;n++)
 	{
 		if (CppSyscallUsed[n])
@@ -1537,13 +1538,13 @@ void RebuildCpp_EmitExtensions(int stub)
 			sym = FindSysCall(n);
 
 			if (sym)
-				RebuildCpp_EmitSyscallFunc(sym, 0, stub);	
+				RebuildCpp_EmitSyscallFunc(sym, 0, stub);
 		}
 	}
 }
 
 //****************************************
-// 
+//
 //****************************************
 
 void RebuildCpp_EmitExtensionsProto()
@@ -1551,13 +1552,13 @@ void RebuildCpp_EmitExtensionsProto()
 	SYMBOL *sym;
 	int len = sizeof(CppSyscallUsed);
 	int n;
-	
+
 	for (n=0;n<len;n++)
 	{
 			sym = FindSysCall(n);
 
 			if (sym)
-				RebuildCpp_EmitSyscallFunc(sym, 1, 1);	
+				RebuildCpp_EmitSyscallFunc(sym, 1, 1);
 	}
 }
 
@@ -1629,7 +1630,7 @@ void RebuildCpp_Main()
 	#endif
 
 	ArrayWrite(&RebuildArray, "rebuild.build.cpp");
-} 
+}
 
 //****************************************
 //			  End Of File

@@ -33,6 +33,10 @@
     softHookPattern = @"";
 	hardHookPattern = @"";
     javaScriptIdentifier = @"javascript:";
+	cantNavigate = @"";
+	canNavigateForward = @"forward";
+	canNavigateBack = @"back";
+	canNavigateEither = [[canNavigateBack stringByAppendingString:canNavigateForward] retain];
 	baseUrl = [[self getDefaultBaseURL] retain];
     urlsToNotHook=[[NSMutableDictionary alloc] init];
 	id ret = [super init];
@@ -69,8 +73,13 @@
 			  NSString* webURLString = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 			  url = [[NSURL URLWithString: webURLString] filePathURL];
 		  } else {
-			  url = [NSURL URLWithString:value];
+              // Convert the string URL into ascii encoding.
+              NSData* data = [value dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+              NSString* formattedURL = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+              url = [NSURL URLWithString:formattedURL];
+              [formattedURL release];
 		  }
+
             NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
             NSString *absoluteURL = [url absoluteString];
 
@@ -153,6 +162,21 @@
 
     } else if ([key isEqualToString:@MAW_WEB_VIEW_BASE_URL]) {
 		return [baseUrl retain];
+	} else if ([key isEqualToString:@MAW_WEB_VIEW_NAVIGATE]) {
+		UIWebView* webView = (UIWebView*)view;
+		if(webView.canGoBack && webView.canGoForward){
+			return [canNavigateEither retain];
+		}
+		else if(webView.canGoBack){
+			return [canNavigateBack retain];
+		}
+		else if(webView.canGoForward){
+			return [canNavigateForward retain];
+		}
+		else {
+			return [cantNavigate retain];
+		}
+
 	} else {
 		return [super getPropertyWithKey:key];
 	}

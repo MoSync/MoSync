@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 MoSync AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -24,18 +24,18 @@
 
 @implementation NavBarWidget
 
-- (id)init {	
+- (id)init {
 	UINavigationBar* navbar = [[UINavigationBar alloc] initWithFrame:CGRectMake(0, 0, 100, 44)];
 	navbar.delegate = self;
 	prevNavitem = [[UINavigationItem alloc] init];
 	currNavitem = [[UINavigationItem alloc] init];
 	[navbar pushNavigationItem:prevNavitem animated:false];
 	[navbar pushNavigationItem:currNavitem animated:false];
-	view = navbar;		
-	
-	id ret = [super init];	
-   	[self setAutoSizeParamX:FILL_PARENT andY:WRAP_CONTENT];	
-    return ret;
+	view = navbar;
+
+	id ret = [super init];
+	[self setAutoSizeParamX:FILL_PARENT andY:WRAP_CONTENT];
+	return ret;
 }
 
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value {

@@ -321,7 +321,6 @@ void MainScreen::idle() {
 			mRotating = false;
 		}
 	}
-
 	grid->render();
 	mGLView->setProperty("invalidate", "");
 }
@@ -515,4 +514,3 @@ extern "C" int MAMain() {
 	Moblet::run(new GraphunApp());
 	return 0;
 }
-

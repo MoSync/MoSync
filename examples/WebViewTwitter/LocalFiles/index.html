@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+		<title>Tweet Reader</title>
+
+		<!-- import JQTouch -->
+		<script src="js/jqtouch/jqtouch.min.js" type="application/x-javascript" charset="utf-8"></script>
+
+		<!-- Import JQTouch default style (iPhone look). Replace the string "themes/default" with "themes/jqt" for a neutral (black) theme -->
+		<link type="text/css" rel="stylesheet" media="screen" href="js/jqtouch/jqtouch.css">
+		<link type="text/css" rel="stylesheet" media="screen" href="js/themes/apple/theme.css">
+		<!-- include JQuery through Google API => Always have the latest version -->
+		<script src="js/jqtouch/jquery-1.4.2.min.js" type="text/javascript" charset="utf-8"></script>
+		<script src="js/jqtouch/jqtouch.js" type="application/x-javascript" charset="utf-8"></script>
+
+		<!-- Import the bridge library. -->
+		<script src="js/bridge.js"></script>
+
+		<!-- Import file extensions. -->
+		<script src="js/file.js"></script>
+
+		<!-- JavaScript goes here -->
+		<script type="text/javascript">
+			// Fire up JQTouch
+			var jQT = $.jQTouch({
+				statusBar: 'black'
+			});
+
+			// We defince the parsed favorites as global functions because
+			// we use them in multiple places.
+			var gParsedFavorites = "";
+
+			// Make sure we get the correct event type on every touch system.
+			var userAgent = navigator.userAgent.toLowerCase();
+			var isiPhone =
+				(userAgent.indexOf('iphone') != -1 ||
+				userAgent.indexOf('ipod') != -1)
+					? true : false;
+			var clickEvent = isiPhone ? 'tap' : 'click';
+
+			/**
+			 * Outputs the received tweets to the user-interface
+			 * @param tweets The tweets as an array. Each element
+			 * represents one tweet and can be accessed via tweets[i].text
+			 */
+			function showTweets(tweets, username)
+			{
+				var tweetsTitle = document.getElementById("tweetsTitle");
+				tweetsTitle.innerHTML = username;
+				var results_ul = document.getElementById("results_ul");
+				// If it is the loading indicator do not parse it.
+				if (tweets == "loading...")
+				{
+					results_ul.innerHTML = "<li>" + tweets + "</li>";
+				}
+				else
+				{
+					var results = "";
+					if ((tweets.length == 0) || (tweets.error == "Not found"))
+					{
+						results = "<li>No tweets could be found check the username!</li>";
+					}
+					else
+					{
+						for (var i=0; i<tweets.length; i++)
+						{
+							results += "<li>" + tweets[i].text + "</li>";
+						}
+					}
+					results_ul.innerHTML = results;
+				}
+			}
+
+			/**
+			 * Navigates back one page.
+			 */
+			function goBack()
+			{
+				jQT.goBack();
+			}
+
+			/**
+			 * Downloads the Tweets for an specific user.
+			 * @param username the username that should be used
+			 * for downloading.
+			 */
+			function getTweetsForUser(username)
+			{
+				showTweets("loading...", username);
+
+				// Prepare the Twitter url, so it can be passed as a GET parameter.
+				var twitterUrl = "http://api.twitter.com/1/statuses/user_timeline.json?screen_name=" + username;
+
+				// Do the ajax call with JSON.
+				$.getJSON(twitterUrl,function(d)
+				{
+					showTweets(d, username);
+				});
+
+				jQT.goTo('#tweets');
+			}
+
+			/**
+			 * Gets the tweets for the user indicated in the input form.
+			 */
+			function getTweets()
+			{
+				// Get the username from the input field.
+				var username = document.getElementById("usernameInput").value;
+				if(username.length == 0)
+				{
+					alert("Invalid username!!!")
+					jQT.goTo('#theform');
+				}
+				else
+				{
+					getTweetsForUser(username)
+				}
+			}
+
+			/**
+			 * Read the list of favourite users, then
+			 * call the supplied callback function
+			 * with two parameters, the user data
+			 * and the path to the data file.
+			 */
+			function readFavoriteUsers(callbackFun)
+			{
+				// Path to file with user data.
+				var filePath;
+
+				// Get path to local file directory, then
+				// read favourite users from that directory.
+				bridge.file.getLocalPath(read);
+
+				function read(path)
+				{
+					if (null == path)
+					{
+						alert("Could not read user list");
+						return;
+					}
+
+					filePath = path + "SavedUsers";
+					bridge.file.read(filePath, handleResult);
+				}
+
+				function handleResult(data)
+				{
+					callbackFun(data, filePath);
+				}
+			}
+
+			/**
+			 * Read and display list of favourite users.
+			 */
+			function readAndDisplayFavoriteUsers()
+			{
+				readFavoriteUsers(displayFavoriteUsers);
+			}
+
+			/**
+			 * This function uses calls to Mosync for accessing files
+			 * and saving favorite users.
+			 */
+			function addFavoriteUser()
+			{
+				// Get the username from the input field
+				var userName = document.getElementById("usernameInput").value;
+
+				if(userName.length == 0)
+				{
+					alert("Invalid username!!!")
+					jQT.goTo('#theform');
+					return;
+				}
+				var userList;
+
+				readFavoriteUsers(addUser);
+
+				function addUser(userData, filePath)
+				{
+					userList = userData;
+					if (null == userList)
+					{
+						userList = "";
+					}
+
+					// Create a unique string, "!" is not in any
+					// Twitter user name.
+					var separatedUserName = "!" + userName + "!";
+
+					// Add user only if not in string.
+					if (-1 == userList.indexOf(separatedUserName))
+					{
+						userList += separatedUserName;
+					}
+
+					// Write user list.
+					bridge.file.write(filePath, userList, reportResult);
+				}
+
+				function reportResult(success)
+				{
+					if (success)
+					{
+						displayFavoriteUsers(userList);
+						alert("User successfully saved");
+					}
+					else
+					{
+						alert("Could not save user");
+					}
+				}
+			}
+
+			function displayFavoriteUsers(userData)
+			{
+				if (null == userData)
+				{
+					return;
+				}
+
+				gParsedFavoriteUsers = parseFavoriteUsers(userData);
+
+				var favorites_ul = document.getElementById("favorites");
+				var myID = "";
+				favorites_ul.innerHTML = "<li> Favorites: </li>";
+				for (var i = 0; i < gParsedFavoriteUsers.length; i++)
+				{
+
+					myID = "#submitButton" + i;
+					favorites_ul.innerHTML += "<li class='arrow'><a id='submitButton" +
+						i +
+						"')' onclick='getTweetsForUser(\"" +
+						gParsedFavoriteUsers[i] +
+						"\")'>" +
+						gParsedFavoriteUsers[i] +
+						"</a></li>";
+				}
+			}
+
+			/**
+			 * Parse a string with a list of user names.
+			 * Format of userData is "!user1!!user2!!...!!userN!"
+			 */
+			function parseFavoriteUsers(userData)
+			{
+				// Split string into elements, remove empty strings.
+				return userData.split("!").filter(
+					function(x){ return x.length > 0 });
+			}
+
+			/**
+			 * Event-listener. Gets called if the user presses a button
+			 * on his/her keyboard in the input field.
+			 * @param keynum The pressed key (as an ASCii value)
+			 */
+			function keydown(keynum)
+			{
+				if (keynum == 13)
+				{
+					$("#submitButton").trigger(clickEvent);
+				}
+			}
+
+			/**
+			 * Will be called after all the markup in <body> was loaded
+			 */
+			function initialize()
+			{
+				$("#submitButton").bind(clickEvent, function(e)
+				{
+					getTweets();
+				});
+				$("#favoriteButton").bind(clickEvent, function(e)
+				{
+					addFavoriteUser();
+				});
+				$("#backButton").bind(clickEvent, function(e)
+				{
+					goBack();
+				});
+
+				readAndDisplayFavoriteUsers();
+			}
+		</script>
+
+		<!-- CSS styles -->
+		<style type="text/css" >
+
+		</style>
+	</head>
+
+	<!-- A simple JQTouch layout consisting of two views -->
+	<body onload="initialize()">
+		<!-- "Page 1" -->
+		<div id="theform">
+			<div class="toolbar">
+				<h1>Tweet Reader</h1>
+			</div>
+			<ul class="rounded">
+				<li>
+					<input onkeydown="keydown(event.which);"
+						type="text"
+						placeholder="User name"
+						name="username"
+						id="usernameInput"
+						autocapitalize="off"
+						autocorrect="off"
+						autocomplete="off">
+				</li>
+
+				<li class="arrow">
+					<a id="submitButton" >View Tweets by this user</a></li>
+				<li><a id="favoriteButton">Add to Favorites List</a></li>
+			</ul>
+
+			<ul id="favorites" class="rounded">
+				<li>Favorites:</li>
+			</ul>
+
+		</div>
+
+		<!-- "Page 2" - Will contain the tweets found -->
+		<div id="tweets">
+			<div class="toolbar">
+				<h1 id="tweetsTitle">Tweets By ...</h1>
+				<a class="button back" href="#theform" id="backButton">Back</a>
+			</div>
+
+			<ul id="results_ul" class="rounded">
+				<li>Loading...</li>
+			</ul>
+		</ul>
+
+	</div>
+</body>
+</html>

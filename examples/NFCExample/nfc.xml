@@ -1,0 +1,18 @@
+<!-- This file instructs the device & runtime to trigger whenever a tag
+     matches one of these technologies.
+-->
+
+<nfc>
+<tech-list>
+<tech name="MifareUltralight" />
+</tech-list>
+
+<tech-list>
+<tech name="MifareClassic" />
+</tech-list>
+
+<tech-list>
+<tech name="Ndef" />
+</tech-list>
+
+</nfc>

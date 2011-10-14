@@ -43,9 +43,56 @@ namespace NativeUI
 
 		/**
 		 * Sets whether the layout can be scrollable or not.
+		 * Note: make sure you call this after you add all the children to it,
+		 * otherwise it would have no effect.
 		 * @param isScrollable If true, the layout can be scrollable.
 		 */
 		virtual void setScrollable(const bool isScrollable);
+
+		/**
+		 * Set the left padding.
+		 *
+		 * @param value The left padding in pixels.
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the property could be set.
+		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+		 * - #MAW_RES_ERROR otherwise.
+		 */
+		virtual int setPaddingLeft( const int value);
+
+		/**
+		 * Set the top padding.
+		 *
+		 * @param value The top padding in pixels.
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the property could be set.
+		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+		 * - #MAW_RES_ERROR otherwise.
+		 */
+		virtual int setPaddingTop( const int value);
+
+		/**
+		 * Set the right padding.
+		 *
+		 * @param value The right padding in pixels.
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the property could be set.
+		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+		 * - #MAW_RES_ERROR otherwise.
+		 */
+		virtual int setPaddingRight( const int value);
+
+		/**
+		 * Set the bottom padding.
+		 *
+		 * @param value The bottom padding in pixels.
+		 * @return Any of the following result codes:
+		 * - #MAW_RES_OK if the property could be set.
+		 * - #MAW_RES_INVALID_PROPERTY_VALUE if the property value was invalid.
+		 * - #MAW_RES_ERROR otherwise.
+		 */
+		virtual int setPaddingBottom( const int value);
+
     protected:
         /**
          * Constructor is protected because actual widget instances

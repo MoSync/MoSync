@@ -17,6 +17,8 @@
 
 #import "PimContactsList.h"
 #import "PimUtil.h"
+#import "MoSyncPanic.h"
+#import "PimError.h"
 
 @implementation PimContactsList
 
@@ -85,7 +87,9 @@
     // Check if the list is opened.
     if(MA_PIM_ERR_HANDLE_INVALID == mKeysArrayIndex)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     // Check if the are more items in list.
@@ -202,7 +206,9 @@
     PimContactItem* item = (PimContactItem*)[self getItem:itemHandle];
     if(!item)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     int resultCode = MA_PIM_ERR_NONE;
@@ -255,7 +261,9 @@
     PimContactItem* item = (PimContactItem*)[self getItem:itemHandle];
     if (!item)
     {
-        return MA_PIM_ERR_HANDLE_INVALID;
+        return [[MoSyncPanic getInstance] error:MA_PIM_ERR_HANDLE_INVALID
+                                  withPanicCode:PANIC_HANDLE_INVALID
+                                  withPanicText:@PANIC_HANDLE_INVALID_TEXT];
     }
 
     PimItemStatus status = [item getStatus];

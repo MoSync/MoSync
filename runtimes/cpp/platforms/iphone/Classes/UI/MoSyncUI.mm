@@ -1,14 +1,14 @@
 /* Copyright (C) 2011 MoSync AB
- 
+
  This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU General Public License, version 2, as published by
  the Free Software Foundation.
- 
+
  This program is distributed in the hope that it will be useful,
  but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
  for more details.
- 
+
  You should have received a copy of the GNU General Public License
  along with this program; see the file COPYING.  If not, write to the Free
  Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -28,7 +28,7 @@
 #include "MoSyncViewController.h"
 
 @interface MoSyncUIWindow : UIWindow {
-	TouchHelper* touchHelper;	
+	TouchHelper* touchHelper;
 }
 
 - (id)initWithFrame:(CGRect)rect;
@@ -56,50 +56,50 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
 	CGFloat screenScale = [self getScreenScale];
-    
-    for (UITouch *touch in touches) 
+
+    for (UITouch *touch in touches)
 	{
 		if(touch.phase ==  UITouchPhaseBegan) {
 			CGPoint point = [touch locationInView:self];
 			int touchId = [touchHelper addTouch: touch];
-			MoSync_AddTouchPressedEvent(point.x*screenScale, point.y*screenScale, touchId);	
+			MoSync_AddTouchPressedEvent(point.x*screenScale, point.y*screenScale, touchId);
 		}
-	}	
+	}
 }
 
 - (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event {
 	CGFloat screenScale = [self getScreenScale];
 
-	for (UITouch *touch in touches) 
+	for (UITouch *touch in touches)
 	{
 		if(touch.phase ==  UITouchPhaseMoved) {
 			CGPoint point = [touch locationInView:self];
 			int touchId = [touchHelper getTouchId: touch];
 			MoSync_AddTouchMovedEvent(point.x*screenScale, point.y*screenScale, touchId);
 		}
-	}	
+	}
 }
 
-- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {	
+- (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event {
 	CGFloat screenScale = [self getScreenScale];
 
-    for (UITouch *touch in touches) 
+    for (UITouch *touch in touches)
 	{
-		if(touch.phase ==  UITouchPhaseEnded) {	
+		if(touch.phase ==  UITouchPhaseEnded) {
 			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];		
+			int touchId = [touchHelper getTouchId: touch];
 			MoSync_AddTouchReleasedEvent(point.x*screenScale, point.y*screenScale, touchId);
 			[touchHelper removeTouch: touch];
 		}
 	}
 }
 
-- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {	
-	for (UITouch *touch in touches) 
+- (void)touchesCancelled:(NSSet *)touches withEvent:(UIEvent *)event {
+	for (UITouch *touch in touches)
 	{
-		if(touch.phase ==  UITouchPhaseCancelled) {	
+		if(touch.phase ==  UITouchPhaseCancelled) {
 			CGPoint point = [touch locationInView:self];
-			int touchId = [touchHelper getTouchId: touch];		
+			int touchId = [touchHelper getTouchId: touch];
 			MoSync_AddTouchReleasedEvent(point.x, point.y, touchId);
 			[touchHelper removeTouch: touch];
 		}
@@ -137,24 +137,24 @@ static IWidget* sOldScreen = nil;
 	[super init];
 	widgetArray = [[NSMutableArray alloc] init];
 	unusedWidgetHandles = [[NSMutableArray alloc] init];
-	
+
 	if(!window) {
 		window = [[MoSyncUIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
 		[window makeKeyAndVisible];
 	}
-    
+
     if(!controller) {
         controller = [[MoSyncViewController alloc] init];
     }
-	
+
 	mainWindow = window;
 	mainController = controller;
 	mainWindow.backgroundColor = [UIColor whiteColor];
-	
+
 	ScreenWidget* mosyncScreen = [[ScreenWidget alloc] initWithController:mainController];
 	[widgetArray addObject:mosyncScreen];
 	[mosyncScreen setWidgetHandle:0]; // MAW_CONSTANT_MOSYNC_SCREEN_HANDLE
-	
+
 	sOldScreen = nil; // show will set this after the screen is shown.
 	[self show: mosyncScreen];
 	return self;
@@ -181,7 +181,7 @@ static IWidget* sOldScreen = nil;
 		created = [[widgetClass alloc] init];
         if(created == nil)
             return MAW_RES_ERROR;
-		
+
 	} else {
 		//created = [[ReflectionWidget alloc] initWithName:name];
 		return MAW_RES_INVALID_TYPE_NAME;
@@ -189,9 +189,9 @@ static IWidget* sOldScreen = nil;
 
 	// todo handle these things.
 	if(created == nil) return MAW_RES_INVALID_TYPE_NAME;
-	
+
 	int ret = MAW_RES_ERROR;
-	
+
 	if([unusedWidgetHandles count] > 0) {
 		ret = [[unusedWidgetHandles objectAtIndex:([unusedWidgetHandles count]-1)] intValue];
 		[unusedWidgetHandles removeLastObject];
@@ -200,15 +200,15 @@ static IWidget* sOldScreen = nil;
 		[widgetArray addObject:created];
 		ret = [widgetArray count]-1;
 	}
-	
-	[created setWidgetHandle:ret];	
+
+	[created setWidgetHandle:ret];
     [created release];
-	
+
 	return ret;
 }
 
 - (int) destroyWidgetInstance:(IWidget*)widget {
-	int handle = [widget getWidgetHandle];	
+	int handle = [widget getWidgetHandle];
 
     [widgetArray replaceObjectAtIndex:handle withObject:[NSNull null]];
 
@@ -229,7 +229,7 @@ static IWidget* sOldScreen = nil;
     NSNumber* numHandle = [[NSNumber alloc] initWithInt:handle];
     [unusedWidgetHandles addObject:numHandle];
     [numHandle release];
-    
+
 	return ret;
 }
 
@@ -248,12 +248,12 @@ static IWidget* sOldScreen = nil;
 	}
 
 	[mainWindow insertSubview:[widget getView] atIndex:0];
-	
+
 	[widget layout];
 	[widget show];
 	[mainWindow makeKeyAndVisible];
 	sOldScreen = widget;
-	
+
 	return MAW_RES_OK;
 }
 

@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -26,12 +26,12 @@
 #endif
 
 #include "rcbinstr.h"
-#include "tokens.h"  
-#include "stack.h"   
-#include "numval.h"  
+#include "tokens.h"
+#include "stack.h"
+#include "numval.h"
 #include "datatype.h"
 
- 
+
 using namespace std ;
 
 extern long CurrentId;
@@ -52,7 +52,7 @@ RCBinaryStream::~RCBinaryStream()
 void RCBinaryStream::OpenForAppend(const String& FileName)
 	{
 	assert( !IsOpen());
-	
+
 	iOs.open( FileName.GetAssertedNonEmptyBuffer(), ios::in | ios::out | ios::binary | ios::ate); // ios::in to prevent overwriting
 	}
 
@@ -60,7 +60,7 @@ int RCBinaryStream::IsOpen()
 	{
 	return(iOs.is_open());
 	}
-		
+
 RCBinaryStream & RCBinaryStream::operator<< ( char o)
 	{
 	Write((const unsigned char*)&o, 1);
@@ -129,7 +129,7 @@ void ResourceDataStream::StartOfBlockWithSizePrefix(DataType aDataTypeOfSizePref
 	{
 	NumericValue* const sizeOfBlockWhenUncompressed=new NumericValue(aDataTypeOfSizePrefix);
 	assert(sizeOfBlockWhenUncompressed!=NULL);
-	iArrayOfMarks.AppendMark(iNumberOfBytesUsed, EMarkType_StartOfBlockWithSizePrefix, (unsigned int)sizeOfBlockWhenUncompressed);
+	iArrayOfMarks.AppendMark(iNumberOfBytesUsed, EMarkType_StartOfBlockWithSizePrefix, (size_t)sizeOfBlockWhenUncompressed);
 	}
 
 void ResourceDataStream::EndOfBlockWithSizePrefix()
@@ -160,11 +160,11 @@ void ResourceDataStream::StartOfCompressedUnicodeRun(int aUncompressedUnicodeSiz
 			}
 		if (insertZeroLengthCompressedUnicodeRunAtStart)
 			{
-			iArrayOfMarks.InsertMark(0, 0, EMarkType_StartOfCompressedUnicodeRun, (unsigned int)BinaryBuffer::New(0, NULL)); // mark the insertion point for the initial zero-length compressed-Unicode run
+			iArrayOfMarks.InsertMark(0, 0, EMarkType_StartOfCompressedUnicodeRun, (size_t)BinaryBuffer::New(0, NULL)); // mark the insertion point for the initial zero-length compressed-Unicode run
 			iArrayOfMarks.InsertMark(1, 0, EMarkType_EndOfCompressedUnicodeRun); // mark the insertion point for the subsquent run of "other stuff"
 			}
 		}
-	iArrayOfMarks.AppendMark(iNumberOfBytesUsed, EMarkType_StartOfCompressedUnicodeRun, (unsigned int)BinaryBuffer::New(aUncompressedUnicodeSizeInBytes, aUncompressedUnicodeBuffer));
+	iArrayOfMarks.AppendMark(iNumberOfBytesUsed, EMarkType_StartOfCompressedUnicodeRun, (size_t)BinaryBuffer::New(aUncompressedUnicodeSizeInBytes, aUncompressedUnicodeBuffer));
 	iContainsCompressedUnicode=true;
 	}
 
@@ -187,7 +187,7 @@ void ResourceDataStream::TwoByteAlignmentPoint()
 
 void ResourceDataStream::EnquireStreamPositionWhenKnown(unsigned long& aStreamPosition)
 	{
-	iArrayOfMarks.AppendMark(iNumberOfBytesUsed, EMarkType_EnquireStreamPositionWhenKnown, (unsigned int)&aStreamPosition);
+	iArrayOfMarks.AppendMark(iNumberOfBytesUsed, EMarkType_EnquireStreamPositionWhenKnown, (size_t)&aStreamPosition);
 	}
 
 void ResourceDataStream::StreamIn(const unsigned char* aBuffer, int aNumberOfBytes)
@@ -237,13 +237,13 @@ startOfFirstPass:
 	// do a second pass to see if there are any compressed-Unicode runs that don't actually make the resource smaller (taking into consideration the preceding run-length byte(s) and any trailing run-length byte(s)) - if so, replace the EMarkType_StartOfCompressedUnicodeRun/EMarkType_EndOfCompressedUnicodeRun mark-pair with a single EMarkType_TwoByteAlignmentPoint mark and go right back to the start of the first pass
 	// do a third and final pass to actually write out the resource data to aStream
 	const int numberOfMarks=iArrayOfMarks.Size(); // caching this is done *after* the "startOfFirstPass" as ConvertCompressedRunToUncompressed (which is called just before "goto startOfFirstPass") changes the number of items in iArrayOfMarks
-	const unsigned int* lengthOfLastRun=NULL;
+	const size_t* lengthOfLastRun=NULL;
 	for (int pass=0; pass<3; ++pass)
 		{
 		const int numberOfBytesBeforeFirstMark=NumberOfBytesToNextMark(-1);
 		int runLength=numberOfBytesBeforeFirstMark;
 		int uncompressedSize=numberOfBytesBeforeFirstMark;
-		unsigned int* addressToWriteSizeOfCompressedIntegerTo=NULL; // used on the first pass
+		size_t* addressToWriteSizeOfCompressedIntegerTo=NULL; // used on the first pass
 		SizePrefixStack sizePrefixStack; // used on the first pass
 		int bufferIndex=0; // used on the third pass
 		if (pass==2)
@@ -273,7 +273,7 @@ startOfFirstPass:
 					{
 					aStream << *sizeOfBlockWhenUncompressed;
 					delete sizeOfBlockWhenUncompressed;
-					mark.iOtherData=(unsigned int)(NumericValue*)NULL;
+					mark.iOtherData=(size_t)(NumericValue*)NULL;
 					}
 				}
 				break;
@@ -313,7 +313,7 @@ startOfFirstPass:
 					}
 				else if (pass==1)
 					{
-					const unsigned int* const lengthOfOtherStuffRun=&nextMark.iOtherData;
+					const size_t* const lengthOfOtherStuffRun=&nextMark.iOtherData;
 					const bool isTheFirstCompressedUnicodeRun=!encounteredCompressedUnicode[pass];
 					const bool isTheLastCompressedUnicodeRun=(lengthOfLastRun==lengthOfOtherStuffRun);
 					if (isTheLastCompressedUnicodeRun || !isTheFirstCompressedUnicodeRun) // if this is the first compressed-Unicode run and there are others, then we can't get rid of it, hence this check
@@ -338,11 +338,11 @@ startOfFirstPass:
 					{
 					assert(pass==2);
 					runWhenUncompressed.Destroy();
-					mark.iOtherData=(unsigned int)(BinaryBuffer*)NULL;
+					mark.iOtherData=(size_t)(BinaryBuffer*)NULL;
 					aStream.WriteCompressedInteger(numberOfBytesWhenCompressed);
 					aStream.Write(reinterpret_cast<unsigned char*>(iBuffer+bufferIndex), numberOfBytesWhenCompressed);
 					bufferIndex+=numberOfBytesWhenCompressed;
-					const unsigned int* const lengthOfOtherStuffRun=&nextMark.iOtherData;
+					const size_t* const lengthOfOtherStuffRun=&nextMark.iOtherData;
 					if ((lengthOfLastRun!=lengthOfOtherStuffRun) || (*lengthOfOtherStuffRun>0))
 						{
 						aStream.WriteCompressedInteger(*lengthOfOtherStuffRun);
@@ -463,7 +463,7 @@ void ResourceDataStream::ConvertCompressedRunToUncompressed(int aMarkIndexOfStar
 	Mark* markForStartOfCompressedUnicodeRun=&iArrayOfMarks.MarkAt(aMarkIndexOfStartOfCompressedUnicodeRun);
 	assert(markForStartOfCompressedUnicodeRun->iMarkType==EMarkType_StartOfCompressedUnicodeRun);
 	BinaryBuffer& runWhenUncompressed=*(BinaryBuffer*)markForStartOfCompressedUnicodeRun->iOtherData;
-	markForStartOfCompressedUnicodeRun->iOtherData=(unsigned int)(BinaryBuffer*)NULL;
+	markForStartOfCompressedUnicodeRun->iOtherData=(size_t)(BinaryBuffer*)NULL;
 	Mark* markForEndOfCompressedUnicodeRun=&iArrayOfMarks.MarkAt(aMarkIndexOfStartOfCompressedUnicodeRun+1);
 	assert(markForEndOfCompressedUnicodeRun->iMarkType==EMarkType_EndOfCompressedUnicodeRun);
 	const int bufferPositionOfStartOfCompressedUnicodeRun=markForStartOfCompressedUnicodeRun->iBufferPosition;

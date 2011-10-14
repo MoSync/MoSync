@@ -57,10 +57,14 @@ final class UBin extends BinaryInterface {
 		MYASSERT(in != null);
 		MYASSERT(size <= mSize);
 		offset += mOffset;
-		long res = in.skip(offset);
-		if(res != offset) {
-			DEBUG_ALWAYS("skip("+offset+") = "+res+"\n");
-			BIG_PHAT_ERROR;
+		MYASSERT(offset >= 0);
+		while(offset > 0) {
+			long res = in.skip(offset);
+			if(res > offset || res == 0) {
+				DEBUG_ALWAYS("skip("+offset+") = "+res+"\n");
+				BIG_PHAT_ERROR;
+			}
+			offset -= res;
 		}
 		return new LimitedLengthInputStream(in, size);
 	}

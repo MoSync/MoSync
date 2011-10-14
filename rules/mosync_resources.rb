@@ -45,12 +45,12 @@ class ConvertToPngTask < FileTask
 	def execute
 		if(@src.to_s.getExt == '.svg')
 			sh "java -jar \"#{mosyncdir}/bin/batik/batik-rasterizer.jar\" -w #{@width} -h #{@height}"+
-				" -d #{File.expand_path(@NAME)} #{File.expand_path(@src)}"
+				" -d \"#{File.expand_path(@NAME)}\" \"#{File.expand_path(@src)}\""
 			if(!File.exist?(@NAME))	# in case batik fails silently.
 				error('batik failed!')
 			end
 		else
-			sh "#{mosyncdir}/bin/ImageMagick/convert -resize #{@width}x#{@height} -background none #{@src} #{@NAME}"
+			sh "#{mosyncdir}/bin/ImageMagick/convert -resize #{@width}x#{@height} -background none \"#{@src}\" \"#{@NAME}\""
 		end
 	end
 	# Read the pixel dimensions of the SVG src and calculate the appropriate size.
@@ -206,5 +206,15 @@ class GeneratedLstTask < MemoryGeneratedFileTask
 			io.write(".#{c.resType} \"#{Pathname.new(c.to_s).relative_path_from(Pathname.new('build'))}\"\n")
 		end
 		@buf = io.string
+	end
+end
+
+class BundleTask < FileTask
+	def initialize(work, target, srcDir)
+		super(work, target)
+		@srcDir = srcDir
+	end
+	def execute
+		sh "#{mosyncdir}/bin/Bundle -in \"#{@srcDir}\" -out \"#{@NAME}\""
 	end
 end

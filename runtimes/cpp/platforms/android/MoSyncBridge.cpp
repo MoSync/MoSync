@@ -340,6 +340,14 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.status = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_ALERT)
+	{
+		event.alertButtonIndex = intArray[1];
+	}
+	else if (event.type == EVENT_TYPE_OPTIONS_BOX_BUTTON_CLICKED)
+	{
+		event.optionsBoxButtonIndex = intArray[1];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*
@@ -352,7 +360,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 *
 		 * Optional:
 		 * WIDGET_EVENT_MESSAGE
-		 * intArray[3] - The id of the message being sent (if it has 
+		 * intArray[3] - The id of the message being sent (if it has
 		 *               dynamically allocated data)
 		 * intARray[4] - Size of the message.
 		 *
@@ -400,6 +408,7 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		 * MAW_EVENT_WEB_VIEW_HOOK_INVOKED
 		 * intArray[3] - Hook type.
 		 * intArray[4] - Handle to url data.
+		 *
 		 */
 
 		// Allocate the widget event data structure.
@@ -468,6 +477,17 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.sensor.type = intArray[1];
 		memcpy( event.sensor.values, intArray + 2, (arrayLength - 2) * sizeof(jint) );
+	}
+	else if (event.type == EVENT_TYPE_NFC_TAG_RECEIVED ||
+			event.type == EVENT_TYPE_NFC_TAG_DATA_READ ||
+			event.type == EVENT_TYPE_NFC_TAG_DATA_WRITTEN ||
+			event.type == EVENT_TYPE_NFC_BATCH_OP ||
+			event.type == EVENT_TYPE_NFC_TAG_AUTH_COMPLETE ||
+			event.type == EVENT_TYPE_NFC_TAG_READ_ONLY)
+	{
+		event.nfc.handle = intArray[1];
+		event.nfc.result = intArray[2];
+		event.nfc.dstId = intArray[3];
 	}
 
 	// Release the memory used for the int array.

@@ -20,8 +20,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <mactype.h>
 
 #ifndef USE_NEWLIB
-#include <conprint.h>
 #include <mavsprintf.h>
+#include <conprint.h>
 #else
 #include <string.h>
 #endif
@@ -76,7 +76,7 @@ struct MA_FILE_t {
 
 	int type;
 	int modeFlags;
-	
+
 	// when (mode&MODE_WRITE)!=0
 	MAHandle store;
 
@@ -111,7 +111,7 @@ static int readString(MAHandle fileSystem, int *offset, char **outString) {
 	char lastByte;
 	int i = 0;
 	do {
-		maReadData(fileSystem, c, (*offset)++, 1);	
+		maReadData(fileSystem, c, (*offset)++, 1);
 		lastByte = *c;
 		c++;
 		i++;
@@ -181,7 +181,7 @@ static VolumeEntry* findFile(const char *filename, VolumeEntry *root) {
 	int i;
 
 	LOG("%i children", root->numChildren);
-	
+
 //	if(root->numChildren != 1) maPanic(0, "Invalid file system root");
 //	root = &root->children[0];
 
@@ -189,7 +189,7 @@ static VolumeEntry* findFile(const char *filename, VolumeEntry *root) {
 		VolumeEntry *ve = NULL;
 		LOG("fFR %i", i);
 		ve = findFileRecursively(filename, &root->children[i]);
-		
+
 		if(ve) {
 			return ve;
 		}
@@ -201,7 +201,7 @@ static VolumeEntry* findFile(const char *filename, VolumeEntry *root) {
 static void printVolumeEntriesRecursively(VolumeEntry *vol, int level) {
 	int i;
 	if(vol->numChildren==0) {
-		printf("%s %d %d", vol->name, vol->dataOffset, vol->dataLength);	
+		printf("%s %d %d", vol->name, vol->dataOffset, vol->dataLength);
 		return;
 	}
 	printf("+%s", vol->name);
@@ -234,14 +234,14 @@ static void readVolumeEntriesRecursively(MAHandle fileSystem, int *offset, Volum
 	readString(fileSystem, offset, &vol->name);
 
 	switch(vol->type) {
-		case VOL_TYPE_DIRECTORY: // directory 
+		case VOL_TYPE_DIRECTORY: // directory
 			maReadData(fileSystem, &vol->numChildren, *offset, 4);
 			(*offset)+=4;
 			FLIP_TO_ENDIAN_INT(vol->numChildren);
-			
+
 			vol->children = (VolumeEntry*)malloc(sizeof(VolumeEntry)*vol->numChildren);
 			for(child = 0; child < vol->numChildren; child++) {
-				readVolumeEntriesRecursively(fileSystem, offset, &vol->children[child]);				
+				readVolumeEntriesRecursively(fileSystem, offset, &vol->children[child]);
 			}
 
 			break;
@@ -279,10 +279,10 @@ static void buildDirectoryTree(MAHandle fileSystem) {
 	FLIP_TO_ENDIAN_INT(sHeader.startOfVolumes);
 	FLIP_TO_ENDIAN_INT(sHeader.startOfData);
 	offset = sHeader.startOfVolumes;
-	
+
 	sRoot = (VolumeEntry*)malloc(sizeof(VolumeEntry));
 	readVolumeEntriesRecursively(fileSystem, &offset, sRoot);
-	
+
 //	printVolumeEntriesRecursively(sRoot, 0);
 }
 
@@ -298,6 +298,146 @@ void setCurrentFileSystem(MAHandle fileSystem, int caseSensitive) {
 	buildDirectoryTree(fileSystem);
 	sCurrentFileSystem = fileSystem;
 	sCaseSensitive = caseSensitive;
+}
+
+/**
+ * Helper function to open a file for writing.
+ * Create the file if it does not exist.
+ * Note: Will truncate the file if it exists.
+ * @return Handle to the open file, <0 on error.
+ */
+static MAHandle openFileForWriting(const char* filePath)
+{
+	MAHandle file = maFileOpen(filePath, MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	if (maFileExists(file))
+	{
+		// If the file exists, truncate it to zero size.
+		// We do this to prevent problems with old data
+		// at the end of the file if the new file is
+		// shorter than the old file.
+		maFileTruncate(file, 0);
+	}
+	else
+	{
+		// If the file does not exist, create it.
+		int result = maFileCreate(file);
+		if (result < 0)
+		{
+			return -1;
+		}
+	}
+
+	return file;
+}
+
+/**
+ * Helper function to ensure a directory exists.
+ * @param path Path to directory, must end with a path delimiter.
+ * @return 1 on success, -1 on error.
+ */
+static int ensureDirectoryExists(const char* path)
+{
+	MAHandle directory = maFileOpen(path, MA_ACCESS_READ_WRITE);
+	if (directory < 0)
+	{
+		return -1;
+	}
+
+	// If the directory does not exist, create it.
+	if (!maFileExists(directory))
+	{
+		int result = maFileCreate(directory);
+		if (result < 0)
+		{
+			return -1;
+		}
+	}
+
+	return 1;
+}
+
+/**
+ * Helper function that extracts directories and files.
+ * @param vol Current volume entry that represents a directory of file.
+ * @param basePath Current base path to the where files are extracted,
+ * must end with a path delimiter.
+ * @param isRoot 1 if this is the root VolumeEntry, 0 is not.
+ * @return 1 on success, -1 on error.
+ */
+static int extractRecursively(VolumeEntry* vol, const char* basePath, int isRoot)
+{
+	char path[1024];
+	MAHandle file;
+	int result;
+	void* data;
+	int i;
+
+	// If we have no children this is a file.
+	if (0 == vol->numChildren)
+	{
+		sprintf(path, "%s%s", basePath, vol->name);
+		file = openFileForWriting(path);
+		if (-1 == file) { return -1; }
+
+		// Write data.
+		data = (void*) malloc(vol->dataLength);
+		maReadData(sCurrentFileSystem, data, vol->dataOffset, vol->dataLength);
+		result = maFileWrite(file, data, vol->dataLength);
+		maFileClose(file);
+		free(data);
+		if (0 != result) { return -1; }
+
+		// Done extracting the file.
+		return 1;
+	}
+
+	// This is a directory, proceed extracting files and subdirectories.
+
+	// Create path to output directory.
+	if (!isRoot)
+	{
+		sprintf(path, "%s%s/", basePath, vol->name);
+	}
+	else
+	{
+		sprintf(path, "%s", basePath);
+	}
+
+	// Ensure the directory exists.
+	result = ensureDirectoryExists(path);
+	if (-1 == result) { return -1; }
+
+	// Extract subdirectories and files.
+	for (i = 0; i < vol->numChildren; i++)
+	{
+		result = extractRecursively(&vol->children[i], path, 0);
+		if (-1 == result) { return -1; }
+	}
+
+	return 1;
+}
+
+/**
+* Extract the current file system bundle to the local file
+* system on the device/emulator.
+*
+* \param destPath Path to the directory on the local file system
+* where the file tree should be extracted. The path MUST end with
+* a path delimeter.
+*
+* \return 1 on success, -1 on error.
+*/
+int extractCurrentFileSystem(const char* destPath)
+{
+	if (NULL == sRoot) { return -1; }
+	if (NULL == destPath) { return -1; }
+
+	return extractRecursively(sRoot, destPath, 1);
 }
 
 // ---------------------------------------------------------------------------------------
@@ -326,7 +466,7 @@ static void filterStoreName(char *dst, int max, const char *filename) {
 		if(*filename=='\\' || *filename=='/' || *filename=='%') {
 			dst+=sprintf(dst, "%%%02x", (int)*filename++);
 		}
-		else 
+		else
 			*dst++ = *filename++;
 	}
 	*dst++ = 0;
@@ -343,7 +483,7 @@ static int getModeFlags(const char *mode) {
 			modeflags |= MODE_WRITE|MODE_APPEND;
 		} else if(*mode == '+') {
 			modeflags |= MODE_READ|MODE_WRITE;
-		} 
+		}
 		mode++;
 	}
 	return modeflags;
@@ -374,12 +514,12 @@ static MA_FILE* openReadWrite(const char *filename, int modeFlags) {
 	if(!store) return NULL;
 
 	file = (MA_FILE*) malloc(sizeof(MA_FILE));
-	if(modeFlags&(MODE_READ|MODE_WRITE)) 
+	if(modeFlags&(MODE_READ|MODE_WRITE))
 		file->type = TYPE_READWRITE;
-	else 
+	else
 		file->type = TYPE_WRITEONLY;
 	file->modeFlags = modeFlags;
-	
+
 	if(modeFlags&(MODE_READ|MODE_APPEND)) {
 		data = maCreatePlaceholder();
 		maReadStore(store, data);
@@ -464,7 +604,7 @@ MA_FILE * MA_fopen ( const char * filename, const char * mode ) {
 
 #define MIN(x, y) ((x)<(y)?(x):(y))
 
-static void readFromBuffer(void *ptr, MA_FILE *stream, int bytesToRead) { 
+static void readFromBuffer(void *ptr, MA_FILE *stream, int bytesToRead) {
 	unsigned char *dst = (unsigned char*)ptr;
 
 	while(bytesToRead>0) {
@@ -472,7 +612,7 @@ static void readFromBuffer(void *ptr, MA_FILE *stream, int bytesToRead) {
 		int bytesToReadFromBuffer = MIN((stream->bufferSize - (startInBuffer)), bytesToRead);
 
 		if(startInBuffer<0 || bytesToReadFromBuffer<=0)
-		{	
+		{
 			int bytesToBuffer;
 			if(bytesToRead>stream->bufferSize)
 			{
@@ -514,7 +654,7 @@ static void readFromBuffer(void *ptr, MA_FILE *stream, int bytesToRead) {
 			}
 			stream->filePtr+=bytesToReadFromBuffer;
 			bytesToRead-=bytesToReadFromBuffer;
-			
+
 		}
 	}
 
@@ -528,17 +668,17 @@ size_t MA_fread ( void * ptr, size_t size, size_t count, MA_FILE * stream) {
 	LOG("fread(%x, %d, %d, %x)", (int)ptr, (int)size, (int)count, (int)stream);
 	if(stream->type==TYPE_WRITEONLY || vol->type!=VOL_TYPE_FILE) {
 		stream->resultFlags|=RES_ERR;
-		return EOF;
+		return 0;
 	}
 
 	bytesToRead = size*count;
 	if(bytesToRead<=0) {
 		stream->resultFlags|=RES_ERR;
-		return EOF;
+		return 0;
 	}
 
 	if(stream->filePtr+bytesToRead > vol->dataOffset+vol->dataLength) {
-		bytesToRead -= ((stream->filePtr+bytesToRead) - 
+		bytesToRead -= ((stream->filePtr+bytesToRead) -
 			(vol->dataOffset+vol->dataLength));
 
 		// round to element size
@@ -548,14 +688,14 @@ size_t MA_fread ( void * ptr, size_t size, size_t count, MA_FILE * stream) {
 		stream->resultFlags|=RES_EOF;
 		if(bytesToRead<=0) {
 			stream->resultFlags|=RES_ERR;
-			return EOF;
+			return 0;
 		}
 	}
 
 	//maReadData(currentFileSystem, ptr, stream->filePtr, bytesToRead);
-	readFromBuffer(ptr, stream, bytesToRead); 
+	readFromBuffer(ptr, stream, bytesToRead);
 	//stream->filePtr+=bytesToRead;
-	return count; 
+	return count;
 }
 
 size_t MA_fwrite ( const void * ptr, size_t size, size_t count, MA_FILE * stream) {
@@ -563,20 +703,21 @@ size_t MA_fwrite ( const void * ptr, size_t size, size_t count, MA_FILE * stream
 	int bytesToWrite;
 	LOG("fwrite(%x, %d, %d, %x)", (int)ptr, (int)size, (int)count, (int)stream);
 	if(stream->type==TYPE_READONLY || vol->type!=VOL_TYPE_FILE) return -1;
-	
+
 	bytesToWrite = size*count;
 	if(bytesToWrite <= 0) {
 		stream->resultFlags|=RES_ERR;
-		return EOF;
+		return 0;
 	}
 	if(stream->filePtr+bytesToWrite > vol->dataOffset+stream->bufferSize) {
 		byte *newBuffer;
 		int lastBufferSize = stream->bufferSize;
+		if(!stream->bufferSize) stream->bufferSize++;
 		while(stream->filePtr+bytesToWrite >  vol->dataOffset+stream->bufferSize) stream->bufferSize<<=1;
 		newBuffer = (byte*)malloc(stream->bufferSize);
 		if(!newBuffer) {
 			stream->resultFlags|=RES_ERR;
-			return EOF;
+			return 0;
 		}
 		memcpy(newBuffer, stream->buffer, lastBufferSize);
 		free(stream->buffer);
@@ -585,12 +726,12 @@ size_t MA_fwrite ( const void * ptr, size_t size, size_t count, MA_FILE * stream
 
 	memcpy(&stream->buffer[stream->filePtr], ptr, bytesToWrite);
 	stream->filePtr+=bytesToWrite;
-	
+
 	if(stream->filePtr>stream->volEntry->dataLength) {
 		vol->dataLength = stream->filePtr;
 	}
 
-	return count; 
+	return count;
 }
 
 
@@ -635,14 +776,14 @@ int MA_fseek ( MA_FILE * stream, long int offset, int origin ) {
 	LOG("fseek(%x, %d, %d)", (int)stream, (int)offset, origin);
 	stream->resultFlags&=~RES_EOF;
 	switch(origin) {
-		case SEEK_SET: 
-			newOffset = dataOffset+offset; 
+		case SEEK_SET:
+			newOffset = dataOffset+offset;
 			break;
-		case SEEK_CUR: 
-			newOffset = stream->filePtr+offset; 
+		case SEEK_CUR:
+			newOffset = stream->filePtr+offset;
 			break;
-		case SEEK_END: 
-			newOffset = dataOffset+dataLength+offset; 
+		case SEEK_END:
+			newOffset = dataOffset+dataLength+offset;
 			break;
 		default:
 			return 1;
@@ -651,7 +792,7 @@ int MA_fseek ( MA_FILE * stream, long int offset, int origin ) {
 	if(newOffset>=dataOffset && newOffset<=dataOffset+dataLength) {
 		stream->filePtr = newOffset;
 		return 0;
-	} 
+	}
 
 	return 1;
 }
@@ -674,7 +815,7 @@ char * MA_fgets ( char * str, int num, MA_FILE * stream ) {
 	int eofReached;
 	LOG("fgets(%x, %d, %x)", (int)str, num, (int)stream);
 	num-=1;
-	if(num<=0) return NULL; 
+	if(num<=0) return NULL;
 	str_ptr = str;
 	eofReached = 0;
 	while(num--) {
@@ -743,8 +884,8 @@ int MA_fsetpos ( MA_FILE * stream, const fpos_t * pos ) {
 	LOG("fsetpos(%x, %x)", (int)stream, (int)pos);
 	stream->resultFlags&=~RES_EOF;
 	if(newOffset>=0 && newOffset<stream->volEntry->dataLength) {
-		stream->filePtr = stream->volEntry->dataOffset+newOffset;	
+		stream->filePtr = stream->volEntry->dataOffset+newOffset;
 		return 0;
-	} 
+	}
 	else return 1;
 }

@@ -43,12 +43,12 @@ using namespace MAUtil;
 // a vector in 3-dimensional space.
 struct Vector3 {
 	Vector3() :
-		x(0.0), y(0.0), z(0.0) {
-
+		x(0.0), y(0.0), z(0.0)
+	{
 	}
-	Vector3(float x, float y, float z) :
-		x(x), y(y), z(z) {
-
+	Vector3(float _x, float _y, float _z) :
+		x(_x), y(_y), z(_z)
+	{
 	}
 
 	float x, y, z;
@@ -152,10 +152,10 @@ public:
 
 			// Set the rotation.
 			mRenderer->setRotation(
-					convertRadiansToDegrees(mRotation.x),
-					convertRadiansToDegrees(mRotation.y),
-					convertRadiansToDegrees(mRotation.z)
-					);
+				convertRadiansToDegrees(mRotation.x),
+				convertRadiansToDegrees(mRotation.y),
+				convertRadiansToDegrees(mRotation.z)
+				);
 		}
 	}
 

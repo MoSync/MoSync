@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!--
+	This is a sample HTML page with a stylesheet and JavaScript for
+	interactivity.
+
+	Replace this file and put your web content in the "LocalFiles"
+	folder in the MoSync Project. The HTML page to be loaded when
+	the application starts should be named "index.html". (You can
+	change this by editing the file name in main.cpp.)
+-->
+<html>
+<head>
+<style>
+html
+{
+	/* Set page attributes. */
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #FFFFFF;
+
+	/* Disable text selection in all browsers. */
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+#LogoBox
+{
+	/* Center element horizontally. */
+	display: table;
+	margin: auto auto;
+
+	/* Set width of box. */
+	width: 16em;
+
+	/* Use a hand pointer. */
+	cursor: pointer;
+}
+
+#LogoBox img
+{
+	/* Make image same with as LogoBox. */
+	width: 16em;
+}
+
+#TextBox
+{
+	/* Text attributes. */
+	font-size: 2.5em;
+	font-family: sans-serif;
+	font-weight: bold;
+	text-align: center;
+}
+</style>
+<script>
+/**
+ * Array with texts for the TextBox.
+ */
+var TextArray = ["Touch Me!", "Welcome to MoSync and HTML5!"];
+
+/**
+ * Change the text in the TextBox. Swaps between array elements.
+ */
+function SwapText()
+{
+	var textBox = document.getElementById("TextBox");
+	if (textBox.innerHTML == TextArray[0])
+	{
+		textBox.innerHTML = TextArray[1];
+	}
+	else
+	{
+		textBox.innerHTML = TextArray[0];
+	}
+}
+</script>
+</head>
+<body>
+<div id="LogoBox" onclick="SwapText()">
+	<img src="images/MoSyncLogo.png"/>
+	<div id="TextBox"></div>
+</div>
+<script>
+	// Page elements has loaded, show initial text.
+	SwapText();
+</script>
+</body>
+</html>

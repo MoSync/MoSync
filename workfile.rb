@@ -13,18 +13,20 @@ PRE_DIRS = ["intlibs/idl-common", "intlibs/filelist"]
 
 if(HOST == :win32) then
 	INTLIB_PLATFORM = "windows"
-	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4", "tools/mifconv",
-		"tools/rcomp", "tools/package", "tools/uidcrc", "tools/MoSyncUpdater"]
+	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4",
+		"tools/MoSyncUpdater"]
 	ADDITIONAL_INTLIBS = ["intlibs/dgles-0.5"]
 elsif(HOST == :darwin)
 	INTLIB_PLATFORM = "linux"
 	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix",
-		"tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc"]
+		]
 	ADDITIONAL_INTLIBS = []
 else
 	INTLIB_PLATFORM = HOST
 	# todo: add lcab
-	PLATFORM_TOOLS = []
+	PLATFORM_TOOLS = [
+		'tools/MoCab',
+	]
 	ADDITIONAL_INTLIBS = []
 end
 
@@ -32,6 +34,7 @@ MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
 	"intlibs/bluetooth",
 	"intlibs/demangle",
 	"intlibs/dll",
+	"intlibs/sqlite",
 	"intlibs/gsm_amr",
 	"intlibs/net",
 	"intlibs/stabs",
@@ -48,6 +51,7 @@ TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/B
 	"tests/unitTestServer", "tools/iphone-builder", "tools/icon-injector", "tools/e32hack",
 	"tools/mx-invoker",
 	"tools/mx-config",
+	"tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc",
 	]
 
 MAIN_DIRS = BASE_DIRS + TOOL_DIRS + PIPE_DIRS
@@ -109,12 +113,16 @@ target :default => :base do
 	Work.invoke_subdirs(MAIN_DIRS)
 end
 
-target :examples => :base do
-	Work.invoke_subdirs(PIPE_DIRS + EXAM_DIRS)
+target :libs => :base do
+	Work.invoke_subdirs(PIPE_DIRS)
+end
+
+target :examples => :libs do
+	Work.invoke_subdirs_ex(true, EXAM_DIRS)
 end
 
 target :all => :default do
-	Work.invoke_subdirs(EXAM_DIRS)
+	Work.invoke_subdirs_ex(true, EXAM_DIRS)
 end
 
 target :more => :base do
@@ -123,10 +131,6 @@ end
 
 target :newlib => :base do
 	Work.invoke_subdirs(NEWLIB_DIRS)
-end
-
-target :libs => :base do
-	Work.invoke_subdirs(PIPE_DIRS)
 end
 
 target :version do
@@ -158,22 +162,27 @@ target :clean do
 end
 
 target :clean_examples do
-	Work.invoke_subdirs(EXAM_DIRS, "clean")
+	Work.invoke_subdirs_ex(true, EXAM_DIRS, "clean")
 end
 
 
+def all_configs(target)
+	sh "ruby workfile.rb #{target}"
+	sh "ruby workfile.rb #{target} CONFIG="
+	sh "ruby workfile.rb #{target} USE_NEWLIB="
+	sh "ruby workfile.rb #{target} USE_NEWLIB= CONFIG="
+end
+
 target :all_configs do
-	sh 'ruby workfile.rb all'
-	sh 'ruby workfile.rb all CONFIG='
-	sh 'ruby workfile.rb all USE_NEWLIB='
-	sh 'ruby workfile.rb all USE_NEWLIB= CONFIG='
+	all_configs('all')
 end
 
 target :all_libs do
-	sh 'ruby workfile.rb libs'
-	sh 'ruby workfile.rb libs CONFIG='
-	sh 'ruby workfile.rb libs USE_NEWLIB='
-	sh 'ruby workfile.rb libs USE_NEWLIB= CONFIG='
+	all_configs('libs')
+end
+
+target :all_ex do
+	all_configs('examples')
 end
 
 Targets.invoke

@@ -52,7 +52,8 @@ class MediaWiki;
  * When the anchor is clicked, the whole article becomes available in a web view.
  */
 class SummaryScreen : public BasicScreen,
-				      public MAUtil::CustomEventListener
+				      public CustomEventListener,
+				      public KeyListener
 {
 public:
 
@@ -79,6 +80,13 @@ public:
 	 * Show the home screen.
 	 */
 	void showHomeScreen();
+
+	/**
+	 * From KeyListener.
+	 * This function is called with a \link #MAK_FIRST MAK_ code \endlink when
+	 * a key is pressed.
+	 */
+	virtual void keyPressEvent(int keyCode, int nativeCode);
 
 	/**
 	 * from CustomEventListener

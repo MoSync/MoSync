@@ -1,14 +1,14 @@
 # Copyright (C) 2009 Mobile Sorcery AB
-# 
+#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
 # the Free Software Foundation.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; see the file COPYING.  If not, write to the Free
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -81,7 +81,7 @@ class Device
 	attr_reader(:name, :vendor, :platformversion)
 	attr_accessor(:caps)	#Hash(Symbol, Array(String))
 end
- 
+
 class Runtime
 	attr_accessor :platform, :caps, :devices
 	def initialize(platform)
@@ -89,7 +89,7 @@ class Runtime
 		@caps = {}
 		@devices = []
 	end
-	
+
 	def add_missing_defines
 		caps.each do |cap, value|
 			if(platform=="s60v2" && cap == "MA_PROF_CONST_BITS_PER_PIXEL")
@@ -99,12 +99,12 @@ class Runtime
 			end
 		end
 	end
-	
+
 	def cmp other
 		if(@platform != other.platform) then
 			raise "HAVOK!"
 		end
-		
+
 		RELEVANT_DEFINES[platform.to_sym].each do |cap|
 			if(@caps.has_key?(cap) != other.caps.has_key?(cap)) then
 				return false
@@ -121,7 +121,7 @@ RELEVANT_CAPS = [
 	:IconSize_x,
 	:IconSize_y,
 	:BitsPerPixel,
-# disabled these... 
+# disabled these...
 #	:StorageSize,
 #	:HeapSize,
 #	:MaxJarSize,
@@ -135,6 +135,7 @@ RELEVANT_CAPS = [
 	:CameraResolution_y,
 	:properties,
 	:JavaPlatform,
+	:BlackberryVersion,
 ]
 
 RELEVANT_DEFINES = {
@@ -152,8 +153,10 @@ RELEVANT_DEFINES = {
 		'MA_PROF_SUPPORT_JAVAPACKAGE_MMAPI',
 		'MA_PROF_BUG_RESOURCE_SIZE_LIMITED',
 		'MA_PROF_BUG_NO_SIZECHANGED',
+		'MA_PROF_BLACKBERRY_VERSION',
+		'MA_PROF_BLACKBERRY_VERSION_MINOR',
 	],
-	
+
 	:s60v2 => ['MA_PROF_SUPPORT_FRAMEBUFFER_32BIT'],
 	:s60v3 => [],
 	:s60v5 => [],
@@ -181,6 +184,7 @@ CAP_TYPES = {
 		:Packager,
 		:CameraResolution_x,
 		:CameraResolution_y,
+		:BlackberryVersion,
 	],
 	:supports => [
 		:JavaPackage,
@@ -225,18 +229,19 @@ def write_config_h(runtime, file, relevant_defines, extra_defines)
 	File.open(file, 'w') do |config_h|
 		config_h.puts "#ifndef CONFIG_H"
 		config_h.puts "#define CONFIG_H"
-				
+
 		relevant_defines.each do |cap|
 			if(runtime.caps.has_key?(cap))
-				config_h.puts "#define #{cap}"
+				val = " #{runtime.caps[cap]}" if(cap)
+				config_h.puts "#define #{cap}#{val}"
 			end
 		end
-		
+
 		extra_defines.each do |define|
-			config_h.puts "#define #{define}"		
+			config_h.puts "#define #{define}"
 		end
-		
-		config_h.puts "#endif /* CONFIG_H */"		
+
+		config_h.puts "#endif /* CONFIG_H */"
 	end
 end
 
@@ -364,10 +369,10 @@ VENDOR.each_with_index do |vendor, index|
 	if(skipVendor?(vendor))
 		next
 	end
-	
+
 	#puts vendor
 	FileUtils.mkdir_p "#{VENDOR_DIR}/#{vendor}"
-	
+
 	icon_path = "icons/#{vendor.downcase}Icon.png"
 	if File.exist? icon_path
 		FileUtils.copy_file( icon_path, "#{VENDOR_DIR}/#{vendor}/icon.png")
@@ -378,12 +383,12 @@ puts "Handling devices..."
 devicesWithErrors = 0
 DEVICE.each_with_index do |device, index|
 	next if(index == 0)
-	
+
 	# if the runtime support isn't implemented we just go to the next device.
 	if(!runtimes[device.platformversion.platform])
 		next
 	end
-	
+
 	vendor = VENDOR[device.vendor]
 	if(skipVendor?(vendor))
 		next
@@ -419,7 +424,7 @@ DEVICE.each_with_index do |device, index|
 						def_name = "MA_PROF_CONST_#{cap.to_s.format}"
 						rt_obj.caps[def_name] = "#{v.upcase}"
 						def_str = "#define #{def_name} #{v.format}"
-						
+
 						if(def_name == "MA_PROF_CONST_STORAGESIZE")
 							definitions[def_name] = "MA_PROF_CONST_STORAGESIZE,StorageSize,bytes"
 						elsif(def_name == "MA_PROF_CONST_SCREENSIZE_Y")
@@ -443,17 +448,17 @@ DEVICE.each_with_index do |device, index|
 						else
 							definitions["#{def_name}_#{v.format}"] = "#{def_name},#{cap}/#{v}"
 						end
-						
+
 						#puts "#{rt_obj.platform} #{def_name}"
-						
+
 						if(rt_obj.platform==:s60v2 && def_name == "MA_PROF_CONST_BITSPERPIXEL")
 							#puts "s60v2 MA_PROF_CONST_BITSPERPIXEL: " + rt_obj.caps[def_name]
 							if(rt_obj.caps[def_name].to_i > 16)
-								rt_obj.caps["MA_PROF_SUPPORT_FRAMEBUFFER_32BIT"] = "TRUE"
+								rt_obj.caps["MA_PROF_SUPPORT_FRAMEBUFFER_32BIT"] = nil
 								profile.puts "#define MA_PROF_SUPPORT_FRAMEBUFFER_32BIT"
 							end
 						end
-						
+
 						if(!(seen_defines.include? def_name)) then
 							seen_defines << def_name
 							profile.puts def_str
@@ -470,7 +475,7 @@ DEVICE.each_with_index do |device, index|
 							if(def_name != "MA_PROF_SUPPORT_JAVAPACKAGE") then
 								seen_defines << def_name
 							end
-							rt_obj.caps["#{def_name}_#{v.format}"] = "TRUE";
+							rt_obj.caps["#{def_name}_#{v.format}"] = nil
 							def_str = "#define #{def_name}_#{v.format}"
 							definitions["#{def_name}_#{v.format}"] = "#{def_name}_#{v.format},#{cap}/#{v}"
 							profile.puts def_str
@@ -480,7 +485,7 @@ DEVICE.each_with_index do |device, index|
 					value.each do |v|
 						def_name = "MA_PROF_BUG_#{v.format}"
 						definitions[def_name] = "#{def_name},#{cap}/#{v}"
-						rt_obj.caps[def_name] = "TRUE";
+						rt_obj.caps[def_name] = nil
 						profile.puts "#define #{def_name}"
 					end
 				elsif(cap == :Features)
@@ -488,7 +493,7 @@ DEVICE.each_with_index do |device, index|
 						#puts v.to_s
 						if v == "hasPointerEvents"
 							definitions["MA_PROF_SUPPORT_STYLUS"] = "MA_PROF_SUPPORT_STYLUS,Support/Stylus"
-							rt_obj.caps["MA_PROF_SUPPORT_STYLUS"] = "TRUE";
+							rt_obj.caps["MA_PROF_SUPPORT_STYLUS"] = nil
 							def_str = "#define MA_PROF_SUPPORT_STYLUS"
 							profile.puts def_str
 						elsif v == "hasCamera"
@@ -496,7 +501,7 @@ DEVICE.each_with_index do |device, index|
 							def_name = "MA_PROF_SUPPORT_CAMERA"
 							if(!(seen_defines.include? def_name))
 								definitions[def_name] = "#{def_name},Support/Camera"
-								rt_obj.caps[def_name] = "TRUE";
+								rt_obj.caps[def_name] = nil
 								def_str = "#define #{def_name}"
 								profile.puts def_str
 							end
@@ -511,7 +516,7 @@ DEVICE.each_with_index do |device, index|
 							def_name = "MA_PROF_SUPPORT_CAMERA"
 							if(!(seen_defines.include? def_name))
 								definitions[def_name] = "#{def_name},Support/Camera"
-								rt_obj.caps[def_name] = "TRUE";
+								rt_obj.caps[def_name] = nil
 								def_str = "#define #{def_name}"
 								profile.puts def_str
 							end
@@ -524,21 +529,23 @@ DEVICE.each_with_index do |device, index|
 							major, minor = version.split('.')
 							if(major.to_i > 4 || minor.to_i >= 3)
 								def_name = 'MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH'
-								rt_obj.caps[def_name] = 'TRUE';
+								rt_obj.caps[def_name] = nil
 								def_str = "#define #{def_name}"
 								profile.puts def_str
 							end
-							profile.puts '#define MA_PROF_SUPPORT_BLACKBERRY'
-							profile.puts "#define MA_PROF_CONST_BLACKBERRY_VERSION \"#{version}\""
+							rt_obj.caps['MA_PROF_BLACKBERRY_VERSION'] = major.to_i
+							rt_obj.caps['MA_PROF_BLACKBERRY_VERSION_MINOR'] = minor.to_i
+							profile.puts "#define MA_PROF_BLACKBERRY_VERSION #{major}"
+							profile.puts "#define MA_PROF_BLACKBERRY_VERSION_MINOR #{minor}"
 						end
 					end
 				elsif(cap == :JavaConfiguration)
 					value.each do |v|
 						if (v == "CLDC/1.0" ||
 							v == "CLDC/1.0.4")
-							rt_obj.caps["MA_PROF_SUPPORT_CLDC_10"] = "TRUE";
+							rt_obj.caps["MA_PROF_SUPPORT_CLDC_10"] = nil
 							definitions["MA_PROF_SUPPORT_CLDC_10"] = "MA_PROF_SUPPORT_CLDC_10,Support/Cldc1.0"
-							
+
 							def_str = "#define MA_PROF_SUPPORT_CLDC_10"
 							profile.puts def_str
 						end
@@ -548,12 +555,12 @@ DEVICE.each_with_index do |device, index|
 		end	#RELEVANT_CAPS.each
 		profile.puts "\n#endif /* _MSAB_PROF_H_ */"
 	end	#File.open
-	
+
 	if(gDoSanityCheck && !(hasScreenSizeX && hasScreenSizeY))
 		puts "Missing screen size: #{vendor}/#{device.name}"
 		devicesWithErrors += 1
 	end
-	
+
 	runtime = runtimes[device.platformversion.platform].add_runtime rt_obj
 	runtime.devices << device
 end	#DEVICE.each
@@ -566,7 +573,7 @@ File.open("#{VENDOR_DIR}/definitions.txt", 'w') do |def_file|
 	definitions.each do |line|
 		def_file.puts line[1]
 	end
-end	
+end
 
 runtimes.each do |platform, devs|
 	puts "#{platform} has #{devs.size} devices!"
@@ -577,17 +584,17 @@ runtimes.each do |platform_name, platform|
 	platform.each do |runtime|
 		runtime_dir = "#{platform_name}/#{id}/"
 		FileUtils.mkdir_p "#{RUNTIME_DIR}/#{runtime_dir}"
-		File.open("#{RUNTIME_DIR}/#{runtime_dir}/devices.txt", 'w') do |devices|  
+		File.open("#{RUNTIME_DIR}/#{runtime_dir}/devices.txt", 'w') do |devices|
 			runtime.devices.each do |device|
 				vendor = VENDOR[device.vendor]
 				File.open("#{VENDOR_DIR}/#{vendor}/#{device.name}/runtime.txt", 'w') do |runtime_txt|
 					runtime_txt.puts "profiles\\runtimes\\#{platform_name}\\#{id}"
 				end
-			
+
 				devices.puts "#{vendor}\\#{device.name}"
 			end
 		end
-		
+
 		release_defines = ['PHONE_RELEASE', 'MOSYNC_COMMERCIAL']
 		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro || platform_name == :s60v3 || platform_name == :s60v5)
 			release_defines << "USE_ARM_RECOMPILER"
@@ -596,35 +603,46 @@ runtimes.each do |platform_name, platform|
 			release_defines << "SUPPORT_MOSYNC_SERVER"
 		end
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/config.h", RELEVANT_DEFINES[platform_name.to_sym], release_defines)
-		
+
 		debug_defines = release_defines + ['PUBLIC_DEBUG', 'LOGGING_ENABLED']
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/configD.h", RELEVANT_DEFINES[platform_name.to_sym], debug_defines)
-		
+
 		cwd = Dir.pwd
 		Dir.chdir "../RuntimeBuilder/"
-		
+
 		puts "platform dir : #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
-		
-		if(platform_name == :JavaME && (runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10"))
-			cmd = "ruby RuntimeBuilder.rb ./Settings.rb JavaMEcldc10 #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
-		else
-			cmd = "ruby RuntimeBuilder.rb ./Settings.rb #{platform_name} #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
+
+		rbp = platform_name
+		if(platform_name == :JavaME)
+			rbp = 'JavaMEcldc10' if(runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10")
+			bbMajor = runtime.caps['MA_PROF_BLACKBERRY_VERSION']
+			if(bbMajor == 4)
+				minor = runtime.caps['MA_PROF_BLACKBERRY_VERSION_MINOR']
+				rbp = 'bb40'
+				rbp = 'bb42' if(minor >= 2)
+
+				# 4.4 and above are equivalent to 4.7
+				rbp = 'bb47' if(minor >= 4)
+			end
+			rbp = 'bb500' if(bbMajor && bbMajor >= 5)
 		end
-		
+
+		cmd = "ruby RuntimeBuilder.rb ./Settings.rb #{rbp} #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
+
 		puts(cmd)
 		if(gBuildRuntimes)
 			success = system(cmd)
 		else
 			success = true
 		end
-		
+
 		Dir.chdir cwd
-		
+
 		if(!success)
 			puts "Building one of the runtimes failed."
 			exit(1)
 		end
-		
+
 		id = id + 1
 	end
 end

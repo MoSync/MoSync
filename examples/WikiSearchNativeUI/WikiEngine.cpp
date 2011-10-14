@@ -248,8 +248,9 @@ void MediaWiki::httpFinished(MAUtil::HttpConnection *conn, int result)
 	if ( result >= 0)
 	{
 		MAUtil::String contentLengthStr;
-		int responseBytes = mHttp.getResponseHeader("Content-Length",
-				&contentLengthStr);
+		// todo: check return value.
+		mHttp.getResponseHeader("Content-Length",
+			&contentLengthStr);
 
 		int contentLength = 0;
 		contentLength = atoi(contentLengthStr.c_str());

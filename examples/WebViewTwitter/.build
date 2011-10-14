@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<buildSequence>
+<buildStep type="bundle">
+<bundle foe="true" inFile="%current-project%/LocalFiles" name="Bundle LocalFiles" outFile="%current-project%/Resources/LocalFiles.bin"/>
+</buildStep>
+<buildStep type="resource"/>
+<buildStep type="compile"/>
+<buildStep type="link"/>
+<buildStep type="pack"/>
+</buildSequence>

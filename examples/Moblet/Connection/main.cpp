@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
 * This example shows how to do basic Moblet based HTTP/HTTPS communication.
-* 
+*
 * If content-length is returned as an response header, then the first 1024
 * bytes of the content will be read.
 *
@@ -55,7 +55,7 @@ public:
 	MyMoblet() : mHttp(this) {
 		showInformation();
 	}
-	
+
 	/**
 	* Shows basic information on how to use the program
 	*/
@@ -112,7 +112,7 @@ public:
 			printf("content-length: %s bytes\n", cl.c_str());
 			int len = atoi(cl.c_str());
 			if(len >= BUFSIZE) {
-				printf("Buffer too small, can't read everything.\n");
+				//printf("Buffer too small, can't read everything.\n");
 				len = BUFSIZE-1;
 			}
 			mBuffer[len] = 0;
@@ -163,7 +163,7 @@ public:
 			printf("Repeat: %i\n", sRepeat);
 		}
 	}
-	
+
 	/**
 	* Moblet listener that has been fired when the screen has been pressed.
 	*/
