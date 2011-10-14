@@ -79,6 +79,7 @@ namespace NativeUI
 
         /**
          * Set the type of accessory.
+         * Available only on iOS.
          * Provides the corresponding icon in the right side of the widget.
          * @param type The type of the accessory.
          */
