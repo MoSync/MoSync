@@ -39,9 +39,9 @@ namespace NativeUI
      * with an optional title, back button and icon.
      * The default background color is light blue gradient.
      * The appearance depends on the platform:
-     *  - on iOS it can have a back button on the left.
-     *  - on Android there's no extra button, the device's back button is used
-     *  instead.
+     * - on iOS it can have a back button on the left.
+     * - on Android there's no extra button, the device's back button is used
+     * instead.
      *
      */
     class NavigationBar : public Widget
