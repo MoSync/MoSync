@@ -46,7 +46,7 @@ extern "C" int MAMain()
 	std::vector<int> v;
 
 	printf("Press zero or back to exit\n");
-	printf("Press key or touch screen to add number to vector\n");
+	printf("Press key or touch screen\nto add number to vector\n");
 
 	while (TRUE)
 	{
