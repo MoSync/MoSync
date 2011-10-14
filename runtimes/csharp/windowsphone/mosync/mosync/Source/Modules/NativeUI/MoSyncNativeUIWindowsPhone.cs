@@ -10,23 +10,91 @@ namespace MoSync
     {
         protected UIElement mView;
 
+        public UIElement View
+        {
+            get { return mView; }
+            set { mView = value; }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_LEFT)]
+        public double Left
+        {
+            get { return (double)mView.GetValue(Canvas.LeftProperty); }
+            set 
+            { 
+                //mView.SetValue(Canvas.LeftProperty, value); 
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_TOP)]
+        public double Top
+        {
+            get { return (double)mView.GetValue(Canvas.TopProperty); }
+            set 
+            { 
+                //mView.SetValue(Canvas.TopProperty, value); 
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_WIDTH)]
+        public double Width
+        {
+            get { return (double)mView.GetValue(Canvas.WidthProperty); }
+            set 
+            {
+                //mView.SetValue(Canvas.WidthProperty, value); 
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_HEIGHT)]
+        public double Height
+        {
+            get { return (double)mView.GetValue(Canvas.HeightProperty); }
+            set {
+                //mView.SetValue(Canvas.HeightProperty, value);
+            }
+        }
+
         public WidgetBaseWindowsPhone()
             : base()
         {
         }
     };
 
+    public class WebView : WidgetBaseWindowsPhone
+    {
+        public WebView()
+        {
+            mView = new Microsoft.Phone.Controls.WebBrowser();
+        }
+
+    }
+
     public class Screen : WidgetBaseWindowsPhone, IScreen
     {
+        protected PhoneApplicationPage mPage;
         public Screen()
         {
-            mView = new PhoneApplicationPage();
+            mPage = new PhoneApplicationPage();
+            mView = mPage;
+        }
+
+        public override void AddChild(IWidget child)
+        {
+            base.AddChild(child);
+            WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
+            mPage.Content = w.View;
         }
 
         public void Show()
         {
-            PhoneApplicationPage page = (PhoneApplicationPage)mView;
-            page.NavigationService.Navigate(new Uri(page.Name, UriKind.Relative));
+            //mPage.NavigationService.Navigate(new Uri(mPage.Name, UriKind.Relative));
+            //System.Windows.Markup.XamlReader(
+            MoSync.Util.RunActionOnMainThreadSync(() =>
+            {
+                PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+                frame.Content = mPage;
+            });
         }
     }
 

@@ -23,15 +23,10 @@ namespace MoSync
 
         protected void InvalidateWriteableBitmapOnMainThread(WriteableBitmap bitmap)
         {
-            using (AutoResetEvent are = new AutoResetEvent(false))
+            MoSync.Util.RunActionOnMainThreadSync(() =>
             {
-                Deployment.Current.Dispatcher.BeginInvoke(() =>
-                {
-                    bitmap.Invalidate();
-                    are.Set();
-                });
-                are.WaitOne();
-            }
+                bitmap.Invalidate();
+            });
         }
 
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
@@ -95,27 +90,21 @@ namespace MoSync
             };
 
             TextBlock textBlock = new TextBlock();
-            //textBlock.MaxWidth = 100000.0;
-            //textBlock.MaxHeight = 100000.0;
             textBlock.FontSize = mCurrentFontSize;
 
             syscalls.maDrawText = delegate(int left, int top, int str)
             {
                 String text = core.GetDataMemory().ReadStringAtAddress(str);
-                using (AutoResetEvent are = new AutoResetEvent(false))
+                
+                MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                    {
-                        textBlock.Text = text;
-                        textBlock.Foreground = new SolidColorBrush(mCurrentWindowsColor);
-                        WriteableBitmap b = new WriteableBitmap(textBlock, null);
-                        mCurrentDrawTarget.Blit(new Rect(left, top, b.PixelWidth, b.PixelHeight),
-                            b,
-                            new Rect(0, 0, b.PixelWidth, b.PixelHeight));
-                        are.Set();
-                    });
-                    are.WaitOne();
-                }
+                    textBlock.Text = text;
+                    textBlock.Foreground = new SolidColorBrush(mCurrentWindowsColor);
+                    WriteableBitmap b = new WriteableBitmap(textBlock, null);
+                    mCurrentDrawTarget.Blit(new Rect(left, top, b.PixelWidth, b.PixelHeight),
+                        b,
+                        new Rect(0, 0, b.PixelWidth, b.PixelHeight));
+                });
             };
 
             syscalls.maGetTextSize = delegate(int str)
@@ -124,17 +113,12 @@ namespace MoSync
                 int textWidth = 0;
                 int textHeight = 0;
 
-                using (AutoResetEvent are = new AutoResetEvent(false))
+                MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                    {
-                        textBlock.Text = text;
-                        textWidth = (int)textBlock.ActualWidth;
-                        textHeight = (int)textBlock.ActualHeight;
-                        are.Set();
-                    });
-                    are.WaitOne();
-                }
+                    textBlock.Text = text;
+                    textWidth = (int)textBlock.ActualWidth;
+                    textHeight = (int)textBlock.ActualHeight;
+                });
 
                 return MoSync.Util.CreateExtent(textWidth, textHeight);
             };
@@ -143,31 +127,26 @@ namespace MoSync
             {
                 String text = core.GetDataMemory().ReadWStringAtAddress(str);
                 if (text.Length == 0) return;
-                using (AutoResetEvent are = new AutoResetEvent(false))
+                
+                MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
+                    textBlock.Text = text;
+                    textBlock.Foreground = new SolidColorBrush(mCurrentWindowsColor);
+                    WriteableBitmap b = new WriteableBitmap(textBlock, null);
+                    Rect dstRect = new Rect(left, top, b.PixelWidth, b.PixelHeight);
+                    Rect srcRect = new Rect(0, 0, b.PixelWidth, b.PixelHeight);
+                    // cliprect..
+                    Rect clipRect = new Rect(0, 0, mBackBuffer.PixelWidth, mBackBuffer.PixelHeight);
+                    clipRect.Intersect(dstRect);
+                    if (clipRect.IsEmpty == true)
                     {
-                        textBlock.Text = text;
-                        textBlock.Foreground = new SolidColorBrush(mCurrentWindowsColor);
-                        WriteableBitmap b = new WriteableBitmap(textBlock, null);
-                        Rect dstRect = new Rect(left, top, b.PixelWidth, b.PixelHeight);
-                        Rect srcRect = new Rect(0, 0, b.PixelWidth, b.PixelHeight);
-                        // cliprect..
-                        Rect clipRect = new Rect(0, 0, mBackBuffer.PixelWidth, mBackBuffer.PixelHeight);
-                        clipRect.Intersect(dstRect);
-                        if(clipRect.IsEmpty == true)
-                        {
-                            are.Set();
-                            return;
-                        }
+                        return;
+                    }
 
-                        mCurrentDrawTarget.Blit(dstRect,
-                            b,
-                            srcRect);
-                        are.Set();
-                    });
-                    are.WaitOne();
-                }
+                    mCurrentDrawTarget.Blit(dstRect,
+                        b,
+                        srcRect);
+                });
             };
 
             syscalls.maGetTextSizeW = delegate(int str)
@@ -176,17 +155,12 @@ namespace MoSync
                 int textWidth = 0;
                 int textHeight = 0;
 
-                using (AutoResetEvent are = new AutoResetEvent(false))
+                MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                    {
-                        textBlock.Text = text;
-                        textWidth = (int)textBlock.ActualWidth;
-                        textHeight = (int)textBlock.ActualHeight;
-                        are.Set();
-                    });
-                    are.WaitOne();
-                }
+                    textBlock.Text = text;
+                    textWidth = (int)textBlock.ActualWidth;
+                    textHeight = (int)textBlock.ActualHeight;
+                });
 
                 return MoSync.Util.CreateExtent(textWidth, textHeight);
             };
@@ -251,16 +225,13 @@ namespace MoSync
                 Resource res = runtime.GetResource(MoSync.Constants.RT_IMAGE, handle);
                 BitmapSource src = (BitmapSource)res.GetInternalObject();
                 int w = 0, h = 0;
-                using (AutoResetEvent are = new AutoResetEvent(false))
+                
+                MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                    {
-                        w = src.PixelWidth;
-                        h = src.PixelHeight;
-                        are.Set();
-                    });
-                    are.WaitOne();
-                }
+                    w = src.PixelWidth;
+                    h = src.PixelHeight;
+                });
+
                 return MoSync.Util.CreateExtent(w, h);
             };
 
@@ -296,16 +267,11 @@ namespace MoSync
                 Resource res = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, placeholder);
                 res.SetResourceType(MoSync.Constants.RT_IMAGE);
                 WriteableBitmap bitmap = null;
-                using (AutoResetEvent are = new AutoResetEvent(false))
+               
+                MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
-                    Deployment.Current.Dispatcher.BeginInvoke(() =>
-                    {
-                        bitmap = new WriteableBitmap(width, height);
-                        are.Set();
-                    });
-                    are.WaitOne();
-                }
-
+                    bitmap = new WriteableBitmap(width, height);
+                });
 
                 if (bitmap == null) return MoSync.Constants.RES_OUT_OF_MEMORY;
                 res.SetInternalObject(bitmap);

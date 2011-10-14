@@ -626,7 +626,7 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 
 		maapiFile << "\t\t\treturn mIoctls." << f.name << "(";
 
-		int i = 0;
+		int argindex = 0;
 		for(size_t k=0; k<f.args.size(); k++) {
 			const Argument& a(f.args[k]);
 			std::string argType = getCSharpType(maapi, a.type, a.in);
@@ -634,22 +634,22 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 				maapiFile << ", ";
 			if(argType == "double") {
 				maapiFile << "MoSync.Util.ConvertToDouble(";
-				outputCSharpIoctlArg(maapiFile, i);
+				outputCSharpIoctlArg(maapiFile, argindex);
 				maapiFile << ", ";
-				i++;
-				outputCSharpIoctlArg(maapiFile, i);
-				i++;
+				argindex++;
+				outputCSharpIoctlArg(maapiFile, argindex);
+				argindex++;
 				maapiFile << ")";
 			}
 			else if(argType == "float") {
 				maapiFile << "MoSync.Util.ConvertToFloat(";
-				outputCSharpIoctlArg(maapiFile, i);
-				i++;
+				outputCSharpIoctlArg(maapiFile, argindex);
+				argindex++;
 				maapiFile << ")";				
 			} else {
 				//maapiFile << "this.regs[Reg.i" << i << "] ";
-				outputCSharpIoctlArg(maapiFile, i);
-				i++;
+				outputCSharpIoctlArg(maapiFile, argindex);
+				argindex++;
 			}
 		}
 		maapiFile << ");\n";

@@ -119,7 +119,7 @@ namespace MoSync
             return (w << 16) | h;
         }
 
-        public void RunOnMainThreadBlock(Action action)
+        public static void RunActionOnMainThreadSync(Action action)
         {
             using (AutoResetEvent are = new AutoResetEvent(false))
             {

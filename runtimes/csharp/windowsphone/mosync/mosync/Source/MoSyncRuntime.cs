@@ -37,8 +37,9 @@ namespace MoSync
     public partial class Runtime
     {
         // these might overlap (i.e. the same group instance might be in both sets)
-        private List<ISyscallModule> mSyscallGroups = new List<ISyscallModule>();
-        private List<IIoctlModule> mIoctlGroups = new List<IIoctlModule>();
+        private List<ISyscallModule> mSyscallModules = new List<ISyscallModule>();
+        private List<IIoctlModule> mIoctlModules = new List<IIoctlModule>();
+        private Dictionary<String, Object> mModules = new Dictionary<String, Object>();
 
         protected Core mCore;
         protected Syscalls mSyscalls;
@@ -65,8 +66,7 @@ namespace MoSync
                 if (t.GetInterface("MoSync.ISyscallModule", false) != null)
                 {
                     syscallGroupInstance = Activator.CreateInstance(t) as ISyscallModule;
-                    mSyscallGroups.Add(syscallGroupInstance);
-                    syscallGroupInstance.Init(mSyscalls, mCore, this);
+                    mSyscallModules.Add(syscallGroupInstance);
                 }
                 if (t.GetInterface("MoSync.IIoctlModule", false) != null)
                 {
@@ -74,17 +74,37 @@ namespace MoSync
                         ioctlGroupInstance = (IIoctlModule)syscallGroupInstance;
                     else
                         ioctlGroupInstance = Activator.CreateInstance(t) as IIoctlModule;
-                    mIoctlGroups.Add(ioctlGroupInstance);
-                    ioctlGroupInstance.Init(mIoctls, mCore, this);
+                    mIoctlModules.Add(ioctlGroupInstance);
                 }
-     
+
+                if (syscallGroupInstance != null)
+                    mModules.Add(t.Name, syscallGroupInstance);
+                else if (ioctlGroupInstance != null)
+                    mModules.Add(t.Name, ioctlGroupInstance);
             }
 
+            foreach (ISyscallModule module in mSyscallModules)
+            {
+                module.Init(mSyscalls, mCore, this);
+            }
+
+            foreach (IIoctlModule module in mIoctlModules)
+            {
+                module.Init(mIoctls, mCore, this);
+            }
+        }
+
+        public T GetModule<T>()
+        {
+            Object ret;
+            if (!mModules.TryGetValue(typeof(T).Name, out ret))
+                return default(T);
+            else
+                return (T)ret;
         }
   
         public Runtime(Core core)
         {
-//            mMainPage = mainPage;
             mCore = core;
             mSyscalls = new Syscalls();
             mIoctls = new Ioctls();
@@ -159,13 +179,6 @@ namespace MoSync
                 return mIoctlInvoker.InvokeIoctl(id, a, b, c);
             };
         }
-
-        /*
-        public test_mosync.MainPage GetMainPage()
-        {
-            return mMainPage;
-        }
-         * */
 
         // will reset the runtime.
         public void Init()
@@ -246,11 +259,14 @@ namespace MoSync
                         file.Read(bytes, 0, (int)size);
                         using (MemoryStream ms = new MemoryStream(bytes, 0, bytes.Length))
                         {
-                            BitmapImage im = new BitmapImage();
-                            im.CreateOptions = BitmapCreateOptions.None;
-                            im.SetSource(ms);
-                            WriteableBitmap wb = new WriteableBitmap(im); 
-                            resource.SetInternalObject(wb);
+                            MoSync.Util.RunActionOnMainThreadSync(() =>
+                            {
+                                BitmapImage im = new BitmapImage();
+                                im.CreateOptions = BitmapCreateOptions.None;
+                                im.SetSource(ms);
+                                WriteableBitmap wb = new WriteableBitmap(im);
+                                resource.SetInternalObject(wb);
+                            });
                         }
                         break;
                 }

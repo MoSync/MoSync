@@ -77,8 +77,9 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Source\Modules\MoSyncFileModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
-    <Compile Include="Source\Modules\NativeUI\MoSyncNativeUIModule.cs" />
+    <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncNativeUI.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncNativeUIWindowsPhone.cs" />
     <Compile Include="Source\MoSyncCore.cs" />

@@ -3,9 +3,30 @@ using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.GamerServices;
 using System.Windows;
+using System.Collections.Generic;
 
 namespace MoSync
 {
+    public class SystemPropertyManager
+    {
+        public delegate String SystemPropertyProvider(String key);
+        public static Dictionary<String, SystemPropertyProvider> mSystemPropertyProviders =
+            new Dictionary<string, SystemPropertyProvider>();
+
+        public static void RegisterSystemPropertyProvider(String key, SystemPropertyProvider provider)
+        {
+            mSystemPropertyProviders.Add(key, provider);
+        }
+
+        public static String GetSystemProperty(String key)
+        {
+            SystemPropertyProvider provider;
+            if (mSystemPropertyProviders.TryGetValue(key, out provider) == false)
+                return null;
+            return provider(key);
+        }
+    }
+
     public class MiscModule : ISyscallModule, IIoctlModule
     {
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
@@ -64,6 +85,15 @@ namespace MoSync
                 core.GetDataMemory().ReadBytes(bytes, src, size);
                 MoSync.Util.Log(bytes);
                 return 0;
+            };
+
+            ioctls.maGetSystemProperty = delegate(int _key, int _buf, int _size)
+            {
+                String key = core.GetDataMemory().ReadStringAtAddress(_key);
+                String value = MoSync.SystemPropertyManager.GetSystemProperty(key);
+                if(value.Length+1 <= _size)
+                    core.GetDataMemory().WriteStringAtAddress(_buf, value, _size);
+                return value.Length+1;
             };
         }
 	}

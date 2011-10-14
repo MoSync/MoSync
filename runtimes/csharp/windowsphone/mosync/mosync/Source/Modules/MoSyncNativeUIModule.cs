@@ -12,6 +12,7 @@ namespace MoSync
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
             mNativeUI = new NativeUIWindowsPhone();
+            mWidgets.Add(null);
 
             ioctls.maWidgetCreate = delegate(int _widgetType)
             {
@@ -20,7 +21,7 @@ namespace MoSync
                 if (widget == null)
                     return MoSync.Constants.MAW_RES_INVALID_TYPE_NAME;
 
-                for (int i = 0; i < mWidgets.Count; i++)
+                for (int i = 1; i < mWidgets.Count; i++)
                 {
                     if (mWidgets[i] == null)
                     {
@@ -37,7 +38,7 @@ namespace MoSync
             {
                 IWidget widget = mWidgets[_widget];
                 widget.RemoveFromParent();
-                mWidgets.Remove(widget);
+                mWidgets[_widget] = null;
                 return MoSync.Constants.MAW_RES_OK;
             };
 
@@ -79,7 +80,21 @@ namespace MoSync
                 String property = core.GetDataMemory().ReadStringAtAddress(_property);
                 String value = core.GetDataMemory().ReadStringAtAddress(_value);
                 IWidget widget = mWidgets[_widget];
-                widget.SetProperty(property, value);
+                try
+                {
+                    widget.SetProperty(property, value);
+                }
+                catch (InvalidPropertyNameException e)
+                {
+                    MoSync.Util.Log(e.ToString());
+                    return MoSync.Constants.MAW_RES_INVALID_PROPERTY_NAME;
+                }
+                catch (InvalidPropertyValueException e)
+                {
+                    MoSync.Util.Log(e.ToString());
+                    return MoSync.Constants.MAW_RES_INVALID_PROPERTY_VALUE;
+                }
+
                 return MoSync.Constants.MAW_RES_OK;
             };
 
@@ -87,16 +102,24 @@ namespace MoSync
             {
                 String property = core.GetDataMemory().ReadStringAtAddress(_property);
                 IWidget widget = mWidgets[_widget];
-                String value = widget.GetProperty(property);
-                core.GetDataMemory().WriteStringAtAddress(_value, value, _bufSize);
+                try
+                {
+                    String value = widget.GetProperty(property);
+                    core.GetDataMemory().WriteStringAtAddress(_value, value, _bufSize);
+                }
+                catch (InvalidPropertyNameException e)
+                {
+                    MoSync.Util.Log(e.ToString());
+                    return MoSync.Constants.MAW_RES_INVALID_PROPERTY_NAME;
+                }
+
                 return MoSync.Constants.MAW_RES_OK;
             };
 
             ioctls.maWidgetScreenShow = delegate(int _screenHandle)
             {
-                Screen screen = (Screen)mWidgets[_screenHandle];
+                IScreen screen = (IScreen)mWidgets[_screenHandle];
                 screen.Show();
-
                 return MoSync.Constants.MAW_RES_OK;
             };
 
