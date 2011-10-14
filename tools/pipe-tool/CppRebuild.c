@@ -703,7 +703,8 @@ void CppDecodeCallReg(OpcodeInfo *theOp)
 	RebuildEmit(");\n");
 
 	// r14 and r15 are always scratch registers after a function call (they may have changed. So we can safely overwrite the content here).
-	if (ThisFunctionRegs & REGBIT(REG_r15)) {
+	if(funcprop.reg_used & REGBIT(REG_r15))
+	{
 		RebuildEmit("	r15 = __dbl_high;\n");
 	}
 }
@@ -799,7 +800,7 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 
 	RebuildEmit(");");
 
-	if (rettype == RET_double && emit_r15 && (ThisFunctionRegs & REGBIT(REG_r15)))
+	if (rettype == RET_double && emit_r15 && (regs & REGBIT(REG_r15)))
 	{
 		RebuildEmit("\n	r15 = __dbl_high;");
 		SetRegInit(REG_r15);
@@ -1062,9 +1063,9 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 
 	// Remove regs that are already declared in func decl
 
-	// TODO: verify that this is ok.
 	// ok this has sort of been reverse engineered by looking at the bitmasks in the rebuilt code... ;)
-	reg_used &= ThisFunctionRegs | (1 << REG_r14) | (1 << REG_r14) | (1 << REG_i0) | (1 << REG_i1) | (1 << REG_i2) | (1 << REG_i3);
+	// this is added to remove warnings about unusued variables.
+	reg_used &= ThisFunctionRegs | (1 << REG_r14) | (1 << REG_r15) | (1 << REG_i0) | (1 << REG_i1) | (1 << REG_i2) | (1 << REG_i3);
 
 	reg_used &= (~reg_alloc);
 
