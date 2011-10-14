@@ -660,6 +660,23 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 	maapiFile << "\t}\n";
 	maapiFile << "}\n\n";
 
+	// output struct info as offsets etc.
+	for(size_t i = 0; i < maapi.structs.size(); i++)
+	{
+		const Struct& s(maapi.structs[i]);
+		for(size_t j = 0; j < s.members.size(); j++)
+		{
+			const Member& m(s.members[j]);
+			if(m.pod.size() == 1) // POD
+			{
+
+			}
+			else // Anonymous union
+			{
+			}
+		}
+	};
+
 	maapiFile << "} // namespace MoSync\n";
 
 }

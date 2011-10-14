@@ -8,7 +8,104 @@ namespace MoSync
 {
     public class FileModule : IIoctlModule
     {
-        protected List<IsolatedStorageFileStream> mFileHandles = new List<IsolatedStorageFileStream>();
+        public class File
+        {
+            public String Path
+            {
+                get 
+                {
+                    return mPath;
+                }
+            }
+
+            public bool Exists
+            {
+                get
+                {
+                    if (mIsDirectory)
+                        return mIsolatedStorage.DirectoryExists(mPath);
+                    else
+                        return mIsolatedStorage.FileExists(mPath);
+                }
+            }
+
+            public IsolatedStorageFileStream FileStream
+            {
+                get
+                {
+                    return mFileStream;
+                }
+
+                set
+                {
+                    mFileStream = value;
+                }
+            }
+
+            public bool IsDirectory
+            {
+                get
+                {
+                    return mIsDirectory;
+                }
+            }
+
+            public File(String path, FileAccess fileAccess)
+            {
+                mPath = path;
+                mIsDirectory = mPath.EndsWith("/");
+                mFileStream = null;
+                mIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication();
+                mFileAccess = fileAccess;
+            }
+
+            public void TryOpen()
+            {
+                if (!mIsDirectory)
+                {
+                    try
+                    {
+                        mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.Open, mFileAccess);
+                    }
+                    catch (IsolatedStorageException e)
+                    {
+                        MoSync.Util.Log(e.ToString());
+                    }
+                }
+            }
+
+            public void Create()
+            {
+                if (mIsDirectory)
+                {
+                    mIsolatedStorage.CreateDirectory(mPath);
+                }
+                else
+                {
+                    mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.Create, mFileAccess);
+                }
+            }
+
+            public void Close()
+            {
+                if (mIsDirectory)
+                {
+                }
+                else
+                {
+                    mFileStream.Close();
+                }
+            }
+
+            protected String mPath;
+            protected FileAccess mFileAccess;
+            protected bool mIsDirectory;
+            protected IsolatedStorageFile mIsolatedStorage;
+            protected IsolatedStorageFileStream mFileStream;
+
+        };
+
+        protected List<File> mFileHandles = new List<File>();
 
         private String ConvertPath(String path)
         {
@@ -23,7 +120,7 @@ namespace MoSync
             MoSync.SystemPropertyManager.RegisterSystemPropertyProvider("mosync.path.local",
                 delegate(String key)
                 {
-                    return "\\";
+                    return "/";
                 }
             );
 
@@ -31,7 +128,8 @@ namespace MoSync
             {
                 String path = core.GetDataMemory().ReadStringAtAddress(_path);
                 path = ConvertPath(path);
-                FileMode mode = FileMode.Open;
+
+                File file = null;
                 FileAccess access = 0;
 
                 if (_mode == MoSync.Constants.MA_ACCESS_READ)
@@ -47,28 +145,44 @@ namespace MoSync
                     return MoSync.Constants.MA_FERR_GENERIC;
                 }
 
-                IsolatedStorageFileStream fileStream = isolatedStorage.OpenFile(path, mode, access);
-                mFileHandles.Add(fileStream);
+                if (path.EndsWith("/") == false) // directory
+                {
+                    FileMode mode = FileMode.Open;
+                    file = new File(path, access);
+                    file.TryOpen();
+                }
+                else
+                {
+                    file = new File(path, access);
+                }
+
+                mFileHandles.Add(file);
                 return mFileHandles.Count - 1;
             };
 
             ioctls.maFileClose = delegate(int _file)
             {
-                IsolatedStorageFileStream fileStream = mFileHandles[_file];
-                fileStream.Close();
+                File file = mFileHandles[_file];
+                file.Close();
                 return 0;
             };
 
             ioctls.maFileRead = delegate(int _file, int _dst, int _len)
             {
-                IsolatedStorageFileStream fileStream = mFileHandles[_file];
+                File file = mFileHandles[_file];
+                if (file.IsDirectory)
+                    return MoSync.Constants.MA_FERR_WRONG_TYPE;
+                IsolatedStorageFileStream fileStream = file.FileStream;
                 core.GetDataMemory().WriteFromStream(_dst, fileStream, _len);
                 return 0;
             };
 
             ioctls.maFileReadToData = delegate(int _file, int _data, int _offset, int _len)
             {
-                IsolatedStorageFileStream fileStream = mFileHandles[_file];
+                File file = mFileHandles[_file];
+                if (file.IsDirectory)
+                    return MoSync.Constants.MA_FERR_WRONG_TYPE;
+                IsolatedStorageFileStream fileStream = file.FileStream;
                 Resource dataRes = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
                 Memory data = (Memory)dataRes.GetInternalObject();
                 data.WriteFromStream(_offset, fileStream, _len);
@@ -77,7 +191,10 @@ namespace MoSync
 
             ioctls.maFileWriteFromData = delegate(int _file, int _data, int _offset, int _len)
             {
-                IsolatedStorageFileStream fileStream = mFileHandles[_file];
+                File file = mFileHandles[_file];
+                if (file.IsDirectory)
+                    return MoSync.Constants.MA_FERR_WRONG_TYPE;
+                IsolatedStorageFileStream fileStream = file.FileStream;
                 Resource dataRes = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
                 Memory data = (Memory)dataRes.GetInternalObject(); 
                 byte[] bytes = new byte[_len];
@@ -88,7 +205,10 @@ namespace MoSync
 
             ioctls.maFileWrite = delegate(int _file, int _src, int _len)
             {
-                IsolatedStorageFileStream fileStream = mFileHandles[_file];
+                File file = mFileHandles[_file];
+                if (file.IsDirectory)
+                    return MoSync.Constants.MA_FERR_WRONG_TYPE;
+                IsolatedStorageFileStream fileStream = file.FileStream;
                 byte[] bytes = new byte[_len];
                 core.GetDataMemory().ReadBytes(bytes, _src, _len);
                 fileStream.Write(bytes, 0, _len);
@@ -97,7 +217,10 @@ namespace MoSync
 
             ioctls.maFileSeek = delegate(int _file, int _offset, int _whence)
             {
-                IsolatedStorageFileStream fileStream = mFileHandles[_file];
+                File file = mFileHandles[_file];
+                if (file.IsDirectory)
+                    return MoSync.Constants.MA_FERR_WRONG_TYPE;
+                IsolatedStorageFileStream fileStream = file.FileStream;
                 SeekOrigin origin;
                 switch (_whence)
                 {
@@ -119,8 +242,26 @@ namespace MoSync
 
             ioctls.maFileTell = delegate(int _file)
             {
-                IsolatedStorageFileStream fileStream = mFileHandles[_file];
+                File file = mFileHandles[_file];
+                if (file.IsDirectory)
+                    return MoSync.Constants.MA_FERR_WRONG_TYPE;
+                IsolatedStorageFileStream fileStream = file.FileStream;
                 return (int)fileStream.Position;
+            };
+
+            ioctls.maFileExists = delegate(int _file)
+            {
+                File file = mFileHandles[_file];
+                return file.Exists?1:0;
+            };
+
+            ioctls.maFileCreate = delegate(int _file)
+            {
+                File file = mFileHandles[_file];
+                if (file.Exists)
+                    return MoSync.Constants.MA_FERR_FORBIDDEN;
+                file.Create();
+                return 0;
             };
         }
     }

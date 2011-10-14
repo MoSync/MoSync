@@ -63,6 +63,16 @@ namespace MoSync
 
     public class WebView : WidgetBaseWindowsPhone
     {
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_WEB_VIEW_URL)]
+        public String url
+        {
+            set
+            {
+                WebBrowser webBrowser = (WebBrowser)mView;
+                webBrowser.Navigate(new Uri(value, UriKind.Relative));
+            }
+        }
+
         public WebView()
         {
             mView = new Microsoft.Phone.Controls.WebBrowser();
@@ -83,7 +93,10 @@ namespace MoSync
         {
             base.AddChild(child);
             WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
-            mPage.Content = w.View;
+            MoSync.Util.RunActionOnMainThreadSync(() =>
+            {
+                mPage.Content = w.View;
+            });
         }
 
         public void Show()
