@@ -50,6 +50,11 @@ import com.mosync.nativeui.util.properties.VerticalAlignment;
 public class Widget
 {
 	/**
+	 * Used for maWidgetGetProperty calls to signal that it received an invalid property name.
+	 */
+	public static String INVALID_PROPERTY_NAME = "InvalidPropertyName";
+
+	/**
 	 * The view that is wrapped by this widget.
 	 */
 	private View m_view;
@@ -278,7 +283,7 @@ public class Widget
 				return "false";
 			}
 		}
-		return "";
+		return INVALID_PROPERTY_NAME;
 	}
 
 	/**

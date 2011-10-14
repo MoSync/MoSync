@@ -73,8 +73,13 @@
 			  NSString* webURLString = [urlString stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding];
 			  url = [[NSURL URLWithString: webURLString] filePathURL];
 		  } else {
-			  url = [NSURL URLWithString:value];
+              // Convert the string URL into ascii encoding.
+              NSData* data = [value dataUsingEncoding:NSASCIIStringEncoding allowLossyConversion:YES];
+              NSString* formattedURL = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+              url = [NSURL URLWithString:formattedURL];
+              [formattedURL release];
 		  }
+
             NSURLRequest *requestObj = [NSURLRequest requestWithURL:url];
             NSString *absoluteURL = [url absoluteString];
 
