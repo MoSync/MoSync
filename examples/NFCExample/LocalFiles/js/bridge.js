@@ -17,22 +17,22 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file josync.js
+ * @file bridge.js
  * @author Mikael Kindborg
  *
  * Library for JavaScript to C++ communication on the MoSync platform.
  */
 
 /**
- * Create a global instance of the josync library.
+ * Create a global instance of the library.
  */
-var josync = function()
+var bridge = function()
 {
-	var jo = {};
+	var self = {};
 
 	// The messagehandler submodule.
 
-	jo.messagehandler = function()
+	self.messagehandler = function()
 	{
 		var self = {};
 		var callbackTable = {};
@@ -93,7 +93,10 @@ var josync = function()
 		};
 
 		/**
-		 * Send a message to C++.
+		 * Send a message to C++. If a callback function is
+		 * supplied, a callbackId parameter will be added to
+		 * the message, this id can be used when sending a reply
+		 * back to JavaScript from C++.
 		 *
 		 * @param message A dictionary with the message parameters.
 		 * The parameter "messageName" specifyes the name of the
@@ -130,7 +133,7 @@ var josync = function()
 		};
 
 		/**
-		 * This function is called from C++ to tell the message
+		 * Call this function from C++ to tell the message
 		 * handler that the last message sent has been processed.
 		 */
 		self.processedMessage = function()
@@ -154,14 +157,12 @@ var josync = function()
 		 * JavaScript. The function takes a variable number of parameters.
 		 *
 		 * For example, to return the value 'Hello World' to the callback
-		 * with id 47, you can use this code in a WebAppMoblet:
+		 * with id 82, you can use this code in a WebAppMoblet:
 		 *
-		 *   callJS("jo.messagehandler.reply(47, 'Hello World')");
+		 *   callJS("bridge.messagehandler.reply(82, 'Hello World')");
 		 *
-		 * Or use the reply method in class WebViewMessage, which
-		 * handles the callbackId automatically:
-		 *
-		 *   webViewMessage.reply("Hello World");
+		 * You can obtain the callbackId from the C++ WebViewMessage
+		 * object, if you use that class to parse the message.
 		 *
 		 * @param callBackId The first parameter is the id of the
 		 * callback function. Remaning parameters are applied to the
@@ -181,86 +182,9 @@ var josync = function()
 			}
 		};
 
-		/**
-		 * Function to be called from C++ to handle
-		 * MoSync events. This function takes a variable
-		 * number of arguments depending on the type of event.
-		 */
-		self.processEvent = function(eventType)
-		{
-			// Get registered listeners for the eventType.
-
-			// Call functions.
-		};
-
-		self.registerEventListener = function(eventType, callbackFun)
-		{
-			var callbacks = self.eventCallbackTable[eventType];
-			if (undefined == callbacks)
-			{
-				self.eventCallbackTable[eventType] = [callbackFun];
-			}
-			else
-			{
-				callbacks.push(callbackFun);
-			}
-		};
-
-		self.unregisterEventListener = function(eventType, callbackFun)
-		{
-			var callbacks = self.eventCallbackTable[eventType];
-			if (undefined != callbacks)
-			{
-				var index = callbacks.indexOf(callbackFun);
-				if (-1 != index)
-				{
-					// Remove element.
-					callbacks.splice(index, 1);
-				}
-			}
-		};
-
 		return self;
 	}();
 
-	// The file submodule.
-
-	jo.file = {};
-
-	jo.file.getLocalPath = function(callbackFun)
-	{
-		jo.messagehandler.send(
-			{ "messageName": "josync.file.getLocalPath" },
-			callbackFun);
-	};
-
-	jo.file.read = function(filePath, callbackFun)
-	{
-		jo.messagehandler.send(
-			{ "messageName": "josync.file.read",
-			  "filePath": filePath },
-			callbackFun);
-	};
-
-	jo.file.write = function(filePath, data, callbackFun)
-	{
-		jo.messagehandler.send(
-			{ "messageName": "josync.file.write",
-			  "filePath": filePath,
-			  "data": data },
-			callbackFun);
-	};
-
-	// Top level functions.
-
-	jo.log = function(message)
-	{
-		jo.messagehandler.send(
-			{ "messageName": "josync.log",
-			  "message": message },
-			null);
-	};
-
 	// Return the library object.
-	return jo;
+	return self;
 }();
