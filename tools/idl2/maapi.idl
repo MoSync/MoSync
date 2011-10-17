@@ -5245,6 +5245,38 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		EDIT_MODE = "editMode";
+
+		/**
+		* @brief Specifies what editing mode the edit box should have.
+		*
+		* @validvalue One of the values #MAW_EDIT_BOX_TYPE_ANY, #MAW_EDIT_BOX_TYPE_EMAILADDR,
+		* #MAW_EDIT_BOX_TYPE_NUMERIC, #MAW_EDIT_BOX_TYPE_PHONENUMBER, #MAW_EDIT_BOX_TYPE_URL,
+		* #MAW_EDIT_BOX_TYPE_DECIMAL, #MAW_EDIT_BOX_TYPE_SINGLELINE.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_INPUT_MODE, toString(MAW_EDIT_BOX_NUMERIC);
+		* \endcode
+		*/
+		INPUT_MODE = "inputMode";
+
+		/**
+		* @brief Specifies the editing flags applied to the edit box.
+		*
+		* @validvalue One of the values #MAW_EDIT_BOX_FLAG_PASSWORD,
+		* #MAW_EDIT_BOX_FLAG_SENSITIVE, #MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS,
+		* #MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD, #MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(editBoxHandle, MAW_EDIT_BOX_INPUT_FLAG, toString(MAW_EDIT_BOX_FLAG_PASSWORD));
+		* \endcode
+		*/
+		INPUT_FLAG = "inputFlag";
 	}
 	} // end of WidgetEditBoxProperties
 
