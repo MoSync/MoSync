@@ -15,7 +15,7 @@ public:
 	 */
 	MyMoblet()
 	{
-		printf("Press zero or back to exit");
+		printf("Press zero or back to exit\n");
 	}
 
 	/**
@@ -30,7 +30,7 @@ public:
 		}
 
 		// Print the key character.
-		printf("You typed: %c", keyCode);
+		printf("You typed: %c\n", keyCode);
 	}
 
 	/**
@@ -46,7 +46,7 @@ public:
 	void pointerPressEvent(MAPoint2d point)
 	{
 		// Print the x and y coordinate.
-		printf("You touched: %i %i", point.x, point.y);
+		printf("You touched: %i %i\n", point.x, point.y);
 	}
 };
 

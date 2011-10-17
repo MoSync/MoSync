@@ -381,7 +381,7 @@ public class MoSyncThread extends Thread
 
 	public void onPause()
 	{
-		mMoSyncSensor.onResume();
+		mMoSyncSensor.onPause();
 	}
 
 	/**

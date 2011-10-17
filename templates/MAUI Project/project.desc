@@ -8,3 +8,9 @@ main.cpp
 [Settings]
 build.prefs:additional.libraries=MAUtil.lib,MAUI.lib
 build.prefs:additional.libraries/Debug=MAUtilD.lib,MAUID.lib
+build.prefs:memory.data/Release=2048
+build.prefs:memory.heap/Release=1536
+build.prefs:memory.stack/Release=256
+build.prefs:memory.data/Debug=2048
+build.prefs:memory.heap/Debug=1536
+build.prefs:memory.stack/Debug=256

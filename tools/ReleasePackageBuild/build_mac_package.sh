@@ -200,6 +200,7 @@ cp $SOURCEDIR/build/release/e32hack $MOSYNCDIR/bin || error_exit "Could not copy
 cp -R $SOURCEDIR/tools/ReleasePackageBuild/build_package_tools/osx_bin/android $MOSYNCDIR/bin/ || error_exit "Could not copy binary."
 cp $SOURCEDIR/runtimes/java/platforms/android/mosync.keystore $MOSYNCDIR/etc || error_exit "Could not copy binary."
 cp $SOURCEDIR/runtimes/java/platforms/android/AndroidProject/res/drawable/icon.png $MOSYNCDIR/etc || error_exit "Could not copy binary."
+cp $SOURCEDIR/runtimes/java/platforms/android/default.icon $MOSYNCDIR/etc || error_exit "Could not copy icon description file."
 
 mv $MOSYNCDIR/bin/moemu $MOSYNCDIR/bin/MoRE
 

@@ -66,8 +66,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 * There is an event queue which contains keypad events and results from asynchronous operations.
 * Use maWait() and maGetEvent() to handle it.
 
-* There are different types of connection operations.
-* For each connection, only one of each type of operation may be active at the same time.
+* MoSync socket/Bluetooth/HTTP connections are asynchronous. Read all about it \link connApiOverview here\endlink.
 */
 
 interface MAAPI {
@@ -782,6 +781,7 @@ interface MAAPI {
 	*
 	* \returns The connecting handle \>0, or one of the \link #CONNERR_GENERIC CONNERR \endlink values.
 	* \see maGetEvent()
+	* \see \ref connApiOverview
 	*/
 	MAHandle maConnect(in MAString url);
 
@@ -801,6 +801,7 @@ interface MAAPI {
 	* The success value is the number of bytes read.
 	*
 	* \see maGetEvent
+	* \see \ref connApiOverview
 	*/
 	void maConnRead(in MAHandle conn, out MAAddress dst, in int size);
 
@@ -814,6 +815,7 @@ interface MAAPI {
 	* \warning The source data must remain available until the operation is complete,
 	* so if it was dynamically allocated, don't free it too early.
 	* \see maGetEvent
+	* \see \ref connApiOverview
 	*/
 	void maConnWrite(in MAHandle conn, in MAAddress src, in int size);
 
@@ -828,6 +830,7 @@ interface MAAPI {
 	* The success value is is the number of bytes read.
 	*
 	* \see maGetEvent
+	* \see \ref connApiOverview
 	*/
 	void maConnReadToData(in MAHandle conn, in MAHandle data, in int offset, in int size);
 
@@ -842,6 +845,7 @@ interface MAAPI {
 	* The success value is \> 0.
 	*
 	* \see maGetEvent
+	* \see \ref connApiOverview
 	*/
 	void maConnWriteFromData(in MAHandle conn, in MAHandle data, in int offset, in int size);
 
@@ -975,6 +979,7 @@ interface MAAPI {
 	*
 	* \param conn An unfinished HTTP connection handle.
 	* \see maGetEvent
+	* \see \ref connApiOverview
 	*/
 	void maHttpFinish(in MAHandle conn);
 

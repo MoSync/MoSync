@@ -321,7 +321,6 @@ void MainScreen::idle() {
 			mRotating = false;
 		}
 	}
-
 	grid->render();
 	mGLView->setProperty("invalidate", "");
 }

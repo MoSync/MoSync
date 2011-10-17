@@ -38,7 +38,7 @@ html
 	font-family: sans-serif;
 	font-weight: normal;
 	text-align: center;
-	border-width: 1px;
+	border-width: 3px;
 	border-style: solid;
 	border-color: rgb(249, 107, 45);
 	border-radius: 20px;
@@ -54,7 +54,8 @@ html
 	font-family: monospace;
 	font-weight: normal;
 	text-align: right;
-	border: 2px;
+	border-width: 3px;
+	border-style: solid;
 	border-color: rgb(249, 107, 45);
 	border-radius: 20px;
 	background: white;
@@ -73,16 +74,16 @@ html
 	Import the josync library to enable communication
 	between JavaScript and C++ .
 -->
-<script src="js/josync.js"></script>
+<script src="js/bridge.js"></script>
 
 <script>
 
 function WriteURLToTag() {
-	josync.messagehandler.send({messageName: "WriteSampleURL"}, null);
+	bridge.messagehandler.send({messageName: "WriteSampleURL"}, null);
 }
 
 function WriteVCardToTag() {
-	josync.messagehandler.send({messageName: "WriteSampleVCard"}, null);
+	bridge.messagehandler.send({messageName: "WriteSampleVCard"}, null);
 }
 
 function showWriteAlert() {
@@ -94,14 +95,6 @@ function updateInfo(icon, info) {
 	infoBox.innerHTML = info;
 	var infoIcon = document.getElementById("InfoIcon");
 	infoIcon.src = "images/" + icon + ".png";
-}
-
-/**
- * Make device vibrate!
- */
-function Vibrate() 
-{
-	josync.messagehandler.send({messageName: "Vibrate"}, null);
 }
 
 </script>
@@ -133,6 +126,6 @@ Write vCard &gt;&nbsp;&nbsp;
 </div>
 </body>
 <script>
-josync.messagehandler.send({messageName: "StartNFC"}, null);
+bridge.messagehandler.send({messageName: "StartNFC"}, null);
 </script>
 </html>
