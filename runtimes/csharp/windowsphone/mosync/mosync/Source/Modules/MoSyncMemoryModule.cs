@@ -22,6 +22,21 @@ namespace MoSync
                 return dst;
             };
 
+            syscalls.strcpy = delegate(int dst, int src)
+            {
+                String str = core.GetDataMemory().ReadStringAtAddress(src);
+                core.GetDataMemory().WriteStringAtAddress(dst, str, str.Length+1);
+                return dst;
+            };
+
+            syscalls.strcmp = delegate(int str1, int str2)
+            {
+                return String.Compare(
+                    core.GetDataMemory().ReadStringAtAddress(str1),
+                    core.GetDataMemory().ReadStringAtAddress(str2)
+                    );
+            };
+
             syscalls.maCreateData = delegate(int placeholder, int size)
             {
                 Memory mem = null;

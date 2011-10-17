@@ -21,16 +21,20 @@ namespace MoSync
                 if (widget == null)
                     return MoSync.Constants.MAW_RES_INVALID_TYPE_NAME;
 
+                widget.SetRuntime(runtime);
+
                 for (int i = 1; i < mWidgets.Count; i++)
                 {
                     if (mWidgets[i] == null)
                     {
+                        widget.SetHandle(i);
                         mWidgets[i] = widget;
                         return i;
                     }
                 }
 
                 mWidgets.Add(widget);
+                widget.SetHandle(mWidgets.Count - 1);
                 return mWidgets.Count-1;
             };
 
@@ -122,7 +126,6 @@ namespace MoSync
                 screen.Show();
                 return MoSync.Constants.MAW_RES_OK;
             };
-
         }
     }
 }

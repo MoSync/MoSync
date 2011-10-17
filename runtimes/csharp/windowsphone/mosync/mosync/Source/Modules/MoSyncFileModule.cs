@@ -53,7 +53,10 @@ namespace MoSync
             public File(String path, FileAccess fileAccess)
             {
                 mPath = path;
-                mIsDirectory = mPath.EndsWith("/");
+                mIsDirectory = mPath.Length==0 || mPath.EndsWith("\\");
+                if (mIsDirectory && mPath.EndsWith("\\"))
+                    mPath = mPath.Substring(0, mPath.Length - 1);
+
                 mFileStream = null;
                 mIsolatedStorage = IsolatedStorageFile.GetUserStoreForApplication();
                 mFileAccess = fileAccess;
@@ -93,7 +96,8 @@ namespace MoSync
                 }
                 else
                 {
-                    mFileStream.Close();
+                    if(mFileStream != null)
+                        mFileStream.Close();
                 }
             }
 
@@ -120,7 +124,7 @@ namespace MoSync
             MoSync.SystemPropertyManager.RegisterSystemPropertyProvider("mosync.path.local",
                 delegate(String key)
                 {
-                    return "/";
+                    return "\\";
                 }
             );
 
@@ -145,15 +149,11 @@ namespace MoSync
                     return MoSync.Constants.MA_FERR_GENERIC;
                 }
 
-                if (path.EndsWith("/") == false) // directory
+                file = new File(path, access);
+
+                if (file.IsDirectory == false)
                 {
-                    FileMode mode = FileMode.Open;
-                    file = new File(path, access);
                     file.TryOpen();
-                }
-                else
-                {
-                    file = new File(path, access);
                 }
 
                 mFileHandles.Add(file);
@@ -173,6 +173,8 @@ namespace MoSync
                 if (file.IsDirectory)
                     return MoSync.Constants.MA_FERR_WRONG_TYPE;
                 IsolatedStorageFileStream fileStream = file.FileStream;
+                if (fileStream == null)
+                    return MoSync.Constants.MA_FERR_GENERIC;
                 core.GetDataMemory().WriteFromStream(_dst, fileStream, _len);
                 return 0;
             };
@@ -183,6 +185,8 @@ namespace MoSync
                 if (file.IsDirectory)
                     return MoSync.Constants.MA_FERR_WRONG_TYPE;
                 IsolatedStorageFileStream fileStream = file.FileStream;
+                if (fileStream == null)
+                    return MoSync.Constants.MA_FERR_GENERIC;
                 Resource dataRes = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
                 Memory data = (Memory)dataRes.GetInternalObject();
                 data.WriteFromStream(_offset, fileStream, _len);
@@ -195,6 +199,8 @@ namespace MoSync
                 if (file.IsDirectory)
                     return MoSync.Constants.MA_FERR_WRONG_TYPE;
                 IsolatedStorageFileStream fileStream = file.FileStream;
+                if (fileStream == null)
+                    return MoSync.Constants.MA_FERR_GENERIC;
                 Resource dataRes = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
                 Memory data = (Memory)dataRes.GetInternalObject(); 
                 byte[] bytes = new byte[_len];
@@ -209,6 +215,8 @@ namespace MoSync
                 if (file.IsDirectory)
                     return MoSync.Constants.MA_FERR_WRONG_TYPE;
                 IsolatedStorageFileStream fileStream = file.FileStream;
+                if (fileStream == null)
+                    return MoSync.Constants.MA_FERR_GENERIC;
                 byte[] bytes = new byte[_len];
                 core.GetDataMemory().ReadBytes(bytes, _src, _len);
                 fileStream.Write(bytes, 0, _len);

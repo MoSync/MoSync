@@ -18,6 +18,9 @@ namespace MoSync
         bool IsChild(IWidget child);
         void SetProperty(String property, String Value);
         String GetProperty(String property);
+        void SetHandle(int handle);
+        int GetHandle();
+        void SetRuntime(Runtime runtime);
     }
 
     // A screen also needs to implement this interface.
@@ -64,6 +67,9 @@ namespace MoSync
     {
         protected IWidget mParent = null;
         protected List<IWidget> mChildren = new List<IWidget>();
+        protected int mHandle;
+        protected Runtime mRuntime;
+
 
         public WidgetBase()
         {
@@ -196,6 +202,21 @@ namespace MoSync
                 ret = GetProperty(pinfo);
 
             return ret;
+        }
+
+        public void SetHandle(int handle)
+        {
+            mHandle = handle;
+        }
+
+        public int GetHandle()
+        {
+            return mHandle;
+        }
+
+        public void SetRuntime(Runtime runtime)
+        {
+            mRuntime = runtime;
         }
     }
 

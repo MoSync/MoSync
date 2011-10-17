@@ -30,6 +30,28 @@ namespace MoSync
         void Init(Ioctls ioctls, Core core, Runtime runtime);
     }
 
+    public class Event
+    {
+        public Event(Memory eventData, Memory customEventData=null)
+        {
+            mEventData = eventData;
+            mCustomEventData = customEventData;
+        }
+
+        public Memory GetEventData()
+        {
+            return mEventData;
+        }
+
+        public Memory GetCustomEventData()
+        {
+            return mCustomEventData;
+        }
+
+        private Memory mEventData;
+        private Memory mCustomEventData;
+    };
+
     // This is the runtime
     // It has a Syscalls instance which contains
     // delegates to the implementations of all syscalls
@@ -49,7 +71,7 @@ namespace MoSync
         protected Dictionary<int, Resource> mResources = new Dictionary<int, Resource>();
         protected int mCurrentResourceHandle;
 
-        private List<Memory> mEvents = new List<Memory>();
+        private List<Event> mEvents = new List<Event>();
         private AutoResetEvent mEventWaiter = new AutoResetEvent(false);
 
         //private test_mosync.MainPage mMainPage;
@@ -126,7 +148,7 @@ namespace MoSync
                 mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
                 mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
                 mem.WriteInt32(MAEvent_point_touchId, 0);
-                PostEvent(mem);
+                PostEvent(new Event(mem));
             };
 
             mainPage.MouseMove += delegate(Object sender, MouseEventArgs e)
@@ -136,7 +158,7 @@ namespace MoSync
                 mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
                 mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
                 mem.WriteInt32(MAEvent_point_touchId, 0);
-                PostEvent(mem);
+                PostEvent(new Event(mem));
             };
 
             mainPage.MouseLeftButtonUp += delegate(Object sender, MouseButtonEventArgs e)
@@ -146,7 +168,7 @@ namespace MoSync
                 mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
                 mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
                 mem.WriteInt32(MAEvent_point_touchId, 0);
-                PostEvent(mem);
+                PostEvent(new Event(mem));
             };
 
             InitSyscalls();
@@ -157,9 +179,18 @@ namespace MoSync
                 {
                     lock (mEvents)
                     {
-                        Memory mem = mEvents[0];
+                        const int MAEvent_data = 4;
+                        Event evt = mEvents[0];
+                        Memory eventData = evt.GetEventData();
                         mEvents.RemoveAt(0);
-                        mCore.GetDataMemory().WriteMemoryAtAddress(ptr, mem, 0, mem.GetSizeInBytes());
+                        Memory customEventData = evt.GetCustomEventData();
+                        if (customEventData != null)
+                        {
+                            mCore.GetDataMemory().WriteMemoryAtAddress(mCore.GetCustomEventDataPointer(),
+                                customEventData, 0, customEventData.GetSizeInBytes());
+                            eventData.WriteInt32(MAEvent_data, mCore.GetCustomEventDataPointer());
+                        }
+                        mCore.GetDataMemory().WriteMemoryAtAddress(ptr, eventData, 0, eventData.GetSizeInBytes());
                     }
                     return 1;
                 }
@@ -171,12 +202,20 @@ namespace MoSync
 
             mSyscalls.maWait = delegate(int timeout)
             {
+                if (timeout < 0)
+                    timeout = 1 << 15;
                 mEventWaiter.WaitOne(timeout);
             };
 
             mSyscalls.maIOCtl = delegate(int id, int a, int b, int c)
             {
                 return mIoctlInvoker.InvokeIoctl(id, a, b, c);
+            };
+
+            mSyscalls.maDestroyObject = delegate(int res)
+            {
+                mResources[res].SetResourceType(MoSync.Constants.RT_PLACEHOLDER);
+                mResources[res].SetInternalObject(null);
             };
         }
 
@@ -185,14 +224,21 @@ namespace MoSync
         {
         }
 
-        public void PostEvent(Memory memory)
+        public void PostEvent(Event evt)
         {
             lock (mEvents)
             {
-                mEvents.Add(memory);
+                mEvents.Add(evt);
             }
 
             mEventWaiter.Set();
+        }
+
+        public void PostCustomEvent(int type, Memory customEvent)
+        {
+            Memory eventData = new Memory(8);
+            eventData.WriteInt32(0, type);
+            PostEvent(new Event(eventData, customEvent));
         }
 
         // resource specific packed integer.

@@ -52,6 +52,11 @@ namespace MoSync
             return mDataMemory;
         }
 
+        public int GetCustomEventDataPointer()
+        {
+            return mCustomEventPointer;
+        }
+
 		protected Runtime mRuntime = null;
         protected Memory mDataMemory;
 		protected uint mDataSegmentSize;
