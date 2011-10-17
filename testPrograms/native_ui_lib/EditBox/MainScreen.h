@@ -130,6 +130,10 @@ private:
 	Label* mGetTextLabel;
 	Button* mKeyboardButton;
 
+	EditBox* mEditBoxEmail;
+	EditBox* mEditBoxDecimal;
+	EditBox* mEditBoxUrl;
+
 	bool mKeyboard;
 };
 
