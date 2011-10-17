@@ -64,20 +64,30 @@ Token::Token(eTokenType type, Function *func) : type(type), func(func)
 void Scope::setVariable(const char *name, float v) 
 {
 	Map<String, Variable*>::Iterator
-		iter = variables.find(name);
+		iter = variables.find(String(name));
+
 	if(iter!=variables.end()) 
 	{
 		(*iter).second->value = v;
 	} 
 	else 
 	{
-		variables[name] = new Variable(v, name);	
+		variables[name] = new Variable(v, name);
 	}
 }
 
 Variable* Scope::getVariable(const char *name) 
 {
-	return variables[name];
+	Map<String, Variable*>::Iterator
+		iter = variables.find(String(name));
+	if(iter!=variables.end())
+		return iter->second;
+	else
+	{
+		Variable *var = new Variable(0.0f, name);
+		variables[name] = var;
+		return var;
+	}
 }
 
 void Scope::setFunction(const char *name, void *ptr, int args) 
@@ -97,7 +107,16 @@ void Scope::setFunction(const char *name, void *ptr, int args)
 
 Function* Scope::getFunction(const char *name) 
 {
-	return functions[name];
+	Map<String, Function*>::Iterator
+		iter = functions.find(String(name));
+	if(iter!=functions.end())
+		return iter->second;
+	else
+	{
+		Function *var = new Function(NULL, 0, name);
+		functions[name] = var;
+		return var;
+	}
 }
 
 Expression::Expression(Scope &scope) : scope(scope) 

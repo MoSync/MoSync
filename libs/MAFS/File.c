@@ -668,13 +668,13 @@ size_t MA_fread ( void * ptr, size_t size, size_t count, MA_FILE * stream) {
 	LOG("fread(%x, %d, %d, %x)", (int)ptr, (int)size, (int)count, (int)stream);
 	if(stream->type==TYPE_WRITEONLY || vol->type!=VOL_TYPE_FILE) {
 		stream->resultFlags|=RES_ERR;
-		return EOF;
+		return 0;
 	}
 
 	bytesToRead = size*count;
 	if(bytesToRead<=0) {
 		stream->resultFlags|=RES_ERR;
-		return EOF;
+		return 0;
 	}
 
 	if(stream->filePtr+bytesToRead > vol->dataOffset+vol->dataLength) {
@@ -688,7 +688,7 @@ size_t MA_fread ( void * ptr, size_t size, size_t count, MA_FILE * stream) {
 		stream->resultFlags|=RES_EOF;
 		if(bytesToRead<=0) {
 			stream->resultFlags|=RES_ERR;
-			return EOF;
+			return 0;
 		}
 	}
 
@@ -707,16 +707,17 @@ size_t MA_fwrite ( const void * ptr, size_t size, size_t count, MA_FILE * stream
 	bytesToWrite = size*count;
 	if(bytesToWrite <= 0) {
 		stream->resultFlags|=RES_ERR;
-		return EOF;
+		return 0;
 	}
 	if(stream->filePtr+bytesToWrite > vol->dataOffset+stream->bufferSize) {
 		byte *newBuffer;
 		int lastBufferSize = stream->bufferSize;
+		if(!stream->bufferSize) stream->bufferSize++;
 		while(stream->filePtr+bytesToWrite >  vol->dataOffset+stream->bufferSize) stream->bufferSize<<=1;
 		newBuffer = (byte*)malloc(stream->bufferSize);
 		if(!newBuffer) {
 			stream->resultFlags|=RES_ERR;
-			return EOF;
+			return 0;
 		}
 		memcpy(newBuffer, stream->buffer, lastBufferSize);
 		free(stream->buffer);

@@ -1727,7 +1727,7 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSensorStart", "(I)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maSensorStop", "(I)I");
 		if (methodID == 0)
 		{
 			return 0;

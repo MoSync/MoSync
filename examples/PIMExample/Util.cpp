@@ -61,24 +61,43 @@ int copyWCharArray(void* destination, const wchar_t* source)
  * be read from buffer address.
  * @param arrayIndex The index of the array.
  * @return A pointer to the wchar array if the arrayIndex is valid, or
- * a pointer to the latest wchar array from buffer otherwise.
+ * NULL otherwise.
  */
 const wchar* getWCharArrayFromBuf(void* buffer, const int arrayIndex)
 {
-	int num = *(int*) buffer;
+	int totalBytes = *(int*) buffer;
 	char* charBuffer = (char*) buffer;
-	const wchar* ptr = (wchar*) (charBuffer + 4);
-
-	for (int i = 0; i < num; i++)
+	const wchar* ptr = (wchar*) (charBuffer + sizeof(int));
+	int countBytes = sizeof(int);
+	int countArrays = 0;
+	while (countBytes < totalBytes)
 	{
-		if (arrayIndex == i)
+		if (arrayIndex == countArrays)
 		{
 			break;
 		}
-		ptr += wcslen(ptr) + 1;
+		int stringLength = wcslen(ptr) + 1;
+		countBytes += stringLength;
+		if (stringLength < totalBytes)
+		{
+			ptr += stringLength;
+			countArrays++;
+		}
+		else
+		{
+			ptr = NULL;
+			break;
+		}
 	}
 
-	return ptr;
+	if (arrayIndex == countArrays)
+	{
+		return ptr;
+	}
+	else
+	{
+		return NULL;
+	}
 }
 
 /**

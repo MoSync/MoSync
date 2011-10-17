@@ -109,12 +109,15 @@
 			{
 				// Get the username from the input field.
 				var username = document.getElementById("usernameInput").value;
-				if(userName.length == 0)
+				if(username.length == 0)
 				{
 					alert("Invalid username!!!")
-					return;
+					jQT.goTo('#theform');
 				}
-				getTweetsForUser(username)
+				else
+				{
+					getTweetsForUser(username)
+				}
 			}
 
 			/**
@@ -170,6 +173,7 @@
 				if(userName.length == 0)
 				{
 					alert("Invalid username!!!")
+					jQT.goTo('#theform');
 					return;
 				}
 				var userList;

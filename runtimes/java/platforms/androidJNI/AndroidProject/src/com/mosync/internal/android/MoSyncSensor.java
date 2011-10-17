@@ -243,7 +243,7 @@ public class MoSyncSensor implements SensorEventListener {
 		{
 			return SENSOR_ERROR_NOT_AVAILABLE;
 		}
-		mSensorRates[sensor - 1] = interval;
+		mSensorRates[sensor - 1] = rate;
 		if (!mSensorManager.registerListener(this, mSensorList[sensor - 1], rate))
 		{
 			return SENSOR_ERROR_INTERVAL_NOT_SET;

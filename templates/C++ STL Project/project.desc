@@ -1,0 +1,26 @@
+id = project.cpp.stl
+name = MoSync C++ STL Project
+description = MoSync C++ project configured to use STL (Standard Template Library).
+
+[Files]
+main.cpp
+
+[Settings]
+build.prefs:additional.include.paths/Debug=%mosync-home%/include/newlib/, %mosync-home%/include/newlib/stlport/
+build.prefs:additional.include.paths/Release=%mosync-home%/include/newlib/, %mosync-home%/include/newlib/stlport/
+build.prefs:additional.library.paths/Debug=%mosync-home%/lib/newlib_debug/
+build.prefs:additional.library.paths/Release=%mosync-home%/lib/newlib_release/
+build.prefs:additional.libraries/Debug=newlib.lib, stlport.lib
+build.prefs:additional.libraries/Release=newlib.lib, stlport.lib
+build.prefs:ignore.default.include.paths/Debug=true
+build.prefs:ignore.default.include.paths/Release=true
+build.prefs:ignore.default.libraries/Debug=true
+build.prefs:ignore.default.libraries/Release=true
+build.prefs:ignore.default.library.paths/Debug=true
+build.prefs:ignore.default.library.paths/Release=true
+build.prefs:memory.data/Debug=2048
+build.prefs:memory.data/Release=2048
+build.prefs:memory.heap/Debug=1536
+build.prefs:memory.heap/Release=1536
+build.prefs:memory.stack/Debug=256
+build.prefs:memory.stack/Release=256
