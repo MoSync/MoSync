@@ -8,11 +8,12 @@
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib, NativeUI.lib, MAFS.lib, josync.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFS.lib, Wormhole.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.name/Release" value="MoSync NFC Example"/>
+<property key="build.prefs:app.permissions" value="File\ Storage NFC Vibrate"/>
 <property key="build.prefs:app.vendor/Release" value="MoSync"/>
 <property key="build.prefs:app.version/Release" value="1.0.0"/>
 <property key="build.prefs:extra.link.sw/Debug" value=""/>

@@ -25,13 +25,13 @@ MAHandle NdefRecord::getHandle() {
 }
 
 int NdefRecord::getTnf() {
-	return maNFCGetTnf(fHandle);
+	return maNFCGetNDEFTnf(fHandle);
 }
 
 Vector<byte> NdefRecord::getId() {
 	Vector<byte> result(INITIAL_SIZE);
 	byte dst[NFC_MAX_PAYLOAD_LENGTH];
-	int length = maNFCGetId(fHandle, dst, sizeof(dst));
+	int length = maNFCGetNDEFId(fHandle, dst, sizeof(dst));
 	result.add(dst, length);
 	return result;
 }
@@ -39,7 +39,7 @@ Vector<byte> NdefRecord::getId() {
 Vector<byte> NdefRecord::getType() {
 	Vector<byte> result(INITIAL_SIZE);
 	byte dst[NFC_MAX_PAYLOAD_LENGTH];
-	int length = maNFCGetType(fHandle, dst, sizeof(dst));
+	int length = maNFCGetNDEFType(fHandle, dst, sizeof(dst));
 	result.add(dst, length);
 	return result;
 }
@@ -47,29 +47,38 @@ Vector<byte> NdefRecord::getType() {
 Vector<byte> NdefRecord::getPayload() {
 	Vector<byte> result(INITIAL_SIZE);
 	byte dst[NFC_MAX_PAYLOAD_LENGTH];
-	int length = maNFCGetPayload(fHandle, dst, sizeof(dst));
+	int length = maNFCGetNDEFPayload(fHandle, dst, sizeof(dst));
 	result.add(dst, length);
 	return result;
 }
 
 void NdefRecord::setTnf(int tnf) {
-	maNFCSetTnf(fHandle, tnf);
+	maNFCSetNDEFTnf(fHandle, tnf);
 }
 
 void NdefRecord::setId(Vector<byte>& id) {
-	maNFCSetId(fHandle, id.pointer(), id.size());
+	maNFCSetNDEFId(fHandle, id.pointer(), id.size());
 }
 
 void NdefRecord::setType(Vector<byte>& type) {
-	maNFCSetType(fHandle, type.pointer(), type.size());
+	maNFCSetNDEFType(fHandle, type.pointer(), type.size());
 }
 
 void NdefRecord::setPayload(Vector<byte>& payload) {
-	maNFCSetPayload(fHandle, payload.pointer(), payload.size());
+	maNFCSetNDEFPayload(fHandle, payload.pointer(), payload.size());
+}
+
+int NdefRecord::getSize() {
+	return maNFCGetSize(fHandle);
 }
 
 MimeMediaNdefRecord::~MimeMediaNdefRecord() {
 	// Do nothing
+}
+
+void MimeMediaNdefRecord::setMimeType(String mimeType) {
+	setTnf(MA_NFC_NDEF_TNF_MIME_MEDIA);
+	maNFCSetNDEFType(fHandle, mimeType.c_str(), mimeType.size());
 }
 
 String MimeMediaNdefRecord::getMimeType() {
@@ -98,11 +107,11 @@ void UriNdefRecord::setUri(String& uri) {
 	// in NDEF records:
 	// 1. TNF = absolute URI
 	// 2. TNF = well-known, with the type set
-	int tnf = maNFCGetTnf(fHandle);
+	int tnf = getTnf();
 	switch (tnf) {
 	case MA_NFC_NDEF_TNF_ABSOLUTE_URI:
-		maNFCSetType(fHandle, NULL, 0);
-		maNFCSetPayload(fHandle, uri.c_str(), uri.length());
+		maNFCSetNDEFType(fHandle, NULL, 0);
+		maNFCSetNDEFPayload(fHandle, uri.c_str(), uri.length());
 		break;
 	default:
 		setUri(0x00, uri);
@@ -111,21 +120,21 @@ void UriNdefRecord::setUri(String& uri) {
 
 void UriNdefRecord::setUri(byte prefixCode, MAUtil::String& remainingUri) {
 	int length = remainingUri.length();
-	maNFCSetTnf(fHandle, MA_NFC_NDEF_TNF_WELL_KNOWN);
+	setTnf(MA_NFC_NDEF_TNF_WELL_KNOWN);
 	byte type[] = { (byte) 0x55 }; // URI
-	maNFCSetType(fHandle, type, 1);
+	maNFCSetNDEFType(fHandle, type, 1);
 	Vector<byte> payload(length * sizeof(char) + 1);
 	payload.add(prefixCode);
 	const char* szRemainingUri = remainingUri.c_str();
 	for (int i = 0; i < length; i++) {
 		payload.insert(1 + sizeof(char) * i, szRemainingUri[i]);
 	}
-	maNFCSetPayload(fHandle, payload.pointer(), payload.size());
+	setPayload(payload);
 }
 
 String UriNdefRecord::getUri() {
 	valid = false;
-	int tnf = maNFCGetTnf(fHandle);
+	int tnf = getTnf();
 	byte type[1];
 	byte payload[256];
 	switch (tnf) {
@@ -133,7 +142,7 @@ String UriNdefRecord::getUri() {
 		valid = true;
 		return String((char*)getPayload().pointer());
 	case MA_NFC_NDEF_TNF_WELL_KNOWN:
-		int typeLen = maNFCGetType(fHandle, type, 1);
+		int typeLen = maNFCGetNDEFType(fHandle, type, 1);
 		if (typeLen > 0 && type[0] == 0x55) {
 			Vector<byte> payload = getPayload();
 			int length = payload.size();

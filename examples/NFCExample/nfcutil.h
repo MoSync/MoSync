@@ -29,6 +29,7 @@ public:
 	void setId(Vector<byte>& id);
 	void setType(Vector<byte>& type);
 	void setPayload(Vector<byte>& payload);
+	int getSize();
 };
 
 class MimeMediaNdefRecord : NdefRecord {
@@ -36,6 +37,7 @@ public:
 	MimeMediaNdefRecord(MAHandle handle) : NdefRecord(handle) {};
 	virtual ~MimeMediaNdefRecord();
 	static bool isMimeType(MAHandle handle, String mimeType);
+	void setMimeType(String mimeType);
 	String getMimeType();
 };
 

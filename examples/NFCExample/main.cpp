@@ -334,15 +334,14 @@ public:
 		destroySampleTag();
 		MAHandle msg = maNFCCreateNDEFMessage(1);
 		MAHandle rec = maNFCGetNDEFRecord(msg, 0);
-		maNFCSetTnf(rec, MA_NFC_NDEF_TNF_MIME_MEDIA);
-		char* type = VCARD_MIME_TYPE;
-		maNFCSetType(rec, type, strlen(VCARD_MIME_TYPE));
+		MimeMediaNdefRecord vCardRec = MimeMediaNdefRecord(rec);
+		vCardRec.setMimeType(String(VCARD_MIME_TYPE));
 		// Let's create a very small vCard that even
 		// fits on a MiFare Ultralight (64 bytes)
 		char* vCard = "BEGIN:VCARD\n"
 				"N:X;Mr\n"
 				"END:VCARD";
-		maNFCSetPayload(rec, vCard, strlen(vCard));
+		maNFCSetNDEFPayload(rec, vCard, strlen(vCard));
 		return msg;
 	}
 
@@ -401,6 +400,7 @@ public:
 		}
 		return String("?");
 	}
+
 	void handleMifare(const char* type, MAHandle mfu) {
 		int size = maNFCGetSize(mfu);
 		sprintf(fInfoBuffer, "<b>%s</b><br/>Size: %d bytes", type, size);
