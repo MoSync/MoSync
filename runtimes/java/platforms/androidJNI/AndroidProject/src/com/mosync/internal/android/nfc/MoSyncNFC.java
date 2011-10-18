@@ -17,6 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
 import android.nfc.NfcManager;
@@ -203,7 +204,15 @@ public class MoSyncNFC {
 		return mosyncThread.getActivity();
 	}
 
+	static boolean nfcPermissionsSet(Activity activity) {
+		return activity.getPackageManager().checkPermission("android.permission.NFC", activity.getPackageName()) == PackageManager.PERMISSION_GRANTED;
+	}
+
 	public int maNFCStart() {
+		if (nfcPermissionsSet(getActivity())) {
+			mosyncThread.threadPanic(1, "NFC permissions not set");
+		}
+
 		NfcManager manager = (NfcManager) getActivity().getSystemService(Context.NFC_SERVICE);
 		if (manager == null) {
 			return MA_NFC_NOT_AVAILABLE;

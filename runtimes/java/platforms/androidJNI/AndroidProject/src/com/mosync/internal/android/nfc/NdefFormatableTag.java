@@ -7,7 +7,7 @@ import java.io.IOException;
 import android.nfc.FormatException;
 import android.nfc.tech.NdefFormatable;
 
-public class NdefFormatableTag extends NFCTagBase<NdefFormatable> implements INDEFMessageHolder {
+public class NdefFormatableTag extends NFCTagBase<NdefFormatable> implements INDEFMessageWritable {
 
 	public static INFCTag get(ResourcePool pool, GenericTag tag) {
 		NdefFormatable ndef = NdefFormatable.get(tag.getTag());
@@ -21,16 +21,6 @@ public class NdefFormatableTag extends NFCTagBase<NdefFormatable> implements IND
 
 	public NdefFormatableTag(ResourcePool pool, NdefFormatable nativeTag) {
 		super(pool, nativeTag, MA_NFC_TAG_TYPE_NDEF_FORMATTABLE);
-	}
-
-	@Override
-	public void requestNDEFMessage(ResourcePool pool) throws IOException {
-		throw new IOException("Not supported.");
-	}
-
-	@Override
-	public NDEFMessage getNDEFMessage() {
-		throw new UnsupportedOperationException("Not supported.");
 	}
 
 	@Override

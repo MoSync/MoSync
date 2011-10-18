@@ -7600,7 +7600,8 @@ group NFCAPI "NFC API" {
 		* Start listening to NFC events.
 		* \return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
 		* MA_NFC_NOT_AVAILABLE if NFC is not at all available, or
-		* 0 otherwise.
+		* 0 otherwise. If the proper permissions (NFC) are not set, a panic will
+		* be raised.
 		*/
 		int maNFCStart();
 
@@ -7726,24 +7727,22 @@ group NFCAPI "NFC API" {
 		* and the result field set to 0 on success and a value < 0 on error.
 		* After receiving the event, clients may call
 		* maNFCGetNDEFMessage() to get the actual message.
-		*
+		* If the handle is not an NDEF tag, a panic is raised.
 		*/
-		int maNFCReadNDEFMessage(in MAHandle tag);
+		void maNFCReadNDEFMessage(in MAHandle tag);
 
 		/**
 		* Writes an NDEF message to the given tag, which must
-		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* be of the MA_NFC_TAG_TYPE_NDEF or MA_NFC_TAG_TYPE_NDEF_FORMATTABLE type.
 		* The response will come a an EVENT_TYPE_NFC_TAG_DATA_WRITE
 		* event with the handle set to the handle passed into this method,
 		* the result field set to 0 on success and a value < 0 on error,
 		* and the dstId field set to the ndefMessage written.
+		* If the handle is not an NDEF or NDEF FORMATTABLE tag, a panic is raised.
 		* \param tag The tag handle to write to
 		* \param ndefMessage The message to write
-		* \return MA_NFC_INVALID_TAG_TYPE if the handle given as argument
-		* does not represent an NDEF message.
-		*
 		*/
-		int maNFCWriteNDEFMessage(in MAHandle tag, in MAHandle ndefMessage);
+		void maNFCWriteNDEFMessage(in MAHandle tag, in MAHandle ndefMessage);
 
 		/**
 		* Creates a new NDEF message, to be used primarily by
@@ -7757,6 +7756,7 @@ group NFCAPI "NFC API" {
 		/**
 		* Gets the NDEF message from a tag, which must
 		* be of the MA_NFC_TAG_TYPE_NDEF type.
+		* If the handle is not an NDEF tag, a panic is raised.
 		* \return The handle to the NDEF message, which
 		* may be subsequently used in NDEF specfic functions,
 		* or the zero handle if the tag has no NDEF message
@@ -7771,16 +7771,14 @@ group NFCAPI "NFC API" {
 		int maNFCGetNDEFMessage(in MAHandle tag);
 
 		/**
-		* \return A handle to the ith NDEF record of an NDEF message,
-		* or a zero handle if the handle given as argument does no
-		* represent an NDEF message.
+		* \return A handle to the ith NDEF record of an NDEF message.
+		* If the handle is not an NDEF message, a panic is raised.
 		*/
 		MAHandle maNFCGetNDEFRecord(in MAHandle ndef, in int ix);
 
 		/**
-		* \return The number of NDEF records in an NDEF message,
-		* or MA_NFC_INVALID_TAG_TYPE if the handle given as argument
-		* does not represent an NDEF record.
+		* \return The number of NDEF records in an NDEF message.
+		* If the handle is not an NDEF message, a panic is raised.
 		*/
 		int maNFCGetNDEFRecordCount(in MAHandle ndef);
 
@@ -7789,78 +7787,60 @@ group NFCAPI "NFC API" {
 		* \param ndefRecord the handle to the record to read from.
 		* \param dst Where the result should be written to.
 		* \param len The maximum length to write.
-		* \return The number of bytes written, or
-		* NFC_INVALID_TAG_TYPE if the handle given as
-		* argument does not represent an NDEF record.
+		* \return The number of bytes written.
+		* If the handle is not an NDEF record, a panic is raised.
 		*/
 		int maNFCGetNDEFId(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		* Reads the variable length payload of an NDEF record.
-		* Returns NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF record.
+		* \param ndefRecord the handle to the record to read from.
+		* \param dst Where the result should be written to.
+		* \param len The maximum length to write.
+		* \return The number of bytes written.
+		* If the handle is not an NDEF record, a panic is raised.
 		*/
 		int maNFCGetNDEFPayload(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
-		 * Returns the 3-bit TNF of an NDEF record,
-		 * or NFC_INVALID_TAG_TYPE if the handle given as argument
-		 * does not represent an NDEF record.
-		 */
+		* Returns the 3-bit TNF of an NDEF record.
+		* If the handle is not an NDEF record, a panic is raised.
+		*/
 		int maNFCGetNDEFTnf(in MAHandle ndefRecord);
 
 		/**
-		* Returns the variable length type field of an NDEF record,
-		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
-		* does not represent an NDEF record.
+		* Returns the variable length type field of an NDEF record.
+		* \param ndefRecord the handle to the record to read from.
+		* \param dst Where the result should be written to.
+		* \param len The maximum length to write.
+		* \return The number of bytes written.
+		* If the handle is not an NDEF record, a panic is raised.
 		*/
 		int maNFCGetNDEFType(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		* Sets the variable length id of an NDEF record.
-		* \return NFC_INVALID_TAG_TYPE if the handle given as
-		* argument does not represent an NDEF message.
+		* If the handle is not an NDEF record, a panic is raised.
 		*/
-		int maNFCSetNDEFId(in MAHandle ndefRecord, in MAAddress dst, in int len);
+		void maNFCSetNDEFId(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
 		* Sets the variable length payload of an NDEF record.
-		* \return NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF message.
+		* If the handle is not an NDEF record, a panic is raised.
 		*/
-		int maNFCSetNDEFPayload(in MAHandle ndefRecord, in MAAddress dst, in int len);
+		void maNFCSetNDEFPayload(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
-		 * Sets the 3-bit TNF of an NDEF record,
-		 * \return NFC_INVALID_TAG_TYPE if the handle given as argument
-		 * does not represent an NDEF record.
-		 */
-		int maNFCSetNDEFTnf(in MAHandle ndefRecord, in int tnf);
+		* Sets the 3-bit TNF of an NDEF record,
+		* If the handle is not an NDEF record, a panic is raised.
+		*/
+		void maNFCSetNDEFTnf(in MAHandle ndefRecord, in int tnf);
 
 		/**
-		* Returns the variable length type field of an NDEF record,
-		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
-		* does not represent an NDEF record.
+		* Returns the variable length type field of an NDEF record.
+		* If the handle is not an NDEF record, a panic is raised.
 		*/
-		int maNFCSetNDEFType(in MAHandle ndefRecord, in MAAddress dst, in int len);
-
-		/**
-		* Returns a non-zero value if a tag can be formatted as an NDEF container,
-		* ie if an NDEF tag can be written to it.
-		* (Please note that NDEF tags will return zero.)
-		*/
-		int maNFCCanFormatNDEF(in MAHandle tag);
-
-		/**
-		* Format a tag as an NDEF container and write an NDEF message to it.
-		* The response will come as an event exactly as if maNFCWriteNDEF was
-		* called, but with the additional error code MA_NFC_FORMAT_FAILED
-		* if the format operation failed.
-		* \param tag The tag to format
-		* \param ndefMessage The message to write to the tag (or 0 if no message
-		* should be written)
-		* \return NFC_INVALID_TAG_TYPE if the handle given as argument
-		* does not represent a tag that can be formatted as an NDEF container.
-		*/
-		int maNFCFormatNDEF(in MAHandle tag, in MAHandle ndefMessage);
+		void maNFCSetNDEFType(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
 		* Authenticates a MIFARE Classic tag using the A or B key. Authentication must take place
@@ -7872,34 +7852,29 @@ group NFCAPI "NFC API" {
 		* \param sectorIndex The sector to authenticate
 		* \param keySrc The address to the key to authenticate with
 		* \param keyLen The length of the key to authenticate with
-		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
-		* tag type is not supported by the device), 0 if authentication can take place.
+		* If the handle is not a Mifare Classic tag, a panic is raised.
 		*/
-		int maNFCAuthenticateMifareSector(in MAHandle tagHandle, in int keyType, in int sectorIndex, in MAAddress keySrc, in int keyLen);
+		void maNFCAuthenticateMifareSector(in MAHandle tagHandle, in int keyType, in int sectorIndex, in MAAddress keySrc, in int keyLen);
 
 		/**
-		* Returns the number of sectors of a MIFARE Classic tag.
-		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
-		* tag type is not supported by the device), otherwise the number of sectors
-		* is returned.
+		* \return The number of sectors of a MIFARE Classic tag.
+		* If the handle is not a Mifare Classic tag, a panic is raised.
 		*/
-		int maNFCGetMifareSectorCount(in MAHandle tagHandle);
+		void maNFCGetMifareSectorCount(in MAHandle tagHandle);
 
 		/**
 		* Returns the number of blocks in a sector of a MIFARE Classic tag.
 		* \param sector The sector to get the number of blocks in.
-		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
-		* tag type is not supported by the device), otherwise the number of sectors
-		* is returned.
+		* \return The number of blocks in a given sector.
+		* If the handle is not a Mifare Classic tag, a panic is raised.
 		*/
 		int maNFCGetMifareBlockCountInSector(in MAHandle tagHandle, in int sector);
 
 		/**
 		* Returns the first block of a sector of a MIFARE Classic tag.
 		* \param sector The sector of which to get the first block.
-		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
-		* tag type is not supported by the device), otherwise the index of the
-		* first block of the sector is returned.
+		* \return The index of the first block of the sector is returned.
+		* If the handle is not a Mifare Classic tag, a panic is raised.
 		*/
 		int maNFCMifareSectorToBlock(in MAHandle tagHandle, in int sector);
 
@@ -7911,10 +7886,9 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to write to.
 		* \param len The number of bytes to read. Several blocks may be read, depending
 		* on len (A block is 16 bytes).
-		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
-		* tag type is not supported by the device), 0 if a read operation can be performed.
+		* If the handle is not a Mifare Classic tag, a panic is raised.
 		*/
-		int maNFCReadMifareBlocks(in MAHandle tagHandle, in int firstBlock, out MAAddress dst, in int len);
+		void maNFCReadMifareBlocks(in MAHandle tagHandle, in int firstBlock, out MAAddress dst, in int len);
 
 		/**
 		* Writes a number of blocks to a MIFARE Classic tag.
@@ -7924,10 +7898,9 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to read from.
 		* \param len The number of bytes to write. Several blocks may be written, depending
 		* on len (A block is 16 bytes).
-		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
-		* tag type is not supported by the device), 0 if a write operation can be performed.
+		* If the handle is not a Mifare Classic tag, a panic is raised.
 		*/
-		int maNFCWriteMifareBlocks(in MAHandle tagHandle, in int firstBlock, in MAAddress dst, in int len);
+		void maNFCWriteMifareBlocks(in MAHandle tagHandle, in int firstBlock, in MAAddress dst, in int len);
 
 		/**
 		* Reads a number of blocks of a MIFARE Ultralight tag.
@@ -7937,10 +7910,9 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to write to.
 		* \param len The number of bytes to read. Several pages may be read, depending
 		* on len (A page is 16 bytes).
-		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
-		* tag type is not supported by the device), 0 if a read operation can be performed.
+		* If the handle is not a Mifare Ultralight tag, a panic is raised.
 		*/
-		int maNFCReadMifarePages(in MAHandle tagHandle, in int firstPage, out MAAddress dst, in int len);
+		void maNFCReadMifarePages(in MAHandle tagHandle, in int firstPage, out MAAddress dst, in int len);
 
 		/**
 		* Writes a number of blocks of a MIFARE Ultralight tag.
@@ -7950,10 +7922,9 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to read from.
 		* \param len The number of bytes to write. Several pages may be written, depending
 		* on len (A page is 16 bytes).
-		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
-		* tag type is not supported by the device), 0 if a write operation can be performed.
+		* If the handle is not a Mifare Ultralight tag, a panic is raised.
 		*/
-		int maNFCWriteMifarePages(in MAHandle tagHandle, in int firstPage, in MAAddress dst, in int len);
+		void maNFCWriteMifarePages(in MAHandle tagHandle, in int firstPage, in MAAddress dst, in int len);
 
 		constset int MA_NFC_ {
 			/**
@@ -8034,35 +8005,6 @@ group NFCAPI "NFC API" {
 			* an NDEF tag.
 			*/
 			NDEF_FORMATTABLE = 128;
-		}
-
-		constset int MA_NFC_NDEF_FIELD_ {
-
-			/**
-			* Represents the TNF of an NDEF record.
-			*/
-			TNF = 1;
-
-			/**
-			* Represents the ID of an NDEF record.
-			*/
-			ID = 2;
-
-			/**
-			* Represents the TYPE of an NDEF record.
-			*/
-			TYPE = 3;
-
-			/**
-			* Represents the PAYLOAD of an NDEF record.
-			*/
-			PAYLOAD = 4;
-
-			/**
-			* Represents a RAW NDEF record, ie the client
-			* is responsible for assembling the NDEF.
-			*/
-			RAW = 5;
 		}
 
 		constset int MA_NFC_NDEF_TNF_ {
