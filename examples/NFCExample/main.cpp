@@ -192,6 +192,8 @@ public:
 					MAHandle mfu = maNFCGetTypedTag(fCurrentTag, MA_NFC_TAG_TYPE_MIFARE_UL);
 					int size = maNFCGetSize(mfu);
 					handleMifare(size > 64 ? "Mifare Ultralight C" : "Mifare Ultralight", mfu);
+				} else {
+					handleUnknownTag();
 				}
 			}
 		} else if (EVENT_TYPE_NFC_TAG_DATA_READ == event.type) {
@@ -207,7 +209,7 @@ public:
 	}
 
 	/**
-	 * Here is where we take care of NFC events when we are in READ mode.
+	 * Here is where we take care of NFC events when we are in WRITE mode.
 	 */
 	void customEventWrite(const MAEvent& event) {
 		// We received a tag, and are prepared to write to it.
@@ -247,7 +249,7 @@ public:
 				sprintf(fInfoBuffer, "Wrote tag. (%d bytes)", size);
 				showStatus(INFO_ICON, fInfoBuffer, TOAST_PERIOD);
 			} else {
-				showStatus(ERROR_ICON, "Unable to write tag", TOAST_PERIOD);
+				showStatus(ERROR_ICON, "<b>Unable to write tag</b><br><i>Note: The sample vCard is too large for a Mifare Ultralight tag.</i>", TOAST_PERIOD);
 			}
 		}
 	}
@@ -336,9 +338,8 @@ public:
 		MAHandle rec = maNFCGetNDEFRecord(msg, 0);
 		MimeMediaNdefRecord vCardRec = MimeMediaNdefRecord(rec);
 		vCardRec.setMimeType(String(VCARD_MIME_TYPE));
-		// Let's create a very small vCard that even
-		// fits on a MiFare Ultralight (64 bytes)
 		char* vCard = "BEGIN:VCARD\n"
+				"VERSION:3.0"
 				"N:X;Mr\n"
 				"END:VCARD";
 		maNFCSetNDEFPayload(rec, vCard, strlen(vCard));
@@ -371,6 +372,10 @@ public:
 
 	void handleNDEFFormattable(MAHandle msg) {
 		showStatus(INFO_ICON, "Empty tag", TOAST_PERIOD);
+	}
+
+	void handleUnknownTag() {
+		showStatus(UNKNOWN_ICON, "Unknown tag format", TOAST_PERIOD);
 	}
 
 	/**
