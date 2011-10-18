@@ -82,7 +82,7 @@ public class MoSyncNFCForegroundUtil {
 	 */
 	public static MoSyncNFCForegroundUtil create(Activity activity) {
 		try {
-		if (activity.getPackageManager().checkPermission("android.permission.NFC", activity.getPackageName()) == PackageManager.PERMISSION_GRANTED) {
+		if (MoSyncNFC.nfcPermissionsSet(activity)) {
 		    NfcAdapter nfc = NfcAdapter.getDefaultAdapter(activity.getApplicationContext());
 			if (nfc != null) {
 				return new MoSyncNFCForegroundUtil(activity, nfc);

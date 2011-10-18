@@ -2511,14 +2511,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCGetId(MAHandle ndefRecordHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCGetNDEFId(MAHandle ndefRecordHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		int fixedDst = dst - memStart;
+		int fixedDst = dst == NULL ? 0 : dst - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCGetId",
+												 "maNFCGetNDEFId",
 												 "(III)I");
 		if (methodID == 0)
 			return 0;
@@ -2530,14 +2530,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCGetPayload(MAHandle ndefRecordHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCGetNDEFPayload(MAHandle ndefRecordHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		int fixedDst = dst - memStart;
+		int fixedDst = dst == NULL ? 0 : dst - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCGetPayload",
+												 "maNFCGetNDEFPayload",
 												 "(III)I");
 		if (methodID == 0)
 			return 0;
@@ -2547,12 +2547,12 @@ namespace Base
 		return result;
 	}
 
-	int _maNFCGetTnf(MAHandle ndefRecordHandle, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCGetNDEFTnf(MAHandle ndefRecordHandle, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCGetTnf",
+												 "maNFCGetNDEFTnf",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
@@ -2564,14 +2564,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCGetType(MAHandle ndefRecordHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCGetNDEFType(MAHandle ndefRecordHandle, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
-		int fixedDst = dst - memStart;
+		int fixedDst = dst == NULL ? 0 : dst - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCGetType",
+												 "maNFCGetNDEFType",
 												 "(III)I");
 		if (methodID == 0)
 			return 0;
@@ -2583,14 +2583,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCSetId(MAHandle ndefRecordHandle, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCSetNDEFId(MAHandle ndefRecordHandle, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		int fixedSrc = src - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCSetId",
+												 "maNFCSetNDEFId",
 												 "(III)I");
 		if (methodID == 0)
 			return 0;
@@ -2602,14 +2602,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCSetPayload(MAHandle ndefRecordHandle, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCSetNDEFPayload(MAHandle ndefRecordHandle, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		int fixedSrc = src - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCSetPayload",
+												 "maNFCSetNDEFPayload",
 												 "(III)I");
 		if (methodID == 0)
 			return 0;
@@ -2619,12 +2619,12 @@ namespace Base
 		return result;
 	}
 
-	int _maNFCSetTnf(MAHandle ndefRecordHandle, int tnf, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCSetNDEFTnf(MAHandle ndefRecordHandle, int tnf, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCSetTnf",
+												 "maNFCSetNDEFTnf",
 												 "(II)I");
 		if (methodID == 0)
 			return 0;
@@ -2636,14 +2636,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCSetType(MAHandle ndefRecordHandle, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCSetNDEFType(MAHandle ndefRecordHandle, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		int fixedSrc = src - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCSetType",
+												 "maNFCSetNDEFType",
 												 "(III)I");
 		if (methodID == 0)
 			return 0;
@@ -2689,14 +2689,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCAuthenticateSector(MAHandle mfcTag, int keyType, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCAuthenticateMifareSector(MAHandle mfcTag, int keyType, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		int fixedKeyAddr = keyAddr - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCAuthenticateSector",
+												 "maNFCAuthenticateMifareSector",
 												 "(IIIII)I");
 		if (methodID == 0)
 			return 0;
@@ -2708,12 +2708,12 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCGetSectorCount(MAHandle mfcTag, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCGetMifareSectorCount(MAHandle mfcTag, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCGetSectorCount",
+												 "maNFCGetMifareSectorCount",
 												 "(I)I");
 		if (methodID == 0)
 			return 0;
@@ -2725,12 +2725,12 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCGetBlockCountInSector(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCGetMifareBlockCountInSector(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCGetBlockCountInSector",
+												 "maNFCGetMifareBlockCountInSector",
 												 "(II)I");
 		if (methodID == 0)
 			return 0;
@@ -2742,12 +2742,12 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCSectorToBlock(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCMifareSectorToBlock(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCSectorToBlock",
+												 "maNFCMifareSectorToBlock",
 												 "(II)I");
 		if (methodID == 0)
 			return 0;
@@ -2759,14 +2759,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCReadBlocks(MAHandle mfcTag, int firstBlock, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCReadMifareBlocks(MAHandle mfcTag, int firstBlock, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		int fixedDst = dst - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCReadBlocks",
+												 "maNFCReadMifareBlocks",
 												 "(IIII)I");
 		if (methodID == 0)
 			return 0;
@@ -2778,14 +2778,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCReadPages(MAHandle mfcTag, int firstPage, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCReadMifarePages(MAHandle mfcTag, int firstPage, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		int fixedDst = dst - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCReadPages",
+												 "maNFCReadMifarePages",
 												 "(IIII)I");
 		if (methodID == 0)
 			return 0;
@@ -2797,14 +2797,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCWriteBlocks(MAHandle mfcTag, int firstBlock, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCWriteMifareBlocks(MAHandle mfcTag, int firstBlock, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		int fixedSrc = src - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCWriteBlocks",
+												 "maNFCWriteMifareBlocks",
 												 "(IIII)I");
 		if (methodID == 0)
 			return 0;
@@ -2816,14 +2816,14 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maNFCWritePages(MAHandle mfcTag, int firstPage, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
+	int _maNFCWriteMifarePages(MAHandle mfcTag, int firstPage, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis) {
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		int fixedSrc = src - memStart;
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 												 cls,
-												 "maNFCWritePages",
+												 "maNFCWriteMifarePages",
 												 "(IIII)I");
 		if (methodID == 0)
 			return 0;

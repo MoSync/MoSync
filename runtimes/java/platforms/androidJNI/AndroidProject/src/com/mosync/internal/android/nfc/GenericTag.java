@@ -67,7 +67,9 @@ public class GenericTag extends ResourceBase implements INFCTag {
 	public void destroy(ResourcePool pool) {
 		super.destroy(pool);
 		for (INFCTag typedTag : typedTags.values()) {
-			typedTag.destroy(pool);
+			if (typedTag != null) {
+				typedTag.destroy(pool);
+			}
 		}
 		typedTags.clear();
 	}
