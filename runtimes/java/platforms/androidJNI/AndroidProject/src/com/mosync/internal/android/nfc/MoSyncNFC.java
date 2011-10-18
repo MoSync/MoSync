@@ -209,7 +209,7 @@ public class MoSyncNFC {
 	}
 
 	public int maNFCStart() {
-		if (nfcPermissionsSet(getActivity())) {
+		if (!nfcPermissionsSet(getActivity())) {
 			mosyncThread.threadPanic(1, "NFC permissions not set");
 		}
 
