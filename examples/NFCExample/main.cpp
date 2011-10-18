@@ -7,7 +7,7 @@
  * defining the type of tags to trigger upon.
  *
  * This example makes use of MoSync HTML5/JavaScript functionality for the
- * user interface
+ * user interface.
  *
  */
 
@@ -144,6 +144,7 @@ public:
 		// close to the device:
 		if (EVENT_TYPE_NFC_TAG_RECEIVED == event.type) {
 			MANFCEventData nfcEventData = event.nfc;
+			// We got an event, now we need to get the actual tag.
 			MAHandle tag = maNFCReadTag(nfcEventData.handle);
 			setCurrentTag(tag);
 			// And buzz a bit
@@ -161,18 +162,6 @@ public:
 		}
 	}
 
-	void setCurrentTag(MAHandle currentTag) {
-		// Make sure to clean up first; otherwise we'd get a leak.
-		destroyCurrentTag();
-		fCurrentTag = currentTag;
-	}
-
-	void destroyCurrentTag() {
-		if (fCurrentTag) {
-			maNFCDestroyTag(fCurrentTag);
-		}
-	}
-
 	/**
 	 * Here is where we take care of NFC events when we are in READ mode.
 	 */
@@ -182,7 +171,7 @@ public:
 				if (maNFCIsType(fCurrentTag, MA_NFC_TAG_TYPE_NDEF)) {
 					// Please note; we always need to convert to
 					// a tag of the proper type. (Destruction of these
-					// tags automatic when the original tag is destroyed.)
+					// tags is automatic when the original tag is destroyed.)
 					MAHandle ndef = maNFCGetTypedTag(fCurrentTag, MA_NFC_TAG_TYPE_NDEF);
 					handleNDEF(ndef);
 				} else if (maNFCIsType(fCurrentTag, MA_NFC_TAG_TYPE_MIFARE_CL)) {
@@ -192,9 +181,12 @@ public:
 					MAHandle mfu = maNFCGetTypedTag(fCurrentTag, MA_NFC_TAG_TYPE_MIFARE_UL);
 					int size = maNFCGetSize(mfu);
 					handleMifare(size > 64 ? "Mifare Ultralight C" : "Mifare Ultralight", mfu);
+				} else {
+					handleUnknownTag();
 				}
 			}
 		} else if (EVENT_TYPE_NFC_TAG_DATA_READ == event.type) {
+			// This event type tells us we've just read some kind of tag data.
 			MANFCEventData& data = (MANFCEventData&) event.nfc;
 			int tag = data.handle;
 			if (data.result < 0) {
@@ -207,7 +199,7 @@ public:
 	}
 
 	/**
-	 * Here is where we take care of NFC events when we are in READ mode.
+	 * Here is where we take care of NFC events when we are in WRITE mode.
 	 */
 	void customEventWrite(const MAEvent& event) {
 		// We received a tag, and are prepared to write to it.
@@ -247,8 +239,20 @@ public:
 				sprintf(fInfoBuffer, "Wrote tag. (%d bytes)", size);
 				showStatus(INFO_ICON, fInfoBuffer, TOAST_PERIOD);
 			} else {
-				showStatus(ERROR_ICON, "Unable to write tag", TOAST_PERIOD);
+				showStatus(ERROR_ICON, "<b>Unable to write tag</b><br><i>Note: The sample vCard is too large for a Mifare Ultralight tag.</i>", TOAST_PERIOD);
 			}
+		}
+	}
+
+	void setCurrentTag(MAHandle currentTag) {
+		// Make sure to clean up first; otherwise we'd get a leak.
+		destroyCurrentTag();
+		fCurrentTag = currentTag;
+	}
+
+	void destroyCurrentTag() {
+		if (fCurrentTag) {
+			maNFCDestroyTag(fCurrentTag);
 		}
 	}
 
@@ -336,9 +340,8 @@ public:
 		MAHandle rec = maNFCGetNDEFRecord(msg, 0);
 		MimeMediaNdefRecord vCardRec = MimeMediaNdefRecord(rec);
 		vCardRec.setMimeType(String(VCARD_MIME_TYPE));
-		// Let's create a very small vCard that even
-		// fits on a MiFare Ultralight (64 bytes)
 		char* vCard = "BEGIN:VCARD\n"
+				"VERSION:3.0"
 				"N:X;Mr\n"
 				"END:VCARD";
 		maNFCSetNDEFPayload(rec, vCard, strlen(vCard));
@@ -371,6 +374,10 @@ public:
 
 	void handleNDEFFormattable(MAHandle msg) {
 		showStatus(INFO_ICON, "Empty tag", TOAST_PERIOD);
+	}
+
+	void handleUnknownTag() {
+		showStatus(UNKNOWN_ICON, "Unknown tag format", TOAST_PERIOD);
 	}
 
 	/**
