@@ -8,7 +8,7 @@
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib, NativeUI.lib, MAFS.lib, josync.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFS.lib, Wormhole.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>

@@ -7786,57 +7786,61 @@ group NFCAPI "NFC API" {
 
 		/**
 		* Reads the variable length id of an NDEF record.
-		* \return NFC_INVALID_TAG_TYPE if the handle given as
+		* \param ndefRecord the handle to the record to read from.
+		* \param dst Where the result should be written to.
+		* \param len The maximum length to write.
+		* \return The number of bytes written, or
+		* NFC_INVALID_TAG_TYPE if the handle given as
 		* argument does not represent an NDEF record.
 		*/
-		int maNFCGetId(in MAHandle ndefRecord, out MAAddress dst, in int len);
+		int maNFCGetNDEFId(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		* Reads the variable length payload of an NDEF record.
 		* Returns NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF record.
 		*/
-		int maNFCGetPayload(in MAHandle ndefRecord, out MAAddress dst, in int len);
+		int maNFCGetNDEFPayload(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		 * Returns the 3-bit TNF of an NDEF record,
 		 * or NFC_INVALID_TAG_TYPE if the handle given as argument
 		 * does not represent an NDEF record.
 		 */
-		int maNFCGetTnf(in MAHandle ndefRecord);
+		int maNFCGetNDEFTnf(in MAHandle ndefRecord);
 
 		/**
 		* Returns the variable length type field of an NDEF record,
 		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
 		* does not represent an NDEF record.
 		*/
-		int maNFCGetType(in MAHandle ndefRecord, out MAAddress dst, in int len);
+		int maNFCGetNDEFType(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		* Sets the variable length id of an NDEF record.
 		* \return NFC_INVALID_TAG_TYPE if the handle given as
 		* argument does not represent an NDEF message.
 		*/
-		int maNFCSetId(in MAHandle ndefRecord, in MAAddress dst, in int len);
+		int maNFCSetNDEFId(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
 		* Sets the variable length payload of an NDEF record.
 		* \return NFC_INVALID_TAG_TYPE if the handle given as argument does not represent an NDEF message.
 		*/
-		int maNFCSetPayload(in MAHandle ndefRecord, in MAAddress dst, in int len);
+		int maNFCSetNDEFPayload(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
 		 * Sets the 3-bit TNF of an NDEF record,
 		 * \return NFC_INVALID_TAG_TYPE if the handle given as argument
 		 * does not represent an NDEF record.
 		 */
-		int maNFCSetTnf(in MAHandle ndefRecord, in int tnf);
+		int maNFCSetNDEFTnf(in MAHandle ndefRecord, in int tnf);
 
 		/**
 		* Returns the variable length type field of an NDEF record,
 		* or NFC_INVALID_TAG_TYPE if the handle given as argumen
 		* does not represent an NDEF record.
 		*/
-		int maNFCSetType(in MAHandle ndefRecord, in MAAddress dst, in int len);
+		int maNFCSetNDEFType(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
 		* Returns a non-zero value if a tag can be formatted as an NDEF container,
@@ -7871,7 +7875,7 @@ group NFCAPI "NFC API" {
 		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
 		* tag type is not supported by the device), 0 if authentication can take place.
 		*/
-		int maNFCAuthenticateSector(in MAHandle tagHandle, in int keyType, in int sectorIndex, in MAAddress keySrc, in int keyLen);
+		int maNFCAuthenticateMifareSector(in MAHandle tagHandle, in int keyType, in int sectorIndex, in MAAddress keySrc, in int keyLen);
 
 		/**
 		* Returns the number of sectors of a MIFARE Classic tag.
@@ -7879,7 +7883,7 @@ group NFCAPI "NFC API" {
 		* tag type is not supported by the device), otherwise the number of sectors
 		* is returned.
 		*/
-		int maNFCGetSectorCount(in MAHandle tagHandle);
+		int maNFCGetMifareSectorCount(in MAHandle tagHandle);
 
 		/**
 		* Returns the number of blocks in a sector of a MIFARE Classic tag.
@@ -7888,7 +7892,7 @@ group NFCAPI "NFC API" {
 		* tag type is not supported by the device), otherwise the number of sectors
 		* is returned.
 		*/
-		int maNFCGetBlockCountInSector(in MAHandle tagHandle, in int sector);
+		int maNFCGetMifareBlockCountInSector(in MAHandle tagHandle, in int sector);
 
 		/**
 		* Returns the first block of a sector of a MIFARE Classic tag.
@@ -7897,7 +7901,7 @@ group NFCAPI "NFC API" {
 		* tag type is not supported by the device), otherwise the index of the
 		* first block of the sector is returned.
 		*/
-		int maNFCSectorToBlock(in MAHandle tagHandle, in int sector);
+		int maNFCMifareSectorToBlock(in MAHandle tagHandle, in int sector);
 
 		/**
 		* Reads a number of blocks of a MIFARE Classic tag.
@@ -7910,7 +7914,7 @@ group NFCAPI "NFC API" {
 		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
 		* tag type is not supported by the device), 0 if a read operation can be performed.
 		*/
-		int maNFCReadBlocks(in MAHandle tagHandle, in int firstBlock, out MAAddress dst, in int len);
+		int maNFCReadMifareBlocks(in MAHandle tagHandle, in int firstBlock, out MAAddress dst, in int len);
 
 		/**
 		* Writes a number of blocks to a MIFARE Classic tag.
@@ -7923,7 +7927,7 @@ group NFCAPI "NFC API" {
 		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
 		* tag type is not supported by the device), 0 if a write operation can be performed.
 		*/
-		int maNFCWriteBlocks(in MAHandle tagHandle, in int firstBlock, in MAAddress dst, in int len);
+		int maNFCWriteMifareBlocks(in MAHandle tagHandle, in int firstBlock, in MAAddress dst, in int len);
 
 		/**
 		* Reads a number of blocks of a MIFARE Ultralight tag.
@@ -7936,7 +7940,7 @@ group NFCAPI "NFC API" {
 		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
 		* tag type is not supported by the device), 0 if a read operation can be performed.
 		*/
-		int maNFCReadPages(in MAHandle tagHandle, in int firstPage, out MAAddress dst, in int len);
+		int maNFCReadMifarePages(in MAHandle tagHandle, in int firstPage, out MAAddress dst, in int len);
 
 		/**
 		* Writes a number of blocks of a MIFARE Ultralight tag.
@@ -7949,7 +7953,7 @@ group NFCAPI "NFC API" {
 		* \return MA_NFC_INVALID_TAG_TYPE if this is not the proper tag (or if the
 		* tag type is not supported by the device), 0 if a write operation can be performed.
 		*/
-		int maNFCWritePages(in MAHandle tagHandle, in int firstPage, in MAAddress dst, in int len);
+		int maNFCWriteMifarePages(in MAHandle tagHandle, in int firstPage, in MAAddress dst, in int len);
 
 		constset int MA_NFC_ {
 			/**
@@ -8030,6 +8034,35 @@ group NFCAPI "NFC API" {
 			* an NDEF tag.
 			*/
 			NDEF_FORMATTABLE = 128;
+		}
+
+		constset int MA_NFC_NDEF_FIELD_ {
+
+			/**
+			* Represents the TNF of an NDEF record.
+			*/
+			TNF = 1;
+
+			/**
+			* Represents the ID of an NDEF record.
+			*/
+			ID = 2;
+
+			/**
+			* Represents the TYPE of an NDEF record.
+			*/
+			TYPE = 3;
+
+			/**
+			* Represents the PAYLOAD of an NDEF record.
+			*/
+			PAYLOAD = 4;
+
+			/**
+			* Represents a RAW NDEF record, ie the client
+			* is responsible for assembling the NDEF.
+			*/
+			RAW = 5;
 		}
 
 		constset int MA_NFC_NDEF_TNF_ {
