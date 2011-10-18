@@ -167,7 +167,7 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 		keypass = s.androidKeyPass;
 	} else {
 		if (!s.silent) {
-			printf("Android: No certficate provided, falling back to default signing options");
+			printf("Android: No certificate provided, falling back to default signing options");
 		}
 		if(isDirectory(keystore.c_str()) < 0) {	// does not exist
 			// create default keystore
@@ -258,7 +258,7 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 	ofstream file(filename, ios::binary);
 	file <<"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 		<<"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n"
-		<<"\tpackage=\"" << packageName << "\" >\n"
+		<<"\tpackage=\"" << packageName << "\"\n"
 		<<"\tandroid:versionCode=\"" << versionCode << "\"\n"
 		<<"\tandroid:versionName=\"" << version << "\">\n"
 		<<"\t<application\n";
