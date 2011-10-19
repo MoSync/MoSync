@@ -3,17 +3,48 @@
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
-<property key="android:package.name" value="com.mosync.NFCExample"/>
+<property key="android:package.name" value="com.mosync.nfc.NFCExample"/>
+<property key="android:version.number" value="1"/>
+<property key="build.prefs:additional.include.paths/Debug" value=""/>
+<property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="MAUtil.lib, NativeUI.lib, MAFS.lib, josync.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFS.lib, josync.lib"/>
-<property key="build.prefs:app.permissions" value="File\ Storage Internet\ Access NFC Vibrate"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib"/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
+<property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:app.name/Release" value="NFCExample"/>
+<property key="build.prefs:app.permissions" value="File\ Storage NFC Vibrate"/>
+<property key="build.prefs:app.vendor/Release" value="MoSync"/>
+<property key="build.prefs:app.version/Release" value="1.0.0"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
+<property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
+<property key="build.prefs:extra.res.sw/Release" value=""/>
+<property key="build.prefs:gcc.switches/Release" value="-O2"/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
+<property key="build.prefs:gcc.warnings/Release" value="0"/>
+<property key="build.prefs:ignore.default.include.paths/Release" value="false"/>
+<property key="build.prefs:ignore.default.libraries/Release" value="false"/>
+<property key="build.prefs:ignore.default.library.paths/Release" value="false"/>
 <property key="build.prefs:memory.data/Debug" value="4096"/>
 <property key="build.prefs:memory.data/Release" value="4096"/>
 <property key="build.prefs:memory.heap/Debug" value="3072"/>
 <property key="build.prefs:memory.heap/Release" value="3072"/>
 <property key="build.prefs:memory.stack/Debug" value="512"/>
 <property key="build.prefs:memory.stack/Release" value="512"/>
+<property key="build.prefs:project.type" value=""/>
 <property key="com.mobilesorcery.sdk.html5.support" value="true"/>
+<property key="dependency.strategy" value="0"/>
+<property key="excludes/Debug" value=""/>
+<property key="excludes/Release" value=""/>
+<property key="standard.excludes" value="%test.ns:test.res%"/>
+<property key="symbian.uids:cert.file" value="/Applications/MoSync/etc/default.cert"/>
+<property key="symbian.uids:key.file" value="/Applications/MoSync/etc/default.key"/>
+<property key="symbian.uids:pass.key" value="default"/>
+<property key="symbian.uids:proj.spec.keys" value="true"/>
+<property key="symbian.uids:uid.s60v2uid" value="0x0de13aac"/>
+<property key="symbian.uids:uid.s60v3uid" value="0xe0e7fa89"/>
 <property key="template.id" value="project.html5.hybrid"/>
+<property key="test.ns:test.res" value="test"/>
 </properties>
 </project>
