@@ -331,8 +331,8 @@ public class MoSyncNFC {
 	}
 
 	private int invalidTagType(String method) {
-		String msg = method + ": Wrong tag type";
-		mosyncThread.threadPanic(40001, msg);
+		//String msg = method + ": Wrong tag type";
+		//mosyncThread.threadPanic(40001, msg);
 		return MA_NFC_INVALID_TAG_TYPE;
 	}
 
