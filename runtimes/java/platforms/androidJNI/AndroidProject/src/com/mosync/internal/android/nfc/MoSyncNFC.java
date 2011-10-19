@@ -209,10 +209,6 @@ public class MoSyncNFC {
 	}
 
 	public int maNFCStart() {
-		if (!nfcPermissionsSet(getActivity())) {
-			mosyncThread.threadPanic(1, "NFC permissions not set");
-		}
-
 		NfcManager manager = (NfcManager) getActivity().getSystemService(Context.NFC_SERVICE);
 		if (manager == null) {
 			return MA_NFC_NOT_AVAILABLE;
@@ -222,6 +218,11 @@ public class MoSyncNFC {
 		if (adapter == null) {
 			return MA_NFC_NOT_AVAILABLE;
 		}
+
+		if (!nfcPermissionsSet(getActivity())) {
+			return MA_NFC_NOT_AVAILABLE;
+		}
+
 		if (!adapter.isEnabled()) {
 			return MA_NFC_NOT_ENABLED;
 		}
