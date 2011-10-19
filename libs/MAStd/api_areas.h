@@ -453,7 +453,8 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 <td>MAUtil::Vector, MAUtil::String, MAUtil::HashMap, MAUtil::Map, MAUtil::Set, MAUtil::List,<br>
 \ref MAUtil/Geometry.h, \ref MAUtil/util.h<br>
 </td>
-<td>SGI Standard Template Library (STL) documentation: <a href="http://www.sgi.com/tech/stl/table_of_contents.html" class="el">SGI Standard Template Library (STL) documentation</a>
+<td>
+<a href="http://www.sgi.com/tech/stl/table_of_contents.html" class="el">SGI Standard Template Library (STL) documentation</a>
 </td>
 </tr>
 <tr style="background-color: rgb(249, 203, 156);">
