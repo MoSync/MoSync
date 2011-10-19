@@ -224,7 +224,7 @@ cd %ORIGINAL_PATH%
 @cd %MOSYNC_TRUNK%\docs\
 @echo on
 
-call gendox.bat
+call ruby gendox.rb
 
 @echo ------------------------------------------------
 @echo Copies the doxygen html files to Eclipse
