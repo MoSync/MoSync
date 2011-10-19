@@ -7600,8 +7600,7 @@ group NFCAPI "NFC API" {
 		* Start listening to NFC events.
 		* \return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
 		* MA_NFC_NOT_AVAILABLE if NFC is not at all available, or
-		* 0 otherwise. If the proper permissions (NFC) are not set, a panic will
-		* be raised.
+		* 0 otherwise.
 		*/
 		int maNFCStart();
 
