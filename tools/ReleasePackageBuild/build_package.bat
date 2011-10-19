@@ -96,7 +96,7 @@ REM Usage: build_package.bat c:\SonyEricsson\JavaME_SDK_CLDC\OnDeviceDebug\ 2>&1
 @echo ------------------------------------------------
 @echo Setting visual c++ vars
 @echo ------------------------------------------------
-@call "%VS80COMNTOOLS%/vsvars32.bat"
+@call "%VS100COMNTOOLS%/vsvars32.bat"
 @echo.
 
 @SET INCLUDE=%CD%\build_package_tools\include;%CD%\build_package_tools\include\msvc;%INCLUDE%
@@ -178,332 +178,19 @@ cd %ORIGINAL_PATH%
 @copy %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl\contacts.xml %MOSYNC_BIN_PATH%\default_contacts.xml /y /D
 
 @echo ------------------------------------------------
-@echo Running DefaultSkinGenerator.
+@echo Building Mosync.
 @echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\DefaultSkinGenerator
+@cd %MOSYNC_TRUNK%\
 ruby workfile.rb
+ruby workfile.rb CONFIG=
+ruby workfile.rb USE_NEWLIB=
+ruby workfile.rb CONFIG= USE_NEWLIB=
 @echo.
 
-@echo ------------------------------------------------
-@echo Building filelist.
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\filelist
-@vcbuild filelist.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
 
-@echo ------------------------------------------------
-@echo Building idl-common.
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\idl-common
-@vcbuild idl-common.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building idl2.
-@echo ------------------------------------------------
-@rem idl will copy asm_config.lst here
-@cd %MOSYNC_TRUNK%\tools\idl2
-vcbuild idl2.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-Release\idl2.exe
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building FontGenerator.
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\FontGenerator
-@vcbuild FontGenerator.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@cd Release
-@copy FontGenerator.exe %MOSYNC_BIN_PATH%\mof.exe /y
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building PanicDoc.
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\PanicDoc
-@vcbuild PanicDoc.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@Release\PanicDoc.exe > ..\DocbookIndexer\src\input\999_Misc\Panics.xml
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building pipe-tool.
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\pipe-tool
-@protobuild  > NUL
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@vcbuild pipe-tool.vcproj /useenv "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building updater.
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\MoSyncUpdater
-@vcbuild MoSyncUpdater.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@copy Release\updater.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building bundler
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\Bundle
-@vcbuild Bundle.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@copy Release\Bundle.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building icon-injector
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\icon-injector
-@vcbuild icon-injector.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building mifconv
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\mifconv
-@vcbuild mifconv.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building makesis-200
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\makesis-2.0.0\win32
-@vcbuild makesis-200.vcproj /useenv "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@copy Release\makesis-200.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building makesis-4
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\makesis-4\win32
-@vcbuild makesis-4.vcproj /useenv "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@copy Release\makesis-4.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building signsis-4
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\makesis-4\win32
-@vcbuild signsis-4.vcproj /useenv "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@copy Release\signsis-4.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building e32hack
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\e32hack
-@vcbuild e32hack.vcproj /useenv "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building uidcrc
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\uidcrc
-@vcbuild uidcrc.vcproj /useenv "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building rcomp
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\rcomp
-@vcbuild rcomp.vcproj /useenv "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building package
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\package
-@vcbuild package.vcproj /useenv "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building iphone-builder
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\iphone-builder
-@vcbuild iphone-builder.vcproj /useenv "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@copy Release\iphone-builder.exe %MOSYNC_BIN_PATH%\ /y
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building internal libraries:
-@echo ------------------------------------------------
-
-@echo ------------------------------------------------
-@echo helpers/windows
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\helpers\platforms\windows
-@vcbuild windows.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo demangle
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\demangle
-@vcbuild demangle.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo stabs
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\stabs
-@ruby typeGen.rb
-@vcbuild stabs.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo bluetooth
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\bluetooth
-@copy config_bluetooth.h.example config_bluetooth.h
-@vcbuild bluetooth.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo net
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\net
-@vcbuild net.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo gsm_amr
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\gsm_amr
-@vcbuild gsm_amr.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@copy release\gsm_amr.dll %MOSYNC_BIN_PATH% /y
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Copy include files:
-@echo ------------------------------------------------
 
 @cd %MOSYNC_TRUNK%\libs
 @call copyHeaders.bat
-
-@echo ------------------------------------------------
-@echo Building MoSync libraries for Windows:
-@echo ------------------------------------------------
-
-@echo ------------------------------------------------
-@echo Building MAStd
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\libs\MAStd
-@vcbuild MAStd.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building MAUtil
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\libs\MAUtil
-@vcbuild MAUtil.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@cd %ORIGINAL_PATH%
-@echo.
-
-@echo ------------------------------------------------
-@echo Building MAUI
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\libs\MAUI
-@vcbuild MAUI.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building MTXml
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\libs\MTXml
-@vcbuild MTXml.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building MAFS
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\libs\MAFS
-@vcbuild MAFS.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building dgles.lib
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\intlibs\dgles-0.5
-@vcbuild dgles.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building MDB, the MoSync Debugger
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\tools\debugger
-@ruby operationsGen.rb
-@vcbuild debugger.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo Building C++ runtimes:
-@echo ------------------------------------------------
-
-@echo ------------------------------------------------
-@echo SDL
-@echo ------------------------------------------------
-@cd %MOSYNC_TRUNK%\runtimes\cpp\platforms\sdl
-@copy config_platform.h.example config_platform.h
-@vcbuild sdl.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
-
-@echo ------------------------------------------------
-@echo MoSyncLib
-@echo ------------------------------------------------
-@cd mosynclib
-@vcbuild MoSyncLib.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@cd ..
-@echo.
-
-@echo ------------------------------------------------
-@echo MoRE
-@echo ------------------------------------------------
-@cd MoRE
-@vcbuild MoRE.vcproj "Release|Win32"
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
-@echo.
 
 @echo ------------------------------------------------
 @echo Building examples (Win32)
@@ -599,9 +286,9 @@ REM @mkdir %MOSYNC_PROFILES_PATH%
 REM @call ruby conv.rb -dst %MOSYNC_PROFILES_PATH%
 REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
-@cd %MOSYNC_TRUNK%\tools\ReleasePackageBuild
-@call ruby buildRuntimes.rb
-@IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
+REM @cd %MOSYNC_TRUNK%\tools\ReleasePackageBuild
+REM @call ruby buildRuntimes.rb
+REM @IF NOT %ERRORLEVEL% == 0 goto TOOL_ERROR
 
 
 @echo ------------------------------------------------
