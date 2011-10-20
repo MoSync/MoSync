@@ -173,6 +173,11 @@ namespace MoSync
                 WriteUInt8(dstaddress + i, val);
             }
         }
+
+        public byte[] GetData()
+        {
+            return mData;
+        }
 	}
 }
 

@@ -69,8 +69,38 @@ namespace MoSync
                 return 0;
             };
 
+            const int MAConnEventData_handle = 0;
+            const int MAConnEventData_opType = 4;
+            const int MAConnEventData_result = 8;
+
             syscalls.maConnRead = delegate(int _conn, int _dst, int _size)
             {
+                Socket _socket = mSockets[_conn];
+                SocketAsyncEventArgs socketEventArg = new SocketAsyncEventArgs();
+                socketEventArg.RemoteEndPoint = _socket.RemoteEndPoint;
+
+                // Setup the buffer to receive the data
+                socketEventArg.SetBuffer(core.GetDataMemory().GetData(), _dst, _size);
+
+                // Inline event handler for the Completed event.
+                // Note: This even handler was implemented inline in order to make this method self-contained.
+                socketEventArg.Completed += new EventHandler<SocketAsyncEventArgs>(delegate(object s, SocketAsyncEventArgs e)
+                {
+                    Memory evt = new Memory(12);
+                    evt.WriteInt32(MAConnEventData_handle, _conn);
+                    evt.WriteInt32(MAConnEventData_opType, MoSync.Constants.CONNOP_READ);
+  
+                    if (e.SocketError == SocketError.Success)
+                    {
+                        evt.WriteInt32(MAConnEventData_result, e.BytesTransferred);
+                    }
+                    else
+                    {
+                        evt.WriteInt32(MAConnEventData_result, MoSync.Constants.CONNERR_GENERIC);
+                    }
+                });
+
+                _socket.ReceiveAsync(socketEventArg);
             };
 
             syscalls.maConnReadToData = delegate(int _conn, int _data, int _offset, int _size)
@@ -79,6 +109,33 @@ namespace MoSync
 
             syscalls.maConnWrite = delegate(int _conn, int _src, int _size)
             {
+                Socket _socket = mSockets[_conn];
+                SocketAsyncEventArgs socketEventArg = new SocketAsyncEventArgs();
+                socketEventArg.RemoteEndPoint = _socket.RemoteEndPoint;
+                socketEventArg.UserToken = null;
+
+                // Setup the buffer from which to send the data
+                socketEventArg.SetBuffer(core.GetDataMemory().GetData(), _src, _size);
+
+                // Inline event handler for the Completed event.
+                // Note: This even handler was implemented inline in order to make this method self-contained.
+                socketEventArg.Completed += new EventHandler<SocketAsyncEventArgs>(delegate(object s, SocketAsyncEventArgs e)
+                {
+                    Memory evt = new Memory(12);
+                    evt.WriteInt32(MAConnEventData_handle, _conn);
+                    evt.WriteInt32(MAConnEventData_opType, MoSync.Constants.CONNOP_WRITE);
+
+                    if (e.SocketError == SocketError.Success)
+                    {
+                        evt.WriteInt32(MAConnEventData_result, e.BytesTransferred);
+                    }
+                    else
+                    {
+                        evt.WriteInt32(MAConnEventData_result, MoSync.Constants.CONNERR_GENERIC);
+                    }
+                });
+
+                _socket.SendAsync(socketEventArg);
             };
 
             syscalls.maConnWriteFromData = delegate(int _conn, int _data, int _offset, int _size)

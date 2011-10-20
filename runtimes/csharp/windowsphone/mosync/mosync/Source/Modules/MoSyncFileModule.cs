@@ -124,6 +124,7 @@ namespace MoSync
             MoSync.SystemPropertyManager.RegisterSystemPropertyProvider("mosync.path.local",
                 delegate(String key)
                 {
+                    // The isolated storage becomes the "root"
                     return "\\";
                 }
             );
