@@ -343,6 +343,7 @@ public:
 		char* vCard = "BEGIN:VCARD\n"
 				"VERSION:3.0"
 				"N:X;Mr\n"
+				"FN: Mr X\n"
 				"END:VCARD";
 		maNFCSetNDEFPayload(rec, vCard, strlen(vCard));
 		return msg;
