@@ -60,6 +60,8 @@ public class PIMList {
 					PIMError.sStrListUnavailable);
 		}
 
+		DebugPrint("COUNT: " + cur.getCount());
+
 		// read each item
 		while (cur.moveToNext()) {
 			String contactId = cur.getString(cur.getColumnIndex(Contacts._ID));
@@ -70,6 +72,9 @@ public class PIMList {
 			mList.add(pimItem);
 		}
 
+		cur.close();
+		cur = null;
+
 		mListIterator = 0;
 
 		return MA_PIM_ERR_NONE;
@@ -79,7 +84,7 @@ public class PIMList {
 	 * Checks if we reached the end of the list.
 	 */
 	boolean hasNext() {
-		return ( mListIterator < mList.size() && mList.size() > 0 );
+		return ((mList.size() > 0) && (mListIterator < mList.size()));
 	}
 
 	/**
