@@ -15,6 +15,14 @@ along with this program; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
+/*! \addtogroup NativeUILib
+ *  @{
+ */
+
+/**
+ *  @defgroup NativeUILib Native UI Library
+ *  @{
+ */
 
 /**
  * @file Button.h
@@ -99,3 +107,5 @@ namespace NativeUI
 } // namespace NativeUI
 
 #endif /* NATIVEUI_BUTTON_H_ */
+
+/*! @} */

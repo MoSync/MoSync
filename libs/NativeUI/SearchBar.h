@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NativeUILib
+ *  @{
+ */
+
+/**
+ *  @defgroup NativeUILib Native UI Library
+ *  @{
+ */
+
 /**
  * @file SearchBar.h
  * @author Emma Tresanszki
@@ -110,3 +119,5 @@ namespace NativeUI
 } // namespace NativeUI
 
 #endif
+
+/*! @} */
