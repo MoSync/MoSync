@@ -60,8 +60,6 @@ public class PIMList {
 					PIMError.sStrListUnavailable);
 		}
 
-		DebugPrint("COUNT: " + cur.getCount());
-
 		// read each item
 		while (cur.moveToNext()) {
 			String contactId = cur.getString(cur.getColumnIndex(Contacts._ID));

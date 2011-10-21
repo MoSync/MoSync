@@ -51,9 +51,6 @@ public class PIMFieldTitle extends PIMField {
 				+ "=?" + " AND " + Data.MIMETYPE + "=?",
 				new String[] { String.valueOf(contactId), mStrType }, null);
 
-		// if (cursor == null)
-		// return;
-
 		while (cursor.moveToNext()) {
 			String[] val = new String[mNames.length];
 			for (int i = 0; i < mNames.length; i++) {
