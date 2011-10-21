@@ -39,6 +39,7 @@ using namespace std;
 static vector<string> readExtensions(const char* filename);
 static void outputMaapi(const vector<string>& ixs, const Interface& maapi);
 static void outputMaapiJavascript(const vector<string>& ixs, const Interface& maapi);
+static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi);
 static void outputRuntimeBuilderFiles(const Interface& maapi);
 static void outputCpp(const Interface& maapi);
 static void outputAsmConfigLst(const Interface& maapi);
@@ -134,6 +135,7 @@ int main() {
 		// Generate files for the MoSync API.
 		outputMaapi(ixs, maapi);
 		outputMaapiJavascript(ixs, maapi);
+		outputMaapiCSharp(ixs, maapi);
 
 		// Generate files used when building the runtimes.
 		outputRuntimeBuilderFiles(maapi);
@@ -175,6 +177,9 @@ int main() {
 		// Copy generated Android file.
 		copy("Output/MAAPI_consts.java",
 			"../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated/");
+
+		// Copy windows phone file.
+		copy("Output/maapi.cs", "../../runtimes/csharp/windowsphone/mosync/mosync/Source/");
 
 		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
 		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");
@@ -297,7 +302,6 @@ static void outputJavascriptIoctlArg(ofstream& maapiFile, int i) {
 	}
 }
 
-
 static void outputMaapiJavascript(const vector<string>& ixs, const Interface& maapi) {
 	ofstream maapiFile("Output/maapi.js");
 
@@ -406,6 +410,275 @@ static void outputMaapiJavascript(const vector<string>& ixs, const Interface& ma
 	}
 	maapiFile << "\t};\n";
 	maapiFile << "};\n";
+}
+
+
+static std::string getCSharpType(const Interface& maapi, const std::string& maapiType, bool in) {
+	std::string resolvedMaapiType = resolveType(maapi, maapiType);
+	if(resolvedMaapiType == "unsigned char" || resolvedMaapiType == "unsigned int" || resolvedMaapiType == "unsigned long"
+		|| resolvedMaapiType == "unsigned short" || resolvedMaapiType == "long int")
+		resolvedMaapiType = "int";
+
+	if(in == false)
+		resolvedMaapiType += "*";
+
+	std::string returnType = jType(maapi, resolvedMaapiType);
+
+	if(resolvedMaapiType == "double")
+		returnType = "double";
+	else if(resolvedMaapiType == "float")
+		returnType = "float";
+	else if(resolvedMaapiType == "long long")
+		returnType = "long";
+	
+	if(returnType == "noreturn")
+		returnType = "void";
+	else if(returnType == "MAString" || returnType == "MAWString")
+		//returnType = "String";
+		returnType = "int";
+	else if(returnType == "MAExtent")
+		returnType = "int";
+	else if(returnType == "MAAddress")
+		returnType = "int";
+	else if(returnType == "MAHandle")
+		returnType = "int";
+	return returnType;
+}
+
+static void outputCSharpSyscallArg(ofstream& maapiFile, int i) {
+	if(i < 4) {
+		maapiFile << "mCore.GetRegisterValue(CoreInterpreted.Reg.I" << i << ")";
+	} else {
+		maapiFile << "mCore.GetStackValue(" << ((i-4)<<2) << ")";
+	}
+}
+
+static void outputCSharpIoctlArg(ofstream& maapiFile, int i) {
+	if(i < 3) {
+		maapiFile << (char)('a'+i);
+	} else {
+		maapiFile << "mCore.GetStackValue(" << ((i-3)<<2) << ")";
+	}
+}
+
+static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi) {
+	ofstream maapiFile("Output/maapi.cs");
+
+	maapiFile << "using System;\n";
+	maapiFile << "namespace MoSync {\n";
+
+	// generate constant table.
+	maapiFile << "public class Constants {\n";
+
+	// generate hash
+	maapiFile << "\tpublic const uint MoSyncHash = " << "0x" << setfill('0') << setw(8) << hex << calculateChecksum(maapi) << dec << ";\n";
+
+	for(size_t j=0; j<maapi.constSets.size(); j++) {
+		const ConstSet& cs(maapi.constSets[j]);
+		for(size_t k=0; k<cs.constants.size(); k++) {
+			const Constant& c(cs.constants[k]);
+			//printf("%s = %s;\n", c.name.c_str(), c.value.c_str());
+
+			std::string type = "int";
+			if(c.type == "MAString")
+				type = "String";
+			maapiFile << "\tpublic const " << type << " " << cs.name << c.name.c_str() << " = " << c.value.c_str();
+			maapiFile << ";\n";
+		}
+	}
+	maapiFile << "}\n\n";
+
+	// generate struct wrappers (todo)
+
+	// generate syscall delegate declarations
+	maapiFile << "public class Syscalls {\n";
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		//maapiFile << "\t\tcase " << f.number << ":\n";
+		std::string returnType = getCSharpType(maapi, f.returnType, true);
+		maapiFile << "\tpublic delegate " << returnType << " Delegate_" << f.name << "(";
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			if(k != 0)
+				maapiFile << ", ";
+
+			std::string argType = getCSharpType(maapi, a.type, a.in);
+			maapiFile << argType << " _" << a.name;
+		}
+		maapiFile << ");\n";
+		maapiFile << "\tpublic Delegate_" << f.name << " " << f.name << " = null;\n";
+	}
+	maapiFile << "}\n\n";
+
+	// generate syscall invoker
+
+	maapiFile << "public class SyscallInvoker {\n\n";
+	maapiFile << "\tprivate CoreInterpreted mCore;\n";
+	maapiFile << "\tprivate Syscalls mSyscalls;\n\n";
+	maapiFile << "\tpublic SyscallInvoker(CoreInterpreted core, Syscalls syscalls) {\n";
+	maapiFile << "\t\tmCore = core;\n";
+	maapiFile << "\t\tmSyscalls = syscalls;\n";
+	maapiFile << "\t}\n\n";
+
+	maapiFile << "\tpublic void InvokeSyscall(int id) {\n";
+	maapiFile << "\t\tswitch(id) {\n";
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		maapiFile << "\t\t\tcase " << f.number << ":\n";
+
+		std::string returnType = getCSharpType(maapi, f.returnType, true);
+		maapiFile << "\t\t\t";
+		if(returnType != "noreturn" && returnType != "void")
+			maapiFile << "mCore.SetReturnValue(";
+
+		maapiFile << "mSyscalls." << f.name << "(";
+
+		int i = 0;
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			std::string argType = getCSharpType(maapi, a.type, a.in);
+			if(k != 0)
+				maapiFile << ", ";
+			if(argType == "double") {
+				//maapiFile << "this.regs[Reg.i" << i << "], ";
+				maapiFile << "MoSync.Util.ConvertToDouble(";
+				outputCSharpSyscallArg(maapiFile, i);
+				maapiFile << ", ";
+				i++;
+//				maapiFile << "this.regs[Reg.i" << i << "] ";
+				outputCSharpSyscallArg(maapiFile, i);
+				i++;
+				maapiFile << ")";
+			}
+			else if(argType == "float") {
+				maapiFile << "MoSync.Util.ConvertToFloat(";
+				outputCSharpSyscallArg(maapiFile, i);
+				i++;
+				maapiFile << ")";				
+			} else {
+				//maapiFile << "this.regs[Reg.i" << i << "] ";
+				outputCSharpSyscallArg(maapiFile, i);
+				i++;
+			}
+		}
+		maapiFile << ")";
+
+		if(returnType != "noreturn" && returnType != "void")
+			maapiFile << ")";
+		maapiFile << ";\n";
+
+		maapiFile << "\t\t\tbreak;\n";
+	}
+	maapiFile << "\t\t}\n";
+	maapiFile << "\t}\n";
+	maapiFile << "}\n\n";
+
+	// generate ioctl delegate declarations
+	const vector<Ioctl>& ioctls = maapi.ioctls;
+
+	maapiFile << "public class Ioctls {\n";
+	for(size_t i=0; i<ioctls.size(); i++) {
+		const Ioctl& ioctl(ioctls[i]);
+		for(size_t j=0; j<ioctl.functions.size(); j++) {
+		const IoctlFunction& ifunc(ioctl.functions[j]);
+		const Function& f(ifunc.f);
+
+		std::string returnType = "long";//getCSharpType(maapi, f.returnType);
+		maapiFile << "\tpublic delegate " << returnType << " Delegate_" << f.name << "(";
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			if(k != 0)
+				maapiFile << ", ";
+
+			std::string argType = getCSharpType(maapi, a.type, a.in);
+			maapiFile << argType << " _" << a.name;
+		}
+		maapiFile << ");\n";
+		maapiFile << "\tpublic Delegate_" << f.name << " " << f.name << " = null;\n";
+		}
+	}
+	maapiFile << "}\n\n";
+
+	// generate ioctl invoker
+
+	maapiFile << "public class IoctlInvoker {\n\n";
+	maapiFile << "\tprivate Core mCore;\n";
+	maapiFile << "\tprivate Ioctls mIoctls;\n\n";
+	maapiFile << "\tpublic IoctlInvoker(Core core, Ioctls ioctls) {\n";
+	maapiFile << "\t\tmCore = core;\n";
+	maapiFile << "\t\tmIoctls = ioctls;\n";
+	maapiFile << "\t}\n\n";
+
+	maapiFile << "\tpublic long InvokeIoctl(int id, int a, int b, int c) {\n";
+	maapiFile << "\t\tswitch(id) {\n";
+	for(size_t i=0; i<ioctls.size(); i++) {
+		const Ioctl& ioctl(ioctls[i]);
+		for(size_t j=0; j<ioctl.functions.size(); j++) {
+		const IoctlFunction& ifunc(ioctl.functions[j]);
+		const Function& f(ifunc.f);
+
+		maapiFile << "\t\t\tcase " << f.number << ":\n";
+
+		maapiFile << "\t\t\tif(mIoctls." << f.name << " == null)\n";
+		maapiFile << "\t\t\t\treturn MoSync.Constants.IOCTL_UNAVAILABLE;\n";
+
+		maapiFile << "\t\t\treturn mIoctls." << f.name << "(";
+
+		int argindex = 0;
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			std::string argType = getCSharpType(maapi, a.type, a.in);
+			if(k != 0)
+				maapiFile << ", ";
+			if(argType == "double") {
+				maapiFile << "MoSync.Util.ConvertToDouble(";
+				outputCSharpIoctlArg(maapiFile, argindex);
+				maapiFile << ", ";
+				argindex++;
+				outputCSharpIoctlArg(maapiFile, argindex);
+				argindex++;
+				maapiFile << ")";
+			}
+			else if(argType == "float") {
+				maapiFile << "MoSync.Util.ConvertToFloat(";
+				outputCSharpIoctlArg(maapiFile, argindex);
+				argindex++;
+				maapiFile << ")";				
+			} else {
+				//maapiFile << "this.regs[Reg.i" << i << "] ";
+				outputCSharpIoctlArg(maapiFile, argindex);
+				argindex++;
+			}
+		}
+		maapiFile << ");\n";
+		}
+	}
+	maapiFile << "\t\t}\n";
+	maapiFile << "\t\treturn MoSync.Constants.IOCTL_UNAVAILABLE;\n";
+	maapiFile << "\t}\n";
+	maapiFile << "}\n\n";
+
+	// output struct info as offsets etc.
+	for(size_t i = 0; i < maapi.structs.size(); i++)
+	{
+		const Struct& s(maapi.structs[i]);
+		for(size_t j = 0; j < s.members.size(); j++)
+		{
+			const Member& m(s.members[j]);
+			if(m.pod.size() == 1) // POD
+			{
+
+			}
+			else // Anonymous union
+			{
+			}
+		}
+	};
+
+	maapiFile << "} // namespace MoSync\n";
+
 }
 
 /**
