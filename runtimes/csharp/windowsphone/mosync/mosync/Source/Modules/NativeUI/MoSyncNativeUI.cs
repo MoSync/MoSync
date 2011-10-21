@@ -31,7 +31,7 @@ namespace MoSync
 
     public class MoSyncWidgetPropertyAttribute : Attribute
     {
-        public MoSyncWidgetPropertyAttribute(String name, bool executeOnMainThread=true)
+        public MoSyncWidgetPropertyAttribute(String name, bool executeOnMainThread = true)
         {
             mName = name;
             mShouldExecuteOnMainThread = executeOnMainThread;
@@ -129,7 +129,7 @@ namespace MoSync
             Type type = this.GetType();
             propertyInfoOut = null;
 
-            foreach(PropertyInfo pinfo in type.GetProperties())
+            foreach (PropertyInfo pinfo in type.GetProperties())
             {
                 foreach (Attribute attr in pinfo.GetCustomAttributes(false))
                 {

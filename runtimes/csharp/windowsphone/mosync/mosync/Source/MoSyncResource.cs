@@ -5,11 +5,12 @@ using Microsoft.Xna.Framework.GamerServices;
 using System.Windows;
 
 namespace MoSync
-{	
+{
     // This is a class used to hold a mosync resoruce
     // Each resource has a specific type and a platform
     // specific internal object.
-	public class Resource {
+    public class Resource
+    {
         protected Object mInternalObject;
         protected int mResourceType;
 
@@ -38,6 +39,5 @@ namespace MoSync
         {
             return mInternalObject;
         }
-	}
+    }
 }
-

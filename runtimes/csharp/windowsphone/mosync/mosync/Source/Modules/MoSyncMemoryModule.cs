@@ -25,7 +25,7 @@ namespace MoSync
             syscalls.strcpy = delegate(int dst, int src)
             {
                 String str = core.GetDataMemory().ReadStringAtAddress(src);
-                core.GetDataMemory().WriteStringAtAddress(dst, str, str.Length+1);
+                core.GetDataMemory().WriteStringAtAddress(dst, str, str.Length + 1);
                 return dst;
             };
 
@@ -40,10 +40,11 @@ namespace MoSync
             syscalls.maCreateData = delegate(int placeholder, int size)
             {
                 Memory mem = null;
-                try {
+                try
+                {
                     mem = new Memory(size);
-                } 
-                catch(OutOfMemoryException e)
+                }
+                catch (OutOfMemoryException e)
                 {
                     MoSync.Util.Log(e.ToString());
                     return MoSync.Constants.RES_OUT_OF_MEMORY;
@@ -100,9 +101,6 @@ namespace MoSync
             syscalls.maCloseStore = delegate(int store, int delete)
             {
             };
-
-
         }
-	}
+    }
 }
-

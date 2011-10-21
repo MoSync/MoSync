@@ -2,7 +2,7 @@ using System;
 using System.IO;
 
 namespace MoSync
-{	
+{
 
     // a class that wraps memory
     // This is the interface to the data memory segment for the mosync core.
@@ -12,7 +12,7 @@ namespace MoSync
     // so that code can be efficiently shared between binary resources
     // and unloaded binary resources. Now ubins are loaded into memory also,
     // in order to get something up and running quickly.
-	public class Memory
+    public class Memory
     {
         protected byte[] mData;
         protected int mSizeInBytes;
@@ -69,7 +69,7 @@ namespace MoSync
             mData[address + 1] = (byte)((b >> 8) & 0xff);
             mData[address + 2] = (byte)((b >> 16) & 0xff);
             mData[address + 3] = (byte)((b >> 24) & 0xff);
- 
+
         }
 
         public byte ReadUInt8(int address)
@@ -112,14 +112,14 @@ namespace MoSync
         {
             int endaddress = address;
             while (mData[endaddress] != 0) endaddress++;
-            return System.Text.UTF8Encoding.UTF8.GetString(mData, address, endaddress-address);
+            return System.Text.UTF8Encoding.UTF8.GetString(mData, address, endaddress - address);
         }
 
         // reads a null-terminated unicode string.
         public String ReadWStringAtAddress(int address)
         {
             int endaddress = address;
-            while (ReadInt16(endaddress) != 0) endaddress+=2;
+            while (ReadInt16(endaddress) != 0) endaddress += 2;
             return System.Text.UnicodeEncoding.Unicode.GetString(mData, address, endaddress - address);
         }
 
@@ -136,7 +136,7 @@ namespace MoSync
 
             if (i > maxSize)
                 return;
-            WriteUInt8(address + i, 0);          
+            WriteUInt8(address + i, 0);
         }
 
         public void WriteWStringAtAddress(int address, String str, int maxSize)
@@ -178,6 +178,5 @@ namespace MoSync
         {
             return mData;
         }
-	}
+    }
 }
-

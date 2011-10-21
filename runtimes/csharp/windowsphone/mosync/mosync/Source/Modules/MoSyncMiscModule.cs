@@ -51,10 +51,11 @@ namespace MoSync
             };
 
             DateTime startDate = System.DateTime.Now;
-            syscalls.maGetMilliSecondCount = delegate() {
+            syscalls.maGetMilliSecondCount = delegate()
+            {
                 System.TimeSpan offset = (System.DateTime.Now - startDate);
 
-                return offset.Milliseconds+(offset.Seconds+(offset.Minutes+(offset.Hours+offset.Days*24)*60)*60)*1000;
+                return offset.Milliseconds + (offset.Seconds + (offset.Minutes + (offset.Hours + offset.Days * 24) * 60) * 60) * 1000;
             };
 
             syscalls.maTime = delegate()
@@ -91,11 +92,10 @@ namespace MoSync
             {
                 String key = core.GetDataMemory().ReadStringAtAddress(_key);
                 String value = MoSync.SystemPropertyManager.GetSystemProperty(key);
-                if(value.Length+1 <= _size)
+                if (value.Length + 1 <= _size)
                     core.GetDataMemory().WriteStringAtAddress(_buf, value, _size);
-                return value.Length+1;
+                return value.Length + 1;
             };
         }
-	}
+    }
 }
-

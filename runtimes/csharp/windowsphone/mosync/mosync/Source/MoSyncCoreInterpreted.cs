@@ -9,8 +9,8 @@ using System.Collections.Generic;
 
 namespace MoSync
 {
-	public class CoreInterpreted : Core
-	{
+    public class CoreInterpreted : Core
+    {
         protected ProgramHeader mProgramHeader = new ProgramHeader();
         protected int mIp;
         protected byte[] mProgramMemory;
@@ -132,23 +132,23 @@ namespace MoSync
             public const int R14 = 30;
             public const int R15 = 31;
         }
-		
-		public CoreInterpreted ()
-		{
-		}
-		
-		
-		public new void Init()
-		{
-			base.Init();
+
+        public CoreInterpreted()
+        {
+        }
+
+
+        public new void Init()
+        {
+            base.Init();
             Start();
-			mIp = (int)mProgramHeader.mEntryPoint;
+            mIp = (int)mProgramHeader.mEntryPoint;
 
             if (mRuntime == null)
                 MoSync.Util.CriticalError("No runtime!");
 
             mSyscallInvoker = new SyscallInvoker(this, mRuntime.GetSyscalls());
-		}
+        }
 
         public int GetRegisterValue(int reg)
         {
@@ -247,7 +247,7 @@ namespace MoSync
             mDataSegmentSize = Util.NextPowerOfTwo(2, mProgramHeader.mDataSize);
             mDataSegmentMask = mDataSegmentSize - 1;
             mDataMemory = new Memory((int)mDataSegmentSize); // new int[mDataSegmentSize >> 2];
-          
+
             for (int i = 0; i < mProgramHeader.mDataLength; i++)
             {
                 mDataMemory.WriteUInt8(i, Util.StreamReadUint8(program));
@@ -312,7 +312,7 @@ namespace MoSync
         {
             const int STATE_BUFFER_SIZE = 1024;
 
-            if(!mDebugLogStateChangesInitialized)
+            if (!mDebugLogStateChangesInitialized)
             {
                 mDebugLogStateChangesInitialized = true;
                 System.Array.Copy(mRegisters, mOldRegisters, 128);
@@ -324,7 +324,7 @@ namespace MoSync
 
             int i = 128;
             mStateChangeInstCount++;
-            while ((i--)!=0)
+            while ((i--) != 0)
             {
                 if (mOldRegisters[i] != mRegisters[i])
                 {
@@ -402,18 +402,18 @@ namespace MoSync
 
 
         public new void Run()
-		{
-			int imm32;
-			byte rd;
-			byte rs;
+        {
+            int imm32;
+            byte rd;
+            byte rs;
 
             int oldIp = 0;
 
             //DebugDumpState();
 
-			//while(mRunning)
-            while(true)
-			{
+            //while(mRunning)
+            while (true)
+            {
                 //DebugLogStateChanges();
                 /*
                 if (mIp == 16754)
@@ -421,438 +421,467 @@ namespace MoSync
                     int a = 2;
                 }
                 */
-          
+
                 oldIp = mIp;
 
-				byte op = mProgramMemory[mIp++];
-				switch(op)
-				{
-					case 0:
-					break;
-				
-					case Op.PUSH: // PUSH
-						rd = mProgramMemory[mIp++];
-						imm32 = mProgramMemory[mIp++];
-						if(rd < 2 || rd+imm32 > 32)
-							MoSync.Util.CriticalError("Hell");
-						do
-						{
-							mRegisters[Reg.SP] -= 4;
-					        mDataMemory.WriteInt32(mRegisters[Reg.SP], mRegisters[rd]);
-							rd++;
-							imm32--;
-						} while(imm32 != 0);				
-					break;
-				
-					case Op.POP: // POP
-						rd = mProgramMemory[mIp++];
-						imm32 = mProgramMemory[mIp++];
-						if(rd > 31 || rd-imm32 < 1)
-							MoSync.Util.CriticalError("Hell");
-						do
-						{
+                byte op = mProgramMemory[mIp++];
+                switch (op)
+                {
+                    case 0:
+                        break;
+
+                    case Op.PUSH: // PUSH
+                        rd = mProgramMemory[mIp++];
+                        imm32 = mProgramMemory[mIp++];
+                        if (rd < 2 || rd + imm32 > 32)
+                            MoSync.Util.CriticalError("Hell");
+                        do
+                        {
+                            mRegisters[Reg.SP] -= 4;
+                            mDataMemory.WriteInt32(mRegisters[Reg.SP], mRegisters[rd]);
+                            rd++;
+                            imm32--;
+                        } while (imm32 != 0);
+                        break;
+
+                    case Op.POP: // POP
+                        rd = mProgramMemory[mIp++];
+                        imm32 = mProgramMemory[mIp++];
+                        if (rd > 31 || rd - imm32 < 1)
+                            MoSync.Util.CriticalError("Hell");
+                        do
+                        {
                             mRegisters[rd] = mDataMemory.ReadInt32(mRegisters[Reg.SP]);
-							mRegisters[Reg.SP] += 4;
-							rd--;
-							imm32--;
-						} while(imm32 != 0);				
-					break;
+                            mRegisters[Reg.SP] += 4;
+                            rd--;
+                            imm32--;
+                        } while (imm32 != 0);
+                        break;
 
-					case Op.CALL: // CALL
-						rd = mProgramMemory[mIp++];
-						mRegisters[Reg.RT] = mIp;
-						mIp = mRegisters[rd];
-					break;
+                    case Op.CALL: // CALL
+                        rd = mProgramMemory[mIp++];
+                        mRegisters[Reg.RT] = mIp;
+                        mIp = mRegisters[rd];
+                        break;
 
-					case Op.CALLI: // CALLI
-						imm32 =  ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-						//console.log("calli addr: " + callAddr);
-						mRegisters[Reg.RT] = mIp;
-						mIp = imm32;
-					break;
+                    case Op.CALLI: // CALLI
+                        imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                        //console.log("calli addr: " + callAddr);
+                        mRegisters[Reg.RT] = mIp;
+                        mIp = imm32;
+                        break;
 
                     case Op.LDB: // LDB
-                    {
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
-                            mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
-                            mConstantPool[imm32];
-                        //mRegisters[rd] = mDataMemory.ReadUInt8(mRegisters[rs] + imm32);
-                        mRegisters[rd] = mDataMemory.ReadInt8(mRegisters[rs] + imm32);
-                    }
-                    break;
+                        {
+                            rd = mProgramMemory[mIp++];
+                            rs = mProgramMemory[mIp++];
+                            imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                                mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
+                                mConstantPool[imm32];
+                            //mRegisters[rd] = mDataMemory.ReadUInt8(mRegisters[rs] + imm32);
+                            mRegisters[rd] = mDataMemory.ReadInt8(mRegisters[rs] + imm32);
+                        }
+                        break;
 
                     case Op.STB: // STB
-                    {
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
-                            mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
-                            mConstantPool[imm32];
-                        mDataMemory.WriteUInt8(mRegisters[rd] + imm32, (byte)mRegisters[rs]);
-                    }
-                    break;
+                        {
+                            rd = mProgramMemory[mIp++];
+                            rs = mProgramMemory[mIp++];
+                            imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                                mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
+                                mConstantPool[imm32];
+                            mDataMemory.WriteUInt8(mRegisters[rd] + imm32, (byte)mRegisters[rs]);
+                        }
+                        break;
 
                     case Op.LDH: // LDH
-                    {
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
-                            mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
-                            mConstantPool[imm32];
-                        //mRegisters[rd] = mDataMemory.ReadUInt16(mRegisters[rs] + imm32);
-                        mRegisters[rd] = mDataMemory.ReadInt16(mRegisters[rs] + imm32);
-                    }
-                    break;
+                        {
+                            rd = mProgramMemory[mIp++];
+                            rs = mProgramMemory[mIp++];
+                            imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                                mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
+                                mConstantPool[imm32];
+                            //mRegisters[rd] = mDataMemory.ReadUInt16(mRegisters[rs] + imm32);
+                            mRegisters[rd] = mDataMemory.ReadInt16(mRegisters[rs] + imm32);
+                        }
+                        break;
 
                     case Op.STH: // STH
-                    {
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
-                            mConstantPool[(((imm32 & 127) << 8) |
-                            mProgramMemory[mIp++])] :
-                            mConstantPool[imm32];
-                        mDataMemory.WriteUInt16(mRegisters[rd] + imm32, (ushort)mRegisters[rs]);
-                    }
-                    break;
-				
-					case Op.LDW: // LDW
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127) ?
-                            mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])] :
-                            mConstantPool[imm32];
-                        mRegisters[rd] = mDataMemory.ReadInt32(mRegisters[rs] + imm32);
-					break;
+                        {
+                            rd = mProgramMemory[mIp++];
+                            rs = mProgramMemory[mIp++];
+                            imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                                mConstantPool[(((imm32 & 127) << 8) |
+                                mProgramMemory[mIp++])] :
+                                mConstantPool[imm32];
+                            mDataMemory.WriteUInt16(mRegisters[rd] + imm32, (ushort)mRegisters[rs]);
+                        }
+                        break;
 
-                    case Op.STW: // STW
-                    {
+                    case Op.LDW: // LDW
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
                         imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
                             mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
                             mConstantPool[imm32];
-                        mDataMemory.WriteInt32(mRegisters[rd] + imm32, mRegisters[rs]);
-                    }
-                    break;
-				
-					case Op.LDI: // LDI
-						rd = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127) ?
-                            mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])] :
+                        mRegisters[rd] = mDataMemory.ReadInt32(mRegisters[rs] + imm32);
+                        break;
+
+                    case Op.STW: // STW
+                        {
+                            rd = mProgramMemory[mIp++];
+                            rs = mProgramMemory[mIp++];
+                            imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                                mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
+                                mConstantPool[imm32];
+                            mDataMemory.WriteInt32(mRegisters[rd] + imm32, mRegisters[rs]);
+                        }
+                        break;
+
+                    case Op.LDI: // LDI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
+                            mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
                             mConstantPool[imm32];
-						mRegisters[rd] = imm32;
-					break;
-				
-					case Op.LDR: // LDR
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] = mRegisters[rs];				
-					break;
-				
-					case Op.ADD: // ADD		
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] += mRegisters[rs];
-					break;
-				
-					case Op.ADDI: // ADDI
-						rd = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];	
-						mRegisters[rd] += imm32;
-					break;
-				
-					case Op.MUL: // MUL		
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] *= mRegisters[rs];
-					break;
-					
-					case Op.MULI: // MULI
-						rd = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];	
-						mRegisters[rd] *= imm32;
-					break;
+                        mRegisters[rd] = imm32;
+                        break;
 
-					case Op.SUB: // SUB
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] -= mRegisters[rs];
-					break;
-				
+                    case Op.LDR: // LDR
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] = mRegisters[rs];
+                        break;
 
-					case Op.SUBI: // SUBI
-						rd = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];	
-						mRegisters[rd] -= imm32;
-					break;
-					
-					case Op.AND: // AND
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] &= mRegisters[rs];
-					break;
-				
-					case Op.ANDI: // ANDI
-						rd = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];	
-						mRegisters[rd] &= imm32;
-					break;
-					
-					case Op.OR: // OR
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] |= mRegisters[rs];
-					break;
-				
-					case Op.ORI: // ORI
-						rd = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];	
-						mRegisters[rd] |= imm32;
-					break;
-				
-					case Op.XOR: // XOR
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] ^= mRegisters[rs];
-					break;
-				
-					case Op.XORI: // XORI
-						rd = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];	
-						mRegisters[rd] ^= imm32;
-					break;
-				
-					case Op.DIVU: // DIVU
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] = (int)((uint)(mRegisters[rd])/((uint)mRegisters[rs]));
-					break;
-				
-					case Op.DIVUI: // DIVUI
-						rd = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];	
-						mRegisters[rd] = (int)((uint)(mRegisters[rd])/((uint)imm32));
-					break;
-				
-					case Op.DIV: // DIV
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
+                    case Op.ADD: // ADD		
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] += mRegisters[rs];
+                        break;
+
+                    case Op.ADDI: // ADDI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        mRegisters[rd] += imm32;
+                        break;
+
+                    case Op.MUL: // MUL		
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] *= mRegisters[rs];
+                        break;
+
+                    case Op.MULI: // MULI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        mRegisters[rd] *= imm32;
+                        break;
+
+                    case Op.SUB: // SUB
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] -= mRegisters[rs];
+                        break;
+
+
+                    case Op.SUBI: // SUBI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        mRegisters[rd] -= imm32;
+                        break;
+
+                    case Op.AND: // AND
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] &= mRegisters[rs];
+                        break;
+
+                    case Op.ANDI: // ANDI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        mRegisters[rd] &= imm32;
+                        break;
+
+                    case Op.OR: // OR
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] |= mRegisters[rs];
+                        break;
+
+                    case Op.ORI: // ORI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        mRegisters[rd] |= imm32;
+                        break;
+
+                    case Op.XOR: // XOR
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] ^= mRegisters[rs];
+                        break;
+
+                    case Op.XORI: // XORI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        mRegisters[rd] ^= imm32;
+                        break;
+
+                    case Op.DIVU: // DIVU
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] = (int)((uint)(mRegisters[rd]) / ((uint)mRegisters[rs]));
+                        break;
+
+                    case Op.DIVUI: // DIVUI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        mRegisters[rd] = (int)((uint)(mRegisters[rd]) / ((uint)imm32));
+                        break;
+
+                    case Op.DIV: // DIV
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
                         mRegisters[rd] /= mRegisters[rs];
-					break;
-				
-					case Op.DIVI: // DIVI
-						rd = mProgramMemory[mIp++];
-						imm32 = ((imm32=mProgramMemory[mIp++])>127)?mConstantPool[(((imm32&127)<<8)|mProgramMemory[mIp++])]:mConstantPool[imm32];	
-						mRegisters[rd] /= imm32;
-					break;
-					
-					case Op.SLL: // SLL
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] <<= mRegisters[rs];
-					break;
-				
-					case Op.SLLI: // SLLI
-						rd = mProgramMemory[mIp++];
-						imm32 = mProgramMemory[mIp++];
-						mRegisters[rd] <<= imm32;
-					break;
-					
-					case Op.SRA: // SRA
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] >>= mRegisters[rs];
-					break;
-				
-					case Op.SRAI: // SRAI
-						rd = mProgramMemory[mIp++];
-						imm32 = mProgramMemory[mIp++];
-						mRegisters[rd] >>= imm32;
-					break;
-					
-					case Op.SRL: // SRL
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] =  (int)((uint)mRegisters[rd] >> mRegisters[rs]);
-					break;
-				
-					case Op.SRLI: // SRLI
-						rd = mProgramMemory[mIp++];
-						imm32 = mProgramMemory[mIp++];
-                        mRegisters[rd] =  (int)((uint)mRegisters[rd] >> imm32);
-					break;					
-				
-					case Op.NOT: // NOT 
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] = ~mRegisters[rs];
-					break;
-	
-					case Op.NEG: // NEG
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] = -mRegisters[rs];				
-					break;
-		
-					case Op.RET: // RET
-						mIp = mRegisters[Reg.RT];
-					break;
-				
-					case Op.JC_EQ: // JC_EQ
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						if(mRegisters[rd] == mRegisters[rs]) {
-							imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-							mIp = imm32;
-						} else {
-							mIp += 2;
-						}
-					break;						
-				
-					case Op.JC_NE: // JC_NE
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						if(mRegisters[rd] != mRegisters[rs]) {
-							imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-							mIp = imm32;
-						} else {
-							mIp += 2;
-						}	
-					break;
-				
-					case Op.JC_GE: // JC_GE
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						if(mRegisters[rd] >= mRegisters[rs]) {
-							imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-							mIp = imm32;
-						} else {
-							mIp += 2;
-						}
-					break;
-				
-					case Op.JC_GEU: // JC_GEU
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						if((uint)mRegisters[rd] >= (uint)mRegisters[rs]) {
-							imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-							mIp = imm32;
-						} else {
-							mIp += 2;
-						}
-					break;
-				
-					case Op.JC_GT: // JC_GT
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						if(mRegisters[rd] > mRegisters[rs]) {
-							imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-							mIp = imm32;
-						} else {
-							mIp += 2;
-						}
-					break;
-					
-					case Op.JC_GTU: // JC_GTU
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						if((uint)mRegisters[rd] > (uint)mRegisters[rs]) {
-							imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-							mIp = imm32;
-						} else {
-							mIp += 2;
-						}
-					break;
-				
-					case Op.JC_LE: // JC_LE
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
+                        break;
+
+                    case Op.DIVI: // DIVI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ? mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] : mConstantPool[imm32];
+                        mRegisters[rd] /= imm32;
+                        break;
+
+                    case Op.SLL: // SLL
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] <<= mRegisters[rs];
+                        break;
+
+                    case Op.SLLI: // SLLI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = mProgramMemory[mIp++];
+                        mRegisters[rd] <<= imm32;
+                        break;
+
+                    case Op.SRA: // SRA
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] >>= mRegisters[rs];
+                        break;
+
+                    case Op.SRAI: // SRAI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = mProgramMemory[mIp++];
+                        mRegisters[rd] >>= imm32;
+                        break;
+
+                    case Op.SRL: // SRL
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] = (int)((uint)mRegisters[rd] >> mRegisters[rs]);
+                        break;
+
+                    case Op.SRLI: // SRLI
+                        rd = mProgramMemory[mIp++];
+                        imm32 = mProgramMemory[mIp++];
+                        mRegisters[rd] = (int)((uint)mRegisters[rd] >> imm32);
+                        break;
+
+                    case Op.NOT: // NOT 
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] = ~mRegisters[rs];
+                        break;
+
+                    case Op.NEG: // NEG
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] = -mRegisters[rs];
+                        break;
+
+                    case Op.RET: // RET
+                        mIp = mRegisters[Reg.RT];
+                        break;
+
+                    case Op.JC_EQ: // JC_EQ
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        if (mRegisters[rd] == mRegisters[rs])
+                        {
+                            imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                            mIp = imm32;
+                        }
+                        else
+                        {
+                            mIp += 2;
+                        }
+                        break;
+
+                    case Op.JC_NE: // JC_NE
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        if (mRegisters[rd] != mRegisters[rs])
+                        {
+                            imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                            mIp = imm32;
+                        }
+                        else
+                        {
+                            mIp += 2;
+                        }
+                        break;
+
+                    case Op.JC_GE: // JC_GE
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        if (mRegisters[rd] >= mRegisters[rs])
+                        {
+                            imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                            mIp = imm32;
+                        }
+                        else
+                        {
+                            mIp += 2;
+                        }
+                        break;
+
+                    case Op.JC_GEU: // JC_GEU
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        if ((uint)mRegisters[rd] >= (uint)mRegisters[rs])
+                        {
+                            imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                            mIp = imm32;
+                        }
+                        else
+                        {
+                            mIp += 2;
+                        }
+                        break;
+
+                    case Op.JC_GT: // JC_GT
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        if (mRegisters[rd] > mRegisters[rs])
+                        {
+                            imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                            mIp = imm32;
+                        }
+                        else
+                        {
+                            mIp += 2;
+                        }
+                        break;
+
+                    case Op.JC_GTU: // JC_GTU
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        if ((uint)mRegisters[rd] > (uint)mRegisters[rs])
+                        {
+                            imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                            mIp = imm32;
+                        }
+                        else
+                        {
+                            mIp += 2;
+                        }
+                        break;
+
+                    case Op.JC_LE: // JC_LE
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
                         if (mRegisters[rd] <= mRegisters[rs])
                         {
-							imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-							mIp = imm32;			
-						} else {
-							mIp += 2;
-						}	
-					break;						
-	
-					case Op.JC_LEU: // JC_LEU
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						if((uint)mRegisters[rd] <= (uint)mRegisters[rs]) {
-							imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-							mIp = imm32;
-						} else {
-							mIp += 2;
-						}
-					break;
-				
-					case Op.JC_LT: // JC_LT
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						if(mRegisters[rd] < mRegisters[rs]) {
-							imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-							mIp = imm32;			
-						} else {
-							mIp += 2;
-						}	
-					break;
-				
-					case Op.JC_LTU: // JC_LTU
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						if((uint)mRegisters[rd] < (uint)mRegisters[rs]) {
-							imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-							mIp = imm32;			
-						} else {
-							mIp += 2;
-						}	
-					break;
-				
-					case Op.JPI: // JPI
-						imm32 = ((int)mProgramMemory[mIp++]<<8)|((int)mProgramMemory[mIp++]);
-						mIp = imm32;
-					break;
-				
-					case Op.JPR: // JPR
-						rd = mProgramMemory[mIp++];
-						mIp = mRegisters[rd];				
-					break;						
-	
-					case Op.XB: // XB
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] = (int)(((mRegisters[rs]&0x80) == 0) ?
+                            imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                            mIp = imm32;
+                        }
+                        else
+                        {
+                            mIp += 2;
+                        }
+                        break;
+
+                    case Op.JC_LEU: // JC_LEU
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        if ((uint)mRegisters[rd] <= (uint)mRegisters[rs])
+                        {
+                            imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                            mIp = imm32;
+                        }
+                        else
+                        {
+                            mIp += 2;
+                        }
+                        break;
+
+                    case Op.JC_LT: // JC_LT
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        if (mRegisters[rd] < mRegisters[rs])
+                        {
+                            imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                            mIp = imm32;
+                        }
+                        else
+                        {
+                            mIp += 2;
+                        }
+                        break;
+
+                    case Op.JC_LTU: // JC_LTU
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        if ((uint)mRegisters[rd] < (uint)mRegisters[rs])
+                        {
+                            imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                            mIp = imm32;
+                        }
+                        else
+                        {
+                            mIp += 2;
+                        }
+                        break;
+
+                    case Op.JPI: // JPI
+                        imm32 = ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                        mIp = imm32;
+                        break;
+
+                    case Op.JPR: // JPR
+                        rd = mProgramMemory[mIp++];
+                        mIp = mRegisters[rd];
+                        break;
+
+                    case Op.XB: // XB
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] = (int)(((mRegisters[rs] & 0x80) == 0) ?
                             ((uint)mRegisters[rs] & 0xff) :
                             ((uint)mRegisters[rs] | 0xffffff00));
-					break;
-				
-					case Op.XH: // XH
-						rd = mProgramMemory[mIp++];
-						rs = mProgramMemory[mIp++];
-						mRegisters[rd] = (int)(((mRegisters[rs]&0x8000) == 0) ?
+                        break;
+
+                    case Op.XH: // XH
+                        rd = mProgramMemory[mIp++];
+                        rs = mProgramMemory[mIp++];
+                        mRegisters[rd] = (int)(((mRegisters[rs] & 0x8000) == 0) ?
                             ((uint)mRegisters[rs] & 0xffff) :
                             ((uint)mRegisters[rs] | 0xffff0000));
-					break;
+                        break;
 
-					case Op.SYSCALL: // SYSCALL
-						imm32 = mProgramMemory[mIp++];
+                    case Op.SYSCALL: // SYSCALL
+                        imm32 = mProgramMemory[mIp++];
                         mSyscallInvoker.InvokeSyscall(imm32);
-					break;
-				
-					case Op.CASE: // CASE
-						rd = mProgramMemory[mIp++];
+                        break;
+
+                    case Op.CASE: // CASE
+                        rd = mProgramMemory[mIp++];
                         imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-						imm32 <<= 2;
+                        imm32 <<= 2;
                         uint caseStart = mDataMemory.ReadUInt32(imm32); //(uint)mDataMemory[imm32];
-                        uint caseLength = mDataMemory.ReadUInt32(imm32+4); //(uint)mDataMemory[imm32 + 1];
+                        uint caseLength = mDataMemory.ReadUInt32(imm32 + 4); //(uint)mDataMemory[imm32 + 1];
                         uint index = ((uint)mRegisters[rd] - (uint)caseStart);
                         if (index <= caseLength)
                         {
-                            int tableAddr = imm32 + 3*4; // 3*sizeof(int)
+                            int tableAddr = imm32 + 3 * 4; // 3*sizeof(int)
                             mIp = mDataMemory.ReadInt32(tableAddr + (int)index * 4); // mDataMemory[tableAddr + index];
                         }
                         else
@@ -860,147 +889,168 @@ namespace MoSync
                             int defaultCaseAddr = mDataMemory.ReadInt32(imm32 + 2 * 4); // mDataMemory[imm32 + 2]; // 2*sizeof(int)
                             mIp = defaultCaseAddr;
                         }
-					break;
-				
-				case Op.FAR: // FAR
-                    op = mProgramMemory[mIp++];
-					switch(op) {
-						case Op.CALLI: // CALLI
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mRegisters[Reg.RT] = mIp;
-                            mIp = imm32;		
-						break;
-						
-						case Op.JC_EQ: // JC_EQ
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        if (mRegisters[rd] == mRegisters[rs])
+                        break;
+
+                    case Op.FAR: // FAR
+                        op = mProgramMemory[mIp++];
+                        switch (op)
                         {
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mIp = imm32;
-						} else {
-                            mIp += 3;
-						}
-						break;
-						
-		
-						case Op.JC_NE: // JC_NE
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        if ((mRegisters[rd]) != (mRegisters[rs]))
-                        {
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mIp = imm32;
-						} else {
-                            mIp += 3;
-						}
-						break;
-				
-						case Op.JC_GE: // JC_GE
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        if (mRegisters[rd] >= mRegisters[rs])
-                        {
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mIp = imm32;
-						} else {
-                            mIp += 3;
-						}
-						break;
-				
-						case Op.JC_GEU: // JC_GEU
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        if (((uint)mRegisters[rd]) >= ((uint)mRegisters[rs]))
-                        {
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mIp = imm32;
-						} else {
-                            mIp += 3;
-						}			
-						break;
-				
-						case Op.JC_GT: // JC_GT
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        if (mRegisters[rd] > mRegisters[rs])
-                        {
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mIp = imm32;
-						} else {
-                            mIp += 3;
-						}
-						break;
-				
-						case Op.JC_GTU: // JC_GTU
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        if (((uint)mRegisters[rd]) > ((uint)mRegisters[rs]))
-                        {
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mIp = imm32;
-						} else {
-                            mIp += 3;
-						}	
-						break;
-				
-						case Op.JC_LE: // JC_LE
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        if (mRegisters[rd] <= mRegisters[rs])
-                        {
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mIp = imm32;
-						} else {
-                            mIp += 3;
-						}
-						break;						
-	
-						case Op.JC_LEU: // JC_LEU
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        if (((uint)mRegisters[rd]) <= ((uint)mRegisters[rs]))
-                        {
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mIp = imm32;
-						} else {
-                            mIp += 3;
-						}
-						break;
-				
-						case Op.JC_LT: // JC_LT
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        if (mRegisters[rd] < mRegisters[rs])
-                        {
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mIp = imm32;
-						} else {
-                            mIp += 3;
-						}
-						break;
-				
-						case Op.JC_LTU: // JC_LTU
-                        rd = mProgramMemory[mIp++];
-                        rs = mProgramMemory[mIp++];
-                        if (((uint)mRegisters[rd]) < ((uint)mRegisters[rs]))
-                        {
-                            imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                            mIp = imm32;
-						} else {
-                            mIp += 3;
-						}
-						break;
-				
-						case Op.JPI: // JPI
-                        imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
-                        mIp = imm32;
-						break;
-					}
-				break;
-					
-				}
-			}
-		}
-	}
+                            case Op.CALLI: // CALLI
+                                imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                mRegisters[Reg.RT] = mIp;
+                                mIp = imm32;
+                                break;
+
+                            case Op.JC_EQ: // JC_EQ
+                                rd = mProgramMemory[mIp++];
+                                rs = mProgramMemory[mIp++];
+                                if (mRegisters[rd] == mRegisters[rs])
+                                {
+                                    imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                    mIp = imm32;
+                                }
+                                else
+                                {
+                                    mIp += 3;
+                                }
+                                break;
+
+
+                            case Op.JC_NE: // JC_NE
+                                rd = mProgramMemory[mIp++];
+                                rs = mProgramMemory[mIp++];
+                                if ((mRegisters[rd]) != (mRegisters[rs]))
+                                {
+                                    imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                    mIp = imm32;
+                                }
+                                else
+                                {
+                                    mIp += 3;
+                                }
+                                break;
+
+                            case Op.JC_GE: // JC_GE
+                                rd = mProgramMemory[mIp++];
+                                rs = mProgramMemory[mIp++];
+                                if (mRegisters[rd] >= mRegisters[rs])
+                                {
+                                    imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                    mIp = imm32;
+                                }
+                                else
+                                {
+                                    mIp += 3;
+                                }
+                                break;
+
+                            case Op.JC_GEU: // JC_GEU
+                                rd = mProgramMemory[mIp++];
+                                rs = mProgramMemory[mIp++];
+                                if (((uint)mRegisters[rd]) >= ((uint)mRegisters[rs]))
+                                {
+                                    imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                    mIp = imm32;
+                                }
+                                else
+                                {
+                                    mIp += 3;
+                                }
+                                break;
+
+                            case Op.JC_GT: // JC_GT
+                                rd = mProgramMemory[mIp++];
+                                rs = mProgramMemory[mIp++];
+                                if (mRegisters[rd] > mRegisters[rs])
+                                {
+                                    imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                    mIp = imm32;
+                                }
+                                else
+                                {
+                                    mIp += 3;
+                                }
+                                break;
+
+                            case Op.JC_GTU: // JC_GTU
+                                rd = mProgramMemory[mIp++];
+                                rs = mProgramMemory[mIp++];
+                                if (((uint)mRegisters[rd]) > ((uint)mRegisters[rs]))
+                                {
+                                    imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                    mIp = imm32;
+                                }
+                                else
+                                {
+                                    mIp += 3;
+                                }
+                                break;
+
+                            case Op.JC_LE: // JC_LE
+                                rd = mProgramMemory[mIp++];
+                                rs = mProgramMemory[mIp++];
+                                if (mRegisters[rd] <= mRegisters[rs])
+                                {
+                                    imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                    mIp = imm32;
+                                }
+                                else
+                                {
+                                    mIp += 3;
+                                }
+                                break;
+
+                            case Op.JC_LEU: // JC_LEU
+                                rd = mProgramMemory[mIp++];
+                                rs = mProgramMemory[mIp++];
+                                if (((uint)mRegisters[rd]) <= ((uint)mRegisters[rs]))
+                                {
+                                    imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                    mIp = imm32;
+                                }
+                                else
+                                {
+                                    mIp += 3;
+                                }
+                                break;
+
+                            case Op.JC_LT: // JC_LT
+                                rd = mProgramMemory[mIp++];
+                                rs = mProgramMemory[mIp++];
+                                if (mRegisters[rd] < mRegisters[rs])
+                                {
+                                    imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                    mIp = imm32;
+                                }
+                                else
+                                {
+                                    mIp += 3;
+                                }
+                                break;
+
+                            case Op.JC_LTU: // JC_LTU
+                                rd = mProgramMemory[mIp++];
+                                rs = mProgramMemory[mIp++];
+                                if (((uint)mRegisters[rd]) < ((uint)mRegisters[rs]))
+                                {
+                                    imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                    mIp = imm32;
+                                }
+                                else
+                                {
+                                    mIp += 3;
+                                }
+                                break;
+
+                            case Op.JPI: // JPI
+                                imm32 = ((int)mProgramMemory[mIp++] << 16) | ((int)mProgramMemory[mIp++] << 8) | ((int)mProgramMemory[mIp++]);
+                                mIp = imm32;
+                                break;
+                        }
+                        break;
+
+                }
+            }
+        }
+    }
 }

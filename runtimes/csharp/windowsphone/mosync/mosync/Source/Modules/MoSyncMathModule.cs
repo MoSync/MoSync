@@ -52,11 +52,10 @@ namespace MoSync
 
             ioctls.atanh = delegate(double d)
             {
-                double value = (Math.Log(1.0 + d) - Math.Log(1.0 - d))/2.0;
-                return BitConverter.DoubleToInt64Bits(value); 
+                double value = (Math.Log(1.0 + d) - Math.Log(1.0 - d)) / 2.0;
+                return BitConverter.DoubleToInt64Bits(value);
             };
 
         }
-	}
+    }
 }
-

@@ -8,52 +8,61 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.GamerServices;
 
 namespace MoSync
-{	
-	class Util {
-		
-		public static uint NextPowerOfTwo(int minPow, uint val) {
-			uint i = (uint)(1 << minPow);
-			while(i < val) {
-				i <<= 1;		
-			}
-			return i;			
-		}
-		
-		public static sbyte StreamReadInt8(Stream stream) {
-			return (sbyte)stream.ReadByte();
-		}
-			
-		public static short StreamReadInt16(Stream stream) {
-			int a = stream.ReadByte();
-			int b = stream.ReadByte();
-			return (short)((b << 8) | a);			
-		}	
-		
-		public static int StreamReadInt32(Stream stream) {
-			int a = stream.ReadByte();
-			int b = stream.ReadByte();
-			int c = stream.ReadByte();
-			int d = stream.ReadByte();
-			return (d << 24) | (c << 16) | (b << 8) | a;			
-		}
-		
-		public static byte StreamReadUint8(Stream stream) {
-			return (byte)stream.ReadByte();
-		}
-			
-		public static ushort StreamReadUint16(Stream stream) {
-			int a = stream.ReadByte();
-			int b = stream.ReadByte();
-			return (ushort)((b << 8) | a);			
-		}	
-		
-		public static uint StreamReadUint32(Stream stream) {
-			int a = stream.ReadByte();
-			int b = stream.ReadByte();
-			int c = stream.ReadByte();
-			int d = stream.ReadByte();
-			return (uint)((d << 24) | (c << 16) | (b << 8) | a);			
-		}
+{
+    class Util
+    {
+
+        public static uint NextPowerOfTwo(int minPow, uint val)
+        {
+            uint i = (uint)(1 << minPow);
+            while (i < val)
+            {
+                i <<= 1;
+            }
+            return i;
+        }
+
+        public static sbyte StreamReadInt8(Stream stream)
+        {
+            return (sbyte)stream.ReadByte();
+        }
+
+        public static short StreamReadInt16(Stream stream)
+        {
+            int a = stream.ReadByte();
+            int b = stream.ReadByte();
+            return (short)((b << 8) | a);
+        }
+
+        public static int StreamReadInt32(Stream stream)
+        {
+            int a = stream.ReadByte();
+            int b = stream.ReadByte();
+            int c = stream.ReadByte();
+            int d = stream.ReadByte();
+            return (d << 24) | (c << 16) | (b << 8) | a;
+        }
+
+        public static byte StreamReadUint8(Stream stream)
+        {
+            return (byte)stream.ReadByte();
+        }
+
+        public static ushort StreamReadUint16(Stream stream)
+        {
+            int a = stream.ReadByte();
+            int b = stream.ReadByte();
+            return (ushort)((b << 8) | a);
+        }
+
+        public static uint StreamReadUint32(Stream stream)
+        {
+            int a = stream.ReadByte();
+            int b = stream.ReadByte();
+            int c = stream.ReadByte();
+            int d = stream.ReadByte();
+            return (uint)((d << 24) | (c << 16) | (b << 8) | a);
+        }
 
         public static double ConvertToDouble(int a, int b)
         {
@@ -87,26 +96,27 @@ namespace MoSync
 
         }
 
-		public static void Log(String text)
-		{
-			Console.Write(text);
+        public static void Log(String text)
+        {
+            Console.Write(text);
             InitLogging();
             WriteTextToFile(text, "log.txt");
-    	}
+        }
 
         public static void Log(byte[] bytes)
         {
             InitLogging();
             WriteBytesToFile(bytes, "log.txt");
         }
-		
-		public static void CriticalError(String text) {
-			Log(text);
-			//System.Environment.Exit(1);
+
+        public static void CriticalError(String text)
+        {
+            Log(text);
+            //System.Environment.Exit(1);
             //MessageBox.Show(text);
             Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
             //throw new Exception("ExitAppException");
-		}
+        }
 
         public static void Exit(int res)
         {
@@ -114,7 +124,7 @@ namespace MoSync
             throw new Exception("ExitAppException");
         }
 
-        public static int CreateExtent(int w, int h) 
+        public static int CreateExtent(int w, int h)
         {
             return (w << 16) | h;
         }
@@ -132,14 +142,14 @@ namespace MoSync
             }
         }
 
-        public static void WriteTextToFile(string message, string file, FileMode fileMode=FileMode.Append)
+        public static void WriteTextToFile(string message, string file, FileMode fileMode = FileMode.Append)
         {
             using (IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
             using (StreamWriter streamWriter = new StreamWriter(new IsolatedStorageFileStream(file, fileMode, isolatedStorage)))
             {
                 if (message != null)
                     streamWriter.Write(message);
-                    //streamWriter.WriteLine(message);
+                //streamWriter.WriteLine(message);
 
                 streamWriter.Close();
             }
@@ -150,11 +160,10 @@ namespace MoSync
             using (IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
             using (BinaryWriter binaryWriter = new BinaryWriter(new IsolatedStorageFileStream(file, fileMode, isolatedStorage)))
             {
-                if(bytes != null)
+                if (bytes != null)
                     binaryWriter.Write(bytes);
                 binaryWriter.Close();
             }
         }
-	}
+    }
 }
-

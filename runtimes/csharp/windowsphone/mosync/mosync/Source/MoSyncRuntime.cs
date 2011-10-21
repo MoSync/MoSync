@@ -32,7 +32,7 @@ namespace MoSync
 
     public class Event
     {
-        public Event(Memory eventData, Memory customEventData=null)
+        public Event(Memory eventData, Memory customEventData = null)
         {
             mEventData = eventData;
             mCustomEventData = customEventData;
@@ -75,7 +75,7 @@ namespace MoSync
         private AutoResetEvent mEventWaiter = new AutoResetEvent(false);
 
         //private test_mosync.MainPage mMainPage;
-      
+
         private void InitSyscalls()
         {
 
@@ -124,7 +124,7 @@ namespace MoSync
             else
                 return (T)ret;
         }
-  
+
         public Runtime(Core core)
         {
             mCore = core;
@@ -275,8 +275,8 @@ namespace MoSync
 
             uint numResources = ReadUnsignedVarInt(file);
             uint resSize = ReadUnsignedVarInt(file);
-            
-            
+
+
             mCurrentResourceHandle = 1;
 
             while (true)
@@ -358,4 +358,3 @@ namespace MoSync
         }
     }
 }
-

@@ -57,7 +57,7 @@ namespace MoSync
                         (byte)(mCurrentColor >> 16),
                         (byte)(mCurrentColor >> 8),
                         (byte)(mCurrentColor));
-                return oldColor&0xffffff;
+                return oldColor & 0xffffff;
             };
 
             syscalls.maSetClipRect = delegate(int x, int y, int w, int h)
@@ -95,7 +95,7 @@ namespace MoSync
             syscalls.maDrawText = delegate(int left, int top, int str)
             {
                 String text = core.GetDataMemory().ReadStringAtAddress(str);
-                
+
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     textBlock.Text = text;
@@ -127,7 +127,7 @@ namespace MoSync
             {
                 String text = core.GetDataMemory().ReadWStringAtAddress(str);
                 if (text.Length == 0) return;
-                
+
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     textBlock.Text = text;
@@ -225,7 +225,7 @@ namespace MoSync
                 Resource res = runtime.GetResource(MoSync.Constants.RT_IMAGE, handle);
                 BitmapSource src = (BitmapSource)res.GetInternalObject();
                 int w = 0, h = 0;
-                
+
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     w = src.PixelWidth;
@@ -267,7 +267,7 @@ namespace MoSync
                 Resource res = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, placeholder);
                 res.SetResourceType(MoSync.Constants.RT_IMAGE);
                 WriteableBitmap bitmap = null;
-               
+
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     bitmap = new WriteableBitmap(width, height);
@@ -330,22 +330,22 @@ namespace MoSync
                 const int MAFrameBufferInfo_supportsGfxSyscalls = 60;
 
                 Memory mem = core.GetDataMemory();
-                mem.WriteInt32(info+MAFrameBufferInfo_sizeInBytes, mBackBuffer.PixelWidth*mBackBuffer.PixelHeight*4);
-                mem.WriteInt32(info+MAFrameBufferInfo_bytesPerPixel, 4);
-                mem.WriteInt32(info+MAFrameBufferInfo_bitsPerPixel, 32);
-                mem.WriteUInt32(info+MAFrameBufferInfo_redMask, 0x00ff0000);
-                mem.WriteUInt32(info+MAFrameBufferInfo_redBits, 8);
-                mem.WriteUInt32(info+MAFrameBufferInfo_redShift, 16);
-                mem.WriteUInt32(info+MAFrameBufferInfo_greenMask, 0x0000ff00);
-                mem.WriteUInt32(info+MAFrameBufferInfo_greenBits, 8);
-                mem.WriteUInt32(info+MAFrameBufferInfo_greenShift, 8);
-                mem.WriteUInt32(info+MAFrameBufferInfo_blueMask, 0x000000ff);
-                mem.WriteUInt32(info+MAFrameBufferInfo_blueBits, 8);
-                mem.WriteUInt32(info+MAFrameBufferInfo_blueShift, 0);
-                mem.WriteInt32(info+MAFrameBufferInfo_width, mBackBuffer.PixelWidth);
-                mem.WriteInt32(info+MAFrameBufferInfo_height, mBackBuffer.PixelHeight);
-                mem.WriteInt32(info+MAFrameBufferInfo_pitch, mBackBuffer.PixelWidth*4);
-                mem.WriteUInt32(info+MAFrameBufferInfo_supportsGfxSyscalls, 0);
+                mem.WriteInt32(info + MAFrameBufferInfo_sizeInBytes, mBackBuffer.PixelWidth * mBackBuffer.PixelHeight * 4);
+                mem.WriteInt32(info + MAFrameBufferInfo_bytesPerPixel, 4);
+                mem.WriteInt32(info + MAFrameBufferInfo_bitsPerPixel, 32);
+                mem.WriteUInt32(info + MAFrameBufferInfo_redMask, 0x00ff0000);
+                mem.WriteUInt32(info + MAFrameBufferInfo_redBits, 8);
+                mem.WriteUInt32(info + MAFrameBufferInfo_redShift, 16);
+                mem.WriteUInt32(info + MAFrameBufferInfo_greenMask, 0x0000ff00);
+                mem.WriteUInt32(info + MAFrameBufferInfo_greenBits, 8);
+                mem.WriteUInt32(info + MAFrameBufferInfo_greenShift, 8);
+                mem.WriteUInt32(info + MAFrameBufferInfo_blueMask, 0x000000ff);
+                mem.WriteUInt32(info + MAFrameBufferInfo_blueBits, 8);
+                mem.WriteUInt32(info + MAFrameBufferInfo_blueShift, 0);
+                mem.WriteInt32(info + MAFrameBufferInfo_width, mBackBuffer.PixelWidth);
+                mem.WriteInt32(info + MAFrameBufferInfo_height, mBackBuffer.PixelHeight);
+                mem.WriteInt32(info + MAFrameBufferInfo_pitch, mBackBuffer.PixelWidth * 4);
+                mem.WriteUInt32(info + MAFrameBufferInfo_supportsGfxSyscalls, 0);
                 return 1;
             };
         }

@@ -12,7 +12,7 @@ namespace MoSync
         {
             public String Path
             {
-                get 
+                get
                 {
                     return mPath;
                 }
@@ -53,7 +53,7 @@ namespace MoSync
             public File(String path, FileAccess fileAccess)
             {
                 mPath = path;
-                mIsDirectory = mPath.Length==0 || mPath.EndsWith("\\");
+                mIsDirectory = mPath.Length == 0 || mPath.EndsWith("\\");
                 if (mIsDirectory && mPath.EndsWith("\\"))
                     mPath = mPath.Substring(0, mPath.Length - 1);
 
@@ -96,7 +96,7 @@ namespace MoSync
                 }
                 else
                 {
-                    if(mFileStream != null)
+                    if (mFileStream != null)
                         mFileStream.Close();
                 }
             }
@@ -203,7 +203,7 @@ namespace MoSync
                 if (fileStream == null)
                     return MoSync.Constants.MA_FERR_GENERIC;
                 Resource dataRes = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
-                Memory data = (Memory)dataRes.GetInternalObject(); 
+                Memory data = (Memory)dataRes.GetInternalObject();
                 byte[] bytes = new byte[_len];
                 data.ReadBytes(bytes, _offset, _len);
                 fileStream.Write(bytes, 0, _len);
@@ -261,7 +261,7 @@ namespace MoSync
             ioctls.maFileExists = delegate(int _file)
             {
                 File file = mFileHandles[_file];
-                return file.Exists?1:0;
+                return file.Exists ? 1 : 0;
             };
 
             ioctls.maFileCreate = delegate(int _file)

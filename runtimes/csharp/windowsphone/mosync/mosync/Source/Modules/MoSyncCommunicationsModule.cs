@@ -42,10 +42,10 @@ namespace MoSync
 
                 _socket.ConnectAsync(socketEventArg);
                 _clientDone.WaitOne();
-                if(socketError == SocketError.Success)
+                if (socketError == SocketError.Success)
                 {
                     mSockets.Add(_socket);
-                    return mSockets.Count-1;
+                    return mSockets.Count - 1;
                 }
                 else
                 {
@@ -89,7 +89,7 @@ namespace MoSync
                     Memory evt = new Memory(12);
                     evt.WriteInt32(MAConnEventData_handle, _conn);
                     evt.WriteInt32(MAConnEventData_opType, MoSync.Constants.CONNOP_READ);
-  
+
                     if (e.SocketError == SocketError.Success)
                     {
                         evt.WriteInt32(MAConnEventData_result, e.BytesTransferred);

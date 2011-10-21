@@ -7,17 +7,17 @@ using System;
 
 namespace MoSync
 {
-	public class Core
-	{	
-		public Core ()
-		{
-		}
-		
-		public void SetRuntime(Runtime runtime)
-		{
-			mRuntime = runtime;
-		}
-		
+    public class Core
+    {
+        public Core()
+        {
+        }
+
+        public void SetRuntime(Runtime runtime)
+        {
+            mRuntime = runtime;
+        }
+
         public void Start()
         {
             mRunning = true;
@@ -38,14 +38,15 @@ namespace MoSync
             return mDataMemory.ReadInt32(GetStackPointer() - offset);
         }
 
-		// will reset the program.
-		public void Init()
-		{
-		}
-		
-		public void Run() {
-			
-		}
+        // will reset the program.
+        public void Init()
+        {
+        }
+
+        public void Run()
+        {
+
+        }
 
         public Memory GetDataMemory()
         {
@@ -57,12 +58,11 @@ namespace MoSync
             return mCustomEventPointer;
         }
 
-		protected Runtime mRuntime = null;
+        protected Runtime mRuntime = null;
         protected Memory mDataMemory;
-		protected uint mDataSegmentSize;
-		protected uint mDataSegmentMask;
-		protected int mCustomEventPointer;
+        protected uint mDataSegmentSize;
+        protected uint mDataSegmentMask;
+        protected int mCustomEventPointer;
         protected bool mRunning = false;
-	}
+    }
 }
-
