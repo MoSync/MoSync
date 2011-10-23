@@ -6,8 +6,8 @@ description = MoSync C++ project configured to use STL (Standard Template Librar
 main.cpp
 
 [Settings]
-build.prefs:additional.include.paths/Debug=%mosync-home%/include/newlib/, %mosync-home%/include/newlib/stlport/
-build.prefs:additional.include.paths/Release=%mosync-home%/include/newlib/, %mosync-home%/include/newlib/stlport/
+build.prefs:additional.include.paths/Debug=%mosync-home%/include/newlib/stlport/, %mosync-home%/include/newlib/
+build.prefs:additional.include.paths/Release=%mosync-home%/include/newlib/stlport/, %mosync-home%/include/newlib/
 build.prefs:additional.library.paths/Debug=%mosync-home%/lib/newlib_debug/
 build.prefs:additional.library.paths/Release=%mosync-home%/lib/newlib_release/
 build.prefs:additional.libraries/Debug=newlib.lib, stlport.lib

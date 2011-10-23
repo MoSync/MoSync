@@ -7,7 +7,44 @@
 <center>The essential guide to MoSync syscalls and libraries</center>
 <br>
 
+
+
 <table style="border-color: lightgrey;">
+<tr style="background-color: #C84A29;">
+<td colspan="2">
+<span style="color: rgb(255, 255, 255);"><strong>HTML5 Support Library</strong></span>
+
+
+</td>
+
+<td>
+<span style="color: rgb(255, 255, 255);"><strong>Classes</strong></span>
+</td>
+<td>
+<span style="color: rgb(255, 255, 255);"><strong>Libraries</strong></span>
+</td>
+<td>
+<strong><span style="color: rgb(255, 255, 255);">See also</span><br>
+</strong>
+</td>
+</tr>
+
+<tr style="background-color: #ffc8b9;">
+<td>
+<strong>Wormhole</strong>
+</td>
+<td><a href="http://www.mosync.com/documentation/manualpages/how-communicate-between-javascript-and-c-mosync"  target="_blank"> Communication between JavaScript and C++</a></td>
+<td>
+Wormhole::WebAppMoblet, Wormhole::WebViewMessage, Wormhole::FileUtil
+</td>
+<td>
+\ref 	WormHoleGroup
+</td>
+<td>
+<a href="http://www.mosync.com/content/html5-javascript-wormhole"  target="_blank">User guides and online resources</a>
+</td>
+</tr>
+
 <tr style="background-color: rgb(53, 28, 117);">
 <td colspan="2">
 <span style="color: rgb(255, 255, 255);"><strong>MoSync-Specific Functions</strong></span>
@@ -294,9 +331,9 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 </td>
 <td>maWidgetCreate(), maWidgetDestroy(), maWidgetAddChild(), maWidgetInsertChild(), maWidgetRemoveChild(), maWidgetScreenShow(), maWidgetStackScreenPush(), maWidgetStackScreenPop(), maWidgetSetProperty(), maWidgetGetProperty()<br>
 </td>
-<td>IX_WIDGET.h<br>
+<td>IX_WIDGET.h<br> NativeUI <br>
 </td>
-<td>\ref WidgetAPI "Widget API"<br>
+<td>\ref WidgetAPI "Widget API"<br> \ref NativeUILib <br>
 </td>
 </tr>
 
@@ -453,7 +490,8 @@ MAUtil::DataHandler, MAUtil::PlaceholderPool
 <td>MAUtil::Vector, MAUtil::String, MAUtil::HashMap, MAUtil::Map, MAUtil::Set, MAUtil::List,<br>
 \ref MAUtil/Geometry.h, \ref MAUtil/util.h<br>
 </td>
-<td>SGI Standard Template Library (STL) documentation: <a href="http://www.sgi.com/tech/stl/table_of_contents.html" class="el">SGI Standard Template Library (STL) documentation</a>
+<td>
+<a href="http://www.sgi.com/tech/stl/table_of_contents.html" class="el">SGI Standard Template Library (STL) documentation</a>
 </td>
 </tr>
 <tr style="background-color: rgb(249, 203, 156);">

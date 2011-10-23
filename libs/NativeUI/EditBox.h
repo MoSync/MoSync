@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NativeUILib
+ *  @{
+ */
+
+/**
+ *  @defgroup NativeUILib Native UI Library
+ *  @{
+ */
+
 /**
  * @file EditBox.h
  * @author Bogdan Iusco
@@ -132,3 +141,5 @@ namespace NativeUI
 } // namespace NativeUI
 
 #endif /* NATIVEUI_EDITBOX_H_ */
+
+/*! @} */
