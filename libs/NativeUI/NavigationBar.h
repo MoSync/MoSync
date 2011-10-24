@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NativeUILib
+ *  @{
+ */
+
+/**
+ *  @defgroup NativeUILib Native UI Library
+ *  @{
+ */
+
 /**
  * @file NavigationBar.h
  * @author Emma Tresanszki
@@ -37,11 +46,10 @@ namespace NativeUI
     /**
      * \brief A navigation bar is an iPhone specific widget that shows a nav bar
      * with an optional title, back button and icon.
-     * The default background color is light blue gradient.
-     * The appearance depends on the platform:
-     *  - on iOS it can have a back button on the left.
-     *  - on Android there's no extra button, the device's back button is used
-     *  instead.
+     * The default background color is light blue gradient. The appearance depends on the platform:
+     * -on iOS it can have a back button on the left.
+     * -on Android there's no extra button, the device's back button is used
+     * instead.
      *
      */
     class NavigationBar : public Widget
@@ -175,3 +183,5 @@ namespace NativeUI
 } // namespace NativeUI
 
 #endif
+
+/*! @} */

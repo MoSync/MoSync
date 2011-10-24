@@ -25,3 +25,8 @@ if(HOST == :win32)
 else
 	sh 'doxygen'
 end
+
+rm_rf('../docs/xml')
+rm_rf('../docs/html')
+mv('xml', '../docs')
+mv('html', '../docs')

@@ -199,7 +199,7 @@ void comparison_functors()
 	log_to_console(array1, arraySize1, "array1 contains: ");
 
 	int array2[] = { 10, 20, -1 };
-	int arraySize2 = sizeof(array2)/sizeof(array2[0]);
+	//int arraySize2 = sizeof(array2)/sizeof(array2[0]);
 	log_to_console(array2, arraySize1, "array2 contains: ");
 	log_to_console("\n");
 
@@ -400,7 +400,7 @@ void STLMoblet::STL_functors()
 	LOG("*					 minus ( binary function <=> arg1 -  arg2 )");
 	LOG("*					 multiplies ( binary function <=> arg1 *  arg2 )");
 	LOG("*					 divides ( binary function <=> arg1 /  arg2 )");
-	LOG("*					 moduluS ( binary function <=> arg1 %  arg2 )");
+	LOG("*					 moduluS ( binary function <=> arg1 %%  arg2 )");
 	LOG("*					 negate ( unary function <=> -arg )");
 	LOG("*");
 	LOG("* 		- comparison operations: equal_to ( binary predicate <=> arg1 ==  arg2 )");

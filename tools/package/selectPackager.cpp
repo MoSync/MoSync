@@ -105,14 +105,12 @@ static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 	// read file
 	ifstream file(filename);
 	setName(file, filename);
-	if(!file.good())
-		return false;
+	beGood(file);
 	string line;
 	getline(file, line);
 	if(line[line.length()-1] == '\r')
 		line = line.erase(line.length()-1, 1);
-	if(!file.good())
-		return false;
+	beGood(file);
 
 	// swap backslashes
 	toSlashes(line);

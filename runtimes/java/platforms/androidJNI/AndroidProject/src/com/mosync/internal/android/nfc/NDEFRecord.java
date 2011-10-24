@@ -2,12 +2,13 @@ package com.mosync.internal.android.nfc;
 
 import java.nio.ByteBuffer;
 
+import android.nfc.FormatException;
 import android.nfc.NdefRecord;
 
 
-public class NDEFRecord extends ResourceBase {
+public class NDEFRecord extends ResourceBase implements ISizeHolder {
 
-	private final NdefRecord delegate;
+	private NdefRecord delegate;
 	private byte[] id;
 	private byte[] payload;
 	private byte[] type;
@@ -36,8 +37,11 @@ public class NDEFRecord extends ResourceBase {
 		this.tnf = new Short((short) 0);
 	}
 
-	int maNFCGetId(ByteBuffer result) {
+	int getId(ByteBuffer result) {
 		byte[] id = internalGetId();
+		if (result == null) {
+			return id.length;
+		}
 		int size = Math.min(result.remaining(), id.length);
 		result.put(id, 0, size);
 		return size;
@@ -47,13 +51,16 @@ public class NDEFRecord extends ResourceBase {
 		return this.id == null ? delegate.getId() : this.id;
 	}
 
-	void maNFCSetId(ByteBuffer id) {
+	void setId(ByteBuffer id) {
 		this.id = new byte[id.limit()];
 		id.get(this.id);
 	}
 
-	int maNFCGetPayload(ByteBuffer result) {
+	int getPayload(ByteBuffer result) {
 		byte[] payload = internalGetPayload();
+		if (result == null) {
+			return payload.length;
+		}
 		int size = Math.min(result.remaining(), payload.length);
 		result.put(payload, 0, size);
 		return size;
@@ -63,21 +70,24 @@ public class NDEFRecord extends ResourceBase {
 		return this.payload == null ? delegate.getPayload() : this.payload;
 	}
 
-	void maNFCSetPayload(ByteBuffer payload) {
+	void setPayload(ByteBuffer payload) {
 		this.payload = new byte[payload.limit()];
 		payload.get(this.payload);
 	}
 
-	int maNFCGetTnf() {
+	int getTnf() {
 		return tnf == null ? delegate.getTnf() : tnf;
 	}
 
-	void maNFCSetTnf(short tnf) {
+	void setTnf(short tnf) {
 		this.tnf = tnf;
 	}
 
-	int maNFCGetType(ByteBuffer result) {
+	int getType(ByteBuffer result) {
 		byte[] type = internalGetType();
+		if (result == null) {
+			return type.length;
+		}
 		int size = Math.min(result.remaining(), type.length);
 		result.put(type, 0, size);
 		return size;
@@ -87,17 +97,46 @@ public class NDEFRecord extends ResourceBase {
 		return this.type == null ? delegate.getType() : this.type;
 	}
 
-	void maNFCSetType(ByteBuffer type) {
+	void setType(ByteBuffer type) {
 		this.type = new byte[type.limit()];
 		type.get(this.type);
 	}
 
+	int setRaw(ByteBuffer raw) {
+		byte[] rawData = new byte[raw.limit()];
+		try {
+			NdefRecord rawRecord = new NdefRecord(rawData);
+			initFromNativeNDEFRecord(rawRecord);
+			return rawData.length;
+		} catch (FormatException e) {
+			return 0;
+		}
+	}
+
+	void getRaw(ByteBuffer raw) {
+
+	}
+
+	void initFromNativeNDEFRecord(NdefRecord delegate) {
+		this.tnf = null;
+		this.id = null;
+		this.payload = null;
+		this.type = null;
+		this.delegate = delegate;
+	}
+
 	public NdefRecord toNativeNDEFRecord() {
-		short tnf = (short) maNFCGetTnf();
+		short tnf = (short) getTnf();
 		byte[] type = internalGetType();
 		byte[] id = internalGetId();
 		byte[] payload = internalGetPayload();
 		return new NdefRecord(tnf, type, id, payload);
+	}
+
+	@Override
+	public int getSize() {
+		// TODO Not very efficient, right?
+		return toNativeNDEFRecord().toByteArray().length;
 	}
 
 }

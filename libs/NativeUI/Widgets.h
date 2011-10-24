@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NativeUILib
+ *  @{
+ */
+
+/**
+ *  @defgroup NativeUILib Native UI Library
+ *  @{
+ */
+
 /**
  * @file Widgets.h
  * @author Mikael Kindborg
@@ -77,3 +86,5 @@ MA 02110-1301, USA.
 #include "WidgetEventListener.h"
 
 #endif
+
+/*! @} */

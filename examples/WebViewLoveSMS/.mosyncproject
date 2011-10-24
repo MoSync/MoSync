@@ -3,18 +3,18 @@
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
-<property key="android:package.name" value="com.mosync.lovesms"/>
+<property key="android:package.name" value="com.mosync.webviewlovesms"/>
 <property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
 <property key="build.prefs:additional.libraries" value="mastd.lib"/>
-<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, josyncD.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib, josync.lib"/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib, NativeUID.lib, MAFSD.lib, WormholeD.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, NativeUI.lib, MAFS.lib, Wormhole.lib"/>
 <property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Debug" value=""/>
 <property key="build.prefs:additional.library.paths/Release" value=""/>
 <property key="build.prefs:app.name/Debug" value="WebViewLoveSMS"/>
-<property key="build.prefs:app.name/Release" value="LoveSMS"/>
+<property key="build.prefs:app.name/Release" value="WebViewLoveSMS"/>
 <property key="build.prefs:app.permissions" value="File\ Storage File\ Storage/Read File\ Storage/Write SMS/Send"/>
 <property key="build.prefs:app.vendor/Debug" value="MoSync"/>
 <property key="build.prefs:app.vendor/Release" value="MoSync"/>

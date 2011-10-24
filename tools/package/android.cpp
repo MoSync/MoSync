@@ -167,7 +167,7 @@ static void sign(const SETTINGS& s, const RuntimeInfo& ri, string& unsignedApk, 
 		keypass = s.androidKeyPass;
 	} else {
 		if (!s.silent) {
-			printf("Android: No certficate provided, falling back to default signing options");
+			printf("Android: No certificate provided, falling back to default signing options");
 		}
 		if(isDirectory(keystore.c_str()) < 0) {	// does not exist
 			// create default keystore
@@ -211,7 +211,6 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 		directories.push_back("/res/drawable");
 
 		if (ri.androidVersion >= 4) {
-			printf("Multiple screen support not yet impl!");
 			// For Android >= 1.6
 			//36x36 for low-density (ldpi)
 			//48x48 for medium-density (mdpi)
@@ -236,7 +235,7 @@ static void injectIcons(const SETTINGS& s, const RuntimeInfo& ri) {
 			string outputDir = string(s.dst) + directories.at(i);
 			_mkdir(outputDir.c_str());
 			string outputIcon = outputDir + "/icon.png";
-			injectIcon("android", size.c_str(), s.icon, outputIcon.c_str(), s.silent);
+			injectIcon("android", size.c_str(), s.icon, file(outputIcon).c_str(), s.silent);
 		}
 	}
 }
@@ -259,7 +258,7 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 	ofstream file(filename, ios::binary);
 	file <<"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
 		<<"<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\"\n"
-		<<"\tpackage=\"" << packageName << "\" >\n"
+		<<"\tpackage=\"" << packageName << "\"\n"
 		<<"\tandroid:versionCode=\"" << versionCode << "\"\n"
 		<<"\tandroid:versionName=\"" << version << "\">\n"
 		<<"\t<application\n";

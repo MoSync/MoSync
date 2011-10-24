@@ -3,6 +3,8 @@
 
 require File.expand_path('../../rules/mosync_lib.rb')
 
+raise unless(USE_NEWLIB)
+
 work = PipeLibWork.new
 work.instance_eval do
 	def collect_files(ending, ignoreSourceFiles = 'nil')
@@ -13,7 +15,7 @@ work.instance_eval do
 		if(defined?(@IGNORED_HEADERS))
 			files.reject! {|file| @IGNORED_HEADERS.member?(File.basename(file)) }
 		end
-		files.reject! {|file| File.directory?(file) }
+		files.reject! {|file| File.directory?(file) || file.getExt == '.rb' }
 		return files.collect do |file| FileTask.new(self, file) end
 	end
 
@@ -22,11 +24,11 @@ work.instance_eval do
 		# create a bunch of CopyFileTasks, then invoke them all.
 		endings.each do |ending|
 			collect_files(ending, '.c').each do |ending|
-			task = CopyFileTask.new(self, dir + "/" + File.basename(ending.to_s), ending)
-			@prerequisites = [task] + @prerequisites
+				task = CopyFileTask.new(self, dir + "/" + File.basename(ending.to_s), ending)
+				@prerequisites = [task] + @prerequisites
+			end
 		end
-	end
-	@prerequisites = [DirTask.new(self, dir)] + @prerequisites
+		@prerequisites = [DirTask.new(self, dir)] + @prerequisites
 	end
 
 	def copyFilesCrtDir(name)
@@ -63,14 +65,6 @@ work.instance_eval do
 		copyFilesSubDir("stlport", "stl/pointers")
 		copyFilesSubDir("stlport", "using")
 		copyFilesSubDir("stlport", "using/h")
-
-		if(USE_NEWLIB)
-			@prerequisites << DirTask.new(self, mosync_include + "/" + "newlib" + "/new")
-			@prerequisites << CopyFileTask.new(self, mosync_include + "/" + "newlib" + "/new",
-				FileTask.new(self, "../libsupc++/new"))
-			@prerequisites << CopyFileTask.new(self, mosync_include + "/" + "newlib" + "/macpp.h",
-				FileTask.new(self, "../libsupc++/macpp.h"))
-		end
 
 		@HEADER_DIRS = ["."]
 

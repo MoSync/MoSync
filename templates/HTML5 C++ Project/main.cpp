@@ -6,11 +6,12 @@
  */
 
 // Include Moblet for web applications.
-#include <josync/WebAppMoblet.h>
+#include <Wormhole/WebAppMoblet.h>
 
 // Namespaces we want to access.
 using namespace MAUtil; // Class Moblet
-using namespace josync; // Class WebAppMoblet
+using namespace NativeUI; // WebView widget.
+using namespace Wormhole; // Class WebAppMoblet
 
 /**
  * The application class.
@@ -36,10 +37,18 @@ public:
 	}
 
 	/**
-	 * Here we handle messages sent from JavaScript.
+	 * This method handles messages sent from the WebView.
+	 * @param webView The WebView that sent the message.
+	 * @param urlData Data object that holds message content.
+	 * Note that the data object will be valid only during
+	 * the life-time of the call of this method, then it
+	 * will be deallocated.
 	 */
-	void handleWebViewMessage(WebViewMessage& message)
+	void handleWebViewMessage(WebView* webView, MAHandle urlData)
 	{
+		// Create message object. This parses the message.
+		WebViewMessage message(webView, urlData);
+
 		if (message.is("Vibrate"))
 		{
 			// Make device vibrate for half a second.
@@ -47,6 +56,10 @@ public:
 			// regardless of the time parameter value.
 			maVibrate(500);
 		}
+
+		// Tell the WebView that we have processed the message, so that
+		// it can send the next one.
+		callJS("bridge.messagehandler.processedMessage()");
 	}
 };
 

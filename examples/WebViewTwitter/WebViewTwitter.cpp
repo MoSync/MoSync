@@ -30,22 +30,51 @@ MA 02110-1301, USA.
  * in JavaScript.
  */
 
-#include <josync/WebAppMoblet.h>	// Moblet for web applications.
+#include <Wormhole/WebAppMoblet.h>	// Moblet for web applications.
+#include "MessageHandler.h"
 
 using namespace MAUtil;
-using namespace josync;
+using namespace NativeUI;
+using namespace Wormhole;
 
 /**
  * The application class.
  */
 class TwitterMoblet : public WebAppMoblet
 {
+private:
+	/**
+	 * Object that handles messages from JavaScript.
+	 */
+	MessageHandler mMessageHandler;
+
 public:
 	TwitterMoblet()
 	{
 		enableWebViewMessages();
 		getWebView()->disableZoom();
 		showPage("index.html");
+	}
+
+	/**
+	 * This method handles messages sent from the WebView.
+	 * @param webView The WebView that sent the message.
+	 * @param urlData Data object that holds message content.
+	 * Note that the data object will be valid only during
+	 * the life-time of the call of this method, then it
+	 * will be deallocated.
+	 */
+	void handleWebViewMessage(WebView* webView, MAHandle urlData)
+	{
+		// Create message object. This parses the message.
+		WebViewMessage message(webView, urlData);
+
+		// Let the message handler handle the message.
+		mMessageHandler.handleMessage(message);
+
+		// Tell the WebView that we have processed the message, so that
+		// it can send the next one.
+		callJS("bridge.messagehandler.processedMessage()");
 	}
 };
 // End of class TwitterMoblet

@@ -52,11 +52,11 @@ MA 02110-1301, USA.
 #include <maheap.h>					// C memory allocation functions.
 #include <mastring.h>				// C String functions.
 #include <mavsprintf.h>				// sprintf etc.
-#include <josync/WebAppMoblet.h>	// Moblet for web applications.
+#include <Wormhole/WebAppMoblet.h>	// Moblet for web applications.
 
 using namespace MAUtil;
 using namespace NativeUI;
-using namespace josync;
+using namespace Wormhole;
 
 /**
  * Set to true to actually send SMS.
@@ -76,6 +76,40 @@ public:
 		enableWebViewMessages();
 		getWebView()->disableZoom();
 		showPage("PageMain.html");
+	}
+
+	/**
+	 * This method handles messages sent from the WebView.
+	 * @param webView The WebView that sent the message.
+	 * @param urlData Data object that holds message content.
+	 * Note that the data object will be valid only during
+	 * the life-time of the call of this method, then it
+	 * will be deallocated.
+	 */
+	void handleWebViewMessage(WebView* webView, MAHandle urlData)
+	{
+		// Create message object. This parses the message.
+		WebViewMessage message(webView, urlData);
+
+		// Handle the message.
+		if (message.is("SendSMS"))
+		{
+			// Save phone no and send SMS.
+			savePhoneNoAndSendSMS(
+				message.getParam("phoneNo"),
+				message.getParam("message"));
+		}
+		else if (message.is("PageLoaded"))
+		{
+			// Load and set saved phone number.
+			// We could implement a JavaScript File API to do
+			// this, which would be a much more general way.
+			setSavedPhoneNo();
+		}
+
+		// Tell the WebView that we have processed the message, so that
+		// it can send the next one.
+		callJS("bridge.messagehandler.processedMessage()");
 	}
 
 	/**
@@ -108,27 +142,6 @@ public:
 					callJSFunction("SMSNotDelivered");
 				}
 				break;
-		}
-	}
-
-	/**
-	 * Here we handle messages sent from JavaScript.
-	 */
-	void handleWebViewMessage(WebViewMessage& message)
-	{
-		if (message.is("SendSMS"))
-		{
-			// Save phone no and send SMS.
-			savePhoneNoAndSendSMS(
-				message.getParam("phoneNo"),
-				message.getParam("message"));
-		}
-		else if (message.is("PageLoaded"))
-		{
-			// Load and set saved phone number.
-			// We could implement a JavaScript File API to do
-			// this, which would be a much more general way.
-			setSavedPhoneNo();
 		}
 	}
 

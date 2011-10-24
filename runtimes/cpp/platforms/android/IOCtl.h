@@ -792,6 +792,8 @@ namespace Base
 
 	int _maNFCTransceive(MAHandle tagHandle, int src, int srcLen, int dst, int dstLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maNFCGetSize(MAHandle tagHandle, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maNFCReadNDEFMessage(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNFCWriteNDEFMessage(MAHandle tag, MAHandle ndefMessage, JNIEnv* jNIEnv, jobject jThis);
@@ -804,37 +806,37 @@ namespace Base
 
 	int _maNFCGetNDEFRecordCount(MAHandle ndef, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCGetId(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCGetNDEFId(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCGetPayload(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCGetNDEFPayload(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCGetTnf(MAHandle ndefRecord, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCGetNDEFTnf(MAHandle ndefRecord, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCGetType(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCGetNDEFType(MAHandle ndefRecord, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCSetId(MAHandle ndefRecord, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCSetNDEFId(MAHandle ndefRecord, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCSetPayload(MAHandle ndefRecord, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCSetNDEFPayload(MAHandle ndefRecord, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCSetTnf(MAHandle ndefRecord, int tnf, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCSetNDEFTnf(MAHandle ndefRecord, int tnf, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCSetType(MAHandle ndefRecord, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCSetNDEFType(MAHandle ndefRecord, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCAuthenticateSector(MAHandle mfcTag, int keyType, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCAuthenticateMifareSector(MAHandle mfcTag, int keyType, int sectorIndex, int keyAddr, int keyLen, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCGetSectorCount(MAHandle mfcTag, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCGetMifareSectorCount(MAHandle mfcTag, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCGetBlockCountInSector(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCGetMifareBlockCountInSector(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCSectorToBlock(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCMifareSectorToBlock(MAHandle mfcTag, int sectorIndex, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCReadBlocks(MAHandle mfcTag, int firstBlock, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCReadMifareBlocks(MAHandle mfcTag, int firstBlock, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCReadPages(MAHandle mfcTag, int firstPage, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCReadMifarePages(MAHandle mfcTag, int firstPage, int dst, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCWriteBlocks(MAHandle mfcTag, int firstBlock, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCWriteMifareBlocks(MAHandle mfcTag, int firstBlock, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNFCWritePages(MAHandle mfcTag, int firstPage, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
+	int _maNFCWriteMifarePages(MAHandle mfcTag, int firstPage, int src, int len, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNFCSetReadOnly(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 

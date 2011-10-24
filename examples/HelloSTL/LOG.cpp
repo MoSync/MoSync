@@ -69,7 +69,7 @@ void log_to_console(std::string *array, int arraySize, const std::string &msg)
 void log_to_console(const std::vector<int> &v, const std::string &msg)
 {
 	std::string final_msg = msg;
-	for(int i=0; i < v.size(); ++i)
+	for(size_t i=0; i < v.size(); ++i)
 	{
 		char buf[10];
 		itoa( v[i], buf, 10);
@@ -121,7 +121,7 @@ void log_to_console(const std::multiset<int> &ms, const std::string &msg)
 void log_to_console(const std::deque<int> &d, const std::string &msg)
 {
 	std::string final_msg = msg;
-	for(int i=0; i < d.size(); ++i)
+	for(size_t i=0; i < d.size(); ++i)
 	{
 		char buf[10];
 		itoa( d[i], buf, 10);
@@ -134,7 +134,7 @@ void log_to_console(const std::deque<int> &d, const std::string &msg)
 void log_to_console(const std::vector<char> &v, const std::string &msg)
 {
 	std::string final_msg = msg;
-	for(int i=0; i < v.size(); ++i)
+	for(size_t i=0; i < v.size(); ++i)
 	{
 		final_msg.append(1, v[i]);
 		final_msg += " ";
@@ -145,7 +145,7 @@ void log_to_console(const std::vector<char> &v, const std::string &msg)
 void log_to_console(const std::vector<Employee> &v, const std::string &msg)
 {
 	std::string final_msg = msg;
-	for(int i=0; i<v.size(); ++i)
+	for(size_t i=0; i<v.size(); ++i)
 	{
 		final_msg += v[i].getName();
 		final_msg += "( exp: ";
@@ -198,7 +198,7 @@ void log_to_console(Employee *array, int arraySize, const std::string &msg)
 void log_to_console(const std::deque<char> &d, const std::string &msg)
 {
 	std::string final_msg = msg;
-	for(int i=0; i < d.size(); ++i)
+	for(size_t i=0; i < d.size(); ++i)
 	{
 		final_msg.append(1, d[i]);
 		final_msg += " ";
@@ -284,11 +284,11 @@ void log_to_console(unsigned long u, const std::string &msg )
 {
 	if(msg.size()>0)
 	{
-		LOG("%s %l ", msg.c_str(), u);
+		LOG("%s %lu ", msg.c_str(), u);
 	}
 	else
 	{
-		LOG("%l ", u);
+		LOG("%lu ", u);
 	}
 }
 

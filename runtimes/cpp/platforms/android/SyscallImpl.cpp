@@ -27,7 +27,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <jni.h>
 #include <GLES/gl.h>
+#ifndef _android_1
 #include <GLES2/gl2.h>
+#endif
 
 #include "helpers/CPP_IX_AUDIOBUFFER.h"
 #include "helpers/CPP_IX_OPENGL_ES.h"
@@ -1267,18 +1269,20 @@ return 0; \
             void* src = GVMR(stringsArray[i], MAAddress);
             strCopies[i] = (GLchar*)src;
         }
-
+#ifndef _android_1
         glShaderSource(shader, count, strCopies, length);
+#endif
         delete strCopies;
     }
 
     void wrap_glGetVertexAttribPointerv(GLuint index, GLenum pname, void* pointer) {
         GLvoid* outPointer;
+#ifndef _android_1
         glGetVertexAttribPointerv(index, pname, &outPointer);
 
         if(pname != GL_VERTEX_ATTRIB_ARRAY_POINTER)
             return;
-
+#endif
         *(int*)pointer = gSyscall->TranslateNativePointerToMoSyncPointer(outPointer);
     }
 
@@ -1341,7 +1345,9 @@ return 0; \
 		{
 		maIOCtl_IX_OPENGL_ES_caselist
 		maIOCtl_IX_GL1_caselist
+#ifndef _android_1
 		maIOCtl_IX_GL2_caselist
+#endif
 	//	maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist
 
 		case maIOCtl_maWriteLog:
@@ -2309,6 +2315,9 @@ return 0; \
 					mJThis);
 		}
 
+		case maIOCtl_maNFCGetSize:
+			return _maNFCGetSize(a, mJNIEnv, mJThis);
+
 		case maIOCtl_maNFCGetNDEFMessage:
 			return _maNFCGetNDEFMessage(a, mJNIEnv, mJThis);
 
@@ -2327,8 +2336,8 @@ return 0; \
 		case maIOCtl_maNFCGetNDEFRecordCount:
 			return _maNFCGetNDEFRecordCount(a, mJNIEnv, mJThis);
 
-		case maIOCtl_maNFCGetId:
-			return _maNFCGetId(
+		case maIOCtl_maNFCGetNDEFId:
+			return _maNFCGetNDEFId(
 				a,
 				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
 				c,
@@ -2336,8 +2345,8 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maNFCGetPayload:
-			return _maNFCGetPayload(
+		case maIOCtl_maNFCGetNDEFPayload:
+			return _maNFCGetNDEFPayload(
 				a,
 				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
 				c,
@@ -2345,23 +2354,14 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maNFCGetTnf:
-			return _maNFCGetTnf(
+		case maIOCtl_maNFCGetNDEFTnf:
+			return _maNFCGetNDEFTnf(
 				a,
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maNFCGetType:
-			return _maNFCGetType(
-				a,
-				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
-				c,
-				(int)gCore->mem_ds,
-				mJNIEnv,
-				mJThis);
-
-		case maIOCtl_maNFCSetId:
-			return _maNFCSetId(
+		case maIOCtl_maNFCGetNDEFType:
+			return _maNFCGetNDEFType(
 				a,
 				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
 				c,
@@ -2369,8 +2369,8 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maNFCSetPayload:
-			return _maNFCSetPayload(
+		case maIOCtl_maNFCSetNDEFId:
+			return _maNFCSetNDEFId(
 				a,
 				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
 				c,
@@ -2378,15 +2378,24 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maNFCSetTnf:
-			return _maNFCSetTnf(
+		case maIOCtl_maNFCSetNDEFPayload:
+			return _maNFCSetNDEFPayload(
+				a,
+				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
+				c,
+				(int)gCore->mem_ds,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maNFCSetNDEFTnf:
+			return _maNFCSetNDEFTnf(
 				a,
 				b,
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maNFCSetType:
-			return _maNFCSetType(
+		case maIOCtl_maNFCSetNDEFType:
+			return _maNFCSetNDEFType(
 				a,
 				(int) SYSCALL_THIS->GetValidatedMemRange( b, c * sizeof(byte)),
 				c,
@@ -2394,11 +2403,11 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maNFCAuthenticateSector:
+		case maIOCtl_maNFCAuthenticateMifareSector:
 		{
 			int keyAddr = SYSCALL_THIS->GetValidatedStackValue(0);
 			int keyLen = SYSCALL_THIS->GetValidatedStackValue(4);
-			return _maNFCAuthenticateSector(
+			return _maNFCAuthenticateMifareSector(
 					a,
 					b,
 					c,
@@ -2409,30 +2418,30 @@ return 0; \
 					mJThis);
 		}
 
-		case maIOCtl_maNFCGetSectorCount:
-			return _maNFCGetSectorCount(
+		case maIOCtl_maNFCGetMifareSectorCount:
+			return _maNFCGetMifareSectorCount(
 					a,
 					mJNIEnv,
 					mJThis);
 
-		case maIOCtl_maNFCGetBlockCountInSector:
-			return _maNFCGetBlockCountInSector(
+		case maIOCtl_maNFCGetMifareBlockCountInSector:
+			return _maNFCGetMifareBlockCountInSector(
 					a,
 					b,
 					mJNIEnv,
 					mJThis);
 
-		case maIOCtl_maNFCSectorToBlock:
-			return _maNFCSectorToBlock(
+		case maIOCtl_maNFCMifareSectorToBlock:
+			return _maNFCMifareSectorToBlock(
 				a,
 				b,
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maNFCReadBlocks:
+		case maIOCtl_maNFCReadMifareBlocks:
 		{
 			int len = SYSCALL_THIS->GetValidatedStackValue(0);
-			return _maNFCReadBlocks(
+			return _maNFCReadMifareBlocks(
 					a,
 					b,
 					(int) SYSCALL_THIS->GetValidatedMemRange( c, len * sizeof(byte)),
@@ -2442,10 +2451,10 @@ return 0; \
 					mJThis);
 		}
 
-		case maIOCtl_maNFCReadPages:
+		case maIOCtl_maNFCReadMifarePages:
 		{
 			int len = SYSCALL_THIS->GetValidatedStackValue(0);
-			return _maNFCReadPages(
+			return _maNFCReadMifarePages(
 					a,
 					b,
 					(int) SYSCALL_THIS->GetValidatedMemRange( c, len * sizeof(byte)),
@@ -2455,10 +2464,10 @@ return 0; \
 					mJThis);
 		}
 
-		case maIOCtl_maNFCWriteBlocks:
+		case maIOCtl_maNFCWriteMifareBlocks:
 		{
 			int len = SYSCALL_THIS->GetValidatedStackValue(0);
-			return _maNFCWriteBlocks(
+			return _maNFCWriteMifareBlocks(
 					a,
 					b,
 					(int) SYSCALL_THIS->GetValidatedMemRange( c, len * sizeof(byte)),
@@ -2468,10 +2477,10 @@ return 0; \
 					mJThis);
 		}
 
-		case maIOCtl_maNFCWritePages:
+		case maIOCtl_maNFCWriteMifarePages:
 		{
 			int len = SYSCALL_THIS->GetValidatedStackValue(0);
-			return _maNFCWritePages(
+			return _maNFCWriteMifarePages(
 					a,
 					b,
 					(int) SYSCALL_THIS->GetValidatedMemRange( c, len * sizeof(byte)),

@@ -50,6 +50,9 @@ static const char* sUsage =
 "     --debug                  Output: use debug runtime.\n"
 "     --s60v3uid <8-digit hex> Output: Symbian UID, 3rd edition.\n"
 "     --s60v2uid <8-digit hex> Output: Symbian UID, 2nd edition.\n"
+"     --s60cert <file>         PEM X.509 certificate for Symbian signing.\n"
+"     --s60key <file>          PEM X.509 private key for Symbian signing.\n"
+"     --s60pass <password>     Password to the Symbian private key.\n"
 "     --ios-cert <name>        Output: name of an iOS developer certificate.\n"
 "     --ios-sdk <path>         Output: path to an iOS SDK. Only useful on OSX.\n"
 "     --ios-project-only       Output: don't compile the generated iOS project.\n"
@@ -132,6 +135,12 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.s60v3uid);
 		} else if(streq(argv[i], "--s60v2uid")) {
 			setString(i, argc, argv, s.s60v2uid);
+		} else if(streq(argv[i], "--s60cert")) {
+			setString(i, argc, argv, s.s60cert);
+		} else if(streq(argv[i], "--s60key")) {
+			setString(i, argc, argv, s.s60key);
+		} else if(streq(argv[i], "--s60pass")) {
+			setString(i, argc, argv, s.s60pass);
 		} else if(streq(argv[i], "--debug")) {
 			s.debug = true;
 		} else if(streq(argv[i], "--nfc")) { // NFC specific
@@ -140,6 +149,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.iOSCert);
 		} else if(streq(argv[i], "--ios-sdk")) { // iOS specific
 			setString(i, argc, argv, s.iOSSdk);
+		} else if(streq(argv[i], "--ios-xcode-target")) { // iOS specific
+			setString(i, argc, argv, s.iOSXcodeTarget);
 		} else if(streq(argv[i], "--ios-project-only")) { // iOS specific
 			s.iOSgenerateOnly = true;
 		} else if(streq(argv[i], "--cpp-output")) {

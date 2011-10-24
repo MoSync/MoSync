@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NativeUILib
+ *  @{
+ */
+
+/**
+ *  @defgroup NativeUILib Native UI Library
+ *  @{
+ */
+
 /**
  * @file Dialog.h
  * @author emma
@@ -24,8 +33,8 @@ MA 02110-1301, USA.
  * A dialog cannot have any parent, it acts only as a container of other widgets.
  * A dialog is a sort of modal view, that can look different depending on
  * the platform:
- *  - On Android it is a modal alert dialog.
- *  - On iPad it is a PopoverController, and on iPhone it is a modal view.
+ * -On Android it is a modal alert dialog.
+ * -On iPad it is a PopoverController, and on iPhone it is a modal view.
  *
  * When a Dialog widget is created it is empty, it has no content.
  * Use setMainWidget(widget) to set the main widget of the dialog.
@@ -57,6 +66,7 @@ namespace NativeUI
 
 	/**
 	 * \brief Class that represents a modal dialog.
+	 *
 	 */
 	class Dialog : public Widget
 	{
@@ -165,3 +175,5 @@ namespace NativeUI
 } // namespace NativeUI
 
 #endif
+
+/*! @} */

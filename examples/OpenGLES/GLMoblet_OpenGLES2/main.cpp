@@ -20,6 +20,7 @@ MA 02110-1301, USA.
 #include <GLES2/gl2.h>
 #include <maheap.h>
 #include <conprint.h>
+#include <mavsprintf.h>
 
 using namespace MAUtil;
 

@@ -38,6 +38,25 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdexcept>
 #include <fstream>
 
+#ifdef WIN32
+#include <stdio.h>
+#include <time.h>
+static time_t timegm (struct tm* brokentime) {
+	const char* old = getenv("TZ");
+	_putenv("TZ=UTC");
+	_tzset();
+	time_t t = mktime(brokentime);
+
+	// restore old TZ, or remove it if it did not exist.
+	char buf[128] = "TZ=";
+	if(old)
+		strcat(buf, old);
+	_putenv(buf);
+	_tzset();
+	return t;
+}
+#endif
+
 using namespace MoSyncError;
 using namespace Base;
 using namespace std;
@@ -143,7 +162,7 @@ void TContactValue<int>::setValue(void* buf, size_t bufSize) {
 static void streamDateTime(ostream& stream, int time) {
 	char buf[64];
 	time_t t = time;
-	strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%SZ", localtime(&t));
+	strftime(buf, sizeof(buf), "%Y-%m-%dT%H:%M:%S", gmtime(&t));
 	stream << buf;
 }
 
@@ -674,13 +693,14 @@ namespace ContactParser {
 			error("integer conversion error");
 	}
 
-	// examples: 1970-01-23, 2010-04-30T16:04:39Z
+	// examples: 1970-01-23, 2010-04-30T16:04:39
 	// this is not a proper W3C DTF parser; fractions of a second is not allowed.
 	// it's ok, though, because they'd be ignored anyway.
+	// Timezone information is ignored.
 	static void parseDate(int& d, const char* value) {
 		struct tm ctime;
 		memset(&ctime, 0, sizeof(struct tm));
-		const char* res = strptime(value, "%FT%T%z", &ctime);
+		const char* res = strptime(value, "%FT%T", &ctime);
 		if(res == NULL) {
 			res = strptime(value, "%F", &ctime);
 			if(res == NULL)
@@ -688,7 +708,7 @@ namespace ContactParser {
 		}
 		if(*res != 0)
 			error("date conversion incomplete");
-		time_t ttime = mktime(&ctime);
+		time_t ttime = timegm(&ctime);
 		if(ttime > INT_MAX || ttime < 0)
 			error("date out of bounds");
 		d = (int)ttime;

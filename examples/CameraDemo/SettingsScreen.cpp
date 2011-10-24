@@ -81,9 +81,8 @@ void SettingsScreen::buttonClicked(Widget* button)
 /**
  * Lazy initialization
  */
-int SettingsScreen::initialize(StackScreen* stackScreen, CameraPreview* previewWidget)
+void SettingsScreen::initialize(StackScreen* stackScreen)
 {
-	mPreviewWidget = previewWidget;
 	mStackScreen = stackScreen;
 	numCameras = maCameraNumber();
 	createUI();
@@ -115,7 +114,9 @@ void SettingsScreen::createUI()
 
 	mFlashModeButton->fillSpaceHorizontally();
 	mFlashModeButton->wrapContentVertically();
-	mFlashModeButton->setText("Flash Mode: OFF");
+	char buffer[128];
+	sprintf(buffer, "Flash Mode: %s", MA_CAMERA_FLASH_OFF);
+	mFlashModeButton->setText(buffer);
 	mFlashModeButton->addButtonListener(this);
 
 	mMainLayoutWidget->addChild(mFlashModeButton);
@@ -167,7 +168,7 @@ void SettingsScreen::pushSettingsScreen()
 /**
  * A wrapper for iterating over flash modes
  */
-char* SettingsScreen::getModeForIndex( int index)
+const char* SettingsScreen::getModeForIndex( int index)
 {
 	switch(index)
 	{
@@ -195,7 +196,7 @@ int SettingsScreen::getCurrentCamera()
 /**
  * Returns the selected flash mode
  */
-char * SettingsScreen::getFLashMode()
+const char * SettingsScreen::getFLashMode()
 {
 	return getModeForIndex(flashModeIndex);
 }

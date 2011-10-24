@@ -6,7 +6,7 @@ import java.io.IOException;
 
 import android.nfc.tech.MifareUltralight;
 
-public class MifareUltralightTag extends NFCTagBase<MifareUltralight> {
+public class MifareUltralightTag extends NFCTagBase<MifareUltralight> implements ITransceivable<MifareUltralight>, ISizeHolder {
 
 	public static INFCTag get(ResourcePool pool, GenericTag tag) {
 		MifareUltralight mfu = MifareUltralight.get(tag.getTag());
@@ -23,5 +23,16 @@ public class MifareUltralightTag extends NFCTagBase<MifareUltralight> {
 	@Override
 	public byte[] transceive(byte[] buffer) throws IOException {
 		return nativeTag.transceive(buffer);
+	}
+
+	@Override
+	public int getSize() {
+		int type = nativeTag.getType();
+		if (type == MifareUltralight.TYPE_ULTRALIGHT) {
+			return 64;
+		} else if (type == MifareUltralight.TYPE_ULTRALIGHT_C) {
+			return 192;
+		}
+		return -1;
 	}
 }

@@ -2,7 +2,7 @@ package com.mosync.internal.android.nfc;
 
 import java.io.IOException;
 
-public interface INDEFMessageHolder extends IResource {
+public interface INDEFMessageHolder extends INDEFMessageWritable {
 
 	/**
 	 * Sends a request to the tag to get the current
@@ -17,12 +17,5 @@ public interface INDEFMessageHolder extends IResource {
 	 * @return
 	 */
 	public NDEFMessage getNDEFMessage();
-
-	/**
-	 * Writes an NDE message
-	 * @param message
-	 * @throws IOException
-	 */
-	public void writeNDEFMessage(NDEFMessage message) throws IOException;
 
 }

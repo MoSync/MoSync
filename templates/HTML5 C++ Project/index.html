@@ -54,10 +54,10 @@ html
 </style>
 
 <!--
-	Import the josync library to enable communication
-	between JavaScript and C++ .
+	Import the bridge library for communication between
+	JavaScript and C++.
 -->
-<script src="js/josync.js"></script>
+<script src="js/bridge.js"></script>
 
 <script>
 /**
@@ -82,7 +82,7 @@ function SwapText()
 }
 
 /**
- * Make device virbrate and update the text shown
+ * Make device vibrate and update the text shown
  * in the user interface.
  */
 function OnTouch()
@@ -92,14 +92,13 @@ function OnTouch()
 }
 
 /**
- * Make device virbrate and update the text shown
- * in the user interface.
+ * Make device vibrate.
  */
 function Vibrate()
 {
 	// This is how a message is passed to C++ when
-	// using the josync library.
-	josync.messagehandler.send({messageName: "Vibrate"}, null);
+	// using the bridge library.
+	bridge.messagehandler.send({messageName: "Vibrate"}, null);
 }
 </script>
 </head>

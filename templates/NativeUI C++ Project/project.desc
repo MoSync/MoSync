@@ -8,3 +8,9 @@ main.cpp
 [Settings]
 build.prefs:additional.libraries=MAUtil.lib,nativeui.lib
 build.prefs:additional.libraries/Debug=MAUtilD.lib,nativeui.lib
+build.prefs:memory.data/Release=4096
+build.prefs:memory.heap/Release=3072
+build.prefs:memory.stack/Release=512
+build.prefs:memory.data/Debug=4096
+build.prefs:memory.heap/Debug=3072
+build.prefs:memory.stack/Debug=512

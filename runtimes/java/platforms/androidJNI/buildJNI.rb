@@ -52,7 +52,9 @@ androidNDKPath = ARGV[0]
 androidSDKPath = ARGV[1]
 androidSDKTools = ARGV[2]
 configPath = ARGV[3]
-debugFlag = ARGV[4]
+androidVersion = ARGV[4]
+debugFlag = ARGV[5]
+
 
 if ENV['MOSYNC_SRC'] == nil
 	cd "../../../../"
@@ -72,8 +74,22 @@ cd cpath
 
 ENV['MOSYNC_JAVA_SRC'] = cpath
 
+#We need two different make files for android due to some restrictions in JNI
+
+puts "android version is: #{androidVersion}"
+if((androidVersion == "3") ||(androidVersion == "4"))
+	cp "#{cpath}/AndroidProject/jni/Application_1.mk", "#{cpath}/AndroidProject/jni/Application.mk"
+else
+	cp "#{cpath}/AndroidProject/jni/Application_2.mk", "#{cpath}/AndroidProject/jni/Application.mk"
+end
+
 if androidNDKPath == nil
 	puts "missing argument, android NDK path is unknown!"
+	exit 1
+end
+
+if androidVersion == nil
+	puts "missing argument, android version is unknown!"
 	exit 1
 end
 

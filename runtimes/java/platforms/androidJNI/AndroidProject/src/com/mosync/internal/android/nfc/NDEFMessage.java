@@ -4,7 +4,7 @@ import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
 
 
-public class NDEFMessage extends ResourceBase {
+public class NDEFMessage extends ResourceBase implements ISizeHolder {
 
 	private final NDEFRecord[] records;
 
@@ -53,6 +53,15 @@ public class NDEFMessage extends ResourceBase {
 		}
 		NdefMessage nativeMessage = new NdefMessage(nativeRecords);
 		return nativeMessage;
+	}
+
+	@Override
+	public int getSize() {
+		int size = 0;
+		for (NDEFRecord record : records) {
+			size += record.getSize();
+		}
+		return size;
 	}
 
 
