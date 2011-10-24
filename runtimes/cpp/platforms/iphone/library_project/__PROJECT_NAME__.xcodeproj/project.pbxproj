@@ -256,6 +256,7 @@
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = __PROJECT_NAME__.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				LIBRARY_SEARCH_PATHS = (
 					"libs/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
 					"\"$(SRCROOT)/libs/Release-iphonesimulator\"",
@@ -273,6 +274,7 @@
 				GCC_PREFIX_HEADER = MoSync_Prefix.pch;
 				GCC_THUMB_SUPPORT = NO;
 				INFOPLIST_FILE = __PROJECT_NAME__.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 3.0;
 				LIBRARY_SEARCH_PATHS = (
 					"libs/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)",
 					"\"$(SRCROOT)/libs/Release-iphonesimulator\"",
