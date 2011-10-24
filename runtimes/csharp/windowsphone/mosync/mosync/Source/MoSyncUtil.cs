@@ -129,8 +129,24 @@ namespace MoSync
             return (w << 16) | h;
         }
 
+
+        static Thread sStartupThread;
+
+        // This must be run once from the main ui thread to save 
+        // which thread is the main ui thread.
+        public static void InitStartupThread()
+        {
+            sStartupThread = Thread.CurrentThread;
+        }
+
         public static void RunActionOnMainThreadSync(Action action)
         {
+            if (Thread.CurrentThread == sStartupThread)
+            {
+                action();
+                return;
+            }
+
             using (AutoResetEvent are = new AutoResetEvent(false))
             {
                 Deployment.Current.Dispatcher.BeginInvoke(() =>

@@ -24,6 +24,7 @@ class MoSyncThread
 
     public MoSyncThread()
     {
+        MoSync.Util.InitStartupThread();
     }
 
     public void Init(Stream program, Stream resources)

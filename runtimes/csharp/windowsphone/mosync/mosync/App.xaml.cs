@@ -84,7 +84,7 @@ namespace test_mosync
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
 
-//            RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
+            //RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
             RootFrame.Loaded += delegate(object _sender, RoutedEventArgs _e)
             {
                 MoSyncThread.CreateAndStart("program", "resources");
