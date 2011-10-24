@@ -5175,6 +5175,70 @@ group WidgetAPI "Widget API" {
 	}
 	} // end of WidgetImageProperties
 
+	group WidgetEditBoxConstants "Edit box constants" {
+	    constset int MAW_EDIT_BOX_TYPE_ {
+	        /**
+			* The user is allowed to enter any text, including line breaks.
+			*/
+			ANY = 0;
+			/**
+			* The user is allowed to enter an e-mail address.
+			*/
+			EMAILADDR = 1;
+			/**
+			* The user is allowed to enter an integer value.
+			*/
+			NUMERIC = 2;
+			/**
+			* The user is allowed to enter a phone number.
+			*/
+			PHONENUMBER = 3;
+			/**
+			* The user is allowed to enter a URL.
+			*/
+			URL = 4;
+			/**
+            * The user is allowed to enter a real number value.
+			* This extends #MAW_EDIT_BOX_TYPE_NUMERIC by allowing a decimal point.
+			*/
+			DECIMAL = 5;
+			/**
+			* The user is allowed to enter any text, except for line breaks.
+			* Unavailable on some platforms.
+			*/
+			SINGLE_LINE = 6;
+	    }
+
+	    constset int MAW_EDIT_BOX_FLAG_ {
+			/**
+			* Indicates that the text entered is confidential data that should be
+			* obscured whenever possible. This implies #MAW_EDIT_BOX_FLAG_SENSITIVE.
+			*/
+			PASSWORD = 0;
+			/**
+			* Indicates that the text entered is sensitive data that the implementation
+			* must never store into a dictionary or table for use in predictive, auto-completing,
+			* or other accelerated input schemes. A credit card number is an example of sensitive data.
+			* Only for Android platform.
+			*/
+			SENSITIVE = 1;
+			/**
+			* This flag is a hint to the implementation that during text editing,
+			* the initial letter of each word should be capitalized.
+			*/
+			INITIAL_CAPS_WORD = 2;
+			/**
+			* This flag is a hint to the implementation that during text editing,
+			* the initial letter of each sentence should be capitalized.
+			*/
+			INITIAL_CAPS_SENTENCE = 3;
+			/**
+			* Capitalize all characters automatically.
+			*/
+			INITIAL_CAPS_ALL_CHARACTERS = 4;
+	    }
+	} // end of WidgetEditBoxConstants
+
 	/**
 	* The available widget properties for a #MAW_EDIT_BOX. See of \ref WidgetProperties "Widget properties" for more properties.
 	*/
@@ -5234,7 +5298,7 @@ group WidgetAPI "Widget API" {
 
 		/**
 		* @brief Specifies what editing mode the edit box should have.
-		*
+		* @deprecated use #MAW_EDIT_BOX_INPUT_FLAG instead.
 		* @validvalue Either 'password' or 'text'.
 		*
 		* @setonly
