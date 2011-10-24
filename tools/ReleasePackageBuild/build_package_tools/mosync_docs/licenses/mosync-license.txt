@@ -39,3 +39,5 @@ tlsf-license.txt covers the Two-level Segregate Fit (TLSF) allocator.
 yasper-license.txt covers Yasper (Yet Another Smart Process EditoR).
 
 Permission from Andreas Jönsson has kindly been given for the use of Angelcode BMFont and redistribution of its binary files.
+
+iphonesim.txt covers iphoneSim from Jeff Haynie (jhaynie@appcelerator.com)
