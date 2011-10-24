@@ -24,7 +24,7 @@ public class MoSyncHelpers
 {
 	private static boolean sLoggingIsOn = false;
 	private static boolean sDebuggingIsOn = false;
-	
+
 	public static void SyslogOn(boolean on)
 	{
 		sLoggingIsOn = on;
@@ -37,12 +37,12 @@ public class MoSyncHelpers
 			Log.i("@@@ MoSync SYSLOG", message);
 		}
 	}
-	
+
 	public static void SYSLOG(String message)
 	{
 		Syslog(message);
 	}
-	
+
 	public static void DebugOn(boolean on)
 	{
 		sDebuggingIsOn = on;
@@ -60,7 +60,7 @@ public class MoSyncHelpers
 			Log.i("@@@ MoSync DEBUG", message);
 		}
 	}
-	
+
 	//#define EXTENT_Y(e) ((short)(e))
 	//#define EXTENT_X(e) ((short)((e) >> 16))
 	//#define EXTENT(x, y) ((MAExtent)((((int)(x)) << 16) | ((y) & 0x0FFFF)))
@@ -79,14 +79,14 @@ public class MoSyncHelpers
 	{
 		return (x << 16) | (y & 0x0FFFF);
 	}
-	
+
 	/**
 	 * TODO: Make version of MYASSET that takes error message.
 	 * @param state
 	 */
-	public static void MYASSERT(boolean state) 
+	public static void MYASSERT(boolean state)
 	{
-		if (!state) 
+		if (!state)
 		{
 			new Exception("MYASSERT failed").printStackTrace();
 			throw new BigPhatError("Error thrown in MYASSERT");

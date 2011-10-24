@@ -184,7 +184,7 @@ public class MoSyncThread extends Thread
 	private boolean mHasDied;
 
 	/**
-	 * Boolean used to determine whether to interrupt the trehad or not,
+	 * Boolean used to determine whether to interrupt the thread or not,
 	 * true if this thread is sleeping in maWait.
 	 */
 	private final AtomicBoolean mIsSleepingInMaWait = new AtomicBoolean(false);

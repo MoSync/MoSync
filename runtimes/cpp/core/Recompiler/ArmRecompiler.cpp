@@ -36,10 +36,16 @@ using namespace Core;
 #ifdef _android
 #include <unistd.h>
 #include <sys/mman.h>
+#include "ashmem.h"
+
 int _androidMemSize;
 int _androidEntryMemSize;
 JNIEnv* mJNIEnv;
 jobject mJThis;
+
+int mAshmemCodeMemory;
+int mAshmemEntryPoint;
+
 #endif
 
 //#define LOGC(x, ...)
@@ -193,64 +199,26 @@ jobject mJThis;
 	}
 #endif	//__SYMBIAN32__
 
-#ifdef _android
-// Returns true iff x is a power of 2.  Does not work for zero.
-template <typename T>
-static inline bool IsPowerOf2(T x) {
-  return (x & (x - 1)) == 0;
-}
-
-// Compute the 0-relative offset of some absolute value x of type T.
-// This allows conversion of Addresses and integral types into
-// 0-relative int offsets.
-template <typename T>
-static inline intptr_t OffsetFrom(T x) {
-  return x - static_cast<T>(0);
-}
-
-// Compute the absolute value of type T for some 0-relative offset x.
-// This allows conversion of 0-relative int offsets into Addresses and
-// integral types.
-template <typename T>
-static inline T AddressFrom(intptr_t x) {
-  return static_cast<T>(0) + x;
-}
-
-// Return the largest multiple of m which is <= x.
-template <typename T>
-static inline T RoundDown(T x, int m) {
-  DEBUG_ASSERT(IsPowerOf2(m));
-  return AddressFrom<T>(OffsetFrom(x) & -m);
-}
-
-
-// Return the smallest multiple of m which is >= x.
-template <typename T>
-static inline T RoundUp(T x, int m) {
-  return RoundDown(x + m - 1, m);
-}
-#endif
-
 	void* MoSync::ArmRecompiler::allocateCodeMemory(int size) {
 #ifdef __SYMBIAN32__
 		return mCodeChunk.allocate(size);
 #elif defined(_android)
-		int nsize = RoundUp<int>(size, getpagesize());
 
-		void* mem = memalign(getpagesize(), nsize);
-		if(NULL == mem) 
-			return NULL;
+		mAshmemCodeMemory = ashmem_create_region("mosync_ashmem_code_memory", size); 
 
-		int mret = mprotect(mem, nsize, PROT_READ|PROT_WRITE|PROT_EXEC);
-		if(0 != mret)
-		{
-			__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code block couldn't set mprotect!");
-			return NULL;
-		}
-		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code block succesfully created!");
+		int r = ashmem_pin_region(mAshmemCodeMemory, 0, size);
 
+		char b[100];
+		sprintf(b, "ashmem_pin_region returned: %d\n", r);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+		
+		void* mem = mmap(NULL, size,
+			PROT_READ | PROT_WRITE | PROT_EXEC,
+			MAP_PRIVATE, mAshmemCodeMemory, 0);
+		
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code memory succesfully created!");
+		
 		return mem;
-
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
@@ -260,7 +228,21 @@ static inline T RoundUp(T x, int m) {
 #ifdef __SYMBIAN32__
 		return mEntryChunk.allocate(size);
 #elif defined(_android)
-		return allocateCodeMemory(size);
+		mAshmemEntryPoint = ashmem_create_region("mosync_ashmem_entry_point", size);
+		
+		int r = ashmem_pin_region(mAshmemEntryPoint, 0, size);
+		
+		char b[100];
+		sprintf(b, "ashmem_pin_region returned: %d\n", r);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+		
+		void* mem = mmap(NULL, size,
+			PROT_READ | PROT_WRITE | PROT_EXEC,
+			MAP_PRIVATE, mAshmemEntryPoint, 0);
+		
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "entry point succesfully created!");
+		
+		return mem;
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
@@ -308,6 +290,17 @@ static inline T RoundUp(T x, int m) {
 		// This seems to work, but might not be correct
 		// Might be better to call CacheSync(...)
 		FlushInstructionCache(GetCurrentProcess(), 0, 0);
+#endif
+	}
+
+	int MoSync::ArmRecompiler::protectMemory(void* addr, int len)
+	{
+#ifdef _android
+		__android_log_write(ANDROID_LOG_INFO,"JNI Recompiler", "Protecting memory from writing");
+		return mprotect(addr, len,
+			PROT_READ | PROT_EXEC);
+#else
+		return 0;
 #endif
 	}
 
@@ -1177,6 +1170,11 @@ namespace MoSync {
 	void ArmRecompiler::endPass() {
 		if(mPass == mNumPasses) {
 			generateEntryPoint();
+		}
+
+		if(mPass != 1)
+		{
+			protectMemory(assm.mipStart, mArmCodeSize);
 		}
 	}
 

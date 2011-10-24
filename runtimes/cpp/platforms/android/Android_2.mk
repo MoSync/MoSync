@@ -34,6 +34,7 @@ LOCAL_SRC_FILES := FileImpl.cpp \
 	../../base/Syscall.cpp \
 	../../core/Core.cpp \
 	../../core/disassembler.cpp \
+	../../core/Recompiler/ashmem.cpp \
 	../../core/Recompiler/ArmAssembler.cpp \
 	../../core/Recompiler/ArmRecompiler.cpp \
 	../../../../intlibs/hashmap/hashmap.cpp \
