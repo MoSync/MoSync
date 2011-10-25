@@ -37,6 +37,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "helpers/CPP_IX_GL2.h"
 //#include "helpers/CPP_IX_GL_OES_FRAMEBUFFER_OBJECT.h"
 #include "helpers/CPP_IX_PIM.h"
+#include "helpers/CPP_IX_CELLID.h"
 
 #define ERROR_EXIT { MoSyncErrorExit(-1); }
 
@@ -2511,6 +2512,13 @@ return 0; \
 		case maIOCtl_maSyscallPanicsDisable:
 			SYSLOG("maIOCtl_maSyscallPanicsDisable");
 			return _maSyscallPanicsDisable(
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maGetCellInfo:
+			return _maGetCellInfo(
+				(int) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MACellInfo)),
+				(int)gCore->mem_ds,
 				mJNIEnv,
 				mJThis);
 
