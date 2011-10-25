@@ -198,3 +198,5 @@ config_platform.h
 /docs/*.dot.*
 
 /tools/mhsd-display/mhsd.bin
+
+/runtimes/csharp/windowsphone/mosync/mosync/Source/maapi.cs

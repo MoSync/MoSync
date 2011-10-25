@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NativeUILib
+ *  @{
+ */
+
+/**
+ *  @defgroup NativeUILib Native UI Library
+ *  @{
+ */
+
 /**
 * @file WebViewListener.h
 * @author Emma Tresanszki
@@ -54,7 +63,7 @@ namespace NativeUI
 		virtual ~WebViewListener()
 		{
 		}
-		
+
 		/**
 		* This method is called when MAW_EVENT_WEB_VIEW_HOOK_INVOKED is received.
 		* @param webView The web view object that generated the event.
@@ -96,3 +105,5 @@ namespace NativeUI
 } // namespace NativeUI
 
 #endif /* NATIVEUI_WEB_VIEW_LISTENER_H_ */
+
+/*! @} */
