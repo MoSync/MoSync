@@ -2891,4 +2891,14 @@ namespace Base
 		return (int)ret;
 	}
 
+	int _maGetCellInfo(MAHandle mem, int memStart, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maGetCellInfo", "(I)I");
+		if (methodID == 0) return 0;
+		jint ret = jNIEnv->CallIntMethod(jThis, methodID, (mem-memStart));
+		jNIEnv->DeleteLocalRef(cls);
+		return (int)ret;
+	}
+
 }

@@ -845,4 +845,7 @@ namespace Base
 	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maSyscallPanicsDisable(JNIEnv* jNIEnv, jobject jThis);
+
+	int _maGetCellInfo(MAHandle mem, int memStart, JNIEnv* jNIEnv, jobject jThis);
+
 }
