@@ -200,3 +200,8 @@ config_platform.h
 /tools/mhsd-display/mhsd.bin
 
 /runtimes/csharp/windowsphone/mosync/mosync/Source/maapi.cs
+
+/runtimes/csharp/windowsphone/mosync/mosync/Bin/rebuild_debug
+/runtimes/csharp/windowsphone/mosync/mosync/Bin/rebuild_release
+/runtimes/csharp/windowsphone/mosync/mosyncLib/obj
+/runtimes/csharp/windowsphone/mosync/mosyncLib/bin

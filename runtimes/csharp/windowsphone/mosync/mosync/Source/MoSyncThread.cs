@@ -18,7 +18,7 @@ using System.Windows.Resources;
 
 class MoSyncThread
 {
-    private MoSync.CoreInterpreted mCore;
+    private MoSync.Core mCore;
     private MoSync.Runtime mRuntime;
     private Thread mThread = null;
 
@@ -29,8 +29,11 @@ class MoSyncThread
 
     public void Init(Stream program, Stream resources)
     {
-        mCore = new MoSync.CoreInterpreted();
-        mCore.LoadProgram(program);
+#if REBUILD
+        mCore = new CoreNativeProgram();
+#else
+        mCore = new MoSync.CoreInterpreted(program);
+#endif
         mRuntime = new MoSync.Runtime(mCore);
         mCore.SetRuntime(mRuntime);
 

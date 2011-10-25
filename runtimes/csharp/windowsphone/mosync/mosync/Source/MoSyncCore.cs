@@ -28,7 +28,7 @@ namespace MoSync
             mRunning = false;
         }
 
-        public int GetStackPointer()
+        public virtual int GetStackPointer()
         {
             return 0;
         }
@@ -39,11 +39,11 @@ namespace MoSync
         }
 
         // will reset the program.
-        public void Init()
+        public virtual void Init()
         {
         }
 
-        public void Run()
+        public virtual void Run()
         {
 
         }

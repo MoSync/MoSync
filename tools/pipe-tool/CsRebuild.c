@@ -16,23 +16,20 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 //*********************************************************************************************
-//				  			  	  Cpp Rebuilder
+//				  			  	  Csharp Rebuilder
 // 						   		Written by A.R.Hartley
+//								Modified by N. Nummelin (from CppRebuild.c)
 //*********************************************************************************************
 
 #include "compile.h"
 
-// fix >>>
-// put in prototypes
-// remove static
+#define INCLUDE_CS_REBUILD
 
-#define INCLUDE_CPP_REBUILD
+#ifdef INCLUDE_CS_REBUILD
 
-#ifdef INCLUDE_CPP_REBUILD
-
-//#define CPP_SHOW_LINES
+//#define CS_SHOW_LINES
 //#define LOG_REGISTER_STATE_CHANGES
-//#define CPP_DEBUG
+//#define CS_DEBUG
 
 #define REGBIT(reg)		(1 << (reg))
 #define REGUSED(v, reg) (v & REGBIT(reg))
@@ -42,15 +39,15 @@ static int ThisFunctionRetType;
 static int ThisFunctionExit;			// True on last instruction
 static int ReturnCount;
 
-static int CppUsedCallReg;
+static int CsUsedCallReg;
 
-static char *Cpp_reg[] = {"zr","sp","rt","fr","d0","d1","d2","d3",
+static char *Cs_reg[] = {"zr","sp","rt","fr","d0","d1","d2","d3",
 					"d4","d5","d6","d7","i0","i1","i2","i3",
 					"r0","r1","r2","r3","r4","r5","r6","r7",
 					"r8","r9","r10","r11","r12","r13","r14","r15"
 				   };
 
-static char CppSyscallUsed[1024];
+static char CsSyscallUsed[1024];
 
 static FuncProp funcprop;
 
@@ -58,7 +55,7 @@ static FuncProp funcprop;
 //****************************************
 //
 //****************************************
-#ifdef CPP_SHOW_LINES
+#ifdef CS_SHOW_LINES
 
 typedef struct FileInfo_t {
 	int numLines;
@@ -138,7 +135,7 @@ const char* GetFileLine(int file, int line) {
 }
 #endif
 
-int RebuildCppInst(OpcodeInfo *theOp)
+int RebuildCsInst(OpcodeInfo *theOp)
 {
 	int ip = theOp->rip;
 	char str[256];
@@ -150,7 +147,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 #endif
 
 
-#ifdef CPP_SHOW_LINES
+#ifdef CS_SHOW_LINES
 	{
 		int line = ArrayGet(&SLD_Line_Array, ip);
 		int file = ArrayGet(&SLD_File_Array, ip);
@@ -165,7 +162,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 	switch (theOp->op)
 	{
 		case _PUSH:
-			RebuildEmit("	//push %s,%d\n",Cpp_reg[theOp->rd], theOp->rs);
+			RebuildEmit("	//push %s,%d\n",Cs_reg[theOp->rd], theOp->rs);
 
 			if (REGUSED(funcprop.reg_used, REG_sp))
 			{
@@ -174,7 +171,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		return 1;
 
 		case _POP:
-			RebuildEmit("	//pop  %s,%d\n",Cpp_reg[theOp->rd], theOp->rs);
+			RebuildEmit("	//pop  %s,%d\n",Cs_reg[theOp->rd], theOp->rs);
 
 			if (REGUSED(funcprop.reg_used, REG_sp))
 			{
@@ -184,133 +181,133 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		return 1;
 
 		case _CASE:
-			CppDecodeSwitch(theOp);
+			CsDecodeSwitch(theOp);
 		break;
 
 
 		case _CALLI:
-			CppDecodeCall(theOp);
+			CsDecodeCall(theOp);
 		break;
 
 		case _SYSCALL:
-			CppDecodeSysCall(theOp);
+			CsDecodeSysCall(theOp);
 		break;
 
 		case _CALL:
-			CppDecodeCallReg(theOp);
+			CsDecodeCallReg(theOp);
 		break;
 
 		case _LDI:
-			RebuildEmit("	%s = 0x%x;", Cpp_reg[theOp->rd], theOp->imm);
+			RebuildEmit("	%s = %d;", Cs_reg[theOp->rd], theOp->imm);
 		break;
 
 		case _LDR:
 		{
 			if (IsRegConst(theOp->rs))
-				RebuildEmit("	%s = 0x%x;", Cpp_reg[theOp->rd], ConstRegValue(theOp->rs));
+				RebuildEmit("	%s = %d;", Cs_reg[theOp->rd], ConstRegValue(theOp->rs));
 			else
-				RebuildEmit("	%s = %s;", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
+				RebuildEmit("	%s = %s;", Cs_reg[theOp->rd], Cs_reg[theOp->rs]);
 		}
 		break;
 
 		// Arithmatic
 
 		case _ADD:
-			CppEmitArith(theOp,"+", 0);
+			CsEmitArith(theOp,"+", 0);
 		break;
 
 		case _ADDI:
-			CppEmitArith(theOp,"+", 1);
+			CsEmitArith(theOp,"+", 1);
 		break;
 
 		case _MUL:
-			CppEmitArith(theOp,"*", 0);
+			CsEmitArith(theOp,"*", 0);
 		break;
 
 		case _MULI:
-			CppEmitArith(theOp,"*", 1);
+			CsEmitArith(theOp,"*", 1);
 		break;
 
 		case _SUB:
-			CppEmitArith(theOp,"-", 0);
+			CsEmitArith(theOp,"-", 0);
 		break;
 
 		case _SUBI:
-			CppEmitArith(theOp,"-", 1);
+			CsEmitArith(theOp,"-", 1);
 		break;
 
 		case _AND:
-			CppEmitArith(theOp,"&", 0);
+			CsEmitArith(theOp,"&", 0);
 		break;
 
 		case _ANDI:
-			CppEmitArith(theOp,"&", 1);
+			CsEmitArith(theOp,"&", 1);
 		break;
 
 		case _OR:
-			CppEmitArith(theOp,"|", 0);
+			CsEmitArith(theOp,"|", 0);
 		break;
 
 		case _ORI:
-			CppEmitArith(theOp,"|", 1);
+			CsEmitArith(theOp,"|", 1);
 		break;
 
 		case _XOR:
-			CppEmitArith(theOp,"^", 0);
+			CsEmitArith(theOp,"^", 0);
 		break;
 
 		case _XORI:
-			CppEmitArith(theOp,"^", 1);
+			CsEmitArith(theOp,"^", 1);
 		break;
 
 		case _DIVU:
-			CppEmitDivu(theOp, 0);
+			CsEmitDivu(theOp, 0);
 		break;
 
 		case _DIVUI:
-			CppEmitDivu(theOp, 1);
+			CsEmitDivu(theOp, 1);
 		break;
 
 		case _DIV:
-			CppEmitArith(theOp,"/", 0);
+			CsEmitArith(theOp,"/", 0);
 		break;
 
 		case _DIVI:
-			CppEmitArith(theOp,"/", 1);
+			CsEmitArith(theOp,"/", 1);
 		break;
 
 		// Shifts
 
 		case _SLL:
-			CppEmitShift(theOp,"<<", 0, 0);
+			CsEmitShift(theOp,"<<", 0, 0);
 		break;
 
 		case _SLLI:
-			CppEmitShift(theOp,"<<", 1, 0);
+			CsEmitShift(theOp,"<<", 1, 0);
 		break;
 
 		case _SRA:
-			CppEmitShift(theOp,">>", 0, 0);
+			CsEmitShift(theOp,">>", 0, 0);
 		break;
 
 		case _SRAI:
-			CppEmitShift(theOp,">>", 1, 0);
+			CsEmitShift(theOp,">>", 1, 0);
 		break;
 
 		case _SRL:
-			CppEmitShift(theOp,">>", 0, 1);		// Unsigned
+			CsEmitShift(theOp,">>", 0, 1);		// Unsigned
 		break;
 
 		case _SRLI:
-			CppEmitShift(theOp,">>", 1, 1);		// Unsigned
+			CsEmitShift(theOp,">>", 1, 1);		// Unsigned
 		break;
 
 		case _NOT:
-			RebuildEmit("	%s = ~%s;", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
+			RebuildEmit("	%s = ~%s;", Cs_reg[theOp->rd], Cs_reg[theOp->rs]);
 		break;
 
 		case _NEG:
-			RebuildEmit("	%s = -%s;", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
+			RebuildEmit("	%s = -%s;", Cs_reg[theOp->rd], Cs_reg[theOp->rs]);
 		break;
 
 		case _RET:
@@ -326,87 +323,87 @@ int RebuildCppInst(OpcodeInfo *theOp)
 		// Conditional jumps
 
 		case _JC_EQ:
-			CppEmitJumpCond(theOp, "==", 0);
+			CsEmitJumpCond(theOp, "==", 0);
 		break;
 
 		case _JC_NE:
-			CppEmitJumpCond(theOp, "!=", 0);
+			CsEmitJumpCond(theOp, "!=", 0);
 		break;
 
 		case _JC_GE:
-			CppEmitJumpCond(theOp, ">=", 0);
+			CsEmitJumpCond(theOp, ">=", 0);
 		break;
 
 		case _JC_GEU:
-			CppEmitJumpCond(theOp, ">=", 1);
+			CsEmitJumpCond(theOp, ">=", 1);
 		break;
 
 		case _JC_GT:
-			CppEmitJumpCond(theOp, ">", 0);
+			CsEmitJumpCond(theOp, ">", 0);
 		break;
 
 		case _JC_GTU:
-			CppEmitJumpCond(theOp, ">", 1);
+			CsEmitJumpCond(theOp, ">", 1);
 		break;
 
 		case _JC_LE:
-			CppEmitJumpCond(theOp, "<=", 0);
+			CsEmitJumpCond(theOp, "<=", 0);
 		break;
 
 		case _JC_LEU:
-			CppEmitJumpCond(theOp, "<=", 1);
+			CsEmitJumpCond(theOp, "<=", 1);
 		break;
 
 		case _JC_LT:
-			CppEmitJumpCond(theOp, "<", 0);
+			CsEmitJumpCond(theOp, "<", 0);
 		break;
 
 		case _JC_LTU:
-			CppEmitJumpCond(theOp, "<", 1);
+			CsEmitJumpCond(theOp, "<", 1);
 		break;
 
 		case _JPI:
-			CppDecodeLabel(theOp, "	goto label_%d;");
+			CsDecodeLabel(theOp, "	goto label_%d;");
 		break;
 
 		// Memory instructions
 
 		case _LDW:
-			Cpp_LoadMem(theOp, "RINT");
+			Cs_LoadMem(theOp, "mDataMemory.ReadInt32");
 		break;
 
 		case _LDH:
-			Cpp_LoadMem(theOp, "RSHORT");
+			Cs_LoadMem(theOp, "mDataMemory.ReadInt16");
 		break;
 
 		case _LDB:
-			Cpp_LoadMem(theOp, "RBYTE");
+			Cs_LoadMem(theOp, "mDataMemory.ReadInt8");
 		break;
 
 		case _STW:
-			Cpp_StoreMem(theOp, "WINT");
+			Cs_StoreMem(theOp, "mDataMemory.WriteInt32", "");
 		break;
 
 		case _STH:
-			Cpp_StoreMem(theOp, "WSHORT");
+			Cs_StoreMem(theOp, "mDataMemory.WriteUInt16", "(ushort)");
 		break;
 
 		case _STB:
-			Cpp_StoreMem(theOp, "WBYTE");
+			Cs_StoreMem(theOp, "mDataMemory.WriteUInt8", "(byte)");
 		break;
 
 		case _XB:
-			RebuildEmit("	%s = (int)((char) %s);", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
+			RebuildEmit("	%s = (int)((sbyte) %s);", Cs_reg[theOp->rd], Cs_reg[theOp->rs]);
 		break;
 
 		case _XH:
-			RebuildEmit("	%s = (int)((short) %s);", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
+			RebuildEmit("	%s = (int)((short) %s);", Cs_reg[theOp->rd], Cs_reg[theOp->rs]);
 		break;
 
 		default:
 			str[0] = 0;
 			DisassembleFromSource(ip, str);
-			ErrorOnIP(Error_Fatal, ip, "Missing instruction in Cpp rebuilder '%s'\n", str);
+			ErrorOnIP(Error_Fatal, ip, "Missing instruction in C# rebuilder '%s'\n", str);
 	}
 
 	//	ArraySet(&SLD_Line_Array, CodeIP, line);
@@ -443,7 +440,7 @@ int RebuildCppInst(OpcodeInfo *theOp)
 //
 //****************************************
 
-void CppDecodeReturn(int shouldPassR15)
+void CsDecodeReturn(int shouldPassR15)
 {
 	switch(ThisFunctionRetType)
 	{
@@ -472,7 +469,7 @@ void CppDecodeReturn(int shouldPassR15)
 //
 //****************************************
 
-void CppDecodeReturnNull()
+void CsDecodeReturnNull()
 {
 	switch(ThisFunctionRetType)
 	{
@@ -500,7 +497,7 @@ void CppDecodeReturnNull()
 //
 //****************************************
 
-void CppDecodeSysCall(OpcodeInfo *theOp)
+void CsDecodeSysCall(OpcodeInfo *theOp)
 {
 	int param_count, need_comma, n;
 
@@ -508,20 +505,17 @@ void CppDecodeSysCall(OpcodeInfo *theOp)
 
 	if (!syscall)
 	{
-		Error(Error_System, "Could'nt locate syscall\n");
+		Error(Error_System, "Couldn't locate syscall\n");
 		return;
 	}
 
-	CppSyscallUsed[theOp->imm]++;
+	CsSyscallUsed[theOp->imm]++;
 
 	param_count = syscall->Params;
 
-	CppEmitReturnType(syscall->RetType);
+	CsEmitReturnType(syscall->RetType);
 
-
-	RebuildEmit("SYSCALL(");
-	RebuildEmit("%s", &syscall->Name[1]);
-	RebuildEmit(")(");
+	RebuildEmit("mSyscallInvoker.%s(", &syscall->Name[1]);
 
 	if (param_count > 4)
 		param_count = 4;
@@ -533,7 +527,7 @@ void CppDecodeSysCall(OpcodeInfo *theOp)
 		if (need_comma)
 			RebuildEmit(", ");
 
-		RebuildEmit("%s", Cpp_reg[REG_i0 + n]);
+		RebuildEmit("%s", Cs_reg[REG_i0 + n]);
 		need_comma = 1;
 	}
 
@@ -547,7 +541,7 @@ void CppDecodeSysCall(OpcodeInfo *theOp)
 //
 //****************************************
 
-void CppForceSysCallUsed(char *name)
+void CsForceSysCallUsed(char *name)
 {
 	SYMBOL	*sym;
 
@@ -556,29 +550,29 @@ void CppForceSysCallUsed(char *name)
 	if (!sym)
 		return;
 
-	CppSyscallUsed[sym->Value]++;
+	CsSyscallUsed[sym->Value]++;
 }
 
 //****************************************
 //
 //****************************************
 
-void Cpp_LoadMem(OpcodeInfo *theOp, char *str)
+void Cs_LoadMem(OpcodeInfo *theOp, char *str)
 {
 
 	if (theOp->rs == 0)
 	{
-		RebuildEmit("	%s = %s(0x%x);", Cpp_reg[theOp->rd], str, theOp->imm);
+		RebuildEmit("	%s = %s(%d);", Cs_reg[theOp->rd], str, theOp->imm);
 		return;
 	}
 
 	if (theOp->imm == 0)
 	{
-		RebuildEmit("	%s = %s(%s);", Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs]);
+		RebuildEmit("	%s = %s(%s);", Cs_reg[theOp->rd], str, Cs_reg[theOp->rs]);
 		return;
 	}
 
-	RebuildEmit("	%s = %s(%s+0x%x);", Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs], theOp->imm);
+	RebuildEmit("	%s = %s(%s+%d);", Cs_reg[theOp->rd], str, Cs_reg[theOp->rs], theOp->imm);
 }
 
 
@@ -586,22 +580,22 @@ void Cpp_LoadMem(OpcodeInfo *theOp, char *str)
 //
 //****************************************
 
-void Cpp_StoreMem(OpcodeInfo *theOp, char *str)
+void Cs_StoreMem(OpcodeInfo *theOp, char *str, const char* cast)
 {
 
 	if (theOp->rd == 0)
 	{
-		RebuildEmit("	%s(0x%x, %s);", str, theOp->imm, Cpp_reg[theOp->rs]);
+		RebuildEmit("	%s(%d, %s%s);", str, theOp->imm, cast, Cs_reg[theOp->rs]);
 		return;
 	}
 
 	if (theOp->imm == 0)
 	{
-		RebuildEmit("	%s(%s, %s);", str, Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
+		RebuildEmit("	%s(%s, %s%s);", str, Cs_reg[theOp->rd], cast, Cs_reg[theOp->rs]);
 		return;
 	}
 
-	RebuildEmit("	%s(%s+0x%x, %s);", str, Cpp_reg[theOp->rd], theOp->imm, Cpp_reg[theOp->rs]);
+	RebuildEmit("	%s(%s+%d, %s%s);", str, Cs_reg[theOp->rd], theOp->imm, cast, Cs_reg[theOp->rs]);
 }
 
 
@@ -609,7 +603,7 @@ void Cpp_StoreMem(OpcodeInfo *theOp, char *str)
 //
 //****************************************
 
-int CppDecodeLabel(OpcodeInfo *theOp, char *str)
+int CsDecodeLabel(OpcodeInfo *theOp, char *str)
 {
 
 	SYMBOL *ref, *labref;
@@ -640,7 +634,7 @@ int CppDecodeLabel(OpcodeInfo *theOp, char *str)
 //
 //****************************************
 
-int CppDecodeCall(OpcodeInfo *theOp)
+int CsDecodeCall(OpcodeInfo *theOp)
 {
 	SYMBOL *ref, *labref;
 	int addr;
@@ -661,14 +655,14 @@ int CppDecodeCall(OpcodeInfo *theOp)
 
 	ref = labref;
 
-	return CppCallFunction(ref, 1);
+	return CsCallFunction(ref, 1);
 }
 
 //****************************************
 //
 //****************************************
 
-void CppDecodeCallReg(OpcodeInfo *theOp)
+void CsDecodeCallReg(OpcodeInfo *theOp)
 {
 	// changed ThisFunctionRegs to funcprop.reg_used (didn't take the parameters to the function into account).
 	int i0 = funcprop.reg_used & REGBIT(REG_i0);
@@ -676,7 +670,7 @@ void CppDecodeCallReg(OpcodeInfo *theOp)
 	int i2 = funcprop.reg_used & REGBIT(REG_i2);
 	int i3 = funcprop.reg_used & REGBIT(REG_i3);
 
-	RebuildEmit("	r14 = CallReg(%s", Cpp_reg[theOp->rd]);
+	RebuildEmit("	r14 = CallReg(%s", Cs_reg[theOp->rd]);
 
 	if (i0)
 		RebuildEmit(", i0");
@@ -698,7 +692,7 @@ void CppDecodeCallReg(OpcodeInfo *theOp)
 	else
 		RebuildEmit(", 0");
 
-	CppUsedCallReg = 1;
+	CsUsedCallReg = 1;
 
 	RebuildEmit(");\n");
 
@@ -713,7 +707,7 @@ void CppDecodeCallReg(OpcodeInfo *theOp)
 //
 //****************************************
 
-int CppDecodeCase(int ip)
+int CsDecodeCase(int ip)
 {
 	SYMBOL *ref;
 
@@ -730,7 +724,7 @@ int CppDecodeCase(int ip)
 //
 //****************************************
 
-int CppDecodeSwitch(OpcodeInfo *theOp)
+int CsDecodeSwitch(OpcodeInfo *theOp)
 {
 	int start, len, data_ip, def_ip, i;
 	int lab_ip;
@@ -742,21 +736,21 @@ int CppDecodeSwitch(OpcodeInfo *theOp)
 	def_ip	= GetDataMemLong(data_ip++);	// default case
 
 
-	RebuildEmit("	switch(%s)\n",  Cpp_reg[theOp->rd]);
+	RebuildEmit("	switch(%s)\n",  Cs_reg[theOp->rd]);
 	RebuildEmit("	{\n");
 
 	for (i=0;i<len+1;i++)
 	{
 		lab_ip = GetDataMemLong(data_ip++);
 
-		RebuildEmit("		case 0x%x: ", start);
-		CppDecodeCase(lab_ip);
+		RebuildEmit("		case %d: ", start);
+		CsDecodeCase(lab_ip);
 		RebuildEmit("\n");
 		start++;
 	}
 
 	RebuildEmit("		default: ", start);
-	CppDecodeCase(def_ip);
+	CsDecodeCase(def_ip);
 	RebuildEmit("\n");
 
 
@@ -770,13 +764,13 @@ int CppDecodeSwitch(OpcodeInfo *theOp)
 //
 //****************************************
 
-int CppCallFunction(SYMBOL *ref, int emit_r15)
+int CsCallFunction(SYMBOL *ref, int emit_r15)
 {
 	int param_count, need_comma, n;
 	int rettype = ref->RetType;
 	int regs;
 
-	CppEmitReturnType(rettype);
+	CsEmitReturnType(rettype);
 
 	RebuildEmit("%s_%d(", ref->Name, ref->LocalScope);
 
@@ -794,7 +788,7 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 		if (need_comma)
 			RebuildEmit(", ");
 
-		RebuildEmit("%s", Cpp_reg[REG_i0 + n]);
+		RebuildEmit("%s", Cs_reg[REG_i0 + n]);
 		need_comma = 1;
 	}
 
@@ -812,15 +806,15 @@ int CppCallFunction(SYMBOL *ref, int emit_r15)
 //
 //****************************************
 
-void CppEmitArith(OpcodeInfo *theOp, char *str, int imm)
+void CsEmitArith(OpcodeInfo *theOp, char *str, int imm)
 {
 	if (imm)
 	{
-		RebuildEmit("	%s %s= 0x%x;", Cpp_reg[theOp->rd], str, theOp->imm);
+		RebuildEmit("	%s %s= %d;", Cs_reg[theOp->rd], str, theOp->imm);
 		return;
 	}
 
-	RebuildEmit("	%s %s= %s;", Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs]);
+	RebuildEmit("	%s %s= %s;", Cs_reg[theOp->rd], str, Cs_reg[theOp->rs]);
 	return;
 }
 
@@ -828,20 +822,20 @@ void CppEmitArith(OpcodeInfo *theOp, char *str, int imm)
 //
 //****************************************
 
-void CppEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
+void CsEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
 {
 	char *us = "";
 
 	if (issigned)
-		us = "(unsigned int)";
+		us = "(uint)";
 
 	// Dest
 
-	RebuildEmit("	%s = ", Cpp_reg[theOp->rd]);
+	RebuildEmit("	%s = ", Cs_reg[theOp->rd]);
 
 	// Typecast and Src
 
-	RebuildEmit("%s %s", us, Cpp_reg[theOp->rd]);
+	RebuildEmit("(int)(%s %s", us, Cs_reg[theOp->rd]);
 
 	// Operator
 
@@ -849,11 +843,11 @@ void CppEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
 
 	if (imm)
 	{
-		RebuildEmit("0x%x;", theOp->imm);
+		RebuildEmit("%d);", theOp->imm);
 		return;
 	}
 	else
-		RebuildEmit("%s;", Cpp_reg[theOp->rs]);
+		RebuildEmit("%s);", Cs_reg[theOp->rs]);
 	return;
 }
 
@@ -861,7 +855,7 @@ void CppEmitShift(OpcodeInfo *theOp, char *oper, int imm, int issigned)
 //
 //****************************************
 
-void CppEmitDiv(OpcodeInfo *theOp, int imm)
+void CsEmitDiv(OpcodeInfo *theOp, int imm)
 {
 	if ((theOp->rs == 0) || (theOp->imm == 0))
 		printf(" ");
@@ -871,12 +865,12 @@ void CppEmitDiv(OpcodeInfo *theOp, int imm)
 		if (theOp->imm == 0)
 			Warning("Division by zero in recompiler");
 
-		RebuildEmit("	%s /= %d;", Cpp_reg[theOp->rd], theOp->imm);
+		RebuildEmit("	%s /= %d;", Cs_reg[theOp->rd], theOp->imm);
 	}
 	else
 	{
-		RebuildEmit("	if (%s == 0) MoSyncDiv0();\n", Cpp_reg[theOp->rs]);
-		RebuildEmit("	%s /= %s;", Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
+		RebuildEmit("	if (%s == 0) MoSyncDiv0();\n", Cs_reg[theOp->rs]);
+		RebuildEmit("	%s /= %s;", Cs_reg[theOp->rd], Cs_reg[theOp->rs]);
 	}
 }
 
@@ -884,19 +878,19 @@ void CppEmitDiv(OpcodeInfo *theOp, int imm)
 //
 //****************************************
 
-void CppEmitDivu(OpcodeInfo *theOp, int imm)
+void CsEmitDivu(OpcodeInfo *theOp, int imm)
 {
 	if (imm)
 	{
 		if (theOp->imm == 0)
 			Warning("Division by zero in recompiler");
 
-		RebuildEmit("	%s = (int) ((unsigned long)(%s)) / ((unsigned long)(%d));", Cpp_reg[theOp->rd], Cpp_reg[theOp->rd], theOp->imm);
+		RebuildEmit("	%s = (int) ((uint)(%s) / (uint)(%d));", Cs_reg[theOp->rd], Cs_reg[theOp->rd], theOp->imm);
 	}
 	else
 	{
-		RebuildEmit("	if(%s == 0) MoSyncDiv0();\n", Cpp_reg[theOp->rs]);
-		RebuildEmit("	%s = (int) ((unsigned long)(%s)) / ((unsigned long)(%s));", Cpp_reg[theOp->rd], Cpp_reg[theOp->rd], Cpp_reg[theOp->rs]);
+		RebuildEmit("	if(%s == 0) MoSyncDiv0();\n", Cs_reg[theOp->rs]);
+		RebuildEmit("	%s = (int) ((uint)(%s) / (uint)(%s));", Cs_reg[theOp->rd], Cs_reg[theOp->rd], Cs_reg[theOp->rs]);
 	}
 }
 
@@ -904,13 +898,13 @@ void CppEmitDivu(OpcodeInfo *theOp, int imm)
 //
 //****************************************
 
-void CppEmitJumpCond(OpcodeInfo *theOp, char *str, int unsign)
+void CsEmitJumpCond(OpcodeInfo *theOp, char *str, int unsign)
 {
 	if(unsign)
-		RebuildEmit("	if ((unsigned long)%s %s (unsigned long)%s) ",Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs]);
+		RebuildEmit("	if ((uint)%s %s (uint)%s) ",Cs_reg[theOp->rd], str, Cs_reg[theOp->rs]);
 	else
-		RebuildEmit("	if (%s %s %s) ",Cpp_reg[theOp->rd], str, Cpp_reg[theOp->rs]);
-	CppDecodeLabel(theOp, "goto label_%d;");
+		RebuildEmit("	if (%s %s %s) ",Cs_reg[theOp->rd], str, Cs_reg[theOp->rs]);
+	CsDecodeLabel(theOp, "goto label_%d;");
 
 	unsign = 0;
 }
@@ -919,7 +913,7 @@ void CppEmitJumpCond(OpcodeInfo *theOp, char *str, int unsign)
 //
 //****************************************
 
-void CppEmitReturnType(int rettype)
+void CsEmitReturnType(int rettype)
 {
 	switch(rettype)
 	{
@@ -946,7 +940,7 @@ void CppEmitReturnType(int rettype)
 //
 //****************************************
 
-void CppEmitReturnDecl(int rettype)
+void CsEmitReturnDecl(int rettype)
 {
 	switch(rettype)
 	{
@@ -955,16 +949,16 @@ void CppEmitReturnDecl(int rettype)
 		break;
 
 		case RET_void:
-		RebuildEmit("void ");
+		RebuildEmit("private void ");
 		break;
 
 		case RET_float:
 		case RET_int:
-		RebuildEmit("int ");
+		RebuildEmit("private int ");
 		break;
 
 		case RET_double:
-		RebuildEmit("int ");
+		RebuildEmit("private int ");
 		break;
 	}
 }
@@ -973,7 +967,7 @@ void CppEmitReturnDecl(int rettype)
 //		Disassemble Function
 //****************************************
 
-void RebuildCppProlog(SYMBOL *sym, int isproto)
+void RebuildCsProlog(SYMBOL *sym, int isproto)
 {
 	int reg_used;
 	int reg_alloc;
@@ -1020,13 +1014,13 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 		break;
 
 		case RET_void:
-		RebuildEmit("void ");
+		RebuildEmit("private void ");
 		break;
 
 		case RET_float:
 		case RET_int:
 		case RET_double:
-		RebuildEmit("int ");
+		RebuildEmit("private int ");
 		break;
 	}
 
@@ -1044,7 +1038,7 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 		if (need_comma)
 			RebuildEmit(", ");
 
-		RebuildEmit("int %s", Cpp_reg[REG_i0 + n]);
+		RebuildEmit("int %s", Cs_reg[REG_i0 + n]);
 		need_comma = 1;
 
 		reg_alloc |=  1 << (REG_i0 + n);
@@ -1092,9 +1086,9 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 				if (need_comma)
 					RebuildEmit(", ");
 
-				RebuildEmit("%s", Cpp_reg[n]);
+				RebuildEmit("%s", Cs_reg[n]);
 
-				if (funcprop.uninit_reg & (1<<n))
+				//if (funcprop.uninit_reg & (1<<n))
 					RebuildEmit("=0");
 
 				need_comma = 1;
@@ -1110,14 +1104,14 @@ void RebuildCppProlog(SYMBOL *sym, int isproto)
 //		Disassemble Function
 //****************************************
 
-void RebuildCppEpilog(SYMBOL *sym)
+void RebuildCsEpilog(SYMBOL *sym)
 {
 //	ThisFunctionExit
 
 	if (ReturnCount > 0)
 		RebuildEmit("label_0:;\n");
 
-	CppDecodeReturn(1);
+	CsDecodeReturn(1);
 	RebuildEmit("\n");
 
 	RebuildEmit("} // %s\n", sym->Name);
@@ -1127,7 +1121,7 @@ void RebuildCppEpilog(SYMBOL *sym)
 //		Disassemble Function
 //****************************************
 
-void RebuildCppFunc(SYMBOL *sym, int isproto)
+void RebuildCsFunc(SYMBOL *sym, int isproto)
 {
 	OpcodeInfo thisOp;
 	SYMBOL *ref;
@@ -1155,7 +1149,7 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 	if (ThisFunctionRegs == -1)
 		return;
 
-	RebuildCppProlog(sym, isproto);
+	RebuildCsProlog(sym, isproto);
 
 	// if we're generating a proto return
 
@@ -1181,10 +1175,10 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 		{
 			if (ref->LabelType == label_Local)
 			{
-#ifdef Cpp_DEBUG
+#ifdef CS_DEBUG
 				RebuildEmit("// %s_%d:\n", ref->Name, ref->LocalScope);
 #endif
-				RebuildEmit("label_%d:;\n", ref->LabelEnum);
+				RebuildEmit("label_%d:\n", ref->LabelEnum);
 			}
 		}
 
@@ -1200,12 +1194,12 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 		if (ip > ip_end)
 			ThisFunctionExit = 1;
 
-		RebuildCppInst(&thisOp);
+		RebuildCsInst(&thisOp);
 
 //		DecodeAsmString(&thisOp, str);
 //		RebuildEmit("\t%s", str);
 
-#ifdef CPP_DEBUG
+#ifdef CS_DEBUG
 		{
 			int len = 4 + strlen(str);
 			str[0] = 0;
@@ -1235,14 +1229,14 @@ void RebuildCppFunc(SYMBOL *sym, int isproto)
 		real_ip += (ip - ip_last);
 	}
 
-	RebuildCppEpilog(sym);
+	RebuildCsEpilog(sym);
 }
 
 //****************************************
 //
 //****************************************
 
-void RebuildCpp_Code()
+void RebuildCs_Code()
 {
 	SYMBOL *sym;
 	int n;
@@ -1257,7 +1251,7 @@ void RebuildCpp_Code()
 			if (sym->Flags & SymFlag_Ref)
 			if (sym->LabelType >= label_Function)
 			{
-				RebuildCppFunc(sym, 0);
+				RebuildCsFunc(sym, 0);
 				c++;
 			}
 		}
@@ -1267,8 +1261,8 @@ void RebuildCpp_Code()
 //****************************************
 //
 //****************************************
-
-void RebuildCpp_EmitProtos()
+#if 0
+void RebuildCs_EmitProtos()
 {
 	SYMBOL *sym;
 	int n;
@@ -1286,18 +1280,18 @@ void RebuildCpp_EmitProtos()
 			if (sym->Flags & SymFlag_Ref)
 			if (sym->LabelType >= label_Function)
 			{
-				RebuildCppFunc(sym, 1);
+				RebuildCsFunc(sym, 1);
 			}
 		}
 	}
 }
-
+#endif
 
 //****************************************
 //
 //****************************************
 
-void RebuildCpp_CallReg()
+void RebuildCs_CallReg()
 {
 	SYMBOL *sym;
 	int n, count;
@@ -1306,7 +1300,7 @@ void RebuildCpp_CallReg()
 	count = GetVirtualIndex();
 
 //	if (!count)
-	if (!CppUsedCallReg)
+	if (!CsUsedCallReg)
 	{
 		RebuildEmit("\n// No virtuals\n\n");
 		return;
@@ -1318,7 +1312,7 @@ void RebuildCpp_CallReg()
 	RebuildEmit("//****************************************\n\n");
 
 
-	RebuildEmit("int CallReg(int s, int i0, int i1, int i2, int i3)\n");
+	RebuildEmit("private int CallReg(int s, int i0, int i1, int i2, int i3)\n");
 	RebuildEmit("{\n");
 
 //	RebuildEmit("	int r14,r15;\n");
@@ -1338,7 +1332,7 @@ void RebuildCpp_CallReg()
 			{
 				RebuildEmit("		case 0x%x:\n", sym->VirtualIndex);
 				RebuildEmit("		");
-				CppCallFunction(sym, 0);
+				CsCallFunction(sym, 0);
 				RebuildEmit("\n\t");
 
 				ThisFunctionRetType = sym->RetType;
@@ -1349,7 +1343,7 @@ void RebuildCpp_CallReg()
 				}
 				else
 				{
-					CppDecodeReturn(0);			// was 1
+					CsDecodeReturn(0);			// was 1
 					RebuildEmit("\n\n");
 				}
 
@@ -1371,31 +1365,8 @@ void RebuildCpp_CallReg()
 //****************************************
 //
 //****************************************
-#if 0
-void RebuildCpp_EmitDS()
-{
-	int need_comma;
-	int count;
-	int n;
 
-	RebuildEmit("\n");
-	RebuildEmit("//****************************************\n");
-	RebuildEmit("//             Data Section\n");
-	RebuildEmit("//****************************************\n\n");
-
-	RebuildEmit("#define ds_len %d\n", DataIP >> 2);
-	RebuildEmit("#define bs_len %d\n", BssIP >> 2);
-	RebuildEmit("#define all_len %d\n\n", (BssIP + DataIP) >> 2);
-	RebuildEmit("#define MaxDataIP %d\n\n", MaxDataIP >> 2);
-
-	RebuildEmit("int *mem_ds\n");
-}
-#endif
-//****************************************
-//
-//****************************************
-
-void RebuildCpp_StartUp()
+void RebuildCs_StartUp()
 {
 	SYMBOL *ep;
 	FILE *out;
@@ -1422,15 +1393,16 @@ void RebuildCpp_StartUp()
 	}
 #endif
 
-	RebuildEmit("#define ds_len  %d\n", DataIP);
-	RebuildEmit("#define bs_len  %d\n", BssIP);
-	RebuildEmit("#define all_len %d\n", (BssIP + DataIP));
-	RebuildEmit("#define max_data %d\n\n", MaxDataIP);
 
-//	RebuildEmit("int *mem_ds;\n");
+	RebuildEmit("public class CoreNativeProgram : MoSync.CoreNative\n");
+	RebuildEmit("{\n\n");
 
+	RebuildEmit("protected const int ds_len = %d;\n", DataIP);
+	RebuildEmit("protected const int bs_len = %d;\n", BssIP);
+	RebuildEmit("protected const int all_len = %d;\n", (BssIP + DataIP));
+	RebuildEmit("protected const int max_data = %d;\n\n", MaxDataIP);
 
-	RebuildEmit("void cpp_main()\n");
+	RebuildEmit("public override void Main()\n");
 	RebuildEmit("{\n");
 
 	RebuildEmit("	int i0,i1,i2;\n");
@@ -1442,10 +1414,9 @@ void RebuildCpp_StartUp()
 	RebuildEmit("	sp = %i-16; //Init stack\n", Default_DataSize);
 	RebuildEmit("\n");
 
-	RebuildEmit("	mem_ds = CppInitReadData(\"data_section.bin\", max_data, i0);\n");
+	RebuildEmit("	InitData(\"data_section.bin\", max_data, i0);\n");
 
 	// emit the bin file
-
 	out = fopen("data_section.bin", "wb");
 	ArrayWriteFP(&DataMemArray, out, MaxDataIP);
 	fclose(out);
@@ -1453,17 +1424,16 @@ void RebuildCpp_StartUp()
 	ep	= GetGlobalSym(Code_EntryPoint);
 
 	if (ep)
-		CppCallFunction(ep, 1);
+		CsCallFunction(ep, 1);
 
 	RebuildEmit("\n}\n");
-
 }
 
 //****************************************
 //
 //****************************************
 
-void RebuildCpp_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
+void RebuildCs_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
 {
 	int param_count, need_comma, n;
 
@@ -1482,7 +1452,7 @@ void RebuildCpp_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
 
 	param_count = sym->Params;
 
-	CppEmitReturnDecl(sym->RetType);
+	CsEmitReturnDecl(sym->RetType);
 
 	RebuildEmit("%s(", sym->Name);
 
@@ -1496,7 +1466,7 @@ void RebuildCpp_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
 		if (need_comma)
 			RebuildEmit(", ");
 
-		RebuildEmit("int %s", Cpp_reg[REG_i0 + n]);
+		RebuildEmit("int %s", Cs_reg[REG_i0 + n]);
 		need_comma = 1;
 	}
 
@@ -1515,7 +1485,7 @@ void RebuildCpp_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
 	else
 	{
 		ThisFunctionRetType = sym->RetType;
-		CppDecodeReturnNull();
+		CsDecodeReturnNull();
 	}
 
 	RebuildEmit("\n}\n");
@@ -1525,20 +1495,20 @@ void RebuildCpp_EmitSyscallFunc(SYMBOL *sym, int proto, int stub)
 //
 //****************************************
 
-void RebuildCpp_EmitExtensions(int stub)
+void RebuildCs_EmitExtensions(int stub)
 {
 	SYMBOL *sym;
-	int len = sizeof(CppSyscallUsed);
+	int len = sizeof(CsSyscallUsed);
 	int n;
 
 	for (n=0;n<len;n++)
 	{
-		if (CppSyscallUsed[n])
+		if (CsSyscallUsed[n])
 		{
 			sym = FindSysCall(n);
 
 			if (sym)
-				RebuildCpp_EmitSyscallFunc(sym, 0, stub);
+				RebuildCs_EmitSyscallFunc(sym, 0, stub);
 		}
 	}
 }
@@ -1547,10 +1517,10 @@ void RebuildCpp_EmitExtensions(int stub)
 //
 //****************************************
 
-void RebuildCpp_EmitExtensionsProto()
+void RebuildCs_EmitExtensionsProto()
 {
 	SYMBOL *sym;
-	int len = sizeof(CppSyscallUsed);
+	int len = sizeof(CsSyscallUsed);
 	int n;
 
 	for (n=0;n<len;n++)
@@ -1558,7 +1528,7 @@ void RebuildCpp_EmitExtensionsProto()
 			sym = FindSysCall(n);
 
 			if (sym)
-				RebuildCpp_EmitSyscallFunc(sym, 1, 1);
+				RebuildCs_EmitSyscallFunc(sym, 1, 1);
 	}
 }
 
@@ -1566,10 +1536,10 @@ void RebuildCpp_EmitExtensionsProto()
 //
 //****************************************
 
-void RebuildCpp_Main()
+void RebuildCs_Main()
 {
 	if (ArgConstOpt != 0)
-		Error(Error_System, "(RebuildCpp_Main) ArgConstOpt must be switched off");
+		Error(Error_System, "(RebuildCs_Main) ArgConstOpt must be switched off");
 
 	#ifdef CPP_SHOW_LINES
 	InitFiles();
@@ -1578,29 +1548,33 @@ void RebuildCpp_Main()
 	ArrayInit(&RebuildArray, sizeof(char), 0);
 	ArrayInit(&LabelDone, sizeof(char), 0);
 
-	memset(CppSyscallUsed, 0, sizeof(CppSyscallUsed));
+	memset(CsSyscallUsed, 0, sizeof(CsSyscallUsed));
 
-	CppForceSysCallUsed("RBYTE");
-	CppForceSysCallUsed("WBYTE");
+	CsForceSysCallUsed("RBYTE");
+	CsForceSysCallUsed("WBYTE");
 
 	Rebuild_Mode = 1;
-	CppUsedCallReg = 0;
+	CsUsedCallReg = 0;
 
 	RebuildEmit("//****************************************\n");
-	RebuildEmit("//          Generated Cpp code\n");
+	RebuildEmit("//          Generated Cs code\n");
 	RebuildEmit("//****************************************\n");
+	RebuildEmit("\n");
 
-	RebuildEmit("\n");
-	RebuildEmit("#include \"mstypeinfo.h\"\n");
-	RebuildEmit("\n");
+	RebuildEmit("#if REBUILD\n\n");
+
+	RebuildEmit("// disable unreferenced label warnings\n");
+	RebuildEmit("#pragma warning disable 0164\n");
+	//RebuildEmit("#include \"mstypeinfo.h\"\n");
+	//RebuildEmit("\n");
 
 #if 0			//My Testing only
-	RebuildCpp_EmitExtensionsProto();
+	RebuildCs_EmitExtensionsProto();
 #endif
 
-	RebuildCpp_EmitProtos();
-
-//	RebuildCpp_EmitDS();
+#if 0
+	RebuildCs_EmitProtos();
+#endif
 
 //	RebuildEmit("class MoSyncCode\n");
 //	RebuildEmit("{\n");
@@ -1611,25 +1585,26 @@ void RebuildCpp_Main()
 
 	RebuildEmit("\n");
 
-//	RebuildCpp_EmitDS();
-	RebuildCpp_StartUp();
+	RebuildCs_StartUp();
 
 	MaxEnumLabel = 0;
 
-	RebuildCpp_Code();
-	//RebuildCpp_EmitExtensions(1);
-	RebuildCpp_CallReg();
+	RebuildCs_Code();
+	//RebuildCs_EmitExtensions(1);
+	RebuildCs_CallReg();
 
+	RebuildEmit("\n} // CoreNative\n");
+	RebuildEmit("#endif // REBUILD\n");
 //	RebuildEmit("}; // End of MosyncCode class\n");
 //	RebuildEmit("// MaxEnumLabel=%d\n", MaxEnumLabel);
 
-//	RebuildCpp_FlowClass();
+//	RebuildCs_FlowClass();
 
-	#ifdef CPP_SHOW_LINES
+	#ifdef CS_SHOW_LINES
 	FreeFiles();
 	#endif
 
-	ArrayWrite(&RebuildArray, "rebuild.build.cpp");
+	ArrayWrite(&RebuildArray, "rebuild.build.cs");
 }
 
 //****************************************
