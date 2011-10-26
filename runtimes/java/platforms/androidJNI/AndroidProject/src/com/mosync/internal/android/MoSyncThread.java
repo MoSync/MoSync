@@ -311,6 +311,7 @@ public class MoSyncThread extends Thread
 			mMoSyncFont = null;
 		}
 
+		cameraScreen = 0;
 		//Do not access camera if it is not available
 		try
 		{
@@ -3390,6 +3391,7 @@ public class MoSyncThread extends Thread
 		if(cameraScreen != 0)
 		{
 			maWidgetDestroy(cameraScreen);
+			mMoSyncCameraController.removePreview();
 			maWidgetScreenShow(IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE);
 			cameraScreen = 0;
 		}
