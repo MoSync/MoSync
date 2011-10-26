@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/*! \addtogroup NativeUILib
+ *  @{
+ */
+
+/**
+ *  @defgroup NativeUILib Native UI Library
+ *  @{
+ */
+
 /**
  * @file ListViewItem.h
  * @author Bogdan Iusco
@@ -79,6 +88,7 @@ namespace NativeUI
 
         /**
          * Set the type of accessory.
+         * Available only on iOS.
          * Provides the corresponding icon in the right side of the widget.
          * @param type The type of the accessory.
          */
@@ -130,3 +140,5 @@ namespace NativeUI
 } // namespace NativeUI
 
 #endif /* NATIVEUI_LIST_VIEW_ITEM_H_ */
+
+/*! @} */

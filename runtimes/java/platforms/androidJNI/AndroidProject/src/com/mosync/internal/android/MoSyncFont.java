@@ -35,6 +35,13 @@ import android.util.Log;
  */
 public class MoSyncFont
 {
+	/**
+	 * Store the font location: the file system, or the assets folder,
+	 * to know where to search it from.
+	 */
+	enum FontLocation{
+		ASSETS, SYSTEM
+	}
 
 	/**
 	 * The MoSync thread object.
@@ -43,6 +50,8 @@ public class MoSyncFont
 
 	/**
 	 * Internal handle for handling fonts.
+	 * A font handle is created by the user via maFontLoadWithName or maFontLoadDefault.
+	 * Each font is created just before usage, by providing the postscriptname/type and style, and size.
 	 */
 	public class MoSyncFontHandle
 	{
@@ -77,9 +86,7 @@ public class MoSyncFont
 		 * This value must be positive and non-negative.
 		 */
 		private float mFontSize;
-
 	}
-
 
 	/**
 	 * Constructor Font API
@@ -101,7 +108,6 @@ public class MoSyncFont
 		 */
 		mFonts.put(new Integer(1), newMosyncFont);
 	}
-
 
 	/************************ Syscalls ************************/
 
@@ -209,6 +215,7 @@ public class MoSyncFont
 	{
 		// Clear this list each time the method gets called.
 		mFontNames.clear();
+		mFontNamesLocation.clear();
 
 		// Add the system fonts.
 		File systemFontsFile = new File(SYSTEM_FONTS_FOLDER);
@@ -222,6 +229,8 @@ public class MoSyncFont
 		for(File font : systemFontsFile.listFiles(myFileNameFilter)){
 			String fontName = font.getName();
 			mFontNames.add(fontName.subSequence(0,fontName.lastIndexOf(FONT_EXT)).toString());
+			// Keep track of the fonts that are located in the system.
+			mFontNamesLocation.add(FontLocation.SYSTEM);
 		}
 
 		//Add custom fonts from Assets Manager.
@@ -232,15 +241,16 @@ public class MoSyncFont
 				if ( assetFiles[i].endsWith(FONT_EXT))
 				{
 					mFontNames.add(assetFiles[i].subSequence(0, assetFiles[i].lastIndexOf(FONT_EXT)).toString());
+					// Keep track of the fonts that are located in the assets folder ( custom ones).
+					mFontNamesLocation.add(FontLocation.ASSETS);
 				}
 			}
 		} catch (IOException e)
 		{
-			Log.e("MoSync", "maFontGetCount No fonts in assets");
+			Log.e("@@MoSync", "maFontGetCount: No fonts in assets.");
 		}
 
 		return mFontNames.size();
-
 	}
 
 	/**
@@ -264,6 +274,7 @@ public class MoSyncFont
 			result = getFontNameOnIndex(index);
 		} catch (IndexOutOfBoundsException iofbe)
 		{
+			Log.e("@@MoSync","maFontGetName: Index out of bounds.");
 			return RES_FONT_INDEX_OUT_OF_BOUNDS;
 		}
 
@@ -276,7 +287,7 @@ public class MoSyncFont
 
 		if( result.length( ) <= 0 )
 		{
-			Log.e( "MoSync", "maFontGetName: List is not initialized");
+			Log.e( "@@MoSync", "maFontGetName: List is not initialized.");
 			return RES_FONT_LIST_NOT_INITIALIZED;
 		}
 
@@ -301,34 +312,67 @@ public class MoSyncFont
 		// Create a new font handle using postscript name and size.
 		MoSyncFontHandle newMosyncFont;
 
-		// Try to get the typeface from system fonts if it exists.
-		Typeface newTypeface = Typeface.createFromFile(SYSTEM_FONTS_FOLDER + postScriptName + FONT_EXT);
-
-		if ( newTypeface == null )
+		// First check if the postscript name exists in the list of fonts.
+		// This can occur if user omits calling maFontGetCount() which retrieves the list of fonts.
+		int fontIndex = mFontNames.indexOf(postScriptName);
+		if ( fontIndex >= 0 )
 		{
-			// Try to create a typeface from assets. ( ex "fonts/myFont.ttf" )
-			newTypeface = Typeface.createFromAsset(
-					mMoSyncThread.getActivity().getAssets(), ASSETS_FONT_FOLDER + "/" + postScriptName + FONT_EXT);
-
-			// Check if the font exists.
-			if ( newTypeface == null )
+			Typeface newTypeface = null;
+			if ( mFontNamesLocation.get(fontIndex) == FontLocation.SYSTEM )
 			{
-				return RES_FONT_NAME_NONEXISTENT;
+				try{
+					// Try to get the typeface from system fonts.
+					newTypeface = Typeface.createFromFile(SYSTEM_FONTS_FOLDER + postScriptName + FONT_EXT);
+					if ( newTypeface == null )
+					{
+						// Check if the font exists.
+						if ( newTypeface == null )
+						{
+							Log.e("@@MoSync", "maFontLoadWithName: Font does not exist anymore in the system.");
+							return RES_FONT_NAME_NONEXISTENT;
+						}
+					}
+				}
+				catch (Exception ex)
+				{
+					// This can happen if between this call and the syscall that gets all the fonts
+					// the font was physically deleted from the device.
+					Log.e("@@MoSync", "maFontLoadWithName: Font does not exist in the system.");
+					return RES_FONT_NAME_NONEXISTENT;
+				}
 			}
+			else
+			{
+				// Try to create a typeface from assets. ( ex "fonts/myFont.ttf" )
+				newTypeface = Typeface.createFromAsset(
+						mMoSyncThread.getActivity().getAssets(), ASSETS_FONT_FOLDER + "/" + postScriptName + FONT_EXT);
+
+				// Check if the font still exists.
+				if ( newTypeface == null )
+				{
+					Log.e("@@Mosync","maFontLoadWithName: Font does not exist anymore in assets.");
+					return RES_FONT_NAME_NONEXISTENT;
+				}
+			}
+
+			// Create the font handle.
+			newMosyncFont = new MoSyncFontHandle(newTypeface, size );
+
+			// Increase the current index in the font list.
+			mFontHandle++;
+
+			/*
+			 * The new font is saved in the list of available fonts.
+			 */
+			mFonts.put(new Integer(mFontHandle), newMosyncFont);
+
+			return mFontHandle;
 		}
-
-		// Create the font handle.
-		newMosyncFont = new MoSyncFontHandle(newTypeface, size );
-
-		// Increase the current index in the font list.
-		mFontHandle++;
-
-		/*
-		 * The new font is saved in the list of available fonts.
-		 */
-		mFonts.put(new Integer(mFontHandle), newMosyncFont);
-
-		return mFontHandle;
+		else
+		{
+			Log.e("@@MoSync","maFontLoadWithName: Postscript name does not exist.");
+			return RES_FONT_NAME_NONEXISTENT;
+		}
 	}
 
 	/**
@@ -424,6 +468,13 @@ public class MoSyncFont
 	List<String> mFontNames = new ArrayList<String>();
 
 	/**
+	 * List that holds location information for all the available fonts
+	 * that are stored in mFontNames.
+	 * Location can be SYSTEM or ASSETS.
+	 */
+	List<FontLocation> mFontNamesLocation = new ArrayList<FontLocation>();
+
+	/**
 	 * The current font handle index in the list of fonts.
 	 * Used for loading fonts.
 	 * 0 is skipped for handles.
@@ -442,5 +493,4 @@ public class MoSyncFont
 	 * and at the next canvas draw we need to set the font.
 	 */
 	boolean mNewFontUsed = false;
-
 }

@@ -103,8 +103,13 @@ void MainScreen::createMainLayout() {
 //	mMainLayout->setBackgroundColor(0xFF0000);
 	Screen::setMainWidget(mMainLayout);
 
+	Label* info1 = new Label();
+	info1->setText("First edit box with Capitalize all characters");
+	mMainLayout->addChild(info1);
+
 	mEditBox = new EditBox();
 	mEditBox->setPlaceholder("Enter text...");
+	mEditBox->setInputFlag(EDIT_BOX_INPUT_GLAG_INITIAL_CAPS_ALL_CHARACTERS);
 	mEditBox->fillSpaceHorizontally();
 	mMainLayout->addChild(mEditBox);
 
@@ -123,6 +128,24 @@ void MainScreen::createMainLayout() {
 	mKeyboardButton = new Button();
 	mKeyboardButton->setText("Show/hide keyboard");
 	mMainLayout->addChild(mKeyboardButton);
+
+	mEditBoxEmail = new EditBox();
+	mEditBoxEmail->setPlaceholder("Enter email address...");
+	mEditBoxEmail->setInputMode(EDIT_BOX_INPUT_MODE_EMAILADDR);
+	mEditBoxEmail->fillSpaceHorizontally();
+	mMainLayout->addChild(mEditBoxEmail);
+
+	mEditBoxDecimal = new EditBox();
+	mEditBoxDecimal->setPlaceholder("Enter a real number...");
+	mEditBoxDecimal->setInputMode(EDIT_BOX_INPUT_MODE_DECIMAL);
+	mEditBoxDecimal->fillSpaceHorizontally();
+	mMainLayout->addChild(mEditBoxDecimal);
+
+	mEditBoxUrl = new EditBox();
+	mEditBoxUrl->setPlaceholder("Enter an URL ..");
+	mEditBoxUrl->setInputMode(EDIT_BOX_INPUT_MODE_URL);
+	mEditBoxUrl->fillSpaceHorizontally();
+	mMainLayout->addChild(mEditBoxUrl);
 
 	maSetColor(0x8A2BE2);
 }
