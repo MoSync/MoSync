@@ -93,6 +93,7 @@ namespace NativeUI
 
     /**
      * Set the mode of the edit box.
+     * @deprecated Use setInputMode and setInputFlag instead.
      * @param editBoxMode The given mode.
      */
     void EditBox::setEditMode(EditBoxMode editBoxMode)
@@ -109,6 +110,24 @@ namespace NativeUI
         }
 
         this->setProperty(MAW_EDIT_BOX_EDIT_MODE, mode);
+    }
+
+    /**
+     * Set the input mode of the edit box.
+     * @param inputMode One of the EditBoxInputMode constants.
+     */
+    void EditBox::setInputMode(EditBoxInputMode inputMode)
+    {
+        this->setPropertyInt(MAW_EDIT_BOX_INPUT_MODE, inputMode);
+    }
+
+    /**
+     * Set the input flags that are to be applied to the edit box.
+     * @param inputFlag One of the EditBoxInputFlag constants.
+     */
+    void EditBox::setInputFlag(EditBoxInputFlag inputFlag)
+    {
+        this->setPropertyInt(MAW_EDIT_BOX_INPUT_FLAG, inputFlag);
     }
 
     /**

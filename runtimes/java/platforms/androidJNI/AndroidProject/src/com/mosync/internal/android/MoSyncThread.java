@@ -60,8 +60,6 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL10;
@@ -184,12 +182,6 @@ public class MoSyncThread extends Thread
 	 * used for maPanic.
 	 */
 	private boolean mHasDied;
-
-	/**
-	 * Boolean used to determine whether to interrupt the trehad or not,
-	 * true if this thread is sleeping in maWait.
-	 */
-	private final AtomicBoolean mIsSleepingInMaWait = new AtomicBoolean(false);
 
 	/**
 	 * a handle used for full screen camera preview
@@ -885,18 +877,8 @@ public class MoSyncThread extends Thread
 		// Add event to queue.
 		nativePostEvent(event);
 
-		// Only interrupt if we are sleeping in maWait.
-		if (mIsSleepingInMaWait.get())
-		{
-			// Wake up this thread to make it process events.
-			interrupt();
-		}
-		else
-		{
-			//Log.i(
-			//	"@@@ MoSyncThread.postEvent",
-			//	"Did not call interrupt, not in maWait (this is good!)");
-		}
+		// Wake up thread if sleeping.
+		interrupt();
 	}
 
 	/**
@@ -2221,8 +2203,6 @@ public class MoSyncThread extends Thread
 
 		try
 		{
-			mIsSleepingInMaWait.set(true);
-
 	 		if (timeout<=0)
 			{
 				Thread.sleep(Long.MAX_VALUE);
@@ -2241,8 +2221,6 @@ public class MoSyncThread extends Thread
 		{
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
-
-		mIsSleepingInMaWait.set(false);
 
 		SYSLOG("maWait returned");
 	}
