@@ -244,6 +244,15 @@ public class MoSyncCameraController {
 	}
 
 	/**
+	 * Sets the MoSyncCameraPreview object to be controlled
+	 * @param preview an object of MoSyncCameraPreview that has already been initialized
+	 */
+	public void removePreview()
+	{
+		mPreview = null;
+	}
+
+	/**
 	 * Sets the active camera
 	 * @param CameraNumber index of the camera from the available cameras
 	 * @return RES_OK
