@@ -24,6 +24,7 @@ import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.core.Types;
 import com.mosync.nativeui.util.KeyboardManager;
 import com.mosync.nativeui.util.properties.BooleanConverter;
+import com.mosync.nativeui.util.properties.IntConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -34,6 +35,8 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  */
 public class EditBoxWidget extends LabelWidget
 {
+	private int m_inputConstraints = 0x00000;
+
 	/**
 	 * Constructor.
 	 *
@@ -84,6 +87,73 @@ public class EditBoxWidget extends LabelWidget
 		else if( property.equals( IX_WIDGET.MAW_EDIT_BOX_TEXT ) )
 		{
 			editTextView.setText( value );
+		}
+		else if( property.equals( IX_WIDGET.MAW_EDIT_BOX_INPUT_MODE ) )
+		{
+			int constraints = IntConverter.convert(value);
+			switch( constraints )
+			{
+			case IX_WIDGET.MAW_EDIT_BOX_TYPE_ANY:
+				m_inputConstraints |=
+				InputType.TYPE_CLASS_TEXT |
+				InputType.TYPE_TEXT_FLAG_MULTI_LINE;
+				break;
+			case IX_WIDGET.MAW_EDIT_BOX_TYPE_DECIMAL:
+				m_inputConstraints |=
+					InputType.TYPE_CLASS_NUMBER |
+					InputType.TYPE_NUMBER_FLAG_DECIMAL |
+					InputType.TYPE_NUMBER_FLAG_SIGNED;
+				break;
+			case IX_WIDGET.MAW_EDIT_BOX_TYPE_EMAILADDR:
+				m_inputConstraints |=
+					InputType.TYPE_CLASS_TEXT |
+					InputType.TYPE_TEXT_VARIATION_EMAIL_ADDRESS;
+				break;
+			case IX_WIDGET.MAW_EDIT_BOX_TYPE_NUMERIC:
+				m_inputConstraints |=
+					InputType.TYPE_CLASS_NUMBER |
+					InputType.TYPE_NUMBER_FLAG_SIGNED;
+				break;
+			case IX_WIDGET.MAW_EDIT_BOX_TYPE_PHONENUMBER:
+				m_inputConstraints |= InputType.TYPE_CLASS_PHONE;
+				break;
+			case IX_WIDGET.MAW_EDIT_BOX_TYPE_SINGLE_LINE:
+				m_inputConstraints |= InputType.TYPE_CLASS_TEXT;
+				break;
+			case IX_WIDGET.MAW_EDIT_BOX_TYPE_URL:
+				m_inputConstraints |=
+					InputType.TYPE_CLASS_TEXT |
+					InputType.TYPE_TEXT_VARIATION_URI;
+				break;
+				default:
+					throw new InvalidPropertyValueException(property, value);
+			}
+			editTextView.setInputType(m_inputConstraints);
+		}
+		else if( property.equals( IX_WIDGET.MAW_EDIT_BOX_INPUT_FLAG ) )
+		{
+			int constraints = IntConverter.convert(value);
+			switch(constraints)
+			{
+			case IX_WIDGET.MAW_EDIT_BOX_FLAG_PASSWORD:
+				m_inputConstraints |= InputType.TYPE_TEXT_VARIATION_PASSWORD;
+				break;
+			case IX_WIDGET.MAW_EDIT_BOX_FLAG_SENSITIVE:
+				m_inputConstraints |= InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS;
+				break;
+			case IX_WIDGET.MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE:
+				m_inputConstraints |= InputType.TYPE_TEXT_FLAG_CAP_SENTENCES;
+				break;
+			case IX_WIDGET.MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD:
+				m_inputConstraints |= InputType.TYPE_TEXT_FLAG_CAP_WORDS;
+			case IX_WIDGET.MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS:
+				m_inputConstraints |= InputType.TYPE_TEXT_FLAG_CAP_CHARACTERS;
+				break;
+				default:
+					throw new InvalidPropertyValueException(property, value);
+			}
+
+			editTextView.setInputType(m_inputConstraints);
 		}
 		else
 		{
