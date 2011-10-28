@@ -33,6 +33,8 @@ stabs.tab
 fp.xml
 profile.txt
 .DS_Store
+.settings
+xcuserdata
 
 config_platform.h
 
@@ -187,6 +189,35 @@ config_platform.h
 /tests/libc-suite/_masterdump.s
 /tests/libc-suite/filesystem
 /tests/libc-suite/loader/config.h
+
+/tests/Benchmarks/linpack/android-dalvik/bin/
+/tests/Benchmarks/linpack/android-dalvik/gen/
+/tests/Benchmarks/linpack/android-ndk/gen/
+/tests/Benchmarks/linpack/android-ndk/obj/
+/tests/Benchmarks/linpack/android-ndk/bin/
+/tests/Benchmarks/linpack/android-ndk/libs/
+
+/tests/Benchmarks/membench/android-dalvik/bin/
+/tests/Benchmarks/membench/android-dalvik/gen/
+/tests/Benchmarks/membench/android-ndk/gen/
+/tests/Benchmarks/membench/android-ndk/obj/
+/tests/Benchmarks/membench/android-ndk/bin/
+/tests/Benchmarks/membench/android-ndk/libs/
+
+/tests/Benchmarks/opengl/android-dalvik/bin/
+/tests/Benchmarks/opengl/android-dalvik/gen/
+
+/tests/Benchmarks/stropbench/android-dalvik/bin/
+/tests/Benchmarks/stropbench/android-dalvik/gen/
+/tests/Benchmarks/stropbench/android-ndk/gen/
+/tests/Benchmarks/stropbench/android-ndk/obj/
+/tests/Benchmarks/stropbench/android-ndk/bin/
+/tests/Benchmarks/stropbench/android-ndk/libs/
+
+/tests/Benchmarks/*/bin/
+/tests/Benchmarks/*/obj/
+/tests/Benchmarks/*/gen/
+/tests/Benchmarks/*/libs/*.so
 
 /tools/vis/sld.*
 

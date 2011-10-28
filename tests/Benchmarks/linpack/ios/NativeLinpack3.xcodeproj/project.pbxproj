@@ -1,0 +1,312 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		10ABC41E13B08B0A00C8AD04 /* MainWindow-iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10ABC41C13B08B0A00C8AD04 /* MainWindow-iPad.xib */; };
+		10FE4A8A13AF8BE500F40190 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10FE4A8913AF8BE500F40190 /* UIKit.framework */; };
+		10FE4A8C13AF8BE500F40190 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10FE4A8B13AF8BE500F40190 /* Foundation.framework */; };
+		10FE4A8E13AF8BE500F40190 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10FE4A8D13AF8BE500F40190 /* CoreGraphics.framework */; };
+		10FE4A9413AF8BE500F40190 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 10FE4A9213AF8BE500F40190 /* InfoPlist.strings */; };
+		10FE4A9713AF8BE500F40190 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 10FE4A9613AF8BE500F40190 /* main.m */; };
+		10FE4A9A13AF8BE500F40190 /* NativeLinpack3AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 10FE4A9913AF8BE500F40190 /* NativeLinpack3AppDelegate.m */; };
+		10FE4A9D13AF8BE500F40190 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10FE4A9B13AF8BE500F40190 /* MainWindow.xib */; };
+		10FE4AA013AF8BE500F40190 /* NativeLinpack3ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 10FE4A9F13AF8BE500F40190 /* NativeLinpack3ViewController.m */; };
+		10FE4AA313AF8BE500F40190 /* NativeLinpack3ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10FE4AA113AF8BE500F40190 /* NativeLinpack3ViewController.xib */; };
+		10FE4AAC13AFA2E700F40190 /* linpack.c in Sources */ = {isa = PBXBuildFile; fileRef = 10FE4AAB13AFA2E700F40190 /* linpack.c */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		10ABC41D13B08B0A00C8AD04 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = "iPad/en.lproj/MainWindow-iPad.xib"; sourceTree = "<group>"; };
+		10FE4A8513AF8BE500F40190 /* NativeLinpack3.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NativeLinpack3.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		10FE4A8913AF8BE500F40190 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		10FE4A8B13AF8BE500F40190 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		10FE4A8D13AF8BE500F40190 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		10FE4A9113AF8BE500F40190 /* NativeLinpack3-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "NativeLinpack3-Info.plist"; sourceTree = "<group>"; };
+		10FE4A9313AF8BE500F40190 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		10FE4A9513AF8BE500F40190 /* NativeLinpack3-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "NativeLinpack3-Prefix.pch"; sourceTree = "<group>"; };
+		10FE4A9613AF8BE500F40190 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		10FE4A9813AF8BE500F40190 /* NativeLinpack3AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NativeLinpack3AppDelegate.h; sourceTree = "<group>"; };
+		10FE4A9913AF8BE500F40190 /* NativeLinpack3AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeLinpack3AppDelegate.m; sourceTree = "<group>"; };
+		10FE4A9C13AF8BE500F40190 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		10FE4A9E13AF8BE500F40190 /* NativeLinpack3ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NativeLinpack3ViewController.h; sourceTree = "<group>"; };
+		10FE4A9F13AF8BE500F40190 /* NativeLinpack3ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NativeLinpack3ViewController.m; sourceTree = "<group>"; };
+		10FE4AA213AF8BE500F40190 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/NativeLinpack3ViewController.xib; sourceTree = "<group>"; };
+		10FE4AAB13AFA2E700F40190 /* linpack.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = linpack.c; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		10FE4A8213AF8BE500F40190 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10FE4A8A13AF8BE500F40190 /* UIKit.framework in Frameworks */,
+				10FE4A8C13AF8BE500F40190 /* Foundation.framework in Frameworks */,
+				10FE4A8E13AF8BE500F40190 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		10ABC41B13B08B0900C8AD04 /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				10ABC41C13B08B0A00C8AD04 /* MainWindow-iPad.xib */,
+			);
+			name = iPad;
+			sourceTree = "<group>";
+		};
+		10FE4A7A13AF8BE500F40190 = {
+			isa = PBXGroup;
+			children = (
+				10FE4A8F13AF8BE500F40190 /* NativeLinpack3 */,
+				10FE4A8813AF8BE500F40190 /* Frameworks */,
+				10FE4A8613AF8BE500F40190 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		10FE4A8613AF8BE500F40190 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				10FE4A8513AF8BE500F40190 /* NativeLinpack3.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		10FE4A8813AF8BE500F40190 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				10FE4A8913AF8BE500F40190 /* UIKit.framework */,
+				10FE4A8B13AF8BE500F40190 /* Foundation.framework */,
+				10FE4A8D13AF8BE500F40190 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		10FE4A8F13AF8BE500F40190 /* NativeLinpack3 */ = {
+			isa = PBXGroup;
+			children = (
+				10ABC41B13B08B0900C8AD04 /* iPad */,
+				10FE4A9813AF8BE500F40190 /* NativeLinpack3AppDelegate.h */,
+				10FE4A9913AF8BE500F40190 /* NativeLinpack3AppDelegate.m */,
+				10FE4A9B13AF8BE500F40190 /* MainWindow.xib */,
+				10FE4AAB13AFA2E700F40190 /* linpack.c */,
+				10FE4A9E13AF8BE500F40190 /* NativeLinpack3ViewController.h */,
+				10FE4A9F13AF8BE500F40190 /* NativeLinpack3ViewController.m */,
+				10FE4AA113AF8BE500F40190 /* NativeLinpack3ViewController.xib */,
+				10FE4A9013AF8BE500F40190 /* Supporting Files */,
+			);
+			path = NativeLinpack3;
+			sourceTree = "<group>";
+		};
+		10FE4A9013AF8BE500F40190 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				10FE4A9113AF8BE500F40190 /* NativeLinpack3-Info.plist */,
+				10FE4A9213AF8BE500F40190 /* InfoPlist.strings */,
+				10FE4A9513AF8BE500F40190 /* NativeLinpack3-Prefix.pch */,
+				10FE4A9613AF8BE500F40190 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		10FE4A8413AF8BE500F40190 /* NativeLinpack3 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 10FE4AA613AF8BE500F40190 /* Build configuration list for PBXNativeTarget "NativeLinpack3" */;
+			buildPhases = (
+				10FE4A8113AF8BE500F40190 /* Sources */,
+				10FE4A8213AF8BE500F40190 /* Frameworks */,
+				10FE4A8313AF8BE500F40190 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = NativeLinpack3;
+			productName = NativeLinpack3;
+			productReference = 10FE4A8513AF8BE500F40190 /* NativeLinpack3.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		10FE4A7C13AF8BE500F40190 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 10FE4A7F13AF8BE500F40190 /* Build configuration list for PBXProject "NativeLinpack3" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 10FE4A7A13AF8BE500F40190;
+			productRefGroup = 10FE4A8613AF8BE500F40190 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				10FE4A8413AF8BE500F40190 /* NativeLinpack3 */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		10FE4A8313AF8BE500F40190 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10FE4A9413AF8BE500F40190 /* InfoPlist.strings in Resources */,
+				10FE4A9D13AF8BE500F40190 /* MainWindow.xib in Resources */,
+				10FE4AA313AF8BE500F40190 /* NativeLinpack3ViewController.xib in Resources */,
+				10ABC41E13B08B0A00C8AD04 /* MainWindow-iPad.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		10FE4A8113AF8BE500F40190 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10FE4A9713AF8BE500F40190 /* main.m in Sources */,
+				10FE4A9A13AF8BE500F40190 /* NativeLinpack3AppDelegate.m in Sources */,
+				10FE4AA013AF8BE500F40190 /* NativeLinpack3ViewController.m in Sources */,
+				10FE4AAC13AFA2E700F40190 /* linpack.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		10ABC41C13B08B0A00C8AD04 /* MainWindow-iPad.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				10ABC41D13B08B0A00C8AD04 /* en */,
+			);
+			name = "MainWindow-iPad.xib";
+			sourceTree = "<group>";
+		};
+		10FE4A9213AF8BE500F40190 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				10FE4A9313AF8BE500F40190 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		10FE4A9B13AF8BE500F40190 /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				10FE4A9C13AF8BE500F40190 /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		10FE4AA113AF8BE500F40190 /* NativeLinpack3ViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				10FE4AA213AF8BE500F40190 /* en */,
+			);
+			name = NativeLinpack3ViewController.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		10FE4AA413AF8BE500F40190 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		10FE4AA513AF8BE500F40190 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		10FE4AA713AF8BE500F40190 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "NativeLinpack3/NativeLinpack3-Prefix.pch";
+				INFOPLIST_FILE = "NativeLinpack3/NativeLinpack3-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		10FE4AA813AF8BE500F40190 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "NativeLinpack3/NativeLinpack3-Prefix.pch";
+				INFOPLIST_FILE = "NativeLinpack3/NativeLinpack3-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 3.2;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		10FE4A7F13AF8BE500F40190 /* Build configuration list for PBXProject "NativeLinpack3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10FE4AA413AF8BE500F40190 /* Debug */,
+				10FE4AA513AF8BE500F40190 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		10FE4AA613AF8BE500F40190 /* Build configuration list for PBXNativeTarget "NativeLinpack3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10FE4AA713AF8BE500F40190 /* Debug */,
+				10FE4AA813AF8BE500F40190 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 10FE4A7C13AF8BE500F40190 /* Project object */;
+}

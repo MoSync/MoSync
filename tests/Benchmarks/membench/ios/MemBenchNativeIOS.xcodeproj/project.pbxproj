@@ -1,0 +1,289 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		10C8A65013CEF3E900820315 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10C8A64F13CEF3E900820315 /* UIKit.framework */; };
+		10C8A65213CEF3E900820315 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10C8A65113CEF3E900820315 /* Foundation.framework */; };
+		10C8A65413CEF3E900820315 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10C8A65313CEF3E900820315 /* CoreGraphics.framework */; };
+		10C8A65A13CEF3E900820315 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 10C8A65813CEF3E900820315 /* InfoPlist.strings */; };
+		10C8A65D13CEF3E900820315 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 10C8A65C13CEF3E900820315 /* main.m */; };
+		10C8A66013CEF3E900820315 /* MemBenchNativeIOSAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 10C8A65F13CEF3E900820315 /* MemBenchNativeIOSAppDelegate.m */; };
+		10C8A66313CEF3E900820315 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10C8A66113CEF3E900820315 /* MainWindow.xib */; };
+		10C8A66613CEF3E900820315 /* MemBenchNativeIOSViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 10C8A66513CEF3E900820315 /* MemBenchNativeIOSViewController.mm */; };
+		10C8A66913CEF3E900820315 /* MemBenchNativeIOSViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 10C8A66713CEF3E900820315 /* MemBenchNativeIOSViewController.xib */; };
+		10C8A68413CEF96900820315 /* membench.mm in Sources */ = {isa = PBXBuildFile; fileRef = 10C8A68313CEF96900820315 /* membench.mm */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		10C8A64B13CEF3E900820315 /* MemBenchNativeIOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MemBenchNativeIOS.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		10C8A64F13CEF3E900820315 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		10C8A65113CEF3E900820315 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		10C8A65313CEF3E900820315 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		10C8A65713CEF3E900820315 /* MemBenchNativeIOS-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "MemBenchNativeIOS-Info.plist"; sourceTree = "<group>"; };
+		10C8A65913CEF3E900820315 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		10C8A65B13CEF3E900820315 /* MemBenchNativeIOS-Prefix.pch */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "MemBenchNativeIOS-Prefix.pch"; sourceTree = "<group>"; };
+		10C8A65C13CEF3E900820315 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		10C8A65E13CEF3E900820315 /* MemBenchNativeIOSAppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemBenchNativeIOSAppDelegate.h; sourceTree = "<group>"; };
+		10C8A65F13CEF3E900820315 /* MemBenchNativeIOSAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MemBenchNativeIOSAppDelegate.m; sourceTree = "<group>"; };
+		10C8A66213CEF3E900820315 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MainWindow.xib; sourceTree = "<group>"; };
+		10C8A66413CEF3E900820315 /* MemBenchNativeIOSViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MemBenchNativeIOSViewController.h; sourceTree = "<group>"; };
+		10C8A66513CEF3E900820315 /* MemBenchNativeIOSViewController.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = MemBenchNativeIOSViewController.mm; sourceTree = "<group>"; };
+		10C8A66813CEF3E900820315 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/MemBenchNativeIOSViewController.xib; sourceTree = "<group>"; };
+		10C8A68213CEF8B000820315 /* membench.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = membench.h; sourceTree = "<group>"; };
+		10C8A68313CEF96900820315 /* membench.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = membench.mm; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		10C8A64813CEF3E900820315 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10C8A65013CEF3E900820315 /* UIKit.framework in Frameworks */,
+				10C8A65213CEF3E900820315 /* Foundation.framework in Frameworks */,
+				10C8A65413CEF3E900820315 /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		10C8A64013CEF3E900820315 = {
+			isa = PBXGroup;
+			children = (
+				10C8A65513CEF3E900820315 /* MemBenchNativeIOS */,
+				10C8A64E13CEF3E900820315 /* Frameworks */,
+				10C8A64C13CEF3E900820315 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		10C8A64C13CEF3E900820315 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				10C8A64B13CEF3E900820315 /* MemBenchNativeIOS.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		10C8A64E13CEF3E900820315 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				10C8A64F13CEF3E900820315 /* UIKit.framework */,
+				10C8A65113CEF3E900820315 /* Foundation.framework */,
+				10C8A65313CEF3E900820315 /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		10C8A65513CEF3E900820315 /* MemBenchNativeIOS */ = {
+			isa = PBXGroup;
+			children = (
+				10C8A68313CEF96900820315 /* membench.mm */,
+				10C8A68213CEF8B000820315 /* membench.h */,
+				10C8A65E13CEF3E900820315 /* MemBenchNativeIOSAppDelegate.h */,
+				10C8A65F13CEF3E900820315 /* MemBenchNativeIOSAppDelegate.m */,
+				10C8A66113CEF3E900820315 /* MainWindow.xib */,
+				10C8A66413CEF3E900820315 /* MemBenchNativeIOSViewController.h */,
+				10C8A66513CEF3E900820315 /* MemBenchNativeIOSViewController.mm */,
+				10C8A66713CEF3E900820315 /* MemBenchNativeIOSViewController.xib */,
+				10C8A65613CEF3E900820315 /* Supporting Files */,
+			);
+			path = MemBenchNativeIOS;
+			sourceTree = "<group>";
+		};
+		10C8A65613CEF3E900820315 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				10C8A65713CEF3E900820315 /* MemBenchNativeIOS-Info.plist */,
+				10C8A65813CEF3E900820315 /* InfoPlist.strings */,
+				10C8A65B13CEF3E900820315 /* MemBenchNativeIOS-Prefix.pch */,
+				10C8A65C13CEF3E900820315 /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		10C8A64A13CEF3E900820315 /* MemBenchNativeIOS */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 10C8A66C13CEF3E900820315 /* Build configuration list for PBXNativeTarget "MemBenchNativeIOS" */;
+			buildPhases = (
+				10C8A64713CEF3E900820315 /* Sources */,
+				10C8A64813CEF3E900820315 /* Frameworks */,
+				10C8A64913CEF3E900820315 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MemBenchNativeIOS;
+			productName = MemBenchNativeIOS;
+			productReference = 10C8A64B13CEF3E900820315 /* MemBenchNativeIOS.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		10C8A64213CEF3E900820315 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 10C8A64513CEF3E900820315 /* Build configuration list for PBXProject "MemBenchNativeIOS" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 10C8A64013CEF3E900820315;
+			productRefGroup = 10C8A64C13CEF3E900820315 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				10C8A64A13CEF3E900820315 /* MemBenchNativeIOS */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		10C8A64913CEF3E900820315 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10C8A65A13CEF3E900820315 /* InfoPlist.strings in Resources */,
+				10C8A66313CEF3E900820315 /* MainWindow.xib in Resources */,
+				10C8A66913CEF3E900820315 /* MemBenchNativeIOSViewController.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		10C8A64713CEF3E900820315 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				10C8A65D13CEF3E900820315 /* main.m in Sources */,
+				10C8A66013CEF3E900820315 /* MemBenchNativeIOSAppDelegate.m in Sources */,
+				10C8A66613CEF3E900820315 /* MemBenchNativeIOSViewController.mm in Sources */,
+				10C8A68413CEF96900820315 /* membench.mm in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		10C8A65813CEF3E900820315 /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				10C8A65913CEF3E900820315 /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		10C8A66113CEF3E900820315 /* MainWindow.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				10C8A66213CEF3E900820315 /* en */,
+			);
+			name = MainWindow.xib;
+			sourceTree = "<group>";
+		};
+		10C8A66713CEF3E900820315 /* MemBenchNativeIOSViewController.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				10C8A66813CEF3E900820315 /* en */,
+			);
+			name = MemBenchNativeIOSViewController.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		10C8A66A13CEF3E900820315 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+			};
+			name = Debug;
+		};
+		10C8A66B13CEF3E900820315 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+			};
+			name = Release;
+		};
+		10C8A66D13CEF3E900820315 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MemBenchNativeIOS/MemBenchNativeIOS-Prefix.pch";
+				INFOPLIST_FILE = "MemBenchNativeIOS/MemBenchNativeIOS-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		10C8A66E13CEF3E900820315 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "MemBenchNativeIOS/MemBenchNativeIOS-Prefix.pch";
+				INFOPLIST_FILE = "MemBenchNativeIOS/MemBenchNativeIOS-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		10C8A64513CEF3E900820315 /* Build configuration list for PBXProject "MemBenchNativeIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10C8A66A13CEF3E900820315 /* Debug */,
+				10C8A66B13CEF3E900820315 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		10C8A66C13CEF3E900820315 /* Build configuration list for PBXNativeTarget "MemBenchNativeIOS" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				10C8A66D13CEF3E900820315 /* Debug */,
+				10C8A66E13CEF3E900820315 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 10C8A64213CEF3E900820315 /* Project object */;
+}
