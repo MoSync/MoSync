@@ -165,6 +165,8 @@ config_platform.h
 /tools/debugger/start.bat
 /tools/debugger/filesystem
 
+/tools/iphone-apns/Certs/
+
 /runtimes/cpp/platforms/sdl/MoRE/filesystem/*
 /runtimes/cpp/platforms/android/config_platform.h.saved
 /runtimes/java/platforms/javaME/setdirs.bat

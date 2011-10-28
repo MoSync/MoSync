@@ -39,3 +39,6 @@ tlsf-license.txt covers the Two-level Segregate Fit (TLSF) allocator.
 yasper-license.txt covers Yasper (Yet Another Smart Process EditoR).
 
 Permission from Andreas Jönsson has kindly been given for the use of Angelcode BMFont and redistribution of its binary files.
+
+iphone-apns was originally written by Oliver Pahl, who has given permission to use and modify the code:
+http://blog.toshsoft.de/index.php?/archives/3-Sending-Apple-Push-Notifications-APN-in-C-Updated-Using-CA-Cert.html
