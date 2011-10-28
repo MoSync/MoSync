@@ -56,13 +56,13 @@ using namespace MoSyncError;
 //***************************************************************************
 
 CAppView* CAppView::NewL(CAppUi& aAppUi)
-{  
+{
 	CAppView* self = NewLC(aAppUi);
 	CleanupStack::Pop(self);
 	return self;
 }
 CAppView* CAppView::NewLC(CAppUi& aAppUi)
-{  
+{
 	CAppView* self = new (ELeave) CAppView(aAppUi);
 	CleanupStack::PushL(self);
 	self->ConstructL();
@@ -108,7 +108,7 @@ void CAppView::ConstructL()
 
 	iWaitTimer = new (ELeave) CWaitTimer(*this);
 	iWaitTimer->ConstructL();
-	
+
 	iDelayTimer = new (ELeave) CDelayTimer(*this);
 	iDelayTimer->ConstructL();
 
@@ -145,7 +145,7 @@ TInt CAppView::StartStuff(TAny* arg) {
 	//clear the back-buffer of the nc text
 #define BLACK 0
 	self->iEngine->SetColor(BLACK);
-	self->iEngine->ClearScreen();	
+	self->iEngine->ClearScreen();
 
 #endif	//MOSYNC_COMMERCIAL
 	return 0;	//don't keep running
@@ -174,7 +174,7 @@ void decode_msg(char* str)
 		if (!msg[n])
 			break;
 
-		str[n] = ((msg[n] - (127*n)) * 8191) % 131071;  
+		str[n] = ((msg[n] - (127*n)) * 8191) % 131071;
 	}
 
 	str[n] = 0;
@@ -204,13 +204,13 @@ void CAppView::CreateCoreL() {
 	iSyscall = new (ELeave) Base::Syscall(*iEngine, *this);
 	iCore = CreateCore(*iSyscall);
 	iSyscall->ConstructL(iCore);
-	
+
 	LoadProgramL();
 }
 
 void CAppView::LoadProgramL() {
 #ifdef PHONE_RELEASE
-	
+
 #if defined(__SERIES60_3X__)
 	_LIT8(KPathFmt, "%S\\resource\\apps\\%08X.comb");
 #else
@@ -223,7 +223,7 @@ void CAppView::LoadProgramL() {
 	filename.Format(KPathFmt, &drive, iAppUi.iDocument.iApp.AppDllUid().iUid);
 	FileStream file(CCP filename.PtrZ());
 	MYASSERT(LoadVMApp(iCore, file, CCP filename.PtrZ()), ERR_PROGRAM_LOAD_FAILED);
-	
+
 #else	//PHONE_RELEASE
 
 	//Load the program
@@ -238,7 +238,7 @@ void CAppView::LoadProgramL() {
 	LOG("Program loaded.\n");
 }
 
-CAppView::~CAppView() 
+CAppView::~CAppView()
 {
 	LOGD("~CAppView\n");
 	if(iCloseTimer) {
@@ -314,7 +314,7 @@ void CAppView::HandleResourceChange(TInt aType) {
 	// resize the window
 	SetRect(CCoeEnv::Static()->ScreenDevice()->SizeInPixels());
 	iEngine->UpdateScreenSize();
-	
+
 	MAEvent event;
 	event.type = EVENT_TYPE_SCREEN_CHANGED;
 	AddEvent(event);
@@ -421,6 +421,15 @@ void CAppView::Wait(int timeout) {
 	LOGD("W %i\n", timeout);
 	if(timeout > 0) {
 		iWaitTimer->mSequence = iWaitTimerSequence;
+		// careful: if (timeout * 1000) > INT_MAX, then Symbian Panic USER 87.
+		static const int MAX_MS = (((1 << 31) - 1) / 1000);	// about 35 minutes.
+		LOGD("MAX_MS: %i\n", MAX_MS);
+		if(timeout > MAX_MS) {
+			// maWait() will return sooner than expected, with no events, but that's ok;
+			// any well-behaved MoSync program will simply wait again.
+			timeout = MAX_MS;
+			LOGD("timeout reset.\n", MAX_MS);
+		}
 		iWaitTimer->After(timeout * 1000);
 	}
 	iWait = true;
@@ -444,7 +453,7 @@ void CAppView::DoCloseEventL() {
 	MAEvent event;
 	event.type = EVENT_TYPE_CLOSE;
 	AddEvent(event);
-	
+
 	if(!iCloseTimer) {
 		iCloseTimer = new (ELeave) CCloseTimer();
 		iCloseTimer->ConstructL();

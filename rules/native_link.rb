@@ -28,8 +28,8 @@ class NativeGccLinkTask < FileTask
 	end
 
 	def needed?(log = true)
-		return true if(flagsNeeded?(log))
-		super(log)
+		return true if(super(log))
+		return if(flagsNeeded?(log))
 	end
 
 	def cFlags

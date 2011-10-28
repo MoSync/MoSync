@@ -23,15 +23,21 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdlib.h>
 #endif
 
-int MAMain() {
-	const wchar_t* wstr = L"Hello 蝮 UniWorld!\n";
+int MAMain(void) {
 	char buf[1024];
-	int res = wcstombs(buf, wstr, sizeof(buf));
-	lprintfln("res: %i\n", res);
-	maWriteLog(buf, res);
-
+	int res;
+	const wchar_t* wstr = L"Hello 蝮 UniWorld!\n";
 	const char* ustr = "Hello 蝮 UTF-8!\n";
 	wchar wbuf[1024];
+
+	res = wcstombs(NULL, wstr, 0);
+	lprintfln("len: %i\n", res);
+	res = wcstombs(buf, wstr, res);
+	lprintfln("res(minimal): %i\n", res);
+	res = wcstombs(buf, wstr, sizeof(buf));
+	lprintfln("res(big buffer): %i\n", res);
+	maWriteLog(buf, res);
+
 	res = mbstowcs(wbuf, ustr, sizeof(wbuf));
 	lprintfln("res: %i\n", res);
 	maWriteLog(wbuf, res*2);

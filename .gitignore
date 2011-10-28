@@ -113,6 +113,7 @@ config_platform.h
 /runtimes/cpp/platforms/iphone/data_section.bin
 /runtimes/cpp/platforms/iphone/template/
 
+/runtimes/cpp/platforms/winmobile/winmobile.sln
 
 /runtimes/cpp/platforms/symbian/sis*/*.SIS
 
@@ -163,6 +164,8 @@ config_platform.h
 /tools/debugger/mdb_commands.txt
 /tools/debugger/start.bat
 /tools/debugger/filesystem
+
+/tools/iphone-apns/Certs/
 
 /runtimes/cpp/platforms/sdl/MoRE/filesystem/*
 /runtimes/cpp/platforms/android/config_platform.h.saved
