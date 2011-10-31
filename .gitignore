@@ -205,3 +205,5 @@ config_platform.h
 /runtimes/csharp/windowsphone/mosync/mosync/Bin/rebuild_release
 /runtimes/csharp/windowsphone/mosync/mosyncLib/obj
 /runtimes/csharp/windowsphone/mosync/mosyncLib/bin
+/runtimes/csharp/windowsphone/mosync/mosyncLibContent/bin
+/runtimes/csharp/windowsphone/mosync/mosyncLibContent/obj

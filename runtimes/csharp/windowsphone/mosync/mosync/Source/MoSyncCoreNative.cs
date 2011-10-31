@@ -1,5 +1,3 @@
-#if REBUILD
-
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -93,16 +91,7 @@ namespace MoSync
 
         public override void Run()
         {
-            try
-            {
-                Main();
-            }
-            catch (Exception e)
-            {
-                MoSync.Util.CriticalError(e.ToString());
-            }
+            Main();
         }
     }
 }
-
-#endif // REBUILD

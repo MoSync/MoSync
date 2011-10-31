@@ -32,16 +32,25 @@ namespace MoSync
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
             PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
-            test_mosync.MainPage mainPage = frame.Content as test_mosync.MainPage;
+            double screenWidth = System.Windows.Application.Current.Host.Content.ActualWidth;
+            double screenHeight = System.Windows.Application.Current.Host.Content.ActualHeight;
+            PhoneApplicationPage mainPage = (PhoneApplicationPage)frame.Content;
+            frame.Content = mainPage;
+            Image mainImage = new Image();
+            mainPage.Width = screenWidth;
+            mainPage.Height = screenHeight;
+            mainImage.Width = mainPage.Width;
+            mainImage.Height = mainPage.Height;
+            mainPage.Content = mainImage;
 
             mBackBuffer = new WriteableBitmap(
-                (int)mainPage.ViewPortContainer.Width,
-                (int)mainPage.ViewPortContainer.Height);
+                (int)mainImage.ActualWidth,
+                (int)mainImage.ActualHeight);
             mFrontBuffer = new WriteableBitmap(
-                (int)mainPage.ViewPortContainer.Width,
-                (int)mainPage.ViewPortContainer.Height);
+                (int)mainImage.ActualWidth,
+                (int)mainImage.ActualHeight);
 
-            mainPage.ViewPort.Source = mFrontBuffer;
+            mainImage.Source = mFrontBuffer;
             mCurrentDrawTarget = mBackBuffer;
 
             mCurrentWindowsColor = System.Windows.Media.Color.FromArgb(0xff,

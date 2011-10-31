@@ -1,5 +1,3 @@
-#if !REBUILD
-
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -1061,5 +1059,3 @@ namespace MoSync
         }
     }
 }
-
-#endif // !REBUILD
