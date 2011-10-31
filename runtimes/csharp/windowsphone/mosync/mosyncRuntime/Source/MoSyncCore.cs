@@ -1,6 +1,6 @@
 using System;
 
-// The Core is the base class for the program execution. 
+// The Core is the base class for the program execution.
 // It has an interface for getting access to the data memory
 // and the stack pointer / stack values.
 // This is the interface the runtime get access to.

@@ -19,7 +19,7 @@ using System.Windows.Resources;
 namespace MoSync
 {
 
-    class Program
+    public class Program
     {
         private MoSync.Core mCore;
         private MoSync.Runtime mRuntime;

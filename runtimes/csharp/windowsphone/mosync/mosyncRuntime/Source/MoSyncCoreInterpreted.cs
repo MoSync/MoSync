@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-// This is the core that interprets mosync 
+// This is the core that interprets mosync
 // byte code (produced by pipe-tool).
 // It has dependencies on some idl compiler
 // generated code, such as the SyscallInvoker
@@ -557,7 +557,7 @@ namespace MoSync
                         mRegisters[rd] = mRegisters[rs];
                         break;
 
-                    case Op.ADD: // ADD		
+                    case Op.ADD: // ADD
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
                         mRegisters[rd] += mRegisters[rs];
@@ -569,7 +569,7 @@ namespace MoSync
                         mRegisters[rd] += imm32;
                         break;
 
-                    case Op.MUL: // MUL		
+                    case Op.MUL: // MUL
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
                         mRegisters[rd] *= mRegisters[rs];
@@ -690,7 +690,7 @@ namespace MoSync
                         mRegisters[rd] = (int)((uint)mRegisters[rd] >> imm32);
                         break;
 
-                    case Op.NOT: // NOT 
+                    case Op.NOT: // NOT
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
                         mRegisters[rd] = ~mRegisters[rs];
