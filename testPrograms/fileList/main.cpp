@@ -47,7 +47,7 @@ static void checkEvents() {
 static char buffer[256];
 
 static bool dumpFileList(const char* path) {
-	MAHandle list = maFileListStart(path, "*");
+	MAHandle list = maFileListStart(path, "*", 0);
 	if(list < 0) {
 		LPRINTFLN("FLS error %i", list);
 		return false;
@@ -76,6 +76,6 @@ extern "C" int MAMain() {
 	dumpFileList("");
 	int endTime = maGetMilliSecondCount();
 	printf("Done in %i ms\n", endTime - startTime);
-	
+
 	FREEZE;
 }
