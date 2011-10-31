@@ -19,13 +19,13 @@ using System.Windows.Resources;
 namespace MoSync
 {
 
-    public class Program
+    public class Machine
     {
         private MoSync.Core mCore;
         private MoSync.Runtime mRuntime;
         private Thread mThread = null;
 
-        public Program()
+        public Machine()
         {
             // This tells the util subsystem which thread is the main thread.
             // Never make an instance of Program from another thread.
@@ -74,7 +74,7 @@ namespace MoSync
             mThread.Join();
         }
 
-        public static Program CreateAndStartInterpretedProgram(String programFile, String resourceFile)
+        public static Machine CreateInterpretedMachine(String programFile, String resourceFile)
         {
             StreamResourceInfo programResInfo = Application.GetResourceStream(new Uri(programFile, UriKind.Relative));
             StreamResourceInfo resourcesResInfo = Application.GetResourceStream(new Uri(resourceFile, UriKind.Relative));
@@ -88,26 +88,22 @@ namespace MoSync
             if (resourcesResInfo != null && resourcesResInfo.Stream != null)
                 resources = resourcesResInfo.Stream;
 
-            MoSync.Program mosyncProgram = new MoSync.Program();
+            MoSync.Machine mosyncMachine = new MoSync.Machine();
             Core core = new MoSync.CoreInterpreted(programResInfo.Stream);
-            mosyncProgram.Init(core, resources);
-            mosyncProgram.Run();
-
-            return mosyncProgram;
+            mosyncMachine.Init(core, resources);
+            return mosyncMachine;
         }
 
-        public static Program CreateAndStartNativeProgram(Core core, String resourceFile)
+        public static Machine CreateNativeMachine(Core core, String resourceFile)
         {
             StreamResourceInfo resourcesResInfo = Application.GetResourceStream(new Uri(resourceFile, UriKind.Relative));
             Stream resources = null;
             if (resourcesResInfo != null && resourcesResInfo.Stream != null)
                 resources = resourcesResInfo.Stream;
 
-            MoSync.Program mosyncProgram = new MoSync.Program();
-            mosyncProgram.Init(core, resources);
-            mosyncProgram.Run();
-
-            return mosyncProgram;
+            MoSync.Machine mosyncMachine = new MoSync.Machine();
+            mosyncMachine.Init(core, resources);
+            return mosyncMachine;
         }
     }
 }

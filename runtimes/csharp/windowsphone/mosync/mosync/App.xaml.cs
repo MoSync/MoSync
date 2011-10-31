@@ -87,11 +87,13 @@ namespace test_mosync
             //RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
             RootFrame.Loaded += delegate(object _sender, RoutedEventArgs _e)
             {
+                MoSync.Machine machine = null;
 #if !REBUILD
-                MoSync.Program.CreateAndStartInterpretedProgram("program", "resources");
+                machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
 #else
-                MoSync.Program.CreateAndStartNativeProgram(new CoreNativeProgram(), "resources");
+                machine = MoSync.Program.CreateNativeMachine(new CoreNativeProgram(), "resources");
 #endif
+                machine.Run();
             };
         }
 
