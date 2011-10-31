@@ -60,8 +60,6 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL10;
@@ -74,6 +72,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -92,6 +91,7 @@ import android.os.Handler;
 import android.os.SystemClock;
 import android.os.Vibrator;
 import android.telephony.TelephonyManager;
+import android.telephony.gsm.GsmCellLocation;
 import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -182,12 +182,6 @@ public class MoSyncThread extends Thread
 	 * used for maPanic.
 	 */
 	private boolean mHasDied;
-
-	/**
-	 * Boolean used to determine whether to interrupt the trehad or not,
-	 * true if this thread is sleeping in maWait.
-	 */
-	private final AtomicBoolean mIsSleepingInMaWait = new AtomicBoolean(false);
 
 	/**
 	 * a handle used for full screen camera preview
@@ -317,6 +311,7 @@ public class MoSyncThread extends Thread
 			mMoSyncFont = null;
 		}
 
+		cameraScreen = 0;
 		//Do not access camera if it is not available
 		try
 		{
@@ -883,18 +878,8 @@ public class MoSyncThread extends Thread
 		// Add event to queue.
 		nativePostEvent(event);
 
-		// Only interrupt if we are sleeping in maWait.
-		if (mIsSleepingInMaWait.get())
-		{
-			// Wake up this thread to make it process events.
-			interrupt();
-		}
-		else
-		{
-			//Log.i(
-			//	"@@@ MoSyncThread.postEvent",
-			//	"Did not call interrupt, not in maWait (this is good!)");
-		}
+		// Wake up thread if sleeping.
+		interrupt();
 	}
 
 	/**
@@ -2219,8 +2204,6 @@ public class MoSyncThread extends Thread
 
 		try
 		{
-			mIsSleepingInMaWait.set(true);
-
 	 		if (timeout<=0)
 			{
 				Thread.sleep(Long.MAX_VALUE);
@@ -2239,8 +2222,6 @@ public class MoSyncThread extends Thread
 		{
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
-
-		mIsSleepingInMaWait.set(false);
 
 		SYSLOG("maWait returned");
 	}
@@ -3410,6 +3391,7 @@ public class MoSyncThread extends Thread
 		if(cameraScreen != 0)
 		{
 			maWidgetDestroy(cameraScreen);
+			mMoSyncCameraController.removePreview();
 			maWidgetScreenShow(IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE);
 			cameraScreen = 0;
 		}
@@ -4184,6 +4166,52 @@ public class MoSyncThread extends Thread
 	int maNFCIsReadOnly(int tagHandle) {
 		return mMoSyncNFC == null ? IOCTL_UNAVAILABLE : mMoSyncNFC.maNFCIsReadOnly(tagHandle);
 	}
+
+	int maGetCellInfo(int cellinfo)
+	{
+		// Check that the Coarse Location permission is set,
+		//  otherwise the CellID request will freeze the device
+		if(!(mContext.getPackageManager().checkPermission("android.permission.ACCESS_COARSE_LOCATION",
+				mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+		{
+			return -3;
+		}
+
+		TelephonyManager manager = (TelephonyManager)
+				mContext.getSystemService(Context.TELEPHONY_SERVICE);
+
+		// Only works with GSM type phone, no CDMA
+		if(manager.getPhoneType() != TelephonyManager.PHONE_TYPE_GSM)
+			return -2;
+
+		// Get the Cell information
+		GsmCellLocation gsmcell = (GsmCellLocation) manager.getCellLocation();
+
+		if(gsmcell == null)
+			return -2;
+
+		int cell = gsmcell.getCid();
+		int lac = gsmcell.getLac();
+
+		// Get the mcc and mnc strings
+		String mcc_mnc = manager.getNetworkOperator();
+		if (mcc_mnc == null)
+			return -2;
+
+		byte[] mcc = mcc_mnc.substring(0, 3).getBytes();
+		byte[] mnc = mcc_mnc.substring(3).getBytes();
+
+		// Store everything in the correct memory location
+		ByteBuffer mem = getMemorySlice(cellinfo, 64);
+		mem.put(mcc);
+		mem.put((byte)0);
+		mem.put(mnc);
+		mem.put((byte)0);
+		mem.putInt(lac);
+		mem.putInt(cell);
+
+		return 0;
+}
 
 	/**
 	 * Class that holds image data.
