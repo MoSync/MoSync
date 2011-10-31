@@ -133,7 +133,7 @@
   <ItemGroup>
     <ProjectReference Include="..\mosyncLib\mosyncLib.csproj">
       <Project>{7746202B-A479-49BE-8FF9-205EB13DDE07}</Project>
-      <Name>mosyncLib</Name>
+      <Name>mosyncLib %28runtimes\Windows Phone 7\mosyncLib%29</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />
