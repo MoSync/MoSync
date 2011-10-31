@@ -1,3 +1,5 @@
+#if !REBUILD
+
 using System;
 using System.IO;
 using System.Collections.Generic;
@@ -19,6 +21,8 @@ namespace MoSync
         protected int[] mConstantPool;
         protected int[] mRegisters = new int[128];
         protected SyscallInvoker mSyscallInvoker;
+
+        protected Stream mProgramFile;
 
         public class ProgramHeader
         {
@@ -133,13 +137,16 @@ namespace MoSync
             public const int R15 = 31;
         }
 
-        public CoreInterpreted()
+        public CoreInterpreted(Stream programFile)
         {
+            mProgramFile = programFile;
         }
 
 
-        public new void Init()
+        public override void Init()
         {
+            LoadProgram(mProgramFile);
+
             base.Init();
             Start();
             mIp = (int)mProgramHeader.mEntryPoint;
@@ -178,7 +185,7 @@ namespace MoSync
             mRegisters[Reg.R15] = (int)(((ulong)value) >> 32);
         }
 
-        new public int GetStackPointer()
+        public override int GetStackPointer()
         {
             return mRegisters[Reg.SP];
         }
@@ -215,7 +222,7 @@ namespace MoSync
             }
         }
 
-        public void LoadProgram(Stream program)
+        protected void LoadProgram(Stream program)
         {
             mProgramHeader.mMagic = Util.StreamReadUint32(program);
             mProgramHeader.mProgramLength = Util.StreamReadUint32(program);
@@ -401,7 +408,7 @@ namespace MoSync
         // ---------------- END FUGLY DEBUG FACILITIES ----------------------------
 
 
-        public new void Run()
+        public override void Run()
         {
             int imm32;
             byte rd;
@@ -1054,3 +1061,5 @@ namespace MoSync
         }
     }
 }
+
+#endif // !REBUILD
