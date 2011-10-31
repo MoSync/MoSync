@@ -114,6 +114,7 @@
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="Source\Modules\MoSyncCommunicationsModule.cs" />
+    <Compile Include="Source\Modules\MoSyncExtensionModule.cs" />
     <Compile Include="Source\Modules\MoSyncFileModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
     <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
