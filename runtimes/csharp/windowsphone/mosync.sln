@@ -2,10 +2,15 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mosync", "mosync\mosync\mosync.csproj", "{ECEC041C-1576-4084-A715-C5D57C9B266D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96} = {8318207D-3E1C-408B-8A4E-75E45B9F1E96}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mosyncLib", "mosync\mosyncLib\mosyncLib.csproj", "{7746202B-A479-49BE-8FF9-205EB13DDE07}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mosyncLibContent", "mosync\mosyncLibContent\mosyncLibContent.contentproj", "{72B670A0-FBFB-4C10-A543-6D23E059E354}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mosyncRuntime", "mosync\mosyncRuntime\mosyncRuntime.csproj", "{8318207D-3E1C-408B-8A4E-75E45B9F1E96}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +88,26 @@ Global
 		{72B670A0-FBFB-4C10-A543-6D23E059E354}.Release|Any CPU.ActiveCfg = Debug|Any CPU
 		{72B670A0-FBFB-4C10-A543-6D23E059E354}.Release|Mixed Platforms.ActiveCfg = Debug|Any CPU
 		{72B670A0-FBFB-4C10-A543-6D23E059E354}.Release|Windows Phone.ActiveCfg = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Debug_Rebuild|Any CPU.ActiveCfg = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Debug_Rebuild|Any CPU.Build.0 = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Debug_Rebuild|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Debug_Rebuild|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Debug_Rebuild|Windows Phone.ActiveCfg = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Debug|Windows Phone.ActiveCfg = Debug|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Release_Rebuild|Any CPU.ActiveCfg = Release|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Release_Rebuild|Any CPU.Build.0 = Release|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Release_Rebuild|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Release_Rebuild|Mixed Platforms.Build.0 = Release|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Release_Rebuild|Windows Phone.ActiveCfg = Release|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Release|Mixed Platforms.Build.0 = Release|Any CPU
+		{8318207D-3E1C-408B-8A4E-75E45B9F1E96}.Release|Windows Phone.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -179,7 +179,7 @@ int main() {
 			"../../runtimes/java/platforms/androidJNI/AndroidProject/src/com/mosync/internal/generated/");
 
 		// Copy windows phone file.
-		copy("Output/maapi.cs", "../../runtimes/csharp/windowsphone/mosync/mosync/Source/");
+		copy("Output/maapi.cs", "../../runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/");
 
 		copy("Output/cpp_defs.h", "../../intlibs/helpers/");
 		copy("Output/cpp_maapi.h", "../../intlibs/helpers/");
@@ -430,7 +430,7 @@ static std::string getCSharpType(const Interface& maapi, const std::string& maap
 		returnType = "float";
 	else if(resolvedMaapiType == "long long")
 		returnType = "long";
-	
+
 	if(returnType == "noreturn")
 		returnType = "void";
 	else if(returnType == "MAString" || returnType == "MAWString")
@@ -520,7 +520,6 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 	maapiFile << "}\n\n";
 
 	// generate syscall invoker
-	maapiFile << "#if !REBUILD // SyscallInvoker\n\n";
 	maapiFile << "public class SyscallInvoker {\n\n";
 	maapiFile << "\tprivate CoreInterpreted mCore;\n";
 	maapiFile << "\tprivate Syscalls mSyscalls;\n\n";
@@ -562,7 +561,7 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 				maapiFile << "MoSync.Util.ConvertToFloat(";
 				outputCSharpSyscallArg(maapiFile, i);
 				i++;
-				maapiFile << ")";				
+				maapiFile << ")";
 			} else {
 				outputCSharpSyscallArg(maapiFile, i);
 				i++;
@@ -579,12 +578,10 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 	maapiFile << "\t\t}\n";
 	maapiFile << "\t}\n";
 	maapiFile << "}\n";
-	maapiFile << "#endif // SyscallInvoker\n\n";
 	// end SyscallInvoker
 
 	// generate CoreNativeBase
 	// CoreNative should implement this.
-	maapiFile << "#if REBUILD\n";
 	maapiFile << "public class CoreNativeSyscallInvoker\n";
 	maapiFile << "{\n";
 	maapiFile << "\tprotected CoreNative mCore;\n";
@@ -678,7 +675,6 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 		maapiFile << "\t}\n";
 	}
 	maapiFile << "}\n";
-	maapiFile << "#endif\n\n";
 	// end NativeCoreSyscallInvoker
 
 	// generate ioctl delegate declarations

@@ -165,3 +165,5 @@ build-one.rb
 /tools/DefaultSkinGenerator/Generator.rb
 
 /tools/vis/ConvertSLD.rb
+
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries

@@ -134,7 +134,7 @@ namespace MoSync
 
         static Thread sStartupThread;
 
-        // This must be run once from the main ui thread to save 
+        // This must be run once from the main ui thread to save
         // which thread is the main ui thread.
         public static void InitStartupThread()
         {

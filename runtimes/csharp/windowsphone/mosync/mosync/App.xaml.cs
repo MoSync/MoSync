@@ -87,7 +87,13 @@ namespace test_mosync
             //RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
             RootFrame.Loaded += delegate(object _sender, RoutedEventArgs _e)
             {
-                MoSyncThread.CreateAndStart("program", "resources");
+                MoSync.Machine machine = null;
+#if !REBUILD
+                machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
+#else
+                machine = MoSync.Program.CreateNativeMachine(new CoreNativeProgram(), "resources");
+#endif
+                machine.Run();
             };
         }
 
@@ -95,12 +101,6 @@ namespace test_mosync
         // This code will not execute when the application is first launched
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
-            /*
-            if (e.IsApplicationInstancePreserved == false)
-            {
-                MoSyncThread.CreateAndStart("program", "resources");
-            }
-             */
         }
 
         // Code to execute when the application is deactivated (sent to background)
