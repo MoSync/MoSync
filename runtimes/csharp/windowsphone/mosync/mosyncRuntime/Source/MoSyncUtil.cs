@@ -101,14 +101,28 @@ namespace MoSync
             Console.Write(text);
             InitLogging();
             WriteTextToFile(text, "log.txt");
-            System.Diagnostics.Debug.WriteLine(text.Substring(0, text.Length-1));
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                DebugWrite(text);
+            }
+        }
+
+        private static void DebugWrite(String text)
+        {
+            if (text[text.Length - 1] == '\n')
+                text = text.Substring(0, text.Length - 1);
+            System.Diagnostics.Debug.WriteLine(text);
         }
 
         public static void Log(byte[] bytes)
         {
             InitLogging();
             WriteBytesToFile(bytes, "log.txt");
-            System.Diagnostics.Debug.WriteLine(bytes);
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                String text = System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                DebugWrite(text);
+            }
         }
 
         public static void CriticalError(String text)
@@ -116,6 +130,10 @@ namespace MoSync
             Log(text);
             //System.Environment.Exit(1);
             //MessageBox.Show(text);
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
             Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
             //throw new Exception("ExitAppException");
         }

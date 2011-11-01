@@ -52,14 +52,20 @@ namespace MoSync
 
         private void ThreadEntry()
         {
-            try
-            {
+            if (System.Diagnostics.Debugger.IsAttached)
                 mCore.Run();
-            }
-            catch (Exception e)
+            else
             {
-                MoSync.Util.CriticalError(e.ToString());
-            };
+                try
+                {
+                    mCore.Run();
+                }
+                catch (Exception e)
+                {
+                    System.Diagnostics.Debug.WriteLine(e.StackTrace);
+                    MoSync.Util.CriticalError(e.ToString());
+                };
+            }
         }
 
         public void Run()

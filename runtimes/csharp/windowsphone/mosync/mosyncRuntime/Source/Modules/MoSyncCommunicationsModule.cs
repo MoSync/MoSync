@@ -130,31 +130,101 @@ namespace MoSync
         class WebRequestConnection : Connection
         {
             protected WebRequest mRequest;
+            protected WebResponse mResponse;
+            protected System.IO.Stream mStream;
+
+            public WebRequestConnection(Uri uri, int handle, int method)
+            {
+                mHandle = handle;
+                mRequest = WebRequest.Create(uri);
+                switch (method)
+                {
+                    case MoSync.Constants.HTTP_GET:
+                        mRequest.Method = "GET";
+                        break;
+                    case MoSync.Constants.HTTP_POST:
+                        mRequest.Method = "POST";
+                        break;
+                    case MoSync.Constants.HTTP_HEAD:
+                        mRequest.Method = "HEAD";
+                        break;
+                    case MoSync.Constants.HTTP_PUT:
+                        mRequest.Method = "PUT";
+                        break;
+                    case MoSync.Constants.HTTP_DELETE:
+                        mRequest.Method = "DELETE";
+                        break;
+                    default:
+                        throw new Exception("HTTP method");
+                }
+            }
 
             public override void connect(ResultHandler rh)
             {
+                mRequest.BeginGetResponse(new AsyncCallback(RespCallback), rh);
             }
+            protected void RespCallback(IAsyncResult ar)
+            {
+                ResultHandler rh = (ResultHandler)ar.AsyncState;
+                mResponse = mRequest.EndGetResponse(ar);
+                mStream = mResponse.GetResponseStream();
+                int result;
+                if (mResponse is HttpWebResponse)
+                    result = (int)((HttpWebResponse)mResponse).StatusCode;
+                else
+                    result = 1;
+                rh(mHandle, MoSync.Constants.CONNOP_CONNECT, result);
+            }
+
             public override void recv(byte[] buffer, int offset, int size,
                  ResultHandler rh)
             {
+                mStream.BeginRead(buffer, offset, size, new AsyncCallback(RecvCallback), rh);
             }
+            protected void RecvCallback(IAsyncResult ar)
+            {
+                ResultHandler rh = (ResultHandler)ar.AsyncState;
+                int result = mStream.EndRead(ar);
+                if (result == 0)
+                {
+                    result = MoSync.Constants.CONNERR_CLOSED;
+                }
+                rh(mHandle, MoSync.Constants.CONNOP_READ, result);
+            }
+
             public override void write(byte[] buffer, int offset, int size,
                  ResultHandler rh)
             {
+                //mStream.BeginWrite(buffer, offset, size, new AsyncCallback(WriteCallback), rh);
+                throw new Exception("HTTP write");
+            }
+            protected void WriteCallback(IAsyncResult ar)
+            {
+                ResultHandler rh = (ResultHandler)ar.AsyncState;
+                mStream.EndWrite(ar);
+                rh(mHandle, MoSync.Constants.CONNOP_WRITE, 1);
             }
 
             // immediate
             public override void close()
             {
+                if (mResponse != null)
+                    mResponse.Close();
+                if (mRequest != null)
+                    mRequest.Abort();
             }
             public override int getAddr(int _addr)
             {
                 return -1;
             }
+            public String getResponseHeader(String key)
+            {
+                return mResponse.Headers[key];
+            }
         }
 
         Dictionary<int, Connection> mConnections = new Dictionary<int, Connection>();
-        int mNextSocketHandle = 1;
+        int mNextConnHandle = 1;
         ResultHandler mResultHandler;
         delegate void CommDelegate(Connection c, byte[] buf, ResultHandler rh);
         delegate void DataDelegate(int _conn, int _data, CommDelegate rh);
@@ -166,7 +236,7 @@ namespace MoSync
                 Memory evt = new Memory(4 * 4);
                 evt.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_CONN);
                 evt.WriteInt32(MAConnEventData_handle, handle);
-                evt.WriteInt32(MAConnEventData_opType, MoSync.Constants.CONNOP_READ);
+                evt.WriteInt32(MAConnEventData_opType, connOp);
                 evt.WriteInt32(MAConnEventData_result, result);
                 runtime.PostEvent(new Event(evt));
             };
@@ -178,7 +248,11 @@ namespace MoSync
                 Connection c;
                 if (uri.Scheme.Equals("socket"))
                 {
-                    c = new SocketConnection(uri, mNextSocketHandle);
+                    c = new SocketConnection(uri, mNextConnHandle);
+                }
+                else if (uri.Scheme.Equals("http") || uri.Scheme.Equals("https"))
+                {
+                    c = new WebRequestConnection(uri, mNextConnHandle, MoSync.Constants.HTTP_GET);
                 }
                 else
                 {
@@ -186,8 +260,8 @@ namespace MoSync
                 }
 
                 c.connect(mResultHandler);
-                mConnections.Add(mNextSocketHandle, c);
-                return mNextSocketHandle++;
+                mConnections.Add(mNextConnHandle, c);
+                return mNextConnHandle++;
             };
 
             syscalls.maConnClose = delegate(int _conn)
@@ -248,7 +322,35 @@ namespace MoSync
                     });
             };
 
+            syscalls.maHttpCreate = delegate(int _url, int _method)
+            {
+                String url = core.GetDataMemory().ReadStringAtAddress(_url);
+                Uri uri = new Uri(url);
+                WebRequestConnection c = new WebRequestConnection(uri, mNextConnHandle, _method);
+                mConnections.Add(mNextConnHandle, c);
+                return mNextConnHandle++;
+            };
 
+            syscalls.maHttpFinish = delegate(int _conn)
+            {
+                WebRequestConnection c = (WebRequestConnection)mConnections[_conn];
+                c.connect(delegate(int handle, int connOp, int result)
+                {
+                    mResultHandler(handle, MoSync.Constants.CONNOP_FINISH, result);
+                });
+            };
+
+            syscalls.maHttpGetResponseHeader = delegate(int _conn, int _key, int _buffer, int _bufSize)
+            {
+                WebRequestConnection c = (WebRequestConnection)mConnections[_conn];
+                String key = core.GetDataMemory().ReadStringAtAddress(_key);
+                String value = c.getResponseHeader(key);
+                if (value == null)
+                    return MoSync.Constants.CONNERR_NOHEADER;
+                if (value.Length + 1 <= _bufSize)
+                    core.GetDataMemory().WriteStringAtAddress(_buffer, value, _bufSize);
+                return value.Length;
+            };
         }
 
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
