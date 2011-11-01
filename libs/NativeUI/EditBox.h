@@ -56,6 +56,76 @@ namespace NativeUI
     };
 
     /**
+     * The EditBoxInputMode defines the type of text that the user is allowed to
+     * enter.
+     */
+    enum EditBoxInputMode
+    {
+		/**
+		* \brief The user is allowed to enter any text, including line breaks.
+		*/
+		EDIT_BOX_INPUT_MODE_ANY = 0,
+		/**
+		* The user is allowed to enter an e-mail address.
+		*/
+		EDIT_BOX_INPUT_MODE_EMAILADDR = 1,
+		/**
+		* The user is allowed to enter an integer value.
+		*/
+		EDIT_BOX_INPUT_MODE_NUMERIC = 2,
+		/**
+		* The user is allowed to enter a phone number.
+		*/
+		EDIT_BOX_INPUT_MODE_PHONENUMBER = 3,
+		/**
+		* The user is allowed to enter a URL.
+		*/
+		EDIT_BOX_INPUT_MODE_URL = 4,
+		/**
+		* The user is allowed to enter a real number value.
+		* This extends EDIT_BOX_INPUT_MODE_NUMERIC by allowing a decimal point.
+		*/
+		EDIT_BOX_INPUT_MODE_DECIMAL = 5,
+		/**
+		* The user is allowed to enter any text, except for line breaks.
+		*/
+		EDIT_BOX_INPUT_MODE_SINGLE_LINE = 6
+    };
+
+    /**
+     * The EditBoxInputFlag defines how the input text is displayed/formatted.
+     */
+    enum EditBoxInputFlag
+    {
+		/**
+		* Indicates that the text entered is confidential data that should be
+		* obscured whenever possible. This implies EDIT_BOX_INPUT_FLAG_SENSITIVE.
+		*/
+		EDIT_BOX_INPUT_FLAG_PASSWORD = 0,
+		/**
+		* Indicates that the text entered is sensitive data that the
+		* implementation must never store into a dictionary or table for use
+		* in predictive, auto-completing, or other accelerated input schemes.
+		* A credit card number is an example of sensitive data.
+		*/
+		EDIT_BOX_INPUT_FLAG_SENSITIVE = 1,
+		/**
+		* This flag is a hint to the implementation that during text editing,
+		* the initial letter of each word should be capitalized.
+		*/
+		EDIT_BOX_INPUT_FLAG_INITIAL_CAPS_WORD = 2,
+		/**
+		* This flag is a hint to the implementation that during text editing,
+		* the initial letter of each sentence should be capitalized.
+		*/
+		EDIT_BOX_INPUT_FLAG_INITIAL_CAPS_SENTENCE = 3,
+		/**
+		* Capitalize all characters automatically.
+		*/
+		EDIT_BOX_INPUT_GLAG_INITIAL_CAPS_ALL_CHARACTERS = 4
+    };
+
+    /**
      * \brief Class for edit box.
      *
      * You can use this widget to gather small amounts of text from the user.
@@ -107,9 +177,22 @@ namespace NativeUI
 
         /**
          * Set the mode of the edit box.
+         * @deprecated Use setInputMode and setInputFlag instead.
          * @param editBoxMode The given mode.
          */
         virtual void setEditMode(EditBoxMode editBoxMode);
+
+        /**
+         * Set the input mode of the edit box.
+         * @param inputMode One of the EditBoxInputMode constants.
+         */
+        virtual void setInputMode(EditBoxInputMode inputMode);
+
+        /**
+         * Set the input flags that are to be applied to the edit box.
+         * @param inputFlag One of the EditBoxInputFlag constants.
+         */
+        virtual void setInputFlag(EditBoxInputFlag inputFlag);
 
         /**
          * Add an edit box event listener.
