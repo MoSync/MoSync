@@ -13,6 +13,7 @@ namespace MoSync
     {
         protected Object mInternalObject;
         protected int mResourceType;
+        public static readonly Resource Flux = new Resource(null, Constants.RT_FLUX);
 
         public Resource(Object internalObject, int resourceType)
         {

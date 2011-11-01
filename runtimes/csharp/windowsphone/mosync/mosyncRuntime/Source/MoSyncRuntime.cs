@@ -256,7 +256,7 @@ namespace MoSync
                 if (nBytes >= 4)
                 {
                     // fail
-                    return 0;
+                    throw new Exception("ReadUnsignedVarInt");
                 }
             }
             return res;
@@ -285,6 +285,7 @@ namespace MoSync
                 if (type == 0) break;
 
                 uint size = ReadUnsignedVarInt(file);
+                Util.Log("Resource type " + type + ", size " + size + "\n");
 
                 Resource resource = new Resource(null, type);
                 mResources.Add(mCurrentResourceHandle, resource);
@@ -292,7 +293,6 @@ namespace MoSync
                 switch (type)
                 {
                     case MoSync.Constants.RT_PLACEHOLDER:
-
                         break;
                     case MoSync.Constants.RT_UBIN:
                     case MoSync.Constants.RT_BINARY:
@@ -314,6 +314,10 @@ namespace MoSync
                                 resource.SetInternalObject(wb);
                             });
                         }
+                        break;
+                    default:
+                        Util.Log("Unknown resource type "+type+", size "+size+"\n");
+                        file.Seek(size, SeekOrigin.Current);
                         break;
                 }
 

@@ -101,12 +101,14 @@ namespace MoSync
             Console.Write(text);
             InitLogging();
             WriteTextToFile(text, "log.txt");
+            System.Diagnostics.Debug.WriteLine(text.Substring(0, text.Length-1));
         }
 
         public static void Log(byte[] bytes)
         {
             InitLogging();
             WriteBytesToFile(bytes, "log.txt");
+            System.Diagnostics.Debug.WriteLine(bytes);
         }
 
         public static void CriticalError(String text)

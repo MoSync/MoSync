@@ -33,12 +33,12 @@ void setup_filesystem() {
 	MAASSERT(chdir(newRoot) == 0);
 	MAASSERT(chroot(".") == 0);
 	// now we have the root of a unix file-system.
-	
+
 	const MAHandle start = maFindLabel("start");
 	const MAHandle end = maFindLabel("end");
 	MAASSERT(start > 0 && end > 0);
 	printf("%i files:\n", end - (start+1));
-	
+
 	for(MAHandle i=start+1; i<end; i++) {
 		char buf[MAX_PATH];
 		int size = maGetDataSize(i);
@@ -50,7 +50,7 @@ void setup_filesystem() {
 		int dataOffset = namelen+1;
 		int dataLen = size - dataOffset;
 		printf("%i: %s (%i bytes)\n", i, name, dataLen);
-		
+
 		bool isDirectory = name[namelen-1] == '/';
 		if(isDirectory) {
 			// there can be no data in a directory.
@@ -61,11 +61,11 @@ void setup_filesystem() {
 			char realName[MAX_PATH];
 			MAHandle fh;
 			bool res;
-			
+
 			memcpy(realName, newRoot, newRootLen);
 			// overwrite the slash in newRoot, so we don't get double slashes.
 			memcpy(realName + newRootLen - 1, name, namelen + 1);
-			
+
 			MAASSERT((fh = maFileOpen(realName, MA_ACCESS_READ_WRITE)) > 0);
 			res = writeFile(fh, i, dataOffset, dataLen);
 			MAASSERT(maFileClose(fh) >= 0);
@@ -96,7 +96,7 @@ static bool writeFile(MAHandle fh, MAHandle data, int dataOffset, int dataLen) {
 static bool makeDir(char* root, int rootLen, const char* name, int bufLen) {
 	// find a root path
 	printf("makeDir(%s)\n", root);
-	MAHandle list = maFileListStart(root, "*");
+	MAHandle list = maFileListStart(root, "*", MA_FL_SORT_NONE);
 	MAT(list);
 	int freeBufSpace = bufLen - rootLen;
 	while(1) {
@@ -141,7 +141,7 @@ static bool tryToMake(const char* dir) {
 
 static bool cleanOut(const char* dir) {
 	printf("cleanOut(%s)\n", dir);
-	MAHandle list = maFileListStart(dir, "*");
+	MAHandle list = maFileListStart(dir, "*", MA_FL_SORT_NONE);
 	MAT(list);
 	char buf[2048];
 	int dirLen = strlen(dir);

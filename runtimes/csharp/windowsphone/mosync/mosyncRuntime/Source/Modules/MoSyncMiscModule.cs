@@ -76,6 +76,12 @@ namespace MoSync
             syscalls.maResetBacklight = delegate()
             {
             };
+
+            syscalls.maSoundPlay = delegate(int _sound_res, int _offset, int _size)
+            {
+                // not implemented, but I don't wanna throw exceptions.
+                return -1;
+            };
         }
 
         public void Init(Ioctls ioctls, Core core, Runtime runtime)

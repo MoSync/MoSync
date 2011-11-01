@@ -130,6 +130,13 @@ namespace test_mosync
         {
             if (System.Diagnostics.Debugger.IsAttached)
             {
+                Exception eo = e.ExceptionObject;
+                System.Diagnostics.Debug.WriteLine(eo.StackTrace);
+                if (eo.GetType() == typeof(System.NotImplementedException) ||
+                    eo.GetType() == typeof(Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException))
+                {
+                    return;
+                }
                 // An unhandled exception has occurred; break into the debugger
                 System.Diagnostics.Debugger.Break();
             }
