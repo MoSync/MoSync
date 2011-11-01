@@ -161,6 +161,11 @@ namespace MoSync
 
             public override void connect(ResultHandler rh)
             {
+                if (mStream != null) // POST
+                {
+                    mStream.Close();
+                    mStream = null;
+                }
                 mRequest.BeginGetResponse(new AsyncCallback(RespCallback), rh);
             }
             protected void RespCallback(IAsyncResult ar)
@@ -195,8 +200,21 @@ namespace MoSync
             public override void write(byte[] buffer, int offset, int size,
                  ResultHandler rh)
             {
-                //mStream.BeginWrite(buffer, offset, size, new AsyncCallback(WriteCallback), rh);
-                throw new Exception("HTTP write");
+                if (mResponse != null)
+                    throw new Exception("HTTP write");
+                if (mStream == null)
+                {
+                    mRequest.BeginGetRequestStream(
+                        new AsyncCallback(delegate(IAsyncResult ar)
+                    {
+                        mStream = mRequest.EndGetRequestStream(ar);
+                        mStream.BeginWrite(buffer, offset, size,
+                            new AsyncCallback(WriteCallback), rh);
+                    }), rh);
+                    return;
+                }
+                mStream.BeginWrite(buffer, offset, size,
+                    new AsyncCallback(WriteCallback), rh);
             }
             protected void WriteCallback(IAsyncResult ar)
             {
@@ -220,6 +238,14 @@ namespace MoSync
             public String getResponseHeader(String key)
             {
                 return mResponse.Headers[key];
+            }
+            public void setRequestHeader(String key, String value)
+            {
+                key = key.ToLowerInvariant();
+                if (key == "content-type")
+                    mRequest.ContentType = value;
+                else
+                    mRequest.Headers[key] = value;
             }
         }
 
@@ -338,6 +364,14 @@ namespace MoSync
                 {
                     mResultHandler(handle, MoSync.Constants.CONNOP_FINISH, result);
                 });
+            };
+
+            syscalls.maHttpSetRequestHeader = delegate(int _conn, int _key, int _value)
+            {
+                WebRequestConnection c = (WebRequestConnection)mConnections[_conn];
+                String key = core.GetDataMemory().ReadStringAtAddress(_key);
+                String value = core.GetDataMemory().ReadStringAtAddress(_value);
+                c.setRequestHeader(key, value);
             };
 
             syscalls.maHttpGetResponseHeader = delegate(int _conn, int _key, int _buffer, int _bufSize)
