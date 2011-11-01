@@ -149,10 +149,6 @@
     <Content Include="SplashScreenImage.jpg" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\mosyncLib\mosyncLib.csproj">
-      <Project>{7746202B-A479-49BE-8FF9-205EB13DDE07}</Project>
-      <Name>mosyncLib</Name>
-    </ProjectReference>
     <ProjectReference Include="..\mosyncRuntime\mosyncRuntime.csproj">
       <Project>{8318207D-3E1C-408B-8A4E-75E45B9F1E96}</Project>
       <Name>mosyncRuntime</Name>
