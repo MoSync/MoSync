@@ -60,7 +60,9 @@ namespace MoSync
 
             syscalls.maTime = delegate()
             {
-                return 0;
+                TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
+                int timestamp = (int)t.TotalSeconds;
+                return timestamp;
             };
 
             syscalls.maLocalTime = delegate()
