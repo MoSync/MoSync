@@ -45,10 +45,12 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	printf("Building: %s\n", s.model);
 
+#if 0
 	// super hack
 	bool rebuild = false;
 	if(std::string(s.model).find("WindowsPhoneRebuilt") != string::npos)
 		rebuild = true;
+#endif
 
 	string dst = s.dst;
 	string templateLocation = string(ri.path) + "/template";
@@ -68,8 +70,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	generateCmd << getBinary("winphone-builder") << " -output-type interpreted -input-file " << file(templateFileLocation) <<
 		" -output-file " << file(csprojOutputFile);
 
-	sh(generateCmd.str().c_str(), false);//s.silent);
-
+	sh(generateCmd.str().c_str(), s.silent);
 
 	// Copy program files to xcode template
 	//copyFile((xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), (src + "/rebuild.build.cpp").c_str());

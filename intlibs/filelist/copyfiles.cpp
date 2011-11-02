@@ -1,5 +1,7 @@
 #include <stack>
 #include <string>
+#include <stdio.h>
+#include <string.h>
 #include "filelist.h"
 #include "../helpers/mkdir.h"
 #include "copyfiles.h"
@@ -13,7 +15,7 @@ void copyFilesRecurse();
 
 // returns total amount of bytes written.
 // on failure, returns an error code, and errno will be set.
-extern "C" int copyFile(const char *src, const char* dst) {
+extern "C" int copySingleFile(const char *src, const char* dst) {
 	char buffer[1024];
 	size_t bytesRead, bytesWritten;
 	size_t bufferIndex = 0;
@@ -50,7 +52,7 @@ extern "C" int copyFile(const char *src, const char* dst) {
 	return res;
 }
 
-void copyFilesCallback(const char *path) {
+static void copyFilesCallback(const char *path) {
 	if(path[0] == '.') return;
 	const char* slash = strrchr(path, '/');
 	const char *fn;
@@ -78,7 +80,7 @@ void copyFilesCallback(const char *path) {
 		string srcFile = path;
 		string dstFile = sDestinationDirectory.top() + string("/") + fn;
 		int errCode;
-		if((errCode = copyFile(srcFile.c_str(), dstFile.c_str()))<0) {
+		if((errCode = copySingleFile(srcFile.c_str(), dstFile.c_str()))<0) {
 			throw errCode;
 			//error("Could not copy file %s. Error code: %d, errno: %i (%s)\n", path, errCode, errno, strerror(errno));
 		}

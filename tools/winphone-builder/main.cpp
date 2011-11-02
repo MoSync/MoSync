@@ -17,8 +17,11 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "pugixml-1.0/src/pugixml.hpp"
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <string>
 #include <vector>
+
 using namespace std;
 
 // The purpose of this program is to generate projects
@@ -34,13 +37,14 @@ using namespace std;
 // AppManifest.xml should be modified from here to.
 // Add input parameters for project name, company name, version etc.
 
-string integerToString(int i) {
+#if 0	//unused
+static string integerToString(int i) {
 	char temp[16];
 	sprintf(temp, "%i", i);
 	return temp;
 }
 
-char *readFileIntoMem(const char* filename, int *len) {
+static char *readFileIntoMem(const char* filename, int *len) {
 	FILE *file = fopen(filename, "rb");
 	if(!file) return NULL;
 	fseek(file, 0, SEEK_END);
@@ -53,28 +57,31 @@ char *readFileIntoMem(const char* filename, int *len) {
 	return memory;
 }
 
-bool writeMemIntoFile(const char* filename, const char *mem, int len) {
+static bool writeMemIntoFile(const char* filename, const char *mem, int len) {
 	FILE *file = fopen(filename, "wb");
 	if(!file) return false;
 	fwrite(mem, len, 1, file);
 	fclose(file);
 	return true;
 }
+#endif
 
-void error(const char *why) {
+static void error(const char *why) {
 	printf("error: %s\n", why);
 	exit(1);
 }
 
-void replaceTemplateDefine(string &templateFile, const string &whatToReplace, const string &replacement) {
+#if 0	//unused
+static void replaceTemplateDefine(string &templateFile, const string &whatToReplace, const string &replacement) {
 	size_t index;
 	while((index=templateFile.find(whatToReplace))!=string::npos) {
 		int endOfReplacement = index+whatToReplace.length();
 		templateFile = templateFile.substr(0, index) + replacement + templateFile.substr(endOfReplacement, templateFile.size()-endOfReplacement);
 	}
 }
+#endif
 
-pugi::xml_node getNode(const pugi::xml_node& node, const std::string& xpath)
+static pugi::xml_node getNode(const pugi::xml_node& node, const std::string& xpath)
 {
 	return node.select_single_node(pugi::xpath_query(xpath.c_str())).node();
 }
