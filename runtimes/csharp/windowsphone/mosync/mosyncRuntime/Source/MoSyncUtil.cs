@@ -9,7 +9,7 @@ using Microsoft.Xna.Framework.GamerServices;
 
 namespace MoSync
 {
-    class Util
+    public class Util
     {
 
         public static uint NextPowerOfTwo(int minPow, uint val)
@@ -125,6 +125,15 @@ namespace MoSync
             }
         }
 
+        public class ExitException : Exception
+        {
+            public readonly int result;
+            public ExitException(int res)
+            {
+                result = res;
+            }
+        };
+
         public static void CriticalError(String text)
         {
             Log(text);
@@ -135,13 +144,13 @@ namespace MoSync
                 System.Diagnostics.Debugger.Break();
             }
             Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
-            //throw new Exception("ExitAppException");
+            throw new ExitException(-1);
         }
 
         public static void Exit(int res)
         {
-            CriticalError("Exited!");
-            throw new Exception("ExitAppException");
+            //CriticalError("Exited!");
+            throw new ExitException(res);
         }
 
         public static int CreateExtent(int w, int h)
