@@ -39,6 +39,9 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MoSyncUpdater", "tools\MoSyncUpdater\MoSyncUpdater.vcxproj", "{A863A48A-4729-4EA4-B4CD-49B8C5A3AA0D}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "package", "tools\package\package.vcxproj", "{93CBBDC2-46DF-4484-9BEA-E937DBB625E9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C49EC64D-E0B9-4830-8B0F-E5F286F971A5} = {C49EC64D-E0B9-4830-8B0F-E5F286F971A5}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PanicDoc", "tools\PanicDoc\PanicDoc.vcxproj", "{154E42C2-B7F4-4A9A-93AD-C94825210D6E}"
 EndProject
