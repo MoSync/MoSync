@@ -1155,7 +1155,7 @@ interface MAAPI {
 		RALT			= 307;
 		LALT			= 308;
 
-		SEARCH          = 309;
+		SEARCH			 = 309;
 	}
 
 	constset int MAKB_ { // Key Bits
@@ -1480,9 +1480,9 @@ interface MAAPI {
 			} textbox;
 
 			struct {
-                /**
-			    * #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if canceled or 1 if Ok was pressed.
-			    */
+				/**
+				 * #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if canceled or 1 if Ok was pressed.
+				 */
 				int imagePickerState;
 
 				/**
@@ -8166,6 +8166,130 @@ group NFCAPI "NFC API" {
 
 		}
 	}//end of NFC API
+
+group DBAPI "DB API" {
+		/**
+		 * Open a database, the database is created if it does not exist.
+		 * Note that the application needs write permissions to create
+		 * database files on the sd card.
+		 * @param path Path to database file name.
+		 * @return Handle to the database >0 on success, <0 on error.
+		 */
+		MAHandle maDBOpen(in MAString path);
+
+		/**
+		 * Close a database.
+		 * @param databaseHandle Handle to the database.
+		 * @return 0 on success, <0 on error.
+		 */
+		int maDBClose(in MAHandle databaseHandle);
+
+		/**
+		 * Executes an SQL statement. If the statement returns a
+		 * query result, a cursor handle is returned.
+		 * @param databaseHandle Handle to the database.
+		 * @param sql The SQL statement.
+		 * @return <0 on error, 0 on success, >0 if there is a cursor
+		 * to a query result, in this case the return value is the
+		 * cursor handle.
+		 */
+		MAHandle maDBExecSQL(in MAHandle databaseHandle, in MAString sql);
+
+		/**
+		 * Destroys a cursor. You must call this function
+		 * when you are done with the cursor to release
+		 * its resources.
+		 * @param cursorHandle Handle to the cursor.
+		 */
+		void maDBCursorDestroy(in MAHandle cursorHandle);
+
+		/**
+		 * Returns the number of rows in the result set pointed
+		 * to by the cursor.
+		 * @param cursorHandle Handle to the cursor.
+		 * @return The number of rows in the result set, < 0 on error.
+		 */
+		int maDBCursorGetRowCount(in MAHandle cursorHandle);
+
+		/**
+		 * Move the cursor to the next row in the result set.
+		 * @param cursorHandle Handle to the cursor.
+		 * @return < 0 if the cursor passed the last row or on error,
+		 * 0 if successfully moved to next row.
+		 */
+		int maDBCursorNext(in MAHandle cursorHandle);
+
+		/**
+		 * Get the column value at the current row pointed to
+		 * by the cursor as a data object. Use this function for
+		 * blob data or text data.
+		 * @param cursorHandle Handle to the cursor.
+		 * @param columnIndex Index of the column to retrieve value from.
+		 * First column has index zero.
+		 * @param placeholder Handle created with maCreatePlaceholder.
+		 * A data object will be created with the column data, and the handle
+		 * will refer to that data.
+		 * @return The actual length of the value returned. If this value
+		 * is greater than the max value
+		 */
+		int maDBCursorGetColumnData(
+			in MAHandle cursorHandle,
+			in int columnIndex,
+			in MAHandle placeholder);
+
+		/**
+		 * Get the column value at the current row pointed to
+		 * by the cursor into a data buffer. Use this function
+		 * for text data.
+		 * @param cursorHandle Handle to the cursor.
+		 * @param columnIndex Index of the column to retrieve value from.
+		 * First column has index zero.
+		 * @param buffer Pointer to buffer to receive the data.
+		 * The result is not zero terminated.
+		 * @param bufferSize Max size of the buffer.
+		 * @return The actual length of the data, < 0 on error.
+		 */
+		int maDBCursorGetColumnText(
+			in MAHandle cursorHandle,
+			in int columnIndex,
+			out MAAddress buffer range("bufferSize"),
+			in int bufferSize);
+
+		/**
+		 * Get the column value at the current row pointed to
+		 * by the cursor as int data.
+		 * @param cursorHandle Handle to the cursor.
+		 * @param columnIndex Index of the column to retrieve value from.
+		 * First column has index zero.
+		 * @param value Pointer to int to receive the value.
+		 * @return > 0 on success, < 0 on error.
+		 */
+		int maDBCursorGetColumnInt(in MAHandle cursorHandle, in int columnIndex, out int value);
+
+		/**
+		 * Get the column value at the current row pointed to
+		 * by the cursor as float data.
+		 * @param cursorHandle Handle to the cursor.
+		 * @param columnIndex Index of the column to retrieve value from.
+		 * First column has index zero.
+		 * @param value Pointer to float to receive the value.
+		 * @return > 0 on success, < 0 on error.
+		 */
+		int maDBCursorGetColumnFloat(in MAHandle cursorHandle, in int columnIndex, out float value);
+
+		constset int MA_DB_ {
+			/**
+			*
+			*/
+			KEY_A = 1;
+
+			/**
+			*
+			*/
+			KEY_B = 2;
+
+		}
+	} // End of DB API
 
 	/**
 	* Enable panic system.
