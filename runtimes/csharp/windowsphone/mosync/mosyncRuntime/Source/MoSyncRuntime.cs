@@ -70,6 +70,7 @@ namespace MoSync
 
         protected Dictionary<int, Resource> mResources = new Dictionary<int, Resource>();
         protected int mCurrentResourceHandle;
+        public readonly Dictionary<String, int> mLabels = new Dictionary<String, int>();
 
         private List<Event> mEvents = new List<Event>();
         private AutoResetEvent mEventWaiter = new AutoResetEvent(false);
@@ -315,6 +316,16 @@ namespace MoSync
                             });
                         }
                         break;
+                    case MoSync.Constants.RT_LABEL:
+                        bytes = new byte[size];
+                        file.Read(bytes, 0, (int)size);
+                        if (bytes[size - 1] != 0)
+                            throw new Exception("invalid label (no null terminator)");
+                        String s = System.Text.Encoding.UTF8.GetString(bytes, 0, (int)size-1);
+                        if (mLabels.ContainsKey(s))
+                            throw new Exception("duplicate label");
+                        mLabels.Add(s, mCurrentResourceHandle);
+                        break;
                     default:
                         Util.Log("Unknown resource type "+type+", size "+size+"\n");
                         file.Seek(size, SeekOrigin.Current);
@@ -352,7 +363,14 @@ namespace MoSync
 
         public void SetResource(int handle, Resource res)
         {
-            mResources.Add(handle, res);
+            if (mResources[handle].GetInternalObject() != null)
+                throw new Exception("Attempted to overwrite resource");
+            SetResourceRaw(handle, res);
+        }
+
+        public void SetResourceRaw(int handle, Resource res)
+        {
+            mResources[handle] = res;
         }
 
         public int AddResource(Resource res)

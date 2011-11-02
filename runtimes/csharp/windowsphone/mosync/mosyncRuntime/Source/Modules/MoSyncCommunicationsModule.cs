@@ -315,11 +315,11 @@ namespace MoSync
                 Connection c = mConnections[_conn];
                 Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
                 Memory mem = (Memory)res.GetInternalObject();
-                runtime.SetResource(_data, Resource.Flux);
+                runtime.SetResourceRaw(_data, Resource.Flux);
                 cd(c, mem.GetData(),
                     delegate(int handle, int connOp, int result)
                     {
-                        runtime.SetResource(_data, res);
+                        runtime.SetResourceRaw(_data, res);
                         mResultHandler(handle, connOp, result);
                     });
             };

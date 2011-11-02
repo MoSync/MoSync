@@ -73,6 +73,16 @@ namespace MoSync
                 return runtime.AddResource(new Resource(null, MoSync.Constants.RT_PLACEHOLDER));
             };
 
+            syscalls.maFindLabel = delegate(int _name)
+            {
+                String name = core.GetDataMemory().ReadStringAtAddress(_name);
+                int res;
+                if (runtime.mLabels.TryGetValue(name, out res))
+                    return res;
+                else
+                    return -1;
+            };
+
             syscalls.maResetBacklight = delegate()
             {
             };

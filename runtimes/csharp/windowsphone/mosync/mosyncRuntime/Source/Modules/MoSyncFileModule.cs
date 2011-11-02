@@ -6,7 +6,7 @@ using System.IO.IsolatedStorage;
 
 namespace MoSync
 {
-    public class FileModule : IIoctlModule
+    public class FileModule : IIoctlModule, ISyscallModule
     {
         public class File
         {
@@ -89,6 +89,19 @@ namespace MoSync
                 }
             }
 
+            public void Delete()
+            {
+                Close();
+                if (mIsDirectory)
+                {
+                    mIsolatedStorage.DeleteDirectory(mPath);
+                }
+                else
+                {
+                    mIsolatedStorage.DeleteFile(mPath);
+                }
+            }
+
             public void Close()
             {
                 if (mIsDirectory)
@@ -120,12 +133,75 @@ namespace MoSync
         protected Dictionary<int, File> mFileHandles = new Dictionary<int, File>();
         protected int mNextFileHandle = 1;
 
+        protected Dictionary<int, File> mStoreHandles = new Dictionary<int, File>();
+        protected int mNextStoreHandle = 1;
+
         protected Dictionary<int, FileList> mFileListHandles = new Dictionary<int, FileList>();
         protected int mNextFileListHandle = 1;
 
         private String ConvertPath(String path)
         {
             return path.Replace('/', '\\');
+        }
+
+        public void Init(Syscalls syscalls, Core core, Runtime runtime)
+        {
+            // todo: store "stores" in a separate location from the filesystem,
+            // to avoid clashes.
+            syscalls.maOpenStore = delegate(int _name, int _flags)
+            {
+                String name = core.GetDataMemory().ReadStringAtAddress(_name);
+                name = ConvertPath(name);
+                File file = new File(name, FileAccess.ReadWrite);
+                if (file.IsDirectory)
+                {
+                    throw new Exception("Invalid store name");
+                }
+                if (file.Exists)
+                    file.TryOpen();
+                else if ((_flags & MoSync.Constants.MAS_CREATE_IF_NECESSARY) != 0)
+                {
+                    file.Create();
+                    file.TryOpen();
+                }
+                else
+                    return MoSync.Constants.STERR_NONEXISTENT;
+                if (file.FileStream == null)
+                    return MoSync.Constants.STERR_GENERIC;
+                mStoreHandles.Add(mNextStoreHandle, file);
+                return mNextStoreHandle++;
+            };
+
+            syscalls.maWriteStore = delegate(int _store, int _data)
+            {
+                File file = mStoreHandles[_store];
+                IsolatedStorageFileStream fileStream = file.FileStream;
+                fileStream.SetLength(0);
+                Resource dataRes = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
+                Memory data = (Memory)dataRes.GetInternalObject();
+                fileStream.Write(data.GetData(), 0, data.GetData().Length);
+                return 1;
+            };
+
+            syscalls.maReadStore = delegate(int _store, int _placeholder)
+            {
+                File file = mStoreHandles[_store];
+                IsolatedStorageFileStream fileStream = file.FileStream;
+                Memory mem = new Memory((int)fileStream.Length);
+                fileStream.Seek(0, SeekOrigin.Begin);
+                fileStream.Read(mem.GetData(), 0, (int)fileStream.Length);
+                runtime.SetResource(_placeholder, new Resource(mem, MoSync.Constants.RT_BINARY));
+                return MoSync.Constants.RES_OK;
+            };
+
+            syscalls.maCloseStore = delegate(int _store, int _delete)
+            {
+                File file = mStoreHandles[_store];
+                file.Close();
+                if (_delete != 0)
+                    file.Delete();
+                mStoreHandles.Remove(_store);
+            };
         }
 
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
