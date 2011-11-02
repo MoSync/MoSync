@@ -23,7 +23,7 @@ namespace MoSync
             get { return (double)mView.GetValue(Canvas.LeftProperty); }
             set
             {
-                //mView.SetValue(Canvas.LeftProperty, value);
+                mView.SetValue(Canvas.LeftProperty, value);
             }
         }
 
@@ -33,7 +33,7 @@ namespace MoSync
             get { return (double)mView.GetValue(Canvas.TopProperty); }
             set
             {
-                //mView.SetValue(Canvas.TopProperty, value);
+                mView.SetValue(Canvas.TopProperty, value);
             }
         }
 
@@ -43,7 +43,7 @@ namespace MoSync
             get { return (double)mView.GetValue(Canvas.WidthProperty); }
             set
             {
-                //mView.SetValue(Canvas.WidthProperty, value);
+                mView.SetValue(Canvas.WidthProperty, value);
             }
         }
 
@@ -53,7 +53,7 @@ namespace MoSync
             get { return (double)mView.GetValue(Canvas.HeightProperty); }
             set
             {
-                //mView.SetValue(Canvas.HeightProperty, value);
+                mView.SetValue(Canvas.HeightProperty, value);
             }
         }
 
@@ -62,6 +62,138 @@ namespace MoSync
         {
         }
     };
+
+    // The button class
+    public class Button : WidgetBaseWindowsPhone
+    {
+        //The text content of the button
+        protected String mText;
+
+        //the vertical alignment of the content
+        protected VerticalAlignment mTextVerticalAlignment;
+
+        //the horizontal alignment of the content
+        protected HorizontalAlignment mTextHorizontalAlignment;
+
+        //the button controll
+        protected System.Windows.Controls.Button mButton;
+
+        //the button constructor
+        public Button()
+        {
+            //initializing the button controll
+            mButton = new System.Windows.Controls.Button();
+
+            //set the view of the current widget as the previously instantiated button controll
+            View = mButton;
+        }
+
+        //MAW_BUTTON_TEXT property implementation
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_TEXT)]
+        public String Text
+        {
+            set
+            {
+                mText = value;
+                mButton.Content = mText;
+            }
+            get
+            {
+                return mText;
+            }
+        }
+
+        //MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT property implementation
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT)]
+        public String TextHorizontalAlignment
+        {
+            set
+            {
+                //doing the proper behaviour for the required value
+                String a = value.ToString();
+                if (value.ToString().Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
+                {
+                    mTextHorizontalAlignment = HorizontalAlignment.Left;
+                    mButton.HorizontalContentAlignment = mTextHorizontalAlignment;
+                }
+                else
+                {
+                    if (value.ToString().Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
+                    {
+                        mTextHorizontalAlignment = HorizontalAlignment.Right;
+                        mButton.HorizontalContentAlignment = mTextHorizontalAlignment;
+                    }
+                    else
+                    {
+                        if (value.ToString().Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
+                        {
+                            mTextHorizontalAlignment = HorizontalAlignment.Center;
+                            mButton.HorizontalContentAlignment = mTextHorizontalAlignment;
+                        }
+                    }
+                }
+            }
+        }
+
+        //MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT property implementation
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT)]
+        public String TextVerticalAlignment
+        {
+            set
+            {
+                if (value.ToString().Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
+                {
+                    mTextVerticalAlignment = VerticalAlignment.Top;
+                    mButton.VerticalContentAlignment = mTextVerticalAlignment;
+                }
+                else
+                {
+                    if (value.ToString().Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
+                    {
+                        mTextVerticalAlignment = VerticalAlignment.Bottom;
+                        mButton.VerticalContentAlignment = mTextVerticalAlignment;
+                    }
+                    else
+                    {
+                        if (value.ToString().Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
+                        {
+                            mTextVerticalAlignment = VerticalAlignment.Center;
+                            mButton.VerticalContentAlignment = mTextVerticalAlignment;
+                        }
+                    }
+                }
+            }
+        }
+
+        //MAW_BUTTON_FONT_COLOR property implementation
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_FONT_COLOR)]
+        public String FontColor
+        {
+            set
+            {
+                if (value.Length == 8 && value[0].Equals('0') && value[1].Equals('x'))
+                {
+                    //converting the string from value into RGB bytes
+                    byte R = Byte.Parse(value.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte G = Byte.Parse(value.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte B = Byte.Parse(value.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
+                    byte A = 255;
+                    mButton.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
+                }
+            }
+        }
+
+        //MAW_BUTTON_FONT_SIZE property implementation
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_FONT_SIZE)]
+        public String FontSize
+        {
+            set
+            {
+                double size = double.Parse(value);
+                mButton.FontSize = size;
+            }
+        }
+    }
 
     public class WebView : WidgetBaseWindowsPhone
     {
