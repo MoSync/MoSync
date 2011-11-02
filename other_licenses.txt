@@ -167,3 +167,4 @@ build-one.rb
 /tools/vis/ConvertSLD.rb
 
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries
+/tools/winphone-builder/pugixml-1.0
