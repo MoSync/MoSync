@@ -34,6 +34,8 @@ namespace MoSync
             PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
             double screenWidth = System.Windows.Application.Current.Host.Content.ActualWidth;
             double screenHeight = System.Windows.Application.Current.Host.Content.ActualHeight;
+            if ((int)screenHeight == 0)
+                throw new Exception("screenHeight");
             PhoneApplicationPage mainPage = (PhoneApplicationPage)frame.Content;
             frame.Content = mainPage;
             Image mainImage = new Image();
@@ -44,11 +46,11 @@ namespace MoSync
             mainPage.Content = mainImage;
 
             mBackBuffer = new WriteableBitmap(
-                (int)mainImage.ActualWidth,
-                (int)mainImage.ActualHeight);
+                (int)screenWidth,
+                (int)screenHeight);
             mFrontBuffer = new WriteableBitmap(
-                (int)mainImage.ActualWidth,
-                (int)mainImage.ActualHeight);
+                (int)screenWidth,
+                (int)screenHeight);
 
             mainImage.Source = mFrontBuffer;
             mCurrentDrawTarget = mBackBuffer;

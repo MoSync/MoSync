@@ -31,6 +31,8 @@ namespace MoSync
     {
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
+            SystemPropertyManager.mSystemPropertyProviders.Clear();
+
             // maybe use some pretty reflection mechanism to find all syscall implementations here..
             syscalls.maCheckInterfaceVersion = delegate(int hash)
             {
@@ -91,6 +93,18 @@ namespace MoSync
             {
                 // not implemented, but I don't wanna throw exceptions.
                 return -1;
+            };
+
+            syscalls.maLoadProgram = delegate(int _data, int _reload)
+            {
+#if REBUILD
+                throw new Exception("maLoadProgram not available in rebuild mode");
+#else
+                Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
+                Memory mem = (Memory)res.GetInternalObject();
+                MoSync.Machine.SetLoadProgram(mem.GetStream(), _reload != 0);
+                throw new Util.ExitException(0);
+#endif
             };
         }
 

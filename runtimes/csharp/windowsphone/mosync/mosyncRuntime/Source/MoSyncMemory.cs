@@ -178,5 +178,10 @@ namespace MoSync
         {
             return mData;
         }
+
+        public Stream GetStream()
+        {
+            return new System.IO.MemoryStream(mData);
+        }
     }
 }
