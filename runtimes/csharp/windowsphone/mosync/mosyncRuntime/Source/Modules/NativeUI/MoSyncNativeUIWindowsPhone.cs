@@ -23,7 +23,7 @@ namespace MoSync
             get { return (double)mView.GetValue(Canvas.LeftProperty); }
             set
             {
-                //mView.SetValue(Canvas.LeftProperty, value); 
+                //mView.SetValue(Canvas.LeftProperty, value);
             }
         }
 
@@ -33,7 +33,7 @@ namespace MoSync
             get { return (double)mView.GetValue(Canvas.TopProperty); }
             set
             {
-                //mView.SetValue(Canvas.TopProperty, value); 
+                //mView.SetValue(Canvas.TopProperty, value);
             }
         }
 
@@ -43,7 +43,7 @@ namespace MoSync
             get { return (double)mView.GetValue(Canvas.WidthProperty); }
             set
             {
-                //mView.SetValue(Canvas.WidthProperty, value); 
+                //mView.SetValue(Canvas.WidthProperty, value);
             }
         }
 

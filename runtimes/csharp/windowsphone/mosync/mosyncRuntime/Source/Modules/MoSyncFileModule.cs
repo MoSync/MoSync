@@ -109,7 +109,19 @@ namespace MoSync
 
         };
 
-        protected List<File> mFileHandles = new List<File>();
+        public class FileList
+        {
+            public String[] dirs, files;
+            // range: 0 => dirs.Length + files.Length.
+            // read from files if(pos >= dirs.Length).
+            public int pos;
+        }
+
+        protected Dictionary<int, File> mFileHandles = new Dictionary<int, File>();
+        protected int mNextFileHandle = 1;
+
+        protected Dictionary<int, FileList> mFileListHandles = new Dictionary<int, FileList>();
+        protected int mNextFileListHandle = 1;
 
         private String ConvertPath(String path)
         {
@@ -125,7 +137,7 @@ namespace MoSync
                 delegate(String key)
                 {
                     // The isolated storage becomes the "root"
-                    return "\\";
+                    return "/";
                 }
             );
 
@@ -157,14 +169,15 @@ namespace MoSync
                     file.TryOpen();
                 }
 
-                mFileHandles.Add(file);
-                return mFileHandles.Count - 1;
+                mFileHandles.Add(mNextFileHandle, file);
+                return mNextFileHandle++;
             };
 
             ioctls.maFileClose = delegate(int _file)
             {
                 File file = mFileHandles[_file];
                 file.Close();
+                mFileHandles.Remove(_file);
                 return 0;
             };
 
@@ -243,7 +256,7 @@ namespace MoSync
                         origin = SeekOrigin.End;
                         break;
                     default:
-                        return MoSync.Constants.MA_FERR_GENERIC;
+                        throw new Exception("maFileSeek whence");
                 }
 
                 return (int)fileStream.Seek(_offset, origin);
@@ -268,8 +281,50 @@ namespace MoSync
             {
                 File file = mFileHandles[_file];
                 if (file.Exists)
-                    return MoSync.Constants.MA_FERR_FORBIDDEN;
+                    return MoSync.Constants.MA_FERR_GENERIC;
                 file.Create();
+                return 0;
+            };
+
+            ioctls.maFileListStart = delegate(int _path, int _filter, int _sorting)
+            {
+                // todo: respect _sorting.
+                String path = core.GetDataMemory().ReadStringAtAddress(_path);
+                path = ConvertPath(path);
+                String filter = core.GetDataMemory().ReadStringAtAddress(_filter);
+                String pattern = path + filter;
+                IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication();
+                FileList fl = new FileList();
+                fl.dirs = isf.GetDirectoryNames(pattern);
+                fl.files = isf.GetFileNames(pattern);
+                fl.pos = 0;
+
+                mFileListHandles.Add(mNextFileListHandle, fl);
+                return mNextFileListHandle++;
+            };
+
+            ioctls.maFileListNext = delegate(int _list, int _nameBuf, int _bufSize)
+            {
+                FileList fl = mFileListHandles[_list];
+                String name;
+                if (fl.pos < fl.dirs.Length)
+                    name = fl.dirs[fl.pos] + "/";
+                else if (fl.pos < fl.dirs.Length + fl.files.Length)
+                    name = fl.files[fl.pos - fl.dirs.Length];
+                else
+                    return 0;
+                if (name.Length >= _bufSize)
+                    return name.Length;
+                core.GetDataMemory().WriteStringAtAddress(_nameBuf,
+                    name, _bufSize);
+                fl.pos++;
+                return name.Length;
+            };
+
+            ioctls.maFileListClose = delegate(int _list)
+            {
+                FileList fl = mFileListHandles[_list];
+                mFileListHandles.Remove(_list);
                 return 0;
             };
         }
