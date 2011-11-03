@@ -97,6 +97,7 @@ module GccVersion
 	def set_defaults
 		if(!gccVersionClass.class_variable_defined?(:@@GCC_IS_V4))
 			gcc_version = get_gcc_version_string(gcc)
+			@@gcc_version = gcc_version
 			is_v4 = gcc_version[0] == "4"[0]
 			set_class_var(gccVersionClass, :@@GCC_IS_V4, is_v4)
 			if(is_v4)
@@ -108,6 +109,7 @@ module GccVersion
 				warning("GCC sub-version: #{gcc_version[2, 1].to_i}")
 			end
 		end
+		@gcc_version = @@gcc_version
 		@GCC_IS_V4 = get_class_var(gccVersionClass, :@@GCC_IS_V4)
 		if(@GCC_IS_V4)
 			@GCC_V4_SUB = get_class_var(gccVersionClass, :@@GCC_V4_SUB)
