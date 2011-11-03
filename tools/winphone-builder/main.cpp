@@ -21,6 +21,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string.h>
 #include <string>
 #include <vector>
+#include "helpers/attribute.h"
 
 using namespace std;
 
@@ -66,6 +67,7 @@ static bool writeMemIntoFile(const char* filename, const char *mem, int len) {
 }
 #endif
 
+static void error(const char *why) GCCATTRIB(noreturn);
 static void error(const char *why) {
 	printf("error: %s\n", why);
 	exit(1);
