@@ -494,6 +494,7 @@ interface MAAPI {
 	 */
 	int maFindLabel(in MAString name);
 
+	// TODO: Should we change RES_OK to be zero? Many
 	constset int RES_ {
 		OUT_OF_MEMORY = -1;
 		BAD_INPUT = -2;
@@ -8170,17 +8171,17 @@ group NFCAPI "NFC API" {
 group DBAPI "DB API" {
 		/**
 		 * Open a database, the database is created if it does not exist.
-		 * Note that the application needs write permissions to create
-		 * database files on the sd card.
-		 * @param path Path to database file name.
-		 * @return Handle to the database >0 on success, <0 on error.
+		 * Note that the application needs file read/write permissions to
+		 * create database files on the sd card.
+		 * @param path Full path to database file name.
+		 * @return Handle to the database >0 on success, #MA_DB_ERROR on error.
 		 */
 		MAHandle maDBOpen(in MAString path);
 
 		/**
 		 * Close a database.
 		 * @param databaseHandle Handle to the database.
-		 * @return 0 on success, <0 on error.
+		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
 		 */
 		int maDBClose(in MAHandle databaseHandle);
 
@@ -8189,9 +8190,9 @@ group DBAPI "DB API" {
 		 * query result, a cursor handle is returned.
 		 * @param databaseHandle Handle to the database.
 		 * @param sql The SQL statement.
-		 * @return <0 on error, 0 on success, >0 if there is a cursor
-		 * to a query result, in this case the return value is the
-		 * cursor handle.
+		 * @return #MA_DB_ERROR on error, #MA_DB_OK on success,
+		 * > 0 if there is a cursor to a query result, in this
+		 * case the return value is the cursor handle.
 		 */
 		MAHandle maDBExecSQL(in MAHandle databaseHandle, in MAString sql);
 
@@ -8207,15 +8208,15 @@ group DBAPI "DB API" {
 		 * Returns the number of rows in the result set pointed
 		 * to by the cursor.
 		 * @param cursorHandle Handle to the cursor.
-		 * @return The number of rows in the result set, < 0 on error.
+		 * @return The number of rows in the result set, #MA_DB_ERROR on error.
 		 */
 		int maDBCursorGetRowCount(in MAHandle cursorHandle);
 
 		/**
 		 * Move the cursor to the next row in the result set.
 		 * @param cursorHandle Handle to the cursor.
-		 * @return < 0 if the cursor passed the last row or on error,
-		 * 0 if successfully moved to next row.
+		 * @return #MA_DB_NO_ROW if there are no more rows in the result set,
+		 * #MA_DB_OK if successfully moved to next row, #MA_DB_ERROR on error.
 		 */
 		int maDBCursorNext(in MAHandle cursorHandle);
 
@@ -8229,8 +8230,7 @@ group DBAPI "DB API" {
 		 * @param placeholder Handle created with maCreatePlaceholder.
 		 * A data object will be created with the column data, and the handle
 		 * will refer to that data.
-		 * @return The actual length of the value returned. If this value
-		 * is greater than the max value
+		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
 		 */
 		int maDBCursorGetColumnData(
 			in MAHandle cursorHandle,
@@ -8245,9 +8245,11 @@ group DBAPI "DB API" {
 		 * @param columnIndex Index of the column to retrieve value from.
 		 * First column has index zero.
 		 * @param buffer Pointer to buffer to receive the data.
-		 * The result is not zero terminated.
+		 * The result is NOT zero terminated.
 		 * @param bufferSize Max size of the buffer.
-		 * @return The actual length of the data, < 0 on error.
+		 * @return The actual length of the data, if the actual length
+		 * returned is > bufferSize, data was not copied (buffer too small),
+		 * returns #MA_DB_ERROR on other errors.
 		 */
 		int maDBCursorGetColumnText(
 			in MAHandle cursorHandle,
@@ -8262,9 +8264,12 @@ group DBAPI "DB API" {
 		 * @param columnIndex Index of the column to retrieve value from.
 		 * First column has index zero.
 		 * @param value Pointer to int to receive the value.
-		 * @return > 0 on success, < 0 on error.
+		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
 		 */
-		int maDBCursorGetColumnInt(in MAHandle cursorHandle, in int columnIndex, out int value);
+		int maDBCursorGetColumnInt(
+			in MAHandle cursorHandle,
+			in int columnIndex,
+			out int value);
 
 		/**
 		 * Get the column value at the current row pointed to
@@ -8273,21 +8278,33 @@ group DBAPI "DB API" {
 		 * @param columnIndex Index of the column to retrieve value from.
 		 * First column has index zero.
 		 * @param value Pointer to float to receive the value.
-		 * @return > 0 on success, < 0 on error.
+		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
 		 */
-		int maDBCursorGetColumnFloat(in MAHandle cursorHandle, in int columnIndex, out float value);
+		int maDBCursorGetColumnFloat(
+			in MAHandle cursorHandle,
+			in int columnIndex,
+			out float value);
 
+		/**
+		 * Status codes returned by the maDB functions.
+		 * TODO: Add specific error codes as needed.
+		 */
 		constset int MA_DB_ {
 			/**
-			*
-			*/
-			KEY_A = 1;
+			 * Success return value.
+			 */
+			OK = 0;
 
 			/**
-			*
-			*/
-			KEY_B = 2;
+			 * Error return value (-1 reserved for IOCtl not implemented).
+			 */
+			ERROR = -2;
 
+			/**
+			 * The cursor is beyond the last row
+			 * when calling #maDBCursorNext.
+			 */
+			NO_ROW = -3;
 		}
 	} // End of DB API
 
