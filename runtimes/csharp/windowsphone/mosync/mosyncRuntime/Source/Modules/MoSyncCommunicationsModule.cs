@@ -183,15 +183,40 @@ namespace MoSync
                 }
                 catch (WebException e)
                 {
-                    /*
-                    if (e.Response is HttpWebResponse)
+                    if (e.Response != null)
                     {
-                        HttpWebResponse response = (HttpWebResponse)e.Response;
-
+                        mResponse = e.Response;
+                        mStream = mResponse.GetResponseStream();
                     }
-                    */
-
-                    result = MoSync.Constants.CONNERR_GENERIC;
+                    switch (e.Status)
+                    {
+                        case WebExceptionStatus.ProtocolError:
+                            if (e.Response is HttpWebResponse)
+                                result = (int)((HttpWebResponse)mResponse).StatusCode;
+                            else
+                                result = MoSync.Constants.CONNERR_GENERIC;
+                            break;
+                        case WebExceptionStatus.NameResolutionFailure:
+                        case WebExceptionStatus.ProxyNameResolutionFailure:
+                            result = MoSync.Constants.CONNERR_DNS;
+                            break;
+                        case WebExceptionStatus.ConnectionClosed:
+                            result = MoSync.Constants.CONNERR_CLOSED;
+                            break;
+                        case WebExceptionStatus.RequestCanceled:
+                            result = MoSync.Constants.CONNERR_CANCELED;
+                            break;
+                        case WebExceptionStatus.SecureChannelFailure:
+                        case WebExceptionStatus.TrustFailure:
+                            result = MoSync.Constants.CONNERR_SSL;
+                            break;
+                        case WebExceptionStatus.ServerProtocolViolation:
+                            result = MoSync.Constants.CONNERR_PROTOCOL;
+                            break;
+                        default:
+                            result = MoSync.Constants.CONNERR_GENERIC;
+                            break;
+                    }
                 }
                 rh(mHandle, MoSync.Constants.CONNOP_CONNECT, result);
             }
