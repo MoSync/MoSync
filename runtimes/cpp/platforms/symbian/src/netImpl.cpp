@@ -66,7 +66,7 @@ void Syscall::ConstructNetworkingL() {
 	gIapPath8.Copy(gIapPath16);
 	LOGS("iap path: %s\n", gIapPath8.PtrZ());
 
-#ifdef SUPPORT_MOSYNC_SERVER
+#if 0//def SUPPORT_MOSYNC_SERVER
 	gNetworkStatusSync = new (ELeave) CClassSynchronizer<Syscall>(this,
 		&Syscall::NetworkStatusChangeHandlerL);
 	gServer.GetNetworkStatusChange(gNetworkRegistrationPckg,
@@ -78,6 +78,7 @@ void Syscall::ConstructNetworkingL() {
 void Syscall::DestructNetworking() {
 	LOG("DestructNetworking\n");
 #ifdef SUPPORT_MOSYNC_SERVER
+	// Can freeze. UI activation appears to unfreeze it. Very weird.
 	if(gNetworkStatusSync) {
 		gServer.CancelNetworkStatusChange();
 		User::WaitForRequest(*gNetworkStatusSync->Status());
