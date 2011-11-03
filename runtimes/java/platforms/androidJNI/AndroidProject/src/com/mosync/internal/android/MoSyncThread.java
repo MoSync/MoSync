@@ -158,6 +158,7 @@ public class MoSyncThread extends Thread
 	MoSyncSensor mMoSyncSensor;
 	MoSyncPIM mMoSyncPIM;
 	MoSyncNFC mMoSyncNFC;
+	MoSyncDB mMoSyncDB;
 
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
@@ -288,7 +289,9 @@ public class MoSyncThread extends Thread
 	{
 		mContext = (MoSync) context;
 
-		// TODO: Clean this up! The static reference should be in this class.
+		// TODO: Clean this up! The static reference should be in one place.
+		// Now the instance of MoSyncThread is passed to many classes and
+		// also accessed via the static variables. We use use one consistent way.
 		EventQueue.sMoSyncThread = this;
 		sMoSyncThread = this;
 
@@ -302,6 +305,7 @@ public class MoSyncThread extends Thread
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
 		mMoSyncFile = new MoSyncFile(this);
+
 		try
 		{
 			mMoSyncFont = new MoSyncFont(this);
@@ -346,20 +350,26 @@ public class MoSyncThread extends Thread
 			mMoSyncSMS = null;
 		}
 
-		nativeInitRuntime();
+		//nativeInitRuntime();
 
 		mMoSyncSensor = new MoSyncSensor(this);
 
 		mMoSyncPIM = new MoSyncPIM(this);
-		try{
+
+		try
+		{
 			mMoSyncNFC = MoSyncNFCService.getDefault();
-			if (mMoSyncNFC != null) {
+			if (mMoSyncNFC != null)
+			{
 				mMoSyncNFC.setMoSyncThread(this);
 			}
-		} catch (Throwable t)
+		}
+		catch (Throwable t)
 		{
 			mMoSyncNFC = null;
 		}
+
+		mMoSyncDB = new MoSyncDB();
 
 		nativeInitRuntime();
 	}
@@ -2560,9 +2570,16 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * TODO: Consider renaming this method to for example setBinaryResource.
+	 * No loading is going on here. And rewrite the comment.
+	 *
 	 * Load and store a binary resource. Since Android differs a lot from
 	 * the other runtimes this is necessary. There isn't a duplicate stored
 	 * on the JNI side.
+	 *
+	 * @param resourceIndex The handle/placeholder id.
+	 * @param buffer Data referenced by the handle with id resourceIndex.
+	 * @return true on success, false on error.
 	 */
 	public boolean loadBinary(int resourceIndex, ByteBuffer buffer)
 	{
@@ -4211,7 +4228,89 @@ public class MoSyncThread extends Thread
 		mem.putInt(cell);
 
 		return 0;
-}
+	}
+
+	// ********** Database API **********
+
+	int maDBOpen(String path)
+	{
+		return mMoSyncDB.maDBOpen(path);
+	}
+
+	int maDBClose(int databaseHandle)
+	{
+		return mMoSyncDB.maDBClose(databaseHandle);
+	}
+
+	int maDBExecSQL(int databaseHandle, String sql)
+	{
+		return mMoSyncDB.maDBExecSQL(databaseHandle, sql);
+	}
+
+	int maDBCursorDestroy(int cursorHandle)
+	{
+		return mMoSyncDB.maDBCursorDestroy(cursorHandle);
+	}
+
+	int maDBCursorGetRowCount(int cursorHandle)
+	{
+		return mMoSyncDB.maDBCursorGetRowCount(cursorHandle);
+	}
+
+	int maDBCursorNext(int cursorHandle)
+	{
+		return mMoSyncDB.maDBCursorNext(cursorHandle);
+	}
+
+	int maDBCursorGetColumnData(
+		int cursorHandle,
+		int columnIndex,
+		int placeholder)
+	{
+		return mMoSyncDB.maDBCursorGetColumnData(
+			cursorHandle,
+			columnIndex,
+			placeholder,
+			this);
+	}
+
+	int maDBCursorGetColumnText(
+		int cursorHandle,
+		int columnIndex,
+		int bufferAddress,
+		int bufferSize)
+	{
+		return mMoSyncDB.maDBCursorGetColumnText(
+			cursorHandle,
+			columnIndex,
+			bufferAddress,
+			bufferSize,
+			this);
+	}
+
+	int maDBCursorGetColumnInt(
+		int cursorHandle,
+		int columnIndex,
+		int intValueAddress)
+	{
+		return mMoSyncDB.maDBCursorGetColumnInt(
+			cursorHandle,
+			columnIndex,
+			intValueAddress,
+			this);
+	}
+
+	int maDBCursorGetColumnFloat(
+		int cursorHandle,
+		int columnIndex,
+		int floatValueAddress)
+	{
+		return mMoSyncDB.maDBCursorGetColumnFloat(
+			cursorHandle,
+			columnIndex,
+			floatValueAddress,
+			this);
+	}
 
 	/**
 	 * Class that holds image data.

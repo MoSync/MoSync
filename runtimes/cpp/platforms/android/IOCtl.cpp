@@ -661,8 +661,6 @@ namespace Base
 		return (int)result;
 	}
 
-
-
 	/**
 	* Turn on/off sending of HomeScreen events. Off by default.
 	* @param eventsOn 1 = events on, 0 = events off
@@ -2901,4 +2899,335 @@ namespace Base
 		return (int)ret;
 	}
 
+
+	// ********** Database API **********
+
+	/**
+	 * Open a database, the database is created if it does not exist.
+	 * @param path Full path to database file name.
+	 * @return Handle to the database >0 on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBOpen(const char* path, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrPath = jNIEnv->NewStringUTF(path);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBOpen",
+			"(Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			jstrPath);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrPath);
+		return (int)result;
+	}
+
+	/**
+	 * Close a database.
+	 * @param databaseHandle Handle to the database.
+	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBClose(MAHandle databaseHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBClose",
+			"(I)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			databaseHandle);
+		jNIEnv->DeleteLocalRef(cls);
+		return (int)result;
+	}
+
+	/**
+	 * Executes an SQL statement. If the statement returns a
+	 * query result, a cursor handle is returned.
+	 * @param databaseHandle Handle to the database.
+	 * @param sql The SQL statement.
+	 * @return #MA_DB_ERROR on error, #MA_DB_OK on success,
+	 * > 0 if there is a cursor to a query result, in this
+	 * case the return value is the cursor handle.
+	 */
+	int _maDBExecSQL(
+		MAHandle databaseHandle,
+		const char* sql,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jstring jstrSql = jNIEnv->NewStringUTF(sql);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBExecSQL",
+			"(Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			jstrSql);
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrSql);
+		return (int)result;
+	}
+
+	/**
+	 * Destroys a cursor. You must call this function
+	 * when you are done with the cursor to release
+	 * its resources.
+	 * @param cursorHandle Handle to the cursor.
+	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBCursorDestroy(
+		MAHandle cursorHandle,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBCursorDestroy",
+			"(I)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			cursorHandle);
+		jNIEnv->DeleteLocalRef(cls);
+		return (int)result;
+	}
+
+	/**
+	 * Returns the number of rows in the result set pointed
+	 * to by the cursor.
+	 * @param cursorHandle Handle to the cursor.
+	 * @return The number of rows in the result set, #MA_DB_ERROR on error.
+	 */
+	int _maDBCursorGetRowCount(
+		MAHandle cursorHandle,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBCursorGetRowCount",
+			"(I)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			cursorHandle);
+		jNIEnv->DeleteLocalRef(cls);
+		return (int)result;
+	}
+
+	/**
+	 * Move the cursor to the next row in the result set.
+	 * @param cursorHandle Handle to the cursor.
+	 * @return #MA_DB_NO_ROW if there are no more rows in the result set,
+	 * #MA_DB_OK if successfully moved to next row, #MA_DB_ERROR on error.
+	 */
+	int _maDBCursorNext(
+		MAHandle cursorHandle,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBCursorNext",
+			"(I)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			cursorHandle);
+		jNIEnv->DeleteLocalRef(cls);
+		return (int)result;
+	}
+
+	/**
+	 * Get the column value at the current row pointed to
+	 * by the cursor as a data object. Use this function for
+	 * blob data or text data.
+	 * @param cursorHandle Handle to the cursor.
+	 * @param columnIndex Index of the column to retrieve value from.
+	 * First column has index zero.
+	 * @param placeholder Handle created with maCreatePlaceholder.
+	 * A data object will be created with the column data, and the handle
+	 * will refer to that data.
+	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBCursorGetColumnData(
+		MAHandle cursorHandle,
+		int columnIndex,
+		MAHandle placeholder,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBCursorGetColumnData",
+			"(III)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			cursorHandle,
+			columnIndex,
+			placeholder);
+		jNIEnv->DeleteLocalRef(cls);
+		return (int)result;
+	}
+
+	/**
+	 * Get the column value at the current row pointed to
+	 * by the cursor into a data buffer. Use this function
+	 * for text data.
+	 * @param cursorHandle Handle to the cursor.
+	 * @param columnIndex Index of the column to retrieve value from.
+	 * First column has index zero.
+	 * @param bufferAddress Address to buffer to receive the data.
+	 * The result is NOT zero terminated.
+	 * @param bufferSize Max size of the buffer.
+	 * @return The actual length of the data, if the actual length
+	 * returned is > bufferSize, data was not copied (buffer too small),
+	 * returns #MA_DB_ERROR on other errors.
+	 */
+	int _maDBCursorGetColumnText(
+		MAHandle cursorHandle,
+		int columnIndex,
+		int bufferAddress,
+		int bufferSize,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBCursorGetColumnText",
+			"(IIII)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			cursorHandle,
+			columnIndex,
+			bufferAddress,
+			bufferSize);
+		jNIEnv->DeleteLocalRef(cls);
+		return (int)result;
+	}
+
+	/**
+	 * Get the column value at the current row pointed to
+	 * by the cursor as int data.
+	 * @param cursorHandle Handle to the cursor.
+	 * @param columnIndex Index of the column to retrieve value from.
+	 * First column has index zero.
+	 * @param intValueAddress Adddress to int to receive the value.
+	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBCursorGetColumnInt(
+		MAHandle cursorHandle,
+		int columnIndex,
+		int intValueAddress,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBCursorGetColumnInt",
+			"(III)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			cursorHandle,
+			columnIndex,
+			intValueAddress);
+		jNIEnv->DeleteLocalRef(cls);
+		return (int)result;
+	}
+
+	/**
+	 * Get the column value at the current row pointed to
+	 * by the cursor as float data.
+	 * @param cursorHandle Handle to the cursor.
+	 * @param columnIndex Index of the column to retrieve value from.
+	 * First column has index zero.
+	 * @param floatValueAddress Address to float to receive the value.
+	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+	 */
+	int _maDBCursorGetColumnFloat(
+		MAHandle cursorHandle,
+		int columnIndex,
+		int floatValueAddress,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maDBCursorGetColumnInt",
+			"(III)I");
+		if (methodID == 0)
+		{
+			// Method not found.
+			return -1;
+		}
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			cursorHandle,
+			columnIndex,
+			floatValueAddress);
+		jNIEnv->DeleteLocalRef(cls);
+		return (int)result;
+	}
 }
