@@ -8201,8 +8201,9 @@ group DBAPI "DB API" {
 		 * when you are done with the cursor to release
 		 * its resources.
 		 * @param cursorHandle Handle to the cursor.
+		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
 		 */
-		void maDBCursorDestroy(in MAHandle cursorHandle);
+		int maDBCursorDestroy(in MAHandle cursorHandle);
 
 		/**
 		 * Returns the number of rows in the result set pointed
