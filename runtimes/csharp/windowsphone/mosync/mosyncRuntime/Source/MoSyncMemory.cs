@@ -155,6 +155,15 @@ namespace MoSync
             System.Array.Copy(mData, src, bytes, 0, size);
         }
 
+        // size equals the amount of integers
+        public void ReadIntegers(int[] integers, int src, int size)
+        {
+            for (int i = 0; i < size; i++)
+            {
+                integers[i] = ReadInt32(src + i * 4);
+            }
+        }
+
         public void WriteMemoryAtAddress(int dstaddress, Memory memory, int srcaddress, int length)
         {
             byte[] srcBytes = memory.mData;

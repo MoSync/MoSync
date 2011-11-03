@@ -159,6 +159,15 @@ namespace MoSync
             return (w << 16) | h;
         }
 
+        public static int ExtentX(int extent)
+        {
+            return (extent>>16)&0xffff;
+        }
+
+        public static int ExtentY(int extent)
+        {
+            return (extent) & 0xffff;
+        }
 
         static Thread sStartupThread;
 

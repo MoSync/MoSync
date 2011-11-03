@@ -289,6 +289,37 @@ namespace MoSync
                 return MoSync.Constants.RES_OK;
             };
 
+            syscalls.maCreateImageRaw = delegate(int _placeholder, int _src, int _size, int _alpha)
+            {
+                int width = MoSync.Util.ExtentX(_size);
+                int height = MoSync.Util.ExtentY(_size);
+
+                WriteableBitmap bitmap = null;
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        bitmap = new WriteableBitmap(width, height);
+                    });
+
+                core.GetDataMemory().ReadIntegers(bitmap.Pixels, _src, width * height);
+                if (_alpha == 0)
+                {
+                    int[] pixels = bitmap.Pixels;
+                    int numPixels = width * height;
+                    for (int i = 0; i < numPixels; i++)
+                    {
+                        pixels[i] = (int)((uint)pixels[i] | 0xff000000);
+                    }
+                }
+
+                runtime.SetResource(_placeholder,
+                    new Resource(
+                        bitmap,
+                        MoSync.Constants.RT_IMAGE
+                        )
+                    );
+                return MoSync.Constants.RES_OK;
+            };
+
             syscalls.maCreateImageFromData = delegate(int _placeholder, int _data, int _offset, int _size)
             {
                 Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
