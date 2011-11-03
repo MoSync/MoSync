@@ -306,6 +306,7 @@ namespace MoSync
                         file.Read(bytes, 0, (int)size);
                         using (MemoryStream ms = new MemoryStream(bytes, 0, bytes.Length))
                         {
+                            /*
                             MoSync.Util.RunActionOnMainThreadSync(() =>
                             {
                                 BitmapImage im = new BitmapImage();
@@ -314,6 +315,9 @@ namespace MoSync
                                 WriteableBitmap wb = new WriteableBitmap(im);
                                 resource.SetInternalObject(wb);
                             });
+                            */
+
+                            resource.SetInternalObject(MoSync.Util.CreateWriteableBitmapFromStream(ms));
                         }
                         break;
                     case MoSync.Constants.RT_LABEL:

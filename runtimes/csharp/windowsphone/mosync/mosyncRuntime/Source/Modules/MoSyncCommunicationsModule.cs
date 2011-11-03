@@ -170,14 +170,29 @@ namespace MoSync
             }
             protected void RespCallback(IAsyncResult ar)
             {
-                ResultHandler rh = (ResultHandler)ar.AsyncState;
-                mResponse = mRequest.EndGetResponse(ar);
-                mStream = mResponse.GetResponseStream();
                 int result;
-                if (mResponse is HttpWebResponse)
-                    result = (int)((HttpWebResponse)mResponse).StatusCode;
-                else
-                    result = 1;
+                ResultHandler rh = (ResultHandler)ar.AsyncState;
+                try
+                {
+                    mResponse = mRequest.EndGetResponse(ar);
+                    mStream = mResponse.GetResponseStream();
+                    if (mResponse is HttpWebResponse)
+                        result = (int)((HttpWebResponse)mResponse).StatusCode;
+                    else
+                        result = 1;
+                }
+                catch (WebException e)
+                {
+                    /*
+                    if (e.Response is HttpWebResponse)
+                    {
+                        HttpWebResponse response = (HttpWebResponse)e.Response;
+
+                    }
+                    */
+
+                    result = MoSync.Constants.CONNERR_GENERIC;
+                }
                 rh(mHandle, MoSync.Constants.CONNOP_CONNECT, result);
             }
 

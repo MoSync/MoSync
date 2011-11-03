@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using System.Windows;
 using System.Threading;
+using System.Windows.Media.Imaging;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.GamerServices;
@@ -209,6 +210,20 @@ namespace MoSync
                     binaryWriter.Write(bytes);
                 binaryWriter.Close();
             }
+        }
+
+        public static WriteableBitmap CreateWriteableBitmapFromStream(Stream stream)
+        {
+            WriteableBitmap wb = null;
+            MoSync.Util.RunActionOnMainThreadSync(() =>
+            {
+                BitmapImage im = new BitmapImage();
+                im.CreateOptions = BitmapCreateOptions.None;
+                im.SetSource(stream);
+                wb = new WriteableBitmap(im);
+            });
+
+            return wb;
         }
     }
 }

@@ -181,7 +181,13 @@ namespace MoSync
 
         public Stream GetStream()
         {
-            return new System.IO.MemoryStream(mData);
+            return new System.IO.MemoryStream((byte[])mData);
         }
+
+        public Stream GetStream(int offset, int size)
+        {
+            return new System.IO.MemoryStream((byte[])mData, offset, size);
+        }
+
     }
 }

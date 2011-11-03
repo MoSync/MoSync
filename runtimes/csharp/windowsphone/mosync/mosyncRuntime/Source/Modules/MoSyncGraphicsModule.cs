@@ -288,6 +288,23 @@ namespace MoSync
                 res.SetInternalObject(bitmap);
                 return MoSync.Constants.RES_OK;
             };
+
+            syscalls.maCreateImageFromData = delegate(int _placeholder, int _data, int _offset, int _size)
+            {
+                Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
+                Memory mem = (Memory)res.GetInternalObject();
+
+                WriteableBitmap bitmap = MoSync.Util.CreateWriteableBitmapFromStream(mem.GetStream(_offset, _size));
+                runtime.SetResource(
+                    _placeholder,
+                    new Resource(
+                        bitmap,
+                        MoSync.Constants.RT_IMAGE
+                        )
+                );
+
+                return MoSync.Constants.RES_OK;
+            };
         }
 
         protected Syscalls.Delegate_maUpdateScreen mOldUpdateScreenImplementation;
