@@ -39,7 +39,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
 #include "MoSyncPanic.h"
-
+#import "Ads.h"
+#import "Notification.h"
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
 #import "CameraPreviewWidget.h"
@@ -336,6 +337,8 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
+        [Notification deleteInstance];
+        [Ads deleteInstance];
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
 	}
@@ -1847,6 +1850,72 @@ return 0; \
         return RES_OK;
 	}
 
+    SYSCALL(int, maAdsBannerCreate(int size, const char* publisherID))
+	{
+		return [[Ads getInstance] createBanner];
+	}
+
+    SYSCALL(int, maAdsAddBannerToLayout(MAHandle bannerHandle, MAHandle layoutHandle))
+	{
+		return [[Ads getInstance] addBanner:bannerHandle toLayout:layoutHandle];
+	}
+
+    SYSCALL(int, maAdsRemoveBannerFromLayout(MAHandle bannerHandle, MAHandle layoutHandle))
+	{
+		return [[Ads getInstance] removeBanner:bannerHandle fromLayout:layoutHandle];
+	}
+
+    SYSCALL(int, maAdsBannerDestroy(MAHandle bannerHandle))
+	{
+        return [[Ads getInstance] bannerDestroy:bannerHandle];
+	}
+    SYSCALL(int, maAdsBannerSetProperty(MAHandle bannerHandle, const char* property, const char* value))
+	{
+        return [[Ads getInstance] bannerSetProperty:bannerHandle property:property value:value];
+	}
+    SYSCALL(int, maAdsBannerGetProperty(MAHandle bannerHandle, const char* property, char* value, const int bufSize))
+	{
+        return [[Ads getInstance] bannerGetProperty:bannerHandle property:property value:value size:bufSize];
+	}
+
+    SYSCALL(int, maNotificationCreate())
+	{
+		return [[Notification getInstance] createNotificationObject];
+	}
+    SYSCALL(int, maNotificationDestroy(MAHandle notificationHandle))
+	{
+        return [[Notification getInstance] destroyNotificationObject:notificationHandle];
+	}
+    SYSCALL(int, maNotificationSetProperty(MAHandle notificationHandle, const char* property, const char* value))
+	{
+        return [[Notification getInstance] notificationSetProperty:notificationHandle
+                                                          property:property
+                                                             value:value];
+	}
+    SYSCALL(int, maNotificationGetProperty(MAHandle notificationHandle, const char* property, char* value, const int bufSize))
+	{
+        return [[Notification getInstance] notificationGetProperty:notificationHandle
+                                                          property:property
+                                                             value:value
+                                                              size:bufSize];
+	}
+    SYSCALL(int, maNotificationLocalRegister(MAHandle notificationHandle))
+	{
+		return [[Notification getInstance] registerLocalNotification:notificationHandle];
+	}
+    SYSCALL(int, maNotificationLocalUnregister(MAHandle notificationHandle))
+	{
+        return [[Notification getInstance] unregisterLocalNotification:notificationHandle];
+	}
+    SYSCALL(int, maNotificationPushRegister(MAHandle pushNotificationType))
+	{
+		return [[Notification getInstance] registerPushNotification:pushNotificationType];
+	}
+    SYSCALL(int, maNotificationPushUnregister())
+	{
+        return [[Notification getInstance] unregisterPushNotification];
+	}
+
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
@@ -1928,6 +1997,20 @@ return 0; \
 		maIOCtl_case(maSendTextSMS);
 		maIOCtl_case(maSyscallPanicsEnable);
 		maIOCtl_case(maSyscallPanicsDisable);
+        maIOCtl_case(maAdsBannerCreate);
+        maIOCtl_case(maAdsAddBannerToLayout);
+        maIOCtl_case(maAdsRemoveBannerFromLayout);
+        maIOCtl_case(maAdsBannerDestroy);
+        maIOCtl_case(maAdsBannerSetProperty);
+        maIOCtl_case(maAdsBannerGetProperty);
+        maIOCtl_case(maNotificationCreate);
+        maIOCtl_case(maNotificationDestroy);
+        maIOCtl_case(maNotificationSetProperty);
+        maIOCtl_case(maNotificationGetProperty);
+        maIOCtl_case(maNotificationLocalRegister);
+        maIOCtl_case(maNotificationLocalUnregister);
+        maIOCtl_case(maNotificationPushRegister);
+        maIOCtl_case(maNotificationPushUnregister);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;

@@ -65,6 +65,15 @@
 		43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A7684E1400F6BA009608A4 /* ImagePickerController.h */; };
 		43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
 		43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
+		43CE0BE51463E9B800F8FFC3 /* Ads.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BE11463E9B800F8FFC3 /* Ads.h */; };
+		43CE0BE61463E9B800F8FFC3 /* Ads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE21463E9B800F8FFC3 /* Ads.mm */; };
+		43CE0BE71463E9B800F8FFC3 /* Ads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE21463E9B800F8FFC3 /* Ads.mm */; };
+		43CE0BE81463E9B800F8FFC3 /* BannerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BE31463E9B800F8FFC3 /* BannerWidget.h */; };
+		43CE0BE91463E9B800F8FFC3 /* BannerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */; };
+		43CE0BEA1463E9B800F8FFC3 /* BannerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */; };
+		43CE0BED1463E9C600F8FFC3 /* Notification.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BEB1463E9C600F8FFC3 /* Notification.h */; };
+		43CE0BEE1463E9C600F8FFC3 /* Notification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BEC1463E9C600F8FFC3 /* Notification.mm */; };
+		43CE0BEF1463E9C600F8FFC3 /* Notification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BEC1463E9C600F8FFC3 /* Notification.mm */; };
 		43D3B01613FFC82E00B3DE23 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
 		43D8046C13EFBCB200183387 /* ActivityIndicatorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */; };
 		43D8046D13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */; };
@@ -324,6 +333,12 @@
 		432B98CB1432040B00BDB926 /* PimError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimError.h; sourceTree = "<group>"; };
 		43A7684E1400F6BA009608A4 /* ImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerController.h; sourceTree = "<group>"; };
 		43A7684F1400F6BA009608A4 /* ImagePickerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImagePickerController.mm; sourceTree = "<group>"; };
+		43CE0BE11463E9B800F8FFC3 /* Ads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Ads.h; path = ads/Ads.h; sourceTree = "<group>"; };
+		43CE0BE21463E9B800F8FFC3 /* Ads.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Ads.mm; path = ads/Ads.mm; sourceTree = "<group>"; };
+		43CE0BE31463E9B800F8FFC3 /* BannerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BannerWidget.h; path = ads/BannerWidget.h; sourceTree = "<group>"; };
+		43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BannerWidget.mm; path = ads/BannerWidget.mm; sourceTree = "<group>"; };
+		43CE0BEB1463E9C600F8FFC3 /* Notification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Notification.h; path = notifications/Notification.h; sourceTree = "<group>"; };
+		43CE0BEC1463E9C600F8FFC3 /* Notification.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Notification.mm; path = notifications/Notification.mm; sourceTree = "<group>"; };
 		43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorWidget.h; sourceTree = "<group>"; };
 		43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ActivityIndicatorWidget.mm; sourceTree = "<group>"; };
 		43D8046013EFBCB200183387 /* DatePickerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatePickerWidget.h; sourceTree = "<group>"; };
@@ -558,6 +573,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				43CE0BE01463E98F00F8FFC3 /* notifications */,
+				43CE0BDE1463E98700F8FFC3 /* ads */,
 				4318696C13F68D410051D97A /* pim */,
 				85A158E312F80E520044BBE1 /* UI */,
 				85BF2B181134039B00BB0201 /* Core */,
@@ -688,6 +705,26 @@
 				29B46B3C1407FAA5009491A6 /* PimContactsList.m */,
 			);
 			path = contacts;
+			sourceTree = "<group>";
+		};
+		43CE0BDE1463E98700F8FFC3 /* ads */ = {
+			isa = PBXGroup;
+			children = (
+				43CE0BE11463E9B800F8FFC3 /* Ads.h */,
+				43CE0BE21463E9B800F8FFC3 /* Ads.mm */,
+				43CE0BE31463E9B800F8FFC3 /* BannerWidget.h */,
+				43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */,
+			);
+			name = ads;
+			sourceTree = "<group>";
+		};
+		43CE0BE01463E98F00F8FFC3 /* notifications */ = {
+			isa = PBXGroup;
+			children = (
+				43CE0BEB1463E9C600F8FFC3 /* Notification.h */,
+				43CE0BEC1463E9C600F8FFC3 /* Notification.mm */,
+			);
+			name = notifications;
 			sourceTree = "<group>";
 		};
 		8500CD3E132E506D0003A01E /* External */ = {
@@ -1021,6 +1058,9 @@
 				0B436BA014308D5400E69AB2 /* ModalDialogWidget.h in Headers */,
 				432B98C81431FE5F00BDB926 /* MoSyncPanic.h in Headers */,
 				432B98CC1432040B00BDB926 /* PimError.h in Headers */,
+				43CE0BE51463E9B800F8FFC3 /* Ads.h in Headers */,
+				43CE0BE81463E9B800F8FFC3 /* BannerWidget.h in Headers */,
+				43CE0BED1463E9C600F8FFC3 /* Notification.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1217,6 +1257,9 @@
 				432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */,
 				29B46B3D1407FAA5009491A6 /* PimContactItem.m in Sources */,
 				29B46B3E1407FAA5009491A6 /* PimContactsList.m in Sources */,
+				43CE0BE61463E9B800F8FFC3 /* Ads.mm in Sources */,
+				43CE0BE91463E9B800F8FFC3 /* BannerWidget.mm in Sources */,
+				43CE0BEE1463E9C600F8FFC3 /* Notification.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1303,6 +1346,9 @@
 				0B436B8C143089BD00E69AB2 /* OptionsDialogView.mm in Sources */,
 				0B436BA114308D5400E69AB2 /* ModalDialogWidget.mm in Sources */,
 				432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */,
+				43CE0BE71463E9B800F8FFC3 /* Ads.mm in Sources */,
+				43CE0BEA1463E9B800F8FFC3 /* BannerWidget.mm in Sources */,
+				43CE0BEF1463E9C600F8FFC3 /* Notification.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
