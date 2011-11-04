@@ -90,12 +90,12 @@ namespace MoSync
                 }
                 catch (InvalidPropertyNameException e)
                 {
-                    MoSync.Util.Log(e.ToString());
+                    MoSync.Util.Log(e);
                     return MoSync.Constants.MAW_RES_INVALID_PROPERTY_NAME;
                 }
                 catch (InvalidPropertyValueException e)
                 {
-                    MoSync.Util.Log(e.ToString());
+                    MoSync.Util.Log(e);
                     return MoSync.Constants.MAW_RES_INVALID_PROPERTY_VALUE;
                 }
 
@@ -113,7 +113,7 @@ namespace MoSync
                 }
                 catch (InvalidPropertyNameException e)
                 {
-                    MoSync.Util.Log(e.ToString());
+                    MoSync.Util.Log(e);
                     return MoSync.Constants.MAW_RES_INVALID_PROPERTY_NAME;
                 }
 

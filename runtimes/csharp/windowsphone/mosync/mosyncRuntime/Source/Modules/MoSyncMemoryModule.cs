@@ -46,7 +46,7 @@ namespace MoSync
                 }
                 catch (OutOfMemoryException e)
                 {
-                    MoSync.Util.Log(e.ToString());
+                    MoSync.Util.Log(e);
                     return MoSync.Constants.RES_OUT_OF_MEMORY;
                 }
 
