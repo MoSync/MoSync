@@ -452,6 +452,15 @@ namespace MoSync
                 File file = mFileHandles[_file];
                 String newName = core.GetDataMemory().ReadStringAtAddress(_newName);
                 newName = ConvertPath(newName);
+                if (newName.Contains("\\"))
+                {
+                    if (newName[0] != '\\')
+                        throw new Exception("Invalid newName");
+                }
+                else
+                {   // add directory of old file.
+                    newName = Path.GetDirectoryName(file.Path) + "\\" + newName;
+                }
                 file.Rename(newName);
                 return 0;
             };
