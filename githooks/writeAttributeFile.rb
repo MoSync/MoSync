@@ -27,7 +27,7 @@ raise '.gitattributes exists!' if(File.exist?(outName))
 @outFile = open(outName, 'w')
 inFile = open(inName, 'r')
 def putLine(line)
-	@outFile.puts line.gsub(' ', '\ ') + ' -diff' unless(line.includeOneOf?(CHECK_PATTERNS))
+	@outFile.puts line.gsub(' ', '.') + ' -diff' unless(line.includeOneOf?(CHECK_PATTERNS))
 end
 inFile.each do |line|
 	line.strip!
