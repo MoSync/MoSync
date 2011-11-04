@@ -43,7 +43,10 @@ namespace MoSync
             get { return (double)mView.GetValue(Canvas.WidthProperty); }
             set
             {
-                mView.SetValue(Canvas.WidthProperty, value);
+                if (!value.Equals(-1))
+                {
+                    mView.SetValue(Canvas.WidthProperty, value);
+                }
             }
         }
 
@@ -53,7 +56,22 @@ namespace MoSync
             get { return (double)mView.GetValue(Canvas.HeightProperty); }
             set
             {
-                mView.SetValue(Canvas.HeightProperty, value);
+                if (!value.Equals(-1))
+                {
+                    mView.SetValue(Canvas.HeightProperty, value);
+                }
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_BACKGROUND_COLOR)]
+        public string BackgroundColor
+        {
+            set
+            {
+                System.Windows.Media.SolidColorBrush brush;
+                MoSync.Util.convertStringToColor(value, out brush);
+                if (View is System.Windows.Controls.Control) ((System.Windows.Controls.Control)View).Background = brush;
+                else if (View is System.Windows.Controls.Panel) ((System.Windows.Controls.Panel)View).Background = brush;
             }
         }
 
@@ -62,6 +80,161 @@ namespace MoSync
         {
         }
     };
+
+    public class HorizontalLayout : WidgetBaseWindowsPhone
+    {
+        protected System.Windows.Controls.Grid mGrid;
+        protected HorizontalAlignment mHorizontalAlignment;
+        protected double mPaddingBottom;
+        protected double mPaddingTop;
+        protected double mPaddingLeft;
+        protected double mPaddingRight;
+
+        public HorizontalLayout()
+        {
+            mGrid = new System.Windows.Controls.Grid();
+
+            RowDefinition rowDef = new RowDefinition();
+            rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
+            mGrid.RowDefinitions.Add(rowDef);
+
+            ChildVerticalAlignment = MoSync.Constants.MAW_ALIGNMENT_TOP;
+            ChildHorizontalAlignment = MoSync.Constants.MAW_ALIGNMENT_LEFT;
+
+            View = mGrid;
+        }
+
+        public override void AddChild(IWidget child)
+        {
+            base.AddChild(child);
+            MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+                    ColumnDefinition columnDef = new ColumnDefinition();
+
+                    columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+                    mGrid.ColumnDefinitions.Add(columnDef);
+                    //@TDB
+                    //((System.Windows.FrameworkElement)widget.View).Margin = new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+
+                    mGrid.Children.Add(widget.View);
+
+                    Grid.SetColumn((widget.View as System.Windows.FrameworkElement), mGrid.Children.Count - 1);
+                    Grid.SetRow((widget.View as System.Windows.FrameworkElement), 0);
+                });
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT)]
+        public String ChildHorizontalAlignment
+        {
+            set
+            {
+                if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
+                {
+                    mGrid.HorizontalAlignment = HorizontalAlignment.Left;
+                }
+                else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
+                {
+                    mGrid.HorizontalAlignment = HorizontalAlignment.Right;
+                }
+                else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
+                {
+                    mGrid.HorizontalAlignment = HorizontalAlignment.Center;
+                }
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT)]
+        public String ChildVerticalAlignment
+        {
+            set
+            {
+                if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
+                {
+                    mGrid.VerticalAlignment = VerticalAlignment.Bottom;
+                }
+                else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
+                {
+                    mGrid.VerticalAlignment = VerticalAlignment.Top;
+                }
+                else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
+                {
+                    mGrid.VerticalAlignment = VerticalAlignment.Center;
+                }
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM)]
+        public String PaddingBottom
+        {
+            set
+            {
+                double val = Double.Parse(value);
+                mPaddingBottom = val;
+                //@TBD
+                //for (int i = 0; i < mGrid.Children.Count; i++)
+                //{
+                //    if(mGrid.Children[i] is System.Windows.FrameworkElement)
+                //        ((System.Windows.FrameworkElement)mGrid.Children[i]).Margin =
+                //            new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+                //}
+                mGrid.Margin = new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_TOP)]
+        public String PaddingTop
+        {
+            set
+            {
+                double val = Double.Parse(value);
+                mPaddingTop = val;
+                //TBD
+                //for (int i = 0; i < mGrid.Children.Count; i++)
+                //{
+                //    if (mGrid.Children[i] is System.Windows.FrameworkElement)
+                //        ((System.Windows.FrameworkElement)mGrid.Children[i]).Margin =
+                //            new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+                //}
+                mGrid.Margin = new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_LEFT)]
+        public String PaddingLeft
+        {
+            set
+            {
+                double val = Double.Parse(value);
+                mPaddingLeft = val;
+                //TBD
+                //for (int i = 0; i < mGrid.Children.Count; i++)
+                //{
+                //    if (mGrid.Children[i] is System.Windows.FrameworkElement)
+                //        ((System.Windows.FrameworkElement)mGrid.Children[i]).Margin =
+                //            new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+                //}
+                mGrid.Margin = new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT)]
+        public String PaddingRight
+        {
+            set
+            {
+                double val = Double.Parse(value);
+                mPaddingRight = val;
+                //for (int i = 0; i < mGrid.Children.Count; i++)
+                //{
+                //    if (mGrid.Children[i] is System.Windows.FrameworkElement)
+                //        ((System.Windows.FrameworkElement)mGrid.Children[i]).Margin =
+                //            new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+                //}
+                mGrid.Margin = new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+            }
+        }
+    }
 
     // The button class
     public class Button : WidgetBaseWindowsPhone
@@ -83,7 +256,6 @@ namespace MoSync
         {
             //initializing the button controll
             mButton = new System.Windows.Controls.Button();
-
             //set the view of the current widget as the previously instantiated button controll
             View = mButton;
         }
@@ -171,15 +343,9 @@ namespace MoSync
         {
             set
             {
-                if (value.Length == 8 && value[0].Equals('0') && value[1].Equals('x'))
-                {
-                    //converting the string from value into RGB bytes
-                    byte R = Byte.Parse(value.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
-                    byte G = Byte.Parse(value.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
-                    byte B = Byte.Parse(value.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
-                    byte A = 255;
-                    mButton.Foreground = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
-                }
+                System.Windows.Media.SolidColorBrush brush;
+                MoSync.Util.convertStringToColor(value, out brush);
+                mButton.Foreground = brush;
             }
         }
 
