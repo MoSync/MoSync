@@ -66,17 +66,8 @@ namespace MoSync
             {
                 if (!mIsDirectory && mIsolatedStorage.FileExists(mPath))
                 {
-                    try
-                    {
-                        mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.Open,
-                            mFileAccess, FileShare.ReadWrite);
-                    }
-                    catch (IsolatedStorageException e)
-                    {
-                        if(e.InnerException != null)
-                            MoSync.Util.Log(e.InnerException.ToString());
-                        MoSync.Util.Log(e.ToString());
-                    }
+                    mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.Open,
+                        mFileAccess, FileShare.ReadWrite);
                 }
             }
 
@@ -210,7 +201,6 @@ namespace MoSync
                 else if ((_flags & MoSync.Constants.MAS_CREATE_IF_NECESSARY) != 0)
                 {
                     file.Create();
-                    file.TryOpen();
                 }
                 else
                     return MoSync.Constants.STERR_NONEXISTENT;
@@ -282,7 +272,7 @@ namespace MoSync
                 }
                 else
                 {
-                    return MoSync.Constants.MA_FERR_GENERIC;
+                    throw new Exception("Invalid file access mode");
                 }
 
                 file = new File(path, access);
@@ -296,7 +286,15 @@ namespace MoSync
                 {
                     if (isolatedStorage.DirectoryExists(path))
                         return MoSync.Constants.MA_FERR_WRONG_TYPE;
-                    file.TryOpen();
+                    try
+                    {
+                        file.TryOpen();
+                    }
+                    catch (IsolatedStorageException e)
+                    {
+                        MoSync.Util.Log(e);
+                        return MoSync.Constants.MA_FERR_GENERIC;
+                    }
                 }
 
                 mFileHandles.Add(mNextFileHandle, file);
@@ -395,7 +393,7 @@ namespace MoSync
                 }
                 catch (IOException e)
                 {
-                    MoSync.Util.Log(e.ToString());
+                    MoSync.Util.Log(e);
                     return MoSync.Constants.MA_FERR_GENERIC;
                 }
             };
@@ -433,7 +431,7 @@ namespace MoSync
                 }
                 catch (IsolatedStorageException e)
                 {
-                    MoSync.Util.Log(e.ToString());
+                    MoSync.Util.Log(e);
                     return MoSync.Constants.MA_FERR_GENERIC;
                 }
                 return 0;
