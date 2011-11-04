@@ -874,6 +874,13 @@ namespace MoSync
 
                     case Op.SYSCALL: // SYSCALL
                         imm32 = mProgramMemory[mIp++];
+#if false//DEBUG
+                        if(imm32 > 4)
+                        Util.Log("Syscall "+imm32+": "+mRegisters[CoreInterpreted.Reg.I0]+" "+
+                            mRegisters[CoreInterpreted.Reg.I1] + " " +
+                            mRegisters[CoreInterpreted.Reg.I2] + " " +
+                            mRegisters[CoreInterpreted.Reg.I3]);
+#endif
                         mSyscallInvoker.InvokeSyscall(imm32);
                         break;
 
