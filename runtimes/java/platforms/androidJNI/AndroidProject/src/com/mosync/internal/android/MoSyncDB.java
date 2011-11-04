@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
+import android.util.Log;
 import static com.mosync.internal.generated.MAAPI_consts.*;
 
 /**
@@ -34,15 +35,16 @@ public class MoSyncDB
 	 */
 	public int maDBOpen(String path)
 	{
-		MoDatabase database = MoDatabase.create(path);
-		if (null != database)
+		try
 		{
+			MoDatabase database = MoDatabase.create(path);
 			++mDatabaseCounter;
 			addDatabase(mDatabaseCounter, database);
 			return mDatabaseCounter;
 		}
-		else
+		catch (SQLiteException ex)
 		{
+			ex.printStackTrace();
 			return MA_DB_ERROR;
 		}
 	}
@@ -54,14 +56,22 @@ public class MoSyncDB
 	 */
 	public int maDBClose(int databaseHandle)
 	{
-		if (hasDatabase(databaseHandle))
+		if (!hasDatabase(databaseHandle))
+		{
+			return MA_DB_ERROR;
+		}
+
+		try
 		{
 			getDatabase(databaseHandle).close();
 			removeDatabase(databaseHandle);
 			return MA_DB_OK;
 		}
-
-		return MA_DB_ERROR;
+		catch (SQLiteException ex)
+		{
+			ex.printStackTrace();
+			return MA_DB_ERROR;
+		}
 	}
 
 	/**
@@ -75,28 +85,42 @@ public class MoSyncDB
 	 */
 	public int maDBExecSQL(int databaseHandle, String sql)
 	{
-		if (!hasDatabase(databaseHandle)) { return -1; }
-
-		// SELECT statements return values and are handled differently than
-		// other statements.
-		// See: http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html#execSQL(java.lang.String)
-		if (sql.toLowerCase().contains("select"))
+		if (!hasDatabase(databaseHandle))
 		{
-			MoCursor cursor = getDatabase(databaseHandle).execQuery(sql);
-			if (null != cursor)
+			return MA_DB_ERROR;
+		}
+
+		MoDatabase database = getDatabase(databaseHandle);
+
+		try
+		{
+			// SELECT statements return values and are handled differently than
+			// other statements.
+			// See: http://developer.android.com/reference/android/database/sqlite/SQLiteDatabase.html#execSQL(java.lang.String)
+			if (sql.toLowerCase().contains("select"))
 			{
-				++mCursorCounter;
-				addCursor(mCursorCounter, cursor);
-				return mCursorCounter;
+				MoCursor cursor = database.execQuery(sql);
+				if (null != cursor)
+				{
+					++mCursorCounter;
+					addCursor(mCursorCounter, cursor);
+					return mCursorCounter;
+				}
+				else
+				{
+					return MA_DB_ERROR;
+				}
 			}
 			else
 			{
-				return MA_DB_ERROR;
+				database.execSQL(sql);
+				return MA_DB_OK;
 			}
 		}
-		else
+		catch (SQLiteException ex)
 		{
-			return getDatabase(databaseHandle).execSQL(sql);
+			ex.printStackTrace();
+			return MA_DB_ERROR;
 		}
 	}
 
@@ -109,7 +133,10 @@ public class MoSyncDB
 	 */
 	public int maDBCursorDestroy(int cursorHandle)
 	{
-		if (!hasCursor(cursorHandle)) { return MA_DB_ERROR; }
+		if (!hasCursor(cursorHandle))
+		{
+			return MA_DB_ERROR;
+		}
 
 		removeCursor(cursorHandle);
 		return MA_DB_OK;
@@ -123,9 +150,20 @@ public class MoSyncDB
 	 */
 	public int maDBCursorGetRowCount(int cursorHandle)
 	{
-		if (!hasCursor(cursorHandle)) { return MA_DB_ERROR; }
+		if (!hasCursor(cursorHandle))
+		{
+			return MA_DB_ERROR;
+		}
 
-		return getCursor(cursorHandle).getRowCount();
+		try
+		{
+			return getCursor(cursorHandle).getRowCount();
+		}
+		catch (SQLiteException ex)
+		{
+			ex.printStackTrace();
+			return MA_DB_ERROR;
+		}
 	}
 
 	/**
@@ -136,15 +174,26 @@ public class MoSyncDB
 	 */
 	public int maDBCursorNext(int cursorHandle)
 	{
-		if (!hasCursor(cursorHandle)) { return MA_DB_ERROR; }
-
-		if (getCursor(cursorHandle).next())
+		if (!hasCursor(cursorHandle))
 		{
-			return MA_DB_OK;
+			return MA_DB_ERROR;
 		}
-		else
+
+		try
 		{
-			return MA_DB_NO_ROW;
+			if (getCursor(cursorHandle).next())
+			{
+				return MA_DB_OK;
+			}
+			else
+			{
+				return MA_DB_NO_ROW;
+			}
+		}
+		catch (SQLiteException ex)
+		{
+			ex.printStackTrace();
+			return MA_DB_ERROR;
 		}
 	}
 
@@ -172,26 +221,29 @@ public class MoSyncDB
 			return MA_DB_ERROR;
 		}
 
-		// Get data as a byte array.
-		byte[] data = getCursor(cursorHandle).getData(columnIndex);
-		if (null == data)
+		try
 		{
-			return MA_DB_ERROR;
+			// Get data as a byte array.
+			byte[] data = getCursor(cursorHandle).getData(columnIndex);
+			if (null != data)
+			{
+				// Put the data in the table of resources. This will make
+				// the placeholder reference the data.
+				boolean success = mosync.loadBinary(
+					placeholder,
+					ByteBuffer.wrap(data));
+				if (success)
+				{
+					return MA_DB_OK;
+				}
+			}
+		}
+		catch (SQLiteException ex)
+		{
+			ex.printStackTrace();
 		}
 
-		// Put the data in the table of resources. This will make
-		// the placeholder reference the data.
-		boolean success = mosync.loadBinary(
-			placeholder,
-			ByteBuffer.wrap(data));
-		if (success)
-		{
-			return MA_DB_OK;
-		}
-		else
-		{
-			return MA_DB_ERROR;
-		}
+		return MA_DB_ERROR;
 	}
 
 	/**
@@ -221,25 +273,34 @@ public class MoSyncDB
 			return MA_DB_ERROR;
 		}
 
-		// Get data as a byte array.
-		byte[] data = getCursor(cursorHandle).getData(columnIndex);
-		if (null == data)
+		try
 		{
+			// Get data as a byte array.
+			String text = getCursor(cursorHandle).getText(columnIndex);
+			if (null == text)
+			{
+				return MA_DB_ERROR;
+			}
+
+			// Write to MoSync memory. Only copy data if it fits
+			// in the destination buffer.
+			byte[] data = text.getBytes();
+			if (data.length <= bufferSize)
+			{
+				ByteBuffer buffer = mosync.getMemorySlice(
+					bufferAddress,
+					data.length);
+				buffer.put(data);
+			}
+
+			// Return length of the data.
+			return data.length;
+		}
+		catch (SQLiteException ex)
+		{
+			ex.printStackTrace();
 			return MA_DB_ERROR;
 		}
-
-		// Write to MoSync memory. Only copy data if it fits
-		// in the destination buffer.
-		if (data.length <= bufferSize)
-		{
-			ByteBuffer buffer = mosync.getMemorySlice(
-				bufferAddress,
-				data.length);
-			buffer.put(data);
-		}
-
-		// Return length of the data.
-		return data.length;
 	}
 
 	/**
@@ -263,17 +324,25 @@ public class MoSyncDB
 			return MA_DB_ERROR;
 		}
 
-		// Get data as an int value.
-		int value = getCursor(cursorHandle).getInt(columnIndex);
+		try
+		{
+			// Get data as an int value.
+			int value = getCursor(cursorHandle).getInt(columnIndex);
 
-		// Write to MoSync memory. Size of an int is 4.
-		// TODO: Verify that MoSync uses the same memory layout
-		// as putInt(). Check endianness etc. Look at how this
-		// is done in the Bluetooth API.
-		ByteBuffer buffer = mosync.getMemorySlice(intValueAddress, 4);
-		buffer.putInt(value);
+			// Write to MoSync memory. Size of an int is 4.
+			// TODO: Verify that MoSync uses the same memory layout
+			// as putInt(). Check endianness etc. Look at how this
+			// is done in the Bluetooth API.
+			ByteBuffer buffer = mosync.getMemorySlice(intValueAddress, 4);
+			buffer.putInt(value);
 
-		return MA_DB_OK;
+			return MA_DB_OK;
+		}
+		catch (SQLiteException ex)
+		{
+			ex.printStackTrace();
+			return MA_DB_ERROR;
+		}
 	}
 
 	/**
@@ -297,17 +366,22 @@ public class MoSyncDB
 			return MA_DB_ERROR;
 		}
 
-		// Get data as a float value.
-		float value = getCursor(cursorHandle).getFloat(columnIndex);
+		try
+		{
+			// Get data as a float value.
+			float value = getCursor(cursorHandle).getFloat(columnIndex);
 
-		// Write to MoSync memory. Size of a float is 4.
-		// TODO: Verify that MoSync uses the same memory layout
-		// as putFloat(). Check endianness etc. Look at how this
-		// is done in the Bluetooth API.
-		ByteBuffer buffer = mosync.getMemorySlice(floatValueAddress, 4);
-		buffer.putFloat(value);
+			// Write to MoSync memory. Size of a float is 4.
+			ByteBuffer buffer = mosync.getMemorySlice(floatValueAddress, 4);
+			buffer.putInt(Float.floatToIntBits(value));
 
-		return MA_DB_OK;
+			return MA_DB_OK;
+		}
+		catch (SQLiteException ex)
+		{
+			ex.printStackTrace();
+			return MA_DB_ERROR;
+		}
 	}
 
 	private boolean hasDatabase(int databaseHandle)
@@ -358,21 +432,15 @@ public class MoSyncDB
 		private SQLiteDatabase mDB;
 
 		public static MoDatabase create(String path)
+			throws SQLException
 		{
-			try
-			{
-				SQLiteDatabase db = SQLiteDatabase.openDatabase(
-					path,
-					null,
-					SQLiteDatabase.OPEN_READWRITE |
-					SQLiteDatabase.CREATE_IF_NECESSARY);
-				return new MoDatabase(db);
-			}
-			catch (SQLiteException ex)
-			{
-				ex.printStackTrace();
-				return null;
-			}
+			SQLiteDatabase db = SQLiteDatabase.openDatabase(
+				path,
+				null,
+				SQLiteDatabase.OPEN_READWRITE |
+				SQLiteDatabase.CREATE_IF_NECESSARY);
+			// TODO: Check null return value?
+			return new MoDatabase(db);
 		}
 
 		public MoDatabase(SQLiteDatabase db)
@@ -381,6 +449,7 @@ public class MoSyncDB
 		}
 
 		public void close()
+			throws SQLException
 		{
 			if (null != mDB)
 			{
@@ -390,32 +459,18 @@ public class MoSyncDB
 		}
 
 		public MoCursor execQuery(String sql)
+			throws SQLException
 		{
 			Cursor cursor = mDB.rawQuery(sql, null);
-			if (null != cursor)
-			{
-				return new MoCursor(cursor);
-			}
-			else
-			{
-				return null;
-			}
+			// TODO: Check null return value?
+			return new MoCursor(cursor);
 		}
 
-		public int execSQL(String sql)
+		public void execSQL(String sql)
+			throws SQLException
 		{
-			try
-			{
-				mDB.execSQL(sql);
-				return MA_DB_OK;
-			}
-			catch (SQLException ex)
-			{
-				ex.printStackTrace();
-				return MA_DB_ERROR;
-			}
+			mDB.execSQL(sql);
 		}
-
 	}
 
 	/**
@@ -431,31 +486,45 @@ public class MoSyncDB
 		}
 
 		public int getRowCount()
+			throws SQLException
 		{
 			return mCursor.getCount();
 		}
 
 		public boolean next()
+			throws SQLException
 		{
 			return mCursor.moveToNext();
 		}
 
 		public byte[] getData(int columnIndex)
+			throws SQLException
 		{
-			return mCursor.getBlob(columnIndex);
+			try
+			{
+				return mCursor.getBlob(columnIndex);
+			}
+			catch (SQLException ex)
+			{
+				ex.printStackTrace();
+				return null;
+			}
 		}
 
 		public String getText(int columnIndex)
+			throws SQLException
 		{
 			return mCursor.getString(columnIndex);
 		}
 
 		public int getInt(int columnIndex)
+			throws SQLException
 		{
 			return mCursor.getInt(columnIndex);
 		}
 
 		public float getFloat(int columnIndex)
+			throws SQLException
 		{
 			return mCursor.getFloat(columnIndex);
 		}

@@ -2974,7 +2974,7 @@ namespace Base
 		jmethodID methodID = jNIEnv->GetMethodID(
 			cls,
 			"maDBExecSQL",
-			"(Ljava/lang/String;)I");
+			"(ILjava/lang/String;)I");
 		if (methodID == 0)
 		{
 			// Method not found.
@@ -2983,6 +2983,7 @@ namespace Base
 		jint result = jNIEnv->CallIntMethod(
 			jThis,
 			methodID,
+			databaseHandle,
 			jstrSql);
 		jNIEnv->DeleteLocalRef(cls);
 		jNIEnv->DeleteLocalRef(jstrSql);
@@ -3214,7 +3215,7 @@ namespace Base
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
 			cls,
-			"maDBCursorGetColumnInt",
+			"maDBCursorGetColumnFloat",
 			"(III)I");
 		if (methodID == 0)
 		{
