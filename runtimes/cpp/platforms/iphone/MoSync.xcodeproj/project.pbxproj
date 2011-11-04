@@ -74,6 +74,8 @@
 		43CE0BED1463E9C600F8FFC3 /* Notification.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BEB1463E9C600F8FFC3 /* Notification.h */; };
 		43CE0BEE1463E9C600F8FFC3 /* Notification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BEC1463E9C600F8FFC3 /* Notification.mm */; };
 		43CE0BEF1463E9C600F8FFC3 /* Notification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BEC1463E9C600F8FFC3 /* Notification.mm */; };
+		43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
+		43CE0BF91463EE7600F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
 		43D3B01613FFC82E00B3DE23 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
 		43D8046C13EFBCB200183387 /* ActivityIndicatorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */; };
 		43D8046D13EFBCB200183387 /* ActivityIndicatorWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */; };
@@ -339,6 +341,7 @@
 		43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BannerWidget.mm; path = ads/BannerWidget.mm; sourceTree = "<group>"; };
 		43CE0BEB1463E9C600F8FFC3 /* Notification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Notification.h; path = notifications/Notification.h; sourceTree = "<group>"; };
 		43CE0BEC1463E9C600F8FFC3 /* Notification.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Notification.mm; path = notifications/Notification.mm; sourceTree = "<group>"; };
+		43CE0BF51463EE5F00F8FFC3 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorWidget.h; sourceTree = "<group>"; };
 		43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ActivityIndicatorWidget.mm; sourceTree = "<group>"; };
 		43D8046013EFBCB200183387 /* DatePickerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatePickerWidget.h; sourceTree = "<group>"; };
@@ -517,6 +520,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */,
 				431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */,
 				431869AB13F68E8A0051D97A /* EventKit.framework in Frameworks */,
 				431869A813F68E560051D97A /* AddressBook.framework in Frameworks */,
@@ -543,6 +547,7 @@
 				85F2551511AC12A700EB47EE /* CoreGraphics.framework in Frameworks */,
 				431869B413F691B70051D97A /* CoreMotion.framework in Frameworks */,
 				431869AC13F68E940051D97A /* EventKit.framework in Frameworks */,
+				43CE0BF91463EE7600F8FFC3 /* iAd.framework in Frameworks */,
 				85F2551611AC12A700EB47EE /* Foundation.framework in Frameworks */,
 				85F2551711AC12A700EB47EE /* UIKit.framework in Frameworks */,
 				858B404012E680460058DBFC /* QuartzCore.framework in Frameworks */,
@@ -656,6 +661,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				43CE0BF51463EE5F00F8FFC3 /* iAd.framework */,
 				431869B213F691A30051D97A /* CoreMotion.framework */,
 				431869AA13F68E8A0051D97A /* EventKit.framework */,
 				431869A713F68E560051D97A /* AddressBook.framework */,
