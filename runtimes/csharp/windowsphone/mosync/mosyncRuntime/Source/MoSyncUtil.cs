@@ -3,13 +3,14 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using System.Windows;
 using System.Threading;
+using System.Windows.Media.Imaging;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.GamerServices;
 
 namespace MoSync
 {
-    class Util
+    public class Util
     {
 
         public static uint NextPowerOfTwo(int minPow, uint val)
@@ -101,29 +102,56 @@ namespace MoSync
             Console.Write(text);
             InitLogging();
             WriteTextToFile(text, "log.txt");
-            System.Diagnostics.Debug.WriteLine(text.Substring(0, text.Length-1));
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                DebugWrite(text);
+            }
+        }
+
+        private static void DebugWrite(String text)
+        {
+            if (text[text.Length - 1] == '\n')
+                text = text.Substring(0, text.Length - 1);
+            System.Diagnostics.Debug.WriteLine(text);
         }
 
         public static void Log(byte[] bytes)
         {
             InitLogging();
             WriteBytesToFile(bytes, "log.txt");
-            System.Diagnostics.Debug.WriteLine(bytes);
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                String text = System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                DebugWrite(text);
+            }
         }
+
+        public class ExitException : Exception
+        {
+            public readonly int result;
+            public ExitException(int res)
+            {
+                result = res;
+            }
+        };
 
         public static void CriticalError(String text)
         {
             Log(text);
             //System.Environment.Exit(1);
             //MessageBox.Show(text);
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
             Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
-            //throw new Exception("ExitAppException");
+            throw new ExitException(-1);
         }
 
         public static void Exit(int res)
         {
-            CriticalError("Exited!");
-            throw new Exception("ExitAppException");
+            //CriticalError("Exited!");
+            throw new ExitException(res);
         }
 
         public static int CreateExtent(int w, int h)
@@ -131,6 +159,15 @@ namespace MoSync
             return (w << 16) | h;
         }
 
+        public static int ExtentX(int extent)
+        {
+            return (extent>>16)&0xffff;
+        }
+
+        public static int ExtentY(int extent)
+        {
+            return (extent) & 0xffff;
+        }
 
         static Thread sStartupThread;
 
@@ -205,6 +242,20 @@ namespace MoSync
                 byte A = 255;
                 brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
             }
+        }
+
+        public static WriteableBitmap CreateWriteableBitmapFromStream(Stream stream)
+        {
+            WriteableBitmap wb = null;
+            MoSync.Util.RunActionOnMainThreadSync(() =>
+            {
+                BitmapImage im = new BitmapImage();
+                im.CreateOptions = BitmapCreateOptions.None;
+                im.SetSource(stream);
+                wb = new WriteableBitmap(im);
+            });
+
+            return wb;
         }
     }
 }

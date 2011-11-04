@@ -15,6 +15,7 @@ using Microsoft.Phone.Shell;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MoSync;
 
 namespace test_mosync
 {
@@ -128,12 +129,14 @@ namespace test_mosync
         // Code to execute on Unhandled Exceptions
         private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
         {
+            Exception eo = e.ExceptionObject;
+            if (eo is MoSync.Util.ExitException)
+                return;
             if (System.Diagnostics.Debugger.IsAttached)
             {
-                Exception eo = e.ExceptionObject;
                 System.Diagnostics.Debug.WriteLine(eo.StackTrace);
-                if (eo.GetType() == typeof(System.NotImplementedException) ||
-                    eo.GetType() == typeof(Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException))
+                if (eo is System.NotImplementedException ||
+                    eo is Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException)
                 {
                     return;
                 }

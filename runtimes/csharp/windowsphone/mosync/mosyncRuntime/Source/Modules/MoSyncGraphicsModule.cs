@@ -34,6 +34,8 @@ namespace MoSync
             PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
             double screenWidth = System.Windows.Application.Current.Host.Content.ActualWidth;
             double screenHeight = System.Windows.Application.Current.Host.Content.ActualHeight;
+            if ((int)screenHeight == 0)
+                throw new Exception("screenHeight");
             PhoneApplicationPage mainPage = (PhoneApplicationPage)frame.Content;
             frame.Content = mainPage;
             Image mainImage = new Image();
@@ -44,11 +46,11 @@ namespace MoSync
             mainPage.Content = mainImage;
 
             mBackBuffer = new WriteableBitmap(
-                (int)mainImage.ActualWidth,
-                (int)mainImage.ActualHeight);
+                (int)screenWidth,
+                (int)screenHeight);
             mFrontBuffer = new WriteableBitmap(
-                (int)mainImage.ActualWidth,
-                (int)mainImage.ActualHeight);
+                (int)screenWidth,
+                (int)screenHeight);
 
             mainImage.Source = mFrontBuffer;
             mCurrentDrawTarget = mBackBuffer;
@@ -284,6 +286,54 @@ namespace MoSync
 
                 if (bitmap == null) return MoSync.Constants.RES_OUT_OF_MEMORY;
                 res.SetInternalObject(bitmap);
+                return MoSync.Constants.RES_OK;
+            };
+
+            syscalls.maCreateImageRaw = delegate(int _placeholder, int _src, int _size, int _alpha)
+            {
+                int width = MoSync.Util.ExtentX(_size);
+                int height = MoSync.Util.ExtentY(_size);
+
+                WriteableBitmap bitmap = null;
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        bitmap = new WriteableBitmap(width, height);
+                    });
+
+                core.GetDataMemory().ReadIntegers(bitmap.Pixels, _src, width * height);
+                if (_alpha == 0)
+                {
+                    int[] pixels = bitmap.Pixels;
+                    int numPixels = width * height;
+                    for (int i = 0; i < numPixels; i++)
+                    {
+                        pixels[i] = (int)((uint)pixels[i] | 0xff000000);
+                    }
+                }
+
+                runtime.SetResource(_placeholder,
+                    new Resource(
+                        bitmap,
+                        MoSync.Constants.RT_IMAGE
+                        )
+                    );
+                return MoSync.Constants.RES_OK;
+            };
+
+            syscalls.maCreateImageFromData = delegate(int _placeholder, int _data, int _offset, int _size)
+            {
+                Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
+                Memory mem = (Memory)res.GetInternalObject();
+
+                WriteableBitmap bitmap = MoSync.Util.CreateWriteableBitmapFromStream(mem.GetStream(_offset, _size));
+                runtime.SetResource(
+                    _placeholder,
+                    new Resource(
+                        bitmap,
+                        MoSync.Constants.RT_IMAGE
+                        )
+                );
+
                 return MoSync.Constants.RES_OK;
             };
         }
