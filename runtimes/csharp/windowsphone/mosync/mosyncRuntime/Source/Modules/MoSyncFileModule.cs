@@ -64,14 +64,17 @@ namespace MoSync
 
             public void TryOpen()
             {
-                if (!mIsDirectory)
+                if (!mIsDirectory && mIsolatedStorage.FileExists(mPath))
                 {
                     try
                     {
-                        mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.Open, mFileAccess);
+                        mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.Open,
+                            mFileAccess, FileShare.ReadWrite);
                     }
                     catch (IsolatedStorageException e)
                     {
+                        if(e.InnerException != null)
+                            MoSync.Util.Log(e.InnerException.ToString());
                         MoSync.Util.Log(e.ToString());
                     }
                 }
@@ -81,12 +84,16 @@ namespace MoSync
             {
                 if (mIsDirectory)
                 {
+                    if (mIsolatedStorage.DirectoryExists(mPath))
+                        throw new Exception("DirectoryExists");
                     mIsolatedStorage.CreateDirectory(mPath);
                 }
                 else
                 {
-                    mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.Create, mFileAccess);
+                    mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.CreateNew, mFileAccess);
                 }
+                if (!Exists)
+                    throw new Exception("Create");
             }
 
             public void Delete()
@@ -110,8 +117,49 @@ namespace MoSync
                 else
                 {
                     if (mFileStream != null)
+                    {
                         mFileStream.Close();
+                        mFileStream = null;
+                    }
                 }
+            }
+
+            public long Size()
+            {
+                return mFileStream.Length;
+            }
+
+            public long AvailableSpace()
+            {
+                return mIsolatedStorage.AvailableFreeSpace;
+            }
+
+            public long TotalSpace()
+            {
+                return mIsolatedStorage.Quota;
+            }
+
+            public DateTimeOffset Date()
+            {
+                return mIsolatedStorage.GetLastWriteTime(mPath);
+            }
+
+            public void Rename(String newName)
+            {
+                if (mIsDirectory)
+                {
+                    mIsolatedStorage.MoveDirectory(mPath, newName);
+                }
+                else
+                {
+                    mIsolatedStorage.MoveFile(mPath, newName);
+                }
+                mPath = newName;
+            }
+
+            public void Truncate(int offset)
+            {
+                mFileStream.SetLength(offset);
             }
 
             protected String mPath;
@@ -206,7 +254,6 @@ namespace MoSync
 
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
-
             IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication();
 
             MoSync.SystemPropertyManager.RegisterSystemPropertyProvider("mosync.path.local",
@@ -240,8 +287,15 @@ namespace MoSync
 
                 file = new File(path, access);
 
-                if (file.IsDirectory == false)
+                if (file.IsDirectory)
                 {
+                    if (isolatedStorage.FileExists(path))
+                        return MoSync.Constants.MA_FERR_WRONG_TYPE;
+                }
+                else
+                {
+                    if (isolatedStorage.DirectoryExists(path))
+                        return MoSync.Constants.MA_FERR_WRONG_TYPE;
                     file.TryOpen();
                 }
 
@@ -359,6 +413,53 @@ namespace MoSync
                 if (file.Exists)
                     return MoSync.Constants.MA_FERR_GENERIC;
                 file.Create();
+                return 0;
+            };
+
+            ioctls.maFileDelete = delegate(int _file)
+            {
+                File file = mFileHandles[_file];
+                file.Delete();
+                return 0;
+            };
+
+            ioctls.maFileSize = delegate(int _file)
+            {
+                File file = mFileHandles[_file];
+                return file.Size();
+            };
+
+            ioctls.maFileAvailableSpace = delegate(int _file)
+            {
+                File file = mFileHandles[_file];
+                return file.AvailableSpace();
+            };
+
+            ioctls.maFileTotalSpace = delegate(int _file)
+            {
+                File file = mFileHandles[_file];
+                return file.TotalSpace();
+            };
+
+            ioctls.maFileDate = delegate(int _file)
+            {
+                File file = mFileHandles[_file];
+                return Util.ToUnixTimeUtc(file.Date().ToFileTime());
+            };
+
+            ioctls.maFileRename = delegate(int _file, int _newName)
+            {
+                File file = mFileHandles[_file];
+                String newName = core.GetDataMemory().ReadStringAtAddress(_newName);
+                newName = ConvertPath(newName);
+                file.Rename(newName);
+                return 0;
+            };
+
+            ioctls.maFileTruncate = delegate(int _file, int _offset)
+            {
+                File file = mFileHandles[_file];
+                file.Truncate(_offset);
                 return 0;
             };
 
