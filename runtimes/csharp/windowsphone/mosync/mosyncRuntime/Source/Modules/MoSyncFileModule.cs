@@ -389,7 +389,15 @@ namespace MoSync
                         throw new Exception("maFileSeek whence");
                 }
 
-                return (int)fileStream.Seek(_offset, origin);
+                try
+                {
+                    return (int)fileStream.Seek(_offset, origin);
+                }
+                catch (IOException e)
+                {
+                    MoSync.Util.Log(e.ToString());
+                    return MoSync.Constants.MA_FERR_GENERIC;
+                }
             };
 
             ioctls.maFileTell = delegate(int _file)
@@ -419,7 +427,15 @@ namespace MoSync
             ioctls.maFileDelete = delegate(int _file)
             {
                 File file = mFileHandles[_file];
-                file.Delete();
+                try
+                {
+                    file.Delete();
+                }
+                catch (IsolatedStorageException e)
+                {
+                    MoSync.Util.Log(e.ToString());
+                    return MoSync.Constants.MA_FERR_GENERIC;
+                }
                 return 0;
             };
 
