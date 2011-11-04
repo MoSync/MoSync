@@ -62,12 +62,12 @@ namespace MoSync
 
             syscalls.maTime = delegate()
             {
-                return 0;
+                return (int)Util.ToUnixTimeUtc(System.DateTime.Now);
             };
 
             syscalls.maLocalTime = delegate()
             {
-                return 0;
+                return (int)Util.ToUnixTime(System.DateTime.Now);
             };
 
             syscalls.maCreatePlaceholder = delegate()
