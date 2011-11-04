@@ -85,7 +85,10 @@ namespace MoSync
             return BitConverter.ToSingle(BitConverter.GetBytes(a), 0);
         }
 
-
+        public static int ConvertToInt(float v)
+        {
+            return BitConverter.ToInt32(BitConverter.GetBytes(v), 0);
+        }
         private static bool sLoggingStarted = false;
         private static void InitLogging()
         {

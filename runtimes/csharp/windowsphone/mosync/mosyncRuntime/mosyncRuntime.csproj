@@ -41,6 +41,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Devices.Sensors" />
     <Reference Include="Microsoft.Phone" />
     <Reference Include="Microsoft.Xna.Framework" />
     <Reference Include="Microsoft.Xna.Framework.GamerServices" />
@@ -66,6 +67,7 @@
     <Compile Include="Source\Modules\MoSyncMiscModule.cs" />
     <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
+    <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncNativeUI.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncNativeUIWindowsPhone.cs" />
     <Compile Include="Source\MoSyncCore.cs" />
