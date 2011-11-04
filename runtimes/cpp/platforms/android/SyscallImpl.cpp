@@ -48,8 +48,16 @@ namespace Base
 {
 	Syscall* gSyscall;
 
+	/**
+	* TODO: Remove this Global Reference to JNIEnv
+	*/
 	JNIEnv* mJNIEnv = 0;
 	jobject mJThis;
+
+	/**
+	* A Reference to the Java Virtual Machine
+	*/
+	JavaVM * mJavaVM;
 
 	int mReloadHandle = 0;
 	bool mIsReloading = false;
@@ -69,6 +77,7 @@ namespace Base
 	int gClipRectIsSet = 0;
 
 	MAHandle gDrawTargetHandle = HANDLE_SCREEN;
+
 
 	/**
 	* Syscall constructor
@@ -95,7 +104,30 @@ namespace Base
 	*/
 	JNIEnv* Syscall::getJNIEnvironment()
 	{
-		return mJNIEnv;
+		JNIEnv* env = NULL;
+		if (mJavaVM->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK)
+		{
+			return NULL;
+		}
+		return env;
+	}
+
+	/**
+	* Returns the Java Virtual Machine instance.
+	*
+	* @ return The JNI Environment
+	*/
+	JavaVM* Syscall::getJavaVM()
+	{
+		return mJavaVM;
+	}
+
+	/**
+	* sets the current JavaVM, Used for accessing JNI environmental variables
+	*/
+	void Syscall::setJavaVM(JavaVM* jvm)
+	{
+		mJavaVM = jvm;
 	}
 
 	/**
@@ -135,25 +167,26 @@ namespace Base
 	char* Syscall::loadBinary(int resourceIndex, int size)
 	{
 		SYSLOG("loadBinary");
-
+		//get current thread's JNIEnvrionmental variable
+		JNIEnv * env = getJNIEnvironment();
 		char* b = (char*)malloc(200);
 		sprintf(b, "loadBinary index:%d size:%d", resourceIndex, size);
 		//__android_log_write(ANDROID_LOG_INFO, "MoSync Syscall", b);
 		free(b);
 
 		char* buffer = (char*)malloc(size);
-		jobject byteBuffer = mJNIEnv->NewDirectByteBuffer((void*)buffer, size);
+		jobject byteBuffer = env->NewDirectByteBuffer((void*)buffer, size);
 
 		if(byteBuffer == NULL) return NULL;
 
-		jclass cls = mJNIEnv->GetObjectClass(mJThis);
-		jmethodID methodID = mJNIEnv->GetMethodID(cls, "loadBinary", "(ILjava/nio/ByteBuffer;)Z");
+		jclass cls = env->GetObjectClass(mJThis);
+		jmethodID methodID = env->GetMethodID(cls, "loadBinary", "(ILjava/nio/ByteBuffer;)Z");
 		if (methodID == 0) return NULL;
 
-		jboolean ret = mJNIEnv->CallBooleanMethod(mJThis, methodID, resourceIndex, byteBuffer);
+		jboolean ret = env->CallBooleanMethod(mJThis, methodID, resourceIndex, byteBuffer);
 
-		mJNIEnv->DeleteLocalRef(cls);
-		mJNIEnv->DeleteLocalRef(byteBuffer);
+		env->DeleteLocalRef(cls);
+		env->DeleteLocalRef(byteBuffer);
 
 		if(ret == false)
 		{
