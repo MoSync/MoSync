@@ -66,17 +66,8 @@ namespace MoSync
             {
                 if (!mIsDirectory && mIsolatedStorage.FileExists(mPath))
                 {
-                    try
-                    {
-                        mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.Open,
-                            mFileAccess, FileShare.ReadWrite);
-                    }
-                    catch (IsolatedStorageException e)
-                    {
-                        if(e.InnerException != null)
-                            MoSync.Util.Log(e.InnerException.ToString());
-                        MoSync.Util.Log(e.ToString());
-                    }
+                    mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.Open,
+                        mFileAccess, FileShare.ReadWrite);
                 }
             }
 
@@ -90,7 +81,8 @@ namespace MoSync
                 }
                 else
                 {
-                    mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.CreateNew, mFileAccess);
+                    mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.CreateNew,
+                        mFileAccess, FileShare.ReadWrite);
                 }
                 if (!Exists)
                     throw new Exception("Create");
@@ -210,7 +202,6 @@ namespace MoSync
                 else if ((_flags & MoSync.Constants.MAS_CREATE_IF_NECESSARY) != 0)
                 {
                     file.Create();
-                    file.TryOpen();
                 }
                 else
                     return MoSync.Constants.STERR_NONEXISTENT;
@@ -282,7 +273,7 @@ namespace MoSync
                 }
                 else
                 {
-                    return MoSync.Constants.MA_FERR_GENERIC;
+                    throw new Exception("Invalid file access mode");
                 }
 
                 file = new File(path, access);
@@ -296,7 +287,15 @@ namespace MoSync
                 {
                     if (isolatedStorage.DirectoryExists(path))
                         return MoSync.Constants.MA_FERR_WRONG_TYPE;
-                    file.TryOpen();
+                    try
+                    {
+                        file.TryOpen();
+                    }
+                    catch (IsolatedStorageException e)
+                    {
+                        MoSync.Util.Log(e);
+                        return MoSync.Constants.MA_FERR_GENERIC;
+                    }
                 }
 
                 mFileHandles.Add(mNextFileHandle, file);
@@ -350,6 +349,7 @@ namespace MoSync
                 byte[] bytes = new byte[_len];
                 data.ReadBytes(bytes, _offset, _len);
                 fileStream.Write(bytes, 0, _len);
+                fileStream.Flush();
                 return 0;
             };
 
@@ -364,6 +364,7 @@ namespace MoSync
                 byte[] bytes = new byte[_len];
                 core.GetDataMemory().ReadBytes(bytes, _src, _len);
                 fileStream.Write(bytes, 0, _len);
+                fileStream.Flush();
                 return 0;
             };
 
@@ -389,7 +390,15 @@ namespace MoSync
                         throw new Exception("maFileSeek whence");
                 }
 
-                return (int)fileStream.Seek(_offset, origin);
+                try
+                {
+                    return (int)fileStream.Seek(_offset, origin);
+                }
+                catch (IOException e)
+                {
+                    MoSync.Util.Log(e);
+                    return MoSync.Constants.MA_FERR_GENERIC;
+                }
             };
 
             ioctls.maFileTell = delegate(int _file)
@@ -419,7 +428,15 @@ namespace MoSync
             ioctls.maFileDelete = delegate(int _file)
             {
                 File file = mFileHandles[_file];
-                file.Delete();
+                try
+                {
+                    file.Delete();
+                }
+                catch (IsolatedStorageException e)
+                {
+                    MoSync.Util.Log(e);
+                    return MoSync.Constants.MA_FERR_GENERIC;
+                }
                 return 0;
             };
 

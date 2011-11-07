@@ -115,7 +115,6 @@ namespace MoSync
                 WriteTextToFile(null, "log.txt", FileMode.Create);
                 sLoggingStarted = true;
             }
-
         }
 
         public static void Log(String text)
@@ -129,11 +128,35 @@ namespace MoSync
             }
         }
 
+        public static void Log(Exception e)
+        {
+            Log(e.Message);
+            Log(e.StackTrace);
+        }
+
         private static void DebugWrite(String text)
         {
-            if (text[text.Length - 1] == '\n')
-                text = text.Substring(0, text.Length - 1);
-            System.Diagnostics.Debug.WriteLine(text);
+            // handle multiple lines
+            int pos = 0;
+            while (pos < text.Length)
+            {
+                int eol = text.IndexOf('\n', pos);
+                int len;
+                if (eol > pos)
+                {
+                    len = eol - pos;
+                    if (eol+1 < text.Length && Char.IsControl(text[eol]))
+                        len -= 1;
+                }
+                else
+                {
+                     len = text.Length - pos;
+                }
+                System.Diagnostics.Debug.WriteLine(text.Substring(pos, len));
+                if (eol < 0)
+                    break;
+                pos = eol + 1;
+            }
         }
 
         public static void Log(byte[] bytes)
