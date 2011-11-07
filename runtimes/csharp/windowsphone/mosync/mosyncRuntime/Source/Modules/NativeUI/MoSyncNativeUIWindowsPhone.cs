@@ -7,6 +7,11 @@ using System.Text.RegularExpressions;
 
 namespace MoSync
 {
+    public class SreenSize
+    {
+        public static int SCREEN_HEIGHT = 800;
+        public static int SCREEN_WIDTH = 480;
+    }
     public class WidgetBaseWindowsPhone : WidgetBase
     {
         protected UIElement mView;
@@ -81,29 +86,62 @@ namespace MoSync
         }
     };
 
+    //HorizintalLayout class
     public class HorizontalLayout : WidgetBaseWindowsPhone
     {
+        //the Grid that will be used as the HorizontalLayout
         protected System.Windows.Controls.Grid mGrid;
-        protected HorizontalAlignment mHorizontalAlignment;
+
+        //padding information
         protected double mPaddingBottom;
         protected double mPaddingTop;
         protected double mPaddingLeft;
         protected double mPaddingRight;
 
+        //row definitions used as spacers for the padding system
+        protected RowDefinition mSpacerUp;
+        protected RowDefinition mSpacerDown;
+        protected ColumnDefinition mSpacerLeft;
+        protected ColumnDefinition mSpacerRight;
+
+        //the main row of the Grid object (an horizontal layout is a grid with one row)
+        protected RowDefinition mRowDef;
+
+        //the constructor
         public HorizontalLayout()
         {
             mGrid = new System.Windows.Controls.Grid();
 
-            RowDefinition rowDef = new RowDefinition();
-            rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
-            mGrid.RowDefinitions.Add(rowDef);
+            mRowDef = new RowDefinition();
+            mSpacerUp = new RowDefinition();
+            mSpacerDown = new RowDefinition();
+
+            mSpacerRight = new ColumnDefinition();
+            mSpacerLeft = new ColumnDefinition();
+
+            mRowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+
+            mSpacerUp.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+            mSpacerDown.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+            mSpacerRight.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+            mSpacerLeft.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+
+            mGrid.RowDefinitions.Add(mSpacerUp);
+            mGrid.RowDefinitions.Add(mRowDef);
+            mGrid.RowDefinitions.Add(mSpacerDown);
+
+            mGrid.ColumnDefinitions.Add(mSpacerLeft);
+            mGrid.ColumnDefinitions.Add(mSpacerRight);
+
+            mView = mGrid;
+
+            //mGrid.ShowGridLines = true; //uncomment to see the grid lines (for debugging)
 
             ChildVerticalAlignment = MoSync.Constants.MAW_ALIGNMENT_TOP;
             ChildHorizontalAlignment = MoSync.Constants.MAW_ALIGNMENT_LEFT;
-
-            View = mGrid;
         }
 
+        //add child
         public override void AddChild(IWidget child)
         {
             base.AddChild(child);
@@ -113,17 +151,16 @@ namespace MoSync
                     ColumnDefinition columnDef = new ColumnDefinition();
 
                     columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
-                    mGrid.ColumnDefinitions.Add(columnDef);
-                    //@TDB
-                    //((System.Windows.FrameworkElement)widget.View).Margin = new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+                    mGrid.ColumnDefinitions.Insert(mGrid.ColumnDefinitions.Count - 1, columnDef);
 
                     mGrid.Children.Add(widget.View);
 
-                    Grid.SetColumn((widget.View as System.Windows.FrameworkElement), mGrid.Children.Count - 1);
-                    Grid.SetRow((widget.View as System.Windows.FrameworkElement), 0);
+                    Grid.SetColumn((widget.View as System.Windows.FrameworkElement), mGrid.ColumnDefinitions.Count - 2);
+                    Grid.SetRow((widget.View as System.Windows.FrameworkElement), 1);
                 });
         }
 
+        //MAW_HORIZONTAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT)]
         public String ChildHorizontalAlignment
         {
@@ -132,18 +169,25 @@ namespace MoSync
                 if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
                 {
                     mGrid.HorizontalAlignment = HorizontalAlignment.Left;
+                    mSpacerRight.Width = new GridLength(1, GridUnitType.Star);
+                    mSpacerLeft.Width = new GridLength(0);
                 }
                 else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_RIGHT))
                 {
                     mGrid.HorizontalAlignment = HorizontalAlignment.Right;
+                    mSpacerRight.Width = new GridLength(0);
+                    mSpacerLeft.Width = new GridLength(1, GridUnitType.Star);
                 }
                 else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                 {
                     mGrid.HorizontalAlignment = HorizontalAlignment.Center;
+                    mSpacerRight.Width = new GridLength(1, GridUnitType.Star);
+                    mSpacerLeft.Width = new GridLength(1, GridUnitType.Star);
                 }
             }
         }
 
+        //MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT)]
         public String ChildVerticalAlignment
         {
@@ -152,18 +196,25 @@ namespace MoSync
                 if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_BOTTOM))
                 {
                     mGrid.VerticalAlignment = VerticalAlignment.Bottom;
+                    mSpacerUp.Height = new GridLength(1, GridUnitType.Star);
+                    mSpacerDown.Height = new GridLength(0);
                 }
                 else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_TOP))
                 {
                     mGrid.VerticalAlignment = VerticalAlignment.Top;
+                    mSpacerDown.Height = new GridLength(1, GridUnitType.Star);
+                    mSpacerUp.Height = new GridLength(0);
                 }
                 else if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_CENTER))
                 {
                     mGrid.VerticalAlignment = VerticalAlignment.Center;
+                    mSpacerDown.Height = new GridLength(1, GridUnitType.Star);
+                    mSpacerUp.Height = new GridLength(1, GridUnitType.Star);
                 }
             }
         }
 
+        //MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM)]
         public String PaddingBottom
         {
@@ -171,17 +222,11 @@ namespace MoSync
             {
                 double val = Double.Parse(value);
                 mPaddingBottom = val;
-                //@TBD
-                //for (int i = 0; i < mGrid.Children.Count; i++)
-                //{
-                //    if(mGrid.Children[i] is System.Windows.FrameworkElement)
-                //        ((System.Windows.FrameworkElement)mGrid.Children[i]).Margin =
-                //            new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
-                //}
-                mGrid.Margin = new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+                mSpacerDown.Height = new GridLength(mPaddingBottom);
             }
         }
 
+        //MAW_HORIZONTAL_LAYOUT_PADDING_TOP implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_TOP)]
         public String PaddingTop
         {
@@ -189,17 +234,11 @@ namespace MoSync
             {
                 double val = Double.Parse(value);
                 mPaddingTop = val;
-                //TBD
-                //for (int i = 0; i < mGrid.Children.Count; i++)
-                //{
-                //    if (mGrid.Children[i] is System.Windows.FrameworkElement)
-                //        ((System.Windows.FrameworkElement)mGrid.Children[i]).Margin =
-                //            new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
-                //}
-                mGrid.Margin = new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+                mSpacerUp.Height = new GridLength(mPaddingTop);
             }
         }
 
+        //MAW_HORIZONTAL_LAYOUT_PADDING_LEFT implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_LEFT)]
         public String PaddingLeft
         {
@@ -207,17 +246,11 @@ namespace MoSync
             {
                 double val = Double.Parse(value);
                 mPaddingLeft = val;
-                //TBD
-                //for (int i = 0; i < mGrid.Children.Count; i++)
-                //{
-                //    if (mGrid.Children[i] is System.Windows.FrameworkElement)
-                //        ((System.Windows.FrameworkElement)mGrid.Children[i]).Margin =
-                //            new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
-                //}
-                mGrid.Margin = new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+                mSpacerLeft.Width = new GridLength(mPaddingLeft);
             }
         }
 
+        //MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_HORIZONTAL_LAYOUT_PADDING_RIGHT)]
         public String PaddingRight
         {
@@ -225,13 +258,7 @@ namespace MoSync
             {
                 double val = Double.Parse(value);
                 mPaddingRight = val;
-                //for (int i = 0; i < mGrid.Children.Count; i++)
-                //{
-                //    if (mGrid.Children[i] is System.Windows.FrameworkElement)
-                //        ((System.Windows.FrameworkElement)mGrid.Children[i]).Margin =
-                //            new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
-                //}
-                mGrid.Margin = new Thickness(mPaddingLeft, mPaddingTop, mPaddingRight, mPaddingBottom);
+                mSpacerRight.Width = new GridLength(mPaddingRight);
             }
         }
     }
@@ -488,6 +515,8 @@ namespace MoSync
             MoSync.Util.RunActionOnMainThreadSync(() =>
             {
                 mPage.Content = w.View;
+                ((System.Windows.FrameworkElement)w.View).Width = 480;
+                ((System.Windows.FrameworkElement)w.View).Height = 800;
             });
         }
 
