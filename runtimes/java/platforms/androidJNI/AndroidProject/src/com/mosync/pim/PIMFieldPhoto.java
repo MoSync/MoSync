@@ -51,10 +51,12 @@ public class PIMFieldPhoto extends PIMField {
 				+ "=?" + " AND " + Data.MIMETYPE + "=?",
 				new String[] { String.valueOf(contactId), mStrType }, null);
 
+		// if (cursor == null)
+		// return;
+
 		while (cursor.moveToNext()) {
 			String[] val = new String[mNames.length];
 			for (int i = 0; i < mNames.length; i++) {
-				val[i] = new String("");
 				int index = cursor.getColumnIndex(mNames[i]);
 				if (index >= 0) {
 					if (mNames[i].equals(Photo.PHOTO)) {
@@ -67,9 +69,14 @@ public class PIMFieldPhoto extends PIMField {
 					}
 				}
 			}
-			mValues.add(val);
-			mStates.add(State.NONE);
+			if ((val[1] != null) && val[1].equals("")) {
+				mValues.add(val);
+				mStates.add(State.NONE);
+			}
 		}
+
+		cursor.close();
+		cursor = null;
 
 		print();
 	}
@@ -232,8 +239,11 @@ public class PIMFieldPhoto extends PIMField {
 
 	void close() {
 		for (int i = 0; i < mValues.size(); i++) {
-			PIMUtil.getThread().destroyBinary(
-					Integer.parseInt(mValues.get(i)[1]));
+			try {
+				PIMUtil.getThread().destroyBinary(
+						Integer.parseInt(mValues.get(i)[1]));
+			} catch (Exception e) {
+			}
 		}
 	}
 

@@ -83,20 +83,29 @@ abstract class PIMField {
 				+ "=?" + " AND " + Data.MIMETYPE + "=?",
 				new String[] { String.valueOf(contactId), mStrType }, null);
 
+		// if (cursor == null)
+		// return;
+
 		while (cursor.moveToNext()) {
 			String[] val = new String[mNames.length];
 			for (int i = 0; i < mNames.length; i++) {
-				val[i] = new String("");
 				if (!mNames[i].equals(DUMMY)) {
 					int index = cursor.getColumnIndex(mNames[i]);
 					if (index >= 0) {
 						val[i] = cursor.getString(index);
 					}
 				}
+				if (val[i] == null) {
+					val[i] = new String("");
+				}
 			}
 			mValues.add(val);
 			mStates.add(State.NONE);
 		}
+
+		cursor.close();
+		cursor = null;
+
 		preProcessData();
 
 		print();
