@@ -325,6 +325,12 @@ static Notification *sharedInstance = nil;
     return MA_NOTIFICATION_RES_OK;
 }
 
+/**
+ * Call this method only when a local notification is received.
+ * @param notification A local notification that encapsulates details about
+ * the notification, potentially including custom data.
+ * Sends MoSync event containing a handle to the local notification.
+ */
 - (void) didReceiveLocalNotification:(UILocalNotification *)notification
 {
     NSLog(@"Notification::didReceiveLocalNotification");
@@ -412,15 +418,59 @@ static Notification *sharedInstance = nil;
     return MA_NOTIFICATION_RES_OK;
 }
 
-- (void) didReceivePushNotification:(NSString *)notification
+/**
+ * The number currently set as the badge of the application icon in Springboard.
+ * @param applicationIconBadgeNumber Set to zero to hide the badge number. The default is zero.
+ * If this value is negative the method will do nothing.
+ */
+-(void) setApplicationIconBadgeNumber:(const int) applicationIconBadgeNumber
 {
+    if (0 <= applicationIconBadgeNumber)
+    {
+        [[UIApplication sharedApplication] setApplicationIconBadgeNumber:applicationIconBadgeNumber];
+    }
+}
+
+/**
+ * Called when a running application receives a push notification.
+ * @param pushNotification A dictionary that contains information related to the push notification,
+ * potentially including a badge number for the application icon, an alert sound, an alert message
+ * to display to the user, a notification identifier, and custom data.
+ * Sends mosync events containing push notification data.
+ */
+- (void) didReceivePushNotification:(NSDictionary*) pushNotification
+{
+    NSDictionary* apsDict = [pushNotification objectForKey:@"aps"];
+    if (!apsDict)
+    {
+        NSLog(@"The push notification object is invalid.");
+        return;
+    }
+
+    NSString* alertMessage = [apsDict objectForKey:@"alert"];
+    NSString* sound = [apsDict objectForKey:@"sound"];
+    NSNumber* badge = [apsDict objectForKey:@"badge"];
+
     MAEvent event;
-    notification = [[NSString alloc] initWithString:@"Salut. Ce mai faci"];
-    event.type = EVENT_TYPE_LOCAL_NOTIFICATION;
-    char* address = new char[notification.length + 1];
-    event.pushNotification = (MAAddress) address;
-    [notification getCString:address maxLength:notification.length + 1 encoding:NSASCIIStringEncoding];
-    NSLog(@"value %s at address %d", address, (int) address);
+    event.type = EVENT_TYPE_PUSH_NOTIFICATION;
+
+    if (alertMessage)
+    {
+        [alertMessage getCString:event.pushNotificationEventData.alertMessage
+                       maxLength:alertMessage.length + 1
+                        encoding:NSASCIIStringEncoding];
+    }
+    if (sound)
+    {
+        [sound getCString:event.pushNotificationEventData.soundFileName
+                    maxLength:sound.length + 1
+                        encoding:NSASCIIStringEncoding];
+    }
+    if (badge)
+    {
+        event.pushNotificationEventData.badgeIcon = [badge intValue];
+    }
+
     Base::gEventQueue.put(event);
 }
 
@@ -431,3 +481,24 @@ static Notification *sharedInstance = nil;
 }
 
 @end
+
+/**
+ * Called when the application receives a local notification.
+ * @param localNotification A local notification that encapsulates details about the notification,
+ * potentially including custom data.
+ */
+void MoSync_DidReceiveLocalNotification(UILocalNotification* localNotification)
+{
+    [[Notification getInstance] didReceiveLocalNotification:localNotification];
+}
+
+/**
+ * Called when a running application receives a push notification.
+ * @param pushNotification A dictionary that contains information related to the push notification,
+ * potentially including a badge number for the application icon, an alert sound, an alert message
+ * to display to the user, a notification identifier, and custom data.
+ */
+void MoSync_DidReceivePushNotification(NSDictionary* pushNotification)
+{
+    [[Notification getInstance] didReceivePushNotification:pushNotification];
+}

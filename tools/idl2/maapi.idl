@@ -1449,6 +1449,21 @@ interface MAAPI {
 	}
 
 	/**
+	* \brief An push notification event.
+	*/
+	struct MAPushNotificationEventData {
+		/// The message displayed in the notification alert.
+		/// Platform: iOS only.
+		char alertMessage[256];
+		/// The name of the file containing the sound to play when an alert is displayed.
+		/// Platform: iOS only.
+		char soundFileName[256];
+		/// The number to display as the application’s icon badge.
+		/// Platform: iOS only.
+		int badgeIcon;
+	}
+
+	/**
 	* \brief An event; a message indicating that something has happened, e.g. that a key has been pressed.
 	*/
 	struct MAEvent {
@@ -1554,12 +1569,16 @@ interface MAAPI {
 			*/
 			MAAdsEventData adsData;
 
-			/** Local notification's handle that send the event.
+			/**
+			* Local notification's handle that send the event.
 			* Valid only if the event type is \link #EVENT_TYPE_LOCAL_NOTIFICATION NOTIFICATION \endlink.
 			*/
 			MAHandle localNotificationHandle;
 
-			MAAddress pushNotification;
+			/**
+			* Push notification event data.
+			*/
+			MAPushNotificationEventData pushNotificationEventData;
 
 			/**
 			* Used by custom events. See invididual event descriptions.
@@ -8804,6 +8823,16 @@ group NotificationAPI "Notification API" {
 		* push notification.
 		*/
 		int maNotificationPushUnregister();
+
+		/**
+		* \brief The number currently set as the badge of the application icon in Springboard.
+		* Platform: iOS only.
+		*
+		*\param applicationIconBadgeNumber Set to zero to hide the badge number. The default is zero.
+		* If this value is negative the syscall will do nothing.
+		*
+		*/
+		void maNotificationSetIconBadge(in int applicationIconBadgeNumber);
 	}//End of Notification Functions
 } // End of Notification API
 

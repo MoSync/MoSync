@@ -20,13 +20,14 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 @class MoSyncView;
 
-
 void getScreenResolution(int &w, int &h);
 void initMoSyncUISyscalls(UIWindow* window, UIViewController* viewController);
 void MoSync_AddCloseEvent();
 void MoSync_AddFocusLostEvent();
 void MoSync_AddFocusGainedEvent();
 void MoSync_Main(int width, int height, MoSyncView* mosyncView);
+void MoSync_DidReceiveLocalNotification(UILocalNotification* localNotification);
+void MoSync_DidReceivePushNotification(NSDictionary* pushNotification);
 
 @implementation MoSyncAppDelegate
 
@@ -59,6 +60,42 @@ void MoSync_Main(int width, int height, MoSyncView* mosyncView);
     return;
 }
 
+/**
+ * Called when the application receives a local notification.
+ * @param application The application that received the local notification.
+ * @param notification A local notification that encapsulates details about
+ * the notification, potentially including custom data.
+ */
+- (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
+{
+//    [[Notification getInstance] didReceiveLocalNotification:notification];
+    MoSync_DidReceiveLocalNotification(notification);
+}
+
+- (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
+{
+    NSString *str = [NSString stringWithFormat:@"Device Token=%@",deviceToken];
+    NSLog(@"%@",str);
+}
+
+- (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)err
+{
+    NSString *str = [NSString stringWithFormat: @"Error: %@", err];
+    NSLog(@"%@",str);
+}
+
+- (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
+{
+    NSLog(@"MoSyncAppDelegate::didReceiveRemoteNotification: %@", [userInfo description]);
+//    for (id key in userInfo)
+//    {
+//        NSLog(@"key: %@, value: %@", key, [userInfo objectForKey:key]);
+//        NSString* value = [userInfo objectForKey:key];
+//        [[Notification getInstance] didReceivePushNotification:value];
+//    }
+    MoSync_DidReceivePushNotification(userInfo);
+
+}
 
 /*
 - (void)applicationDidFinishLaunching:(UIApplication *)application {    

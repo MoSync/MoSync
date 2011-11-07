@@ -130,6 +130,7 @@
  * Call this method only when a local notification is received.
  * @param notification A local notification that encapsulates details about
  * the notification, potentially including custom data.
+ * Sends MoSync event containing a handle to the local notification.
  */
 - (void) didReceiveLocalNotification:(UILocalNotification *)notification;
 
@@ -161,6 +162,35 @@
  */
 -(int) unregisterPushNotification;
 
-- (void) didReceivePushNotification:(NSString *)notification;
+/**
+ * The number currently set as the badge of the application icon in Springboard.
+ * @param applicationIconBadgeNumber Set to zero to hide the badge number. The default is zero.
+ * If this value is negative the method will do nothing.
+ */
+-(void) setApplicationIconBadgeNumber:(const int) applicationIconBadgeNumber;
+
+/**
+ * Called when a running application receives a push notification.
+ * @param pushNotification A dictionary that contains information related to the push notification,
+ * potentially including a badge number for the application icon, an alert sound, an alert message
+ * to display to the user, a notification identifier, and custom data.
+ * Sends mosync events containing push notification data.
+ */
+-(void) didReceivePushNotification:(NSDictionary*) pushNotification;
 
 @end
+
+/**
+ * Called when the application receives a local notification.
+ * @param localNotification A local notification that encapsulates details about the notification,
+ * potentially including custom data.
+ */
+void MoSync_DidReceiveLocalNotification(UILocalNotification* localNotification);
+
+/**
+ * Called when a running application receives a push notification.
+ * @param pushNotification A dictionary that contains information related to the push notification,
+ * potentially including a badge number for the application icon, an alert sound, an alert message
+ * to display to the user, a notification identifier, and custom data.
+ */
+void MoSync_DidReceivePushNotification(NSDictionary* pushNotification);
