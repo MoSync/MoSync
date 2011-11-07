@@ -62,14 +62,12 @@ namespace MoSync
 
             syscalls.maTime = delegate()
             {
-                TimeSpan t = (DateTime.UtcNow - new DateTime(1970, 1, 1));
-                int timestamp = (int)t.TotalSeconds;
-                return timestamp;
+                return (int)Util.ToUnixTimeUtc(System.DateTime.Now);
             };
 
             syscalls.maLocalTime = delegate()
             {
-                return 0;
+                return (int)Util.ToUnixTime(System.DateTime.Now);
             };
 
             syscalls.maCreatePlaceholder = delegate()

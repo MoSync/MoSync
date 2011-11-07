@@ -12,6 +12,24 @@ namespace MoSync
 {
     public class Util
     {
+        public static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        public static readonly long EpochFileTime = Epoch.ToFileTime();
+        public static readonly long EpochFileTimeUtc = Epoch.ToFileTimeUtc();
+
+        public static long ToUnixTime(DateTime dt)
+        {
+            return (dt.ToFileTime() - EpochFileTime) / 10000000;
+        }
+
+        public static long ToUnixTimeUtc(DateTime dt)
+        {
+            return ToUnixTimeUtc(dt.ToFileTimeUtc());
+        }
+
+        public static long ToUnixTimeUtc(long fileTime)
+        {
+            return (fileTime - EpochFileTimeUtc) / 10000000;
+        }
 
         public static uint NextPowerOfTwo(int minPow, uint val)
         {
@@ -85,7 +103,10 @@ namespace MoSync
             return BitConverter.ToSingle(BitConverter.GetBytes(a), 0);
         }
 
-
+        public static int ConvertToInt(float v)
+        {
+            return BitConverter.ToInt32(BitConverter.GetBytes(v), 0);
+        }
         private static bool sLoggingStarted = false;
         private static void InitLogging()
         {
