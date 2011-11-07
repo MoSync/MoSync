@@ -19,7 +19,15 @@ namespace MoSync
             mSyscalls.__fixunsdfsi = delegate(double a) { return (int)((uint)a); };
             mSyscalls.__floatsidf = delegate(int a) { return (double)a; };
             mSyscalls.__extendsfdf2 = delegate(float a) { return (double)a; };
-            mSyscalls.dcmp = delegate(double a, double b) { return (a < b) ? -1 : ((a > b) ? 1 : 0); };
+            mSyscalls.dcmp = delegate(double a, double b)
+            {
+                if (a > b)
+                    return 1;
+                else if (a == b)
+                    return 0;
+                else	//a < b //or NaN!
+                    return -1;
+            };
 
             mSyscalls.__addsf3 = delegate(float a, float b) { return a + b; };
             mSyscalls.__subsf3 = delegate(float a, float b) { return a - b; };
@@ -30,7 +38,15 @@ namespace MoSync
             mSyscalls.__fixunssfsi = delegate(float a) { return (int)((uint)a); };
             mSyscalls.__floatsisf = delegate(int a) { return (float)a; };
             mSyscalls.__truncdfsf2 = delegate(double a) { return (float)a; };
-            mSyscalls.fcmp = delegate(float a, float b) { return (a < b) ? -1 : ((a > b) ? 1 : 0); };
+            mSyscalls.fcmp = delegate(float a, float b)
+            {
+                if (a > b)
+                    return 1;
+                else if (a == b)
+                    return 0;
+                else	//a < b //or NaN!
+                    return -1;
+            };
 
             mSyscalls.sin = delegate(double v) { return System.Math.Sin(v); };
             mSyscalls.cos = delegate(double v) { return System.Math.Cos(v); };
