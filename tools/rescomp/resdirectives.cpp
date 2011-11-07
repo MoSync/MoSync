@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #define ATTR_PLATFORM "platform"
 #define ATTR_ID "id"
+#define ATTR_LOAD_TYPE "loadType"
 #define ATTR_RES_FILE "resource"
 #define ATTR_MIME_TYPE "mimeType"
 
@@ -46,6 +47,12 @@ void ResourceDirective::initDirectiveFromAttributes(const char** attributes) {
 	const char* id = findAttr(ATTR_ID, attributes);
 	if (id) {
 		setId(string(id));
+	}
+	const char* loadType = findAttr(ATTR_LOAD_TYPE, attributes);
+	if (loadType && !strcmp("unloaded", loadType)) {
+		setLoadType(LoadType_Unloaded);
+	} else {
+		setLoadType(LoadType_Startup);
 	}
 }
 
@@ -75,6 +82,30 @@ string ResourceDirective::validate() {
 	return string();
 }
 
+void ResourceDirective::setFile(string file) {
+	fFile = file;
+}
+
+void ResourceDirective::setLineNo(int lineNo) {
+	fLineNo = lineNo;
+}
+
+int ResourceDirective::getLineNo() {
+	return fLineNo;
+}
+
+string ResourceDirective::getFile() {
+	return fFile;
+}
+
+void ResourceDirective::setLoadType(LoadType loadType) {
+	fLoadType = loadType;
+}
+
+LoadType ResourceDirective::getLoadType() {
+	return fLoadType;
+}
+
 string ResourceDirective::getUniqueToken() {
 	return string();
 }
@@ -83,18 +114,20 @@ void FileResourceDirective::setResource(string resource) {
 	fResource = resource;
 }
 
-void FileResourceDirective::setLoadType(LoadType loadType) {
-	fLoadType = loadType;
-}
-
 void FileResourceDirective::writeDirectives(ostringstream& output, bool asVariant) {
+	// Just get rid of a bunch of .lfile stuff!
+	string lfileDirective =  ".lfile \'" + fFile + "\'\n";
+	if (lfileDirective != gLastLFileDirective) {
+		output << lfileDirective;
+		gLastLFileDirective = lfileDirective;
+	}
 	ResourceDirective::writeDirectives(output, asVariant);
 	string resourceStr = string("\"") + fResource + string("\"");
 	if (asVariant) {
 		output << ".ubin\n";
 		output << ".include " << resourceStr << "\n";
 	} else {
-		output << '.' << getSpecialDirective() << " " << resourceStr << "\n";
+		output << '.' << fResType << " " << resourceStr << "\n";
 	}
 }
 
@@ -111,14 +144,6 @@ string FileResourceDirective::validate() {
 		return "Resource tags require the 'resource' attribute";
 	}
 	return ResourceDirective::validate();
-}
-
-string FileResourceDirective::getSpecialDirective() {
-	if (fLoadType == unloaded) {
-		return "u" + fResType;
-	} else {
-		return fResType;
-	}
 }
 
 string FileResourceDirective::getUniqueToken() {

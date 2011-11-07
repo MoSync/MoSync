@@ -21,7 +21,24 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <sstream>
 #include <string>
 
-enum LoadType { startup, unloaded, explicitLoad };
+enum LoadType { LoadType_Startup, LoadType_Unloaded };
+
+// Copied from compile.h
+enum
+{
+	ResType_null = 0,
+	ResType_PlaceHolder = 1,
+	ResType_Image = 2,
+	ResType_Sprite = 3,
+	ResType_Binary = 4,
+	ResType_UBinary = 5,
+	ResType_Skip = 6,
+	ResType_TileSet = 7,
+	ResType_TileMap = 8,
+	ResType_Label = 9,
+//	ResType_Media = 10,
+//	ResType_UMedia = 11
+};
 
 using namespace std;
 
@@ -31,28 +48,37 @@ class ResourceDirective {
 protected:
 	string fResType;
 	string fId;
+	LoadType fLoadType;
+	string fFile;
+	int fLineNo;
 public:
 	ResourceDirective() { }
 	ResourceDirective(const char* resType) : fResType(string(resType)) { }
 	void setId(string id);
 	string getId();
+	void setLoadType(LoadType loadType);
+	LoadType getLoadType();
+	virtual int getResourceTypeAsInt() { return ResType_Binary; }
 	virtual void writeDirectives(ostringstream& output, bool asVariant);
 	virtual void initDirectiveFromAttributes(const char **attributes);
 	virtual void initDirectiveFromCData(const char* cdata, int length);
 	virtual string getUniqueToken();
 	virtual string validate();
+	void setFile(string file);
+	string getFile();
+	void setLineNo(int lineNo);
+	int getLineNo();
 	static void writeByteDirective(ostringstream& output, const char* array, size_t offset, size_t len);
 };
+
+static string gLastLFileDirective;
 
 class FileResourceDirective : public ResourceDirective {
 protected:
 	string fResource;
-	LoadType fLoadType;
 public:
 	FileResourceDirective(const char* resType) : ResourceDirective(resType) { }
 	void setResource(string resource);
-	void setLoadType(LoadType loadType);
-	virtual string getSpecialDirective();
 	string getUniqueToken();
 	virtual void writeDirectives(ostringstream& output, bool asVariant);
 	virtual void initDirectiveFromAttributes(const char **attributes);
@@ -62,11 +88,13 @@ public:
 class BinaryResourceDirective : public FileResourceDirective {
 public:
 	BinaryResourceDirective() : FileResourceDirective("bin") { }
+	int getResourceTypeAsInt() { return ResType_Binary; }
 };
 
 class ImageResourceDirective : public FileResourceDirective {
 public:
 	ImageResourceDirective() : FileResourceDirective("image") { }
+	int getResourceTypeAsInt() { return ResType_Image; }
 };
 
 class MediaResourceDirective : public FileResourceDirective {
@@ -99,6 +127,7 @@ class PlaceholderDirective : public ResourceDirective {
 public:
 	PlaceholderDirective() : ResourceDirective("placeholder") { }
 	void writeDirectives(ostringstream& output, bool asVariant);
+	int getResourceType() { return ResType_PlaceHolder; }
 };
 
 /*class LSTXResourceDirectiveFactory {

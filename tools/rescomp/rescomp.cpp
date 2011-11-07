@@ -17,13 +17,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <string>
 #include "xlstcomp.h"
+#include "File.h"
+
 #define LST_EXT "lst"
 #define LSTX_EXT "lstx"
 
 using namespace std;
 
 void printUsage() {
-	printf("Usage: rescomp platform outputdir [.lst|.lstx files]");
+	printf("Usage: rescomp [-L lstfile] platform outputdir [.lst|.lstx files]");
 	exit(1);
 }
 
@@ -35,27 +37,49 @@ bool isExt(const string& filename, const string& ext) {
 }
 
 int main(int argc,char *argv[]) {
-	if (argc < 3) {
+	// Parse option(s):
+	int arg = 1;
+	bool generateOnly = false;
+
+	if (argc > 1) {
+		// Generate lst file only
+		if (!strcmp("-L", argv[1])) {
+			generateOnly = true;
+			arg += 1;
+		}
+	}
+
+	if (argc < arg + 2) {
 		printUsage();
 	}
 
-	char* platform = argv[1];
-	char* outputDir = argv[2];
+	char* platform = argv[arg];
+	char* outputDir = argv[arg + 1];
+	string lstFile = string(outputDir) + "/~tmpres.lst";
 
 	VariantResourceSet resources = VariantResourceSet();
 	resources.setPlatform(string(platform));
 
-	for (int i = 3; i < argc; i++) {
+	arg += 2;
+
+	for (int i = arg; i < argc; i++) {
 		string filename = string(argv[i]);
-		if (isExt(filename, string(LSTX_EXT))) {
-			string lstFile = resources.parseLSTX(filename, outputDir);
-			string resFile = resources.parseLST(lstFile, outputDir);
+		File file = File(filename);
+		if (file.isDirectory()) {
+			resources.scanForResources(file.getAbsolutePath());
+		} else if (isExt(filename, string(LSTX_EXT))) {
+			resources.parseLSTX(filename);
 		} else if (isExt(filename, string(LST_EXT))) {
 			printf("The rescomp tool does not support .lst files, use pipe-tool instead");
 		} else {
 			printf("Wrong file extension, must be .lstx\n");
 			exit(1);
 		}
+	}
+
+	resources.writeResources(lstFile);
+	if (!generateOnly) {
+		string resFile = resources.parseLST(lstFile, outputDir);
 	}
 
 	return 0;

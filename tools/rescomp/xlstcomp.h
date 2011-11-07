@@ -29,36 +29,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace std;
 
-class VariantResourceSet {
-private:
-	string fPlatform;
-	map<int, string> fResourceIndices;
-	map<string, map<string, int> > fMappedResources;
-	map<string, map<string, int> > fMappedPriorities;
-	map<string, int> fCurrentPriority;
-	map<string, map<string, ResourceDirective*> > fDirectives;
-	vector<string> fVariantResIds;
-	vector<string> fNonVariantResIds;
-	vector<string> fVariants;
-	int fCurrentId;
-	void assignVirtualIndex(string resId, int virtualIndex);
-	void assignMappedIndex(string resId, string variant, int mappedIndex);
-	string createResMap();
-public:
-	VariantResourceSet();
-	virtual ~VariantResourceSet();
-	void addDirective(ResourceDirective* directive, string variant);
-	vector<string> getAllVariants();
-	vector<string> getAllVariantResIds();
-	vector<string> getAllNonVariantResIds();
-	ResourceDirective* getDirective(string resId, string variant);
-	string scanForResources(string resourceDir, string outputDir);
-	string parseLSTX(string inputFile, string outputDir);
-	string parseLST(string lstFile, string outputDir);
-	void writeResources(string lstFile);
-	void setPlatform(string platform);
-};
-
 class VariantCondition {
 private:
 	map<string, string> fConditions;
@@ -69,7 +39,53 @@ public:
 	bool setCondition(string condition, string value);
 	string getCondition(string condition);
 	bool hasCondition(string condition);
+	bool isApplicable();
 	string getVariantIdentifier(bool filtered);
+};
+
+class VariantResourceSet {
+private:
+	string fPlatform;
+	map<int, string> fVirtualResourceIndices;
+	map<int, int> fResTypes;
+	map<int, LoadType> fLoadTypes;
+	map<string, map<string, int> > fMappedResources;
+	map<string, map<string, int> > fMappedPriorities;
+	map<string, int> fCurrentPriority;
+	map<string, map<string, ResourceDirective*> > fDirectives;
+	vector<string> fVariantResIds;
+	vector<string> fNonVariantResIds;
+	vector<string> fVariants;
+	int fCurrentId;
+	void assignVirtualIndex(string resId, int virtualIndex);
+	void assignMappedIndex(string resId, string variant, int mappedIndex);
+	bool assignPriority(ResourceDirective* directive, VariantCondition* condition, int priority);
+	bool isAmbiguous(string resId);
+	void assignResAndLoadType(int resIndex, int resType, LoadType loadType);
+	static int computeResAndLoadType(int resType, LoadType loadType);
+	static int computeResAndLoadType(ResourceDirective* directive);
+	void scanForResources(string directoryToScan,
+			string resourceType,
+			string variantAttrName,
+			string variantAttrValue,
+			LoadType loadType,
+			VariantCondition currentCondition,
+			int priority);
+	string createResMap();
+	string createResTypeList();
+public:
+	VariantResourceSet();
+	virtual ~VariantResourceSet();
+	bool addDirective(ResourceDirective* directive, VariantCondition* condition);
+	vector<string> getAllVariants();
+	vector<string> getAllVariantResIds();
+	vector<string> getAllNonVariantResIds();
+	ResourceDirective* getDirective(string resId, string variant);
+	void scanForResources(string directoryToScan);
+	void parseLSTX(string inputFile);
+	string parseLST(string lstFile, string outputDir);
+	void writeResources(string lstOutput);
+	void setPlatform(string platform);
 };
 
 struct ParserState {
