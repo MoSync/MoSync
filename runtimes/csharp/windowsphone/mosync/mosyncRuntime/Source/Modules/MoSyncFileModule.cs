@@ -81,7 +81,8 @@ namespace MoSync
                 }
                 else
                 {
-                    mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.CreateNew, mFileAccess);
+                    mFileStream = mIsolatedStorage.OpenFile(mPath, FileMode.CreateNew,
+                        mFileAccess, FileShare.ReadWrite);
                 }
                 if (!Exists)
                     throw new Exception("Create");
@@ -348,6 +349,7 @@ namespace MoSync
                 byte[] bytes = new byte[_len];
                 data.ReadBytes(bytes, _offset, _len);
                 fileStream.Write(bytes, 0, _len);
+                fileStream.Flush();
                 return 0;
             };
 
@@ -362,6 +364,7 @@ namespace MoSync
                 byte[] bytes = new byte[_len];
                 core.GetDataMemory().ReadBytes(bytes, _src, _len);
                 fileStream.Write(bytes, 0, _len);
+                fileStream.Flush();
                 return 0;
             };
 
