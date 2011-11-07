@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "sqlite3.h"
 #include "MoSyncDB.h"
 
@@ -59,24 +60,42 @@ int testdb(){
 int testdb2()
 {
 	int db = maDBOpen("c:\\cprog\\testdb.db");
+	if (db < 1)
+	{
+		printf("maDBOpen failed\n");
+	}
+
+	maDBExecSQL(db, "DROP TABLE pet");
 
 	int result = maDBExecSQL(db,
-		"CREATE TABLE pet (name TEXT(50), age INTEGER)");
+		"CREATE TABLE pet (name TEXT(50), age INTEGER, playfulness DOUBLE)");
 	if (0 != result)
 	{
 		printf("CREATE TABLE failed\n");
 	}
 
-	result = maDBExecSQL(db, "INSERT INTO pet VALUES ('Kurre', 13)");
+	result = maDBExecSQL(db, "INSERT INTO pet VALUES ('Kurre', 13, 0.65)");
 	if (0 != result)
 	{
 		printf("INSERT 1 failed\n");
 	}
-	result = maDBExecSQL(db, "INSERT INTO pet VALUES ('Vilma', 10)");
+	result = maDBExecSQL(db, "INSERT INTO pet VALUES ('Vilma', 10, 0.999)");
 	if (0 != result)
 	{
 		printf("INSERT 2 failed\n");
 	}
+
+	// Test to get the number of rows.
+	MAHandle cursor1 = maDBExecSQL(db, "SELECT COUNT(*) FROM (SELECT * FROM pet)");
+	if (cursor1 < 1)
+	{
+		printf("SELECT COUNT failed\n");
+	}
+	maDBCursorNext(cursor1);
+	int numberOfRows;
+	maDBCursorGetColumnInt(cursor1, 0, &numberOfRows);
+	printf("Number of rows: %d\n", numberOfRows);
+	maDBCursorDestroy(cursor1);
 
 	MAHandle cursor = maDBExecSQL(db, "SELECT * FROM pet");
 	if (cursor < 1)
@@ -85,13 +104,30 @@ int testdb2()
 	}
 
 	// Print all rows.
+	char name[51];
 	int age;
+	double playfulness;
 	while (0 == maDBCursorNext(cursor))
 	{
+		int length = maDBCursorGetColumnText(cursor, 0, name, 50);
+		printf("length: %d\n", length);
+		if (length <= 50)
+		{
+			name[length] = 0;
+		}
+		else
+		{
+			strcpy(name, "ERROR: name buffer too small");
+		}
 		maDBCursorGetColumnInt(cursor, 1, &age);
-		printf("age: %d\n", age);
+		maDBCursorGetColumnDouble(cursor, 2, &playfulness);
+		printf("%s %d %f\n", name, age, playfulness);
 	}
 
+	// Free the cursor.
+	maDBCursorDestroy(cursor);
+
+	// Close the database.
 	maDBClose(db);
 }
 

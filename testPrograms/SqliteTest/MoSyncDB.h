@@ -26,10 +26,11 @@ MA 02110-1301, USA.
 #ifndef MOSYNCDB_H
 #define MOSYNCDB_H
 
+// MoSync constants and types.
+// TODO: Remove these in the iOS implementation.
 #define MA_DB_OK 0;
 #define MA_DB_ERROR -2;
 #define MA_DB_NO_ROW -3;
-
 #define MAHandle int
 
 /**
@@ -66,18 +67,15 @@ MAHandle maDBExecSQL(MAHandle databaseHandle, const char* sql);
 int maDBCursorDestroy(MAHandle cursorHandle);
 
 /**
- * Returns the number of rows in the result set pointed
- * to by the cursor.
- * @param cursorHandle Handle to the cursor.
- * @return The number of rows in the result set, #MA_DB_ERROR on error.
- */
-int maDBCursorGetRowCount(MAHandle cursorHandle);
-
-/**
  * Move the cursor to the next row in the result set.
+ * Note that you must call this function before retrieving
+ * column data. The initial position of the cursor is
+ * before the first row in the result set. If the result
+ * set is empty, this function will return a value != MA_DB_OK.
  * @param cursorHandle Handle to the cursor.
- * @return #MA_DB_NO_ROW if there are no more rows in the result set,
- * #MA_DB_OK if successfully moved to next row, #MA_DB_ERROR on error.
+ * @return #MA_DB_OK if successfully moved to next row,
+ * #MA_DB_NO_ROW if there are no more rows in the result set,
+ * #MA_DB_ERROR on error.
  */
 int maDBCursorNext(MAHandle cursorHandle);
 
@@ -100,12 +98,12 @@ int maDBCursorGetColumnData(
 
 /**
  * Get the column value at the current row pointed to
- * by the cursor into a data buffer. Use this function
- * for text data.
+ * by the cursor as a text data buffer. Use this function for
+ * text data.
  * @param cursorHandle Handle to the cursor.
  * @param columnIndex Index of the column to retrieve value from.
  * First column has index zero.
- * @param buffer Address to buffer to receive the data.
+ * @param buffer Pointer to buffer to receive the data.
  * The result is NOT zero terminated.
  * @param bufferSize Max size of the buffer.
  * @return The actual length of the data, if the actual length
@@ -120,7 +118,7 @@ int maDBCursorGetColumnText(
 
 /**
  * Get the column value at the current row pointed to
- * by the cursor as int data.
+ * by the cursor as an int value.
  * @param cursorHandle Handle to the cursor.
  * @param columnIndex Index of the column to retrieve value from.
  * First column has index zero.
@@ -134,16 +132,16 @@ int maDBCursorGetColumnInt(
 
 /**
  * Get the column value at the current row pointed to
- * by the cursor as float data.
+ * by the cursor as a double value.
  * @param cursorHandle Handle to the cursor.
  * @param columnIndex Index of the column to retrieve value from.
  * First column has index zero.
- * @param value Pointer to float to receive the value.
+ * @param value Pointer to double to receive the value.
  * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
  */
-int maDBCursorGetColumnFloat(
+int maDBCursorGetColumnDouble(
 	MAHandle cursorHandle,
 	int columnIndex,
-	float* value);
+	double* value);
 
 #endif

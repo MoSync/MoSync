@@ -27,6 +27,7 @@ MA 02110-1301, USA.
 #include "sqlite3.h"
 #include <map>
 #include <stdio.h>
+#include <string.h>
 
 /**
  * Class that represents a cursor for a query result.
@@ -94,8 +95,8 @@ static int gDatabaseHandle = 0;
 static int gCursorHandle = 0;
 
 // Object tables.
-std::map <MAHandle, sqlite3*> gDatabaseTable;
-std::map <MAHandle, MoDBCursor*> gCursorTable;
+static std::map <MAHandle, sqlite3*> gDatabaseTable;
+static std::map <MAHandle, MoDBCursor*> gCursorTable;
 
 static int MoDBDatabaseExists(MAHandle databaseHandle)
 {
@@ -215,7 +216,7 @@ int maDBExecSQL(MAHandle databaseHandle, const char* sql)
 		NULL);
 	if (SQLITE_OK != result)
 	{
-		printf("sqlite3_prepare_v2 failed\n");
+		//printf("sqlite3_prepare_v2 failed\n");
 		return MA_DB_ERROR;
 	}
 
@@ -228,7 +229,7 @@ int maDBExecSQL(MAHandle databaseHandle, const char* sql)
 		SQLITE_MISUSE == result)
 	{
 		// The result was an error.
-		printf("sqlite3_step failed\n");
+		//printf("sqlite3_step failed\n");
 		sqlite3_finalize(statement);
 		return MA_DB_ERROR;
 	}
@@ -269,21 +270,15 @@ int maDBCursorDestroy(MAHandle cursorHandle)
 }
 
 /**
- * Returns the number of rows in the result set pointed
- * to by the cursor.
- * @param cursorHandle Handle to the cursor.
- * @return The number of rows in the result set, #MA_DB_ERROR on error.
- */
-int maDBCursorGetRowCount(MAHandle cursorHandle)
-{
-	return -1;
-}
-
-/**
  * Move the cursor to the next row in the result set.
+ * Note that you must call this function before retrieving
+ * column data. The initial position of the cursor is
+ * before the first row in the result set. If the result
+ * set is empty, this function will return a value != MA_DB_OK.
  * @param cursorHandle Handle to the cursor.
- * @return #MA_DB_NO_ROW if there are no more rows in the result set,
- * #MA_DB_OK if successfully moved to next row, #MA_DB_ERROR on error.
+ * @return #MA_DB_OK if successfully moved to next row,
+ * #MA_DB_NO_ROW if there are no more rows in the result set,
+ * #MA_DB_ERROR on error.
  */
 int maDBCursorNext(MAHandle cursorHandle)
 {
@@ -327,12 +322,12 @@ int maDBCursorGetColumnData(
 
 /**
  * Get the column value at the current row pointed to
- * by the cursor into a data buffer. Use this function
- * for text data.
+ * by the cursor as a text data buffer. Use this function for
+ * text data.
  * @param cursorHandle Handle to the cursor.
  * @param columnIndex Index of the column to retrieve value from.
  * First column has index zero.
- * @param buffer Address to buffer to receive the data.
+ * @param buffer Pointer to buffer to receive the data.
  * The result is NOT zero terminated.
  * @param bufferSize Max size of the buffer.
  * @return The actual length of the data, if the actual length
@@ -345,12 +340,49 @@ int maDBCursorGetColumnText(
 	void* buffer,
 	int bufferSize)
 {
-	return -1;
+	// Get the cursor object.
+	MoDBCursor* cursor = MoDBGetCursor(cursorHandle);
+	if (NULL == cursor)
+	{
+		return MA_DB_ERROR;
+	}
+
+	// First get pointer to text data.
+	const unsigned char* text = sqlite3_column_text(
+		cursor->getStatement(),
+		columnIndex);
+	if (NULL == text)
+	{
+		return MA_DB_ERROR;
+	}
+
+	//printf("TEXT: %s\n", text);
+
+	// Next find the bumber of bytes, excluding zero
+	// termination character. See this page for details:
+	// http://sqlite.org/c3ref/column_blob.html
+	int numberOfBytes = sqlite3_column_bytes(
+		cursor->getStatement(),
+		columnIndex);
+
+	//printf("numberOfBytes: %d\n", numberOfBytes);
+
+	// Is the buffer big enough?
+	if (bufferSize < numberOfBytes)
+	{
+		// No, return number of bytes.
+		return numberOfBytes;
+	}
+
+	// Copy text data to buffer.
+	memcpy(buffer, text, numberOfBytes);
+
+	return numberOfBytes;
 }
 
 /**
  * Get the column value at the current row pointed to
- * by the cursor as int data.
+ * by the cursor as an int value.
  * @param cursorHandle Handle to the cursor.
  * @param columnIndex Index of the column to retrieve value from.
  * First column has index zero.
@@ -379,17 +411,29 @@ int maDBCursorGetColumnInt(
 
 /**
  * Get the column value at the current row pointed to
- * by the cursor as float data.
+ * by the cursor as a double value.
  * @param cursorHandle Handle to the cursor.
  * @param columnIndex Index of the column to retrieve value from.
  * First column has index zero.
- * @param value Pointer to float to receive the value.
+ * @param value Pointer to double to receive the value.
  * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
  */
-int maDBCursorGetColumnFloat(
+int maDBCursorGetColumnDouble(
 	MAHandle cursorHandle,
 	int columnIndex,
-	float* value)
+	double* value)
 {
-	return -1;
+	// Get the cursor object.
+	MoDBCursor* cursor = MoDBGetCursor(cursorHandle);
+	if (NULL == cursor)
+	{
+		return MA_DB_ERROR;
+	}
+
+	// Get the int value.
+	double v = sqlite3_column_double(
+		cursor->getStatement(),
+		columnIndex);
+	*value = v;
+	return MA_DB_OK;
 }
