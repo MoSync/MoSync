@@ -31,6 +31,12 @@ inline void convertRet<double>(int& r14, int& r15, double type) {
 }
 
 template <>
+inline void convertRet<longlong>(int& r14, int& r15, longlong type) {
+	r14 = (type&0xffffffff);
+	r15 = (int)((unsigned long long)type>>32);
+}
+
+template <>
 inline void convertRet<float>(int& r14, int& r15, float type) {
 	MA_FV fv;
 	fv.f = type;
