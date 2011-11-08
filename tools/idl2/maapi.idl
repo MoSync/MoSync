@@ -1449,21 +1449,6 @@ interface MAAPI {
 	}
 
 	/**
-	* \brief An push notification event.
-	*/
-	struct MAPushNotificationEventData {
-		/// The message displayed in the notification alert.
-		/// Platform: iOS only.
-		char alertMessage[256];
-		/// The name of the file containing the sound to play when an alert is displayed.
-		/// Platform: iOS only.
-		char soundFileName[256];
-		/// The number to display as the application’s icon badge.
-		/// Platform: iOS only.
-		int badgeIcon;
-	}
-
-	/**
 	* \brief An event; a message indicating that something has happened, e.g. that a key has been pressed.
 	*/
 	struct MAEvent {
@@ -1571,14 +1556,15 @@ interface MAAPI {
 
 			/**
 			* Local notification's handle that send the event.
-			* Valid only if the event type is \link #EVENT_TYPE_LOCAL_NOTIFICATION NOTIFICATION \endlink.
+			* Valid only if the event type is \link #EVENT_TYPE_LOCAL_NOTIFICATION LOCAL_NOTIFICATION \endlink.
 			*/
 			MAHandle localNotificationHandle;
 
 			/**
-			* Push notification event data.
+			* Push notification's handle that send the event.
+			* Valid only if the event type is \link #EVENT_TYPE_PUSH_NOTIFICATION PUSH_NOTIFICATION \endlink.
 			*/
-			MAPushNotificationEventData pushNotificationEventData;
+			MAHandle pushNotificationHandle;
 
 			/**
 			* Used by custom events. See invididual event descriptions.
@@ -8723,6 +8709,42 @@ group NotificationAPI "Notification API" {
 		}
 	} // end of Notification Properties
 
+	group NotificationPushStruct "Push Notification Struct" {
+		/**
+		* \brief An push notification event.
+		*/
+		struct MAPushNotificationData {
+			/// A bit mask specifying the types of notifications.
+			/// The bit mask is created using \link #MA_NOTIFICATION_PUSH_TYPE_BADGE
+			/// MA_NOTIFICATION_PUSH_TYPE \endlink type values.
+			/// Platform: iOS only.
+			int type;
+
+			/// The address to a buffer that will contain the message displayed in
+			/// the notification alert.
+			/// This buffer will be filled only if the type is MA_NOTIFICATION_PUSH_TYPE_ALERT.
+			/// Platform: iOS only.
+			MAAddress alertMessage;
+
+			/// The size of the buffer that will contain the notification alert message.
+			int alertMessageSize;
+
+			/// The address to a buffer that will contain the name of the file containing
+			/// the sound to play when an alert is displayed.
+			/// This buffer will be filled only if the type is MA_NOTIFICATION_PUSH_TYPE_SOUND.
+			/// Platform: iOS only.
+			MAAddress soundFileName;
+
+			/// The size of the buffer that will contain the sound filename.
+			int soundFileNameSize;
+
+			/// Will contain the number to display as the application’s icon badge.
+			/// This value will be set only if the type is MA_NOTIFICATION_PUSH_TYPE_BADGE.
+			/// Platform: iOS only.
+			int badgeIcon;
+		}
+	} // end of Push Notification Struct
+
 	group NotificationFunctions "Notification Functions" {
 		/**
 		* \brief Creates a new local notification object.
@@ -8825,14 +8847,36 @@ group NotificationAPI "Notification API" {
 		int maNotificationPushUnregister();
 
 		/**
-		* \brief The number currently set as the badge of the application icon in Springboard.
+		* \brief Fills pushNotificationData struct with the values for a given push notification.
+		*
+		* \param pushNotificationHandle Handle to a given push notification.
+		* \param pushNotificationData A struct that will contain the values for a given push notification.
+		*
+		* \return One of the next contants:
+		* - MA_NOTIFICATION_RES_OK if no error occurred.
+		* - MA_NOTIFICATION_RES_INVALID_HANDLE if the pushNotificationHandle is invalid.
+		* - MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if at least one of the buffers from
+		* pushNotificationData are too small.
+		*/
+		int maNotificationPushGetData(in MAHandle pushNotificationHandle,
+									  out MAPushNotificationData pushNotificationData);
+
+		/**
+		* \brief Set the number currently set as the badge of the application icon in Springboard.
 		* Platform: iOS only.
 		*
 		*\param applicationIconBadgeNumber Set to zero to hide the badge number. The default is zero.
 		* If this value is negative the syscall will do nothing.
-		*
 		*/
 		void maNotificationSetIconBadge(in int applicationIconBadgeNumber);
+
+		/**
+		* \brief Get the number currently set as the badge of the application icon in Springboard.
+		* Platform: iOS only.
+		*
+		*\return The number displayed as the badge of the application.
+		*/
+		int maNotificationGetIconBadge();
 	}//End of Notification Functions
 } // End of Notification API
 
