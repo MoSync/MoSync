@@ -1,0 +1,3713 @@
+<div class="node">
+<a name="Top"></a>
+<p><hr>
+Up:&nbsp;<a rel="up" accesskey="u" href="#dir">(dir)</a>
+
+</div>
+
+<h2 class="unnumbered">Top</h2>
+
+<html lang="en">
+<head>
+<title>Untitled</title>
+<meta http-equiv="Content-Type" content="text/html">
+<meta name="description" content="Untitled">
+<meta name="generator" content="makeinfo 4.13">
+<link title="Top" rel="top" href="#Top">
+<link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
+<meta http-equiv="Content-Style-Type" content="text/css">
+<style type="text/css"><!--
+  pre.display { font-family:inherit }
+  pre.format  { font-family:inherit }
+  pre.smalldisplay { font-family:inherit; font-size:smaller }
+  pre.smallformat  { font-family:inherit; font-size:smaller }
+  pre.smallexample { font-size:smaller }
+  pre.smalllisp    { font-size:smaller }
+  span.sc    { font-variant:small-caps }
+  span.roman { font-family:serif; font-weight:normal; }
+  span.sansserif { font-family:sans-serif; font-weight:normal; }
+--></style>
+</head>
+<body>
+<ul class="menu">
+<li><a accesskey="1" href="#Math">Math</a>:            The mathematical functions (`math.h').
+<li><a accesskey="2" href="#Complex">Complex</a>:         The mathematical complex functions (`complex.h').
+<li><a accesskey="3" href="#Reentrancy">Reentrancy</a>:      The functions in libm are not reentrant by default.
+<li><a accesskey="4" href="#Long-Double-Functions">Long Double Functions</a>:  The long double function support of libm.
+<li><a accesskey="5" href="#Index">Index</a>
+</ul>
+
+<div class="node">
+<a name="Math"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Complex">Complex</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Top">Top</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">1 Mathematical Functions (<samp><span class="file">math.h</span></samp>)</h2>
+
+<p>This chapter groups a wide variety of mathematical functions.  The
+corresponding definitions and declarations are in <samp><span class="file">math.h</span></samp>.
+Two definitions from <samp><span class="file">math.h</span></samp> are of particular interest.
+
+     <ol type=1 start=1>
+<li>The representation of infinity as a <code>double</code> is defined as
+<code>HUGE_VAL</code>; this number is returned on overflow by many functions.
+The macro <code>HUGE_VALF</code> is a corresponding value for <code>float</code>.
+
+     <li>The structure <code>exception</code> is used when you write customized error
+handlers for the mathematical functions.  You can customize error
+handling for most of these functions by defining your own version of
+<code>matherr</code>; see the section on <code>matherr</code> for details.
+        </ol>
+
+   <p><a name="index-system-calls-1"></a><a name="index-support-subroutines-2"></a><a name="index-stubs-3"></a><a name="index-OS-stubs-4"></a>Since the error handling code calls <code>fputs</code>, the mathematical
+subroutines require stubs or minimal implementations for the same list
+of OS subroutines as <code>fputs</code>: <code>close</code>, <code>fstat</code>,
+<code>isatty</code>, <code>lseek</code>, <code>read</code>, <code>sbrk</code>, <code>write</code>.
+See <a href="libc.html#syscalls">System Calls</a>,
+for a discussion and for sample minimal implementations of these support
+subroutines.
+
+   <p>Alternative declarations of the mathematical functions, which exploit
+specific machine capabilities to operate faster&mdash;but generally have
+less error checking and may reflect additional limitations on some
+machines&mdash;are available when you include <samp><span class="file">fastmath.h</span></samp> instead of
+<samp><span class="file">math.h</span></samp>.
+
+<ul class="menu">
+<li><a accesskey="1" href="#version">version</a>: 	Version of library
+<li><a accesskey="2" href="#acos">acos</a>: 	Arccosine
+<li><a accesskey="3" href="#acosh">acosh</a>: 	Inverse hyperbolic cosine
+<li><a accesskey="4" href="#asin">asin</a>: 	Arcsine
+<li><a accesskey="5" href="#asinh">asinh</a>: 	Inverse hyperbolic sine
+<li><a accesskey="6" href="#atan">atan</a>: 	Arctangent
+<li><a accesskey="7" href="#atan2">atan2</a>: 	Arctangent of y/x
+<li><a accesskey="8" href="#atanh">atanh</a>: 	Inverse hyperbolic tangent
+<li><a accesskey="9" href="#jN">jN</a>: 	        Bessel functions (jN, yN)
+<li><a href="#cbrt">cbrt</a>: 	Cube root
+<li><a href="#copysign">copysign</a>: 	Sign of Y, magnitude of X
+<li><a href="#cosh">cosh</a>: 	Hyperbolic cosine
+<li><a href="#erf">erf</a>: 		Error function (erf, erfc)
+<li><a href="#exp">exp</a>: 		Exponential, base e
+<li><a href="#exp2">exp2</a>: 	Exponential, base 2
+<li><a href="#expm1">expm1</a>: 	Exponential, base e, of x - 1
+<li><a href="#fabs">fabs</a>: 	Absolute value (magnitude)
+<li><a href="#fdim">fdim</a>: 	Positive difference
+<li><a href="#floor">floor</a>: 	Floor and ceiling (floor, ceil)
+<li><a href="#fma">fma</a>: 		Floating multiply add
+<li><a href="#fmax">fmax</a>: 	Maximum
+<li><a href="#fmin">fmin</a>: 	Minimum
+<li><a href="#fmod">fmod</a>: 	Floating-point remainder (modulo)
+<li><a href="#fpclassify">fpclassify</a>: 	Floating-point classification macro
+<li><a href="#frexp">frexp</a>: 	Split floating-point number
+<li><a href="#gamma">gamma</a>: 	Logarithmic gamma function
+<li><a href="#hypot">hypot</a>: 	Distance from origin
+<li><a href="#ilogb">ilogb</a>: 	Get exponent
+<li><a href="#infinity">infinity</a>: 	Floating infinity
+<li><a href="#isgreater">isgreater</a>: 	Comparison macros
+<li><a href="#ldexp">ldexp</a>: 	Scale by a power of 2
+<li><a href="#log">log</a>: 		Natural logarithms
+<li><a href="#log10">log10</a>: 	Base 10 logarithms
+<li><a href="#log1p">log1p</a>: 	Log of 1 + X
+<li><a href="#log2">log2</a>: 	Base 2 logarithms
+<li><a href="#logb">logb</a>: 	Get exponent
+<li><a href="#lrint">lrint</a>: 	Round to integer
+<li><a href="#lround">lround</a>: 	Round to integer, away from zero (lround, llround)
+<li><a href="#matherr">matherr</a>: 	Modifiable math error handler
+<li><a href="#modf">modf</a>: 	Split fractional and integer parts
+<li><a href="#nan">nan</a>: 		Floating Not a Number
+<li><a href="#nearbyint">nearbyint</a>: 	Round to integer
+<li><a href="#nextafter">nextafter</a>: 	Get next representable number
+<li><a href="#pow">pow</a>: 		X to the power Y
+<li><a href="#remainder">remainder</a>: 	remainder of X divided by Y
+<li><a href="#remquo">remquo</a>: 	Remainder and part of quotient
+<li><a href="#rint">rint</a>: 	Round to integer
+<li><a href="#round">round</a>: 	Round to integer, away from zero
+<li><a href="#scalbn">scalbn</a>: 	Scale by a power of FLT_RADIX (2)
+<li><a href="#signbit">signbit</a>: 	Does floating-point number have negative sign?
+<li><a href="#sin">sin</a>: 		Sine or cosine (sin, cos)
+<li><a href="#sinh">sinh</a>: 	Hyperbolic sine
+<li><a href="#sqrt">sqrt</a>: 	Positive square root
+<li><a href="#tan">tan</a>: 		Tangent
+<li><a href="#tanh">tanh</a>: 	Hyperbolic tangent
+<li><a href="#trunc">trunc</a>: 	Round to integer, towards zero
+</ul>
+
+<div class="node">
+<a name="version"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#acos">acos</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.1 Error Handling</h3>
+
+<p>There are four different versions of the math library routines: IEEE,
+POSIX, X/Open, or SVID.  The version may be selected at runtime by
+setting the global variable <code>_LIB_VERSION</code>, defined in
+<samp><span class="file">math.h</span></samp>.  It may be set to one of the following constants defined
+in <samp><span class="file">math.h</span></samp>: <code>_IEEE_</code>, <code>_POSIX_</code>, <code>_XOPEN_</code>, or
+<code>_SVID_</code>.  The <code>_LIB_VERSION</code> variable is not specific to any
+thread, and changing it will affect all threads.
+
+   <p>The versions of the library differ only in how errors are handled.
+
+   <p>In IEEE mode, the <code>matherr</code> function is never called, no warning
+messages are printed, and <code>errno</code> is never set.
+
+   <p>In POSIX mode, <code>errno</code> is set correctly, but the <code>matherr</code>
+function is never called and no warning messages are printed.
+
+   <p>In X/Open mode, <code>errno</code> is set correctly, and <code>matherr</code> is
+called, but warning message are not printed.
+
+   <p>In SVID mode, functions which overflow return 3.40282346638528860e+38,
+the maximum single-precision floating-point value, rather than infinity.
+Also, <code>errno</code> is set correctly, <code>matherr</code> is called, and, if
+<code>matherr</code> returns 0, warning messages are printed for some errors.
+For example, by default &lsquo;<samp><span class="samp">log(-1.0)</span></samp>&rsquo; writes this message on standard
+error output:
+
+<pre class="example">     log: DOMAIN error
+</pre>
+   <p>The library is set to X/Open mode by default.
+
+   <p>The aforementioned error reporting is the supported Newlib libm error
+handling method.  However, the majority of the functions are written
+so as to produce the floating-point exceptions (e.g. "invalid",
+"divide-by-zero") as required by the C and POSIX standards, for
+floating-point implementations that support them.  Newlib does not provide
+the floating-point exception access routines defined in the standards
+for fenv.h, though, which is why they are considered unsupported.  It is
+mentioned in case you have separately-provided access routines so that
+you are aware that they can be caused.
+
+<h3 class="section">1.2 Standards Compliance And Portability</h3>
+
+<p>Most of the individual function descriptions describe the standards to which
+each function complies.  However, these descriptions are mostly out of date,
+having been written before C99 was released.  One of these days we'll get
+around to updating the rest of them.  (If you'd like to help, please let us
+know.)
+
+   <p>&ldquo;C99&rdquo; refers to ISO/IEC 9899:1999, &ldquo;Programming languages&ndash;C&rdquo;.
+&ldquo;POSIX&rdquo; refers to IEEE Standard 1003.1.  POSIX&reg; is a
+registered trademark of The IEEE.
+
+<!-- To sort the include list easily, keep the indentation right because want to -->
+<!-- skip the s_|w_ at the start of most-but not all-of the file names. -->
+<!-- (e.g., isgreater.def does not have a leading s nor w.)  Then, sort -->
+<!-- based on the column.  For example:  "sort -t@ -k3.17" -->
+<!-- A few hand-edits might be appropriate after a sort, although not necessary -->
+<!-- and are a nuisance as ought to be kept in sync with menu list above: -->
+<!-- atan2 after atan, exp2 after exp, log first in log list, and w_j0 to place -->
+<!-- to reflect function name of Bessel (as opposed to j; e.g. after atanh, -->
+<!-- before cbrt). -->
+<div class="node">
+<a name="acos"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#acosh">acosh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#version">version</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.3 <code>acos</code>, <code>acosf</code>&mdash;arc cosine</h3>
+
+<p><a name="index-acos-5"></a><a name="index-acosf-6"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double acos(double <var>x</var>);
+     float acosf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+
+   <p><code>acos</code> computes the inverse cosine (arc cosine) of the input value.
+Arguments to <code>acos</code> must be in the range &minus;1 to 1.
+
+   <p><code>acosf</code> is identical to <code>acos</code>, except that it performs
+its calculations on <code>floats</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>acos</code> and <code>acosf</code> return values in radians, in the range of 0 to pi.
+
+   <p>If <var>x</var> is not between &minus;1 and 1, the returned value is NaN
+(not a number) the global variable <code>errno</code> is set to <code>EDOM</code>, and a
+<code>DOMAIN error</code> message is sent as standard error output.
+
+   <p>You can modify error handling for these functions using <code>matherr</code>.
+
+   <p><br>
+
+<div class="node">
+<a name="acosh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#asin">asin</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#acos">acos</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.4 <code>acosh</code>, <code>acoshf</code>&mdash;inverse hyperbolic cosine</h3>
+
+<p><a name="index-acosh-7"></a><a name="index-acoshf-8"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double acosh(double <var>x</var>);
+     float acoshf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>acosh</code> calculates the inverse hyperbolic cosine of <var>x</var>.
+<code>acosh</code> is defined as
+<pre class="smallexample">      log(<var>x</var> + sqrt(<var>x</var>*<var>x</var>-1))
+</pre>
+   <p><var>x</var> must be a number greater than or equal to 1.
+
+   <p><code>acoshf</code> is identical, other than taking and returning floats.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>acosh</code> and <code>acoshf</code> return the calculated value.  If <var>x</var>
+less than 1, the return value is NaN and <code>errno</code> is set to <code>EDOM</code>.
+
+   <p>You can change the error-handling behavior with the non-ANSI
+<code>matherr</code> function.
+
+   <p><br>
+<strong>Portability</strong><br>
+Neither <code>acosh</code> nor <code>acoshf</code> are ANSI C.  They are not recommended
+for portable programs.
+
+   <p><br>
+
+<div class="node">
+<a name="asin"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#asinh">asinh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#acosh">acosh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.5 <code>asin</code>, <code>asinf</code>&mdash;arc sine</h3>
+
+<p><a name="index-asin-9"></a><a name="index-asinf-10"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double asin(double <var>x</var>);
+     float asinf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+
+   <p><code>asin</code> computes the inverse sine (arc sine) of the argument <var>x</var>.
+Arguments to <code>asin</code> must be in the range &minus;1 to 1.
+
+   <p><code>asinf</code> is identical to <code>asin</code>, other than taking and
+returning floats.
+
+   <p>You can modify error handling for these routines using <code>matherr</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>asin</code> returns values in radians, in the range of -pi/2 to pi/2.
+
+   <p>If <var>x</var> is not in the range &minus;1 to 1, <code>asin</code> and <code>asinf</code>
+return NaN (not a number), set the global variable <code>errno</code> to
+<code>EDOM</code>, and issue a <code>DOMAIN error</code> message.
+
+   <p>You can change this error treatment using <code>matherr</code>.
+
+   <p><br>
+
+<div class="node">
+<a name="asinh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#atan">atan</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#asin">asin</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.6 <code>asinh</code>, <code>asinhf</code>&mdash;inverse hyperbolic sine</h3>
+
+<p><a name="index-asinh-11"></a><a name="index-asinhf-12"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double asinh(double <var>x</var>);
+     float asinhf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>asinh</code> calculates the inverse hyperbolic sine of <var>x</var>.
+<code>asinh</code> is defined as
+<pre class="smallexample">      sgn(<var>x</var>) * log(abs(<var>x</var>) + sqrt(1+<var>x</var>*<var>x</var>))
+</pre>
+   <p><code>asinhf</code> is identical, other than taking and returning floats.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>asinh</code> and <code>asinhf</code> return the calculated value.
+
+   <p><br>
+<strong>Portability</strong><br>
+Neither <code>asinh</code> nor <code>asinhf</code> are ANSI C.
+
+   <p><br>
+
+<div class="node">
+<a name="atan"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#atan2">atan2</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#asinh">asinh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.7 <code>atan</code>, <code>atanf</code>&mdash;arc tangent</h3>
+
+<p><a name="index-atan-13"></a><a name="index-atanf-14"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double atan(double <var>x</var>);
+     float atanf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+
+   <p><code>atan</code> computes the inverse tangent (arc tangent) of the input value.
+
+   <p><code>atanf</code> is identical to <code>atan</code>, save that it operates on <code>floats</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>atan</code> returns a value in radians, in the range of -pi/2 to pi/2.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>atan</code> is ANSI C.  <code>atanf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="atan2"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#atanh">atanh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#atan">atan</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.8 <code>atan2</code>, <code>atan2f</code>&mdash;arc tangent of y/x</h3>
+
+<p><a name="index-atan2-15"></a><a name="index-atan2f-16"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double atan2(double <var>y</var>,double <var>x</var>);
+     float atan2f(float <var>y</var>,float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+
+   <p><code>atan2</code> computes the inverse tangent (arc tangent) of <var>y</var>/<var>x</var>.
+<code>atan2</code> produces the correct result even for angles near
+pi/2 or -pi/2
+(that is, when <var>x</var> is near 0).
+
+   <p><code>atan2f</code> is identical to <code>atan2</code>, save that it takes and returns
+<code>float</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>atan2</code> and <code>atan2f</code> return a value in radians, in the range of
+-pi to pi.
+
+   <p>You can modify error handling for these functions using <code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>atan2</code> is ANSI C.  <code>atan2f</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="atanh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#jN">jN</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#atan2">atan2</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.9 <code>atanh</code>, <code>atanhf</code>&mdash;inverse hyperbolic tangent</h3>
+
+<p><a name="index-atanh-17"></a><a name="index-atanhf-18"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double atanh(double <var>x</var>);
+     float atanhf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>atanh</code> calculates the inverse hyperbolic tangent of <var>x</var>.
+
+   <p><code>atanhf</code> is identical, other than taking and returning
+<code>float</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>atanh</code> and <code>atanhf</code> return the calculated value.
+
+   <p>If
+<pre class="smallexample">     <var>x</var>|
+</pre>
+   <p>is greater than 1, the global <code>errno</code> is set to <code>EDOM</code> and
+the result is a NaN.  A <code>DOMAIN error</code> is reported.
+
+   <p>If
+<pre class="smallexample">     <var>x</var>|
+</pre>
+   <p>is 1, the global <code>errno</code> is set to <code>EDOM</code>; and the result is
+infinity with the same sign as <code>x</code>.  A <code>SING error</code> is reported.
+
+   <p>You can modify the error handling for these routines using
+<code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+Neither <code>atanh</code> nor <code>atanhf</code> are ANSI C.
+
+   <p><br>
+
+<div class="node">
+<a name="jN"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cbrt">cbrt</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#atanh">atanh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.10 <code>jN</code>, <code>jNf</code>, <code>yN</code>, <code>yNf</code>&mdash;Bessel functions</h3>
+
+<p><a name="index-j0-19"></a><a name="index-j0f-20"></a><a name="index-j1-21"></a><a name="index-j1f-22"></a><a name="index-jn-23"></a><a name="index-jnf-24"></a><a name="index-y0-25"></a><a name="index-y0f-26"></a><a name="index-y1-27"></a><a name="index-y1f-28"></a><a name="index-yn-29"></a><a name="index-ynf-30"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double j0(double <var>x</var>);
+     float j0f(float <var>x</var>);
+     double j1(double <var>x</var>);
+     float j1f(float <var>x</var>);
+     double jn(int <var>n</var>, double <var>x</var>);
+     float jnf(int <var>n</var>, float <var>x</var>);
+     double y0(double <var>x</var>);
+     float y0f(float <var>x</var>);
+     double y1(double <var>x</var>);
+     float y1f(float <var>x</var>);
+     double yn(int <var>n</var>, double <var>x</var>);
+     float ynf(int <var>n</var>, float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The Bessel functions are a family of functions that solve the
+differential equation
+<pre class="smallexample">       2               2    2
+      x  y'' + xy' + (x  - p )y  = 0
+</pre>
+   <p>These functions have many applications in engineering and physics.
+
+   <p><code>jn</code> calculates the Bessel function of the first kind of order
+<var>n</var>.  <code>j0</code> and <code>j1</code> are special cases for order 0 and order
+1 respectively.
+
+   <p>Similarly, <code>yn</code> calculates the Bessel function of the second kind of
+order <var>n</var>, and <code>y0</code> and <code>y1</code> are special cases for order 0 and
+1.
+
+   <p><code>jnf</code>, <code>j0f</code>, <code>j1f</code>, <code>ynf</code>, <code>y0f</code>, and <code>y1f</code> perform the
+same calculations, but on <code>float</code> rather than <code>double</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+The value of each Bessel function at <var>x</var> is returned.
+
+   <p><br>
+<strong>Portability</strong><br>
+None of the Bessel functions are in ANSI C.
+
+   <p><br>
+
+<div class="node">
+<a name="cbrt"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#copysign">copysign</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#jN">jN</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.11 <code>cbrt</code>, <code>cbrtf</code>&mdash;cube root</h3>
+
+<p><a name="index-cbrt-31"></a><a name="index-cbrtf-32"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double cbrt(double <var>x</var>);
+     float  cbrtf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>cbrt</code> computes the cube root of the argument.
+
+   <p><br>
+<strong>Returns</strong><br>
+The cube root is returned.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>cbrt</code> is in System V release 4.  <code>cbrtf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="copysign"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cosh">cosh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cbrt">cbrt</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.12 <code>copysign</code>, <code>copysignf</code>&mdash;sign of <var>y</var>, magnitude of <var>x</var></h3>
+
+<p><a name="index-copysign-33"></a><a name="index-copysignf-34"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double copysign (double <var>x</var>, double <var>y</var>);
+     float copysignf (float <var>x</var>, float <var>y</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>copysign</code> constructs a number with the magnitude (absolute value)
+of its first argument, <var>x</var>, and the sign of its second argument,
+<var>y</var>.
+
+   <p><code>copysignf</code> does the same thing; the two functions differ only in
+the type of their arguments and result.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>copysign</code> returns a <code>double</code> with the magnitude of
+<var>x</var> and the sign of <var>y</var>.
+<code>copysignf</code> returns a <code>float</code> with the magnitude of
+<var>x</var> and the sign of <var>y</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>copysign</code> is not required by either ANSI C or the System V Interface
+Definition (Issue 2).
+
+   <p><br>
+
+<div class="node">
+<a name="cosh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#erf">erf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#copysign">copysign</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.13 <code>cosh</code>, <code>coshf</code>&mdash;hyperbolic cosine</h3>
+
+<p><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double cosh(double <var>x</var>);
+     float coshf(float <var>x</var>)
+
+</pre>
+   <p><strong>Description</strong><br>
+
+   <p><code>cosh</code> computes the hyperbolic cosine of the argument <var>x</var>.
+<code>cosh(</code><var>x</var><code>)</code> is defined as
+<pre class="smallexample">      (exp(x) + exp(-x))/2
+</pre>
+   <p>Angles are specified in radians.
+<code>coshf</code> is identical, save that it takes and returns <code>float</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The computed value is returned.  When the correct value would create
+an overflow,  <code>cosh</code> returns the value <code>HUGE_VAL</code> with the
+appropriate sign, and the global value <code>errno</code> is set to <code>ERANGE</code>.
+
+   <p>You can modify error handling for these functions using the
+function <code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>cosh</code> is ANSI.
+<code>coshf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="erf"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#exp">exp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cosh">cosh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.14 <code>erf</code>, <code>erff</code>, <code>erfc</code>, <code>erfcf</code>&mdash;error function</h3>
+
+<p><a name="index-erf-35"></a><a name="index-erff-36"></a><a name="index-erfc-37"></a><a name="index-erfcf-38"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double erf(double <var>x</var>);
+     float erff(float <var>x</var>);
+     double erfc(double <var>x</var>);
+     float erfcf(float <var>x</var>);
+</pre>
+   <p><strong>Description</strong><br>
+<code>erf</code> calculates an approximation to the &ldquo;error function&rdquo;,
+which estimates the probability that an observation will fall within
+<var>x</var> standard deviations of the mean (assuming a normal
+distribution).
+
+   <p><code>erfc</code> calculates the complementary probability; that is,
+<code>erfc(</code><var>x</var><code>)</code> is <code>1 - erf(</code><var>x</var><code>)</code>.  <code>erfc</code> is computed directly,
+so that you can use it to avoid the loss of precision that would
+result from subtracting large probabilities (on large <var>x</var>) from 1.
+
+   <p><code>erff</code> and <code>erfcf</code> differ from <code>erf</code> and <code>erfc</code> only in the
+argument and result types.
+
+   <p><br>
+<strong>Returns</strong><br>
+For positive arguments, <code>erf</code> and all its variants return a
+probability&mdash;a number between 0 and 1.
+
+   <p><br>
+<strong>Portability</strong><br>
+None of the variants of <code>erf</code> are ANSI C.
+
+   <p><br>
+
+<div class="node">
+<a name="exp"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#exp2">exp2</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#erf">erf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.15 <code>exp</code>, <code>expf</code>&mdash;exponential</h3>
+
+<p><a name="index-exp-39"></a><a name="index-expf-40"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double exp(double <var>x</var>);
+     float expf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>exp</code> and <code>expf</code> calculate the exponential of <var>x</var>, that is,
+e raised to the power <var>x</var> (where e
+is the base of the natural system of logarithms, approximately 2.71828).
+
+   <p>You can use the (non-ANSI) function <code>matherr</code> to specify
+error handling for these functions.
+
+   <p><br>
+<strong>Returns</strong><br>
+On success, <code>exp</code> and <code>expf</code> return the calculated value.
+If the result underflows, the returned value is <code>0</code>.  If the
+result overflows, the returned value is <code>HUGE_VAL</code>.  In
+either case, <code>errno</code> is set to <code>ERANGE</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>exp</code> is ANSI C.  <code>expf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="exp2"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#expm1">expm1</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#exp">exp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.16 <code>exp2</code>, <code>exp2f</code>&ndash;exponential, base 2</h3>
+
+<p><a name="index-exp2-41"></a><a name="index-exp2f-42"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double exp2(double <var>x</var>);
+     float exp2f(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>exp2</code> and <code>exp2f</code> calculate 2 ^ <var>x</var>, that is,
+2 raised to the power <var>x</var>.
+
+   <p>You can use the (non-ANSI) function <code>matherr</code> to specify
+error handling for these functions.
+
+   <p><br>
+<strong>Returns</strong><br>
+On success, <code>exp2</code> and <code>exp2f</code> return the calculated value.
+If the result underflows, the returned value is <code>0</code>.  If the
+result overflows, the returned value is <code>HUGE_VAL</code>.  In
+either case, <code>errno</code> is set to <code>ERANGE</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX.
+
+   <p><br>
+
+<div class="node">
+<a name="expm1"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#fabs">fabs</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#exp2">exp2</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.17 <code>expm1</code>, <code>expm1f</code>&mdash;exponential minus 1</h3>
+
+<p><a name="index-expm1-43"></a><a name="index-expm1f-44"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double expm1(double <var>x</var>);
+     float expm1f(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>expm1</code> and <code>expm1f</code> calculate the exponential of <var>x</var>
+and subtract 1, that is,
+e raised to the power <var>x</var> minus 1 (where e
+is the base of the natural system of logarithms, approximately
+2.71828).  The result is accurate even for small values of
+<var>x</var>, where using <code>exp(</code><var>x</var><code>)-1</code> would lose many
+significant digits.
+
+   <p><br>
+<strong>Returns</strong><br>
+e raised to the power <var>x</var>, minus 1.
+
+   <p><br>
+<strong>Portability</strong><br>
+Neither <code>expm1</code> nor <code>expm1f</code> is required by ANSI C or by
+the System V Interface Definition (Issue 2).
+
+   <p><br>
+
+<div class="node">
+<a name="fabs"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#fdim">fdim</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#expm1">expm1</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.18 <code>fabs</code>, <code>fabsf</code>&mdash;absolute value (magnitude)</h3>
+
+<p><a name="index-fabs-45"></a><a name="index-fabsf-46"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double fabs(double <var>x</var>);
+     float fabsf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>fabs</code> and <code>fabsf</code> calculate
+the absolute value (magnitude) of the argument <var>x</var>, by direct
+manipulation of the bit representation of <var>x</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The calculated value is returned.  No errors are detected.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>fabs</code> is ANSI.
+<code>fabsf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="fdim"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#floor">floor</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#fabs">fabs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.19 <code>fdim</code>, <code>fdimf</code>&ndash;positive difference</h3>
+
+<p><a name="index-fdim-47"></a><a name="index-fdimf-48"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double fdim(double <var>x</var>, double <var>y</var>);
+     float fdimf(float <var>x</var>, float <var>y</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>fdim</code> functions determine the positive difference between their
+arguments, returning:
+<pre class="smallexample">     	<var>x</var> - <var>y</var>	if <var>x</var> &gt; <var>y</var>, or
+</pre>
+   <pre class="smallexample">     	+0	if <var>x</var> &lt;= <var>y</var>, or
+</pre>
+   <pre class="smallexample">     	NAN	if either argument is NAN.
+</pre>
+   <p>A range error may occur.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>fdim</code> functions return the positive difference value.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX.
+
+   <p><br>
+
+<div class="node">
+<a name="floor"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#fma">fma</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#fdim">fdim</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.20 <code>floor</code>, <code>floorf</code>, <code>ceil</code>, <code>ceilf</code>&mdash;floor and ceiling</h3>
+
+<p><a name="index-floor-49"></a><a name="index-floorf-50"></a><a name="index-ceil-51"></a><a name="index-ceilf-52"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double floor(double <var>x</var>);
+     float floorf(float <var>x</var>);
+     double ceil(double <var>x</var>);
+     float ceilf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>floor</code> and <code>floorf</code> find
+the nearest integer less than or equal to <var>x</var>.
+<code>ceil</code> and <code>ceilf</code> find
+the nearest integer greater than or equal to <var>x</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>floor</code> and <code>ceil</code> return the integer result as a double.
+<code>floorf</code> and <code>ceilf</code> return the integer result as a float.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>floor</code> and <code>ceil</code> are ANSI.
+<code>floorf</code> and <code>ceilf</code> are extensions.
+
+   <p><br>
+
+<div class="node">
+<a name="fma"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#fmax">fmax</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#floor">floor</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.21 <code>fma</code>, <code>fmaf</code>&ndash;floating multiply add</h3>
+
+<p><a name="index-fma-53"></a><a name="index-fmaf-54"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double fma(double <var>x</var>, double <var>y</var>, double <var>z</var>);
+     float fmaf(float <var>x</var>, float <var>y</var>, float <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>fma</code> functions compute (<var>x</var> * <var>y</var>) + <var>z</var>, rounded as one ternary
+operation:  they compute the value (as if) to infinite precision and round once
+to the result format, according to the rounding mode characterized by the value
+of FLT_ROUNDS.  That is, they are supposed to do this:  see below.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>fma</code> functions return (<var>x</var> * <var>y</var>) + <var>z</var>, rounded as one ternary
+operation.
+
+   <p><br>
+<strong>Bugs</strong><br>
+This implementation does not provide the function that it should, purely
+returning "(<var>x</var> * <var>y</var>) + <var>z</var>;" with no attempt at all to provide the
+simulated infinite precision intermediates which are required.  DO NOT USE THEM.
+
+   <p>If double has enough more precision than float, then <code>fmaf</code> should provide
+the expected numeric results, as it does use double for the calculation.  But
+since this is not the case for all platforms, this manual cannot determine
+if it is so for your case.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX.
+
+   <p><br>
+
+<div class="node">
+<a name="fmax"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#fmin">fmin</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#fma">fma</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.22 <code>fmax</code>, <code>fmaxf</code>&ndash;maximum</h3>
+
+<p><a name="index-fmax-55"></a><a name="index-fmaxf-56"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double fmax(double <var>x</var>, double <var>y</var>);
+     float fmaxf(float <var>x</var>, float <var>y</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>fmax</code> functions determine the maximum numeric value of their arguments.
+NaN arguments are treated as missing data:  if one argument is a NaN and the
+other numeric, then the <code>fmax</code> functions choose the numeric value.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>fmax</code> functions return the maximum numeric value of their arguments.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX.
+
+   <p><br>
+
+<div class="node">
+<a name="fmin"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#fmod">fmod</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#fmax">fmax</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.23 <code>fmin</code>, <code>fminf</code>&ndash;minimum</h3>
+
+<p><a name="index-fmin-57"></a><a name="index-fminf-58"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double fmin(double <var>x</var>, double <var>y</var>);
+     float fminf(float <var>x</var>, float <var>y</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>fmin</code> functions determine the minimum numeric value of their arguments.
+NaN arguments are treated as missing data:  if one argument is a NaN and the
+other numeric, then the <code>fmin</code> functions choose the numeric value.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>fmin</code> functions return the minimum numeric value of their arguments.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX.
+
+   <p><br>
+
+<div class="node">
+<a name="fmod"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#fpclassify">fpclassify</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#fmin">fmin</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.24 <code>fmod</code>, <code>fmodf</code>&mdash;floating-point remainder (modulo)</h3>
+
+<p><a name="index-fmod-59"></a><a name="index-fmodf-60"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double fmod(double <var>x</var>, double <var>y</var>)
+     float fmodf(float <var>x</var>, float <var>y</var>)
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>fmod</code> and <code>fmodf</code> functions compute the floating-point
+remainder of <var>x</var>/<var>y</var> (<var>x</var> modulo <var>y</var>).
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>fmod</code> function returns the value
+<var>x</var>-<var>i</var>*<var>y</var>,
+for the largest integer <var>i</var> such that, if <var>y</var> is nonzero, the
+result has the same sign as <var>x</var> and magnitude less than the
+magnitude of <var>y</var>.
+
+   <p><code>fmod(</code><var>x</var><code>,0)</code> returns NaN, and sets <code>errno</code> to <code>EDOM</code>.
+
+   <p>You can modify error treatment for these functions using <code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>fmod</code> is ANSI C. <code>fmodf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="frexp"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#gamma">gamma</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#fpclassify">fpclassify</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.25 <code>frexp</code>, <code>frexpf</code>&mdash;split floating-point number</h3>
+
+<p><a name="index-frexp-61"></a><a name="index-frexpf-62"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double frexp(double <var>val</var>, int *<var>exp</var>);
+     float frexpf(float <var>val</var>, int *<var>exp</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+All nonzero, normal numbers can be described as <var>m</var> * 2**<var>p</var>.
+<code>frexp</code> represents the double <var>val</var> as a mantissa <var>m</var>
+and a power of two <var>p</var>. The resulting mantissa will always
+be greater than or equal to <code>0.5</code>, and less than <code>1.0</code> (as
+long as <var>val</var> is nonzero). The power of two will be stored
+in <code>*</code><var>exp</var>.
+
+   <p><var>m</var> and <var>p</var> are calculated so that
+<var>val</var> is <var>m</var> times <code>2</code> to the power <var>p</var>.
+
+   <p><code>frexpf</code> is identical, other than taking and returning
+floats rather than doubles.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>frexp</code> returns the mantissa <var>m</var>. If <var>val</var> is <code>0</code>, infinity,
+or Nan, <code>frexp</code> will set <code>*</code><var>exp</var> to <code>0</code> and return <var>val</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>frexp</code> is ANSI.
+<code>frexpf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="gamma"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#hypot">hypot</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#frexp">frexp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.26 <code>gamma</code>, <code>gammaf</code>, <code>lgamma</code>, <code>lgammaf</code>, <code>gamma_r</code>, <code>gammaf_r</code>, <code>lgamma_r</code>, <code>lgammaf_r</code>, <code>tgamma</code>, and <code>tgammaf</code>&ndash;logarithmic and plain gamma functions</h3>
+
+<p><a name="index-gamma-63"></a><a name="index-gammaf-64"></a><a name="index-lgamma-65"></a><a name="index-lgammaf-66"></a><a name="index-gamma_005fr-67"></a><a name="index-gammaf_005fr-68"></a><a name="index-lgamma_005fr-69"></a><a name="index-lgammaf_005fr-70"></a><a name="index-tgamma-71"></a><a name="index-tgammaf-72"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double gamma(double <var>x</var>);
+     float gammaf(float <var>x</var>);
+     double lgamma(double <var>x</var>);
+     float lgammaf(float <var>x</var>);
+     double gamma_r(double <var>x</var>, int *<var>signgamp</var>);
+     float gammaf_r(float <var>x</var>, int *<var>signgamp</var>);
+     double lgamma_r(double <var>x</var>, int *<var>signgamp</var>);
+     float lgammaf_r(float <var>x</var>, int *<var>signgamp</var>);
+     double tgamma(double <var>x</var>);
+     float tgammaf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>gamma</code> calculates
+the natural logarithm of the gamma function of <var>x</var>.  The gamma function
+(<code>exp(gamma(</code><var>x</var><code>))</code>) is a generalization of factorial, and retains
+the property that
+<code>exp(gamma(N))</code> is equivalent to <code>N*exp(gamma(N-1))</code>.
+Accordingly, the results of the gamma function itself grow very
+quickly.  <code>gamma</code> is defined as
+the natural log of the gamma function, rather than the gamma function
+itself,
+to extend the useful range of results representable.
+
+   <p>The sign of the result is returned in the global variable <code>signgam</code>,
+which is declared in math.h.
+
+   <p><code>gammaf</code> performs the same calculation as <code>gamma</code>, but uses and
+returns <code>float</code> values.
+
+   <p><code>lgamma</code> and <code>lgammaf</code> are alternate names for <code>gamma</code> and
+<code>gammaf</code>.  The use of <code>lgamma</code> instead of <code>gamma</code> is a reminder
+that these functions compute the log of the gamma function, rather
+than the gamma function itself.
+
+   <p>The functions <code>gamma_r</code>, <code>gammaf_r</code>, <code>lgamma_r</code>, and
+<code>lgammaf_r</code> are just like <code>gamma</code>, <code>gammaf</code>, <code>lgamma</code>, and
+<code>lgammaf</code>, respectively, but take an additional argument.  This
+additional argument is a pointer to an integer.  This additional
+argument is used to return the sign of the result, and the global
+variable <code>signgam</code> is not used.  These functions may be used for
+reentrant calls (but they will still set the global variable <code>errno</code>
+if an error occurs).
+
+   <p><code>tgamma</code> and <code>tgammaf</code> are the "true gamma" functions, returning
+the gamma function of <var>x</var>&ndash;without a logarithm.
+(They are apparently so named because of the prior existence of the old,
+poorly-named <code>gamma</code> functions which returned the log of gamma up
+through BSD 4.2.)
+
+   <p><br>
+<strong>Returns</strong><br>
+Normally, the computed result is returned.
+
+   <p>When <var>x</var> is a nonpositive integer, <code>gamma</code> returns <code>HUGE_VAL</code>
+and <code>errno</code> is set to <code>EDOM</code>.  If the result overflows, <code>gamma</code>
+returns <code>HUGE_VAL</code> and <code>errno</code> is set to <code>ERANGE</code>.
+
+   <p>You can modify this error treatment using <code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+Neither <code>gamma</code> nor <code>gammaf</code> is ANSI C.  It is better not to use either
+of these; use <code>lgamma</code> or <code>tgamma</code> instead.<br>
+<code>lgamma</code>, <code>lgammaf</code>, <code>tgamma</code>, and <code>tgammaf</code> are nominally C standard
+in terms of the base return values, although the <code>matherr</code> error-handling
+is not standard, nor is the <var>signgam</var> global for <code>lgamma</code>.
+
+   <p><br>
+
+<div class="node">
+<a name="hypot"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#ilogb">ilogb</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#gamma">gamma</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.27 <code>hypot</code>, <code>hypotf</code>&mdash;distance from origin</h3>
+
+<p><a name="index-hypot-73"></a><a name="index-hypotf-74"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double hypot(double <var>x</var>, double <var>y</var>);
+     float hypotf(float <var>x</var>, float <var>y</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>hypot</code> calculates the Euclidean distance
+<code>sqrt(</code><var>x</var><code>*</code><var>x</var><code> + </code><var>y</var><code>*</code><var>y</var><code>)</code>
+between the origin (0,0) and a point represented by the
+Cartesian coordinates (<var>x</var>,<var>y</var>).  <code>hypotf</code> differs only
+in the type of its arguments and result.
+
+   <p><br>
+<strong>Returns</strong><br>
+Normally, the distance value is returned.  On overflow,
+<code>hypot</code> returns <code>HUGE_VAL</code> and sets <code>errno</code> to
+<code>ERANGE</code>.
+
+   <p>You can change the error treatment with <code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>hypot</code> and <code>hypotf</code> are not ANSI C.
+<br>
+
+<div class="node">
+<a name="ilogb"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#infinity">infinity</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#hypot">hypot</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.28 <code>ilogb</code>, <code>ilogbf</code>&mdash;get exponent of floating-point number</h3>
+
+<p><a name="index-ilogb-75"></a><a name="index-ilogbf-76"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     int ilogb(double <var>val</var>);
+     int ilogbf(float <var>val</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+
+   <p>All nonzero, normal numbers can be described as <var>m</var> *
+2**<var>p</var>.  <code>ilogb</code> and <code>ilogbf</code> examine the argument
+<var>val</var>, and return <var>p</var>.  The functions <code>frexp</code> and
+<code>frexpf</code> are similar to <code>ilogb</code> and <code>ilogbf</code>, but also
+return <var>m</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+
+   <p><code>ilogb</code> and <code>ilogbf</code> return the power of two used to form the
+floating-point argument.
+If <var>val</var> is <code>0</code>, they return <code>FP_ILOGB0</code>.
+If <var>val</var> is infinite, they return <code>INT_MAX</code>.
+If <var>val</var> is NaN, they return <code>FP_ILOGBNAN</code>.
+(<code>FP_ILOGB0</code> and <code>FP_ILOGBNAN</code> are defined in math.h, but in turn are
+defined as INT_MIN or INT_MAX from limits.h.  The value of FP_ILOGB0 may be
+either INT_MIN or -INT_MAX.  The value of FP_ILOGBNAN may be either INT_MAX or
+INT_MIN.)
+
+<!-- The bugs might not be worth noting, given the mass non-C99/POSIX -->
+<!-- behavior of much of the Newlib math library. -->
+<!-- BUGS -->
+<!-- On errors, errno is not set per C99 and POSIX requirements even if -->
+<!-- (math_errhandling & MATH_ERRNO) is non-zero. -->
+   <p><br>
+<strong>Portability</strong><br>
+C99, POSIX
+
+   <p><br>
+
+<div class="node">
+<a name="infinity"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#isgreater">isgreater</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#ilogb">ilogb</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.29 <code>infinity</code>, <code>infinityf</code>&ndash;representation of infinity</h3>
+
+<p><a name="index-infinity-77"></a><a name="index-infinityf-78"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double infinity(void);
+     float infinityf(void);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>infinity</code> and <code>infinityf</code> return the special number IEEE
+infinity in double- and single-precision arithmetic
+respectively.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>infinity</code> and <code>infinityf</code> are neither standard C nor POSIX.  C and
+POSIX require macros HUGE_VAL and HUGE_VALF to be defined in math.h, which
+Newlib defines to be infinities corresponding to these archaic infinity()
+and infinityf() functions in floating-point implementations which do have
+infinities.
+
+   <p><br>
+
+<div class="node">
+<a name="isgreater"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#ldexp">ldexp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#infinity">infinity</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.30 <code>isgreater</code>, <code>isgreaterequal</code>, <code>isless</code>, <code>islessequal</code>, <code>islessgreater</code>, and <code>isunordered</code>&ndash;comparison macros</h3>
+
+<p><a name="index-isgreater-79"></a><a name="index-isgreaterequal-80"></a><a name="index-isless-81"></a><a name="index-islessequal-82"></a><a name="index-islessgreater-83"></a><a name="index-isunordered-84"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     int isgreater(real-floating <var>x</var>, real-floating <var>y</var>);
+     int isgreaterequal(real-floating <var>x</var>, real-floating <var>y</var>);
+     int isless(real-floating <var>x</var>, real-floating <var>y</var>);
+     int islessequal(real-floating <var>x</var>, real-floating <var>y</var>);
+     int islessgreater(real-floating <var>x</var>, real-floating <var>y</var>);
+     int isunordered(real-floating <var>x</var>, real-floating <var>y</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>isgreater</code>, <code>isgreaterequal</code>, <code>isless</code>, <code>islessequal</code>,
+<code>islessgreater</code>, and <code>isunordered</code> are macros defined for use in
+comparing floating-point numbers without raising any floating-point
+exceptions.
+
+   <p>The relational operators (i.e. &lt;, &gt;, &lt;=, and &gt;=) support the usual mathematical
+relationships between numeric values.  For any ordered pair of numeric
+values exactly one of the relationships&ndash;less, greater, and equal&ndash;is
+true.  Relational operators may raise the "invalid" floating-point
+exception when argument values are NaNs.  For a NaN and a numeric value, or
+for two NaNs, just the unordered relationship is true (i.e., if one or both
+of the arguments a NaN, the relationship is called unordered).  The specified
+macros are quiet (non floating-point exception raising) versions of the
+relational operators, and other comparison macros that facilitate writing
+efficient code that accounts for NaNs without suffering the "invalid"
+floating-point exception.  In the synopses shown, "real-floating" indicates
+that the argument is an expression of real floating type.
+
+   <p>Please note that saying that the macros do not raise floating-point
+exceptions, it is referring to the function that they are performing.  It
+is certainly possible to give them an expression which causes an exception.
+For example:
+     <dl>
+<dt><code>NaN &lt; 1.0</code><dd>causes an "invalid" exception,
+<br><dt><code>isless(NaN, 1.0)</code><dd>does not, and
+<br><dt><code>isless(NaN*0., 1.0)</code><dd>causes an exception due to the "NaN*0.", but not from the
+resultant reduced comparison of isless(NaN, 1.0).
+</dl>
+
+   <p><br>
+<strong>Returns</strong><br>
+<!-- Formatting note:  "$@" forces a new line -->
+No floating-point exceptions are raised for any of the macros.<br>
+The <code>isgreater</code> macro returns the value of (x) &gt; (y).<br>
+The <code>isgreaterequal</code> macro returns the value of (x) &gt;= (y).<br>
+The <code>isless</code> macro returns the value of (x) &lt; (y).<br>
+The <code>islessequal</code> macro returns the value of (x) &lt;= (y).<br>
+The <code>islessgreater</code> macro returns the value of (x) &lt; (y) || (x) &gt; (y).<br>
+The <code>isunordered</code> macro returns 1 if either of its arguments is NaN and 0 otherwise.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99, POSIX.
+
+   <p><br>
+
+<div class="node">
+<a name="fpclassify"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#frexp">frexp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#fmod">fmod</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.31 <code>fpclassify</code>, <code>isfinite</code>, <code>isinf</code>, <code>isnan</code>, and <code>isnormal</code>&ndash;floating-point classification macros; <code>finite</code>, <code>finitef</code>, <code>isinf</code>, <code>isinff</code>, <code>isnan</code>, <code>isnanf</code>&ndash;test for exceptional numbers</h3>
+
+<p><a name="index-fpclassify-85"></a><a name="index-isfinite-86"></a><a name="index-isinf-87"></a><a name="index-isnan-88"></a><a name="index-isnormal-89"></a><a name="index-isnan-90"></a><a name="index-isinf-91"></a><a name="index-finite-92"></a><a name="index-isnanf-93"></a><a name="index-isinff-94"></a><a name="index-finitef-95"></a><strong>Synopsis</strong>
+<pre class="example">     [C99 standard macros:]
+     #include &lt;math.h&gt;
+     int fpclassify(real-floating <var>x</var>);
+     int isfinite(real-floating <var>x</var>);
+     int isinf(real-floating <var>x</var>);
+     int isnan(real-floating <var>x</var>);
+     int isnormal(real-floating <var>x</var>);
+
+     [Archaic SUSv2 functions:]
+     #include &lt;ieeefp.h&gt;
+     int isnan(double <var>arg</var>);
+     int isinf(double <var>arg</var>);
+     int finite(double <var>arg</var>);
+     int isnanf(float <var>arg</var>);
+     int isinff(float <var>arg</var>);
+     int finitef(float <var>arg</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>fpclassify</code>, <code>isfinite</code>, <code>isinf</code>, <code>isnan</code>, and <code>isnormal</code> are macros
+defined for use in classifying floating-point numbers.  This is a help because
+of special "values" like NaN and infinities.  In the synopses shown,
+"real-floating" indicates that the argument is an expression of real floating
+type.  These function-like macros are C99 and POSIX-compliant, and should be
+used instead of the now-archaic SUSv2 functions.
+
+   <p>The <code>fpclassify</code> macro classifies its argument value as NaN, infinite, normal,
+subnormal, zero, or into another implementation-defined category.  First, an
+argument represented in a format wider than its semantic type is converted to
+its semantic type.  Then classification is based on the type of the argument.
+The <code>fpclassify</code> macro returns the value of the number classification macro
+appropriate to the value of its argument:
+
+     <dl>
+<dt><code>FP_INFINITE</code><dd><var>x</var> is either plus or minus infinity;
+<br><dt><code>FP_NAN</code><dd><var>x</var> is "Not A Number" (plus or minus);
+<br><dt><code>FP_NORMAL</code><dd><var>x</var> is a "normal" number (i.e. is none of the other special forms);
+<br><dt><code>FP_SUBNORMAL</code><dd><var>x</var> is too small be stored as a regular normalized number (i.e. loss of precision is likely); or
+<br><dt><code>FP_ZERO</code><dd><var>x</var> is 0 (either plus or minus).
+</dl>
+
+   <p>The "<code>is</code>" set of macros provide a useful set of shorthand ways for
+classifying floating-point numbers, providing the following equivalent
+relations:
+
+     <dl>
+<dt><code>isfinite(</code><var>x</var><code>)</code><dd>returns non-zero if <var>x</var> is finite.  (It is equivalent to
+(<code>fpclassify</code>(<var>x</var>) != FP_INFINITE  &amp;&amp;  <code>fpclassify</code>(<var>x</var>) != FP_NAN).)
+
+     <br><dt><code>isinf(</code><var>x</var><code>)</code><dd>returns non-zero if <var>x</var> is infinite.  (It is equivalent to
+(<code>fpclassify</code>(<var>x</var>) == FP_INFINITE).)
+
+     <br><dt><code>isnan(</code><var>x</var><code>)</code><dd>returns non-zero if <var>x</var> is NaN.  (It is equivalent to
+(<code>fpclassify</code>(<var>x</var>) == FP_NAN).)
+
+     <br><dt><code>isnormal(</code><var>x</var><code>)</code><dd>returns non-zero if <var>x</var> is normal.  (It is equivalent to
+(<code>fpclassify</code>(<var>x</var>) == FP_NORMAL).)
+</dl>
+
+   <p>The archaic SUSv2 functions provide information on the floating-point
+argument supplied.
+
+   <p>There are five major number formats ("exponent" referring to the
+biased exponent in the binary-encoded number):
+     <dl>
+<dt><code>zero</code><dd>A number which contains all zero bits, excluding the sign bit.
+<br><dt><code>subnormal</code><dd>A number with a zero exponent but a nonzero fraction.
+<br><dt><code>normal</code><dd>A number with an exponent and a fraction.
+<br><dt><code>infinity</code><dd>A number with an all 1's exponent and a zero fraction.
+<br><dt><code>NAN</code><dd>A number with an all 1's exponent and a nonzero fraction.
+
+   </dl>
+
+   <p><code>isnan</code> returns 1 if the argument is a nan. <code>isinf</code>
+returns 1 if the argument is infinity.  <code>finite</code> returns 1 if the
+argument is zero, subnormal or normal.
+The <code>isnanf</code>, <code>isinff</code> and <code>finitef</code> functions perform the same
+operations as their <code>isnan</code>, <code>isinf</code> and <code>finite</code>
+counterparts, but on single-precision floating-point numbers.
+
+   <p>It should be noted that the C99 standard dictates that <code>isnan</code>
+and <code>isinf</code> are macros that operate on multiple types of
+floating-point.  The SUSv2 standard declares <code>isnan</code> as
+a function taking double.  Newlib has decided to declare
+them both as macros in math.h and as functions in ieeefp.h to
+maintain backward compatibility.
+
+   <p><br>
+<strong>Returns</strong><br>
+<!-- Formatting note:  "$@" forces a new line -->
+The fpclassify macro returns the value corresponding to the appropriate FP_ macro.<br>
+The isfinite macro returns nonzero if <var>x</var> is finite, else 0.<br>
+The isinf macro returns nonzero if <var>x</var> is infinite, else 0.<br>
+The isnan macro returns nonzero if <var>x</var> is an NaN, else 0.<br>
+The isnormal macro returns nonzero if <var>x</var> has a normal value, else 0.
+
+   <p><br>
+<strong>Portability</strong><br>
+math.h macros are C99, POSIX.
+
+   <p>ieeefp.h funtions are outdated and should be avoided.
+
+   <p><br>
+
+<div class="node">
+<a name="ldexp"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#log">log</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#isgreater">isgreater</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.32 <code>ldexp</code>, <code>ldexpf</code>&mdash;load exponent</h3>
+
+<p><a name="index-ldexp-96"></a><a name="index-ldexpf-97"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double ldexp(double <var>val</var>, int <var>exp</var>);
+     float ldexpf(float <var>val</var>, int <var>exp</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>ldexp</code> calculates the value
+<var>val</var> times 2 to the power <var>exp</var>.
+<code>ldexpf</code> is identical, save that it takes and returns <code>float</code>
+rather than <code>double</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>ldexp</code> returns the calculated value.
+
+   <p>Underflow and overflow both set <code>errno</code> to <code>ERANGE</code>.
+On underflow, <code>ldexp</code> and <code>ldexpf</code> return 0.0.
+On overflow, <code>ldexp</code> returns plus or minus <code>HUGE_VAL</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>ldexp</code> is ANSI. <code>ldexpf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="log"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#log10">log10</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#ldexp">ldexp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.33 <code>log</code>, <code>logf</code>&mdash;natural logarithms</h3>
+
+<p><a name="index-log-98"></a><a name="index-logf-99"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double log(double <var>x</var>);
+     float logf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+Return the natural logarithm of <var>x</var>, that is, its logarithm base e
+(where e is the base of the natural system of logarithms, 2.71828<small class="dots">...</small>).
+<code>log</code> and <code>logf</code> are identical save for the return and argument types.
+
+   <p>You can use the (non-ANSI) function <code>matherr</code> to specify error
+handling for these functions.
+
+   <p><br>
+<strong>Returns</strong><br>
+Normally, returns the calculated value.  When <var>x</var> is zero, the
+returned value is <code>-HUGE_VAL</code> and <code>errno</code> is set to <code>ERANGE</code>.
+When <var>x</var> is negative, the returned value is NaN (not a number) and
+<code>errno</code> is set to <code>EDOM</code>.  You can control the error behavior via
+<code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>log</code> is ANSI. <code>logf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="log10"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#log1p">log1p</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#log">log</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.34 <code>log10</code>, <code>log10f</code>&mdash;base 10 logarithms</h3>
+
+<p><a name="index-log10-100"></a><a name="index-log10f-101"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double log10(double <var>x</var>);
+     float log10f(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>log10</code> returns the base 10 logarithm of <var>x</var>.
+It is implemented as <code>log(</code><var>x</var><code>) / log(10)</code>.
+
+   <p><code>log10f</code> is identical, save that it takes and returns <code>float</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>log10</code> and <code>log10f</code> return the calculated value.
+
+   <p>See the description of <code>log</code> for information on errors.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>log10</code> is ANSI C.  <code>log10f</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="log1p"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#log2">log2</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#log10">log10</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.35 <code>log1p</code>, <code>log1pf</code>&mdash;log of <code>1 + </code><var>x</var></h3>
+
+<p><a name="index-log1p-102"></a><a name="index-log1pf-103"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double log1p(double <var>x</var>);
+     float log1pf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>log1p</code> calculates
+the natural logarithm of <code>1+</code><var>x</var>.  You can use <code>log1p</code> rather
+than `<code>log(1+</code><var>x</var><code>)</code>' for greater precision when <var>x</var> is very
+small.
+
+   <p><code>log1pf</code> calculates the same thing, but accepts and returns
+<code>float</code> values rather than <code>double</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>log1p</code> returns a <code>double</code>, the natural log of <code>1+</code><var>x</var>.
+<code>log1pf</code> returns a <code>float</code>, the natural log of <code>1+</code><var>x</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+Neither <code>log1p</code> nor <code>log1pf</code> is required by ANSI C or by the System V
+Interface Definition (Issue 2).
+
+   <p><br>
+
+<div class="node">
+<a name="log2"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#logb">logb</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#log1p">log1p</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.36 <code>log2</code>, <code>log2f</code>&ndash;base 2 logarithm</h3>
+
+<p><a name="index-log2-104"></a><a name="index-log2f-105"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double log2(double <var>x</var>);
+     float log2f(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>log2</code> functions compute the base-2 logarithm of <var>x</var>.  A domain error
+occurs if the argument is less than zero.  A range error occurs if the
+argument is zero.
+
+   <p>The Newlib implementations are not full, intrinisic calculations, but
+rather are derivatives based on <code>log</code>.  (Accuracy might be slightly off from
+a direct calculation.)  In addition to functions, they are also implemented as
+macros defined in math.h:
+<pre class="smallexample">      #define log2(x) (log (x) / _M_LN2)
+      #define log2f(x) (logf (x) / (float) _M_LN2)
+</pre>
+   <p>To use the functions instead, just undefine the macros first.
+
+   <p>You can use the (non-ANSI) function <code>matherr</code> to specify error
+handling for these functions, indirectly through the respective <code>log</code>
+function.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>log2</code> functions return
+<code>log base-2(</code><var>x</var><code>)</code>
+on success.
+When <var>x</var> is zero, the
+returned value is <code>-HUGE_VAL</code> and <code>errno</code> is set to <code>ERANGE</code>.
+When <var>x</var> is negative, the returned value is NaN (not a number) and
+<code>errno</code> is set to <code>EDOM</code>.  You can control the error behavior via
+<code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99, POSIX, System V Interface Definition (Issue 6).
+
+   <p><br>
+
+<div class="node">
+<a name="logb"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#lrint">lrint</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#log2">log2</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.37 <code>logb</code>, <code>logbf</code>&ndash;get exponent of floating-point number</h3>
+
+<p><a name="index-logb-106"></a><a name="index-logbf-107"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double logb(double <var>x</var>);
+     float logbf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>logb</code> functions extract the exponent of <var>x</var>, as a signed integer value
+in floating-point format.  If <var>x</var> is subnormal it is treated as though it were
+normalized; thus, for positive finite <var>x</var>,
+1 &lt;= (<var>x</var> * FLT_RADIX to the power (-logb(<var>x</var>))) &lt; FLT_RADIX.
+A domain error may occur if the argument is zero.
+In this floating-point implementation, FLT_RADIX is 2.  Which also means
+that for finite <var>x</var>, <code>logb</code>(<var>x</var>) = <code>floor</code>(<code>log2</code>(<code>fabs</code>(<var>x</var>))).
+
+   <p>All nonzero, normal numbers can be described as
+<var>m</var> * 2**<var>p</var>, where 1.0 &lt;= <var>m</var> &lt; 2.0.
+The <code>logb</code> functions examine the argument <var>x</var>, and return <var>p</var>.
+The <code>frexp</code> functions are similar to the <code>logb</code> functions, but
+returning <var>m</var> adjusted to the interval [.5, 1) or 0, and <var>p</var>+1.
+
+   <p><br>
+<strong>Returns</strong><br>
+<!-- Formatting note:  "$@" forces a new line -->
+When <var>x</var> is:<br>
++inf or -inf, +inf is returned;<br>
+NaN, NaN is returned;<br>
+0, -inf is returned, and the divide-by-zero exception is raised;<br>
+otherwise, the <code>logb</code> functions return the signed exponent of <var>x</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX
+
+   <p><br>
+<strong>See Also</strong><br>
+frexp, ilogb
+
+   <p><br>
+
+<div class="node">
+<a name="lrint"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#lround">lround</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#logb">logb</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.38 <code>lrint</code>, <code>lrintf</code>, <code>llrint</code>, <code>llrintf</code>&ndash;round to integer</h3>
+
+<p><a name="index-lrint-108"></a><a name="index-lrintf-109"></a><a name="index-llrint-110"></a><a name="index-llrintf-111"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     long int lrint(double <var>x</var>);
+     long int lrintf(float <var>x</var>);
+     long long int llrint(double <var>x</var>);
+     long long int llrintf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>lrint</code> and <code>llrint</code> functions round their argument to the nearest
+integer value, using the current rounding direction.  If the rounded value is
+outside the range of the return type, the numeric result is unspecified.  A
+range error may occur if the magnitude of <var>x</var> is too large.
+The "inexact" floating-point exception is raised in implementations that
+support it when the result differs in value from the argument (i.e., when
+a fraction actually has been truncated).
+
+   <p><br>
+<strong>Returns</strong><br>
+<var>x</var> rounded to an integral value, using the current rounding direction.
+
+   <p><br>
+<strong>See Also</strong><br>
+<code>lround</code>
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX
+
+   <p><br>
+
+<div class="node">
+<a name="lround"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#matherr">matherr</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#lrint">lrint</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.39 <code>lround</code>, <code>lroundf</code>, <code>llround</code>, <code>llroundf</code>&ndash;round to integer, to nearest</h3>
+
+<p><a name="index-lround-112"></a><a name="index-lroundf-113"></a><a name="index-llround-114"></a><a name="index-llroundf-115"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     long int lround(double <var>x</var>);
+     long int lroundf(float <var>x</var>);
+     long long int llround(double <var>x</var>);
+     long long int llroundf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>lround</code> and <code>llround</code> functions round their argument to the
+nearest integer value, rounding halfway cases away from zero, regardless
+of the current rounding direction.  If the rounded value is outside the
+range of the return type, the numeric result is unspecified (depending
+upon the floating-point implementation, not the library).  A range
+error may occur if the magnitude of x is too large.
+
+   <p><br>
+<strong>Returns</strong><br>
+<var>x</var> rounded to an integral value as an integer.
+
+   <p><br>
+<strong>See Also</strong><br>
+See the <code>round</code> functions for the return being the same floating-point type
+as the argument.  <code>lrint</code>, <code>llrint</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX
+
+   <p><br>
+
+<div class="node">
+<a name="matherr"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#modf">modf</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#lround">lround</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.40 <code>matherr</code>&mdash;modifiable math error handler</h3>
+
+<p><a name="index-matherr-116"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     int matherr(struct exception *<var>e</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>matherr</code> is called whenever a math library function generates an error.
+You can replace <code>matherr</code> by your own subroutine to customize
+error treatment.  The customized <code>matherr</code> must return 0 if
+it fails to resolve the error, and non-zero if the error is resolved.
+
+   <p>When <code>matherr</code> returns a nonzero value, no error message is printed
+and the value of <code>errno</code> is not modified.  You can accomplish either
+or both of these things in your own <code>matherr</code> using the information
+passed in the structure <code>*</code><var>e</var>.
+
+   <p>This is the <code>exception</code> structure (defined in `<code>math.h</code>'):
+<pre class="smallexample">     	struct exception {
+     	        int type;
+     	        char *name;
+     	        double arg1, arg2, retval;
+     		int err;
+     	};
+</pre>
+   <p>The members of the exception structure have the following meanings:
+     <dl>
+<dt><code>type</code><dd>The type of mathematical error that occured; macros encoding error
+types are also defined in `<code>math.h</code>'.
+
+     <br><dt><code>name</code><dd>a pointer to a null-terminated string holding the
+name of the math library function where the error occurred.
+
+     <br><dt><code>arg1, arg2</code><dd>The arguments which caused the error.
+
+     <br><dt><code>retval</code><dd>The error return value (what the calling function will return).
+
+     <br><dt><code>err</code><dd>If set to be non-zero, this is the new value assigned to <code>errno</code>.
+</dl>
+
+   <p>The error types defined in `<code>math.h</code>' represent possible mathematical
+errors as follows:
+
+     <dl>
+<dt><code>DOMAIN</code><dd>An argument was not in the domain of the function; e.g. <code>log(-1.0)</code>.
+
+     <br><dt><code>SING</code><dd>The requested calculation would result in a singularity; e.g. <code>pow(0.0,-2.0)</code>
+
+     <br><dt><code>OVERFLOW</code><dd>A calculation would produce a result too large to represent; e.g.
+<code>exp(1000.0)</code>.
+
+     <br><dt><code>UNDERFLOW</code><dd>A calculation would produce a result too small to represent; e.g.
+<code>exp(-1000.0)</code>.
+
+     <br><dt><code>TLOSS</code><dd>Total loss of precision.  The result would have no significant digits;
+e.g. <code>sin(10e70)</code>.
+
+     <br><dt><code>PLOSS</code><dd>Partial loss of precision.
+</dl>
+
+   <p><br>
+<strong>Returns</strong><br>
+The library definition for <code>matherr</code> returns <code>0</code> in all cases.
+
+   <p>You can change the calling function's result from a customized <code>matherr</code>
+by modifying <code>e-&gt;retval</code>, which propagates backs to the caller.
+
+   <p>If <code>matherr</code> returns <code>0</code> (indicating that it was not able to resolve
+the error) the caller sets <code>errno</code> to an appropriate value, and prints
+an error message.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>matherr</code> is not ANSI C.
+
+   <p><br>
+
+<div class="node">
+<a name="modf"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#nan">nan</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#matherr">matherr</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.41 <code>modf</code>, <code>modff</code>&mdash;split fractional and integer parts</h3>
+
+<p><a name="index-modf-117"></a><a name="index-modff-118"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double modf(double <var>val</var>, double *<var>ipart</var>);
+     float modff(float <var>val</var>, float *<var>ipart</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>modf</code> splits the double <var>val</var> apart into an integer part
+and a fractional part, returning the fractional part and
+storing the integer part in <code>*</code><var>ipart</var>.  No rounding
+whatsoever is done; the sum of the integer and fractional
+parts is guaranteed to be exactly  equal to <var>val</var>.   That
+is, if <var>realpart</var> = modf(<var>val</var>, &amp;<var>intpart</var>); then
+`<var>realpart</var><code>+</code><var>intpart</var>' is the same as <var>val</var>.
+<code>modff</code> is identical, save that it takes and returns
+<code>float</code> rather than <code>double</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+The fractional part is returned.  Each result has the same
+sign as the supplied argument <var>val</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>modf</code> is ANSI C. <code>modff</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="nan"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#nearbyint">nearbyint</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#modf">modf</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.42 <code>nan</code>, <code>nanf</code>&mdash;representation of &ldquo;Not a Number&rdquo;</h3>
+
+<p><a name="index-nan-119"></a><a name="index-nanf-120"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double nan(const char *);
+     float nanf(const char *);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>nan</code> and <code>nanf</code> return an IEEE NaN (Not a Number) in
+double- and single-precision arithmetic respectively.  The
+argument is currently disregarded.
+
+   <p><br>
+
+<div class="node">
+<a name="nearbyint"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#nextafter">nextafter</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#nan">nan</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.43 <code>nearbyint</code>, <code>nearbyintf</code>&ndash;round to integer</h3>
+
+<p><a name="index-nearbyint-121"></a><a name="index-nearbyintf-122"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double nearbyint(double <var>x</var>);
+     float nearbyintf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>nearbyint</code> functions round their argument to an integer value in
+floating-point format, using the current rounding direction and
+(supposedly) without raising the "inexact" floating-point exception.
+See the <code>rint</code> functions for the same function with the "inexact"
+floating-point exception being raised when appropriate.
+
+   <p><br>
+<strong>Bugs</strong><br>
+Newlib does not support the floating-point exception model, so that
+the floating-point exception control is not present and thereby what may
+be seen will be compiler and hardware dependent in this regard.
+The Newlib <code>nearbyint</code> functions are identical to the <code>rint</code>
+functions with respect to the floating-point exception behavior, and
+will cause the "inexact" exception to be raised for most targets.
+
+   <p><br>
+<strong>Returns</strong><br>
+<var>x</var> rounded to an integral value, using the current rounding direction.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX
+
+   <p><br>
+<strong>See Also</strong><br>
+<code>rint</code>, <code>round</code>
+
+   <p><br>
+
+<div class="node">
+<a name="nextafter"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#pow">pow</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#nearbyint">nearbyint</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.44 <code>nextafter</code>, <code>nextafterf</code>&mdash;get next number</h3>
+
+<p><a name="index-nextafter-123"></a><a name="index-nextafterf-124"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double nextafter(double <var>val</var>, double <var>dir</var>);
+     float nextafterf(float <var>val</var>, float <var>dir</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>nextafter</code> returns the double-precision floating-point number
+closest to <var>val</var> in the direction toward <var>dir</var>.  <code>nextafterf</code>
+performs the same operation in single precision.  For example,
+<code>nextafter(0.0,1.0)</code> returns the smallest positive number which is
+representable in double precision.
+
+   <p><br>
+<strong>Returns</strong><br>
+Returns the next closest number to <var>val</var> in the direction toward
+<var>dir</var>.
+
+   <p><br>
+<strong>Portability</strong><br>
+Neither <code>nextafter</code> nor <code>nextafterf</code> is required by ANSI C
+or by the System V Interface Definition (Issue 2).
+
+   <p><br>
+
+<div class="node">
+<a name="pow"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#remainder">remainder</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#nextafter">nextafter</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.45 <code>pow</code>, <code>powf</code>&mdash;x to the power y</h3>
+
+<p><a name="index-pow-125"></a><a name="index-powf-126"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double pow(double <var>x</var>, double <var>y</var>);
+     float powf(float <var>x</var>, float <var>y</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>pow</code> and <code>powf</code> calculate <var>x</var> raised to the exponent <var>y</var>.
+
+   <p><br>
+<strong>Returns</strong><br>
+On success, <code>pow</code> and <code>powf</code> return the value calculated.
+
+   <p>When the argument values would produce overflow, <code>pow</code>
+returns <code>HUGE_VAL</code> and set <code>errno</code> to <code>ERANGE</code>.  If the
+argument <var>x</var> passed to <code>pow</code> or <code>powf</code> is a negative
+noninteger, and <var>y</var> is also not an integer, then <code>errno</code>
+is set to <code>EDOM</code>.  If <var>x</var> and <var>y</var> are both 0, then
+<code>pow</code> and <code>powf</code> return <code>1</code>.
+
+   <p>You can modify error handling for these functions using <code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>pow</code> is ANSI C. <code>powf</code> is an extension.
+<br>
+
+<div class="node">
+<a name="remainder"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#remquo">remquo</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#pow">pow</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.46 <code>remainder</code>, <code>remainderf</code>&mdash;round and  remainder</h3>
+
+<p><a name="index-remainder-127"></a><a name="index-remainderf-128"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double remainder(double <var>x</var>, double <var>y</var>);
+     float remainderf(float <var>x</var>, float <var>y</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>remainder</code> and <code>remainderf</code> find the remainder of
+<var>x</var>/<var>y</var>; this value is in the range -<var>y</var>/2 .. +<var>y</var>/2.
+
+   <p><br>
+<strong>Returns</strong><br>
+<code>remainder</code> returns the integer result as a double.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>remainder</code> is a System V release 4.
+<code>remainderf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="remquo"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#rint">rint</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#remainder">remainder</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.47 <code>remquo</code>, <code>remquof</code>&ndash;remainder and part of quotient</h3>
+
+<p><a name="index-remquo-129"></a><a name="index-remquof-130"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double remquo(double <var>x</var>, double <var>y</var>, int *<var>quo</var>);
+     float remquof(float <var>x</var>, float <var>y</var>, int *<var>quo</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>remquo</code> functions compute the same remainder as the <code>remainder</code>
+functions; this value is in the range -<var>y</var>/2 ... +<var>y</var>/2.  In the object
+pointed to by <code>quo</code> they store a value whose sign is the sign of <code>x</code>/<code>y</code>
+and whose magnitude is congruent modulo 2**n to the magnitude of the integral
+quotient of <code>x</code>/<code>y</code>.  (That is, <code>quo</code> is given the n lsbs of the
+quotient, not counting the sign.)  This implementation uses n=31 if int is 32
+bits or more, otherwise, n is 1 less than the width of int.
+
+   <p>For example:
+<pre class="smallexample">     	remquo(-29.0, 3.0, &amp;<var>quo</var>)
+</pre>
+   <p>returns -1.0 and sets <var>quo</var>=10, and
+<pre class="smallexample">     	remquo(-98307.0, 3.0, &amp;<var>quo</var>)
+</pre>
+   <p>returns -0.0 and sets <var>quo</var>=-32769, although for 16-bit int, <var>quo</var>=-1.  In
+the latter case, the actual quotient of -(32769=0x8001) is reduced to -1
+because of the 15-bit limitation for the quotient.
+
+   <p><br>
+<strong>Returns</strong><br>
+When either argument is NaN, NaN is returned.  If <var>y</var> is 0 or <var>x</var> is
+infinite (and neither is NaN), a domain error occurs (i.e. the "invalid"
+floating point exception is raised or errno is set to EDOM), and NaN is
+returned.
+Otherwise, the <code>remquo</code> functions return <var>x</var> REM <var>y</var>.
+
+   <p><br>
+<strong>Bugs</strong><br>
+IEEE754-2008 calls for <code>remquo</code>(subnormal, inf) to cause the "underflow"
+floating-point exception.  This implementation does not.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99, POSIX.
+
+   <p><br>
+
+<div class="node">
+<a name="rint"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#round">round</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#remquo">remquo</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.48 <code>rint</code>, <code>rintf</code>&ndash;round to integer</h3>
+
+<p><a name="index-rint-131"></a><a name="index-rintf-132"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double rint(double <var>x</var>);
+     float rintf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>rint</code> functions round their argument to an integer value in
+floating-point format, using the current rounding direction.  They
+raise the "inexact" floating-point exception if the result differs
+in value from the argument.  See the <code>nearbyint</code> functions for the
+same function with the "inexact" floating-point exception never being
+raised.  Newlib does not directly support floating-point exceptions.
+The <code>rint</code> functions are written so that the "inexact" exception is
+raised in hardware implementations that support it, even though Newlib
+does not provide access.
+
+   <p><br>
+<strong>Returns</strong><br>
+<var>x</var> rounded to an integral value, using the current rounding direction.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX
+
+   <p><br>
+<strong>See Also</strong><br>
+<code>nearbyint</code>, <code>round</code>
+
+   <p><br>
+
+<div class="node">
+<a name="round"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#scalbn">scalbn</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#rint">rint</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.49 <code>round</code>, <code>roundf</code>&ndash;round to integer, to nearest</h3>
+
+<p><a name="index-round-133"></a><a name="index-roundf-134"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double round(double <var>x</var>);
+     float roundf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>round</code> functions round their argument to the nearest integer
+value in floating-point format, rounding halfway cases away from zero,
+regardless of the current rounding direction.  (While the "inexact"
+floating-point exception behavior is unspecified by the C standard, the
+<code>round</code> functions are written so that "inexact" is not raised if the
+result does not equal the argument, which behavior is as recommended by
+IEEE 754 for its related functions.)
+
+   <p><br>
+<strong>Returns</strong><br>
+<var>x</var> rounded to an integral value.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX
+
+   <p><br>
+<strong>See Also</strong><br>
+<code>nearbyint</code>, <code>rint</code>
+
+   <p><br>
+
+<div class="node">
+<a name="scalbn"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#signbit">signbit</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#round">round</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.50 <code>scalbn</code>, <code>scalbnf</code>, <code>scalbln</code>, <code>scalblnf</code>&ndash;scale by power of FLT_RADIX (=2)</h3>
+
+<p><a name="index-scalbn-135"></a><a name="index-scalbnf-136"></a><a name="index-scalbln-137"></a><a name="index-scalblnf-138"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double scalbn(double <var>x</var>, int <var>n</var>);
+     float scalbnf(float <var>x</var>, int <var>n</var>);
+     double scalbln(double <var>x</var>, long int <var>n</var>);
+     float scalblnf(float <var>x</var>, long int <var>n</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>scalbn</code> and <code>scalbln</code> functions compute
+<var>x</var> times FLT_RADIX to the power <var>n</var>.
+efficiently.  The result is computed by manipulating the exponent, rather than
+by actually performing an exponentiation or multiplication.  In this
+floating-point implementation FLT_RADIX=2, which makes the <code>scalbn</code>
+functions equivalent to the <code>ldexp</code> functions.
+
+   <p><br>
+<strong>Returns</strong><br>
+<var>x</var> times 2 to the power <var>n</var>.  A range error may occur.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX
+
+   <p><br>
+<strong>See Also</strong><br>
+<code>ldexp</code>
+
+   <p><br>
+
+<div class="node">
+<a name="signbit"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#sin">sin</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#scalbn">scalbn</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.51 <code>signbit</code>&ndash;Does floating-point number have negative sign?</h3>
+
+<p><a name="index-signbit-139"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     int signbit(real-floating <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>signbit</code> macro determines whether the sign of its argument value is
+negative.  The macro reports the sign of all values, including infinities,
+zeros, and NaNs.  If zero is unsigned, it is treated as positive.  As shown in
+the synopsis, the argument is "real-floating," meaning that any of the real
+floating-point types (float, double, etc.) may be given to it.
+
+   <p>Note that because of the possibilities of signed 0 and NaNs, the expression
+"<var>x</var> &lt; 0.0" does not give the same result as <code>signbit</code> in all cases.
+
+   <p><br>
+<strong>Returns</strong><br>
+The <code>signbit</code> macro returns a nonzero value if and only if the sign of its
+argument value is negative.
+
+   <p><br>
+<strong>Portability</strong><br>
+C99, POSIX.
+
+   <p><br>
+
+<div class="node">
+<a name="sin"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#sinh">sinh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#signbit">signbit</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.52 <code>sin</code>, <code>sinf</code>, <code>cos</code>, <code>cosf</code>&mdash;sine or cosine</h3>
+
+<p><a name="index-sin-140"></a><a name="index-sinf-141"></a><a name="index-cos-142"></a><a name="index-cosf-143"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double sin(double <var>x</var>);
+     float  sinf(float <var>x</var>);
+     double cos(double <var>x</var>);
+     float cosf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>sin</code> and <code>cos</code> compute (respectively) the sine and cosine
+of the argument <var>x</var>.  Angles are specified in radians.
+
+   <p><code>sinf</code> and <code>cosf</code> are identical, save that they take and
+return <code>float</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+The sine or cosine of <var>x</var> is returned.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>sin</code> and <code>cos</code> are ANSI C.
+<code>sinf</code> and <code>cosf</code> are extensions.
+
+   <p><br>
+
+<div class="node">
+<a name="sinh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#sqrt">sqrt</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#sin">sin</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.53 <code>sinh</code>, <code>sinhf</code>&mdash;hyperbolic sine</h3>
+
+<p><a name="index-sinh-144"></a><a name="index-sinhf-145"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double sinh(double <var>x</var>);
+     float  sinhf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>sinh</code> computes the hyperbolic sine of the argument <var>x</var>.
+Angles are specified in radians.   <code>sinh</code>(<var>x</var>) is defined as
+<pre class="smallexample">      (exp(<var>x</var>) - exp(-<var>x</var>))/2
+</pre>
+   <p><code>sinhf</code> is identical, save that it takes and returns <code>float</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+The hyperbolic sine of <var>x</var> is returned.
+
+   <p>When the correct result is too large to be representable (an
+overflow),  <code>sinh</code> returns <code>HUGE_VAL</code> with the
+appropriate sign, and sets the global value <code>errno</code> to
+<code>ERANGE</code>.
+
+   <p>You can modify error handling for these functions with <code>matherr</code>.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>sinh</code> is ANSI C.
+<code>sinhf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="sqrt"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#tan">tan</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#sinh">sinh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.54 <code>sqrt</code>, <code>sqrtf</code>&mdash;positive square root</h3>
+
+<p><a name="index-sqrt-146"></a><a name="index-sqrtf-147"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double sqrt(double <var>x</var>);
+     float  sqrtf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>sqrt</code> computes the positive square root of the argument.
+You can modify error handling for this function with
+<code>matherr</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+On success, the square root is returned. If <var>x</var> is real and
+positive, then the result is positive.  If <var>x</var> is real and
+negative, the global value <code>errno</code> is set to <code>EDOM</code> (domain error).
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>sqrt</code> is ANSI C.  <code>sqrtf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="tan"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#tanh">tanh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#sqrt">sqrt</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.55 <code>tan</code>, <code>tanf</code>&mdash;tangent</h3>
+
+<p><a name="index-tan-148"></a><a name="index-tanf-149"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double tan(double <var>x</var>);
+     float tanf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+<code>tan</code> computes the tangent of the argument <var>x</var>.
+Angles are specified in radians.
+
+   <p><code>tanf</code> is identical, save that it takes and returns <code>float</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+The tangent of <var>x</var> is returned.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>tan</code> is ANSI. <code>tanf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="tanh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#trunc">trunc</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#tan">tan</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.56 <code>tanh</code>, <code>tanhf</code>&mdash;hyperbolic tangent</h3>
+
+<p><a name="index-tanh-150"></a><a name="index-tanhf-151"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double tanh(double <var>x</var>);
+     float tanhf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+
+   <p><code>tanh</code> computes the hyperbolic tangent of
+the argument <var>x</var>.  Angles are specified in radians.
+
+   <p><code>tanh(</code><var>x</var><code>)</code> is defined as
+<pre class="smallexample">      sinh(<var>x</var>)/cosh(<var>x</var>)
+</pre>
+   <p><code>tanhf</code> is identical, save that it takes and returns <code>float</code> values.
+
+   <p><br>
+<strong>Returns</strong><br>
+The hyperbolic tangent of <var>x</var> is returned.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>tanh</code> is ANSI C.  <code>tanhf</code> is an extension.
+
+   <p><br>
+
+<div class="node">
+<a name="trunc"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#tanh">tanh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Math">Math</a>
+
+</div>
+
+<h3 class="section">1.57 <code>trunc</code>, <code>truncf</code>&ndash;round to integer, towards zero</h3>
+
+<p><a name="index-trunc-152"></a><a name="index-truncf-153"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;math.h&gt;
+     double trunc(double <var>x</var>);
+     float truncf(float <var>x</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The <code>trunc</code> functions round their argument to the integer value, in
+floating format, nearest to but no larger in magnitude than the
+argument, regardless of the current rounding direction.  (While the
+"inexact" floating-point exception behavior is unspecified by the C
+standard, the <code>trunc</code> functions are written so that "inexact" is not
+raised if the result does not equal the argument, which behavior is as
+recommended by IEEE 754 for its related functions.)
+
+   <p><br>
+<strong>Returns</strong><br>
+<var>x</var> truncated to an integral value.
+
+   <p><br>
+<strong>Portability</strong><br>
+ANSI C, POSIX
+
+   <p><br>
+<div class="node">
+<a name="Complex"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Reentrancy">Reentrancy</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Math">Math</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">2 Mathematical Complex Functions (<samp><span class="file">complex.h</span></samp>)</h2>
+
+<p>This chapter groups the complex mathematical functions.  The
+corresponding definitions and declarations are in <samp><span class="file">complex.h</span></samp>.
+Functions and documentations are taken from NetBSD.
+
+<ul class="menu">
+<li><a accesskey="1" href="#cabs">cabs</a>: 	Complex absolute value
+<li><a accesskey="2" href="#cacos">cacos</a>: 	Complex arc cosine
+<li><a accesskey="3" href="#cacosh">cacosh</a>: 	Complex arc hyperbolic cosine
+<li><a accesskey="4" href="#carg">carg</a>: 	Argument (also called phase angle)
+<li><a accesskey="5" href="#casin">casin</a>: 	Complex arc sine
+<li><a accesskey="6" href="#casinh">casinh</a>: 	Complex arc hyperbolic sine
+<li><a accesskey="7" href="#catan">catan</a>: 	Complex arc tangent
+<li><a accesskey="8" href="#catanh">catanh</a>: 	Complex arc hyperbolic tangent
+<li><a accesskey="9" href="#ccos">ccos</a>: 	Complex cosine
+<li><a href="#ccosh">ccosh</a>: 	Complex hyperbolic cosine
+<li><a href="#cexp">cexp</a>: 	Complex exponent
+<li><a href="#cimag">cimag</a>: 	Imaginary part
+<li><a href="#clog">clog</a>: 	Complex natural (base e) logarithm
+<li><a href="#conj">conj</a>: 	Complex conjugate
+<li><a href="#cpow">cpow</a>: 	Complex power function
+<li><a href="#cproj">cproj</a>: 	Compute a projection on the Riemann sphere
+<li><a href="#creal">creal</a>: 	Real part
+<li><a href="#csin">csin</a>: 	Complex sine
+<li><a href="#csinh">csinh</a>: 	Complex hyperbolic sine
+<li><a href="#csqrt">csqrt</a>: 	Complex square root
+<li><a href="#ctan">ctan</a>: 	Complex tangent
+<li><a href="#ctanh">ctanh</a>: 	Complex hyperbolic tangent
+</ul>
+
+<div class="node">
+<a name="cabs"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cacos">cacos</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.1 <code>cabs</code>, <code>cabsf</code>&mdash;complex absolute-value</h3>
+
+<p><a name="index-cabs-154"></a><a name="index-cabsf-155"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double cabs(double complex <var>z</var>);
+     float cabsf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute compute the complex absolute value
+(also called norm, modulus, or magnitude) of <var>z</var>.
+
+   <p><code>cabsf</code> is identical to <code>cabs</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The cabs functions return the complex absolute value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>cabs</code> and <code>cabsf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="cacos"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cacosh">cacosh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cabs">cabs</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.2 <code>cacos</code>, <code>cacosf</code>&mdash;complex arc cosine</h3>
+
+<p><a name="index-cacos-156"></a><a name="index-cacosf-157"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex cacos(double complex <var>z</var>);
+     float complex cacosf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex arc cosine of <var>z</var>,
+with branch cuts outside the interval [-1, +1] along the real axis.
+
+   <p><code>cacosf</code> is identical to <code>cacos</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex arc cosine value, in the range
+of a strip mathematically  unbounded  along the imaginary axis
+and in the interval [0, pi] along the real axis.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>cacos</code> and <code>cacosf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="cacosh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#carg">carg</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cacos">cacos</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.3 <code>cacosh</code>, <code>cacoshf</code>&mdash;complex arc hyperbolic cosine</h3>
+
+<p><a name="index-cacosh-158"></a><a name="index-cacoshf-159"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex cacosh(double complex <var>z</var>);
+     float complex cacoshf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex arc hyperbolic cosine of <var>z</var>,
+with a branch cut at values less than 1 along the real axis.
+
+   <p><code>cacoshf</code> is identical to <code>cacosh</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex arc hyperbolic cosine value,
+in the range of a half-strip of non-negative values along the
+real axis and in the interval [-i * pi, +i * pi] along the
+imaginary axis.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>cacosh</code> and <code>cacoshf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="carg"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#casin">casin</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cacosh">cacosh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.4 <code>carg</code>, <code>cargf</code>&mdash;argument (phase angle)</h3>
+
+<p><a name="index-carg-160"></a><a name="index-cargf-161"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double carg(double complex <var>z</var>);
+     float cargf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the argument (also called phase angle)
+of <var>z</var>, with a branch cut along the negative real axis.
+
+   <p><code>cargf</code> is identical to <code>carg</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The carg functions return the value of the argument in the
+interval [-pi, +pi]
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>carg</code> and <code>cargf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="casin"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#casinh">casinh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#carg">carg</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.5 <code>casin</code>, <code>casinf</code>&mdash;complex arc sine</h3>
+
+<p><a name="index-casin-162"></a><a name="index-casinf-163"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex casin(double complex <var>z</var>);
+     float complex casinf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex arc sine of <var>z</var>,
+with branch cuts outside the interval [-1, +1] along the real axis.
+
+   <p><code>casinf</code> is identical to <code>casin</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex arc sine value, in the range
+of a strip mathematically  unbounded  along the imaginary axis
+and in the interval [-pi/2, +pi/2] along the real axis.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>casin</code> and <code>casinf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="casinh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#catan">catan</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#casin">casin</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.6 <code>casinh</code>, <code>casinhf</code>&mdash;complex arc hyperbolic sine</h3>
+
+<p><a name="index-casinh-164"></a><a name="index-casinhf-165"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex casinh(double complex <var>z</var>);
+     float complex casinhf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex arc hyperbolic sine of <var>z</var>,
+with branch cuts outside the interval [-i, +i] along the
+imaginary axis.
+
+   <p><code>casinhf</code> is identical to <code>casinh</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex arc hyperbolic sine value,
+in the range of a strip mathematically unbounded along the
+real axis and in the interval [-i*p/2, +i*p/2] along the
+imaginary axis.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>casinh</code> and <code>casinhf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="catan"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#catanh">catanh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#casinh">casinh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.7 <code>catan</code>, <code>catanf</code>&mdash;complex arc tangent</h3>
+
+<p><a name="index-catan-166"></a><a name="index-catanf-167"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex catan(double complex <var>z</var>);
+     float complex catanf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex arc tangent of <var>z</var>,
+with branch cuts outside the interval [-i, +i] along the
+imaginary axis.
+
+   <p><code>catanf</code> is identical to <code>catan</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex arc tangent value, in the range
+of a strip mathematically  unbounded  along the imaginary axis
+and in the interval [-pi/2, +pi/2] along the real axis.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>catan</code> and <code>catanf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="catanh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#ccos">ccos</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#catan">catan</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.8 <code>catanh</code>, <code>catanhf</code>&mdash;complex arc hyperbolic tangent</h3>
+
+<p><a name="index-catanh-168"></a><a name="index-catanhf-169"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex catanh(double complex <var>z</var>);
+     float complex catanhf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex arc hyperbolic tan of <var>z</var>,
+with branch cuts outside the interval [-1, +1] along the
+real axis.
+
+   <p><code>catanhf</code> is identical to <code>catanh</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex arc hyperbolic tangent value,
+in the range of a strip mathematically unbounded along the
+real axis and in the interval [-i*p/2, +i*p/2] along the
+imaginary axis.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>catanh</code> and <code>catanhf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="ccos"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#ccosh">ccosh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#catanh">catanh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.9 <code>ccos</code>, <code>ccosf</code>&mdash;complex cosine</h3>
+
+<p><a name="index-ccos-170"></a><a name="index-ccosf-171"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex ccos(double complex <var>z</var>);
+     float complex ccosf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex cosine of <var>z</var>.
+
+   <p><code>ccosf</code> is identical to <code>ccos</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex cosine value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>ccos</code> and <code>ccosf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="ccosh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cexp">cexp</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#ccos">ccos</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.10 <code>ccosh</code>, <code>ccoshf</code>&mdash;complex hyperbolic cosine</h3>
+
+<p><a name="index-ccosh-172"></a><a name="index-ccoshf-173"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex ccosh(double complex <var>z</var>);
+     float complex ccoshf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex hyperbolic cosine of <var>z</var>.
+
+   <p><code>ccoshf</code> is identical to <code>ccosh</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex hyperbolic cosine value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>ccosh</code> and <code>ccoshf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="cexp"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cimag">cimag</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#ccosh">ccosh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.11 <code>cexp</code>, <code>cexpf</code>&mdash;complex base-e exponential</h3>
+
+<p><a name="index-cexp-174"></a><a name="index-cexpf-175"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex cexp(double complex <var>z</var>);
+     float complex cexpf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute  the complex base-<var>e</var> exponential of <var>z</var>.
+
+   <p><code>cexpf</code> is identical to <code>cexp</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The cexp functions return the complex base-<var>e</var> exponential value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>cexp</code> and <code>cexpf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="cimag"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#clog">clog</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cexp">cexp</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.12 <code>cimag</code>, <code>cimagf</code>&mdash;imaginary part</h3>
+
+<p><a name="index-cimag-176"></a><a name="index-cimagf-177"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double cimag(double complex <var>z</var>);
+     float cimagf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the imaginary part of <var>z</var>.
+
+   <p><code>cimagf</code> is identical to <code>cimag</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The cimag functions return the imaginary part value (as a real).
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>cimag</code> and <code>cimagf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="clog"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#conj">conj</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cimag">cimag</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.13 <code>clog</code>, <code>clogf</code>&mdash;complex base-e logarithm</h3>
+
+<p><a name="index-clog-178"></a><a name="index-clogf-179"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex clog(double complex <var>z</var>);
+     float complex clogf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex natural (base-<var>e</var>) logarithm
+of <var>z</var>, with a branch cut along the negative real axis.
+
+   <p><code>clogf</code> is identical to <code>clog</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The clog functions return the complex natural logarithm value, in
+the range of a strip mathematically unbounded along the real axis
+and in the interval [-i*pi , +i*pi] along the imaginary axis.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>clog</code> and <code>clogf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="conj"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cpow">cpow</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#clog">clog</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.14 <code>conj</code>, <code>conjf</code>&mdash;complex conjugate</h3>
+
+<p><a name="index-conj-180"></a><a name="index-conjf-181"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex conj(double complex <var>z</var>);
+     float complex conjf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex conjugate of <var>z</var>,
+by reversing the sign of its imaginary part.
+
+   <p><code>conjf</code> is identical to <code>conj</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The conj functions return the complex conjugate value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>conj</code> and <code>conjf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="cpow"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#cproj">cproj</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#conj">conj</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.15 <code>cpow</code>, <code>cpowf</code>&mdash;complex power</h3>
+
+<p><a name="index-cpow-182"></a><a name="index-cpowf-183"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex cpow(double complex <var>x</var>, double complex <var>y</var>);
+     float complex cpowf(float complex <var>x</var>, float complex <var>y</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+The cpow functions compute the complex power function x^y
+power, with a branch cut for the first parameter along the
+negative real axis.
+
+   <p><code>cpowf</code> is identical to <code>cpow</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The cpow functions return the complex power function value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>cpow</code> and <code>cpowf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="cproj"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#creal">creal</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cpow">cpow</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.16 <code>cproj</code>, <code>cprojf</code>&mdash; Riemann sphere projection</h3>
+
+<p><a name="index-cproj-184"></a><a name="index-cprojf-185"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex cproj(double complex <var>z</var>);
+     float complex cprojf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute a projection of <var>z</var> onto the Riemann
+sphere: <var>z</var> projects to <var>z</var> except that all complex infinities
+(even those with one infinite part and one NaN part) project
+to positive infinity on the real axis. If <var>z</var> has an infinite part,
+then <code>cproj</code>(<var>z</var>) is equivalent to
+
+   <p>INFINITY + I * copysign(0.0, cimag(z))
+
+   <p><code>cprojf</code> is identical to <code>cproj</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The cproj functions return the value of the projection onto
+the Riemann sphere.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>cproj</code> and <code>cprojf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="creal"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#csin">csin</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#cproj">cproj</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.17 <code>creal</code>, <code>crealf</code>&mdash;real part</h3>
+
+<p><a name="index-creal-186"></a><a name="index-crealf-187"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double creal(double complex <var>z</var>);
+     float crealf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the real part of <var>z</var>.
+
+   <p><code>crealf</code> is identical to <code>creal</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The creal functions return the real part value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>creal</code> and <code>crealf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="csin"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#csinh">csinh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#creal">creal</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.18 <code>csin</code>, <code>csinf</code>&mdash;complex sine</h3>
+
+<p><a name="index-csin-188"></a><a name="index-csinf-189"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex csin(double complex <var>z</var>);
+     float complex csinf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex sine of <var>z</var>.
+
+   <p><code>csinf</code> is identical to <code>csin</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex sine value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>csin</code> and <code>csinf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="csinh"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#csqrt">csqrt</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#csin">csin</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.19 <code>csinh</code>, <code>csinhf</code>&mdash;complex hyperbolic sine</h3>
+
+<p><a name="index-csinh-190"></a><a name="index-csinhf-191"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex csinh(double complex <var>z</var>);
+     float complex csinhf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex hyperbolic sine of <var>z</var>.
+
+   <p><code>ccoshf</code> is identical to <code>ccosh</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex hyperbolic sine value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>csinh</code> and <code>csinhf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="csqrt"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#ctan">ctan</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#csinh">csinh</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.20 <code>csqrt</code>, <code>csqrtf</code>&mdash;complex square root</h3>
+
+<p><a name="index-csqrt-192"></a><a name="index-csqrtf-193"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex csqrt(double complex <var>z</var>);
+     float complex csqrtf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex square root of <var>z</var>, with
+a branch cut along the negative real axis.
+
+   <p><code>csqrtf</code> is identical to <code>csqrt</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+The csqrt functions return the complex square root value, in
+the range of the right halfplane (including the imaginary axis).
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>csqrt</code> and <code>csqrtf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="ctan"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#ctanh">ctanh</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#csqrt">csqrt</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.21 <code>ctan</code>, <code>ctanf</code>&mdash;complex tangent</h3>
+
+<p><a name="index-ctan-194"></a><a name="index-ctanf-195"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex ctan(double complex <var>z</var>);
+     float complex ctanf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex tangent of <var>z</var>.
+
+   <p><code>ctanf</code> is identical to <code>ctan</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex tangent value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>ctan</code> and <code>ctanf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="ctanh"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#ctan">ctan</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Complex">Complex</a>
+
+</div>
+
+<h3 class="section">2.22 <code>ctanh</code>, <code>ctanf</code>&mdash;complex hyperbolic tangent</h3>
+
+<p><a name="index-ctanh-196"></a><a name="index-ctanhf-197"></a><strong>Synopsis</strong>
+<pre class="example">     #include &lt;complex.h&gt;
+     double complex ctanh(double complex <var>z</var>);
+     float complex ctanhf(float complex <var>z</var>);
+
+</pre>
+   <p><strong>Description</strong><br>
+These functions compute the complex hyperbolic tangent of <var>z</var>.
+
+   <p><code>ctanhf</code> is identical to <code>ctanh</code>, except that it performs
+its calculations on <code>floats complex</code>.
+
+   <p><br>
+<strong>Returns</strong><br>
+These functions return the complex hyperbolic tangent value.
+
+   <p><br>
+<strong>Portability</strong><br>
+<code>ctanh</code> and <code>ctanhf</code> are ISO C99
+
+   <p><br>
+
+<div class="node">
+<a name="Reentrancy"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Long-Double-Functions">Long Double Functions</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Complex">Complex</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">3 Reentrancy Properties of <code>libm</code></h2>
+
+<p><a name="index-reentrancy-198"></a><a name="index-g_t_0040code_007bmatherr_007d-and-reentrancy-199"></a>When a libm function detects an exceptional case, <code>errno</code> may be
+set, the <code>matherr</code> function may be called, and a error message
+may be written to the standard error stream.  This behavior may not
+be reentrant.
+
+<!-- The exact behavior depends on the currently selected error handling -->
+<!-- mode (IEEE, POSIX, X/Open, or SVID). -->
+   <p>With reentrant C libraries like the Red Hat newlib C library, <code>errno</code> is
+a macro which expands to the per-thread error value.  This makes it thread
+safe.
+
+   <p>When the user provides his own <code>matherr</code> function it must be
+reentrant for the math library as a whole to be reentrant.
+
+   <p>In normal debugged programs, there are usually no math subroutine
+errors&mdash;and therefore no assignments to <code>errno</code> and no <code>matherr</code>
+calls; in that situation, the math functions behave reentrantly.
+
+<div class="node">
+<a name="Long-Double-Functions"></a>
+<p><hr>
+Next:&nbsp;<a rel="next" accesskey="n" href="#Index">Index</a>,
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Reentrancy">Reentrancy</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="chapter">4 The long double function support of <code>libm</code></h2>
+
+<p>Currently, the full set of long double math functions is only provided
+on platforms where long double equals double.
+For such platforms, the long double math functions are implemented as calls to the double versions.
+<div class="node">
+<a name="Index"></a>
+<p><hr>
+Previous:&nbsp;<a rel="previous" accesskey="p" href="#Long-Double-Functions">Long Double Functions</a>,
+Up:&nbsp;<a rel="up" accesskey="u" href="#Top">Top</a>
+
+</div>
+
+<h2 class="unnumbered">Index</h2>
+
+<ul class="index-cp" compact>
+<li><a href="#index-acos-5"><code>acos</code></a>: <a href="#acos">acos</a></li>
+<li><a href="#index-acosf-6"><code>acosf</code></a>: <a href="#acos">acos</a></li>
+<li><a href="#index-acosh-7"><code>acosh</code></a>: <a href="#acosh">acosh</a></li>
+<li><a href="#index-acoshf-8"><code>acoshf</code></a>: <a href="#acosh">acosh</a></li>
+<li><a href="#index-asin-9"><code>asin</code></a>: <a href="#asin">asin</a></li>
+<li><a href="#index-asinf-10"><code>asinf</code></a>: <a href="#asin">asin</a></li>
+<li><a href="#index-asinh-11"><code>asinh</code></a>: <a href="#asinh">asinh</a></li>
+<li><a href="#index-asinhf-12"><code>asinhf</code></a>: <a href="#asinh">asinh</a></li>
+<li><a href="#index-atan-13"><code>atan</code></a>: <a href="#atan">atan</a></li>
+<li><a href="#index-atan2-15"><code>atan2</code></a>: <a href="#atan2">atan2</a></li>
+<li><a href="#index-atan2f-16"><code>atan2f</code></a>: <a href="#atan2">atan2</a></li>
+<li><a href="#index-atanf-14"><code>atanf</code></a>: <a href="#atan">atan</a></li>
+<li><a href="#index-atanh-17"><code>atanh</code></a>: <a href="#atanh">atanh</a></li>
+<li><a href="#index-atanhf-18"><code>atanhf</code></a>: <a href="#atanh">atanh</a></li>
+<li><a href="#index-cabs-154"><code>cabs</code></a>: <a href="#cabs">cabs</a></li>
+<li><a href="#index-cabsf-155"><code>cabsf</code></a>: <a href="#cabs">cabs</a></li>
+<li><a href="#index-cacos-156"><code>cacos</code></a>: <a href="#cacos">cacos</a></li>
+<li><a href="#index-cacosf-157"><code>cacosf</code></a>: <a href="#cacos">cacos</a></li>
+<li><a href="#index-cacosh-158"><code>cacosh</code></a>: <a href="#cacosh">cacosh</a></li>
+<li><a href="#index-cacoshf-159"><code>cacoshf</code></a>: <a href="#cacosh">cacosh</a></li>
+<li><a href="#index-carg-160"><code>carg</code></a>: <a href="#carg">carg</a></li>
+<li><a href="#index-cargf-161"><code>cargf</code></a>: <a href="#carg">carg</a></li>
+<li><a href="#index-casin-162"><code>casin</code></a>: <a href="#casin">casin</a></li>
+<li><a href="#index-casinf-163"><code>casinf</code></a>: <a href="#casin">casin</a></li>
+<li><a href="#index-casinh-164"><code>casinh</code></a>: <a href="#casinh">casinh</a></li>
+<li><a href="#index-casinhf-165"><code>casinhf</code></a>: <a href="#casinh">casinh</a></li>
+<li><a href="#index-catan-166"><code>catan</code></a>: <a href="#catan">catan</a></li>
+<li><a href="#index-catanf-167"><code>catanf</code></a>: <a href="#catan">catan</a></li>
+<li><a href="#index-catanh-168"><code>catanh</code></a>: <a href="#catanh">catanh</a></li>
+<li><a href="#index-catanhf-169"><code>catanhf</code></a>: <a href="#catanh">catanh</a></li>
+<li><a href="#index-cbrt-31"><code>cbrt</code></a>: <a href="#cbrt">cbrt</a></li>
+<li><a href="#index-cbrtf-32"><code>cbrtf</code></a>: <a href="#cbrt">cbrt</a></li>
+<li><a href="#index-ccos-170"><code>ccos</code></a>: <a href="#ccos">ccos</a></li>
+<li><a href="#index-ccosf-171"><code>ccosf</code></a>: <a href="#ccos">ccos</a></li>
+<li><a href="#index-ccosh-172"><code>ccosh</code></a>: <a href="#ccosh">ccosh</a></li>
+<li><a href="#index-ccoshf-173"><code>ccoshf</code></a>: <a href="#ccosh">ccosh</a></li>
+<li><a href="#index-ceil-51"><code>ceil</code></a>: <a href="#floor">floor</a></li>
+<li><a href="#index-ceilf-52"><code>ceilf</code></a>: <a href="#floor">floor</a></li>
+<li><a href="#index-cexp-174"><code>cexp</code></a>: <a href="#cexp">cexp</a></li>
+<li><a href="#index-cexpf-175"><code>cexpf</code></a>: <a href="#cexp">cexp</a></li>
+<li><a href="#index-cimag-176"><code>cimag</code></a>: <a href="#cimag">cimag</a></li>
+<li><a href="#index-cimagf-177"><code>cimagf</code></a>: <a href="#cimag">cimag</a></li>
+<li><a href="#index-clog-178"><code>clog</code></a>: <a href="#clog">clog</a></li>
+<li><a href="#index-clogf-179"><code>clogf</code></a>: <a href="#clog">clog</a></li>
+<li><a href="#index-conj-180"><code>conj</code></a>: <a href="#conj">conj</a></li>
+<li><a href="#index-conjf-181"><code>conjf</code></a>: <a href="#conj">conj</a></li>
+<li><a href="#index-copysign-33"><code>copysign</code></a>: <a href="#copysign">copysign</a></li>
+<li><a href="#index-copysignf-34"><code>copysignf</code></a>: <a href="#copysign">copysign</a></li>
+<li><a href="#index-cos-142"><code>cos</code></a>: <a href="#sin">sin</a></li>
+<li><a href="#index-cosf-143"><code>cosf</code></a>: <a href="#sin">sin</a></li>
+<li><a href="#index-cpow-182"><code>cpow</code></a>: <a href="#cpow">cpow</a></li>
+<li><a href="#index-cpowf-183"><code>cpowf</code></a>: <a href="#cpow">cpow</a></li>
+<li><a href="#index-cproj-184"><code>cproj</code></a>: <a href="#cproj">cproj</a></li>
+<li><a href="#index-cprojf-185"><code>cprojf</code></a>: <a href="#cproj">cproj</a></li>
+<li><a href="#index-creal-186"><code>creal</code></a>: <a href="#creal">creal</a></li>
+<li><a href="#index-crealf-187"><code>crealf</code></a>: <a href="#creal">creal</a></li>
+<li><a href="#index-csin-188"><code>csin</code></a>: <a href="#csin">csin</a></li>
+<li><a href="#index-csinf-189"><code>csinf</code></a>: <a href="#csin">csin</a></li>
+<li><a href="#index-csinh-190"><code>csinh</code></a>: <a href="#csinh">csinh</a></li>
+<li><a href="#index-csinhf-191"><code>csinhf</code></a>: <a href="#csinh">csinh</a></li>
+<li><a href="#index-csqrt-192"><code>csqrt</code></a>: <a href="#csqrt">csqrt</a></li>
+<li><a href="#index-csqrtf-193"><code>csqrtf</code></a>: <a href="#csqrt">csqrt</a></li>
+<li><a href="#index-ctan-194"><code>ctan</code></a>: <a href="#ctan">ctan</a></li>
+<li><a href="#index-ctanf-195"><code>ctanf</code></a>: <a href="#ctan">ctan</a></li>
+<li><a href="#index-ctanh-196"><code>ctanh</code></a>: <a href="#ctanh">ctanh</a></li>
+<li><a href="#index-ctanhf-197"><code>ctanhf</code></a>: <a href="#ctanh">ctanh</a></li>
+<li><a href="#index-erf-35"><code>erf</code></a>: <a href="#erf">erf</a></li>
+<li><a href="#index-erfc-37"><code>erfc</code></a>: <a href="#erf">erf</a></li>
+<li><a href="#index-erfcf-38"><code>erfcf</code></a>: <a href="#erf">erf</a></li>
+<li><a href="#index-erff-36"><code>erff</code></a>: <a href="#erf">erf</a></li>
+<li><a href="#index-exp-39"><code>exp</code></a>: <a href="#exp">exp</a></li>
+<li><a href="#index-exp2-41"><code>exp2</code></a>: <a href="#exp2">exp2</a></li>
+<li><a href="#index-exp2f-42"><code>exp2f</code></a>: <a href="#exp2">exp2</a></li>
+<li><a href="#index-expf-40"><code>expf</code></a>: <a href="#exp">exp</a></li>
+<li><a href="#index-expm1-43"><code>expm1</code></a>: <a href="#expm1">expm1</a></li>
+<li><a href="#index-expm1f-44"><code>expm1f</code></a>: <a href="#expm1">expm1</a></li>
+<li><a href="#index-fabs-45"><code>fabs</code></a>: <a href="#fabs">fabs</a></li>
+<li><a href="#index-fabsf-46"><code>fabsf</code></a>: <a href="#fabs">fabs</a></li>
+<li><a href="#index-fdim-47"><code>fdim</code></a>: <a href="#fdim">fdim</a></li>
+<li><a href="#index-fdimf-48"><code>fdimf</code></a>: <a href="#fdim">fdim</a></li>
+<li><a href="#index-finite-92"><code>finite</code></a>: <a href="#fpclassify">fpclassify</a></li>
+<li><a href="#index-finitef-95"><code>finitef</code></a>: <a href="#fpclassify">fpclassify</a></li>
+<li><a href="#index-floor-49"><code>floor</code></a>: <a href="#floor">floor</a></li>
+<li><a href="#index-floorf-50"><code>floorf</code></a>: <a href="#floor">floor</a></li>
+<li><a href="#index-fma-53"><code>fma</code></a>: <a href="#fma">fma</a></li>
+<li><a href="#index-fmaf-54"><code>fmaf</code></a>: <a href="#fma">fma</a></li>
+<li><a href="#index-fmax-55"><code>fmax</code></a>: <a href="#fmax">fmax</a></li>
+<li><a href="#index-fmaxf-56"><code>fmaxf</code></a>: <a href="#fmax">fmax</a></li>
+<li><a href="#index-fmin-57"><code>fmin</code></a>: <a href="#fmin">fmin</a></li>
+<li><a href="#index-fminf-58"><code>fminf</code></a>: <a href="#fmin">fmin</a></li>
+<li><a href="#index-fmod-59"><code>fmod</code></a>: <a href="#fmod">fmod</a></li>
+<li><a href="#index-fmodf-60"><code>fmodf</code></a>: <a href="#fmod">fmod</a></li>
+<li><a href="#index-fpclassify-85"><code>fpclassify</code></a>: <a href="#fpclassify">fpclassify</a></li>
+<li><a href="#index-frexp-61"><code>frexp</code></a>: <a href="#frexp">frexp</a></li>
+<li><a href="#index-frexpf-62"><code>frexpf</code></a>: <a href="#frexp">frexp</a></li>
+<li><a href="#index-gamma-63"><code>gamma</code></a>: <a href="#gamma">gamma</a></li>
+<li><a href="#index-gamma_005fr-67"><code>gamma_r</code></a>: <a href="#gamma">gamma</a></li>
+<li><a href="#index-gammaf-64"><code>gammaf</code></a>: <a href="#gamma">gamma</a></li>
+<li><a href="#index-gammaf_005fr-68"><code>gammaf_r</code></a>: <a href="#gamma">gamma</a></li>
+<li><a href="#index-hypot-73"><code>hypot</code></a>: <a href="#hypot">hypot</a></li>
+<li><a href="#index-hypotf-74"><code>hypotf</code></a>: <a href="#hypot">hypot</a></li>
+<li><a href="#index-ilogb-75"><code>ilogb</code></a>: <a href="#ilogb">ilogb</a></li>
+<li><a href="#index-ilogbf-76"><code>ilogbf</code></a>: <a href="#ilogb">ilogb</a></li>
+<li><a href="#index-infinity-77"><code>infinity</code></a>: <a href="#infinity">infinity</a></li>
+<li><a href="#index-infinityf-78"><code>infinityf</code></a>: <a href="#infinity">infinity</a></li>
+<li><a href="#index-isfinite-86"><code>isfinite</code></a>: <a href="#fpclassify">fpclassify</a></li>
+<li><a href="#index-isgreater-79"><code>isgreater</code></a>: <a href="#isgreater">isgreater</a></li>
+<li><a href="#index-isgreaterequal-80"><code>isgreaterequal</code></a>: <a href="#isgreater">isgreater</a></li>
+<li><a href="#index-isinf-87"><code>isinf</code></a>: <a href="#fpclassify">fpclassify</a></li>
+<li><a href="#index-isinff-94"><code>isinff</code></a>: <a href="#fpclassify">fpclassify</a></li>
+<li><a href="#index-isless-81"><code>isless</code></a>: <a href="#isgreater">isgreater</a></li>
+<li><a href="#index-islessequal-82"><code>islessequal</code></a>: <a href="#isgreater">isgreater</a></li>
+<li><a href="#index-islessgreater-83"><code>islessgreater</code></a>: <a href="#isgreater">isgreater</a></li>
+<li><a href="#index-isnan-88"><code>isnan</code></a>: <a href="#fpclassify">fpclassify</a></li>
+<li><a href="#index-isnanf-93"><code>isnanf</code></a>: <a href="#fpclassify">fpclassify</a></li>
+<li><a href="#index-isnormal-89"><code>isnormal</code></a>: <a href="#fpclassify">fpclassify</a></li>
+<li><a href="#index-isunordered-84"><code>isunordered</code></a>: <a href="#isgreater">isgreater</a></li>
+<li><a href="#index-j0-19"><code>j0</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-j0f-20"><code>j0f</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-j1-21"><code>j1</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-j1f-22"><code>j1f</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-jn-23"><code>jn</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-jnf-24"><code>jnf</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-ldexp-96"><code>ldexp</code></a>: <a href="#ldexp">ldexp</a></li>
+<li><a href="#index-ldexpf-97"><code>ldexpf</code></a>: <a href="#ldexp">ldexp</a></li>
+<li><a href="#index-lgamma-65"><code>lgamma</code></a>: <a href="#gamma">gamma</a></li>
+<li><a href="#index-lgamma_005fr-69"><code>lgamma_r</code></a>: <a href="#gamma">gamma</a></li>
+<li><a href="#index-lgammaf-66"><code>lgammaf</code></a>: <a href="#gamma">gamma</a></li>
+<li><a href="#index-lgammaf_005fr-70"><code>lgammaf_r</code></a>: <a href="#gamma">gamma</a></li>
+<li><a href="#index-llrint-110"><code>llrint</code></a>: <a href="#lrint">lrint</a></li>
+<li><a href="#index-llrintf-111"><code>llrintf</code></a>: <a href="#lrint">lrint</a></li>
+<li><a href="#index-llround-114"><code>llround</code></a>: <a href="#lround">lround</a></li>
+<li><a href="#index-llroundf-115"><code>llroundf</code></a>: <a href="#lround">lround</a></li>
+<li><a href="#index-log-98"><code>log</code></a>: <a href="#log">log</a></li>
+<li><a href="#index-log10-100"><code>log10</code></a>: <a href="#log10">log10</a></li>
+<li><a href="#index-log10f-101"><code>log10f</code></a>: <a href="#log10">log10</a></li>
+<li><a href="#index-log1p-102"><code>log1p</code></a>: <a href="#log1p">log1p</a></li>
+<li><a href="#index-log1pf-103"><code>log1pf</code></a>: <a href="#log1p">log1p</a></li>
+<li><a href="#index-log2-104"><code>log2</code></a>: <a href="#log2">log2</a></li>
+<li><a href="#index-log2f-105"><code>log2f</code></a>: <a href="#log2">log2</a></li>
+<li><a href="#index-logb-106"><code>logb</code></a>: <a href="#logb">logb</a></li>
+<li><a href="#index-logbf-107"><code>logbf</code></a>: <a href="#logb">logb</a></li>
+<li><a href="#index-logf-99"><code>logf</code></a>: <a href="#log">log</a></li>
+<li><a href="#index-lrint-108"><code>lrint</code></a>: <a href="#lrint">lrint</a></li>
+<li><a href="#index-lrintf-109"><code>lrintf</code></a>: <a href="#lrint">lrint</a></li>
+<li><a href="#index-lround-112"><code>lround</code></a>: <a href="#lround">lround</a></li>
+<li><a href="#index-lroundf-113"><code>lroundf</code></a>: <a href="#lround">lround</a></li>
+<li><a href="#index-matherr-116"><code>matherr</code></a>: <a href="#matherr">matherr</a></li>
+<li><a href="#index-g_t_0040code_007bmatherr_007d-and-reentrancy-199"><code>matherr</code> and reentrancy</a>: <a href="#Reentrancy">Reentrancy</a></li>
+<li><a href="#index-modf-117"><code>modf</code></a>: <a href="#modf">modf</a></li>
+<li><a href="#index-modff-118"><code>modff</code></a>: <a href="#modf">modf</a></li>
+<li><a href="#index-nan-119"><code>nan</code></a>: <a href="#nan">nan</a></li>
+<li><a href="#index-nanf-120"><code>nanf</code></a>: <a href="#nan">nan</a></li>
+<li><a href="#index-nearbyint-121"><code>nearbyint</code></a>: <a href="#nearbyint">nearbyint</a></li>
+<li><a href="#index-nearbyintf-122"><code>nearbyintf</code></a>: <a href="#nearbyint">nearbyint</a></li>
+<li><a href="#index-nextafter-123"><code>nextafter</code></a>: <a href="#nextafter">nextafter</a></li>
+<li><a href="#index-nextafterf-124"><code>nextafterf</code></a>: <a href="#nextafter">nextafter</a></li>
+<li><a href="#index-OS-stubs-4">OS stubs</a>: <a href="#Math">Math</a></li>
+<li><a href="#index-pow-125"><code>pow</code></a>: <a href="#pow">pow</a></li>
+<li><a href="#index-powf-126"><code>powf</code></a>: <a href="#pow">pow</a></li>
+<li><a href="#index-reentrancy-198">reentrancy</a>: <a href="#Reentrancy">Reentrancy</a></li>
+<li><a href="#index-remainder-127"><code>remainder</code></a>: <a href="#remainder">remainder</a></li>
+<li><a href="#index-remainderf-128"><code>remainderf</code></a>: <a href="#remainder">remainder</a></li>
+<li><a href="#index-remquo-129"><code>remquo</code></a>: <a href="#remquo">remquo</a></li>
+<li><a href="#index-remquof-130"><code>remquof</code></a>: <a href="#remquo">remquo</a></li>
+<li><a href="#index-rint-131"><code>rint</code></a>: <a href="#rint">rint</a></li>
+<li><a href="#index-rintf-132"><code>rintf</code></a>: <a href="#rint">rint</a></li>
+<li><a href="#index-round-133"><code>round</code></a>: <a href="#round">round</a></li>
+<li><a href="#index-roundf-134"><code>roundf</code></a>: <a href="#round">round</a></li>
+<li><a href="#index-scalbln-137"><code>scalbln</code></a>: <a href="#scalbn">scalbn</a></li>
+<li><a href="#index-scalblnf-138"><code>scalblnf</code></a>: <a href="#scalbn">scalbn</a></li>
+<li><a href="#index-scalbn-135"><code>scalbn</code></a>: <a href="#scalbn">scalbn</a></li>
+<li><a href="#index-scalbnf-136"><code>scalbnf</code></a>: <a href="#scalbn">scalbn</a></li>
+<li><a href="#index-signbit-139"><code>signbit</code></a>: <a href="#signbit">signbit</a></li>
+<li><a href="#index-sin-140"><code>sin</code></a>: <a href="#sin">sin</a></li>
+<li><a href="#index-sinf-141"><code>sinf</code></a>: <a href="#sin">sin</a></li>
+<li><a href="#index-sinh-144"><code>sinh</code></a>: <a href="#sinh">sinh</a></li>
+<li><a href="#index-sinhf-145"><code>sinhf</code></a>: <a href="#sinh">sinh</a></li>
+<li><a href="#index-sqrt-146"><code>sqrt</code></a>: <a href="#sqrt">sqrt</a></li>
+<li><a href="#index-sqrtf-147"><code>sqrtf</code></a>: <a href="#sqrt">sqrt</a></li>
+<li><a href="#index-stubs-3">stubs</a>: <a href="#Math">Math</a></li>
+<li><a href="#index-support-subroutines-2">support subroutines</a>: <a href="#Math">Math</a></li>
+<li><a href="#index-system-calls-1">system calls</a>: <a href="#Math">Math</a></li>
+<li><a href="#index-tan-148"><code>tan</code></a>: <a href="#tan">tan</a></li>
+<li><a href="#index-tanf-149"><code>tanf</code></a>: <a href="#tan">tan</a></li>
+<li><a href="#index-tanh-150"><code>tanh</code></a>: <a href="#tanh">tanh</a></li>
+<li><a href="#index-tanhf-151"><code>tanhf</code></a>: <a href="#tanh">tanh</a></li>
+<li><a href="#index-tgamma-71"><code>tgamma</code></a>: <a href="#gamma">gamma</a></li>
+<li><a href="#index-tgammaf-72"><code>tgammaf</code></a>: <a href="#gamma">gamma</a></li>
+<li><a href="#index-trunc-152"><code>trunc</code></a>: <a href="#trunc">trunc</a></li>
+<li><a href="#index-truncf-153"><code>truncf</code></a>: <a href="#trunc">trunc</a></li>
+<li><a href="#index-y0-25"><code>y0</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-y0f-26"><code>y0f</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-y1-27"><code>y1</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-y1f-28"><code>y1f</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-yn-29"><code>yn</code></a>: <a href="#jN">jN</a></li>
+<li><a href="#index-ynf-30"><code>ynf</code></a>: <a href="#jN">jN</a></li>
+</ul>
+<div class="contents">
+<h2>Table of Contents</h2>
+<ul>
+<li><a name="toc_Top" href="#Top">Top</a>
+<li><a name="toc_Math" href="#Math">1 Mathematical Functions (<samp><span class="file">math.h</span></samp>)</a>
+<ul>
+<li><a href="#version">1.1 Error Handling</a>
+<li><a href="#version">1.2 Standards Compliance And Portability</a>
+<li><a href="#acos">1.3 <code>acos</code>, <code>acosf</code>&mdash;arc cosine</a>
+<li><a href="#acosh">1.4 <code>acosh</code>, <code>acoshf</code>&mdash;inverse hyperbolic cosine</a>
+<li><a href="#asin">1.5 <code>asin</code>, <code>asinf</code>&mdash;arc sine</a>
+<li><a href="#asinh">1.6 <code>asinh</code>, <code>asinhf</code>&mdash;inverse hyperbolic sine</a>
+<li><a href="#atan">1.7 <code>atan</code>, <code>atanf</code>&mdash;arc tangent</a>
+<li><a href="#atan2">1.8 <code>atan2</code>, <code>atan2f</code>&mdash;arc tangent of y/x</a>
+<li><a href="#atanh">1.9 <code>atanh</code>, <code>atanhf</code>&mdash;inverse hyperbolic tangent</a>
+<li><a href="#jN">1.10 <code>jN</code>, <code>jNf</code>, <code>yN</code>, <code>yNf</code>&mdash;Bessel functions</a>
+<li><a href="#cbrt">1.11 <code>cbrt</code>, <code>cbrtf</code>&mdash;cube root</a>
+<li><a href="#copysign">1.12 <code>copysign</code>, <code>copysignf</code>&mdash;sign of <var>y</var>, magnitude of <var>x</var></a>
+<li><a href="#cosh">1.13 <code>cosh</code>, <code>coshf</code>&mdash;hyperbolic cosine</a>
+<li><a href="#erf">1.14 <code>erf</code>, <code>erff</code>, <code>erfc</code>, <code>erfcf</code>&mdash;error function</a>
+<li><a href="#exp">1.15 <code>exp</code>, <code>expf</code>&mdash;exponential</a>
+<li><a href="#exp2">1.16 <code>exp2</code>, <code>exp2f</code>&ndash;exponential, base 2</a>
+<li><a href="#expm1">1.17 <code>expm1</code>, <code>expm1f</code>&mdash;exponential minus 1</a>
+<li><a href="#fabs">1.18 <code>fabs</code>, <code>fabsf</code>&mdash;absolute value (magnitude)</a>
+<li><a href="#fdim">1.19 <code>fdim</code>, <code>fdimf</code>&ndash;positive difference</a>
+<li><a href="#floor">1.20 <code>floor</code>, <code>floorf</code>, <code>ceil</code>, <code>ceilf</code>&mdash;floor and ceiling</a>
+<li><a href="#fma">1.21 <code>fma</code>, <code>fmaf</code>&ndash;floating multiply add</a>
+<li><a href="#fmax">1.22 <code>fmax</code>, <code>fmaxf</code>&ndash;maximum</a>
+<li><a href="#fmin">1.23 <code>fmin</code>, <code>fminf</code>&ndash;minimum</a>
+<li><a href="#fmod">1.24 <code>fmod</code>, <code>fmodf</code>&mdash;floating-point remainder (modulo)</a>
+<li><a href="#frexp">1.25 <code>frexp</code>, <code>frexpf</code>&mdash;split floating-point number</a>
+<li><a href="#gamma">1.26 <code>gamma</code>, <code>gammaf</code>, <code>lgamma</code>, <code>lgammaf</code>, <code>gamma_r</code>, <code>gammaf_r</code>, <code>lgamma_r</code>, <code>lgammaf_r</code>, <code>tgamma</code>, and <code>tgammaf</code>&ndash;logarithmic and plain gamma functions</a>
+<li><a href="#hypot">1.27 <code>hypot</code>, <code>hypotf</code>&mdash;distance from origin</a>
+<li><a href="#ilogb">1.28 <code>ilogb</code>, <code>ilogbf</code>&mdash;get exponent of floating-point number</a>
+<li><a href="#infinity">1.29 <code>infinity</code>, <code>infinityf</code>&ndash;representation of infinity</a>
+<li><a href="#isgreater">1.30 <code>isgreater</code>, <code>isgreaterequal</code>, <code>isless</code>, <code>islessequal</code>, <code>islessgreater</code>, and <code>isunordered</code>&ndash;comparison macros</a>
+<li><a href="#fpclassify">1.31 <code>fpclassify</code>, <code>isfinite</code>, <code>isinf</code>, <code>isnan</code>, and <code>isnormal</code>&ndash;floating-point classification macros; <code>finite</code>, <code>finitef</code>, <code>isinf</code>, <code>isinff</code>, <code>isnan</code>, <code>isnanf</code>&ndash;test for exceptional numbers</a>
+<li><a href="#ldexp">1.32 <code>ldexp</code>, <code>ldexpf</code>&mdash;load exponent</a>
+<li><a href="#log">1.33 <code>log</code>, <code>logf</code>&mdash;natural logarithms</a>
+<li><a href="#log10">1.34 <code>log10</code>, <code>log10f</code>&mdash;base 10 logarithms</a>
+<li><a href="#log1p">1.35 <code>log1p</code>, <code>log1pf</code>&mdash;log of <code>1 + </code><var>x</var></a>
+<li><a href="#log2">1.36 <code>log2</code>, <code>log2f</code>&ndash;base 2 logarithm</a>
+<li><a href="#logb">1.37 <code>logb</code>, <code>logbf</code>&ndash;get exponent of floating-point number</a>
+<li><a href="#lrint">1.38 <code>lrint</code>, <code>lrintf</code>, <code>llrint</code>, <code>llrintf</code>&ndash;round to integer</a>
+<li><a href="#lround">1.39 <code>lround</code>, <code>lroundf</code>, <code>llround</code>, <code>llroundf</code>&ndash;round to integer, to nearest</a>
+<li><a href="#matherr">1.40 <code>matherr</code>&mdash;modifiable math error handler</a>
+<li><a href="#modf">1.41 <code>modf</code>, <code>modff</code>&mdash;split fractional and integer parts</a>
+<li><a href="#nan">1.42 <code>nan</code>, <code>nanf</code>&mdash;representation of &ldquo;Not a Number&rdquo;</a>
+<li><a href="#nearbyint">1.43 <code>nearbyint</code>, <code>nearbyintf</code>&ndash;round to integer</a>
+<li><a href="#nextafter">1.44 <code>nextafter</code>, <code>nextafterf</code>&mdash;get next number</a>
+<li><a href="#pow">1.45 <code>pow</code>, <code>powf</code>&mdash;x to the power y</a>
+<li><a href="#remainder">1.46 <code>remainder</code>, <code>remainderf</code>&mdash;round and  remainder</a>
+<li><a href="#remquo">1.47 <code>remquo</code>, <code>remquof</code>&ndash;remainder and part of quotient</a>
+<li><a href="#rint">1.48 <code>rint</code>, <code>rintf</code>&ndash;round to integer</a>
+<li><a href="#round">1.49 <code>round</code>, <code>roundf</code>&ndash;round to integer, to nearest</a>
+<li><a href="#scalbn">1.50 <code>scalbn</code>, <code>scalbnf</code>, <code>scalbln</code>, <code>scalblnf</code>&ndash;scale by power of FLT_RADIX (=2)</a>
+<li><a href="#signbit">1.51 <code>signbit</code>&ndash;Does floating-point number have negative sign?</a>
+<li><a href="#sin">1.52 <code>sin</code>, <code>sinf</code>, <code>cos</code>, <code>cosf</code>&mdash;sine or cosine</a>
+<li><a href="#sinh">1.53 <code>sinh</code>, <code>sinhf</code>&mdash;hyperbolic sine</a>
+<li><a href="#sqrt">1.54 <code>sqrt</code>, <code>sqrtf</code>&mdash;positive square root</a>
+<li><a href="#tan">1.55 <code>tan</code>, <code>tanf</code>&mdash;tangent</a>
+<li><a href="#tanh">1.56 <code>tanh</code>, <code>tanhf</code>&mdash;hyperbolic tangent</a>
+<li><a href="#trunc">1.57 <code>trunc</code>, <code>truncf</code>&ndash;round to integer, towards zero</a>
+</li></ul>
+<li><a name="toc_Complex" href="#Complex">2 Mathematical Complex Functions (<samp><span class="file">complex.h</span></samp>)</a>
+<ul>
+<li><a href="#cabs">2.1 <code>cabs</code>, <code>cabsf</code>&mdash;complex absolute-value</a>
+<li><a href="#cacos">2.2 <code>cacos</code>, <code>cacosf</code>&mdash;complex arc cosine</a>
+<li><a href="#cacosh">2.3 <code>cacosh</code>, <code>cacoshf</code>&mdash;complex arc hyperbolic cosine</a>
+<li><a href="#carg">2.4 <code>carg</code>, <code>cargf</code>&mdash;argument (phase angle)</a>
+<li><a href="#casin">2.5 <code>casin</code>, <code>casinf</code>&mdash;complex arc sine</a>
+<li><a href="#casinh">2.6 <code>casinh</code>, <code>casinhf</code>&mdash;complex arc hyperbolic sine</a>
+<li><a href="#catan">2.7 <code>catan</code>, <code>catanf</code>&mdash;complex arc tangent</a>
+<li><a href="#catanh">2.8 <code>catanh</code>, <code>catanhf</code>&mdash;complex arc hyperbolic tangent</a>
+<li><a href="#ccos">2.9 <code>ccos</code>, <code>ccosf</code>&mdash;complex cosine</a>
+<li><a href="#ccosh">2.10 <code>ccosh</code>, <code>ccoshf</code>&mdash;complex hyperbolic cosine</a>
+<li><a href="#cexp">2.11 <code>cexp</code>, <code>cexpf</code>&mdash;complex base-e exponential</a>
+<li><a href="#cimag">2.12 <code>cimag</code>, <code>cimagf</code>&mdash;imaginary part</a>
+<li><a href="#clog">2.13 <code>clog</code>, <code>clogf</code>&mdash;complex base-e logarithm</a>
+<li><a href="#conj">2.14 <code>conj</code>, <code>conjf</code>&mdash;complex conjugate</a>
+<li><a href="#cpow">2.15 <code>cpow</code>, <code>cpowf</code>&mdash;complex power</a>
+<li><a href="#cproj">2.16 <code>cproj</code>, <code>cprojf</code>&mdash; Riemann sphere projection</a>
+<li><a href="#creal">2.17 <code>creal</code>, <code>crealf</code>&mdash;real part</a>
+<li><a href="#csin">2.18 <code>csin</code>, <code>csinf</code>&mdash;complex sine</a>
+<li><a href="#csinh">2.19 <code>csinh</code>, <code>csinhf</code>&mdash;complex hyperbolic sine</a>
+<li><a href="#csqrt">2.20 <code>csqrt</code>, <code>csqrtf</code>&mdash;complex square root</a>
+<li><a href="#ctan">2.21 <code>ctan</code>, <code>ctanf</code>&mdash;complex tangent</a>
+<li><a href="#ctanh">2.22 <code>ctanh</code>, <code>ctanf</code>&mdash;complex hyperbolic tangent</a>
+</li></ul>
+<li><a name="toc_Reentrancy" href="#Reentrancy">3 Reentrancy Properties of <code>libm</code></a>
+<li><a name="toc_Long-Double-Functions" href="#Long-Double-Functions">4 The long double function support of <code>libm</code></a>
+<li><a name="toc_Index" href="#Index">Index</a>
+</li></ul>
+</div>
+
+</body></html>
+

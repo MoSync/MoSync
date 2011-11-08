@@ -17,6 +17,10 @@
 require "#{File.dirname(__FILE__)}/util.rb"
 require "#{File.dirname(__FILE__)}/targets.rb"
 
+# load local_config.rb, if it exists.
+lc = "#{File.dirname(__FILE__)}/local_config.rb"
+require lc if(File.exists?(lc))
+
 # Defines default values for all variables that can be used by individual workfiles.
 module Defaults
 def set_defaults
@@ -67,6 +71,15 @@ def set_defaults
 	# Valid values are "debug" and "" (optimized).
 	default_const(:CONFIG, "debug")
 
+	# If true, the GCC version number will be added to BUILDDIR names for native projects.
+	# Useful if you often switch between different versions of GCC.
+	default_const(:USE_GCC_VERSION_IN_BUILDDIR_NAME, false)
+	if(USE_GCC_VERSION_IN_BUILDDIR_NAME && self.class.const_defined?(:NativeGccWork) && self.is_a?(NativeGccWork))
+		builddir_postfix = @gcc_version
+	else
+		builddir_postfix = ''
+	end
+
 	# @BUILDDIR is the name of the build directory, where generated files are stored.
 	# @CONFIG_NAME is the name of the configuration.
 	if(CONFIG == "debug") then
@@ -76,10 +89,10 @@ def set_defaults
 	else
 		error "wrong configuration: " + CONFIG
 	end
-	default(:BUILDDIR_NAME, @BUILDDIR_PREFIX + @CONFIG_NAME)
+	default(:BUILDDIR_NAME, @BUILDDIR_PREFIX + @CONFIG_NAME + builddir_postfix)
 	default(:BUILDDIR, @BUILDDIR_BASE + @BUILDDIR_NAME + "/")
 
-	default(:COMMON_BUILDDIR_NAME, @COMMOM_BUILDDDIR_PREFIX + @CONFIG_NAME)
+	default(:COMMON_BUILDDIR_NAME, @COMMOM_BUILDDDIR_PREFIX + @CONFIG_NAME + builddir_postfix)
 
 	# String, path to a common base directory for all workfiles in the project.
 	default(:COMMON_BASEDIR, File.expand_path_fix(File.dirname(__FILE__) + "/.."))

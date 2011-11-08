@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 
-// This is the core that interprets mosync 
+// This is the core that interprets mosync
 // byte code (produced by pipe-tool).
 // It has dependencies on some idl compiler
 // generated code, such as the SyscallInvoker
@@ -19,6 +19,8 @@ namespace MoSync
         protected int[] mConstantPool;
         protected int[] mRegisters = new int[128];
         protected SyscallInvoker mSyscallInvoker;
+
+        protected Stream mProgramFile;
 
         public class ProgramHeader
         {
@@ -133,13 +135,16 @@ namespace MoSync
             public const int R15 = 31;
         }
 
-        public CoreInterpreted()
+        public CoreInterpreted(Stream programFile)
         {
+            mProgramFile = programFile;
         }
 
 
-        public new void Init()
+        public override void Init()
         {
+            LoadProgram(mProgramFile);
+
             base.Init();
             Start();
             mIp = (int)mProgramHeader.mEntryPoint;
@@ -178,7 +183,7 @@ namespace MoSync
             mRegisters[Reg.R15] = (int)(((ulong)value) >> 32);
         }
 
-        new public int GetStackPointer()
+        public override int GetStackPointer()
         {
             return mRegisters[Reg.SP];
         }
@@ -215,7 +220,7 @@ namespace MoSync
             }
         }
 
-        public void LoadProgram(Stream program)
+        protected void LoadProgram(Stream program)
         {
             mProgramHeader.mMagic = Util.StreamReadUint32(program);
             mProgramHeader.mProgramLength = Util.StreamReadUint32(program);
@@ -401,7 +406,7 @@ namespace MoSync
         // ---------------- END FUGLY DEBUG FACILITIES ----------------------------
 
 
-        public new void Run()
+        public override void Run()
         {
             int imm32;
             byte rd;
@@ -552,7 +557,7 @@ namespace MoSync
                         mRegisters[rd] = mRegisters[rs];
                         break;
 
-                    case Op.ADD: // ADD		
+                    case Op.ADD: // ADD
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
                         mRegisters[rd] += mRegisters[rs];
@@ -564,7 +569,7 @@ namespace MoSync
                         mRegisters[rd] += imm32;
                         break;
 
-                    case Op.MUL: // MUL		
+                    case Op.MUL: // MUL
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
                         mRegisters[rd] *= mRegisters[rs];
@@ -685,7 +690,7 @@ namespace MoSync
                         mRegisters[rd] = (int)((uint)mRegisters[rd] >> imm32);
                         break;
 
-                    case Op.NOT: // NOT 
+                    case Op.NOT: // NOT
                         rd = mProgramMemory[mIp++];
                         rs = mProgramMemory[mIp++];
                         mRegisters[rd] = ~mRegisters[rs];
@@ -869,6 +874,13 @@ namespace MoSync
 
                     case Op.SYSCALL: // SYSCALL
                         imm32 = mProgramMemory[mIp++];
+#if false//DEBUG
+                        if(imm32 > 4)
+                        Util.Log("Syscall "+imm32+": "+mRegisters[CoreInterpreted.Reg.I0]+" "+
+                            mRegisters[CoreInterpreted.Reg.I1] + " " +
+                            mRegisters[CoreInterpreted.Reg.I2] + " " +
+                            mRegisters[CoreInterpreted.Reg.I3]);
+#endif
                         mSyscallInvoker.InvokeSyscall(imm32);
                         break;
 

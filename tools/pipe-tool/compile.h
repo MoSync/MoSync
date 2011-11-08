@@ -738,6 +738,7 @@ decset(int ArgRes, 0)
 decset(int ArgJavaNative, 0)
 decset(int ArgBrewGen, 0)
 decset(int ArgCppGen, 0)
+decset(int ArgCsGen, 0)
 
 decset(int ArgFilePaths, 0)
 decset(int ArgOptimize, 1)

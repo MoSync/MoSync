@@ -12,7 +12,4 @@
     Foreground="{StaticResource PhoneForegroundBrush}"
     SupportedOrientations="Portrait" Orientation="Portrait"
     shell:SystemTray.IsVisible="False">
-    <Grid x:Name="ViewPortContainer" Width="480" Height="800" Margin="0,0">
-    <Image x:Name="ViewPort" />
-    </Grid>
 </phone:PhoneApplicationPage>

@@ -113,6 +113,7 @@ config_platform.h
 /runtimes/cpp/platforms/iphone/data_section.bin
 /runtimes/cpp/platforms/iphone/template/
 
+/runtimes/cpp/platforms/winmobile/winmobile.sln
 
 /runtimes/cpp/platforms/symbian/sis*/*.SIS
 
@@ -164,6 +165,8 @@ config_platform.h
 /tools/debugger/start.bat
 /tools/debugger/filesystem
 
+/tools/iphone-apns/Certs/
+
 /runtimes/cpp/platforms/sdl/MoRE/filesystem/*
 /runtimes/cpp/platforms/android/config_platform.h.saved
 /runtimes/java/platforms/javaME/setdirs.bat
@@ -200,3 +203,15 @@ config_platform.h
 /tools/mhsd-display/mhsd.bin
 
 /runtimes/csharp/windowsphone/mosync/mosync/Source/maapi.cs
+
+/runtimes/csharp/windowsphone/mosync/mosync/Bin/rebuild_debug
+/runtimes/csharp/windowsphone/mosync/mosync/Bin/rebuild_release
+/runtimes/csharp/windowsphone/mosync/mosync/obj
+/runtimes/csharp/windowsphone/mosync/mosync/RebuildData
+/runtimes/csharp/windowsphone/mosync/mosyncLib/obj
+/runtimes/csharp/windowsphone/mosync/mosyncLib/bin
+/runtimes/csharp/windowsphone/mosync/mosyncLibContent/bin
+/runtimes/csharp/windowsphone/mosync/mosyncLibContent/obj
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/maapi.cs
+
+/rules/local_config.rb

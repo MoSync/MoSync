@@ -3,14 +3,33 @@ using System.IO;
 using System.IO.IsolatedStorage;
 using System.Windows;
 using System.Threading;
+using System.Windows.Media.Imaging;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.GamerServices;
 
 namespace MoSync
 {
-    class Util
+    public class Util
     {
+        public static readonly DateTime Epoch = new DateTime(1970, 1, 1, 0, 0, 0, 0);
+        public static readonly long EpochFileTime = Epoch.ToFileTime();
+        public static readonly long EpochFileTimeUtc = Epoch.ToFileTimeUtc();
+
+        public static long ToUnixTime(DateTime dt)
+        {
+            return (dt.ToFileTime() - EpochFileTime) / 10000000;
+        }
+
+        public static long ToUnixTimeUtc(DateTime dt)
+        {
+            return ToUnixTimeUtc(dt.ToFileTimeUtc());
+        }
+
+        public static long ToUnixTimeUtc(long fileTime)
+        {
+            return (fileTime - EpochFileTimeUtc) / 10000000;
+        }
 
         public static uint NextPowerOfTwo(int minPow, uint val)
         {
@@ -84,7 +103,10 @@ namespace MoSync
             return BitConverter.ToSingle(BitConverter.GetBytes(a), 0);
         }
 
-
+        public static int ConvertToInt(float v)
+        {
+            return BitConverter.ToInt32(BitConverter.GetBytes(v), 0);
+        }
         private static bool sLoggingStarted = false;
         private static void InitLogging()
         {
@@ -101,27 +123,56 @@ namespace MoSync
             Console.Write(text);
             InitLogging();
             WriteTextToFile(text, "log.txt");
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                DebugWrite(text);
+            }
+        }
+
+        private static void DebugWrite(String text)
+        {
+            if (text[text.Length - 1] == '\n')
+                text = text.Substring(0, text.Length - 1);
+            System.Diagnostics.Debug.WriteLine(text);
         }
 
         public static void Log(byte[] bytes)
         {
             InitLogging();
             WriteBytesToFile(bytes, "log.txt");
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                String text = System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+                DebugWrite(text);
+            }
         }
+
+        public class ExitException : Exception
+        {
+            public readonly int result;
+            public ExitException(int res)
+            {
+                result = res;
+            }
+        };
 
         public static void CriticalError(String text)
         {
             Log(text);
             //System.Environment.Exit(1);
             //MessageBox.Show(text);
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                System.Diagnostics.Debugger.Break();
+            }
             Deployment.Current.Dispatcher.BeginInvoke(() => MessageBox.Show(text));
-            //throw new Exception("ExitAppException");
+            throw new ExitException(-1);
         }
 
         public static void Exit(int res)
         {
-            CriticalError("Exited!");
-            throw new Exception("ExitAppException");
+            //CriticalError("Exited!");
+            throw new ExitException(res);
         }
 
         public static int CreateExtent(int w, int h)
@@ -129,10 +180,19 @@ namespace MoSync
             return (w << 16) | h;
         }
 
+        public static int ExtentX(int extent)
+        {
+            return (extent>>16)&0xffff;
+        }
+
+        public static int ExtentY(int extent)
+        {
+            return (extent) & 0xffff;
+        }
 
         static Thread sStartupThread;
 
-        // This must be run once from the main ui thread to save 
+        // This must be run once from the main ui thread to save
         // which thread is the main ui thread.
         public static void InitStartupThread()
         {
@@ -180,6 +240,43 @@ namespace MoSync
                     binaryWriter.Write(bytes);
                 binaryWriter.Close();
             }
+        }
+
+        public static void convertStringToColor(string value, out System.Windows.Media.SolidColorBrush brush)
+        {
+            brush = null;
+            if (value.Length == 8 && value[0].Equals('0') && value[1].Equals('x'))
+            {
+                //converting the string from value into RGB bytes
+                byte R = Byte.Parse(value.Substring(2, 2), System.Globalization.NumberStyles.HexNumber);
+                byte G = Byte.Parse(value.Substring(4, 2), System.Globalization.NumberStyles.HexNumber);
+                byte B = Byte.Parse(value.Substring(6, 2), System.Globalization.NumberStyles.HexNumber);
+                byte A = 255;
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
+            }
+            else if (value.Length == 7 && value[0].Equals('#'))
+            {
+                //converting the string from value into RGB bytes
+                byte R = Byte.Parse(value.Substring(1, 2), System.Globalization.NumberStyles.HexNumber);
+                byte G = Byte.Parse(value.Substring(3, 2), System.Globalization.NumberStyles.HexNumber);
+                byte B = Byte.Parse(value.Substring(5, 2), System.Globalization.NumberStyles.HexNumber);
+                byte A = 255;
+                brush = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromArgb(A, R, G, B));
+            }
+        }
+
+        public static WriteableBitmap CreateWriteableBitmapFromStream(Stream stream)
+        {
+            WriteableBitmap wb = null;
+            MoSync.Util.RunActionOnMainThreadSync(() =>
+            {
+                BitmapImage im = new BitmapImage();
+                im.CreateOptions = BitmapCreateOptions.None;
+                im.SetSource(stream);
+                wb = new WriteableBitmap(im);
+            });
+
+            return wb;
         }
     }
 }

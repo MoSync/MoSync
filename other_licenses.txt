@@ -155,6 +155,7 @@ build-one.rb
 /tools/e32hack/crc.h
 
 /tools/ReleasePackageBuild/build_package_tools/mosync_bin/default_maprofile.h
+/tools/ReleasePackageBuild/build_package_tools/mosync_docs/newlib/
 /tools/ReleasePackageBuild/linux
 
 /tools/SplashScreenGenerator/main.rb
@@ -164,3 +165,6 @@ build-one.rb
 /tools/DefaultSkinGenerator/Generator.rb
 
 /tools/vis/ConvertSLD.rb
+
+/runtimes/csharp/windowsphone/mosync/mosyncRuntime/Libraries
+/tools/winphone-builder/pugixml-1.0

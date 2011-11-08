@@ -8,7 +8,7 @@ namespace MoSync
     // This is the interface to the data memory segment for the mosync core.
     // It is also used for binary resources among other things.
     // This should probably implement the stream interface in order to be able to pass it to functions that require streams.
-    // TODO: maybe this should implement another interface (like Stream) 
+    // TODO: maybe this should implement another interface (like Stream)
     // so that code can be efficiently shared between binary resources
     // and unloaded binary resources. Now ubins are loaded into memory also,
     // in order to get something up and running quickly.
@@ -155,6 +155,15 @@ namespace MoSync
             System.Array.Copy(mData, src, bytes, 0, size);
         }
 
+        // size equals the amount of integers
+        public void ReadIntegers(int[] integers, int src, int size)
+        {
+            for (int i = 0; i < size; i++)
+            {
+                integers[i] = ReadInt32(src + i * 4);
+            }
+        }
+
         public void WriteMemoryAtAddress(int dstaddress, Memory memory, int srcaddress, int length)
         {
             byte[] srcBytes = memory.mData;
@@ -178,5 +187,16 @@ namespace MoSync
         {
             return mData;
         }
+
+        public Stream GetStream()
+        {
+            return new System.IO.MemoryStream((byte[])mData);
+        }
+
+        public Stream GetStream(int offset, int size)
+        {
+            return new System.IO.MemoryStream((byte[])mData, offset, size);
+        }
+
     }
 }

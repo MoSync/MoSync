@@ -1,6 +1,6 @@
 using System;
 
-// The Core is the base class for the program execution. 
+// The Core is the base class for the program execution.
 // It has an interface for getting access to the data memory
 // and the stack pointer / stack values.
 // This is the interface the runtime get access to.
@@ -28,7 +28,7 @@ namespace MoSync
             mRunning = false;
         }
 
-        public int GetStackPointer()
+        public virtual int GetStackPointer()
         {
             return 0;
         }
@@ -39,11 +39,11 @@ namespace MoSync
         }
 
         // will reset the program.
-        public void Init()
+        public virtual void Init()
         {
         }
 
-        public void Run()
+        public virtual void Run()
         {
 
         }
