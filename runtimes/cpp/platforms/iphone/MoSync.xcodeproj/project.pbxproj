@@ -65,6 +65,9 @@
 		43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A7684E1400F6BA009608A4 /* ImagePickerController.h */; };
 		43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
 		43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
+		43C3F4811469794600E02C41 /* PushNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 43C3F47F1469794600E02C41 /* PushNotification.h */; };
+		43C3F4821469794600E02C41 /* PushNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C3F4801469794600E02C41 /* PushNotification.mm */; };
+		43C3F4831469794600E02C41 /* PushNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C3F4801469794600E02C41 /* PushNotification.mm */; };
 		43CE0BE51463E9B800F8FFC3 /* Ads.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BE11463E9B800F8FFC3 /* Ads.h */; };
 		43CE0BE61463E9B800F8FFC3 /* Ads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE21463E9B800F8FFC3 /* Ads.mm */; };
 		43CE0BE71463E9B800F8FFC3 /* Ads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE21463E9B800F8FFC3 /* Ads.mm */; };
@@ -335,6 +338,8 @@
 		432B98CB1432040B00BDB926 /* PimError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimError.h; sourceTree = "<group>"; };
 		43A7684E1400F6BA009608A4 /* ImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerController.h; sourceTree = "<group>"; };
 		43A7684F1400F6BA009608A4 /* ImagePickerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImagePickerController.mm; sourceTree = "<group>"; };
+		43C3F47F1469794600E02C41 /* PushNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PushNotification.h; path = notifications/PushNotification.h; sourceTree = "<group>"; };
+		43C3F4801469794600E02C41 /* PushNotification.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PushNotification.mm; path = notifications/PushNotification.mm; sourceTree = "<group>"; };
 		43CE0BE11463E9B800F8FFC3 /* Ads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Ads.h; path = ads/Ads.h; sourceTree = "<group>"; };
 		43CE0BE21463E9B800F8FFC3 /* Ads.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Ads.mm; path = ads/Ads.mm; sourceTree = "<group>"; };
 		43CE0BE31463E9B800F8FFC3 /* BannerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BannerWidget.h; path = ads/BannerWidget.h; sourceTree = "<group>"; };
@@ -727,6 +732,8 @@
 		43CE0BE01463E98F00F8FFC3 /* notifications */ = {
 			isa = PBXGroup;
 			children = (
+				43C3F47F1469794600E02C41 /* PushNotification.h */,
+				43C3F4801469794600E02C41 /* PushNotification.mm */,
 				43CE0BEB1463E9C600F8FFC3 /* Notification.h */,
 				43CE0BEC1463E9C600F8FFC3 /* Notification.mm */,
 			);
@@ -1067,6 +1074,7 @@
 				43CE0BE51463E9B800F8FFC3 /* Ads.h in Headers */,
 				43CE0BE81463E9B800F8FFC3 /* BannerWidget.h in Headers */,
 				43CE0BED1463E9C600F8FFC3 /* Notification.h in Headers */,
+				43C3F4811469794600E02C41 /* PushNotification.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1266,6 +1274,7 @@
 				43CE0BE61463E9B800F8FFC3 /* Ads.mm in Sources */,
 				43CE0BE91463E9B800F8FFC3 /* BannerWidget.mm in Sources */,
 				43CE0BEE1463E9C600F8FFC3 /* Notification.mm in Sources */,
+				43C3F4821469794600E02C41 /* PushNotification.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1355,6 +1364,7 @@
 				43CE0BE71463E9B800F8FFC3 /* Ads.mm in Sources */,
 				43CE0BEA1463E9B800F8FFC3 /* BannerWidget.mm in Sources */,
 				43CE0BEF1463E9C600F8FFC3 /* Notification.mm in Sources */,
+				43C3F4831469794600E02C41 /* PushNotification.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
