@@ -34,12 +34,24 @@
      * - UILocalNotification type objects(the object).
      * - NSNumber type objects(the key).
      */
-    NSMutableDictionary* mNotificationDictionary;
+    NSMutableDictionary* mLocalNotificationDictionary;
 
     /**
-     * Counts the number of created notifications.
+     * Counts the number of created local notifications.
      */
-    int mHandleCount;
+    int mLocalNotificationHandleCount;
+
+    /**
+     * Stores pairs of:
+     * - PushNotification type objects(the object).
+     * - NSNumber type objects(the key).
+     */
+    NSMutableDictionary* mPushNotificationDictionary;
+
+    /**
+     * Counts the number of created local notifications.
+     */
+    int mPushNotificationHandleCount;
 
     /**
      * Set if the push notification are enabled.
@@ -163,11 +175,30 @@
 -(int) unregisterPushNotification;
 
 /**
- * The number currently set as the badge of the application icon in Springboard.
+ * Fills pushNotificationData struct with the values from a given push notification.
+ * @param pushNotificationHandle Handle to a given push notification.
+ * @param pushNotificationData A struct that will contain the values for a given push notification.
+ * @return One of the next contants:
+ * - MA_NOTIFICATION_RES_OK if no error occurred.
+ * - MA_NOTIFICATION_RES_INVALID_HANDLE if the pushNotificationHandle is invalid.
+ * - MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if at least one of the buffers from
+ * pushNotificationData are too small.
+ */
+-(int) getPushNotificationData:(MAHandle) pushNotificationHandle
+                          data:(MAPushNotificationData*) pushNotificationData;
+
+/**
+ * Set the number currently set as the badge of the application icon in Springboard.
  * @param applicationIconBadgeNumber Set to zero to hide the badge number. The default is zero.
  * If this value is negative the method will do nothing.
  */
 -(void) setApplicationIconBadgeNumber:(const int) applicationIconBadgeNumber;
+
+/**
+ * Get the number currently set as the badge of the application icon in Springboard.
+ * @return The number displayed as the badge of the application.
+ */
+-(int) getApplicationIconBadgeNumber;
 
 /**
  * Called when a running application receives a push notification.

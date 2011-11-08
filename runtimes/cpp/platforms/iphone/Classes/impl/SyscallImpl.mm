@@ -1915,9 +1915,19 @@ return 0; \
 	{
         return [[Notification getInstance] unregisterPushNotification];
 	}
+    SYSCALL(int, maNotificationPushGetData(MAHandle pushNotificationHandle,
+                                           MAPushNotificationData* pushNotificationData))
+	{
+        return [[Notification getInstance] getPushNotificationData:pushNotificationHandle
+                                                              data:pushNotificationData];
+	}
     SYSCALL(void, maNotificationSetIconBadge(const int applicationIconBadgeNumber))
 	{
-        return [[Notification getInstance] setApplicationIconBadgeNumber:applicationIconBadgeNumber];
+        [[Notification getInstance] setApplicationIconBadgeNumber:applicationIconBadgeNumber];
+	}
+    SYSCALL(int, maNotificationGetIconBadge())
+	{
+        return [[Notification getInstance] getApplicationIconBadgeNumber];
 	}
 
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c))
@@ -2015,7 +2025,9 @@ return 0; \
         maIOCtl_case(maNotificationLocalUnregister);
         maIOCtl_case(maNotificationPushRegister);
         maIOCtl_case(maNotificationPushUnregister);
+        maIOCtl_case(maNotificationPushGetData);
         maIOCtl_case(maNotificationSetIconBadge);
+        maIOCtl_case(maNotificationGetIconBadge);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;

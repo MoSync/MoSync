@@ -15,10 +15,31 @@
  02111-1307, USA.
  */
 
+/**
+ * An example for a received push notification JSON data:
+ *
+ * aps =
+ * {
+ *   alert = "This is my message.";
+ *   badge = 1;
+ *   sound = "mysound.mp3";
+ *  };
+ *
+ */
+// Dictionary key name for push notification JSON data.
+#define NOTIFICATION_KEY @"aps"
+
+// Dictionary key names for the push notification values.
+#define BADGE_ICON_KEY @"badge"
+#define ALERT_MESSAGE_KEY @"alert"
+#define SOUND_KEY @"sound"
+
 #import "Notification.h"
 
 #import "IWidget.h"
 #import "helpers/cpp_defs.h"
+#import "Syscall.h"
+#import "PushNotification.h"
 
 @implementation Notification
 
@@ -46,10 +67,15 @@ static Notification *sharedInstance = nil;
     [sharedInstance release];
 }
 
+/**
+ * Init function.
+ */
 - (id)init
 {
-    mHandleCount = 0;
-    mNotificationDictionary = [[NSMutableDictionary alloc] init];
+    mLocalNotificationHandleCount = 0;
+    mPushNotificationHandleCount = 0;
+    mLocalNotificationDictionary = [[NSMutableDictionary alloc] init];
+    mPushNotificationDictionary = [[NSMutableDictionary alloc] init];
     mIsPushNotificationEnabled = false;
 
     return [super init];
@@ -64,8 +90,8 @@ static Notification *sharedInstance = nil;
  */
 -(MAHandle) createNotificationObject
 {
-    mHandleCount++;
-    if (INT32_MAX == mHandleCount)
+    mLocalNotificationHandleCount++;
+    if (INT32_MAX == mLocalNotificationHandleCount)
     {
         return MA_NOTIFICATION_RES_ERROR;
     }
@@ -82,14 +108,14 @@ static Notification *sharedInstance = nil;
 
         notification.timeZone = [NSTimeZone systemTimeZone];
         notification.fireDate = [NSDate date];
-        [mNotificationDictionary setObject:notification
-                                    forKey:[NSNumber numberWithInt:mHandleCount]];
+        [mLocalNotificationDictionary setObject:notification
+                                    forKey:[NSNumber numberWithInt:mLocalNotificationHandleCount]];
     }
     else
     {
         return MA_NOTIFICATION_RES_UNSUPPORTED;
     }
-    return mHandleCount;
+    return mLocalNotificationHandleCount;
 }
 
 /**
@@ -102,14 +128,14 @@ static Notification *sharedInstance = nil;
 -(int) destroyNotificationObject:(MAHandle) notificationHandle
 {
     NSNumber* key = [NSNumber numberWithInt:notificationHandle];
-    UILocalNotification* notification = [mNotificationDictionary objectForKey:key];
+    UILocalNotification* notification = [mLocalNotificationDictionary objectForKey:key];
     if (!notification)
     {
         NSLog(@"destroyNotificationObject invalid handle");
         return MA_NOTIFICATION_RES_INVALID_HANDLE;
     }
 
-    [mNotificationDictionary removeObjectForKey:key];
+    [mLocalNotificationDictionary removeObjectForKey:key];
     [notification release];
     return MA_NOTIFICATION_RES_OK;
 }
@@ -130,10 +156,9 @@ static Notification *sharedInstance = nil;
                          value:(const char*) valueChar
 {
     NSNumber* key = [NSNumber numberWithInt:notificationHandle];
-    UILocalNotification* notification = [mNotificationDictionary objectForKey:key];
+    UILocalNotification* notification = [mLocalNotificationDictionary objectForKey:key];
     if (!notification)
     {
-        NSLog(@"notificationSetProperty invalid handle");
         return MA_NOTIFICATION_RES_INVALID_HANDLE;
     }
 
@@ -202,7 +227,7 @@ static Notification *sharedInstance = nil;
                           size:(int) maxSize
 {
     NSNumber* key = [NSNumber numberWithInt:notificationHandle];
-    UILocalNotification* notification = [mNotificationDictionary objectForKey:key];
+    UILocalNotification* notification = [mLocalNotificationDictionary objectForKey:key];
     if (!notification)
     {
         NSLog(@"notificationGetProperty invalid handle");
@@ -292,7 +317,7 @@ static Notification *sharedInstance = nil;
 -(int) registerLocalNotification:(MAHandle) notificationHandle
 {
     NSNumber* key = [NSNumber numberWithInt:notificationHandle];
-    UILocalNotification* notification = [mNotificationDictionary objectForKey:key];
+    UILocalNotification* notification = [mLocalNotificationDictionary objectForKey:key];
     if (!notification)
     {
         NSLog(@"registerLocalNotification invalid handle");
@@ -313,7 +338,7 @@ static Notification *sharedInstance = nil;
 -(int) unregisterLocalNotification:(MAHandle) notificationHandle
 {
     NSNumber* key = [NSNumber numberWithInt:notificationHandle];
-    UILocalNotification* notification = [mNotificationDictionary objectForKey:key];
+    UILocalNotification* notification = [mLocalNotificationDictionary objectForKey:key];
     if (!notification)
     {
         NSLog(@"unregisterLocalNotification invalid handle");
@@ -352,10 +377,10 @@ static Notification *sharedInstance = nil;
  */
 -(MAHandle) getNotificationHandle:(UILocalNotification*) notification
 {
-    NSArray* allKeys = [mNotificationDictionary allKeys];
+    NSArray* allKeys = [mLocalNotificationDictionary allKeys];
     for (NSNumber* key in allKeys)
     {
-        UILocalNotification* localNotification = [mNotificationDictionary objectForKey:key];
+        UILocalNotification* localNotification = [mLocalNotificationDictionary objectForKey:key];
         if (localNotification == notification)
         {
             return [key intValue];
@@ -419,7 +444,7 @@ static Notification *sharedInstance = nil;
 }
 
 /**
- * The number currently set as the badge of the application icon in Springboard.
+ * Set the number currently set as the badge of the application icon in Springboard.
  * @param applicationIconBadgeNumber Set to zero to hide the badge number. The default is zero.
  * If this value is negative the method will do nothing.
  */
@@ -432,6 +457,15 @@ static Notification *sharedInstance = nil;
 }
 
 /**
+ * Get the number currently set as the badge of the application icon in Springboard.
+ * @return The number displayed as the badge of the application.
+ */
+-(int) getApplicationIconBadgeNumber
+{
+    return [[UIApplication sharedApplication] applicationIconBadgeNumber];
+}
+
+/**
  * Called when a running application receives a push notification.
  * @param pushNotification A dictionary that contains information related to the push notification,
  * potentially including a badge number for the application icon, an alert sound, an alert message
@@ -440,43 +474,110 @@ static Notification *sharedInstance = nil;
  */
 - (void) didReceivePushNotification:(NSDictionary*) pushNotification
 {
-    NSDictionary* apsDict = [pushNotification objectForKey:@"aps"];
+    NSDictionary* apsDict = [pushNotification objectForKey:NOTIFICATION_KEY];
     if (!apsDict)
     {
         NSLog(@"The push notification object is invalid.");
         return;
     }
 
-    NSString* alertMessage = [apsDict objectForKey:@"alert"];
-    NSString* sound = [apsDict objectForKey:@"sound"];
-    NSNumber* badge = [apsDict objectForKey:@"badge"];
+    // Extract values from dictionary.
+    NSString* alertMessage = [apsDict objectForKey:ALERT_MESSAGE_KEY];
+    NSString* sound = [apsDict objectForKey:SOUND_KEY];
+    NSNumber* badge = [apsDict objectForKey:BADGE_ICON_KEY];
 
-    MAEvent event;
-    event.type = EVENT_TYPE_PUSH_NOTIFICATION;
-
+    PushNotification* pushNotificationObj = [[PushNotification alloc] init];
     if (alertMessage)
     {
-        [alertMessage getCString:event.pushNotificationEventData.alertMessage
-                       maxLength:alertMessage.length + 1
-                        encoding:NSASCIIStringEncoding];
+        pushNotificationObj.alertMessage = alertMessage;
     }
     if (sound)
     {
-        [sound getCString:event.pushNotificationEventData.soundFileName
-                    maxLength:sound.length + 1
-                        encoding:NSASCIIStringEncoding];
+        pushNotificationObj.soundFileName = sound;
     }
     if (badge)
     {
-        event.pushNotificationEventData.badgeIcon = [badge intValue];
+        pushNotificationObj.badgeIcon = badge;
     }
 
+    // Store the push notification object into dictionary.
+    mPushNotificationHandleCount++;
+    [mPushNotificationDictionary setObject:pushNotificationObj
+                                    forKey:[NSNumber numberWithInt:mPushNotificationHandleCount]];
+
+    // Send push notification event.
+    MAEvent event;
+    event.type = EVENT_TYPE_PUSH_NOTIFICATION;
+    event.pushNotificationHandle = mPushNotificationHandleCount;
     Base::gEventQueue.put(event);
 }
 
+/**
+ * Fills pushNotificationData struct with the values from a given push notification.
+ * @param pushNotificationHandle Handle to a given push notification.
+ * @param pushNotificationData A struct that will contain the values for a given push notification.
+ * @return One of the next contants:
+ * - MA_NOTIFICATION_RES_OK if no error occurred.
+ * - MA_NOTIFICATION_RES_INVALID_HANDLE if the pushNotificationHandle is invalid.
+ * - MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if at least one of the buffers from
+ * pushNotificationData are too small.
+ */
+-(int) getPushNotificationData:(MAHandle) pushNotificationHandle
+                          data:(MAPushNotificationData*) pushNotificationData
+{
+    PushNotification* pushNotification = [mPushNotificationDictionary objectForKey:
+                                          [NSNumber numberWithInt:pushNotificationHandle]];
+    if (!pushNotificationHandle)
+    {
+        return MA_NOTIFICATION_RES_INVALID_HANDLE;
+    }
+
+    int pushNotificationType = 0;
+    int maxLength = pushNotificationData->alertMessageSize;
+    int address = (int) pushNotificationData->alertMessage;
+    char* charAddress = (char*) Base::gSyscall->GetValidatedMemRange(address, maxLength);
+
+    NSString* messageAlert = pushNotification.alertMessage;
+    if (messageAlert)
+    {
+        [messageAlert getCString:charAddress maxLength:maxLength encoding:NSASCIIStringEncoding];
+        pushNotificationType = pushNotificationType | MA_NOTIFICATION_PUSH_TYPE_ALERT;
+    }
+
+    maxLength = pushNotificationData->soundFileNameSize;
+    address = (int) pushNotificationData->soundFileName;
+    charAddress = (char*) Base::gSyscall->GetValidatedMemRange(address, maxLength);
+
+    NSString* soundFileName = pushNotification.soundFileName;
+    if (soundFileName)
+    {
+        [soundFileName getCString:charAddress maxLength:maxLength encoding:NSASCIIStringEncoding];
+        pushNotificationType = pushNotificationType | MA_NOTIFICATION_PUSH_TYPE_SOUND;
+    }
+
+    NSNumber* iconBadge = pushNotification.badgeIcon;
+    if (iconBadge)
+    {
+        pushNotificationData->badgeIcon = [iconBadge intValue];
+        pushNotificationType = pushNotificationType | MA_NOTIFICATION_PUSH_TYPE_BADGE;
+    }
+    else
+    {
+        pushNotificationData->badgeIcon = 0;
+    }
+
+    pushNotificationData->type = pushNotificationType;
+    return MA_NOTIFICATION_RES_OK;
+}
+
+/**
+ * Release all contained objects.
+ */
 -(void) dealloc
 {
-    [mNotificationDictionary release];
+    [mLocalNotificationDictionary release];
+    [mPushNotificationDictionary release];
+
     [super dealloc];
 }
 
