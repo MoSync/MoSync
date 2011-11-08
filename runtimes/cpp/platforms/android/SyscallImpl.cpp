@@ -2606,12 +2606,6 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maDBCursorGetRowCount:
-			return _maDBCursorGetRowCount(
-				a,
-				mJNIEnv,
-				mJThis);
-
 		case maIOCtl_maDBCursorNext:
 			return _maDBCursorNext(
 				a,
@@ -2649,8 +2643,8 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
-		case maIOCtl_maDBCursorGetColumnFloat:
-			return _maDBCursorGetColumnFloat(
+		case maIOCtl_maDBCursorGetColumnDouble:
+			return _maDBCursorGetColumnDouble(
 				a,
 				b,
 				(int)SYSCALL_THIS->GetValidatedMemRange(c, sizeof(float))

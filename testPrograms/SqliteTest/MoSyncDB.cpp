@@ -18,7 +18,7 @@ MA 02110-1301, USA.
 
 /**
  * @file MoSyncDB.cpp
- * @author Mikael KIndborg
+ * @author Mikael Kindborg
  *
  * @brief Implemention of the MoSync Database API.
  */

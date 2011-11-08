@@ -3021,39 +3021,15 @@ namespace Base
 	}
 
 	/**
-	 * Returns the number of rows in the result set pointed
-	 * to by the cursor.
-	 * @param cursorHandle Handle to the cursor.
-	 * @return The number of rows in the result set, #MA_DB_ERROR on error.
-	 */
-	int _maDBCursorGetRowCount(
-		MAHandle cursorHandle,
-		JNIEnv* jNIEnv,
-		jobject jThis)
-	{
-		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(
-			cls,
-			"maDBCursorGetRowCount",
-			"(I)I");
-		if (methodID == 0)
-		{
-			// Method not found.
-			return -1;
-		}
-		jint result = jNIEnv->CallIntMethod(
-			jThis,
-			methodID,
-			cursorHandle);
-		jNIEnv->DeleteLocalRef(cls);
-		return (int)result;
-	}
-
-	/**
 	 * Move the cursor to the next row in the result set.
+	 * Note that you must call this function before retrieving
+	 * column data. The initial position of the cursor is
+	 * before the first row in the result set. If the result
+	 * set is empty, this function will return a value != MA_DB_OK.
 	 * @param cursorHandle Handle to the cursor.
-	 * @return #MA_DB_NO_ROW if there are no more rows in the result set,
-	 * #MA_DB_OK if successfully moved to next row, #MA_DB_ERROR on error.
+	 * @return #MA_DB_OK if successfully moved to next row,
+	 * #MA_DB_NO_ROW if there are no more rows in the result set,
+	 * #MA_DB_ERROR on error.
 	 */
 	int _maDBCursorNext(
 		MAHandle cursorHandle,
@@ -3119,8 +3095,8 @@ namespace Base
 
 	/**
 	 * Get the column value at the current row pointed to
-	 * by the cursor into a data buffer. Use this function
-	 * for text data.
+	 * by the cursor as a text data buffer. Use this function for
+	 * text data.
 	 * @param cursorHandle Handle to the cursor.
 	 * @param columnIndex Index of the column to retrieve value from.
 	 * First column has index zero.
@@ -3162,11 +3138,11 @@ namespace Base
 
 	/**
 	 * Get the column value at the current row pointed to
-	 * by the cursor as int data.
+	 * by the cursor as an int value.
 	 * @param cursorHandle Handle to the cursor.
 	 * @param columnIndex Index of the column to retrieve value from.
 	 * First column has index zero.
-	 * @param intValueAddress Adddress to int to receive the value.
+	 * @param intValueAddress Address to int to receive the value.
 	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
 	 */
 	int _maDBCursorGetColumnInt(
@@ -3198,24 +3174,24 @@ namespace Base
 
 	/**
 	 * Get the column value at the current row pointed to
-	 * by the cursor as float data.
+	 * by the cursor as a double value.
 	 * @param cursorHandle Handle to the cursor.
 	 * @param columnIndex Index of the column to retrieve value from.
 	 * First column has index zero.
-	 * @param floatValueAddress Address to float to receive the value.
+	 * @param doubleValueAddress Address to double to receive the value.
 	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
 	 */
-	int _maDBCursorGetColumnFloat(
+	int _maDBCursorGetColumnDouble(
 		MAHandle cursorHandle,
 		int columnIndex,
-		int floatValueAddress,
+		int doubleValueAddress,
 		JNIEnv* jNIEnv,
 		jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jmethodID methodID = jNIEnv->GetMethodID(
 			cls,
-			"maDBCursorGetColumnFloat",
+			"maDBCursorGetColumnDouble",
 			"(III)I");
 		if (methodID == 0)
 		{
@@ -3227,7 +3203,7 @@ namespace Base
 			methodID,
 			cursorHandle,
 			columnIndex,
-			floatValueAddress);
+			doubleValueAddress);
 		jNIEnv->DeleteLocalRef(cls);
 		return (int)result;
 	}

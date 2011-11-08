@@ -59,11 +59,11 @@ int getColumnInt(MAHandle cursor, int column)
 /**
  * Utility function that gets a float value.
  */
-float getColumnFloat(MAHandle cursor, int column)
+double getColumnDouble(MAHandle cursor, int column)
 {
-	float value;
-	int success = maDBCursorGetColumnFloat(cursor, column, &value);
-	MUST_HOLD(MA_DB_OK == success, "getColumnInt failed");
+	double value;
+	int success = maDBCursorGetColumnDouble(cursor, column, &value);
+	MUST_HOLD(MA_DB_OK == success, "getColumnDouble failed");
 	return value;
 }
 
@@ -94,7 +94,7 @@ void test1()
 
 	// Create table.
 	result = maDBExecSQL(db,
-		"CREATE TABLE pet (name TEXT(50), age INTEGER, curiosity FLOAT)");
+		"CREATE TABLE pet (name TEXT(50), age INTEGER, curiosity DOUBLE)");
 	MUST_HOLD(MA_DB_OK == result, "CREATE TABLE failed");
 
 	// Insert values.
@@ -103,22 +103,28 @@ void test1()
 	result = maDBExecSQL(db, "INSERT INTO pet VALUES ('Vilma', 10, 0.999)");
 	MUST_HOLD(MA_DB_OK == result, "INSERT 2 failed");
 
+	// Count all rows.
+	MAHandle cursorx = maDBExecSQL(db, "SELECT COUNT(*) FROM (SELECT * FROM pet)");
+	maDBCursorNext(cursorx);
+	int numberOfRows = getColumnInt(cursorx, 0);
+	printf("Number of rows: %i\n", numberOfRows);
+	MUST_HOLD(2 == numberOfRows, "Wrong number of rows");
+    maDBCursorDestroy(cursorx);
+
 	// Query all rows.
 	MAHandle cursor = maDBExecSQL(db, "SELECT * FROM pet");
-	printf("Number of rows: %i\n" , maDBCursorGetRowCount(cursor));
-	MUST_HOLD(2 == maDBCursorGetRowCount(cursor), "Wrong number of rows");
 
 	// Print all rows.
 	char name[51];
 	int age;
-	float curiosity;
+	double curiosity;
 	int row = 0;
 	while (MA_DB_OK == maDBCursorNext(cursor))
 	{
 		// Get and print data.
 		getColumnString(cursor, 0, name, 50);
 		age = getColumnInt(cursor, 1);
-		curiosity = getColumnFloat(cursor, 2);
+		curiosity = getColumnDouble(cursor, 2);
 		printf("%s %d %f\n", name, age, curiosity);
 
 		// Test that data is as expected.
@@ -180,12 +186,8 @@ void test2()
 	result = maDBClose(db);
 	MUST_HOLD(MA_DB_OK == result, "maDBClose failed");
 
-	MUST_HOLD(MA_DB_ERROR == maDBCursorGetRowCount(999), "Negative 4 failed");
-	MUST_HOLD(MA_DB_ERROR == maDBCursorGetRowCount(0), "Negative 5 failed");
-	MUST_HOLD(MA_DB_ERROR == maDBCursorGetRowCount(-1), "Negative 6 failed");
-
 	result = maDBCursorDestroy(8888);
-	MUST_HOLD(MA_DB_ERROR == maDBCursorGetRowCount(-1), "Negative 7 failed");
+	MUST_HOLD(MA_DB_ERROR == result, "Negative 4 failed");
 
 	// TODO: Add negative query tests.
 

@@ -4,10 +4,10 @@ import java.nio.ByteBuffer;
 import java.util.HashMap;
 
 import android.database.Cursor;
+import android.database.CursorIndexOutOfBoundsException;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteException;
-import android.util.Log;
 import static com.mosync.internal.generated.MAAPI_consts.*;
 
 /**
@@ -143,34 +143,15 @@ public class MoSyncDB
 	}
 
 	/**
-	 * Returns the number of rows in the result set pointed
-	 * to by the cursor.
-	 * @param cursorHandle Handle to the cursor.
-	 * @return The number of rows in the result set, MA_DB_ERROR on error.
-	 */
-	public int maDBCursorGetRowCount(int cursorHandle)
-	{
-		if (!hasCursor(cursorHandle))
-		{
-			return MA_DB_ERROR;
-		}
-
-		try
-		{
-			return getCursor(cursorHandle).getRowCount();
-		}
-		catch (SQLiteException ex)
-		{
-			ex.printStackTrace();
-			return MA_DB_ERROR;
-		}
-	}
-
-	/**
 	 * Move the cursor to the next row in the result set.
+	 * Note that you must call this function before retrieving
+	 * column data. The initial position of the cursor is
+	 * before the first row in the result set. If the result
+	 * set is empty, this function will return a value != MA_DB_OK.
 	 * @param cursorHandle Handle to the cursor.
-	 * @return MA_DB_NO_ROW if there are no more rows in the result set,
-	 * MA_DB_OK if successfully moved to next row, MA_DB_ERROR on error.
+	 * @return MA_DB_OK if successfully moved to next row,
+	 * MA_DB_NO_ROW if there are no more rows in the result set,
+	 * MA_DB_ERROR on error.
 	 */
 	public int maDBCursorNext(int cursorHandle)
 	{
@@ -238,9 +219,13 @@ public class MoSyncDB
 				}
 			}
 		}
-		catch (SQLiteException ex)
+		catch (CursorIndexOutOfBoundsException ex1)
 		{
-			ex.printStackTrace();
+			ex1.printStackTrace();
+		}
+		catch (SQLiteException ex2)
+		{
+			ex2.printStackTrace();
 		}
 
 		return MA_DB_ERROR;
@@ -287,6 +272,7 @@ public class MoSyncDB
 			byte[] data = text.getBytes();
 			if (data.length <= bufferSize)
 			{
+				// TODO: Replace with high-level call to write text.
 				ByteBuffer buffer = mosync.getMemorySlice(
 					bufferAddress,
 					data.length);
@@ -296,11 +282,16 @@ public class MoSyncDB
 			// Return length of the data.
 			return data.length;
 		}
-		catch (SQLiteException ex)
+		catch (CursorIndexOutOfBoundsException ex1)
 		{
-			ex.printStackTrace();
-			return MA_DB_ERROR;
+			ex1.printStackTrace();
 		}
+		catch (SQLiteException ex2)
+		{
+			ex2.printStackTrace();
+		}
+
+		return MA_DB_ERROR;
 	}
 
 	/**
@@ -309,7 +300,7 @@ public class MoSyncDB
 	 * @param cursorHandle Handle to the cursor.
 	 * @param columnIndex Index of the column to retrieve value from.
 	 * First column has index zero.
-	 * @param intValueAddress Adddress to int to receive the value.
+	 * @param intValueAddress Address to int to receive the value.
 	 * @param mosync The MoSyncThread instance.
 	 * @return MA_DB_OK on success, MA_DB_ERROR on error.
 	 */
@@ -330,35 +321,38 @@ public class MoSyncDB
 			int value = getCursor(cursorHandle).getInt(columnIndex);
 
 			// Write to MoSync memory. Size of an int is 4.
-			// TODO: Verify that MoSync uses the same memory layout
-			// as putInt(). Check endianness etc. Look at how this
-			// is done in the Bluetooth API.
+			// TODO: Replace with high-level call to write double.
 			ByteBuffer buffer = mosync.getMemorySlice(intValueAddress, 4);
 			buffer.putInt(value);
 
 			return MA_DB_OK;
 		}
-		catch (SQLiteException ex)
+		catch (CursorIndexOutOfBoundsException ex1)
 		{
-			ex.printStackTrace();
-			return MA_DB_ERROR;
+			ex1.printStackTrace();
 		}
+		catch (SQLiteException ex2)
+		{
+			ex2.printStackTrace();
+		}
+
+		return MA_DB_ERROR;
 	}
 
 	/**
 	 * Get the column value at the current row pointed to
-	 * by the cursor as float data.
+	 * by the cursor as double data.
 	 * @param cursorHandle Handle to the cursor.
 	 * @param columnIndex Index of the column to retrieve value from.
 	 * First column has index zero.
-	 * @param floatValueAddress Address to float to receive the value.
+	 * @param doubleValueAddress Address to double to receive the value.
 	 * @param mosync The MoSyncThread instance.
 	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
 	 */
-	public int maDBCursorGetColumnFloat(
+	public int maDBCursorGetColumnDouble(
 		int cursorHandle,
 		int columnIndex,
-		int floatValueAddress,
+		int doubleValueAddress,
 		MoSyncThread mosync)
 	{
 		if (!hasCursor(cursorHandle))
@@ -369,19 +363,25 @@ public class MoSyncDB
 		try
 		{
 			// Get data as a float value.
-			float value = getCursor(cursorHandle).getFloat(columnIndex);
+			double value = getCursor(cursorHandle).getDouble(columnIndex);
 
-			// Write to MoSync memory. Size of a float is 4.
-			ByteBuffer buffer = mosync.getMemorySlice(floatValueAddress, 4);
-			buffer.putInt(Float.floatToIntBits(value));
+			// Write to MoSync memory. Size of a double is 8.
+			// TODO: Replace with high-level call to write int.
+			ByteBuffer buffer = mosync.getMemorySlice(doubleValueAddress, 8);
+			buffer.putLong(Double.doubleToLongBits(value));
 
 			return MA_DB_OK;
 		}
-		catch (SQLiteException ex)
+		catch (CursorIndexOutOfBoundsException ex1)
 		{
-			ex.printStackTrace();
-			return MA_DB_ERROR;
+			ex1.printStackTrace();
 		}
+		catch (SQLiteException ex2)
+		{
+			ex2.printStackTrace();
+		}
+
+		return MA_DB_ERROR;
 	}
 
 	private boolean hasDatabase(int databaseHandle)
@@ -523,10 +523,10 @@ public class MoSyncDB
 			return mCursor.getInt(columnIndex);
 		}
 
-		public float getFloat(int columnIndex)
+		public double getDouble(int columnIndex)
 			throws SQLException
 		{
-			return mCursor.getFloat(columnIndex);
+			return mCursor.getDouble(columnIndex);
 		}
 	}
 }

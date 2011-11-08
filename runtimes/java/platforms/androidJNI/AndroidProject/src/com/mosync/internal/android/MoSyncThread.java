@@ -4252,11 +4252,6 @@ public class MoSyncThread extends Thread
 		return mMoSyncDB.maDBCursorDestroy(cursorHandle);
 	}
 
-	int maDBCursorGetRowCount(int cursorHandle)
-	{
-		return mMoSyncDB.maDBCursorGetRowCount(cursorHandle);
-	}
-
 	int maDBCursorNext(int cursorHandle)
 	{
 		return mMoSyncDB.maDBCursorNext(cursorHandle);
@@ -4300,15 +4295,15 @@ public class MoSyncThread extends Thread
 			this);
 	}
 
-	int maDBCursorGetColumnFloat(
+	int maDBCursorGetColumnDouble(
 		int cursorHandle,
 		int columnIndex,
-		int floatValueAddress)
+		int doubleValueAddress)
 	{
-		return mMoSyncDB.maDBCursorGetColumnFloat(
+		return mMoSyncDB.maDBCursorGetColumnDouble(
 			cursorHandle,
 			columnIndex,
-			floatValueAddress,
+			doubleValueAddress,
 			this);
 	}
 
