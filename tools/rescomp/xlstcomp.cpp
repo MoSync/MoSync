@@ -597,9 +597,9 @@ int VariantResourceSet::computeResAndLoadType(ResourceDirective* directive) {
 
 string VariantResourceSet::createResTypeList() {
 	ostringstream resultStr;
+	resultStr << ".res\n";
 	addLabelDirective(resultStr, "res-types");
-	resultStr << ".res\n"
-			".ubin\n";
+	resultStr << ".ubin\n";
 
 	int resTypeListSize = fResTypes.size();
 	char* result = (char*) malloc(resTypeListSize);
@@ -628,9 +628,9 @@ string VariantResourceSet::createResMap() {
 	}
 
 	ostringstream resultStr;
+	resultStr << ".res\n";
 	addLabelDirective(resultStr, "variant-mapping");
-	resultStr << ".res\n"
-			".ubin\n";
+	resultStr << ".ubin\n";
 
 	// We malloc enough. We just set max lengths for all variant ids
 	int resMapSize = 3 + numVariants * (2 + 256 + 3 * numVariantResources);
