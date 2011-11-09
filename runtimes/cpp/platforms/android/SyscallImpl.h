@@ -24,15 +24,25 @@ private:
 	bool loadImage(int resourceIndex, int pos, int length, int binaryResourceHandle = 0);
 	Image* loadSprite(void* surface, ushort left, ushort top, ushort width, ushort height, ushort cx, ushort cy);
 	void loadUBinary(int resourceIndex, int offset, int size);
-	
+
 public:
 	JNIEnv* getJNIEnvironment();
 	jobject getJNIThis();
-	
+
+	/**
+	* returns the current JavaVM
+	*/
+	JavaVM* getJavaVM();
+
+	/**
+	* sets the current JavaVM
+	* It is set in MoSync bridge when the onload function is called
+	*/
+	void setJavaVM(JavaVM* jvm);
 public:
 
-	Syscall();	
-	
+	Syscall();
+
 	int loadBinaryStore(int resourceIndex, int size);
 	char* loadBinary(int resourceIndex, int size);
 	bool destroyBinaryResource(int resourceIndex);
@@ -41,7 +51,7 @@ public:
 	void postEvent(MAEvent event, JNIEnv *jniEnv);
 	void setJNIEnvironment(JNIEnv* je, jobject jthis);
 	void checkAndStoreAudioResource(int resourceIndex);
-	
+
 	int getReloadHandle();
 	int setReloadHandle(MAHandle handle);
 	bool isReloading();
