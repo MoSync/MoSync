@@ -4921,12 +4921,12 @@ group WidgetAPI "Widget API" {
 		/**
 		* @copydoc MAW_SCREEN_TITLE
 		*/
-		TITLE = MAW_SCREEN_TITLE;
+		TITLE = "title";
 
 		/**
 		* @copydoc MAW_SCREEN_ICON
 		*/
-		ICON = MAW_SCREEN_ICON;
+		ICON = "icon";
 
 		/**
 		* @brief Sets or gets the currently open tab to the tab with the given index.
@@ -4966,12 +4966,12 @@ group WidgetAPI "Widget API" {
 		/**
 		* @copydoc #MAW_SCREEN_TITLE
 		*/
-		TITLE = MAW_SCREEN_TITLE;
+		TITLE = "title";
 
 		/**
 		* @copydoc #MAW_SCREEN_ICON
 		*/
-		ICON = MAW_SCREEN_ICON;
+		ICON = "icon";
 
 		/**
 		* @brief Specifies whether the back button automatically should pop the stack screen.
@@ -6239,7 +6239,7 @@ group WidgetAPI "Widget API" {
 	group WidgetProgressBarProperties "Progress bar properties" {
 	constset MAString MAW_PROGRESS_BAR_ {
 		/**
-		* @brief Sets or gets the range of the progress bar to 0...max.
+		* @brief Sets or gets the range of the progress bar to 0..max.
 		*
 		* @validvalue An positive integer that specifies the upper range of this progress bar.
 		*
@@ -6310,7 +6310,7 @@ group WidgetAPI "Widget API" {
 	group WidgetSliderProperties "Slider properties" {
 	constset MAString MAW_SLIDER_ {
 		/**
-		* @brief Sets or gets the range of the slider to 0...max.
+		* @brief Sets or gets the range of the slider to 0..max.
 		*
 		* @validvalue An positive integer that specifies the upper range of this slider.
 		*
