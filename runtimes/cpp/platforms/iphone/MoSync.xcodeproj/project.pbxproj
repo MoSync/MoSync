@@ -26,6 +26,10 @@
 		29B46B3E1407FAA5009491A6 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.m */; };
 		4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
 		41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */ = {isa = PBXBuildFile; fileRef = 4192E7B613F5801900C10302 /* CameraConfirgurator.h */; };
+		41EB03DC146A696D0088E3A4 /* MoSyncDB.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41EB03DB146A696D0088E3A4 /* MoSyncDB.mm */; };
+		41EB03DD146A696D0088E3A4 /* MoSyncDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 41EB03DA146A696D0088E3A4 /* MoSyncDB.h */; };
+		41EB03DE146A696D0088E3A4 /* MoSyncDB.mm in Sources */ = {isa = PBXBuildFile; fileRef = 41EB03DB146A696D0088E3A4 /* MoSyncDB.mm */; };
+		41EB03E4146A69BF0088E3A4 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */; };
 		4318698513F68D410051D97A /* PimContactItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318696E13F68D410051D97A /* PimContactItem.h */; };
 		4318698813F68D410051D97A /* PimContactsList.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697013F68D410051D97A /* PimContactsList.h */; };
 		4318699113F68D410051D97A /* PimDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697713F68D410051D97A /* PimDatabase.h */; };
@@ -298,6 +302,9 @@
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
 		4192E7B613F5801900C10302 /* CameraConfirgurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraConfirgurator.h; sourceTree = "<group>"; };
 		4192E7B713F5801900C10302 /* CameraConfirgurator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraConfirgurator.mm; sourceTree = "<group>"; };
+		41EB03DA146A696D0088E3A4 /* MoSyncDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncDB.h; path = impl/MoSyncDB.h; sourceTree = "<group>"; };
+		41EB03DB146A696D0088E3A4 /* MoSyncDB.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncDB.mm; path = impl/MoSyncDB.mm; sourceTree = "<group>"; };
+		41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
 		4318696E13F68D410051D97A /* PimContactItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactItem.h; sourceTree = "<group>"; };
 		4318697013F68D410051D97A /* PimContactsList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactsList.h; sourceTree = "<group>"; };
 		4318697713F68D410051D97A /* PimDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimDatabase.h; sourceTree = "<group>"; };
@@ -515,6 +522,7 @@
 				857B020212C627C200DEA306 /* OpenGLES.framework in Frameworks */,
 				857B025612C62F5600DEA306 /* QuartzCore.framework in Frameworks */,
 				0B10E8D214064DDB00B6DA6B /* MessageUI.framework in Frameworks */,
+				41EB03E4146A69BF0088E3A4 /* libsqlite3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -611,6 +619,7 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -817,6 +826,8 @@
 		85BF2B0C1134036D00BB0201 /* impl */ = {
 			isa = PBXGroup;
 			children = (
+				41EB03DA146A696D0088E3A4 /* MoSyncDB.h */,
+				41EB03DB146A696D0088E3A4 /* MoSyncDB.mm */,
 				858B431F12E7325F0058DBFC /* log.cpp */,
 				850943291185AF87004A3B2D /* SyscallImpl.mm */,
 				85EF80EB1174AA1900B3E43A /* ThreadPoolImpl.mm */,
@@ -1021,6 +1032,7 @@
 				0B436BA014308D5400E69AB2 /* ModalDialogWidget.h in Headers */,
 				432B98C81431FE5F00BDB926 /* MoSyncPanic.h in Headers */,
 				432B98CC1432040B00BDB926 /* PimError.h in Headers */,
+				41EB03DD146A696D0088E3A4 /* MoSyncDB.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1217,6 +1229,7 @@
 				432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */,
 				29B46B3D1407FAA5009491A6 /* PimContactItem.m in Sources */,
 				29B46B3E1407FAA5009491A6 /* PimContactsList.m in Sources */,
+				41EB03DC146A696D0088E3A4 /* MoSyncDB.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1303,6 +1316,7 @@
 				0B436B8C143089BD00E69AB2 /* OptionsDialogView.mm in Sources */,
 				0B436BA114308D5400E69AB2 /* ModalDialogWidget.mm in Sources */,
 				432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */,
+				41EB03DE146A696D0088E3A4 /* MoSyncDB.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

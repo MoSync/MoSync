@@ -47,6 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "ImagePickerController.h"
 #include "netImpl.h"
 
+
 #define NETWORKING_H
 #include "networking.h"
 #include <bluetooth/discovery.h>
@@ -1928,6 +1929,15 @@ return 0; \
 		maIOCtl_case(maSendTextSMS);
 		maIOCtl_case(maSyscallPanicsEnable);
 		maIOCtl_case(maSyscallPanicsDisable);
+		maIOCtl_syscall_case(maDBOpen);
+		maIOCtl_syscall_case(maDBClose);
+		maIOCtl_syscall_case(maDBExecSQL);
+		maIOCtl_syscall_case(maDBCursorDestroy);
+		maIOCtl_syscall_case(maDBCursorNext);
+		maIOCtl_syscall_case(maDBCursorGetColumnData);
+		maIOCtl_syscall_case(maDBCursorGetColumnText);
+		maIOCtl_syscall_case(maDBCursorGetColumnInt);
+		maIOCtl_syscall_case(maDBCursorGetColumnDouble);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
