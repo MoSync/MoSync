@@ -85,7 +85,8 @@ static void replaceTemplateDefine(string &templateFile, const string &whatToRepl
 
 static pugi::xml_node getNode(const pugi::xml_node& node, const std::string& xpath)
 {
-	return node.select_single_node(pugi::xpath_query(xpath.c_str())).node();
+	pugi::xpath_query query(xpath.c_str());
+	return node.select_single_node(query).node();
 }
 
 int main(int argc, char **argv) {
@@ -135,7 +136,8 @@ int main(int argc, char **argv) {
 	}
 
 
-	pugi::xml_node project = document.select_single_node(pugi::xpath_query("Project")).node();
+	pugi::xpath_query projectQuery("Project");
+	pugi::xml_node project = document.select_single_node(projectQuery).node();
 	std::string version = project.attribute("ToolsVersion").value();
 
 	if(outputType == "rebuilt")
