@@ -8252,7 +8252,7 @@ group DBAPI "DB API" {
 		int maDBCursorGetColumnText(
 			in MAHandle cursorHandle,
 			in int columnIndex,
-			out MAAddress buffer range("bufferSize"),
+			out MAAddress buffer,
 			in int bufferSize);
 
 		/**
