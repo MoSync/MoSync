@@ -77,6 +77,27 @@ namespace MoSync
 
         //private test_mosync.MainPage mMainPage;
 
+        public delegate void Cleaner();
+        private List<Cleaner> mCleaners = new List<Cleaner>();
+
+        // Cleaners are called when the runtime is being closed down.
+        // They should Close any open streams and empty any static variables.
+        // They should be prepared for Init() to be called again,
+        // triggered by maLoadProgram().
+        public void RegisterCleaner(Cleaner c)
+        {
+            mCleaners.Add(c);
+        }
+
+        public void RunCleaners()
+        {
+            mCleaners.ForEach(delegate(Cleaner c)
+            {
+                c();
+            });
+            mCleaners.Clear();
+        }
+
         private void InitSyscalls()
         {
 
@@ -126,6 +147,45 @@ namespace MoSync
                 return (T)ret;
         }
 
+        // this could probably be generated
+        const int MAEvent_type = 0;
+        const int MAEvent_point_x = 4;
+        const int MAEvent_point_y = 8;
+        const int MAEvent_point_touchId = 12;
+
+        private void MouseLeftButtonDown(Object sender, MouseButtonEventArgs e)
+        {
+            PhoneApplicationFrame mainPage = (PhoneApplicationFrame)Application.Current.RootVisual;
+            Memory mem = new Memory(4 * 4);
+            mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_PRESSED);
+            mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
+            mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
+            mem.WriteInt32(MAEvent_point_touchId, 0);
+            PostEvent(new Event(mem));
+        }
+
+        private void MouseLeftButtonUp(Object sender, MouseButtonEventArgs e)
+        {
+            PhoneApplicationFrame mainPage = (PhoneApplicationFrame)Application.Current.RootVisual;
+            Memory mem = new Memory(4 * 4);
+            mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_RELEASED);
+            mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
+            mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
+            mem.WriteInt32(MAEvent_point_touchId, 0);
+            PostEvent(new Event(mem));
+        }
+
+        private void MouseMove(Object sender, MouseEventArgs e)
+        {
+            PhoneApplicationFrame mainPage = (PhoneApplicationFrame)Application.Current.RootVisual;
+            Memory mem = new Memory(4 * 4);
+            mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_DRAGGED);
+            mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
+            mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
+            mem.WriteInt32(MAEvent_point_touchId, 0);
+            PostEvent(new Event(mem));
+        }
+
         public Runtime(Core core)
         {
             mCore = core;
@@ -133,44 +193,21 @@ namespace MoSync
             mIoctls = new Ioctls();
             mIoctlInvoker = new IoctlInvoker(mCore, mIoctls);
 
-
-            // this could probably be generated
-            const int MAEvent_type = 0;
-            const int MAEvent_point_x = 4;
-            const int MAEvent_point_y = 8;
-            const int MAEvent_point_touchId = 12;
-
             PhoneApplicationFrame mainPage = (PhoneApplicationFrame)Application.Current.RootVisual;
 
-            mainPage.MouseLeftButtonDown += delegate(Object sender, MouseButtonEventArgs e)
-            {
-                Memory mem = new Memory(4 * 4);
-                mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_PRESSED);
-                mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
-                mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
-                mem.WriteInt32(MAEvent_point_touchId, 0);
-                PostEvent(new Event(mem));
-            };
+            mainPage.MouseLeftButtonDown += MouseLeftButtonDown;
+            mainPage.MouseMove += this.MouseMove;
+            mainPage.MouseLeftButtonUp += MouseLeftButtonUp;
 
-            mainPage.MouseMove += delegate(Object sender, MouseEventArgs e)
+            RegisterCleaner(() =>
             {
-                Memory mem = new Memory(4 * 4);
-                mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_DRAGGED);
-                mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
-                mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
-                mem.WriteInt32(MAEvent_point_touchId, 0);
-                PostEvent(new Event(mem));
-            };
-
-            mainPage.MouseLeftButtonUp += delegate(Object sender, MouseButtonEventArgs e)
-            {
-                Memory mem = new Memory(4 * 4);
-                mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_RELEASED);
-                mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
-                mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
-                mem.WriteInt32(MAEvent_point_touchId, 0);
-                PostEvent(new Event(mem));
-            };
+                Util.RunActionOnMainThreadSync(() =>
+                {
+                    mainPage.MouseLeftButtonDown -= MouseLeftButtonDown;
+                    mainPage.MouseMove -= this.MouseMove;
+                    mainPage.MouseLeftButtonUp -= MouseLeftButtonUp;
+                });
+            });
 
             InitSyscalls();
 
@@ -318,6 +355,7 @@ namespace MoSync
                             */
 
                             resource.SetInternalObject(MoSync.Util.CreateWriteableBitmapFromStream(ms));
+                            ms.Close();
                         }
                         break;
                     case MoSync.Constants.RT_LABEL:

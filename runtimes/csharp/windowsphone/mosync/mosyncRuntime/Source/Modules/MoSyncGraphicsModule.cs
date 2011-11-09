@@ -37,13 +37,21 @@ namespace MoSync
             if ((int)screenHeight == 0)
                 throw new Exception("screenHeight");
             PhoneApplicationPage mainPage = (PhoneApplicationPage)frame.Content;
-            frame.Content = mainPage;
             Image mainImage = new Image();
             mainPage.Width = screenWidth;
             mainPage.Height = screenHeight;
             mainImage.Width = mainPage.Width;
             mainImage.Height = mainPage.Height;
             mainPage.Content = mainImage;
+
+            // no apparent effect on memory leaks.
+            runtime.RegisterCleaner(delegate()
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mainPage.Content = null;
+                });
+            });
 
             mBackBuffer = new WriteableBitmap(
                 (int)screenWidth,
@@ -92,7 +100,7 @@ namespace MoSync
 
             syscalls.maFillRect = delegate(int x, int y, int w, int h)
             {
-                mCurrentDrawTarget.FillRectangle(0, 0, w, h, (int)mCurrentColor);
+                mCurrentDrawTarget.FillRectangle(x, y, x + w, y + h, (int)mCurrentColor);
             };
 
             syscalls.maLine = delegate(int x1, int y1, int x2, int y2)
@@ -178,12 +186,14 @@ namespace MoSync
 
             syscalls.maFillTriangleFan = delegate(int points, int count)
             {
-                int[] newPoints = new int[count * 2];
+                int[] newPoints = new int[count * 2 + 2];
                 for (int i = 0; i < count; i++)
                 {
-                    newPoints[i * 2 + 0] = core.GetDataMemory().ReadInt32(points + i * 4 + 0);
-                    newPoints[i * 2 + 1] = core.GetDataMemory().ReadInt32(points + i * 4 + 1);
+                    newPoints[i * 2 + 0] = core.GetDataMemory().ReadInt32(points + i * 8);
+                    newPoints[i * 2 + 1] = core.GetDataMemory().ReadInt32(points + i * 8 + 4);
                 }
+                newPoints[count * 2 + 0] = core.GetDataMemory().ReadInt32(points + 0);
+                newPoints[count * 2 + 1] = core.GetDataMemory().ReadInt32(points + 4);
                 mCurrentDrawTarget.FillPolygon(newPoints, (int)mCurrentColor);
             };
 
@@ -195,8 +205,8 @@ namespace MoSync
 
                 for (int i = 0; i < count; i++)
                 {
-                    xcoords[i] = core.GetDataMemory().ReadInt32(points + i * 4 + 0);
-                    ycoords[i] = core.GetDataMemory().ReadInt32(points + i * 4 + 1);
+                    xcoords[i] = core.GetDataMemory().ReadInt32(points + i * 8);
+                    ycoords[i] = core.GetDataMemory().ReadInt32(points + i * 8 + 4);
                 }
 
                 for (int i = 2; i < count; i++)
@@ -300,7 +310,8 @@ namespace MoSync
                         bitmap = new WriteableBitmap(width, height);
                     });
 
-                core.GetDataMemory().ReadIntegers(bitmap.Pixels, _src, width * height);
+                //core.GetDataMemory().ReadIntegers(bitmap.Pixels, _src, width * height);
+                bitmap.FromByteArray(core.GetDataMemory().GetData(), _src, width * height * 4);
                 if (_alpha == 0)
                 {
                     int[] pixels = bitmap.Pixels;
@@ -320,12 +331,59 @@ namespace MoSync
                 return MoSync.Constants.RES_OK;
             };
 
+            syscalls.maDrawRGB = delegate(int _dstPoint, int _src, int _srcRect, int _scanlength)
+            {
+                Memory dataMemory = core.GetDataMemory();
+                int dstX = dataMemory.ReadInt32(_dstPoint + 0);
+                int dstY = dataMemory.ReadInt32(_dstPoint + 4);
+                int srcRectX = dataMemory.ReadInt32(_srcRect + 0);
+                int srcRectY = dataMemory.ReadInt32(_srcRect + 4);
+                int srcRectW = dataMemory.ReadInt32(_srcRect + 8);
+                int srcRectH = dataMemory.ReadInt32(_srcRect + 12);
+                int[] pixels = mCurrentDrawTarget.Pixels;
+                // todo: clipRect
+                for (int h = 0; h < srcRectH; h++)
+                {
+                    int pixelIndex = dstY * mCurrentDrawTarget.PixelWidth + dstX;
+                    int address = _src + (srcRectY + h) * _scanlength;
+                    for (int w = 0; w < srcRectW; w++)
+                    {
+                        pixels[pixelIndex] = dataMemory.ReadInt32(address);
+                        address += 4;
+                        pixelIndex++;
+                    }
+                }
+            };
+
+            syscalls.maGetImageData = delegate(int _image, int _dst, int _srcRect, int _scanlength)
+            {
+                Resource res = runtime.GetResource(MoSync.Constants.RT_IMAGE, _image);
+                WriteableBitmap src = (WriteableBitmap)res.GetInternalObject();
+                Memory dataMemory = core.GetDataMemory();
+                int srcRectX = dataMemory.ReadInt32(_srcRect + 0);
+                int srcRectY = dataMemory.ReadInt32(_srcRect + 4);
+                int srcRectW = dataMemory.ReadInt32(_srcRect + 8);
+                int srcRectH = dataMemory.ReadInt32(_srcRect + 12);
+                int lineDst = _dst;
+                byte[] data = src.ToByteArray(srcRectY * src.PixelWidth,
+                    srcRectH * src.PixelWidth);
+                byte[] coreArray = dataMemory.GetData();
+                for (int y = 0; y<srcRectH; y++)
+                {
+                    System.Array.Copy(data, y * src.PixelWidth * 4, coreArray,
+                        lineDst, src.PixelWidth * 4);
+                    lineDst += _scanlength;
+                }
+            };
+
             syscalls.maCreateImageFromData = delegate(int _placeholder, int _data, int _offset, int _size)
             {
                 Resource res = runtime.GetResource(MoSync.Constants.RT_BINARY, _data);
                 Memory mem = (Memory)res.GetInternalObject();
 
-                WriteableBitmap bitmap = MoSync.Util.CreateWriteableBitmapFromStream(mem.GetStream(_offset, _size));
+                Stream s = mem.GetStream(_offset, _size);
+                WriteableBitmap bitmap = MoSync.Util.CreateWriteableBitmapFromStream(s);
+                s.Close();
                 runtime.SetResource(
                     _placeholder,
                     new Resource(
