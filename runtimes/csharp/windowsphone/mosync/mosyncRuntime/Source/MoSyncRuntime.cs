@@ -203,7 +203,7 @@ namespace MoSync
 
             mSyscalls.maWait = delegate(int timeout)
             {
-                if (timeout < 0)
+                if (timeout <= 0)
                     timeout = 1 << 15;
                 mEventWaiter.WaitOne(timeout);
             };
