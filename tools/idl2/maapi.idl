@@ -411,7 +411,7 @@ interface MAAPI {
 
 	/**
 	* Draws an image.
-	* The source is an array of ints that represent pixels in XRGB format.
+	* The source is an array of ints that represent pixels in ARGB format.
 	* \param dstPoint The top-left point on the draw target.
 	* \param src The address to the source image.
 	* \param srcRect The portion of the source image to be drawn.
