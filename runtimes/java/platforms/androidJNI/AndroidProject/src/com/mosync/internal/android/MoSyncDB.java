@@ -208,12 +208,9 @@ public class MoSyncDB
 			byte[] data = getCursor(cursorHandle).getData(columnIndex);
 			if (null != data)
 			{
-				// Put the data in the table of resources. This will make
-				// the placeholder reference the data.
-				boolean success = mosync.loadBinary(
-					placeholder,
-					ByteBuffer.wrap(data));
-				if (success)
+				// This calls maCreateData and copies data to the data object.
+				int result = mosync.createDataObject(placeholder, data);
+				if ((result > 0) && (result == placeholder))
 				{
 					return MA_DB_OK;
 				}

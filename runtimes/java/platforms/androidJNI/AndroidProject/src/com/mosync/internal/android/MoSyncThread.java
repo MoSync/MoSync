@@ -720,25 +720,40 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Create a data object by (indirectly) calling maCreatePlaceholder,
-	 * and maCreateData, then copy the data given in the data parameter
-	 * to the new buffer.
+	 * Create a data object by (indirectly) calling maCreatePlaceholder
+	 * (if no placeholder is supplied), and maCreateData, then copy the
+	 * data given in the data parameter to the new buffer.
+	 * @param placeholder The placeholder that should refer to the data,
+	 * if this parameter is zero, a new placeholder is created.
 	 * @param data The data to fill the new data object with.
 	 * @return The handle to the data if successful, <0 on error.
+	 * If a placeholder is supplied, that value is returned on success.
+	 * TODO: This method needs improved error checking.
 	 */
-	public int createDataObject(byte[] data)
+	public int createDataObject(int placeholder, byte[] data)
 	{
-		// Create handle.
-		int dataHandle = nativeCreatePlaceholder();
+		// The handle to the data.
+		int dataHandle = placeholder;
 
-		// Allocate data.
+		// Create handle if no placeholder is given.
+		if (0 == placeholder)
+		{
+			// This calls maCreatePlaceholder.
+			// TODO: Check return value for error.
+			dataHandle = nativeCreatePlaceholder();
+		}
+
+		// Allocate data. This calls maCreateData and will create a
+		// new data object.
 		int result = nativeCreateBinaryResource(dataHandle, data.length);
 		if (result < 0)
 		{
 			return result;
 		}
 
-		// Get byte buffer for the handle.
+		// Get byte buffer for the handle and copy data
+		// to the data object.
+		// TODO: Handle error if this fails.
 		ByteBuffer buf = getBinaryResource(dataHandle);
 		if (null != buf)
 		{
