@@ -114,6 +114,7 @@ namespace MoSync
             syscalls.maDrawText = delegate(int left, int top, int str)
             {
                 String text = core.GetDataMemory().ReadStringAtAddress(str);
+                if (text.Length == 0) return;
 
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {

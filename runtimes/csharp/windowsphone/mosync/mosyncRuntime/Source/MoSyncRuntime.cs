@@ -75,8 +75,6 @@ namespace MoSync
         private List<Event> mEvents = new List<Event>();
         private AutoResetEvent mEventWaiter = new AutoResetEvent(false);
 
-        //private test_mosync.MainPage mMainPage;
-
         public delegate void Cleaner();
         private List<Cleaner> mCleaners = new List<Cleaner>();
 

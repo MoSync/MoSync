@@ -58,9 +58,11 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Source\maapi.cs" />
+    <Compile Include="Source\Modules\MoSyncAudioModule.cs" />
     <Compile Include="Source\Modules\MoSyncCommunicationsModule.cs" />
     <Compile Include="Source\Modules\MoSyncExtensionModule.cs" />
     <Compile Include="Source\Modules\MoSyncFileModule.cs" />
+    <Compile Include="Source\Modules\MoSyncFontModule.cs" />
     <Compile Include="Source\Modules\MoSyncGraphicsModule.cs" />
     <Compile Include="Source\Modules\MoSyncMathModule.cs" />
     <Compile Include="Source\Modules\MoSyncMemoryModule.cs" />
