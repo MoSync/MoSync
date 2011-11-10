@@ -124,7 +124,7 @@ void FileResourceDirective::writeDirectives(ostringstream& output, bool asVarian
 	ResourceDirective::writeDirectives(output, asVariant);
 	string resourceStr = string("\"") + fResource + string("\"");
 	if (asVariant) {
-		output << ".ubin\n";
+		output << ".bin\n";
 		output << ".include " << resourceStr << "\n";
 	} else {
 		output << '.' << fResType << " " << resourceStr << "\n";

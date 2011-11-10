@@ -599,12 +599,14 @@ string VariantResourceSet::createResTypeList() {
 	ostringstream resultStr;
 	resultStr << ".res\n";
 	addLabelDirective(resultStr, "res-types");
-	resultStr << ".ubin\n";
+	resultStr << ".bin\n";
 
 	int resTypeListSize = fResTypes.size();
-	char* result = (char*) malloc(resTypeListSize);
+	char* result = (char*) malloc(resTypeListSize + 2);
 
 	int offset = 0;
+
+	writeWord(result, offset, resTypeListSize);
 
 	for (int i = 1; i <= resTypeListSize; i++) {
 		int resType = fResTypes[i];
@@ -630,7 +632,7 @@ string VariantResourceSet::createResMap() {
 	ostringstream resultStr;
 	resultStr << ".res\n";
 	addLabelDirective(resultStr, "variant-mapping");
-	resultStr << ".ubin\n";
+	resultStr << ".bin\n";
 
 	// We malloc enough. We just set max lengths for all variant ids
 	int resMapSize = 3 + numVariants * (2 + 256 + 3 * numVariantResources);
