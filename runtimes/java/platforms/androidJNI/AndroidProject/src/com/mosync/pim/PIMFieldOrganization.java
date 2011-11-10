@@ -65,6 +65,10 @@ public class PIMFieldOrganization extends PIMField {
 				mStates.add(State.NONE);
 			}
 		}
+
+		cursor.close();
+		cursor = null;
+
 		preProcessData();
 
 		print();
