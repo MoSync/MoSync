@@ -336,7 +336,7 @@ int Syscall::maDBCursorGetColumnData(
 		return MA_DB_ERROR;
 	}
 
-	//printf("TEXT: %s\n", text);
+	printf("TEXT: %s\n", text);
 
 	// Next find the bumber of bytes, excluding zero
 	// termination character. See this page for details:
@@ -345,14 +345,21 @@ int Syscall::maDBCursorGetColumnData(
 											 cursor->getStatement(),
 											 columnIndex);
 
-	//printf("numberOfBytes: %d\n", numberOfBytes);
+	printf("numberOfBytes: %d\n", numberOfBytes);
 
 	//Copy the data into the provided placholder
 	MemStream *stream = new MemStream(numberOfBytes);
-	stream->write(text, numberOfBytes);
-	gSyscall->resources.add_RT_BINARY(placeholder, stream);
-
-	return numberOfBytes;
+	bool writeResult = stream->write(text, numberOfBytes);
+	if(!writeResult)
+	{
+		return MA_DB_ERROR;
+	}
+	int writeSize = gSyscall->resources.add_RT_BINARY(placeholder, stream);
+	if(writeSize <=0)
+	{
+		return MA_DB_ERROR;
+	}
+	return MA_DB_OK;
 
 }
 
