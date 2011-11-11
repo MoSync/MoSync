@@ -262,9 +262,10 @@
 // C headers may reside in different directory, so separate macro is provided.
 // Hint : never install STLport in the directory that ends with "include"
 //#define _STLP_NATIVE_INCLUDE_PATH ../
-#define _STLP_NATIVE_C_INCLUDE_PATH  ..
-#define _STLP_NATIVE_CPP_C_INCLUDE_PATH ..
-#define _STLP_NATIVE_CPP_RUNTIME_HEADER(header) <../header>
+
+#define _STLP_NATIVE_C_INCLUDE_PATH  ../newlib
+#define _STLP_NATIVE_CPP_C_INCLUDE_PATH ../newlib
+#define _STLP_NATIVE_CPP_RUNTIME_HEADER(header) <../newlib/header
 
 // This macro constructs header path from directory and name.
 // You may change it if your compiler does not understand "/".
