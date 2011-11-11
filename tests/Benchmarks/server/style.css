@@ -1,0 +1,15 @@
+body {
+	padding: 0, 0, 0, 0;
+}
+
+h1 {
+font-size: 30pt;
+font-weight: bold;
+font-family: verdana;
+}
+
+#header_div {
+	width: 100%;
+	padding: 0, 0, 0, 0;
+	text-align: center;
+}
