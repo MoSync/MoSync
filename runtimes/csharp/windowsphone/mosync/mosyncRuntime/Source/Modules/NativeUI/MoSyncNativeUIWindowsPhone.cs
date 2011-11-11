@@ -12,25 +12,25 @@ namespace MoSync
         public static int SCREEN_HEIGHT = 800;
         public static int SCREEN_WIDTH = 480;
     }
-    public class WidgetBaseWindowsPhone : WidgetBase
-    {
-        protected UIElement mView;
+	public class WidgetBaseWindowsPhone : WidgetBase
+	{
+		protected UIElement mView;
 
-        public UIElement View
-        {
-            get { return mView; }
-            set { mView = value; }
-        }
+		public UIElement View
+		{
+			get { return mView; }
+			set { mView = value; }
+		}
 
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_LEFT)]
-        public double Left
-        {
-            get { return (double)mView.GetValue(Canvas.LeftProperty); }
-            set
-            {
-                mView.SetValue(Canvas.LeftProperty, value);
-            }
-        }
+		[MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_LEFT)]
+		public double Left
+		{
+			get { return (double)mView.GetValue(Canvas.LeftProperty); }
+			set
+			{
+				mView.SetValue(Canvas.LeftProperty, value);
+			}
+		}
 
         [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_TOP)]
         public double Top
@@ -85,6 +85,127 @@ namespace MoSync
         {
         }
     };
+
+    public class Label : WidgetBaseWindowsPhone
+    {
+        protected System.Windows.Controls.TextBlock mLabel;
+
+        protected int mMaxNumberOfLines;
+        public Label()
+        {
+            mLabel = new System.Windows.Controls.TextBlock();
+            mView = mLabel;
+            mMaxNumberOfLines = 0;
+            mLabel.TextWrapping = TextWrapping.NoWrap;
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT)]
+        public String Text
+        {
+            set
+            {
+                mLabel.Text = value;
+            }
+            get
+            {
+                return mLabel.Text;
+
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_VERTICAL_ALIGNMENT)]
+        public String textVerticalAlignment
+        {
+            set
+            {
+                switch (value)
+                {
+                    case MoSync.Constants.MAW_ALIGNMENT_TOP:
+                        mLabel.VerticalAlignment = VerticalAlignment.Top;
+                        break;
+                    case MoSync.Constants.MAW_ALIGNMENT_CENTER:
+                        mLabel.VerticalAlignment = VerticalAlignment.Center;
+                        break;
+                    case MoSync.Constants.MAW_ALIGNMENT_BOTTOM:
+                        mLabel.VerticalAlignment = VerticalAlignment.Bottom;
+                        break;
+                }
+            }
+            get
+            {
+                return mLabel.Text;
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT)]
+        public String textHorizontalAlignment
+        {
+            set
+            {
+                switch (value)
+                {
+                    case MoSync.Constants.MAW_ALIGNMENT_LEFT:
+                        mLabel.TextAlignment = TextAlignment.Left;
+
+                        break;
+                    case MoSync.Constants.MAW_ALIGNMENT_RIGHT:
+                        mLabel.TextAlignment = TextAlignment.Right;
+                        break;
+                    case MoSync.Constants.MAW_ALIGNMENT_CENTER:
+                        mLabel.TextAlignment = TextAlignment.Center;
+                        break;
+                }
+            }
+            get
+            {
+                return mLabel.TextAlignment.ToString();
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_SIZE)]
+        public String fontSize
+        {
+            set
+            {
+                //todo
+                double size = Double.Parse(value);
+                mLabel.FontSize = size;
+            }
+        }
+
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_COLOR)]
+        public String fontColor
+        {
+            set
+            {
+                System.Windows.Media.SolidColorBrush brush;
+                MoSync.Util.convertStringToColor(value, out brush);
+                mLabel.Foreground = brush;
+
+            }
+        }
+
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_MAX_NUMBER_OF_LINES)]
+        public String maxNumberOfLines
+        {
+            set
+            {
+                int val = Int32.Parse(value);
+                if (val == 0)
+                {
+                    mMaxNumberOfLines = 0;
+                    mLabel.TextWrapping = TextWrapping.NoWrap;
+                }
+                if (val == 1)
+                {
+                    mMaxNumberOfLines = 1;
+                    mLabel.TextWrapping = TextWrapping.Wrap;
+                }
+            }
+        }
+    }
+
 
     //HorizintalLayout class
     public class HorizontalLayout : WidgetBaseWindowsPhone
@@ -146,18 +267,18 @@ namespace MoSync
         {
             base.AddChild(child);
             MoSync.Util.RunActionOnMainThreadSync(() =>
-                {
-                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
-                    ColumnDefinition columnDef = new ColumnDefinition();
+            {
+                WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+                ColumnDefinition columnDef = new ColumnDefinition();
 
-                    columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
-                    mGrid.ColumnDefinitions.Insert(mGrid.ColumnDefinitions.Count - 1, columnDef);
+                columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+                mGrid.ColumnDefinitions.Insert(mGrid.ColumnDefinitions.Count - 1, columnDef);
 
-                    mGrid.Children.Add(widget.View);
+                mGrid.Children.Add(widget.View);
 
-                    Grid.SetColumn((widget.View as System.Windows.FrameworkElement), mGrid.ColumnDefinitions.Count - 2);
-                    Grid.SetRow((widget.View as System.Windows.FrameworkElement), 1);
-                });
+                Grid.SetColumn((widget.View as System.Windows.FrameworkElement), mGrid.ColumnDefinitions.Count - 2);
+                Grid.SetRow((widget.View as System.Windows.FrameworkElement), 1);
+            });
         }
 
         //MAW_HORIZONTAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT implementation
