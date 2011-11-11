@@ -79,8 +79,8 @@ void MoSync_ApplicationRegistration(NSNumber* errorCode, NSString* text);
     NSString* token = [[NSString alloc] initWithData:deviceToken encoding:NSASCIIStringEncoding];
     MoSync_ApplicationRegistration(
         [NSNumber numberWithInt:0],
-        token);
-    NSLog(@"%@",token);
+        str);
+//    NSLog(@"device token: %@",token);
     [token release];
 }
 

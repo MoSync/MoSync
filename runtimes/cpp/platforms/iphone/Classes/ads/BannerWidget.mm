@@ -63,7 +63,7 @@
 {
     NSLog(@"iOS setProperty");
     ADBannerView* bannerView  = (ADBannerView*) view;
-    if ([key isEqualToString:@MA_ADS_ENABLE])
+    if ([key isEqualToString:@MA_ADS_ENABLED])
     {
         if ([value isEqualToString:@"true"])
         {
@@ -126,7 +126,7 @@
         }
         return [[NSString alloc] initWithString:@"true"];
     }
-    else if ([key isEqualToString:@MA_ADS_ENABLE])
+    else if ([key isEqualToString:@MA_ADS_ENABLED])
     {
         if (bannerView.userInteractionEnabled)
         {

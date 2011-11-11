@@ -284,7 +284,7 @@ namespace Ads
      */
     void Banner::setEnabled(bool enable)
     {
-        setProperty(MA_ADS_ENABLE, (enable ? "true" : "false") );
+        setProperty(MA_ADS_ENABLED, (enable ? "true" : "false") );
     }
 
     /**
@@ -294,7 +294,7 @@ namespace Ads
     bool Banner::isEnabled()
     {
         MAUtil::String value = MAUtil::lowerString(
-			this->getPropertyString(MA_ADS_ENABLE));
+			this->getPropertyString(MA_ADS_ENABLED));
         if ( strcmp(value.c_str(),"true") == 0 )
         {
             return true;

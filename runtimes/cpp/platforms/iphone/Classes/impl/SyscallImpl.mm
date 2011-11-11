@@ -1907,7 +1907,7 @@ return 0; \
 	{
         return [[Notification getInstance] unregisterLocalNotification:notificationHandle];
 	}
-    SYSCALL(int, maNotificationPushRegister(MAHandle pushNotificationType))
+    SYSCALL(int, maNotificationPushRegister(MAHandle pushNotificationType, const char* accountID))
 	{
 		return [[Notification getInstance] registerPushNotification:pushNotificationType];
 	}
@@ -1920,6 +1920,10 @@ return 0; \
 	{
         return [[Notification getInstance] getPushNotificationData:pushNotificationHandle
                                                               data:pushNotificationData];
+	}
+    SYSCALL(int, maNotificationPushGetRegistration(char* buffer, const int size))
+	{
+        return [[Notification getInstance] getPushRegistrationData:buffer size:size];
 	}
     SYSCALL(void, maNotificationSetIconBadge(const int applicationIconBadgeNumber))
 	{
@@ -2026,6 +2030,7 @@ return 0; \
         maIOCtl_case(maNotificationPushRegister);
         maIOCtl_case(maNotificationPushUnregister);
         maIOCtl_case(maNotificationPushGetData);
+        maIOCtl_case(maNotificationPushGetRegistration);
         maIOCtl_case(maNotificationSetIconBadge);
         maIOCtl_case(maNotificationGetIconBadge);
 		maIOCtl_IX_WIDGET_caselist

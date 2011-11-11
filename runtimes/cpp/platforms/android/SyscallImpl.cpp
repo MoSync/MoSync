@@ -2503,6 +2503,136 @@ return 0; \
 					mJNIEnv,
 					mJThis);
 
+		case maIOCtl_maAdsBannerCreate:
+		{
+			const char *_publisher = SYSCALL_THIS->GetValidatedStr(b);
+			return _maAdsBannerCreate(
+					a,
+					_publisher,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maAdsAddBannerToLayout:
+			return _maAdsAddBannerToLayout(a, b, mJNIEnv, mJThis);
+
+		case maIOCtl_maAdsRemoveBannerFromLayout:
+			return _maAdsRemoveBannerFromLayout(a, b, mJNIEnv, mJThis);
+
+		case maIOCtl_maAdsBannerDestroy:
+			return _maAdsBannerDestroy(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maAdsBannerSetProperty:
+		{
+			const char *_prop = SYSCALL_THIS->GetValidatedStr(b);
+			const char *_value = SYSCALL_THIS->GetValidatedStr(c);
+			return _maAdsBannerSetProperty(
+					a,
+					_prop,
+					_value,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maAdsBannerGetProperty:
+		{
+			int _ad = a;
+			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
+			//Read the fourth parameter from the register
+			//(the first three can be read directly)
+			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				c,
+				_valueBufferSize * sizeof(char));
+
+			return _maAdsBannerGetProperty((int)gCore->mem_ds, _ad, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maNotificationCreate:
+			return _maNotificationCreate(mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationDestroy:
+			return _maNotificationDestroy(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationSetProperty:
+		{
+			const char *_prop = SYSCALL_THIS->GetValidatedStr(b);
+			const char *_value = SYSCALL_THIS->GetValidatedStr(c);
+			return _maNotificationSetProperty(
+					a,
+					_prop,
+					_value,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maNotificationGetProperty:
+		{
+			int _notification = a;
+			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
+			//Read the fourth parameter from the register
+			//(the first three can be read directly)
+			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				c,
+				_valueBufferSize * sizeof(char));
+
+			return _maNotificationGetProperty((int)gCore->mem_ds, _notification, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maNotificationLocalRegister:
+			return  _maNotificationLocalRegister(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationLocalUnregister:
+			return _maNotificationLocalUnregister(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationPushRegister:
+		{
+			const char *_account = SYSCALL_THIS->GetValidatedStr(b);
+			return _maNotificationPushRegister(a, _account, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maNotificationPushGetRegistration:
+		{
+			int _valueBufferSize = b;
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				a,
+				_valueBufferSize * sizeof(char));
+
+			return _maNotificationPushGetRegistration(
+				(int)gCore->mem_ds,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maNotificationPushUnregister:
+			return _maNotificationPushUnregister(mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationPushGetData:
+		{
+
+			MAPushNotificationData* data = (MAPushNotificationData*) SYSCALL_THIS->GetValidatedMemRange(b,sizeof(MAPushNotificationData));
+			int _valueBufferSize = data->alertMessageSize;
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				data->alertMessage,
+				_valueBufferSize * sizeof(char));
+
+			return _maNotificationPushGetData(
+				(int)gCore->mem_ds,
+				a,
+				data->type,
+				_valueBuffer,
+				_valueBufferSize,
+				data->soundFileName,
+				data->soundFileNameSize,
+				// The badge icon is used only on iOS.
+				data->badgeIcon,
+				mJNIEnv,
+				mJThis);
+		}
+
 		case maIOCtl_maSyscallPanicsEnable:
 			SYSLOG("maIOCtl_maSyscallPanicsEnable");
 			return _maSyscallPanicsEnable(

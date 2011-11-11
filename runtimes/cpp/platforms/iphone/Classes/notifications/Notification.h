@@ -217,6 +217,8 @@
 
 -(void) didFailToRegisterForPushNotification:(NSString*) error;
 
+-(int) getPushRegistrationData:(char*) messageAddress
+                          size:(const int) size;
 @end
 
 /**

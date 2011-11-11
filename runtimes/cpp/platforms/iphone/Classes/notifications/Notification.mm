@@ -570,6 +570,26 @@ static Notification *sharedInstance = nil;
     return MA_NOTIFICATION_RES_OK;
 }
 
+-(int) getPushRegistrationData:(char*) messageAddress
+                          size:(const int) size
+{
+    int result = MA_NOTIFICATION_RES_OK;
+    NSString* messageString;
+    if (!mRegistrationError)
+    {
+        messageString = mDeviceToken;
+    }
+    else
+    {
+        messageString = mRegistrationError;
+        result = MA_NOTIFICATION_RES_REGISTRATION_SERVICE_NOT_AVAILABLE;
+    }
+//    char* charAddress = (char*) Base::gSyscall->GetValidatedMemRange((int)messageAddress, size);
+    [messageString getCString:messageAddress maxLength:size encoding:NSASCIIStringEncoding];
+
+    return result;
+}
+
 -(void) didRegisterForPushNotification:(NSString*) deviceToken
 {
     NSLog(@"didRegisterForPushNotification %@", deviceToken);
@@ -629,4 +649,8 @@ void MoSync_ApplicationRegistration(NSNumber* errorCode, NSString* text)
     {
         [[Notification getInstance] didFailToRegisterForPushNotification: text];
     }
+
+    MAEvent event;
+    event.type = EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION;
+    Base::gEventQueue.put(event);
 }
