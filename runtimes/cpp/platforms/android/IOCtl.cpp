@@ -3079,13 +3079,13 @@ namespace Base
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 		jstring jstr = jNIEnv->NewStringUTF(accountID);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushRegister", "(I;Ljava/lang/String;)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushRegister", "(ILjava/lang/String;)I");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 
-		int result = jNIEnv->CallIntMethod(jThis, methodID, pushNotificationTypes);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, pushNotificationTypes, jstr);
 
 		jNIEnv->DeleteLocalRef(jstr);
 		jNIEnv->DeleteLocalRef(cls);
