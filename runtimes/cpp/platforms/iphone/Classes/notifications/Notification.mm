@@ -570,6 +570,18 @@ static Notification *sharedInstance = nil;
     return MA_NOTIFICATION_RES_OK;
 }
 
+-(void) didRegisterForPushNotification:(NSString*) deviceToken
+{
+    NSLog(@"didRegisterForPushNotification %@", deviceToken);
+    mDeviceToken = [deviceToken retain];
+}
+
+-(void) didFailToRegisterForPushNotification:(NSString*) error
+{
+    NSLog(@"didFailToRegisterForPushNotification %@", error);
+    mRegistrationError = [error retain];
+}
+
 /**
  * Release all contained objects.
  */
@@ -577,6 +589,8 @@ static Notification *sharedInstance = nil;
 {
     [mLocalNotificationDictionary release];
     [mPushNotificationDictionary release];
+    [mDeviceToken release];
+    [mRegistrationError release];
 
     [super dealloc];
 }
@@ -602,4 +616,17 @@ void MoSync_DidReceiveLocalNotification(UILocalNotification* localNotification)
 void MoSync_DidReceivePushNotification(NSDictionary* pushNotification)
 {
     [[Notification getInstance] didReceivePushNotification:pushNotification];
+}
+
+void MoSync_ApplicationRegistration(NSNumber* errorCode, NSString* text)
+{
+    NSLog(@"MoSync_ApplicationRegistration");
+    if (0 == [errorCode intValue])
+    {
+        [[Notification getInstance] didRegisterForPushNotification: text];
+    }
+    else
+    {
+        [[Notification getInstance] didFailToRegisterForPushNotification: text];
+    }
 }

@@ -28,6 +28,7 @@ void MoSync_AddFocusGainedEvent();
 void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 void MoSync_DidReceiveLocalNotification(UILocalNotification* localNotification);
 void MoSync_DidReceivePushNotification(NSDictionary* pushNotification);
+void MoSync_ApplicationRegistration(NSNumber* errorCode, NSString* text);
 
 @implementation MoSyncAppDelegate
 
@@ -75,13 +76,21 @@ void MoSync_DidReceivePushNotification(NSDictionary* pushNotification);
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {
     NSString *str = [NSString stringWithFormat:@"Device Token=%@",deviceToken];
-    NSLog(@"%@",str);
+    NSString* token = [[NSString alloc] initWithData:deviceToken encoding:NSASCIIStringEncoding];
+    MoSync_ApplicationRegistration(
+        [NSNumber numberWithInt:0],
+        token);
+    NSLog(@"%@",token);
+    [token release];
 }
 
 - (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)err
 {
     NSString *str = [NSString stringWithFormat: @"Error: %@", err];
     NSLog(@"%@",str);
+    MoSync_ApplicationRegistration(
+        [NSNumber numberWithInt:-1],
+        str);
 }
 
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo

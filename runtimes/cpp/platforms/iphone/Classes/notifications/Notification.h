@@ -57,6 +57,10 @@
      * Set if the push notification are enabled.
      */
     bool mIsPushNotificationEnabled;
+
+    NSString* mDeviceToken;
+
+    NSString* mRegistrationError;
 }
 
 /**
@@ -209,6 +213,10 @@
  */
 -(void) didReceivePushNotification:(NSDictionary*) pushNotification;
 
+-(void) didRegisterForPushNotification:(NSString*) deviceToken;
+
+-(void) didFailToRegisterForPushNotification:(NSString*) error;
+
 @end
 
 /**
@@ -225,3 +233,5 @@ void MoSync_DidReceiveLocalNotification(UILocalNotification* localNotification);
  * to display to the user, a notification identifier, and custom data.
  */
 void MoSync_DidReceivePushNotification(NSDictionary* pushNotification);
+
+void MoSync_ApplicationRegistration(NSNumber* errorCode, NSString* text);
