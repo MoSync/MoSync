@@ -1395,9 +1395,15 @@ interface MAAPI {
 		LOCAL_NOTIFICATION = 43;
 
 		/**
+		* \brief Send after a registration for push notification.
+		* Platform: Android and iOS.
+		*/
+		PUSH_NOTIFICATION_REGISTRATION = 44;
+
+		/**
 		* \brief Send when the application receives a push notification.
 		*/
-		PUSH_NOTIFICATION = 44;
+		PUSH_NOTIFICATION = 45;
 		}
 
 	/**

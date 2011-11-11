@@ -12,7 +12,7 @@
 		431869C913F69ECA0051D97A /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869C813F69ECA0051D97A /* EventKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4370369E13E9487D00F22783 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4370369D13E9487D00F22783 /* AddressBook.framework */; };
 		43B44A0613F94480001F2492 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B44A0513F94480001F2492 /* MediaPlayer.framework */; };
-		43CE0BFF1463EEA400F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BFE1463EEA400F8FFC3 /* iAd.framework */; };
+		43CE0BFF1463EEA400F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BFE1463EEA400F8FFC3 /* iAd.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		85796C5512719251002B7859 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5312719251002B7859 /* Icon-72.png */; };
 		85796C5612719251002B7859 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5412719251002B7859 /* Icon.png */; };
 		858B401012E67D8D0058DBFC /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 858B400F12E67D8D0058DBFC /* OpenGLES.framework */; };
