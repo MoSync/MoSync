@@ -1,4 +1,4 @@
-package com.mosync.internal.android.notifications;
+package com.mosync.java.android;
 
 /**
  * Holds info about the latest registration that was attempted.
@@ -30,6 +30,8 @@ public class PushRegistrationData {
 	PushRegistrationData(){}
 
 	public Boolean registrationAttempted = false;
+
+	public Boolean registrationInProgress = false;
 
 	/**
 	 * True if the application is already registered to the C2DM service.

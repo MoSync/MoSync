@@ -1,6 +1,9 @@
-package com.mosync.internal.android.notifications;
+package com.mosync.java.android;
 
 import java.nio.ByteBuffer;
+
+//import com.google.android.c2dm.C2DMBaseReceiver;
+//import com.google.android.c2dm.C2DMessaging;
 
 import com.google.android.c2dm.C2DMBaseReceiver;
 import com.google.android.c2dm.C2DMessaging;
@@ -8,6 +11,8 @@ import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.java.android.MoSync;
 import com.mosync.nativeui.util.HandleTable;
+
+//import com.google.android.c2dm.C2DMBaseReceiver;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -29,21 +34,21 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_REG
  * received from C2Dm server.
  * Receives all C2DM events.
  */
-public class PushNotificationsManager extends C2DMBaseReceiver{
+public class PushNotificationsManager {//extends C2DMBaseReceiver{
 
 	/**
 	 * Constructor.
 	 */
 	public PushNotificationsManager(MoSyncThread mThread, Context context)
 	{
-		super("dummy@google.com");
+//		super("dummy@google.com");
 		mMosyncThread = mThread;
 		mAppContext = context;
 	}
-
+/*
 	@Override
 	protected void onMessage(Context context, Intent intent) {
-		Log.e("C2DM", "Message: Fantastic!!!");
+		Log.e("C2DM", "manager Message: Fantastic!!!");
 
 		// create new PushNotificationObject that holds the payload.
 
@@ -57,8 +62,9 @@ public class PushNotificationsManager extends C2DMBaseReceiver{
 
 	@Override
 	public void onError(Context context, String errorId) {
-		Log.e("@@MoSync", "C2DmBaseReceiver onError " + errorId);
+		Log.e("@@MoSync", "manager C2DmBaseReceiver onError " + errorId);
 		//TODO case for err codes to set strings.
+		mRegistrationInfo.registrationInProgress = false;
 		mRegistrationInfo.errorMessage = errorId;
 		mRegistrationInfo.registrationSuccess = false;
 	}
@@ -66,13 +72,14 @@ public class PushNotificationsManager extends C2DMBaseReceiver{
 	@Override
 	public void onRegistered(Context context, String registrationId)
 			throws java.io.IOException {
-		Log.e("C2DM", "Registration ID arrived: Fantastic!!!");
+		Log.e("C2DM", "manager   Registration ID arrived: Fantastic!!!");
 		Log.e("@@MoSync", "C2DM onRegistered " + registrationId);
+		mRegistrationInfo.registrationInProgress = false;
 		mRegistrationInfo.registrationID = registrationId;
 		mRegistrationInfo.registrationSuccess = true;
 		// SEND EVENT
 	};
-
+*/
 	// delete this, handled in onRegistered.
 	public static void setRegId(String regId)
 	{
@@ -87,10 +94,11 @@ public class PushNotificationsManager extends C2DMBaseReceiver{
 	 */
 	public void createNotification(Context context, String message)
 	{
-		int icon = getResources().getIdentifier(
-				"icon",
-				"drawable",
-				getPackageName());
+//		int icon = getResources().getIdentifier(
+//				"icon",
+//				"drawable",
+//				getPackageName());
+		int icon = -1;
 		PushNotificationObject notification = new PushNotificationObject(message, icon);
 		m_NotificationTable.add(notification);
 
@@ -104,12 +112,31 @@ public class PushNotificationsManager extends C2DMBaseReceiver{
 	 */
 	public int register(String accountID)
 	{
+		Log.e("EMMA", "Manager register");
 		if ( mRegistrationInfo.registrationSuccess )
+		{
+			Log.e("@@MoSync", "Application is already registered to C2DM");
 			return MA_NOTIFICATION_RES_ALREADY_REGISTERED;
+		}
+		if ( mRegistrationInfo.registrationInProgress )
+		{
+			Log.e("@@MoSync","One registration is already in progress.");
+			return -1;
+		}
 
+		mRegistrationInfo.registrationInProgress = true;
 		mRegistrationInfo.registrationAttempted = true;
 		mSenderID = accountID;
-		C2DMessaging.register(mAppContext, mSenderID);
+		try {
+			Class.forName("C2DMMessaging");
+
+		}catch (ClassNotFoundException cnf)
+		{
+			Log.e("EMMA not found","");
+		}
+		Log.e("EMMA", "BEFORE");
+		C2DMessaging.register(mMosyncThread.getActivity(), "emma.tresanszki@mobilesorcery.com");
+		Log.e("EMMA","AFTER");
 		return MA_NOTIFICATION_RES_OK;
 	}
 
@@ -211,7 +238,7 @@ public class PushNotificationsManager extends C2DMBaseReceiver{
 	/**
 	 * Hold the latest registration information.
 	 */
-	public static PushRegistrationData mRegistrationInfo;
+	public static PushRegistrationData mRegistrationInfo = new PushRegistrationData();
 
 	/**
 	 * Is the ID of the account authorized to send messages to the application,

@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-package com.mosync.internal.android.notifications;
+package com.mosync.java.android;
 
 import java.util.GregorianCalendar;
 import java.util.Timer;
@@ -337,25 +337,25 @@ public class LocalNotificationsService extends Service
  * Android versions below level 5.
  * @author Mikael Kindborg
  */
-class StartForegroundWrapper
+/*class StartForegroundWrapper
 {
 	public void startForeground(
 		Service service, int id, Notification notification)
 	{
 		service.startForeground(id, notification);
 	}
-}
+}*/
 
 /**
  * Wrapper class for startForeground, which is not available on
  * Android versions below level 5.
  * @author Mikael Kindborg
  */
-class StopForegroundWrapper
+/*class StopForegroundWrapper
 {
 	public void stopForegroundAndRemoveNotificationIcon(Service service)
 	{
 		// The true argument removes the notification icon.
 		service.stopForeground(true);
 	}
-}
+}*/

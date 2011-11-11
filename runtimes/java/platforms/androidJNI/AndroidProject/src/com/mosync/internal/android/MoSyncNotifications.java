@@ -3,8 +3,10 @@ package com.mosync.internal.android;
 import android.app.Activity;
 import android.content.Context;
 
-import com.mosync.internal.android.notifications.LocalNotificationsManager;
-import com.mosync.internal.android.notifications.PushNotificationsManager;
+import com.mosync.java.android.LocalNotificationsManager;
+import com.mosync.java.android.PushNotificationsManager;
+//import com.mosync.internal.android.notifications.LocalNotificationsManager;
+//import com.mosync.internal.android.notifications.PushNotificationsManager;
 
 /**
  * Wrapper for Notifications Syscalls to avoid cluttering the MoSyncSyscalls file.

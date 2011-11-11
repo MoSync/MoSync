@@ -2,7 +2,7 @@ package com.google.android.c2dm;
 
 import java.io.IOException;
 
-import com.mosync.internal.android.notifications.PushNotificationsManager;
+//import com.mosync.internal.android.notifications.PushNotificationsManager;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -179,7 +179,7 @@ public abstract class C2DMBaseReceiver extends IntentService {
 			try {
 				onRegistered(context, registrationId);
 //				C2DMessaging.setRegistrationId(context, registrationId);
-				PushNotificationsManager.setRegId(registrationId);
+//				PushNotificationsManager.setRegId(registrationId);
 				// Raise an event now. TODO
 				Log.e("Emmaaaa setRegID", registrationId);
 			} catch (IOException ex) {

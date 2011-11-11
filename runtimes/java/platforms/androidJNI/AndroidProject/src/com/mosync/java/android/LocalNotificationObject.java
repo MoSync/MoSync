@@ -1,4 +1,4 @@
-package com.mosync.internal.android.notifications;
+package com.mosync.java.android;
 
 import java.util.Date;
 

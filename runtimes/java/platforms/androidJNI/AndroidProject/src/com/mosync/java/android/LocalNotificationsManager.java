@@ -1,4 +1,4 @@
-package com.mosync.internal.android.notifications;
+package com.mosync.java.android;
 
 import android.app.Activity;
 import android.content.Context;
