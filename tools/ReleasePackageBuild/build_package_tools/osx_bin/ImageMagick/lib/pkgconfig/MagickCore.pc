@@ -1,0 +1,10 @@
+prefix=$MAGICK_HOME
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/ImageMagick
+
+Name: MagickCore
+Description: MagickCore - C API for ImageMagick
+Version: 6.6.7
+Libs: -L${libdir} -lMagickCore
+Cflags: -I${includedir} -fopenmp

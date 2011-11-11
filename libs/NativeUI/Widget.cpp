@@ -43,7 +43,8 @@ namespace NativeUI
      */
     Widget::Widget(const MAUtil::String& widgetType) :
         mWidgetManager(WidgetManager::getInstance()),
-        mLastError(LastError())
+        mLastError(LastError()),
+		mData(NULL)
     {
         mWidgetHandle = maWidgetCreate(widgetType.c_str());
         if ( mWidgetHandle == MAW_RES_INVALID_TYPE_NAME )
@@ -686,5 +687,21 @@ namespace NativeUI
 		mLastError.errorCode = errCode;
 		mLastError.errorCause = cause;
     }
+
+	/**
+	 * Set a pointer to any data you want to associate the widget to.
+	 */
+	void Widget::setData(void *data)
+	{
+		mData = data;
+	}
+
+	/**
+	 * Get a pointer to the data, the widget is associated to. (default: NULL)
+	 */
+	void* Widget::getData()
+	{
+		return mData;
+	}
 
 } // namespace NativeUI

@@ -54,6 +54,7 @@ build-one.rb
 /tools/makesis-2.0.0*
 /tools/MoCab/lcab
 /tools/ReleasePackageBuild/build_package_tools/include
+/tools/ReleasePackageBuild/build_package_tools//osx_bin/ImageMagick
 /tools/uidcrc
 
 # files

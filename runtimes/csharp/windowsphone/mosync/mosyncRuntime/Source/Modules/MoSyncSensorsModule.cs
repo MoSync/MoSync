@@ -70,6 +70,7 @@ namespace MoSync
                             SendSensorEventVector(runtime, MoSync.Constants.SENSOR_TYPE_MAGNETIC_FIELD, rot);
                         };
                 }
+#if false
                 else if (_sensor == MoSync.Constants.SENSOR_TYPE_ORIENTATION &&
                     Motion.IsSupported)
                 {
@@ -80,6 +81,7 @@ namespace MoSync
                                {
                                };
                 }
+#endif
                 else
                     return MoSync.Constants.SENSOR_ERROR_NOT_AVAILABLE;
 

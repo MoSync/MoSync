@@ -34,6 +34,7 @@ namespace MoSync
 
             Stream dataSection = dataSectionInfo.Stream;
             mDataMemory.WriteFromStream(0, dataSection, fileSize);
+            dataSection.Close();
 
             int customEventDataSize = 60;
             sp -= customEventDataSize;

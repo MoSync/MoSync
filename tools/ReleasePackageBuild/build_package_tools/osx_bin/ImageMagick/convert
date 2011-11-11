@@ -1,0 +1,5 @@
+#!/bin/sh
+export MAGICK_HOME=/Applications/MoSync/bin/ImageMagick/
+export DYLD_LIBRARY_PATH="$MAGICK_HOME/lib/"
+
+/Applications/MoSync/bin/ImageMagick/bin/convert $1 $2

@@ -184,8 +184,24 @@ namespace MoSync
             return path.Replace('/', '\\');
         }
 
+        private static void CleanDictionary(Dictionary<int, File> d)
+        {
+            foreach (KeyValuePair<int, File> p in d)
+            {
+                p.Value.Close();
+            }
+            d.Clear();
+        }
+
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
+            runtime.RegisterCleaner(delegate()
+            {
+                CleanDictionary(mFileHandles);
+                CleanDictionary(mStoreHandles);
+                mFileListHandles.Clear();
+            });
+
             // todo: store "stores" in a separate location from the filesystem,
             // to avoid clashes.
             syscalls.maOpenStore = delegate(int _name, int _flags)

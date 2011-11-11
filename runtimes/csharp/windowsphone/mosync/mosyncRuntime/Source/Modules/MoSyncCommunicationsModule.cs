@@ -266,6 +266,8 @@ namespace MoSync
             // immediate
             public override void close()
             {
+                if (mStream != null)
+                    mStream.Close();
                 if (mResponse != null)
                     mResponse.Close();
                 if (mRequest != null)
@@ -297,6 +299,14 @@ namespace MoSync
 
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
+            runtime.RegisterCleaner(delegate()
+            {
+                foreach(KeyValuePair<int, Connection> p in mConnections) {
+                    p.Value.close();
+                }
+                mConnections.Clear();
+            });
+
             mResultHandler = delegate(int handle, int connOp, int result)
             {
                 Memory evt = new Memory(4 * 4);
