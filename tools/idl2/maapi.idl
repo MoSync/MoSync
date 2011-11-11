@@ -7514,7 +7514,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		 * Add a notification item.
-		 *
+		 * @deprecated use maNotificationCreate instead.
 		 * Note that there can only be one notification of type
 		 * #NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification
 		 * types may be added in the future. This syscall is available
@@ -7536,6 +7536,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		 * Remove a notification item.
+		 * @deprecated use maNotificationDestroy instead.
 		 * Currently implemented only on Android.
 		 * @param id The id of the notification.
 		 * @return \< 0 on error.
@@ -8280,47 +8281,47 @@ group AdsAPI "Ads API" {
 	group AdsErrorCodes "Ads error codes" {
 		constset int MA_ADS_ERROR_ {
 			/**
-			* @brief
+			* @brief Indicates that something happened internally: for instance, the Activity may have been destroyed mid-refresh.
 			* Platform: Android.
 			*/
-			INTERNAL = 0;
+			INTERNAL = -1;
 
 			/**
-			* @brief
+			* @brief Indicates that the ad request is invalid.
 			* Platform: Android.
 			*/
-			INVALID_REQUEST = -1;
+			INVALID_REQUEST = -2;
 
 			/**
 			* @brief Indicates that the connection to the advertisements server failed.
 			* Platform: Android and iOS.
 			*/
-			NETWORK = -2;
+			NETWORK = -3;
 
 			/**
-			* @brief Indicates that no advertisements are currently available to download.
+			* @brief Indicates that no ad was returned due to lack of ad inventory.
 			* Platform: Android and iOS.
 			*/
-			NO_FILL = -3;
+			NO_FILL = -4;
 
 			/**
 			* @brief Indicates that your application has not been configured to receive advertisements.
 			* Platform: iOS.
 			*/
-			CONFIGURATION = -4;
+			CONFIGURATION = -5;
 
 			/**
 			* @brief Indicates that the banner is visible, but no advertisement is shown.
 			* Your application must always hide the banner when it does not have an advertisement to display.
 			* Platform: iOS.
 			*/
-			NO_CONTENT = -5;
+			NO_CONTENT = -6;
 
 			/**
 			* @brief Indicates that ad content is not available because the application is not currently active.
 			* Platform: iOS.
 			*/
-			APPLICATION_INACTIVE = -6;
+			APPLICATION_INACTIVE = -7;
 		}
 	} // end of Ads Error Codes
 
@@ -8362,14 +8363,13 @@ group AdsAPI "Ads API" {
 			* @brief Sets whether the banner is visible or not. Layouts ignore invisible widgets.
 			* The banner is visible by default.
 			*
-			* @validvalue true or false.
+			* @validvalue A boolean string 'true' or 'false', where true is visible and false is invisible.
 			*
 			* @setandget
 			*
 			* @par Example
 			* \code
-			*   char buf[256];
-			*	maAdsBannerSetProperty(MA_ADS_VISIBLE, "false");
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_VISIBLE, "false");
 			* \endcode
 			*/
 			VISIBLE = "visible";
@@ -8384,15 +8384,13 @@ group AdsAPI "Ads API" {
 			*
 			* @par Example
 			* \code
-			*   char buf[256];
-			*	maAdsBannerSetProperty(MA_ADS_ENABLE, "true");
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_ENABLED, "false");
 			* \endcode
 			*/
-			ENABLE = "enable";
+			ENABLED = "enabled";
 
 			/**
 			* @brief Sets the devices that are going to receive test ads only.
-			* If set to true all the requests are made for test ads only.
 			* You should utilize this property during development to avoid generating false impressions.
 			* Available only on Android.
 			*
@@ -8403,7 +8401,7 @@ group AdsAPI "Ads API" {
 			* @par Example
 			* \code
 			*   char buf[256];
-			*	maAdsBannerSetProperty(MA_ADS_TEST_DEVICE, "E83D20734F72FB3108F104ABC0FFC738"); // My T-Mobile G1 test phone
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_TEST_DEVICE, "E83D20734F72FB3108F104ABC0FFC738"); // My T-Mobile G1 test phone
 			* \endcode
 			*/
 			TEST_DEVICE = "testDevice";
@@ -8411,18 +8409,122 @@ group AdsAPI "Ads API" {
 			/**
 			* @brief Sets the request state of the ads.
 			* If set to true ads are starting to be requested, if set to false the request for ads is stopped.
+			* After requesting for content no other property setter will be taken into account.
+			* @validvalue A boolean string 'true' or 'false'.
+			* Available only on Android.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_REQUEST_CONTENT, "true");
+			* \endcode
+			*/
+			REQUEST_CONTENT = "requestContent";
+
+			/**
+			* @brief Returns true if the ad is successfully loaded and is ready to be shown.
+			* Available only on Android.
 			*
 			* @validvalue A boolean string 'true' or 'false'.
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerGetProperty(bannerHandle, MA_ADS_IS_READY, buf);
+			* \endcode
+			*/
+			IS_READY = "isReady";
+
+			/**
+			* @brief Sets the coloration of test ads, specifically the background color.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_BG, "0xAAAAFF");
+			* \endcode
+			*/
+			COLOR_BG = "colorBg";
+
+			/**
+			* @brief Sets the coloration of test ads,specifically the gradient background color at top.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_BG_TOP, "0xFFFFFF");
+			* \endcode
+			*/
+			COLOR_BG_TOP = "colorBgTop";
+
+			/**
+			* @brief Sets the coloration of test ads, specfiically the border color.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
 			*
 			* @setonly
 			*
 			* @par Example
 			* \code
 			*   char buf[256];
-			*	maAdsBannerSetProperty(MA_ADS_REQUEST_CONTENT, "true");
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_BORDER, "0xFFFFFF");
 			* \endcode
 			*/
-			REQUEST_CONTENT = "requestContent";
+			COLOR_BORDER = "colorBorder";
+
+			/**
+			* @brief Sets the coloration of test ads, specfiically the link text color.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_LINK, "0xFFFFFF");
+			* \endcode
+			*/
+			COLOR_LINK = "colorLink";
+
+			/**
+			* @brief Sets the coloration of test ads, specfiically the text color.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_TEXT, "0xFFFFFF");
+			* \endcode
+			*/
+			COLOR_TEXT = "colorText";
+
+			/**
+			* @brief Sets the coloration of test ads, specfiically the url color.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_URL, "0xFFFFFF");
+			* \endcode
+			*/
+			COLOR_URL = "colorUrl";
 		}
 	} // end of Ads properties
 
@@ -8568,7 +8670,7 @@ group NotificationAPI "Notification API" {
 			INVALID_PROPERTY_VALUE = -4;
 
 			/**
-			* @brief Indicates that the call to maNotificationGetProperty needs a larger buffer.
+			* @brief Indicates that the call to maNotificationGetProperty or maNotificationPushGetData needs a larger buffer.
 			*/
 			INVALID_STRING_BUFFER_SIZE = -5;
 
@@ -8590,9 +8692,64 @@ group NotificationAPI "Notification API" {
 			NOT_REGISTERED = -8;
 
 			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the
+			* device can't read the response, or there was a 500/503 from the server that can be retried later.
+			* The application should use exponential back off and retry.
+			* Platform: Android only.
+			*/
+			REGISTRATION_SERVICE_NOT_AVAILABLE = -9;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because there is no
+			* Google account on the phone.
+			* The application should ask the user to open the account manager and add a Google account.
+			* Platform: Android only.
+			*/
+			REGISTRATION_ACCOUNT_MISSING = -10;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the password was bad.
+			* The application should ask the user to enter his/her password, and let user retry manually later.
+			* Platform: Android only.
+			*/
+			REGISTRATION_AUTHENTICATION_FAILED = -11;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the user has too many
+			* applications registered.
+			* The application should tell the user to uninstall some other applications, let user retry manually.
+			* Platform: Android only.
+			*/
+			REGISTRATION_TOO_MANY_REGISTRATIONS = -12;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the sender account
+			* is not recognized.
+			* Platform: Android only.
+			*/
+			REGISTRATION_INVALID_SENDER = -13;
+
+			/**
+			* @brief  Indicates that the call to maNotificationPushRegister was unsuccesfull because of incorrect
+			* phone registration with Google. This phone doesn't currently support C2DM.
+			* Platform: Android only.
+			*/
+			REGISTRATION_PHONE_REGISTRATION_ERROR = -14;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushGetRegistration needs a larger buffer.
+			*/
+			REGISTRATION_MESSAGE_BUF_TOO_SMALL = -15;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushGetRegistration occured before trying to register.
+			*/
+			REGISTRATION_NOT_CALLED = -16;
+
+			/**
 			* @brief Indicates that the call to an notification syscall was unsuccessful.
 			*/
-			ERROR = -9;
+			ERROR = -17;
 		}
 	} // end of Notification Result Codes
 
@@ -8828,19 +8985,27 @@ group NotificationAPI "Notification API" {
 
 		/**
 		* \brief Registers the current application for receiving push notifications.
-		*
+		* Note that on Android you might want to store the registrationID that you receive,
+		* and call this again only if it expires at some point.
+		* On Android: if the registration is succesfful, the application receives a registration ID.
+		* The application should store this ID for later use. Note that Google may periodically refresh
+		* the registration ID, so you should design your application with the understanding that this
+		* syscall  may be called multiple times.
 		* \param pushNotificationTypes A bit mask specifying the types of notifications
 		* the application accepts.
 		* See \link #MA_NOTIFICATION_PUSH_TYPE_BADGE MA_NOTIFICATION_PUSH_TYPE_ \endlink
 		* for valid bit-mask values.
 		* On Android platform this param is ignored.
+		* \param accountID Is the ID of the account authorized to send messages to the application,
+		* typically the email address of an account set up by the application's developer.
+		* On iOS platform this param is ignored.
 		*
 		* \returns One of the next constants:
 		* - MA_NOTIFICATION_RES_OK if no error occurred.
 		* - MA_NOTIFICATION_ALREADY_REGISTERED if the application is already registered for
 		* receiving push notifications.
 		*/
-		int maNotificationPushRegister(in MAHandle pushNotificationTypes);
+		int maNotificationPushRegister(in MAHandle pushNotificationTypes, in MAString accountID);
 
 		/**
 		* \brief Unregister application for push notifications.
@@ -8851,6 +9016,22 @@ group NotificationAPI "Notification API" {
 		* push notification.
 		*/
 		int maNotificationPushUnregister();
+
+		/**
+		* \brief Gets the latest registration response.
+		* \param registrationMesssage The registrationID if the registration was successfull, or the error messsage otherwise.
+		* \response  One of the next constants:
+		* - MA_NOTIFICATION_RES_OK if the application registered successfully.
+		* - MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED
+		* - MA_NOTIFICATION_RES_REGISTRATION_SERVICE_NOT_AVAILABLE
+		* - MA_NOTIFICATION_RES_REGISTRATION_ACCOUNT_MISSING
+		* - MA_NOTIFICATION_RES_REGISTRATION_AUTHENTICATION_FAILED
+		* - MA_NOTIFICATION_RES_REGISTRATION_TOO_MANY_REGISTRATIONS
+		* - MA_NOTIFICATION_RES_REGISTRATION_INVALID_SENDER
+		* - MA_NOTIFICATION_RES_REGISTRATION_PHONE_REGISTRATION_ERROR
+		* - MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL
+		*/
+		int maNotificationPushGetRegistration(out MAAddress registrationMesssage, out int registrationMessageSize);
 
 		/**
 		* \brief Fills pushNotificationData struct with the values for a given push notification.

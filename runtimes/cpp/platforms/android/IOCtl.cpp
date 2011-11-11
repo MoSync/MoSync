@@ -2869,6 +2869,278 @@ namespace Base
 		return (int)result;
 	}
 
+	int _maAdsBannerCreate(int bannerSize, const char* publisherID, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrPublisher = jNIEnv->NewStringUTF(publisherID);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maAdsBannerCreate", "(ILjava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, bannerSize, jstrPublisher);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrPublisher);
+
+		return result;
+	}
+
+	int _maAdsAddBannerToLayout(MAHandle bannerHandle, MAHandle layoutHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maAdsAddBannerToLayout", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, bannerHandle, layoutHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maAdsRemoveBannerFromLayout(MAHandle bannerHandle, MAHandle layoutHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maAdsRemoveBannerFromLayout", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, bannerHandle, layoutHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maAdsBannerDestroy(MAHandle bannerHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maAdsBannerDestroy", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, bannerHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maAdsBannerSetProperty(MAHandle bannerHandle, const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrProp = jNIEnv->NewStringUTF(property);
+		jstring jstrValue = jNIEnv->NewStringUTF(value);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maAdsBannerSetProperty", "(ILjava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, bannerHandle, jstrProp, jstrValue);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrValue);
+		jNIEnv->DeleteLocalRef(jstrProp);
+
+		return result;
+	}
+
+	int _maAdsBannerGetProperty(int memStart, MAHandle bannerHandle, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrProp = jNIEnv->NewStringUTF(property);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maAdsBannerGetProperty", "(ILjava/lang/String;II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, bannerHandle, jstrProp, memBuffer - memStart, bufSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrProp);
+
+		return result;
+	}
+
+	int _maNotificationCreate(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationCreate", "()I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maNotificationDestroy(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationDestroy", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, notificationHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maNotificationSetProperty(MAHandle notificationHandle, const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrProp = jNIEnv->NewStringUTF(property);
+		jstring jstrValue = jNIEnv->NewStringUTF(value);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationSetProperty", "(ILjava/lang/String;Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, notificationHandle, jstrProp, jstrValue);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrValue);
+		jNIEnv->DeleteLocalRef(jstrProp);
+
+		return result;
+	}
+
+	int _maNotificationGetProperty(int memStart, MAHandle notificationHandle, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrProp = jNIEnv->NewStringUTF(property);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationGetProperty", "(ILjava/lang/String;II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, notificationHandle, jstrProp, memBuffer - memStart, bufSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrProp);
+
+		return result;
+	}
+
+	int _maNotificationLocalRegister(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationLocalRegister", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, notificationHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maNotificationLocalUnregister(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationLocalUnregister", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, notificationHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maNotificationPushRegister(MAHandle pushNotificationTypes, const char* accountID, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jstring jstr = jNIEnv->NewStringUTF(accountID);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushRegister", "(I;Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, pushNotificationTypes);
+
+		jNIEnv->DeleteLocalRef(jstr);
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maNotificationPushGetRegistration(int memStart, int messagePointer, int messageSize, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushGetRegistration", "(II)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, messagePointer - memStart, messageSize);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maNotificationPushUnregister(JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushUnregister", "()I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maNotificationPushGetData(MAHandle pushNotificationHandle, int type, int memStart, int messagePointer,int messageSize, int soundFilePointer, int soundFileSize, int badgeIcon, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushGetData", "(IIIIIII)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, pushNotificationHandle, type, messagePointer - memStart, messageSize, soundFilePointer, soundFileSize, badgeIcon);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
 	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
