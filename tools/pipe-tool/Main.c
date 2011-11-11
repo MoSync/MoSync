@@ -164,6 +164,7 @@ int main(int argc,char *argv[])
 	ArgJavaNative = 0;
 	ArgBrewGen = 0;
 	ArgCppGen = 0;
+	ArgCsGen = 0;
 	ArgSLD = 0;
 	ArgDebugRebuild = 0;
 	ArgUseStabs = 0;
@@ -464,6 +465,16 @@ int main(int argc,char *argv[])
 			Do_Elimination = 1;
 
 			dbprintf("Native cpp build on\n");
+			continue;
+		}
+
+		if (Token("cs"))
+		{
+			ArgCsGen = 1;
+			ArgConstOpt = 0;
+			Do_Elimination = 1;
+
+			dbprintf("Native cs build on\n");
 			continue;
 		}
 

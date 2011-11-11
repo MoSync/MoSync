@@ -2,8 +2,6 @@
 <html>
 <!--
   This file contains CSS, JavaScript and HTML for the application.
-  The state of the CSS is quite experimental, the code could be
-  cleaned up and simplified.
 -->
 <head>
 <style type="text/css">
@@ -26,7 +24,6 @@ html
   font-weight: bold;
   color: white;
   text-align: center;
-  /* background-color:green; For layout debugging */
 }
 
 #Message
@@ -47,38 +44,34 @@ html
 
 .button
 {
+  /* Width for buttons. */
+  width: 11em;
+
   /* Centers the button horizontally. */
   display: table;
   margin: 0.9em auto;
 
+  /* Padding and radius. */
   padding: 0.3em 0.5em;
   border-radius: 0.3em;
   -moz-border-radius: 0.3em;
   -webkit-border-radius: 0.3em;
 
+  /* Text properties. */
   font-size: 1.5em;
   font-weight: bold;
   text-align: center;
-
   color: white;
+
+  /* If gradients are not supported, use solid background color. */
   background-color: #99CF00;
-  border-left: solid 1px #C3F83A;
-  border-top: solid 1px #C3F83A;
-  border-right: solid 1px #82A528;
-  border-bottom: solid 1px #58701B;
 
-  background-color: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#99CF00), to(#6DB700));
-  background-color: -moz-linear-gradient(19% 75% 90deg, #6DB700, #99CF00);
+  /* Background gradients. */
+  background-image: -webkit-gradient(linear, left top, left bottom, from(#99CF00), to(#6DB700));
+  background-image: -moz-linear-gradient(#99CF00, #6DB700);
 
+  /* This is only useful on systems having a cursor. */
   cursor: pointer;
-
-  width: 11em;
-}
-
-.button:active
-{
-  background-color: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#6DB700), to(#99CF00));
-  background-color: -moz-linear-gradient(19% 75% 90deg,#99CF00, #6DB700);
 }
 
 #PhoneNo
@@ -182,8 +175,7 @@ function ValidatePhoneNo()
   var phoneNo = CleanPhoneNo(GetPhoneNo());
   if (phoneNo.length < 6)
   {
-    //alert('Not a valid phone number.' + GetPhoneNo());
-  DisplayMessage('Invalid phone number');
+    DisplayMessage('Invalid phone number');
     return false;
   }
   else

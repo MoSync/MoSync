@@ -459,6 +459,16 @@ namespace NativeUI
          */
         struct LastError getLastError();
 
+		/**
+		 * Set a pointer to any data you want to associate the widget to.
+		 */
+		void setData(void *data);
+
+		/**
+		 * Get a pointer to the data, the widget is associated to. (default: NULL)
+		 */
+		void* getData();
+
     protected:
         /**
          * Constructor is protected because actual widget instances
@@ -501,6 +511,11 @@ namespace NativeUI
          * Contains information about the cause of the error, as well as it's code.
          */
         struct LastError mLastError;
+
+		/**
+		 * A pointer to some data, associated with the widget.
+		 */
+		void* mData;
     };
 
 } // namespace NativeUI

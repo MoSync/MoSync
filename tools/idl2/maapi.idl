@@ -411,7 +411,7 @@ interface MAAPI {
 
 	/**
 	* Draws an image.
-	* The source is an array of ints that represent pixels in XRGB format.
+	* The source is an array of ints that represent pixels in ARGB format.
 	* \param dstPoint The top-left point on the draw target.
 	* \param src The address to the source image.
 	* \param srcRect The portion of the source image to be drawn.
@@ -4921,12 +4921,12 @@ group WidgetAPI "Widget API" {
 		/**
 		* @copydoc MAW_SCREEN_TITLE
 		*/
-		TITLE = MAW_SCREEN_TITLE;
+		TITLE = "title";
 
 		/**
 		* @copydoc MAW_SCREEN_ICON
 		*/
-		ICON = MAW_SCREEN_ICON;
+		ICON = "icon";
 
 		/**
 		* @brief Sets or gets the currently open tab to the tab with the given index.
@@ -4966,12 +4966,12 @@ group WidgetAPI "Widget API" {
 		/**
 		* @copydoc #MAW_SCREEN_TITLE
 		*/
-		TITLE = MAW_SCREEN_TITLE;
+		TITLE = "title";
 
 		/**
 		* @copydoc #MAW_SCREEN_ICON
 		*/
-		ICON = MAW_SCREEN_ICON;
+		ICON = "icon";
 
 		/**
 		* @brief Specifies whether the back button automatically should pop the stack screen.
@@ -6239,7 +6239,7 @@ group WidgetAPI "Widget API" {
 	group WidgetProgressBarProperties "Progress bar properties" {
 	constset MAString MAW_PROGRESS_BAR_ {
 		/**
-		* @brief Sets or gets the range of the progress bar to 0...max.
+		* @brief Sets or gets the range of the progress bar to 0..max.
 		*
 		* @validvalue An positive integer that specifies the upper range of this progress bar.
 		*
@@ -6310,7 +6310,7 @@ group WidgetAPI "Widget API" {
 	group WidgetSliderProperties "Slider properties" {
 	constset MAString MAW_SLIDER_ {
 		/**
-		* @brief Sets or gets the range of the slider to 0...max.
+		* @brief Sets or gets the range of the slider to 0..max.
 		*
 		* @validvalue An positive integer that specifies the upper range of this slider.
 		*
@@ -8167,6 +8167,48 @@ group NFCAPI "NFC API" {
 		}
 	}//end of NFC API
 
+#if IX_AUDIO
+	group AudioAPI "Audio API" {
+		typedef int MAAudioData;
+		typedef int MAAudioInstance;
+
+		group AudioAPIConsts "Audio API Constants" {
+			constset int MA_AUDIO_DATA_ {
+				// Bit in maAudioDataCreate flags to specify if the sound should be streamed instead of fully decoded to memory.
+				STREAM = 1;
+			}
+
+			constset int MA_AUDIO_ERR_ {
+				OK = 0;
+				INVALID_INSTANCE = -2;
+				INVALID_DATA = -3;
+				INVALID_FILENAME = -4;
+				INVALID_FILE = -5;
+				STREAMING_NOT_SUPPORTED = -6;
+				VOLUME_OUT_OF_RANGE = -7;
+				POSITION_OUT_OF_RANGE = -8;
+				INVALID_SOUND_FORMAT = -9;
+				OUT_OF_MEMORY = -10;
+			}
+		} // end of Audio API constants
+
+		group AudioAPIFunctions "Audio API Functions" {
+			MAAudioData maAudioDataCreateFromResource(in MAString mime, in MAHandle data, in int offset, in int length, in int flags);
+			MAAudioData maAudioDataCreateFromFile(in MAString mime, in MAString filename, in int flags);
+			int maAudioDataDestroy(in MAAudioData audioData);
+			MAAudioInstance maAudioInstanceCreate(in MAAudioData audioData);
+			int maAudioInstanceDestroy(in MAAudioInstance audioInstance);
+			int maAudioGetLength(in MAAudioInstance audio);
+			int maAudioSetNumberOfLoops(in MAAudioInstance audio, in int loops);
+			int maAudioPlay(in MAAudioInstance audio);
+			int maAudioSetPosition(in MAAudioInstance audio, in int milliseconds);
+			int maAudioGetPosition(in MAAudioInstance audio);
+			int maAudioSetVolume(in MAAudioInstance audio, in float volume);
+			int maAudioStop(in MAAudioInstance audio);
+		}// End of Audio API Functions
+	} // End of Audio API group
+#endif // IX_AUDIO
+
 	/**
 	* Enable panic system.
 	* If a panic is raised a message will be displayed to the user and the program will be shut down.
@@ -8181,7 +8223,6 @@ group NFCAPI "NFC API" {
 	* \return #RES_OK.
 	*/
 	int maSyscallPanicsDisable();
-
 }
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

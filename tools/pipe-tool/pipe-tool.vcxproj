@@ -129,6 +129,7 @@
     <ClCompile Include="CodeTools.c" />
     <ClCompile Include="constreg.c" />
     <ClCompile Include="CppRebuild.c" />
+    <ClCompile Include="CsRebuild.c" />
     <ClCompile Include="demangle.c" />
     <ClCompile Include="Directives.c" />
     <ClCompile Include="Eval.c" />

@@ -39,7 +39,7 @@ typedef long int ssize_t;
 # define PFZT_PREFIX ""
 #elif defined(__GNUC__)
 # if (__GNUC__ == 4) && defined(WIN32)
-#  define PFZT_PREFIX ""
+#  define PFZT_PREFIX "I"
 # else
 #  define PFZT_PREFIX "z"
 # endif	//WIN32
@@ -48,11 +48,7 @@ typedef long int ssize_t;
 #endif
 
 #define PFZT PFZT_PREFIX "u"
-#if defined(__GNUC__) && (__GNUC__ == 4) && defined(WIN32)
-# define PFSZT "li"
-#else
-# define PFSZT PFZT_PREFIX "i"
-#endif
+#define PFSZT PFZT_PREFIX "i"
 #define PFXZT PFZT_PREFIX "x"
 
 #ifdef SYMBIAN

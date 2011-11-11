@@ -998,7 +998,8 @@ SYSCALL(void, maDrawRGB(const MAPoint2d* dstPoint, const void* src,
 	clrUtil.Begin(TPoint(0, 0));
 	for(int y=top; y<bottom; y++) {
 		for(int x=left; x<right; x++) {
-			clrUtil.SetPixel(srcInt[y*scanlength + x] >> 8);
+			int argb = srcInt[y*scanlength + x];
+			clrUtil.SetPixel(argb & 0xffffff);
 			clrUtil.IncXPos();	//wraps around for us
 		}
 		//clrUtil.IncYPos();	//not needed because of wrap

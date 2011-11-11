@@ -15,6 +15,7 @@ using Microsoft.Phone.Shell;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using MoSync;
 
 namespace test_mosync
 {
@@ -84,10 +85,16 @@ namespace test_mosync
         private void Application_Launching(object sender, LaunchingEventArgs e)
         {
 
-//            RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
+            //RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
             RootFrame.Loaded += delegate(object _sender, RoutedEventArgs _e)
             {
-                MoSyncThread.CreateAndStart("program", "resources");
+                MoSync.Machine machine = null;
+#if !REBUILD
+                machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
+#else
+                machine = MoSync.Program.CreateNativeMachine(new CoreNativeProgram(), "resources");
+#endif
+                machine.Run();
             };
         }
 
@@ -95,12 +102,6 @@ namespace test_mosync
         // This code will not execute when the application is first launched
         private void Application_Activated(object sender, ActivatedEventArgs e)
         {
-            /*
-            if (e.IsApplicationInstancePreserved == false)
-            {
-                MoSyncThread.CreateAndStart("program", "resources");
-            }
-             */
         }
 
         // Code to execute when the application is deactivated (sent to background)
@@ -128,8 +129,17 @@ namespace test_mosync
         // Code to execute on Unhandled Exceptions
         private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
         {
+            Exception eo = e.ExceptionObject;
+            if (eo is MoSync.Util.ExitException)
+                return;
             if (System.Diagnostics.Debugger.IsAttached)
             {
+                System.Diagnostics.Debug.WriteLine(eo.StackTrace);
+                if (eo is System.NotImplementedException ||
+                    eo is Microsoft.Xna.Framework.Graphics.NoSuitableGraphicsDeviceException)
+                {
+                    return;
+                }
                 // An unhandled exception has occurred; break into the debugger
                 System.Diagnostics.Debugger.Break();
             }

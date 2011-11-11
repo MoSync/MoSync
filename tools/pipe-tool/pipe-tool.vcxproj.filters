@@ -58,5 +58,6 @@
     <ClCompile Include="ThunkReg.c" />
     <ClCompile Include="Tokens.c" />
     <ClCompile Include="VarPool.c" />
+    <ClCompile Include="CsRebuild.c" />
   </ItemGroup>
 </Project>
