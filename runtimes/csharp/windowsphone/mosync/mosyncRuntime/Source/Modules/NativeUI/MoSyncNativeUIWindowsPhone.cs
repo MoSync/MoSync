@@ -7,7 +7,7 @@ using System.Text.RegularExpressions;
 
 namespace MoSync
 {
-    public class SreenSize
+    public class ScreenSize
     {
         public static int SCREEN_HEIGHT = 800;
         public static int SCREEN_WIDTH = 480;
@@ -15,6 +15,8 @@ namespace MoSync
     public class WidgetBaseWindowsPhone : WidgetBase
     {
         protected UIElement mView;
+        public bool fillSpaceHorizontalyEnabled;
+        public bool fillSpaceVerticalyEnabled;
 
         public UIElement View
         {
@@ -52,6 +54,11 @@ namespace MoSync
                 {
                     mView.SetValue(Canvas.WidthProperty, value);
                 }
+                else
+                {
+                    mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
+                    fillSpaceHorizontalyEnabled = true;
+                }
             }
         }
 
@@ -64,6 +71,11 @@ namespace MoSync
                 if (!value.Equals(-1))
                 {
                     mView.SetValue(Canvas.HeightProperty, value);
+                }
+                else
+                {
+                    mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
+                    fillSpaceVerticalyEnabled = true;
                 }
             }
         }
@@ -119,12 +131,12 @@ namespace MoSync
             mSpacerRight = new ColumnDefinition();
             mSpacerLeft = new ColumnDefinition();
 
-            mRowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+            mRowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
 
-            mSpacerUp.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
-            mSpacerDown.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
-            mSpacerRight.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
-            mSpacerLeft.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+            mSpacerUp.Height = new System.Windows.GridLength(0);
+            mSpacerDown.Height = new System.Windows.GridLength(0);
+            mSpacerRight.Width = new System.Windows.GridLength(0);
+            mSpacerLeft.Width = new System.Windows.GridLength(0);
 
             mGrid.RowDefinitions.Add(mSpacerUp);
             mGrid.RowDefinitions.Add(mRowDef);
@@ -136,9 +148,6 @@ namespace MoSync
             mView = mGrid;
 
             //mGrid.ShowGridLines = true; //uncomment to see the grid lines (for debugging)
-
-            ChildVerticalAlignment = MoSync.Constants.MAW_ALIGNMENT_TOP;
-            ChildHorizontalAlignment = MoSync.Constants.MAW_ALIGNMENT_LEFT;
         }
 
         //add child
@@ -150,7 +159,9 @@ namespace MoSync
                     WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                     ColumnDefinition columnDef = new ColumnDefinition();
 
-                    columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+                    if (widget.fillSpaceHorizontalyEnabled) columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
+                    else columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+
                     mGrid.ColumnDefinitions.Insert(mGrid.ColumnDefinitions.Count - 1, columnDef);
 
                     mGrid.Children.Add(widget.View);
@@ -296,12 +307,12 @@ namespace MoSync
             mSpacerRight = new ColumnDefinition();
             mSpacerLeft = new ColumnDefinition();
 
-            mColDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+            mColDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
 
-            mSpacerUp.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
-            mSpacerDown.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
-            mSpacerRight.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
-            mSpacerLeft.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+            mSpacerUp.Height = new System.Windows.GridLength(0);
+            mSpacerDown.Height = new System.Windows.GridLength(0);
+            mSpacerRight.Width = new System.Windows.GridLength(0);
+            mSpacerLeft.Width = new System.Windows.GridLength(0);
 
             mGrid.RowDefinitions.Add(mSpacerUp);
             mGrid.RowDefinitions.Add(mSpacerDown);
@@ -311,11 +322,7 @@ namespace MoSync
             mGrid.ColumnDefinitions.Add(mSpacerRight);
 
             mView = mGrid;
-
             //mGrid.ShowGridLines = true; //uncomment to see the grid lines (for debugging)
-
-            ChildVerticalAlignment = MoSync.Constants.MAW_ALIGNMENT_TOP;
-            ChildHorizontalAlignment = MoSync.Constants.MAW_ALIGNMENT_LEFT;
         }
 
         //add child
@@ -327,7 +334,9 @@ namespace MoSync
                 WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
                 RowDefinition rowDef = new RowDefinition();
 
-                rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+                if(widget.fillSpaceVerticalyEnabled) rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
+                else rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+
                 mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, rowDef);
 
                 mGrid.Children.Add(widget.View);
@@ -462,6 +471,24 @@ namespace MoSync
             mButton = new System.Windows.Controls.Button();
             //set the view of the current widget as the previously instantiated button controll
             View = mButton;
+            mButton.HorizontalAlignment = HorizontalAlignment.Left;
+            mButton.VerticalAlignment = VerticalAlignment.Top;
+
+            fillSpaceVerticalyEnabled = false;
+            fillSpaceHorizontalyEnabled = false;
+
+            mButton.Click += new RoutedEventHandler(
+                delegate(Object from, RoutedEventArgs evt)
+                {
+                    Memory eventData = new Memory(8);
+
+                    const int MAWidgetEventData_eventType = 0;
+                    const int MAWidgetEventData_widgetHandle = 4;
+
+                    eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_POINTER_PRESSED);
+                    eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                    mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                });
         }
 
         //MAW_BUTTON_TEXT property implementation
@@ -692,8 +719,8 @@ namespace MoSync
             MoSync.Util.RunActionOnMainThreadSync(() =>
             {
                 mPage.Content = w.View;
-                ((System.Windows.FrameworkElement)w.View).Width = SreenSize.SCREEN_WIDTH;
-                ((System.Windows.FrameworkElement)w.View).Height = SreenSize.SCREEN_HEIGHT;
+                ((System.Windows.FrameworkElement)w.View).Width = ScreenSize.SCREEN_WIDTH;
+                ((System.Windows.FrameworkElement)w.View).Height = ScreenSize.SCREEN_HEIGHT;
             });
         }
 
