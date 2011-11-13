@@ -24,12 +24,32 @@ using namespace std;
 
 void printUsage() {
 	printf(
-		"Usage: package <OPTIONS>\n"
+		"Usage: profiledb <OPTIONS>\n"
 		"\n"
 		"Options:\n"
-		"-l, --list               Lists all available profiles\n"
-		"-g, --get PROFILE        Returns the capabilities of PROFILE\n"
+		"-l, --list  [PATTERN]            Lists all available profiles that\n"
+		"                                 matches PATTERN. A PATTERN is a\n"
+		"                                 comma-separated list of sub-PATTERNs,\n"
+		"                                 that may be either the name of a\n"
+		"                                 profile, or a name followed by a\n"
+		"                                 wildcard character (*) to match\n"
+		"                                 all profiles that starts with a\n"
+		"                                 specific string.\n"
+		"-f, --list-families              Lists all available profile families.\n"
+		"-g, --get   [PATTERN]            Returns a description of all\n"
+		"                                 profiles that matches PATTERN.\n"
+		"-m, --match PROFILE CAPABILITIES Returns a profile matching PROFILE.\n"
+		"                                 and CAPABILITIES\n"
+		"-c, --list-capabilities [STATE]  Lists all available capabilities.\n"
+		"                                 that matches TYPE, which is a comma-\n"
+		"                                 separated list of states (may be\n"
+		"                                 SUPPORTED, UNSUPPORTED, NOT_IMPLEMENTED\n"
+		"                                 REQUIRES_PERMISSION or\n"
+		"                                 REQUIRES_PRIVILEGED_PERMISSION\n"
+		"-x, --exclude PATTERN            Filter out all profiles matching\n"
+		"                                 PATTERN."
 		"\n"
+		""
 		"Environment variables used:\n"
 		" MOSYNCDIR               Path to the MoSync installation directory.\n"
 	);
@@ -38,22 +58,35 @@ void printUsage() {
 
 int main(int argc,char *argv[]) {
 	// Parse option(s):
-	int arg = 1;
 	ProfileDB db = ProfileDB();
-	while (arg < argc) {
-		if ((!strcmp("--get", argv[arg]) || !strcmp("-g", argv[arg]))  && argc >= arg + 1) {
-			char* profile = argv[arg + 1];
-			db.getProfile(profile);
-			exit(0);
-		}
-		if (!strcmp("--list", argv[arg]) || !strcmp("-l", argv[arg])) {
-			string profilePattern = argc > arg + 1 ? argv[arg + 1] : "*";
-			db.listProfiles(profilePattern);
-			exit(0);
-		}
-		arg++;
+	int curArg = 0;
+	string cmd = argc > curArg + 1 ? string(argv[curArg + 1]) : string("");
+	if ((cmd == "--exclude" || cmd == "-x") && argc > 2) {
+		db.setExcluded(string(argv[2]));
+		curArg += 2;
 	}
-
-	printUsage();
+	cmd = argc > curArg + 1 ? string(argv[curArg + 1]) : string("");
+	if (("--get" == cmd || "-g" == cmd) && argc == curArg + 3) {
+		char* profile = argv[curArg + 2];
+		db.getProfiles(profile);
+	} else if (("--list" == cmd || "-l" == cmd) && argc <= curArg + 3) {
+		string profilePattern = argc > curArg + 2 ? argv[curArg + 2] : "*";
+		db.listProfiles(profilePattern, false);
+	} else if (("--list-families" == cmd || "-f" == cmd) && argc == curArg + 2) {
+		db.listProfiles("*", true);
+	} else if (("--match" == cmd || "-m" == cmd) && argc >= curArg + 3) {
+		string profilePattern = string(argv[curArg + 2]);
+		vector<Capability> capabilities;
+		for (int i = curArg + 3; i < argc; i++) {
+			capabilities.push_back(Capability(string(argv[i]), SUPPORTED));
+		}
+		db.matchProfiles(profilePattern, capabilities);
+	} else if (("--list-capabilities" == cmd || "-c" == cmd) && argc >= curArg + 2) {
+		string statePattern = argc > curArg + 2 ? argv[curArg + 2] : "*";
+		db.listCapabilities(statePattern);
+	} else {
+		printUsage();
+		return 1;
+	}
 	return 0;
 }

@@ -26,13 +26,19 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include "File.h"
 #include "profiledb.h"
+#include "XMLWriter.h"
 
 using namespace std;
 
 #define ELEMENT_PLATFORM "platform"
+#define ELEMENT_CAPABILITY "capability"
 #define ATTR_INHERIT "inherit"
 #define ATTR_FAMILY "family"
 #define ATTR_VARIANT "variant"
+#define ATTR_RUNTIME "runtime"
+#define ATTR_ABSTRACT "abstract"
+#define ATTR_NAME "name"
+#define ATTR_STATE "state"
 
 struct ParserState {
 	Profile* profile;
@@ -54,13 +60,31 @@ string ProfileDB::profilesdir() {
 	return string(md) + "/profiles/platforms";
 }
 
+static bool isWildcard(string pattern) {
+	return pattern.length() > 0 && pattern.at(pattern.length() - 1) == '*';
+}
+
+static bool beginsWith(string prefix, string str) {
+	bool result = str.length() >= prefix.length() && prefix == str.substr(0, prefix.length());
+	return result;
+}
+
 static bool matches(string pattern, string name) {
-	bool isWildcard = pattern.at(pattern.length() - 1) == '*';
-	if (isWildcard) {
-		return name.length() > pattern.length() && name.substr(0, pattern.length() - 1) == pattern.substr(0, pattern.length() - 1);
-	} else {
-		return name == pattern;
+	size_t ix = 0;
+	size_t newIx = 0;
+	while (newIx != string::npos) {
+		newIx = pattern.find_first_of(',', ix);
+		size_t endIx = newIx == string::npos ? pattern.length() : newIx;
+		string subPattern = pattern.substr(ix, endIx - ix);
+		bool wildcard = isWildcard(subPattern);
+		if (wildcard && beginsWith(subPattern.substr(0, subPattern.length() - 1), name)) {
+			return true;
+		} else if (subPattern == name) {
+			return true;
+		}
+		ix = newIx + 1;
 	}
+	return false;
 }
 
 static const char* findAttr(const char* name, const char** attributes) {
@@ -90,52 +114,129 @@ static void error(ParserState* state, string msg) {
 	}
 }
 
-void innerListAllProfiles(File& root, string name, string pattern, vector<string>& result) {
+void innerListAllProfiles(File& root, string name, string pattern, bool onlyFamilies, vector<string>& result) {
 	list<File> files = root.listFiles();
 	for (list<File>::iterator filesIterator = files.begin(); filesIterator != files.end(); filesIterator++) {
 		File file = *filesIterator;
 		if (file.isDirectory()) {
 			const char* slash = name.size() == 0 ? "" : "/";
-			innerListAllProfiles(file, name + slash + file.getName(), pattern, result);
+			string newName = name.size() == 0 || !onlyFamilies ? name + slash + file.getName() : name;
+			innerListAllProfiles(file, newName, pattern, onlyFamilies, result);
 		} else if (string("profile.xml") == file.getName() && matches(pattern, name)) {
 			result.push_back(name);
 		}
 	}
 }
 
-void ProfileDB::listProfiles(string pattern) {
+void ProfileDB::listProfiles(string pattern, bool onlyFamilies) {
 	File root = File(profilesdir());
 	vector<string> result;
-	innerListAllProfiles(root, string(), pattern, result);
+	innerListAllProfiles(root, string(), pattern, onlyFamilies, result);
 
 	ostringstream output;
 
+	set<string> families;
 	for (size_t i = 0; i < result.size(); i++) {
 		string profile = result.at(i);
-		output << profile << '\n';
+		if (families.find(profile) == families.end()) {
+			families.insert(profile);
+			output << profile << '\n';
+		}
 	}
 
 	printf("%s", output.str().c_str());
 }
 
-void ProfileDB::getProfile(string profileName) {
-	ostringstream output;
-	output << "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+void ProfileDB::dumpProfile(Profile* profile, string profileName) {
+	vector<Profile*> profiles;
+	if (profile) {
+		profiles.push_back(profile);
+	}
+	dumpProfiles(profiles, profileName);
+}
 
-	output << "<db version=\"1.0\" id=\"main\">\n";
+void ProfileDB::dumpProfiles(vector<Profile*> profiles, string profileName) {
+	ostringstream output;
+	XMLWriter writer = XMLWriter(&output);
+	writer.start();
+	writer.startTag("db");
+	writer.setAttr("version", "1.0");
+	writer.setAttr("id", "main");
 
 	string line;
 
-	Profile* profile = findProfile(profileName, set<string>());
-	if (profile) {
-		profile->toXML(output);
+	if (profiles.size() > 0) {
+		for (size_t i = 0; i < profiles.size(); i++) {
+			Profile* profile = profiles.at(i);
+			if (profile) {
+				profile->toXML(writer);
+			}
+		}
 	} else {
-		output << "\t<error>Could find no profile for " << profileName << "</error>\n";
+		writer.startTag("error");
+		writer.text(string("Could find no matching profile for ") + profileName);
+		writer.endTag();
 	}
 
-	output << "<db>\n";
+	writer.endTag();
 
 	printf("%s", output.str().c_str());
+}
+
+void ProfileDB::getProfiles(string profilePattern, vector<Profile*>& profiles) {
+	File root = File(profilesdir());
+	vector<string> profileNames;
+	innerListAllProfiles(root, string(), profilePattern, false, profileNames);
+	for (size_t i = 0; i < profileNames.size(); i++) {
+		string profileName = profileNames.at(i);
+		Profile* profile = findProfile(profileName, set<string>());
+		if (profile && !isExcluded(profile)) {
+			profiles.push_back(profile);
+		}
+	}
+}
+
+void ProfileDB::setExcluded(string excludePattern) {
+	fExcludePattern = excludePattern;
+}
+
+void ProfileDB::getProfiles(string profilePattern) {
+	vector<Profile*> profiles;
+	getProfiles(profilePattern, profiles);
+	dumpProfiles(profiles, profilePattern);
+}
+
+void ProfileDB::listCapabilities(string statePattern) {
+	vector<Profile*> profiles;
+	set<string> aggregateCapabilities;
+	getProfiles("*", profiles);
+	for (size_t i = 0; i < profiles.size(); i++) {
+		Profile* profile = profiles.at(i);
+		set<string> capabilities = profile->getCapabilities();
+		for (set<string>::iterator capabilityIt = capabilities.begin();
+				capabilityIt != capabilities.end(); capabilityIt++) {
+			Capability capability = profile->getCapability(*capabilityIt);
+			if (capability.matchCapability(statePattern)) {
+				aggregateCapabilities.insert(*capabilityIt);
+			}
+		}
+	}
+
+	ostringstream output;
+	XMLWriter writer = XMLWriter(&output);
+	writer.start();
+	writer.startTag("db");
+	writer.setAttr("version", "1.0");
+	writer.setAttr("id", "main");
+	for (set<string>::iterator capabilityIt = aggregateCapabilities.begin();
+					capabilityIt != aggregateCapabilities.end(); capabilityIt++) {
+		writer.startTag(ELEMENT_CAPABILITY);
+		writer.setAttr(ATTR_NAME, *capabilityIt);
+		writer.endTag();
+	}
+	writer.endTag();
+	writer.end();
+	writer.dump();
 }
 
 static void xmlStart(void *data, const char *tagName, const char **attributes) {
@@ -155,15 +256,44 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 		}
 		const char* family = findAttr(ATTR_FAMILY, attributes);
 		if (!family) {
-			error(state, string("No family attribute defined: ") + parentProfile);
+			error(state, string("No family attribute defined: ") + profile->getProfileName());
 		}
 		const char* variant = findAttr(ATTR_VARIANT, attributes);
 		if (!variant) {
-			error(state, string("No variant attribute defined: ") + parentProfile);
+			error(state, string("No variant attribute defined: ") + profile->getProfileName());
 		}
+		const char* runtime = findAttr(ATTR_RUNTIME, attributes);
+		if (!runtime) {
+			error(state, string("No runtime attribute defined: ") + profile->getProfileName());
+		}
+		const char* abstract = findAttr(ATTR_ABSTRACT, attributes);
+		bool isAbstract = abstract && !strcmp("true", abstract);
 
 		profile->setFamily(string(family));
 		profile->setVariant(string(variant));
+		profile->setRuntime(string(runtime));
+		profile->setAbstract(isAbstract);
+	} else if (!strcmp(ELEMENT_CAPABILITY, tagName)) {
+		const char* capabilityName = findAttr(ATTR_NAME, attributes);
+		const char* capabilityStateStr = findAttr(ATTR_STATE, attributes);
+		CapabilityState capabilityState;
+		if (!capabilityStateStr) {
+			capabilityState = UNSUPPORTED;
+		} else if (!strcmp(capabilityStateStr, "SUPPORTED")) {
+			capabilityState = SUPPORTED;
+		} else if (!strcmp(capabilityStateStr, "UNSUPPORTED")) {
+			capabilityState = UNSUPPORTED;
+		} else if (!strcmp(capabilityStateStr, "NOT_IMPLEMENTED")) {
+			capabilityState = NOT_IMPLEMENTED;
+		} else if (!strcmp(capabilityStateStr, "REQUIRES_PERMISSION")) {
+			capabilityState = REQUIRES_PERMISSION;
+		} else if (!strcmp(capabilityStateStr, "REQUIRES_PRIVILEGED_PERMISSION")) {
+			capabilityState = REQUIRES_PRIVILEGED_PERMISSION;
+		} else {
+			error(state, string("Unknown state: ") + capabilityStateStr);
+		}
+		Capability capability = Capability(capabilityName, capabilityState);
+		state->profile->addCapability(capability);
 	}
 }
 
@@ -181,7 +311,6 @@ Profile* ProfileDB::findProfile(string profileName, set<string> alreadyFound) {
 		delete profile;
 		profile = NULL;
 	}
-
 	return profile;
 }
 
@@ -222,11 +351,85 @@ bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
 	return profile;
 }
 
+bool internalMatchProfile(Profile* profile, vector<Capability> capabilities) {
+	for (vector<Capability>::iterator capability = capabilities.begin();
+			capability != capabilities.end(); capability++) {
+		Capability matchedCapability = profile->getCapability(capability->getName());
+		CapabilityState matchedState = matchedCapability.getState();
+		// Ok, so we don't support this, bail out!
+		if (matchedState == NOT_IMPLEMENTED || matchedState == UNSUPPORTED) {
+			return false;
+		}
+	}
+	return true;
+}
+
+bool ProfileDB::isExcluded(Profile* profile) {
+	return !profile || profile->isAbstract() || matches(fExcludePattern, profile->getProfileName());
+}
+
+bool ProfileDB::matchProfiles(string profilePattern, vector<Capability> capabilities) {
+	File root = File(profilesdir());
+	vector<string> profiles;
+	innerListAllProfiles(root, string(), profilePattern, false, profiles);
+	set<string> profileNames; // TODO: Maybe we want VARIANTS as well!?
+	vector<Profile*> matchingProfiles;
+	for (vector<string>::iterator profileIt = profiles.begin();
+			profileIt != profiles.end(); profileIt++) {
+		Profile* match = matchProfile(*profileIt, capabilities);
+		if (match && profileNames.find(match->getProfileName()) == profileNames.end()) {
+			profileNames.insert(match->getProfileName());
+			matchingProfiles.push_back(match);
+		}
+	}
+
+	for (vector<Profile*>::iterator matchingProfilesIt = matchingProfiles.begin();
+			matchingProfilesIt != matchingProfiles.end(); matchingProfilesIt++) {
+		dumpProfile(*matchingProfilesIt, (*matchingProfilesIt)->getProfileName());
+	}
+
+	return profileNames.size() > 0;
+}
+
+Profile* ProfileDB::matchProfile(string profileName, vector<Capability> capabilities) {
+	Profile* profile = findProfile(profileName, set<string>());
+	if (profile) {
+		Profile* parent = profile->getParent();
+		if (!parent || !matchProfile(parent->getProfileName(), capabilities)) {
+			if (internalMatchProfile(profile, capabilities)) {
+				bool excluded = isExcluded(profile);
+				if (!excluded) {
+					return profile;
+				}
+				return NULL;
+			}
+		}
+	}
+	return NULL;
+}
+
+void Profile::addCapability(Capability capability) {
+	fCapabilities[capability.getName()] = capability;
+}
+
+set<string> Profile::getCapabilities() {
+	set<string> result;
+	for (map<string, Capability>::iterator capability = fCapabilities.begin();
+			capability != fCapabilities.end(); capability++) {
+		result.insert(capability->first);
+	}
+	if (fParent) {
+		set<string> parentCapabilities = fParent->getCapabilities();
+		result.insert(parentCapabilities.begin(), parentCapabilities.end());
+	}
+	return result;
+}
+
 Capability Profile::getCapability(string capabilityName) {
 	map<string, Capability>::iterator capability = fCapabilities.find(capabilityName);
 	if (capability == fCapabilities.end()) {
 		if (fParent) {
-			fParent->getCapability(capabilityName);
+			return fParent->getCapability(capabilityName);
 		}
 		return Capability();
 	} else {
@@ -234,12 +437,53 @@ Capability Profile::getCapability(string capabilityName) {
 	}
 }
 
-void Profile::toXML(ostringstream& output) {
-	output << "<platform family=\"" << fFamily << "\" variant=\"" << fVariant << "\"";
-	if (fParent) {
-		output << " inherit=\"" << fParent->fProfileName << "\"";
+void Profile::toXML(XMLWriter& writer) {
+	writer.startTag(ELEMENT_PLATFORM);
+	writer.setAttr(ATTR_FAMILY, fFamily);
+	writer.setAttr(ATTR_VARIANT, fVariant);
+	writer.setAttr(ATTR_RUNTIME, fRuntime);
+	if (fIsAbstract) {
+		writer.setAttr(ATTR_ABSTRACT, "true");
 	}
-	output << ">\n";
+	set<string> capabilities = Profile::getCapabilities();
+	for (set<string>::iterator capability = capabilities.begin();
+			capability != capabilities.end(); capability++) {
+		Capability value = getCapability(*capability);
+		value.toXML(writer);
+	}
+	writer.endTag();
+}
 
-	output << "</platform>\n";
+string getStateString(CapabilityState state) {
+	switch (state) {
+	case SUPPORTED:
+		return "SUPPORTED";
+		break;
+	case UNSUPPORTED:
+		return "UNSUPPORTED";
+		break;
+	case NOT_IMPLEMENTED:
+		return "NOT_IMPLEMENTED";
+		break;
+	case REQUIRES_PERMISSION:
+		return "REQUIRES_PERMISSION";
+		break;
+	case REQUIRES_PRIVILEGED_PERMISSION:
+		return "REQUIRES_PRIVILEGED_PERMISSION";
+		break;
+	}
+	return "";
+}
+
+void Capability::toXML(XMLWriter& writer) {
+	string stateStr = getStateString(fState);
+
+	writer.startTag(ELEMENT_CAPABILITY);
+	writer.setAttr(ATTR_NAME, fName);
+	writer.setAttr(ATTR_STATE, stateStr);
+	writer.endTag();
+}
+
+bool Capability::matchCapability(string statePattern) {
+	return matches(statePattern, getStateString(fState));
 }
