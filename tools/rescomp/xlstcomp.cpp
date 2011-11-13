@@ -599,6 +599,7 @@ string VariantResourceSet::createResTypeList() {
 	ostringstream resultStr;
 	resultStr << ".res\n";
 	addLabelDirective(resultStr, "res-types");
+	resultStr << ".res\n";
 	resultStr << ".bin\n";
 
 	int resTypeListSize = fResTypes.size();
@@ -632,6 +633,7 @@ string VariantResourceSet::createResMap() {
 	ostringstream resultStr;
 	resultStr << ".res\n";
 	addLabelDirective(resultStr, "variant-mapping");
+	resultStr << ".res\n";
 	resultStr << ".bin\n";
 
 	// We malloc enough. We just set max lengths for all variant ids
