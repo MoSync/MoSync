@@ -15,16 +15,13 @@ namespace MoSync
         private Gyroscope mGyroscope = null;
         private Motion mMotion = null;
 
-        const int MASensor_type = 0;
-        const int MASensor_values = 4;
-
         private void SendSensorEventVector(Runtime runtime, int type, Vector3 data)
         {
             Memory eventData = new Memory(4 * 4);
-            eventData.WriteInt32(MASensor_type, type);
-            eventData.WriteInt32(MASensor_values + 0, MoSync.Util.ConvertToInt(data.X));
-            eventData.WriteInt32(MASensor_values + 4, MoSync.Util.ConvertToInt(data.Y));
-            eventData.WriteInt32(MASensor_values + 8, MoSync.Util.ConvertToInt(data.Z));
+            eventData.WriteInt32(MoSync.Struct.MASensor.type, type);
+			eventData.WriteInt32(MoSync.Struct.MASensor.values + 0, MoSync.Util.ConvertToInt(data.X));
+			eventData.WriteInt32(MoSync.Struct.MASensor.values + 4, MoSync.Util.ConvertToInt(data.Y));
+			eventData.WriteInt32(MoSync.Struct.MASensor.values + 8, MoSync.Util.ConvertToInt(data.Z));
             runtime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_SENSOR, eventData);
         }
 

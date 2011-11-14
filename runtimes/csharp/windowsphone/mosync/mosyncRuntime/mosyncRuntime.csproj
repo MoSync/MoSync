@@ -75,6 +75,7 @@
     <Compile Include="Source\MoSyncCore.cs" />
     <Compile Include="Source\MoSyncCoreInterpreted.cs" />
     <Compile Include="Source\MoSyncCoreNative.cs" />
+    <Compile Include="Source\MoSyncGraphicsUtil.cs" />
     <Compile Include="Source\MoSyncMemory.cs" />
     <Compile Include="Source\MoSyncMachine.cs" />
     <Compile Include="Source\MoSyncResource.cs" />
