@@ -48,15 +48,15 @@ def writeResourceFile(name)
 	resFile = open("#{resFileName}", 'w')
 	resFile.puts('.res')
 	resFile.puts('.label "start"')
-	
+
 	dir = Dir.new('filesystem/')
 	doResourceDir(resFile, dir, '/', 0)
-	
+
 	resFile.puts('')
 	resFile.puts('.res')
 	resFile.puts('.label "end"')
 	resFile.close
-	
+
 	FileUtils.cd 'build'
 	sh "#{MOSYNCDIR}/bin/pipe-tool -R resources ../#{resFileName}"
 	FileUtils.cd '..'
@@ -73,7 +73,7 @@ def doResourceDir(resFile, dir, prefix, count)
 		if(File.directory?(realPath))
 			runtimeName = prefix+name+'/'
 			resFile.puts(".cstring \"#{runtimeName}\"")
-			
+
 			d2 = Dir.new(realPath+'/')
 			count = doResourceDir(resFile, d2, runtimeName, count)
 		else
@@ -160,7 +160,7 @@ def process_line(line)
 	if(lineIsInteresting)
 		#p line
 		words = line.scan(/[^ \t]+/)
-		
+
 		#puts "test: #{words[0]}"
 		return nil unless(MAKEFILE_TEST_ARRAYS.include?(words[0]))
 		#p words
@@ -183,7 +183,7 @@ def parse_makefile(filename)
 	open(filename) do |mf|
 		# Read the entire file.
 		lines = mf.read
-		
+
 		# Get rid of comments, and combine logical lines into physical lines, for easy processing.
 		lines.gsub!(/\\ /, SPACE_MARK)
 		lines.gsub!(/#[^\n]*\n/m, "")
@@ -266,9 +266,9 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	esFile = ofn.ext('.e.s')
 	sldFile = ofn.ext('.sld' + suffix) if(USE_SLD)
 	stabsFile = ofn.ext('.stabs' + suffix) if(USE_SLD)
-	
+
 	delete_if_empty(pfn)
-	
+
 	# link
 	if(!File.exists?(pfn) || force_rebuild)
 		pipetool = "#{MOSYNCDIR}/bin/pipe-tool"
@@ -287,15 +287,15 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 	if(!File.exists?(pfn))
 		error"Unknown link failure."
 	end
-	
+
 	# execute it, if not win already, or we rebuilt something.
-	
+
 	shouldSkipTest = (File.exists?(winFile) || !SETTINGS[:retry_failed]) && !force_rebuild
 	return force_rebuild if(shouldSkipTest && !SETTINGS[:force_copy_htdocs])
-	
+
 	clear_filesystem
 	has_files = false
-	
+
 	# copy files only when executing
 	files.each do |file|
 		has_files = true
@@ -307,7 +307,7 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 			sh "#{cmd} \"filesystem/#{File.basename(input)}\""
 		end
 	end
-	
+
 	if(code)
 		has_files = true
 		code.call
@@ -328,20 +328,26 @@ def link_and_test(ofn, argvs, files, dead_code, force_rebuild, inputs, code)
 		puts 'Copying to htdocs...'
 		bn = File.basename(pfn)
 		lfn = SETTINGS[:htdocs_dir] + bn
-		
+
 		# copy program file
 		FileUtils.cp(pfn, lfn)
 		# append resource file
 		open(lfn, 'ab') do |f|
 			f.write(open(resFile, 'rb').read)
 		end
-		
+
 		LOADER_URLS_FILE.puts(SETTINGS[:loader_base_url] + bn)
 		LOADER_URLS_FILE.flush
 	end
-	
+
+	if(SETTINGS[:copy_single] && ARGV.size > 0)
+		puts "Copying to '#{SETTINGS[:copy_single]}'"
+		FileUtils.cp(pfn, SETTINGS[:copy_single] + 'program')
+		FileUtils.cp(resFile, SETTINGS[:copy_single] + 'resources')
+	end
+
 	return force_rebuild if(shouldSkipTest)
-	
+
 	sldFlag = " -sld #{sldFile}" if(USE_SLD)
 	cmd = "#{MOSYNCDIR}/bin/MoRE -timeout 600 -allowdivzero -noscreen -program #{pfn}#{sldFlag} -resource #{resFile}"
 	$stderr.puts cmd
@@ -455,32 +461,32 @@ files.each do |filename, targetName|
 	end
 	puts bn
 	unskippedCount += 1
-	
+
 	ofn = BUILD_DIR + '/' + bn.ext('.s')
 	force_rebuild |= SETTINGS[:rebuild_failed] && (File.exists?(ofn.ext('.fail')) || File.exists?(ofn.ext('.faile')))
 	force_rebuild |= SETTINGS[:rebuild_missing_log] && !File.exists?(ofn.ext('.win')) && !File.exists?(ofn.ext('.log'))
 	force_rebuild |= !File.exists?(ofn.ext('.win')) && !File.exists?(ofn.ext('.fail'))
-	
+
 	# compile
 	if(!File.exists?(ofn) || force_rebuild)
 		sh "#{MOSYNCDIR}/bin/xgcc -g -S \"#{filename}\" -o #{ofn}#{GCC_FLAGS} -I \"#{File.dirname(filename)}\""
 		force_rebuild = true
 	end
-	
+
 	inputs = input_files(filename)
-	
+
 	argv = SPECIFIC_ARGV.fetch(bn, nil)
 	if(argv != nil || !inputs.empty?)
 		argvs = doArgv(bn, argv, filename, force_rebuild)
 	else
 		argvs = DEFAULT_ARGV_SFILE
 	end
-	
+
 	files = SPECIFIC_FILES.fetch(bn, [])
 	files += inputs
-	
+
 	code = SPECIFIC_CODE.fetch(bn, nil)
-	
+
 	unless(SETTINGS[:dce_only])
 		force_rebuild = link_and_test(ofn, argvs, files, false, force_rebuild, inputs, code)
 		wins += 1 if(File.exists?(ofn.ext('.win')))

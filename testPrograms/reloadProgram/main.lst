@@ -1,0 +1,6 @@
+.res PROGRAM
+.bin
+.include "build/pipe_debug/program"
+
+.res LABEL
+.label "label"

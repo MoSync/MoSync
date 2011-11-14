@@ -23,6 +23,23 @@ static void freeze() {
 	Freeze(0);
 }
 
+static void waitForPress() {
+	maUpdateScreen();
+	for(;;) {
+		MAEvent event;
+		while(maGetEvent(&event)) {
+			switch(event.type) {
+			case EVENT_TYPE_CLOSE:
+				maExit(0);
+			case EVENT_TYPE_KEY_PRESSED:
+			case EVENT_TYPE_POINTER_PRESSED:
+				return;
+			}
+		}
+		maWait(0);
+	}
+}
+
 class MyMoblet : public Moblet, HttpConnectionListener {
 private:
 	// the index of the next test to run, or < 0 if there's no list available.
@@ -55,12 +72,13 @@ private:
 			return;
 		TEST(store);
 		maCloseStore(store, true);
-		
+
 		store = maOpenStore("exit_status", 0);
 		if(store == STERR_NONEXISTENT) {
 			printf("test %i crashed.\n", mState);
 			printf("%s\n", strrchr(getNextTest(), '/'));
-			FREEZE;
+			waitForPress();
+			return;
 		}
 		TEST(store);
 		int status;
@@ -80,7 +98,7 @@ private:
 		mState++;
 		saveState();
 	}
-	
+
 	void loadState() {
 		mState = -1;
 		MAHandle data = PlaceholderPool::alloc();
@@ -97,7 +115,7 @@ private:
 		maReadData(data, &mState, 0, sizeof(int));
 		PlaceholderPool::put(data);
 	}
-	
+
 	void saveState() {
 		MAHandle store = maOpenStore(STORE_BASE_NAME "state", MAS_CREATE_IF_NECESSARY);
 		TEST(store);
@@ -108,17 +126,17 @@ private:
 		PlaceholderPool::put(data);
 		maCloseStore(store, 0);
 	}
-	
+
 	void fetchList() {
 		mHttp.setListener(this);
 		printf("fetching list...\n");
 		TEST(mHttp.connect(LIST_URL));
 	}
-	
+
 	void httpFinished(HttpConnection* http, int result) {
 		printf("htf\n");
 	}
-	
+
 	void connectFinished(Connection*, int result) {
 		TEST(result);
 		if(result != 200) {
@@ -133,7 +151,7 @@ private:
 		TEST(maCreateData(mListData, len));
 		mHttp.readToData(mListData, 0, len);
 	}
-	
+
 	void connReadFinished(Connection*, int result) {
 		mHttp.close();
 		TEST(result);
@@ -142,14 +160,14 @@ private:
 		saveState();
 		runNextTest();
 	}
-	
+
 	void saveList() {
 		MAHandle store = maOpenStore(STORE_BASE_NAME "list", MAS_CREATE_IF_NECESSARY);
 		TEST(store);
 		TEST(maWriteStore(store, mListData));
 		maCloseStore(store, 0);
 	}
-	
+
 	void loadList() {
 		mListData = PlaceholderPool::alloc();
 		MAHandle store = maOpenStore(STORE_BASE_NAME "list", 0);
@@ -180,7 +198,7 @@ private:
 		}
 		return ptr;
 	}
-	
+
 	void runNextTest() {
 		const char* nextTestUrl = getNextTest();
 		if(!nextTestUrl) {
@@ -197,11 +215,11 @@ private:
 	class TestHandler : public HttpConnectionListener {
 	private:
 		MAHandle mData;
-		
+
 		void httpFinished(HttpConnection* http, int result) {
 			printf("htf\n");
 		}
-	
+
 		void connectFinished(Connection* conn, int result) {
 			HttpConnection* http = (HttpConnection*)conn;
 			TEST(result);

@@ -527,13 +527,15 @@ int openat(int __fd, const char * __filename, int __mode, ...) {
 	// O_SHLOCK, O_EXLOCK and O_NOATIME are unsupported. we drop them silently.
 
 	// Check to see if we're opening a directory.
-	__mode &= ~O_DIRECTORY;
-	length = strlen(temp);
-	if(temp[length-1] == '/') {
-		__mode |= O_DIRECTORY;
+	if(!(__mode & O_DIRECTORY)) {
+		length = strlen(temp);
+		if(temp[length-1] == '/') {
+			__mode |= O_DIRECTORY;
+		}
 	}
 
 	// Find a spot in the descriptor array.
+	// This won't modify the array.
 	CHECK(newFd = findFreeFd(), EMFILE);
 	newLfd = findFreeLfd();
 

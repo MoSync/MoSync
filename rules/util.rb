@@ -1,14 +1,14 @@
 # Copyright (C) 2009 Mobile Sorcery AB
-# 
+#
 # This program is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License, version 2, as published by
 # the Free Software Foundation.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
 # or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 # for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; see the file COPYING.  If not, write to the Free
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
@@ -53,7 +53,7 @@ class String
 		end end
 		return self[0, doti] + newEnd
 	end
-	
+
 	def getExt
 	doti = rindex('.')
 	slashi = rindex('/')
@@ -63,12 +63,12 @@ class String
 	end
   return nil
  end
-	
+
 	def noExt
 		doti = rindex('.')
 		return self[0, doti]
 	end
-	
+
 	# Returns true if self begins with with.
 	def beginsWith(with)
 		return false if(self.length < with.length)
@@ -84,18 +84,23 @@ end
 def sh(cmd)
 	# Print the command to stdout.
 	puts cmd
-	# Open a process.
-	IO::popen(cmd) do |io|
-		# Pipe the process's output to our stdout.
-		while !io.eof?
-			line = io.gets
-			puts line
+	if(HOST == :win32)
+		success = system(cmd)
+		raise "Command failed" unless(success)
+	else
+		# Open a process.
+		IO::popen(cmd) do |io|
+			# Pipe the process's output to our stdout.
+			while !io.eof?
+				line = io.gets
+				puts line
 	    end
 	    # Check the return code
 	    exitCode = Process::waitpid2(io.pid)[1].exitstatus
-	    if(exitCode != 0) then
-			error "Command failed, code #{exitCode}"
-	    end
+			if(exitCode != 0)
+				error "Command failed, code #{exitCode}"
+			end
+		end
 	end
 end
 
@@ -144,12 +149,12 @@ end
 class EarlyTime
 	include Comparable
 	include Singleton
-	
+
 	def <=>(other)
 		return 0 if(other.instance_of?(EarlyTime))
 		return -1
 	end
-	
+
 	def to_s
 		"<EARLY TIME>"
 	end
@@ -161,12 +166,12 @@ EARLY = EarlyTime.instance
 class LateTime
 	include Comparable
 	include Singleton
-	
+
 	def <=>(other)
 		return 0 if(other.instance_of?(LateTime))
 		return 1
 	end
-	
+
 	def to_s
 		"<LATE TIME>"
 	end

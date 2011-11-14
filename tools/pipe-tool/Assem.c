@@ -117,6 +117,10 @@ void AsmMain()
 		{
 			RebuildCpp_Main();
 		}
+		else if (ArgCsGen)
+		{
+			RebuildCs_Main();
+		}
 		else
 		{
 			Rebuild_Main();
