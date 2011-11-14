@@ -122,6 +122,8 @@ namespace MoSync
             {
                 String key = core.GetDataMemory().ReadStringAtAddress(_key);
                 String value = MoSync.SystemPropertyManager.GetSystemProperty(key);
+                if (value == null)
+                    return -2;
                 if (value.Length + 1 <= _size)
                     core.GetDataMemory().WriteStringAtAddress(_buf, value, _size);
                 return value.Length + 1;
