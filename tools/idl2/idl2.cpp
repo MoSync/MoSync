@@ -614,7 +614,7 @@ static const char* escapeCSharp(const string& name) {
 	};
 	for(size_t i=0; i<(sizeof(cSharpKeywords)/sizeof(char*)); i++) {
 		const char* key = cSharpKeywords[i];
-		if(strncmp(key, name.c_str(), strlen(key)-1) == 0)
+		if(strncmp(key, name.c_str(), MAX(strlen(key)-1, name.size())) == 0)
 			return key;
 	}
 	return name.c_str();
