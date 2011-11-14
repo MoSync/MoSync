@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
+using System.Reflection;
 
 namespace MoSync
 {
@@ -24,6 +25,7 @@ namespace MoSync
             set { mView = value; }
         }
 
+        //MAW_WIDGET_LEFT implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_LEFT)]
         public double Left
         {
@@ -34,6 +36,7 @@ namespace MoSync
             }
         }
 
+        //MAW_WIDGET_TOP implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_TOP)]
         public double Top
         {
@@ -44,6 +47,7 @@ namespace MoSync
             }
         }
 
+        //MAW_WIDGET_WIDTH implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_WIDTH)]
         public double Width
         {
@@ -62,6 +66,7 @@ namespace MoSync
             }
         }
 
+        //MAW_WIDGET_HEIGHT implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_HEIGHT)]
         public double Height
         {
@@ -80,6 +85,7 @@ namespace MoSync
             }
         }
 
+        //MAW_WIDGET_BACKGROUND_COLOR implementation
         [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_BACKGROUND_COLOR)]
         public string BackgroundColor
         {
@@ -89,6 +95,99 @@ namespace MoSync
                 MoSync.Util.convertStringToColor(value, out brush);
                 if (View is System.Windows.Controls.Control) ((System.Windows.Controls.Control)View).Background = brush;
                 else if (View is System.Windows.Controls.Panel) ((System.Windows.Controls.Panel)View).Background = brush;
+            }
+        }
+
+        //MAW_WIDGET_ENABLED implementation
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_ENABLED)]
+        public string Enabled
+        {
+            set
+            {
+                Type objType = mView.GetType();
+                if (objType.GetProperty("IsEnabled") != null)
+                {
+                    bool val = Boolean.Parse(value);
+                    var property = objType.GetProperty("IsEnabled");
+                    property.SetValue(mView, val, null);
+                }
+            }
+            get
+            {
+                Type objType = mView.GetType();
+                if (objType.GetProperty("IsEnabled") != null)
+                {
+                    var property = objType.GetProperty("IsEnabled");
+                    return (string)(property.GetValue(mView, null));
+                }
+                return null;
+            }
+        }
+
+        //MAW_WIDGET_VISIBLE implementation
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_VISIBLE)]
+        public string Visible
+        {
+            set
+            {
+                bool val = Boolean.Parse(value);
+                if(false == val) mView.Visibility = Visibility.Collapsed;
+                else mView.Visibility = Visibility.Visible;
+            }
+            get
+            {
+                if (Visibility.Collapsed == mView.Visibility)
+                {
+                    return "false";
+                }
+                else
+                {
+                    return "true";
+                }
+            }
+        }
+
+        //MAW_WIDGET_BACKGROUND_GRADIENT implementation
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_BACKGROUND_GRADIENT)]
+        public string BackgroundGradient
+        {
+            set
+            {
+                System.Windows.Media.GradientStop firstGradientStop = new System.Windows.Media.GradientStop();
+                System.Windows.Media.GradientStop secondGradientStop = new System.Windows.Media.GradientStop();
+
+                System.Windows.Media.SolidColorBrush firstBrush;
+                Util.convertStringToColor(value.Split(',')[0], out firstBrush);
+
+                System.Windows.Media.SolidColorBrush secondBrush;
+                Util.convertStringToColor(value.Split(',')[1], out secondBrush);
+
+                firstGradientStop.Color = firstBrush.Color;
+                secondGradientStop.Color = secondBrush.Color;
+
+                firstGradientStop.Offset = 0.0;
+                secondGradientStop.Offset = 0.5;
+
+                System.Windows.Media.LinearGradientBrush brush = new System.Windows.Media.LinearGradientBrush();
+
+                brush.StartPoint = new Point(0.5, 0);
+                brush.EndPoint = new Point(0.5, 1);
+                brush.GradientStops.Add(firstGradientStop);
+                brush.GradientStops.Add(secondGradientStop);
+
+                if (View is System.Windows.Controls.Control) ((System.Windows.Controls.Control)View).Background = brush;
+                else if (View is System.Windows.Controls.Panel) ((System.Windows.Controls.Panel)View).Background = brush;
+            }
+        }
+
+        //MAW_WIDGET_ALPHA implementation
+        [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_ALPHA)]
+        public string Alpha
+        {
+            set
+            {
+                double val = double.Parse(value);
+                mView.Opacity = val;
             }
         }
 
@@ -446,6 +545,32 @@ namespace MoSync
                 mPaddingRight = val;
                 mSpacerRight.Width = new GridLength(mPaddingRight);
             }
+        }
+    }
+
+    //RelativeLayout class
+    public class RelativeLayout : WidgetBaseWindowsPhone
+    {
+        //Canvas is the content in which the children are aranged relatively to the parent
+        protected System.Windows.Controls.Canvas mPanel;
+
+        //Constructor
+        public RelativeLayout()
+        {
+            mPanel = new System.Windows.Controls.Canvas();
+            mView = mPanel;
+        }
+
+        //add child
+        public override void AddChild(IWidget child)
+        {
+            base.AddChild(child);
+            MoSync.Util.RunActionOnMainThreadSync(() =>
+            {
+                WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+
+                mPanel.Children.Add(widget.View);
+            });
         }
     }
 
