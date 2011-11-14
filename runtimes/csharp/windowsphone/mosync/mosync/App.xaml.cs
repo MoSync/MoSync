@@ -82,19 +82,23 @@ namespace test_mosync
 
         // Code to execute when the application is launching (eg, from Start)
         // This code will not execute when the application is reactivated
-        private void Application_Launching(object sender, LaunchingEventArgs e)
+		private MoSync.Machine machine = null;
+
+		private void Application_Launching(object sender, LaunchingEventArgs e)
         {
 
             //RootFrame.Navigated += delegate(object _sender, NavigationEventArgs _e)
             RootFrame.Loaded += delegate(object _sender, RoutedEventArgs _e)
             {
-                MoSync.Machine machine = null;
+				if (machine == null)
+				{
 #if !REBUILD
-                machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
+					machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
 #else
-                machine = MoSync.Machine.CreateNativeMachine(new CoreNativeProgram(), "resources");
+	                machine = MoSync.Machine.CreateNativeMachine(new CoreNativeProgram(), "resources");
 #endif
-                machine.Run();
+					machine.Run();
+				}
             };
         }
 
