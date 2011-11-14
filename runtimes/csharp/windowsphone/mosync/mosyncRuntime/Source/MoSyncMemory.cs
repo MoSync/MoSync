@@ -126,15 +126,15 @@ namespace MoSync
         public void WriteStringAtAddress(int address, String str, int maxSize)
         {
             char[] data = str.ToCharArray();
-            int i = 0;
+            int i;
             for (i = 0; i < data.Length; i++)
             {
-                if (i > maxSize)
+                if (i >= maxSize)
                     break;
                 WriteUInt8(address + i, (byte)data[i]);
             }
 
-            if (i > maxSize)
+            if (i >= maxSize)
                 return;
             WriteUInt8(address + i, 0);
         }
@@ -142,12 +142,17 @@ namespace MoSync
         public void WriteWStringAtAddress(int address, String str, int maxSize)
         {
             char[] data = str.ToCharArray();
-            for (int i = 0; i < data.Length; i++)
+            int i;
+            for (i = 0; i < data.Length; i++)
             {
-                if (i > maxSize)
+                if (i >= maxSize)
                     break;
                 WriteInt16(address + i * 2, (short)data[i]);
             }
+
+            if (i >= maxSize)
+                return;
+            WriteInt16(address + i * 2, 0);
         }
 
         public void ReadBytes(byte[] bytes, int src, int size)

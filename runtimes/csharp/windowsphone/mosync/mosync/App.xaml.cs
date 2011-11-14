@@ -92,7 +92,7 @@ namespace test_mosync
 #if !REBUILD
                 machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
 #else
-                machine = MoSync.Program.CreateNativeMachine(new CoreNativeProgram(), "resources");
+                machine = MoSync.Machine.CreateNativeMachine(new CoreNativeProgram(), "resources");
 #endif
                 machine.Run();
             };
