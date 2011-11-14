@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0B10E94A14065AE600B6DA6B /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B10E94914065AE600B6DA6B /* MessageUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		41EB0400146A6A410088E3A4 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41EB03FF146A6A410088E3A4 /* libsqlite3.dylib */; };
 		431869BF13F691E50051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869BE13F691E50051D97A /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		431869C913F69ECA0051D97A /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869C813F69ECA0051D97A /* EventKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4370369E13E9487D00F22783 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4370369D13E9487D00F22783 /* AddressBook.framework */; };
@@ -41,6 +42,7 @@
 		28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncViewController.h; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
+		41EB03FF146A6A410088E3A4 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		431869BE13F691E50051D97A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		431869C813F69ECA0051D97A /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		4370369D13E9487D00F22783 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
@@ -82,6 +84,7 @@
 				858B401012E67D8D0058DBFC /* OpenGLES.framework in Frameworks */,
 				858B403E12E67F790058DBFC /* QuartzCore.framework in Frameworks */,
 				0B10E94A14065AE600B6DA6B /* MessageUI.framework in Frameworks */,
+				41EB0400146A6A410088E3A4 /* libsqlite3.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,6 +120,7 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				41EB03FF146A6A410088E3A4 /* libsqlite3.dylib */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
