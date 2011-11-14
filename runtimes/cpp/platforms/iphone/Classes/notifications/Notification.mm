@@ -570,6 +570,16 @@ static Notification *sharedInstance = nil;
     return MA_NOTIFICATION_RES_OK;
 }
 
+/**
+ * Gets the latest registration response.
+ * @param messageAddress The registrationID if the registration was successfull,
+ * or the error messsage otherwise.
+ * @param size The size of the buffer.
+ * @return One of the next constants:
+ * - MA_NOTIFICATION_RES_OK if the application registered successfully.
+ * - MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL if the buffer is too small.
+ * - MA_NOTIFICATION_RES_ERROR in case of error.
+ */
 -(int) getPushRegistrationData:(char*) messageAddress
                           size:(const int) size
 {
@@ -584,21 +594,33 @@ static Notification *sharedInstance = nil;
         messageString = mRegistrationError;
         result = MA_NOTIFICATION_RES_REGISTRATION_SERVICE_NOT_AVAILABLE;
     }
-//    char* charAddress = (char*) Base::gSyscall->GetValidatedMemRange((int)messageAddress, size);
-    [messageString getCString:messageAddress maxLength:size encoding:NSASCIIStringEncoding];
 
+    if ([messageString length] > size)
+    {
+        return MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL;
+    }
+
+    [messageString getCString:messageAddress maxLength:size encoding:NSASCIIStringEncoding];
     return result;
 }
 
+/**
+ * Called when application registration response for push notification has been received.
+ * @param deviceToken The device token received from the server.
+ */
 -(void) didRegisterForPushNotification:(NSString*) deviceToken
 {
-    NSLog(@"didRegisterForPushNotification %@", deviceToken);
+    [mDeviceToken release];
     mDeviceToken = [deviceToken retain];
 }
 
+/**
+ * Called when Apple Push Service cannot successfully complete the registration process.
+ * @param error Error's localized description.
+ */
 -(void) didFailToRegisterForPushNotification:(NSString*) error
 {
-    NSLog(@"didFailToRegisterForPushNotification %@", error);
+    [mRegistrationError release];
     mRegistrationError = [error retain];
 }
 
@@ -638,10 +660,14 @@ void MoSync_DidReceivePushNotification(NSDictionary* pushNotification)
     [[Notification getInstance] didReceivePushNotification:pushNotification];
 }
 
-void MoSync_ApplicationRegistration(NSNumber* errorCode, NSString* text)
+/**
+ * Called when application registration response for push notification has been received.
+ * @param errorCode Zero if the application has been successfully registered, or the error code otherwise.
+ * @param text The device token if the application has been registered, or the localized error otherwise.
+ */
+void MoSync_ApplicationRegistration(NSInteger errorCode, NSString* text)
 {
-    NSLog(@"MoSync_ApplicationRegistration");
-    if (0 == [errorCode intValue])
+    if (0 == errorCode)
     {
         [[Notification getInstance] didRegisterForPushNotification: text];
     }

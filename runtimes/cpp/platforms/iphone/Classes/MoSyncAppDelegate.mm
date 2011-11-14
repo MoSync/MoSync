@@ -28,7 +28,7 @@ void MoSync_AddFocusGainedEvent();
 void MoSync_Main(int width, int height, MoSyncView* mosyncView);
 void MoSync_DidReceiveLocalNotification(UILocalNotification* localNotification);
 void MoSync_DidReceivePushNotification(NSDictionary* pushNotification);
-void MoSync_ApplicationRegistration(NSNumber* errorCode, NSString* text);
+void MoSync_ApplicationRegistration(NSInteger errorCode, NSString* text);
 
 @implementation MoSyncAppDelegate
 
@@ -69,41 +69,52 @@ void MoSync_ApplicationRegistration(NSNumber* errorCode, NSString* text);
  */
 - (void)application:(UIApplication *)application didReceiveLocalNotification:(UILocalNotification *)notification
 {
-//    [[Notification getInstance] didReceiveLocalNotification:notification];
     MoSync_DidReceiveLocalNotification(notification);
 }
 
+/**
+ * Called when the application successfully registers with Apple Push Service (APS).
+ * @param application The application that initiated the remote-notification registration process.
+ * @param deviceToken A token that identifies the device to APS. The token is an opaque data type
+ * because that is the form that the provider needs to submit to the APS servers when it sends a
+ * notification to a device. The APS servers require a binary format for performance reasons.
+ */
 - (void)application:(UIApplication *)app didRegisterForRemoteNotificationsWithDeviceToken:(NSData *)deviceToken
 {
-    NSString *str = [NSString stringWithFormat:@"Device Token=%@",deviceToken];
-    NSString* token = [[NSString alloc] initWithData:deviceToken encoding:NSASCIIStringEncoding];
+    NSString *parsedToken = [NSString stringWithFormat:@"%@",deviceToken];
+    // Remove empty spaces
+    parsedToken = [parsedToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+    // Remove "<" and ">" characters
+    parsedToken = [parsedToken stringByReplacingOccurrencesOfString:@"<" withString:@""];
+    parsedToken = [parsedToken stringByReplacingOccurrencesOfString:@">" withString:@""];
     MoSync_ApplicationRegistration(
-        [NSNumber numberWithInt:0],
-        str);
-//    NSLog(@"device token: %@",token);
-    [token release];
+        0,
+        parsedToken);
 }
 
-- (void)application:(UIApplication *)app didFailToRegisterForRemoteNotificationsWithError:(NSError *)err
+/**
+ * Called when Apple Push Service cannot successfully complete the registration process.
+ * @param application The application that initiated the remote-notification registration process.
+ * @param error An NSError object that encapsulates information why registration did not succeed.
+ * The application can choose to display this information to the user.
+ */
+- (void)application:(UIApplication *)application didFailToRegisterForRemoteNotificationsWithError:(NSError *)error
 {
-    NSString *str = [NSString stringWithFormat: @"Error: %@", err];
-    NSLog(@"%@",str);
     MoSync_ApplicationRegistration(
-        [NSNumber numberWithInt:-1],
-        str);
+        [error code],
+        [error localizedDescription]);
 }
 
+/**
+ * Called when a running application receives a remote notification.
+ * @param application The application that received the remote notification.
+ * @param userInfo A dictionary that contains information related to the remote notification,
+ * potentially including a badge number for the application icon, an alert sound, an alert
+ * message to display to the user, a notification identifier, and custom data.
+ */
 - (void)application:(UIApplication *)application didReceiveRemoteNotification:(NSDictionary *)userInfo
 {
-    NSLog(@"MoSyncAppDelegate::didReceiveRemoteNotification: %@", [userInfo description]);
-//    for (id key in userInfo)
-//    {
-//        NSLog(@"key: %@, value: %@", key, [userInfo objectForKey:key]);
-//        NSString* value = [userInfo objectForKey:key];
-//        [[Notification getInstance] didReceivePushNotification:value];
-//    }
     MoSync_DidReceivePushNotification(userInfo);
-
 }
 
 /*

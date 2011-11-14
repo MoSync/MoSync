@@ -9030,6 +9030,7 @@ group NotificationAPI "Notification API" {
 		* - MA_NOTIFICATION_RES_REGISTRATION_INVALID_SENDER
 		* - MA_NOTIFICATION_RES_REGISTRATION_PHONE_REGISTRATION_ERROR
 		* - MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL
+		* - MA_NOTIFICATION_RES_ERROR - iOS platform only.
 		*/
 		int maNotificationPushGetRegistration(out MAString value range("bufSize"), in int bufSize);
 
