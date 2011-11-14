@@ -32,3 +32,4 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define IX_GL2
 #define IX_GL_OES_FRAMEBUFFER_OBJECT
 #define IX_WIDGET
+#define IX_AUDIO

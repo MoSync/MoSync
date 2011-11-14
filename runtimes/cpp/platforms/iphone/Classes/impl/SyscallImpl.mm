@@ -76,6 +76,9 @@ using namespace MoSyncError;
 #include "../../../../generated/gl.h.cpp"
 #endif
 
+#include <helpers/CPP_IX_AUDIO.h>
+#include "AudioSyscall.h"
+
 extern ThreadPool gThreadPool;
 
 #define NOT_IMPLEMENTED BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED)
@@ -324,6 +327,7 @@ namespace Base {
 		MANetworkInit();
 
 		MAPimInit();
+        MAAudioInit();
 
 		// init some image.h optimizations.
 		initMulTable();
@@ -336,6 +340,7 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
+        MAAudioClose();
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
 	}
@@ -1020,11 +1025,8 @@ namespace Base {
 		//int time = (int)(CFAbsoluteTimeGetCurrent()*1000.0f);
 		//int time = (int)((double)mach_absolute_time()*gTimeConversion);
 		int time = (((mach_absolute_time() - gTimeStart) * gTimeBase.numer) / gTimeBase.denom) / 1000000;
-
-
 		return time;
 	}
-
 
 	SYSCALL(int, maFreeObjectMemory()) {
 		return getFreeAmountOfMemory();
@@ -1847,7 +1849,7 @@ return 0; \
         return RES_OK;
 	}
 
-	SYSCALL(int, maIOCtl(int function, int a, int b, int c))
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
 
@@ -1935,6 +1937,7 @@ return 0; \
         maIOCtl_IX_GL2_caselist;
         maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist;
 #endif	//SUPPORT_OPENGL_ES
+        maIOCtl_IX_AUDIO_caselist;
 		}
 
 		return IOCTL_UNAVAILABLE;

@@ -118,6 +118,9 @@ namespace MoSync
 
             Core core = new MoSync.CoreInterpreted(programResInfo.Stream);
             Init(core, resources);
+            programResInfo.Stream.Close();
+            if (resources != null)
+                resources.Close();
         }
 
         public static Machine CreateInterpretedMachine(String programFile, String resourceFile)
@@ -136,6 +139,8 @@ namespace MoSync
 
             MoSync.Machine mosyncMachine = new MoSync.Machine();
             mosyncMachine.Init(core, resources);
+            if (resources != null)
+                resources.Close();
             return mosyncMachine;
         }
 #endif  //REBUILD
@@ -149,16 +154,20 @@ namespace MoSync
                 {
 #endif
                     mCore.Run();
-#if !REBUILD
+#if REBUILD
+                    mRuntime.RunCleaners();
+#else
                 }
                 catch (MoSync.Util.ExitException e)
                 {
+                    mRuntime.RunCleaners();
                     if (mLoadProgramStream != null)
                     {
                         Stream s = mLoadProgramStream;
                         mLoadProgramStream = null;
                         Util.RunActionOnMainThreadSync(
                             delegate() { LoadProgram(s); });
+                        s.Close();
                         continue;
                     }
                     else if (mLoadProgramFlag)
