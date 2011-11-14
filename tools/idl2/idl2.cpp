@@ -523,6 +523,37 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 	maapiFile << "using System;\n";
 	maapiFile << "namespace MoSync {\n";
 
+	// generate struct offsets
+	maapiFile << "namespace Struct {\n";
+	for(size_t i=0; i<maapi.structs.size(); i++) {
+		const Struct& s(maapi.structs[i]);
+		maapiFile << "\tpublic class "<<s.name<<" {\n";
+		size_t offset = 0;
+		for(size_t j=0; j<s.members.size(); j++) {
+			const Member& m(s.members[j]);
+			size_t max = 0;
+			for(size_t k=0; k<m.pod.size(); k++) {
+				const PlainOldData& pod(m.pod[k]);
+
+				size_t size = cTypeSize(maapi, pod.type);
+
+				int count;
+				string baseName;
+				if(isArray(maapi, pod.name, count, baseName)) {
+					size *= count;
+				} else {
+					baseName = pod.name;
+				}
+
+				max = MAX(max, size);
+				maapiFile << "\t\tpublic const int "<<baseName<< " = " <<offset<< ";\n";
+			}
+			offset += max;
+		}
+		maapiFile << "\t}\n";
+	}
+	maapiFile << "}\n\n";
+
 	// generate constant table.
 	maapiFile << "public class Constants {\n";
 
@@ -543,8 +574,6 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 		}
 	}
 	maapiFile << "}\n\n";
-
-	// generate struct wrappers (todo)
 
 	// generate syscall delegate declarations
 	maapiFile << "public class Syscalls {\n";
