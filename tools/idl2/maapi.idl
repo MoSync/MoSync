@@ -494,6 +494,7 @@ interface MAAPI {
 	 */
 	int maFindLabel(in MAString name);
 
+	// TODO: Should we change RES_OK to be zero? Many
 	constset int RES_ {
 		OUT_OF_MEMORY = -1;
 		BAD_INPUT = -2;
@@ -1155,7 +1156,7 @@ interface MAAPI {
 		RALT			= 307;
 		LALT			= 308;
 
-		SEARCH          = 309;
+		SEARCH			 = 309;
 	}
 
 	constset int MAKB_ { // Key Bits
@@ -1480,9 +1481,9 @@ interface MAAPI {
 			} textbox;
 
 			struct {
-                /**
-			    * #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if canceled or 1 if Ok was pressed.
-			    */
+				/**
+				 * #EVENT_TYPE_IMAGE_PICKER events, this will be 0 if canceled or 1 if Ok was pressed.
+				 */
 				int imagePickerState;
 
 				/**
@@ -8166,6 +8167,144 @@ group NFCAPI "NFC API" {
 
 		}
 	}//end of NFC API
+
+group DBAPI "DB API" {
+		/**
+		 * Open a database, the database is created if it does not exist.
+		 * Note that the application needs file read/write permissions to
+		 * create database files on the sd card.
+		 * @param path Full path to database file name.
+		 * @return Handle to the database >0 on success, #MA_DB_ERROR on error.
+		 */
+		MAHandle maDBOpen(in MAString path);
+
+		/**
+		 * Close a database.
+		 * @param databaseHandle Handle to the database.
+		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+		 */
+		int maDBClose(in MAHandle databaseHandle);
+
+		/**
+		 * Executes an SQL statement. If the statement returns a
+		 * query result, a cursor handle is returned.
+		 * @param databaseHandle Handle to the database.
+		 * @param sql The SQL statement.
+		 * @return #MA_DB_ERROR on error, #MA_DB_OK on success,
+		 * > 0 if there is a cursor to a query result, in this
+		 * case the return value is the cursor handle.
+		 */
+		MAHandle maDBExecSQL(in MAHandle databaseHandle, in MAString sql);
+
+		/**
+		 * Destroys a cursor. You must call this function
+		 * when you are done with the cursor to release
+		 * its resources.
+		 * @param cursorHandle Handle to the cursor.
+		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+		 */
+		int maDBCursorDestroy(in MAHandle cursorHandle);
+
+		/**
+		 * Move the cursor to the next row in the result set.
+		 * Note that you must call this function before retrieving
+		 * column data. The initial position of the cursor is
+		 * before the first row in the result set. If the result
+		 * set is empty, this function will return a value != MA_DB_OK.
+		 * @param cursorHandle Handle to the cursor.
+		 * @return #MA_DB_OK if successfully moved to next row,
+		 * #MA_DB_NO_ROW if there are no more rows in the result set,
+		 * #MA_DB_ERROR on error.
+		 */
+		int maDBCursorNext(in MAHandle cursorHandle);
+
+		/**
+		 * Get the column value at the current row pointed to
+		 * by the cursor as a data object. Use this function for
+		 * blob data or text data.
+		 * @param cursorHandle Handle to the cursor.
+		 * @param columnIndex Index of the column to retrieve value from.
+		 * First column has index zero.
+		 * @param placeholder Handle created with maCreatePlaceholder.
+		 * A data object will be created with the column data, and the handle
+		 * will refer to that data.
+		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+		 */
+		int maDBCursorGetColumnData(
+			in MAHandle cursorHandle,
+			in int columnIndex,
+			in MAHandle placeholder);
+
+		/**
+		 * Get the column value at the current row pointed to
+		 * by the cursor as a text data buffer. Use this function for
+		 * text data.
+		 * @param cursorHandle Handle to the cursor.
+		 * @param columnIndex Index of the column to retrieve value from.
+		 * First column has index zero.
+		 * @param buffer Pointer to buffer to receive the data.
+		 * The result is NOT zero terminated.
+		 * @param bufferSize Max size of the buffer.
+		 * @return The actual length of the data, if the actual length
+		 * returned is > bufferSize, data was not copied (buffer too small),
+		 * returns #MA_DB_ERROR on other errors.
+		 */
+		int maDBCursorGetColumnText(
+			in MAHandle cursorHandle,
+			in int columnIndex,
+			out MAAddress buffer,
+			in int bufferSize);
+
+		/**
+		 * Get the column value at the current row pointed to
+		 * by the cursor as an int value.
+		 * @param cursorHandle Handle to the cursor.
+		 * @param columnIndex Index of the column to retrieve value from.
+		 * First column has index zero.
+		 * @param value Pointer to int to receive the value.
+		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+		 */
+		int maDBCursorGetColumnInt(
+			in MAHandle cursorHandle,
+			in int columnIndex,
+			out int value);
+
+		/**
+		 * Get the column value at the current row pointed to
+		 * by the cursor as a double value.
+		 * @param cursorHandle Handle to the cursor.
+		 * @param columnIndex Index of the column to retrieve value from.
+		 * First column has index zero.
+		 * @param value Pointer to double to receive the value.
+		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+		 */
+		int maDBCursorGetColumnDouble(
+			in MAHandle cursorHandle,
+			in int columnIndex,
+			out double value);
+
+		/**
+		 * Status codes returned by the maDB functions.
+		 * TODO: Add specific error codes as needed.
+		 */
+		constset int MA_DB_ {
+			/**
+			 * Success return value.
+			 */
+			OK = 0;
+
+			/**
+			 * Error return value (-1 reserved for IOCtl not implemented).
+			 */
+			ERROR = -2;
+
+			/**
+			 * The cursor is beyond the last row
+			 * when calling #maDBCursorNext.
+			 */
+			NO_ROW = -3;
+		}
+	} // End of DB API
 
 #if IX_AUDIO
 	group AudioAPI "Audio API" {

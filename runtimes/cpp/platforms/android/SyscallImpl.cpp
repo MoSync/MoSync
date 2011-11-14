@@ -1654,6 +1654,7 @@ return 0; \
 			// Allocate memory for the output buffer
 			int _outText = (int) SYSCALL_THIS->GetValidatedMemRange(
 				c,
+				// TODO: Should this not be wchar !?
 				_maxSize * sizeof(char));
 			// Call the actual internal _maTextBox function
 			return _maTextBox(
@@ -1666,6 +1667,8 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 		}
+
+		// ********** Widget API **********
 
 		case maIOCtl_maWidgetCreate:
 			SYSLOG("maIOCtl_maWidgetCreate");
@@ -1726,6 +1729,8 @@ return 0; \
 			SYSLOG("maIOCtl_maWidgetStackScreenPop");
 			return _maWidgetStackScreenPop(a, mJNIEnv, mJThis);
 
+		// ********** Notification API **********
+
 		case maIOCtl_maNotificationAdd:
 			SYSLOG("maIOCtl_maNotificationAdd");
 			return _maNotificationAdd(
@@ -1740,6 +1745,9 @@ return 0; \
 		case maIOCtl_maNotificationRemove:
 			SYSLOG("maIOCtl_maNotificationRemove");
 			return _maNotificationRemove(a, mJNIEnv, mJThis);
+
+		// ********** Various APIs **********
+		// TODO: Group with related APIs.
 
 		case maIOCtl_maSendToBackground:
 			SYSLOG("maIOCtl_maSendToBackground");
@@ -1836,6 +1844,8 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 			}
+
+		// ********** File API **********
 
 		case maIOCtl_maFileOpen:
 			SYSLOG("maIOCtl_maFileOpen");
@@ -1980,6 +1990,8 @@ return 0; \
 				mJNIEnv,
 				mJThis);
 
+		// ********** Font API **********
+
 		case maIOCtl_maFontLoadDefault:
 			SYSLOG("maIOCtl_maFontLoadDefault");
 			return _maFontLoadDefault(
@@ -2028,6 +2040,8 @@ return 0; \
 				a,
 				mJNIEnv,
 				mJThis);
+
+		// ********** Camera API **********
 
 		case maIOCtl_maCameraStart:
 			return _maCameraStart(
@@ -2111,6 +2125,8 @@ return 0; \
 			return _maCameraGetProperty((int)gCore->mem_ds, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
 		}
 
+		// ********** Sensor API **********
+
 		case maIOCtl_maSensorStart:
 			SYSLOG("maIOCtl_maSensorStart");
 			return _maSensorStart(
@@ -2125,6 +2141,8 @@ return 0; \
 				a,
 				mJNIEnv,
 				mJThis);
+
+		// ********** PIM API **********
 
 		case maIOCtl_maPimListOpen:
 			SYSLOG("maIOCtl_maPimListOpen");
@@ -2298,6 +2316,8 @@ return 0; \
 				b,
 				mJNIEnv,
 				mJThis);
+
+		// ********** NFC API **********
 
 		case maIOCtl_maNFCStart:
 			SYSLOG("maIOCtl_maNFCStart");
@@ -2536,6 +2556,9 @@ return 0; \
 					mJNIEnv,
 					mJThis);
 
+		// ********** Various APIs **********
+		// TODO: Group with related APIs.
+
 		case maIOCtl_maSyscallPanicsEnable:
 			SYSLOG("maIOCtl_maSyscallPanicsEnable");
 			return _maSyscallPanicsEnable(
@@ -2552,6 +2575,80 @@ return 0; \
 			return _maGetCellInfo(
 				(int) SYSCALL_THIS->GetValidatedMemRange(a, sizeof(MACellInfo)),
 				(int)gCore->mem_ds,
+				mJNIEnv,
+				mJThis);
+
+
+		// ********** Database API **********
+
+		case maIOCtl_maDBOpen:
+			return _maDBOpen(
+				SYSCALL_THIS->GetValidatedStr(a),
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maDBClose:
+			return _maDBClose(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maDBExecSQL:
+			return _maDBExecSQL(
+				a,
+				SYSCALL_THIS->GetValidatedStr(b),
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maDBCursorDestroy:
+			return _maDBCursorDestroy(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maDBCursorNext:
+			return _maDBCursorNext(
+				a,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maDBCursorGetColumnData:
+			return _maDBCursorGetColumnData(
+				a,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maDBCursorGetColumnText:
+		{
+			// Get fourth parameter.
+			int d = SYSCALL_THIS->GetValidatedStackValue(0);
+			return _maDBCursorGetColumnText(
+				a,
+				b,
+				(int)SYSCALL_THIS->GetValidatedMemRange(c, d)
+					- (int)gCore->mem_ds,
+				d,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maDBCursorGetColumnInt:
+			return _maDBCursorGetColumnInt(
+				a,
+				b,
+				(int)SYSCALL_THIS->GetValidatedMemRange(c, sizeof(int))
+					- (int)gCore->mem_ds,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maDBCursorGetColumnDouble:
+			return _maDBCursorGetColumnDouble(
+				a,
+				b,
+				(int)SYSCALL_THIS->GetValidatedMemRange(c, sizeof(float))
+					- (int)gCore->mem_ds,
 				mJNIEnv,
 				mJThis);
 
