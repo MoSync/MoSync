@@ -93,25 +93,25 @@ namespace MoSync
         protected int mMaxNumberOfLines;
         public Label()
         {
-            mLabel = new System.Windows.Controls.TextBlock();
-            mView = mLabel;
-            mMaxNumberOfLines = 0;
-            mLabel.TextWrapping = TextWrapping.NoWrap;
-        }
+			//the label
+			mLabel = new System.Windows.Controls.TextBlock();
+			mView = mLabel;
+			mMaxNumberOfLines = 0;
+			mLabel.TextWrapping = TextWrapping.NoWrap;
+		}
 
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT)]
-        public String Text
-        {
-            set
-            {
-                mLabel.Text = value;
-            }
-            get
-            {
-                return mLabel.Text;
-
-            }
-        }
+		[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT)]
+		public String Text
+		{
+			set
+			{
+				mLabel.Text = value;
+			}
+			get
+			{
+				return mLabel.Text;
+			}
+		}
 
         [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_VERTICAL_ALIGNMENT)]
         public String textVerticalAlignment
@@ -205,6 +205,8 @@ namespace MoSync
             }
         }
     }
+
+    
 
 
     //HorizintalLayout class
