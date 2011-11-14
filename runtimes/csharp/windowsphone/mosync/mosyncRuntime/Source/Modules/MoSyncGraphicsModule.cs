@@ -477,40 +477,23 @@ namespace MoSync
 
 			ioctls.maFrameBufferGetInfo = delegate(int info)
 			{
-				const int MAFrameBufferInfo_sizeInBytes = 0;
-				const int MAFrameBufferInfo_bytesPerPixel = 4;
-				const int MAFrameBufferInfo_bitsPerPixel = 8;
-				const int MAFrameBufferInfo_redMask = 12;
-				const int MAFrameBufferInfo_redShift = 16;
-				const int MAFrameBufferInfo_redBits = 20;
-				const int MAFrameBufferInfo_greenMask = 24;
-				const int MAFrameBufferInfo_greenShift = 28;
-				const int MAFrameBufferInfo_greenBits = 32;
-				const int MAFrameBufferInfo_blueMask = 36;
-				const int MAFrameBufferInfo_blueShift = 40;
-				const int MAFrameBufferInfo_blueBits = 44;
-				const int MAFrameBufferInfo_width = 48;
-				const int MAFrameBufferInfo_height = 52;
-				const int MAFrameBufferInfo_pitch = 56;
-				const int MAFrameBufferInfo_supportsGfxSyscalls = 60;
-
 				Memory mem = core.GetDataMemory();
-				mem.WriteInt32(info + MAFrameBufferInfo_sizeInBytes, mBackBuffer.PixelWidth * mBackBuffer.PixelHeight * 4);
-				mem.WriteInt32(info + MAFrameBufferInfo_bytesPerPixel, 4);
-				mem.WriteInt32(info + MAFrameBufferInfo_bitsPerPixel, 32);
-				mem.WriteUInt32(info + MAFrameBufferInfo_redMask, 0x00ff0000);
-				mem.WriteUInt32(info + MAFrameBufferInfo_redBits, 8);
-				mem.WriteUInt32(info + MAFrameBufferInfo_redShift, 16);
-				mem.WriteUInt32(info + MAFrameBufferInfo_greenMask, 0x0000ff00);
-				mem.WriteUInt32(info + MAFrameBufferInfo_greenBits, 8);
-				mem.WriteUInt32(info + MAFrameBufferInfo_greenShift, 8);
-				mem.WriteUInt32(info + MAFrameBufferInfo_blueMask, 0x000000ff);
-				mem.WriteUInt32(info + MAFrameBufferInfo_blueBits, 8);
-				mem.WriteUInt32(info + MAFrameBufferInfo_blueShift, 0);
-				mem.WriteInt32(info + MAFrameBufferInfo_width, mBackBuffer.PixelWidth);
-				mem.WriteInt32(info + MAFrameBufferInfo_height, mBackBuffer.PixelHeight);
-				mem.WriteInt32(info + MAFrameBufferInfo_pitch, mBackBuffer.PixelWidth * 4);
-				mem.WriteUInt32(info + MAFrameBufferInfo_supportsGfxSyscalls, 0);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.sizeInBytes, mBackBuffer.PixelWidth * mBackBuffer.PixelHeight * 4);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.bytesPerPixel, 4);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.bitsPerPixel, 32);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.redMask, 0x00ff0000);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.redBits, 8);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.redShift, 16);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.greenMask, 0x0000ff00);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.greenBits, 8);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.greenShift, 8);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.blueMask, 0x000000ff);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.blueBits, 8);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.blueShift, 0);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.width, mBackBuffer.PixelWidth);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.height, mBackBuffer.PixelHeight);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.pitch, mBackBuffer.PixelWidth * 4);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.supportsGfxSyscalls, 0);
 				return 1;
 			};
 		}
