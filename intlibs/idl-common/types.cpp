@@ -95,8 +95,7 @@ bool isArray(const Interface& inf, const string& name, int& count, string& baseN
 }
 
 size_t cTypeSize(const Interface& inf, const string& type) {
-	if(type == "int" || type == "float" ||
-		type == "char" || type == "uint")
+	if(type == "int" || type == "float" || type == "uint")
 		return 4;
 	if(type == "double" || type == "long long")
 		return 8;

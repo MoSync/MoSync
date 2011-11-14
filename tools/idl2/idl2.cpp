@@ -517,6 +517,51 @@ static void outputCSharpIoctlArgTyped(ofstream& maapiFile, int& argindex, const 
 	}
 }
 
+const Struct& findStruct(const Interface& inf, const string& name) {
+	for(size_t i=0; i<inf.structs.size(); i++) {
+		const Struct& s(inf.structs[i]);
+		if(s.name == name)
+			return s;
+	}
+	throwException("Struct not found: " + name);
+}
+
+static size_t streamCSharpOffsets(ostream& stream, const Interface& inf,
+	const Struct& s, size_t offset)
+{
+	size_t size = 0;
+	for(size_t j=0; j<s.members.size(); j++) {
+		const Member& m(s.members[j]);
+		size_t max = 0;
+		for(size_t k=0; k<m.pod.size(); k++) {
+			const PlainOldData& pod(m.pod[k]);
+			size_t size;
+			if(isAnonStructName(pod.type)) {
+				const Struct& as(findStruct(inf, pod.type));
+				size = streamCSharpOffsets(stream, inf, as, offset);
+				max = MAX(max, size);
+				continue;
+			} else {
+				size = cTypeSize(inf, pod.type);
+			}
+
+			int count;
+			string baseName;
+			if(isArray(inf, pod.name, count, baseName)) {
+				size *= count;
+			} else {
+				baseName = pod.name;
+			}
+			max = MAX(max, size);
+
+			stream << "\t\tpublic const int "<<baseName<< " = " <<offset<< ";\n";
+		}
+		offset += max;
+		size += max;
+	}
+	return size;
+}
+
 static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi) {
 	ofstream maapiFile("Output/maapi.cs");
 
@@ -527,29 +572,10 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 	maapiFile << "namespace Struct {\n";
 	for(size_t i=0; i<maapi.structs.size(); i++) {
 		const Struct& s(maapi.structs[i]);
+		if(isAnonStructName(s.name))
+			continue;
 		maapiFile << "\tpublic class "<<s.name<<" {\n";
-		size_t offset = 0;
-		for(size_t j=0; j<s.members.size(); j++) {
-			const Member& m(s.members[j]);
-			size_t max = 0;
-			for(size_t k=0; k<m.pod.size(); k++) {
-				const PlainOldData& pod(m.pod[k]);
-
-				size_t size = cTypeSize(maapi, pod.type);
-
-				int count;
-				string baseName;
-				if(isArray(maapi, pod.name, count, baseName)) {
-					size *= count;
-				} else {
-					baseName = pod.name;
-				}
-
-				max = MAX(max, size);
-				maapiFile << "\t\tpublic const int "<<baseName<< " = " <<offset<< ";\n";
-			}
-			offset += max;
-		}
+		streamCSharpOffsets(maapiFile, maapi, s, 0);
 		maapiFile << "\t}\n";
 	}
 	maapiFile << "}\n\n";
