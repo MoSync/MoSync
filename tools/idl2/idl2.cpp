@@ -517,49 +517,156 @@ static void outputCSharpIoctlArgTyped(ofstream& maapiFile, int& argindex, const 
 	}
 }
 
-const Struct& findStruct(const Interface& inf, const string& name) {
+const Struct* findStruct(const Interface& inf, const string& name) {
 	for(size_t i=0; i<inf.structs.size(); i++) {
 		const Struct& s(inf.structs[i]);
 		if(s.name == name)
-			return s;
+			return &s;
 	}
-	throwException("Struct not found: " + name);
+	return NULL;
+}
+
+static void streamIndent(ostream& stream, int indent) {
+	for(int i=0; i<indent; i++) {
+		stream << "\t";
+	}
+}
+
+static const char* escapeCSharp(const string& name) {
+	static const char* cSharpKeywords[] = {
+		"abstract_",
+		"as_",
+		"base_",
+		"bool_",
+		"break_",
+		"byte_",
+		"case_",
+		"catch_",
+		"char_",
+		"checked_",
+		"class_",
+		"const_",
+		"continue_",
+		"decimal_",
+		"default_",
+		"delegate_",
+		"do_",
+		"double_",
+		"else_",
+		"enum_",
+		"event_",
+		"explicit_",
+		"extern_",
+		"false_",
+		"finally_",
+		"fixed_",
+		"float_",
+		"for_",
+		"foreach_",
+		"goto_",
+		"if_",
+		"implicit_",
+		"in_",
+		"int_",
+		"interface_",
+		"internal_",
+		"is_",
+		"lock_",
+		"long_",
+		"namespace_",
+		"new_",
+		"null_",
+		"object_",
+		"operator_",
+		"out_",
+		"override_",
+		"params_",
+		"private_",
+		"protected_",
+		"public_",
+		"readonly_",
+		"ref_",
+		"return_",
+		"sbyte_",
+		"sealed_",
+		"short_",
+		"sizeof_",
+		"stackalloc_",
+		"static_",
+		"string_",
+		"struct_",
+		"switch_",
+		"this_",
+		"throw_",
+		"true_",
+		"try_",
+		"typeof_",
+		"uint_",
+		"ulong_",
+		"unchecked_",
+		"unsafe_",
+		"ushort_",
+		"using_",
+		"virtual_",
+		"void_",
+		"volatile_",
+		"while_",
+	};
+	for(size_t i=0; i<(sizeof(cSharpKeywords)/sizeof(char*)); i++) {
+		const char* key = cSharpKeywords[i];
+		if(strncmp(key, name.c_str(), strlen(key)-1) == 0)
+			return key;
+	}
+	return name.c_str();
 }
 
 static size_t streamCSharpOffsets(ostream& stream, const Interface& inf,
-	const Struct& s, size_t offset)
+	const Struct& s, size_t offset, int indent)
 {
-	size_t size = 0;
+	size_t structSize = 0;
 	for(size_t j=0; j<s.members.size(); j++) {
 		const Member& m(s.members[j]);
 		size_t max = 0;
 		for(size_t k=0; k<m.pod.size(); k++) {
 			const PlainOldData& pod(m.pod[k]);
-			size_t size;
+			size_t memberSize;
+			const Struct* subStruct = findStruct(inf, pod.type);
 			if(isAnonStructName(pod.type)) {
-				const Struct& as(findStruct(inf, pod.type));
-				size = streamCSharpOffsets(stream, inf, as, offset);
-				max = MAX(max, size);
+				const Struct* as(findStruct(inf, pod.type));
+				if(!subStruct)
+					throwException("Struct not found: " + pod.type);
+				memberSize = streamCSharpOffsets(stream, inf, *subStruct, offset, indent);
+				max = MAX(max, memberSize);
 				continue;
-			} else {
-				size = cTypeSize(inf, pod.type);
 			}
+
+			memberSize = cTypeSize(inf, pod.type);
 
 			int count;
 			string baseName;
-			if(isArray(inf, pod.name, count, baseName)) {
-				size *= count;
+			bool array = isArray(inf, pod.name, count, baseName);
+			if(array) {
+				memberSize *= count;
 			} else {
 				baseName = pod.name;
 			}
-			max = MAX(max, size);
 
-			stream << "\t\tpublic const int "<<baseName<< " = " <<offset<< ";\n";
+			if(subStruct && !array) {
+				streamIndent(stream, indent);
+				stream << "public class "<<escapeCSharp(baseName)<<" {\n";
+				memberSize = streamCSharpOffsets(stream, inf, *subStruct, offset, indent+1);
+				streamIndent(stream, indent);
+				stream << "}\n";
+			} else {
+				streamIndent(stream, indent);
+				stream << "public const int "<<escapeCSharp(baseName)<< " = " <<offset<< ";\n";
+			}
+			max = MAX(max, memberSize);
 		}
 		offset += max;
-		size += max;
+		structSize += max;
 	}
-	return size;
+	return structSize;
 }
 
 static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi) {
@@ -575,7 +682,7 @@ static void outputMaapiCSharp(const vector<string>& ixs, const Interface& maapi)
 		if(isAnonStructName(s.name))
 			continue;
 		maapiFile << "\tpublic class "<<s.name<<" {\n";
-		streamCSharpOffsets(maapiFile, maapi, s, 0);
+		streamCSharpOffsets(maapiFile, maapi, s, 0, 2);
 		maapiFile << "\t}\n";
 	}
 	maapiFile << "}\n\n";
