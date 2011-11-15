@@ -44,7 +44,7 @@ namespace MoSync
                     const int MAWidgetEventData_eventType = 0;
                     const int MAWidgetEventData_widgetHandle = 4;
 
-                    eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_POINTER_PRESSED);
+                    eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
                     eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
                     mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                 });
