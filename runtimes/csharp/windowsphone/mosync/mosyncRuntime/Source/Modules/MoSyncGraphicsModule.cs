@@ -8,6 +8,7 @@ using System.Threading;
 using System.Windows.Media;
 using System.Windows.Controls;
 using Microsoft.Phone.Controls;
+using System.Collections.Generic;
 
 namespace MoSync
 {
@@ -16,228 +17,11 @@ namespace MoSync
 		public WriteableBitmap mFrontBuffer;
 		public WriteableBitmap mBackBuffer;
 		public WriteableBitmap mCurrentDrawTarget;
+		private Rect mClipRect = new Rect();
 		public int mCurrentDrawTargetIndex = MoSync.Constants.HANDLE_SCREEN;
 		private uint mCurrentColor = 0xff000000;
 		private System.Windows.Media.Color mCurrentWindowsColor;
 		private double mCurrentFontSize = 24;
-
-		public static void DrawImageRegion(WriteableBitmap dst, int left, int top,
-				Rect srcRect, WriteableBitmap img, int transformMode)
-		{
-			int width = (int)srcRect.Width,
-				height = (int)srcRect.Height,
-				u = (int)srcRect.X,
-				v = (int)srcRect.Y;
-
-			int bpp = 1,
-				srcPitchX,
-				srcPitchY,
-				transTopLeftX,
-				transTopLeftY,
-				transBottomRightX,
-				transBottomRightY,
-				transWidth,
-				transHeight;
-
-			int dirHorizontalX = 0,
-				dirHorizontalY = 0,
-				dirVerticalX = 0,
-				dirVerticalY = 0;
-
-			switch (transformMode)
-			{
-				case MoSync.Constants.TRANS_NONE:
-					srcPitchX = bpp;
-					srcPitchY = img.PixelWidth;
-					transTopLeftX = u;
-					transTopLeftY = v;
-					transBottomRightX = u + width - 1;
-					transBottomRightY = v + height - 1;
-					transWidth = width;
-					transHeight = height;
-					dirHorizontalX = 1;
-					dirVerticalY = 1;
-					break;
-				case MoSync.Constants.TRANS_ROT90:
-					srcPitchX = -img.PixelWidth;
-					srcPitchY = bpp;
-					transTopLeftX = u;
-					transTopLeftY = v + height - 1;
-					transBottomRightX = u + width - 1;
-					transBottomRightY = v;
-					transWidth = height;
-					transHeight = width;
-					dirHorizontalY = -1;
-					dirVerticalX = 1;
-					break;
-				case MoSync.Constants.TRANS_ROT180:
-					srcPitchX = -bpp;
-					srcPitchY = -img.PixelWidth;
-					transTopLeftX = u + width - 1;
-					transTopLeftY = v + height - 1;
-					transBottomRightX = u;
-					transBottomRightY = v;
-					transWidth = width;
-					transHeight = height;
-					dirHorizontalX = -1;
-					dirVerticalY = -1;
-					break;
-				case MoSync.Constants.TRANS_ROT270:
-					srcPitchX = img.PixelWidth;
-					srcPitchY = -bpp;
-					transTopLeftX = u + width - 1;
-					transTopLeftY = v;
-					transBottomRightX = u;
-					transBottomRightY = v + height - 1;
-					transWidth = height;
-					transHeight = width;
-					dirHorizontalY = 1;
-					dirVerticalX = -1;
-					break;
-				case MoSync.Constants.TRANS_MIRROR:
-					srcPitchX = -bpp;
-					srcPitchY = img.PixelWidth;
-					transTopLeftX = u + width - 1;
-					transTopLeftY = v;
-					transBottomRightX = u;
-					transBottomRightY = v + height - 1;
-					transWidth = width;
-					transHeight = height;
-					dirHorizontalX = -1;
-					dirVerticalY = 1;
-					break;
-				case MoSync.Constants.TRANS_MIRROR_ROT90:
-					srcPitchX = -img.PixelWidth;
-					srcPitchY = -bpp;
-					transTopLeftX = u + width - 1;
-					transTopLeftY = v + height - 1;
-					transBottomRightX = u;
-					transBottomRightY = v;
-					transWidth = height;
-					transHeight = width;
-					dirHorizontalY = -1;
-					dirVerticalX = -1;
-					break;
-				case MoSync.Constants.TRANS_MIRROR_ROT180:
-					srcPitchX = bpp;
-					srcPitchY = -img.PixelWidth;
-					transTopLeftX = u;
-					transTopLeftY = v + height - 1;
-					transBottomRightX = u + width - 1;
-					transBottomRightY = v;
-					transWidth = width;
-					transHeight = height;
-					dirHorizontalX = 1;
-					dirVerticalY = -1;
-					break;
-				case MoSync.Constants.TRANS_MIRROR_ROT270:
-					srcPitchX = img.PixelWidth;
-					srcPitchY = bpp;
-					transTopLeftX = u;
-					transTopLeftY = v;
-					transBottomRightX = u + width - 1;
-					transBottomRightY = v + height - 1;
-					transWidth = height;
-					transHeight = width;
-					dirHorizontalY = 1;
-					dirVerticalX = 1;
-					break;
-				default:
-					MoSync.Util.CriticalError("Invalid transform!");
-					return;
-			}
-
-			if (transWidth <= 0 || transHeight <= 0) return;
-
-			if (transTopLeftX >= img.PixelWidth) { MoSync.Util.CriticalError("Source rect error!"); }
-			else if (transTopLeftX < 0) { MoSync.Util.CriticalError("Source rect error!"); }
-			if (transTopLeftY >= img.PixelHeight) { MoSync.Util.CriticalError("Source rect error!"); }
-			else if (transTopLeftY < 0) { MoSync.Util.CriticalError("Source rect error!"); }
-			if (transBottomRightX < 0) { MoSync.Util.CriticalError("Source rect error!"); }
-			else if (transBottomRightX >= img.PixelWidth) { MoSync.Util.CriticalError("Source rect error!"); }
-			if (transBottomRightY < 0) { MoSync.Util.CriticalError("Source rect error!"); }
-			else if (transBottomRightY >= img.PixelHeight) { MoSync.Util.CriticalError("Source rect error!"); }
-
-			if (transWidth <= 0 || transHeight <= 0) return;
-
-			/*
-			if (left >= clipRect.x + clipRect.width)
-				return;
-			else if(left < clipRect.x) {
-				transTopLeftX += (clipRect.x - left)*dirHorizontalX;
-				transTopLeftY += (clipRect.x - left)*dirHorizontalY;
-				transWidth -= clipRect.x - left;
-				left = clipRect.x;
-			}
-			if (top >= clipRect.y + clipRect.height)
-				return;
-			else if(top < clipRect.y) {
-				transTopLeftX += (clipRect.y - top)*dirVerticalX;
-				transTopLeftY += (clipRect.y - top)*dirVerticalY;
-				transHeight -= clipRect.y - top;
-				top = clipRect.y;
-			}
-			if(left + transWidth < clipRect.x)
-				return;
-			else if(left + transWidth >= clipRect.x + clipRect.width)
-				transWidth -= (left + transWidth) - (clipRect.x + clipRect.width);
-			if(top + height < clipRect.y)
-				return;
-			else if(top + transHeight >= clipRect.y + clipRect.height)
-				transHeight -= (top + transHeight) - (clipRect.y + clipRect.height);
-			*/
-
-			if (transWidth <= 0 || transHeight <= 0) return;
-
-			/*
-			unsigned char *dst = &data[left*bytesPerPixel + top*pitch];
-			unsigned char *src = &img->data[transTopLeftX*img->bytesPerPixel + transTopLeftY*img->pitch];
-			*/
-
-			int dstPixel = left + top * dst.PixelWidth;
-			int srcPixel = transTopLeftX + transTopLeftY * img.PixelWidth;
-
-			while (transHeight-- != 0)
-			{
-				int x = transWidth;
-				int dstScan = dstPixel;
-				int srcScan = srcPixel;
-				while (x-- != 0)
-				{
-					uint srcCol = (uint)img.Pixels[srcScan];
-					uint dstCol = (uint)dst.Pixels[dstScan];
-					uint sa = (((srcCol) & 0xff000000) >> 24);
-
-					if (sa == 255)
-					{
-						dst.Pixels[dstScan] = (int)srcCol;
-					}
-					else if (sa == 0)
-					{
-						dst.Pixels[dstScan] = (int)dstCol;
-					}
-					else
-					{
-						uint sr = (((srcCol) & 0x00ff0000) >> 16);
-						uint sg = (((srcCol) & 0x0000ff00) >> 8);
-						uint sb = (((srcCol) & 0x000000ff) >> 0);
-
-						uint dr = (((dstCol) & 0x00ff0000) >> 16);
-						uint dg = (((dstCol) & 0x0000ff00) >> 8);
-						uint db = (((dstCol) & 0x000000ff) >> 0);
-
-						dst.Pixels[dstScan] = (int)(
-									(((dr + (((sr - dr) * (sa)) >> 8)) << 16) & 0x00ff0000) |
-									(((dg + (((sg - dg) * (sa)) >> 8)) << 8) & 0x0000ff00) |
-									(((db + (((sb - db) * (sa)) >> 8)) << 0) & 0x000000ff));
-					}
-					srcScan += srcPitchX;
-					dstScan++;
-				}
-				srcPixel += srcPitchY;
-				dstPixel += dst.PixelWidth;
-			}
-		}
 
 		protected void InvalidateWriteableBitmapOnMainThread(WriteableBitmap bitmap)
 		{
@@ -261,6 +45,11 @@ namespace MoSync
 			mainImage.Width = screenWidth;
 			mainImage.Height = screenHeight;
 			mainPage.Content = mainImage;
+
+			mClipRect.X = 0.0;
+			mClipRect.Y = 0.0;
+			mClipRect.Width = screenWidth;
+			mClipRect.Height = screenHeight;
 
 			// no apparent effect on memory leaks.
 			runtime.RegisterCleaner(delegate()
@@ -299,10 +88,19 @@ namespace MoSync
 
 			syscalls.maSetClipRect = delegate(int x, int y, int w, int h)
 			{
+				mClipRect.X = x;
+				mClipRect.Y = y;
+				mClipRect.Width = w;
+				mClipRect.Height = h;
 			};
 
 			syscalls.maGetClipRect = delegate(int cliprect)
 			{
+				Memory mem = core.GetDataMemory();
+				mem.WriteInt32(cliprect + MoSync.Struct.MARect.left, (int)mClipRect.X);
+				mem.WriteInt32(cliprect + MoSync.Struct.MARect.top, (int)mClipRect.Y);
+				mem.WriteInt32(cliprect + MoSync.Struct.MARect.width, (int)mClipRect.Width);
+				mem.WriteInt32(cliprect + MoSync.Struct.MARect.height, (int)mClipRect.Height);
 			};
 
 			syscalls.maPlot = delegate(int x, int y)
@@ -323,7 +121,13 @@ namespace MoSync
 
 			syscalls.maLine = delegate(int x1, int y1, int x2, int y2)
 			{
-				mCurrentDrawTarget.DrawLine(x1, y1, x2, y2, (int)mCurrentColor);
+				GraphicsUtil.Point p1 = new GraphicsUtil.Point(x1, y1);
+				GraphicsUtil.Point p2 = new GraphicsUtil.Point(x2, y2);
+				if(!GraphicsUtil.ClipLine(p1, p2, (int)mClipRect.X, (int)(mClipRect.X+mClipRect.Width),
+					(int)mClipRect.Y, (int)(mClipRect.Y+mClipRect.Height)))
+					return;
+
+				mCurrentDrawTarget.DrawLine((int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y, (int)mCurrentColor);
 			};
 
 			TextBlock textBlock = new TextBlock();
@@ -408,11 +212,11 @@ namespace MoSync
 				int[] newPoints = new int[count * 2 + 2];
 				for (int i = 0; i < count; i++)
 				{
-					newPoints[i * 2 + 0] = core.GetDataMemory().ReadInt32(points + i * 8);
-					newPoints[i * 2 + 1] = core.GetDataMemory().ReadInt32(points + i * 8 + 4);
+					newPoints[i * 2 + 0] = core.GetDataMemory().ReadInt32(points + i * 8 + MoSync.Struct.MAPoint2d.x);
+					newPoints[i * 2 + 1] = core.GetDataMemory().ReadInt32(points + i * 8 + MoSync.Struct.MAPoint2d.y);
 				}
-				newPoints[count * 2 + 0] = core.GetDataMemory().ReadInt32(points + 0);
-				newPoints[count * 2 + 1] = core.GetDataMemory().ReadInt32(points + 4);
+				newPoints[count * 2 + 0] = core.GetDataMemory().ReadInt32(points + MoSync.Struct.MAPoint2d.x);
+				newPoints[count * 2 + 1] = core.GetDataMemory().ReadInt32(points + MoSync.Struct.MAPoint2d.y);
 				mCurrentDrawTarget.FillPolygon(newPoints, (int)mCurrentColor);
 			};
 
@@ -424,8 +228,8 @@ namespace MoSync
 
 				for (int i = 0; i < count; i++)
 				{
-					xcoords[i] = core.GetDataMemory().ReadInt32(points + i * 8);
-					ycoords[i] = core.GetDataMemory().ReadInt32(points + i * 8 + 4);
+					xcoords[i] = core.GetDataMemory().ReadInt32(points + i * 8 + MoSync.Struct.MAPoint2d.x);
+					ycoords[i] = core.GetDataMemory().ReadInt32(points + i * 8 + MoSync.Struct.MAPoint2d.y);
 				}
 
 				for (int i = 2; i < count; i++)
@@ -490,18 +294,18 @@ namespace MoSync
 				WriteableBitmap src = (WriteableBitmap)res.GetInternalObject();
 
 				Memory dataMemory = core.GetDataMemory();
-				int srcRectX = dataMemory.ReadInt32(srcRectPtr + 0);
-				int srcRectY = dataMemory.ReadInt32(srcRectPtr + 4);
-				int srcRectW = dataMemory.ReadInt32(srcRectPtr + 8);
-				int srcRectH = dataMemory.ReadInt32(srcRectPtr + 12);
-				int dstPointX = dataMemory.ReadInt32(dstPointPtr + 0);
-				int dstPointY = dataMemory.ReadInt32(dstPointPtr + 4);
+				int srcRectX = dataMemory.ReadInt32(srcRectPtr + MoSync.Struct.MARect.left);
+				int srcRectY = dataMemory.ReadInt32(srcRectPtr + MoSync.Struct.MARect.top);
+				int srcRectW = dataMemory.ReadInt32(srcRectPtr + MoSync.Struct.MARect.width);
+				int srcRectH = dataMemory.ReadInt32(srcRectPtr + MoSync.Struct.MARect.height);
+				int dstPointX = dataMemory.ReadInt32(dstPointPtr + MoSync.Struct.MAPoint2d.x);
+				int dstPointY = dataMemory.ReadInt32(dstPointPtr + MoSync.Struct.MAPoint2d.y);
 
 				Rect srcRect = new Rect(srcRectX, srcRectY, srcRectW, srcRectH);
 				Rect dstRect = new Rect(dstPointX, dstPointY, srcRectW, srcRectH);
 				// mCurrentDrawTarget.Blit(dstRect, src, srcRect, WriteableBitmapExtensions.BlendMode.Alpha);
 
-				DrawImageRegion(mCurrentDrawTarget, dstPointX, dstPointY, srcRect, src, transformMode);
+				GraphicsUtil.DrawImageRegion(mCurrentDrawTarget, dstPointX, dstPointY, srcRect, src, transformMode);
 			};
 
 			syscalls.maCreateDrawableImage = delegate(int placeholder, int width, int height)
@@ -555,12 +359,12 @@ namespace MoSync
 			syscalls.maDrawRGB = delegate(int _dstPoint, int _src, int _srcRect, int _scanlength)
 			{
 				Memory dataMemory = core.GetDataMemory();
-				int dstX = dataMemory.ReadInt32(_dstPoint + 0);
-				int dstY = dataMemory.ReadInt32(_dstPoint + 4);
-				int srcRectX = dataMemory.ReadInt32(_srcRect + 0);
-				int srcRectY = dataMemory.ReadInt32(_srcRect + 4);
-				int srcRectW = dataMemory.ReadInt32(_srcRect + 8);
-				int srcRectH = dataMemory.ReadInt32(_srcRect + 12);
+				int dstX = dataMemory.ReadInt32(_dstPoint + MoSync.Struct.MAPoint2d.x);
+				int dstY = dataMemory.ReadInt32(_dstPoint + MoSync.Struct.MAPoint2d.y);
+				int srcRectX = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.left);
+				int srcRectY = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.top);
+				int srcRectW = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.width);
+				int srcRectH = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.height);
 				int[] pixels = mCurrentDrawTarget.Pixels;
 				// todo: clipRect
 
@@ -604,10 +408,10 @@ namespace MoSync
 				Resource res = runtime.GetResource(MoSync.Constants.RT_IMAGE, _image);
 				WriteableBitmap src = (WriteableBitmap)res.GetInternalObject();
 				Memory dataMemory = core.GetDataMemory();
-				int srcRectX = dataMemory.ReadInt32(_srcRect + 0);
-				int srcRectY = dataMemory.ReadInt32(_srcRect + 4);
-				int srcRectW = dataMemory.ReadInt32(_srcRect + 8);
-				int srcRectH = dataMemory.ReadInt32(_srcRect + 12);
+				int srcRectX = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.left);
+				int srcRectY = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.top);
+				int srcRectW = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.width);
+				int srcRectH = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.height);
 				int lineDst = _dst;
 				byte[] data = src.ToByteArray(srcRectY * src.PixelWidth,
 					srcRectH * src.PixelWidth);
@@ -673,40 +477,23 @@ namespace MoSync
 
 			ioctls.maFrameBufferGetInfo = delegate(int info)
 			{
-				const int MAFrameBufferInfo_sizeInBytes = 0;
-				const int MAFrameBufferInfo_bytesPerPixel = 4;
-				const int MAFrameBufferInfo_bitsPerPixel = 8;
-				const int MAFrameBufferInfo_redMask = 12;
-				const int MAFrameBufferInfo_redShift = 16;
-				const int MAFrameBufferInfo_redBits = 20;
-				const int MAFrameBufferInfo_greenMask = 24;
-				const int MAFrameBufferInfo_greenShift = 28;
-				const int MAFrameBufferInfo_greenBits = 32;
-				const int MAFrameBufferInfo_blueMask = 36;
-				const int MAFrameBufferInfo_blueShift = 40;
-				const int MAFrameBufferInfo_blueBits = 44;
-				const int MAFrameBufferInfo_width = 48;
-				const int MAFrameBufferInfo_height = 52;
-				const int MAFrameBufferInfo_pitch = 56;
-				const int MAFrameBufferInfo_supportsGfxSyscalls = 60;
-
 				Memory mem = core.GetDataMemory();
-				mem.WriteInt32(info + MAFrameBufferInfo_sizeInBytes, mBackBuffer.PixelWidth * mBackBuffer.PixelHeight * 4);
-				mem.WriteInt32(info + MAFrameBufferInfo_bytesPerPixel, 4);
-				mem.WriteInt32(info + MAFrameBufferInfo_bitsPerPixel, 32);
-				mem.WriteUInt32(info + MAFrameBufferInfo_redMask, 0x00ff0000);
-				mem.WriteUInt32(info + MAFrameBufferInfo_redBits, 8);
-				mem.WriteUInt32(info + MAFrameBufferInfo_redShift, 16);
-				mem.WriteUInt32(info + MAFrameBufferInfo_greenMask, 0x0000ff00);
-				mem.WriteUInt32(info + MAFrameBufferInfo_greenBits, 8);
-				mem.WriteUInt32(info + MAFrameBufferInfo_greenShift, 8);
-				mem.WriteUInt32(info + MAFrameBufferInfo_blueMask, 0x000000ff);
-				mem.WriteUInt32(info + MAFrameBufferInfo_blueBits, 8);
-				mem.WriteUInt32(info + MAFrameBufferInfo_blueShift, 0);
-				mem.WriteInt32(info + MAFrameBufferInfo_width, mBackBuffer.PixelWidth);
-				mem.WriteInt32(info + MAFrameBufferInfo_height, mBackBuffer.PixelHeight);
-				mem.WriteInt32(info + MAFrameBufferInfo_pitch, mBackBuffer.PixelWidth * 4);
-				mem.WriteUInt32(info + MAFrameBufferInfo_supportsGfxSyscalls, 0);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.sizeInBytes, mBackBuffer.PixelWidth * mBackBuffer.PixelHeight * 4);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.bytesPerPixel, 4);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.bitsPerPixel, 32);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.redMask, 0x00ff0000);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.redBits, 8);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.redShift, 16);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.greenMask, 0x0000ff00);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.greenBits, 8);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.greenShift, 8);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.blueMask, 0x000000ff);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.blueBits, 8);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.blueShift, 0);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.width, mBackBuffer.PixelWidth);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.height, mBackBuffer.PixelHeight);
+				mem.WriteInt32(info + MoSync.Struct.MAFrameBufferInfo.pitch, mBackBuffer.PixelWidth * 4);
+				mem.WriteUInt32(info + MoSync.Struct.MAFrameBufferInfo.supportsGfxSyscalls, 0);
 				return 1;
 			};
 		}

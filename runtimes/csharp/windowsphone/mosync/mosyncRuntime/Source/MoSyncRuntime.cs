@@ -145,20 +145,14 @@ namespace MoSync
                 return (T)ret;
         }
 
-        // this could probably be generated
-        const int MAEvent_type = 0;
-        const int MAEvent_point_x = 4;
-        const int MAEvent_point_y = 8;
-        const int MAEvent_point_touchId = 12;
-
         private void MouseLeftButtonDown(Object sender, MouseButtonEventArgs e)
         {
             PhoneApplicationFrame mainPage = (PhoneApplicationFrame)Application.Current.RootVisual;
             Memory mem = new Memory(4 * 4);
-            mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_PRESSED);
-            mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
-            mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
-            mem.WriteInt32(MAEvent_point_touchId, 0);
+            mem.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_POINTER_PRESSED);
+			mem.WriteInt32(MoSync.Struct.MAEvent.point.x, (int)e.GetPosition(mainPage).X); // x
+			mem.WriteInt32(MoSync.Struct.MAEvent.point.y, (int)e.GetPosition(mainPage).Y); // y
+			mem.WriteInt32(MoSync.Struct.MAEvent.touchId, 0);
             PostEvent(new Event(mem));
         }
 
@@ -166,10 +160,10 @@ namespace MoSync
         {
             PhoneApplicationFrame mainPage = (PhoneApplicationFrame)Application.Current.RootVisual;
             Memory mem = new Memory(4 * 4);
-            mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_RELEASED);
-            mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
-            mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
-            mem.WriteInt32(MAEvent_point_touchId, 0);
+            mem.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_POINTER_RELEASED);
+            mem.WriteInt32(MoSync.Struct.MAEvent.point.x, (int)e.GetPosition(mainPage).X); // x
+            mem.WriteInt32(MoSync.Struct.MAEvent.point.y, (int)e.GetPosition(mainPage).Y); // y
+            mem.WriteInt32(MoSync.Struct.MAEvent.touchId, 0);
             PostEvent(new Event(mem));
         }
 
@@ -177,10 +171,10 @@ namespace MoSync
         {
             PhoneApplicationFrame mainPage = (PhoneApplicationFrame)Application.Current.RootVisual;
             Memory mem = new Memory(4 * 4);
-            mem.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_POINTER_DRAGGED);
-            mem.WriteInt32(MAEvent_point_x, (int)e.GetPosition(mainPage).X); // x
-            mem.WriteInt32(MAEvent_point_y, (int)e.GetPosition(mainPage).Y); // y
-            mem.WriteInt32(MAEvent_point_touchId, 0);
+            mem.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_POINTER_DRAGGED);
+            mem.WriteInt32(MoSync.Struct.MAEvent.point.x, (int)e.GetPosition(mainPage).X); // x
+            mem.WriteInt32(MoSync.Struct.MAEvent.point.y, (int)e.GetPosition(mainPage).Y); // y
+            mem.WriteInt32(MoSync.Struct.MAEvent.touchId, 0);
             PostEvent(new Event(mem));
         }
 
@@ -215,7 +209,6 @@ namespace MoSync
                 {
                     lock (mEvents)
                     {
-                        const int MAEvent_data = 4;
                         Event evt = mEvents[0];
                         Memory eventData = evt.GetEventData();
                         mEvents.RemoveAt(0);
@@ -224,7 +217,7 @@ namespace MoSync
                         {
                             mCore.GetDataMemory().WriteMemoryAtAddress(mCore.GetCustomEventDataPointer(),
                                 customEventData, 0, customEventData.GetSizeInBytes());
-                            eventData.WriteInt32(MAEvent_data, mCore.GetCustomEventDataPointer());
+                            eventData.WriteInt32(MoSync.Struct.MAEvent.data, mCore.GetCustomEventDataPointer());
                         }
                         mCore.GetDataMemory().WriteMemoryAtAddress(ptr, eventData, 0, eventData.GetSizeInBytes());
                     }

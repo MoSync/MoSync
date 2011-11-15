@@ -17,13 +17,6 @@ namespace MoSync
 {
     public class CommunicationsModule : IIoctlModule, ISyscallModule
     {
-        // event struct offsets
-        // todo: generate from IDL.
-        const int MAEvent_type = 0;
-        const int MAConnEventData_handle = 4;
-        const int MAConnEventData_opType = 8;
-        const int MAConnEventData_result = 12;
-
         delegate void ResultHandler(int handle, int connOp, int result);
 
         // represents either a Socket or a WebRequest
@@ -313,10 +306,10 @@ namespace MoSync
             mResultHandler = delegate(int handle, int connOp, int result)
             {
                 Memory evt = new Memory(4 * 4);
-                evt.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_CONN);
-                evt.WriteInt32(MAConnEventData_handle, handle);
-                evt.WriteInt32(MAConnEventData_opType, connOp);
-                evt.WriteInt32(MAConnEventData_result, result);
+                evt.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_CONN);
+                evt.WriteInt32(MoSync.Struct.MAConnEventData.handle, handle);
+				evt.WriteInt32(MoSync.Struct.MAConnEventData.opType, connOp);
+				evt.WriteInt32(MoSync.Struct.MAConnEventData.result, result);
                 runtime.PostEvent(new Event(evt));
             };
 

@@ -517,7 +517,7 @@ static void outputCSharpIoctlArgTyped(ofstream& maapiFile, int& argindex, const 
 	}
 }
 
-const Struct* findStruct(const Interface& inf, const string& name) {
+static const Struct* findStruct(const Interface& inf, const string& name) {
 	for(size_t i=0; i<inf.structs.size(); i++) {
 		const Struct& s(inf.structs[i]);
 		if(s.name == name)
@@ -614,7 +614,7 @@ static const char* escapeCSharp(const string& name) {
 	};
 	for(size_t i=0; i<(sizeof(cSharpKeywords)/sizeof(char*)); i++) {
 		const char* key = cSharpKeywords[i];
-		if(strncmp(key, name.c_str(), strlen(key)-1) == 0)
+		if(strncmp(key, name.c_str(), MAX(strlen(key)-1, name.size())) == 0)
 			return key;
 	}
 	return name.c_str();
@@ -632,7 +632,6 @@ static size_t streamCSharpOffsets(ostream& stream, const Interface& inf,
 			size_t memberSize;
 			const Struct* subStruct = findStruct(inf, pod.type);
 			if(isAnonStructName(pod.type)) {
-				const Struct* as(findStruct(inf, pod.type));
 				if(!subStruct)
 					throwException("Struct not found: " + pod.type);
 				memberSize = streamCSharpOffsets(stream, inf, *subStruct, offset, indent);
