@@ -17,13 +17,6 @@ namespace MoSync
 {
     public class CommunicationsModule : IIoctlModule, ISyscallModule
     {
-        // event struct offsets
-        // todo: generate from IDL.
-        const int MAEvent_type = 0;
-        const int MAConnEventData_handle = 4;
-        const int MAConnEventData_opType = 8;
-        const int MAConnEventData_result = 12;
-
         delegate void ResultHandler(int handle, int connOp, int result);
 
         // represents either a Socket or a WebRequest
@@ -77,7 +70,7 @@ namespace MoSync
             }
 
             private SocketAsyncEventArgs setupRW(byte[] buffer, int offset, int size,
-                 ResultHandler rh)
+                 ResultHandler rh, int connop)
             {
                 SocketAsyncEventArgs socketEventArg = new SocketAsyncEventArgs();
 
@@ -92,13 +85,16 @@ namespace MoSync
                         int result;
                         if (e.SocketError == SocketError.Success)
                         {
-                            result = e.BytesTransferred;
+                            if (connop == MoSync.Constants.CONNOP_WRITE)
+                                result = 1;
+                            else
+                                result = e.BytesTransferred;
                         }
                         else
                         {
                             result = MoSync.Constants.CONNERR_GENERIC;
                         }
-                        rh(mHandle, MoSync.Constants.CONNOP_READ, result);
+                        rh(mHandle, connop, result);
                     });
                 return socketEventArg;
             }
@@ -106,12 +102,12 @@ namespace MoSync
             public override void recv(byte[] buffer, int offset, int size,
                  ResultHandler rh)
             {
-                mSocket.ReceiveAsync(setupRW(buffer, offset, size, rh));
+                mSocket.ReceiveAsync(setupRW(buffer, offset, size, rh, MoSync.Constants.CONNOP_READ));
             }
             public override void write(byte[] buffer, int offset, int size,
                  ResultHandler rh)
             {
-                mSocket.SendAsync(setupRW(buffer, offset, size, rh));
+                mSocket.SendAsync(setupRW(buffer, offset, size, rh, MoSync.Constants.CONNOP_WRITE));
             }
 
             // immediate
@@ -266,6 +262,8 @@ namespace MoSync
             // immediate
             public override void close()
             {
+                if (mStream != null)
+                    mStream.Close();
                 if (mResponse != null)
                     mResponse.Close();
                 if (mRequest != null)
@@ -297,19 +295,29 @@ namespace MoSync
 
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
+            runtime.RegisterCleaner(delegate()
+            {
+                foreach(KeyValuePair<int, Connection> p in mConnections) {
+                    p.Value.close();
+                }
+                mConnections.Clear();
+            });
+
             mResultHandler = delegate(int handle, int connOp, int result)
             {
                 Memory evt = new Memory(4 * 4);
-                evt.WriteInt32(MAEvent_type, MoSync.Constants.EVENT_TYPE_CONN);
-                evt.WriteInt32(MAConnEventData_handle, handle);
-                evt.WriteInt32(MAConnEventData_opType, connOp);
-                evt.WriteInt32(MAConnEventData_result, result);
+                evt.WriteInt32(MoSync.Struct.MAEvent.type, MoSync.Constants.EVENT_TYPE_CONN);
+                evt.WriteInt32(MoSync.Struct.MAConnEventData.handle, handle);
+				evt.WriteInt32(MoSync.Struct.MAConnEventData.opType, connOp);
+				evt.WriteInt32(MoSync.Struct.MAConnEventData.result, result);
                 runtime.PostEvent(new Event(evt));
             };
 
             syscalls.maConnect = delegate(int _url)
             {
                 String url = core.GetDataMemory().ReadStringAtAddress(_url);
+                if (url.StartsWith("btspp"))
+                    return MoSync.Constants.CONNERR_UNAVAILABLE;
                 Uri uri = new Uri(url);
                 Connection c;
                 if (uri.Scheme.Equals("socket"))
@@ -339,6 +347,8 @@ namespace MoSync
 
             syscalls.maConnGetAddr = delegate(int _conn, int _addr)
             {
+                if (_conn == 0) // todo: local address
+                    return -1;
                 Connection c = mConnections[_conn];
                 return c.getAddr(_addr);
             };
@@ -411,7 +421,8 @@ namespace MoSync
                 WebRequestConnection c = (WebRequestConnection)mConnections[_conn];
                 String key = core.GetDataMemory().ReadStringAtAddress(_key);
                 String value = core.GetDataMemory().ReadStringAtAddress(_value);
-                c.setRequestHeader(key, value);
+                if (value.Length > 0)
+                    c.setRequestHeader(key, value);
             };
 
             syscalls.maHttpGetResponseHeader = delegate(int _conn, int _key, int _buffer, int _bufSize)

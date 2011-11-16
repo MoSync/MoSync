@@ -506,7 +506,6 @@ namespace MoSync
                             imm32 = ((imm32 = mProgramMemory[mIp++]) > 127) ?
                                 mConstantPool[(((imm32 & 127) << 8) | mProgramMemory[mIp++])] :
                                 mConstantPool[imm32];
-                            //mRegisters[rd] = mDataMemory.ReadUInt16(mRegisters[rs] + imm32);
                             mRegisters[rd] = mDataMemory.ReadInt16(mRegisters[rs] + imm32);
                         }
                         break;

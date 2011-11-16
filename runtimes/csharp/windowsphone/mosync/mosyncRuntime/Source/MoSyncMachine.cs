@@ -24,9 +24,11 @@ namespace MoSync
         private MoSync.Core mCore;
         private MoSync.Runtime mRuntime;
         private Thread mThread = null;
+        private readonly bool mRebuild;
 
-        public Machine()
+        private Machine(bool rebuild)
         {
+            mRebuild = rebuild;
             // This tells the util subsystem which thread is the main thread.
             // Never make an instance of Program from another thread.
             MoSync.Util.InitStartupThread();
@@ -80,7 +82,6 @@ namespace MoSync
             mThread.Join();
         }
 
-#if !REBUILD
         private void LoadProgram(Stream s)
         {
             Core core = new MoSync.CoreInterpreted(s);
@@ -118,15 +119,18 @@ namespace MoSync
 
             Core core = new MoSync.CoreInterpreted(programResInfo.Stream);
             Init(core, resources);
+            programResInfo.Stream.Close();
+            if (resources != null)
+                resources.Close();
         }
 
         public static Machine CreateInterpretedMachine(String programFile, String resourceFile)
         {
-            MoSync.Machine mosyncMachine = new MoSync.Machine();
+            MoSync.Machine mosyncMachine = new MoSync.Machine(false);
             mosyncMachine.LoadProgram(programFile, resourceFile);
             return mosyncMachine;
         }
-#else
+
         public static Machine CreateNativeMachine(Core core, String resourceFile)
         {
             StreamResourceInfo resourcesResInfo = Application.GetResourceStream(new Uri(resourceFile, UriKind.Relative));
@@ -134,31 +138,36 @@ namespace MoSync
             if (resourcesResInfo != null && resourcesResInfo.Stream != null)
                 resources = resourcesResInfo.Stream;
 
-            MoSync.Machine mosyncMachine = new MoSync.Machine();
+            MoSync.Machine mosyncMachine = new MoSync.Machine(true);
             mosyncMachine.Init(core, resources);
+            if (resources != null)
+                resources.Close();
             return mosyncMachine;
         }
-#endif  //REBUILD
 
         private void CoreRun()
         {
-#if !REBUILD
+            if(mRebuild) {
+                mCore.Run();
+                mRuntime.RunCleaners();
+                return;
+            }
             while (true)
             {
                 try
                 {
-#endif
                     mCore.Run();
-#if !REBUILD
                 }
                 catch (MoSync.Util.ExitException e)
                 {
+                    mRuntime.RunCleaners();
                     if (mLoadProgramStream != null)
                     {
                         Stream s = mLoadProgramStream;
                         mLoadProgramStream = null;
                         Util.RunActionOnMainThreadSync(
                             delegate() { LoadProgram(s); });
+                        s.Close();
                         continue;
                     }
                     else if (mLoadProgramFlag)
@@ -174,11 +183,9 @@ namespace MoSync
                     }
                 }
             }
-#endif
         }
 
 
-#if !REBUILD
         private static Stream mLoadProgramStream = null;
         private static bool mLoadProgramFlag = false;
 
@@ -189,6 +196,5 @@ namespace MoSync
             mLoadProgramStream = comboStream;
             mLoadProgramFlag |= reloadFlag;
         }
-#endif
     }
 }
