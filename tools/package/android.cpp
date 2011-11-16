@@ -40,6 +40,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 static void writePermission(ostream& stream, bool flag, const char* nativePerm);
 static void writeNFCDirectives(ostream& stream, const SETTINGS& s);
 static void writeNFCResource(ostream& stream, const SETTINGS& s);
+static void writeC2DMReceiver(ostream& stream, const string& packageName);
 static string packageNameToByteCodeName(const string& packageName);
 
 void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
@@ -290,6 +291,7 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t\tandroid:theme=\"@android:style/Theme.NoTitleBar.FullScreen\">\n"
 		<<"\t\t\tandroid:configChanges=\"orientation|keyboard|keyboardHidden\">\n"
 		<<"\t\t</activity>\n"
+		;
     //if (ri.androidVersion >= 8) {
 		writeC2DMReceiver(file, packageName);
 	//}
@@ -329,7 +331,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	if (!s.permissions) {
 		return;
 	}
-
+	string packageName = string(s.androidPackage);
 	set<string> permissionSet = set<string>();
 	parsePermissions(permissionSet, s.permissions);
 
@@ -378,12 +380,13 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	// Only add this for android 2.2 and higher. Permission for Google C2DM Service for push notifications.
 	if (ri.androidVersion >= 8)
 	{
-		if (isPermissionSet(permissionSet, C2DM_MESSAGE)
+		if (isPermissionSet(permissionSet, C2DM_MESSAGE))
 		{
-			stream <<"\t<permission android:name=\""<<packageName<<.permission.<<C2DM_MESSAGE<<"\" />\n"
+			stream <<"\t<permission android:name=\"com.mosync.java.android.permission.C2D_MESSAGE\"\n";
 			stream <<"\t\tandroid:protectionLevel=\"signature\" />\n";
 		}
-		writePermission(stream, isPermissionSet(permissionSet, C2DM_MESSAGE), packageName + ".permission.C2D_MESSAGE");
+		string permMessage = packageName + ".permission.C2D_MESSAGE";
+		writePermission(stream, isPermissionSet(permissionSet, C2DM_MESSAGE), permMessage.c_str());
 		//writePermission(stream, true, packageName + ".permission.C2D_MESSAGE");
 		writePermission(stream, isPermissionSet(permissionSet, C2DM_RECEIVE), "com.google.android.c2dm.permission.RECEIVE");
 		//writePermission(stream,true, "com.google.android.c2dm.permission.RECEIVE");
