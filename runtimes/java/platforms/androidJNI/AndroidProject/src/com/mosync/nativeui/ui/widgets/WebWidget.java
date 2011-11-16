@@ -480,7 +480,9 @@ public class WebWidget extends Widget
 				// Store the message in a data object.
 				String messageString = url;
 				int urlData = MoSyncThread.getInstance().createDataObject(
-					messageString.getBytes());
+					0, // Zero makes the system create a new placeholder.
+					messageString.getBytes() // Data content.
+					);
 
 				// Post message.
 				EventQueue.getDefault().postWidgetEvent(

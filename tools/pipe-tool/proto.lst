@@ -26,6 +26,7 @@ CodeSearch.c
 CodeRebuild.c
 JavaRebuild.c
 CppRebuild.c
+CsRebuild.c
 BrewRebuild.c
 Peeper.c
 JavaRebuild.c
