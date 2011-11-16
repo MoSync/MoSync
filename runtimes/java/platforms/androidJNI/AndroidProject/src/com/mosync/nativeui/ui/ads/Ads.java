@@ -28,6 +28,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_ADS_SIZE_RECT;
 
 /**
  * Class for handling ads.
+ * @author emma tresanszki
  */
 public class Ads
 {
@@ -67,11 +68,11 @@ public class Ads
 
 	/**
 	 * Create an ad with the specified type and publisher id.
-	 * @param activity
-	 * @param handle
-	 * @param bannerSize
+	 * @param activity The app activity.
+	 * @param handle The ad internal handle.
+	 * @param bannerSize The banner size.
 	 * @param publisherID
-	 * @return
+	 * @return the result code.
 	 */
 	public AdWidget createAd(Activity activity, int handle, int bannerSize, String publisherID)
 	{

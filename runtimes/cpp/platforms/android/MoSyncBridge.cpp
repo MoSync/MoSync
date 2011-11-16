@@ -358,15 +358,20 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.localNotificationHandle = intArray[1];
 	}
-	/*else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION_DEVICE_TOKEN)
+	else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION)
 	{
-		// Get the registration ID from Google C2DM.
+		// Just signals that we have a result to the request,
+		// and the result can be taken with maNotificationPushGetRegistration.
+	}
+	else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION_UNREGISTRATION)
+	{
+		// Just signals that we've unregistered. No data needed.
 	}
 	else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION)
 	{
 		event.pushNotificationHandle = intArray[1];
 		// TODO struct
-	}*/
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*

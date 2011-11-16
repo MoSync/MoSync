@@ -3,10 +3,10 @@ package com.mosync.internal.android;
 import android.app.Activity;
 import android.content.Context;
 
-import com.mosync.java.android.LocalNotificationsManager;
-import com.mosync.java.android.PushNotificationsManager;
-//import com.mosync.internal.android.notifications.LocalNotificationsManager;
-//import com.mosync.internal.android.notifications.PushNotificationsManager;
+import com.mosync.internal.android.notifications.LocalNotificationsManager;
+import com.mosync.internal.android.notifications.PushNotificationsManager;
+
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
 
 /**
  * Wrapper for Notifications Syscalls to avoid cluttering the MoSyncSyscalls file.
@@ -35,41 +35,41 @@ class MoSyncNotifications {
 	/**
 	 * Notifications related methods
 	 */
-	int maNotificationCreate(Context appContext)
+	int maNotificationLocalCreate(Context appContext)
 	{
-		return mLocalNotificationsManager.maNotificationCreate(appContext);
+		return mLocalNotificationsManager.create(appContext);
 	}
 
-	int maNotificationDestroy(int handle, Activity activity)
+	int maNotificationLocalDestroy(int handle, Activity activity)
 	{
-		return mLocalNotificationsManager.maNotificationDestroy(handle, activity);
+		return mLocalNotificationsManager.destroy(handle, activity);
 	}
 
-	int maNotificationSetProperty(
+	int maNotificationLocalSetProperty(
 			int handle,
 			String property,
 			String value)
 	{
-		return mLocalNotificationsManager.maNotificationSetProperty(handle, property, value);
+		return mLocalNotificationsManager.setProperty(handle, property, value);
 	}
 
-	int maNotificationGetProperty(
+	int maNotificationLocalGetProperty(
 			int handle,
 			String property,
 			int memBuffer,
 			int memBufferSize)
 	{
-		return mLocalNotificationsManager.maNotificationGetProperty(handle, property, memBuffer, memBufferSize);
+		return mLocalNotificationsManager.getProperty(handle, property, memBuffer, memBufferSize);
 	}
 
-	int maNotificationLocalRegister(int handle, Context appContext)
+	int maNotificationLocalSchedule(int handle, Context appContext)
 	{
-		return mLocalNotificationsManager.maNotificationLocalRegister(handle, appContext);
+		return mLocalNotificationsManager.schedule(handle, appContext);
 	}
 
-	int maNotificationLocalUnregister(int handle)
+	int maNotificationLocalUnschedule(int handle)
 	{
-		return mLocalNotificationsManager.maNotificationLocalUnregister(handle);
+		return mLocalNotificationsManager.unschedule(handle);
 	}
 
 	int maNotificationPushRegister(String accountID)
@@ -77,11 +77,33 @@ class MoSyncNotifications {
 		return mPushNotificationManager.register(accountID);
 	}
 
+	int maNotificationPushGetRegistration(int buf, int bufSize)
+	{
+		return mPushNotificationManager.getRegistrationData(buf, bufSize);
+	}
+
 	int maNotificationPushUnregister()
 	{
 		return mPushNotificationManager.unregister();
 	}
 
+	int maNotificationPushGetData(int pushNotificationHandle, int allertMessage,
+			int allertMessageSize)
+	{
+		return mPushNotificationManager.getPushData(pushNotificationHandle, allertMessage, allertMessageSize);
+	}
+
+	int maNotificationPushSetTickerText(String text)
+	{
+		mPushNotificationManager.setTickerText(text);
+		return MA_NOTIFICATION_RES_OK;
+	}
+
+	int maNotificationPushSetMessageTitle(String title)
+	{
+		mPushNotificationManager.setMessageTitle(title);
+		return MA_NOTIFICATION_RES_OK;
+	}
 	/************************ Class members ************************/
 	/**
 	 * The MoSync thread object.

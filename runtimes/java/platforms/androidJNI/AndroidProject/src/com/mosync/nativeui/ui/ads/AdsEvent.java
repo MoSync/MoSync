@@ -2,7 +2,7 @@ package com.mosync.nativeui.ui.ads;
 
 /**
  * Event sent by a banner widget.
- *
+ * @author emma tresanszki
  */
 public class AdsEvent
 {

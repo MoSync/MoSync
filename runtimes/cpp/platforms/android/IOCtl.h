@@ -854,17 +854,17 @@ namespace Base
 
 	int _maAdsBannerGetProperty(int memStart, MAHandle bannerHandle, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNotificationCreate(JNIEnv* jNIEnv, jobject jThis);
+	int _maNotificationLocalCreate(JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNotificationDestroy(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis);
+	int _maNotificationLocalDestroy(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNotificationSetProperty(MAHandle notificationHandle, const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis);
+	int _maNotificationLocalSetProperty(MAHandle notificationHandle, const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNotificationGetProperty(int memStart, MAHandle notificationHandle, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis);
+	int _maNotificationLocalGetProperty(int memStart, MAHandle notificationHandle, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNotificationLocalRegister(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis);
+	int _maNotificationLocalSchedule(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNotificationLocalUnregister(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis);
+	int _maNotificationLocalUnschedule(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNotificationPushRegister(MAHandle pushNotificationTypes, const char* accountID, JNIEnv* jNIEnv, jobject jThis);
 
@@ -873,6 +873,10 @@ namespace Base
 	int _maNotificationPushUnregister(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNotificationPushGetData(MAHandle pushNotificationHandle, int type, int memStart, int messagePointer,int messageSize, int soundFilePointer, int soundFileSize, int badgeIcon, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationPushSetTickerText(const char* text, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maNotificationPushSetMessageTitle(const char* text, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis);
 

@@ -2973,10 +2973,10 @@ namespace Base
 		return result;
 	}
 
-	int _maNotificationCreate(JNIEnv* jNIEnv, jobject jThis)
+	int _maNotificationLocalCreate(JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationCreate", "()I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationLocalCreate", "()I");
 		if (methodID == 0)
 		{
 			return 0;
@@ -2989,10 +2989,10 @@ namespace Base
 		return result;
 	}
 
-	int _maNotificationDestroy(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis)
+	int _maNotificationLocalDestroy(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationDestroy", "(I)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationLocalDestroy", "(I)I");
 		if (methodID == 0)
 		{
 			return 0;
@@ -3005,12 +3005,12 @@ namespace Base
 		return result;
 	}
 
-	int _maNotificationSetProperty(MAHandle notificationHandle, const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis)
+	int _maNotificationLocalSetProperty(MAHandle notificationHandle, const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrProp = jNIEnv->NewStringUTF(property);
 		jstring jstrValue = jNIEnv->NewStringUTF(value);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationSetProperty", "(ILjava/lang/String;Ljava/lang/String;)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationLocalSetProperty", "(ILjava/lang/String;Ljava/lang/String;)I");
 		if (methodID == 0)
 		{
 			return 0;
@@ -3025,11 +3025,11 @@ namespace Base
 		return result;
 	}
 
-	int _maNotificationGetProperty(int memStart, MAHandle notificationHandle, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis)
+	int _maNotificationLocalGetProperty(int memStart, MAHandle notificationHandle, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrProp = jNIEnv->NewStringUTF(property);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationGetProperty", "(ILjava/lang/String;II)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationLocalGetProperty", "(ILjava/lang/String;II)I");
 		if (methodID == 0)
 		{
 			return 0;
@@ -3043,10 +3043,10 @@ namespace Base
 		return result;
 	}
 
-	int _maNotificationLocalRegister(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis)
+	int _maNotificationLocalSchedule(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationLocalRegister", "(I)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationLocalSchedule", "(I)I");
 		if (methodID == 0)
 		{
 			return 0;
@@ -3059,10 +3059,10 @@ namespace Base
 		return result;
 	}
 
-	int _maNotificationLocalUnregister(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis)
+	int _maNotificationLocalUnschedule(MAHandle notificationHandle, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationLocalUnregister", "(I)I");
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationLocalUnschedule", "(I)I");
 		if (methodID == 0)
 		{
 			return 0;
@@ -3137,6 +3137,42 @@ namespace Base
 		int result = jNIEnv->CallIntMethod(jThis, methodID, pushNotificationHandle, type, messagePointer - memStart, messageSize, soundFilePointer, soundFileSize, badgeIcon);
 
 		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
+	int _maNotificationPushSetTickerText(const char* text, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrText = jNIEnv->NewStringUTF(text);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushSetTickerText", "(Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrText);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrText);
+
+		return result;
+	}
+
+	int _maNotificationPushSetMessageTitle(const char* text, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jstring jstrText = jNIEnv->NewStringUTF(text);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushSetMessageTitle", "(Ljava/lang/String;)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, jstrText);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrText);
 
 		return result;
 	}

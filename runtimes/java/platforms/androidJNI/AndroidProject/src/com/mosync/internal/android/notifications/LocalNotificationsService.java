@@ -15,7 +15,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 02111-1307, USA.
 */
 
-package com.mosync.java.android;
+package com.mosync.internal.android.notifications;
 
 import java.util.GregorianCalendar;
 import java.util.Timer;
@@ -34,6 +34,8 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
 
 /**
  * The service that displays the status bar notification.
@@ -43,6 +45,7 @@ import android.util.Log;
  * a notification icon that can be used to launch the application.
  * Start service in foreground with notification icon.
  * Start foreground is only available on Android API level 5 and above.
+ * @author emma tresanszki
  */
 public class LocalNotificationsService extends Service
 {
@@ -50,6 +53,8 @@ public class LocalNotificationsService extends Service
 	/**
 	 * Create an empty notification object.
 	 * Set it's properties via maNotificationSetProperty calls.
+	 * @param appContext application's context.
+	 * @return notification's unique Id.
 	 */
 	public int createNotification(Context appContext)
 	{
@@ -64,10 +69,8 @@ public class LocalNotificationsService extends Service
 
 	/**
 	 * Call this method to start the service and display a notification icon.
-	 * @param context
-	 * @param notificationId
-	 * @param notificationTitle
-	 * @param notificationText
+	 * @param context Application's context.
+	 * @param notificationHandle The local notification handle.
 	 */
 	public void startService(
 		Context context,
@@ -93,6 +96,7 @@ public class LocalNotificationsService extends Service
 
 	/**
 	 * Called by the Android runtime to stop the service.
+	 * @return MA_NOTIFICATION_RES_OK or MA_NOTIFICATION_RES_ERROR.
 	 */
 	public int stopService()
 	{
@@ -103,13 +107,15 @@ public class LocalNotificationsService extends Service
 			Log.i("@@@MoSync", "MoSyncService.stopService - stopSelf");
 			sMe.stopSelf();
 			sMe = null;
-			return 0;
+			return MA_NOTIFICATION_RES_OK;
 		}
-		return -1;
+		return MA_NOTIFICATION_RES_ERROR;
 	}
 
 	/**
 	 * Called by the Android runtime to remove the notification icon.
+	 * @param notificationId Notification's unique Id.
+	 * @param activity
 	 */
 	public static void removeServiceNotification(
 		int notificationId,
@@ -337,25 +343,25 @@ public class LocalNotificationsService extends Service
  * Android versions below level 5.
  * @author Mikael Kindborg
  */
-/*class StartForegroundWrapper
+class StartForegroundWrapper
 {
 	public void startForeground(
 		Service service, int id, Notification notification)
 	{
 		service.startForeground(id, notification);
 	}
-}*/
+}
 
 /**
  * Wrapper class for startForeground, which is not available on
  * Android versions below level 5.
  * @author Mikael Kindborg
  */
-/*class StopForegroundWrapper
+class StopForegroundWrapper
 {
 	public void stopForegroundAndRemoveNotificationIcon(Service service)
 	{
 		// The true argument removes the notification icon.
 		service.stopForeground(true);
 	}
-}*/
+}

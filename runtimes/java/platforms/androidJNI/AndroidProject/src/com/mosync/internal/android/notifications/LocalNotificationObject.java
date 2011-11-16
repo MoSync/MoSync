@@ -1,4 +1,4 @@
-package com.mosync.java.android;
+package com.mosync.internal.android.notifications;
 
 import java.util.Date;
 
@@ -11,12 +11,20 @@ import android.app.Notification;
 import android.net.Uri;
 import android.util.Log;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_TICKER_TEXT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_CONTENT_TITLE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_SOUND;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_PLAY_SOUND;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_CONTENT_BODY;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME;
+
 /**
  * An instance of a notification.
  * Holds required information like: text,title,id, flags.
  * When the user registers it to the NotificationManager
  * the Notification instance is created with current timebase.
- *
+ * @author emma tresanszki
  */
 public class LocalNotificationObject {
 
@@ -32,18 +40,21 @@ public class LocalNotificationObject {
 		int ledOffMS;
 	}
 
+	public final String NOTIFICATION_INVALID_PROPERTY_NAME = "Invalid property name";
+
 	/*
 	 * Create an empty notification object.
+	 * @param icon The notification icon, typically
+	 * the app icon.
 	 */
 	public LocalNotificationObject(int icon)
 	{
-//		mNotification = new Notification(icon, "", when);
 		mNotification = new Notification();
 		mNotification.icon = icon;
 	}
 
 	/**
-	 * Trigger the notification.
+	 * Trigger the local notification.
 	 */
 	public void trigger()
 	{
@@ -59,34 +70,40 @@ public class LocalNotificationObject {
 		mNotification.defaults |= Notification.DEFAULT_LIGHTS;
 	}
 
+	/**
+	 * Set a specific property on the notification.
+	 * @param property The property name.
+	 * @param value The property value.
+	 * @return result code.
+	 */
 	public int setProperty(String name, String value)
 		throws PropertyConversionException
-	{/*
-		if ( name.equals(MA_NOTIFICATION_TICKER_TEXT) )
+	{
+		if ( name.equals(MA_NOTIFICATION_LOCAL_TICKER_TEXT) )
 		{
 			mTickerText = value;
-		}
-		else if ( name.equals(MA_NOTIFICATION_FIRE_DATE) )
+		}/*
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_FIRE_DATE) )
 		{
 			// COnvert value
 //			mFireDate = value;
-		}
-		else if ( name.equals(MA_NOTIFICATION_CONTENT_BODY) )
+		}*/
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_CONTENT_BODY) )
 		{
 			mText = value;
 		}
-		else if ( name.equals(MA_NOTIFICATION_CONTENT_TITLE) )
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_CONTENT_TITLE) )
 		{
 			mTitle = value;
 		}
-		else if ( name.equals(MA_NOTIFICATION_PLAY_SOUND) )
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_PLAY_SOUND) )
 		{
-			mSound = BooleanConverter.convert(value);
-		}
-		else if ( name.equals(MA_NOTIFICATION_SOUND) )
+//			mSound = BooleanConverter.convert(value);
+		}/*
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_SOUND) )
 		{
 			//SOUND_DEFAULT
-			if ( value.equals(MA_NOTIFICATION_SOUND_DEFAULT) )
+			if ( value.equals(MA_NOTIFICATION_LOCAL_SOUND_DEFAULT) )
 			{
 				mNotification.defaults |= Notification.DEFAULT_SOUND;
 			}
@@ -95,17 +112,17 @@ public class LocalNotificationObject {
 				mNotification.sound = Uri.parse("file:///sdcard/notification/ringer.mp3");
 			}
 		}
-		else if ( name.equals(MA_NOTIFICATION_FLAG_AUTO_CANCEL) )
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_FLAG_AUTO_CANCEL) )
 		{
 			// Ignore the value.
 			mNotification.defaults = Notification.FLAG_AUTO_CANCEL;
 		}
-		else if ( name.equals(MA_NOTIFICATION_VIBRATE) )
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_VIBRATE) )
 		{
-			if ( value.equals(MA_NOTIFICATION_VIBRATE_DEFAULT) )
+			if ( value.equals(MA_NOTIFICATION_LOCAL_VIBRATE_DEFAULT) )
 			{
 				mNotification.defaults |= Notification.DEFAULT_VIBRATE;
-			}
+			}/*
 			else
 			{
 				// The long array defines the alternating pattern for the length of vibration
@@ -148,9 +165,9 @@ public class LocalNotificationObject {
 				mNotification.vibrate = sequence;
 			}
 		}
-		else if ( name.equals(MA_NOTIFICATION_FLASH_LIGHTS) )
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS) )
 		{
-			if ( value.equals(MA_NOTIFICATION_FLASH_LIGHTS_DEFAULT) )
+			if ( value.equals(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_DEFAULT) )
 				{
 					mNotification.defaults = Notification.DEFAULT_LIGHTS;
 				}
@@ -163,71 +180,99 @@ public class LocalNotificationObject {
 				mNotification.flags |= Notification.FLAG_SHOW_LIGHTS;
 			}
 		}
-		else if ( name.equals(MA_NOTIFICATION_FLAG) )
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_FLAG) )
 		{
-			if ( value.equals(MA_NOTIFICATION_FLAG_INSISTENT) )
+			if ( value.equals(MA_NOTIFICATION_LOCAL_FLAG_INSISTENT) )
 			{
 				mNotification.flags = Notification.FLAG_INSISTENT;
 			}
-			else if ( value.equals(MA_NOTIFICATION_FLAG_AUTO_CANCEL) )
+			else if ( value.equals(MA_NOTIFICATION_LOCAL_FLAG_AUTO_CANCEL) )
 			{
 				mNotification.flags = Notification.FLAG_AUTO_CANCEL;
 			}
 			else
 			{
-//				return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
+				return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
 			}
-		}
+		}*/
 		else
 		{
-//			return MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME;
+			return MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME;
 		}
-		*/
-		return 0;
-//		return MA_NOTIFICATION_RES_OK;
+		return MA_NOTIFICATION_RES_OK;
 	}
 
+	/**
+	 * Gets the value of a given property.
+	 * @param name The name of the property.
+	 * @return the property of the notification. If no property is found,
+	 *         a string describing the error is returned.
+	 * @throws PropertyConversionException
+	 */
 	public String getProperty(String name)
 		throws PropertyConversionException
-	{/*
-		if( name.equals( MA_NOTIFICATION_CONTENT_BODY ) )
+	{
+		if( name.equals( MA_NOTIFICATION_LOCAL_CONTENT_BODY ) )
 		{
 			return mText;
 		}
-		else if ( name.equals(MA_NOTIFICATION_CONTENT_TITLE) )
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_CONTENT_TITLE) )
 		{
 			return mTitle;
-		}*/
+		}
 		Log.e("@@MoSync", "maNotificationGetProperty Invalid property name " + name);
-//		return MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME;
-		return "";
+		return NOTIFICATION_INVALID_PROPERTY_NAME;
 	}
 
+	/**
+	 * Gets the notification object.
+	 * @return The notification.
+	 */
 	public Notification getNotification()
 	{
 		return mNotification;
 	}
 
+	/**
+	 * Get the content body of the notification.
+	 * @return The body.
+	 */
 	public String getText()
 	{
 		return mText;
 	}
 
+	/**
+	 * Get the content title of the notification.
+	 * @return The title.
+	 */
 	public String getTitle()
 	{
 		return mTitle;
 	}
 
+	/**
+	 * Sets the unique Id of the notification.
+	 * @param id The id.
+	 */
 	public void setId(final int id)
 	{
 		mId = id;
 	}
 
+	/**
+	 * Get the unique Id of the notification.
+	 * @return the Id.
+	 */
 	public int getId()
 	{
 		return mId;
 	}
 
+	/**
+	 * Get the fire date of the notification.
+	 * @return the fire date.
+	 */
 	public int getFireDate()
 	{
 		return mFireDate;

@@ -2547,17 +2547,17 @@ return 0; \
 			return _maAdsBannerGetProperty((int)gCore->mem_ds, _ad, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
 		}
 
-		case maIOCtl_maNotificationCreate:
-			return _maNotificationCreate(mJNIEnv, mJThis);
+		case maIOCtl_maNotificationLocalCreate:
+			return _maNotificationLocalCreate(mJNIEnv, mJThis);
 
-		case maIOCtl_maNotificationDestroy:
-			return _maNotificationDestroy(a, mJNIEnv, mJThis);
+		case maIOCtl_maNotificationLocalDestroy:
+			return _maNotificationLocalDestroy(a, mJNIEnv, mJThis);
 
-		case maIOCtl_maNotificationSetProperty:
+		case maIOCtl_maNotificationLocalSetProperty:
 		{
 			const char *_prop = SYSCALL_THIS->GetValidatedStr(b);
 			const char *_value = SYSCALL_THIS->GetValidatedStr(c);
-			return _maNotificationSetProperty(
+			return _maNotificationLocalSetProperty(
 					a,
 					_prop,
 					_value,
@@ -2565,7 +2565,7 @@ return 0; \
 					mJThis);
 		}
 
-		case maIOCtl_maNotificationGetProperty:
+		case maIOCtl_maNotificationLocalGetProperty:
 		{
 			int _notification = a;
 			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
@@ -2576,14 +2576,14 @@ return 0; \
 				c,
 				_valueBufferSize * sizeof(char));
 
-			return _maNotificationGetProperty((int)gCore->mem_ds, _notification, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+			return _maNotificationLocalGetProperty((int)gCore->mem_ds, _notification, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
 		}
 
-		case maIOCtl_maNotificationLocalRegister:
-			return  _maNotificationLocalRegister(a, mJNIEnv, mJThis);
+		case maIOCtl_maNotificationLocalSchedule:
+			return  _maNotificationLocalSchedule(a, mJNIEnv, mJThis);
 
-		case maIOCtl_maNotificationLocalUnregister:
-			return _maNotificationLocalUnregister(a, mJNIEnv, mJThis);
+		case maIOCtl_maNotificationLocalUnschedule:
+			return _maNotificationLocalUnschedule(a, mJNIEnv, mJThis);
 
 		case maIOCtl_maNotificationPushRegister:
 		{
@@ -2619,8 +2619,8 @@ return 0; \
 				_valueBufferSize * sizeof(char));
 
 			return _maNotificationPushGetData(
-				(int)gCore->mem_ds,
 				a,
+				(int)gCore->mem_ds,
 				data->type,
 				_valueBuffer,
 				_valueBufferSize,
@@ -2630,6 +2630,24 @@ return 0; \
 				data->badgeIcon,
 				mJNIEnv,
 				mJThis);
+		}
+
+		case maIOCtl_maNotificationPushSetTickerText:
+		{
+			const char *_text = SYSCALL_THIS->GetValidatedStr(a);
+			return _maNotificationPushSetTickerText(
+					_text,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maNotificationPushSetMessageTitle:
+		{
+			const char *_text = SYSCALL_THIS->GetValidatedStr(a);
+			return _maNotificationPushSetMessageTitle(
+					_text,
+					mJNIEnv,
+					mJThis);
 		}
 
 		case maIOCtl_maSyscallPanicsEnable:

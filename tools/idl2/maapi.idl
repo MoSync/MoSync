@@ -1395,15 +1395,26 @@ interface MAAPI {
 		LOCAL_NOTIFICATION = 43;
 
 		/**
-		* \brief Send when the application successfully registers with Apple Push Service.
-		* Platform: iOS only.
+		* \brief Send when the application receives a registration result.
+		* The application tries to register to Apple Push Service, or Google C2DM Service,
+		* and the received result ( either success, either fail) is sending this event.
+		* After this event is received, get the result of the registration request by
+		* calling maNotificationPushGetRegistration.
 		*/
-		PUSH_NOTIFICATION_DEVICE_TOKEN = 44;
+		PUSH_NOTIFICATION_REGISTRATION = 44;
+
+		/**
+		* \brief Send when the application receives an unregistration result.
+		* The application unregistered from Apple Push Service, or Google C2DM Service,
+		* and will not receive anymore push messages.
+		* Platform: Android only.
+		*/
+		PUSH_NOTIFICATION_UNREGISTRATION = 45;
 
 		/**
 		* \brief Send when the application receives a push notification.
 		*/
-		PUSH_NOTIFICATION = 45;
+		PUSH_NOTIFICATION = 46;
 		}
 
 	/**
@@ -8675,7 +8686,7 @@ group NotificationAPI "Notification API" {
 			INVALID_STRING_BUFFER_SIZE = -5;
 
 			/**
-			* @brief Indicates that notifications are not supporeted on current platform.
+			* @brief Indicates that notifications are not supported on current platform.
 			*/
 			UNSUPPORTED = -6;
 
@@ -8692,12 +8703,18 @@ group NotificationAPI "Notification API" {
 			NOT_REGISTERED = -8;
 
 			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccessful because
+			* the application did not finish processing a previous registration request.
+			*/
+			REGISTRATION_IN_PROGRESS = -9;
+
+			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the
 			* device can't read the response, or there was a 500/503 from the server that can be retried later.
 			* The application should use exponential back off and retry.
 			* Platform: Android only.
 			*/
-			REGISTRATION_SERVICE_NOT_AVAILABLE = -9;
+			REGISTRATION_SERVICE_NOT_AVAILABLE = -10;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because there is no
@@ -8705,14 +8722,14 @@ group NotificationAPI "Notification API" {
 			* The application should ask the user to open the account manager and add a Google account.
 			* Platform: Android only.
 			*/
-			REGISTRATION_ACCOUNT_MISSING = -10;
+			REGISTRATION_ACCOUNT_MISSING = -11;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the password was bad.
 			* The application should ask the user to enter his/her password, and let user retry manually later.
 			* Platform: Android only.
 			*/
-			REGISTRATION_AUTHENTICATION_FAILED = -11;
+			REGISTRATION_AUTHENTICATION_FAILED = -12;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the user has too many
@@ -8720,36 +8737,36 @@ group NotificationAPI "Notification API" {
 			* The application should tell the user to uninstall some other applications, let user retry manually.
 			* Platform: Android only.
 			*/
-			REGISTRATION_TOO_MANY_REGISTRATIONS = -12;
+			REGISTRATION_TOO_MANY_REGISTRATIONS = -13;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the sender account
 			* is not recognized.
 			* Platform: Android only.
 			*/
-			REGISTRATION_INVALID_SENDER = -13;
+			REGISTRATION_INVALID_SENDER = -14;
 
 			/**
 			* @brief  Indicates that the call to maNotificationPushRegister was unsuccesfull because of incorrect
 			* phone registration with Google. This phone doesn't currently support C2DM.
 			* Platform: Android only.
 			*/
-			REGISTRATION_PHONE_REGISTRATION_ERROR = -14;
+			REGISTRATION_PHONE_REGISTRATION_ERROR = -15;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushGetRegistration needs a larger buffer.
 			*/
-			REGISTRATION_MESSAGE_BUF_TOO_SMALL = -15;
+			REGISTRATION_MESSAGE_BUF_TOO_SMALL = -16;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushGetRegistration occured before trying to register.
 			*/
-			REGISTRATION_NOT_CALLED = -16;
+			REGISTRATION_NOT_CALLED = -17;
 
 			/**
 			* @brief Indicates that the call to an notification syscall was unsuccessful.
 			*/
-			ERROR = -17;
+			ERROR = -18;
 		}
 	} // end of Notification Result Codes
 
@@ -8775,8 +8792,8 @@ group NotificationAPI "Notification API" {
 		}
 	} // end of Notification Push Types
 
-	group NotificationProperties "Notification Properties" {
-		constset MAString MA_NOTIFICATION_ {
+	group LocalNotificationProperties "Local Notification Properties" {
+		constset MAString MA_NOTIFICATION_LOCAL_ {
 			/**
 			* @brief Set the number displayed on the application's icon badge.
 			* Platform: iOS.
@@ -8788,7 +8805,7 @@ group NotificationAPI "Notification API" {
 			* @par Example
 			* \code
 			*   char buf[256];
-			*	maAdsBannerGetProperty(MA_NOTIFICATION_BADGE_NUMBER, buf);
+			*	maNotificationLocalGetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_BADGE_NUMBER, buf);
 			* \endcode
 			*/
 			BADGE_NUMBER = "badge_number";
@@ -8805,7 +8822,7 @@ group NotificationAPI "Notification API" {
 			* @par Example
 			* \code
 			*   char buf[256];
-			*	maAdsBannerGetProperty(MA_NOTIFICATION_FIRE_DATE, buf);
+			*	maNotificationLocalGetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FIRE_DATE, buf);
 			* \endcode
 			*/
 			FIRE_DATE = "fire_date";
@@ -8820,7 +8837,7 @@ group NotificationAPI "Notification API" {
 			*
 			* @par Example
 			* \code
-			*	maAdsBannerSetProperty(MA_NOTIFICATION_ALERT_BODY, "Did you forget something?");
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_ALERT_BODY, "Did you forget something?");
 			* \endcode
 			*/
 			CONTENT_BODY = "content_body";
@@ -8829,13 +8846,13 @@ group NotificationAPI "Notification API" {
 			* @brief Set the title of the action button or slider.
 			* Platform: iOS.
 			*
-			* @validvalue an string.
+			* @validvalue a string.
 			*
 			* @setandget
 			*
 			* @par Example
 			* \code
-			*	maAdsBannerSetProperty(MA_NOTIFICATION_ALERT_ACTION, "Show");
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_ALERT_ACTION, "Show");
 			* \endcode
 			*/
 			ALERT_ACTION = "alert_action";
@@ -8850,7 +8867,7 @@ group NotificationAPI "Notification API" {
 			*
 			* @par Example
 			* \code
-			*	maAdsBannerSetProperty(MA_NOTIFICATION_PLAY_SOUND, "true");
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_PLAY_SOUND, "true");
 			* \endcode
 			*/
 			PLAY_SOUND = "play_sound";
@@ -8865,10 +8882,40 @@ group NotificationAPI "Notification API" {
 			*
 			* @par Example
 			* \code
-			*	maAdsBannerSetProperty(MA_NOTIFICATION_SOUND_PATH, "....");
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_SOUND_PATH, "....");
 			* \endcode
 			*/
 			SOUND = "sound";
+
+			/**
+			* @brief Set the title that goes in the expanded entry of the notification.
+			* Platform: Android.
+			*
+			* @validvalue a string.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*     maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_CONTENT_TITLE, "My message");
+			* \endcode
+			*/
+			CONTENT_TITLE = "contentTitle";
+
+			/**
+			* @brief The text that flows by in the status bar when the notification first activates.
+			* Platform: Android.
+			*
+			* @validvalue a string.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*     maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_TICKER_TEXT, "You got new message");
+			* \endcode
+			*/
+			TICKER_TEXT = "tickerText";
 		}
 	} // end of Notification Properties
 
@@ -8914,7 +8961,7 @@ group NotificationAPI "Notification API" {
 		*
 		* \returns A handle to a local notification object.
 		*/
-		int maNotificationCreate();
+		int maNotificationLocalCreate();
 
 		/**
 		* \brief Destroy a local notification object.
@@ -8922,10 +8969,10 @@ group NotificationAPI "Notification API" {
 		* \param bannerHandle Handle to a local notification object.
 		*
 		* \returns One of the next constants:
-		* - MA_NOTIFICATION_RES_OK if no error occurred.
-		* - MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
 		*/
-		int maNotificationDestroy(in MAHandle notificationHandle);
+		int maNotificationLocalDestroy(in MAHandle notificationHandle);
 
 		/**
 		* \brief Set a notification property.
@@ -8935,12 +8982,12 @@ group NotificationAPI "Notification API" {
 		* \param value The value that will be assigned to the property.
 		*
 		* \returns One of the next result codes:
-		* - MA_NOTIFICATION_RES_OK if no error occurred.
-		* - MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
-		* - MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
-		* - MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
+		* - #MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
 		*/
-		int maNotificationSetProperty(in MAHandle notificationHandle, in MAString property, in MAString value);
+		int maNotificationLocalSetProperty(in MAHandle notificationHandle, in MAString property, in MAString value);
 
 		/**
 		* \brief Retrieves a specified property from the given notification object.
@@ -8951,12 +8998,12 @@ group NotificationAPI "Notification API" {
 		* \param bufSize Size of the buffer.
 		*
 		* \returns One of the next result codes:
-		* - MA_NOTIFICATION_RES_OK if no error occurred.
-		* - MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
-		* - MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
-		* - MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
+		* - #MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
 		*/
-		int maNotificationGetProperty(in MAHandle notificationHandle, in MAString property,
+		int maNotificationLocalGetProperty(in MAHandle notificationHandle, in MAString property,
 								   out MAString value range("bufSize"), in int bufSize);
 
 		/**
@@ -8965,10 +9012,10 @@ group NotificationAPI "Notification API" {
 		* \param notificationHandle Handle to a local notification object.
 		*
 		* \returns One of the next constants:
-		* - MA_NOTIFICATION_RES_OK if no error occurred.
-		* - MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
 		*/
-		int maNotificationLocalRegister(in MAHandle notificationHandle);
+		int maNotificationLocalSchedule(in MAHandle notificationHandle);
 
 		/**
 		* \brief Cancels the delivery of the specified scheduled local notification.
@@ -8978,10 +9025,10 @@ group NotificationAPI "Notification API" {
 		* \param bannerHandle Handle to a local notification object.
 		*
 		* \returns One of the next constants:
-		* - MA_NOTIFICATION_RES_OK if no error occurred.
-		* - MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
 		*/
-		int maNotificationLocalUnregister(in MAHandle notificationHandle);
+		int maNotificationLocalUnschedule(in MAHandle notificationHandle);
 
 		/**
 		* \brief Registers the current application for receiving push notifications.
@@ -9001,8 +9048,8 @@ group NotificationAPI "Notification API" {
 		* On iOS platform this param is ignored.
 		*
 		* \returns One of the next constants:
-		* - MA_NOTIFICATION_RES_OK if no error occurred.
-		* - MA_NOTIFICATION_ALREADY_REGISTERED if the application is already registered for
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_ALREADY_REGISTERED if the application is already registered for
 		* receiving push notifications.
 		*/
 		int maNotificationPushRegister(in MAHandle pushNotificationTypes, in MAString accountID);
@@ -9011,27 +9058,27 @@ group NotificationAPI "Notification API" {
 		* \brief Unregister application for push notifications.
 		*
 		* \returns One of the next constants:
-		* - MA_NOTIFICATION_RES_OK if no error occurred.
-		* - MA_NOTIFICATION_NOT_REGISTERED if the application was not registered for receiving
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_NOT_REGISTERED if the application was not registered for receiving
 		* push notification.
 		*/
 		int maNotificationPushUnregister();
 
 		/**
-		* \brief Gets the latest registration response.
+		* \brief Gets the latest push notification registration response.
 		* \param registrationMesssage The registrationID if the registration was successfull, or the error messsage otherwise.
 		* \response  One of the next constants:
-		* - MA_NOTIFICATION_RES_OK if the application registered successfully.
-		* - MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED
-		* - MA_NOTIFICATION_RES_REGISTRATION_SERVICE_NOT_AVAILABLE
-		* - MA_NOTIFICATION_RES_REGISTRATION_ACCOUNT_MISSING
-		* - MA_NOTIFICATION_RES_REGISTRATION_AUTHENTICATION_FAILED
-		* - MA_NOTIFICATION_RES_REGISTRATION_TOO_MANY_REGISTRATIONS
-		* - MA_NOTIFICATION_RES_REGISTRATION_INVALID_SENDER
-		* - MA_NOTIFICATION_RES_REGISTRATION_PHONE_REGISTRATION_ERROR
-		* - MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL
+		* - #MA_NOTIFICATION_RES_OK if the application registered successfully.
+		* - #MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED
+		* - #MA_NOTIFICATION_RES_REGISTRATION_SERVICE_NOT_AVAILABLE
+		* - #MA_NOTIFICATION_RES_REGISTRATION_ACCOUNT_MISSING
+		* - #MA_NOTIFICATION_RES_REGISTRATION_AUTHENTICATION_FAILED
+		* - #MA_NOTIFICATION_RES_REGISTRATION_TOO_MANY_REGISTRATIONS
+		* - #MA_NOTIFICATION_RES_REGISTRATION_INVALID_SENDER
+		* - #MA_NOTIFICATION_RES_REGISTRATION_PHONE_REGISTRATION_ERROR
+		* - #MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL
 		*/
-		int maNotificationPushGetRegistration(out MAAddress registrationMesssage, out int registrationMessageSize);
+		int maNotificationPushGetRegistration(out MAAddress registrationMesssage, in int registrationMessageSize);
 
 		/**
 		* \brief Fills pushNotificationData struct with the values for a given push notification.
@@ -9040,9 +9087,9 @@ group NotificationAPI "Notification API" {
 		* \param pushNotificationData A struct that will contain the values for a given push notification.
 		*
 		* \return One of the next contants:
-		* - MA_NOTIFICATION_RES_OK if no error occurred.
-		* - MA_NOTIFICATION_RES_INVALID_HANDLE if the pushNotificationHandle is invalid.
-		* - MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if at least one of the buffers from
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the pushNotificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if at least one of the buffers from
 		* pushNotificationData are too small.
 		*/
 		int maNotificationPushGetData(in MAHandle pushNotificationHandle,
@@ -9064,6 +9111,32 @@ group NotificationAPI "Notification API" {
 		*\return The number displayed as the badge of the application.
 		*/
 		int maNotificationGetIconBadge();
+
+		/**
+		* \brief Set the ticker text in the notification status bar for incoming push notifications.
+		* Provide also the accountID so that the same ticker text can be assigned for all incoming
+		* push notifications received from a certain 3rd party service.
+		* This call does not alter already received notifications.
+		* Platform: Android only.
+		* \param tickerText The text that flows by in the status bar when the notification first activates.
+		* \return One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_ERROR.
+		*/
+		int maNotificationPushSetTickerText(in MAString tickerText);
+
+		/**
+		* \brief Set the  message title in the notification area for incoming push notifications.
+		* Provide the accountID so that the same message title will be applied to all incoming
+		* push notifications received from a certain 3rd party service.
+		* This call does not alter already received notifications.
+		* Platform: Android only.
+		* \param messageTitle The title that goes in the expanded entry of the notification.
+		* \return One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_ERROR.
+		*/
+		int maNotificationPushSetMessageTitle(in MAString messageTitle);
 	}//End of Notification Functions
 } // End of Notification API
 

@@ -2888,7 +2888,7 @@ public class MoSyncThread extends Thread
 
 	/**
 	 * Display a notification.
-	 * @deprecared use maNotificationCreate() instead.
+	 * @deprecated use maNotificationCreate() instead.
 	 * @param type
 	 * @param id
 	 * @param title
@@ -2920,7 +2920,7 @@ public class MoSyncThread extends Thread
 	 * Depending of whether this is a NOTIFICATION_TYPE_APPLICATION_LAUNCHER
 	 * or a regular notification we either stop the service or remove the
 	 * notification.
-	 * @depredated use maNotificationDestroy() instead.
+	 * @deprecated use maNotificationDestroy() instead.
 	 * @param notificationId
 	 * @return
 	 */
@@ -2947,14 +2947,14 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
-	 * Create a notification.
+	 * Create a local notification.
 	 * @return a handle to a new local notification object, or
 	 * MA_NOTIFICATION_RES_UNSUPPORTED if the notifications are not supported on current system..
 	 */
-	int maNotificationCreate()
+	int maNotificationLocalCreate()
 	{
-		//Log.i("MoSync", "maNotificationCreate");
-		return mMoSyncNotifications.maNotificationCreate(mContext);
+		//Log.i("MoSync", "maNotificationLocalCreate");
+		return mMoSyncNotifications.maNotificationLocalCreate(mContext);
 	}
 
 	/**
@@ -2962,9 +2962,9 @@ public class MoSyncThread extends Thread
 	 * @param handle Handle to a local notification object.
 	 * @return MA_NOTIFICATION_RES_OK, or MA_NOTIFICATION_RES_INVALID_HANDLE.
 	 */
-	int maNotificationDestroy(int handle)
+	int maNotificationLocalDestroy(int handle)
 	{
-		return mMoSyncNotifications.maNotificationDestroy(handle, mContext);
+		return mMoSyncNotifications.maNotificationLocalDestroy(handle, mContext);
 	}
 
 	/**
@@ -2974,9 +2974,9 @@ public class MoSyncThread extends Thread
 	 * @param propertyValue
 	 * @return
 	 */
-	int maNotificationSetProperty(int handle, String propertyName, String propertyValue)
+	int maNotificationLocalSetProperty(int handle, String propertyName, String propertyValue)
 	{
-		return mMoSyncNotifications.maNotificationSetProperty(handle, propertyName, propertyValue);
+		return mMoSyncNotifications.maNotificationLocalSetProperty(handle, propertyName, propertyValue);
 	}
 
 	/**
@@ -2986,9 +2986,9 @@ public class MoSyncThread extends Thread
 	 * @param propertyValue
 	 * @return
 	 */
-	int maNotificationGetProperty(int handle, String propertyName, int memBuffer, int memBufferSize)
+	int maNotificationLocalGetProperty(int handle, String propertyName, int memBuffer, int memBufferSize)
 	{
-		return mMoSyncNotifications.maNotificationGetProperty(handle, propertyName, memBuffer, memBufferSize);
+		return mMoSyncNotifications.maNotificationLocalGetProperty(handle, propertyName, memBuffer, memBufferSize);
 	}
 
 	/**
@@ -2997,9 +2997,9 @@ public class MoSyncThread extends Thread
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred,
 	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
 	 */
-	int maNotificationLocalRegister(int handle)
+	int maNotificationLocalSchedule(int handle)
 	{
-		return mMoSyncNotifications.maNotificationLocalRegister(handle, mContext.getApplicationContext());
+		return mMoSyncNotifications.maNotificationLocalSchedule(handle, mContext.getApplicationContext());
 	}
 
 	/**
@@ -3008,15 +3008,16 @@ public class MoSyncThread extends Thread
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred,
 	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
 	 */
-	int maNotificationLocalUnregister(int handle)
+	int maNotificationLocalUnschedule(int handle)
 	{
-		return mMoSyncNotifications.maNotificationLocalUnregister(handle);
+		return mMoSyncNotifications.maNotificationLocalUnschedule(handle);
 	}
 
 	/**
 	 * Registers the current application for receiving push notifications for C2DM server.
 	 * @param pushNotificationTypes ignored on Android.
-	 * @param accountID The email address of an account set up by the application's developer.
+	 * @param accountID Is the ID of the account authorized to send messages to the application,
+	 * typically the email address of an account set up by the application's developer.
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred.
      * MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already registered for receiving push notifications.
 	 */
@@ -3053,20 +3054,46 @@ public class MoSyncThread extends Thread
 	 * - MA_NOTIFICATION_RES_REGISTRATION_INVALID_SENDER
 	 * - MA_NOTIFICATION_RES_REGISTRATION_PHONE_REGISTRATION_ERROR
 	 */
-	int maNotificationPushGetRegistration()
+	int maNotificationPushGetRegistration(int buf, int bufSize)
 	{
-		return -1;
+		return mMoSyncNotifications.maNotificationPushGetRegistration(buf, bufSize);
 	}
 
 	/**
-	 * Gets the latest registration response.
-	 * @param MAHandle
-	 * @return
+	 * Get info about for a given push notification.
+	 * @param handle The push notification handle.
+	 * @param type Ignored
+	 * @param allertMessage The offset in which to copy the notification payload.
+	 * @param allertMessageSize The size of the notification payload.
+	 * @return  One of the next constants:
+	 *  - MA_NOTIFICATION_RES_OK
+	 *  - MA_NOTIFICATION_RES_INVALID_HANDLE
+	 *  - MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE
 	 */
-	int maNotificationPushGetData(int pushNotificationHandle, int type, int allertMessage,
+	int maNotificationPushGetData(int handle, int type, int allertMessage,
 			int allertMessageSize, int soundFilename, int soundFilenameSize, int bagdeIcon)
 	{
-		return -1;
+		return mMoSyncNotifications.maNotificationPushGetData(handle,allertMessage, allertMessageSize);
+	}
+
+	/**
+	 * Set the ticker text in the notification status bar for incoming push notifications.
+	 * @param tickerText The text that flows by in the status bar when the notification first activates.
+	 * @return MA_NOTIFICATION_RES_OK, MA_NOTIFICATION_RES_ERROR.
+	 */
+	int maNotificationPushSetTickerText(String tickerText)
+	{
+		return mMoSyncNotifications.maNotificationPushSetTickerText(tickerText);
+	}
+
+	/**
+	 * Set the  message title in the notification area for incoming push notifications.
+	 * @param title The title that goes in the expanded entry of the notification.
+	 * @return MA_NOTIFICATION_RES_OK, MA_NOTIFICATION_RES_ERROR.
+	 */
+	int maNotificationPushSetMessageTitle(String title)
+	{
+		return mMoSyncNotifications.maNotificationPushSetMessageTitle(title);
 	}
 
 	/**

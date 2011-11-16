@@ -1,9 +1,10 @@
-package com.mosync.java.android;
+package com.mosync.internal.android.notifications;
 
 /**
  * Holds info about the latest registration that was attempted.
+ * In case of success the registrationID is provided,
+ * otherwise an error code and an error message.
  * @author emma tresanszki
- *
  */
 public class PushRegistrationData {
 
@@ -27,10 +28,29 @@ public class PushRegistrationData {
 	/**
 	 * Constructor.
 	 */
-	PushRegistrationData(){}
+	public PushRegistrationData(){}
 
+	/**
+	 * Set the error code based on the message.
+	 * @param errMessage
+	 */
+	public void setErrorCode(String errMessage)
+	{
+		int code = 0;
+
+
+		errorCode = code;
+	}
+
+	/**
+	 * True if a registration request was made.
+	 */
 	public Boolean registrationAttempted = false;
 
+	/**
+	 * True if a registration request is in progress.
+	 * ( Has not received server's response yet).
+	 */
 	public Boolean registrationInProgress = false;
 
 	/**

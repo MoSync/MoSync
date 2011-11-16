@@ -285,7 +285,15 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t<activity android:name=\".TextBox\"\n"
 		<<"\t\t\tandroid:label=\"@string/app_name\">\n"
 		<<"\t\t</activity>\n"
-		<<"\t</application>\n"
+		// Enable Google AdMob Ads.
+		<<"\t\t<activity android:name=\"com.google.ads.AdActivity\"\n"
+		<<"\t\t\tandroid:theme=\"@android:style/Theme.NoTitleBar.FullScreen\">\n"
+		<<"\t\t\tandroid:configChanges=\"orientation|keyboard|keyboardHidden\">\n"
+		<<"\t\t</activity>\n"
+    //if (ri.androidVersion >= 8) {
+		writeC2DMReceiver(file, packageName);
+	//}
+	file <<"\t</application>\n"
 		<<"\t<uses-sdk android:minSdkVersion=\""<<ri.androidVersion<<"\" />\n"
 		;
 
@@ -366,6 +374,20 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 
 	// Always add this.
 	writePermission(stream, true, "android.permission.READ_PHONE_STATE");
+
+	// Only add this for android 2.2 and higher. Permission for Google C2DM Service for push notifications.
+	if (ri.androidVersion >= 8)
+	{
+		if (isPermissionSet(permissionSet, C2DM_MESSAGE)
+		{
+			stream <<"\t<permission android:name=\""<<packageName<<.permission.<<C2DM_MESSAGE<<"\" />\n"
+			stream <<"\t\tandroid:protectionLevel=\"signature\" />\n";
+		}
+		writePermission(stream, isPermissionSet(permissionSet, C2DM_MESSAGE), packageName + ".permission.C2D_MESSAGE");
+		//writePermission(stream, true, packageName + ".permission.C2D_MESSAGE");
+		writePermission(stream, isPermissionSet(permissionSet, C2DM_RECEIVE), "com.google.android.c2dm.permission.RECEIVE");
+		//writePermission(stream,true, "com.google.android.c2dm.permission.RECEIVE");
+	}
 }
 static void writePermission(ostream& stream, bool flag, const char* nativePerm) {
 	if (flag) {
@@ -407,6 +429,22 @@ static void writeNFCResource(ostream& stream, const SETTINGS& s) {
 	}
 	stream << "</resources>";
 	//TODO: delete nfcInfo;
+}
+
+static void writeC2DMReceiver(ostream& stream, const string& packageName) {
+	// Receiver for messages and registration responses.
+	stream << "\t\t<service android:name=\".C2DMReceiver\" />\n";
+	stream << "\t\t<receiver android:name=\"com.google.android.c2dm.C2DMBroadcastReceiver\"\n";
+	stream << "\t\t\tandroid:permission=\"com.google.android.c2dm.permission.SEND\">\n";
+	stream << "\t\t\t<intent-filter>\n";
+	stream << "\t\t\t\t<action android:name=\"com.google.android.c2dm.intent.RECEIVE\" />\n";
+	stream << "\t\t\t\t<category android:name=\"<<packageName<<\" />\n";
+	stream << "\t\t\t</intent-filter>\n";
+	stream << "\t\t\t<intent-filter>\n";
+	stream << "\t\t\t\t<action android:name=\"com.google.android.c2dm.intent.REGISTRATION\" />\n";
+	stream << "\t\t\t\t<category android:name=\"<<packageName<<\" />\n";
+	stream << "\t\t\t</intent-filter>\n";
+	stream << "\t\t</receiver>\n";
 }
 
 static void writeMain(const char* filename, const SETTINGS& s, const RuntimeInfo& ri) {

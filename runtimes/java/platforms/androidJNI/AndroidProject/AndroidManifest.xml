@@ -82,7 +82,7 @@
     <permission android:name="com.mosync.java.android.permission.C2D_MESSAGE"
 	android:protectionLevel="signature" />
 	<uses-permission android:name="com.mosync.java.android.permission.C2D_MESSAGE" />
-	<uses-permission android:name="com.mosync.java.android.permission.RECEIVE" />
+	<uses-permission android:name="com.google.android.c2dm.permission.RECEIVE" />
 	<supports-screens
 			android:largeScreens="true"
 			android:normalScreens="true"

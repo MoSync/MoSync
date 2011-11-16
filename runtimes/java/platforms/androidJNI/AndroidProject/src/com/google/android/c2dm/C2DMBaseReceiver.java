@@ -2,8 +2,6 @@ package com.google.android.c2dm;
 
 import java.io.IOException;
 
-//import com.mosync.internal.android.notifications.PushNotificationsManager;
-
 import android.app.AlarmManager;
 import android.app.IntentService;
 import android.app.PendingIntent;

@@ -1,69 +1,64 @@
 package com.mosync.java.android;
 
 import com.google.android.c2dm.C2DMBaseReceiver;
-import com.mosync.java.android.MoSync;
+import com.mosync.internal.android.notifications.PushNotificationsManager;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-//import com.google.android.c2dm.C2DMBaseReceiver;
-
+/**
+ * C2DM receiver for registration and push messages from Google.
+ * @author emma tresanszki
+ *
+ */
 public class C2DMReceiver extends C2DMBaseReceiver {
 	public C2DMReceiver() {
 		// Email address currently not used by the C2DM Messaging framework
-//		super("dummy@google.com");
-		super("emma.tresanszki@mobilesorcery.com");
+		super("dummy@google.com");
 	}
 
+	/**
+	 * Called when a registration token has been received.
+	 */
 	@Override
 	public void onRegistered(Context context, String registrationId)
 			throws java.io.IOException {
-		Log.e("C2DM", "Registration ID arrived: Fantastic!!!");
-		Log.e("C2DM", registrationId);
+		Log.e("@@MoSync", "C2DM Registration success");
+		// Notify the manager of this event.
+		PushNotificationsManager manager = PushNotificationsManager.getRef();
+		manager.registrationReady(registrationId);
 	};
 
+	/**
+	 * Called when a cloud message has been received.
+	 */
 	@Override
 	protected void onMessage(Context context, Intent intent) {
-		Log.e("C2DM", "Message: Fantastic!!!");
-
-		// create new PushNotificationObject that holds the payload.
-
-		// TODO raise event
-
-		// Launch local notification
+		Log.e("@@MoSync", "C2DM Message received");
+		// Create new PushNotificationObject that holds the payload.
 		final String message = intent.getStringExtra("payload");
-		createNotification(context, message);
+		PushNotificationsManager manager = PushNotificationsManager.getRef();
+		manager.messageReceived(message);
 	}
 
+	/**
+	 * Called on registration error.
+	 */
 	@Override
 	public void onError(Context context, String errorId) {
-		Log.e("C2DM", "Error occured!!!");
+		Log.e("@@MoSync", " C2DM Registration error");
+		PushNotificationsManager manager = PushNotificationsManager.getRef();
+		manager.registrationFail(errorId);
 	}
 
-	public void createNotification(Context context, String message)
-	{
-		NotificationManager notificationManager = (NotificationManager) context
-				.getSystemService(Context.NOTIFICATION_SERVICE);
-		int icon = getResources().getIdentifier(
-				"icon",
-				"drawable",
-				getPackageName());
-		Notification notification = new Notification(icon,
-				"MoSync Notification", System.currentTimeMillis());
-		// Hide the notification after its selected
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
-
-		Intent intent = new Intent(context, MoSync.class);
-		intent.putExtra("payload", message);
-		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0,
-				intent, 0);
-		notification.setLatestEventInfo(context, "Message received",
-				message, pendingIntent);
-		notificationManager.notify(0, notification);
+	/**
+	 * Called when the device has been unregistered.
+	 */
+	@Override
+	public void onUnregistered(Context context) {
+		Log.e("@@MoSync", "C2Dm Unregistered");
+		PushNotificationsManager manager = PushNotificationsManager.getRef();
+		manager.unregistered();
 	}
-
 }

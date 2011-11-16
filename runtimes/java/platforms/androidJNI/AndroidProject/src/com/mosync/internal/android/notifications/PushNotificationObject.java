@@ -1,4 +1,4 @@
-package com.mosync.java.android;
+package com.mosync.internal.android.notifications;
 
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -13,42 +13,53 @@ import com.mosync.java.android.MoSync;
  * A push notification is created when C2DMBaseReceiver is processing a new message.
  * Holds required information like: content body, content title, icon, ticker text.
  * The content body can consist of the message payload, or a user defined string.
+ * @author emma tresanszki
  */
-public class PushNotificationObject {
+public class PushNotificationObject
+{
+
+	public PushNotificationObject() {}
 
 	/**
 	 * Constructor.
 	 */
-	PushNotificationObject(String payload, int icon)
+	PushNotificationObject(String payload, int icon, String tickerText, String title)
 	{
 		mMessage = payload;
 		mIcon = icon;
+		mTicker = tickerText;
+		mMessageTitle = title;
 	}
 
 	/**
 	 * Triggers a notification for the message received from C2DM.
+	 * Apply the ticker text, message payload and title.
+	 * @param context Application's context.
 	 */
 	public void triggerNotification(Context context)
 	{
 		NotificationManager notificationManager = (NotificationManager) context
 		.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification notification = new Notification(mIcon,
-		"MoSync Notification", System.currentTimeMillis());
-		// Hide the notification after its selected
-		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+		Notification notification = new Notification(
+				mIcon, mTicker, System.currentTimeMillis());
+		// Hide the notification after its selected.
+//		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
 		Intent intent = new Intent(context, MoSync.class);
 		intent.putExtra("payload", mMessage);
 		PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, 0);
-		notification.setLatestEventInfo(context, "Message received", mMessage, pendingIntent);
+		notification.setLatestEventInfo(context, mMessageTitle, mMessage, pendingIntent);
 		notificationManager.notify(0, notification);
 	}
 
+	/**
+	 * Get the message payload.
+	 * @return The payload.
+	 */
 	String getMessage()
 	{
 		return mMessage;
 	}
-
 
 	/************************ Class members ************************/
 	/**
@@ -66,5 +77,9 @@ public class PushNotificationObject {
 	 */
 	private String mTicker = null;
 
+	/**
+	 * The icon of the notification,
+	 * typically the app icon.
+	 */
 	private int mIcon;
 }

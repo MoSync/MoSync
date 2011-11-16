@@ -46,7 +46,6 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ADS_BANNER;
  * The Ad is like a widget, but it has it's specific properties only,
  * accessed via setAdBannerProperty/getAdBannerProperty calls.
  * @author emma tresanszki
- *
  */
 public class AdWidget extends Widget implements AdListener
 {
