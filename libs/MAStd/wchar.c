@@ -134,14 +134,33 @@ size_t wcstombs(char* dst, const wchar_t* src, size_t count) {
 			srcp++;
 		} while(res > 0);
 		dpos++;	// terminating NULL.
-	} else while(dpos + MB_CUR_MAX < count) {
-		int res = wctomb(dst + dpos, *srcp);
-		if(res < 0)
-			return res;
-		if(res == 0)
-			break;
-		srcp++;
-		dpos += res;
+	} else {
+		// write directly to dst while enough space remains.
+		while(dpos + MB_CUR_MAX < count) {
+			int res = wctomb(dst + dpos, *srcp);
+			if(res < 0)
+				return res;
+			if(res == 0)
+				return dpos;
+			srcp++;
+			dpos += res;
+		}
+		// slower method when very little space remains.
+		while(dpos < count) {
+			char buf[MB_CUR_MAX];
+			int bytes = wctomb(buf, *srcp);
+			int remain, num_to_copy;
+			if(bytes < 0)
+				return bytes;
+			remain = count - dpos;
+			num_to_copy = (remain > bytes ? bytes : remain);
+			for(int i=0; i<num_to_copy; ++i)
+				dst[dpos++] = buf[i];
+
+			if (*srcp == 0)
+				return dpos;
+			++srcp;
+		}
 	}
 	return dpos;
 }

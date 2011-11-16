@@ -60,8 +60,6 @@ import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 import java.util.TimeZone;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import javax.microedition.khronos.egl.EGL10;
 import javax.microedition.khronos.egl.EGLContext;
 import javax.microedition.khronos.opengles.GL10;
@@ -317,6 +315,7 @@ public class MoSyncThread extends Thread
 			mMoSyncFont = null;
 		}
 
+		cameraScreen = 0;
 		//Do not access camera if it is not available
 		try
 		{
@@ -883,18 +882,8 @@ public class MoSyncThread extends Thread
 		// Add event to queue.
 		nativePostEvent(event);
 
-		// Only interrupt if we are sleeping in maWait.
-		if (mIsSleepingInMaWait.get())
-		{
-			// Wake up this thread to make it process events.
-			interrupt();
-		}
-		else
-		{
-			//Log.i(
-			//	"@@@ MoSyncThread.postEvent",
-			//	"Did not call interrupt, not in maWait (this is good!)");
-		}
+		// Wake up thread if sleeping.
+		interrupt();
 	}
 
 	/**
@@ -2219,8 +2208,6 @@ public class MoSyncThread extends Thread
 
 		try
 		{
-			mIsSleepingInMaWait.set(true);
-
 	 		if (timeout<=0)
 			{
 				Thread.sleep(Long.MAX_VALUE);
@@ -2239,8 +2226,6 @@ public class MoSyncThread extends Thread
 		{
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
-
-		mIsSleepingInMaWait.set(false);
 
 		SYSLOG("maWait returned");
 	}
@@ -3410,6 +3395,7 @@ public class MoSyncThread extends Thread
 		if(cameraScreen != 0)
 		{
 			maWidgetDestroy(cameraScreen);
+			mMoSyncCameraController.removePreview();
 			maWidgetScreenShow(IX_WIDGET.MAW_CONSTANT_MOSYNC_SCREEN_HANDLE);
 			cameraScreen = 0;
 		}

@@ -130,10 +130,15 @@ public class PIMItem {
 	void read(ContentResolver cr, String contactId) {
 		DebugPrint("PIMItem.read(" + cr + ", " + contactId + ")");
 
-		Iterator<PIMField> fieldsIt = mPIMFields.iterator();
+		try {
+			Iterator<PIMField> fieldsIt = mPIMFields.iterator();
 
-		while (fieldsIt.hasNext()) {
-			fieldsIt.next().read(cr, contactId);
+			while (fieldsIt.hasNext()) {
+				fieldsIt.next().read(cr, contactId);
+			}
+		} catch (Exception e) {
+			DebugPrint("Failed to read contact " + contactId + ".");
+			e.printStackTrace();
 		}
 	}
 

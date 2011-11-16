@@ -50,39 +50,39 @@ using namespace std;
 // ****************** Lua header file generation starts here ******************
 
 static void lua_streamHeaderFile(
-	ostream& stream, 
-	const Interface& inf, 
+	ostream& stream,
+	const Interface& inf,
 	int ix);
 static void lua_streamHeaderFunctions(
-	ostream& stream, 
+	ostream& stream,
 	const Interface& inf);
 static void lua_streamIoctlFunction(
-	ostream& stream, 
-	const Interface& inf, 
+	ostream& stream,
+	const Interface& inf,
 	const Function& f,
 	const string& ioctlName);
 static void lua_streamIoctls(
-	ostream& stream, 
-	const Interface& inf, 
+	ostream& stream,
+	const Interface& inf,
 	int ix);
 static void lua_streamMembers(
-	ostream& stream, 
-	string tab, 
+	ostream& stream,
+	string tab,
 	const vector<Member>& members,
 	const vector<Struct>& structs);
 /* Not used.
 static void lua_streamStructs(
-	ostream& stream, 
-	const vector<Struct>& structs, 
+	ostream& stream,
+	const vector<Struct>& structs,
 	int ix);
 */
 static void lua_streamTypedefs(
-	ostream& stream, 
-	const vector<Typedef>& typedefs, 
+	ostream& stream,
+	const vector<Typedef>& typedefs,
 	int ix);
 static void lua_streamConstants(
-	ostream& stream, 
-	const vector<ConstSet>& constSets, 
+	ostream& stream,
+	const vector<ConstSet>& constSets,
 	int ix) ;
 /*
 static void lua_streamHelperApi(
@@ -95,19 +95,19 @@ static void lua_streamHelperApi(
 void lua_outputHeaderFile(
 	const Interface& maapi,
 	const vector<string>& ixs,
-	const char* destinationFile) 
+	const char* destinationFile)
 {
 	ofstream luaHeaderFile(destinationFile);
 
 	lua_streamHeaderFile(luaHeaderFile, maapi, MAIN_INTERFACE);
 
 	// Include selected extensions.
-	for (size_t i=0; i<ixs.size(); i++) 
+	for (size_t i=0; i<ixs.size(); i++)
 	{
 		// This is how we include an extension.
 		// We want to include NativeUI and OpenGL.
 		string s = ixs[i];
-		if (s == "IX_WIDGET" || 
+		if (s == "IX_WIDGET" ||
 			s == "IX_OPENGL_ES")
 		{
 			lua_streamHeaderFile(luaHeaderFile, maapi, i);
@@ -123,8 +123,8 @@ void lua_outputHeaderFile(
  * http://www.tecgraf.puc-rio.br/~celes/tolua/tolua-3.2.html
  */
 static void lua_streamHeaderFile(
-	ostream& stream, 
-	const Interface& inf, 
+	ostream& stream,
+	const Interface& inf,
 	int ix)
 {
 	lua_streamTypedefs(stream, inf.typedefs, ix);
@@ -137,7 +137,7 @@ static void lua_streamHeaderFile(
 	// Skip structs.
 	//lua_streamStructs(stream, inf.structs, ix);
 
-	if (ix == MAIN_INTERFACE) 
+	if (ix == MAIN_INTERFACE)
 	{
 		lua_streamHeaderFunctions(stream, inf);
 	}
@@ -149,32 +149,34 @@ static void lua_streamHeaderFile(
  * Stream function declarations.
  */
 static void lua_streamHeaderFunctions(
-	ostream& stream, 
-	const Interface& inf) 
+	ostream& stream,
+	const Interface& inf)
 {
-	for (size_t i=0; i<inf.functions.size(); i++) 
+	for (size_t i=0; i<inf.functions.size(); i++)
 	{
 		const Function& f(inf.functions[i]);
 
-		// We don't want this function.
-		if (f.name == "maIOCtl")
+		// We don't want these functions.
+		if (f.name == "maIOCtl" || f.name == "maInvokeExtension")
+		{
 			continue;
+		}
 
 		stream << cType(inf, f.returnType);
 
 		stream << " " << f.name << "(";
 
-		if (f.args.size() == 0) 
+		if (f.args.size() == 0)
 		{
 			stream << "void";
 		}
 
-		for (size_t j=0; j<f.args.size(); j++) 
+		for (size_t j=0; j<f.args.size(); j++)
 		{
 			const Argument& a(f.args[j]);
 			if (j != 0)
 				stream << ", ";
-			if (a.in && isPointerType(inf, a.type)) 
+			if (a.in && isPointerType(inf, a.type))
 			{
 				stream << "const ";
 			}
@@ -184,8 +186,9 @@ static void lua_streamHeaderFunctions(
 			stream << " " << a.name;
 		}
 
-		if (f.isIOCtl) 
-			stream << " MA_IOCTL_ELLIPSIS";
+		// The tolua binding tool cannot handle this.
+		//if (f.isIOCtl)
+		//	stream << " MA_IOCTL_ELLIPSIS";
 
 		stream << ");\n";
 	}
@@ -194,8 +197,8 @@ static void lua_streamHeaderFunctions(
 }
 
 static void lua_streamIoctlFunction(
-	ostream& stream, 
-	const Interface& inf, 
+	ostream& stream,
+	const Interface& inf,
 	const Function& f,
 	const string& ioctlName)
 {
@@ -204,13 +207,13 @@ static void lua_streamIoctlFunction(
 	stream << f.returnType << " " << f.name << "(";
 
 	// If no params.
-	if (f.args.size() == 0) 
+	if (f.args.size() == 0)
 	{
 		stream << "void";
 	}
-	
+
 	// Stream parms.
-	for (size_t j=0; j<f.args.size(); j++) 
+	for (size_t j=0; j<f.args.size(); j++)
 	{
 		const Argument& a(f.args[j]);
 
@@ -219,7 +222,7 @@ static void lua_streamIoctlFunction(
 			stream << ", ";
 		}
 
-		if (a.in && isPointerType(inf, a.type)) 
+		if (a.in && isPointerType(inf, a.type))
 		{
 			stream << "const ";
 		}
@@ -264,14 +267,14 @@ static void lua_streamIoctlFunction(
 }
 
 static void lua_streamIoctls(
-	ostream& stream, 
-	const Interface& inf, 
-	int ix) 
+	ostream& stream,
+	const Interface& inf,
+	int ix)
 {
-	for (size_t i=0; i<inf.ioctls.size(); i++) 
+	for (size_t i=0; i<inf.ioctls.size(); i++)
 	{
 		const Ioctl& ioctl(inf.ioctls[i]);
-		for (size_t j=0; j<ioctl.functions.size(); j++) 
+		for (size_t j=0; j<ioctl.functions.size(); j++)
 		{
 			const IoctlFunction& f(ioctl.functions[j]);
 			if (f.ix == ix)
@@ -288,37 +291,37 @@ static void lua_streamIoctls(
 }
 
 static void lua_streamMembers(
-	ostream& stream, 
-	string tab, 
+	ostream& stream,
+	string tab,
 	const vector<Member>& members,
 	const vector<Struct>& structs)
 {
-	for (size_t k=0; k<members.size(); k++) 
+	for (size_t k=0; k<members.size(); k++)
 	{
 		const Member& m(members[k]);
 
 		// Don't think unions are supported by tolua,
 		// but by tolua++ it seems.
-		if (m.pod.size() != 1) 
+		if (m.pod.size() != 1)
 		{
 			stream << tab << "union {\n";
 			tab += "\t";
 		}
 
-		for (size_t l=0; l<m.pod.size(); l++) 
+		for (size_t l=0; l<m.pod.size(); l++)
 		{
 			const PlainOldData pod(m.pod[l]);
-			if (isAnonStructName(pod.type)) 
+			if (isAnonStructName(pod.type))
 			{
 				if (pod.name.empty() || pod.comment.size() > 0)
 					throwException("Bad anonymous struct");
 
 				//find struct definition
 				bool found = false;
-				for (size_t m2=0; m2<structs.size(); m2++) 
+				for (size_t m2=0; m2<structs.size(); m2++)
 				{
 					const Struct& as(structs[m2]);
-					if (as.name == pod.type) 
+					if (as.name == pod.type)
 					{
 						stream << tab << "struct {\n";
 						lua_streamMembers(stream, tab + "\t", as.members, structs);
@@ -329,14 +332,14 @@ static void lua_streamMembers(
 				}
 				if (!found)
 					throwException("Anonymous struct not found");
-			} 
-			else 
+			}
+			else
 			{
 				stream << tab << pod.type << " " << pod.name << ";\n";
 			}
 		}	//pod
 
-		if (m.pod.size() != 1) 
+		if (m.pod.size() != 1)
 		{
 			stream << "\t};\n";
 		}
@@ -345,11 +348,11 @@ static void lua_streamMembers(
 
 /* Not used.
 static void lua_streamStructs(
-	ostream& stream, 
-	const vector<Struct>& structs, 
-	int ix) 
+	ostream& stream,
+	const vector<Struct>& structs,
+	int ix)
 {
-	for (size_t j=0; j<structs.size(); j++) 
+	for (size_t j=0; j<structs.size(); j++)
 	{
 		const Struct& s(structs[j]);
 		if (s.ix == ix)
@@ -369,8 +372,8 @@ static void lua_streamStructs(
 */
 
 static void lua_streamTypedefs(
-	ostream& stream, 
-	const vector<Typedef>& typedefs, 
+	ostream& stream,
+	const vector<Typedef>& typedefs,
 	int ix)
 {
 	if (ix == MAIN_INTERFACE)
@@ -384,7 +387,7 @@ static void lua_streamTypedefs(
 			;
 	}
 
-	for (size_t i=0; i<typedefs.size(); i++) 
+	for (size_t i=0; i<typedefs.size(); i++)
 	{
 		const Typedef& t(typedefs[i]);
 		if (t.ix == ix)
@@ -414,14 +417,14 @@ static void lua_streamTypedefs(
  * Works ok to generate constants.
  */
 static void lua_streamConstants(
-	ostream& stream, 
-	const vector<ConstSet>& constSets, 
-	int ix) 
+	ostream& stream,
+	const vector<ConstSet>& constSets,
+	int ix)
 {
-	for (size_t i=0; i<constSets.size(); i++) 
+	for (size_t i=0; i<constSets.size(); i++)
 	{
 		const ConstSet& cs(constSets[i]);
-		for (size_t j=0; j<cs.constants.size(); j++) 
+		for (size_t j=0; j<cs.constants.size(); j++)
 		{
 			const Constant& c(cs.constants[j]);
 			if (c.ix == ix)

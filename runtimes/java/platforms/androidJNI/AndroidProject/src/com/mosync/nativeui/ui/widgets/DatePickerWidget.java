@@ -224,6 +224,9 @@ public class DatePickerWidget extends Widget {
 			throws FeatureNotAvailableException
 	{
 		DatePicker datePicker = (DatePicker) getView();
+		// Call it in order to trigger onFocusChanged when you change the date
+		// using the keyboard and you don't focus out from the field.
+		datePicker.clearFocus();
 
 		if (property.equals(IX_WIDGET.MAW_DATE_PICKER_YEAR))
 		{

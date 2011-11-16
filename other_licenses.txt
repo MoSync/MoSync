@@ -54,6 +54,7 @@ build-one.rb
 /tools/makesis-2.0.0*
 /tools/MoCab/lcab
 /tools/ReleasePackageBuild/build_package_tools/include
+/tools/ReleasePackageBuild/build_package_tools//osx_bin/ImageMagick
 /tools/uidcrc
 
 # files
@@ -155,6 +156,7 @@ build-one.rb
 /tools/e32hack/crc.h
 
 /tools/ReleasePackageBuild/build_package_tools/mosync_bin/default_maprofile.h
+/tools/ReleasePackageBuild/build_package_tools/mosync_docs/newlib/
 /tools/ReleasePackageBuild/linux
 
 /tools/SplashScreenGenerator/main.rb
