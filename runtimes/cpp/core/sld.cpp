@@ -302,7 +302,7 @@ bool loadSLD(const char* filename) {
 
 	//read variable map
 	FAILIF(strcmp(buffer, "VARIABLES") != 0);
-	int lastStart = -1;
+	//int lastStart = -1;
 	while(1) {
 		TEST(readLine(buffer, BUFSIZE, file));
 		VarMapping vm;
@@ -318,7 +318,7 @@ bool loadSLD(const char* filename) {
 #endif
 		vm.scope = fileIndexFromScope(vm.scope);
 		FAILIF(vm.scope < 0);
-		lastStart = vm.start;
+		//lastStart = vm.start;
 		if(buffer[0] == '_') {	//because we seem to be getting a few too many variables.
 			vm.name = buffer + 1;	//skip the extra '_'.
 			gVarMap.push_back(vm);
@@ -394,7 +394,7 @@ int mapFileLine(const char* filename, int lineNumber, vector<int>& addresses) {
 	LineMapping lm;
 	lm.file = fileIndex;
 	lm.line = lineNumber;
-	
+
 	AddressSet::const_iterator itr = gAddressSet.lower_bound(lm);
 
 	addresses.clear();
@@ -402,7 +402,7 @@ int mapFileLine(const char* filename, int lineNumber, vector<int>& addresses) {
 	set<int> foundFunctions;
 
 	// find first valid line
-	while(itr!=gAddressSet.end() && itr->file==fileIndex && itr->line<lineNumber) { 
+	while(itr!=gAddressSet.end() && itr->file==fileIndex && itr->line<lineNumber) {
 		itr++;
 	}
 	if(itr==gAddressSet.end()) {
@@ -422,7 +422,7 @@ int mapFileLine(const char* filename, int lineNumber, vector<int>& addresses) {
 
 	if(addresses.size() == 0)
 		return ERR_NOLINE;
-	
+
 	return 0;
 }
 

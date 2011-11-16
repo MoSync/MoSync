@@ -83,14 +83,14 @@ public:
 
 #ifdef USE_INTERACTIVE_TESTS
 		// interactive tests
-#ifndef MA_PROF_SUPPORT_STYLUS		
+#ifndef MA_PROF_SUPPORT_STYLUS
 		addCharInputTests(&mSuite);
 #endif	//MA_PROF_SUPPORT_STYLUS
 		addFramebufferTests(&mSuite);
 		addSoundTests(&mSuite);
 		addAdvGfxTests(&mSuite);
 		addBasicGfxTests(&mSuite);
-#ifndef MA_PROF_SUPPORT_STYLUS				
+#ifndef MA_PROF_SUPPORT_STYLUS
 		addKeypadTests(&mSuite);
 #endif	//MA_PROF_SUPPORT_STYLUS
 		addTimeTests(&mSuite);

@@ -37,19 +37,19 @@ uchar *LoadToMemory(char *filename)
 	uchar *ThisMem;
 	long Length;
 	int res;
-	
+
 	if ((InputFile = fopen(filename, "rb")) == NULL)
 	{
 			Error(Error_System, "Problem opening file '%s'\n",filename);
 			return 0;
 	}
-	
+
 	fseek(InputFile, 0L ,SEEK_END);	// Point to end
 	Length = ftell(InputFile);
 	fseek(InputFile, 0L ,SEEK_SET);	// Point to beginning
-	
+
 	FileLen = Length;
-	
+
 	ThisMem = (uchar *) calloc(Length + 1000, 1);
 
 	if (ThisMem == 0)
@@ -80,18 +80,18 @@ void SaveToFile(char *filename, char *start, int len)
 {
 	FILE *theFile;
 	int res;
-	
+
 	theFile = fopen(filename, "wb");
-	
+
 	if (!theFile)
 		return;
 
 	res = fwrite(start, 1, len, theFile);
 	if(res != len)
 		return;	//FIXME: silent fail
-	
+
 	fclose(theFile);
-	return;	
+	return;
 }
 
 //****************************************
@@ -99,13 +99,13 @@ void SaveToFile(char *filename, char *start, int len)
 //****************************************
 
 void PatchClass(char *infile, char *outfile)
-{			
+{
 	printf("Patching %s\n", infile);
 	ClassFilePtr = LoadToMemory(infile);
 	ClassPtr = ClassFilePtr;
-	
+
 	ReadClass(&mainClass);
-	
+
 	//DispConstantPool(&mainClass);
 
 	SaveToFile(outfile, (char *) ClassPtr, FileLen);
@@ -117,12 +117,12 @@ void PatchClass(char *infile, char *outfile)
 //****************************************
 
 void OptimizeClass()
-{			
+{
 	ClassFilePtr = LoadToMemory("Core.class");
 	ClassPtr = ClassFilePtr;
-	
+
 	ReadClass(&mainClass);
-	
+
 	//DispConstantPool(&mainClass);
 
 //	SaveToFile(outfile, (char *) ClassPtr, FileLen);
@@ -177,7 +177,7 @@ float ReadFloat()
 		float f;
 		long l;
 	} v;
-	
+
 	v.l = ReadLong();
 	return v.f;
 }
@@ -189,12 +189,12 @@ float ReadFloat()
 long long ReadLongLong()
 {
 	long long v = 0;
-	
+
 	v |= (long long)ReadByte() << 56;
 	v |= (long long)ReadByte() << 48;
 	v |= (long long)ReadByte() << 40;
 	v |= (long long)ReadByte() << 32;
-	
+
 	v |= (long long)ReadByte() << 24;
 	v |= (long long)ReadByte() << 16;
 	v |= (long long)ReadByte() << 8;
@@ -212,8 +212,8 @@ double ReadDouble()
 		double d;
 		long long ll;
 	} v;
-	
-	
+
+
 	v.ll = ReadLongLong();
 	return v.d;
 }
@@ -242,25 +242,25 @@ void SkipData(long Size)
 //****************************************
 
 int ReadClass(ClassEntry *theClass)
-{	
-	long Magic;
-	
+{
+	//long Magic;
+
 	theClass->ClassFilePtr = ClassFilePtr;
-	
-	Magic = ReadLong();
+
+	/*Magic =*/ ReadLong();
 
 	theClass->Major_version = ReadWord();
 	theClass->Minor_version = ReadWord();
-	
+
 	IndexConstantPool(theClass);
 
 	theClass->AccessFlags = ReadWord();
 	theClass->ThisClass = ReadWord();
 	theClass->SuperClass = ReadWord();
-	
+
 	vprintf("ThisClass %d = '%s'\n", theClass->ThisClass,GetPoolString(theClass, theClass->ThisClass));
 	vprintf("SuperClass %d = '%s'\n", theClass->SuperClass,GetPoolString(theClass, theClass->SuperClass));
-	
+
 	theClass->InterfaceCount = ReadWord();
 
 	if (theClass->InterfaceCount)
@@ -285,7 +285,7 @@ void ReadFields(ClassEntry *theClass)
 {
 	short	AccessFlags,NameIndex,TypeIndex,AttrCount;
 	short	n,m;
-		
+
 	theClass->FieldsCount = ReadWord();
 	theClass->FieldsFPos = ClassFilePtr;
 
@@ -322,16 +322,16 @@ void ReadFields(ClassEntry *theClass)
 */
 		for (m=0;m<AttrCount;m++)
 		{
-			short	AttrNameIndex,ConstValueIndex;
-			long	BytesCount;
-			
-			AttrNameIndex = ReadWord();
+			//short	AttrNameIndex,ConstValueIndex;
+			//long	BytesCount;
+
+			/*AttrNameIndex =*/ ReadWord();
 //			printf("AttrNameIndex %d = '%s'\n", AttrNameIndex, GPS(AttrNameIndex));
 
-			BytesCount = ReadLong();
+			/*BytesCount =*/ ReadLong();
 //			printf("BytesCount %ld\n", BytesCount);
 
-			ConstValueIndex = ReadWord();
+			/*ConstValueIndex =*/ ReadWord();
 //			printf("ConstValueIndex %d = %ld\n", ConstValueIndex,GPC(ConstValueIndex));
 		}
 
@@ -378,7 +378,7 @@ void ReadMedthods(ClassEntry *theClass)
 //			short	AttrNameIndex,ConstValueIndex;
 			short	AttrNameIndex;
 			long	BytesCount;
-			
+
 			AttrNameIndex = ReadWord();
 			vprintf("AttrNameIndex %d = '%s'\n", AttrNameIndex,GPS(AttrNameIndex));
 
@@ -416,33 +416,33 @@ void IndexConstantPool(ClassEntry *theClass)
 {
 	long lastindex;
 	int psize, n;
-	
+
 	theClass->PoolCount = ReadWord();
-	
+
 	psize = sizeof(long) * theClass->PoolCount;
-	
+
 	CpIndex = (long *) malloc(psize);
-	
+
 	if (!CpIndex)
 	{
 		printf("Could'nt allocate CpIndex\n");
 		exit(1);
 	}
-	
+
 	memset(CpIndex, 0, psize);
-	
+
 	theClass->PoolPtr	= CpIndex;
-	
+
 	for (n=1;n<theClass->PoolCount;n++)
 	{
 		lastindex = CpIndex[n-1] = (long) GetReadPtr();
-		
+
 		switch(ReadByte())
 		{
 			case CONSTANT_Utf8 :
 				SkipData(ReadWord());
 			break;
-			
+
 /*			case CONSTANT_Unicode :
 				printf("Unicode(%d)",Type);
 			break;
@@ -451,7 +451,7 @@ void IndexConstantPool(ClassEntry *theClass)
 			case CONSTANT_Float :
 				ReadLong();
 				break;
-			
+
 			case CONSTANT_Long :
 			case CONSTANT_Double :
 
@@ -491,9 +491,9 @@ void GetPoolInfo(ClassEntry *theClass, short Entry, PoolInfo *theInfo)
 {
 	uchar Type;
 	uchar *oldClassFilePtr = ClassFilePtr;
-	
+
 	Entry--;
-	
+
 	if (Entry < 0 || Entry > theClass->PoolCount)
 		Error(Error_System, "Attempt to access illegal pool entry");
 
@@ -514,17 +514,17 @@ void GetPoolInfo(ClassEntry *theClass, short Entry, PoolInfo *theInfo)
 	{
 		case CONSTANT_Utf8 :
 		{
-			short Len = ReadWord();	
-		
+			short Len = ReadWord();
+
 			ReadData(theInfo->String,Len);
 			theInfo->String[Len] = 0;
 			break;
 		}
-			
+
 		case CONSTANT_Integer :
 			theInfo->Value = ReadLong();
 			break;
-			
+
 		case CONSTANT_Float :
 			theInfo->fValue = ReadFloat();
 			break;
@@ -538,40 +538,40 @@ void GetPoolInfo(ClassEntry *theClass, short Entry, PoolInfo *theInfo)
 			break;
 
 		case CONSTANT_Class :
-		{	
+		{
 			theInfo->Index = ReadWord();		// Value is the index to class
 
-			AccumulateString(theClass, theInfo->String, theInfo->Index);	
+			AccumulateString(theClass, theInfo->String, theInfo->Index);
 			break;
 		}
 
 		case CONSTANT_String :
 		{
 			theInfo->Index = ReadWord();		// Value is the index to string
-	
-			AccumulateString(theClass, theInfo->String, theInfo->Index);				
+
+			AccumulateString(theClass, theInfo->String, theInfo->Index);
 			break;
 		}
-		
+
 		case CONSTANT_Fieldref :
 		case CONSTANT_Methodref :
 		case CONSTANT_InterfaceMethodref :
 		case CONSTANT_NameAndType :
-	
+
 			theInfo->Index = ReadWord();
 			theInfo->Value = ReadWord();
 
 			AccumulateString(theClass, theInfo->String, theInfo->Index);
 			AccumulateString(theClass, theInfo->String, theInfo->Value);
 			break;
-		
+
 		default:
 			Error(Error_System, "Illegal Constant Pool Type");
 
 	}
 
 	ClassFilePtr = oldClassFilePtr;
-	return;	
+	return;
 }
 
 //****************************************
@@ -584,7 +584,7 @@ void AccumulateString(ClassEntry *theClass, char *String, short Index)
 
 	if (strlen(String) > 490)
 		Error(Error_System, "String is too long");
-	
+
 	GetPoolInfo(theClass, Index, &PoolString);
 
 	if (PoolString.String[0] == 0)
@@ -606,13 +606,13 @@ char * PoolSubString(char *str, char *dst, int index)
 	int count = 0;
 	char c;
 	char *outstr = dst;
-	
+
 	// Reset dst
-	
+
 	*dst = 0;
-	
+
 	// find start pos
-	
+
 	if (index > 0)
 	{
 		while(1)
@@ -621,16 +621,16 @@ char * PoolSubString(char *str, char *dst, int index)
 
 			if (c == 0)
 				return outstr;			// return no index
-			
+
 			if (c == ':')
 			{
 				count++;
 				if (index == count)
-					break;	
-			}	
-		}	
+					break;
+			}
+		}
 	}
-	
+
 	// copy to end of string
 
 	while(1)
@@ -688,11 +688,11 @@ void DispPoolEntry(ClassEntry * theClass,short Entry)
 		case CONSTANT_Utf8 :
 			printf("Utf8 '%s'",theInfo.String);
 			return;
-			
+
 		case CONSTANT_Integer :
 			printf("Integer %d",theInfo.Value);
 			return;
-			
+
 		case CONSTANT_Float :
 			printf("Float %f",theInfo.fValue);
 			return;
@@ -747,7 +747,7 @@ void DispPoolEntry(ClassEntry * theClass,short Entry)
 void DispConstantPool(ClassEntry *theClass)
 {
 	int	n;
-		
+
 	for (n=1;n<theClass->PoolCount;n++)
 	{
 		printf("%2d: ",n);

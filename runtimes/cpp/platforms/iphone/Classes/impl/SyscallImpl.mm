@@ -39,13 +39,15 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <helpers/CPP_IX_GUIDO.h>
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
 #include "MoSyncPanic.h"
-
+#import "Ads.h"
+#import "Notification.h"
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
 #import "CameraPreviewWidget.h"
 #import "CameraConfirgurator.h"
 #import "ImagePickerController.h"
 #include "netImpl.h"
+
 
 #define NETWORKING_H
 #include "networking.h"
@@ -75,6 +77,9 @@ using namespace MoSyncError;
 #include <OpenGLES/ES1/glext.h>
 #include "../../../../generated/gl.h.cpp"
 #endif
+
+#include <helpers/CPP_IX_AUDIO.h>
+#include "AudioSyscall.h"
 
 extern ThreadPool gThreadPool;
 
@@ -324,6 +329,7 @@ namespace Base {
 		MANetworkInit();
 
 		MAPimInit();
+        MAAudioInit();
 
 		// init some image.h optimizations.
 		initMulTable();
@@ -336,6 +342,9 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
+        [Notification deleteInstance];
+        [Ads deleteInstance];
+        MAAudioClose();
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
 	}
@@ -1020,11 +1029,8 @@ namespace Base {
 		//int time = (int)(CFAbsoluteTimeGetCurrent()*1000.0f);
 		//int time = (int)((double)mach_absolute_time()*gTimeConversion);
 		int time = (((mach_absolute_time() - gTimeStart) * gTimeBase.numer) / gTimeBase.denom) / 1000000;
-
-
 		return time;
 	}
-
 
 	SYSCALL(int, maFreeObjectMemory()) {
 		return getFreeAmountOfMemory();
@@ -1847,7 +1853,92 @@ return 0; \
         return RES_OK;
 	}
 
+    SYSCALL(int, maAdsBannerCreate(int size, const char* publisherID))
+	{
+		return [[Ads getInstance] createBanner];
+	}
+
+    SYSCALL(int, maAdsAddBannerToLayout(MAHandle bannerHandle, MAHandle layoutHandle))
+	{
+		return [[Ads getInstance] addBanner:bannerHandle toLayout:layoutHandle];
+	}
+
+    SYSCALL(int, maAdsRemoveBannerFromLayout(MAHandle bannerHandle, MAHandle layoutHandle))
+	{
+		return [[Ads getInstance] removeBanner:bannerHandle fromLayout:layoutHandle];
+	}
+
+    SYSCALL(int, maAdsBannerDestroy(MAHandle bannerHandle))
+	{
+        return [[Ads getInstance] bannerDestroy:bannerHandle];
+	}
+    SYSCALL(int, maAdsBannerSetProperty(MAHandle bannerHandle, const char* property, const char* value))
+	{
+        return [[Ads getInstance] bannerSetProperty:bannerHandle property:property value:value];
+	}
+    SYSCALL(int, maAdsBannerGetProperty(MAHandle bannerHandle, const char* property, char* value, const int bufSize))
+	{
+        return [[Ads getInstance] bannerGetProperty:bannerHandle property:property value:value size:bufSize];
+	}
+
+    SYSCALL(int, maNotificationCreate())
+	{
+		return [[Notification getInstance] createNotificationObject];
+	}
+    SYSCALL(int, maNotificationDestroy(MAHandle notificationHandle))
+	{
+        return [[Notification getInstance] destroyNotificationObject:notificationHandle];
+	}
+    SYSCALL(int, maNotificationSetProperty(MAHandle notificationHandle, const char* property, const char* value))
+	{
+        return [[Notification getInstance] notificationSetProperty:notificationHandle
+                                                          property:property
+                                                             value:value];
+	}
+    SYSCALL(int, maNotificationGetProperty(MAHandle notificationHandle, const char* property, char* value, const int bufSize))
+	{
+        return [[Notification getInstance] notificationGetProperty:notificationHandle
+                                                          property:property
+                                                             value:value
+                                                              size:bufSize];
+	}
+    SYSCALL(int, maNotificationLocalRegister(MAHandle notificationHandle))
+	{
+		return [[Notification getInstance] registerLocalNotification:notificationHandle];
+	}
+    SYSCALL(int, maNotificationLocalUnregister(MAHandle notificationHandle))
+	{
+        return [[Notification getInstance] unregisterLocalNotification:notificationHandle];
+	}
+    SYSCALL(int, maNotificationPushRegister(MAHandle pushNotificationType, const char* accountID))
+	{
+		return [[Notification getInstance] registerPushNotification:pushNotificationType];
+	}
+    SYSCALL(int, maNotificationPushUnregister())
+	{
+        return [[Notification getInstance] unregisterPushNotification];
+	}
+    SYSCALL(int, maNotificationPushGetData(MAHandle pushNotificationHandle,
+                                           MAPushNotificationData* pushNotificationData))
+	{
+        return [[Notification getInstance] getPushNotificationData:pushNotificationHandle
+                                                              data:pushNotificationData];
+	}
+    SYSCALL(int, maNotificationPushGetRegistration(char* buffer, const int size))
+	{
+        return [[Notification getInstance] getPushRegistrationData:buffer size:size];
+	}
+    SYSCALL(void, maNotificationSetIconBadge(const int applicationIconBadgeNumber))
+	{
+        [[Notification getInstance] setApplicationIconBadgeNumber:applicationIconBadgeNumber];
+	}
+    SYSCALL(int, maNotificationGetIconBadge())
+	{
+        return [[Notification getInstance] getApplicationIconBadgeNumber];
+	}
+
 	SYSCALL(int, maIOCtl(int function, int a, int b, int c))
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
 
@@ -1928,6 +2019,33 @@ return 0; \
 		maIOCtl_case(maSendTextSMS);
 		maIOCtl_case(maSyscallPanicsEnable);
 		maIOCtl_case(maSyscallPanicsDisable);
+        maIOCtl_case(maAdsBannerCreate);
+        maIOCtl_case(maAdsAddBannerToLayout);
+        maIOCtl_case(maAdsRemoveBannerFromLayout);
+        maIOCtl_case(maAdsBannerDestroy);
+        maIOCtl_case(maAdsBannerSetProperty);
+        maIOCtl_case(maAdsBannerGetProperty);
+        maIOCtl_case(maNotificationCreate);
+        maIOCtl_case(maNotificationDestroy);
+        maIOCtl_case(maNotificationSetProperty);
+        maIOCtl_case(maNotificationGetProperty);
+        maIOCtl_case(maNotificationLocalRegister);
+        maIOCtl_case(maNotificationLocalUnregister);
+        maIOCtl_case(maNotificationPushRegister);
+        maIOCtl_case(maNotificationPushUnregister);
+        maIOCtl_case(maNotificationPushGetData);
+        maIOCtl_case(maNotificationPushGetRegistration);
+        maIOCtl_case(maNotificationSetIconBadge);
+        maIOCtl_case(maNotificationGetIconBadge);
+		maIOCtl_syscall_case(maDBOpen);
+		maIOCtl_syscall_case(maDBClose);
+		maIOCtl_syscall_case(maDBExecSQL);
+		maIOCtl_syscall_case(maDBCursorDestroy);
+		maIOCtl_syscall_case(maDBCursorNext);
+		maIOCtl_syscall_case(maDBCursorGetColumnData);
+		maIOCtl_syscall_case(maDBCursorGetColumnText);
+		maIOCtl_syscall_case(maDBCursorGetColumnInt);
+		maIOCtl_syscall_case(maDBCursorGetColumnDouble);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
@@ -1935,6 +2053,7 @@ return 0; \
         maIOCtl_IX_GL2_caselist;
         maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist;
 #endif	//SUPPORT_OPENGL_ES
+        maIOCtl_IX_AUDIO_caselist;
 		}
 
 		return IOCTL_UNAVAILABLE;

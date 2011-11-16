@@ -38,9 +38,9 @@ void SDL_putPixel(SDL_Surface *surf, int x, int y, Uint32 clr)
 	int Bpp = surf->format->BytesPerPixel;
 	Uint8 *p;
 
-	if (! ((x < surf->clip_rect.x) || 
+	if (! ((x < surf->clip_rect.x) ||
 		   (x >= (surf->clip_rect.x + surf->clip_rect.w)) ||
-		   (y < surf->clip_rect.y) || 
+		   (y < surf->clip_rect.y) ||
 		   (y >= (surf->clip_rect.y + surf->clip_rect.h))
 		   ))
 	{
@@ -81,9 +81,9 @@ void SDL_putPixel(SDL_Surface *surf, int x, int y, Uint32 clr)
 INLINE
 Uint8* SDL_getPixel(SDL_Surface *surf, int x, int y)
 {
-	if (! ((x < surf->clip_rect.x) || 
+	if (! ((x < surf->clip_rect.x) ||
 		   (x >= (surf->clip_rect.x + surf->clip_rect.w)) ||
-		   (y < surf->clip_rect.y) || 
+		   (y < surf->clip_rect.y) ||
 		   (y >= (surf->clip_rect.y + surf->clip_rect.h))
 		   ))
 		return (Uint8*)surf->pixels + y * surf->pitch + x * surf->format->BytesPerPixel;
@@ -176,7 +176,7 @@ void SDL_blendPixel( SDL_Surface *surf, int x, int y, Uint32 clr,
 void SDL_drawLine_TG( SDL_Surface *surf, int x, int y, int x2, int y2,
 					 Uint32 clr, Uint8 alpha, Uint8 flags )
 {
-	int xaa, yaa, *a, *b, *a2, *b2, da, xd, yd;
+	int xaa, yaa, *a, *b, *a2, da, xd, yd;
 	float aa, db;
 	float realb;
 
@@ -218,7 +218,6 @@ void SDL_drawLine_TG( SDL_Surface *surf, int x, int y, int x2, int y2,
 		a = &x;
 		b = &y;
 		a2 = &x2;
-		b2 = &y2;
 		db = (float)yd / xd;
 	} else {
 		/* draw top/bottom to top/bottom */
@@ -227,7 +226,6 @@ void SDL_drawLine_TG( SDL_Surface *surf, int x, int y, int x2, int y2,
 		a = &y;
 		b = &x;
 		a2 = &y2;
-		b2 = &x2;
 		db = (float)xd / yd;
 	}
 
@@ -513,7 +511,7 @@ void SDL_drawCircle_TG( SDL_Surface *surf, int x1, int y1, int r, Uint32 clr,
 /*
 * draws triangles
 *
-* this isn't very good, there is a good amount of pixel overlapping, 
+* this isn't very good, there is a good amount of pixel overlapping,
 * and there are sometimes pixels dangling off the corners...
 *
 * bleh, fuck it, i'll fix it later

@@ -30,7 +30,7 @@
 
 
 #ifdef DIGITAL_SIGNATURES
-// implies you ''have'' to use wincrypt.lib 
+// implies you ''have'' to use wincrypt.lib
 #include <WinHash.h>
 #include <WinKey.h>
 #include <WinSHA1.h>
@@ -110,7 +110,7 @@ void CSISWriter::Release()
 	{
 	// remove any temporary files
 	CleanupTemp();
-	
+
 	// free up allocated structures
 	LANGSTRINGNODE *pLangStringNode = m_pLangStringBase;
 	while(m_pLangStringBase)
@@ -119,7 +119,7 @@ void CSISWriter::Release()
 		delete m_pLangStringBase;
 		m_pLangStringBase = pLangStringNode;
 		}
-	
+
 	LANGNODE *pLangNode = m_pLangBase;
 	while(m_pLangBase)
 		{
@@ -127,7 +127,7 @@ void CSISWriter::Release()
 		delete m_pLangBase;
 		m_pLangBase = pLangNode;
 		}
-	
+
 	PKGLINENODE *pPkgLineNode = m_pPkgLineBase;
 	while(m_pPkgLineBase)
 		{
@@ -160,12 +160,12 @@ void CSISWriter::Release()
 		delete m_pPkgLineBase;
 		m_pPkgLineBase = pPkgLineNode;
 		}
-	
+
 	DEPENDNODE *pDependNode = m_pDependBase;
 	while(m_pDependBase)
 		{
 		pDependNode = pDependNode->pNext;
-		
+
 		pLangStringNode = m_pDependBase->pLangStringBase;
 		while(m_pLangStringBase)
 			{
@@ -176,9 +176,9 @@ void CSISWriter::Release()
 		delete m_pDependBase;
 		m_pDependBase = pDependNode;
 		}
-	
+
 	if (m_pSignatureBase) delete m_pSignatureBase;
-	
+
 	CAPABILITYNODE *pCapabilityNode = m_pCapabilityBase;
 	while(m_pCapabilityBase)
 		{
@@ -186,7 +186,7 @@ void CSISWriter::Release()
 		delete m_pCapabilityBase;
 		m_pCapabilityBase = pCapabilityNode;
 		}
-	
+
 	}
 
 void CSISWriter::ReleaseCondExpr(PKGLINECONDITION* expr)
@@ -239,7 +239,7 @@ void CSISWriter::SetCmdPassword(LPCWSTR pszCmdPassword)
 BOOL CSISWriter::GetCmdPassword(LPWSTR pszCmdPassword) const
 	{
 	wcscpy(pszCmdPassword, m_pszCmdPassword);
-	
+
 	return m_bCmdPassword;
 	}
 
@@ -320,12 +320,12 @@ void CSISWriter::SetVersionInfo(DWORD dwUID, WORD wMajor, WORD wMinor, DWORD dwB
 //		      wType							SIS file type
 //		      wFlags						Installation flags
 	{
-	m_dwUID		= dwUID;    
-	m_wMajor	= wMajor;  
-	m_wMinor	= wMinor;  
+	m_dwUID		= dwUID;
+	m_wMajor	= wMajor;
+	m_wMinor	= wMinor;
 	m_dwBuild	= dwBuild;
 	m_wType		= wType;
-	m_wFlags	= wFlags;  
+	m_wFlags	= wFlags;
 	}
 
 void CSISWriter::QueryVersionInfo (WORD *wMajor, WORD *wMinor, DWORD *dwBuild) const
@@ -345,7 +345,7 @@ void CSISWriter::SetLangDependFileDestinations(LPCWSTR pszDest, LPCWSTR pszMimeT
 	{
 	PKGLINENODE *pNode = m_pPkgLineBase;
 	WORD wNumLangs = 0;
-	
+
 	while(pNode && (wNumLangs++ < m_wNumLangs))
 		{
 		wcscpy(pNode->file->pszDest, pszDest);
@@ -377,7 +377,7 @@ void CSISWriter::SetLangDependCompDestinations(DWORD dwUID)
 	{
 	PKGLINENODE *pNode = m_pPkgLineBase;
 	WORD wNumLangs = 0;
-	
+
 	while(pNode && (wNumLangs++ < m_wNumLangs))
 		{
 		pNode->iPackageLineType = EInstPkgLineLanguageFile;
@@ -411,22 +411,22 @@ void CSISFileGeneratorBase::GenerateSISFile(LPCWSTR pszTargetFile, BOOL fIsStub 
 	m_stubFile=fIsStub;
 	// convert any text files to unicode if necessary
 	if (SizeOfChar()!=1 && !m_stubFile) CheckUnicodeTextFiles();
-	
+
 	// Estimate the maximum amount of space an installation could require
-	
+
 	EstimateInstallationSizeL();
-	
+
 	// Compress files into temp directory
 	CompressFiles();
-	
+
 	//Re-Write Certificate files
 	ParseCertificates();
-	
+
 	// Calculate the offsets
 	CalculateOffsets();
-	
+
 	m_wCheck = 0;	// reset checksum
-	
+
 	WriteHeaderL();
 	WriteLanguageL();
 	WritePkgLinesL();
@@ -444,10 +444,10 @@ void CSISFileGeneratorBase::CheckUnicodeTextFiles()
 // Converts any text files to UNICODE
 	{
 	Verbage(_T("Converting text files to unicode"));
-	
+
 	PKGLINENODE *pNode = (PKGLINENODE *)m_pSISWriter->GetPkgLineBase();
 	BOOL converted=FALSE;
-	
+
 	while(pNode)
 		{
 		if (pNode->iPackageLineType==EInstPkgLineFile || pNode->iPackageLineType==EInstPkgLineLanguageFile)
@@ -455,7 +455,7 @@ void CSISFileGeneratorBase::CheckUnicodeTextFiles()
 			WORD wMaxLangs=1;
 			if (pNode->iPackageLineType==EInstPkgLineLanguageFile) wMaxLangs = m_pSISWriter->GetNoLanguages();
 			WORD wNumLang = 0;
-			
+
 			while(pNode && (wNumLang < wMaxLangs))
 				{
 				if(pNode->file->type==EInstFileTypeText)
@@ -490,12 +490,12 @@ void CSISFileGeneratorBase::CheckUnicodeTextFiles()
 						}
 					HANDLE hInFile = ::MakeSISOpenFile(pNode->file->pszSource, GENERIC_READ, OPEN_EXISTING);
 					if(hInFile == INVALID_HANDLE_VALUE)
-						throw ErrCannotOpenFile;				
+						throw ErrCannotOpenFile;
 					if (converted) pNode->file->dwSize=::GetFileSize(hInFile, NULL);
 					::CloseHandle(hInFile);
 					}
 				pNode = pNode->pNext;
-				wNumLang++;			
+				wNumLang++;
 				}
 			}
 		else
@@ -509,14 +509,14 @@ void CSISFileGeneratorBase::CalculateOffsets()
 	assert(m_pSISWriter);
 	// Calculate the language offset (The size of the HEADER block) -------------------------------
 	m_dwOffLang = sizeof(TInstInstallation);
-	
+
 	// Calculate the PKG lines offset (The size of the LANGUAGE	block) --------------------------------
 	m_dwOffPkgLines = m_dwOffLang + (sizeof(TInstLang) * m_pSISWriter->GetNoLanguages());
-	
+
 	// Calculate the dependency offset (The size of the PKG lines block) ------------------------------
 	m_dwOffDepend = m_dwOffPkgLines;
 	DWORD stringSizes=0;
-	const PKGLINENODE *pNode = m_pSISWriter->GetPkgLineBase(); 
+	const PKGLINENODE *pNode = m_pSISWriter->GetPkgLineBase();
 	while(pNode)
 		{
 		m_dwOffDepend += sizeof(TInstPackageLineType);
@@ -528,13 +528,13 @@ void CSISFileGeneratorBase::CalculateOffsets()
 				WORD wNumLangs = 1;
 				if (pNode->iPackageLineType==EInstPkgLineLanguageFile)
 					wNumLangs = m_pSISWriter->GetNoLanguages();
-				
+
 				m_dwOffDepend += sizeof(TInstFile) +
 					((sizeof(unsigned long) + sizeof(FOFF) + sizeof(unsigned long)) * wNumLangs) +
 					sizeof(TInstString);
 				stringSizes += (wcslen(pNode->file->pszSource) + wcslen(pNode->file->pszDest)) * SizeOfChar() +
 					wcslen(pNode->file->pszMimeType);
-				
+
 				while(pNode && (wNumLangs > 1))
 					{
 					pNode = pNode->pNext;
@@ -544,7 +544,7 @@ void CSISFileGeneratorBase::CalculateOffsets()
 				break;
 			case EInstPkgLineOption:
 				{
-				m_dwOffDepend += sizeof(TInstOptions); 
+				m_dwOffDepend += sizeof(TInstOptions);
 				const LANGSTRINGNODE* pLSNode = pNode->option->pLangStringBase;
 				while(pLSNode)
 					{
@@ -552,7 +552,7 @@ void CSISFileGeneratorBase::CalculateOffsets()
 					stringSizes += wcslen(pLSNode->pszString) * SizeOfChar();
 					pLSNode = pLSNode->pNext;
 					}
-				m_dwOffDepend += sizeof(TUint32)*KInstallMaxOptionsInts; 
+				m_dwOffDepend += sizeof(TUint32)*KInstallMaxOptionsInts;
 				}
 				break;
 			case EInstPkgLineCondIf:
@@ -565,16 +565,16 @@ void CSISFileGeneratorBase::CalculateOffsets()
 			}
 		pNode = pNode->pNext;
 		}
-	
+
 	// Calculate the certificate block offset (the size of The DEPENDENCY block) -----------------------------
 	m_dwOffCertificates = m_dwOffDepend;
-	const DEPENDNODE *pDNode = m_pSISWriter->GetDependencyBase(); 
+	const DEPENDNODE *pDNode = m_pSISWriter->GetDependencyBase();
 	while(pDNode)
 		{
 		m_dwOffCertificates += sizeof(TInstDependency) + ((sizeof(DWORD) + sizeof(FOFF)) * m_pSISWriter->GetNoLanguages());
 		pDNode = pDNode->pNext;
 		}
-	
+
 	// Calculate capabilities offsets (the size of the certificates block)
 	DWORD size=0;
 #ifdef DIGITAL_SIGNATURES
@@ -584,46 +584,46 @@ void CSISFileGeneratorBase::CalculateOffsets()
 		{
 		if (m_bWriteChain)
 			{
-			hInFile = ::MakeSISOpenFile(pSignature->pszChainFile, GENERIC_READ, OPEN_EXISTING);	
+			hInFile = ::MakeSISOpenFile(pSignature->pszChainFile, GENERIC_READ, OPEN_EXISTING);
 			if (hInFile == INVALID_HANDLE_VALUE) throw ErrCannotOpenFile;
 			}
 		else
 			{
 			//write certificate verbatim
-			hInFile = ::MakeSISOpenFile(pSignature->pszB64File, GENERIC_READ, OPEN_EXISTING);	
+			hInFile = ::MakeSISOpenFile(pSignature->pszB64File, GENERIC_READ, OPEN_EXISTING);
 			if (hInFile == INVALID_HANDLE_VALUE) throw ErrCannotOpenFile;
 			}
 		size=::GetFileSize(hInFile, NULL) + sizeof (TInstCertBlock);
-		
+
 		::CloseHandle(hInFile);
 		if (size==0xFFFFFFFF) throw ErrCannotOpenFile;
 		}
 #endif
 	m_dwOffCapabilities = m_dwOffCertificates+size;
-	
+
 	// Calculate the string block offset (the size of the CAPABILITIES block) -----------------------------
 	m_dwOffString = m_dwOffCapabilities;
-	const CAPABILITYNODE* pCNode = m_pSISWriter->GetCapabilityBase(); 
+	const CAPABILITYNODE* pCNode = m_pSISWriter->GetCapabilityBase();
 	while(pCNode)
 		{
 		m_dwOffString += sizeof(TInstCapability);
 		pCNode = pCNode->pNext;
 		}
-	
+
 	// Calculate the code offset (the size of the STRING block) -----------------------------------
 	// 1. The Language Strings
 	m_dwOffCode = m_dwOffString;
 	m_dwOffCode += (sizeof(DWORD) + sizeof(FOFF)) * m_pSISWriter->GetNoLanguages();
-	
+
 	const LANGSTRINGNODE *pLSNode = m_pSISWriter->GetLangStringBase();
 	while(pLSNode)
 		{
 		m_dwOffCode += wcslen(pLSNode->pszString) * SizeOfChar();
 		pLSNode = pLSNode->pNext;
-		}	
+		}
 	// 2. Allow for any package line strings
 	m_dwOffCode += stringSizes;
-	// 3. Any File dependencies 
+	// 3. Any File dependencies
 	pDNode = m_pSISWriter->GetDependencyBase();
 	while(pDNode)
 		{
@@ -648,7 +648,7 @@ void CSISFileGeneratorBase::CalculateOffsets()
 		pNode = pNode->pNext;
 		}
 	}
-	
+
 DWORD CSISFileGeneratorBase::CalcConditionExprSize(const PKGLINECONDITION* expr, DWORD* stringSizes)
 		{
 		DWORD size=0;
@@ -690,9 +690,9 @@ DWORD CSISFileGeneratorBase::CalcConditionExprSize(const PKGLINECONDITION* expr,
 			}
 		return size;
 		}
-	
+
 void CSISFileGeneratorBase::WriteHeaderL()
-  // Purpose  : Writes the SIS file HEADER block                   
+  // Purpose  : Writes the SIS file HEADER block
   // Inputs   : fIsStub - TRUE if writing a stub file
 {
 	Verbage(_T("Writing installation header"));
@@ -704,14 +704,14 @@ void CSISFileGeneratorBase::WriteHeaderL()
 
 	// Set the UID
 	iiHead.iThisUID.iUid[0] = m_pSISWriter->GetUID();
-		
+
 	if(m_pSISWriter->GetFlags() &  EInstIsUnicode)
 		iiHead.iThisUID.iUid[1] = KUidInstallAppUid1U;
 	else
 		iiHead.iThisUID.iUid[1] = KUidInstallAppUid1;		 // Narrow output
 
 	iiHead.iThisUID.iUid[2] = KUidInstallAppValue;
-		
+
 	// Write the UID Checksum
 	DWORD dwCheck = 0;
 	UIDCheck(((char *)&iiHead.iThisUID.iUid[0]) + 1);
@@ -720,36 +720,36 @@ void CSISFileGeneratorBase::WriteHeaderL()
 	UIDCheck((char *)&iiHead.iThisUID.iUid[0]);
 	dwCheck |= m_wCheck;
 	iiHead.iUidChecksum = dwCheck;
-		
+
 	// CRC
 	m_wCheck = 0;
 	Crc((void *)&iiHead, sizeof (TInstUID));
-	Crc((void *)&iiHead.iUidChecksum, sizeof (DWORD)); 
-		
+	Crc((void *)&iiHead.iUidChecksum, sizeof (DWORD));
+
 	// Set the version
 	iiHead.iInstVersion = KInstallerVersion;
-		
+
 	// Set the type & flags
 	iiHead.iType = (TInt16)m_pSISWriter->GetType();
 	iiHead.iFlags = m_pSISWriter->GetFlags();
-		
+
 	// Set this version
 	WORD wMajor, wMinor;
 	DWORD dwBuild;
 	m_pSISWriter->QueryVersionInfo(&wMajor, &wMinor, &dwBuild);
-		
+
 	iiHead.iCompVersion.iMajor		= (WORD)wMajor;
 	iiHead.iCompVersion.iMinor		= (WORD)wMinor;
 	iiHead.iCompVersion.iBuild		= dwBuild;
-		
+
 	// Set the languages
 	iiHead.iNumLanguages   = m_pSISWriter->GetNoLanguages();
 	iiHead.iLanguageBlock = m_dwOffLang;
-		
+
 	// Set the PKG lines
 	const PKGLINENODE *pNode = m_pSISWriter->GetPkgLineBase();
 	while(pNode) {
-		iiHead.iNumPkgLines++;			
+		iiHead.iNumPkgLines++;
 		if (pNode->iPackageLineType==EInstPkgLineFile ||
 		    pNode->iPackageLineType==EInstPkgLineLanguageFile) {
 			if (pNode->file->pszDest[0]) {
@@ -770,7 +770,7 @@ void CSISFileGeneratorBase::WriteHeaderL()
 		pNode = pNode->pNext;
 	}
 	iiHead.iPackageLinesBlock = m_dwOffPkgLines;
-		
+
 	// Set the dependencies
 	const DEPENDNODE *pDNode = m_pSISWriter->GetDependencyBase();
 	while(pDNode) {
@@ -778,13 +778,13 @@ void CSISFileGeneratorBase::WriteHeaderL()
 		pDNode = pDNode->pNext;
 	}
 	iiHead.iDependenciesBlock = m_dwOffDepend;
-		
+
 	// set the certificates block offset
 #ifdef DIGITAL_SIGNATURES
 	if (m_pSISWriter->GetSignatureBase())
 		iiHead.iCertificatesBlock = m_dwOffCertificates;
 #endif
-		
+
 	// Set the capabilities
 	const CAPABILITYNODE *pCNode = m_pSISWriter->GetCapabilityBase();
 	while(pCNode) {
@@ -792,62 +792,62 @@ void CSISFileGeneratorBase::WriteHeaderL()
 		pCNode = pCNode->pNext;
 	}
 	iiHead.iCapabilitiesBlock = m_dwOffCapabilities;
-		
+
 	// Set the Names
 	iiHead.iNames = m_dwOffString;
 	m_dwCurrString = m_dwOffString + ((sizeof(DWORD) + sizeof(FOFF)) * m_pSISWriter->GetNoLanguages());
-		
+
 	// Check if we are writing a stub file
 	if(m_stubFile) {
 		iiHead.iInstallDrive = (WORD)'z';
 		iiHead.iNumPkgLinesDone = iiHead.iNumPkgLines;
 		iiHead.iLangChosen = 0;
 	}
-		
+
 	// set maximum size required to install
 	iiHead.iMaximumSpaceNeeded = m_dwMaximumSpaceNeeded;
-		
+
 	// Set the digital signature offset
 #ifdef DIGITAL_SIGNATURES
 	if (m_pSISWriter->GetSignatureBase())
 		iiHead.iSignatureBlock = m_dwOffSignature;
 #endif
-		
+
 	// Write the buffer
 	DWORD dwNumBytes;
 	if(!::WriteFile(m_hFile, (LPVOID)&iiHead, sizeof(TInstInstallation), &dwNumBytes, NULL))
 		throw ErrFailedToWriteHeader;
-		
+
 	m_dwCurrCode = m_dwOffCode;
-		
+
 	// CRC
 	Crc((void *)(&iiHead.iNumLanguages), sizeof (TInstInstallation) - sizeof(TInstUID) - sizeof(DWORD) - sizeof(WORD));
-		
+
 }
 
 void CSISFileGeneratorBase::WriteLanguageL()
 // To write the SIS file's LANGUAGES block
 	{
 	Verbage(_T("Writing languages"));
-	
+
 	DWORD dwLangCount      = m_pSISWriter->GetNoLanguages();
 	const LANGNODE *pLNode = m_pSISWriter->GetLanguageBase();
 	WORD *pLang            = new WORD[dwLangCount];
 	if (!pLang) throw ErrNotEnoughMemory;
-	
+
 	WORD wCount = 0;
 	while(pLNode)
 		{
 		pLang[wCount++] = pLNode->wLang;
 		pLNode = pLNode->pNext;
 		}
-	
+
 	DWORD dwNumBytes;
 	if(!::WriteFile(m_hFile, (LPVOID)pLang, sizeof(WORD) * dwLangCount, &dwNumBytes, NULL))
 		throw ErrFailedToWriteLanguages;
-	
+
 	Crc((void *)pLang, sizeof(WORD) * dwLangCount);
-	
+
 	delete [] pLang;
 	}
 
@@ -855,15 +855,15 @@ void CSISFileGeneratorBase::WritePkgLinesL()
 // To write the SIS pkg lines block
 	{
 	Verbage(_T("Writing PKG lines block"));
-	
+
 	DWORD dwNumBytes;
 	const PKGLINENODE *pNode = m_pSISWriter->GetPkgLineBase();
-	
+
 	while(pNode)
 		{
 		// write type
 		if(!::WriteFile(m_hFile, (LPVOID)&pNode->iPackageLineType, sizeof(TInstPackageLineType), &dwNumBytes, NULL))
-			throw ErrFailedToWriteFilesBlock;		
+			throw ErrFailedToWriteFilesBlock;
 		Crc((void *)&pNode->iPackageLineType, sizeof(TInstPackageLineType));
 		// write specific PKG node data
 		switch (pNode->iPackageLineType)
@@ -891,7 +891,7 @@ void CSISFileGeneratorBase::WritePkgLinesL()
 				DWORD stringSizes;
 				DWORD size=CalcConditionExprSize(pNode->cond, &stringSizes);
 				if(!::WriteFile(m_hFile, (LPVOID)&size, sizeof(DWORD), &dwNumBytes, NULL))
-					throw ErrFailedToWriteFilesBlock;		
+					throw ErrFailedToWriteFilesBlock;
 				Crc((void *)&size, sizeof(DWORD));
 				WriteConditionNodeL(pNode);
 				}
@@ -910,35 +910,35 @@ void CSISFileGeneratorBase::WriteFileNodeL(const PKGLINENODE* pNode)
 	const PKGLINEFILE* pFNode=pNode->file;
 	DWORD dwNumBytes;
 	TInstFile ifFile;
-	
+
 	memset((void *)&ifFile, '\0', sizeof(TInstFile));
 	ConfigureFileNode(pFNode, &ifFile);
-	
+
 	if(!::WriteFile(m_hFile, (LPVOID)&ifFile, sizeof(ifFile), &dwNumBytes, NULL))
 		throw ErrFailedToWriteFilesBlock;
-	
+
 	// CRC
 	Crc((void *)&ifFile, sizeof(ifFile));
-	
+
 	// Set the file lengths and offsets
 	const PKGLINENODE *pTempNode = pNode;
 	WORD wMaxLangs = 1;
 	if (pNode->iPackageLineType==EInstPkgLineLanguageFile) wMaxLangs = m_pSISWriter->GetNoLanguages();
-	
+
 	// write file lengths (compressed lengths if enabled)
 	WORD wNumLang = 0;
 	while(pNode && (wNumLang < wMaxLangs))
 		{
 		if (!::WriteFile(m_hFile, (LPVOID)&pNode->file->dwSize, sizeof(DWORD), &dwNumBytes, NULL))
 			throw ErrFailedToWriteFilesBlock;
-		
+
 		// CRC
 		Crc((void *)&pNode->file->dwSize, sizeof(DWORD));
-		
+
 		pNode = pNode->pNext;
-		wNumLang++;		
+		wNumLang++;
 		}
-	
+
 	// write file offsets
 	pNode = pTempNode;
 	wNumLang = 0;
@@ -948,34 +948,34 @@ void CSISFileGeneratorBase::WriteFileNodeL(const PKGLINENODE* pNode)
 			throw ErrFailedToWriteFilesBlock;
 		// CRC
 		Crc((void *)&m_dwCurrCode, sizeof(DWORD));
-		
+
 		m_dwCurrCode += pNode->file->dwSize;
 		pNode = pNode->pNext;
 		wNumLang++;
 		}
-	
+
 	// write uncompressed file lengths
 	pNode = pTempNode;
 	wNumLang = 0;
 	while(pNode && (wNumLang < wMaxLangs))
 		{
-		
+
 		if (!::WriteFile(m_hFile, (LPVOID)&pNode->file->dwUncompressedSize, sizeof(DWORD), &dwNumBytes, NULL))
 			throw ErrFailedToWriteFilesBlock;
-		
+
 		Crc((void *)&pNode->file->dwUncompressedSize, sizeof(DWORD));
-		
+
 		pNode = pNode->pNext;
-		wNumLang++;		
+		wNumLang++;
 		}
-	
+
 	// write mime type if appropriate
 	TInstString mimeType;
 	mimeType.iCount=wcslen(pFNode->pszMimeType);	// NOTE: 8 bit string!
 	mimeType.iStringPtr=m_dwCurrString;
 	m_dwCurrString += mimeType.iCount;
 	if (!::WriteFile(m_hFile, (LPVOID)&mimeType, sizeof(TInstString), &dwNumBytes, NULL))
-		throw ErrFailedToWriteFilesBlock;		
+		throw ErrFailedToWriteFilesBlock;
 	Crc((void *)&mimeType, sizeof(TInstString));
 	}
 
@@ -986,12 +986,12 @@ void CSISFileGeneratorBase::ConfigureFileNode(const PKGLINEFILE *pNode, TInstFil
 	{
 	pifFile->iFileType = pNode->type;
 	pifFile->iOption = pNode->options;
-	
+
 	// Set the source
 	pifFile->iSource.iCount = wcslen(pNode->pszSource) * SizeOfChar();
 	pifFile->iSource.iStringPtr = m_dwCurrString;
 	m_dwCurrString += pifFile->iSource.iCount;
-	
+
 	// Set the dest
 	pifFile->iDestination.iCount = wcslen(pNode->pszDest) * SizeOfChar();
 	pifFile->iDestination.iStringPtr = m_dwCurrString;
@@ -1016,12 +1016,12 @@ void CSISFileGeneratorBase::WriteOptionsNodeL(const PKGLINENODE* pNode)
 		const LANGSTRINGNODE *pLSNode2 = pLSNode;
 		for(j=0;j<m_pSISWriter->GetNoLanguages();j++)
 			{
-			dwLength = wcslen(pLSNode->pszString) * SizeOfChar();			
+			dwLength = wcslen(pLSNode->pszString) * SizeOfChar();
 			if(!::WriteFile(m_hFile, (LPVOID)&dwLength, sizeof(DWORD), &dwNumBytes, NULL))
-				throw ErrFailedToWriteOptionsBlock;			
+				throw ErrFailedToWriteOptionsBlock;
 			// CRC
 			Crc((void *)&dwLength, sizeof(DWORD));
-			pLSNode = pLSNode->pNext;			
+			pLSNode = pLSNode->pNext;
 			}
 		pLSNode = pLSNode2;
 		for(j=0;j<m_pSISWriter->GetNoLanguages();j++)
@@ -1039,7 +1039,7 @@ void CSISFileGeneratorBase::WriteOptionsNodeL(const PKGLINENODE* pNode)
 	for (i=0;i<KInstallMaxOptionsInts;i++)
 		{
 		if(!::WriteFile(m_hFile, (LPVOID)&dwSelected, sizeof(DWORD), &dwNumBytes, NULL))
-			throw ErrFailedToWriteOptionsBlock;			
+			throw ErrFailedToWriteOptionsBlock;
 		// CRC
 		Crc((void *)&dwSelected, sizeof(DWORD));
 		}
@@ -1050,7 +1050,7 @@ void CSISFileGeneratorBase::WriteConditionNodeL(const PKGLINENODE* pNode)
 	{
 	const PKGLINECONDITION* pCNode=pNode->cond;
 	// write out recursive condition expression(s)
-	WriteCondExprL(pCNode);	
+	WriteCondExprL(pCNode);
 	}
 
 void CSISFileGeneratorBase::WriteCondExprL(const PKGLINECONDITION* expr)
@@ -1058,7 +1058,7 @@ void CSISFileGeneratorBase::WriteCondExprL(const PKGLINECONDITION* expr)
 	TInstCondExpr iceExpr;
 	TInstCondPrim prim;
 	DWORD dwNumBytes;
-	
+
 	if (expr)
 		{
 		iceExpr.iExprType=expr->exprType;
@@ -1121,50 +1121,50 @@ void CSISFileGeneratorBase::WriteDependL()
 // To write the SIS file's DEPENDENCY block
 	{
 	Verbage( _T("Writing dependencies"));
-	
+
 	const DEPENDNODE *pDNode = m_pSISWriter->GetDependencyBase();
 	while(pDNode)
 		{
 		TInstDependency idDepend;
-		
+
 		idDepend.iUid = pDNode->dwUID;
-		
+
 		idDepend.iVersion.iMajor    = pDNode->wMajor;
 		idDepend.iVersion.iMinor    = pDNode->wMinor;
 		idDepend.iVersion.iBuild    = pDNode->dwBuild;
-		
+
 		DWORD dwNumBytes;
 		if(!WriteFile(m_hFile, (LPVOID)&idDepend, sizeof(TInstDependency), &dwNumBytes, NULL))
 			throw ErrFailedToWriteDependencyBlock;
-		
+
 		// CRC
 		Crc((void *)&idDepend, sizeof(idDepend));
-		
+
 		// Now write out the names
 		LANGSTRINGNODE *pLSNode = pDNode->pLangStringBase;
 		while(pLSNode)
 			{
 			DWORD dwLength = wcslen(pLSNode->pszString) * SizeOfChar();
-			
+
 			DWORD dwNumBytes;
 			if(!::WriteFile(m_hFile, (LPVOID)&dwLength, sizeof(DWORD), &dwNumBytes, NULL))
 				throw ErrFailedToWriteDependencyBlock;
-			
+
 			// CRC
 			Crc((void *)&dwLength, sizeof(DWORD));
 			pLSNode = pLSNode->pNext;
 			}
-		
+
 		pLSNode = pDNode->pLangStringBase;
 		while(pLSNode)
 			{
 			DWORD dwNumBytes;
 			if(!::WriteFile(m_hFile, (LPVOID)&m_dwCurrString, sizeof(DWORD), &dwNumBytes, NULL))
 				throw ErrFailedToWriteDependencyBlock;
-			
+
 			// CRC
 			Crc((void *)&m_dwCurrString, sizeof(DWORD));
-			
+
 			m_dwCurrString += wcslen(pLSNode->pszString) * SizeOfChar();
 			pLSNode = pLSNode->pNext;
 			}
@@ -1178,85 +1178,85 @@ void CSISFileGeneratorBase::WriteCertificatesL()
 #ifdef DIGITAL_SIGNATURES
 	//get digital sig info (public key/private key and password)
 	const SIGNATURENODE* pSignature = m_pSISWriter->GetSignatureBase();
-	
+
 	if (pSignature)
 		{
-		HANDLE hInFile; 
+		HANDLE hInFile;
 		DWORD dwFileSize;
 		DWORD dwNumBytes;
-		
+
 		BYTE *pBuf;
-		
+
 		//pck7 file was re-written to a chain file, so read it instead
-		if (m_bWriteChain) 
+		if (m_bWriteChain)
 			{
 			//open certificate chain
-			hInFile = ::MakeSISOpenFile(pSignature->pszChainFile, GENERIC_READ, OPEN_EXISTING);	
+			hInFile = ::MakeSISOpenFile(pSignature->pszChainFile, GENERIC_READ, OPEN_EXISTING);
 			if(hInFile == INVALID_HANDLE_VALUE) throw ErrCannotOpenFile;
-			
+
 			}
-		
-		
+
+
 		//no conversions in pPKCS7 object so write certificate verbatim
-		else	
+		else
 			{
 			//open public key file (pre-converted from Base64)
-			hInFile = ::MakeSISOpenFile(pSignature->pszB64File, GENERIC_READ, OPEN_EXISTING);	
+			hInFile = ::MakeSISOpenFile(pSignature->pszB64File, GENERIC_READ, OPEN_EXISTING);
 			if(hInFile == INVALID_HANDLE_VALUE) throw ErrCannotOpenFile;
-			
+
 			}
-		
-		
+
+
 		dwFileSize = ::GetFileSize(hInFile, NULL);
 		if (dwFileSize==0xFFFFFFFF) throw ErrCannotOpenFile;
-		
+
 		TInstCertBlock CertBlock;
-		
-		
+
+
 		//get system time
 		struct tm *newtime;
 		long ltime;
 		time( &ltime );
 		/* Obtain GMT */
 		newtime = gmtime( &ltime );
-		
+
 		//copy RTC to our internal structure
 		CertBlock.iTimeStamp.iSecond = (TInt16) newtime->tm_sec;
 		CertBlock.iTimeStamp.iMinute = (TInt16) newtime->tm_min;
 		CertBlock.iTimeStamp.iHour = (TInt16) newtime->tm_hour;
-		
+
 		//date is stored with year 1900 as baseline
 		if (newtime->tm_year >= 100)
 			{
 			newtime->tm_year += Y2K_FIX;
 			}
-		
+
 		CertBlock.iTimeStamp.iYear = (TInt16) newtime->tm_year;
 		CertBlock.iTimeStamp.iMonth = (TInt16) newtime->tm_mon;
 		CertBlock.iTimeStamp.iDay = (TInt16) newtime->tm_mday;
-		
+
 		CertBlock.iNumCerts = pSignature->iNumCerts;
-		
-		
-		pBuf = new BYTE[dwFileSize + sizeof (TInstCertBlock)];	
+
+
+		pBuf = new BYTE[dwFileSize + sizeof (TInstCertBlock)];
 		if (!pBuf) throw ErrNotEnoughMemory;
-		
+
 		memcpy(pBuf, (LPVOID)&CertBlock, sizeof (TInstCertBlock));
-		
+
 		BYTE* pBuf2 = &pBuf[sizeof (TInstCertBlock)];
-		
-		
+
+
 		if(!::ReadFile(hInFile, (LPVOID)pBuf2, dwFileSize, &dwNumBytes, NULL))
 			throw ErrCannotReadFile;
-		
+
 		if(!::WriteFile(m_hFile, (LPVOID)pBuf, dwFileSize + sizeof (TInstCertBlock), &dwNumBytes, NULL))
 			throw ErrFailedToWriteCertificatesBlock;
-		
+
 		// CRC
 		Crc((void *)pBuf, dwNumBytes);
 		delete [] pBuf;
-		
-		
+
+
 		::CloseHandle(hInFile);
 		}
 #endif
@@ -1266,22 +1266,22 @@ void CSISFileGeneratorBase::WriteCapabilitiesL()
 // To write the SIS file's CAPABILITIES block
 	{
 	Verbage( _T("Writing capabilities"));
-	
+
 	const CAPABILITYNODE *pCNode = m_pSISWriter->GetCapabilityBase();
 	while(pCNode)
 		{
 		TInstCapability idCapability;
-		
+
 		idCapability.iKey = pCNode->iKey;
 		idCapability.iValue = pCNode->iValue;
-		
+
 		DWORD dwNumBytes;
 		if(!WriteFile(m_hFile, (LPVOID)&idCapability, sizeof(TInstCapability), &dwNumBytes, NULL))
 			throw ErrFailedToWriteCapabilitiesBlock;
-		
+
 		// CRC
 		Crc((void *)&idCapability, sizeof(TInstCapability));
-		
+
 		pCNode = pCNode->pNext;
 		}
 	}
@@ -1290,17 +1290,17 @@ void CSISFileGeneratorBase::WriteStringsL()
 // To write the SIS file's STRINGS block
 	{
 	Verbage(_T("Writing strings"));
-	
+
 	// Write the installation name string descriptors  --------------------------------------------
-	const LANGSTRINGNODE *pLSNode = m_pSISWriter->GetLangStringBase();	 
-	
+	const LANGSTRINGNODE *pLSNode = m_pSISWriter->GetLangStringBase();
+
 	DWORD  dwCount   = m_pSISWriter->GetNoLanguages();
 	DWORD* pdwLength = new DWORD [dwCount];
 	DWORD* pdwPos    = new DWORD [dwCount];
 	DWORD  i = 0;
-	
+
 	if (!pdwLength || !pdwPos) throw ErrNotEnoughMemory;
-	
+
 	while(pLSNode)
 		{
 		pdwLength[i] = wcslen(pLSNode->pszString) * SizeOfChar();
@@ -1309,19 +1309,19 @@ void CSISFileGeneratorBase::WriteStringsL()
 		m_dwCurrString += pdwLength[i++];
 		assert(i <= dwCount);
 		}
-	
+
 	DWORD dwNumBytes;
 	if(!::WriteFile(m_hFile, (LPVOID)pdwLength, dwCount * sizeof(DWORD), &dwNumBytes, NULL))
 		throw ErrFailedToWriteStringsBlock;
 	Crc((void *)pdwLength, sizeof(DWORD) * dwCount);
-	
+
 	if(!::WriteFile(m_hFile, (LPVOID)pdwPos, dwCount * sizeof(DWORD), &dwNumBytes, NULL))
 		throw ErrFailedToWriteStringsBlock;
 	Crc((void *)pdwPos, sizeof(DWORD) * dwCount);
-	
+
 	// Put PKG lines strings ----------------------------------------------------------------
 	const PKGLINENODE *pNode = m_pSISWriter->GetPkgLineBase();
-	
+
 	while(pNode)
 		{
 		switch (pNode->iPackageLineType)
@@ -1329,9 +1329,9 @@ void CSISFileGeneratorBase::WriteStringsL()
 			case EInstPkgLineFile:
 			case EInstPkgLineLanguageFile:
 				{
-				WriteString(pNode->file->pszSource, m_hFile);		
+				WriteString(pNode->file->pszSource, m_hFile);
 				WriteString(pNode->file->pszDest, m_hFile);
-				
+
 				// Check for multiple language forms...
 				WORD wMaxLangs = 0;
 				if (pNode->iPackageLineType==EInstPkgLineLanguageFile) wMaxLangs = m_pSISWriter->GetNoLanguages();
@@ -1343,7 +1343,7 @@ void CSISFileGeneratorBase::WriteStringsL()
 					}
 				}
 				// write mime type
-				WriteString8(pNode->file->pszMimeType, m_hFile);		
+				WriteString8(pNode->file->pszMimeType, m_hFile);
 				break;
 			case EInstPkgLineOption:
 				{
@@ -1365,7 +1365,7 @@ void CSISFileGeneratorBase::WriteStringsL()
 			}
 		pNode = pNode->pNext;
 		}
-	
+
 	// Write the dependency names -----------------------------------------------------------------
 	const DEPENDNODE *pDNode = m_pSISWriter->GetDependencyBase();
 	while(pDNode)
@@ -1379,16 +1379,16 @@ void CSISFileGeneratorBase::WriteStringsL()
 			}
 		pDNode = pDNode->pNext;
 		}
-	
+
 	// Now write out the installation names -------------------------------------------------------
-	pLSNode = m_pSISWriter->GetLangStringBase();	 
+	pLSNode = m_pSISWriter->GetLangStringBase();
 	while(pLSNode)
 		{
 		WriteString(pLSNode->pszString, m_hFile);
 		pLSNode = pLSNode->pNext;
 		}
 	}
-	
+
 
 void CSISFileGeneratorBase::WriteCondExprStrL(const PKGLINECONDITION* expr)
 {
@@ -1428,31 +1428,31 @@ void CSISFileGeneratorBase::WriteCondExprStrL(const PKGLINECONDITION* expr)
 	}
 }
 
-	
+
 // To write the SIS file's CODE block
 void CSISFileGeneratorBase::WriteCodeL()
 {
 	Verbage(_T("Writing code"));
 
 	const PKGLINENODE *pNode = m_pSISWriter->GetPkgLineBase();
-		
+
 	while(pNode) {
 		if((pNode->iPackageLineType == EInstPkgLineFile || pNode->iPackageLineType == EInstPkgLineLanguageFile) &&
 		   pNode->file->type != EInstFileTypeNull) {
 			HANDLE hInFile = ::MakeSISOpenFile(pNode->file->pszSource, GENERIC_READ, OPEN_EXISTING);
 			if(hInFile == INVALID_HANDLE_VALUE)
 				throw ErrCannotOpenFile;
-				
-			BYTE *pBuf = new BYTE[pNode->file->dwSize];			
+
+			BYTE *pBuf = new BYTE[pNode->file->dwSize];
 			if (!pBuf) throw ErrNotEnoughMemory;
-				
+
 			DWORD dwNumBytes;
 			if(!::ReadFile(hInFile, (LPVOID)pBuf, pNode->file->dwSize, &dwNumBytes, NULL))
 				throw ErrCannotReadFile;
 
 			if(!::WriteFile(m_hFile, (LPVOID)pBuf, pNode->file->dwSize, &dwNumBytes, NULL))
 				throw ErrCannotWriteFile;
-				
+
 			// CRC
 			Crc((void *)pBuf, pNode->file->dwSize);
 			delete [] pBuf;
@@ -1463,26 +1463,26 @@ void CSISFileGeneratorBase::WriteCodeL()
 	}
 }
 
-	
-// To write the CRC section                           
+
+// To write the CRC section
 void CSISFileGeneratorBase::WriteCrcL()
 {
 	Verbage(_T("Writing crc"));
-		
+
 	if(::SetFilePointer(m_hFile, sizeof(TInstUID) + sizeof(DWORD), NULL, FILE_BEGIN) == 0xFFFFFFFF)
 		throw ErrFailedToWriteCRC;
-		
+
 	DWORD dwNumBytes;
 	if(!::WriteFile(m_hFile, (LPVOID)&m_wCheck, sizeof(WORD), &dwNumBytes, NULL))
 		throw ErrFailedToWriteCRC;
 }
-	
+
 
 void CSISFileGeneratorBase::WriteSignatureL(LPCWSTR pszTargetFile)
 		{
 #ifdef DIGITAL_SIGNATURES
 		Verbage(_T("Writing digital signature"));
-		
+
 		//get private key to encrypt hash for digital signature
 		const SIGNATURENODE* pSignature = m_pSISWriter->GetSignatureBase();
 		if (pSignature)
@@ -1490,153 +1490,153 @@ void CSISFileGeneratorBase::WriteSignatureL(LPCWSTR pszTargetFile)
 			// convert private key file name into MBCS for Encrypt() method
 			DWORD length=wcslen(pSignature->pszPrivateKey);
 			LPSTR fName=MakeMBCSString(pSignature->pszPrivateKey, CP_ACP, length);
-			
+
 			// convert password into MBCS for Encrypt() method
 			WCHAR pszCmdPassword[MAX_PATH];	 // Command Line Decryption Password
 			LPSTR pszPassword = "";
-			
+
 			//test for command line Decryption Password
 			if (m_pSISWriter->GetCmdPassword(pszCmdPassword))
 				{
 				length=wcslen(pszCmdPassword);
 				pszPassword=MakeMBCSString(pszCmdPassword, CP_ACP, length);
-				
+
 				/*
 				#ifdef _DEBUG
 				printf("***DEBUG CODE*** Password is %s\n", pszPassword);
 				#endif
 				*/
 				}
-			
+
 			else
 				{
 				length=wcslen(pSignature->pszPassword);
 				pszPassword=MakeMBCSString(pSignature->pszPassword, CP_ACP, length);
 				}
-			
-			
+
+
 			CPrivateKey* pKey = new CPrivateKey;
 			if (!pKey) throw ErrNotEnoughMemory;
-			
+
 			pKey->LoadKey(fName, pszPassword);
-			
+
 			if (pKey->Loaded() == FALSE)
-				{	
+				{
 				throw ErrCannotOpenFile;
 				}
-			
-			
+
+
 			// compute hash across SIS file
 			CHash* pHash = NULL;
-			
+
 			pHash = new CSHA1;
 			if (!pHash) throw ErrNotEnoughMemory;
-			
+
 			char hash[HASHLEN];
-			
+
 			// convert SIS file name into MBCS for HashFile() method
 			DWORD lengthsis=wcslen(pszTargetFile);
 			LPSTR fSISName=MakeMBCSString(pszTargetFile, CP_ACP, lengthsis);
-			
+
 			// hash will contain the computed hash for the SIS file
 			DWORD TargetLen = pHash->HashFile(fSISName, hash);
-			
-			
-			delete [] fSISName;	
+
+
+			delete [] fSISName;
 			delete pHash;
-			
+
 			//now we need to DSA the SHA-1 signature
 			if (pKey->KeyType() == EDSAPrivateKey)
 				{
 				pHash = new CDSA;
 				if (!pHash) throw ErrNotEnoughMemory;
-				
+
 				pHash->SetKey(pKey->GetKeyPtr());
 				// hash will contain the computed SHA-1 signed by DSA
 				pHash->HashFile("", hash);
-				
+
 				}
-			
+
 			// encrypt hash to create digital signature
-			CEncrypt* crypto = new CEncrypt;		
+			CEncrypt* crypto = new CEncrypt;
 			if (!crypto) throw ErrNotEnoughMemory;
-			
+
 			char ciphertext[CIPHERTEXTLEN];
-			
-			
-			
+
+
+
 			int KeyLen;
 			TKeyCipher ciphertype;
-			
+
 			//cipher text will contain the encrypted hash (we only do this for RSA)
 			if (pKey->KeyType() == ERSAPrivateKey)
 				{
-				
+
 				char string2char[20];
-				
+
 				pHash->HexStringToBytes(hash, string2char);
-				
+
 				if (!crypto->Encrypt(string2char, (unsigned char*)ciphertext, fName, pszPassword, &KeyLen, &ciphertype))
 					throw ErrCannotOpenFile;
 				}
-			
+
 			delete [] pszPassword;
 			delete [] fName;
 			delete crypto;
-			
+
 			// now read in unsigned SIS file & write out new SIS file with appended signature
-			
+
 			HANDLE hSISFile = ::MakeSISOpenFile(pszTargetFile, GENERIC_READ, OPEN_EXISTING);
 			if(hSISFile == INVALID_HANDLE_VALUE) throw ErrCannotOpenFile;
-			
+
 			// double check file size is as expected
 			if (TargetLen != ::GetFileSize(hSISFile, NULL)) throw ErrFailedToWriteSignatureBlock;
-			
+
 			if (pKey->KeyType() == EDSAPrivateKey)
 				{
 				KeyLen = pKey->KeyLength();
 				}
-			
+
 			unsigned char* pFileBuf = new unsigned char[TargetLen + KeyLen];
 			if (!pFileBuf) throw ErrNotEnoughMemory;
-			
+
 			DWORD dwNumBytes;
 			if(!::ReadFile(hSISFile, (LPVOID)pFileBuf, TargetLen, &dwNumBytes, NULL))
 				throw ErrCannotReadFile;
-			
+
 			::CloseHandle(hSISFile);
-			
+
 			//append hash cipher text to end of the file
-			
+
 			//if RSA, we need to add the RSA'd SHA-1 signature
 			if (pKey->KeyType() == ERSAPrivateKey)
 				{
 				memcpy(&pFileBuf[TargetLen], ciphertext, KeyLen);
 				}
-			
+
 			//If DSA, we need to add the DSA'd SHA-1 signature
 			if (pKey->KeyType() == EDSAPrivateKey)
 				{
 				memcpy(&pFileBuf[TargetLen], hash, KeyLen);
-				
-				
+
+
 				delete pHash;
 				}
-			
+
 			//write new SIS file to disk (hash is now appended)
 			HANDLE hOutFile = ::MakeSISOpenFile(pszTargetFile, GENERIC_WRITE, OPEN_EXISTING);
-			if(hOutFile == INVALID_HANDLE_VALUE) throw ErrCannotOpenFile;			
-			
+			if(hOutFile == INVALID_HANDLE_VALUE) throw ErrCannotOpenFile;
+
 			if(!::WriteFile(hOutFile, (LPVOID)pFileBuf, TargetLen + KeyLen, &dwNumBytes, NULL))
 				throw ErrCannotWriteFile;
-			
+
 			::CloseHandle(hOutFile);
-			
+
 			delete [] pFileBuf;
 			delete pKey;
-			
+
 		}
-#endif		
+#endif
 }
 
 
@@ -1645,48 +1645,48 @@ CPrivateKey* CSISFileGeneratorBase::LoadPrivateKey()
 	{
 	CPrivateKey* result = NULL;
 #ifdef DIGITAL_SIGNATURES
-	
+
 	const SIGNATURENODE* pSignature = m_pSISWriter->GetSignatureBase();
 	if (pSignature)
 		{
 		// convert private key file name into MBCS for Encrypt() method
 		DWORD length=wcslen(pSignature->pszPrivateKey);
 		LPSTR fName=MakeMBCSString(pSignature->pszPrivateKey, CP_ACP, length);
-		
+
 		// convert password into MBCS for Encrypt() method
 		WCHAR pszCmdPassword[MAX_PATH];	 // Command Line Decryption Password
 		LPSTR pszPassword = "";
-		
+
 		//test for command line Decryption Password
 		if (m_pSISWriter->GetCmdPassword(pszCmdPassword))
 			{
 			length=wcslen(pszCmdPassword);
 			pszPassword=MakeMBCSString(pszCmdPassword, CP_ACP, length);
-			
+
 			/*
 			#ifdef _DEBUG
 			printf("***DEBUG CODE*** Password is %s\n", pszPassword);
 			#endif
 			*/
 			}
-		
+
 		else
 			{
 			length=wcslen(pSignature->pszPassword);
 			pszPassword=MakeMBCSString(pSignature->pszPassword, CP_ACP, length);
 			}
-		
-		
+
+
 		CPrivateKey* pKey = new CPrivateKey;
 		if (!pKey) throw ErrNotEnoughMemory;
-		
+
 		pKey->LoadKey(fName, pszPassword);
-		
+
 		delete [] pszPassword;
 		delete [] fName;
-		
+
 		if (pKey->Loaded() == FALSE)
-			{	
+			{
 			throw ErrCannotOpenFile;
 			}
 		else
@@ -1694,16 +1694,16 @@ CPrivateKey* CSISFileGeneratorBase::LoadPrivateKey()
 			result = pKey;
 			}
 		}
-#endif		
+#endif
 	return result;
 	}
 
 
 
 void CSISFileGeneratorBase::Crc(const void *pPtr, DWORD dwLength)
-// Purpose  : Creates the CRC checksum                              
-// Inputs   : pPtr    - Pointer to a block of memory                 
-//            wLength - The length of the memory block            
+// Purpose  : Creates the CRC checksum
+// Inputs   : pPtr    - Pointer to a block of memory
+//            wLength - The length of the memory block
 	{
 	const unsigned char *pB = (const unsigned char *)pPtr;
 	const unsigned char *pE = pB + dwLength;
@@ -1714,8 +1714,8 @@ void CSISFileGeneratorBase::Crc(const void *pPtr, DWORD dwLength)
 	}
 
 void CSISFileGeneratorBase::UIDCheck(const void *pPtr)
-// Purpose  : To create a UID checksum                           
-// Inputs   : pPtr    - Pointer to a block of memory                 
+// Purpose  : To create a UID checksum
+// Inputs   : pPtr    - Pointer to a block of memory
 	{
 	const unsigned char *pB = (const unsigned char *)pPtr;
 	const unsigned char *pE = pB + (KUidInstallNumUid * sizeof(DWORD));
@@ -1725,7 +1725,7 @@ void CSISFileGeneratorBase::UIDCheck(const void *pPtr)
 		{
 		*pT++ = (*pB);
 		pB += 2;
-		} 
+		}
 	m_wCheck = 0;
 	Crc(&buf[0], (KUidInstallNumUid * sizeof(DWORD))>>1);
 	}
@@ -1734,30 +1734,30 @@ void CSISFileGeneratorBase::EstimateInstallationSizeL()
 	{
 	int nodes, i;
 	const PKGLINENODE *pNode = m_pSISWriter->GetPkgLineBase();
-	
+
 	// This method makes an estimate of the amount of space required by an installation.
 	// It sums the uncompressed size of all files that are to be installed on an epoc device.
 	// If statements are a special case.  Only the largest file installed by any given branch of
 	// an if statement will be added to the total install size.  Consequently the space required will
-	// overestimated for package files with if statements. 
-	
-	// Since nodes are added to the front of the list, the last package line appears at the 
+	// overestimated for package files with if statements.
+
+	// Since nodes are added to the front of the list, the last package line appears at the
 	// front of the list.  Its easier to compute the maximum amount of space required by an
-	// if statement if we can access the nodes in the order in which they appear in the 
-	// .pkg file.  Hence, an array is created with pointers to these nodes. 
-	
-	for (nodes = 0; pNode != NULL; pNode = pNode->pNext) 
+	// if statement if we can access the nodes in the order in which they appear in the
+	// .pkg file.  Hence, an array is created with pointers to these nodes.
+
+	for (nodes = 0; pNode != NULL; pNode = pNode->pNext)
 		nodes++;
-	
+
 	const PKGLINENODE **pNodePointers = new const PKGLINENODE*[nodes];
-	
+
 	pNode = m_pSISWriter->GetPkgLineBase();
 	for (i = nodes-1; i >= 0; i--)
 		{
 		pNodePointers[i] = pNode;
 		pNode = pNode->pNext;
 		}
-	
+
 	try
 		{
 		m_dwMaximumSpaceNeeded = 0;
@@ -1778,7 +1778,7 @@ void CSISFileGeneratorBase::EstimateInstallationSizeL()
 		delete[] pNodePointers;
 		throw;
 		}
-	
+
 	delete[] pNodePointers;
 	}
 
@@ -1788,7 +1788,7 @@ int CSISFileGeneratorBase::CalculateInstallSizeOfIfBlockL(const PKGLINENODE **pN
 	int needsOfBlock;
 	bool processingIf = true;
 	index++;
-	
+
 	while (processingIf)
 		{
 		needsOfBlock = 0;
@@ -1804,23 +1804,23 @@ int CSISFileGeneratorBase::CalculateInstallSizeOfIfBlockL(const PKGLINENODE **pN
 				index++;
 				}
 			}
-		
+
 		if (needsOfBlock > spaceNeeded)
 			spaceNeeded = needsOfBlock;
-		
+
 		processingIf = (pNode[index]->iPackageLineType != EInstPkgLineCondEndIf);
 		index++;
 		}
-	
+
 	return spaceNeeded;
 	}
 
 int CSISFileGeneratorBase::CalculateInstallSizeOfFileL(const PKGLINENODE *pNode) const
 	{
 	int spaceNeeded = 0;
-	
+
 	if ((pNode->iPackageLineType == EInstPkgLineFile || pNode->iPackageLineType == EInstPkgLineLanguageFile) &&
-		(pNode->file->type != EInstFileTypeText && pNode->file->type != EInstFileTypeNull && 
+		(pNode->file->type != EInstFileTypeText && pNode->file->type != EInstFileTypeNull &&
 		pNode->file->type != EInstFileTypeMime))
 		{
 		if (pNode->file->type == EInstFileTypeComponent)
@@ -1838,7 +1838,7 @@ int CSISFileGeneratorBase::CalculateInstallSizeOfFileL(const PKGLINENODE *pNode)
 			if (pNode->file->type != EInstFileTypeText)
 				spaceNeeded = pNode->file->dwSize;
 		}
-	
+
 	return spaceNeeded;
 	}
 
@@ -1846,25 +1846,25 @@ void CSISFileGeneratorBase::CompressFiles()
 // Purpose : To compress files embedded within the sis file.
 	{
 	int compressedSize = 0;
-	
-	
+
+
 	Verbage(_T("Compressing files"));
 	const PKGLINENODE *pNode = m_pSISWriter->GetPkgLineBase();
-	
+
 	while(pNode)
 		{
 		if ((pNode->iPackageLineType == EInstPkgLineFile || pNode->iPackageLineType == EInstPkgLineLanguageFile) && pNode->file->type != EInstFileTypeNull)
 			{
 			pNode->file->dwUncompressedSize = pNode->file->dwSize;
-			
+
 			if (((m_pSISWriter->GetFlags() & EInstNoCompress) == 0))
 				{
 				LPWSTR pszCompressedFileName = TempFileName(pNode->file->pszSource);
-				
+
 				CompressFile(pNode,pszCompressedFileName,compressedSize);
-				
+
 				// update the source filename and the file size in the PKGLINEFILE node.
-				
+
 				wcscpy(pNode->file->pszSource, pszCompressedFileName);
 				pNode->file->dwSize = compressedSize;
 				}
@@ -1881,57 +1881,57 @@ void CSISFileGeneratorBase::CompressFile(const PKGLINENODE *pNode, LPWSTR pszOut
 // Outputs:	compressedSize: The size of the compressed File.
 	{
 	HANDLE hUncompressedFile, hCompressedFile;
-	DWORD dwUncompressedFileSize;
+	//DWORD dwUncompressedFileSize;
 	const int bufferSize = 0xffff;
 	int zlibErr;
 	BOOL zlibInit = FALSE;
-	
+
 	hUncompressedFile = ::MakeSISOpenFile(pNode->file->pszSource, GENERIC_READ, OPEN_EXISTING);
 	if(hUncompressedFile == INVALID_HANDLE_VALUE) throw ErrCannotOpenFile;
-	dwUncompressedFileSize = ::GetFileSize(hUncompressedFile, NULL);
-	
+	//dwUncompressedFileSize = ::GetFileSize(hUncompressedFile, NULL);
+
 	hCompressedFile = ::MakeSISOpenFile(pszOutputFname, GENERIC_WRITE|GENERIC_READ, CREATE_NEW);
 	if (hCompressedFile==INVALID_HANDLE_VALUE) throw ErrCannotOpenFile;
-	
+
 	BYTE *pbInputBuffer = new BYTE [bufferSize];
 	BYTE *pbOutputBuffer = new BYTE [bufferSize];
 	z_stream compressionState;
-	
+
 	try
 		{
 		if (!pbOutputBuffer || !pbInputBuffer) throw ErrNotEnoughMemory;
-		
+
 		compressionState.zalloc = NULL;
 		compressionState.zfree = NULL;
 		compressionState.opaque = NULL;
 		compressionState.next_out = pbOutputBuffer;
 		compressionState.avail_out = bufferSize;
 		ReadFromUncompressedFile(hUncompressedFile,pbInputBuffer,compressionState,bufferSize);
-		
+
 		zlibInit = TRUE;
 		zlibErr = deflateInit(&compressionState,Z_DEFAULT_COMPRESSION);
 		if (zlibErr != Z_OK) throw ErrFailedCompression;
-		
+
 		while ((zlibErr = deflate(&compressionState,Z_NO_FLUSH)) == Z_OK)
 			{
 			if (compressionState.avail_in == 0)
 				ReadFromUncompressedFile(hUncompressedFile,pbInputBuffer,compressionState,bufferSize);
-			
+
 			if (compressionState.avail_out == 0)
 				WriteToCompressedFile(hCompressedFile, pbOutputBuffer,compressionState, bufferSize);
 			}
-		
+
 		while ((zlibErr = deflate(&compressionState,Z_FINISH)) == Z_OK)
 			{
 			if (compressionState.avail_in == 0)
 				ReadFromUncompressedFile(hUncompressedFile,pbInputBuffer,compressionState,bufferSize);
-			
+
 			if (compressionState.avail_out == 0)
 				WriteToCompressedFile(hCompressedFile, pbOutputBuffer,compressionState, bufferSize);
 			}
 		if (zlibErr != Z_STREAM_END) throw ErrFailedCompression;
 		WriteToCompressedFile(hCompressedFile, pbOutputBuffer,compressionState, bufferSize);
-		} 
+		}
 	catch(...)
 		{
 		delete[] pbInputBuffer;
@@ -1943,14 +1943,14 @@ void CSISFileGeneratorBase::CompressFile(const PKGLINENODE *pNode, LPWSTR pszOut
 			deflateEnd(&compressionState);
 		throw;
 		}
-	
+
 	delete[] pbInputBuffer;
 	delete[] pbOutputBuffer;
 	::CloseHandle(hUncompressedFile);
 	::CloseHandle(hCompressedFile);
-	
+
 	compressedSize = compressionState.total_out;
-	deflateEnd(&compressionState);	
+	deflateEnd(&compressionState);
 	}
 
 void CSISFileGeneratorBase::ReadFromUncompressedFile(HANDLE hFile,BYTE *pbBuffer,z_stream &compressionState, int bufferSize)
@@ -1959,7 +1959,7 @@ void CSISFileGeneratorBase::ReadFromUncompressedFile(HANDLE hFile,BYTE *pbBuffer
 	if (::ReadFile(hFile, (LPVOID)pbBuffer, bufferSize, &dwNumBytes, NULL))
 		{
 		compressionState.next_in = pbBuffer;
-		compressionState.avail_in = dwNumBytes;	
+		compressionState.avail_in = dwNumBytes;
 		}
 	else
 		throw ErrCannotReadFile;
@@ -1974,7 +1974,7 @@ void CSISFileGeneratorBase::WriteToCompressedFile(HANDLE hFile,BYTE *pbBuffer,z_
 		compressionState.avail_out = dwNumBytes;
 		}
 	else
-		throw ErrCannotWriteFile; 
+		throw ErrCannotWriteFile;
 	}
 
 // ===========================================================================
@@ -1986,25 +1986,25 @@ template<class T>
 void CSISFileGeneratorT<T>::WriteString(LPCWSTR pStr, HANDLE hFile)
 // Purpose  : Write a string to the file
 // Inputs   : pStr	-	The string to write (comes from CSISWritre so is always UNICODE!)
-//			  hFile -	The target file	
+//			  hFile -	The target file
 	{
 	// Copy the string into the output format...
 	long len = wcslen(pStr);
-	
+
 	T* buf = new T[len + 1];
 	if (!buf) throw ErrNotEnoughMemory;
-	
+
 	for(int i = 0; i < len; ++i)
 		buf[i] = (T)pStr[i];
-	
+
 	// And write it to the file
 	DWORD dwNumBytes;
 	if(!::WriteFile(hFile, (LPVOID)buf, len * sizeof(T), &dwNumBytes, NULL))
 		throw ErrFailedToWriteStringsBlock;
-	
+
 	// CRC
 	Crc((void *)buf, len * sizeof(T));
-	
+
 	delete [] buf;
 	}
 
@@ -2012,25 +2012,25 @@ template<class T>
 void CSISFileGeneratorT<T>::WriteString8(LPCWSTR pStr, HANDLE hFile)
 // Purpose  : Write an 8bit string to the file
 // Inputs   : pStr	-	The string to write
-//			  hFile -	The target file	
+//			  hFile -	The target file
 	{
 	// Copy the string into the output format...
 	long len = wcslen(pStr);
-	
+
 	char* buf = new char[len + 1];
 	if (!buf) throw ErrNotEnoughMemory;
-	
+
 	for(int i = 0; i < len; ++i)
 		buf[i] = (char)pStr[i];
-	
+
 	// And write it to the file
 	DWORD dwNumBytes;
 	if(!::WriteFile(hFile, (LPVOID)buf, len, &dwNumBytes, NULL))
 		throw ErrFailedToWriteStringsBlock;
-	
+
 	// CRC
 	Crc((void *)buf, len);
-	
+
 	delete [] buf;
 	}
 
@@ -2041,52 +2041,52 @@ void CSISFileGeneratorBase::ParseCertificates()
 #ifdef DIGITAL_SIGNATURES
 	//get digital sig info
 	const SIGNATURENODE* pSignature = m_pSISWriter->GetSignatureBase();
-	
+
 	if (pSignature)
 		{
-		
+
 		int status;
-		
+
 		m_bWriteChain = FALSE;
-		
+
 		//get a temporary filename for re-writing a PCKS chain
 		LPWSTR pszTempCert;
 		pszTempCert = TempFileName(pSignature->pszPublicKey);
-		
+
 		// convert tempfile name for Convert Signed method
 		DWORD lent=wcslen(pszTempCert);
 		LPSTR fNameTmp=MakeMBCSString(pszTempCert, CP_ACP, lent);
-		
-		
+
+
 		// convert temporary Certificate file name for Convert Signed method
 		DWORD lench=wcslen(pSignature->pszChainFile);
 		LPSTR fNameChain=MakeMBCSString(pSignature->pszChainFile, CP_ACP, lench);
-		
-		
+
+
 		// convert certificate name for Convert Signed method
 		DWORD lenc=wcslen(pSignature->pszPublicKey);
 		LPSTR fNameCrt=MakeMBCSString(pSignature->pszPublicKey, CP_ACP, lenc);
-		
-		
+
+
 		// convert b64 name
 		DWORD lencb64=wcslen(pSignature->pszB64File);
 		LPSTR fNameB64=MakeMBCSString(pSignature->pszB64File, CP_ACP, lencb64);
-		
-		
-		
+
+
+
 		//create our PKCS7 aware object
 		CPKCS7* pPKCS7 = new CPKCS7;
 		if (!pPKCS7) throw ErrNotEnoughMemory;
-		
+
 		status = pPKCS7->ConvertSigned(fNameCrt, fNameTmp);
 		//status = pPKCS7->ConvertBase64(fNameCrt, fNameTmp);
-		
-		
+
+
 		// If not a single cert, specify that the end entity cert comes first.
 		// Identify ee cert by private key
 		CPrivateKey* pKey = LoadPrivateKey();
 		pPKCS7->SetEndEntityKey(pKey);
-		
+
 		int keyMatchesCert = 1;
 		if (status == PKCS7FileReWritten)
 			{
@@ -2094,7 +2094,7 @@ void CSISFileGeneratorBase::ParseCertificates()
 			m_bWriteChain = TRUE;
 			if (extractStatus == ErrEndEntityNotFound)
 				keyMatchesCert = 0;
-			
+
 			}
 		else if (status != PKCS7FileIsCertificate)
 			{
@@ -2111,15 +2111,15 @@ void CSISFileGeneratorBase::ParseCertificates()
 
 		if (!keyMatchesCert)
 			throw ErrCertFileKeyFileMismatch;
-		
+
 		delete pKey;
 		delete pPKCS7;
-		
+
 		//create a Base64 convertor object
 		CB64Decrypt* pB64 = new CB64Decrypt;
-		
+
 		if (!pB64) throw ErrNotEnoughMemory;
-		
+
 		if (m_bWriteChain)
 			{
 			pB64->Do(fNameChain, fNameB64, NULL);
@@ -2128,14 +2128,14 @@ void CSISFileGeneratorBase::ParseCertificates()
 			{
 			pB64->Do(fNameCrt, fNameB64, NULL);
 			}
-		
+
 		delete pB64;
-		
+
 		delete [] fNameTmp;
 		delete [] fNameChain;
 		delete [] fNameCrt;
-		
-		
+
+
 		}
 #endif
 	}

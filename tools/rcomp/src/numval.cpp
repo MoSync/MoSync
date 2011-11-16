@@ -11,7 +11,7 @@
 *
 * Contributors:
 *
-* Description: 
+* Description:
 *
 */
 
@@ -33,11 +33,11 @@ using std::endl;
 #endif //__MSVCDOTNET__
 
 #include "astring.h"
-#include "numval.h"  
+#include "numval.h"
 #include "structst.h"
 #include "parser.h"
 #include "rcomp.hpp"
-#include "mem.h"     
+#include "mem.h"
 #include "errorhan.h"
 #include "rcbinstr.h"
 
@@ -87,7 +87,7 @@ NumericValue::NumericValue( const NumericValue & Source):
 	iData( NULL),
 	iULongValue( 0),
 	iSignedValue( 0),
-	iDoubleValue( 0.0)	
+	iDoubleValue( 0.0)
 	{
 	AllocateSpace();
 	memcpy( iData, Source.iData, iSize);
@@ -148,14 +148,14 @@ void NumericValue::ConvertToDouble( const String & Source)
 	{
 	assert( iNumericValueType == L_DOUBLE);
 	assert( Source.Length() > 0);
-	
+
 	double d = atof( Source.GetAssertedNonEmptyBuffer());
 	if ( d == 0.0 && !( Source == "0.0" || Source == "0") )
 		{ MOFF; cerr << "atof may have failed for " << Source << endl; MON;}
-		
+
 	iDoubleValue = d;
 	}
- 
+
 #if defined(__VC32__)
 #pragma warning( disable : 4706 ) // assignment within conditional expression
 #endif
@@ -163,9 +163,9 @@ void NumericValue::ConvertToDouble( const String & Source)
 void NumericValue::ConvertToNatural( const String & Source)
 	{
 	unsigned long	LongValue = 0;
-	
+
 	assert( sizeof( unsigned long) >= 4);	// Assume that LongValue can hold at least 2^32 - 1.
-	
+
 	const char *	pSourceChar = Source.iRep;
 	int	bLeadingHyphen = 0;
 	int	bHexNumber = 0;
@@ -176,7 +176,7 @@ void NumericValue::ConvertToNatural( const String & Source)
 		pSourceChar++;
 		pSourceChar++;
 		}
-	
+
 	if ( pSourceChar[0] == '-')
 		{
 		bLeadingHyphen = 1;
@@ -186,7 +186,7 @@ void NumericValue::ConvertToNatural( const String & Source)
 	while ( * pSourceChar != '\0')
 		{
 		unsigned char DigitValue;
-		
+
 		if ( bHexNumber)
 			{
 			assert( isxdigit( * pSourceChar) );
@@ -196,7 +196,7 @@ void NumericValue::ConvertToNatural( const String & Source)
 				DigitValue = (unsigned char)(toupper( * pSourceChar) - 'A' + 10);
 				if (LongValue >= 0x10000000)
 					{
-					String st("Number \"");	
+					String st("Number \"");
 					st += Source;
 					st +=  "\" is too big ";
 					ErrorHandler::OutputErrorLine(st);	//prevents overflow if number is bigger than 2^32 - 1.
@@ -217,19 +217,19 @@ void NumericValue::ConvertToNatural( const String & Source)
 			DigitValue = (unsigned char)(* pSourceChar - '0');
 			if ((LongValue > 429496729) || ((LongValue == 429496729) && (DigitValue > 5)))
 				{
-				String st("Number \"");	
+				String st("Number \"");
 				st += Source;
 				st +=  "\" is too big ";
 				ErrorHandler::OutputErrorLine(st);	//prevents overflow if number is bigger than 2^32 - 1.
 				}
 			LongValue = LongValue * 10 + DigitValue;
-			}	
-		pSourceChar++;		
+			}
+		pSourceChar++;
 		assert( ( pSourceChar - Source.iRep) < 10000);	// Safety check!
 		}
 
 	int inrange=0;
-	
+
 	// Check value is within the allowed range for the type taking into account
 	// a leading hyphen (minus sign) if there was one.
 	switch( iNumericValueType)
@@ -270,7 +270,7 @@ void NumericValue::ConvertToNatural( const String & Source)
 
 	if(!inrange)
 		exit(1);
-	
+
 	StoreValue( LongValue);
 
 	// If there was a hyphen then make the stored number negative (using two's complement).
@@ -297,14 +297,14 @@ void NumericValue::ConvertToNatural( const String & Source)
 #endif
 
 void NumericValue::StoreValue( unsigned long LongValue)
-	{		
+	{
 	iULongValue = LongValue;
-	
+
 	if ( LongValue <= 0x80000000)
 		iSignedValue = (unsigned long) LongValue;
 
 	int inrange = 1;
-		
+
 	switch( iNumericValueType)
 		{
 		case L_BYTE:
@@ -317,7 +317,7 @@ void NumericValue::StoreValue( unsigned long LongValue)
 			inrange = ( LongValue <= 0xFFFFFFFF);
 		}
 
-	if ( ! inrange)	
+	if ( ! inrange)
 		{
 		ErrorHandler::OutputErrorLine( "Error: Numeric value out of range for specified type");
 		exit(1);
@@ -339,7 +339,7 @@ void NumericValue::StoreValue( unsigned long LongValue)
 template<bool> class __CompileTimeAssert {public: __CompileTimeAssert(...) {}};
 template<> class __CompileTimeAssert<false> {};
 struct COMPILE_TIME_ERROR {};
-#define COMPILE_TIME_ASSERT(aCondition) { __CompileTimeAssert<(aCondition)> __temp = __CompileTimeAssert<(aCondition)>(COMPILE_TIME_ERROR()); }
+#define COMPILE_TIME_ASSERT(aCondition) { /*__CompileTimeAssert<(aCondition)> __temp =*/ __CompileTimeAssert<(aCondition)>(COMPILE_TIME_ERROR()); }
 
 RCBinaryStream & operator<< ( RCBinaryStream & os, NumericValue o)
 	{
@@ -361,7 +361,7 @@ RCBinaryStream & operator<< ( RCBinaryStream & os, NumericValue o)
 		default:
 			assert(0);
 		}
-	
+
 	return os;
 	}
 
@@ -390,7 +390,7 @@ void NumericValue::StreamOut(ResourceDataStream& aStream) const
 NumericValue & NumericValue::operator= ( unsigned long ValueToSet)
 	{
 	StoreValue( ValueToSet);
-	
+
 	return * this;
 	}
 
@@ -429,7 +429,7 @@ String NumericValue::ltoa( long Source)
 	char	v[10];	// long can have no more than 10 digits in this implementation.
 	char *	pv = v;
 	long	x;
-	
+
 	if ( Source < 0)
 		x = - Source;
 	else
@@ -451,7 +451,7 @@ String NumericValue::ltoa( long Source)
 
 	// Now reverse digits so they are in the correct order. Put in terminating null and hyphen
 	// if necessary.
-	
+
 	char	r[12];
 	char *	pr = r;
 
@@ -466,8 +466,8 @@ String NumericValue::ltoa( long Source)
 		assert( pr < (r+11) );
 		* pr++ = * --pv;
 		}
-		
+
 	* pr = '\0';
-	
+
 	return r;
 	}

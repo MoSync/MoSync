@@ -95,7 +95,6 @@ int main(int argc, char *argv[]) {
 	const char* argv0 = argv[0];
 	int ch;
 	SigType type = SigAuto;
-	bool verbose = false;
 	bool remove = false;
 	while ((ch = getopt(argc, argv, "?c:opsuv")) != -1) {
 		switch (ch) {
@@ -115,9 +114,6 @@ int main(int argc, char *argv[]) {
 			break;
 		case 'u':
 			remove = true;
-			break;
-		case 'v':
-			verbose = true;
 			break;
 		case '?':
 		default:

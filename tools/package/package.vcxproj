@@ -107,6 +107,7 @@
     <ClCompile Include="tools.cpp" />
     <ClCompile Include="util.cpp" />
     <ClCompile Include="windowsMobile.cpp" />
+    <ClCompile Include="windowsPhone.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="nfc.h" />

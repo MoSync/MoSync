@@ -34,7 +34,7 @@ int IsWide;
 
 //****************************************
 
-char *ArrayTypes[16] = 
+char *ArrayTypes[16] =
 {
 	"error",
 	"error",
@@ -50,7 +50,7 @@ char *ArrayTypes[16] =
 	"short",
 	"int",
 	"long",
-	
+
 	"error",
 	"error",
 	"error",
@@ -63,7 +63,7 @@ char *ArrayTypes[16] =
 
 #define INSTRDEF(str, sym, flag, len, perm) str,
 
-char *opcode_name[256] = 
+char *opcode_name[256] =
 {
 #include "Bytecode.h"
 };
@@ -102,7 +102,7 @@ int GetOpcodeLen(unsigned char *pc)
 {
 	uint n;
 	uchar opc = *pc;
-	
+
 	if (opc > IMPDEP2)
 		return -1;
 
@@ -111,17 +111,18 @@ int GetOpcodeLen(unsigned char *pc)
 		case TABLESWITCH:
 		{
 			int off;
-			int default_off;
+			//int default_off;
 			int low,high;
 			int pad;
 			uchar *ts = pc;
-						
+
 			// Skip padding
 			off = (ts - CodeStart);
 			pad = ((off & 3) ^ 3) + 1;	// Add 1 to skip opcode
 			ts += pad;
-			
-			default_off = memLI(ts);
+
+			//default_off = memLI(ts);
+			ts += 4;
 			low = memLI(ts);
 			high = memLI(ts);
 
@@ -129,7 +130,7 @@ int GetOpcodeLen(unsigned char *pc)
 			off = (ts - pc);
 			return off;
 		}
-			
+
 		case LOOKUPSWITCH:
 			n = (4 - ((uint) (pc - CodeStart) & 0x03)) + 4;
 			pc += n;
@@ -181,19 +182,19 @@ void Dis_LookUpSwitch()
 	int n,pad;
 
 	dprintf("lookupswitch ");
-	
+
 	// Skip padding
 
-	off = CODE_OFFSET();	
+	off = CODE_OFFSET();
 	pad = 4 - (off % 4);
 	CodePtr += pad;
-	
+
 	default_off = memLI(CodePtr);
 	dprintf("default_off %d ", default_off);
 
 	entries = memLI(CodePtr);
 	dprintf("entries %d\n", entries);
-			
+
 	for (n=0;n<entries;n++)
 	{
 		key = memLI(CodePtr);
@@ -215,25 +216,25 @@ void Dis_TableSwitch()
 	int n,pad;
 
 	dprintf("tableswitch ");
-	
+
 	CodePtr--;							// Backup to opcode
 
 	// Skip padding
-	
+
 	off = (CodePtr - CodeStart);
 	pad = ((off & 3) ^ 3) + 1;			// Add 1 to skip opcode
 
 	CodePtr += pad;
 
 	default_off = memLI(CodePtr);
-	
+
 	low = memLI(CodePtr);;
 	dprintf("{ %d ", low);
 
 	high = memLI(CodePtr);;
 	dprintf("to %d\n", high);
 
-	for (n = 0; n < high - low + 1; n++)	
+	for (n = 0; n < high - low + 1; n++)
 	{
 		offset = memLI(CodePtr);
 		dprintf("\t%d: %d;\n", low + n, offset + off);
@@ -257,14 +258,14 @@ void DecodeBytecode(int opc, int off)
 	int v;
 
 	ms_trigger = 0;
-	
+
 	while(1)
 	{
 		c = *opPtr++;
 
 		if (!c)
 			return;
-		
+
 		if (c == '%')
 		{
 			c = *opPtr++;
@@ -273,42 +274,42 @@ void DecodeBytecode(int opc, int off)
 			{
 				case 0:
 					return;
-					
+
 				case 'b':
 					v = memBI(CodePtr);
 					dprintf("%d",(char) v);
-					break;		
+					break;
 
 				case 'w':
 					v = memWI(CodePtr);
 					dprintf("%d",(short) v);
-					break;		
+					break;
 
 				case 'n':
 					v = memBI(CodePtr);
 					dprintf("%d", v);
-				break;		
+				break;
 
 				case 'o':
 					v = memWI(CodePtr);
 					dprintf("%d", off + (short) v);
-				break;		
+				break;
 
 				case 'p':
 				{
 					PoolInfo theInfo;
 					char str[100];
 					char *substr;
-					
+
 					v = memWI(CodePtr);
 					GetPoolInfo(&mainClass, v, &theInfo);
 
 					substr = PoolSubString(theInfo.String, str, 0);
 					dprintf("%s", substr );
-					
+
 					if (strcmp(substr, "ms") == 0)
 						ms_trigger++;
-					
+
 					substr = PoolSubString(theInfo.String, str, 1);
 					dprintf(".%s", substr );
 
@@ -320,17 +321,17 @@ void DecodeBytecode(int opc, int off)
 //					printf("'%s'",theInfo.String);
 
 				}
-				break;		
+				break;
 
 				case 't':
 					v = memBI(CodePtr) & 0x0f;
 					dprintf("%s", ArrayTypes[v]);
-				break;		
-				
+				break;
+
 				default:
 					dprintf("!!! %%%c", c);
 			}
-			
+
 			continue;
 		}
 
@@ -369,7 +370,7 @@ void PrintOpcode()
 		CodePtr++;
 	}
 
-	off = CODE_OFFSET();	
+	off = CODE_OFFSET();
 	opc = *CodePtr++;
 
 	if (IsWide)
@@ -377,7 +378,7 @@ void PrintOpcode()
 		//ToDo: must check if valid wide opcode here
 		//if (!ValidWide(op))
 	}
-	
+
 	if (opc == LOOKUPSWITCH)
 	{
 		Dis_LookUpSwitch();
@@ -430,7 +431,7 @@ void Disassemble()
 	CodeLen = memLI(CodePtr);
 
 	// Mark the code start position
-		
+
 	SetCodeStart(CodePtr, CodeLen);
 
 	CodeTop = CodePtr;
@@ -438,17 +439,17 @@ void Disassemble()
 #if 1		// Switch On Goto Label Patching with 1
 
 	// Local labels
-	
+
 	dprintf("\n\nLabelSearch: Code Block (MaxStack=%d : MaxLocal=%d : CodeLen=%d)\n",MaxStack,MaxLocal,CodeLen);
-	
+
 	for (n=0;n<CodeLen;n++)
 	{
 		if (CodePtr >= CodeEnd)
 			break;
-		
+
 		LastCodePtr = CodePtr;
 		LastCodeOff = CODE_OFFSET();
-		
+
 		dprintf("\n%d :", CodePtr - ClassPtr);
 		PrintOpcode();
 
@@ -466,7 +467,7 @@ void Disassemble()
 				LastCodePtr[0] = NOP;
 				LastCodePtr[1] = NOP;
 				LastCodePtr[2] = NOP;
-				
+
 			}
 		}
 	}
@@ -476,14 +477,14 @@ void Disassemble()
 	CodePtr = CodeTop;
 
 	dprintf("\n\nGotoPatch: Code Block (MaxStack=%d : MaxLocal=%d : CodeLen=%d)\n",MaxStack,MaxLocal,CodeLen);
-	
+
 	for (n=0;n<CodeLen;n++)
 	{
 		if (CodePtr >= CodeEnd)
 			break;
-		
+
 		LastCodePtr = CodePtr;
-		LastCodeOff = CODE_OFFSET();	
+		LastCodeOff = CODE_OFFSET();
 
 		dprintf("\n%d :", CodePtr - ClassPtr);
 		PrintOpcode();
@@ -516,17 +517,17 @@ void Disassemble()
 	CodePtr = CodeTop;
 
 	// Local labels
-	
+
 	dprintf("\n\nResults: Code Block (MaxStack=%d : MaxLocal=%d : CodeLen=%d)\n",MaxStack,MaxLocal,CodeLen);
-	
+
 	for (n=0;n<CodeLen;n++)
 	{
 		if (CodePtr >= CodeEnd)
 			break;
-		
+
 		LastCodePtr = CodePtr;
 		LastCodeOff = CODE_OFFSET();
-		
+
 		dprintf("\n%d :", CodePtr - ClassPtr);
 		PrintOpcode();
 	}
@@ -564,26 +565,26 @@ void DisassembleNew()
 	CodeLen = memLI(CodePtr);
 
 	// Mark the code start position
-		
+
 	SetCodeStart(CodePtr, CodeLen);
 
 	CodeTop = CodePtr;
 
 	// Local labels
-	
+
 	dprintf("Code Block (MaxStack=%d : MaxLocal=%d : CodeLen=%d)\n\n",MaxStack,MaxLocal,CodeLen);
-	
+
 	for (n=0;n<CodeLen;n++)
 	{
 		if (CodePtr >= CodeEnd)
 			break;
-		
+
 		LastCodePtr = CodePtr;
 		LastCodeOff = CODE_OFFSET();
-		
+
 		dprintf("%d :", CodePtr - ClassPtr);
 		PrintOpcode();
-		
+
 		len = GetOpcodeLen(LastCodePtr);
 
 		printf("\t\t");
@@ -592,7 +593,7 @@ void DisassembleNew()
 		{
 			printf("%s ", Hex8(LastCodePtr[b]));
 		}
-		
+
 
 		dprintf("\n");
 
@@ -601,7 +602,7 @@ void DisassembleNew()
 }
 #endif
 //****************************************
-//		 
+//
 //****************************************
 /*
 void ReadHandlers()
@@ -617,7 +618,7 @@ void ReadHandlers()
 		int end_pc			= ReadWord();
 		int handler_pc		= ReadWord();
 		int catch_type_index= ReadWord();
-		
+
 		vprintf("start_pc=%ld\n", start_pc);
 		vprintf("end_pc=%ld\n", end_pc);
 		vprintf("handler_pc=%ld\n", handler_pc);
@@ -643,7 +644,7 @@ void ReadAttributes()
 		int end_pc			= ReadWord();
 		int handler_pc		= ReadWord();
 		int catch_type_index= ReadWord();
-		
+
 		printf("start_pc=%ld\n", start_pc);
 		printf("end_pc=%ld\n", end_pc);
 		printf("handler_pc=%ld\n", handler_pc);

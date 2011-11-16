@@ -31,8 +31,8 @@
 <property key="build.prefs:ignore.default.library.paths" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Release" value="true"/>
-<property key="build.prefs:memory.data/Release" value="4096"/>
-<property key="build.prefs:memory.heap/Release" value="3000"/>
+<property key="build.prefs:memory.data/Release" value="8192"/>
+<property key="build.prefs:memory.heap/Release" value="5000"/>
 <property key="build.prefs:memory.stack/Release" value="128"/>
 <property key="build.prefs:project.type" value=""/>
 <property key="debug" value="false"/>

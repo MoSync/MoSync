@@ -52,10 +52,6 @@ typedef unsigned short Uint16;
 // Declaration of SslConnection
 //***************************************************************************
 
-// Forward declarations of Objective-C classes.
-class NSInputStream;
-class NSOutputStream;
-
 /**
  * This class is an implementation of
  * an ssl socket.
