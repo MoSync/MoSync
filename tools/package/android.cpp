@@ -288,7 +288,7 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t</activity>\n"
 		// Enable Google AdMob Ads.
 		<<"\t\t<activity android:name=\"com.google.ads.AdActivity\"\n"
-		<<"\t\t\tandroid:theme=\"@android:style/Theme.NoTitleBar.FullScreen\">\n"
+		//<<"\t\t\tandroid:theme=\"@android:style/Theme.NoTitleBar.FullScreen\">\n"
 		<<"\t\t\tandroid:configChanges=\"orientation|keyboard|keyboardHidden\">\n"
 		<<"\t\t</activity>\n"
 		;
@@ -441,15 +441,15 @@ static void writeC2DMReceiver(ostream& stream, const string& packageName) {
 	stream << "\t\t\tandroid:permission=\"com.google.android.c2dm.permission.SEND\">\n";
 	stream << "\t\t\t<intent-filter>\n";
 	stream << "\t\t\t\t<action android:name=\"com.google.android.c2dm.intent.RECEIVE\" />\n";
-	stream << "\t\t\t\t<category android:name=\"<<packageName<<\" />\n";
+	stream << "\t\t\t\t<category android:name=\""<<packageName<<"\" />\n";
 	stream << "\t\t\t</intent-filter>\n";
 	stream << "\t\t\t<intent-filter>\n";
 	stream << "\t\t\t\t<action android:name=\"com.google.android.c2dm.intent.REGISTRATION\" />\n";
-	stream << "\t\t\t\t<category android:name=\"<<packageName<<\" />\n";
+	stream << "\t\t\t\t<category android:name=\""<<packageName<<"\" />\n";
 	stream << "\t\t\t</intent-filter>\n";
 	stream << "\t\t</receiver>\n";
 }
-
+//<<"\tpackage=\"" << packageName << "\"\n"
 static void writeMain(const char* filename, const SETTINGS& s, const RuntimeInfo& ri) {
 	ofstream file(filename, ios::binary);
 	file <<"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
