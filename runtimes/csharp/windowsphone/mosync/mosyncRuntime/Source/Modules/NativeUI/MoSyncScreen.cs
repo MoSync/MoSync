@@ -8,34 +8,37 @@ using System.Reflection;
 
 namespace MoSync
 {
-    public class Screen : WidgetBaseWindowsPhone, IScreen
+    namespace NativeUI
     {
-        protected PhoneApplicationPage mPage;
-        public Screen()
+        public class Screen : WidgetBaseWindowsPhone, IScreen
         {
-            mPage = new PhoneApplicationPage();
-            mView = mPage;
-        }
-
-        public override void AddChild(IWidget child)
-        {
-            base.AddChild(child);
-            WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
-            MoSync.Util.RunActionOnMainThreadSync(() =>
+            protected PhoneApplicationPage mPage;
+            public Screen()
             {
-                mPage.Content = w.View;
-                ((System.Windows.FrameworkElement)w.View).Width = ScreenSize.SCREEN_WIDTH;
-                ((System.Windows.FrameworkElement)w.View).Height = ScreenSize.SCREEN_HEIGHT;
-            });
-        }
+                mPage = new PhoneApplicationPage();
+                mView = mPage;
+            }
 
-        public void Show()
-        {
-            MoSync.Util.RunActionOnMainThreadSync(() =>
+            public override void AddChild(IWidget child)
             {
-                PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
-                frame.Content = mPage;
-            });
+                base.AddChild(child);
+                WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mPage.Content = w.View;
+                    ((System.Windows.FrameworkElement)w.View).Width = ScreenSize.SCREEN_WIDTH;
+                    ((System.Windows.FrameworkElement)w.View).Height = ScreenSize.SCREEN_HEIGHT;
+                });
+            }
+
+            public void Show()
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+                    frame.Content = mPage;
+                });
+            }
         }
     }
 }

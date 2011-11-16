@@ -8,47 +8,50 @@ using System.Reflection;
 
 namespace MoSync
 {
-    public class CheckBox : WidgetBaseWindowsPhone
+    namespace NativeUI
     {
-        protected System.Windows.Controls.CheckBox mCheckBox;
-
-        public CheckBox()
+        public class CheckBox : WidgetBaseWindowsPhone
         {
-            mCheckBox = new System.Windows.Controls.CheckBox();
+            protected System.Windows.Controls.CheckBox mCheckBox;
 
-            mView = mCheckBox;
-
-            mCheckBox.Click += new RoutedEventHandler(
-               delegate(Object from, RoutedEventArgs evt)
-               {
-                   Memory eventData = new Memory(8);
-
-                   const int MAWidgetEventData_eventType = 0;
-                   const int MAWidgetEventData_widgetHandle = 4;
-
-                   eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
-                   eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                   mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-               });
-        }
-
-        public virtual void setState(bool state)
-        {
-            mCheckBox.IsChecked = state;
-        }
-
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_CHECK_BOX_CHECKED)]
-        public String Checked
-        {
-            get
+            public CheckBox()
             {
-                return mCheckBox.IsChecked.ToString();
+                mCheckBox = new System.Windows.Controls.CheckBox();
+
+                mView = mCheckBox;
+
+                mCheckBox.Click += new RoutedEventHandler(
+                   delegate(Object from, RoutedEventArgs evt)
+                   {
+                       Memory eventData = new Memory(8);
+
+                       const int MAWidgetEventData_eventType = 0;
+                       const int MAWidgetEventData_widgetHandle = 4;
+
+                       eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
+                       eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                       mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                   });
             }
 
-            set
+            public virtual void setState(bool state)
             {
-                bool val = bool.Parse(value);
-                mCheckBox.IsChecked = val;
+                mCheckBox.IsChecked = state;
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_CHECK_BOX_CHECKED)]
+            public String Checked
+            {
+                get
+                {
+                    return mCheckBox.IsChecked.ToString();
+                }
+
+                set
+                {
+                    bool val = bool.Parse(value);
+                    mCheckBox.IsChecked = val;
+                }
             }
         }
     }

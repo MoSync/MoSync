@@ -8,29 +8,32 @@ using System.Reflection;
 
 namespace MoSync
 {
-    //RelativeLayout class
-    public class RelativeLayout : WidgetBaseWindowsPhone
+    namespace NativeUI
     {
-        //Canvas is the content in which the children are aranged relatively to the parent
-        protected System.Windows.Controls.Canvas mPanel;
-
-        //Constructor
-        public RelativeLayout()
+        //RelativeLayout class
+        public class RelativeLayout : WidgetBaseWindowsPhone
         {
-            mPanel = new System.Windows.Controls.Canvas();
-            mView = mPanel;
-        }
+            //Canvas is the content in which the children are aranged relatively to the parent
+            protected System.Windows.Controls.Canvas mPanel;
 
-        //add child
-        public override void AddChild(IWidget child)
-        {
-            base.AddChild(child);
-            MoSync.Util.RunActionOnMainThreadSync(() =>
+            //Constructor
+            public RelativeLayout()
             {
-                WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+                mPanel = new System.Windows.Controls.Canvas();
+                mView = mPanel;
+            }
 
-                mPanel.Children.Add(widget.View);
-            });
+            //add child
+            public override void AddChild(IWidget child)
+            {
+                base.AddChild(child);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+
+                    mPanel.Children.Add(widget.View);
+                });
+            }
         }
     }
 }

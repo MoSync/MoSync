@@ -8,128 +8,131 @@ using System.Reflection;
 
 namespace MoSync
 {
-    //The slider class
-    public class Slider : WidgetBaseWindowsPhone
+    namespace NativeUI
     {
-        protected System.Windows.Controls.Slider mSlider;
-        protected int mMaxValue;
-        protected int mMinValue;
-        protected int mProgressValue;
-
-        public static int DEFAULT_MAX_VALUE = 100;
-        public static int DEFAULT_MIN_VALUE = 0;
-
-        //the constructor
-        public Slider()
+        //The slider class
+        public class Slider : WidgetBaseWindowsPhone
         {
-            mSlider = new System.Windows.Controls.Slider();
+            protected System.Windows.Controls.Slider mSlider;
+            protected int mMaxValue;
+            protected int mMinValue;
+            protected int mProgressValue;
 
-            mSlider.Maximum = DEFAULT_MAX_VALUE;
-            mSlider.Minimum = DEFAULT_MIN_VALUE;
+            public static int DEFAULT_MAX_VALUE = 100;
+            public static int DEFAULT_MIN_VALUE = 0;
 
-            mMaxValue = DEFAULT_MAX_VALUE;
-            mMinValue = DEFAULT_MIN_VALUE;
-            mProgressValue = DEFAULT_MIN_VALUE;
-
-            mView = mSlider;
-
-            //the event handler
-            mSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(
-                delegate(Object from, RoutedPropertyChangedEventArgs<double> arg)
-                {
-                    Memory eventData = new Memory(12);
-
-                    const int MAWidgetEventData_eventType = 0;
-                    const int MAWidgetEventData_sliderValue = 4;
-                    const int MAWidgetEventData_widgetHandle = 8;
-
-                    mProgressValue = ((Int32)arg.NewValue);
-
-                    eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SLIDER_VALUE_CHANGED);
-                    eventData.WriteInt32(MAWidgetEventData_sliderValue, mProgressValue);
-                    eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                    mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-                });
-        }
-
-        //MAW_SLIDER_MAX implementation
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_MAX)]
-        public string Max
-        {
-            set
+            //the constructor
+            public Slider()
             {
-                int maxVal = Int32.Parse(value);
-                if (maxVal >= 0)
-                {
-                    mMaxValue = maxVal;
-                    if (maxVal < mProgressValue)
+                mSlider = new System.Windows.Controls.Slider();
+
+                mSlider.Maximum = DEFAULT_MAX_VALUE;
+                mSlider.Minimum = DEFAULT_MIN_VALUE;
+
+                mMaxValue = DEFAULT_MAX_VALUE;
+                mMinValue = DEFAULT_MIN_VALUE;
+                mProgressValue = DEFAULT_MIN_VALUE;
+
+                mView = mSlider;
+
+                //the event handler
+                mSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(
+                    delegate(Object from, RoutedPropertyChangedEventArgs<double> arg)
                     {
-                        mProgressValue = maxVal;
-                        Value = maxVal.ToString();
+                        Memory eventData = new Memory(12);
+
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_sliderValue = 4;
+                        const int MAWidgetEventData_widgetHandle = 8;
+
+                        mProgressValue = ((Int32)arg.NewValue);
+
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SLIDER_VALUE_CHANGED);
+                        eventData.WriteInt32(MAWidgetEventData_sliderValue, mProgressValue);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                    });
+            }
+
+            //MAW_SLIDER_MAX implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_MAX)]
+            public string Max
+            {
+                set
+                {
+                    int maxVal = Int32.Parse(value);
+                    if (maxVal >= 0)
+                    {
+                        mMaxValue = maxVal;
+                        if (maxVal < mProgressValue)
+                        {
+                            mProgressValue = maxVal;
+                            Value = maxVal.ToString();
+                        }
+                        mSlider.Maximum = mMaxValue;
                     }
-                    mSlider.Maximum = mMaxValue;
+                    else
+                    {
+                        mMaxValue = 0;
+                        mSlider.Maximum = mMaxValue;
+                    }
                 }
-                else
+                get
                 {
-                    mMaxValue = 0;
-                    mSlider.Maximum = mMaxValue;
+                    return mMaxValue.ToString();
                 }
             }
-            get
-            {
-                return mMaxValue.ToString();
-            }
-        }
 
-        //MAW_SLIDER_VALUE implementation
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_VALUE)]
-        public string Value
-        {
-            set
+            //MAW_SLIDER_VALUE implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_VALUE)]
+            public string Value
             {
-                int val = Int32.Parse(value);
-
-                if (val <= mMaxValue && val >= mMinValue)
+                set
                 {
-                    mProgressValue = val;
-                    mSlider.Value = mProgressValue;
-                }
-                else if (val > mMaxValue)
-                {
-                    mSlider.Value = mMaxValue;
-                    mProgressValue = mMaxValue;
-                }
-                else if (val < mMinValue)
-                {
-                    mSlider.Value = mMinValue;
-                    mProgressValue = mMinValue;
-                }
-            }
-            get
-            {
-                return mProgressValue.ToString();
-            }
-        }
+                    int val = Int32.Parse(value);
 
-        //MAW_SLIDER_INCREASE_VALUE implementation
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_INCREASE_VALUE)]
-        public string IncreaseValue
-        {
-            set
-            {
-                int val = Int32.Parse(value);
-                Value = (mProgressValue + val).ToString();
+                    if (val <= mMaxValue && val >= mMinValue)
+                    {
+                        mProgressValue = val;
+                        mSlider.Value = mProgressValue;
+                    }
+                    else if (val > mMaxValue)
+                    {
+                        mSlider.Value = mMaxValue;
+                        mProgressValue = mMaxValue;
+                    }
+                    else if (val < mMinValue)
+                    {
+                        mSlider.Value = mMinValue;
+                        mProgressValue = mMinValue;
+                    }
+                }
+                get
+                {
+                    return mProgressValue.ToString();
+                }
             }
-        }
 
-        //MAW_SLIDER_DECREASE_VALUE implementation
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_DECREASE_VALUE)]
-        public string DecreaseValue
-        {
-            set
+            //MAW_SLIDER_INCREASE_VALUE implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_INCREASE_VALUE)]
+            public string IncreaseValue
             {
-                int val = Int32.Parse(value);
-                Value = (mProgressValue - val).ToString();
+                set
+                {
+                    int val = Int32.Parse(value);
+                    Value = (mProgressValue + val).ToString();
+                }
+            }
+
+            //MAW_SLIDER_DECREASE_VALUE implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_SLIDER_DECREASE_VALUE)]
+            public string DecreaseValue
+            {
+                set
+                {
+                    int val = Int32.Parse(value);
+                    Value = (mProgressValue - val).ToString();
+                }
             }
         }
     }

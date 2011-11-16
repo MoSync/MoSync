@@ -8,120 +8,123 @@ using System.Reflection;
 
 namespace MoSync
 {
-    public class Label : WidgetBaseWindowsPhone
+    namespace NativeUI
     {
-        protected System.Windows.Controls.TextBlock mLabel;
-
-        protected int mMaxNumberOfLines;
-        public Label()
+        public class Label : WidgetBaseWindowsPhone
         {
-            //the label
-            mLabel = new System.Windows.Controls.TextBlock();
-            mView = mLabel;
-            mMaxNumberOfLines = 0;
-            mLabel.TextWrapping = TextWrapping.NoWrap;
-        }
+            protected System.Windows.Controls.TextBlock mLabel;
 
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT)]
-        public String Text
-        {
-            set
+            protected int mMaxNumberOfLines;
+            public Label()
             {
-                mLabel.Text = value;
+                //the label
+                mLabel = new System.Windows.Controls.TextBlock();
+                mView = mLabel;
+                mMaxNumberOfLines = 0;
+                mLabel.TextWrapping = TextWrapping.NoWrap;
             }
-            get
-            {
-                return mLabel.Text;
-            }
-        }
 
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_VERTICAL_ALIGNMENT)]
-        public String textVerticalAlignment
-        {
-            set
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT)]
+            public String Text
             {
-                switch (value)
+                set
                 {
-                    case MoSync.Constants.MAW_ALIGNMENT_TOP:
-                        mLabel.VerticalAlignment = VerticalAlignment.Top;
-                        break;
-                    case MoSync.Constants.MAW_ALIGNMENT_CENTER:
-                        mLabel.VerticalAlignment = VerticalAlignment.Center;
-                        break;
-                    case MoSync.Constants.MAW_ALIGNMENT_BOTTOM:
-                        mLabel.VerticalAlignment = VerticalAlignment.Bottom;
-                        break;
+                    mLabel.Text = value;
+                }
+                get
+                {
+                    return mLabel.Text;
                 }
             }
-            get
-            {
-                return mLabel.Text;
-            }
-        }
 
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT)]
-        public String textHorizontalAlignment
-        {
-            set
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_VERTICAL_ALIGNMENT)]
+            public String textVerticalAlignment
             {
-                switch (value)
+                set
                 {
-                    case MoSync.Constants.MAW_ALIGNMENT_LEFT:
-                        mLabel.TextAlignment = TextAlignment.Left;
-
-                        break;
-                    case MoSync.Constants.MAW_ALIGNMENT_RIGHT:
-                        mLabel.TextAlignment = TextAlignment.Right;
-                        break;
-                    case MoSync.Constants.MAW_ALIGNMENT_CENTER:
-                        mLabel.TextAlignment = TextAlignment.Center;
-                        break;
+                    switch (value)
+                    {
+                        case MoSync.Constants.MAW_ALIGNMENT_TOP:
+                            mLabel.VerticalAlignment = VerticalAlignment.Top;
+                            break;
+                        case MoSync.Constants.MAW_ALIGNMENT_CENTER:
+                            mLabel.VerticalAlignment = VerticalAlignment.Center;
+                            break;
+                        case MoSync.Constants.MAW_ALIGNMENT_BOTTOM:
+                            mLabel.VerticalAlignment = VerticalAlignment.Bottom;
+                            break;
+                    }
+                }
+                get
+                {
+                    return mLabel.Text;
                 }
             }
-            get
-            {
-                return mLabel.TextAlignment.ToString();
-            }
-        }
 
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_SIZE)]
-        public String fontSize
-        {
-            set
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT)]
+            public String textHorizontalAlignment
             {
-                //todo
-                double size = Double.Parse(value);
-                mLabel.FontSize = size;
-            }
-        }
-
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_COLOR)]
-        public String fontColor
-        {
-            set
-            {
-                System.Windows.Media.SolidColorBrush brush;
-                MoSync.Util.convertStringToColor(value, out brush);
-                mLabel.Foreground = brush;
-
-            }
-        }
-
-        [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_MAX_NUMBER_OF_LINES)]
-        public String maxNumberOfLines
-        {
-            set
-            {
-                int val = Int32.Parse(value);
-                if (val == 0)
+                set
                 {
-                    mMaxNumberOfLines = 0;
-                    mLabel.TextWrapping = TextWrapping.NoWrap;
+                    switch (value)
+                    {
+                        case MoSync.Constants.MAW_ALIGNMENT_LEFT:
+                            mLabel.TextAlignment = TextAlignment.Left;
+
+                            break;
+                        case MoSync.Constants.MAW_ALIGNMENT_RIGHT:
+                            mLabel.TextAlignment = TextAlignment.Right;
+                            break;
+                        case MoSync.Constants.MAW_ALIGNMENT_CENTER:
+                            mLabel.TextAlignment = TextAlignment.Center;
+                            break;
+                    }
                 }
-                if (val == 1)
+                get
                 {
-                    mMaxNumberOfLines = 1;
-                    mLabel.TextWrapping = TextWrapping.Wrap;
+                    return mLabel.TextAlignment.ToString();
+                }
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_SIZE)]
+            public String fontSize
+            {
+                set
+                {
+                    //todo
+                    double size = Double.Parse(value);
+                    mLabel.FontSize = size;
+                }
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_COLOR)]
+            public String fontColor
+            {
+                set
+                {
+                    System.Windows.Media.SolidColorBrush brush;
+                    MoSync.Util.convertStringToColor(value, out brush);
+                    mLabel.Foreground = brush;
+
+                }
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_MAX_NUMBER_OF_LINES)]
+            public String maxNumberOfLines
+            {
+                set
+                {
+                    int val = Int32.Parse(value);
+                    if (val == 0)
+                    {
+                        mMaxNumberOfLines = 0;
+                        mLabel.TextWrapping = TextWrapping.NoWrap;
+                    }
+                    if (val == 1)
+                    {
+                        mMaxNumberOfLines = 1;
+                        mLabel.TextWrapping = TextWrapping.Wrap;
+                    }
                 }
             }
         }
