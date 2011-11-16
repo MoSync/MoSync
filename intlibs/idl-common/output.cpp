@@ -797,9 +797,14 @@ static void streamIoctls(ostream& stream, const Interface& inf, int ix) {
 		}
 	}
 }
-
 void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
 	const string& ioctlName, int fnOffset)
+{
+	streamIoctlFunction(stream, inf, f, ioctlName, toString(fnOffset + f.number));
+}
+
+void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& f,
+	const string& ioctlName, const string& fnName)
 {
 	stream << f.comment;
 	if(f.groupId != "")
@@ -864,7 +869,7 @@ void streamIoctlFunction(ostream& stream, const Interface& inf, const Function& 
 	for(size_t j=usedArgs; j<3; j++) {
 		invokeArgs += ", 0";
 	}
-	string invoke = ioctlName + "(" + toString(fnOffset + f.number) + invokeArgs + ");";
+	string invoke = ioctlName + "(" + fnName /*toString(fnOffset + f.number)*/ + invokeArgs + ");";
 	if(f.returnType == "double") {
 		//stream << "\tMA_DV _result;\n";
 		stream << "\t_result.ll = " + invoke + "\n";
