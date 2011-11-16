@@ -83,7 +83,7 @@ void MoSync_ApplicationRegistration(NSInteger errorCode, NSString* text);
 {
     NSString *parsedToken = [NSString stringWithFormat:@"%@",deviceToken];
     // Remove empty spaces
-    parsedToken = [parsedToken stringByReplacingOccurrencesOfString:@" " withString:@""];
+//    parsedToken = [parsedToken stringByReplacingOccurrencesOfString:@" " withString:@""];
     // Remove "<" and ">" characters
     parsedToken = [parsedToken stringByReplacingOccurrencesOfString:@"<" withString:@""];
     parsedToken = [parsedToken stringByReplacingOccurrencesOfString:@">" withString:@""];
