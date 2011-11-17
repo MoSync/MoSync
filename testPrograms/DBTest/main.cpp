@@ -31,59 +31,36 @@ MAUtil::String getLocalPath()
 /**
  * Utility function that gets a text zero terminated.
  */
-void getColumnString(MAHandle cursor, int column, char* buf, int maxSize)
+int getColumnString(MAHandle cursor, int column, char* buf, int maxSize)
 {
 	int size = maDBCursorGetColumnText(cursor, column, buf, maxSize);
-	SHOULD_HOLD(MA_DB_ERROR != size, "getColumnString failed");
 	if (size < maxSize)
 	{
 		buf[size] = 0;
 	}
-	else
-	{
-		buf[maxSize] = 0;
-	}
+	return size;
 }
 
 /**
  * Utility function that gets a text zero terminated.
  */
-void getColumnDataAsString(MAHandle cursor, int column, char* buf, int maxSize)
+int getColumnDataAsString(MAHandle cursor, int column, char* buf, int maxSize)
 {
 	MAHandle data = maCreatePlaceholder();
 	int result = maDBCursorGetColumnData(cursor, column, data);
-	SHOULD_HOLD(MA_DB_OK == result, "getColumnDataAsString failed");
-	int size = maGetDataSize(data);
-	maReadData(data, buf, 0, size);
-	buf[size] = 0;
-}
-
-/**
- * Utility function that gets an int value.
- */
-int getColumnInt(MAHandle cursor, int column)
-{
-	int value;
-	int success = maDBCursorGetColumnInt(cursor, column, &value);
-	SHOULD_HOLD(MA_DB_OK == success, "getColumnInt failed");
-	return value;
-}
-
-/**
- * Utility function that gets a float value.
- */
-double getColumnDouble(MAHandle cursor, int column)
-{
-	double value;
-	int success = maDBCursorGetColumnDouble(cursor, column, &value);
-	SHOULD_HOLD(MA_DB_OK == success, "getColumnDouble failed");
-	return value;
+	if (result == MA_DB_OK)
+	{
+		int size = maGetDataSize(data);
+		maReadData(data, buf, 0, size);
+		buf[size] = 0;
+	}
+	return result;
 }
 
 /**
  * Test the database syscalls.
  */
-void test1()
+void testBasicThings()
 {
 	int result;
 
@@ -114,13 +91,16 @@ void test1()
 	SHOULD_HOLD(MA_DB_OK == result, "INSERT 1 failed");
 	result = maDBExecSQL(db, "INSERT INTO pet VALUES ('Vilma', 10, 0.999)");
 	SHOULD_HOLD(MA_DB_OK == result, "INSERT 2 failed");
+	result = maDBExecSQL(db, "INSERT INTO pet VALUES (NULL, NULL, NULL)");
+	SHOULD_HOLD(MA_DB_OK == result, "INSERT 3 failed");
 
 	// Count all rows.
 	MAHandle cursorx = maDBExecSQL(db, "SELECT COUNT(*) FROM (SELECT * FROM pet)");
 	maDBCursorNext(cursorx);
-	int numberOfRows = getColumnInt(cursorx, 0);
+	int numberOfRows;
+	maDBCursorGetColumnInt(cursorx, 0, &numberOfRows);
 	printf("Number of rows: %i\n", numberOfRows);
-	SHOULD_HOLD(2 == numberOfRows, "Wrong number of rows");
+	SHOULD_HOLD(3 == numberOfRows, "Wrong number of rows");
     maDBCursorDestroy(cursorx);
 
 	// Query all rows.
@@ -132,14 +112,27 @@ void test1()
 	char name2[51];
 	int age;
 	double curiosity;
+	int nameResult;
+	int name2Result;
+	int ageResult;
+	int curiosityResult;
 	int row = 0;
 	while (MA_DB_OK == maDBCursorNext(cursor))
 	{
 		// Get and print data.
-		getColumnString(cursor, 0, name, 50);
-		getColumnDataAsString(cursor, 0, name2, 50);
-		age = getColumnInt(cursor, 1);
-		curiosity = getColumnDouble(cursor, 2);
+		nameResult = getColumnString(cursor, 0, name, 50);
+		SHOULD_HOLD(MA_DB_ERROR != nameResult, "Error in getColumnString");
+		name2Result = getColumnDataAsString(cursor, 0, name2, 50);
+		SHOULD_HOLD(MA_DB_ERROR != name2Result, "Error in getColumnString");
+		ageResult = maDBCursorGetColumnInt(cursor, 1, &age);
+		SHOULD_HOLD(MA_DB_ERROR != ageResult, "Error in getColumnString");
+		curiosityResult = maDBCursorGetColumnDouble(cursor, 2, &curiosity);
+		SHOULD_HOLD(MA_DB_ERROR != curiosityResult, "Error in getColumnString");
+
+		if (MA_DB_NULL == nameResult) { strcpy(name, "NULL"); }
+		if (MA_DB_NULL == name2Result) { strcpy(name2, "NULL"); }
+		if (MA_DB_NULL == ageResult) { age = 0; }
+		if (MA_DB_NULL == curiosityResult) { curiosity = 0.0; }
 		printf("%s %s %d %f\n", name, name2, age, curiosity);
 
 		// Test that data is as expected.
@@ -156,9 +149,16 @@ void test1()
 			SHOULD_HOLD(0 == strcmp(name, "Vilma"), "Vilma not equal to name");
 			SHOULD_HOLD(0 == strcmp(name, name2), "Vilma not equal to name2");
 			SHOULD_HOLD(10 == age, "age 10 failed");
-			// Float comparisons are tricky...
+			// Double comparisons are tricky...
 			SHOULD_HOLD(0.998 < curiosity && 0.9991 > curiosity,
 				"curiosity 0.999 failed");
+		}
+		if (3 == row)
+		{
+			SHOULD_HOLD(MA_DB_NULL == nameResult, "MA_DB_NULL != nameResult");
+			SHOULD_HOLD(MA_DB_NULL == name2Result, "MA_DB_NULL != name2Result");
+			SHOULD_HOLD(MA_DB_NULL == ageResult, "MA_DB_NULL != ageResult");
+			SHOULD_HOLD(MA_DB_NULL == curiosityResult, "MA_DB_NULL != curiosityResult");
 		}
 	}
 
@@ -174,7 +174,7 @@ void test1()
 /**
  * Negative tests.
  */
-void test2()
+void testThingsThatShouldFail()
 {
 	int result;
 
@@ -213,13 +213,9 @@ void test2()
 /**
  * Test using multiple databases and cursors.
  */
-void test3()
+void testMultipleDatabasesAndCursors()
 {
-	int result;
-
-	printf("Test 3 started\n");
-
-	printf("Test 3 passed successfully\n");
+	// TODO: Implement.
 }
 
 /**
@@ -232,9 +228,10 @@ extern "C" int MAMain()
 	// printf("Press zero or back to exit\n");
 	// printf("Touch screen to run DB test\n");
 
-	test1();
-	test2();
-	test3();
+	testBasicThings();
+	testThingsThatShouldFail();
+	testMultipleDatabasesAndCursors();
+
 	printf("All tests passed successfully\n");
 	printf("Press zero or back to exit\n");
 
