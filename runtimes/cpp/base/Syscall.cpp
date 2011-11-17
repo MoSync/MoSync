@@ -128,13 +128,6 @@ namespace Base {
 	static int sFileListNextHandle = 1;
 #endif	//SYMBIAN
 
-#ifdef EMULATOR
-#define FILESYSTEM_CHROOT 1
-#define FILESYSTEM_DIR "filesystem"
-#else
-#define FILESYSTEM_CHROOT 0
-#endif	//EMULATOR
-
 	void Syscall::init() {
 		gStoreNextId = 1;
 		gFileNextHandle = 1;
@@ -776,6 +769,7 @@ namespace Base {
 #if FILESYSTEM_CHROOT
 		std::string name = std::string(FILESYSTEM_DIR) + path;
 		fn = name.c_str();
+		MYASSERT(path[0] == '/', ERR_FILE_PATH_INVALID);
 		size = name.length() + 1;
 #else
 		fn = path;

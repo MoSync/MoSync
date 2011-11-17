@@ -88,6 +88,7 @@ extern "C" {
 #include "TcpConnection.h"
 #include "ConfigParser.h"
 #include "sdl_stream.h"
+#include "MoSyncDB.h"
 
 #include "Skinning/Screen.h"
 #include "Skinning/SkinManager.h"
@@ -2197,6 +2198,15 @@ namespace Base {
 			maIOCtl_case(maCameraStop);
 			maIOCtl_case(maCameraSnapshot);
 
+			maIOCtl_case(maDBOpen);
+			maIOCtl_case(maDBClose);
+			maIOCtl_case(maDBExecSQL);
+			maIOCtl_case(maDBCursorDestroy);
+			maIOCtl_case(maDBCursorNext);
+			maIOCtl_case(maDBCursorGetColumnData);
+			maIOCtl_case(maDBCursorGetColumnText);
+			maIOCtl_case(maDBCursorGetColumnInt);
+			maIOCtl_case(maDBCursorGetColumnDouble);
 #ifdef EMULATOR
 		maIOCtl_syscall_case(maPimListOpen);
 		maIOCtl_syscall_case(maPimListNext);

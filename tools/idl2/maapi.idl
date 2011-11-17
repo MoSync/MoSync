@@ -8170,10 +8170,10 @@ group NFCAPI "NFC API" {
 
 group DBAPI "DB API" {
 		/**
-		 * Open a database, the database is created if it does not exist.
-		 * Note that the application needs file read/write permissions to
-		 * create database files on the sd card.
-		 * @param path Full path to database file name.
+		 * Open a database file. The database is created if it does not exist.
+		 * \note The application needs file read/write permissions to
+		 * access database files.
+		 * @param path Absolute path to the database file.
 		 * @return Handle to the database >0 on success, #MA_DB_ERROR on error.
 		 */
 		MAHandle maDBOpen(in MAString path);
@@ -8210,7 +8210,7 @@ group DBAPI "DB API" {
 		 * Note that you must call this function before retrieving
 		 * column data. The initial position of the cursor is
 		 * before the first row in the result set. If the result
-		 * set is empty, this function will return a value != MA_DB_OK.
+		 * set is empty, this function will return #MA_DB_NO_ROW.
 		 * @param cursorHandle Handle to the cursor.
 		 * @return #MA_DB_OK if successfully moved to next row,
 		 * #MA_DB_NO_ROW if there are no more rows in the result set,

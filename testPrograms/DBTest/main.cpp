@@ -19,10 +19,10 @@ MAUtil::String getLocalPath()
 		buffer,
 		bufferSize);
 
-	// If there was an error, return empty string.
+	// If there was an error, return default root path.
 	if (size < 0 || size > bufferSize)
 	{
-		return "";
+		return "/";
 	}
 
 	return buffer;
@@ -142,7 +142,7 @@ void testBasicThings()
 			SHOULD_HOLD(0 == strcmp(name, "Kurre"), "Kurre not equal to name");
 			SHOULD_HOLD(0 == strcmp(name, name2), "Kurre not equal to name2");
 			SHOULD_HOLD(13 == age, "age 13 failed");
-			SHOULD_HOLD(0.75 == curiosity, "curiosity 0.75 failed");
+			SHOULD_HOLD(curiosity < 0.75001 && curiosity > 0.74999, "curiosity 0.75 failed");
 		}
 		if (2 == row)
 		{
@@ -248,7 +248,7 @@ extern "C" int MAMain()
 		{
 			if (MAK_BACK == event.key || MAK_0 == event.key)
 			{
-				break;
+				return 0;
 			}
 		}
 		else if (EVENT_TYPE_POINTER_PRESSED == event.type)

@@ -24,7 +24,11 @@ MA 02110-1301, USA.
  */
 
 #include "config_platform.h"
-#import "syscall.h"
+#include "syscall.h"
+#include "MoSyncDB.h"
+#if FILESYSTEM_CHROOT
+#include "helpers/mkdir.h"
+#endif
 
 #include <sqlite3.h>
 #include <map>
@@ -78,7 +82,7 @@ public:
 			return true;
 		}
 
-		// Run the query again.
+		// Run the next stop of the query.
 		int result = sqlite3_step(mStatement);
 
 		// Is there a query result available?
@@ -153,15 +157,22 @@ static MAHandle MoDBCreateCursorHandle(sqlite3_stmt* statement)
 	return gCursorHandle;
 }
 
-/**
- * Open a database, the database is created if it does not exist.
- * @param path Full path to database file name.
- * @return Handle to the database >0 on success, #MA_DB_ERROR on error.
- */
-int Syscall::maDBOpen(const char* path)
+extern "C"
+int maDBOpen(const char* path)
 {
 	sqlite3* db;
-	int result = sqlite3_open(path, &db);
+
+	const char* fn;
+#if FILESYSTEM_CHROOT
+	std::string name = std::string(FILESYSTEM_DIR) + path;
+	fn = name.c_str();
+	MYASSERT(path[0] == '/', ERR_FILE_PATH_INVALID);
+	_mkdir(FILESYSTEM_DIR);
+#else
+	fn = path;
+#endif
+
+	int result = sqlite3_open(fn, &db);
 	if (result)
 	{
 		sqlite3_close(db);
@@ -173,12 +184,8 @@ int Syscall::maDBOpen(const char* path)
 	}
 }
 
-/**
- * Close a database.
- * @param databaseHandle Handle to the database.
- * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
- */
-int Syscall::maDBClose(MAHandle databaseHandle)
+extern "C"
+int maDBClose(MAHandle databaseHandle)
 {
 	sqlite3* db = MoDBGetDatabase(databaseHandle);
 	if (NULL == db)
@@ -190,16 +197,8 @@ int Syscall::maDBClose(MAHandle databaseHandle)
 	return MA_DB_OK;
 }
 
-/**
- * Executes an SQL statement. If the statement returns a
- * query result, a cursor handle is returned.
- * @param databaseHandle Handle to the database.
- * @param sql The SQL statement.
- * @return #MA_DB_ERROR on error, #MA_DB_OK on success,
- * > 0 if there is a cursor to a query result, in this
- * case the return value is the cursor handle.
- */
-int Syscall::maDBExecSQL(MAHandle databaseHandle, const char* sql)
+extern "C"
+int maDBExecSQL(MAHandle databaseHandle, const char* sql)
 {
 	// Get database object.
 	sqlite3* db = MoDBGetDatabase(databaseHandle);
@@ -252,15 +251,11 @@ int Syscall::maDBExecSQL(MAHandle databaseHandle, const char* sql)
 		// of the result.
 		return MoDBCreateCursorHandle(statement);
 	}
+	DEBIG_PHAT_ERROR;
 }
 
-/**
- * Destroys a cursor. You must call this function
- * when you are done with the cursor to release
- * its resources.
- * @param cursorHandle Handle to the cursor.
- */
-int Syscall::maDBCursorDestroy(MAHandle cursorHandle)
+extern "C"
+int maDBCursorDestroy(MAHandle cursorHandle)
 {
 	MoDBCursor* cursor = MoDBGetCursor(cursorHandle);
 	if (NULL == cursor)
@@ -272,18 +267,8 @@ int Syscall::maDBCursorDestroy(MAHandle cursorHandle)
 	return MA_DB_OK;
 }
 
-/**
- * Move the cursor to the next row in the result set.
- * Note that you must call this function before retrieving
- * column data. The initial position of the cursor is
- * before the first row in the result set. If the result
- * set is empty, this function will return a value != MA_DB_OK.
- * @param cursorHandle Handle to the cursor.
- * @return #MA_DB_OK if successfully moved to next row,
- * #MA_DB_NO_ROW if there are no more rows in the result set,
- * #MA_DB_ERROR on error.
- */
-int Syscall::maDBCursorNext(MAHandle cursorHandle)
+extern "C"
+int maDBCursorNext(MAHandle cursorHandle)
 {
 	// Get the cursor object.
 	MoDBCursor* cursor = MoDBGetCursor(cursorHandle);
@@ -303,19 +288,8 @@ int Syscall::maDBCursorNext(MAHandle cursorHandle)
 	}
 }
 
-/**
- * Get the column value at the current row pointed to
- * by the cursor as a data object. Use this function for
- * blob data or text data.
- * @param cursorHandle Handle to the cursor.
- * @param columnIndex Index of the column to retrieve value from.
- * First column has index zero.
- * @param placeholder Handle created with maCreatePlaceholder.
- * A data object will be created with the column data, and the handle
- * will refer to that data.
- * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
- */
-int Syscall::maDBCursorGetColumnData(
+extern "C"
+int maDBCursorGetColumnData(
 	MAHandle cursorHandle,
 	int columnIndex,
 	MAHandle placeholder)
@@ -329,8 +303,8 @@ int Syscall::maDBCursorGetColumnData(
 
 	// First get pointer to text data.
 	const unsigned char* text = sqlite3_column_text(
-													cursor->getStatement(),
-													columnIndex);
+		cursor->getStatement(),
+		columnIndex);
 	if (NULL == text)
 	{
 		return MA_DB_ERROR;
@@ -342,8 +316,8 @@ int Syscall::maDBCursorGetColumnData(
 	// termination character. See this page for details:
 	// http://sqlite.org/c3ref/column_blob.html
 	int numberOfBytes = sqlite3_column_bytes(
-											 cursor->getStatement(),
-											 columnIndex);
+		cursor->getStatement(),
+		columnIndex);
 
 	printf("numberOfBytes: %d\n", numberOfBytes);
 
@@ -363,21 +337,8 @@ int Syscall::maDBCursorGetColumnData(
 
 }
 
-/**
- * Get the column value at the current row pointed to
- * by the cursor as a text data buffer. Use this function for
- * text data.
- * @param cursorHandle Handle to the cursor.
- * @param columnIndex Index of the column to retrieve value from.
- * First column has index zero.
- * @param buffer Pointer to buffer to receive the data.
- * The result is NOT zero terminated.
- * @param bufferSize Max size of the buffer.
- * @return The actual length of the data, if the actual length
- * returned is > bufferSize, data was not copied (buffer too small),
- * returns #MA_DB_ERROR on other errors.
- */
-int Syscall::maDBCursorGetColumnText(
+extern "C"
+int maDBCursorGetColumnText(
 	MAHandle cursorHandle,
 	int columnIndex,
 	void* buffer,
@@ -423,16 +384,8 @@ int Syscall::maDBCursorGetColumnText(
 	return numberOfBytes;
 }
 
-/**
- * Get the column value at the current row pointed to
- * by the cursor as an int value.
- * @param cursorHandle Handle to the cursor.
- * @param columnIndex Index of the column to retrieve value from.
- * First column has index zero.
- * @param value Pointer to int to receive the value.
- * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
- */
-int Syscall::maDBCursorGetColumnInt(
+extern "C"
+int maDBCursorGetColumnInt(
 	MAHandle cursorHandle,
 	int columnIndex,
 	int* value)
@@ -452,16 +405,8 @@ int Syscall::maDBCursorGetColumnInt(
 	return MA_DB_OK;
 }
 
-/**
- * Get the column value at the current row pointed to
- * by the cursor as a double value.
- * @param cursorHandle Handle to the cursor.
- * @param columnIndex Index of the column to retrieve value from.
- * First column has index zero.
- * @param value Pointer to double to receive the value.
- * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
- */
-int Syscall::maDBCursorGetColumnDouble(
+extern "C"
+int maDBCursorGetColumnDouble(
 	MAHandle cursorHandle,
 	int columnIndex,
 	double* value)
