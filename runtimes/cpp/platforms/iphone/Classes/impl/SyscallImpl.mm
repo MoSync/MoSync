@@ -1881,32 +1881,32 @@ return 0; \
         return [[Ads getInstance] bannerGetProperty:bannerHandle property:property value:value size:bufSize];
 	}
 
-    SYSCALL(int, maNotificationCreate())
+    SYSCALL(int, maNotificationLocalCreate())
 	{
 		return [[Notification getInstance] createNotificationObject];
 	}
-    SYSCALL(int, maNotificationDestroy(MAHandle notificationHandle))
+    SYSCALL(int, maNotificationLocalDestroy(MAHandle notificationHandle))
 	{
         return [[Notification getInstance] destroyNotificationObject:notificationHandle];
 	}
-    SYSCALL(int, maNotificationSetProperty(MAHandle notificationHandle, const char* property, const char* value))
+    SYSCALL(int, maNotificationLocalSetProperty(MAHandle notificationHandle, const char* property, const char* value))
 	{
         return [[Notification getInstance] notificationSetProperty:notificationHandle
                                                           property:property
                                                              value:value];
 	}
-    SYSCALL(int, maNotificationGetProperty(MAHandle notificationHandle, const char* property, char* value, const int bufSize))
+    SYSCALL(int, maNotificationLocalGetProperty(MAHandle notificationHandle, const char* property, char* value, const int bufSize))
 	{
         return [[Notification getInstance] notificationGetProperty:notificationHandle
                                                           property:property
                                                              value:value
                                                               size:bufSize];
 	}
-    SYSCALL(int, maNotificationLocalRegister(MAHandle notificationHandle))
+    SYSCALL(int, maNotificationLocalSchedule(MAHandle notificationHandle))
 	{
 		return [[Notification getInstance] registerLocalNotification:notificationHandle];
 	}
-    SYSCALL(int, maNotificationLocalUnregister(MAHandle notificationHandle))
+    SYSCALL(int, maNotificationLocalUnschedule(MAHandle notificationHandle))
 	{
         return [[Notification getInstance] unregisterLocalNotification:notificationHandle];
 	}
@@ -1937,7 +1937,6 @@ return 0; \
         return [[Notification getInstance] getApplicationIconBadgeNumber];
 	}
 
-	SYSCALL(int, maIOCtl(int function, int a, int b, int c))
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
@@ -2025,12 +2024,12 @@ return 0; \
         maIOCtl_case(maAdsBannerDestroy);
         maIOCtl_case(maAdsBannerSetProperty);
         maIOCtl_case(maAdsBannerGetProperty);
-        maIOCtl_case(maNotificationCreate);
-        maIOCtl_case(maNotificationDestroy);
-        maIOCtl_case(maNotificationSetProperty);
-        maIOCtl_case(maNotificationGetProperty);
-        maIOCtl_case(maNotificationLocalRegister);
-        maIOCtl_case(maNotificationLocalUnregister);
+        maIOCtl_case(maNotificationLocalCreate);
+        maIOCtl_case(maNotificationLocalDestroy);
+        maIOCtl_case(maNotificationLocalSetProperty);
+        maIOCtl_case(maNotificationLocalGetProperty);
+        maIOCtl_case(maNotificationLocalSchedule);
+        maIOCtl_case(maNotificationLocalUnschedule);
         maIOCtl_case(maNotificationPushRegister);
         maIOCtl_case(maNotificationPushUnregister);
         maIOCtl_case(maNotificationPushGetData);

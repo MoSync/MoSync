@@ -164,11 +164,11 @@ static Notification *sharedInstance = nil;
 
     NSString* propertyName = [NSString stringWithUTF8String:propertyNameChar];
     NSString* value = [NSString stringWithUTF8String:valueChar];
-    if ([propertyName isEqualToString:@MA_NOTIFICATION_BADGE_NUMBER])
+    if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_BADGE_NUMBER])
     {
         notification.applicationIconBadgeNumber = [value intValue];
     }
-    else if ([propertyName isEqualToString:@MA_NOTIFICATION_FIRE_DATE])
+    else if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_FIRE_DATE])
     {
         // Notification fire date must be in GMT format.
         double seconds = [value doubleValue];
@@ -178,15 +178,15 @@ static Notification *sharedInstance = nil;
         notification.fireDate = date;
         NSLog(@"show notification at %@", [date description]);
     }
-    else if ([propertyName isEqualToString:@MA_NOTIFICATION_CONTENT_BODY])
+    else if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_CONTENT_BODY])
     {
         notification.alertBody = value;
     }
-    else if ([propertyName isEqualToString:@MA_NOTIFICATION_ALERT_ACTION])
+    else if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_ALERT_ACTION])
     {
         notification.alertAction = value;
     }
-    else if ([propertyName isEqualToString:@MA_NOTIFICATION_PLAY_SOUND])
+    else if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_PLAY_SOUND])
     {
         if ([value isEqualToString:@"true"])
         {
@@ -236,11 +236,11 @@ static Notification *sharedInstance = nil;
 
     NSString* propertyName = [NSString stringWithUTF8String:property];
     NSString* retVal = nil;
-    if ([propertyName isEqualToString:@MA_NOTIFICATION_BADGE_NUMBER])
+    if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_BADGE_NUMBER])
     {
         retVal = [[NSString alloc] initWithFormat:@"%d",notification.applicationIconBadgeNumber];
     }
-    else if ([propertyName isEqualToString:@MA_NOTIFICATION_FIRE_DATE])
+    else if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_FIRE_DATE])
     {
         // Notification's fire date is in GMT format.
         // We need to convert it to local time.
@@ -250,7 +250,7 @@ static Notification *sharedInstance = nil;
         seconds += [localTimeZone secondsFromGMT];
         retVal = [[NSString alloc] initWithFormat:@"%d",(int)seconds];
     }
-    else if ([propertyName isEqualToString:@MA_NOTIFICATION_CONTENT_BODY])
+    else if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_CONTENT_BODY])
     {
         if (notification.alertBody)
         {
@@ -261,7 +261,7 @@ static Notification *sharedInstance = nil;
             retVal = [[NSString alloc] init];
         }
     }
-    else if ([propertyName isEqualToString:@MA_NOTIFICATION_ALERT_ACTION])
+    else if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_ALERT_ACTION])
     {
         if (notification.alertAction)
         {
@@ -272,7 +272,7 @@ static Notification *sharedInstance = nil;
             retVal = [[NSString alloc] init];
         }
     }
-    else if ([propertyName isEqualToString:@MA_NOTIFICATION_PLAY_SOUND])
+    else if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_PLAY_SOUND])
     {
         if (notification.soundName)
         {

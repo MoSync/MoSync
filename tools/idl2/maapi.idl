@@ -9247,7 +9247,8 @@ group NotificationAPI "Notification API" {
 
 		/**
 		* \brief Gets the latest push notification registration response.
-		* \param registrationMesssage The registrationID if the registration was successfull, or the error messsage otherwise.
+		* \param buffer The registrationID if the registration was successfull, or the error messsage otherwise.
+		* \param bufSize Size of the buffer.
 		* \response  One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if the application registered successfully.
 		* - #MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED
@@ -9260,7 +9261,7 @@ group NotificationAPI "Notification API" {
 		* - #MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL
 		* - MA_NOTIFICATION_RES_ERROR - iOS platform only.
 		*/
-		int maNotificationPushGetRegistration(out MAAddress registrationMesssage, in int registrationMessageSize);
+		int maNotificationPushGetRegistration(out MAString buffer range("bufSize"), in int bufSize);
 
 		/**
 		* \brief Fills pushNotificationData struct with the values for a given push notification.

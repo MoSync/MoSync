@@ -66,6 +66,9 @@
 		432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CC1432040B00BDB926 /* PimError.h in Headers */ = {isa = PBXBuildFile; fileRef = 432B98CB1432040B00BDB926 /* PimError.h */; };
+		438DBD401475388500980239 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
+		438DBD451475393800980239 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
+		438DBD461475393800980239 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
 		43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A7684E1400F6BA009608A4 /* ImagePickerController.h */; };
 		43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
 		43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
@@ -1321,6 +1324,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				438DBD451475393800980239 /* AudioInstance.mm in Sources */,
+				438DBD461475393800980239 /* AudioData.mm in Sources */,
+				438DBD401475388500980239 /* AudioSyscall.mm in Sources */,
 				43D3B01613FFC82E00B3DE23 /* CameraConfirgurator.mm in Sources */,
 				858B44BB12E7B1060058DBFC /* log.cpp in Sources */,
 				858B3FEC12E67D090058DBFC /* NSObjectExpanded.m in Sources */,
