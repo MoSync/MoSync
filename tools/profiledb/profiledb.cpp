@@ -1,19 +1,19 @@
 /* Copyright (C) 2011 Mobile Sorcery AB
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License, version 2, as published by
-the Free Software Foundation.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License, version 2, as published by
+ the Free Software Foundation.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program; see the file COPYING.  If not, write to the Free
+ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+ 02111-1307, USA.
+ */
 
 #include <string>
 #include <map>
@@ -39,6 +39,7 @@ using namespace std;
 #define ATTR_ABSTRACT "abstract"
 #define ATTR_NAME "name"
 #define ATTR_STATE "state"
+#define ATTR_FRAGMENTATION "fragmentation"
 
 struct ParserState {
 	Profile* profile;
@@ -50,9 +51,9 @@ struct ParserState {
 
 string ProfileDB::profilesdir() {
 	static const char* md = NULL;
-	if(!md) {
-		md	= getenv("MOSYNCDIR");
-		if(!md) {
+	if (!md) {
+		md = getenv("MOSYNCDIR");
+		if (!md) {
 			printf("MOSYNCDIR is not set!\n");
 			exit(1);
 		}
@@ -64,8 +65,21 @@ static bool isWildcard(string pattern) {
 	return pattern.length() > 0 && pattern.at(pattern.length() - 1) == '*';
 }
 
+static bool equalsIgnoreCaseASCII(string s1, string s2) {
+	if (s1.length() == s2.length()) {
+		for (size_t i = 0; i < s1.length(); i++) {
+			if (tolower(s1.at(i)) != tolower(s2.at(i))) {
+				return false;
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
 static bool beginsWith(string prefix, string str) {
-	bool result = str.length() >= prefix.length() && prefix == str.substr(0, prefix.length());
+	bool result = str.length() >= prefix.length() &&
+			equalsIgnoreCaseASCII(prefix, str.substr(0, prefix.length()));
 	return result;
 }
 
@@ -77,9 +91,10 @@ static bool matches(string pattern, string name) {
 		size_t endIx = newIx == string::npos ? pattern.length() : newIx;
 		string subPattern = pattern.substr(ix, endIx - ix);
 		bool wildcard = isWildcard(subPattern);
-		if (wildcard && beginsWith(subPattern.substr(0, subPattern.length() - 1), name)) {
+		if (wildcard && beginsWith(
+				subPattern.substr(0, subPattern.length() - 1), name)) {
 			return true;
-		} else if (subPattern == name) {
+		} else if (equalsIgnoreCaseASCII(subPattern, name)) {
 			return true;
 		}
 		ix = newIx + 1;
@@ -88,12 +103,12 @@ static bool matches(string pattern, string name) {
 }
 
 static const char* findAttr(const char* name, const char** attributes) {
-	  for (int i = 0; attributes[i]; i += 2) {
-		  if (!strcmp(attributes[i], name)) {
-			  return attributes[i + 1];
-		  }
-	  }
-	  return NULL;
+	for (int i = 0; attributes[i]; i += 2) {
+		if (!strcmp(attributes[i], name)) {
+			return attributes[i + 1];
+		}
+	}
+	return NULL;
 }
 
 static void error(const char* file, int lineNo, string msg) {
@@ -114,15 +129,19 @@ static void error(ParserState* state, string msg) {
 	}
 }
 
-void innerListAllProfiles(File& root, string name, string pattern, bool onlyFamilies, vector<string>& result) {
+void innerListAllProfiles(File& root, string name, string pattern,
+		bool onlyFamilies, vector<string>& result) {
 	list<File> files = root.listFiles();
-	for (list<File>::iterator filesIterator = files.begin(); filesIterator != files.end(); filesIterator++) {
+	for (list<File>::iterator filesIterator = files.begin(); filesIterator
+			!= files.end(); filesIterator++) {
 		File file = *filesIterator;
 		if (file.isDirectory()) {
 			const char* slash = name.size() == 0 ? "" : "/";
-			string newName = name.size() == 0 || !onlyFamilies ? name + slash + file.getName() : name;
+			string newName = name.size() == 0 || !onlyFamilies ? name + slash
+					+ file.getName() : name;
 			innerListAllProfiles(file, newName, pattern, onlyFamilies, result);
-		} else if (string("profile.xml") == file.getName() && matches(pattern, name)) {
+		} else if (string("profile.xml") == file.getName() && matches(pattern,
+				name)) {
 			result.push_back(name);
 		}
 	}
@@ -189,7 +208,7 @@ void ProfileDB::getProfiles(string profilePattern, vector<Profile*>& profiles) {
 	innerListAllProfiles(root, string(), profilePattern, false, profileNames);
 	for (size_t i = 0; i < profileNames.size(); i++) {
 		string profileName = profileNames.at(i);
-		Profile* profile = findProfile(profileName, set<string>());
+		Profile* profile = findProfile(profileName, set<string> ());
 		if (profile && !isExcluded(profile)) {
 			profiles.push_back(profile);
 		}
@@ -213,8 +232,8 @@ void ProfileDB::listCapabilities(string statePattern) {
 	for (size_t i = 0; i < profiles.size(); i++) {
 		Profile* profile = profiles.at(i);
 		set<string> capabilities = profile->getCapabilities();
-		for (set<string>::iterator capabilityIt = capabilities.begin();
-				capabilityIt != capabilities.end(); capabilityIt++) {
+		for (set<string>::iterator capabilityIt = capabilities.begin(); capabilityIt
+				!= capabilities.end(); capabilityIt++) {
 			Capability capability = profile->getCapability(*capabilityIt);
 			if (capability.matchCapability(statePattern)) {
 				aggregateCapabilities.insert(*capabilityIt);
@@ -228,8 +247,8 @@ void ProfileDB::listCapabilities(string statePattern) {
 	writer.startTag("db");
 	writer.setAttr("version", "1.0");
 	writer.setAttr("id", "main");
-	for (set<string>::iterator capabilityIt = aggregateCapabilities.begin();
-					capabilityIt != aggregateCapabilities.end(); capabilityIt++) {
+	for (set<string>::iterator capabilityIt = aggregateCapabilities.begin(); capabilityIt
+			!= aggregateCapabilities.end(); capabilityIt++) {
 		writer.startTag(ELEMENT_CAPABILITY);
 		writer.setAttr(ATTR_NAME, *capabilityIt);
 		writer.endTag();
@@ -247,28 +266,49 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 	if (!strcmp(ELEMENT_PLATFORM, tagName)) {
 		const char* parentProfile = findAttr(ATTR_INHERIT, attributes);
 		if (parentProfile) {
-			Profile* parent = db->findProfile(parentProfile, state->alreadyFound);
+			Profile* parent = db->findProfile(parentProfile,
+					state->alreadyFound);
 			if (parent == NULL) {
-				error(state, string("This platform element refers to an invalid parent profile: ") + parentProfile);
+				error(
+						state,
+						string(
+								"This platform element refers to an invalid parent profile: ")
+								+ parentProfile);
 			} else {
 				profile->setParent(parent);
 			}
 		}
 		const char* family = findAttr(ATTR_FAMILY, attributes);
 		if (!family) {
-			error(state, string("No family attribute defined: ") + profile->getProfileName());
+			error(
+					state,
+					string("No family attribute defined: ")
+							+ profile->getProfileName());
 		}
 		const char* variant = findAttr(ATTR_VARIANT, attributes);
 		if (!variant) {
-			error(state, string("No variant attribute defined: ") + profile->getProfileName());
+			error(
+					state,
+					string("No variant attribute defined: ")
+							+ profile->getProfileName());
 		}
 		const char* runtime = findAttr(ATTR_RUNTIME, attributes);
 		if (!runtime) {
-			error(state, string("No runtime attribute defined: ") + profile->getProfileName());
+			error(
+					state,
+					string("No runtime attribute defined: ")
+							+ profile->getProfileName());
 		}
 		const char* abstract = findAttr(ATTR_ABSTRACT, attributes);
 		bool isAbstract = abstract && !strcmp("true", abstract);
 
+		const char* slash = strlen(variant) > 0 ? "/" : "";
+		if (!equalsIgnoreCaseASCII(string(family) + slash + string(variant),
+				profile->getProfileName())) {
+			error(state, string("Expected family (") + family +
+					string(") and variant (") + variant + string(") to match ")
+					+ profile->getProfileName());
+		}
 		profile->setFamily(string(family));
 		profile->setVariant(string(variant));
 		profile->setRuntime(string(runtime));
@@ -276,6 +316,7 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 	} else if (!strcmp(ELEMENT_CAPABILITY, tagName)) {
 		const char* capabilityName = findAttr(ATTR_NAME, attributes);
 		const char* capabilityStateStr = findAttr(ATTR_STATE, attributes);
+		const char* fragmentationStr = findAttr(ATTR_FRAGMENTATION, attributes);
 		CapabilityState capabilityState;
 		if (!capabilityStateStr) {
 			capabilityState = UNSUPPORTED;
@@ -292,7 +333,10 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 		} else {
 			error(state, string("Unknown state: ") + capabilityStateStr);
 		}
-		Capability capability = Capability(capabilityName, capabilityState);
+		Fragmentation fragmentation = fragmentationStr && !strcmp("buildtime",
+				fragmentationStr) ? BUILDTIME : RUNTIME;
+		Capability capability = Capability(capabilityName, capabilityState,
+				fragmentation);
 		state->profile->addCapability(capability);
 	}
 }
@@ -316,7 +360,8 @@ Profile* ProfileDB::findProfile(string profileName, set<string> alreadyFound) {
 
 bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
 	string profileName = profile->getProfileName();
-	File file = File(string(profilesdir() + "/" + profileName + "/profile.xml"));
+	File file =
+			File(string(profilesdir() + "/" + profileName + "/profile.xml"));
 	string path = file.getAbsolutePath();
 
 	ParserState state;
@@ -337,7 +382,8 @@ bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
 			state.lineNo++;
 			getline(fs, line);
 			if (!XML_Parse(parser, line.c_str(), line.length(), false)) {
-				printf("<!-- FATAL ERROR: XML malformatted (%s, line %d) -->", path.c_str(), state.lineNo);
+				printf("<!-- FATAL ERROR: XML malformatted (%s, line %d) -->",
+						path.c_str(), state.lineNo);
 				return NULL;
 			}
 		}
@@ -351,61 +397,99 @@ bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
 	return profile;
 }
 
-bool internalMatchProfile(Profile* profile, vector<Capability> capabilities) {
-	for (vector<Capability>::iterator capability = capabilities.begin();
-			capability != capabilities.end(); capability++) {
-		Capability matchedCapability = profile->getCapability(capability->getName());
+bool internalMatchProfile(Profile* profile,
+		vector<Capability>& requiredCapabilites,
+		vector<Capability>& optionalCapabilites,
+		string& matchToken) {
+	bool match = true;
+	for (vector<Capability>::iterator capability = requiredCapabilites.begin(); capability
+			!= requiredCapabilites.end(); capability++) {
+		Capability matchedCapability = profile->getCapability(
+				capability->getName());
 		CapabilityState matchedState = matchedCapability.getState();
 		// Ok, so we don't support this, bail out!
 		if (matchedState == NOT_IMPLEMENTED || matchedState == UNSUPPORTED) {
-			return false;
+			match = false;
 		}
 	}
-	return true;
+
+	// So, the optional capabilities are matched in a different way.
+	// We add stuff to the matchTokens string to produce a string that
+	// is unique to the optional capabilities being matched.
+	for (vector<Capability>::iterator capability = optionalCapabilites.begin(); capability
+			!= optionalCapabilites.end(); capability++) {
+		Capability matchedCapability = profile->getCapability(
+				capability->getName());
+		CapabilityState matchedState = matchedCapability.getState();
+		Fragmentation fragmentation = matchedCapability.getFragmentation();
+		bool fragmented = fragmentation == BUILDTIME && (matchedState == NOT_IMPLEMENTED || matchedState == UNSUPPORTED);
+		matchToken.append(fragmented ? "+" : "-");
+	}
+	return match;
 }
 
 bool ProfileDB::isExcluded(Profile* profile) {
-	return !profile || profile->isAbstract() || matches(fExcludePattern, profile->getProfileName());
+	return !profile || profile->isAbstract() || matches(fExcludePattern,
+			profile->getProfileName());
 }
 
-bool ProfileDB::matchProfiles(string profilePattern, vector<Capability> capabilities) {
+bool ProfileDB::matchProfiles(string profilePattern,
+		vector<Capability> requiredCapabilities,
+		vector<Capability> optionalCapabilities) {
 	File root = File(profilesdir());
 	vector<string> profiles;
 	innerListAllProfiles(root, string(), profilePattern, false, profiles);
-	set<string> profileNames; // TODO: Maybe we want VARIANTS as well!?
 	vector<Profile*> matchingProfiles;
-	for (vector<string>::iterator profileIt = profiles.begin();
-			profileIt != profiles.end(); profileIt++) {
-		Profile* match = matchProfile(*profileIt, capabilities);
-		if (match && profileNames.find(match->getProfileName()) == profileNames.end()) {
+
+	for (vector<string>::iterator profileIt = profiles.begin(); profileIt
+			!= profiles.end(); profileIt++) {
+		matchProfile(*profileIt, requiredCapabilities,
+				optionalCapabilities, matchingProfiles);
+	}
+
+	set<string> profileNames; // TODO: Maybe we want VARIANTS as well!?
+	vector<Profile*> prunedProfiles;
+	for (vector<Profile*>::iterator matchingProfilesIt =
+			matchingProfiles.begin(); matchingProfilesIt
+			!= matchingProfiles.end(); matchingProfilesIt++) {
+		Profile* match = *matchingProfilesIt;
+		// Make sure we only add a specific profile once.
+		if (profileNames.find(match->getProfileName())
+				== profileNames.end()) {
 			profileNames.insert(match->getProfileName());
-			matchingProfiles.push_back(match);
+			prunedProfiles.push_back(match);
 		}
 	}
 
-	for (vector<Profile*>::iterator matchingProfilesIt = matchingProfiles.begin();
-			matchingProfilesIt != matchingProfiles.end(); matchingProfilesIt++) {
-		dumpProfile(*matchingProfilesIt, (*matchingProfilesIt)->getProfileName());
-	}
+	dumpProfiles(prunedProfiles, profilePattern);
 
 	return profileNames.size() > 0;
 }
 
-Profile* ProfileDB::matchProfile(string profileName, vector<Capability> capabilities) {
-	Profile* profile = findProfile(profileName, set<string>());
-	if (profile) {
-		Profile* parent = profile->getParent();
-		if (!parent || !matchProfile(parent->getProfileName(), capabilities)) {
-			if (internalMatchProfile(profile, capabilities)) {
-				bool excluded = isExcluded(profile);
-				if (!excluded) {
-					return profile;
-				}
-				return NULL;
+void ProfileDB::matchProfile(string profileName,
+		vector<Capability> requiredCapabilities,
+		vector<Capability> optionalCapabilities,
+		vector<Profile*>& result) {
+	Profile* profile = findProfile(profileName, set<string> ());
+	vector<Profile*> genealogy;
+	while (profile) {
+		genealogy.push_back(profile);
+		profile = profile->getParent();
+	}
+
+	set<string> matchTokens;
+	for (vector<Profile*>::reverse_iterator genealogyIt = genealogy.rbegin();
+			genealogyIt != genealogy.rend(); genealogyIt++) {
+		Profile* profileToMatch = *genealogyIt;
+		string matchToken;
+		if (!profileToMatch->isAbstract() &&
+				internalMatchProfile(profileToMatch, requiredCapabilities, optionalCapabilities, matchToken)) {
+			if (matchTokens.find(matchToken) == matchTokens.end()) {
+				matchTokens.insert(matchToken);
+				result.push_back(profileToMatch);
 			}
 		}
 	}
-	return NULL;
 }
 
 void Profile::addCapability(Capability capability) {
@@ -414,8 +498,8 @@ void Profile::addCapability(Capability capability) {
 
 set<string> Profile::getCapabilities() {
 	set<string> result;
-	for (map<string, Capability>::iterator capability = fCapabilities.begin();
-			capability != fCapabilities.end(); capability++) {
+	for (map<string, Capability>::iterator capability = fCapabilities.begin(); capability
+			!= fCapabilities.end(); capability++) {
 		result.insert(capability->first);
 	}
 	if (fParent) {
@@ -426,7 +510,8 @@ set<string> Profile::getCapabilities() {
 }
 
 Capability Profile::getCapability(string capabilityName) {
-	map<string, Capability>::iterator capability = fCapabilities.find(capabilityName);
+	map<string, Capability>::iterator capability = fCapabilities.find(
+			capabilityName);
 	if (capability == fCapabilities.end()) {
 		if (fParent) {
 			return fParent->getCapability(capabilityName);
@@ -446,8 +531,8 @@ void Profile::toXML(XMLWriter& writer) {
 		writer.setAttr(ATTR_ABSTRACT, "true");
 	}
 	set<string> capabilities = Profile::getCapabilities();
-	for (set<string>::iterator capability = capabilities.begin();
-			capability != capabilities.end(); capability++) {
+	for (set<string>::iterator capability = capabilities.begin(); capability
+			!= capabilities.end(); capability++) {
 		Capability value = getCapability(*capability);
 		value.toXML(writer);
 	}
@@ -481,6 +566,8 @@ void Capability::toXML(XMLWriter& writer) {
 	writer.startTag(ELEMENT_CAPABILITY);
 	writer.setAttr(ATTR_NAME, fName);
 	writer.setAttr(ATTR_STATE, stateStr);
+	writer.setAttr(ATTR_FRAGMENTATION,
+			fFragmentation == BUILDTIME ? "buildtime" : "runtime");
 	writer.endTag();
 }
 

@@ -76,11 +76,19 @@ int main(int argc,char *argv[]) {
 		db.listProfiles("*", true);
 	} else if (("--match" == cmd || "-m" == cmd) && argc >= curArg + 3) {
 		string profilePattern = string(argv[curArg + 2]);
-		vector<Capability> capabilities;
+		vector<Capability> requiredCapabilities;
+		vector<Capability> optionalCapabilities;
+		vector<Capability>* currentCapabilities = &requiredCapabilities;
 		for (int i = curArg + 3; i < argc; i++) {
-			capabilities.push_back(Capability(string(argv[i]), SUPPORTED));
+			string cap = string(argv[i]);
+			if ("-o" == cap || "--optional" == cap) {
+				currentCapabilities = &optionalCapabilities;
+			} else {
+				currentCapabilities->push_back(Capability(cap, SUPPORTED, RUNTIME));
+			}
 		}
-		db.matchProfiles(profilePattern, capabilities);
+
+		db.matchProfiles(profilePattern, requiredCapabilities, optionalCapabilities);
 	} else if (("--list-capabilities" == cmd || "-c" == cmd) && argc >= curArg + 2) {
 		string statePattern = argc > curArg + 2 ? argv[curArg + 2] : "*";
 		db.listCapabilities(statePattern);

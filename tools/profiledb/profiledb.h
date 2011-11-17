@@ -30,16 +30,20 @@ using namespace std;
 class ProfileDB;
 
 enum CapabilityState { UNSUPPORTED, NOT_IMPLEMENTED, SUPPORTED, REQUIRES_PERMISSION, REQUIRES_PRIVILEGED_PERMISSION };
+enum Fragmentation { BUILDTIME, RUNTIME };
 
 class Capability {
 private:
 	string fName;
 	CapabilityState fState;
+	Fragmentation fFragmentation;
 public:
-	Capability() : fName(""), fState(UNSUPPORTED) { }
-	Capability(string name, CapabilityState state) : fName(name), fState(state) { }
+	Capability() : fName(""), fState(UNSUPPORTED), fFragmentation(RUNTIME) { }
+	Capability(string name, CapabilityState state, Fragmentation fragmentation) :
+		fName(name), fState(state), fFragmentation(fragmentation) { }
 	string getName() { return fName; }
 	CapabilityState getState() { return fState; }
+	Fragmentation getFragmentation() { return fFragmentation; }
 	bool matchCapability(string statePattern);
 	void toXML(XMLWriter& output);
 };
@@ -76,7 +80,8 @@ private:
 	bool isExcluded(Profile* profile);
 	bool parseProfileXML(Profile* profile, set<string> alreadyFound);
 	void getProfiles(string profilePattern, vector<Profile*>& profiles);
-	Profile* matchProfile(string profileName, vector<Capability> capabilities);
+	void matchProfile(string profileName, vector<Capability> requiredCapabilities,
+			vector<Capability> optionalCapabilities, vector<Profile*>& result);
 	void dumpProfile(Profile* profile, string profileName);
 	void dumpProfiles(vector<Profile*> profile, string unmatchedName);
 public:
@@ -85,7 +90,8 @@ public:
 	void getProfiles(string profileName);
 	void listProfiles(string pattern, bool onlyFamilies);
 	void listCapabilities(string pattern);
-	bool matchProfiles(string profilePattern, vector<Capability> capabilities);
+	bool matchProfiles(string profilePattern, vector<Capability> requiredCapabilities,
+			vector<Capability> optionalCapabilities);
 	Profile* findProfile(string profileName, set<string> alreadyFound);
 };
 
