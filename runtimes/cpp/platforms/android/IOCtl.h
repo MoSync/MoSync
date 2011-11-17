@@ -842,6 +842,8 @@ namespace Base
 
 	int _maNFCIsReadOnly(MAHandle tag, JNIEnv* jNIEnv, jobject jThis);
 
+	// ********** ADS API **********
+
 	int _maAdsBannerCreate(int bannerSize, const char* publisherID, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maAdsAddBannerToLayout(MAHandle bannerHandle, MAHandle layoutHandle, JNIEnv* jNIEnv, jobject jThis);
@@ -853,6 +855,8 @@ namespace Base
 	int _maAdsBannerSetProperty(MAHandle bannerHandle, const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maAdsBannerGetProperty(int memStart, MAHandle bannerHandle, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis);
+
+	// ********** Notifications API **********
 
 	int _maNotificationLocalCreate(JNIEnv* jNIEnv, jobject jThis);
 
@@ -872,7 +876,7 @@ namespace Base
 
 	int _maNotificationPushUnregister(JNIEnv* jNIEnv, jobject jThis);
 
-	int _maNotificationPushGetData(MAHandle pushNotificationHandle, int type, int memStart, int messagePointer,int messageSize, int soundFilePointer, int soundFileSize, int badgeIcon, JNIEnv* jNIEnv, jobject jThis);
+	int _maNotificationPushGetData(MAHandle pushNotificationHandle, int memStart, int buffer, int messageSize, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNotificationPushSetTickerText(const char* text, JNIEnv* jNIEnv, jobject jThis);
 

@@ -3123,16 +3123,19 @@ namespace Base
 		return result;
 	}
 
-	int _maNotificationPushGetData(MAHandle pushNotificationHandle, int type, int memStart, int messagePointer,int messageSize, int soundFilePointer, int soundFileSize, int badgeIcon, JNIEnv* jNIEnv, jobject jThis)
+	int _maNotificationPushGetData(MAHandle pushNotificationHandle, int memStart, int bufferPointer, int messageSize, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jclass cls = jNIEnv->GetObjectClass(jThis);
-		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushGetData", "(IIIIIII)I");
+		//int fixedDst = destination == NULL ? 0 : destination - memStart;
+		//int dest = (int)messagePointer - (int)gCore->mem_ds;
+
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushGetData", "(III)I");
 		if (methodID == 0)
 		{
 			return 0;
 		}
 
-		int result = jNIEnv->CallIntMethod(jThis, methodID, pushNotificationHandle, type, messagePointer - memStart, messageSize, soundFilePointer, soundFileSize, badgeIcon);
+		int result = jNIEnv->CallIntMethod(jThis, methodID, pushNotificationHandle, bufferPointer - memStart, messageSize);
 
 		jNIEnv->DeleteLocalRef(cls);
 

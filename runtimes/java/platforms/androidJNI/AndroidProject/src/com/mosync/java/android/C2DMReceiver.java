@@ -23,7 +23,8 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	 */
 	@Override
 	public void onRegistered(Context context, String registrationId)
-			throws java.io.IOException {
+			throws java.io.IOException
+	{
 		Log.e("@@MoSync", "C2DM Registration success");
 		// Notify the manager of this event.
 		PushNotificationsManager manager = PushNotificationsManager.getRef();
@@ -34,12 +35,16 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 	 * Called when a cloud message has been received.
 	 */
 	@Override
-	protected void onMessage(Context context, Intent intent) {
+	protected void onMessage(Context context, Intent intent)
+	{
 		Log.e("@@MoSync", "C2DM Message received");
 		// Create new PushNotificationObject that holds the payload.
 		final String message = intent.getStringExtra("payload");
-		PushNotificationsManager manager = PushNotificationsManager.getRef();
-		manager.messageReceived(message);
+		if ( message != null )
+		{
+			PushNotificationsManager manager = PushNotificationsManager.getRef();
+			manager.messageReceived(message);
+		}
 	}
 
 	/**

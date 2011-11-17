@@ -2556,6 +2556,8 @@ return 0; \
 					mJNIEnv,
 					mJThis);
 
+		// ********** ADS API **********
+
 		case maIOCtl_maAdsBannerCreate:
 		{
 			const char *_publisher = SYSCALL_THIS->GetValidatedStr(b);
@@ -2600,6 +2602,8 @@ return 0; \
 
 			return _maAdsBannerGetProperty((int)gCore->mem_ds, _ad, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
 		}
+
+		// ********** Notifications API **********
 
 		case maIOCtl_maNotificationLocalCreate:
 			return _maNotificationLocalCreate(mJNIEnv, mJThis);
@@ -2665,28 +2669,21 @@ return 0; \
 
 		case maIOCtl_maNotificationPushGetData:
 		{
-
 			MAPushNotificationData* data = (MAPushNotificationData*) SYSCALL_THIS->GetValidatedMemRange(b,sizeof(MAPushNotificationData));
 			int _valueBufferSize = data->alertMessageSize;
 			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
 				data->alertMessage,
 				_valueBufferSize * sizeof(char));
 
+			// The type, badge icon and soundFile are used only on iOS.
 			return _maNotificationPushGetData(
 				a,
 				(int)gCore->mem_ds,
-				data->type,
 				_valueBuffer,
 				_valueBufferSize,
-				data->soundFileName,
-				data->soundFileNameSize,
-				// The badge icon is used only on iOS.
-				data->badgeIcon,
 				mJNIEnv,
 				mJThis);
 		}
-		// ********** Various APIs **********
-		// TODO: Group with related APIs.
 
 		case maIOCtl_maNotificationPushSetTickerText:
 		{
