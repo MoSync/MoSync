@@ -1,11 +1,7 @@
 package com.mosync.nativeui.ui.ads;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import android.util.Log;
 import android.view.View;
-import android.webkit.ValueCallback;
 
 import com.google.ads.Ad;
 import com.google.ads.AdRequest;

@@ -3074,18 +3074,19 @@ public class MoSyncThread extends Thread
 	/**
 	 * Get info about for a given push notification.
 	 * @param handle The push notification handle.
-	 * @param type Ignored
-	 * @param allertMessage The offset in which to copy the notification payload.
-	 * @param allertMessageSize The size of the notification payload.
+	 * @param type By default is 1.
+	 * @param allertMessage Address to buffer to receive the data.
+	 * The result is NOT zero terminated.
+	 * @param allertMessageSize Max size of the buffer.
 	 * @return  One of the next constants:
 	 *  - MA_NOTIFICATION_RES_OK
 	 *  - MA_NOTIFICATION_RES_INVALID_HANDLE
 	 *  - MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE
 	 */
-	int maNotificationPushGetData(int handle, int type, int allertMessage,
-			int allertMessageSize, int soundFilename, int soundFilenameSize, int bagdeIcon)
+	int maNotificationPushGetData(int handle, int allertMessage,
+			int allertMessageSize)
 	{
-		return mMoSyncNotifications.maNotificationPushGetData(handle,allertMessage, allertMessageSize);
+		return mMoSyncNotifications.maNotificationPushGetData(handle, allertMessage, allertMessageSize);
 	}
 
 	/**

@@ -2,26 +2,14 @@ package com.mosync.internal.android.notifications;
 
 import java.nio.ByteBuffer;
 
-//import com.google.android.c2dm.C2DMBaseReceiver;
-//import com.google.android.c2dm.C2DMessaging;
-
-import com.google.android.c2dm.C2DMBaseReceiver;
 import com.google.android.c2dm.C2DMessaging;
 import com.mosync.internal.android.MoSyncThread;
-import com.mosync.internal.generated.IX_WIDGET;
-import com.mosync.java.android.MoSync;
+
 import com.mosync.nativeui.util.HandleTable;
 
-//import com.google.android.c2dm.C2DMBaseReceiver;
 
 import android.os.Build;
-import android.os.Build.VERSION;
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
-import android.database.MergeCursor;
 import android.util.Log;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
@@ -147,7 +135,6 @@ public class PushNotificationsManager
 	 */
 	private void postEventNotificationReceived(int handle)
 	{
-		Log.e("Emma","notification received");
 		int[] event = new int[2];
 		event[0] = EVENT_TYPE_PUSH_NOTIFICATION;
 		event[1] = handle;
@@ -165,7 +152,6 @@ public class PushNotificationsManager
 	 */
 	private void postEventRegistration(int registrationState)
 	{
-		Log.e("Emma", "send registration event");
 		int[] event = new int[1];
 		event[0] = registrationState;
 
@@ -174,8 +160,9 @@ public class PushNotificationsManager
 
 	/**
 	 * Register to the C2DM server.
-	 * @param accountID The developer's account, typically the email
-	 * address that was registered with Google C2DM.
+	 * @param accountID The ID of the account authorized to send messages to the application,
+	 * typically the email address of an account set up by the application's developer.
+	 *
 	 * @return a result code.
 	 */
 	public int register(String accountID)
@@ -186,8 +173,8 @@ public class PushNotificationsManager
 		{
 			// No need to send registration request, it can be handled locally.
 			Log.e("@@MoSync", "Current Android version does not support C2DM. Use Android 2.2 or higher.");
-//			registrationFail(PushRegistrationData.REG_ERR_MESSAGE_PHONE_ERROR);
-			return MA_NOTIFICATION_RES_UNSUPPORTED; //MA_NOTIFICATION_RES_OK
+			registrationFail(PushRegistrationData.REG_ERR_MESSAGE_PHONE_ERROR);
+			return MA_NOTIFICATION_RES_UNSUPPORTED;
 		}
 		else if ( mRegistrationInfo.registrationInProgress )
 		{
@@ -203,8 +190,7 @@ public class PushNotificationsManager
 		// Start requesting registration.
 		mRegistrationInfo.registrationInProgress = true;
 		mRegistrationInfo.registrationAttempted = true;
-		// Store the ID of the account authorized to send push messages.
-		mSenderID = accountID;
+		// Register with the ID of the account authorized to send push messages.
 
 		C2DMessaging.register(mMosyncThread.getActivity(), accountID);
 
@@ -246,10 +232,15 @@ public class PushNotificationsManager
 	/**
 	 * Get the values for a given notification.
 	 * @param notificationHandle
-	 * @param payload The address from which  to start writing the message.
-	 * @param payloadLength The size of the message that will be written.
+	 * @param type By default is 1. This is used only on iOS.
+	 * @param payloadBuffer Address to buffer to receive the data.
+	 * @param bufferSize The max size of the buffer.
+	 * @return One of the values:
+	 *  - MA_NOTIFICATION_RES_OK
+	 *  - MA_NOTIFICATION_RES_INVALID_HANDLE
+	 *  - MA_NOTIFICATION_RES_INVALIS_STRING_BUFFER_SIZE
 	 */
-	public int getPushData(int notificationHandle, int payload, int payloadLength)
+	public int getPushData(int notificationHandle, int payloadBuffer, int bufferSize)
 	{
 		PushNotificationObject notification = m_NotificationTable.get(notificationHandle);
 		if ( notification == null )
@@ -259,15 +250,14 @@ public class PushNotificationsManager
 		}
 
 		String messagePayload = notification.getMessage();
-		if( messagePayload.length( ) + 1 > payloadLength )
+		if( messagePayload.length( ) + 1 > bufferSize )
 		{
-			Log.e( "@@MoSync Notification", "maNotificationPushGetData: Buffer size " + payloadLength +
+			Log.e( "@@MoSync Notification", "maNotificationPushGetData: Buffer size " + bufferSize +
 					" too short to hold buffer of size: " + messagePayload.length( ) + 1 );
 			return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
 		}
 
-		Log.e("Emma","getPushData get message " + messagePayload);
-		writeToMoSyncMemory(messagePayload, payload);
+		writeToMoSyncMemory(messagePayload, payloadBuffer);
 
 		return MA_NOTIFICATION_RES_OK;
 	}
@@ -284,9 +274,16 @@ public class PushNotificationsManager
 		{
 			if ( !mRegistrationInfo.registrationSuccess )
 			{
+				if( mRegistrationInfo.errorMessage.length() + 1 > registrationBufSize )
+				{
+					Log.e( "@@MoSync Notification", "getPushData: Buffer size " + registrationBufSize +
+							" too short to hold buffer of size: " + mRegistrationInfo.errorMessage.length( ) + 1 );
+					return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
+				}
+
 				// Return the err code and specific message.
 				writeToMoSyncMemory(mRegistrationInfo.errorMessage,registrationBuf);
-				return mRegistrationInfo.errorCode;
+				return MA_NOTIFICATION_RES_ERROR;
 			}
 			else
 			{
@@ -343,12 +340,6 @@ public class PushNotificationsManager
 	 * Hold the latest registration information.
 	 */
 	public static PushRegistrationData mRegistrationInfo = new PushRegistrationData();
-
-	/**
-	 * Tthe ID of the account authorized to send messages to the application,
-	 * typically the email address of an account set up by the application's developer.
-	 */
-	private String mSenderID = null;
 
 	/**
 	 * The app context.

@@ -31,18 +31,6 @@ public class PushRegistrationData {
 	public PushRegistrationData(){}
 
 	/**
-	 * Set the error code based on the message.
-	 * @param errMessage
-	 */
-	public void setErrorCode(String errMessage)
-	{
-		int code = 0;
-
-
-		errorCode = code;
-	}
-
-	/**
 	 * True if a registration request was made.
 	 */
 	public Boolean registrationAttempted = false;
@@ -62,11 +50,6 @@ public class PushRegistrationData {
 	 * The registration ID received from the C2DM server.
 	 */
 	public String registrationID = null;
-
-	/**
-	 * The error code received from the C2DM server.
-	 */
-	public int errorCode;
 
 	/**
 	 * The error message to accompany the errCode.

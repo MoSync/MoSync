@@ -32,8 +32,6 @@ public class C2DMessaging {
      */
     public static void register(Context context,
             String senderId) {
-Log.e("EMMA", "In c2dm Messaging register");
-
         Intent registrationIntent = new Intent(REQUEST_REGISTRATION_INTENT);
         registrationIntent.setPackage(GSF_PACKAGE);
         registrationIntent.putExtra(EXTRA_APPLICATION_PENDING_INTENT,

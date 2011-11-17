@@ -40,7 +40,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 //#include <helpers/CPP_IX_ACCELEROMETER.h>
 #include "MoSyncPanic.h"
 #import "Ads.h"
-#import "Notification.h"
+#import "NotificationManager.h"
 #include <helpers/CPP_IX_WIDGET.h>
 #include "MoSyncUISyscalls.h"
 #import "CameraPreviewWidget.h"
@@ -342,7 +342,7 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
-        [Notification deleteInstance];
+        [NotificationManager deleteInstance];
         [Ads deleteInstance];
         MAAudioClose();
         [OptionsDialogView deleteInstance];
@@ -1883,58 +1883,58 @@ return 0; \
 
     SYSCALL(int, maNotificationLocalCreate())
 	{
-		return [[Notification getInstance] createNotificationObject];
+		return [[NotificationManager getInstance] createNotificationObject];
 	}
     SYSCALL(int, maNotificationLocalDestroy(MAHandle notificationHandle))
 	{
-        return [[Notification getInstance] destroyNotificationObject:notificationHandle];
+        return [[NotificationManager getInstance] destroyNotificationObject:notificationHandle];
 	}
     SYSCALL(int, maNotificationLocalSetProperty(MAHandle notificationHandle, const char* property, const char* value))
 	{
-        return [[Notification getInstance] notificationSetProperty:notificationHandle
+        return [[NotificationManager getInstance] notificationSetProperty:notificationHandle
                                                           property:property
                                                              value:value];
 	}
     SYSCALL(int, maNotificationLocalGetProperty(MAHandle notificationHandle, const char* property, char* value, const int bufSize))
 	{
-        return [[Notification getInstance] notificationGetProperty:notificationHandle
+        return [[NotificationManager getInstance] notificationGetProperty:notificationHandle
                                                           property:property
                                                              value:value
                                                               size:bufSize];
 	}
     SYSCALL(int, maNotificationLocalSchedule(MAHandle notificationHandle))
 	{
-		return [[Notification getInstance] registerLocalNotification:notificationHandle];
+		return [[NotificationManager getInstance] registerLocalNotification:notificationHandle];
 	}
     SYSCALL(int, maNotificationLocalUnschedule(MAHandle notificationHandle))
 	{
-        return [[Notification getInstance] unregisterLocalNotification:notificationHandle];
+        return [[NotificationManager getInstance] unregisterLocalNotification:notificationHandle];
 	}
     SYSCALL(int, maNotificationPushRegister(MAHandle pushNotificationType, const char* accountID))
 	{
-		return [[Notification getInstance] registerPushNotification:pushNotificationType];
+		return [[NotificationManager getInstance] registerPushNotification:pushNotificationType];
 	}
     SYSCALL(int, maNotificationPushUnregister())
 	{
-        return [[Notification getInstance] unregisterPushNotification];
+        return [[NotificationManager getInstance] unregisterPushNotification];
 	}
     SYSCALL(int, maNotificationPushGetData(MAHandle pushNotificationHandle,
                                            MAPushNotificationData* pushNotificationData))
 	{
-        return [[Notification getInstance] getPushNotificationData:pushNotificationHandle
+        return [[NotificationManager getInstance] getPushNotificationData:pushNotificationHandle
                                                               data:pushNotificationData];
 	}
     SYSCALL(int, maNotificationPushGetRegistration(char* buffer, const int size))
 	{
-        return [[Notification getInstance] getPushRegistrationData:buffer size:size];
+        return [[NotificationManager getInstance] getPushRegistrationData:buffer size:size];
 	}
     SYSCALL(void, maNotificationSetIconBadge(const int applicationIconBadgeNumber))
 	{
-        [[Notification getInstance] setApplicationIconBadgeNumber:applicationIconBadgeNumber];
+        [[NotificationManager getInstance] setApplicationIconBadgeNumber:applicationIconBadgeNumber];
 	}
     SYSCALL(int, maNotificationGetIconBadge())
 	{
-        return [[Notification getInstance] getApplicationIconBadgeNumber];
+        return [[NotificationManager getInstance] getApplicationIconBadgeNumber];
 	}
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))

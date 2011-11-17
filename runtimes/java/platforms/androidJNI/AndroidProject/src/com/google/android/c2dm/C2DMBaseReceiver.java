@@ -127,10 +127,8 @@ public abstract class C2DMBaseReceiver extends IntentService {
 
 	}
 
-	private void handleRegistration(final Context context, Intent intent) {
-		Log.e("@@MoSync", "C2DMBaseReceiver handleRegistration");
+	private void handleRegistration(final Context context, Intent intent){
 
-		System.out.println("IN BaseReceiver handleRegistration");
 		final String registrationId = intent
 				.getStringExtra(EXTRA_REGISTRATION_ID);
 //		RegisterActivity.setReg(registrationId);

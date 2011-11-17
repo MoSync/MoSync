@@ -8967,7 +8967,8 @@ group NotificationAPI "Notification API" {
 
 			/**
 			* @brief The application accepts alert messages as notifications.
-			* Platform: iOS only.
+			* This is the only push notification type that is supported by
+			* both Android and iOS.
 			*/
 			ALERT = 4;
 		}
@@ -9108,14 +9109,13 @@ group NotificationAPI "Notification API" {
 			/// A bit mask specifying the types of notifications.
 			/// The bit mask is created using \link #MA_NOTIFICATION_PUSH_TYPE_BADGE
 			/// MA_NOTIFICATION_PUSH_TYPE \endlink type values.
-			/// Platform: iOS only.
+			/// Specific to iOS. On Android it will be #MA_NOTIFICATION_PUSH_TYPE_ALERT.
 			int type;
 
-			/// The address to a buffer that will contain the message displayed in
-			/// the notification alert.
+			/// The  buffer that will contain the message displayed in the notification alert.
 			/// This buffer will be filled only if the type is MA_NOTIFICATION_PUSH_TYPE_ALERT.
 			/// Platform: iOS only.
-			MAAddress alertMessage;
+			MAString alertMessage;
 
 			/// The size of the buffer that will contain the notification alert message.
 			int alertMessageSize;
@@ -9251,17 +9251,10 @@ group NotificationAPI "Notification API" {
 		* \param bufSize Size of the buffer.
 		* \response  One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if the application registered successfully.
-		* - #MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED
-		* - #MA_NOTIFICATION_RES_REGISTRATION_SERVICE_NOT_AVAILABLE
-		* - #MA_NOTIFICATION_RES_REGISTRATION_ACCOUNT_MISSING
-		* - #MA_NOTIFICATION_RES_REGISTRATION_AUTHENTICATION_FAILED
-		* - #MA_NOTIFICATION_RES_REGISTRATION_TOO_MANY_REGISTRATIONS
-		* - #MA_NOTIFICATION_RES_REGISTRATION_INVALID_SENDER
-		* - #MA_NOTIFICATION_RES_REGISTRATION_PHONE_REGISTRATION_ERROR
-		* - #MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL
-		* - MA_NOTIFICATION_RES_ERROR - iOS platform only.
+		* - #MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED if maNotificationPushRegister was not called.
+		* - MA_NOTIFICATION_RES_ERROR if registration has failed.
 		*/
-		int maNotificationPushGetRegistration(out MAString buffer range("bufSize"), in int bufSize);
+		int maNotificationPushGetRegistration(out MAString registrationMesssage range("registrationMessageSize"), in int registrationMessageSize);
 
 		/**
 		* \brief Fills pushNotificationData struct with the values for a given push notification.
@@ -9297,10 +9290,9 @@ group NotificationAPI "Notification API" {
 
 		/**
 		* \brief Set the ticker text in the notification status bar for incoming push notifications.
-		* Provide also the accountID so that the same ticker text can be assigned for all incoming
-		* push notifications received from a certain 3rd party service.
 		* This call does not alter already received notifications.
 		* Platform: Android only.
+		*
 		* \param tickerText The text that flows by in the status bar when the notification first activates.
 		* \return One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
@@ -9310,10 +9302,9 @@ group NotificationAPI "Notification API" {
 
 		/**
 		* \brief Set the  message title in the notification area for incoming push notifications.
-		* Provide the accountID so that the same message title will be applied to all incoming
-		* push notifications received from a certain 3rd party service.
 		* This call does not alter already received notifications.
 		* Platform: Android only.
+		*
 		* \param messageTitle The title that goes in the expanded entry of the notification.
 		* \return One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.

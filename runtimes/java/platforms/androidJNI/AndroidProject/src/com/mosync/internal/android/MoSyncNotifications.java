@@ -87,8 +87,8 @@ class MoSyncNotifications {
 		return mPushNotificationManager.unregister();
 	}
 
-	int maNotificationPushGetData(int pushNotificationHandle, int allertMessage,
-			int allertMessageSize)
+	int maNotificationPushGetData(int pushNotificationHandle,
+			int allertMessage, int allertMessageSize)
 	{
 		return mPushNotificationManager.getPushData(pushNotificationHandle, allertMessage, allertMessageSize);
 	}
