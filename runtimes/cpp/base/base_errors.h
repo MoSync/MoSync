@@ -95,6 +95,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40075, ERR_EXT_CALL, "Invalid extension call")\
 	m(40076, ERR_FILE_LIST_SORT, "Invalid file list sorting option")\
 	m(40077, ERR_FILE_PATH_INVALID, "Invalid file path")\
+	m(40078, ERR_DB_INVALID_HANDLE, "Invalid database handle")\
+	m(40079, ERR_DB_INVALID_COLUMN_INDEX, "Invalid database column index")\
 
 DECLARE_ERROR_ENUM(BASE)
 

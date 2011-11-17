@@ -8309,7 +8309,7 @@ group DBAPI "DB API" {
 
 			/**
 			 * A database field value was NULL when calling
-			 * the maDBCursorGetColum* functions.
+			 * the maDBCursorGetColumn* functions.
 			 */
 			NULL = -4;
 		}
@@ -8358,16 +8358,21 @@ group DBAPI "DB API" {
 #endif // IX_AUDIO
 
 	/**
-	* Enable panic system.
+	* Enable panics for programmer errors.
+	* Such panics are enabled by default, but can be disabled by maSyscallPanicsDisable().
 	* If a panic is raised a message will be displayed to the user and the program will be shut down.
 	* \return #RES_OK.
 	*/
 	int maSyscallPanicsEnable();
 
 	/**
-	* Disable panic system.
-	* If an error occurs in the syscall, an error code will be returned by the syscall and the
+	* Disable panics for programmer errors.
+	* Some errors, such as feeding invalid parameters to certain syscalls,
+	* can be prevented by the programmer. By default, these errors cause a MoSync Panic.
+	* After this function is called,
+	* if such an error occurs in a syscall, an error code will be returned by the syscall and the
 	* program will continue running.
+	* Panics can be re-enabled by maSyscallPanicsEnable().
 	* \return #RES_OK.
 	*/
 	int maSyscallPanicsDisable();

@@ -129,6 +129,7 @@ namespace Base {
 #endif	//SYMBIAN
 
 	void Syscall::init() {
+		mPanicOnProgrammerError = true;
 		gStoreNextId = 1;
 		gFileNextHandle = 1;
 	}

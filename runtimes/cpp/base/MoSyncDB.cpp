@@ -119,6 +119,8 @@ static sqlite3* MoDBGetDatabase(MAHandle databaseHandle)
 	}
 	else
 	{
+		if(gSyscall->mPanicOnProgrammerError)
+			BIG_PHAT_ERROR(ERR_DB_INVALID_HANDLE);
 		return NULL;
 	}
 }
@@ -145,8 +147,33 @@ static MoDBCursor* MoDBGetCursor(MAHandle cursorHandle)
 	}
 	else
 	{
+		if(gSyscall->mPanicOnProgrammerError)
+			BIG_PHAT_ERROR(ERR_DB_INVALID_HANDLE);
 		return NULL;
 	}
+}
+
+static MoDBCursor* MoDBGetCursor(MAHandle cursorHandle, int index, int* result)
+{
+	MoDBCursor* c = MoDBGetCursor(cursorHandle);
+	if(!c)
+	{
+		*result = MA_DB_ERROR;
+		return NULL;
+	}
+	if(index >= sqlite3_column_count(c->getStatement()))
+	{
+		if(gSyscall->mPanicOnProgrammerError)
+			BIG_PHAT_ERROR(ERR_DB_INVALID_COLUMN_INDEX);
+		*result = MA_DB_ERROR;
+		return NULL;
+	}
+	if(sqlite3_column_type(c->getStatement(), index) == SQLITE_NULL)
+	{
+		*result = MA_DB_NULL;
+		return NULL;
+	}
+	return c;
 }
 
 static MAHandle MoDBCreateCursorHandle(sqlite3_stmt* statement)
@@ -204,7 +231,7 @@ int maDBExecSQL(MAHandle databaseHandle, const char* sql)
 	sqlite3* db = MoDBGetDatabase(databaseHandle);
 	if (NULL == db)
 	{
-		//printf("MoDBGetDatabase failed\n");
+		//LOGD("MoDBGetDatabase failed\n");
 		return MA_DB_ERROR;
 	}
 
@@ -218,7 +245,7 @@ int maDBExecSQL(MAHandle databaseHandle, const char* sql)
 		NULL);
 	if (SQLITE_OK != result)
 	{
-		//printf("sqlite3_prepare_v2 failed\n");
+		//LOGD("sqlite3_prepare_v2 failed\n");
 		return MA_DB_ERROR;
 	}
 
@@ -231,7 +258,7 @@ int maDBExecSQL(MAHandle databaseHandle, const char* sql)
 		SQLITE_MISUSE == result)
 	{
 		// The result was an error.
-		//printf("sqlite3_step failed\n");
+		//LOGD("sqlite3_step failed\n");
 		sqlite3_finalize(statement);
 		return MA_DB_ERROR;
 	}
@@ -295,41 +322,37 @@ int maDBCursorGetColumnData(
 	MAHandle placeholder)
 {
 	// Get the cursor object.
-	MoDBCursor* cursor = MoDBGetCursor(cursorHandle);
+	int result;
+	MoDBCursor* cursor = MoDBGetCursor(cursorHandle, columnIndex, &result);
 	if (NULL == cursor)
 	{
-		return MA_DB_ERROR;
+		return result;
 	}
 
-	// First get pointer to text data.
-	const unsigned char* text = sqlite3_column_text(
-		cursor->getStatement(),
-		columnIndex);
-	if (NULL == text)
-	{
-		return MA_DB_ERROR;
-	}
-
-	printf("TEXT: %s\n", text);
-
-	// Next find the bumber of bytes, excluding zero
+	// Find the bumber of bytes, excluding zero
 	// termination character. See this page for details:
 	// http://sqlite.org/c3ref/column_blob.html
 	int numberOfBytes = sqlite3_column_bytes(
 		cursor->getStatement(),
 		columnIndex);
 
-	printf("numberOfBytes: %d\n", numberOfBytes);
+	LOGD("numberOfBytes: %d\n", numberOfBytes);
 
 	//Copy the data into the provided placholder
 	MemStream *stream = new MemStream(numberOfBytes);
-	bool writeResult = stream->write(text, numberOfBytes);
-	if(!writeResult)
+	if(numberOfBytes > 0)
 	{
-		return MA_DB_ERROR;
+		bool writeResult = stream->write(
+			sqlite3_column_blob(cursor->getStatement(), columnIndex),
+			numberOfBytes);
+		if(!writeResult)
+		{
+			delete stream;
+			return MA_DB_ERROR;
+		}
 	}
 	int writeSize = gSyscall->resources.add_RT_BINARY(placeholder, stream);
-	if(writeSize <=0)
+	if(writeSize <= 0)
 	{
 		return MA_DB_ERROR;
 	}
@@ -345,10 +368,11 @@ int maDBCursorGetColumnText(
 	int bufferSize)
 {
 	// Get the cursor object.
-	MoDBCursor* cursor = MoDBGetCursor(cursorHandle);
+	int result;
+	MoDBCursor* cursor = MoDBGetCursor(cursorHandle, columnIndex, &result);
 	if (NULL == cursor)
 	{
-		return MA_DB_ERROR;
+		return result;
 	}
 
 	// First get pointer to text data.
@@ -360,7 +384,7 @@ int maDBCursorGetColumnText(
 		return MA_DB_ERROR;
 	}
 
-	//printf("TEXT: %s\n", text);
+	//LOGD("TEXT: %s\n", text);
 
 	// Next find the bumber of bytes, excluding zero
 	// termination character. See this page for details:
@@ -369,7 +393,7 @@ int maDBCursorGetColumnText(
 		cursor->getStatement(),
 		columnIndex);
 
-	//printf("numberOfBytes: %d\n", numberOfBytes);
+	//LOGD("numberOfBytes: %d\n", numberOfBytes);
 
 	// Is the buffer big enough?
 	if (bufferSize < numberOfBytes)
@@ -391,10 +415,11 @@ int maDBCursorGetColumnInt(
 	int* value)
 {
 	// Get the cursor object.
-	MoDBCursor* cursor = MoDBGetCursor(cursorHandle);
+	int result;
+	MoDBCursor* cursor = MoDBGetCursor(cursorHandle, columnIndex, &result);
 	if (NULL == cursor)
 	{
-		return MA_DB_ERROR;
+		return result;
 	}
 
 	// Get the int value.
@@ -412,10 +437,11 @@ int maDBCursorGetColumnDouble(
 	double* value)
 {
 	// Get the cursor object.
-	MoDBCursor* cursor = MoDBGetCursor(cursorHandle);
+	int result;
+	MoDBCursor* cursor = MoDBGetCursor(cursorHandle, columnIndex, &result);
 	if (NULL == cursor)
 	{
-		return MA_DB_ERROR;
+		return result;
 	}
 
 	// Get the int value.

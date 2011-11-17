@@ -2233,6 +2233,15 @@ namespace Base {
 			maIOCtl_case(maTextBox);
 #endif
 
+		case maIOCtl_maSyscallPanicsEnable:
+			LOG("maSyscallPanicsEnable\n");
+			gSyscall->mPanicOnProgrammerError = true;
+			return RES_OK;
+		case maIOCtl_maSyscallPanicsDisable:
+			LOG("maSyscallPanicsDisable\n");
+			gSyscall->mPanicOnProgrammerError = false;
+			return RES_OK;
+
 		default:
 			LOGD("maIOCtl(%i) unimplemented.\n", function);
 			return IOCTL_UNAVAILABLE;

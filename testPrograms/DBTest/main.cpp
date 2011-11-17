@@ -180,6 +180,8 @@ void testThingsThatShouldFail()
 
 	printf("Test 2 started\n");
 
+	maSyscallPanicsDisable();
+
 	// Open/create the database.
 	MAUtil::String path = getLocalPath();
 	path += "MikiDB";
@@ -207,6 +209,8 @@ void testThingsThatShouldFail()
 
 	// TODO: Add negative query tests.
 
+	maSyscallPanicsEnable();
+
 	printf("Test 2 passed successfully\n");
 }
 
@@ -227,6 +231,8 @@ extern "C" int MAMain()
 
 	// printf("Press zero or back to exit\n");
 	// printf("Touch screen to run DB test\n");
+
+	maSyscallPanicsEnable();	// just in case it's not enabled by default.
 
 	testBasicThings();
 	testThingsThatShouldFail();
