@@ -8170,10 +8170,10 @@ group NFCAPI "NFC API" {
 
 group DBAPI "DB API" {
 		/**
-		 * Open a database, the database is created if it does not exist.
-		 * Note that the application needs file read/write permissions to
-		 * create database files on the sd card.
-		 * @param path Full path to database file name.
+		 * Open a database file. The database is created if it does not exist.
+		 * \note The application needs file read/write permissions to
+		 * access database files.
+		 * @param path Absolute path to the database file.
 		 * @return Handle to the database >0 on success, #MA_DB_ERROR on error.
 		 */
 		MAHandle maDBOpen(in MAString path);
@@ -8210,7 +8210,7 @@ group DBAPI "DB API" {
 		 * Note that you must call this function before retrieving
 		 * column data. The initial position of the cursor is
 		 * before the first row in the result set. If the result
-		 * set is empty, this function will return a value != MA_DB_OK.
+		 * set is empty, this function will return #MA_DB_NO_ROW.
 		 * @param cursorHandle Handle to the cursor.
 		 * @return #MA_DB_OK if successfully moved to next row,
 		 * #MA_DB_NO_ROW if there are no more rows in the result set,
@@ -8228,7 +8228,8 @@ group DBAPI "DB API" {
 		 * @param placeholder Handle created with maCreatePlaceholder.
 		 * A data object will be created with the column data, and the handle
 		 * will refer to that data.
-		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+		 * @return #MA_DB_OK on success, #MA_DB_NULL if the column value
+		 * is NULL, #MA_#MA_DB_ERROR on error.
 		 */
 		int maDBCursorGetColumnData(
 			in MAHandle cursorHandle,
@@ -8247,7 +8248,8 @@ group DBAPI "DB API" {
 		 * @param bufferSize Max size of the buffer.
 		 * @return The actual length of the data, if the actual length
 		 * returned is > bufferSize, data was not copied (buffer too small),
-		 * returns #MA_DB_ERROR on other errors.
+		 * returns #MA_DB_ERROR on other errors, returns #MA_DB_NULL if the
+		 * column value is NULL.
 		 */
 		int maDBCursorGetColumnText(
 			in MAHandle cursorHandle,
@@ -8262,7 +8264,8 @@ group DBAPI "DB API" {
 		 * @param columnIndex Index of the column to retrieve value from.
 		 * First column has index zero.
 		 * @param value Pointer to int to receive the value.
-		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+		 * @return #MA_DB_OK on success, #MA_DB_NULL if the column value
+		 * is NULL, #MA_#MA_DB_ERROR on error.
 		 */
 		int maDBCursorGetColumnInt(
 			in MAHandle cursorHandle,
@@ -8276,7 +8279,8 @@ group DBAPI "DB API" {
 		 * @param columnIndex Index of the column to retrieve value from.
 		 * First column has index zero.
 		 * @param value Pointer to double to receive the value.
-		 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+		 * @return #MA_DB_OK on success, #MA_DB_NULL if the column value
+		 * is NULL, #MA_#MA_DB_ERROR on error.
 		 */
 		int maDBCursorGetColumnDouble(
 			in MAHandle cursorHandle,
@@ -8285,7 +8289,6 @@ group DBAPI "DB API" {
 
 		/**
 		 * Status codes returned by the maDB functions.
-		 * TODO: Add specific error codes as needed.
 		 */
 		constset int MA_DB_ {
 			/**
@@ -8303,6 +8306,12 @@ group DBAPI "DB API" {
 			 * when calling #maDBCursorNext.
 			 */
 			NO_ROW = -3;
+
+			/**
+			 * A database field value was NULL when calling
+			 * the maDBCursorGetColumn* functions.
+			 */
+			NULL = -4;
 		}
 	} // End of DB API
 
@@ -8349,16 +8358,21 @@ group DBAPI "DB API" {
 #endif // IX_AUDIO
 
 	/**
-	* Enable panic system.
+	* Enable panics for programmer errors.
+	* Such panics are enabled by default, but can be disabled by maSyscallPanicsDisable().
 	* If a panic is raised a message will be displayed to the user and the program will be shut down.
 	* \return #RES_OK.
 	*/
 	int maSyscallPanicsEnable();
 
 	/**
-	* Disable panic system.
-	* If an error occurs in the syscall, an error code will be returned by the syscall and the
+	* Disable panics for programmer errors.
+	* Some errors, such as feeding invalid parameters to certain syscalls,
+	* can be prevented by the programmer. By default, these errors cause a MoSync Panic.
+	* After this function is called,
+	* if such an error occurs in a syscall, an error code will be returned by the syscall and the
 	* program will continue running.
+	* Panics can be re-enabled by maSyscallPanicsEnable().
 	* \return #RES_OK.
 	*/
 	int maSyscallPanicsDisable();
