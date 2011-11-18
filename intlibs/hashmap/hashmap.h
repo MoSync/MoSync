@@ -100,8 +100,8 @@ enum HashMapError {
 };
 
 // template map of int to T*.
-// deletes objects, but does not allocate them.
-template<class T> class HashMap : protected HashMapBase {
+// does not deleted objects.
+template<class T> class HashMapNoDelete : protected HashMapBase {
 public:
 	struct Pair {
 		uint key;
@@ -123,12 +123,13 @@ public:
 	void close() { HashMapBase::close(); }
 	uint size() const { return HashMapBase::size(); }
 protected:
-	virtual void dispose(BasePair& pair) { delete (T*)pair.value; }
+	virtual void dispose(HashMapBase::BasePair&) {}
 };
 
-template<class T> class HashMapNoDelete : public HashMap<T> {
+// deletes objects, but does not allocate them.
+template<class T> class HashMap : public HashMapNoDelete<T> {
 protected:
-	virtual void dispose(HashMapBase::BasePair&) {}
+	virtual void dispose(HashMapBase::BasePair& pair) { delete (T*)pair.value; }
 };
 
 // map of int to const string.
