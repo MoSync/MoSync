@@ -1,4 +1,31 @@
-﻿using Microsoft.Phone.Controls;
+﻿/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+/**
+ * @file MoSyncNativeUIWindowsPhone.cs
+ * @author Niklas Nummelin, Ciprian Filipas
+ *
+ * @brief This represents the WidgetBaseWindowsPhone implementation for the NativeUI
+ *         component on Windows Phone 7, the base class for all the custom MoSync Widgets,
+ *         language c#
+ *
+ * @platform WP 7.1
+ **/
+
+using Microsoft.Phone.Controls;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Navigation;
@@ -18,6 +45,8 @@ namespace MoSync
         public class WidgetBaseWindowsPhone : WidgetBase
         {
             protected UIElement mView;
+
+            //fill available space flags
             public bool fillSpaceHorizontalyEnabled;
             public bool fillSpaceVerticalyEnabled;
 
@@ -64,6 +93,21 @@ namespace MoSync
                     {
                         mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
                         fillSpaceHorizontalyEnabled = true;
+
+                        //in case of setting the widget property after it is added
+                        //to a parent widget
+
+                        Type objType = mView.GetType();
+                        if (objType.GetProperty("Parent") != null)
+                        {
+                            var property = objType.GetProperty("Parent");
+                            Object parent = property.GetValue(mView, null);
+                            if (null != parent && parent is Grid)
+                            {
+                                int columnIndex = Grid.GetColumn((FrameworkElement)mView);
+                                (parent as Grid).ColumnDefinitions[columnIndex].Width = new GridLength(1, GridUnitType.Star);
+                            }
+                        }
                     }
                 }
             }
@@ -83,6 +127,20 @@ namespace MoSync
                     {
                         mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
                         fillSpaceVerticalyEnabled = true;
+
+                        //in case of setting the widget property after it is added
+                        //to a parent widget
+                        Type objType = mView.GetType();
+                        if (objType.GetProperty("Parent") != null)
+                        {
+                            var property = objType.GetProperty("Parent");
+                            Object parent = property.GetValue(mView, null);
+                            if (null != parent && parent is Grid)
+                            {
+                                int rowIndex = Grid.GetRow((FrameworkElement)mView);
+                                (parent as Grid).RowDefinitions[rowIndex].Height = new GridLength(1, GridUnitType.Star);
+                            }
+                        }
                     }
                 }
             }
