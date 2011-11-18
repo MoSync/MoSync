@@ -1,0 +1,20 @@
+<platform family="FeaturePhone" abstract="true">
+  <capability name="Power Management" state="REQUIRES_PERMISSION"/>
+  <capability name="Vibration" state="SUPPORTED"/>
+  <capability name="File Storage" state="REQUIRES_PERMISSION">
+    <capability name="Read" state="REQUIRES_PERMISSION"/>
+    <capability name="Write" state="REQUIRES_PERMISSION"/>
+  </capability>
+  <capability name="Internet Access" state="REQUIRES_PERMISSION">
+    <capability name="HTTPS" state="REQUIRES_PERMISSION"/>
+  </capability>
+  <capability name="SMS" state="REQUIRES_PERMISSION"/>
+  <capability name="Location" state="REQUIRES_PERMISSION">
+    <capability name="Fine" state="REQUIRES_PERMISSION"/>
+    <capability name="Coarse" state="REQUIRES_PERMISSION"/>
+  </capability>
+  <capability name="BlueTooth" state="REQUIRES_PERMISSION"/>
+  <capability name="Contacts" state="REQUIRES_PERMISSION"/>
+  <capability name="Calendar" state="REQUIRES_PERMISSION"/>
+  <capability name="Camera" state="REQUIRES_PERMISSION"/>
+</platform>

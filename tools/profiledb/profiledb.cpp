@@ -20,6 +20,7 @@
 #include <set>
 #include <vector>
 #include <fstream>
+#include <stack>
 #include <ostream>
 #include <sstream>
 #include <expat.h>
@@ -47,6 +48,7 @@ struct ParserState {
 	int lineNo;
 	string fileName;
 	set<string> alreadyFound;
+	vector<Capability> capabilityStack;
 };
 
 string ProfileDB::profilesdir() {
@@ -158,8 +160,11 @@ void ProfileDB::listProfiles(string pattern, bool onlyFamilies) {
 	for (size_t i = 0; i < result.size(); i++) {
 		string profile = result.at(i);
 		if (families.find(profile) == families.end()) {
-			families.insert(profile);
-			output << profile << '\n';
+			Profile* p = findProfile(profile, set<string>());
+			if (onlyFamilies || (p && !p->isAbstract())) {
+				families.insert(profile);
+				output << profile << '\n';
+			}
 		}
 	}
 
@@ -258,6 +263,16 @@ void ProfileDB::listCapabilities(string statePattern) {
 	writer.dump();
 }
 
+static string getCapabilityPrefix(vector<Capability>& capabilityStack) {
+	string result;
+	for (size_t i = 0; i < capabilityStack.size(); i++) {
+		string capabilityName = capabilityStack.at(i).getName();
+		result.append(capabilityName);
+		result.append("/");
+	}
+	return result;
+}
+
 static void xmlStart(void *data, const char *tagName, const char **attributes) {
 	ParserState* state = (ParserState*) data;
 	ProfileDB* db = state->db;
@@ -278,6 +293,9 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 				profile->setParent(parent);
 			}
 		}
+		const char* abstract = findAttr(ATTR_ABSTRACT, attributes);
+		bool isAbstract = abstract && !strcmp("true", abstract);
+
 		const char* family = findAttr(ATTR_FAMILY, attributes);
 		if (!family) {
 			error(
@@ -286,21 +304,22 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 							+ profile->getProfileName());
 		}
 		const char* variant = findAttr(ATTR_VARIANT, attributes);
-		if (!variant) {
+		if (!isAbstract && !variant) {
 			error(
 					state,
 					string("No variant attribute defined: ")
 							+ profile->getProfileName());
 		}
 		const char* runtime = findAttr(ATTR_RUNTIME, attributes);
-		if (!runtime) {
+		if (!isAbstract && !runtime) {
 			error(
 					state,
 					string("No runtime attribute defined: ")
 							+ profile->getProfileName());
 		}
-		const char* abstract = findAttr(ATTR_ABSTRACT, attributes);
-		bool isAbstract = abstract && !strcmp("true", abstract);
+
+		if (!variant) variant = "";
+		if (!runtime) runtime = "";
 
 		const char* slash = strlen(variant) > 0 ? "/" : "";
 		if (!equalsIgnoreCaseASCII(string(family) + slash + string(variant),
@@ -314,11 +333,17 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 		profile->setRuntime(string(runtime));
 		profile->setAbstract(isAbstract);
 	} else if (!strcmp(ELEMENT_CAPABILITY, tagName)) {
+		CapabilityState capabilityState;
+		Capability* parentCapability = NULL;
+		string prefix = getCapabilityPrefix(state->capabilityStack);
+		if (!state->capabilityStack.empty()) {
+			parentCapability = &(state->capabilityStack.back());
+			capabilityState = parentCapability->getState();
+		}
 		const char* capabilityName = findAttr(ATTR_NAME, attributes);
 		const char* capabilityStateStr = findAttr(ATTR_STATE, attributes);
 		const char* fragmentationStr = findAttr(ATTR_FRAGMENTATION, attributes);
-		CapabilityState capabilityState;
-		if (!capabilityStateStr) {
+		if (!capabilityStateStr && !parentCapability) {
 			capabilityState = UNSUPPORTED;
 		} else if (!strcmp(capabilityStateStr, "SUPPORTED")) {
 			capabilityState = SUPPORTED;
@@ -335,14 +360,20 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 		}
 		Fragmentation fragmentation = fragmentationStr && !strcmp("buildtime",
 				fragmentationStr) ? BUILDTIME : RUNTIME;
-		Capability capability = Capability(capabilityName, capabilityState,
+		Capability capability = Capability(prefix + capabilityName, capabilityState,
 				fragmentation);
 		state->profile->addCapability(capability);
+		state->capabilityStack.push_back(capability);
 	}
 }
 
 static void xmlEnd(void *data, const char *tagName) {
-
+	ParserState* state = (ParserState*) data;
+	if (!strcmp(ELEMENT_CAPABILITY, tagName)) {
+		if (!state->capabilityStack.empty()) {
+			state->capabilityStack.pop_back();
+		}
+	}
 }
 
 Profile* ProfileDB::findProfile(string profileName, set<string> alreadyFound) {
@@ -381,7 +412,7 @@ bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
 		while (!fs.eof()) {
 			state.lineNo++;
 			getline(fs, line);
-			if (!XML_Parse(parser, line.c_str(), line.length(), false)) {
+			if (XML_Parse(parser, line.c_str(), line.length(), false) == XML_STATUS_ERROR) {
 				printf("<!-- FATAL ERROR: XML malformatted (%s, line %d) -->",
 						path.c_str(), state.lineNo);
 				return NULL;

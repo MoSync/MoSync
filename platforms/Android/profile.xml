@@ -1,0 +1,2 @@
+<platform family="Android" inherit="SmartPhone" abstract="true">
+</platform>

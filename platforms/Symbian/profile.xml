@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<platform family="Symbian" inherit="FeaturePhone" abstract="true">
+  <capability name="Camera" state="REQUIRES_PERMISSION"/>
+</platform>

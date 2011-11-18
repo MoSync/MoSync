@@ -1,0 +1,35 @@
+<platform family="SmartPhone" abstract="true">
+  <capability name="Power Management" state="REQUIRES_PERMISSION"/>
+  <capability name="Vibration" state="SUPPORTED"/>
+  <capability name="File Storage" state="REQUIRES_PERMISSION">
+    <capability name="Read" state="REQUIRES_PERMISSION"/>
+    <capability name="Write" state="REQUIRES_PERMISSION"/>
+  </capability>
+  <capability name="Internet Access" state="REQUIRES_PERMISSION">
+    <capability name="HTTPS" state="REQUIRES_PERMISSION"/>
+  </capability>
+  <capability name="SMS" state="REQUIRES_PERMISSION"/>
+  <capability name="Location" state="REQUIRES_PERMISSION">
+    <capability name="Fine" state="REQUIRES_PERMISSION"/>
+    <capability name="Coarse" state="REQUIRES_PERMISSION"/>
+  </capability>
+  <capability name="BlueTooth" state="REQUIRES_PERMISSION"/>
+  <capability name="Contacts" state="REQUIRES_PERMISSION"/>
+  <capability name="Calendar" state="REQUIRES_PERMISSION"/>
+  <capability name="Camera" state="REQUIRES_PERMISSION"/>
+  <capability name="Sensors" state="REQUIRES_PERMISSION">
+    <capability name="Accelerometer" state="REQUIRES_PERMISSION"/>
+    <capability name="Proximity" state="REQUIRES_PERMISSION"/>
+    <capability name="Gyroscope" state="REQUIRES_PERMISSION"/>
+    <capability name="Orientation" state="REQUIRES_PERMISSION"/>
+    <capability name="Compass" state="REQUIRES_PERMISSION"/>
+  </capability>
+  <capability name="Device Fonts" state="SUPPORTED"/>
+  <capability name="NFC" state="UNSUPPORTED"/>
+  <capability name="OpenGL" state="REQUIRES_PERMISSION"/>
+  <capability name="HTML5" state="SUPPORTED"/>
+  <capability name="NativeUI" state="SUPPORTED"/>
+  <capability name="Home Screen" state="UNSUPPORTED"/>
+  <capability name="Autostart" state="UNSUPPORTED"/>
+  <capability name="C2DM" state="UNSUPPORTED"/>
+</platform>

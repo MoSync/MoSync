@@ -52,6 +52,7 @@ OUTPUT_ROOT = output_root
 BUILD_ROOT = build_root
 VENDOR_DIR = "#{OUTPUT_ROOT}vendors"
 RUNTIME_DIR = "#{OUTPUT_ROOT}runtimes"
+PLATFORMS_DIR = "#{OUTPUT_ROOT}platforms"
 
 
 # data types
@@ -113,6 +114,68 @@ class Runtime
 	end
 end
 
+# JavaME is the only platform
+# we 'compute' capabilities for,
+# since it's marvelously fragmented
+class JavaMEPlatform
+    attr_accessor :runtime
+    def initialize(runtime)
+        @runtime = runtime
+    end
+
+    def write_profile_xml(output_file, variant, runtimeDir, inherit, write_caps, is_abstract)
+        # Unfortunately, all these JavaME APIs may
+        # require operator certs.
+        FileUtils.mkdir_p output_file
+        File.open("#{output_file}/profile.xml", 'w') do |profile_xml|
+            profile_xml.puts(self.to_xml(@runtime, "JavaME", variant, runtimeDir, inherit, write_caps, is_abstract))
+        end
+    end
+
+    def to_capability_xml(runtime, capability)
+        result = ""
+        if (runtime.caps.has_key?(capability))
+            names = self.map_capability_name capability
+            names.each do |name|
+                result << "  <capability name=\"" << name
+                result << "\" state=\"REQUIRES_PRIVILEGED_PERMISSION\" fragmentation=\"buildtime\"/>\n"
+            end
+        end
+        return result
+    end
+
+    def to_xml(runtime, family, variant, runtimeDir, inherit, write_caps, is_abstract)
+        xml = "<platform family=\"" << family
+        xml << "\" variant=\"" << variant.to_s << "\" "
+        xml << "runtime=\"" << runtimeDir << "\" "
+        xml << "inherit=\"" << inherit << "\""
+        if (is_abstract)
+            xml << " abstract=\"true\""
+        end
+        xml << ">\n"
+        if (write_caps)
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH");
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI");
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI");
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_CAMERA");
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION");
+            xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI");
+        end
+        xml << "</platform>\n"
+        return xml
+    end
+
+    def map_capability_name runtime_cap
+        return ["BlueTooth"] if(runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH")
+        return ["Location"] if (runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI")
+        return ["SMS"] if (runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_WMAPI")
+        return ["Camera"] if (runtime_cap == "MA_PROF_SUPPORT_CAMERA")
+        return ["File Storage"] if (runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION")
+        return ["Contacts", "Calendar"] if (runtime_cap == "MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI")
+        # MMAPI?
+        return []
+    end
+end
 
 # const data
 RELEVANT_CAPS = [
@@ -155,6 +218,8 @@ RELEVANT_DEFINES = {
 		'MA_PROF_BUG_NO_SIZECHANGED',
 		'MA_PROF_BLACKBERRY_VERSION',
 		'MA_PROF_BLACKBERRY_VERSION_MINOR',
+        'MA_PROF_CONST_ICONSIZE_Y',
+        'MA_PROF_CONST_ICONSIZE_X',
 	],
 
 	:s60v2 => ['MA_PROF_SUPPORT_FRAMEBUFFER_32BIT'],
@@ -356,6 +421,7 @@ puts "Generating all capability permutations!"
 
 FileUtils.mkdir_p VENDOR_DIR
 FileUtils.mkdir_p RUNTIME_DIR
+FileUtils.mkdir_p PLATFORMS_DIR
 definitions = {}
 
 def skipVendor?(vendor)
@@ -579,6 +645,12 @@ runtimes.each do |platform, devs|
 	puts "#{platform} has #{devs.size} devices!"
 end
 
+# Ok, copy all 'hand-made' profile.xml files into the proper place
+FileUtils.cp_r("../../platforms/.", PLATFORMS_DIR, :verbose => true)
+
+# Java ME: special case!
+javame_profile_tokens={}
+
 runtimes.each do |platform_name, platform|
 	id = 1
 	platform.each do |runtime|
@@ -607,9 +679,6 @@ runtimes.each do |platform_name, platform|
 		debug_defines = release_defines + ['PUBLIC_DEBUG', 'LOGGING_ENABLED']
 		write_config_h(runtime, "#{RUNTIME_DIR}/#{runtime_dir}/configD.h", RELEVANT_DEFINES[platform_name.to_sym], debug_defines)
 
-		cwd = Dir.pwd
-		Dir.chdir "../RuntimeBuilder/"
-
 		puts "platform dir : #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
 
 		rbp = platform_name
@@ -625,12 +694,30 @@ runtimes.each do |platform_name, platform|
 				rbp = 'bb47' if(minor >= 4)
 			end
 			rbp = 'bb500' if(bbMajor && bbMajor >= 5)
+
+            if (!bbMajor)
+                profile = JavaMEPlatform.new(runtime)
+                profileXmlDir = "#{PLATFORMS_DIR}/JavaME/#{id}"
+                # Produce a string that represents some 'equality' between
+                # profiles -- whenever there is time, refactor!
+                profile_token = profile.to_xml(runtime, "JavaME", 0, "", "JavaME", true, false)
+                inherit = javame_profile_tokens[profile_token]
+                if (!inherit)
+                    javame_profile_tokens[profile_token] = id
+                    profile.write_profile_xml(profileXmlDir, id, runtime_dir, "JavaME", true, false)
+                else
+                    profile.write_profile_xml(profileXmlDir, id, "JavaME/#{inherit}", "JavaME/#{inherit}", false, true)
+                end
+            end
 		end
+
+        cwd = Dir.pwd
+		Dir.chdir "../RuntimeBuilder/"
 
 		cmd = "ruby RuntimeBuilder.rb ./Settings.rb #{rbp} #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
 
-		puts(cmd)
 		if(gBuildRuntimes)
+            puts(cmd)
 			success = system(cmd)
 		else
 			success = true
@@ -646,4 +733,6 @@ runtimes.each do |platform_name, platform|
 		id = id + 1
 	end
 end
+
+
 exit(0)
