@@ -57,14 +57,23 @@ public class MoSyncFile {
 
 	int mFileHandleNext = 1;
 
+	// TODO: Move logging to a central place?
+	final boolean mIsLoggingOn = false;
+
 	void log(String s)
 	{
-		Log.i("MoSyncFile", s);
+		if (mIsLoggingOn)
+		{
+			Log.i("MoSyncFile", s);
+		}
 	}
 
 	void logerr(String s)
 	{
-		Log.e("MoSyncFile ERROR", s);
+		if (mIsLoggingOn)
+		{
+			Log.e("MoSyncFile ERROR", s);
+		}
 	}
 
 	/**
@@ -612,6 +621,7 @@ public class MoSyncFile {
 
 	/**
 	 * Stores the data in the given file in a ByteBuffer
+	 * @return The number of bytes read, or MA_FERR_GENERIC on error.
 	 */
 	private int readFileToByteBuffer(
 		MoSyncFileHandle fileHandle,
@@ -619,16 +629,16 @@ public class MoSyncFile {
 	{
 		try
 		{
-			int ret = fileHandle.mFileChannel.read(byteBuffer);
+			int bytesRead = fileHandle.mFileChannel.read(byteBuffer);
 
-			log("readFileToByteBuffer bytes read: "  + ret);
+			log("readFileToByteBuffer bytes read: "  + bytesRead);
 
 			fileHandle.mCurrentPosition =
 				(int)fileHandle.mFileChannel.position();
 
-			return ret;
+			return bytesRead;
 		}
-		catch(Throwable t)
+		catch (Throwable t)
 		{
 			logerr("readFileToByteBuffer Exception - " + t);
 			return MA_FERR_GENERIC;
@@ -758,9 +768,19 @@ public class MoSyncFile {
 		ByteBuffer slicedBuffer = mMoSyncThread.mMemDataSection.slice();
 		slicedBuffer.limit(len);
 
-		readFileToByteBuffer(fileHandle, slicedBuffer);
+		int bytesRead = readFileToByteBuffer(fileHandle, slicedBuffer);
 
-		return 0;
+		if (len != bytesRead)
+		{
+			logerr("maFileRead: MA_FERR_GENERIC error: len != bytesRead");
+			return MA_FERR_GENERIC;
+		}
+		else
+		{
+			// Success.
+			log("bytesRead: success");
+			return 0;
+		}
 	}
 
 	/**

@@ -96,6 +96,7 @@ config_platform.h
 /testPrograms/_masterdump.s
 /testPrograms/temp.s
 /testPrograms/copyfiles.bat
+/testPrograms/filesystem/
 
 /runtimes/cpp/generated
 
