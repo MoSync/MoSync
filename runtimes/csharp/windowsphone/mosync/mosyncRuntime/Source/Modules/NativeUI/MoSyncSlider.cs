@@ -1,4 +1,30 @@
-﻿using Microsoft.Phone.Controls;
+﻿/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+/**
+ * @file MoSyncSlider.cs
+ * @author Ciprian Filipas
+ *
+ * @brief This represents the Slider Widget implementation for the NativeUI
+ *        component on Windows Phone 7, language c#
+ *
+ * @platform WP 7.1
+ **/
+
+using Microsoft.Phone.Controls;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Navigation;
@@ -39,10 +65,14 @@ namespace MoSync
                 mSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(
                     delegate(Object from, RoutedPropertyChangedEventArgs<double> arg)
                     {
+                        //create a Memory object of 12 Bytes
                         Memory eventData = new Memory(12);
 
+                        //starting with the 0 Byte we write the eventType
                         const int MAWidgetEventData_eventType = 0;
+                        //starting with the 4 Byte we write the sliderValue
                         const int MAWidgetEventData_sliderValue = 4;
+                        //starting with the 8 Byte we write the widgetHandle
                         const int MAWidgetEventData_widgetHandle = 8;
 
                         mProgressValue = ((Int32)arg.NewValue);
@@ -50,6 +80,7 @@ namespace MoSync
                         eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_SLIDER_VALUE_CHANGED);
                         eventData.WriteInt32(MAWidgetEventData_sliderValue, mProgressValue);
                         eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        //posting a CustomEvent
                         mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     });
             }
@@ -60,21 +91,24 @@ namespace MoSync
             {
                 set
                 {
-                    int maxVal = Int32.Parse(value);
-                    if (maxVal >= 0)
+                    int maxVal;
+                    if(Int32.TryParse(value, out maxVal))
                     {
-                        mMaxValue = maxVal;
-                        if (maxVal < mProgressValue)
+                        if (maxVal >= 0)
                         {
-                            mProgressValue = maxVal;
-                            Value = maxVal.ToString();
+                            mMaxValue = maxVal;
+                            if (maxVal < mProgressValue)
+                            {
+                                mProgressValue = maxVal;
+                                Value = maxVal.ToString();
+                            }
+                            mSlider.Maximum = mMaxValue;
                         }
-                        mSlider.Maximum = mMaxValue;
-                    }
-                    else
-                    {
-                        mMaxValue = 0;
-                        mSlider.Maximum = mMaxValue;
+                        else
+                        {
+                            mMaxValue = 0;
+                            mSlider.Maximum = mMaxValue;
+                        }
                     }
                 }
                 get
@@ -89,22 +123,24 @@ namespace MoSync
             {
                 set
                 {
-                    int val = Int32.Parse(value);
-
-                    if (val <= mMaxValue && val >= mMinValue)
+                    int val;
+                    if (Int32.TryParse(value, out val))
                     {
-                        mProgressValue = val;
-                        mSlider.Value = mProgressValue;
-                    }
-                    else if (val > mMaxValue)
-                    {
-                        mSlider.Value = mMaxValue;
-                        mProgressValue = mMaxValue;
-                    }
-                    else if (val < mMinValue)
-                    {
-                        mSlider.Value = mMinValue;
-                        mProgressValue = mMinValue;
+                        if (val <= mMaxValue && val >= mMinValue)
+                        {
+                            mProgressValue = val;
+                            mSlider.Value = mProgressValue;
+                        }
+                        else if (val > mMaxValue)
+                        {
+                            mSlider.Value = mMaxValue;
+                            mProgressValue = mMaxValue;
+                        }
+                        else if (val < mMinValue)
+                        {
+                            mSlider.Value = mMinValue;
+                            mProgressValue = mMinValue;
+                        }
                     }
                 }
                 get
@@ -119,8 +155,11 @@ namespace MoSync
             {
                 set
                 {
-                    int val = Int32.Parse(value);
-                    Value = (mProgressValue + val).ToString();
+                    int val;
+                    if (Int32.TryParse(value, out val))
+                    {
+                        Value = (mProgressValue + val).ToString();
+                    }
                 }
             }
 
@@ -130,8 +169,11 @@ namespace MoSync
             {
                 set
                 {
-                    int val = Int32.Parse(value);
-                    Value = (mProgressValue - val).ToString();
+                    int val;
+                    if (Int32.TryParse(value, out val))
+                    {
+                        Value = (mProgressValue - val).ToString();
+                    }
                 }
             }
         }

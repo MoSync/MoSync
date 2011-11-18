@@ -75,6 +75,7 @@
     <Compile Include="Source\Modules\NativeUI\MoSyncCheckBox.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncEditBox.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncHorizontalLayout.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncImage.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncLabel.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncNativeUI.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncNativeUIWindowsPhone.cs" />
