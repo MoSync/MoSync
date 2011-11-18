@@ -24,7 +24,8 @@ MA 02110-1301, USA.
  * communication between a JavaScript and C++.
  */
 
-#include <conprint.h>
+#include <mastdlib.h>
+#include <mavsprintf.h>
 #include <NativeUI/WebViewListener.h>
 #include "WebAppMoblet.h"
 
@@ -76,8 +77,12 @@ namespace Wormhole
 	 */
 	WebAppMoblet::WebAppMoblet()
 	{
-		extractFileSystem();
+		// Create file utility object.
+		mFileUtil = new FileUtil();
+
 		createUI();
+
+		extractFileSystem();
 	}
 
 	/**
@@ -163,6 +168,34 @@ namespace Wormhole
 	}
 
 	/**
+	 * This method is called to show a screen while unpacking the
+	 * file bundle. You can override this method to customize
+	 * the screen displayed. You can display anything you wish
+	 * in the WebView widget. The default implementation just
+	 * displays a plain message.
+	 */
+	void WebAppMoblet::displayWelcomeScreenShownWhileUnpackingFiles()
+	{
+		getWebView()->setHtml(
+			"<!DOCTYPE html>"
+			"<html><head>"
+			"<style type=\"text/css\">"
+			"#Message {"
+				"margin: 0.3em 0.3em;"
+				"font-size: 3.0em;"
+				"font-weight: bold;"
+				"color: white;"
+				"text-align: center;"
+				"background-color: black;"
+				"font-family: sans-serif;"
+			"}"
+			"</head><body>"
+			"<div id=\"Message\">Installing application files...</div>"
+			"</body></html>"
+			);
+	}
+
+	/**
 	 * This method handles messages sent from the WebView.
 	 * Implement this method in a subclass of this class.
 	 * @param webView The WebView that sent the message.
@@ -196,11 +229,55 @@ namespace Wormhole
 	 */
 	void WebAppMoblet::extractFileSystem()
 	{
-		// Create file utility object.
-		mFileUtil = new FileUtil();
+		// Display splash screen if this is the first time launch
+		// or if the checksum has changed.
+		if (checksumHasChanged())
+		{
+			displayWelcomeScreenShownWhileUnpackingFiles();
 
-		// Extract bundled files to the local file system.
-		mFileUtil->extractLocalFiles();
+			int timestamp = maGetMilliSecondCount();
+
+			// Extract bundled files to the local file system.
+			mFileUtil->extractLocalFiles();
+lprintfln("@@@@@@@@@@@@@ step3");
+			// Ensure the unpack screen is visible for at least two seconds.
+			while (timestamp + 2000 > maGetMilliSecondCount())
+			{
+				maWait(100);
+			}
+		}
+lprintfln("@@@@@@@@@@@@@ step4");
+	}
+
+	bool WebAppMoblet::checksumHasChanged()
+	{
+		// Assume checksum has changed (or does not exist).
+		bool hasChanged = true;
+
+		// Read existing checksum value and check it.
+		MAUtil::String filePath = getFileUtil()->getLocalPath();
+		filePath += "MoSyncFileBundleChecksum";
+lprintfln("@@@@@@@@@@@@@ step1");
+		int checksum = getFileUtil()->getFileSystemChecksum(1);
+
+lprintfln("@@@ File bundle checksum: %d", checksum);
+		MAUtil::String data;
+		if (getFileUtil()->readTextFromFile(filePath, data))
+		{
+			int existingChecksum = (int)strtol(data.c_str(), NULL, 10);
+lprintfln("@@@     existingChecksum: %d", existingChecksum);
+			hasChanged = checksum != existingChecksum;
+		}
+
+		// Save checksum value if it has changed.
+		if (hasChanged)
+		{
+			char checksumBuf[16];
+			sprintf(checksumBuf, "%d", checksum);
+			getFileUtil()->writeTextToFile(filePath, checksumBuf);
+		}
+
+		return hasChanged;
 	}
 
 	/**

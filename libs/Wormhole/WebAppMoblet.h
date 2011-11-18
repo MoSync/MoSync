@@ -98,6 +98,15 @@ namespace Wormhole
 		virtual void callJS(const MAUtil::String& script);
 
 		/**
+		 * This method is called to show a screen while unpacking the
+		 * file bundle. You can override this method to customize
+		 * the screen displayed. You can display anything you wish
+		 * in the WebView widget. The default implementation just
+		 * displays a plain message.
+		 */
+		virtual void displayWelcomeScreenShownWhileUnpackingFiles();
+
+		/**
 		 * This method handles messages sent from the WebView.
 		 * Implement this method in a subclass of this class.
 		 * @param webView The WebView that sent the message.
@@ -122,6 +131,12 @@ namespace Wormhole
 		 * Extract HTML/CSS/JS/Media files to the local file system.
 		 */
 		virtual void extractFileSystem();
+
+		/**
+		 * @return true if the checksum has changed (or if the old
+		 * value did not exist, such as on first time load).
+		 */
+		virtual bool checksumHasChanged();
 
 		/**
 		 * Create the user interface of the application.

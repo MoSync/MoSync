@@ -115,6 +115,18 @@ namespace Wormhole
 	}
 
 	/**
+	 * Get the checksum of a file bundle.
+	 * @param handle The resource handle of the bundled
+	 * file system. Bundles are created with the Bundle tool
+	 * that comes with MoSync.
+	 * @return A 32-bit checksum.
+	 */
+	int FileUtil::getFileSystemChecksum(MAHandle handle)
+	{
+		return getFileSystemChecksum(handle);
+	}
+
+	/**
 	 * Open a file for writing.
 	 * Create the file if it does not exist.
 	 * Note: Will truncate the file if it exists.
