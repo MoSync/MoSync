@@ -238,6 +238,7 @@ namespace Base {
 #ifdef EMULATOR
 		gSyscall->pimClose();
 #endif
+		MoSyncDBClose();
 	}
 
 	//***************************************************************************
@@ -410,6 +411,8 @@ namespace Base {
 #ifdef EMULATOR
 		gSyscall->pimInit();
 #endif
+
+		MoSyncDBInit();
 
 		AudioEngine::init();
 
@@ -2750,6 +2753,7 @@ void MoSyncExit(int r) {
 		MALibQuit();	//disabled, hack to allow static destructors
 #endif
 		AudioEngine::close();
+		MoSyncDBClose();
 
 		reportClose();
 		exit(r);

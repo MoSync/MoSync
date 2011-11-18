@@ -31,7 +31,7 @@ MA 02110-1301, USA.
 #endif
 
 #include <sqlite3.h>
-#include <map>
+#include "hashmap/hashmap.h"
 #include <stdio.h>
 #include <string.h>
 
@@ -102,20 +102,28 @@ static int gDatabaseHandle = 0;
 static int gCursorHandle = 0;
 
 // Object tables.
-static std::map <MAHandle, sqlite3*> gDatabaseTable;
-static std::map <MAHandle, MoDBCursor*> gCursorTable;
+static HashMapNoDelete<sqlite3> gDatabaseTable;
+static HashMap<MoDBCursor> gCursorTable;
 
-static int MoDBDatabaseExists(MAHandle databaseHandle)
-{
-	return gDatabaseTable.find(databaseHandle) != gDatabaseTable.end();
+void MoSyncDBInit(void) {
+}
+void MoSyncDBClose(void) {
+	gCursorTable.close();
+
+	HashMapNoDelete<sqlite3>::TIteratorC itr = gDatabaseTable.begin();
+	while(itr.hasMore()) {
+		sqlite3_close(itr.next().value);
+	}
+	gDatabaseTable.close();
 }
 
 static sqlite3* MoDBGetDatabase(MAHandle databaseHandle)
 {
 	// Check if handle exists.
-	if (MoDBDatabaseExists(databaseHandle))
+	sqlite3* db = gDatabaseTable.find(databaseHandle);
+	if (db)
 	{
-		return gDatabaseTable[databaseHandle];
+		return db;
 	}
 	else
 	{
@@ -129,21 +137,17 @@ static MAHandle MoDBCreateDatabaseHandle(sqlite3* db)
 {
 	// Create new table entry.
 	++gDatabaseHandle;
-	gDatabaseTable[gDatabaseHandle] = db;
+	gDatabaseTable.insert(gDatabaseHandle, db);
 	return gDatabaseHandle;
-}
-
-static int MoDBCursorExists(MAHandle cursorHandle)
-{
-	return gCursorTable.find(cursorHandle) != gCursorTable.end();
 }
 
 static MoDBCursor* MoDBGetCursor(MAHandle cursorHandle)
 {
 	// Check if cursor exists.
-	if (MoDBCursorExists(cursorHandle))
+	MoDBCursor* c = gCursorTable.find(cursorHandle);
+	if (c)
 	{
-		return gCursorTable[cursorHandle];
+		return c;
 	}
 	else
 	{
@@ -180,7 +184,7 @@ static MAHandle MoDBCreateCursorHandle(sqlite3_stmt* statement)
 {
 	// Create new table entry.
 	++gCursorHandle;
-	gCursorTable[gCursorHandle] = new MoDBCursor(statement);
+	gCursorTable.insert(gCursorHandle, new MoDBCursor(statement));
 	return gCursorHandle;
 }
 
@@ -290,7 +294,6 @@ int maDBCursorDestroy(MAHandle cursorHandle)
 		return MA_DB_ERROR;
 	}
 	gCursorTable.erase(cursorHandle);
-	delete cursor;
 	return MA_DB_OK;
 }
 

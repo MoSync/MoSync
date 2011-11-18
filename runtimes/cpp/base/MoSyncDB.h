@@ -55,6 +55,9 @@ int maDBCursorGetColumnDouble(
 	int columnIndex,
 	double* value);
 
+void MoSyncDBInit(void);
+void MoSyncDBClose(void);
+
 #ifdef __cplusplus
 }
 #endif
