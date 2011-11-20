@@ -9124,7 +9124,7 @@ group NotificationAPI "Notification API" {
 			/// the sound to play when an alert is displayed.
 			/// This buffer will be filled only if the type is MA_NOTIFICATION_PUSH_TYPE_SOUND.
 			/// Platform: iOS only.
-			MAAddress soundFileName;
+			MAString soundFileName;
 
 			/// The size of the buffer that will contain the sound filename.
 			int soundFileNameSize;
@@ -9140,9 +9140,12 @@ group NotificationAPI "Notification API" {
 		/**
 		* \brief Creates a new local notification object.
 		*
-		* \returns A handle to a local notification object.
+		* \returns
+		*  - MA_NOTIFICATION_RES_UNSUPPORTED if the notifications are not supported on current system.
+		*  - MA_NOTIFICATION_RES_ERROR if a error occurred while creating the notification object.
+		*  - a handle to a new local notification object(the handle value is >= 0).
 		*/
-		int maNotificationLocalCreate();
+		MAHandle maNotificationLocalCreate();
 
 		/**
 		* \brief Destroy a local notification object.
@@ -9252,9 +9255,11 @@ group NotificationAPI "Notification API" {
 		* \response  One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if the application registered successfully.
 		* - #MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED if maNotificationPushRegister was not called.
+		* - MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL if the buffer is too small.
 		* - MA_NOTIFICATION_RES_ERROR if registration has failed.
 		*/
-		int maNotificationPushGetRegistration(out MAString registrationMesssage range("registrationMessageSize"), in int registrationMessageSize);
+		int maNotificationPushGetRegistration(out MAString registrationMesssage range("registrationMessageSize"),
+											 in int registrationMessageSize);
 
 		/**
 		* \brief Fills pushNotificationData struct with the values for a given push notification.

@@ -452,7 +452,13 @@ static NotificationManager *sharedInstance = nil;
     {
         return MA_NOTIFICATION_RES_NOT_REGISTERED;
     }
+
     mIsPushNotificationEnabled = false;
+    [mDeviceToken release];
+    mDeviceToken = nil;
+    [mRegistrationError release];
+    mRegistrationError = nil;
+
     [[UIApplication sharedApplication] unregisterForRemoteNotifications];
     return MA_NOTIFICATION_RES_OK;
 }
@@ -546,29 +552,36 @@ static NotificationManager *sharedInstance = nil;
         return MA_NOTIFICATION_RES_INVALID_HANDLE;
     }
 
+    // Write push notification message to buffer.
     int pushNotificationType = 0;
     int maxLength = pushNotificationData->alertMessageSize;
-    int address = (int) pushNotificationData->alertMessage;
-    char* charAddress = (char*) Base::gSyscall->GetValidatedMemRange(address, maxLength);
-
+    char* charAddress = (char*) pushNotificationData->alertMessage;
     NSString* messageAlert = pushNotification.alertMessage;
     if (messageAlert)
     {
+        if (maxLength < [messageAlert length])
+        {
+            return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
+        }
         [messageAlert getCString:charAddress maxLength:maxLength encoding:NSASCIIStringEncoding];
         pushNotificationType = pushNotificationType | MA_NOTIFICATION_PUSH_TYPE_ALERT;
     }
 
+    // Write push notification sound file name to buffer.
     maxLength = pushNotificationData->soundFileNameSize;
-    address = (int) pushNotificationData->soundFileName;
-    charAddress = (char*) Base::gSyscall->GetValidatedMemRange(address, maxLength);
-
+    charAddress = (char*) pushNotificationData->soundFileName;
     NSString* soundFileName = pushNotification.soundFileName;
     if (soundFileName)
     {
+        if (maxLength < [soundFileName length])
+        {
+            return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
+        }
         [soundFileName getCString:charAddress maxLength:maxLength encoding:NSASCIIStringEncoding];
         pushNotificationType = pushNotificationType | MA_NOTIFICATION_PUSH_TYPE_SOUND;
     }
 
+    // Store push notification icon badge number to data struct.
     NSNumber* iconBadge = pushNotification.badgeIcon;
     if (iconBadge)
     {
@@ -580,7 +593,9 @@ static NotificationManager *sharedInstance = nil;
         pushNotificationData->badgeIcon = 0;
     }
 
+    // Store the type of the push notification to data struct.
     pushNotificationData->type = pushNotificationType;
+
     return MA_NOTIFICATION_RES_OK;
 }
 
@@ -591,6 +606,7 @@ static NotificationManager *sharedInstance = nil;
  * @param size The size of the buffer.
  * @return One of the next constants:
  * - MA_NOTIFICATION_RES_OK if the application registered successfully.
+ * - MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED if maNotificationPushRegister was not called.
  * - MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL if the buffer is too small.
  * - MA_NOTIFICATION_RES_ERROR in case of error.
  */
@@ -599,14 +615,18 @@ static NotificationManager *sharedInstance = nil;
 {
     int result = MA_NOTIFICATION_RES_OK;
     NSString* messageString;
-    if (!mRegistrationError)
+    if (mDeviceToken)
     {
         messageString = mDeviceToken;
     }
-    else
+    else if (!mRegistrationError)
     {
         messageString = mRegistrationError;
-        result = MA_NOTIFICATION_RES_REGISTRATION_SERVICE_NOT_AVAILABLE;
+        result = MA_NOTIFICATION_RES_ERROR;
+    }
+    else
+    {
+        return MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED;
     }
 
     if ([messageString length] > size)

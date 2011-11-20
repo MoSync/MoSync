@@ -253,6 +253,7 @@
  * @param size The size of the buffer.
  * @return One of the next constants:
  * - MA_NOTIFICATION_RES_OK if the application registered successfully.
+ * - MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED if maNotificationPushRegister was not called.
  * - MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL if the buffer is too small.
  * - MA_NOTIFICATION_RES_ERROR in case of error.
  */
