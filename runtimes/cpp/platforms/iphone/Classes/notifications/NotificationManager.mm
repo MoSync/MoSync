@@ -555,8 +555,12 @@ static NotificationManager *sharedInstance = nil;
     // Write push notification message to buffer.
     int pushNotificationType = 0;
     int maxLength = pushNotificationData->alertMessageSize;
-    char* charAddress = (char*) pushNotificationData->alertMessage;
+    char* charAddress;
+    int address;
+
     NSString* messageAlert = pushNotification.alertMessage;
+    address = (int) pushNotificationData->alertMessage;
+    charAddress = (char*) Base::gSyscall->GetValidatedMemRange(address, maxLength);
     if (messageAlert)
     {
         if (maxLength < [messageAlert length])
@@ -569,7 +573,8 @@ static NotificationManager *sharedInstance = nil;
 
     // Write push notification sound file name to buffer.
     maxLength = pushNotificationData->soundFileNameSize;
-    charAddress = (char*) pushNotificationData->soundFileName;
+    address = (int) pushNotificationData->soundFileName;
+    charAddress = (char*) Base::gSyscall->GetValidatedMemRange(address, maxLength);
     NSString* soundFileName = pushNotification.soundFileName;
     if (soundFileName)
     {

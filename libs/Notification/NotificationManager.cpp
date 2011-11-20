@@ -120,7 +120,12 @@ namespace Notification
             data.alertMessageSize = BUFFER_SIZE;
             data.soundFileName = sound;
             data.soundFileNameSize = BUFFER_SIZE;
-            maNotificationPushGetData(pushNotificationHandle, &data);
+            int result = maNotificationPushGetData(pushNotificationHandle, &data);
+            if (MA_NOTIFICATION_RES_OK != result)
+            {
+                printf("NotificationManager::customEvent error = %d", result);
+                return;
+            }
 
             // Create the push notification object.
             PushNotification* pushNotificationObj = new PushNotification();

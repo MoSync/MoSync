@@ -82,7 +82,14 @@ namespace Notification
      */
     MAUtil::String PushNotification::getMessage() const
     {
-        return *mMessage;
+        if (mMessage)
+        {
+            return *mMessage;
+        }
+        else
+        {
+            return "";
+        }
     }
 
     /**
