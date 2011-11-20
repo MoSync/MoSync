@@ -196,19 +196,25 @@ int main(int argc, const char** argv) {
 static int generateConfig(const char* output, const char* idlFile) {
 	vector<string> dummy;
 	Interface* interface = new Interface(parseInterface(dummy, idlFile));
+
 	outputExtensionHeader(output, *interface);
 	outputExtensionSource(output, *interface);
 	return 0;
 }
 
-string getExtensionHandleName(const Function& function)
+string getExtensionHandleName(const Interface& inf, const Function& function)
 {
-	return "gMoSyncExtension_" + function.name;
+	return "MAExtensionFunction_" + inf.name + "_" + function.name;
+}
+
+string getExtensionModuleHandleName(const Interface& inf)
+{
+	return "MAExtensionModule_" + inf.name;
 }
 
 static void outputExtensionHeader(const char* output, const Interface& inf) {
 	ofstream stream((string(output)+"/"+inf.name+".h").c_str());
-	string headerName = "EXTENSION_" + inf.name;
+	string headerName = "MA_EXTENSION_" + inf.name;
 
 	stream << "#ifndef " << headerName << "_H\n";
 	stream << "#define " << headerName << "_H\n\n";
@@ -219,8 +225,10 @@ static void outputExtensionHeader(const char* output, const Interface& inf) {
 
 	stream << "#include <ma.h>\n\n";
 
-	stream << "#define IDL_HASH_" << inf.name << " ((int)0x" << setfill('0') << setw(8) <<
+	stream << "#define MA_EXTENSION_" << inf.name << "_IDL_HASH ((int)0x" << setfill('0') << setw(8) <<
 		hex << calculateChecksum(inf) << dec << ")\n\n";
+
+	stream << "#define MA_EXTENSION_" << inf.name << "_ID \"" << inf.name << "\"\n\n";
 
 	stream << "#ifdef __cplusplus\n"
 		"extern \"C\" {\n"
@@ -230,16 +238,17 @@ static void outputExtensionHeader(const char* output, const Interface& inf) {
 
 	stream << "\n";
 
-	stream << "extern void gMoSyncExtension_" << inf.name << "_Init();\n";
+	stream << "void MAExtension_" << inf.name << "_Init();\n";
+	stream << "MAExtensionModule MAExtension_" << inf.name << "_GetModule();\n";
 
 	for(size_t i=0; i<inf.functions.size(); i++) {
-		stream << "extern MAExtensionHandle " << getExtensionHandleName(inf.functions[i]) << ";\n";
+		stream << "extern MAExtensionFunction " << getExtensionHandleName(inf, inf.functions[i]) << ";\n";
 	}
 
 	stream << "\n";
 
 	for(size_t i=0; i<inf.functions.size(); i++) {
-		streamIoctlFunction(stream, inf, inf.functions[i], "maInvokeExtension", getExtensionHandleName(inf.functions[i]));
+		streamIoctlFunction(stream, inf, inf.functions[i], "maExtensionFunctionInvoke", getExtensionHandleName(inf, inf.functions[i]));
 	}
 
 	stream << "#ifdef __cplusplus\n"
@@ -252,26 +261,34 @@ static void outputExtensionHeader(const char* output, const Interface& inf) {
 
 static void outputExtensionSource(const char* output, const Interface& inf) {
 	ofstream stream((string(output)+"/"+inf.name+".c").c_str());
-	string headerName = "EXTENSION_" + inf.name;
+	string headerName = "MA_EXTENSION_" + inf.name;
 
 	stream << "#include <" << inf.name << ".h>\n\n";
 
+	stream << "MAExtensionModule " << getExtensionModuleHandleName(inf) << " = MA_EXTENSION_MODULE_UNAVAILABLE;\n";
 	for(size_t i=0; i<inf.functions.size(); i++) {
-		stream << "MAExtensionHandle " << getExtensionHandleName(inf.functions[i]) << " = 0;\n";
+		stream << "MAExtensionFunction " << getExtensionHandleName(inf, inf.functions[i]) << " = MA_EXTENSION_FUNCTION_UNAVAILABLE;\n";
 	}
 
 	stream << "\n";
 
-	stream << "void gMoSyncExtension_" << inf.name << "_Init() {\n";
+	stream << "void MAExtension_" << inf.name << "_Init() {\n";
 
-	stream << "\tmaExtensionCheckInterface(\"" << inf.name << "\", IDL_HASH_" << inf.name << ");\n";
+	stream << "\t" << getExtensionModuleHandleName(inf) << " = " <<
+		"maExtensionModuleLoad(MA_EXTENSION_" << inf.name << "_ID, MA_EXTENSION_" << inf.name << "_IDL_HASH);\n";
 
 	for(size_t i=0; i<inf.functions.size(); i++) {
-		stream << "\t" << getExtensionHandleName(inf.functions[i]) << " = maExtensionLoad(\"" <<
-				inf.name << "\", " << toString(inf.functions[i].number) << ");\n";
+		stream << "\t" << getExtensionHandleName(inf, inf.functions[i]) << " = maExtensionFunctionLoad(" <<
+				getExtensionModuleHandleName(inf) << ", " << toString(inf.functions[i].number) << ");\n";
 	}
 
 	stream << "}\n";
+
+	stream << "MAExtensionModule MAExtension_" << inf.name << "_GetModule() {\n";
+	stream << "\tif(" << getExtensionModuleHandleName(inf) << " == MA_EXTENSION_MODULE_UNAVAILABLE)\n";
+	stream << "\t\tMAExtension_" << inf.name << "_Init();\n";
+	stream << "\treturn " << getExtensionModuleHandleName(inf) << ";\n";
+	stream << "}\n\n";
 
 	flushStream(stream);
 }
