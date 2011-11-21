@@ -52,7 +52,7 @@
 #include <string.h>
 
 // hack (for debugging)
-#include "core.h"
+#include <core.h>
 extern Core::VMCore *gCore;
 
 namespace avmplus
