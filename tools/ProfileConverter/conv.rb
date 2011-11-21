@@ -596,7 +596,7 @@ runtimes.each do |platform_name, platform|
 		end
 
 		release_defines = ['PHONE_RELEASE', 'MOSYNC_COMMERCIAL']
-		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro || platform_name == :s60v3 || platform_name == :s60v5 || platform_name == :android_3 || platform_name == :android_4 || platform_name == :android_7 )
+		if(platform_name == :sp2003 || platform_name == :wm5 || platform_name == :wm6 || platform_name == :wm6pro || platform_name == :s60v3 || platform_name == :s60v5 || platform_name == :android_7 )
 			release_defines << "USE_ARM_RECOMPILER"
 		end
 		if(platform_name == :s60v3)
