@@ -9150,7 +9150,7 @@ group NotificationAPI "Notification API" {
 		/**
 		* \brief Destroy a local notification object.
 		*
-		* \param bannerHandle Handle to a local notification object.
+		* \param notificationHandle Handle to a local notification object.
 		*
 		* \returns One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
@@ -9263,6 +9263,7 @@ group NotificationAPI "Notification API" {
 
 		/**
 		* \brief Fills pushNotificationData struct with the values for a given push notification.
+		* Note: Call maNotificationPushDestroy() in order to destroy the push notification object.
 		*
 		* \param pushNotificationHandle Handle to a given push notification.
 		* \param pushNotificationData A struct that will contain the values for a given push notification.
@@ -9275,6 +9276,17 @@ group NotificationAPI "Notification API" {
 		*/
 		int maNotificationPushGetData(in MAHandle pushNotificationHandle,
 									  out MAPushNotificationData pushNotificationData);
+
+		/**
+		* \brief Destroy a push notification object.
+		*
+		* \param notificationHandle Handle to a push notification object.
+		*
+		* \returns One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		*/
+		int maNotificationPushDestroy(in MAHandle notificationHandle);
 
 		/**
 		* \brief Set the number currently set as the badge of the application icon in Springboard.

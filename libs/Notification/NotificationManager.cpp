@@ -151,6 +151,7 @@ namespace Notification
             }
 
             delete pushNotificationObj;
+            maNotificationPushDestroy(pushNotificationHandle);
         }
         else if (EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION == event.type)
         {

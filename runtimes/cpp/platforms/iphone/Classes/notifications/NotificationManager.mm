@@ -605,6 +605,26 @@ static NotificationManager *sharedInstance = nil;
 }
 
 /**
+ * Destroy a push notification object.
+ * @param notificationHandle Handle to a push notification object.
+ * @return One of the next constants:
+ * - MA_NOTIFICATION_RES_OK if no error occurred.
+ * - MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+ */
+-(int) pushNotificationDestroy:(MAHandle) pushNotificationHandle
+{
+    PushNotification* pushNotification = [mPushNotificationDictionary objectForKey:
+                                          [NSNumber numberWithInt:pushNotificationHandle]];
+    if (!pushNotificationHandle)
+    {
+        return MA_NOTIFICATION_RES_INVALID_HANDLE;
+    }
+
+    [pushNotification release];
+    return MA_NOTIFICATION_RES_OK;
+}
+
+/**
  * Gets the latest registration response.
  * @param messageAddress The registrationID if the registration was successfull,
  * or the error messsage otherwise.
