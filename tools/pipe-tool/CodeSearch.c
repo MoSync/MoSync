@@ -74,12 +74,12 @@ void SearchDep_Function(SYMBOL *sym, int depth)
 		return;
 
 	// Check section
-	
+
 	if (sym->Type != SECT_code)
 		return;
 
 	// Mark as found
-	
+
 	sym->Flags |= SymFlag_Ref;
 
 	// Dont scan local labels (but mark them as found).
@@ -87,12 +87,12 @@ void SearchDep_Function(SYMBOL *sym, int depth)
 	if (sym->LabelType == label_Local)
 	{
 		// Find labels function scope
-		
+
 		SYMBOL *func = FunctionSymFromIP(sym);
-		
+
 		sym->EndIP = func->EndIP;
 	}
-	
+
 	// print info
 
 #ifdef CD_DEBUG
@@ -125,7 +125,7 @@ int SearchDep_Function_Inner(int ip, int ip_end, int depth)
 	SYMBOL *thisSym;
 
 	unsigned int ip_next, v;
-	
+
 	// Fetch the current opcode, but don't advance ip yet !!
 
 
@@ -149,7 +149,7 @@ int SearchDep_Function_Inner(int ip, int ip_end, int depth)
 			return ip;
 
 		// Only examine this code if its untouched
-		
+
 		if (ArrayGet(&CodeTouchArray, ip) == 0)
 		{
 			// Say this opcode has been touched
@@ -164,7 +164,7 @@ int SearchDep_Function_Inner(int ip, int ip_end, int depth)
 			{
 				// Investigate function at this symbol
 
-				thisSym = (SYMBOL *) v;			
+				thisSym = (SYMBOL *) v;
 				SearchDep_Function(thisSym, depth+1);
 			}
 
@@ -200,14 +200,14 @@ int SearchDep_Function_Inner(int ip, int ip_end, int depth)
 			case _JC_LTU:
 			{
 				int new_ip = thisOpcode.imm;
-	
+
 				// Test if the target ip is alreay touched, quit if so
-				
+
 				if (ArrayGet(&CodeTouchArray, new_ip) == 0)
 				{
 					// Search the new ip
 
-					SearchDep_Function_Inner(new_ip, ip_end, depth+1);		
+					SearchDep_Function_Inner(new_ip, ip_end, depth+1);
 
 					// Continue since jump was conditional
 				}
@@ -219,9 +219,9 @@ int SearchDep_Function_Inner(int ip, int ip_end, int depth)
 			case _JPI:
 			{
 				int new_ip = thisOpcode.imm;
-	
+
 				// Test if the target ip is alreay touched, quit if so
-				
+
 				if (ArrayGet(&CodeTouchArray, new_ip) == 1)
 					return ip;
 
@@ -233,12 +233,12 @@ int SearchDep_Function_Inner(int ip, int ip_end, int depth)
 
 			case _CASE:
 			{
-				int start, len, data_ip, def_ip, i;
+				int /*start,*/ len, data_ip, def_ip, i;
 				int lab_ip;
-				
+
 				data_ip = thisOpcode.imm;
 
-				start	= GetDataMemLong(data_ip++);
+				/*start	=*/ GetDataMemLong(data_ip++);
 				len		= GetDataMemLong(data_ip++);
 				def_ip	= GetDataMemLong(data_ip++);	// default case
 
@@ -249,19 +249,19 @@ int SearchDep_Function_Inner(int ip, int ip_end, int depth)
 					if (ArrayGet(&CodeTouchArray, lab_ip) == 0)
 						SearchDep_Function_Inner(lab_ip, ip_end, depth+1);
 				}
-				
+
 				if (ArrayGet(&CodeTouchArray, def_ip) == 1)
 					return ip;
 
 				ip = def_ip;
 				continue;
 			}
-			
+
 			// if we found a return then break out
-			
+
 			case _RET:
 				return ip;
-				
+
 			// Next ip
 			default:
 				ip = ip_next;
@@ -321,7 +321,7 @@ void SearchDep_Memory(SYMBOL *sym, int depth)
 
 	// print info
 
-#ifdef CD_DEBUG	
+#ifdef CD_DEBUG
 	CDPRINTF("\n");
 	CDTAB(depth);
 	CDPRINTF("%s[]=\n", sym->Name);
@@ -351,25 +351,25 @@ void SearchDep_Memory(SYMBOL *sym, int depth)
 		{
 			thisSym = (SYMBOL *) v;
 
-						
+
 			// only explore data section variables, since bss contains
 			// no initialized data.
 
 			// if dataref then follow that
-			
+
 			if (thisSym->Type == SECT_data || thisSym->Type == SECT_bss)
 				SearchDep_Memory(thisSym, depth+1);
-	
+
 			// if we found a function pointer we must follow it
 
 			if (thisSym->Type == SECT_code)
 				 SearchDep_Function(thisSym, depth+1);
 
 		}
-		
+
 
 		// Check if the data symbol has hit alignment padding
-		
+
 		v = ArrayGet(&PaddingArray, n);
 
 		if (v)
@@ -377,7 +377,7 @@ void SearchDep_Memory(SYMBOL *sym, int depth)
 
 		// Check if the data symbol is finished, i.e it bumps
 		// into the next symbol
-		
+
 		if (n != (uint)ip)
 		{
 			v = ArrayGet(&LabelArray, n);
@@ -415,16 +415,16 @@ void SearchDep_Main()
 	SYMBOL *ip;
 
 	ArrayClear(&CodeTouchArray);
-	
+
 	// Clear the ref flag in for the whole symbol table
-	
+
 	ClearSymbolFlags(SymFlag_Ref);
-	
+
 	ip = GetGlobalSym(Code_EntryPoint);
 
 	if (ip)
 		SearchDep_Function(ip, 0);
-} 
+}
 
 //****************************************
 // Finds the function above the input ip
@@ -434,7 +434,7 @@ SYMBOL * FunctionSymFromIP(SYMBOL *localsym)
 {
 	SYMBOL *sym;
 	int in_ip;
-	
+
 	if (!localsym)
 		ErrorOnIP(Error_Fatal, 0, "FunctionSymFromIP sym=0");
 
@@ -457,10 +457,7 @@ SYMBOL * FunctionSymFromIP(SYMBOL *localsym)
 SYMBOL * FunctionAboveIP(int ip)
 {
 	SYMBOL *sym;
-	int in_ip;
 
-	in_ip = ip;
-		
 	if (ip > (int) CodeLabelArray.hi)
 		return 0;
 
@@ -470,12 +467,12 @@ SYMBOL * FunctionAboveIP(int ip)
 
 		if (ip < 0)
 			break;
-		
+
 		sym = (SYMBOL *) ArrayGet(&CodeLabelArray, ip);
 
 		if (sym)
 		{
-	
+
 			if (sym->LabelType >= label_Function)		// Include virtuals
 				return sym;
 		}
@@ -502,7 +499,7 @@ int FindLabelExtent(int ip)
 	for (n=ip;n<LabelArray.hi;n++)
 	{
 		// Check if the data symbol has hit alignment padding
-		
+
 		v = ArrayGet(&PaddingArray, n);
 
 		if (v)
@@ -510,7 +507,7 @@ int FindLabelExtent(int ip)
 
 		// Check if the data symbol is finished, i.e it bumps
 		// into the next symbol
-		
+
 		if (n != (uint)ip)
 		{
 			v = ArrayGet(&LabelArray, n);

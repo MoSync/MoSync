@@ -42,7 +42,9 @@ static int sDataSize;
 static int sCustomEventDataPointer;
 
 void MoSyncDiv0() {
+#ifndef ALLOW_DIVISION_BY_ZERO
 	BIG_PHAT_ERROR(ERR_DIVISION_BY_ZERO);
+#endif
 }
 
 void* Base::Syscall::GetValidatedMemRange(int address, int size) {

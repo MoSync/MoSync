@@ -22,6 +22,7 @@ MA 02110-1301, USA.
 
 int maCreateImageRawTest();
 int maDrawRGBTest();
+int maDrawRGBTest2();
 int maCreateImageFromDataTest();
 int maGetImageDataTest();
 
@@ -36,11 +37,13 @@ void addAdvGfxTests(TestSuite* suite)
 {
 	suite->addTestCase(new TemplateCase<maCreateImageRawTest>("maCreateImageRaw test"));
 	suite->addTestCase(new TemplateCase<maDrawRGBTest>("maDrawRGB test"));
+	suite->addTestCase(new TemplateCase<maDrawRGBTest2>("maDrawRGB test2"));
 	suite->addTestCase(new TemplateCase<maCreateImageFromDataTest>("maCreateImageFromData test"));
 	suite->addTestCase(new TemplateCase<maGetImageDataTest>("maGetImageData test"));
 }
 
 #define GRADIENT_SEGMENT_HEIGHT 16
+#define SIDE_HEIGHT 40
 
 /**
  * @brief Tests the maCreateImageRaw syscall
@@ -209,6 +212,52 @@ int maDrawRGBTest()
 	const char *title = "maDrawRGB:";
 	maDrawText(4, 0, title);
 	maDrawText(4, EXTENT_Y(maGetTextSize(title))+2, "alpha gradient on chessboard");
+
+	maUpdateScreen();
+
+	return FUNC_OK;
+}
+
+static void drawRgb2(int* buf, int x, int y, int color) {
+	for(int j = 0; j < SIDE_HEIGHT; j++) {
+		for(int i = 0; i < SIDE_HEIGHT; i++) {
+			buf[i+j*SIDE_HEIGHT] = color;
+		}
+	}
+
+	MAPoint2d dst = {x, SIDE_HEIGHT+y};
+	MARect srcRect = {0, 0, SIDE_HEIGHT, SIDE_HEIGHT};
+	maDrawRGB(&dst, buf, &srcRect, SIDE_HEIGHT);
+}
+
+/**
+* @brief Tests the maDrawRGB syscall again.
+*
+* This test attempts to draw rectangles in pure
+* blue, red, and green, respectively.
+*/
+int maDrawRGBTest2()
+{
+	MAExtent e = maGetScrSize();
+	Dimensions screen;
+	screen.width = EXTENT_X(e);
+	screen.height = EXTENT_Y(e);
+	maSetClipRect(0, 0, screen.width, screen.height);
+	maSetColor(0);
+	maFillRect(0,0, screen.width, screen.height);
+
+	int *src = new int[SIDE_HEIGHT*SIDE_HEIGHT];
+	if(NULL == src)
+		return FUNC_OUT_OF_MEMORY_ALLOC;
+	drawRgb2(src, 0,0, 0xffff0000);	//red, upper-left
+	drawRgb2(src, SIDE_HEIGHT,0, 0xff00ff00);	//green, upper-right
+	drawRgb2(src, 0,SIDE_HEIGHT, 0xff0000ff);	//blue, lower-left
+	delete []src;
+
+	maSetColor(0xff0000);
+	const char *title = "maDrawRGB2:";
+	maDrawText(4, 0, title);
+	maDrawText(4, EXTENT_Y(maGetTextSize(title))+2, "RG\nB");
 
 	maUpdateScreen();
 

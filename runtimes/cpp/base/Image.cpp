@@ -1028,6 +1028,7 @@ void Image::clipPolygonTop(int src, int dst) {
 			case A_IN:
 				clippedPoints[dst][numPoints[dst]++] = clippedPoints[src][i];
 				clippedPoints[dst][numPoints[dst]++] = clippedPoint;
+				break;
 			case B_IN:
 				clippedPoints[dst][numPoints[dst]++] = clippedPoint;
 				break;
@@ -1037,37 +1038,6 @@ void Image::clipPolygonTop(int src, int dst) {
 			case BOTH_OUT:
 				break;
 		}
-
-		/*
-		bool shouldAddThisPoint = false;
-		bool shouldAddClippedPoint = false;
-
-		if(clippedPoints[src][i].y<top && clippedPoints[src][next].y<top) continue;
-
-		if((clippedPoints[src][i].y>=top && clippedPoints[src][next].y<top)) {
-			shouldAddThisPoint = true;
-			shouldAddClippedPoint = true;
-
-		} else if((clippedPoints[src][i].y<top && clippedPoints[src][next].y>=top)) {
-			shouldAddClippedPoint = true;
-		} else {
-			shouldAddThisPoint = true;
-		}
-
-		if(shouldAddThisPoint) {
-			clippedPoints[dst][numPoints[dst]] = clippedPoints[src][i];
-			numPoints[dst]++;	
-		}
-
-		if(shouldAddClippedPoint) {
-			if(abs(clippedPoints[src][next].y-clippedPoints[src][i].y)<0xffff) continue;
-			int mul = fp_mul32((top-clippedPoints[src][i].y),(clippedPoints[src][next].x-clippedPoints[src][i].x));
-			int div = fp_div32(mul, (clippedPoints[src][next].y-clippedPoints[src][i].y));			
-			clippedPoints[dst][numPoints[dst]].x = clippedPoints[src][i].x + div;
-			clippedPoints[dst][numPoints[dst]].y = top;
-			numPoints[dst]++;
-		}
-		*/
 	}
 	currentList = dst;
 }
@@ -1085,6 +1055,7 @@ void Image::clipPolygonLeft(int src, int dst) {
 			case A_IN:
 				clippedPoints[dst][numPoints[dst]++] = clippedPoints[src][i];
 				clippedPoints[dst][numPoints[dst]++] = clippedPoint;
+				break;
 			case B_IN:
 				clippedPoints[dst][numPoints[dst]++] = clippedPoint;
 				break;
@@ -1094,38 +1065,6 @@ void Image::clipPolygonLeft(int src, int dst) {
 			case BOTH_OUT:
 				break;
 		}
-
-
-		/*
-		bool shouldAddThisPoint = false;
-		bool shouldAddClippedPoint = false;
-
-		if(clippedPoints[src][i].x<left && clippedPoints[src][next].x<left) continue;
-
-		if((clippedPoints[src][i].x>=left && clippedPoints[src][next].x<left)) {
-			shouldAddThisPoint = true;
-			shouldAddClippedPoint = true;
-
-		} else if((clippedPoints[src][i].x<left && clippedPoints[src][next].x>=left)) {
-			shouldAddClippedPoint = true;
-		} else {
-			shouldAddThisPoint = true;
-		}
-
-		if(shouldAddThisPoint) {
-			clippedPoints[dst][numPoints[dst]] = clippedPoints[src][i];
-			numPoints[dst]++;	
-		}
-
-		if(shouldAddClippedPoint) {
-			if(abs(clippedPoints[src][next].x-clippedPoints[src][i].x)<0xffff) continue;
-			int mul = fp_mul32((left-clippedPoints[src][i].x),(clippedPoints[src][next].y-clippedPoints[src][i].y));
-			int div = fp_div32(mul, (clippedPoints[src][next].x-clippedPoints[src][i].x));
-			clippedPoints[dst][numPoints[dst]].x = left;
-			clippedPoints[dst][numPoints[dst]].y = clippedPoints[src][i].y + div;
-			numPoints[dst]++;
-		}
-		*/
 	}
 
 	currentList = dst;
@@ -1144,6 +1083,7 @@ void Image::clipPolygonRight(int src, int dst) {
 			case A_IN:
 				clippedPoints[dst][numPoints[dst]++] = clippedPoints[src][i];
 				clippedPoints[dst][numPoints[dst]++] = clippedPoint;
+				break;
 			case B_IN:
 				clippedPoints[dst][numPoints[dst]++] = clippedPoint;
 				break;
@@ -1153,38 +1093,6 @@ void Image::clipPolygonRight(int src, int dst) {
 			case BOTH_OUT:
 				break;
 		}
-
-
-		/*
-		bool shouldAddThisPoint = false;
-		bool shouldAddClippedPoint = false;
-
-		if(clippedPoints[src][i].x>right && clippedPoints[src][next].x>right) continue;
-
-		if((clippedPoints[src][i].x<=right && clippedPoints[src][next].x>right)) {
-			shouldAddThisPoint = true;
-			shouldAddClippedPoint = true;
-
-		} else if((clippedPoints[src][i].x>right && clippedPoints[src][next].x<=right)) {
-			shouldAddClippedPoint = true;
-		} else {
-			shouldAddThisPoint = true;
-		}
-
-		if(shouldAddThisPoint) {
-			clippedPoints[dst][numPoints[dst]] = clippedPoints[src][i];
-			numPoints[dst]++;	
-		}
-
-		if(shouldAddClippedPoint) {
-			if(abs(clippedPoints[src][next].x-clippedPoints[src][i].x)<0xffff) continue;
-			int mul = fp_mul32((right-clippedPoints[src][i].x),(clippedPoints[src][next].y-clippedPoints[src][i].y));
-			int div = fp_div32(mul, (clippedPoints[src][next].x-clippedPoints[src][i].x));
-			clippedPoints[dst][numPoints[dst]].x = right;
-			clippedPoints[dst][numPoints[dst]].y = clippedPoints[src][i].y + div;
-			numPoints[dst]++;
-		}
-		*/
 	}
 
 	currentList = dst;
@@ -1203,6 +1111,7 @@ void Image::clipPolygonBottom(int src, int dst) {
 			case A_IN:
 				clippedPoints[dst][numPoints[dst]++] = clippedPoints[src][i];
 				clippedPoints[dst][numPoints[dst]++] = clippedPoint;
+				break;
 			case B_IN:
 				clippedPoints[dst][numPoints[dst]++] = clippedPoint;
 				break;
@@ -1212,37 +1121,6 @@ void Image::clipPolygonBottom(int src, int dst) {
 			case BOTH_OUT:
 				break;
 		}
-
-		/*
-		bool shouldAddThisPoint = false;
-		bool shouldAddClippedPoint = false;
-
-		if(clippedPoints[src][i].y>bottom && clippedPoints[src][next].y>bottom) continue;
-
-		if((clippedPoints[src][i].y<=bottom && clippedPoints[src][next].y>bottom)) {
-			shouldAddThisPoint = true;
-			shouldAddClippedPoint = true;
-
-		} else if((clippedPoints[src][i].y>bottom && clippedPoints[src][next].y<=bottom)) {
-			shouldAddClippedPoint = true;
-		} else {
-			shouldAddThisPoint = true;
-		}
-
-		if(shouldAddThisPoint) {
-			clippedPoints[dst][numPoints[dst]] = clippedPoints[src][i];
-			numPoints[dst]++;	
-		}
-
-		if(shouldAddClippedPoint) {
-			if(abs(clippedPoints[src][next].y-clippedPoints[src][i].y)<0xffff) continue;
-			int mul = fp_mul32((bottom-clippedPoints[src][i].y),(clippedPoints[src][next].x-clippedPoints[src][i].x));
-			int div = fp_div32(mul, (clippedPoints[src][next].y-clippedPoints[src][i].y));			
-			clippedPoints[dst][numPoints[dst]].x = clippedPoints[src][i].x + div;
-			clippedPoints[dst][numPoints[dst]].y = bottom;
-			numPoints[dst]++;
-		}
-		*/
 	}
 
 	currentList = dst;

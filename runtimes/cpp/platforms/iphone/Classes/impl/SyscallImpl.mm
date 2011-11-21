@@ -32,6 +32,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <MemStream.h>
 #include <FileStream.h>
 #include "Syscall.h"
+#include "MoSyncDB.h"
 #include "PimSyscall.h"
 #include "OptionsDialogView.h"
 #include <CoreMedia/CoreMedia.h>
@@ -46,6 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "CameraConfirgurator.h"
 #import "ImagePickerController.h"
 #include "netImpl.h"
+
 
 #define NETWORKING_H
 #include "networking.h"
@@ -75,6 +77,9 @@ using namespace MoSyncError;
 #include <OpenGLES/ES1/glext.h>
 #include "../../../../generated/gl.h.cpp"
 #endif
+
+#include <helpers/CPP_IX_AUDIO.h>
+#include "AudioSyscall.h"
 
 extern ThreadPool gThreadPool;
 
@@ -324,6 +329,7 @@ namespace Base {
 		MANetworkInit();
 
 		MAPimInit();
+        MAAudioInit();
 
 		// init some image.h optimizations.
 		initMulTable();
@@ -336,6 +342,7 @@ namespace Base {
 		DeleteCriticalSection(&exitMutex);
 		MANetworkClose();
         MAPimClose();
+        MAAudioClose();
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
 	}
@@ -1020,11 +1027,8 @@ namespace Base {
 		//int time = (int)(CFAbsoluteTimeGetCurrent()*1000.0f);
 		//int time = (int)((double)mach_absolute_time()*gTimeConversion);
 		int time = (((mach_absolute_time() - gTimeStart) * gTimeBase.numer) / gTimeBase.denom) / 1000000;
-
-
 		return time;
 	}
-
 
 	SYSCALL(int, maFreeObjectMemory()) {
 		return getFreeAmountOfMemory();
@@ -1399,7 +1403,6 @@ return 0; \
 
 		return MA_GL_TEX_IMAGE_2D_OK;
 	}
-
 
 	int maOpenGLTexSubImage2D(MAHandle image) {
 		Surface* img = gSyscall->resources.get_RT_IMAGE(image);
@@ -1825,6 +1828,7 @@ return 0; \
 
 
 
+
     SYSCALL(int, maSensorStart(int sensor, int interval))
 	{
 		return MoSync_SensorStart(sensor, interval);
@@ -1847,7 +1851,7 @@ return 0; \
         return RES_OK;
 	}
 
-	SYSCALL(int, maIOCtl(int function, int a, int b, int c))
+	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
 
@@ -1928,6 +1932,15 @@ return 0; \
 		maIOCtl_case(maSendTextSMS);
 		maIOCtl_case(maSyscallPanicsEnable);
 		maIOCtl_case(maSyscallPanicsDisable);
+		maIOCtl_case(maDBOpen);
+		maIOCtl_case(maDBClose);
+		maIOCtl_case(maDBExecSQL);
+		maIOCtl_case(maDBCursorDestroy);
+		maIOCtl_case(maDBCursorNext);
+		maIOCtl_case(maDBCursorGetColumnData);
+		maIOCtl_case(maDBCursorGetColumnText);
+		maIOCtl_case(maDBCursorGetColumnInt);
+		maIOCtl_case(maDBCursorGetColumnDouble);
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
@@ -1935,6 +1948,7 @@ return 0; \
         maIOCtl_IX_GL2_caselist;
         maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist;
 #endif	//SUPPORT_OPENGL_ES
+        maIOCtl_IX_AUDIO_caselist;
 		}
 
 		return IOCTL_UNAVAILABLE;

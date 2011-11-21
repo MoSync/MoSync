@@ -3,7 +3,7 @@
 require File.expand_path('../../rules/native_lib.rb')
 
 work = NativeLibWork.new
-work.instance_eval do 
+work.instance_eval do
 	@SOURCES = []
 	if(HOST == :win32)
 		@EXTRA_SOURCEFILES = ["filelist-win32.c"]
@@ -18,6 +18,7 @@ work.instance_eval do
 	else
 		error "Unsupported platform"
 	end
+	@EXTRA_SOURCEFILES << 'copyfiles.cpp'
 	@EXTRA_INCLUDES = [".."]
 	@NAME = "filelist"
 end

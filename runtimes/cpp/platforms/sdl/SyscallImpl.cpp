@@ -88,6 +88,7 @@ extern "C" {
 #include "TcpConnection.h"
 #include "ConfigParser.h"
 #include "sdl_stream.h"
+#include "MoSyncDB.h"
 
 #include "Skinning/Screen.h"
 #include "Skinning/SkinManager.h"
@@ -136,7 +137,7 @@ namespace Base {
 	static int gTimerSequence;
 	static SDL_mutex* gTimerMutex = NULL;
 	static bool gShowScreen;
-	
+
 	static SDL_TimerID gExitTimer = NULL;
 
 #ifdef SUPPORT_OPENGL_ES
@@ -167,7 +168,7 @@ namespace Base {
 	static void cameraViewFinderUpdate();
 
 	static int maGetSystemProperty(const char* key, char* buf, int size);
-	
+
 #ifdef WIN32
 	static HFONT gWindowsUnifont = NULL;
 	static int maTextBox(const wchar* title, const wchar* inText, wchar* outText,
@@ -237,6 +238,7 @@ namespace Base {
 #ifdef EMULATOR
 		gSyscall->pimClose();
 #endif
+		MoSyncDBClose();
 	}
 
 	//***************************************************************************
@@ -316,7 +318,7 @@ namespace Base {
 			MASendPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_PRESSED);
 		}
 		void onMoSyncPointerDrag(int x, int y, int touchId) {
-			MASendPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_DRAGGED);	
+			MASendPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_DRAGGED);
 		}
 		void onMoSyncPointerRelease(int x, int y, int touchId) {
 			MASendPointerEvent(x, y, touchId, EVENT_TYPE_POINTER_RELEASED);
@@ -349,7 +351,7 @@ namespace Base {
 			} else {
 				sSkin->setListener(new MoSyncSkinListener());
 				// fix with mobile image
-				TEST_Z(gScreen = SDL_SetVideoMode(sSkin->getWindowWidth(), sSkin->getWindowHeight(), 32, SDL_SWSURFACE | SDL_ANYFORMAT)); 
+				TEST_Z(gScreen = SDL_SetVideoMode(sSkin->getWindowWidth(), sSkin->getWindowHeight(), 32, SDL_SWSURFACE | SDL_ANYFORMAT));
 			}
 		} else {
 #ifdef __USE_FULLSCREEN__
@@ -391,7 +393,7 @@ namespace Base {
          * It is important that the SDL subsystems are initialized after
 		 * MANetworkInit. Otherwise there is a race condition for a shared
 		 * object between one of the SDL audio threads and openssl which causes
-		 * SSL_CTX_new to hang in Heap32Next. However, SDL_Init should be 
+		 * SSL_CTX_new to hang in Heap32Next. However, SDL_Init should be
 		 * called before MANetworkInit since it relies on SDL-mutexes.
 		 */
 		MANetworkInit();
@@ -409,6 +411,8 @@ namespace Base {
 #ifdef EMULATOR
 		gSyscall->pimInit();
 #endif
+
+		MoSyncDBInit();
 
 		AudioEngine::init();
 
@@ -431,7 +435,7 @@ namespace Base {
 			if(settings.iconPath) {
 				SDL_Surface *surf = IMG_Load(settings.iconPath);
 				if(surf)
-					SDL_WM_SetIcon(surf, NULL);				
+					SDL_WM_SetIcon(surf, NULL);
 			}
 
 		} else {
@@ -514,7 +518,7 @@ namespace Base {
 	#if 0
 	static SDL_Surface* createNew32BitSurface(SDL_Surface *src, int left, int top, int width, int height, bool freeOldSurface) {
 /*
-	
+
 		int i, j;
 		unsigned char *dst = (unsigned char*) surf->pixels;
 		for(j = 0; j < src->h; j++) {
@@ -537,8 +541,8 @@ namespace Base {
 		rect.w = width;
 		rect.h = height;
 		//May fail to copy alpha info. test it.
-		SDL_SetAlpha(surf, 0, 0x0);  
-		SDL_BlitSurface(src, &rect, surf, NULL);	
+		SDL_SetAlpha(surf, 0, 0x0);
+		SDL_BlitSurface(src, &rect, surf, NULL);
 */
 //		if(freeOldSurface) {
 //			SDL_FreeSurface(src);
@@ -547,7 +551,7 @@ namespace Base {
 		return src;
 	}
 	#endif	//0
-	
+
 	SDL_Surface* Syscall::loadImage(MemStream& s) {
 		int size;
 		TEST(s.length(size));
@@ -558,7 +562,7 @@ namespace Base {
 		MYASSERT(surf, SDLERR_IMAGE_LOAD_FAILED);
 		surf = SDL_DisplayFormatAlpha(surf);
 		SDL_FreeRW(rwops);
-		
+
 		return surf;
 	}
 
@@ -572,7 +576,7 @@ namespace Base {
 		rect.w = width;
 		rect.h = height;
 		//May fail to copy alpha info. test it.
-		SDL_SetAlpha(surf, 0, 0x0);  
+		SDL_SetAlpha(surf, 0, 0x0);
 		SDL_BlitSurface(surface, &rect, surf, NULL);
 		surf = SDL_DisplayFormatAlpha(surf);
 		MYASSERT(surf, SDLERR_SPRITE_LOAD_FAILED);
@@ -719,7 +723,7 @@ namespace Base {
 		}
 		SDL_UnlockSurface(srcSurface);
 		SDL_UnlockSurface(dstSurface);
-		SDL_UpdateRect(dstSurface, x, y, srcSurface->w*multiplier, srcSurface->h*multiplier);		
+		SDL_UpdateRect(dstSurface, x, y, srcSurface->w*multiplier, srcSurface->h*multiplier);
 	}
 
 
@@ -1244,8 +1248,8 @@ namespace Base {
 			(Uint16)srcRect->width, (Uint16)srcRect->height};
 		SDL_Rect dstSurfaceRect = { (Sint16)dstPoint->x, (Sint16)dstPoint->y,
 			(Uint16)srcRect->width, (Uint16)srcRect->height};
-		SDL_Surface* srcSurface = SDL_CreateRGBSurfaceFrom((void*)src, 
-			srcSurfaceRect.w, srcSurfaceRect.h, 32, scanlength<<2, 
+		SDL_Surface* srcSurface = SDL_CreateRGBSurfaceFrom((void*)src,
+			srcSurfaceRect.w, srcSurfaceRect.h, 32, scanlength<<2,
 			0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
 
 		SDL_SetAlpha(srcSurface, SDL_SRCALPHA, 0x0);
@@ -1256,7 +1260,7 @@ namespace Base {
 
 	SYSCALL(void, maDrawImageRegion(MAHandle image, const MARect* src, const MAPoint2d* dstTopLeft, int transformMode)) {
 		//LOG("Entering DrawImageRegion start\n");
-		
+
 		SDL_Surface* surf = gSyscall->resources.get_RT_IMAGE(image);
 		gSyscall->ValidateMemRange(src, sizeof(MARect));
 		gSyscall->ValidateMemRange(dstTopLeft, sizeof(MAPoint2d));
@@ -1266,7 +1270,6 @@ namespace Base {
 		int dstPitchY = gDrawSurface->pitch>>2;
 		int srcPitchX, srcPitchY;
 		int transTopLeftX, transTopLeftY;
-		int transBottomRightX, transBottomRightY;
 		int transWidth, transHeight;
 		int bpp = 4;
 		int width = src->width;
@@ -1278,23 +1281,23 @@ namespace Base {
 
 		if( width <= 0 || height <= 0) return;
 
-		if (u > surf->clip_rect.x + surf->clip_rect.w) 
+		if (u > surf->clip_rect.x + surf->clip_rect.w)
 			return;
 		else if(u < surf->clip_rect.x) {
 			left += surf->clip_rect.x - u;
 			u = surf->clip_rect.x;
 		}
-		if (v > surf->clip_rect.y + surf->clip_rect.h) 
+		if (v > surf->clip_rect.y + surf->clip_rect.h)
 			return;
 		else if(v < surf->clip_rect.y) {
-			top += surf->clip_rect.y - v;		
+			top += surf->clip_rect.y - v;
 			v = surf->clip_rect.y;
 		}
-		if(u + surf->clip_rect.w < surf->clip_rect.x) 
+		if(u + surf->clip_rect.w < surf->clip_rect.x)
 			return;
 		else if(u + width > surf->clip_rect.x + surf->clip_rect.w)
 			width -= (u + width) - (surf->clip_rect.x + surf->clip_rect.w);
-		if(v + height< surf->clip_rect.y) 
+		if(v + height< surf->clip_rect.y)
 			return;
 		else if(v + height > surf->clip_rect.y + surf->clip_rect.h)
 			height -= (v + height) - (surf->clip_rect.y + surf->clip_rect.h);
@@ -1307,8 +1310,6 @@ namespace Base {
 				srcPitchY = surf->pitch;
 				transTopLeftX = u;
 				transTopLeftY = v;
-				transBottomRightX = u + width - 1;
-				transBottomRightY = v + height - 1;
 				transWidth = width;
 				transHeight = height;
 				break;
@@ -1317,8 +1318,6 @@ namespace Base {
 				srcPitchY = bpp;
 				transTopLeftX = u;
 				transTopLeftY = v+height-1;
-				transBottomRightX = u + width - 1;
-				transBottomRightY = v;
 				transWidth = height;
 				transHeight = width;
 				break;
@@ -1327,8 +1326,6 @@ namespace Base {
 				srcPitchY = -surf->pitch;
 				transTopLeftX = u + width - 1;
 				transTopLeftY = v + height - 1;
-				transBottomRightX = u;
-				transBottomRightY = v;
 				transWidth = width;
 				transHeight = height;
 				break;
@@ -1337,8 +1334,6 @@ namespace Base {
 				srcPitchY = -bpp;
 				transTopLeftX = u + width - 1;
 				transTopLeftY = v;
-				transBottomRightX = u;
-				transBottomRightY = v + height - 1;
 				transWidth = height;
 				transHeight = width;
 				break;
@@ -1347,8 +1342,6 @@ namespace Base {
 				srcPitchY = surf->pitch;
 				transTopLeftX = u + width - 1;
 				transTopLeftY = v;
-				transBottomRightX = u;
-				transBottomRightY = v + height - 1;
 				transWidth = width;
 				transHeight = height;
 				break;
@@ -1357,8 +1350,6 @@ namespace Base {
 				srcPitchY = -bpp;
 				transTopLeftX = u+width-1;
 				transTopLeftY = v+height-1;
-				transBottomRightX = u;
-				transBottomRightY = v;
 				transWidth = height;
 				transHeight = width;
 				break;
@@ -1367,8 +1358,6 @@ namespace Base {
 				srcPitchY = -surf->pitch;
 				transTopLeftX = u;
 				transTopLeftY = v + height - 1;
-				transBottomRightX = u + width - 1;
-				transBottomRightY = v;
 				transWidth = width;
 				transHeight = height;
 				break;
@@ -1377,8 +1366,6 @@ namespace Base {
 				srcPitchY = bpp;
 				transTopLeftX = u;
 				transTopLeftY = v;
-				transBottomRightX = u + width - 1;
-				transBottomRightY = v + height - 1;
 				transWidth = height;
 				transHeight = width;
 				break;
@@ -1421,8 +1408,8 @@ namespace Base {
 					y < gDrawSurface->clip_rect.y + gDrawSurface->clip_rect.h) {
 
 						while(width) {
-							if( destX >= gDrawSurface->clip_rect.x && 
-								destX < gDrawSurface->clip_rect.x + gDrawSurface->clip_rect.w ) 
+							if( destX >= gDrawSurface->clip_rect.x &&
+								destX < gDrawSurface->clip_rect.x + gDrawSurface->clip_rect.w )
 							{
 								int d = destPixels[destX + destY];
 								int s = srcPixels[srcX + srcY];
@@ -1433,9 +1420,9 @@ namespace Base {
 								int dr = (((d)&dstRedMask)>>dstRedShift);
 								int dg = (((d)&dstGreenMask)>>dstGreenShift);
 								int db = (((d)&dstBlueMask)>>dstBlueShift);
-								
+
 								/* Do alpha blitting */
-								destPixels[destX + destY] = 
+								destPixels[destX + destY] =
 									(((dr + (((sr-dr)*(a))>>8)) << dstRedShift)  &dstRedMask) |
 									(((dg + (((sg-dg)*(a))>>8)) << dstGreenShift)&dstGreenMask) |
 									(((db + (((sb-db)*(a))>>8)) << dstBlueShift) &dstBlueMask);
@@ -1461,11 +1448,11 @@ namespace Base {
 					y < gDrawSurface->clip_rect.y + gDrawSurface->clip_rect.h) {
 
 						while(width) {
-							if( destX >= gDrawSurface->clip_rect.x && 
-								destX < gDrawSurface->clip_rect.x + gDrawSurface->clip_rect.w ) 
+							if( destX >= gDrawSurface->clip_rect.x &&
+								destX < gDrawSurface->clip_rect.x + gDrawSurface->clip_rect.w )
 							{
 								/* Do blitting without alpha */
-								destPixels[destX + destY] = (destPixels[destX + destY] & dstAlphaMask) | 
+								destPixels[destX + destY] = (destPixels[destX + destY] & dstAlphaMask) |
 									(srcPixels[srcX + srcY] & (srcRedMask | srcGreenMask | srcBlueMask));
 							}
 							srcX+=srcPitchX;
@@ -1477,7 +1464,7 @@ namespace Base {
 				destY+=dstPitchY;
 				transHeight--;
 				y++;
-			}		
+			}
 		}
 	}
 
@@ -1512,11 +1499,11 @@ namespace Base {
 			src_ptr+=surf->pitch;
 		}
 		*/
-		
-		SDL_Surface* dstSurface = SDL_CreateRGBSurfaceFrom(dst, 
-			src->width, src->height, 32, scanlength<<2, 
+
+		SDL_Surface* dstSurface = SDL_CreateRGBSurfaceFrom(dst,
+			src->width, src->height, 32, scanlength<<2,
 			0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
-	
+
 		bool srcAlpha = false;
 		if(surf->flags&SDL_SRCALPHA) {
 			SDL_SetAlpha(surf, 0, 0);
@@ -1835,7 +1822,7 @@ namespace Base {
 	static int maAudioBufferInit(const MAAudioBufferInfo *ainfo) {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
 		if(src!=NULL) {
-			src->close(); // todo: do a safe delete of the source here.. now it leaks memory, 
+			src->close(); // todo: do a safe delete of the source here.. now it leaks memory,
 		}
 		src = new BufferAudioSource(ainfo, fillBufferCallback);
 		AudioEngine::getChannel(1)->setAudioSource(src);
@@ -1852,7 +1839,7 @@ namespace Base {
 	static int maAudioBufferClose() {
 		AudioSource *src = AudioEngine::getChannel(1)->getAudioSource();
 		if(src!=NULL) {
-			src->close(); // todo: do a safe delete of the source here.. now it leaks memory, 
+			src->close(); // todo: do a safe delete of the source here.. now it leaks memory,
 		}
 
 		AudioEngine::getChannel(1)->setAudioSource(NULL);
@@ -1865,7 +1852,7 @@ namespace Base {
 	SYSCALL(int, maStreamVideoStart(const char* url)) {
 		//int res;
 		//if((res=rtspCreateConnection(url, rtspConnection))<0) return res;
-		
+
 		return -1;
 	}
 
@@ -1931,7 +1918,7 @@ namespace Base {
 
 	int maOpenGLTexImage2D(MAHandle image) {
 		SDL_Surface* surface = gSyscall->resources.get_RT_IMAGE(image);
-	
+
         // get the number of channels in the SDL surface
         GLint nOfColors = surface->format->BytesPerPixel;
 		GLenum texture_format = 0;
@@ -1965,7 +1952,7 @@ namespace Base {
 					texture_format = GL_RGBA;
 					flipColors = 1; //texture_format = GL_BGR;
 				}
-		} 
+		}
 		else if (nOfColors == 3)     // no alpha channel
         {
                 if (surface->format->Bmask == 0xff0000)
@@ -1974,12 +1961,12 @@ namespace Base {
 					texture_format = GL_RGB;
 					flipColors = 1; //texture_format = GL_BGR;
 				}
-        } 
-		
+        }
+
 		if(texture_format == 0) {
 			return MA_GL_TEX_IMAGE_2D_INVALID_IMAGE;
 		}
- 	 
+
 		byte* data = (byte*)surface->pixels;
 		if(flipColors) {
 			int numBytes = surface->w * surface->h * surface->format->BytesPerPixel;
@@ -1990,11 +1977,11 @@ namespace Base {
 				int gIndex = surface->format->Gshift/8;
 				int bIndex = surface->format->Bshift/8;
 				int aIndex = surface->format->Ashift/8;
-				copy[i+0] = data[i+rIndex]; 
-				copy[i+1] = data[i+gIndex]; 
-				copy[i+2] = data[i+bIndex]; 
+				copy[i+0] = data[i+rIndex];
+				copy[i+1] = data[i+gIndex];
+				copy[i+2] = data[i+bIndex];
 				if(nOfColors == 4)
-					copy[i+3] = data[i+aIndex]; 
+					copy[i+3] = data[i+aIndex];
 			}
 
 			data = copy;
@@ -2013,9 +2000,9 @@ namespace Base {
 
 		return MA_GL_TEX_IMAGE_2D_OK;
 	}
-	
+
 	int maOpenGLTexSubImage2D(MAHandle image) {
-		SDL_Surface* surface = gSyscall->resources.get_RT_IMAGE(image);	
+		SDL_Surface* surface = gSyscall->resources.get_RT_IMAGE(image);
 
         GLint nOfColors = surface->format->BytesPerPixel;
 		GLenum texture_format = 0;
@@ -2029,7 +2016,7 @@ namespace Base {
 					texture_format = GL_RGBA;
 					flipColors = 1; //texture_format = GL_BGR;
 				}
-		} 
+		}
 		else if (nOfColors == 3)     // no alpha channel
         {
                 if (surface->format->Bmask == 0xff0000)
@@ -2050,11 +2037,11 @@ namespace Base {
 				int gIndex = surface->format->Gshift/8;
 				int bIndex = surface->format->Bshift/8;
 				int aIndex = surface->format->Ashift/8;
-				copy[i+0] = data[i+rIndex]; 
-				copy[i+1] = data[i+gIndex]; 
-				copy[i+2] = data[i+bIndex]; 
+				copy[i+0] = data[i+rIndex];
+				copy[i+1] = data[i+gIndex];
+				copy[i+2] = data[i+bIndex];
 				if(nOfColors == 4)
-					copy[i+3] = data[i+aIndex]; 
+					copy[i+3] = data[i+aIndex];
 			}
 
 			data = copy;
@@ -2067,11 +2054,11 @@ namespace Base {
 		if(flipColors) {
 			delete data;
 		}
-		
+
 		return MA_GL_TEX_IMAGE_2D_OK;
 	}
 
-#endif // SUPPORT_OPENGL_ES	
+#endif // SUPPORT_OPENGL_ES
 
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c, ...)) {
 		va_list argptr;
@@ -2214,6 +2201,16 @@ namespace Base {
 			maIOCtl_case(maCameraStop);
 			maIOCtl_case(maCameraSnapshot);
 
+			maIOCtl_case(maDBOpen);
+			maIOCtl_case(maDBClose);
+			maIOCtl_case(maDBExecSQL);
+			maIOCtl_case(maDBExecSQLParams);
+			maIOCtl_case(maDBCursorDestroy);
+			maIOCtl_case(maDBCursorNext);
+			maIOCtl_case(maDBCursorGetColumnData);
+			maIOCtl_case(maDBCursorGetColumnText);
+			maIOCtl_case(maDBCursorGetColumnInt);
+			maIOCtl_case(maDBCursorGetColumnDouble);
 #ifdef EMULATOR
 		maIOCtl_syscall_case(maPimListOpen);
 		maIOCtl_syscall_case(maPimListNext);
@@ -2239,6 +2236,15 @@ namespace Base {
 #ifdef WIN32
 			maIOCtl_case(maTextBox);
 #endif
+
+		case maIOCtl_maSyscallPanicsEnable:
+			LOG("maSyscallPanicsEnable\n");
+			gSyscall->mPanicOnProgrammerError = true;
+			return RES_OK;
+		case maIOCtl_maSyscallPanicsDisable:
+			LOG("maSyscallPanicsDisable\n");
+			gSyscall->mPanicOnProgrammerError = false;
+			return RES_OK;
 
 		default:
 			LOGD("maIOCtl(%i) unimplemented.\n", function);
@@ -2338,11 +2344,11 @@ namespace Base {
 		LONG windowStyle = GetWindowLong(sMainWnd, GWL_STYLE);
 		SetWindowLong(sMainWnd, GWL_STYLE, windowStyle | WS_CLIPCHILDREN);
 
-		sEditBox = CreateWindowW(L"EDIT",	// predefined class 
+		sEditBox = CreateWindowW(L"EDIT",	// predefined class
 			(LPCWSTR)inText,
 			WS_CHILD | WS_VISIBLE | WS_VSCROLL | ES_LEFT | ES_MULTILINE | ES_AUTOVSCROLL,
 			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-			sMainWnd,	// parent window 
+			sMainWnd,	// parent window
 			NULL, GetModuleHandle(NULL), NULL);
 		GLE(sEditBox);
 		GLE(SetWindowPos(sEditBox, NULL,
@@ -2720,10 +2726,10 @@ void MoSyncExit(int r) {
 
 		//freeChannel(0);
 		AudioEngine::close();
-		
+
 		MANetworkReset();
 
-		//there is no Bluetooth cancel function, so we'll just ignore that for now. 
+		//there is no Bluetooth cancel function, so we'll just ignore that for now.
 		//chalk one up for Known Issues.
 
 		gDrawTargetHandle = HANDLE_SCREEN;
@@ -2746,8 +2752,9 @@ void MoSyncExit(int r) {
 		}
 #ifdef USE_MALIBQUIT
 		MALibQuit();	//disabled, hack to allow static destructors
-#endif	
+#endif
 		AudioEngine::close();
+		MoSyncDBClose();
 
 		reportClose();
 		exit(r);

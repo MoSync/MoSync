@@ -45,5 +45,6 @@ void packageWM(const SETTINGS&, const RuntimeInfo&);
 void packageMoblin(const SETTINGS&, const RuntimeInfo&);
 void packageAndroid(const SETTINGS&, const RuntimeInfo&);
 void packageIOS(const SETTINGS&, const RuntimeInfo&);
+void packageWindowsPhone(const SETTINGS&, const RuntimeInfo&);
 
 #endif	//PACKAGERS_H

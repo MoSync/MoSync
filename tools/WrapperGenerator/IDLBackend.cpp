@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "IDLBackend.h"
 #include "Struct.h"
+#include <algorithm>
 
 using namespace std;
 

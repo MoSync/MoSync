@@ -194,7 +194,7 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType, bool
 	deref = convertConstType(deref);
 
 	std::string type = getType(arrayType, false);
-	std::string value = ""; 
+	std::string value = "";
 	this->exp->updateData(value, type, arrayType->isSimpleValue());
 
 	for(int i = 0; i < arrayType->mLength; i++) {
@@ -210,9 +210,9 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType, bool
 	}
 
 	//children.resize(arrayType->mLength);
-	if(!shouldCreateChildren) { 
+	if(!shouldCreateChildren) {
 		mHasCreatedChildren = false;
-		return; 
+		return;
 	}
 	mHasCreatedChildren = true;
 
@@ -255,11 +255,11 @@ void Variable::addArray(const char* dataAdress, const ArrayType *arrayType, bool
 			value = "";
 			if(!invalidMemory && dataAdress) value = getValue(deref, childAddress, var.printFormat);
 			var.exp->updateData(
-				value, 
-				getType(deref, false), 
+				value,
+				getType(deref, false),
 				deref->isSimpleValue());
 		}
-	}	
+	}
 }
 
 void Variable::addPointer(const char* dataAdress, const PointerType *pointerType, bool shouldCreateChildren, bool invalidMemory) {
@@ -277,11 +277,11 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 
 	if(deref->type() == TypeBase::eBuiltin && ((Builtin*)deref)->mSubType==Builtin::eVoid) {
 		// if it's a void-pointer we don't know the size of the data it is pointing to, thus we don´t give the variable a child.
-		return;		
+		return;
 	}
 
 	//children.resize(1);
-	if(!shouldCreateChildren) { 
+	if(!shouldCreateChildren) {
 		if(deref->type() != TypeBase::eStruct) {
 			StringPrintFunctor spf;
 			spf("*(%s)", localName.c_str());
@@ -289,11 +289,11 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 			spf.reset();
 			children[0].localName = varName;
 		} else {
-			addStruct(NULL, (StructType*)deref, false, true, true);	
+			addStruct(NULL, (StructType*)deref, false, true, true);
 		}
 
-		mHasCreatedChildren = false;	
-		return; 
+		mHasCreatedChildren = false;
+		return;
 	}
 	mHasCreatedChildren = true;
 
@@ -335,8 +335,8 @@ void Variable::addPointer(const char* dataAdress, const PointerType *pointerType
 				value = getValue(pointerType, childAddress, printFormat);
 			}
 			var.exp->updateData(
-				value, 
-				getType(deref, false), 
+				value,
+				getType(deref, false),
 				deref->isSimpleValue());
 		}
 		sVariableMap[var.name] = &var;
@@ -365,7 +365,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 	const vector<BaseClass>& bases = structType->getBases();
 	const vector<DataMember>& dataMembers = structType->getDataMembers();
 
-	std::string value = ""; 
+	std::string value = "";
 	if(!isPointer) {
 		std::string type = getType(structType, false);
 		this->exp->updateData(value, type, structType->isSimpleValue());
@@ -390,9 +390,9 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 		sVariableMap[virtualVar.name] = &virtualVar;
 	}
 
-	if(!shouldCreateChildren) { 
+	if(!shouldCreateChildren) {
 		mHasCreatedChildren = false;
-		//return; 
+		//return;
 	}
 
 	mHasCreatedChildren = true;
@@ -475,7 +475,7 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 				if(dataAdress && !invalidMemory) value = getValue(deref, childAddress, var.printFormat);
 				var.exp->updateData(
 					value,
-					getType(deref, false), 
+					getType(deref, false),
 					deref->isSimpleValue());
 			}
 		}
@@ -484,8 +484,8 @@ void Variable::addStruct(const char* dataAdress, const StructType *structType, b
 
 static void Callback::varEECreate(const Value* v, const char *err) {
 	if(err) {
-		error("%s", err); 
-		return; 
+		error("%s", err);
+		return;
 	}
 
 	//const SYM& sym = v->getSymbol();
@@ -501,7 +501,7 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 	} else if(typeBase->type() == TypeBase::eStruct) {
 		sVar->addStruct((const char*)v->getDataAddress(), (const StructType*)typeBase, true, false, false);
 	} else if(typeBase->type() == TypeBase::ePointer) {
-		sVar->addPointer((const char*)v->getDataAddress(), (const PointerType*)typeBase, true, !v->isDereferencable());	
+		sVar->addPointer((const char*)v->getDataAddress(), (const PointerType*)typeBase, true, !v->isDereferencable());
 
 	} else {
 		std::string type = getType(typeBase, false);
@@ -513,9 +513,9 @@ static void Callback::varEECreate(const Value* v, const char *err) {
 }
 
 static void Callback::varEEUpdate(const Value* v, const char *err) {
-	if(err) { 
-		error("%s", err); 
-		return; 
+	if(err) {
+		error("%s", err);
+		return;
 	}
 
 	const TypeBase* typeBase = convertConstType(v->getTypeBase());
@@ -602,7 +602,7 @@ ExpUpdateResult Expression::update(ExpressionCallback ecb) {
 					}
 					break;
 			}
-		}	
+		}
 		sVar->outOfScope = false;
 	}
 
@@ -743,7 +743,7 @@ static void Callback::varCreate() {
 //******************************************************************************
 
 void var_delete(const string& args) {
-	bool childrenOnly = false;
+	//bool childrenOnly = false;
 	//split args
 	vector<string> argv;
 	splitArgs(args, argv);
@@ -756,7 +756,7 @@ void var_delete(const string& args) {
 			return;
 		}
 		name = argv[1];
-		childrenOnly = true;
+		//childrenOnly = true;
 	} else {
 		error("Bad number of arguments");
 		return;
@@ -882,7 +882,7 @@ static void printListChildrenItem(Variable* var) {
 	oprintf("{name=\"%s\"", var->name.c_str());
 	oprintf(",numchild=\"%"PFZT"\"", var->children.size());
 	printValue(var);
-	oprintf(",type=\"%s\"", (!var->exp)?"":var->exp->type().c_str());	
+	oprintf(",type=\"%s\"", (!var->exp)?"":var->exp->type().c_str());
 	oprintf(",exp=\"%s\"", var->localName.c_str());
 	oprintf("}");
 	if(var->exp)
@@ -993,7 +993,7 @@ static Variable* getAndValidateVariable(const string& args) {
 		return NULL;
 	}
 
-	return var;	
+	return var;
 }
 
 void var_show_format(const string& args) {
@@ -1059,7 +1059,7 @@ void var_list_children(const string& args) {
 			return;
 		}
 	} else {
-		error("Invalid number of arguments.");	
+		error("Invalid number of arguments.");
 		return;
 	}
 
@@ -1109,7 +1109,7 @@ void var_info_expression(const string& args) {
 	if(!var) return;
 	oprintDone();
 	oprintf(",lang=\"C++\",exp=\"%s\"\n", var->localName.c_str());
-	commandComplete();	
+	commandComplete();
 }
 
 void var_info_path_expression(const string& args) {
@@ -1117,7 +1117,7 @@ void var_info_path_expression(const string& args) {
 	if(!var) return;
 	oprintDone();
 	oprintf(",lang=\"C++\",exp=\"%s\"\n", var->exp->getExprText().c_str());
-	commandComplete();	
+	commandComplete();
 
 }
 void var_info_num_children(const string& args) {
