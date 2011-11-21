@@ -37,6 +37,7 @@ LOCAL_SRC_FILES := FileImpl.cpp \
 	../../core/Recompiler/ArmAssembler.cpp \
 	../../core/Recompiler/ArmRecompiler.cpp \
 	../../../../intlibs/hashmap/hashmap.cpp \
+	../../core/Recompiler/ashmem.cpp \
 
 LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog -lGLESv1_CM
 

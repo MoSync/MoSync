@@ -28,8 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 // Comment/comment out to turn on/off logging.
 // TODO: Move this to a header file to support common logging for all files.
-#define SYSLOG(m) __android_log_write(ANDROID_LOG_INFO, "MoSync JNI", m)
-//#define SYSLOG(...)
+//#define SYSLOG(m) __android_log_write(ANDROID_LOG_INFO, "MoSync JNI", m)
+#define SYSLOG(...)
 
 /*
 // This is how you trap exeptions from the Java side.

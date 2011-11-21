@@ -72,6 +72,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -180,12 +181,6 @@ public class MoSyncThread extends Thread
 	 * used for maPanic.
 	 */
 	private boolean mHasDied;
-
-	/**
-	 * Boolean used to determine whether to interrupt the thread or not,
-	 * true if this thread is sleeping in maWait.
-	 */
-	private final AtomicBoolean mIsSleepingInMaWait = new AtomicBoolean(false);
 
 	/**
 	 * a handle used for full screen camera preview
@@ -2490,6 +2485,19 @@ public class MoSyncThread extends Thread
 
 			return 0;
 		}
+/*
+		else if(url.startsWith("tel://"))
+		{
+			if(!(mContext.getPackageManager().checkPermission("android.permission.NFC",
+					mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+			{
+
+			}
+
+			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
+			((Activity)mContext).startActivity(intent);
+		}
+*/
 		return -1;
 	}
 

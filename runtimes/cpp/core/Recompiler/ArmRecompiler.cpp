@@ -37,14 +37,19 @@ using namespace Core;
 #include <unistd.h>
 #include <sys/mman.h>
 #include "ashmem.h"
+//#include <linux/ashmem.h>
+//#include <asm/cacheflush.h>
 
+
+void* _androidMemAddress;
 int _androidMemSize;
+void* _androidEntryAddress;
 int _androidEntryMemSize;
 JNIEnv* mJNIEnv;
 jobject mJThis;
 
-int mAshmemCodeMemory;
-int mAshmemEntryPoint;
+int mAshmemCodeMemory = -1;
+int mAshmemEntryPoint = -1;
 
 #endif
 
@@ -182,9 +187,9 @@ int mAshmemEntryPoint;
 		//round up to page size
 		TInt minSize = ((size-1+pageSize) / pageSize) * pageSize;
 		TInt maxSize = minSize;
-		
+
 		LOG("SafeChunk. request: %i page: %i grant: %i\n", size, pageSize, minSize);
-		
+
 		LHEL(mChunk.CreateLocalCode(minSize, maxSize));
 		mChunkIsOpen = true;
 		return mChunk.Base();
@@ -199,25 +204,72 @@ int mAshmemEntryPoint;
 	}
 #endif	//__SYMBIAN32__
 
+#ifdef _android
+	int alignMemorySize(int size)
+	{
+		int ps = getpagesize();
+		size += ps;
+
+		int n = size/ps;
+		return n*ps;
+	}
+#endif
+
 	void* MoSync::ArmRecompiler::allocateCodeMemory(int size) {
 #ifdef __SYMBIAN32__
 		return mCodeChunk.allocate(size);
 #elif defined(_android)
 
-		mAshmemCodeMemory = ashmem_create_region("mosync_ashmem_code_memory", size); 
+		int alignedSize = alignMemorySize(size);
 
-		int r = ashmem_pin_region(mAshmemCodeMemory, 0, size);
+		//mAshmemCodeMemory = ashmem_create_region("mosync_ashmem_code_memory", alignedSize);
 
+		//int r = ashmem_pin_region(mAshmemCodeMemory, 0, alignedSize);
+/*
 		char b[100];
-		sprintf(b, "ashmem_pin_region returned: %d\n", r);
+
+		sprintf(b, "size from %i to %i\n", size, alignedSize);
 		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
-		
-		void* mem = mmap(NULL, size,
+
+		//sprintf(b, "ashmem_pin_region returned: %d\n", r);
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
+		void* mem = mmap(NULL, alignedSize,
 			PROT_READ | PROT_WRITE | PROT_EXEC,
-			MAP_PRIVATE, mAshmemCodeMemory, 0);
-		
+			MAP_PRIVATE, -1, 0);//mAshmemCodeMemory, 0);
+
+
+		_androidMemAddress = mem;
+*/
+		char b[100];
+
+		sprintf(b, "size from %i to %i\n", size, alignedSize);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
+		void* mem = memalign(getpagesize(), alignedSize);
+
+		if(mem == 0)
+		{
+			__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code memory not allocated!");
+			return 0;
+		}
+
+		void* mmem = mmap(mem, alignedSize, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE, -1, 0);
+
+		if(mmem <= 0)
+		{
+			__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code memory not memory mapped!");
+			return 0;
+		}
+
+		_androidMemAddress = mem;
+		_androidMemSize = alignedSize;
+
 		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "code memory succesfully created!");
-		
+
+		sprintf(b, "code memory created at %d (%x)\n", (int)mem, (int)mem);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
 		return mem;
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
@@ -228,21 +280,57 @@ int mAshmemEntryPoint;
 #ifdef __SYMBIAN32__
 		return mEntryChunk.allocate(size);
 #elif defined(_android)
-		mAshmemEntryPoint = ashmem_create_region("mosync_ashmem_entry_point", size);
-		
-		int r = ashmem_pin_region(mAshmemEntryPoint, 0, size);
-		
+
+		int alignedSize = size;//alignMemorySize(size);
+
+		mAshmemEntryPoint = ashmem_create_region("mosync_ashmem_entry_point", alignedSize);
+
+		//int r = ashmem_pin_region(mAshmemEntryPoint, 0, alignedSize);
+
 		char b[100];
-		sprintf(b, "ashmem_pin_region returned: %d\n", r);
+
+		sprintf(b, "size from %i to %i\n", size, alignedSize);
 		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
-		
-		void* mem = mmap(NULL, size,
+
+		//sprintf(b, "ashmem_pin_region returned: %d\n", r);
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
+		void* mem = mmap(NULL, alignedSize,
 			PROT_READ | PROT_WRITE | PROT_EXEC,
 			MAP_PRIVATE, mAshmemEntryPoint, 0);
-		
+/*
+
+		char b[100];
+		sprintf(b, "size from %i to %i\n", size, alignedSize);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
+		void* mem = memalign(getpagesize(), alignedSize);
+		if(mem == 0)
+		{
+			__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "entry memory not allocated!");
+			return 0;
+		}
+
+		void* mmem = mmap(mem, alignedSize, PROT_READ|PROT_WRITE|PROT_EXEC, MAP_PRIVATE, -1, 0);
+		if(mmem <= 0)
+		{
+			__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "entry memory not memory mapped!");
+			return 0;
+		}
+*/
+		_androidEntryAddress = mem;
+		_androidEntryMemSize = alignedSize;
+
 		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "entry point succesfully created!");
-		
+
+		sprintf(b, "entry point created at %d (%x)\n", (int)mem, (int)mem);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
 		return mem;
+
+//		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "allocating entry point");
+
+//		return allocateCodeMemory(size);
 #else	// winmobile
 		return VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
 #endif
@@ -284,6 +372,11 @@ int mAshmemEntryPoint;
 		User::IMB_Range(addr, end);
 		LOGD("User::IMB_Range worked\n");
 #elif defined(_android)
+		addr = (void*) ((int)addr & ~0xFFF);
+		 len = (len+8192) & ~0xFFF;
+
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "flushing instruction cache");
+
 		cacheflush((long int)addr, (long int)addr+len, 0);
 		return;
 #else // winmobile
@@ -331,10 +424,14 @@ namespace MoSync {
 
 		// store mosync register address
 		entryPoint.MOV_imm32(REGISTER_ADDR, (int)&mEnvironment.regs[0]);
-		
+
 		loadEnvironmentRegisters(entryPoint);
 
 		loadStaticRegisters(entryPoint);
+
+		char b[100];
+		sprintf(b, "AA::PC %d AA::r0 %d\n", AA::PC, AA::R0);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
 
 		// goto recompiled code
 		entryPoint.MOV(AA::PC, AA::R0);
@@ -389,7 +486,7 @@ namespace MoSync {
 	#endif
 
 		for(int i = 0; i < NUM_STATICALLY_ALLOCATED_REGISTERS; i++) {
-			if(registerMapping[i].msReg == msReg) {			
+			if(registerMapping[i].msReg == msReg) {
 				return registerMapping[i].armReg;
 			}
 		}
@@ -492,9 +589,9 @@ namespace MoSync {
 
 		AA::Register reg = loadRegister(REG_sp, AA::R1);
 		assm.ADD(AA::R1, reg, MEMORY_ADDR(AA::R2));
-		
-		for(int i = rd; i > rd-imm32; i--) 
-		{	
+
+		for(int i = rd; i > rd-imm32; i--)
+		{
 			AA::Register saveReg = getSaveRegister(i, AA::R2);
 			assm.LDR(saveReg, 0, AA::R1);
 			saveRegister(i, saveReg);
@@ -505,7 +602,7 @@ namespace MoSync {
 		saveRegister(REG_sp, saveReg);
 	}
 
-	void ArmRecompiler::visit_CALL() { 
+	void ArmRecompiler::visit_CALL() {
 		LOGC("CALL\n");
 		byte rd = mInstructions[0].rd;
 
@@ -519,7 +616,7 @@ namespace MoSync {
 		assm.AND(AA::R1, reg, AA::R2);
 
 		//assm.MOV_imm32(AA::R0, (int)mPipeToArmInstMap); // r0 = pipeToArmInstMap
-		
+
 		assm.LSL_i(AA::R1, AA::R1, 2); // *sizeof(int)
 		assm.ADD(AA::R0, PIPE_TO_ARM_MAP(AA::R3), AA::R1);           // r0 += r1
 		assm.LDR(AA::R2, 0, AA::R0);                // r1 = *r0
@@ -537,7 +634,7 @@ namespace MoSync {
 		LOGC("LDB\n");
 		byte rd = mInstructions[0].rd;
 		byte rs = mInstructions[0].rs;
-		int imm32 = mInstructions[0].imm;		
+		int imm32 = mInstructions[0].imm;
 		LOAD(LDRBS, rd, rs, imm32, char);
 	}
 
@@ -545,7 +642,7 @@ namespace MoSync {
 		LOGC("STB\n");
 		byte rd = mInstructions[0].rd;
 		byte rs = mInstructions[0].rs;
-		int imm32 = mInstructions[0].imm;	
+		int imm32 = mInstructions[0].imm;
 		STORE(STRB, rd, rs, imm32, char);
 	}
 
@@ -557,7 +654,7 @@ namespace MoSync {
 		LOAD(LDRHS, rd, rs, imm32, short);
 	}
 
-	void ArmRecompiler::visit_STH() { 
+	void ArmRecompiler::visit_STH() {
 		LOGC("STH\n");
 		byte rd = mInstructions[0].rd;
 		byte rs = mInstructions[0].rs;
@@ -606,7 +703,7 @@ namespace MoSync {
 		ARITHMETIC(ADD, rd, rs);
 	}
 
-	void ArmRecompiler::visit_ADDI() { 
+	void ArmRecompiler::visit_ADDI() {
 		LOGC("ADDI\n");
 		byte rd = mInstructions[0].rd;
 		int imm32 = mInstructions[0].imm;
@@ -658,7 +755,7 @@ namespace MoSync {
 		ARITHMETIC_IMM_OPT(AND, rd, imm32);
 	}
 
-	void ArmRecompiler::visit_OR() { 
+	void ArmRecompiler::visit_OR() {
 		LOGC("OR\n");
 		byte rd = mInstructions[0].rd;
 		byte rs = mInstructions[0].rs;
@@ -679,7 +776,7 @@ namespace MoSync {
 		ARITHMETIC(EOR, rd, rs);
 	}
 
-	void ArmRecompiler::visit_XORI() { 
+	void ArmRecompiler::visit_XORI() {
 		LOGC("XORI\n");
 		byte rd = mInstructions[0].rd;
 		int imm32 = mInstructions[0].imm;
@@ -751,7 +848,7 @@ namespace MoSync {
 		int imm32 = mInstructions[0].imm;
 		ARITHMETIC_IMM_DIRECT(LSL_i, rd, imm32);
 	}
-	
+
 	void ArmRecompiler::visit_SRA() {
 		LOGC("SRA\n");
 		byte rd = mInstructions[0].rd;
@@ -772,7 +869,7 @@ namespace MoSync {
 		byte rs = mInstructions[0].rs;
 		ARITHMETIC(LSR, rd, rs);
 	}
-	
+
 	void ArmRecompiler::visit_SRLI() {
 		LOGC("SRLI\n");
 		byte rd = mInstructions[0].rd;
@@ -841,7 +938,7 @@ namespace MoSync {
 		JUMP_IMM16(rd, rs, imm32, AA::GE);
 	}
 
-	void ArmRecompiler::visit_JC_GEU() { 
+	void ArmRecompiler::visit_JC_GEU() {
 		LOGC("JC_GEU\n");
 		byte rd = mInstructions[0].rd;
 		byte rs = mInstructions[0].rs;
@@ -865,7 +962,7 @@ namespace MoSync {
 		JUMP_IMM16(rd, rs, imm32, AA::HI);
 	}
 
-	void ArmRecompiler::visit_JC_LE() { 
+	void ArmRecompiler::visit_JC_LE() {
 		LOGC("JC_LE\n");
 		byte rd = mInstructions[0].rd;
 		byte rs = mInstructions[0].rs;
@@ -873,7 +970,7 @@ namespace MoSync {
 		JUMP_IMM16(rd, rs, imm32, AA::LE);
 	}
 
-	void ArmRecompiler::visit_JC_LEU() { 
+	void ArmRecompiler::visit_JC_LEU() {
 		LOGC("JC_LEU\n");
 		byte rd = mInstructions[0].rd;
 		byte rs = mInstructions[0].rs;
@@ -929,7 +1026,7 @@ namespace MoSync {
 			LOAD_MEMORY_FUNC(LDRBS, &mEnvironment.regs[rs], saveReg, AA::R1);
 		} else {
 			LOAD_MEMORY_FUNC(LDRBS, &mEnvironment.regs[rs], saveReg, AA::R1);
-		}	
+		}
 		saveRegister(rd, saveReg);
 	}
 
@@ -942,9 +1039,9 @@ namespace MoSync {
 		if(rs<64) {
 			SAVE_MEMORY(&mEnvironment.regs[rs], loadRegister(rs, AA::R3), AA::R1);
 			LOAD_MEMORY_FUNC(LDRHS, &mEnvironment.regs[rs], saveReg, AA::R1);
-		} else {		
+		} else {
 			LOAD_MEMORY_FUNC(LDRHS, &mEnvironment.regs[rs], saveReg, AA::R1);
-		}	
+		}
 		saveRegister(rd, saveReg);
 	}
 
@@ -958,7 +1055,7 @@ namespace MoSync {
 
 	//#if 1
 	#if 0
-		switch(syscallNumber) 
+		switch(syscallNumber)
 		{
 	#include "invoke_syscall_arm_recompiler.h"
 		}
@@ -975,7 +1072,7 @@ namespace MoSync {
 
 		assm.MOV(AA::LR, AA::PC);
 		assm.MOV(AA::PC, AA::R2);
-		
+
 		saveStackPointer(assm, AA::R3);
 
 		loadStaticRegisters(assm);
@@ -997,9 +1094,9 @@ namespace MoSync {
 
 		if(mPass!=1) {
 			assm.mip = &assm.mipStart[lastPc];
-			assm.SET_CONDITION_CODE(AA::EQ); 
+			assm.SET_CONDITION_CODE(AA::EQ);
 			assm.B((newPc-(lastPc))*sizeof(AA::MDInstruction)); // inject branch
-			assm.SET_CONDITION_CODE(AA::AL); 
+			assm.SET_CONDITION_CODE(AA::AL);
 			assm.mInstructionCount--;
 			assm.mip = &assm.mipStart[newPc];
 		}
@@ -1018,7 +1115,7 @@ namespace MoSync {
 		assm.SUB(AA::R2, loadRegister(rd, AA::R2), AA::R0); // index
 
 		assm.CMP(AA::R2, AA::R1);
-		
+
 		int label = ARM_PC;
 		assm.B(0);
 
@@ -1030,7 +1127,7 @@ namespace MoSync {
 		assm.LDR(AA::R0, 0, AA::R1); // ip
 
 		SET_PC(AA::R0, AA::R2);
-			
+
 		if(mPass!=1) {
 			assm.SET_CONDITION_CODE(AA::HI);
 			int continueLabel = ARM_PC; // jump over next branch
@@ -1042,10 +1139,10 @@ namespace MoSync {
 		}
 
 		assm.MOV_imm32(AA::R1, RECOMP_MEM(int, imm32 + 2*sizeof(int), READ));
-		
+
 		SET_PC(AA::R1, AA::R2);
 	}
-	
+
 	void ArmRecompiler::visit_FAR() {
 		LOGC("FAR\n");
 		int op = mInstructions[0].op2;
@@ -1067,19 +1164,19 @@ namespace MoSync {
 			case _JC_GTU:	JUMP_IMM16(rd, rs, imm32, AA::HI); break;
 			case _JC_LEU:	JUMP_IMM16(rd, rs, imm32, AA::LS); break;
 
-			case _JPI:		
+			case _JPI:
 			{
 				JUMP_GEN(imm32);
 			}
 			break;
 		}
 	}
-	
+
 	ArmRecompiler::ArmRecompiler() :
 		Recompiler<ArmRecompiler>(2) {
 		mPipeToArmInstMap = NULL;
 		mInstructions = NULL;
-		INSTRUCTIONS(SETUP_DEFAULT_VISITOR_ELEM);	
+		INSTRUCTIONS(SETUP_DEFAULT_VISITOR_ELEM);
 	}
 
 	void ArmRecompiler::analyze() {
@@ -1103,9 +1200,9 @@ namespace MoSync {
 			byte op = inst.op;
 			if(inst.op2!=_ENDOP) op = inst.op2;
 			int imm32 = inst.imm;
-			//int rd = inst.rd, 
+			//int rd = inst.rd,
 				//rs = inst.rs;
-			
+
 
 			if(op==_JC_EQ ||
 			   op==_JC_NE ||
@@ -1121,7 +1218,7 @@ namespace MoSync {
 				int len = imm32 - (int)(lastIp-mEnvironment.mem_cs);
 				if(len<0) {
 					int i = imm32;
-					for(int j = 0; j < -len; j++) { 
+					for(int j = 0; j < -len; j++) {
 						loopWeights[i++]++;
 					}
 				}
@@ -1133,7 +1230,7 @@ namespace MoSync {
 			int loopWeight = (int)loopWeights[(int)(ip-mEnvironment.mem_cs)];
 			loopWeight = 1+loopWeight*loopWeight;
 			//const byte *lastIp = ip;
-			
+
 			inst.rd = _ENDOP; inst.rs = _ENDOP;
 			ip += decodeInstruction(ip, inst);
 
@@ -1164,7 +1261,7 @@ namespace MoSync {
 		LOG("Statically allocated registers:\n");
 		for(int i = 0; i < NUM_STATICALLY_ALLOCATED_REGISTERS; i++) {
 			LOG("Reg%d\n", registerMapping[i].msReg);
-		}	
+		}
 	}
 
 	void ArmRecompiler::endPass() {
@@ -1179,7 +1276,7 @@ namespace MoSync {
 	}
 
 	void ArmRecompiler::beginPass() {
-		if(mPass==1) {			
+		if(mPass==1) {
 			analyze();
 
 			// reset
@@ -1209,7 +1306,7 @@ namespace MoSync {
 	}
 
 	void ArmRecompiler::beginInstruction(int ip) {
-		if(mPass==1) {			
+		if(mPass==1) {
 			// reset
 			assm.mip = tempInst;
 			mPipeToArmInstMap[ip] = assm.mInstructionCount*sizeof(AA::MDInstruction);
@@ -1223,7 +1320,7 @@ namespace MoSync {
 
 #ifdef LOG_STATE_CHANGE
 			emitOneArgFuncCall(&ArmRecompiler::logStateChange, ip);
-#endif	
+#endif
 	}
 #ifdef LOG_STATE_CHANGE
 	void ArmRecompiler::logStateChange(int ip) {
@@ -1232,7 +1329,7 @@ namespace MoSync {
 #endif
 
 	void ArmRecompiler::debugBreak(int a) {
-#ifdef _WIN32	
+#ifdef _WIN32
 		DebugBreak();
 #endif
 	}
@@ -1259,13 +1356,38 @@ namespace MoSync {
 			ip = (int)mPipeToArmInstMap[mEnvironment.entryPoint];
 			mStopped = false;
 		}
+
+		char b[100];
+
+		sprintf(b, "entry point fd %i\n", mAshmemEntryPoint);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
+		sprintf(b, "code memory fd %i\n", mAshmemCodeMemory);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
+		sprintf(b, "entryPoint.mipstart %i (%x) ip %i (%x)\n", entryPoint.mipStart, entryPoint.mipStart,  ip, ip);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
+		sprintf(b, "diff  %i (%x)\n", ((int)ip-(int)entryPoint.mipStart), ((int)ip-(int)entryPoint.mipStart));
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
+		flushInstructionCache(_androidMemAddress, _androidMemSize);
+		flushInstructionCache(_androidEntryAddress, _androidEntryMemSize);
+
 		//LOGD("Entering generated code...\n");
 		int arm_ip = ((int (*)(int))entryPoint.mipStart)(ip);
+
+		sprintf(b, "entry point mip start %i\n", (int)arm_ip);
+		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
+
 		//LOGD("Exited generated code.\n");
 		return arm_ip;
 	}
 
 	int ArmRecompiler::shiftAriMatcher() {
+
+		//__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "shiftAriMatcher");
+
 		const Instruction& i1 = mInstructions[0];
 		const Instruction& i2 = mInstructions[1];
 		if(i1.rd == i2.rs && i2.rd == i2.rs) return 1;
@@ -1273,18 +1395,18 @@ namespace MoSync {
 	}
 
 	void ArmRecompiler::shiftAriVisitor() {
-#ifdef _WIN32	
+#ifdef _WIN32
 		DebugBreak();
 #endif
 	}
 
-#if 0	
-#ifdef __SYMBIAN32__	
+#if 0
+#ifdef __SYMBIAN32__
 static void MyExceptionHandlerL(TExcType aType)
 {
 	LOG("Exception type: %d", aType);
    User::Leave(KErrGeneral);
-   
+
    /*
    switch (aType)
        {
@@ -1293,14 +1415,14 @@ static void MyExceptionHandlerL(TExcType aType)
           // console->Printf(_L("Access Voilation Exception\n"));
 		   User::After(TTimeIntervalMicroSeconds32(1000000));
            User::Leave(KErrGeneral);
-           break;        
+           break;
            }
         //You can add more exceptions which are defined in e32const.h in TExcType Enumerator
        }
 	   */
 }
-#endif	
-#endif // 0	
+#endif
+#endif // 0
 #ifndef _android
 	void ArmRecompiler::init(Core::VMCore *core, int *VM_Yield) {
 #else
@@ -1323,7 +1445,7 @@ static void MyExceptionHandlerL(TExcType aType)
 	User::SetExceptionHandler(MyExceptionHandlerL, KExceptionFault|KExceptionInteger|KExceptionAbort|KExceptionKill|KExceptionFpe|KExceptionUserInterrupt);
 	#else
 	RThread().SetExceptionHandler(MyExceptionHandlerL, KExceptionFault|KExceptionInteger|KExceptionAbort|KExceptionKill|KExceptionFpe|KExceptionUserInterrupt);
-	#endif		
+	#endif
 #endif // 0
 #endif // __SYMBIAN32__
 		mPipeToArmInstMap = new
@@ -1356,7 +1478,7 @@ static void MyExceptionHandlerL(TExcType aType)
 		for(unsigned int i = 0; i < sizeof(shifts); i++) {
 			pattern[0] = shifts[i];
 			for(unsigned int j = 0; j < sizeof(arithmetics); j++) {
-				pattern[1] = arithmetics[j];				
+				pattern[1] = arithmetics[j];
 				setPattern(&ArmRecompiler::shiftAriMatcher, &ArmRecompiler::shiftAriVisitor, pattern);
 			}
 
