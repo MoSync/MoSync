@@ -70,12 +70,15 @@
     <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
     <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
+    <Compile Include="Source\Modules\NativeUI\ListView.cs" />
+    <Compile Include="Source\Modules\NativeUI\ListViewItem.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSycnWebView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncButton.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncCheckBox.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncEditBox.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncHorizontalLayout.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncImage.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncImageButton.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncLabel.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncNativeUI.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncNativeUIWindowsPhone.cs" />
