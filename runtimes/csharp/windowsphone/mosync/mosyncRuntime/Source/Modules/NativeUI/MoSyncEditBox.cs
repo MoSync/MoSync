@@ -1,4 +1,30 @@
-﻿using Microsoft.Phone.Controls;
+﻿/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+/**
+ * @file EditBox.cs
+ * @author Rata Gabriela
+ *
+ * @brief This represents the EditBox Widget implementation for the NativeUI
+ *        component on Windows Phone 7, language C#
+ *
+ * @platform WP 7.1
+ **/
+
+using Microsoft.Phone.Controls;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Navigation;
@@ -10,12 +36,31 @@ namespace MoSync
 {
     namespace NativeUI
     {
+        /**
+         * The EditBox class defines the attributes and behavior of a EditBox widget
+         */
         public class EditBox : WidgetBaseWindowsPhone
         {
+            /**
+             * TextBox control (receives user input)
+             */
             protected System.Windows.Controls.TextBox mEditBox;
+
+            /**
+            * if set to true, indicates that all the words typed by the user will start with capital letters
+            */
             protected bool mInitialCapsWord;
+
+            /**
+             * if set to true, indicates that all the sentences will start with capital letters
+             */
             protected bool mInitialCapsSentence;
 
+            /**
+             * Helper function that sets the input mode of the edit box
+             * @param scopeValue: indicates the type of input that is expected from the user.
+             * Can have values like: Url, FullFilePath, FileName, EmailUserName, PostalCode, Password, Numeric
+             */
             protected void setInputMode(System.Windows.Input.InputScopeNameValue scopeValue)
             {
                 System.Windows.Input.InputScope keyboard = new System.Windows.Input.InputScope();
@@ -26,6 +71,9 @@ namespace MoSync
                 mEditBox.InputScope = keyboard;
             }
 
+            /**
+             * Constructor
+             */
             public EditBox()
             {
                 mEditBox = new System.Windows.Controls.TextBox();
@@ -34,6 +82,9 @@ namespace MoSync
                 mInitialCapsSentence = false;
             }
 
+            /**
+             * Property for setting and getting the text that the edit box contains.
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_TEXT)]
             public String Text
             {
@@ -47,6 +98,9 @@ namespace MoSync
                 }
             }
 
+            /**
+            * Property for setting the default text that the edit box will contain when first displayed
+            */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_PLACEHOLDER)]
             public String Placeholder
             {
@@ -56,7 +110,10 @@ namespace MoSync
                 }
             }
 
-            //showKeyboard "true" or "false"
+            /**
+             * Property for showing/hidding the keyboard
+             * set: accepts a String containg the values "true" and "false"
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_SHOW_KEYBOARD)]
             public String ShowKeyboard
             {
@@ -66,8 +123,10 @@ namespace MoSync
                 }
             }
 
-
-            //validvalue Either 'password' or 'text'.
+            /**
+            * Property for setting the input mode for the edit box.
+            * set: accepts a String containg the values "text" or "password"
+            */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_EDIT_MODE)]
             public String EditMode
             {
@@ -91,6 +150,11 @@ namespace MoSync
                 }
             }
 
+            /**
+             * Property for setting the input mode for the edit box.
+             * The values have to be the constants defined in IX_WIDGET.h (WidgetEditBoxConstants)  MAW_EDIT_BOX_TYPE_ANY,
+             * MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_PHONENUMBER ect.
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_INPUT_MODE)]
             public String InputMode
             {
