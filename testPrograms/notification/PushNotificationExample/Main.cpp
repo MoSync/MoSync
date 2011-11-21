@@ -58,6 +58,30 @@ public:
         delete mMainScreen;
     }
 
+	/**
+	 * This method is called when the application is closed.
+	 */
+	void NativeUIMoblet::closeEvent()
+	{
+		// Deallocate the main screen.
+		delete mMainScreen;
+		mMainScreen = NULL;
+
+		// Exit the app.
+		close();
+	}
+
+	/**
+	 * Method called when a key is pressed.
+	 */
+	void NativeUIMoblet::keyPressEvent(int keyCode, int nativeCode)
+	{
+	    // Close the application if the back key is pressed.
+	    if(MAK_BACK == keyCode)
+	    {
+	        closeEvent();
+	    }
+	}
 private:
     MainScreen* mMainScreen;
 };

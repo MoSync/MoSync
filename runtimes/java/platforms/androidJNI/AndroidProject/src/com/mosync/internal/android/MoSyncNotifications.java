@@ -2,33 +2,43 @@ package com.mosync.internal.android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
+import android.util.Log;
 
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
 
 /**
  * Wrapper for Notifications Syscalls to avoid cluttering the MoSyncSyscalls file.
  */
-class MoSyncNotifications {
-
+class MoSyncNotifications
+{
 	/**
 	 * Constructor.
 	 * @param thread
 	 *            The MoSync thread.
 	 */
-	public MoSyncNotifications(MoSyncThread thread) {
+	public MoSyncNotifications(MoSyncThread thread)
+	{
+		Log.e("emma","In MosyncNotifications");
 		mMoSyncThread = thread;
 		mLocalNotificationsManager = new LocalNotificationsManager();
-		mPushNotificationManager = new PushNotificationsManager(thread,thread.getActivity());
+		// C2DM supports only devices with Android 2.2 and higher.
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
+		{
+			mPushNotificationManager = new PushNotificationsManager(thread, getActivity());
+		}
 		mLocalNotificationsManager.mMoSyncThread = thread;
 	}
 
 	/**
 	 * @return The Activity object.
 	 */
-	private Activity getActivity() {
+	private Activity getActivity()
+	{
 		return mMoSyncThread.getActivity();
 	}
 
@@ -79,30 +89,70 @@ class MoSyncNotifications {
 
 	int maNotificationPushGetRegistration(int buf, int bufSize)
 	{
-		return mPushNotificationManager.getRegistrationData(buf, bufSize);
+		if ( mPushNotificationManager != null)
+		{
+			return mPushNotificationManager.getRegistrationData(buf, bufSize);
+		}
+		else
+		{
+			Log.e("@@MoSync","maNotificationPushGetRegistration Platform unsupported");
+			return MA_NOTIFICATION_RES_ERROR;
+		}
 	}
 
 	int maNotificationPushUnregister()
 	{
-		return mPushNotificationManager.unregister();
+		if ( mPushNotificationManager != null)
+		{
+			return mPushNotificationManager.unregister();
+		}
+		else
+		{
+			Log.e("@@MoSync","maNotificationPushUnregister Platform unsupported");
+			return MA_NOTIFICATION_RES_ERROR;
+		}
 	}
 
 	int maNotificationPushGetData(int pushNotificationHandle,
 			int allertMessage, int allertMessageSize)
 	{
-		return mPushNotificationManager.getPushData(pushNotificationHandle, allertMessage, allertMessageSize);
+		if ( mPushNotificationManager != null )
+		{
+			return mPushNotificationManager.getPushData(pushNotificationHandle, allertMessage, allertMessageSize);
+		}
+		else
+		{
+			Log.e("@@MoSync","maNotificationPushGetData Platform unsupported");
+			return MA_NOTIFICATION_RES_ERROR;
+		}
 	}
 
 	int maNotificationPushSetTickerText(String text)
 	{
-		mPushNotificationManager.setTickerText(text);
-		return MA_NOTIFICATION_RES_OK;
+		if ( mPushNotificationManager != null )
+		{
+			mPushNotificationManager.setTickerText(text);
+			return MA_NOTIFICATION_RES_OK;
+		}
+		else
+		{
+			Log.e("@@MoSync","maNotificationPushSetTickerText Platform unsupported");
+			return MA_NOTIFICATION_RES_ERROR;
+		}
 	}
 
 	int maNotificationPushSetMessageTitle(String title)
 	{
-		mPushNotificationManager.setMessageTitle(title);
-		return MA_NOTIFICATION_RES_OK;
+		if ( mPushNotificationManager != null )
+		{
+			mPushNotificationManager.setMessageTitle(title);
+			return MA_NOTIFICATION_RES_OK;
+		}
+		else
+		{
+			Log.e("@@MoSync","maNotificationPushSetMessageTitle Platform unsupported");
+			return MA_NOTIFICATION_RES_ERROR;
+		}
 	}
 	/************************ Class members ************************/
 	/**

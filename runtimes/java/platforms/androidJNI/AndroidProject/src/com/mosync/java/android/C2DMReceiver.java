@@ -3,6 +3,9 @@ package com.mosync.java.android;
 import com.google.android.c2dm.C2DMBaseReceiver;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
 
+import android.app.Notification;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -12,10 +15,37 @@ import android.util.Log;
  * @author emma tresanszki
  *
  */
-public class C2DMReceiver extends C2DMBaseReceiver {
-	public C2DMReceiver() {
+public class C2DMReceiver extends C2DMBaseReceiver
+{
+	/**
+	 * The name of the extra data sent when launching MoSync activity.
+	 * Used at incoming push notifications.
+	 */
+	public static String MOSYNC_INTENT_EXTRA_MESSAGE = "com.mosync.java.android.IntentExtra";
+
+	public C2DMReceiver()
+	{
 		// Email address currently not used by the C2DM Messaging framework
 		super("dummy@google.com");
+	}
+
+	/**
+	 * Launch the MoSync application when a push notification is received.
+	 * @param context
+	 * @param message The push message.
+	 */
+	private static void activateMoSyncApp(Context context, String message)
+	{
+		Log.e("@@MoSync","Launch MoSync activity");
+
+		Intent launcherIntent = new Intent(context, MoSync.class);
+		launcherIntent.setAction(C2DMBaseReceiver.C2DM_INTENT);
+		// Add the push message to the intent.
+		launcherIntent.putExtra(MOSYNC_INTENT_EXTRA_MESSAGE, message);
+		launcherIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+				| Intent.FLAG_ACTIVITY_REORDER_TO_FRONT
+				| Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		context.startActivity(launcherIntent);
 	}
 
 	/**
@@ -40,10 +70,20 @@ public class C2DMReceiver extends C2DMBaseReceiver {
 		Log.e("@@MoSync", "C2DM Message received");
 		// Create new PushNotificationObject that holds the payload.
 		final String message = intent.getStringExtra("payload");
+		// Process the message only if the payload string is not empty.
 		if ( message != null )
 		{
-			PushNotificationsManager manager = PushNotificationsManager.getRef();
-			manager.messageReceived(message);
+			// If the MoSync activity is already started,
+			// just display the notification and send the push event.
+			if ( PushNotificationsManager.getRef() != null )
+			{
+				PushNotificationsManager.getRef().messageReceived(message);
+			}
+			else
+			{
+				// Otherwise, start the MoSync activity and display the notification.
+				activateMoSyncApp(context, message);
+			}
 		}
 	}
 

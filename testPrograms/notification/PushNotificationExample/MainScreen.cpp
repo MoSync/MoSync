@@ -52,6 +52,7 @@ MA 02110-1301, USA.
 #include "MAHeaders.h"
 #include "SoundListener.h"
 #include "TCPConnection.h"
+#include "Util.h"
 
 /**
  * Constructor.
@@ -61,23 +62,114 @@ MainScreen::MainScreen() :
     mSoundListener(NULL),
     mConnection(NULL),
     mMessageLabel(NULL),
-    mImage(NULL)
+    mImage(NULL),
+	mSendRegistrationNeeded(false)
 {
     mCurrentImageHandle = RES_IMAGE1;
     this->createMainLayout();
 
-    Notification::NotificationManager::getInstance()->registerPushNotification(
-        Notification::PUSH_NOTIFICATION_TYPE_BADGE |
-        Notification::PUSH_NOTIFICATION_TYPE_ALERT |
-        Notification::PUSH_NOTIFICATION_TYPE_SOUND,
-        "");
+	if ( isAndroid() )
+	{
+		// Store the reg ID, and call registration only once per app.
+		checkStore();
+	}
+	else
+	{
+		Notification::NotificationManager::getInstance()->registerPushNotification(
+				Notification::PUSH_NOTIFICATION_TYPE_BADGE |
+				Notification::PUSH_NOTIFICATION_TYPE_ALERT |
+				Notification::PUSH_NOTIFICATION_TYPE_SOUND,
+				"emma.tresanszki@mobilesorcery.com");
+		mConnection = new TCPConnection(this);
+	}
+
     Notification::NotificationManager::getInstance()->addPushNotificationListener(this);
     MAUtil::Environment::getEnvironment().addTimer(this, 200, 0);
-    mSoundListener = new SoundListener();
-    mSoundListener->start();
-    mConnection = new TCPConnection();
+    //mSoundListener = new SoundListener();
+    //mSoundListener->start();
+	Notification::NotificationManager::getInstance()->setPushNotificationsTickerText("My message");
+	Notification::NotificationManager::getInstance()->setPushNotificationsTitle("MoSync Push notification");
 }
 
+
+/**
+ * Android only.
+ * Check if store exists, and get the registration value.
+ * If not exist, create it and write to it the received reg.
+ */
+void MainScreen::checkStore()
+{
+	MAHandle myStore = maOpenStore("MyStore", 0);
+
+		if(myStore == STERR_NONEXISTENT)
+		{
+
+			printf("Need to create the store -----------------------------");
+
+			mSendRegistrationNeeded = true;
+
+			// Request registration ID.
+			Notification::NotificationManager::getInstance()->registerPushNotification(
+					Notification::PUSH_NOTIFICATION_TYPE_BADGE |
+					Notification::PUSH_NOTIFICATION_TYPE_ALERT |
+					Notification::PUSH_NOTIFICATION_TYPE_SOUND,
+					"emma.tresanszki@mobilesorcery.com");
+
+			// Initiate connection to the server.
+//			mConnection = new TCPConnection();
+
+			// Close store without deleting it.
+			maCloseStore(myStore,0);
+		}
+		else
+		{
+			printf("Store is already created ----------------------------");
+			mSendRegistrationNeeded = false;
+/*
+		     // Store does exist, and myData is a valid handle to it.
+			// This means that the registration ID was already send to the server.
+			MAHandle myData = maCreatePlaceholder();
+			//MAHandle myStore = maOpenStore("MyStore", 0);
+			// The store exists, so we can read from it.
+			int result = maReadStore(myStore, myData);
+			if(result == RES_OUT_OF_MEMORY)
+			{
+				// This store is too large to read into memory - error
+			}
+			char registration[maGetDataSize(myData)];
+			maReadData(myData, &registration, 0, maGetDataSize(myData));
+*/
+			// Close store without deleting it.
+			maCloseStore(myStore,0);
+		}
+
+}
+
+void MainScreen::storeRegistrationID(MAUtil::String& token)
+{
+	mToken = token;
+
+	// Store doesn't exist.
+	MAHandle myStore = maOpenStore("MyStore", MAS_CREATE_IF_NECESSARY);
+
+	// Create store and write Registration ID
+	MAHandle myData = maCreatePlaceholder();
+	if(maCreateData(myData, token.length()) == RES_OK)
+	{
+		 maWriteData(myData, token.c_str(), 0, token.length());
+		 // Write the data resource to the store.
+		 int result = maWriteStore(myStore, myData);
+
+		 if ( result < 0 )
+		 {
+			 printf("Cannot write to store the token!!");
+		 }
+		 maCloseStore(myStore, 0);
+	}
+
+	// Finally, send it over TCP to the server.
+	//mConnection->sendData(token);
+}
 /**
  * Destructor.
  */
@@ -122,11 +214,12 @@ void MainScreen::createMainLayout() {
     // Add the message label to layout.
     mMessageLabel = new NativeUI::Label();
     mMessageLabel->setText("");
-    mMessageLabel->setPropertyInt(MAW_LABEL_MAX_NUMBER_OF_LINES, 0);
-    mMessageLabel->setPropertyFloat(MAW_WIDGET_LEFT, left);
-    mMessageLabel->setPropertyFloat(MAW_WIDGET_TOP, top);
-    mMessageLabel->setWidth((int)widgetWidth);
-    mMessageLabel->setHeight((int)widgetHeight);
+	mMessageLabel->setLeftPosition((int)left);
+	mMessageLabel->setTopPosition((int)top);
+	mMessageLabel->setFontColor(0xFF0000);
+   // mMessageLabel->setPropertyInt(MAW_LABEL_MAX_NUMBER_OF_LINES, 0);
+	mMessageLabel->setWidth((int)widgetWidth);
+	mMessageLabel->setHeight((int)widgetHeight);
     mainLayout->addChild(mMessageLabel);
 }
 
@@ -149,19 +242,29 @@ void MainScreen::didReceivePushNotification(
 void MainScreen::didApplicationRegistered(MAUtil::String& token)
 {
     printf(" MainScreen::didApplicationRegistered %s", token.c_str());
-    mConnection->sendData(token);
+
+    mMessageLabel->setText("Your app registered for push notifications");
+	if ( mSendRegistrationNeeded && isAndroid() )
+	{
+		mToken = token;
+		// Initiate connection to the server.
+		mConnection = new TCPConnection(this);
+	}
+	else if ( !isAndroid() )
+	{
+		mConnection->sendData(token);
+	}
 }
 
 /**
  * Called if the application did not registered for push notification.
  */
 void MainScreen::didFaildToRegister(
-    const int code,
     MAUtil::String& error)
 {
     printf("MainScreen::didFaildToRegister %s", error.c_str());
     mConnection->sendData(error);
-    maMessageBox(REGISTRATION_ERROR_TITLE, REGISTRATION_ERROR_MESSAGE);
+    maMessageBox(REGISTRATION_ERROR_TITLE, error.c_str());
 }
 
 /**
@@ -188,4 +291,14 @@ void MainScreen::show()
     printf("MainScreen::show");
     NativeUI::Screen::show();
     Notification::NotificationManager::getInstance()->setApplicationIconBadgeNumber(0);
+}
+
+void MainScreen::ConnectionEstablished()
+{
+	// This is the first time the app is launched on Android phone.
+	// Need to send the token. Also, store it to the store.
+	storeRegistrationID(mToken);
+
+	// Finally, send it over TCP to the server.
+	mConnection->sendData(mToken);
 }

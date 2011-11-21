@@ -70,7 +70,6 @@ namespace Notification
 
         /**
          * Check if the push notification contains alert message.
-         * Platform: iOS only.
          * @return True if the push notification contains alert message,
          * false otherwise.
          */
