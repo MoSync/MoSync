@@ -84,8 +84,9 @@ namespace MoSync
                 mGrid.ColumnDefinitions.Add(mSpacerRight);
 
                 mView = mGrid;
-
-                //mGrid.ShowGridLines = true; //uncomment to see the grid lines (for debugging)
+#if DEBUG
+                mGrid.ShowGridLines = true;
+#endif
             }
 
             //add child

@@ -65,7 +65,7 @@ namespace MoSync
                 mSlider.ValueChanged += new RoutedPropertyChangedEventHandler<double>(
                     delegate(Object from, RoutedPropertyChangedEventArgs<double> arg)
                     {
-                        //create a Memory object of 12 Bytes
+                        ////click event needs a memory chunk of 12 bytes
                         Memory eventData = new Memory(12);
 
                         //starting with the 0 Byte we write the eventType
@@ -94,7 +94,7 @@ namespace MoSync
                     int maxVal;
                     if(Int32.TryParse(value, out maxVal))
                     {
-                        if (maxVal >= 0)
+                        if (0 <= maxVal)
                         {
                             mMaxValue = maxVal;
                             if (maxVal < mProgressValue)

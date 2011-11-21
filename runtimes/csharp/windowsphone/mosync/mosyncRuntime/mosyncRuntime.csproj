@@ -72,7 +72,7 @@
     <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
     <Compile Include="Source\Modules\NativeUI\ListView.cs" />
     <Compile Include="Source\Modules\NativeUI\ListViewItem.cs" />
-    <Compile Include="Source\Modules\NativeUI\MoSycnWebView.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncWebView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncButton.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncCheckBox.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncEditBox.cs" />

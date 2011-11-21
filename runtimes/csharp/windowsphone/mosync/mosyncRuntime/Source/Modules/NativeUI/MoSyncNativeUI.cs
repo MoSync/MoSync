@@ -83,12 +83,18 @@ namespace MoSync
 
             public virtual void InsertChild(IWidget child, int index)
             {
-                mChildren.Insert(index, child);
+                if (index >= 0 && index <= mChildren.Count)
+                {
+                    mChildren.Insert(index, child);
+                }
             }
 
             public virtual void RemoveChild(int index)
             {
-                mChildren.RemoveAt(index);
+                if(index >= 0 && index < mChildren.Count)
+                {
+                    mChildren.RemoveAt(index);
+                }
             }
 
             public virtual void RemoveChild(IWidget child)
