@@ -1,4 +1,15 @@
-﻿using Microsoft.Phone.Controls;
+﻿*/
+/**
+ * @file MoSyncLabel.cs
+ * @author Rata Gabriela
+ *
+ * @brief This represents the Label Widget implementation for the NativeUI
+ *        component on Windows Phone 7, language c#
+ *
+ * @platform WP 7.1
+ **/
+
+using Microsoft.Phone.Controls;
 using System.Windows.Controls;
 using System.Windows;
 using System.Windows.Navigation;
@@ -10,20 +21,40 @@ namespace MoSync
 {
 	namespace NativeUI
 	{
+        /**
+         * Class defining a Label widget.
+         */
 		public class Label : WidgetBaseWindowsPhone
 		{
-			protected System.Windows.Controls.TextBlock mLabel;
+			/**
+            * The TextBlock widget, that will contain the text.
+            */
+            protected System.Windows.Controls.TextBlock mLabel;
 
+            /**
+             * mMaxNumberOfLines: can take two values: 1 and 0. For 1 the label is single line.
+             * 0 means that the label is multiline.             * 
+             */
 			protected int mMaxNumberOfLines;
+
+            /**
+             * Constructor 
+             */
 			public Label()
 			{
-				//the label
-				mLabel = new System.Windows.Controls.TextBlock();
-				mView = mLabel;
 				mMaxNumberOfLines = 0;
+
+                mLabel = new System.Windows.Controls.TextBlock();
 				mLabel.TextWrapping = TextWrapping.NoWrap;
+
+                mView = mLabel;
 			}
 
+            /**
+             * Implementation of the Text property 
+             * set: sets the text on the label
+             * get: returns the text displayed on the label
+             */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT)]
 			public String Text
 			{
@@ -37,6 +68,10 @@ namespace MoSync
 				}
 			}
 
+            /**
+             * Implementation of the textVerticalAlignment property 
+             * Sets the vertical alignment of the text displayed on the label
+             */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_VERTICAL_ALIGNMENT)]
 			public String textVerticalAlignment
 			{
@@ -61,6 +96,10 @@ namespace MoSync
 				}
 			}
 
+            /**
+             * Implementation of the textHorizontalAlignment property 
+             * Sets the horizontal alignment of the text displayed on the label
+             */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT)]
 			public String textHorizontalAlignment
 			{
@@ -79,13 +118,16 @@ namespace MoSync
 							break;
 					}
 				}
-
 				get
 				{
 					return mLabel.TextAlignment.ToString();
 				}
 			}
 
+            /**
+             * Implementation of the fontSize property 
+             * Sets the font size of the text displayed on the label
+             */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_SIZE)]
 			public String fontSize
 			{
@@ -99,6 +141,10 @@ namespace MoSync
 				}
 			}
 
+            /**
+             * Implementation of the fontColor property 
+             * Sets the font color of the text displayed on the label
+             */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_COLOR)]
 			public String fontColor
 			{
@@ -110,6 +156,11 @@ namespace MoSync
 				}
 			}
 
+            /**
+             * Implementation of the maxNumberOfLines property 
+             * set: sets if the label is single or multiline. 
+             * Accepts two values: 1 (meaning single line) and 0 (multiline)
+             */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_MAX_NUMBER_OF_LINES)]
 			public String maxNumberOfLines
 			{
