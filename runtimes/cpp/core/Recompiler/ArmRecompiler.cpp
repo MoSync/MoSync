@@ -428,11 +428,11 @@ namespace MoSync {
 		loadEnvironmentRegisters(entryPoint);
 
 		loadStaticRegisters(entryPoint);
-
+#ifdef _android
 		char b[100];
 		sprintf(b, "AA::PC %d AA::r0 %d\n", AA::PC, AA::R0);
 		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
-
+#endif
 		// goto recompiled code
 		entryPoint.MOV(AA::PC, AA::R0);
 	}
@@ -1356,7 +1356,7 @@ namespace MoSync {
 			ip = (int)mPipeToArmInstMap[mEnvironment.entryPoint];
 			mStopped = false;
 		}
-
+#ifdef _android
 		char b[100];
 
 		sprintf(b, "entry point fd %i\n", mAshmemEntryPoint);
@@ -1373,20 +1373,15 @@ namespace MoSync {
 
 		flushInstructionCache(_androidMemAddress, _androidMemSize);
 		flushInstructionCache(_androidEntryAddress, _androidEntryMemSize);
-
+#endif
 		//LOGD("Entering generated code...\n");
 		int arm_ip = ((int (*)(int))entryPoint.mipStart)(ip);
-
-		sprintf(b, "entry point mip start %i\n", (int)arm_ip);
-		__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", b);
 
 		//LOGD("Exited generated code.\n");
 		return arm_ip;
 	}
 
 	int ArmRecompiler::shiftAriMatcher() {
-
-		//__android_log_write(ANDROID_LOG_INFO, "JNI Recompiler", "shiftAriMatcher");
 
 		const Instruction& i1 = mInstructions[0];
 		const Instruction& i2 = mInstructions[1];
