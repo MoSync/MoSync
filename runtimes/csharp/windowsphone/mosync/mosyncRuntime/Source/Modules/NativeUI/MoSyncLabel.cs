@@ -1,5 +1,4 @@
-﻿*/
-/**
+﻿/**
  * @file MoSyncLabel.cs
  * @author Rata Gabriela
  *
@@ -159,7 +158,7 @@ namespace MoSync
             /**
              * Implementation of the maxNumberOfLines property 
              * set: sets if the label is single or multiline. 
-             * Accepts two values: 1 (meaning single line) and 0 (multiline)
+             * Accepts two values: 1 (meaning single line) and 1
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_MAX_NUMBER_OF_LINES)]
 			public String maxNumberOfLines
