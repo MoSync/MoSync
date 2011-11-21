@@ -1025,7 +1025,7 @@ namespace Base {
 		SYSCALL_THIS->getFileHandle(file);	// just to make sure the file handle is ok.
 		drive = 0;
 #else
-		Syscall::FileHandle& fh();
+		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
 		drive = (fh.name[0] - 'A') + 1;
 #endif	//FILESYSTEM_CHROOT
 		if(_getdiskfree(drive, &df) != 0) {
@@ -1277,6 +1277,7 @@ namespace Base {
 #endif	//_WIN32_WCE
 #else	//FILESYSTEM_CHROOT
 #ifdef WIN32
+			FileListItem fli;
 			DWORD res = GetLogicalDrives();
 			GLE(res);
 			char buf[] = "X:/";

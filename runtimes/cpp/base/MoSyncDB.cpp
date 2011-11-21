@@ -24,7 +24,7 @@ MA 02110-1301, USA.
  */
 
 #include "config_platform.h"
-#include "syscall.h"
+#include "Syscall.h"
 #include "MoSyncDB.h"
 #if FILESYSTEM_CHROOT
 #include "helpers/mkdir.h"
@@ -228,8 +228,7 @@ int maDBClose(MAHandle databaseHandle)
 	return MA_DB_OK;
 }
 
-extern "C"
-int maDBExecSQL(MAHandle databaseHandle, const char* sql)
+static int prepStatement(MAHandle databaseHandle, const char* sql, sqlite3_stmt*& statement)
 {
 	// Get database object.
 	sqlite3* db = MoDBGetDatabase(databaseHandle);
@@ -240,7 +239,6 @@ int maDBExecSQL(MAHandle databaseHandle, const char* sql)
 	}
 
 	// Prepare the query.
-	sqlite3_stmt* statement;
 	int result = sqlite3_prepare_v2(
 		db,
 		sql,
@@ -252,9 +250,13 @@ int maDBExecSQL(MAHandle databaseHandle, const char* sql)
 		//LOGD("sqlite3_prepare_v2 failed\n");
 		return MA_DB_ERROR;
 	}
+	return MA_DB_OK;
+}
 
+static int runStatement(sqlite3_stmt* statement)
+{
 	// Run the query.
-	result = sqlite3_step(statement);
+	int result = sqlite3_step(statement);
 
 	// Was there an error?
 	if (SQLITE_BUSY == result ||
@@ -283,6 +285,81 @@ int maDBExecSQL(MAHandle databaseHandle, const char* sql)
 		return MoDBCreateCursorHandle(statement);
 	}
 	DEBIG_PHAT_ERROR;
+}
+
+extern "C"
+int maDBExecSQL(MAHandle databaseHandle, const char* sql)
+{
+	sqlite3_stmt* statement;
+	int result = prepStatement(databaseHandle, sql, statement);
+	if (result < 0)
+		return result;
+	return runStatement(statement);
+}
+
+extern "C"
+MAHandle maDBExecSQLParams(MAHandle databaseHandle, const char* sql,
+	const MADBValue* params, int paramCount)
+{
+	sqlite3_stmt* statement;
+	int result = prepStatement(databaseHandle, sql, statement);
+	if (result < 0)
+		return result;
+
+	// Bind parameters
+	for(int i=1; i<=paramCount; i++) {
+		const MADBValue& v(params[i-1]);
+		switch(v.type) {
+		case MA_DB_TYPE_NULL:
+			result = sqlite3_bind_null(statement, i);
+			break;
+		case MA_DB_TYPE_INT:
+			result = sqlite3_bind_int(statement, i, v.i);
+			break;
+		case MA_DB_TYPE_INT64:
+			result = sqlite3_bind_int64(statement, i, v.i64);
+			break;
+		case MA_DB_TYPE_DOUBLE:
+			result = sqlite3_bind_double(statement, i, v.d);
+			break;
+		case MA_DB_TYPE_BLOB:
+			result = sqlite3_bind_blob(statement, i,
+				gSyscall->GetValidatedMemRange(v.blob.data, v.blob.size),
+				v.blob.size, SQLITE_STATIC);
+			break;
+		case MA_DB_TYPE_DATA:
+			{
+				Stream* s = gSyscall->resources.get_RT_BINARY(v.dataHandle);
+				int length;
+				MYASSERT(s->length(length), ERR_DATA_ACCESS_FAILED);
+				// if we can access the data directly, do so.
+				if(s->ptrc())
+					result = sqlite3_bind_blob(statement, i, s->ptrc(), length, SQLITE_STATIC);
+				else
+				{
+					// otherwise, create a temporary copy.
+					void* buf = malloc(length);
+					MYASSERT(s->read(buf, length), ERR_DATA_ACCESS_FAILED);
+					result = sqlite3_bind_blob(statement, i, buf, length, &free);
+				}
+				// todo: put resource in flux while statement is active.
+			}
+			break;
+		case MA_DB_TYPE_TEXT:
+			{
+				const char* text;
+				if(v.text.length >= 0)
+					text = (char*)gSyscall->GetValidatedMemRange(v.text.addr, v.text.length);
+				else
+					text = gSyscall->GetValidatedStr(v.text.addr);
+				result = sqlite3_bind_text(statement, i, text, v.text.length, SQLITE_STATIC);
+			}
+			break;
+		}
+		DEBUG_ASSERT(result == SQLITE_OK);
+	}
+
+	return runStatement(statement);
 }
 
 extern "C"
