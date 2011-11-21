@@ -93,18 +93,14 @@ namespace Wormhole
 		virtual void showPage(const MAUtil::String& url);
 
 		/**
+		 * Display the WebView.
+		 */
+		virtual void showWebView();
+
+		/**
 		 * Run JavaScript code in the WebView.
 		 */
 		virtual void callJS(const MAUtil::String& script);
-
-		/**
-		 * This method is called to show a screen while unpacking the
-		 * file bundle. You can override this method to customize
-		 * the screen displayed. You can display anything you wish
-		 * in the WebView widget. The default implementation just
-		 * displays a plain message.
-		 */
-		virtual void displayWelcomeScreenShownWhileUnpackingFiles();
 
 		/**
 		 * This method handles messages sent from the WebView.
@@ -126,7 +122,6 @@ namespace Wormhole
 		 */
 		virtual void keyPressEvent(int keyCode, int nativeCode);
 
-	protected:
 		/**
 		 * Extract HTML/CSS/JS/Media files to the local file system.
 		 */
@@ -137,13 +132,6 @@ namespace Wormhole
 		 * value did not exist, such as on first time load).
 		 */
 		virtual bool checksumHasChanged();
-
-		/**
-		 * Create the user interface of the application.
-		 * This creates a full screen WebView and configures
-		 * it to receive messages from JavaScript.
-		 */
-		virtual void createUI();
 
 	protected:
 		/**
@@ -165,6 +153,11 @@ namespace Wormhole
 		 * File utility object.
 		 */
 		FileUtil* mFileUtil;
+
+		/**
+		 * Has extractFileSystem() been called?
+		 */
+		bool mFileSystemIsExtracted;
 	};
 } // namespace
 

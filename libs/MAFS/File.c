@@ -292,7 +292,13 @@ static void readHeader(MAHandle fileSystem)
 	FLIP_TO_ENDIAN_INT(sHeader.startOfVolumes);
 	FLIP_TO_ENDIAN_INT(sHeader.startOfData);
 	FLIP_TO_ENDIAN_INT(sHeader.magic);
-	// We won't flip the checksum, no need for that.
+	// We won't flip the checksum, no need for that,
+	// and it would break the old file format.
+
+	if (sHeader.magic != MAGIC2)
+	{
+		maPanic(0, "sHeader.magic != MAGIC2");
+	}
 }
 
 static void buildDirectoryTree(MAHandle fileSystem) {
@@ -322,7 +328,7 @@ void setCurrentFileSystem(MAHandle fileSystem, int caseSensitive) {
 	sCaseSensitive = caseSensitive;
 }
 
-int getFileSystemChecksum(MAHandle fileSystem)
+int MAFS_getFileSystemChecksum(MAHandle fileSystem)
 {
 	readHeader(fileSystem);
 
@@ -468,7 +474,7 @@ static int extractRecursively(VolumeEntry* vol, const char* basePath, int isRoot
 *
 * \return 1 on success, -1 on error.
 */
-int extractCurrentFileSystem(const char* destPath)
+int MAFS_extractCurrentFileSystem(const char* destPath)
 {
 	if (NULL == sRoot) { return -1; }
 	if (NULL == destPath) { return -1; }

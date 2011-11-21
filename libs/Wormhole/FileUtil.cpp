@@ -94,7 +94,7 @@ namespace Wormhole
 		const MAUtil::String& destinationPath)
 	{
 		setCurrentFileSystem(handle, 0);
-		int result = extractCurrentFileSystem(destinationPath.c_str());
+		int result = MAFS_extractCurrentFileSystem(destinationPath.c_str());
 		freeCurrentFileSystem();
 		return 1 == result;
 	}
@@ -123,7 +123,7 @@ namespace Wormhole
 	 */
 	int FileUtil::getFileSystemChecksum(MAHandle handle)
 	{
-		return getFileSystemChecksum(handle);
+		return MAFS_getFileSystemChecksum(handle);
 	}
 
 	/**

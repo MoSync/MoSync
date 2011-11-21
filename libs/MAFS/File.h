@@ -409,7 +409,7 @@ void freeCurrentFileSystem(void);
 *
 * \return A checksum value, returns 0 if there is no checksum available.
 */
-int getFileSystemChecksum(MAHandle fileSystem);
+int MAFS_getFileSystemChecksum(MAHandle fileSystem);
 
 /**
 * Extract the current file system bundle to the local file
@@ -421,7 +421,7 @@ int getFileSystemChecksum(MAHandle fileSystem);
 *
 * \return 1 on success, -1 on error.
 */
-int extractCurrentFileSystem(const char* destPath);
+int MAFS_extractCurrentFileSystem(const char* destPath);
 
 /*
 // not implemented yet

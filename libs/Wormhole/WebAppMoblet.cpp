@@ -77,12 +77,12 @@ namespace Wormhole
 	 */
 	WebAppMoblet::WebAppMoblet()
 	{
+		// I don't care about using initialisers!
+		mFileSystemIsExtracted = false;
+		mWebView = NULL;
+
 		// Create file utility object.
 		mFileUtil = new FileUtil();
-
-		createUI();
-
-		extractFileSystem();
 	}
 
 	/**
@@ -106,10 +106,24 @@ namespace Wormhole
 
 	/**
 	 * Get the WebView widget displayed by this moblet.
+	 * Creates the WebView if it does not exist.
 	 * @return Pointer to a WebView instance.
 	 */
 	NativeUI::WebView* WebAppMoblet::getWebView()
 	{
+		// Create the WebView if it does not exist.
+		if (NULL == mWebView)
+		{
+			// Create and configure the WebView.
+			mWebView = new NativeUI::WebView();
+			mWebView->fillSpaceHorizontally();
+			mWebView->fillSpaceVertically();
+
+			// Create and show the screen that holds the WebView.
+			mScreen = new NativeUI::Screen();
+			mScreen->setMainWidget(mWebView);
+		}
+
 		return mWebView;
 	}
 
@@ -131,8 +145,8 @@ namespace Wormhole
 		if (NULL == mWebViewListener)
 		{
 			mWebViewListener = new WebAppMoblet_WebViewListener(this);
-			mWebView->addWebViewListener(mWebViewListener);
-			mWebView->enableWebViewMessages();
+			getWebView()->addWebViewListener(mWebViewListener);
+			getWebView()->enableWebViewMessages();
 		}
 	}
 
@@ -143,8 +157,8 @@ namespace Wormhole
 	{
 		if (NULL != mWebViewListener)
 		{
-			mWebView->removeWebViewListener(mWebViewListener);
-			mWebView->disableWebViewMessages();
+			getWebView()->removeWebViewListener(mWebViewListener);
+			getWebView()->disableWebViewMessages();
 			delete mWebViewListener;
 			mWebViewListener = NULL;
 		}
@@ -156,7 +170,33 @@ namespace Wormhole
 	 */
 	void WebAppMoblet::showPage(const MAUtil::String& url)
 	{
-		mWebView->openURL(url);
+		// Since extractFileSystem() is moved out of the constructor
+		// into application code, make sure it has been called before
+		// displaying the page. This makes the code updates backwards
+		// compatible with old application code.
+		if (!mFileSystemIsExtracted)
+		{
+			extractFileSystem();
+		}
+
+		// Make sure the WebView is displayed.
+		// It should do no harm to call this method multiple times.
+		showWebView();
+
+		// Open the page.
+		getWebView()->openURL(url);
+	}
+
+	/**
+	 * Display the WebView.
+	 */
+	void WebAppMoblet::showWebView()
+	{
+		// Make sure the WebView is created.
+		getWebView();
+
+		// Show the screen that contains the WebView.
+		mScreen->show();
 	}
 
 	/**
@@ -164,36 +204,36 @@ namespace Wormhole
 	 */
 	void WebAppMoblet::callJS(const MAUtil::String& script)
 	{
-		mWebView->callJS(script);
+		getWebView()->callJS(script);
 	}
 
-	/**
-	 * This method is called to show a screen while unpacking the
-	 * file bundle. You can override this method to customize
-	 * the screen displayed. You can display anything you wish
-	 * in the WebView widget. The default implementation just
-	 * displays a plain message.
-	 */
-	void WebAppMoblet::displayWelcomeScreenShownWhileUnpackingFiles()
-	{
-		getWebView()->setHtml(
-			"<!DOCTYPE html>"
-			"<html><head>"
-			"<style type=\"text/css\">"
-			"#Message {"
-				"margin: 0.3em 0.3em;"
-				"font-size: 3.0em;"
-				"font-weight: bold;"
-				"color: white;"
-				"text-align: center;"
-				"background-color: black;"
-				"font-family: sans-serif;"
-			"}"
-			"</head><body>"
-			"<div id=\"Message\">Installing application files...</div>"
-			"</body></html>"
-			);
-	}
+	// /**
+	 // * This method is called to show a screen while unpacking the
+	 // * file bundle. You can override this method to customize
+	 // * the screen displayed. You can display anything you wish
+	 // * in the WebView widget. The default implementation just
+	 // * displays a plain message.
+	 // */
+	// void WebAppMoblet::displayUnpackScreen()
+	// {
+		// getWebView()->setHtml(
+			// "<!DOCTYPE html>"
+			// "<html><head>"
+			// "<style type=\"text/css\">"
+			// "#Message {"
+				// "margin: 0.3em 0.3em;"
+				// "font-size: 3.0em;"
+				// "font-weight: bold;"
+				// "color: white;"
+				// "text-align: center;"
+				// "background-color: black;"
+				// "font-family: sans-serif;"
+			// "}"
+			// "</head><body>"
+			// "<div id=\"Message\">Installing application files...</div>"
+			// "</body></html>"
+			// );
+	// }
 
 	/**
 	 * This method handles messages sent from the WebView.
@@ -229,26 +269,22 @@ namespace Wormhole
 	 */
 	void WebAppMoblet::extractFileSystem()
 	{
+		// This function has been called.
+		mFileSystemIsExtracted = true;
+
 		// Display splash screen if this is the first time launch
 		// or if the checksum has changed.
 		if (checksumHasChanged())
 		{
-			displayWelcomeScreenShownWhileUnpackingFiles();
-
-			int timestamp = maGetMilliSecondCount();
-
 			// Extract bundled files to the local file system.
 			mFileUtil->extractLocalFiles();
-lprintfln("@@@@@@@@@@@@@ step3");
-			// Ensure the unpack screen is visible for at least two seconds.
-			while (timestamp + 2000 > maGetMilliSecondCount())
-			{
-				maWait(100);
-			}
 		}
-lprintfln("@@@@@@@@@@@@@ step4");
 	}
 
+	/**
+	 * @return true if the checksum has changed (or if the old
+	 * value did not exist, such as on first time load).
+	 */
 	bool WebAppMoblet::checksumHasChanged()
 	{
 		// Assume checksum has changed (or does not exist).
@@ -257,20 +293,17 @@ lprintfln("@@@@@@@@@@@@@ step4");
 		// Read existing checksum value and check it.
 		MAUtil::String filePath = getFileUtil()->getLocalPath();
 		filePath += "MoSyncFileBundleChecksum";
-lprintfln("@@@@@@@@@@@@@ step1");
 		int checksum = getFileUtil()->getFileSystemChecksum(1);
 
-lprintfln("@@@ File bundle checksum: %d", checksum);
 		MAUtil::String data;
 		if (getFileUtil()->readTextFromFile(filePath, data))
 		{
 			int existingChecksum = (int)strtol(data.c_str(), NULL, 10);
-lprintfln("@@@     existingChecksum: %d", existingChecksum);
 			hasChanged = checksum != existingChecksum;
 		}
 
 		// Save checksum value if it has changed.
-		if (hasChanged)
+		if (hasChanged && checksum != 0)
 		{
 			char checksumBuf[16];
 			sprintf(checksumBuf, "%d", checksum);
@@ -278,24 +311,6 @@ lprintfln("@@@     existingChecksum: %d", existingChecksum);
 		}
 
 		return hasChanged;
-	}
-
-	/**
-	 * Create the user interface of the application.
-	 * This creates a full screen WebView and configures
-	 * it to receive messages from JavaScript.
-	 */
-	void WebAppMoblet::createUI()
-	{
-		// Create and configure the WebView.
-		mWebView = new NativeUI::WebView();
-		mWebView->fillSpaceHorizontally();
-		mWebView->fillSpaceVertically();
-
-		// Create and show the screen that holds the WebView.
-		mScreen = new NativeUI::Screen();
-		mScreen->setMainWidget(mWebView);
-		mScreen->show();
 	}
 
 } // namespace
