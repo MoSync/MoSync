@@ -34,8 +34,8 @@ using System.Reflection;
 
 namespace MoSync
 {
-    namespace NativeUI
-    {
+	namespace NativeUI
+	{
         /**
          * The ListViewItem class defines the attributes and behavior of the
          * items that appear in ListView objects.
@@ -45,160 +45,165 @@ namespace MoSync
             /**
              * The TextBlock widget that will hold the text of the list view item
              */
-            protected System.Windows.Controls.TextBlock mText;
+			protected System.Windows.Controls.TextBlock mText;
 
             /**
              * Image wiget for the icon
              */
-            protected System.Windows.Controls.Image mIcon;
+			protected System.Windows.Controls.Image mIcon;
 
             /**
              * Stech object that defines the way in which the icon will be streched
              */
-            protected System.Windows.Media.Stretch mStretch;
+			protected System.Windows.Media.Stretch mStretch;
 
             /**
             * The Grid object holding the icon and the text
             */
-            protected System.Windows.Controls.Grid mGrid;
+			protected System.Windows.Controls.Grid mGrid;
 
             /**
              * The The Grid will have one row and two colums. First column for the icon, 
              * the second for text
              */
-            protected RowDefinition mRow;
-            protected ColumnDefinition mColumn1;
-            protected ColumnDefinition mColumn2;
+			protected RowDefinition mRow;
+			protected ColumnDefinition mColumn1;
+			protected ColumnDefinition mColumn2;
 
             /**
             * Constructor 
             */
-            public ListViewItem()
-            {             
-                mGrid = new System.Windows.Controls.Grid();
+			public ListViewItem()
+			{
+				mGrid = new System.Windows.Controls.Grid();
 
-                mIcon = new System.Windows.Controls.Image();
-                mIcon.VerticalAlignment = VerticalAlignment.Center;
-                mStretch = new System.Windows.Media.Stretch();
+				mIcon = new System.Windows.Controls.Image();
+				mIcon.VerticalAlignment = VerticalAlignment.Center;
+				mStretch = new System.Windows.Media.Stretch();
 
-                mText = new System.Windows.Controls.TextBlock();
-                mText.TextWrapping = TextWrapping.NoWrap;
-                mText.Margin = new Thickness(10);
-                mText.VerticalAlignment = VerticalAlignment.Center;
-                mText.TextAlignment = TextAlignment.Left;           
-              
-                mColumn1 = new ColumnDefinition();
-                mColumn1.Width = new GridLength(1, GridUnitType.Auto);
+				mText = new System.Windows.Controls.TextBlock();
+				mText.TextWrapping = TextWrapping.NoWrap;
+				mText.Margin = new Thickness(10);
+				mText.VerticalAlignment = VerticalAlignment.Center;
+				mText.TextAlignment = TextAlignment.Left;
 
-                mColumn2 = new ColumnDefinition();
-                mColumn2.Width = new GridLength(1, GridUnitType.Star);
+				mColumn1 = new ColumnDefinition();
+				mColumn1.Width = new GridLength(1, GridUnitType.Auto);
 
-                mRow = new RowDefinition();
-                mRow.Height = new GridLength(1, GridUnitType.Auto);
+				mColumn2 = new ColumnDefinition();
+				mColumn2.Width = new GridLength(1, GridUnitType.Star);
 
-                mGrid.RowDefinitions.Add(mRow);
-                mGrid.ColumnDefinitions.Add(mColumn1);
-                mGrid.ColumnDefinitions.Add(mColumn2);
+				mRow = new RowDefinition();
+				mRow.Height = new GridLength(1, GridUnitType.Auto);
 
-                Grid.SetRow(mIcon, 0);
-                Grid.SetColumn(mIcon, 0);
+				mGrid.RowDefinitions.Add(mRow);
+				mGrid.ColumnDefinitions.Add(mColumn1);
+				mGrid.ColumnDefinitions.Add(mColumn2);
 
-                Grid.SetRow(mText, 0);
-                Grid.SetColumnSpan(mText, 1);
-                Grid.SetColumn(mText, 1);
+				Grid.SetRow(mIcon, 0);
+				Grid.SetColumn(mIcon, 0);
 
-                mGrid.Children.Add(mIcon);
-                mGrid.Children.Add(mText);             
-                
-                mView = mGrid;
-            }
+				Grid.SetRow(mText, 0);
+				Grid.SetColumnSpan(mText, 1);
+				Grid.SetColumn(mText, 1);
+
+				mGrid.Children.Add(mIcon);
+				mGrid.Children.Add(mText);             
+
+				mView = mGrid;
+			}
 
             /**
              * Implementation of the "Text" property. 
              * Sets the text that will appear on the list view item
              */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_TEXT)]
-            public String Text
-            {
-                set
-                {
-                    mText.Text = value;
-                }
-                get
-                {
-                    return mText.Text;
-                }
-            }
+			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_TEXT)]
+			public String Text
+			{
+				set
+				{
+					mText.Text = value;
+				}
+				get
+				{
+					return mText.Text;
+				}
+			}
 
             /**
              * Implementation of the "Icon" property. 
              * Sets the Icon that will appear on the list view item, on the left of the text
              */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_ICON)]
-            public String Icon
-            {
-                set
-                {                  
-                    int val = Int32.Parse(value);
-                    Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, val);
-                    if (null != res && res.GetInternalObject() != null)
-                    {
-                      
-                        mIcon.Width = mText.Height;
-                        mIcon.Height = mText.Height;
-                        mIcon.Margin = new Thickness(mText.Margin.Left, mText.Margin.Top, 0, mText.Margin.Bottom);
-                        mStretch = System.Windows.Media.Stretch.Fill;
-                        mIcon.Stretch = mStretch;                    
+			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_ICON)]
+			public String Icon
+			{
+				set
+				{                  
+					int val = 0;
+					if(int.TryParse(value, out val))
+					{
+						Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, val);
+						if (null != res && res.GetInternalObject() != null)
+						{
+							mIcon.Width = mText.Height;
+							mIcon.Height = mText.Height;
+							mIcon.Margin = new Thickness(mText.Margin.Left, mText.Margin.Top, 0, mText.Margin.Bottom);
+							mStretch = System.Windows.Media.Stretch.Fill;
+							mIcon.Stretch = mStretch;                    
 
-                        System.Windows.Media.Imaging.BitmapSource bmpSource =
-                        (System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
+							System.Windows.Media.Imaging.BitmapSource bmpSource =
+							(System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
-                        mIcon.Source = bmpSource;                         
-                    }
-                }
-            }
+							mIcon.Source = bmpSource;                         
+						}
+					}
+				}
+			}
 
             /**
              * The "AccessoryType" property. 
              * Has no effect. Available only on iOS.
              */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE)]
-            public String AccessoryType
-            {
-                set
-                {
-                    //not available for Windows Phone
-                }
-            }
+			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE)]
+			public String AccessoryType
+			{
+				set
+				{
+					//not available for Windows Phone
+				}
+			}
 
             /**
              * The implementation of the "FontColor" property. 
              * Sets the font color of the item's text
              */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_FONT_COLOR)]
-            public String FontColor
-            {
-                set
-                {
-                    System.Windows.Media.SolidColorBrush brush;
-                    MoSync.Util.convertStringToColor(value, out brush);
-                    mText.Foreground = brush;
-                }
-            }
+			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_FONT_COLOR)]
+			public String FontColor
+			{
+				set
+				{
+					System.Windows.Media.SolidColorBrush brush;
+					MoSync.Util.convertStringToColor(value, out brush);
+					mText.Foreground = brush;
+				}
+			}
 
             /**
              * The implementation of the "FontSize" property. 
              * Sets the font size of the item's text
              */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_FONT_SIZE)]
-            public String FontSize
-            {
-                set
-                {
-                    double size = Double.Parse(value);
-                    mText.FontSize = size;
-                }
-            }
-        }
-    }
+			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_FONT_SIZE)]
+			public String FontSize
+			{
+				set
+				{
+					double size = 0; 
+					if (double.TryParse(value, out size))
+					{
+						mText.FontSize = size;
+					}
+				}
+			}
+		}
+	}
 }
