@@ -27,4 +27,3 @@ public:
 	Syscall(int w, int h);
 
 #include "PimSyscall.h"
-#include "MoSyncDB.h"
