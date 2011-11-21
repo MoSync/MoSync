@@ -77,7 +77,6 @@ namespace MoSync
 
             public virtual void AddChild(IWidget child)
             {
-                child.SetParent(mParent);
                 mChildren.Add(child);
             }
 

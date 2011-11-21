@@ -50,6 +50,7 @@ namespace MoSync
             {
                 IWidget parent = mWidgets[_parent];
                 IWidget child = mWidgets[_child];
+                child.SetParent(parent);
                 parent.AddChild(child);
                 return MoSync.Constants.MAW_RES_OK;
             };
