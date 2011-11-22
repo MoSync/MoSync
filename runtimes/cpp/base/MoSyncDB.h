@@ -35,6 +35,8 @@ extern "C" {
 MAHandle maDBOpen(const char* path);
 int maDBClose(MAHandle databaseHandle);
 MAHandle maDBExecSQL(MAHandle databaseHandle, const char* sql);
+MAHandle maDBExecSQLParams(MAHandle databaseHandle, const char* sql,
+	const MADBValue* params, int paramCount);
 int maDBCursorDestroy(MAHandle cursorHandle);
 int maDBCursorNext(MAHandle cursorHandle);
 int maDBCursorGetColumnData(

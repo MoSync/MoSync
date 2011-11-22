@@ -8168,7 +8168,44 @@ group NFCAPI "NFC API" {
 		}
 	}//end of NFC API
 
-group DBAPI "DB API" {
+	group DBAPI "DB API" {
+		struct MADBBlob {
+			MAAddress data;
+			int size;
+		}
+		struct MADBText {
+			MAString addr;
+			/// Length in bytes of the string pointed to by \a addr.
+			/// May be \< 0, in which case the string is null-terminated.
+			int length;
+		}
+
+		constset int MA_DB_TYPE_ {
+			NULL = 1;
+			INT = 2;
+			INT64 = 3;
+			DOUBLE = 4;
+			BLOB = 5;
+			DATA = 6;
+			TEXT = 7;
+		}
+
+		/// Input value for maDBExecSQLParams().
+		struct MADBValue {
+			union {
+				int i;
+				double d;
+				MADBBlob blob;
+				MAHandle dataHandle;
+				MADBText text;
+				longlong i64;
+			}
+			// has to be last. otherwise this struct would get an alignment mismatch
+			// due to the double union member, which has to be 8-byte-aligned on x86 platforms.
+			/// One of the MA_DB_TYPE_ constants.
+			int type;
+		}
+
 		/**
 		 * Open a database file. The database is created if it does not exist.
 		 * \note The application needs file read/write permissions to
@@ -8195,6 +8232,22 @@ group DBAPI "DB API" {
 		 * case the return value is the cursor handle.
 		 */
 		MAHandle maDBExecSQL(in MAHandle databaseHandle, in MAString sql);
+
+		/**
+		 * @copydoc maDBExecSQL()
+		 * @param params Array of values to bind to parameters.
+		 * Parameters are specified by question marks (?)
+		 * in the SQL statement.
+		 *
+		 * If this function returns a cursor,
+		 * any text or blob values being pointed to by elements of the array must remain valid until
+		 * the cursor has been destroyed by maDBCursorDestroy().
+		 * The array itself does not need to remain valid after this function returns.
+		 *
+		 * @param paramCount Number of elements in the array pointed to by \a params.
+		 */
+		MAHandle maDBExecSQLParams(in MAHandle databaseHandle, in MAString sql,
+			in MADBValue params, in int paramCount);
 
 		/**
 		 * Destroys a cursor. You must call this function
@@ -8271,6 +8324,8 @@ group DBAPI "DB API" {
 			in MAHandle cursorHandle,
 			in int columnIndex,
 			out int value);
+
+		// todo: maDBCursorGetColumnInt64
 
 		/**
 		 * Get the column value at the current row pointed to
