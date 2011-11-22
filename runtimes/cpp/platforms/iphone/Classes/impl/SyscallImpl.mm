@@ -1928,6 +1928,10 @@ return 0; \
 	{
         return [[NotificationManager getInstance] getPushRegistrationData:buffer size:size];
 	}
+    SYSCALL(int, maNotificationPushDestroy(MAHandle pushNotificationHandle))
+	{
+        return [[NotificationManager getInstance] pushNotificationDestroy:pushNotificationHandle];
+	}
     SYSCALL(void, maNotificationSetIconBadge(const int applicationIconBadgeNumber))
 	{
         [[NotificationManager getInstance] setApplicationIconBadgeNumber:applicationIconBadgeNumber];
@@ -2034,6 +2038,7 @@ return 0; \
         maIOCtl_case(maNotificationPushUnregister);
         maIOCtl_case(maNotificationPushGetData);
         maIOCtl_case(maNotificationPushGetRegistration);
+        maIOCtl_case(maNotificationPushDestroy);
         maIOCtl_case(maNotificationSetIconBadge);
         maIOCtl_case(maNotificationGetIconBadge);
 		maIOCtl_syscall_case(maDBOpen);
