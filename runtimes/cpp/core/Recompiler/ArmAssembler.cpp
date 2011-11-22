@@ -51,9 +51,11 @@
 #include <stdio.h>
 #include <string.h>
 
+#ifdef AVMPLUS_VERBOSE
 // hack (for debugging)
 #include <core.h>
 extern Core::VMCore *gCore;
+#endif
 
 namespace avmplus
 {
@@ -138,7 +140,7 @@ namespace avmplus
 			"REG_r15"
 	};
 
-
+#ifdef AVMPLUS_VERBOSE
 	char temp[16];
 	const char *findPipeReg(int addr) {
 		for(int i = 0; i < 128; i++) {
@@ -153,6 +155,7 @@ namespace avmplus
 		}
 		return NULL;
 	}
+#endif
 
 	char* PrintWriter::bufferpos = NULL;
 	char PrintWriter::buffer[PW_BUFFER_SIZE];
