@@ -63,7 +63,7 @@ namespace MoSync
 			protected System.Windows.Controls.Grid mGrid;
 
             /**
-             * The The Grid will have one row and two colums. First column for the icon, 
+             * The The Grid will have one row and two colums. First column for the icon,
              * the second for text
              */
 			protected RowDefinition mRow;
@@ -71,7 +71,7 @@ namespace MoSync
 			protected ColumnDefinition mColumn2;
 
             /**
-            * Constructor 
+            * Constructor
             */
 			public ListViewItem()
 			{
@@ -108,7 +108,7 @@ namespace MoSync
 				Grid.SetColumn(mText, 1);
 
 				mGrid.Children.Add(mIcon);
-				mGrid.Children.Add(mText);             
+				mGrid.Children.Add(mText);
 
 				mView = mGrid;
 			}
@@ -154,7 +154,7 @@ namespace MoSync
 							System.Windows.Media.Imaging.BitmapSource bmpSource =
 							(System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
 
-							mIcon.Source = bmpSource;                         
+							mIcon.Source = bmpSource;
 						}
 					}
 				}

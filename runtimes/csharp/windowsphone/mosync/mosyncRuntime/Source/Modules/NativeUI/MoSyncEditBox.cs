@@ -58,7 +58,7 @@ namespace MoSync
 
             /**
              * Helper function that sets the input mode of the edit box
-             * @param scopeValue: indicates the type of input that is expected from the user. 
+             * @param scopeValue: indicates the type of input that is expected from the user.
              * Can have values like: Url, FullFilePath, FileName, EmailUserName, PostalCode, Password, Numeric
              */
 			protected void setInputMode(System.Windows.Input.InputScopeNameValue scopeValue)
@@ -171,16 +171,15 @@ namespace MoSync
 
             /**
              * Property for setting the input mode for the edit box.
-             * The values have to be the constants defined in IX_WIDGET.h (WidgetEditBoxConstants)  MAW_EDIT_BOX_TYPE_ANY, 
-             * MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_PHONENUMBER ect.       
+             * The values have to be the constants defined in IX_WIDGET.h (WidgetEditBoxConstants)  MAW_EDIT_BOX_TYPE_ANY,
+             * MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_PHONENUMBER ect.
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_INPUT_MODE)]
 			public String InputMode
 			{
 				set
 				{
-
-					int inputType = 0; 
+					int inputType = 0;
 					if (!int.TryParse(value, out inputType))
 					{
 						return;

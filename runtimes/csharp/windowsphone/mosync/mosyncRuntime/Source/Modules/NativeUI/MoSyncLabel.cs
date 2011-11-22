@@ -132,7 +132,7 @@ namespace MoSync
 			{
 				set
 				{
-					double size = 0; 
+					double size = 0;
 					if (double.TryParse(value, out size))
 					{
 						mLabel.FontSize = size;
@@ -165,7 +165,7 @@ namespace MoSync
 			{
 				set
 				{
-					int val = -1; 
+					int val = -1;
 					if (!int.TryParse(value, out val))
 					{
 						return;

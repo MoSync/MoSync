@@ -15,13 +15,20 @@ namespace MoSync
             protected WebBrowser mWebBrowser;
             protected String mHardHook = "";
             protected String mSoftHook = "";
+            protected bool mHorizontalScrollBarEnabled = false;
+            protected bool mVerticalScrollBarEnabled = false;
+            protected bool mEnabledZoom = true;
+            protected String mNavigatedFrom = "";
+            protected String mNavigatingTo = "";
+            
+            //this is used when loading relative paths
+            protected String mBaseURL = "";
 
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WEB_VIEW_URL)]
             public String Url
             {
                 set
                 {
-
                     if (value.StartsWith("javascript:"))
                     {
                         int startIndex = "javascript:".Length;
@@ -53,7 +60,6 @@ namespace MoSync
                 {
                     mHardHook = value;
                 }
-
                 get
                 {
                     return mHardHook;
@@ -71,6 +77,73 @@ namespace MoSync
                 get
                 {
                     return mSoftHook;
+                }
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WEB_VIEW_BASE_URL)]
+            public String BaseUrl
+            {
+                set
+                {
+                    mWebBrowser.Base = mBaseURL;
+                }
+                get
+                {
+                    return mBaseURL;
+                }
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WEB_VIEW_HORIZONTAL_SCROLL_BAR_ENABLED)]
+            public String HoziontalScrollBarEnabled
+            {
+                set
+                {
+                }
+                get
+                {
+                    return mHorizontalScrollBarEnabled.ToString();
+                }
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WEB_VIEW_VERTICAL_SCROLL_BAR_ENABLED)]
+            public String VerticalScrollBarEnabled
+            {
+                set
+                {
+                    
+                }
+                get
+                {
+                    return mVerticalScrollBarEnabled.ToString();
+                }
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WEB_VIEW_ENABLE_ZOOM)]
+            public String EnableZoom
+            {
+                set
+                {
+                    bool.TryParse(value,out mEnabledZoom);
+                }
+                get
+                {
+                    return mEnabledZoom.ToString();
+                }
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_WEB_VIEW_NAVIGATE)]
+            public String Navigate
+            {
+                set
+                {
+                    if (value.Equals("back"))
+                    {
+                        mWebBrowser.Navigate(new Uri(mNavigatedFrom));
+                    }
+                    else if (value.Equals("forward"))
+                    {
+                        mWebBrowser.Navigate(new Uri(mNavigatingTo));
+                    }
                 }
             }
             public WebView()
@@ -117,6 +190,17 @@ namespace MoSync
                         mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
                 );
+
+                mWebBrowser.Navigated += new EventHandler<NavigationEventArgs>(
+                    delegate(object from, NavigationEventArgs args)
+                    {
+                        mNavigatedFrom = args.Uri.ToString();
+                    });
+                mWebBrowser.Navigating += new EventHandler<NavigatingEventArgs>(
+                   delegate(object from, NavigatingEventArgs args)
+                   {
+                       mNavigatingTo = args.Uri.ToString();
+                   });
             }
         }
     }

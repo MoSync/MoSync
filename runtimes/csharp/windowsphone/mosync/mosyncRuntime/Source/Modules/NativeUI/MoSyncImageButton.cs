@@ -46,9 +46,9 @@ namespace MoSync
 			protected ColumnDefinition mColumn2;
 
 			protected System.Windows.Controls.TextBlock mText;
-			protected System.Windows.Controls.Image mForegroundImage;        
+			protected System.Windows.Controls.Image mForegroundImage;
 
-			protected System.Windows.Controls.Image mBackgroundImage;   
+			protected System.Windows.Controls.Image mBackgroundImage;
 			protected System.Windows.Media.Stretch mStretch;
 
 			private void createTextBlock()
@@ -91,7 +91,7 @@ namespace MoSync
 				Grid.SetColumn(mText, 1);
 
 				mGrid.Children.Add(mForegroundImage);
-				mGrid.Children.Add(mText);             
+				mGrid.Children.Add(mText);
 			}
 
 			private void createBackgroundImage()
@@ -236,7 +236,7 @@ namespace MoSync
 			{
 				set
 				{
-					int val = 0; 
+					int val = 0;
 					if (!int.TryParse(value, out val))
 					{
 						return;
@@ -265,7 +265,7 @@ namespace MoSync
 			{
 				set
 				{
-					int val = 0; 
+					int val = 0;
 					if (!int.TryParse(value, out val))
 					{
 						return;
