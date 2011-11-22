@@ -113,13 +113,32 @@ namespace MoSync
             /**
              * Property for showing/hidding the keyboard
              * set: accepts a String containg the values "true" and "false"
-             */
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_SHOW_KEYBOARD)]
+             *
+             * Windows Phone 7 doesn't have a way to hide the keyboard
+             * other than setting focus to another control that doesn't accept input, thus hiding the keyboard;
+             **/
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_SHOW_KEYBOARD)]
 			public String ShowKeyboard
 			{
 				set
 				{
-					//todo: implement
+                    if (value.Equals("true"))
+                    {
+                        mEditBox.Focus();
+                    }
+                    else if (value.Equals("false"))
+                    {
+                        // we need to focus another, non-input element in order to hide the keyboard
+                        try
+                        {
+                            // the parent is most probable to exist and be a non-input control
+                            System.Windows.Controls.Control ctrl = (System.Windows.Controls.Control)mEditBox.Parent;
+                            ctrl.Focus();
+                        }
+                        catch
+                        {
+                        }
+                    }
 				}
 			}
 
