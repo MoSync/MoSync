@@ -31,6 +31,9 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Windows.Media;
+using System.Windows.Input;
+
 
 namespace MoSync
 {
@@ -57,19 +60,19 @@ namespace MoSync
 			protected bool mInitialCapsSentence;
 
             /**
-             * Helper function that sets the input mode of the edit box
-             * @param scopeValue: indicates the type of input that is expected from the user.
-             * Can have values like: Url, FullFilePath, FileName, EmailUserName, PostalCode, Password, Numeric
+             * if set to true, indicates that all the text is a watermark/placeholder
              */
-			protected void setInputMode(System.Windows.Input.InputScopeNameValue scopeValue)
-			{
-				System.Windows.Input.InputScope keyboard = new System.Windows.Input.InputScope();
-				System.Windows.Input.InputScopeName scopeName = new System.Windows.Input.InputScopeName();
+			protected bool mIsWatermarkMode;
 
-				scopeName.NameValue = scopeValue;
-				keyboard.Names.Add(scopeName);
-				mEditBox.InputScope = keyboard;
-			}
+           /**
+             * if set to true, indicates that all the text is a watermark/placeholder
+             */
+            protected Brush mForegroundColor;
+
+            /**
+             * The watermark/placeholder text
+             */
+            protected String mPlaceholderText;
 
             /**
              * Constructor
@@ -80,7 +83,80 @@ namespace MoSync
 				View = mEditBox;
 				mInitialCapsWord = false;
 				mInitialCapsSentence = false;
+                mIsWatermarkMode = false;
+                mPlaceholderText = "";
+
+                mForegroundColor = mEditBox.Foreground;
+
+                /**
+                  * GotFocuse event
+                  * used for simulating the watermark/placeholder
+                  */
+                mEditBox.GotFocus += new RoutedEventHandler(
+                    delegate (object from, RoutedEventArgs args) {
+                        // if watermark present
+                        if (mIsWatermarkMode)
+                        {
+                            // move the cursor to the first position
+                            mEditBox.Select(0, 0);
+                        }
+                    }
+                ); // end of mEditBox.GotFocus
+
+                /**
+                  * LostFocus event
+                  * used for simulating the watermark/placeholder
+                  */
+                mEditBox.LostFocus += new RoutedEventHandler(
+                    delegate(object from, RoutedEventArgs args)
+                    {
+                        // if watermark present
+                        if (mIsWatermarkMode)
+                        {
+                            // if no text has been entered by the user than leave the watermark text
+                            if (mEditBox.Text.Equals(""))
+                            {
+                                Placeholder = mPlaceholderText;
+                            }
+                            else
+                            {
+                                // some text has been "saved" so watermark is off
+                                mIsWatermarkMode = true;
+                            }
+                        }
+                    }
+                ); // end of mEditBox.LostFocus
+
+                /**
+                  * LostFocus event
+                  * used for simulating the watermark/placeholder
+                  */
+                mEditBox.TextInputStart += new TextCompositionEventHandler(
+                    delegate(object from, TextCompositionEventArgs args)
+                    {
+                        mEditBox.Text = "";
+
+                        // change the foreground to "normal" for user input
+                        mEditBox.Foreground = mForegroundColor;
+                    }
+                ); // end of TextInputStart
 			}
+
+            /**
+             * Helper function that sets the input mode of the edit box
+             * @param scopeValue: indicates the type of input that is expected from the user.
+             * Can have values like: Url, FullFilePath, FileName, EmailUserName, PostalCode, Password, Numeric
+             */
+            protected void setInputMode(System.Windows.Input.InputScopeNameValue scopeValue)
+            {
+                System.Windows.Input.InputScope keyboard = new System.Windows.Input.InputScope();
+                System.Windows.Input.InputScopeName scopeName = new System.Windows.Input.InputScopeName();
+
+                scopeName.NameValue = scopeValue;
+                keyboard.Names.Add(scopeName);
+                mEditBox.InputScope = keyboard;
+            }
+
 
             /**
              * Property for setting and getting the text that the edit box contains.
@@ -100,13 +176,26 @@ namespace MoSync
 
             /**
             * Property for setting the default text that the edit box will contain when first displayed
+            *
+            * Since the Watermark is not yet implemented we use the solution suggested by MS 
+            * (http://msdn.microsoft.com/en-us/library/system.windows.controls.textbox(v=vs.95).aspx)
             */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_PLACEHOLDER)]
 			public String Placeholder
 			{
 				set
 				{
-					mEditBox.Text = value;
+                    mIsWatermarkMode = true;
+
+                    // save the "normal" brush
+                    mForegroundColor = mEditBox.Foreground;
+
+                    SolidColorBrush waterMarkBrush = new SolidColorBrush();
+                    waterMarkBrush.Color = Colors.Gray;
+                    mEditBox.Foreground = waterMarkBrush;
+                    mPlaceholderText = value;
+
+                    mEditBox.Text = mPlaceholderText;
 				}
 			}
 
@@ -210,6 +299,7 @@ namespace MoSync
 					}
 				}
 			}
-		}
-	}
-}
+
+		} // class EditBox
+	} // namespace NativeUI
+} // namespace MoSync
