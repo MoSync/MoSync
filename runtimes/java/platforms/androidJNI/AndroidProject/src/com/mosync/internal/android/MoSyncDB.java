@@ -16,6 +16,8 @@ import static com.mosync.internal.generated.MAAPI_consts.*;
  */
 public class MoSyncDB
 {
+	public boolean mIsLoggingOn = true;
+
 	private int mDatabaseCounter = 0;
 	private HashMap<Integer, MoDatabase> mDatabaseTable =
 		new HashMap<Integer, MoDatabase>();
@@ -26,6 +28,14 @@ public class MoSyncDB
 
 	public MoSyncDB()
 	{
+	}
+
+	public void logStackTrace(Throwable ex)
+	{
+		if (mIsLoggingOn)
+		{
+			ex.printStackTrace();
+		}
 	}
 
 	/**
@@ -44,7 +54,7 @@ public class MoSyncDB
 		}
 		catch (SQLiteException ex)
 		{
-			ex.printStackTrace();
+			logStackTrace(ex);
 			return MA_DB_ERROR;
 		}
 	}
@@ -69,7 +79,7 @@ public class MoSyncDB
 		}
 		catch (SQLiteException ex)
 		{
-			ex.printStackTrace();
+			logStackTrace(ex);
 			return MA_DB_ERROR;
 		}
 	}
@@ -119,7 +129,7 @@ public class MoSyncDB
 		}
 		catch (SQLiteException ex)
 		{
-			ex.printStackTrace();
+			logStackTrace(ex);
 			return MA_DB_ERROR;
 		}
 	}
@@ -173,7 +183,7 @@ public class MoSyncDB
 		}
 		catch (SQLiteException ex)
 		{
-			ex.printStackTrace();
+			logStackTrace(ex);
 			return MA_DB_ERROR;
 		}
 	}
@@ -189,7 +199,8 @@ public class MoSyncDB
 	 * A data object will be created with the column data, and the handle
 	 * will refer to that data.
 	 * @param mosync The MoSyncThread instance.
-	 * @return MA_DB_OK on success, MA_DB_ERROR on error.
+	 * @return #MA_DB_OK on success, #MA_DB_NULL if the column value
+	 * is NULL, #MA_#MA_DB_ERROR on error.
 	 */
 	public int maDBCursorGetColumnData(
 		int cursorHandle,
@@ -204,25 +215,33 @@ public class MoSyncDB
 
 		try
 		{
+			// Check for NULL value.
+			if (getCursor(cursorHandle).isNull(columnIndex))
+			{
+				return MA_DB_NULL;
+			}
+
 			// Get data as a byte array.
 			byte[] data = getCursor(cursorHandle).getData(columnIndex);
-			if (null != data)
+			if (null == data)
 			{
-				// This calls maCreateData and copies data to the data object.
-				int result = mosync.createDataObject(placeholder, data);
-				if ((result > 0) && (result == placeholder))
-				{
-					return MA_DB_OK;
-				}
+				return MA_DB_NULL;
+			}
+
+			// This calls maCreateData and copies data to the data object.
+			int result = mosync.createDataObject(placeholder, data);
+			if ((result > 0) && (result == placeholder))
+			{
+				return MA_DB_OK;
 			}
 		}
 		catch (CursorIndexOutOfBoundsException ex1)
 		{
-			ex1.printStackTrace();
+			logStackTrace(ex1);
 		}
-		catch (SQLiteException ex2)
+		catch (SQLException ex2)
 		{
-			ex2.printStackTrace();
+			logStackTrace(ex2);
 		}
 
 		return MA_DB_ERROR;
@@ -241,7 +260,8 @@ public class MoSyncDB
 	 * @param mosync The MoSyncThread instance.
 	 * @return The actual length of the data, if the actual length
 	 * returned is > bufferSize, data was not copied (buffer too small),
-	 * returns MA_DB_ERROR on other errors.
+	 * returns #MA_DB_ERROR on other errors, returns #MA_DB_NULL if the
+	 * column value is NULL.
 	 */
 	public int maDBCursorGetColumnText(
 		int cursorHandle,
@@ -257,11 +277,17 @@ public class MoSyncDB
 
 		try
 		{
+			// Check for NULL value.
+			if (getCursor(cursorHandle).isNull(columnIndex))
+			{
+				return MA_DB_NULL;
+			}
+
 			// Get data as a byte array.
 			String text = getCursor(cursorHandle).getText(columnIndex);
 			if (null == text)
 			{
-				return MA_DB_ERROR;
+				return MA_DB_NULL;
 			}
 
 			// Write to MoSync memory. Only copy data if it fits
@@ -281,11 +307,11 @@ public class MoSyncDB
 		}
 		catch (CursorIndexOutOfBoundsException ex1)
 		{
-			ex1.printStackTrace();
+			logStackTrace(ex1);
 		}
-		catch (SQLiteException ex2)
+		catch (SQLException ex2)
 		{
-			ex2.printStackTrace();
+			logStackTrace(ex2);
 		}
 
 		return MA_DB_ERROR;
@@ -299,7 +325,8 @@ public class MoSyncDB
 	 * First column has index zero.
 	 * @param intValueAddress Address to int to receive the value.
 	 * @param mosync The MoSyncThread instance.
-	 * @return MA_DB_OK on success, MA_DB_ERROR on error.
+	 * @return #MA_DB_OK on success, #MA_DB_NULL if the column value
+	 * is NULL, #MA_#MA_DB_ERROR on error.
 	 */
 	public int maDBCursorGetColumnInt(
 		int cursorHandle,
@@ -314,11 +341,17 @@ public class MoSyncDB
 
 		try
 		{
+			// Check for NULL value.
+			if (getCursor(cursorHandle).isNull(columnIndex))
+			{
+				return MA_DB_NULL;
+			}
+
 			// Get data as an int value.
 			int value = getCursor(cursorHandle).getInt(columnIndex);
 
 			// Write to MoSync memory. Size of an int is 4.
-			// TODO: Replace with high-level call to write double.
+			// TODO: Replace with high-level call to write int.
 			ByteBuffer buffer = mosync.getMemorySlice(intValueAddress, 4);
 			buffer.putInt(value);
 
@@ -326,11 +359,11 @@ public class MoSyncDB
 		}
 		catch (CursorIndexOutOfBoundsException ex1)
 		{
-			ex1.printStackTrace();
+			logStackTrace(ex1);
 		}
-		catch (SQLiteException ex2)
+		catch (SQLException ex2)
 		{
-			ex2.printStackTrace();
+			logStackTrace(ex2);
 		}
 
 		return MA_DB_ERROR;
@@ -344,7 +377,8 @@ public class MoSyncDB
 	 * First column has index zero.
 	 * @param doubleValueAddress Address to double to receive the value.
 	 * @param mosync The MoSyncThread instance.
-	 * @return #MA_DB_OK on success, #MA_DB_ERROR on error.
+	 * @return #MA_DB_OK on success, #MA_DB_NULL if the column value
+	 * is NULL, #MA_#MA_DB_ERROR on error.
 	 */
 	public int maDBCursorGetColumnDouble(
 		int cursorHandle,
@@ -359,11 +393,17 @@ public class MoSyncDB
 
 		try
 		{
+			// Check for NULL value.
+			if (getCursor(cursorHandle).isNull(columnIndex))
+			{
+				return MA_DB_NULL;
+			}
+
 			// Get data as a float value.
 			double value = getCursor(cursorHandle).getDouble(columnIndex);
 
 			// Write to MoSync memory. Size of a double is 8.
-			// TODO: Replace with high-level call to write int.
+			// TODO: Replace with high-level call to write double.
 			ByteBuffer buffer = mosync.getMemorySlice(doubleValueAddress, 8);
 			buffer.putLong(Double.doubleToLongBits(value));
 
@@ -371,11 +411,11 @@ public class MoSyncDB
 		}
 		catch (CursorIndexOutOfBoundsException ex1)
 		{
-			ex1.printStackTrace();
+			logStackTrace(ex1);
 		}
-		catch (SQLiteException ex2)
+		catch (SQLException ex2)
 		{
-			ex2.printStackTrace();
+			logStackTrace(ex2);
 		}
 
 		return MA_DB_ERROR;
@@ -482,30 +522,22 @@ public class MoSyncDB
 			mCursor = cursor;
 		}
 
-		public int getRowCount()
-			throws SQLException
-		{
-			return mCursor.getCount();
-		}
-
 		public boolean next()
 			throws SQLException
 		{
 			return mCursor.moveToNext();
 		}
 
+		public boolean isNull(int columnIndex)
+			throws SQLException
+		{
+			return mCursor.isNull(columnIndex);
+		}
+
 		public byte[] getData(int columnIndex)
 			throws SQLException
 		{
-			try
-			{
-				return mCursor.getBlob(columnIndex);
-			}
-			catch (SQLException ex)
-			{
-				ex.printStackTrace();
-				return null;
-			}
+			return mCursor.getBlob(columnIndex);
 		}
 
 		public String getText(int columnIndex)
