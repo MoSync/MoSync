@@ -96,6 +96,7 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.provider.Settings.Secure;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.nfc.MoSyncNFC;
@@ -2447,6 +2448,23 @@ public class MoSyncThread extends Thread
 		else if(key.equals("mosync.device"))
 		{
 			property = Build.FINGERPRINT;
+		}
+		else if(key.equals("mosync.device.name"))
+		{
+			property = Build.DEVICE;
+		}
+		else if(key.equals("mosync.device.UUID"))
+		{
+			property = Secure.getString( mContext.getContentResolver(),
+					Secure.ANDROID_ID);
+		}
+		else if(key.equals("mosync.device.OS"))
+		{
+			property = "Android";
+		}
+		else if(key.equals("mosync.device.OS.version"))
+		{
+			property = Build.VERSION.RELEASE;
 		}
 		else if (key.equals("mosync.path.local"))
 		{
