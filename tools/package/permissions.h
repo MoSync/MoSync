@@ -42,6 +42,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define HOMESCREEN "Home Screen"
 #define AUTOSTART "Auto Start"
 #define NFC "NFC"
+#define C2DM_MESSAGE "C2DM/Messages"
+#define C2DM_RECEIVE "C2DM/Receiver"
 
 // Parse permissions
 void parsePermissions(std::set<std::string>& out, const char* permissions);

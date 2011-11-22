@@ -178,6 +178,7 @@ end
 sh( "#{File.join(androidSDKTools, "/aapt")} package -f -v " +
 	"-M #{File.join(package_root,"AndroidManifest.xml")} -F resources.ap_ " +
 	"-I #{File.join(androidSDKPath, "android.jar")} " +
+	"-I #{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")} " +
 	"-S #{File.join(package_root, "res")} " +
 	"-m -J #{File.join(package_root, "gen")}");
 
@@ -196,7 +197,10 @@ packages = ["src/com/mosync/java/android/*.java",
 			"src/com/mosync/nativeui/ui/custom/*.java",
 			"gen/com/mosync/java/android/*.java",
             "src/com/mosync/internal/android/nfc/*.java",
-            "src/com/mosync/internal/android/nfc/ops/*.java"
+            "src/com/mosync/internal/android/nfc/ops/*.java",
+	        "src/com/mosync/nativeui/ui/ads/*.java",
+			"src/com/google/android/c2dm/*.java",
+			"src/com/mosync/internal/android/notifications/*.java"
             ]
 
 # Concatenate each list element with package_root, and flatten the list to a string
@@ -205,15 +209,23 @@ java_files = packages.map { |package| File.join(package_root, package) }.join(" 
 
 
 # Compile all the java files into class files
-sh(
-	"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
-	"-classpath " +
-	"#{File.join(androidSDKPath, "android.jar")} " + java_files)
+if ENV['OS'] == "Windows_NT"
+	sh(
+		"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
+		"-classpath " +
+		"\"#{File.join(androidSDKPath, "android.jar")};#{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")}\" " + java_files);
+else
+	sh(
+		"javac -source 1.6 -target 1.6 -g -d #{class_dir} " +
+		"-classpath " +
+		"\"#{File.join(androidSDKPath, "android.jar")}:#{File.join("#{package_root}libs/", "GoogleAdMobAdsSdk.jar")}\" " + java_files);
+end
 
 puts "Copy Generated Library File\n\n"
 
 # copy the library file
 FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/armeabi/libmosync.so")}", "temp/libmosync.so")
+FileUtils.copy_file( "#{File.join(cpath, "AndroidProject/libs/GoogleAdMobAdsSdk.jar")}", "temp/GoogleAdMobAdsSdk.jar")
 
 puts "Build Zip Package\n\n"
 
