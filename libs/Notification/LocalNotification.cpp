@@ -237,7 +237,7 @@ namespace Notification
      * Set the message displayed in the notification alert.
      * @param text The given text that will be displayed in notification.
      */
-    void LocalNotification::setContentBody(MAUtil::String& text)
+    void LocalNotification::setContentBody(const MAUtil::String& text)
     {
         this->setProperty(MA_NOTIFICATION_LOCAL_CONTENT_BODY, text);
     }
@@ -252,11 +252,31 @@ namespace Notification
     }
 
     /**
+     * Set the title that goes in the expanded entry of the notification.
+     * Platform: Android.
+     * @param text The given text that will be displayed in the notification.
+     */
+    void LocalNotification::setContentTitle(const MAUtil::String text)
+    {
+		this->setProperty(MA_NOTIFICATION_LOCAL_CONTENT_TITLE, text);
+    }
+
+    /**
+     * Get the title that goes in the expanded entry of the notification.
+     * Platform: Android.
+     * @return The text displayed in the notification.
+     */
+    MAUtil::String LocalNotification::getContentTitle() const
+    {
+		return this->getPropertyString(MA_NOTIFICATION_LOCAL_CONTENT_TITLE);
+    }
+
+    /**
      * Set the title of the action button or slider.
      * Platform: iOS.
      * @param alertAction The given title.
      */
-    void LocalNotification::setAlertAction(MAUtil::String& alertAction)
+    void LocalNotification::setAlertAction(const MAUtil::String& alertAction)
     {
         this->setProperty(MA_NOTIFICATION_LOCAL_ALERT_ACTION, alertAction);
     }
@@ -269,6 +289,42 @@ namespace Notification
     MAUtil::String LocalNotification::getAlertAction() const
     {
         return this->getPropertyString(MA_NOTIFICATION_LOCAL_ALERT_ACTION);
+    }
+
+    /**
+     * Set the text that flows by in the status bar when the
+     * notification first activates.
+     * Platform: Android.
+     * @param text The text that flows by in the status bar.
+     */
+    void LocalNotification::setTickerText(const MAUtil::String text)
+    {
+		this->setProperty(MA_NOTIFICATION_LOCAL_TICKER_TEXT, text);
+    }
+
+    /**
+     * Get the text that flows by in the status bar when the
+     * notification first activates.
+     * Platform: Android.
+     * @return The ticker text.
+     */
+    MAUtil::String LocalNotification::getTickerText() const
+    {
+		return this->getPropertyString(MA_NOTIFICATION_LOCAL_TICKER_TEXT);
+    }
+
+    /**
+     * Set the flags applied to the local notification.
+     * Platform: Android.
+     * @param flag One of the constants:
+     *  - #NOTIFICATION_FLAG_INSISTENT
+     *  - #NOTIFICATION_FLAG_NO_CLEAR
+     *  - #NOTIFICATION_FLAG_HIGH_PRIORITY
+     *  - #NOTIFICATION_FLAG_AUTO_CANCEL
+     */
+    void LocalNotification::setFlag(const int flag)
+    {
+		this->setPropertyInt(MA_NOTIFICATION_LOCAL_FLAG, flag);
     }
 
     /**
@@ -305,6 +361,109 @@ namespace Notification
             return true;
         }
         return false;
+    }
+
+    /**
+     * Set the sound to play when an alert is displayed.
+     * Plarform: Android.
+     * @param path A valid path to an audio file.
+     */
+    void LocalNotification::setSound(const MAUtil::String path)
+    {
+        this->setProperty(MA_NOTIFICATION_LOCAL_SOUND_PATH, path);
+    }
+
+    /**
+     * Enable/disable the the default vibration when an alert is displayed.
+     * If set to true, it will use the default notification vibrate. This will
+     * ignore any given vibrate.
+     * Using phone vibration requires the VIBRATE permission.
+     * Platform: Android.
+     * @param vibrate If true the user will be alerted with a vibration when
+     * the local notification is shown.
+     */
+    void LocalNotification::setVibrate(bool vibrate)
+    {
+        MAUtil::String value;
+        if (vibrate)
+        {
+            value = "true";
+        }
+        else
+        {
+            value = "false";
+        }
+        this->setProperty(MA_NOTIFICATION_LOCAL_VIBRATE, value);
+    }
+
+    /**
+     * Check if the local notification has vibrate enabled.
+     * Platform: Android.
+     * @return True if the user will be alerted with a vibration,
+     * false otherwise.
+     */
+    bool LocalNotification::isVibrateEnabled() const
+    {
+        MAUtil::String value =
+            this->getPropertyString(MA_NOTIFICATION_LOCAL_VIBRATE);
+        if (0 == strcmp(value.c_str(), "true"))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Set the vibration duration when an alert is displayed.
+     * Using phone vibration requires the VIBRATE permission.
+     * Platform: Android.
+     * @param duration The number of milliseconds to vibrate.
+     */
+    void LocalNotification::setVibrateDuration(const int duration)
+    {
+		this->setPropertyInt(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, duration);
+    }
+
+    /**
+     * Enable/Disable the default notification LED lights.
+     * This will ignore the setFlashLightsPattern().
+     * Not every color in the spectrum is supported by the device LEDs, and not
+     * every device supports the same  colors, so the hardware estimates to the
+     * best of its ability. Green is the most common notification color.
+     * Platform: Android.
+     * @param flahsing If set to true the user will be alerted by the default
+     * light pattern.
+     */
+    void LocalNotification::setFlashLights(bool flashing)
+    {
+        MAUtil::String value;
+        if (flashing)
+        {
+            value = "true";
+        }
+        else
+        {
+            value = "false";
+        }
+        this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, value);
+    }
+
+    /**
+     * Define your own color and pattern for the lights.
+     * Not every color in the spectrum is supported by the device LEDs, and not every
+     * device supports the same  colors, so the hardware estimates to the best of its
+     * ability. Green is the most common notification color.
+     * Also, not all Android devices support this feature.
+     * Platform: Android.
+     * @param lightPattern a NotificationFlashLights struct.
+     */
+    void LocalNotification::setFlashLightsPattern(const NotificationFlashLights lightPattern)
+    {
+		MAUtil::String pattern = "";
+		pattern = MAUtil::integerToString(lightPattern.ledARGB) + ",";
+		pattern += MAUtil::integerToString(lightPattern.ledOnMS) + ",";
+		pattern += MAUtil::integerToString(lightPattern.ledOffMS);
+        this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, pattern);
     }
 
     /**
