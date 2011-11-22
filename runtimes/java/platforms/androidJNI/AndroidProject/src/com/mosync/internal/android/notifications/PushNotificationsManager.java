@@ -1,15 +1,15 @@
 package com.mosync.internal.android.notifications;
 
-import java.nio.ByteBuffer;
-
-import com.google.android.c2dm.C2DMessaging;
 import com.mosync.internal.android.MoSyncThread;
+import com.google.android.c2dm.C2DMessaging;
+import com.mosync.java.android.C2DMReceiver;
+import com.mosync.internal.android.notifications.PushNotificationsUtil;
 
 import com.mosync.nativeui.util.HandleTable;
 
-
 import android.os.Build;
 import android.content.Context;
+import android.content.Intent;
 import android.util.Log;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
@@ -30,23 +30,43 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PUSH_NOTIFIC
  * The Notifications Manager that holds all the notifications that were
  * received from C2Dm server.
  * Receives all C2DM events.
+ * C2DM supports only devices with Android 2.2 and higher.
+ * This manager is not created on unsupported platforms.
  * @author emma tresanszki
  */
 public class PushNotificationsManager
 {
-
 	/**
 	 * Constructor.
 	 */
 	public PushNotificationsManager(MoSyncThread mThread, Context context)
 	{
-		// C2DM supports only devices with Android 2.2 and higher.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
+		Log.e("@@MoSync","C2DM Create PushNotificationManager");
+		mMosyncThread = mThread;
+		mAppContext = context;
+		ref = this;
+	}
+
+	/**
+	 * Handles an C2DM intent.
+	 * Routine: C2DM message is received, the MoSync activity
+	 * is launched, and this function is called.
+	 * @param intent
+	 * @return {@code true} If the intent was a C2DM intent and handled.
+	 */
+	public static boolean handlePushNotificationIntent(Intent intent)
+	{
+		Log.e("@@MoSync", "handlePushNotificationIntent");
+		// Get message from intent.
+		PushNotificationsManager instance = getRef();
+		if ( instance == null )
 		{
-			mMosyncThread = mThread;
-			mAppContext = context;
-			ref = this;
+			return false;
 		}
+		// Process the new incoming message.
+		instance.messageReceived(intent.getStringExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_MESSAGE));
+
+		return true;
 	}
 
 	/**
@@ -80,7 +100,8 @@ public class PushNotificationsManager
 		mRegistrationInfo.registrationSuccess = false;
 		mRegistrationInfo.registrationInProgress = false;
 		mRegistrationInfo.errorMessage = regError;
-		// POST MoSync event, notify that the request was processed.
+		// Raise a MoSync event, notify that the request was processed,
+		// unconditioned by the result.
 		postEventRegistration(EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION);
 	}
 
@@ -99,16 +120,35 @@ public class PushNotificationsManager
 	 */
 	public void messageReceived(String message)
 	{
+		Log.e("@@MoSync","C2DM messageReceived");
+		// Create local notification object.
 		int newHandle = createNotification(mMosyncThread.getActivity(), message);
-		postEventNotificationReceived(newHandle);
+		// Launch the notification now.
+		triggerNotification(mMosyncThread.getActivity(), newHandle);
 
+		postEventNotificationReceived(newHandle);
 	}
 
 	/**
 	 * Launch local notification for a received message.
+	 * @param id The notification handle.
+	 * @return True if the local notification object exists.
+	 */
+	public Boolean triggerNotification(Context context, int id)
+	{
+		PushNotificationObject notification =
+			m_NotificationTable.get(id);
+		if ( notification == null )
+			return false;
+		notification.triggerNotification(context);
+		return true;
+	}
+
+	/**
+	 * Create a local notification for a received message.
 	 * @param context
 	 * @param message The content body of the notification.
-	 * @return The notification handle.
+	 * @return The new notification handle.
 	 */
 	public int createNotification(Context context, String message)
 	{
@@ -117,14 +157,14 @@ public class PushNotificationsManager
 				"drawable",
 				context.getPackageName());
 		PushNotificationObject notification = new PushNotificationObject(
-				message, icon, mTickerText, mMessageTitle);
+				message,
+				icon,
+				PushNotificationsUtil.getNotificationTicker(context),
+				PushNotificationsUtil.getNotificationTitle(context));
 
 		// Add the notification to the map.
 		int handle = m_NotificationTable.add(notification);
 
-		notification.triggerNotification(context);
-
-		Log.e("EMMA","push notification HANDLE IS " + handle);
 		return handle;
 	}
 
@@ -164,11 +204,11 @@ public class PushNotificationsManager
 	 * typically the email address of an account set up by the application's developer.
 	 *
 	 * @return a result code.
+	 * The registration request is asynchronous. Get the request result using
+	 * maNotificationPushGetRegistration.
 	 */
 	public int register(String accountID)
 	{
-		Log.e("EMMA", "Manager register");
-
 		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO)
 		{
 			// No need to send registration request, it can be handled locally.
@@ -190,8 +230,8 @@ public class PushNotificationsManager
 		// Start requesting registration.
 		mRegistrationInfo.registrationInProgress = true;
 		mRegistrationInfo.registrationAttempted = true;
-		// Register with the ID of the account authorized to send push messages.
 
+		// Register with the ID of the account authorized to send push messages.
 		C2DMessaging.register(mMosyncThread.getActivity(), accountID);
 
 		return MA_NOTIFICATION_RES_OK;
@@ -312,7 +352,7 @@ public class PushNotificationsManager
 	 */
 	public void setTickerText(String text)
 	{
-		mTickerText = text;
+		PushNotificationsUtil.setPushNotificationTicker(mMosyncThread.getActivity(), text);
 	}
 
 	/**
@@ -321,15 +361,9 @@ public class PushNotificationsManager
 	 */
 	public void setMessageTitle(String title)
 	{
-		mMessageTitle = title;
+		PushNotificationsUtil.setPushNotificationTitle(mMosyncThread.getActivity(), title);
 	}
 
-	private ByteBuffer getMemoryAt(int offset, int bound) {
-		mMosyncThread.mMemDataSection.position(offset);
-		ByteBuffer slice = mMosyncThread.mMemDataSection.slice();
-		slice.limit(bound);
-		return slice;
-	}
 	/************************ Class members ************************/
 	/**
 	 * The MoSync thread object.
@@ -355,16 +389,4 @@ public class PushNotificationsManager
 	 * A static reference to this object.
 	 */
 	private static PushNotificationsManager ref;
-
-	/**
-	 * The ticker text for incoming notifications.
-	 * It is set by maNotificationPushSetTickerText.
-	 */
-	private String mTickerText = null;
-
-	/**
-	 * The message title for incoming notifications.
-	 * It is set bymaNotificationPushSetMessageTitle.
-	 */
-	private String mMessageTitle = null;
 }

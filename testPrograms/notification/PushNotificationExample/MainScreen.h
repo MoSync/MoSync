@@ -39,6 +39,7 @@ MA 02110-1301, USA.
 #include <Notification/PushNotification.h>
 #include <Notification/PushNotificationListener.h>
 
+#include "TCPListener.h"
 // Forward declarations
 class TCPConnection;
 class SoundListener;
@@ -50,7 +51,8 @@ class SoundListener;
 class MainScreen:
     public NativeUI::Screen,
     public MAUtil::TimerListener,
-    public Notification::PushNotificationListener
+    public Notification::PushNotificationListener,
+    public TCPListener
 {
 
 public:
@@ -70,6 +72,7 @@ public:
      * Note: This method is only applicable to screens.
      */
     virtual void show();
+	virtual void ConnectionEstablished();
 private:
     /**
      * Creates and adds main layout to the screen.
@@ -92,7 +95,6 @@ private:
      * Called if the application did not registered for push notification.
      */
     virtual void didFaildToRegister(
-        const int code,
         MAUtil::String& error);
 
     /**
@@ -100,6 +102,9 @@ private:
      */
     virtual void runTimerEvent();
 
+    void checkStore();
+
+    void storeRegistrationID(MAUtil::String& token);
 private:
     /**
      * Used for playing a sound repeatedly.
@@ -121,10 +126,12 @@ private:
      */
     NativeUI::Image* mImage;
 
-    /**
-     * Currently displayed background image handle.
-     */
-    MAHandle mCurrentImageHandle;
+	// Android only.
+	// Send reg ID to the server only first time
+	// the app is launched.
+	bool mSendRegistrationNeeded;
+	MAHandle mCurrentImageHandle;
+	MAUtil::String mToken;
 };
 
 

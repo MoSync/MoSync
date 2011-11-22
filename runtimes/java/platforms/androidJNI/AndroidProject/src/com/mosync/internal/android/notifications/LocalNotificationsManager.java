@@ -22,12 +22,11 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
  */
 public class LocalNotificationsManager
 {
-
 	/**
 	 * Constructor.
 	 */
-	public LocalNotificationsManager()
-	{}
+	public LocalNotificationsManager(){
+	}
 
 	/**
 	 * Create a notification object.

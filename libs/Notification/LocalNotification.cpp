@@ -333,7 +333,7 @@ namespace Notification
     }
 
     /**
-     * Add an event listener for this banner.
+     * Add an event listener for this local notification.
      * @param listener The listener that will receive
      * local notification events.
      */

@@ -29,12 +29,15 @@ MA 02110-1301, USA.
 #define CANNOT_SEND_DATA_ERROR "Cannot send data to server!"
 
 // The address of the server that will send push notifications.
-#define SERVER_ADDRESS "socket://188.27.128.230:4567"
+#define SERVER_ADDRESS_iOS "socket://188.27.128.230:4567"
+//#define SERVER_ADDRESS_ANDROID "socket://188.27.128.230:6789"
+#define SERVER_ADDRESS_ANDROID "socket://192.168.1.108:6789"
 
 // Default size for buffers.
 #define BUF_SIZE 256
 
 #include "TCPConnection.h"
+#include "Util.h"
 
 #include <conprint.h>
 #include <mastdlib.h>
@@ -42,13 +45,22 @@ MA 02110-1301, USA.
 /**
  * Constructor.
  */
-TCPConnection::TCPConnection(): mConnection(this)
+TCPConnection::TCPConnection(TCPListener* listener):
+mConnection(this),
+mMessageSent(false),
+mConnected(false)
 {
-    mConnectionStatus = mConnection.connect(SERVER_ADDRESS);
-    if(mConnectionStatus < 0)
-    {
-        maMessageBox(CONNECTION_ERROR_TITLE, CONNECTION_ERROR_MESSAGE);
-    }
+	mListener = listener;
+	if ( isAndroid() )
+		mConnectionStatus = mConnection.connect(SERVER_ADDRESS_ANDROID);
+	else
+		mConnectionStatus = mConnection.connect(SERVER_ADDRESS_iOS);
+
+	if(mConnectionStatus < 0)
+	{
+		printf("Cannot connect");
+		maMessageBox(CONNECTION_ERROR_TITLE, CONNECTION_ERROR_MESSAGE);
+	}
 }
 
 /**
@@ -57,6 +69,7 @@ TCPConnection::TCPConnection(): mConnection(this)
 TCPConnection::~TCPConnection()
 {
     mConnection.close();
+    delete mListener;
 }
 
 /**
@@ -86,10 +99,16 @@ void TCPConnection::sendData(const MAUtil::String& data)
 */
 void TCPConnection::connectFinished(MAUtil::Connection* conn, int result)
 {
-    if(0 > result)
+    if(result < 0)
     {
         printf("mConnection.connectFinished failed. Error code: %d", result);
     }
+    else
+    {
+		mConnected = true;
+		mListener->ConnectionEstablished();
+    }
+
 }
 
 /**
@@ -100,9 +119,14 @@ void TCPConnection::connectFinished(MAUtil::Connection* conn, int result)
 */
 void TCPConnection::connWriteFinished(MAUtil::Connection* conn, int result)
 {
-    if(0 > result)
+    if(result < 0)
     {
+		mMessageSent = false;
         printf("mConnection.write failed. Error code: %d", result);
         maMessageBox(CONNECTION_ERROR_TITLE, CANNOT_SEND_DATA_ERROR);
+    }
+    else
+    {
+		mMessageSent = true;
     }
 }

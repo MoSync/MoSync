@@ -1,5 +1,19 @@
 package com.google.android.c2dm;
-
+/*
+ * Copyright 2010 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import java.io.IOException;
 
 import android.app.AlarmManager;
@@ -14,11 +28,12 @@ import android.util.Log;
  * Base class for C2D message receiver. Includes constants for the strings used
  * in the protocol.
  */
-public abstract class C2DMBaseReceiver extends IntentService {
+public abstract class C2DMBaseReceiver extends IntentService
+{
 	private static final String C2DM_RETRY = "com.google.android.c2dm.intent.RETRY";
 
 	public static final String REGISTRATION_CALLBACK_INTENT = "com.google.android.c2dm.intent.REGISTRATION";
-	private static final String C2DM_INTENT = "com.google.android.c2dm.intent.RECEIVE";
+	public static final String C2DM_INTENT = "com.google.android.c2dm.intent.RECEIVE";
 
 	// Logging tag
 	private static final String TAG = "@@MoSync C2DM";
@@ -30,6 +45,7 @@ public abstract class C2DMBaseReceiver extends IntentService {
 
 	public static final String EXTRA_REGISTRATION_ID = "registration_id";
 
+	// Error messages.
 	public static final String ERR_SERVICE_NOT_AVAILABLE = "SERVICE_NOT_AVAILABLE";
 	public static final String ERR_ACCOUNT_MISSING = "ACCOUNT_MISSING";
 	public static final String ERR_AUTHENTICATION_FAILED = "AUTHENTICATION_FAILED";
@@ -38,7 +54,7 @@ public abstract class C2DMBaseReceiver extends IntentService {
 	public static final String ERR_INVALID_SENDER = "INVALID_SENDER";
 	public static final String ERR_PHONE_REGISTRATION_ERROR = "PHONE_REGISTRATION_ERROR";
 
-	// wakelock
+	// Wakelock
 	private static final String WAKELOCK_KEY = "C2DM_LIB";
 
 	private static PowerManager.WakeLock mWakeLock;
@@ -48,8 +64,8 @@ public abstract class C2DMBaseReceiver extends IntentService {
 	 * The C2DMReceiver class must create a no-arg constructor and pass the
 	 * sender id to be used for registration.
 	 */
-	public C2DMBaseReceiver(String senderId) {
-		// senderId is used as base name for threads, etc.
+	public C2DMBaseReceiver(String senderId)
+	{
 		super(senderId);
 		this.senderId = senderId;
 	}
@@ -71,8 +87,6 @@ public abstract class C2DMBaseReceiver extends IntentService {
 	 */
 	public void onRegistered(Context context, String registrationId)
 			throws IOException {
-		System.out.println("IN BaseReceiver onRegistered");
-		// registrationId will also be saved
 	}
 
 	/**
@@ -108,7 +122,8 @@ public abstract class C2DMBaseReceiver extends IntentService {
 	 * call handleMessage(), registered(), etc. in background threads, with a
 	 * wake lock, while keeping the service alive.
 	 */
-	static void runIntentInService(Context context, Intent intent) {
+	static void runIntentInService(Context context, Intent intent)
+	{
 		if (mWakeLock == null) {
 			// This is called from BroadcastReceiver, there is no init.
 			PowerManager pm = (PowerManager) context
@@ -127,29 +142,28 @@ public abstract class C2DMBaseReceiver extends IntentService {
 
 	}
 
-	private void handleRegistration(final Context context, Intent intent){
-
+	/**
+	 * Handle registration result.
+	 * @param context
+	 * @param intent
+	 */
+	private void handleRegistration(final Context context, Intent intent)
+	{
 		final String registrationId = intent
 				.getStringExtra(EXTRA_REGISTRATION_ID);
-//		RegisterActivity.setReg(registrationId);
 
 		String error = intent.getStringExtra(EXTRA_ERROR);
 		String removed = intent.getStringExtra(EXTRA_UNREGISTERED);
 
-		if (Log.isLoggable(TAG, Log.DEBUG)) {
-			Log.d(TAG, "dmControl: registrationId = " + registrationId
-					+ ", error = " + error + ", removed = " + removed);
-		}
-
-		if (removed != null) {
-			// Remember we are unregistered
-			C2DMessaging.clearRegistrationId(context);
+		if (removed != null)
+		{
+			// Send unregistered event.
 			onUnregistered(context);
 			return;
-		} else if (error != null) {
+		} else if (error != null)
+		{
 			// we are not registered, can try again
-			C2DMessaging.clearRegistrationId(context);
-			// Registration failed
+			// Registration failed.
 			Log.e(TAG, "Registration error " + error);
 			onError(context, error);
 			if ("SERVICE_NOT_AVAILABLE".equals(error)) {
@@ -174,10 +188,6 @@ public abstract class C2DMBaseReceiver extends IntentService {
 		} else {
 			try {
 				onRegistered(context, registrationId);
-//				C2DMessaging.setRegistrationId(context, registrationId);
-//				PushNotificationsManager.setRegId(registrationId);
-				// Raise an event now. TODO
-				Log.e("Emmaaaa setRegID", registrationId);
 			} catch (IOException ex) {
 				Log.e(TAG, "Registration error " + ex.getMessage());
 			}

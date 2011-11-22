@@ -17,8 +17,8 @@ import com.mosync.java.android.MoSync;
  */
 public class PushNotificationObject
 {
-
-	public PushNotificationObject() {}
+	public PushNotificationObject(){
+	}
 
 	/**
 	 * Constructor.
@@ -43,7 +43,7 @@ public class PushNotificationObject
 		Notification notification = new Notification(
 				mIcon, mTicker, System.currentTimeMillis());
 		// Hide the notification after its selected.
-//		notification.flags |= Notification.FLAG_AUTO_CANCEL;
+		notification.flags |= Notification.FLAG_AUTO_CANCEL;
 
 		Intent intent = new Intent(context, MoSync.class);
 		intent.putExtra("payload", mMessage);

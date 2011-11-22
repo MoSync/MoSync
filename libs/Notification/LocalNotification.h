@@ -57,6 +57,7 @@ namespace Notification
      * happen.
      * When you create a local notification, you must specify when the system
      * should deliver the notification(see fire date property).
+	 * If you don't specify a fire date, the default System time will be set.
      */
     class LocalNotification
     {
@@ -227,7 +228,7 @@ namespace Notification
         virtual struct tm getFireDate() const;
 
         /**
-         * Add an event listener for this banner.
+         * Add an event listener for this local notification.
          * @param listener The listener that will receive
          * local notification events.
          */

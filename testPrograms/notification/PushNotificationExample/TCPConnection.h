@@ -31,6 +31,8 @@ MA 02110-1301, USA.
 #include <MAUtil/Connection.h>
 #include <maapi.h>
 
+#include "TCPListener.h"
+
 /**
  * @brief Send package to a server application using tcp socket.
  */
@@ -41,7 +43,7 @@ public:
 	/**
 	 * Constructor.
 	 */
-	TCPConnection();
+	TCPConnection(TCPListener* listener);
 
 	/**
 	 * Destructor.
@@ -55,6 +57,7 @@ public:
 	 */
 	virtual void sendData(const MAUtil::String& data);
 
+	bool mMessageSent;
 private:
 	/**
 	* Called when a write operation finishes.
@@ -84,6 +87,8 @@ private:
 	 * not been established.
 	 */
 	int mConnectionStatus;
+	bool mConnected;
+	TCPListener* mListener;
 };
 
 #endif /* TCPCONNECTION_H_ */

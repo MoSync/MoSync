@@ -49,7 +49,6 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERR
  */
 public class LocalNotificationsService extends Service
 {
-
 	/**
 	 * Create an empty notification object.
 	 * Set it's properties via maNotificationSetProperty calls.

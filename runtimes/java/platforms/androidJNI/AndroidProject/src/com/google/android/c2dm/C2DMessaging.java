@@ -1,5 +1,19 @@
 package com.google.android.c2dm;
-
+/*
+ * Copyright 2010 Google Inc.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -53,27 +67,10 @@ public class C2DMessaging {
     }
 
     /**
-     * Return the current registration id.
-     *
-     * If result is empty, the registration has failed.
-     *
-     * @return registration id, or empty string if the registration is not complete.
+     * Get the registration back off time.
+     * @param context
+     * @return
      */
-    public static String getRegistrationId(Context context) {
-        final SharedPreferences prefs = context.getSharedPreferences(
-                PREFERENCE,
-                Context.MODE_PRIVATE);
-        String registrationId = prefs.getString("dm_registration", "");
-        return registrationId;
-    }
-
-    public static long getLastRegistrationChange(Context context) {
-        final SharedPreferences prefs = context.getSharedPreferences(
-                PREFERENCE,
-                Context.MODE_PRIVATE);
-        return prefs.getLong(LAST_REGISTRATION_CHANGE, 0);
-    }
-
     static long getBackoff(Context context) {
         final SharedPreferences prefs = context.getSharedPreferences(
                 PREFERENCE,
@@ -81,6 +78,14 @@ public class C2DMessaging {
         return prefs.getLong(BACKOFF, DEFAULT_BACKOFF);
     }
 
+    /**
+     * Store registration back off time.
+     * If the registration is unsuccessful due to
+     * SERVICE_NOT_AVAILABLE, try again.
+     *
+     * @param context
+     * @param backoff
+     */
     static void setBackoff(Context context, long backoff) {
         final SharedPreferences prefs = context.getSharedPreferences(
                 PREFERENCE,
@@ -88,30 +93,5 @@ public class C2DMessaging {
         Editor editor = prefs.edit();
         editor.putLong(BACKOFF, backoff);
         editor.commit();
-
-    }
-
-    // package
-    static void clearRegistrationId(Context context) {
-        final SharedPreferences prefs = context.getSharedPreferences(
-                PREFERENCE,
-                Context.MODE_PRIVATE);
-        Editor editor = prefs.edit();
-        editor.putString("dm_registration", "");
-        editor.putLong(LAST_REGISTRATION_CHANGE, System.currentTimeMillis());
-        editor.commit();
-
-    }
-
-    // package
-    static void setRegistrationId(Context context, String registrationId) {
-
-        final SharedPreferences prefs = context.getSharedPreferences(
-                PREFERENCE,
-                Context.MODE_PRIVATE);
-        Editor editor = prefs.edit();
-        editor.putString("dm_registration", registrationId);
-        editor.commit();
-
     }
 }
