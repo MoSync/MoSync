@@ -32,12 +32,12 @@ namespace MoSync
 
             /**
              * mMaxNumberOfLines: can take two values: 1 and 0. For 1 the label is single line.
-             * 0 means that the label is multiline.             * 
+             * 0 means that the label is multiline.
              */
 			protected int mMaxNumberOfLines;
 
             /**
-             * Constructor 
+             * Constructor
              */
 			public Label()
 			{
@@ -50,7 +50,7 @@ namespace MoSync
 			}
 
             /**
-             * Implementation of the Text property 
+             * Implementation of the Text property
              * set: sets the text on the label
              * get: returns the text displayed on the label
              */
@@ -68,7 +68,7 @@ namespace MoSync
 			}
 
             /**
-             * Implementation of the textVerticalAlignment property 
+             * Implementation of the textVerticalAlignment property
              * Sets the vertical alignment of the text displayed on the label
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_VERTICAL_ALIGNMENT)]
@@ -96,7 +96,7 @@ namespace MoSync
 			}
 
             /**
-             * Implementation of the textHorizontalAlignment property 
+             * Implementation of the textHorizontalAlignment property
              * Sets the horizontal alignment of the text displayed on the label
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_TEXT_HORIZONTAL_ALIGNMENT)]
@@ -124,7 +124,7 @@ namespace MoSync
 			}
 
             /**
-             * Implementation of the fontSize property 
+             * Implementation of the fontSize property
              * Sets the font size of the text displayed on the label
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_SIZE)]
@@ -141,7 +141,7 @@ namespace MoSync
 			}
 
             /**
-             * Implementation of the fontColor property 
+             * Implementation of the fontColor property
              * Sets the font color of the text displayed on the label
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_COLOR)]
@@ -156,8 +156,8 @@ namespace MoSync
 			}
 
             /**
-             * Implementation of the maxNumberOfLines property 
-             * set: sets if the label is single or multiline. 
+             * Implementation of the maxNumberOfLines property
+             * set: sets if the label is single or multiline.
              * Accepts two values: 1 (meaning single line) and 1
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_MAX_NUMBER_OF_LINES)]
