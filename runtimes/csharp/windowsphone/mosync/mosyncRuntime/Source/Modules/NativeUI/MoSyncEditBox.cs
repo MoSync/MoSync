@@ -167,23 +167,23 @@ namespace MoSync
 					}
 					switch (inputType)
 					{
-						case 0:					//MAW_EDIT_BOX_TYPE_ANY
+                        case 0:			    //todo: check if Default this is equivalent option to MAW_EDIT_BOX_TYPE_ANY
 							setInputMode(System.Windows.Input.InputScopeNameValue.Default);
 							break;
 						case 1:             //MAW_EDIT_BOX_TYPE_EMAILADDR
-							setInputMode(System.Windows.Input.InputScopeNameValue.EmailSmtpAddress);
+							setInputMode(System.Windows.Input.InputScopeNameValue.EmailSmtpAddress); //todo: test this option
 							break;
 						case 2:             //MAW_EDIT_BOX_TYPE_NUMERIC
-							setInputMode(System.Windows.Input.InputScopeNameValue.NumberFullWidth);
+							setInputMode(System.Windows.Input.InputScopeNameValue.NumberFullWidth);//todo: test if NumberFullWidth is the right option 
 							break;
 						case 3:             //MAW_EDIT_BOX_TYPE_PHONENUMBER
-							setInputMode(System.Windows.Input.InputScopeNameValue.TelephoneNumber);
+							setInputMode(System.Windows.Input.InputScopeNameValue.TelephoneNumber); //todo: test this option
 							break;
 						case 4:             //MAW_EDIT_BOX_TYPE_URL
-							setInputMode(System.Windows.Input.InputScopeNameValue.Url);
+							setInputMode(System.Windows.Input.InputScopeNameValue.Url); //todo: test this option
 							break;
-						case 5:             //MAW_EDIT_BOX_TYPE_DECIMAL
-							setInputMode(System.Windows.Input.InputScopeNameValue.Digits); //???????
+                        case 5:             //todo: check if Digits this is equivalent option to MAW_EDIT_BOX_TYPE_DECIMAL
+							setInputMode(System.Windows.Input.InputScopeNameValue.Digits); 
 							break;
 						case 6:             //MAW_EDIT_BOX_TYPE_SINGLE_LINE
 							mEditBox.TextWrapping = TextWrapping.NoWrap;
