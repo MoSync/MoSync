@@ -5627,6 +5627,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		INPUT_FLAG = "inputFlag";
+
+		/**
+		* @brief Sets the font color of the edit box's text.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(labelHandle, MAW_EDIT_BOX_FONT_COLOR, "0xff0000");
+		* \endcode
+		*/
+		FONT_COLOR = "fontColor";
 	}
 	} // end of WidgetEditBoxProperties
 
