@@ -34,69 +34,70 @@ using System.Reflection;
 
 namespace MoSync
 {
-    namespace NativeUI
-    {
+	namespace NativeUI
+	{
         /**
         * The CheckBox class defines the attributes and behavior of a check box widget
         */
-        public class CheckBox : WidgetBaseWindowsPhone
-        {
+		public class CheckBox : WidgetBaseWindowsPhone
+		{
             /**
              * Native CheckBox object
              */
-            protected System.Windows.Controls.CheckBox mCheckBox;
+			protected System.Windows.Controls.CheckBox mCheckBox;
 
             /**
              * Constructor
              */
-            public CheckBox()
-            {
-                mCheckBox = new System.Windows.Controls.CheckBox();
+			public CheckBox()
+			{
+				mCheckBox = new System.Windows.Controls.CheckBox();
+				mView = mCheckBox;
 
-                mView = mCheckBox;
+				mCheckBox.Click += new RoutedEventHandler(
+				delegate(Object from, RoutedEventArgs evt)
+				{
+						Memory eventData = new Memory(8);
+						const int MAWidgetEventData_eventType = 0;
+						const int MAWidgetEventData_widgetHandle = 4;
 
-                mCheckBox.Click += new RoutedEventHandler(
-                   delegate(Object from, RoutedEventArgs evt)
-                   {
-                       Memory eventData = new Memory(8);
-
-                       const int MAWidgetEventData_eventType = 0;
-                       const int MAWidgetEventData_widgetHandle = 4;
-
-                       eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
-                       eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                       mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-                   });
-            }
+						eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
+						eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+						mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+				});
+			}
 
             /**
              * Set the state of the check box.
              * @param state True if the check box should be checked, false otherwise.
              */
-            public virtual void setState(bool state)
-            {
-                mCheckBox.IsChecked = state;
-            }
+			public virtual void setState(bool state)
+			{
+				mCheckBox.IsChecked = state;
+			}
 
             /**
              * Property for setting and getting the state of the check box.
              * set: a String containing the values "true" or "false" must be provided.
              * get: returns the state of the checkbox as a String containg "true" or "false"
              */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_CHECK_BOX_CHECKED)]
-            public String Checked
-            {
-                get
-                {
-                    return mCheckBox.IsChecked.ToString();
-                }
+			[MoSyncWidgetProperty(MoSync.Constants.MAW_CHECK_BOX_CHECKED)]
+			public String Checked
+			{
+				get
+				{
+					return mCheckBox.IsChecked.ToString();
+				}
 
-                set
-                {
-                    bool val = bool.Parse(value);
-                    mCheckBox.IsChecked = val;
-                }
-            }
-        }
-    }
+				set
+				{
+					bool val;
+					if(bool.TryParse(value, out val))
+					{
+						mCheckBox.IsChecked = val;
+					}
+				}
+			}
+		}
+	}
 }
