@@ -174,7 +174,7 @@ namespace MoSync
 							setInputMode(System.Windows.Input.InputScopeNameValue.EmailSmtpAddress); //todo: test this option
 							break;
 						case 2:             //MAW_EDIT_BOX_TYPE_NUMERIC
-							setInputMode(System.Windows.Input.InputScopeNameValue.NumberFullWidth);//todo: test if NumberFullWidth is the right option 
+							setInputMode(System.Windows.Input.InputScopeNameValue.NumberFullWidth);//todo: test if NumberFullWidth is the right option
 							break;
 						case 3:             //MAW_EDIT_BOX_TYPE_PHONENUMBER
 							setInputMode(System.Windows.Input.InputScopeNameValue.TelephoneNumber); //todo: test this option
@@ -183,7 +183,7 @@ namespace MoSync
 							setInputMode(System.Windows.Input.InputScopeNameValue.Url); //todo: test this option
 							break;
                         case 5:             //todo: check if Digits this is equivalent option to MAW_EDIT_BOX_TYPE_DECIMAL
-							setInputMode(System.Windows.Input.InputScopeNameValue.Digits); 
+							setInputMode(System.Windows.Input.InputScopeNameValue.Digits);
 							break;
 						case 6:             //MAW_EDIT_BOX_TYPE_SINGLE_LINE
 							mEditBox.TextWrapping = TextWrapping.NoWrap;

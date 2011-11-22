@@ -114,7 +114,7 @@ namespace MoSync
 			}
 
             /**
-             * Implementation of the "Text" property. 
+             * Implementation of the "Text" property.
              * Sets the text that will appear on the list view item
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_TEXT)]
@@ -131,14 +131,14 @@ namespace MoSync
 			}
 
             /**
-             * Implementation of the "Icon" property. 
+             * Implementation of the "Icon" property.
              * Sets the Icon that will appear on the list view item, on the left of the text
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_ICON)]
 			public String Icon
 			{
 				set
-				{                  
+				{
 					int val = 0;
 					if(int.TryParse(value, out val))
 					{
@@ -149,7 +149,7 @@ namespace MoSync
 							mIcon.Height = mText.Height;
 							mIcon.Margin = new Thickness(mText.Margin.Left, mText.Margin.Top, 0, mText.Margin.Bottom);
 							mStretch = System.Windows.Media.Stretch.Fill;
-							mIcon.Stretch = mStretch;                    
+							mIcon.Stretch = mStretch;
 
 							System.Windows.Media.Imaging.BitmapSource bmpSource =
 							(System.Windows.Media.Imaging.BitmapSource)(res.GetInternalObject());
@@ -161,7 +161,7 @@ namespace MoSync
 			}
 
             /**
-             * The "AccessoryType" property. 
+             * The "AccessoryType" property.
              * Has no effect. Available only on iOS.
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_ACCESSORY_TYPE)]
@@ -174,7 +174,7 @@ namespace MoSync
 			}
 
             /**
-             * The implementation of the "FontColor" property. 
+             * The implementation of the "FontColor" property.
              * Sets the font color of the item's text
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_FONT_COLOR)]
@@ -189,7 +189,7 @@ namespace MoSync
 			}
 
             /**
-             * The implementation of the "FontSize" property. 
+             * The implementation of the "FontSize" property.
              * Sets the font size of the item's text
              */
 			[MoSyncWidgetProperty(MoSync.Constants.MAW_LIST_VIEW_ITEM_FONT_SIZE)]
@@ -197,7 +197,7 @@ namespace MoSync
 			{
 				set
 				{
-					double size = 0; 
+					double size = 0;
 					if (double.TryParse(value, out size))
 					{
 						mText.FontSize = size;
