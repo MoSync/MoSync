@@ -1247,6 +1247,19 @@ namespace Base {
 			res = size;
 		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
 			[@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
+		} else if (strcmp(key, "mosync.device.name") == 0) {
+			[[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
+		} else if (strcmp(key, "mosync.device.UUID")== 0) {
+			[[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
+		} else if (strcmp(key, "mosync.device.OS")== 0) {
+			[[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
+		} else if (strcmp(key, "mosync.device.OS.version") == 0) {
+			[[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
 		}
 		return res;
 	}
