@@ -93,27 +93,49 @@ namespace MoSync
 			/**
 			 * Function that that creates the foreground image
 			 */
-			private void createForegroundImageLayout()
+			private void createForegroundImage()
 			{
-				mGrid = new System.Windows.Controls.Grid();
-
+                /**
+                 * Create the foreground image and display it in the center of the button
+                 */
 				mForegroundImage = new System.Windows.Controls.Image();
 				mForegroundImage.VerticalAlignment = VerticalAlignment.Center;
 				mForegroundImage.HorizontalAlignment = HorizontalAlignment.Center;
 
-				Grid.SetRow(mForegroundImage, 0);
-				Grid.SetColumn(mForegroundImage, 0);
-
-				Grid.SetRow(mText, 0);
-				Grid.SetColumn(mText, 0);
-
-				Grid.SetRow(mBackgroundImage, 0);
-				Grid.SetColumn(mBackgroundImage, 0);
-
-				mGrid.Children.Add(mBackgroundImage);
-				mGrid.Children.Add(mForegroundImage);
-				mGrid.Children.Add(mText);
+               
 			}
+
+            /**
+             * Function for creating the Grid.  Arranges the text and the foreground and background images on it.
+             */
+            private void AddWidgetsToGrid()
+            {
+               /**
+                * Add the foreground image
+                */
+                Grid.SetRow(mForegroundImage, 0);
+                Grid.SetColumn(mForegroundImage, 0);
+
+                /**
+                 * Add the TextBlock widget
+                 */
+                Grid.SetRow(mText, 0);
+                Grid.SetColumn(mText, 0);
+
+
+                /**
+                 * Add the background image
+                 */
+                Grid.SetRow(mBackgroundImage, 0);
+                Grid.SetColumn(mBackgroundImage, 0);
+
+                /**
+                 * Make the text, the foreground and background image children of the mGrid object
+                 */
+                mGrid.Children.Add(mBackgroundImage);
+                mGrid.Children.Add(mForegroundImage);
+                mGrid.Children.Add(mText);
+            }
 
 			/**
 			 * Function that creates the background image
@@ -140,7 +162,15 @@ namespace MoSync
 
 				this.createBackgroundImage();
 				this.createTextBlock();
-				this.createForegroundImageLayout();
+				this.createForegroundImage();
+                
+                /**
+                 * Grid object that holds the text and the foreground and background images
+                 * It has only one row and one column
+                 * It will display whe widgets one on top of each other
+                 */
+                mGrid = new System.Windows.Controls.Grid();                
+                this.AddWidgetsToGrid();
 
 				mButton.Content = mGrid;
 
@@ -303,7 +333,12 @@ namespace MoSync
 					Resource res = mRuntime.GetResource(MoSync.Constants.RT_IMAGE, val);
 					if (null != res && res.GetInternalObject() != null)
 					{
-						mForegroundImage.Width = mText.Height;
+
+                        /**
+                         * Set the height and width of the foreground image
+                         * The image will be scaled so that the width and height are equal to the TextBlock height.
+                         */
+                        mForegroundImage.Width = mText.Height;
 						mForegroundImage.Height = mText.Height;
 
 						mForegroundImage.Stretch = mStretchForeground;
@@ -345,6 +380,15 @@ namespace MoSync
 					}
 				}
 			}
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_IMAGE_BUTTON_FONT_HANDLE)]
+            public String FontHandle
+            {
+                set
+                {
+                   
+                }
+            }
 		}
 	}
 }
