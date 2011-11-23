@@ -85,6 +85,7 @@
     <Compile Include="Source\Modules\NativeUI\MoSyncRelativeLayout.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncScreen.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncSlider.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncToggleButton.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncVerticalLayout.cs" />
     <Compile Include="Source\MoSyncCore.cs" />
     <Compile Include="Source\MoSyncCoreInterpreted.cs" />
