@@ -16,7 +16,7 @@ MA 02110-1301, USA.
 */
 /**
  * @file MoSyncButton.cs
- * @author Ciprian Filipas
+ * @author Gabriela Rata
  *
  * @brief This represents the ToggleButton Widget implementation for the NativeUI
  *        component on Windows Phone 7, language c#
@@ -88,8 +88,11 @@ namespace MoSync
                 set
                 {
                     bool checkedVal;
-                    bool.TryParse(value, out checkedVal);
-                    mToggleButton.IsChecked = checkedVal;
+                    
+                    if (bool.TryParse(value, out checkedVal))
+                    {
+                        mToggleButton.IsChecked = checkedVal;
+                    }
                 }
             }
 
