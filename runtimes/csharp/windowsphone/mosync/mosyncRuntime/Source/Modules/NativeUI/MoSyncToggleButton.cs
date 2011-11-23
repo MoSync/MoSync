@@ -18,7 +18,7 @@ MA 02110-1301, USA.
  * @file MoSyncButton.cs
  * @author Ciprian Filipas
  *
- * @brief This represents the Button Widget implementation for the NativeUI
+ * @brief This represents the ToggleButton Widget implementation for the NativeUI
  *        component on Windows Phone 7, language c#
  *
  * @platform WP 7.1
@@ -36,36 +36,48 @@ namespace MoSync
 {
     namespace NativeUI
     {
-        // The button class
+        /**
+         * The ToggleButton class defining a ToggleButton button. 
+         */
         public class ToggleButton : WidgetBaseWindowsPhone
         {
+            /**
+             * The native ToggleButton widget. 
+             */
             protected System.Windows.Controls.Primitives.ToggleButton mToggleButton;
 
+            /**
+             * Constructor 
+             */
             public ToggleButton()
             {
                 mToggleButton = new System.Windows.Controls.Primitives.ToggleButton();
                 mView = mToggleButton;
 
-                //mToggleButton.Click += new RoutedEventHandler(
-                //   delegate(Object from, RoutedEventArgs evt)
-                //   {
-                //       //click event needs a memory chunk of 8 bytes
-                //       Memory eventData = new Memory(8);
+                mToggleButton.Click += new RoutedEventHandler(
+                   delegate(Object from, RoutedEventArgs evt)
+                   {
+                       //click event needs a memory chunk of 8 bytes
+                       Memory eventData = new Memory(8);
 
-                //       //starting with the 0 Byte we write the eventType
-                //       const int MAWidgetEventData_eventType = 0;
-                //       //starting with the 4th Byte we write the widgetHandle
-                //       const int MAWidgetEventData_widgetHandle = 4;
+                       //starting with the 0 Byte we write the eventType
+                       const int MAWidgetEventData_eventType = 0;
+                       //starting with the 4th Byte we write the widgetHandle
+                       const int MAWidgetEventData_widgetHandle = 4;
 
-                //       eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
-                //       eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                //       //posting a CustomEvent
-                //       mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-                //   });
+                       eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
+                       eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                       //posting a CustomEvent
+                       mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                   });
                 
             }
 
-            //checked
+            /**
+             * Property for setting and getting the state of the check box.
+             * set: a String containing the values "true" or "false" must be provided.
+             * get: returns the state of the checkbox as a String containg "true" or "false"
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_TOGGLE_BUTTON_CHECKED)]
             public String Checked
             {
