@@ -70,7 +70,7 @@ private:
 	 * Helper function to create list view item with
 	 * specific label and edit/check box.
 	 */
-	ListViewItem* createListViewItem(const MAUtil::String& labelText, Widget* widget)//EditBox* editBox);
+	ListViewItem* createListViewItem(const MAUtil::String& labelText, Widget* widget);//EditBox* editBox);
 
 	/**
 	 * Reset view's content.

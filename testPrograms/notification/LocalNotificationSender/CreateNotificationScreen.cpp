@@ -23,7 +23,7 @@ MA 02110-1301, USA.
 #define BADGE_NUMBER_LABEL_TEXT "Badge number:"
 #define ALERT_ACTION_LABEL_TEXT "Alert action:"
 #define PLAY_SOUND_LABEL_TEXT "Play sound:"
-#define SOUND_PATH_LABEL_TEXT "Sound path:";
+#define SOUND_PATH_LABEL_TEXT "Sound path:"
 #define FIRE_TIME_LABEL_TEXT "Schedule in(seconds):"
 #define SECONDS_LABEL_TEXT " seconds"
 #define SEND_BUTTON_TEXT "SEND"
@@ -297,7 +297,7 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 				if ( mVibrateDuration->getText().length() > 0 )
 				{
 					notification->setVibrateDuration(
-							MAUtil::integerToString(mVibrateDuration->getText()));
+							MAUtil::stringToInteger(mVibrateDuration->getText()));
 				}
 			}
 			if ( mFlash->isChecked() )
@@ -309,10 +309,10 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 						&&
 						mFlashOffLength->getText().length() > 0)
 				{
-					struct NotificationFlashLights pattern = new NotificationFlashLights(
-							MAUtil::integerToString(mFlashColor->getText()),
-							MAUtil::integerToString(mFlashOnLength->getText()),
-							MAUtil::integerToString(mFlashOffLength->getText()));
+					struct NotificationFlashLights pattern = NotificationFlashLights(
+							MAUtil::stringToInteger(mFlashColor->getText()),
+							MAUtil::stringToInteger(mFlashOnLength->getText()),
+							MAUtil::stringToInteger(mFlashOffLength->getText()));
 					notification->setFlashLightsPattern(pattern);
 				}
 			}
@@ -432,7 +432,7 @@ bool CreateNotificationScreen::isUserInputDataValid()
 			return false;
 		}
 		String flashOff = mFlashOffLength->getText();
-		if (!this->canStringBeConvertedToInteger(flashoff))
+		if (!this->canStringBeConvertedToInteger(flashOff))
 		{
 			printf("invalid flash off duration value");
 			mFlashOffLength->setFontColor(TEXT_COLOR_ERROR);
