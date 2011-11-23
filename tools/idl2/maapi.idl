@@ -9034,13 +9034,44 @@ group NotificationAPI "Notification API" {
 		}
 	} // end of Notification Result Codes
 
-	group NotificationPushTypes "Notification push types" {
+	group NotificationFlags "Notification Flags" {
+		constset int MA_NOTIFICATION_FLAG_ {
+			/**
+			* If set, the audio will be repeated until the notification is canceled or the
+			* notification window is opened.
+			* Platform: Android only.
+			*/
+			INSISTENT = 4;
+
+			/**
+			* Should be set if the notification should not be canceled when the user clicks the
+			* Clear all button.
+			* Platform: Android only.
+			*/
+			NO_CLEAR = 32;
+
+			/**
+			* Should be set if this notification represents a high-priority event that may be shown to
+			* the user even if notifications are otherwise unavailable (that is, when the status bar is hidden).
+			* Platform: Android only.
+			*/
+			HIGH_PRIORITY = 128;
+
+			/**
+			* Should be set if the notification should be canceled when it is clicked by the user.
+			* Platform: Android only.
+			*/
+			AUTO_CANCEL = 16;
+		}
+	} // end of Notification Flags
+
+	group NotificationPushTypes "Notification Push Types" {
 		constset int MA_NOTIFICATION_PUSH_TYPE_ {
 			/**
 			* @brief The application accepts notifications that badge the application icon.
 			* Platform: iOS only.
 			*/
-			BADGE= 1;
+			BADGE = 1;
 
 			/**
 			* @brief The application accepts alert sounds as notifications.
@@ -9077,7 +9108,6 @@ group NotificationAPI "Notification API" {
 
 			/**
 			* @brief Set the date and time when the system should deliver the notification.
-			* Platform: iOS.
 			*
 			* @validvalue an int.
 			* The date is in seconds(UNIX time - seconds elapsed since January 1, 1970).
@@ -9125,6 +9155,7 @@ group NotificationAPI "Notification API" {
 			/**
 			* @brief Enable/disable the sound played when an alert is displayed.
 			* Platform: iOS and Android.
+			* If set to true, it will play the default sound.
 			*
 			* @validvalue "true" or "false" strings.
 			*
@@ -9150,7 +9181,7 @@ group NotificationAPI "Notification API" {
 			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_SOUND_PATH, "....");
 			* \endcode
 			*/
-			SOUND = "sound";
+			SOUND_PATH = "soundPath";
 
 			/**
 			* @brief Set the title that goes in the expanded entry of the notification.
@@ -9181,6 +9212,96 @@ group NotificationAPI "Notification API" {
 			* \endcode
 			*/
 			TICKER_TEXT = "tickerText";
+
+			/**
+			* @brief Set or get the flags applied to the local notification.
+			* Platform: Android.
+			*
+			* @validvalue One of the constants:
+			* - MA_NOTIFICATION_FLAG_INSISTENT
+			* - MA_NOTIFICATION_FLAG_AUTO_CANCEL
+			* - MA_NOTIFICATION_FLAG_HIGH_PRIORITY
+			* - MA_NOTIFICATION_FLAG_NO_CLEAR.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*     maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLAG, MA_NOTIFICATION_FLAG_AUTO_CANCEL);
+			* \endcode
+			*/
+			FLAG = "flag";
+
+			/**
+			* @brief Enable/disable the the default vibration when an alert is displayed.
+			* Platform: Android only.
+			* If set to true, it will use the default notification vibrate. This will ignore any given vibrate.
+			* Using phone vibration requires the VIBRATE permission.
+			*
+			* @validvalue "true" or "false" strings.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_VIBRATE, "true");
+			* \endcode
+			*/
+			VIBRATE = "vibrate";
+
+			/**
+			* @brief Set the vibration duration when an alert is displayed.
+			* Platform: Android only.
+			* Using phone vibration requires the VIBRATE permission.
+			*
+			* @validvalue an int The number of milliseconds to vibrate.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, "300");
+			* \endcode
+			*/
+			VIBRATE_DURATION = "vibrateDuration";
+
+			/**
+			* @brief Enable/Disable the default notification lights.
+			* This will ignore the #MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN.
+			* Not every color in the spectrum is supported by the device LEDs, and not every device supports the same
+			* colors, so the hardware estimates to the best of its ability. Green is the most common notification color.
+			* Platform: Android only.
+			*
+			* @validvalue "true" or "false" strings.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, "true");
+			*/
+			FLASH_LIGHTS = "flashLights";
+
+			/**
+			* @brief Define your own color and pattern for the lights.
+			* Not every color in the spectrum is supported by the device LEDs, and not every device supports the same
+			* colors, so the hardware estimates to the best of its ability. Green is the most common notification color.
+			* Also, not all Android devices support this feature.
+			* Platform: Android only.
+			*
+			* @validvalue An int array containing 3 values:
+			* - a value for the ledARGB field (for the color),
+			* - the ledOffMS field (length of time, in milliseconds, to keep the light off),
+			* - the ledOnMS (length of time, in milliseconds, to keep the light on).
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			* 	// In this example, the green light repeatedly flashes on for 300 milliseconds and turns off for one second.
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, "0xff00ff00,300,1000");
+			*/
+			FLASH_LIGHTS_PATTERN = "flashLightsPattern";
 		}
 	} // end of Notification Properties
 

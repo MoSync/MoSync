@@ -63,6 +63,8 @@ public class C2DMReceiver extends C2DMBaseReceiver
 
 	/**
 	 * Called when a cloud message has been received.
+	 * @param context
+	 * @param intent The intent that
 	 */
 	@Override
 	protected void onMessage(Context context, Intent intent)

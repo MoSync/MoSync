@@ -1,16 +1,15 @@
 package com.mosync.internal.android.notifications;
 
-import com.mosync.internal.android.MoSyncThread;
-import com.google.android.c2dm.C2DMessaging;
-import com.mosync.java.android.C2DMReceiver;
-import com.mosync.internal.android.notifications.PushNotificationsUtil;
-
-import com.mosync.nativeui.util.HandleTable;
-
 import android.os.Build;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import com.mosync.internal.android.MoSyncThread;
+import com.mosync.nativeui.util.HandleTable;
+import com.google.android.c2dm.C2DMessaging;
+import com.mosync.java.android.C2DMReceiver;
+import com.mosync.internal.android.notifications.PushNotificationsUtil;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
@@ -299,6 +298,29 @@ public class PushNotificationsManager
 
 		writeToMoSyncMemory(messagePayload, payloadBuffer);
 
+		return MA_NOTIFICATION_RES_OK;
+	}
+
+	/**
+	 * Destroy a push notification object.
+	 * This is not called explicitly by the user, but
+	 * implicitly( in Notifications library) after a
+	 * push notification is received.
+	 * @param notificationHandle
+	 * \returns One of the next constants:
+	 * - #MA_NOTIFICATION_RES_OK if no error occurred.
+	 * - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+	 */
+	public int destroyNotification(int notificationHandle)
+	{
+
+		PushNotificationObject notification = m_NotificationTable.get(notificationHandle);
+		if ( notification == null )
+		{
+			Log.e("@@MoSync","maNotificationPushDestroy Invalid handle");
+			return MA_NOTIFICATION_RES_INVALID_HANDLE;
+		}
+		m_NotificationTable.remove(notificationHandle);
 		return MA_NOTIFICATION_RES_OK;
 	}
 

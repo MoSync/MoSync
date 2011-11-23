@@ -17,12 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android.notifications;
 
-import java.util.GregorianCalendar;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import com.mosync.java.android.MoSync;
-import com.mosync.nativeui.util.HandleTable;
 
 import android.app.Activity;
 import android.app.Notification;
@@ -33,6 +29,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.util.Log;
+
+import com.mosync.java.android.MoSync;
+import com.mosync.nativeui.util.HandleTable;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
@@ -230,7 +229,7 @@ public class LocalNotificationsService extends Service
 	 */
 	private void scheduleNotification()
 	{
-		Log.e("@@MoSync","displayNotificationIcon");
+		Log.e("@@MoSync","scheduleNotification");
 
 		// If the fire date is not set, trigger it now.
 		if ( mLatestNotification.getFireDate() == -1 )
@@ -248,8 +247,9 @@ public class LocalNotificationsService extends Service
 		            triggerNotification();
 		        }
 		    };
-	        GregorianCalendar date = new GregorianCalendar(2011, 9, 20, 16, 50);
-	        long task = date.getTimeInMillis() - System.currentTimeMillis();
+
+//		    Date scheduledDate = new Date(mLatestNotification.getFireDate());
+	        long task = mLatestNotification.getFireDate() - System.currentTimeMillis();
 		    timer.schedule(timerTask, task);
 		}
 	}
@@ -260,16 +260,10 @@ public class LocalNotificationsService extends Service
 	void triggerNotification()
 	{
 		Log.e("@@MoSync","triggerNotification");
-//		int icon = getResources().getIdentifier(
-//				"icon",
-//				"drawable",
-//				getPackageName());
-//			Log.i("@@@MoSync",
-//				"triggerNotification icon: " + icon);
 
+		// The notification is already created, just trigger it.
 		mLatestNotification.trigger();
 
-//		Notification notification = new Notification(icon, tickerText, when);
 		Context context = getApplicationContext();
 		Intent intent = new Intent(context, MoSync.class);
 		intent.addFlags(

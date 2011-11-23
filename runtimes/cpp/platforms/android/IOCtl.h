@@ -878,6 +878,8 @@ namespace Base
 
 	int _maNotificationPushGetData(MAHandle pushNotificationHandle, int memStart, int buffer, int messageSize, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maNotificationPushDestroy(MAHandle pushNotificationHandle, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maNotificationPushSetTickerText(const char* text, JNIEnv* jNIEnv, jobject jThis);
 
 	int _maNotificationPushSetMessageTitle(const char* text, JNIEnv* jNIEnv, jobject jThis);
