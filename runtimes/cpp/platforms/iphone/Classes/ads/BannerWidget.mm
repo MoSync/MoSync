@@ -1,18 +1,30 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+ Copyright (C) 2011 MoSync AB
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License, version 2, as published by
- the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License,
+ version 2, as published by the Free Software Foundation.
 
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- for more details.
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with this program; see the file COPYING.  If not, write to the Free
- Software Foundation, 59 Temple Place - Suite 330, Boston, MA
- 02111-1307, USA.
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ MA 02110-1301, USA.
+ */
+
+/**
+ * @file BannerWidget.mm
+ * @author Bogdan Iusco
+ * @date 1 Nov 2011
+ *
+ * @brief BannerWidget represents a MoSync widget used for displaying
+ * advertisments. Advertisements are downloaded from iAd Network.
+ * It uses the view from a ADBannerView object and adds it to
+ * the super class(IWidget).
  */
 
 // Default banner size for a ADBannerView type object.
@@ -21,9 +33,7 @@
 
 #import "BannerWidget.h"
 
-
 @implementation BannerWidget
-
 
 /**
  * Init function.
@@ -61,7 +71,6 @@
  */
 - (int)setPropertyWithKey: (NSString*)key toValue: (NSString*)value
 {
-    NSLog(@"iOS setProperty");
     ADBannerView* bannerView  = (ADBannerView*) view;
     if ([key isEqualToString:@MA_ADS_ENABLED])
     {
@@ -105,10 +114,10 @@
  * Retrieves a specified property value.
  * @param key A string representing for which property to get the value.
  * @return The value for the given property, or nil if the property is invalid.
+ * The ownership of the returned object is passed to the caller.
  */
 - (NSString*)getPropertyWithKey: (NSString*)key
 {
-    NSLog(@"iOS getProperty");
     ADBannerView* bannerView  = (ADBannerView*) view;
     if ([key isEqualToString:@MA_ADS_WIDTH])
     {
@@ -140,15 +149,20 @@
 
 #pragma mark AdBannerViewDelagate
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
-{
-    // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
-}
+//- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+//{
+//    // Return YES for supported orientations
+//    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+//}
 
+/**
+ * Called when a banner view fails to load a new advertisement.
+ * @param banner The banner view that failed to load an advertisement.
+ * @param error The error object that describes the problem.
+ */
 - (void)bannerView:(ADBannerView *)banner didFailToReceiveAdWithError:(NSError *)error
 {
-    NSLog(@"didFailToReceiveAdWithError:%d %@", error.code, [error description]);
+    NSLog(@"BannerWidget::didFailToReceiveAdWithError:%d %@", error.code, [error description]);
     MAEvent event;
 	event.type = EVENT_TYPE_ADS_BANNER;
 	event.adsData.bannerHandle = mBannerHandle;
@@ -174,16 +188,18 @@
         case ADErrorApplicationInactive:
             errorCode = MA_ADS_ERROR_APPLICATION_INACTIVE;
             break;
-        default:
-            break;
     }
     event.adsData.bannerErrorCode = errorCode;
     Base::gEventQueue.put(event);
 }
 
+/**
+ * Called after a banner view finishes executing an action that covered your application’s user interface.
+ * @param banner The banner view that finished executing an action.
+ */
 - (void)bannerViewActionDidFinish:(ADBannerView *)banner
 {
-    NSLog(@"bannerViewActionDidFinish");
+    NSLog(@"BannerWidget::bannerViewActionDidFinish");
     MAEvent event;
 	event.type = EVENT_TYPE_ADS_BANNER;
 	event.adsData.bannerHandle = mBannerHandle;
@@ -191,9 +207,15 @@
     Base::gEventQueue.put(event);
 }
 
+/**
+ * Called before a banner view executes an action.
+ * @param banner The banner view that the user tapped.
+ * @param willLeave YES if another application will be launched to execute the action,
+ * NO if the action is going to be executed inside your application.
+ */
 - (BOOL)bannerViewActionShouldBegin:(ADBannerView *)banner willLeaveApplication:(BOOL)willLeave
 {
-    NSLog(@"willLeaveApplication");
+    NSLog(@"BannerWidget::willLeaveApplication");
     MAEvent event;
 	event.type = EVENT_TYPE_ADS_BANNER;
 	event.adsData.bannerHandle = mBannerHandle;
@@ -201,10 +223,13 @@
     Base::gEventQueue.put(event);
     return TRUE;
 }
-
+/**
+ * Called when a new banner advertisement is loaded.
+ * @param banner The banner view that loaded a new advertisement.
+ */
 - (void)bannerViewDidLoadAd:(ADBannerView *)banner
 {
-    NSLog(@"bannerViewDidLoadAd");
+    NSLog(@"BannerWidget::bannerViewDidLoadAd");
     MAEvent event;
 	event.type = EVENT_TYPE_ADS_BANNER;
 	event.adsData.bannerHandle = mBannerHandle;

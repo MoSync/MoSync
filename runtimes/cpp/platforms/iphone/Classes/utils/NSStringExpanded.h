@@ -21,11 +21,14 @@
  * @author Bogdan Iusco
  * @date 22 Nov 2011
  *
- * @brief
+ * @brief Add new methods to NSString class.
  */
 
 #import <Foundation/Foundation.h>
 
+/**
+ * @brief Add new methods to NSString class.
+ */
 @interface NSString (NSStringExpanded)
 
 /**
