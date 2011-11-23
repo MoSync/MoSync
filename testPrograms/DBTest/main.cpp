@@ -54,6 +54,7 @@ int getColumnDataAsString(MAHandle cursor, int column, char* buf, int maxSize)
 		maReadData(data, buf, 0, size);
 		buf[size] = 0;
 	}
+	maDestroyObject(data);
 	return result;
 }
 
