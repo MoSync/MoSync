@@ -67,6 +67,12 @@ private:
 	void createMainLayout();
 
 	/**
+	 * Helper function to create list view item with
+	 * specific label and edit/check box.
+	 */
+	ListViewItem* createListViewItem(const MAUtil::String& labelText, Widget* widget)//EditBox* editBox);
+
+	/**
 	 * Reset view's content.
 	 * Set default values for widgets.
 	 */
@@ -122,6 +128,18 @@ private:
     EditBox* mContentBody;
 
     /**
+     * Used for getting notification's content title.
+     * Available only on Android platform.
+     */
+    EditBox* mContentTitle;
+
+    /**
+     * Used for getting the ticker text.
+     * Available only on Android platform.
+     */
+    EditBox* mTickerText;
+
+    /**
      * Used for getting notification's badge number.
      * Shown only on iOS platform.
      */
@@ -135,8 +153,43 @@ private:
 
     /**
      * If set the notification will play sound.
+     * If set to true it will play the default sound.
      */
     CheckBox* mPlaySound;
+
+    /**
+     * Used for the sound that will be played.
+     * Available only on Android platform.
+     */
+    EditBox* mSoundPath;
+
+    /**
+     * If set the notification will alert the user with a vibration.
+     * If no vibrate duration is set, the default vibration pattern
+     * will be used.
+     * Available only on Android platform.
+     */
+    CheckBox* mVibrate;
+
+    /**
+     * Sets the vibration duration.
+     * Available only on Android platform.
+     */
+    EditBox* mVibrateDuration;
+
+    /**
+     * If set the notification will use flashing LED.
+     * If set to true it will use the default flashing pattern.
+     * Available only on Android platform.
+     */
+    CheckBox* mFlash;
+
+    /**
+     * The flash pattern: the color, ledOnLength, ledOffLength.
+     */
+    EditBox* mFlashColor;
+    EditBox* mFlashOnLength;
+    EditBox* mFlashOffLength;
 
     /**
      * Used to get the number of seconds on which the notification will be fired.

@@ -323,7 +323,6 @@ namespace Notification
 
     /**
      * Enable/disable the sound played when an alert is displayed.
-     * Platform: iOS.
      * @param playSound If true the notification will play a sound when
      * it's shown.
      */
@@ -359,6 +358,7 @@ namespace Notification
 
     /**
      * Set the sound to play when an alert is displayed.
+     * Could be ignored if using setPlaySound(false).
      * Plarform: Android.
      * @param path A valid path to an audio file.
      */
@@ -369,6 +369,7 @@ namespace Notification
 
     /**
      * Enable/disable the the default vibration when an alert is displayed.
+     * By default, the vibration is disabled.
      * If set to true, it will use the default notification vibrate. This will
      * ignore any given vibrate.
      * Using phone vibration requires the VIBRATE permission.
@@ -409,6 +410,7 @@ namespace Notification
 
     /**
      * Set the vibration duration when an alert is displayed.
+     * This setting is ignored if setVibrate is disabled.
      * Using phone vibration requires the VIBRATE permission.
      * Platform: Android.
      * @param duration The number of milliseconds to vibrate.
