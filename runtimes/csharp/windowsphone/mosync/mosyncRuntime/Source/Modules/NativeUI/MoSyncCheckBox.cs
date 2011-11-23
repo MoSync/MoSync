@@ -91,7 +91,7 @@ namespace MoSync
 
 				set
 				{
-					bool val; 
+					bool val;
 					if(bool.TryParse(value, out val))
 					{
 						mCheckBox.IsChecked = val;

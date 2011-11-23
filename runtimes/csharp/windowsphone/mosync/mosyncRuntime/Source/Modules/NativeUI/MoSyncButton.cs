@@ -70,7 +70,7 @@ namespace MoSync
                 mButton.Click += new RoutedEventHandler(
                     delegate(Object from, RoutedEventArgs evt)
                     {
-                        //create a Memory object of 8 Bytes
+                        //click event needs a memory chunk of 8 bytes
                         Memory eventData = new Memory(8);
 
                         //starting with the 0 Byte we write the eventType

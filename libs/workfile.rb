@@ -23,6 +23,8 @@ if(USE_NEWLIB)
 else
 	stdlibs = ["MAStd", "MAFS"]
 end
-SUBDIRS = stdlibs + ["MAUtil", "MTXml", "MAUI", "MAUI-revamp", "MATest", "MAP", "Testify", "stlport"] #, "MinUI"
+
+SUBDIRS = stdlibs + ["MAUtil", "MTXml", "MAUI", "MAUI-revamp", "MATest", "MAP",
+	"Testify", "stlport", "MAFS", "yajl", "Ads", "Facebook", "NativeUI", "Wormhole", "Notification"]
 
 Targets.invoke

@@ -52,8 +52,8 @@ namespace MoSync
              */
 			public ListView()
 			{
-				mList = new System.Windows.Controls.ListBox();               
-				mView = mList;                              
+				mList = new System.Windows.Controls.ListBox();
+				mView = mList;
 			}
 
             /**
