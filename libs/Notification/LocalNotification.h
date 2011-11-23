@@ -45,10 +45,6 @@ MA 02110-1301, USA.
 namespace Notification
 {
 
-    // Forward declaration.
-    class NotificationManager;
-    class LocalNotificationListener;
-
     /**
      * @brief Local notifications are used for displaying alerts, playing sounds
      * and for badging application icon.
@@ -227,44 +223,11 @@ namespace Notification
          */
         virtual struct tm getFireDate() const;
 
-        /**
-         * Add an event listener for this local notification.
-         * @param listener The listener that will receive
-         * local notification events.
-         */
-        virtual void addNotificationListener(
-            LocalNotificationListener* listener);
-
-        /**
-         * Remove the event listener for this local notification.
-         * @param listener The listener that receives local notification events.
-         */
-        virtual void removeNotificationListener(
-            LocalNotificationListener* listener);
-
-        /**
-         * This method is called when there is an event for this local
-         * notification.
-         * @param eventData The event data for this local notification.
-         */
-        virtual void handleLocalNotificationEvent(const MAEvent& eventData);
-
     private:
         /**
          * Handle that identifies the local notification.
          */
         MAHandle mHandle;
-
-        /**
-         * Pointer to the notification manager.
-         * Not own.
-         */
-        NotificationManager* mNotificationManager;
-
-        /**
-         * Array with local notification listeners.
-         */
-        MAUtil::Vector<LocalNotificationListener*> mLocalNotificationListeners;
     };
 } // namespace Notification
 

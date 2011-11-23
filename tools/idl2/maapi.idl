@@ -9242,9 +9242,9 @@ group NotificationAPI "Notification API" {
 		int maNotificationLocalDestroy(in MAHandle notificationHandle);
 
 		/**
-		* \brief Set a notification property.
+		* \brief Set a local notification property.
 		*
-		* \param notificationHandle Handle to the notification object.
+		* \param notificationHandle Handle to the local notification object.
 		* \param property A string representing which property to set.
 		* \param value The value that will be assigned to the property.
 		*

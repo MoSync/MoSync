@@ -102,7 +102,7 @@
  * - MA_NOTIFICATION_RES_ERROR if a error occurred while creating the notification object.
  * - a handle to a notification object.
  */
--(MAHandle) createNotificationObject;
+-(MAHandle) createLocalNotificationObject;
 
 /**
  * Destroy a local notification object.
@@ -111,7 +111,7 @@
  * - MA_NOTIFICATION_RES_OK if no error occurred.
  * - MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
  */
--(int) destroyNotificationObject:(MAHandle) notificationHandle;
+-(int) destroyLocalNotificationObject:(MAHandle) notificationHandle;
 
 /**
  * Set a local notification property.
@@ -124,9 +124,9 @@
  * - MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
  * - MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
  */
--(int) notificationSetProperty:(MAHandle) notificationHandle
-                      property:(const char*) propertyName
-                         value:(const char*) value;
+-(int) localNotificationSetProperty:(MAHandle) notificationHandle
+                           property:(const char*) propertyName
+                              value:(const char*) value;
 
 /**
  * Retrieves a specified property from a given local notificaiton object.
@@ -140,10 +140,10 @@
  * - MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
  * - MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
  */
--(int) notificationGetProperty:(MAHandle) notificationHandle
-                      property:(const char*) property
-                         value:(char*) value
-                          size:(int) maxSize;
+-(int) localNotificationGetProperty:(MAHandle) notificationHandle
+                           property:(const char*) property
+                              value:(char*) value
+                               size:(int) maxSize;
 
 /**
  * Schedules a local notification for delivery at its encapsulated date and time.

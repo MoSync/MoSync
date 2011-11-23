@@ -34,8 +34,6 @@ MA 02110-1301, USA.
 #include <mastdlib.h>
 
 #include "LocalNotification.h"
-#include "NotificationManager.h"
-#include "LocalNotificationListener.h"
 
 namespace Notification
 {
@@ -47,11 +45,9 @@ namespace Notification
      * Constructor.
      */
     LocalNotification::LocalNotification():
-        mHandle(0),
-        mNotificationManager(NotificationManager::getInstance())
+        mHandle(0)
     {
         mHandle = maNotificationLocalCreate();
-        mNotificationManager->addEventListener(this);
     }
 
     /**
@@ -59,8 +55,6 @@ namespace Notification
      */
     LocalNotification::~LocalNotification()
     {
-        mNotificationManager->removeEventListener(this);
-        mLocalNotificationListeners.clear();
         maNotificationLocalDestroy(mHandle);
     }
 
@@ -330,56 +324,6 @@ namespace Notification
          tm timeStruct;
          split_time(minDateMilliseconds, &timeStruct);
          return timeStruct;
-    }
-
-    /**
-     * Add an event listener for this local notification.
-     * @param listener The listener that will receive
-     * local notification events.
-     */
-    void LocalNotification::addNotificationListener(
-        LocalNotificationListener* listener)
-    {
-        for (int i = 0; i < mLocalNotificationListeners.size(); i++)
-        {
-            if (listener == mLocalNotificationListeners[i])
-            {
-                return;
-            }
-        }
-
-        mLocalNotificationListeners.add(listener);
-    }
-
-    /**
-     * Remove the event listener for this local notification.
-     * @param listener The listener that receives local notification events.
-     */
-    void LocalNotification::removeNotificationListener(
-        LocalNotificationListener* listener)
-    {
-        for (int i = 0; i < mLocalNotificationListeners.size(); i++)
-        {
-            if (listener == mLocalNotificationListeners[i])
-            {
-                mLocalNotificationListeners.remove(i);
-                break;
-            }
-        }
-    }
-
-    /**
-     * This method is called when there is an event for this local
-     * notification.
-     * @param eventData The event data for this local notification.
-     */
-    void LocalNotification::handleLocalNotificationEvent(
-        const MAEvent& eventData)
-    {
-        for (int i = 0; i < mLocalNotificationListeners.size(); i++)
-        {
-            mLocalNotificationListeners[i]->didReceiveLocalNotification(this);
-        }
     }
 
 } // namespace Notification

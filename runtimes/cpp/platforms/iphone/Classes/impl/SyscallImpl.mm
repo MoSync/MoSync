@@ -1884,24 +1884,25 @@ return 0; \
 
     SYSCALL(int, maNotificationLocalCreate())
 	{
-		return [[NotificationManager getInstance] createNotificationObject];
+		return [[NotificationManager getInstance] createLocalNotificationObject];
 	}
     SYSCALL(int, maNotificationLocalDestroy(MAHandle notificationHandle))
 	{
-        return [[NotificationManager getInstance] destroyNotificationObject:notificationHandle];
+        return [[NotificationManager getInstance] destroyLocalNotificationObject:notificationHandle];
 	}
     SYSCALL(int, maNotificationLocalSetProperty(MAHandle notificationHandle, const char* property, const char* value))
 	{
-        return [[NotificationManager getInstance] notificationSetProperty:notificationHandle
-                                                          property:property
-                                                             value:value];
+        return [[NotificationManager getInstance] localNotificationSetProperty:notificationHandle
+                                                                      property:property
+                                                                         value:value];
 	}
-    SYSCALL(int, maNotificationLocalGetProperty(MAHandle notificationHandle, const char* property, char* value, const int bufSize))
+    SYSCALL(int, maNotificationLocalGetProperty(MAHandle notificationHandle, const char* property,
+                                                char* value, const int bufSize))
 	{
-        return [[NotificationManager getInstance] notificationGetProperty:notificationHandle
-                                                          property:property
-                                                             value:value
-                                                              size:bufSize];
+        return [[NotificationManager getInstance] localNotificationGetProperty:notificationHandle
+                                                                      property:property
+                                                                         value:value
+                                                                          size:bufSize];
 	}
     SYSCALL(int, maNotificationLocalSchedule(MAHandle notificationHandle))
 	{
