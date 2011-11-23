@@ -127,6 +127,19 @@ class MoSyncNotifications
 		}
 	}
 
+	int maNotificationPushDestroy(int pushNotificationHandle)
+	{
+		if ( mPushNotificationManager != null )
+		{
+			return mPushNotificationManager.destroyNotification(pushNotificationHandle);
+		}
+		else
+		{
+			Log.e("@@MoSync","maNotificationPushDestroy Platform unsupported");
+			return MA_NOTIFICATION_RES_ERROR;
+		}
+	}
+
 	int maNotificationPushSetTickerText(String text)
 	{
 		if ( mPushNotificationManager != null )

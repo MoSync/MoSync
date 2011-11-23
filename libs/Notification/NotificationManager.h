@@ -105,6 +105,7 @@ namespace Notification
 
     // Forward declaration.
     class LocalNotification;
+    class LocalNotificationListener;
     class PushNotificationListener;
 
     /**
@@ -140,22 +141,20 @@ namespace Notification
         virtual void customEvent(const MAEvent& event);
 
         /**
-         * Add a local notification to the map that holds notifications.
-         * The local notification will receive custom events.
-         * @param localNotification The local notification that needs to be
-         * registered.
-         * The ownership of the local notification is not passed to this method.
+         * Add an event listener for local notifications.
+         * @param listener The listener that will receive
+         * local notification events.
          */
-        virtual void addEventListener(
-            LocalNotification* localNotification);
+        virtual void addLocalNotificationListener(
+            LocalNotificationListener* listener);
 
         /**
-         * Remove a local notification from the map that holds notifications.
-         * The local notification will not receive custom events.
-         * @param banner The local notification that needs to be unregistered.
+         * Remove the event listener for local notifications.
+         * @param listener The listener that receives local notification events.
          */
-        virtual void removeEventListener(
-            LocalNotification* localNotification);
+        virtual void removeLocalNotificationListener(
+            LocalNotificationListener* listener);
+
 
         /**
          * Schedules a local notification for delivery at its encapsulated
@@ -296,6 +295,11 @@ namespace Notification
          * Dictionary of local notifications identified by handles.
          */
         MAUtil::Map<MAHandle, LocalNotification*> mLocalNotificationMap;
+
+        /**
+         * Array with local notification listeners.
+         */
+        MAUtil::Vector<LocalNotificationListener*> mLocalNotificationListeners;
 
         /**
          * Array with push notification listeners.

@@ -3142,6 +3142,22 @@ namespace Base
 		return result;
 	}
 
+	int _maNotificationPushDestroy(MAHandle pushNotificationHandle, JNIEnv* jNIEnv, jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+		jmethodID methodID = jNIEnv->GetMethodID(cls, "maNotificationPushDestroy", "(I)I");
+		if (methodID == 0)
+		{
+			return 0;
+		}
+
+		int result = jNIEnv->CallIntMethod(jThis, methodID, pushNotificationHandle);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return result;
+	}
+
 	int _maNotificationPushSetTickerText(const char* text, JNIEnv* jNIEnv, jobject jThis)
 	{
 		jstring jstrText = jNIEnv->NewStringUTF(text);

@@ -44,7 +44,7 @@ namespace Notification
          * @param localNotification The received local notification.
          */
         virtual void didReceiveLocalNotification(
-            LocalNotification* localNotification) = 0;
+            LocalNotification& localNotification) = 0;
     };
 
 } // namespace Notification
