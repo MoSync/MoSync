@@ -31,6 +31,7 @@ MA 02110-1301, USA.
 
 #include "NotificationManager.h"
 #include "LocalNotification.h"
+#include "LocalNotificationListener.h"
 #include "PushNotification.h"
 #include "PushNotificationListener.h"
 
@@ -93,7 +94,6 @@ namespace Notification
      */
     void NotificationManager::customEvent(const MAEvent& event)
     {
-        // Check if this is a notification event.
         if (EVENT_TYPE_LOCAL_NOTIFICATION == event.type)
         {
             // Check if the local notification exists in the map.
@@ -104,8 +104,13 @@ namespace Notification
                 LocalNotification* localNotification =
                     mLocalNotificationMap[event.localNotificationHandle];
 
-                // Call the local notification's event handling method.
-                localNotification->handleLocalNotificationEvent(event);
+                // Notify listeners.
+                for (int i = 0; i < mLocalNotificationListeners.size(); i++)
+                {
+                    LocalNotificationListener* listener =
+                        mLocalNotificationListeners[i];
+                    listener->didReceiveLocalNotification(*localNotification);
+                }
             }
         }
         else if (EVENT_TYPE_PUSH_NOTIFICATION == event.type)
@@ -192,28 +197,39 @@ namespace Notification
     }
 
     /**
-     * Add a local notification to the map that holds notifications.
-     * The local notification will receive custom events.
-     * @param localNotification The local notification that needs to be
-     * registered.
-     * The ownership of the local notification is not passed to this method.
+     * Add an event listener for local notifications.
+     * @param listener The listener that will receive
+     * local notification events.
      */
-    void NotificationManager::addEventListener(
-        LocalNotification* localNotification)
+    void NotificationManager::addLocalNotificationListener(
+        LocalNotificationListener* listener)
     {
-        mLocalNotificationMap[localNotification->getHandle()] =
-            localNotification;
+        for (int i = 0; i < mLocalNotificationListeners.size(); i++)
+        {
+            if (listener == mLocalNotificationListeners[i])
+            {
+                return;
+            }
+        }
+
+        mLocalNotificationListeners.add(listener);
     }
 
     /**
-     * Remove a local notification from the map that holds notifications.
-     * The local notification will not receive custom events.
-     * @param banner The local notification that needs to be unregistered.
+     * Remove the event listener for local notifications.
+     * @param listener The listener that receives local notification events.
      */
-    void NotificationManager::removeEventListener(
-        LocalNotification* localNotification)
+    void NotificationManager::removeLocalNotificationListener(
+        LocalNotificationListener* listener)
     {
-        mLocalNotificationMap.erase(localNotification->getHandle());
+        for (int i = 0; i < mLocalNotificationListeners.size(); i++)
+        {
+            if (listener == mLocalNotificationListeners[i])
+            {
+                mLocalNotificationListeners.remove(i);
+                break;
+            }
+        }
     }
 
     /**

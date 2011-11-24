@@ -289,6 +289,7 @@ public class MoSyncThread extends Thread
 	 */
 	public MoSyncThread(Context context, Handler handler) throws Exception
 	{
+		Log.e("Emma","moSycn thread constructor");
 		mContext = (MoSync) context;
 
 		// TODO: Clean this up! The static reference should be in one place.
@@ -3087,6 +3088,18 @@ public class MoSyncThread extends Thread
 			int allertMessageSize)
 	{
 		return mMoSyncNotifications.maNotificationPushGetData(handle, allertMessage, allertMessageSize);
+	}
+
+	/**
+	 * Destroy a push notification object.
+	 * @param handle Handle to a push notification object.
+	 * @return One of the next constants:
+	 * - #MA_NOTIFICATION_RES_OK if no error occurred.
+	 * - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+	 */
+	int maNotificationPushDestroy(int handle)
+	{
+		return mMoSyncNotifications.maNotificationPushDestroy(handle);
 	}
 
 	/**

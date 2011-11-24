@@ -78,6 +78,9 @@
 		43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A7684E1400F6BA009608A4 /* ImagePickerController.h */; };
 		43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
 		43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
+		43B16FEA147BF9FC00B6BB8A /* NSStringExpanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 43B16FE8147BF9FC00B6BB8A /* NSStringExpanded.h */; };
+		43B16FEB147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B16FE9147BF9FC00B6BB8A /* NSStringExpanded.mm */; };
+		43B16FEC147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43B16FE9147BF9FC00B6BB8A /* NSStringExpanded.mm */; };
 		43C3F4811469794600E02C41 /* PushNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 43C3F47F1469794600E02C41 /* PushNotification.h */; };
 		43C3F4821469794600E02C41 /* PushNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C3F4801469794600E02C41 /* PushNotification.mm */; };
 		43C3F4831469794600E02C41 /* PushNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C3F4801469794600E02C41 /* PushNotification.mm */; };
@@ -357,6 +360,8 @@
 		432B98CB1432040B00BDB926 /* PimError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimError.h; sourceTree = "<group>"; };
 		43A7684E1400F6BA009608A4 /* ImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerController.h; sourceTree = "<group>"; };
 		43A7684F1400F6BA009608A4 /* ImagePickerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImagePickerController.mm; sourceTree = "<group>"; };
+		43B16FE8147BF9FC00B6BB8A /* NSStringExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringExpanded.h; path = utils/NSStringExpanded.h; sourceTree = "<group>"; };
+		43B16FE9147BF9FC00B6BB8A /* NSStringExpanded.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NSStringExpanded.mm; path = utils/NSStringExpanded.mm; sourceTree = "<group>"; };
 		43C3F47F1469794600E02C41 /* PushNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PushNotification.h; path = notifications/PushNotification.h; sourceTree = "<group>"; };
 		43C3F4801469794600E02C41 /* PushNotification.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PushNotification.mm; path = notifications/PushNotification.mm; sourceTree = "<group>"; };
 		43CE0BE11463E9B800F8FFC3 /* Ads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Ads.h; path = ads/Ads.h; sourceTree = "<group>"; };
@@ -618,6 +623,7 @@
 				85BF2B171134038600BB0201 /* Base */,
 				85BF2B0D1134037600BB0201 /* intlibs */,
 				85BF2B0C1134036D00BB0201 /* impl */,
+				43B16FE6147BF9AA00B6BB8A /* utils */,
 				1D3623240D0F684500981E51 /* MoSyncAppDelegate.h */,
 				1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */,
 				28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */,
@@ -744,6 +750,15 @@
 				29B46B3C1407FAA5009491A6 /* PimContactsList.m */,
 			);
 			path = contacts;
+			sourceTree = "<group>";
+		};
+		43B16FE6147BF9AA00B6BB8A /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				43B16FE8147BF9FC00B6BB8A /* NSStringExpanded.h */,
+				43B16FE9147BF9FC00B6BB8A /* NSStringExpanded.mm */,
+			);
+			name = utils;
 			sourceTree = "<group>";
 		};
 		43CE0BDE1463E98700F8FFC3 /* ads */ = {
@@ -1115,6 +1130,7 @@
 				41BD2ED214768C47005ADEB9 /* AudioSyscall.h in Headers */,
 				41BD2ED414768C55005ADEB9 /* AudioData.h in Headers */,
 				41BD2ED514768C5D005ADEB9 /* AudioInstance.h in Headers */,
+				43B16FEA147BF9FC00B6BB8A /* NSStringExpanded.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1318,11 +1334,11 @@
 				43CE0BE91463E9B800F8FFC3 /* BannerWidget.mm in Sources */,
 				43CE0BEE1463E9C600F8FFC3 /* NotificationManager.mm in Sources */,
 				43C3F4821469794600E02C41 /* PushNotification.mm in Sources */,
-				41EB03DC146A696D0088E3A4 /* MoSyncDB.mm in Sources */,
 				E4D36EA81459AC5B00477B1E /* AudioData.mm in Sources */,
 				E4D36EA91459AC5B00477B1E /* AudioSyscall.mm in Sources */,
 				E4D36EAD1459B5B600477B1E /* AudioInstance.mm in Sources */,
 				4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */,
+				43B16FEB147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1420,6 +1436,7 @@
 				41BD2ED114768C40005ADEB9 /* AudioSyscall.mm in Sources */,
 				41BD2ED314768C4D005ADEB9 /* AudioData.mm in Sources */,
 				41BD2ED614768C63005ADEB9 /* AudioInstance.mm in Sources */,
+				43B16FEC147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

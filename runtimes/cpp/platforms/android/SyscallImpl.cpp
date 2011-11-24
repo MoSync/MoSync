@@ -2685,6 +2685,9 @@ return 0; \
 				mJThis);
 		}
 
+		case maIOCtl_maNotificationPushDestroy:
+			return _maNotificationPushDestroy(a, mJNIEnv, mJThis);
+
 		case maIOCtl_maNotificationPushSetTickerText:
 		{
 			const char *_text = SYSCALL_THIS->GetValidatedStr(a);

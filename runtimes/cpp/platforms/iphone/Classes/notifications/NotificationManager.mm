@@ -54,6 +54,7 @@
 #import "IWidget.h"
 #import "helpers/cpp_defs.h"
 #import "Syscall.h"
+#import "NSStringExpanded.h"
 #import "PushNotification.h"
 
 @implementation NotificationManager
@@ -103,13 +104,13 @@ static NotificationManager *sharedInstance = nil;
  * - MA_NOTIFICATION_RES_ERROR if a error occurred while creating the notification object.
  * - a handle to a notification object.
  */
--(MAHandle) createNotificationObject
+-(MAHandle) createLocalNotificationObject
 {
-    mLocalNotificationHandleCount++;
     if (INT32_MAX == mLocalNotificationHandleCount)
     {
         return MA_NOTIFICATION_RES_ERROR;
     }
+    mLocalNotificationHandleCount++;
 
     // Check if notifications are supported on current platform.
     Class cls = NSClassFromString(@"UILocalNotification");
@@ -122,9 +123,8 @@ static NotificationManager *sharedInstance = nil;
         }
 
         notification.timeZone = [NSTimeZone systemTimeZone];
-        notification.fireDate = [NSDate date];
         [mLocalNotificationDictionary setObject:notification
-                                    forKey:[NSNumber numberWithInt:mLocalNotificationHandleCount]];
+                                         forKey:[NSNumber numberWithInt:mLocalNotificationHandleCount]];
     }
     else
     {
@@ -140,13 +140,13 @@ static NotificationManager *sharedInstance = nil;
  * - MA_NOTIFICATION_RES_OK if no error occurred.
  * - MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
  */
--(int) destroyNotificationObject:(MAHandle) notificationHandle
+-(int) destroyLocalNotificationObject:(MAHandle) notificationHandle
 {
     NSNumber* key = [NSNumber numberWithInt:notificationHandle];
     UILocalNotification* notification = [mLocalNotificationDictionary objectForKey:key];
     if (!notification)
     {
-        NSLog(@"destroyNotificationObject invalid handle");
+        NSLog(@"NotificationManager::destroyLocalNotificationObject invalid handle");
         return MA_NOTIFICATION_RES_INVALID_HANDLE;
     }
 
@@ -158,22 +158,23 @@ static NotificationManager *sharedInstance = nil;
 /**
  * Set a local notification property.
  * @param notificationHandle Handle to a local notification object.
- * @param property A string representing which property to set.
- * @param value The value that will be assigned to the property.
+ * @param propertyNameChar A string representing which property to set.
+ * @param valueChar The value that will be assigned to the property.
  * @return One of the next constants:
  * - MA_NOTIFICATION_RES_OK if no error occurred.
  * - MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
  * - MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
  * - MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
  */
--(int) notificationSetProperty:(MAHandle) notificationHandle
-                      property:(const char*) propertyNameChar
-                         value:(const char*) valueChar
+-(int) localNotificationSetProperty:(MAHandle) notificationHandle
+                           property:(const char*) propertyNameChar
+                              value:(const char*) valueChar
 {
     NSNumber* key = [NSNumber numberWithInt:notificationHandle];
     UILocalNotification* notification = [mLocalNotificationDictionary objectForKey:key];
     if (!notification)
     {
+        NSLog(@"NotificationManager::localNotificationSetProperty invalid handle");
         return MA_NOTIFICATION_RES_INVALID_HANDLE;
     }
 
@@ -181,11 +182,23 @@ static NotificationManager *sharedInstance = nil;
     NSString* value = [NSString stringWithUTF8String:valueChar];
     if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_BADGE_NUMBER])
     {
+        if (![value canParseNumber])
+        {
+            NSLog(@"NotificationManager::localNotificationSetProperty invalid property value");
+            return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
+        }
         notification.applicationIconBadgeNumber = [value intValue];
     }
     else if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_FIRE_DATE])
     {
-        // Notification fire date must be in GMT format.
+        if (![value canParseNumber])
+        {
+            NSLog(@"NotificationManager::localNotificationSetProperty invalid property value");
+            return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
+        }
+
+        // Notification fire date must be in GMT + 0:00 format(system time).
+        // Received date is using local time.
         double seconds = [value doubleValue];
         NSTimeZone* localTimeZone = [NSTimeZone localTimeZone];
         seconds -= [localTimeZone secondsFromGMT];
@@ -235,16 +248,16 @@ static NotificationManager *sharedInstance = nil;
  * - MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
  * - MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
  */
--(int) notificationGetProperty:(MAHandle) notificationHandle
-                      property:(const char*) property
-                         value:(char*) value
-                          size:(int) maxSize
+-(int) localNotificationGetProperty:(MAHandle) notificationHandle
+                           property:(const char*) property
+                              value:(char*) value
+                               size:(int) maxSize
 {
     NSNumber* key = [NSNumber numberWithInt:notificationHandle];
     UILocalNotification* notification = [mLocalNotificationDictionary objectForKey:key];
     if (!notification)
     {
-        NSLog(@"notificationGetProperty invalid handle");
+        NSLog(@"NotificationManager::notificationGetProperty invalid handle");
         return MA_NOTIFICATION_RES_INVALID_HANDLE;
     }
 
@@ -256,7 +269,7 @@ static NotificationManager *sharedInstance = nil;
     }
     else if ([propertyName isEqualToString:@MA_NOTIFICATION_LOCAL_FIRE_DATE])
     {
-        // Notification's fire date is in GMT format.
+        // Notification's fire date is in GMT + 0:00 format(system time).
         // We need to convert it to local time.
         NSDate* fireDate = notification.fireDate;
         double seconds = [fireDate timeIntervalSince1970];
@@ -304,7 +317,7 @@ static NotificationManager *sharedInstance = nil;
 
     if(!retVal)
     {
-        NSLog(@"notificationGetProperty invalid property name");
+        NSLog(@"NotificationManager::notificationGetProperty invalid property name");
         return MA_ADS_RES_INVALID_PROPERTY_NAME;
     }
 
@@ -312,7 +325,8 @@ static NotificationManager *sharedInstance = nil;
 	int realLength = [retVal length];
 	if(realLength > length)
     {
-        NSLog(@"notificationGetProperty invalid buffer size");
+        NSLog(@"NotificationManager::notificationGetProperty invalid buffer size");
+        [retVal release];
 		return MA_ADS_RES_INVALID_STRING_BUFFER_SIZE;
 	}
 
@@ -497,7 +511,13 @@ static NotificationManager *sharedInstance = nil;
     NSDictionary* apsDict = [pushNotification objectForKey:NOTIFICATION_KEY];
     if (!apsDict)
     {
-        NSLog(@"The push notification object is invalid.");
+        NSLog(@"NotificationManager::didReceivePushNotification The push notification object is invalid.");
+        return;
+    }
+
+    if (INT32_MAX == mPushNotificationHandleCount)
+    {
+        NSLog(@"NotificationManager::didReceivePushNotification Cannot create push notification object.");
         return;
     }
 
@@ -549,6 +569,7 @@ static NotificationManager *sharedInstance = nil;
                                           [NSNumber numberWithInt:pushNotificationHandle]];
     if (!pushNotificationHandle)
     {
+        NSLog(@"NotificationManager::getPushNotificationData Invalid handle.");
         return MA_NOTIFICATION_RES_INVALID_HANDLE;
     }
 
@@ -565,6 +586,7 @@ static NotificationManager *sharedInstance = nil;
     {
         if (maxLength < [messageAlert length])
         {
+            NSLog(@"NotificationManager::getPushNotificationData Buffer too small.");
             return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
         }
         [messageAlert getCString:charAddress maxLength:maxLength encoding:NSASCIIStringEncoding];
@@ -580,6 +602,7 @@ static NotificationManager *sharedInstance = nil;
     {
         if (maxLength < [soundFileName length])
         {
+            NSLog(@"NotificationManager::getPushNotificationData Buffer too small.");
             return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
         }
         [soundFileName getCString:charAddress maxLength:maxLength encoding:NSASCIIStringEncoding];
@@ -617,6 +640,7 @@ static NotificationManager *sharedInstance = nil;
                                           [NSNumber numberWithInt:pushNotificationHandle]];
     if (!pushNotificationHandle)
     {
+        NSLog(@"NotificationManager::pushNotificationDestroy Invalid handle.");
         return MA_NOTIFICATION_RES_INVALID_HANDLE;
     }
 

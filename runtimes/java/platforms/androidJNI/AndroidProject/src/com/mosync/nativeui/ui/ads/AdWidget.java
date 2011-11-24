@@ -60,7 +60,6 @@ public class AdWidget extends Widget implements AdListener
 		super ( handle, view );
 		mHandle = handle;
 		mThread = mosyncThread;
-//		view.setAdListener(this);
 		// Create an ad request.
 		mAdRequest = new AdRequest();
 	}
@@ -219,6 +218,7 @@ public class AdWidget extends Widget implements AdListener
 
 	/**
 	 * Gets a specific ad property.
+	 * @param property The specific property name.
 	 */
 	public String getAdBannerProperty(String property)
 	{
@@ -251,7 +251,6 @@ public class AdWidget extends Widget implements AdListener
 
 	/**
 	 * No widget specific properties.
-	 * If maWidget
 	 */
 	@Override
 	public boolean setProperty(String property, String value)
@@ -259,6 +258,7 @@ public class AdWidget extends Widget implements AdListener
 	{
 		return false;
 	}
+
 	@Override
 	public String getProperty(String property)
 	{
