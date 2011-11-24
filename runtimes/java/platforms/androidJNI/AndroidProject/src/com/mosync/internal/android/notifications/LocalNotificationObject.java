@@ -14,7 +14,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_T
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_FIRE_DATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_CONTENT_TITLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_FLAG;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_SOUND;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_SOUND_PATH;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_PLAY_SOUND;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_VIBRATE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_VIBRATE_DURATION;
@@ -104,7 +104,7 @@ public class LocalNotificationObject {
 				mNotification.defaults |= Notification.DEFAULT_SOUND;
 			}
 		}
-		else if ( name.equals(MA_NOTIFICATION_LOCAL_SOUND) )
+		else if ( name.equals(MA_NOTIFICATION_LOCAL_SOUND_PATH) )
 		{
 			if ( value.isEmpty() )
 				throw new PropertyConversionException(value);

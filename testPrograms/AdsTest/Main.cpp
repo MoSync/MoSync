@@ -18,29 +18,26 @@ MA 02110-1301, USA.
 
 /**
  * @file Main.cpp
- * @author Bogdan Iusco
+ * @author Mikael Kindborg
  *
  * This is the main entry point for the example application
  * that demonstrates NativeUI on MoSync.
  */
 
-#include <ma.h>
-#include <MAUtil/String.h>
-#include <MAUtil/Moblet.h>
-#include <MAUtil/Environment.h>
-#include <conprint.h>
+#include <ma.h> 				// Syscalls
+#include <MAUtil/String.h>		// C++ String class
+#include <MAUtil/Moblet.h>		// Moblet class
+#include <conprint.h>			// lprintfln for logging
 #include <NativeUI/Widgets.h>
+#include "MainScreen.h"			// Main UI screen
 
-#include <Notification/NotificationManager.h>
-
-#include "CreateNotificationScreen.h"
-#include "Util.h"
+using namespace MAUtil;
+using namespace NativeUI;
 
 /**
  * Moblet for the  application.
  */
-class NativeUIMoblet : public MAUtil::Moblet,
-					   public MAUtil::FocusListener
+class NativeUIMoblet : public Moblet
 {
 public:
 	/**
@@ -48,21 +45,11 @@ public:
 	 */
 	NativeUIMoblet()
 	{
-		if (!isAndroid() && !isIOS())
-		{
-			maMessageBox("Error", "Run this program on Android or iOS devices");
-		}
-		else
-		{
+		// Create the main user interface screen.
+		mMainScreen = new MainScreen();
 
-			// Create the main user interface screen.
-			mMainScreen = new CreateNotificationScreen();
-
-			// Show the screen.
-			mMainScreen->show();
-		}
-
-		this->addFocusListener(this);
+		// Show the screen.
+		mMainScreen->show();
 	}
 
 	/**
@@ -70,24 +57,7 @@ public:
 	 */
 	virtual ~NativeUIMoblet()
 	{
-		this->removeFocusListener(this);
 		delete mMainScreen;
-	}
-
-	/**
-	 * Called when the application goes to background.
-	 */
-	virtual void focusLost()
-	{
-		// No implementation required.
-	}
-
-	/**
-	 * Called when the application comes to foreground.
-	 */
-	virtual void focusGained()
-	{
-		NotificationManager::getInstance()->setApplicationIconBadgeNumber(0);
 	}
 
 	/**
@@ -114,8 +84,9 @@ public:
 	        closeEvent();
 	    }
 	}
+
 private:
-	CreateNotificationScreen* mMainScreen;
+	MainScreen* mMainScreen;
 };
 
 /**
@@ -127,7 +98,7 @@ extern "C" int MAMain()
 	NativeUIMoblet* moblet = new NativeUIMoblet();
 
 	// Run the moblet event loop.
-	MAUtil::Moblet::run(moblet);
+	Moblet::run(moblet);
 
 	// Deallocate objects.
 	delete moblet;
