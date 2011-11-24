@@ -85,7 +85,7 @@ namespace MoSync
                 get { return (double)mView.GetValue(Canvas.WidthProperty); }
                 set
                 {
-                    if (!value.Equals(-1))
+                    if (value > 0)
                     {
                         mView.SetValue(Canvas.WidthProperty, value);
                     }
@@ -119,7 +119,7 @@ namespace MoSync
                 get { return (double)mView.GetValue(Canvas.HeightProperty); }
                 set
                 {
-                    if (!value.Equals(-1))
+                    if (value > 0)
                     {
                         mView.SetValue(Canvas.HeightProperty, value);
                     }

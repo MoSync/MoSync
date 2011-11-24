@@ -182,6 +182,19 @@ namespace MoSync
 					}
 				}
 			}
+
+            /**
+             * The implementation of the "FontHandle" property. 
+             * Sets the font handle used to display the item's text
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_HANDLE)]
+            public String FontHandle
+            {
+                set
+                {
+
+                }
+            }
 		}
     }
 }

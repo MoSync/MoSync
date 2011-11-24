@@ -72,9 +72,26 @@
 		432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CC1432040B00BDB926 /* PimError.h in Headers */ = {isa = PBXBuildFile; fileRef = 432B98CB1432040B00BDB926 /* PimError.h */; };
+		438DBD401475388500980239 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
+		438DBD451475393800980239 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
+		438DBD461475393800980239 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
 		43A768501400F6BA009608A4 /* ImagePickerController.h in Headers */ = {isa = PBXBuildFile; fileRef = 43A7684E1400F6BA009608A4 /* ImagePickerController.h */; };
 		43A768511400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
 		43A768521400F6BA009608A4 /* ImagePickerController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43A7684F1400F6BA009608A4 /* ImagePickerController.mm */; };
+		43C3F4811469794600E02C41 /* PushNotification.h in Headers */ = {isa = PBXBuildFile; fileRef = 43C3F47F1469794600E02C41 /* PushNotification.h */; };
+		43C3F4821469794600E02C41 /* PushNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C3F4801469794600E02C41 /* PushNotification.mm */; };
+		43C3F4831469794600E02C41 /* PushNotification.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43C3F4801469794600E02C41 /* PushNotification.mm */; };
+		43CE0BE51463E9B800F8FFC3 /* Ads.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BE11463E9B800F8FFC3 /* Ads.h */; };
+		43CE0BE61463E9B800F8FFC3 /* Ads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE21463E9B800F8FFC3 /* Ads.mm */; };
+		43CE0BE71463E9B800F8FFC3 /* Ads.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE21463E9B800F8FFC3 /* Ads.mm */; };
+		43CE0BE81463E9B800F8FFC3 /* BannerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BE31463E9B800F8FFC3 /* BannerWidget.h */; };
+		43CE0BE91463E9B800F8FFC3 /* BannerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */; };
+		43CE0BEA1463E9B800F8FFC3 /* BannerWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */; };
+		43CE0BED1463E9C600F8FFC3 /* NotificationManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 43CE0BEB1463E9C600F8FFC3 /* NotificationManager.h */; };
+		43CE0BEE1463E9C600F8FFC3 /* NotificationManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BEC1463E9C600F8FFC3 /* NotificationManager.mm */; };
+		43CE0BEF1463E9C600F8FFC3 /* NotificationManager.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43CE0BEC1463E9C600F8FFC3 /* NotificationManager.mm */; };
+		43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
+		43CE0BF91463EE7600F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BF51463EE5F00F8FFC3 /* iAd.framework */; };
 		43CE0C101464065400F8FFC3 /* NumberPickerWIdget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046213EFBCB200183387 /* NumberPickerWIdget.h */; };
 		43CE0C111464065400F8FFC3 /* ActivityIndicatorWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */; };
 		43CE0C121464065400F8FFC3 /* DatePickerWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 43D8046013EFBCB200183387 /* DatePickerWidget.h */; };
@@ -340,6 +357,15 @@
 		432B98CB1432040B00BDB926 /* PimError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimError.h; sourceTree = "<group>"; };
 		43A7684E1400F6BA009608A4 /* ImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerController.h; sourceTree = "<group>"; };
 		43A7684F1400F6BA009608A4 /* ImagePickerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImagePickerController.mm; sourceTree = "<group>"; };
+		43C3F47F1469794600E02C41 /* PushNotification.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PushNotification.h; path = notifications/PushNotification.h; sourceTree = "<group>"; };
+		43C3F4801469794600E02C41 /* PushNotification.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = PushNotification.mm; path = notifications/PushNotification.mm; sourceTree = "<group>"; };
+		43CE0BE11463E9B800F8FFC3 /* Ads.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Ads.h; path = ads/Ads.h; sourceTree = "<group>"; };
+		43CE0BE21463E9B800F8FFC3 /* Ads.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Ads.mm; path = ads/Ads.mm; sourceTree = "<group>"; };
+		43CE0BE31463E9B800F8FFC3 /* BannerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = BannerWidget.h; path = ads/BannerWidget.h; sourceTree = "<group>"; };
+		43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = BannerWidget.mm; path = ads/BannerWidget.mm; sourceTree = "<group>"; };
+		43CE0BEB1463E9C600F8FFC3 /* NotificationManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NotificationManager.h; path = notifications/NotificationManager.h; sourceTree = "<group>"; };
+		43CE0BEC1463E9C600F8FFC3 /* NotificationManager.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NotificationManager.mm; path = notifications/NotificationManager.mm; sourceTree = "<group>"; };
+		43CE0BF51463EE5F00F8FFC3 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		43D8045E13EFBCB200183387 /* ActivityIndicatorWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ActivityIndicatorWidget.h; sourceTree = "<group>"; };
 		43D8045F13EFBCB200183387 /* ActivityIndicatorWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ActivityIndicatorWidget.mm; sourceTree = "<group>"; };
 		43D8046013EFBCB200183387 /* DatePickerWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatePickerWidget.h; sourceTree = "<group>"; };
@@ -524,6 +550,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */,
 				431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */,
 				431869AB13F68E8A0051D97A /* EventKit.framework in Frameworks */,
 				431869A813F68E560051D97A /* AddressBook.framework in Frameworks */,
@@ -551,6 +578,7 @@
 				85F2551511AC12A700EB47EE /* CoreGraphics.framework in Frameworks */,
 				431869B413F691B70051D97A /* CoreMotion.framework in Frameworks */,
 				431869AC13F68E940051D97A /* EventKit.framework in Frameworks */,
+				43CE0BF91463EE7600F8FFC3 /* iAd.framework in Frameworks */,
 				85F2551611AC12A700EB47EE /* Foundation.framework in Frameworks */,
 				85F2551711AC12A700EB47EE /* UIKit.framework in Frameworks */,
 				858B404012E680460058DBFC /* QuartzCore.framework in Frameworks */,
@@ -581,6 +609,8 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				43CE0BE01463E98F00F8FFC3 /* notifications */,
+				43CE0BDE1463E98700F8FFC3 /* ads */,
 				E4D36EA31459AC5B00477B1E /* audio */,
 				4318696C13F68D410051D97A /* pim */,
 				85A158E312F80E520044BBE1 /* UI */,
@@ -664,6 +694,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				43CE0BF51463EE5F00F8FFC3 /* iAd.framework */,
 				431869B213F691A30051D97A /* CoreMotion.framework */,
 				431869AA13F68E8A0051D97A /* EventKit.framework */,
 				431869A713F68E560051D97A /* AddressBook.framework */,
@@ -713,6 +744,28 @@
 				29B46B3C1407FAA5009491A6 /* PimContactsList.m */,
 			);
 			path = contacts;
+			sourceTree = "<group>";
+		};
+		43CE0BDE1463E98700F8FFC3 /* ads */ = {
+			isa = PBXGroup;
+			children = (
+				43CE0BE11463E9B800F8FFC3 /* Ads.h */,
+				43CE0BE21463E9B800F8FFC3 /* Ads.mm */,
+				43CE0BE31463E9B800F8FFC3 /* BannerWidget.h */,
+				43CE0BE41463E9B800F8FFC3 /* BannerWidget.mm */,
+			);
+			name = ads;
+			sourceTree = "<group>";
+		};
+		43CE0BE01463E98F00F8FFC3 /* notifications */ = {
+			isa = PBXGroup;
+			children = (
+				43C3F47F1469794600E02C41 /* PushNotification.h */,
+				43C3F4801469794600E02C41 /* PushNotification.mm */,
+				43CE0BEB1463E9C600F8FFC3 /* NotificationManager.h */,
+				43CE0BEC1463E9C600F8FFC3 /* NotificationManager.mm */,
+			);
+			name = notifications;
 			sourceTree = "<group>";
 		};
 		8500CD3E132E506D0003A01E /* External */ = {
@@ -1054,6 +1107,10 @@
 				0B436BA014308D5400E69AB2 /* ModalDialogWidget.h in Headers */,
 				432B98C81431FE5F00BDB926 /* MoSyncPanic.h in Headers */,
 				432B98CC1432040B00BDB926 /* PimError.h in Headers */,
+				43CE0BE51463E9B800F8FFC3 /* Ads.h in Headers */,
+				43CE0BE81463E9B800F8FFC3 /* BannerWidget.h in Headers */,
+				43CE0BED1463E9C600F8FFC3 /* NotificationManager.h in Headers */,
+				43C3F4811469794600E02C41 /* PushNotification.h in Headers */,
 				4142402814766C03006977A1 /* MoSyncDB.h in Headers */,
 				41BD2ED214768C47005ADEB9 /* AudioSyscall.h in Headers */,
 				41BD2ED414768C55005ADEB9 /* AudioData.h in Headers */,
@@ -1257,6 +1314,11 @@
 				432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */,
 				29B46B3D1407FAA5009491A6 /* PimContactItem.m in Sources */,
 				29B46B3E1407FAA5009491A6 /* PimContactsList.m in Sources */,
+				43CE0BE61463E9B800F8FFC3 /* Ads.mm in Sources */,
+				43CE0BE91463E9B800F8FFC3 /* BannerWidget.mm in Sources */,
+				43CE0BEE1463E9C600F8FFC3 /* NotificationManager.mm in Sources */,
+				43C3F4821469794600E02C41 /* PushNotification.mm in Sources */,
+				41EB03DC146A696D0088E3A4 /* MoSyncDB.mm in Sources */,
 				E4D36EA81459AC5B00477B1E /* AudioData.mm in Sources */,
 				E4D36EA91459AC5B00477B1E /* AudioSyscall.mm in Sources */,
 				E4D36EAD1459B5B600477B1E /* AudioInstance.mm in Sources */,
@@ -1268,6 +1330,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				438DBD451475393800980239 /* AudioInstance.mm in Sources */,
+				438DBD461475393800980239 /* AudioData.mm in Sources */,
+				438DBD401475388500980239 /* AudioSyscall.mm in Sources */,
 				43D3B01613FFC82E00B3DE23 /* CameraConfirgurator.mm in Sources */,
 				858B44BB12E7B1060058DBFC /* log.cpp in Sources */,
 				858B3FEC12E67D090058DBFC /* NSObjectExpanded.m in Sources */,
@@ -1347,6 +1412,10 @@
 				0B436B8C143089BD00E69AB2 /* OptionsDialogView.mm in Sources */,
 				0B436BA114308D5400E69AB2 /* ModalDialogWidget.mm in Sources */,
 				432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */,
+				43CE0BE71463E9B800F8FFC3 /* Ads.mm in Sources */,
+				43CE0BEA1463E9B800F8FFC3 /* BannerWidget.mm in Sources */,
+				43CE0BEF1463E9C600F8FFC3 /* NotificationManager.mm in Sources */,
+				43C3F4831469794600E02C41 /* PushNotification.mm in Sources */,
 				4142402714766C03006977A1 /* MoSyncDB.cpp in Sources */,
 				41BD2ED114768C40005ADEB9 /* AudioSyscall.mm in Sources */,
 				41BD2ED314768C4D005ADEB9 /* AudioData.mm in Sources */,
