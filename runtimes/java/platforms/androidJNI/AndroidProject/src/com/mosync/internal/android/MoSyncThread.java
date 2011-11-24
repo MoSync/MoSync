@@ -83,6 +83,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.opengl.GLUtils;
 import android.os.Build;
@@ -97,6 +98,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import android.provider.Settings.Secure;
+import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.nfc.MoSyncNFC;
@@ -272,6 +274,12 @@ public class MoSyncThread extends Thread
 	private final Rect mMaDrawImageRegionTempSourceRect = new Rect();
 	private final Rect mMaDrawImageRegionTempDestRect = new Rect();
 
+
+	/**
+	 * An Instance of Connectivity Manager used for detecting connection type
+	 */
+	private ConnectivityManager mConnectivityManager;
+
 	int mMaxStoreId = 0;
 
 	public boolean mIsUpdatingScreen = false;
@@ -371,6 +379,8 @@ public class MoSyncThread extends Thread
 		}
 
 		mMoSyncDB = new MoSyncDB();
+
+		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 		nativeInitRuntime();
 	}
@@ -2483,6 +2493,12 @@ public class MoSyncThread extends Thread
 			//Log.i("@@@ MoSync", "Property mosync.path.local.url: " + url);
 			property = url;
 		}
+		else if (key.equals("mosync.network.type"))
+		{
+			//get the connection that we are using right now
+			NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
+			property = getNetworkNameFromInfo(info);
+		}
 
 		if (null == property) { return -2; }
 
@@ -2511,6 +2527,39 @@ public class MoSyncThread extends Thread
 		slicedBuffer.put((byte)0);
 
 		return property.length() + 1;
+	}
+
+	/**
+	 * converts the network information into a single string indicating
+	 * the type of the network.
+	 *
+	 * @param info NetowrkInformation obtained from a ConnectivityManager instance
+	 * @return a String indicating the type of the connection, for Mobile networks
+	 * it returns the exact type of mobile network, e.g. GSM, GPRS, or HSDPA...
+	 * The result might contain the full name and version of the mobiel network type
+	 */
+	private String getNetworkNameFromInfo(NetworkInfo info)
+	{
+	       if (info != null) {
+	            String type = info.getTypeName();
+	            if(type == null)
+	            {
+					return "unknown";
+	            }
+	            else if (type.toLowerCase().equals("mobile"))
+	            {
+					//return a generic default
+					return "mobile";
+	            }
+	            else
+	            {
+					return "wifi";
+	            }
+	        }
+	        else
+	        {
+				return "none";
+	        }
 	}
 
 	/**
