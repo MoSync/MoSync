@@ -32,6 +32,9 @@ MA 02110-1301, USA.
 
 #include <maapi.h>
 #include <mastdlib.h>
+#include <conprint.h>
+#include <matime.h>
+#include <MAUtil/util.h>
 
 #include "LocalNotification.h"
 
@@ -446,14 +449,15 @@ namespace Notification
 
     /**
      * Define your own color and pattern for the lights.
-     * Not every color in the spectrum is supported by the device LEDs, and not every
-     * device supports the same  colors, so the hardware estimates to the best of its
-     * ability. Green is the most common notification color.
+     * Not every color in the spectrum is supported by the device LEDs, and not
+     * every device supports the same  colors, so the hardware estimates to the
+     * best of its ability. Green is the most common notification color.
      * Also, not all Android devices support this feature.
      * Platform: Android.
      * @param lightPattern a NotificationFlashLights struct.
      */
-    void LocalNotification::setFlashLightsPattern(const NotificationFlashLights lightPattern)
+    void LocalNotification::setFlashLightsPattern(
+        const NotificationFlashLights lightPattern)
     {
 		MAUtil::String pattern = "";
 		pattern = MAUtil::integerToString(lightPattern.ledARGB) + ",";

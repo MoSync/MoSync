@@ -18,9 +18,10 @@ MA 02110-1301, USA.
 
 /**
  * @file Banner.h
- * @author Bogdan Iusco
+ * @author Emma Tresanszki and Bogdan Iusco
+ * @date 1 Nov 2011
  *
- * \brief Provides a widget that displays advertisement to the user.
+ * @brief Provides a widget that displays advertisement to the user.
  * When the user taps a banner, it triggers an action programmed into
  * the advertisement.
  * Your application is notified when an action starts or stops.
@@ -31,13 +32,8 @@ MA 02110-1301, USA.
 #ifndef ADS_BANNER_H_
 #define ADS_BANNER_H_
 
-#include <ma.h>
-#include <conprint.h>
 #include <MAUtil/String.h>
-#include <MAUtil/Map.h>
 #include <MAUtil/Vector.h>
-#include <MAUtil/Environment.h>
-#include <MAUtil/util.h>
 
 namespace Ads
 {
@@ -140,19 +136,25 @@ namespace Ads
 
         /**
          * Sets the request state of the ads.
-         * If set to true ads are starting to be requested, if set to false loading ads is stopped.
-         * Available only on Android. On iOS ads loading starts automatically at creation.
-         * Call requestContent(true) after the ad is created and/or after you set properties to it.
-         * @param requestState If true ads are starting to be requested, otherwise the request for ads is stopped.
+         * If set to true ads are starting to be requested, if set to false
+         * loading ads is stopped.
+         * Available only on Android. On iOS ads loading starts automatically at
+         * creation.
+         * Call requestContent(true) after the ad is created and/or after you
+         * set properties to it.
+         * @param requestState If true ads are starting to be requested,
+         * otherwise the request for ads is stopped.
          */
         virtual void requestContent(bool requestState);
 
         /**
          * Sets the devices that are going to receive test ads only.
-         * You should utilize this property during development to avoid generating false impressions.
+         * You should utilize this property during development to avoid
+         * generating false impressions.
          * Causes test ads to be returned to a device.
          * Available only on Android.
-         * @param testDevice the device ID. Use TEST_EMULATOR to get test ads in the emulator.
+         * @param testDevice the device ID. Use TEST_EMULATOR to get test ads
+         * in the emulator.
          */
         virtual void addTestDevice(const MAUtil::String& testDevice);
 
@@ -175,7 +177,8 @@ namespace Ads
         virtual int setBackgroundColor(const int color);
 
         /**
-         * Sets the coloration of test ads,specifically the gradient background color at top.
+         * Sets the coloration of test ads,specifically the gradient background
+         * color at top.
          * Available only on Android.
          * @param color A hexadecimal color value, e.g. 0xFF0000.
          * @return Any of the following result codes:
@@ -279,7 +282,8 @@ namespace Ads
         /**
          * Set a widget integer property, in hexadecimal base.
          * @param property A string representing which property to set.
-         * @param value The integer value in hexadecimal which will be assigned to the property.
+         * @param value The integer value in hexadecimal which will be assigned
+         * to the property.
          * @return Any of the following result codes:
          * - #MAW_RES_OK if the property could be set.
          * - #MAW_RES_INVALID_HANDLE if the handle was invalid.

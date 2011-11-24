@@ -33,14 +33,7 @@ MA 02110-1301, USA.
 #ifndef NOTIFICATION_LOCAL_NOTIFICATION_H_
 #define NOTIFICATION_LOCAL_NOTIFICATION_H_
 
-#include <ma.h>
-#include <conprint.h>
-#include <matime.h>
 #include <MAUtil/String.h>
-#include <MAUtil/Map.h>
-#include <MAUtil/Vector.h>
-#include <MAUtil/Environment.h>
-#include <MAUtil/util.h>
 
 namespace Notification
 {

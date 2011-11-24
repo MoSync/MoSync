@@ -18,16 +18,15 @@ MA 02110-1301, USA.
 
 /**
  * @file BannerManager.h
- * @author Bogdan Iusco
+ * @author Emma Tresanszki and Bogdan Iusco
+ * @date 1 Nov 2011
  *
- * \brief The BannnerManager manages banner events and dispatches
+ * @brief The BannnerManager manages banner events and dispatches
  * them to the target banners.
  */
 
 #ifndef ADS_BANNER_MANAGER_H_
 #define ADS_BANNER_MANAGER_H_
-
-#include <ma.h>
 
 #include <MAUtil/String.h>
 #include <MAUtil/Map.h>
@@ -40,7 +39,7 @@ namespace Ads
 	class Banner;
 
 	/**
-	 * \brief Class that handles banner events.
+	 * @brief Class that handles banner events.
 	 */
 	class BannerManager : public MAUtil::CustomEventListener
 	{
@@ -104,6 +103,5 @@ namespace Ads
 	};
 
 } // namespace Ads
-
 
 #endif /* ADS_BANNER_MANAGER_H_ */

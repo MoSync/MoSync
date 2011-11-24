@@ -32,7 +32,6 @@ MA 02110-1301, USA.
 #ifndef NOTIFICATION_PUSH_NOTIFICATION_H_
 #define NOTIFICATION_PUSH_NOTIFICATION_H_
 
-#include <conprint.h>
 #include <MAUtil/String.h>
 
 namespace Notification
