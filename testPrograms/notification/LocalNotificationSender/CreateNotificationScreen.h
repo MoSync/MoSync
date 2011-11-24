@@ -33,9 +33,6 @@ MA 02110-1301, USA.
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 
-#include <maapi.h>
-
-#include <MAUtil/util.h>
 #include <MAUtil/String.h>
 
 #include <Notification/NotificationManager.h>

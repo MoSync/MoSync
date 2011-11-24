@@ -61,6 +61,10 @@ MA 02110-1301, USA.
 #define TEXT_COLOR 0x000000
 #define TEXT_COLOR_ERROR 0xFF0000
 
+#include <matime.h>
+#include <maapi.h>
+#include <MAUtil/util.h>
+
 #include "CreateNotificationScreen.h"
 #include "Util.h"
 #include "MAHeaders.h"
