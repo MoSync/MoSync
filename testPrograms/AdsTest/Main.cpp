@@ -18,17 +18,15 @@ MA 02110-1301, USA.
 
 /**
  * @file Main.cpp
- * @author Mikael Kindborg
+ * @author Bogdan Iusco
  *
- * This is the main entry point for the example application
- * that demonstrates NativeUI on MoSync.
+ * This is the main entry point for the application.
  */
 
 #include <ma.h> 				// Syscalls
 #include <MAUtil/String.h>		// C++ String class
 #include <MAUtil/Moblet.h>		// Moblet class
-#include <conprint.h>			// lprintfln for logging
-#include <NativeUI/Widgets.h>
+
 #include "MainScreen.h"			// Main UI screen
 
 using namespace MAUtil;

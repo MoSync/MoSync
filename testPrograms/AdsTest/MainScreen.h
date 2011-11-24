@@ -18,7 +18,11 @@ MA 02110-1301, USA.
 
 /**
  * @file MainScreen.h
- * @author Bogdan Iusco.
+ * @author Emma Tresanszki and Bogdan Iusco
+ *
+ * @brief Screen used for displaying a banner.
+ * Contains widgets(e.g. check box, button) used for setting and getting
+ * values for banner.
  */
 
 #ifndef MAINSCREEN_H_
@@ -27,9 +31,7 @@ MA 02110-1301, USA.
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 
-#include <IX_PIM.h>
 #include <maapi.h>
-#include <MAUtil/util.h>
 
 #include <Ads/Banner.h>
 #include <Ads/BannerListener.h>
@@ -37,6 +39,11 @@ MA 02110-1301, USA.
 using namespace NativeUI;
 using namespace Ads;
 
+/**
+ * @brief Screen used for displaying a banner.
+ * Contains widgets(e.g. check box, button) used for setting and getting
+ * values for banner.
+ */
 class MainScreen:
 	public Screen,
 	public ButtonListener,
@@ -55,34 +62,20 @@ public:
 	 */
 	~MainScreen();
 
-    /**
-     * This method is called when there is an touch-down event for
-     * a button.
-     * @param button The button object that generated the event.
-     */
-    virtual void buttonPressed(Widget* button);
-
-    /**
-     * This method is called when there is an touch-up event for
-     * a button.
-     * @param button The button object that generated the event.
-     */
-    virtual void buttonReleased(Widget* button);
-
-    /**
-     * This method is called if the touch-up event was inside the
-     * bounds of the button.
-     * @param button The button object that generated the event.
-     */
-    virtual void buttonClicked(Widget* button);
-
 private:
-
 	/**
 	 * Creates and adds main layout to the screen.
 	 */
 	void createMainLayout();
 
+	/**
+	 * Creates a list view item.
+	 * @param check Will be added to the list view item.
+	 * Can be NULL.
+	 * @param label Will be added to the list view item.
+	 * Cannot be NULL.
+	 * @return The list view item.
+	 */
 	ListViewItem* createItem(Widget* check, Label* label);
 
     /**
@@ -115,6 +108,13 @@ private:
     virtual void bannerOnDismiss(Banner* banner);
 
     /**
+     * This method is called if the touch-up event was inside the
+     * bounds of the button.
+     * @param button The button object that generated the event.
+     */
+    virtual void buttonClicked(Widget* button);
+
+    /**
      * This method is called when the state of the check box was changed
      * by the user.
      * @param checkBox The check box object that generated the event.
@@ -125,27 +125,46 @@ private:
         bool state);
 
 private:
-	/**
-	 * Main layout.
-	 */
-	VerticalLayout* mMainLayout;
 
+    /**
+     * First widget displayed on the screen.
+     */
 	Banner* mBanner;
 
+	/**
+	 * Displays banner's status.
+	 */
 	Label* mBannerMessage;
 
+	/**
+	 * Contains widgets for setting & getting banner's properties.
+	 */
 	ListView* mListView;
+
+	/**
+	 * Widgets for setting & getting enable property for banner.
+	 */
 	CheckBox* mEnableCheckBox;
 	Button* mRefreshEnableButton;
 	Label* mIsBannerEnabled;
 
+	/**
+	 * Widgets for setting & getting visible property for banner.
+	 */
 	CheckBox* mShowBannerCheckBox;
 	Button* mRefreshVisibleButton;
 	Label* mIsBannerVisible;
 
+	/**
+	 * Widgets for getting size property for banner.
+	 */
 	Button* mGetSizeButton;
 	Label* mSizeLabel;
 
+	/**
+	 * Widgets for setting & getting color properties for banner.
+	 * Used only on Android platform.
+	 */
 	Button* mSetBgColor;
 	Button* mSetTopColor;
 	Button* mSetBorderColor;
@@ -153,6 +172,5 @@ private:
 	Button* mSetTextColor;
 	Button* mSetUrlColor;
 };
-
 
 #endif /* MAINSCREEN_H_ */

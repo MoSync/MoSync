@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/**
+ * @file CreateNotificationScreen.cpp
+ * @author Emma Tresanszki and Bogdan Iusco
+ *
+ * @brief Screen used for creating notifications.
+ * Contains widgets(e.g. edit box, check box, button) used for setting
+ * notification values.
+ */
+
 // Text to label widgets
 #define CONTENT_BODY_LABEL_TEXT "Content body:"
 #define CONTENT_TITLE_LABEL_TEXT "Content title:"

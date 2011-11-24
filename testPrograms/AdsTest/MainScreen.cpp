@@ -18,10 +18,12 @@
 
 /**
  * @file MainScreen.cpp
- * @author Bogdan Iusco.
+ * @author Emma Tresanszki and Bogdan Iusco
+ *
+ * @brief Screen used for displaying a banner.
+ * Contains widgets(e.g. check box, button) used for setting and getting
+ * values for banner.
  */
-
-#include "MainScreen.h"
 
 #include <conprint.h>
 #include <wchar.h>
@@ -29,13 +31,16 @@
 #include <maassert.h>
 #include <mawstring.h>
 #include <maxtoa.h>
+#include <MAUtil/util.h>
+
+#include "MainScreen.h"
+#include "Util.h"
 
 /**
  * Constructor.
  */
 MainScreen::MainScreen() :
 	Screen(),
-	mMainLayout(NULL),
 	mBanner(NULL),
 	mBannerMessage(NULL),
 	mListView(NULL),
@@ -61,7 +66,10 @@ MainScreen::MainScreen() :
 	mGetSizeButton->addButtonListener(this);
 	mRefreshEnableButton->addButtonListener(this);
 	mRefreshVisibleButton->addButtonListener(this);
-	mSetBgColor->addButtonListener(this);
+	if (isAndroid())
+	{
+		mSetBgColor->addButtonListener(this);
+	}
 }
 
 /**
@@ -75,19 +83,21 @@ MainScreen::~MainScreen()
 	mGetSizeButton->removeButtonListener(this);
 	mRefreshEnableButton->removeButtonListener(this);
 	mRefreshVisibleButton->removeButtonListener(this);
-	mSetBgColor->removeButtonListener(this);
+
+	if (isAndroid())
+	{
+		mSetBgColor->removeButtonListener(this);
+	}
 }
 
 /**
- * This method is called when there is an touch-down event for
- * a button.
- * @param button The button object that generated the event.
+ * Creates a list view item.
+ * @param check Will be added to the list view item.
+ * Can be NULL.
+ * @param label Will be added to the list view item.
+ * Cannot be NULL.
+ * @return The list view item.
  */
-void MainScreen::buttonPressed(Widget* button)
-{
-
-}
-
 ListViewItem* MainScreen::createItem(Widget* check, Label* label)
 {
 	ListViewItem* item = new ListViewItem();
@@ -109,17 +119,17 @@ ListViewItem* MainScreen::createItem(Widget* check, Label* label)
  */
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
-	mMainLayout = new VerticalLayout();
-	Screen::setMainWidget(mMainLayout);
+	VerticalLayout* mainLayout = new VerticalLayout();
+	Screen::setMainWidget(mainLayout);
 	mBanner = new Banner("a14dbba084368db");
 	mBanner->requestContent(true);
-	mMainLayout->addBanner(mBanner);
+	mainLayout->addBanner(mBanner);
 
 	// Create List Box
 	mListView = new ListView();
 	mListView->fillSpaceHorizontally();
 	mListView->fillSpaceVertically();
-	mMainLayout->addChild(mListView);
+	mainLayout->addChild(mListView);
 
 	Label* label;
 
@@ -134,7 +144,6 @@ void MainScreen::createMainLayout() {
 	label->setText("Enable click on banner");
 	mEnableCheckBox = new CheckBox();
 	mEnableCheckBox->setState(true);
-//	mEnableCheckBox->setEnabled(true);
 	mListView->addChild(createItem(mEnableCheckBox, label));
 
 	// Add "Is banner enabled/disabled status" into a list item
@@ -168,68 +177,14 @@ void MainScreen::createMainLayout() {
 	mSizeLabel->setText("Banner size: 0 x 0 px");
 	mListView->addChild(createItem(mGetSizeButton, mSizeLabel));
 
-	// Add "Set BG color" list item
-//	hLayout = new HorizontalLayout();
-	mSetBgColor = new Button();
-	mSetBgColor->setText("Set background color to Orange");
-	mSetBgColor->wrapContentHorizontally();
-//	hLayout->addChild(mSetBgColor);
-	mListView->addChild(mSetBgColor);
-	// if iOS
-}
-
-/**
- * This method is called when there is an touch-up event for
- * a button.
- * @param button The button object that generated the event.
- */
-void MainScreen::buttonReleased(Widget* button)
-{
-}
-
-/**
- * This method is called if the touch-up event was inside the
- * bounds of the button.
- * @param button The button object that generated the event.
- */
-void MainScreen::buttonClicked(Widget* button)
-{
-	if (button == mGetSizeButton)
+	if (isAndroid())
 	{
-		int height = mBanner->getHeight();
-		int width = mBanner->getWidth();
-		char buffer[124];
-		sprintf(buffer, "Banner size: %d x %d px", width, height);
-		mSizeLabel->setText(buffer);
-	}
-	else if (button == mRefreshEnableButton)
-	{
-		bool isEnabled = mBanner->isEnabled();
-		if (isEnabled)
-		{
-			mIsBannerEnabled->setText("Banner is enabled");
-		}
-		else
-		{
-			mIsBannerEnabled->setText("Banner is disabled");
-		}
-	}
-	else if (button == mRefreshVisibleButton)
-	{
-		bool isVisible = mBanner->isVisible();
-		if (isVisible)
-		{
-			mIsBannerVisible->setText("Banner is visible");
-		}
-		else
-		{
-			mIsBannerVisible->setText("Banner is not visible");
-		}
-	}
-	else if (button == mSetBgColor)
-	{
-		mBanner->setBackgroundColor(0xEE7621);
-		mBanner->requestContent(true);
+		// Add "Set BG color" list item
+//		hLayout = new HorizontalLayout();
+		mSetBgColor = new Button();
+		mSetBgColor->setText("Set background color to Orange");
+		mSetBgColor->wrapContentHorizontally();
+		mListView->addChild(mSetBgColor);
 	}
 }
 
@@ -284,6 +239,52 @@ void MainScreen::bannerOnDismiss(Banner* banner)
 	printf("MainScreen::bannerOnDismiss");
 	mBannerMessage->setFontColor(0x0000FF);
 	mBannerMessage->setText("bannerOnDismiss");
+}
+
+/**
+ * This method is called if the touch-up event was inside the
+ * bounds of the button.
+ * @param button The button object that generated the event.
+ */
+void MainScreen::buttonClicked(Widget* button)
+{
+	if (button == mGetSizeButton)
+	{
+		int height = mBanner->getHeight();
+		int width = mBanner->getWidth();
+		char buffer[124];
+		sprintf(buffer, "Banner size: %d x %d px", width, height);
+		mSizeLabel->setText(buffer);
+	}
+	else if (button == mRefreshEnableButton)
+	{
+		bool isEnabled = mBanner->isEnabled();
+		if (isEnabled)
+		{
+			mIsBannerEnabled->setText("Banner is enabled");
+		}
+		else
+		{
+			mIsBannerEnabled->setText("Banner is disabled");
+		}
+	}
+	else if (button == mRefreshVisibleButton)
+	{
+		bool isVisible = mBanner->isVisible();
+		if (isVisible)
+		{
+			mIsBannerVisible->setText("Banner is visible");
+		}
+		else
+		{
+			mIsBannerVisible->setText("Banner is not visible");
+		}
+	}
+	else if (button == mSetBgColor)
+	{
+		mBanner->setBackgroundColor(0xEE7621);
+		mBanner->requestContent(true);
+	}
 }
 
 /**
