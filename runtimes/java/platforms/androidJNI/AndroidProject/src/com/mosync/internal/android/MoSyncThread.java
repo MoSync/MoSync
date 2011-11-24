@@ -17,6 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android;
 
+import static com.mosync.internal.android.MoSyncHelpers.DebugPrint;
+
 import static com.mosync.internal.android.MoSyncHelpers.EXTENT;
 import static com.mosync.internal.android.MoSyncHelpers.SYSLOG;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_BLUETOOTH_TURNED_OFF;
@@ -45,11 +47,15 @@ import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT270;
 import static com.mosync.internal.generated.MAAPI_consts.TRANS_ROT90;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_ALERT;
 
+import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_OPEN;
+import static com.mosync.internal.generated.MAAPI_consts.MA_RESOURCE_CLOSE;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -133,7 +139,12 @@ public class MoSyncThread extends Thread
 		long programOffset,
 		FileDescriptor resource,
 		long resourceOffset);
-	public native boolean nativeLoadResource(ByteBuffer resource);
+	//public native boolean nativeLoadResource(ByteBuffer resource);
+	public native boolean nativeLoadResource(
+		FileDescriptor resource,
+		long resoruceOffset,
+		int handle,
+		int placeholder);
 	public native ByteBuffer nativeLoadCombined(ByteBuffer combined);
 	public native void nativeRun();
 	public native void nativePostEvent(int[] eventBuffer);
@@ -187,6 +198,8 @@ public class MoSyncThread extends Thread
 	 * a handle used for full screen camera preview
 	 */
 	private int cameraScreen;
+
+	FileDescriptor mResourceFd = null;
 
 	/**
 	 * This is the size of the header of the asset file
@@ -666,6 +679,7 @@ public class MoSyncThread extends Thread
 			AssetManager assetManager = mContext.getAssets();
 			AssetFileDescriptor pAfd = assetManager.openFd(RESOURCE_FILE);
 			FileDescriptor pFd = pAfd.getFileDescriptor();
+			mResourceOffset = pAfd.getStartOffset();
 			return pFd;
 		}
 		catch (Exception e)
@@ -2167,6 +2181,40 @@ public class MoSyncThread extends Thread
 		{
 			maPanic(1, "maCloseStore failed!");
 		}
+	}
+
+	/**
+	 * maLoadResource
+	 */
+	int maLoadResource(int handle, int placeholder, int flag)
+	{
+		SYSLOG("maLoadResource");
+		// Try to load the resource file, if we get an exception
+		// it just means that this application has no resource file
+		// and that is not an error.
+		if (((flag & MA_RESOURCE_OPEN) != 0) && (mResourceFd == null)) {
+			mResourceFd = getResourceFileDesriptor();
+		}
+
+		// We have a program file so now we sends it to the native side
+		// so it will be loaded into memory. The data section will also be
+		// created and if there are any resources they will be loaded.
+		if (null != mResourceFd) {
+			if (false == nativeLoadResource(mResourceFd, mResourceOffset,
+					handle,
+					placeholder)) {
+				logError("maLoadResource - "
+						+ "ERROR Load resource was unsuccesfull");
+				return 1;
+			}
+		}
+
+		if ((flag & MA_RESOURCE_CLOSE) != 0) {
+			mResourceFd = null;
+			mResourceOffset = 0;
+		}
+
+		return 0;
 	}
 
 	/**

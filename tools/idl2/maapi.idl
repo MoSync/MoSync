@@ -994,6 +994,16 @@ interface MAAPI {
 	*/
 	int maLoadResources(in MAHandle data);
 
+
+	constset int MA_RESOURCE_ {
+		OPEN = 0x1;
+		CLOSE = 0x2;
+	}
+	/**
+	* Loads a specific resource in the given placeholder.
+	*/
+	int maLoadResource(in MAHandle handle, in MAHandle placeholder, in int flag);
+
 	/**
 	* Loads a new program from the a data object, closes the running program, and starts the new one.
 	* The format of the data object is a MoSync program file concatenated with a resource file.

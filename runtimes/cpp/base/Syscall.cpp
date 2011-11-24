@@ -147,7 +147,13 @@ namespace Base {
 		platformDestruct();
 	}
 
+	int *resourceOffset;
+	int *resourceSize;
+	int *resourceType;
+
 	bool Syscall::loadResources(Stream& file, const char* aFilename)  {
+
+		int startPos = 0;
 		bool hasResources = true;
 		if(!file.isOpen())
 			hasResources = false;
@@ -157,6 +163,7 @@ namespace Base {
 			TEST(file.tell(pos));
 			if(len == pos)
 				hasResources = false;
+			startPos = pos;
 		}
 		if(!hasResources/* && aFilename != NULL*/) {
 			resources.init(0);
@@ -173,6 +180,10 @@ namespace Base {
 		DAR_UVINT(rSize);
 		resources.init(nResources);
 
+		resourceOffset = new int[nResources];
+		resourceSize = new int[nResources];
+		resourceType = new int[nResources];
+
 		// rI is the resource index.
 		int rI = 1;
 
@@ -186,22 +197,15 @@ namespace Base {
 			DAR_UVINT(size);
 			LOG_RES("Type %i, size %i\n", type, size);
 
+			int index = rI - 1;
+
+			resourceOffset[index] = 0;
+			file.tell(resourceOffset[index]);
+			resourceOffset[index] -= startPos;
+			resourceSize[index] = size;
+			resourceType[index] = type;
+
 			switch(type) {
-			case RT_BINARY:
-				{
-#ifndef _android
-					MemStream* ms = new MemStream(size);
-#else
-					char* b = loadBinary(rI, size);
-					MemStream* ms = new MemStream(b, size);
-#endif
-					TEST(file.readFully(*ms));
-					ROOM(resources.dadd_RT_BINARY(rI, ms));
-#ifdef _android
-					checkAndStoreAudioResource(rI);
-#endif
-				}
-				break;
 			case RT_UBIN:
 				{
 					int pos;
@@ -226,51 +230,6 @@ namespace Base {
 				break;
 			case RT_PLACEHOLDER:
 				ROOM(resources.dadd_RT_PLACEHOLDER(rI, NULL));
-				break;
-			case RT_IMAGE:
-				{
-					MemStream b(size);
-					TEST(file.readFully(b));
-#ifndef _android
-					// On all platforms except Android, we load and add
-					// the image data. "dadd" means "delete and add",
-					// and is defined in runtimes\cpp\base\ResourceArray.h
-                    RT_IMAGE_Type* image = loadImage(b);
-                    if(!image)
-                        BIG_PHAT_ERROR(ERR_IMAGE_LOAD_FAILED);
-					ROOM(resources.dadd_RT_IMAGE(rI, image));
-#else
-					// On Android images are stored on the Java side.
-					// Here we allocate a dummy array (real image is
-					// in a table in Java) so that the resource handling,
-					// like deleting resources, will work also on Android.
-					// The actual image will be garbage collected on
-					// Android when a resource is replaced in the Java table.
-					ROOM(resources.dadd_RT_IMAGE(rI, new int[1]));
-					int pos;
-					file.tell(pos);
-					loadImage(
-						rI,
-						pos - size,
-						size,
-						Base::gSyscall->getReloadHandle());
-#endif
-				}
-				break;
-			case RT_SPRITE:
-				{
-					DAR_USHORT(indexSource);
-					DAR_USHORT(left);
-					DAR_USHORT(top);
-					DAR_USHORT(width);
-					DAR_USHORT(height);
-					DAR_SHORT(cx);
-					DAR_SHORT(cy);
-#ifndef _android
-					ROOM(resources.dadd_RT_IMAGE(rI, loadSprite(resources.get_RT_IMAGE(indexSource),
-						left, top, width, height, cx, cy)));
-#endif
-				}
 				break;
 			case RT_LABEL:
 				{
@@ -298,6 +257,7 @@ namespace Base {
 			default:
 				TEST(file.seek(Seek::Current, size));
 			}
+
 			rI++;
 		}
 		if(rI != nResources + 1) {
@@ -305,6 +265,102 @@ namespace Base {
 			BIG_PHAT_ERROR(ERR_RES_FILE_INCONSISTENT);
 		}
 		LOG_RES("ResLoad complete\n");
+		return true;
+	}
+
+	bool Syscall::loadResource(Stream& file, MAHandle originalHandle, MAHandle destHandle)  {
+
+		if(!file.isOpen())
+		{
+			return false;
+		}
+
+		if ((resourceType == NULL) || (resourceSize == NULL) || (resourceOffset == NULL))
+		{
+			return false;
+		}
+
+		int len, pos = 0;
+		TEST(file.length(len));
+		TEST(file.tell(pos));
+
+		int type = resourceType[originalHandle - 1];
+		int size = resourceSize[originalHandle - 1];
+		int offset = resourceOffset[originalHandle - 1];
+		int rI = destHandle;
+		const char* aFilename = "resources";
+
+		if ( resources.is_loaded(rI) )
+		{
+			return true;
+		}
+
+		TEST(file.seek(Seek::Current, offset));
+
+		switch(type) {
+		case RT_BINARY:
+			{
+#ifndef _android
+				MemStream* ms = new MemStream(size);
+#else
+				char* b = loadBinary(rI, size);
+				MemStream* ms = new MemStream(b, size);
+#endif
+				TEST(file.readFully(*ms));
+				ROOM(resources.dadd_RT_BINARY(rI, ms));
+#ifdef _android
+				checkAndStoreAudioResource(rI);
+#endif
+			}
+			break;
+		case RT_IMAGE:
+			{
+				MemStream b(size);
+				TEST(file.readFully(b));
+#ifndef _android
+				// On all platforms except Android, we load and add
+				// the image data. "dadd" means "delete and add",
+				// and is defined in runtimes\cpp\base\ResourceArray.h
+				RT_IMAGE_Type* image = loadImage(b);
+				if(!image)
+					BIG_PHAT_ERROR(ERR_IMAGE_LOAD_FAILED);
+				ROOM(resources.dadd_RT_IMAGE(rI, image));
+#else
+				// On Android images are stored on the Java side.
+				// Here we allocate a dummy array (real image is
+				// in a table in Java) so that the resource handling,
+				// like deleting resources, will work also on Android.
+				// The actual image will be garbage collected on
+				// Android when a resource is replaced in the Java table.
+				ROOM(resources.dadd_RT_IMAGE(rI, new int[1]));
+				int pos;
+				file.tell(pos);
+				loadImage(
+					rI,
+					pos - size,
+					size,
+					Base::gSyscall->getReloadHandle());
+#endif
+			}
+			break;
+			case RT_SPRITE:
+				{
+					DAR_USHORT(indexSource);
+					DAR_USHORT(left);
+					DAR_USHORT(top);
+					DAR_USHORT(width);
+					DAR_USHORT(height);
+					DAR_SHORT(cx);
+					DAR_SHORT(cy);
+#ifndef _android
+					ROOM(resources.dadd_RT_IMAGE(rI, loadSprite(resources.get_RT_IMAGE(indexSource),
+						left, top, width, height, cx, cy)));
+#endif
+				}
+				break;
+		default:
+			LOG("Cannot load resource type %d.", type);
+		}
 		return true;
 	}
 }	//namespace Base

@@ -17,6 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <Core.h>
 #include <base/Syscall.h>
+#include <base/FileStream.h>
 
 #include <string.h>
 #include <stdio.h>
@@ -174,16 +175,63 @@ static jboolean nativeLoad(
 
 /**
 * @brief nativeLoadResource
-* TODO: This method is unfinished!
 */
-static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
+static jboolean nativeLoadResource(
+	JNIEnv* env,
+	jobject jthis,
+	jobject resource,
+	jlong resourceOffset,
+	MAHandle handle,
+	MAHandle placeholder)
 {
 	SYSLOG("load resource");
 
-	char* resourceBuffer = (char*)env->GetDirectBufferAddress(resource);
+	int resFd = -1;
 
-	// TODO: Now what?
+	if (resourceOffset != 0)
+	{
+		SYSLOG("MoSyncBridge.cpp: nativeLoad: Get resource file descriptor");
+		jclass fdClass2 = env->FindClass("java/io/FileDescriptor");
+		if (fdClass2 != NULL)
+		{
+			jclass fdResClassRef = (jclass) env->NewGlobalRef(fdClass2);
+			jfieldID fdClassDescriptorFieldID =
+				env->GetFieldID(fdResClassRef, "descriptor", "I");
+
+			if (fdClassDescriptorFieldID != NULL && resource != NULL)
+			{
+				jint fd = env->GetIntField(
+					resource,
+					fdClassDescriptorFieldID);
+				resFd = dup(fd);
+				lseek(resFd, resourceOffset, SEEK_SET);
+			}
+			else if (resource == NULL)
+			{
+				resFd = -1;
+			}
+		}
+	}
+
+	if (resFd > 0)
+	{
+		Base::FileStream res(resFd);
+		Base::gSyscall->loadResource(res, handle, placeholder);
+	}
 }
+
+/**
+* @brief nativeLoadResource
+* TODO: This method is unfinished!
+*/
+//static jboolean nativeLoadResource(JNIEnv* env, jobject jthis, jobject resource)
+//{
+//	SYSLOG("load resource");
+//
+//	char* resourceBuffer = (char*)env->GetDirectBufferAddress(resource);
+//
+//	// TODO: Now what?
+//}
 
 /**
  * @return The newly created Data Section as a Direct ByteBuffer object
@@ -577,7 +625,8 @@ static JNINativeMethod sMethods[] =
 	// name, signature, funcPtr
 	{ "nativeInitRuntime", "()Z", (void*)nativeInitRuntime },
 	{ "nativeLoad", "(Ljava/io/FileDescriptor;JLjava/io/FileDescriptor;J)Z", (void*)nativeLoad },
-	{ "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource },
+	{ "nativeLoadResource", "(Ljava/io/FileDescriptor;JII)Z", (void*)nativeLoadResource },
+	//{ "nativeLoadResource", "(Ljava/nio/ByteBuffer;)Z", (void*)nativeLoadResource },
 	{ "nativeLoadCombined", "(Ljava/nio/ByteBuffer;)Ljava/nio/ByteBuffer;", (void*)nativeLoadCombined },
 	{ "nativeRun", "()V", (void*)nativeRun },
 	{ "nativePostEvent", "([I)V", (void*)nativePostEvent },

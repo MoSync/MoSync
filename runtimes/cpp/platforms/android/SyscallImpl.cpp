@@ -945,6 +945,17 @@ namespace Base
 		SYSCALL_THIS->VM_Yield();
 	}
 
+	SYSCALL(int, maLoadResource(MAHandle handle, MAHandle placeholder, int flag))
+	{
+		jclass cls = mJNIEnv->GetObjectClass(mJThis);
+		jmethodID methodID = mJNIEnv->GetMethodID(cls, "maLoadResource", "(III)I");
+		if (methodID == 0) ERROR_EXIT;
+		mJNIEnv->CallIntMethod(mJThis, methodID,
+			handle, placeholder, flag);
+
+		mJNIEnv->DeleteLocalRef(cls);
+	}
+
 	SYSCALL(void,  maLoadProgram(MAHandle data, int reload))
 	{
 		SYSLOG("maLoadProgram");

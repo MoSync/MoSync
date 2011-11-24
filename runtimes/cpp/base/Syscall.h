@@ -48,6 +48,7 @@ namespace Base {
 
 	public:
 		bool loadResources(Stream& file, const char* aFilename);
+		bool loadResource(Stream& file, MAHandle originalHandle, MAHandle destHandle);
 
 		void init();
 		virtual ~Syscall();

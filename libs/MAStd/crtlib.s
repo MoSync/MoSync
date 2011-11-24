@@ -56,6 +56,8 @@ __stacktop:
 	call &_ansi_heap_init_crt0	// Heap init
 }
 
+	call &_resource_selector
+
 	ld	i0,&__global_ctor_chain 		//constructor chain
 	call &_crt_tor_chain
 
