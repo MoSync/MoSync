@@ -1,0 +1,5 @@
+After installing mingw with default settings,
+run these commands to install MoSync's prerequisites.
+
+
+mingw-get install libz

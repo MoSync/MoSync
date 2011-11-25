@@ -51,7 +51,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>../../base;../../../../intlibs;$(ProjectDir);../../../../libs;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../base;../../../../intlibs;$(ProjectDir);../../../../libs;%(AdditionalIncludeDirectories);../../../../intlibs/sqlite</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
@@ -72,7 +72,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>../../base;../../../../intlibs;$(ProjectDir);../../../../libs;../../../../tools/ReleasePackageBuild/build_package_tools/include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>../../base;../../../../intlibs;$(ProjectDir);../../../../libs;../../../../tools/ReleasePackageBuild/build_package_tools/include;%(AdditionalIncludeDirectories);../../../../intlibs/sqlite</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_DEPRECATE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <PrecompiledHeader>
@@ -91,6 +91,7 @@
     <ClCompile Include="..\..\base\base_errors.cpp" />
     <ClCompile Include="..\..\base\FileStream.cpp" />
     <ClCompile Include="..\..\base\MemStream.cpp" />
+    <ClCompile Include="..\..\base\MoSyncDB.cpp" />
     <ClCompile Include="..\..\base\networking.cpp" />
     <ClCompile Include="..\..\base\pim.cpp" />
     <ClCompile Include="..\..\base\Stream.cpp" />
@@ -151,6 +152,7 @@
     <ClInclude Include="..\..\base\base_errors.h" />
     <ClInclude Include="..\..\base\FileStream.h" />
     <ClInclude Include="..\..\base\MemStream.h" />
+    <ClInclude Include="..\..\base\MoSyncDB.h" />
     <ClInclude Include="..\..\base\networking.h" />
     <ClInclude Include="..\..\base\pim.h" />
     <ClInclude Include="..\..\base\pimImpl.h" />

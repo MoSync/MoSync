@@ -143,7 +143,7 @@ namespace Base {
 		const char* GetValidatedStr(int address);
 		const wchar* GetValidatedWStr(int address);
 
-        int TranslateNativePointerToMoSyncPointer(void *nativePointer);
+		int TranslateNativePointerToMoSyncPointer(void *nativePointer);
 
 #ifndef VSV_ARGPTR_DECL
 #define VSV_ARGPTR_DECL
@@ -161,6 +161,7 @@ namespace Base {
 #ifdef EMULATOR
 		bool mAllowDivZero;
 #endif
+		bool mPanicOnProgrammerError;
 
 		void VM_Yield();
 

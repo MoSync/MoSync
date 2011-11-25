@@ -128,14 +128,8 @@ namespace Base {
 	static int sFileListNextHandle = 1;
 #endif	//SYMBIAN
 
-#ifdef EMULATOR
-#define FILESYSTEM_CHROOT 1
-#define FILESYSTEM_DIR "filesystem"
-#else
-#define FILESYSTEM_CHROOT 0
-#endif	//EMULATOR
-
 	void Syscall::init() {
+		mPanicOnProgrammerError = true;
 		gStoreNextId = 1;
 		gFileNextHandle = 1;
 	}
@@ -832,6 +826,7 @@ namespace Base {
 #if FILESYSTEM_CHROOT
 		std::string name = std::string(FILESYSTEM_DIR) + path;
 		fn = name.c_str();
+		MYASSERT(path[0] == '/', ERR_FILE_PATH_INVALID);
 		size = name.length() + 1;
 #else
 		fn = path;
@@ -1086,7 +1081,7 @@ namespace Base {
 		SYSCALL_THIS->getFileHandle(file);	// just to make sure the file handle is ok.
 		drive = 0;
 #else
-		Syscall::FileHandle& fh();
+		Syscall::FileHandle& fh(SYSCALL_THIS->getFileHandle(file));
 		drive = (fh.name[0] - 'A') + 1;
 #endif	//FILESYSTEM_CHROOT
 		if(_getdiskfree(drive, &df) != 0) {
@@ -1338,6 +1333,7 @@ namespace Base {
 #endif	//_WIN32_WCE
 #else	//FILESYSTEM_CHROOT
 #ifdef WIN32
+			FileListItem fli;
 			DWORD res = GetLogicalDrives();
 			GLE(res);
 			char buf[] = "X:/";

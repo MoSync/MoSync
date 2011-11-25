@@ -380,7 +380,7 @@ static PimUtils *sharedInstance = nil;
 -(NSMutableArray*) getDate:(void*) address
 {
     int seconds = *(int*) address;
-    NSData* date = [[NSDate alloc] initWithTimeIntervalSince1970:seconds];
+    NSDate* date = [[NSDate alloc] initWithTimeIntervalSince1970:seconds];
     NSMutableArray* array = [[NSMutableArray alloc] init];
     [array addObject:date];
     [date release];
@@ -717,14 +717,6 @@ static PimUtils *sharedInstance = nil;
                      withSize:(const int) size
 {
     return Base::gSyscall->GetValidatedMemRange(address, size);
-}
-
-/**
- * Release all objects.
- */
-- (void)release
-{
-    [super release];
 }
 
 @end

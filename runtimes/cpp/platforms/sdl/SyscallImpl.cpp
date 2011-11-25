@@ -88,6 +88,7 @@ extern "C" {
 #include "TcpConnection.h"
 #include "ConfigParser.h"
 #include "sdl_stream.h"
+#include "MoSyncDB.h"
 
 #include "Skinning/Screen.h"
 #include "Skinning/SkinManager.h"
@@ -237,6 +238,7 @@ namespace Base {
 #ifdef EMULATOR
 		gSyscall->pimClose();
 #endif
+		MoSyncDBClose();
 	}
 
 	//***************************************************************************
@@ -409,6 +411,8 @@ namespace Base {
 #ifdef EMULATOR
 		gSyscall->pimInit();
 #endif
+
+		MoSyncDBInit();
 
 		AudioEngine::init();
 
@@ -2197,6 +2201,16 @@ namespace Base {
 			maIOCtl_case(maCameraStop);
 			maIOCtl_case(maCameraSnapshot);
 
+			maIOCtl_case(maDBOpen);
+			maIOCtl_case(maDBClose);
+			maIOCtl_case(maDBExecSQL);
+			maIOCtl_case(maDBExecSQLParams);
+			maIOCtl_case(maDBCursorDestroy);
+			maIOCtl_case(maDBCursorNext);
+			maIOCtl_case(maDBCursorGetColumnData);
+			maIOCtl_case(maDBCursorGetColumnText);
+			maIOCtl_case(maDBCursorGetColumnInt);
+			maIOCtl_case(maDBCursorGetColumnDouble);
 #ifdef EMULATOR
 		maIOCtl_syscall_case(maPimListOpen);
 		maIOCtl_syscall_case(maPimListNext);
@@ -2222,6 +2236,15 @@ namespace Base {
 #ifdef WIN32
 			maIOCtl_case(maTextBox);
 #endif
+
+		case maIOCtl_maSyscallPanicsEnable:
+			LOG("maSyscallPanicsEnable\n");
+			gSyscall->mPanicOnProgrammerError = true;
+			return RES_OK;
+		case maIOCtl_maSyscallPanicsDisable:
+			LOG("maSyscallPanicsDisable\n");
+			gSyscall->mPanicOnProgrammerError = false;
+			return RES_OK;
 
 		default:
 			LOGD("maIOCtl(%i) unimplemented.\n", function);
@@ -2731,6 +2754,7 @@ void MoSyncExit(int r) {
 		MALibQuit();	//disabled, hack to allow static destructors
 #endif
 		AudioEngine::close();
+		MoSyncDBClose();
 
 		reportClose();
 		exit(r);
