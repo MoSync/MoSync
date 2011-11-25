@@ -21,7 +21,7 @@
  * @author Bogdan Iusco
  * @date 22 Nov 2011
  *
- * @brief
+ * @brief Add new methods to NSString class.
  */
 
 #import "NSStringExpanded.h"

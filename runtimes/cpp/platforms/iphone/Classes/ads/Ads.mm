@@ -15,6 +15,16 @@
  02111-1307, USA.
  */
 
+/**
+ * @file Ads.mm
+ * @author Bogdan Iusco
+ * @date 1 Nov 2011
+ *
+ * @brief Design pattern: singleton.
+ * Provide functions for creating and deleting banner widgets.
+ * Store banner widgets.
+ */
+
 #import "Ads.h"
 
 #import "IWidget.h"
@@ -59,21 +69,63 @@ static Ads *sharedInstance = nil;
 
 /**
  * Creates a new banner.
- * @return A handle to a banner object.
+ * @return
+ *  - MA_ADS_RES_UNSUPPORTED if ads are not supported on current system.
+ *  - MA_ADS_RES_ERROR if a error occurred while creating the banner widget.
+ *  - a handle to a new banner widget(the handle value is >= 0).
  */
 -(MAHandle) createBanner
 {
+    if (INT32_MAX == mHandleCount)
+    {
+        return MA_ADS_RES_ERROR;
+    }
     mHandleCount++;
-    [self performSelectorOnMainThread:@selector(createBannerMainThread:)
-                                                   withObject:[NSNumber numberWithInt:mHandleCount]
-                                                waitUntilDone:YES];
+
+    // Check if ads are supported on current platform.
+    Class cls = NSClassFromString(@"ADBannerView");
+    if (cls)
+    {
+        [self performSelectorOnMainThread:@selector(createBannerMainThread:)
+                               withObject:[NSNumber numberWithInt:mHandleCount]
+                            waitUntilDone:YES];
+    }
+    else
+    {
+        return MA_ADS_RES_UNSUPPORTED;
+    }
+
     return mHandleCount;
 }
 
+/**
+ * Create a new BannerWidget type object.
+ * Call this method only on main thread.
+ */
 -(void) createBannerMainThread:(NSNumber*) handle
 {
     BannerWidget* widget = [[BannerWidget alloc] initWithHandle:[handle intValue]];
     [mBannerDictionary setObject:widget forKey:[NSNumber numberWithInt:mHandleCount]];
+}
+
+/**
+ * Destroy a banner.
+ * @param bannerHandle Handle to a banner.
+ * @return One of the next constants:
+ * - MA_ADS_RES_OK if no error occurred.
+ * - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+ */
+-(int) bannerDestroy:(MAHandle) bannerHandle
+{
+    IWidget* widget = [mBannerDictionary objectForKey:[NSNumber numberWithInt:bannerHandle]];
+    if (!widget)
+    {
+        return MA_ADS_RES_INVALID_BANNER_HANDLE;
+    }
+    [mBannerDictionary removeObjectForKey:[NSNumber numberWithInt:bannerHandle]];
+    [widget release];
+
+    return MA_ADS_RES_OK;
 }
 
 /**
@@ -100,13 +152,22 @@ static Ads *sharedInstance = nil;
     return returnValue;
 }
 
+/**
+ * Add a banner to a widget layout.
+ * Call this method only on main thread.
+ * @param bannerHandle Handle to a banner.
+ * @param layoutHandle Handle to a widget layout.
+ * @return One of the next constants:
+ * - MA_ADS_RES_OK if no error occurred.
+ * - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+ * - MA_ADS_RES_INVALID_LAYOUT_HANDLE if the layout handle is invalid.
+ */
 -(int) addBannerMainThread:(NSNumber*) bannerHandle
                   toLayout:(NSNumber*) layoutHandle
 {
     IWidget* widget = [mBannerDictionary objectForKey:bannerHandle];
     if (!widget)
     {
-        NSLog(@"addBannerMainThread invalid widget");
         return MA_ADS_RES_INVALID_BANNER_HANDLE;
     }
 
@@ -114,7 +175,6 @@ static Ads *sharedInstance = nil;
     IWidget* layoutWidget = [moSyncUI getWidget:[layoutHandle intValue]];
     if (!layoutWidget)
     {
-        NSLog(@"addBannerMainThread invalid layout");
         return MA_ADS_RES_INVALID_LAYOUT_HANDLE;
     }
 
@@ -146,13 +206,22 @@ static Ads *sharedInstance = nil;
     return returnValue;
 }
 
+/**
+ * Remove a banner from a widget layout.
+ * Call this method only on main thread.
+ * @param bannerHandle Handle to a banner.
+ * @param layoutHandle Handle to a widget layout.
+ * @return One of the next constants:
+ * - MA_ADS_RES_OK if no error occurred.
+ * - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+ * - MA_ADS_RES_INVALID_LAYOUT_HANDLE if the layout handle is invalid.
+ */
 -(int) removeBannerMainThread:(NSNumber*) bannerHandle
                   fromLayout:(NSNumber*) layoutHandle
 {
     IWidget* widget = [mBannerDictionary objectForKey:bannerHandle];
     if (!widget)
     {
-        NSLog(@"removeBannerMainThread invalid widget");
         return MA_ADS_RES_INVALID_BANNER_HANDLE;
     }
 
@@ -160,32 +229,10 @@ static Ads *sharedInstance = nil;
     IWidget* layoutWidget = [moSyncUI getWidget:[layoutHandle intValue]];
     if (!layoutWidget)
     {
-        NSLog(@"removeBannerMainThread invalid layout");
         return MA_ADS_RES_INVALID_LAYOUT_HANDLE;
     }
 
     [layoutWidget removeChild:widget];
-    return MA_ADS_RES_OK;
-}
-
-/**
- * Destroy a banner.
- * @param bannerHandle Handle to a banner.
- * @return One of the next constants:
- * - MA_ADS_RES_OK if no error occurred.
- * - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
- */
--(int) bannerDestroy:(MAHandle) bannerHandle
-{
-    IWidget* widget = [mBannerDictionary objectForKey:[NSNumber numberWithInt:bannerHandle]];
-    if (!widget)
-    {
-        NSLog(@"removeBannerMainThread invalid widget");
-        return MA_ADS_RES_INVALID_BANNER_HANDLE;
-    }
-    [mBannerDictionary removeObjectForKey:[NSNumber numberWithInt:bannerHandle]];
-    [widget release];
-
     return MA_ADS_RES_OK;
 }
 
@@ -204,11 +251,9 @@ static Ads *sharedInstance = nil;
                property:(const char*) propertyName
                   value:(const char*) value
 {
-    NSLog(@"set banner property");
     IWidget* widget = [mBannerDictionary objectForKey:[NSNumber numberWithInt:bannerHandle]];
     if (!widget)
     {
-        NSLog(@"bannerSetProperty invalid widget");
         return MA_ADS_RES_INVALID_BANNER_HANDLE;
     }
 
@@ -245,21 +290,13 @@ static Ads *sharedInstance = nil;
     IWidget* widget = [mBannerDictionary objectForKey:[NSNumber numberWithInt:bannerHandle]];
     if (!widget)
     {
-        NSLog(@"bannerSetProperty invalid handle");
         return MA_ADS_RES_INVALID_BANNER_HANDLE;
     }
 
     if(!property)
     {
-        NSLog(@"bannerSetProperty invalid property name");
         return MA_ADS_RES_INVALID_PROPERTY_NAME;
     }
-
-//    if(!value)
-//    {
-//        NSLog(@"bannerSetProperty invalid handle");
-//        return MA_ADS_RES_INVALID_PROPERTY_VALUE;
-//    }
 
 	NSString* propertyString = [NSString stringWithUTF8String:property];
 	NSString* retval;
@@ -273,7 +310,7 @@ static Ads *sharedInstance = nil;
 
 	if(!retval)
     {
-        NSLog(@"bannerSetProperty invalid property name");
+        NSLog(@"Ads::bannerSetProperty invalid property name");
         return MA_ADS_RES_INVALID_PROPERTY_NAME;
     }
 
@@ -281,7 +318,8 @@ static Ads *sharedInstance = nil;
 	int realLength = [retval length];
 	if(realLength > length)
     {
-        NSLog(@"bannerSetProperty invalid buffer size");
+        NSLog(@"Ads::bannerSetProperty buffer too small");
+        [retval release];
 		return MA_ADS_RES_INVALID_STRING_BUFFER_SIZE;
 	}
 
@@ -291,10 +329,12 @@ static Ads *sharedInstance = nil;
 	return realLength;
 }
 
+/**
+ * Release all contained objects.
+ */
 -(void) dealloc
 {
     [mBannerDictionary release];
-
     [super dealloc];
 }
 

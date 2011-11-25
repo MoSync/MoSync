@@ -29,8 +29,6 @@ MA 02110-1301, USA.
 #ifndef NOTIFICATION_NOTIFICATION_MANAGER_H_
 #define NOTIFICATION_NOTIFICATION_MANAGER_H_
 
-#include <ma.h>
-
 #include <MAUtil/String.h>
 #include <MAUtil/Map.h>
 #include <MAUtil/Environment.h>

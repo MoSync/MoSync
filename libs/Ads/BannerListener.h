@@ -19,8 +19,9 @@ MA 02110-1301, USA.
 /**
  * @file BannerListener.h
  * @author Bogdan Iusco
+ * @date 1 Nov 2011
  *
- * \brief Listener for banner events.
+ * @brief Listener for banner events.
  */
 
 #ifndef ADS_BANNER_LISTENER_H_
@@ -32,7 +33,7 @@ namespace Ads
     class Banner;
 
     /**
-     * \brief Listener for banner events.
+     * @brief Listener for banner events.
      */
     class BannerListener
     {

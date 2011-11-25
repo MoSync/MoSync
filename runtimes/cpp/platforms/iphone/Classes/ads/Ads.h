@@ -1,18 +1,29 @@
-/* Copyright (C) 2011 MoSync AB
+/*
+ Copyright (C) 2011 MoSync AB
 
- This program is free software; you can redistribute it and/or modify it under
- the terms of the GNU General Public License, version 2, as published by
- the Free Software Foundation.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License,
+ version 2, as published by the Free Software Foundation.
 
  This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
- or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
- for more details.
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with this program; see the file COPYING.  If not, write to the Free
- Software Foundation, 59 Temple Place - Suite 330, Boston, MA
- 02111-1307, USA.
+ along with this program; if not, write to the Free Software
+ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ MA 02110-1301, USA.
+ */
+
+/**
+ * @file Ads.h
+ * @author Bogdan Iusco
+ * @date 1 Nov 2011
+ *
+ * @brief Design pattern: singleton.
+ * Provide functions for creating and deleting banner widgets.
+ * Store banner widgets.
  */
 
 #import <Foundation/Foundation.h>
@@ -20,14 +31,21 @@
 
 #import "helpers/cpp_defs.h"
 
-@interface Ads :  NSObject<ADBannerViewDelegate> {
+/**
+ * @brief Design pattern: singleton.
+ * Provide functions for creating and deleting banner widgets.
+ * Store banner widgets.
+ */
+@interface Ads : NSObject {
     /**
-     *
+     * Stores pairs of:
+     * - BannerWidget type objects(the object).
+     * - NSNumber type objects(the key).
      */
     NSMutableDictionary* mBannerDictionary;
 
     /**
-     *
+     * Counts the number of created banner widgets.
      */
     int mHandleCount;
 }
@@ -45,9 +63,21 @@
 
 /**
  * Creates a new banner.
- * @return A handle to a banner object.
+ * @return
+ *  - MA_ADS_RES_UNSUPPORTED if ads are not supported on current system.
+ *  - MA_ADS_RES_ERROR if a error occurred while creating the banner widget.
+ *  - a handle to a new banner widget(the handle value is >= 0).
  */
 -(MAHandle) createBanner;
+
+/**
+ * Destroy a banner.
+ * @param bannerHandle Handle to a banner.
+ * @return One of the next constants:
+ * - MA_ADS_RES_OK if no error occurred.
+ * - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+ */
+-(int) bannerDestroy:(MAHandle) bannerHandle;
 
 /**
  * Add a banner to a widget layout.
@@ -72,15 +102,6 @@
  */
 -(int) removeBanner:(MAHandle) bannerHandle
         fromLayout:(MAHandle) layoutHandle;
-
-/**
- * Destroy a banner.
- * @param bannerHandle Handle to a banner.
- * @return One of the next constants:
- * - MA_ADS_RES_OK if no error occurred.
- * - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
- */
--(int) bannerDestroy:(MAHandle) bannerHandle;
 
 /**
  * Set a banner property.

@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/**
+ * @file CreateNotificationScreen.h
+ * @author Emma Tresanszki and Bogdan Iusco
+ *
+ * @brief Screen used for creating notifications.
+ * Contains widgets(e.g. edit box, check box, button) used for setting
+ * notification values.
+ */
+
 #ifndef CREATENOTIFICATIONSCREEN_H_
 #define CREATENOTIFICATIONSCREEN_H_
 
@@ -24,9 +33,6 @@ MA 02110-1301, USA.
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 
-#include <maapi.h>
-
-#include <MAUtil/util.h>
 #include <MAUtil/String.h>
 
 #include <Notification/NotificationManager.h>
@@ -65,6 +71,12 @@ private:
 	 * Creates and adds main layout to the screen.
 	 */
 	void createMainLayout();
+
+	/**
+	 * Helper function to create list view item with
+	 * specific label and edit/check box.
+	 */
+	ListViewItem* createListViewItem(const MAUtil::String& labelText, Widget* widget);//EditBox* editBox);
 
 	/**
 	 * Reset view's content.
@@ -122,6 +134,18 @@ private:
     EditBox* mContentBody;
 
     /**
+     * Used for getting notification's content title.
+     * Available only on Android platform.
+     */
+    EditBox* mContentTitle;
+
+    /**
+     * Used for getting the ticker text.
+     * Available only on Android platform.
+     */
+    EditBox* mTickerText;
+
+    /**
      * Used for getting notification's badge number.
      * Shown only on iOS platform.
      */
@@ -135,8 +159,43 @@ private:
 
     /**
      * If set the notification will play sound.
+     * If set to true it will play the default sound.
      */
     CheckBox* mPlaySound;
+
+    /**
+     * Used for the sound that will be played.
+     * Available only on Android platform.
+     */
+    EditBox* mSoundPath;
+
+    /**
+     * If set the notification will alert the user with a vibration.
+     * If no vibrate duration is set, the default vibration pattern
+     * will be used.
+     * Available only on Android platform.
+     */
+    CheckBox* mVibrate;
+
+    /**
+     * Sets the vibration duration.
+     * Available only on Android platform.
+     */
+    EditBox* mVibrateDuration;
+
+    /**
+     * If set the notification will use flashing LED.
+     * If set to true it will use the default flashing pattern.
+     * Available only on Android platform.
+     */
+    CheckBox* mFlash;
+
+    /**
+     * The flash pattern: the color, ledOnLength, ledOffLength.
+     */
+    EditBox* mFlashColor;
+    EditBox* mFlashOnLength;
+    EditBox* mFlashOffLength;
 
     /**
      * Used to get the number of seconds on which the notification will be fired.

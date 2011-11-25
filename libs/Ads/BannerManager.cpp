@@ -17,10 +17,11 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file BannerManager.cpp
- * @author Bogdan Iusco
+ * @file BannerManager.h
+ * @author Emma Tresanszki and Bogdan Iusco
+ * @date 1 Nov 2011
  *
- * \brief The BannnerManager manages banner events and dispatches
+ * @brief The BannnerManager manages banner events and dispatches
  * them to the target banners.
  */
 

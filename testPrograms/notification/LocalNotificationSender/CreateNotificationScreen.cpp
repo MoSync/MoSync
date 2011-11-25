@@ -16,17 +16,36 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/**
+ * @file CreateNotificationScreen.cpp
+ * @author Emma Tresanszki and Bogdan Iusco
+ *
+ * @brief Screen used for creating notifications.
+ * Contains widgets(e.g. edit box, check box, button) used for setting
+ * notification values.
+ */
+
 // Text to label widgets
 #define CONTENT_BODY_LABEL_TEXT "Content body:"
+#define CONTENT_TITLE_LABEL_TEXT "Content title:"
+#define TICKER_TEXT_LABEL_TEXT "Ticker text:"
 #define BADGE_NUMBER_LABEL_TEXT "Badge number:"
 #define ALERT_ACTION_LABEL_TEXT "Alert action:"
 #define PLAY_SOUND_LABEL_TEXT "Play sound:"
-#define FIRE_TIME_LABEL_TEXT "Schedule in:"
+#define SOUND_PATH_LABEL_TEXT "Sound path:"
+#define FIRE_TIME_LABEL_TEXT "Schedule in(seconds):"
 #define SECONDS_LABEL_TEXT " seconds"
 #define SEND_BUTTON_TEXT "SEND"
 
 // Default text for edit box widgets
 #define DEFAULT_CONTENT_BODY_EDIT_BOX_TEXT "Content body"
+#define DEFAULT_CONTENT_TITLE_EDIT_BOX_TEXT "Content title"
+#define DEFAULT_TICKER_TEXT_EDIT_BOX_TEXT "Ticker text"
+#define DEFAULT_SOUND_PATH_EDIT_BOX_TEXT "file:///sdcard/notification/ringer.mp3"
+#define DEFAULT_VIBRATION_EDIT_BOX_TEXT "" // 0 duration
+#define DEFAULT_FLASH_COLOR_EDIT_BOX_TEXT "0xff00ff00"
+#define DEFAULT_FLASH_ON_EDIT_BOX_TEXT "300"
+#define DEFAULT_FLASH_OFF_EDIT_BOX_TEXT "1000"
 #define DEFAULT_BADGE_NUMBER_EDIT_BOX_TEXT "1"
 #define DEFAULT_ALERT_ACTION_EDIT_BOX_TEXT "Alert action"
 #define DEFAULT_FIRE_TIME_EDIT_BOX_TEXT "5"
@@ -42,6 +61,10 @@ MA 02110-1301, USA.
 #define TEXT_COLOR 0x000000
 #define TEXT_COLOR_ERROR 0xFF0000
 
+#include <matime.h>
+#include <maapi.h>
+#include <MAUtil/util.h>
+
 #include "CreateNotificationScreen.h"
 #include "Util.h"
 #include "MAHeaders.h"
@@ -52,9 +75,18 @@ MA 02110-1301, USA.
 CreateNotificationScreen::CreateNotificationScreen():
 	Screen(),
 	mContentBody(NULL),
+	mContentTitle(NULL),
+	mTickerText(NULL),
 	mBadgeNumber(NULL),
 	mAlertAction(NULL),
 	mPlaySound(NULL),
+	mSoundPath(NULL),
+	mVibrate(NULL),
+	mVibrateDuration(NULL),
+	mFlash(NULL),
+	mFlashColor(NULL),
+	mFlashOnLength(NULL),
+	mFlashOffLength(NULL),
 	mTime(NULL),
 	mCreateNotificationButton(NULL)
 {
@@ -81,6 +113,16 @@ CreateNotificationScreen::~CreateNotificationScreen()
 		mAlertAction->removeEditBoxListener(this);
 		mBadgeNumber->removeEditBoxListener(this);
 	}
+	else
+	{
+		mContentTitle->removeEditBoxListener(this);
+		mTickerText->removeEditBoxListener(this);
+		mSoundPath->removeEditBoxListener(this);
+		mVibrateDuration->removeEditBoxListener(this);
+		mFlashColor->removeEditBoxListener(this);
+		mFlashOnLength->removeEditBoxListener(this);
+		mFlashOffLength->removeEditBoxListener(this);
+	}
 
 	while (0 != mLocalNotificationVector.size())
 	{
@@ -92,10 +134,38 @@ CreateNotificationScreen::~CreateNotificationScreen()
 }
 
 /**
+ * Helper function to create list view item with
+ * specific label and edit box.
+ */
+ListViewItem* CreateNotificationScreen::createListViewItem(const MAUtil::String& labelText, Widget* widget)//EditBox* editBox)
+{
+	ListViewItem* listItem;
+	HorizontalLayout* hLayout;
+	Widget* space;
+	Label* label;
+
+	hLayout = new HorizontalLayout();
+	label = new Label();
+	label->setText(labelText);
+	hLayout->addChild(label);
+
+	space = this->createSpacer();
+	hLayout->addChild(space);
+
+	widget->fillSpaceHorizontally();
+	hLayout->addChild(widget);
+
+	listItem = new ListViewItem();
+	listItem->addChild(hLayout);
+	return listItem;
+}
+
+/**
  * Creates and adds main layout to the screen.
  */
 void CreateNotificationScreen::createMainLayout()
 {
+
 	VerticalLayout* mainLayout = new VerticalLayout();
 	Screen::setMainWidget(mainLayout);
 
@@ -110,103 +180,64 @@ void CreateNotificationScreen::createMainLayout()
 	Label* label;
 
 	// ================ Content body =====================
-	hLayout = new HorizontalLayout();
-	label = new Label();
-	label->setText(CONTENT_BODY_LABEL_TEXT);
-	hLayout->addChild(label);
-
-	space = this->createSpacer();
-	hLayout->addChild(space);
-
 	mContentBody = new EditBox();
-	mContentBody->fillSpaceHorizontally();
-	hLayout->addChild(mContentBody);
+	listView->addChild(createListViewItem(CONTENT_BODY_LABEL_TEXT, mContentBody));
 
-	listItem = new ListViewItem();
-	listItem->addChild(hLayout);
-	listView->addChild(listItem);
+	// ================ Content title =====================
+	if ( isAndroid() )
+	{
+		mContentTitle = new EditBox();
+		mContentTitle->addEditBoxListener(this);
+		listView->addChild(createListViewItem(CONTENT_TITLE_LABEL_TEXT, mContentTitle));
+	}
+
+	// ================ Ticker text =====================
+	if ( isAndroid() )
+	{
+		mTickerText = new EditBox();
+		mTickerText->addEditBoxListener(this);
+		listView->addChild(createListViewItem(TICKER_TEXT_LABEL_TEXT, mTickerText));
+	}
 
 	if (isIOS())
 	{
 		// ================ Badge number =====================
-		hLayout = new HorizontalLayout();
-		label = new Label();
-		label->setText(BADGE_NUMBER_LABEL_TEXT);
-		hLayout->addChild(label);
-
-		space = this->createSpacer();
-		hLayout->addChild(space);
-
 		mBadgeNumber = new EditBox();
 		mBadgeNumber->setWidth(NUMERIC_EDIT_BOX_WIDTH);
 		mBadgeNumber->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
 		mBadgeNumber->addEditBoxListener(this);
-		hLayout->addChild(mBadgeNumber);
-
-		listItem = new ListViewItem();
-		listItem->addChild(hLayout);
-		listView->addChild(listItem);
+		listView->addChild(createListViewItem(BADGE_NUMBER_LABEL_TEXT, mBadgeNumber));
 
 		// ================ Alert action =====================
-		hLayout = new HorizontalLayout();
-		label = new Label();
-		label->setText(ALERT_ACTION_LABEL_TEXT);
-		hLayout->addChild(label);
-
-		space = this->createSpacer();
-		hLayout->addChild(space);
-
 		mAlertAction = new EditBox();
-		mAlertAction->fillSpaceHorizontally();
 		mAlertAction->addEditBoxListener(this);
-		hLayout->addChild(mAlertAction);
-
-		listItem = new ListViewItem();
-		listItem->addChild(hLayout);
-		listView->addChild(listItem);
+		listView->addChild(createListViewItem(ALERT_ACTION_LABEL_TEXT, mAlertAction));
 	}
+
 	// ================ Play sound =====================
-	hLayout = new HorizontalLayout();
-	label = new Label();
-	label->setText(PLAY_SOUND_LABEL_TEXT);
-	hLayout->addChild(label);
-
-	space = this->createSpacer();
-	hLayout->addChild(space);
-
 	mPlaySound = new CheckBox();
-	hLayout->addChild(mPlaySound);
+	listView->addChild(createListViewItem(PLAY_SOUND_LABEL_TEXT, mPlaySound));
 
-	listItem = new ListViewItem();
-	listItem->addChild(hLayout);
-	listView->addChild(listItem);
+	// ================ Sound path=====================
+	if ( isAndroid() )
+	{
+		mSoundPath = new EditBox();
+		mSoundPath->addEditBoxListener(this);
+		listView->addChild(createListViewItem(SOUND_PATH_LABEL_TEXT, mSoundPath));
+	}
 
 	// ================ Fire time =====================
-	hLayout = new HorizontalLayout();
-	label = new Label();
-	label->setText(FIRE_TIME_LABEL_TEXT);
-	label->wrapContentHorizontally();
-	hLayout->addChild(label);
-
-	space = this->createSpacer();
-	hLayout->addChild(space);
-
 	mTime = new EditBox();
 	mTime->setWidth(NUMERIC_EDIT_BOX_WIDTH);
 	mTime->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
 	mTime->addEditBoxListener(this);
-	hLayout->addChild(mTime);
+	listView->addChild(createListViewItem(FIRE_TIME_LABEL_TEXT, mTime));
+	//	label = new Label();
+//	label->setText(SECONDS_LABEL_TEXT);
+//	label->wrapContentHorizontally();
+//	hLayout->addChild(label);
 
-	label = new Label();
-	label->setText(SECONDS_LABEL_TEXT);
-	label->wrapContentHorizontally();
-	hLayout->addChild(label);
-
-	listItem = new ListViewItem();
-	listItem->addChild(hLayout);
-	listView->addChild(listItem);
-
-//	// ================= Send image button ================
+	// ================= Send image button ================
 	hLayout = new HorizontalLayout();
 	hLayout->fillSpaceHorizontally();
 	listItem = new ListViewItem();
@@ -269,6 +300,36 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			MAUtil::String alertAction = mAlertAction->getText();
 			notification->setAlertAction(alertAction);
 		}
+		else
+		{
+			notification->setContentTitle(mContentTitle->getText());
+			notification->setTickerText(mTickerText->getText());
+			if ( mVibrate->isChecked() )
+			{
+				notification->setVibrate(true);
+				if ( mVibrateDuration->getText().length() > 0 )
+				{
+					notification->setVibrateDuration(
+							MAUtil::stringToInteger(mVibrateDuration->getText()));
+				}
+			}
+			if ( mFlash->isChecked() )
+			{
+				notification->setFlashLights(true);
+				if ( mFlashColor->getText().length() > 0
+						&&
+						mFlashOnLength->getText().length() > 0
+						&&
+						mFlashOffLength->getText().length() > 0)
+				{
+					struct NotificationFlashLights pattern = NotificationFlashLights(
+							MAUtil::stringToInteger(mFlashColor->getText()),
+							MAUtil::stringToInteger(mFlashOnLength->getText()),
+							MAUtil::stringToInteger(mFlashOffLength->getText()));
+					notification->setFlashLightsPattern(pattern);
+				}
+			}
+		}
 
 		// Set play sound property
 		bool playSound = mPlaySound->isChecked();
@@ -329,6 +390,18 @@ void CreateNotificationScreen::resetView()
 		mBadgeNumber->setFontColor(TEXT_COLOR);
 		mAlertAction->setText(DEFAULT_ALERT_ACTION_EDIT_BOX_TEXT);
 	}
+	else
+	{
+		mContentTitle->setText(DEFAULT_CONTENT_TITLE_EDIT_BOX_TEXT);
+		mTickerText->setText(DEFAULT_TICKER_TEXT_EDIT_BOX_TEXT);
+		mSoundPath->setText(DEFAULT_CONTENT_TITLE_EDIT_BOX_TEXT);
+		mVibrate->setState(false);
+		mVibrateDuration->setText(DEFAULT_VIBRATION_EDIT_BOX_TEXT);
+		mFlash->setState(false);
+//		mFlashColor->setText(DEFAULT_FLASH_COLOR_EDIT_BOX_TEXT);
+//		mFlashOnLength->setText(DEFAULT_FLASH_ON_EDIT_BOX_TEXT);
+//		mFlashOffLength->setText(DEFAULT_FLASH_OFF_EDIT_BOX_TEXT);
+	}
 }
 
 /**
@@ -345,6 +418,37 @@ bool CreateNotificationScreen::isUserInputDataValid()
 		{
 			printf("invalid badge number value");
 			mBadgeNumber->setFontColor(TEXT_COLOR_ERROR);
+			return false;
+		}
+	}
+	else
+	{
+		String vibrationDuration = mVibrateDuration->getText();
+		if (!this->canStringBeConvertedToInteger(vibrationDuration))
+		{
+			printf("invalid vibration duration value");
+			mVibrateDuration->setFontColor(TEXT_COLOR_ERROR);
+			return false;
+		}
+//		String flashColor = mFlashColor->getText();
+//		if (!this->canStringBeConvertedToInteger(flashColor))
+//		{
+//			printf("invalid flash color value");
+//			mFlashColor->setFontColor(TEXT_COLOR_ERROR);
+//			return false;
+//		}
+		String flashOn = mFlashOnLength->getText();
+		if (!this->canStringBeConvertedToInteger(flashOn))
+		{
+			printf("invalid flash on duration value");
+			mFlashOnLength->setFontColor(TEXT_COLOR_ERROR);
+			return false;
+		}
+		String flashOff = mFlashOffLength->getText();
+		if (!this->canStringBeConvertedToInteger(flashOff))
+		{
+			printf("invalid flash off duration value");
+			mFlashOffLength->setFontColor(TEXT_COLOR_ERROR);
 			return false;
 		}
 	}

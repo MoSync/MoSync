@@ -32,6 +32,9 @@ MA 02110-1301, USA.
 
 #include <maapi.h>
 #include <mastdlib.h>
+#include <conprint.h>
+#include <matime.h>
+#include <MAUtil/util.h>
 
 #include "LocalNotification.h"
 
@@ -323,7 +326,6 @@ namespace Notification
 
     /**
      * Enable/disable the sound played when an alert is displayed.
-     * Platform: iOS.
      * @param playSound If true the notification will play a sound when
      * it's shown.
      */
@@ -359,6 +361,7 @@ namespace Notification
 
     /**
      * Set the sound to play when an alert is displayed.
+     * Could be ignored if using setPlaySound(false).
      * Plarform: Android.
      * @param path A valid path to an audio file.
      */
@@ -369,6 +372,7 @@ namespace Notification
 
     /**
      * Enable/disable the the default vibration when an alert is displayed.
+     * By default, the vibration is disabled.
      * If set to true, it will use the default notification vibrate. This will
      * ignore any given vibrate.
      * Using phone vibration requires the VIBRATE permission.
@@ -409,6 +413,7 @@ namespace Notification
 
     /**
      * Set the vibration duration when an alert is displayed.
+     * This setting is ignored if setVibrate is disabled.
      * Using phone vibration requires the VIBRATE permission.
      * Platform: Android.
      * @param duration The number of milliseconds to vibrate.
@@ -444,14 +449,15 @@ namespace Notification
 
     /**
      * Define your own color and pattern for the lights.
-     * Not every color in the spectrum is supported by the device LEDs, and not every
-     * device supports the same  colors, so the hardware estimates to the best of its
-     * ability. Green is the most common notification color.
+     * Not every color in the spectrum is supported by the device LEDs, and not
+     * every device supports the same  colors, so the hardware estimates to the
+     * best of its ability. Green is the most common notification color.
      * Also, not all Android devices support this feature.
      * Platform: Android.
      * @param lightPattern a NotificationFlashLights struct.
      */
-    void LocalNotification::setFlashLightsPattern(const NotificationFlashLights lightPattern)
+    void LocalNotification::setFlashLightsPattern(
+        const NotificationFlashLights lightPattern)
     {
 		MAUtil::String pattern = "";
 		pattern = MAUtil::integerToString(lightPattern.ledARGB) + ",";
