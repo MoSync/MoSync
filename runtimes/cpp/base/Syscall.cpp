@@ -461,7 +461,11 @@ namespace Base {
 	}
 
 	SYSCALL(MAHandle, maCreatePlaceholder()) {
-		return (MAHandle) SYSCALL_THIS->resources.create_RT_PLACEHOLDER();
+		return (MAHandle) SYSCALL_THIS->resources._maCreatePlaceholder();
+	}
+
+	SYSCALL(MAHandle, maDestroyPlaceholder()) {
+		return (MAHandle) SYSCALL_THIS->resources._maDestroyPlaceholder();
 	}
 
 	SYSCALL(void, maDestroyObject(MAHandle handle)) {
