@@ -29,6 +29,8 @@ MA 02110-1301, USA.
 // Default buffer size.
 #define BUFFER_SIZE 256
 
+#include <conprint.h>
+
 #include "NotificationManager.h"
 #include "LocalNotification.h"
 #include "LocalNotificationListener.h"
@@ -375,7 +377,8 @@ namespace Notification
      * @param ticker The text that flows by in the status bar when the
      * notification first activates.
      */
-    void NotificationManager::setPushNotificationsTickerText(const MAUtil::String& ticker)
+    void NotificationManager::setPushNotificationsTickerText(
+        const MAUtil::String& ticker)
     {
         maNotificationPushSetTickerText(ticker.c_str());
     }

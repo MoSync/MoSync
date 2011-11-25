@@ -31,6 +31,8 @@ MA 02110-1301, USA.
 
 #define DEFAULT_APP_ICON_BADGE_NUMBER -1
 
+#include <conprint.h>
+
 #include "PushNotification.h"
 
 namespace Notification
