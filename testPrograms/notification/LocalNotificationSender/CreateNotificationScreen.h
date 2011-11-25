@@ -121,6 +121,11 @@ private:
      */
     virtual bool canStringBeConvertedToInteger(const MAUtil::String& string);
 
+    /**
+     * Checks if the given string can be converted to a color.
+     * @return True if the string is in the format 0xRRGGBB.
+     */
+    bool canStringBeConvertedToColor(const MAUtil::String& string);
 private:
     /**
      * Used for getting notification's content body.

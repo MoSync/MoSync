@@ -12,6 +12,7 @@ import com.google.ads.AdView;
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.nativeui.ui.widgets.Widget;
 import com.mosync.nativeui.util.properties.BooleanConverter;
+import com.mosync.nativeui.util.properties.ColorConverter;
 import com.mosync.nativeui.util.properties.InvalidPropertyValueException;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
@@ -64,11 +65,19 @@ public class AdWidget extends Widget implements AdListener
 		mAdRequest = new AdRequest();
 	}
 
+	/**
+	 * Called when the full-screen Activity presented with onPresentScreen
+	 * has been dismissed and control is returning to your app.
+	 */
 	@Override
 	public void onDismissScreen(Ad arg0) {
 		postAdsBannerEvent(new AdsEvent(MA_ADS_EVENT_ON_DISMISS, mHandle, 0));
 	}
 
+	/**
+	 * Sent when loadAd has failed, typically because of network failure,
+	 * an application configuration error, or a lack of ad inventory.
+	 */
 	@Override
 	public void onFailedToReceiveAd(Ad arg0, ErrorCode err) {
 		int errCode = 0;
@@ -90,6 +99,9 @@ public class AdWidget extends Widget implements AdListener
 		postAdsBannerEvent(new AdsEvent(MA_ADS_EVENT_FAILED, mHandle, errCode));
 	}
 
+	/**
+	 * Called when an Ad touch will launch a new application.
+	 */
 	@Override
 	public void onLeaveApplication(Ad arg0) {
 		postAdsBannerEvent(new AdsEvent(MA_ADS_EVENT_ON_LEAVE_APPLICATION, mHandle, 0));
@@ -99,6 +111,9 @@ public class AdWidget extends Widget implements AdListener
 	public void onPresentScreen(Ad arg0) {
 	}
 
+	/**
+	 * Sent when AdView.loadAd has succeeded.
+	 */
 	@Override
 	public void onReceiveAd(Ad arg0) {
 		postAdsBannerEvent(new AdsEvent(MA_ADS_EVENT_LOADED, mHandle, 0));
@@ -187,26 +202,39 @@ public class AdWidget extends Widget implements AdListener
 		}
 		else if ( property.equals( MA_ADS_COLOR_BG ) )
 		{
+			// Throws PropertyConversionException.
+			ColorConverter.convert(value);
+			// Set the color in the format: RRGGBB.
 			mAdRequest.addExtra("color_bg", value.substring(2));
 		}
 		else if ( property.equals( MA_ADS_COLOR_BG_TOP ) )
 		{
+			// Throws PropertyConversionException.
+			ColorConverter.convert(value);
 			mAdRequest.addExtra("color_bg_top", value.substring(2));
 		}
 		else if ( property.equals( MA_ADS_COLOR_BORDER ) )
 		{
+			// Throws PropertyConversionException.
+			ColorConverter.convert(value);
 			mAdRequest.addExtra("color_border", value.substring(2));
 		}
 		else if ( property.equals( MA_ADS_COLOR_LINK ) )
 		{
+			// Throws PropertyConversionException.
+			ColorConverter.convert(value);
 			mAdRequest.addExtra("color_link", value.substring(2));
 		}
 		else if ( property.equals( MA_ADS_COLOR_TEXT ) )
 		{
+			// Throws PropertyConversionException.
+			ColorConverter.convert(value);
 			mAdRequest.addExtra("color_text", value.substring(2));
 		}
 		else if ( property.equals( MA_ADS_COLOR_URL ) )
 		{
+			// Throws PropertyConversionException.
+			ColorConverter.convert(value);
 			mAdRequest.addExtra("color_url", value.substring(2));
 		}
 		else

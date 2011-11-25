@@ -9260,7 +9260,8 @@ group NotificationAPI "Notification API" {
 			*
 			* @par Example
 			* \code
-			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, "300");
+			*   // Vibrate for 3 seconds.
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, "3000");
 			* \endcode
 			*/
 			VIBRATE_DURATION = "vibrateDuration";

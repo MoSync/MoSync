@@ -60,6 +60,12 @@ namespace Notification
      */
     NotificationManager::~NotificationManager()
     {
+		delete mTitle;
+		mTitle = NULL;
+
+		delete mTickerText;
+		mTickerText = NULL;
+
         // Remove me as a custom event listener.
         MAUtil::Environment::getEnvironment().removeCustomEventListener(this);
     }

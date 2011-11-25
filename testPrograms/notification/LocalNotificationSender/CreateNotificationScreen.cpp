@@ -24,6 +24,12 @@ MA 02110-1301, USA.
 #define ALERT_ACTION_LABEL_TEXT "Alert action:"
 #define PLAY_SOUND_LABEL_TEXT "Play sound:"
 #define SOUND_PATH_LABEL_TEXT "Sound path:"
+#define VIBRATE_LABEL_TEXT "Vibration:"
+#define VIBRATE_DURATION_LABEL_TEXT "Vibration duration(seconds):"
+#define FLASH_LABEL_TEXT "Flashing: "
+#define FLASH_COLOR_LABEL_TEXT "Flash color:"
+#define FLASH_ON_LABEL_TEXT "Flash On for:(seconds)"
+#define FLASH_OFF_LABEL_TEXT "Flash Off for:(seconds)"
 #define FIRE_TIME_LABEL_TEXT "Schedule in(seconds):"
 #define SECONDS_LABEL_TEXT " seconds"
 #define SEND_BUTTON_TEXT "SEND"
@@ -83,7 +89,7 @@ CreateNotificationScreen::CreateNotificationScreen():
 	mTime->addEditBoxListener(this);
 	mCreateNotificationButton->addButtonListener(this);
 	NotificationManager::getInstance()->addLocalNotificationListener(this);
-	this->resetView();
+//	this->resetView();
 }
 
 /**
@@ -100,16 +106,6 @@ CreateNotificationScreen::~CreateNotificationScreen()
 		mAlertAction->removeEditBoxListener(this);
 		mBadgeNumber->removeEditBoxListener(this);
 	}
-	else
-	{
-		mContentTitle->removeEditBoxListener(this);
-		mTickerText->removeEditBoxListener(this);
-		mSoundPath->removeEditBoxListener(this);
-		mVibrateDuration->removeEditBoxListener(this);
-		mFlashColor->removeEditBoxListener(this);
-		mFlashOnLength->removeEditBoxListener(this);
-		mFlashOffLength->removeEditBoxListener(this);
-	}
 
 	while (0 != mLocalNotificationVector.size())
 	{
@@ -122,7 +118,7 @@ CreateNotificationScreen::~CreateNotificationScreen()
 
 /**
  * Helper function to create list view item with
- * specific label and edit box.
+ * specific label and edit/check box.
  */
 ListViewItem* CreateNotificationScreen::createListViewItem(const MAUtil::String& labelText, Widget* widget)//EditBox* editBox)
 {
@@ -164,29 +160,22 @@ void CreateNotificationScreen::createMainLayout()
 	ListViewItem* listItem;
 	HorizontalLayout* hLayout;
 	Widget* space;
-	Label* label;
 
 	// ================ Content body =====================
 	mContentBody = new EditBox();
-	listView->addChild(createListViewItem(CONTENT_BODY_LABEL_TEXT, mContentBody));
+	listView->addChild(createListViewItem(CONTENT_BODY_LABEL_TEXT,(Widget*) mContentBody));
 
-	// ================ Content title =====================
 	if ( isAndroid() )
 	{
+		// ================ Content title =====================
 		mContentTitle = new EditBox();
-		mContentTitle->addEditBoxListener(this);
 		listView->addChild(createListViewItem(CONTENT_TITLE_LABEL_TEXT, mContentTitle));
-	}
 
-	// ================ Ticker text =====================
-	if ( isAndroid() )
-	{
+		// ================ Ticker text =====================
 		mTickerText = new EditBox();
-		mTickerText->addEditBoxListener(this);
 		listView->addChild(createListViewItem(TICKER_TEXT_LABEL_TEXT, mTickerText));
 	}
-
-	if (isIOS())
+	else
 	{
 		// ================ Badge number =====================
 		mBadgeNumber = new EditBox();
@@ -204,25 +193,42 @@ void CreateNotificationScreen::createMainLayout()
 	// ================ Play sound =====================
 	mPlaySound = new CheckBox();
 	listView->addChild(createListViewItem(PLAY_SOUND_LABEL_TEXT, mPlaySound));
+	printf("after play sound");
 
-	// ================ Sound path=====================
 	if ( isAndroid() )
 	{
+		// ================ Sound path=====================
 		mSoundPath = new EditBox();
-		mSoundPath->addEditBoxListener(this);
 		listView->addChild(createListViewItem(SOUND_PATH_LABEL_TEXT, mSoundPath));
+		printf("after create sound path");
+
+		// ================ Vibrate =====================
+		mVibrate = new CheckBox();
+		listView->addChild(createListViewItem(VIBRATE_LABEL_TEXT, mVibrate));
+
+		mVibrateDuration = new EditBox();
+		mVibrateDuration->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
+		listView->addChild(createListViewItem(VIBRATE_DURATION_LABEL_TEXT, mVibrateDuration));
+
+		// ================ Flashing LED =====================
+		mFlash = new CheckBox();
+		listView->addChild(createListViewItem(FLASH_LABEL_TEXT, mFlash));
+		// The pattern
+		mFlashColor = new EditBox();
+		listView->addChild(createListViewItem(FLASH_COLOR_LABEL_TEXT, mFlashColor));
+		mFlashOnLength = new EditBox();
+		mFlashOnLength->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
+		listView->addChild(createListViewItem(FLASH_ON_LABEL_TEXT, mFlashOnLength));
+		mFlashOffLength = new EditBox();
+		mFlashOffLength->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
+		listItem->addChild(createListViewItem(FLASH_OFF_LABEL_TEXT, mFlashOffLength));
 	}
 
 	// ================ Fire time =====================
 	mTime = new EditBox();
 	mTime->setWidth(NUMERIC_EDIT_BOX_WIDTH);
 	mTime->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
-	mTime->addEditBoxListener(this);
 	listView->addChild(createListViewItem(FIRE_TIME_LABEL_TEXT, mTime));
-	//	label = new Label();
-//	label->setText(SECONDS_LABEL_TEXT);
-//	label->wrapContentHorizontally();
-//	hLayout->addChild(label);
 
 	// ================= Send image button ================
 	hLayout = new HorizontalLayout();
@@ -300,6 +306,10 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 							MAUtil::stringToInteger(mVibrateDuration->getText()));
 				}
 			}
+			else
+			{
+				notification->setVibrate(false);
+			}
 			if ( mFlash->isChecked() )
 			{
 				notification->setFlashLights(true);
@@ -315,6 +325,10 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 							MAUtil::stringToInteger(mFlashOffLength->getText()));
 					notification->setFlashLightsPattern(pattern);
 				}
+			}
+			else
+			{
+				notification->setFlashLights(false);
 			}
 		}
 
@@ -381,7 +395,7 @@ void CreateNotificationScreen::resetView()
 	{
 		mContentTitle->setText(DEFAULT_CONTENT_TITLE_EDIT_BOX_TEXT);
 		mTickerText->setText(DEFAULT_TICKER_TEXT_EDIT_BOX_TEXT);
-		mSoundPath->setText(DEFAULT_CONTENT_TITLE_EDIT_BOX_TEXT);
+		mSoundPath->setText(DEFAULT_SOUND_PATH_EDIT_BOX_TEXT);
 		mVibrate->setState(false);
 		mVibrateDuration->setText(DEFAULT_VIBRATION_EDIT_BOX_TEXT);
 		mFlash->setState(false);
@@ -410,33 +424,39 @@ bool CreateNotificationScreen::isUserInputDataValid()
 	}
 	else
 	{
-		String vibrationDuration = mVibrateDuration->getText();
-		if (!this->canStringBeConvertedToInteger(vibrationDuration))
+		if ( mVibrate->isChecked() )
 		{
-			printf("invalid vibration duration value");
-			mVibrateDuration->setFontColor(TEXT_COLOR_ERROR);
-			return false;
+			String vibrationDuration = mVibrateDuration->getText();
+			if (!this->canStringBeConvertedToInteger(vibrationDuration))
+			{
+				printf("invalid vibration duration value");
+				mVibrateDuration->setFontColor(TEXT_COLOR_ERROR);
+				return false;
+			}
 		}
-//		String flashColor = mFlashColor->getText();
-//		if (!this->canStringBeConvertedToInteger(flashColor))
-//		{
-//			printf("invalid flash color value");
-//			mFlashColor->setFontColor(TEXT_COLOR_ERROR);
-//			return false;
-//		}
-		String flashOn = mFlashOnLength->getText();
-		if (!this->canStringBeConvertedToInteger(flashOn))
+		if ( mFlash->isChecked() )
 		{
-			printf("invalid flash on duration value");
-			mFlashOnLength->setFontColor(TEXT_COLOR_ERROR);
-			return false;
-		}
-		String flashOff = mFlashOffLength->getText();
-		if (!this->canStringBeConvertedToInteger(flashOff))
-		{
-			printf("invalid flash off duration value");
-			mFlashOffLength->setFontColor(TEXT_COLOR_ERROR);
-			return false;
+			String flashColor = mFlashColor->getText();
+			if (!this->canStringBeConvertedToColor(flashColor))
+			{
+				printf("invalid flash color value");
+				mFlashColor->setFontColor(TEXT_COLOR_ERROR);
+				return false;
+			}
+			String flashOn = mFlashOnLength->getText();
+			if (!this->canStringBeConvertedToInteger(flashOn))
+			{
+				printf("invalid flash on duration value");
+				mFlashOnLength->setFontColor(TEXT_COLOR_ERROR);
+				return false;
+			}
+			String flashOff = mFlashOffLength->getText();
+			if (!this->canStringBeConvertedToInteger(flashOff))
+			{
+				printf("invalid flash off duration value");
+				mFlashOffLength->setFontColor(TEXT_COLOR_ERROR);
+				return false;
+			}
 		}
 	}
 
@@ -479,4 +499,22 @@ bool CreateNotificationScreen::canStringBeConvertedToInteger(
 	}
 
 	return true;
+}
+
+/**
+ * Checks if the given string can be converted to a color.
+ * @return True if the string is in the format 0xRRGGBB.
+ */
+bool CreateNotificationScreen::canStringBeConvertedToColor(const MAUtil::String& string)
+{
+	if ( string.length() == 8)
+	{
+		if ( 0 == MAUtil::lowerString(string).find("0x",0) )
+		{
+			return true;
+		}
+		else
+			return false;
+	}
+	return false;
 }

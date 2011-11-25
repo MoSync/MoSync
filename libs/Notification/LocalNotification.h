@@ -72,9 +72,9 @@ namespace Notification
 	 */
 	struct NotificationFlashLights{
 		int ledARGB;
-		// Length of time, in milliseconds, to keep the light on.
+		// Length of time, in seconds, to keep the light on.
 		int ledOnMS;
-		// Length of time, in milliseconds, to keep the light off.
+		// Length of time, in seconds, to keep the light off.
 		int ledOffMS;
 		NotificationFlashLights(int color, int on, int off):
 			ledARGB(color), ledOnMS(on), ledOffMS(off){};
@@ -318,7 +318,7 @@ namespace Notification
          * This setting is ignored if setVibrate is disabled.
          * Using phone vibration requires the VIBRATE permission.
          * Platform: Android.
-         * @param duration The number of milliseconds to vibrate.
+         * @param duration The number of seconds to vibrate.
          */
         virtual void setVibrateDuration(const int duration);
 
