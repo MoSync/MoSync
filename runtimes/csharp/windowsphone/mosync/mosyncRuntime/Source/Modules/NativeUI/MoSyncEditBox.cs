@@ -296,28 +296,28 @@ namespace MoSync
 				}
 			}
 
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_EDIT_MODE)]
-            public String EditMode
-            {
-                set
-                {
-                    if (value != "password" && value != "text")
-                        return;
+            //[MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_EDIT_MODE)]
+            //public String EditMode
+            //{
+            //    set
+            //    {
+            //        if (value != "password" && value != "text")
+            //            return;
 
-                    System.Windows.Input.InputScope keyboard = new System.Windows.Input.InputScope();
-                    System.Windows.Input.InputScopeName scopeName = new System.Windows.Input.InputScopeName();
-                    if (value == "password")
-                    {
-                        scopeName.NameValue = System.Windows.Input.InputScopeNameValue.Password;
-                    }
-                    else if (value == "text")
-                    {
-                        scopeName.NameValue = System.Windows.Input.InputScopeNameValue.Text;
-                    }
-                    keyboard.Names.Add(scopeName);
-                    mEditBox.InputScope = keyboard;
-                }
-            }
+            //        System.Windows.Input.InputScope keyboard = new System.Windows.Input.InputScope();
+            //        System.Windows.Input.InputScopeName scopeName = new System.Windows.Input.InputScopeName();
+            //        if (value == "password")
+            //        {
+            //            scopeName.NameValue = System.Windows.Input.InputScopeNameValue.Password;
+            //        }
+            //        else if (value == "text")
+            //        {
+            //            scopeName.NameValue = System.Windows.Input.InputScopeNameValue.Text;
+            //        }
+            //        keyboard.Names.Add(scopeName);
+            //        mEditBox.InputScope = keyboard;
+            //    }
+            //}
 
             /**
              * Helper function that sets the input mode of the edit box
