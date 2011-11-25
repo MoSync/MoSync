@@ -17,6 +17,7 @@
  */
 
 #include "membench.h"
+#include <benchdb/benchdb.h>
 
 MemBench::MemBench() {
 
@@ -31,66 +32,114 @@ void MemBench::bench() {
 	int time;
 	int i;
 
+	/* stand alone test vars */
+	float allocStr10 = 0.0;
+	float allocStr100 = 0.0;
+	float allocVoid1 = 0.0;
+	float allocVoid100 = 0.0;
+	float allocVoid1000 = 0.0;
+	float allocDummy = 0.0;
+	float allocDummyStruct = 0.0;
+	float allocDummyMix = 0.0;
+	float accessArray = 0.0;
+	float accessVector = 0.0;
+	float addVector = 0.0;
+	float accessDummy = 0.0;
+	float accessDummyStruct = 0.0;
+	float accessDummyMix = 0.0;
+
+	/* merged tests vars */
+	float strFlops = 0.0;
+	float mallocFlops = 0.0;
+	float accessFlops = 0.0;
+
+
+
 	printf("Memory Benchmark started");
 
 	//double the amount of test runs until the test take more than RUNNING_TIME to perform
 	for(i = 1; (time = this->heapBench(i, 10, MAUTIL_STRING)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d MAUtil::Strings of capacity 10 ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocStr10 = (float)(ALOT*i)/(float) time));
+	strFlops += (float)(ALOT*i)/(float) time;
+
 
 	for(i = 1; (time = this->heapBench(i, 100, MAUTIL_STRING)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d MAUtil::Strings of capacity: 100 ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocStr100 = (float)(ALOT*i)/(float) time));
+	strFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->heapBench(i, 1, MALLOC)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d heap blocks of size 1 using malloc() ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocVoid1 = (float)(ALOT*i)/(float) time));
+	mallocFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->heapBench(i, 100, MALLOC)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d heap blocks of size 100 using malloc() ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocVoid100 = (float)(ALOT*i)/(float) time));
+	mallocFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->heapBench(i, 1000, MALLOC)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d heap blocks of size 1000 using malloc() ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocVoid1000 = (float)(ALOT*i)/(float) time));
+	mallocFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->heapBench(i, 100, DUMMY)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d dummy objects ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocDummy = (float)(ALOT*i)/(float) time));
+	mallocFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->heapBench(i, 100, DUMMY_STRUCT)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d dummy structs ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocDummyStruct = (float)(ALOT*i)/(float) time));
+	mallocFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->heapBench(i, 100, DUMMY_MIX)) < RUNNING_TIME; i*=2);
 	printf("allocating/freeing %d larger dummy objects ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (allocDummyMix = (float)(ALOT*i)/(float) time));
+	mallocFlops += (float)(ALOT*i)/(float) time;
 
 	mArray = (char*) malloc(100 * sizeof(char));
 	for(i = 1; (time = this->memAccess(i, 100, ARRAY)) < RUNNING_TIME; i*=2);
 	printf("accessing each element in a char array[100] %d times ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*100)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (accessArray = (float)(ALOT*i)/(float) time));
+	accessFlops += (float)(ALOT*i)/(float) time;
 	free(mArray);
 
 	for(i = 1; (time = this->memAccess(i, 100, VECTOR_ACCESS)) < RUNNING_TIME; i*=2);
 	printf("accessing 100 int:s in a MAUtil::vector<int> %d times ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*100)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (accessVector = (float)(ALOT*i)/(float) time));
+	accessFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->memAccess(i, 100, VECTOR_ADD)) < RUNNING_TIME; i*=2);
 	printf("adding 100 int:s to a MAUtil::vector<int> %d times ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i*100)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (addVector = (float)(ALOT*i*100)/(float) time));
+	accessFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->memAccess(i, 1, DUMMY_ACCESS)) < RUNNING_TIME; i*=2);
 	printf("DUMMY_ACCESS %d times ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (accessDummy = (float)(ALOT*i)/(float) time));
+	accessFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->memAccess(i, 1, DUMMY_STRUCT_ACCESS)) < RUNNING_TIME; i*=2);
 	printf("DUMMY_STRUCT_ACCESS %d times ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (accessDummyStruct = (float)(ALOT*i)/(float) time));
+	accessFlops += (float)(ALOT*i)/(float) time;
 
 	for(i = 1; (time = this->memAccess(i, 1, DUMMY_MIX_ACCESS)) < RUNNING_TIME; i*=2);
 	printf("DUMMY_MIX_ACCESS %d times ", ALOT*i);
-	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (float) (ALOT*i)/(float) time);
+	printf("Time: %d msecs, %1.2f KMEMOPS.\n", time, (accessDummyMix = (float)(ALOT*i)/(float) time));
+	accessFlops += (float)(ALOT*i)/(float) time;
+
+	printf("String ops: %1.2f KMEMOPS.\n", strFlops);
+	printf("Malloc ops: %1.2f KMEMOPS.\n", mallocFlops);
+	printf("Mem access ops: %1.2f KMEMOPS.\n", accessFlops);
+	printf("Total: %1.2f KMEMOPS.\n", strFlops + mallocFlops + accessFlops);
+
+	/* Send result to the benchmark database here */
+	publish_membench_result("http://127.0.0.1/benchmarks/publish_result.php", "1337", "MoSync", "987123ab", "HTC%20Wildfire",
+	"2", allocStr10, allocStr100, allocVoid1, allocVoid100, allocVoid1000, allocDummy, allocDummyStruct, allocDummyMix,
+	accessArray, accessVector, addVector, accessDummy, accessDummyStruct, accessDummyMix);
 
 
 	FREEZE;

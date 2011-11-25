@@ -7,6 +7,7 @@
  * Create a Moblet project to use the high level
  * MoSync C++ library.
  */
+
 extern "C" int MAMain()
 {
 
