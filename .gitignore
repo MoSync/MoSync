@@ -221,6 +221,8 @@ config_platform.h
 /tests/Benchmarks/*/obj/
 /tests/Benchmarks/*/gen/
 /tests/Benchmarks/*/libs/*.so
+/tests/Benchmarks/server/db_conn.php
+/tests/Benchmarks/server/db_priv_conn.php
 
 /tools/vis/sld.*
 
