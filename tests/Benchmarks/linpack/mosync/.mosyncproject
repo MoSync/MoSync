@@ -3,17 +3,28 @@
 <build.cfg id="Debug" types="Debug"/>
 <build.cfg id="Release" types="Release"/>
 <properties>
+<property key="build.prefs:additional.include.paths/Debug" value=""/>
 <property key="build.prefs:additional.include.paths/Release" value=""/>
+<property key="build.prefs:additional.libraries/Debug" value="MAUtilD.lib"/>
 <property key="build.prefs:additional.libraries/Release" value="MAUtil.lib"/>
-<property key="build.prefs:additional.library.paths/Release" value=""/>
+<property key="build.prefs:additional.library.paths/Debug" value=""/>
+<property key="build.prefs:additional.library.paths/Release" value="C:/Mosync/lib/benchdb"/>
+<property key="build.prefs:extra.link.sw/Debug" value=""/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
+<property key="build.prefs:extra.res.sw/Debug" value=""/>
 <property key="build.prefs:extra.res.sw/Release" value=""/>
+<property key="build.prefs:gcc.warnings/Debug" value="0"/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
+<property key="build.prefs:ignore.default.libraries/Release" value="false"/>
+<property key="build.prefs:lib.output.path/Release" value="Release/benchdb.lib"/>
 <property key="build.prefs:memory.data/Release" value="1024"/>
 <property key="build.prefs:memory.heap/Release" value="512"/>
-<property key="build.prefs:project.type" value=""/>
+<property key="build.prefs:project.type" value="lib"/>
 <property key="dependency.strategy" value="0"/>
-<property key="excludes/Release" value=""/>
+<property key="excludes/Debug" value="linpack.c"/>
+<property key="excludes/Release" value="linpack.c"/>
+<property key="symbian.uids:uid.s60v2uid" value="0x042db65a"/>
+<property key="symbian.uids:uid.s60v3uid" value="0xe811792f"/>
 <property key="template.id" value="project.c"/>
 </properties>
 </project>

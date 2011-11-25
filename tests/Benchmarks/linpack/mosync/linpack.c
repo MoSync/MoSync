@@ -28,7 +28,7 @@
 #include <conprint.h>
 #include <limits.h>
 #include <maassert.h>
-#include "benchdb.h"
+#include <benchdb/benchdb.h>
 
 #define SP
 
@@ -175,8 +175,9 @@ static REAL linpack(long nreps,int arsize)
             nreps,totalt,100.*tdgefa/totalt,
             100.*tdgesl/totalt,100.*toverhead/totalt,
             kflops/1000.0);
-    if(totalt > 10.)
-    	publish_linpack_result("http://127.0.0.1/benchmarks/publish_result.php", "1337", "MoSync", "987123ab", "HTC%20Wildfire", "2", kflops/1000.0);
+    if(totalt > 10.){ //publish the result in the benchmark database
+    	publish_linpack_result("http://modev.mine.nu:8070/benchmark/publish_result.php", "1337", "MoSync", "987123ab", "HTC%20Wildfire", "2", kflops/1000.0);
+    }
     return(totalt);
     }
 
