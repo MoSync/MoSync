@@ -17,6 +17,7 @@ MA 02110-1301, USA.
 /**
  * @file EditBox.cs
  * @author Rata Gabriela
+ *         ovidiu
  *
  * @brief This represents the EditBox Widget implementation for the NativeUI
  *        component on Windows Phone 7, language C#
@@ -34,35 +35,37 @@ using System.Reflection;
 using System.Windows.Media;
 using System.Windows.Input;
 
+using System.Globalization;
+
 
 namespace MoSync
 {
-	namespace NativeUI
-	{
+    namespace NativeUI
+    {
         /**
          * The EditBox class defines the attributes and behavior of a EditBox widget
          */
-		public class EditBox : WidgetBaseWindowsPhone
-		{
+        public class EditBox : WidgetBaseWindowsPhone
+        {
             /**
              * TextBox control (receives user input)
              */
-			protected System.Windows.Controls.TextBox mEditBox;
+            protected System.Windows.Controls.TextBox mEditBox;
 
             /**
             * if set to true, indicates that all the words typed by the user will start with capital letters
             */
-			protected bool mInitialCapsWord;
+            protected bool mInitialCapsWord;
 
             /**
              * if set to true, indicates that all the sentences will start with capital letters
              */
-			protected bool mInitialCapsSentence;
+            protected bool mInitialCapsSentence;
 
             /**
              * if set to true, indicates that all the text is a watermark/placeholder
              */
-			protected bool mIsWatermarkMode;
+            protected bool mIsWatermarkMode;
 
             /**
              * if true, indicates that this is the first char entered so delete 
@@ -70,9 +73,9 @@ namespace MoSync
              */
             protected bool mFirstChar;
 
-           /**
-             * if set to true, indicates that all the text is a watermark/placeholder
-             */
+            /**
+              * if set to true, indicates that all the text is a watermark/placeholder
+              */
             protected Brush mForegroundColor;
 
             /**
@@ -80,26 +83,31 @@ namespace MoSync
              */
             protected String mPlaceholderText;
 
+            protected bool mAllCaps;
+
             /**
              * Constructor
              */
-			public EditBox()
-			{
-				mEditBox = new System.Windows.Controls.TextBox();
-				View = mEditBox;
-				mInitialCapsWord = false;
-				mInitialCapsSentence = false;
+            public EditBox()
+            {
+                mEditBox = new System.Windows.Controls.TextBox();
+                View = mEditBox;
+                mInitialCapsWord = false;
+                mInitialCapsSentence = false;
                 mIsWatermarkMode = false;
                 mPlaceholderText = "";
+                mAllCaps = false;
 
                 mForegroundColor = mEditBox.Foreground;
+
 
                 /**
                   * GotFocuse event
                   * used for simulating the watermark/placeholder
                   */
                 mEditBox.GotFocus += new RoutedEventHandler(
-                    delegate (object from, RoutedEventArgs args) {
+                    delegate(object from, RoutedEventArgs args)
+                    {
                         // if watermark present and no user char has been entered
                         if (mIsWatermarkMode && mFirstChar)
                         {
@@ -147,24 +155,24 @@ namespace MoSync
                         }
                     }
                 ); // end of TextInputStart
-			}
+            }
 
 
             /**
              * Property for setting and getting the text that the edit box contains.
              */
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_TEXT)]
-			public String Text
-			{
-				set
-				{
-					mEditBox.Text = value;
-				}
-				get
-				{
-					return mEditBox.Text;
-				}
-			}
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_TEXT)]
+            public String Text
+            {
+                set
+                {
+                    mEditBox.Text = value;
+                }
+                get
+                {
+                    return mEditBox.Text;
+                }
+            }
 
 
             /**
@@ -173,11 +181,11 @@ namespace MoSync
             * Since the Watermark is not yet implemented we use the solution suggested by MS 
             * (http://msdn.microsoft.com/en-us/library/system.windows.controls.textbox(v=vs.95).aspx)
             */
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_PLACEHOLDER)]
-			public String Placeholder
-			{
-				set
-				{
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_PLACEHOLDER)]
+            public String Placeholder
+            {
+                set
+                {
                     mIsWatermarkMode = true;
 
                     // save the "normal" brush
@@ -189,8 +197,8 @@ namespace MoSync
                     mPlaceholderText = value;
 
                     mEditBox.Text = mPlaceholderText;
-				}
-			}
+                }
+            }
 
 
             /**
@@ -201,10 +209,10 @@ namespace MoSync
              * other than setting focus to another control that doesn't accept input, thus hiding the keyboard;
              **/
             [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_SHOW_KEYBOARD)]
-			public String ShowKeyboard
-			{
-				set
-				{
+            public String ShowKeyboard
+            {
+                set
+                {
                     if (value.Equals("true"))
                     {
                         mEditBox.Focus();
@@ -222,80 +230,15 @@ namespace MoSync
                         {
                         }
                     }
-				}
-			}
+                }
+            }
 
 
             /**
             * Property for setting the input mode for the edit box.
             * set: accepts a String containg the values "text" or "password"
+            * deprecated, use MAW_EDIT_BOX_INPUT_FLAG instead
             */
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_EDIT_MODE)]
-			public String EditMode
-			{
-				set
-				{
-					if (value != "password" && value != "text")
-						return;
-
-					System.Windows.Input.InputScope keyboard = new System.Windows.Input.InputScope();
-					System.Windows.Input.InputScopeName scopeName = new System.Windows.Input.InputScopeName();
-					if (value == "password")
-					{
-						scopeName.NameValue = System.Windows.Input.InputScopeNameValue.Password;
-					}
-					else if (value == "text")
-					{
-						scopeName.NameValue = System.Windows.Input.InputScopeNameValue.Text;
-					}
-					keyboard.Names.Add(scopeName);
-					mEditBox.InputScope = keyboard;
-				}
-			}
-
-
-            /**
-             * Property for setting the input mode for the edit box.
-             * The values have to be the constants defined in IX_WIDGET.h (WidgetEditBoxConstants)  MAW_EDIT_BOX_TYPE_ANY,
-             * MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_PHONENUMBER ect.
-             */
-			[MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_INPUT_MODE)]
-			public String InputMode
-			{
-				set
-				{
-					int inputType = 0;
-					if (!int.TryParse(value, out inputType))
-					{
-						return;
-					}
-					switch (inputType)
-					{
-                        case 0:			    //todo: check if Default this is equivalent option to MAW_EDIT_BOX_TYPE_ANY
-							setInputMode(System.Windows.Input.InputScopeNameValue.Default);
-							break;
-						case 1:             //MAW_EDIT_BOX_TYPE_EMAILADDR
-							setInputMode(System.Windows.Input.InputScopeNameValue.EmailSmtpAddress);
-							break;
-						case 2:             //MAW_EDIT_BOX_TYPE_NUMERIC integer value
-							setInputMode(System.Windows.Input.InputScopeNameValue.Number);
-							break;
-						case 3:             //MAW_EDIT_BOX_TYPE_PHONENUMBER
-							setInputMode(System.Windows.Input.InputScopeNameValue.TelephoneNumber);
-							break;
-						case 4:             //MAW_EDIT_BOX_TYPE_URL
-							setInputMode(System.Windows.Input.InputScopeNameValue.Url);
-							break;
-                        case 5:             //MAW_EDIT_BOX_TYPE_DECIMAL real number
-							setInputMode(System.Windows.Input.InputScopeNameValue.Digits);
-							break;
-						case 6:             //MAW_EDIT_BOX_TYPE_SINGLE_LINE any text except for line breaks
-							mEditBox.TextWrapping = TextWrapping.NoWrap;
-							break;
-					}
-				}
-			}
-
             [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_EDIT_MODE)]
             public String EditMode
             {
@@ -319,6 +262,92 @@ namespace MoSync
                 }
             }
 
+
+            /**
+             * Property for setting the input mode for the edit box.
+             * The values have to be the constants defined in IX_WIDGET.h (WidgetEditBoxConstants)  MAW_EDIT_BOX_TYPE_ANY,
+             * MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_PHONENUMBER ect.
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_INPUT_MODE)]
+            public String InputMode
+            {
+                set
+                {
+                    int inputType = 0;
+                    if (!int.TryParse(value, out inputType))
+                    {
+                        return;
+                    }
+
+
+                    switch (inputType)
+                    {
+                        case 0:			    //todo: check if Default this is equivalent option to MAW_EDIT_BOX_TYPE_ANY
+                            setInputMode(System.Windows.Input.InputScopeNameValue.Default);
+                            break;
+                        case 1:             //MAW_EDIT_BOX_TYPE_EMAILADDR
+                            setInputMode(System.Windows.Input.InputScopeNameValue.EmailSmtpAddress);
+                            break;
+                        case 2:             //MAW_EDIT_BOX_TYPE_NUMERIC integer value
+                            setInputMode(System.Windows.Input.InputScopeNameValue.Number);
+                            break;
+                        case 3:             //MAW_EDIT_BOX_TYPE_PHONENUMBER
+                            setInputMode(System.Windows.Input.InputScopeNameValue.TelephoneNumber);
+                            break;
+                        case 4:             //MAW_EDIT_BOX_TYPE_URL
+                            setInputMode(System.Windows.Input.InputScopeNameValue.Url);
+                            break;
+                        case 5:             //MAW_EDIT_BOX_TYPE_DECIMAL real number
+                            setInputMode(System.Windows.Input.InputScopeNameValue.Digits);
+                            break;
+                        case 6:             //MAW_EDIT_BOX_TYPE_SINGLE_LINE any text except for line breaks
+                            mEditBox.TextWrapping = TextWrapping.NoWrap;
+                            break;
+                    }
+                }
+            }
+
+            /**
+             * Implementation of the InputFlag property
+             * Sets the editing flags applied to the edit box.             *
+             * valid values: MAW_EDIT_BOX_FLAG_PASSWORD,
+             * MAW_EDIT_BOX_FLAG_SENSITIVE, MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS,
+             * MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD, MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_INPUT_FLAG)]
+            public String InputFlag
+            {
+                set
+                {
+                    int inputFlag = 0;
+
+                    if (!int.TryParse(value, out inputFlag))
+                    {
+                        return;
+                    }
+
+                    switch (inputFlag)
+                    {
+                        case 0:			    //MAW_EDIT_BOX_FLAG_PASSWORD
+                            setInputMode(System.Windows.Input.InputScopeNameValue.Password);
+                            break;
+                        case 1:             //MAW_EDIT_BOX_FLAG_SENSITIVE
+                            setInputMode(System.Windows.Input.InputScopeNameValue.Default);
+                            break;
+                        case 2:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD 
+                            setInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
+                            break;
+                        case 3:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE
+                            setInputMode(System.Windows.Input.InputScopeNameValue.PhraseList);
+                            break;
+                        case 4:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS
+                            setInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
+                            break;
+                    }
+                }
+            }
+
+
             /**
              * Helper function that sets the input mode of the edit box
              * @param scopeValue: indicates the type of input that is expected from the user.
@@ -334,6 +363,6 @@ namespace MoSync
                 mEditBox.InputScope = keyboard;
             }
 
-		} // class EditBox
-	} // namespace NativeUI
+        } // class EditBox
+    } // namespace NativeUI
 } // namespace MoSync
