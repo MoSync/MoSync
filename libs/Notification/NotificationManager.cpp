@@ -98,67 +98,11 @@ namespace Notification
     {
         if (EVENT_TYPE_LOCAL_NOTIFICATION == event.type)
         {
-            // Check if the local notification exists in the map.
-            if (mLocalNotificationMap.end() != mLocalNotificationMap.find(
-                event.localNotificationHandle))
-            {
-                // Get the local notification object that wraps the handle.
-                LocalNotification* localNotification =
-                    mLocalNotificationMap[event.localNotificationHandle];
-
-                // Notify listeners.
-                for (int i = 0; i < mLocalNotificationListeners.size(); i++)
-                {
-                    LocalNotificationListener* listener =
-                        mLocalNotificationListeners[i];
-                    listener->didReceiveLocalNotification(*localNotification);
-                }
-            }
+            this->receivedLocalNotification(event);
         }
         else if (EVENT_TYPE_PUSH_NOTIFICATION == event.type)
         {
-            MAHandle pushNotificationHandle = event.pushNotificationHandle;
-
-            // Get push notification data
-            MAPushNotificationData data;
-            char messageAlert[BUFFER_SIZE];
-            char sound[BUFFER_SIZE];
-            data.alertMessage = messageAlert;
-            data.alertMessageSize = BUFFER_SIZE;
-            data.soundFileName = sound;
-            data.soundFileNameSize = BUFFER_SIZE;
-            int result = maNotificationPushGetData(pushNotificationHandle, &data);
-            if (MA_NOTIFICATION_RES_OK != result)
-            {
-                printf("NotificationManager::customEvent error = %d", result);
-                return;
-            }
-
-            // Create the push notification object.
-            PushNotification* pushNotificationObj = new PushNotification();
-            if (data.type & MA_NOTIFICATION_PUSH_TYPE_ALERT)
-            {
-                pushNotificationObj->setMessage(data.alertMessage);
-            }
-            if (data.type & MA_NOTIFICATION_PUSH_TYPE_SOUND)
-            {
-                pushNotificationObj->setSoundFileName(sound);
-            }
-            if (data.type & MA_NOTIFICATION_PUSH_TYPE_BADGE)
-            {
-                pushNotificationObj->setIconBadge(data.badgeIcon);
-            }
-
-            // Notify listeners.
-            for (int i = 0; i < mPushNotificationListeners.size(); i++)
-            {
-                PushNotificationListener* listener =
-                    mPushNotificationListeners[i];
-                listener->didReceivePushNotification(*pushNotificationObj);
-            }
-
-            delete pushNotificationObj;
-            maNotificationPushDestroy(pushNotificationHandle);
+            this->receivedPushNotification(event);
         }
         else if (EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION == event.type)
         {
@@ -423,4 +367,83 @@ namespace Notification
             return "";
         }
     }
+
+    /**
+     * Notifies listeners that a new local notification event has been
+     * received.
+     * @param event The new received event.
+     */
+    void NotificationManager::receivedLocalNotification(const MAEvent& event)
+    {
+        if (EVENT_TYPE_LOCAL_NOTIFICATION == event.type)
+        {
+			// Check if the local notification exists in the map.
+			if (mLocalNotificationMap.end()
+					!= mLocalNotificationMap.find(event.localNotificationHandle))
+			{
+				// Get the local notification object that wraps the handle.
+				LocalNotification* localNotification =
+					mLocalNotificationMap[event.localNotificationHandle];
+
+				// Notify listeners.
+				for (int i = 0; i < mLocalNotificationListeners.size(); i++) {
+					LocalNotificationListener* listener =
+							mLocalNotificationListeners[i];
+					listener->didReceiveLocalNotification(*localNotification);
+				}
+			}
+        }
+    }
+
+    /**
+     * Notifies listeners that a new push notification event has been
+     * received.
+     * @param event The new received event.
+     */
+    void NotificationManager::receivedPushNotification(const MAEvent& event)
+    {
+        MAHandle pushNotificationHandle = event.pushNotificationHandle;
+
+        // Get push notification data
+        MAPushNotificationData data;
+        char messageAlert[BUFFER_SIZE];
+        char sound[BUFFER_SIZE];
+        data.alertMessage = messageAlert;
+        data.alertMessageSize = BUFFER_SIZE;
+        data.soundFileName = sound;
+        data.soundFileNameSize = BUFFER_SIZE;
+        int result = maNotificationPushGetData(pushNotificationHandle, &data);
+        if (MA_NOTIFICATION_RES_OK != result)
+        {
+            printf("NotificationManager::customEvent error = %d", result);
+            return;
+        }
+
+        // Create the push notification object.
+        PushNotification* pushNotificationObj = new PushNotification();
+        if (data.type & MA_NOTIFICATION_PUSH_TYPE_ALERT)
+        {
+            pushNotificationObj->setMessage(data.alertMessage);
+        }
+        if (data.type & MA_NOTIFICATION_PUSH_TYPE_SOUND)
+        {
+            pushNotificationObj->setSoundFileName(data.soundFileName);
+        }
+        if (data.type & MA_NOTIFICATION_PUSH_TYPE_BADGE)
+        {
+            pushNotificationObj->setIconBadge(data.badgeIcon);
+        }
+
+        // Notify listeners.
+        for (int i = 0; i < mPushNotificationListeners.size(); i++)
+        {
+            PushNotificationListener* listener =
+                mPushNotificationListeners[i];
+            listener->didReceivePushNotification(*pushNotificationObj);
+        }
+
+        delete pushNotificationObj;
+        maNotificationPushDestroy(pushNotificationHandle);
+    }
+
 } // namespace Notification
