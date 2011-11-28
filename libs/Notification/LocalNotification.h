@@ -329,10 +329,13 @@ namespace Notification
          * every device supports the same  colors, so the hardware estimates to the
          * best of its ability. Green is the most common notification color.
          * Platform: Android.
-         * @param flahsing If set to true the user will be alerted by the default
+         * @param flashing If set to true the user will be alerted by the default
          * light pattern.
+         * @return One of the following result codes:
+         *  -  MA_NOTIFICATION_RES_ERROR if the current device doesn't support flashing LED.
+         *  -  MA_NOTIFICATION_RES_OK.
          */
-        virtual void setFlashLights(bool flashing);
+        virtual bool setFlashLights(bool flashing);
 
         /**
          * Define your own color and pattern for the lights.

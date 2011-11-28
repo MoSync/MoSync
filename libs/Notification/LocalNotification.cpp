@@ -427,10 +427,13 @@ namespace Notification
      * every device supports the same  colors, so the hardware estimates to the
      * best of its ability. Green is the most common notification color.
      * Platform: Android.
-     * @param flahsing If set to true the user will be alerted by the default
+     * @param flashing If set to true the user will be alerted by the default
      * light pattern.
+     * @return One of the following result codes:
+     *  -  MA_NOTIFICATION_RES_ERROR if the current device doesn't support flashing LED.
+     *  -  MA_NOTIFICATION_RES_OK.
      */
-    void LocalNotification::setFlashLights(bool flashing)
+    bool LocalNotification::setFlashLights(bool flashing)
     {
         MAUtil::String value;
         if (flashing)
@@ -441,7 +444,7 @@ namespace Notification
         {
             value = "false";
         }
-        this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, value);
+        return this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, value);
     }
 
     /**
