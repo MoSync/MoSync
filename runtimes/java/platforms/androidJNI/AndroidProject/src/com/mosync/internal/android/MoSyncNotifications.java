@@ -2,6 +2,7 @@ package com.mosync.internal.android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 
@@ -23,15 +24,18 @@ class MoSyncNotifications
 	 */
 	public MoSyncNotifications(MoSyncThread thread)
 	{
-		Log.e("emma","In MosyncNotifications");
+//		Log.e("@@MoSync","MosyncNotifications constructor");
+
 		mMoSyncThread = thread;
-		mLocalNotificationsManager = new LocalNotificationsManager();
+		mLocalNotificationsManager = new LocalNotificationsManager(thread);
 		// C2DM supports only devices with Android 2.2 and higher.
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
 		{
+			Log.e("Emma", "froyo");
 			mPushNotificationManager = new PushNotificationsManager(thread, getActivity());
 		}
-		mLocalNotificationsManager.mMoSyncThread = thread;
+		else
+			Log.e("emma","below");
 	}
 
 	/**
@@ -43,6 +47,33 @@ class MoSyncNotifications
 	}
 
 	/**
+	 * Check if Push permissions are set, and if not call maPanic().
+	 */
+	boolean isPushPermissionsSet()
+	{
+		return
+			(PackageManager.PERMISSION_GRANTED ==
+				getActivity().checkCallingOrSelfPermission(
+						"com.mosync.java.android.permission.C2D_MESSAGE"))
+			&&
+			(PackageManager.PERMISSION_GRANTED ==
+				getActivity().checkCallingOrSelfPermission(
+						"com.google.android.c2dm.permission.RECEIVE"));
+	}
+
+	/**
+	 * Check if Push permissions are set, and if not call maPanic().
+	 */
+	void panicIfPushPermissionsAreNotSet()
+	{
+		if (!isPushPermissionsSet())
+		{
+			mMoSyncThread.maPanic(1,
+				"Push Notifications permission is not set in the MoSync project");
+		}
+	}
+
+	/**
 	 * Notifications related methods
 	 */
 	int maNotificationLocalCreate(Context appContext)
@@ -50,9 +81,9 @@ class MoSyncNotifications
 		return mLocalNotificationsManager.create(appContext);
 	}
 
-	int maNotificationLocalDestroy(int handle, Activity activity)
+	int maNotificationLocalDestroy(int handle)
 	{
-		return mLocalNotificationsManager.destroy(handle, activity);
+		return mLocalNotificationsManager.destroy(handle);
 	}
 
 	int maNotificationLocalSetProperty(
@@ -84,11 +115,13 @@ class MoSyncNotifications
 
 	int maNotificationPushRegister(String accountID)
 	{
+		panicIfPushPermissionsAreNotSet();
 		return mPushNotificationManager.register(accountID);
 	}
 
 	int maNotificationPushGetRegistration(int buf, int bufSize)
 	{
+		panicIfPushPermissionsAreNotSet();
 		if ( mPushNotificationManager != null)
 		{
 			return mPushNotificationManager.getRegistrationData(buf, bufSize);
@@ -102,6 +135,7 @@ class MoSyncNotifications
 
 	int maNotificationPushUnregister()
 	{
+		panicIfPushPermissionsAreNotSet();
 		if ( mPushNotificationManager != null)
 		{
 			return mPushNotificationManager.unregister();
@@ -116,6 +150,7 @@ class MoSyncNotifications
 	int maNotificationPushGetData(int pushNotificationHandle,
 			int allertMessage, int allertMessageSize)
 	{
+		panicIfPushPermissionsAreNotSet();
 		if ( mPushNotificationManager != null )
 		{
 			return mPushNotificationManager.getPushData(pushNotificationHandle, allertMessage, allertMessageSize);
@@ -129,6 +164,7 @@ class MoSyncNotifications
 
 	int maNotificationPushDestroy(int pushNotificationHandle)
 	{
+		panicIfPushPermissionsAreNotSet();
 		if ( mPushNotificationManager != null )
 		{
 			return mPushNotificationManager.destroyNotification(pushNotificationHandle);
@@ -142,6 +178,7 @@ class MoSyncNotifications
 
 	int maNotificationPushSetTickerText(String text)
 	{
+		panicIfPushPermissionsAreNotSet();
 		if ( mPushNotificationManager != null )
 		{
 			mPushNotificationManager.setTickerText(text);
@@ -156,6 +193,7 @@ class MoSyncNotifications
 
 	int maNotificationPushSetMessageTitle(String title)
 	{
+		panicIfPushPermissionsAreNotSet();
 		if ( mPushNotificationManager != null )
 		{
 			mPushNotificationManager.setMessageTitle(title);

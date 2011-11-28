@@ -31,7 +31,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 import com.mosync.java.android.MoSync;
-import com.mosync.nativeui.util.HandleTable;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
@@ -49,30 +48,13 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERR
 public class LocalNotificationsService extends Service
 {
 	/**
-	 * Create an empty notification object.
-	 * Set it's properties via maNotificationSetProperty calls.
-	 * @param appContext application's context.
-	 * @return notification's unique Id.
-	 */
-	public int createNotification(Context appContext)
-	{
-		int icon = getResources().getIdentifier(
-					"icon",
-					"drawable",
-					getPackageName());
-		LocalNotificationObject notification = new LocalNotificationObject(icon);
-		notification.setId( m_NotificationTable.add(notification) );
-		return notification.getId();
-	}
-
-	/**
 	 * Call this method to start the service and display a notification icon.
 	 * @param context Application's context.
-	 * @param notificationHandle The local notification handle.
+	 * @param notification The local notification object.
 	 */
-	public void startService(
+	public static void startService(
 		Context context,
-		int notificationHandle)
+		LocalNotificationObject notification)
 	{
 		Log.i("@@@MoSync", "NotificationsService.startService");
 
@@ -82,13 +64,14 @@ public class LocalNotificationsService extends Service
 //			Log.i("@@@MoSync", "NotificationsService.startService - service is already running, returning");
 //			return;
 //		}
-		// TODO test service running in parallel
-		mLatestNotification = m_NotificationTable.get(notificationHandle);//.getId();
 
-		Intent serviceIntent = new Intent(context, LocalNotificationsService.class);
+		mLatestNotification = notification;
+
+		Intent serviceIntent = new Intent(context, com.mosync.internal.android.notifications.LocalNotificationsService.class);
 		// Here we set a flag to signal that the service was started
 		// from the MoSync application.
 		serviceIntent.putExtra("StartedByTheMoSyncApplication", true);
+		serviceIntent.setAction(Integer.toString(notification.getId()));
 		context.startService(serviceIntent);
 	}
 
@@ -96,28 +79,28 @@ public class LocalNotificationsService extends Service
 	 * Called by the Android runtime to stop the service.
 	 * @return MA_NOTIFICATION_RES_OK or MA_NOTIFICATION_RES_ERROR.
 	 */
-	public int stopService()
+	public static int stopService()
 	{
-		Log.i("@@@MoSync", "MoSyncService.stopService");
+		Log.i("@@@MoSync", "LocalNotificationsService.stopService");
 
 		if (null != sMe)
 		{
-			Log.i("@@@MoSync", "MoSyncService.stopService - stopSelf");
+			Log.i("@@@MoSync", "LocalNotificationsService.stopService - stopSelf");
+			// Cancel the pending notifications.
 			sMe.stopSelf();
 			sMe = null;
 			return MA_NOTIFICATION_RES_OK;
 		}
+		Log.e("@@@MoSync", "LocalNotificationsService is not started");
 		return MA_NOTIFICATION_RES_ERROR;
 	}
 
 	/**
 	 * Called by the Android runtime to remove the notification icon.
 	 * @param notificationId Notification's unique Id.
-	 * @param activity
 	 */
 	public static void removeServiceNotification(
-		int notificationId,
-		Activity activity)
+		int notificationId, Context context)
 	{
 		// We use a wrapper class to be backwards compatible.
 		// Loading the wrapper class will throw an error on
@@ -135,7 +118,7 @@ public class LocalNotificationsService extends Service
 			// We are below API level 5, and need to remove the
 			// notification manually.
 			NotificationManager mNotificationManager = (NotificationManager)
-				activity.getSystemService(Context.NOTIFICATION_SERVICE);
+				context.getSystemService(Context.NOTIFICATION_SERVICE);
 			mNotificationManager.cancel(notificationId);
 		}
 	}
@@ -186,6 +169,16 @@ public class LocalNotificationsService extends Service
 	    return START_NOT_STICKY;
 	}
 
+	@Override
+	public void onDestroy()
+	{
+		super.onDestroy();
+
+		Log.i("@@@MoSync", "LocalNotificationsService.onDestroy");
+
+		stopService();
+	}
+
 	/**
 	 * Start the service.
 	 * @param intent Could be null.
@@ -195,8 +188,8 @@ public class LocalNotificationsService extends Service
 		// Stop the service if there is no intent.
 		if (null == intent)
 		{
-			Log.i("@@@MoSync", "NotificationsService.startMe: "
-				+ "stopping service because intent is null");
+//			Log.i("@@@MoSync", "NotificationsService.startMe: "
+//				+ "stopping service because intent is null");
 			stopSelf();
 			return;
 		}
@@ -206,8 +199,8 @@ public class LocalNotificationsService extends Service
 			intent.getBooleanExtra("StartedByTheMoSyncApplication", false);
 		if (!startFlag)
 		{
-			Log.i("@@@MoSync", "NotificationsService.startMe: "
-				+ "stopping service because startFlag is false");
+//			Log.i("@@@MoSync", "NotificationsService.startMe: "
+//				+ "stopping service because startFlag is false");
 			stopSelf();
 			return;
 		}
@@ -215,11 +208,12 @@ public class LocalNotificationsService extends Service
 		// sMe must be set.
 		if (null == sMe)
 		{
-			Log.i("@@@MoSync", "NotificationsService.startMe: "
-				+ "stopping service because sMe is null");
+//			Log.i("@@@MoSync", "NotificationsService.startMe: "
+//				+ "stopping service because sMe is null");
 			stopSelf();
 			return;
 		}
+//		intent.getAction(); get the ID
 
 		scheduleNotification();
 	}
@@ -229,7 +223,7 @@ public class LocalNotificationsService extends Service
 	 */
 	private void scheduleNotification()
 	{
-		Log.e("@@MoSync","scheduleNotification");
+//		Log.e("@@MoSync","scheduleNotification");
 
 		// If the fire date is not set, trigger it now.
 		if ( mLatestNotification.getFireDate() == -1 )
@@ -248,7 +242,6 @@ public class LocalNotificationsService extends Service
 		        }
 		    };
 
-//		    Date scheduledDate = new Date(mLatestNotification.getFireDate());
 	        long task = mLatestNotification.getFireDate() - System.currentTimeMillis();
 		    timer.schedule(timerTask, task);
 		}
@@ -259,7 +252,7 @@ public class LocalNotificationsService extends Service
 	 */
 	void triggerNotification()
 	{
-		Log.e("@@MoSync","triggerNotification");
+//		Log.e("@@MoSync","triggerNotification");
 
 		// The notification is already created, just trigger it.
 		mLatestNotification.trigger();
@@ -284,6 +277,9 @@ public class LocalNotificationsService extends Service
 			mLatestNotification.getText(),
 			contentIntent);
 
+		// Post a MoSync event.
+		LocalNotificationsManager.postEventNotificationReceived(mLatestNotification.getId());
+
 		// We use a wrapper class to be backwards compatible.
 		// Loading the wrapper class will throw an error on
 		// platforms that does not support it.
@@ -303,16 +299,6 @@ public class LocalNotificationsService extends Service
 		}
 	}
 
-	@Override
-	public void onDestroy()
-	{
-		super.onDestroy();
-
-		Log.i("@@@MoSync", "MoSyncService.onDestroy");
-
-		stopService();
-	}
-
 	/************************ Class members ************************/
 
 	/**
@@ -323,12 +309,7 @@ public class LocalNotificationsService extends Service
 	/**
 	 * The latest registered notification.
 	 */
-	private LocalNotificationObject mLatestNotification;
-
-	/**
-	 * A table that contains a mapping between a handle and a notification.
-	 */
-	private HandleTable<LocalNotificationObject> m_NotificationTable = new HandleTable<LocalNotificationObject>();
+	private static LocalNotificationObject mLatestNotification;
 }
 
 /**

@@ -395,11 +395,11 @@ namespace Notification
      * This setting is ignored if setVibrate is disabled.
      * Using phone vibration requires the VIBRATE permission.
      * Platform: Android.
-     * @param duration The number of milliseconds to vibrate.
+     * @param duration The number of seconds to vibrate.
      */
     void LocalNotification::setVibrateDuration(const int duration)
     {
-		this->setPropertyInt(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, duration);
+		this->setPropertyInt(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, duration * 1000);
     }
 
     /**
@@ -432,8 +432,8 @@ namespace Notification
     {
 		MAUtil::String pattern = "";
 		pattern = MAUtil::integerToString(lightPattern.ledARGB) + ",";
-		pattern += MAUtil::integerToString(lightPattern.ledOnMS) + ",";
-		pattern += MAUtil::integerToString(lightPattern.ledOffMS);
+		pattern += MAUtil::integerToString(lightPattern.ledOnMS * 1000) + ",";
+		pattern += MAUtil::integerToString(lightPattern.ledOffMS * 1000);
         this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, pattern);
     }
 
@@ -444,8 +444,8 @@ namespace Notification
      */
     void LocalNotification::setFireDate(struct tm* time)
     {
-        int dateMillisec = mktime(time);
-        this->setPropertyInt(MA_NOTIFICATION_LOCAL_FIRE_DATE, dateMillisec);
+        int dateSec = mktime(time);
+        this->setPropertyInt(MA_NOTIFICATION_LOCAL_FIRE_DATE, dateSec);
     }
 
     /**
