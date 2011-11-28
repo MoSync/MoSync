@@ -9302,7 +9302,7 @@ group NotificationAPI "Notification API" {
 			* - a value for the ledARGB field (for the color),
 			* - the ledOffMS field (length of time, in milliseconds, to keep the light off),
 			* - the ledOnMS (length of time, in milliseconds, to keep the light on).
-			*
+			*  returns MA_NOTIFICATION_ERROR if the current device doesn't support flashing LED.
 			* @setonly
 			*
 			* @par Example

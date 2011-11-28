@@ -14,7 +14,7 @@
 # Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 # 02111-1307, USA.
 
-APP_BUILD_SCRIPT	:= $(MOSYNC_CPP_SRC)/Android.mk
+APP_BUILD_SCRIPT	:= $(MOSYNC_CPP_SRC)/Android_2.mk
 APP_PROJECT_PATH	:= $(MOSYNC_JAVA_SRC)/AndroidProject
 APP_MODULES			:= mosync
 
