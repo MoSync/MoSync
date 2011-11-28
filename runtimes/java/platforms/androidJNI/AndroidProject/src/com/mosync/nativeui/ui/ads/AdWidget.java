@@ -63,6 +63,7 @@ public class AdWidget extends Widget implements AdListener
 		mThread = mosyncThread;
 		// Create an ad request.
 		mAdRequest = new AdRequest();
+		view.setAdListener(this);
 	}
 
 	/**
