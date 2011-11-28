@@ -235,35 +235,6 @@ namespace MoSync
 
 
             /**
-            * Property for setting the input mode for the edit box.
-            * set: accepts a String containg the values "text" or "password"
-            * deprecated, use MAW_EDIT_BOX_INPUT_FLAG instead
-            */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_EDIT_MODE)]
-            public String EditMode
-            {
-                set
-                {
-                    if (value != "password" && value != "text")
-                        return;
-
-                    System.Windows.Input.InputScope keyboard = new System.Windows.Input.InputScope();
-                    System.Windows.Input.InputScopeName scopeName = new System.Windows.Input.InputScopeName();
-                    if (value == "password")
-                    {
-                        scopeName.NameValue = System.Windows.Input.InputScopeNameValue.Password;
-                    }
-                    else if (value == "text")
-                    {
-                        scopeName.NameValue = System.Windows.Input.InputScopeNameValue.Text;
-                    }
-                    keyboard.Names.Add(scopeName);
-                    mEditBox.InputScope = keyboard;
-                }
-            }
-
-
-            /**
              * Property for setting the input mode for the edit box.
              * The values have to be the constants defined in IX_WIDGET.h (WidgetEditBoxConstants)  MAW_EDIT_BOX_TYPE_ANY,
              * MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_EMAILADDR, MAW_EDIT_BOX_TYPE_PHONENUMBER ect.
@@ -346,6 +317,31 @@ namespace MoSync
                     }
                 }
             }
+
+            /**
+            * @brief Sent from the Edit box when it gains focus(the user selects the widget).
+            * The virtual keyboard is shown.
+            * Only for iphone platform. EDIT_BOX_EDITING_DID_BEGIN = 16;
+            */
+
+            /**
+             * @brief Sent from the Edit box when it loses focus.
+             * The virtual keyboard is hidden.
+             * Only for iphone platform. EDIT_BOX_EDITING_DID_END = 17;
+             */
+
+            /**
+             * @brief Sent from the Edit box when the text was changed.
+             * EDIT_BOX_TEXT_CHANGED = 18;
+             */
+
+
+            /**
+             * @brief Sent from the Edit box when the return button was pressed.
+             * On iphone platform the virtual keyboard is not closed after receiving this event.
+             * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
+             * EDIT_BOX_RETURN = 19;
+             */
 
 
             /**
