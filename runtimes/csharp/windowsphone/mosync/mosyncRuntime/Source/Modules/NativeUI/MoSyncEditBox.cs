@@ -102,29 +102,47 @@ namespace MoSync
 
 
                 /**
-                  * GotFocuse event
-                  * used for simulating the watermark/placeholder
-                  */
+                 * @brief Sent from the Edit box when it gains focus(the user selects the widget).
+                 * The virtual keyboard is shown.
+                 *        MAW_EVENT_EDIT_BOX_EDITING_DID_BEGIN
+                 */
                 mEditBox.GotFocus += new RoutedEventHandler(
                     delegate(object from, RoutedEventArgs args)
                     {
+                        /**
+                          * simulating the placeholder/watermark
+                          */
                         // if watermark present and no user char has been entered
                         if (mIsWatermarkMode && mFirstChar)
                         {
                             // move the cursor to the first position
                             mEditBox.Select(0, 0);
                         }
+
+                        /**
+                         * post the event to MoSync runtime
+                         */
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_EDIT_BOX_EDITING_DID_BEGIN);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
                 ); // end of mEditBox.GotFocus
 
+
                 /**
-                  * LostFocus event
-                  * used for simulating the watermark/placeholder
+                  * @brief Sent from the Edit box when it loses focus.
+                  * The virtual keyboard is hidden.
+                  *        MAW_EVENT_EDIT_BOX_EDITING_DID_END
                   */
                 mEditBox.LostFocus += new RoutedEventHandler(
                     delegate(object from, RoutedEventArgs args)
                     {
-                        // if watermark present
+                        /**
+                         * simulating the placeholder/watermark
+                         */
                         if (mIsWatermarkMode)
                         {
                             // if no text has been entered by the user than leave the watermark text
@@ -134,17 +152,31 @@ namespace MoSync
                                 mFirstChar = true;
                             }
                         }
+
+                        /**
+                         * post the event to MoSync runtime
+                         */
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_EDIT_BOX_EDITING_DID_END);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
                 ); // end of mEditBox.LostFocus
 
+
                 /**
-                  * LostFocus event
-                  * used for simulating the watermark/placeholder
+                  * @brief Sent from the Edit box when the text was changed.
+                  *        MAW_EVENT_EDIT_BOX_TEXT_CHANGED
                   */
                 mFirstChar = true;
                 mEditBox.TextInputStart += new TextCompositionEventHandler(
                     delegate(object from, TextCompositionEventArgs args)
                     {
+                        /**
+                          * simulating the placeholder/watermark
+                          */
                         if (mFirstChar)
                         {
                             mFirstChar = false;
@@ -153,8 +185,25 @@ namespace MoSync
                             // change the foreground to "normal" for user input
                             mEditBox.Foreground = mForegroundColor;
                         }
+
+                        /**
+                         * post the event to MoSync runtime
+                         */
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_EDIT_BOX_TEXT_CHANGED);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
                 ); // end of TextInputStart
+
+                /**
+                 * @brief Sent from the Edit box when the return button was pressed.
+                 * On iphone platform the virtual keyboard is not closed after receiving this event.
+                 * EDIT_BOX_RETURN
+                 */
+                // Not available on Windows Phone 7.1
             }
 
 
@@ -230,35 +279,6 @@ namespace MoSync
                         {
                         }
                     }
-                }
-            }
-
-
-            /**
-            * Property for setting the input mode for the edit box.
-            * set: accepts a String containg the values "text" or "password"
-            * deprecated, use MAW_EDIT_BOX_INPUT_FLAG instead
-            */
-            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_EDIT_MODE)]
-            public String EditMode
-            {
-                set
-                {
-                    if (value != "password" && value != "text")
-                        return;
-
-                    System.Windows.Input.InputScope keyboard = new System.Windows.Input.InputScope();
-                    System.Windows.Input.InputScopeName scopeName = new System.Windows.Input.InputScopeName();
-                    if (value == "password")
-                    {
-                        scopeName.NameValue = System.Windows.Input.InputScopeNameValue.Password;
-                    }
-                    else if (value == "text")
-                    {
-                        scopeName.NameValue = System.Windows.Input.InputScopeNameValue.Text;
-                    }
-                    keyboard.Names.Add(scopeName);
-                    mEditBox.InputScope = keyboard;
                 }
             }
 

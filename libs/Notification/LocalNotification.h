@@ -100,7 +100,7 @@ namespace Notification
         /**
          * @return The handle of the local notification.
          */
-        virtual MAHandle getHandle() const;
+        MAHandle getHandle() const;
 
         /**
          * Set a local notification string property.
@@ -113,7 +113,7 @@ namespace Notification
          * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value
          * was invalid.
          */
-        virtual int setProperty(
+        int setProperty(
             const MAUtil::String& property,
             const MAUtil::String& value);
 
@@ -128,7 +128,7 @@ namespace Notification
          * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value
          *  was invalid.
          */
-        virtual int setPropertyInt(
+        int setPropertyInt(
             const MAUtil::String& property,
             const int value);
 
@@ -145,7 +145,7 @@ namespace Notification
          * too small.
          * @return The property value.
          */
-        virtual int getPropertyInt(
+        int getPropertyInt(
             const MAUtil::String& property,
             int& resultCode) const;
 
@@ -154,7 +154,7 @@ namespace Notification
          * @param property A string representing which property to get.
          * @return The property value.
          */
-        virtual int getPropertyInt(
+        int getPropertyInt(
             const MAUtil::String& property) const;
 
         /**
@@ -170,7 +170,7 @@ namespace Notification
          * too small.
          * @return The property value.
          */
-        virtual MAUtil::String getPropertyString(
+        MAUtil::String getPropertyString(
             const MAUtil::String& property,
             int& resultCode) const;
 
@@ -179,7 +179,7 @@ namespace Notification
          * @param property A string representing which property to get.
          * @return The property value.
          */
-        virtual MAUtil::String getPropertyString(
+        MAUtil::String getPropertyString(
             const MAUtil::String& property) const;
 
         /**
@@ -188,40 +188,40 @@ namespace Notification
          * @param badgeNumber The number that will be displayed on the
          * application's icon badge. Must be a positive value.
          */
-        virtual void setBadgeNumber(const int badgeNumber);
+        void setBadgeNumber(const int badgeNumber);
 
         /**
          * Get the number displayed on the application's icon badge.
          * Platform: iOS.
          * @return the number displayed on the application's icon badge.
          */
-        virtual int getBadgeNumber() const;
+        int getBadgeNumber() const;
 
         /**
          * Set the message displayed in the notification alert.
          * @param text The given text that will be displayed in notification.
          */
-        virtual void setContentBody(const MAUtil::String& text);
+        void setContentBody(const MAUtil::String& text);
 
         /**
          * Get the text displayed in the notification alert.
          * @return The text displayed in the notification alert.
          */
-        virtual MAUtil::String getContentBody() const;
+        MAUtil::String getContentBody() const;
 
         /**
          * Set the title that goes in the expanded entry of the notification.
          * Platform: Android.
          * @param text The given text that will be displayed in the notification.
          */
-        virtual void setContentTitle(const MAUtil::String text);
+        void setContentTitle(const MAUtil::String text);
 
         /**
          * Get the title that goes in the expanded entry of the notification.
          * Platform: Android.
          * @return The text displayed in the notification.
          */
-        virtual MAUtil::String getContentTitle() const;
+        MAUtil::String getContentTitle() const;
 
         /**
          * Set the text that flows by in the status bar when the
@@ -229,7 +229,7 @@ namespace Notification
          * Platform: Android.
          * @param text The text that flows by in the status bar.
          */
-        virtual void setTickerText(const MAUtil::String text);
+        void setTickerText(const MAUtil::String text);
 
         /**
          * Get the text that flows by in the status bar when the
@@ -237,7 +237,7 @@ namespace Notification
          * Platform: Android.
          * @return The ticker text.
          */
-        virtual MAUtil::String getTickerText() const;
+        MAUtil::String getTickerText() const;
 
         /**
          * Set the flags applied to the local notification.
@@ -248,35 +248,35 @@ namespace Notification
          *  - #NOTIFICATION_FLAG_HIGH_PRIORITY
          *  - #NOTIFICATION_FLAG_AUTO_CANCEL
          */
-        virtual void setFlag(const int flag);
+        void setFlag(const int flag);
 
         /**
          * Set the title of the action button or slider.
          * Platform: iOS.
          * @param alertAction The given title.
          */
-        virtual void setAlertAction(const MAUtil::String& alertAction);
+        void setAlertAction(const MAUtil::String& alertAction);
 
         /**
          * Get the title of the action button or slider.
          * Platform: iOS.
          * @return The title of the action button or slider.
          */
-        virtual MAUtil::String getAlertAction() const;
+        MAUtil::String getAlertAction() const;
 
         /**
          * Enable/disable the sound played when an alert is displayed.
          * @param playSound If true the notification will play a sound when
          * it's shown.
          */
-        virtual void setPlaySound(bool playSound);
+        void setPlaySound(bool playSound);
 
         /**
          * Check if the local notification is playing sound.
          * @return True if the local notification is playing sound when it's
          * shown, false otherwise.
          */
-        virtual bool isPlayingSound() const;
+        bool isPlayingSound() const;
 
         /**
          * Set the sound to play when an alert is displayed.
@@ -284,7 +284,7 @@ namespace Notification
          * Platform: Android.
          * @param path A valid path to an audio file.
          */
-        virtual void setSound(const MAUtil::String path);
+        void setSound(const MAUtil::String path);
 
         /**
          * Enable/disable the the default vibration when an alert is displayed.
@@ -296,7 +296,7 @@ namespace Notification
          * @param vibrate If true the user will be alerted with a vibration when
          * the local notification is shown.
          */
-        virtual void setVibrate(bool vibrate);
+        void setVibrate(bool vibrate);
 
         /**
          * Check if the local notification has vibrate enabled.
@@ -304,7 +304,7 @@ namespace Notification
          * @return True if the user will be alerted with a vibration,
          * false otherwise.
          */
-        virtual bool isVibrateEnabled() const;
+        bool isVibrateEnabled() const;
 
         /**
          * Set the vibration duration when an alert is displayed.
@@ -313,7 +313,7 @@ namespace Notification
          * Platform: Android.
          * @param duration The number of milliseconds to vibrate.
          */
-        virtual void setVibrateDuration(const int duration);
+        void setVibrateDuration(const int duration);
 
         /**
          * Enable/Disable the default notification LED lights.
@@ -325,7 +325,7 @@ namespace Notification
          * @param flahsing If set to true the user will be alerted by the default
          * light pattern.
          */
-        virtual void setFlashLights(bool flashing);
+        void setFlashLights(bool flashing);
 
         /**
          * Define your own color and pattern for the lights.
@@ -336,21 +336,21 @@ namespace Notification
          * Platform: Android.
          * @param lightPattern a NotificationFlashLights struct.
          */
-        virtual void setFlashLightsPattern(const NotificationFlashLights lightPattern);
+        void setFlashLightsPattern(const NotificationFlashLights lightPattern);
 
         /**
          * Set the date and time when the system should deliver the notification.
          * @param tm A date and time struct that specifies when the system
          * should deliver the notification.
          */
-        virtual void setFireDate(struct tm* time);
+        void setFireDate(struct tm* time);
 
         /**
          * Get the date and time when the system will deliver the notification.
          * @return A date and time struct that specifies when the system will
          * deliver the notification.
          */
-        virtual struct tm getFireDate() const;
+        struct tm getFireDate() const;
 
     private:
         /**

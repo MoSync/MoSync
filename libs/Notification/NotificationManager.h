@@ -143,23 +143,22 @@ namespace Notification
          * @param listener The listener that will receive
          * local notification events.
          */
-        virtual void addLocalNotificationListener(
+        void addLocalNotificationListener(
             LocalNotificationListener* listener);
 
         /**
          * Remove the event listener for local notifications.
          * @param listener The listener that receives local notification events.
          */
-        virtual void removeLocalNotificationListener(
+        void removeLocalNotificationListener(
             LocalNotificationListener* listener);
-
 
         /**
          * Schedules a local notification for delivery at its encapsulated
          * date and time.
          * @param localNotification Handle to a local notification object.
          */
-        virtual void scheduleLocalNotification(
+        void scheduleLocalNotification(
             LocalNotification* localNotification);
 
         /**
@@ -168,7 +167,7 @@ namespace Notification
          * if  it is currently displaying an alert.
          * @param localNotification Handle to a local notification object.
          */
-        virtual void unscheduleLocalNotification(
+        void unscheduleLocalNotification(
             LocalNotification* localNotification);
 
         /**
@@ -193,14 +192,14 @@ namespace Notification
          *  - MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already
          *    registered for receiving push notifications.
          */
-        virtual int registerPushNotification(
+        int registerPushNotification(
             const int types,
             const MAUtil::String& accountID);
 
         /**
          * Unregister application for push notifications.
          */
-        virtual void unregisterPushNotification();
+        void unregisterPushNotification();
 
         /**
          * Add listener for push notifications received by this application.
@@ -209,14 +208,14 @@ namespace Notification
          * Don't forget to register the application for receiving push
          * notifications by calling registerPushNotification function.
          */
-        virtual void addPushNotificationListener(
+        void addPushNotificationListener(
             PushNotificationListener* listener);
 
         /**
          * Remove listener for push notifications received by this application.
          * @param listener The listener that receives push notification events.
          */
-        virtual void removePushNotificationListener(
+        void removePushNotificationListener(
             PushNotificationListener* listener);
 
         /**
@@ -226,14 +225,14 @@ namespace Notification
          * the application icon.
          * If this value is negative this method will do nothing.
          */
-        virtual void setApplicationIconBadgeNumber(const int iconBadgeNumber);
+        void setApplicationIconBadgeNumber(const int iconBadgeNumber);
 
         /**
          * Get the number currently set as the badge of the application icon.
          * Platform: iOS only.
          * @return The number currently set as the badge of the application icon.
          */
-        virtual int getApplicationIconBadgeNumber();
+        int getApplicationIconBadgeNumber();
 
         /**
          * Set the  message title in the notification area for incoming push
@@ -243,7 +242,7 @@ namespace Notification
          * @param title The title that goes in the expanded entry of the
          * notification.
          */
-        virtual void setPushNotificationsTitle(const MAUtil::String& title);
+        void setPushNotificationsTitle(const MAUtil::String& title);
 
         /**
          * Set the ticker text in the notification status bar for incoming push
@@ -253,7 +252,7 @@ namespace Notification
          * @param ticker The text that flows by in the status bar when the
          * notification first activates.
          */
-        virtual void setPushNotificationsTickerText(const MAUtil::String& ticker);
+        void setPushNotificationsTickerText(const MAUtil::String& ticker);
 
         /**
          * Get the message title of the incoming notifications.
@@ -262,7 +261,7 @@ namespace Notification
          * Platform: Android only.
          * @return the title that goes in the expanded entry of the notification.
          */
-        virtual MAUtil::String getMessageTitle() const;
+        MAUtil::String getMessageTitle() const;
 
         /**
          * Get the ticker text in the notification status bar for the incoming
@@ -274,7 +273,7 @@ namespace Notification
          * @return The text that flows by in the status bar when the notification
          * first activates.
          */
-        virtual MAUtil::String getTickerText() const;
+        MAUtil::String getTickerText() const;
 
     protected:
         /**
@@ -283,11 +282,39 @@ namespace Notification
          */
         NotificationManager();
 
+        /**
+         * Notifies listeners that a new local notification event has been
+         * received.
+         * @param event The new received event.
+         */
+        void receivedLocalNotification(const MAEvent& event);
+
+        /**
+         * Notifies listeners that a new push notification event has been
+         * received.
+         * @param event The new received event.
+         */
+        void receivedPushNotification(const MAEvent& event);
+
     private:
         /**
          * The single instance of this class.
          */
         static NotificationManager* sInstance;
+
+        /**
+         * The title of the message for the incoming notifications.
+         * Platform: Android only.
+         */
+        MAUtil::String* mTitle;
+
+        /**
+         * The ticker text for the incoming notifications.
+         * The text that flows by in the status bar when the notification first
+         * activates.
+         * Platform: Android only.
+         */
+        MAUtil::String* mTickerText;
 
         /**
          * Dictionary of local notifications identified by handles.
@@ -303,20 +330,6 @@ namespace Notification
          * Array with push notification listeners.
          */
         MAUtil::Vector<PushNotificationListener*> mPushNotificationListeners;
-
-        /**
-         * The title of the message for the incoming notifications.
-         * Platform: Android only.
-         */
-        MAUtil::String* mTitle;
-
-        /**
-         * The ticker text for the incoming notifications.
-         * The text that flows by in the status bar when the notification first
-         * activates.
-         * Platform: Android only.
-         */
-        MAUtil::String* mTickerText;
     };
 
 } // namespace Notification
