@@ -1141,8 +1141,8 @@ namespace Base {
 
 		MFMessageComposeViewController *smsController = [[MFMessageComposeViewController alloc] init];
 
-		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst]];
-		smsController.body = [NSString stringWithCString:msg];
+		smsController.recipients = [NSArray arrayWithObject:[NSString stringWithCString:dst encoding:NSASCIIStringEncoding]];
+		smsController.body = [NSString stringWithCString:msg encoding:NSASCIIStringEncoding];
 
 		smsController.messageComposeDelegate = [[SMSResultDelegate alloc] init];
 

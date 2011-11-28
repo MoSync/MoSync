@@ -34,7 +34,7 @@ MAUtil::String getLocalPath()
 int getColumnString(MAHandle cursor, int column, char* buf, int maxSize)
 {
 	int size = maDBCursorGetColumnText(cursor, column, buf, maxSize);
-	if (size < maxSize)
+	if (size >= 0 && size < maxSize)
 	{
 		buf[size] = 0;
 	}
@@ -180,8 +180,6 @@ void testThingsThatShouldFail()
 
 	printf("Test 2 started\n");
 
-	maSyscallPanicsDisable();
-
 	// Open/create the database.
 	MAUtil::String path = getLocalPath();
 	path += "MikiDB";
@@ -194,9 +192,11 @@ void testThingsThatShouldFail()
 	result = maDBExecSQL(db, "DROP TABLE foo");
 	SHOULD_HOLD(MA_DB_ERROR == result, "Negative 1 failed");
 
+	maSyscallPanicsDisable();
 	// Should always fail.
 	result = maDBExecSQL(9999, "DROP TABLE foo");
 	SHOULD_HOLD(MA_DB_ERROR == result, "Negative 2 failed");
+	maSyscallPanicsEnable();
 
 	result = maDBExecSQL(db, "klasj xasdjkas awjlkasd");
 	SHOULD_HOLD(MA_DB_ERROR == result, "Negative 3 failed");
@@ -204,15 +204,121 @@ void testThingsThatShouldFail()
 	result = maDBClose(db);
 	SHOULD_HOLD(MA_DB_OK == result, "maDBClose failed");
 
+	maSyscallPanicsDisable();
 	result = maDBCursorDestroy(8888);
 	SHOULD_HOLD(MA_DB_ERROR == result, "Negative 4 failed");
+	maSyscallPanicsEnable();
 
 	// TODO: Add negative query tests.
 
-	maSyscallPanicsEnable();
-
 	printf("Test 2 passed successfully\n");
 }
+
+static void testParameters()
+{
+	int result;
+
+	printf("Test 3 started\n");
+
+	// Open/create the database.
+	MAUtil::String path = getLocalPath();
+	path += "MikiDB";
+	printf("Database path: %s\n", path.c_str());
+	MAHandle db = maDBOpen(path.c_str());
+	SHOULD_HOLD(db > 0, "maDBOpen failed");
+
+	// Create a new table, first drop the table if it exists.
+	result = maDBExecSQL(db, "DROP TABLE IF EXISTS para");
+	SHOULD_HOLD(MA_DB_OK == result, "DROP TABLE IF EXISTS failed");
+
+	// Create table.
+	result = maDBExecSQL(db,
+		"CREATE TABLE para (text TEXT(50), int INTEGER, double REAL, i64 INTEGER, blob BLOB, handle BLOB, temp)");
+	SHOULD_HOLD(MA_DB_OK == result, "CREATE TABLE failed");
+
+	// Insert value.
+	MADBValue params[7];
+	printf("sizeof(MA_DB_VALUE): %li\n", sizeof(MADBValue));
+	params[0].type = MA_DB_TYPE_TEXT;
+	params[0].text.addr = (char*)"some text";
+	params[0].text.length = 9;
+	params[1].type = MA_DB_TYPE_INT;
+	params[1].i = 42;
+	params[2].type = MA_DB_TYPE_DOUBLE;
+	params[2].d = 3.14;
+	params[3].type = MA_DB_TYPE_INT64;
+	params[3].d = 1LL << 40;
+	params[4].type = MA_DB_TYPE_BLOB;
+	params[4].blob.data = (void*)"blob data";
+	params[4].blob.size = 8;
+	params[5].type = MA_DB_TYPE_DATA;
+	params[5].dataHandle = maCreatePlaceholder();
+	maCreateData(params[5].dataHandle, 12);
+	maWriteData(params[5].dataHandle, "more blob data", 0, 12);
+	params[6].type = MA_DB_TYPE_NULL;
+	result = maDBExecSQLParams(db, "INSERT INTO para VALUES (?, ?, ?, ?, ?, ?, ?)", params, 7);
+	SHOULD_HOLD(MA_DB_OK == result, "INSERT failed");
+
+	// Count all rows.
+	MAHandle cursorx = maDBExecSQL(db, "SELECT COUNT(*) FROM (SELECT * FROM para)");
+	maDBCursorNext(cursorx);
+	int numberOfRows;
+	maDBCursorGetColumnInt(cursorx, 0, &numberOfRows);
+	printf("Number of rows: %i\n", numberOfRows);
+	SHOULD_HOLD(1 == numberOfRows, "Wrong number of rows");
+    maDBCursorDestroy(cursorx);
+
+	// Query all rows.
+	MAHandle cursor = maDBExecSQL(db, "SELECT * FROM para");
+
+	// Test and print data in all rows.
+	result == maDBCursorNext(cursor);
+	SHOULD_HOLD(MA_DB_OK == result, "maDBCursorNext failed");
+	{
+		// Get and print data.
+		char buf[50];
+		int i;
+		//longlong i64;
+		double d;
+
+		result = getColumnString(cursor, 0, buf, 50);
+		SHOULD_HOLD(result >= 0, "Error in getColumnString");
+		SHOULD_HOLD(strcmp(buf, "some text") == 0, "text");
+
+		result = maDBCursorGetColumnInt(cursor, 1, &i);
+		SHOULD_HOLD(MA_DB_OK == result, "Error in maDBCursorGetColumnInt");
+		SHOULD_HOLD(i == 42, "int");
+
+		result = maDBCursorGetColumnDouble(cursor, 2, &d);
+		SHOULD_HOLD(MA_DB_OK == result, "Error in maDBCursorGetColumnDouble");
+		SHOULD_HOLD(d > 3.13999 && d < 3.14001, "double");
+
+		// todo
+		//result = maDBCursorGetColumnInt64(cursor, 3, &i64);
+		//SHOULD_HOLD(MA_DB_OK == result, "Error in maDBCursorGetColumnInt");
+		//SHOULD_HOLD(i64 == 1LL << 40, "int64");
+
+		result = getColumnDataAsString(cursor, 4, buf, 50);
+		SHOULD_HOLD(MA_DB_OK == result, "Error in getColumnDataAsString");
+		SHOULD_HOLD(memcmp(buf, "blob data", 8) == 0, "blob");
+
+		result = getColumnDataAsString(cursor, 5, buf, 50);
+		SHOULD_HOLD(MA_DB_OK == result, "Error in getColumnDataAsString");
+		SHOULD_HOLD(memcmp(buf, "more blob data", 12) == 0, "data");
+	}
+
+	result = maDBCursorNext(cursor);
+	SHOULD_HOLD(MA_DB_NO_ROW == result, "MA_DB_NO_ROW failed");
+
+	result = maDBCursorDestroy(cursor);
+	SHOULD_HOLD(MA_DB_OK == result, "maDBCursorDestroy failed");
+
+	result = maDBClose(db);
+	SHOULD_HOLD(MA_DB_OK == result, "maDBClose failed");
+
+	printf("Test 1 passed successfully\n");
+}
+
 
 /**
  * Test using multiple databases and cursors.
@@ -234,6 +340,7 @@ extern "C" int MAMain()
 
 	maSyscallPanicsEnable();	// just in case it's not enabled by default.
 
+	testParameters();
 	testBasicThings();
 	testThingsThatShouldFail();
 	testMultipleDatabasesAndCursors();

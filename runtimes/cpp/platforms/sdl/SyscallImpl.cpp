@@ -2204,6 +2204,7 @@ namespace Base {
 			maIOCtl_case(maDBOpen);
 			maIOCtl_case(maDBClose);
 			maIOCtl_case(maDBExecSQL);
+			maIOCtl_case(maDBExecSQLParams);
 			maIOCtl_case(maDBCursorDestroy);
 			maIOCtl_case(maDBCursorNext);
 			maIOCtl_case(maDBCursorGetColumnData);
