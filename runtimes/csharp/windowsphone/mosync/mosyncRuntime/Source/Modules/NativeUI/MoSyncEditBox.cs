@@ -102,29 +102,47 @@ namespace MoSync
 
 
                 /**
-                  * GotFocuse event
-                  * used for simulating the watermark/placeholder
-                  */
+                 * @brief Sent from the Edit box when it gains focus(the user selects the widget).
+                 * The virtual keyboard is shown.
+                 *        MAW_EVENT_EDIT_BOX_EDITING_DID_BEGIN
+                 */
                 mEditBox.GotFocus += new RoutedEventHandler(
                     delegate(object from, RoutedEventArgs args)
                     {
+                        /**
+                          * simulating the placeholder/watermark
+                          */
                         // if watermark present and no user char has been entered
                         if (mIsWatermarkMode && mFirstChar)
                         {
                             // move the cursor to the first position
                             mEditBox.Select(0, 0);
                         }
+
+                        /**
+                         * post the event to MoSync runtime
+                         */
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_EDIT_BOX_EDITING_DID_BEGIN);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
                 ); // end of mEditBox.GotFocus
 
+
                 /**
-                  * LostFocus event
-                  * used for simulating the watermark/placeholder
+                  * @brief Sent from the Edit box when it loses focus.
+                  * The virtual keyboard is hidden.
+                  *        MAW_EVENT_EDIT_BOX_EDITING_DID_END
                   */
                 mEditBox.LostFocus += new RoutedEventHandler(
                     delegate(object from, RoutedEventArgs args)
                     {
-                        // if watermark present
+                        /**
+                         * simulating the placeholder/watermark
+                         */
                         if (mIsWatermarkMode)
                         {
                             // if no text has been entered by the user than leave the watermark text
@@ -134,17 +152,31 @@ namespace MoSync
                                 mFirstChar = true;
                             }
                         }
+
+                        /**
+                         * post the event to MoSync runtime
+                         */
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_EDIT_BOX_EDITING_DID_END);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
                 ); // end of mEditBox.LostFocus
 
+
                 /**
-                  * LostFocus event
-                  * used for simulating the watermark/placeholder
+                  * @brief Sent from the Edit box when the text was changed.
+                  *        MAW_EVENT_EDIT_BOX_TEXT_CHANGED
                   */
                 mFirstChar = true;
                 mEditBox.TextInputStart += new TextCompositionEventHandler(
                     delegate(object from, TextCompositionEventArgs args)
                     {
+                        /**
+                          * simulating the placeholder/watermark
+                          */
                         if (mFirstChar)
                         {
                             mFirstChar = false;
@@ -153,8 +185,25 @@ namespace MoSync
                             // change the foreground to "normal" for user input
                             mEditBox.Foreground = mForegroundColor;
                         }
+
+                        /**
+                         * post the event to MoSync runtime
+                         */
+                        Memory eventData = new Memory(8);
+                        const int MAWidgetEventData_eventType = 0;
+                        const int MAWidgetEventData_widgetHandle = 4;
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_EDIT_BOX_TEXT_CHANGED);
+                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     }
                 ); // end of TextInputStart
+
+                /**
+                 * @brief Sent from the Edit box when the return button was pressed.
+                 * On iphone platform the virtual keyboard is not closed after receiving this event.
+                 * EDIT_BOX_RETURN
+                 */
+                // Not available on Windows Phone 7.1
             }
 
 
@@ -317,31 +366,6 @@ namespace MoSync
                     }
                 }
             }
-
-            /**
-            * @brief Sent from the Edit box when it gains focus(the user selects the widget).
-            * The virtual keyboard is shown.
-            * Only for iphone platform. EDIT_BOX_EDITING_DID_BEGIN = 16;
-            */
-
-            /**
-             * @brief Sent from the Edit box when it loses focus.
-             * The virtual keyboard is hidden.
-             * Only for iphone platform. EDIT_BOX_EDITING_DID_END = 17;
-             */
-
-            /**
-             * @brief Sent from the Edit box when the text was changed.
-             * EDIT_BOX_TEXT_CHANGED = 18;
-             */
-
-
-            /**
-             * @brief Sent from the Edit box when the return button was pressed.
-             * On iphone platform the virtual keyboard is not closed after receiving this event.
-             * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
-             * EDIT_BOX_RETURN = 19;
-             */
 
 
             /**

@@ -4264,14 +4264,12 @@ group WidgetAPI "Widget API" {
         /**
          * @brief Sent from the Edit box when it gains focus(the user selects the widget).
          * The virtual keyboard is shown.
-         * Only for iphone platform.
          */
          EDIT_BOX_EDITING_DID_BEGIN = 16;
 
         /**
          * @brief Sent from the Edit box when it loses focus.
          * The virtual keyboard is hidden.
-         * Only for iphone platform.
          */
          EDIT_BOX_EDITING_DID_END = 17;
 
@@ -4284,6 +4282,7 @@ group WidgetAPI "Widget API" {
          * @brief Sent from the Edit box when the return button was pressed.
          * On iphone platform the virtual keyboard is not closed after receiving this event.
          * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
+		 * Not available on Windows Phone 7.1
          */
          EDIT_BOX_RETURN = 19;
 
