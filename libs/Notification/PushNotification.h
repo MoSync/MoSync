@@ -36,7 +36,6 @@ MA 02110-1301, USA.
 
 namespace Notification
 {
-
     // Forward declaration
     class NotificationManager;
 
@@ -72,15 +71,16 @@ namespace Notification
          * @return True if the push notification contains alert message,
          * false otherwise.
          */
-        virtual bool containsMessage() const;
+        bool containsMessage() const;
 
         /**
          * Get the alert message.
          * Check if the push notification contains an alert message by calling
          * containsMessage() function.
          * @return The message displayed in the notification alert.
+         * Can be NULL.
          */
-        virtual MAUtil::String getMessage() const;
+        MAUtil::String* getMessage() const;
 
         /**
          * Check if the push notification contains sound file name.
@@ -88,7 +88,7 @@ namespace Notification
          * @return True if the push notification contains sound file name,
          * false otherwise.
          */
-        virtual bool containsSoundFileName() const;
+        bool containsSoundFileName() const;
 
         /**
          * Get the sound file name.
@@ -97,8 +97,9 @@ namespace Notification
          * containsSoundFileName() function.
          * @return The name of the file containing the sound to play when an
          * alert is displayed.
+         * Can be NULL.
          */
-        virtual MAUtil::String getSoundFileName() const;
+        MAUtil::String* getSoundFileName() const;
 
         /**
          * Check if the push notification contains icon badge number.
@@ -106,7 +107,7 @@ namespace Notification
          * @return True if the push notification contains icon badge number,
          * false otherwise.
          */
-        virtual bool containsIconBadgeNumber() const;
+        bool containsIconBadgeNumber() const;
 
         /**
          * Get the application icon badge number.
@@ -115,28 +116,28 @@ namespace Notification
          * calling containsIconBadgeNumber() function.
          * @return The number to display as the application’s icon badge.
          */
-        virtual int getIconBadgeNumebr() const;
+        int getIconBadgeNumebr() const;
 
     protected:
         /**
          * Set the alert message.
          * @param alertMessage The message displayed in the notification alert.
          */
-        virtual void setMessage(const MAUtil::String& alertMessage);
+        void setMessage(const MAUtil::String& alertMessage);
 
         /**
          * Set the sound file name.
          * @param soundFileName The sound file name for the current push
          * notification.
          */
-        virtual void setSoundFileName(const MAUtil::String& soundFileName);
+        void setSoundFileName(const MAUtil::String& soundFileName);
 
         /**
          * Set the application icon badge number.
          * @param iconBadgeNumber The application icon badge number for the
          * current push notification.
          */
-        virtual void setIconBadge(const int iconBadgeNumber);
+        void setIconBadge(const int iconBadgeNumber);
 
     private:
         /**

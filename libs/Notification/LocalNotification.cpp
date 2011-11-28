@@ -331,15 +331,7 @@ namespace Notification
      */
     void LocalNotification::setPlaySound(bool playSound)
     {
-        MAUtil::String value;
-        if (playSound)
-        {
-            value = "true";
-        }
-        else
-        {
-            value = "false";
-        }
+        MAUtil::String value = playSound ? "true" : "false";
         this->setProperty(MA_NOTIFICATION_LOCAL_PLAY_SOUND, value);
     }
 
@@ -352,11 +344,8 @@ namespace Notification
     {
         MAUtil::String value =
             this->getPropertyString(MA_NOTIFICATION_LOCAL_PLAY_SOUND);
-        if (0 == strcmp(value.c_str(), "true"))
-        {
-            return true;
-        }
-        return false;
+
+        return (0 == strcmp(value.c_str(), "true")) ? true : false;
     }
 
     /**
@@ -382,15 +371,8 @@ namespace Notification
      */
     void LocalNotification::setVibrate(bool vibrate)
     {
-        MAUtil::String value;
-        if (vibrate)
-        {
-            value = "true";
-        }
-        else
-        {
-            value = "false";
-        }
+        MAUtil::String value = vibrate ? "true" : "false";
+
         this->setProperty(MA_NOTIFICATION_LOCAL_VIBRATE, value);
     }
 
@@ -404,11 +386,8 @@ namespace Notification
     {
         MAUtil::String value =
             this->getPropertyString(MA_NOTIFICATION_LOCAL_VIBRATE);
-        if (0 == strcmp(value.c_str(), "true"))
-        {
-            return true;
-        }
-        return false;
+
+        return (0 == strcmp(value.c_str(), "true")) ? true : false;
     }
 
     /**
@@ -435,15 +414,7 @@ namespace Notification
      */
     void LocalNotification::setFlashLights(bool flashing)
     {
-        MAUtil::String value;
-        if (flashing)
-        {
-            value = "true";
-        }
-        else
-        {
-            value = "false";
-        }
+        MAUtil::String value = flashing ? "true" : "false";
         this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, value);
     }
 
