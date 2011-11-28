@@ -305,7 +305,7 @@ namespace MoSync
                         case 1:             //MAW_EDIT_BOX_FLAG_SENSITIVE
                             setInputMode(System.Windows.Input.InputScopeNameValue.Default);
                             break;
-                        case 2:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD 
+                        case 2:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD
                             setInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
                             break;
                         case 3:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE
