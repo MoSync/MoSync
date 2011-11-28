@@ -461,11 +461,18 @@ namespace Base {
 	}
 
 	SYSCALL(MAHandle, maCreatePlaceholder()) {
-		return (MAHandle) SYSCALL_THIS->resources._maCreatePlaceholder();
+		return (MAHandle) SYSCALL_THIS->resources.create_RT_PLACEHOLDER();
 	}
 
-	SYSCALL(MAHandle, maDestroyPlaceholder()) {
-		return (MAHandle) SYSCALL_THIS->resources._maDestroyPlaceholder();
+	SYSCALL(int, maDestroyPlaceholder(MAHandle handle)) {
+		// If this is an existing dynamically allocated data object,
+		// we destroy the object.
+		if (SYSCALL_THIS->resources.isDynamicResource(handle)) {
+			maDestroyObject(handle);
+		}
+
+		// Destroy (free) the placeholder.
+		return SYSCALL_THIS->resources._maDestroyPlaceholder(handle);
 	}
 
 	SYSCALL(void, maDestroyObject(MAHandle handle)) {

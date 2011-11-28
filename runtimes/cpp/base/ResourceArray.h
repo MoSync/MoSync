@@ -190,13 +190,120 @@ namespace Base {
 			}
 		}
 
+		/**
+		 * It is used to see if a resource is already loaded.
+		 * Works with both static and dynamic resources.
+		 * @param index The handle to the resource.
+		 * @return true if a resource is already loaded, false if not.
+		 */
+		bool is_loaded(unsigned index) {
+			void **res = mRes;
+			if(index&DYNAMIC_PLACEHOLDER_BIT) {
+				res = mDynRes;
+				index = index&(~DYNAMIC_PLACEHOLDER_BIT);
+				TESTINDEX(index, mDynResSize);
+			} else {
+				TESTINDEX(index, mResSize);
+			}
+
+			if (res[index] != NULL)
+			{
+				return true;
+			}
+			return false;
+		}
+
 		unsigned size() {
 			return mResSize;
 		}
 
 		/**
-		 * Destroy a placeholder. Destroys the object refered to
-		 * by the placeholder handle if it exists.
+		 * Implementation of maCreatePlaceholder.
+		 * @return A placeholder handle.
+		 */
+		unsigned int create_RT_PLACEHOLDER() {
+			// Get a placeholder from the pool, if available.
+			if (mDynResPoolSize > 0) {
+				--mDynResPoolSize;
+				unsigned handle = mDynResPool[mDynResPoolSize];
+				int placeholderIndex = handle & (~DYNAMIC_PLACEHOLDER_BIT);
+				mDynResTypes[placeholderIndex] = RT_PLACEHOLDER;
+				return handle;
+			}
+
+			// Expand the dynamic resource array if needed.
+			if (mDynResSize + 1 > mDynResCapacity) {
+				void** oldPlaceholders = mDynRes;
+				byte* oldPlaceholderTypes = mDynResTypes;
+				mDynRes = new void*[mDynResCapacity * 2];
+				MYASSERT(mDynRes != NULL, ERR_OOM);
+				mDynResTypes = new byte[mDynResCapacity * 2];
+				MYASSERT(mDynResTypes != NULL, ERR_OOM);
+				memset(mDynRes, 0, sizeof(void*) * (mDynResCapacity * 2));
+
+				if (oldPlaceholders != NULL) {
+					// Copy from old to new.
+					memcpy(
+						mDynRes,
+						oldPlaceholders,
+						mDynResCapacity * sizeof(void*));
+					memcpy(
+						mDynResTypes,
+						oldPlaceholderTypes,
+						mDynResCapacity * sizeof(byte));
+
+					// Delete old arrays.
+					delete []oldPlaceholders;
+					delete []oldPlaceholderTypes;
+				}
+
+				// Set new capacity.
+				mDynResCapacity = mDynResCapacity * 2;
+			}
+
+			// This is the index of the new placeholder.
+			int placeholderIndex = mDynResSize;
+
+			// Increment placeholder array size.
+			++mDynResSize;
+
+			// Add a placeholder type to the new array item.
+			mDynResTypes[placeholderIndex] = RT_PLACEHOLDER;
+
+			// Return the handle id, this is the index of the
+			// array item with the dynamic resource bit set.
+			return placeholderIndex | DYNAMIC_PLACEHOLDER_BIT;
+		}
+
+		/**
+		 * Check if a handle refers to an existing dynamic resource object.
+		 * @param index Placeholder handle.
+		 * @return Non zero if data object exists, zero if it does not exist.
+		 */
+		int isDynamicResource(unsigned index) {
+
+			// The handle must be a dynamic placeholder.
+			if (!(index & DYNAMIC_PLACEHOLDER_BIT)) {
+				return 0;
+			}
+
+			// Get the index into the dynamic resource array.
+			int i = index & (~DYNAMIC_PLACEHOLDER_BIT);
+			TESTINDEX(i, mDynResSize);
+
+			// The placeholder must not have been destroyed.
+			if (0 == mDynResTypes[i])
+			{
+				return 0;
+			}
+
+			// If the resource is a non-NULL object it exists.
+			return NULL != mDynRes[i];
+		}
+
+		/**
+		 * Destroy a placeholder. Mark this placeholder as free
+		 * and store the index in the pool of free placeholders.
 		 * @param index The placeholder handle.
 		 * @return Status code.
 		 */
@@ -211,24 +318,20 @@ namespace Base {
 			int i = index & (~DYNAMIC_PLACEHOLDER_BIT);
 			TESTINDEX(i, mDynResSize);
 
-			// The placeholder must NOT be destroyed.
+			// The placeholder must not have been destroyed.
 			if (0 == mDynResTypes[i])
 			{
 				// TODO: Panic
 				return -2;
 			}
 
-			// Destroy the object refered by the resource if it exist.
-			if (NULL != mDynRes[i])
-			{
-				_destroy(i);
-			}
-
-			// Set the handle type to 0.
+			// Set the handle type to 0. This marks the
+			// placeholder as destroyed.
 			mDynResTypes[i] = 0;
 
 			// Put handle into the pool.
 
+			// Create or expand the pool as needed.
 			if (0 == mDynResPoolCapacity) {
 				// Create the initial pool.
 				mDynResPoolCapacity = 2;
@@ -258,50 +361,7 @@ namespace Base {
 			// Add free handle index last in array (push to stack).
 			mDynResPool[mDynResPoolSize - 1] = index;
 
-			return MA_RES_OK;
-		}
-
-		/**
-		 * Implementation of maCreatePlaceholder.
-		 * @return A placeholder handle.
-		 */
-		unsigned int _maCreatePlaceholder() {
-			// Get a placeholder from the pool, if available.
-			if (mDynResPoolSize > 0) {
-				unsigned handle = mDynResPool[mDynResPoolSize - 1];
-				--mDynResPoolSize;
-				return handle;
-			}
-
-			// Expand the dynamic resource array if needed.
-			if (mDynResSize + 1 > mDynResCapacity) {
-				void ** oldPlaceholders = mDynRes;
-				byte *oldPlaceholderTypes = mDynResTypes;
-				mDynRes = new void*[(mDynResCapacity)*2];
-				MYASSERT(mDynRes != NULL, ERR_OOM);
-				mDynResTypes = new byte[(mDynResCapacity)*2];
-				MYASSERT(mDynResTypes != NULL, ERR_OOM);
-				memset(mDynRes, 0, sizeof(void*)*(mDynResCapacity*2));
-
-				if (oldPlaceholders != NULL) {
-					memcpy(mDynRes, oldPlaceholders, mDynResCapacity*sizeof(void*));
-					memcpy(mDynResTypes, oldPlaceholderTypes, mDynResCapacity*sizeof(byte));
-					delete []oldPlaceholders;
-					delete []oldPlaceholderTypes;
-				}
-
-				mDynResCapacity = (mDynResCapacity)*2;
-			}
-
-			// Add a placeholder type to the new array item.
-			mDynResTypes[mDynResSize] = RT_PLACEHOLDER;
-
-			// Increment array size.
-			mDynResSize++;
-
-			// Return the handle id, this is the index of the
-			// array item with the dynamic resource bit set.
-			return (mDynResSize-1)|DYNAMIC_PLACEHOLDER_BIT;
+			return RES_OK;
 		}
 
 #ifdef RESOURCE_MEMORY_LIMIT
