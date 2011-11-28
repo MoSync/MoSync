@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/**
+ * @file CreateNotificationScreen.h
+ * @author Emma Tresanszki and Bogdan Iusco
+ *
+ * @brief Screen used for creating notifications.
+ * Contains widgets(e.g. edit box, check box, button) used for setting
+ * notification values.
+ */
+
 #ifndef CREATENOTIFICATIONSCREEN_H_
 #define CREATENOTIFICATIONSCREEN_H_
 
@@ -24,9 +33,6 @@ MA 02110-1301, USA.
 // Include all the wrappers.
 #include <NativeUI/Widgets.h>
 
-#include <maapi.h>
-
-#include <MAUtil/util.h>
 #include <MAUtil/String.h>
 
 #include <Notification/NotificationManager.h>

@@ -20,8 +20,7 @@ MA 02110-1301, USA.
  * @file Main.cpp
  * @author Bogdan Iusco
  *
- * This is the main entry point for the example application
- * that demonstrates NativeUI on MoSync.
+ * This is the main entry point for the application
  */
 
 #include <ma.h>
@@ -29,7 +28,6 @@ MA 02110-1301, USA.
 #include <MAUtil/Moblet.h>
 #include <MAUtil/Environment.h>
 #include <conprint.h>
-#include <NativeUI/Widgets.h>
 
 #include <Notification/NotificationManager.h>
 

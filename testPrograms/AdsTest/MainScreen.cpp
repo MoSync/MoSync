@@ -18,7 +18,11 @@
 
 /**
  * @file MainScreen.cpp
- * @author Bogdan Iusco.
+ * @author Emma Tresanszki and Bogdan Iusco
+ *
+ * @brief Screen used for displaying a banner.
+ * Contains widgets(e.g. check box, button) used for setting and getting
+ * values for banner.
  */
 
 #include <conprint.h>
@@ -27,6 +31,10 @@
 #include <maassert.h>
 #include <mawstring.h>
 #include <maxtoa.h>
+#include <MAUtil/util.h>
+
+#include "MainScreen.h"
+#include "Util.h"
 
 #include "MainScreen.h"
 
@@ -35,7 +43,6 @@
  */
 MainScreen::MainScreen() :
 	Screen(),
-	mMainLayout(NULL),
 	mBanner(NULL),
 	mBannerMessage(NULL),
 	mEnableCheckBox(NULL),
@@ -70,16 +77,6 @@ MainScreen::~MainScreen()
 }
 
 /**
- * This method is called when there is an touch-down event for
- * a button.
- * @param button The button object that generated the event.
- */
-void MainScreen::buttonPressed(Widget* button)
-{
-
-}
-
-/**
  * Create a new row for settings.
  * It contains a check box/button and a label.
  */
@@ -102,11 +99,11 @@ HorizontalLayout* MainScreen::createRow(Widget* check, Label* label)
  */
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
-	mMainLayout = new VerticalLayout();
-	Screen::setMainWidget(mMainLayout);
+	VerticalLayout* mainLayout = new VerticalLayout();
+	Screen::setMainWidget(mainLayout);
 	mBanner = new Banner("a14dbba084368db");
 	mBanner->requestContent(true);
-	mMainLayout->addBanner(mBanner);
+	mainLayout->addBanner(mBanner);
 
 	Label* label;
 
@@ -114,14 +111,14 @@ void MainScreen::createMainLayout() {
 	mBannerMessage = new Label();
 	mBannerMessage->setText("before loading Ad");
 	mBannerMessage->setFontColor(0xFF0000);
-	mMainLayout->addChild(mBannerMessage);
+	mainLayout->addChild(mBannerMessage);
 
 	// Add "Enable/Disable banner" list item
 	label = new Label();
 	label->setText("Enable click on banner");
 	mEnableCheckBox = new CheckBox();
 	mEnableCheckBox->setState(true);
-	mMainLayout->addChild(createRow(mEnableCheckBox, label));
+	mainLayout->addChild(createRow(mEnableCheckBox, label));
 
 	// Add "Is banner enabled/disabled status" into a list item
 	mRefreshEnableButton = new Button();
@@ -129,14 +126,14 @@ void MainScreen::createMainLayout() {
 	mRefreshEnableButton->wrapContentHorizontally();
 	mIsBannerEnabled = new Label();
 	mIsBannerEnabled->setText("Banner is enabled");
-	mMainLayout->addChild(createRow(mRefreshEnableButton, mIsBannerEnabled));
+	mainLayout->addChild(createRow(mRefreshEnableButton, mIsBannerEnabled));
 
 	// Add "Show/Hide banner" list item
 	label = new Label();
 	label->setText("Show banner");
 	mShowBannerCheckBox = new CheckBox();
 	mShowBannerCheckBox->setState(true);
-	mMainLayout->addChild(createRow(mShowBannerCheckBox, label));
+	mainLayout->addChild(createRow(mShowBannerCheckBox, label));
 
 	// Add "Is banner visible status" into a list item
 	mRefreshVisibleButton = new Button();
@@ -144,7 +141,7 @@ void MainScreen::createMainLayout() {
 	mRefreshVisibleButton->wrapContentHorizontally();
 	mIsBannerVisible = new Label();
 	mIsBannerVisible->setText("Banner is visible");
-	mMainLayout->addChild(createRow(mRefreshVisibleButton, mIsBannerVisible));
+	mainLayout->addChild(createRow(mRefreshVisibleButton, mIsBannerVisible));
 
 	// Add "Get banner size" list item
 	mGetSizeButton = new Button();
@@ -152,16 +149,7 @@ void MainScreen::createMainLayout() {
 	mGetSizeButton->wrapContentHorizontally();
 	mSizeLabel = new Label();
 	mSizeLabel->setText("Banner size: 0 x 0 px");
-	mMainLayout->addChild(createRow(mGetSizeButton, mSizeLabel));
-}
-
-/**
- * This method is called when there is an touch-up event for
- * a button.
- * @param button The button object that generated the event.
- */
-void MainScreen::buttonReleased(Widget* button)
-{
+	mainLayout->addChild(createRow(mGetSizeButton, mSizeLabel));
 }
 
 /**

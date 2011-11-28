@@ -8550,6 +8550,11 @@ group AdsAPI "Ads API" {
 			* @brief Indicates that the call to an Ad syscall was unsuccessful.
 			*/
 			ERROR = -6;
+
+			/**
+			* @brief Indicates that ads are not supported on current platform.
+			*/
+			UNSUPPORTED = -7;
 		}
 	} // end of Ads Result Codes
 
@@ -8845,9 +8850,23 @@ group AdsAPI "Ads API" {
 		* \note A banner is a widget type object.
 		* For more info see Widget API.
 		*
-		* \returns A handle to a banner widget.
+		* \returns
+		*  - MA_ADS_RES_UNSUPPORTED if ads are not supported on current system.
+		*  - MA_ADS_RES_ERROR if a error occurred while creating the banner widget.
+		*  - a handle to a new banner widget(the handle value is >= 0).
 		*/
 		int maAdsBannerCreate(in int bannerSize, in MAString publisherID);
+
+		/**
+		* \brief Destroy a banner.
+		*
+		* \param bannerHandle Handle to a banner.
+		*
+		* \returns One of the next constants:
+		* - MA_ADS_RES_OK if no error occurred.
+		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		*/
+		int maAdsBannerDestroy(in MAHandle bannerHandle);
 
 		/**
 		* \brief Add a banner to a layout widget.
@@ -8874,17 +8893,6 @@ group AdsAPI "Ads API" {
 		* - MA_ADS_RES_INVALID_LAYOUT_HANDLE if the layout handle is invalid.
 		*/
 		int maAdsRemoveBannerFromLayout(in MAHandle bannerHandle, in MAHandle layoutHandle);
-
-		/**
-		* \brief Destroy a banner.
-		*
-		* \param bannerHandle Handle to a banner.
-		*
-		* \returns One of the next constants:
-		* - MA_ADS_RES_OK if no error occurred.
-		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
-		*/
-		int maAdsBannerDestroy(in MAHandle bannerHandle);
 
 		/**
 		* \brief Set a banner property.

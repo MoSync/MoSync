@@ -16,6 +16,15 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
 MA 02110-1301, USA.
 */
 
+/**
+ * @file CreateNotificationScreen.cpp
+ * @author Emma Tresanszki and Bogdan Iusco
+ *
+ * @brief Screen used for creating notifications.
+ * Contains widgets(e.g. edit box, check box, button) used for setting
+ * notification values.
+ */
+
 // Text to label widgets
 #define CONTENT_BODY_LABEL_TEXT "Content body:"
 #define CONTENT_TITLE_LABEL_TEXT "Content title:"
@@ -54,6 +63,10 @@ MA 02110-1301, USA.
 // Text colors
 #define TEXT_COLOR 0x000000
 #define TEXT_COLOR_ERROR 0xFF0000
+
+#include <matime.h>
+#include <maapi.h>
+#include <MAUtil/util.h>
 
 #include "CreateNotificationScreen.h"
 #include "Util.h"

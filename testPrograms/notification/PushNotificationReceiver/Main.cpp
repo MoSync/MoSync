@@ -20,22 +20,25 @@ MA 02110-1301, USA.
  * @file Main.cpp
  * @author Bogdan Iusco
  *
- * This is the main entry point for the application.
+ * This is the main entry point for the application
  */
 
-#include <ma.h> 				// Syscalls
-#include <MAUtil/String.h>		// C++ String class
-#include <MAUtil/Moblet.h>		// Moblet class
+#include <ma.h>
+#include <MAUtil/String.h>
+#include <MAUtil/Moblet.h>
+#include <MAUtil/Environment.h>
+#include <conprint.h>
 
-#include "MainScreen.h"			// Main UI screen
+#include <Notification/NotificationManager.h>
 
-using namespace MAUtil;
-using namespace NativeUI;
+#include "MainScreen.h"
+#include "Util.h"
 
 /**
  * Moblet for the  application.
  */
-class NativeUIMoblet : public Moblet
+class NativeUIMoblet : public MAUtil::Moblet,
+					   public MAUtil::FocusListener
 {
 public:
 	/**
@@ -43,11 +46,21 @@ public:
 	 */
 	NativeUIMoblet()
 	{
-		// Create the main user interface screen.
-		mMainScreen = new MainScreen();
+		if (!isAndroid() && !isIOS())
+		{
+			maMessageBox("Error", "Run this program on Android or iOS devices");
+		}
+		else
+		{
 
-		// Show the screen.
-		mMainScreen->show();
+			// Create the main user interface screen.
+			mMainScreen = new MainScreen();
+
+			// Show the screen.
+			mMainScreen->show();
+		}
+
+		this->addFocusListener(this);
 	}
 
 	/**
@@ -55,7 +68,24 @@ public:
 	 */
 	virtual ~NativeUIMoblet()
 	{
+		this->removeFocusListener(this);
 		delete mMainScreen;
+	}
+
+	/**
+	 * Called when the application goes to background.
+	 */
+	virtual void focusLost()
+	{
+		// No implementation required.
+	}
+
+	/**
+	 * Called when the application comes to foreground.
+	 */
+	virtual void focusGained()
+	{
+		NotificationManager::getInstance()->setApplicationIconBadgeNumber(0);
 	}
 
 	/**
@@ -82,7 +112,6 @@ public:
 	        closeEvent();
 	    }
 	}
-
 private:
 	MainScreen* mMainScreen;
 };
@@ -96,7 +125,7 @@ extern "C" int MAMain()
 	NativeUIMoblet* moblet = new NativeUIMoblet();
 
 	// Run the moblet event loop.
-	Moblet::run(moblet);
+	MAUtil::Moblet::run(moblet);
 
 	// Deallocate objects.
 	delete moblet;

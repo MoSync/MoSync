@@ -31,6 +31,8 @@ MA 02110-1301, USA.
 
 #define DEFAULT_APP_ICON_BADGE_NUMBER -1
 
+#include <conprint.h>
+
 #include "PushNotification.h"
 
 namespace Notification
@@ -53,7 +55,10 @@ namespace Notification
     PushNotification::~PushNotification()
     {
         delete mMessage;
+        mMessage = NULL;
+
         delete mSoundFileName;
+        mSoundFileName = NULL;
     }
 
     /**
@@ -79,17 +84,11 @@ namespace Notification
      * Check if the push notification contains an alert message by calling
      * containsAlertMessage() function.
      * @return The message displayed in the notification alert.
+     * Can be NULL.
      */
-    MAUtil::String PushNotification::getMessage() const
+    MAUtil::String* PushNotification::getMessage() const
     {
-        if (mMessage)
-        {
-            return *mMessage;
-        }
-        else
-        {
-            return "";
-        }
+        return mMessage;
     }
 
     /**
@@ -129,17 +128,11 @@ namespace Notification
      * containsSoundFileName() function.
      * @return The name of the file containing the sound to play when an
      * alert is displayed.
+     * Can be NULL.
      */
-    MAUtil::String PushNotification::getSoundFileName() const
+    MAUtil::String* PushNotification::getSoundFileName() const
     {
-        if (mSoundFileName)
-        {
-            return *mSoundFileName;
-        }
-        else
-        {
-            return "";
-        }
+        return mSoundFileName;
     }
 
     /**
