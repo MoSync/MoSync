@@ -40,9 +40,6 @@ MA 02110-1301, USA.
 #define DEFAULT_TICKER_TEXT_EDIT_BOX_TEXT "Ticker text"
 #define DEFAULT_SOUND_PATH_EDIT_BOX_TEXT "file:///sdcard/notification/ringer.mp3"
 #define DEFAULT_VIBRATION_EDIT_BOX_TEXT "" // 0 duration
-#define DEFAULT_FLASH_COLOR_EDIT_BOX_TEXT "0xff00ff00"
-#define DEFAULT_FLASH_ON_EDIT_BOX_TEXT "300"
-#define DEFAULT_FLASH_OFF_EDIT_BOX_TEXT "1000"
 #define DEFAULT_BADGE_NUMBER_EDIT_BOX_TEXT "1"
 #define DEFAULT_ALERT_ACTION_EDIT_BOX_TEXT "Alert action"
 #define DEFAULT_FIRE_TIME_EDIT_BOX_TEXT "5"
@@ -282,6 +279,10 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 		MAUtil::String contentBody = mContentBody->getText();
 		notification->setContentBody(contentBody);
 
+		// Set play sound property
+		bool playSound = mPlaySound->isChecked();
+		notification->setPlaySound(playSound);
+
 		if (isIOS())
 		{
 			// Set badge number
@@ -330,11 +331,11 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			{
 				notification->setFlashLights(false);
 			}
+			if ( playSound )
+			{
+				notification->setSound(mSoundPath->getText());
+			}
 		}
-
-		// Set play sound property
-		bool playSound = mPlaySound->isChecked();
-		notification->setPlaySound(playSound);
 
 		NotificationManager::getInstance()->scheduleLocalNotification(notification);
 		printf("notification created");
@@ -399,9 +400,9 @@ void CreateNotificationScreen::resetView()
 		mVibrate->setState(false);
 		mVibrateDuration->setText(DEFAULT_VIBRATION_EDIT_BOX_TEXT);
 		mFlash->setState(false);
-//		mFlashColor->setText(DEFAULT_FLASH_COLOR_EDIT_BOX_TEXT);
-//		mFlashOnLength->setText(DEFAULT_FLASH_ON_EDIT_BOX_TEXT);
-//		mFlashOffLength->setText(DEFAULT_FLASH_OFF_EDIT_BOX_TEXT);
+		mFlashColor->setText("");
+		mFlashOnLength->setText("");
+		mFlashOffLength->setText("");
 	}
 }
 

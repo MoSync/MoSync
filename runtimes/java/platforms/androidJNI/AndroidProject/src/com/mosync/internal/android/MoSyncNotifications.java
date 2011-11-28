@@ -24,18 +24,13 @@ class MoSyncNotifications
 	 */
 	public MoSyncNotifications(MoSyncThread thread)
 	{
-//		Log.e("@@MoSync","MosyncNotifications constructor");
-
 		mMoSyncThread = thread;
 		mLocalNotificationsManager = new LocalNotificationsManager(thread);
 		// C2DM supports only devices with Android 2.2 and higher.
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
 		{
-			Log.e("Emma", "froyo");
 			mPushNotificationManager = new PushNotificationsManager(thread, getActivity());
 		}
-		else
-			Log.e("emma","below");
 	}
 
 	/**

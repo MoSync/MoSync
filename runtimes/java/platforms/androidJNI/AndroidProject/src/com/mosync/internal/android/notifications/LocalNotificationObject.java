@@ -113,6 +113,8 @@ public class LocalNotificationObject {
 		}
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_FIRE_DATE) )
 		{
+			if ( IntConverter.convert(value) < 0 )
+				throw new InvalidPropertyValueException(name, value);
 			if ( value.length() == 0 )
 				throw new PropertyConversionException(value);
 			mFireDate = (long)IntConverter.convert(value) * (long) 1000;
@@ -157,6 +159,8 @@ public class LocalNotificationObject {
 		}
 		else if ( name.equals(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION) )
 		{
+			if ( IntConverter.convert(value) < 0 )
+				throw new InvalidPropertyValueException(name, value);
 			// Ignore the default value.
 			mVibrateDefault = false;
 			long[] sequence  = new long[2];
@@ -203,6 +207,8 @@ public class LocalNotificationObject {
 						ledOn = IntConverter.convert(value2);
 						value3 = next.substring(commaIndex+1);
 						ledOff = IntConverter.convert(value3);
+						if ( ledOn < 0 || ledOff < 0 )
+							throw new InvalidPropertyValueException(name, value);
 						// Apply the pattern.
 						mNotification.ledARGB = ledColor;
 						mNotification.ledOnMS = ledOn;

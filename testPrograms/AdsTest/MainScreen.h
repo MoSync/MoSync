@@ -83,7 +83,11 @@ private:
 	 */
 	void createMainLayout();
 
-	ListViewItem* createItem(Widget* check, Label* label);
+	/**
+	 * Create a new row for settings.
+	 * It contains a check box/button and a label.
+	 */
+	HorizontalLayout* createRow(Widget* check, Label* label);
 
     /**
      * Called when a banner view fails to load a new advertisement.
@@ -134,7 +138,6 @@ private:
 
 	Label* mBannerMessage;
 
-	ListView* mListView;
 	CheckBox* mEnableCheckBox;
 	Button* mRefreshEnableButton;
 	Label* mIsBannerEnabled;
@@ -145,13 +148,6 @@ private:
 
 	Button* mGetSizeButton;
 	Label* mSizeLabel;
-
-	Button* mSetBgColor;
-	Button* mSetTopColor;
-	Button* mSetBorderColor;
-	Button* mSetLinkColor;
-	Button* mSetTextColor;
-	Button* mSetUrlColor;
 };
 
 

@@ -21,14 +21,14 @@
  * @author Bogdan Iusco.
  */
 
-#include "MainScreen.h"
-
 #include <conprint.h>
 #include <wchar.h>
 #include <ma.h>
 #include <maassert.h>
 #include <mawstring.h>
 #include <maxtoa.h>
+
+#include "MainScreen.h"
 
 /**
  * Constructor.
@@ -38,20 +38,13 @@ MainScreen::MainScreen() :
 	mMainLayout(NULL),
 	mBanner(NULL),
 	mBannerMessage(NULL),
-	mListView(NULL),
 	mEnableCheckBox(NULL),
 	mRefreshEnableButton(NULL),
 	mIsBannerEnabled(NULL),
 	mGetSizeButton(NULL),
 	mSizeLabel(NULL),
 	mRefreshVisibleButton(NULL),
-	mIsBannerVisible(NULL),
-	mSetBgColor(NULL),
-	mSetTopColor(NULL),
-	mSetBorderColor(NULL),
-	mSetTextColor(NULL),
-	mSetLinkColor(NULL),
-	mSetUrlColor(NULL)
+	mIsBannerVisible(NULL)
 {
 	createMainLayout();
 
@@ -61,7 +54,6 @@ MainScreen::MainScreen() :
 	mGetSizeButton->addButtonListener(this);
 	mRefreshEnableButton->addButtonListener(this);
 	mRefreshVisibleButton->addButtonListener(this);
-	mSetBgColor->addButtonListener(this);
 }
 
 /**
@@ -75,7 +67,6 @@ MainScreen::~MainScreen()
 	mGetSizeButton->removeButtonListener(this);
 	mRefreshEnableButton->removeButtonListener(this);
 	mRefreshVisibleButton->removeButtonListener(this);
-	mSetBgColor->removeButtonListener(this);
 }
 
 /**
@@ -88,9 +79,12 @@ void MainScreen::buttonPressed(Widget* button)
 
 }
 
-ListViewItem* MainScreen::createItem(Widget* check, Label* label)
+/**
+ * Create a new row for settings.
+ * It contains a check box/button and a label.
+ */
+HorizontalLayout* MainScreen::createRow(Widget* check, Label* label)
 {
-	ListViewItem* item = new ListViewItem();
 	HorizontalLayout* hLayout = new HorizontalLayout();
 	if ( check != NULL )
 	{
@@ -100,8 +94,7 @@ ListViewItem* MainScreen::createItem(Widget* check, Label* label)
 		hLayout->addChild(space);
 	}
 	hLayout->addChild(label);
-	item->addChild(hLayout);
-	return item;
+	return hLayout;
 }
 
 /**
@@ -115,27 +108,20 @@ void MainScreen::createMainLayout() {
 	mBanner->requestContent(true);
 	mMainLayout->addBanner(mBanner);
 
-	// Create List Box
-	mListView = new ListView();
-	mListView->fillSpaceHorizontally();
-	mListView->fillSpaceVertically();
-	mMainLayout->addChild(mListView);
-
 	Label* label;
 
 	// Add banner status to list item
 	mBannerMessage = new Label();
-	mBannerMessage->fillSpaceHorizontally();
-	mBannerMessage->wrapContentVertically();
-	mListView->addChild(createItem(NULL,mBannerMessage));
+	mBannerMessage->setText("before loading Ad");
+	mBannerMessage->setFontColor(0xFF0000);
+	mMainLayout->addChild(mBannerMessage);
 
 	// Add "Enable/Disable banner" list item
 	label = new Label();
 	label->setText("Enable click on banner");
 	mEnableCheckBox = new CheckBox();
 	mEnableCheckBox->setState(true);
-//	mEnableCheckBox->setEnabled(true);
-	mListView->addChild(createItem(mEnableCheckBox, label));
+	mMainLayout->addChild(createRow(mEnableCheckBox, label));
 
 	// Add "Is banner enabled/disabled status" into a list item
 	mRefreshEnableButton = new Button();
@@ -143,14 +129,14 @@ void MainScreen::createMainLayout() {
 	mRefreshEnableButton->wrapContentHorizontally();
 	mIsBannerEnabled = new Label();
 	mIsBannerEnabled->setText("Banner is enabled");
-	mListView->addChild(createItem(mRefreshEnableButton, mIsBannerEnabled));
+	mMainLayout->addChild(createRow(mRefreshEnableButton, mIsBannerEnabled));
 
 	// Add "Show/Hide banner" list item
 	label = new Label();
 	label->setText("Show banner");
 	mShowBannerCheckBox = new CheckBox();
 	mShowBannerCheckBox->setState(true);
-	mListView->addChild(createItem(mShowBannerCheckBox, label));
+	mMainLayout->addChild(createRow(mShowBannerCheckBox, label));
 
 	// Add "Is banner visible status" into a list item
 	mRefreshVisibleButton = new Button();
@@ -158,7 +144,7 @@ void MainScreen::createMainLayout() {
 	mRefreshVisibleButton->wrapContentHorizontally();
 	mIsBannerVisible = new Label();
 	mIsBannerVisible->setText("Banner is visible");
-	mListView->addChild(createItem(mRefreshVisibleButton, mIsBannerVisible));
+	mMainLayout->addChild(createRow(mRefreshVisibleButton, mIsBannerVisible));
 
 	// Add "Get banner size" list item
 	mGetSizeButton = new Button();
@@ -166,16 +152,7 @@ void MainScreen::createMainLayout() {
 	mGetSizeButton->wrapContentHorizontally();
 	mSizeLabel = new Label();
 	mSizeLabel->setText("Banner size: 0 x 0 px");
-	mListView->addChild(createItem(mGetSizeButton, mSizeLabel));
-
-	// Add "Set BG color" list item
-//	hLayout = new HorizontalLayout();
-	mSetBgColor = new Button();
-	mSetBgColor->setText("Set background color to Orange");
-	mSetBgColor->wrapContentHorizontally();
-//	hLayout->addChild(mSetBgColor);
-	mListView->addChild(mSetBgColor);
-	// if iOS
+	mMainLayout->addChild(createRow(mGetSizeButton, mSizeLabel));
 }
 
 /**
@@ -226,11 +203,6 @@ void MainScreen::buttonClicked(Widget* button)
 			mIsBannerVisible->setText("Banner is not visible");
 		}
 	}
-	else if (button == mSetBgColor)
-	{
-		mBanner->setBackgroundColor(0xEE7621);
-		mBanner->requestContent(true);
-	}
 }
 
 /**
@@ -243,7 +215,6 @@ void MainScreen::bannerFailedLoad(
 		int error)
 {
 	printf("MainScreen::bannerFailedLoad error code = %d", error);
-	mBannerMessage->setFontColor(0xFF0000);
 	char buf[4];
 	itoa(error, buf, 10);
 	MAUtil::String text = "bannerFailedLoad error code = ";
@@ -258,7 +229,6 @@ void MainScreen::bannerFailedLoad(
 void MainScreen::bannerLoaded(Banner* banner)
 {
 	printf("MainScreen::bannerLoaded");
-	mBannerMessage->setFontColor(0x0000FF);
 	mBannerMessage->setText("bannerLoaded");
 }
 
@@ -270,7 +240,6 @@ void MainScreen::bannerLoaded(Banner* banner)
 void MainScreen::bannerOnLeaveApplication(Banner* banner)
 {
 	printf("MainScreen::bannerOnLeaveApplication");
-	mBannerMessage->setFontColor(0x0000FF);
 	mBannerMessage->setText("bannerOnLeaveApplication");
 }
 
@@ -282,7 +251,6 @@ void MainScreen::bannerOnLeaveApplication(Banner* banner)
 void MainScreen::bannerOnDismiss(Banner* banner)
 {
 	printf("MainScreen::bannerOnDismiss");
-	mBannerMessage->setFontColor(0x0000FF);
 	mBannerMessage->setText("bannerOnDismiss");
 }
 
@@ -298,12 +266,10 @@ void MainScreen::checkBoxStateChanged(
 {
 	if (checkBox == mEnableCheckBox)
 	{
-		bool isChecked = mEnableCheckBox->isChecked();
-		mBanner->setEnabled(isChecked);
+		mBanner->setEnabled(mEnableCheckBox->isChecked() ? true : false );
 	}
 	else if (checkBox == mShowBannerCheckBox)
 	{
-		bool isChecked = mShowBannerCheckBox->isChecked();
-		mBanner->setVisible(isChecked);
+		mBanner->setVisible(mShowBannerCheckBox->isChecked() ? true : false );
 	}
 }
