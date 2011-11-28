@@ -18,6 +18,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef PACKAGE_H
 #define PACKAGE_H
 
+enum ProfileType { DEVICE_BASED, PLATFORM_BASED };
+
 // Validity checks should be done on access.
 struct SETTINGS {
 	const char* program;
@@ -35,6 +37,7 @@ struct SETTINGS {
 	const char* s60cert;
 	const char* s60key;
 	const char* s60pass;
+	const char* profileType;
 	bool debug;
 	bool silent;
 	bool showPasswords;
@@ -68,6 +71,7 @@ void package(const SETTINGS&);
 void testProgram(const SETTINGS&);
 void testModel(const SETTINGS&);
 void testDst(const SETTINGS&);
+void testProfileType(const SETTINGS&);
 void testName(const SETTINGS&);
 void testVendor(const SETTINGS&);
 void testVersion(const SETTINGS&);
