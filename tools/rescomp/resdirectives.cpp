@@ -123,12 +123,7 @@ void FileResourceDirective::writeDirectives(ostringstream& output, bool asVarian
 	}
 	ResourceDirective::writeDirectives(output, asVariant);
 	string resourceStr = string("\"") + fResource + string("\"");
-	if (asVariant) {
-		output << ".bin\n";
-		output << ".include " << resourceStr << "\n";
-	} else {
-		output << '.' << fResType << " " << resourceStr << "\n";
-	}
+	output << '.' << fResType << " " << resourceStr << "\n";
 }
 
 void FileResourceDirective::initDirectiveFromAttributes(const char** attributes) {
@@ -151,11 +146,7 @@ string FileResourceDirective::getUniqueToken() {
 }
 
 void MediaResourceDirective::writeDirectives(ostringstream& output, bool asVariant) {
-	if (asVariant) {
-		FileResourceDirective::writeDirectives(output, asVariant);
-	} else {
-		output << ".media \"" << fMimeType << "\",\"" << fResource << "\"\n";
-	}
+	output << ".media \"" << fMimeType << "\",\"" << fResource << "\"\n";
 }
 
 void MediaResourceDirective::initDirectiveFromAttributes(const char** attributes) {
@@ -180,8 +171,7 @@ void StringResourceDirective::writeDirectiveAsString(ostringstream& output, size
 
 void StringResourceDirective::writeDirectives(ostringstream& output, bool asVariant) {
 	ResourceDirective::writeDirectives(output, asVariant);
-	string binStr = asVariant ? ".ubin" : ".bin";
-	output << binStr << "\n";
+	output << ".bin\n";
 	size_t currentPos = 0;
 	size_t currentOffset = 0;
 	bool isInSpecialString = false;
