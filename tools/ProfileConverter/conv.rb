@@ -123,18 +123,27 @@ class JavaMEPlatform
         @runtime = runtime
     end
 
-    def write_profile_xml(output_file, variant, runtimeDir, inherit, write_caps, is_abstract)
+    def write_profile_xml(output_dir, variant, runtimeDir, inherit, write_caps, is_abstract)
         # Unfortunately, all these JavaME APIs may
         # require operator certs.
-        FileUtils.mkdir_p output_file
-        File.open("#{output_file}/profile.xml", 'w') do |profile_xml|
+        FileUtils.mkdir_p output_dir
+        File.open("#{output_dir}/profile.xml", 'w') do |profile_xml|
             profile_xml.puts(self.to_xml(@runtime, "JavaME", variant, runtimeDir, inherit, write_caps, is_abstract))
+        end
+    end
+
+    def write_runtime_txt(output_dir, runtime_dir)
+        FileUtils.mkdir_p output_dir
+        clean_runtime = "profiles\\runtimes\\"
+        clean_runtime << runtime_dir.to_s.gsub('/', '\\')
+        File.open("#{output_dir}/runtime.txt", 'w') do |runtime_txt|
+            runtime_txt.puts(clean_runtime)
         end
     end
 
     def to_capability_xml(runtime, capability)
         result = ""
-        if (runtime.caps.has_key?(capability))
+        if (runtime && runtime.caps.has_key?(capability))
             names = self.map_capability_name capability
             names.each do |name|
                 result << "  <capability name=\"" << name
@@ -163,6 +172,10 @@ class JavaMEPlatform
         end
         xml << "</platform>\n"
         return xml
+    end
+
+    def create_token
+        return to_xml(@runtime, "JavaME", 0, "", "JavaME/Default", true, false)
     end
 
     def map_capability_name runtime_cap
@@ -650,11 +663,15 @@ FileUtils.cp_r("../../platforms/.", PLATFORMS_DIR, :verbose => true)
 
 # Java ME: special case!
 javame_profile_tokens={}
+javame_default_profile=JavaMEPlatform.new(nil)
+javame_default_profile_token=javame_default_profile.create_token
+javame_default_runtime = 0
 
 runtimes.each do |platform_name, platform|
 	id = 1
 	platform.each do |runtime|
-		runtime_dir = "#{platform_name}/#{id}/"
+        runtime_name = "#{platform_name}/#{id}"
+        runtime_dir = "#{runtime_name}/"
 		FileUtils.mkdir_p "#{RUNTIME_DIR}/#{runtime_dir}"
 		File.open("#{RUNTIME_DIR}/#{runtime_dir}/devices.txt", 'w') do |devices|
 			runtime.devices.each do |device|
@@ -700,11 +717,15 @@ runtimes.each do |platform_name, platform|
                 profileXmlDir = "#{PLATFORMS_DIR}/JavaME/#{id}"
                 # Produce a string that represents some 'equality' between
                 # profiles -- whenever there is time, refactor!
-                profile_token = profile.to_xml(runtime, "JavaME", 0, "", "JavaME", true, false)
+                profile_token = profile.create_token
                 inherit = javame_profile_tokens[profile_token]
+                if (javame_default_runtime == 0 && javame_default_profile_token == profile_token)
+                    javame_default_runtime = id
+                end
                 if (!inherit)
                     javame_profile_tokens[profile_token] = id
-                    profile.write_profile_xml(profileXmlDir, id, runtime_dir, "JavaME", true, false)
+                    profile.write_profile_xml(profileXmlDir, id, runtime_name, "JavaME/Default", true, false)
+                    profile.write_runtime_txt(profileXmlDir, runtime_name)
                 else
                     profile.write_profile_xml(profileXmlDir, id, "JavaME/#{inherit}", "JavaME/#{inherit}", false, true)
                 end
@@ -734,5 +755,8 @@ runtimes.each do |platform_name, platform|
 	end
 end
 
+# Write the default JavaME profile
+javame_default_profile.write_profile_xml("#{PLATFORMS_DIR}/JavaME/Default", "Default", "JavaME/#{javame_default_runtime}", "JavaME/Base", true, false)
+javame_default_profile.write_runtime_txt("#{PLATFORMS_DIR}/JavaME/Default", "JavaME/#{javame_default_runtime}")
 
 exit(0)

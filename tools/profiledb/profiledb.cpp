@@ -171,6 +171,13 @@ void ProfileDB::listProfiles(string pattern, bool onlyFamilies) {
 	printf("%s", output.str().c_str());
 }
 
+void ProfileDB::listRuntime(string profileName) {
+	Profile* profile = findProfile(profileName, set<string>());
+	if (profile) {
+		printf("%s\n", profile->getRuntime().c_str());
+	}
+}
+
 void ProfileDB::dumpProfile(Profile* profile, string profileName) {
 	vector<Profile*> profiles;
 	if (profile) {
@@ -179,7 +186,7 @@ void ProfileDB::dumpProfile(Profile* profile, string profileName) {
 	dumpProfiles(profiles, profileName);
 }
 
-void ProfileDB::dumpProfiles(vector<Profile*> profiles, string profileName) {
+void dumpProfilesXML(vector<Profile*> profiles, string profileName) {
 	ostringstream output;
 	XMLWriter writer = XMLWriter(&output);
 	writer.start();
@@ -205,6 +212,20 @@ void ProfileDB::dumpProfiles(vector<Profile*> profiles, string profileName) {
 	writer.endTag();
 
 	printf("%s", output.str().c_str());
+}
+
+void dumpProfilesBrief(vector<Profile*> profiles, string profileName) {
+	for (size_t i = 0; i < profiles.size(); i++) {
+		printf("%s\n", profiles.at(i)->getProfileName().c_str());
+	}
+}
+
+void ProfileDB::dumpProfiles(vector<Profile*> profiles, string profileName) {
+	if (fBrief) {
+		dumpProfilesBrief(profiles, profileName);
+	} else {
+		dumpProfilesXML(profiles, profileName);
+	}
 }
 
 void ProfileDB::getProfiles(string profilePattern, vector<Profile*>& profiles) {

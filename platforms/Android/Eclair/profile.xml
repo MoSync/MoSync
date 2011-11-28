@@ -2,4 +2,5 @@
   <capability name="Autostart" state="REQUIRES_PERMISSION"/>
   <capability name="NFC" state="REQUIRES_PERMISSION"/>
   <capability name="C2DM" state="REQUIRES_PERMISSION"/>
+  <capability name="Home Screen" state="REQUIRES_PERMISSION"/>
 </platform>

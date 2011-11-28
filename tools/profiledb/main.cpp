@@ -46,10 +46,12 @@ void printUsage() {
 		"                                 SUPPORTED, UNSUPPORTED, NOT_IMPLEMENTED\n"
 		"                                 REQUIRES_PERMISSION or\n"
 		"                                 REQUIRES_PRIVILEGED_PERMISSION\n"
+		"-r, --list-runtime [PROFILE]     Lists the runtime for a profile\n"
 		"-x, --exclude PATTERN            Filter out all profiles matching\n"
 		"                                 PATTERN."
+		"-b, --brief                      List all profiles in a short list\n"
+		"                                 instead of using XML.\n"
 		"\n"
-		""
 		"Environment variables used:\n"
 		" MOSYNCDIR               Path to the MoSync installation directory.\n"
 	);
@@ -60,41 +62,51 @@ int main(int argc,char *argv[]) {
 	// Parse option(s):
 	ProfileDB db = ProfileDB();
 	int curArg = 0;
-	string cmd = argc > curArg + 1 ? string(argv[curArg + 1]) : string("");
-	if ((cmd == "--exclude" || cmd == "-x") && argc > 2) {
-		db.setExcluded(string(argv[2]));
-		curArg += 2;
-	}
-	cmd = argc > curArg + 1 ? string(argv[curArg + 1]) : string("");
-	if (("--get" == cmd || "-g" == cmd) && argc == curArg + 3) {
-		char* profile = argv[curArg + 2];
-		db.getProfiles(profile);
-	} else if (("--list" == cmd || "-l" == cmd) && argc <= curArg + 3) {
-		string profilePattern = argc > curArg + 2 ? argv[curArg + 2] : "*";
-		db.listProfiles(profilePattern, false);
-	} else if (("--list-families" == cmd || "-f" == cmd) && argc == curArg + 2) {
-		db.listProfiles("*", true);
-	} else if (("--match" == cmd || "-m" == cmd) && argc >= curArg + 3) {
-		string profilePattern = string(argv[curArg + 2]);
-		vector<Capability> requiredCapabilities;
-		vector<Capability> optionalCapabilities;
-		vector<Capability>* currentCapabilities = &requiredCapabilities;
-		for (int i = curArg + 3; i < argc; i++) {
-			string cap = string(argv[i]);
-			if ("-o" == cap || "--optional" == cap) {
-				currentCapabilities = &optionalCapabilities;
-			} else {
-				currentCapabilities->push_back(Capability(cap, SUPPORTED, RUNTIME));
+	while (curArg < argc) {
+		curArg++;
+		string cmd = argc > curArg ? string(argv[curArg]) : string("");
+		string param = argc > curArg + 1 ? string(argv[curArg + 1]) : string("");
+		if (cmd == "--exclude" || cmd == "-x") {
+			db.setExcluded(param);
+			curArg++;
+		} else if ((cmd == "--brief" || cmd == "-b")) {
+			db.setBrief(true);
+		} else if ("--get" == cmd || "-g" == cmd) {
+			db.getProfiles(param);
+			return 0;
+		} else if ("--list" == cmd || "-l" == cmd) {
+			string profilePattern = param.length() > 0 ? param : string("*");
+			db.listProfiles(profilePattern, false);
+			return 0;
+		} else if ("--list-families" == cmd || "-f" == cmd) {
+			db.listProfiles("*", true);
+			return 0;
+		} else if ("--match" == cmd || "-m" == cmd) {
+			string profilePattern = param;
+			vector<Capability> requiredCapabilities;
+			vector<Capability> optionalCapabilities;
+			vector<Capability>* currentCapabilities = &requiredCapabilities;
+			for (int i = curArg + 2; i < argc; i++) {
+				string cap = string(argv[i]);
+				if ("-o" == cap || "--optional" == cap) {
+					currentCapabilities = &optionalCapabilities;
+				} else {
+					currentCapabilities->push_back(Capability(cap, SUPPORTED, RUNTIME));
+				}
 			}
-		}
 
-		db.matchProfiles(profilePattern, requiredCapabilities, optionalCapabilities);
-	} else if (("--list-capabilities" == cmd || "-c" == cmd) && argc >= curArg + 2) {
-		string statePattern = argc > curArg + 2 ? argv[curArg + 2] : "*";
-		db.listCapabilities(statePattern);
-	} else {
-		printUsage();
-		return 1;
+			db.matchProfiles(profilePattern, requiredCapabilities, optionalCapabilities);
+			return 0;
+		} else if ("--list-capabilities" == cmd || "-c" == cmd) {
+			string statePattern = param.length() > 0 ? param : string("*");
+			db.listCapabilities(statePattern);
+			return 0;
+		} else if ("--list-runtime" == cmd || "-r" == cmd) {
+			db.listRuntime(param);
+			return 0;
+		}
 	}
-	return 0;
+
+	printUsage();
+	return 1;
 }

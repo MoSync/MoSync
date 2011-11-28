@@ -64,6 +64,7 @@ public:
 	void setFamily(string family) { fFamily = family; }
 	void setVariant(string variant) { fVariant = variant; }
 	void setRuntime(string runtime) { fRuntime = runtime; }
+	string getRuntime() { return fRuntime; }
 	void setAbstract(bool isAbstract) { fIsAbstract = isAbstract; }
 	bool isAbstract() { return fIsAbstract; }
 	void addCapability(Capability capability);
@@ -76,6 +77,7 @@ public:
 class ProfileDB {
 private:
 	string fExcludePattern;
+	bool fBrief;
 	string profilesdir();
 	bool isExcluded(Profile* profile);
 	bool parseProfileXML(Profile* profile, set<string> alreadyFound);
@@ -86,10 +88,12 @@ private:
 	void dumpProfiles(vector<Profile*> profile, string unmatchedName);
 public:
 	ProfileDB() { };
+	void setBrief(bool brief) { fBrief = brief; }
 	void setExcluded(string excludePattern);
 	void getProfiles(string profileName);
 	void listProfiles(string pattern, bool onlyFamilies);
 	void listCapabilities(string pattern);
+	void listRuntime(string profileName);
 	bool matchProfiles(string profilePattern, vector<Capability> requiredCapabilities,
 			vector<Capability> optionalCapabilities);
 	Profile* findProfile(string profileName, set<string> alreadyFound);

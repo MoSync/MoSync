@@ -1,0 +1,23 @@
+<platform family="JavaME" variant="Base" inherit="FeaturePhone" abstract="true">
+  <!-- The various JavaME platforms will override these,
+       so the default JavaME platform does actually
+       NOT support very much at all... -->
+  <capability name="Power Management" state="UNSUPPORTED"/>
+  <capability name="Vibration" state="SUPPORTED"/>
+  <capability name="File Storage" state="UNSUPPORTED">
+    <capability name="Read" state="UNSUPPORTED"/>
+    <capability name="Write" state="UNSUPPORTED"/>
+  </capability>
+  <capability name="Internet Access" state="UNSUPPORTED">
+    <capability name="HTTPS" state="UNSUPPORTED"/>
+  </capability>
+  <capability name="SMS" state="UNSUPPORTED"/>
+  <capability name="Location" state="UNSUPPORTED">
+    <capability name="Fine" state="UNSUPPORTED"/>
+    <capability name="Coarse" state="UNSUPPORTED"/>
+  </capability>
+  <capability name="BlueTooth" state="UNSUPPORTED"/>
+  <capability name="Contacts" state="UNSUPPORTED"/>
+  <capability name="Calendar" state="UNSUPPORTED"/>
+  <capability name="Camera" state="UNSUPPORTED"/>
+</platform>

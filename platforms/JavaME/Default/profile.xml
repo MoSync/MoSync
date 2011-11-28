@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<platform family="JavaME" variant="Default" runtime="JavaME/1" inherit="FeaturePhone">
+</platform>
