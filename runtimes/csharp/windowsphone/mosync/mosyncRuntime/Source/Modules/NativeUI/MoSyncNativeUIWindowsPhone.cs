@@ -88,8 +88,9 @@ namespace MoSync
                     if (value > 0)
                     {
                         mView.SetValue(Canvas.WidthProperty, value);
+                        fillSpaceHorizontalyEnabled = false;
                     }
-                    else
+                    else if(-1 == value)
                     {
                         mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
                         fillSpaceHorizontalyEnabled = true;
@@ -122,8 +123,9 @@ namespace MoSync
                     if (value > 0)
                     {
                         mView.SetValue(Canvas.HeightProperty, value);
+                        fillSpaceVerticalyEnabled = false;
                     }
-                    else
+                    else if(-1 == value)
                     {
                         mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
                         fillSpaceVerticalyEnabled = true;

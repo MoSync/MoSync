@@ -66,7 +66,15 @@ namespace MoSync
                     }
                     else
                     {
-                        Uri uri = new Uri(value, UriKind.Relative);
+                        Uri uri;
+                        if (value.StartsWith("http://"))
+                        {
+                            uri = new Uri(value, UriKind.Absolute);
+                        }
+                        else
+                        {
+                            uri = new Uri(value, UriKind.Relative);
+                        }
                         mWebBrowser.Navigate(uri);
                     }
                 }

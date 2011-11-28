@@ -83,6 +83,9 @@ namespace MoSync
                 mGrid.ColumnDefinitions.Add(mColDef);
                 mGrid.ColumnDefinitions.Add(mSpacerRight);
 
+                this.fillSpaceVerticalyEnabled = false;
+                this.fillSpaceHorizontalyEnabled = false;
+
                 mView = mGrid;
 #if DEBUG
                 mGrid.ShowGridLines = true;
@@ -99,7 +102,14 @@ namespace MoSync
                     RowDefinition rowDef = new RowDefinition();
 
                     if (widget.fillSpaceVerticalyEnabled) rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star);
-                    else rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+                    else if (double.IsNaN(widget.Height) == false && 0 != widget.Height)
+                    {
+                        rowDef.Height = new System.Windows.GridLength(widget.Height, System.Windows.GridUnitType.Pixel);
+                    }
+                    else
+                    {
+                        rowDef.Height = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+                    }
 
                     mGrid.RowDefinitions.Insert(mGrid.RowDefinitions.Count - 1, rowDef);
 
