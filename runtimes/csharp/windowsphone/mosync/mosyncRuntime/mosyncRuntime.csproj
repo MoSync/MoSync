@@ -54,6 +54,12 @@
     <Reference Include="WriteableBitmapExWinPhone">
       <HintPath>Libraries\WriteableBitmapEx_v0.9.7.0\WindowsPhone\WriteableBitmapExWinPhone.dll</HintPath>
     </Reference>
+	<Reference Include="Microsoft.Phone.Controls.Toolkit">
+		<HintPath>Libraries\Microsoft.Phone.Controls.Toolkit\Oct11\Bin\Microsoft.Phone.Controls.Toolkit.dll</HintPath>
+	</Reference>
+	<Reference Include="Microsoft.Phone.Controls">
+		<HintPath>Libraries\Microsoft.Phone.Controls\Microsoft.Phone.Controls.dll</HintPath>
+	</Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -70,6 +76,7 @@
     <Compile Include="Source\Modules\MoSyncNativeUIModule.cs" />
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
     <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncTabScreen.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncWebView.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncButton.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncCheckBox.cs" />
