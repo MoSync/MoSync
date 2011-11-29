@@ -37,72 +37,72 @@ namespace MoSync
 {
 	namespace NativeUI
 	{
-        /**
-         * The ListView class that displays a list of items, containing text and an image
-         */
+		/**
+		 * The ListView class that displays a list of items, containing text and an image
+		 */
 		public class ListView : WidgetBaseWindowsPhone
 		{
-            /**
-             * A ListBox object that will hold the items
-             */
+			/**
+			 * A ListBox object that will hold the items
+			 */
 			protected System.Windows.Controls.ListBox mList;
 
-            /**
-             * Constructor
-             */
+			/**
+			 * Constructor
+			 */
 			public ListView()
 			{
-                mList = new System.Windows.Controls.ListBox(); 
+				mList = new System.Windows.Controls.ListBox();
 
-                mView = mList;
+				mView = mList;
 
-                mList.Tap += new EventHandler<System.Windows.Input.GestureEventArgs>(
-                    delegate(Object from, System.Windows.Input.GestureEventArgs evt)
-                    {
-                        //create a Memory object of 8 Bytes
-                        Memory eventData = new Memory(12);
+				mList.Tap += new EventHandler<System.Windows.Input.GestureEventArgs>(
+				delegate(Object from, System.Windows.Input.GestureEventArgs evt)
+					{
+						//create a Memory object of 8 Bytes
+						Memory eventData = new Memory(12);
 
-                        //starting with the 0 Byte we write the eventType
-                        const int MAWidgetEventData_eventType = 0;
-                        //starting with the 4th Byte we write the widgetHandle
-                        
-                        const int MAWidgetEventData_widgetHandle = 4;
+						//starting with the 0 Byte we write the eventType
+						const int MAWidgetEventData_eventType = 0;
 
-                        //starting with the 8th Byte we write the selectedIndex                        
-                        const int MAWidgetEventData_selectedIndex = 8;
+						//starting with the 4th Byte we write the widgetHandle
+						const int MAWidgetEventData_widgetHandle = 4;
 
-                        int selIndex = mList.SelectedIndex;
+						//starting with the 8th Byte we write the selectedIndex
+						const int MAWidgetEventData_selectedIndex = 8;
 
-                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_ITEM_CLICKED);
-                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+						int selIndex = mList.SelectedIndex;
 
-                        if (selIndex > 0)
-                        {
-                            eventData.WriteInt32(MAWidgetEventData_selectedIndex, selIndex);
-                            //posting a CustomEvent
-                            mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
-                        }                        
-                    });
+						eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_ITEM_CLICKED);
+						eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+
+						if (selIndex > 0)
+						{
+							eventData.WriteInt32(MAWidgetEventData_selectedIndex, selIndex);
+							//posting a CustomEvent
+							mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+						}
+					});
 			}
 
-            /**
-             * Override of the WidgetBase AddChild function
-             */
+			/**
+			 * Override of the WidgetBase AddChild function
+			 */
 			public override void AddChild(IWidget child)
 			{
-                base.AddChild(child);
+				base.AddChild(child);
 				MoSync.Util.RunActionOnMainThreadSync(() =>
 				{
 					System.Windows.Controls.ListBoxItem item = new System.Windows.Controls.ListBoxItem();
 					WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
 					item.Content = widget.View;
-                    mList.Items.Add(item);
+					mList.Items.Add(item);
 				});
 			}
 
-            /**
-             * Override of the WidgetBase InsertChild function
-             */
+			/**
+			 * Override of the WidgetBase InsertChild function
+			 */
 			public override void InsertChild(IWidget child, int index)
 			{
 				base.InsertChild(child, index);
@@ -115,9 +115,9 @@ namespace MoSync
 				});
 			}
 
-            /**
-             * Override of the WidgetBase RemoveChild function
-             */
+			/**
+			 * Override of the WidgetBase RemoveChild function
+			 */
 			public override void RemoveChild(int index)
 			{
 				base.RemoveChild(index);
@@ -127,9 +127,9 @@ namespace MoSync
 				});
 			}
 
-            /**
-             * Override of the WidgetBase RemoveChild function
-             */
+			/**
+			 * Override of the WidgetBase RemoveChild function
+			 */
 			public override void RemoveChild(IWidget child)
 			{
 				int index = base.mChildren.IndexOf(child);
