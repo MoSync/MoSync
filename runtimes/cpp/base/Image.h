@@ -58,9 +58,9 @@ public:
 	};
 
 	struct ImageInitParams {
-		int width; 
-		int height; 
-		int pitch; 
+		int width;
+		int height;
+		int pitch;
 		int redMask;
 		int greenMask;
 		int blueMask;
@@ -78,9 +78,11 @@ public:
 	};
 
 	Image();
-	Image(unsigned char *data, unsigned char *alpha, int width, int height, int pitch, PixelFormat pixelFormat, bool makeCopy=false, bool shouldFreeData=true);
+	Image(unsigned char *data, unsigned char *alpha, int width, int height, int pitch,
+		PixelFormat pixelFormat, bool makeCopy=false, bool shouldFreeData=true, int alphaPitch=-1);
 
-	Image(unsigned char *data, unsigned char *alpha, const ImageInitParams &params, bool makeCopy=false, bool shouldFreeData=true);
+	Image(unsigned char *data, unsigned char *alpha, const ImageInitParams &params,
+		bool makeCopy=false, bool shouldFreeData=true, int alphaPitch=-1);
 	Image(int width, int height, int pitch, PixelFormat pixelFormat);
 
 	~Image();
@@ -88,7 +90,7 @@ public:
 	bool hasData();
 	bool hasAlpha();
 
-	void init(unsigned char *data, unsigned char *alpha, bool makeCopy);
+	void init(unsigned char *data, unsigned char *alpha, bool makeCopy, int alphaPitch=-1);
 	void calculateConstants();
 
 	void drawPoint(int x, int y, int color);
@@ -99,7 +101,7 @@ public:
 	void drawImage(int left, int top, Image *src);
 
 	ClipRect		clipRect;
-	
+
 #ifdef SYMBIAN
 	// must be set before use.
 	unsigned char* mulTable;
@@ -111,9 +113,10 @@ public:
 	int				width;
 	int				height;
 	int				pitch;
+	int alphaPitch;
 	int				bytesPerPixel;
 	int				bitsPerPixel;
-	
+
 	unsigned int	alphaMask;
 	unsigned int	alphaShift;
 	unsigned int	alphaBits;
