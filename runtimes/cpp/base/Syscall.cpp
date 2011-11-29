@@ -922,7 +922,7 @@ namespace Base {
 		{
 			resource = new FileStream(resourcesFilename);
 		}
-		if (resourse == NULL)
+		if (resource == NULL)
 		{
 			return 0;
 		}
