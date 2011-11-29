@@ -326,18 +326,30 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			}
 			if ( mFlash->isChecked() )
 			{
-				notification->setFlashLights(true);
-				if ( mFlashColor->getText().length() > 0
-						&&
-						mFlashOnLength->getText().length() > 0
-						&&
-						mFlashOffLength->getText().length() > 0)
+				// Check if flashing LED is possible on the device.
+				if (notification->setFlashLights(true) )
 				{
-					struct NotificationFlashLights pattern = NotificationFlashLights(
-							MAUtil::stringToInteger(mFlashColor->getText()),
-							MAUtil::stringToInteger(mFlashOnLength->getText()),
-							MAUtil::stringToInteger(mFlashOffLength->getText()));
-					notification->setFlashLightsPattern(pattern);
+					if ( mFlashColor->getText().length() > 0
+							&&
+							mFlashOnLength->getText().length() > 0
+							&&
+							mFlashOffLength->getText().length() > 0)
+					{
+						struct NotificationFlashLights pattern = NotificationFlashLights(
+								MAUtil::stringToInteger(mFlashColor->getText()),
+								MAUtil::stringToInteger(mFlashOnLength->getText()),
+								MAUtil::stringToInteger(mFlashOffLength->getText()));
+						notification->setFlashLightsPattern(pattern);
+					}
+				}
+				else
+				{
+					mFlashColor->setText("Not available");
+					mFlashOffLength->setText("Not available");
+					mFlashOnLength->setText("Not available");
+					mFlashColor->setEnabled(false);
+					mFlashOffLength->setEnabled(false);
+					mFlashOnLength->setEnabled(false);
 				}
 			}
 			else
