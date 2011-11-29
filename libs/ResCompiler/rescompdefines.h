@@ -24,7 +24,7 @@ MA 02110-1301, USA.
 #ifndef __RESCOMPDEFINES_H__
 #define __RESCOMPDEFINES_H__
 
-	#define DEBUG_ENABLED
+	//#define DEBUG_ENABLED
 	#ifdef DEBUG_ENABLED
 		#define PRINTINT(v) 					printf("%s = %d", #v, v);
 		#define PRINTINTARRAY(v, size)			{if (v){for (int _i=0; _i<size; _i++){printf("%s[%d] = %d", #v, _i, v[_i]);}}}

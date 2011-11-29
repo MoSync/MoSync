@@ -25,11 +25,11 @@ MA 02110-1301, USA.
 
 namespace ResourceCompiler
 {
-	ByteArrayStream::ByteArrayStream()
+	ByteArrayStream::ByteArrayStream():
+	buffer(0),
+	size(0),
+	pos(0)
 	{
-		buffer = 0;
-		size = 0;
-		pos = 0;
 	}
 
 	ByteArrayStream::~ByteArrayStream()

@@ -306,6 +306,7 @@ namespace Base {
 	}
 
 	int resourcesCount = -1;
+	char* resourcesFilename;
 	int *resourceOffset;
 	int *resourceSize;
 	int *resourceType;
@@ -346,6 +347,8 @@ namespace Base {
 		resourceOffset = new int[nResources];
 		resourceSize = new int[nResources];
 		resourceType = new int[nResources];
+		resourcesFilename = new char[strlen(aFilename) + 1];
+		strcpy(resourcesFilename, aFilename);
 
 		// rI is the resource index.
 		int rI = 1;
@@ -910,6 +913,30 @@ namespace Base {
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
 		return SYSCALL_THIS->loadResourcesFromBuffer(*b, NULL);
 	}
+
+#ifndef _android
+	FileStream* resource = NULL;
+
+	SYSCALL(int, maLoadResource(MAHandle originalHandle, MAHandle destHandle, int flag)) {
+		if (((flag & MA_RESOURCE_OPEN) != 0) && (resource == NULL))
+		{
+			resource = new FileStream(resourcesFilename);
+		}
+		if (resourse == NULL)
+		{
+			return 0;
+		}
+		int ret = SYSCALL_THIS->loadResource(*resource, originalHandle, destHandle);
+
+		if (((flag & MA_RESOURCE_CLOSE) != 0) && (resource != NULL))
+		{
+			delete resource;
+			resource = NULL;
+		}
+
+		return ret;
+	}
+#endif
 
 	SYSCALL(int, maCountResources()) {
 		return SYSCALL_THIS->countResources();
