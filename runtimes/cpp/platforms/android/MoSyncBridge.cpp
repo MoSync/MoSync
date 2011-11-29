@@ -370,7 +370,6 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION)
 	{
 		event.pushNotificationHandle = intArray[1];
-		// TODO struct
 	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{

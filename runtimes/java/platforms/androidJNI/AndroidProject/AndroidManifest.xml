@@ -36,6 +36,7 @@
 			android:configChanges="orientation|keyboard|keyboardHidden">
 		</activity>
 		<service android:name=".MoSyncService"/>
+		<service android:name="com.mosync.internal.android.notifications.LocalNotificationsService"/>
         <service android:name=".C2DMReceiver" />
         <!-- Only C2DM servers can send messages for the app. If permission is
             not set - any other app can generate it -->

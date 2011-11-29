@@ -4,8 +4,9 @@ Android: Note that that the very first time AdMob sees your publisher ID it may 
 Next,  there are the settings:
 	- "Enable click on banner" which if set to true enables the ad to be taped.
 	- "Is enabled" button which gets the enabled state of the ad: after the buttton is pressed the label next to it will display the state.
+	(Note! that this enabled property does not work for the moment on Android, it will work only after we can build the runtime against targetSdkVersion = 13.)
 	- "Show banner" option which shows or hides the banner.
 	- "Is visible" button gets the visibility of the banner.
-	- "Get size" which gets the size of the banner.
+	- "Get size" which gets the size of the banner. Note that even when the banner is not visible, the size can still be retrieved.
 
 The back button exits the application on Android.

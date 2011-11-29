@@ -395,11 +395,11 @@ namespace Notification
      * This setting is ignored if setVibrate is disabled.
      * Using phone vibration requires the VIBRATE permission.
      * Platform: Android.
-     * @param duration The number of milliseconds to vibrate.
+     * @param duration The number of seconds to vibrate.
      */
     void LocalNotification::setVibrateDuration(const int duration)
     {
-		this->setPropertyInt(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, duration);
+		this->setPropertyInt(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, duration * 1000);
     }
 
     /**
@@ -409,13 +409,17 @@ namespace Notification
      * every device supports the same  colors, so the hardware estimates to the
      * best of its ability. Green is the most common notification color.
      * Platform: Android.
-     * @param flahsing If set to true the user will be alerted by the default
+     * @param flashing If set to true the user will be alerted by the default
      * light pattern.
+     * @return One of the following result codes:
+     *  -  MA_NOTIFICATION_RES_ERROR if the current device doesn't support flashing LED.
+     *  -  MA_NOTIFICATION_RES_OK.
      */
-    void LocalNotification::setFlashLights(bool flashing)
+    bool LocalNotification::setFlashLights(bool flashing)
     {
+
         MAUtil::String value = flashing ? "true" : "false";
-        this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, value);
+        return this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, value);
     }
 
     /**
@@ -432,8 +436,8 @@ namespace Notification
     {
 		MAUtil::String pattern = "";
 		pattern = MAUtil::integerToString(lightPattern.ledARGB) + ",";
-		pattern += MAUtil::integerToString(lightPattern.ledOnMS) + ",";
-		pattern += MAUtil::integerToString(lightPattern.ledOffMS);
+		pattern += MAUtil::integerToString(lightPattern.ledOnMS * 1000) + ",";
+		pattern += MAUtil::integerToString(lightPattern.ledOffMS * 1000);
         this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, pattern);
     }
 
@@ -444,8 +448,8 @@ namespace Notification
      */
     void LocalNotification::setFireDate(struct tm* time)
     {
-        int dateMillisec = mktime(time);
-        this->setPropertyInt(MA_NOTIFICATION_LOCAL_FIRE_DATE, dateMillisec);
+        int dateSec = mktime(time);
+        this->setPropertyInt(MA_NOTIFICATION_LOCAL_FIRE_DATE, dateSec);
     }
 
     /**
