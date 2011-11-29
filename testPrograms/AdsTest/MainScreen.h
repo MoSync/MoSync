@@ -69,14 +69,10 @@ private:
 	void createMainLayout();
 
 	/**
-	 * Creates a list view item.
-	 * @param check Will be added to the list view item.
-	 * Can be NULL.
-	 * @param label Will be added to the list view item.
-	 * Cannot be NULL.
-	 * @return The list view item.
+	 * Create a new row for settings.
+	 * It contains a check box/button and a label.
 	 */
-	ListViewItem* createItem(Widget* check, Label* label);
+	HorizontalLayout* createRow(Widget* check, Label* label);
 
     /**
      * Called when a banner view fails to load a new advertisement.
@@ -136,14 +132,6 @@ private:
 	 */
 	Label* mBannerMessage;
 
-	/**
-	 * Contains widgets for setting & getting banner's properties.
-	 */
-	ListView* mListView;
-
-	/**
-	 * Widgets for setting & getting enable property for banner.
-	 */
 	CheckBox* mEnableCheckBox;
 	Button* mRefreshEnableButton;
 	Label* mIsBannerEnabled;
@@ -160,17 +148,6 @@ private:
 	 */
 	Button* mGetSizeButton;
 	Label* mSizeLabel;
-
-	/**
-	 * Widgets for setting & getting color properties for banner.
-	 * Used only on Android platform.
-	 */
-	Button* mSetBgColor;
-	Button* mSetTopColor;
-	Button* mSetBorderColor;
-	Button* mSetLinkColor;
-	Button* mSetTextColor;
-	Button* mSetUrlColor;
 };
 
 #endif /* MAINSCREEN_H_ */

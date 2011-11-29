@@ -2977,7 +2977,7 @@ public class MoSyncThread extends Thread
 	 */
 	int maNotificationLocalDestroy(int handle)
 	{
-		return mMoSyncNotifications.maNotificationLocalDestroy(handle, mContext);
+		return mMoSyncNotifications.maNotificationLocalDestroy(handle);
 	}
 
 	/**

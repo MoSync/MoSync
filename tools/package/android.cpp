@@ -288,13 +288,14 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t</activity>\n"
 		// Enable Google AdMob Ads.
 		<<"\t\t<activity android:name=\"com.google.ads.AdActivity\"\n"
-		//<<"\t\t\tandroid:theme=\"@android:style/Theme.NoTitleBar.FullScreen\">\n"
+		<<"\t\t\tandroid:theme=\"@android:style/Theme.NoTitleBar.FullScreen\">\n"
 		<<"\t\t\tandroid:configChanges=\"orientation|keyboard|keyboardHidden\">\n"
 		<<"\t\t</activity>\n"
 		;
-    //if (ri.androidVersion >= 8) {
+	file <<"\t\t<service android:name=\"com.mosync.internal.android.notifications.LocalNotificationsService\" />\n";
+    if (ri.androidVersion >= 8) {
 		writeC2DMReceiver(file, packageName);
-	//}
+	}
 	file <<"\t</application>\n"
 		<<"\t<uses-sdk android:minSdkVersion=\""<<ri.androidVersion<<"\" />\n"
 		;
@@ -380,16 +381,14 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	// Only add this for android 2.2 and higher. Permission for Google C2DM Service for push notifications.
 	if (ri.androidVersion >= 8)
 	{
-		//if (isPermissionSet(permissionSet, C2DM_MESSAGE))
-		//{
+		if (isPermissionSet(permissionSet, PUSH_NOTIFICATIONS))
+		{
 			stream <<"\t<permission android:name=\"com.mosync.java.android.permission.C2D_MESSAGE\"\n";
 			stream <<"\t\tandroid:protectionLevel=\"signature\" />\n";
-		//}
+		}
 		string permMessage = packageName + ".permission.C2D_MESSAGE";
-		//writePermission(stream, isPermissionSet(permissionSet, C2DM_MESSAGE), permMessage.c_str());
-		writePermission(stream, true, permMessage.c_str());
-		//writePermission(stream, isPermissionSet(permissionSet, C2DM_RECEIVE), "com.google.android.c2dm.permission.RECEIVE");
-		writePermission(stream,true, "com.google.android.c2dm.permission.RECEIVE");
+		writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), permMessage.c_str());
+		writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "com.google.android.c2dm.permission.RECEIVE");
 	}
 }
 static void writePermission(ostream& stream, bool flag, const char* nativePerm) {

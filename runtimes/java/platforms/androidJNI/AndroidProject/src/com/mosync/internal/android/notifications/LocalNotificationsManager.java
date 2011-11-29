@@ -6,10 +6,10 @@ import android.util.Log;
 
 import com.mosync.internal.android.MoSyncThread;
 import com.mosync.internal.generated.IX_WIDGET;
-import com.mosync.java.android.MoSyncService;
 import com.mosync.nativeui.util.HandleTable;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
+import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_LOCAL_NOTIFICATION;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
@@ -24,19 +24,34 @@ public class LocalNotificationsManager
 {
 	/**
 	 * Constructor.
+	 * @param thread The MoSync thread object.
 	 */
-	public LocalNotificationsManager(){
+	public LocalNotificationsManager(MoSyncThread thread)
+	{
+		mMoSyncThread = thread;
 	}
 
 	/**
 	 * Create a notification object.
-	 * @param appContext
+	 * @param appContext Application's context.
 	 * @return The unique notification id.
 	 */
 	public int create(Context appContext)
 	{
-		mAppContext = appContext;
-		return mService.createNotification(appContext.getApplicationContext());
+		return createNotification(appContext);
+	}
+
+	/**
+	 * Create an empty notification object.
+	 * Set it's properties via maNotificationSetProperty calls.
+	 * @param appContext application's context.
+	 * @return notification's unique Id.
+	 */
+	public int createNotification(Context appContext)
+	{
+		LocalNotificationObject notification = new LocalNotificationObject(appContext);
+		notification.setId( m_NotificationTable.add(notification) );
+		return notification.getId();
 	}
 
 	/**
@@ -44,17 +59,21 @@ public class LocalNotificationsManager
 	 * @param handle The notification handle.
 	 * @return result code.
 	 */
-	public int destroy(int handle, Activity activity)
+	public int destroy(int handle)
 	{
 		LocalNotificationObject notification = m_NotificationTable.get(handle);
 		if ( notification != null )
 		{
-			// Remove the service notification.
-			MoSyncService.removeServiceNotification(
-					 m_NotificationTable.get(handle).getId(), activity);
-//			return mService.stopService();
-			// Stop the service.
-			MoSyncService.stopService();
+			// Remove the service notification if it is pending.
+			if ( notification.isActive() )
+			{
+				LocalNotificationsService.removeServiceNotification(
+						m_NotificationTable.get(handle).getId(),
+						mMoSyncThread.getActivity());
+			}
+			// Stop the service, even when the application is in background.
+			LocalNotificationsService.stopService();
+			// Remove the internal notification object.
 			m_NotificationTable.remove(handle);
 			return MA_NOTIFICATION_RES_OK;
 		}
@@ -79,13 +98,13 @@ public class LocalNotificationsManager
 			try{
 				return notif.setProperty(property, value);
 			}catch (PropertyConversionException pce){
-				Log.e("@@MoSync", "maNotificationSetProperty: Error while converting property value "+ value + ":" + pce.getMessage());
+				Log.e("@@MoSync", "maNotificationLocalSetProperty: Error while converting property value "+ value + ":" + pce.getMessage());
 				return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
 			}
 		}
 		else
 		{
-			Log.e("@@MoSync", "maNotificationSetProperty: Invalid notification handle: "+ handle);
+			Log.e("@@MoSync", "maNotificationLocalSetProperty: Invalid notification handle: "+ handle);
 			return MA_NOTIFICATION_RES_INVALID_HANDLE;
 		}
 	}
@@ -153,8 +172,7 @@ public class LocalNotificationsManager
 		}
 		else
 		{
-			// Get the id of the notification.
-			mService.startService(appContext, m_NotificationTable.get(handle).getId());
+			LocalNotificationsService.startService(appContext, m_NotificationTable.get(handle));
 			return MA_NOTIFICATION_RES_OK;
 		}
 	}
@@ -173,26 +191,40 @@ public class LocalNotificationsManager
 		}
 		else
 		{
-			m_NotificationTable.remove(handle);
-			return mService.stopService();
+			// Remove the service notification if it is pending.
+			if ( notification.isActive() )
+			{
+				LocalNotificationsService.removeServiceNotification(
+						m_NotificationTable.get(handle).getId(),
+						mMoSyncThread.getActivity());
+				// Set the state of the notification to inactive.
+				notification.unschedule();
+			}
+			// No need to delete the notification, just stop
+			// the service if it's started.
+			return LocalNotificationsService.stopService();
+//			return LocalNotificationsService.stopServiceIntent();
 		}
 	}
 
+	/**
+	 * Post a message to the MoSync event queue.
+	 * Send the handle of the local notification.
+	 * @param index The notification handle.
+	 */
+	public static void postEventNotificationReceived(int handle)
+	{
+		int[] event = new int[2];
+		event[0] = EVENT_TYPE_LOCAL_NOTIFICATION;
+		event[1] = handle;
+
+		mMoSyncThread.postEvent(event);
+	}
 	/************************ Class members ************************/
 	/**
 	 * The MoSync thread object.
 	 */
-	public MoSyncThread mMoSyncThread;
-
-	/**
-	 * Application context.
-	 */
-	public Context mAppContext;
-
-	/**
-	 * The service that notifies the user, even though the application is in background.
-	 */
-	public LocalNotificationsService mService;
+	private static MoSyncThread mMoSyncThread;
 
 	/**
 	 * A table that contains a mapping between a handle and a notification.

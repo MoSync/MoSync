@@ -7,11 +7,11 @@ package com.mosync.nativeui.ui.ads;
 public class AdsEvent
 {
 	// Banner's handle that sends the event.
-	int mBannerHandle;
+	public int mBannerHandle;
 	// One of the #MA_ADS_EVENT constants.
-	int mBannerEventType;
+	public int mBannerEventType;
 	// If bannerEventType is #MA_ADS_EVENT_FAILED this code will describe the error.
-	int mErrCode;
+	public int mErrCode;
 
 	public AdsEvent(int type, int handle, int errorCode)
 	{

@@ -3,9 +3,6 @@ package com.mosync.java.android;
 import com.google.android.c2dm.C2DMBaseReceiver;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
