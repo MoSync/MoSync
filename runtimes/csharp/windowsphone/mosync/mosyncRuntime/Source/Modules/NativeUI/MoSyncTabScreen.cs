@@ -1,4 +1,30 @@
-﻿using System;
+﻿/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+/**
+ * @file MoSyncTabScreen.cs
+ * @author Ciprian Filipas
+ *
+ * @brief This represents the TabScreen implementation for the NativeUI
+ *        component on Windows Phone 7, language c#
+ * @note The Icon property cannot be implemented on Windows Phone
+ * @platform WP 7.1
+ **/
+
+using System;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -15,29 +41,65 @@ namespace MoSync
     {
         public class TabScreen : Screen
         {
+            //The TabScreen is currently implemented using a Pivot control
             protected Microsoft.Phone.Controls.Pivot mPivot;
 
-            public TabScreen()
+            //The constructor
+            public TabScreen() : base()
             {
                 mPivot = new Microsoft.Phone.Controls.Pivot();
-                mPivot.Title = "My Application";
-                View = mPivot;
+
+                //Setting the content of the View property of a Screen (which is a PhoneApplicationPage)
+                //as the Pivot control
+                (View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = mPivot;
             }
 
+            //Override of the AddChild function, add a "tab" to the Screen
             public override void AddChild(IWidget child)
             {
-                base.AddChild(child);
                 if (child is Screen)
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                         {
-                            Microsoft.Phone.Controls.PivotItem pivItem = new Microsoft.Phone.Controls.PivotItem();
-                            pivItem.Height = 200;
-                            //pivItem.Content = child;
-                            pivItem.Header = ((child as Screen).View as Microsoft.Phone.Controls.PhoneApplicationPage).Title;
-                            mPivot.Items.Add(pivItem);
+                            mPivot.Items.Add(new Microsoft.Phone.Controls.PivotItem {
+                                Header = ((child as Screen).View as Microsoft.Phone.Controls.PhoneApplicationPage).Title,
+                                Content = (child as Screen).View
+                            });
                         }
                     );
+                }
+            }
+
+            //MAW_TAB_SCREEN_TITLE property implementation
+            //In order to avoid the property hiding from Screen you have to specify
+            //the new keyword in front of the property
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_TAB_SCREEN_TITLE)]
+            public new String Title
+            {
+                set
+                {
+                    mPivot.Title = value;
+                }
+            }
+
+            //MAW_TAB_SCREEN_CURRENT_TAB property implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_TAB_SCREEN_CURRENT_TAB)]
+            public String CurrentTab
+            {
+                set
+                {
+                    int val;
+                    if (Int32.TryParse(value, out val))
+                    {
+                        if (val < mPivot.Items.Count)
+                        {
+                            mPivot.SelectedIndex = val;
+                        }
+                    }
+                }
+                get
+                {
+                    return mPivot.SelectedIndex.ToString();
                 }
             }
         }

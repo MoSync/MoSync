@@ -39,12 +39,15 @@ namespace MoSync
         public class Screen : WidgetBaseWindowsPhone, IScreen
         {
             protected PhoneApplicationPage mPage;
+
+            //The constructor
             public Screen()
             {
                 mPage = new PhoneApplicationPage();
                 mView = mPage;
             }
 
+            //The AddChild implementation
             public override void AddChild(IWidget child)
             {
                 base.AddChild(child);
@@ -52,11 +55,10 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     mPage.Content = w.View;
-                    ((System.Windows.FrameworkElement)w.View).Width = ScreenSize.SCREEN_WIDTH;
-                    ((System.Windows.FrameworkElement)w.View).Height = ScreenSize.SCREEN_HEIGHT;
                 });
             }
 
+            //Show function implementation
             public void Show()
             {
                 MoSync.Util.RunActionOnMainThreadSync(() =>
