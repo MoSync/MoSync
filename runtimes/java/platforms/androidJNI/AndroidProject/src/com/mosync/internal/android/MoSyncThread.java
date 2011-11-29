@@ -713,7 +713,7 @@ public class MoSyncThread extends Thread
 	 * @return ByteBuffer with the data.
 	 * @throws Exception
 	 */
-	public ByteBuffer readInputStream(InputStream is) throws Exception
+	public synchronized ByteBuffer readInputStream(InputStream is) throws Exception
 	{
 		ReadableByteChannel byteChannel = Channels.newChannel(is);
 		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(CHUNK_READ_SIZE);
@@ -795,7 +795,7 @@ public class MoSyncThread extends Thread
 	 *
 	 * @return	The created Bitmap, null if it failed
 	 */
-	Bitmap decodeImageFromData(final byte[] data, final BitmapFactory.Options options)
+	synchronized Bitmap decodeImageFromData(final byte[] data, final BitmapFactory.Options options)
 	{
 		try
 		{
@@ -844,7 +844,7 @@ public class MoSyncThread extends Thread
 	 *
 	 * @return	The created Bitmap, null if it failed
 	 */
-	Bitmap createBitmap(final int width, final int height)
+	synchronized Bitmap createBitmap(final int width, final int height)
 	{
 		try
 		{
@@ -877,7 +877,7 @@ public class MoSyncThread extends Thread
 	 *
 	 * @return	The created Bitmap, null if it failed
 	 */
-	Bitmap createBitmapFromData(final int width, final int height, final int[] pixels)
+	synchronized Bitmap createBitmapFromData(final int width, final int height, final int[] pixels)
 	{
 		try
 		{
@@ -2032,7 +2032,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * maOpenStore
 	 */
-	int maOpenStore(String name, int flags)
+	synchronized int maOpenStore(String name, int flags)
 	{
 		SYSLOG("maOpenStore");
 
@@ -2078,7 +2078,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * maWriteStore
 	 */
-	int maWriteStore(int store, int data)
+	synchronized int maWriteStore(int store, int data)
 	{
 		SYSLOG("maWriteStore");
 		try
@@ -2138,7 +2138,7 @@ public class MoSyncThread extends Thread
 	 * _maReadStore
 	 * @return RES_OUT_OF_MEMORY on error.
 	 */
-	int _maReadStore(int store, int resourceIndex)
+	synchronized int _maReadStore(int store, int resourceIndex)
 	{
 		SYSLOG("_maReadStore");
 
@@ -2288,7 +2288,7 @@ public class MoSyncThread extends Thread
 		}
 		catch (InterruptedException ie)
 		{
-			SYSLOG("Sleeping thread interrupted!");
+			SYSLOG("Sleeping thread interrupted (this is normal behaviour)");
 		}
 		// TODO: This exception is never thrown! Remove it.
 		catch (Exception e)
