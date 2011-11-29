@@ -35,23 +35,23 @@ using System.Collections.Generic;
 
 namespace MoSync
 {
-	namespace NativeUI
-	{
+    namespace NativeUI
+    {
         /**
          * The ListView class that displays a list of items, containing text and an image
          */
-		public class ListView : WidgetBaseWindowsPhone
-		{
+        public class ListView : WidgetBaseWindowsPhone
+        {
             /**
              * A ListBox object that will hold the items
              */
-			protected System.Windows.Controls.ListBox mList;
+            protected System.Windows.Controls.ListBox mList;
 
             /**
              * Constructor
              */
-			public ListView()
-			{
+            public ListView()
+            {
                 mList = new System.Windows.Controls.ListBox();
 
                 mView = mList;
@@ -60,73 +60,84 @@ namespace MoSync
                     delegate(Object from, System.Windows.Input.GestureEventArgs evt)
                     {
                         //create a Memory object of 8 Bytes
-                        Memory eventData = new Memory(8);
+                        Memory eventData = new Memory(12);
 
                         //starting with the 0 Byte we write the eventType
                         const int MAWidgetEventData_eventType = 0;
                         //starting with the 4th Byte we write the widgetHandle
+
                         const int MAWidgetEventData_widgetHandle = 4;
 
-                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
+                        //starting with the 8th Byte we write the selectedIndex
+                        const int MAWidgetEventData_selectedIndex = 8;
+
+                        int selIndex = mList.SelectedIndex;
+
+                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_ITEM_CLICKED);
                         eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                        //posting a CustomEvent
-                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+
+                        if (selIndex > 0)
+                        {
+                            eventData.WriteInt32(MAWidgetEventData_selectedIndex, selIndex);
+                            //posting a CustomEvent
+                            mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
+                        }
                     });
-			}
+            }
 
             /**
              * Override of the WidgetBase AddChild function
              */
-			public override void AddChild(IWidget child)
-			{
-				base.AddChild(child);
-				MoSync.Util.RunActionOnMainThreadSync(() =>
-				{
-					System.Windows.Controls.ListBoxItem item = new System.Windows.Controls.ListBoxItem();
-					WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
-					item.Content = widget.View;
-					mList.Items.Add(item);
-				});
-			}
+            public override void AddChild(IWidget child)
+            {
+                base.AddChild(child);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    System.Windows.Controls.ListBoxItem item = new System.Windows.Controls.ListBoxItem();
+                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+                    item.Content = widget.View;
+                    mList.Items.Add(item);
+                });
+            }
 
             /**
              * Override of the WidgetBase InsertChild function
              */
-			public override void InsertChild(IWidget child, int index)
-			{
-				base.InsertChild(child, index);
-				MoSync.Util.RunActionOnMainThreadSync(() =>
-				{
-					System.Windows.Controls.ListBoxItem item = new System.Windows.Controls.ListBoxItem();
-					WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
-					item.Content = widget.View;
-					mList.Items.Insert(index, item);
-				});
-			}
+            public override void InsertChild(IWidget child, int index)
+            {
+                base.InsertChild(child, index);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    System.Windows.Controls.ListBoxItem item = new System.Windows.Controls.ListBoxItem();
+                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+                    item.Content = widget.View;
+                    mList.Items.Insert(index, item);
+                });
+            }
 
             /**
              * Override of the WidgetBase RemoveChild function
              */
-			public override void RemoveChild(int index)
-			{
-				base.RemoveChild(index);
-				MoSync.Util.RunActionOnMainThreadSync(() =>
-				{
-					mList.Items.RemoveAt(index);
-				});
-			}
+            public override void RemoveChild(int index)
+            {
+                base.RemoveChild(index);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mList.Items.RemoveAt(index);
+                });
+            }
 
             /**
              * Override of the WidgetBase RemoveChild function
              */
-			public override void RemoveChild(IWidget child)
-			{
-				int index = base.mChildren.IndexOf(child);
-				if (index >= 0)
-				{
-					this.RemoveChild(index);
-				}
-			}
-		}
-	}
+            public override void RemoveChild(IWidget child)
+            {
+                int index = base.mChildren.IndexOf(child);
+                if (index >= 0)
+                {
+                    this.RemoveChild(index);
+                }
+            }
+        }
+    }
 }

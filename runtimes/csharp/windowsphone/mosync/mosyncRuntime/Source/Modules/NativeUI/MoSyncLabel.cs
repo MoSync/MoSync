@@ -44,7 +44,7 @@ namespace MoSync
 				mMaxNumberOfLines = 0;
 
                 mLabel = new System.Windows.Controls.TextBlock();
-				mLabel.TextWrapping = TextWrapping.NoWrap;
+				mLabel.TextWrapping = TextWrapping.Wrap;
 
                 mView = mLabel;
 			}
