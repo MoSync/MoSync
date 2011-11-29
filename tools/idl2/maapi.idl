@@ -1005,6 +1005,11 @@ interface MAAPI {
 	*/
 	int maLoadResource(in MAHandle handle, in MAHandle placeholder, in int flag);
 
+	/*
+	* Returns the number of available resources.
+	*/
+	int maCountResources();
+
 	/**
 	* Loads a new program from the a data object, closes the running program, and starts the new one.
 	* The format of the data object is a MoSync program file concatenated with a resource file.

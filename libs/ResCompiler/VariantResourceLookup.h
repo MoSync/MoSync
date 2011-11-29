@@ -30,16 +30,18 @@ MA 02110-1301, USA.
 #include <ma.h>
 #include <mastring.h>
 
-#include "ResourceSetLookup.h"
 #include "rescompdefines.h"
 
 namespace ResourceCompiler
 {
+	class ResourceSetLookup;
+
 	class VariantResourceLookup
 	{
 	public:
 		VariantResourceLookup();
 		~VariantResourceLookup();
+		void countResources();
 		void readVariantMapping(MAHandle handle);
 		void readResourceTypes(MAHandle handle);
 		bool checkVariant(char* variant);
@@ -47,7 +49,7 @@ namespace ResourceCompiler
 		MAHandle getSmartHandle(MAHandle handle);
 		void loadResource(MAHandle handle, byte flag = MA_RESOURCE_OPEN|MA_RESOURCE_CLOSE);
 		void unloadResource(MAHandle handle);
-		void loadResources();
+		void loadResources(bool checkDelayed);
 
 	private:
 		// The number of variants that has specific resource sets

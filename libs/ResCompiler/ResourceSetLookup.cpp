@@ -22,6 +22,7 @@ MA 02110-1301, USA.
  **/
 
 #include "ResourceSetLookup.h"
+#include "ByteArrayStream.h"
 
 namespace ResourceCompiler
 {

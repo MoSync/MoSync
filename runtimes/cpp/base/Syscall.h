@@ -47,8 +47,10 @@ namespace Base {
 #include "SyscallImpl.h"
 
 	public:
+		bool loadResourcesFromBuffer(Stream& file, const char* aFilename);
 		bool loadResources(Stream& file, const char* aFilename);
 		bool loadResource(Stream& file, MAHandle originalHandle, MAHandle destHandle);
+		int countResources();
 
 		void init();
 		virtual ~Syscall();

@@ -27,11 +27,12 @@ MA 02110-1301, USA.
 #ifndef __RESOURCESETLOOKUP_H__
 #define __RESOURCESETLOOKUP_H__
 
-#include "ByteArrayStream.h"
 #include "rescompdefines.h"
 
 namespace ResourceCompiler
 {
+	class ByteArrayStream;
+
 	class ResourceSetLookup
 	{
 	private:

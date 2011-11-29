@@ -22,10 +22,19 @@ MA 02110-1301, USA.
  **/
 
 #include "rescomp.h"
+#include "VariantResourceLookup.h"
+
+ResourceCompiler::VariantResourceLookup resManager;
 
 int loadResource(MAHandle handle)
 {
 	resManager.loadResource(handle);
+	return 0;
+}
+
+int unloadResource(MAHandle handle)
+{
+	resManager.unloadResource(handle);
 	return 0;
 }
 
@@ -34,8 +43,11 @@ int resource_selector()
 	int labelMapping = maFindLabel("variant-mapping");
 	int labelTypes = maFindLabel("res-types");
 
+	resManager.countResources();
+
 	if ((labelMapping == -1) || (labelTypes == -1))
 	{
+		resManager.loadResources(false);
 		return -1;
 	}
 
@@ -45,7 +57,7 @@ int resource_selector()
 
 	resManager.pickResources();
 
-	resManager.loadResources();
+	resManager.loadResources(true);
 
 	return 0;
 }

@@ -22,6 +22,8 @@ MA 02110-1301, USA.
  **/
 
 #include "VariantResourceLookup.h"
+#include "ResourceSetLookup.h"
+#include "ByteArrayStream.h"
 
 namespace ResourceCompiler
 {
@@ -38,8 +40,17 @@ namespace ResourceCompiler
 		DELETE(resourceTypes)
 	}
 
+	void VariantResourceLookup::countResources()
+	{
+		numberOfResources = maCountResources();
+		PRINTINT(numberOfResources);
+	}
+
 	void VariantResourceLookup::readVariantMapping(MAHandle handle)
 	{
+		// if we have a mapping binary, that means we will ignore it and it's label in the future
+		numberOfResources -= 2;
+
 		PRINTINT(handle);
 
 		PRINT("maLoadRes");
@@ -77,6 +88,10 @@ namespace ResourceCompiler
 
 	void VariantResourceLookup::readResourceTypes(MAHandle handle)
 	{
+		//TODO: remove this binary
+		// if we have a resource types binary, that means we will ignore it and it's label in the future
+		numberOfResources -= 2;
+
 		PRINTINT(handle);
 
 		maLoadResource(handle, handle, MA_RESOURCE_OPEN|MA_RESOURCE_CLOSE);
@@ -87,7 +102,7 @@ namespace ResourceCompiler
 		ByteArrayStream* buffer = new ByteArrayStream(bufferSize);
 		buffer->writeData(handle);
 
-		numberOfResources = buffer->readShort();
+		buffer->readShort(); //TODO: remove this short from the binary
 		PRINTINT(numberOfResources)
 
 		resourceTypes = new byte[numberOfResources];
@@ -219,19 +234,21 @@ namespace ResourceCompiler
 		maDestroyObject(handle);
 	}
 
-	void VariantResourceLookup::loadResources()
+	void VariantResourceLookup::loadResources(bool checkDelayed)
 	{
 		int flag = MA_RESOURCE_OPEN;
 		int lastLoadedResource = -1;
 		for (int i=0; i<numberOfResources; i++)
 		{
-			if ((resourceTypes[getSmartHandle(i+1)] & 0x40) == 0)
+			if ( !checkDelayed || ((resourceTypes[getSmartHandle(i+1)] & 0x40) == 0) )
 			{
 				loadResource(i + 1, flag);
 				lastLoadedResource = i + 1;
 				flag = 0;
 			}
 		}
+
+		// since this resource is already loaded, just close the resoruce file
 		if (lastLoadedResource != -1)
 		{
 			loadResource(lastLoadedResource, MA_RESOURCE_CLOSE);

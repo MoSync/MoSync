@@ -24,13 +24,11 @@ MA 02110-1301, USA.
 #ifndef __RESCOMP_H__
 #define __RESCOMP_H__
 
-#include "VariantResourceLookup.h"
+#include <ma.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-	ResourceCompiler::VariantResourceLookup resManager;
-
 	int loadResource(MAHandle handle);
 	int resource_selector();
 #ifdef __cplusplus

@@ -141,10 +141,178 @@ namespace Base {
 		platformDestruct();
 	}
 
+	/*
+	* Loads all resources from the given buffer.
+	*/
+	bool Syscall::loadResourcesFromBuffer(Stream& file, const char* aFilename)  {
+		bool hasResources = true;
+		if(!file.isOpen())
+			hasResources = false;
+		else {
+			int len, pos;
+			TEST(file.length(len));
+			TEST(file.tell(pos));
+			if(len == pos)
+				hasResources = false;
+		}
+		if(!hasResources/* && aFilename != NULL*/) {
+			resources.init(0);
+			return true;
+		}
+
+#define MATCH_BYTE(c) { DAR_UBYTE(b); if(b != c) { FAIL; } }
+		MATCH_BYTE('M');
+		MATCH_BYTE('A');
+		MATCH_BYTE('R');
+		MATCH_BYTE('S');
+
+		DAR_UVINT(nResources);
+		DAR_UVINT(rSize);
+		resources.init(nResources);
+
+		// rI is the resource index.
+		int rI = 1;
+
+		while(true) {
+			DAR_UBYTE(type);
+			if(type == 0)
+				break;
+
+			//dispose flag
+
+			DAR_UVINT(size);
+			LOG_RES("Type %i, size %i\n", type, size);
+
+			switch(type) {
+			case RT_BINARY:
+				{
+#ifndef _android
+					MemStream* ms = new MemStream(size);
+#else
+					char* b = loadBinary(rI, size);
+					MemStream* ms = new MemStream(b, size);
+#endif
+					TEST(file.readFully(*ms));
+					ROOM(resources.dadd_RT_BINARY(rI, ms));
+#ifdef _android
+					checkAndStoreAudioResource(rI);
+#endif
+				}
+				break;
+			case RT_UBIN:
+				{
+					int pos;
+					MYASSERT(aFilename, ERR_RES_LOAD_UBIN);
+					TEST(file.tell(pos));
+#ifndef _android
+					ROOM(resources.dadd_RT_BINARY(rI,
+						new LimitedFileStream(aFilename, pos, size)));
+#else
+					// Android loads ubins by using JNI.
+					loadUBinary(rI, pos, size);
+					ROOM(resources.dadd_RT_BINARY(rI,
+						new LimitedFileStream(
+							aFilename,
+							pos,
+							size,
+							getJNIEnvironment(),
+							getJNIThis())));
+#endif
+					TEST(file.seek(Seek::Current, size));
+				}
+				break;
+			case RT_PLACEHOLDER:
+				ROOM(resources.dadd_RT_PLACEHOLDER(rI, NULL));
+				break;
+			case RT_IMAGE:
+				{
+					MemStream b(size);
+					TEST(file.readFully(b));
+#ifndef _android
+					// On all platforms except Android, we load and add
+					// the image data. "dadd" means "delete and add",
+					// and is defined in runtimes\cpp\base\ResourceArray.h
+                    RT_IMAGE_Type* image = loadImage(b);
+                    if(!image)
+                        BIG_PHAT_ERROR(ERR_IMAGE_LOAD_FAILED);
+					ROOM(resources.dadd_RT_IMAGE(rI, image));
+#else
+					// On Android images are stored on the Java side.
+					// Here we allocate a dummy array (real image is
+					// in a table in Java) so that the resource handling,
+					// like deleting resources, will work also on Android.
+					// The actual image will be garbage collected on
+					// Android when a resource is replaced in the Java table.
+					ROOM(resources.dadd_RT_IMAGE(rI, new int[1]));
+					int pos;
+					file.tell(pos);
+					loadImage(
+						rI,
+						pos - size,
+						size,
+						Base::gSyscall->getReloadHandle());
+#endif
+				}
+				break;
+			case RT_SPRITE:
+				{
+					DAR_USHORT(indexSource);
+					DAR_USHORT(left);
+					DAR_USHORT(top);
+					DAR_USHORT(width);
+					DAR_USHORT(height);
+					DAR_SHORT(cx);
+					DAR_SHORT(cy);
+#ifndef _android
+					ROOM(resources.dadd_RT_IMAGE(rI, loadSprite(resources.get_RT_IMAGE(indexSource),
+						left, top, width, height, cx, cy)));
+#endif
+				}
+				break;
+			case RT_LABEL:
+				{
+					MemStream b(size);
+					TEST(file.readFully(b));
+					ROOM(resources.dadd_RT_LABEL(rI, new Label((const char*)b.ptr(), rI)));
+				}
+				break;
+
+#ifdef LOGGING_ENABLED
+			case 99:  //testtype
+#define DUMP_UVI { DAR_UVINT(u); LOG_RES("u %i\n", u); }
+#define DUMP_SVI { DAR_SVINT(s); LOG_RES("s %i\n", s); }
+				DUMP_UVI;
+				DUMP_UVI;
+				DUMP_UVI;
+				DUMP_SVI;
+				DUMP_SVI;
+				DUMP_SVI;
+				DUMP_SVI;
+				DUMP_SVI;
+				DUMP_SVI;
+				break;
+#endif
+			default:
+				TEST(file.seek(Seek::Current, size));
+			}
+			rI++;
+		}
+		if(rI != nResources + 1) {
+			LOG("rI %i, nR %i\n", rI, nResources);
+			BIG_PHAT_ERROR(ERR_RES_FILE_INCONSISTENT);
+		}
+		LOG_RES("ResLoad complete\n");
+		return true;
+	}
+
+	int resourcesCount = -1;
 	int *resourceOffset;
 	int *resourceSize;
 	int *resourceType;
 
+	/*
+	* Loads all resources from the stream, except images, binaries and sprites.
+	*/
 	bool Syscall::loadResources(Stream& file, const char* aFilename)  {
 
 		int startPos = 0;
@@ -174,6 +342,7 @@ namespace Base {
 		DAR_UVINT(rSize);
 		resources.init(nResources);
 
+		resourcesCount = nResources;
 		resourceOffset = new int[nResources];
 		resourceSize = new int[nResources];
 		resourceType = new int[nResources];
@@ -262,6 +431,9 @@ namespace Base {
 		return true;
 	}
 
+	/*
+	* Loads a resource from the stream, from originalHandle index to destHandle placeholder.
+	*/
 	bool Syscall::loadResource(Stream& file, MAHandle originalHandle, MAHandle destHandle)  {
 
 		if(!file.isOpen())
@@ -356,6 +528,11 @@ namespace Base {
 			LOG("Cannot load resource type %d.", type);
 		}
 		return true;
+	}
+
+	int Syscall::countResources()
+	{
+		return resourcesCount;
 	}
 }	//namespace Base
 
@@ -732,7 +909,11 @@ namespace Base {
 
 	SYSCALL(int, maLoadResources(MAHandle data)) {
 		Stream* b = SYSCALL_THIS->resources.get_RT_BINARY(data);
-		return SYSCALL_THIS->loadResources(*b, NULL);
+		return SYSCALL_THIS->loadResourcesFromBuffer(*b, NULL);
+	}
+
+	SYSCALL(int, maCountResources()) {
+		return SYSCALL_THIS->countResources();
 	}
 
 	SYSCALL(void, maExit(int result)) {
