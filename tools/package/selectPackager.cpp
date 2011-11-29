@@ -77,9 +77,7 @@ void package(const SETTINGS& s) {
 	}
 
 	// select runtime
-	if (ri.path.find("wm6pro/2") != string::npos) {
-		packageWindowsPhone(s, ri);
-	} else if (runtimeName == "JavaME") {
+	if (runtimeName == "JavaME") {
 		packageJavaME(s, ri);
 		if (ri.isBlackberry) {
 			packageBlackberry(s, ri);
@@ -98,6 +96,8 @@ void package(const SETTINGS& s) {
 		packageWM(s, ri);
 	} else if (runtimeName == "wm6pro") {
 		packageWM(s, ri);
+	} else if (runtimeName == "winphone") {
+		packageWindowsPhone(s, ri);
 	} else if (runtimeName == "moblin") {
 		packageMoblin(s, ri);
 	} else if (runtimeName.find("android") == 0) { //begins with
