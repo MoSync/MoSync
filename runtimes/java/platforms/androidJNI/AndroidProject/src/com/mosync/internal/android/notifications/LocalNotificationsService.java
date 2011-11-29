@@ -58,12 +58,14 @@ public class LocalNotificationsService extends Service
 	{
 		Log.i("@@@MoSync", "NotificationsService.startService");
 
-		// There should be no running service.
-//		if (null != sMe)
-//		{
-//			Log.i("@@@MoSync", "NotificationsService.startService - service is already running, returning");
+		// The service is already running.
+		if (null != sMe)
+		{
+			Log.i("@@@MoSync", "NotificationsService.startService - service is already running");
+			// Schedule the new notification.
+//			scheduleNotification(notification);
 //			return;
-//		}
+		}
 
 		mLatestNotification = notification;
 
@@ -223,7 +225,7 @@ public class LocalNotificationsService extends Service
 	 */
 	private void scheduleNotification()
 	{
-//		Log.e("@@MoSync","scheduleNotification");
+		Log.e("@@MoSync","scheduleNotification");
 
 		// If the fire date is not set, trigger it now.
 		if ( mLatestNotification.getFireDate() == -1 )
@@ -252,7 +254,7 @@ public class LocalNotificationsService extends Service
 	 */
 	void triggerNotification()
 	{
-//		Log.e("@@MoSync","triggerNotification");
+		Log.e("@@MoSync","triggerNotification");
 
 		// The notification is already created, just trigger it.
 		mLatestNotification.trigger();

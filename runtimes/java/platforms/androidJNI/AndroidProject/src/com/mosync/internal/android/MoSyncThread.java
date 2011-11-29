@@ -289,7 +289,6 @@ public class MoSyncThread extends Thread
 	 */
 	public MoSyncThread(Context context, Handler handler) throws Exception
 	{
-		Log.e("Emma","moSycn thread constructor");
 		mContext = (MoSync) context;
 
 		// TODO: Clean this up! The static reference should be in one place.
