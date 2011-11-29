@@ -3,6 +3,7 @@
 
 require File.expand_path('../../rules/mosync_lib.rb')
 
+
 work = PipeLibWork.new
 work.instance_eval do
 	def collect_files(ending)
