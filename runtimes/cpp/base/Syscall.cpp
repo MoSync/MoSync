@@ -454,7 +454,6 @@ namespace Base {
 		int size = resourceSize[originalHandle - 1];
 		int offset = resourceOffset[originalHandle - 1];
 		int rI = destHandle;
-		const char* aFilename = "resources";
 
 		if ( resources.is_loaded(rI) )
 		{
