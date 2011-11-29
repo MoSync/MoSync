@@ -3,7 +3,6 @@
 
 require File.expand_path('../../rules/mosync_lib.rb')
 
-raise unless(USE_NEWLIB)
 
 work = PipeLibWork.new
 work.instance_eval do
