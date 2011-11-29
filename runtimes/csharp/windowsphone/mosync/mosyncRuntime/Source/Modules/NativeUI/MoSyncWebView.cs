@@ -218,12 +218,9 @@ namespace MoSync
                         const int MAWidgetEventData_eventType = 0;
                         const int MAWidgetEventData_widgetHandle = 4;
                         const int MAWidgetEventData_status = 8;
-
-
                         eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_WEB_VIEW_CONTENT_LOADING);
                         eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
                         eventData.WriteInt32(MAWidgetEventData_status, MoSync.Constants.MAW_CONSTANT_DONE);
-
                         mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     });
 
