@@ -54,6 +54,7 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 /**
@@ -233,6 +234,11 @@ public class TextBox extends Activity implements OnClickListener {
 		mLabel = new TextView(this);
 		mLabel.setText(title);
 
+		// Use ScrollView for scrollable content (available only in Portrait mode).
+		LinearLayout mainLayout = new LinearLayout(this);
+		ScrollView scrollView = new ScrollView(this);
+		mainLayout.addView(scrollView);
+
 		// Add buttons to a sub-layout
 		LinearLayout horizontalLayout = new LinearLayout(this);
 		horizontalLayout.addView(mCancelButton);
@@ -244,9 +250,10 @@ public class TextBox extends Activity implements OnClickListener {
 		verticalLayout.addView(mLabel);
 		verticalLayout.addView(mEdit);
 		verticalLayout.addView(horizontalLayout);
+		scrollView.addView(verticalLayout);
 
 		// Show the global layout
-		setContentView(verticalLayout);
+		setContentView(mainLayout);
 	}
 
 	@Override
