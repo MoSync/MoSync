@@ -76,7 +76,7 @@ namespace MoSync
 						eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_ITEM_CLICKED);
 						eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
 
-						if (selIndex > 0)
+						if (selIndex > -1)
 						{
 							eventData.WriteInt32(MAWidgetEventData_selectedIndex, selIndex);
 							//posting a CustomEvent
