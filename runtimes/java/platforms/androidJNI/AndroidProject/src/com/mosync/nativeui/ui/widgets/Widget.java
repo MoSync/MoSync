@@ -245,7 +245,7 @@ public class Widget
 	 *
 	 * @param property
 	 * @return the property of the wrapped widget. If no property is found,
-	 *         an empty string is returned.
+	 *         a string describing the error is returned.
 	 */
 	public String getProperty(String property)
 	{
