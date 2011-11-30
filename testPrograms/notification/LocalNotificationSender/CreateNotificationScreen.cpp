@@ -262,6 +262,42 @@ void CreateNotificationScreen::createMainLayout()
 }
 
 /**
+ * Checks if the flash LED pattern has correct input values.
+ */
+bool CreateNotificationScreen::checkFlashPattern()
+{
+	if ( mFlashColor->getText().length() == 0
+			||
+		mFlashOnLength->getText().length() == 0
+			||
+		mFlashOffLength->getText().length() == 0)
+			return false;
+
+	String flashColor = mFlashColor->getText();
+	if (!this->canStringBeConvertedToColor(flashColor))
+	{
+		printf("invalid flash color value");
+		mFlashColor->setFontColor(TEXT_COLOR_ERROR);
+		return false;
+	}
+	String flashOn = mFlashOnLength->getText();
+	if (!this->canStringBeConvertedToInteger(flashOn))
+	{
+		printf("invalid flash on duration value");
+		mFlashOnLength->setFontColor(TEXT_COLOR_ERROR);
+		return false;
+	}
+	String flashOff = mFlashOffLength->getText();
+	if (!this->canStringBeConvertedToInteger(flashOff))
+	{
+		printf("invalid flash off duration value");
+		mFlashOffLength->setFontColor(TEXT_COLOR_ERROR);
+		return false;
+	}
+	return true;
+}
+
+/**
  * This method is called if the touch-up event was inside the
  * bounds of the button.
  * @param button The button object that generated the event.
@@ -327,29 +363,28 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			if ( mFlash->isChecked() )
 			{
 				// Check if flashing LED is possible on the device.
-				if (notification->setFlashLights(true) )
+				if ( notification->setFlashLights(true) )
 				{
-					if ( mFlashColor->getText().length() > 0
-							&&
-							mFlashOnLength->getText().length() > 0
-							&&
-							mFlashOffLength->getText().length() > 0)
-					{
-						struct NotificationFlashLights pattern = NotificationFlashLights(
-								MAUtil::stringToInteger(mFlashColor->getText()),
-								MAUtil::stringToInteger(mFlashOnLength->getText()),
-								MAUtil::stringToInteger(mFlashOffLength->getText()));
-						notification->setFlashLightsPattern(pattern);
-					}
+					mFlashColor->setText("IS available");
+						if ( checkFlashPattern() )
+						{
+							struct NotificationFlashLights pattern = NotificationFlashLights(
+										MAUtil::stringToInteger(mFlashColor->getText()),
+										MAUtil::stringToInteger(mFlashOnLength->getText()),
+										MAUtil::stringToInteger(mFlashOffLength->getText()));
+							notification->setFlashLightsPattern(pattern);
+						}
 				}
 				else
 				{
-					mFlashColor->setText("Not available");
-					mFlashOffLength->setText("Not available");
-					mFlashOnLength->setText("Not available");
-					mFlashColor->setEnabled(false);
-					mFlashOffLength->setEnabled(false);
-					mFlashOnLength->setEnabled(false);
+						mFlashColor->setText("Not available");
+						mFlashOffLength->setText("Not available");
+						mFlashOnLength->setText("Not available");
+						mFlashColor->setEnabled(false);
+						mFlashOffLength->setEnabled(false);
+						mFlashOnLength->setEnabled(false);
+						mFlash->setState(false);
+						mFlash->setEnabled(false);
 				}
 			}
 			else
@@ -457,30 +492,6 @@ bool CreateNotificationScreen::isUserInputDataValid()
 			{
 				printf("invalid vibration duration value");
 				mVibrateDuration->setFontColor(TEXT_COLOR_ERROR);
-				return false;
-			}
-		}
-		if ( mFlash->isChecked() )
-		{
-			String flashColor = mFlashColor->getText();
-			if (!this->canStringBeConvertedToColor(flashColor))
-			{
-				printf("invalid flash color value");
-				mFlashColor->setFontColor(TEXT_COLOR_ERROR);
-				return false;
-			}
-			String flashOn = mFlashOnLength->getText();
-			if (!this->canStringBeConvertedToInteger(flashOn))
-			{
-				printf("invalid flash on duration value");
-				mFlashOnLength->setFontColor(TEXT_COLOR_ERROR);
-				return false;
-			}
-			String flashOff = mFlashOffLength->getText();
-			if (!this->canStringBeConvertedToInteger(flashOff))
-			{
-				printf("invalid flash off duration value");
-				mFlashOffLength->setFontColor(TEXT_COLOR_ERROR);
 				return false;
 			}
 		}
