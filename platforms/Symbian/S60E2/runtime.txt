@@ -1,1 +1,0 @@
-profiles\runtimes\s60v2\1

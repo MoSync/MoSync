@@ -29,7 +29,4 @@
   <capability name="OpenGL" state="REQUIRES_PERMISSION"/>
   <capability name="HTML5" state="SUPPORTED"/>
   <capability name="NativeUI" state="SUPPORTED"/>
-  <capability name="Home Screen" state="UNSUPPORTED"/>
-  <capability name="Autostart" state="UNSUPPORTED"/>
-  <capability name="C2DM" state="UNSUPPORTED"/>
 </platform>

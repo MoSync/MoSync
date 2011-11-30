@@ -35,15 +35,17 @@ enum Fragmentation { BUILDTIME, RUNTIME };
 class Capability {
 private:
 	string fName;
+	string fValue;
 	CapabilityState fState;
 	Fragmentation fFragmentation;
 public:
-	Capability() : fName(""), fState(UNSUPPORTED), fFragmentation(RUNTIME) { }
-	Capability(string name, CapabilityState state, Fragmentation fragmentation) :
-		fName(name), fState(state), fFragmentation(fragmentation) { }
+	Capability() : fName(""), fValue(""), fState(UNSUPPORTED), fFragmentation(RUNTIME) { }
+	Capability(string name, string value, CapabilityState state, Fragmentation fragmentation) :
+		fName(name), fValue(value), fState(state), fFragmentation(fragmentation) { }
 	string getName() { return fName; }
 	CapabilityState getState() { return fState; }
 	Fragmentation getFragmentation() { return fFragmentation; }
+	string getValue() { return fValue; }
 	bool matchCapability(string statePattern);
 	void toXML(XMLWriter& output);
 };
@@ -71,31 +73,43 @@ public:
 	Profile* getParent() { return fParent; }
 	set<string> getCapabilities();
 	Capability getCapability(string capabilityName);
-	void toXML(XMLWriter& output);
+	void toXML(XMLWriter& output, bool includeCapabilities);
 };
 
 class ProfileDB {
 private:
 	string fExcludePattern;
+	bool fOutputMappings;
 	bool fBrief;
+	bool fIncludeCapabilities;
+	map<string, Profile*> fFoundProfiles;
 	string profilesdir();
 	bool isExcluded(Profile* profile);
 	bool parseProfileXML(Profile* profile, set<string> alreadyFound);
 	void getProfiles(string profilePattern, vector<Profile*>& profiles);
 	void matchProfile(string profileName, vector<Capability> requiredCapabilities,
-			vector<Capability> optionalCapabilities, vector<Profile*>& result);
-	void dumpProfile(Profile* profile, string profileName);
-	void dumpProfiles(vector<Profile*> profile, string unmatchedName);
+			vector<Capability> optionalCapabilities, vector<Profile*>& result,
+			map<string, Profile*>& profileMappings);
+	//void dumpProfile(Profile* profile, string profileName);
+	void dumpProfiles(vector<Profile*> profile, map<string, Profile*> profileMappings, string unmatchedName);
+	void dumpProfilesXML(vector<Profile*> profiles, map<string, Profile*> profileMappings, string profileName);
+	void dumpProfilesBrief(vector<Profile*> profiles, map<string, Profile*> profileMappings, string profileName);
+	void dumpProfileMapping(XMLWriter* writer, string profileName, string mappedToProfileName);
+	void dumpProfileMappings(XMLWriter* writer, map<string, Profile*> profileMappings);
 public:
 	ProfileDB() { };
+	virtual ~ProfileDB();
 	void setBrief(bool brief) { fBrief = brief; }
+	void setIncludeCapabilities(bool includeCapabilities) { fIncludeCapabilities = includeCapabilities; }
 	void setExcluded(string excludePattern);
+	void setOutputMappings(bool outputMappings) { fOutputMappings = outputMappings; }
 	void getProfiles(string profileName);
 	void listProfiles(string pattern, bool onlyFamilies);
 	void listCapabilities(string pattern);
 	void listRuntime(string profileName);
 	bool matchProfiles(string profilePattern, vector<Capability> requiredCapabilities,
 			vector<Capability> optionalCapabilities);
+	Profile* findProfile(string profileName);
 	Profile* findProfile(string profileName, set<string> alreadyFound);
 };
 

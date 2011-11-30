@@ -123,12 +123,12 @@ class JavaMEPlatform
         @runtime = runtime
     end
 
-    def write_profile_xml(output_dir, variant, runtimeDir, inherit, write_caps, is_abstract)
+    def write_profile_xml(output_dir, family, variant, runtimeDir, inherit, write_caps, is_abstract)
         # Unfortunately, all these JavaME APIs may
         # require operator certs.
         FileUtils.mkdir_p output_dir
         File.open("#{output_dir}/profile.xml", 'w') do |profile_xml|
-            profile_xml.puts(self.to_xml(@runtime, "JavaME", variant, runtimeDir, inherit, write_caps, is_abstract))
+            profile_xml.puts(self.to_xml(@runtime, family, variant, runtimeDir, inherit, write_caps, is_abstract))
         end
     end
 
@@ -162,6 +162,11 @@ class JavaMEPlatform
             xml << " abstract=\"true\""
         end
         xml << ">\n"
+        if (runtime && runtime.caps.has_key?("MA_PROF_BLACKBERRY_VERSION"))
+            #    xml << "<!-- BlackBerry version: " << runtime.caps["MA_PROF_BLACKBERRY_VERSION"]
+            #xml << "." << runtime.caps["MA_PROF_BLACKBERRY_VERSION_MINOR"]
+            #xml << "-->\n"
+        end
         if (write_caps)
             xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_BLUETOOTH");
             xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI");
@@ -174,8 +179,9 @@ class JavaMEPlatform
         return xml
     end
 
-    def create_token
-        return to_xml(@runtime, "JavaME", 0, "", "JavaME/Default", true, false)
+    def create_token(isBlackBerry)
+        # For BlackBerry, we don't use capabilities for the token, only the version numbers
+        return to_xml(@runtime, "JavaME", 0, "", "JavaME/Default", !isBlackBerry, false)
     end
 
     def map_capability_name runtime_cap
@@ -664,7 +670,7 @@ FileUtils.cp_r("../../platforms/.", PLATFORMS_DIR, :verbose => true)
 # Java ME: special case!
 javame_profile_tokens={}
 javame_default_profile=JavaMEPlatform.new(nil)
-javame_default_profile_token=javame_default_profile.create_token
+javame_default_profile_token=javame_default_profile.create_token(false)
 javame_default_runtime = 0
 
 runtimes.each do |platform_name, platform|
@@ -702,32 +708,70 @@ runtimes.each do |platform_name, platform|
 		if(platform_name == :JavaME)
 			rbp = 'JavaMEcldc10' if(runtime.caps.has_key? "MA_PROF_SUPPORT_CLDC_10")
 			bbMajor = runtime.caps['MA_PROF_BLACKBERRY_VERSION']
+            bbMinor = 0
 			if(bbMajor == 4)
-				minor = runtime.caps['MA_PROF_BLACKBERRY_VERSION_MINOR']
+				bbMinor = runtime.caps['MA_PROF_BLACKBERRY_VERSION_MINOR']
 				rbp = 'bb40'
-				rbp = 'bb42' if(minor >= 2)
+				rbp = 'bb42' if(bbMinor >= 2)
 
 				# 4.4 and above are equivalent to 4.7
-				rbp = 'bb47' if(minor >= 4)
+				rbp = 'bb47' if(bbMinor >= 4)
 			end
 			rbp = 'bb500' if(bbMajor && bbMajor >= 5)
 
+            # This section is there to map between the 'old' device-based profile database
+            # and the 'new' platform-based profile database.
+            # Basically, we produce XML files based on the 'old' database that can be
+            # consumed by the 'new' database.
+            #
+            # JavaME     - we produce profiles with the same name & (similar) capabilities as
+            #              per the device-based profile database
+            # BlackBerry - we produce profiles with the name BlackBerry/x.y, where x.y
+            #              is the BlackBerry version
+            #
+            # To accomplish this, various hacks are implemented below...
+
+            profile = JavaMEPlatform.new(runtime)
+
+            # Produce a string that represents some 'equality' between
+            # profiles -- whenever there is time, refactor!
+            family = platform_name.to_s
+            variant = id.to_s
+            profile_token = profile.create_token(bbMajor)
+            if (bbMajor)
+                family = "BlackBerry"
+                variant = "#{bbMajor}.#{bbMinor}"
+                profile_token << variant
+            end
+
+            inherit = javame_profile_tokens[profile_token]
+
+            fullPlatform = "#{family}/#{variant}"
+            profileXmlDir = "#{PLATFORMS_DIR}/#{fullPlatform}"
+
+            if (!inherit)
+                javame_profile_tokens[profile_token] = fullPlatform
+                profile.write_runtime_txt(profileXmlDir, runtime_name)
+            end
+
             if (!bbMajor)
-                profile = JavaMEPlatform.new(runtime)
-                profileXmlDir = "#{PLATFORMS_DIR}/JavaME/#{id}"
-                # Produce a string that represents some 'equality' between
-                # profiles -- whenever there is time, refactor!
-                profile_token = profile.create_token
-                inherit = javame_profile_tokens[profile_token]
                 if (javame_default_runtime == 0 && javame_default_profile_token == profile_token)
                     javame_default_runtime = id
                 end
-                if (!inherit)
-                    javame_profile_tokens[profile_token] = id
-                    profile.write_profile_xml(profileXmlDir, id, runtime_name, "JavaME/Default", true, false)
-                    profile.write_runtime_txt(profileXmlDir, runtime_name)
+                if (inherit)
+                    profile.write_profile_xml(profileXmlDir, family, variant, runtime_name, inherit, false, true)
                 else
-                    profile.write_profile_xml(profileXmlDir, id, "JavaME/#{inherit}", "JavaME/#{inherit}", false, true)
+                    profile.write_profile_xml(profileXmlDir, family, variant, runtime_name, "JavaME/Default", true, false)
+                end
+            else
+                puts "BB RUNTIME (#{id}); #{inherit}; #{fullPlatform}"
+                # For this to work, every BlackBerry version must have a corresponding
+                # profile not created by this tool with the name "BlackBerry/x.y" that
+                # this automatically created profile can inherit from.
+                if (inherit)
+                    profile.write_profile_xml("#{profileXmlDir}_L#{id}", family, "#{variant}_L#{id}", runtime_name, inherit, false, true)
+                else
+                    profile.write_profile_xml(profileXmlDir, family, variant, runtime_name, "#{fullPlatform}_Base", false, false)
                 end
             end
 		end
@@ -756,7 +800,7 @@ runtimes.each do |platform_name, platform|
 end
 
 # Write the default JavaME profile
-javame_default_profile.write_profile_xml("#{PLATFORMS_DIR}/JavaME/Default", "Default", "JavaME/#{javame_default_runtime}", "JavaME/Base", true, false)
+javame_default_profile.write_profile_xml("#{PLATFORMS_DIR}/JavaME/Default", "JavaME", "Default", "JavaME/#{javame_default_runtime}", "JavaME/Base", true, false)
 javame_default_profile.write_runtime_txt("#{PLATFORMS_DIR}/JavaME/Default", "JavaME/#{javame_default_runtime}")
 
 exit(0)

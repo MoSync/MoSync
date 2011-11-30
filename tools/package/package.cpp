@@ -42,6 +42,7 @@ static const char* sUsage =
 "                              Used by the iOS packager.\n"
 " -t, --type <profiletype>     Input: Type of profile database,\n"
 "                              either \"device\" and \"platform\" based.\n"
+"                              Default: device.\n"
 " -m, --model <vendor>/<model> Output: target model.\n"
 "             <family>/<variant>\n"
 " -d, --dst <path>             Output: target directory.\n"

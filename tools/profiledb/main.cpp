@@ -18,16 +18,16 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
-#include "profiledb.h"
+#include "profiledb/profiledb.h"
 
 using namespace std;
 
 void printUsage() {
 	printf(
-		"Usage: profiledb <OPTIONS>\n"
+		"Usage: profiledb [OPTIONS] COMMAND [PARAMETERS]\n"
 		"\n"
-		"Options:\n"
-		"-l, --list  [PATTERN]            Lists all available profiles that\n"
+		"Commands:\n"
+		"-l, --list  [PATTERN]            List all available profiles that\n"
 		"                                 matches PATTERN. A PATTERN is a\n"
 		"                                 comma-separated list of sub-PATTERNs,\n"
 		"                                 that may be either the name of a\n"
@@ -35,22 +35,25 @@ void printUsage() {
 		"                                 wildcard character (*) to match\n"
 		"                                 all profiles that starts with a\n"
 		"                                 specific string.\n"
-		"-f, --list-families              Lists all available profile families.\n"
-		"-g, --get   [PATTERN]            Returns a description of all\n"
+		"-f, --list-families              List all available profile families.\n"
+		"-g, --get   [PATTERN]            Return a description of all\n"
 		"                                 profiles that matches PATTERN.\n"
-		"-m, --match PROFILE CAPABILITIES Returns a profile matching PROFILE.\n"
+		"-m, --match PROFILE CAPABILITIES Return a profile matching PROFILE.\n"
 		"                                 and CAPABILITIES\n"
-		"-c, --list-capabilities [STATE]  Lists all available capabilities.\n"
+		"-c, --list-capabilities [STATE]  List all available capabilities.\n"
 		"                                 that matches TYPE, which is a comma-\n"
 		"                                 separated list of states (may be\n"
 		"                                 SUPPORTED, UNSUPPORTED, NOT_IMPLEMENTED\n"
 		"                                 REQUIRES_PERMISSION or\n"
 		"                                 REQUIRES_PRIVILEGED_PERMISSION\n"
-		"-r, --list-runtime [PROFILE]     Lists the runtime for a profile\n"
+		"-r, --list-runtime [PROFILE]     List the runtime for a profile\n\n"
+		"Options:\n"
 		"-x, --exclude PATTERN            Filter out all profiles matching\n"
-		"                                 PATTERN."
+		"                                 PATTERN.\n"
 		"-b, --brief                      List all profiles in a short list\n"
 		"                                 instead of using XML.\n"
+		"    --no-caps                    Do not include capabilities in\n"
+		"                                 XML output"
 		"\n"
 		"Environment variables used:\n"
 		" MOSYNCDIR               Path to the MoSync installation directory.\n"
@@ -61,6 +64,7 @@ void printUsage() {
 int main(int argc,char *argv[]) {
 	// Parse option(s):
 	ProfileDB db = ProfileDB();
+	db.setIncludeCapabilities(true);
 	int curArg = 0;
 	while (curArg < argc) {
 		curArg++;
@@ -69,8 +73,12 @@ int main(int argc,char *argv[]) {
 		if (cmd == "--exclude" || cmd == "-x") {
 			db.setExcluded(param);
 			curArg++;
+		} else if (cmd == "--no-caps") {
+			db.setIncludeCapabilities(false);
 		} else if ((cmd == "--brief" || cmd == "-b")) {
 			db.setBrief(true);
+		} else if (cmd == "--list-mappings") {
+			db.setOutputMappings(true);
 		} else if ("--get" == cmd || "-g" == cmd) {
 			db.getProfiles(param);
 			return 0;
@@ -91,7 +99,7 @@ int main(int argc,char *argv[]) {
 				if ("-o" == cap || "--optional" == cap) {
 					currentCapabilities = &optionalCapabilities;
 				} else {
-					currentCapabilities->push_back(Capability(cap, SUPPORTED, RUNTIME));
+					currentCapabilities->push_back(Capability(cap, string(), SUPPORTED, RUNTIME));
 				}
 			}
 

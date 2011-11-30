@@ -2,7 +2,7 @@
   <!-- The various JavaME platforms will override these,
        so the default JavaME platform does actually
        NOT support very much at all... -->
-  <capability name="Power Management" state="UNSUPPORTED"/>
+  <capability name="Power Management" state="REQUIRES_PERMISSION"/>
   <capability name="Vibration" state="SUPPORTED"/>
   <capability name="File Storage" state="UNSUPPORTED">
     <capability name="Read" state="UNSUPPORTED"/>

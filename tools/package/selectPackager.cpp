@@ -24,12 +24,16 @@
 #include "package.h"
 #include "packagers.h"
 #include "util.h"
+#include "profiledb/profiledb.h"
 
 using namespace std;
 
-static bool parseRuntimeTxt(const char* filename, string& path, string& name);
-static bool parseProfileHeader(ProfileType pt, const char* filename,
-        RuntimeInfo& pi);
+static string getModelDir(ProfileType pt, const SETTINGS& s);
+static bool getRuntime(ProfileType pt, const SETTINGS& s, RuntimeInfo& ri, string& name);
+static bool parseProfileInfo(ProfileType pt, Profile* p, const SETTINGS& s, const char* filename,
+		RuntimeInfo& pi);
+static bool parseRuntimeLine(string line, string& path, string& name);
+static bool parseRuntimeTxt(const char* line, string& path, string& name);
 static bool parseIntProp(const string& line, const char* key, int& value);
 //static bool parseStringProp(const string& line, const char* key, string& value);
 
@@ -41,29 +45,17 @@ void package(const SETTINGS& s) {
 	testProfileType(s);
 
 	ProfileType profileType =
-	        s.profileType && !strcmp("device", s.profileType) ? DEVICE_BASED
-	                : PLATFORM_BASED;
+	        s.profileType && !strcmp("platform", s.profileType) ?
+				PLATFORM_BASED :
+				DEVICE_BASED;
 
 	// find profile info
-	string modelDir(mosyncdir());
-	modelDir += profileType == DEVICE_BASED ? "/profiles/vendors/"
-	        : "/profiles/platforms/";
-	modelDir += s.model;
-	string runtimeTxtPath = modelDir + "/runtime.txt";
-	toSlashes(runtimeTxtPath);
-	string headerPath = modelDir + "/maprofile.h";
-	toSlashes(headerPath);
-
 	RuntimeInfo ri;
 
 	// parse files
 	string runtimeName;
-	if (!parseRuntimeTxt(runtimeTxtPath.c_str(), ri.path, runtimeName)) {
-		printf("runtime.txt parse error\n");
-		exit(1);
-	}
-	if (!parseProfileHeader(profileType, headerPath.c_str(), ri)) {
-		printf("maprofile.h parse error\n");
+	if (!getRuntime(profileType, s, ri, runtimeName)) {
+		printf("runtime parse error\n");
 		exit(1);
 	}
 	toDir(ri.path);
@@ -110,6 +102,39 @@ void package(const SETTINGS& s) {
 	}
 }
 
+static string getModelDir(ProfileType pt, const SETTINGS& s) {
+	string modelDir(mosyncdir());
+	modelDir += pt == DEVICE_BASED ? "/profiles/vendors/"
+	        : "/profiles/platforms/";
+	modelDir += s.model;
+	return modelDir;
+}
+
+static bool getRuntime(ProfileType pt, const SETTINGS& s, RuntimeInfo& ri, string& name) {
+	if (pt == DEVICE_BASED) {
+		string modelDir = getModelDir(pt, s);
+		string runtimeTxtPath = modelDir + "/runtime.txt";
+		toSlashes(runtimeTxtPath);
+		string headerPath = modelDir + "/maprofile.h";
+		toSlashes(headerPath);
+
+		if (parseRuntimeTxt(runtimeTxtPath.c_str(), ri.path, name)) {
+			return parseProfileInfo(DEVICE_BASED, NULL, s, headerPath.c_str(), ri);
+		}
+
+	} else {
+		ProfileDB db;
+		Profile* profile = db.findProfile(string(s.model));
+		if (profile) {
+			string runtime = profile->getRuntime();
+			if (parseRuntimeLine("profiles/runtimes/" + runtime, ri.path, name)) {
+				return parseProfileInfo(PLATFORM_BASED, profile, s, NULL, ri);
+			}
+		}
+	}
+	return false;
+}
+
 static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 	// read file
 	ifstream file(filename);
@@ -120,7 +145,11 @@ static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 	if (line[line.length() - 1] == '\r')
 		line = line.erase(line.length() - 1, 1);
 	beGood(file);
+	return parseRuntimeLine(line, path, name);
+}
 
+static bool parseRuntimeLine(string line, string& path, string& name) {
+	printf("%s\n", line.c_str());
 	// swap backslashes
 	toSlashes(line);
 
@@ -194,7 +223,7 @@ static bool parseStringProp(const string& line, const char* key, string& value) 
 }
 #endif
 
-static bool parseProfileHeader(ProfileType profileType, const char* filename,
+static bool parseProfileInfo(ProfileType profileType, Profile* p, const SETTINGS& s, const char* filename,
         RuntimeInfo& pi) {
 	bool hasBbMajor = false, hasBbMinor = false;
 	pi.isBlackberry = false;
@@ -225,6 +254,11 @@ static bool parseProfileHeader(ProfileType profileType, const char* filename,
 			parseIntProp(line, "MA_PROF_CONST_ICONSIZE_Y", iconY);
 		}
 		//pi.isBlackberry = (hasBbMajor && hasBbMinor);	//rapc is not available.
+	} else {
+		Capability major = p->getCapability("Version/Major");
+		Capability minor = p->getCapability("Version/Minor");
+		sscanf(major.getValue().c_str(), "%i", &pi.blackberryVersion);
+		sscanf(minor.getValue().c_str(), "%i", &pi.blackberryMinor);
 	}
 	if (iconX > 0 && iconY > 0) {
 		char buf[32];

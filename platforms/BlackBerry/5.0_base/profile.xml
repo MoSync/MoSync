@@ -1,3 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <platform family="BlackBerry" variant="5.0_base" inherit="BlackBerry/4.7" abstract="true">
+  <capability name="Version/Major" value="5"/>
+  <capability name="Version/Minor" value="0"/>
 </platform>
