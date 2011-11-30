@@ -42,6 +42,8 @@ namespace MoSync
          */
         public class ListViewItem : WidgetBaseWindowsPhone
         {
+            System.Windows.Controls.ListBoxItem mItem;
+
             /**
              * The TextBlock widget that will hold the text of the list view item
              */
@@ -75,7 +77,9 @@ namespace MoSync
             */
 			public ListViewItem()
 			{
-				mGrid = new System.Windows.Controls.Grid();
+                mItem = new System.Windows.Controls.ListBoxItem();
+
+                mGrid = new System.Windows.Controls.Grid();
 
 				mIcon = new System.Windows.Controls.Image();
 				mIcon.VerticalAlignment = VerticalAlignment.Center;
@@ -110,7 +114,9 @@ namespace MoSync
 				mGrid.Children.Add(mIcon);
 				mGrid.Children.Add(mText);
 
-				mView = mGrid;
+                mItem.Content = mGrid;
+
+				mView = mItem;
 			}
 
             /**
