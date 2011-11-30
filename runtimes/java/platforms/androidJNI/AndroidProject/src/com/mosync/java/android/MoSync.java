@@ -55,6 +55,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 
+import com.google.android.c2dm.C2DMBaseReceiver;
 import com.mosync.internal.android.Mediator;
 import com.mosync.internal.android.MoSyncMultiTouchHandler;
 import com.mosync.internal.android.MoSyncSingleTouchHandler;
@@ -63,6 +64,7 @@ import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
+import com.mosync.internal.android.notifications.PushNotificationsManager;
 
 /**
  * Main MoSync activity
@@ -88,7 +90,7 @@ public class MoSync extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState)
 	{
-		//Log.i("MoSync", "onCreate");
+		Log.i("MoSync", "MoSync onCreate");
 
 		super.onCreate(savedInstanceState);
 
@@ -122,6 +124,17 @@ public class MoSync extends Activity
 				ex);
 			finish();
 			return;
+		}
+
+		try {
+			// If triggered by a C2DM message, handle it here.
+			// Call this after the MoSyncThread is created.
+			if ( getIntent().getAction().equals(C2DMBaseReceiver.C2DM_INTENT) )
+			{
+				PushNotificationsManager.handlePushNotificationIntent(getIntent());
+			}
+		}catch(Throwable t){
+			SYSLOG("No C2DM message");
 		}
 
 		// Create the view.

@@ -348,6 +348,29 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.optionsBoxButtonIndex = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_ADS_BANNER)
+	{
+		event.adsData.bannerEventType = intArray[1];
+		event.adsData.bannerHandle = intArray[2];
+		event.adsData.bannerErrorCode = intArray[3];
+	}
+	else if (event.type == EVENT_TYPE_LOCAL_NOTIFICATION)
+	{
+		event.localNotificationHandle = intArray[1];
+	}
+	else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION)
+	{
+		// Just signals that we have a result to the request,
+		// and the result can be taken with maNotificationPushGetRegistration.
+	}
+	else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION_UNREGISTRATION)
+	{
+		// Just signals that we've unregistered. No data needed.
+	}
+	else if (event.type == EVENT_TYPE_PUSH_NOTIFICATION)
+	{
+		event.pushNotificationHandle = intArray[1];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*

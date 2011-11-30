@@ -45,7 +45,7 @@ inline int32_t fp_div32(int32_t a, int32_t b) {
 
 inline int32_t fp_mul32(int32_t a, int32_t b) {
 	return (int32_t)(((int64_t)a * (int64_t)b)>>FP_RESOLUTION);
-}  
+}
 
 struct Point {
 	int x, y;
@@ -76,8 +76,8 @@ ClipResult clipTopLine(Point &a, Point &b, Point& out, int top) {
 
 	if(abs(b.y-a.y)<FP_MASK) return BOTH_OUT;
 //	int mul = fp_mul32((top-a.y),(b.x-a.x));
-//	int div = fp_div32(mul, (b.y-a.y));			
-  	int div = fp_mul32((b.x-a.x), fp_div32((top-a.y), (b.y-a.y)));			
+//	int div = fp_div32(mul, (b.y-a.y));
+		int div = fp_mul32((b.x-a.x), fp_div32((top-a.y), (b.y-a.y)));
 	out.x = a.x + div;
 	out.y = top;
 	return clipResult;
@@ -96,8 +96,8 @@ ClipResult clipBottomLine(Point &a, Point &b, Point& out, int bottom) {
 
 	if(abs(b.y-a.y)<FP_MASK) return BOTH_OUT;
 	//int mul = fp_mul32((bottom-a.y),(b.x-a.x));
-	//int div = fp_div32(mul, (b.y-a.y));			
-    int div = fp_mul32((b.x-a.x), fp_div32((bottom-a.y), (b.y-a.y)));			
+	//int div = fp_div32(mul, (b.y-a.y));
+    int div = fp_mul32((b.x-a.x), fp_div32((bottom-a.y), (b.y-a.y)));
     out.x = a.x + div;
 	out.y = bottom;
 	return clipResult;
@@ -116,8 +116,8 @@ ClipResult clipLeftLine(Point &a, Point &b, Point& out, int left) {
 
 	if(abs(b.x-a.x)<FP_MASK) return BOTH_OUT;
 	//int mul = fp_mul32((left-a.x),(b.y-a.y));
-	//int div = fp_div32(mul, (b.x-a.x));			
-    int div = fp_mul32((b.y-a.y), fp_div32((left-a.x), (b.x-a.x)));			
+	//int div = fp_div32(mul, (b.x-a.x));
+    int div = fp_mul32((b.y-a.y), fp_div32((left-a.x), (b.x-a.x)));
     out.x = left;
 	out.y =  a.y + div;
 	return clipResult;
@@ -136,7 +136,7 @@ ClipResult clipRightLine(Point &a, Point &b, Point& out, int right) {
 
 	if(abs(b.x-a.x)<FP_MASK) return BOTH_OUT;
 //	int mul = fp_mul32((right-a.x),(b.y-a.y));
-//	int div = fp_div32(mul, (b.x-a.x));			
+//	int div = fp_div32(mul, (b.x-a.x));
     int div = fp_mul32((b.y-a.y), fp_div32((right-a.x), (b.x-a.x)));
 	out.x = right;
 	out.y =  a.y + div;
@@ -169,10 +169,10 @@ bool Image::hasData() {if(data==NULL) return false; return true;}
 bool Image::hasAlpha() {if(alpha==NULL) return false; return true;}
 
 void Image::calculateConstants() {
-	
+
 	alphaMask	= 0x0;
 	alphaShift	= 0;
-	
+
 	switch(pixelFormat) {
 		case PIXELFORMAT_RGB444:
 			redMask		= 0x0f00;
@@ -211,7 +211,7 @@ void Image::calculateConstants() {
 			blueShift	= 0;
 			redBits		= 5;
 			greenBits	= 6;
-			blueBits	= 5;	
+			blueBits	= 5;
 			bytesPerPixel = 2;
 			bitsPerPixel = 16;
 		break;
@@ -225,7 +225,7 @@ void Image::calculateConstants() {
 			blueShift	= 0;
 			redBits		= 8;
 			greenBits	= 8;
-			blueBits	= 8;		
+			blueBits	= 8;
 			bytesPerPixel = 4;
 			bitsPerPixel = 24;
 		break;
@@ -242,22 +242,24 @@ void Image::calculateConstants() {
 			alphaBits	= 8;
 			redBits		= 8;
 			greenBits	= 8;
-			blueBits	= 8;		
+			blueBits	= 8;
 			bytesPerPixel = 4;
 			bitsPerPixel = 32;
 		break;
 	}
 }
 
-void Image::init(unsigned char *data, unsigned char *alpha, bool makeCopy) {
+void Image::init(unsigned char *data, unsigned char *alpha, bool makeCopy, int aP) {
+	alphaPitch = aP;
+	if(alphaPitch < 0)
+		alphaPitch = (pitch/bytesPerPixel);
 	if(data) {
 		if(makeCopy) {
 			this->data = new unsigned char[pitch*height];
 			if(this->data == NULL) if(this->data == 0) return;
-			memcpy(this->data, data, pitch*height);		
+			memcpy(this->data, data, pitch*height);
 			if(alpha) {
-				int apitch = (pitch/bytesPerPixel);
-				this->alpha = new unsigned char[apitch*height];
+				this->alpha = new unsigned char[alphaPitch*height];
 				if(this->alpha == NULL)
 				{
 					delete this->data;
@@ -269,8 +271,8 @@ void Image::init(unsigned char *data, unsigned char *alpha, bool makeCopy) {
 				unsigned char *asrc = alpha;
 				for(int j = 0; j < height; j++) {
 					memcpy(adst, asrc, width);
-					adst+=apitch;
-					asrc+=width;
+					adst += alphaPitch;
+					asrc += width;
 				}
 			}
 		} else {
@@ -278,7 +280,6 @@ void Image::init(unsigned char *data, unsigned char *alpha, bool makeCopy) {
 			this->alpha = alpha;
 		}
 	} else {
-		//
 		int size = pitch * height;
 		this->data = new unsigned char[size];
 		if(this->data == 0) return;
@@ -290,7 +291,8 @@ void Image::init(unsigned char *data, unsigned char *alpha, bool makeCopy) {
 	clipRect.height = height;
 }
 
-Image::Image(unsigned char *data, unsigned char *alpha, const ImageInitParams &params, bool makeCopy, bool shouldFreeData) :
+Image::Image(unsigned char *data, unsigned char *alpha, const ImageInitParams &params,
+	bool makeCopy, bool shouldFreeData, int alphaPitch) :
 	data(NULL),
 	alpha(NULL),
 	width(params.width),
@@ -317,7 +319,7 @@ Image::Image(unsigned char *data, unsigned char *alpha, const ImageInitParams &p
 	shouldFreeData(shouldFreeData)
 {
 	if(height>65536 || pitch>65536) return;
-	init(data, alpha, makeCopy);
+	init(data, alpha, makeCopy, alphaPitch);
 }
 
 Image::Image(int width, int height, int pitch, PixelFormat pixelFormat) :
@@ -334,7 +336,8 @@ Image::Image(int width, int height, int pitch, PixelFormat pixelFormat) :
 	init(NULL, NULL, false);
 }
 
-Image::Image(unsigned char *data, unsigned char *alpha, int width, int height, int pitch, PixelFormat pixelFormat, bool makeCopy, bool shouldFreeData) :
+Image::Image(unsigned char *data, unsigned char *alpha, int width, int height, int pitch,
+PixelFormat pixelFormat, bool makeCopy, bool shouldFreeData, int alphaPitch) :
 	pixelFormat(pixelFormat),
 	data(NULL),
 	alpha(NULL),
@@ -345,9 +348,9 @@ Image::Image(unsigned char *data, unsigned char *alpha, int width, int height, i
 {
 	if(height>65536 || pitch>65536) return;
 	calculateConstants();
-	init(data, alpha, makeCopy);
+	init(data, alpha, makeCopy, alphaPitch);
 }
-	
+
 Image::~Image() {
 	if(shouldFreeData) {
 		if(data) {
@@ -378,13 +381,15 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 
 	int bpp = img->bytesPerPixel,
 		//dstPitchY = pitch,
-		srcPitchX, 
+		srcPitchX,
 		srcPitchY,
-		transTopLeftX, 
-		transTopLeftY, 
-		transBottomRightX, 
+		srcAPX,
+		srcAPY,
+		transTopLeftX,
+		transTopLeftY,
+		transBottomRightX,
 		transBottomRightY,
-		transWidth, 
+		transWidth,
 		transHeight;
 
 	int dirHorizontalX = 0,
@@ -396,6 +401,8 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	case TRANS_NONE:
 		srcPitchX = bpp;
 		srcPitchY = img->pitch;
+		srcAPX = 1;
+		srcAPY = img->alphaPitch;
 		transTopLeftX = u;
 		transTopLeftY = v;
 		transBottomRightX = u + width - 1;
@@ -408,6 +415,8 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	case TRANS_ROT90:
 		srcPitchX = -img->pitch;
 		srcPitchY = bpp;
+		srcAPX = -img->alphaPitch;
+		srcAPY = 1;
 		transTopLeftX = u;
 		transTopLeftY = v+height-1;
 		transBottomRightX = u + width - 1;
@@ -420,6 +429,8 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	case TRANS_ROT180:
 		srcPitchX = -bpp;
 		srcPitchY = -img->pitch;
+		srcAPX = -1;
+		srcAPY = -img->alphaPitch;
 		transTopLeftX = u + width - 1;
 		transTopLeftY = v + height - 1;
 		transBottomRightX = u;
@@ -432,6 +443,8 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	case TRANS_ROT270:
 		srcPitchX = img->pitch;
 		srcPitchY = -bpp;
+		srcAPX = img->alphaPitch;
+		srcAPY = -1;
 		transTopLeftX = u + width - 1;
 		transTopLeftY = v;
 		transBottomRightX = u;
@@ -444,6 +457,8 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	case TRANS_MIRROR:
         srcPitchX = -bpp;
         srcPitchY = img->pitch;
+		srcAPX = -1;
+		srcAPY = img->alphaPitch;
         transTopLeftX = u + width - 1;
         transTopLeftY = v;
         transBottomRightX = u ;
@@ -451,11 +466,13 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
         transWidth = width;
         transHeight = height;
         dirHorizontalX = -1;
-        dirVerticalY = 1;            
+        dirVerticalY = 1;
 		break;
     case TRANS_MIRROR_ROT90:
         srcPitchX = -img->pitch;
         srcPitchY = -bpp;
+		srcAPX = -img->alphaPitch;
+		srcAPY = -1;
         transTopLeftX = u + width - 1;
         transTopLeftY = v + height-1;
         transBottomRightX = u;
@@ -463,11 +480,13 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
         transWidth = height;
         transHeight = width;
         dirHorizontalY = -1;
-        dirVerticalX = -1;       
+        dirVerticalX = -1;
         break;
 	case TRANS_MIRROR_ROT180:
         srcPitchX = bpp;
         srcPitchY = -img->pitch;
+		srcAPX = 1;
+		srcAPY = -img->alphaPitch;
         transTopLeftX = u;
         transTopLeftY = v + height - 1;
         transBottomRightX = u + width - 1;
@@ -475,11 +494,13 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
         transWidth = width;
         transHeight = height;
         dirHorizontalX = 1;
-        dirVerticalY = -1;            
+        dirVerticalY = -1;
 		break;
 	case TRANS_MIRROR_ROT270:
         srcPitchX = img->pitch;
         srcPitchY = bpp;
+		srcAPX = img->alphaPitch;
+		srcAPY = 1;
         transTopLeftX = u;
         transTopLeftY = v;
         transBottomRightX = u + width - 1;
@@ -494,7 +515,7 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 	}
 
 	if(transWidth <= 0 || transHeight <= 0) return;
-	
+
 	if (transTopLeftX >= img->width) {BIG_PHAT_SOURCE_RECT_ERROR;}
 	else if(transTopLeftX < 0) {BIG_PHAT_SOURCE_RECT_ERROR;}
 	if (transTopLeftY >= img->height) {BIG_PHAT_SOURCE_RECT_ERROR;}
@@ -506,7 +527,7 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 
 	if(transWidth <= 0 || transHeight <= 0) return;
 
-	if (left >= clipRect.x + clipRect.width) 
+	if (left >= clipRect.x + clipRect.width)
 		return;
 	else if(left < clipRect.x) {
 		transTopLeftX += (clipRect.x - left)*dirHorizontalX;
@@ -514,27 +535,27 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 		transWidth -= clipRect.x - left;
 		left = clipRect.x;
 	}
-	if (top >= clipRect.y + clipRect.height) 
+	if (top >= clipRect.y + clipRect.height)
 		return;
 	else if(top < clipRect.y) {
-		transTopLeftX += (clipRect.y - top)*dirVerticalX;		
-		transTopLeftY += (clipRect.y - top)*dirVerticalY;		
+		transTopLeftX += (clipRect.y - top)*dirVerticalX;
+		transTopLeftY += (clipRect.y - top)*dirVerticalY;
 		transHeight -= clipRect.y - top;
 		top = clipRect.y;
 	}
-	if(left + transWidth < clipRect.x) 
+	if(left + transWidth < clipRect.x)
 		return;
 	else if(left + transWidth >= clipRect.x + clipRect.width)
 		transWidth -= (left + transWidth) - (clipRect.x + clipRect.width);
-	if(top + height < clipRect.y) 
+	if(top + height < clipRect.y)
 		return;
 	else if(top + transHeight >= clipRect.y + clipRect.height)
 		transHeight -= (top + transHeight) - (clipRect.y + clipRect.height);
-	
+
 	if(transWidth <= 0 || transHeight<= 0) return;
 
 	unsigned char *dst = &data[left*bytesPerPixel + top*pitch];
-	unsigned char *src = &img->data[transTopLeftX*img->bytesPerPixel + transTopLeftY*img->pitch];
+	unsigned char *src = &img->data[transTopLeftX*img->bytesPerPixel + transTopLeftY*img->alphaPitch];
 
 #define DUMP(x) LOG("%s: %i\n", #x, x);
 #define DUMPX(x) LOG("%s: 0x%x\n", #x, x);
@@ -547,7 +568,7 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 		case 2:
 			{
 				srcPitchX>>=1;
-				unsigned char *salpha = &img->alpha[transTopLeftX + transTopLeftY*(img->pitch>>1)];
+				unsigned char *salpha = &img->alpha[transTopLeftX + transTopLeftY*img->alphaPitch];
 				unsigned char *ascan;
 				unsigned short *src_scan;
 				unsigned short *dst_scan;
@@ -572,9 +593,9 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 						} else if(*ascan == 0) {
 							*dst_scan = (((dr)<< redShift)&redMask) |
 								(((dg)<< greenShift)&greenMask) |
-								(((db)<< blueShift)&blueMask);									
+								(((db)<< blueShift)&blueMask);
 						} else {
-							*dst_scan = 
+							*dst_scan =
 								(((dr + (((sr-dr)*(*ascan))>>8)) << redShift)&redMask) |
 								(((dg + (((sg-dg)*(*ascan))>>8)) << greenShift)&greenMask) |
 								(((db + (((sb-db)*(*ascan))>>8)) << blueShift)&blueMask);
@@ -582,18 +603,18 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 
 						src_scan+=srcPitchX;
 						dst_scan++;
-						ascan+=srcPitchX;
+						ascan+=srcAPX;
 					}
 					src += srcPitchY;
 					dst += pitch;
-					salpha += srcPitchY>>1;
-				}	
+					salpha += srcAPY;
+				}
 			}
 			break;
 		case 4:
 			{
 				srcPitchX>>=2;
-				unsigned char *salpha = &img->alpha[transTopLeftX + transTopLeftY*(img->pitch>>2)];
+				unsigned char *salpha = &img->alpha[transTopLeftX + transTopLeftY*img->alphaPitch];
 				unsigned char *ascan;
 				unsigned int *src_scan;
 				unsigned int *dst_scan;
@@ -625,9 +646,9 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 						} else if(*ascan == 0) {
 							*dst_scan = (((dr)<< redShift)&redMask) |
 								(((dg)<< greenShift)&greenMask) |
-								(((db)<< blueShift)&blueMask);									
+								(((db)<< blueShift)&blueMask);
 						} else {
-							*dst_scan = 
+							*dst_scan =
 								(((dr + (((sr-dr)*(*ascan))>>8)) << redShift)&redMask) |
 								(((dg + (((sg-dg)*(*ascan))>>8)) << greenShift)&greenMask) |
 								(((db + (((sb-db)*(*ascan))>>8)) << blueShift)&blueMask);
@@ -635,12 +656,12 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 
 						src_scan+=srcPitchX;
 						dst_scan++;
-						ascan+=srcPitchX;
+						ascan+=srcAPX;
 					}
 					src += srcPitchY;
 					dst += pitch;
-					salpha += srcPitchY>>2;
-				}	
+					salpha += srcAPY;
+				}
 			}
 			break;
 		default:
@@ -656,7 +677,7 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 				srcPitchX>>=2;
 				unsigned int *src_scan;
 				unsigned int *dst_scan;
-				
+
 				while(transHeight--) {
 					src_scan = (unsigned int*)src;
 					dst_scan = (unsigned int*)dst;
@@ -666,11 +687,11 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 						int sg = (((*src_scan)&img->greenMask)>>img->greenShift);
 						int sb = (((*src_scan)&img->blueMask)>>img->blueShift);
 						int sa = (((*src_scan)&img->alphaMask)>>img->alphaShift);
-						
+
 						int dr = (((*dst_scan)&redMask)>>redShift);
 						int dg = (((*dst_scan)&greenMask)>>greenShift);
 						int db = (((*dst_scan)&blueMask)>>blueShift);
-						
+
 						if(sa == 255) {
 							*dst_scan = (((sr)<< redShift)&redMask) |
 							(((sg)<< greenShift)&greenMask) |
@@ -678,9 +699,9 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 						} else if(sa == 0) {
 							*dst_scan = (((dr)<< redShift)&redMask) |
 							(((dg)<< greenShift)&greenMask) |
-							(((db)<< blueShift)&blueMask);									
+							(((db)<< blueShift)&blueMask);
 						} else {
-							*dst_scan = 
+							*dst_scan =
 							(((dr + (((sr-dr)*(sa))>>8)) << redShift)&redMask) |
 							(((dg + (((sg-dg)*(sa))>>8)) << greenShift)&greenMask) |
 							(((db + (((sb-db)*(sa))>>8)) << blueShift)&blueMask);
@@ -690,12 +711,12 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 					}
 					src += srcPitchY;
 					dst += pitch;
-				}	
+				}
 			}
 				break;
 			default:
 				BIG_PHAT_ERROR(ERR_UNSUPPORTED_BPP);
-			}			
+			}
 		} else {
 			int dstOffsetY = -transWidth*bytesPerPixel + pitch;
 			int srcOffsetY = -srcPitchX*transWidth + srcPitchY;
@@ -708,15 +729,15 @@ void Image::drawImageRegion(int left, int top, ClipRect *srcRect, Image *img, in
 				}
 				dst+=dstOffsetY;
 				src+=srcOffsetY;
-			}	
+			}
 		}
 	}
 }
 
 #ifndef SYMBIAN
 void Image::drawPoint(int posX, int posY, int color) {
-	if( posX < clipRect.x || 
-		posX >= clipRect.x + clipRect.width || 
+	if( posX < clipRect.x ||
+		posX >= clipRect.x + clipRect.width ||
 		posY < clipRect.y ||
 		posY >= clipRect.y + clipRect.height) return;
 	switch(bytesPerPixel) {
@@ -805,7 +826,7 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 				case 2:
 				{
 					while(y0<=y1) {
-						*((unsigned short*)pixel) = color;			
+						*((unsigned short*)pixel) = color;
 						y0++;
 						pixel+=pitch;
 					}
@@ -814,7 +835,7 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 				case 4:
 				{
 					while(y0<=y1) {
-						*((unsigned int*)pixel) = color;			
+						*((unsigned int*)pixel) = color;
 						y0++;
 						pixel+=pitch;
 					}
@@ -833,7 +854,7 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 				case 2:
 				{
 					while(x0<=x1) {
-						*((unsigned short*)pixel) = color;			
+						*((unsigned short*)pixel) = color;
 						x0++;
 						pixel+=bpp;
 					}
@@ -842,7 +863,7 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 				case 4:
 				{
 					while(x0<=x1) {
-						*((unsigned int*)pixel) = color;			
+						*((unsigned int*)pixel) = color;
 						x0++;
 						pixel+=bpp;
 					}
@@ -864,14 +885,14 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 				case 2:
 					for(int y = y0; y <= y1; y++) {
 						//drawPoint(fp_ceil(x0), y, color);
-						(((unsigned short*)&pixel[y*pitch])[fp_ceil(x0)]) = color;		
+						(((unsigned short*)&pixel[y*pitch])[fp_ceil(x0)]) = color;
 						x0+=dxdy;
 					}
 					break;
 				case 4:
 					for(int y = y0; y <= y1; y++) {
 						//drawPoint(fp_ceil(x0), y, color);
-						(((unsigned int*)&pixel[y*pitch])[fp_ceil(x0)]) = color;	
+						(((unsigned int*)&pixel[y*pitch])[fp_ceil(x0)]) = color;
 						x0+=dxdy;
 					}
 					break;
@@ -892,14 +913,14 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 				case 2:
 					for(int x = x0; x <= x1; x++) {
 						//drawPoint(x, fp_ceil(y0), color);
-						(((unsigned short*)&pixel[fp_ceil(y0)*pitch])[x]) = color;		
+						(((unsigned short*)&pixel[fp_ceil(y0)*pitch])[x]) = color;
 						y0+=dydx;
 					}
 					break;
 				case 4:
 					for(int x = x0; x <= x1; x++) {
 						//drawPoint(fp_ceil(x0), y, color);
-						(((unsigned int*)&pixel[fp_ceil(y0)*pitch])[x]) = color;	
+						(((unsigned int*)&pixel[fp_ceil(y0)*pitch])[x]) = color;
 						y0+=dydx;
 					}
 					break;
@@ -931,7 +952,7 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 					y0  += sdy;
 				}
 				drawPoint(x0, y0, color);
-				//memcpy(&pixel[x0*bpp+y0*pitch], &color, bpp); 
+				//memcpy(&pixel[x0*bpp+y0*pitch], &color, bpp);
 				x0 += sdx;
 			}
 		}
@@ -939,7 +960,7 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 		{
 			ac = dy>>1;
 			for (n=0;n<dy;n++)
-			{      
+			{
 				// line math
 				ac += dx;
 				if (ac > dy)
@@ -948,7 +969,7 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 					x0  += sdx;
 				}
 				drawPoint(x0, y0, color);
-				//memcpy(&pixel[x0*bpp+y0*pitch], &color, bpp); 
+				//memcpy(&pixel[x0*bpp+y0*pitch], &color, bpp);
 				y0 += sdy;
 			}
 		}
@@ -957,23 +978,23 @@ void Image::drawLine(int x0, int y0, int x1, int y1, int realColor) {
 
 void Image::drawFilledRect(int x, int y, int rectWidth, int rectHeight, int realColor) {
 		/* clip it ! */
-	if (x > clipRect.x + clipRect.width) 
+	if (x > clipRect.x + clipRect.width)
 			return;
 		else if(x < clipRect.x) {
 			rectWidth-=clipRect.x-x;
 			x = clipRect.x;
 		}
-		if (y > clipRect.y + clipRect.height) 
+		if (y > clipRect.y + clipRect.height)
 			return;
 		else if(y < clipRect.y) {
 			rectHeight-=clipRect.y-y;
 			y = clipRect.y;
 		}
-		if(x + rectWidth < clipRect.x) 
+		if(x + rectWidth < clipRect.x)
 			return;
 		else if(x + rectWidth > clipRect.x + clipRect.width)
 			rectWidth -= (x + rectWidth) - (clipRect.x + clipRect.width);
-		if(y + rectHeight< clipRect.y) 
+		if(y + rectHeight< clipRect.y)
 			return;
 		else if(y + rectHeight > clipRect.y + clipRect.height)
 			rectHeight -= (y + rectHeight) - (clipRect.y + clipRect.height);
@@ -1164,17 +1185,17 @@ void Image::drawTriangleWithoutClipping(int x1, int y1, int x2, int y2, int x3, 
 
 	if(y1>y2) { SWAP(x1, x2, temp); SWAP(y1, y2, temp); }
 	if(y1>y3) { SWAP(x1, x3, temp); SWAP(y1, y3, temp); }
-	if(y2>y3) { SWAP(x2, x3, temp); SWAP(y2, y3, temp); }	
-	
+	if(y2>y3) { SWAP(x2, x3, temp); SWAP(y2, y3, temp); }
+
 	/*
 	dx = x2-x1;
 	if(dx==0) {
 		// if vertical line take delta of lower side instead
 		dx = x2-x3;
-		if(dx==0) 
+		if(dx==0)
 			return;
 	}*/
-    
+
 	height = y3 - y1;
     if(height == 0)
         return;
@@ -1197,7 +1218,7 @@ void Image::drawTriangleWithoutClipping(int x1, int y1, int x2, int y2, int x3, 
 			dxdy_left2 = dxdy_left1;
 			if(y2-y1) {
 				dxdy_right1 = fp_mul32(((x2-x1)<<FP_RESOLUTION), recipLut[y2-y1]);
-			} 
+			}
 			if(y3-y2) {
 				dxdy_right2 = fp_mul32(((x3-x2)<<FP_RESOLUTION), recipLut[y3-y2]);
 			}
@@ -1216,7 +1237,7 @@ void Image::drawTriangleWithoutClipping(int x1, int y1, int x2, int y2, int x3, 
 			}
 			if(y3-y2) {
 				dxdy_left2 = fp_mul32(((x3-x2)<<FP_RESOLUTION), recipLut[y3-y2]);
-			}		
+			}
 		} else {
 			return;
 		}
@@ -1278,7 +1299,7 @@ void Image::drawTriangleWithoutClipping(int x1, int y1, int x2, int y2, int x3, 
 					int *scan = (int*)dst;
 					scan+=x_start;
 					while(w--) *scan++=color;
-				}	
+				}
 				dst+=pitch;
 				x_left+=dxdy_left2;
 				x_right+=dxdy_right2;
@@ -1287,14 +1308,14 @@ void Image::drawTriangleWithoutClipping(int x1, int y1, int x2, int y2, int x3, 
 	}
 }
 
-void Image::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int color) {	
+void Image::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int color) {
     /*
     drawLine(x1, y1, x2, y2, color);
     drawLine(x2, y2, x3, y3, color);
     drawLine(x3, y3, x1, y1, color);
     return;
     */
-    
+
 	clippedPoints[0][0].x = x1<<FP_RESOLUTION;
 	clippedPoints[0][0].y = y1<<FP_RESOLUTION;
 	clippedPoints[0][1].x = x2<<FP_RESOLUTION;
@@ -1303,7 +1324,7 @@ void Image::drawTriangle(int x1, int y1, int x2, int y2, int x3, int y3, int col
 	clippedPoints[0][2].y = y3<<FP_RESOLUTION;
 	currentList = 0;
 	numPoints[0] = 3;
-	
+
 	if(!clipPolygon()) return;
 
 	for(int i = 0; i < numPoints[currentList]-1; i++) {

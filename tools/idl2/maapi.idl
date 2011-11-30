@@ -1384,7 +1384,39 @@ interface MAAPI {
 		* Send by maOptionsBox dialog when one of the option buttons is clicked.
 		*/
 		OPTIONS_BOX_BUTTON_CLICKED = 41;
-	}
+
+		/**
+		* \brief Send by a banner ad.
+		*/
+		ADS_BANNER = 42;
+
+		/**
+		* \brief Send when the application receives a local notification.
+		*/
+		LOCAL_NOTIFICATION = 43;
+
+		/**
+		* \brief Send when the application receives a registration result.
+		* The application tries to register to Apple Push Service, or Google C2DM Service,
+		* and the received result ( either success, either fail) is sending this event.
+		* After this event is received, get the result of the registration request by
+		* calling maNotificationPushGetRegistration.
+		*/
+		PUSH_NOTIFICATION_REGISTRATION = 44;
+
+		/**
+		* \brief Send when the application receives an unregistration result.
+		* The application unregistered from Apple Push Service, or Google C2DM Service,
+		* and will not receive anymore push messages.
+		* Platform: Android only.
+		*/
+		PUSH_NOTIFICATION_UNREGISTRATION = 45;
+
+		/**
+		* \brief Send when the application receives a push notification.
+		*/
+		PUSH_NOTIFICATION = 46;
+		}
 
 	/**
 	* \brief Data for a connection event, including an indicator or success or failure.
@@ -1418,6 +1450,20 @@ interface MAAPI {
 		/// The destination of any read or write operation. Could be a memory
 		/// address, a block number, or some other value depending on the operation.
 		int dstId;
+	}
+
+	/**
+	* \brief An event send by a banner widget.
+	*/
+	struct MAAdsEventData {
+		/// Banner's handle that send the event.
+		MAHandle bannerHandle;
+		/// One of the \link #MA_ADS_EVENT_FAILED MA_ADS_EVENT \endlink constants.
+		int bannerEventType;
+		/// If bannerEventType is #\link #MA_ADS_EVENT_FAILED MA_ADS_EVENT_FAILED \endlink
+		/// this variable will contain the error code.
+		/// One of the \link #MA_ADS_ERROR_INTERNAL MA_ADS_ERROR \endlink constants.
+		int bannerErrorCode;
 	}
 
 	/**
@@ -1520,6 +1566,23 @@ interface MAAPI {
 			* NFC event data
 			*/
 			MANFCEventData nfc;
+
+			/**
+			* Ads event data.
+			*/
+			MAAdsEventData adsData;
+
+			/**
+			* Local notification's handle that send the event.
+			* Valid only if the event type is \link #EVENT_TYPE_LOCAL_NOTIFICATION LOCAL_NOTIFICATION \endlink.
+			*/
+			MAHandle localNotificationHandle;
+
+			/**
+			* Push notification's handle that send the event.
+			* Valid only if the event type is \link #EVENT_TYPE_PUSH_NOTIFICATION PUSH_NOTIFICATION \endlink.
+			*/
+			MAHandle pushNotificationHandle;
 
 			/**
 			* Used by custom events. See invididual event descriptions.
@@ -4218,14 +4281,12 @@ group WidgetAPI "Widget API" {
         /**
          * @brief Sent from the Edit box when it gains focus(the user selects the widget).
          * The virtual keyboard is shown.
-         * Only for iphone platform.
          */
          EDIT_BOX_EDITING_DID_BEGIN = 16;
 
         /**
          * @brief Sent from the Edit box when it loses focus.
          * The virtual keyboard is hidden.
-         * Only for iphone platform.
          */
          EDIT_BOX_EDITING_DID_END = 17;
 
@@ -4238,6 +4299,7 @@ group WidgetAPI "Widget API" {
          * @brief Sent from the Edit box when the return button was pressed.
          * On iphone platform the virtual keyboard is not closed after receiving this event.
          * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
+		 * Not available on Windows Phone 7.1
          */
          EDIT_BOX_RETURN = 19;
 
@@ -5581,6 +5643,20 @@ group WidgetAPI "Widget API" {
 		* \endcode
 		*/
 		INPUT_FLAG = "inputFlag";
+
+		/**
+		* @brief Sets the font color of the edit box's text.
+		*
+		* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+		*
+		* @setonly
+		*
+		* @par Example
+		* \code
+		*	maWidgetSetProperty(labelHandle, MAW_EDIT_BOX_FONT_COLOR, "0xff0000");
+		* \endcode
+		*/
+		FONT_COLOR = "fontColor";
 	}
 	} // end of WidgetEditBoxProperties
 
@@ -7480,7 +7556,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		 * Add a notification item.
-		 *
+		 * @deprecated use maNotificationCreate instead.
 		 * Note that there can only be one notification of type
 		 * #NOTIFICATION_TYPE_APPLICATION_LAUNCHER. Additional notification
 		 * types may be added in the future. This syscall is available
@@ -7502,6 +7578,7 @@ group CameraFunctions "Camera Functions" {
 
 		/**
 		 * Remove a notification item.
+		 * @deprecated use maNotificationDestroy instead.
 		 * Currently implemented only on Android.
 		 * @param id The id of the notification.
 		 * @return \< 0 on error.
@@ -8448,6 +8525,1041 @@ group NFCAPI "NFC API" {
 	* \return #RES_OK.
 	*/
 	int maSyscallPanicsDisable();
+
+group AdsAPI "Ads API" {
+	group AdsResultCodes "Ads result codes" {
+		constset int MA_ADS_RES_ {
+			/**
+			* @brief Indicates that the call was successful.
+			*/
+			OK = 0;
+
+			/**
+			* @brief Indicates that the call to a maAdsAddBannerToScreen or maAdsRemoveBannerFromScreen received
+			* an invalid layout handle.
+			*/
+			INVALID_LAYOUT_HANDLE = -1;
+
+			/**
+			* @brief Indicates that the call to a banner function received an invalid banner handle.
+			*/
+			INVALID_BANNER_HANDLE = -2;
+
+			/**
+			* @brief Indicates that the call to maAdsBannerSetProperty or maAdsBannerGetProperty received
+			* an invalid property name.
+			*/
+			INVALID_PROPERTY_NAME = -3;
+
+			/**
+			* @brief Indicates that the call to maAdsBannerSetProperty or maAdsBannerGetProperty received
+			* an invalid property value.
+			*/
+			INVALID_PROPERTY_VALUE = -4;
+
+			/**
+			* @brief Indicates that the call to maAdsBannerSetProperty needs a larger buffer.
+			*/
+			INVALID_STRING_BUFFER_SIZE = -5;
+
+			/**
+			* @brief Indicates that the call to an Ad syscall was unsuccessful.
+			*/
+			ERROR = -6;
+
+			/**
+			* @brief Indicates that ads are not supported on current platform.
+			*/
+			UNSUPPORTED = -7;
+		}
+	} // end of Ads Result Codes
+
+	group AdsErrorCodes "Ads error codes" {
+		constset int MA_ADS_ERROR_ {
+			/**
+			* @brief Indicates that something happened internally: for instance, the Activity may have been destroyed mid-refresh.
+			* Platform: Android.
+			*/
+			INTERNAL = -1;
+
+			/**
+			* @brief Indicates that the ad request is invalid.
+			* Platform: Android.
+			*/
+			INVALID_REQUEST = -2;
+
+			/**
+			* @brief Indicates that the connection to the advertisements server failed.
+			* Platform: Android and iOS.
+			*/
+			NETWORK = -3;
+
+			/**
+			* @brief Indicates that no ad was returned due to lack of ad inventory.
+			* Platform: Android and iOS.
+			*/
+			NO_FILL = -4;
+
+			/**
+			* @brief Indicates that your application has not been configured to receive advertisements.
+			* Platform: iOS.
+			*/
+			CONFIGURATION = -5;
+
+			/**
+			* @brief Indicates that the banner is visible, but no advertisement is shown.
+			* Your application must always hide the banner when it does not have an advertisement to display.
+			* Platform: iOS.
+			*/
+			NO_CONTENT = -6;
+
+			/**
+			* @brief Indicates that ad content is not available because the application is not currently active.
+			* Platform: iOS.
+			*/
+			APPLICATION_INACTIVE = -7;
+		}
+	} // end of Ads Error Codes
+
+	group AdsProperties "Ads Properties" {
+		constset MAString MA_ADS_ {
+			/**
+			* @brief Gets the height of the ads banner.
+			* The view will have no size until the ad is loaded.
+			*
+			* @validvalue an int.
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerGetProperty(MA_ADS_HEIGHT, buf);
+			* \endcode
+			*/
+			HEIGHT = "height";
+
+			/**
+			* @brief Gets the width of the ads banner.
+			* The view will have no size until the ad is loaded.
+			*
+			* @validvalue an int.
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*    char buf[256];
+			*	maAdsBannerGetProperty(MA_ADS_WIDTH, buf);
+			* \endcode
+			*/
+			WIDTH = "width";
+
+			/**
+			* @brief Sets whether the banner is visible or not. Layouts ignore invisible widgets.
+			* The banner is visible by default.
+			*
+			* @validvalue A boolean string 'true' or 'false', where true is visible and false is invisible.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_VISIBLE, "false");
+			* \endcode
+			*/
+			VISIBLE = "visible";
+
+			/**
+			* @brief Sets whether the banner is enabled or not. If disabled, the user cannot interact with it.
+			* Ads are enabled by default.
+			*
+			* @validvalue A boolean string 'true' or 'false', where true is enabled and false is disabled.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_ENABLED, "false");
+			* \endcode
+			*/
+			ENABLED = "enabled";
+
+			/**
+			* @brief Sets the devices that are going to receive test ads only.
+			* You should utilize this property during development to avoid generating false impressions.
+			* Available only on Android.
+			*
+			* @validvalue String that holds the device ID.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_TEST_DEVICE, "E83D20734F72FB3108F104ABC0FFC738"); // My T-Mobile G1 test phone
+			* \endcode
+			*/
+			TEST_DEVICE = "testDevice";
+
+			/**
+			* @brief Sets the request state of the ads.
+			* If set to true ads are starting to be requested, if set to false the request for ads is stopped.
+			* After requesting for content no other property setter will be taken into account.
+			* @validvalue A boolean string 'true' or 'false'.
+			* Available only on Android.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_REQUEST_CONTENT, "true");
+			* \endcode
+			*/
+			REQUEST_CONTENT = "requestContent";
+
+			/**
+			* @brief Returns true if the ad is successfully loaded and is ready to be shown.
+			* Available only on Android.
+			*
+			* @validvalue A boolean string 'true' or 'false'.
+			*
+			* @getonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerGetProperty(bannerHandle, MA_ADS_IS_READY, buf);
+			* \endcode
+			*/
+			IS_READY = "isReady";
+
+			/**
+			* @brief Sets the coloration of test ads, specifically the background color.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_BG, "0xAAAAFF");
+			* \endcode
+			*/
+			COLOR_BG = "colorBg";
+
+			/**
+			* @brief Sets the coloration of test ads,specifically the gradient background color at top.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_BG_TOP, "0xFFFFFF");
+			* \endcode
+			*/
+			COLOR_BG_TOP = "colorBgTop";
+
+			/**
+			* @brief Sets the coloration of test ads, specfiically the border color.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_BORDER, "0xFFFFFF");
+			* \endcode
+			*/
+			COLOR_BORDER = "colorBorder";
+
+			/**
+			* @brief Sets the coloration of test ads, specfiically the link text color.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_LINK, "0xFFFFFF");
+			* \endcode
+			*/
+			COLOR_LINK = "colorLink";
+
+			/**
+			* @brief Sets the coloration of test ads, specfiically the text color.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_TEXT, "0xFFFFFF");
+			* \endcode
+			*/
+			COLOR_TEXT = "colorText";
+
+			/**
+			* @brief Sets the coloration of test ads, specfiically the url color.
+			*
+			* @validvalue A hexadecimal value 0xRRGGBB, where R, G and B are the red, green and blue components respectively.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maAdsBannerSetProperty(bannerHandle, MA_ADS_COLOR_URL, "0xFFFFFF");
+			* \endcode
+			*/
+			COLOR_URL = "colorUrl";
+		}
+	} // end of Ads properties
+
+	group AdsConstants "Ads Constants" {
+		constset int MA_ADS_SIZE_ {
+			// An Ad can be created ony with those predefined sizes.
+			// This is the default banner of size 320*50.
+			BANNER = 0;
+			// Standard medium rectange of size 300*250.
+			// Availabe only on Android.
+			RECT = 1;
+			// Full size banner of size 468*60.
+			// Availabe only on Android.
+			IAB_BANNER = 2;
+			// Of size 728*90.
+			// Availabe only on Android.
+			LEADERBOARD = 3;
+		}
+	} // end of Ads Constants
+
+	group AdsEventTypes "Ads Event Types" {
+		constset int MA_ADS_EVENT_ {
+			// This event is send when a banner view fails to load a new advertisement.
+			FAILED = 0;
+			// This event is send when a new banner advertisement is loaded.
+			LOADED = 1;
+			// This event is send after a banner view finishes executing an action that
+			// covered your application's user interface.
+			ON_DISMISS = 2;
+			// This event is send when the user taps the banner view.
+			// The application is moved to background after this event is send.
+			ON_LEAVE_APPLICATION = 3;
+		}
+	} // end of Ads Constants
+
+	group AdsFunctions "Ads Functions" {
+		/**
+		* \brief Creates a new banner.
+		* \param bannerSize One of the MA_ADS_SIZE_ constants. Only for Android platform.
+		* \param publisherID Only for Android platform.
+		* This param is ignored on iOS platform.
+		*
+		* \note A banner is a widget type object.
+		* For more info see Widget API.
+		*
+		* \returns
+		*  - MA_ADS_RES_UNSUPPORTED if ads are not supported on current system.
+		*  - MA_ADS_RES_ERROR if a error occurred while creating the banner widget.
+		*  - a handle to a new banner widget(the handle value is >= 0).
+		*/
+		int maAdsBannerCreate(in int bannerSize, in MAString publisherID);
+
+		/**
+		* \brief Destroy a banner.
+		*
+		* \param bannerHandle Handle to a banner.
+		*
+		* \returns One of the next constants:
+		* - MA_ADS_RES_OK if no error occurred.
+		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		*/
+		int maAdsBannerDestroy(in MAHandle bannerHandle);
+
+		/**
+		* \brief Add a banner to a layout widget.
+		*
+		* \param bannerHandle Handle to a banner.
+		* \param layoutHandle Handle to a layout.
+		*
+		* \returns One of the next constants:
+		* - MA_ADS_RES_OK if no error occurred.
+		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		* - MA_ADS_RES_INVALID_LAYOUT_HANDLE if the layout handle is invalid.
+		*/
+		int maAdsAddBannerToLayout(in MAHandle bannerHandle, in MAHandle layoutHandle);
+
+		/**
+		* \brief Remove a banner from a layout widget.
+		*
+		* \param bannerHandle Handle to a banner.
+		* \param layoutHandle Handle to a layout.
+		*
+		* \returns One of the next constants:
+		* - MA_ADS_RES_OK if no error occurred.
+		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		* - MA_ADS_RES_INVALID_LAYOUT_HANDLE if the layout handle is invalid.
+		*/
+		int maAdsRemoveBannerFromLayout(in MAHandle bannerHandle, in MAHandle layoutHandle);
+
+		/**
+		* \brief Set a banner property.
+		*
+		* \param bannerHandle Handle to the banner.
+		* \param property A string representing which property to set.
+		* \param value The value that will be assigned to the property.
+		*
+		* \returns One of the next result codes:
+		* - MA_ADS_RES_OK if no error occurred.
+		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		* - MA_ADS_RES_INVALID_PROPERTY_NAME if the property name is not valid.
+		* - MA_ADS_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+		*/
+		int maAdsBannerSetProperty(in MAHandle bannerHandle, in MAString property, in MAString value);
+
+		/**
+		* \brief Retrieves a specified property from the given banner.
+		*
+		* \param bannerHandle Handle to the banner.
+		* \param property A string representing for which property to get the value.
+		* \param value A buffer that will hold the value of the property, represented as a string.
+		* \param bufSize Size of the buffer.
+		*
+		* \returns One of the next result codes:
+		* - MA_ADS_RES_OK if no error occurred.
+		* - MA_ADS_RES_INVALID_BANNER_HANDLE if the banner handle is invalid.
+		* - MA_ADS_RES_INVALID_PROPERTY_NAME if the property name is not valid.
+		* - MA_ADS_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		*/
+		int maAdsBannerGetProperty(in MAHandle bannerHandle, in MAString property, out MAString value range("bufSize"), in int bufSize);
+	}//End of Ads Functions
+} // End of Ads API
+
+group NotificationAPI "Notification API" {
+	group NotificationResultCodes "Notification result codes" {
+		constset int MA_NOTIFICATION_RES_ {
+			/**
+			* @brief Indicates that the call was successful.
+			*/
+			OK = 0;
+
+			/**
+			* @brief Indicates that the syscall received an invalid local notification handle.
+			*/
+			INVALID_HANDLE = -1;
+
+			/**
+			* @brief Indicates that the call to maNotificationSetProperty or maNotificationGetProperty received
+			* an invalid property name.
+			*/
+			INVALID_PROPERTY_NAME = -3;
+
+			/**
+			* @brief Indicates that the call to maNotificationSetProperty or maNotificationGetProperty received
+			* an invalid property value.
+			*/
+			INVALID_PROPERTY_VALUE = -4;
+
+			/**
+			* @brief Indicates that the call to maNotificationGetProperty or maNotificationPushGetData needs a larger buffer.
+			*/
+			INVALID_STRING_BUFFER_SIZE = -5;
+
+			/**
+			* @brief Indicates that notifications are not supported on current platform.
+			*/
+			UNSUPPORTED = -6;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccessful because
+			* the application is already registered for receiving push notification.
+			*/
+			ALREADY_REGISTERED = -7;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushUnregister was unsuccessful because
+			* the application is not registered for receiving push notification.
+			*/
+			NOT_REGISTERED = -8;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccessful because
+			* the application did not finish processing a previous registration request.
+			*/
+			REGISTRATION_IN_PROGRESS = -9;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the
+			* device can't read the response, or there was a 500/503 from the server that can be retried later.
+			* The application should use exponential back off and retry.
+			* Platform: Android only.
+			*/
+			REGISTRATION_SERVICE_NOT_AVAILABLE = -10;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because there is no
+			* Google account on the phone.
+			* The application should ask the user to open the account manager and add a Google account.
+			* Platform: Android only.
+			*/
+			REGISTRATION_ACCOUNT_MISSING = -11;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the password was bad.
+			* The application should ask the user to enter his/her password, and let user retry manually later.
+			* Platform: Android only.
+			*/
+			REGISTRATION_AUTHENTICATION_FAILED = -12;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the user has too many
+			* applications registered.
+			* The application should tell the user to uninstall some other applications, let user retry manually.
+			* Platform: Android only.
+			*/
+			REGISTRATION_TOO_MANY_REGISTRATIONS = -13;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the sender account
+			* is not recognized.
+			* Platform: Android only.
+			*/
+			REGISTRATION_INVALID_SENDER = -14;
+
+			/**
+			* @brief  Indicates that the call to maNotificationPushRegister was unsuccesfull because of incorrect
+			* phone registration with Google. This phone doesn't currently support C2DM.
+			* Platform: Android only.
+			*/
+			REGISTRATION_PHONE_REGISTRATION_ERROR = -15;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushGetRegistration needs a larger buffer.
+			*/
+			REGISTRATION_MESSAGE_BUF_TOO_SMALL = -16;
+
+			/**
+			* @brief Indicates that the call to maNotificationPushGetRegistration occured before trying to register.
+			*/
+			REGISTRATION_NOT_CALLED = -17;
+
+			/**
+			* @brief Indicates that the call to an notification syscall was unsuccessful.
+			*/
+			ERROR = -18;
+		}
+	} // end of Notification Result Codes
+
+	group NotificationFlags "Notification Flags" {
+		constset int MA_NOTIFICATION_FLAG_ {
+			/**
+			* If set, the audio will be repeated until the notification is canceled or the
+			* notification window is opened.
+			* Platform: Android only.
+			*/
+			INSISTENT = 4;
+
+			/**
+			* Should be set if the notification should not be canceled when the user clicks the
+			* Clear all button.
+			* Platform: Android only.
+			*/
+			NO_CLEAR = 32;
+
+			/**
+			* Should be set if this notification represents a high-priority event that may be shown to
+			* the user even if notifications are otherwise unavailable (that is, when the status bar is hidden).
+			* Platform: Android only.
+			*/
+			HIGH_PRIORITY = 128;
+
+			/**
+			* Should be set if the notification should be canceled when it is clicked by the user.
+			* Platform: Android only.
+			*/
+			AUTO_CANCEL = 16;
+		}
+	} // end of Notification Flags
+
+	group NotificationPushTypes "Notification Push Types" {
+		constset int MA_NOTIFICATION_PUSH_TYPE_ {
+			/**
+			* @brief The application accepts notifications that badge the application icon.
+			* Platform: iOS only.
+			*/
+			BADGE = 1;
+
+			/**
+			* @brief The application accepts alert sounds as notifications.
+			* Platform: iOS only.
+			*/
+			SOUND = 2;
+
+			/**
+			* @brief The application accepts alert messages as notifications.
+			* This is the only push notification type that is supported by
+			* both Android and iOS.
+			*/
+			ALERT = 4;
+		}
+	} // end of Notification Push Types
+
+	group LocalNotificationProperties "Local Notification Properties" {
+		constset MAString MA_NOTIFICATION_LOCAL_ {
+			/**
+			* @brief Set the number displayed on the application's icon badge.
+			* Platform: iOS.
+			*
+			* @validvalue an int.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maNotificationLocalGetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_BADGE_NUMBER, buf);
+			* \endcode
+			*/
+			BADGE_NUMBER = "badge_number";
+
+			/**
+			* @brief Set the date and time when the system should deliver the notification.
+			*
+			* @validvalue an int.
+			* The date is in seconds(UNIX time - seconds elapsed since January 1, 1970).
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*	maNotificationLocalGetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FIRE_DATE, buf);
+			* \endcode
+			*/
+			FIRE_DATE = "fire_date";
+
+			/**
+			* @brief Set the message displayed in the notification alert.
+			* Platform: Android and iOS.
+			*
+			* @validvalue an string.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_ALERT_BODY, "Did you forget something?");
+			* \endcode
+			*/
+			CONTENT_BODY = "content_body";
+
+			/**
+			* @brief Set the title of the action button or slider.
+			* Platform: iOS.
+			*
+			* @validvalue a string.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_ALERT_ACTION, "Show");
+			* \endcode
+			*/
+			ALERT_ACTION = "alert_action";
+
+			/**
+			* @brief Enable/disable the sound played when an alert is displayed.
+			* Platform: iOS and Android.
+			* If set to true, it will play the default sound.
+			*
+			* @validvalue "true" or "false" strings.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_PLAY_SOUND, "true");
+			* \endcode
+			*/
+			PLAY_SOUND = "play_sound";
+
+			/**
+			* @brief Set the sound to play when an alert is displayed.
+			* Platform: Android.
+			*
+			* @validvalue a valid path to an audio file.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_SOUND_PATH, "....");
+			* \endcode
+			*/
+			SOUND_PATH = "soundPath";
+
+			/**
+			* @brief Set the title that goes in the expanded entry of the notification.
+			* Platform: Android.
+			*
+			* @validvalue a string.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*     maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_CONTENT_TITLE, "My message");
+			* \endcode
+			*/
+			CONTENT_TITLE = "contentTitle";
+
+			/**
+			* @brief The text that flows by in the status bar when the notification first activates.
+			* Platform: Android.
+			*
+			* @validvalue a string.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*     maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_TICKER_TEXT, "You got new message");
+			* \endcode
+			*/
+			TICKER_TEXT = "tickerText";
+
+			/**
+			* @brief Set or get the flags applied to the local notification.
+			* Platform: Android.
+			*
+			* @validvalue One of the constants:
+			* - MA_NOTIFICATION_FLAG_INSISTENT
+			* - MA_NOTIFICATION_FLAG_AUTO_CANCEL
+			* - MA_NOTIFICATION_FLAG_HIGH_PRIORITY
+			* - MA_NOTIFICATION_FLAG_NO_CLEAR.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*     maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLAG, MA_NOTIFICATION_FLAG_AUTO_CANCEL);
+			* \endcode
+			*/
+			FLAG = "flag";
+
+			/**
+			* @brief Enable/disable the the default vibration when an alert is displayed.
+			* Platform: Android only.
+			* If set to true, it will use the default notification vibrate. This will ignore any given vibrate.
+			* Using phone vibration requires the VIBRATE permission.
+			*
+			* @validvalue "true" or "false" strings.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_VIBRATE, "true");
+			* \endcode
+			*/
+			VIBRATE = "vibrate";
+
+			/**
+			* @brief Set the vibration duration when an alert is displayed.
+			* Platform: Android only.
+			* Using phone vibration requires the VIBRATE permission.
+			*
+			* @validvalue an int The number of milliseconds to vibrate.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*   // Vibrate for 3 seconds.
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, "3000");
+			* \endcode
+			*/
+			VIBRATE_DURATION = "vibrateDuration";
+
+			/**
+			* @brief Enable/Disable the default notification lights.
+			* This will ignore the #MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN.
+			* Not every color in the spectrum is supported by the device LEDs, and not every device supports the same
+			* colors, so the hardware estimates to the best of its ability. Green is the most common notification color.
+			* Platform: Android only.
+			*
+			* @validvalue "true" or "false" strings.
+			*
+			* @setandget
+			*
+			* @par Example
+			* \code
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLASH_LIGHTS, "true");
+			*/
+			FLASH_LIGHTS = "flashLights";
+
+			/**
+			* @brief Define your own color and pattern for the lights.
+			* Not every color in the spectrum is supported by the device LEDs, and not every device supports the same
+			* colors, so the hardware estimates to the best of its ability. Green is the most common notification color.
+			* Also, not all Android devices support this feature.
+			* Platform: Android only.
+			*
+			* @validvalue An int array containing 3 values:
+			* - a value for the ledARGB field (for the color),
+			* - the ledOffMS field (length of time, in milliseconds, to keep the light off),
+			* - the ledOnMS (length of time, in milliseconds, to keep the light on).
+			*  returns MA_NOTIFICATION_ERROR if the current device doesn't support flashing LED.
+			* @setonly
+			*
+			* @par Example
+			* \code
+			* 	// In this example, the green light repeatedly flashes on for 300 milliseconds and turns off for one second.
+			*	maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, "0xff00ff00,300,1000");
+			*/
+			FLASH_LIGHTS_PATTERN = "flashLightsPattern";
+		}
+	} // end of Notification Properties
+
+	group NotificationPushStruct "Push Notification Struct" {
+		/**
+		* \brief An push notification event.
+		*/
+		struct MAPushNotificationData {
+			/// A bit mask specifying the types of notifications.
+			/// The bit mask is created using \link #MA_NOTIFICATION_PUSH_TYPE_BADGE
+			/// MA_NOTIFICATION_PUSH_TYPE \endlink type values.
+			/// Specific to iOS. On Android it will be #MA_NOTIFICATION_PUSH_TYPE_ALERT.
+			int type;
+
+			/// The  buffer that will contain the message displayed in the notification alert.
+			/// This buffer will be filled only if the type is MA_NOTIFICATION_PUSH_TYPE_ALERT.
+			/// Platform: iOS only.
+			MAString alertMessage;
+
+			/// The size of the buffer that will contain the notification alert message.
+			int alertMessageSize;
+
+			/// The address to a buffer that will contain the name of the file containing
+			/// the sound to play when an alert is displayed.
+			/// This buffer will be filled only if the type is MA_NOTIFICATION_PUSH_TYPE_SOUND.
+			/// Platform: iOS only.
+			MAString soundFileName;
+
+			/// The size of the buffer that will contain the sound filename.
+			int soundFileNameSize;
+
+			/// Will contain the number to display as the application’s icon badge.
+			/// This value will be set only if the type is MA_NOTIFICATION_PUSH_TYPE_BADGE.
+			/// Platform: iOS only.
+			int badgeIcon;
+		}
+	} // end of Push Notification Struct
+
+	group NotificationFunctions "Notification Functions" {
+		/**
+		* \brief Creates a new local notification object.
+		*
+		* \returns
+		*  - MA_NOTIFICATION_RES_UNSUPPORTED if the notifications are not supported on current system.
+		*  - MA_NOTIFICATION_RES_ERROR if a error occurred while creating the notification object.
+		*  - a handle to a new local notification object(the handle value is >= 0).
+		*/
+		MAHandle maNotificationLocalCreate();
+
+		/**
+		* \brief Destroy a local notification object.
+		*
+		* \param notificationHandle Handle to a local notification object.
+		*
+		* \returns One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		*/
+		int maNotificationLocalDestroy(in MAHandle notificationHandle);
+
+		/**
+		* \brief Set a local notification property.
+		*
+		* \param notificationHandle Handle to the local notification object.
+		* \param property A string representing which property to set.
+		* \param value The value that will be assigned to the property.
+		*
+		* \returns One of the next result codes:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
+		* - #MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+		*/
+		int maNotificationLocalSetProperty(in MAHandle notificationHandle, in MAString property, in MAString value);
+
+		/**
+		* \brief Retrieves a specified property from the given notification object.
+		*
+		* \param notificationHandle Handle to the notification object.
+		* \param property A string representing for which property to get the value.
+		* \param value A buffer that will hold the value of the property, represented as a string.
+		* \param bufSize Size of the buffer.
+		*
+		* \returns One of the next result codes:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
+		* - #MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		*/
+		int maNotificationLocalGetProperty(in MAHandle notificationHandle, in MAString property,
+								   out MAString value range("bufSize"), in int bufSize);
+
+		/**
+		* \brief Schedules a local notification for delivery at its encapsulated date and time.
+		*
+		* \param notificationHandle Handle to a local notification object.
+		*
+		* \returns One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		*/
+		int maNotificationLocalSchedule(in MAHandle notificationHandle);
+
+		/**
+		* \brief Cancels the delivery of the specified scheduled local notification.
+		* Calling this method also programmatically dismisses the notification if
+		* it is currently displaying an alert.
+		*
+		* \param bannerHandle Handle to a local notification object.
+		*
+		* \returns One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		*/
+		int maNotificationLocalUnschedule(in MAHandle notificationHandle);
+
+		/**
+		* \brief Registers the current application for receiving push notifications.
+		* Note that on Android you might want to store the registrationID that you receive,
+		* and call this again only if it expires at some point.
+		* On Android: if the registration is succesfful, the application receives a registration ID.
+		* The application should store this ID for later use. Note that Google may periodically refresh
+		* the registration ID, so you should design your application with the understanding that this
+		* syscall  may be called multiple times.
+		* \param pushNotificationTypes A bit mask specifying the types of notifications
+		* the application accepts.
+		* See \link #MA_NOTIFICATION_PUSH_TYPE_BADGE MA_NOTIFICATION_PUSH_TYPE_ \endlink
+		* for valid bit-mask values.
+		* On Android platform this param is ignored.
+		* \param accountID Is the ID of the account authorized to send messages to the application,
+		* typically the email address of an account set up by the application's developer.
+		* On iOS platform this param is ignored.
+		*
+		* \returns One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_ALREADY_REGISTERED if the application is already registered for
+		* receiving push notifications.
+		*/
+		int maNotificationPushRegister(in MAHandle pushNotificationTypes, in MAString accountID);
+
+		/**
+		* \brief Unregister application for push notifications.
+		*
+		* \returns One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_NOT_REGISTERED if the application was not registered for receiving
+		* push notification.
+		*/
+		int maNotificationPushUnregister();
+
+		/**
+		* \brief Gets the latest push notification registration response.
+		* \param buffer The registrationID if the registration was successfull, or the error messsage otherwise.
+		* \param bufSize Size of the buffer.
+		* \response  One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if the application registered successfully.
+		* - #MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED if maNotificationPushRegister was not called.
+		* - MA_NOTIFICATION_RES_REGISTRATION_MESSAGE_BUF_TOO_SMALL if the buffer is too small.
+		* - MA_NOTIFICATION_RES_ERROR if registration has failed.
+		*/
+		int maNotificationPushGetRegistration(out MAString registrationMesssage range("registrationMessageSize"),
+											 in int registrationMessageSize);
+
+		/**
+		* \brief Fills pushNotificationData struct with the values for a given push notification.
+		* Note: Call maNotificationPushDestroy() in order to destroy the push notification object.
+		*
+		* \param pushNotificationHandle Handle to a given push notification.
+		* \param pushNotificationData A struct that will contain the values for a given push notification.
+		*
+		* \return One of the next contants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the pushNotificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE if at least one of the buffers from
+		* pushNotificationData are too small.
+		*/
+		int maNotificationPushGetData(in MAHandle pushNotificationHandle,
+									  out MAPushNotificationData pushNotificationData);
+
+		/**
+		* \brief Destroy a push notification object.
+		*
+		* \param notificationHandle Handle to a push notification object.
+		*
+		* \returns One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		*/
+		int maNotificationPushDestroy(in MAHandle notificationHandle);
+
+		/**
+		* \brief Set the number currently set as the badge of the application icon in Springboard.
+		* Platform: iOS only.
+		*
+		*\param applicationIconBadgeNumber Set to zero to hide the badge number. The default is zero.
+		* If this value is negative the syscall will do nothing.
+		*/
+		void maNotificationSetIconBadge(in int applicationIconBadgeNumber);
+
+		/**
+		* \brief Get the number currently set as the badge of the application icon in Springboard.
+		* Platform: iOS only.
+		*
+		*\return The number displayed as the badge of the application.
+		*/
+		int maNotificationGetIconBadge();
+
+		/**
+		* \brief Set the ticker text in the notification status bar for incoming push notifications.
+		* This call does not alter already received notifications.
+		* Platform: Android only.
+		*
+		* \param tickerText The text that flows by in the status bar when the notification first activates.
+		* \return One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_ERROR.
+		*/
+		int maNotificationPushSetTickerText(in MAString tickerText);
+
+		/**
+		* \brief Set the  message title in the notification area for incoming push notifications.
+		* This call does not alter already received notifications.
+		* Platform: Android only.
+		*
+		* \param messageTitle The title that goes in the expanded entry of the notification.
+		* \return One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_ERROR.
+		*/
+		int maNotificationPushSetMessageTitle(in MAString messageTitle);
+	}//End of Notification Functions
+} // End of Notification API
+
 }
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

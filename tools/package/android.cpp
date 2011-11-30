@@ -40,6 +40,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 static void writePermission(ostream& stream, bool flag, const char* nativePerm);
 static void writeNFCDirectives(ostream& stream, const SETTINGS& s);
 static void writeNFCResource(ostream& stream, const SETTINGS& s);
+static void writeC2DMReceiver(ostream& stream, const string& packageName);
 static string packageNameToByteCodeName(const string& packageName);
 
 void packageAndroid(const SETTINGS& s, const RuntimeInfo& ri) {
@@ -285,7 +286,17 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t<activity android:name=\".TextBox\"\n"
 		<<"\t\t\tandroid:label=\"@string/app_name\">\n"
 		<<"\t\t</activity>\n"
-		<<"\t</application>\n"
+		// Enable Google AdMob Ads.
+		<<"\t\t<activity android:name=\"com.google.ads.AdActivity\"\n"
+		<<"\t\t\tandroid:theme=\"@android:style/Theme.NoTitleBar.FullScreen\">\n"
+		<<"\t\t\tandroid:configChanges=\"orientation|keyboard|keyboardHidden\">\n"
+		<<"\t\t</activity>\n"
+		;
+	file <<"\t\t<service android:name=\"com.mosync.internal.android.notifications.LocalNotificationsService\" />\n";
+    if (ri.androidVersion >= 8) {
+		writeC2DMReceiver(file, packageName);
+	}
+	file <<"\t</application>\n"
 		<<"\t<uses-sdk android:minSdkVersion=\""<<ri.androidVersion<<"\" />\n"
 		;
 
@@ -321,7 +332,7 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 	if (!s.permissions) {
 		return;
 	}
-
+	string packageName = string(s.androidPackage);
 	set<string> permissionSet = set<string>();
 	parsePermissions(permissionSet, s.permissions);
 
@@ -366,6 +377,19 @@ static void writePermissions(ostream& stream, const SETTINGS& s, const RuntimeIn
 
 	// Always add this.
 	writePermission(stream, true, "android.permission.READ_PHONE_STATE");
+
+	// Only add this for android 2.2 and higher. Permission for Google C2DM Service for push notifications.
+	if (ri.androidVersion >= 8)
+	{
+		if (isPermissionSet(permissionSet, PUSH_NOTIFICATIONS))
+		{
+			stream <<"\t<permission android:name=\"com.mosync.java.android.permission.C2D_MESSAGE\"\n";
+			stream <<"\t\tandroid:protectionLevel=\"signature\" />\n";
+		}
+		string permMessage = packageName + ".permission.C2D_MESSAGE";
+		writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), permMessage.c_str());
+		writePermission(stream, isPermissionSet(permissionSet, PUSH_NOTIFICATIONS), "com.google.android.c2dm.permission.RECEIVE");
+	}
 }
 static void writePermission(ostream& stream, bool flag, const char* nativePerm) {
 	if (flag) {
@@ -409,6 +433,22 @@ static void writeNFCResource(ostream& stream, const SETTINGS& s) {
 	//TODO: delete nfcInfo;
 }
 
+static void writeC2DMReceiver(ostream& stream, const string& packageName) {
+	// Receiver for messages and registration responses.
+	stream << "\t\t<service android:name=\".C2DMReceiver\" />\n";
+	stream << "\t\t<receiver android:name=\"com.google.android.c2dm.C2DMBroadcastReceiver\"\n";
+	stream << "\t\t\tandroid:permission=\"com.google.android.c2dm.permission.SEND\">\n";
+	stream << "\t\t\t<intent-filter>\n";
+	stream << "\t\t\t\t<action android:name=\"com.google.android.c2dm.intent.RECEIVE\" />\n";
+	stream << "\t\t\t\t<category android:name=\""<<packageName<<"\" />\n";
+	stream << "\t\t\t</intent-filter>\n";
+	stream << "\t\t\t<intent-filter>\n";
+	stream << "\t\t\t\t<action android:name=\"com.google.android.c2dm.intent.REGISTRATION\" />\n";
+	stream << "\t\t\t\t<category android:name=\""<<packageName<<"\" />\n";
+	stream << "\t\t\t</intent-filter>\n";
+	stream << "\t\t</receiver>\n";
+}
+//<<"\tpackage=\"" << packageName << "\"\n"
 static void writeMain(const char* filename, const SETTINGS& s, const RuntimeInfo& ri) {
 	ofstream file(filename, ios::binary);
 	file <<"<?xml version=\"1.0\" encoding=\"utf-8\"?>\n"
