@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<platform family="BlackBerry" variant="4.1_base" inherit="BlackBerry/4.0" abstract="true">
+</platform>
