@@ -1728,17 +1728,34 @@ interface MAAPI {
 	*/
 	void maSoundSetVolume(in int vol);
 
+	typedef int MAExtensionModule;
+	typedef int MAExtensionFunction;
+
+	constset int MA_EXTENSION_ {
+		MODULE_UNAVAILABLE = -1;
+		FUNCTION_UNAVAILABLE = -1;
+	}
 
 	/**
 	* Invokes an extension function. Normally you don't call this function directly.
 	*/
-	ioctl maInvokeExtension {}
+	ioctl maExtensionFunctionInvoke {}
 
 	/**
 	* These functions are available only on certain platforms.
 	* Returns -1 if the function is not available.
 	*/
 	ioctl maIOCtl {
+
+	/**
+	* Loads an extension module. Normally you don't call this function directly.
+	*/
+	MAExtensionModule maExtensionModuleLoad(in MAString id, in int hash);
+
+	/**
+	* Loads an extension function. Normally you don't call this function directly.
+	*/
+	MAExtensionFunction maExtensionFunctionLoad(in MAExtensionModule module, in int index);
 
 #if IX_RESOURCE_TYPES
 	constset int RT_ {  //WARNING: must match the resource compiler.

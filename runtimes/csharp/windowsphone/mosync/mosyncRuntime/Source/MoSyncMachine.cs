@@ -26,6 +26,16 @@ namespace MoSync
         private Thread mThread = null;
         private readonly bool mRebuild;
 
+		public MoSync.Core GetCore()
+		{
+			return mCore;
+		}
+
+		public MoSync.Runtime GetRuntime()
+		{
+			return mRuntime;
+		}
+
         private Machine(bool rebuild)
         {
             mRebuild = rebuild;
