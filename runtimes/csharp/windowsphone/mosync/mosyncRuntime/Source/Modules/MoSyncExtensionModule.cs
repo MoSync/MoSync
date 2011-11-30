@@ -1,3 +1,4 @@
+
 using System;
 using System.IO;
 using Microsoft.Xna.Framework;
@@ -12,94 +13,102 @@ namespace MoSync
     {
         void Init(Core core, Runtime runtime);
         String GetName();
-        long Invoke(int index, int a, int b, int c);
+		uint GetHash();
+		long Invoke(MoSync.Core core, int index, int a, int b, int c);
     }
 
-    public class MA_HELLO_ExtensionFunctions
+    public class ExtensionModule : ISyscallModule, IIoctlModule
     {
-        public delegate long Delegate_maPlot(int _x, int _y);
-        public Delegate_maPlot maPlot = null;
-    }
-
-    public class MA_HELLO_ExtensionModule : IExtensionModule
-    {
-        protected MA_HELLO_ExtensionFunctions mFunctions = new MA_HELLO_ExtensionFunctions();
-        public String GetName()
-        {
-            return "MA_HELLO";
-        }
-
-        public void Init(Core core, Runtime runtime)
-        {
-            Syscalls syscalls = runtime.GetSyscalls();
-
-            mFunctions.maPlot = delegate(int _x, int _y)
-            {
-                syscalls.maPlot(_x, _y);
-                return 0;
-            };
-        }
-
-        public long Invoke(int index, int a, int b, int c)
-        {
-            switch (index)
-            {
-                case 0:
-                    return mFunctions.maPlot(a, b);
-            }
-
-            return MoSync.Constants.IOCTL_UNAVAILABLE;
-        }
-    }
-
-    public class ExtensionModule : ISyscallModule
-    {
-        private Dictionary<String, IExtensionModule> mModules = new Dictionary<String, IExtensionModule>();
-
+		private List<IExtensionModule> mModules = new List<IExtensionModule>();
         protected void InitExtensions(Core core, Runtime runtime)
         {
-            foreach (Type t in Assembly.GetCallingAssembly().GetTypes())
+			//Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			//foreach(Assembly a in assemblies)
+			//foreach (Type t in a.GetTypes())
+			foreach(Type t in Assembly.GetExecutingAssembly().GetTypes())
             {
                 IExtensionModule extensionGroupInstance = null;
                 if (t.GetInterface("MoSync.IExtensionModule", false) != null)
                 {
                     extensionGroupInstance = Activator.CreateInstance(t) as IExtensionModule;
-                    mModules.Add(extensionGroupInstance.GetName(), extensionGroupInstance);
+                    mModules.Add(extensionGroupInstance);
                 }
             }
 
-            foreach (KeyValuePair<String, IExtensionModule> module in mModules)
+            foreach (IExtensionModule module in mModules)
             {
-                module.Value.Init(core, runtime);
+                module.Init(core, runtime);
             }
         }
 
-        private IExtensionModule GetModule(String name)
+		public void AddModule(IExtensionModule mod)
+		{
+			mModules.Add(mod);
+		}
+
+        private IExtensionModule GetModule(String name, out int handle)
         {
-            IExtensionModule ret;
-            if (!mModules.TryGetValue(name, out ret))
-                return null;
-            else
-                return ret;
+			int i = 0;
+			foreach (IExtensionModule module in mModules)
+			{
+				if (module.GetName().Equals(name))
+				{
+					handle = i;
+					return module;
+				}
+
+				i++;
+			}
+
+			handle = MoSync.Constants.MA_EXTENSION_MODULE_UNAVAILABLE;
+			return null;
         }
 
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
-
-            InitExtensions(core, runtime);
-
-            syscalls.maInvokeExtension = delegate(int extensionId, int a, int b, int c)
+            syscalls.maExtensionFunctionInvoke = delegate(int extensionId, int a, int b, int c)
             {
-                int ptr = core.GetDataMemory().ReadInt32(extensionId+0);
-                String module = core.GetDataMemory().ReadStringAtAddress(ptr);
-                int index = core.GetDataMemory().ReadInt32(extensionId + 4);
+				int _module = extensionId >> 8;
+				if (_module >= 0 && _module < mModules.Count)
+				{
+					IExtensionModule module = mModules[_module];
+					int function = extensionId & 0xff;
+					return module.Invoke(core, function, a, b, c);
+				}
 
-                IExtensionModule extension = GetModule(module);
-                if (extension == null)
-                    return MoSync.Constants.IOCTL_UNAVAILABLE;
-                else
-                    return extension.Invoke(index, a, b, c);
+				return MoSync.Constants.MA_EXTENSION_FUNCTION_UNAVAILABLE;
             };
         }
+
+		public void Init(Ioctls ioctls, Core core, Runtime runtime)
+		{
+            InitExtensions(core, runtime);
+
+			ioctls.maExtensionModuleLoad = delegate(int _name, int _hash)
+			{
+				int handle = MoSync.Constants.MA_EXTENSION_MODULE_UNAVAILABLE;
+
+				String name = core.GetDataMemory().ReadStringAtAddress(_name);
+				if(GetModule(name, out handle) != null)
+				{
+					return handle;
+				}
+
+				return handle;
+			};
+
+			ioctls.maExtensionFunctionLoad = delegate(int _module, int _index)
+			{
+				int handle = MoSync.Constants.MA_EXTENSION_FUNCTION_UNAVAILABLE;
+
+				if (_module >= 0 && _module < mModules.Count)
+				{
+					// maybe have method count as a generated part of the extension
+					return (_module << 8) | (_index&0xff);
+				}
+
+				return handle;
+			};
+		}
     }
 }

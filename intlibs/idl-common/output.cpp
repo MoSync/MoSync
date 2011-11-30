@@ -1003,6 +1003,342 @@ void streamInvokeSyscall(ostream& stream, const Interface& maapi, bool java, int
 	}
 }
 
+std::string getCSharpType(const Interface& maapi, const std::string& maapiType, bool in) {
+	std::string resolvedMaapiType = resolveType(maapi, maapiType);
+	if(resolvedMaapiType == "unsigned char" || resolvedMaapiType == "unsigned int" || resolvedMaapiType == "unsigned long"
+		|| resolvedMaapiType == "unsigned short" || resolvedMaapiType == "long int")
+		resolvedMaapiType = "int";
+
+	if(in == false)
+		resolvedMaapiType += "*";
+
+	std::string returnType = jType(maapi, resolvedMaapiType);
+
+	if(resolvedMaapiType == "double")
+		returnType = "double";
+	else if(resolvedMaapiType == "float")
+		returnType = "float";
+	else if(resolvedMaapiType == "long long")
+		returnType = "long";
+
+	if(returnType == "noreturn")
+		returnType = "void";
+	else if(returnType == "MAString" || returnType == "MAWString")
+		//returnType = "String";
+		returnType = "int";
+	else if(returnType == "MAExtent")
+		returnType = "int";
+	else if(returnType == "MAAddress")
+		returnType = "int";
+	else if(returnType == "MAHandle")
+		returnType = "int";
+	return returnType;
+}
+
+void outputCSharpSyscallArg(ostream& maapiFile, int i, const std::string& coreObject) {
+	if(i < 4) {
+		maapiFile << coreObject << "GetRegisterValue(CoreInterpreted.Reg.I" << i << ")";
+	} else {
+		maapiFile << coreObject << "GetStackValue(" << ((i-4)<<2) << ")";
+	}
+}
+
+void outputCSharpSyscallNativeArg(ostream& maapiFile, int i, const string& coreObject) {
+	if(i < 4) {
+		maapiFile << "i" << i;
+	} else {
+		maapiFile << coreObject << "GetStackValue(" << ((i-4)<<2) << ")";
+	}
+}
+
+void outputCSharpIoctlArg(ostream& maapiFile, int i, const std::string& coreObject) {
+	if(i < 3) {
+		maapiFile << (char)('a'+i);
+	} else {
+		maapiFile << coreObject << "GetStackValue(" << ((i-3)<<2) << ")";
+	}
+}
+
+void outputCSharpSyscallArgTyped(ostream& maapiFile, int& i, const Argument& a,
+	const Interface& maapi, const std::string& coreObject)
+{
+	std::string argType = getCSharpType(maapi, a.type, a.in);
+	if(argType == "double") {
+		maapiFile << "MoSync.Util.ConvertToDouble(";
+		outputCSharpSyscallArg(maapiFile, i, coreObject);
+		maapiFile << ", ";
+		i++;
+		outputCSharpSyscallArg(maapiFile, i, coreObject);
+		i++;
+		maapiFile << ")";
+	}
+	else if(argType == "float") {
+		maapiFile << "MoSync.Util.ConvertToFloat(";
+		outputCSharpSyscallArg(maapiFile, i, coreObject);
+		i++;
+		maapiFile << ")";
+	} else {
+		outputCSharpSyscallArg(maapiFile, i, coreObject);
+		i++;
+	}
+}
+
+void outputCSharpIoctlArgTyped(ostream& maapiFile, int& argindex, const Argument& a,
+	const Interface& maapi, const std::string& coreObject)
+{
+	std::string argType = getCSharpType(maapi, a.type, a.in);
+	if(argType == "double") {
+		maapiFile << "MoSync.Util.ConvertToDouble(";
+		outputCSharpIoctlArg(maapiFile, argindex, coreObject);
+		maapiFile << ", ";
+		argindex++;
+		outputCSharpIoctlArg(maapiFile, argindex, coreObject);
+		argindex++;
+		maapiFile << ")";
+	}
+	else if(argType == "float") {
+		maapiFile << "MoSync.Util.ConvertToFloat(";
+		outputCSharpIoctlArg(maapiFile, argindex, coreObject);
+		argindex++;
+		maapiFile << ")";
+	} else {
+		outputCSharpIoctlArg(maapiFile, argindex, coreObject);
+		argindex++;
+	}
+}
+
+static const Struct* findStruct(const Interface& inf, const string& name) {
+	for(size_t i=0; i<inf.structs.size(); i++) {
+		const Struct& s(inf.structs[i]);
+		if(s.name == name)
+			return &s;
+	}
+	return NULL;
+}
+
+static void streamIndent(ostream& stream, int indent) {
+	for(int i=0; i<indent; i++) {
+		stream << "\t";
+	}
+}
+
+static const char* escapeCSharp(const string& name) {
+	static const char* cSharpKeywords[] = {
+		"abstract_",
+		"as_",
+		"base_",
+		"bool_",
+		"break_",
+		"byte_",
+		"case_",
+		"catch_",
+		"char_",
+		"checked_",
+		"class_",
+		"const_",
+		"continue_",
+		"decimal_",
+		"default_",
+		"delegate_",
+		"do_",
+		"double_",
+		"else_",
+		"enum_",
+		"event_",
+		"explicit_",
+		"extern_",
+		"false_",
+		"finally_",
+		"fixed_",
+		"float_",
+		"for_",
+		"foreach_",
+		"goto_",
+		"if_",
+		"implicit_",
+		"in_",
+		"int_",
+		"interface_",
+		"internal_",
+		"is_",
+		"lock_",
+		"long_",
+		"namespace_",
+		"new_",
+		"null_",
+		"object_",
+		"operator_",
+		"out_",
+		"override_",
+		"params_",
+		"private_",
+		"protected_",
+		"public_",
+		"readonly_",
+		"ref_",
+		"return_",
+		"sbyte_",
+		"sealed_",
+		"short_",
+		"sizeof_",
+		"stackalloc_",
+		"static_",
+		"string_",
+		"struct_",
+		"switch_",
+		"this_",
+		"throw_",
+		"true_",
+		"try_",
+		"typeof_",
+		"uint_",
+		"ulong_",
+		"unchecked_",
+		"unsafe_",
+		"ushort_",
+		"using_",
+		"virtual_",
+		"void_",
+		"volatile_",
+		"while_",
+	};
+	for(size_t i=0; i<(sizeof(cSharpKeywords)/sizeof(char*)); i++) {
+		const char* key = cSharpKeywords[i];
+		if(strncmp(key, name.c_str(), MAX(strlen(key)-1, name.size())) == 0)
+			return key;
+	}
+	return name.c_str();
+}
+
+size_t streamCSharpOffsets(ostream& stream, const Interface& inf,
+	const Struct& s, size_t offset, int indent)
+{
+	size_t structSize = 0;
+	for(size_t j=0; j<s.members.size(); j++) {
+		const Member& m(s.members[j]);
+		size_t max = 0;
+		for(size_t k=0; k<m.pod.size(); k++) {
+			const PlainOldData& pod(m.pod[k]);
+			size_t memberSize;
+			const Struct* subStruct = findStruct(inf, pod.type);
+			if(isAnonStructName(pod.type)) {
+				if(!subStruct)
+					throwException("Struct not found: " + pod.type);
+				memberSize = streamCSharpOffsets(stream, inf, *subStruct, offset, indent);
+				max = MAX(max, memberSize);
+				continue;
+			}
+
+			memberSize = cTypeSize(inf, pod.type);
+
+			int count;
+			string baseName;
+			bool array = isArray(inf, pod.name, count, baseName);
+			if(array) {
+				memberSize *= count;
+			} else {
+				baseName = pod.name;
+			}
+
+			if(subStruct && !array) {
+				streamIndent(stream, indent);
+				stream << "public class "<<escapeCSharp(baseName)<<" {\n";
+				memberSize = streamCSharpOffsets(stream, inf, *subStruct, offset, indent+1);
+				streamIndent(stream, indent);
+				stream << "}\n";
+			} else {
+				streamIndent(stream, indent);
+				stream << "public const int "<<escapeCSharp(baseName)<< " = " <<offset<< ";\n";
+			}
+			max = MAX(max, memberSize);
+		}
+		offset += max;
+		structSize += max;
+	}
+	return structSize;
+}
+
+void streamCSharpConstants(ostream& maapiFile, const Interface& maapi)
+{
+	// generate hash
+	maapiFile << "\tpublic const uint MoSyncHash = " << "0x" << setfill('0') << setw(8) << hex << calculateChecksum(maapi) << dec << ";\n";
+
+	for(size_t j=0; j<maapi.constSets.size(); j++) {
+		const ConstSet& cs(maapi.constSets[j]);
+		for(size_t k=0; k<cs.constants.size(); k++) {
+			const Constant& c(cs.constants[k]);
+			//printf("%s = %s;\n", c.name.c_str(), c.value.c_str());
+
+			std::string type = "int";
+			if(c.type == "MAString")
+				type = "String";
+			maapiFile << "\tpublic const " << type << " " << cs.name << c.name.c_str() << " = " << c.value.c_str();
+			maapiFile << ";\n";
+		}
+	}
+}
+
+void streamCSharpFunctionDelegates(ostream& maapiFile, const Interface& maapi)
+{
+	for(size_t j=0; j<maapi.functions.size(); j++) {
+		const Function& f(maapi.functions[j]);
+
+		//maapiFile << "\t\tcase " << f.number << ":\n";
+		std::string returnType = getCSharpType(maapi, f.returnType, true);
+		maapiFile << "\tpublic delegate " << returnType << " Delegate_" << f.name << "(";
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			if(k != 0)
+				maapiFile << ", ";
+
+			std::string argType = getCSharpType(maapi, a.type, a.in);
+			maapiFile << argType << " _" << a.name;
+		}
+		maapiFile << ");\n";
+		maapiFile << "\tpublic Delegate_" << f.name << " " << f.name << " = null;\n";
+	}
+}
+
+void streamIoctlFunctionInvokeCSharp(ostream& maapiFile, const Function& f, const Interface& maapi, const std::string& object, const std::string& coreObject)
+{
+	maapiFile << "\t\t\tcase " << f.number << ":\n";
+
+	maapiFile << "\t\t\tif(" << object << f.name << " == null)\n";
+	maapiFile << "\t\t\t\tresult = MoSync.Constants.IOCTL_UNAVAILABLE;\n";
+	maapiFile << "\t\t\telse\n";
+	maapiFile << "\t\t\t\tresult = " << object << f.name << "(";
+
+	int argindex = 0;
+	for(size_t k=0; k<f.args.size(); k++) {
+		const Argument& a(f.args[k]);
+		std::string argType = getCSharpType(maapi, a.type, a.in);
+		if(k != 0)
+			maapiFile << ", ";
+		outputCSharpIoctlArgTyped(maapiFile, argindex, a, maapi, coreObject);
+	}
+	maapiFile << ");\n";
+
+	// SYSCALL_LOG
+	if(f.name != "maWriteLog") {
+		maapiFile << "#if SYSCALL_LOG\n";
+		maapiFile << "\t\t\tUtil.Log(\""<<f.name<<"(\"+\n";
+		argindex = 0;
+		for(size_t k=0; k<f.args.size(); k++) {
+			const Argument& a(f.args[k]);
+			maapiFile << "\t\t\t\t";
+			if(k != 0)
+				maapiFile << "\",\"+";
+			outputCSharpIoctlArgTyped(maapiFile, argindex, a, maapi, coreObject);
+			maapiFile << "+\n";
+		}
+		maapiFile << "\t\t\t\t\"): \"+result+\"\\n\");\n";
+		maapiFile << "#endif\n";
+	}
+	// END LOG
+
+	maapiFile << "\t\t\treturn result;\n";
+}
+
 static uint32 hash32shift(uint32 key) {
 	key = key + ~(key << 15); // key = key - (key << 15) - 1;
 	key = key ^ (key >> 10);

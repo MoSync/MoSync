@@ -7,7 +7,7 @@ work = ExeWork.new
 work.instance_eval do
 	@SOURCES = ["."]
 	@EXTRA_INCLUDES = ["../../intlibs"]
-	@LOCAL_LIBS = ["idl-common"]
+	@LOCAL_LIBS = ["idl-common", "filelist"]
 	@NAME = "mosync-extension"
 	@INSTALLDIR = mosyncdir + '/bin'
 end

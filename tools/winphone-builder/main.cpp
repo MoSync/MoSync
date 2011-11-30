@@ -89,21 +89,67 @@ static pugi::xml_node getNode(const pugi::xml_node& node, const std::string& xpa
 	return node.select_single_node(query).node();
 }
 
+struct LibraryReference
+{
+	LibraryReference(const std::string& name, const std::string& value) :
+		name(name),
+		value(value)
+	{
+	}
+
+	std::string name;
+	std::string value;
+};
+
 int main(int argc, char **argv) {
 
 	string inputFile = "";
 	string outputType = "rebuilt";
 	string outputFile = "";
 
+	std::vector<LibraryReference> libraryReferences;
+
+	bool extensionDevMode = false;
 	string releaseInterpretedConfig = " '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ";
 	string debugInterpretedConfig = " '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ";
 	string releaseRebuildConfig = "'$(Configuration)|$(Platform)' == 'rebuild_release|AnyCPU'";
 	string debugRebuildConfig = "'$(Configuration)|$(Platform)' == 'rebuild_debug|AnyCPU'";
 	string programFileRelativePath = "program";
+	string resourceFileRelativePath = "resources";
 	string dataSectionFileRelativePath = "RebuildData\\data_section.bin";
 	string rebuildCsFileRelativePath = "RebuildData\\rebuild.build.cs";
+	string projectName = "mosync";
+	string runtimePath = "Libraries\\mosyncRuntime\\mosyncRuntime.dll";
+
+	bool hasResourceFile = true;
 
 	for(int i = 1; i < argc; i++) {
+		if(strcmp("-build-extension-devenv", argv[i])==0) {
+			extensionDevMode = true;
+		} else
+		if(strcmp("-project-name", argv[i])==0) {
+			i++;
+			if(i>=argc) error("Invalid argument to -project-name.");
+			projectName = argv[i];
+		} else
+		if(strcmp("-runtime-path", argv[i])==0) {
+			i++;
+			if(i>=argc) error("Invalid argument to -runtime-path.");
+			runtimePath = argv[i];
+		} else
+		if(strcmp("-exclude-resource-file", argv[i])==0) {
+			hasResourceFile = false;
+		} else
+		if(strcmp("-ref", argv[i])==0) {
+			i++;
+			if(i>=argc) error("Invalid argument to -ref <name> <path>.");
+			std::string name = argv[i];
+			i++;
+			if(i>=argc) error("Invalid argument to -ref <name> <path>.");
+			std::string value = argv[i];
+
+			libraryReferences.push_back(LibraryReference(name, value));
+		} else
 		if(strcmp("-input-file", argv[i])==0) {
 			i++;
 			if(i>=argc) error("Invalid argument to -input.");
@@ -140,26 +186,40 @@ int main(int argc, char **argv) {
 	pugi::xml_node project = document.select_single_node(projectQuery).node();
 	std::string version = project.attribute("ToolsVersion").value();
 
-	if(outputType == "rebuilt")
+	if(!extensionDevMode)
 	{
-		pugi::xml_node relCnfNode = getNode(project, "PropertyGroup[@Condition=\"" + releaseInterpretedConfig + "\"]");
-		pugi::xml_node dbgCnfNode = getNode(project, "PropertyGroup[@Condition=\"" + debugInterpretedConfig + "\"]");
-		pugi::xml_node programContentNode = getNode(project, "ItemGroup/Content[@Include=\"" + programFileRelativePath + "\"]");
-		relCnfNode.parent().remove_child(relCnfNode);
-		dbgCnfNode.parent().remove_child(dbgCnfNode);
-		programContentNode.parent().remove_child(programContentNode);
+		if(outputType == "rebuilt")
+		{
+			pugi::xml_node relCnfNode = getNode(project, "PropertyGroup[@Condition=\"" + releaseInterpretedConfig + "\"]");
+			pugi::xml_node dbgCnfNode = getNode(project, "PropertyGroup[@Condition=\"" + debugInterpretedConfig + "\"]");
+			pugi::xml_node programContentNode = getNode(project, "ItemGroup/Content[@Include=\"" + programFileRelativePath + "\"]");
+			relCnfNode.parent().remove_child(relCnfNode);
+			dbgCnfNode.parent().remove_child(dbgCnfNode);
+			programContentNode.parent().remove_child(programContentNode);
 
-	}
-	else if(outputType == "interpreted")
-	{
-		pugi::xml_node relRebuildCnfNode = getNode(project, "PropertyGroup[@Condition=\"" + releaseRebuildConfig + "\"]");
-		pugi::xml_node dbgRebuildCnfNode = getNode(project, "PropertyGroup[@Condition=\"" + debugRebuildConfig + "\"]");
-		pugi::xml_node dataSectionContentNode = getNode(project, "ItemGroup/Content[@Include=\"" + dataSectionFileRelativePath + "\"]");
-		pugi::xml_node rebuildCsIncludeNode = getNode(project, "ItemGroup/Compile[@Include=\"" + rebuildCsFileRelativePath + "\"]");
-		relRebuildCnfNode.parent().remove_child(relRebuildCnfNode);
-		dbgRebuildCnfNode.parent().remove_child(dbgRebuildCnfNode);
-		dataSectionContentNode.parent().remove_child(dataSectionContentNode);
-		rebuildCsIncludeNode.parent().remove_child(rebuildCsIncludeNode);
+			if(!hasResourceFile)
+			{
+				pugi::xml_node resContentNode = getNode(project, "ItemGroup/Content[@Include=\"" + resourceFileRelativePath + "\"]");
+				resContentNode.parent().remove_child(resContentNode);
+			}
+		}
+		else if(outputType == "interpreted")
+		{
+			pugi::xml_node relRebuildCnfNode = getNode(project, "PropertyGroup[@Condition=\"" + releaseRebuildConfig + "\"]");
+			pugi::xml_node dbgRebuildCnfNode = getNode(project, "PropertyGroup[@Condition=\"" + debugRebuildConfig + "\"]");
+			pugi::xml_node dataSectionContentNode = getNode(project, "ItemGroup/Content[@Include=\"" + dataSectionFileRelativePath + "\"]");
+			pugi::xml_node rebuildCsIncludeNode = getNode(project, "ItemGroup/Compile[@Include=\"" + rebuildCsFileRelativePath + "\"]");
+			relRebuildCnfNode.parent().remove_child(relRebuildCnfNode);
+			dbgRebuildCnfNode.parent().remove_child(dbgRebuildCnfNode);
+			dataSectionContentNode.parent().remove_child(dataSectionContentNode);
+			rebuildCsIncludeNode.parent().remove_child(rebuildCsIncludeNode);
+
+			if(!hasResourceFile)
+			{
+				pugi::xml_node resContentNode = getNode(project, "ItemGroup/Content[@Include=\"" + resourceFileRelativePath + "\"]");
+				resContentNode.parent().remove_child(resContentNode);
+			}
+		}
 	}
 
 /*
@@ -174,11 +234,26 @@ int main(int argc, char **argv) {
 	pugi::xml_attribute mosyncRuntimeRefAttrNode = mosyncRuntimeRefNode.append_attribute("Include");
 	mosyncRuntimeRefAttrNode.set_value("mosyncRuntime");
 	pugi::xml_node mosyncRuntimeHintPath = mosyncRuntimeRefNode.append_child("HintPath").append_child(pugi::node_pcdata);
-	mosyncRuntimeHintPath.set_value("Libraries\\mosyncRuntime\\mosyncRuntime.dll");
+	mosyncRuntimeHintPath.set_value(runtimePath.c_str());
+
+	for(size_t i = 0; i < libraryReferences.size(); i++)
+	{
+		pugi::xml_node firstReferenceNode = getNode(project, "ItemGroup/Reference[@Include]");
+		pugi::xml_node refNode = firstReferenceNode.parent().insert_child_before("Reference", firstReferenceNode);
+		pugi::xml_attribute refAttrNode = refNode.append_attribute("Include");
+		refAttrNode.set_value(libraryReferences[i].name.c_str());
+		pugi::xml_node hintPath = refNode.append_child("HintPath").append_child(pugi::node_pcdata);
+		hintPath.set_value(libraryReferences[i].value.c_str());
+	}
 
 	// remove a reference to the mosync runtime project
 	pugi::xml_node mosyncRuntimeProjectReferenceNode = getNode(project, "ItemGroup/ProjectReference[@Include=\"..\\mosyncRuntime\\mosyncRuntime.csproj\"]");
 	mosyncRuntimeProjectReferenceNode.parent().remove_child(mosyncRuntimeProjectReferenceNode);
+
+	pugi::xml_node rootNameSpaceNode = getNode(project, "PropertyGroup/RootNamespace");
+	pugi::xml_node assemblyNameNode = getNode(project, "PropertyGroup/AssemblyName");
+	rootNameSpaceNode.first_child().set_value(projectName.c_str());
+	assemblyNameNode.first_child().set_value(projectName.c_str());
 
 	pugi::xml_node decl = document.prepend_child(pugi::node_declaration);
 	decl.append_attribute("version").set_value("1.0");

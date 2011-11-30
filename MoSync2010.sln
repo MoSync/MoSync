@@ -234,6 +234,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "winphone-builder", "tools\w
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "mosync-extension", "tools\mosync-extension\mosync-extension.vcxproj", "{94F9C761-6648-4E36-A920-5B48CFB9185D}"
 	ProjectSection(ProjectDependencies) = postProject
+		{C49EC64D-E0B9-4830-8B0F-E5F286F971A5} = {C49EC64D-E0B9-4830-8B0F-E5F286F971A5}
 		{A61A15F9-7412-44AA-B2C8-8A3CACAAC588} = {A61A15F9-7412-44AA-B2C8-8A3CACAAC588}
 	EndProjectSection
 EndProject

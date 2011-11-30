@@ -42,5 +42,9 @@ FileUtils.rm_rf([mosyncdir+"/profiles/runtimes/winphone"])
 FileUtils.mkpath([
 					mosyncdir+"/profiles/runtimes/winphone",
 					mosyncdir+"/profiles/runtimes/winphone/1",
-					mosyncdir+"/profiles/runtimes/winphone/1/template"])
+					mosyncdir+"/profiles/runtimes/winphone/1/template",
+					mosyncdir+"/profiles/runtimes/winphone/1/extension_dev_template"])
 FileUtils.cp_r "template", mosyncdir+"/profiles/runtimes/winphone/1"
+
+FileUtils.cp_r "mosync/mosyncExtensionTemplate", mosyncdir+"/profiles/runtimes/winphone/1"
+FileUtils.cp_r "mosync/mosyncExtensionTemplate", mosyncdir+"/profiles/runtimes/winphone/1"
