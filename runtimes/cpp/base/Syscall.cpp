@@ -926,6 +926,7 @@ namespace Base {
 		{
 			return 0;
 		}
+		TEST(resource->seek(Seek::Start, 0));
 		int ret = SYSCALL_THIS->loadResource(*resource, originalHandle, destHandle);
 
 		if (((flag & MA_RESOURCE_CLOSE) != 0) && (resource != NULL))
