@@ -47,6 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "CameraPreviewWidget.h"
 #import "CameraConfirgurator.h"
 #import "ImagePickerController.h"
+#import "ScreenOrientation.h"
 #include "netImpl.h"
 
 
@@ -345,6 +346,8 @@ namespace Base {
         MAPimClose();
         [NotificationManager deleteInstance];
         [Ads deleteInstance];
+        [ScreenOrientation deleteInstance];
+
         MAAudioClose();
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
@@ -1943,6 +1946,19 @@ return 0; \
         return [[NotificationManager getInstance] getApplicationIconBadgeNumber];
 	}
 
+    SYSCALL(int, maScreenSetSupportedOrientations(const int orientations))
+	{
+        return [[ScreenOrientation getInstance] setSupportedOrientations:orientations];
+	}
+    SYSCALL(int, maScreenGetSupportedOrientations())
+	{
+        return [[ScreenOrientation getInstance] getSupportedOrientations];
+	}
+    SYSCALL(int, maScreenGetCurrentOrientation())
+	{
+        return [[ScreenOrientation getInstance] getCurrentScreenOrientation];
+	}
+
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
@@ -2052,6 +2068,10 @@ return 0; \
 		maIOCtl_case(maDBCursorGetColumnText);
 		maIOCtl_case(maDBCursorGetColumnInt);
 		maIOCtl_case(maDBCursorGetColumnDouble);
+		maIOCtl_case(maScreenSetSupportedOrientations);
+		maIOCtl_case(maScreenGetSupportedOrientations);
+		maIOCtl_case(maScreenGetCurrentOrientation);
+
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;

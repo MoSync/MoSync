@@ -169,7 +169,7 @@
 		85A1592312F80E520044BBE1 /* VLayoutView.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158ED12F80E520044BBE1 /* VLayoutView.m */; };
 		85A1592612F80E520044BBE1 /* MoSyncUI.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F312F80E520044BBE1 /* MoSyncUI.mm */; };
 		85A1592712F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */; };
-		85A1592812F80E520044BBE1 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F712F80E520044BBE1 /* ScreenWidgetController.m */; };
+		85A1592812F80E520044BBE1 /* ScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F712F80E520044BBE1 /* ScreenWidgetController.mm */; };
 		85A1592912F80E520044BBE1 /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F912F80E520044BBE1 /* UIColor-Expanded.m */; };
 		85A1592A12F80E520044BBE1 /* ButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158FC12F80E520044BBE1 /* ButtonWidget.mm */; };
 		85A1592B12F80E520044BBE1 /* CheckBoxWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158FE12F80E520044BBE1 /* CheckBoxWidget.mm */; };
@@ -198,7 +198,7 @@
 		85A1594912F80E520044BBE1 /* MoSyncUISyscalls.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */; };
 		85A1594A12F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */; };
 		85A1594B12F80E520044BBE1 /* ScreenWidgetController.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F612F80E520044BBE1 /* ScreenWidgetController.h */; };
-		85A1594C12F80E520044BBE1 /* ScreenWidgetController.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F712F80E520044BBE1 /* ScreenWidgetController.m */; };
+		85A1594C12F80E520044BBE1 /* ScreenWidgetController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F712F80E520044BBE1 /* ScreenWidgetController.mm */; };
 		85A1594D12F80E520044BBE1 /* UIColor-Expanded.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158F812F80E520044BBE1 /* UIColor-Expanded.h */; };
 		85A1594E12F80E520044BBE1 /* UIColor-Expanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 85A158F912F80E520044BBE1 /* UIColor-Expanded.m */; };
 		85A1594F12F80E520044BBE1 /* ButtonWidget.h in Headers */ = {isa = PBXBuildFile; fileRef = 85A158FB12F80E520044BBE1 /* ButtonWidget.h */; };
@@ -436,7 +436,7 @@
 		85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncUISyscalls.h; sourceTree = "<group>"; };
 		85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncUISyscalls.mm; sourceTree = "<group>"; };
 		85A158F612F80E520044BBE1 /* ScreenWidgetController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenWidgetController.h; sourceTree = "<group>"; };
-		85A158F712F80E520044BBE1 /* ScreenWidgetController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ScreenWidgetController.m; sourceTree = "<group>"; };
+		85A158F712F80E520044BBE1 /* ScreenWidgetController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScreenWidgetController.mm; sourceTree = "<group>"; };
 		85A158F812F80E520044BBE1 /* UIColor-Expanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor-Expanded.h"; sourceTree = "<group>"; };
 		85A158F912F80E520044BBE1 /* UIColor-Expanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor-Expanded.m"; sourceTree = "<group>"; };
 		85A158FB12F80E520044BBE1 /* ButtonWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ButtonWidget.h; sourceTree = "<group>"; };
@@ -825,7 +825,7 @@
 				85A158F412F80E520044BBE1 /* MoSyncUISyscalls.h */,
 				85A158F512F80E520044BBE1 /* MoSyncUISyscalls.mm */,
 				85A158F612F80E520044BBE1 /* ScreenWidgetController.h */,
-				85A158F712F80E520044BBE1 /* ScreenWidgetController.m */,
+				85A158F712F80E520044BBE1 /* ScreenWidgetController.mm */,
 				0B436B88143089BD00E69AB2 /* OptionsDialogView.h */,
 				0B436B89143089BD00E69AB2 /* OptionsDialogView.mm */,
 				43DFEBFE148620B800757143 /* ScreenOrientation.h */,
@@ -1294,7 +1294,7 @@
 				85A1592312F80E520044BBE1 /* VLayoutView.m in Sources */,
 				85A1592612F80E520044BBE1 /* MoSyncUI.mm in Sources */,
 				85A1592712F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */,
-				85A1592812F80E520044BBE1 /* ScreenWidgetController.m in Sources */,
+				85A1592812F80E520044BBE1 /* ScreenWidgetController.mm in Sources */,
 				85A1592912F80E520044BBE1 /* UIColor-Expanded.m in Sources */,
 				85A1592A12F80E520044BBE1 /* ButtonWidget.mm in Sources */,
 				85A1592B12F80E520044BBE1 /* CheckBoxWidget.mm in Sources */,
@@ -1394,7 +1394,7 @@
 				85A1594212F80E520044BBE1 /* VLayoutView.m in Sources */,
 				85A1594812F80E520044BBE1 /* MoSyncUI.mm in Sources */,
 				85A1594A12F80E520044BBE1 /* MoSyncUISyscalls.mm in Sources */,
-				85A1594C12F80E520044BBE1 /* ScreenWidgetController.m in Sources */,
+				85A1594C12F80E520044BBE1 /* ScreenWidgetController.mm in Sources */,
 				85A1594E12F80E520044BBE1 /* UIColor-Expanded.m in Sources */,
 				85A1595012F80E520044BBE1 /* ButtonWidget.mm in Sources */,
 				85A1595212F80E520044BBE1 /* CheckBoxWidget.mm in Sources */,

@@ -44,6 +44,11 @@
      * - MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT
      */
     int mAllowedScreenOrientations;
+
+    /**
+     * Store the current screen orientation.
+     */
+    UIInterfaceOrientation mCurrentScreenOrientation;
 }
 
 /**
@@ -65,12 +70,64 @@
  * - #MA_SCREEN_ORIENTATION_RES_OK
  * - #MA_SCREEN_ORIENTATION_RES_INVALID_VALUE
  */
--(int) setSupportedOrientations(const int orientations);
+-(int) setSupportedOrientations:(const int) orientations;
 
 /**
  * Get supported screen orientations.
  * @return A bitmask consisting of flags describing the supported screen orientations.
  * The bitmask is created using MA_SCREEN_ORIENTATION values.
  */
--(int) getSupportedOrientations();
+-(int) getSupportedOrientations;
+
+/**
+ * Check if a given orientation is supported by the application.
+ * @param orientation The given orientation.
+ * @return True if the orientation is supported by the application, false oftherwise.
+ */
+-(bool) isInterfaceOrientationSupported:(UIInterfaceOrientation) orientation;
+
+/**
+ * Check if portrait mode is supported by the application.
+ * @return True if portrait mode is supported by the application, false otherwise.
+ */
+-(bool) isPortraitModeSupported;
+
+/**
+ * Check if portrait upside down mode is supported by the application.
+ * Device is in portrait upside down mode if it's in portrait mode but upside down,
+ * with the device held upright and the home button at the top.
+ * @return True if portrait upside down mode is supported by the application, false otherwise.
+ */
+-(bool) isPortraitUpsideDownModeSupported;
+
+/**
+ * Check if landscape left mode is supported by the application.
+ * The device is in landscape left mode if it's held upright and the home button on the left side.
+ * @return True if landscape left mode is supported by the application, false otherwise.
+ */
+-(bool) isLandscapeLeftModeSupported;
+
+/**
+ * Check if landscape right mode is supported by the application.
+ * The device is in landscape right mode if it's held upright and the home button on the right side.
+ * @return True if landscape right mode is supported by the application, false otherwise.
+ */
+-(bool) isLandscapeRightModeSupported;
+
+/**
+ * Called when the screen orientation has changed.
+ * @param orientation New screen orientation.
+ */
+-(void) currentOrientationChanged:(UIInterfaceOrientation) orientation;
+
+/**
+ * Get current screen orientation.
+ * @return One of the next constants:
+ * - MA_SCREEN_ORIENTATION_PORTRAIT
+ * - MA_SCREEN_ORIENTATION_PORTRAIT_UPSIDE_DOWN
+ * - MA_SCREEN_ORIENTATION_LANDSCAPE_LEFT
+ * - MA_SCREEN_ORIENTATION_LANDSCAPE_RIGHT
+ */
+-(int) getCurrentScreenOrientation;
+
 @end
