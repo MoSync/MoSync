@@ -98,6 +98,9 @@
 		43D8047F13EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
 		43D8048013EFBCB200183387 /* VideoViewWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43D8046B13EFBCB200183387 /* VideoViewWidget.mm */; };
 		43D8048413EFBEEE00183387 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43D8048213EFBCC700183387 /* MediaPlayer.framework */; };
+		43DFEC00148620B800757143 /* ScreenOrientation.h in Headers */ = {isa = PBXBuildFile; fileRef = 43DFEBFE148620B800757143 /* ScreenOrientation.h */; };
+		43DFEC01148620B800757143 /* ScreenOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43DFEBFF148620B800757143 /* ScreenOrientation.mm */; };
+		43DFEC02148620B800757143 /* ScreenOrientation.mm in Sources */ = {isa = PBXBuildFile; fileRef = 43DFEBFF148620B800757143 /* ScreenOrientation.mm */; };
 		43FBCABF1433627400301E39 /* PimContactItem.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3B1407FAA5009491A6 /* PimContactItem.m */; };
 		43FBCAC01433627400301E39 /* PimContactsList.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B46B3C1407FAA5009491A6 /* PimContactsList.m */; };
 		85037840133A2275009251E2 /* StackScreenWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8503783F133A2275009251E2 /* StackScreenWidget.mm */; };
@@ -355,6 +358,8 @@
 		43D8046A13EFBCB200183387 /* VideoViewWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VideoViewWidget.h; sourceTree = "<group>"; };
 		43D8046B13EFBCB200183387 /* VideoViewWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = VideoViewWidget.mm; sourceTree = "<group>"; };
 		43D8048213EFBCC700183387 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		43DFEBFE148620B800757143 /* ScreenOrientation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScreenOrientation.h; sourceTree = "<group>"; };
+		43DFEBFF148620B800757143 /* ScreenOrientation.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ScreenOrientation.mm; sourceTree = "<group>"; };
 		8503783E133A2275009251E2 /* StackScreenWidget.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StackScreenWidget.h; sourceTree = "<group>"; };
 		8503783F133A2275009251E2 /* StackScreenWidget.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = StackScreenWidget.mm; sourceTree = "<group>"; };
 		850943291185AF87004A3B2D /* SyscallImpl.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = SyscallImpl.mm; path = impl/SyscallImpl.mm; sourceTree = "<group>"; };
@@ -755,6 +760,8 @@
 				85A158F712F80E520044BBE1 /* ScreenWidgetController.m */,
 				0B436B88143089BD00E69AB2 /* OptionsDialogView.h */,
 				0B436B89143089BD00E69AB2 /* OptionsDialogView.mm */,
+				43DFEBFE148620B800757143 /* ScreenOrientation.h */,
+				43DFEBFF148620B800757143 /* ScreenOrientation.mm */,
 				85A158FA12F80E520044BBE1 /* Widgets */,
 			);
 			path = UI;
@@ -1058,6 +1065,7 @@
 				41BD2ED214768C47005ADEB9 /* AudioSyscall.h in Headers */,
 				41BD2ED414768C55005ADEB9 /* AudioData.h in Headers */,
 				41BD2ED514768C5D005ADEB9 /* AudioInstance.h in Headers */,
+				43DFEC00148620B800757143 /* ScreenOrientation.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1261,6 +1269,7 @@
 				E4D36EA91459AC5B00477B1E /* AudioSyscall.mm in Sources */,
 				E4D36EAD1459B5B600477B1E /* AudioInstance.mm in Sources */,
 				4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */,
+				43DFEC01148620B800757143 /* ScreenOrientation.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1351,6 +1360,7 @@
 				41BD2ED114768C40005ADEB9 /* AudioSyscall.mm in Sources */,
 				41BD2ED314768C4D005ADEB9 /* AudioData.mm in Sources */,
 				41BD2ED614768C63005ADEB9 /* AudioInstance.mm in Sources */,
+				43DFEC02148620B800757143 /* ScreenOrientation.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
