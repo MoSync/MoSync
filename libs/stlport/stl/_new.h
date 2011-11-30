@@ -27,28 +27,7 @@
 using _STLP_VENDOR_CSTD::malloc;
 #endif
 
-#if !defined (_STLP_NO_NEW_NEW_HEADER)
-// eMbedded Visual C++ .NET unfortunately uses _INC_NEW for both <new.h> and <new>
-// we undefine the symbol to get the stuff in the SDK's <new>
-#  if defined (_STLP_WCE_NET) && defined (_INC_NEW)
-#    undef _INC_NEW
-#  endif
-
-#  if defined (new)
-/* STLport cannot replace native Std library new header if new is a macro,
- * please define new macro after <new> header inclusion.
- */
-#    error Cannot include native new header as new is a macro.
-#  endif
-
-#  if defined (_STLP_HAS_INCLUDE_NEXT)
-#    include_next <new>
-#  else
-#    include _STLP_NATIVE_CPP_RUNTIME_HEADER(new)
-#  endif
-#else
-#  include <new.h>
-#endif
+#include <../new>
 
 #if defined (_STLP_NO_BAD_ALLOC) && !defined (_STLP_NEW_DONT_THROW_BAD_ALLOC)
 #  define _STLP_NEW_DONT_THROW_BAD_ALLOC 1
