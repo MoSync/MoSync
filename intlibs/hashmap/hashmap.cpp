@@ -231,7 +231,7 @@ void HashMapBase::dispose(BasePair&) {
 HashMapBase::TIteratorC::TIteratorC(const BasePair* pos, const BasePair* end)
 : mPos(pos), mEnd(end)
 {
-	if(mPos->value == NULL)
+	if(mPos != NULL) if(mPos->value == NULL)
 		proceed();
 }
 
