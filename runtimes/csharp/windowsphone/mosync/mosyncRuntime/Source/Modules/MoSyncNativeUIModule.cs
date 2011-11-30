@@ -72,11 +72,16 @@ namespace MoSync
 
             ioctls.maWidgetStackScreenPush = delegate(int _stackScreen, int _newScreen)
             {
+                IScreen stackScreen = (IScreen)mWidgets[_stackScreen];
+                IScreen newScreen = (IScreen)mWidgets[_newScreen];
+                (stackScreen as MoSync.NativeUI.StackScreen).Push(newScreen);
                 return MoSync.Constants.MAW_RES_OK;
             };
 
             ioctls.maWidgetStackScreenPop = delegate(int _stackScreen)
             {
+                IScreen stackScreen = (IScreen)mWidgets[_stackScreen];
+                (stackScreen as MoSync.NativeUI.StackScreen).Pop();
                 return MoSync.Constants.MAW_RES_OK;
             };
 
