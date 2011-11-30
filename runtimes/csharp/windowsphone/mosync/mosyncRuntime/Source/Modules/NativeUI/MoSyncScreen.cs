@@ -45,6 +45,42 @@ namespace MoSync
             {
                 mPage = new PhoneApplicationPage();
                 mView = mPage;
+
+                //This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
+                (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress += new EventHandler<System.ComponentModel.CancelEventArgs>(BackKeyPressHandler);
+            }
+
+            //The BackKeyPress event handler
+            //Currently it contains the functionality for the back event when a StackScreen is a child of a TabScreen
+            //When this handler does not cover the functionality required it should be updated
+            private void BackKeyPressHandler(object from, System.ComponentModel.CancelEventArgs args)
+            {
+                //Will check if the event is not canceled
+                if (false == args.Cancel)
+                {
+                    //If the caller screen is a TabScreen, otherwise pass the event to the parent
+                    if (this is TabScreen)
+                    {
+                        Microsoft.Phone.Controls.Pivot pivot = ((this as TabScreen).mPivot);
+                        //If the selected tab is a StackScreen
+                        if (this.mChildren[pivot.SelectedIndex] is StackScreen)
+                        {
+                            //If pop is possible
+                            if ((this.mChildren[pivot.SelectedIndex] as StackScreen).StackCount() > 1)
+                            {
+                                //Do a pop and cancel the event
+                                (this.mChildren[pivot.SelectedIndex] as StackScreen).Pop();
+                                args.Cancel = true;
+                            }
+                        }
+                        //If the selected tab is not a StackScreen the application should exit
+                        else
+                        {
+                            //Remove the event handler from the TabScreen
+                            (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress -= BackKeyPressHandler;
+                        }
+                    }
+                }
             }
 
             //The AddChild implementation

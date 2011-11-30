@@ -42,7 +42,7 @@ namespace MoSync
         public class TabScreen : Screen
         {
             //The TabScreen is currently implemented using a Pivot control
-            protected Microsoft.Phone.Controls.Pivot mPivot;
+            public Microsoft.Phone.Controls.Pivot mPivot { get; set; }
 
             //The constructor
             public TabScreen() : base()
@@ -68,6 +68,7 @@ namespace MoSync
                         }
                     );
                 }
+                mChildren.Add(child);
             }
 
             //MAW_TAB_SCREEN_TITLE property implementation
