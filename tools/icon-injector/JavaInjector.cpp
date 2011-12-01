@@ -20,6 +20,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <fstream>
 #include <sstream>
 #include "Shared.h"
+#include <stdio.h>
 
 using namespace std;
 
@@ -34,6 +35,7 @@ static int j_inject(const char *jarFile, const char *pngFile) {
 	res = run(buf);
 	if(res != 0)
 		return res;
+	char icon[1024];
 
 	//parse / modify
 	{
@@ -44,13 +46,14 @@ static int j_inject(const char *jarFile, const char *pngFile) {
 			mfIn.getline(buf, sizeof(buf));
 			if(!mfIn.good())
 				break;
-			char name[1024], icon[1024], midlet[1024];
+			char name[1024], midlet[1024];
 			if(sscanf(buf, "MIDlet-1: %[^,], %[^,], %s", name, icon, midlet) == 3) {
-				mfStrOut << "MIDlet-1: " << name << ", " << pngFile << ", " << midlet << "\n";
+				// Modifying the manifest will lead to deployment problems,
+				// hence this fix
+				//mfStrOut << "MIDlet-1: " << name << ", " << pngFile << ", " << midlet << "\n";
 				found = true;
-			} else {
-				mfStrOut << buf << "\n";
 			}
+			mfStrOut << buf << "\n";
 		}
 		if(!found) {
 			printf("Didn't find MIDlet-1! Not a valid J2ME application!\n");
@@ -61,8 +64,11 @@ static int j_inject(const char *jarFile, const char *pngFile) {
 		mfFileOut << mfStrOut.str();
 	}
 
+	// Rename our png file
+	rename(pngFile, icon);
+
 	//insert modified manifest & icon
-	sprintf(buf, "zip \"%s\" \"%s\" \"%s\"", jarFile, "META-INF/MANIFEST.MF", pngFile);
+	sprintf(buf, "zip \"%s\" \"%s\" \"%s\"", jarFile, "META-INF/MANIFEST.MF", icon);
 	res = run(buf);
 	if(res != 0)
 		return res;
@@ -78,9 +84,9 @@ void JavaInjector::inject(const Icon* icon, const std::map<std::string, std::str
 	const IconInstance* iconInst = icon->findBestInstance(size);
 	if(!iconInst) errorExit("Couldn't find any icon instance.");
 
-	if(!convertInstanceToImageFormat(iconInst, "temp.png", size, "png")) 
+	if(!convertInstanceToImageFormat(iconInst, "temp.png", size, "png"))
 		errorExit("Java icon conversion failed.");
-	if(j_inject(dst.c_str(), "temp.png") != 0) 
+	if(j_inject(dst.c_str(), "temp.png") != 0)
 		errorExit("Java injector failed.");
 }
 
