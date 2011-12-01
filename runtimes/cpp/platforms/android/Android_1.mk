@@ -31,6 +31,7 @@ LOCAL_SRC_FILES := FileImpl.cpp \
 	../../base/MemStream.cpp \
 	../../base/Stream.cpp \
 	../../base/Image.cpp \
+	../../base/ResourceArray.cpp \
 	../../base/Syscall.cpp \
 	../../core/Core.cpp \
 	../../core/disassembler.cpp \

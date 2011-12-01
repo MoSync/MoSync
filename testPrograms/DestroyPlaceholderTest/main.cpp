@@ -160,6 +160,45 @@ void testAccumulatedCreateData()
 }
 
 /**
+ * Negative tests.
+ */
+void testNegativeCases()
+{
+	int result;
+
+	// Comment out to test panics.
+	maSyscallPanicsDisable();
+
+	MAHandle h = maCreatePlaceholder();
+	if (h < 0)
+	{
+		maPanic(0, "testNegativeCases: maCreatePlaceholder should not fail");
+	}
+
+	result = maDestroyPlaceholder(h);
+	if (RES_OK != result)
+	{
+		maPanic(0, "testNegativeCases: maDestroyPlaceholder should not fail");
+	}
+
+	result = maDestroyPlaceholder(h);
+	if (RES_OK == result)
+	{
+		maPanic(0, "testNegativeCases: maDestroyPlaceholder should fail (1)");
+	}
+
+	result = maDestroyPlaceholder(1000);
+	if (RES_OK == result)
+	{
+		maPanic(0, "testNegativeCases: maDestroyPlaceholder should fail (2)");
+	}
+
+	maSyscallPanicsEnable();
+
+	printf("Negative tests passed\n");
+}
+
+/**
  * This test is expected to make the app run out of
  * memory, and crash on Android at least. Perhaps
  * on some other platforms it exits gracefully?
@@ -175,13 +214,16 @@ void testThatShouldCrashApp()
  */
 void testThatShouldPassSuccessfully()
 {
-	printf("Test 1: Call maDestroyPlaceholder on accumulated data\n");
+	printf("Test 1: Negative tests\n");
+	testNegativeCases();
+
+	printf("Test 2: Call maDestroyPlaceholder on accumulated data\n");
 	testAccumulatedCreateData();
 
-	printf("Test 2: Call maDestroyObject and maDestroyPlaceholder\n");
+	printf("Test 3: Call maDestroyObject and maDestroyPlaceholder\n");
 	testCreateData(true, true);
 
-	printf("Test 3: Call only maDestroyPlaceholder\n");
+	printf("Test 4: Call only maDestroyPlaceholder\n");
 	testCreateData(false, true);
 }
 

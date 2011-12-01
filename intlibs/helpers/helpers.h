@@ -197,7 +197,8 @@ namespace MoSyncError {
 #define MYASSERT(a, errorCode) MYASSERT_EXTRA(a, errorCode, )
 #define MYASSERT_EXTRA(a, errorCode, extra) if(!(a)) { LOG("Assert failure %s ", #a);\
 	IN_FILE_ON_LINE; extra; MoSyncErrorExit(errorCode); }
-
+#define MYASSERT_IF_PANICS_ENABLED(a, errorCode) \
+	if (gSyscall->mPanicOnProgrammerError) { MYASSERT(a, errorCode) }
 #define DEBUG_ASSERT(a) MYASSERT(a, MoSyncError::ERR_INTERNAL)
 #define DEBIG_PHAT_ERROR BIG_PHAT_ERROR(MoSyncError::ERR_INTERNAL)
 

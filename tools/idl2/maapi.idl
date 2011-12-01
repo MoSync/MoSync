@@ -1768,6 +1768,7 @@ interface MAAPI {
 		UBIN = 5;
 		SKIP = 6;
 		LABEL = 9;
+		NIL = 10; // Placeholder that is not used.
 		FLUX = 127;
 	}
 
