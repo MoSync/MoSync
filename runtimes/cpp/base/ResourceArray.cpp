@@ -103,7 +103,7 @@ namespace Base {
 	 * Destructor.
 	 */
 	ResourceArray::~ResourceArray() {
-		/*// Destroy static resources
+		// Destroy static resources
 		for(unsigned i=1; i<mResSize; ++i) {
 			LOGD("RA %i\n", i);
 			_destroy(i);
@@ -124,7 +124,7 @@ namespace Base {
 		}
 		if(mDynResPool) {
 			delete[] mDynResPool;
-		}*/
+		}
 	}
 
 	void ResourceArray::destroy(unsigned index) {
