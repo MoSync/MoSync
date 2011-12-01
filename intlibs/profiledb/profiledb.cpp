@@ -42,6 +42,9 @@ using namespace std;
 #define ATTR_STATE "state"
 #define ATTR_FRAGMENTATION "fragmentation"
 #define ATTR_VALUE "value"
+#define ATTR_TYPE "type"
+#define PROPERTY_TYPE "property"
+
 
 struct ParserState {
 	Profile* profile;
@@ -406,6 +409,7 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 		const char* capabilityStateStr = findAttr(ATTR_STATE, attributes);
 		const char* fragmentationStr = findAttr(ATTR_FRAGMENTATION, attributes);
 		const char* valueStr = findAttr(ATTR_VALUE, attributes);
+		const char* typeStr = findAttr(ATTR_TYPE, attributes);
 		if (!capabilityStateStr && !parentCapability) {
 			capabilityState = UNSUPPORTED;
 		} else if (!strcmp(capabilityStateStr, "SUPPORTED")) {
@@ -424,7 +428,8 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 		Fragmentation fragmentation = fragmentationStr && !strcmp("buildtime",
 				fragmentationStr) ? BUILDTIME : RUNTIME;
 		string value = valueStr ? string(valueStr) : string();
-		Capability capability = Capability(prefix + capabilityName, value, capabilityState,
+		string type = typeStr ? string(typeStr) : (value.length() == 0 ? string() : PROPERTY_TYPE);
+		Capability capability = Capability(prefix + capabilityName, type, value, capabilityState,
 				fragmentation);
 		state->profile->addCapability(capability);
 		state->capabilityStack.push_back(capability);
@@ -690,6 +695,9 @@ void Capability::toXML(XMLWriter& writer) {
 	writer.setAttr(ATTR_STATE, stateStr);
 	writer.setAttr(ATTR_FRAGMENTATION,
 			fFragmentation == BUILDTIME ? "buildtime" : "runtime");
+	if (fType.length() > 0) {
+		writer.setAttr(ATTR_TYPE, fType);
+	}
 	writer.endTag();
 }
 

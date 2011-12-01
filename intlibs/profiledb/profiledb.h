@@ -35,17 +35,19 @@ enum Fragmentation { BUILDTIME, RUNTIME };
 class Capability {
 private:
 	string fName;
+	string fType;
 	string fValue;
 	CapabilityState fState;
 	Fragmentation fFragmentation;
 public:
 	Capability() : fName(""), fValue(""), fState(UNSUPPORTED), fFragmentation(RUNTIME) { }
-	Capability(string name, string value, CapabilityState state, Fragmentation fragmentation) :
-		fName(name), fValue(value), fState(state), fFragmentation(fragmentation) { }
+	Capability(string name, string type, string value, CapabilityState state, Fragmentation fragmentation) :
+		fName(name), fType(type), fValue(value), fState(state), fFragmentation(fragmentation) { }
 	string getName() { return fName; }
 	CapabilityState getState() { return fState; }
 	Fragmentation getFragmentation() { return fFragmentation; }
 	string getValue() { return fValue; }
+	string getType() { return fType; }
 	bool matchCapability(string statePattern);
 	void toXML(XMLWriter& output);
 };
@@ -63,14 +65,16 @@ public:
 	Profile(string profileName) : fProfileName(profileName), fParent(NULL) { }
 	string getProfileName() { return fProfileName; }
 	void setParent(Profile* parent) { fParent = parent; }
+	Profile* getParent() { return fParent; }
 	void setFamily(string family) { fFamily = family; }
+	string getFamily() { return fFamily; }
 	void setVariant(string variant) { fVariant = variant; }
+	string getVariant() { return fVariant; }
 	void setRuntime(string runtime) { fRuntime = runtime; }
 	string getRuntime() { return fRuntime; }
 	void setAbstract(bool isAbstract) { fIsAbstract = isAbstract; }
 	bool isAbstract() { return fIsAbstract; }
 	void addCapability(Capability capability);
-	Profile* getParent() { return fParent; }
 	set<string> getCapabilities();
 	Capability getCapability(string capabilityName);
 	void toXML(XMLWriter& output, bool includeCapabilities);

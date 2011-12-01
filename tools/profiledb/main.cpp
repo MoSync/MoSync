@@ -99,7 +99,7 @@ int main(int argc,char *argv[]) {
 				if ("-o" == cap || "--optional" == cap) {
 					currentCapabilities = &optionalCapabilities;
 				} else {
-					currentCapabilities->push_back(Capability(cap, string(), SUPPORTED, RUNTIME));
+					currentCapabilities->push_back(Capability(cap, string(), string(), SUPPORTED, RUNTIME));
 				}
 			}
 
