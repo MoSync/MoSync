@@ -35,6 +35,8 @@ MA 02110-1301, USA.
 #ifndef NATIVEUI_LAYOUT_H_
 #define NATIVEUI_LAYOUT_H_
 
+#include <Ads/Banner.h>
+
 #include "Widget.h"
 
 namespace NativeUI
@@ -102,6 +104,18 @@ namespace NativeUI
 		 */
 		virtual int setPaddingBottom( const int value);
 
+		/**
+		 * Ads a banner as a child of this widget.
+		 * @param banner The banner tat will be added.
+		 */
+		virtual void addBanner(Ads::Banner* banner);
+
+		/**
+		 * Remove a child banner from its parent(but does not destroy it).
+		 * @param banner The banner to be removed.
+		 */
+		virtual void removeBanner(Ads::Banner* banner);
+
     protected:
         /**
          * Constructor is protected because actual widget instances
@@ -110,6 +124,12 @@ namespace NativeUI
          *             (one of the MAW_ constants).
          */
         Layout(const MAUtil::String& layoutType);
+
+    protected:
+        /**
+         * List of child banners.
+         */
+        MAUtil::Vector<Ads::Banner*> mBanner;
 	};
 
 } // namespace NativeUI
