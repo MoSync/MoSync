@@ -18,6 +18,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef PERMISSION_H
 #define PERMISSION_H
 
+#include <set>
+#include <string>
+
 #define BLUETOOTH "Bluetooth"
 #define CALENDAR "Calendar"
 #define CALENDAR_READ "Calendar/Read"
@@ -47,6 +50,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 // Parse permissions
 void parsePermissions(std::set<std::string>& out, const char* permissions);
 
-bool isPermissionSet(std::set<std::string>& permissions, const char* permission);
+std::string getParentPermission(std::string permission);
+
+bool isPermissionSet(std::set<std::string>& permissions, std::string permission);
 
 #endif // PERMISSION_H
