@@ -3,6 +3,7 @@ PREC = "Double";
 ZERO = 0.0; //this must be changed to a double when testing DP performance
 ONE = 1.0; //this must be changed to a double when testing DP performance
 var g_startTime; 
+var g_timeToRun = 1000.0; //the time to run the benchmark in milliseconds
 
 function bench() {
 	g_startTime = (new Date).getTime(); //start the timer
@@ -14,7 +15,7 @@ function bench() {
 	msg += "----------------------------------------------------------<br/>";
 	nreps = 1;
 	
-	while (linpack_f(nreps,arsize)<5000.0) //TODO change back to 10 seconds
+	while (linpack_f(nreps,arsize)<g_timeToRun) //TODO change back to 10 seconds
 		nreps*=2;
 	//linpack_f(nreps,arsize); // only call it once when we print debug info
 	
@@ -73,8 +74,12 @@ function linpack_f(nreps, arsize) {
 			tdgesl=0.0;
 		if (toverhead<0.0)
 			toverhead=0.0;
-		msg += nreps + " " + totalt + " " + 100.0*tdgefa/totalt + " " + 100.0*tdgesl/totalt + " " + 100.0*toverhead/totalt + " " + kflops/1000.0 + "<br/>"; //num.toFixed(int) kflops/1000 to get MFLOPS, TODO is the constants correct?!
+		msg += nreps + " " + totalt + "   " + (100.0*tdgefa/totalt).toFixed(4) + "   " + (100.0*tdgesl/totalt).toFixed(4) + "   " + (100.0*toverhead/totalt).toFixed(4) + "   " + (kflops/1000.0).toFixed(4) + "<br/>"; //num.toFixed(int) kflops/1000 to get MFLOPS, TODO is the constants correct?!
 		//printA(a,lda,arsize); //TODO ADDED BY ME FOR DEBUGING PURPOSES
+		if(totalt>=g_timeToRun){ //send results to database
+			mygetrequest.open("GET", "../publish_result.php?benchmark=linpack&revision=0&runtime=JavaScript&git_hash=0&phone=Corei5&native_sdk_ver=0&mflops="+(kflops/1000.0).toFixed(4), true)
+			mygetrequest.send(null)
+		}	
 		return(totalt);
 	}
 	
@@ -338,6 +343,7 @@ function linpack_f(nreps, arsize) {
 
             for (k = 0; k < n; k++)
                 {
+					document.write("<p>calling ddot_r</p>");
 					t = ddot_r(k,a,lda*k+0,1,b,0,1);
 					b[k] = (b[k] - t)/a[lda*k+k];
                 }
@@ -399,6 +405,7 @@ function linpack_f(nreps, arsize) {
 
             for (k = 0; k < n; k++)
                 {
+				document.write("calling ddot_ur");
                 t = ddot_ur(k,a,lda*k+0,1,b,0,1);
                 b[k] = (b[k] - t)/a[lda*k+k];
                 }
@@ -584,6 +591,7 @@ function linpack_f(nreps, arsize) {
 	 ** Jack Dongarra, linpack, 3/11/78.
 	 */
 	function idamax(n, dx, dxpos, incx) { //TODO The dxpos is added by me and is the starting index of dx[] NEED A DOUBLE version of this
+		//document.write("<p>idamax got called.</p>");
 		var dmax;
 		var i, ix, itemp;
 
@@ -627,6 +635,47 @@ function linpack_f(nreps, arsize) {
 		}
 		return (itemp);
 	}
+	
+		/*
+	 ** Forms the dot product of two vectors.
+	 ** Jack Dongarra, linpack, 3/11/78.
+	 ** ROLLED version
+	 */
+	function ddot_r(n, dx, dxpos, incx, dy, dypos, incy) {
+		document.write("<p>ddot_r got called</p>");//
+	
+		var dtemp;
+		var i,ix,iy;
+
+		dtemp = 0.0;
+
+		if (n <= 0)
+			return(0.0);
+
+		if (incx != 1 || incy != 1)
+		{
+
+			/* code for unequal increments or equal increments != 1 */
+
+			ix = 0; //TODO These 2 lines edited by me
+			iy = 0;
+			if (incx < 0) ix = (-n+1)*incx;
+			if (incy < 0) iy = (-n+1)*incy;
+			for (i = 0;i < n; i++)
+			{
+				dtemp = dtemp + dx[ix+dxpos]*dy[iy+dypos];
+				ix = ix + incx;
+				iy = iy + incy;
+			}
+			return(dtemp);
+		}
+
+		/* code for both increments equal to 1 */
+
+		for (i=0;i < n; i++)
+			dtemp = dtemp + dx[i]*dy[i];
+		return(dtemp);
+	}
 
 /* 
  * Return time passed since g_startTime in milliseconds
@@ -642,6 +691,42 @@ function second() {
  */
 function printRes() {
 	document.write("<p>" + bench() + "</p>");
+}
+
+/*
+ *AJAX-Object
+ */
+function ajaxRequest(){
+ var activexmodes=["Msxml2.XMLHTTP", "Microsoft.XMLHTTP"] //activeX versions to check for in IE
+ if (window.ActiveXObject){ //Test for support for ActiveXObject in IE first (as XMLHttpRequest in IE7 is broken)
+  for (var i=0; i<activexmodes.length; i++){
+   try{
+    return new ActiveXObject(activexmodes[i])
+   }
+   catch(e){
+    //suppress error
+   }
+  }
+ }
+ else if (window.XMLHttpRequest) // if Mozilla, Safari etc
+  return new XMLHttpRequest()
+ else
+  return false
+}
+
+/* 
+ * use the AJAX-Object to send the results to the database
+ */
+var mygetrequest=new ajaxRequest()
+mygetrequest.onreadystatechange=function(){
+ if (mygetrequest.readyState==4){
+  if (mygetrequest.status==200 || window.location.href.indexOf("http")==-1){
+   document.write("<p>Result sent to database.</p>");// EVERYTHING WENT WELL, DO NOTHING. document.getElementById("result").innerHTML=mygetrequest.responseText;
+  }
+  else{
+   alert(mygetrequest.responseText);
+  }
+ }
 }
 
 

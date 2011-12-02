@@ -2,8 +2,8 @@
 
 /* login with all privelegies on the benchmark database */
 
-$db_user = 'benchmark_all'; //all has all rights in the database 'benchmark'
-$pwd = '3YsDfh7AF8RGDnsZ';
+$db_user = 'alexander'; //all has all rights in the database 'benchmark'
+$pwd = '983jf73ndsk';
 $link = mysql_connect('localhost', $db_user, $pwd);
 
 if (!$link) {

@@ -1,5 +1,5 @@
 <?php
-	require_once('db_conn.php'); //set up the connection to the database
+	require_once('db_priv_conn.php'); //set up the connection to the database
 	
 	/* this SQL statement returns the latest testruns of the linpack benchmark, the latest per distinct runtime */
 	$result = mysql_query("SELECT
