@@ -288,7 +288,7 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t</activity>\n"
 		// Enable Google AdMob Ads.
 		<<"\t\t<activity android:name=\"com.google.ads.AdActivity\"\n"
-		<<"\t\t\tandroid:theme=\"@android:style/Theme.NoTitleBar.FullScreen\">\n"
+//		<<"\t\t\tandroid:theme=\"@android:style/Theme.NoTitleBar.FullScreen\">\n"
 		<<"\t\t\tandroid:configChanges=\"orientation|keyboard|keyboardHidden\">\n"
 		<<"\t\t</activity>\n"
 		;
