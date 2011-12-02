@@ -132,6 +132,11 @@ private:
      * @return True if the string is in the format 0xRRGGBB.
      */
     bool canStringBeConvertedToColor(const MAUtil::String& string);
+
+    /**
+     * Checks if the flash LED pattern has correct input values.
+     */
+    bool checkFlashPattern();
 private:
     /**
      * Used for getting notification's content body.

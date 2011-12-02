@@ -90,7 +90,7 @@ public class MoSync extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState)
 	{
-		Log.i("MoSync", "MoSync onCreate");
+//		Log.i("MoSync", "MoSync onCreate");
 
 		super.onCreate(savedInstanceState);
 
