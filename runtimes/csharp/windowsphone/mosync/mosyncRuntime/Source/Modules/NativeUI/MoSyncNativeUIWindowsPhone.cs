@@ -110,6 +110,26 @@ namespace MoSync
                             }
                         }
                     }
+                    else if (-2 == value)
+					{
+                        mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
+                        fillSpaceHorizontalyEnabled = false;
+
+                        //in case of setting the widget property after it is added
+                        //to a parent widget
+
+                        Type objType = mView.GetType();
+                        if (objType.GetProperty("Parent") != null)
+                        {
+                            var property = objType.GetProperty("Parent");
+                            Object parent = property.GetValue(mView, null);
+                            if (null != parent && parent is Grid)
+                            {
+                                int columnIndex = Grid.GetColumn((FrameworkElement)mView);
+                                (parent as Grid).ColumnDefinitions[columnIndex].Width = new GridLength(1, GridUnitType.Auto);
+                            }
+                        }
+                    }
                 }
             }
 
@@ -141,6 +161,25 @@ namespace MoSync
                             {
                                 int rowIndex = Grid.GetRow((FrameworkElement)mView);
                                 (parent as Grid).RowDefinitions[rowIndex].Height = new GridLength(1, GridUnitType.Star);
+                            }
+                        }
+                    }
+                    else if (-2 == value)
+                    {
+                        mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
+                        fillSpaceVerticalyEnabled = false;
+
+                        //in case of setting the widget property after it is added
+                        //to a parent widget
+                        Type objType = mView.GetType();
+                        if (objType.GetProperty("Parent") != null)
+                        {
+                            var property = objType.GetProperty("Parent");
+                            Object parent = property.GetValue(mView, null);
+                            if (null != parent && parent is Grid)
+                            {
+                                int rowIndex = Grid.GetRow((FrameworkElement)mView);
+                                (parent as Grid).RowDefinitions[rowIndex].Height = new GridLength(1, GridUnitType.Auto);
                             }
                         }
                     }
