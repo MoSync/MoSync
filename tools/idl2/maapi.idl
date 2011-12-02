@@ -548,19 +548,18 @@ interface MAAPI {
 
 	/**
 	* Releases a placeholder created by maCreatePlaceholder. If the
-	* placeholder refers to a dynamically created data object, that
-	* object is destroyed. You can use this function as an alternative
-	* to maDestroyObject if you do not wish to reuse the placeholder.
+	* placeholder refers to a data object, that object is destroyed.
+	* You can use this function as an alternative to maDestroyObject
+	* if you do not wish to reuse the placeholder.
 	* In many cases, maDestroyPlaceholder is to be preferred over
 	* maDestroyObject, since the actual placeholder is also released.
 	* It is valid to first call maDestroyObject, then maDestroyPlaceholder.
-	* If the placeholder parameter does not refer to a valid placeholder
-	* created by maCreatePlaceholder, an error code is returned.
+	* If the placeholder parameter does not refer to a valid, non-destroyed
+	* placeholder created by maCreatePlaceholder, the program is aborted
+	* with a MoSync Panic message.
 	* @param placeholder The placeholder to be released.
-	* @return RES_OK on success, <0 if there is an error (if the
-	* placeholder is invalid or is already destroyed).
 	*/
-	int maDestroyPlaceholder(in MAHandle placeholder);
+	void maDestroyPlaceholder(in MAHandle placeholder);
 
 	/**
 	* Destroys an object of any type. The handle becomes a placeholder.
