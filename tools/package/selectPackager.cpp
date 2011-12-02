@@ -69,7 +69,9 @@ void package(const SETTINGS& s) {
 	}
 
 	// select runtime
-	if (runtimeName == "JavaME") {
+	if (runtimeName == "JavaME" || runtimeName == "BlackBerry") {
+		// The above condition will satisify the device
+		// based AND the platform based versions.
 		packageJavaME(s, ri);
 		if (ri.isBlackberry) {
 			packageBlackberry(s, ri);
@@ -149,7 +151,6 @@ static bool parseRuntimeTxt(const char* filename, string& path, string& name) {
 }
 
 static bool parseRuntimeLine(string line, string& path, string& name) {
-	printf("%s\n", line.c_str());
 	// swap backslashes
 	toSlashes(line);
 
@@ -255,10 +256,14 @@ static bool parseProfileInfo(ProfileType profileType, Profile* p, const SETTINGS
 		}
 		//pi.isBlackberry = (hasBbMajor && hasBbMinor);	//rapc is not available.
 	} else {
-		Capability major = p->getCapability("Version/Major");
-		Capability minor = p->getCapability("Version/Minor");
-		sscanf(major.getValue().c_str(), "%i", &pi.blackberryVersion);
-		sscanf(minor.getValue().c_str(), "%i", &pi.blackberryMinor);
+		pi.isBlackberry = p->getFamily() == "BlackBerry";
+		if (pi.isBlackberry) {
+			Capability major = p->getCapability("Version/Major");
+			Capability minor = p->getCapability("Version/Minor");
+			sscanf(major.getValue().c_str(), "%i", &pi.blackberryVersion);
+			sscanf(minor.getValue().c_str(), "%i", &pi.blackberryMinor);
+			pi.iconSize = "80x80";
+		}
 	}
 	if (iconX > 0 && iconY > 0) {
 		char buf[32];

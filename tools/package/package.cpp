@@ -73,6 +73,10 @@ static const char* sUsage =
 "     --android-alias <alias>  Key alias (Android only).\n"
 "     --android-keypass <password>\n"
 "                              Key password (Android only).\n"
+"     --blackberry-jde <jde-location>\n"
+"                              BlackBerry JDE location (BlackBerry only).\n"
+"     --blackberry-signkey <password>\n"
+"                              Signing file password (BlackBerry only).\n"
 "     --javame-keystore <file> Keystore for signing (JavaME only).\n"
 "     --javame-storepass <password>"
 "                              Keystore password (JavaME only).\n"
@@ -173,6 +177,10 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.androidAlias);
 		} else if(streq(argv[i], "--android-keypass")) {
 			setString(i, argc, argv, s.androidKeyPass);
+		} else if(streq(argv[i], "--blackberry-jde")) {
+			setString(i, argc, argv, s.blackberryJde);
+		} else if(streq(argv[i], "--blackberry-signkey")) {
+			setString(i, argc, argv, s.blackberrySignKey);
 		} else if(streq(argv[i], "--javame-keystore")) {
 			setString(i, argc, argv, s.javameKeystore);
 		} else if(streq(argv[i], "--javame-storepass")) {
@@ -355,6 +363,13 @@ void testAndroidVersionCode(const SETTINGS& s) {
 	}
 	if (atoi(s.androidVersionCode) < 1) {
 		printf("Android version code must be a number > 0!\n");
+		exit(1);
+	}
+}
+
+void testBlackberryJde(const SETTINGS& s) {
+	if (!s.blackberryJde) {
+		printf("Must specify BlackBerry JDE location!\n");
 		exit(1);
 	}
 }

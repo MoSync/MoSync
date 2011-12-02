@@ -59,6 +59,10 @@ struct SETTINGS {
     const char* androidAlias;
     const char* androidKeyPass;
 
+    // BlackBerry specific settings
+    const char* blackberryJde;
+    const char* blackberrySignKey;
+
     // JavaME specific settings
     const char* javameKeystore;
     const char* javameStorePass;
@@ -87,6 +91,8 @@ void testIOSSdk(const SETTINGS&);
 
 void testAndroidPackage(const SETTINGS&);
 void testAndroidVersionCode(const SETTINGS&);
+
+void testBlackberryJde(const SETTINGS&);
 
 void testJavaMESigning(const SETTINGS& s);
 
