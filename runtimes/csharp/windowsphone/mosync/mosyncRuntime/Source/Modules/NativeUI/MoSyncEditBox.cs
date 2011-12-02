@@ -53,16 +53,6 @@ namespace MoSync
             protected System.Windows.Controls.TextBox mEditBox;
 
             /**
-            * if set to true, indicates that all the words typed by the user will start with capital letters
-            */
-            protected bool mInitialCapsWord;
-
-            /**
-             * if set to true, indicates that all the sentences will start with capital letters
-             */
-            protected bool mInitialCapsSentence;
-
-            /**
              * if set to true, indicates that all the text is a watermark/placeholder
              */
             protected bool mIsWatermarkMode;
@@ -74,7 +64,7 @@ namespace MoSync
             protected bool mFirstChar;
 
             /**
-              * if set to true, indicates that all the text is a watermark/placeholder
+              * save the "normal" brush when working with the watermark
               */
             protected Brush mForegroundColor;
 
@@ -83,7 +73,6 @@ namespace MoSync
              */
             protected String mPlaceholderText;
 
-            protected bool mAllCaps;
 
             /**
              * Constructor
@@ -92,14 +81,11 @@ namespace MoSync
             {
                 mEditBox = new System.Windows.Controls.TextBox();
                 View = mEditBox;
-                mInitialCapsWord = false;
-                mInitialCapsSentence = false;
+
                 mIsWatermarkMode = false;
                 mPlaceholderText = "";
-                mAllCaps = false;
 
                 mForegroundColor = mEditBox.Foreground;
-
 
                 /**
                  * @brief Sent from the Edit box when it gains focus(the user selects the widget).
@@ -358,12 +344,27 @@ namespace MoSync
                             setInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
                             break;
                         case 3:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE
-                            setInputMode(System.Windows.Input.InputScopeNameValue.PhraseList);
+                            setInputMode(System.Windows.Input.InputScopeNameValue.PersonalNamePrefix);
                             break;
                         case 4:             //MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS
                             setInputMode(System.Windows.Input.InputScopeNameValue.PersonalFullName);
                             break;
                     }
+                }
+            }
+
+
+            //MAW_EDIT_BOX_FONT_COLOR property implementation
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_EDIT_BOX_FONT_COLOR)]
+            public String FontColor
+            {
+                set
+                {
+                    System.Windows.Media.SolidColorBrush brush;
+                    MoSync.Util.convertStringToColor(value, out brush);
+                    mForegroundColor = brush;
+
+                    mEditBox.Foreground = mForegroundColor;
                 }
             }
 
@@ -375,12 +376,18 @@ namespace MoSync
              */
             protected void setInputMode(System.Windows.Input.InputScopeNameValue scopeValue)
             {
-                System.Windows.Input.InputScope keyboard = new System.Windows.Input.InputScope();
-                System.Windows.Input.InputScopeName scopeName = new System.Windows.Input.InputScopeName();
+                try
+                {
+                    mEditBox.InputScope = new InputScope()
+                    {
+                        Names = { new InputScopeName() { NameValue = scopeValue } }
+                    };
+                }
+                catch (NotImplementedException e)
+                {
+                    //TODO: return an error value
+                }
 
-                scopeName.NameValue = scopeValue;
-                keyboard.Names.Add(scopeName);
-                mEditBox.InputScope = keyboard;
             }
 
         } // class EditBox
