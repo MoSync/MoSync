@@ -17,13 +17,11 @@
   <capability name="Contacts" state="REQUIRES_PERMISSION"/>
   <capability name="Calendar" state="REQUIRES_PERMISSION"/>
   <capability name="Camera" state="REQUIRES_PERMISSION"/>
-  <capability name="Sensors" state="REQUIRES_PERMISSION">
-    <capability name="Accelerometer" state="REQUIRES_PERMISSION"/>
-    <capability name="Proximity" state="REQUIRES_PERMISSION"/>
-    <capability name="Gyroscope" state="REQUIRES_PERMISSION"/>
-    <capability name="Orientation" state="REQUIRES_PERMISSION"/>
-    <capability name="Compass" state="REQUIRES_PERMISSION"/>
-  </capability>
+  <capability name="Accelerometer" state="REQUIRES_PERMISSION"/>
+  <capability name="Proximity" state="REQUIRES_PERMISSION"/>
+  <capability name="Gyroscope" state="REQUIRES_PERMISSION"/>
+  <capability name="Orientation" state="REQUIRES_PERMISSION"/>
+  <capability name="Compass" state="REQUIRES_PERMISSION"/>
   <capability name="Device Fonts" state="SUPPORTED"/>
   <capability name="NFC" state="UNSUPPORTED"/>
   <capability name="OpenGL" state="REQUIRES_PERMISSION"/>
