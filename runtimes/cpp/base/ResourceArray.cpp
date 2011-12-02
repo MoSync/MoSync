@@ -262,7 +262,9 @@ namespace Base {
 	int ResourceArray::_maDestroyPlaceholder(unsigned index) {
 		// The handle must be a dynamic placeholder.
 		if (!(index & DYNAMIC_PLACEHOLDER_BIT)) {
-			MYASSERT_IF_PANICS_ENABLED(
+			// TODO: Use MYASSERT_IF_PANICS_ENABLED when
+			// conditional panics are to be used.
+			MYASSERT(
 				false, // Always trigger this panic.
 				ERR_RES_PLACEHOLDER_NOT_DYNAMIC);
 			return -2;
@@ -275,7 +277,9 @@ namespace Base {
 		// The placeholder must not have been destroyed.
 		if (RT_NIL == mDynResTypes[i])
 		{
-			MYASSERT_IF_PANICS_ENABLED(
+			// TODO: Use MYASSERT_IF_PANICS_ENABLED when
+			// conditional panics are to be used.
+			MYASSERT(
 				false, // Always trigger this panic.
 				ERR_RES_PLACEHOLDER_ALREADY_DESTROYED);
 			return -2;

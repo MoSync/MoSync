@@ -97,7 +97,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 	m(40077, ERR_FILE_PATH_INVALID, "Invalid file path")\
 	m(40078, ERR_DB_INVALID_HANDLE, "Invalid database handle")\
 	m(40079, ERR_DB_INVALID_COLUMN_INDEX, "Invalid database column index")\
-	m(40080, ERR_RES_PLACEHOLDER_NOT_DYNAMIC, "Placeholder was not created dynamically")\
+	m(40080, ERR_RES_PLACEHOLDER_NOT_DYNAMIC, "Placeholder not created using maCreatePlaceholder")\
 	m(40081, ERR_RES_PLACEHOLDER_ALREADY_DESTROYED, "Placeholder is already destroyed")\
 
 DECLARE_ERROR_ENUM(BASE)

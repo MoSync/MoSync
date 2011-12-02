@@ -75,13 +75,14 @@ void testCreateData(bool destroyObject, bool destroyPlaceholder)
 
 		if (destroyPlaceholder)
 		{
-			result = maDestroyPlaceholder(handle);
-			if (result < 0)
-			{
-				printf("testCreateData: maDestroyPlaceholder failed\n");
-				success = false;
-				break;
-			}
+			maDestroyPlaceholder(handle);
+//			result = maDestroyPlaceholder(handle);
+//			if (result < 0)
+//			{
+//				printf("testCreateData: maDestroyPlaceholder failed\n");
+//				success = false;
+//				break;
+//			}
 		}
 	}
 
@@ -140,13 +141,14 @@ void testAccumulatedCreateData()
 		}
 
 		int handle = handles[i];
-		int result = maDestroyPlaceholder(handle);
-		if (result < 0)
-		{
-			printf("testCreateData: maDestroyPlaceholder failed\n");
-			success = false;
-			break;
-		}
+		maDestroyPlaceholder(handle);
+//		int result = maDestroyPlaceholder(handle);
+//		if (result < 0)
+//		{
+//			printf("testCreateData: maDestroyPlaceholder failed\n");
+//			success = false;
+//			break;
+//		}
 	}
 
 	if (success)
@@ -161,41 +163,54 @@ void testAccumulatedCreateData()
 
 /**
  * Negative tests.
+ * TODO: Uncomment when return values and conditional
+ * panics are used.
+ * For now you will have to manually run netaive tests
+ * by commenting/uncommenting code, since panics are
+ * unconditional.
  */
 void testNegativeCases()
 {
-	int result;
+//	// Should panic.
+//	MAHandle h = maCreatePlaceholder();
+//	maDestroyPlaceholder(h);
+//	maDestroyPlaceholder(h);
 
-	// Comment out to test panics.
-	maSyscallPanicsDisable();
+//	// Non existing handle, should panic.
+//	maDestroyPlaceholder(1000);
 
-	MAHandle h = maCreatePlaceholder();
-	if (h < 0)
-	{
-		maPanic(0, "testNegativeCases: maCreatePlaceholder should not fail");
-	}
-
-	result = maDestroyPlaceholder(h);
-	if (RES_OK != result)
-	{
-		maPanic(0, "testNegativeCases: maDestroyPlaceholder should not fail");
-	}
-
-	result = maDestroyPlaceholder(h);
-	if (RES_OK == result)
-	{
-		maPanic(0, "testNegativeCases: maDestroyPlaceholder should fail (1)");
-	}
-
-	result = maDestroyPlaceholder(1000);
-	if (RES_OK == result)
-	{
-		maPanic(0, "testNegativeCases: maDestroyPlaceholder should fail (2)");
-	}
-
-	maSyscallPanicsEnable();
-
-	printf("Negative tests passed\n");
+//	int result;
+//
+//	// Comment out to test panics.
+//	maSyscallPanicsDisable();
+//
+//	MAHandle h = maCreatePlaceholder();
+//	if (h < 0)
+//	{
+//		maPanic(0, "testNegativeCases: maCreatePlaceholder should not fail");
+//	}
+//
+//	result = maDestroyPlaceholder(h);
+//	if (RES_OK != result)
+//	{
+//		maPanic(0, "testNegativeCases: maDestroyPlaceholder should not fail");
+//	}
+//
+//	result = maDestroyPlaceholder(h);
+//	if (RES_OK == result)
+//	{
+//		maPanic(0, "testNegativeCases: maDestroyPlaceholder should fail (1)");
+//	}
+//
+//	result = maDestroyPlaceholder(1000);
+//	if (RES_OK == result)
+//	{
+//		maPanic(0, "testNegativeCases: maDestroyPlaceholder should fail (2)");
+//	}
+//
+//	maSyscallPanicsEnable();
+//
+//	printf("Negative tests passed\n");
 }
 
 /**
@@ -215,7 +230,8 @@ void testThatShouldCrashApp()
 void testThatShouldPassSuccessfully()
 {
 	printf("Test 1: Negative tests\n");
-	testNegativeCases();
+	printf("Negative tests currently disabled.\n");
+	//testNegativeCases();
 
 	printf("Test 2: Call maDestroyPlaceholder on accumulated data\n");
 	testAccumulatedCreateData();
