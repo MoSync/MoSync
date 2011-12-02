@@ -52,6 +52,7 @@ TOOL_DIRS = ["tools/debugger", "tools/FontGenerator", "tools/PanicDoc", "tools/B
 	"tools/winphone-builder",
 	"tools/mx-invoker",
 	"tools/mx-config",
+	"tools/profiledb", "tools/rescomp",
 	"tools/mifconv", "tools/rcomp", "tools/package", "tools/uidcrc",
 	]
 
