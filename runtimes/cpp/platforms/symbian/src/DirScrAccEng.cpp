@@ -136,7 +136,7 @@ void CDirScrAccEng::LineDrawClip(long x,long y,long dx,long dy)
 		linelen = dyabs;
 		//LOGD("Y mode. ac %i  len %i\n", ac, linelen);
 		for (n=0;n<dyabs;n++)
-		{      
+		{
 			if(x >= iCurrentClipRect.iTl.iX && x < iCurrentClipRect.iBr.iX &&
 				y >= iCurrentClipRect.iTl.iY && y < iCurrentClipRect.iBr.iY) {
 				Plot(drawBuffer, x, y);
@@ -150,7 +150,7 @@ void CDirScrAccEng::LineDrawClip(long x,long y,long dx,long dy)
 			}
 			y += sdy;
 		}
-	}	
+	}
 }
 
 void CDirScrAccEng::SetColor(int argb) {
@@ -225,11 +225,11 @@ void CDirScrAccEng::FillTriangleStripClip(const MAPoint2d* points, int count) {
 	TMyDrawBuf drawBuffer(*iDrawSurface, true);
 	for(int i = 2; i < count; i++) {
 		DrawTriangle(drawBuffer,
-			points[i-2].x, 
+			points[i-2].x,
 			points[i-2].y,
-			points[i-1].x, 
+			points[i-1].x,
 			points[i-1].y,
-			points[i].x, 
+			points[i].x,
 			points[i].y);
 	}
 }
@@ -279,23 +279,30 @@ void CDirScrAccEng::DrawImage(TAlphaBitmap* img, const TRect& srcRect,
 		Image::PixelFormat format = Image::PIXELFORMAT_RGB565;
 #endif
 		CFbsBitmap& color(*img->Color());
+		CFbsBitmap* ap(img->Alpha());
 		TMyDrawBuf colorBuf(color, true);
-		byte* alpha;
-		if(img->Alpha()) {
-			BeginDataAccess(*img->Alpha(), false);
-			alpha = (byte*)img->Alpha()->DataAddress();
-		} else {
-			alpha = NULL;
-		}
+
 		TSize srcSize = color.SizeInPixels();
 		int srcPitch = color.ScanLineLength(srcSize.iWidth, color.DisplayMode());
 		//LOG("src size: %ix%i, pitch: %i\n", srcSize.iWidth, srcSize.iHeight,
 			//srcPitch);
-		
+
+		byte* alpha;
+		int alphaPitch;
+		if(ap) {
+			BeginDataAccess(*ap, false);
+			alpha = (byte*)ap->DataAddress();
+			alphaPitch = ap->ScanLineLength(srcSize.iWidth, ap->DisplayMode());
+			//LOG("alpha pitch: %i\n", alphaPitch);
+		} else {
+			alpha = NULL;
+			alphaPitch = -1;
+		}
+
 		// todo: there could be a problem with alpha pitch not being equal to
 		// the width. investigate.
 		Image src((byte*)(Pixel*)colorBuf, alpha,
-			srcSize.iWidth, srcSize.iHeight, srcPitch, format, false, false);
+			srcSize.iWidth, srcSize.iHeight, srcPitch, format, false, false, alphaPitch);
 		src.mulTable = iMulTable;
 
 		// set up destination image
@@ -362,7 +369,7 @@ void CDirScrAccEng::DrawTriangle(TMyDrawBuf& drawBuffer,
 
 	ystart2=0;
 
-	if (y2 < y1) 
+	if (y2 < y1)
 	{
 		t = y1;
 		y1 = y2;
@@ -373,7 +380,7 @@ void CDirScrAccEng::DrawTriangle(TMyDrawBuf& drawBuffer,
 		x2 = t;
 	}
 
-	if (y3 < y2) 
+	if (y3 < y2)
 	{
 		t = y2;
 		y2 = y3;
@@ -383,7 +390,7 @@ void CDirScrAccEng::DrawTriangle(TMyDrawBuf& drawBuffer,
 		x2 = x3;
 		x3 = t;
 
-		if (y2 < y1) 
+		if (y2 < y1)
 		{
 			t = y1;
 			y1 = y2;
@@ -407,7 +414,7 @@ void CDirScrAccEng::DrawTriangle(TMyDrawBuf& drawBuffer,
 		xstart2 = xstart1;
 		ystart2 = y2 - y1;
 
-		for (a=0; a<ystart2; a++) 
+		for (a=0; a<ystart2; a++)
 		{
 			DrawSpan(xstart1 >> 16, a+y1, (xstart2 >> 16) - (xstart1 >> 16), drawBuffer);
 
@@ -427,7 +434,7 @@ void CDirScrAccEng::DrawTriangle(TMyDrawBuf& drawBuffer,
 
 	ystart1 = y2 - y1;
 
-	for (a=ystart1; a<ystart2+ystart1; a++) 
+	for (a=ystart1; a<ystart2+ystart1; a++)
 	{
 		DrawSpan(xstart1 >> 16, a+y1, (xstart2 >> 16) - (xstart1 >> 16), drawBuffer);
 		xstart1 += step1;
@@ -445,7 +452,7 @@ CDirScrAccEng::CDirScrAccEng(RWsSession& aClient, CWsScreenDevice& aScreenDevice
 	iWindow(aWindow), iDirectScreenAccess(0), iScreenGc(0),
 	iDrawing(EFalse), iOffScreenBmp(0), iOffScreenDevice(0), iFBGc(0),
 	iRawFrameBuf(NULL), iMulTable(NULL)
-{    
+{
 	LOGG("DSAE\n");
 	TSize size = aWindow.Size();
 	// calculate the (used) frame buffer size in bytes
@@ -535,7 +542,7 @@ void CDirScrAccEng::UpdateScreenSize() {
 void CDirScrAccEng::StartDrawingL() {
 	LOGG("SD\n");
 	DEBUG_ASSERT(!iDrawing);
-	
+
 	UpdateScreenSize();
 
 	// Initialise DSA
@@ -550,7 +557,7 @@ void CDirScrAccEng::StartDrawingL() {
 
 		// Get region that DSA can draw in
 		iRegion = iDirectScreenAccess->DrawingRegion();
-		
+
 		LOGG("Region: %i sections.\n", iRegion->Count());
 #ifdef GRAPHICS_DEBUGGING_MODE
 		const TRect* rl = iRegion->RectangleList();
@@ -569,7 +576,7 @@ void CDirScrAccEng::StartDrawingL() {
 		//gDrawBuffer = (TUint16*)iDrawSurface->DataAddress();
 
 		iDrawing = ETrue;
-		
+
 #ifdef __S60_50__	//5th edition
 		UpdateScreen();
 #endif
@@ -643,7 +650,7 @@ void CDirScrAccEng::StopDrawing() {
 void CDirScrAccEng::Restart(RDirectScreenAccess::TTerminationReasons /*aReason*/) {
 	// Restart display
 	// Note that this will result in the clipping region being updated
-	// so that menus, overlaying dialogs, etc. will not be drawn over      
+	// so that menus, overlaying dialogs, etc. will not be drawn over
 	LOG("R\n");
 	LTRAP(StartDrawingL());
 }
@@ -651,7 +658,7 @@ void CDirScrAccEng::Restart(RDirectScreenAccess::TTerminationReasons /*aReason*/
 void CDirScrAccEng::AbortNow(RDirectScreenAccess::TTerminationReasons /*aReason*/) {
 	// Cancel DSA
 	LOG("AN\n");
-	iDirectScreenAccess->Cancel();    
+	iDirectScreenAccess->Cancel();
 	LOG("AN2\n");
 	iDrawing = EFalse;
 }
@@ -667,9 +674,9 @@ void CDirScrAccEng::UpdateScreen() {
 	// blit the offscreen bitmap (if used) to screen
 	iScreenGc->BitBlt(TPoint(0,0), iOffScreenBmp, TRect(iWindow.Size()));
 	// Force screen update: this is required for WINS, but may
-	// not be for all hardware. 
-	// For Series 60 devices this is necessary, 
-	// we can't access screen memory directly, 
+	// not be for all hardware.
+	// For Series 60 devices this is necessary,
+	// we can't access screen memory directly,
 	// rather we access a screen buffer.
 	iDirectScreenAccess->ScreenDevice()->Update();
 	//LOGD("US4\n");
