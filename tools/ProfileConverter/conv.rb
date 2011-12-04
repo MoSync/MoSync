@@ -781,8 +781,9 @@ runtimes.each do |platform_name, platform|
 
 		cmd = "ruby RuntimeBuilder.rb ./Settings.rb #{rbp} #{BUILD_ROOT}#{RUNTIME_DIR}/#{runtime_dir}"
 
+        # Do not remove the puts statement below; the build script uses it!
+        puts(cmd)
 		if(gBuildRuntimes)
-            puts(cmd)
 			success = system(cmd)
 		else
 			success = true
