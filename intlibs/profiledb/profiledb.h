@@ -72,7 +72,7 @@ public:
 	string getVariant() { return fVariant; }
 	void setRuntime(string runtime) { fRuntime = runtime; }
 	string getRuntime() { return fRuntime; }
-	void setAbstract(bool isAbstract) { fIsAbstract = isAbstract; }
+	void setAbstract(bool _isAbstract) { fIsAbstract = _isAbstract; }
 	bool isAbstract() { return fIsAbstract; }
 	void addCapability(Capability capability);
 	set<string> getCapabilities();

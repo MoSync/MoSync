@@ -6,10 +6,6 @@ work = MoSyncExe.new
 work.instance_eval do
         @SOURCES = ["."]
         @LOCAL_LIBS = ["filelist", "profiledb"]
-        if ( HOST == :darwin )
-                # Objective-C++ compiler
-                @EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-prototypes"
-        end
 
         @NAME = "profiledb"
         if(HOST==:linux || HOST==:darwin)

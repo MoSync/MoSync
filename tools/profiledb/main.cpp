@@ -58,7 +58,6 @@ void printUsage() {
 		"Environment variables used:\n"
 		" MOSYNCDIR               Path to the MoSync installation directory.\n"
 	);
-	exit(1);
 }
 
 int main(int argc,char *argv[]) {

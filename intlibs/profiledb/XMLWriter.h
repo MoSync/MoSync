@@ -31,7 +31,7 @@ private:
 	int fAttrCount;
 	bool fIsLeaf;
 	void indent();
-	void line(string line);
+	void line(string _line);
 	void closeParentTag();
 public:
 	XMLWriter(ostringstream* output);

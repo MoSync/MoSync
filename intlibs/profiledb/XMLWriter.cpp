@@ -34,9 +34,9 @@ void XMLWriter::indent() {
 	}
 }
 
-void XMLWriter::line(string line) {
+void XMLWriter::line(string _line) {
 	indent();
-	*fOutput << line << '\n';
+	*fOutput << _line << '\n';
 }
 
 void XMLWriter::closeParentTag() {
@@ -74,9 +74,9 @@ void XMLWriter::setAttr(string key, string value) {
 	fAttrCount++;
 }
 
-void XMLWriter::text(string text) {
+void XMLWriter::text(string _text) {
 	closeParentTag();
-	*fOutput << text;
+	*fOutput << _text;
 	fIsLeaf = false;
 }
 
