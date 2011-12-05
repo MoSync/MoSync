@@ -30,6 +30,7 @@ MA 02110-1301, USA.
 extern "C" {
 #endif
 	int loadResource(MAHandle handle);
+	int unloadResource(MAHandle handle);
 	int resource_selector();
 #ifdef __cplusplus
 }	//extern "C"
