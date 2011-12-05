@@ -5,7 +5,7 @@ require File.expand_path('../../rules/native_lib.rb')
 work = NativeLibWork.new
 work.instance_eval do
 	@SOURCES = ["."]
-	@EXTRA_INCLUDES = [".."]
+	@EXTRA_INCLUDES = ["..","../../tools/ReleasePackageBuild/build_package_tools/include/"]
 	@NAME = "profiledb"
         if(HOST==:linux || HOST==:darwin)
                 @LIBRARIES = ["expat"]
