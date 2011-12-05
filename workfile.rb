@@ -15,19 +15,19 @@ if(HOST == :win32) then
 	INTLIB_PLATFORM = "windows"
 	PLATFORM_TOOLS = ["tools/makesis-2.0.0", "tools/makesis-4",
 		"tools/MoSyncUpdater"]
-	ADDITIONAL_INTLIBS = ["intlibs/dgles-0.5"]
+	ADDITIONAL_INTLIBS = ["intlibs/dgles-0.5", "intlibs/profiledb"]
 elsif(HOST == :darwin)
 	INTLIB_PLATFORM = "linux"
 	PLATFORM_TOOLS = ["tools/makesis-2.0.0_unix", "tools/makesis-4_unix",
 		]
-	ADDITIONAL_INTLIBS = []
+	ADDITIONAL_INTLIBS = ["intlibs/profiledb"]
 else
 	INTLIB_PLATFORM = HOST
 	# todo: add lcab
 	PLATFORM_TOOLS = [
 		'tools/MoCab',
 	]
-	ADDITIONAL_INTLIBS = []
+	ADDITIONAL_INTLIBS = ["intlibs/profiledb"]
 end
 
 MORE_DIRS = ["intlibs/helpers/platforms/#{INTLIB_PLATFORM}",
