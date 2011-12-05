@@ -1,4 +1,3 @@
-package com.google.android.c2dm;
 /*
  * Copyright 2010 Google Inc.
  *
@@ -14,6 +13,9 @@ package com.google.android.c2dm;
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+package com.google.android.c2dm;
+
 import java.io.IOException;
 
 import android.app.AlarmManager;

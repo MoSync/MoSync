@@ -22,16 +22,18 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnKeyListener;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import com.mosync.internal.android.EventQueue;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.ui.widgets.EditBoxWidget;
 import com.mosync.nativeui.ui.widgets.Widget;
+import com.mosync.nativeui.util.KeyboardManager;
 
 /**
  * A factory that creates an editbox that sends a click event
- * when the enter key is pressed. 
- * 
+ * when the enter key is pressed.
+ *
  * @author fmattias
  */
 public class EditBoxFactory implements AbstractViewFactory
@@ -39,7 +41,7 @@ public class EditBoxFactory implements AbstractViewFactory
 	@Override
 	public Widget create(Activity activity, final int handle)
 	{
-		EditText editBox = new EditText( activity );
+		final EditText editBox = new EditText( activity );
 		editBox.setOnKeyListener( new OnKeyListener( ) {
 			@Override
 			public boolean onKey(View v, int keyCode, KeyEvent event)
@@ -58,7 +60,7 @@ public class EditBoxFactory implements AbstractViewFactory
 				}
 			}
 		});
-		
+
 		editBox.setSingleLine( );
 
 		return new EditBoxWidget( handle, editBox );

@@ -1,7 +1,28 @@
+/* Copyright (C) 2011 MoSync AB
+
+This program is free software; you can redistribute it and/or
+modify it under the terms of the GNU General Public License,
+version 2, as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+MA 02110-1301, USA.
+*/
+
 package com.mosync.internal.android.notifications;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.util.Log;
 
 import com.mosync.internal.android.MoSyncThread;
@@ -10,10 +31,12 @@ import com.mosync.nativeui.util.HandleTable;
 import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_LOCAL_NOTIFICATION;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_LOCAL_FLASH_LIGHTS;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
 
 /**
  * The Notifications Manager that holds all the local notifications that
@@ -96,9 +119,14 @@ public class LocalNotificationsManager
 		if (  notif != null )
 		{
 			try{
+				 if ( property.equals(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS)
+						 &&
+					  mMoSyncThread.getActivity().getApplicationContext().getPackageManager().
+						 hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH) )
+					 return MA_NOTIFICATION_RES_ERROR;
 				return notif.setProperty(property, value);
 			}catch (PropertyConversionException pce){
-				Log.e("@@MoSync", "maNotificationLocalSetProperty: Error while converting property value "+ value + ":" + pce.getMessage());
+				Log.e("@@MoSync", "maNotificationLocalSetProperty: Error while converting property value " + value + ":" + pce.getMessage());
 				return MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
 			}
 		}
@@ -203,6 +231,7 @@ public class LocalNotificationsManager
 			// No need to delete the notification, just stop
 			// the service if it's started.
 			return LocalNotificationsService.stopService();
+			// TODO
 //			return LocalNotificationsService.stopServiceIntent();
 		}
 	}
@@ -230,4 +259,9 @@ public class LocalNotificationsManager
 	 * A table that contains a mapping between a handle and a notification.
 	 */
 	private HandleTable<LocalNotificationObject> m_NotificationTable = new HandleTable<LocalNotificationObject>();
+
+	/**
+	 *
+	 */
+	private Timer mTimer;
 }
