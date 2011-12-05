@@ -10,7 +10,7 @@ work.instance_eval do
         if(HOST==:linux || HOST==:darwin)
                 @LIBRARIES = ["expat"]
         else    # win32
-                @CUSTOM_LIBS = ["libexpat.lib"]
+                @LIBRARIES = ["libexpat.lib"]
         end
 end
 
