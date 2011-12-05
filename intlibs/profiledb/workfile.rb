@@ -7,6 +7,11 @@ work.instance_eval do
 	@SOURCES = ["."]
 	@EXTRA_INCLUDES = [".."]
 	@NAME = "profiledb"
+        if(HOST==:linux || HOST==:darwin)
+                @LIBRARIES = ["expat"]
+        else    # win32
+                @CUSTOM_LIBS = ["libexpat.lib"]
+        end
 end
 
 work.invoke
