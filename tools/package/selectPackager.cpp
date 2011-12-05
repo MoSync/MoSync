@@ -70,7 +70,7 @@ void package(const SETTINGS& s) {
 	}
 
 	// select runtime
-	if(ri.path.find("wm6pro/2") != string::npos)
+	if(ri.path.find("winphone") != string::npos)
 	{
 		packageWindowsPhone(s, ri);
 	} else if(runtimeName == "JavaME") {

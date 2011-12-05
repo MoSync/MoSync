@@ -77,6 +77,7 @@
     <Compile Include="Source\Modules\MoSyncOpenGLESModule.cs" />
     <Compile Include="Source\Modules\MoSyncSensorsModule.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncStackScreen.cs" />
+    <Compile Include="Source\Modules\NativeUI\MoSyncDatePicker.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncTabScreen.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncProgressBar.cs" />
     <Compile Include="Source\Modules\NativeUI\MoSyncEditBox.cs" />
