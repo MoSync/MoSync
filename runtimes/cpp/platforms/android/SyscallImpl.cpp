@@ -2567,8 +2567,155 @@ return 0; \
 					mJNIEnv,
 					mJThis);
 
-		// ********** Various APIs **********
-		// TODO: Group with related APIs.
+		// ********** ADS API **********
+
+		case maIOCtl_maAdsBannerCreate:
+		{
+			const char *_publisher = SYSCALL_THIS->GetValidatedStr(b);
+			return _maAdsBannerCreate(
+					a,
+					_publisher,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maAdsAddBannerToLayout:
+			return _maAdsAddBannerToLayout(a, b, mJNIEnv, mJThis);
+
+		case maIOCtl_maAdsRemoveBannerFromLayout:
+			return _maAdsRemoveBannerFromLayout(a, b, mJNIEnv, mJThis);
+
+		case maIOCtl_maAdsBannerDestroy:
+			return _maAdsBannerDestroy(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maAdsBannerSetProperty:
+		{
+			const char *_prop = SYSCALL_THIS->GetValidatedStr(b);
+			const char *_value = SYSCALL_THIS->GetValidatedStr(c);
+			return _maAdsBannerSetProperty(
+					a,
+					_prop,
+					_value,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maAdsBannerGetProperty:
+		{
+			int _ad = a;
+			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
+			//Read the fourth parameter from the register
+			//(the first three can be read directly)
+			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				c,
+				_valueBufferSize * sizeof(char));
+
+			return _maAdsBannerGetProperty((int)gCore->mem_ds, _ad, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}
+
+		// ********** Notifications API **********
+
+		case maIOCtl_maNotificationLocalCreate:
+			return _maNotificationLocalCreate(mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationLocalDestroy:
+			return _maNotificationLocalDestroy(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationLocalSetProperty:
+		{
+			const char *_prop = SYSCALL_THIS->GetValidatedStr(b);
+			const char *_value = SYSCALL_THIS->GetValidatedStr(c);
+			return _maNotificationLocalSetProperty(
+					a,
+					_prop,
+					_value,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maNotificationLocalGetProperty:
+		{
+			int _notification = a;
+			const char *_property = SYSCALL_THIS->GetValidatedStr(b);
+			//Read the fourth parameter from the register
+			//(the first three can be read directly)
+			int _valueBufferSize = SYSCALL_THIS->GetValidatedStackValue(0);
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				c,
+				_valueBufferSize * sizeof(char));
+
+			return _maNotificationLocalGetProperty((int)gCore->mem_ds, _notification, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maNotificationLocalSchedule:
+			return  _maNotificationLocalSchedule(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationLocalUnschedule:
+			return _maNotificationLocalUnschedule(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationPushRegister:
+		{
+			const char *_account = SYSCALL_THIS->GetValidatedStr(b);
+			return _maNotificationPushRegister(a, _account, mJNIEnv, mJThis);
+		}
+
+		case maIOCtl_maNotificationPushGetRegistration:
+		{
+			int _valueBufferSize = b;
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				a,
+				_valueBufferSize * sizeof(char));
+
+			return _maNotificationPushGetRegistration(
+				(int)gCore->mem_ds,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maNotificationPushUnregister:
+			return _maNotificationPushUnregister(mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationPushGetData:
+		{
+			MAPushNotificationData* data = (MAPushNotificationData*) SYSCALL_THIS->GetValidatedMemRange(b,sizeof(MAPushNotificationData));
+			int _valueBufferSize = data->alertMessageSize;
+			int _valueBuffer = (int) SYSCALL_THIS->GetValidatedMemRange(
+				data->alertMessage,
+				_valueBufferSize * sizeof(char));
+
+			// The type, badge icon and soundFile are used only on iOS.
+			return _maNotificationPushGetData(
+				a,
+				(int)gCore->mem_ds,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maNotificationPushDestroy:
+			return _maNotificationPushDestroy(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maNotificationPushSetTickerText:
+		{
+			const char *_text = SYSCALL_THIS->GetValidatedStr(a);
+			return _maNotificationPushSetTickerText(
+					_text,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maNotificationPushSetMessageTitle:
+		{
+			const char *_text = SYSCALL_THIS->GetValidatedStr(a);
+			return _maNotificationPushSetMessageTitle(
+					_text,
+					mJNIEnv,
+					mJThis);
+		}
 
 		case maIOCtl_maSyscallPanicsEnable:
 			SYSLOG("maIOCtl_maSyscallPanicsEnable");
