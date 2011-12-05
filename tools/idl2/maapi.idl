@@ -4329,6 +4329,11 @@ group WidgetAPI "Widget API" {
 		*/
 		DIALOG_DISMISSED = 22;
 
+		/**
+		* Send by current screen just before it begins rotating.
+		*/
+		SCREEN_ORIENTATION_WILL_CHANGE = 23;
+
 	}
 
 	} // end of WidgetEventTypes

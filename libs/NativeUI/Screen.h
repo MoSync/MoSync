@@ -63,7 +63,7 @@ namespace NativeUI
 		 * tab indicator.
 		 * @param title The screen title.
 		 */
-		virtual void setTitle(const MAUtil::String& title);
+		void setTitle(const MAUtil::String& title);
 
 		/**
 		 * Set the icon of the screen. The icon is displayed
@@ -71,7 +71,7 @@ namespace NativeUI
 		 * @param imageHandle Handle to an image with the icon.
 		 * @return The result code.
 		 */
-		virtual int setIcon(const MAHandle imageHandle);
+		int setIcon(const MAHandle imageHandle);
 
 		/**
 		 * Set the main widget of the screen.
@@ -87,7 +87,7 @@ namespace NativeUI
 		 * - #MAW_RES_INVALID_LAYOUT if the widget was added to a non-layout.
 		 * - #MAW_RES_ERROR if it could not be added for some other reason.
 		 */
-		virtual int setMainWidget(Widget* widget);
+		int setMainWidget(Widget* widget);
 
 		/**
 		 * Show a screen. Only one screen at a time is visible.
@@ -96,6 +96,13 @@ namespace NativeUI
 		 */
 		virtual void show();
 
+		/**
+		 * Called just before the screen begins rotating.
+		 * Subclasses may override this method to perform additional actions
+		 * immediately prior to the rotation.
+		 */
+		virtual void orientationWillChange();
+
 	protected:
 		/**
 		 * Protected because only subclasses should use this constructor.
@@ -103,6 +110,13 @@ namespace NativeUI
 		 * (one of the MAW_ constants).
 		 */
 		Screen(const MAUtil::String& widgetType);
+
+        /**
+         * This method is called when there is an event for this widget.
+         * It passes on the event to all widget's listeners.
+         * @param widgetEventData The data for the widget event.
+         */
+        void handleWidgetEvent(MAWidgetEventData* widgetEventData);
 	};
 
 } // namespace NativeUI
