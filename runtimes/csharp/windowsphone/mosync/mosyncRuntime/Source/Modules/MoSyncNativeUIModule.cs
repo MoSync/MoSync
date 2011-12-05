@@ -40,6 +40,8 @@ namespace MoSync
 
             ioctls.maWidgetDestroy = delegate(int _widget)
             {
+				if (_widget < 0 || _widget >= mWidgets.Count)
+					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IWidget widget = mWidgets[_widget];
                 widget.RemoveFromParent();
                 mWidgets[_widget] = null;
@@ -48,8 +50,12 @@ namespace MoSync
 
             ioctls.maWidgetAddChild = delegate(int _parent, int _child)
             {
-                IWidget parent = mWidgets[_parent];
-                IWidget child = mWidgets[_child];
+				if (_parent < 0 || _parent >= mWidgets.Count)
+					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+				IWidget parent = mWidgets[_parent];
+				if (_child < 0 || _child >= mWidgets.Count)
+					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+				IWidget child = mWidgets[_child];
                 child.SetParent(parent);
                 parent.AddChild(child);
                 return MoSync.Constants.MAW_RES_OK;
@@ -57,6 +63,8 @@ namespace MoSync
 
             ioctls.maWidgetRemoveChild = delegate(int _child)
             {
+				if (_child < 0 || _child >= mWidgets.Count)
+					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IWidget child = mWidgets[_child];
                 child.RemoveFromParent();
                 return MoSync.Constants.MAW_RES_OK;
@@ -64,8 +72,12 @@ namespace MoSync
 
             ioctls.maWidgetInsertChild = delegate(int _parent, int _child, int index)
             {
+				if (_parent < 0 || _parent >= mWidgets.Count)
+					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IWidget parent = mWidgets[_parent];
-                IWidget child = mWidgets[_child];
+				if (_child < 0 || _child >= mWidgets.Count)
+					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
+				IWidget child = mWidgets[_child];
                 parent.InsertChild(child, index);
                 return MoSync.Constants.MAW_RES_OK;
             };
@@ -84,6 +96,8 @@ namespace MoSync
             {
                 String property = core.GetDataMemory().ReadStringAtAddress(_property);
                 String value = core.GetDataMemory().ReadStringAtAddress(_value);
+				if (_widget < 0 || _widget >= mWidgets.Count)
+					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IWidget widget = mWidgets[_widget];
                 try
                 {
@@ -106,6 +120,8 @@ namespace MoSync
             ioctls.maWidgetGetProperty = delegate(int _widget, int _property, int _value, int _bufSize)
             {
                 String property = core.GetDataMemory().ReadStringAtAddress(_property);
+				if (_widget < 0 || _widget >= mWidgets.Count)
+					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IWidget widget = mWidgets[_widget];
                 try
                 {
@@ -123,6 +139,8 @@ namespace MoSync
 
             ioctls.maWidgetScreenShow = delegate(int _screenHandle)
             {
+				if (_screenHandle < 0 || _screenHandle >= mWidgets.Count)
+					return MoSync.Constants.MAW_RES_INVALID_HANDLE;
                 IScreen screen = (IScreen)mWidgets[_screenHandle];
                 screen.Show();
                 return MoSync.Constants.MAW_RES_OK;
