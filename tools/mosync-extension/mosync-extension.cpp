@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <vector>
 #include <string>
+#include <map>
 #include <fstream>
 #include <iomanip>
 #include <string.h>
@@ -34,6 +35,20 @@ static int generateConfig(const char* output, const char* idlFile);
 static void outputExtensionHeader(const char* output, const Interface& inf);
 static void outputExtensionSource(const char* output, const Interface& inf);
 static bool performTask(const std::string mode, const vector<std::string>& arguments);
+
+
+static std::map<std::string, Interface*> sInterfaces;
+Interface* parseOrGetCachedInterface(const std::string& filename)
+{
+	map<string, Interface*>::iterator iter;
+	if((iter = sInterfaces.find(filename)) == sInterfaces.end())
+	{
+		vector<string> dummy;
+		return sInterfaces[filename] = new Interface(parseInterface(dummy, filename));
+	}
+
+	return iter->second;
+}
 
 const char* mosyncdir() {
 	static const char* md = NULL;
@@ -199,7 +214,7 @@ class BuildWpDevProjectMode : public Mode
 				return false;
 
 			vector<string> dummy;
-			Interface* interface = new Interface(parseInterface(dummy, arguments[1]));
+			Interface* interface = parseOrGetCachedInterface(arguments[1]); //new Interface(parseInterface(dummy, arguments[1]));
 			string className = interface->name;
 
 			_mkdir(arguments[0].c_str());
@@ -238,7 +253,7 @@ class BuildWpDevProjectMode : public Mode
 				" -output-type interpreted"
 				" -input-file " + mosyncProjFileSrc +
 				" -output-file " + mosyncProjFileDst +
-				" -ref " + className + " ..\\extension\\Bin\\Debug\\" + className + ".dll";
+				" -ref " + className + " ..\\..\\lib\\Bin\\Debug\\" + className + ".dll";
 
 			sh(cmd.c_str(), false, NULL);
 
@@ -285,7 +300,7 @@ class BuildWpBindingsMode : public Mode
 				return false;
 
 			vector<string> dummy;
-			Interface* interface = new Interface(parseInterface(dummy, arguments[1]));
+			Interface* interface = parseOrGetCachedInterface(arguments[1]); //new Interface(parseInterface(dummy, arguments[1]));
 			string className = interface->name;
 
 			_mkdir(arguments[0].c_str());
@@ -301,7 +316,7 @@ class BuildWpBindingsMode : public Mode
 			stream << "// note: this file is generated, do not modify.\n";
 			stream << "using MoSync;\n";
 			stream << "using System;\n";
-			stream << "partial class " << className << " : IExtensionModule\n";
+			stream << "public partial class " << className << " : IExtensionModule\n";
 			stream << "{\n";
 
 			streamCSharpFunctionDelegates(stream, *interface);
@@ -428,7 +443,7 @@ class BuildWpImplTemplateMode : public Mode
 				return false;
 
 			vector<string> dummy;
-			Interface* interface = new Interface(parseInterface(dummy, arguments[1]));
+			Interface* interface = parseOrGetCachedInterface(arguments[1]); //new Interface(parseInterface(dummy, arguments[1]));
 			string className = interface->name;
 
 			_mkdir(arguments[0].c_str());
@@ -445,7 +460,7 @@ class BuildWpImplTemplateMode : public Mode
 
 			stream << "using MoSync;\n";
 			stream << "using System;\n";
-			stream << "partial class " << className << " : IExtensionModule\n";
+			stream << "public partial class " << className << " : IExtensionModule\n";
 			stream << "{\n";
 			stream << "\tpublic void Init(Core core, Runtime runtime)\n";
 			stream << "\t{\n";
@@ -549,7 +564,7 @@ int main(int argc, const char** argv) {
 
 static int generateConfig(const char* output, const char* idlFile) {
 	vector<string> dummy;
-	Interface* interface = new Interface(parseInterface(dummy, idlFile));
+	Interface* interface = parseOrGetCachedInterface(idlFile); //new Interface(parseInterface(dummy, idlFile));
 
 	outputExtensionHeader(output, *interface);
 	outputExtensionSource(output, *interface);
@@ -617,7 +632,7 @@ static void outputExtensionSource(const char* output, const Interface& inf) {
 	ofstream stream((string(output)+"/"+inf.name+".c").c_str());
 	string headerName = "MA_EXTENSION_" + inf.name;
 
-	stream << "#include <" << inf.name << ".h>\n\n";
+	stream << "#include \"" << inf.name << ".h\"\n\n";
 
 	stream << "MAExtensionModule " << getExtensionModuleHandleName(inf) << " = MA_EXTENSION_MODULE_UNAVAILABLE;\n";
 	for(size_t i=0; i<inf.functions.size(); i++) {

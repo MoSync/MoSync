@@ -219,3 +219,11 @@ config_platform.h
 /runtimes/csharp/windowsphone/mosync/mosyncRuntime/Source/maapi.cs
 
 /rules/local_config.rb
+
+/runtimes/csharp/windowsphone/template
+/runtimes/csharp/windowsphone/mosync/mosyncExtensionTemplate/Bin
+/runtimes/csharp/windowsphone/mosync/mosyncExtensionTemplate/obj
+/runtimes/csharp/windowsphone/mosync/mosync/Service References
+/runtimes/csharp/windowsphone/mosync/mosync/Bin
+/tools/winphone-builder/pugixml-1.0/scripts
+/tools/winphone-builder/pugixml-1.0/docs
