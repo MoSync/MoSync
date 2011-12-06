@@ -120,6 +120,8 @@ static void error(const char* file, int lineNo, string msg) {
 	exit(1);
 }
 
+static void error(ParserState* state, string msg)  __attribute__ ((noreturn));
+
 static void error(ParserState* state, string msg) {
 	if (state) {
 		error(state->fileName.c_str(), state->lineNo, msg);
