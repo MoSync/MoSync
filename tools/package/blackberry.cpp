@@ -63,7 +63,8 @@ void packageBlackberry(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	cmd << "java -Xmx256m -classpath \""<<bbbin<<"/rapc.jar\""
 		" net.rim.tools.compiler.Compiler"
-		" \"import="<<bblib<<"/net_rim_api.jar\""
+		" -noshortname -verbose -warning"
+		" -listing="<<s.name<<" \"import="<<bblib<<"/net_rim_api.jar\""
 		" \""<<codnameParam<<"="<<s.name<<"\" -quiet -midlet"
 		" \"jad="<<s.name<<".jad\" \""<<s.name<<".jar\"";
 	sh(cmd.str().c_str());

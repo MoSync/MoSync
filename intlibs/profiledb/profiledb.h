@@ -23,6 +23,7 @@
 #include <set>
 #include <string>
 #include <sstream>
+#include "File.h"
 #include "XMLWriter.h"
 
 using namespace std;
@@ -194,18 +195,18 @@ struct ParserState {
 	set<string> alreadyFound;
 	vector<Capability> capabilityStack;
 };
-static void xmlStart(void *data, const char *tagName, const char **attributes);
-static void xmlEnd(void *data, const char *tagName);
+//static void xmlStart(void *data, const char *tagName, const char **attributes);
+//static void xmlEnd(void *data, const char *tagName);
 
 // Utility functions
-static bool isWildcard(string pattern);
-static bool equalsIgnoreCaseASCII(string s1, string s2);
-static bool beginsWith(string prefix, string str);
-static bool matches(string pattern, string name);
-static const char* findAttr(const char* name, const char** attributes);
-static void error(const char* file, int lineNo, string msg) __attribute__ ((noreturn));
-static void error(ParserState* state, string msg);
-static string getStateString(CapabilityState state);
-static string getCapabilityPrefix(vector<Capability>& capabilityStack);
+//static bool isWildcard(string pattern);
+//static bool equalsIgnoreCaseASCII(string s1, string s2);
+//static bool beginsWith(string prefix, string str);
+//static bool matches(string pattern, string name);
+//static const char* findAttr(const char* name, const char** attributes);
+//static void error(const char* file, int lineNo, string msg) __attribute__ ((noreturn));
+//static void error(ParserState* state, string msg);
+//static string getStateString(CapabilityState state);
+//static string getCapabilityPrefix(vector<Capability>& capabilityStack);
 
 #endif /* PROFILEDB_H_ */
