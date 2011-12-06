@@ -108,6 +108,8 @@ static const char* findAttr(const char* name, const char** attributes) {
 	return NULL;
 }
 
+static void error(const char* file, int lineNo, string msg) __attribute__ ((noreturn));
+
 static void error(const char* file, int lineNo, string msg) {
 	ostringstream errMsg;
 	if (file) {
