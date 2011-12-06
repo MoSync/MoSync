@@ -25,6 +25,7 @@
 #include <sstream>
 #include <expat.h>
 #include <stdio.h>
+#include <string.h>
 #include "File.h"
 #include "profiledb.h"
 #include "XMLWriter.h"
@@ -44,16 +45,6 @@ using namespace std;
 #define ATTR_VALUE "value"
 #define ATTR_TYPE "type"
 #define PROPERTY_TYPE "property"
-
-
-struct ParserState {
-	Profile* profile;
-	ProfileDB* db;
-	int lineNo;
-	string fileName;
-	set<string> alreadyFound;
-	vector<Capability> capabilityStack;
-};
 
 string ProfileDB::profilesdir() {
 	static const char* md = NULL;
@@ -117,8 +108,6 @@ static const char* findAttr(const char* name, const char** attributes) {
 	return NULL;
 }
 
-static void error(const char* file, int lineNo, string msg) __attribute__ ((noreturn));
-
 static void error(const char* file, int lineNo, string msg) {
 	ostringstream errMsg;
 	if (file) {
@@ -137,7 +126,7 @@ static void error(ParserState* state, string msg) {
 	}
 }
 
-void innerListAllProfiles(File& root, string name, string pattern,
+void ProfileDB::innerListAllProfiles(File& root, string name, string pattern,
 		bool onlyFamilies, vector<string>& result) {
 	list<File> files = root.listFiles();
 	for (list<File>::iterator filesIterator = files.begin(); filesIterator
@@ -513,7 +502,7 @@ bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
 	return profile;
 }
 
-bool internalMatchProfile(Profile* profile,
+bool ProfileDB::internalMatchProfile(Profile* profile,
 		vector<Capability>& requiredCapabilites,
 		vector<Capability>& optionalCapabilites,
 		string& matchToken) {
@@ -665,7 +654,7 @@ void Profile::toXML(XMLWriter& writer, bool includeCapabilities) {
 	writer.endTag();
 }
 
-string getStateString(CapabilityState state) {
+static string getStateString(CapabilityState state) {
 	switch (state) {
 	case SUPPORTED:
 		return "SUPPORTED";
