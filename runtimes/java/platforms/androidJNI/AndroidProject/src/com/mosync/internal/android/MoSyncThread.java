@@ -3007,7 +3007,8 @@ public class MoSyncThread extends Thread
 	 * Schedules a local notification for delivery at its encapsulated date and time.
 	 * @param handle Handle to a local notification object.
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred,
-	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid,
+	 * MA_NOTIFICATION_RES_ALREADY_SCHEDULED if it was already scheduled.
 	 */
 	int maNotificationLocalSchedule(int handle)
 	{
@@ -3019,6 +3020,7 @@ public class MoSyncThread extends Thread
 	 * @param handle Handle to a local notification object.
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred,
 	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+	 * MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE if it wasn't scheduled before.
 	 */
 	int maNotificationLocalUnschedule(int handle)
 	{
