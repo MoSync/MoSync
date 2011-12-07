@@ -39,25 +39,27 @@ namespace MoSync
         //VerticalLayout class
         public class VerticalLayout : WidgetBaseWindowsPhone
         {
-            //the Grid that will be used as the VerticalLayout
+            //The Grid that will be used as the VerticalLayout
             protected System.Windows.Controls.Grid mGrid;
 
-            //padding information
+            //Padding information
             protected double mPaddingBottom;
             protected double mPaddingTop;
             protected double mPaddingLeft;
             protected double mPaddingRight;
 
-            //row definitions used as spacers for the padding system
+            //Row definitions used as spacers for the padding system
             protected RowDefinition mSpacerUp;
             protected RowDefinition mSpacerDown;
             protected ColumnDefinition mSpacerLeft;
             protected ColumnDefinition mSpacerRight;
 
-            //the main column of the Grid object (an vertical layout is a grid with one column)
+            //The main column of the Grid object (an vertical layout is a grid with one column)
             protected ColumnDefinition mColDef;
 
-            //the constructor
+            /**
+             * The constructor
+             */
             public VerticalLayout()
             {
                 mGrid = new System.Windows.Controls.Grid();
@@ -92,7 +94,10 @@ namespace MoSync
 #endif
             }
 
-            //add child
+            /**
+             * AddChild function override
+             * @param child IWidget the "child" widget that needs to be added
+             */
             public override void AddChild(IWidget child)
             {
                 base.AddChild(child);
@@ -120,7 +125,42 @@ namespace MoSync
                 });
             }
 
-            //MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT implementation
+            /**
+            * The RemoveChild implementation
+            * @param index int the index of the "child" widget that will be removed
+            */
+            public override void RemoveChild(int index)
+            {
+                if (0 <= index && mChildren.Count > index)
+                {
+                    IWidget child = mChildren[index];
+
+                    if (null != child)
+                    {
+                        RemoveChild(child);
+                    }
+                }
+            }
+
+            /**
+            * The RemoveChild implementation
+            * @param child IWidget the "child" widget that will be removed
+            */
+            public override void RemoveChild(IWidget child)
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+                    int x = Grid.GetRow((widget.View) as System.Windows.FrameworkElement);
+                    mGrid.RowDefinitions.RemoveAt(x);
+                    mGrid.Children.Remove((child as WidgetBaseWindowsPhone).View);
+                });
+                base.RemoveChild(child);
+            }
+
+            /**
+             * MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT)]
             public String ChildHorizontalAlignment
             {
@@ -147,7 +187,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT implementation
+            /**
+             * MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_CHILD_VERTICAL_ALIGNMENT)]
             public String ChildVerticalAlignment
             {
@@ -174,7 +216,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_VERTICAL_LAYOUT_PADDING_BOTTOM implementation
+            /**
+             * MAW_VERTICAL_LAYOUT_PADDING_BOTTOM implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_PADDING_BOTTOM)]
             public String PaddingBottom
             {
@@ -189,7 +233,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_VERTICAL_LAYOUT_PADDING_TOP implementation
+            /**
+             * MAW_VERTICAL_LAYOUT_PADDING_TOP implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_PADDING_TOP)]
             public String PaddingTop
             {
@@ -204,7 +250,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_VERTICAL_LAYOUT_PADDING_LEFT implementation
+            /**
+             * MAW_VERTICAL_LAYOUT_PADDING_LEFT implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_PADDING_LEFT)]
             public String PaddingLeft
             {
@@ -219,7 +267,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_VERTICAL_LAYOUT_PADDING_RIGHT implementation
+            /**
+             * MAW_VERTICAL_LAYOUT_PADDING_RIGHT implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_VERTICAL_LAYOUT_PADDING_RIGHT)]
             public String PaddingRight
             {

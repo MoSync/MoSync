@@ -106,7 +106,10 @@ namespace MoSync
                     {
                         columnDef.Width = new System.Windows.GridLength(widget.Width, System.Windows.GridUnitType.Pixel);
                     }
-                    else columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+                    else
+                    {
+                        columnDef.Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Auto);
+                    }
 
                     mGrid.ColumnDefinitions.Insert(mGrid.ColumnDefinitions.Count - 1, columnDef);
 
@@ -115,6 +118,39 @@ namespace MoSync
                     Grid.SetColumn((widget.View as System.Windows.FrameworkElement), mGrid.ColumnDefinitions.Count - 2);
                     Grid.SetRow((widget.View as System.Windows.FrameworkElement), 1);
                 });
+            }
+
+            /**
+             * The RemoveChild implementation
+             * @param index int the index of the "child" widget that will be removed
+             */
+            public override void RemoveChild(int index)
+            {
+                if (0 <= index && mChildren.Count > index)
+                {
+                    IWidget child = mChildren[index];
+
+                    if (null != child)
+                    {
+                        RemoveChild(child);
+                    }
+                }
+            }
+
+            /**
+            * The RemoveChild implementation
+            * @param child IWidget the "child" widget that will be removed
+            */
+            public override void RemoveChild(IWidget child)
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+                    int x = Grid.GetColumn((widget.View) as System.Windows.FrameworkElement);
+                    mGrid.ColumnDefinitions.RemoveAt(x);
+                    mGrid.Children.Remove((child as WidgetBaseWindowsPhone).View);
+                });
+                base.RemoveChild(child);
             }
 
             //MAW_HORIZONTAL_LAYOUT_CHILD_HORIZONTAL_ALIGNMENT implementation
