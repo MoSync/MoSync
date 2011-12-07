@@ -72,6 +72,9 @@
 		432B98C91431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CA1431FE5F00BDB926 /* MoSyncPanic.mm in Sources */ = {isa = PBXBuildFile; fileRef = 432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */; };
 		432B98CC1432040B00BDB926 /* PimError.h in Headers */ = {isa = PBXBuildFile; fileRef = 432B98CB1432040B00BDB926 /* PimError.h */; };
+		436A47BA148E54180087B17A /* Capture.h in Headers */ = {isa = PBXBuildFile; fileRef = 436A47B8148E54180087B17A /* Capture.h */; };
+		436A47BB148E54180087B17A /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 436A47B9148E54180087B17A /* Capture.mm */; };
+		436A47BC148E54180087B17A /* Capture.mm in Sources */ = {isa = PBXBuildFile; fileRef = 436A47B9148E54180087B17A /* Capture.mm */; };
 		438DBD401475388500980239 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
 		438DBD451475393800980239 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
 		438DBD461475393800980239 /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
@@ -358,6 +361,8 @@
 		432B98C61431FE5F00BDB926 /* MoSyncPanic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncPanic.h; sourceTree = "<group>"; };
 		432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncPanic.mm; sourceTree = "<group>"; };
 		432B98CB1432040B00BDB926 /* PimError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimError.h; sourceTree = "<group>"; };
+		436A47B8148E54180087B17A /* Capture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Capture.h; path = capture/Capture.h; sourceTree = "<group>"; };
+		436A47B9148E54180087B17A /* Capture.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = Capture.mm; path = capture/Capture.mm; sourceTree = "<group>"; };
 		43A7684E1400F6BA009608A4 /* ImagePickerController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ImagePickerController.h; sourceTree = "<group>"; };
 		43A7684F1400F6BA009608A4 /* ImagePickerController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ImagePickerController.mm; sourceTree = "<group>"; };
 		43B16FE8147BF9FC00B6BB8A /* NSStringExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = NSStringExpanded.h; path = utils/NSStringExpanded.h; sourceTree = "<group>"; };
@@ -614,6 +619,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				436A47B6148E53700087B17A /* capture */,
 				43CE0BE01463E98F00F8FFC3 /* notifications */,
 				43CE0BDE1463E98700F8FFC3 /* ads */,
 				E4D36EA31459AC5B00477B1E /* audio */,
@@ -750,6 +756,15 @@
 				29B46B3C1407FAA5009491A6 /* PimContactsList.m */,
 			);
 			path = contacts;
+			sourceTree = "<group>";
+		};
+		436A47B6148E53700087B17A /* capture */ = {
+			isa = PBXGroup;
+			children = (
+				436A47B8148E54180087B17A /* Capture.h */,
+				436A47B9148E54180087B17A /* Capture.mm */,
+			);
+			name = capture;
 			sourceTree = "<group>";
 		};
 		43B16FE6147BF9AA00B6BB8A /* utils */ = {
@@ -1131,6 +1146,7 @@
 				41BD2ED414768C55005ADEB9 /* AudioData.h in Headers */,
 				41BD2ED514768C5D005ADEB9 /* AudioInstance.h in Headers */,
 				43B16FEA147BF9FC00B6BB8A /* NSStringExpanded.h in Headers */,
+				436A47BA148E54180087B17A /* Capture.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1339,6 +1355,7 @@
 				E4D36EAD1459B5B600477B1E /* AudioInstance.mm in Sources */,
 				4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */,
 				43B16FEB147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
+				436A47BB148E54180087B17A /* Capture.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1437,6 +1454,7 @@
 				41BD2ED314768C4D005ADEB9 /* AudioData.mm in Sources */,
 				41BD2ED614768C63005ADEB9 /* AudioInstance.mm in Sources */,
 				43B16FEC147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
+				436A47BC148E54180087B17A /* Capture.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -9544,6 +9544,238 @@ group NotificationAPI "Notification API" {
 	}//End of Notification Functions
 } // End of Notification API
 
+group CaptureAPI "Capture API" {
+	group CaptureResultCodes "Capture result codes" {
+		constset int MA_CAPTURE_RES_ {
+			/**
+			* @brief Indicates that the call was successful.
+			*/
+			OK = 0;
+
+			/**
+			* @brief The given file name is invalid.
+			*/
+			FILE_INVALID_NAME = -1;
+
+			/**
+			* @brief The file already exists.
+			*/
+			FILE_ALREADY_EXISTS = -2;
+
+			/**
+			* @brief Indicates that the call to maCaptureSetProperty or maCaptureGetProperty received
+			* an invalid property name.
+			*/
+			INVALID_PROPERTY = -3;
+
+			/**
+			* @brief Indicates that the call to maCaptureSetProperty or maCaptureGetProperty received
+			* an invalid property value.
+			*/
+			INVALID_PROPERTY_VALUE = -4;
+
+			/**
+			* @brief Indicates that the call to maCaptureGetProperty needs a larger buffer.
+			*/
+			INVALID_STRING_BUFFER_SIZE = -5;
+
+			/**
+			* @brief Indicates that the call to maCaptureAction received an invalid action type.
+			*/
+			INVALID_ACTION = -6;
+
+			/**
+			* @brief Indicates that the call to maCaptureDestroyData received an invalid handle.
+			*/
+			INVALID_HANDLE = -7;
+
+			/**
+			* @brief Indicates that ads are not supported on current platform.
+			*/
+			UNSUPPORTED = -8;
+		}
+	} // end of Capture Result Codes
+
+	group CaptureProperties "Capture Properties" {
+		constset MAString MA_CAPTURE_ {
+			/**
+			* @brief Maximum duration video that should be recorded, in seconds.
+			* Platform: Android and iOS.
+			*
+			* @validvalue Positive integer value.
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%d", 100);
+			*	maCaptureSetProperty(MA_CAPTURE_MAX_DURATION, buf);
+			* \endcode
+			*/
+			MAX_DURATION = "maxDuration";
+
+			/**
+			* @brief Set the video recording quality.
+			* Platform: Android and iOS.
+			*
+			* @validvalue One of the \link #MA_CAPTURE_VIDEO_QUALITY_ MA_CAPTURE_VIDEO_QUALITY \endlink constants.
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%d", MA_CAPTURE_VIDEO_QUALITY_HIGH);
+			*	maCaptureSetProperty(MA_CAPTURE_VIDEO_QUALITY, buf);
+			* \endcode
+			*/
+			VIDEO_QUALITY = "videoQuality";
+
+			/**
+			* @brief Set the video recording quality.
+			* Platform: Android.
+			*
+			* @validvalue Any string.
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%s", "My title");
+			*	maCaptureSetProperty(MA_CAPTURE_DISPLAY_NAME, buf);
+			* \endcode
+			*/
+			DISPLAY_NAME = "displayName";
+
+			/**
+			* @brief
+			* Platform: Android.
+			*
+			* @validvalue Positive integer value.
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%s", "My title");
+			*	maCaptureSetProperty(MA_CAPTURE_ORIENTATION, buf);
+			* \endcode
+			*/
+			ORIENTATION = "orientation";
+		}
+	} // end of Capture properties
+
+	group CaptureVideoQuality "Capture Video Quality" {
+		constset int MA_CAPTURE_VIDEO_QUALITY_ {
+			/// Use low-quality video recording.
+			/// Platform: iOS.
+			LOW = 0;
+			/// Use medium-quality video recording.
+			/// Platform: iOS.
+			MEDIUM = 1;
+			/// The highest-quality video recording supported for the active camera on the device.
+			/// Platform: iOS.
+			HIGH = 2;
+		}
+	} // end of Capture Media Types
+
+	group CaptureAction "Capture Action" {
+		constset int MA_CAPTURE_ACTION_ {
+			/// Start the picker with video mode and stores the result in a data object.
+			/// Platform: Android and iOS.
+			RECORD_VIDEO = 0;
+			/// Stops the recording.
+			/// Platform: Android and iOS.
+			STOP_RECORDING = 1;
+			/// Starts the picker with picture mode and  stores the picture in a dataObject.
+			/// Platform: Android and iOS.
+			TAKE_PICTURE = 2;
+		}
+	} // end of Capture Action
+
+	group CaptureEventType "Capture Event type" {
+		constset int MA_CAPTURE_EVENT_TYPE_ {
+			/// Send after a image has been taken.
+			/// Platform: Android and iOS.
+			IMAGE = 0;
+			/// Send after a video has been taken.
+			/// Platform: Android and iOS.
+			VIDEO = 1;
+			/// Send if the user cancels taking image/video.
+			/// Platform: Android and iOS.
+			CANCEL = 2;
+		}
+	} // end of Capture Action
+
+	group CaptureFunctions "Capture Functions" {
+		/**
+		* \brief Sets the properties to the Native Image Picker.
+		* \param property A string representing which property to set.
+		*  One of the \link #MA_CAPTURE_ MA_CAPTURE \endlink constants.
+		* \param value The value that will be assigned to the property.
+		*
+		* \returns
+		*  - MA_CAPTURE_RES_OK
+		*  - MA_CAPTURE_RES_INVALID_PROPERTY
+		*  - MA_CAPTURE_RES_INVALID_PROPERTY_VALUE
+		*/
+		int maCaptureSetProperty(in MAString property,in MAString value);
+
+		/**
+		* \brief Retrieves the properties from the Native Image Picker.
+		*
+		* \param property A string representing which property to get.
+		*  One of the \link #MA_CAPTURE_ MA_CAPTURE \endlink constants.
+		* \param value A buffer that will hold the value of the property, represented as a string.
+		* \param bufSize Size of the buffer.
+		*
+		* \returns One of the next constants:
+		* - MA_CAPTURE_RES_OK if no error occurred.
+		* - MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+		* - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		*/
+		int maCaptureGetProperty(in MAString property, out MAString value range("bufSize"), in int bufSize);
+
+		/**
+		* \brief Perform an action on the image picker.
+		* \param action One of the \link #MA_CAPTURE_ACTION_ MA_CAPTURE_ACTION \endlink constants.
+		*
+		* \returns One of the next constants:
+		*  - MA_CAPTURE_RES_OK if no error occurred.
+		*  - MA_CAPTURE_RES_INVALID_ACTION if the given action is invalid.
+		*/
+		int maCaptureAction(in int action);
+
+		/**
+		* \brief Save a image/video data object to a file.
+		* \param handle Handle to a image/video data object.
+		* \param fullPath A buffer containing the a full path where the file will be created.
+		* \param fullPathBufSize The size of the fullPath buffer.
+		*
+		* \returns One of the next constants:
+		*  - MA_CAPTURE_RES_OK if no error occurred.
+		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - MA_CAPTURE_RES_FILE_INVALID_NAME if the fullPath param is invalid.
+		*  - MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
+		*/
+		int maCaptureSaveDataToFile(in MAHandle handle,in MAString fullPath,in int fullPathBufSize);
+
+		/**
+		* \brief Destroys a image/video data object.
+		* \param handle Handle to a image/video data object.
+		*
+		* \returns One of the next constants:
+		*  - MA_CAPTURE_RES_OK if no error occurred.
+		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*/
+		int maCaptureDestroyData(in MAHandle handle);
+	}//End of Capture Functions
+
+} // End of Capture API
+
 }
 	constset int IOCTL_ {
 		UNAVAILABLE = -1;

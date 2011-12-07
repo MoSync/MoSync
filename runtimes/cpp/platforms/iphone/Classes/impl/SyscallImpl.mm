@@ -47,6 +47,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "CameraPreviewWidget.h"
 #import "CameraConfirgurator.h"
 #import "ImagePickerController.h"
+#import "Capture.h"
 #include "netImpl.h"
 
 
@@ -348,6 +349,7 @@ namespace Base {
         MAAudioClose();
         [OptionsDialogView deleteInstance];
         [ImagePickerController deleteInstance];
+        [Capture deleteInstance];
 	}
 
 
@@ -1943,6 +1945,27 @@ return 0; \
         return [[NotificationManager getInstance] getApplicationIconBadgeNumber];
 	}
 
+    SYSCALL(int, maCaptureSetProperty(const char* property, const char* value))
+	{
+        return [[Capture getInstance] setProperty:property withValue:value];
+	}
+    SYSCALL(int, maCaptureGetProperty(const char* property, const char* value, const int bufSize))
+	{
+        return [[Capture getInstance] getProperty:property value:value maxSize:bufSize];
+	}
+    SYSCALL(int, maCaptureAction(const int action))
+	{
+        return [[Capture getInstance] action:action];
+	}
+    SYSCALL(int, maCaptureSaveDataToFile(const int handle, const char* fullPath, const int fullPathSize))
+	{
+        return [[Capture getInstance] saveDataToFile:handle withPath:fullPath maxSize:fullPathSize];
+	}
+    SYSCALL(int, maCaptureDestroyData(const int handle))
+	{
+        return [[Capture getInstance] destroyData:handle];
+	}
+
 	SYSCALL(longlong, maIOCtl(int function, int a, int b, int c))
 	{
 		switch(function) {
@@ -2052,6 +2075,12 @@ return 0; \
 		maIOCtl_case(maDBCursorGetColumnText);
 		maIOCtl_case(maDBCursorGetColumnInt);
 		maIOCtl_case(maDBCursorGetColumnDouble);
+		maIOCtl_case(maCaptureSetProperty);
+		maIOCtl_case(maCaptureGetProperty);
+		maIOCtl_case(maCaptureAction);
+		maIOCtl_case(maCaptureSaveDataToFile);
+		maIOCtl_case(maCaptureDestroyData);
+
 		maIOCtl_IX_WIDGET_caselist
 #ifdef SUPPORT_OPENGL_ES
 		maIOCtl_IX_OPENGL_ES_caselist;
