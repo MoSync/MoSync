@@ -23,13 +23,6 @@ package com.mosync.nativeui.ui.ads;
  */
 public class AdsEvent
 {
-	// Banner's handle that sends the event.
-	public int mBannerHandle;
-	// One of the #MA_ADS_EVENT constants.
-	public int mBannerEventType;
-	// If bannerEventType is #MA_ADS_EVENT_FAILED this code will describe the error.
-	public int mErrCode;
-
 	public AdsEvent(int type, int handle, int errorCode)
 	{
 		this.mBannerEventType = type;
@@ -46,4 +39,13 @@ public class AdsEvent
 
 		return "Ad " + mBannerHandle + " event: " + mBannerEventType;
 	}
+
+	/************************ Class members ************************/
+
+	// Banner's handle that sends the event.
+	public int mBannerHandle;
+	// One of the #MA_ADS_EVENT constants.
+	public int mBannerEventType;
+	// If bannerEventType is #MA_ADS_EVENT_FAILED this code will describe the error.
+	public int mErrCode;
 }

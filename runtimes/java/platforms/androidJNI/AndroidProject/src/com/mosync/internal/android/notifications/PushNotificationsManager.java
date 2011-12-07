@@ -73,12 +73,14 @@ public class PushNotificationsManager
 	public static boolean handlePushNotificationIntent(Intent intent)
 	{
 		Log.e("@@MoSync", "handlePushNotificationIntent");
+
 		// Get message from intent.
 		PushNotificationsManager instance = getRef();
-		if ( instance == null )
+		if ( null == instance )
 		{
 			return false;
 		}
+
 		// Process the new incoming message.
 		instance.messageReceived(intent.getStringExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_MESSAGE));
 
@@ -102,7 +104,7 @@ public class PushNotificationsManager
 		mRegistrationInfo.registrationInProgress = false;
 		mRegistrationInfo.registrationSuccess = true;
 		mRegistrationInfo.registrationID = regId;
-//		mRegistrationInfo.registrationAttempted = true;
+
 		// Raise a MoSync event, notify that the request was processed.
 		postEventRegistration(EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION);
 	}
@@ -116,6 +118,7 @@ public class PushNotificationsManager
 		mRegistrationInfo.registrationSuccess = false;
 		mRegistrationInfo.registrationInProgress = false;
 		mRegistrationInfo.errorMessage = regError;
+
 		// Raise a MoSync event, notify that the request was processed,
 		// unconditioned by the result.
 		postEventRegistration(EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION);
@@ -137,8 +140,10 @@ public class PushNotificationsManager
 	public void messageReceived(String message)
 	{
 		Log.e("@@MoSync","C2DM messageReceived");
+
 		// Create local notification object.
 		int newHandle = createNotification(mMosyncThread.getActivity(), message);
+
 		// Launch the notification now.
 		triggerNotification(mMosyncThread.getActivity(), newHandle);
 
@@ -154,7 +159,7 @@ public class PushNotificationsManager
 	{
 		PushNotificationObject notification =
 			m_NotificationTable.get(id);
-		if ( notification == null )
+		if ( null == notification )
 			return false;
 		notification.triggerNotification(context);
 		return true;
@@ -232,12 +237,12 @@ public class PushNotificationsManager
 			registrationFail(PushRegistrationData.REG_ERR_MESSAGE_PHONE_ERROR);
 			return MA_NOTIFICATION_RES_UNSUPPORTED;
 		}
-		else if ( mRegistrationInfo.registrationInProgress )
+		if ( mRegistrationInfo.registrationInProgress )
 		{
 			Log.e("@@MoSync","One registration is already in progress.");
 			return MA_NOTIFICATION_RES_REGISTRATION_IN_PROGRESS;
 		}
-		else if ( mRegistrationInfo.registrationSuccess )
+		if ( mRegistrationInfo.registrationSuccess )
 		{
 			Log.e("@@MoSync", "Application is already registered to C2DM");
 			return MA_NOTIFICATION_RES_ALREADY_REGISTERED;
@@ -299,7 +304,7 @@ public class PushNotificationsManager
 	public int getPushData(int notificationHandle, int payloadBuffer, int bufferSize)
 	{
 		PushNotificationObject notification = m_NotificationTable.get(notificationHandle);
-		if ( notification == null )
+		if ( null == notification )
 		{
 			Log.e("@@MoSync Notification", "maNotificationPushGetData received invalid handle " + notificationHandle);
 			return MA_NOTIFICATION_RES_INVALID_HANDLE;
@@ -330,13 +335,13 @@ public class PushNotificationsManager
 	 */
 	public int destroyNotification(int notificationHandle)
 	{
-
 		PushNotificationObject notification = m_NotificationTable.get(notificationHandle);
-		if ( notification == null )
+		if ( null == notification )
 		{
 			Log.e("@@MoSync","maNotificationPushDestroy Invalid handle");
 			return MA_NOTIFICATION_RES_INVALID_HANDLE;
 		}
+
 		m_NotificationTable.remove(notificationHandle);
 		return MA_NOTIFICATION_RES_OK;
 	}
@@ -364,19 +369,15 @@ public class PushNotificationsManager
 				writeToMoSyncMemory(mRegistrationInfo.errorMessage,registrationBuf);
 				return MA_NOTIFICATION_RES_ERROR;
 			}
-			else
+			if( mRegistrationInfo.registrationID.length( ) + 1 > registrationBufSize )
 			{
-				if( mRegistrationInfo.registrationID.length( ) + 1 > registrationBufSize )
-				{
-					Log.e( "@@MoSync Notification", "getPushData: Buffer size " + registrationBufSize +
-							" too short to hold buffer of size: " + mRegistrationInfo.registrationID.length( ) + 1 );
-					return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
-				}
-
-				writeToMoSyncMemory(mRegistrationInfo.registrationID, registrationBuf);
-
-				return MA_NOTIFICATION_RES_OK;
+				Log.e( "@@MoSync Notification", "getPushData: Buffer size " + registrationBufSize +
+						" too short to hold buffer of size: " + mRegistrationInfo.registrationID.length( ) + 1 );
+				return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
 			}
+
+			writeToMoSyncMemory(mRegistrationInfo.registrationID, registrationBuf);
+			return MA_NOTIFICATION_RES_OK;
 		}
 		else
 		{
