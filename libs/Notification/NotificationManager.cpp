@@ -188,11 +188,16 @@ namespace Notification
      * Schedules a local notification for delivery at its encapsulated
      * date and time.
      * @param localNotification Handle to a local notification object.
+     * @return One of the constants:
+     *  - #MA_NOTIFICATION_RES_OK if no error occurred.
+     *  - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+     *  - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was already
+     *  scheduled.
      */
-    void NotificationManager::scheduleLocalNotification(
+    int NotificationManager::scheduleLocalNotification(
         LocalNotification* localNotification)
     {
-        maNotificationLocalSchedule(localNotification->getHandle());
+        return maNotificationLocalSchedule(localNotification->getHandle());
     }
 
     /**
@@ -200,11 +205,16 @@ namespace Notification
      * calling this method also programmatically dismisses the notification
      * if  it is currently displaying an alert.
      * @param localNotification Handle to a local notification object.
+     * @return One of the constants:
+     *  - #MA_NOTIFICATION_RES_OK
+     *  - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+     *  - #MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE If the notification was not
+     *  scheduled.
      */
-    void NotificationManager::unscheduleLocalNotification(
+    int NotificationManager::unscheduleLocalNotification(
         LocalNotification* localNotification)
     {
-        maNotificationLocalUnschedule(localNotification->getHandle());
+        return maNotificationLocalUnschedule(localNotification->getHandle());
     }
 
     /**

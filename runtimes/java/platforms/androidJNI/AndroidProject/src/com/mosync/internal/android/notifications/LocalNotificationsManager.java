@@ -39,8 +39,8 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INV
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
-//import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
-//import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE;
 
 /**
  * The Notifications Manager that holds all the local notifications that
@@ -132,11 +132,11 @@ public class LocalNotificationsManager
 		if (  null != notification )
 		{
 			try{
-//				if ( notification.getScheduled() )
-//				{
-//					Log.e("@@MoSync", "maNotificationLocalSetProperty cannot be called after scheduling the notification.");
-//					return MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
-//				}
+				if ( notification.getScheduled() )
+				{
+					Log.e("@@MoSync", "maNotificationLocalSetProperty cannot be called after scheduling the notification.");
+					return MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
+				}
 				 if ( property.equals(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS)
 						 &&
 					  mMoSyncThread.getActivity().getApplicationContext().getPackageManager().
@@ -217,11 +217,11 @@ public class LocalNotificationsManager
 		}
 		else
 		{
-//			if ( notification.getScheduled() )
-//			{
-//				Log.e("@@MoSync","maNotificationLocalSchedule was already called.");
-//				return MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
-//			}
+			if ( notification.getScheduled() )
+			{
+				Log.e("@@MoSync","maNotificationLocalSchedule was already called.");
+				return MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
+			}
 			notification.setScheduled(true);
 
 		    TimerTask timerTask = new TimerTask()
@@ -264,11 +264,11 @@ public class LocalNotificationsManager
 		}
 		else
 		{
-//			if ( !notification.getScheduled() )
-//			{
-//				Log.e("@@MoSync","maNotificationLocalUnschedule: failed because notification was not scheduled.");
-//				return MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE;
-//			}
+			if ( !notification.getScheduled() )
+			{
+				Log.e("@@MoSync","maNotificationLocalUnschedule: failed because notification was not scheduled.");
+				return MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE;
+			}
 			notification.setScheduled(false);
 
 			// Remove the service notification if it is pending.

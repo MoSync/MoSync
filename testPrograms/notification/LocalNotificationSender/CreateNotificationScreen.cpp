@@ -362,8 +362,7 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			if ( mFlash->isChecked() )
 			{
 				// Check if flashing LED is possible on the device.
-//				if ( MA_NOTIFICATION_RES_OK == notification->setFlashLights(true) )
-				if ( notification->setFlashLights(true) )
+				if ( MA_NOTIFICATION_RES_OK == notification->setFlashLights(true) )
 				{
 					mFlashColor->setText("IS available");
 					if ( checkFlashPattern() )

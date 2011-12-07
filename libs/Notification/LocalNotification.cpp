@@ -79,6 +79,8 @@ namespace Notification
      * was invalid.
      * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value
      * was invalid.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
      */
     int LocalNotification::setProperty(
         const MAUtil::String& property,
@@ -101,6 +103,8 @@ namespace Notification
      * was invalid.
      * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value
      *  was invalid.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
      */
     int LocalNotification::setPropertyInt(
         const MAUtil::String& property,
@@ -214,10 +218,16 @@ namespace Notification
      * Platform: iOS.
      * @param badgeNumber The number that will be displayed on the
      * application's icon badge. Must be a positive value.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
      */
-    void LocalNotification::setBadgeNumber(const int badgeNumber)
+    int LocalNotification::setBadgeNumber(const int badgeNumber)
     {
-        this->setPropertyInt(MA_NOTIFICATION_LOCAL_BADGE_NUMBER, badgeNumber);
+        return this->setPropertyInt(MA_NOTIFICATION_LOCAL_BADGE_NUMBER, badgeNumber);
     }
 
     /**
@@ -233,10 +243,14 @@ namespace Notification
     /**
      * Set the message displayed in the notification alert.
      * @param text The given text that will be displayed in notification.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
      */
-    void LocalNotification::setContentBody(const MAUtil::String& text)
+    int LocalNotification::setContentBody(const MAUtil::String& text)
     {
-        this->setProperty(MA_NOTIFICATION_LOCAL_CONTENT_BODY, text);
+        return this->setProperty(MA_NOTIFICATION_LOCAL_CONTENT_BODY, text);
     }
 
     /**
@@ -252,10 +266,16 @@ namespace Notification
      * Set the title that goes in the expanded entry of the notification.
      * Platform: Android.
      * @param text The given text that will be displayed in the notification.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
      */
-    void LocalNotification::setContentTitle(const MAUtil::String text)
+    int LocalNotification::setContentTitle(const MAUtil::String text)
     {
-		this->setProperty(MA_NOTIFICATION_LOCAL_CONTENT_TITLE, text);
+		return this->setProperty(MA_NOTIFICATION_LOCAL_CONTENT_TITLE, text);
     }
 
     /**
@@ -272,10 +292,16 @@ namespace Notification
      * Set the title of the action button or slider.
      * Platform: iOS.
      * @param alertAction The given title.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
      */
-    void LocalNotification::setAlertAction(const MAUtil::String& alertAction)
+    int LocalNotification::setAlertAction(const MAUtil::String& alertAction)
     {
-        this->setProperty(MA_NOTIFICATION_LOCAL_ALERT_ACTION, alertAction);
+        return this->setProperty(MA_NOTIFICATION_LOCAL_ALERT_ACTION, alertAction);
     }
 
     /**
@@ -293,10 +319,16 @@ namespace Notification
      * notification first activates.
      * Platform: Android.
      * @param text The text that flows by in the status bar.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
      */
-    void LocalNotification::setTickerText(const MAUtil::String text)
+    int LocalNotification::setTickerText(const MAUtil::String text)
     {
-		this->setProperty(MA_NOTIFICATION_LOCAL_TICKER_TEXT, text);
+		return this->setProperty(MA_NOTIFICATION_LOCAL_TICKER_TEXT, text);
     }
 
     /**
@@ -318,21 +350,33 @@ namespace Notification
      *  - #NOTIFICATION_FLAG_NO_CLEAR
      *  - #NOTIFICATION_FLAG_HIGH_PRIORITY
      *  - #NOTIFICATION_FLAG_AUTO_CANCEL
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
      */
-    void LocalNotification::setFlag(const int flag)
+    int LocalNotification::setFlag(const int flag)
     {
-		this->setPropertyInt(MA_NOTIFICATION_LOCAL_FLAG, flag);
+		return this->setPropertyInt(MA_NOTIFICATION_LOCAL_FLAG, flag);
     }
 
     /**
      * Enable/disable the sound played when an alert is displayed.
      * @param playSound If true the notification will play a sound when
      * it's shown.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
      */
-    void LocalNotification::setPlaySound(bool playSound)
+    int LocalNotification::setPlaySound(bool playSound)
     {
         MAUtil::String value = playSound ? "true" : "false";
-        this->setProperty(MA_NOTIFICATION_LOCAL_PLAY_SOUND, value);
+        return this->setProperty(MA_NOTIFICATION_LOCAL_PLAY_SOUND, value);
     }
 
     /**
@@ -351,12 +395,18 @@ namespace Notification
     /**
      * Set the sound to play when an alert is displayed.
      * Could be ignored if using setPlaySound(false).
-     * Plarform: Android.
+     * Platform: Android.
      * @param path A valid path to an audio file.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
      */
-    void LocalNotification::setSound(const MAUtil::String path)
+    int LocalNotification::setSound(const MAUtil::String path)
     {
-        this->setProperty(MA_NOTIFICATION_LOCAL_SOUND_PATH, path);
+        return this->setProperty(MA_NOTIFICATION_LOCAL_SOUND_PATH, path);
     }
 
     /**
@@ -368,12 +418,18 @@ namespace Notification
      * Platform: Android.
      * @param vibrate If true the user will be alerted with a vibration when
      * the local notification is shown.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
      */
-    void LocalNotification::setVibrate(bool vibrate)
+    int LocalNotification::setVibrate(bool vibrate)
     {
         MAUtil::String value = vibrate ? "true" : "false";
 
-        this->setProperty(MA_NOTIFICATION_LOCAL_VIBRATE, value);
+        return this->setProperty(MA_NOTIFICATION_LOCAL_VIBRATE, value);
     }
 
     /**
@@ -396,10 +452,16 @@ namespace Notification
      * Using phone vibration requires the VIBRATE permission.
      * Platform: Android.
      * @param duration The number of seconds to vibrate.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
      */
-    void LocalNotification::setVibrateDuration(const int duration)
+    int LocalNotification::setVibrateDuration(const int duration)
     {
-		this->setPropertyInt(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, duration * 1000);
+		return this->setPropertyInt(MA_NOTIFICATION_LOCAL_VIBRATE_DURATION, duration * 1000);
     }
 
     /**
@@ -412,10 +474,14 @@ namespace Notification
      * @param flashing If set to true the user will be alerted by the default
      * light pattern.
      * @return One of the following result codes:
-     *  -  MA_NOTIFICATION_RES_ERROR if the current device doesn't support flashing LED.
-     *  -  MA_NOTIFICATION_RES_OK.
+     * - #MA_NOTIFICATION_RES_ERROR if the current device doesn't support flashing LED.
+     * - #MA_NOTIFICATION_RES_OK.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
      */
-    bool LocalNotification::setFlashLights(bool flashing)
+    int LocalNotification::setFlashLights(bool flashing)
     {
 
         MAUtil::String value = flashing ? "true" : "false";
@@ -424,32 +490,43 @@ namespace Notification
 
     /**
      * Define your own color and pattern for the lights.
-     * Not every color in the spectrum is supported by the device LEDs, and not
-     * every device supports the same  colors, so the hardware estimates to the
-     * best of its ability. Green is the most common notification color.
+     * Not every color in the spectrum is supported by the device LEDs, and not every
+     * device supports the same  colors, so the hardware estimates to the best of its
+     * ability. Green is the most common notification color.
      * Also, not all Android devices support this feature.
      * Platform: Android.
      * @param lightPattern a NotificationFlashLights struct.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
      */
-    void LocalNotification::setFlashLightsPattern(
+    int LocalNotification::setFlashLightsPattern(
         const NotificationFlashLights lightPattern)
     {
 		MAUtil::String pattern = "";
 		pattern = MAUtil::integerToString(lightPattern.ledARGB) + ",";
 		pattern += MAUtil::integerToString(lightPattern.ledOnMS * 1000) + ",";
 		pattern += MAUtil::integerToString(lightPattern.ledOffMS * 1000);
-        this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, pattern);
+
+        return this->setProperty(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS_PATTERN, pattern);
     }
 
     /**
      * Set the date and time when the system should deliver the notification.
      * @param tm A date and time struct that specifies when the system
      * should deliver the notification.
+     * @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was
+     *  scheduled, and it cannot be altered anymore.
      */
-    void LocalNotification::setFireDate(struct tm* time)
+    int LocalNotification::setFireDate(struct tm* time)
     {
         int dateSec = mktime(time);
-        this->setPropertyInt(MA_NOTIFICATION_LOCAL_FIRE_DATE, dateSec);
+        return this->setPropertyInt(MA_NOTIFICATION_LOCAL_FIRE_DATE, dateSec);
     }
 
     /**

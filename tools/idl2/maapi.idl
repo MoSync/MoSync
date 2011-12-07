@@ -8941,19 +8941,19 @@ group NotificationAPI "Notification API" {
 			INVALID_HANDLE = -1;
 
 			/**
-			* @brief Indicates that the call to maNotificationSetProperty or maNotificationGetProperty received
+			* @brief Indicates that the call to maNotificationLocalSetProperty or maNotificationLocalGetProperty received
 			* an invalid property name.
 			*/
 			INVALID_PROPERTY_NAME = -3;
 
 			/**
-			* @brief Indicates that the call to maNotificationSetProperty or maNotificationGetProperty received
+			* @brief Indicates that the call to maNotificationLocalSetProperty or maNotificationLocalGetProperty received
 			* an invalid property value.
 			*/
 			INVALID_PROPERTY_VALUE = -4;
 
 			/**
-			* @brief Indicates that the call to maNotificationGetProperty or maNotificationPushGetData needs a larger buffer.
+			* @brief Indicates that the call to maNotificationLocalGetProperty or maNotificationPushGetData needs a larger buffer.
 			*/
 			INVALID_STRING_BUFFER_SIZE = -5;
 
@@ -8963,22 +8963,35 @@ group NotificationAPI "Notification API" {
 			UNSUPPORTED = -6;
 
 			/**
+			* @brief Indicates that maNotficationLocalSetProperty cannot be called after scheduling via
+			* maNotificationLocalSchedule, or that the call to maNotificationLocalSchedule failed because
+			* the notification was already scheduled.
+			*/
+			ALREADY_SCHEDULED = -7;
+
+			/**
+			* @brief Indicates that the call to maNotificationLocalUnschedule failed because the notification
+			* was not scheduled.
+			*/
+			CANNOT_UNSCHEDULE = -8;
+
+			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccessful because
 			* the application is already registered for receiving push notification.
 			*/
-			ALREADY_REGISTERED = -7;
+			ALREADY_REGISTERED = -9;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushUnregister was unsuccessful because
 			* the application is not registered for receiving push notification.
 			*/
-			NOT_REGISTERED = -8;
+			NOT_REGISTERED = -10;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccessful because
 			* the application did not finish processing a previous registration request.
 			*/
-			REGISTRATION_IN_PROGRESS = -9;
+			REGISTRATION_IN_PROGRESS = -11;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the
@@ -8986,7 +8999,7 @@ group NotificationAPI "Notification API" {
 			* The application should use exponential back off and retry.
 			* Platform: Android only.
 			*/
-			REGISTRATION_SERVICE_NOT_AVAILABLE = -10;
+			REGISTRATION_SERVICE_NOT_AVAILABLE = -12;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because there is no
@@ -8994,14 +9007,14 @@ group NotificationAPI "Notification API" {
 			* The application should ask the user to open the account manager and add a Google account.
 			* Platform: Android only.
 			*/
-			REGISTRATION_ACCOUNT_MISSING = -11;
+			REGISTRATION_ACCOUNT_MISSING = -13;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the password was bad.
 			* The application should ask the user to enter his/her password, and let user retry manually later.
 			* Platform: Android only.
 			*/
-			REGISTRATION_AUTHENTICATION_FAILED = -12;
+			REGISTRATION_AUTHENTICATION_FAILED = -14;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the user has too many
@@ -9009,36 +9022,36 @@ group NotificationAPI "Notification API" {
 			* The application should tell the user to uninstall some other applications, let user retry manually.
 			* Platform: Android only.
 			*/
-			REGISTRATION_TOO_MANY_REGISTRATIONS = -13;
+			REGISTRATION_TOO_MANY_REGISTRATIONS = -15;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushRegister was unsuccesfull because the sender account
 			* is not recognized.
 			* Platform: Android only.
 			*/
-			REGISTRATION_INVALID_SENDER = -14;
+			REGISTRATION_INVALID_SENDER = -16;
 
 			/**
 			* @brief  Indicates that the call to maNotificationPushRegister was unsuccesfull because of incorrect
 			* phone registration with Google. This phone doesn't currently support C2DM.
 			* Platform: Android only.
 			*/
-			REGISTRATION_PHONE_REGISTRATION_ERROR = -15;
+			REGISTRATION_PHONE_REGISTRATION_ERROR = -17;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushGetRegistration needs a larger buffer.
 			*/
-			REGISTRATION_MESSAGE_BUF_TOO_SMALL = -16;
+			REGISTRATION_MESSAGE_BUF_TOO_SMALL = -18;
 
 			/**
 			* @brief Indicates that the call to maNotificationPushGetRegistration occured before trying to register.
 			*/
-			REGISTRATION_NOT_CALLED = -17;
+			REGISTRATION_NOT_CALLED = -19;
 
 			/**
 			* @brief Indicates that the call to an notification syscall was unsuccessful.
 			*/
-			ERROR = -18;
+			ERROR = -20;
 		}
 	} // end of Notification Result Codes
 
@@ -9383,6 +9396,7 @@ group NotificationAPI "Notification API" {
 		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
 		* - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name is not valid.
 		* - #MA_NOTIFICATION_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+		* - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification is scheduled.
 		*/
 		int maNotificationLocalSetProperty(in MAHandle notificationHandle, in MAString property, in MAString value);
 
@@ -9411,6 +9425,7 @@ group NotificationAPI "Notification API" {
 		* \returns One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
 		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_ALREADY_SCHEDULED if the notification was already scheduled.
 		*/
 		int maNotificationLocalSchedule(in MAHandle notificationHandle);
 
@@ -9424,6 +9439,7 @@ group NotificationAPI "Notification API" {
 		* \returns One of the next constants:
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
 		* - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+		* - #MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE if the notification was not scheduled.
 		*/
 		int maNotificationLocalUnschedule(in MAHandle notificationHandle);
 
