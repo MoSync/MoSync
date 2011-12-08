@@ -203,14 +203,12 @@ void CreateNotificationScreen::createMainLayout()
 	// ================ Play sound =====================
 	mPlaySound = new CheckBox();
 	listView->addChild(createListViewItem(PLAY_SOUND_LABEL_TEXT, mPlaySound));
-	printf("after play sound");
 
 	if ( isAndroid() )
 	{
 		// ================ Sound path=====================
 		mSoundPath = new EditBox();
 		listView->addChild(createListViewItem(SOUND_PATH_LABEL_TEXT, mSoundPath));
-		printf("after create sound path");
 
 		// ================ Vibrate =====================
 		mVibrate = new CheckBox();
@@ -231,7 +229,7 @@ void CreateNotificationScreen::createMainLayout()
 		listView->addChild(createListViewItem(FLASH_ON_LABEL_TEXT, mFlashOnLength));
 		mFlashOffLength = new EditBox();
 		mFlashOffLength->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
-		listItem->addChild(createListViewItem(FLASH_OFF_LABEL_TEXT, mFlashOffLength));
+		listView->addChild(createListViewItem(FLASH_OFF_LABEL_TEXT, mFlashOffLength));
 	}
 
 	// ================ Fire time =====================
@@ -313,6 +311,7 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 		}
 
 		LocalNotification* notification = new LocalNotification();
+
 		mLocalNotificationVector.add(notification);
 
 		// Set fire date.
@@ -363,17 +362,18 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			if ( mFlash->isChecked() )
 			{
 				// Check if flashing LED is possible on the device.
+//				if ( MA_NOTIFICATION_RES_OK == notification->setFlashLights(true) )
 				if ( notification->setFlashLights(true) )
 				{
 					mFlashColor->setText("IS available");
-						if ( checkFlashPattern() )
-						{
-							struct NotificationFlashLights pattern = NotificationFlashLights(
-										MAUtil::stringToInteger(mFlashColor->getText()),
-										MAUtil::stringToInteger(mFlashOnLength->getText()),
-										MAUtil::stringToInteger(mFlashOffLength->getText()));
-							notification->setFlashLightsPattern(pattern);
-						}
+					if ( checkFlashPattern() )
+					{
+						struct NotificationFlashLights pattern = NotificationFlashLights(
+									MAUtil::stringToInteger(mFlashColor->getText()),
+									MAUtil::stringToInteger(mFlashOnLength->getText()),
+									MAUtil::stringToInteger(mFlashOffLength->getText()));
+						notification->setFlashLightsPattern(pattern);
+					}
 				}
 				else
 				{
@@ -397,8 +397,9 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			}
 		}
 
+//		notification->setFlag(NOTIFICATION_FLAG_AUTO_CANCEL);
 		NotificationManager::getInstance()->scheduleLocalNotification(notification);
-		printf("notification created");
+		printf("notification created with handle = %d ", notification->getHandle());
 		this->resetView();
 	}
 }
