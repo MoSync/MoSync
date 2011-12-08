@@ -18,6 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stack>
 #include <sstream>
 #include <string>
+#include <stdio.h>
 #include "XMLWriter.h"
 
 using namespace std;
