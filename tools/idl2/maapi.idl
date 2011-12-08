@@ -8313,16 +8313,22 @@ group NFCAPI "NFC API" {
 
 		/**
 		 * @copydoc maDBExecSQL()
+		 *
 		 * @param params Array of values to bind to parameters.
-		 * Parameters are specified by question marks (?)
-		 * in the SQL statement.
+		 * Parameters are specified by question marks (?) in the SQL statement.
 		 *
-		 * If this function returns a cursor,
-		 * any text or blob values being pointed to by elements of the array must remain valid until
-		 * the cursor has been destroyed by maDBCursorDestroy().
-		 * The array itself does not need to remain valid after this function returns.
+		 * If this function returns a cursor, any text or blob values being
+		 * pointed to by elements of the array must remain valid until the
+		 * cursor has been destroyed by maDBCursorDestroy().
 		 *
-		 * @param paramCount Number of elements in the array pointed to by \a params.
+		 * The array itself does not need to remain valid after this
+		 * function returns.
+		 *
+		 * @param paramCount Number of elements in the array pointed to
+		 * by \a params.
+		 *
+		 * This function is currently available on iOS and MoRE
+		 * (not on Android).
 		 */
 		MAHandle maDBExecSQLParams(in MAHandle databaseHandle, in MAString sql,
 			in MADBValue params, in int paramCount);
