@@ -59,6 +59,9 @@ public abstract class C2DMBaseReceiver extends IntentService
 	// Wakelock
 	private static final String WAKELOCK_KEY = "C2DM_LIB";
 
+	// Registration back off time. If the registration is unsuccessful due to SERVICE_NOT_AVAILABLE, try again.
+	private static final int BACKOFF_RETRY_WAIT_TIME = 2;
+
 	private static PowerManager.WakeLock mWakeLock;
 	private final String senderId;
 
@@ -162,7 +165,8 @@ public abstract class C2DMBaseReceiver extends IntentService
 			// Send unregistered event.
 			onUnregistered(context);
 			return;
-		} else if (error != null)
+		}
+		if (error != null)
 		{
 			// we are not registered, can try again
 			// Registration failed.
@@ -178,13 +182,13 @@ public abstract class C2DMBaseReceiver extends IntentService
 						.getBroadcast(context, 0 /* requestCode */, retryIntent,
 								0 /* flags */);
 
-				AlarmManager am = (AlarmManager) context
+				AlarmManager alarmManager = (AlarmManager) context
 						.getSystemService(Context.ALARM_SERVICE);
-				am.set(AlarmManager.ELAPSED_REALTIME, backoffTimeMs,
+				alarmManager.set(AlarmManager.ELAPSED_REALTIME, backoffTimeMs,
 						retryPIntent);
 
 				// Next retry should wait longer.
-				backoffTimeMs *= 2;
+				backoffTimeMs *= BACKOFF_RETRY_WAIT_TIME;
 				C2DMessaging.setBackoff(context, backoffTimeMs);
 			}
 		} else {
