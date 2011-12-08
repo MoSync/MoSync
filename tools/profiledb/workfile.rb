@@ -5,6 +5,7 @@ require File.expand_path('../../rules/native_mosync.rb')
 work = MoSyncExe.new
 work.instance_eval do
         @SOURCES = ["."]
+        @EXTRA_INCLUDES = ["../../intlibs"]
         @LOCAL_LIBS = ["filelist", "profiledb"]
 
         @NAME = "profiledb"

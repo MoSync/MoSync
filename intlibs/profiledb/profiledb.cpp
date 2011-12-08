@@ -26,7 +26,7 @@
 #include <expat.h>
 #include <stdio.h>
 #include <string.h>
-#include "File.h"
+#include "filelist/File.h"
 #include "profiledb.h"
 #include "XMLWriter.h"
 

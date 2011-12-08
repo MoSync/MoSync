@@ -17,7 +17,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include <string>
 #include "xlstcomp.h"
-#include "File.h"
+#include "filelist/File.h"
 
 #define LST_EXT "lst"
 #define LSTX_EXT "lstx"
