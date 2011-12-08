@@ -23,7 +23,7 @@
 #include <set>
 #include <string>
 #include <sstream>
-#include "filelist/File.h"
+#include "File.h"
 #include "XMLWriter.h"
 
 using namespace std;

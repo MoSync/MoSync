@@ -26,7 +26,7 @@
 #include <expat.h>
 #include <stdio.h>
 #include <string.h>
-#include "filelist/File.h"
+#include "File.h"
 #include "profiledb.h"
 #include "XMLWriter.h"
 
@@ -531,8 +531,9 @@ bool ProfileDB::internalMatchProfile(Profile* profile,
 				capability->getName());
 		CapabilityState matchedState = matchedCapability.getState();
 		Fragmentation fragmentation = matchedCapability.getFragmentation();
+		string valueStr = matchedCapability.getValue();
 		bool fragmented = fragmentation == BUILDTIME && (matchedState == NOT_IMPLEMENTED || matchedState == UNSUPPORTED);
-		matchToken.append(fragmented ? "+" : "-");
+		matchToken.append(fragmented ? (valueStr + "+") : "-");
 	}
 	return match;
 }

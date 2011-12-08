@@ -19,7 +19,6 @@ work.instance_eval do
 		error "Unsupported platform"
 	end
 	@EXTRA_SOURCEFILES << 'copyfiles.cpp'
-    @EXTRA_SOURCEFILES << 'File.cpp'
 	@EXTRA_INCLUDES = [".."]
 	@NAME = "filelist"
 end
