@@ -6,11 +6,12 @@ work = MoSyncExe.new
 work.instance_eval do
         @SOURCES = ["."]
         @LOCAL_LIBS = ["filelist"]
-        if ( HOST == :darwin )
-                # Objective-C++ compiler
-                @EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-prototypes"
-        end
+    #if ( HOST == :darwin )
+    #           # Objective-C++ compiler
+    #           @EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-prototypes"
+    #   end
 
+        @EXTRA_CPPFLAGS = " -Wno-error"
         @NAME = "rescomp"
         if(HOST==:linux || HOST==:darwin)
                 @IGNORED_FILES = ["WinmobileInjector.cpp", "ErrorCheck.cpp", "IconFileLoader.cpp"]
