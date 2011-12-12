@@ -1,0 +1,6 @@
+.res LOCAL_FILES_BIN
+.ubin
+.include "LocalFiles.bin"
+.res BEEP_WAV
+.media "audio/x-wav", "beep.wav"
+.eof

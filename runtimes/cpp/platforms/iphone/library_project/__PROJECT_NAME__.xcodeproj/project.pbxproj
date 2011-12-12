@@ -8,11 +8,13 @@
 
 /* Begin PBXBuildFile section */
 		0B10E94A14065AE600B6DA6B /* MessageUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0B10E94914065AE600B6DA6B /* MessageUI.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		4180481C147E91DC0048FB95 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4180481B147E91DC0048FB95 /* SystemConfiguration.framework */; };
 		41EB0400146A6A410088E3A4 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41EB03FF146A6A410088E3A4 /* libsqlite3.dylib */; };
 		431869BF13F691E50051D97A /* CoreMotion.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869BE13F691E50051D97A /* CoreMotion.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		431869C913F69ECA0051D97A /* EventKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 431869C813F69ECA0051D97A /* EventKit.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		4370369E13E9487D00F22783 /* AddressBook.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4370369D13E9487D00F22783 /* AddressBook.framework */; };
 		43B44A0613F94480001F2492 /* MediaPlayer.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43B44A0513F94480001F2492 /* MediaPlayer.framework */; };
+		43CE0BFF1463EEA400F8FFC3 /* iAd.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43CE0BFE1463EEA400F8FFC3 /* iAd.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
 		85796C5512719251002B7859 /* Icon-72.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5312719251002B7859 /* Icon-72.png */; };
 		85796C5612719251002B7859 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 85796C5412719251002B7859 /* Icon.png */; };
 		858B401012E67D8D0058DBFC /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 858B400F12E67D8D0058DBFC /* OpenGLES.framework */; };
@@ -42,11 +44,13 @@
 		28D7ACF60DDB3853001CB0EB /* MoSyncViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSyncViewController.h; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
+		4180481B147E91DC0048FB95 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		41EB03FF146A6A410088E3A4 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = usr/lib/libsqlite3.dylib; sourceTree = SDKROOT; };
 		431869BE13F691E50051D97A /* CoreMotion.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreMotion.framework; path = System/Library/Frameworks/CoreMotion.framework; sourceTree = SDKROOT; };
 		431869C813F69ECA0051D97A /* EventKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = EventKit.framework; path = System/Library/Frameworks/EventKit.framework; sourceTree = SDKROOT; };
 		4370369D13E9487D00F22783 /* AddressBook.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AddressBook.framework; path = System/Library/Frameworks/AddressBook.framework; sourceTree = SDKROOT; };
 		43B44A0513F94480001F2492 /* MediaPlayer.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MediaPlayer.framework; path = System/Library/Frameworks/MediaPlayer.framework; sourceTree = SDKROOT; };
+		43CE0BFE1463EEA400F8FFC3 /* iAd.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = iAd.framework; path = System/Library/Frameworks/iAd.framework; sourceTree = SDKROOT; };
 		850943881185B35D004A3B2D /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = System/Library/Frameworks/AVFoundation.framework; sourceTree = SDKROOT; };
 		850944001185C440004A3B2D /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		8519011E1199B90400B71F58 /* data_section.bin */ = {isa = PBXFileReference; lastKnownFileType = archive.macbinary; path = data_section.bin; sourceTree = "<group>"; };
@@ -70,6 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43CE0BFF1463EEA400F8FFC3 /* iAd.framework in Frameworks */,
 				43B44A0613F94480001F2492 /* MediaPlayer.framework in Frameworks */,
 				431869C913F69ECA0051D97A /* EventKit.framework in Frameworks */,
 				431869BF13F691E50051D97A /* CoreMotion.framework in Frameworks */,
@@ -85,6 +90,7 @@
 				858B403E12E67F790058DBFC /* QuartzCore.framework in Frameworks */,
 				0B10E94A14065AE600B6DA6B /* MessageUI.framework in Frameworks */,
 				41EB0400146A6A410088E3A4 /* libsqlite3.dylib in Frameworks */,
+				4180481C147E91DC0048FB95 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -121,6 +127,7 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				41EB03FF146A6A410088E3A4 /* libsqlite3.dylib */,
+				4180481B147E91DC0048FB95 /* SystemConfiguration.framework */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -149,6 +156,7 @@
 		29B97323FDCFA39411CA2CEA /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				43CE0BFE1463EEA400F8FFC3 /* iAd.framework */,
 				43B44A0513F94480001F2492 /* MediaPlayer.framework */,
 				431869C813F69ECA0051D97A /* EventKit.framework */,
 				431869BE13F691E50051D97A /* CoreMotion.framework */,

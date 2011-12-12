@@ -31,11 +31,11 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
 /**
  * A screen widget that represents the root of a widget
  * tree.
- * 
+ *
  * Note: For now a screen widget is just a wrapper to a view
  * like all other widgets, but by default it fills the whole
  * screen.
- * 
+ *
  * @author fmattias
  */
 public class ScreenWidget extends Layout
@@ -44,20 +44,25 @@ public class ScreenWidget extends Layout
 	 * Title of this screen.
 	 */
 	private String m_title = "";
-	
+
 	/**
 	 * Icon of this screen.
 	 */
 	private Drawable m_icon = null;
-	
+
 	/**
 	 * Listener for when the title changes.
 	 */
 	private TitleChangedListener m_titleChangedListener = null;
-	
+
+	/**
+	 * Listener for when the icon changes.
+	 */
+	private IconChangedListener m_iconChangedListener = null;
+
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param handle handle Integer handle corresponding to this instance.
 	 * @param view A screen wrapped by this widget.
 	 */
@@ -74,7 +79,7 @@ public class ScreenWidget extends Layout
 		{
 			return true;
 		}
-		
+
 		if( property.equals( IX_WIDGET.MAW_SCREEN_TITLE ) )
 		{
 			m_title = value;
@@ -90,6 +95,10 @@ public class ScreenWidget extends Layout
 			if( icon != null )
 			{
 				m_icon = new BitmapDrawable( NativeUI.getBitmap( imageHandle ) );
+				if ( m_iconChangedListener != null )
+				{
+					m_iconChangedListener.iconChanged( this, m_icon);
+				}
 			}
 			else
 			{
@@ -100,10 +109,10 @@ public class ScreenWidget extends Layout
 		{
 			return false;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * @see Layout.updateLayoutParams.
 	 */
@@ -112,53 +121,75 @@ public class ScreenWidget extends Layout
 	{
 		return new android.widget.FrameLayout.LayoutParams( mosyncLayoutParams.getWidth( ) , mosyncLayoutParams.getHeight( ) );
 	}
-	
+
 	/**
 	 * Returns the title of this screen.
-	 * 
+	 *
 	 * @return the title of this screen.
 	 */
 	public String getTitle()
 	{
 		return m_title;
 	}
-	
+
 	/**
 	 * Returns the icon of this screen.
-	 * 
+	 *
 	 * @return the icon of this screen.
 	 */
 	public Drawable getIcon()
 	{
 		return m_icon;
 	}
-	
+
 	/**
 	 * Sets a listener that is called when the title
 	 * of the screen has changed.
-	 * 
+	 *
 	 * @param titleChangedListener A listener for title changes.
 	 */
 	public void setTitleChangedListener(TitleChangedListener titleChangedListener)
 	{
 		m_titleChangedListener = titleChangedListener;
 	}
-	
+
+	public void setIconChangedListener(IconChangedListener iconChangedListener)
+	{
+		m_iconChangedListener = iconChangedListener;
+	}
 	/**
 	 * A listener class for when the title of a screen changes,
 	 * so that the for example the tab screen has a chance
 	 * to update its tab title.
-	 * 
+	 *
 	 * @author fmattias
 	 */
 	public interface TitleChangedListener
 	{
 		/**
 		 * Called when a title of the screen has changed.
-		 * 
+		 *
 		 * @param screen The screen whose title has changed.
 		 * @param newTitle The new title of the screen.
 		 */
 		void titleChanged(ScreenWidget screen, String newTitle);
+	}
+
+	/**
+	 * A listener class for when the icon of a screen changes,
+	 * so that the for example the tab screen has a chance
+	 * to update its icon in the tab indicator.
+	 *
+	 * @author emma
+	 */
+	public interface IconChangedListener
+	{
+		/**
+		 * Called when a icon of the screen has changed.
+		 *
+		 * @param screen The screen whose icon has changed.
+		 * @param newIcon The new icon of the screen.
+		 */
+		void iconChanged(ScreenWidget screen, Drawable newIcon);
 	}
 }

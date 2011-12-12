@@ -83,6 +83,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.opengl.GLUtils;
 import android.os.Build;
@@ -96,6 +97,8 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.provider.Settings.Secure;
+import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.nfc.MoSyncNFC;
@@ -158,6 +161,8 @@ public class MoSyncThread extends Thread
 	MoSyncSensor mMoSyncSensor;
 	MoSyncPIM mMoSyncPIM;
 	MoSyncNFC mMoSyncNFC;
+	MoSyncAds mMoSyncAds;
+	MoSyncNotifications mMoSyncNotifications;
 	MoSyncDB mMoSyncDB;
 
 	static final String PROGRAM_FILE = "program.mp3";
@@ -271,6 +276,12 @@ public class MoSyncThread extends Thread
 	private final Rect mMaDrawImageRegionTempSourceRect = new Rect();
 	private final Rect mMaDrawImageRegionTempDestRect = new Rect();
 
+
+	/**
+	 * An Instance of Connectivity Manager used for detecting connection type
+	 */
+	private ConnectivityManager mConnectivityManager;
+
 	int mMaxStoreId = 0;
 
 	public boolean mIsUpdatingScreen = false;
@@ -369,7 +380,11 @@ public class MoSyncThread extends Thread
 			mMoSyncNFC = null;
 		}
 
+		mMoSyncAds = new MoSyncAds(this);
+		mMoSyncNotifications = new MoSyncNotifications(this);
 		mMoSyncDB = new MoSyncDB();
+
+		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
 
 		nativeInitRuntime();
 	}
@@ -699,7 +714,7 @@ public class MoSyncThread extends Thread
 	 * @return ByteBuffer with the data.
 	 * @throws Exception
 	 */
-	public ByteBuffer readInputStream(InputStream is) throws Exception
+	public synchronized ByteBuffer readInputStream(InputStream is) throws Exception
 	{
 		ReadableByteChannel byteChannel = Channels.newChannel(is);
 		ByteBuffer byteBuffer = ByteBuffer.allocateDirect(CHUNK_READ_SIZE);
@@ -781,7 +796,7 @@ public class MoSyncThread extends Thread
 	 *
 	 * @return	The created Bitmap, null if it failed
 	 */
-	Bitmap decodeImageFromData(final byte[] data, final BitmapFactory.Options options)
+	synchronized Bitmap decodeImageFromData(final byte[] data, final BitmapFactory.Options options)
 	{
 		try
 		{
@@ -830,7 +845,7 @@ public class MoSyncThread extends Thread
 	 *
 	 * @return	The created Bitmap, null if it failed
 	 */
-	Bitmap createBitmap(final int width, final int height)
+	synchronized Bitmap createBitmap(final int width, final int height)
 	{
 		try
 		{
@@ -863,7 +878,7 @@ public class MoSyncThread extends Thread
 	 *
 	 * @return	The created Bitmap, null if it failed
 	 */
-	Bitmap createBitmapFromData(final int width, final int height, final int[] pixels)
+	synchronized Bitmap createBitmapFromData(final int width, final int height, final int[] pixels)
 	{
 		try
 		{
@@ -2018,7 +2033,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * maOpenStore
 	 */
-	int maOpenStore(String name, int flags)
+	synchronized int maOpenStore(String name, int flags)
 	{
 		SYSLOG("maOpenStore");
 
@@ -2064,7 +2079,7 @@ public class MoSyncThread extends Thread
 	/**
 	 * maWriteStore
 	 */
-	int maWriteStore(int store, int data)
+	synchronized int maWriteStore(int store, int data)
 	{
 		SYSLOG("maWriteStore");
 		try
@@ -2124,7 +2139,7 @@ public class MoSyncThread extends Thread
 	 * _maReadStore
 	 * @return RES_OUT_OF_MEMORY on error.
 	 */
-	int _maReadStore(int store, int resourceIndex)
+	synchronized int _maReadStore(int store, int resourceIndex)
 	{
 		SYSLOG("_maReadStore");
 
@@ -2240,7 +2255,7 @@ public class MoSyncThread extends Thread
 		}
 		catch (InterruptedException ie)
 		{
-			SYSLOG("Sleeping thread interrupted!");
+			SYSLOG("Sleeping thread interrupted (this is normal behaviour)");
 		}
 		// TODO: This exception is never thrown! Remove it.
 		catch (Exception e)
@@ -2448,6 +2463,23 @@ public class MoSyncThread extends Thread
 		{
 			property = Build.FINGERPRINT;
 		}
+		else if(key.equals("mosync.device.name"))
+		{
+			property = Build.DEVICE;
+		}
+		else if(key.equals("mosync.device.UUID"))
+		{
+			property = Secure.getString( mContext.getContentResolver(),
+					Secure.ANDROID_ID);
+		}
+		else if(key.equals("mosync.device.OS"))
+		{
+			property = "Android";
+		}
+		else if(key.equals("mosync.device.OS.version"))
+		{
+			property = Build.VERSION.RELEASE;
+		}
 		else if (key.equals("mosync.path.local"))
 		{
 			String path = getActivity().getFilesDir().getAbsolutePath() + "/";
@@ -2464,6 +2496,12 @@ public class MoSyncThread extends Thread
 				getActivity().getFilesDir().getAbsolutePath() + "/";
 			//Log.i("@@@ MoSync", "Property mosync.path.local.url: " + url);
 			property = url;
+		}
+		else if (key.equals("mosync.network.type"))
+		{
+			//get the connection that we are using right now
+			NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
+			property = getNetworkNameFromInfo(info);
 		}
 
 		if (null == property) { return -2; }
@@ -2493,6 +2531,39 @@ public class MoSyncThread extends Thread
 		slicedBuffer.put((byte)0);
 
 		return property.length() + 1;
+	}
+
+	/**
+	 * converts the network information into a single string indicating
+	 * the type of the network.
+	 *
+	 * @param info NetowrkInformation obtained from a ConnectivityManager instance
+	 * @return a String indicating the type of the connection, for Mobile networks
+	 * it returns the exact type of mobile network, e.g. GSM, GPRS, or HSDPA...
+	 * The result might contain the full name and version of the mobiel network type
+	 */
+	private String getNetworkNameFromInfo(NetworkInfo info)
+	{
+	       if (info != null) {
+	            String type = info.getTypeName();
+	            if(type == null)
+	            {
+					return "unknown";
+	            }
+	            else if (type.toLowerCase().equals("mobile"))
+	            {
+					//return a generic default
+					return "mobile";
+	            }
+	            else
+	            {
+					return "wifi";
+	            }
+	        }
+	        else
+	        {
+				return "none";
+	        }
 	}
 
 	/**
@@ -2857,8 +2928,46 @@ public class MoSyncThread extends Thread
 		return mMoSyncNativeUI.maOptionsBox(title, destructiveButtonTitle, cancelButtonTitle, buffPointer, buffSize);
 	}
 
+	int maAdsBannerCreate(final int bannerSize, final String publisherID)
+	{
+		return mMoSyncAds.maAdsBannerCreate(bannerSize, publisherID);
+	}
+
+	int maAdsAddBannerToLayout(int bannerHandle, int layoutHandle)
+	{
+		return mMoSyncAds.maAdsAddBannerToLayout(bannerHandle, layoutHandle, mMoSyncNativeUI.getWidget(layoutHandle));
+	}
+
+	int maAdsRemoveBannerFromLayout(int bannerHandle, int layoutHandle)
+	{
+		return mMoSyncAds.maAdsRemoveBannerFromLayout(bannerHandle, layoutHandle, mMoSyncNativeUI.getWidget(layoutHandle));
+	}
+
+	int maAdsBannerDestroy(int bannerHandle)
+	{
+		return mMoSyncAds.maAdsBannerDestroy(bannerHandle);
+	}
+
+	int maAdsBannerSetProperty(
+		final int adHandle,
+		final String key,
+		final String value)
+	{
+		return mMoSyncAds.maAdsBannerSetProperty(adHandle, key, value);
+	}
+
+	int maAdsBannerGetProperty(
+		final int adHandle,
+		final String key,
+		final int memBuffer,
+		final int memBufferSize)
+	{
+		return mMoSyncAds.maAdsBannerGetProperty(adHandle, key, memBuffer, memBufferSize);
+	}
+
 	/**
 	 * Display a notification.
+	 * @deprecated use maNotificationCreate() instead.
 	 * @param type
 	 * @param id
 	 * @param title
@@ -2890,6 +2999,7 @@ public class MoSyncThread extends Thread
 	 * Depending of whether this is a NOTIFICATION_TYPE_APPLICATION_LAUNCHER
 	 * or a regular notification we either stop the service or remove the
 	 * notification.
+	 * @deprecated use maNotificationDestroy() instead.
 	 * @param notificationId
 	 * @return
 	 */
@@ -2913,6 +3023,171 @@ public class MoSyncThread extends Thread
 		// TODO: Implement case for regular notifications.
 
 		return -1;
+	}
+
+	/**
+	 * Create a local notification.
+	 * @return a handle to a new local notification object, or
+	 * MA_NOTIFICATION_RES_UNSUPPORTED if the notifications are not supported on current system..
+	 */
+	int maNotificationLocalCreate()
+	{
+		//Log.i("MoSync", "maNotificationLocalCreate");
+		return mMoSyncNotifications.maNotificationLocalCreate(mContext);
+	}
+
+	/**
+	 * Destroys a local notification object, and clears it from the notifications list.
+	 * @param handle Handle to a local notification object.
+	 * @return MA_NOTIFICATION_RES_OK, or MA_NOTIFICATION_RES_INVALID_HANDLE.
+	 */
+	int maNotificationLocalDestroy(int handle)
+	{
+		return mMoSyncNotifications.maNotificationLocalDestroy(handle);
+	}
+
+	/**
+	 * Set a specific property on a notification.
+	 * @param handle Handle to a local notification object.
+	 * @param propertyName
+	 * @param propertyValue
+	 * @return
+	 */
+	int maNotificationLocalSetProperty(int handle, String propertyName, String propertyValue)
+	{
+		return mMoSyncNotifications.maNotificationLocalSetProperty(handle, propertyName, propertyValue);
+	}
+
+	/**
+	 * Get a specific property of a notification.
+	 * @param handle Handle to a local notification object.
+	 * @param propertyName
+	 * @param propertyValue
+	 * @return
+	 */
+	int maNotificationLocalGetProperty(int handle, String propertyName, int memBuffer, int memBufferSize)
+	{
+		return mMoSyncNotifications.maNotificationLocalGetProperty(handle, propertyName, memBuffer, memBufferSize);
+	}
+
+	/**
+	 * Schedules a local notification for delivery at its encapsulated date and time.
+	 * @param handle Handle to a local notification object.
+	 * @return MA_NOTIFICATION_RES_OK if no error occurred,
+	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid,
+	 * MA_NOTIFICATION_RES_ALREADY_SCHEDULED if it was already scheduled.
+	 */
+	int maNotificationLocalSchedule(int handle)
+	{
+		return mMoSyncNotifications.maNotificationLocalSchedule(handle, mContext.getApplicationContext());
+	}
+
+	/**
+	 * Cancels the delivery of the specified scheduled local notification.
+	 * @param handle Handle to a local notification object.
+	 * @return MA_NOTIFICATION_RES_OK if no error occurred,
+	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+	 * MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE if it wasn't scheduled before.
+	 */
+	int maNotificationLocalUnschedule(int handle)
+	{
+		return mMoSyncNotifications.maNotificationLocalUnschedule(handle);
+	}
+
+	/**
+	 * Registers the current application for receiving push notifications for C2DM server.
+	 * @param pushNotificationTypes ignored on Android.
+	 * @param accountID Is the ID of the account authorized to send messages to the application,
+	 * typically the email address of an account set up by the application's developer.
+	 * @return MA_NOTIFICATION_RES_OK if no error occurred.
+     * MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already registered for receiving push notifications.
+	 */
+	int maNotificationPushRegister(int pushNotificationTypes, String accountID)
+	{
+		Log.e("@@MoSync", "maNotificationPushRegister");
+
+		// Ignore the first param on Android.
+		return mMoSyncNotifications.maNotificationPushRegister(accountID);
+	}
+
+	/**
+	 * Unregister application for push notifications.
+	 * @return One of the next constants:
+	 * - MA_NOTIFICATION_RES_OK if no error occurred.
+	 * - MA_NOTIFICATION_NOT_REGISTERED if the application was not registered for receiving
+	 * push notification.
+	 */
+	int maNotificationPushUnregister()
+	{
+		return mMoSyncNotifications.maNotificationPushUnregister();
+	}
+
+	/**
+	 * Gets the latest registration response.
+	 * \param registrationMesssage The registrationID if the registration was successfull,
+	 * or the error messsage otherwise.
+	 * \return  One of the next constants:
+	 * - MA_NOTIFICATION_RES_OK if the application registered successfully.
+	 * - MA_NOTIFICATION_RES_REGISTRATION_SERVICE_NOT_AVAILABLE
+	 * - MA_NOTIFICATION_RES_REGISTRATION_ACCOUNT_MISSING
+	 * - MA_NOTIFICATION_RES_REGISTRATION_AUTHENTICATION_FAILED
+	 * - MA_NOTIFICATION_RES_REGISTRATION_TOO_MANY_REGISTRATIONS
+	 * - MA_NOTIFICATION_RES_REGISTRATION_INVALID_SENDER
+	 * - MA_NOTIFICATION_RES_REGISTRATION_PHONE_REGISTRATION_ERROR
+	 */
+	int maNotificationPushGetRegistration(int buf, int bufSize)
+	{
+		return mMoSyncNotifications.maNotificationPushGetRegistration(buf, bufSize);
+	}
+
+	/**
+	 * Get info about for a given push notification.
+	 * @param handle The push notification handle.
+	 * @param type By default is 1.
+	 * @param allertMessage Address to buffer to receive the data.
+	 * The result is NOT zero terminated.
+	 * @param allertMessageSize Max size of the buffer.
+	 * @return  One of the next constants:
+	 *  - MA_NOTIFICATION_RES_OK
+	 *  - MA_NOTIFICATION_RES_INVALID_HANDLE
+	 *  - MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE
+	 */
+	int maNotificationPushGetData(int handle, int allertMessage,
+			int allertMessageSize)
+	{
+		return mMoSyncNotifications.maNotificationPushGetData(handle, allertMessage, allertMessageSize);
+	}
+
+	/**
+	 * Destroy a push notification object.
+	 * @param handle Handle to a push notification object.
+	 * @return One of the next constants:
+	 * - #MA_NOTIFICATION_RES_OK if no error occurred.
+	 * - #MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+	 */
+	int maNotificationPushDestroy(int handle)
+	{
+		return mMoSyncNotifications.maNotificationPushDestroy(handle);
+	}
+
+	/**
+	 * Set the ticker text in the notification status bar for incoming push notifications.
+	 * @param tickerText The text that flows by in the status bar when the notification first activates.
+	 * @return MA_NOTIFICATION_RES_OK, MA_NOTIFICATION_RES_ERROR.
+	 */
+	int maNotificationPushSetTickerText(String tickerText)
+	{
+		return mMoSyncNotifications.maNotificationPushSetTickerText(tickerText);
+	}
+
+	/**
+	 * Set the  message title in the notification area for incoming push notifications.
+	 * @param title The title that goes in the expanded entry of the notification.
+	 * @return MA_NOTIFICATION_RES_OK, MA_NOTIFICATION_RES_ERROR.
+	 */
+	int maNotificationPushSetMessageTitle(String title)
+	{
+		return mMoSyncNotifications.maNotificationPushSetMessageTitle(title);
 	}
 
 	/**
