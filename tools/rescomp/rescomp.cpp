@@ -16,6 +16,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "xlstcomp.h"
 #include "File.h"
 
@@ -23,6 +26,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define LSTX_EXT "lstx"
 
 using namespace std;
+
+void printUsage();
+bool isExt(const string& filename, const string& ext);
 
 void printUsage() {
 	printf("Usage: rescomp [-L lstfile] platform outputdir [.lst|.lstx files]");

@@ -26,6 +26,9 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <expat.h>
 #include <stdio.h>
 #include <cctype>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <algorithm>
 #include "File.h"
 #include "xlstcomp.h"

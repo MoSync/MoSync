@@ -16,6 +16,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 */
 
 #include "resdirectives.h"
+#include <string>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <sstream>
 
 #define ATTR_PLATFORM "platform"
