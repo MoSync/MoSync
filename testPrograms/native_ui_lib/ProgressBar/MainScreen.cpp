@@ -19,6 +19,7 @@
 /**
  * @file MainScreen.cpp
  * @author Bogdan Iusco.
+ *         ovidiu
  */
 
 #include <conprint.h>
@@ -39,13 +40,13 @@ MainScreen::MainScreen() :
 	mProgressBar(NULL),
 	mProgressBarValue(NULL),
 	mSetProgressValueButton(NULL),
-	mGetProgressValueButton(NULL),
+	mSetMaximumValueButton(NULL),
 	mIncreaseValueButton(NULL)
 {
 	createMainLayout();
 
 	mSetProgressValueButton->addButtonListener(this);
-    mGetProgressValueButton->addButtonListener(this);
+	mSetMaximumValueButton->addButtonListener(this);
 	mIncreaseValueButton->addButtonListener(this);
 }
 
@@ -56,7 +57,7 @@ MainScreen::~MainScreen()
 {
     mSetProgressValueButton->removeButtonListener(this);
     mIncreaseValueButton->removeButtonListener(this);
-    mGetProgressValueButton->removeButtonListener(this);
+    mSetMaximumValueButton->removeButtonListener(this);
 }
 
 /**
@@ -70,17 +71,33 @@ void MainScreen::buttonClicked(Widget* button)
     {
         MAUtil::String stringValue = mEditBox->getText();
         int value = atoi(stringValue.c_str());
+
+        // set and get Progress value
         mProgressBar->setProgress(value);
+        mProgressBarValue->setText(MAUtil::integerToString(mProgressBar->getProgress()));
+
+        return;
     }
-    else if (button == mGetProgressValueButton)
+
+    if (button == mSetMaximumValueButton)
     {
-			mProgressBarValue->setText(MAUtil::integerToString(mProgressBar->getProgress()));
-        int value = mProgressBar->getProgress();
-        printf("progress value = %d", value);
+		MAUtil::String stringValue = mEditBox->getText();
+		int value = atoi(stringValue.c_str());
+
+		// set Max value
+		mProgressBar->setMaximumValue(value);
+
+		mSetMaximumValueButton->setText("set max (" + stringValue + ")");
+        printf("progress max value = %d", value);
+        return;
     }
-    else if (button == mIncreaseValueButton)
+
+    if (button == mIncreaseValueButton)
     {
+		// set IncrementProgress
         mProgressBar->increaseProgress(10);
+
+        mProgressBarValue->setText(MAUtil::integerToString(mProgressBar->getProgress()));
     }
 }
 
@@ -90,28 +107,38 @@ void MainScreen::buttonClicked(Widget* button)
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
-	mMainLayout->setBackgroundColor(0xFF0000);
 	Screen::setMainWidget(mMainLayout);
 
+	Label* label = new Label();
+	label->setText("Value of the ProgressBar");
+	mMainLayout->addChild(label);
+
+	mProgressBarValue = new Label();
+	mMainLayout->addChild(mProgressBarValue);
+
+	// the ProgressBar
 	mProgressBar = new ProgressBar();
 	mProgressBar->fillSpaceHorizontally();
-	mProgressBar->setMaximumValue(100);
 	mMainLayout->addChild(mProgressBar);
 
+	// check the default Progress value
+	mProgressBarValue->setText(MAUtil::integerToString(mProgressBar->getProgress()));
+
+	label = new Label();
+	label->setText("Use the text box to 'set progress' or 'set max'");
+	mMainLayout->addChild(label);
+
 	mEditBox = new EditBox();
-	mEditBox->setText("30");
+	mEditBox->setPlaceholder("your value...");
 	mMainLayout->addChild(mEditBox);
 
 	mSetProgressValueButton = new Button();
 	mSetProgressValueButton->setText("set progress");
 	mMainLayout->addChild(mSetProgressValueButton);
 
-	mGetProgressValueButton = new Button();
-	mGetProgressValueButton->setText("get progress");
-	mMainLayout->addChild(mGetProgressValueButton);
-
-	mProgressBarValue = new Label();
-	mMainLayout->addChild(mProgressBarValue);
+	mSetMaximumValueButton = new Button();
+	mSetMaximumValueButton->setText("set max");
+	mMainLayout->addChild(mSetMaximumValueButton);
 
 	mIncreaseValueButton = new Button();
 	mIncreaseValueButton->setText("increase value with 10");
