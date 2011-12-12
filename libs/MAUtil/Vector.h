@@ -181,10 +181,11 @@ namespace MAUtil {
 		void add(const Type* ptr, int num) {
 			int neededCapacity = mSize + num;
 			if(mCapacity < neededCapacity) {
+				int newCapacity = mCapacity;
 				do {
-					mCapacity *= 2;
-				} while(mCapacity < neededCapacity);
-				reserve(mCapacity);
+					newCapacity *= 2;
+				} while(newCapacity < neededCapacity);
+				reserve(newCapacity);
 			}
 			for(int i=0; i<num; i++) {
 				mData[mSize++] = *(ptr++);

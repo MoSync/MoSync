@@ -71,16 +71,14 @@ public class Ads
 	{
 		int nextHandle = m_AdsTable.getNextHandle( );
 		AdWidget ad = createAd(m_activity, nextHandle, bannerSize, publisherID);
-		if( ad != null )
+		if( null != ad )
 		{
 			m_AdsTable.add( nextHandle, ad );
 			return nextHandle;
 		}
-		else
-		{
-			Log.e("MoSync", "maAdsBannerCreate: Error while creating ad banner" );
-			return MA_ADS_RES_ERROR;
-		}
+
+		Log.e("MoSync", "maAdsBannerCreate: Error while creating ad banner" );
+		return MA_ADS_RES_ERROR;
 	}
 
 	/**
@@ -109,7 +107,8 @@ public class Ads
 			adSize = AdSize.IAB_MRECT;
 			break;
 		default:
-				adSize = AdSize.BANNER;
+			adSize = AdSize.BANNER;
+			break;
 		}
 		AdView adView = new AdView(activity, adSize, publisherID);
 
@@ -132,22 +131,22 @@ public class Ads
 
 		AdWidget child = m_AdsTable.get( childHandle );
 
-		if( child == null )
+		if( null == child )
 		{
 			Log.e( "MoSync", "maAdsAddBannerToLayout: Invalid ad banner handle: " + childHandle );
 			return MA_ADS_RES_INVALID_BANNER_HANDLE;
 		}
-		else if( parent == null )
+		if( null == parent )
 		{
 			Log.e( "MoSync", "maAdsAddBannerToLayout: Invalid parent widget handle: " + parentHandle );
 			return MA_ADS_RES_INVALID_LAYOUT_HANDLE;
 		}
-		else if ( child.getParent() != null )
+		if ( null != child.getParent() )
 		{
 			Log.e( "MoSync", "maAdsAddBannerToLayout: Child already has a parent." );
 			return MA_ADS_RES_ERROR;
 		}
-		else if ( parent.isLayout() )
+		if ( parent.isLayout() )
 		{
 			Layout parentAsLayout = (Layout) parent;
 			parentAsLayout.addChildAt( child, -1 );
@@ -168,14 +167,14 @@ public class Ads
 	public int maAdsRemoveBannerFromLayout(final int bannerHandle, final int layoutHandle, final Widget layoutWidget)
 	{
 		AdWidget child = m_AdsTable.get( bannerHandle );
-		if( child == null )
+		if( null == child )
 		{
 			Log.e( "MoSync", "maAdsRemoveBannerFromLayout: Invalid ad banner handle: " + bannerHandle );
 			return MA_ADS_RES_INVALID_BANNER_HANDLE;
 		}
 
 		Widget parent = child.getParent( );
-		if( parent == null )
+		if( null == parent )
 		{
 			Log.e( "MoSync", "maAdsRemoveBannerFromLayout: AdWidget " + bannerHandle + " has no parent." );
 			return MA_ADS_RES_INVALID_BANNER_HANDLE;
@@ -203,7 +202,7 @@ public class Ads
 	public int maAdsBannerDestroy(int bannerHandle)
 	{
 		AdWidget ad = m_AdsTable.get( bannerHandle );
-		if( ad == null )
+		if( null == ad )
 		{
 			Log.e( "MoSync", "maAdsBannerDestroy: Invalid ad banner handle: " + bannerHandle );
 			return MA_ADS_RES_INVALID_BANNER_HANDLE;
@@ -214,7 +213,7 @@ public class Ads
 
 		// Disconnect widget from widget tree.
 		Layout parent = (Layout) ad.getParent( );
-		if( parent != null )
+		if( null != parent )
 		{
 			parent.removeChild( ad );
 		}
@@ -238,7 +237,7 @@ public class Ads
 		final String value)
 	{
 		AdWidget adBanner = m_AdsTable.get( adHandle );
-		if( adBanner == null )
+		if( null == adBanner )
 		{
 			Log.e( "MoSync", "maAdsBannerSetProperty: Invalid ad banner handle: " + adHandle );
 			return MA_ADS_RES_INVALID_BANNER_HANDLE;
@@ -264,11 +263,9 @@ public class Ads
 		{
 			return MA_ADS_RES_OK;
 		}
-		else
-		{
-			Log.e( "MoSync", "maAdsBannerSetProperty: Invalid property '" + key + "' on ad widget: " + adHandle );
-			return MA_ADS_RES_INVALID_PROPERTY_NAME;
-		}
+
+		Log.e( "MoSync", "maAdsBannerSetProperty: Invalid property '" + key + "' on ad widget: " + adHandle );
+		return MA_ADS_RES_INVALID_PROPERTY_NAME;
 	}
 
 	/**
@@ -285,7 +282,7 @@ public class Ads
 		final int memBufferSize)
 	{
 		AdWidget adBanner = m_AdsTable.get( adHandle );
-		if( adBanner == null )
+		if( null == adBanner )
 		{
 			Log.e( "MoSync", "maAdsBannerGetProperty: Invalid ad banner handle: " + adHandle );
 			return MA_ADS_RES_INVALID_BANNER_HANDLE;
@@ -306,16 +303,18 @@ public class Ads
 			return MA_ADS_RES_INVALID_STRING_BUFFER_SIZE;
 		}
 
-		byte[] ba = result.getBytes();
+		byte[] byteArray = result.getBytes();
 
 		// Write string to MoSync memory.
 		MoSyncThread mosyncThread = ((MoSync) m_activity).getMoSyncThread( );
 		mosyncThread.mMemDataSection.position( memBuffer );
-		mosyncThread.mMemDataSection.put( ba );
+		mosyncThread.mMemDataSection.put( byteArray );
 		mosyncThread.mMemDataSection.put( (byte)0 );
 
 		return result.length( );
 	}
+
+	/************************ Class members ************************/
 
 	/**
 	 * The MoSync thread object.
