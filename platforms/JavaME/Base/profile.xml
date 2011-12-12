@@ -4,20 +4,20 @@
        NOT support very much at all... -->
   <capability name="Power Management" state="REQUIRES_PERMISSION"/>
   <capability name="Vibration" state="SUPPORTED"/>
-  <capability name="File Storage" state="UNSUPPORTED">
-    <capability name="Read" state="UNSUPPORTED"/>
-    <capability name="Write" state="UNSUPPORTED"/>
+  <capability name="File Storage" state="UNSUPPORTED" fragmentation="buildtime">
+    <capability name="Read" state="UNSUPPORTED" fragmentation="buildtime"/>
+    <capability name="Write" state="UNSUPPORTED" fragmentation="buildtime"/>
   </capability>
-  <capability name="Internet Access" state="UNSUPPORTED">
-    <capability name="HTTPS" state="UNSUPPORTED"/>
+  <capability name="Internet Access" state="UNSUPPORTED" fragmentation="buildtime">
+    <capability name="HTTPS" state="UNSUPPORTED" fragmentation="buildtime"/>
   </capability>
-  <capability name="SMS" state="UNSUPPORTED"/>
-  <capability name="Location" state="UNSUPPORTED">
-    <capability name="Fine" state="UNSUPPORTED"/>
-    <capability name="Coarse" state="UNSUPPORTED"/>
+  <capability name="SMS" state="UNSUPPORTED" fragmentation="buildtime"/>
+  <capability name="Location" state="UNSUPPORTED" fragmentation="buildtime">
+    <capability name="Fine" state="UNSUPPORTED" fragmentation="buildtime"/>
+    <capability name="Coarse" state="UNSUPPORTED" fragmentation="buildtime"/>
   </capability>
-  <capability name="BlueTooth" state="UNSUPPORTED"/>
-  <capability name="Contacts" state="UNSUPPORTED"/>
-  <capability name="Calendar" state="UNSUPPORTED"/>
-  <capability name="Camera" state="UNSUPPORTED"/>
+  <capability name="BlueTooth" state="UNSUPPORTED" fragmentation="buildtime"/>
+  <capability name="Contacts" state="UNSUPPORTED" fragmentation="buildtime"/>
+  <capability name="Calendar" state="UNSUPPORTED" fragmentation="buildtime"/>
+  <capability name="Camera" state="UNSUPPORTED" fragmentation="buildtime"/>
 </platform>

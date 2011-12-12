@@ -75,8 +75,8 @@ static bool equalsIgnoreCaseASCII(string s1, string s2) {
 }
 
 static bool beginsWith(string prefix, string str) {
-	bool result = str.length() >= prefix.length() &&
-			equalsIgnoreCaseASCII(prefix, str.substr(0, prefix.length()));
+	bool result = str.length() >= prefix.length() && equalsIgnoreCaseASCII(
+	        prefix, str.substr(0, prefix.length()));
 	return result;
 }
 
@@ -89,7 +89,7 @@ static bool matches(string pattern, string name) {
 		string subPattern = pattern.substr(ix, endIx - ix);
 		bool wildcard = isWildcard(subPattern);
 		if (wildcard && beginsWith(
-				subPattern.substr(0, subPattern.length() - 1), name)) {
+		        subPattern.substr(0, subPattern.length() - 1), name)) {
 			return true;
 		} else if (equalsIgnoreCaseASCII(subPattern, name)) {
 			return true;
@@ -120,7 +120,7 @@ static void error(const char* file, int lineNo, string msg) {
 	exit(1);
 }
 
-static void error(ParserState* state, string msg)  __attribute__ ((noreturn));
+static void error(ParserState* state, string msg) __attribute__ ((noreturn));
 
 static void error(ParserState* state, string msg) {
 	if (state) {
@@ -131,29 +131,29 @@ static void error(ParserState* state, string msg) {
 }
 
 void ProfileDB::innerListAllProfiles(File& root, string name, string pattern,
-		bool onlyFamilies, vector<string>& result) {
+        bool onlyFamilies, vector<string>& result) {
 	list<File> files = root.listFiles();
 	for (list<File>::iterator filesIterator = files.begin(); filesIterator
-			!= files.end(); filesIterator++) {
+	        != files.end(); filesIterator++) {
 		File file = *filesIterator;
 		if (file.isDirectory()) {
 			const char* slash = name.size() == 0 ? "" : "/";
 			string newName = name.size() == 0 || !onlyFamilies ? name + slash
-					+ file.getName() : name;
+			        + file.getName() : name;
 			innerListAllProfiles(file, newName, pattern, onlyFamilies, result);
 		} else if (string("profile.xml") == file.getName() && matches(pattern,
-				name)) {
+		        name)) {
 			result.push_back(name);
 		}
 	}
 }
 
 ProfileDB::~ProfileDB() {
-	for (map<string, Profile*>::iterator fFoundProfilesIt = fFoundProfiles.begin();
-			fFoundProfilesIt != fFoundProfiles.end();
-			fFoundProfilesIt++) {
+	for (map<string, Profile*>::iterator fFoundProfilesIt =
+	        fFoundProfiles.begin(); fFoundProfilesIt != fFoundProfiles.end(); fFoundProfilesIt++) {
 		Profile* p = (*fFoundProfilesIt).second;
-		if (p) delete p;
+		if (p)
+			delete p;
 	}
 }
 
@@ -168,7 +168,7 @@ void ProfileDB::listProfiles(string pattern, bool onlyFamilies) {
 	for (size_t i = 0; i < result.size(); i++) {
 		string profile = result.at(i);
 		if (families.find(profile) == families.end()) {
-			Profile* p = findProfile(profile, set<string>());
+			Profile* p = findProfile(profile, set<string> ());
 			if (onlyFamilies || (p && !p->isAbstract())) {
 				families.insert(profile);
 				output << profile << '\n';
@@ -180,31 +180,32 @@ void ProfileDB::listProfiles(string pattern, bool onlyFamilies) {
 }
 
 void ProfileDB::listRuntime(string profileName) {
-	Profile* profile = findProfile(profileName, set<string>());
+	Profile* profile = findProfile(profileName, set<string> ());
 	if (profile) {
 		printf("%s\n", profile->getRuntime().c_str());
 	}
 }
 
 /*void ProfileDB::dumpProfile(Profile* profile, string profileName) {
-	vector<Profile*> profiles;
-	if (profile) {
-		profiles.push_back(profile);
-	}
-	dumpProfiles(profiles, profileName);
-}*/
+ vector<Profile*> profiles;
+ if (profile) {
+ profiles.push_back(profile);
+ }
+ dumpProfiles(profiles, profileName);
+ }*/
 
-void ProfileDB::dumpProfileMappings(XMLWriter* writer, map<string, Profile*> profileMappings) {
+void ProfileDB::dumpProfileMappings(XMLWriter* writer,
+        map<string, Profile*> profileMappings) {
 	for (map<string, Profile*>::iterator profileMappingsIt =
-			profileMappings.begin(); profileMappingsIt !=
-			profileMappings.end(); profileMappingsIt++) {
+	        profileMappings.begin(); profileMappingsIt != profileMappings.end(); profileMappingsIt++) {
 		string profileName = (*profileMappingsIt).first;
 		Profile* mapTo = (*profileMappingsIt).second;
 		dumpProfileMapping(writer, profileName, mapTo->getProfileName());
 	}
 }
 
-void ProfileDB::dumpProfileMapping(XMLWriter* writer, string profileName, string mappedToProfileName) {
+void ProfileDB::dumpProfileMapping(XMLWriter* writer, string profileName,
+        string mappedToProfileName) {
 	if (fBrief) {
 		printf("%s -> %s\n", profileName.c_str(), mappedToProfileName.c_str());
 	} else if (writer) {
@@ -219,7 +220,8 @@ void ProfileDB::dumpProfileMapping(XMLWriter* writer, string profileName, string
 	}
 }
 
-void ProfileDB::dumpProfilesXML(vector<Profile*> profiles, map<string, Profile*> profileMappings, string profileName) {
+void ProfileDB::dumpProfilesXML(vector<Profile*> profiles,
+        map<string, Profile*> profileMappings, string profileName) {
 	ostringstream output;
 	XMLWriter writer = XMLWriter(&output);
 	writer.start();
@@ -250,7 +252,8 @@ void ProfileDB::dumpProfilesXML(vector<Profile*> profiles, map<string, Profile*>
 	printf("%s", output.str().c_str());
 }
 
-void ProfileDB::dumpProfilesBrief(vector<Profile*> profiles, map<string, Profile*> profileMappings, string profileName) {
+void ProfileDB::dumpProfilesBrief(vector<Profile*> profiles,
+        map<string, Profile*> profileMappings, string profileName) {
 	for (size_t i = 0; i < profiles.size(); i++) {
 		printf("%s\n", profiles.at(i)->getProfileName().c_str());
 	}
@@ -259,7 +262,8 @@ void ProfileDB::dumpProfilesBrief(vector<Profile*> profiles, map<string, Profile
 	}
 }
 
-void ProfileDB::dumpProfiles(vector<Profile*> profiles, map<string, Profile*> profileMappings, string profileName) {
+void ProfileDB::dumpProfiles(vector<Profile*> profiles,
+        map<string, Profile*> profileMappings, string profileName) {
 	if (fBrief) {
 		dumpProfilesBrief(profiles, profileMappings, profileName);
 	} else {
@@ -287,7 +291,7 @@ void ProfileDB::setExcluded(string excludePattern) {
 void ProfileDB::getProfiles(string profilePattern) {
 	vector<Profile*> profiles;
 	getProfiles(profilePattern, profiles);
-	dumpProfiles(profiles, map<string, Profile*>(), profilePattern);
+	dumpProfiles(profiles, map<string, Profile*> (), profilePattern);
 }
 
 void ProfileDB::listCapabilities(string statePattern) {
@@ -298,7 +302,7 @@ void ProfileDB::listCapabilities(string statePattern) {
 		Profile* profile = profiles.at(i);
 		set<string> capabilities = profile->getCapabilities();
 		for (set<string>::iterator capabilityIt = capabilities.begin(); capabilityIt
-				!= capabilities.end(); capabilityIt++) {
+		        != capabilities.end(); capabilityIt++) {
 			Capability capability = profile->getCapability(*capabilityIt);
 			if (capability.matchCapability(statePattern)) {
 				aggregateCapabilities.insert(*capabilityIt);
@@ -313,7 +317,7 @@ void ProfileDB::listCapabilities(string statePattern) {
 	writer.setAttr("version", "1.0");
 	writer.setAttr("id", "main");
 	for (set<string>::iterator capabilityIt = aggregateCapabilities.begin(); capabilityIt
-			!= aggregateCapabilities.end(); capabilityIt++) {
+	        != aggregateCapabilities.end(); capabilityIt++) {
 		writer.startTag(ELEMENT_CAPABILITY);
 		writer.setAttr(ATTR_NAME, *capabilityIt);
 		writer.endTag();
@@ -342,13 +346,13 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 		const char* parentProfile = findAttr(ATTR_INHERIT, attributes);
 		if (parentProfile) {
 			Profile* parent = db->findProfile(parentProfile,
-					state->alreadyFound);
+			        state->alreadyFound);
 			if (parent == NULL) {
 				error(
-						state,
-						string(
-								"This platform element refers to an invalid parent profile: ")
-								+ parentProfile);
+				        state,
+				        string(
+				                "This platform element refers to an invalid parent profile: ")
+				                + parentProfile);
 			} else {
 				profile->setParent(parent);
 			}
@@ -359,34 +363,38 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 		const char* family = findAttr(ATTR_FAMILY, attributes);
 		if (!family) {
 			error(
-					state,
-					string("No family attribute defined: ")
-							+ profile->getProfileName());
+			        state,
+			        string("No family attribute defined: ")
+			                + profile->getProfileName());
 		}
 		const char* variant = findAttr(ATTR_VARIANT, attributes);
 		if (!isAbstract && !variant) {
 			error(
-					state,
-					string("No variant attribute defined: ")
-							+ profile->getProfileName());
+			        state,
+			        string("No variant attribute defined: ")
+			                + profile->getProfileName());
 		}
 		const char* runtime = findAttr(ATTR_RUNTIME, attributes);
 		if (!isAbstract && !runtime) {
 			error(
-					state,
-					string("No runtime attribute defined: ")
-							+ profile->getProfileName());
+			        state,
+			        string("No runtime attribute defined: ")
+			                + profile->getProfileName());
 		}
 
-		if (!variant) variant = "";
-		if (!runtime) runtime = "";
+		if (!variant)
+			variant = "";
+		if (!runtime)
+			runtime = "";
 
 		const char* slash = strlen(variant) > 0 ? "/" : "";
 		if (!equalsIgnoreCaseASCII(string(family) + slash + string(variant),
-				profile->getProfileName())) {
-			error(state, string("Expected family (") + family +
-					string(") and variant (") + variant + string(") to match ")
-					+ profile->getProfileName());
+		        profile->getProfileName())) {
+			error(
+			        state,
+			        string("Expected family (") + family + string(
+			                ") and variant (") + variant
+			                + string(") to match ") + profile->getProfileName());
 		}
 		profile->setFamily(string(family));
 		profile->setVariant(string(variant));
@@ -421,11 +429,12 @@ static void xmlStart(void *data, const char *tagName, const char **attributes) {
 			error(state, string("Unknown state: ") + capabilityStateStr);
 		}
 		Fragmentation fragmentation = fragmentationStr && !strcmp("buildtime",
-				fragmentationStr) ? BUILDTIME : RUNTIME;
+		        fragmentationStr) ? BUILDTIME : RUNTIME;
 		string value = valueStr ? string(valueStr) : string();
-		string type = typeStr ? string(typeStr) : (value.length() == 0 ? string() : PROPERTY_TYPE);
-		Capability capability = Capability(prefix + capabilityName, type, value, capabilityState,
-				fragmentation);
+		string type = typeStr ? string(typeStr)
+		        : (value.length() == 0 ? string() : PROPERTY_TYPE);
+		Capability capability = Capability(prefix + capabilityName, type,
+		        value, capabilityState, fragmentation);
 		state->profile->addCapability(capability);
 		state->capabilityStack.push_back(capability);
 	}
@@ -441,7 +450,7 @@ static void xmlEnd(void *data, const char *tagName) {
 }
 
 Profile* ProfileDB::findProfile(string profileName) {
-	return findProfile(profileName, set<string>());
+	return findProfile(profileName, set<string> ());
 }
 
 Profile* ProfileDB::findProfile(string profileName, set<string> alreadyFound) {
@@ -470,7 +479,7 @@ Profile* ProfileDB::findProfile(string profileName, set<string> alreadyFound) {
 bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
 	string profileName = profile->getProfileName();
 	File file =
-			File(string(profilesdir() + "/" + profileName + "/profile.xml"));
+	        File(string(profilesdir() + "/" + profileName + "/profile.xml"));
 	string path = file.getAbsolutePath();
 
 	ParserState state;
@@ -490,9 +499,10 @@ bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
 		while (!fs.eof()) {
 			state.lineNo++;
 			getline(fs, line);
-			if (XML_Parse(parser, line.c_str(), line.length(), false) == XML_STATUS_ERROR) {
+			if (XML_Parse(parser, line.c_str(), line.length(), false)
+			        == XML_STATUS_ERROR) {
 				printf("<!-- FATAL ERROR: XML malformatted (%s, line %d) -->",
-						path.c_str(), state.lineNo);
+				        path.c_str(), state.lineNo);
 				return NULL;
 			}
 		}
@@ -507,45 +517,75 @@ bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
 }
 
 bool ProfileDB::internalMatchProfile(Profile* profile,
-		vector<Capability>& requiredCapabilites,
-		vector<Capability>& optionalCapabilites,
-		string& matchToken) {
+        vector<Capability>& requiredCapabilites,
+        vector<Capability>& optionalCapabilites, string& matchToken) {
 	bool match = true;
+
+	// When can we NOT reuse a specific runtime?
+	// Only if fragmentation is set to BUILDTIME and if either a) one supports the capability and
+	// the other does not OR b) the capability value differs.
+	// So we add strings to create a unique match token for every
+	// runtime that need be built
 	for (vector<Capability>::iterator capability = requiredCapabilites.begin(); capability
-			!= requiredCapabilites.end(); capability++) {
+	        != requiredCapabilites.end(); capability++) {
 		Capability matchedCapability = profile->getCapability(
-				capability->getName());
+		        capability->getName());
 		CapabilityState matchedState = matchedCapability.getState();
 		// Ok, so we don't support this, bail out!
 		if (matchedState == NOT_IMPLEMENTED || matchedState == UNSUPPORTED) {
 			match = false;
 		}
+		Fragmentation fragmentation = matchedCapability.getFragmentation();
+		string valueStr =
+		        fragmentation == BUILDTIME ? matchedCapability.getValue() : "";
+		matchToken.append(valueStr);
+		matchToken.append("|");
 	}
 
 	// So, the optional capabilities are matched in a different way.
 	// We add stuff to the matchTokens string to produce a string that
 	// is unique to the optional capabilities being matched.
 	for (vector<Capability>::iterator capability = optionalCapabilites.begin(); capability
-			!= optionalCapabilites.end(); capability++) {
+	        != optionalCapabilites.end(); capability++) {
 		Capability matchedCapability = profile->getCapability(
-				capability->getName());
+		        capability->getName());
 		CapabilityState matchedState = matchedCapability.getState();
 		Fragmentation fragmentation = matchedCapability.getFragmentation();
-		string valueStr = matchedCapability.getValue();
-		bool fragmented = fragmentation == BUILDTIME && (matchedState == NOT_IMPLEMENTED || matchedState == UNSUPPORTED);
-		matchToken.append(fragmented ? (valueStr + "+") : "-");
+		string valueStr =
+		        fragmentation == BUILDTIME ? matchedCapability.getValue() : "";
+		bool capSupported = fragmentation == BUILDTIME && (matchedState
+		        == NOT_IMPLEMENTED || matchedState == UNSUPPORTED);
+		matchToken.append((capSupported ? "+" : "-") + valueStr);
+		matchToken.append("|");
+	}
+
+	// Finally we add PROPERTIES of the runtime which are buildtime fragmented.
+	// For example, different device types or icon sizes should always generate
+	// a unique runtime.
+	set<string> allCapabilities = profile->getCapabilities();
+	for (set<string>::iterator allCapabilitesIt = allCapabilities.begin();
+			allCapabilitesIt != allCapabilities.end();
+			allCapabilitesIt++) {
+		string capabilityName = *allCapabilitesIt;
+		Capability capability = profile->getCapability(capabilityName);
+		if (capability.getType() == "property") {
+			Fragmentation fragmentation = capability.getFragmentation();
+			string valueStr = fragmentation == BUILDTIME ? capability.getValue() : "-";
+			matchToken.append(valueStr);
+			matchToken.append("|");
+		}
 	}
 	return match;
 }
 
 bool ProfileDB::isExcluded(Profile* profile) {
 	return !profile || profile->isAbstract() || matches(fExcludePattern,
-			profile->getProfileName());
+	        profile->getProfileName());
 }
 
 bool ProfileDB::matchProfiles(string profilePattern,
-		vector<Capability> requiredCapabilities,
-		vector<Capability> optionalCapabilities) {
+        vector<Capability> requiredCapabilities,
+        vector<Capability> optionalCapabilities) {
 	File root = File(profilesdir());
 	vector<string> profiles;
 	innerListAllProfiles(root, string(), profilePattern, false, profiles);
@@ -553,21 +593,19 @@ bool ProfileDB::matchProfiles(string profilePattern,
 	map<string, Profile*> profileMappings;
 
 	for (vector<string>::iterator profileIt = profiles.begin(); profileIt
-			!= profiles.end(); profileIt++) {
-		matchProfile(*profileIt, requiredCapabilities,
-				optionalCapabilities, matchingProfiles,
-				profileMappings);
+	        != profiles.end(); profileIt++) {
+		matchProfile(*profileIt, requiredCapabilities, optionalCapabilities,
+		        matchingProfiles, profileMappings);
 	}
 
 	set<string> profileNames; // TODO: Maybe we want VARIANTS as well!?
 	vector<Profile*> prunedProfiles;
 	for (vector<Profile*>::iterator matchingProfilesIt =
-			matchingProfiles.begin(); matchingProfilesIt
-			!= matchingProfiles.end(); matchingProfilesIt++) {
+	        matchingProfiles.begin(); matchingProfilesIt
+	        != matchingProfiles.end(); matchingProfilesIt++) {
 		Profile* match = *matchingProfilesIt;
 		// Make sure we only add a specific profile once.
-		if (profileNames.find(match->getProfileName())
-				== profileNames.end()) {
+		if (profileNames.find(match->getProfileName()) == profileNames.end()) {
 			profileNames.insert(match->getProfileName());
 			prunedProfiles.push_back(match);
 		}
@@ -578,10 +616,9 @@ bool ProfileDB::matchProfiles(string profilePattern,
 }
 
 void ProfileDB::matchProfile(string profileName,
-		vector<Capability> requiredCapabilities,
-		vector<Capability> optionalCapabilities,
-		vector<Profile*>& result,
-		map<string, Profile*>& profileMappings) {
+        vector<Capability> requiredCapabilities,
+        vector<Capability> optionalCapabilities, vector<Profile*>& result,
+        map<string, Profile*>& profileMappings) {
 	Profile* profile = findProfile(profileName, set<string> ());
 	vector<Profile*> genealogy;
 	while (profile) {
@@ -590,20 +627,21 @@ void ProfileDB::matchProfile(string profileName,
 	}
 
 	map<string, Profile*> matchTokens;
-	for (vector<Profile*>::reverse_iterator genealogyIt = genealogy.rbegin();
-			genealogyIt != genealogy.rend(); genealogyIt++) {
+	for (vector<Profile*>::reverse_iterator genealogyIt = genealogy.rbegin(); genealogyIt
+	        != genealogy.rend(); genealogyIt++) {
 		Profile* profileToMatch = *genealogyIt;
 		string matchToken;
 		bool isAbstract = profileToMatch->isAbstract();
 		bool doMatch = !isAbstract || fOutputMappings;
-		if (doMatch &&
-				internalMatchProfile(profileToMatch, requiredCapabilities, optionalCapabilities, matchToken)) {
+		if (doMatch && internalMatchProfile(profileToMatch,
+		        requiredCapabilities, optionalCapabilities, matchToken)) {
 			Profile* alreadyMatched = matchTokens[matchToken];
 			if (!isAbstract && alreadyMatched == NULL) {
 				matchTokens[matchToken] = profileToMatch;
 				result.push_back(profileToMatch);
 			} else if (alreadyMatched) {
-				profileMappings[profileToMatch->getProfileName()] = matchTokens[matchToken];
+				profileMappings[profileToMatch->getProfileName()]
+				        = matchTokens[matchToken];
 			}
 		}
 	}
@@ -616,7 +654,7 @@ void Profile::addCapability(Capability capability) {
 set<string> Profile::getCapabilities() {
 	set<string> result;
 	for (map<string, Capability>::iterator capability = fCapabilities.begin(); capability
-			!= fCapabilities.end(); capability++) {
+	        != fCapabilities.end(); capability++) {
 		result.insert(capability->first);
 	}
 	if (fParent) {
@@ -628,7 +666,7 @@ set<string> Profile::getCapabilities() {
 
 Capability Profile::getCapability(string capabilityName) {
 	map<string, Capability>::iterator capability = fCapabilities.find(
-			capabilityName);
+	        capabilityName);
 	if (capability == fCapabilities.end()) {
 		if (fParent) {
 			return fParent->getCapability(capabilityName);
@@ -651,7 +689,7 @@ void Profile::toXML(XMLWriter& writer, bool includeCapabilities) {
 	if (includeCapabilities) {
 		set<string> capabilities = Profile::getCapabilities();
 		for (set<string>::iterator capability = capabilities.begin(); capability
-				!= capabilities.end(); capability++) {
+		        != capabilities.end(); capability++) {
 			Capability value = getCapability(*capability);
 			value.toXML(writer);
 		}
@@ -690,7 +728,7 @@ void Capability::toXML(XMLWriter& writer) {
 	}
 	writer.setAttr(ATTR_STATE, stateStr);
 	writer.setAttr(ATTR_FRAGMENTATION,
-			fFragmentation == BUILDTIME ? "buildtime" : "runtime");
+	        fFragmentation == BUILDTIME ? "buildtime" : "runtime");
 	if (fType.length() > 0) {
 		writer.setAttr(ATTR_TYPE, fType);
 	}

@@ -141,16 +141,34 @@ class JavaMEPlatform
         end
     end
 
+    def create_capability_tag(name, value, state, fragmentation, type)
+        result = ""
+        result << "  <capability name=\"" << name << "\""
+        if (value.length > 0)
+            result << " value=\"" << value << "\"";
+        end
+        result << " state=\"" << state << "\" fragmentation=\"" << fragmentation << "\" type=\"" << type << "\"/>\n"
+        return result
+    end
+
     def to_capability_xml(runtime, capability)
         result = ""
         if (runtime && runtime.caps.has_key?(capability))
             names = self.map_capability_name capability
             names.each do |name|
-                result << "  <capability name=\"" << name
-                result << "\" state=\"REQUIRES_PRIVILEGED_PERMISSION\" fragmentation=\"buildtime\"/>\n"
+                result << self.create_capability_tag(name, "", "REQUIRES_PRIVILEGED_PERMISSION", "buildtime", "");
             end
         end
         return result
+    end
+
+    def to_icon_size_xml(runtime)
+        result = ""
+        if (runtime && runtime.caps.has_key?("MA_PROF_CONST_ICONSIZE_Y") && runtime.caps.has_key?("MA_PROF_CONST_ICONSIZE_X"))
+            sizeStr = runtime.caps["MA_PROF_CONST_ICONSIZE_X"] + "x" + runtime.caps["MA_PROF_CONST_ICONSIZE_X"]
+            result << self.create_capability_tag("IconSize", sizeStr, "SUPPORTED", "buildtime", "property");
+        end
+        return result;
     end
 
     def to_xml(runtime, family, variant, runtimeDir, inherit, write_caps, is_abstract)
@@ -174,6 +192,7 @@ class JavaMEPlatform
             xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_CAMERA");
             xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_FILECONNECTION");
             xml << self.to_capability_xml(runtime, "MA_PROF_SUPPORT_JAVAPACKAGE_PIMAPI");
+            xml << self.to_icon_size_xml(runtime);
         end
         xml << "</platform>\n"
         return xml
@@ -672,6 +691,7 @@ javame_profile_tokens={}
 javame_default_profile=JavaMEPlatform.new(nil)
 javame_default_profile_token=javame_default_profile.create_token(false)
 javame_default_runtime = 0
+javame_last_non_abstract_runtime = "JavaME/Default"
 
 runtimes.each do |platform_name, platform|
 	id = 1
@@ -761,7 +781,8 @@ runtimes.each do |platform_name, platform|
                 if (inherit)
                     profile.write_profile_xml(profileXmlDir, family, variant, runtime_name, inherit, false, true)
                 else
-                    profile.write_profile_xml(profileXmlDir, family, variant, runtime_name, "JavaME/Default", true, false)
+                    profile.write_profile_xml(profileXmlDir, family, variant, runtime_name, javame_last_non_abstract_runtime, true, false)
+                    javame_last_non_abstract_runtime = "JavaME/#{id}"
                 end
             else
                 puts "BB RUNTIME (#{id}); #{inherit}; #{fullPlatform}"
