@@ -78,18 +78,17 @@ void MainScreen::buttonClicked(Widget* button)
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
-	mMainLayout->setBackgroundColor(0xFF0000);
 	Screen::setMainWidget(mMainLayout);
 
 	mActivityIndicator = new ActivityIndicator();
 	mMainLayout->addChild(mActivityIndicator);
 
 	mShow = new Button();
-	mShow->setText("show");
+	mShow->setText("show ActivityIndicator");
 	mMainLayout->addChild(mShow);
 
 	mHide = new Button();
-	mHide->setText("hide");
+	mHide->setText("hide ActivityIndicator");
 	mMainLayout->addChild(mHide);
 
 }
