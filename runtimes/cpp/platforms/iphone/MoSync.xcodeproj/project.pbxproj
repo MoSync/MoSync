@@ -27,6 +27,10 @@
 		4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4142402414766C03006977A1 /* MoSyncDB.cpp */; };
 		4142402714766C03006977A1 /* MoSyncDB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4142402414766C03006977A1 /* MoSyncDB.cpp */; };
 		4142402814766C03006977A1 /* MoSyncDB.h in Headers */ = {isa = PBXBuildFile; fileRef = 4142402514766C03006977A1 /* MoSyncDB.h */; };
+		418047B6147E8B6A0048FB95 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 418047B5147E8B6A0048FB95 /* Reachability.m */; };
+		418047B7147E8B6A0048FB95 /* Reachability.h in Headers */ = {isa = PBXBuildFile; fileRef = 418047B4147E8B6A0048FB95 /* Reachability.h */; };
+		418047B8147E8B6A0048FB95 /* Reachability.m in Sources */ = {isa = PBXBuildFile; fileRef = 418047B5147E8B6A0048FB95 /* Reachability.m */; };
+		41804802147E91050048FB95 /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 41804801147E91050048FB95 /* SystemConfiguration.framework */; };
 		4192E7B813F5801900C10302 /* CameraConfirgurator.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4192E7B713F5801900C10302 /* CameraConfirgurator.mm */; };
 		41BD2ED114768C40005ADEB9 /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
 		41BD2ED214768C47005ADEB9 /* AudioSyscall.h in Headers */ = {isa = PBXBuildFile; fileRef = E4D36EA61459AC5B00477B1E /* AudioSyscall.h */; };
@@ -336,6 +340,9 @@
 		32CA4F630368D1EE00C91783 /* MoSync_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MoSync_Prefix.pch; sourceTree = "<group>"; };
 		4142402414766C03006977A1 /* MoSyncDB.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MoSyncDB.cpp; path = ../../base/MoSyncDB.cpp; sourceTree = SOURCE_ROOT; };
 		4142402514766C03006977A1 /* MoSyncDB.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncDB.h; path = ../../base/MoSyncDB.h; sourceTree = SOURCE_ROOT; };
+		418047B4147E8B6A0048FB95 /* Reachability.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Reachability.h; sourceTree = "<group>"; };
+		418047B5147E8B6A0048FB95 /* Reachability.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Reachability.m; sourceTree = "<group>"; };
+		41804801147E91050048FB95 /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		4192E7B613F5801900C10302 /* CameraConfirgurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraConfirgurator.h; sourceTree = "<group>"; };
 		4192E7B713F5801900C10302 /* CameraConfirgurator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraConfirgurator.mm; sourceTree = "<group>"; };
 		41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
@@ -579,6 +586,7 @@
 				857B025612C62F5600DEA306 /* QuartzCore.framework in Frameworks */,
 				0B10E8D214064DDB00B6DA6B /* MessageUI.framework in Frameworks */,
 				41EB03E4146A69BF0088E3A4 /* libsqlite3.dylib in Frameworks */,
+				41804802147E91050048FB95 /* SystemConfiguration.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -658,6 +666,8 @@
 				4192E7B713F5801900C10302 /* CameraConfirgurator.mm */,
 				43A7684E1400F6BA009608A4 /* ImagePickerController.h */,
 				43A7684F1400F6BA009608A4 /* ImagePickerController.mm */,
+				418047B4147E8B6A0048FB95 /* Reachability.h */,
+				418047B5147E8B6A0048FB95 /* Reachability.m */,
 				432B98C61431FE5F00BDB926 /* MoSyncPanic.h */,
 				432B98C71431FE5F00BDB926 /* MoSyncPanic.mm */,
 			);
@@ -683,6 +693,7 @@
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
 				41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */,
+				41804801147E91050048FB95 /* SystemConfiguration.framework */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -1151,6 +1162,7 @@
 				41BD2ED214768C47005ADEB9 /* AudioSyscall.h in Headers */,
 				41BD2ED414768C55005ADEB9 /* AudioData.h in Headers */,
 				41BD2ED514768C5D005ADEB9 /* AudioInstance.h in Headers */,
+				418047B7147E8B6A0048FB95 /* Reachability.h in Headers */,
 				43B16FEA147BF9FC00B6BB8A /* NSStringExpanded.h in Headers */,
 				436A47BA148E54180087B17A /* Capture.h in Headers */,
 			);
@@ -1360,6 +1372,7 @@
 				E4D36EA91459AC5B00477B1E /* AudioSyscall.mm in Sources */,
 				E4D36EAD1459B5B600477B1E /* AudioInstance.mm in Sources */,
 				4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */,
+				418047B6147E8B6A0048FB95 /* Reachability.m in Sources */,
 				43B16FEB147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
 				436A47BB148E54180087B17A /* Capture.mm in Sources */,
 			);
@@ -1459,6 +1472,7 @@
 				41BD2ED114768C40005ADEB9 /* AudioSyscall.mm in Sources */,
 				41BD2ED314768C4D005ADEB9 /* AudioData.mm in Sources */,
 				41BD2ED614768C63005ADEB9 /* AudioInstance.mm in Sources */,
+				418047B8147E8B6A0048FB95 /* Reachability.m in Sources */,
 				43B16FEC147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
 				436A47BC148E54180087B17A /* Capture.mm in Sources */,
 			);

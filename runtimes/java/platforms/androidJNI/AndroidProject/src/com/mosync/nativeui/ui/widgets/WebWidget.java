@@ -21,7 +21,9 @@ import java.util.HashSet;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.webkit.JsResult;
@@ -117,6 +119,9 @@ public class WebWidget extends Widget
 
 		// Create a WebChromeClient object.
 		webView.setWebChromeClient(new WebWidget.MoSyncWebChromeClient());
+
+		//Enable GeoLocation for webbased apps
+		webView.getSettings().setGeolocationEnabled(true);
 
 		return webWidget;
 	}
@@ -500,6 +505,26 @@ public class WebWidget extends Widget
 				{
 					return false;
 				}
+			}
+			//Here we have two default URLs that should always be processed outside.
+			//if the user wants to override them it is possible since user HOOKs
+			//have priority
+			else if (url.startsWith("rtsp:"))
+			{
+				//Start a media view intent for the video links
+				Uri uri = Uri.parse(url);
+			    Intent intent = new Intent(Intent.ACTION_VIEW, uri);
+			    mWebWidget.getView().getContext().startActivity(intent);
+			    return true;
+			}
+			else if(url.startsWith("tel:"))
+			{
+				//by default we should open the PhoneApp when this URL
+				//is loaded
+				Uri uri = Uri.parse(url);
+			    Intent intent = new Intent(Intent.ACTION_DIAL, uri);
+			    mWebWidget.getView().getContext().startActivity(intent);
+			    return true;
 			}
 			else
 			{
