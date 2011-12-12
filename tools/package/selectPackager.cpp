@@ -256,13 +256,16 @@ static bool parseProfileInfo(ProfileType profileType, Profile* p, const SETTINGS
 		}
 		//pi.isBlackberry = (hasBbMajor && hasBbMinor);	//rapc is not available.
 	} else {
+		Capability iconSize = p->getCapability("IconSize");
+		if (iconSize.getValue().length() > 0) {
+			pi.iconSize = iconSize.getValue().c_str();
+		}
 		pi.isBlackberry = p->getFamily() == "BlackBerry";
 		if (pi.isBlackberry) {
 			Capability major = p->getCapability("Version/Major");
 			Capability minor = p->getCapability("Version/Minor");
 			sscanf(major.getValue().c_str(), "%i", &pi.blackberryVersion);
 			sscanf(minor.getValue().c_str(), "%i", &pi.blackberryMinor);
-			pi.iconSize = "80x80";
 		}
 	}
 	if (iconX > 0 && iconY > 0) {
