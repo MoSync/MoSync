@@ -1416,6 +1416,12 @@ interface MAAPI {
 		* \brief Send when the application receives a push notification.
 		*/
 		PUSH_NOTIFICATION = 46;
+
+		/**
+		* \brief Send before the Native Image Picker is dismissed.
+		* This event will contain a MACaptureEventData struct.
+		*/
+		CAPTURE = 47;
 		}
 
 	/**
@@ -1464,6 +1470,17 @@ interface MAAPI {
 		/// this variable will contain the error code.
 		/// One of the \link #MA_ADS_ERROR_INTERNAL MA_ADS_ERROR \endlink constants.
 		int bannerErrorCode;
+	}
+
+	/**
+	* \brief An event send by the Native Image Picker(Capture API).
+	*/
+	struct MACaptureEventData {
+		/// One of the \link #MA_CAPTURE_EVENT_TYPE_IMAGE MA_CAPTURE_EVENT_TYPE \endlink constants.
+		int type;
+		/// Handle to a video/image data object.
+		/// This value is set only if the event type is MA_CAPTURE_EVENT_TYPE_IMAGE or MA_CAPTURE_EVENT_TYPE_VIDEO.
+		MAHandle handle;
 	}
 
 	/**
@@ -1583,6 +1600,12 @@ interface MAAPI {
 			* Valid only if the event type is \link #EVENT_TYPE_PUSH_NOTIFICATION PUSH_NOTIFICATION \endlink.
 			*/
 			MAHandle pushNotificationHandle;
+
+			/**
+			* Store the result for a capture action.
+			* Valid only if the event type is \link #EVENT_TYPE_CAPTURE CAPTURE \endlink.
+			*/
+			MACaptureEventData captureData;
 
 			/**
 			* Used by custom events. See invididual event descriptions.
@@ -9590,9 +9613,27 @@ group CaptureAPI "Capture API" {
 			INVALID_HANDLE = -7;
 
 			/**
-			* @brief Indicates that ads are not supported on current platform.
+			* @brief Indicates that capture is not supported on current platform.
 			*/
 			UNSUPPORTED = -8;
+
+			/**
+			* @brief Indicates that camera is not available at the moment.
+			* Platform: iOS.
+			*/
+			CAMERA_NOT_AVAILABLE = -9;
+
+			/**
+			* @brief Indicates that video recording is not supported.
+			* Platform: iOS.
+			*/
+			VIDEO_NOT_SUPPORTED = -10;
+
+			/**
+			* @brief Indicates that camera picture mode is not supported.
+			* Platform: iOS.
+			*/
+			PICTURE_NOT_SUPPORTED = -11;
 		}
 	} // end of Capture Result Codes
 
@@ -9746,12 +9787,15 @@ group CaptureAPI "Capture API" {
 		* \returns One of the next constants:
 		*  - MA_CAPTURE_RES_OK if no error occurred.
 		*  - MA_CAPTURE_RES_INVALID_ACTION if the given action is invalid.
+		*  - MA_CAPTURE_RES_CAMERA_NOT_AVAILABLE if camera is not available at the moment.
+		*  - MA_CAPTURE_RES_VIDEO_NOT_SUPPORTED if video recording is not supported.
+		*  - MA_CAPTURE_RES_PICTURE_NOT_SUPPORTED if camera picture mode is not supported.
 		*/
 		int maCaptureAction(in int action);
 
 		/**
-		* \brief Save a image/video data object to a file.
-		* \param handle Handle to a image/video data object.
+		* \brief Save a image data object to a file.
+		* \param handle Handle to a image data object.
 		* \param fullPath A buffer containing the a full path where the file will be created.
 		* \param fullPathBufSize The size of the fullPath buffer.
 		*
@@ -9761,7 +9805,20 @@ group CaptureAPI "Capture API" {
 		*  - MA_CAPTURE_RES_FILE_INVALID_NAME if the fullPath param is invalid.
 		*  - MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
 		*/
-		int maCaptureSaveDataToFile(in MAHandle handle,in MAString fullPath,in int fullPathBufSize);
+		int maCaptureWriteImage(in MAHandle handle,in MAString fullPath,in int fullPathBufSize);
+
+		/**
+		* Get full path to a recorded video.
+		* \param handle Handle to a video data object.
+		* \param buffer Will contain the full path to the video file.
+		* \param bufferSize Maximum size of the buffer.
+		*
+		* \returns One of the next constants:
+		*  - MA_CAPTURE_RES_OK if no error occurred.
+		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		*/
+		int maCaptureGetVideoPath(in MAHandle handle, out MAString buffer range("bufferSize"), in int bufferSize);
 
 		/**
 		* \brief Destroys a image/video data object.

@@ -318,7 +318,7 @@ static NotificationManager *sharedInstance = nil;
     if(!retVal)
     {
         NSLog(@"NotificationManager::notificationGetProperty invalid property name");
-        return MA_ADS_RES_INVALID_PROPERTY_NAME;
+        return MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME;
     }
 
 	int length = maxSize;
@@ -327,7 +327,7 @@ static NotificationManager *sharedInstance = nil;
     {
         NSLog(@"NotificationManager::notificationGetProperty invalid buffer size");
         [retVal release];
-		return MA_ADS_RES_INVALID_STRING_BUFFER_SIZE;
+		return MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
 	}
 
     [retVal getCString:value maxLength:length encoding:NSASCIIStringEncoding];

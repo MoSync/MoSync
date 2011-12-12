@@ -36,6 +36,8 @@
 		41BD2ED614768C63005ADEB9 /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
 		41D54E11140523F700552E66 /* CameraConfirgurator.h in Headers */ = {isa = PBXBuildFile; fileRef = 4192E7B613F5801900C10302 /* CameraConfirgurator.h */; };
 		41EB03E4146A69BF0088E3A4 /* libsqlite3.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */; };
+		43039F7D148F935A00254C4C /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43039F7C148F935A00254C4C /* MobileCoreServices.framework */; settings = {ATTRIBUTES = (Weak, ); }; };
+		43039F87148F93CD00254C4C /* MobileCoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43039F7C148F935A00254C4C /* MobileCoreServices.framework */; };
 		4318698513F68D410051D97A /* PimContactItem.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318696E13F68D410051D97A /* PimContactItem.h */; };
 		4318698813F68D410051D97A /* PimContactsList.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697013F68D410051D97A /* PimContactsList.h */; };
 		4318699113F68D410051D97A /* PimDatabase.h in Headers */ = {isa = PBXBuildFile; fileRef = 4318697713F68D410051D97A /* PimDatabase.h */; };
@@ -337,6 +339,7 @@
 		4192E7B613F5801900C10302 /* CameraConfirgurator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CameraConfirgurator.h; sourceTree = "<group>"; };
 		4192E7B713F5801900C10302 /* CameraConfirgurator.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CameraConfirgurator.mm; sourceTree = "<group>"; };
 		41EB03E3146A69BF0088E3A4 /* libsqlite3.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.dylib; path = /usr/lib/libsqlite3.dylib; sourceTree = "<absolute>"; };
+		43039F7C148F935A00254C4C /* MobileCoreServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MobileCoreServices.framework; path = System/Library/Frameworks/MobileCoreServices.framework; sourceTree = SDKROOT; };
 		4318696E13F68D410051D97A /* PimContactItem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactItem.h; sourceTree = "<group>"; };
 		4318697013F68D410051D97A /* PimContactsList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimContactsList.h; sourceTree = "<group>"; };
 		4318697713F68D410051D97A /* PimDatabase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PimDatabase.h; sourceTree = "<group>"; };
@@ -560,6 +563,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				43039F7D148F935A00254C4C /* MobileCoreServices.framework in Frameworks */,
 				43CE0BF61463EE5F00F8FFC3 /* iAd.framework in Frameworks */,
 				431869B313F691A30051D97A /* CoreMotion.framework in Frameworks */,
 				431869AB13F68E8A0051D97A /* EventKit.framework in Frameworks */,
@@ -589,6 +593,7 @@
 				431869B413F691B70051D97A /* CoreMotion.framework in Frameworks */,
 				431869AC13F68E940051D97A /* EventKit.framework in Frameworks */,
 				43CE0BF91463EE7600F8FFC3 /* iAd.framework in Frameworks */,
+				43039F87148F93CD00254C4C /* MobileCoreServices.framework in Frameworks */,
 				85F2551611AC12A700EB47EE /* Foundation.framework in Frameworks */,
 				85F2551711AC12A700EB47EE /* UIKit.framework in Frameworks */,
 				858B404012E680460058DBFC /* QuartzCore.framework in Frameworks */,
@@ -716,6 +721,7 @@
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
 				288765A40DF7441C002DB57D /* CoreGraphics.framework */,
+				43039F7C148F935A00254C4C /* MobileCoreServices.framework */,
 				85E2A0D51181D1B200CDB453 /* AudioToolbox.framework */,
 				850943881185B35D004A3B2D /* AVFoundation.framework */,
 				857B025512C62F5600DEA306 /* QuartzCore.framework */,
