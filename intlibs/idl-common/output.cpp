@@ -28,6 +28,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include "types.h"
 #include "tokenizer.h"
 
+#include <string.h>
+
 using namespace std;
 
 #define DO_LEVEL { if(level > 0) printf("%*c", level, ' '); }
