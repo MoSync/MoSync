@@ -39,6 +39,7 @@ MA 02110-1301, USA.
 #define FLASH_COLOR_LABEL_TEXT "Flash color:"
 #define FLASH_ON_LABEL_TEXT "Flash On for:(seconds)"
 #define FLASH_OFF_LABEL_TEXT "Flash Off for:(seconds)"
+#define SHOW_ONLY_IF_IN_BACKGROUND "Show only when in background"
 #define FIRE_TIME_LABEL_TEXT "Schedule in(seconds):"
 #define SECONDS_LABEL_TEXT " seconds"
 #define SEND_BUTTON_TEXT "SEND"
@@ -90,6 +91,7 @@ CreateNotificationScreen::CreateNotificationScreen():
 	mFlashColor(NULL),
 	mFlashOnLength(NULL),
 	mFlashOffLength(NULL),
+	mShowOnlyIfInBackground(NULL),
 	mTime(NULL),
 	mCreateNotificationButton(NULL)
 {
@@ -230,6 +232,10 @@ void CreateNotificationScreen::createMainLayout()
 		mFlashOffLength = new EditBox();
 		mFlashOffLength->setInputMode(EDIT_BOX_INPUT_MODE_NUMERIC);
 		listView->addChild(createListViewItem(FLASH_OFF_LABEL_TEXT, mFlashOffLength));
+
+		mShowOnlyIfInBackground = new CheckBox();
+		mShowOnlyIfInBackground->setState(true);
+		listView->addChild(createListViewItem(SHOW_ONLY_IF_IN_BACKGROUND, mShowOnlyIfInBackground));
 	}
 
 	// ================ Fire time =====================
@@ -390,9 +396,21 @@ void CreateNotificationScreen::buttonClicked(Widget* button)
 			{
 				notification->setFlashLights(false);
 			}
+
 			if ( playSound )
 			{
 				notification->setSound(mSoundPath->getText());
+			}
+
+			if ( mShowOnlyIfInBackground->isChecked() )
+			{
+				// Show the notification only if the app is in background.
+				notification->setDisplayFlag(NOTIFICATION_DISPLAY_DEFAULT);
+			}
+			else
+			{
+				// Show the notification even if app is in foreground.
+				notification->setDisplayFlag(NOTIFICATION_DISPLAY_ANYTIME);
 			}
 		}
 

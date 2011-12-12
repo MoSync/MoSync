@@ -26,6 +26,7 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_UNSUPPORTED;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -2965,7 +2966,6 @@ public class MoSyncThread extends Thread
 	 */
 	int maNotificationLocalCreate()
 	{
-		//Log.i("MoSync", "maNotificationLocalCreate");
 		return mMoSyncNotifications.maNotificationLocalCreate(mContext);
 	}
 
@@ -3034,11 +3034,10 @@ public class MoSyncThread extends Thread
 	 * typically the email address of an account set up by the application's developer.
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred.
      * MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already registered for receiving push notifications.
+     * MA_NOTIFICATION_RES_UNSUPPORTED
 	 */
 	int maNotificationPushRegister(int pushNotificationTypes, String accountID)
 	{
-		Log.e("@@MoSync", "maNotificationPushRegister");
-
 		// Ignore the first param on Android.
 		return mMoSyncNotifications.maNotificationPushRegister(accountID);
 	}
@@ -3121,6 +3120,18 @@ public class MoSyncThread extends Thread
 	int maNotificationPushSetMessageTitle(String title)
 	{
 		return mMoSyncNotifications.maNotificationPushSetMessageTitle(title);
+	}
+
+	/**
+	 * Set the display flags applied to the incoming push notifications.
+	 * @param flag One of the constants:
+	 *  - MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT
+	 *  - MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME
+	 * @return MA_NOTIFICATION_RES_OK, MA_NOTIFICATION_RES_ERROR.
+	 */
+	int maNotificationPushSetDisplayFlag(int flag)
+	{
+		return mMoSyncNotifications.maNotificationPushSetDisplayFlag(flag);
 	}
 
 	/**

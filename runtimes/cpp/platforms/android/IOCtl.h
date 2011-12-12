@@ -884,6 +884,8 @@ namespace Base
 
 	int _maNotificationPushSetMessageTitle(const char* text, JNIEnv* jNIEnv, jobject jThis);
 
+	int _maNotificationPushSetDisplayFlag(int flag, JNIEnv* jNIEnv, jobject jThis);
+
 	int _maSyscallPanicsEnable(JNIEnv* jNIEnv, jobject jThis);
 
 	int _maSyscallPanicsDisable(JNIEnv* jNIEnv, jobject jThis);

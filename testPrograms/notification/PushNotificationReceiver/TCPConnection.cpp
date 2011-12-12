@@ -58,6 +58,7 @@ TCPConnection::TCPConnection(TCPListener* listener):
 TCPConnection::~TCPConnection()
 {
     mConnection.close();
+    delete mListener;
 }
 
 /**

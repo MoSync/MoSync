@@ -19,15 +19,23 @@ package com.mosync.internal.android;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.pm.PermissionInfo;
 import android.os.Build;
 import android.util.Log;
 
 import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
+import com.mosync.internal.android.notifications.PushRegistrationData;
+import com.mosync.nativeui.util.properties.FloatConverter;
+import com.mosync.nativeui.util.properties.IntConverter;
+import com.mosync.nativeui.util.properties.PropertyConversionException;
 
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_OK;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ERROR;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_UNSUPPORTED;
 
 /**
  * Wrapper for Notifications Syscalls to avoid cluttering the MoSyncSyscalls file.
@@ -45,9 +53,17 @@ class MoSyncNotifications
 		mMoSyncThread = thread;
 		mLocalNotificationsManager = new LocalNotificationsManager(thread);
 		// C2DM supports only devices with Android 2.2 and higher.
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO)
+		// Version.SDK_INT is not available on sdk 3.
+		try{
+			int target = IntConverter.convert( Build.VERSION.SDK );
+			if ( target >= 8 )
+			{
+				mPushNotificationManager = new PushNotificationsManager(thread, getActivity());
+			}
+		}
+		catch(PropertyConversionException pce )
 		{
-			mPushNotificationManager = new PushNotificationsManager(thread, getActivity());
+			return;
 		}
 	}
 
@@ -62,7 +78,7 @@ class MoSyncNotifications
 	/**
 	 * Check if Push permissions are set, and if not call maPanic().
 	 */
-	boolean isPushPermissionsSet()
+	boolean isPushPermissionSet()
 	{
 		return
 			(PackageManager.PERMISSION_GRANTED ==
@@ -79,7 +95,7 @@ class MoSyncNotifications
 	 */
 	void panicIfPushPermissionsAreNotSet()
 	{
-		if (!isPushPermissionsSet())
+		if (!isPushPermissionSet())
 		{
 			mMoSyncThread.maPanic(1,
 				"Push Notifications permission is not set in the MoSync project");
@@ -128,8 +144,17 @@ class MoSyncNotifications
 
 	int maNotificationPushRegister(String accountID)
 	{
-		panicIfPushPermissionsAreNotSet();
-		return mPushNotificationManager.register(accountID);
+//		panicIfPushPermissionsAreNotSet();
+		if ( mPushNotificationManager != null )
+		{
+			return mPushNotificationManager.register(accountID);
+		}
+		else
+		{
+			// No need to send registration request, it can be handled locally.
+			Log.e("@@MoSync", "Current Android version does not support C2DM. Use Android 2.2 or higher.");
+			return MA_NOTIFICATION_RES_UNSUPPORTED;
+		}
 	}
 
 	int maNotificationPushGetRegistration(int buf, int bufSize)
@@ -215,6 +240,20 @@ class MoSyncNotifications
 		else
 		{
 			Log.e("@@MoSync","maNotificationPushSetMessageTitle Platform unsupported");
+			return MA_NOTIFICATION_RES_ERROR;
+		}
+	}
+
+	int maNotificationPushSetDisplayFlag(int displayFlag)
+	{
+		panicIfPushPermissionsAreNotSet();
+		if ( mPushNotificationManager != null )
+		{
+			return mPushNotificationManager.setDisplayFlag(displayFlag);
+		}
+		else
+		{
+			Log.e("@@MoSync","maNotificationPushSetDisplayFlag Platform unsupported");
 			return MA_NOTIFICATION_RES_ERROR;
 		}
 	}

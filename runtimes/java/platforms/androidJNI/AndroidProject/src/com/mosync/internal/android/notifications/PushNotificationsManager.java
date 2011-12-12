@@ -40,7 +40,8 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_REG
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PUSH_NOTIFICATION;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PUSH_NOTIFICATION_UNREGISTRATION;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PUSH_NOTIFICATION_REGISTRATION;
-
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME;
 
 /**
  * The Notifications Manager that holds all the notifications that were
@@ -61,11 +62,15 @@ public class PushNotificationsManager
 		mMosyncThread = mThread;
 		mAppContext = context;
 		ref = this;
+		// Store the default display flag in SharedPreferences.
+		PushNotificationsUtil.setPushNotificationDisplayFlag(
+				mMosyncThread.getActivity(), MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT);
 	}
 
 	/**
 	 * Handles an C2DM intent.
-	 * Routine: C2DM message is received, the MoSync activity
+	 * Routine: C2DM message is received.
+	 * If the application is not running the MoSync activity
 	 * is launched, and this function is called.
 	 * @param intent
 	 * @return {@code true} If the intent was a C2DM intent and handled.
@@ -74,15 +79,17 @@ public class PushNotificationsManager
 	{
 		Log.e("@@MoSync", "handlePushNotificationIntent");
 
-		// Get message from intent.
 		PushNotificationsManager instance = getRef();
 		if ( null == instance )
 		{
 			return false;
 		}
 
-		// Process the new incoming message.
-		instance.messageReceived(intent.getStringExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_MESSAGE));
+		// Get message from intent.
+		String pushMessage = intent.getStringExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_MESSAGE);
+
+		// Process the new incoming message and show the notification.
+		instance.messageReceived(pushMessage, true);
 
 		return true;
 	}
@@ -135,18 +142,24 @@ public class PushNotificationsManager
 
 	/**
 	 * The manager is notified by a new incoming message.
-	 * @param mess The C2DM message.
+	 * @param message The C2DM message.
+	 * @param showNotification True if the notification should be
+	 * displayed to the user.
 	 */
-	public void messageReceived(String message)
+	public void messageReceived(String message, Boolean showNotification)
 	{
 		Log.e("@@MoSync","C2DM messageReceived");
 
 		// Create local notification object.
 		int newHandle = createNotification(mMosyncThread.getActivity(), message);
 
-		// Launch the notification now.
-		triggerNotification(mMosyncThread.getActivity(), newHandle);
+		if ( showNotification )
+		{
+			// Launch the notification now.
+			triggerNotification(mMosyncThread.getActivity(), newHandle);
+		}
 
+		// Post a message to MoSync queue.
 		postEventNotificationReceived(newHandle);
 	}
 
@@ -230,13 +243,6 @@ public class PushNotificationsManager
 	 */
 	public int register(String accountID)
 	{
-		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.FROYO)
-		{
-			// No need to send registration request, it can be handled locally.
-			Log.e("@@MoSync", "Current Android version does not support C2DM. Use Android 2.2 or higher.");
-			registrationFail(PushRegistrationData.REG_ERR_MESSAGE_PHONE_ERROR);
-			return MA_NOTIFICATION_RES_UNSUPPORTED;
-		}
 		if ( mRegistrationInfo.registrationInProgress )
 		{
 			Log.e("@@MoSync","One registration is already in progress.");
@@ -404,6 +410,31 @@ public class PushNotificationsManager
 		PushNotificationsUtil.setPushNotificationTitle(mMosyncThread.getActivity(), title);
 	}
 
+	/**
+	 * Store the display flag in Preferences.
+	 * @param displayFlag
+	 * @return MA_NOTIFICATION_RES_OK or MA_NOTIFICATION_RES_ERROR.
+	 */
+	public int setDisplayFlag(int displayFlag)
+	{
+		switch ( displayFlag)
+		{
+			case MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT:
+				PushNotificationsUtil.setPushNotificationDisplayFlag(
+						mMosyncThread.getActivity(), MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT);
+				break;
+			case MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME:
+				PushNotificationsUtil.setPushNotificationDisplayFlag(
+						mMosyncThread.getActivity(), MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME);
+				break;
+			default:
+			{
+				Log.e("@@MoSync", "maNotificationPushSetDisplayFlag Invalid flag");
+				return MA_NOTIFICATION_RES_ERROR;
+			}
+		}
+		return MA_NOTIFICATION_RES_OK;
+	}
 	/************************ Class members ************************/
 	/**
 	 * The MoSync thread object.

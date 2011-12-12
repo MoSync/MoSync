@@ -17,12 +17,16 @@ MA 02110-1301, USA.
 
 package com.mosync.java.android;
 
-import com.google.android.c2dm.C2DMBaseReceiver;
-import com.mosync.internal.android.notifications.PushNotificationsManager;
-
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import com.google.android.c2dm.C2DMBaseReceiver;
+import com.mosync.internal.android.notifications.PushNotificationsManager;
+import com.mosync.internal.android.notifications.PushNotificationsUtil;
+
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT;
+import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME;
 
 /**
  * C2DM receiver for registration and push messages from Google.
@@ -70,6 +74,7 @@ public class C2DMReceiver extends C2DMBaseReceiver
 			throws java.io.IOException
 	{
 		Log.e("@@MoSync", "C2DM Registration success");
+
 		// Notify the manager of this event.
 		PushNotificationsManager manager = PushNotificationsManager.getRef();
 		manager.registrationReady(registrationId);
@@ -84,16 +89,32 @@ public class C2DMReceiver extends C2DMBaseReceiver
 	protected void onMessage(Context context, Intent intent)
 	{
 		Log.e("@@MoSync", "C2DM Message received");
+
 		// Create new PushNotificationObject that holds the payload.
 		final String message = intent.getStringExtra("payload");
+
 		// Process the message only if the payload string is not empty.
 		if ( message != null )
 		{
-			// If the MoSync activity is already started,
-			// just display the notification and send the push event.
+			// If the MoSync activity is already started, send the push event,
+			// but display the notification only if MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME
+			// flag was set via maNotificationPushSetDisplayFlag syscall.
 			if ( PushNotificationsManager.getRef() != null )
 			{
-				PushNotificationsManager.getRef().messageReceived(message);
+				// PushNotificationsManager.getAppContext()
+				if ( PushNotificationsUtil.getPushNotificationDisplayFlag(context)
+						== MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME )
+				{
+					// Notify the NotificationsManager on the new message. Display the notification.
+					PushNotificationsManager.getRef().messageReceived(message, true);
+				}
+				else
+				{
+					// Notify the NotificationsManager on the new message. But don't display the notification.
+					PushNotificationsManager.getRef().messageReceived(message, false);
+					Log.e("@@MoSync",
+							"PushNotifications: new message received. The notification is not displayed because the application is running");
+				}
 			}
 			else
 			{

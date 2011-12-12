@@ -137,7 +137,7 @@ public class LocalNotificationsManager
 					Log.e("@@MoSync", "maNotificationLocalSetProperty cannot be called after scheduling the notification.");
 					return MA_NOTIFICATION_RES_ALREADY_SCHEDULED;
 				}
-				 if ( property.equals(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS)
+				if ( property.equals(MA_NOTIFICATION_LOCAL_FLASH_LIGHTS)
 						 &&
 					  mMoSyncThread.getActivity().getApplicationContext().getPackageManager().
 						 hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH) )
@@ -312,20 +312,33 @@ public class LocalNotificationsManager
 	/**
 	 * The notification manager is notified when the application has
 	 * come in foreground again. In this case, the local notifications
-	 * will not be triggered.
+	 * will not be shown.
 	 */
 	public static void focusGained()
 	{
-		// ToDo see if this is truly needed.
+		Log.e("@MoSync","LocalNotificationsManager - focusGained");
+
+		mFocusState = true;
 	}
 
 	/**
 	 * The notification manager is notified when the application has
-	 * gone to background. Only now the local notifications can be triggered.
+	 * gone to background. Only now the local notifications can be shown.
 	 */
 	public static void focusLost()
 	{
-		// ToDo see if this is truly needed.
+		Log.e("@MoSync","LocalNotificationsManager - focusLost");
+
+		mFocusState = false;
+	}
+
+	/**
+	 * Get the MoSync application's foreground state.
+	 * @return true if the app is in foreground, false otherwise.
+	 */
+	public static Boolean getFocusState()
+	{
+		return mFocusState;
 	}
 	/************************ Class members ************************/
 	/**
@@ -351,4 +364,11 @@ public class LocalNotificationsManager
 	 */
 	private Hashtable<Integer,TimerTask> m_TimerTasks =
 		new Hashtable<Integer,TimerTask>();
+
+	/**
+	 * The MoSync application's focus state.
+	 * If true the app is in foreground.
+	 * If false the app is in background.
+	 */
+	private static Boolean mFocusState = true;
 }

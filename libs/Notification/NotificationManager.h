@@ -33,6 +33,8 @@ MA 02110-1301, USA.
 #include <MAUtil/Map.h>
 #include <MAUtil/Environment.h>
 
+#include "LocalNotification.h"
+
 namespace Notification
 {
 
@@ -156,6 +158,9 @@ namespace Notification
         /**
          * Schedules a local notification for delivery at its encapsulated
          * date and time.
+         * By default, the notifications are displayed to the user only if the application
+         * is in background. But on Android you can configure this via the
+         * #MA_NOTIFICATION_LOCAL_DISPLAY_FLAG property by calling setDisplayFlag().
          * @param localNotification Handle to a local notification object.
          * @return One of the constants:
          *  - #MA_NOTIFICATION_RES_OK if no error occurred.
@@ -198,9 +203,11 @@ namespace Notification
          *  PUSH_NOTIFICATION_TYPE_BADGE | PUSH_NOTIFICATION_TYPE_ALERT, "");
          *
          *  @return One of the next result codes:
-         *  - MA_NOTIFICATION_RES_OK if no error occurred.
-         *  - MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already
+         *  - #MA_NOTIFICATION_RES_OK if no error occurred.
+         *  - #MA_NOTIFICATION_RES_ALREADY_REGISTERED if the application is already
          *    registered for receiving push notifications.
+         *  - #MA_NOTIFICATION_RES_UNSUPPORTED if notifications are not supported
+         *  on current platform.
          */
         int registerPushNotification(
             const int types,
@@ -245,14 +252,35 @@ namespace Notification
         int getApplicationIconBadgeNumber();
 
         /**
+         * Set the display flags applied to the incoming push notifications.
+         * Note that regardless of this setting, the didReceivePushNotification
+         * callback will be made for each incoming notification.
+         * #NOTIFICATION_DISPLAY_DEFAULT is enabled by default.
+         * Platform: Android only.
+         * @param displayFlag  is the required state of the application for
+         * a notification to be displayed. One of the constants:
+         *  - #NOTIFICATION_DISPLAY_DEFAULT
+         *  - #NOTIFICATION_DISPLAY_ANYTIME.
+         * @return Any of the following result codes:
+         * - #MA_NOTIFICATION_RES_OK if the property could be set.
+         * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+         * was invalid for the target platform.
+         */
+        int setPushNotificationsDisplayFlag(const NotificationDisplayFlag displayFlag);
+
+        /**
          * Set the  message title in the notification area for incoming push
          * notifications.
          * This call does not alter already received notifications.
          * Platform: Android only.
          * @param title The title that goes in the expanded entry of the
          * notification.
+         * @return Any of the following result codes:
+         * - #MA_NOTIFICATION_RES_OK if the property could be set.
+         * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+         * was invalid for the target platform.
          */
-        void setPushNotificationsTitle(const MAUtil::String& title);
+        int setPushNotificationsTitle(const MAUtil::String& title);
 
         /**
          * Set the ticker text in the notification status bar for incoming push
@@ -261,8 +289,12 @@ namespace Notification
          * Platform: Android only.
          * @param ticker The text that flows by in the status bar when the
          * notification first activates.
+         * @return Any of the following result codes:
+         * - #MA_NOTIFICATION_RES_OK if the property could be set.
+         * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+         * was invalid for the target platform.
          */
-        void setPushNotificationsTickerText(const MAUtil::String& ticker);
+        int setPushNotificationsTickerText(const MAUtil::String& ticker);
 
         /**
          * Get the message title of the incoming notifications.

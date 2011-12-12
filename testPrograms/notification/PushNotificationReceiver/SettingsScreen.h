@@ -43,7 +43,8 @@ class SettingsScreenListener;
 class SettingsScreen:
 	public Screen,
 	public ButtonListener,
-	public EditBoxListener
+	public EditBoxListener,
+	public CheckBoxListener
 {
 public:
 	/**
@@ -104,6 +105,16 @@ private:
     void editBoxReturn(EditBox* editBox);
 
     /**
+     * This method is called when the state of the check box was changed
+     * by the user.
+     * @param checkBox The check box object that generated the event.
+     * @param state True if the check box is checked, false otherwise.
+     */
+    void checkBoxStateChanged(
+        CheckBox* checkBox,
+        bool state);
+
+    /**
      * Creates an empty widget with a given width.
      * The ownership of the result is passed to the caller.
      * @return An empty widget.
@@ -142,6 +153,26 @@ private:
      * Used for establish connection with server.
      */
     Button* mConnectButton;
+
+    // Android only
+    /**
+     * The ticker text for incoming notifications.
+     * ( The text that flows by in the status bar when the
+     * notification first arrives.
+     */
+    EditBox* mTickerText;
+
+    /**
+     * The title in the content area.
+     */
+    EditBox* mContentTitle;
+
+    /**
+     * The incoming notifications will be displayed only if the app
+     * is running in background.
+     * Android only.
+     */
+    CheckBox* mShowOnlyIfInBackground;
 };
 
 #endif /* SETTINGSSCREEN_H_ */

@@ -39,10 +39,10 @@ namespace Notification
 {
 
 	/**
-	 * Constants indicating the flags
+	 * Constants indicating the notification flags.
 	 * Platform: Android only.
 	 */
-	enum NotificationFlags
+	enum NotificationFlag
 	{
 		// Indicates that the audio will be repeated until the notification is
 		// canceled or the notification window is opened.
@@ -56,6 +56,28 @@ namespace Notification
 		NOTIFICATION_FLAG_HIGH_PRIORITY = 128,
 		// Indicates that the notification should be canceled when it is clicked by the user.
 		NOTIFICATION_FLAG_AUTO_CANCEL = 16
+	};
+
+	/**
+	 * Constants used for setting the required state of the application
+	 * for a notification to be displayed.
+	 * Note that regardless of this setting, the didReceiveLocalNotification
+	 * callback will be made for each incoming notification.
+	 * Platform: Android only.
+	 */
+	enum NotificationDisplayFlag
+	{
+		// For local notifications:by setting this, the incoming notifications
+		// will be displayed to the user only if the application is in background.
+		// For push notifications: by setting this, the incoming notifications
+		// will be displayed to the user only if the application is not in use.
+		// This setting is enabled by default.
+		NOTIFICATION_DISPLAY_DEFAULT = 0,
+		// By setting this, the incoming notifications will be displayed to
+		// the user regardless of the application's focus state.
+		// So, even when in foreground, the notifications will be shown to
+		// the user.
+		NOTIFICATION_DISPLAY_ANYTIME = 1
 	};
 
 	/**
@@ -280,7 +302,24 @@ namespace Notification
          * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
          * was invalid for the target platform.
          */
-        int setFlag(const int flag);
+        int setFlag(const NotificationFlag flag);
+
+        /**
+         * Set the display flags applied to the local notification.
+         * Note that regardless of this setting, the didReceiveLocalNotification
+         * callback will be made for each incoming notification.
+         * #NOTIFICATION_DISPLAY_ONLY_IF_IN_BACKGROUND is enabled by default.
+         * Platform: Android.
+         * @param displayFlag  is the required state of the application for
+         * a notification to be displayed. One of the constants:
+         *  - #NOTIFICATION_DISPLAY_DEFAULT
+         *  - #NOTIFICATION_DISPLAY_ANYTIME.
+         *  @return Any of the following result codes:
+         * - #MA_NOTIFICATION_RES_OK if the property could be set.
+         * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+         * was invalid for the target platform.
+         */
+        int setDisplayFlag(const NotificationDisplayFlag displayFlag);
 
         /**
          * Set the title of the action button or slider.

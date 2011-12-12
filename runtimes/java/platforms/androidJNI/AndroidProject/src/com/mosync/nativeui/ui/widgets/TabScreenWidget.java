@@ -41,7 +41,7 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
  * @author fmattias
  */
 public class TabScreenWidget extends ScreenWidget
-	implements ScreenWidget.TitleChangedListener, ScreenWidget.IconChangedListener
+	implements ScreenWidget.TitleChangedListener
 {
 	/**
 	 * Map from a screen widget to its tab index in this
@@ -96,7 +96,6 @@ public class TabScreenWidget extends ScreenWidget
 		tab.addTab( tabSpec );
 		m_tabIndexToScreen.put( screen, indexOfNewTab );
 		screen.setTitleChangedListener( this );
-		screen.setIconChangedListener(this);
 	}
 
 	private void setIndicators(TabSpec tabSpec, String title, Drawable icon)
@@ -189,17 +188,5 @@ public class TabScreenWidget extends ScreenWidget
 
 		TextView tabTitle = (TextView) tabIndicatorView.findViewById( android.R.id.title );
 		tabTitle.setText( newTitle );
-	}
-
-	@Override
-	public void iconChanged(ScreenWidget screen, Drawable newIcon)
-	{
-//		Log.e("@@MoSync","TabIcon changed");
-
-		int tabIndex = m_tabIndexToScreen.get( screen );
-		TabHost tabHost = (TabHost) getView( );
-		View tabIndicatorView = tabHost.getTabWidget( ).getChildTabViewAt( tabIndex );
-		ImageView icon = (ImageView) tabIndicatorView.findViewById(android.R.id.icon);
-		icon.setImageDrawable(newIcon);
 	}
 }

@@ -9086,6 +9086,34 @@ group NotificationAPI "Notification API" {
 		}
 	} // end of Notification Flags
 
+		group NotificationDisplayFlags "Notification Display Flags" {
+		constset int MA_NOTIFICATION_DISPLAY_FLAG_ {
+			/**
+			* For local notifications: if set, the incoming notifications will be displayed to
+			* the user only if the application is in background.
+			* For push notifications: if set, the incoming notifications will be displayed to
+			* the user only if the application is not in use.
+			* Note that the received push notification event will always be received regardless
+			* of this flag.
+			* This setting is enabled by default.
+			* Platform: Android only.
+			*/
+			DEFAULT = 0;
+
+			/**
+			* If set, all the incoming notification will be displayed to the user regardless of
+			* it's focus state.
+			* For local notifications: this means that the user will get the notifications when the
+			* application is in background, but also in foreground.
+			* For push notifications: this means that the user will get the notifications when the
+			* application is closed, but also when it's in use.
+			* Note that the  event will always be received regardless of this flag.
+			* Platform: Android only.
+			*/
+			ANYTIME = 1;
+		}
+	} // end of Notification Display Flags
+
 	group NotificationPushTypes "Notification Push Types" {
 		constset int MA_NOTIFICATION_PUSH_TYPE_ {
 			/**
@@ -9235,14 +9263,14 @@ group NotificationAPI "Notification API" {
 			TICKER_TEXT = "tickerText";
 
 			/**
-			* @brief Set or get the flags applied to the local notification.
+			* @brief Set the flags applied to the local notification.
 			* Platform: Android.
 			*
 			* @validvalue One of the constants:
-			* - MA_NOTIFICATION_FLAG_INSISTENT
-			* - MA_NOTIFICATION_FLAG_AUTO_CANCEL
-			* - MA_NOTIFICATION_FLAG_HIGH_PRIORITY
-			* - MA_NOTIFICATION_FLAG_NO_CLEAR.
+			* - #MA_NOTIFICATION_FLAG_INSISTENT
+			* - #MA_NOTIFICATION_FLAG_AUTO_CANCEL
+			* - #MA_NOTIFICATION_FLAG_HIGH_PRIORITY
+			* - #MA_NOTIFICATION_FLAG_NO_CLEAR.
 			*
 			* @setonly
 			*
@@ -9252,6 +9280,25 @@ group NotificationAPI "Notification API" {
 			* \endcode
 			*/
 			FLAG = "flag";
+
+			/**
+			* @brief Set the display flag applied to the local notification.
+			* Note the regardless of this flag, the #EVENT_TYPE_LOCAL_NOTIFICATION event will be received.
+			* Platform: Android.
+			*
+			* @validvalue One of the constants:
+			* - #MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT Which is enabled by default.
+			* - #MA_NOTIFICATION_DISPLAY_FLAG_ ANYTIME.
+			*
+			* @setonly
+			*
+			* @par Example
+			* \code
+			*    // Display the notification even when the application is in foreground.
+			*    maNotificationLocalSetProperty(notificationHandle, MA_NOTIFICATION_LOCAL_DISPLAY_FLAG, MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME);
+			* \endcode
+			*/
+			DISPLAY_FLAG = "displayFlag";
 
 			/**
 			* @brief Enable/disable the the default vibration when an alert is displayed.
@@ -9315,7 +9362,7 @@ group NotificationAPI "Notification API" {
 			* - a value for the ledARGB field (for the color),
 			* - the ledOffMS field (length of time, in milliseconds, to keep the light off),
 			* - the ledOnMS (length of time, in milliseconds, to keep the light on).
-			*  returns MA_NOTIFICATION_ERROR if the current device doesn't support flashing LED.
+			*  returns #MA_NOTIFICATION_ERROR if the current device doesn't support flashing LED.
 			* @setonly
 			*
 			* @par Example
@@ -9419,6 +9466,9 @@ group NotificationAPI "Notification API" {
 
 		/**
 		* \brief Schedules a local notification for delivery at its encapsulated date and time.
+		* By default, the notifications are displayed to the user only if the application is
+		* in background. But on Android you can configure this by setting the
+		* #MA_NOTIFICATION_LOCAL_DISPLAY_FLAG property.
 		*
 		* \param notificationHandle Handle to a local notification object.
 		*
@@ -9464,6 +9514,7 @@ group NotificationAPI "Notification API" {
 		* - #MA_NOTIFICATION_RES_OK if no error occurred.
 		* - #MA_NOTIFICATION_ALREADY_REGISTERED if the application is already registered for
 		* receiving push notifications.
+		* - #MA_NOTIFICATION_RES_UNSUPPORTED if notifications are not supported on current platform.
 		*/
 		int maNotificationPushRegister(in MAHandle pushNotificationTypes, in MAString accountID);
 
@@ -9557,6 +9608,22 @@ group NotificationAPI "Notification API" {
 		* - #MA_NOTIFICATION_RES_ERROR.
 		*/
 		int maNotificationPushSetMessageTitle(in MAString messageTitle);
+
+		/**
+		* \brief Set the display flags applied to the incoming push notifications.
+		* Note that regardless of this setting, the #EVENT_TYPE_PUSH_NOTIFICATION event
+		* will be received for each incoming notification.
+		* #MA_NOTIFICATION_DISPLAY_DEFAULT is enabled by default.
+		* Platform: Android only.
+		* \param displayFlag One of the constants:
+		* - #MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT Which is enabled by default.
+		* - #MA_NOTIFICATION_DISPLAY_FLAG_ANYTIME.
+		* \return One of the next constants:
+		* - #MA_NOTIFICATION_RES_OK if no error occurred.
+		* - #MA_NOTIFICATION_RES_ERROR if push notifications are not supported,
+		* or the input value is not valid.
+		*/
+		int maNotificationPushSetDisplayFlag(in int displayFlag);
 	}//End of Notification Functions
 } // End of Notification API
 

@@ -357,9 +357,29 @@ namespace Notification
      * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
      * was invalid for the target platform.
      */
-    int LocalNotification::setFlag(const int flag)
+    int LocalNotification::setFlag(const NotificationFlag flag)
     {
 		return this->setPropertyInt(MA_NOTIFICATION_LOCAL_FLAG, flag);
+    }
+
+    /**
+     * Set the display flags applied to the local notification.
+     * Note that regardless of this setting, the didReceiveLocalNotification
+     * callback will be made for each incoming notification.
+     * #NOTIFICATION_DISPLAY_ONLY_IF_IN_BACKGROUND is enabled by default.
+     * Platform: Android.
+     * @param displayFlag  is the required state of the application for
+     * a notification to be displayed. One of the constants:
+     *  - #NOTIFICATION_DISPLAY_ONLY_IF_IN_BACKGROUND
+     *  - #NOTIFICATION_DISPLAY_ANYTIME.
+     *  @return Any of the following result codes:
+     * - #MA_NOTIFICATION_RES_OK if the property could be set.
+     * - #MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME if the property name
+     * was invalid for the target platform.
+     */
+    int LocalNotification::setDisplayFlag(const NotificationDisplayFlag displayFlag)
+    {
+		return this->setPropertyInt(MA_NOTIFICATION_LOCAL_DISPLAY_FLAG, displayFlag);
     }
 
     /**
