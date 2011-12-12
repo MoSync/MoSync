@@ -28,6 +28,7 @@ MA 02110-1301, USA.
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
+#include "PhoneGapMessage.h"
 
 class PhoneGapMessageHandler;
 
@@ -51,7 +52,7 @@ public:
 	 * Implementation of File API exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
-	bool handleMessage(Wormhole::WebViewMessage& message);
+	bool handleMessage(PhoneGapMessage& message);
 
 private:
 	PhoneGapMessageHandler* mMessageHandler;

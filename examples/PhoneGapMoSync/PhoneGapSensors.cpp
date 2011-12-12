@@ -50,7 +50,7 @@ PhoneGapSensors::~PhoneGapSensors()
  * Implementation of sensor API:s exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-bool PhoneGapSensors::handleMessage(Wormhole::WebViewMessage& message)
+bool PhoneGapSensors::handleMessage(PhoneGapMessage& message)
 {
 	// Accelerometer request from PhoneGap
 	if ((message.getParam("service") == "Accelerometer"))

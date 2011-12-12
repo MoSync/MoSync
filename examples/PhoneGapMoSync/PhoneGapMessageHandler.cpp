@@ -277,3 +277,35 @@ void PhoneGapMessageHandler::sendPhoneGapError(
 		data);
 	mWebView->callJS(script);
 }
+
+/**
+ * Evaluate JavaScript code in the WebView.
+ *
+ * @param script Code that should be evaluated.
+ */
+void PhoneGapMessageHandler::callJS(const String& script)
+{
+	mWebView->callJS(script);
+}
+
+/**
+ * Evaluate JavaScript code in the WebView.
+ *
+ * @param callbackID The id of the JS callback function.
+ * @param args Return values as a JSON string.
+ * @param castFunction Name of an optional JS function that
+ * will convert the JSOn args to a JS object.
+ */
+void PhoneGapMessageHandler::callSuccess(
+	const String& callbackID,
+	const String& args,
+	const String& castFunction
+	)
+{
+	String script = "PhoneGap.CallbackSuccess(";
+	script += callbackId + ",";
+	script += args + ",";
+	script += castFunction + ")";
+
+	mWebView->callJS(script);
+}
