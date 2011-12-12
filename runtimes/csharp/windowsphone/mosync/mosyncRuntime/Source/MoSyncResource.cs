@@ -13,13 +13,25 @@ namespace MoSync
     {
         protected Object mInternalObject;
         protected int mResourceType;
+		protected bool mIsDynamicPlaceholder = false;
         public static readonly Resource Flux = new Resource(null, Constants.RT_FLUX);
 
-        public Resource(Object internalObject, int resourceType)
+        public Resource(Object internalObject, int resourceType, bool isDynamicPlaceholder=false)
         {
             mInternalObject = internalObject;
             mResourceType = resourceType;
+			mIsDynamicPlaceholder = isDynamicPlaceholder;
         }
+
+		public bool IsDynamicPlaceholder()
+		{
+			return mIsDynamicPlaceholder;
+		}
+
+		public void SetIsDynamicPlaceholder(bool s)
+		{
+			mIsDynamicPlaceholder = s;
+		}
 
         public void SetInternalObject(Object internalObject)
         {

@@ -69,7 +69,7 @@ namespace MoSync
         protected IoctlInvoker mIoctlInvoker;
 
         protected Dictionary<int, Resource> mResources = new Dictionary<int, Resource>();
-        protected int mCurrentResourceHandle;
+        protected int mCurrentResourceHandle = 1;
         public readonly Dictionary<String, int> mLabels = new Dictionary<String, int>();
 
         private List<Event> mEvents = new List<Event>();
@@ -246,6 +246,23 @@ namespace MoSync
                 mResources[res].SetResourceType(MoSync.Constants.RT_PLACEHOLDER);
                 mResources[res].SetInternalObject(null);
             };
+
+			mSyscalls.maDestroyPlaceholder = delegate(int res)
+			{
+				if (mResources[res].IsDynamicPlaceholder() == false)
+				{
+					MoSync.Util.CriticalError("maDestroyPlaceholder can only be used on resource placeholders created with maCreatePlaceholder.");
+				}
+
+				if (mResources.Remove(res) == true)
+				{
+					return;
+				}
+				else
+				{
+					MoSync.Util.CriticalError("Could not destroy placeholder!");
+				}
+			};
         }
 
         // will reset the runtime.

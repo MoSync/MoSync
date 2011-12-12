@@ -72,7 +72,8 @@ namespace MoSync
 
             syscalls.maCreatePlaceholder = delegate()
             {
-                return runtime.AddResource(new Resource(null, MoSync.Constants.RT_PLACEHOLDER));
+				Resource res = new Resource(null, MoSync.Constants.RT_PLACEHOLDER, true);
+                return runtime.AddResource(res);
             };
 
             syscalls.maFindLabel = delegate(int _name)

@@ -347,12 +347,9 @@ namespace MoSync
 					}
 				}
 
-				runtime.SetResource(_placeholder,
-					new Resource(
-						bitmap,
-						MoSync.Constants.RT_IMAGE
-						)
-					);
+				Resource res = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, _placeholder);
+				res.SetInternalObject(bitmap);
+				res.SetResourceType(MoSync.Constants.RT_IMAGE);
 				return MoSync.Constants.RES_OK;
 			};
 
@@ -432,14 +429,10 @@ namespace MoSync
 				Stream s = mem.GetStream(_offset, _size);
 				WriteableBitmap bitmap = MoSync.Util.CreateWriteableBitmapFromStream(s);
 				s.Close();
-				runtime.SetResource(
-					_placeholder,
-					new Resource(
-						bitmap,
-						MoSync.Constants.RT_IMAGE
-						)
-				);
 
+				Resource imageRes = runtime.GetResource(MoSync.Constants.RT_PLACEHOLDER, _placeholder);
+				imageRes.SetInternalObject(bitmap);
+				imageRes.SetResourceType(MoSync.Constants.RT_IMAGE);
 				return MoSync.Constants.RES_OK;
 			};
 		}
