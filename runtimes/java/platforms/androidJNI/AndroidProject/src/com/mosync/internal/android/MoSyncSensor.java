@@ -196,6 +196,8 @@ public class MoSyncSensor implements SensorEventListener {
 						orientation = UIDEVICE_ORIENTATION_UNKNOWN;
 					}
 					event[SEVENT_SENSOR_VALUES] = Float.floatToIntBits(orientation);
+					//compass orientation value
+					event[SEVENT_SENSOR_VALUES + 1] = Float.floatToIntBits(arg0.values[0]);
 					break;
 				case SENSOR_TYPE_PROXIMITY:
 					event[SEVENT_SENSOR_VALUES] =
