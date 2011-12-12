@@ -38,8 +38,13 @@ LOCAL_SRC_FILES := FileImpl.cpp \
 	../../core/Recompiler/ArmRecompiler.cpp \
 	../../../../intlibs/hashmap/hashmap.cpp \
 
-LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog -lGLESv1_CM
 
-LOCAL_CFLAGS	:= -DFPM_ARM
+ifeq ($(ANDROID_API_BELOW_7),true)
+	LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog -lGLESv1_CM
+	LOCAL_CFLAGS := -D_android_1
+else
+	LOCAL_LDLIBS	:= -L$(SYSROOT)/usr/lib -llog -lGLESv1_CM -lGLESv2
+endif
+LOCAL_CFLAGS	+= -DFPM_ARM
 
 include $(BUILD_SHARED_LIBRARY)
