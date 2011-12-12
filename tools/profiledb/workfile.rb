@@ -6,7 +6,7 @@ work = MoSyncExe.new
 work.instance_eval do
         @SOURCES = ["."]
         @EXTRA_INCLUDES = ["../../intlibs"]
-        @LOCAL_LIBS = ["filelist", "profiledb"]
+        @LOCAL_LIBS = ["profiledb", "filelist"]
 
         @NAME = "profiledb"
         if(HOST==:linux || HOST==:darwin)
