@@ -67,10 +67,16 @@ static Capture *sSharedInstance = nil;
     mImagePicker = [[UIImagePickerController alloc] init];
     mImagePicker.delegate = self;
     mImagePicker.allowsEditing = YES;
+    if ([UIImagePickerController isSourceTypeAvailable:
+         UIImagePickerControllerSourceTypeCamera] == YES)
+    {
+        mImagePicker.sourceType = UIImagePickerControllerSourceTypeCamera;
+    }
 
     mImageHandleArray = [[NSMutableDictionary alloc] init];
     mVideoDictionary = [[NSMutableDictionary alloc] init];
 
+    mSaveDataToCameraRoll = true;
     return [super init];
 }
 
@@ -128,9 +134,10 @@ static Capture *sSharedInstance = nil;
  *  One of the MA_CAPTURE_ constants.
  * @param value The value that will be assigned to the property.
  * @return
- *  - MA_CAPTURE_RES_OK
- *  - MA_CAPTURE_RES_INVALID_PROPERTY
- *  - MA_CAPTURE_RES_INVALID_PROPERTY_VALUE
+ *  - MA_CAPTURE_RES_OK if no error occurred.
+ *  - MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+ *  - MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+ *  - MA_CAPTURE_RES_FLASH_NOT_SUPPORTED if flash is not supported on current device.
  */
 -(int) setProperty:(const char*) property
          withValue:(const char*) value
@@ -155,6 +162,18 @@ static Capture *sSharedInstance = nil;
     {
         returnValue = [self setVideoQuality:valueString];
     }
+    else if ([propertyString isEqualToString:@MA_CAPTURE_CAMERA_ROLL])
+    {
+        returnValue = [self setCameraRollFlag:valueString];
+    }
+    else if ([propertyString isEqualToString:@MA_CAPTURE_FLASH])
+    {
+        returnValue = [self setFlashMode:valueString];
+    }
+    else if ([propertyString isEqualToString:@MA_CAPTURE_CAMERA_CONTROLS])
+    {
+        returnValue = [self setCameraControls:valueString];
+    }
     else
     {
         returnValue = MA_CAPTURE_RES_INVALID_PROPERTY;
@@ -176,6 +195,7 @@ static Capture *sSharedInstance = nil;
  * - MA_CAPTURE_RES_OK if no error occurred.
  * - MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
  * - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+ * - MA_CAPTURE_RES_FLASH_NOT_SUPPORTED if flash is not supported on current device.
  */
 -(int) getProperty:(const char*) property
              value:(char*) value
@@ -194,6 +214,37 @@ static Capture *sSharedInstance = nil;
     {
         int videoQuality = [self getVideoQuality];
         valueString = [[NSString alloc] initWithFormat:@"%d", videoQuality];
+    }
+    else if ([propertyString isEqualToString:@MA_CAPTURE_CAMERA_ROLL])
+    {
+        if (mSaveDataToCameraRoll)
+        {
+            valueString = [[NSString alloc] initWithString:@"true"];
+        }
+        else
+        {
+            valueString = [[NSString alloc] initWithString:@"false"];
+        }
+    }
+    else if ([propertyString isEqualToString:@MA_CAPTURE_FLASH])
+    {
+        returnedValue = [self getFlashMode];
+        if (returnedValue != MA_CAPTURE_RES_FLASH_NOT_SUPPORTED)
+        {
+            valueString = [[NSString alloc] initWithFormat:@"%d",returnedValue];
+            returnedValue = MA_CAPTURE_RES_OK;
+        }
+    }
+    else if ([propertyString isEqualToString:@MA_CAPTURE_CAMERA_CONTROLS])
+    {
+        if (mImagePicker.showsCameraControls)
+        {
+            valueString = [[NSString alloc] initWithString:@"true"];
+        }
+        else
+        {
+            valueString = [[NSString alloc] initWithString:@"false"];
+        }
     }
     else
     {
@@ -542,11 +593,17 @@ static Capture *sSharedInstance = nil;
 {
     NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
     UIImage* image = [cameraDictionary objectForKey:UIImagePickerControllerEditedImage];
+
     if (!image)
     {
         NSLog(@"Capture::handleTakenPhoto image is invalid");
         [pool release];
         return;
+    }
+
+    if (mSaveDataToCameraRoll)
+    {
+        UIImageWriteToSavedPhotosAlbum(image, nil, nil, nil);
     }
 
     MAHandle dataPlaceholder = maCreatePlaceholder();
@@ -585,10 +642,10 @@ static Capture *sSharedInstance = nil;
 {
     NSString *videoPath = [[cameraDictionary objectForKey:UIImagePickerControllerMediaURL] path];
 
-//    if (UIVideoAtPathIsCompatibleWithSavedPhotosAlbum (videoPath))
-//    {
-//        UISaveVideoAtPathToSavedPhotosAlbum(videoPath, nil, nil, nil);
-//    }
+    if (mSaveDataToCameraRoll && UIVideoAtPathIsCompatibleWithSavedPhotosAlbum (videoPath))
+    {
+        UISaveVideoAtPathToSavedPhotosAlbum(videoPath, nil, nil, nil);
+    }
 
     if (!videoPath)
     {
@@ -613,6 +670,142 @@ static Capture *sSharedInstance = nil;
     Base::gEventQueue.put(event);
 
     [key release];
+}
+
+/**
+ * Set the camera roll flag.
+ * @param value "true" or "false" values.
+ * If true, recorded movies and taken photos will be addded to the user’s Camera Roll album.
+ * @return One of the next constants:
+ * - MA_CAPTURE_RES_OK if no error occurred.
+ * - MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if value param is invalid.
+ */
+-(int) setCameraRollFlag:(NSString*) value
+{
+    int returnValue = MA_CAPTURE_RES_OK;
+
+    if ([value isEqualToString:@"true"])
+    {
+        mSaveDataToCameraRoll = true;
+    }
+    else if ([value isEqualToString:@"false"])
+    {
+        mSaveDataToCameraRoll = false;
+    }
+    else
+    {
+        returnValue = MA_CAMERA_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    return returnValue;
+}
+
+/**
+ * Set the flash mode.
+ * @param flashModeString A string containing one of the next constants:
+ * - MA_CAPTURE_FLASH_AUTO
+ * - MA_CAPTURE_FLASH_ON
+ * - MA_CAPTURE_FLASH_OFF
+ * @return One of the next constants:
+ * - MA_CAPTURE_RES_OK if no error occurred.
+ * - MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if flashMode param is invalid.
+ * - MA_CAPTURE_RES_FLASH_NOT_SUPPORTED if flash is not supported on current device.
+ */
+-(int) setFlashMode:(NSString*) flashModeString
+{
+    if (![UIImagePickerController isFlashAvailableForCameraDevice:UIImagePickerControllerCameraDeviceRear])
+    {
+        return MA_CAPTURE_RES_FLASH_NOT_SUPPORTED;
+    }
+
+    if (![flashModeString canParseNumber])
+    {
+        return MA_CAPTURE_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    int flashMode = [flashModeString intValue];
+    int returnValue = MA_CAPTURE_RES_OK;
+    UIImagePickerControllerCameraFlashMode flashModeNative = UIImagePickerControllerCameraFlashModeAuto;
+    switch (flashMode)
+    {
+        case MA_CAPTURE_FLASH_AUTO:
+            flashModeNative = UIImagePickerControllerCameraFlashModeAuto;
+            break;
+        case MA_CAPTURE_FLASH_ON:
+            flashModeNative = UIImagePickerControllerCameraFlashModeOn;
+            break;
+        case MA_CAPTURE_FLASH_OFF:
+            flashModeNative = UIImagePickerControllerCameraFlashModeOff;
+            break;
+        default:
+            returnValue = MA_CAPTURE_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    if (returnValue == MA_CAPTURE_RES_OK)
+    {
+        mImagePicker.cameraFlashMode = flashModeNative;
+    }
+
+    return returnValue;
+}
+
+/**
+ * Get the flash mode.
+ * @return One of the next constants:
+ * - MA_CAPTURE_FLASH_AUTO
+ * - MA_CAPTURE_FLASH_ON
+ * - MA_CAPTURE_FLASH_OFF
+ * - MA_CAPTURE_RES_FLASH_NOT_SUPPORTED if flash is not supported on current device.
+ */
+-(int) getFlashMode
+{
+    if (![UIImagePickerController isFlashAvailableForCameraDevice:UIImagePickerControllerCameraDeviceRear])
+    {
+        return MA_CAPTURE_RES_FLASH_NOT_SUPPORTED;
+    }
+
+    UIImagePickerControllerCameraFlashMode flashModeNative = mImagePicker.cameraFlashMode;
+    int flashMode;
+    switch (flashModeNative)
+    {
+        case UIImagePickerControllerCameraFlashModeAuto:
+            flashMode = MA_CAPTURE_FLASH_AUTO;
+            break;
+        case UIImagePickerControllerCameraFlashModeOn:
+            flashMode = MA_CAPTURE_FLASH_ON;
+            break;
+        case UIImagePickerControllerCameraFlashModeOff:
+            flashMode = MA_CAPTURE_FLASH_OFF;
+            break;
+    }
+
+    return flashMode;
+}
+
+/**
+ * Set the camera controls.
+ * @param cameraControls A string containing "true" or "false" values.
+ * If cameraControls is "true" shows the default camera controls, otherwise hides them.
+ * @return One of the next constants:
+ * - MA_CAPTURE_RES_OK if no error occurred.
+ * - MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if cameraControls param is invalid.
+ */
+-(int) setCameraControls:(NSString*) cameraControls
+{
+    if ([cameraControls isEqualToString:@"true"])
+    {
+        mImagePicker.showsCameraControls = YES;
+    }
+    else if ([cameraControls isEqualToString:@"false"])
+    {
+        mImagePicker.showsCameraControls = NO;
+    }
+    else
+    {
+        return MA_CAPTURE_RES_INVALID_PROPERTY_VALUE;
+    }
+
+    return MA_CAPTURE_RES_OK;
 }
 
 /**

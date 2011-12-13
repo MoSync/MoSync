@@ -9585,48 +9585,57 @@ group CaptureAPI "Capture API" {
 		constset int MA_CAPTURE_RES_ {
 			/**
 			* @brief Indicates that the call was successful.
+			* Platform: Android and iOS.
 			*/
 			OK = 0;
 
 			/**
 			* @brief The given file name is invalid.
+			* Platform: iOS.
 			*/
 			FILE_INVALID_NAME = -1;
 
 			/**
 			* @brief The file already exists.
+			* Platform: iOS.
 			*/
 			FILE_ALREADY_EXISTS = -2;
 
 			/**
 			* @brief Indicates that the call to maCaptureSetProperty or maCaptureGetProperty received
 			* an invalid property name.
+			* Platform: iOS.
 			*/
 			INVALID_PROPERTY = -3;
 
 			/**
 			* @brief Indicates that the call to maCaptureSetProperty or maCaptureGetProperty received
 			* an invalid property value.
+			* Platform: iOS.
 			*/
 			INVALID_PROPERTY_VALUE = -4;
 
 			/**
 			* @brief Indicates that the call to maCaptureGetProperty needs a larger buffer.
+			* Platform: iOS.
 			*/
 			INVALID_STRING_BUFFER_SIZE = -5;
 
 			/**
 			* @brief Indicates that the call to maCaptureAction received an invalid action type.
+			* Platform: iOS.
 			*/
 			INVALID_ACTION = -6;
 
 			/**
 			* @brief Indicates that the call to maCaptureDestroyData received an invalid handle.
+			* Platform: iOS.
 			*/
 			INVALID_HANDLE = -7;
 
 			/**
 			* @brief Indicates that capture is not supported on current platform.
+			* Platform: iOS.
 			*/
 			UNSUPPORTED = -8;
 
@@ -9647,6 +9656,12 @@ group CaptureAPI "Capture API" {
 			* Platform: iOS.
 			*/
 			PICTURE_NOT_SUPPORTED = -11;
+
+			/**
+			* @brief Indicates that flash mode is not supported.
+			* Platform: iOS.
+			*/
+			FLASH_NOT_SUPPORTED = -12;
 		}
 	} // end of Capture Result Codes
 
@@ -9657,6 +9672,7 @@ group CaptureAPI "Capture API" {
 			* Platform: Android and iOS.
 			*
 			* @validvalue Positive integer value.
+			* Default value is platform specific.
 			*
 			* @getandset
 			*
@@ -9673,7 +9689,8 @@ group CaptureAPI "Capture API" {
 			* @brief Set the video recording quality.
 			* Platform: Android and iOS.
 			*
-			* @validvalue One of the \link #MA_CAPTURE_VIDEO_QUALITY_ MA_CAPTURE_VIDEO_QUALITY \endlink constants.
+			* @validvalue One of the \link #MA_CAPTURE_VIDEO_QUALITY_LOW MA_CAPTURE_VIDEO_QUALITY \endlink constants.
+			* Default value is MA_CAPTURE_VIDEO_QUALITY_MEDIUM.
 			*
 			* @getandset
 			*
@@ -9719,6 +9736,60 @@ group CaptureAPI "Capture API" {
 			* \endcode
 			*/
 			ORIENTATION = "orientation";
+
+			/**
+			* @brief Store the recorded movie/taken photo to the user’s Camera Roll album.
+			* Platform: iOS.
+			*
+			* @validvalue "false" or "true".
+			* Default value: "true".
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%s", "true");
+			*	maCaptureSetProperty(MA_CAPTURE_CAMERA_ROLL, buf);
+			* \endcode
+			*/
+			CAMERA_ROLL = "cameraRoll";
+
+			/**
+			* @brief Set the flash mode used by the active camera.
+			* Platform: iOS.
+			*
+			* @validvalue One of the \link #MA_CAPTURE_FLASH_AUTO MA_CAPTURE_FLASH \endlink constants.
+			* Default value: #MA_CAPTURE_FLASH_AUTO.
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%d", MA_CAPTURE_FLASH_OFF);
+			*	maCaptureSetProperty(MA_CAPTURE_FLASH, buf);
+			* \endcode
+			*/
+			FLASH = "flash";
+
+			/**
+			* @brief Show/hide default camera controls.
+			* Platform: iOS.
+			*
+			* @validvalue "true" or "false".
+			* Default value: "true".
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%s", "false");
+			*	maCaptureSetProperty(MA_CAPTURE_CAMERA_CONTROLS, buf);
+			* \endcode
+			*/
+			CAMERA_CONTROLS = "cameraControls";
 		}
 	} // end of Capture properties
 
@@ -9764,6 +9835,21 @@ group CaptureAPI "Capture API" {
 		}
 	} // end of Capture Action
 
+	group CaptureFlashMode "Capture flash mode" {
+		constset int MA_CAPTURE_FLASH_ {
+			/// Specifies that the device should consider ambient light conditions to automatically
+			/// determine whether or not to use flash illumination.
+			/// Platform: iOS.
+			AUTO = 0;
+			/// Specifies that flash illumination is always on, no matter what the ambient light conditions are.
+			/// Platform: iOS.
+			ON = 1;
+			/// Specifies that flash illumination is always off, no matter what the ambient light conditions are.
+			/// Platform: iOS.
+			OFF = 2;
+		}
+	} // end of Capture Action
+
 	group CaptureFunctions "Capture Functions" {
 		/**
 		* \brief Sets the properties to the Native Image Picker.
@@ -9771,10 +9857,10 @@ group CaptureAPI "Capture API" {
 		*  One of the \link #MA_CAPTURE_ MA_CAPTURE \endlink constants.
 		* \param value The value that will be assigned to the property.
 		*
-		* \returns
-		*  - MA_CAPTURE_RES_OK
-		*  - MA_CAPTURE_RES_INVALID_PROPERTY
-		*  - MA_CAPTURE_RES_INVALID_PROPERTY_VALUE
+		* \returns One of the next constants:
+		*  - MA_CAPTURE_RES_OK if no error occurred.
+		*  - MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+		*  - MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
 		*/
 		int maCaptureSetProperty(in MAString property,in MAString value);
 
