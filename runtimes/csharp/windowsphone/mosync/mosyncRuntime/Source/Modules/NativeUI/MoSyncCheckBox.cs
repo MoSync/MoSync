@@ -57,24 +57,19 @@ namespace MoSync
 				mCheckBox.Click += new RoutedEventHandler(
 				delegate(Object from, RoutedEventArgs evt)
 				{
-						Memory eventData = new Memory(8);
+						Memory eventData = new Memory(12);
 						const int MAWidgetEventData_eventType = 0;
 						const int MAWidgetEventData_widgetHandle = 4;
+                        const int MAWidgetEventData_checked = 8;
 
 						eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
 						eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                        eventData.WriteInt32(MAWidgetEventData_checked, mCheckBox.IsChecked.Value ? 1 : 0);
+
 						mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
 				});
 			}
 
-            /**
-             * Set the state of the check box.
-             * @param state True if the check box should be checked, false otherwise.
-             */
-			public virtual void setState(bool state)
-			{
-				mCheckBox.IsChecked = state;
-			}
 
             /**
              * Property for setting and getting the state of the check box.

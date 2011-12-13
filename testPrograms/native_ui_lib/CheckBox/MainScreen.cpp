@@ -37,12 +37,16 @@ MainScreen::MainScreen() :
 	mMainLayout(NULL),
 	mCheckBox(NULL),
 	mCheckBoxButton(NULL),
+	mCheckBoxInfoLabel(NULL),
+	mToggleButton(NULL),
+	mToggleInfoLabel(NULL),
 	mCheckBoxState(false)
 {
 	createMainLayout();
 
 	mCheckBoxButton->addButtonListener(this);
 	mCheckBox->addCheckBoxListener(this);
+	mToggleButton->addToggleButtonListener(this);
 }
 
 /**
@@ -52,6 +56,7 @@ MainScreen::~MainScreen()
 {
     mCheckBoxButton->removeButtonListener(this);
     mCheckBox->removeCheckBoxListener(this);
+    mToggleButton->removeToggleButtonListener(this);
 }
 
 /**
@@ -65,6 +70,8 @@ void MainScreen::buttonClicked(Widget* button)
     {
         mCheckBoxState = !mCheckBoxState;
         mCheckBox->setState(mCheckBoxState);
+
+		mToggleButton->setCheckedState(!(mToggleButton->isChecked()));
     }
 }
 
@@ -73,36 +80,69 @@ void MainScreen::buttonClicked(Widget* button)
  * @param checkBox The check box object that generated the event.
  * @param state True if the check box is checked, false otherwise.
  */
-void MainScreen::checkBoxStateChanged(
-    CheckBox* checkBox,
-    bool state)
+void MainScreen::checkBoxStateChanged(CheckBox* checkBox, bool state)
 {
     if (checkBox == mCheckBox)
     {
 		mCheckBoxState = state;
         if (state)
         {
+            mCheckBoxInfoLabel->setText("CheckBox event: checked");
             printf("check box state = true");
         }
         else
         {
+            mCheckBoxInfoLabel->setText("CheckBox event: unchecked");
             printf("check box state = false");
         }
     }
 }
+
+/*
+ * toggleButtonStateChanged(ToggleButton, bool)
+ * from ToggleButtonListener
+ */
+void MainScreen::toggleButtonStateChanged(ToggleButton* toggleButton, bool state)
+{
+	if(toggleButton == mToggleButton) {
+		MAUtil::String msg = state ? "ToggleButton event: checked" : "ToggleButton event: unchecked";
+		mToggleInfoLabel->setText(msg);
+	}
+}
+
 /**
  * Creates and adds main layout to the screen.
  */
 void MainScreen::createMainLayout() {
 	// Create and add the main layout to the screen.
 	mMainLayout = new VerticalLayout();
-	mMainLayout->setBackgroundColor(0xFF0000);
 	Screen::setMainWidget(mMainLayout);
 
+	Label* label = new Label();
+	label->setText("CheckBox and ToggleButton test program");
+	mMainLayout->addChild(label);
+
+	// the CheckBox
 	mCheckBox = new CheckBox();
 	mMainLayout->addChild(mCheckBox);
 
+	// info label about the CheckBox
+	mCheckBoxInfoLabel = new Label();
+	MAUtil::String msg = mCheckBox->isChecked() ? "CheckBox is checked" : "CheckBox is unchecked";
+	mCheckBoxInfoLabel->setText(msg);
+	mMainLayout->addChild(mCheckBoxInfoLabel);
+
 	mCheckBoxButton = new Button();
-	mCheckBoxButton->setText("Change check box state");
+	mCheckBoxButton->setText("Change widgets' states");
 	mMainLayout->addChild(mCheckBoxButton);
+
+	// the ToggleButton
+	mToggleButton = new ToggleButton();
+	mMainLayout->addChild(mToggleButton);
+
+	// info label about the ToggleButton
+	mToggleInfoLabel = new Label();
+	msg = mToggleButton->isChecked() ? "ToggleButton is checked" : "ToggleButton is unchecked";
+	mToggleInfoLabel->setText(msg);
+	mMainLayout->addChild(mToggleInfoLabel);
 }

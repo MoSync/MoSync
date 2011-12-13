@@ -67,9 +67,12 @@ namespace MoSync
             {
                 set
                 {
-                    double maxValue = 0;
-                    if (double.TryParse(value, out maxValue))
+                    int maxValue = 0;
+                    if (int.TryParse(value, out maxValue))
                     {
+                        // only positive integers are accepted
+                        if (0 > maxValue) maxValue = 0;
+
                         mProgressBar.Maximum = maxValue;
                     }
                 }
@@ -78,6 +81,7 @@ namespace MoSync
             /**
              * Implementation of the "progress" property
              * set: sets the current progress value
+             *      if the user value is greater than the max value, the new value will be the max value
              * get: returns the current progress value
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_PROGRESS_BAR_PROGRESS)]
@@ -85,12 +89,13 @@ namespace MoSync
             {
                 set
                 {
-                    double val = 0;
-                    if (double.TryParse(value, out val) && val <= mProgressBar.Maximum)
+                    int val = 0;
+                    if (int.TryParse(value, out val))
                     {
-                        mProgressBar.Value = val;
+                        mProgressBar.Value = (val <= mProgressBar.Maximum) ? val : mProgressBar.Maximum;
                     }
                 }
+
                 get
                 {
                     return mProgressBar.Value.ToString();
@@ -100,6 +105,7 @@ namespace MoSync
             /**
              * Implemention of the "incrementProgress" property
              * Increases the progress value with the specified amount.
+             * If the new value is greater than the max, than the set value is the max value.
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_PROGRESS_BAR_INCREMENT_PROGRESS)]
             public String IncrementProgress
@@ -109,7 +115,8 @@ namespace MoSync
                     int incrementVal = 0;
                     if (int.TryParse(value, out incrementVal))
                     {
-                        mProgressBar.Value = mProgressBar.Value + incrementVal;
+                        double newValue = mProgressBar.Value + incrementVal;
+                        mProgressBar.Value = (newValue > mProgressBar.Maximum) ? mProgressBar.Maximum : newValue;
                     }
                 }
             }
