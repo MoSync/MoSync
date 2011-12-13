@@ -55,11 +55,14 @@ MainScreen::MainScreen() :
 	}
 	else
 	{
-		Notification::NotificationManager::getInstance()->registerPushNotification(
+		int registerCode = Notification::NotificationManager::getInstance()->registerPushNotification(
 				Notification::PUSH_NOTIFICATION_TYPE_BADGE |
 				Notification::PUSH_NOTIFICATION_TYPE_ALERT |
 				Notification::PUSH_NOTIFICATION_TYPE_SOUND,
 				C2DM_USER_ACCOUNT);
+
+		if ( MA_NOTIFICATION_RES_UNSUPPORTED == registerCode )
+			maPanic(0, "This device does not support push notifications");
 	}
 
 	NotificationManager::getInstance()->addPushNotificationListener(this);
@@ -73,7 +76,7 @@ MainScreen::MainScreen() :
  * connection to the server is established.
  */
 void MainScreen::checkStore() {
-	MAHandle myStore = maOpenStore("MyStore", 0);
+	MAHandle myStore = maOpenStore("MyPushStore", 0);
 
 	if (myStore == STERR_NONEXISTENT)
 	{
@@ -109,7 +112,7 @@ void MainScreen::storeRegistrationID(MAUtil::String* token)
 	mToken = token;
 
 	// Store doesn't exist.
-	MAHandle myStore = maOpenStore("MyStore", MAS_CREATE_IF_NECESSARY);
+	MAHandle myStore = maOpenStore("MyPushStore", MAS_CREATE_IF_NECESSARY);
 
 	// Create store and write Registration ID
 	MAHandle myData = maCreatePlaceholder();
@@ -138,6 +141,7 @@ MainScreen::~MainScreen()
 	delete mDisplayNotificationScreen;
 	delete mSettingsScreen;
 	delete mToken;
+    Notification::NotificationManager::getInstance()->removePushNotificationListener(this);
 }
 
 /**
@@ -158,8 +162,10 @@ void MainScreen::didReceivePushNotification(
 void MainScreen::didApplicationRegistered(MAUtil::String& token)
 {
 	printf("MainScreen::didApplicationRegistered");
+	printf(token.c_str());
 	mToken = new MAUtil::String(token);
-//    mMessageLabel->setText("Your app registered for push notifications");
+	mDisplayNotificationScreen->pushRegistrationDone(true);
+    //mMessageLabel->setText("Your app registered for push notifications");
     // Now you can press Connect to connect and send data to the server.
 }
 
@@ -179,6 +185,7 @@ void MainScreen::didFaildToRegister(
     MAUtil::String& error)
 {
 	printf("MainScreen::didFaildToRegister");
+	mDisplayNotificationScreen->pushRegistrationDone(false);
 }
 
 /**
