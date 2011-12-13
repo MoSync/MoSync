@@ -449,10 +449,6 @@ namespace Base {
 			return false;
 		}
 
-		int len, pos = 0;
-		TEST(file.length(len));
-		TEST(file.tell(pos));
-
 		int type = resourceType[originalHandle - 1];
 		int size = resourceSize[originalHandle - 1];
 		int offset = resourceOffset[originalHandle - 1];
@@ -917,7 +913,7 @@ namespace Base {
 #ifndef _android
 	FileStream* resource = NULL;
 
-	SYSCALL(int, maLoadResource(MAHandle originalHandle, MAHandle destHandle, int flag)) {
+	SYSCALL(int, maLoadResource(MAHandle handle, MAHandle placeholder, int flag)) {
 		if (((flag & MA_RESOURCE_OPEN) != 0) && (resource == NULL))
 		{
 			resource = new FileStream(resourcesFilename);
@@ -927,7 +923,7 @@ namespace Base {
 			return 0;
 		}
 		TEST(resource->seek(Seek::Start, 0));
-		int ret = SYSCALL_THIS->loadResource(*resource, originalHandle, destHandle);
+		int ret = SYSCALL_THIS->loadResource(*resource, handle, placeholder);
 
 		if (((flag & MA_RESOURCE_CLOSE) != 0) && (resource != NULL))
 		{

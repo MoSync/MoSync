@@ -160,9 +160,9 @@ class PipeExeWork < PipeGccWork
 			@prerequisites << @resourceTask
 		end
 		if(USE_NEWLIB)
-			default(:DEFAULT_LIBS, ["newlib"])
+			default(:DEFAULT_LIBS, ["newlib","rescompiler"])
 		else
-			default(:DEFAULT_LIBS, ["mastd"])
+			default(:DEFAULT_LIBS, ["mastd","rescompiler"])
 		end
 
 		# libs
