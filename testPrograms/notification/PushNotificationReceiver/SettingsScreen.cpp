@@ -25,6 +25,10 @@ MA 02110-1301, USA.
 
 #define IP_LABEL_TEXT "IP:"
 #define PORT_LABEL_TEXT "Port:"
+#define TICKER_LABEL "Ticker:"
+#define TICKER_DEFAULT "Ticker text"
+#define TITLE_LABEL "Title:"
+#define TITLE_DEFAULT "Default title"
 #define SHOW_ONLY_IF_NOT_RUNNING "Show only if not running"
 #define CONNECTION_NOT_ESTABLISHED "Connection status: not connected!"
 #define CONNECTION_CONNECTING "Connection status: connecting.."
@@ -79,6 +83,8 @@ SettingsScreen::SettingsScreen(SettingsScreenListener* listener):
 
 	mIPEditBox->addEditBoxListener(this);
 	mPortEditBox->addEditBoxListener(this);
+	mTickerText->addEditBoxListener(this);
+	mContentTitle->addEditBoxListener(this);
 	mConnectButton->addButtonListener(this);
 
 	if (isAndroid())
@@ -86,8 +92,10 @@ SettingsScreen::SettingsScreen(SettingsScreenListener* listener):
 		mShowOnlyIfInBackground->addCheckBoxListener(this);
 	}
 
-	mIPEditBox->setText("192.168.1.116");
-	mPortEditBox->setText("4567");
+	mIPEditBox->setText("192.168.1.111");
+	mPortEditBox->setText("6789");
+	Notification::NotificationManager::getInstance()->setPushNotificationsTickerText(mTickerText->getText());
+	Notification::NotificationManager::getInstance()->setPushNotificationsTitle(mContentTitle->getText());
 }
 
 /**
@@ -98,6 +106,8 @@ SettingsScreen::~SettingsScreen()
 	if (isAndroid())
 	{
 		mShowOnlyIfInBackground->removeCheckBoxListener(this);
+		mTickerText->removeEditBoxListener(this);
+		mContentTitle->removeEditBoxListener(this);
 	}
 	mIPEditBox->removeEditBoxListener(this);
 	mPortEditBox->removeEditBoxListener(this);
@@ -155,6 +165,14 @@ void SettingsScreen::createMainLayout()
 		mShowOnlyIfInBackground = new CheckBox();
 		mShowOnlyIfInBackground->setState(true);
 		listView->addChild(createListViewItem(SHOW_ONLY_IF_NOT_RUNNING, mShowOnlyIfInBackground));
+
+		mTickerText = new EditBox();
+		mTickerText->setText(TICKER_DEFAULT);
+		listView->addChild(createListViewItem(TICKER_LABEL, mTickerText));
+
+		mContentTitle = new EditBox();
+		mContentTitle->setText(TITLE_DEFAULT);
+		listView->addChild(createListViewItem(TITLE_LABEL, mContentTitle));
 	}
 
 	// Android: If the registrationID was already saved from previous launches,
@@ -191,7 +209,6 @@ void SettingsScreen::buttonClicked(Widget* button)
 	{
 		if (mListener)
 		{
-//			mConnectButton->setEnabled(false);
 			mListener->connectToServer(mIPEditBox->getText(),
 				mPortEditBox->getText());
 		}
@@ -208,6 +225,11 @@ void SettingsScreen::buttonClicked(Widget* button)
  */
 void SettingsScreen::editBoxReturn(EditBox* editBox)
 {
+	if ( mTickerText  == editBox )
+		Notification::NotificationManager::getInstance()->setPushNotificationsTickerText(mTickerText->getText());
+	else if ( mContentTitle == editBox )
+		Notification::NotificationManager::getInstance()->setPushNotificationsTitle(mContentTitle->getText());
+
 	editBox->hideKeyboard();
 }
 

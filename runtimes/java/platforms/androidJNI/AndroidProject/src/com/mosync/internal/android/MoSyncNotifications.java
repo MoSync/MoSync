@@ -82,8 +82,7 @@ class MoSyncNotifications
 	{
 		return
 			(PackageManager.PERMISSION_GRANTED ==
-				getActivity().checkCallingOrSelfPermission(
-						"com.mosync.java.android.permission.C2D_MESSAGE"))
+				getActivity().checkCallingOrSelfPermission(getActivity().getPackageName() + ".permission.C2D_MESSAGE"))
 			&&
 			(PackageManager.PERMISSION_GRANTED ==
 				getActivity().checkCallingOrSelfPermission(
@@ -144,7 +143,7 @@ class MoSyncNotifications
 
 	int maNotificationPushRegister(String accountID)
 	{
-//		panicIfPushPermissionsAreNotSet();
+		panicIfPushPermissionsAreNotSet();
 		if ( mPushNotificationManager != null )
 		{
 			return mPushNotificationManager.register(accountID);

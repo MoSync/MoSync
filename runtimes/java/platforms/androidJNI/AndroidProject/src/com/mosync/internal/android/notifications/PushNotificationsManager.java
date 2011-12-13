@@ -65,6 +65,7 @@ public class PushNotificationsManager
 		// Store the default display flag in SharedPreferences.
 		PushNotificationsUtil.setPushNotificationDisplayFlag(
 				mMosyncThread.getActivity(), MA_NOTIFICATION_DISPLAY_FLAG_DEFAULT);
+		mRegistrationInfo.registrationInProgress = false;
 	}
 
 	/**
