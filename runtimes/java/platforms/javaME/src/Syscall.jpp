@@ -2592,7 +2592,7 @@ public
 #endif	//0
 #endif	//MA_PROF_SUPPORT_JAVAPACKAGE_LOCATIONAPI
 
-	SYSCALL(int) maInvokeExtension(int function, int a, int b, int c) {
+	SYSCALL(int) maExtensionFunctionInvoke(int function, int a, int b, int c) {
 #ifdef MOSYNC_SUPPORT_EXTENSIONS
 		return mExt.invoke(function, a, b, c);
 #else
