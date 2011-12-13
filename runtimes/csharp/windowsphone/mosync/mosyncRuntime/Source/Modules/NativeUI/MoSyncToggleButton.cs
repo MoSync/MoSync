@@ -44,29 +44,37 @@ namespace MoSync
             /**
              * The native ToggleButton widget. 
              */
-            protected System.Windows.Controls.Primitives.ToggleButton mToggleButton;
+            protected Microsoft.Phone.Controls.ToggleSwitch mToggleButton;
 
             /**
              * Constructor 
              */
             public ToggleButton()
             {
-                mToggleButton = new System.Windows.Controls.Primitives.ToggleButton();
+                mToggleButton = new Microsoft.Phone.Controls.ToggleSwitch();
                 mView = mToggleButton;
 
-                mToggleButton.Click += new RoutedEventHandler(
+                /**
+                 * implementation of the Click event
+                 */
+                mToggleButton.Click += new EventHandler<RoutedEventArgs>(
                    delegate(Object from, RoutedEventArgs evt)
                    {
                        //click event needs a memory chunk of 8 bytes
-                       Memory eventData = new Memory(8);
+                       Memory eventData = new Memory(12);
 
                        //starting with the 0 Byte we write the eventType
                        const int MAWidgetEventData_eventType = 0;
                        //starting with the 4th Byte we write the widgetHandle
                        const int MAWidgetEventData_widgetHandle = 4;
+                       //starting with the 8th Byte write the selectedIndex
+                       const int MAWidgetEventData_checked = 8;
+                       int state = mToggleButton.IsChecked.Value ? 1 : 0;
 
                        eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
                        eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
+                       eventData.WriteInt32(MAWidgetEventData_checked, state);
+
                        //posting a CustomEvent
                        mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                    });
