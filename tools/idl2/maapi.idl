@@ -3087,6 +3087,19 @@ interface MAAPI {
 		* and firmware version.
 		* The format of this description is not specified. It varies from device to device.
 		*
+		* "mosync.device.name" is the name of the device. Usually set by the user.
+		*
+		* "mosync.device.UUID" is the Unique identifier of the device.
+		*
+		* "mosync.device.OS" is the operating system or platform that the device is using.
+		* It might contain version detail as well.
+		*
+		* "mosync.device.OS.version" is the the version of the operating system that is running on the device.
+		* It might contain minor revision information, e.g. 2.1Update-1.
+		*
+		* "mosync.network.type" it the type of the current active network connection.
+		* It can one of the following four values: "none", "wifi", "mobile", or "unknown".
+		*
 		* "mosync.path.local" is the absolute path to the local file system,
 		* on devices that have a local file system. The returned path has a
 		* trailing slash character ('/').
