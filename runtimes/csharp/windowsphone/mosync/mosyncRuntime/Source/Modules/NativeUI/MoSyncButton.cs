@@ -42,22 +42,24 @@ namespace MoSync
             //The text content of the button
             protected String mText;
 
-            //the vertical alignment of the content
+            //The vertical alignment of the content
             protected VerticalAlignment mTextVerticalAlignment;
 
             //the horizontal alignment of the content
             protected HorizontalAlignment mTextHorizontalAlignment;
 
-            //the button controll
+            //The button controll
             protected System.Windows.Controls.Button mButton;
 
-            //the button constructor
+            /**
+             * The button constructor
+             */
             public Button()
             {
-                //initializing the button controll
+                //Initializing the button controll
                 mButton = new System.Windows.Controls.Button();
 
-                //set the view of the current widget as the previously instantiated button controll
+                //Set the view of the current widget as the previously instantiated button controll
                 View = mButton;
 
                 mButton.HorizontalAlignment = HorizontalAlignment.Left;
@@ -66,33 +68,31 @@ namespace MoSync
                 fillSpaceVerticalyEnabled = false;
                 fillSpaceHorizontalyEnabled = false;
 
-                //the click handle the button component
+                //The click handle the button component
                 mButton.Click += new RoutedEventHandler(
                     delegate(Object from, RoutedEventArgs evt)
                     {
-                        //click event needs a memory chunk of 8 bytes
+                        //Click event needs a memory chunk of 8 bytes
                         Memory eventData = new Memory(8);
-
-                        //starting with the 0 Byte we write the eventType
                         const int MAWidgetEventData_eventType = 0;
-                        //starting with the 4th Byte we write the widgetHandle
                         const int MAWidgetEventData_widgetHandle = 4;
-
                         eventData.WriteInt32(MAWidgetEventData_eventType, MoSync.Constants.MAW_EVENT_CLICKED);
                         eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
-                        //posting a CustomEvent
+                        //Posting a CustomEvent
                         mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                     });
             }
 
-            //MAW_BUTTON_TEXT property implementation
+            /**
+             * MAW_BUTTON_TEXT property implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_TEXT)]
             public String Text
             {
                 set
                 {
                     mText = value;
-                    mButton.Content = mText;
+                    mButton.Content = value;
                 }
                 get
                 {
@@ -100,13 +100,15 @@ namespace MoSync
                 }
             }
 
-            //MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT property implementation
+            /**
+             * MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT property implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_TEXT_HORIZONTAL_ALIGNMENT)]
             public string TextHorizontalAlignment
             {
                 set
                 {
-                    //doing the proper behaviour for the required value
+                    //Doing the proper behaviour for the required value
                     if (value.Equals(MoSync.Constants.MAW_ALIGNMENT_LEFT))
                     {
                         mTextHorizontalAlignment = HorizontalAlignment.Left;
@@ -131,7 +133,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT property implementation
+            /**
+             * MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT property implementatio
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_TEXT_VERTICAL_ALIGNMENT)]
             public String TextVerticalAlignment
             {
@@ -161,7 +165,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_BUTTON_FONT_COLOR property implementation
+            /**
+             * MAW_BUTTON_FONT_COLOR property implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_FONT_COLOR)]
             public String FontColor
             {
@@ -173,7 +179,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_BUTTON_FONT_SIZE property implementation
+            /**
+             * MAW_BUTTON_FONT_SIZE property implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_BUTTON_FONT_SIZE)]
             public String FontSize
             {

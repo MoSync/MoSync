@@ -42,14 +42,19 @@ namespace MoSync
             //Canvas is the content in which the children are aranged relatively to the parent
             protected System.Windows.Controls.Canvas mPanel;
 
-            //Constructor
+            /**
+             * The constructor
+             */
             public RelativeLayout()
             {
                 mPanel = new System.Windows.Controls.Canvas();
                 mView = mPanel;
             }
 
-            //add child
+            /**
+             * AddChild implementation
+             * @param child IWidget the "child" widget that needs to be added
+             */
             public override void AddChild(IWidget child)
             {
                 base.AddChild(child);
@@ -59,6 +64,37 @@ namespace MoSync
 
                     mPanel.Children.Add(widget.View);
                 });
+            }
+
+            /**
+             * The RemoveChild implementation
+             * @param index int the index of the "child" widget that will be removed
+             */
+            public override void RemoveChild(int index)
+            {
+                if (0 <= index && mChildren.Count > index)
+                {
+                    IWidget child = mChildren[index];
+
+                    if (null != child)
+                    {
+                        RemoveChild(child);
+                    }
+                }
+            }
+
+            /**
+            * The RemoveChild implementation
+            * @param child IWidget the "child" widget that will be removed
+            */
+            public override void RemoveChild(IWidget child)
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    WidgetBaseWindowsPhone widget = (child as WidgetBaseWindowsPhone);
+                    mPanel.Children.Remove((child as WidgetBaseWindowsPhone).View);
+                });
+                base.RemoveChild(child);
             }
         }
     }

@@ -46,13 +46,19 @@ namespace MoSync
                 mPage = new PhoneApplicationPage();
                 mView = mPage;
 
-                //This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
+                /**
+                 * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
+                 */
                 (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress += new EventHandler<System.ComponentModel.CancelEventArgs>(BackKeyPressHandler);
             }
 
-            //The BackKeyPress event handler
-            //Currently it contains the functionality for the back event when a StackScreen is a child of a TabScreen
-            //When this handler does not cover the functionality required it should be updated
+            /**
+             * The BackKeyPress event handler
+             * Currently it contains the functionality for the back event when a StackScreen is a child of a TabScreen
+             * When this handler does not cover the functionality required it should be updated
+             * @param from Object the object that triggers the event
+             * @param args System.ComponentModel.CancelEventArgs the event arguments
+             */
             private void BackKeyPressHandler(object from, System.ComponentModel.CancelEventArgs args)
             {
                 //Will check if the event is not canceled
@@ -66,7 +72,7 @@ namespace MoSync
                         if (this.mChildren[pivot.SelectedIndex] is StackScreen)
                         {
                             //If pop is possible
-                            if ((this.mChildren[pivot.SelectedIndex] as StackScreen).StackCount() > 1)
+                            if ((this.mChildren[pivot.SelectedIndex] as StackScreen).StackCount() > 1 && (this.mChildren[pivot.SelectedIndex] as StackScreen).GetBackButtonEnabled() == true)
                             {
                                 //Do a pop and cancel the event
                                 (this.mChildren[pivot.SelectedIndex] as StackScreen).Pop();
@@ -78,6 +84,15 @@ namespace MoSync
                         {
                             //Remove the event handler from the TabScreen
                             (Application.Current.RootVisual as Microsoft.Phone.Controls.PhoneApplicationFrame).BackKeyPress -= BackKeyPressHandler;
+                        }
+                    }
+                    else if(this is StackScreen && !(this.GetParent() is TabScreen))
+                    {
+                        if ((this as StackScreen).StackCount() > 1 && (this as StackScreen).GetBackButtonEnabled() == true)
+                        {
+                            //Do a pop and cancel the event
+                            (this as StackScreen).Pop();
+                            args.Cancel = true;
                         }
                     }
                 }
@@ -94,7 +109,45 @@ namespace MoSync
                 });
             }
 
-            //Show function implementation
+            /**
+             * The RemoveChild implementation
+             * @param child IWidget the "child" widget that will be removed
+             */
+            public override void RemoveChild(IWidget child)
+            {
+                base.RemoveChild(child);
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                {
+                    mPage.Content = null;
+                    if (0 < mChildren.Count)
+                    {
+                        mPage.Content = (mChildren[mChildren.Count - 1] as WidgetBaseWindowsPhone).View;
+                    }
+                });
+            }
+
+            /**
+             * The RemoveChild implementation
+             * @param index int the index of the "child" widget that will be removed
+             */
+            public override void RemoveChild(int index)
+            {
+                if (0 <= index && mChildren.Count > index)
+                {
+                    base.RemoveChild(index);
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        if (0 < mChildren.Count)
+                        {
+                            mPage.Content = (mChildren[mChildren.Count - 1] as WidgetBaseWindowsPhone).View;
+                        }
+                    });
+                }
+            }
+
+            /**
+             * Show function implementation
+             */
             public void Show()
             {
                 MoSync.Util.RunActionOnMainThreadSync(() =>
@@ -104,7 +157,9 @@ namespace MoSync
                 });
             }
 
-            //MAW_SCREEN_TITLE property implementation
+            /**
+             * MAW_SCREEN_TITLE property implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_SCREEN_TITLE)]
             public String Title
             {

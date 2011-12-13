@@ -41,10 +41,14 @@ namespace MoSync
     {
         public class TabScreen : Screen
         {
-            //The TabScreen is currently implemented using a Pivot control
+            /**
+             * The TabScreen is currently implemented using a Pivot control
+             */
             public Microsoft.Phone.Controls.Pivot mPivot { get; set; }
 
-            //The constructor
+            /**
+             * The constructor
+             */
             public TabScreen() : base()
             {
                 mPivot = new Microsoft.Phone.Controls.Pivot();
@@ -54,7 +58,9 @@ namespace MoSync
                 (View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = mPivot;
             }
 
-            //Override of the AddChild function, add a "tab" to the Screen
+            /**
+             * Override of the AddChild function, add a "tab" to the Screen
+             */
             public override void AddChild(IWidget child)
             {
                 if (child is Screen)
@@ -71,9 +77,47 @@ namespace MoSync
                 mChildren.Add(child);
             }
 
-            //MAW_TAB_SCREEN_TITLE property implementation
-            //In order to avoid the property hiding from Screen you have to specify
-            //the new keyword in front of the property
+            /**
+             * Override of the RemoveChild function, removes a "tab" from the Screen
+             * @param child IWidget the "child" that needs to be removed
+             */
+            public override void RemoveChild(IWidget child)
+            {
+                MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        for (int i = 0; i < mPivot.Items.Count; i++)
+                        {
+                            if ((mPivot.Items[i] as Microsoft.Phone.Controls.PivotItem).Content.Equals((child as Screen).View))
+                            {
+                                mPivot.Items.RemoveAt(i);
+                                break;
+                            }
+                        }
+                    });
+                mChildren.Remove(child);
+            }
+
+            /**
+             * Override of the RemoveChild function, removes a "tab" from the Screen
+             * @param index int the index of the "child" that needs to be removed
+             */
+            public override void RemoveChild(int index)
+            {
+                if (0 <= index && mChildren.Count > index)
+                {
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        mPivot.Items.RemoveAt(index);
+                    });
+                    mChildren.RemoveAt(index);
+                }
+            }
+
+            /**
+             * MAW_TAB_SCREEN_TITLE property implementation
+             * In order to avoid the property hiding from Screen you have to specify
+             * the new keyword in front of the property
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_TAB_SCREEN_TITLE)]
             public new String Title
             {
@@ -83,7 +127,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_TAB_SCREEN_CURRENT_TAB property implementation
+            /**
+             * MAW_TAB_SCREEN_CURRENT_TAB property implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_TAB_SCREEN_CURRENT_TAB)]
             public String CurrentTab
             {

@@ -92,7 +92,7 @@ private:
 	EditBox* mEditBox;
 
 	Button* mSetProgressValueButton;
-	Button* mGetProgressValueButton;
+	Button* mSetMaximumValueButton;
 	Button* mIncreaseValueButton;
 };
 

@@ -37,16 +37,11 @@ namespace MoSync
 {
     namespace NativeUI
     {
-        public class ScreenSize
-        {
-            public static int SCREEN_HEIGHT = 800;
-            public static int SCREEN_WIDTH = 480;
-        }
         public class WidgetBaseWindowsPhone : WidgetBase
         {
             protected UIElement mView;
 
-            //fill available space flags
+            //Fill available space flags
             public bool fillSpaceHorizontalyEnabled;
             public bool fillSpaceVerticalyEnabled;
 
@@ -56,7 +51,9 @@ namespace MoSync
                 set { mView = value; }
             }
 
-            //MAW_WIDGET_LEFT implementation
+            /**
+             * MAW_WIDGET_LEFT implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_LEFT)]
             public double Left
             {
@@ -67,7 +64,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_WIDGET_TOP implementation
+            /**
+             * MAW_WIDGET_TOP implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_TOP)]
             public double Top
             {
@@ -78,7 +77,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_WIDGET_WIDTH implementation
+            /**
+             * MAW_WIDGET_WIDTH implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_WIDTH)]
             public double Width
             {
@@ -95,7 +96,7 @@ namespace MoSync
                         mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
                         fillSpaceHorizontalyEnabled = true;
 
-                        //in case of setting the widget property after it is added
+                        //In case of setting the widget property after it is added
                         //to a parent widget
 
                         Type objType = mView.GetType();
@@ -112,10 +113,10 @@ namespace MoSync
                     }
                     else if (-2 == value)
 					{
-                        mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Stretch);
+                        mView.SetValue(Canvas.HorizontalAlignmentProperty, HorizontalAlignment.Center);
                         fillSpaceHorizontalyEnabled = false;
 
-                        //in case of setting the widget property after it is added
+                        //In case of setting the widget property after it is added
                         //to a parent widget
 
                         Type objType = mView.GetType();
@@ -133,7 +134,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_WIDGET_HEIGHT implementation
+            /**
+             * MAW_WIDGET_HEIGHT implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_HEIGHT)]
             public double Height
             {
@@ -150,7 +153,7 @@ namespace MoSync
                         mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
                         fillSpaceVerticalyEnabled = true;
 
-                        //in case of setting the widget property after it is added
+                        //In case of setting the widget property after it is added
                         //to a parent widget
                         Type objType = mView.GetType();
                         if (objType.GetProperty("Parent") != null)
@@ -166,10 +169,10 @@ namespace MoSync
                     }
                     else if (-2 == value)
                     {
-                        mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Stretch);
+                        mView.SetValue(Canvas.VerticalAlignmentProperty, VerticalAlignment.Center);
                         fillSpaceVerticalyEnabled = false;
 
-                        //in case of setting the widget property after it is added
+                        //In case of setting the widget property after it is added
                         //to a parent widget
                         Type objType = mView.GetType();
                         if (objType.GetProperty("Parent") != null)
@@ -186,7 +189,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_WIDGET_BACKGROUND_COLOR implementation
+            /**
+             * MAW_WIDGET_BACKGROUND_COLOR implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_BACKGROUND_COLOR)]
             public string BackgroundColor
             {
@@ -199,7 +204,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_WIDGET_ENABLED implementation
+            /**
+             * MAW_WIDGET_ENABLED implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_ENABLED)]
             public string Enabled
             {
@@ -225,7 +232,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_WIDGET_VISIBLE implementation
+            /**
+             * MAW_WIDGET_VISIBLE implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_VISIBLE)]
             public string Visible
             {
@@ -248,7 +257,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_WIDGET_BACKGROUND_GRADIENT implementation
+            /**
+             * MAW_WIDGET_BACKGROUND_GRADIENT implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_BACKGROUND_GRADIENT)]
             public string BackgroundGradient
             {
@@ -281,7 +292,9 @@ namespace MoSync
                 }
             }
 
-            //MAW_WIDGET_ALPHA implementation
+            /**
+             * MAW_WIDGET_ALPHA implementation
+             */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_WIDGET_ALPHA)]
             public string Alpha
             {
@@ -304,7 +317,7 @@ namespace MoSync
             public NativeUIWindowsPhone()
                 : base()
             {
-                // this should always be a PhoneApplicationFrame.
+                //This should always be a PhoneApplicationFrame.
                 mFrame = (PhoneApplicationFrame)Application.Current.RootVisual;
             }
         }

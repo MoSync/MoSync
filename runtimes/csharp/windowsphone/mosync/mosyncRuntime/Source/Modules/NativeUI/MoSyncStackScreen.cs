@@ -42,42 +42,59 @@ namespace MoSync
         public class StackScreen : Screen
         {
             protected System.Collections.Generic.Stack<IScreen> mStack;
+            protected Boolean mBackButtonEnabled = true;
 
-            //The constructor
+            /**
+             * The constructor
+             */
             public StackScreen()
             {
                 mStack = new System.Collections.Generic.Stack<IScreen>();
             }
 
-            //Override the AddChild function
+            /**
+             * Override the AddChild function
+             */
             public override void AddChild(IWidget child)
             {
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                     {
                         mPage.Content = (child as NativeUI.WidgetBaseWindowsPhone).View;
                     });
-                //Manualy add the child to the children array
+                /**
+                 * Manualy add the child to the children array
+                 */
                 mChildren.Add(child);
             }
 
-            //The push implementation
+            /**
+             * The push implementation
+             */
             public void Push(IScreen _newScreen)
             {
                 if (_newScreen is Screen)
                 {
                     mStack.Push(_newScreen);
-                    //Manualy add the child to the screen
+                    /**
+                     * Manualy add the child to the screen
+                     */
                     AddChild((_newScreen as Screen));
                 }
             }
 
-            //The pop implementation
+            /**
+             * The pop implementation
+             */
             public void Pop()
             {
-                //If the stack has more than one item pop it and post the MAW_EVENT_STACK_SCREEN_POPPED event
+                /**
+                 * If the stack has more than one item pop it and post the MAW_EVENT_STACK_SCREEN_POPPED event
+                 */
                 if (1 < mStack.Count)
                 {
-                    //STACK_SCREEN_POPPED event needs a memory chunk of 16 bytes
+                    /**
+                     * STACK_SCREEN_POPPED event needs a memory chunk of 16 bytes
+                     */
                     Memory eventData = new Memory(16);
 
                     const int MAWidgetEventData_eventType = 0;
@@ -89,18 +106,44 @@ namespace MoSync
                     eventData.WriteInt32(MAWidgetEventData_widgetHandle, mHandle);
                     eventData.WriteInt32(MAWidgetEventData_fromHandle, (mStack.Pop() as Screen).GetHandle());
                     eventData.WriteInt32(MAWidgetEventData_toHandle, (mStack.Peek() as Screen).GetHandle());
-                    //posting a CustomEvent
+                    /**
+                     * posting a CustomEvent
+                     */
                     mRuntime.PostCustomEvent(MoSync.Constants.EVENT_TYPE_WIDGET, eventData);
                 }
 
-                //If the stack is not empty show the top element of the stack
+                /**
+                 * If the stack is not empty show the top element of the stack
+                 */
                 if (0 < mStack.Count)
                 {
                     (View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
                 }
             }
 
-            //Returns the number of elements from the stack
+            /**
+             * MAW_STACK_SCREEN_BACK_BUTTON_ENABLED property implementation
+             */
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_STACK_SCREEN_BACK_BUTTON_ENABLED)]
+            public String backButtonEnabled
+            {
+                set
+                {
+                    Boolean.TryParse(value, out mBackButtonEnabled);
+                }
+            }
+
+            /**
+             * Returns the value of the mBackButtonEnabled
+             */
+            public Boolean GetBackButtonEnabled()
+            {
+                return mBackButtonEnabled;
+            }
+
+            /**
+             * Returns the number of elements from the stack
+             */
             public int StackCount()
             {
                 return mStack.Count;
