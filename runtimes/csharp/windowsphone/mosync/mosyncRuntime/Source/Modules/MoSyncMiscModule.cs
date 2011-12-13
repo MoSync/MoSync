@@ -2,8 +2,10 @@ using System;
 using System.IO;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.GamerServices;
+using Microsoft.Phone.Info;
 using System.Windows;
 using System.Collections.Generic;
+
 
 namespace MoSync
 {
@@ -25,14 +27,14 @@ namespace MoSync
                 return null;
             return provider(key);
         }
-    }
+    } // end class SystemPropertyManager
+
+
 
     public class MiscModule : ISyscallModule, IIoctlModule
     {
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
-            SystemPropertyManager.mSystemPropertyProviders.Clear();
-
             // maybe use some pretty reflection mechanism to find all syscall implementations here..
             syscalls.maCheckInterfaceVersion = delegate(int hash)
             {
@@ -110,6 +112,15 @@ namespace MoSync
 
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
+            // add system property providers
+            SystemPropertyManager.mSystemPropertyProviders.Clear();
+
+            /**
+             * Regitser system properties
+             */
+            SystemPropertyManager.SystemPropertyProvider myDelegateForIMEI = new SystemPropertyManager.SystemPropertyProvider(getIMEI);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.imei", myDelegateForIMEI);
+
             ioctls.maWriteLog = delegate(int src, int size)
             {
                 byte[] bytes = new byte[size];
@@ -129,5 +140,15 @@ namespace MoSync
                 return value.Length + 1;
             };
         }
-    }
-}
+
+        /**
+         * Retrieves the value of MoSync System Property mosync.imei if available
+         */
+        private static String getIMEI(String key)
+        {
+            byte[] byteData = (byte[])(DeviceExtendedProperties.GetValue("DeviceUniqueId"));
+            return System.Convert.ToBase64String(byteData);
+        }
+
+    } // end class MiscModule
+} // end namespace MoSync
