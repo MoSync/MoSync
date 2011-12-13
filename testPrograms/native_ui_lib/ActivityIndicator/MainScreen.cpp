@@ -80,12 +80,16 @@ void MainScreen::createMainLayout() {
 	mMainLayout = new VerticalLayout();
 	Screen::setMainWidget(mMainLayout);
 
-	mActivityIndicator = new ActivityIndicator();
-	mMainLayout->addChild(mActivityIndicator);
+	Label* label = new Label();
+	label->setText("Show/hide Activity Indicator");
+	mMainLayout->addChild(label);
 
 	mShow = new Button();
 	mShow->setText("show ActivityIndicator");
 	mMainLayout->addChild(mShow);
+
+	mActivityIndicator = new ActivityIndicator();
+	mMainLayout->addChild(mActivityIndicator);
 
 	mHide = new Button();
 	mHide->setText("hide ActivityIndicator");

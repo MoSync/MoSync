@@ -54,8 +54,8 @@ namespace MoSync
             public ActivityIndicator()
             {
                 mActivityIndicator = new Microsoft.Phone.Controls.PerformanceProgressBar();
-                mActivityIndicator.IsIndeterminate = true;
-                //mActivityIndicator.Visibility = Visibility.Collapsed;
+                mActivityIndicator.IsIndeterminate = false;
+                mActivityIndicator.Visibility = Visibility.Collapsed;
 
                 mView = mActivityIndicator;
             }
@@ -65,12 +65,16 @@ namespace MoSync
              * Hide or show the ActivityIndicator
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_ACTIVITY_INDICATOR_IN_PROGRESS)]
-            public bool inProgress
+            public String InProgress
             {
                 set
                 {
-                    mActivityIndicator.IsIndeterminate = value;
-                    mActivityIndicator.Visibility = Visibility.Visible;//(true == value) ? Visibility.Visible : Visibility.Collapsed;
+                    bool myValue;
+                    if (bool.TryParse(value, out myValue))
+                    {
+                        mActivityIndicator.IsIndeterminate = myValue;
+                        mActivityIndicator.Visibility = (myValue) ? Visibility.Visible : Visibility.Collapsed;
+                    }
                 }
             }
 
