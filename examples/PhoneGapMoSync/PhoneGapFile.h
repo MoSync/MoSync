@@ -28,6 +28,7 @@ MA 02110-1301, USA.
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
+#include <MAUtil/String.h>
 #include "PhoneGapMessage.h"
 
 class PhoneGapMessageHandler;
@@ -47,6 +48,27 @@ public:
 	 * Destructor.
 	 */
 	virtual ~PhoneGapFile();
+
+	MAUtil::String PhoneGapFile::emitFileSystemInfo(
+		const MAUtil::String& name,
+		const MAUtil::String& rootEntry);
+
+	MAUtil::String PhoneGapFile::emitFileEntry(
+		const MAUtil::String& isFile,
+		const MAUtil::String& isDirectory,
+		const MAUtil::String& name,
+		const MAUtil::String& fullPath);
+
+	void callSuccess(
+		const MAUtil::String& callbackID,
+		const MAUtil::String& args,
+		const MAUtil::String& castFunction
+		);
+
+	void callError(
+		const MAUtil::String& callbackID,
+		const MAUtil::String& errorCode
+		);
 
 	/**
 	 * Implementation of File API exposed to JavaScript.

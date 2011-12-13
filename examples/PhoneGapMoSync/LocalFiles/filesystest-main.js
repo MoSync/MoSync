@@ -3,7 +3,8 @@ function testFileSystem() {
 }
 
 function gotFS(fileSystem) {
-    //fileSystem.root.getFile("readme.txt", null, gotFileEntry, fail);
+	console.log("@@ fileSystem.root.name: " + fileSystem.root.name);
+    fileSystem.root.getFile("readme.txt", null, gotFileEntry, fail);
 }
 
 function gotFileEntry(fileEntry) {

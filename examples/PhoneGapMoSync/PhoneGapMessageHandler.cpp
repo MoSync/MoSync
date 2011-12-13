@@ -83,7 +83,7 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	else if ((message.getParam("service") == "Notification") &&
 			(message.getParam("action") == "vibrate"))
 	{
-		int duration = message.getJSONFieldInt("duration");
+		int duration = message.getArgsFieldInt("duration");
 		maVibrate(duration);
 	}
 	//Process the beep message
@@ -279,33 +279,107 @@ void PhoneGapMessageHandler::sendPhoneGapError(
 }
 
 /**
- * Evaluate JavaScript code in the WebView.
+ * Call the PhoneGap success function.
  *
- * @param script Code that should be evaluated.
+ * @param callbackID The id of the JS callback function.
+ * @param status Status code.
+ * @param args Return values as a JSON string.
+ * @param keepCallback true if this callback should be kept by PhoneGap.
+ * @param castFunction Name of an optional JS function that
+ * will convert the JSON args to a JS object.
  */
-void PhoneGapMessageHandler::callJS(const String& script)
+void PhoneGapMessageHandler::callSuccess(
+	const String& callbackID,
+	const MAUtil::String& status,
+	const String& args,
+	bool keepCallback,
+	const String& castFunction
+	)
 {
+	callCallback(
+		"PhoneGap.CallbackSuccess",
+		callbackID,
+		status,
+		args,
+		keepCallback,
+		castFunction);
+}
+
+/**
+ * Call the PhoneGap error function.
+ *
+ * @param callbackID The id of the JS callback function.
+ * @param args Return values as a JSON string.
+ * @param keepCallback true if this callback should be kept by PhoneGap.
+ */
+void PhoneGapMessageHandler::callError(
+	const String& callbackID,
+	const String& args,
+	bool keepCallback
+	)
+{
+	callCallback(
+		"PhoneGap.CallbackError",
+		callbackID,
+		PHONEGAP_CALLBACK_STATUS_ERROR,
+		args,
+		keepCallback);
+}
+
+/**
+ * Evaluate a callback function in JavaScript.
+ *
+ * @param callbackFunction The JS function to handle the callback.
+ * @param callbackID The id of the JS callback.
+ * @param status Status code.
+ * @param args Result values as a JSON string.
+ * @param keepCallback true if this callback should be kept by PhoneGap.
+ * @param castFunction Name of an optional JS function that
+ * will convert the JSON args to a JS object.
+ */
+void PhoneGapMessageHandler::callCallback(
+	const String& callbackFunction,
+	const String& callbackID,
+	const MAUtil::String& status,
+	const String& args,
+	bool keepCallback,
+	const String& castFunction
+	)
+{
+	// Generate JavaScipt code.
+
+	String script = callbackFunction + "(";
+	script += "'" + callbackID + "'";
+
+	script += ",\"{";
+	script += "'status':" + status;
+	script += ",'message':" + args;
+
+	if (keepCallback)
+	{
+		script += ",'keepCallback':true";
+	}
+
+	script += "}\"";
+
+	if (castFunction.size() > 0)
+	{
+		script += ",'" + castFunction + "'";
+	}
+
+	script += ")";
+
+	lprintfln("@@@ callCallback: %s", script.c_str());
+
 	mWebView->callJS(script);
 }
 
 /**
  * Evaluate JavaScript code in the WebView.
  *
- * @param callbackID The id of the JS callback function.
- * @param args Return values as a JSON string.
- * @param castFunction Name of an optional JS function that
- * will convert the JSOn args to a JS object.
+ * @param script Code that should be evaluated.
  */
-void PhoneGapMessageHandler::callSuccess(
-	const String& callbackID,
-	const String& args,
-	const String& castFunction
-	)
+void PhoneGapMessageHandler::callJS(const String& script)
 {
-	String script = "PhoneGap.CallbackSuccess(";
-	script += callbackId + ",";
-	script += args + ",";
-	script += castFunction + ")";
-
 	mWebView->callJS(script);
 }

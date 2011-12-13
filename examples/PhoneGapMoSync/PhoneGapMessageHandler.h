@@ -33,6 +33,18 @@ MA 02110-1301, USA.
 #include "PhoneGapSensors.h"
 #include "PhoneGapFile.h"
 
+// PhoneGap callback result codes.
+#define PHONEGAP_CALLBACK_STATUS_NO_RESULT "0"
+#define PHONEGAP_CALLBACK_STATUS_OK "1"
+#define PHONEGAP_CALLBACK_STATUS_CLASS_NOT_FOUND_EXCEPTION "2"
+#define PHONEGAP_CALLBACK_STATUS_ILLEGAL_ACCESS_EXCEPTION "3"
+#define PHONEGAP_CALLBACK_STATUS_INSTANTIATION_EXCEPTION "4"
+#define PHONEGAP_CALLBACK_STATUS_MALFORMED_URL_EXCEPTION "5"
+#define PHONEGAP_CALLBACK_STATUS_IO_EXCEPTION "6"
+#define PHONEGAP_CALLBACK_STATUS_INVALID_ACTION "7"
+#define PHONEGAP_CALLBACK_STATUS_JSON_EXCEPTION "8"
+#define PHONEGAP_CALLBACK_STATUS_ERROR "9"
+
 /**
  * Class that implements JavaScript calls.
  *
@@ -110,10 +122,67 @@ public:
 	 */
 	void sendDeviceProperties(MAUtil::String callbackID);
 
+	/**
+	 * Call the PhoneGap success function.
+	 *
+	 * @param callbackID The id of the JS callback function.
+	 * @param status Status code.
+	 * @param args Return values as a JSON string.
+	 * @param keepCallback true if this callback should be kept by PhoneGap.
+	 * @param castFunction Name of an optional JS function that
+	 * will convert the JSON args to a JS object.
+	 */
+	void callSuccess(
+		const MAUtil::String& callbackID,
+		const MAUtil::String& status,
+		const MAUtil::String& args,
+		bool keepCallback = false,
+		const MAUtil::String& castFunction = ""
+		);
+
+	/**
+	 * Call the PhoneGap error function.
+	 *
+	 * @param callbackID The id of the JS callback function.
+	 * @param args Return values as a JSON string.
+	 * @param keepCallback true if this callback should be kept by PhoneGap.
+	 */
+	void callError(
+		const MAUtil::String& callbackID,
+		const MAUtil::String& args,
+		bool keepCallback = false
+		);
+
+	/**
+	 * Evaluate a callback function in JavaScript.
+	 *
+	 * @param callbackFunction The JS function to handle the callback.
+	 * @param status Status code.
+	 * @param callbackID The id of the JS callback.
+	 * @param args Result values as a JSON string.
+	 * @param keepCallback true if this callback should be kept by PhoneGap.
+	 * @param castFunction Name of an optional JS function that
+	 * will convert the JSON args to a JS object.
+	 */
+	void PhoneGapMessageHandler::callCallback(
+		const MAUtil::String& callbackFunction,
+		const MAUtil::String& callbackID,
+		const MAUtil::String& status,
+		const MAUtil::String& args,
+		bool keepCallback = false,
+		const MAUtil::String& castFunction = ""
+		);
+
+	/**
+	 * Evaluate JavaScript code in the WebView.
+	 *
+	 * @param script Code that should be evaluated.
+	 */
+	void callJS(const MAUtil::String& script);
+
 private:
 	/**
-	 * A Pointer to the main webview
-	 * Used for communicating with PhoneGap
+	 * The WebView used by PhoneGap.
 	 */
 	NativeUI::WebView* mWebView;
 

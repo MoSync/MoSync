@@ -30,19 +30,24 @@ MA 02110-1301, USA.
 
 using namespace MAUtil;
 
-// Error codes.
-#define NOT_FOUND_ERR 1
-#define SECURITY_ERR 2
-#define ABORT_ERR 3
-#define NOT_READABLE_ERR 4
-#define ENCODING_ERR 5
-#define NO_MODIFICATION_ALLOWED_ERR 6
-#define INVALID_STATE_ERR 7
-#define SYNTAX_ERR 8
-#define INVALID_MODIFICATION_ERR 9
-#define QUOTA_EXCEEDED_ERR 10
-#define TYPE_MISMATCH_ERR 11
-#define PATH_EXISTS_ERR 12
+// File error codes.
+#define FILEERROR_NOT_FOUND_ERR "1"
+#define FILEERROR_SECURITY_ERR "2"
+#define FILEERROR_ABORT_ERR "3"
+#define FILEERROR_NOT_READABLE_ERR "4"
+#define FILEERROR_ENCODING_ERR "5"
+#define FILEERROR_NO_MODIFICATION_ALLOWED_ERR "6"
+#define FILEERROR_INVALID_STATE_ERR "7"
+#define FILEERROR_SYNTAX_ERR "8"
+#define FILEERROR_INVALID_MODIFICATION_ERR "9"
+#define FILEERROR_QUOTA_EXCEEDED_ERR "10"
+#define FILEERROR_TYPE_MISMATCH_ERR "11"
+#define FILEERROR_PATH_EXISTS_ERR "12"
+
+// FileTransfer error codes.
+#define FILETRANSERERROR_FILE_NOT_FOUND_ERR "1"
+#define FILETRANSERERROR_INVALID_URL_ERR "2"
+#define FILETRANSERERROR_CONNECTION_ERR "3"
 
 // File system options.
 #define LOCALFILESYSTEM_TEMPORARY 0
@@ -65,24 +70,50 @@ PhoneGapFile::~PhoneGapFile()
 {
 }
 
-String PhoneGapFile::emitFileSystemInfo(String& name, String& rootEntry)
+String PhoneGapFile::emitFileSystemInfo(
+	const String& name,
+	const String& rootEntry)
 {
-	return "{\"name\"=" + name + ", \"root\"=" + rootEntry + "}";
+	return "{'name':'" + name + "', 'root':" + rootEntry + "}";
 }
 
 String PhoneGapFile::emitFileEntry(
-	String& isFile, String& isDirectory, String& name, String& fullPath)
+	const String& isFile,
+	const String& isDirectory,
+	const String& name,
+	const String& fullPath)
 {
 	return
-		"{\"isFile\"=" + isFile + ", " +
-		"\"isDirectory\"=" + isDirectory + ", " +
-		"\"name\"=" + name + ", " +
-		"\"fullPath\"=" + fullPath + "}";
+		"{'isFile':" + isFile + "," +
+		"'isDirectory':" + isDirectory + "," +
+		"'name':'" + name + "'," +
+		"'fullPath':'" + fullPath + "'}";
 }
 
-void PhoneGapFile::passResult()
+void PhoneGapFile::callSuccess(
+	const String& callbackID,
+	const String& args,
+	const String& castFunction
+	)
 {
+	mMessageHandler->callSuccess(
+		callbackID,
+		PHONEGAP_CALLBACK_STATUS_OK,
+		args,
+		false,
+		castFunction);
+}
 
+void PhoneGapFile::callError(
+	const String& callbackID,
+	const String& errorCode
+	)
+{
+	String args = "{'code':" + errorCode + "}";
+
+	mMessageHandler->callError(
+		callbackID,
+		args);
 }
 
 /**
@@ -94,15 +125,48 @@ bool PhoneGapFile::handleMessage(PhoneGapMessage& message)
 	if (message.getParam("action") == "requestFileSystem")
 	{
 		lprintfln("@@@ requestFileSystem\n");
-		// We ignore type and size parameters and use persistent storage.
-		String rootEntry = emitFileEntry(true, true, "sdcard", "/sdcard/");
+
+		String callbackID = message.getParam("PhoneGapCallBackId");
+
+		// We support only persistent storage.
+		int type = message.getArgsFieldInt("type");
+		if (LOCALFILESYSTEM_PERSISTENT != type)
+		{
+			callError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+			return true;
+		}
+
+		// Size parameter must be zero.
+		int size = message.getArgsFieldInt("size");
+		if (0 != size)
+		{
+			callError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+			return true;
+		}
+
+		String rootEntry = emitFileEntry("true", "true", "/", "/");
 		String fileSystemInfo = emitFileSystemInfo("persistent", rootEntry);
+		callSuccess(
+			callbackID,
+			fileSystemInfo,
+			"window.localFileSystem._castFS");
 
 	}
-	else if (message.getParam("action") == "testFileExists")
+	else if (message.getParam("action") == "getFile")
 	{
-		String fileName = message.getParam("fileName");
-		lprintfln("testFileExists: %s\n", fileName.c_str());
+		lprintfln("@@@ getFile\n");
+
+		String callbackID = message.getParam("PhoneGapCallBackId");
+
+		// We support only persistent storage.
+		String fullPath = message.getArgsField("fullPath");
+		String path = message.getArgsField("path");
+		String options = message.getArgsField("options");
+
+		lprintfln("@@@ fullPath: %s path: %s options: %s",
+			fullPath.c_str(),
+			path.c_str(),
+			options.c_str());
 	}
 
 	return true;

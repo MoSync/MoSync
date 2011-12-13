@@ -10,15 +10,15 @@
  * Copyright (c) 2011, MoSync AB
  */
 
-
+// MOSYNC: Object to hold utility functions.
 var MoSync = {};
 
+// MOSYNC: JSON.parse apparently does not work on Android,
+// we use eval instead.
 MoSync.parseJSON = function(jsonString)
 {
-    // This parses JSON (JSON.parse doesnot work on Android).
     return eval('(' + jsonString + ')');
-}
-
+};
 
 /**
  * The order of events during page load and PhoneGap startup is as follows:
@@ -101,11 +101,13 @@ PhoneGap.exec = function(success, fail, service, action, args)
         PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
     }
 
-    // Instead of using PhoneGap's direct Command Mechanism we send
+    // MOSYNC: Instead of using PhoneGap's direct Command Mechanism we send
     // it to the bridge Library for preprocessing and behavior translation.
     bridge.PhoneGap.exec(callbackId, service, action, args);
 };
 
+// MOSYNC: We currently do not call this function, but call
+// PhoneGap.CallbackSuccess and PhoneGap.CallbackError from C++.
 PhoneGapCommandResult = function(status,callbackId,args,cast)
 {
     if(status === "backbutton") {
@@ -720,7 +722,7 @@ Accelerometer.prototype.getCurrentAcceleration = function(successCallback, error
 
     var onSuccess = function(result)
     {
-        var accResult MoSync.parseJSON(result);
+        var accResult = MoSync.parseJSON(result);
         console.log("Accel x = " + accResult.x);
         self.lastAcceleration = new Acceleration(accResult.x,accResult.y,accResult.z);
         successCallback(self.lastAcceleration);
