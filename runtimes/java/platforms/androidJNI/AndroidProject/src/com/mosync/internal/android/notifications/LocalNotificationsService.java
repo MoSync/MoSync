@@ -17,10 +17,6 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.internal.android.notifications;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -62,9 +58,6 @@ public class LocalNotificationsService extends Service
 		if (null != sMe)
 		{
 			Log.i("@@@MoSync", "NotificationsService.startService - service is already running");
-			// Schedule the new notification.
-//			scheduleNotification(notification);
-//			return;
 		}
 
 		mLatestNotification = notification;
@@ -73,7 +66,6 @@ public class LocalNotificationsService extends Service
 		// Here we set a flag to signal that the service was started
 		// from the MoSync application.
 		serviceIntent.putExtra("StartedByTheMoSyncApplication", true);
-		serviceIntent.setAction(Integer.toString(notification.getId()));
 		context.startService(serviceIntent);
 	}
 
@@ -104,6 +96,8 @@ public class LocalNotificationsService extends Service
 	public static void removeServiceNotification(
 		int notificationId, Context context)
 	{
+		Log.e("@@MoSync", "LocalNotification: remove service notification");
+
 		// We use a wrapper class to be backwards compatible.
 		// Loading the wrapper class will throw an error on
 		// platforms that does not support it.
@@ -190,8 +184,8 @@ public class LocalNotificationsService extends Service
 		// Stop the service if there is no intent.
 		if (null == intent)
 		{
-//			Log.i("@@@MoSync", "NotificationsService.startMe: "
-//				+ "stopping service because intent is null");
+			Log.i("@@@MoSync", "NotificationsService.startMe: "
+				+ "stopping service because intent is null");
 			stopSelf();
 			return;
 		}
@@ -201,8 +195,8 @@ public class LocalNotificationsService extends Service
 			intent.getBooleanExtra("StartedByTheMoSyncApplication", false);
 		if (!startFlag)
 		{
-//			Log.i("@@@MoSync", "NotificationsService.startMe: "
-//				+ "stopping service because startFlag is false");
+			Log.i("@@@MoSync", "NotificationsService.startMe: "
+				+ "stopping service because startFlag is false");
 			stopSelf();
 			return;
 		}
@@ -210,43 +204,13 @@ public class LocalNotificationsService extends Service
 		// sMe must be set.
 		if (null == sMe)
 		{
-//			Log.i("@@@MoSync", "NotificationsService.startMe: "
-//				+ "stopping service because sMe is null");
+			Log.i("@@@MoSync", "NotificationsService.startMe: "
+				+ "stopping service because sMe is null");
 			stopSelf();
 			return;
 		}
-//		intent.getAction(); get the ID
 
-		scheduleNotification();
-	}
-
-	/**
-	 * Schedule a status bar notification.
-	 */
-	private void scheduleNotification()
-	{
-		Log.e("@@MoSync","scheduleNotification");
-
-		// If the fire date is not set, trigger it now.
-		if ( mLatestNotification.getFireDate() == -1 )
-		{
-			triggerNotification();
-		}
-		else
-		{
-		    Timer timer = new Timer();
-		    TimerTask timerTask = new TimerTask()
-		    {
-		        @Override
-		        public void run()
-		        {
-		            triggerNotification();
-		        }
-		    };
-
-	        long task = mLatestNotification.getFireDate() - System.currentTimeMillis();
-		    timer.schedule(timerTask, task);
-		}
+		triggerNotification();
 	}
 
 	/**
