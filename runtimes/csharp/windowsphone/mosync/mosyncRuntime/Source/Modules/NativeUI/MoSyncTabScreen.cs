@@ -78,7 +78,7 @@ namespace MoSync
             }
 
             /**
-             * Override of the RemoveChild function, add a "tab" to the Screen
+             * Override of the RemoveChild function, removes a "tab" from the Screen
              * @param child IWidget the "child" that needs to be removed
              */
             public override void RemoveChild(IWidget child)
@@ -98,7 +98,7 @@ namespace MoSync
             }
 
             /**
-             * Override of the RemoveChild function, add a "tab" to the Screen
+             * Override of the RemoveChild function, removes a "tab" from the Screen
              * @param index int the index of the "child" that needs to be removed
              */
             public override void RemoveChild(int index)

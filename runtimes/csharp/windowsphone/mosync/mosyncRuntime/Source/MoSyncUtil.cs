@@ -301,5 +301,17 @@ namespace MoSync
 
             return wb;
         }
+
+        public static WriteableBitmap CreateWriteableBitmapFromMemory(Memory memory)
+        {
+            WriteableBitmap wb = null;
+
+            BitmapImage im = new BitmapImage();
+            im.CreateOptions = BitmapCreateOptions.None;
+            im.SetSource(memory.GetStream());
+            wb = new WriteableBitmap(im);
+
+            return wb;
+        }
     }
 }

@@ -4809,6 +4809,13 @@ group WidgetAPI "Widget API" {
 		* See \ref WidgetModalDialogProperties "Modal Dialog properties" for the properties available.
 		*/
 		MODAL_DIALOG = "ModalDialog";
+
+		/**
+		* @brief A panorama control is a Windows Phone 7 specific control
+		* Available only on Windows Phone 7
+		* Seen \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
+		*/
+		PANORAMA_VIEW = "PanoramaView";
 	}
 	} // end of WidgetTypes
 
@@ -5037,6 +5044,61 @@ group WidgetAPI "Widget API" {
 		CURRENT_TAB = "currentTab";
 	}
 	} // end of WidgetTabScreenProperties
+
+	/**
+	* The available widget properties for a #MAW_PANORAMA_VIEW. See \ref WidgetProperties "Widget properties" for more properties
+	*/
+
+	group WidgetPanoramaViewProperties "Panorama View properties" {
+	constset MAString MAW_PANORAMA_VIEW_ {
+		/**
+		* @copydoc #MAW_SCREEN_TITLE
+		*/
+		TITLE = "title";
+
+		/**
+		* @brief Sets or gets the currently shown screen to the screen with the given index.
+		*
+		* @validvalue A 0-indexed tab number.
+		*
+		* @setandget
+		*
+		* @par Example set
+		* \code
+		*	maWidgetSetProperty(panoramaViewHandle, MAW_PANORAMA_VIEW_CURRENT_SCREEN, "1");
+		* \endcode
+		*
+		* @par Example get
+		* \code
+		* 	char currentScreenBuffer[BUFFER_SIZE];
+		* 	int result = maWidgetGetProperty(
+		* 		panoramaViewHandle,
+		* 		MAW_WEB_VIEW_CURRENT_SCREEN,
+		* 		currentScreenBuffer,
+		*		BUFFER_SIZE);
+		* 	if (result > 0)
+		* 	{
+		* 	    // Do something with current screen.
+		* 	}
+		* \endcode
+		*/
+		CURRENT_SCREEN = "currentScreen";
+
+		/**
+		 * @brief Sets the background image of the view
+		 *
+		 * @validvalue MoSync handle to an uncompressed image resource. The size of the image should be large enough to fill the space used by the panorama
+		 *
+		 * @setonly
+		 * @par Example
+		 * \code
+		 *	maWidgetSetProperty(panoramaViewHandle, MAW_PANORAMA_VIEW_BACKGROUND_IMAGE, toString(R_MY_IMG));
+		 * \endcode
+		 */
+
+		BACKGROUND_IMAGE = "backgroundImage";
+	}
+	} // end of WidgetPanoramaViewProperties
 
 	/**
 	* The available widget properties for a #MAW_STACK_SCREEN. See \ref WidgetProperties "Widget properties" for more properties.

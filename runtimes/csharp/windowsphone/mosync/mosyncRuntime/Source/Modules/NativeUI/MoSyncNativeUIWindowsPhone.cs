@@ -37,11 +37,6 @@ namespace MoSync
 {
     namespace NativeUI
     {
-        public class ScreenSize
-        {
-            public static int SCREEN_HEIGHT = 800;
-            public static int SCREEN_WIDTH = 480;
-        }
         public class WidgetBaseWindowsPhone : WidgetBase
         {
             protected UIElement mView;
