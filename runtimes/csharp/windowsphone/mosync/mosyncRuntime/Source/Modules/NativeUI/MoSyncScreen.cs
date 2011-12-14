@@ -39,12 +39,17 @@ namespace MoSync
         public class Screen : WidgetBaseWindowsPhone, IScreen
         {
             protected PhoneApplicationPage mPage;
+            protected Microsoft.Phone.Shell.ApplicationBar mApplicationBar;
 
             //The constructor
             public Screen()
             {
                 mPage = new PhoneApplicationPage();
                 mView = mPage;
+
+                ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar = new Microsoft.Phone.Shell.ApplicationBar();
+                ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar.IsVisible = false;
+
 
                 /**
                  * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
@@ -153,6 +158,7 @@ namespace MoSync
                 MoSync.Util.RunActionOnMainThreadSync(() =>
                 {
                     PhoneApplicationFrame frame = (PhoneApplicationFrame)Application.Current.RootVisual;
+
                     frame.Content = mPage;
                 });
             }
@@ -166,6 +172,14 @@ namespace MoSync
                 set
                 {
                     mPage.Title = value;
+                }
+            }
+
+            public void AddApplicationBar(IWidget applicationBar)
+            {
+                if (applicationBar is ApplicationBar)
+                {
+                    ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar = (applicationBar as ApplicationBar).GetApplicationBar();
                 }
             }
         }
