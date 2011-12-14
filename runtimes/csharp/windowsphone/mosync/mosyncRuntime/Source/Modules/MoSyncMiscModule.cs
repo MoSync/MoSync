@@ -4,6 +4,7 @@ using Microsoft.Phone.Info;
 using System.Windows;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
+using System.Globalization;
 
 
 namespace MoSync
@@ -120,6 +121,8 @@ namespace MoSync
             SystemPropertyManager.SystemPropertyProvider myDelegateForDeviceInfo = new SystemPropertyManager.SystemPropertyProvider(getDeviceInfo);
             SystemPropertyManager.RegisterSystemPropertyProvider("mosync.imei",              myDelegateForDeviceInfo);
             SystemPropertyManager.RegisterSystemPropertyProvider("mosync.imsi",              myDelegateForDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.iso-639-1",         myDelegateForDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.iso-639-2",         myDelegateForDeviceInfo);
             SystemPropertyManager.RegisterSystemPropertyProvider("mosync.device",            myDelegateForDeviceInfo);
             SystemPropertyManager.RegisterSystemPropertyProvider("mosync.device.name",       myDelegateForDeviceInfo);
             SystemPropertyManager.RegisterSystemPropertyProvider("mosync.device.UUID",       myDelegateForDeviceInfo);
@@ -154,26 +157,38 @@ namespace MoSync
          */
         public static string getDeviceInfo(string key)
         {
+            // imei
             if (key.Equals("mosync.imei"))
             {
-                return "mosync.imei";
+                string sImei = string.Empty;
+                object objImei;
+
+                if (Microsoft.Phone.Info.UserExtendedProperties.TryGetValue("ANID", out objImei))
+                {
+                    sImei = (string)objImei;
+                    return sImei;
+                }
             }
 
+            // imsi
             if (key.Equals("mosync.imsi"))
             {
-                return "mosync.imsi";
+                //TODO
             }
 
+            // lang
             if (key.Equals("mosync.iso-639-1"))
             {
-                return "mosync.iso-639-1";
+                return System.Globalization.CultureInfo.CurrentCulture.ToString();
             }
 
+            // lantg
             if (key.Equals("mosync.iso-639-2"))
             {
-                return "mosync.iso-639-2";
+                return System.Globalization.CultureInfo.CurrentCulture.Name;
             }
 
+            // device info
             if (key.Equals("mosync.device"))
             {
                 string device = DeviceStatus.DeviceManufacturer + ";" +
@@ -182,6 +197,7 @@ namespace MoSync
                 return device;
             }
 
+            // device name
             if (key.Equals("mosync.device.name"))
             {
                 return DeviceStatus.DeviceName;
@@ -192,36 +208,41 @@ namespace MoSync
             // this will then warn users in marketplace
             if (key.Equals("mosync.device.UUID"))
             {
-                byte[] result = null;
+                byte[] sUUID = null;
                 object uniqueId;
                 if (DeviceExtendedProperties.TryGetValue("DeviceUniqueId", out uniqueId))
-                    result = (byte[])uniqueId;
-
-                return BitConverter.ToString(result);
+                {
+                    sUUID = (byte[])uniqueId;
+                    return BitConverter.ToString(sUUID);
+                }
             }
 
+            // device OS
             if (key.Equals("mosync.device.OS"))
             {
                 return Environment.OSVersion.ToString();
             }
 
+            // device OS version
             if (key.Equals("mosync.device.OS.version"))
             {
                 return Environment.OSVersion.Version.ToString();
             }
 
+            // network connection type
             if (key.Equals("mosync.network.type"))
             {
                 return Microsoft.Phone.Net.NetworkInformation.NetworkInterface.NetworkInterfaceType.ToString();
             }
 
-            // called only by trusted applications
+            // absolute path to the local folder - called only by trusted applications
             if (key.Equals("mosync.path.local"))
             {
                 return Environment.CurrentDirectory.ToString();
             }
 
-            return string.Empty;
+            // in case of no information return empty
+            return "not available";
         }
 
     } // end class MiscModule
