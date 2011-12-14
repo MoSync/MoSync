@@ -64,6 +64,7 @@ import com.mosync.internal.android.MoSyncTouchHandler;
 import com.mosync.internal.android.MoSyncView;
 import com.mosync.internal.android.nfc.MoSyncNFCForegroundUtil;
 import com.mosync.internal.android.nfc.MoSyncNFCService;
+import com.mosync.internal.android.notifications.LocalNotificationsManager;
 import com.mosync.internal.android.notifications.PushNotificationsManager;
 
 /**
@@ -90,7 +91,7 @@ public class MoSync extends Activity
     @Override
     public void onCreate(Bundle savedInstanceState)
 	{
-//		Log.i("MoSync", "MoSync onCreate");
+		Log.i("MoSync", "MoSync onCreate");
 
 		super.onCreate(savedInstanceState);
 
@@ -129,8 +130,9 @@ public class MoSync extends Activity
 		try {
 			// If triggered by a C2DM message, handle it here.
 			// Call this after the MoSyncThread is created.
-			if ( getIntent().getAction().equals(C2DMBaseReceiver.C2DM_INTENT) )
+			if ( getIntent().getBooleanExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_NOTIFICATION, false) )
 			{
+				Log.e("@@MoSync","MoSync activity started after a push notification was received");
 				PushNotificationsManager.handlePushNotificationIntent(getIntent());
 			}
 		}catch(Throwable t){
@@ -184,7 +186,7 @@ public class MoSync extends Activity
 	@Override
 	public void onConfigurationChanged(Configuration newConfig)
 	{
-		//Log.i("MoSync", "onConfigurationChanged");
+		Log.i("MoSync", "onConfigurationChanged");
 
 		super.onConfigurationChanged(newConfig);
 	}
@@ -192,7 +194,7 @@ public class MoSync extends Activity
 	@Override
     protected void onStart()
 	{
-		//Log.i("MoSync", "onStart");
+		Log.i("MoSync", "onStart");
 
 		super.onStart();
 
@@ -202,7 +204,7 @@ public class MoSync extends Activity
     @Override
     protected void onStop()
 	{
-		//Log.i("MoSync", "onStop");
+		Log.i("MoSync", "onStop");
 		mMoSyncThread.releaseHardware();
 		super.onStop();
 
@@ -212,7 +214,7 @@ public class MoSync extends Activity
 	@Override
     protected void onResume()
 	{
-		//Log.i("MoSync", "onResume");
+		Log.i("MoSync", "onResume");
 
 		super.onResume();
 
@@ -226,6 +228,11 @@ public class MoSync extends Activity
 		if (nfcForegroundHandler != null) {
 			nfcForegroundHandler.enableForeground();
 		}
+
+		// Notify the local notifications manager that the application
+		// has gained focus.
+		LocalNotificationsManager.focusGained();
+
 		SYSLOG("Posting EVENT_TYPE_FOCUS_GAINED to MoSync");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_FOCUS_GAINED;
@@ -235,7 +242,7 @@ public class MoSync extends Activity
 	@Override
     protected void onPause()
 	{
-		//Log.i("MoSync", "onPause");
+		Log.i("MoSync", "onPause");
 		mMoSyncThread.releaseHardware();
 		super.onPause();
 
@@ -248,6 +255,11 @@ public class MoSync extends Activity
 		if (nfcForegroundHandler != null) {
 			nfcForegroundHandler.disableForeground();
 		}
+
+		// Notify the local notifications manager that the application
+		// has lost focus.
+		LocalNotificationsManager.focusLost();
+
 		SYSLOG("Posting EVENT_TYPE_FOCUS_LOST to MoSync");
 		int[] event = new int[1];
 		event[0] = EVENT_TYPE_FOCUS_LOST;
@@ -257,7 +269,7 @@ public class MoSync extends Activity
 	@Override
     protected void onRestart()
 	{
-		//Log.i("MoSync", "onRestart");
+		Log.i("MoSync", "onRestart");
 
 		super.onRestart();
 
@@ -267,7 +279,7 @@ public class MoSync extends Activity
 	@Override
     protected void onDestroy()
 	{
-		//Log.i("MoSync", "onDestroy");
+		Log.i("MoSync", "onDestroy");
 
 		super.onDestroy();
 

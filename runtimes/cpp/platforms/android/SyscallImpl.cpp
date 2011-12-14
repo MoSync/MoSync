@@ -2706,6 +2706,9 @@ return 0; \
 					mJThis);
 		}
 
+		case maIOCtl_maNotificationPushSetDisplayFlag:
+			return _maNotificationPushSetDisplayFlag(a, mJNIEnv, mJThis);
+
 		case maIOCtl_maSyscallPanicsEnable:
 			SYSLOG("maIOCtl_maSyscallPanicsEnable");
 			return _maSyscallPanicsEnable(

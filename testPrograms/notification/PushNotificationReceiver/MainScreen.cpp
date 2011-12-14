@@ -27,6 +27,9 @@ MA 02110-1301, USA.
 #include "SettingsScreen.h"
 #include "DisplayNotificationScreen.h"
 #include "TCPConnection.h"
+#include "Util.h"
+
+#define C2DM_USER_ACCOUNT "emmaTestMosync@gmail.com"
 
 /**
  * Constructor.
@@ -45,12 +48,89 @@ MainScreen::MainScreen() :
 	this->addTab(mDisplayNotificationScreen);
 	this->addTab(mSettingsScreen);
 
-	NotificationManager::getInstance()->registerPushNotification(
-		PUSH_NOTIFICATION_TYPE_BADGE |
-		PUSH_NOTIFICATION_TYPE_SOUND |
-		PUSH_NOTIFICATION_TYPE_ALERT,
-		"");
+	if ( isAndroid() )
+	{
+		// Store the reg ID, and call registration only once per app.
+		checkStore();
+	}
+	else
+	{
+		int registerCode = Notification::NotificationManager::getInstance()->registerPushNotification(
+				Notification::PUSH_NOTIFICATION_TYPE_BADGE |
+				Notification::PUSH_NOTIFICATION_TYPE_ALERT |
+				Notification::PUSH_NOTIFICATION_TYPE_SOUND,
+				C2DM_USER_ACCOUNT);
+
+		if ( MA_NOTIFICATION_RES_UNSUPPORTED == registerCode )
+			maPanic(0, "This device does not support push notifications");
+	}
+
 	NotificationManager::getInstance()->addPushNotificationListener(this);
+}
+
+/**
+ * Used for Android only.
+ * Check if the store exists.
+ * If it does not exist, call the registration method,
+ * create the store for later writing to it after the
+ * connection to the server is established.
+ */
+void MainScreen::checkStore() {
+	MAHandle myStore = maOpenStore("MyPushStore", 0);
+
+	if (myStore == STERR_NONEXISTENT)
+	{
+		mSendRegistrationNeeded = true;
+
+		// Request registration ID.
+		int registerCode = Notification::NotificationManager::getInstance()->registerPushNotification(
+				Notification::PUSH_NOTIFICATION_TYPE_BADGE
+						| Notification::PUSH_NOTIFICATION_TYPE_ALERT
+						| Notification::PUSH_NOTIFICATION_TYPE_SOUND,
+				C2DM_USER_ACCOUNT);
+		if ( MA_NOTIFICATION_RES_UNSUPPORTED == registerCode )
+			maPanic(0, "This device does not support push notifications");
+
+		// Close store without deleting it.
+		maCloseStore(myStore, 0);
+	}
+	else
+	{
+		mSendRegistrationNeeded = false;
+		// Close store without deleting it.
+		maCloseStore(myStore, 0);
+	}
+}
+
+/**
+ * Used for Android only.
+ * Stores the registration ID in a store for later use.
+ * @param token The registration_ID.
+ */
+void MainScreen::storeRegistrationID(MAUtil::String* token)
+{
+	mToken = token;
+
+	// Store doesn't exist.
+	MAHandle myStore = maOpenStore("MyPushStore", MAS_CREATE_IF_NECESSARY);
+
+	// Create store and write Registration ID
+	MAHandle myData = maCreatePlaceholder();
+	if(maCreateData(myData, token->length()) == RES_OK)
+	{
+		 maWriteData(myData, token->c_str(), 0, token->length());
+		 // Write the data resource to the store.
+		 int result = maWriteStore(myStore, myData);
+
+		 if ( result < 0 )
+		 {
+			 printf("Cannot write to store the token!!");
+		 }
+		 maCloseStore(myStore, 0);
+	}
+
+	// Finally, send it over TCP to the server.
+	//mConnection->sendData(token);
 }
 
 /**
@@ -61,6 +141,7 @@ MainScreen::~MainScreen()
 	delete mDisplayNotificationScreen;
 	delete mSettingsScreen;
 	delete mToken;
+    Notification::NotificationManager::getInstance()->removePushNotificationListener(this);
 }
 
 /**
@@ -81,7 +162,11 @@ void MainScreen::didReceivePushNotification(
 void MainScreen::didApplicationRegistered(MAUtil::String& token)
 {
 	printf("MainScreen::didApplicationRegistered");
+	printf(token.c_str());
 	mToken = new MAUtil::String(token);
+	mDisplayNotificationScreen->pushRegistrationDone(true);
+    //mMessageLabel->setText("Your app registered for push notifications");
+    // Now you can press Connect to connect and send data to the server.
 }
 
 /**
@@ -100,6 +185,7 @@ void MainScreen::didFaildToRegister(
     MAUtil::String& error)
 {
 	printf("MainScreen::didFaildToRegister");
+	mDisplayNotificationScreen->pushRegistrationDone(false);
 }
 
 /**
@@ -120,9 +206,19 @@ void MainScreen::tabScreenTabChanged(
 void MainScreen::connectionEstablished()
 {
 	printf("MainScreen::connectionEstablished()");
+	// Update the UI.
 	mSettingsScreen->connectionEstablished();
+
 	if (mToken)
 	{
+		// This is the first time the app is launched on Android phone.
+		// Need to send the token. Also, store it to the store.
+		if (isAndroid())
+		{
+			storeRegistrationID(mToken);
+		}
+
+		// Finally send it over TCP to the server.
 		mTCPConnection->sendData(*mToken);
 	}
 }

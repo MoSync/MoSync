@@ -67,6 +67,22 @@ public:
 	virtual ~MainScreen();
 private:
 
+	/**
+	 * Used for Android only.
+	 * Check if the store exists.
+	 * If it does not exist, call the registration method,
+	 * create the store for later writing to it after the
+	 * connection to the server is established.
+	 */
+    void checkStore();
+
+    /**
+     * Used for Android only.
+     * Stores the registration ID in a store for later use.
+     * @param token The registration_ID.
+     */
+    void storeRegistrationID(MAUtil::String* token);
+
 	// PushNotificationListener methods
 
     /**
@@ -137,6 +153,12 @@ private:
 	 * Token received after registering to APNs / Google service.
 	 */
 	MAUtil::String* mToken;
+
+	/**
+	 * Android only.
+	 * Send reg ID to the server only first time the app is launched.
+	 */
+	bool mSendRegistrationNeeded;
 };
 
 #endif /* MAINSCREEN_H_ */
