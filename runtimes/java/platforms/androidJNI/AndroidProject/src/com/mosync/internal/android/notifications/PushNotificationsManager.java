@@ -71,8 +71,8 @@ public class PushNotificationsManager
 	/**
 	 * Handles an C2DM intent.
 	 * Routine: C2DM message is received.
-	 * If the application is not running the MoSync activity
-	 * is launched, and this function is called.
+	 * If the MoSync activity is started by clicking on the
+	 * notification this function is called.
 	 * @param intent
 	 * @return {@code true} If the intent was a C2DM intent and handled.
 	 */
@@ -86,12 +86,14 @@ public class PushNotificationsManager
 			return false;
 		}
 
-		// Get message from intent.
-		String pushMessage = intent.getStringExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_MESSAGE);
-
-		// Process the new incoming message and show the notification.
-		instance.messageReceived(pushMessage, true);
-
+		int notificationHandle = intent.getIntExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_NOTIFICATION_HANDLE, -1);
+		if ( -1 != notificationHandle )
+		{
+			// Post a message to MoSync queue.
+			postEventNotificationReceived(notificationHandle);
+		}
+		// Some error occurred and the notification handle that was passed
+		// was invalid.
 		return true;
 	}
 
@@ -165,17 +167,33 @@ public class PushNotificationsManager
 	}
 
 	/**
+	 * The manager is notified by a new incoming message.
+	 * This will trigger a notification immediately,
+	 * and after the MoSync activity is started the event will
+	 * be received.
+	 * @param message
+	 * @param context
+	 */
+	public static void messageReceivedWhenAppNotRunning(String message, Context context)
+	{
+		Log.e("@@MoSync","C2DM messageReceived when application is not running");
+
+		int newHandle = createNotification(context, message);
+		triggerNotification(context, newHandle);
+		// MoSyncThread will be able to queue events only after the activity is started.
+	}
+	/**
 	 * Launch local notification for a received message.
 	 * @param id The notification handle.
 	 * @return True if the local notification object exists.
 	 */
-	public Boolean triggerNotification(Context context, int id)
+	public static Boolean triggerNotification(Context context, int id)
 	{
 		PushNotificationObject notification =
 			m_NotificationTable.get(id);
 		if ( null == notification )
 			return false;
-		notification.triggerNotification(context);
+		notification.triggerNotification(context, id);
 		return true;
 	}
 
@@ -185,7 +203,7 @@ public class PushNotificationsManager
 	 * @param message The content body of the notification.
 	 * @return The new notification handle.
 	 */
-	public int createNotification(Context context, String message)
+	public static int createNotification(Context context, String message)
 	{
 		int icon = context.getResources().getIdentifier(
 				"icon",
@@ -208,7 +226,7 @@ public class PushNotificationsManager
 	 * Send the handle of the push notification.
 	 * @param index The notification handle.
 	 */
-	private void postEventNotificationReceived(int handle)
+	private static void postEventNotificationReceived(int handle)
 	{
 		int[] event = new int[2];
 		event[0] = EVENT_TYPE_PUSH_NOTIFICATION;
@@ -310,6 +328,8 @@ public class PushNotificationsManager
 	 */
 	public int getPushData(int notificationHandle, int payloadBuffer, int bufferSize)
 	{
+		Log.e("@@MoSync","maNotificationPushGetData");
+
 		PushNotificationObject notification = m_NotificationTable.get(notificationHandle);
 		if ( null == notification )
 		{
@@ -440,7 +460,7 @@ public class PushNotificationsManager
 	/**
 	 * The MoSync thread object.
 	 */
-	private MoSyncThread mMosyncThread;
+	private static MoSyncThread mMosyncThread;
 
 	/**
 	 * Hold the latest registration information.
@@ -455,7 +475,7 @@ public class PushNotificationsManager
 	/**
 	 * A table that contains a mapping between a handle and a push notification.
 	 */
-	private HandleTable<PushNotificationObject> m_NotificationTable = new HandleTable<PushNotificationObject>();
+	private static HandleTable<PushNotificationObject> m_NotificationTable = new HandleTable<PushNotificationObject>();
 
 	/**
 	 * A static reference to this object.

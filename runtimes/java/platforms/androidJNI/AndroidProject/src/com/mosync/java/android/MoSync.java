@@ -130,8 +130,9 @@ public class MoSync extends Activity
 		try {
 			// If triggered by a C2DM message, handle it here.
 			// Call this after the MoSyncThread is created.
-			if ( getIntent().getAction().equals(C2DMBaseReceiver.C2DM_INTENT) )
+			if ( getIntent().getBooleanExtra(C2DMReceiver.MOSYNC_INTENT_EXTRA_NOTIFICATION, false) )
 			{
+				Log.e("@@MoSync","MoSync activity started after a push notification was received");
 				PushNotificationsManager.handlePushNotificationIntent(getIntent());
 			}
 		}catch(Throwable t){

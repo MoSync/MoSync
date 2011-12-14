@@ -461,6 +461,8 @@ namespace Notification
         data.alertMessageSize = BUFFER_SIZE;
         data.soundFileName = sound;
         data.soundFileNameSize = BUFFER_SIZE;
+        // The default value for the type is MA_NOTIFICATION_PUSH_TYPE_ALERT
+        data.type = MA_NOTIFICATION_PUSH_TYPE_ALERT;
         int result = maNotificationPushGetData(pushNotificationHandle, &data);
         if (MA_NOTIFICATION_RES_OK != result)
         {

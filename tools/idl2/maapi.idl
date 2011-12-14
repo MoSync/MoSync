@@ -9398,9 +9398,10 @@ group NotificationAPI "Notification API" {
 			/// Specific to iOS. On Android it will be #MA_NOTIFICATION_PUSH_TYPE_ALERT.
 			int type;
 
-			/// The  buffer that will contain the message displayed in the notification alert.
+			/// The  buffer that will contain the message displayed in the notification alert,
+			/// or the notification content on Android.
 			/// This buffer will be filled only if the type is MA_NOTIFICATION_PUSH_TYPE_ALERT.
-			/// Platform: iOS only.
+			/// Platform: iOS and Android.
 			MAString alertMessage;
 
 			/// The size of the buffer that will contain the notification alert message.

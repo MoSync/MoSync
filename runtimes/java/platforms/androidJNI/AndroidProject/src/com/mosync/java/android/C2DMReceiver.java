@@ -40,6 +40,8 @@ public class C2DMReceiver extends C2DMBaseReceiver
 	 * Used at incoming push notifications.
 	 */
 	public static String MOSYNC_INTENT_EXTRA_MESSAGE = "com.mosync.java.android.IntentExtra";
+	public static String MOSYNC_INTENT_EXTRA_NOTIFICATION_HANDLE = "push.notification.handle";
+	public static String MOSYNC_INTENT_EXTRA_NOTIFICATION = "push.notification";
 
 	public C2DMReceiver()
 	{
@@ -49,6 +51,8 @@ public class C2DMReceiver extends C2DMBaseReceiver
 
 	/**
 	 * Launch the MoSync application when a push notification is received.
+	 * Save it for later use in case we need to launch MoSync activity
+	 * automatically when new push notification is received.
 	 * @param context
 	 * @param message The push message.
 	 */
@@ -83,7 +87,7 @@ public class C2DMReceiver extends C2DMBaseReceiver
 	/**
 	 * Called when a cloud message has been received.
 	 * @param context
-	 * @param intent The intent that
+	 * @param intent The intent of the activity that was launched.
 	 */
 	@Override
 	protected void onMessage(Context context, Intent intent)
@@ -118,8 +122,9 @@ public class C2DMReceiver extends C2DMBaseReceiver
 			}
 			else
 			{
-				// Otherwise, start the MoSync activity and display the notification.
-				activateMoSyncApp(context, message);
+				// Display the notification, and when the MoSync activity is started
+				// by clicking on the notification the push event is received.
+				PushNotificationsManager.messageReceivedWhenAppNotRunning(message, context);
 			}
 		}
 	}
