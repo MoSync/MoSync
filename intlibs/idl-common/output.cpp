@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <sstream>
 //#include <direct.h>
 #include <iomanip>
+#include <string.h>
 
 #include <filelist/filelist.h>
 #include <helpers/types.h>

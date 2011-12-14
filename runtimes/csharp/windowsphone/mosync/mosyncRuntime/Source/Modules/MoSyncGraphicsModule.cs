@@ -23,6 +23,13 @@ namespace MoSync
 		private System.Windows.Media.Color mCurrentWindowsColor;
 		private double mCurrentFontSize = 24;
 
+		TextBlock textBlock = new TextBlock();
+		public void SetCurrentFontSource(System.Windows.Documents.FontSource src)
+		{
+			//textBlock.FontSize = mCurrentFontSize;
+			textBlock.FontSource = src;
+		}
+
 		protected void InvalidateWriteableBitmapOnMainThread(WriteableBitmap bitmap)
 		{
 			MoSync.Util.RunActionOnMainThreadSync(() =>
@@ -130,7 +137,6 @@ namespace MoSync
 				mCurrentDrawTarget.DrawLine((int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y, (int)mCurrentColor);
 			};
 
-			TextBlock textBlock = new TextBlock();
 			textBlock.FontSize = mCurrentFontSize;
 
 			syscalls.maDrawText = delegate(int left, int top, int str)

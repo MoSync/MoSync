@@ -2528,7 +2528,7 @@ DWORD GetScreenOrientation()
 	}
 */
 
-	SYSCALL(int, maInvokeExtension(int, int, int, int)) {
+	SYSCALL(int, maExtensionFunctionInvoke(int, int, int, int)) {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
 
