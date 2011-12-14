@@ -129,7 +129,7 @@ namespace MoSync
             SystemPropertyManager.RegisterSystemPropertyProvider("mosync.device.OS",         myDelegateForDeviceInfo);
             SystemPropertyManager.RegisterSystemPropertyProvider("mosync.device.OS.version", myDelegateForDeviceInfo);
             SystemPropertyManager.RegisterSystemPropertyProvider("mosync.network.type",      myDelegateForDeviceInfo);
-            //SystemPropertyManager.RegisterSystemPropertyProvider("mosync.path.local",        myDelegateForDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.path.local",        myDelegateForDeviceInfo);
 
             ioctls.maWriteLog = delegate(int src, int size)
             {
@@ -238,7 +238,8 @@ namespace MoSync
             // absolute path to the local folder - called only by trusted applications
             if (key.Equals("mosync.path.local"))
             {
-                return Environment.CurrentDirectory.ToString();
+                //return Directory.GetCurrentDirectory();
+                return "not allowed";
             }
 
             // in case of no information return empty

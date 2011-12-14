@@ -263,13 +263,13 @@ namespace MoSync
         {
             IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication();
 
-            MoSync.SystemPropertyManager.RegisterSystemPropertyProvider("mosync.path.local",
-                delegate(String key)
-                {
-                    // The isolated storage becomes the "root"
-                    return "/";
-                }
-            );
+//            MoSync.SystemPropertyManager.RegisterSystemPropertyProvider("mosync.path.local",
+//                delegate(String key)
+//                {
+//                    // The isolated storage becomes the "root"
+//                    return "/";
+//                }
+//            );
 
             ioctls.maFileOpen = delegate(int _path, int _mode)
             {
