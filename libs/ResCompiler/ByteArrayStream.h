@@ -46,8 +46,12 @@ namespace ResourceCompiler
 
 	private:
 		byte*	buffer;
+
+		//buffer size
 		int		size;
-		int		pos; //pointer position in buffer
+
+		//pointer position in buffer
+		int		pos;
 	};
 }
 
