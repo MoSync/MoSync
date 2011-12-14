@@ -76,6 +76,24 @@ namespace MoSync
                             uri = new Uri(value, UriKind.Relative);
                         }
                         mWebBrowser.Navigate(uri);
+
+						/*
+						String initialScript =
+						"window.onerror = function(e)\n" +
+						"{\n" +
+						"window.external.Notify(\"Error:\" + JSON.stringify(e));\n" +
+						"};\n" +
+						"if(typeof window.console == \"undefined\")\n" +
+						"{\n" +
+						"window.console = {\n" +
+						"log:function(str) {\n" +
+						"window.external.Notify(\"Info:\" + str);\n" +
+						"}\n" +
+						"};\n" +
+						"}\n";
+
+						mWebBrowser.InvokeScript("execScript", new string[] { initialScript });
+						*/
                     }
                 }
                 get
@@ -169,7 +187,7 @@ namespace MoSync
                     delegate(object from, NotifyEventArgs args)
                     {
                         String str = args.Value;
-                        MoSync.Util.Log(str);
+                        MoSync.Util.Log(str + "\n");
 
                         int hookType = 0;
 

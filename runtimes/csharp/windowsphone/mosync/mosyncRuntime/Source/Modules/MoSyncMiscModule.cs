@@ -1,11 +1,9 @@
 using System;
 using System.IO;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Phone.Info;
 using System.Windows;
 using System.Collections.Generic;
-
+using System.Net.NetworkInformation;
 
 namespace MoSync
 {
@@ -33,6 +31,8 @@ namespace MoSync
 
     public class MiscModule : ISyscallModule, IIoctlModule
     {
+		private Microsoft.Devices.VibrateController mVibrateController = null;
+
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
             // maybe use some pretty reflection mechanism to find all syscall implementations here..
@@ -97,6 +97,21 @@ namespace MoSync
                 return -1;
             };
 
+			syscalls.maVibrate = delegate(int _ms)
+			{
+				if (mVibrateController == null)
+					mVibrateController = Microsoft.Devices.VibrateController.Default;
+
+				if (_ms < 0)
+					return _ms;
+				else if (_ms == 0)
+					mVibrateController.Stop();
+				else
+					mVibrateController.Start(TimeSpan.FromMilliseconds(_ms));
+
+				return 0;
+			};
+
             syscalls.maLoadProgram = delegate(int _data, int _reload)
             {
 #if REBUILD
@@ -116,10 +131,17 @@ namespace MoSync
             SystemPropertyManager.mSystemPropertyProviders.Clear();
 
             /**
-             * Regitser system properties
+             * Register system properties
              */
-            SystemPropertyManager.SystemPropertyProvider myDelegateForIMEI = new SystemPropertyManager.SystemPropertyProvider(getIMEI);
-            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.imei", myDelegateForIMEI);
+            SystemPropertyManager.SystemPropertyProvider myDelegateForDeviceInfo = new SystemPropertyManager.SystemPropertyProvider(getDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.imei",              myDelegateForDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.imsi",              myDelegateForDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.device",            myDelegateForDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.device.name",       myDelegateForDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.device.UUID",       myDelegateForDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.device.OS",         myDelegateForDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.device.OS.version", myDelegateForDeviceInfo);
+            SystemPropertyManager.RegisterSystemPropertyProvider("mosync.network.type",      myDelegateForDeviceInfo);
 
             ioctls.maWriteLog = delegate(int src, int size)
             {
@@ -141,13 +163,74 @@ namespace MoSync
             };
         }
 
+
         /**
-         * Retrieves the value of MoSync System Property mosync.imei if available
+         * Retrieves the values of MoSync System Properties
          */
-        private static String getIMEI(String key)
+        public static string getDeviceInfo(string key)
         {
-            byte[] byteData = (byte[])(DeviceExtendedProperties.GetValue("DeviceUniqueId"));
-            return System.Convert.ToBase64String(byteData);
+            if (key.Equals("mosync.imei"))
+            {
+                return "mosync.imei";
+            }
+
+            if (key.Equals("mosync.imsi"))
+            {
+                return "mosync.imsi";
+            }
+
+            if (key.Equals("mosync.iso-639-1"))
+            {
+                return "mosync.iso-639-1";
+            }
+
+            if (key.Equals("mosync.iso-639-2"))
+            {
+                return "mosync.iso-639-2";
+            }
+
+            if (key.Equals("mosync.device"))
+            {
+                string device = DeviceStatus.DeviceManufacturer + ";" +
+                                DeviceStatus.DeviceFirmwareVersion;
+                                // + model name
+                return device;
+            }
+
+            if (key.Equals("mosync.device.name"))
+            {
+                return DeviceStatus.DeviceName;
+            }
+
+            //Note: to get a result requires ID_CAP_IDENTITY_DEVICE
+            // to be added to the capabilities of the WMAppManifest
+            // this will then warn users in marketplace
+            if (key.Equals("mosync.device.UUID"))
+            {
+                byte[] result = null;
+                object uniqueId;
+                if (DeviceExtendedProperties.TryGetValue("DeviceUniqueId", out uniqueId))
+                    result = (byte[])uniqueId;
+
+                return BitConverter.ToString(result);
+            }
+
+            if (key.Equals("mosync.device.OS"))
+            {
+                return Environment.OSVersion.ToString();
+            }
+
+            if (key.Equals("mosync.device.OS.version"))
+            {
+                return Environment.OSVersion.Version.ToString();
+            }
+
+            if (key.Equals("mosync.network.type"))
+            {
+                return Microsoft.Phone.Net.NetworkInformation.NetworkInterface.NetworkInterfaceType.ToString();
+            }
+
+            return string.Empty;
         }
 
     } // end class MiscModule

@@ -117,15 +117,16 @@ namespace MoSync
             }
         }
 
+		// make these thread safe.
         public static void Log(String text)
         {
-            Console.Write(text);
-            InitLogging();
-            WriteTextToFile(text, "log.txt");
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                DebugWrite(text);
-            }
+			Console.Write(text);
+			InitLogging();
+			WriteTextToFile(text, "log.txt");
+			if (System.Diagnostics.Debugger.IsAttached)
+			{
+				DebugWrite(text);
+			}
         }
 
         public static void Log(Exception e)
@@ -159,15 +160,16 @@ namespace MoSync
             }
         }
 
+		// make these thread safe.
         public static void Log(byte[] bytes)
         {
-            InitLogging();
-            WriteBytesToFile(bytes, "log.txt");
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                String text = System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
-                DebugWrite(text);
-            }
+			InitLogging();
+			WriteBytesToFile(bytes, "log.txt");
+			if (System.Diagnostics.Debugger.IsAttached)
+			{
+				String text = System.Text.Encoding.UTF8.GetString(bytes, 0, bytes.Length);
+				DebugWrite(text);
+			}
         }
 
         public class ExitException : Exception
@@ -243,26 +245,32 @@ namespace MoSync
 
         public static void WriteTextToFile(string message, string file, FileMode fileMode = FileMode.Append)
         {
-            using (IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
-            using (StreamWriter streamWriter = new StreamWriter(new IsolatedStorageFileStream(file, fileMode, isolatedStorage)))
-            {
-                if (message != null)
-                    streamWriter.Write(message);
-                //streamWriter.WriteLine(message);
+			lock (typeof(MoSync.Util))
+			{
+				using (IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
+				using (StreamWriter streamWriter = new StreamWriter(new IsolatedStorageFileStream(file, fileMode, isolatedStorage)))
+				{
+					if (message != null)
+						streamWriter.Write(message);
+					//streamWriter.WriteLine(message);
 
-                streamWriter.Close();
-            }
+					streamWriter.Close();
+				}
+			}
         }
 
         public static void WriteBytesToFile(byte[] bytes, string file, FileMode fileMode = FileMode.Append)
         {
-            using (IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
-            using (BinaryWriter binaryWriter = new BinaryWriter(new IsolatedStorageFileStream(file, fileMode, isolatedStorage)))
-            {
-                if (bytes != null)
-                    binaryWriter.Write(bytes);
-                binaryWriter.Close();
-            }
+			lock (typeof(MoSync.Util))
+			{
+				using (IsolatedStorageFile isolatedStorage = IsolatedStorageFile.GetUserStoreForApplication())
+				using (BinaryWriter binaryWriter = new BinaryWriter(new IsolatedStorageFileStream(file, fileMode, isolatedStorage)))
+				{
+					if (bytes != null)
+						binaryWriter.Write(bytes);
+					binaryWriter.Close();
+				}
+			}
         }
 
         public static void convertStringToColor(string value, out System.Windows.Media.SolidColorBrush brush)
