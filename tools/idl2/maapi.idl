@@ -9688,32 +9688,32 @@ group CaptureAPI "Capture API" {
 			/**
 			* @brief Indicates that the call to maCaptureSetProperty or maCaptureGetProperty received
 			* an invalid property name.
-			* Platform: iOS.
+			* Platform: iOS and Android.
 			*/
 			INVALID_PROPERTY = -3;
 
 			/**
 			* @brief Indicates that the call to maCaptureSetProperty or maCaptureGetProperty received
 			* an invalid property value.
-			* Platform: iOS.
+			* Platform: iOS and Android.
 			*/
 			INVALID_PROPERTY_VALUE = -4;
 
 			/**
 			* @brief Indicates that the call to maCaptureGetProperty needs a larger buffer.
-			* Platform: iOS.
+			* Platform: iOS and Android.
 			*/
 			INVALID_STRING_BUFFER_SIZE = -5;
 
 			/**
 			* @brief Indicates that the call to maCaptureAction received an invalid action type.
-			* Platform: iOS.
+			* Platform: iOS and Android.
 			*/
 			INVALID_ACTION = -6;
 
 			/**
 			* @brief Indicates that the call to maCaptureDestroyData received an invalid handle.
-			* Platform: iOS.
+			* Platform: iOS and Android.
 			*/
 			INVALID_HANDLE = -7;
 
@@ -9899,7 +9899,7 @@ group CaptureAPI "Capture API" {
 			/// Stops the recording.
 			/// Platform: Android and iOS.
 			STOP_RECORDING = 1;
-			/// Starts the picker with picture mode and  stores the picture in a dataObject.
+			/// Starts the picker with picture mode and  stores the picture in a data object.
 			/// Platform: Android and iOS.
 			TAKE_PICTURE = 2;
 		}
@@ -9917,7 +9917,7 @@ group CaptureAPI "Capture API" {
 			/// Platform: Android and iOS.
 			CANCEL = 2;
 		}
-	} // end of Capture Action
+	} // end of Capture Event type
 
 	group CaptureFlashMode "Capture flash mode" {
 		constset int MA_CAPTURE_FLASH_ {
@@ -9932,7 +9932,7 @@ group CaptureAPI "Capture API" {
 			/// Platform: iOS.
 			OFF = 2;
 		}
-	} // end of Capture Action
+	} // end of Capture flash mode
 
 	group CaptureFunctions "Capture Functions" {
 		/**
@@ -9942,11 +9942,11 @@ group CaptureAPI "Capture API" {
 		* \param value The value that will be assigned to the property.
 		*
 		* \returns One of the next constants:
-		*  - MA_CAPTURE_RES_OK if no error occurred.
-		*  - MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
-		*  - MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+		*  - #MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
 		*/
-		int maCaptureSetProperty(in MAString property,in MAString value);
+		int maCaptureSetProperty(in MAString property, in MAString value);
 
 		/**
 		* \brief Retrieves the properties from the Native Image Picker.
@@ -9957,9 +9957,9 @@ group CaptureAPI "Capture API" {
 		* \param bufSize Size of the buffer.
 		*
 		* \returns One of the next constants:
-		* - MA_CAPTURE_RES_OK if no error occurred.
-		* - MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
-		* - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+		* - #MA_CAPTURE_RES_OK if no error occurred.
+		* - #MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+		* - #MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
 		*/
 		int maCaptureGetProperty(in MAString property, out MAString value range("bufSize"), in int bufSize);
 
@@ -9968,11 +9968,11 @@ group CaptureAPI "Capture API" {
 		* \param action One of the \link #MA_CAPTURE_ACTION_ MA_CAPTURE_ACTION \endlink constants.
 		*
 		* \returns One of the next constants:
-		*  - MA_CAPTURE_RES_OK if no error occurred.
-		*  - MA_CAPTURE_RES_INVALID_ACTION if the given action is invalid.
-		*  - MA_CAPTURE_RES_CAMERA_NOT_AVAILABLE if camera is not available at the moment.
-		*  - MA_CAPTURE_RES_VIDEO_NOT_SUPPORTED if video recording is not supported.
-		*  - MA_CAPTURE_RES_PICTURE_NOT_SUPPORTED if camera picture mode is not supported.
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_ACTION if the given action is invalid.
+		*  - #MA_CAPTURE_RES_CAMERA_NOT_AVAILABLE if camera is not available at the moment.
+		*  - #MA_CAPTURE_RES_VIDEO_NOT_SUPPORTED if video recording is not supported.
+		*  - #MA_CAPTURE_RES_PICTURE_NOT_SUPPORTED if camera picture mode is not supported.
 		*/
 		int maCaptureAction(in int action);
 
@@ -9983,15 +9983,15 @@ group CaptureAPI "Capture API" {
 		* \param fullPathBufSize The size of the fullPath buffer.
 		*
 		* \returns One of the next constants:
-		*  - MA_CAPTURE_RES_OK if no error occurred.
-		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
-		*  - MA_CAPTURE_RES_FILE_INVALID_NAME if the fullPath param is invalid.
-		*  - MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - #MA_CAPTURE_RES_FILE_INVALID_NAME if the fullPath param is invalid.
+		*  - #MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
 		*/
-		int maCaptureWriteImage(in MAHandle handle,in MAString fullPath,in int fullPathBufSize);
+		int maCaptureWriteImage(in MAHandle handle, in MAString fullPath, in int fullPathBufSize);
 
 		/**
-		* Get full path to a recorded video.
+		* \brief Get full path to a recorded video.
 		* \param handle Handle to a video data object.
 		* \param buffer Will contain the full path to the video file.
 		* \param bufferSize Maximum size of the buffer.
@@ -10008,8 +10008,8 @@ group CaptureAPI "Capture API" {
 		* \param handle Handle to a image/video data object.
 		*
 		* \returns One of the next constants:
-		*  - MA_CAPTURE_RES_OK if no error occurred.
-		*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+		*  - #MA_CAPTURE_RES_OK if no error occurred.
+		*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
 		*/
 		int maCaptureDestroyData(in MAHandle handle);
 	}//End of Capture Functions

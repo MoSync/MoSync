@@ -26,7 +26,6 @@ import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_SCREEN_STATE
 import static com.mosync.internal.generated.MAAPI_consts.IOCTL_UNAVAILABLE;
 import static com.mosync.internal.generated.MAAPI_consts.MAS_CREATE_IF_NECESSARY;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NFC_NOT_AVAILABLE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_UNSUPPORTED;
 import static com.mosync.internal.generated.MAAPI_consts.NOTIFICATION_TYPE_APPLICATION_LAUNCHER;
 import static com.mosync.internal.generated.MAAPI_consts.RES_BAD_INPUT;
 import static com.mosync.internal.generated.MAAPI_consts.RES_OK;
@@ -164,6 +163,7 @@ public class MoSyncThread extends Thread
 	MoSyncNFC mMoSyncNFC;
 	MoSyncAds mMoSyncAds;
 	MoSyncNotifications mMoSyncNotifications;
+	MoSyncCapture mMoSyncCapture;
 	MoSyncDB mMoSyncDB;
 
 	static final String PROGRAM_FILE = "program.mp3";
@@ -382,7 +382,11 @@ public class MoSyncThread extends Thread
 		}
 
 		mMoSyncAds = new MoSyncAds(this);
+
 		mMoSyncNotifications = new MoSyncNotifications(this);
+
+		mMoSyncCapture = new MoSyncCapture(this);
+
 		mMoSyncDB = new MoSyncDB();
 
 		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -3199,6 +3203,94 @@ public class MoSyncThread extends Thread
 	int maNotificationPushSetDisplayFlag(int flag)
 	{
 		return mMoSyncNotifications.maNotificationPushSetDisplayFlag(flag);
+	}
+
+	/**
+	 * Sets the properties to the Native Image Picker.
+	 * @param property property A string representing which property to set.
+	 * One of the #MA_CAPTURE_ MA_CAPTURE constants.
+	 * @param value The value that will be assigned to the property.
+	 * @return One of the next constants:
+	 *  - #MA_CAPTURE_RES_OK if no error occurred.
+	 *  - #MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+	 *  - #MA_CAPTURE_RES_INVALID_PROPERTY_VALUE if the property value is not valid.
+	 */
+	int maCaptureSetProperty(String property, String value)
+	{
+		return mMoSyncCapture.maCaptureSetProperty(property, value);
+	}
+
+	/**
+	 * Retrieves the properties from the Native Image Picker.
+	 * @param property A string representing which property to get.
+	 * @param value A buffer that will hold the value of the property, represented as a string.
+	 * @valueSize the value buffer size.
+	 * @return One of the next constants:
+	 * - #MA_CAPTURE_RES_OK if no error occurred.
+	 * - #MA_CAPTURE_RES_INVALID_PROPERTY if the property name is not valid.
+	 * - #MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+	 */
+	int maCaptureGetProperty(String property, int valueBuffer, int valueSize)
+	{
+		return mMoSyncCapture.maCaptureGetProperty(property, valueBuffer, valueSize);
+	}
+
+	/**
+	* Perform an action on the image picker.
+	* @param action One of the #MA_CAPTURE_ACTION_ MA_CAPTURE_ACTION constants.
+	* @return One of the next constants:
+	*  - #MA_CAPTURE_RES_OK if no error occurred.
+	*  - #MA_CAPTURE_RES_INVALID_ACTION if the given action is invalid.
+	*  - #MA_CAPTURE_RES_CAMERA_NOT_AVAILABLE if camera is not available at the moment.
+	*  - #MA_CAPTURE_RES_VIDEO_NOT_SUPPORTED if video recording is not supported.
+	*  - #MA_CAPTURE_RES_PICTURE_NOT_SUPPORTED if camera picture mode is not supported.
+	*/
+	int maCaptureAction(int action)
+	{
+		return mMoSyncCapture.maCaptureAction(action);
+	}
+
+	/**
+	* Save a image data object to a file.
+	* @param handle Handle to a image data object.
+	* @param fullPath A buffer containing the a full path where the file will be created.
+	* @param fullPathBufSize The size of the fullPath buffer.
+	* @return One of the next constants:
+	*  - #MA_CAPTURE_RES_OK if no error occurred.
+	*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+	*  - #MA_CAPTURE_RES_FILE_INVALID_NAME if the fullPath param is invalid.
+	*  - #MA_CAPTURE_RES_FILE_ALREADY_EXISTS if the file already exists.
+	*/
+	int maCaptureWriteImage(int handle, int fullPathBuffer, int fullPathBufSize)
+	{
+		return mMoSyncCapture.maCaptureWriteImage(handle, fullPathBuffer, fullPathBufSize);
+	}
+
+	/**
+	* Get full path to a recorded video.
+	* @param handle Handle to a video data object.
+	* @param buffer Will contain the full path to the video file.
+	* @param bufferSize Maximum size of the buffer.
+	* @return One of the next constants:
+	*  - MA_CAPTURE_RES_OK if no error occurred.
+	*  - MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+	*  - MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE if the buffer size was to small.
+	*/
+	int maCaptureGetVideoPath(int handle, int buffer, int bufferSize)
+	{
+		return mMoSyncCapture.maCaptureGetVideoPath(handle, buffer, bufferSize);
+	}
+
+	/**
+	* Destroys a image/video data object.
+	* @param handle Handle to a image/video data object.
+	* @return One of the next constants:
+	*  - #MA_CAPTURE_RES_OK if no error occurred.
+	*  - #MA_CAPTURE_RES_INVALID_HANDLE if the given handle was invalid.
+	*/
+	int maCaptureDestroyData(int handle)
+	{
+		return mMoSyncCapture.maCaptureDestroyData(handle);
 	}
 
 	/**

@@ -55,8 +55,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 
-import com.google.android.c2dm.C2DMBaseReceiver;
 import com.mosync.internal.android.Mediator;
+import com.mosync.internal.android.MoSyncCapture;
 import com.mosync.internal.android.MoSyncMultiTouchHandler;
 import com.mosync.internal.android.MoSyncSingleTouchHandler;
 import com.mosync.internal.android.MoSyncThread;
@@ -299,7 +299,8 @@ public class MoSync extends Activity
 
 	/**
 	 * This method is called when we get a result from a sub-activity.
-	 * Specifically, it is used to get the result of a Bluetooth enable dialog.
+	 * Specifically, it is used to get the result of a Bluetooth enable dialog,
+	 * or to get the results for capture API.
 	 */
 	@Override
 	protected void onActivityResult(
@@ -312,6 +313,41 @@ public class MoSync extends Activity
 		{
 			Mediator.getInstance().postBluetoothDialogClosedMessage();
 		}
+		else if ( requestCode == MoSyncCapture.CAPTURE_MODE_RECORD_VIDEO_REQUEST )
+		{
+			MoSyncCapture.handleVideo(data);
+		}
+		else if ( requestCode == MoSyncCapture.CAPTURE_MODE_STOP_RECORDING_REQUEST )
+		{
+			MoSyncCapture.handleStopRecording(data);
+		}
+		else if ( requestCode == MoSyncCapture.CAPTURE_MODE_TAKE_PICTURE_REQUEST )
+		{
+			// A picture was taken.
+			MoSyncCapture.handlePicture(data);
+		}
+		else if ( requestCode == RESULT_CANCELED ) //RESULT_OK
+		{
+			// Send MoSync event: the capture was canceled by the user.
+			MoSyncCapture.handleCaptureCanceled();
+		}
+	}
+
+	@Override
+	protected void onSaveInstanceState( Bundle outState )
+	{
+		Log.e("@@MoSync", "onSaveInstanceState");
+	    outState.putBoolean( MoSyncCapture.PHOTO_TAKEN, MoSyncCapture.mPhotoTaken );
+	}
+
+	@Override
+	protected void onRestoreInstanceState( Bundle savedInstanceState)
+	{
+	    Log.i( "@@MoSync", "onRestoreInstanceState");
+//	    if( savedInstanceState.getBoolean( MoSyncCapture.PHOTO_TAKEN ) )
+//	    {
+//	    	MoSyncCapture.handlePicture(data)();
+//	    }
 	}
 
 	/**

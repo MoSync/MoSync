@@ -371,6 +371,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 	{
 		event.pushNotificationHandle = intArray[1];
 	}
+	else if (event.type == EVENT_TYPE_CAPTURE)
+	{
+		event.captureData.type = intArray[1];
+		event.captureData.handle = intArray[2];
+	}
 	else if (event.type == EVENT_TYPE_WIDGET)
 	{
 		/*

@@ -2600,7 +2600,14 @@ return 0; \
 				c,
 				_valueBufferSize * sizeof(char));
 
-			return _maAdsBannerGetProperty((int)gCore->mem_ds, _ad, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+			return _maAdsBannerGetProperty(
+				(int)gCore->mem_ds,
+				_ad,
+				_property,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
 		}
 
 		// ********** Notifications API **********
@@ -2634,7 +2641,14 @@ return 0; \
 				c,
 				_valueBufferSize * sizeof(char));
 
-			return _maNotificationLocalGetProperty((int)gCore->mem_ds, _notification, _property, _valueBuffer, _valueBufferSize, mJNIEnv, mJThis);
+			return _maNotificationLocalGetProperty(
+				(int)gCore->mem_ds,
+				_notification,
+				_property,
+				_valueBuffer,
+				_valueBufferSize,
+				mJNIEnv,
+				mJThis);
 		}
 
 		case maIOCtl_maNotificationLocalSchedule:
@@ -2708,6 +2722,57 @@ return 0; \
 
 		case maIOCtl_maNotificationPushSetDisplayFlag:
 			return _maNotificationPushSetDisplayFlag(a, mJNIEnv, mJThis);
+
+		// ********** Capture API **********
+
+		case maIOCtl_maCaptureSetProperty:
+		{
+			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
+			const char *_value = SYSCALL_THIS->GetValidatedStr(b);
+			return _maCaptureSetProperty(
+					_property,
+					_value,
+					mJNIEnv,
+					mJThis);
+		}
+
+		case maIOCtl_maCaptureGetProperty:
+		{
+			const char *_property = SYSCALL_THIS->GetValidatedStr(a);
+			return _maCaptureGetProperty(
+				(int)gCore->mem_ds,
+				_property,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+		}
+
+		case maIOCtl_maCaptureAction:
+			return _maCaptureAction(a, mJNIEnv, mJThis);
+
+		case maIOCtl_maCaptureWriteImage:
+			return _maCaptureWriteImage(
+				(int)gCore->mem_ds,
+				a,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCaptureGetVideoPath:
+			return _maCaptureGetVideoPath(
+				(int)gCore->mem_ds,
+				a,
+				b,
+				c,
+				mJNIEnv,
+				mJThis);
+
+		case maIOCtl_maCaptureDestroyData:
+			return _maCaptureDestroyData(a, mJNIEnv, mJThis);
+
+		// ********** Panics **********
 
 		case maIOCtl_maSyscallPanicsEnable:
 			SYSLOG("maIOCtl_maSyscallPanicsEnable");

@@ -17,7 +17,6 @@ MA 02110-1301, USA.
 
 package com.mosync.internal.android.notifications;
 
-import android.os.Build;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -35,7 +34,6 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_ALR
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_STRING_BUFFER_SIZE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_HANDLE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_REGISTRATION_NOT_CALLED;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_UNSUPPORTED;
 import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_REGISTRATION_IN_PROGRESS;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PUSH_NOTIFICATION;
 import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PUSH_NOTIFICATION_UNREGISTRATION;
