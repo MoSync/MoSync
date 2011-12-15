@@ -12,7 +12,7 @@ namespace MoSync
         public void Init(Ioctls ioctls, Core core, Runtime runtime)
         {
             mNativeUI = new NativeUI.NativeUIWindowsPhone();
-            mWidgets.Add(null); // why?
+            //mWidgets.Add(null); // why?
 
             ioctls.maWidgetCreate = delegate(int _widgetType)
             {
@@ -23,7 +23,7 @@ namespace MoSync
 
                 widget.SetRuntime(runtime);
 
-                for (int i = 1; i < mWidgets.Count; i++)
+                for (int i = 0; i < mWidgets.Count; i++)
                 {
                     if (mWidgets[i] == null)
                     {

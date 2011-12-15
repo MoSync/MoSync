@@ -81,10 +81,6 @@ static const char* sUsage =
 " MOSYNCDIR                    Path to the MoSync installation directory.\n"
 ;
 
-static bool streq(const char* a, const char* b) {
-	return strcmp(a, b) == 0;
-}
-
 static void setString(int& i, int argc, const char** argv, const char*& dst) {
 	i++;
 	if(i == argc) {
@@ -153,6 +149,14 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.iOSXcodeTarget);
 		} else if(streq(argv[i], "--ios-project-only")) { // iOS specific
 			s.iOSgenerateOnly = true;
+		} else if(streq(argv[i], "--wp-config")) { // Windows Phone specific
+			setString(i, argc, argv, s.WPconfig);
+		} else if(streq(argv[i], "--wp-target")) { // Windows Phone specific
+			setString(i, argc, argv, s.WPtarget);
+		} else if(streq(argv[i], "--wp-project-only")) { // Windows Phone specific
+			s.WPgenerateOnly = true;
+		} else if(streq(argv[i], "--cs-output")) {
+			setString(i, argc, argv, s.csOutputDir);
 		} else if(streq(argv[i], "--cpp-output")) {
 			setString(i, argc, argv, s.cppOutputDir);
 		} else if(streq(argv[i], "--android-package")) {
@@ -275,6 +279,12 @@ void testCppOutputDir(const SETTINGS& s) {
 	}
 }
 
+void testCsOutputDir(const SETTINGS& s) {
+	if(!s.csOutputDir) {
+		printf("Must specify Csharp output directory!\n");
+		exit(1);
+	}
+}
 void testAndroidPackage(const SETTINGS& s) {
 	if (!s.androidPackage) {
 		printf("Must specify Android package!\n");

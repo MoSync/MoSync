@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using System.Globalization;
 
-
 namespace MoSync
 {
     public class SystemPropertyManager
@@ -33,6 +32,8 @@ namespace MoSync
 
     public class MiscModule : ISyscallModule, IIoctlModule
     {
+		private Microsoft.Devices.VibrateController mVibrateController = null;
+
         public void Init(Syscalls syscalls, Core core, Runtime runtime)
         {
             // maybe use some pretty reflection mechanism to find all syscall implementations here..
@@ -96,6 +97,21 @@ namespace MoSync
                 // not implemented, but I don't wanna throw exceptions.
                 return -1;
             };
+
+			syscalls.maVibrate = delegate(int _ms)
+			{
+				if (mVibrateController == null)
+					mVibrateController = Microsoft.Devices.VibrateController.Default;
+
+				if (_ms < 0)
+					return _ms;
+				else if (_ms == 0)
+					mVibrateController.Stop();
+				else
+					mVibrateController.Start(TimeSpan.FromMilliseconds(_ms));
+
+				return 0;
+			};
 
             syscalls.maLoadProgram = delegate(int _data, int _reload)
             {

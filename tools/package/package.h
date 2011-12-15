@@ -24,6 +24,7 @@ struct SETTINGS {
 	const char* resource;
 	const char* icon;
 	const char* cppOutputDir;
+	const char* csOutputDir;
 	const char* model;
 	const char* dst;
 	const char* name;
@@ -47,6 +48,11 @@ struct SETTINGS {
 	const char* iOSSdk;
 	const char* iOSXcodeTarget;
 	bool iOSgenerateOnly;
+
+	// Windows Phone specific settings
+	const char* WPconfig;
+	const char* WPtarget;
+	bool WPgenerateOnly;
 
 	// Android specific settings
     const char* androidPackage;
@@ -77,6 +83,7 @@ void testS60v2Uid(const SETTINGS&);
 void testIOSCert(const SETTINGS&);
 void testIOSSdk(const SETTINGS&);
 void testCppOutputDir(const SETTINGS&);
+void testCsOutputDir(const SETTINGS&);
 
 void testIOSCert(const SETTINGS&);
 void testIOSSdk(const SETTINGS&);

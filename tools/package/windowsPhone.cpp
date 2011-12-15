@@ -26,8 +26,8 @@
 #include "helpers/mkdir.h"
 #include "filelist/copyFiles.h"
 
-#if defined (__MACH__) || defined(__APPLE__)
-#define PLATFORM_OSX
+#if defined (WIN32) || defined(_WIN32)
+#define PLATFORM_WIN32
 #endif
 
 using namespace std;
@@ -38,19 +38,11 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	testVendor(s);
 	testVersion(s);
 	//testIOSCert(s);
-	//testCppOutputDir(s);
 
 	std::ostringstream generateCmd;
 	std::ostringstream buildCmd;
 
 	printf("Building: %s\n", s.model);
-
-#if 0
-	// super hack
-	bool rebuild = false;
-	if(std::string(s.model).find("WindowsPhoneRebuilt") != string::npos)
-		rebuild = true;
-#endif
 
 	string dst = s.dst;
 	string templateLocation = string(ri.path) + "/template";
@@ -67,14 +59,28 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	_mkdir(csprojOutput.c_str());
 	copyFilesRecursively(templateLocation.c_str(), csprojOutput.c_str());
-	generateCmd << getBinary("winphone-builder") << " -output-type interpreted -input-file " << file(templateFileLocation) <<
+
+	std::string outputType = "interpreted";
+	if(streq(s.WPconfig, "rebuild_debug") || streq(s.WPconfig, "rebuild_release"))
+		outputType = "rebuilt";
+
+
+	generateCmd << getBinary("winphone-builder") <<
+		" -output-type " << outputType <<
+		" -input-file " << file(templateFileLocation) <<
 		" -output-file " << file(csprojOutputFile);
 
 	sh(generateCmd.str().c_str(), s.silent);
 
 	// Copy program files to xcode template
-	//copyFile((xcodeprojOutput + "/Classes/rebuild.build.cpp").c_str(), (src + "/rebuild.build.cpp").c_str());
-	copyFile((csprojOutput + "/program").c_str(), s.program);
+	if(outputType == "rebuilt")
+	{
+		testCsOutputDir(s);
+		copyFile((csprojOutput + "/RebuildData/data_section.bin").c_str(), (s.csOutputDir + string("/data_section.bin")).c_str());
+		copyFile((csprojOutput + "/RebuildData/rebuild.build.cs").c_str(), (s.csOutputDir + string("/rebuild.build.cs")).c_str());
+	} else {
+		copyFile((csprojOutput + "/program").c_str(), s.program);
+	}
 
 	string resourceFileCopy = csprojOutput + "/resources";
 	if(s.resource) {
@@ -99,24 +105,39 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	}
 	*/
 
-	/*
-	if (!s.iOSgenerateOnly) {
-#ifdef PLATFORM_OSX
-		testIOSSdk(s);
-		chdir(xcodeprojOutput.c_str());
-		buildCmd << "xcodebuild -project " << arg(string(s.name) + ".xcodeproj");
-		if (s.iOSSdk) {
-			buildCmd << " -sdk " << arg(s.iOSSdk);
-		}
-		if (s.iOSXcodeTarget) {
-			buildCmd << " -configuration " << arg(s.iOSXcodeTarget);
-		}
+	if (!s.WPgenerateOnly) {
+#ifdef PLATFORM_WIN32
+		//testIOSSdk(s);
+
+		// todo: find this programatically...
+		std::string msBuildPath =
+			"/Windows/Microsoft.NET/Framework/v4.0.30319/MSBuild.exe";
+
+		_chdir(csprojOutput.c_str());
+
+		buildCmd << msBuildPath << " mosync.csproj";
+
+		// Set our configuration.
+		buildCmd << " /p:Configuration=" << s.WPconfig;
+
+		// Target rebuild. Means always rebuild.
+		buildCmd << " /t:Rebuild";
+
+		// We compile for any cpu.
+		buildCmd << " /p:Platform=\"Any CPU\"";
+
+		// Doesn't seem to get the DefineConstants from the configurations??
+		if(outputType == "rebuilt")
+			buildCmd << " /p:DefineConstants=\"REBUILD\"";
+
+		// Output path will be defined by the config name.
+		buildCmd << " /p:OutputPath=\"Bin\\" << s.WPconfig << "\"";
+
 		sh(buildCmd.str().c_str(), s.silent);
+
 #else
-		printf("Building Xcode projects is only supported on Mac OS X");
+		printf("Building Visual Studio projects is only supported on Windows");
 		exit(1);
 #endif
 	}
-	*/
-
 }

@@ -50,6 +50,7 @@ namespace MoSync
 					{
 						int count = 0;
 						System.Collections.Generic.IEnumerator<Typeface> en = System.Windows.Media.Fonts.SystemTypefaces.GetEnumerator();
+						en.MoveNext();
 						while (count < _index)
 						{
 							en.MoveNext();
@@ -78,6 +79,7 @@ namespace MoSync
 				{
 					int count = Fonts.SystemTypefaces.Count;
 					System.Collections.Generic.IEnumerator<Typeface> en = Fonts.SystemTypefaces.GetEnumerator();
+					en.MoveNext();
 					while (count != 0)
 					{
 						typeface = en.Current;
@@ -87,6 +89,7 @@ namespace MoSync
 							{
 								break;
 							}
+							glyphTypeface = null;
 						}
 						en.MoveNext();
 						count--;
@@ -122,8 +125,12 @@ namespace MoSync
 
 			ioctls.maFontSetCurrent = delegate(int _font)
 			{
-				mCurrentFont = mFonts[_font];
-				mCurrentFontSource = new System.Windows.Documents.FontSource(mCurrentFont);
+				MoSync.Util.RunActionOnMainThreadSync(() =>
+				{
+					mCurrentFont = mFonts[_font];
+					mCurrentFontSource = new System.Windows.Documents.FontSource(mCurrentFont);
+					runtime.GetModule<GraphicsModule>().SetCurrentFontSource(mCurrentFontSource);
+				});
 				return 0;
 			};
 		}
