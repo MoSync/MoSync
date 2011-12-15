@@ -127,7 +127,12 @@ void FileResourceDirective::writeDirectives(ostringstream& output, bool asVarian
 	}
 	ResourceDirective::writeDirectives(output, asVariant);
 	string resourceStr = string("\"") + fResource + string("\"");
-	output << '.' << fResType << " " << resourceStr << "\n";
+	if (fUseIncludeDirective) {
+		output << '.' << fResType << "\n";
+		output << ".include " << resourceStr << "\n";
+	} else {
+		output << '.' << fResType << " " << resourceStr << "\n";
+	}
 }
 
 void FileResourceDirective::initDirectiveFromAttributes(const char** attributes) {

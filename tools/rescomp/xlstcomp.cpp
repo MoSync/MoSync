@@ -240,6 +240,10 @@ static void xlstStart(void *data, const char *tagName, const char **attributes) 
 			const char* value = attributes[i + 1];
 			condition.setCondition(name, value);
 		}
+		string errormsg = condition.validate();
+		if (!errormsg.empty()) {
+			error(state, errormsg);
+		}
 		state->conditionStack.push(condition);
 	} else {
 		ResourceDirective* directive = createDirective(tagName);
@@ -461,6 +465,10 @@ void VariantResourceSet::scanForResources(string directoryToScan,
 				// Important to check BOTH of these; top-level resources in
 				// for example the image dir should have no variant identifier!
 				newCondition.setCondition(variantAttrName, variantAttrValue);
+				string errormsg = newCondition.validate();
+				if (!errormsg.empty()) {
+					error(file.getAbsolutePath().c_str(), -1, errormsg);
+				}
 			}
 			scanForResources(newDirectory, resourceType, variantAttrName, variantAttrValue, loadType, newCondition, priority + 1);
 		} else if (resTypeAssigned) {
@@ -739,6 +747,16 @@ string VariantCondition::getCondition(string condition) {
 
 bool VariantCondition::hasCondition(string condition) {
 	return fConditions.find(condition) != fConditions.end();
+}
+
+string VariantCondition::validate() {
+	// Ok, at this point we only support platform + screen size
+	string cond = getCondition(ATTR_SCREENSIZE);
+	if (!cond.empty() && cond != "small" && cond != "normal" && cond != "large" && cond != "xlarge") {
+		return string("Invalid screenSize attribute (") +
+				cond + "); must be small, normal, large or xlarge.";
+	}
+	return string();
 }
 
 // Returns an 'unqualifed' attribute, or removes the 'platform:' prefix

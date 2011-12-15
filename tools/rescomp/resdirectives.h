@@ -76,8 +76,10 @@ static string gLastLFileDirective;
 class FileResourceDirective : public ResourceDirective {
 protected:
 	string fResource;
+	bool fUseIncludeDirective;
 public:
-	FileResourceDirective(const char* resType) : ResourceDirective(resType) { }
+	FileResourceDirective(const char* resType, bool useIncludeDirective)
+		: ResourceDirective(resType) { fUseIncludeDirective = useIncludeDirective; }
 	void setResource(string resource);
 	string getUniqueToken();
 	virtual void writeDirectives(ostringstream& output, bool asVariant);
@@ -87,13 +89,13 @@ public:
 
 class BinaryResourceDirective : public FileResourceDirective {
 public:
-	BinaryResourceDirective() : FileResourceDirective("bin") { }
+	BinaryResourceDirective() : FileResourceDirective("bin", true) { }
 	int getResourceTypeAsInt() { return ResType_Binary; }
 };
 
 class ImageResourceDirective : public FileResourceDirective {
 public:
-	ImageResourceDirective() : FileResourceDirective("image") { }
+	ImageResourceDirective() : FileResourceDirective("image", false) { }
 	int getResourceTypeAsInt() { return ResType_Image; }
 };
 
@@ -101,7 +103,7 @@ class MediaResourceDirective : public FileResourceDirective {
 private:
 	string fMimeType;
 public:
-	MediaResourceDirective() : FileResourceDirective("media") { }
+	MediaResourceDirective() : FileResourceDirective("media", false) { }
 	void setMimeType(string mimeType);
 	void writeDirectives(ostringstream& output, bool asVariant);
 	virtual void initDirectiveFromAttributes(const char **attributes);

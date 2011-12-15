@@ -41,6 +41,7 @@ public:
 	bool hasCondition(string condition);
 	bool isApplicable();
 	string getVariantIdentifier(bool filtered);
+	string validate();
 };
 
 class VariantResourceSet {
