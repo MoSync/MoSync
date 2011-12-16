@@ -136,7 +136,7 @@ void ProfileDB::innerListAllProfiles(File& root, string name, string pattern,
 	for (list<File>::iterator filesIterator = files.begin(); filesIterator
 	        != files.end(); filesIterator++) {
 		File file = *filesIterator;
-		if (file.isDirectory()) {
+		if (!file.isSelfOrBackRef() && file.isDirectory()) {
 			const char* slash = name.size() == 0 ? "" : "/";
 			string newName = name.size() == 0 || !onlyFamilies ? name + slash
 			        + file.getName() : name;

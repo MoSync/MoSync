@@ -31,7 +31,7 @@ void printUsage();
 bool isExt(const string& filename, const string& ext);
 
 void printUsage() {
-	printf("Usage: rescomp [-L lstfile] platform outputdir [.lst|.lstx files]");
+	printf("Usage: rescomp [-L lstfile] platform outputdir [.lst|.lstx files]\n");
 	exit(1);
 }
 

@@ -106,7 +106,7 @@ bool VariantResourceSet::addDirective(ResourceDirective* directive, VariantCondi
 	if (add) {
 		string variant = cond == NULL ? string() : cond->getVariantIdentifier(true);
 		string resId = directive->getId();
-//		printf("Adding %s to variant %s\n", resId.c_str(), getVariantStr(variant).c_str());
+		printf("Adding %s to variant %s\n", resId.c_str(), getVariantStr(variant).c_str());
 		if (variant.size() > 0) { // Is it a variant resource?
 			fVariantResIds.push_back(resId);
 		} else {
@@ -365,11 +365,25 @@ const char* getDefaultVariantAttr(const char* resourceType) {
 	return NULL;
 }
 
-bool isStandardVariantAttr(const char* variantAttr) {
-	bool nope = strcmp(ATTR_PLATFORM, variantAttr) &&
-			strcmp(ATTR_LOCALE, variantAttr) &&
-			strcmp(ATTR_SCREENSIZE, variantAttr);
-	return !nope;
+bool doesMatch(const char* attr, const char* variantAttr) {
+	int varlen = strlen(variantAttr);
+	int attrlen = strlen(attr);
+	if (varlen == attrlen) {
+		for (int i = 0; i < attrlen; i++) {
+			if (tolower(attr[i]) != tolower(variantAttr[i])) {
+				return false;
+			}
+		}
+		return true;
+	}
+	return false;
+}
+
+const char* getStandardVariantAttr(const char* variantAttr) {
+	if (doesMatch(ATTR_PLATFORM, variantAttr)) return ATTR_PLATFORM;
+	if (doesMatch(ATTR_LOCALE, variantAttr)) return ATTR_LOCALE;
+	if (doesMatch(ATTR_SCREENSIZE, variantAttr)) return ATTR_SCREENSIZE;
+	return NULL;
 }
 
 static string toResName(string filename) {
@@ -438,57 +452,61 @@ void VariantResourceSet::scanForResources(string directoryToScan,
 	list<File> files = dir.listFiles();
 	for (list<File>::iterator fileIt = files.begin(); fileIt != files.end(); fileIt++) {
 		File file = *fileIt;
-		string filename = file.getName();
-		string lcaseName = file.getName();
-		// Lower-case it.
-		for (size_t i = 0; i < lcaseName.size(); i++) {
-			lcaseName[i] = tolower(lcaseName.at(i));
-		}
-		if (file.isDirectory()) {
-			string newDirectory = directoryToScan + F_SEPERATOR + filename;
-			LoadType newLoadType = getLoadType(lcaseName);
-			string potentialResourceType = getResourceType(lcaseName);
-			if (!resTypeAssigned && isResource(potentialResourceType.c_str())) {
-				// Is it the top level, ie image, binary, etc?
-				loadType = newLoadType;
-				resourceType = potentialResourceType;
-				variantAttrName = getDefaultVariantAttr(resourceType.c_str());
-			} else if (isStandardVariantAttr(lcaseName.c_str())) {
-				// Or is it a standard variant attr?
-				variantAttrName = lcaseName;
-			} else {
-				// Otherwise, it is the variant attr value.
-				variantAttrValue = lcaseName;
+		if (!file.isSelfOrBackRef()) {
+			string filename = file.getName();
+			string lcaseName = file.getName();
+			// Lower-case it.
+			for (size_t i = 0; i < lcaseName.size(); i++) {
+				lcaseName[i] = tolower(lcaseName.at(i));
 			}
-			VariantCondition newCondition = VariantCondition(condition);
-			if (variantAttrName.size() > 0 && variantAttrValue.size() > 0) {
-				// Important to check BOTH of these; top-level resources in
-				// for example the image dir should have no variant identifier!
-				newCondition.setCondition(variantAttrName, variantAttrValue);
-				string errormsg = newCondition.validate();
-				if (!errormsg.empty()) {
-					error(file.getAbsolutePath().c_str(), -1, errormsg);
-				}
-			}
-			scanForResources(newDirectory, resourceType, variantAttrName, variantAttrValue, loadType, newCondition, priority + 1);
-		} else if (resTypeAssigned) {
-			// And if it is not a directory, then we've got the actual resources!
-			FileResourceDirective* directive = createFileDirective(resourceType.c_str());
-			if (directive) {
-				string resId = toResName(filename);
-				string variant = condition.getVariantIdentifier(true);
-				directive->setId(resId);
-				directive->setFile(file.getAbsolutePath());
-				directive->setResource(filename);
-				directive->setLoadType(loadType);
-				bool shouldAdd = condition.isApplicable();
-				if (shouldAdd && addDirective(directive, &condition)) {
-					assignPriority(directive, &condition, priority);
-					if (isAmbiguous(resId)) {
-						error(NULL, string("Ambiguous resource: ") + resId);
-					}
+			if (file.isDirectory()) {
+				string newDirectory = directoryToScan + F_SEPERATOR + filename;
+				LoadType newLoadType = getLoadType(lcaseName);
+				string potentialResourceType = getResourceType(lcaseName);
+				if (!resTypeAssigned && isResource(potentialResourceType.c_str())) {
+					// Is it the top level, ie image, binary, etc?
+					loadType = newLoadType;
+					resourceType = potentialResourceType;
+					variantAttrName = getDefaultVariantAttr(resourceType.c_str());
+				} else if (getStandardVariantAttr(lcaseName.c_str())) {
+					// Or is it a standard variant attr?
+					variantAttrName = getStandardVariantAttr(lcaseName.c_str());
 				} else {
-					disposeDirective(directive);
+					// Otherwise, it is the variant attr value.
+					variantAttrValue = lcaseName;
+				}
+				VariantCondition newCondition = VariantCondition(condition);
+				printf("Lcase: %s; name: %s, value %s.\n", lcaseName.c_str(), variantAttrName.c_str(), variantAttrValue.c_str());
+				if (variantAttrName.size() > 0 && variantAttrValue.size() > 0) {
+					// Important to check BOTH of these; top-level resources in
+					// for example the image dir should have no variant identifier!
+					newCondition.setCondition(variantAttrName, variantAttrValue);
+				}
+				printf("Condition %s for dir %s\n", newCondition.getVariantIdentifier(false).c_str(), file.getAbsolutePath().c_str());
+				scanForResources(newDirectory, resourceType, variantAttrName, variantAttrValue, loadType, newCondition, priority + 1);
+			} else if (resTypeAssigned) {
+				// And if it is not a directory, then we've got the actual resources!
+				FileResourceDirective* directive = createFileDirective(resourceType.c_str());
+				if (directive) {
+					string resId = toResName(filename);
+					string errormsg = condition.validate();
+					if (!errormsg.empty()) {
+						error(file.getAbsolutePath().c_str(), -1, errormsg);
+					}
+					string variant = condition.getVariantIdentifier(true);
+					directive->setId(resId);
+					directive->setFile(file.getAbsolutePath());
+					directive->setResource(filename);
+					directive->setLoadType(loadType);
+					bool shouldAdd = condition.isApplicable();
+					if (shouldAdd && addDirective(directive, &condition)) {
+						assignPriority(directive, &condition, priority);
+						if (isAmbiguous(resId)) {
+							error(NULL, string("Ambiguous resource: ") + resId);
+						}
+					} else {
+						disposeDirective(directive);
+					}
 				}
 			}
 		}
