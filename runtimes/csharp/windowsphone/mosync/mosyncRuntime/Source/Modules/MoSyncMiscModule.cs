@@ -4,6 +4,8 @@ using Microsoft.Phone.Info;
 using System.Windows;
 using System.Collections.Generic;
 using System.Net.NetworkInformation;
+using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework;
 
 namespace MoSync
 {

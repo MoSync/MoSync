@@ -110,7 +110,7 @@ namespace MoSync
                 }
                 catch (InvalidPropertyNameException e)
                 {
-                    MoSync.Util.Log(e);
+                    MoSync.Util.Log(widget.GetType().ToString() + " invalid property name: " + property);
                     return MoSync.Constants.MAW_RES_INVALID_PROPERTY_NAME;
                 }
                 catch (InvalidPropertyValueException e)
