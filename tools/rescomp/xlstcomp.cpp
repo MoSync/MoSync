@@ -108,7 +108,7 @@ bool VariantResourceSet::addDirective(ResourceDirective* directive, VariantCondi
 		string unfilteredVariant = cond == NULL ? string() : cond->getVariantIdentifier(false);
 
 		string resId = directive->getId();
-//		printf("Adding %s to variant %s.\n", resId.c_str(), getVariantStr(variant).c_str());
+		printf("Adding %s to variant %s.\n", resId.c_str(), getVariantStr(variant).c_str());
 		if (variant.length() > 0) { // Is it a variant resource?
 			fVariantResIds.push_back(resId);
 		} else {

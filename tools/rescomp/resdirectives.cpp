@@ -151,7 +151,7 @@ string FileResourceDirective::validate() {
 }
 
 string FileResourceDirective::getUniqueToken() {
-	return fResource;
+	return fResource + "|" + fFile;
 }
 
 void MediaResourceDirective::writeDirectives(ostringstream& output, bool asVariant) {
