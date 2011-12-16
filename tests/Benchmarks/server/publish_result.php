@@ -73,8 +73,8 @@ if($benchmark == 'linpack'){ //insert row into 'linpack_testruns'
 	$res = mysql_query("INSERT INTO linpack_testruns (revision, runtime_id, git_hash, phone_id, native_sdk_ver, mflops) VALUES ('$revision', '$runtime_id', '$git_hash', '$phone_id', '
 $native_sdk_ver', '$mflops')");
 }else if($benchmark == 'opengl'){ //insert row into 'opengl_testruns' TODO FIX
-	$res = mysql_query("INSERT INTO opengl_testruns (revision, runtime_id, git_hash, phone_id, native_sdk_ver, mflops) VALUES ('$revision', '$runtime_id', '$git_hash', '$phone_id', '$native_sdk_ver
-', '$mflops')");
+	$res = mysql_query("INSERT INTO opengl_testruns (revision, runtime_id, git_hash, phone_id, native_sdk_ver, test1, test2, test3, test4) VALUES ('$revision', '$runtime_id', '$git_hash', '$phone_id', '$native_sdk_ver
+', '$test1', '$test2', '$test3', '$test4')");
 }else if($benchmark == 'membench'){
 	$res = mysql_query("INSERT INTO membench_testruns (revision, runtime_id, git_hash, phone_id, native_sdk_ver, alloc_str_10, alloc_str_100, alloc_void_1, alloc_void_100, alloc_void_1000, 
 	alloc_dummy, alloc_dummy_struct, alloc_dummy_mix, access_array, access_vector, add_vector, access_dummy, access_dummy_struct, access_dummy_mix) VALUES ('$revision', '$runtime_id', '$git_hash', '

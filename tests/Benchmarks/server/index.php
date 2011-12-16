@@ -12,6 +12,14 @@
 	$num_rows = mysql_num_rows($result_latest_runs);
 	$i = 0;
 	
+	/* This SQL statement get the latest runs of the membench benchmark, the latest of each runtime */
+	$result_latest_membench = mysql_query("SELECT  *
+	FROM
+    membench_testruns a
+    inner join 
+        (SELECT runtime_name, max(id) as maxid FROM membench_testruns, runtimes WHERE membench_testruns.runtime_id = runtimes.runtime_id group by runtime_name) as b on
+        a.id = b.maxid JOIN phones ON a.phone_id=phones.phone_id");
+	
 	// get the average result of each runtime
 	$result_average_runtime = mysql_query("SELECT runtime_name, AVG( mflops ) AS avgmflops
 		FROM linpack_testruns, runtimes
@@ -22,7 +30,7 @@
 	// get historical result for a specific device TODO hardcoded device id ATM
 	$result_hist = mysql_query("SELECT runtime_name, runtimes.runtime_id as run_id, avg(mflops) as avgmflops, DATEDIFF(now(), timestamp) AS datediff 
 	FROM linpack_testruns, runtimes 
-	WHERE runtimes.runtime_id = linpack_testruns.runtime_id AND phone_id = 3 
+	WHERE runtimes.runtime_id = linpack_testruns.runtime_id AND phone_id = 2 
 	GROUP BY datediff, runtimes.runtime_id ORDER BY datediff DESC");
 	
 	$result_runtimes = mysql_query("SELECT runtime_name FROM runtimes");
@@ -124,7 +132,7 @@
                      'width':500,
                      'height':400};
 					 
-	var options3 = {'title':'LINPACK history on runtimes over the last 30 days(MFLOPS)',
+	var options3 = {'title':'LINPACK history on specific device, different runtimes over the last 30 days(MFLOPS)',
 					 'width':500,
                      'height':400};
 
