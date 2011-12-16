@@ -74,7 +74,7 @@ static void error(ParserState* state, const char* msg) {
 }
 
 string getVariantStr(string variant) {
-	if (variant.size() == 0) {
+	if (variant.length() == 0) {
 		return string("(fallback variant)");
 	} else {
 		return variant;
@@ -105,18 +105,27 @@ bool VariantResourceSet::addDirective(ResourceDirective* directive, VariantCondi
 	bool add = directive != NULL;
 	if (add) {
 		string variant = cond == NULL ? string() : cond->getVariantIdentifier(true);
+		string unfilteredVariant = cond == NULL ? string() : cond->getVariantIdentifier(false);
+
 		string resId = directive->getId();
-		printf("Adding %s to variant %s\n", resId.c_str(), getVariantStr(variant).c_str());
-		if (variant.size() > 0) { // Is it a variant resource?
+//		printf("Adding %s to variant %s.\n", resId.c_str(), getVariantStr(variant).c_str());
+		if (variant.length() > 0) { // Is it a variant resource?
 			fVariantResIds.push_back(resId);
 		} else {
 			fNonVariantResIds.push_back(resId);
 		}
 		fVariants.push_back(variant);
-		if (getDirective(resId, variant) && variant.size() > 0) {
-			error(directive->getFile().c_str(),
-					directive->getLineNo(),
-					(string("Duplicate definition of resource ") + resId + " for variant " + variant).c_str());
+		ResourceDirective* existingDirective = getDirective(resId, variant);
+		if (existingDirective && variant.length() > 0) {
+			// Is it an invalid duplicate, or should we allow an override to take place?
+			bool allowOverride = unfilteredVariant != variant;
+			if (!allowOverride) {
+				error(directive->getFile().c_str(),
+						directive->getLineNo(),
+						(string("Duplicate definition of resource ") + resId + " for variant " + variant).c_str());
+			} else {
+				disposeDirective(existingDirective);
+			}
 		}
 		fDirectives[variant][resId] = directive;
 		fMappedPriorities[variant][resId] = fCurrentPriority[resId];
@@ -169,7 +178,7 @@ vector<string> VariantResourceSet::getAllNonVariantResIds() {
 		bool nonVariant = true;
 		for (vector<string>::iterator variantIt = variants.begin(); variantIt != variants.end(); ++variantIt) {
 			string variant = *variantIt;
-			if (variant.size() > 0 && getDirective(*nonVariantResId, variant)) {
+			if (variant.length() > 0 && getDirective(*nonVariantResId, variant)) {
 				nonVariant = false;
 			}
 		}
@@ -205,7 +214,7 @@ static ResourceDirective* createDirective(const char* tagName) {
 	return NULL;
 }
 
-static void disposeDirective(ResourceDirective* directive) {
+void disposeDirective(ResourceDirective* directive) {
 	if (directive) {
 		delete directive;
 	}
@@ -253,7 +262,7 @@ static void xlstStart(void *data, const char *tagName, const char **attributes) 
 			directive->setLineNo(state->lineNo);
 			string id = directive->getId();
 			state->currentId = id;
-			if (state->currentId.size() == 0) {
+			if (state->currentId.length() == 0) {
 				error(state, "No id attribute in resource tag " + string(tagName) + " (or a parent resource tag)");
 			}
 			VariantCondition* cond = state->conditionStack.empty() ? NULL : &(state->conditionStack.top());
@@ -388,8 +397,8 @@ const char* getStandardVariantAttr(const char* variantAttr) {
 
 static string toResName(string filename) {
 	string resName(filename);
-	int lastDot = filename.size();
-	for (size_t i = 0; i < resName.size(); i++) {
+	int lastDot = filename.length();
+	for (size_t i = 0; i < resName.length(); i++) {
 		char ch = resName.at(i);
 		resName[i] = toupper(ch);
 		if (ch == '.') {
@@ -405,7 +414,7 @@ void VariantResourceSet::scanForResources(string directoryToScan) {
 }
 
 static LoadType getLoadType(string lcaseFilename) {
-	if (lcaseFilename.size() > 0 && lcaseFilename.at(0) == 'u' && isResource(lcaseFilename.substr(1, lcaseFilename.size() - 1).c_str())) {
+	if (lcaseFilename.length() > 0 && lcaseFilename.at(0) == 'u' && isResource(lcaseFilename.substr(1, lcaseFilename.length() - 1).c_str())) {
 		return LoadType_Unloaded;
 	}
 	return LoadType_Startup;
@@ -413,7 +422,7 @@ static LoadType getLoadType(string lcaseFilename) {
 
 static string getResourceType(string lcaseFilename) {
 	if (getLoadType(lcaseFilename) == LoadType_Unloaded) {
-		return lcaseFilename.substr(1, lcaseFilename.size() - 1);
+		return lcaseFilename.substr(1, lcaseFilename.length() - 1);
 	}
 	return lcaseFilename;
 }
@@ -445,18 +454,20 @@ void VariantResourceSet::scanForResources(string directoryToScan,
 	// +--/string
 	// |
 	// ...
-
-	bool resTypeAssigned = resourceType.size() > 0;
+	bool resTypeAssigned = resourceType.length() > 0;
 //	printf("Loadtype for dir %s: %d\n", directoryToScan.c_str(), loadType);
 	File dir = File(directoryToScan);
 	list<File> files = dir.listFiles();
 	for (list<File>::iterator fileIt = files.begin(); fileIt != files.end(); fileIt++) {
 		File file = *fileIt;
 		if (!file.isSelfOrBackRef()) {
+			string variantAttrNameToUse = string(variantAttrName);
+			string variantAttrValueToUse = string(variantAttrValue);
+
 			string filename = file.getName();
 			string lcaseName = file.getName();
 			// Lower-case it.
-			for (size_t i = 0; i < lcaseName.size(); i++) {
+			for (size_t i = 0; i < lcaseName.length(); i++) {
 				lcaseName[i] = tolower(lcaseName.at(i));
 			}
 			if (file.isDirectory()) {
@@ -467,23 +478,22 @@ void VariantResourceSet::scanForResources(string directoryToScan,
 					// Is it the top level, ie image, binary, etc?
 					loadType = newLoadType;
 					resourceType = potentialResourceType;
-					variantAttrName = getDefaultVariantAttr(resourceType.c_str());
+					variantAttrNameToUse = getDefaultVariantAttr(resourceType.c_str());
 				} else if (getStandardVariantAttr(lcaseName.c_str())) {
 					// Or is it a standard variant attr?
-					variantAttrName = getStandardVariantAttr(lcaseName.c_str());
+					variantAttrNameToUse = getStandardVariantAttr(lcaseName.c_str());
 				} else {
 					// Otherwise, it is the variant attr value.
-					variantAttrValue = lcaseName;
+					variantAttrValueToUse = lcaseName;
 				}
-				VariantCondition newCondition = VariantCondition(condition);
-				printf("Lcase: %s; name: %s, value %s.\n", lcaseName.c_str(), variantAttrName.c_str(), variantAttrValue.c_str());
-				if (variantAttrName.size() > 0 && variantAttrValue.size() > 0) {
+				VariantCondition newCondition = VariantCondition();
+				newCondition.initFrom(condition);
+				if (variantAttrNameToUse.length() > 0 && variantAttrValueToUse.length() > 0) {
 					// Important to check BOTH of these; top-level resources in
 					// for example the image dir should have no variant identifier!
-					newCondition.setCondition(variantAttrName, variantAttrValue);
+					newCondition.setCondition(variantAttrNameToUse, variantAttrValueToUse);
 				}
-				printf("Condition %s for dir %s\n", newCondition.getVariantIdentifier(false).c_str(), file.getAbsolutePath().c_str());
-				scanForResources(newDirectory, resourceType, variantAttrName, variantAttrValue, loadType, newCondition, priority + 1);
+				scanForResources(newDirectory, resourceType, variantAttrNameToUse, variantAttrValueToUse, loadType, newCondition, priority + 1);
 			} else if (resTypeAssigned) {
 				// And if it is not a directory, then we've got the actual resources!
 				FileResourceDirective* directive = createFileDirective(resourceType.c_str());
@@ -561,7 +571,7 @@ void VariantResourceSet::writeResources(string lstOutput) {
 				string uniqueToken = directive->getUniqueToken();
 				int cachedId = cachedResources[uniqueToken];
 				lstFileOutput << "// " << *id << " - " << getVariantStr(*variantIt) << '\n';
-				if (uniqueToken.size() > 0 && cachedId > 0) {
+				if (uniqueToken.length() > 0 && cachedId > 0) {
 					lstFileOutput << "// Using cached resource #" << cachedId << '\n';
 					resIdToUse = cachedId;
 				} else {
@@ -746,11 +756,16 @@ string VariantResourceSet::createResMap() {
 	return resultStr.str();
 }
 
+VariantCondition::VariantCondition() {
+
+}
+
 VariantCondition::VariantCondition(string platform) {
 	VariantCondition::fPlatform = platform;
 }
 
 void VariantCondition::initFrom(VariantCondition& prototype) {
+	fPlatform = prototype.fPlatform;
 	fConditions.insert(prototype.fConditions.begin(), prototype.fConditions.end());
 }
 
@@ -764,7 +779,7 @@ string VariantCondition::getCondition(string condition) {
 }
 
 bool VariantCondition::hasCondition(string condition) {
-	return fConditions.find(condition) != fConditions.end();
+	return !getCondition(condition).empty();
 }
 
 string VariantCondition::validate() {
@@ -781,8 +796,8 @@ string VariantCondition::validate() {
 // before a platform specific attribute
 static string getUnqualifiedAttr(string qualifiedAttr, string qualifier) {
 	string qualifierWithColon = qualifier + ":";
-	if (qualifiedAttr.substr(0, qualifierWithColon.size()) == qualifierWithColon) {
-		return qualifiedAttr.substr(qualifierWithColon.size());
+	if (qualifiedAttr.substr(0, qualifierWithColon.length()) == qualifierWithColon) {
+		return qualifiedAttr.substr(qualifierWithColon.length());
 	}
 	return qualifiedAttr;
 }
@@ -797,7 +812,7 @@ static string getPrefix(string qualifiedAttr) {
 // itself will be escaped, since they have a special meaning.
 static string escape(string attr) {
 	ostringstream escaped;
-	for (size_t i = 0; i < attr.size(); i++) {
+	for (size_t i = 0; i < attr.length(); i++) {
 		const char ch = attr.at(i);
 		if (ch == '\\' || ch == ':' || ch == ',') {
 			escaped << '\\';
@@ -825,7 +840,7 @@ string VariantCondition::getVariantIdentifier(bool filtered) {
 					result << ",";
 				}
 				string prefix = getPrefix(variantAttr);
-				if (prefix.size() == 0 || prefix == fPlatform) {
+				if (attrValue.length() > 0 && (prefix.length() == 0 || prefix == fPlatform)) {
 					string attrName = filtered ? getUnqualifiedAttr(variantAttr, fPlatform) : variantAttr;
 					result << escape(attrName) << ":" << escape(attrValue);
 					attrCount++;

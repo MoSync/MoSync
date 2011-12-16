@@ -34,6 +34,7 @@ private:
 	map<string, string> fConditions;
 	string fPlatform;
 public:
+	VariantCondition();
 	VariantCondition(string platform);
 	void initFrom(VariantCondition& prototype);
 	bool setCondition(string condition, string value);
@@ -111,5 +112,7 @@ struct ParserState {
 };
 
 const char* findAttr(const char* name, const char** attributes);
+
+void disposeDirective(ResourceDirective* directive);
 
 #endif /* XLSTCOMP_H_ */
