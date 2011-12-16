@@ -46,6 +46,8 @@ using namespace std;
 #define ATTR_TYPE "type"
 #define PROPERTY_TYPE "property"
 
+string toSlashes(string str);
+
 string ProfileDB::profilesdir() {
 	static const char* md = NULL;
 	if (!md) {
@@ -55,7 +57,7 @@ string ProfileDB::profilesdir() {
 			exit(1);
 		}
 	}
-	return string(md) + "/profiles/platforms";
+	return toSlashes(string(md) + "/profiles/platforms");
 }
 
 static bool isWildcard(string pattern) {
@@ -476,10 +478,23 @@ Profile* ProfileDB::findProfile(string profileName, set<string> alreadyFound) {
 	return profile;
 }
 
+string toSlashes(string str) {
+	string result = string(str);
+	for (size_t i = 0; i < str.length(); i++) {
+		result[i] = str[i];
+		if (result[i] == '\\' || result[i] == '/') {
+			result[i] = F_SEPERATOR;
+		}
+	}
+	return result;
+}
+
 bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
-	string profileName = profile->getProfileName();
-	File file =
-	        File(string(profilesdir() + "/" + profileName + "/profile.xml"));
+	string profileName = string(profile->getProfileName());
+	File file = File(toSlashes(
+	        string(
+	                profilesdir() + F_SEPERATOR + profileName + F_SEPERATOR
+	                        + "profile.xml")));
 	string path = file.getAbsolutePath();
 
 	ParserState state;
@@ -563,14 +578,14 @@ bool ProfileDB::internalMatchProfile(Profile* profile,
 	// For example, different device types or icon sizes should always generate
 	// a unique runtime.
 	set<string> allCapabilities = profile->getCapabilities();
-	for (set<string>::iterator allCapabilitesIt = allCapabilities.begin();
-			allCapabilitesIt != allCapabilities.end();
-			allCapabilitesIt++) {
+	for (set<string>::iterator allCapabilitesIt = allCapabilities.begin(); allCapabilitesIt
+	        != allCapabilities.end(); allCapabilitesIt++) {
 		string capabilityName = *allCapabilitesIt;
 		Capability capability = profile->getCapability(capabilityName);
 		if (capability.getType() == "property") {
 			Fragmentation fragmentation = capability.getFragmentation();
-			string valueStr = fragmentation == BUILDTIME ? capability.getValue() : "-";
+			string valueStr =
+			        fragmentation == BUILDTIME ? capability.getValue() : "-";
 			matchToken.append(valueStr);
 			matchToken.append("|");
 		}
