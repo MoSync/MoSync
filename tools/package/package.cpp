@@ -141,6 +141,8 @@ int main(int argc, const char** argv) {
 			setString(i, argc, argv, s.version);
 		} else if(streq(argv[i], "--permissions")) {
 			setString(i, argc, argv, s.permissions);
+		} else if(streq(argv[i], "--output-type")) {
+			setString(i, argc, argv, s.outputType);
 		} else if(streq(argv[i], "--s60v3uid")) {
 			setString(i, argc, argv, s.s60v3uid);
 		} else if(streq(argv[i], "--s60v2uid")) {
@@ -250,6 +252,15 @@ void testVersion(const SETTINGS& s) {
 	if (!s.version) {
 		printf("Must specify version!\n");
 		exit(1);
+	}
+}
+void testOutputType(const SETTINGS& s) {
+	if (s.outputType) {
+		if (strcmp("interpreted", s.outputType) &&
+			strcmp("rebuilt", s.outputType)) {
+			printf("Output type must be either \"interpreted\" or \"rebuilt\"!\n");
+			exit(1);
+		}
 	}
 }
 static void testUid(const char* uid) {

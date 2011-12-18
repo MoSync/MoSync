@@ -32,6 +32,7 @@ struct SETTINGS {
 	const char* vendor;
 	const char* version;
 	const char* permissions;
+	const char* outputType;
 	const char* s60v3uid;
 	const char* s60v2uid;
 	const char* s60cert;
@@ -79,6 +80,7 @@ void testProfileType(const SETTINGS&);
 void testName(const SETTINGS&);
 void testVendor(const SETTINGS&);
 void testVersion(const SETTINGS&);
+void testOutputType(const SETTINGS& s);
 void testS60v3Uid(const SETTINGS&);
 void testS60v2Uid(const SETTINGS&);
 

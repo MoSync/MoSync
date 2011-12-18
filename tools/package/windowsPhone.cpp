@@ -57,6 +57,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	string templateFileLocation = string(ri.path) + "/template/mosync.csproj";
 	string csprojOutputFile = dst + "/project/mosync.csproj";
 	string csprojOutput = dst + "/project";
+	string outputType = s.outputType ? string(s.outputType) : string("interpreted");
 
 	/*
 	generateCmd << getBinary("iphone-builder") << " generate -project-name " <<
@@ -67,7 +68,7 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 
 	_mkdir(csprojOutput.c_str());
 	copyFilesRecursively(templateLocation.c_str(), csprojOutput.c_str());
-	generateCmd << getBinary("winphone-builder") << " -output-type interpreted -input-file " << file(templateFileLocation) <<
+	generateCmd << getBinary("winphone-builder") << " -output-type " << outputType << " -input-file " << file(templateFileLocation) <<
 		" -output-file " << file(csprojOutputFile);
 
 	sh(generateCmd.str().c_str(), s.silent);
