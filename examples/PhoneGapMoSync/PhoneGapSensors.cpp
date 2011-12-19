@@ -50,7 +50,7 @@ PhoneGapSensors::~PhoneGapSensors()
  * Implementation of sensor API:s exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-bool PhoneGapSensors::handleMessage(PhoneGapMessage& message)
+void PhoneGapSensors::handleMessage(PhoneGapMessage& message)
 {
 	// Accelerometer request from PhoneGap
 	if ((message.getParam("service") == "Accelerometer"))
@@ -102,8 +102,6 @@ bool PhoneGapSensors::handleMessage(PhoneGapMessage& message)
 			message.getParam("PhoneGapCallBackId"),
 			false); //stop Sensor after the first run
 	}
-
-	return true;
 }
 
 /**

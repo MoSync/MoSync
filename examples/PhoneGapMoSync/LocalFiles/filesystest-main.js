@@ -1,22 +1,98 @@
+
+function PrintObject(obj, indent)
+{
+    if (undefined === indent)
+    {
+        indent = "";
+    }
+
+    console.log(indent + "@@ PrintObject");
+
+    for (var field in obj)
+    {
+        if (typeof obj[field] != "function")
+        {
+            console.log("  " + indent + "[" + field + ": " + obj[field] + "]");
+            if ((null != obj[field]) && (typeof obj[field] == "object"))
+            {
+                PrintObject(obj[field], indent + "  ");
+            }
+        }
+    }
+}
+
 function testFileSystem() {
-    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFS, fail);
+    console.log("@@ Calling window.requestFileSystem");
+    window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFileSystem, filefail);
+    //window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFileSystem, filefail);
 }
 
-function gotFS(fileSystem) {
-	console.log("@@ fileSystem.root.name: " + fileSystem.root.name);
-    fileSystem.root.getFile("readme.txt", null, gotFileEntry, fail);
+function gotFileSystem(fileSystem)
+{
+    console.log("@@ gotFileSystem");
+    PrintObject(fileSystem);
+    console.log("@@ Calling fileSystem.root.getFile");
+    fileSystem.root.getFile("helloworld.txt", {create: true}, gotOpenFileEntry, filefail);
 }
 
-function gotFileEntry(fileEntry) {
-    fileEntry.file(gotFile, fail);
+function gotOpenFileEntry(fileEntry) {
+    gFileEntry = fileEntry;
+    console.log("@@ gotOpenFileEntry");
+    console.log("@@ Calling fileEntry.createWriter");
+    fileEntry.createWriter(gotFileWriter, filefail);
 }
 
-function gotFile(file){
+function gotFileWriter(writer) {
+    console.log("@@ gotFileWriter");
+    writer.onwrite = function(obj) {
+        console.log("@@ writer.onwrite");
+        //PrintObject(obj);
+        readFileEntry(gFileEntry);
+    };
+    writer.error = function(obj) {
+        console.log("@@ writer.error");
+        PrintObject(obj);
+    };
+    writer.write("Hello World");
+    console.log("@@ writer.write called");
+}
+
+function readFileEntry(fileEntry)
+{
+    console.log("@@ readFileEntry");
+    console.log("@@ Calling fileEntry.file");
+    fileEntry.file(function(file)
+    {
+        readAsText(file);
+    },
+    filefail);
+}
+
+function readAsText(file) {
+    console.log("@@ readAsText");
+    var reader = new FileReader();
+    reader.onload = function(obj)
+    {
+        console.log("@@ reader.onload");
+        PrintObject(obj);
+    };
+    reader.onerror = function(obj)
+    {
+        console.log("@@ reader.onerror");
+        PrintObject(obj);
+    };
+    console.log("@@ Calling reader.readAsText");
+    reader.readAsText(file);
+}
+
+function readFile(file){
+    console.log("@@ readFile");
     readDataUrl(file);
     readAsText(file);
 }
 
 function readDataUrl(file) {
+    console.log("@@ readDataUrl");
     var reader = new FileReader();
     reader.onloadend = function(evt) {
         console.log("Read as data URL");
@@ -25,17 +101,9 @@ function readDataUrl(file) {
     reader.readAsDataURL(file);
 }
 
-function readAsText(file) {
-    var reader = new FileReader();
-    reader.onloadend = function(evt) {
-        console.log("Read as text");
-        console.log(evt.target.result);
-    };
-    reader.readAsText(file);
-}
 
-function fail(evt) {
-    console.log(evt.target.error.code);
+function filefail(error) {
+    console.log("@@ filefail code: " + error.code);
 }
 
 // ---------------------------------------------------------------

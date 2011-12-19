@@ -112,6 +112,8 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	{
 		mPhoneGapFile.handleMessage(message);
 	}
+
+	return true;
 }
 
 void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)

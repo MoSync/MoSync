@@ -52,7 +52,7 @@ public:
 	 * Implementation of File API exposed to JavaScript.
 	 * @return true if message was handled, false if not.
 	 */
-	bool handleMessage(PhoneGapMessage& message);
+	void handleMessage(PhoneGapMessage& message);
 
 	void sendAccelerometerData(MASensor sensorData);
 

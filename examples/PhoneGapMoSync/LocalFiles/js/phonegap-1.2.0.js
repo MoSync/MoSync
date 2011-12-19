@@ -137,6 +137,28 @@ PhoneGapCommandResult = function(status,callbackId,args,cast)
     }
 };
 
+function PrintObj(obj, indent)
+{
+    if (undefined === indent)
+    {
+        indent = "";
+    }
+
+    console.log(indent + "@@ PrintObj");
+
+    for (var field in obj)
+    {
+        if (typeof obj[field] != "function")
+        {
+            console.log("  " + indent + "[" + field + ": " + obj[field] + "]");
+            if ((null != obj[field]) && (typeof obj[field] == "object"))
+            {
+                PrintObj(obj[field], indent + "  ");
+            }
+        }
+    }
+}
+
 /**
  * Called by native code when returning successful result from an action.
  *
@@ -146,11 +168,15 @@ PhoneGapCommandResult = function(status,callbackId,args,cast)
  */
 PhoneGap.CallbackSuccess = function(callbackId, args, cast)
 {
-
     var commandResult;
     try
     {
         commandResult = MoSync.parseJSON(args);
+
+        console.log("@@ BEGIN --------------");
+        console.log("@@ callbackId: " + callbackId);
+        PrintObj(commandResult);
+        console.log("@@ END --------------");
 
         if (typeof cast !== 'undefined')
         {

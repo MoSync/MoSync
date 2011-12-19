@@ -49,15 +49,24 @@ public:
 	 */
 	virtual ~PhoneGapFile();
 
-	MAUtil::String PhoneGapFile::emitFileSystemInfo(
+	MAUtil::String emitFileSystemInfo(
 		const MAUtil::String& name,
 		const MAUtil::String& rootEntry);
 
-	MAUtil::String PhoneGapFile::emitFileEntry(
-		const MAUtil::String& isFile,
-		const MAUtil::String& isDirectory,
+	MAUtil::String emitDirectoryEntry(
 		const MAUtil::String& name,
 		const MAUtil::String& fullPath);
+
+	MAUtil::String emitFileEntry(
+		const MAUtil::String& name,
+		const MAUtil::String& fullPath);
+
+	MAUtil::String emitFile(
+		const MAUtil::String& name,
+		const MAUtil::String& fullPath,
+		const MAUtil::String& type,
+		const MAUtil::String& lastModifiedDate,
+		const MAUtil::String& size);
 
 	void callSuccess(
 		const MAUtil::String& callbackID,
@@ -65,16 +74,30 @@ public:
 		const MAUtil::String& castFunction
 		);
 
-	void callError(
+	void callFileError(
 		const MAUtil::String& callbackID,
 		const MAUtil::String& errorCode
 		);
 
 	/**
 	 * Implementation of File API exposed to JavaScript.
-	 * @return true if message was handled, false if not.
 	 */
-	bool handleMessage(PhoneGapMessage& message);
+	void handleMessage(PhoneGapMessage& message);
+
+	/**
+	 * Return a FileSystem object.
+	 */
+	void handleRequestFileSystem(PhoneGapMessage& message);
+
+	/**
+	 * Return a FileEntry object.
+	 */
+	void handleGetFile(PhoneGapMessage& message);
+
+	/**
+	 * Return a File object.
+	 */
+	void handleGetFileMetaData(PhoneGapMessage& message);
 
 private:
 	PhoneGapMessageHandler* mMessageHandler;

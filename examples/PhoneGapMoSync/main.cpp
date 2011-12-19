@@ -58,7 +58,8 @@ public:
 		// Zero terminate.
 		stringData[dataSize] = 0;
 
-		lprintfln("@@@ URL: %s\n", stringData);
+		lprintfln("@@@ URL: %s\n",
+			WebViewMessage::unescape(stringData).c_str());
 
 		free(stringData);
 	}
