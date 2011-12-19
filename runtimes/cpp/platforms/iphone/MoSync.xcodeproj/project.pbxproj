@@ -136,14 +136,14 @@
 		8527D52B1302E34000535CCA /* ImageButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8527D5281302E34000535CCA /* ImageButtonWidget.mm */; };
 		853983AB116CADEF000521C0 /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
 		853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
+		85407553149F9E62001B14C0 /* MoSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407550149F9E62001B14C0 /* MoSync.mm */; };
+		85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407552149F9E62001B14C0 /* MoSyncExtension.mm */; };
 		85581E6012EA323E009C6204 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85581E5F12EA323E009C6204 /* TouchHelper.mm */; };
 		85581E6112EA323E009C6204 /* TouchHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 85581E5E12EA323E009C6204 /* TouchHelper.h */; };
 		85581E6212EA323E009C6204 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85581E5F12EA323E009C6204 /* TouchHelper.mm */; };
 		8558307F11C79B030008FDC1 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307D11C79B030008FDC1 /* MoSyncCLController.mm */; };
 		8558308011C79B030008FDC1 /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
 		8558308111C79B210008FDC1 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307D11C79B030008FDC1 /* MoSyncCLController.mm */; };
-		855DD37A1491002D00FADE12 /* MoSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 855DD3781491002D00FADE12 /* MoSync.mm */; };
-		855DD37C149114DD00FADE12 /* MoSyncExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 855DD37B149114DC00FADE12 /* MoSyncExtension.mm */; };
 		856ACBD412B1A2C00017BD6D /* NSObjectExpanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */; };
 		857B020212C627C200DEA306 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B020112C627C200DEA306 /* OpenGLES.framework */; };
 		857B025612C62F5600DEA306 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
@@ -408,14 +408,14 @@
 		853983AA116CADEF000521C0 /* hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashmap.h; path = ../../../../intlibs/hashmap/hashmap.h; sourceTree = SOURCE_ROOT; };
 		853985D9116CF423000521C0 /* CMGlyphDrawing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMGlyphDrawing.h; sourceTree = "<group>"; };
 		853985DA116CF423000521C0 /* CMGlyphDrawing.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CMGlyphDrawing.mm; sourceTree = "<group>"; };
+		8540754F149F9E62001B14C0 /* MoSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSync.h; path = Extensions/MoSync.h; sourceTree = "<group>"; };
+		85407550149F9E62001B14C0 /* MoSync.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSync.mm; path = Extensions/MoSync.mm; sourceTree = "<group>"; };
+		85407551149F9E62001B14C0 /* MoSyncExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncExtension.h; path = Extensions/MoSyncExtension.h; sourceTree = "<group>"; };
+		85407552149F9E62001B14C0 /* MoSyncExtension.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncExtension.mm; path = Extensions/MoSyncExtension.mm; sourceTree = "<group>"; };
 		85581E5E12EA323E009C6204 /* TouchHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchHelper.h; sourceTree = "<group>"; };
 		85581E5F12EA323E009C6204 /* TouchHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TouchHelper.mm; sourceTree = "<group>"; };
 		8558307D11C79B030008FDC1 /* MoSyncCLController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncCLController.mm; sourceTree = "<group>"; };
 		8558307E11C79B030008FDC1 /* MoSyncViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncViewController.mm; sourceTree = "<group>"; };
-		855DD3771491002D00FADE12 /* MoSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSync.h; path = Extensions/MoSync.h; sourceTree = "<group>"; };
-		855DD3781491002D00FADE12 /* MoSync.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSync.mm; path = Extensions/MoSync.mm; sourceTree = "<group>"; };
-		855DD3791491002D00FADE12 /* MoSyncExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncExtension.h; path = Extensions/MoSyncExtension.h; sourceTree = "<group>"; };
-		855DD37B149114DC00FADE12 /* MoSyncExtension.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncExtension.mm; path = Extensions/MoSyncExtension.mm; sourceTree = "<group>"; };
 		856ACBD212B1A2C00017BD6D /* NSObjectExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSObjectExpanded.h; sourceTree = "<group>"; };
 		856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSObjectExpanded.m; sourceTree = "<group>"; };
 		857B020112C627C200DEA306 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -628,6 +628,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				8540754E149F9E55001B14C0 /* Extensions */,
 				43CE0BE01463E98F00F8FFC3 /* notifications */,
 				43CE0BDE1463E98700F8FFC3 /* ads */,
 				E4D36EA31459AC5B00477B1E /* audio */,
@@ -819,13 +820,13 @@
 			name = hashmap;
 			sourceTree = "<group>";
 		};
-		855DD3751491001E00FADE12 /* Extensions */ = {
+		8540754E149F9E55001B14C0 /* Extensions */ = {
 			isa = PBXGroup;
 			children = (
-				855DD37B149114DC00FADE12 /* MoSyncExtension.mm */,
-				855DD3771491002D00FADE12 /* MoSync.h */,
-				855DD3781491002D00FADE12 /* MoSync.mm */,
-				855DD3791491002D00FADE12 /* MoSyncExtension.h */,
+				8540754F149F9E62001B14C0 /* MoSync.h */,
+				85407550149F9E62001B14C0 /* MoSync.mm */,
+				85407551149F9E62001B14C0 /* MoSyncExtension.h */,
+				85407552149F9E62001B14C0 /* MoSyncExtension.mm */,
 			);
 			name = Extensions;
 			sourceTree = "<group>";
@@ -1369,6 +1370,8 @@
 				4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */,
 				418047B6147E8B6A0048FB95 /* Reachability.m in Sources */,
 				43B16FEB147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
+				85407553149F9E62001B14C0 /* MoSync.mm in Sources */,
+				85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
