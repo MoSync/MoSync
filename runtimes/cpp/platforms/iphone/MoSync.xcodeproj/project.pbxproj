@@ -118,6 +118,8 @@
 		8558307F11C79B030008FDC1 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307D11C79B030008FDC1 /* MoSyncCLController.mm */; };
 		8558308011C79B030008FDC1 /* MoSyncViewController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307E11C79B030008FDC1 /* MoSyncViewController.mm */; };
 		8558308111C79B210008FDC1 /* MoSyncCLController.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8558307D11C79B030008FDC1 /* MoSyncCLController.mm */; };
+		855DD37A1491002D00FADE12 /* MoSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 855DD3781491002D00FADE12 /* MoSync.mm */; };
+		855DD37C149114DD00FADE12 /* MoSyncExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 855DD37B149114DC00FADE12 /* MoSyncExtension.mm */; };
 		856ACBD412B1A2C00017BD6D /* NSObjectExpanded.m in Sources */ = {isa = PBXBuildFile; fileRef = 856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */; };
 		857B020212C627C200DEA306 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B020112C627C200DEA306 /* OpenGLES.framework */; };
 		857B025612C62F5600DEA306 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 857B025512C62F5600DEA306 /* QuartzCore.framework */; };
@@ -372,6 +374,10 @@
 		85581E5F12EA323E009C6204 /* TouchHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TouchHelper.mm; sourceTree = "<group>"; };
 		8558307D11C79B030008FDC1 /* MoSyncCLController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncCLController.mm; sourceTree = "<group>"; };
 		8558307E11C79B030008FDC1 /* MoSyncViewController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncViewController.mm; sourceTree = "<group>"; };
+		855DD3771491002D00FADE12 /* MoSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSync.h; path = Extensions/MoSync.h; sourceTree = "<group>"; };
+		855DD3781491002D00FADE12 /* MoSync.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSync.mm; path = Extensions/MoSync.mm; sourceTree = "<group>"; };
+		855DD3791491002D00FADE12 /* MoSyncExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncExtension.h; path = Extensions/MoSyncExtension.h; sourceTree = "<group>"; };
+		855DD37B149114DC00FADE12 /* MoSyncExtension.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncExtension.mm; path = Extensions/MoSyncExtension.mm; sourceTree = "<group>"; };
 		856ACBD212B1A2C00017BD6D /* NSObjectExpanded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NSObjectExpanded.h; sourceTree = "<group>"; };
 		856ACBD312B1A2C00017BD6D /* NSObjectExpanded.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NSObjectExpanded.m; sourceTree = "<group>"; };
 		857B020112C627C200DEA306 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -581,6 +587,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				855DD3751491001E00FADE12 /* Extensions */,
 				E4D36EA31459AC5B00477B1E /* audio */,
 				4318696C13F68D410051D97A /* pim */,
 				85A158E312F80E520044BBE1 /* UI */,
@@ -732,6 +739,17 @@
 				853983AA116CADEF000521C0 /* hashmap.h */,
 			);
 			name = hashmap;
+			sourceTree = "<group>";
+		};
+		855DD3751491001E00FADE12 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				855DD37B149114DC00FADE12 /* MoSyncExtension.mm */,
+				855DD3771491002D00FADE12 /* MoSync.h */,
+				855DD3781491002D00FADE12 /* MoSync.mm */,
+				855DD3791491002D00FADE12 /* MoSyncExtension.h */,
+			);
+			name = Extensions;
 			sourceTree = "<group>";
 		};
 		85923F23114539D4004875E4 /* filelist */ = {
@@ -1265,6 +1283,8 @@
 				E4D36EA91459AC5B00477B1E /* AudioSyscall.mm in Sources */,
 				E4D36EAD1459B5B600477B1E /* AudioInstance.mm in Sources */,
 				4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */,
+				855DD37A1491002D00FADE12 /* MoSync.mm in Sources */,
+				855DD37C149114DD00FADE12 /* MoSyncExtension.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
