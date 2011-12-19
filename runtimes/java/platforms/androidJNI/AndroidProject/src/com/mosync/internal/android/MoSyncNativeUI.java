@@ -476,4 +476,9 @@ public class MoSyncNativeUI implements RootViewReplacedListener
 	{
 		return mNativeUI.getCameraView(handle);
 	}
+
+	public Widget getWidget(final int handle)
+	{
+		return mNativeUI.getWidget(handle);
+	}
 }

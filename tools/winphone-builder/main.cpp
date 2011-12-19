@@ -30,7 +30,7 @@ using namespace std;
 // the one used when developing. This way the main project
 // can be used as a template bundled with the mosync framework.
 // It takes an input filename and an output filename, and finally
-// a output project type. The type of project determines which
+// an output project type. The type of project determines which
 // files the project requires. The two types available now
 // are rebuilt and interpreted.
 
@@ -91,9 +91,9 @@ static pugi::xml_node getNode(const pugi::xml_node& node, const std::string& xpa
 
 struct LibraryReference
 {
-	LibraryReference(const std::string& name, const std::string& value) :
-		name(name),
-		value(value)
+	LibraryReference(const std::string& _name, const std::string& _value) :
+		name(_name),
+		value(_value)
 	{
 	}
 
@@ -238,8 +238,8 @@ int main(int argc, char **argv) {
 
 	for(size_t i = 0; i < libraryReferences.size(); i++)
 	{
-		pugi::xml_node firstReferenceNode = getNode(project, "ItemGroup/Reference[@Include]");
-		pugi::xml_node refNode = firstReferenceNode.parent().insert_child_before("Reference", firstReferenceNode);
+		pugi::xml_node firstLibReferenceNode = getNode(project, "ItemGroup/Reference[@Include]");
+		pugi::xml_node refNode = firstLibReferenceNode.parent().insert_child_before("Reference", firstLibReferenceNode);
 		pugi::xml_attribute refAttrNode = refNode.append_attribute("Include");
 		refAttrNode.set_value(libraryReferences[i].name.c_str());
 		pugi::xml_node hintPath = refNode.append_child("HintPath").append_child(pugi::node_pcdata);

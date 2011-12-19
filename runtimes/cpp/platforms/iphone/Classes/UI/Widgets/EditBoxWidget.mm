@@ -81,7 +81,7 @@
 		if(!color) return MAW_RES_INVALID_PROPERTY_VALUE;
 		textField.textColor = color;
 	}
-	else if([key isEqualToString:@MAW_LABEL_FONT_SIZE]) {
+	else if([key isEqualToString:@MAW_EDIT_BOX_FONT_COLOR]) {
 		float fontSize = [value floatValue];
 		textField.font = [UIFont boldSystemFontOfSize:fontSize];
 	}
@@ -92,8 +92,65 @@
 		   textField.secureTextEntry = YES;
 		else
 		   textField.secureTextEntry = NO;
-
 	}
+    else if([key isEqualToString:@MAW_EDIT_BOX_INPUT_MODE])
+    {
+        int type = [value intValue];
+        int typeFound = true;
+        switch (type)
+        {
+            case MAW_EDIT_BOX_TYPE_EMAILADDR:
+                textField.keyboardType = UIKeyboardTypeEmailAddress;
+                break;
+            case MAW_EDIT_BOX_TYPE_NUMERIC:
+                textField.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
+                break;
+            case MAW_EDIT_BOX_TYPE_PHONENUMBER:
+                textField.keyboardType = UIKeyboardTypePhonePad;
+                break;
+            case MAW_EDIT_BOX_TYPE_URL:
+                textField.keyboardType = UIKeyboardTypeURL;
+                break;
+            case MAW_EDIT_BOX_TYPE_DECIMAL:
+                textField.keyboardType = UIKeyboardTypeDecimalPad;
+                break;
+            case MAW_EDIT_BOX_TYPE_SINGLE_LINE:
+                textField.keyboardType = UIKeyboardTypeDefault;
+                break;
+            default:
+                typeFound = false;
+        }
+        if (!typeFound)
+        {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+    }
+    else if([key isEqualToString:@MAW_EDIT_BOX_INPUT_FLAG])
+    {
+        int flag = [value intValue];
+        bool flagFound = true;
+        switch (flag)
+        {
+            case MAW_EDIT_BOX_FLAG_PASSWORD:
+                textField.secureTextEntry = YES;
+                break;
+            case MAW_EDIT_BOX_FLAG_INITIAL_CAPS_WORD:
+                textField.autocapitalizationType = UITextAutocapitalizationTypeWords;
+                break;
+            case MAW_EDIT_BOX_FLAG_INITIAL_CAPS_SENTENCE:
+                textField.autocapitalizationType = UITextAutocapitalizationTypeSentences;
+                break;
+            case MAW_EDIT_BOX_FLAG_INITIAL_CAPS_ALL_CHARACTERS:
+                textField.autocapitalizationType = UITextAutocapitalizationTypeAllCharacters;
+                break;
+            default:
+                flagFound = false;
+        }
+        if (!flagFound)
+        {
+            return MAW_RES_INVALID_PROPERTY_VALUE;
+        }
+    }
 	else {
 		return [super setPropertyWithKey:key toValue:value];
 	}

@@ -23,6 +23,7 @@ import java.util.Map.Entry;
 import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabHost.TabContentFactory;
 import android.widget.TabHost.TabSpec;
@@ -36,20 +37,21 @@ import com.mosync.nativeui.util.properties.PropertyConversionException;
 /**
  * A screen that allows navigation between screens using
  * tabs.
- * 
+ *
  * @author fmattias
  */
-public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleChangedListener
+public class TabScreenWidget extends ScreenWidget
+	implements ScreenWidget.TitleChangedListener, ScreenWidget.IconChangedListener
 {
 	/**
 	 * Map from a screen widget to its tab index in this
 	 * screen.
 	 */
 	private HashMap<ScreenWidget, Integer> m_tabIndexToScreen = new HashMap<ScreenWidget, Integer>( );
-	
+
 	/**
 	 * Constructor
-	 * 
+	 *
 	 * @param handle handle Integer handle corresponding to this instance.
 	 * @param view A TabHost wrapped by this widget.
 	 */
@@ -68,20 +70,20 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 			Log.w( "MoSync", "Adding tab to a specific index other than last is" +
 					" currently not supported on Android." );
 		}
-		
+
 		if( !( child instanceof ScreenWidget ) )
 		{
 			return;
 		}
 		ScreenWidget screen = (ScreenWidget) child;
 		final View screenView = screen.getView( );
-		
+
 		TabHost tab = (TabHost) getView( );
-		
+
 		int indexOfNewTab = tab.getTabWidget( ).getChildCount( );
 		TabSpec tabSpec = tab.newTabSpec( Integer.toString( indexOfNewTab ) );
 		setIndicators( tabSpec, screen.getTitle( ), screen.getIcon( ) );
-		
+
 		// Provides the tab with its content.
 		tabSpec.setContent( new TabContentFactory( ) {
 			@Override
@@ -94,6 +96,7 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 		tab.addTab( tabSpec );
 		m_tabIndexToScreen.put( screen, indexOfNewTab );
 		screen.setTitleChangedListener( this );
+		screen.setIconChangedListener(this);
 	}
 
 	private void setIndicators(TabSpec tabSpec, String title, Drawable icon)
@@ -116,17 +119,17 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 		{
 			return true;
 		}
-		
+
 		TabHost tabHost = (TabHost) getView( );
 		if( property.equals( IX_WIDGET.MAW_TAB_SCREEN_CURRENT_TAB ) )
 		{
-			int currentTabIndex = IntConverter.convert( value );			
+			int currentTabIndex = IntConverter.convert( value );
 			tabHost.setCurrentTab( currentTabIndex );
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public String getProperty(String property)
 	{
@@ -140,7 +143,7 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 			return super.getProperty( property );
 		}
 	}
-	
+
 	/**
 	 * Passes on the back event to the currently active tab.
 	 */
@@ -149,7 +152,7 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 	{
 		TabHost tabHost = (TabHost) getView( );
 		int currentTabIndex = tabHost.getCurrentTab( );
-		
+
 		// This set is likely to be small so we can safely iterate over it
 		for( Entry<ScreenWidget, Integer> entry : m_tabIndexToScreen.entrySet( ) )
 		{
@@ -159,7 +162,7 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -183,8 +186,20 @@ public class TabScreenWidget extends ScreenWidget implements ScreenWidget.TitleC
 		{
 			return;
 		}
-		
+
 		TextView tabTitle = (TextView) tabIndicatorView.findViewById( android.R.id.title );
 		tabTitle.setText( newTitle );
+	}
+
+	@Override
+	public void iconChanged(ScreenWidget screen, Drawable newIcon)
+	{
+//		Log.e("@@MoSync","TabIcon changed");
+
+		int tabIndex = m_tabIndexToScreen.get( screen );
+		TabHost tabHost = (TabHost) getView( );
+		View tabIndicatorView = tabHost.getTabWidget( ).getChildTabViewAt( tabIndex );
+		ImageView icon = (ImageView) tabIndicatorView.findViewById(android.R.id.icon);
+		icon.setImageDrawable(newIcon);
 	}
 }

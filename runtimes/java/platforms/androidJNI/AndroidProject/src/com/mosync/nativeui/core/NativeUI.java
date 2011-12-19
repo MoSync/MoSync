@@ -143,6 +143,11 @@ public class NativeUI
 		return m_imageTable;
 	}
 
+	public HandleTable<Widget> getWidgetTable()
+	{
+		return m_widgetTable;
+	}
+
 	/**
 	 * Sets the default MoSync canvas view, so that it is possible
 	 * to switch back to it from native UI.
@@ -718,6 +723,11 @@ public class NativeUI
 	public Widget getCameraView(final int handle)
 	{
 		return m_widgetTable.get(handle);
+	}
+
+	public Widget getWidget(final int handle)
+	{
+		return (Widget) m_widgetTable.get( handle );
 	}
 
 }

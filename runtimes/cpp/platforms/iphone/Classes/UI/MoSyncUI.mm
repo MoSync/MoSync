@@ -275,7 +275,7 @@ static IWidget* sOldScreen = nil;
 			popOverController = [[UIPopoverController alloc] initWithContentViewController:controller];
 		}
 		popOverController.contentViewController = controller;
-		popOverController.delegate = controller.delegate;
+		popOverController.delegate = (NSObject*) controller.delegate;
 		[popOverController presentPopoverFromRect:[sOldScreen getView].frame inView:[sOldScreen getView] permittedArrowDirections:UIPopoverArrowDirectionAny animated:YES];
 	}
 

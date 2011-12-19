@@ -65,6 +65,21 @@ namespace NativeUI
     }
 
     /**
+     * Set the font color of the widget's text.
+     * @param color A hexadecimal value 0xRRGGBB, where R, G and B are the
+     *              red, green and blue components respectively.
+     * @return Any of the following result codes:
+     * - #MAW_RES_OK if the property could be set.
+     * - #MAW_RES_INVALID_PROPERTY_VALUE if the color value was invalid.
+     */
+    int EditBox::setFontColor(const int color)
+    {
+        char buffer[BUF_SIZE];
+        sprintf(buffer, "0x%.6X", color);
+        return this->setProperty(MAW_EDIT_BOX_FONT_COLOR, buffer);
+    }
+
+    /**
      * Set a text in the edit box that acts as a placeholder when an
      * edit box is empty.
      * @param text The given text.

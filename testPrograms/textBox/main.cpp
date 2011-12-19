@@ -42,7 +42,7 @@ public:
 
 	void keyPressEvent(int keyCode, int nativeCode) {
 		printf("kP: %i, %i\n", keyCode, nativeCode);
-		if(keyCode == MAK_0)
+		if(keyCode == MAK_0 || keyCode == MAK_FIRE)
 			close();
 	}
 };

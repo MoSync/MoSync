@@ -14,6 +14,7 @@ namespace MoSync
 {
 	public class GraphicsModule : ISyscallModule, IIoctlModule
 	{
+		private Image mMainImage;
 		public WriteableBitmap mFrontBuffer;
 		public WriteableBitmap mBackBuffer;
 		public WriteableBitmap mCurrentDrawTarget;
@@ -23,10 +24,26 @@ namespace MoSync
 		private System.Windows.Media.Color mCurrentWindowsColor;
 		private double mCurrentFontSize = 24;
 
+		TextBlock textBlock = new TextBlock();
+		public void SetCurrentFontSource(System.Windows.Documents.FontSource src)
+		{
+			//textBlock.FontSize = mCurrentFontSize;
+			textBlock.FontSource = src;
+		}
+
 		protected void InvalidateWriteableBitmapOnMainThread(WriteableBitmap bitmap)
 		{
 			MoSync.Util.RunActionOnMainThreadSync(() =>
 			{
+				bitmap.Invalidate();
+			});
+		}
+
+		protected void InvalidateWriteableBitmapBackBufferOnMainThread(WriteableBitmap bitmap)
+		{
+			MoSync.Util.RunActionOnMainThreadSync(() =>
+			{
+				mMainImage.Source = bitmap;
 				bitmap.Invalidate();
 			});
 		}
@@ -39,12 +56,14 @@ namespace MoSync
 			if ((int)screenHeight == 0)
 				throw new Exception("screenHeight");
 			PhoneApplicationPage mainPage = (PhoneApplicationPage)frame.Content;
-			Image mainImage = new Image();
+			mMainImage = new Image();
+
+
 			mainPage.Width = screenWidth;
 			mainPage.Height = screenHeight;
-			mainImage.Width = screenWidth;
-			mainImage.Height = screenHeight;
-			mainPage.Content = mainImage;
+			mMainImage.Width = screenWidth;
+			mMainImage.Height = screenHeight;
+			mainPage.Content = mMainImage;
 
 			mClipRect.X = 0.0;
 			mClipRect.Y = 0.0;
@@ -67,7 +86,7 @@ namespace MoSync
 				(int)screenWidth,
 				(int)screenHeight);
 
-			mainImage.Source = mFrontBuffer;
+			mMainImage.Source = mFrontBuffer;
 			mCurrentDrawTarget = mBackBuffer;
 
 			mCurrentWindowsColor = System.Windows.Media.Color.FromArgb(0xff,
@@ -110,7 +129,8 @@ namespace MoSync
 
 			syscalls.maUpdateScreen = delegate()
 			{
-				System.Array.Copy(mBackBuffer.Pixels, mFrontBuffer.Pixels, mFrontBuffer.PixelWidth * mFrontBuffer.PixelHeight);
+				//System.Array.Copy(mBackBuffer.Pixels, mFrontBuffer.Pixels, mFrontBuffer.PixelWidth * mFrontBuffer.PixelHeight);
+				System.Buffer.BlockCopy(mBackBuffer.Pixels, 0, mFrontBuffer.Pixels, 0, mFrontBuffer.PixelWidth * mFrontBuffer.PixelHeight * 4);
 				InvalidateWriteableBitmapOnMainThread(mFrontBuffer);
 			};
 
@@ -130,7 +150,6 @@ namespace MoSync
 				mCurrentDrawTarget.DrawLine((int)p1.x, (int)p1.y, (int)p2.x, (int)p2.y, (int)mCurrentColor);
 			};
 
-			TextBlock textBlock = new TextBlock();
 			textBlock.FontSize = mCurrentFontSize;
 
 			syscalls.maDrawText = delegate(int left, int top, int str)
@@ -414,7 +433,7 @@ namespace MoSync
 				int srcRectH = dataMemory.ReadInt32(_srcRect + MoSync.Struct.MARect.height);
 				int lineDst = _dst;
 				byte[] data = src.ToByteArray(srcRectY * src.PixelWidth,
-					srcRectH * src.PixelWidth);
+					srcRectH * src.PixelWidth); // BlockCopy?
 				byte[] coreArray = dataMemory.GetData();
 				for (int y = 0; y < srcRectH; y++)
 				{
@@ -455,14 +474,21 @@ namespace MoSync
 
 				syscalls.maUpdateScreen = delegate()
 				{
-					int[] dst = mFrontBuffer.Pixels;
 					Memory mem = core.GetDataMemory();
+					int[] dst = mFrontBuffer.Pixels;
+
+					//mFrontBuffer.FromByteArray(mem.GetData(), frameBufferPointer, dst.Length * 4);
+					System.Buffer.BlockCopy(mem.GetData(), frameBufferPointer, dst, 0, dst.Length * 4);
+					const int opaque = (int)(0xff<<24);
 					for (int i = 0; i < dst.Length; i++)
 					{
-						dst[i] = (int)(0xff000000 | mem.ReadUInt32(frameBufferPointer + i * 4));
+						dst[i] |= opaque;
 					}
 
-					InvalidateWriteableBitmapOnMainThread(mFrontBuffer);
+					InvalidateWriteableBitmapBackBufferOnMainThread(mFrontBuffer);
+					WriteableBitmap temp = mFrontBuffer;
+					mFrontBuffer = mBackBuffer;
+					mBackBuffer = temp;
 				};
 
 				return 1;

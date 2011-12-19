@@ -80,4 +80,6 @@ void setName(std::ios& i, const char* name);
 // Reports the error using the name set by setName().
 void beGood(std::ios& i);
 
+bool streq(const char* a, const char* b);
+
 #endif	//UTIL_H

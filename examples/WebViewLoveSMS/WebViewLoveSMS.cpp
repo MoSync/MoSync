@@ -73,6 +73,7 @@ class LoveSMSMoblet : public WebAppMoblet
 public:
 	LoveSMSMoblet()
 	{
+		extractFileSystem();
 		enableWebViewMessages();
 		getWebView()->disableZoom();
 		showPage("PageMain.html");
@@ -198,7 +199,7 @@ public:
 	 */
 	String loadPhoneNo()
 	{
-		MAUtil::String phoneNo;
+		String phoneNo;
 		bool success = getFileUtil()->readTextFromFile(phoneNoPath(), phoneNo);
 		if (success)
 		{

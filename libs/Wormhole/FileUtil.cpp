@@ -94,7 +94,7 @@ namespace Wormhole
 		const MAUtil::String& destinationPath)
 	{
 		setCurrentFileSystem(handle, 0);
-		int result = extractCurrentFileSystem(destinationPath.c_str());
+		int result = MAFS_extractCurrentFileSystem(destinationPath.c_str());
 		freeCurrentFileSystem();
 		return 1 == result;
 	}
@@ -112,6 +112,18 @@ namespace Wormhole
 	bool FileUtil::extractLocalFiles()
 	{
 		return extractFileSystem(1, getLocalPath());
+	}
+
+	/**
+	 * Get the checksum of a file bundle.
+	 * @param handle The resource handle of the bundled
+	 * file system. Bundles are created with the Bundle tool
+	 * that comes with MoSync.
+	 * @return A 32-bit checksum.
+	 */
+	int FileUtil::getFileSystemChecksum(MAHandle handle)
+	{
+		return MAFS_getFileSystemChecksum(handle);
 	}
 
 	/**

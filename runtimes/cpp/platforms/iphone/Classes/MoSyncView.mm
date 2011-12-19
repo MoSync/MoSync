@@ -155,8 +155,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
             self.contentScaleFactor = 2.0;
         }
         
-		self.frame.origin.y = 0;
-		self.frame.origin.x = 0;
+		self.frame.origin = CGRectZero.origin;
 		mosyncView = nil;
         // Initialization code
 		locationController = [[MoSyncCLController alloc] init];

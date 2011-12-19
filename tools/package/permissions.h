@@ -42,6 +42,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #define HOMESCREEN "Home Screen"
 #define AUTOSTART "Auto Start"
 #define NFC "NFC"
+#define PUSH_NOTIFICATIONS "Push Notifications"
 
 // Parse permissions
 void parsePermissions(std::set<std::string>& out, const char* permissions);

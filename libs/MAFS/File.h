@@ -387,9 +387,11 @@ int MA_fsetpos ( MA_FILE * stream, const fpos_t * pos );
 * Only one file system image may be mounted at a time.
 * All following calls to the file api functions will use this image.
 
-* \param fileSystem MAHandle to the binary resource containing the file system image to be mounted.
-* \param caseSensitive An int stating whether to take case into account (1) or not (0).
-* Emulating a Windows file system should have this set as 0, while Unix should be 1.
+* \param fileSystem MAHandle to the binary resource containing the
+* file system image to be mounted.
+* \param caseSensitive An int stating whether to take case into
+* account (1) or not (0). Emulating a Windows file system should
+* have this set as 0, while Unix should be 1.
 */
 void setCurrentFileSystem(MAHandle fileSystem, int caseSensitive);
 
@@ -397,6 +399,17 @@ void setCurrentFileSystem(MAHandle fileSystem, int caseSensitive);
 * Frees the resources allocated for the current file system.
 */
 void freeCurrentFileSystem(void);
+
+/**
+* Returns a checksum for the file system, if the header contains that.
+* (Old Bundle format does not have a checksum.)
+*
+* \param fileSystem MAHandle to the binary resource containing the
+* file system image.
+*
+* \return A checksum value, returns 0 if there is no checksum available.
+*/
+int MAFS_getFileSystemChecksum(MAHandle fileSystem);
 
 /**
 * Extract the current file system bundle to the local file
@@ -408,7 +421,7 @@ void freeCurrentFileSystem(void);
 *
 * \return 1 on success, -1 on error.
 */
-int extractCurrentFileSystem(const char* destPath);
+int MAFS_extractCurrentFileSystem(const char* destPath);
 
 /*
 // not implemented yet

@@ -45,6 +45,12 @@ namespace NativeUI
      */
     Layout::~Layout()
      {
+        for (int i = 0; i < mBanner.size(); ++i)
+        {
+            delete mBanner[i];
+        }
+
+        mBanner.clear();
      }
 
 	/**
@@ -113,4 +119,37 @@ namespace NativeUI
 	{
 		return this->setPropertyInt(MAW_HORIZONTAL_LAYOUT_PADDING_BOTTOM, value);
 	}
+
+	/**
+	 * Ads a banner as a child of this widget.
+	 * @param banner The banner tat will be added.
+	 */
+	void Layout::addBanner(Ads::Banner* banner)
+	{
+		mBanner.add(banner);
+		maAdsAddBannerToLayout(
+			banner->getHandle(),
+			this->getWidgetHandle());
+	}
+
+	/**
+	 * Remove a child banner from its parent(but does not destroy it).
+	 * @param banner The banner to be removed.
+	 */
+	void Layout::removeBanner(Ads::Banner* banner)
+	{
+        for (int i = 0; i< mBanner.size(); i++)
+        {
+            if (banner == mBanner[i])
+            {
+                mBanner.remove(i);
+                break;
+            }
+        }
+
+        maAdsRemoveBannerFromLayout(
+            banner->getHandle(),
+            this->getWidgetHandle());
+	}
+
 } // namespace NativeUI
