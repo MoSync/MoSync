@@ -563,7 +563,7 @@ interface MAAPI {
 	*
 	* @param handle The handle to be released.
 	*/
-	void maDestroyPlaceholder(in MAHandle placeholder);
+	void maDestroyPlaceholder(in MAHandle handle);
 
 	/**
 	* Destroys an object of any type. The handle becomes a placeholder.
