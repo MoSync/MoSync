@@ -89,8 +89,14 @@ namespace MoSync
 				int handle = MoSync.Constants.MA_EXTENSION_MODULE_UNAVAILABLE;
 
 				String name = core.GetDataMemory().ReadStringAtAddress(_name);
-				if(GetModule(name, out handle) != null)
+				IExtensionModule module = null;
+				if((module = GetModule(name, out handle)) != null)
 				{
+					if (module.GetHash() != (uint)_hash)
+					{
+						MoSync.Util.CriticalError("Invalid extension hash!");
+					}
+
 					return handle;
 				}
 

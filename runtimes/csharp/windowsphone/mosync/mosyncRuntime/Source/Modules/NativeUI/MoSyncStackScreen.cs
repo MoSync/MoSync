@@ -124,7 +124,10 @@ namespace MoSync
                  */
                 if (0 < mStack.Count)
                 {
-                    (View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
+					MoSync.Util.RunActionOnMainThreadSync(() =>
+					{
+						(View as Microsoft.Phone.Controls.PhoneApplicationPage).Content = (mStack.Peek() as NativeUI.WidgetBaseWindowsPhone).View;
+					});
                 }
             }
 
