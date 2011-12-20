@@ -29,7 +29,7 @@ namespace MoSync
                 if (child is ApplicationBarButton)
                 {
                     Microsoft.Phone.Shell.ApplicationBarIconButton button = new Microsoft.Phone.Shell.ApplicationBarIconButton();
-                    button.IconUri = new Uri((child as ApplicationBarButton).IconUri, UriKind.Relative);
+                    button.IconUri = (child as ApplicationBarButton).iconUri();
                     button.Text = (child as ApplicationBarButton).Text;
 
                     mApplicationBar.Buttons.Add(button);
@@ -45,6 +45,23 @@ namespace MoSync
             public Microsoft.Phone.Shell.ApplicationBar GetApplicationBar()
             {
                 return mApplicationBar;
+            }
+
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_APPLICATION_BAR_VISIBLE)]
+            public String Visible
+            {
+                set
+                {
+                    bool val = false;
+                    if (bool.TryParse(value, out val))
+                    {
+                        mApplicationBar.IsVisible = val;
+                    }
+                }
+                get
+                {
+                    return mApplicationBar.IsVisible.ToString();
+                }
             }
         }
     }

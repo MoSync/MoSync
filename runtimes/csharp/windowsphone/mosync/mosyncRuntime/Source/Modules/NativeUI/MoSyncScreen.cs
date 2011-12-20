@@ -107,11 +107,19 @@ namespace MoSync
             public override void AddChild(IWidget child)
             {
                 base.AddChild(child);
-                WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
-                MoSync.Util.RunActionOnMainThreadSync(() =>
+
+                if (child is ApplicationBar)
                 {
-                    mPage.Content = w.View;
-                });
+                    AddApplicationBar(child);
+                }
+                else
+                {
+                    WidgetBaseWindowsPhone w = (WidgetBaseWindowsPhone)child;
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        mPage.Content = w.View;
+                    });
+                }
             }
 
             /**
@@ -179,7 +187,11 @@ namespace MoSync
             {
                 if (applicationBar is ApplicationBar)
                 {
-                    ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar = (applicationBar as ApplicationBar).GetApplicationBar();
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar = (applicationBar as ApplicationBar).GetApplicationBar();
+                        ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar.IsVisible = mApplicationBar.IsVisible;
+                    });
                 }
             }
         }

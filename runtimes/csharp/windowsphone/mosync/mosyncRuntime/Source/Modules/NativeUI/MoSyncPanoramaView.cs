@@ -58,7 +58,11 @@ namespace MoSync
              */
             public override void AddChild(IWidget child)
             {
-                if (child is Screen)
+                if (child is ApplicationBar)
+                {
+                    AddApplicationBar(child);
+                }
+                else if (child is Screen)
                 {
                     MoSync.Util.RunActionOnMainThreadSync(() =>
                     {

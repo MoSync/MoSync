@@ -22,6 +22,7 @@ namespace MoSync
                 mView = null;
             }
 
+            [MoSyncWidgetProperty(MoSync.Constants.MAW_APPLICATION_BAR_MENU_ITEM_TEXT)]
             public String Text
             {
                 set
