@@ -94,7 +94,6 @@ PhoneGap.addResource = function(name) {
 
 PhoneGap.exec = function(success, fail, service, action, args)
 {
-
     var callbackId = service + PhoneGap.callbackId++;
     if (typeof success == "function" || typeof fail == "function")
     {
@@ -171,12 +170,9 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
     var commandResult;
     try
     {
-        commandResult = MoSync.parseJSON(args);
+        console.log("@@ PhoneGap.CallbackSuccess " + callbackId + " " + unescape(args));
 
-        console.log("@@ BEGIN --------------");
-        console.log("@@ callbackId: " + callbackId);
-        PrintObj(commandResult);
-        console.log("@@ END --------------");
+        commandResult = MoSync.parseJSON(args);
 
         if (typeof cast !== 'undefined')
         {
@@ -2941,6 +2937,11 @@ LocalFileSystem.prototype._createEntry = function(castMe) {
     return entry;
 };
 
+/**
+ * This function casts a File object, or a Date. The name is
+ * confusing.
+ * TODO: Rename?
+ */
 LocalFileSystem.prototype._castDate = function (pluginResult) {
     if (pluginResult.message.modificationTime) {
         var modTime = new Date(pluginResult.message.modificationTime);

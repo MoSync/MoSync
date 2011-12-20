@@ -71,7 +71,7 @@ public:
 	void callSuccess(
 		const MAUtil::String& callbackID,
 		const MAUtil::String& args,
-		const MAUtil::String& castFunction
+		const MAUtil::String& castFunction = ""
 		);
 
 	void callFileError(
@@ -87,17 +87,21 @@ public:
 	/**
 	 * Return a FileSystem object.
 	 */
-	void handleRequestFileSystem(PhoneGapMessage& message);
+	void actionRequestFileSystem(PhoneGapMessage& message);
 
 	/**
 	 * Return a FileEntry object.
 	 */
-	void handleGetFile(PhoneGapMessage& message);
+	void actionGetFile(PhoneGapMessage& message);
 
 	/**
 	 * Return a File object.
 	 */
-	void handleGetFileMetaData(PhoneGapMessage& message);
+	void actionGetFileMetadata(PhoneGapMessage& message);
+
+	void actionWrite(PhoneGapMessage& message);
+
+	void actionReadAsText(PhoneGapMessage& message);
 
 private:
 	PhoneGapMessageHandler* mMessageHandler;

@@ -23,6 +23,7 @@ MA 02110-1301, USA.
  * Implementation of PhoneGap calls made from JavaScript.
  */
 
+#include <mastring.h>
 #include <conprint.h>
 #include <MAUtil/String.h>
 #include <MAUtil/HashDict.h>
@@ -59,10 +60,10 @@ using namespace MAUtil;
 
 // For unknown type it is recommended to use 'application/octet-stream'.
 // http://stackoverflow.com/questions/1176022/unknown-file-type-mime
-static String DefaultMimeType = "application/octet-stream";
+static String MimeTypeDefault = "application/octet-stream";
 
 /// Stores mime type for all necessary extension
-static char* MIMETypesDictionary[][2] =
+static char* MimeTypeDictionary[][2] =
 {
 	{"avi", "video/x-msvideo"},
 	{"bmp", "image/bmp"},
@@ -102,17 +103,125 @@ static char* MIMETypesDictionary[][2] =
 	{"wbmp", "image/vnd.wap.wbmp"}
 };
 
+static String FileGetMimeType(const String& filePath)
+{
+	// Get the file name extension.
+	int pos = filePath.findLastOf('.');
+	if (pos == String::npos)
+	{
+		// Extension not found.
+		return MimeTypeDefault;
+	}
+
+	// Move to position after the '.'
+	pos = pos + 1;
+
+	int extensionLength = filePath.size() - pos;
+	if (extensionLength > 7)
+	{
+		// Something is wrong, we do not support that long extensions.
+		return MimeTypeDefault;
+	}
+
+	// Extract extension.
+	String extension = filePath.substr(pos, extensionLength);
+	char ext[8];
+	strcpy(ext, extension.c_str());
+
+	// Do linear search in MIME type table.
+	// TODO: Optimize, use hash table.
+	int size = sizeof(MimeTypeDictionary) / (sizeof(char*) * 2);
+	for (int i = 0; i < size; ++i)
+	{
+		char* ext2 = MimeTypeDictionary[i][0];
+		lprintfln("@@@@@ FileGetMimeType size: %i ext: %s ext2: %s", size, ext, ext2);
+		if (0 == stricmp(ext, ext2))
+		{
+			return MimeTypeDictionary[i][1];
+		}
+	}
+
+	return MimeTypeDefault;
+}
+
+/**
+ * TODO: This wound work to get a directory name if
+ * the path ends with a slash, e.g.: /sdcard/MyMusic/
+ */
+static String FileGetName(const String& filePath)
+{
+	// Find last slash.
+	int pos = filePath.findLastOf('/');
+	if (String::npos == pos)
+	{
+		// No slash found, just return the file path.
+		return filePath;
+	}
+
+	// Move to position after the '/'
+	pos = pos + 1;
+
+	// Return file name.
+	return filePath.substr(pos, filePath.size() - pos);
+}
+
+/**
+ * Get size of a file.
+ * @return File size on success, <0 on error.
+ */
+static int FileGetSize(const String& path)
+{
+	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	int size = maFileSize(file);
+	maFileClose(file);
+	return size;
+}
+
+/**
+ * Get date of a file.
+ * @return File date on the form "Mon Dec 19 2011 12:46:43 GMT+0100 (CET)".
+ * Returns empty string on error.
+ */
+static String FileGetDate(const String& path)
+{
+	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return "";
+	}
+
+	int date = maFileDate(file);
+	if (date < 0)
+	{
+		// Error.
+		return "";
+	}
+	maFileClose(file);
+
+	// TODO: Implement string formatting of date/time/timezone.
+	// Can you obtain time zone in MoSync?
+	return "Mon Dec 19 2011 12:46:43 GMT+0100 (CET)";
+}
+
 /**
  * TODO: Handle the case of a directory that does not end with /.
  */
 static bool FileExists(const String& path)
 {
 	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return false;
+	}
 	int exists = maFileExists(file);
 	maFileClose(file);
 	return 1 == exists;
 }
-
 
 /**
  * @return path of parent directory, ending with a slash.
@@ -139,7 +248,9 @@ static String FileGetParentDirectory(const String& fullPath)
 		return "";
 	}
 
-	// Return parent path.
+	lprintfln("@@@@@@@ FileGetParentDirectory: %s", (path.substr(0, pos)).c_str());
+
+	// Return parent path, including the slash.
 	return path.substr(0, pos);
 }
 
@@ -149,6 +260,11 @@ static String FileGetParentDirectory(const String& fullPath)
 static bool FileCreate(const String& path)
 {
 	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return false;
+	}
+
 	int result = maFileCreate(file);
 	maFileClose(file);
 	return 0 == result;
@@ -177,36 +293,77 @@ static bool FileCreatePath(const String& path)
 }
 
 /**
- * Get size of a file.
- * @return File size on success, <0 on error.
+ * @return >0 on success, <0 on error.
  */
-static int FileSize(const String& path)
+static int FileWrite(const String& path, const String& data, int position)
 {
-	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
-	int size = maFileSize(file);
+	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);	if (file < 0)
+	{
+		return -1;
+	}
+
+	// TODO: Now we assume file must exist. Is that ok?
+	//int exists = maFileExists(file);
+
+	int result = maFileSeek(file, position, MA_SEEK_SET);
+
+	// New position must equal requested position.
+	if (result != position)
+	{
+		return -1;
+	}
+
+	result = maFileWrite(file, data.c_str(), data.size());
+	if (result < 0)
+	{
+		return -1;
+	}
+
 	maFileClose(file);
-	return size;
+
+	return 1;
 }
 
 /**
- * Get date of a file.
- * @return File date on the form "Mon Dec 19 2011 12:46:43 GMT+0100 (CET)".
- * Returns empty string on error.
+ * @return >0 on success, <0 on error.
  */
-static String FileDate(const String& path)
+static int FileRead(const String& path, String& data)
 {
 	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
-	int date = maFileDate(file);
-	if (date < 0)
+	if (file < 0)
 	{
-		// Error.
-		return "";
+		return -1;
 	}
+
+	int size = maFileSize(file);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	char* buf = (char*) malloc(size + 1);
+	if (NULL == buf)
+	{
+		return -1;
+	}
+
+	int result = maFileRead(file, buf, size);
+
 	maFileClose(file);
 
-	// TODO: Implement string formatting of date/time/timezone.
-	// Can you obtain time zone in MoSync?
-	return "Mon Dec 19 2011 12:46:43 GMT+0100 (CET)";
+	if (result < 0)
+	{
+		free(buf);
+		return -1;
+	}
+
+	buf[size] = 0;
+
+	data = buf;
+
+	free(buf);
+
+	return 1;
 }
 
 /**
@@ -298,24 +455,32 @@ void PhoneGapFile::handleMessage(PhoneGapMessage& message)
 {
 	if (message.getParam("action") == "requestFileSystem")
 	{
-		handleRequestFileSystem(message);
+		actionRequestFileSystem(message);
 	}
 	else if (message.getParam("action") == "getFile")
 	{
-		handleGetFile(message);
+		actionGetFile(message);
 	}
 	else if (message.getParam("action") == "getFileMetadata")
 	{
-		handleGetFileMetaData(message);
+		actionGetFileMetadata(message);
+	}
+	else if (message.getParam("action") == "write")
+	{
+		actionWrite(message);
+	}
+	else if (message.getParam("action") == "readAsText")
+	{
+		actionReadAsText(message);
 	}
 }
 
 /**
  * Return a FileSystem object.
  */
-void PhoneGapFile::handleRequestFileSystem(PhoneGapMessage& message)
+void PhoneGapFile::actionRequestFileSystem(PhoneGapMessage& message)
 {
-	lprintfln("@@@ requestFileSystem\n");
+	lprintfln("@@@ actionRequestFileSystem\n");
 
 	String callbackID = message.getParam("PhoneGapCallBackId");
 
@@ -347,9 +512,9 @@ void PhoneGapFile::handleRequestFileSystem(PhoneGapMessage& message)
 /**
  * Return a FileEntry object.
  */
-void PhoneGapFile::handleGetFile(PhoneGapMessage& message)
+void PhoneGapFile::actionGetFile(PhoneGapMessage& message)
 {
-	lprintfln("@@@ getFile\n");
+	lprintfln("@@@ actionGetFile\n");
 
 	String callbackID = message.getParam("PhoneGapCallBackId");
 
@@ -384,11 +549,12 @@ void PhoneGapFile::handleGetFile(PhoneGapMessage& message)
 		}
 	}
 
+	// Create file if requested.
 	if (create)
 	{
 		if (exclusive)
 		{
-			// The file should not exist.
+			// The file must not exist if "exclusive" is true.
 			if (FileExists(fullFilePath))
 			{
 				callFileError(callbackID, FILEERROR_PATH_EXISTS_ERR);
@@ -408,8 +574,7 @@ void PhoneGapFile::handleGetFile(PhoneGapMessage& message)
 		}
 	}
 
-	// Obtain file data.
-
+	// Send back FileEntry data.
 	String fileEntry = emitFileEntry(
 		path,
 		fullFilePath);
@@ -422,11 +587,79 @@ void PhoneGapFile::handleGetFile(PhoneGapMessage& message)
 /**
  * Return a File object.
  */
-void PhoneGapFile::handleGetFileMetaData(PhoneGapMessage& message)
+void PhoneGapFile::actionGetFileMetadata(PhoneGapMessage& message)
 {
-	lprintfln("@@@ handleGetFileMetaData\n");
+	lprintfln("@@@ actionGetFileMetadata\n");
 
 	String callbackID = message.getParam("PhoneGapCallBackId");
 
 	String fullPath = message.getArgsField("fullPath");
+
+	char sizeBuf[64];
+	sprintf(sizeBuf, "%i", FileGetSize(fullPath));
+
+	String file = emitFile(
+		FileGetName(fullPath),
+		fullPath,
+		FileGetMimeType(fullPath),
+		FileGetDate(fullPath),
+		sizeBuf);
+
+	// Note that _castDate also casts a File object.
+	callSuccess(
+		callbackID,
+		file,
+		"window.localFileSystem._castDate");
+}
+
+void PhoneGapFile::actionWrite(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionWrite\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String fullPath = message.getArgsField("fileName");
+	String data = message.getArgsField("data");
+	int position = message.getArgsFieldInt("position");
+
+	int result = FileWrite(fullPath, data, position);
+	if (result < 0)
+	{
+		callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+		return;
+	}
+
+	// Send back the new file size.
+	char sizeBuf[64];
+	sprintf(sizeBuf, "%i", FileGetSize(fullPath));
+	callSuccess(
+		callbackID,
+		sizeBuf);
+}
+
+//mosync://PhoneGap?service=File&action=readAsText&args=
+//{"fileName":"/mnt/sdcard/helloworld.txt","encoding":"UTF-8"}&PhoneGapCallBackId=File8
+
+void PhoneGapFile::actionReadAsText(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionReadAsText\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String fullPath = message.getArgsField("fileName");
+	String encoding = message.getArgsField("encoding");
+	// TODO: Encoding is not used.
+
+	String content;
+	int result = FileRead(fullPath, content);
+	if (result < 0)
+	{
+		callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+		return;
+	}
+
+	// Send back the file content.
+	callSuccess(
+		callbackID,
+		content);
 }

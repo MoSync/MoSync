@@ -21,7 +21,112 @@ function PrintObject(obj, indent)
     }
 }
 
-function testFileSystem() {
+var FileSys = function()
+{
+    var self = {};
+
+    /**
+     * Make an error handling function that calls fun.
+     */
+    function error(fun)
+    {
+        return function(result)
+        {
+            console.log("@@@ FileSys error: " + result.code);
+            fun(false, null);
+        };
+    }
+
+    self.writeText = function(path, data, fun)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                fileSystem.root.getFile(
+                    path,
+                    { create: true },
+                    function(fileEntry)
+                    {
+                        var writer = new FileWriter(fileEntry);
+                        writer.onwrite = function(obj)
+                        {
+                            fun(true);
+                        };
+                        writer.error = function(obj)
+                        {
+                            fun(false);
+                        };
+                        writer.write(data);
+                    },
+                    error(fun));
+            },
+            error(fun));
+    };
+
+    self.readText = function(path, fun)
+    {
+        window.requestFileSystem(
+            LocalFileSystem.PERSISTENT,
+            0,
+            function (fileSystem)
+            {
+                fileSystem.root.getFile(
+                    path,
+                    { create: true },
+                    function(fileEntry)
+                    {
+                        var reader = new FileReader();
+                        reader.onload = function(obj)
+                        {
+                            fun(true, obj.target.result);
+                        };
+                        reader.onerror = function(obj)
+                        {
+                             fun(false, null);
+                        };
+                        reader.readAsText(fileEntry);
+                    },
+                    error(fun));
+            },
+            error(fun));
+    };
+
+    return self;
+}();
+
+function testFileSystem()
+{
+    function fileWritten(success)
+    {
+        console.log("@@@@@ FileWritten result: " + success);
+        if (success)
+        {
+            FileSys.readText("hello2.txt", fileRead);
+        }
+    }
+
+    function fileRead(success, data)
+    {
+        console.log("@@@@@ FileRead result: " + success);
+        console.log("@@@@@ FileRead data: " + data);
+    }
+
+    FileSys.writeText("hello2.txt", "Hello Wonderful World!", fileWritten);
+}
+
+function foo()
+{
+    function bar()
+    {
+        return 44;
+    }
+
+    return bar();
+}
+
+function XtestFileSystem() {
     console.log("@@ Calling window.requestFileSystem");
     window.requestFileSystem(LocalFileSystem.PERSISTENT, 0, gotFileSystem, filefail);
     //window.requestFileSystem(LocalFileSystem.TEMPORARY, 0, gotFileSystem, filefail);
@@ -45,8 +150,8 @@ function gotOpenFileEntry(fileEntry) {
 function gotFileWriter(writer) {
     console.log("@@ gotFileWriter");
     writer.onwrite = function(obj) {
-        console.log("@@ writer.onwrite");
-        //PrintObject(obj);
+        console.log("@@ writer.onwrite obj: " + obj);
+        PrintObject(obj);
         readFileEntry(gFileEntry);
     };
     writer.error = function(obj) {

@@ -86,21 +86,21 @@ public:
 	 */
 	virtual void customEvent(const MAEvent&);
 
-	/**
-	 * General wrapper for phoneGap success callback.
-	 * If an operation is successful this function should be called.
-	 *
-	 * @param data the data that should be passed to the callback function
-	 */
-	void sendPhoneGapSuccess(const char* data);
-
-	/**
-	 * General wrapper for phoneGap error callback.
-	 * If an operation is successful this function should be called.
-	 *
-	 * @param data the data that should be passed to the callback function
-	 */
-	void sendPhoneGapError(const char* data, MAUtil::String callbackID);
+//	/**
+//	 * General wrapper for phoneGap success callback.
+//	 * If an operation is successful this function should be called.
+//	 *
+//	 * @param data the data that should be passed to the callback function
+//	 */
+//	void sendPhoneGapSuccess(const char* data);
+//
+//	/**
+//	 * General wrapper for phoneGap error callback.
+//	 * If an operation is successful this function should be called.
+//	 *
+//	 * @param data the data that should be passed to the callback function
+//	 */
+//	void sendPhoneGapError(const char* data, MAUtil::String callbackID);
 
 	/**
 	 * General wrapper for phoneGap error callback.
@@ -144,12 +144,14 @@ public:
 	 * Call the PhoneGap error function.
 	 *
 	 * @param callbackID The id of the JS callback function.
-	 * @param args Return values as a JSON string.
+	 * @param errorCode The error code.
+	 * @param errorMessage Optional error message.
 	 * @param keepCallback true if this callback should be kept by PhoneGap.
 	 */
-	void callError(
+	void PhoneGapMessageHandler::callError(
 		const MAUtil::String& callbackID,
-		const MAUtil::String& args,
+		const MAUtil::String& errorCode,
+		const MAUtil::String& errorMessage = "",
 		bool keepCallback = false
 		);
 
