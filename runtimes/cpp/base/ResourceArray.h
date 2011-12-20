@@ -62,7 +62,7 @@ namespace Base {
 #define DECLARE_SIZEFUNCS(R, T, D) uint size_##R(T*);
 		TYPES(DECLARE_SIZEFUNCS);
 #endif
-    
+
 #define DECLARE_RESOURCE_TYPES(R, T, D) typedef T R##_Type;
     TYPES(DECLARE_RESOURCE_TYPES);
 
@@ -75,13 +75,13 @@ namespace Base {
 #ifdef RESOURCE_MEMORY_LIMIT
 			uint resMax
 #endif
-			) : mN(0), mRes(NULL), mTypes(NULL), 
+			) : mN(0), mRes(NULL), mTypes(NULL),
 #ifdef RESOURCE_MEMORY_LIMIT
 			mResmemMax(resMax),
 			mResmem(0),
 #endif
 			dynResSize(1),
-			dynResCapacity(1), 
+			dynResCapacity(1),
 			dynRes(NULL)
 			{}
 		void init(unsigned nRes) {  //saves all the old objects
@@ -100,10 +100,7 @@ namespace Base {
 				delete[] oldTypes;
 			}
 			if(mN > oldN) { //clear the new objects
-				//pointer arithmetic bug
-				//memset(mRes + oldN*sizeof(void*), 0, (mN - oldN)*sizeof(void*));
 				memset(&mRes[oldN], 0, (mN - oldN) * sizeof(void*));
-
 				memset(mTypes + oldN, RT_PLACEHOLDER, (mN - oldN));
 			}
 		}
@@ -117,7 +114,7 @@ namespace Base {
 			}
 			delete[] mRes;
 			delete[] mTypes;
-			
+
 			for(unsigned i=1; i<dynResSize; i++) {
 				LOGD("DA %i\n", i);
 				_destroy(i | DYNAMIC_PLACEHOLDER_BIT);
@@ -190,10 +187,10 @@ namespace Base {
 		uint getResmemMax() const { return mResmemMax; }
 		uint getResmem() const { return mResmem; }
 #endif
-		
+
 		void logEverything() {
 #define RESOURCE_STRINGS(R, T, D) resourceStrings[R] = #R;
-			const char *resourceStrings[128] = {0};			
+			const char *resourceStrings[128] = {0};
 			TYPES(RESOURCE_STRINGS)
 
 #ifdef LOGGING_ENABLED
@@ -203,12 +200,12 @@ namespace Base {
 				byte type = mTypes[i];
 				LOG("Static resource %d is of type %s\n", i, resourceStrings[type]);
 			}
-			
+
 			for(unsigned int i = 0; i < dynResSize; i++) {
 				byte type = dynResTypes[i];
 				LOG("Dynamic resource %d is of type %s\n", i, resourceStrings[type]);
 			}
-#endif	
+#endif
 		}
 
 	private:
@@ -299,7 +296,7 @@ namespace Base {
 				TESTINDEX(index, dynResSize);
 			} else {
 				TESTINDEX(index, mN);
-			}			
+			}
 
 			if(types[index] != R) {
 				BIG_PHAT_ERROR(ERR_RES_INVALID_TYPE);
@@ -317,7 +314,7 @@ namespace Base {
 				TESTINDEX(index, dynResSize);
 			} else {
 				TESTINDEX(index, mN);
-			}			
+			}
 
 			if(types[index] != R) {
 				BIG_PHAT_ERROR(ERR_RES_INVALID_TYPE);

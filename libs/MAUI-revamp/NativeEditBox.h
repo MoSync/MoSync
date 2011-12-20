@@ -38,14 +38,14 @@ class NativeEditBox;
 class NativeEditBoxListener {
 public:
 	/**
-	 * Called when the user has pressed the OK button on 
+	 * Called when the user has pressed the OK button on
 	 * the native edit box, closing it.
 	 * TODO: We should also detect cancel. Add a third arg for this?
 	 * \param editBox The editbox that was closed.
 	 * \param text The text entered by the user.
 	 */
 	virtual void nativeEditFinished(
-		NativeEditBox* editBox, 
+		NativeEditBox* editBox,
 		const String& text) = 0;
 
 	/**
@@ -69,18 +69,18 @@ public:
 	 * \param y The top coordinate of the widget.
 	 * \param width The width of the widget.
 	 * \param height The height of the widget.
-	 * \param maxSize Max number of characters in the widget.
+	 * \param maxSize Max number of characters in the widget, including the terminating zero.
 	 * \param options Textbox options.
 	 * \param initialText The text to be initially displayed.
 	 * \param titleString The title of the textbox.
 	 */
 	NativeEditBox(
 		NativeEditBoxListener* mainListener,
-		int x=0, 
-		int y=0, 
-		int width=0, 
+		int x=0,
+		int y=0,
+		int width=0,
 		int height=0,
-		int maxSize=128, 
+		int maxSize=128,
 		int options=MA_TB_TYPE_ANY,
 		const MAUtil::String& initialText="",
 		const MAUtil::WString& titleString=L"");
@@ -91,11 +91,11 @@ public:
 	~NativeEditBox();
 
 	/**
-	 * Set the textbox options. 
+	 * Set the textbox options.
 	 * \param options MA_TB_* constants defined in maapi.h.
 	 */
 	void setOptions(int options);
-	
+
 	/**
 	 * Set the max number of characters in the textbox.
 	 * \param size The max number of characters.
@@ -107,7 +107,7 @@ public:
 	 * \param titleString The title string.
 	 */
 	void setTitleString(const MAUtil::WString& titleString);
-	
+
 	/**
 	 * \return The title string of the textbox.
 	 */
@@ -119,12 +119,12 @@ public:
 	 * TODO: Document or refer to superclass comment.
 	 */
 	bool pointerPressed(MAPoint2d p, int id);
-	
+
 	/**
 	 * TODO: Document or refer to superclass comment.
 	 */
 	bool pointerMoved(MAPoint2d p, int id);
-	
+
 	/**
 	 * TODO: Document or refer to superclass comment.
 	 */
@@ -146,12 +146,12 @@ public:
 	 * Add a listener for the edit box.
 	 */
 	void addNativeEditBoxListener(NativeEditBoxListener* listener);
-	
+
 	/**
 	 * Remove a listener for the edit box.
 	 */
 	void removeNativeEditBoxListener(NativeEditBoxListener* listener);
-	
+
 protected:
 	/// TextBoxListener
 	void textBoxClosed(int res, int length);
@@ -160,19 +160,19 @@ protected:
 	 * The title of the native textbox.
 	 */
 	MAUtil::WString mTitleString;
-	
+
 	/**
 	 * TODO: Is this comment correct?
 	 * Content of the textbox/label.
 	 */
 	wchar_t* mString;
-	
+
 	/**
 	 * TODO: Is this comment correct?
 	 * Max number of characters in the textbox.
 	 */
 	int mMaxSize;
-	
+
 	/**
 	 * TODO: Is this comment correct?
 	 * Options for maTextBox.
@@ -183,7 +183,7 @@ protected:
 	 * TODO: Document this variable.
 	 */
 	int mStartX;
-	
+
 	/**
 	 * TODO: Document this variable.
 	 */
