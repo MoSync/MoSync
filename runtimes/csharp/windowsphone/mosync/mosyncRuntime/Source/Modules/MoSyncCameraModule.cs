@@ -38,6 +38,22 @@ namespace MoSync
 			mCamera = new PhotoCamera(CameraType.Primary);
 			mVideoBrush = new VideoBrush();
 			mVideoBrush.SetSource(mCamera);
+			mVideoBrush.Stretch = Stretch.Uniform;
+
+			runtime.RegisterCleaner(delegate()
+			{
+				mCamera.Dispose();
+				mCamera = null;
+			});
+
+			// this should be set according to the orientation of
+			// the device I guess.
+			mVideoBrush.RelativeTransform = new CompositeTransform()
+			{
+				CenterX = 0.5,
+				CenterY = 0.5,
+				Rotation = 90
+			};
 
 			ioctls.maCameraFormat = delegate(int _index, int _fmt)
 			{
@@ -82,6 +98,18 @@ namespace MoSync
 				// something like
 				// videoBrush = ((CameraViewFinder)runtime.GetModule<MoSyncNativeUIModule>.GetWidget(_widgetHandle)).GetBrush();
 				// videoBrush.SetSource(mCamera)
+				IWidget w = runtime.GetModule<NativeUIModule>().GetWidget(_widgetHandle);
+				if (w.GetType() != typeof(MoSync.NativeUI.CameraPreview))
+				{
+					return MoSync.Constants.MA_CAMERA_RES_FAILED;
+				}
+				NativeUI.CameraPreview prev = (NativeUI.CameraPreview)w;
+				System.Windows.Controls.Canvas canvas = prev.GetViewFinderCanvas();
+				MoSync.Util.RunActionOnMainThreadSync(() =>
+				{
+					canvas.Background = mVideoBrush;
+				});
+
 				return 0;
 			};
 
