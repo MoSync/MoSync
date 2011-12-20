@@ -264,9 +264,7 @@ namespace Base {
 		if (!(index & DYNAMIC_PLACEHOLDER_BIT)) {
 			// TODO: Use MYASSERT_IF_PANICS_ENABLED when
 			// conditional panics are to be used.
-			MYASSERT(
-				false, // Always trigger this panic.
-				ERR_RES_PLACEHOLDER_NOT_DYNAMIC);
+			BIG_PHAT_ERROR(ERR_RES_PLACEHOLDER_NOT_DYNAMIC);
 			return -2;
 		}
 
@@ -279,9 +277,7 @@ namespace Base {
 		{
 			// TODO: Use MYASSERT_IF_PANICS_ENABLED when
 			// conditional panics are to be used.
-			MYASSERT(
-				false, // Always trigger this panic.
-				ERR_RES_PLACEHOLDER_ALREADY_DESTROYED);
+			BIG_PHAT_ERROR(ERR_RES_PLACEHOLDER_ALREADY_DESTROYED);
 			return -2;
 		}
 
