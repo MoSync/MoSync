@@ -55,7 +55,7 @@ void testCreateData(bool destroyObject, bool destroyPlaceholder)
 		int handle = maCreatePlaceholder();
 		if (handle < 0)
 		{
-			printf("testCreateData: maCreatePlaceholder failed\n");
+			printf("testCreateData: maCreatePlaceholder failed (%i)\n", handle);
 			success = false;
 			break;
 		}
@@ -63,7 +63,7 @@ void testCreateData(bool destroyObject, bool destroyPlaceholder)
 		int result = maCreateData(handle, CHUNK_SIZE);
 		if (result < 0)
 		{
-			printf("testCreateData: maCreateData failed\n");
+			printf("testCreateData: maCreateData failed (%i)\n", result);
 			success = false;
 			break;
 		}
@@ -116,7 +116,7 @@ void testAccumulatedCreateData()
 		int handle = maCreatePlaceholder();
 		if (handle < 0)
 		{
-			printf("testAccumulatedCreateData: maCreatePlaceholder failed\n");
+			printf("testAccumulatedCreateData: maCreatePlaceholder failed (%i)\n", handle);
 			success = false;
 			break;
 		}
@@ -124,7 +124,7 @@ void testAccumulatedCreateData()
 		int result = maCreateData(handle, 1024);
 		if (result < 0)
 		{
-			printf("testAccumulatedCreateData: maCreateData failed\n");
+			printf("testAccumulatedCreateData: maCreateData failed (%i)\n", result);
 			success = false;
 			break;
 		}
