@@ -61,10 +61,17 @@ class WebViewMessage
 public:
 	/**
 	 * Take a string that is "percent encoded" and decode it.
-	 * @param url Encoded string.
+	 * @param str Encoded string.
 	 * @return The decoded string.
 	 */
-	static MAUtil::String unescape(const MAUtil::String& url);
+	static MAUtil::String unescape(const MAUtil::String& str);
+
+	/**
+	 * Take a string and "percent encode" it.
+	 * @param str String to be encoded.
+	 * @return The encoded string.
+	 */
+	static MAUtil::String escape(const MAUtil::String& str);
 
 	/**
 	 * Constructor.
