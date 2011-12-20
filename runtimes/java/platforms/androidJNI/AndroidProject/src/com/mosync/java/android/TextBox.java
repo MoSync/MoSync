@@ -36,6 +36,7 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_URL;
 import static com.mosync.internal.generated.MAAPI_consts.MA_TB_TYPE_SINGLE_LINE;
 
 import java.nio.CharBuffer;
+import java.lang.String;
 
 import com.mosync.internal.android.MoSyncThread;
 
@@ -67,6 +68,8 @@ import android.widget.TextView;
 * Clicking cancel only dismisses the dialog.
 */
 public class TextBox extends Activity implements OnClickListener {
+
+	public static final String savedInstanceString = "savedInstance";
 
 	public Handler mHandler;
 	private Button mOkButton;
@@ -216,7 +219,15 @@ public class TextBox extends Activity implements OnClickListener {
 		mEdit.setHeight(height/3);
 		// The commented out line below creates a bug on HTC Desire.
 		// mEdit.setGravity(Gravity.TOP);
-		mEdit.setText(text);
+
+		if( savedInstanceState != null)
+		{
+			String savedString = savedInstanceState.getString(savedInstanceString);
+			mEdit.setText(savedString);
+		}
+		else
+			mEdit.setText(text);
+
 		mEdit.setInputType( this.convertInputConstraints(mConstraints) );
 		// Set an InputFilter to restrict input length.
 		mEdit.setFilters(new InputFilter[] {
@@ -255,6 +266,13 @@ public class TextBox extends Activity implements OnClickListener {
 		// Show the global layout
 		setContentView(mainLayout);
 	}
+
+	public void onSaveInstanceState( Bundle savedInstanceState )
+	{
+		// now, save the text if something overlaps this Activity
+		savedInstanceState.putString( savedInstanceString, mEdit.getText().toString() );
+	}
+
 
 	@Override
 	protected void onStop()
