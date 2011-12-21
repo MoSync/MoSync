@@ -10,22 +10,22 @@ mod.class_eval do
 		@EXTRA_SOURCEFILES = ["conprint.c", "ma.c", "maassert.c", "mactype.c", "madmath.c",
 			"mastdlib.c", "mastring.c", "matime.c", "mavsprintf.c", "maxtoa.c", "maheap.c"]
 		@SPECIFIC_CFLAGS = @native_specific_cflags
-		
+
 		@LOCAL_DLLS = ["mosync"]
 	end
-	
+
 	def copyGlHeaders()
 		@INSTALL_INCDIR = "GLES"
 		@HEADER_DIRS = ["GLES"]
 		copyHeaders
 	end
-	
+
 	def copyGl2Headers()
 		@INSTALL_INCDIR = "GLES2"
 		@HEADER_DIRS = ["GLES2"]
 		copyHeaders
-	end	
-	
+	end
+
 	def setup_pipe
 		setup_base
 		@SOURCES = [".", "../libsupc++", "libgcc"]
@@ -42,7 +42,7 @@ mod.class_eval do
 		@prerequisites << CopyFileTask.new(self, mosync_include + "/" + @INSTALL_INCDIR + "/macpp.h",
 			FileTask.new(self, "../libsupc++/macpp.h"))
 	end
-	
+
 	def setup_base
 		if(CONFIG == "" && @GCC_IS_V4)
 			#broken compiler/stdlib
@@ -65,13 +65,16 @@ mod.class_eval do
 		else
 			pipe_specflags = {}
 		end
-		
+		if(@GCC_IS_V4)
+			pipe_specflags['mastring.c'] = ' -Wno-pointer-sign'
+		end
+
 		@native_specific_cflags = {
 			"madmath.c" => " -Wno-missing-declarations",
 			"mavsprintf.c" => " -Wno-float-equal",
 			"mawvsprintf.c" => " -Wno-float-equal",
 			}.merge(native_specflags, &HashMergeAdd)
-		
+
 		@pipe_specific_cflags = @native_specific_cflags.merge({
 			"intrinsics.c" => " -Wno-missing-prototypes -Wno-missing-declarations",
 			"madmath.c" => " -Wno-missing-prototypes -Wno-missing-declarations",
@@ -84,10 +87,10 @@ mod.class_eval do
 			"e_asin.c" => " -fno-strict-aliasing",
 			"mastdlib.c" => " -Wno-deprecated-declarations",
 			}, &HashMergeAdd).merge(pipe_specflags, &HashMergeAdd)
-		
+
 		copyGlHeaders()
-	    copyGl2Headers()
-			
+		copyGl2Headers()
+
 		@HEADER_DIRS = ["."]
 		@INSTALL_INCDIR = "."
 		@IGNORED_HEADERS = ["math_private.h", "fdlibm.h"]
