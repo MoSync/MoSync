@@ -38,15 +38,17 @@ public class PIMList {
 				panicText);
 	}
 
+	Cursor listCursor = null;
+
 	/**
 	 * Read the list
 	 */
 	int read(ContentResolver cr) {
 		DebugPrint("PIMList.read(" + cr + ")");
 		// try to query for contacts
-		Cursor cur;
 		try {
-			cur = cr.query(Contacts.CONTENT_URI, new String[] { Contacts._ID },
+			listCursor = cr.query(Contacts.CONTENT_URI,
+					new String[] { Contacts._ID },
 					null, null, null);
 		} catch (Exception e) {
 			return throwError(MA_PIM_ERR_LIST_UNAVAILABLE,
@@ -54,24 +56,25 @@ public class PIMList {
 					PIMError.sStrListUnavailable);
 		}
 
-		if (cur == null) {
+		if (listCursor == null) {
 			return throwError(MA_PIM_ERR_LIST_UNAVAILABLE,
 					PIMError.PANIC_LIST_UNAVAILABLE,
 					PIMError.sStrListUnavailable);
 		}
 
 		// read each item
-		while (cur.moveToNext()) {
-			String contactId = cur.getString(cur.getColumnIndex(Contacts._ID));
+		for (int i = 0; i < listCursor.getCount(); i++) {
+			// String contactId = listCursor.getString(listCursor
+			// .getColumnIndex(Contacts._ID));
 
 			PIMItem pimItem = new PIMItem(false);
-			pimItem.read(cr, contactId);
+			// pimItem.read(cr, contactId);
 
 			mList.add(pimItem);
 		}
 
-		cur.close();
-		cur = null;
+		// listCursor.close();
+		// listCursor = null;
 
 		mListIterator = 0;
 
@@ -88,8 +91,19 @@ public class PIMList {
 	/**
 	 * @return The next element in the list.
 	 */
-	PIMItem next() {
-		return mList.get(mListIterator++);
+	PIMItem next(ContentResolver cr) {
+		PIMItem pimItem = mList.get(mListIterator);
+		// read each item
+		if (listCursor.moveToNext()) {
+			String contactId = listCursor.getString(listCursor
+					.getColumnIndex(Contacts._ID));
+
+			pimItem.read(cr, contactId);
+
+			mList.set(mListIterator, pimItem);
+		}
+		mListIterator++;
+		return pimItem;
 	}
 
 	/**
@@ -129,9 +143,14 @@ public class PIMList {
 	 */
 	void close(ContentResolver cr) {
 		DebugPrint("PIMList.close(" + cr + ")");
-		mListIterator = 0;
-		while (hasNext()) {
-			next().close(cr);
+		try {
+			mListIterator = 0;
+			while (hasNext()) {
+				next(cr).close(cr);
+			}
+			listCursor.close();
+			listCursor = null;
+		} catch (Exception e) {
 		}
 	}
 }
