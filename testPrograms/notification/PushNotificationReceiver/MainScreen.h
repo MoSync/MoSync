@@ -49,7 +49,6 @@ class TCPConnection;
  */
 class MainScreen:
 	public TabScreen,
-	public TabScreenListener,
 	public PushNotificationListener,
 	public TCPListener,
 	public SettingsScreenListener
@@ -108,17 +107,6 @@ private:
      */
     virtual void didFaildToRegister(
         MAUtil::String& error);
-
-    // TabScreen listener method
-
-    /**
-     * This method is called when a tab screen has changed to a new tab.
-     * @param tabScreen The tab screen object that generated the event.
-     * @param tabScreenIndex The index of the new tab.
-     */
-    virtual void tabScreenTabChanged(
-        TabScreen* tabScreen,
-        const int tabScreenIndex);
 
     /**
      * Called when the application is connected to the server.

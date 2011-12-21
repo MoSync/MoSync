@@ -29,8 +29,8 @@ MA 02110-1301, USA.
 #include "TCPConnection.h"
 #include "Util.h"
 
-#define C2DM_USER_ACCOUNT "emmaTestMosync@gmail.com"
-
+//#define C2DM_USER_ACCOUNT "emmaTestMosync@gmail.com"
+#define C2DM_USER_ACCOUNT "emma.tresanszki@mobilesorcery.com"
 /**
  * Constructor.
  */
@@ -138,10 +138,10 @@ void MainScreen::storeRegistrationID(MAUtil::String* token)
  */
 MainScreen::~MainScreen()
 {
-	delete mDisplayNotificationScreen;
-	delete mSettingsScreen;
 	delete mToken;
-    Notification::NotificationManager::getInstance()->removePushNotificationListener(this);
+	if ( mTCPConnection )
+		delete mTCPConnection;
+	NotificationManager::getInstance()->removePushNotificationListener(this);
 }
 
 /**
@@ -186,18 +186,6 @@ void MainScreen::didFaildToRegister(
 {
 	printf("MainScreen::didFaildToRegister");
 	mDisplayNotificationScreen->pushRegistrationDone(false);
-}
-
-/**
- * This method is called when a tab screen has changed to a new tab.
- * @param tabScreen The tab screen object that generated the event.
- * @param tabScreenIndex The index of the new tab.
- */
-void MainScreen::tabScreenTabChanged(
-    TabScreen* tabScreen,
-    const int tabScreenIndex)
-{
-
 }
 
 /**
