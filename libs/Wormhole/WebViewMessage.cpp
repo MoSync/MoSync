@@ -100,42 +100,6 @@ namespace Wormhole
 
 		return result;
 	}
-}
-
-/**
- * Helper function that unescapes a string.
- */
-static MAUtil::String UnescapeHelper(const MAUtil::String& str)
-{
-	// The decoded string.
-	MAUtil::String result = "";
-
-	for (int i = 0; i < str.length(); ++i)
-	{
-		// If the current character is the '%' escape char...
-		if ('%' == (char) str[i])
-		{
-			// Get the char value of the two digit hex value.
-			MAUtil::String hex = str.substr(i + 1, 2);
-			long charValue = strtol(
-				hex.c_str(),
-				NULL,
-				16);
-			// Append to result.
-			result += (char) charValue;
-
-			// Skip over the hex chars.
-			i += 2;
-		}
-		else
-		{
-			// Not encoded, just copy the character.
-			result += str[i];
-		}
-	}
-
-	return result;
-}
 
 	/**
 	 * Constructor.
