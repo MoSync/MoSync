@@ -40,6 +40,11 @@ class PhoneGapMessage : public Wormhole::WebViewMessage
 {
 public:
 	/**
+	 * Make a JSON stringified string.
+	 */
+	static MAUtil::String JSONStringify(const MAUtil::String& str);
+
+	/**
 	 * Constructor.
 	 */
 	PhoneGapMessage(NativeUI::WebView* webView, MAHandle dataHandle);

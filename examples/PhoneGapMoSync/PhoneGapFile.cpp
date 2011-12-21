@@ -385,7 +385,7 @@ String PhoneGapFile::emitFileSystemInfo(
 	const String& name,
 	const String& rootEntry)
 {
-	return "{'name':'" + name + "', 'root':" + rootEntry + "}";
+	return "{\"name\":\"" + name + "\", \"root\":" + rootEntry + "}";
 }
 
 String PhoneGapFile::emitDirectoryEntry(
@@ -393,8 +393,8 @@ String PhoneGapFile::emitDirectoryEntry(
 	const String& fullPath)
 {
 	return
-		"{'isFile':false,'isDirectory':true,'name':'" + name + "'," +
-		"'fullPath':'" + fullPath + "','filesystem': null}";
+		"{\"isFile\":false,\"isDirectory\":true,\"name\":\"" + name + "\"," +
+		"\"fullPath\":\"" + fullPath + "\",\"filesystem\": null}";
 }
 
 String PhoneGapFile::emitFileEntry(
@@ -402,8 +402,8 @@ String PhoneGapFile::emitFileEntry(
 	const String& fullPath)
 {
 	return
-		"{'isFile':true,'isDirectory':false,'name':'" + name + "'," +
-		"'fullPath':'" + fullPath + "','filesystem': null}";
+		"{\"isFile\":true,\"isDirectory\":false,\"name\":\"" + name + "\"," +
+		"\"fullPath\":\"" + fullPath + "\",\"filesystem\": null}";
 }
 
 String PhoneGapFile::emitFile(
@@ -414,11 +414,11 @@ String PhoneGapFile::emitFile(
 	const String& size)
 {
 	return
-		"{'name':'" + name + "'," +
-		"'fullPath':'" + fullPath + "'," +
-		"'type':'" + type + "'," +
-		"'lastModifiedDate':'" + lastModifiedDate + "'," +
-		"'size':" + size + "}";
+		"{\"name\":\"" + name + "\"," +
+		"\"fullPath\":\"" + fullPath + "\"," +
+		"\"type\":\"" + type + "\"," +
+		"\"lastModifiedDate\":\"" + lastModifiedDate + "\"," +
+		"\"size\":" + size + "}";
 }
 
 void PhoneGapFile::callSuccess(
@@ -440,7 +440,7 @@ void PhoneGapFile::callFileError(
 	const String& errorCode
 	)
 {
-	String args = "{'code':" + errorCode + "}";
+	String args = "{\"code\":" + errorCode + "}";
 
 	mMessageHandler->callError(
 		callbackID,
@@ -648,7 +648,7 @@ void PhoneGapFile::actionReadAsText(PhoneGapMessage& message)
 
 	String fullPath = message.getArgsField("fileName");
 	String encoding = message.getArgsField("encoding");
-	// TODO: Encoding is not used.
+	// TODO: Encoding param is not used.
 
 	String content;
 	int result = FileRead(fullPath, content);
@@ -661,5 +661,5 @@ void PhoneGapFile::actionReadAsText(PhoneGapMessage& message)
 	// Send back the file content.
 	callSuccess(
 		callbackID,
-		content);
+		PhoneGapMessage::JSONStringify(content));
 }

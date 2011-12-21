@@ -144,7 +144,7 @@ void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)
 	//TODO: we need to convert the type to PhoneGaps simplified version
 	sprintf(
 		buffer,
-		"'%s'",
+		"\"%s\"",
 		networkType);
 
 	callSuccess(
@@ -203,11 +203,11 @@ void PhoneGapMessageHandler::sendDeviceProperties(MAUtil::String callbackID)
 	// Send the result back to PhoneGap.
 	sprintf(buffer,
 		"{"
-			"'platform':'%s',"
-			"'name':'%s',"
-			"'uuid':'%s',"
-			"'version':'%s',"
-			"'phonegap':'1.2.0'"
+			"\"platform\":\"%s\","
+			"\"name\":\"%s\","
+			"\"uuid\":\"%s\","
+			"\"version\":\"%s\","
+			"\"phonegap\":\"1.2.0\""
 		"}",
 		deviceOS,
 		deviceName,
@@ -286,7 +286,7 @@ void PhoneGapMessageHandler::sensorEvent(MASensor sensorData)
 //	char script[1024];
 //	sprintf(
 //		script,
-//		"PhoneGap.CallbackError('%s', \"{'message' : '%s'}\")",
+//		"PhoneGap.CallbackError(\"%s\", \"{\"message\" : \"%s\"}\")",
 //		callbackID.c_str(),
 //		data);
 //	mWebView->callJS(script);
@@ -335,8 +335,8 @@ void PhoneGapMessageHandler::callError(
 	)
 {
 	String args =
-		"{'code':" + errorCode +
-		"'message':'" + errorMessage + "'}";
+		"{\"code\":" + errorCode +
+		"\"message\":\"" + errorMessage + "\"}";
 
 	callCallback(
 		"PhoneGap.CallbackError",
@@ -371,16 +371,16 @@ void PhoneGapMessageHandler::callCallback(
 	String script = callbackFunction + "(";
 	script += "'" + callbackID + "'";
 
-	script += ",\"{";
-	script += "'status':" + status;
-	script += ",'message':" + args;
+	script += ",'{";
+	script += "\"status\":" + status;
+	script += ",\"message\":" + args;
 
 	if (keepCallback)
 	{
-		script += ",'keepCallback':true";
+		script += ",\"keepCallback\":true";
 	}
 
-	script += "}\"";
+	script += "}'";
 
 	if (castFunction.size() > 0)
 	{

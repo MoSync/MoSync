@@ -10,16 +10,6 @@
  * Copyright (c) 2011, MoSync AB
  */
 
-// MOSYNC: Object to hold utility functions.
-var MoSync = {};
-
-// MOSYNC: JSON.parse apparently does not work on Android,
-// we use eval instead.
-MoSync.parseJSON = function(jsonString)
-{
-    return eval('(' + jsonString + ')');
-};
-
 /**
  * The order of events during page load and PhoneGap startup is as follows:
  *
@@ -100,9 +90,8 @@ PhoneGap.exec = function(success, fail, service, action, args)
         PhoneGap.callbacks[callbackId] = {success:success, fail:fail};
     }
 
-    // MOSYNC: Instead of using PhoneGap's direct Command Mechanism we send
-    // it to the bridge Library for preprocessing and behavior translation.
-    bridge.PhoneGap.exec(callbackId, service, action, args);
+    // MOSYNC: Use the bridge library to send the message to C++.
+    bridge.PhoneGap.send(callbackId, service, action, JSON.stringify(args));
 };
 
 // MOSYNC: We currently do not call this function, but call
@@ -170,9 +159,9 @@ PhoneGap.CallbackSuccess = function(callbackId, args, cast)
     var commandResult;
     try
     {
-        console.log("@@ PhoneGap.CallbackSuccess " + callbackId + " " + unescape(args));
+        console.log("@@ PhoneGap.CallbackSuccess: " + callbackId + " args: " + args);
 
-        commandResult = MoSync.parseJSON(args);
+        commandResult = JSON.parse(args);
 
         if (typeof cast !== 'undefined')
         {
@@ -219,7 +208,7 @@ PhoneGap.CallbackError = function (callbackId, args, cast) {
     var commandResult;
     try
     {
-        commandResult  = MoSync.parseJSON(args);
+        commandResult = JSON.parse(args);
     }
     catch(exception)
     {
@@ -744,7 +733,7 @@ Accelerometer.prototype.getCurrentAcceleration = function(successCallback, error
 
     var onSuccess = function(result)
     {
-        var accResult = MoSync.parseJSON(result);
+        var accResult = JSON.parse(result);
         console.log("Accel x = " + accResult.x);
         self.lastAcceleration = new Acceleration(accResult.x,accResult.y,accResult.z);
         successCallback(self.lastAcceleration);
@@ -784,7 +773,7 @@ Accelerometer.prototype.watchAcceleration = function(successCallback, errorCallb
     }
 
     var onSuccess = function (result) {
-        var accResult = MoSync.parseJSON(result);
+        var accResult = JSON.parse(result);
         console.log("Accel x = " + accResult.x);
         self.lastAcceleration = new Acceleration(accResult.x, accResult.y, accResult.z);
         successCallback(self.lastAcceleration);
@@ -1226,7 +1215,7 @@ Compass.prototype.getCurrentHeading = function(successCallback, errorCallback, o
         var self = this;
         var onSuccess = function(result)
         {
-            var compassResult = MoSync.parseJSON(result);
+            var compassResult = JSON.parse(result);
             console.log("compassResult = " + compassResult);
             self.lastHeading = compassResult;
             successCallback(self.lastHeading);
@@ -1661,7 +1650,7 @@ var Device = function() {
     var me = this;
     this.getInfo(
         function (res) {
-            var info = MoSync.parseJSON(res);
+            var info = JSON.parse(res);
             console.log("GotDeviceInfo :: " + info.version);
             me.available = true;
             me.platform = info.platform;

@@ -127,14 +127,14 @@ void PhoneGapSensors::sendLocationData(const MAEvent& event)
 
 	// Call the PhoneGap function, can call the commandResult function too.
 	sprintf(result,
-		"{'coords':{"
-			"'latitude':%f,"
-			"'longitude':%f,"
-			"'altitude':%f,"
-			"'accuracy':%f,"
-			"'altitudeAccuracy':%f,"
-			"'heading':%f,"
-			"'speed':%f"
+		"{\"coords\":{"
+			"\"latitude\":%f,"
+			"\"longitude\":%f,"
+			"\"altitude\":%f,"
+			"\"accuracy\":%f,"
+			"\"altitudeAccuracy\":%f,"
+			"\"heading\":%f,"
+			"\"speed\":%f"
 			"}}",
 		loc.lat,
 		loc.lon,
@@ -202,9 +202,9 @@ void PhoneGapSensors::sendAccelerometerData(
 	// Call the PhoneGap function, can call the commandResult function too.
 	sprintf(result,
 		"{"
-			"'x': %f,"
-			"'y': %f,"
-			"'z': %f"
+			"\"x\": %f,"
+			"\"y\": %f,"
+			"\"z\": %f"
 		"}",
 		sensorData.values[0],
 		sensorData.values[1],
@@ -232,7 +232,7 @@ void PhoneGapSensors::sendCompassData(
 	//Call the Phonegap function, Can call the commandResult function too
 	sprintf(
 			result,
-			"{'magneticHeading':%f }",
+			"{\"magneticHeading\":%f }",
 			sensorData.values[1] // only x is considered as compass heading in PhoneGap
 			);
 	mMessageHandler->callSuccess(

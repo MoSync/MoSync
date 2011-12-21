@@ -113,7 +113,7 @@ function testFileSystem()
         console.log("@@@@@ FileRead data: " + data);
     }
 
-    FileSys.writeText("hello2.txt", "Hello Wonderful World!", fileWritten);
+    FileSys.writeText("hello2.txt", "Hello\nWonderful\nWorld!", fileWritten);
 }
 
 function foo()

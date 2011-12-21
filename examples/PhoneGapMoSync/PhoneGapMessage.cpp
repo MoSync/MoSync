@@ -24,8 +24,64 @@ MA 02110-1301, USA.
  */
 
 #include "PhoneGapMessage.h"
+#include <mastring.h>
 
 using namespace MAUtil;
+
+static void CharToHex(unsigned char c, char * hexBuf)
+{
+	const char* hexchar = "0123456789ABCDEF";
+	hexBuf[0] = hexchar[c >> 4];
+	hexBuf[1] = hexchar[c & 0x0F];
+}
+
+/**
+ * Make a JSON stringified string.
+ */
+String PhoneGapMessage::JSONStringify(const String& str)
+{
+	String jsonString = "\"";
+	int length = str.size();
+	char hexBuf[8];
+	hexBuf[0] = '\\';
+	hexBuf[1] = '\\';
+	hexBuf[2] = 'u';
+	hexBuf[3] = '0';
+	hexBuf[4] = '0';
+	hexBuf[7] = 0;
+	char strBuf[2];
+	strBuf[1] = 0;
+
+	for (int i = 0; i < length; ++i)
+	{
+		strBuf[0] = str[i];
+		char* escaped = strBuf;
+		switch (str[i])
+		{
+			case '\r': escaped = "\\\\r"; break;
+			case '\n': escaped = "\\\\n"; break;
+			case '\\': escaped = "\\\\\\\\"; break;
+			case '/': escaped = "\\\\/"; break;
+			case '"': escaped = "\\\\\""; break;
+			case '\f': escaped = "\\\\f"; break;
+			case '\b': escaped = "\\\\b"; break;
+			case '\t': escaped = "\\\\t"; break;
+			default:
+				if ((unsigned char) str[i] < 32)
+				{
+					CharToHex(str[i], hexBuf + 5);
+					escaped = hexBuf;
+				}
+				break;
+		}
+
+		jsonString += escaped;
+	}
+
+	jsonString += "\"";
+
+	return jsonString;
+}
 
 /**
  * Constructor.
