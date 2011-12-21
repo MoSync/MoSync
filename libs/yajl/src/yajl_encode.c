@@ -71,6 +71,7 @@ yajl_string_encode2(const yajl_print_t print,
             case '\\': escaped = "\\\\"; break;
             /* case '/': escaped = "\\/"; break; */
             case '"': escaped = "\\\""; break;
+            case '\'': escaped = "\\\'"; break;
             case '\f': escaped = "\\f"; break;
             case '\b': escaped = "\\b"; break;
             case '\t': escaped = "\\t"; break;
