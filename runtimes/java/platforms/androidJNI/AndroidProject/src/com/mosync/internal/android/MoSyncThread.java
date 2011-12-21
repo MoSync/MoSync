@@ -412,15 +412,21 @@ public class MoSyncThread extends Thread
 	 * Do cleanup here (but it is not guaranteed that
 	 * this will be called.)
 	 */
-    public void onDestroy()
+	public void onDestroy()
 	{
-    	if (null != mMoSyncBluetooth)
-    	{
-    		// Delegate onDestroy to the Bluetooth object.
-    		mMoSyncBluetooth.onDestroy();
-    		mMoSyncBluetooth = null;
-    	}
-    }
+		if (null != mMoSyncBluetooth)
+		{
+			// Delegate onDestroy to the Bluetooth object.
+			mMoSyncBluetooth.onDestroy();
+			mMoSyncBluetooth = null;
+		}
+
+		if(null != mMoSyncNetwork)
+		{
+			mMoSyncNetwork.killAllConnections();
+			mMoSyncNetwork = null;
+		}
+	}
 
 	/**
 	 * Return the activity that this thread is related to.
