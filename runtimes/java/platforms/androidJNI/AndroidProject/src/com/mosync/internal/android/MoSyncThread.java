@@ -144,12 +144,14 @@ public class MoSyncThread extends Thread
 		int resourceIndex,
 		int length);
 	public native int nativeCreatePlaceholder();
+	public native void nativeExit();
 
 	// Modules that handle syscalls for various subsystems.
 	// We delegate syscalls from this class to the modules.
 	MoSyncNetwork mMoSyncNetwork;
 	MoSyncBluetooth mMoSyncBluetooth;
 	MoSyncSound mMoSyncSound;
+	//MoSyncAudio mMoSyncAudio;
 	MoSyncLocation mMoSyncLocation;
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
@@ -312,6 +314,7 @@ public class MoSyncThread extends Thread
 
 		mMoSyncNetwork = new MoSyncNetwork(this);
 		mMoSyncSound = new MoSyncSound(this);
+		//mMoSyncAudio = new MoSyncAudio(this);
 		mMoSyncLocation = new MoSyncLocation(this);
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
@@ -571,38 +574,26 @@ public class MoSyncThread extends Thread
 	 */
 	public void threadPanic(int errorCode, String message)
 	{
-		new Exception("STACKTRACE: threadPanic").printStackTrace();
-
-		//Log.i("@@@ MoSync",
-		//	"PANIC - errorCode: " + errorCode + " message: " + message);
+		//new Exception("STACKTRACE: threadPanic").printStackTrace();
 
 		mHasDied = true;
 
-		try
-		{
-			// Launch panic dialog.
-			MoSyncPanicDialog.sPanicMessage = message;
-			Intent myIntent = new Intent(
-				mMoSyncView.getContext(), MoSyncPanicDialog.class);
-			mMoSyncView.getContext().startActivity(myIntent);
+		// Launch panic dialog.
+		MoSyncPanicDialog.sPanicMessage = message;
+		Intent myIntent = new Intent(
+			mMoSyncView.getContext(), MoSyncPanicDialog.class);
+		mMoSyncView.getContext().startActivity(myIntent);
 
-			// Sleep so that the MoSync thread is kept alive while
-			// the dialog is open.
-			while (true)
-			{
-				try
-				{
-					sleep(Long.MAX_VALUE);
-				}
-				catch (Exception e)
-				{
-					logError("threadPanic exception 1:" + e, e);
-				}
-			}
-		}
-		catch (Exception e)
+		while(true)
 		{
-			logError("threadPanic exception 2:" + e, e);
+			try
+			{
+				sleep(500);
+			}
+			catch(Exception e)
+			{
+				Log.i("MoSync Thread","oops.. got an exception, conutine until application ends");
+			}
 		}
 	}
 
@@ -3448,6 +3439,71 @@ public class MoSyncThread extends Thread
 		return mMoSyncSound.maSoundIsPlaying();
 	}
 
+
+/*
+	int maAudioDataCreateFromResource(String mime, int data,
+			int offset, int length, int flags)
+	{
+		return mMoSyncAudio.maAudioDataCreateFromResource(mime, data, offset, length, flags);
+	}
+
+	int maAudioDataCreateFromFile(String mime, String filename, int flags)
+	{
+		return mMoSyncAudio.maAudioDataCreateFromFile(mime, filename, flags);
+	}
+
+	int maAudioDataDestroy(int audioData)
+	{
+		return mMoSyncAudio.maAudioDataDestroy(audioData);
+	}
+
+	int maAudioInstanceCreate(int audioData)
+	{
+		return mMoSyncAudio.maAudioInstanceCreate(audioData);
+	}
+
+	int maAudioInstanceDestroy(int audioInstance)
+	{
+		return mMoSyncAudio.maAudioInstanceDestroy(audioInstance);
+	}
+
+	int maAudioGetLength(int audio)
+	{
+		return mMoSyncAudio.maAudioGetLength(audio);
+	}
+
+	int maAudioSetNumberOfLoops(int audio, int loops)
+	{
+		return mMoSyncAudio.maAudioSetNumberOfLoops(audio, loops);
+	}
+
+	int maAudioPlay(int audio)
+	{
+		return mMoSyncAudio.maAudioPlay(audio);
+	}
+
+	int maAudioSetPosition(int audio, int milliseconds)
+	{
+		return mMoSyncAudio.maAudioSetPosition(audio, milliseconds);
+	}
+
+	int maAudioGetPosition(int audio)
+	{
+		return mMoSyncAudio.maAudioGetPosition(audio);
+	}
+
+	int maAudioSetVolume(int audio, float volume)
+	{
+		return mMoSyncAudio.maAudioSetVolume(audio, volume);
+	}
+
+	int maAudioStop(int audio)
+	{
+		return mMoSyncAudio.maAudioStop(audio);
+	}
+*/
+
+
 	public int maAudioBufferInit(int info)
 	{
 		// TODO: Implement syscall.
@@ -4595,6 +4651,14 @@ public class MoSyncThread extends Thread
 			columnIndex,
 			doubleValueAddress,
 			this);
+	}
+
+	/**
+	 * Ends the application by calling the native exit() function
+	 */
+	public void exitApplication()
+	{
+		nativeExit();
 	}
 
 	/**
