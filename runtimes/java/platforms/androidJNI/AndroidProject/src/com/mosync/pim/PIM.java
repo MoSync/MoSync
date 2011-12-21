@@ -138,7 +138,7 @@ public class PIM {
 		}
 
 		if (pimList.hasNext()) {
-			mPIMItems.put(mResourceIndex, pimList.next());
+			mPIMItems.put(mResourceIndex, pimList.next(getContentResolver()));
 		} else {
 			return MA_PIM_ERR_NONE;
 		}
