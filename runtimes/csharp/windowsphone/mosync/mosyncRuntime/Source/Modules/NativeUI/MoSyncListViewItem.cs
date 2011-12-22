@@ -31,6 +31,8 @@ using System.Windows.Navigation;
 using System;
 using System.Text.RegularExpressions;
 using System.Reflection;
+using System.Windows.Documents;
+using System.Windows.Media;
 
 namespace MoSync
 {
@@ -216,12 +218,17 @@ namespace MoSync
              * Sets the font handle used to display the item's text
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_HANDLE)]
-            public String FontHandle
+            public int FontHandle
             {
                 set
                 {
+					FontModule.FontInfo fontInfo =
+						mRuntime.GetModule<FontModule>().GetFont(value);
 
-                }
+					mText.FontFamily = fontInfo.family;
+					mText.FontWeight = fontInfo.weight;
+					mText.FontStyle = fontInfo.style;
+				}
             }
 		}
 	}
