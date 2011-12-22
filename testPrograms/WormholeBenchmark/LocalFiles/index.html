@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<!--
+	This application shows how to communicate from JavaScript to C++.
+	When the LogoBox is touched, a call is made to C++ to make the
+	device vibrate. The C++ code that gets called is in main.cpp.
+-->
+<html>
+<head>
+<style>
+html
+{
+	/* Set page attributes. */
+	margin: 0;
+	padding: 0;
+	width: 100%;
+	height: 100%;
+	background-color: #FFFFFF;
+
+	/* Disable text selection in all browsers. */
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-o-user-select: none;
+	user-select: none;
+}
+
+#LogoBox
+{
+	/* Center element horizontally. */
+	display: table;
+	margin: auto auto;
+
+	/* Set width of box. */
+	width: 10em;
+}
+
+#TouchArea
+{
+  font-size: 1.5em;
+  font-family: sans-serif;
+  font-weight: bold;
+  text-align: center;
+
+  padding: 0.3em 0.5em;
+  border-radius: 0.3em;
+  -webkit-border-radius: 0.3em;
+  margin: 1em 0.5em;
+
+  color: white;
+  background-color: #99CF00;
+}
+
+#LogoBox img
+{
+	/* Make image same with as LogoBox. */
+	width: 10em;
+}
+
+#TextBox
+{
+	/* Text attributes. */
+	font-size: 1.0em;
+	font-family: sans-serif;
+	font-weight: bold;
+	text-align: center;
+}
+</style>
+
+<!--
+	Import the bridge library for communication between
+	JavaScript and C++.
+-->
+<script src="js/bridge.js"></script>
+
+<script>
+
+var Iterations = 200;
+// 30*4*5
+// = 120*5
+// = 600
+var ThroughputStartTime = 0;
+var ThroughputCount = 0;
+
+var RoundtripStartTime = 0;
+var RoundtripCount = 0;
+
+var LongMessage = "";
+for (var i = 0; i < 300; ++i)
+{
+	LongMessage = LongMessage + "a";
+}
+LongMessage = LongMessage + "b";
+
+function SetText(text)
+{
+	var textBox = document.getElementById("TextBox");
+	textBox.innerHTML = text;
+	console.log(text);
+}
+
+function GetText()
+{
+	var textBox = document.getElementById("TextBox");
+	return textBox.innerHTML;
+}
+
+function TestStart()
+{
+	SetText("<p>Running Wormhole performance tests...</p>");
+
+	// Use the faster method.
+	bridge.messagehandler.send = bridge.messagehandler.sendfast;
+
+	// Start first test.
+	ThroughputStart();
+	//UrlEncodingTest();
+	//TestPromptBare();
+}
+
+/**
+ * This test is for Android only, and requires a change
+ * in the runtime to be meaningful.
+ */
+function TestPromptBare()
+{
+	var iterations = Iterations;
+
+	var startTime = new Date().getTime();
+
+	for (var i = 0; i < iterations; ++i)
+	{
+		var result = prompt(LongMessage);
+		if (result != "ok")
+		{
+			console.log("@@@@@@ TestPromptBare failed");
+			return;
+		}
+	}
+
+	// Report result.
+	var timeTaken = new Date().getTime() - startTime;
+	var promptsPerSecond = (iterations / timeTaken) * 1000;
+
+	// Display result.
+	promptsPerSecond = Math.round(promptsPerSecond*10000)/10000;
+	SetText(GetText()
+		+ "<p>Prompts/second: "
+		+ promptsPerSecond
+		+ "</p>");
+}
+
+/**
+ * Test how many messages can be sent to C++ per second,
+ * without calling back to JS.
+ */
+function ThroughputStart()
+{
+	ThroughputCount = 0;
+	ThroughputStartTime = new Date().getTime();
+
+	for (var i = 0; i < Iterations; ++i)
+	{
+		++ThroughputCount;
+		bridge.messagehandler.send({messageName: "ThroughputMessage"}, null);
+	}
+	bridge.messagehandler.send({messageName: "ThroughputEnd"}, null);
+}
+
+/**
+ * Called from C++ to report throughput result.
+ */
+function ThroughputEnd()
+{
+	// Compute performance.
+	var timeTaken = new Date().getTime() - ThroughputStartTime;
+	var messagesPerSecond = (ThroughputCount / timeTaken) * 1000;
+
+	// Display result.
+	messagesPerSecond = Math.round(messagesPerSecond*10000)/10000;
+	SetText(GetText()
+		+ "<p>Throughput/second: "
+		+ messagesPerSecond
+		+ "</p>");
+
+	// Start next test.
+	DataThroughputStart();
+}
+
+function DataThroughputStart()
+{
+	ThroughputCount = 0;
+	ThroughputStartTime = new Date().getTime();
+
+	// This is so slow that we do less iterations.
+	for (var i = 0; i < Iterations/10; ++i)
+	{
+		++ThroughputCount;
+		bridge.messagehandler.send({messageName: "DataThroughputMessage", data: LongMessage}, null);
+	}
+	bridge.messagehandler.send({messageName: "DataThroughputEnd"}, null);
+}
+
+function DataThroughputEnd()
+{
+	// Compute performance.
+	var timeTaken = new Date().getTime() - ThroughputStartTime;
+	var messagesPerSecond = (ThroughputCount / timeTaken) * 1000;
+
+	// Display result.
+	messagesPerSecond = Math.round(messagesPerSecond*10000)/10000;
+	SetText(GetText()
+		+ "<p>Data throughput/second: "
+		+ messagesPerSecond
+		+ "</p>");
+
+	// Start next test.
+	RoundtripStart();
+}
+
+/**
+ * Test how many messages and JS callbacks can be
+ * processed C++ per second.
+ */
+function RoundtripStart()
+{
+	RoundtripStartTime = new Date().getTime();
+	RoundtripCount = 0;
+	bridge.messagehandler.send({messageName: "RoundtripMessage"}, null);
+}
+
+/**
+ * Called from C++ on each throughput cycle.
+ */
+function RoundtripCallback()
+{
+	++RoundtripCount;
+	if (RoundtripCount < Iterations)
+	{
+		// Do more roundtrips.
+		bridge.messagehandler.send({messageName: "RoundtripMessage"}, null);
+	}
+	else
+	{
+		// Report result.
+		var timeTaken = new Date().getTime() - RoundtripStartTime;
+		var messagesPerSecond = (RoundtripCount / timeTaken) * 1000;
+
+		// Display result.
+		messagesPerSecond = Math.round(messagesPerSecond*10000)/10000;
+		SetText(GetText()
+			+ "<p>Roundtrip messages/second: "
+			+ messagesPerSecond
+			+ "</p>");
+
+		// Run next test.
+		UrlEncodingTest();
+	}
+}
+
+function UrlEncodingTest()
+{
+	var iterations = Iterations * 10;
+
+	var startTime = new Date().getTime();
+
+	for (var i = 0; i < iterations; ++i)
+	{
+		var result = bridge.messagehandler.createMessageUrl(
+			{messageName: "ThroughputMessage", data: LongMessage});
+		if (result.charAt(0) != 'm')
+		{
+			console.log("@@@ result: " + result);
+			SetText("Data integrity check failed: " + result.charAt(0));
+			return;
+		}
+	}
+
+	// Report result.
+	var timeTaken = new Date().getTime() - startTime;
+	var encodingsPerSecond = (iterations / timeTaken) * 1000;
+
+	// Display result.
+	encodingsPerSecond = Math.round(encodingsPerSecond*10000)/10000;
+	SetText(GetText()
+		+ "<p>JS UrlEncodings/second: "
+		+ encodingsPerSecond
+		+ "</p>");
+
+	// Run next test.
+	UrlDecodingTest();
+}
+
+function UrlDecodingTest()
+{
+	bridge.messagehandler.send({messageName: "UrlDecodingTest", data: LongMessage}, null);
+}
+
+function UrlDecodingResult(decodingsPerSecond)
+{
+	// Display result.
+	decodingsPerSecond = Math.round(decodingsPerSecond*10000)/10000;
+	SetText(GetText()
+		+ "<p>C++ UrlDecodings/second: "
+		+ decodingsPerSecond
+		+ "</p>");
+}
+
+
+</script>
+</head>
+
+<body>
+<div id="LogoBox"">
+	<img src="images/MoSyncLogo.png"/>
+</div>
+<div>
+	<div id="TouchArea" ontouchend="TestStart()">Start performance test</div>
+	<div id="TextBox"></div>
+</div>
+</body>
+</html>
