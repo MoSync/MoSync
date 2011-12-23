@@ -33,7 +33,31 @@ Roundtrip messages/second: 154.0832
 JS UrlEncodings/second: 36363.6364
 C++ UrlDecodings/second: 6.1835
 
+Native Android:
 Message: "hello"
 Prompts/second: 1739.1304
-Message: 30000
+Message: 30000 characters
 Prompts/second: 296.7359
+
+300 characters/message:
+prompt:
+Throughput/second: 230.1496
+Data throughput/second: 175.4386
+Roundtrip messages/second: 160.7717
+JS UrlEncodings/second: 42553.1915
+C++ UrlDecodings/second: 0
+
+1000 characters/message:
+prompt:
+Throughput/second: 185.0139
+Data throughput/second: 153.8462
+Roundtrip messages/second: 153.7279
+JS UrlEncodings/second: 17391.3043
+C++ UrlDecodings/second: 0
+
+10000 characters/message:
+Throughput/second: 187.7934
+Data throughput/second: 52.7704
+Roundtrip messages/second: 152.207
+JS UrlEncodings/second: 2076.8432
+C++ UrlDecodings/second: 0

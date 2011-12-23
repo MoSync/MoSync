@@ -7,6 +7,8 @@
 
 // Include Moblet for web applications.
 #include <Wormhole/WebAppMoblet.h>
+
+#include <conprint.h>
 #include "WebViewMessage.h"
 
 // Namespaces we want to access.
@@ -22,6 +24,8 @@ class MyMoblet : public WebAppMoblet
 public:
 	MyMoblet()
 	{
+		lprintfln("@@@ MyMoblet");
+
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 
@@ -47,7 +51,7 @@ public:
 	 */
 	void handleWebViewMessage(WebView* webView, MAHandle urlData)
 	{
-		App:WebViewMessage message(webView, urlData);
+		App::WebViewMessage message(webView, urlData);
 
 		if (message.is("ThroughputMessage"))
 		{
@@ -82,7 +86,7 @@ public:
 //
 //			for (int i = 0; i < iterations; ++i)
 //			{
-//				App:WebViewMessage msg(webView, urlData);
+//				App::WebViewMessage msg(webView, urlData);
 //				String data = msg.getParam("data");
 //				if (data[data.size() - 1] != 'b')
 //				{

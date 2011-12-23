@@ -28,6 +28,7 @@ MA 02110-1301, USA.
 #include <mastring.h>		// C string functions
 #include <mavsprintf.h>		// C string functions
 #include <mastdlib.h>		// C string conversion functions
+#include <conprint.h>
 
 #include "WebViewMessage.h"
 
@@ -172,6 +173,8 @@ namespace App
 	 */
 	void WebViewMessage::parse(MAHandle dataHandle)
 	{
+		//lprintfln("@@@ WebViewMessage::parse %i", dataHandle);
+
 		// Set message name to empty string as default.
 		mMessageName = "";
 
@@ -193,7 +196,7 @@ namespace App
 		// Zero terminate.
 		stringData[dataSize] = 0;
 
-		maWriteLog(stringData, dataSize);
+		//maWriteLog(stringData, dataSize);
 
 		// Create String object with message.
 		MAUtil::String messageString = stringData;
