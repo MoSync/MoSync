@@ -4112,6 +4112,7 @@ group WidgetAPI "Widget API" {
 				* One of:
 				*  #MAW_CONSTANT_SOFT
 				*  #MAW_CONSTANT_HARD
+				*  #MAW_CONSTANT_MESSAGE
 				*/
 				int hookType;
 
@@ -4403,6 +4404,15 @@ group WidgetAPI "Widget API" {
 		* #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
 		*/
 		HARD = 6;
+
+		/**
+		* @brief The hook type is a message sendt from JavaScript.
+		* Used in #MAW_EVENT_WEB_VIEW_HOOK_INVOKED.
+		* This type of hook does not use any hook pattern, it is
+		* always sent from the browser, using a platform specific
+		* method (which is abstracted away in the libraries).
+		*/
+		MESSAGE = 7;
 
 		/**
 		* @brief The popover arrow should point up. Used in
