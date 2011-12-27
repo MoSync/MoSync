@@ -1,19 +1,19 @@
 /* Copyright (C) 2011 Mobile Sorcery AB
 
-This program is free software; you can redistribute it and/or modify it under
-the terms of the GNU General Public License, version 2, as published by
-the Free Software Foundation.
+ This program is free software; you can redistribute it and/or modify it under
+ the terms of the GNU General Public License, version 2, as published by
+ the Free Software Foundation.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-for more details.
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; see the file COPYING.  If not, write to the Free
-Software Foundation, 59 Temple Place - Suite 330, Boston, MA
-02111-1307, USA.
-*/
+ You should have received a copy of the GNU General Public License
+ along with this program; see the file COPYING.  If not, write to the Free
+ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
+ 02111-1307, USA.
+ */
 
 #include <string>
 #include <stdio.h>
@@ -23,10 +23,10 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 using namespace std;
 
 void printUsage();
+string handleStandaloneWildcard(string& qouted);
 
 void printUsage() {
-	printf(
-		"Usage: profiledb [OPTIONS] COMMAND [PARAMETERS]\n"
+	printf("Usage: profiledb [OPTIONS] COMMAND [PARAMETERS]\n"
 		"\n"
 		"Commands:\n"
 		"-l, --list  [PATTERN]            List all available profiles that\n"
@@ -58,11 +58,24 @@ void printUsage() {
 		"                                 XML output"
 		"\n"
 		"Environment variables used:\n"
-		" MOSYNCDIR               Path to the MoSync installation directory.\n"
-	);
+		" MOSYNCDIR               Path to the MoSync installation directory.\n");
 }
 
-int main(int argc,char *argv[]) {
+string handleStandaloneWildcard(string& quoted) {
+	if (quoted == "+") { // We can also use a + character.
+		return "*";
+	}
+	string unquoted = string(quoted);
+	string::iterator unquotedBegin = unquoted.begin();
+	string::iterator unquotedEnd = unquoted.end() - 1;
+	if ((*unquotedBegin == '\'') && (*unquotedEnd == '\'')) {
+		unquoted.erase(unquotedBegin);
+		unquoted.erase(unquotedEnd);
+	}
+	return unquoted;
+}
+
+int main(int argc, char *argv[]) {
 	// Parse option(s):
 	ProfileDB db = ProfileDB();
 	db.setIncludeCapabilities(true);
@@ -70,7 +83,8 @@ int main(int argc,char *argv[]) {
 	while (curArg < argc) {
 		curArg++;
 		string cmd = argc > curArg ? string(argv[curArg]) : string("");
-		string param = argc > curArg + 1 ? string(argv[curArg + 1]) : string("");
+		string param = argc > curArg + 1 ? string(argv[curArg + 1])
+		        : string("");
 		if (cmd == "--exclude" || cmd == "-x") {
 			db.setExcluded(param);
 			curArg++;
@@ -81,10 +95,12 @@ int main(int argc,char *argv[]) {
 		} else if (cmd == "--list-mappings") {
 			db.setOutputMappings(true);
 		} else if ("--get" == cmd || "-g" == cmd) {
+			param = handleStandaloneWildcard(param);
 			db.getProfiles(param);
 			return 0;
 		} else if ("--list" == cmd || "-l" == cmd) {
 			string profilePattern = param.length() > 0 ? param : string("*");
+			profilePattern = handleStandaloneWildcard(profilePattern);
 			db.listProfiles(profilePattern, false);
 			return 0;
 		} else if ("--list-families" == cmd || "-f" == cmd) {
@@ -100,14 +116,19 @@ int main(int argc,char *argv[]) {
 				if ("-o" == cap || "--optional" == cap) {
 					currentCapabilities = &optionalCapabilities;
 				} else {
-					currentCapabilities->push_back(Capability(cap, string(), string(), SUPPORTED, RUNTIME));
+					currentCapabilities->push_back(
+					        Capability(cap, string(), string(), SUPPORTED,
+					                RUNTIME));
 				}
 			}
 
-			db.matchProfiles(profilePattern, requiredCapabilities, optionalCapabilities);
+			profilePattern = handleStandaloneWildcard(profilePattern);
+			db.matchProfiles(profilePattern, requiredCapabilities,
+			        optionalCapabilities);
 			return 0;
 		} else if ("--list-capabilities" == cmd || "-c" == cmd) {
 			string statePattern = param.length() > 0 ? param : string("*");
+			statePattern = handleStandaloneWildcard(statePattern);
 			db.listCapabilities(statePattern);
 			return 0;
 		} else if ("--list-runtime" == cmd || "-r" == cmd) {
