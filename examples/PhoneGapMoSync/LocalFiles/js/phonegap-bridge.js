@@ -1,25 +1,7 @@
 bridge.PhoneGap = {};
 
-bridge.PhoneGap.CallBackTable = {};
-
-/**
- * A replica of the PhoneGap.exec function that translates phongap
- * commands into Mosync commands and then calls send to send the message
- *
- * @param callbackId ID of the PhoneGap Callback to be used
- * @param service name of the PhoneGap Service
- * @param action action name for the specified service
- * @param args extra arguments
- */
-bridge.PhoneGap.exec = function(callbackId, service, action, args)
-{
-	// We need to use JSON format for this option because of its structure.
-	bridge.PhoneGap.send(
-		callbackId,
-		service,
-		action,
-		JSON.stringify(args));
-};
+// TODO: Is this needed? Remove?
+//bridge.PhoneGap.CallBackTable = {};
 
 /**
  * sends a message through bridge as a PhoneGap message

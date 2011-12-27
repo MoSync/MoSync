@@ -17,6 +17,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 package com.mosync.java.android;
 
+import com.mosync.internal.android.MoSyncThread;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
@@ -29,18 +31,18 @@ import android.widget.LinearLayout;
  * @author Anders Malm
  */
 public class MoSyncPanicDialog extends Activity
-{	
+{
 	public static String sPanicMessage;
-	
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
 	{
         super.onCreate(savedInstanceState);
-		
+
 		LinearLayout ll = new LinearLayout(this);
 		ll.setOrientation(LinearLayout.VERTICAL);
 		setContentView(ll);
-		
+
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
 		builder.setCancelable(false);
 		builder.setMessage(sPanicMessage);
@@ -48,19 +50,17 @@ public class MoSyncPanicDialog extends Activity
 		{
 			public void onClick(DialogInterface dialog, int which)
 			{
-				Log.i("dialog on click", "finish!!");
 				finish();
 			}
-		}); 
+		});
 		AlertDialog alertDialog = builder.create();
 		alertDialog.show();
     }
- 
+
     @Override
     protected void onStop()
 	{
 		super.onStop();
-	  	Log.i("MoSyncPanicDialog","onStop");
 		finish();
 	}
 
@@ -68,21 +68,18 @@ public class MoSyncPanicDialog extends Activity
     protected void onRestart()
 	{
 		super.onRestart();
-	   	Log.i("MoSyncPanicDialog","onRestart");
     }
-	
+
 	@Override
     protected void onResume()
 	{
-		super.onResume();		
-    	Log.i("MoSyncPanicDialog","onResume");
+		super.onResume();
     }
 
 	@Override
     protected void onPause()
 	{
-		super.onPause();		
-    	Log.i("MoSyncPanicDialog","onPause");
+		super.onPause();
 		finish();
     }
 
@@ -90,7 +87,10 @@ public class MoSyncPanicDialog extends Activity
     protected void onDestroy()
 	{
 		super.onDestroy();
-    	Log.i("MoSyncPanicDialog","onDestroy");
+
+		MoSyncThread mosyncThread = MoSyncThread.getInstance();
+		mosyncThread.exitApplication();
+
 		finish();
     }
 }
