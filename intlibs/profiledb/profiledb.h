@@ -87,7 +87,7 @@ private:
 	map<string, Capability> fCapabilities;
 public:
 	Profile(string profileName) :
-		fProfileName(profileName), fParent(NULL) {
+		fProfileName(profileName), fParent(NULL), fIsAbstract(false) {
 	}
 	string getProfileName() {
 		return fProfileName;
@@ -161,7 +161,7 @@ private:
 	void dumpProfileMappings(XMLWriter* writer,
 	        map<string, Profile*> profileMappings);
 public:
-	ProfileDB() {
+	ProfileDB() : fOutputMappings(false), fBrief(false), fIncludeCapabilities(true) {
 	}
 	;
 	virtual ~ProfileDB();

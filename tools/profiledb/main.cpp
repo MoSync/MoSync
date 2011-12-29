@@ -79,6 +79,8 @@ int main(int argc, char *argv[]) {
 	// Parse option(s):
 	ProfileDB db = ProfileDB();
 	db.setIncludeCapabilities(true);
+	db.setBrief(false);
+	db.setOutputMappings(false);
 	int curArg = 0;
 	while (curArg < argc) {
 		curArg++;
