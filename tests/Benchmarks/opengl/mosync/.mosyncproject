@@ -5,13 +5,13 @@
 <properties>
 <property key="build.prefs:additional.include.paths" value="%mosync-home%/include"/>
 <property key="build.prefs:additional.include.paths/Debug" value="%mosync-home%/include"/>
-<property key="build.prefs:additional.include.paths/Release" value="%mosync-home%/include"/>
+<property key="build.prefs:additional.include.paths/Release" value="C:/MoSync/include"/>
 <property key="build.prefs:additional.libraries" value="mastd.lib, MAUtil.lib"/>
 <property key="build.prefs:additional.libraries/Debug" value="mastdD.lib, MAUtilD.lib"/>
-<property key="build.prefs:additional.libraries/Release" value="mastd.lib, MAUtil.lib"/>
+<property key="build.prefs:additional.libraries/Release" value="MAUtil.lib, benchdb.lib"/>
 <property key="build.prefs:additional.library.paths" value="%mosync-home%/lib/pipe"/>
 <property key="build.prefs:additional.library.paths/Debug" value="%mosync-home%/lib/pipe"/>
-<property key="build.prefs:additional.library.paths/Release" value="%mosync-home%/lib/pipe"/>
+<property key="build.prefs:additional.library.paths/Release" value="%mosync-home%/lib/pipe, C:/MoSync/lib/benchdb"/>
 <property key="build.prefs:extra.link.sw/Release" value=""/>
 <property key="build.prefs:extra.res.sw/Release" value=""/>
 <property key="build.prefs:gcc.warnings/Release" value="0"/>
@@ -20,7 +20,7 @@
 <property key="build.prefs:ignore.default.include.paths/Release" value="true"/>
 <property key="build.prefs:ignore.default.libraries" value="true"/>
 <property key="build.prefs:ignore.default.libraries/Debug" value="true"/>
-<property key="build.prefs:ignore.default.libraries/Release" value="true"/>
+<property key="build.prefs:ignore.default.libraries/Release" value="false"/>
 <property key="build.prefs:ignore.default.library.paths" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Debug" value="true"/>
 <property key="build.prefs:ignore.default.library.paths/Release" value="true"/>

@@ -44,9 +44,11 @@ BenchDBConnector::BenchDBConnector(BenchResult& br) : mHttp(this) //constructor,
 
 	printf("Publishing result via url:");
 
+	//build url according to benchmark
 	if(strcmp(br.benchmark, "linpack") == 0)
 		sprintf(completeUrl, "%s%s%s%s%s%s%s%s%s%s%s%s%.3f", M_URL, "?benchmark=linpack&revision=", br.revision, "&runtime=", br.runtime, "&git_hash=", br.git_hash, "&phone=", br.phone, "&native_sdk_ver=", br.nativeSdkVer, "&mflops=", br.mflops);
-
+	else if(strcmp(br.benchmark, "opengl") == 0)
+		sprintf(completeUrl, "%s%s%s%s%s%s%s%s%s%s%s%s%d%s%d%s%d%s%d", M_URL, "?benchmark=opengl&revision=", br.revision, "&runtime=", br.runtime, "&git_hash=", br.git_hash, "&phone=", br.phone, "&native_sdk_ver=", br.nativeSdkVer, "&test1=", br.test1, "&test2=", br.test2, "&test3=", br.test3, "&test4=", br.test4);
 	printf(completeUrl);
 	initiateConnection(completeUrl); //connect to the url, publishing the results via HTTP GET
 }

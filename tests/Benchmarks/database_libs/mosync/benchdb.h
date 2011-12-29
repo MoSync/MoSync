@@ -17,13 +17,25 @@
 
 struct BenchResult {
 
+	//hardware/software information
 	char * benchmark;
 	char * revision;
 	char * runtime;
 	char * git_hash;
 	char * phone;
 	char * nativeSdkVer;
+
+	//linpack results
 	float mflops;
+
+	//opengles results
+	int test1, test2, test3, test4;
+
+	//strops results
+
+	//membench results
+
+
 
 };
 

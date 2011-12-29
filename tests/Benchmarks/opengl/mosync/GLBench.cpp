@@ -52,11 +52,13 @@ MA 02110-1301, USA.
 
 #include <conprint.h>
 #include <maassert.h>
+#include <benchdb/benchdb.h>
 
 /**
  * A Moblet is the main object of MoSync application. In the Moblet
  * we manage the application and handle events.
  */
+
 class GLBench :
 public MAUtil::Moblet
 {
@@ -78,6 +80,8 @@ public:
 		mTimeSlot(0),
 		mStartTime(0)
 	{
+
+		mRes1 = mRes2 = mRes3 = mRes4 = 0;
 
 		mT = 0; //starting time
 
@@ -188,6 +192,15 @@ public:
 				maWidgetSetProperty(mGLView, MAW_WIDGET_VISIBLE, "false");
 				maUpdateScreen();
 
+				//Test is done, build BenchResult object and pass it to the BenchDBConnector
+				BenchResult br;
+				br.benchmark = "opengl"; //the benchmark
+				br.test1 = mRes1;		 // test results
+				br.test2 = mRes2;
+				br.test3 = mRes3;
+				br.test4 = mRes4;
+				BenchDBConnector * bdbc = new BenchDBConnector(br); //create the bench database connector and pass it the results
+
 			}
 		}
 	}
@@ -197,13 +210,13 @@ public:
 	 */
 	void doTest(int test) {
 
-		bool switch_dir = false; //switch direction
+		bool switch_dir = false; //switch direction of the camera so that as many planes as possible will be visible
 		mFrameCounter = 0;
 		switch(test) {
 
-		default: //fillrate test
+		default: //fillrate test without texture (1)
 			glEnable(GL_BLEND);
-			glDisable(GL_TEXTURE_2D);
+			glDisable(GL_TEXTURE_2D); //disable texturing
 			mStartTime = maGetMilliSecondCount();
 			while(true) {
 				drawTextFillTest(1); // 0 equals texture fill test
@@ -226,7 +239,9 @@ public:
 					printf("Test #1: Fillrate (No texture)\n");
 					showStats();
 					printf("#planes (fill rate tests): %d", mNumPlanes);
-					printf("#planes x FPS: %f\n", (float) mNumPlanes*((float) mFrameCounter / (float) mTimeSlot*1000.0f));
+					mRes1 = (int) mNumPlanes*((float) mFrameCounter / (float) mTimeSlot*1000.0f);
+					printf("#planes x FPS: %f\n", mRes1);
+
 					mNumPlanes = 2; //reset the number of planes for the next fill rate test
 					mTimeSlot = 0; //reset timer
 					return;
@@ -250,6 +265,7 @@ public:
 				if((mTimeSlot = maGetMilliSecondCount() - mStartTime) > 20000) {
 					printf("-----------------------------\n");
 					printf("Test #4: Rotating textured box\n");
+					mRes4 = mFrameCounter * 1000 / mTimeSlot;
 					showStats();
 					return;
 				}
@@ -276,7 +292,8 @@ public:
 					printf("-----------------------------\n");
 					printf("Test #3: Dynamic Object test\n");
 					showStats();
-					printf("#Vertices (dynamic object test): %d", mNumPolygons);
+					mRes3 = mNumPolygons;
+					printf("#Vertices (dynamic object test): %d", mRes3);
 					printf("drawing time (msecs): %d\nobject coordinates calc time (msecs): %d", mGLTimeSlot, mMoTimeSlot);
 					printf("drawing time/object coord calc time ratio: %f\n", (float) mGLTimeSlot/ (float) mMoTimeSlot);
 					return;
@@ -311,7 +328,8 @@ public:
 					printf("Test #2: Fillrate (With texture)\n");
 					showStats();
 					printf("#planes (fill rate tests): %d", mNumPlanes);
-					printf("#planes x FPS: %f\n", (float) mNumPlanes*((float) mFrameCounter / (float) mTimeSlot*1000.0f));
+					mRes2 = (int) mNumPlanes*((float) mFrameCounter / (float) mTimeSlot*1000.0f);
+					printf("#planes x FPS: %f\n", mRes2);
 					mNumPlanes = 2; //reset the number of planes for the next fill rate test
 					mTimeSlot = 0; //reset timer
 					return;
@@ -866,6 +884,9 @@ private:
 	int mNumPlanes; //the number of planes to draw in the fill tests (this will vary to make sure that the device will have to sweat!)
 	int mNumPolygons; //the number of polygons in the dynamic object test (this will vary to make sure that the device will have to sweat!)
 
+	/* test results of resp. tests */
+	int mRes1, mRes2, mRes3, mRes4;
+
 };
 
 /**
@@ -875,6 +896,12 @@ extern "C" int MAMain()
 {
 	// Start the application by creating and running a Moblet.
 	MAUtil::Moblet::run(new GLBench());
+	//printf("DONE!\n\n");
+
+
+	//publish the results to the database here
+	//publish_opengl_result("1337", "MoSync", "987123ab", "HTC%20Wildfire",
+	//		"2", gRes1, gRes2, gRes3, gRes4);
 
 
 	// The Moblet will run until it is closed by the user.
