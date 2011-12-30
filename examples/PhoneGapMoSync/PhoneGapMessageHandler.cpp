@@ -140,11 +140,11 @@ void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)
 	{
 		sprintf(networkType, "3g");
 	}
+
 	//create the callback
-	//TODO: we need to convert the type to PhoneGaps simplified version
 	sprintf(
 		buffer,
-		"\"%s\"",
+		"%s",
 		networkType);
 
 	callSuccess(
@@ -373,7 +373,7 @@ void PhoneGapMessageHandler::callCallback(
 
 	script += ",'{";
 	script += "\"status\":" + status;
-	script += ",\"message\":" + args;
+	script += ",\"message\": \\'" + args + "\\'";
 
 	if (keepCallback)
 	{
