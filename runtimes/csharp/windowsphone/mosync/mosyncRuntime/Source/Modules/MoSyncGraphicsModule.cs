@@ -25,6 +25,7 @@ namespace MoSync
 		private double mCurrentFontSize = 24;
 
 		TextBlock textBlock = new TextBlock();
+
 		public void SetCurrentFontSource(System.Windows.Documents.FontSource src)
 		{
 			//textBlock.FontSize = mCurrentFontSize;
@@ -156,16 +157,21 @@ namespace MoSync
 			{
 				String text = core.GetDataMemory().ReadStringAtAddress(str);
 				if (text.Length == 0) return;
+				WriteableBitmap bitmap = null;
+				double w = 0, h = 0;
 
 				MoSync.Util.RunActionOnMainThreadSync(() =>
 				{
 					textBlock.Text = text;
 					textBlock.Foreground = new SolidColorBrush(mCurrentWindowsColor);
-					WriteableBitmap b = new WriteableBitmap(textBlock, null);
-					mCurrentDrawTarget.Blit(new Rect(left, top, b.PixelWidth, b.PixelHeight),
-						b,
-						new Rect(0, 0, b.PixelWidth, b.PixelHeight));
+					bitmap = new WriteableBitmap(textBlock, null);
+					w = bitmap.PixelWidth;
+					h = bitmap.PixelHeight;
 				});
+
+				mCurrentDrawTarget.Blit(new Rect(left, top, w, h),
+					bitmap,
+					new Rect(0, 0, w, h));
 			};
 
 			syscalls.maGetTextSize = delegate(int str)
@@ -189,25 +195,21 @@ namespace MoSync
 				String text = core.GetDataMemory().ReadWStringAtAddress(str);
 				if (text.Length == 0) return;
 
+				WriteableBitmap bitmap = null;
+				double w = 0, h = 0;
+
 				MoSync.Util.RunActionOnMainThreadSync(() =>
 				{
 					textBlock.Text = text;
 					textBlock.Foreground = new SolidColorBrush(mCurrentWindowsColor);
-					WriteableBitmap b = new WriteableBitmap(textBlock, null);
-					Rect dstRect = new Rect(left, top, b.PixelWidth, b.PixelHeight);
-					Rect srcRect = new Rect(0, 0, b.PixelWidth, b.PixelHeight);
-					// cliprect..
-					Rect clipRect = new Rect(0, 0, mBackBuffer.PixelWidth, mBackBuffer.PixelHeight);
-					clipRect.Intersect(dstRect);
-					if (clipRect.IsEmpty == true)
-					{
-						return;
-					}
-
-					mCurrentDrawTarget.Blit(dstRect,
-						b,
-						srcRect);
+					bitmap = new WriteableBitmap(textBlock, null);
+					w = bitmap.PixelWidth;
+					h = bitmap.PixelHeight;
 				});
+
+				mCurrentDrawTarget.Blit(new Rect(left, top, w, h),
+					bitmap,
+					new Rect(0, 0, w, h));
 			};
 
 			syscalls.maGetTextSizeW = delegate(int str)
@@ -466,6 +468,19 @@ namespace MoSync
 		protected Syscalls.Delegate_maUpdateScreen mOldUpdateScreenImplementation;
 		public void Init(Ioctls ioctls, Core core, Runtime runtime)
 		{
+
+			ioctls.maFontSetCurrent = delegate(int _font)
+			{
+				FontModule.FontInfo finfo = runtime.GetModule<FontModule>().GetFont(_font);
+				MoSync.Util.RunActionOnMainThreadSync(() =>
+					{
+						textBlock.FontFamily = finfo.family;
+						textBlock.FontStyle = finfo.style;
+						textBlock.FontWeight = finfo.weight;
+					});
+
+				return 0;
+			};
 
 			ioctls.maFrameBufferInit = delegate(int frameBufferPointer)
 			{

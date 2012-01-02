@@ -14,7 +14,7 @@ namespace MoSync
 {
 	public class FontModule : IIoctlModule
 	{
-		public struct FontInfo
+		public class FontInfo
 		{
 			public FontFamily family;
 			public FontWeight weight;
@@ -84,12 +84,16 @@ namespace MoSync
 //		private List<GlyphTypeface> mFonts = new List<GlyphTypeface>();
 		private List<FontInfo> mFonts = new List<FontInfo>();
 
-		GlyphTypeface mCurrentFont = null;
-		FontSource mCurrentFontSource = null;
+		int mCurrentFont = -1;
 
 		public FontInfo GetFont(int handle)
 		{
 			return mFonts[handle];
+		}
+
+		public FontInfo GetCurrentFont()
+		{
+			return mFonts[mCurrentFont];
 		}
 
 		public void Init(Ioctls ioctls, Core core, Runtime runtime)
@@ -153,11 +157,6 @@ namespace MoSync
 				}
 
 				return 0;
-			};
-
-			ioctls.maFontSetCurrent = delegate(int _font)
-			{
-				return -1;
 			};
 		}
 	}
