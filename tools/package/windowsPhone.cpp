@@ -37,7 +37,6 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	testName(s);
 	testVendor(s);
 	testVersion(s);
-	//testIOSCert(s);
 
 	std::ostringstream generateCmd;
 	std::ostringstream buildCmd;
@@ -49,21 +48,10 @@ void packageWindowsPhone(const SETTINGS& s, const RuntimeInfo& ri) {
 	string templateFileLocation = string(ri.path) + "/template/mosync.csproj";
 	string csprojOutputFile = dst + "/project/mosync.csproj";
 	string csprojOutput = dst + "/project";
-
-	/*
-	generateCmd << getBinary("iphone-builder") << " generate -project-name " <<
-		arg(s.name) << " -version " << s.version << " -company-name " <<
-		arg(s.vendor) << " -cert " << arg(s.iOSCert) << " -input " << file(templateLocation) <<
-		" -output " << file(xcodeprojOutput);
-	*/
+	string outputType = s.outputType ? string(s.outputType) : string("interpreted");
 
 	_mkdir(csprojOutput.c_str());
 	copyFilesRecursively(templateLocation.c_str(), csprojOutput.c_str());
-
-	std::string outputType = "interpreted";
-	if(streq(s.WPconfig, "rebuild_debug") || streq(s.WPconfig, "rebuild_release"))
-		outputType = "rebuilt";
-
 
 	generateCmd << getBinary("winphone-builder") <<
 		" -output-type " << outputType <<
