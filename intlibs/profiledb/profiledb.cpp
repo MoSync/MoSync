@@ -29,6 +29,7 @@
 #include "File.h"
 #include "profiledb.h"
 #include "XMLWriter.h"
+#include "../helpers/attribute.h"
 
 using namespace std;
 
@@ -110,7 +111,7 @@ static const char* findAttr(const char* name, const char** attributes) {
 	return NULL;
 }
 
-static void error(const char* file, int lineNo, string msg) __attribute__ ((noreturn));
+static void error(const char* file, int lineNo, string msg) GCCATTRIB(noreturn);
 
 static void error(const char* file, int lineNo, string msg) {
 	ostringstream errMsg;
@@ -122,7 +123,7 @@ static void error(const char* file, int lineNo, string msg) {
 	exit(1);
 }
 
-static void error(ParserState* state, string msg) __attribute__ ((noreturn));
+static void error(ParserState* state, string msg) GCCATTRIB(noreturn);
 
 static void error(ParserState* state, string msg) {
 	if (state) {
@@ -518,17 +519,17 @@ bool ProfileDB::parseProfileXML(Profile* profile, set<string> alreadyFound) {
 			        == XML_STATUS_ERROR) {
 				printf("<!-- FATAL ERROR: XML malformatted (%s, line %d) -->",
 				        path.c_str(), state.lineNo);
-				return NULL;
+				return false;
 			}
 		}
 	} else {
-		return NULL;
+		return false;
 	}
 
 	XML_Parse(parser, "", 0, true);
 	XML_ParserFree(parser);
 
-	return profile;
+	return true;
 }
 
 bool ProfileDB::internalMatchProfile(Profile* profile,
