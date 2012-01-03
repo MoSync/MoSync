@@ -293,7 +293,9 @@ static void writeManifest(const char* filename, const SETTINGS& s, const Runtime
 		<<"\t\t</activity>\n"
 		;
 	file <<"\t\t<service android:name=\"com.mosync.internal.android.notifications.LocalNotificationsService\" />\n";
-    if (ri.androidVersion >= 8) {
+	file <<"\t\t<service android:name=\".MoSyncService\" />\n";
+
+	if (ri.androidVersion >= 8) {
 		writeC2DMReceiver(file, packageName);
 	}
 	file <<"\t</application>\n"
