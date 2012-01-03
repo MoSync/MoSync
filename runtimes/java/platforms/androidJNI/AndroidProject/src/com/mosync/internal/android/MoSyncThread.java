@@ -264,7 +264,7 @@ public class MoSyncThread extends Thread
 
 	int mTextConsoleHeight;
 
-	//private boolean mIsSleeping;
+	private boolean mIsSleeping;
 
 	/**
 	 * Ascent of text in the default console font.
@@ -314,7 +314,7 @@ public class MoSyncThread extends Thread
 
 		mHasDied = false;
 
-		//mIsSleeping = false;
+		mIsSleeping = false;
 
 		mMoSyncNetwork = new MoSyncNetwork(this);
 		mMoSyncSound = new MoSyncSound(this);
@@ -920,8 +920,8 @@ public class MoSyncThread extends Thread
 		nativePostEvent(event);
 
 		// Wake up thread if sleeping.
-		//if(mIsSleeping)
-		interrupt();
+		if(mIsSleeping)
+			interrupt();
 	}
 
 	/**
@@ -2244,7 +2244,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maWait");
 
-		//mIsSleeping = true;
+		mIsSleeping = true;
 		try
 		{
 	 		if (timeout<=0)
@@ -2266,7 +2266,7 @@ public class MoSyncThread extends Thread
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
 
-		//mIsSleeping = false;
+		mIsSleeping = false;
 
 		SYSLOG("maWait returned");
 	}
