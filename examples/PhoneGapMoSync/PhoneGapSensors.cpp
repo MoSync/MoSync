@@ -112,7 +112,6 @@ void PhoneGapSensors::sendLocationData(const MAEvent& event)
 	MALocation& loc = *(MALocation*)event.data;
 	char result[1024];
 	bool keepCallBack;
-
 	// This is used to prevent PhoneGap from deleting the callback after
 	// receiving the first result.
 	if (mLocationWatchStarted) {
@@ -127,14 +126,14 @@ void PhoneGapSensors::sendLocationData(const MAEvent& event)
 
 	// Call the PhoneGap function, can call the commandResult function too.
 	sprintf(result,
-		"{\"coords\":{"
-			"\"latitude\":%f,"
-			"\"longitude\":%f,"
-			"\"altitude\":%f,"
-			"\"accuracy\":%f,"
-			"\"altitudeAccuracy\":%f,"
-			"\"heading\":%f,"
-			"\"speed\":%f"
+		"{coords:{"
+			"latitude:%f,"
+			"longitude:%f,"
+			"altitude:%f,"
+			"accuracy:%f,"
+			"altitudeAccuracy:%f,"
+			"heading:%f,"
+			"speed:%f"
 			"}}",
 		loc.lat,
 		loc.lon,
@@ -271,7 +270,6 @@ void PhoneGapSensors::processLocationRequest(
 {
 	//Enable accelerometer which is supported in PhoneGap
 	int res = maLocationStart();
-	lprintfln("Started the Location Service with : %d +++", res);
 	if (res < 0)
 	{
 		mMessageHandler->callError(
