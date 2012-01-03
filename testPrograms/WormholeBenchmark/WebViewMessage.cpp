@@ -32,6 +32,8 @@ MA 02110-1301, USA.
 
 #include "WebViewMessage.h"
 
+using namespace MAUtil;
+
 namespace App
 {
 	/**
@@ -39,10 +41,10 @@ namespace App
 	 * @param str Encoded string.
 	 * @return The decoded string.
 	 */
-	MAUtil::String WebViewMessage::unescape(const MAUtil::String& str)
+	String WebViewMessage::unescape(const String& str)
 	{
 		// The decoded string.
-		MAUtil::String result = "";
+		String result = "";
 
 		for (int i = 0; i < str.length(); ++i)
 		{
@@ -50,7 +52,7 @@ namespace App
 			if ('%' == (char) str[i])
 			{
 				// Get the char value of the two digit hex value.
-				MAUtil::String hex = str.substr(i + 1, 2);
+				String hex = str.substr(i + 1, 2);
 				long charValue = strtol(
 					hex.c_str(),
 					NULL,
@@ -76,10 +78,10 @@ namespace App
 	 * @param str String to be encoded.
 	 * @return The encoded string.
 	 */
-	MAUtil::String WebViewMessage::escape(const MAUtil::String& str)
+	String WebViewMessage::escape(const String& str)
 	{
 		// The encoded string.
-		MAUtil::String result = "";
+		String result = "";
 		char buf[8];
 
 		for (int i = 0; i < str.length(); ++i)
@@ -103,22 +105,29 @@ namespace App
 	}
 
 	/**
-	 * Constructor.
+	 * Constructor. Here we parse the message.
 	 */
 	WebViewMessage::WebViewMessage(
 		NativeUI::WebView* webView,
 		MAHandle dataHandle)
 	{
 		mWebView = webView;
+		mCurrentMessageIndex = -1;
 		parse(dataHandle);
 	}
 
 	/**
-	 * Destructor.
+	 * Destructor. Here we delete the JSON tree.
 	 */
 	WebViewMessage::~WebViewMessage()
 	{
-		// Nothing needs to be explicitly destroyed.
+		// The root must not be NULL or Value::NUL.
+		if (NULL != mJSONRoot && YAJLDom::Value::NUL != mJSONRoot->getType())
+		{
+			// Delete the JSON tree.
+			YAJLDom::deleteValue(mJSONRoot);
+			mJSONRoot = NULL;
+		}
 	}
 
 	/**
@@ -131,40 +140,92 @@ namespace App
 	}
 
 	/**
+	 * Move to the next message. Initially, the message
+	 * pointer is positioned right before the first message.
+	 * Do a call to this method to get the first message.
+	 *
+	 * @return true if moved to next message, false
+	 * if there are no more messages.
+	 */
+	bool WebViewMessage::next()
+	{
+		if (NULL != mJSONRoot && YAJLDom::Value::ARRAY == mJSONRoot->getType())
+		{
+			++mCurrentMessageIndex;
+			return mCurrentMessageIndex < mJSONRoot->getNumChildValues();
+		}
+		return false;
+	}
+
+	/**
 	 * Checks if this message matches the given message name.
 	 */
-	bool WebViewMessage::is(const MAUtil::String& messageName)
+	bool WebViewMessage::is(const char* paramName)
 	{
-		return mMessageName == messageName;
+		YAJLDom::Value* value = getParamNode("messageName");
+		if (NULL != value && YAJLDom::Value::STRING == value->getType());
+		{
+//			YAJLDom::StringValue* stringValue = (YAJLDom::StringValue*) value;
+//			return 0 == strncmp(
+//				paramName,
+//				stringValue->getCharPointer(),
+//				stringValue->getLength());
+			return value->toString() == paramName;
+		}
+		return false;
 	}
 
 	/**
 	 * Returns the string value of a message parameter.
 	 * @return The param value as a string.
 	 */
-	MAUtil::String WebViewMessage::getParam(const MAUtil::String& paramName)
+	String WebViewMessage::getParam(const char* paramName)
 	{
-		return mMessageParams[paramName];
+		YAJLDom::Value* value = getParamNode(paramName);
+		if (NULL != value && YAJLDom::Value::STRING == value->getType());
+		{
+			return value->toString();
+		}
+		return "";
 	}
 
 	/**
 	 * Returns the integer value of a message parameter.
 	 * @return The param value as an int.
 	 */
-	int WebViewMessage::getParamInt(const MAUtil::String& paramName)
+	int WebViewMessage::getParamInt(const char* paramName)
 	{
-		return (int) strtol(
-			mMessageParams[paramName].c_str(),
-			NULL,
-			10);
+		YAJLDom::Value* value = getParamNode(paramName);
+		if (NULL != value && YAJLDom::Value::NUMBER == value->getType());
+		{
+			return value->toInt();
+		}
+		return 0;
 	}
 
 	/**
 	 * Checks if the given parameter name is in the message.
 	 */
-	bool WebViewMessage::hasParam(const MAUtil::String& paramName)
+	bool WebViewMessage::hasParam(const char* paramName)
 	{
-		return mMessageParams.find(paramName) != mMessageParams.end();
+		YAJLDom::Value* value = getParamNode(paramName);
+		return (NULL != value && YAJLDom::Value::NUL != value->getType());
+	}
+
+	/**
+	 * Get the node of a parameter in the current message.
+	 */
+	YAJLDom::Value* WebViewMessage::getParamNode(const char* paramName)
+	{
+		if (NULL != mJSONRoot && YAJLDom::Value::ARRAY == mJSONRoot->getType())
+		{
+			YAJLDom::Value* message = mJSONRoot->getValueByIndex(mCurrentMessageIndex);
+			if (YAJLDom::Value::MAP == message->getType())
+			{
+				return message->getValueForKey(paramName);
+			}
+		}
+		return NULL;
 	}
 
 	/**
@@ -198,70 +259,21 @@ namespace App
 
 		//maWriteLog(stringData, dataSize);
 
-		// Create String object with message.
-		MAUtil::String messageString = stringData;
+		// Check that we have the "ma:" prefix,
+		// followed by the JSON array.
+		if (stringData[0] != 'm') { return; }
+		if (stringData[1] != 'a') { return; }
+		if (stringData[2] != ':') { return; }
+		if (stringData[3] != '[') { return; }
 
-		// Find schema.
-		int start = messageString.find("mosync://");
-		if (0 != start)
-		{
-			return;
-		}
+		// Pointer to the start of the JSOn array at the
+		// opening '[' character.
+		char* jsonData = stringData + 3;
 
-		// Set start of message name.
-		start = 9;
+		mJSONRoot = YAJLDom::parse(
+			(const unsigned char*)jsonData,
+			dataSize - 3);
 
-		// Find end of message name.
-		int end = messageString.find("?", start);
-		if (MAUtil::String::npos == end)
-		{
-			// No params, set message name to rest of string.
-			mMessageName = messageString.substr(start);
-			return;
-		}
-
-		// Set message name.
-		mMessageName = messageString.substr(start, end - start);
-#if(0)
-		while (1)
-		{
-			// Find param name.
-			start = end + 1;
-			end = messageString.find("=", start);
-			if (MAUtil::String::npos == end)
-			{
-				// No param name found, we are done.
-				break;
-			}
-
-			// Set param name.
-			MAUtil::String paramName = messageString.substr(start, end - start);
-			MAUtil::String paramValue;
-
-			// Find end of param value.
-			start = end + 1;
-			end = messageString.find("&", start);
-			if (MAUtil::String::npos == end)
-			{
-				// Last param, set param value to rest of string.
-				paramValue = messageString.substr(start);
-			}
-			else
-			{
-				paramValue = messageString.substr(start, end - start);
-			}
-
-			// Add param to table.
-			mMessageParams.insert(unescape(paramName), unescape(paramValue));
-
-			// If no more params we are done.
-			if (MAUtil::String::npos == end)
-			{
-				break;
-			}
-		}
-#endif
-		// Free string data.
 		free(stringData);
 	}
 

@@ -38,6 +38,7 @@ MA 02110-1301, USA.
 #include <MAUtil/String.h>
 #include <MAUtil/HashMap.h>
 #include <NativeUI/WebView.h>
+#include <yajl/YAJLDom.h>
 
 namespace App
 {
@@ -46,13 +47,9 @@ namespace App
  * Class that parses messages in the form of urls sent from a
  * WebView as MAW_EVENT_WEB_VIEW_HOOK_INVOKED events.
  *
- * Message (urls) used with this class has the format:
+ * Messages used with this class has the format:
  *
- *   mosync://MessageName?Param1=Value1&Param2=Value2&...
- *
- * Example JavaScript call (with no parameters):
- *
- *   document.location = "mosync://GetGeoLocation";
+ *   ma:[{"messageName":"message1",...},{"messageName":"message2",...},...]
  *
  * TODO: Add copy constructor and assignment operator.
  */
@@ -90,26 +87,41 @@ public:
 	virtual NativeUI::WebView* getWebView();
 
 	/**
+	 * Move to the next message. Initially, the message
+	 * pointer is positioned right before the first message.
+	 * Do a call to this method to get the first message.
+	 *
+	 * @return true if moved to next message, false
+	 * if there are no more messages.
+	 */
+	virtual bool next();
+
+	/**
 	 * Checks if this message matches the given message name.
 	 */
-	virtual bool is(const MAUtil::String& messageName);
+	virtual bool is(const char* paramName);
 
 	/**
 	 * Returns the string value of a message parameter.
 	 * @return The param value as a string.
 	 */
-	virtual MAUtil::String getParam(const MAUtil::String& paramName);
+	virtual MAUtil::String getParam(const char* paramName);
 
 	/**
 	 * Returns the integer value of a message parameter.
 	 * @return The param value as an int.
 	 */
-	virtual int getParamInt(const MAUtil::String& paramName);
+	virtual int getParamInt(const char* paramName);
 
 	/**
 	 * Checks if the given parameter name is in the message.
 	 */
-	virtual bool hasParam(const MAUtil::String& paramName);
+	virtual bool hasParam(const char* paramName);
+
+	/**
+	 * Get the node of a parameter in the current message.
+	 */
+	virtual MAUtil::YAJLDom::Value* getParamNode(const char* paramName);
 
 protected:
 	/**
@@ -123,15 +135,21 @@ protected:
 	 */
 	NativeUI::WebView* mWebView;
 
+public:
 	/**
-	 * The message name is the "command name".
+	 * The name of the current message (the "command name").
 	 */
 	MAUtil::String mMessageName;
 
 	/**
 	 * Table for message parameters.
 	 */
-	MAUtil::HashMap<MAUtil::String, MAUtil::String> mMessageParams;
+	MAUtil::YAJLDom::Value* mJSONRoot;
+
+	/**
+	 * Index of current message.
+	 */
+	int mCurrentMessageIndex;
 };
 
 } // namespace

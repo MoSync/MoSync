@@ -24,8 +24,6 @@ class MyMoblet : public WebAppMoblet
 public:
 	MyMoblet()
 	{
-		lprintfln("@@@ MyMoblet");
-
 		// Enable message sending from JavaScript to C++.
 		enableWebViewMessages();
 
@@ -53,55 +51,66 @@ public:
 	{
 		App::WebViewMessage message(webView, urlData);
 
-		if (message.is("ThroughputMessage"))
+		while (message.next())
 		{
-			// No action.
-		}
-		else if (message.is("ThroughputEnd"))
-		{
-			callJS("ThroughputEnd()");
-		}
-		if (message.is("DataThroughputMessage"))
-		{
-//			String data = message.getParam("data");
-//			if (data[data.size() - 1] != 'b')
-//			{
-//				maPanic(0, "DataThroughputMessage: Data not ok");
-//			}
-			//maWriteLog("@@@", 3);
-		}
-		else if (message.is("DataThroughputEnd"))
-		{
-			callJS("DataThroughputEnd()");
-		}
-		else if (message.is("RoundtripMessage"))
-		{
-			callJS("RoundtripCallback()");
-		}
-		else if (message.is("UrlDecodingTest"))
-		{
-//			int iterations = 100;
-//
-//			int startTime = maGetMilliSecondCount();
-//
-//			for (int i = 0; i < iterations; ++i)
-//			{
-//				App::WebViewMessage msg(webView, urlData);
-//				String data = msg.getParam("data");
-//				if (data[data.size() - 1] != 'b')
-//				{
-//					maPanic(0, "UrlDecodingTest: Data not ok");
-//				}
-//			}
-//
-//			int timeTaken = maGetMilliSecondCount() - startTime;
-//
-//			float decodingsPerSecond = ((float)iterations / (float)timeTaken) * 1000.0;
+			if (message.is("ThroughputMessage"))
+			{
+				//lprintfln("C++ ThroughputMessage");
+				// No action.
+			}
+			else if (message.is("ThroughputEnd"))
+			{
+				//lprintfln("C++ ThroughputEnd");
+				callJS("ThroughputEnd()");
+			}
+			else if (message.is("DataThroughputMessage"))
+			{
+				//lprintfln("C++ DataThroughputMessage");
+	//			String data = message.getParam("data");
+	//			if (data[data.size() - 1] != 'b')
+	//			{
+	//				maPanic(0, "DataThroughputMessage: Data not ok");
+	//			}
+			}
+			else if (message.is("DataThroughputEnd"))
+			{
+				//lprintfln("C++ DataThroughputEnd");
+				callJS("DataThroughputEnd()");
+			}
+			else if (message.is("RoundtripMessage"))
+			{
+				//lprintfln("C++ RoundtripMessage");
+				callJS("RoundtripCallback()");
+			}
+			else if (message.is("UrlDecodingTest"))
+			{
+	//			int iterations = 100;
+	//
+	//			int startTime = maGetMilliSecondCount();
+	//
+	//			for (int i = 0; i < iterations; ++i)
+	//			{
+	//				App::WebViewMessage msg(webView, urlData);
+	//				String data = msg.getParam("data");
+	//				if (data[data.size() - 1] != 'b')
+	//				{
+	//					maPanic(0, "UrlDecodingTest: Data not ok");
+	//				}
+	//			}
+	//
+	//			int timeTaken = maGetMilliSecondCount() - startTime;
+	//
+	//			float decodingsPerSecond = ((float)iterations / (float)timeTaken) * 1000.0;
 
-			float decodingsPerSecond = 0;
-			char buf[1024];
-			sprintf(buf, "UrlDecodingResult(%f)", decodingsPerSecond);
-			callJS(buf);
+				float decodingsPerSecond = 0;
+				char buf[1024];
+				sprintf(buf, "UrlDecodingResult(%f)", decodingsPerSecond);
+				callJS(buf);
+			}
+			else
+			{
+				lprintfln("@@@ C++ Unknown message");
+			}
 		}
 
 		// Tell the WebView that we have processed the message, so that

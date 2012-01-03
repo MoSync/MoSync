@@ -70,11 +70,11 @@ html
 	Import the bridge library for communication between
 	JavaScript and C++.
 -->
-<script src="js/bridge.js"></script>
+<script src="js/mosync-bridge.js"></script>
 
 <script>
 
-var Iterations = 200;
+var Iterations = 200; //200
 // 30*4*5
 // = 120*5
 // = 600
@@ -108,45 +108,10 @@ function TestStart()
 {
 	SetText("<p>Running Wormhole performance tests...</p>");
 
-	// Use the faster method.
-	bridge.messagehandler.send = bridge.messagehandler.sendfast;
-
 	// Start first test.
 	ThroughputStart();
+	//RoundtripStart();
 	//UrlEncodingTest();
-	//TestPromptBare();
-}
-
-/**
- * This test is for Android only, and requires a change
- * in the runtime to be meaningful.
- */
-function TestPromptBare()
-{
-	var iterations = Iterations;
-
-	var startTime = new Date().getTime();
-
-	for (var i = 0; i < iterations; ++i)
-	{
-		var result = prompt(LongMessage);
-		if (result != "ok")
-		{
-			console.log("@@@@@@ TestPromptBare failed");
-			return;
-		}
-	}
-
-	// Report result.
-	var timeTaken = new Date().getTime() - startTime;
-	var promptsPerSecond = (iterations / timeTaken) * 1000;
-
-	// Display result.
-	promptsPerSecond = Math.round(promptsPerSecond*10000)/10000;
-	SetText(GetText()
-		+ "<p>Prompts/second: "
-		+ promptsPerSecond
-		+ "</p>");
 }
 
 /**
@@ -161,9 +126,9 @@ function ThroughputStart()
 	for (var i = 0; i < Iterations; ++i)
 	{
 		++ThroughputCount;
-		bridge.messagehandler.send({messageName: "ThroughputMessage"}, null);
+		mosync.bridge.send({messageName: "ThroughputMessage"}, null);
 	}
-	bridge.messagehandler.send({messageName: "ThroughputEnd"}, null);
+	mosync.bridge.send({messageName: "ThroughputEnd"}, null);
 }
 
 /**
@@ -176,7 +141,7 @@ function ThroughputEnd()
 	var messagesPerSecond = (ThroughputCount / timeTaken) * 1000;
 
 	// Display result.
-	messagesPerSecond = Math.round(messagesPerSecond*10000)/10000;
+	messagesPerSecond = Math.round(messagesPerSecond*100)/100;
 	SetText(GetText()
 		+ "<p>Throughput/second: "
 		+ messagesPerSecond
@@ -195,9 +160,9 @@ function DataThroughputStart()
 	for (var i = 0; i < Iterations/10; ++i)
 	{
 		++ThroughputCount;
-		bridge.messagehandler.send({messageName: "DataThroughputMessage", data: LongMessage}, null);
+		mosync.bridge.send({messageName: "DataThroughputMessage", data: LongMessage}, null);
 	}
-	bridge.messagehandler.send({messageName: "DataThroughputEnd"}, null);
+	mosync.bridge.send({messageName: "DataThroughputEnd"}, null);
 }
 
 function DataThroughputEnd()
@@ -207,7 +172,7 @@ function DataThroughputEnd()
 	var messagesPerSecond = (ThroughputCount / timeTaken) * 1000;
 
 	// Display result.
-	messagesPerSecond = Math.round(messagesPerSecond*10000)/10000;
+	messagesPerSecond = Math.round(messagesPerSecond*100)/100;
 	SetText(GetText()
 		+ "<p>Data throughput/second: "
 		+ messagesPerSecond
@@ -225,7 +190,7 @@ function RoundtripStart()
 {
 	RoundtripStartTime = new Date().getTime();
 	RoundtripCount = 0;
-	bridge.messagehandler.send({messageName: "RoundtripMessage"}, null);
+	mosync.bridge.send({messageName: "RoundtripMessage"}, null);
 }
 
 /**
@@ -237,7 +202,7 @@ function RoundtripCallback()
 	if (RoundtripCount < Iterations)
 	{
 		// Do more roundtrips.
-		bridge.messagehandler.send({messageName: "RoundtripMessage"}, null);
+		mosync.bridge.send({messageName: "RoundtripMessage"}, null);
 	}
 	else
 	{
@@ -246,14 +211,14 @@ function RoundtripCallback()
 		var messagesPerSecond = (RoundtripCount / timeTaken) * 1000;
 
 		// Display result.
-		messagesPerSecond = Math.round(messagesPerSecond*10000)/10000;
+		messagesPerSecond = Math.round(messagesPerSecond*100)/100;
 		SetText(GetText()
 			+ "<p>Roundtrip messages/second: "
 			+ messagesPerSecond
 			+ "</p>");
 
 		// Run next test.
-		UrlEncodingTest();
+		//UrlEncodingTest();
 	}
 }
 
@@ -280,7 +245,7 @@ function UrlEncodingTest()
 	var encodingsPerSecond = (iterations / timeTaken) * 1000;
 
 	// Display result.
-	encodingsPerSecond = Math.round(encodingsPerSecond*10000)/10000;
+	encodingsPerSecond = Math.round(encodingsPerSecond*100)/100;
 	SetText(GetText()
 		+ "<p>JS UrlEncodings/second: "
 		+ encodingsPerSecond
@@ -292,19 +257,51 @@ function UrlEncodingTest()
 
 function UrlDecodingTest()
 {
-	bridge.messagehandler.send({messageName: "UrlDecodingTest", data: LongMessage}, null);
+	mosync.bridge.send({messageName: "UrlDecodingTest", data: LongMessage}, null);
 }
 
 function UrlDecodingResult(decodingsPerSecond)
 {
 	// Display result.
-	decodingsPerSecond = Math.round(decodingsPerSecond*10000)/10000;
+	decodingsPerSecond = Math.round(decodingsPerSecond*100)/100;
 	SetText(GetText()
 		+ "<p>C++ UrlDecodings/second: "
 		+ decodingsPerSecond
 		+ "</p>");
 }
 
+
+/**
+ * This test is for Android only, and requires a change
+ * in the runtime to be meaningful.
+ */
+function TestPromptBare()
+{
+	var iterations = Iterations;
+
+	var startTime = new Date().getTime();
+
+	for (var i = 0; i < iterations; ++i)
+	{
+		var result = prompt(LongMessage);
+		if (result != "ok")
+		{
+			console.log("@@@@@@ TestPromptBare failed");
+			return;
+		}
+	}
+
+	// Report result.
+	var timeTaken = new Date().getTime() - startTime;
+	var promptsPerSecond = (iterations / timeTaken) * 1000;
+
+	// Display result.
+	promptsPerSecond = Math.round(promptsPerSecond*100)/100;
+	SetText(GetText()
+		+ "<p>Prompts/second: "
+		+ promptsPerSecond
+		+ "</p>");
+}
 
 </script>
 </head>

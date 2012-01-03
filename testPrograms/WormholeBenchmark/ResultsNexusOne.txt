@@ -61,3 +61,10 @@ Data throughput/second: 52.7704
 Roundtrip messages/second: 152.207
 JS UrlEncodings/second: 2076.8432
 C++ UrlDecodings/second: 0
+
+--------------------------------
+Using mosync-bridge.js:
+
+Throughput/second: 364.3
+Data throughput/second: 92.17
+Roundtrip messages/second: 93.28
