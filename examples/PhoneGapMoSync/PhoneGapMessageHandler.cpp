@@ -144,7 +144,7 @@ void PhoneGapMessageHandler::sendConnectionType(MAUtil::String callbackID)
 	//create the callback
 	sprintf(
 		buffer,
-		"%s",
+		"\\\"%s\\\"",
 		networkType);
 
 	callSuccess(
@@ -202,13 +202,13 @@ void PhoneGapMessageHandler::sendDeviceProperties(MAUtil::String callbackID)
 
 	// Send the result back to PhoneGap.
 	sprintf(buffer,
-		"{"
+		"\\'{"
 			"\"platform\":\"%s\","
 			"\"name\":\"%s\","
 			"\"uuid\":\"%s\","
 			"\"version\":\"%s\","
 			"\"phonegap\":\"1.2.0\""
-		"}",
+		"}\\'",
 		deviceOS,
 		deviceName,
 		deviceUUID,
@@ -236,7 +236,6 @@ void PhoneGapMessageHandler::enableHardware()
  */
 void PhoneGapMessageHandler::customEvent(const MAEvent& event)
 {
-	lprintfln("Got a custom event with Type %d", event.type);
 	if (event.type == EVENT_TYPE_LOCATION)
 	{
 		mPhoneGapSensors.sendLocationData(event);
@@ -373,7 +372,7 @@ void PhoneGapMessageHandler::callCallback(
 
 	script += ",'{";
 	script += "\"status\":" + status;
-	script += ",\"message\": \\'" + args + "\\'";
+	script += ",\"message\": " + args;
 
 	if (keepCallback)
 	{
