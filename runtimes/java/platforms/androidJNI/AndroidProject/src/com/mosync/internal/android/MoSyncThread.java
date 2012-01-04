@@ -2587,6 +2587,19 @@ public class MoSyncThread extends Thread
 
 			return 0;
 		}
+/*
+		else if(url.startsWith("tel://"))
+		{
+			if(!(mContext.getPackageManager().checkPermission("android.permission.NFC",
+					mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+			{
+
+			}
+
+			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
+			((Activity)mContext).startActivity(intent);
+		}
+*/
 		return -1;
 	}
 
