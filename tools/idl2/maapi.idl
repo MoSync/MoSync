@@ -1809,17 +1809,34 @@ interface MAAPI {
 	*/
 	void maSoundSetVolume(in int vol);
 
+	typedef int MAExtensionModule;
+	typedef int MAExtensionFunction;
+
+	constset int MA_EXTENSION_ {
+		MODULE_UNAVAILABLE = -1;
+		FUNCTION_UNAVAILABLE = -1;
+	}
 
 	/**
 	* Invokes an extension function. Normally you don't call this function directly.
 	*/
-	ioctl maInvokeExtension {}
+	ioctl maExtensionFunctionInvoke {}
 
 	/**
 	* These functions are available only on certain platforms.
 	* Returns -1 if the function is not available.
 	*/
 	ioctl maIOCtl {
+
+	/**
+	* Loads an extension module. Normally you don't call this function directly.
+	*/
+	MAExtensionModule maExtensionModuleLoad(in MAString id, in int hash);
+
+	/**
+	* Loads an extension function. Normally you don't call this function directly.
+	*/
+	MAExtensionFunction maExtensionFunctionLoad(in MAExtensionModule module, in int index);
 
 #if IX_RESOURCE_TYPES
 	constset int RT_ {  //WARNING: must match the resource compiler.
@@ -4295,14 +4312,12 @@ group WidgetAPI "Widget API" {
         /**
          * @brief Sent from the Edit box when it gains focus(the user selects the widget).
          * The virtual keyboard is shown.
-         * Only for iphone platform.
          */
          EDIT_BOX_EDITING_DID_BEGIN = 16;
 
         /**
          * @brief Sent from the Edit box when it loses focus.
          * The virtual keyboard is hidden.
-         * Only for iphone platform.
          */
          EDIT_BOX_EDITING_DID_END = 17;
 
@@ -4315,6 +4330,7 @@ group WidgetAPI "Widget API" {
          * @brief Sent from the Edit box when the return button was pressed.
          * On iphone platform the virtual keyboard is not closed after receiving this event.
          * The virtual keyboard can be hided by setting the MAW_EDIT_BOX_SHOW_KEYBOARD to "false".
+		 * Not available on Windows Phone 7.1
          */
          EDIT_BOX_RETURN = 19;
 
@@ -4824,6 +4840,13 @@ group WidgetAPI "Widget API" {
 		* See \ref WidgetModalDialogProperties "Modal Dialog properties" for the properties available.
 		*/
 		MODAL_DIALOG = "ModalDialog";
+
+		/**
+		* @brief A panorama control is a Windows Phone 7 specific control
+		* Available only on Windows Phone 7
+		* Seen \ref WidgetPanoramaViewProperties "Panorama View properties" for the properties available
+		*/
+		PANORAMA_VIEW = "PanoramaView";
 	}
 	} // end of WidgetTypes
 
@@ -5052,6 +5075,61 @@ group WidgetAPI "Widget API" {
 		CURRENT_TAB = "currentTab";
 	}
 	} // end of WidgetTabScreenProperties
+
+	/**
+	* The available widget properties for a #MAW_PANORAMA_VIEW. See \ref WidgetProperties "Widget properties" for more properties
+	*/
+
+	group WidgetPanoramaViewProperties "Panorama View properties" {
+	constset MAString MAW_PANORAMA_VIEW_ {
+		/**
+		* @copydoc #MAW_SCREEN_TITLE
+		*/
+		TITLE = "title";
+
+		/**
+		* @brief Sets or gets the currently shown screen to the screen with the given index.
+		*
+		* @validvalue A 0-indexed tab number.
+		*
+		* @setandget
+		*
+		* @par Example set
+		* \code
+		*	maWidgetSetProperty(panoramaViewHandle, MAW_PANORAMA_VIEW_CURRENT_SCREEN, "1");
+		* \endcode
+		*
+		* @par Example get
+		* \code
+		* 	char currentScreenBuffer[BUFFER_SIZE];
+		* 	int result = maWidgetGetProperty(
+		* 		panoramaViewHandle,
+		* 		MAW_WEB_VIEW_CURRENT_SCREEN,
+		* 		currentScreenBuffer,
+		*		BUFFER_SIZE);
+		* 	if (result > 0)
+		* 	{
+		* 	    // Do something with current screen.
+		* 	}
+		* \endcode
+		*/
+		CURRENT_SCREEN = "currentScreen";
+
+		/**
+		 * @brief Sets the background image of the view
+		 *
+		 * @validvalue MoSync handle to an uncompressed image resource. The size of the image should be large enough to fill the space used by the panorama
+		 *
+		 * @setonly
+		 * @par Example
+		 * \code
+		 *	maWidgetSetProperty(panoramaViewHandle, MAW_PANORAMA_VIEW_BACKGROUND_IMAGE, toString(R_MY_IMG));
+		 * \endcode
+		 */
+
+		BACKGROUND_IMAGE = "backgroundImage";
+	}
+	} // end of WidgetPanoramaViewProperties
 
 	/**
 	* The available widget properties for a #MAW_STACK_SCREEN. See \ref WidgetProperties "Widget properties" for more properties.
@@ -7806,8 +7884,7 @@ group NFCAPI "NFC API" {
 		* Start listening to NFC events.
 		* \return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
 		* MA_NFC_NOT_AVAILABLE if NFC is not at all available, or
-		* 0 otherwise. If the proper permissions (NFC) are not set, a panic will
-		* be raised.
+		* 0 otherwise.
 		*/
 		int maNFCStart();
 
@@ -7962,7 +8039,8 @@ group NFCAPI "NFC API" {
 		/**
 		* Gets the NDEF message from a tag, which must
 		* be of the MA_NFC_TAG_TYPE_NDEF type.
-		* * If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* (Please note the difference between an NDEF \b tag and an NDEF \b message.)
 		* \return The handle to the NDEF message, which
 		* may be subsequently used in NDEF specfic functions,
 		* or the zero handle if the tag has no NDEF message
@@ -7978,15 +8056,15 @@ group NFCAPI "NFC API" {
 
 		/**
 		* \return A handle to the ith NDEF record of an NDEF message.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
-		MAHandle maNFCGetNDEFRecord(in MAHandle ndef, in int ix);
+		MAHandle maNFCGetNDEFRecord(in MAHandle ndefMessage, in int ix);
 
 		/**
 		* \return The number of NDEF records in an NDEF message.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
-		int maNFCGetNDEFRecordCount(in MAHandle ndef);
+		int maNFCGetNDEFRecordCount(in MAHandle ndefMessage);
 
 		/**
 		* Reads the variable length id of an NDEF record.
@@ -7994,7 +8072,7 @@ group NFCAPI "NFC API" {
 		* \param dst Where the result should be written to.
 		* \param len The maximum length to write.
 		* \return The number of bytes written.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetNDEFId(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
@@ -8004,13 +8082,13 @@ group NFCAPI "NFC API" {
 		* \param dst Where the result should be written to.
 		* \param len The maximum length to write.
 		* \return The number of bytes written.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetNDEFPayload(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		* Returns the 3-bit TNF of an NDEF record.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetNDEFTnf(in MAHandle ndefRecord);
 
@@ -8020,31 +8098,31 @@ group NFCAPI "NFC API" {
 		* \param dst Where the result should be written to.
 		* \param len The maximum length to write.
 		* \return The number of bytes written.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetNDEFType(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		* Sets the variable length id of an NDEF record.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCSetNDEFId(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
 		* Sets the variable length payload of an NDEF record.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCSetNDEFPayload(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
 		* Sets the 3-bit TNF of an NDEF record,
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCSetNDEFTnf(in MAHandle ndefRecord, in int tnf);
 
 		/**
 		* Returns the variable length type field of an NDEF record.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCSetNDEFType(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
@@ -8058,13 +8136,13 @@ group NFCAPI "NFC API" {
 		* \param sectorIndex The sector to authenticate
 		* \param keySrc The address to the key to authenticate with
 		* \param keyLen The length of the key to authenticate with
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCAuthenticateMifareSector(in MAHandle tagHandle, in int keyType, in int sectorIndex, in MAAddress keySrc, in int keyLen);
 
 		/**
 		* \return The number of sectors of a MIFARE Classic tag.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetMifareSectorCount(in MAHandle tagHandle);
 
@@ -8072,7 +8150,7 @@ group NFCAPI "NFC API" {
 		* Returns the number of blocks in a sector of a MIFARE Classic tag.
 		* \param sector The sector to get the number of blocks in.
 		* \return The number of blocks in a given sector.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetMifareBlockCountInSector(in MAHandle tagHandle, in int sector);
 
@@ -8080,7 +8158,7 @@ group NFCAPI "NFC API" {
 		* Returns the first block of a sector of a MIFARE Classic tag.
 		* \param sector The sector of which to get the first block.
 		* \return The index of the first block of the sector is returned.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCMifareSectorToBlock(in MAHandle tagHandle, in int sector);
 
@@ -8092,7 +8170,7 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to write to.
 		* \param len The number of bytes to read. Several blocks may be read, depending
 		* on len (A block is 16 bytes).
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCReadMifareBlocks(in MAHandle tagHandle, in int firstBlock, out MAAddress dst, in int len);
 
@@ -8104,7 +8182,7 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to read from.
 		* \param len The number of bytes to write. Several blocks may be written, depending
 		* on len (A block is 16 bytes).
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCWriteMifareBlocks(in MAHandle tagHandle, in int firstBlock, in MAAddress dst, in int len);
 
@@ -8116,7 +8194,7 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to write to.
 		* \param len The number of bytes to read. Several pages may be read, depending
 		* on len (A page is 16 bytes).
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Ultralight tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCReadMifarePages(in MAHandle tagHandle, in int firstPage, out MAAddress dst, in int len);
 
@@ -8128,7 +8206,7 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to read from.
 		* \param len The number of bytes to write. Several pages may be written, depending
 		* on len (A page is 16 bytes).
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Ultralight tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCWriteMifarePages(in MAHandle tagHandle, in int firstPage, in MAAddress dst, in int len);
 
@@ -8344,16 +8422,22 @@ group NFCAPI "NFC API" {
 
 		/**
 		 * @copydoc maDBExecSQL()
+		 *
 		 * @param params Array of values to bind to parameters.
-		 * Parameters are specified by question marks (?)
-		 * in the SQL statement.
+		 * Parameters are specified by question marks (?) in the SQL statement.
 		 *
-		 * If this function returns a cursor,
-		 * any text or blob values being pointed to by elements of the array must remain valid until
-		 * the cursor has been destroyed by maDBCursorDestroy().
-		 * The array itself does not need to remain valid after this function returns.
+		 * If this function returns a cursor, any text or blob values being
+		 * pointed to by elements of the array must remain valid until the
+		 * cursor has been destroyed by maDBCursorDestroy().
 		 *
-		 * @param paramCount Number of elements in the array pointed to by \a params.
+		 * The array itself does not need to remain valid after this
+		 * function returns.
+		 *
+		 * @param paramCount Number of elements in the array pointed to
+		 * by \a params.
+		 *
+		 * This function is currently available on iOS and MoRE
+		 * (not on Android).
 		 */
 		MAHandle maDBExecSQLParams(in MAHandle databaseHandle, in MAString sql,
 			in MADBValue params, in int paramCount);

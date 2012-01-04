@@ -295,9 +295,9 @@ static void readHeader(MAHandle fileSystem)
 	// We won't flip the checksum, no need for that,
 	// and it would break the old file format.
 
-	if (sHeader.magic != MAGIC2)
+	if (sHeader.magic != MAGIC1 && sHeader.magic != MAGIC2)
 	{
-		maPanic(0, "sHeader.magic != MAGIC2");
+		maPanic(0, "sHeader.magic invalid");
 	}
 }
 

@@ -42,6 +42,20 @@ void parsePermissions(set<string>& out, const char* permissions) {
 	}
 }
 
-bool isPermissionSet(std::set<std::string>& permissionSet, const char* permission) {
-	return permissionSet.find(string(permission)) != permissionSet.end();
+string getParentPermission(string permission) {
+	string::size_type slashPos = permission.find_last_of("/", string::npos);
+	if (string::npos == slashPos) {
+		return string();
+	} else {
+		return permission.substr(0, slashPos);
+	}
+}
+
+bool isPermissionSet(std::set<std::string>& permissionSet, string permission) {
+	if (permission.length() == 0) {
+		return false;
+	}
+	string parent = getParentPermission(permission);
+	return permissionSet.find(string(permission)) != permissionSet.end() ||
+		isPermissionSet(permissionSet, parent);
 }

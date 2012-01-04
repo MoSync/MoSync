@@ -1209,9 +1209,9 @@ namespace Base
 
 	// TODO : Implement maInvokeExtension
 
-	SYSCALL(int,  maInvokeExtension(int function, int a, int b, int c))
+	SYSCALL(longlong,  maExtensionFunctionInvoke(MAExtensionFunction function, int a, int b, int c))
 	{
-		SYSLOG("maInvokeExtension NOT IMPLEMENTED");
+		SYSLOG("maExtensionFunctionInvoke NOT IMPLEMENTED");
 		return -1;
 	}
 

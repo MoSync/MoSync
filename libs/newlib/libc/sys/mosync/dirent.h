@@ -54,7 +54,7 @@ int dirfd(DIR*);
 DIR* fdopendir(int fd);
 DIR* opendir(const char* name);
 dirent* readdir(DIR*);
-int readdir_r(DIR* restrict, dirent* restrict entry, dirent ** restrict result);
+int readdir_r(DIR* restrict, dirent* __restrict entry, dirent ** __restrict result);
 void rewinddir(DIR*);
 int scandir(const char* name, dirent *** namelist,
 	int (*sel)(const dirent *),
