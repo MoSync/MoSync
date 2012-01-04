@@ -200,11 +200,11 @@ void PhoneGapSensors::sendAccelerometerData(
 
 	// Call the PhoneGap function, can call the commandResult function too.
 	sprintf(result,
-		"{"
+		"\\'{"
 			"\"x\": %f,"
 			"\"y\": %f,"
 			"\"z\": %f"
-		"}",
+		"}\\'",
 		sensorData.values[0],
 		sensorData.values[1],
 		sensorData.values[2]
