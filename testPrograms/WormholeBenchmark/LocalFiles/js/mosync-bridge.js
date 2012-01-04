@@ -55,7 +55,6 @@ var mosync = function()
 		var callbackIdCounter = 0;
 		var messageQueue = [];
 		var messageSender = null;
-		var retainMessages = false;
 
 		/**
 		 * Send a message to C++. If a callback function is
@@ -97,7 +96,7 @@ var mosync = function()
 			// Start timer for sender function.
 			// This will get called once sequential
 			// execution of JS code is done.
-			if (!retainMessages && null == messageSender)
+			if (null == messageSender)
 			{
 				//console.log("@@@ creating message sender");
 				messageSender = setTimeout(function()
@@ -153,18 +152,8 @@ var mosync = function()
 			}
 		};
 
-		// TODO: remove not needed.
-		bridge.retainMessages = function()
-		{
-			retainMessages = true;
-		};
-
 		// You can use sendAllMessages instead!
-		bridge.flushMessages = function()
-		{
-			retainMessages = false;
-			bridge.sendAllMessages();
-		};
+		bridge.flushMessages = bridge.sendAllMessages;
 
 		/**
 		 * @deprecated Not used.

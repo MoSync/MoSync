@@ -73,8 +73,59 @@ html
 <script src="js/mosync-bridge.js"></script>
 
 <script>
+mosync.encoder = (function()
+{
+	var encoder = {};
+	var firstChar = 33;
+	var lastChar = 126;
+	var base = lastChar - firstChar;
 
-var Iterations = 200; //200
+	encoder.itox = function(i)
+	{
+		var n = i;
+		var digits = [];
+
+		while (n > base)
+		{
+			digits.push((n % base) + firstChar);
+			n = (n / base) >> 0;
+		}
+		digits.push(n + firstChar);
+
+		return String.fromCharCode.apply(null, digits);
+	};
+
+	encoder.xtoi = function(s)
+	{
+		var n = 0;
+		var length = s.length;
+
+		for (var i = 0; i < length; ++i)
+		{
+			n += Math.pow(base, i) * (s.charCodeAt(i) - firstChar);
+		}
+
+		return n;
+	};
+
+	encoder.encodeString = function(s)
+	{
+		return ""
+			+ encoder.itox(s.length)
+			+ " "
+			+ s
+			+ " ";
+	};
+
+	return encoder;
+}
+)();
+</script>
+
+
+<script>
+
+var Iterations = 2000; //200
 // 30*4*5
 // = 120*5
 // = 600
@@ -109,9 +160,49 @@ function TestStart()
 	SetText("<p>Running Wormhole performance tests...</p>");
 
 	// Start first test.
-	ThroughputStart();
+	RawMessageStart();
+	//ThroughputStart();
 	//RoundtripStart();
 	//UrlEncodingTest();
+}
+
+function RawMessageStart()
+{
+	ThroughputCount = 0;
+	ThroughputStartTime = new Date().getTime();
+
+	for (var i = 0; i < 1; ++i)
+	{
+		var messageStream = "ms:";
+		for (var j = 0; j < Iterations; ++j)
+		{
+			++ThroughputCount;
+			messageStream = messageStream
+				+ mosync.encoder.encodeString("RAWS")
+				+ mosync.encoder.encodeString("One")
+				+ mosync.encoder.encodeString("Two & three");
+
+		}
+		mosync.bridge.sendRaw(messageStream);
+	}
+	mosync.bridge.sendRaw("ms:" + mosync.encoder.encodeString("RAWE"));
+}
+
+function RawMessageEnd()
+{
+	// Compute performance.
+	var timeTaken = new Date().getTime() - ThroughputStartTime;
+	var messagesPerSecond = (ThroughputCount / timeTaken) * 1000;
+
+	// Display result.
+	messagesPerSecond = Math.round(messagesPerSecond*100)/100;
+	SetText(GetText()
+		+ "<p>Raw messages/second: "
+		+ messagesPerSecond
+		+ "</p>");
+
+	// Start next test.
+	//ThroughputStart();
 }
 
 /**
@@ -123,10 +214,14 @@ function ThroughputStart()
 	ThroughputCount = 0;
 	ThroughputStartTime = new Date().getTime();
 
-	for (var i = 0; i < Iterations; ++i)
+	for (var i = 0; i < Iterations/10; ++i)
 	{
-		++ThroughputCount;
-		mosync.bridge.send({messageName: "ThroughputMessage"}, null);
+		for (var j = 0; j < Iterations; ++j)
+		{
+			++ThroughputCount;
+			mosync.bridge.send({messageName: "ThroughputMessage"}, null);
+		}
+		mosync.bridge.sendAllMessages();
 	}
 	mosync.bridge.send({messageName: "ThroughputEnd"}, null);
 }
@@ -156,11 +251,14 @@ function DataThroughputStart()
 	ThroughputCount = 0;
 	ThroughputStartTime = new Date().getTime();
 
-	// This is so slow that we do less iterations.
 	for (var i = 0; i < Iterations/10; ++i)
 	{
-		++ThroughputCount;
-		mosync.bridge.send({messageName: "DataThroughputMessage", data: LongMessage}, null);
+		for (var j = 0; j < Iterations/10; ++j)
+		{
+			++ThroughputCount;
+			mosync.bridge.send({messageName: "DataThroughputMessage", data: LongMessage}, null);
+		}
+		mosync.bridge.sendAllMessages();
 	}
 	mosync.bridge.send({messageName: "DataThroughputEnd"}, null);
 }
