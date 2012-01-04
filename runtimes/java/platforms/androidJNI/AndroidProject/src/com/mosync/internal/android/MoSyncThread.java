@@ -3472,9 +3472,9 @@ public class MoSyncThread extends Thread
 		return mMoSyncAudio.maAudioDataCreateFromResource(mime, data, offset, length, flags);
 	}
 
-	int maAudioDataCreateFromFile(String mime, String filename, int flags)
+	int maAudioDataCreateFromURL(String mime, String url, int flags)
 	{
-		return mMoSyncAudio.maAudioDataCreateFromFile(mime, filename, flags);
+		return mMoSyncAudio.maAudioDataCreateFromURL(mime, url, flags);
 	}
 
 	int maAudioDataDestroy(int audioData)

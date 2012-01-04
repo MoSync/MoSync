@@ -8529,7 +8529,7 @@ group NFCAPI "NFC API" {
 			/**
 			*
 			*/
-			MAAudioData maAudioDataCreateFromFile(in MAString mime, in MAString filename, in int flags);
+			MAAudioData maAudioDataCreateFromURL(in MAString mime, in MAString url, in int flags);
 
 			/**
 			*

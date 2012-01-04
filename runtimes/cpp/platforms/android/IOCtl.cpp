@@ -3572,20 +3572,20 @@ namespace Base
 		return (int)result;
 	}
 
-	int _maAudioDataCreateFromFile(
+	int _maAudioDataCreateFromURL(
 		const char* mime,
-		const char* filename,
+		const char* url,
 		int flags,
 		JNIEnv* jNIEnv,
 		jobject jThis)
 	{
 		jstring jstrMime = jNIEnv->NewStringUTF(mime);
-		jstring jstrFilename = jNIEnv->NewStringUTF(filename);
+		jstring jstrURL = jNIEnv->NewStringUTF(url);
 		jclass cls = jNIEnv->GetObjectClass(jThis);
 
 		jmethodID methodID = jNIEnv->GetMethodID(
 			cls,
-			"maAudioDataCreateFromFile",
+			"maAudioDataCreateFromURL",
 			"(Ljava/lang/String;Ljava/lang/String;I)I");
 
 		if (methodID == 0)
@@ -3595,11 +3595,11 @@ namespace Base
 			jThis,
 			methodID,
 			jstrMime,
-			jstrFilename,
+			jstrURL,
 			flags);
 
 		jNIEnv->DeleteLocalRef(cls);
-		jNIEnv->DeleteLocalRef(jstrFilename);
+		jNIEnv->DeleteLocalRef(jstrURL);
 		jNIEnv->DeleteLocalRef(jstrMime);
 
 		return (int)result;

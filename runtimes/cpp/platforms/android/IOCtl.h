@@ -1034,10 +1034,10 @@ namespace Base
 		JNIEnv* jNIEnv,
 		jobject jThis);
 
-	//MAAudioData maAudioDataCreateFromFile(in MAString mime, in MAString filename, in int flags);
-	int _maAudioDataCreateFromFile(
+	//MAAudioData maAudioDataCreateFromURL(in MAString mime, in MAString url, in int flags);
+	int _maAudioDataCreateFromURL(
 		const char* mime,
-		const char* filename,
+		const char* url,
 		int flags,
 		JNIEnv* jNIEnv,
 		jobject jThis);

@@ -304,15 +304,15 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 		return audioCreateFromFile(fileName, flags, savedBytes);
 	}
 
-	int maAudioDataCreateFromFile(
+	int maAudioDataCreateFromURL(
 		String mime,
-		String fileName,
+		String url,
 		int flags)
 	{
-		if(fileName.startsWith("http://") || fileName.startsWith("https://"))
-			return audioCreateFromStream(fileName, flags, 0);
+		if(url.startsWith("http://") || url.startsWith("https://"))
+			return audioCreateFromStream(url, flags, 0);
 
-		return audioCreateFromFile(fileName, flags, 0);
+		return audioCreateFromFile(url, flags, 0);
 	}
 
 	int audioCreateFromFile(

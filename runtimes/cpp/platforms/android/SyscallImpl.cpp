@@ -1588,15 +1588,15 @@ return 0; \
 			return _maAudioDataCreateFromResource(mime, data, offset, length, flags, mJNIEnv, mJThis);
 		}
 
-		case  maIOCtl_maAudioDataCreateFromFile:
+		case  maIOCtl_maAudioDataCreateFromURL:
 		{
-			SYSLOG("maIOCtl_maAudioDataCreateFromFile");
+			SYSLOG("maIOCtl_maAudioDataCreateFromURL");
 
 			const char* mime = SYSCALL_THIS->GetValidatedStr(a);
-			const char* filename = SYSCALL_THIS->GetValidatedStr(b);
+			const char* url = SYSCALL_THIS->GetValidatedStr(b);
 			int flags = c;
 
-			return _maAudioDataCreateFromFile(mime, filename, flags, mJNIEnv, mJThis);
+			return _maAudioDataCreateFromFile(mime, url, flags, mJNIEnv, mJThis);
 		}
 
 		case maIOCtl_maAudioDataDestroy:
