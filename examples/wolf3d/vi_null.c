@@ -15,6 +15,10 @@ extern boolean InternalKeyboard[NumCodes];
 
 #include <IX_AUDIOBUFFER.h>
 
+#include <maapi.h>
+static int sWidth;
+static int sHeight;
+
 /*
 ==========================
 =
@@ -80,8 +84,10 @@ void VL_Startup()
 {
 	if (gfxbuf == NULL) {
 		gfxbuf = malloc(320 * 200 * 1);
-		FrameBuffer_init(320, 200, ORIENTATION_0, 0);
+		FrameBuffer_init(320, 200, ORIENTATION_90, 0);
 	}
+	sWidth = EXTENT_X(maGetScrSize());
+	sHeight = EXTENT_Y(maGetScrSize());
 }
 
 /*
@@ -310,6 +316,41 @@ static int XKeysymToScancode(unsigned int keysym)
 			return sc_None;
 	}
 }
+int lastTouch = -1;
+void handleTouch(int pressed, int x, int y)
+{
+	if(x>sWidth/3 && x<sWidth*2/3 && y>sHeight/3 && y < sHeight*2/3 )
+	{
+		lastTouch = MAK_FIRE;
+		keyboard_handler(XKeysymToScancode(lastTouch), 1);
+	}
+	else if(x>sWidth/3 && x < sWidth*2/3)
+	{
+		lastTouch = -1;
+		if(y < sHeight/3)
+			lastTouch = MAK_UP;
+		if(y > sHeight*2/3)
+			lastTouch = MAK_DOWN;
+
+		keyboard_handler(XKeysymToScancode(lastTouch), 1);
+	}
+	else if(y>sHeight/3 && y < sHeight*2/3)
+	{
+		lastTouch = -1;
+		if(x < sWidth/3)
+			lastTouch = MAK_LEFT;
+		if(x > sWidth*2/3)
+			lastTouch = MAK_RIGHT;
+
+		keyboard_handler(XKeysymToScancode(lastTouch), 1);
+	}
+
+	if(pressed == 0)
+	{
+		if(lastTouch != -1)
+			keyboard_handler(XKeysymToScancode(lastTouch), 0);
+	}
+}
 
 void INL_Update()
 {
@@ -317,10 +358,12 @@ void INL_Update()
 	while (maGetEvent(&event)) {
 			switch(event.type) {
 				case EVENT_TYPE_POINTER_PRESSED:
-					keyboard_handler(sc_Space, 1);
+					//keyboard_handler(sc_Space, 1);
+					handleTouch(1, event.point.x, event.point.y);
 				break;
 				case EVENT_TYPE_POINTER_RELEASED:
-					keyboard_handler(sc_Space, 0);
+					//keyboard_handler(sc_Space, 0);
+					handleTouch(0, event.point.x, event.point.y);
 				break;
 
 				case EVENT_TYPE_KEY_PRESSED:
