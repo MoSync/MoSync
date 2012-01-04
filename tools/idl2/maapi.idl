@@ -7737,9 +7737,9 @@ group OpenGLES "OpenGLES" {
 		* \param title The title of the message box shown.
 		* \param message The message should be short, not more than 40 characters,
 		* to ensure its visibility on all screen sizes.
-		* \button1 The text on the first button. On Android it indicates a positive selection.
-		* \button2 The text on the second button. On Android it indicates a neutral selection.
-		* \button3 The text on the third button. On Android it indicates that a negative selection.
+		* \param button1 The text on the first button. On Android it indicates a positive selection.
+		* \param button2 The text on the second button. On Android it indicates a neutral selection.
+		* \param button3 The text on the third button. On Android it indicates that a negative selection.
 		*/
 		void maAlert(in MAString title, in MAString message, in MAString button1, in MAString button2, in MAString button3);
 
