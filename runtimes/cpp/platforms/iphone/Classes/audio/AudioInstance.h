@@ -21,9 +21,10 @@
 
 @class AudioData;
 
-@interface AudioInstance :  NSObject {
+@interface AudioInstance :  NSObject <AVAudioPlayerDelegate> {
     AVAudioPlayer* mAudioPlayer;
     AudioData* mAudioData;
+	BOOL mPrepared;
 }
 
 /**

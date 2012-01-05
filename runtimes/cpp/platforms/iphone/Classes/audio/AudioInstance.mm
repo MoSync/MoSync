@@ -52,6 +52,8 @@
 
 			mAudioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&error];
 
+			mAudioPlayer.delegate = self;
+
 			if(error != nil)
 			{
 				*errorCode = MA_AUDIO_ERR_INVALID_INSTANCE;
@@ -64,13 +66,19 @@
 		}
 	}
 
-	[mAudioPlayer prepareToPlay];
+	mPrepared = NO;
 
 	return [super init];
 }
 
 -(void) play
 {
+	if(!mPrepared)
+	{
+		[mAudioPlayer prepareToPlay];
+		mPrepared = true;
+	}
+
 	[mAudioPlayer play];
 }
 
@@ -112,6 +120,11 @@
 	[super dealloc];
 	if(mAudioPlayer)
 		[mAudioPlayer release];
+}
+
+- (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
+{
+	mPrepared = false;
 }
 
 @end
