@@ -1275,11 +1275,18 @@ interface MAAPI {
 		/// or \< 0 on error.
 		AUDIOBUFFER_FILL = 18;
 #endif
-		/** \brief Event which is triggered when an audio has been asychronous prepared
-		* The MAEvent::audioInstancePrepared contains the prepared MAAudioInstance,
+		/**
+		* \brief Event which is triggered when an audio has been asychronous prepared
+		* The MAEvent::audioInstance contains the prepared MAAudioInstance,
 		* or <0 if a problem happened while preparing.
 		*/
 		AUDIO_PREPARED = 19;
+
+		/**
+		* \brief Event which is triggered when a streaming audio has finished playing
+		* The MAEvent::audioInstance contains the MAAudioInstance which finished
+		*/
+		AUDIO_COMPLETED = 20;
 
 		/** \brief The size of the screen has changed.
 		* Use maGetScrSize() to get the new size.
@@ -1615,9 +1622,11 @@ interface MAAPI {
 
 			/**
 			* Contains the prepared audio instance.
-			* Valid only if the event type is \link #EVENT_TYPE_AUDIO_PREPARED AUDIO_PREPARED \endlink.
+			* Valid only if the event type is \link #EVENT_TYPE_AUDIO_PREPARED AUDIO_PREPARED \endlink
+			* or \link #EVENT_TYPE_AUDIO_COMPLETED AUDIO_COMPLETED \endlink.
 			*/
-			MAAudioInstance audioPreparedInstance;
+			MAAudioInstance audioInstance;
+
 		}
 	}
 
@@ -8659,6 +8668,9 @@ group NFCAPI "NFC API" {
 			* If synchronous the call will block until finished
 			* and the audio instance will be ready directly.
 			* An EVENT_TYPE_AUDIO_PREPARED event will be triggered for the asynchronous prepare.
+			* Notes:
+			* Android: If a streaming audio is already playing and a new one is being prepared,
+			* the playing audio will stop.
 			* \param audio The audio instance
 			* \param async 0 if synchronus, 1 if asynchronous
 			* \return 	MA_AUDIO_ERR_OK on success
@@ -8668,7 +8680,12 @@ group NFCAPI "NFC API" {
 			int maAudioPrepare(in MAAudioInstance audio, in int async);
 
 			/**
-			*
+			* \brief Plays the current sound in the audio instance
+			* If the sound hasn't been prepared it will be prepared before playing.
+			* Notes:
+			* Android: If the audio hasn't been prepared it will be synchrounous prepared before playing,
+			* this means that there might be a delay before this call returns. Always make sure that your
+			* audio has been properly prepared before playing.
 			*/
 			int maAudioPlay(in MAAudioInstance audio);
 

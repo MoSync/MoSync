@@ -51,6 +51,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnErrorListener;
 import android.media.MediaPlayer.OnPreparedListener;
 import android.media.SoundPool;
@@ -177,7 +178,9 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 		private AudioData mAudioData;
 		private float mVolume;
 		private int mLooping;
+		private int mLoopsLeft;
 		private boolean mPlaying;
+		private boolean mPaused;
 		private int mStreamID;
 
 		public AudioInstance(AudioData audioData)
@@ -185,7 +188,9 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 			mAudioData = audioData;
 			mVolume = 1.0f;
 			mLooping = 0;
+			mLoopsLeft = 1;
 			mPlaying = false;
+			mPaused = false;
 			mStreamID = -1;
 		}
 
@@ -207,6 +212,7 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 		void setLooping(int looping)
 		{
 			mLooping = looping;
+			mLoopsLeft = looping+1;
 		}
 
 		int getLooping()
@@ -214,9 +220,36 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 			return mLooping;
 		}
 
+		boolean shouldLoop()
+		{
+			if(mLooping == 0)
+				return false;
+
+			mLoopsLeft--;
+			if(mLoopsLeft == 0)
+				return false;
+
+			return true;
+		}
+
 		boolean isPlaying()
 		{
 			return mPlaying;
+		}
+
+		void setPlaying(boolean playing)
+		{
+			mPlaying = playing;
+		}
+
+		boolean isPaused()
+		{
+			return mPaused;
+		}
+
+		void setPaused(boolean paused)
+		{
+			mPaused = paused;
 		}
 
 		void setStreamID(int streamID)
@@ -241,7 +274,7 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 		AudioStore audioStore = mMoSyncThread.mMoSyncSound.obtainAudioStoreObject(data);
 
 		if(audioStore != null)
-			return maAudioDataCreateFromFile(mime,
+			return maAudioDataCreateFromURL(mime,
 											audioStore.mTemporaryFileName,
 											flags);
 
@@ -428,6 +461,7 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 			return MA_AUDIO_ERR_INVALID_INSTANCE;
 
 		AudioInstance instance = mAudioInstance.get(audioInstance);
+
 		if(instance.isPlaying())
 			maAudioStop(audioInstance);
 
@@ -490,6 +524,9 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 		if(null == instance)
 			return 0;
 
+		if(instance.isPaused())
+			return 0;
+
 		AudioData data = instance.getAudioData();
 
 		if(data.getPreparedState() == AUDIO_PREPARED)
@@ -537,10 +574,13 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 
 		AudioData data = instance.getAudioData();
 
-		if(null != mMediaPlayer)
-			return false;
-
-		mMediaPlayer = new MediaPlayer();
+		if(null == mMediaPlayer)
+			mMediaPlayer = new MediaPlayer();
+		else
+		{
+			mMediaPlayer.stop();
+			mMediaPlayer.reset();
+		}
 
 		try
 		{
@@ -577,6 +617,19 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 
 		AudioData data = instance.getAudioData();
 
+		if(instance.isPaused())
+		{
+			if(MA_AUDIO_DATA_STREAM == data.getFlags())
+			{
+				mMediaPlayer.start();
+			}
+			else
+			{
+				mSoundPool.resume(instance.getStreamID());
+			}
+			return MA_AUDIO_ERR_OK;
+		}
+
 		if(MA_AUDIO_DATA_STREAM == data.getFlags())
 		{
 			try
@@ -597,7 +650,6 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 				}
 
 				mMediaPlayer.setVolume(instance.getVolume(), instance.getVolume());
-
 				mMediaPlayer.start();
 			}
 			catch (Exception e)
@@ -692,6 +744,21 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 
 		AudioData data = instance.getAudioData();
 
+		if((false == instance.isPlaying()) || (true == instance.isPaused()))
+			return MA_AUDIO_ERR_OK;
+
+		if(MA_AUDIO_DATA_STREAM == data.getFlags())
+		{
+			if(null != mMediaPlayer)
+				mMediaPlayer.pause();
+		}
+		else
+		{
+			int streamID = instance.getStreamID();
+			if(streamID != -1)
+				mSoundPool.pause(streamID);
+		}
+/*
 		if((MA_AUDIO_DATA_STREAM == data.getFlags())
 				&& (null != mMediaPlayer))
 		{
@@ -707,8 +774,13 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 
 			mSoundPool.stop(streamID);
 		}
-
+*/
 		return MA_AUDIO_ERR_OK;
+	}
+
+	void killSound(AudioInstance instance)
+	{
+
 	}
 
 	/**
@@ -726,6 +798,11 @@ public class MoSyncAudio implements OnPreparedListener, OnErrorListener
 	private Activity getActivity()
 	{
 		return mMoSyncThread.getActivity();
+	}
+
+	public void onCompletion(MediaPlayer mp)
+	{
+
 	}
 
 	public void onPrepared(MediaPlayer mp)

@@ -1607,7 +1607,7 @@ return 0; \
 			const char* url = SYSCALL_THIS->GetValidatedStr(b);
 			int flags = c;
 
-			return _maAudioDataCreateFromFile(mime, url, flags, mJNIEnv, mJThis);
+			return _maAudioDataCreateFromURL(mime, url, flags, mJNIEnv, mJThis);
 		}
 
 		case maIOCtl_maAudioDataDestroy:
