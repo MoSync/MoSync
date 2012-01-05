@@ -188,11 +188,16 @@ namespace MoSync
              * Sets the font handle used to display the item's text
              */
             [MoSyncWidgetProperty(MoSync.Constants.MAW_LABEL_FONT_HANDLE)]
-            public String FontHandle
+            public int FontHandle
             {
                 set
                 {
+					FontModule.FontInfo fontInfo =
+						mRuntime.GetModule<FontModule>().GetFont(value);
 
+					mLabel.FontFamily = fontInfo.family;
+					mLabel.FontWeight = fontInfo.weight;
+					mLabel.FontStyle = fontInfo.style;
                 }
             }
 		}

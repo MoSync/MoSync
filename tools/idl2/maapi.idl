@@ -1257,6 +1257,12 @@ interface MAAPI {
 		/// or \< 0 on error.
 		AUDIOBUFFER_FILL = 18;
 #endif
+		/** \brief Event which is triggered when an audio has been asychronous prepared
+		* The MAEvent::audioInstancePrepared contains the prepared MAAudioInstance,
+		* or <0 if a problem happened while preparing.
+		*/
+		AUDIO_PREPARED = 19;
+
 		/** \brief The size of the screen has changed.
 		* Use maGetScrSize() to get the new size.
 		*
@@ -1588,6 +1594,12 @@ interface MAAPI {
 			* Used by custom events. See invididual event descriptions.
 			*/
 			void* data;
+
+			/**
+			* Contains the prepared audio instance.
+			* Valid only if the event type is \link #EVENT_TYPE_AUDIO_PREPARED AUDIO_PREPARED \endlink.
+			*/
+			MAAudioInstance audioPreparedInstance;
 		}
 	}
 
@@ -7866,8 +7878,7 @@ group NFCAPI "NFC API" {
 		* Start listening to NFC events.
 		* \return MA_NFC_NOT_ENABLED if NFC is not enabled on this device,
 		* MA_NFC_NOT_AVAILABLE if NFC is not at all available, or
-		* 0 otherwise. If the proper permissions (NFC) are not set, a panic will
-		* be raised.
+		* 0 otherwise.
 		*/
 		int maNFCStart();
 
@@ -8022,7 +8033,8 @@ group NFCAPI "NFC API" {
 		/**
 		* Gets the NDEF message from a tag, which must
 		* be of the MA_NFC_TAG_TYPE_NDEF type.
-		* * If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* (Please note the difference between an NDEF \b tag and an NDEF \b message.)
 		* \return The handle to the NDEF message, which
 		* may be subsequently used in NDEF specfic functions,
 		* or the zero handle if the tag has no NDEF message
@@ -8038,15 +8050,15 @@ group NFCAPI "NFC API" {
 
 		/**
 		* \return A handle to the ith NDEF record of an NDEF message.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
-		MAHandle maNFCGetNDEFRecord(in MAHandle ndef, in int ix);
+		MAHandle maNFCGetNDEFRecord(in MAHandle ndefMessage, in int ix);
 
 		/**
 		* \return The number of NDEF records in an NDEF message.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
-		int maNFCGetNDEFRecordCount(in MAHandle ndef);
+		int maNFCGetNDEFRecordCount(in MAHandle ndefMessage);
 
 		/**
 		* Reads the variable length id of an NDEF record.
@@ -8054,7 +8066,7 @@ group NFCAPI "NFC API" {
 		* \param dst Where the result should be written to.
 		* \param len The maximum length to write.
 		* \return The number of bytes written.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetNDEFId(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
@@ -8064,13 +8076,13 @@ group NFCAPI "NFC API" {
 		* \param dst Where the result should be written to.
 		* \param len The maximum length to write.
 		* \return The number of bytes written.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetNDEFPayload(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		* Returns the 3-bit TNF of an NDEF record.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetNDEFTnf(in MAHandle ndefRecord);
 
@@ -8080,31 +8092,31 @@ group NFCAPI "NFC API" {
 		* \param dst Where the result should be written to.
 		* \param len The maximum length to write.
 		* \return The number of bytes written.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetNDEFType(in MAHandle ndefRecord, out MAAddress dst, in int len);
 
 		/**
 		* Sets the variable length id of an NDEF record.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not an NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCSetNDEFId(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
 		* Sets the variable length payload of an NDEF record.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCSetNDEFPayload(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
 		/**
 		* Sets the 3-bit TNF of an NDEF record,
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCSetNDEFTnf(in MAHandle ndefRecord, in int tnf);
 
 		/**
 		* Returns the variable length type field of an NDEF record.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not NDEF message record, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCSetNDEFType(in MAHandle ndefRecord, in MAAddress dst, in int len);
 
@@ -8118,13 +8130,13 @@ group NFCAPI "NFC API" {
 		* \param sectorIndex The sector to authenticate
 		* \param keySrc The address to the key to authenticate with
 		* \param keyLen The length of the key to authenticate with
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCAuthenticateMifareSector(in MAHandle tagHandle, in int keyType, in int sectorIndex, in MAAddress keySrc, in int keyLen);
 
 		/**
 		* \return The number of sectors of a MIFARE Classic tag.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetMifareSectorCount(in MAHandle tagHandle);
 
@@ -8132,7 +8144,7 @@ group NFCAPI "NFC API" {
 		* Returns the number of blocks in a sector of a MIFARE Classic tag.
 		* \param sector The sector to get the number of blocks in.
 		* \return The number of blocks in a given sector.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCGetMifareBlockCountInSector(in MAHandle tagHandle, in int sector);
 
@@ -8140,7 +8152,7 @@ group NFCAPI "NFC API" {
 		* Returns the first block of a sector of a MIFARE Classic tag.
 		* \param sector The sector of which to get the first block.
 		* \return The index of the first block of the sector is returned.
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCMifareSectorToBlock(in MAHandle tagHandle, in int sector);
 
@@ -8152,7 +8164,7 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to write to.
 		* \param len The number of bytes to read. Several blocks may be read, depending
 		* on len (A block is 16 bytes).
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCReadMifareBlocks(in MAHandle tagHandle, in int firstBlock, out MAAddress dst, in int len);
 
@@ -8164,7 +8176,7 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to read from.
 		* \param len The number of bytes to write. Several blocks may be written, depending
 		* on len (A block is 16 bytes).
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Classic tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCWriteMifareBlocks(in MAHandle tagHandle, in int firstBlock, in MAAddress dst, in int len);
 
@@ -8176,7 +8188,7 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to write to.
 		* \param len The number of bytes to read. Several pages may be read, depending
 		* on len (A page is 16 bytes).
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Ultralight tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCReadMifarePages(in MAHandle tagHandle, in int firstPage, out MAAddress dst, in int len);
 
@@ -8188,7 +8200,7 @@ group NFCAPI "NFC API" {
 		* \param dst The memory address to read from.
 		* \param len The number of bytes to write. Several pages may be written, depending
 		* on len (A page is 16 bytes).
-		* If the handle is not an NDEF tag, MA_NFC_INVALID_TAG_TYPE will be returned.
+		* If the handle is not a Mifare Ultralight tag, MA_NFC_INVALID_TAG_TYPE will be returned.
 		*/
 		int maNFCWriteMifarePages(in MAHandle tagHandle, in int firstPage, in MAAddress dst, in int len);
 
@@ -8404,16 +8416,22 @@ group NFCAPI "NFC API" {
 
 		/**
 		 * @copydoc maDBExecSQL()
+		 *
 		 * @param params Array of values to bind to parameters.
-		 * Parameters are specified by question marks (?)
-		 * in the SQL statement.
+		 * Parameters are specified by question marks (?) in the SQL statement.
 		 *
-		 * If this function returns a cursor,
-		 * any text or blob values being pointed to by elements of the array must remain valid until
-		 * the cursor has been destroyed by maDBCursorDestroy().
-		 * The array itself does not need to remain valid after this function returns.
+		 * If this function returns a cursor, any text or blob values being
+		 * pointed to by elements of the array must remain valid until the
+		 * cursor has been destroyed by maDBCursorDestroy().
 		 *
-		 * @param paramCount Number of elements in the array pointed to by \a params.
+		 * The array itself does not need to remain valid after this
+		 * function returns.
+		 *
+		 * @param paramCount Number of elements in the array pointed to
+		 * by \a params.
+		 *
+		 * This function is currently available on iOS and MoRE
+		 * (not on Android).
 		 */
 		MAHandle maDBExecSQLParams(in MAHandle databaseHandle, in MAString sql,
 			in MADBValue params, in int paramCount);
@@ -8539,7 +8557,6 @@ group NFCAPI "NFC API" {
 		}
 	} // End of DB API
 
-#if IX_AUDIO
 	group AudioAPI "Audio API" {
 		typedef int MAAudioData;
 		typedef int MAAudioInstance;
@@ -8561,25 +8578,103 @@ group NFCAPI "NFC API" {
 				POSITION_OUT_OF_RANGE = -8;
 				INVALID_SOUND_FORMAT = -9;
 				OUT_OF_MEMORY = -10;
+				ALREADY_PREPARED = -11;
+				IS_PLAYING = -12;
 			}
 		} // end of Audio API constants
 
+		/**
+		* A multi sound audio API which allows applications to play
+		* Only available on Android and iOS
+		*/
 		group AudioAPIFunctions "Audio API Functions" {
+
+			/**
+			* \brief creates a MAAudioData from a binary MoSync resource
+			* Loads a binary resource and creates a MAAudioData if possible
+			* \param mime	The mime string for the resource. Can be NULL
+			* \param data	The binary resource
+			* \param offset The offset in the binary file to where the data starts
+			* \param length	The length of the data to use
+			* \param flags	MA_AUDIO_DATA_STREAM means that the audio should be streamed
+			*		either from disk or over HTTP. This is for music playback.
+			*		Sound effects should have the flag set to 0.
+			* \return	A MAAudioData index >0
+			*		<0 on fail
+			*/
 			MAAudioData maAudioDataCreateFromResource(in MAString mime, in MAHandle data, in int offset, in int length, in int flags);
-			MAAudioData maAudioDataCreateFromFile(in MAString mime, in MAString filename, in int flags);
+
+			/**
+			*
+			*/
+			MAAudioData maAudioDataCreateFromURL(in MAString mime, in MAString url, in int flags);
+
+			/**
+			*
+			*/
 			int maAudioDataDestroy(in MAAudioData audioData);
+
+			/**
+			*
+			*/
 			MAAudioInstance maAudioInstanceCreate(in MAAudioData audioData);
+
+			/**
+			*
+			*/
 			int maAudioInstanceDestroy(in MAAudioInstance audioInstance);
+
+			/**
+			*
+			*/
 			int maAudioGetLength(in MAAudioInstance audio);
+
+			/**
+			*
+			*/
 			int maAudioSetNumberOfLoops(in MAAudioInstance audio, in int loops);
+
+			/**
+			* \brief Prepares an audio instance before playback
+			* If asynchronous the call will return directly, but the
+			* audio instance will not be ready for playback.
+			* If synchronous the call will block until finished
+			* and the audio instance will be ready directly.
+			* An EVENT_TYPE_AUDIO_PREPARED event will be triggered for the asynchronous prepare.
+			* \param audio The audio instance
+			* \param async 0 if synchronus, 1 if asynchronous
+			* \return 	MA_AUDIO_ERR_OK on success
+			*		MA_AUDIO_ERR_INVALID_INSTANCE on invalid audio instance
+			*		MA_AUDIO_ERR_ALREADY_PREPARED on already prepared audio instance
+			*/
+			int maAudioPrepare(in MAAudioInstance audio, in int async);
+
+			/**
+			*
+			*/
 			int maAudioPlay(in MAAudioInstance audio);
+
+			/**
+			*
+			*/
 			int maAudioSetPosition(in MAAudioInstance audio, in int milliseconds);
+
+			/**
+			*
+			*/
 			int maAudioGetPosition(in MAAudioInstance audio);
+
+			/**
+			*
+			*/
 			int maAudioSetVolume(in MAAudioInstance audio, in float volume);
+
+			/**
+			*
+			*/
 			int maAudioStop(in MAAudioInstance audio);
 		}// End of Audio API Functions
 	} // End of Audio API group
-#endif // IX_AUDIO
 
 	/**
 	* Enable panics for programmer errors.

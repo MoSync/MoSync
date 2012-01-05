@@ -151,7 +151,7 @@ public class MoSyncThread extends Thread
 	MoSyncNetwork mMoSyncNetwork;
 	MoSyncBluetooth mMoSyncBluetooth;
 	MoSyncSound mMoSyncSound;
-	//MoSyncAudio mMoSyncAudio;
+	MoSyncAudio mMoSyncAudio;
 	MoSyncLocation mMoSyncLocation;
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
@@ -264,6 +264,8 @@ public class MoSyncThread extends Thread
 
 	int mTextConsoleHeight;
 
+	private boolean mIsSleeping;
+
 	/**
 	 * Ascent of text in the default console font.
 	 */
@@ -312,9 +314,11 @@ public class MoSyncThread extends Thread
 
 		mHasDied = false;
 
+		mIsSleeping = false;
+
 		mMoSyncNetwork = new MoSyncNetwork(this);
 		mMoSyncSound = new MoSyncSound(this);
-		//mMoSyncAudio = new MoSyncAudio(this);
+		mMoSyncAudio = new MoSyncAudio(this);
 		mMoSyncLocation = new MoSyncLocation(this);
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
@@ -412,15 +416,21 @@ public class MoSyncThread extends Thread
 	 * Do cleanup here (but it is not guaranteed that
 	 * this will be called.)
 	 */
-    public void onDestroy()
+	public void onDestroy()
 	{
-    	if (null != mMoSyncBluetooth)
-    	{
-    		// Delegate onDestroy to the Bluetooth object.
-    		mMoSyncBluetooth.onDestroy();
-    		mMoSyncBluetooth = null;
-    	}
-    }
+		if (null != mMoSyncBluetooth)
+		{
+			// Delegate onDestroy to the Bluetooth object.
+			mMoSyncBluetooth.onDestroy();
+			mMoSyncBluetooth = null;
+		}
+
+		if(null != mMoSyncNetwork)
+		{
+			mMoSyncNetwork.killAllConnections();
+			mMoSyncNetwork = null;
+		}
+	}
 
 	/**
 	 * Return the activity that this thread is related to.
@@ -910,7 +920,8 @@ public class MoSyncThread extends Thread
 		nativePostEvent(event);
 
 		// Wake up thread if sleeping.
-		interrupt();
+		if(mIsSleeping)
+			interrupt();
 	}
 
 	/**
@@ -2233,6 +2244,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maWait");
 
+		mIsSleeping = true;
 		try
 		{
 	 		if (timeout<=0)
@@ -2253,6 +2265,8 @@ public class MoSyncThread extends Thread
 		{
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
+
+		mIsSleeping = false;
 
 		SYSLOG("maWait returned");
 	}
@@ -2573,6 +2587,19 @@ public class MoSyncThread extends Thread
 
 			return 0;
 		}
+/*
+		else if(url.startsWith("tel://"))
+		{
+			if(!(mContext.getPackageManager().checkPermission("android.permission.NFC",
+					mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+			{
+
+			}
+
+			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
+			((Activity)mContext).startActivity(intent);
+		}
+*/
 		return -1;
 	}
 
@@ -3439,17 +3466,15 @@ public class MoSyncThread extends Thread
 		return mMoSyncSound.maSoundIsPlaying();
 	}
 
-
-/*
 	int maAudioDataCreateFromResource(String mime, int data,
 			int offset, int length, int flags)
 	{
 		return mMoSyncAudio.maAudioDataCreateFromResource(mime, data, offset, length, flags);
 	}
 
-	int maAudioDataCreateFromFile(String mime, String filename, int flags)
+	int maAudioDataCreateFromURL(String mime, String url, int flags)
 	{
-		return mMoSyncAudio.maAudioDataCreateFromFile(mime, filename, flags);
+		return mMoSyncAudio.maAudioDataCreateFromURL(mime, url, flags);
 	}
 
 	int maAudioDataDestroy(int audioData)
@@ -3477,6 +3502,11 @@ public class MoSyncThread extends Thread
 		return mMoSyncAudio.maAudioSetNumberOfLoops(audio, loops);
 	}
 
+	int maAudioPrepare(int audio, int async)
+	{
+		return mMoSyncAudio.maAudioPrepare(audio, async);
+	}
+
 	int maAudioPlay(int audio)
 	{
 		return mMoSyncAudio.maAudioPlay(audio);
@@ -3501,7 +3531,6 @@ public class MoSyncThread extends Thread
 	{
 		return mMoSyncAudio.maAudioStop(audio);
 	}
-*/
 
 
 	public int maAudioBufferInit(int info)

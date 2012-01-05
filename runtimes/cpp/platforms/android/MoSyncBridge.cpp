@@ -512,6 +512,10 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.nfc.result = intArray[2];
 		event.nfc.dstId = intArray[3];
 	}
+	else if (event.type == EVENT_TYPE_AUDIO_PREPARED)
+	{
+		event.audioPreparedInstance = intArray[1];
+	}
 
 	// Release the memory used for the int array.
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);

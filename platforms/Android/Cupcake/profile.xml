@@ -1,0 +1,3 @@
+<platform family="Android" variant="Cupcake" runtime="android_3/1" inherit="Android">
+  <capability name="BlueTooth" state="UNSUPPORTED"/>
+</platform>

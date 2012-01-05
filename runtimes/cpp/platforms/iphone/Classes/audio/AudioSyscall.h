@@ -20,13 +20,13 @@
 
 #include <config_platform.h>
 #include <helpers/cpp_defs.h>
-#include <helpers/CPP_IX_AUDIO.h>
+//#include <helpers/CPP_IX_AUDIO.h>
 
 void MAAudioInit();
 void MAAudioClose();
 
 MAAudioData maAudioDataCreateFromResource(const char* mime, MAHandle data, int offset, int length, int flags);
-MAAudioData maAudioDataCreateFromFile(const char* mime, const char* filename, int flags);
+MAAudioData maAudioDataCreateFromURL(const char* mime, const char* url, int flags);
 
 int maAudioDataDestroy(MAAudioData audioData);
 MAAudioInstance maAudioInstanceCreate(MAAudioData audioData);
@@ -35,6 +35,7 @@ int maAudioInstanceDestroy(MAAudioInstance audioInstance);
 int maAudioGetLength(MAAudioData audio);
 int maAudioSetNumberOfLoops(MAAudioInstance audio, int loops);
 int maAudioPlay(MAAudioInstance audio);
+int maAudioPrepare(MAAudioInstance audio, int async);
 int maAudioSetPosition(MAAudioInstance audio, int milliseconds);
 int maAudioGetPosition(MAAudioInstance audio);
 int maAudioSetVolume(MAAudioInstance audio, float volume);
