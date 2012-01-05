@@ -18,15 +18,17 @@
 #import "AudioInstance.h"
 #import "AudioData.h"
 //#include <helpers/CPP_IX_AUDIO.h>
+#include "Platform.h"
 
 @implementation AudioInstance
 
 /**
  * Init function.
  */
--(id) initWithAudioData:(AudioData*)audioData error:(int*)errorCode
+-(id) initWithAudioData:(AudioData*)audioData andHandle:(int)handle error:(int*)errorCode
 {
 	mAudioData = audioData;
+	mHandle = handle;
 
 	NSData* data = [mAudioData getData];
 	NSError* error = nil;
@@ -67,23 +69,69 @@
 	}
 
 	mPrepared = NO;
+	mIsPreparing = NO;
 
 	return [super init];
 }
 
--(void) play
+-(BOOL) play
 {
-	if(!mPrepared)
+	mPrepared = true; // play implicitly calls prepareToPlay if it isn't already prepared
+	return [mAudioPlayer play];
+}
+
+-(BOOL) isPrepared
+{
+	return mPrepared;
+}
+
+-(BOOL) isPreparing
+{
+	return mIsPreparing;
+}
+
+-(void) prepareThread
+{
+	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+	BOOL res = [mAudioPlayer prepareToPlay];
+
+	mIsPreparing = false;
+
+	MAEvent event;
+	event.type = EVENT_TYPE_AUDIO_PREPARED;
+	if(res == NO)
+		event.audioInstance = MA_AUDIO_ERR_PREPARE_FAILED;
+	else
+		event.audioInstance = mHandle;
+	Base::gEventQueue.put(event);
+
+	[pool release];
+}
+
+-(BOOL) prepare:(BOOL)async
+{
+	if(async == NO)
 	{
-		[mAudioPlayer prepareToPlay];
 		mPrepared = true;
+		return [mAudioPlayer prepareToPlay];
+	} else {
+		mIsPreparing = true;
+		[NSThread detachNewThreadSelector:@selector(prepareThread) toTarget:self withObject:nil];
 	}
 
-	[mAudioPlayer play];
+	return true;
 }
+
+
+-(void) pause
+{
+	[mAudioPlayer pause];
+}
+
 
 -(void) stop
 {
+	mPrepared = false;
 	[mAudioPlayer stop];
 }
 
@@ -124,7 +172,17 @@
 
 - (void)audioPlayerDidFinishPlaying:(AVAudioPlayer *)player successfully:(BOOL)flag
 {
-	mPrepared = false;
+	MAEvent event;
+	event.type = EVENT_TYPE_AUDIO_COMPLETED;
+
+	if(flag == YES)
+	{
+		event.audioInstance = mHandle;
+	} else {
+		event.audioInstance = MA_AUDIO_ERR_GENERIC;
+	}
+
+	Base::gEventQueue.put(event);
 }
 
 @end
