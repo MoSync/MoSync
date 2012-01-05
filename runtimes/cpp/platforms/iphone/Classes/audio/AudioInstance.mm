@@ -29,7 +29,7 @@
 	mAudioData = audioData;
 
 	NSData* data = [mAudioData getData];
-	NSError* error;
+	NSError* error = nil;
 
 	if(errorCode)
 		*errorCode = MA_AUDIO_ERR_OK;
@@ -42,9 +42,22 @@
 
 		if(filename)
 		{
-			NSURL *fileURL = [[NSURL alloc] initFileURLWithPath:filename];
-			mAudioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:fileURL error:&error];
-			[fileURL release];
+			NSURL* url = nil;
+			if([filename hasPrefix:@"/"])
+			{
+				url = [[NSURL alloc] initFileURLWithPath:filename];
+			} else {
+				url = [[NSURL alloc] initWithString:filename];
+			}
+
+			mAudioPlayer = [[AVAudioPlayer alloc] initWithContentsOfURL:url error:&error];
+
+			if(error != nil)
+			{
+				*errorCode = MA_AUDIO_ERR_INVALID_INSTANCE;
+			}
+
+			[url release];
 		} else {
 			if(errorCode)
 				*errorCode = MA_AUDIO_ERR_INVALID_DATA;
