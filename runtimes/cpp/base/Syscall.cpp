@@ -305,7 +305,15 @@ namespace Base {
 		return true;
 	}
 
+#ifdef SYMBIAN
 	int Syscall::resourcesCount = -1;
+#else
+	int resourcesCount = -1;
+	char* resourcesFilename;
+	int *resourceOffset;
+	int *resourceSize;
+	int *resourceType;
+#endif
 
 	/*
 	* Loads all resources from the stream, except images, binaries and sprites.
@@ -906,7 +914,11 @@ namespace Base {
 		return SYSCALL_THIS->loadResourcesFromBuffer(*b, NULL);
 	}
 
+#ifdef SYMBIAN
 	FileStream* Syscall::resource = NULL;
+#else
+	FileStream* resource = NULL;
+#endif
 
 #ifndef _android
 	SYSCALL(int, maLoadResource(MAHandle handle, MAHandle placeholder, int flag)) {

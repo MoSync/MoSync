@@ -56,6 +56,7 @@ namespace Base {
 		virtual ~Syscall();
 		void platformDestruct();
 
+#ifdef SYMBIAN
 		static int resourcesCount;
 		char* resourcesFilename;
 		int *resourceOffset;
@@ -63,6 +64,7 @@ namespace Base {
 		int *resourceType;
 
 		static FileStream* resource;
+#endif
 
 /*
 #ifdef _android
