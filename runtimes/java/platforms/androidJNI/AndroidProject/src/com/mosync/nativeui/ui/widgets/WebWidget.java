@@ -24,9 +24,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-//import android.util.Log;
 import android.util.Log;
 import android.view.MotionEvent;
+import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebStorage;
@@ -122,7 +122,7 @@ public class WebWidget extends Widget
 		webView.setWebViewClient(new WebWidget.MoSyncWebViewClient(webWidget));
 
 		// Create a WebChromeClient object.
-		webView.setWebChromeClient(new WebWidget.MoSyncWebChromeClient());
+		webView.setWebChromeClient(new WebWidget.MoSyncWebChromeClient(webWidget));
 
 		//Enable GeoLocation for webbased apps
 		webView.getSettings().setGeolocationEnabled(true);
@@ -214,7 +214,7 @@ public class WebWidget extends Widget
 			mNonHookedUrls.add(url);
 
 			// Here we check if the url has schema specifier.
-			// This is done so that is there is no schema
+			// This is done so that if there is no schema
 			// we use the file:// schema to load the file
 			// from the application's local file system.
 			if (url.contains("://") || url.contains("javascript:"))
@@ -452,13 +452,13 @@ public class WebWidget extends Widget
 	static class MoSyncWebViewClient extends WebViewClient
 	{
 		/**
-		 * Access to the wrapped web view, so that we can set the
-		 * 'newurl' property.
+		 * The web view widget.
 		 */
 		private WebWidget mWebWidget;
 
 		/**
-		 * @param webWidget The web view that the url overrider is bound to.
+		 * Constructor.
+		 * @param webWidget The web view that this object is bound to.
 		 */
 		public MoSyncWebViewClient(WebWidget webWidget)
 		{
@@ -531,7 +531,7 @@ public class WebWidget extends Widget
 			    mWebWidget.getView().getContext().startActivity(intent);
 			    return true;
 			}
-			else if(url.startsWith("tel:"))
+			else if (url.startsWith("tel:"))
 			{
 				//by default we should open the PhoneApp when this URL
 				//is loaded
@@ -621,6 +621,20 @@ public class WebWidget extends Widget
 	static class MoSyncWebChromeClient extends WebChromeClient
 	{
 		/**
+		 * The web view widget.
+		 */
+		private WebWidget mWebWidget;
+
+		/**
+		 * Constructor.
+		 * @param webWidget The web view that this object is bound to.
+		 */
+		public MoSyncWebChromeClient(WebWidget webWidget)
+		{
+			mWebWidget = webWidget;
+		}
+
+		/**
 		 * Try updating the Quota if it exceeds
 		 */
 		@Override
@@ -671,6 +685,33 @@ public class WebWidget extends Widget
 
 			// This is needed to end the alert state.
 			result.confirm();
+
+			return true;
+		}
+
+		public boolean onJsPrompt(
+			WebView view,
+			String url,
+			String message,
+			String defaultValue,
+			JsPromptResult result)
+		{
+//			Log.i("@@@ MoSync", "onJsPrompt: " + message);
+
+			// Store the message in a data object.
+			int urlData = MoSyncThread.getInstance().createDataObject(
+				0, // Zero makes the system create a new placeholder.
+				message.getBytes() // Data content.
+				);
+
+			// Post message.
+			EventQueue.getDefault().postWidgetEvent(
+				IX_WIDGET.MAW_EVENT_WEB_VIEW_HOOK_INVOKED,
+				mWebWidget.getHandle(),
+				IX_WIDGET.MAW_CONSTANT_SOFT,
+				urlData);
+
+			result.confirm("ok");
 
 			return true;
 		}
