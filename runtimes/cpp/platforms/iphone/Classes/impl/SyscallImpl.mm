@@ -79,8 +79,9 @@ using namespace MoSyncError;
 #include "../../../../generated/gl.h.cpp"
 #endif
 
-#include <helpers/CPP_IX_AUDIO.h>
 #include "AudioSyscall.h"
+
+#include "MoSyncExtension.h"
 
 extern ThreadPool gThreadPool;
 
@@ -335,6 +336,8 @@ namespace Base {
 		// init some image.h optimizations.
 		initMulTable();
 		initRecipLut();
+
+        initExtensions(NULL);
 
 		return true;
 	}
@@ -1156,7 +1159,17 @@ namespace Base {
 		return 0;
 	}
 
-	SYSCALL(int, maInvokeExtension(int, int, int, int)) {
+	SYSCALL(MAExtensionModule, maExtensionModuleLoad(const char* name, int hash))
+	{
+		return MA_EXTENSION_MODULE_UNAVAILABLE;
+	}
+
+	SYSCALL(MAExtensionFunction, maExtensionFunctionLoad(MAHandle module, int index))
+	{
+		return MA_EXTENSION_FUNCTION_UNAVAILABLE;
+	}
+
+	SYSCALL(int, maExtensionFunctionInvoke(int, int, int, int)) {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
 
@@ -2097,7 +2110,22 @@ return 0; \
         maIOCtl_IX_GL2_caselist;
         maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist;
 #endif	//SUPPORT_OPENGL_ES
-        maIOCtl_IX_AUDIO_caselist;
+        //maIOCtl_IX_AUDIO_caselist;
+		maIOCtl_case(maAudioDataCreateFromResource);
+		maIOCtl_case(maAudioDataCreateFromURL);
+		maIOCtl_case(maAudioDataDestroy);
+		maIOCtl_case(maAudioInstanceCreate);
+		maIOCtl_case(maAudioInstanceDestroy);
+		maIOCtl_case(maAudioGetLength);
+		maIOCtl_case(maAudioSetNumberOfLoops);
+		maIOCtl_case(maAudioPrepare);
+		maIOCtl_case(maAudioPlay);
+		maIOCtl_case(maAudioSetPosition);
+		maIOCtl_case(maAudioGetPosition);
+		maIOCtl_case(maAudioSetVolume);
+		maIOCtl_case(maAudioStop);
+		maIOCtl_case(maExtensionModuleLoad);
+        maIOCtl_case(maExtensionFunctionLoad);
 		}
 
 		return IOCTL_UNAVAILABLE;

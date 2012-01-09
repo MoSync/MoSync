@@ -18,23 +18,28 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #ifndef PACKAGE_H
 #define PACKAGE_H
 
+enum ProfileType { DEVICE_BASED, PLATFORM_BASED };
+
 // Validity checks should be done on access.
 struct SETTINGS {
 	const char* program;
 	const char* resource;
 	const char* icon;
 	const char* cppOutputDir;
+	const char* csOutputDir;
 	const char* model;
 	const char* dst;
 	const char* name;
 	const char* vendor;
 	const char* version;
 	const char* permissions;
+	const char* outputType;
 	const char* s60v3uid;
 	const char* s60v2uid;
 	const char* s60cert;
 	const char* s60key;
 	const char* s60pass;
+	const char* profileType;
 	bool debug;
 	bool silent;
 	bool showPasswords;
@@ -48,6 +53,11 @@ struct SETTINGS {
 	const char* iOSXcodeTarget;
 	bool iOSgenerateOnly;
 
+	// Windows Phone specific settings
+	const char* WPconfig;
+	const char* WPtarget;
+	bool WPgenerateOnly;
+
 	// Android specific settings
     const char* androidPackage;
     const char* androidVersionCode;
@@ -55,6 +65,10 @@ struct SETTINGS {
     const char* androidStorePass;
     const char* androidAlias;
     const char* androidKeyPass;
+
+    // BlackBerry specific settings
+    const char* blackberryJde;
+    const char* blackberrySignKey;
 
     // JavaME specific settings
     const char* javameKeystore;
@@ -68,21 +82,26 @@ void package(const SETTINGS&);
 void testProgram(const SETTINGS&);
 void testModel(const SETTINGS&);
 void testDst(const SETTINGS&);
+void testProfileType(const SETTINGS&);
 void testName(const SETTINGS&);
 void testVendor(const SETTINGS&);
 void testVersion(const SETTINGS&);
+void testOutputType(const SETTINGS& s);
 void testS60v3Uid(const SETTINGS&);
 void testS60v2Uid(const SETTINGS&);
 
 void testIOSCert(const SETTINGS&);
 void testIOSSdk(const SETTINGS&);
 void testCppOutputDir(const SETTINGS&);
+void testCsOutputDir(const SETTINGS&);
 
 void testIOSCert(const SETTINGS&);
 void testIOSSdk(const SETTINGS&);
 
 void testAndroidPackage(const SETTINGS&);
 void testAndroidVersionCode(const SETTINGS&);
+
+void testBlackberryJde(const SETTINGS&);
 
 void testJavaMESigning(const SETTINGS& s);
 

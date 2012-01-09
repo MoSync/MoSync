@@ -29,6 +29,9 @@ import android.view.MotionEvent;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
 import android.webkit.WebChromeClient;
+import android.webkit.WebStorage;
+import android.webkit.WebSettings;
+
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
@@ -395,6 +398,16 @@ public class WebWidget extends Widget
 			// This might affect memory consumption / performance.
 			this.getSettings().setJavaScriptEnabled(true);
 
+
+			//use the default path for storage and database
+			String databasePath = context.getDir("database", Context.MODE_PRIVATE).getPath();
+			this.getSettings().setDatabasePath(databasePath);
+
+
+			//enable support for DOM Storage and Database
+			this.getSettings().setDatabaseEnabled(true);
+			this.getSettings().setDomStorageEnabled(true);
+
 			this.setVerticalScrollbarOverlay(true);
 		}
 
@@ -619,6 +632,21 @@ public class WebWidget extends Widget
 		public MoSyncWebChromeClient(WebWidget webWidget)
 		{
 			mWebWidget = webWidget;
+		}
+
+		/**
+		 * Try updating the Quota if it exceeds
+		 */
+		@Override
+		public void onExceededDatabaseQuota(
+				String url,
+				String databaseIdentifier,
+				long currentQuota,
+				long estimatedSize,
+				long totalUsedQuota,
+				WebStorage.QuotaUpdater quotaUpdater)
+		{
+			quotaUpdater.updateQuota(estimatedSize * 2);
 		}
 
 // Commented out this method, because the console messages and JavaScript

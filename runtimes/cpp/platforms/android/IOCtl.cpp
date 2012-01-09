@@ -3534,4 +3534,358 @@ namespace Base
 		jNIEnv->DeleteLocalRef(cls);
 		return (int)result;
 	}
+
+	// AUDIO API
+
+	int _maAudioDataCreateFromResource(
+		const char* mime,
+		int data,
+		int offset,
+		int length,
+		int flags,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jstring jstrMime = jNIEnv->NewStringUTF(mime);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioDataCreateFromResource",
+			"(Ljava/lang/String;IIII)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			jstrMime,
+			data,
+			offset,
+			length,
+			flags);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrMime);
+
+		return (int)result;
+	}
+
+	int _maAudioDataCreateFromURL(
+		const char* mime,
+		const char* url,
+		int flags,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jstring jstrMime = jNIEnv->NewStringUTF(mime);
+		jstring jstrURL = jNIEnv->NewStringUTF(url);
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioDataCreateFromURL",
+			"(Ljava/lang/String;Ljava/lang/String;I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			jstrMime,
+			jstrURL,
+			flags);
+
+		jNIEnv->DeleteLocalRef(cls);
+		jNIEnv->DeleteLocalRef(jstrURL);
+		jNIEnv->DeleteLocalRef(jstrMime);
+
+		return (int)result;
+	}
+
+	int _maAudioDataDestroy(
+		int audioData,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioDataDestroy",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioData);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioInstanceCreate(
+		int audioData,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioInstanceCreate",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioData);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioInstanceDestroy(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioInstanceDestroy",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioGetLength(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioGetLength",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioSetNumberOfLoops(
+		int audioInstance,
+		int loops,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioSetNUmberOfLoops",
+			"(II)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance,
+			loops);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioPrepare(
+		int audioInstance,
+		int async,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioPrepare",
+			"(II)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance,
+			async);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioPlay(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioPlay",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioSetPosition(
+		int audioInstance,
+		int milliseconds,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioSetPosition",
+			"(II)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance,
+			milliseconds);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioGetPosition(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioGetPosition",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioSetVolume(
+		int audioInstance,
+		float volume,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioInstanceDestroy",
+			"(IF)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance,
+			volume);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
+	int _maAudioStop(
+		int audioInstance,
+		JNIEnv* jNIEnv,
+		jobject jThis)
+	{
+		jclass cls = jNIEnv->GetObjectClass(jThis);
+
+		jmethodID methodID = jNIEnv->GetMethodID(
+			cls,
+			"maAudioStop",
+			"(I)I");
+
+		if (methodID == 0)
+			return -1;
+
+		jint result = jNIEnv->CallIntMethod(
+			jThis,
+			methodID,
+			audioInstance);
+
+		jNIEnv->DeleteLocalRef(cls);
+
+		return (int)result;
+	}
+
 }
