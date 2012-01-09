@@ -79,7 +79,6 @@ using namespace MoSyncError;
 #include "../../../../generated/gl.h.cpp"
 #endif
 
-#include <helpers/CPP_IX_AUDIO.h>
 #include "AudioSyscall.h"
 
 #include "MoSyncExtension.h"
@@ -2111,8 +2110,21 @@ return 0; \
         maIOCtl_IX_GL2_caselist;
         maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist;
 #endif	//SUPPORT_OPENGL_ES
-        maIOCtl_IX_AUDIO_caselist;
-        maIOCtl_case(maExtensionModuleLoad);
+        //maIOCtl_IX_AUDIO_caselist;
+		maIOCtl_case(maAudioDataCreateFromResource);
+		maIOCtl_case(maAudioDataCreateFromURL);
+		maIOCtl_case(maAudioDataDestroy);
+		maIOCtl_case(maAudioInstanceCreate);
+		maIOCtl_case(maAudioInstanceDestroy);
+		maIOCtl_case(maAudioGetLength);
+		maIOCtl_case(maAudioSetNumberOfLoops);
+		maIOCtl_case(maAudioPrepare);
+		maIOCtl_case(maAudioPlay);
+		maIOCtl_case(maAudioSetPosition);
+		maIOCtl_case(maAudioGetPosition);
+		maIOCtl_case(maAudioSetVolume);
+		maIOCtl_case(maAudioStop);
+		maIOCtl_case(maExtensionModuleLoad);
         maIOCtl_case(maExtensionFunctionLoad);
 		}
 

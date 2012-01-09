@@ -1257,6 +1257,19 @@ interface MAAPI {
 		/// or \< 0 on error.
 		AUDIOBUFFER_FILL = 18;
 #endif
+		/**
+		* \brief Event which is triggered when an audio has been asychronous prepared
+		* The MAEvent::audioInstance contains the prepared MAAudioInstance,
+		* or <0 if a problem happened while preparing.
+		*/
+		AUDIO_PREPARED = 19;
+
+		/**
+		* \brief Event which is triggered when a streaming audio has finished playing
+		* The MAEvent::audioInstance contains the MAAudioInstance which finished
+		*/
+		AUDIO_COMPLETED = 20;
+
 		/** \brief The size of the screen has changed.
 		* Use maGetScrSize() to get the new size.
 		*
@@ -1588,6 +1601,14 @@ interface MAAPI {
 			* Used by custom events. See invididual event descriptions.
 			*/
 			void* data;
+
+			/**
+			* Contains the prepared audio instance.
+			* Valid only if the event type is \link #EVENT_TYPE_AUDIO_PREPARED AUDIO_PREPARED \endlink
+			* or \link #EVENT_TYPE_AUDIO_COMPLETED AUDIO_COMPLETED \endlink.
+			*/
+			MAAudioInstance audioInstance;
+
 		}
 	}
 
@@ -8545,7 +8566,6 @@ group NFCAPI "NFC API" {
 		}
 	} // End of DB API
 
-#if IX_AUDIO
 	group AudioAPI "Audio API" {
 		typedef int MAAudioData;
 		typedef int MAAudioInstance;
@@ -8567,25 +8587,111 @@ group NFCAPI "NFC API" {
 				POSITION_OUT_OF_RANGE = -8;
 				INVALID_SOUND_FORMAT = -9;
 				OUT_OF_MEMORY = -10;
+				ALREADY_PREPARED = -11;
+				IS_PLAYING = -12;
 			}
 		} // end of Audio API constants
 
+		/**
+		* A multi sound audio API which allows applications to play
+		* Only available on Android and iOS
+		*/
 		group AudioAPIFunctions "Audio API Functions" {
+
+			/**
+			* \brief creates a MAAudioData from a binary MoSync resource
+			* Loads a binary resource and creates a MAAudioData if possible
+			* \param mime	The mime string for the resource. Can be NULL
+			* \param data	The binary resource
+			* \param offset The offset in the binary file to where the data starts
+			* \param length	The length of the data to use
+			* \param flags	MA_AUDIO_DATA_STREAM means that the audio should be streamed
+			*		either from disk or over HTTP. This is for music playback.
+			*		Sound effects should have the flag set to 0.
+			* \return	A MAAudioData index >0
+			*		<0 on fail
+			*/
 			MAAudioData maAudioDataCreateFromResource(in MAString mime, in MAHandle data, in int offset, in int length, in int flags);
-			MAAudioData maAudioDataCreateFromFile(in MAString mime, in MAString filename, in int flags);
+
+			/**
+			*
+			*/
+			MAAudioData maAudioDataCreateFromURL(in MAString mime, in MAString url, in int flags);
+
+			/**
+			*
+			*/
 			int maAudioDataDestroy(in MAAudioData audioData);
+
+			/**
+			*
+			*/
 			MAAudioInstance maAudioInstanceCreate(in MAAudioData audioData);
+
+			/**
+			*
+			*/
 			int maAudioInstanceDestroy(in MAAudioInstance audioInstance);
+
+			/**
+			*
+			*/
 			int maAudioGetLength(in MAAudioInstance audio);
+
+			/**
+			*
+			*/
 			int maAudioSetNumberOfLoops(in MAAudioInstance audio, in int loops);
+
+			/**
+			* \brief Prepares an audio instance before playback
+			* If asynchronous the call will return directly, but the
+			* audio instance will not be ready for playback.
+			* If synchronous the call will block until finished
+			* and the audio instance will be ready directly.
+			* An EVENT_TYPE_AUDIO_PREPARED event will be triggered for the asynchronous prepare.
+			* Notes:
+			* Android: If a streaming audio is already playing and a new one is being prepared,
+			* the playing audio will stop.
+			* \param audio The audio instance
+			* \param async 0 if synchronus, 1 if asynchronous
+			* \return 	MA_AUDIO_ERR_OK on success
+			*		MA_AUDIO_ERR_INVALID_INSTANCE on invalid audio instance
+			*		MA_AUDIO_ERR_ALREADY_PREPARED on already prepared audio instance
+			*/
+			int maAudioPrepare(in MAAudioInstance audio, in int async);
+
+			/**
+			* \brief Plays the current sound in the audio instance
+			* If the sound hasn't been prepared it will be prepared before playing.
+			* Notes:
+			* Android: If the audio hasn't been prepared it will be synchrounous prepared before playing,
+			* this means that there might be a delay before this call returns. Always make sure that your
+			* audio has been properly prepared before playing.
+			*/
 			int maAudioPlay(in MAAudioInstance audio);
+
+			/**
+			*
+			*/
 			int maAudioSetPosition(in MAAudioInstance audio, in int milliseconds);
+
+			/**
+			*
+			*/
 			int maAudioGetPosition(in MAAudioInstance audio);
+
+			/**
+			*
+			*/
 			int maAudioSetVolume(in MAAudioInstance audio, in float volume);
+
+			/**
+			*
+			*/
 			int maAudioStop(in MAAudioInstance audio);
 		}// End of Audio API Functions
 	} // End of Audio API group
-#endif // IX_AUDIO
 
 	/**
 	* Enable panics for programmer errors.

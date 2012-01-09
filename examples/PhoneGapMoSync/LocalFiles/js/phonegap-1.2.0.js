@@ -34,6 +34,15 @@
  *      document.addEventListener("pause", myPauseListener, false);
  */
 
+/**
+ * We override the JSON.parse function because it does not work properly on all phones.
+ */
+JSON.parse = function(JSONDocument)
+{
+	var parsedObject = eval('(' + JSONDocument + ')');
+	return parsedObject;
+};
+
  if (typeof(DeviceInfo) !== 'object') {
     var DeviceInfo = {};
 }

@@ -73,7 +73,7 @@ MAAudioData maAudioDataCreateFromResource(const char* mime, MAHandle data, int o
     return [sAudioData count] - 1;
 }
 
-MAAudioData maAudioDataCreateFromFile(const char* mime, const char* path, int flags)
+MAAudioData maAudioDataCreateFromURL(const char* mime, const char* path, int flags)
 {
     NSString* mimeType = @"";
     if(mime != NULL)
@@ -169,6 +169,11 @@ int maAudioPlay(MAAudioInstance audio)
     [instance play];
 
     return MA_AUDIO_ERR_OK;
+}
+
+int maAudioPrepare(MAAudioInstance audio, int async)
+{
+	return -1;
 }
 
 int maAudioSetPosition(MAAudioInstance audio, int milliseconds)
