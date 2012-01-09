@@ -55,6 +55,15 @@ namespace Base {
 		void init();
 		virtual ~Syscall();
 		void platformDestruct();
+
+		static int resourcesCount;
+		char* resourcesFilename;
+		int *resourceOffset;
+		int *resourceSize;
+		int *resourceType;
+
+		static FileStream* resource;
+
 /*
 #ifdef _android
 		JNIEnv* mJNIEnv;

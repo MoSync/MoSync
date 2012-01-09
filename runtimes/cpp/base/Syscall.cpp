@@ -305,11 +305,7 @@ namespace Base {
 		return true;
 	}
 
-	int resourcesCount = -1;
-	char* resourcesFilename;
-	int *resourceOffset;
-	int *resourceSize;
-	int *resourceType;
+	int Syscall::resourcesCount = -1;
 
 	/*
 	* Loads all resources from the stream, except images, binaries and sprites.
@@ -911,7 +907,7 @@ namespace Base {
 	}
 
 #ifndef _android
-	FileStream* resource = NULL;
+	FileStream* Syscall::resource = NULL;
 
 	SYSCALL(int, maLoadResource(MAHandle handle, MAHandle placeholder, int flag)) {
 		if (((flag & MA_RESOURCE_OPEN) != 0) && (resource == NULL))
