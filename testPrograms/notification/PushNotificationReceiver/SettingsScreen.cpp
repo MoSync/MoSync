@@ -155,11 +155,16 @@ void SettingsScreen::buttonClicked(Widget* button)
 	printf("SettingsScreen::buttonClicked");
 	if (button == mConnectButton)
 	{
+
+		mIPEditBox->hideKeyboard();
+		mPortEditBox->hideKeyboard();
+
 		if (mListener)
 		{
 			mListener->connectToServer(mIPEditBox->getText(),
 				mPortEditBox->getText());
 		}
+
 		mConnectButton->setEnabled(false);
 		mConnectionStatusLabel->setText(CONNECTION_CONNECTING);
 	}
