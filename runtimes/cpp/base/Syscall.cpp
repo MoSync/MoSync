@@ -906,9 +906,9 @@ namespace Base {
 		return SYSCALL_THIS->loadResourcesFromBuffer(*b, NULL);
 	}
 
-#ifndef _android
 	FileStream* Syscall::resource = NULL;
 
+#ifndef _android
 	SYSCALL(int, maLoadResource(MAHandle handle, MAHandle placeholder, int flag)) {
 		if (((flag & MA_RESOURCE_OPEN) != 0) && (resource == NULL))
 		{
