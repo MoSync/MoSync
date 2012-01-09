@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mosyncExtensionTemplate", "mosyncExtensionTemplate.csproj", "{BDB66E63-2AC0-4F7B-AB29-1F1B31C5B38C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "mosync", "..\mosync\mosync.csproj", "{ECEC041C-1576-4084-A715-C5D57C9B266D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		rebuild_debug|Any CPU = rebuild_debug|Any CPU
+		rebuild_release|Any CPU = rebuild_release|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BDB66E63-2AC0-4F7B-AB29-1F1B31C5B38C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BDB66E63-2AC0-4F7B-AB29-1F1B31C5B38C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BDB66E63-2AC0-4F7B-AB29-1F1B31C5B38C}.rebuild_debug|Any CPU.ActiveCfg = Release|Any CPU
+		{BDB66E63-2AC0-4F7B-AB29-1F1B31C5B38C}.rebuild_debug|Any CPU.Build.0 = Release|Any CPU
+		{BDB66E63-2AC0-4F7B-AB29-1F1B31C5B38C}.rebuild_release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDB66E63-2AC0-4F7B-AB29-1F1B31C5B38C}.rebuild_release|Any CPU.Build.0 = Release|Any CPU
+		{BDB66E63-2AC0-4F7B-AB29-1F1B31C5B38C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BDB66E63-2AC0-4F7B-AB29-1F1B31C5B38C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.rebuild_debug|Any CPU.ActiveCfg = rebuild_debug|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.rebuild_debug|Any CPU.Build.0 = rebuild_debug|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.rebuild_debug|Any CPU.Deploy.0 = rebuild_debug|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.rebuild_release|Any CPU.ActiveCfg = rebuild_release|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.rebuild_release|Any CPU.Build.0 = rebuild_release|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.rebuild_release|Any CPU.Deploy.0 = rebuild_release|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ECEC041C-1576-4084-A715-C5D57C9B266D}.Release|Any CPU.Deploy.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

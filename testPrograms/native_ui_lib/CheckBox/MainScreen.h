@@ -36,7 +36,8 @@ using namespace NativeUI;
 class MainScreen:
 	public Screen,
 	public ButtonListener,
-	public CheckBoxListener
+	public CheckBoxListener,
+	public ToggleButtonListener
 {
 
 public:
@@ -82,6 +83,15 @@ private:
         CheckBox* checkBox,
         bool state);
 
+    /**
+	 * This method is called when the state of the toggle button has changed
+	 * @param toggleButton The toggle button object that generated the event.
+	 * @param state True if the toggle button is checked, false otherwise.
+	 */
+    virtual void toggleButtonStateChanged(
+			ToggleButton* toggleButton,
+			bool state);
+
 	/**
 	 * Creates and adds main layout to the screen.
 	 */
@@ -95,6 +105,10 @@ private:
 
 	CheckBox* mCheckBox;
 	Button* mCheckBoxButton;
+	Label* mCheckBoxInfoLabel;
+
+	ToggleButton* mToggleButton;
+	Label* mToggleInfoLabel;
 
 	bool mCheckBoxState;
 };

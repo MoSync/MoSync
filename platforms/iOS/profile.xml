@@ -1,0 +1,3 @@
+<platform family="iOS" inherit="SmartPhone" abstract="true">
+  <capability name="BlueTooth" state="UNSUPPORTED"/>
+</platform>

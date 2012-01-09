@@ -48,7 +48,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #import "CameraConfirgurator.h"
 #import "ImagePickerController.h"
 #include "netImpl.h"
-
+#import "Reachability.h"
 
 #define NETWORKING_H
 #include "networking.h"
@@ -79,8 +79,9 @@ using namespace MoSyncError;
 #include "../../../../generated/gl.h.cpp"
 #endif
 
-#include <helpers/CPP_IX_AUDIO.h>
 #include "AudioSyscall.h"
+
+#include "MoSyncExtension.h"
 
 extern ThreadPool gThreadPool;
 
@@ -335,6 +336,8 @@ namespace Base {
 		// init some image.h optimizations.
 		initMulTable();
 		initRecipLut();
+
+        initExtensions(NULL);
 
 		return true;
 	}
@@ -1156,7 +1159,17 @@ namespace Base {
 		return 0;
 	}
 
-	SYSCALL(int, maInvokeExtension(int, int, int, int)) {
+	SYSCALL(MAExtensionModule, maExtensionModuleLoad(const char* name, int hash))
+	{
+		return MA_EXTENSION_MODULE_UNAVAILABLE;
+	}
+
+	SYSCALL(MAExtensionFunction, maExtensionFunctionLoad(MAHandle module, int index))
+	{
+		return MA_EXTENSION_FUNCTION_UNAVAILABLE;
+	}
+
+	SYSCALL(int, maExtensionFunctionInvoke(int, int, int, int)) {
 		BIG_PHAT_ERROR(ERR_FUNCTION_UNIMPLEMENTED);
 	}
 
@@ -1250,7 +1263,45 @@ namespace Base {
 			res = size;
 		} else if (strcmp(key, "mosync.path.local.urlPrefix") == 0) {
 			[@"file://localhost/" getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
+		} else if (strcmp(key, "mosync.device.name") == 0) {
+			[[[UIDevice currentDevice] name] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
+		} else if (strcmp(key, "mosync.device.UUID")== 0) {
+			[[[UIDevice currentDevice] uniqueIdentifier] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
+		} else if (strcmp(key, "mosync.device.OS")== 0) {
+			[[[UIDevice currentDevice] systemName] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
+		} else if (strcmp(key, "mosync.device.OS.version") == 0) {
+			[[[UIDevice currentDevice] systemVersion] getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			res = size;
+		} else if (strcmp(key, "mosync.network.type") == 0) {
+			NSString* networkType;
+			//Use Apples Reachability sample class for detecting the network type
+			Reachability * reachability = [Reachability reachabilityForInternetConnection];
+			NetworkStatus networkStatus = [reachability currentReachabilityStatus];
+			NSLog(@"networkStatus is %d", networkStatus);
+			switch(networkStatus)
+			{
+				case NotReachable:
+					networkType = @"none";
+					break;
+				case ReachableViaWWAN:
+					networkType = @"mobile"; //Generic name for mobile networks
+					break;
+				case ReachableViaWiFi:
+					networkType = @"wifi";
+					break;
+				default:
+					networkType = @"unknown";
+					break;
+			}
+			[networkType getCString:buf maxLength:size encoding:NSASCIIStringEncoding];
+			[reachability release];
+			res = size;
 		}
+
 		return res;
 	}
 
@@ -2059,7 +2110,22 @@ return 0; \
         maIOCtl_IX_GL2_caselist;
         maIOCtl_IX_GL_OES_FRAMEBUFFER_OBJECT_caselist;
 #endif	//SUPPORT_OPENGL_ES
-        maIOCtl_IX_AUDIO_caselist;
+        //maIOCtl_IX_AUDIO_caselist;
+		maIOCtl_case(maAudioDataCreateFromResource);
+		maIOCtl_case(maAudioDataCreateFromURL);
+		maIOCtl_case(maAudioDataDestroy);
+		maIOCtl_case(maAudioInstanceCreate);
+		maIOCtl_case(maAudioInstanceDestroy);
+		maIOCtl_case(maAudioGetLength);
+		maIOCtl_case(maAudioSetNumberOfLoops);
+		maIOCtl_case(maAudioPrepare);
+		maIOCtl_case(maAudioPlay);
+		maIOCtl_case(maAudioSetPosition);
+		maIOCtl_case(maAudioGetPosition);
+		maIOCtl_case(maAudioSetVolume);
+		maIOCtl_case(maAudioStop);
+		maIOCtl_case(maExtensionModuleLoad);
+        maIOCtl_case(maExtensionFunctionLoad);
 		}
 
 		return IOCTL_UNAVAILABLE;

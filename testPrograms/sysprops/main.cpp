@@ -1,4 +1,5 @@
 /* Copyright (C) 2009 Mobile Sorcery AB
+/* Copyright (C) 2011 MoSync AB
 
 This program is free software; you can redistribute it and/or modify it under
 the terms of the GNU General Public License, version 2, as published by
@@ -20,21 +21,41 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 using namespace MAUtil;
 
-class MyMoblet : public Moblet {
+/**
+ * A Moblet is a high-level class that defines the
+ * behaviour of a MoSync program.
+ */
+class MyMoblet : public Moblet
+{
 public:
-	MyMoblet() {
-		printf("Hello World!\n");
+	/**
+	 * Initialize the application in the constructor.
+	 */
+	MyMoblet()
+	{
+		printf("Press zero or back to exit\n");
+
+		dumpProp("mosync.imei");
+		dumpProp("mosync.imsi");
+		dumpProp("mosync.iso-639-1");
+		dumpProp("mosync.iso-639-2");
 		dumpProp("mosync.device");
-		dumpProp("microedition.platform");
-		dumpProp("com.sonyericsson.net.lac");
-		dumpProp("com.sonyericsson.net.cellid");
-		dumpProp("com.sonyericsson.net.mcc");
-		//dumpProp("com.sonyericsson.net.cmcc");
-		dumpProp("com.sonyericsson.net.mnc");
-		//dumpProp("com.sonyericsson.net.cmnc");
-		dumpProp("com.sonyericsson.net.status");
-		dumpProp("com.sonyericsson.net.isonhomeplmn");
-		dumpProp("com.sonyericsson.net.rat");
+		dumpProp("mosync.device.name");
+		dumpProp("mosync.device.UUID");
+		dumpProp("mosync.device.OS");
+		dumpProp("mosync.device.OS.version");
+		dumpProp("mosync.network.type");
+		dumpProp("mosync.path.local");
+//		dumpProp("microedition.platform");
+//		dumpProp("com.sonyericsson.net.lac");
+//		dumpProp("com.sonyericsson.net.cellid");
+//		dumpProp("com.sonyericsson.net.mcc");
+//		//dumpProp("com.sonyericsson.net.cmcc");
+//		dumpProp("com.sonyericsson.net.mnc");
+//		//dumpProp("com.sonyericsson.net.cmnc");
+//		dumpProp("com.sonyericsson.net.status");
+//		dumpProp("com.sonyericsson.net.isonhomeplmn");
+//		dumpProp("com.sonyericsson.net.rat");
 	}
 
 	void dumpProp(const char* key) {
@@ -46,22 +67,33 @@ public:
 		} else if(res > (int)sizeof(buf)) {
 			printf("too long: %i\n", res);
 		} else {
-			printf("%s\n", buf);
+			printf("    %s\n", buf);
 		}
-		
+
 	}
 
-	void keyPressEvent(int keyCode) {
-		if(keyCode == MAK_0) {
+	/**
+	 * Called when a key is pressed.
+	 */
+	void keyPressEvent(int keyCode, int nativeCode)
+	{
+		if (MAK_BACK == keyCode || MAK_0 == keyCode)
+		{
+			// Call close to exit the application.
 			close();
 		}
 	}
 };
 
-extern "C" int MAMain() {
+/**
+ * Entry point of the program. The MAMain function
+ * needs to be declared as extern "C".
+ */
+extern "C" int MAMain()
+{
 	InitConsole();
 	gConsoleLogging = 1;
 
 	Moblet::run(new MyMoblet());
 	return 0;
-};
+}

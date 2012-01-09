@@ -512,6 +512,11 @@ static void nativePostEvent(JNIEnv* env, jobject jthis, jintArray eventBuffer)
 		event.nfc.result = intArray[2];
 		event.nfc.dstId = intArray[3];
 	}
+	else if (event.type == EVENT_TYPE_AUDIO_PREPARED ||
+			event.type == EVENT_TYPE_AUDIO_COMPLETED)
+	{
+		event.audioInstance = intArray[1];
+	}
 
 	// Release the memory used for the int array.
 	env->ReleaseIntArrayElements(eventBuffer, intArray, 0);
@@ -548,6 +553,17 @@ static int nativeCreatePlaceholder( JNIEnv* env, jobject jthis )
 }
 
 /**
+ * @brief Exits the application
+ * This function uses the native exit() function to kill the application.
+ * All the threads and processes being started by the applicaton will be killed
+ */
+static void nativeExit( JNIEnv* env, jobject jthis )
+{
+	exit(1);
+	return;
+}
+
+/**
 * @brief jniRegisterNativeMethods
 */
 int jniRegisterNativeMethods(
@@ -578,7 +594,7 @@ int jniRegisterNativeMethods(
 	return 0;
 }
 
-jint gNumJavaMethods = 8;
+jint gNumJavaMethods = 9;
 static JNINativeMethod sMethods[] =
 {
 	// name, signature, funcPtr
@@ -589,7 +605,8 @@ static JNINativeMethod sMethods[] =
 	{ "nativeRun", "()V", (void*)nativeRun },
 	{ "nativePostEvent", "([I)V", (void*)nativePostEvent },
 	{ "nativeCreateBinaryResource", "(II)I", (void*)nativeCreateBinaryResource },
-	{ "nativeCreatePlaceholder", "()I", (void*)nativeCreatePlaceholder }
+	{ "nativeCreatePlaceholder", "()I", (void*)nativeCreatePlaceholder },
+	{ "nativeExit", "()V", (void*)nativeExit }
 };
 
 /**

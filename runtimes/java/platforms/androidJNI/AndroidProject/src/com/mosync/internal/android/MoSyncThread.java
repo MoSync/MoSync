@@ -83,6 +83,7 @@ import android.graphics.Path;
 import android.graphics.PorterDuff.Mode;
 import android.graphics.Rect;
 import android.graphics.Region;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.opengl.GLUtils;
 import android.os.Build;
@@ -96,6 +97,8 @@ import android.util.Log;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
+import android.provider.Settings.Secure;
+import android.net.ConnectivityManager;
 
 import com.mosync.internal.android.MoSyncFont.MoSyncFontHandle;
 import com.mosync.internal.android.nfc.MoSyncNFC;
@@ -141,12 +144,14 @@ public class MoSyncThread extends Thread
 		int resourceIndex,
 		int length);
 	public native int nativeCreatePlaceholder();
+	public native void nativeExit();
 
 	// Modules that handle syscalls for various subsystems.
 	// We delegate syscalls from this class to the modules.
 	MoSyncNetwork mMoSyncNetwork;
 	MoSyncBluetooth mMoSyncBluetooth;
 	MoSyncSound mMoSyncSound;
+	MoSyncAudio mMoSyncAudio;
 	MoSyncLocation mMoSyncLocation;
 	MoSyncHomeScreen mMoSyncHomeScreen;
 	MoSyncNativeUI mMoSyncNativeUI;
@@ -259,6 +264,8 @@ public class MoSyncThread extends Thread
 
 	int mTextConsoleHeight;
 
+	private boolean mIsSleeping;
+
 	/**
 	 * Ascent of text in the default console font.
 	 */
@@ -272,6 +279,12 @@ public class MoSyncThread extends Thread
 	// Rectangle objects used for drawing in maDrawImageRegion().
 	private final Rect mMaDrawImageRegionTempSourceRect = new Rect();
 	private final Rect mMaDrawImageRegionTempDestRect = new Rect();
+
+
+	/**
+	 * An Instance of Connectivity Manager used for detecting connection type
+	 */
+	private ConnectivityManager mConnectivityManager;
 
 	int mMaxStoreId = 0;
 
@@ -301,8 +314,11 @@ public class MoSyncThread extends Thread
 
 		mHasDied = false;
 
+		mIsSleeping = false;
+
 		mMoSyncNetwork = new MoSyncNetwork(this);
 		mMoSyncSound = new MoSyncSound(this);
+		mMoSyncAudio = new MoSyncAudio(this);
 		mMoSyncLocation = new MoSyncLocation(this);
 		mMoSyncHomeScreen = new MoSyncHomeScreen(this);
 		mMoSyncNativeUI = new MoSyncNativeUI(this, mImageResources);
@@ -375,6 +391,8 @@ public class MoSyncThread extends Thread
 		mMoSyncNotifications = new MoSyncNotifications(this);
 		mMoSyncDB = new MoSyncDB();
 
+		mConnectivityManager = (ConnectivityManager) mContext.getSystemService(Context.CONNECTIVITY_SERVICE);
+
 		nativeInitRuntime();
 	}
 
@@ -398,15 +416,21 @@ public class MoSyncThread extends Thread
 	 * Do cleanup here (but it is not guaranteed that
 	 * this will be called.)
 	 */
-    public void onDestroy()
+	public void onDestroy()
 	{
-    	if (null != mMoSyncBluetooth)
-    	{
-    		// Delegate onDestroy to the Bluetooth object.
-    		mMoSyncBluetooth.onDestroy();
-    		mMoSyncBluetooth = null;
-    	}
-    }
+		if (null != mMoSyncBluetooth)
+		{
+			// Delegate onDestroy to the Bluetooth object.
+			mMoSyncBluetooth.onDestroy();
+			mMoSyncBluetooth = null;
+		}
+
+		if(null != mMoSyncNetwork)
+		{
+			mMoSyncNetwork.killAllConnections();
+			mMoSyncNetwork = null;
+		}
+	}
 
 	/**
 	 * Return the activity that this thread is related to.
@@ -560,38 +584,26 @@ public class MoSyncThread extends Thread
 	 */
 	public void threadPanic(int errorCode, String message)
 	{
-		new Exception("STACKTRACE: threadPanic").printStackTrace();
-
-		//Log.i("@@@ MoSync",
-		//	"PANIC - errorCode: " + errorCode + " message: " + message);
+		//new Exception("STACKTRACE: threadPanic").printStackTrace();
 
 		mHasDied = true;
 
-		try
-		{
-			// Launch panic dialog.
-			MoSyncPanicDialog.sPanicMessage = message;
-			Intent myIntent = new Intent(
-				mMoSyncView.getContext(), MoSyncPanicDialog.class);
-			mMoSyncView.getContext().startActivity(myIntent);
+		// Launch panic dialog.
+		MoSyncPanicDialog.sPanicMessage = message;
+		Intent myIntent = new Intent(
+			mMoSyncView.getContext(), MoSyncPanicDialog.class);
+		mMoSyncView.getContext().startActivity(myIntent);
 
-			// Sleep so that the MoSync thread is kept alive while
-			// the dialog is open.
-			while (true)
-			{
-				try
-				{
-					sleep(Long.MAX_VALUE);
-				}
-				catch (Exception e)
-				{
-					logError("threadPanic exception 1:" + e, e);
-				}
-			}
-		}
-		catch (Exception e)
+		while(true)
 		{
-			logError("threadPanic exception 2:" + e, e);
+			try
+			{
+				sleep(500);
+			}
+			catch(Exception e)
+			{
+				Log.i("MoSync Thread","oops.. got an exception, conutine until application ends");
+			}
 		}
 	}
 
@@ -908,7 +920,8 @@ public class MoSyncThread extends Thread
 		nativePostEvent(event);
 
 		// Wake up thread if sleeping.
-		interrupt();
+		if(mIsSleeping)
+			interrupt();
 	}
 
 	/**
@@ -2231,6 +2244,7 @@ public class MoSyncThread extends Thread
 	{
 		SYSLOG("maWait");
 
+		mIsSleeping = true;
 		try
 		{
 	 		if (timeout<=0)
@@ -2251,6 +2265,8 @@ public class MoSyncThread extends Thread
 		{
 			logError("Thread sleep failed : " + e.toString(), e);
 		}
+
+		mIsSleeping = false;
 
 		SYSLOG("maWait returned");
 	}
@@ -2452,6 +2468,23 @@ public class MoSyncThread extends Thread
 		{
 			property = Build.FINGERPRINT;
 		}
+		else if(key.equals("mosync.device.name"))
+		{
+			property = Build.DEVICE;
+		}
+		else if(key.equals("mosync.device.UUID"))
+		{
+			property = Secure.getString( mContext.getContentResolver(),
+					Secure.ANDROID_ID);
+		}
+		else if(key.equals("mosync.device.OS"))
+		{
+			property = "Android";
+		}
+		else if(key.equals("mosync.device.OS.version"))
+		{
+			property = Build.VERSION.RELEASE;
+		}
 		else if (key.equals("mosync.path.local"))
 		{
 			String path = getActivity().getFilesDir().getAbsolutePath() + "/";
@@ -2468,6 +2501,12 @@ public class MoSyncThread extends Thread
 				getActivity().getFilesDir().getAbsolutePath() + "/";
 			//Log.i("@@@ MoSync", "Property mosync.path.local.url: " + url);
 			property = url;
+		}
+		else if (key.equals("mosync.network.type"))
+		{
+			//get the connection that we are using right now
+			NetworkInfo info = mConnectivityManager.getActiveNetworkInfo();
+			property = getNetworkNameFromInfo(info);
 		}
 
 		if (null == property) { return -2; }
@@ -2500,6 +2539,39 @@ public class MoSyncThread extends Thread
 	}
 
 	/**
+	 * converts the network information into a single string indicating
+	 * the type of the network.
+	 *
+	 * @param info NetowrkInformation obtained from a ConnectivityManager instance
+	 * @return a String indicating the type of the connection, for Mobile networks
+	 * it returns the exact type of mobile network, e.g. GSM, GPRS, or HSDPA...
+	 * The result might contain the full name and version of the mobiel network type
+	 */
+	private String getNetworkNameFromInfo(NetworkInfo info)
+	{
+	       if (info != null) {
+	            String type = info.getTypeName();
+	            if(type == null)
+	            {
+					return "unknown";
+	            }
+	            else if (type.toLowerCase().equals("mobile"))
+	            {
+					//return a generic default
+					return "mobile";
+	            }
+	            else
+	            {
+					return "wifi";
+	            }
+	        }
+	        else
+	        {
+				return "none";
+	        }
+	}
+
+	/**
 	 * Perform a platform request.
 	 * @param url The url that specifies the request.
 	 * @return
@@ -2515,6 +2587,19 @@ public class MoSyncThread extends Thread
 
 			return 0;
 		}
+/*
+		else if(url.startsWith("tel://"))
+		{
+			if(!(mContext.getPackageManager().checkPermission("android.permission.NFC",
+					mContext.getPackageName()) == PackageManager.PERMISSION_GRANTED))
+			{
+
+			}
+
+			Intent intent = new Intent(Intent.ACTION_CALL, Uri.parse(url));
+			((Activity)mContext).startActivity(intent);
+		}
+*/
 		return -1;
 	}
 
@@ -3007,7 +3092,8 @@ public class MoSyncThread extends Thread
 	 * Schedules a local notification for delivery at its encapsulated date and time.
 	 * @param handle Handle to a local notification object.
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred,
-	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid,
+	 * MA_NOTIFICATION_RES_ALREADY_SCHEDULED if it was already scheduled.
 	 */
 	int maNotificationLocalSchedule(int handle)
 	{
@@ -3019,6 +3105,7 @@ public class MoSyncThread extends Thread
 	 * @param handle Handle to a local notification object.
 	 * @return MA_NOTIFICATION_RES_OK if no error occurred,
 	 * MA_NOTIFICATION_RES_INVALID_HANDLE if the notificationHandle is invalid.
+	 * MA_NOTIFICATION_RES_CANNOT_UNSCHEDULE if it wasn't scheduled before.
 	 */
 	int maNotificationLocalUnschedule(int handle)
 	{
@@ -3378,6 +3465,73 @@ public class MoSyncThread extends Thread
 	{
 		return mMoSyncSound.maSoundIsPlaying();
 	}
+
+	int maAudioDataCreateFromResource(String mime, int data,
+			int offset, int length, int flags)
+	{
+		return mMoSyncAudio.maAudioDataCreateFromResource(mime, data, offset, length, flags);
+	}
+
+	int maAudioDataCreateFromURL(String mime, String url, int flags)
+	{
+		return mMoSyncAudio.maAudioDataCreateFromURL(mime, url, flags);
+	}
+
+	int maAudioDataDestroy(int audioData)
+	{
+		return mMoSyncAudio.maAudioDataDestroy(audioData);
+	}
+
+	int maAudioInstanceCreate(int audioData)
+	{
+		return mMoSyncAudio.maAudioInstanceCreate(audioData);
+	}
+
+	int maAudioInstanceDestroy(int audioInstance)
+	{
+		return mMoSyncAudio.maAudioInstanceDestroy(audioInstance);
+	}
+
+	int maAudioGetLength(int audio)
+	{
+		return mMoSyncAudio.maAudioGetLength(audio);
+	}
+
+	int maAudioSetNumberOfLoops(int audio, int loops)
+	{
+		return mMoSyncAudio.maAudioSetNumberOfLoops(audio, loops);
+	}
+
+	int maAudioPrepare(int audio, int async)
+	{
+		return mMoSyncAudio.maAudioPrepare(audio, async);
+	}
+
+	int maAudioPlay(int audio)
+	{
+		return mMoSyncAudio.maAudioPlay(audio);
+	}
+
+	int maAudioSetPosition(int audio, int milliseconds)
+	{
+		return mMoSyncAudio.maAudioSetPosition(audio, milliseconds);
+	}
+
+	int maAudioGetPosition(int audio)
+	{
+		return mMoSyncAudio.maAudioGetPosition(audio);
+	}
+
+	int maAudioSetVolume(int audio, float volume)
+	{
+		return mMoSyncAudio.maAudioSetVolume(audio, volume);
+	}
+
+	int maAudioStop(int audio)
+	{
+		return mMoSyncAudio.maAudioStop(audio);
+	}
+
 
 	public int maAudioBufferInit(int info)
 	{
@@ -4526,6 +4680,14 @@ public class MoSyncThread extends Thread
 			columnIndex,
 			doubleValueAddress,
 			this);
+	}
+
+	/**
+	 * Ends the application by calling the native exit() function
+	 */
+	public void exitApplication()
+	{
+		nativeExit();
 	}
 
 	/**

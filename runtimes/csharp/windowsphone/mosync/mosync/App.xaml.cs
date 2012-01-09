@@ -84,6 +84,32 @@ namespace test_mosync
         // This code will not execute when the application is reactivated
 		private MoSync.Machine machine = null;
 
+		protected void InitExtensions(MoSync.Core core, MoSync.Runtime runtime)
+		{
+			try
+			{
+				MoSync.ExtensionsLoader.Load();
+			}
+			catch (Exception e)
+			{
+				MoSync.Util.CriticalError("Couldn't load extension: " + e.ToString());
+			}
+
+			MoSync.ExtensionModule extMod = runtime.GetModule<MoSync.ExtensionModule>();
+			System.Reflection.Assembly[] assemblies = AppDomain.CurrentDomain.GetAssemblies();
+			foreach (System.Reflection.Assembly a in assemblies)
+			foreach (Type t in a.GetTypes())
+				{
+					IExtensionModule extensionGroupInstance = null;
+					if (t.GetInterface("MoSync.IExtensionModule", false) != null)
+					{
+						extensionGroupInstance = Activator.CreateInstance(t) as IExtensionModule;
+						extMod.AddModule(extensionGroupInstance);
+						extensionGroupInstance.Init(core, runtime);
+					}
+				}
+		}
+
 		private void Application_Launching(object sender, LaunchingEventArgs e)
         {
 
@@ -94,9 +120,11 @@ namespace test_mosync
 				{
 #if !REBUILD
 					machine = MoSync.Machine.CreateInterpretedMachine("program", "resources");
+
 #else
 	                machine = MoSync.Machine.CreateNativeMachine(new CoreNativeProgram(), "resources");
 #endif
+					InitExtensions(machine.GetCore(), machine.GetRuntime());
 					machine.Run();
 				}
             };
