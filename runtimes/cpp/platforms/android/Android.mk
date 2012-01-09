@@ -38,6 +38,7 @@ LOCAL_SRC_FILES := FileImpl.cpp \
 	../../core/Recompiler/ArmAssembler.cpp \
 	../../core/Recompiler/ArmRecompiler.cpp \
 	../../../../intlibs/hashmap/hashmap.cpp \
+	../../core/Recompiler/ashmem.cpp \
 
 
 ifeq ($(ANDROID_API_BELOW_7),true)

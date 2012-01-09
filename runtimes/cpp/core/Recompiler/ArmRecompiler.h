@@ -72,7 +72,8 @@ namespace MoSync {
 		void freeCodeMemory(void *addr);
 		void freeEntryPoint(void *addr);
 		void flushInstructionCache(void *addr, int len);
-		
+		int protectMemory(void *addr, int len);
+
 		int run(int ip);
 #ifndef _android
 		void init(Core::VMCore *core, int *VM_Yield);
@@ -128,8 +129,11 @@ AA::Register PIPE_TO_ARM_MAP(AA::Register temp) { assm.MOV_imm32(temp, (int) mPi
 }
 // Symbian can't recompile using any of the following registers AA::R9, AA::R10, AA::SP, AA::LR, AA::IP 
 
+#ifdef _android
+#define NUM_STATICALLY_ALLOCATED_REGISTERS 5
+#else
 #define NUM_STATICALLY_ALLOCATED_REGISTERS 0
-//#define NUM_STATICALLY_ALLOCATED_REGISTERS 5
+#endif
 
 #define loadEnvironmentRegisters(x)
 #endif

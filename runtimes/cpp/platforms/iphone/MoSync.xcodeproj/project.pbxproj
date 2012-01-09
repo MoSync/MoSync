@@ -136,6 +136,8 @@
 		8527D52B1302E34000535CCA /* ImageButtonWidget.mm in Sources */ = {isa = PBXBuildFile; fileRef = 8527D5281302E34000535CCA /* ImageButtonWidget.mm */; };
 		853983AB116CADEF000521C0 /* hashmap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 853983A9116CADEF000521C0 /* hashmap.cpp */; };
 		853985DB116CF423000521C0 /* CMGlyphDrawing.mm in Sources */ = {isa = PBXBuildFile; fileRef = 853985DA116CF423000521C0 /* CMGlyphDrawing.mm */; };
+		85407553149F9E62001B14C0 /* MoSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407550149F9E62001B14C0 /* MoSync.mm */; };
+		85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407552149F9E62001B14C0 /* MoSyncExtension.mm */; };
 		85581E6012EA323E009C6204 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85581E5F12EA323E009C6204 /* TouchHelper.mm */; };
 		85581E6112EA323E009C6204 /* TouchHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 85581E5E12EA323E009C6204 /* TouchHelper.h */; };
 		85581E6212EA323E009C6204 /* TouchHelper.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85581E5F12EA323E009C6204 /* TouchHelper.mm */; };
@@ -299,6 +301,8 @@
 		85F2559711AC162700EB47EE /* libMoSyncLib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 85F2550D11AC125400EB47EE /* libMoSyncLib.a */; };
 		85F25A3611AD614700EB47EE /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 29B97316FDCFA39411CA2CEA /* main.m */; };
 		85F25A3711AD614700EB47EE /* MoSyncAppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 1D3623250D0F684500981E51 /* MoSyncAppDelegate.mm */; };
+		E4B3144E14B483FF009F88B4 /* MoSync.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407550149F9E62001B14C0 /* MoSync.mm */; };
+		E4B3145014B48404009F88B4 /* MoSyncExtension.mm in Sources */ = {isa = PBXBuildFile; fileRef = 85407552149F9E62001B14C0 /* MoSyncExtension.mm */; };
 		E4D36EA81459AC5B00477B1E /* AudioData.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA51459AC5B00477B1E /* AudioData.mm */; };
 		E4D36EA91459AC5B00477B1E /* AudioSyscall.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EA71459AC5B00477B1E /* AudioSyscall.mm */; };
 		E4D36EAD1459B5B600477B1E /* AudioInstance.mm in Sources */ = {isa = PBXBuildFile; fileRef = E4D36EAB1459B5B600477B1E /* AudioInstance.mm */; };
@@ -406,6 +410,10 @@
 		853983AA116CADEF000521C0 /* hashmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = hashmap.h; path = ../../../../intlibs/hashmap/hashmap.h; sourceTree = SOURCE_ROOT; };
 		853985D9116CF423000521C0 /* CMGlyphDrawing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CMGlyphDrawing.h; sourceTree = "<group>"; };
 		853985DA116CF423000521C0 /* CMGlyphDrawing.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = CMGlyphDrawing.mm; sourceTree = "<group>"; };
+		8540754F149F9E62001B14C0 /* MoSync.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSync.h; path = Extensions/MoSync.h; sourceTree = "<group>"; };
+		85407550149F9E62001B14C0 /* MoSync.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSync.mm; path = Extensions/MoSync.mm; sourceTree = "<group>"; };
+		85407551149F9E62001B14C0 /* MoSyncExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = MoSyncExtension.h; path = Extensions/MoSyncExtension.h; sourceTree = "<group>"; };
+		85407552149F9E62001B14C0 /* MoSyncExtension.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = MoSyncExtension.mm; path = Extensions/MoSyncExtension.mm; sourceTree = "<group>"; };
 		85581E5E12EA323E009C6204 /* TouchHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TouchHelper.h; sourceTree = "<group>"; };
 		85581E5F12EA323E009C6204 /* TouchHelper.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = TouchHelper.mm; sourceTree = "<group>"; };
 		8558307D11C79B030008FDC1 /* MoSyncCLController.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = MoSyncCLController.mm; sourceTree = "<group>"; };
@@ -622,6 +630,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				8540754E149F9E55001B14C0 /* Extensions */,
 				43CE0BE01463E98F00F8FFC3 /* notifications */,
 				43CE0BDE1463E98700F8FFC3 /* ads */,
 				E4D36EA31459AC5B00477B1E /* audio */,
@@ -811,6 +820,17 @@
 				853983AA116CADEF000521C0 /* hashmap.h */,
 			);
 			name = hashmap;
+			sourceTree = "<group>";
+		};
+		8540754E149F9E55001B14C0 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				8540754F149F9E62001B14C0 /* MoSync.h */,
+				85407550149F9E62001B14C0 /* MoSync.mm */,
+				85407551149F9E62001B14C0 /* MoSyncExtension.h */,
+				85407552149F9E62001B14C0 /* MoSyncExtension.mm */,
+			);
+			name = Extensions;
 			sourceTree = "<group>";
 		};
 		85923F23114539D4004875E4 /* filelist */ = {
@@ -1352,6 +1372,8 @@
 				4142402614766C03006977A1 /* MoSyncDB.cpp in Sources */,
 				418047B6147E8B6A0048FB95 /* Reachability.m in Sources */,
 				43B16FEB147BF9FC00B6BB8A /* NSStringExpanded.mm in Sources */,
+				85407553149F9E62001B14C0 /* MoSync.mm in Sources */,
+				85407554149F9E62001B14C0 /* MoSyncExtension.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1364,9 +1386,11 @@
 				438DBD401475388500980239 /* AudioSyscall.mm in Sources */,
 				43D3B01613FFC82E00B3DE23 /* CameraConfirgurator.mm in Sources */,
 				858B44BB12E7B1060058DBFC /* log.cpp in Sources */,
+				E4B3144E14B483FF009F88B4 /* MoSync.mm in Sources */,
 				858B3FEC12E67D090058DBFC /* NSObjectExpanded.m in Sources */,
 				858B3FF312E67D090058DBFC /* MoSyncGLView.mm in Sources */,
 				8558308111C79B210008FDC1 /* MoSyncCLController.mm in Sources */,
+				E4B3145014B48404009F88B4 /* MoSyncExtension.mm in Sources */,
 				85F2553011AC12DE00EB47EE /* MoSyncView.mm in Sources */,
 				85F2551B11AC12DE00EB47EE /* connection.cpp in Sources */,
 				85F2551C11AC12DE00EB47EE /* discovery.cpp in Sources */,

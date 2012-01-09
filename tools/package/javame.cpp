@@ -78,7 +78,8 @@ void packageJavaME(const SETTINGS& s, const RuntimeInfo& ri) {
 	testVendor(s);
 	testJavaMESigning(s);
 
-	string dstPath = ri.isBlackberry ? "" : s.dst;
+	//string dstPath = ri.isBlackberry ? "" : s.dst;
+	string dstPath = s.dst;
 	string program, resource;
 	program = fullpathString(s.program);
 	if(s.resource)
