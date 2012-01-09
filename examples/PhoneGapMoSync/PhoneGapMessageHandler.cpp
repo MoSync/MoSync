@@ -40,7 +40,8 @@ using namespace Wormhole; // Class WebAppMoblet
 PhoneGapMessageHandler::PhoneGapMessageHandler(NativeUI::WebView* webView) :
 	mWebView(webView),
 	mPhoneGapSensors(this),
-	mPhoneGapFile(this)
+	mPhoneGapFile(this),
+	mPhoneGapSensorManager(this)
 {
 	enableHardware();
 }
@@ -108,6 +109,10 @@ bool PhoneGapMessageHandler::handleMessage(PhoneGapMessage& message)
 	{
 		mPhoneGapSensors.handleMessage(message);
 	}
+	else if (message.getParam("service") == "SensorManager")
+		{
+			mPhoneGapSensorManager.handleMessage(message);
+		}
 	else if (message.getParam("service") == "File")
 	{
 		mPhoneGapFile.handleMessage(message);

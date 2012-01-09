@@ -32,6 +32,7 @@ MA 02110-1301, USA.
 #include "PhoneGapMessage.h"
 #include "PhoneGapSensors.h"
 #include "PhoneGapFile.h"
+#include "PhoneGapSensorManager.h"
 
 // PhoneGap callback result codes.
 #define PHONEGAP_CALLBACK_STATUS_NO_RESULT "0"
@@ -192,6 +193,11 @@ private:
 	 * PhoneGap sensor API:s message handler.
 	 */
 	PhoneGapSensors mPhoneGapSensors;
+
+	/**
+	 * PhoneGap w3c sensor manager API:s message handler.
+	 */
+	PhoneGapSensorManager mPhoneGapSensorManager;
 
 	/**
 	 * PhoneGap File API message handler.

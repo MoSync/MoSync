@@ -79,3 +79,76 @@ navigator.geolocation.clearWatch = function(success, fail)
     }
     bridge.PhoneGap.send(callbackId, "GeoLocation", "clearWatch");
 };
+
+
+navigator.findSensors = function(type)
+{
+	var sensorRequest = {};
+	sensorRequest.result = [];
+	sensorRequest.readyState = "processing";
+
+	var callbackId = "SensorManager" + PhoneGap.callbackId++;
+    if (typeof success == "function" || typeof fail == "function")
+	{
+        PhoneGap.callbacks[callbackId] = {success:	function(sensorList)
+        											{
+        												sensorRequest.result = sensorList.result;
+        												if(typeof sensorRequest.onsuccess == "function")
+        												{
+        													sensorRequest.onsuccess();
+        												}
+        											},
+        									fail:	function()
+        											{
+        												if(typeof sensorRequest.onsuccess == "function")
+        												{
+        													sensorRequest.onerror();
+        												}
+        											}
+        								};
+    }
+    bridge.PhoneGap.send(callbackId, "SensorManager", "findSensors","{\"type\":\"" + type + "\"}");
+    return sensorRequest;
+};
+
+function SensorConnection(options)
+{
+	if(typeof options == "string")
+	{
+		this.type = options;
+	}
+	else if(typeof options.name == "string")
+	{
+		this.type = options.name;
+	}
+	else
+	{
+		this.type = options.type;
+	}
+
+	this.status = "open";
+
+	this.startWatch = 	function(watchOptions)
+						{
+							if(this.status != "open")
+							{
+								throw "ILLEGAL_STATE";
+								return;
+							}
+							alert("mpika2");
+							bridge.PhoneGap.send(callbackId,
+												"SensorManager",
+												"startSensor",
+												"{\"type\":\"" + this.type + "\", \"interval\":\"" + watchOptions.interval + "\"}");
+						};
+
+	this.endWatch = 	function()
+						{
+							bridge.PhoneGap.send(callbackId, "SensorManager", "stopSensor","{\"type\":\"" + this.type + "\"}");
+						};
+
+	this.read = 		function()
+						{
+
+						};
+}
