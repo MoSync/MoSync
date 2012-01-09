@@ -770,6 +770,14 @@ void VariantCondition::initFrom(VariantCondition& prototype) {
 }
 
 bool VariantCondition::setCondition(string condition, string value) {
+	if (doesMatch(ATTR_PLATFORM, condition.c_str())) {
+		// Special case!
+		string newValue = string(value);
+		for (int i = 0; i < newValue.length(); i++) {
+			newValue[i] = tolower(value.at(i));
+		}
+		value = newValue;
+	}
 	fConditions[condition] = value;
 	return false;
 }
