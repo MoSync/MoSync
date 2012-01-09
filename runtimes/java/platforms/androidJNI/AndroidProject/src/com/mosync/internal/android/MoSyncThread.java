@@ -385,7 +385,7 @@ public class MoSyncThread extends Thread
 
 		mMoSyncNotifications = new MoSyncNotifications(this);
 
-		mMoSyncCapture = new MoSyncCapture(this);
+		mMoSyncCapture = new MoSyncCapture(this, mImageResources);
 
 		mMoSyncDB = new MoSyncDB();
 

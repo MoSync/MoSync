@@ -62,11 +62,11 @@ MainScreen::MainScreen() :
  */
 MainScreen::~MainScreen()
 {
-	delete mSettingsScreen;
-	delete mVideoQualityScreen;
-	delete mImageScreen;
-	delete mVideoScreen;
-	delete mFlashModeScreen;
+//	delete mSettingsScreen;
+//	delete mVideoQualityScreen;
+//	delete mImageScreen;
+//	delete mVideoScreen;
+//	delete mFlashModeScreen;
 
 	Environment::getEnvironment().removeCustomEventListener(this);
 }

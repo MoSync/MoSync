@@ -21,7 +21,7 @@ import java.io.File;
 import java.util.Hashtable;
 import java.util.TimerTask;
 
-import com.mosync.internal.android.notifications.LocalNotificationObject;
+import com.mosync.internal.android.MoSyncThread.ImageCache;
 import com.mosync.internal.generated.IX_WIDGET;
 import com.mosync.nativeui.util.HandleTable;
 import com.mosync.nativeui.util.properties.IntConverter;
@@ -32,12 +32,12 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
-import static com.mosync.internal.generated.MAAPI_consts.EVENT_TYPE_PUSH_NOTIFICATION;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_ACTION_RECORD_VIDEO;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_ACTION_STOP_RECORDING;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_ACTION_TAKE_PICTURE;
@@ -57,7 +57,6 @@ import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_PROPERTY;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_PROPERTY_VALUE;
 import static com.mosync.internal.generated.MAAPI_consts.MA_CAPTURE_RES_INVALID_STRING_BUFFER_SIZE;
-import static com.mosync.internal.generated.MAAPI_consts.MA_NOTIFICATION_RES_INVALID_PROPERTY_NAME;
 
 /**
  * Class that implements Capture API.
@@ -85,9 +84,10 @@ public class MoSyncCapture
 	 * Constructor Capture API.
 	 * @param thread The underlying MoSync thread.
 	 */
-	public MoSyncCapture(MoSyncThread thread)
+	public MoSyncCapture(MoSyncThread thread, Hashtable<Integer, ImageCache> imageTable)
 	{
 		mMoSyncThread = thread;
+		mImageTable = imageTable;
 	}
 
 	/**
@@ -265,11 +265,14 @@ public class MoSyncCapture
 	public static void handlePicture(Intent data)
 	{
 		//int imageHandle = data.getExtras().getInt("data");
-//	    Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
+	    Bitmap photo = (Bitmap) data.getExtras().get("data");
 
+        // Create handle.
+        int dataHandle = mMoSyncThread.nativeCreatePlaceholder();
+		mImageTable.put(dataHandle, new ImageCache(null, photo));
 
-	    // Post MoSync event
-	    postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_IMAGE, -1);
+	    // Post MoSync event.
+	    postEventNotificationReceived(MA_CAPTURE_EVENT_TYPE_IMAGE, dataHandle); // + the default image name
 	}
 
 	/**
@@ -358,6 +361,11 @@ public class MoSyncCapture
 	 * The MoSync thread object.
 	 */
 	private static MoSyncThread mMoSyncThread;
+
+    /**
+     * It has access to the image resource table.
+     */
+    private static Hashtable<Integer, ImageCache> mImageTable;
 
 	/**
 	 * A table that contains a mapping between a handle and a capture object.

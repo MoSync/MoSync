@@ -309,7 +309,7 @@ public class MoSync extends Activity
 		Intent data)
 	{
 		// Check that this is the result of the Bluetooth enable activity.
-		if (Mediator.REQUEST_ENABLE_BLUETOOTH == requestCode)
+		if (Mediator.REQUEST_ENABLE_BLUETOOTH == requestCode) // && resultCode == RESULT_OK
 		{
 			Mediator.getInstance().postBluetoothDialogClosedMessage();
 		}
@@ -326,7 +326,7 @@ public class MoSync extends Activity
 			// A picture was taken.
 			MoSyncCapture.handlePicture(data);
 		}
-		else if ( requestCode == RESULT_CANCELED ) //RESULT_OK
+		else if ( resultCode == RESULT_CANCELED ) //RESULT_OK
 		{
 			// Send MoSync event: the capture was canceled by the user.
 			MoSyncCapture.handleCaptureCanceled();
