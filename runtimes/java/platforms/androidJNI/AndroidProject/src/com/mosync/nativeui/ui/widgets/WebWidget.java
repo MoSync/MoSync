@@ -214,7 +214,7 @@ public class WebWidget extends Widget
 			mNonHookedUrls.add(url);
 
 			// Here we check if the url has schema specifier.
-			// This is done so that is there is no schema
+			// This is done so that if there is no schema
 			// we use the file:// schema to load the file
 			// from the application's local file system.
 			if (url.contains("://") || url.contains("javascript:"))
