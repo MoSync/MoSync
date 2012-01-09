@@ -21,17 +21,24 @@
 
 @class AudioData;
 
-@interface AudioInstance :  NSObject {
+@interface AudioInstance :  NSObject <AVAudioPlayerDelegate> {
     AVAudioPlayer* mAudioPlayer;
     AudioData* mAudioData;
+	int mHandle;
+	BOOL mPrepared;
+	BOOL mIsPreparing;
 }
 
 /**
  * Init function.
  */
--(id) initWithAudioData:(AudioData*)audioData error:(int*)error;
+-(id) initWithAudioData:(AudioData*)audioData andHandle:(int)handle error:(int*)error;
 
--(void) play;
+-(BOOL) isPrepared;
+-(BOOL) isPreparing;
+-(BOOL) prepare:(BOOL)async;
+-(BOOL) play;
+-(void) pause;
 -(void) stop;
 -(void) setPosition:(int)millis;
 -(int) getPosition;
