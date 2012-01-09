@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <!--
-	This application shows how to communicate from JavaScript to C++.
-	When the LogoBox is touched, a call is made to C++ to make the
-	device vibrate. The C++ code that gets called is in main.cpp.
+	Test program to make Wormhole performance benchmarks.
 -->
 <html>
 <head>
@@ -73,74 +71,13 @@ html
 <script src="js/mosync-bridge.js"></script>
 
 <script>
-mosync.encoder = (function()
-{
-	var encoder = {};
-	var firstChar = 33;
-	var lastChar = 126;
-	var base = lastChar - firstChar;
+var Iterations = 100;
 
-	encoder.itox = function(i)
-	{
-		var n = i;
-		var digits = [];
-
-		while (n > base)
-		{
-			digits.push((n % base) + firstChar);
-			n = (n / base) >> 0;
-		}
-		digits.push(n + firstChar);
-
-		return String.fromCharCode.apply(null, digits);
-	};
-
-	encoder.xtoi = function(s)
-	{
-		var n = 0;
-		var length = s.length;
-
-		for (var i = 0; i < length; ++i)
-		{
-			n += Math.pow(base, i) * (s.charCodeAt(i) - firstChar);
-		}
-
-		return n;
-	};
-
-	encoder.encodeString = function(s)
-	{
-		return ""
-			+ encoder.itox(s.length)
-			+ " "
-			+ s
-			+ " ";
-	};
-
-	return encoder;
-}
-)();
-</script>
-
-
-<script>
-
-var Iterations = 2000; //200
-// 30*4*5
-// = 120*5
-// = 600
 var ThroughputStartTime = 0;
 var ThroughputCount = 0;
 
 var RoundtripStartTime = 0;
 var RoundtripCount = 0;
-
-var LongMessage = "";
-for (var i = 0; i < 100; ++i)
-{
-	LongMessage = LongMessage + "a";
-}
-LongMessage = LongMessage + "b";
 
 function SetText(text)
 {
@@ -160,35 +97,34 @@ function TestStart()
 	SetText("<p>Running Wormhole performance tests...</p>");
 
 	// Start first test.
-	RawMessageStart();
-	//ThroughputStart();
-	//RoundtripStart();
-	//UrlEncodingTest();
+	StringMessageStart();
 }
 
-function RawMessageStart()
+/**
+ * Test sending of string messages.
+ */
+function StringMessageStart()
 {
 	ThroughputCount = 0;
 	ThroughputStartTime = new Date().getTime();
 
-	for (var i = 0; i < 1; ++i)
+	for (var i = 0; i < Iterations; ++i)
 	{
-		var messageStream = "ms:";
 		for (var j = 0; j < Iterations; ++j)
 		{
 			++ThroughputCount;
-			messageStream = messageStream
-				+ mosync.encoder.encodeString("RAWS")
-				+ mosync.encoder.encodeString("One")
-				+ mosync.encoder.encodeString("Two & three");
+			mosync.bridge.send(["StringMessage", "One", "Two & three"]);
 
 		}
-		mosync.bridge.sendRaw(messageStream);
+		mosync.bridge.sendAll();
 	}
-	mosync.bridge.sendRaw("ms:" + mosync.encoder.encodeString("RAWE"));
+	mosync.bridge.send(["StringMessageEnd"]);
 }
 
-function RawMessageEnd()
+/**
+ * Called from C++ to report finishing sending string messages.
+ */
+function StringMessageEnd()
 {
 	// Compute performance.
 	var timeTaken = new Date().getTime() - ThroughputStartTime;
@@ -197,39 +133,42 @@ function RawMessageEnd()
 	// Display result.
 	messagesPerSecond = Math.round(messagesPerSecond*100)/100;
 	SetText(GetText()
-		+ "<p>Raw messages/second: "
+		+ "<p>String messages/s: "
 		+ messagesPerSecond
 		+ "</p>");
 
 	// Start next test.
-	//ThroughputStart();
+	JSONMessageStart();
 }
 
 /**
- * Test how many messages can be sent to C++ per second,
- * without calling back to JS.
+ * Test sending of JSON messages.
  */
-function ThroughputStart()
+function JSONMessageStart()
 {
 	ThroughputCount = 0;
 	ThroughputStartTime = new Date().getTime();
 
-	for (var i = 0; i < Iterations/10; ++i)
+	for (var i = 0; i < Iterations / 10; ++i)
 	{
 		for (var j = 0; j < Iterations; ++j)
 		{
 			++ThroughputCount;
-			mosync.bridge.send({messageName: "ThroughputMessage"}, null);
+			mosync.bridge.sendJSON({
+				messageName: "JSONMessage",
+				param1: "One",
+				param2: "Two & three"
+			});
 		}
-		mosync.bridge.sendAllMessages();
+		mosync.bridge.sendAllJSON();
 	}
-	mosync.bridge.send({messageName: "ThroughputEnd"}, null);
+	mosync.bridge.sendJSON({messageName: "JSONMessageEnd"});
 }
 
 /**
  * Called from C++ to report throughput result.
  */
-function ThroughputEnd()
+function JSONMessageEnd()
 {
 	// Compute performance.
 	var timeTaken = new Date().getTime() - ThroughputStartTime;
@@ -238,69 +177,34 @@ function ThroughputEnd()
 	// Display result.
 	messagesPerSecond = Math.round(messagesPerSecond*100)/100;
 	SetText(GetText()
-		+ "<p>Throughput/second: "
+		+ "<p>JSON messages/s: "
 		+ messagesPerSecond
 		+ "</p>");
 
 	// Start next test.
-	DataThroughputStart();
-}
-
-function DataThroughputStart()
-{
-	ThroughputCount = 0;
-	ThroughputStartTime = new Date().getTime();
-
-	for (var i = 0; i < Iterations/10; ++i)
-	{
-		for (var j = 0; j < Iterations/10; ++j)
-		{
-			++ThroughputCount;
-			mosync.bridge.send({messageName: "DataThroughputMessage", data: LongMessage}, null);
-		}
-		mosync.bridge.sendAllMessages();
-	}
-	mosync.bridge.send({messageName: "DataThroughputEnd"}, null);
-}
-
-function DataThroughputEnd()
-{
-	// Compute performance.
-	var timeTaken = new Date().getTime() - ThroughputStartTime;
-	var messagesPerSecond = (ThroughputCount / timeTaken) * 1000;
-
-	// Display result.
-	messagesPerSecond = Math.round(messagesPerSecond*100)/100;
-	SetText(GetText()
-		+ "<p>Data throughput/second: "
-		+ messagesPerSecond
-		+ "</p>");
-
-	// Start next test.
-	RoundtripStart();
+	StringRoundtripStart();
 }
 
 /**
- * Test how many messages and JS callbacks can be
- * processed C++ per second.
+ * Test sending of string messages "roundtrip style".
  */
-function RoundtripStart()
+function StringRoundtripStart()
 {
 	RoundtripStartTime = new Date().getTime();
 	RoundtripCount = 0;
-	mosync.bridge.send({messageName: "RoundtripMessage"}, null);
+	mosync.bridge.send(["StringRoundtripMessage"]);
 }
 
 /**
  * Called from C++ on each throughput cycle.
  */
-function RoundtripCallback()
+function StringRoundtripCallback()
 {
 	++RoundtripCount;
 	if (RoundtripCount < Iterations)
 	{
 		// Do more roundtrips.
-		mosync.bridge.send({messageName: "RoundtripMessage"}, null);
+		mosync.bridge.send(["StringRoundtripMessage"]);
 	}
 	else
 	{
@@ -311,67 +215,57 @@ function RoundtripCallback()
 		// Display result.
 		messagesPerSecond = Math.round(messagesPerSecond*100)/100;
 		SetText(GetText()
-			+ "<p>Roundtrip messages/second: "
+			+ "<p>String roundtrips/s: "
 			+ messagesPerSecond
 			+ "</p>");
 
-		// Run next test.
-		//UrlEncodingTest();
+		// Next test.
+		JSONRoundtripStart();
 	}
 }
 
-function UrlEncodingTest()
+/**
+ * Test sending of JSON messages "roundtrip style".
+ */
+function JSONRoundtripStart()
 {
-	var iterations = Iterations * 10;
+	RoundtripStartTime = new Date().getTime();
+	RoundtripCount = 0;
+	mosync.bridge.sendJSON({messageName: "JSONRoundtripMessage"});
+}
 
-	var startTime = new Date().getTime();
-
-	for (var i = 0; i < iterations; ++i)
+/**
+ * Called from C++ on each throughput cycle.
+ */
+function JSONRoundtripCallback()
+{
+	++RoundtripCount;
+	if (RoundtripCount < Iterations)
 	{
-		var result = bridge.messagehandler.createMessageUrl(
-			{messageName: "ThroughputMessage", data: LongMessage});
-		if (result.charAt(0) != 'm')
-		{
-			console.log("@@@ result: " + result);
-			SetText("Data integrity check failed: " + result.charAt(0));
-			return;
-		}
+		// Do more roundtrips.
+		mosync.bridge.sendJSON({messageName: "JSONRoundtripMessage"});
 	}
+	else
+	{
+		// Report result.
+		var timeTaken = new Date().getTime() - RoundtripStartTime;
+		var messagesPerSecond = (RoundtripCount / timeTaken) * 1000;
 
-	// Report result.
-	var timeTaken = new Date().getTime() - startTime;
-	var encodingsPerSecond = (iterations / timeTaken) * 1000;
+		// Display result.
+		messagesPerSecond = Math.round(messagesPerSecond*100)/100;
+		SetText(GetText()
+			+ "<p>JSON roundtrips/s: "
+			+ messagesPerSecond
+			+ "</p>");
 
-	// Display result.
-	encodingsPerSecond = Math.round(encodingsPerSecond*100)/100;
-	SetText(GetText()
-		+ "<p>JS UrlEncodings/second: "
-		+ encodingsPerSecond
-		+ "</p>");
-
-	// Run next test.
-	UrlDecodingTest();
+		// This was the last test.
+	}
 }
-
-function UrlDecodingTest()
-{
-	mosync.bridge.send({messageName: "UrlDecodingTest", data: LongMessage}, null);
-}
-
-function UrlDecodingResult(decodingsPerSecond)
-{
-	// Display result.
-	decodingsPerSecond = Math.round(decodingsPerSecond*100)/100;
-	SetText(GetText()
-		+ "<p>C++ UrlDecodings/second: "
-		+ decodingsPerSecond
-		+ "</p>");
-}
-
 
 /**
  * This test is for Android only, and requires a change
- * in the runtime to be meaningful.
+ * in the runtime to be meaningful. Thsi code is just
+ * kept as a reference.
  */
 function TestPromptBare()
 {

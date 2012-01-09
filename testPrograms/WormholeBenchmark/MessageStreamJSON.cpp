@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2011 MoSync AB
+Copyright (C) 2012 MoSync AB
 
 This program is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License,
@@ -17,10 +17,10 @@ MA 02110-1301, USA.
 */
 
 /**
- * @file WebViewMessage.cpp
+ * @file MessageStreamJSON.cpp
  * @author Mikael Kindborg
  *
- * Class for parsing messages from a WebView.
+ * Class for parsing JSON messages from a WebView.
  */
 
 #include <ma.h>				// MoSync API
@@ -30,84 +30,16 @@ MA 02110-1301, USA.
 #include <mastdlib.h>		// C string conversion functions
 #include <conprint.h>
 
-#include "WebViewMessage.h"
+#include "MessageStreamJSON.h"
 
 using namespace MAUtil;
 
 namespace App
 {
 	/**
-	 * Take a string that is "percent encoded" and decode it.
-	 * @param str Encoded string.
-	 * @return The decoded string.
-	 */
-	String WebViewMessage::unescape(const String& str)
-	{
-		// The decoded string.
-		String result = "";
-
-		for (int i = 0; i < str.length(); ++i)
-		{
-			// If the current character is the '%' escape char...
-			if ('%' == (char) str[i])
-			{
-				// Get the char value of the two digit hex value.
-				String hex = str.substr(i + 1, 2);
-				long charValue = strtol(
-					hex.c_str(),
-					NULL,
-					16);
-				// Append to result.
-				result += (char) charValue;
-
-				// Skip over the hex chars.
-				i += 2;
-			}
-			else
-			{
-				// Not encoded, just copy the character.
-				result += str[i];
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * Take a string and "percent encode" it.
-	 * @param str String to be encoded.
-	 * @return The encoded string.
-	 */
-	String WebViewMessage::escape(const String& str)
-	{
-		// The encoded string.
-		String result = "";
-		char buf[8];
-
-		for (int i = 0; i < str.length(); ++i)
-		{
-			char c = str[i];
-			if ((48 <= c && c <= 57) ||  // 0-9
-				(65 <= c && c <= 90) ||  // a..z
-				(97 <= c && c <= 122))   // A..Z
-			{
-				result.append(&str[i], 1);
-			}
-			else
-			{
-				result += "%";
-				sprintf(buf, "%02X", str[i]);
-				result += buf;
-			}
-		}
-
-		return result;
-	}
-
-	/**
 	 * Constructor. Here we parse the message.
 	 */
-	WebViewMessage::WebViewMessage(
+	MessageStreamJSON::MessageStreamJSON(
 		NativeUI::WebView* webView,
 		MAHandle dataHandle)
 	{
@@ -119,7 +51,7 @@ namespace App
 	/**
 	 * Destructor. Here we delete the JSON tree.
 	 */
-	WebViewMessage::~WebViewMessage()
+	MessageStreamJSON::~MessageStreamJSON()
 	{
 		// The root must not be NULL or Value::NUL.
 		if (NULL != mJSONRoot && YAJLDom::Value::NUL != mJSONRoot->getType())
@@ -134,7 +66,7 @@ namespace App
 	 * Get the WebView widget associated with this message.
 	 * @return Pointer to WebView object.
 	 */
-	NativeUI::WebView* WebViewMessage::getWebView()
+	NativeUI::WebView* MessageStreamJSON::getWebView()
 	{
 		return mWebView;
 	}
@@ -147,7 +79,7 @@ namespace App
 	 * @return true if moved to next message, false
 	 * if there are no more messages.
 	 */
-	bool WebViewMessage::next()
+	bool MessageStreamJSON::next()
 	{
 		if (NULL != mJSONRoot && YAJLDom::Value::ARRAY == mJSONRoot->getType())
 		{
@@ -160,7 +92,7 @@ namespace App
 	/**
 	 * Checks if this message matches the given message name.
 	 */
-	bool WebViewMessage::is(const char* paramName)
+	bool MessageStreamJSON::is(const char* paramName)
 	{
 		YAJLDom::Value* value = getParamNode("messageName");
 		if (NULL != value && YAJLDom::Value::STRING == value->getType());
@@ -179,7 +111,7 @@ namespace App
 	 * Returns the string value of a message parameter.
 	 * @return The param value as a string.
 	 */
-	String WebViewMessage::getParam(const char* paramName)
+	String MessageStreamJSON::getParam(const char* paramName)
 	{
 		YAJLDom::Value* value = getParamNode(paramName);
 		if (NULL != value && YAJLDom::Value::STRING == value->getType());
@@ -193,7 +125,7 @@ namespace App
 	 * Returns the integer value of a message parameter.
 	 * @return The param value as an int.
 	 */
-	int WebViewMessage::getParamInt(const char* paramName)
+	int MessageStreamJSON::getParamInt(const char* paramName)
 	{
 		YAJLDom::Value* value = getParamNode(paramName);
 		if (NULL != value && YAJLDom::Value::NUMBER == value->getType());
@@ -206,7 +138,7 @@ namespace App
 	/**
 	 * Checks if the given parameter name is in the message.
 	 */
-	bool WebViewMessage::hasParam(const char* paramName)
+	bool MessageStreamJSON::hasParam(const char* paramName)
 	{
 		YAJLDom::Value* value = getParamNode(paramName);
 		return (NULL != value && YAJLDom::Value::NUL != value->getType());
@@ -215,7 +147,7 @@ namespace App
 	/**
 	 * Get the node of a parameter in the current message.
 	 */
-	YAJLDom::Value* WebViewMessage::getParamNode(const char* paramName)
+	YAJLDom::Value* MessageStreamJSON::getParamNode(const char* paramName)
 	{
 		if (NULL != mJSONRoot && YAJLDom::Value::ARRAY == mJSONRoot->getType())
 		{
@@ -232,12 +164,9 @@ namespace App
 	 * Parse the message. This finds the message name and
 	 * creates a dictionary with the message parameters.
 	 */
-	void WebViewMessage::parse(MAHandle dataHandle)
+	void MessageStreamJSON::parse(MAHandle dataHandle)
 	{
-		//lprintfln("@@@ WebViewMessage::parse %i", dataHandle);
-
-		// Set message name to empty string as default.
-		mMessageName = "";
+		//lprintfln("@@@ MessageStreamJSON::parse %i", dataHandle);
 
 		// We must have data.
 		if (NULL == dataHandle)
