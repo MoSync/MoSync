@@ -306,7 +306,7 @@ namespace Base {
 	}
 
 #ifdef SYMBIAN
-	int Syscall::resourcesCount = -1;
+	//int resourcesCount;
 #else
 	int resourcesCount = -1;
 	char* resourcesFilename;
@@ -915,7 +915,7 @@ namespace Base {
 	}
 
 #ifdef SYMBIAN
-	FileStream* Syscall::resource = NULL;
+	//FileStream* Syscall::resource = NULL;
 #else
 	FileStream* resource = NULL;
 #endif
