@@ -40,6 +40,11 @@ class PhoneGapMessage : public Wormhole::WebViewMessage
 {
 public:
 	/**
+	 * Make a JSON stringified string.
+	 */
+	static MAUtil::String JSONStringify(const MAUtil::String& str);
+
+	/**
 	 * Constructor.
 	 */
 	PhoneGapMessage(NativeUI::WebView* webView, MAHandle dataHandle);
@@ -59,13 +64,13 @@ public:
 	 * of the JSON tree. Return empty string if the field
 	 * does not exist.
 	 */
-	MAUtil::String getJSONField(const MAUtil::String& fieldName);
+	MAUtil::String getArgsField(const MAUtil::String& fieldName);
 
 	/**
 	 * @return The integer value of a field at the top-level
 	 * of the JSON tree. Return 0 if the field does not exist.
 	 */
-	int getJSONFieldInt(const MAUtil::String& fieldName);
+	int getArgsFieldInt(const MAUtil::String& fieldName);
 
 protected:
 	MAUtil::YAJLDom::Value* mJSONRoot;

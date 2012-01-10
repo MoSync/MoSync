@@ -10,7 +10,11 @@ work.instance_eval do
 	@SPECIFIC_CFLAGS = {
                 "selectPackager.cpp" => " -Wno-missing-noreturn",
 	}
-	@LOCAL_LIBS = ["filelist"]
+    if ( HOST == :darwin )
+        # Objective-C++ compiler
+        @EXTRA_CPPFLAGS = " -Wno-shadow -Wno-missing-prototypes"
+    end
+	@LOCAL_LIBS = ["filelist", "profiledb"]
 	if(HOST==:linux || HOST==:darwin)
 		@IGNORED_FILES = ["WinmobileInjector.cpp", "ErrorCheck.cpp", "IconFileLoader.cpp"]
 		@LIBRARIES = ["expat"]

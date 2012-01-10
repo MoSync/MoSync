@@ -73,7 +73,7 @@ MAAudioData maAudioDataCreateFromResource(const char* mime, MAHandle data, int o
     return [sAudioData count] - 1;
 }
 
-MAAudioData maAudioDataCreateFromFile(const char* mime, const char* path, int flags)
+MAAudioData maAudioDataCreateFromURL(const char* mime, const char* path, int flags)
 {
     NSString* mimeType = @"";
     if(mime != NULL)
@@ -106,18 +106,21 @@ MAAudioInstance maAudioInstanceCreate(MAAudioData audioData)
     if(!data)
         return MA_AUDIO_ERR_INVALID_DATA;
 
-    int error;
-    AudioInstance* audioInstance = [[AudioInstance alloc] initWithAudioData:data error:&error];
+    int error = MA_AUDIO_ERR_OK;
+
+	MAAudioInstance handle = [sAudioInstances count];
+
+    AudioInstance* audioInstance = [[AudioInstance alloc] initWithAudioData:data andHandle:handle error:&error];
 
     if(error != MA_AUDIO_ERR_OK)
         return error;
 
     if(audioInstance == nil)
-        return MA_AUDIO_ERR_INVALID_INSTANCE;
+        return MA_AUDIO_ERR_GENERIC;
 
     [sAudioInstances addObject:audioInstance];
 
-    return [sAudioInstances count] - 1;
+    return handle;
 }
 
 static AudioInstance* getAudioInstance(int audio)
@@ -166,9 +169,24 @@ int maAudioPlay(MAAudioInstance audio)
     if(!instance)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
-    [instance play];
+    if(![instance play])
+		return MA_AUDIO_ERR_GENERIC;
 
     return MA_AUDIO_ERR_OK;
+}
+
+int maAudioPrepare(MAAudioInstance audio, int async)
+{
+    AudioInstance* instance = getAudioInstance(audio);
+    if(!instance)
+        return MA_AUDIO_ERR_INVALID_INSTANCE;
+	if([instance isPreparing] || [instance isPrepared])
+		return MA_AUDIO_ERR_ALREADY_PREPARED;
+
+	if(![instance prepare:(async==1)])
+		return MA_AUDIO_ERR_PREPARE_FAILED;
+
+	return MA_AUDIO_ERR_OK;
 }
 
 int maAudioSetPosition(MAAudioInstance audio, int milliseconds)
@@ -209,6 +227,17 @@ int maAudioStop(MAAudioInstance audio)
         return MA_AUDIO_ERR_INVALID_INSTANCE;
 
     [instance stop];
+
+    return MA_AUDIO_ERR_OK;
+}
+
+int maAudioPause(MAAudioInstance audio)
+{
+    AudioInstance* instance = getAudioInstance(audio);
+    if(!instance)
+        return MA_AUDIO_ERR_INVALID_INSTANCE;
+
+    [instance pause];
 
     return MA_AUDIO_ERR_OK;
 }

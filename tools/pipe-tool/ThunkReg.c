@@ -22,7 +22,8 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 
 #include "compile.h"
 
-SYMBOL *ThunkTable[128];
+//SYMBOL *ThunkTable[128];
+SYMBOL *ThunkTable[65536];
 
 //***************************************
 //		  Initialize Thunk Table

@@ -50,7 +50,7 @@ PhoneGapSensors::~PhoneGapSensors()
  * Implementation of sensor API:s exposed to JavaScript.
  * @return true if message was handled, false if not.
  */
-bool PhoneGapSensors::handleMessage(Wormhole::WebViewMessage& message)
+void PhoneGapSensors::handleMessage(PhoneGapMessage& message)
 {
 	// Accelerometer request from PhoneGap
 	if ((message.getParam("service") == "Accelerometer"))
@@ -102,8 +102,6 @@ bool PhoneGapSensors::handleMessage(Wormhole::WebViewMessage& message)
 			message.getParam("PhoneGapCallBackId"),
 			false); //stop Sensor after the first run
 	}
-
-	return true;
 }
 
 /**
@@ -113,44 +111,44 @@ void PhoneGapSensors::sendLocationData(const MAEvent& event)
 {
 	MALocation& loc = *(MALocation*)event.data;
 	char result[1024];
-	char keepCallBack[128];
-	//This is used to prevent phonegap from deleting the callback after
-	//receiving the first result.
+	bool keepCallBack;
+	// This is used to prevent PhoneGap from deleting the callback after
+	// receiving the first result.
 	if (mLocationWatchStarted) {
-		sprintf(keepCallBack," , 'keepCallback': true");
+		keepCallBack = true;
 	}
 	else
 	{
-		sprintf(keepCallBack,"");
-		// stop it after first data since we are not in watched mode
+		keepCallBack = false;
+		// Stop it after first data since we are not in watched mode.
 		maLocationStop();
 	}
 
-	//Call the Phonegap function, Can call the commandResult function too
+	// Call the PhoneGap function, can call the commandResult function too.
 	sprintf(result,
-		"'%s', \"{ 'status' : 1,"
-		"'message': { 'coords':{"
-			"'latitude': %f,"
-			"'longitude': %f,"
-			"'altitude': %f,"
-			"'accuracy': %f,"
-			"'altitudeAccuracy': %f,"
-			"'heading': %f,"
-			"'speed': %f"
-			"}}"
-		"%s}\"",
-		mLocationWatchCallBack.c_str(),
+		"{coords:{"
+			"latitude:%f,"
+			"longitude:%f,"
+			"altitude:%f,"
+			"accuracy:%f,"
+			"altitudeAccuracy:%f,"
+			"heading:%f,"
+			"speed:%f"
+			"}}",
 		loc.lat,
 		loc.lon,
 		loc.alt,
 		loc.horzAcc,
 		loc.vertAcc,
-		0, //MoSync Location API does not support heading
-		0, //MoSync Location API does not support speed
-		keepCallBack
+		0, // MoSync Location API does not support heading
+		0 // MoSync Location API does not support speed
 		);
-	lprintfln(result);
-	mMessageHandler->sendPhoneGapSuccess(result);
+
+	mMessageHandler->callSuccess(
+		mLocationWatchCallBack,
+		PHONEGAP_CALLBACK_STATUS_OK,
+		result,
+		keepCallBack);
 }
 
 void PhoneGapSensors::sendAccelerometerData(MASensor sensorData)
@@ -187,32 +185,35 @@ void PhoneGapSensors::sendAccelerometerData(
 		MASensor sensorData)
 {
 	char result[1024];
-	char keepCallBack[128];
-	//This is used to prevent phonegap from deleting the callback after
-	//receiving the first result.
-	if (mAccelerometerWatchStarted) {
-		sprintf(keepCallBack," , 'keepCallback': true");
+	bool keepCallBack;
+
+	// This is used to prevent PhoneGap from deleting the callback after
+	// receiving the first result.
+	if (mAccelerometerWatchStarted)
+	{
+		keepCallBack = true;
 	}
 	else
 	{
-		sprintf(keepCallBack,"");
+		keepCallBack = false;
 	}
 
-	//Call the Phonegap function, Can call the commandResult function too
+	// Call the PhoneGap function, can call the commandResult function too.
 	sprintf(result,
-		"'%s', \"{ 'status' : 1,"
-		"'message': \\\"{"
-			"'x': %f,"
-			"'y': %f,"
-			"'z': %f}\\\""
-		"%s}\"",
-		callbackID.c_str(),
+		"\\'{"
+			"\"x\": %f,"
+			"\"y\": %f,"
+			"\"z\": %f"
+		"}\\'",
 		sensorData.values[0],
 		sensorData.values[1],
-		sensorData.values[2],
-		keepCallBack
+		sensorData.values[2]
 		);
-	mMessageHandler->sendPhoneGapSuccess(result);
+	mMessageHandler->callSuccess(
+		callbackID,
+		PHONEGAP_CALLBACK_STATUS_OK,
+		result,
+		keepCallBack);
 }
 
 /**
@@ -230,13 +231,13 @@ void PhoneGapSensors::sendCompassData(
 	//Call the Phonegap function, Can call the commandResult function too
 	sprintf(
 			result,
-			"'%s', \"{ 'status' : 1,"
-			"'message': \\\"{ 'magneticHeading': %f }\\\""
-			"}\"",
-			callbackID.c_str(),
-			sensorData.values[1] //only x is considered as compass heading in PhoneGap
+			"{\"magneticHeading\":%f }",
+			sensorData.values[1] // only x is considered as compass heading in PhoneGap
 			);
-	mMessageHandler->sendPhoneGapSuccess(result);
+	mMessageHandler->callSuccess(
+		callbackID,
+		PHONEGAP_CALLBACK_STATUS_OK,
+		result);
 }
 
 /**
@@ -250,9 +251,10 @@ void PhoneGapSensors::processAcelerometerRequest(
 	int res = maSensorStart(SENSOR_TYPE_ACCELEROMETER, SENSOR_RATE_NORMAL);
 	if(res < 0)
 	{
-		mMessageHandler->sendPhoneGapError(
-			"MoSync: Failed to Start Accelerometer",
-			callbackID);
+		mMessageHandler->callError(
+			callbackID,
+			PHONEGAP_CALLBACK_STATUS_ERROR,
+			"MoSync: Failed to Start Accelerometer");
 		return;
 	}
 	mAccelerometerWatchCallBack = callbackID;
@@ -268,12 +270,12 @@ void PhoneGapSensors::processLocationRequest(
 {
 	//Enable accelerometer which is supported in PhoneGap
 	int res = maLocationStart();
-	lprintfln("Started the Location Service with : %d +++", res);
 	if (res < 0)
 	{
-		mMessageHandler->sendPhoneGapError(
-			"MoSync: Failed to Start LocationService",
-			callbackID);
+		mMessageHandler->callError(
+			callbackID,
+			PHONEGAP_CALLBACK_STATUS_ERROR,
+			"MoSync: Failed to Start LocationService");
 		return;
 	}
 	mLocationWatchCallBack = callbackID;
@@ -291,9 +293,10 @@ void PhoneGapSensors::processCompassRequest(
 	int res = maSensorStart(SENSOR_TYPE_ORIENTATION, SENSOR_RATE_NORMAL);
 	if (res < 0)
 	{
-		mMessageHandler->sendPhoneGapError(
-			"MoSync: Failed to Start Compass",
-			callbackID);
+		mMessageHandler->callError(
+			callbackID,
+			PHONEGAP_CALLBACK_STATUS_ERROR,
+			"MoSync: Failed to Start Compass");
 		return;
 	}
 

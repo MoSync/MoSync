@@ -28,6 +28,8 @@ MA 02110-1301, USA.
 
 #include <Wormhole/WebViewMessage.h>
 #include <NativeUI/WebView.h>
+#include <MAUtil/String.h>
+#include "PhoneGapMessage.h"
 
 class PhoneGapMessageHandler;
 
@@ -47,11 +49,59 @@ public:
 	 */
 	virtual ~PhoneGapFile();
 
+	MAUtil::String emitFileSystemInfo(
+		const MAUtil::String& name,
+		const MAUtil::String& rootEntry);
+
+	MAUtil::String emitDirectoryEntry(
+		const MAUtil::String& name,
+		const MAUtil::String& fullPath);
+
+	MAUtil::String emitFileEntry(
+		const MAUtil::String& name,
+		const MAUtil::String& fullPath);
+
+	MAUtil::String emitFile(
+		const MAUtil::String& name,
+		const MAUtil::String& fullPath,
+		const MAUtil::String& type,
+		const MAUtil::String& lastModifiedDate,
+		const MAUtil::String& size);
+
+	void callSuccess(
+		const MAUtil::String& callbackID,
+		const MAUtil::String& args,
+		const MAUtil::String& castFunction = ""
+		);
+
+	void callFileError(
+		const MAUtil::String& callbackID,
+		const MAUtil::String& errorCode
+		);
+
 	/**
 	 * Implementation of File API exposed to JavaScript.
-	 * @return true if message was handled, false if not.
 	 */
-	bool handleMessage(Wormhole::WebViewMessage& message);
+	void handleMessage(PhoneGapMessage& message);
+
+	/**
+	 * Return a FileSystem object.
+	 */
+	void actionRequestFileSystem(PhoneGapMessage& message);
+
+	/**
+	 * Return a FileEntry object.
+	 */
+	void actionGetFile(PhoneGapMessage& message);
+
+	/**
+	 * Return a File object.
+	 */
+	void actionGetFileMetadata(PhoneGapMessage& message);
+
+	void actionWrite(PhoneGapMessage& message);
+
+	void actionReadAsText(PhoneGapMessage& message);
 
 private:
 	PhoneGapMessageHandler* mMessageHandler;

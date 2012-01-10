@@ -88,6 +88,51 @@ private:
 	 */
 	void createMainLayout();
 
+	/**
+	 * Function for testing the "text" property
+	 * Sets the text displayed on the item
+	 */
+	void setItemText(ListViewItem *item, const MAUtil::String &text);
+
+	/**
+	 * Function for testing the "background" property
+	 */
+	void setItemBackground(ListViewItem *item, int color);
+
+	/**
+	 * Function for testing the "Icon" property
+	 * Sets an icon of the list view item that is placed to the left of the text
+	 */
+	void setItemIcon(ListViewItem *item, MAHandle image);
+
+	/**
+	 * Function for testing the "accessoryType" property.
+	 * Sets the type of list item displayed.
+	 * Provides the corresponding icon in the right side of the list view.
+	 * This is not available for Windows Phone. The "accessoryType" should
+	 * have no effect.
+	 */
+	void setItemAccessoryType(ListViewItem *item, NativeUI::ListViewItemAccessory accessory);
+
+	/**
+	 * Function for testing the "fontSize" property
+	 * Sets the font size of the text part
+	 */
+	void setItemFontSize(ListViewItem *item, int size);
+
+	/**
+	 * Function for testing the "fontColor" property
+	 * Sets the font color of the text
+	 */
+	void setItemFontColor(ListViewItem *item, int color);
+
+	/**
+	 * Function for testing the "fontHandle" property.
+	 * The "font" property sets the typeface and style in which the text
+	 * should be displayed
+	 */
+	void setItemFont(ListViewItem *item);
+
 private:
 	/**
 	 * Main layout.

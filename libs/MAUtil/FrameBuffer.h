@@ -18,7 +18,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 /** 
  * \file FrameBuffer.h
  * \brief Pixel format conversion, scaling, orientation change for palletized surfaces
- * \author Fredrik Eldh
+ * \author Niklas Nummelin
  */
 
 #ifndef _FRAMEBUFFER_H_
@@ -32,7 +32,7 @@ extern "C" {
 
 /*
 	FrameBuffer API for use with palletized surfaces. Common usage area: porting legacy games that used 4/8-bit palletized surfaces.
-	Handles pixel format convertion (from 4/8 bpp to native), scaling (half/direct/double) and orientation change (90-degrees).
+	Handles pixel format conversion (from 4/8 bpp to native), scaling (half/direct/double) and orientation change (90-degrees).
  */
 
 #define FLAG_4BPP 1
