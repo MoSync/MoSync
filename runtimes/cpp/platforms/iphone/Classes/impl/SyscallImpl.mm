@@ -2124,6 +2124,7 @@ return 0; \
 		maIOCtl_case(maAudioGetPosition);
 		maIOCtl_case(maAudioSetVolume);
 		maIOCtl_case(maAudioStop);
+		maIOCtl_case(maAudioPause);
 		maIOCtl_case(maExtensionModuleLoad);
         maIOCtl_case(maExtensionFunctionLoad);
 		}

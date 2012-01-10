@@ -8588,7 +8588,9 @@ group NFCAPI "NFC API" {
 				INVALID_SOUND_FORMAT = -9;
 				OUT_OF_MEMORY = -10;
 				ALREADY_PREPARED = -11;
-				IS_PLAYING = -12;
+				PREPARE_FAILED = -12;
+				IS_PLAYING = -13;
+				GENERIC = -14;
 			}
 		} // end of Audio API constants
 
@@ -8687,7 +8689,15 @@ group NFCAPI "NFC API" {
 			int maAudioSetVolume(in MAAudioInstance audio, in float volume);
 
 			/**
-			*
+			* \brief Pauses the the audio instance.
+			* It will stay prepared, so the sound can be resumed at any time using maAudioPlay.
+			*/
+			int maAudioPause(in MAAudioInstance audio);
+
+			/**
+			* \brief Stops the the audio instance and sets the position to the beginning.
+			* The audio instance will be unprepared, meaning all it's prepared buffers will
+			* be unloaded. In order to play the sound again the instance has to be prepared.
 			*/
 			int maAudioStop(in MAAudioInstance audio);
 		}// End of Audio API Functions
