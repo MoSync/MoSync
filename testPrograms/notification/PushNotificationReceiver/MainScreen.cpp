@@ -29,8 +29,8 @@ MA 02110-1301, USA.
 #include "TCPConnection.h"
 #include "Util.h"
 
-//#define C2DM_USER_ACCOUNT "emmaTestMosync@gmail.com"
-#define C2DM_USER_ACCOUNT "emma.tresanszki@mobilesorcery.com"
+#define C2DM_USER_ACCOUNT "emmaTestMosync@gmail.com"
+//#define C2DM_USER_ACCOUNT "emma.tresanszki@mobilesorcery.com"
 /**
  * Constructor.
  */
