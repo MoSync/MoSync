@@ -9840,6 +9840,24 @@ group CaptureAPI "Capture API" {
 			CAMERA_ROLL = "cameraRoll";
 
 			/**
+			* @brief Store the recorded movie/taken photo to the user’s Gallery album.
+			* Platform: Android.
+			*
+			* @validvalue "false" or "true".
+			* Default value: "true".
+			*
+			* @getandset
+			*
+			* @par Example
+			* \code
+			*   char buf[256];
+			*   sprintf(buf, "%s", "true");
+			*	maCaptureSetProperty(MA_CAPTURE_GALLERY, buf);
+			* \endcode
+			*/
+			GALLERY = "gallery";
+
+			/**
 			* @brief Set the flash mode used by the active camera.
 			* Platform: iOS.
 			*
@@ -9897,7 +9915,7 @@ group CaptureAPI "Capture API" {
 			/// Platform: Android and iOS.
 			RECORD_VIDEO = 0;
 			/// Stops the recording.
-			/// Platform: Android and iOS.
+			/// Platform: iOS only.
 			STOP_RECORDING = 1;
 			/// Starts the picker with picture mode and  stores the picture in a data object.
 			/// Platform: Android and iOS.
@@ -9914,7 +9932,7 @@ group CaptureAPI "Capture API" {
 			/// Platform: Android and iOS.
 			VIDEO = 1;
 			/// Send if the user cancels taking image/video.
-			/// Platform: Android and iOS.
+			/// Platform: iOS only.
 			CANCEL = 2;
 		}
 	} // end of Capture Event type

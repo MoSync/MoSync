@@ -309,24 +309,26 @@ public class MoSync extends Activity
 		Intent data)
 	{
 		// Check that this is the result of the Bluetooth enable activity.
-		if (Mediator.REQUEST_ENABLE_BLUETOOTH == requestCode) // && resultCode == RESULT_OK
+		if (Mediator.REQUEST_ENABLE_BLUETOOTH == requestCode)
 		{
 			Mediator.getInstance().postBluetoothDialogClosedMessage();
 		}
-		else if ( requestCode == MoSyncCapture.CAPTURE_MODE_RECORD_VIDEO_REQUEST )
+		else if ( resultCode == RESULT_OK &&
+				requestCode == MoSyncCapture.CAPTURE_MODE_RECORD_VIDEO_REQUEST )
 		{
 			MoSyncCapture.handleVideo(data);
 		}
-		else if ( requestCode == MoSyncCapture.CAPTURE_MODE_STOP_RECORDING_REQUEST )
-		{
-			MoSyncCapture.handleStopRecording(data);
-		}
-		else if ( requestCode == MoSyncCapture.CAPTURE_MODE_TAKE_PICTURE_REQUEST )
+//		else if ( requestCode == MoSyncCapture.CAPTURE_MODE_STOP_RECORDING_REQUEST )
+//		{
+//			MoSyncCapture.handleStopRecording(data);
+//		}
+		else if ( resultCode == RESULT_OK &&
+				requestCode == MoSyncCapture.CAPTURE_MODE_TAKE_PICTURE_REQUEST )
 		{
 			// A picture was taken.
 			MoSyncCapture.handlePicture(data);
 		}
-		else if ( resultCode == RESULT_CANCELED ) //RESULT_OK
+		else if ( resultCode == RESULT_CANCELED )
 		{
 			// Send MoSync event: the capture was canceled by the user.
 			MoSyncCapture.handleCaptureCanceled();
