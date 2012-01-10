@@ -60,6 +60,11 @@ int main(int argc,char *argv[]) {
 	}
 
 	char* platform = argv[arg];
+	int platformLen = strlen(platform);
+	// Must be lower case!
+	for (int i = 0; i < platformLen; i++) {
+		platform[i] = tolower(platform[i]);
+	}
 	char* outputDir = argv[arg + 1];
 	string lstFile = string(outputDir) + "/~tmpres.lst";
 
