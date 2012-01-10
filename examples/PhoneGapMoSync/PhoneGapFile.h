@@ -103,6 +103,10 @@ public:
 
 	void actionReadAsText(PhoneGapMessage& message);
 
+	void actionReadAsDataURL(PhoneGapMessage& message);
+
+	void actionTruncate(PhoneGapMessage& message);
+
 private:
 	PhoneGapMessageHandler* mMessageHandler;
 };

@@ -134,7 +134,7 @@ static String FileGetMimeType(const String& filePath)
 	for (int i = 0; i < size; ++i)
 	{
 		char* ext2 = MimeTypeDictionary[i][0];
-		lprintfln("@@@@@ FileGetMimeType size: %i ext: %s ext2: %s", size, ext, ext2);
+		//lprintfln("@@@@@ FileGetMimeType size: %i ext: %s ext2: %s", size, ext, ext2);
 		if (0 == stricmp(ext, ext2))
 		{
 			return MimeTypeDictionary[i][1];
@@ -270,6 +270,54 @@ static bool FileCreate(const String& path)
 	return 0 == result;
 }
 
+
+/**
+ * Truncate a file.
+ * @return New file length on success, <0 on error.
+ */
+static int FileTruncate(const String& path, int size)
+{
+	MAHandle file = maFileOpen(path.c_str(), MA_ACCESS_READ_WRITE);
+	if (file < 0)
+	{
+		return -1;
+	}
+
+	int exists = maFileExists(file);
+	if (1 != exists)
+	{
+		// Error.
+		maFileClose(file);
+		return -1;
+	}
+
+	int fileSize = maFileSize(file);
+	if (fileSize < 0)
+	{
+		// Error.
+		maFileClose(file);
+		return -1;
+	}
+
+	if (fileSize < size)
+	{
+		// No need to truncate, return current file size.
+		maFileClose(file);
+		return fileSize;
+	}
+
+	int result = maFileTruncate(file, size);
+	maFileClose(file);
+	if (0 == result)
+	{
+		// Success, return truncated size.
+		return size;
+	}
+
+	// Error.
+	return -1;
+}
+
 /**
  * Create path recursively if parts of the path
  * do not exist.
@@ -304,6 +352,17 @@ static int FileWrite(const String& path, const String& data, int position)
 
 	// TODO: Now we assume file must exist. Is that ok?
 	//int exists = maFileExists(file);
+
+	// TODO: Should we check that position is within file size?
+	// int size = maFileSize(file);
+
+	// If we start writing from the beginning of the file, we truncate
+	// the file. Not clear what the specification says about this.
+	// TODO: Check how this should work! It makes no sense to truncate here.
+//	if (position == 0)
+//	{
+//		maFileTruncate(file, 0);
+//	}
 
 	int result = maFileSeek(file, position, MA_SEEK_SET);
 
@@ -472,6 +531,14 @@ void PhoneGapFile::handleMessage(PhoneGapMessage& message)
 	else if (message.getParam("action") == "readAsText")
 	{
 		actionReadAsText(message);
+	}
+	else if (message.getParam("action") == "readAsDataURL")
+	{
+		actionReadAsDataURL(message);
+	}
+	else if (message.getParam("action") == "truncate")
+	{
+		actionTruncate(message);
 	}
 }
 
@@ -647,8 +714,10 @@ void PhoneGapFile::actionReadAsText(PhoneGapMessage& message)
 	String callbackID = message.getParam("PhoneGapCallBackId");
 
 	String fullPath = message.getArgsField("fileName");
-	String encoding = message.getArgsField("encoding");
-	// TODO: Encoding param is not used.
+
+	// TODO: Encoding param is not used. This is the requested
+	// encoding of the data send back to PhoneGap.
+	//String encoding = message.getArgsField("encoding");
 
 	String content;
 	int result = FileRead(fullPath, content);
@@ -661,5 +730,54 @@ void PhoneGapFile::actionReadAsText(PhoneGapMessage& message)
 	// Send back the file content.
 	callSuccess(
 		callbackID,
-		PhoneGapMessage::JSONStringify(content));
+		PhoneGapMessage::JSONStringify(content.c_str()));
+}
+
+void PhoneGapFile::actionReadAsDataURL(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionReadAsDataURL\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String fullPath = message.getArgsField("fileName");
+
+	String content;
+	int result = FileRead(fullPath, content);
+	if (result < 0)
+	{
+		callFileError(callbackID, FILEERROR_NO_MODIFICATION_ALLOWED_ERR);
+		return;
+	}
+
+	String base64URL = "\"data:";
+	base64URL += FileGetMimeType(fullPath);
+	base64URL += ";base64,";
+	base64URL += PhoneGapMessage::base64Encode(content.c_str());
+	base64URL += "\"";
+
+	// Send back the file content.
+	callSuccess(callbackID, base64URL);
+}
+
+void PhoneGapFile::actionTruncate(PhoneGapMessage& message)
+{
+	lprintfln("@@@ actionTruncate\n");
+
+	String callbackID = message.getParam("PhoneGapCallBackId");
+
+	String fullPath = message.getArgsField("fileName");
+
+	int size = message.getArgsFieldInt("size");
+
+	int result = FileTruncate(fullPath, size);
+	if (result < 0)
+	{
+		callFileError(callbackID, FILEERROR_NOT_FOUND_ERR);
+		return;
+	}
+
+	// Send back the result, the new length of the file.
+	char lengthBuf[32];
+	sprintf(lengthBuf, "%d", result);
+	callSuccess(callbackID, lengthBuf);
 }
