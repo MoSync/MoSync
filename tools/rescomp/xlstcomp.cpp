@@ -265,6 +265,10 @@ static void xlstStart(void *data, const char *tagName, const char **attributes) 
 			if (state->currentId.length() == 0) {
 				error(state, "No id attribute in resource tag " + string(tagName) + " (or a parent resource tag)");
 			}
+			string errorMsg = directive->validate();
+			if (!errorMsg.empty()) {
+				error(state, errorMsg);
+			}
 			VariantCondition* cond = state->conditionStack.empty() ? NULL : &(state->conditionStack.top());
 			bool shouldAdd = !cond || cond->isApplicable();
 			if (shouldAdd && state->resourceSet->addDirective(directive, cond)) {
@@ -294,7 +298,6 @@ static void xlstCDATA(void *data, const char *content, int length) {
 	ParserState* state = (ParserState*) data;
 	ResourceDirective* directive = state->currentDirective;
 	if (directive) {
-		printf("%s", directive->getId().c_str());
 		directive->initDirectiveFromCData(content, length);
 	}
 }
@@ -374,7 +377,7 @@ const char* getDefaultVariantAttr(const char* resourceType) {
 	return NULL;
 }
 
-bool doesMatch(const char* attr, const char* variantAttr) {
+bool equalsIgnoreCase(const char* attr, const char* variantAttr) {
 	int varlen = strlen(variantAttr);
 	int attrlen = strlen(attr);
 	if (varlen == attrlen) {
@@ -389,9 +392,9 @@ bool doesMatch(const char* attr, const char* variantAttr) {
 }
 
 const char* getStandardVariantAttr(const char* variantAttr) {
-	if (doesMatch(ATTR_PLATFORM, variantAttr)) return ATTR_PLATFORM;
-	if (doesMatch(ATTR_LOCALE, variantAttr)) return ATTR_LOCALE;
-	if (doesMatch(ATTR_SCREENSIZE, variantAttr)) return ATTR_SCREENSIZE;
+	if (equalsIgnoreCase(ATTR_PLATFORM, variantAttr)) return ATTR_PLATFORM;
+	if (equalsIgnoreCase(ATTR_LOCALE, variantAttr)) return ATTR_LOCALE;
+	if (equalsIgnoreCase(ATTR_SCREENSIZE, variantAttr)) return ATTR_SCREENSIZE;
 	return NULL;
 }
 
@@ -508,6 +511,10 @@ void VariantResourceSet::scanForResources(string directoryToScan,
 					directive->setFile(file.getAbsolutePath());
 					directive->setResource(filename);
 					directive->setLoadType(loadType);
+					string errorMsg = directive->validate();
+					if (!errorMsg.empty()) {
+						error(NULL, errorMsg);
+					}
 					bool shouldAdd = condition.isApplicable();
 					if (shouldAdd && addDirective(directive, &condition)) {
 						assignPriority(directive, &condition, priority);
@@ -770,10 +777,10 @@ void VariantCondition::initFrom(VariantCondition& prototype) {
 }
 
 bool VariantCondition::setCondition(string condition, string value) {
-	if (doesMatch(ATTR_PLATFORM, condition.c_str())) {
+	if (equalsIgnoreCase(ATTR_PLATFORM, condition.c_str())) {
 		// Special case!
 		string newValue = string(value);
-		for (int i = 0; i < newValue.length(); i++) {
+		for (size_t i = 0; i < newValue.length(); i++) {
 			newValue[i] = tolower(value.at(i));
 		}
 		value = newValue;
