@@ -995,6 +995,24 @@ interface MAAPI {
 	*/
 	int maLoadResources(in MAHandle data);
 
+	constset int MA_RESOURCE_ {
+		OPEN = 0x1;
+		CLOSE = 0x2;
+	}
+	/**
+	* Loads a specific resource in the given placeholder.
+	* \param handle The handle of the resource that needs to be loaded
+	* \param placeholder The placeholder where to load the resource from handle.
+	* \param flag One of the MA_RESOURCE_OPEN, MA_RESOURCE_CLOSE,
+	* MA_RESOURCE_OPEN|MA_RESOURCE_CLOSE to control the resource binary.
+	*/
+	int maLoadResource(in MAHandle handle, in MAHandle placeholder, in int flag);
+
+	/*
+	* Returns the number of available resources.
+	*/
+	int maCountResources();
+
 	/**
 	* Loads a new program from the a data object, closes the running program, and starts the new one.
 	* The format of the data object is a MoSync program file concatenated with a resource file.
