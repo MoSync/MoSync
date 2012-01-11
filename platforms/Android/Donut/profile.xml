@@ -1,0 +1,3 @@
+<platform family="Android" variant="Donut" runtime="android_4/1" inherit="Android/Cupcake">
+  <capability name="BlueTooth" state="REQUIRES_PERMISSION"/>
+</platform>
