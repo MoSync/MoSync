@@ -167,6 +167,11 @@ public class MoSyncThread extends Thread
 	MoSyncNotifications mMoSyncNotifications;
 	MoSyncDB mMoSyncDB;
 
+	/**
+	 * Synchronization monitor for postEvent
+	 */
+	private final Object mPostEventMonitor = new Object();
+
 	static final String PROGRAM_FILE = "program.mp3";
 	static final String RESOURCE_FILE = "resources.mp3";
 
@@ -264,7 +269,7 @@ public class MoSyncThread extends Thread
 
 	int mTextConsoleHeight;
 
-	private boolean mIsSleeping;
+	private volatile boolean mIsSleeping;
 
 	/**
 	 * Ascent of text in the default console font.
@@ -758,7 +763,6 @@ public class MoSyncThread extends Thread
 			// TODO: Check return value for error.
 			dataHandle = nativeCreatePlaceholder();
 		}
-
 		// Allocate data. This calls maCreateData and will create a
 		// new data object.
 		int result = nativeCreateBinaryResource(dataHandle, data.length);
@@ -914,14 +918,17 @@ public class MoSyncThread extends Thread
 	/**
 	 * Post a event to the MoSync event queue.
 	 */
-	public synchronized void postEvent(int[] event)
+	public void postEvent(int[] event)
 	{
-		// Add event to queue.
-		nativePostEvent(event);
-
-		// Wake up thread if sleeping.
-		if(mIsSleeping)
-			interrupt();
+		synchronized(mPostEventMonitor) {
+			// Add event to queue.
+			nativePostEvent(event);
+			// Wake up thread if sleeping.
+			if(mIsSleeping)
+			{
+				interrupt();
+			}
+		}
 	}
 
 	/**
