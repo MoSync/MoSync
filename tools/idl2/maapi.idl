@@ -5146,14 +5146,14 @@ group WidgetAPI "Widget API" {
 		 *
 		 * @par Example
 		 * \code
-		 *  maWidgetSetProperty(applicationBarHandle, MAW_APPLICATION_BAR_VISIBILITY, 'true');
+		 *  maWidgetSetProperty(applicationBarHandle, MAW_APPLICATION_BAR_IS_VISIBILE, 'true');
 		 * \endcode
 		 *
 		 * @par Example
 		 * \code
 		 * int result = maWidgetGetProperty(
 		 *	  applicationBarHandle,
-		 *    MAW_APPLICATION_BAR_VISIBLE,
+		 *    MAW_APPLICATION_BAR_IS_VISIBLE,
 		 *	  textBuffer,
 		 *	  BUFFER_SIZE);
 		 * if (rezult > 0)
@@ -5162,7 +5162,7 @@ group WidgetAPI "Widget API" {
 		 * }
 		 * \endcode
 		 */
-		VISIBLE = "visible";
+		IS_VISIBLE = "isVisible";
 	}
 	}
 
@@ -5198,13 +5198,13 @@ group WidgetAPI "Widget API" {
 		/**
 		* @brief Sets or gets the currently shown screen to the screen with the given index.
 		*
-		* @validvalue MoSync handle to an uncompressed image resource. The size of the image should be small enough to be used as an application bar button icon
+		* @validvalue the relative path of the icon; the icons must be placed in the folder Resources/ApplicationBarIcons. The size of the image should be small enough to be used as an application bar button icon
 		*
 		* @setonly
 		*
 		* @par Example set
 		* \code
-		*	maWidgetSetProperty(applicationBarButton, MAW_APPLICATION_BAR_BUTTON_ICON, toString(RES_ICON));
+		*	maWidgetSetProperty(applicationBarButton, MAW_APPLICATION_BAR_BUTTON_ICON, "ApplicationBarIcon1.png");
 		* \endcode
 		*/
 		ICON = "icon";

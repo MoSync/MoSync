@@ -48,9 +48,7 @@ namespace MoSync
                 mView = mPage;
 
                 ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar = new Microsoft.Phone.Shell.ApplicationBar();
-                ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar.IsVisible = false;
-
-
+                ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar.IsVisible = true;
                 /**
                  * This will add a BackKeyPress event handler to the Application.Current.RootVisual, this is application wide
                  */
@@ -110,7 +108,11 @@ namespace MoSync
 
                 if (child is ApplicationBar)
                 {
-                    AddApplicationBar(child);
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        //((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar = (child as ApplicationBar).GetApplicationBar();
+                        mPage.ApplicationBar = (child as ApplicationBar).GetApplicationBar();
+                    });
                 }
                 else
                 {
@@ -180,18 +182,6 @@ namespace MoSync
                 set
                 {
                     mPage.Title = value;
-                }
-            }
-
-            public void AddApplicationBar(IWidget applicationBar)
-            {
-                if (applicationBar is ApplicationBar)
-                {
-                    MoSync.Util.RunActionOnMainThreadSync(() =>
-                    {
-                        ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar = (applicationBar as ApplicationBar).GetApplicationBar();
-                        ((Application.Current.RootVisual as PhoneApplicationFrame).Content as PhoneApplicationPage).ApplicationBar.IsVisible = mApplicationBar.IsVisible;
-                    });
                 }
             }
         }

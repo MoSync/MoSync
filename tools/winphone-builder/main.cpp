@@ -19,6 +19,7 @@ Software Foundation, 59 Temple Place - Suite 330, Boston, MA
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <windows.h>
 #include <string>
 #include <vector>
 #include "helpers/attribute.h"
@@ -101,6 +102,15 @@ struct LibraryReference
 	std::string value;
 };
 
+struct ApplicationBarIconReference
+{
+	ApplicationBarIconReference(const std::string _path) :
+		iconPath(_path)
+	{}
+
+	std::string iconPath;
+};
+
 int main(int argc, char **argv) {
 
 	string inputFile = "";
@@ -108,6 +118,7 @@ int main(int argc, char **argv) {
 	string outputFile = "";
 
 	std::vector<LibraryReference> libraryReferences;
+	std::vector<ApplicationBarIconReference> applicationBarIconReferences;
 
 	bool extensionDevMode = false;
 	string releaseInterpretedConfig = " '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ";
@@ -244,6 +255,79 @@ int main(int argc, char **argv) {
 		refAttrNode.set_value(libraryReferences[i].name.c_str());
 		pugi::xml_node hintPath = refNode.append_child("HintPath").append_child(pugi::node_pcdata);
 		hintPath.set_value(libraryReferences[i].value.c_str());
+	}
+
+	//add the application bar icons
+	std::string dirPath;
+
+	if("" != outputFile)
+	{
+		int position = outputFile.find("Output");
+		if(-1 != position)
+		{
+			dirPath = outputFile.substr(0, position);
+		}
+		else
+		{
+			position = outputFile.find("FinalOutput");
+			if(-1 != position)
+			{
+				dirPath = outputFile.substr(0, position);
+			}
+		}
+
+		dirPath.append("Resources\\ApplicationBarIcons\\*.*");
+	}
+
+	printf("%s\n", dirPath.c_str());
+
+	//create directory
+	int position = outputFile.find("project");
+	std::string outputDirPath;
+	std::string command;
+	command.append("mkdir \"");
+
+	outputDirPath.append(outputFile.substr(0, position));
+	command.append(outputFile.substr(0, position));
+
+	outputDirPath.append("project\\ApplicationBarIcons\"");
+	command.append("project\\ApplicationBarIcons\"");
+
+	system(command.c_str());
+
+	WIN32_FIND_DATA data;
+
+	HANDLE fileHandle = FindFirstFile(dirPath.c_str(), &data);
+
+	if(fileHandle != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			if( !(data.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) )
+			{
+				applicationBarIconReferences.push_back( ApplicationBarIconReference( data.cFileName ) );
+				std::string copyCmd;
+				copyCmd.append("cp ");
+				copyCmd.append(dirPath.substr(0, strlen(dirPath.c_str()) - 3));
+				copyCmd.append(data.cFileName);
+				copyCmd.append(" \"");
+				copyCmd.append(outputDirPath);
+				system(copyCmd.c_str());
+			}
+		}while( FindNextFile(fileHandle, &data) != 0);
+	}
+
+	pugi::xml_node mosyncApplicationBarIcons = project.append_child("ItemGroup");
+	while(applicationBarIconReferences.empty() == false)
+	{
+		pugi::xml_node contentChild = mosyncApplicationBarIcons.append_child("Content");
+		std::string nodeValue;
+		nodeValue.append("ApplicationBarIcons\\");
+		nodeValue.append(applicationBarIconReferences.back().iconPath);
+		contentChild.append_attribute("Include").set_value(nodeValue.c_str());
+		contentChild.append_child("CopyToOutputDirectory").append_child(pugi::node_pcdata).set_value("PreserveNewest");
+
+		applicationBarIconReferences.pop_back();
 	}
 
 	// remove a reference to the mosync runtime project

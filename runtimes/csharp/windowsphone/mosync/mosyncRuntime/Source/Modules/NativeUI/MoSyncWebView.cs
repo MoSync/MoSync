@@ -67,7 +67,7 @@ namespace MoSync
                     else
                     {
                         Uri uri;
-                        if (value.StartsWith("http://"))
+                        if (value.StartsWith("http://") || value.StartsWith("www."))
                         {
                             uri = new Uri(value, UriKind.Absolute);
                         }

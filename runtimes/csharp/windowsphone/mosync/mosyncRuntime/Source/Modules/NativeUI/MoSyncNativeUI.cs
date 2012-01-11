@@ -27,7 +27,6 @@ namespace MoSync
         public interface IScreen
         {
             void Show();
-            void AddApplicationBar(IWidget applicationBar);
         }
 
         public class MoSyncWidgetPropertyAttribute : Attribute

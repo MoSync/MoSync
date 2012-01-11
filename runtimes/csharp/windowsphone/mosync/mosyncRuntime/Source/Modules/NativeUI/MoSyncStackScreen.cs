@@ -59,7 +59,10 @@ namespace MoSync
             {
                 if (child is ApplicationBar)
                 {
-                    AddApplicationBar(child);
+                    MoSync.Util.RunActionOnMainThreadSync(() =>
+                    {
+                        mPage.ApplicationBar = (child as ApplicationBar).GetApplicationBar();
+                    });
                 }
                 else if (child is Screen)
                 {
