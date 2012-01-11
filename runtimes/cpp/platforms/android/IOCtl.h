@@ -892,6 +892,20 @@ namespace Base
 
 	int _maGetCellInfo(MAHandle mem, int memStart, JNIEnv* jNIEnv, jobject jThis);
 
+	// ********** Capture API  **********
+
+	int _maCaptureSetProperty(const char* property, const char* value, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureGetProperty(int memStart, const char* property, int memBuffer, int bufSize, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureAction(int action, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureWriteImage(MAHandle handle, const char* fullPathBuffer, int fullPathBufSize, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureGetVideoPath(int memStart, MAHandle handle, int buffer, int bufferSize, JNIEnv* jNIEnv, jobject jThis);
+
+	int _maCaptureDestroyData(MAHandle handle, JNIEnv* jNIEnv, jobject jThis);
+
 	// ********** Database API **********
 
 	/**
