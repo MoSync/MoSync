@@ -49,7 +49,6 @@ class TCPConnection;
  */
 class MainScreen:
 	public TabScreen,
-	public TabScreenListener,
 	public PushNotificationListener,
 	public TCPListener,
 	public SettingsScreenListener
@@ -66,6 +65,22 @@ public:
 	 */
 	virtual ~MainScreen();
 private:
+
+	/**
+	 * Used for Android only.
+	 * Check if the store exists.
+	 * If it does not exist, call the registration method,
+	 * create the store for later writing to it after the
+	 * connection to the server is established.
+	 */
+    void checkStore();
+
+    /**
+     * Used for Android only.
+     * Stores the registration ID in a store for later use.
+     * @param token The registration_ID.
+     */
+    void storeRegistrationID(MAUtil::String* token);
 
 	// PushNotificationListener methods
 
@@ -92,17 +107,6 @@ private:
      */
     virtual void didFaildToRegister(
         MAUtil::String& error);
-
-    // TabScreen listener method
-
-    /**
-     * This method is called when a tab screen has changed to a new tab.
-     * @param tabScreen The tab screen object that generated the event.
-     * @param tabScreenIndex The index of the new tab.
-     */
-    virtual void tabScreenTabChanged(
-        TabScreen* tabScreen,
-        const int tabScreenIndex);
 
     /**
      * Called when the application is connected to the server.
@@ -137,6 +141,12 @@ private:
 	 * Token received after registering to APNs / Google service.
 	 */
 	MAUtil::String* mToken;
+
+	/**
+	 * Android only.
+	 * Send reg ID to the server only first time the app is launched.
+	 */
+	bool mSendRegistrationNeeded;
 };
 
 #endif /* MAINSCREEN_H_ */

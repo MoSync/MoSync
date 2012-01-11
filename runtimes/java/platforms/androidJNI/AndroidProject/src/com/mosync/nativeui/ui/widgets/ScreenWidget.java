@@ -20,6 +20,7 @@ package com.mosync.nativeui.ui.widgets;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.util.Log;
 import android.view.ViewGroup;
 
 import com.mosync.internal.generated.IX_WIDGET;
@@ -56,11 +57,6 @@ public class ScreenWidget extends Layout
 	private TitleChangedListener m_titleChangedListener = null;
 
 	/**
-	 * Listener for when the icon changes.
-	 */
-	private IconChangedListener m_iconChangedListener = null;
-
-	/**
 	 * Constructor
 	 *
 	 * @param handle handle Integer handle corresponding to this instance.
@@ -95,10 +91,6 @@ public class ScreenWidget extends Layout
 			if( icon != null )
 			{
 				m_icon = new BitmapDrawable( NativeUI.getBitmap( imageHandle ) );
-				if ( m_iconChangedListener != null )
-				{
-					m_iconChangedListener.iconChanged( this, m_icon);
-				}
 			}
 			else
 			{
@@ -153,10 +145,6 @@ public class ScreenWidget extends Layout
 		m_titleChangedListener = titleChangedListener;
 	}
 
-	public void setIconChangedListener(IconChangedListener iconChangedListener)
-	{
-		m_iconChangedListener = iconChangedListener;
-	}
 	/**
 	 * A listener class for when the title of a screen changes,
 	 * so that the for example the tab screen has a chance
@@ -173,23 +161,5 @@ public class ScreenWidget extends Layout
 		 * @param newTitle The new title of the screen.
 		 */
 		void titleChanged(ScreenWidget screen, String newTitle);
-	}
-
-	/**
-	 * A listener class for when the icon of a screen changes,
-	 * so that the for example the tab screen has a chance
-	 * to update its icon in the tab indicator.
-	 *
-	 * @author emma
-	 */
-	public interface IconChangedListener
-	{
-		/**
-		 * Called when a icon of the screen has changed.
-		 *
-		 * @param screen The screen whose icon has changed.
-		 * @param newIcon The new icon of the screen.
-		 */
-		void iconChanged(ScreenWidget screen, Drawable newIcon);
 	}
 }

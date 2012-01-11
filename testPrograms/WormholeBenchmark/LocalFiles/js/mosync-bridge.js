@@ -107,6 +107,7 @@ var mosync = (function()
 		var messageSender = null;
 		var messageQueueJSON = [];
 		var messageSenderJSON = null;
+		var rawMessageQueue = [];
 
 		/**
 		 * Send message strings to C++. If a callback function is
@@ -265,6 +266,7 @@ var mosync = (function()
 			}
 			else if (mosync.isIOS)
 			{
+				rawMessageQueue.push(data);
 				window.location = "mosync://DataAvailable";
 			}
 			else if (mosync.isWindowsPhone)
@@ -273,8 +275,22 @@ var mosync = (function()
 			}
 			else
 			{
-				console.log("@@@ bridge.sendRaw: unknown platform");
+				alert("bridge.sendRaw: unknown platform");
 			}
+		};
+
+		/**
+		 *
+		 */
+		bridge.getMessageData = function()
+		{
+			if(rawMessageQueue.length == 0)
+			{
+				//return an empty string so the runtime knows we don't have anything
+				return "";
+			}
+			var message = rawMessageQueue.pop();
+			return message;
 		};
 
 		/**
